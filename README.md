@@ -1,4 +1,6 @@
-# UltraSM64-extbounds
+# Music Comp Hack (UltraSM64-extbounds)
+By anonymous_moose and InTheBeef
+
 Fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in `config.h`): 
 - slope fix
 - exposed ceilings fix
