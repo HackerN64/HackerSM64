@@ -27,3 +27,9 @@
 #include "metal_box/geo.inc.c"
 #include "exclamation_box_outline/geo.inc.c"
 #include "koopa_shell/geo.inc.c"
+
+#include "rosedrift/geo.inc.c"
+#include "patch_mario_stone/geo.inc.c"
+#include "plush_peach/geo.inc.c"
+#include "plush_bowser/geo.inc.c"
+#include "piranha_creeper/geo.inc.c"

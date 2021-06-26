@@ -79,3 +79,17 @@ UNUSED static const u64 binid_17 = 17;
 
 #include "koopa_shell/model.inc.c"
 UNUSED static const u64 binid_18 = 18;
+
+#include "rosedrift/model.inc.c"
+#include "rosedrift/anims/data.inc.c"
+#include "rosedrift/anims/table.inc.c"
+#include "patch_mario_stone/model.inc.c"
+#include "plush_peach/model.inc.c"
+#include "plush_peach/anims/data.inc.c"
+#include "plush_peach/anims/table.inc.c"
+#include "plush_bowser/model.inc.c"
+#include "plush_bowser/anims/data.inc.c"
+#include "plush_bowser/anims/table.inc.c"
+#include "piranha_creeper/model.inc.c"
+#include "piranha_creeper/anims/data.inc.c"
+#include "piranha_creeper/anims/table.inc.c"

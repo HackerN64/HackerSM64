@@ -118,7 +118,7 @@ static void toad_message_opaque(void) {
         if (gCurrentObject->oInteractStatus & INT_STATUS_INTERACTED) {
             gCurrentObject->oInteractStatus = 0;
             gCurrentObject->oToadMessageState = TOAD_MESSAGE_TALKING;
-            play_toads_jingle();
+            //play_toads_jingle();
         }
     }
 }
@@ -126,7 +126,7 @@ static void toad_message_opaque(void) {
 static void toad_message_talking(void) {
     if (cur_obj_update_dialog_with_cutscene(3, 1, CUTSCENE_DIALOG, gCurrentObject->oToadMessageDialogId)
         != 0) {
-        gCurrentObject->oToadMessageRecentlyTalked = TRUE;
+        //gCurrentObject->oToadMessageRecentlyTalked = TRUE;
         gCurrentObject->oToadMessageState = TOAD_MESSAGE_FADING;
         switch (gCurrentObject->oToadMessageDialogId) {
             case TOAD_STAR_1_DIALOG:

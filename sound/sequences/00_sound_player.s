@@ -368,6 +368,10 @@ sound_ref .sound_action_jump_default
 sound_ref .sound_action_jump_default
 sound_ref .sound_action_jump_default
 
+
+
+
+
 .sound_action_jump_default:
 chan_setbank 1
 chan_setinstr 0
@@ -2830,6 +2834,8 @@ sound_ref .sound_general_boing3
 sound_ref .sound_general_grand_star
 sound_ref .sound_general_grand_star_jump
 sound_ref .sound_general_boat_rock
+sound_ref .sound_stone_patch_break
+sound_ref .sound_stone_patch_deform
 .ifdef VERSION_JP
   sound_ref .sound_menu_enter_hole
   sound_ref .sound_menu_enter_hole
@@ -2852,6 +2858,7 @@ sound_ref .sound_general_boat_rock
   sound_ref .sound_general_boing2
   sound_ref .sound_general_yoshi_walk
   sound_ref .sound_general_enemy_alert1
+  
 .endif
 
 .sound_general_activate_cap_switch:
@@ -4898,6 +4905,18 @@ chan_setinstr 5
 chan_setdecayrelease 20
 chan_setlayer 1, .layer_1DE4
 chan_setlayer 2, .layer_1DE2
+chan_end
+
+.sound_stone_patch_break:
+chan_setbank 0
+chan_setinstr 6
+chan_setlayer 0, .layer_234
+chan_end
+
+.sound_stone_patch_deform:
+chan_setbank 0
+chan_setinstr 7
+chan_setlayer 0, .layer_234
 chan_end
 
 .layer_1DD4:

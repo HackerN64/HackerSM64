@@ -25,3 +25,6 @@
 #include "white_particle_small/model.inc.c"
 
 #include "sparkle_animation/model.inc.c"
+
+#include "mario/collision.inc.c"
+#include "plush_mario/model.inc.c"

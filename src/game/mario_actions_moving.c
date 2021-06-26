@@ -206,11 +206,18 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
 
     //! Speed is capped a frame late (butt slide HSG)
     m->forwardVel = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+    if (m->curPatch == 1) {
+        if (m->forwardVel > 200.0f) {
+        m->slideVelX = m->slideVelX * 200.0f / m->forwardVel;
+        m->slideVelZ = m->slideVelZ * 200.0f / m->forwardVel;
+    }
+    }
+    else {
     if (m->forwardVel > 100.0f) {
         m->slideVelX = m->slideVelX * 100.0f / m->forwardVel;
         m->slideVelZ = m->slideVelZ * 100.0f / m->forwardVel;
     }
-
+    }
     if (newFacingDYaw < -0x4000 || newFacingDYaw > 0x4000) {
         m->forwardVel *= -1.0f;
     }
@@ -237,11 +244,17 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
         case SURFACE_CLASS_VERY_SLIPPERY:
             accel = 10.0f;
             lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.98f;
+            if (m->curPatch == 1) {
+                accel = 20.0f;
+            }
             break;
 
         case SURFACE_CLASS_SLIPPERY:
             accel = 8.0f;
             lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.96f;
+            if (m->curPatch == 1) {
+                accel = 16.0f;
+            }
             break;
 
         default:
@@ -254,6 +267,8 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
             lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.92f;
             break;
     }
+
+    
 
     oldSpeed = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
 
@@ -779,7 +794,7 @@ s32 act_walking(struct MarioState *m) {
     s16 startYaw = m->faceAngle[1];
 
     mario_drop_held_object(m);
-
+if (m->curPatch != 1) {
     if (should_begin_sliding(m)) {
         return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
     }
@@ -807,16 +822,31 @@ s32 act_walking(struct MarioState *m) {
     if (m->input & INPUT_Z_PRESSED) {
         return set_mario_action(m, ACT_CROUCH_SLIDE, 0);
     }
-
+}
     m->actionState = 0;
 
     vec3f_copy(startPos, m->pos);
     update_walking_speed(m);
 
+    if (m->curPatch == 1) {
+
+        if (m->forwardVel < 1.0f && m->intendedMag == 0) {
+            m->marioObj->header.gfx.animInfo.curAnim->flags |= ANIM_FLAG_2;
+            
+        }
+        
+        
+    }
+
     switch (perform_ground_step(m)) {
         case GROUND_STEP_LEFT_GROUND:
+        if (m->curPatch == 1) {
+          set_mario_action(m, ACT_STONE_PATCH_AIRBORNE, 0);  
+        }
+        else {
             set_mario_action(m, ACT_FREEFALL, 0);
             set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
+        }
             break;
 
         case GROUND_STEP_NONE:
@@ -827,8 +857,10 @@ s32 act_walking(struct MarioState *m) {
             break;
 
         case GROUND_STEP_HIT_WALL:
+        if (m->curPatch != 1) {
             push_or_sidle_wall(m, startPos);
             m->actionTimer = 0;
+        }
             break;
     }
 
@@ -1347,6 +1379,30 @@ s32 act_burning_ground(struct MarioState *m) {
 #if ENABLE_RUMBLE
     reset_rumble_timers();
 #endif
+    return FALSE;
+}
+
+s32 act_stone_patch_grounded(struct MarioState *m) {
+    act_walking(m);
+    
+    if(m->forwardVel > 0) {
+        //m->forwardVel -= 4;
+    }
+    return FALSE;
+}
+
+s32 act_stone_patch_air_land(struct MarioState *m) {
+
+
+    //apply_slope_decel(m, 0.4f);
+    //perform_ground_step(m);
+
+    if (m->forwardVel != 0) {
+        common_slide_action(m, ACT_STONE_PATCH_AIR_LAND, ACT_STONE_PATCH_AIRBORNE, m->animation);
+        update_sliding(m, 7.0f);
+    //cur_obj_play_sound_2(SOUND_ENV_SLIDING);
+    }
+
     return FALSE;
 }
 
@@ -2023,6 +2079,8 @@ s32 mario_execute_moving_action(struct MarioState *m) {
         case ACT_QUICKSAND_JUMP_LAND:      cancel = act_quicksand_jump_land(m);      break;
         case ACT_HOLD_QUICKSAND_JUMP_LAND: cancel = act_hold_quicksand_jump_land(m); break;
         case ACT_LONG_JUMP_LAND:           cancel = act_long_jump_land(m);           break;
+        case ACT_STONE_PATCH_GROUNDED:           cancel = act_stone_patch_grounded(m);           break;
+        case ACT_STONE_PATCH_AIR_LAND:        cancel = act_stone_patch_air_land(m);        break;
     }
     /* clang-format on */
 

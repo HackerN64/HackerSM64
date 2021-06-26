@@ -3,7 +3,7 @@
     "00_sound_player": ["00", "01_terrain", "02_water", "03", "04", "05", "06", "07", "08_mario", "09", "0A_mario_peach"],
     "01_cutscene_collect_star": ["22"],
     "02_menu_title_screen": ["11"],
-    "03_level_grass": ["22"],
+    "03_level_grass": ["25"],
     "04_level_inside_castle": ["0E"],
     "05_level_water": ["13"],
     "06_level_hot": ["0F"],
@@ -12,7 +12,7 @@
     "09_level_slide": ["0D"],
     "0A_level_spooky": ["10", "21"],
     "0B_event_piranha_plant": ["14_piranha_music_box"],
-    "0C_level_underground": ["15"],
+    "0C_level_underground": ["25"],
     "0D_menu_star_select": ["16_course_start"],
     "0E_event_powerup": ["17"],
     "0F_event_metal_cap": ["18"],
@@ -33,6 +33,6 @@
     "1E_cutscene_intro": ["1B"],
     "1F_cutscene_victory": ["1A"],
     "20_cutscene_ending": ["23"],
-    "21_menu_file_select": ["24"],
+    "21_menu_file_select": ["0C"],
     "22_cutscene_lakitu": {"ifdef": ["VERSION_US", "VERSION_EU", "VERSION_SH"], "banks": ["1B"]}
 }

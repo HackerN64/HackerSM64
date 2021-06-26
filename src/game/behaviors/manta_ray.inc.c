@@ -41,87 +41,16 @@ void bhv_manta_ray_init(void) {
 }
 
 static void manta_ray_move(void) {
-    s16 animFrame;
-    s32 pathStatus;
-
-    animFrame = o->header.gfx.animInfo.animFrame;
-    gCurrentObject->oPathedStartWaypoint = (struct Waypoint *) sMantaRayTraj;
-    pathStatus = cur_obj_follow_path(pathStatus);
-    o->oMantaTargetYaw   = o->oPathedTargetYaw;
-    o->oMantaTargetPitch = o->oPathedTargetPitch;
-    o->oForwardVel = 10.0f;
-
-    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oMantaTargetYaw, 0x80);
-    o->oMoveAnglePitch = approach_s16_symmetric(o->oMoveAnglePitch, o->oMantaTargetPitch, 0x80);
     
-    // This causes the ray to tilt as it turns.
-    if ((s16) o->oMantaTargetYaw != (s16) o->oMoveAngleYaw) {
-        o->oMoveAngleRoll -= 91;
-        if (o->oMoveAngleRoll < -5461.3332) {
-            o->oMoveAngleRoll = -0x4000 / 3;
-        }
-    } else {
-        o->oMoveAngleRoll += 91;
-        if (o->oMoveAngleRoll > 5461.3332) {
-            o->oMoveAngleRoll = 0x4000 / 3;
-        }
-    }
-
-    cur_obj_set_pos_via_transform();
-    if (animFrame == 0) {
-        cur_obj_play_sound_2(SOUND_GENERAL_MOVING_WATER);
-    }
 }
 
 static void manta_ray_act_spawn_ring(void) {
-    struct Object *ringManager = o->parentObj;
-    struct Object *ring;
-
-    if (o->oTimer == 300) {
-        o->oTimer = 0;
-    }
-
-    if (o->oTimer == 0 || o->oTimer == 50 || o->oTimer == 150 || o->oTimer == 200 || o->oTimer == 250) {
-        ring = spawn_object(o, MODEL_WATER_RING, bhvMantaRayWaterRing);
-
-        ring->oFaceAngleYaw = o->oMoveAngleYaw;
-        ring->oFaceAnglePitch = o->oMoveAnglePitch + 0x4000;
-
-        ring->oPosX = o->oPosX + 200.0f * sins(o->oMoveAngleYaw + 0x8000);
-        ring->oPosY = o->oPosY + 10.0f + 200.0f * sins(o->oMoveAnglePitch);
-        ring->oPosZ = o->oPosZ + 200.0f * coss(o->oMoveAngleYaw + 0x8000);
-        ring->oWaterRingIndex = ringManager->oWaterRingMgrNextRingIndex;
-
-        ringManager->oWaterRingMgrNextRingIndex++;
-        if (ringManager->oWaterRingMgrNextRingIndex > 10000) {
-            ringManager->oWaterRingMgrNextRingIndex = 0;
-        }
-    }
+    
 }
 
 /**
  * Behavior that occurs every frame.
  */
 void bhv_manta_ray_loop(void) {
-    switch (o->oAction) {
-        case MANTA_ACT_SPAWN_RINGS:
-            manta_ray_move();
-            manta_ray_act_spawn_ring();
-
-            // Spawn a star after collecting 5 rings.
-            if (o->oWaterRingSpawnerRingsCollected == 5) {
-                spawn_mist_particles();
-                spawn_default_star(-3180.0f, -3600.0f, 120.0f);
-                o->oAction = MANTA_ACT_NO_RINGS;
-            }
-            break;
-
-        case MANTA_ACT_NO_RINGS:
-            manta_ray_move();
-            break;
-    }
-
-    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-        o->oInteractStatus = 0;
-    }
+    
 }

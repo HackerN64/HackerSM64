@@ -132,34 +132,7 @@ void moneybag_act_move_around(void) {
 }
 
 void moneybag_act_return_home(void) {
-    s16 collisionFlags;
-    f32 sp28 = o->oHomeX - o->oPosX;
-    f32 sp24 = o->oHomeZ - o->oPosZ;
-    s16 sp22 = atan2s(sp24, sp28);
-    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, sp22, 0x800);
-
-    collisionFlags = object_step();
-    if (((collisionFlags & OBJ_COL_FLAGS_LANDED) == OBJ_COL_FLAGS_LANDED)
-        && (o->oMoneybagJumpState == MONEYBAG_JUMP_LANDING))
-        o->oMoneybagJumpState = MONEYBAG_JUMP_WALK_HOME;
-
-    moneybag_jump(collisionFlags);
-    moneybag_check_mario_collision();
-
-    if (is_point_close_to_object(o, o->oHomeX, o->oHomeY, o->oHomeZ, 100)) {
-        spawn_object(o, MODEL_YELLOW_COIN, bhvMoneybagHidden);
-#ifndef VERSION_JP
-        cur_obj_play_sound_2(SOUND_GENERAL_VANISH_SFX);
-#endif
-        cur_obj_init_animation(0);
-        o->oAction = MONEYBAG_ACT_DISAPPEAR;
-        o->oMoneybagJumpState = MONEYBAG_JUMP_LANDING;
-    }
-
-    if (is_point_within_radius_of_mario(o->oHomeX, o->oHomeY, o->oHomeZ, 800) == 1) {
-        o->oAction = MONEYBAG_ACT_MOVE_AROUND;
-        o->oMoneybagJumpState = MONEYBAG_JUMP_LANDING;
-    }
+   
 }
 
 void moneybag_act_disappear(void) {

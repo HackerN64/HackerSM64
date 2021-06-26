@@ -1190,9 +1190,27 @@ s32 transition_submerged_to_airborne(struct MarioState *m) {
  * non-submerged action. This also applies the water surface camera preset.
  */
 s32 set_water_plunge_action(struct MarioState *m) {
+static int plungeCringe;
+
     m->forwardVel = m->forwardVel / 4.0f;
     m->vel[1] = m->vel[1] / 2.0f;
 
+    if (m->curPatch == 1) {
+         m->forwardVel = m->forwardVel / 4.0f;
+    m->vel[1] = m->vel[1] * 2.0f;
+    
+    
+    
+    if (plungeCringe == 0) {
+    m->particleFlags |= PARTICLE_WATER_SPLASH;
+    plungeCringe = 1;
+    play_sound(SOUND_ACTION_UNKNOWN430, m->marioObj->header.gfx.cameraToObject);
+    }
+        return;
+    }
+    else {
+        plungeCringe = 0;
+    }
     // !BUG: Causes waterbox upwarp
     // m->pos[1] = m->waterLevel - 100;
 
@@ -1710,12 +1728,63 @@ void func_sh_8025574C(void) {
     }
 }
 #endif
-
+struct SpawnParticlesInfo StoneBreak = {
+    0, 30, MODEL_PEBBLE, 0, 40, 0, 20, 40, 252, 30, 5.0f, 0.0f
+};
+struct SpawnParticlesInfo StoneForm = {
+    2, 25, MODEL_MIST, 20.0f, -20, 0, 20, 40, 252, 30, 15.0f, 0.0f
+};
+struct SpawnParticlesInfo ThornPass = {
+    1, 10, MODEL_LEAVES, 20.0f, -20, 0, 20, 40, 252, 30, 15.0f, 0.0f
+};
 /**
  * Main function for executing Mario's behavior.
  */
 s32 execute_mario_action(UNUSED struct Object *o) {
     s32 inLoop = TRUE;
+
+    //DEBUG
+    if (gPlayer1Controller->buttonDown & D_JPAD) {
+        gMarioState->vel[1] = 20.0f;
+    }
+
+    if (gPlayer1Controller->buttonPressed & L_TRIG) {
+        switch (gMarioState->curPatch) {
+            case 0:
+        o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_PATCH_MARIO_STONE];
+        gMarioState->curPatch = 1;
+        cur_obj_spawn_particles(&StoneForm);
+        play_sound(SOUND_STONE_PATCH_BREAK, gMarioState->marioObj->header.gfx.cameraToObject);
+        if (gMarioState->action == ACT_IDLE || gMarioState->action == ACT_PANTING || gMarioState->action == ACT_WALKING) {
+        set_mario_action(gMarioState, ACT_STONE_PATCH_GROUNDED, 0);
+        }
+        else {
+        set_mario_action(gMarioState, ACT_STONE_PATCH_AIRBORNE, 0);
+        }
+        break;
+        case 1: gMarioState->curPatch = 0;
+        o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_MARIO];
+        set_mario_action(gMarioState, ACT_FORWARD_ROLLOUT, 0);
+        gMarioState->vel[1] += 5.0f;
+        cur_obj_spawn_particles(&StoneBreak);
+        play_sound(SOUND_STONE_PATCH_DEFORM, gMarioState->marioObj->header.gfx.cameraToObject);
+        }
+    }
+
+    if (gMarioState->thornParticles == 1) {
+         cur_obj_spawn_particles(&ThornPass);
+         play_sound(SOUND_ACTION_CLIMB_UP_TREE, gMarioState->marioObj->header.gfx.cameraToObject);
+        gMarioState->thornParticles = 2;
+    }
+
+static int thornPartCount;
+    if (gMarioState->thornParticles == 2 && gMarioState->forwardVel > 5.0f) {
+        thornPartCount += 1;
+        if (thornPartCount == 20) {
+            thornPartCount = 0;
+            gMarioState->thornParticles = 0;
+        }
+    }
 
     if (gMarioState->action) {
         gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;

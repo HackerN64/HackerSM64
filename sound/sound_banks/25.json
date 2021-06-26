@@ -168,7 +168,7 @@
         "inst11": {
             "release_rate": 10,
             "envelope": "envelope12",
-            "sound": "44_grand_piano"
+            "sound": "49_human_voice"
         },
         "inst12": {
             "release_rate": 10,

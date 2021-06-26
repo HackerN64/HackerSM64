@@ -118,7 +118,45 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode,
             if (surf->type == SURFACE_CAMERA_BOUNDARY || surf->type == SURFACE_NEW_WATER || surf->type == SURFACE_NEW_WATER_BOTTOM) {
                 continue;
             }
-
+            if (surf->type == SURFACE_THORN_BUSH) {
+                if (gMarioState->curPatch != 1) {
+                if (gMarioState->action == ACT_BACKWARD_AIR_KB)
+                {
+                    gMarioState->action = ACT_FORWARD_AIR_KB;
+                gMarioState->vel[1] = 30.0f;
+                }
+                else {
+                gMarioState->action = ACT_BACKWARD_AIR_KB;
+                gMarioState->vel[1] = 10.0f;
+                mario_set_forward_vel(gMarioState, -50);
+                }
+                continue;
+                }
+                else {
+                    continue;
+                }
+            }
+            if (surf->type == SURFACE_THORN_WALL) {
+                if (gMarioState->curPatch != 1) {
+                    if (gMarioState->action != ACT_LAVA_BOOST) {
+                check_lava_boost(gMarioState);
+                    }
+                }
+                else {
+                   
+                    
+                    if (gMarioState->thornParticles == 0) {
+                    gMarioState->thornParticles = 1;
+                    
+                    }
+                    continue;
+                }
+            }
+            else {
+                gMarioState->thornParticles = 0;
+            }
+            
+            
             // If an object can pass through a vanish cap wall, pass through.
             if (surf->type == SURFACE_VANISH_CAP_WALLS) {
                 // If an object can pass through a vanish cap wall, pass through.
@@ -439,11 +477,15 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         if (y < (height - 78.0f)) {
             continue;
         }
+        if (surf != NULL && surf->type == SURFACE_THORNS && gMarioState->curPatch == 1) {
+            continue;
+        }
         *pheight = height;
         floor = surf;
         if (height - 78.0f == y) {
             break;
         }
+        
     }
     return floor;
 }
@@ -517,6 +559,8 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
         }
     }
 
+
+    
     return floor;
 }
 
@@ -612,6 +656,8 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
         // To prevent accidentally leaving the floor tangible, stop checking for it.
         gFindFloorIncludeSurfaceIntangible = FALSE;
     }
+
+    
 
     // If a floor was missed, increment the debug counter.
     if (floor == NULL) {

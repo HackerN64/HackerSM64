@@ -1887,6 +1887,11 @@ void mario_handle_special_floors(struct MarioState *m) {
                 case SURFACE_BURNING:
                     check_lava_boost(m);
                     break;
+                case SURFACE_THORNS:
+                if (gMarioState->curPatch != 1) {
+                check_lava_boost(m);
+                }
+                    break;
             }
         }
     }

@@ -552,6 +552,14 @@ void bhv_dust_smoke_loop(void);
 void bhv_yoshi_loop(void);
 void bhv_volcano_trap_loop(void);
 
+void rosedrift_init(void);
+void rosedrift_loop(void);
+void piranha_creeper_loop(void);
+void piranha_creeper_init(void);
+void piranha_creeper_checkpoint_loop(void);
+
+Gfx *geo_piranha_creeper_vine(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
+
 Gfx *geo_move_mario_part_from_parent(s32 run, UNUSED struct GraphNode *node, Mat4 mtx);
 
 // Bowser

@@ -1240,6 +1240,29 @@ s32 act_thrown_forward(struct MarioState *m) {
     return FALSE;
 }
 
+s32 act_stone_patch_airborne(struct MarioState *m) {
+    s32 stepResult;
+    m->vel[1] -= 1.0f;
+    m->marioObj->header.gfx.animInfo.curAnim->flags |= ANIM_FLAG_2;
+    
+    stepResult = perform_air_step(m, 0);
+
+    if (stepResult == AIR_STEP_LANDED) {
+        set_mario_action(m, ACT_STONE_PATCH_AIR_LAND, 0);
+        play_mario_heavy_landing_sound(m, SOUND_ACTION_TERRAIN_HEAVY_LANDING);
+                    m->particleFlags |= PARTICLE_MIST_CIRCLE | PARTICLE_HORIZONTAL_STAR;
+        if (m->forwardVel > 0) {
+        m->forwardVel -= 4.0f;
+        }
+    }
+    //apply_landing_accel(m, 6.0f);
+    return FALSE;
+}
+
+
+
+
+
 s32 act_soft_bonk(struct MarioState *m) {
     if (check_wall_kick(m)) {
         return TRUE;
@@ -2112,6 +2135,8 @@ s32 mario_execute_airborne_action(struct MarioState *m) {
         case ACT_RIDING_HOOT:          cancel = act_riding_hoot(m);          break;
         case ACT_TOP_OF_POLE_JUMP:     cancel = act_top_of_pole_jump(m);     break;
         case ACT_VERTICAL_WIND:        cancel = act_vertical_wind(m);        break;
+        case ACT_STONE_PATCH_AIRBORNE:        cancel = act_stone_patch_airborne(m);        break;
+        
     }
     /* clang-format on */
 

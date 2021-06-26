@@ -203,4 +203,22 @@ extern const GeoLayout test_platform_geo[];
 extern const Gfx unknown_seg8_dl_08026260[];
 extern const Collision unknown_seg8_collision_080262F8[];
 
+#include "rosedrift/geo_header.h"
+
+
+#include "rosedrift/anim_header.h"
+#include "patch_mario_stone/geo_header.h"
+
+#include "plush_peach/geo_header.h"
+
+
+#include "plush_peach/anim_header.h"
+#include "plush_bowser/geo_header.h"
+
+
+#include "plush_bowser/anim_header.h"
+#include "piranha_creeper/geo_header.h"
+
+
+#include "piranha_creeper/anim_header.h"
 #endif

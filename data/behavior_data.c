@@ -1586,7 +1586,7 @@ const BehaviorScript bhvBetaFishSplashSpawner[] = {
 const BehaviorScript bhvSpindrift[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    LOAD_ANIMATIONS(oAnimations, spindrift_seg5_anims_05002D68),
+    LOAD_ANIMATIONS(oAnimations, rosedrift_anims),
     ANIMATE(0),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ -400, /*Bounciness*/ 0, /*Drag strength*/ 0, /*Friction*/ 0, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     SET_HOME(),
@@ -6106,4 +6106,46 @@ const BehaviorScript bhvIntroScene[] = {
     END_LOOP(),
 };
 
+const BehaviorScript bhvRosedrift[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, rosedrift_anims),
+    ANIMATE(0),
+    SET_INTERACT_TYPE(INTERACT_TEXT),
+    SET_HITBOX(/*Radius*/ 80, /*Height*/ 100),
+    SET_INT(oIntangibleTimer, 0),
+    CALL_NATIVE(bhv_toad_message_init),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_toad_message_loop),
+        CALL_NATIVE(rosedrift_loop),
+    END_LOOP(),
+};
 
+const BehaviorScript bhvPiranhaCreeper[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    LOAD_ANIMATIONS(oAnimations, piranha_creeper_anims),
+    ANIMATE(0),
+    SET_INTERACT_TYPE(INTERACT_DAMAGE),
+    SET_HITBOX(/*Radius*/ 100, /*Height*/ 200),
+    SET_HURTBOX(/*Radius*/ 50, /*Height*/ 200),
+    SET_INT(oIntangibleTimer, 0),
+    SET_INT(oDamageOrCoinValue, 3),
+    SET_INT(oNumLootCoins, 5),
+    //SPAWN_CHILD(/*Model*/ MODEL_BUBBLE, /*Behavior*/ bhvPiranhaPlantBubble),
+    SET_FLOAT(oDrawingDistance, 20000),
+    CALL_NATIVE(piranha_creeper_init),
+    SET_HOME(),
+    BEGIN_LOOP(),
+        CALL_NATIVE(piranha_creeper_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvPiranhaCreeperCheckpoint[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    SET_HITBOX(/*Radius*/ 300, /*Height*/ 300),
+    BEGIN_LOOP(),
+        CALL_NATIVE(piranha_creeper_checkpoint_loop),
+    END_LOOP(),
+};

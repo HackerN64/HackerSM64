@@ -345,6 +345,16 @@ struct MarioState
     /*0xBC*/ f32 peakHeight;
     /*0xC0*/ f32 quicksandDepth;
     /*0xC4*/ f32 unkC4;
+
+    int thornParticles;
+
+/*
+PATCH IDS:
+0: No Patch
+1: Stone Patch
+*/
+
+    int curPatch;
 };
 
 #endif // TYPES_H

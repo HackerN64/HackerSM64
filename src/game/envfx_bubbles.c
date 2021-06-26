@@ -72,7 +72,9 @@ s32 random_flower_offset(void) {
  */
 void envfx_update_flower(Vec3s centerPos) {
     s32 i;
+    s16 floorY;
     struct FloorGeometry *floorGeo; // unused
+    struct Surface *surface;
     s32 timer = gGlobalTimer;
 
     s16 centerX = centerPos[0];
@@ -81,11 +83,12 @@ void envfx_update_flower(Vec3s centerPos) {
 
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
         (gEnvFxBuffer + i)->isAlive = particle_is_laterally_close(i, centerX, centerZ, 3000);
+        floorY =
+        find_floor((gEnvFxBuffer + i)->xPos, centerY + 500, (gEnvFxBuffer + i)->zPos, &surface);
+        
         if ((gEnvFxBuffer + i)->isAlive == 0) {
-            (gEnvFxBuffer + i)->xPos = random_flower_offset() + centerX;
-            (gEnvFxBuffer + i)->zPos = random_flower_offset() + centerZ;
-            (gEnvFxBuffer + i)->yPos = find_floor_height_and_data((gEnvFxBuffer + i)->xPos, 10000.0f,
-                                                                  (gEnvFxBuffer + i)->zPos, &floorGeo);
+            
+            envfx_set_lava_bubble_position(i, centerPos);
             (gEnvFxBuffer + i)->isAlive = 1;
             (gEnvFxBuffer + i)->animFrame = random_float() * 5.0f;
         } else if ((timer & 0x03) == 0) {
@@ -94,7 +97,8 @@ void envfx_update_flower(Vec3s centerPos) {
                 (gEnvFxBuffer + i)->animFrame = 0;
             }
         }
-    }
+
+}
 }
 
 /**
@@ -139,7 +143,7 @@ void envfx_set_lava_bubble_position(s32 index, Vec3s centerPos) {
         return;
     }
 
-    if (surface->type == SURFACE_BURNING) {
+    if (surface->type == SURFACE_THORNS) {
         (gEnvFxBuffer + index)->yPos = floorY;
     } else {
         (gEnvFxBuffer + index)->yPos = FLOOR_LOWER_LIMIT_MISC;

@@ -754,6 +754,14 @@
 #define /*0x10C*/ oSLWalkingPenguinCurStep           OBJECT_FIELD_S32(0x21)
 #define /*0x110*/ oSLWalkingPenguinCurStepTimer      OBJECT_FIELD_S32(0x22)
 
+
+#define /*0x0F4*/ oPiranhaCreeperCheckpointState OBJECT_FIELD_S32(0x1B)
+
+#define /*0x0F4*/ oPiranhaCreeperPathIndex OBJECT_FIELD_S32(0x1B)
+#define /*0x0AC*/ oPiranhaCreeperInitX                       OBJECT_FIELD_F32(0x1C)
+#define /*0x0AC*/ oPiranhaCreeperInitY                       OBJECT_FIELD_F32(0x1D)
+#define /*0x0AC*/ oPiranhaCreeperInitZ                       OBJECT_FIELD_F32(0x1E)
+
 /* Piranha Plant */
 #define /*0x0F4*/ oPiranhaPlantSleepMusicState OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oPiranhaPlantScale           OBJECT_FIELD_F32(0x1C)
