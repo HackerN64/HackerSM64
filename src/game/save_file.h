@@ -11,6 +11,15 @@
 #define EEPROM_SIZE 0x200
 #define NUM_SAVE_FILES 4
 
+#ifdef EEP4K
+    #define SAVE_SIZE 512
+#endif
+#ifdef EEP16k
+    #define SAVE_SIZE 2048
+#endif
+#ifdef SRAM
+    #define SAVE_SIZE 32768 
+#endif
 struct SaveBlockSignature
 {
     u16 magic;
@@ -54,6 +63,7 @@ struct MainMenuSaveData
     u16 soundMode;
     u8 widescreen;
     u8 consoleRegion;
+    u32 array[3];
 
 #ifdef VERSION_EU
     u16 language;
@@ -63,7 +73,7 @@ struct MainMenuSaveData
 #endif
 
     // Pad to match the EEPROM size of 0x200 (10 bytes on JP/US, 8 bytes on EU)
-    u8 filler[EEPROM_SIZE / 2 - SUBTRAHEND - NUM_SAVE_FILES * (4 + sizeof(struct SaveFile))];
+    //u8 filler[EEPROM_SIZE / 2 - SUBTRAHEND - NUM_SAVE_FILES * (4 + sizeof(struct SaveFile))];
 
     struct SaveBlockSignature signature;
 };
@@ -75,6 +85,8 @@ struct SaveBuffer
     // The main menu data has two copies. If one is bad, the other is used as a backup.
     struct MainMenuSaveData menuData[2];
 };
+
+STATIC_ASSERT(sizeof(struct SaveBuffer) <= SAVE_SIZE, "ERROR: Save struct too big for specified save type");
 
 extern u8 gLastCompletedCourseNum;
 extern u8 gLastCompletedStarNum;
