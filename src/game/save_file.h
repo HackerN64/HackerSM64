@@ -8,18 +8,16 @@
 
 #include "course_table.h"
 
-#define EEPROM_SIZE 0x200
+#if defined(SRAM)
+    #define EEPROM_SIZE 0x8000
+#elif defined(EEP16K)
+    #define EEPROM_SIZE 0x800
+#else
+    #define EEPROM_SIZE 0x200
+#endif
+
 #define NUM_SAVE_FILES 4
 
-#ifdef EEP4K
-    #define SAVE_SIZE 512
-#endif
-#ifdef EEP16k
-    #define SAVE_SIZE 2048
-#endif
-#ifdef SRAM
-    #define SAVE_SIZE 32768 
-#endif
 struct SaveBlockSignature
 {
     u16 magic;
@@ -63,11 +61,10 @@ struct MainMenuSaveData
     u16 soundMode;
     u8 widescreen;
     u8 consoleRegion;
-    u32 array[3];
 
 #ifdef VERSION_EU
     u16 language;
-#define SUBTRAHEND 8
+#define SUBTRAHEND 10
 #else
 #define SUBTRAHEND 8
 #endif
@@ -86,7 +83,7 @@ struct SaveBuffer
     struct MainMenuSaveData menuData[2];
 };
 
-STATIC_ASSERT(sizeof(struct SaveBuffer) <= SAVE_SIZE, "ERROR: Save struct too big for specified save type");
+STATIC_ASSERT(sizeof(struct SaveBuffer) <= EEPROM_SIZE, "ERROR: Save struct too big for specified save type");
 
 extern u8 gLastCompletedCourseNum;
 extern u8 gLastCompletedStarNum;
