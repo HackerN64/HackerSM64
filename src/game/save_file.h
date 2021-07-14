@@ -52,12 +52,14 @@ struct MainMenuSaveData
     // on the high score screen.
     u32 coinScoreAges[NUM_SAVE_FILES];
     u16 soundMode;
+    u8 widescreen;
+    u8 consoleRegion;
 
 #ifdef VERSION_EU
     u16 language;
 #define SUBTRAHEND 8
 #else
-#define SUBTRAHEND 6
+#define SUBTRAHEND 8
 #endif
 
     // Pad to match the EEPROM size of 0x200 (10 bytes on JP/US, 8 bytes on EU)
@@ -150,6 +152,7 @@ void save_file_set_cannon_unlocked(void);
 void save_file_set_cap_pos(s16 x, s16 y, s16 z);
 s32 save_file_get_cap_pos(Vec3s capPos);
 void save_file_set_sound_mode(u16 mode);
+void save_file_set_widescreen_mode(u8 wide);
 u16 save_file_get_sound_mode(void);
 void save_file_move_cap_to_default_location(void);
 

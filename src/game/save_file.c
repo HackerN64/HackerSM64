@@ -629,6 +629,11 @@ void save_file_set_sound_mode(u16 mode) {
     save_main_menu_data();
 }
 
+void save_file_set_widescreen_mode(u8 wide) {
+    gWidescreen = wide;
+    gSaveBuffer.menuData[0].widescreen = wide;
+}
+
 u16 save_file_get_sound_mode(void) {
     return gSaveBuffer.menuData[0].soundMode;
 }
