@@ -29,12 +29,10 @@
 #define BUGFIX_BOWSER_FALLEN_OFF_STAGE (0 || VERSION_US || VERSION_EU || VERSION_SH)
 /// Fixes bug where Bowser would look weird while fading out
 #define BUGFIX_BOWSER_FADING_OUT (0 || VERSION_US || VERSION_EU || VERSION_SH)
-/// Removes multi-language cake screen
-#define EU_CUSTOM_CAKE_FIX 1
 
 // Support Rumble Pak
 // Currently not recommended, as it may cause random crashes.
-//#define ENABLE_RUMBLE (1 || VERSION_SH)
+// #define ENABLE_RUMBLE (1 || VERSION_SH)
 
 // Clear RAM on boot
 #define CLEARRAM 1
@@ -59,7 +57,7 @@
 // The end quote should be here:               "
 #define INTERNAL_ROM_NAME "SUPERMARIO64        "
 // Disable lives and hide the lives counter
-#define DISABLE_LIVES
+// #define DISABLE_LIVES
 // Skip peach letter cutscene
 #define PEACH_SKIP
 // Fixes the castle music sometimes triggering after getting a dialog
@@ -67,15 +65,15 @@
 // Remove course specific camera processing
 #define CAMERA_FIX
 // Change the movement speed when hanging from a ceiling
-#define HANGING_SPEED 12.f
+#define HANGING_SPEED 12.0f
 // Makes Mario face the direction of the analog stick directly while hanging from a ceiling, without doing "semicircles"
 #define TIGHTER_HANGING_CONTROLS
-// Makes Mario turn around instantly when moving on the ground
-//#define SUPER_RESPONSIVE_CONTROLS
+// Makes Mario turn around instantly when moving on the ground (broken)
+#define SUPER_RESPONSIVE_CONTROLS
 // Disables fall damage
 #define NO_FALL_DAMAGE
 // Disables the scream that mario makes when falling off a great height (this is separate from actual fall damage)
-//#define NO_FALL_DAMAGE_SOUND
+// #define NO_FALL_DAMAGE_SOUND
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
 #define X_COIN_STAR 100
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Breaks treadmills.
@@ -83,14 +81,13 @@
 // Stars don't kick you out of the level
 // #define NON_STOP_STARS
 // Uncomment this if you want global star IDs (useful for creating an open world hack ala MVC)
-//#define GLOBAL_STAR_IDS
+// #define GLOBAL_STAR_IDS
 // Uncomment this if you want to skip the title screen (Super Mario 64 logo)
-//#define SKIP_TITLE_SCREEN
+// #define SKIP_TITLE_SCREEN
 // Uncomment this if you want to keep the mario head and not skip it
-//#define KEEP_MARIO_HEAD
+#define KEEP_MARIO_HEAD
 // Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
 #define IA8_COINS
-
 
 // HACKER QOL 
 // Enable widescreen (16:9) support
@@ -121,16 +118,16 @@
 #define HANGING_FIX
 // The last frame that will be considered a firsty when wallkicking
 #define FIRSTY_LAST_FRAME 1
-// 46 degree walkicks
-//#define WALLKICKS_46_DEGREES
+// 46 degree wallkicks
+#define WALLKICKS_46_DEGREES
 // Disable BLJs and crush SimpleFlips's dreams
-//#define DISABLE_BLJ
+// #define DISABLE_BLJ
 
 // RELATING TO EXIT COURSE
 // Disable exit course
-//#define DISABLE_EXIT_COURSE
+// #define DISABLE_EXIT_COURSE
 // Decides whether you can exit course while moving (has no effect if you disable exit course)
-//#define EXIT_COURSE_WHILE_MOVING
+#define EXIT_COURSE_WHILE_MOVING
 // Decides which level "exit course" takes you to (has no effect if you disable exit course)
 #define EXIT_COURSE_LEVEL LEVEL_CASTLE
 // Decides the area node "exit course" takes you to (has no effect if you disable exit course)
@@ -145,5 +142,48 @@
 #define SKYBOX_SIZE 1
 
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
+
+// Makes obj_resolve_object_collisions work consistently
+#define OBJ_COLLISIONS_FIX
+
+// Glowing effect on power stars
+#define STAR_GLOW
+
+#define HELD_TRANSPARENT_STAR
+
+#define IA8_30FPS_COINS
+
+#define WALL_QUICKSAND
+
+#define AIR_STAR_DANCE
+// Press A when jumping on an enemy to jump higher
+#define BOUNCE_BOOST
+
+#define EASIER_DIALOG_TRIGGER
+// requires EASIER_DIALOG_TRIGGER
+#define DIALOG_INDICATOR
+
+#define LAVA_FIX
+//! not implemented
+#define SCREEN_SHADE
+
+#define IMPROVED_COLLISION
+
+#define NULL_FLOOR_MISSES 3
+
+#define IMPROVED_MOVEMENT
+
+// The following require IMPROVED_MOVEMENT
+#define WALL_SLIDE
+
+#define GROUND_POUND_DIVE
+//! not implemented
+#define GROUND_POUND_JUMP
+
+#define WATER_GROUND_POUND
+// Press Z while twirling to descend faster
+#define Z_TWIRL
+// Number of frames
+#define COYOTE_TIME 8
 
 #endif // CONFIG_H
