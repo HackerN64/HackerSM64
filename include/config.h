@@ -29,6 +29,8 @@
 #define BUGFIX_BOWSER_FALLEN_OFF_STAGE (0 || VERSION_US || VERSION_EU || VERSION_SH)
 /// Fixes bug where Bowser would look weird while fading out
 #define BUGFIX_BOWSER_FADING_OUT (0 || VERSION_US || VERSION_EU || VERSION_SH)
+/// Removes multi-language cake screen
+#define EU_CUSTOM_CAKE_FIX 1
 
 // Support Rumble Pak
 // Currently not recommended, as it may cause random crashes.
@@ -64,8 +66,8 @@
 #define CASTLE_MUSIC_FIX
 // Remove course specific camera processing
 #define CAMERA_FIX
-// Change the movement speed when hanging from a ceiling
-#define HANGING_SPEED 12.0f
+// Change the movement speed when hanging from a ceiling (the vanilla value is 4.f)
+#define HANGING_SPEED 12.f
 // Makes Mario face the direction of the analog stick directly while hanging from a ceiling, without doing "semicircles"
 #define TIGHTER_HANGING_CONTROLS
 // Makes Mario turn around instantly when moving on the ground (broken)
@@ -88,6 +90,8 @@
 #define KEEP_MARIO_HEAD
 // Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
 #define IA8_COINS
+// Enables "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the dpad
+#define PARALLEL_LAKITU_CAM
 
 // HACKER QOL 
 // Enable widescreen (16:9) support
@@ -142,6 +146,8 @@
 #define SKYBOX_SIZE 1
 
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
+
+#define DEBUG_MODE
 
 // Makes obj_resolve_object_collisions work consistently
 #define OBJ_COLLISIONS_FIX
