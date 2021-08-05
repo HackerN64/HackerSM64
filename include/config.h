@@ -109,6 +109,8 @@
 #define EXPAND_AUDIO_HEAP
 // Allow all surfaces types to have force, (doesn't require setting force, just allows it to be optional).
 #define ALL_SURFACES_HAVE_FORCE
+// Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
+//#define CUSTOM_DEBUG
 
 // BUG/GAME QOL FIXES
 // Fix instant warp offset not working when warping across different areas

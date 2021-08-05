@@ -37,7 +37,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 
 **Hacker QOL:**
 - Global, non-level based, star IDs (off by default) *
-- FPS counter (use the function `print_fps(x,y)` anywhere that runs code every frame)
+- Debug mode: prints mario's coordinates, angle and speed, and a FPS counter.
 - Automatic console/emulator detection. If emulator is detected, LODs are disabled. *
 - Ability to configure whether there's a 100 coin star at all and how many coins are required to spawn it *
 - Ability to easily change the warp that EXIT COURSE takes you to via config.h, or disable it entirely. *
