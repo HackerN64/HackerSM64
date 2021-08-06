@@ -10,7 +10,7 @@ endif
 # Strip gzip header
 $(BUILD_DIR)/%.szp: $(BUILD_DIR)/%.gz
 	$(call print,Converting:,$<,$@)
-	$(V)dd bs=10 skip=1 if=$< of=$(<:.gz=.gz.strip)
+	$(V)dd bs=10 skip=1 if=$< of=$(<:.gz=.gz.strip) status=none
 	$(V)$(FILESIZER) $(<:.gz=.gz.strip) $@ `stat --format="%s" $(<:.gz=.bin)`
 
 # convert binary szp to object file

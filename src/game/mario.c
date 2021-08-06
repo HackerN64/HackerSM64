@@ -1283,6 +1283,23 @@ void update_mario_button_inputs(struct MarioState *m) {
         m->input |= INPUT_A_DOWN;
     }
 
+#ifdef CUSTOM_DEBUG
+    if (m->controller->buttonPressed & L_JPAD) {
+        gCustomDebugMode ^= 1;
+    }
+    if (gCustomDebugMode) {
+        if (m->controller->buttonPressed & R_JPAD) {
+            if (gMarioState->action == ACT_DEBUG_FREE_MOVE) {
+                set_mario_action(gMarioState, ACT_IDLE, 0);
+            } else {
+                set_mario_action(gMarioState, ACT_DEBUG_FREE_MOVE, 0);
+            }
+        }
+    } else if (gMarioState->action == ACT_DEBUG_FREE_MOVE) {
+        set_mario_action(gMarioState, ACT_IDLE, 0);
+    }
+#endif
+
     // Don't update for these buttons if squished.
     if (m->squishTimer == 0) {
         if (m->controller->buttonPressed & B_BUTTON) {

@@ -33,7 +33,7 @@ void bhv_snow_mound_spawn_loop(void) {
     if (o->oTimer == 64 || o->oTimer == 128 || o->oTimer == 192 || o->oTimer == 224 || o->oTimer == 256)
         sp1C = spawn_object(o, MODEL_SL_SNOW_TRIANGLE, bhvSlidingSnowMound);
 
-    if (o->oTimer == 256) {
+    if (sp1C && o->oTimer == 256) {
         sp1C->header.gfx.scale[0] = 2.0f;
         sp1C->header.gfx.scale[1] = 2.0f;
     }

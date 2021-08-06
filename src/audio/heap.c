@@ -1240,9 +1240,9 @@ void audio_reset_session(void) {
     gReverbDownsampleRate = preset->reverbDownsampleRate;
 #ifdef BETTER_REVERB
     if (gIsConsole)
-        reverbConsole = betterReverbConsoleDownsample; // Console!
+        reverbConsole = betterReverbDownsampleConsole; // Console!
     else
-        reverbConsole = betterReverbEmulatorDownsample; // Setting this to 1 is REALLY slow, please use sparingly!
+        reverbConsole = betterReverbDownsampleEmulator; // Setting this to 1 is REALLY slow, please use sparingly!
 
     if (reverbConsole <= 0) {
         reverbConsole = 1;
@@ -1457,15 +1457,16 @@ void audio_reset_session(void) {
  // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
 #ifdef BETTER_REVERB
         if (toggleBetterReverb) {
-            for (i = 0; i < NUM_ALLPASS; ++i)
-                delays[i] = delaysBaseline[i] / gReverbDownsampleRate;
-
-            delayBufs = (s32***) soundAlloc(&gAudioSessionPool, 2 * sizeof(s32**));
-            delayBufs[0] = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
-            delayBufs[1] = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
             for (i = 0; i < NUM_ALLPASS; ++i) {
-                delayBufs[0][i] = (s32*) soundAlloc(&gAudioSessionPool, delays[i] * sizeof(s32));
-                delayBufs[1][i] = (s32*) soundAlloc(&gAudioSessionPool, delays[i] * sizeof(s32));
+                delaysL[i] = delaysBaselineL[i] / gReverbDownsampleRate;
+                delaysR[i] = delaysBaselineR[i] / gReverbDownsampleRate;
+            }
+
+            delayBufsL = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
+            delayBufsR = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
+            for (i = 0; i < NUM_ALLPASS; ++i) {
+                delayBufsL[i] = (s32*) soundAlloc(&gAudioSessionPool, delaysL[i] * sizeof(s32));
+                delayBufsR[i] = (s32*) soundAlloc(&gAudioSessionPool, delaysR[i] * sizeof(s32));
             }
         }
 #endif

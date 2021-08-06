@@ -84,8 +84,8 @@
 //#define NO_FALL_DAMAGE_SOUND
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
 #define X_COIN_STAR 100
-// Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Breaks treadmills.
-//#define PLATFORM_DISPLACEMENT_2
+// Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!
+#define PLATFORM_DISPLACEMENT_2
 // Stars don't kick you out of the level
 // #define NON_STOP_STARS
 // Uncomment this if you want global star IDs (useful for creating an open world hack ala MVC)
@@ -109,6 +109,8 @@
 #define EXPAND_AUDIO_HEAP
 // Allow all surfaces types to have force, (doesn't require setting force, just allows it to be optional).
 #define ALL_SURFACES_HAVE_FORCE
+// Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
+//#define CUSTOM_DEBUG
 
 // BUG/GAME QOL FIXES
 // Fix instant warp offset not working when warping across different areas

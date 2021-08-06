@@ -144,6 +144,14 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
 		vec3f_sub(pos, platformPos);
 	}
 
+    if (platformPos[0] == platform->oPosX
+    && platformPos[1] == platform->oPosY
+    && platformPos[2] == platform->oPosZ) {
+        pos[0] += platform->oVelX;
+        pos[1] += platform->oVelY;
+        pos[2] += platform->oVelZ;
+    }
+    
 	// Transform from world positions to relative positions for use next frame
 	linear_mtxf_transpose_mul_vec3f(*platform->header.gfx.throwMatrix, scaledPos, pos);
 	scale_vec3f(displaceInfo->prevTransformedPos, scaledPos, platform->header.gfx.scale, TRUE);

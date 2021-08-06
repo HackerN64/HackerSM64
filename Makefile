@@ -43,8 +43,9 @@ endif
 
 # COMPILER - selects the C compiler to use
 #   gcc - uses the GNU C Compiler
+#   clang - uses clang C/C++ frontend for LLVM
 COMPILER ?= gcc
-$(eval $(call validate-option,COMPILER,gcc))
+$(eval $(call validate-option,COMPILER,gcc clang))
 
 
 # LIBGCCDIR - selects the libgcc configuration for checking for dividing by zero
@@ -158,7 +159,12 @@ LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 ifeq ($(COMPILER),gcc)
   NON_MATCHING := 1
   MIPSISET     := -mips3
-  OPT_FLAGS    := -O2 -g
+  OPT_FLAGS    := -O2
+else ifeq ($(COMPILER),clang)
+  NON_MATCHING := 1
+  # clang doesn't support ABI 'o32' for 'mips3'
+  MIPSISET     := -mips2
+  OPT_FLAGS    := -O2
 endif
 
 
@@ -390,6 +396,8 @@ export LD_LIBRARY_PATH=./tools
 AS        := $(CROSS)as
 ifeq ($(COMPILER),gcc)
   CC      := $(CROSS)gcc
+else ifeq ($(COMPILER),clang)
+  CC      := clang
 endif
 # Prefer gcc's cpp if installed on the system
 ifneq (,$(call find-command,cpp-10))
@@ -423,9 +431,12 @@ DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
 CFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
 ifeq ($(COMPILER),gcc)
   CFLAGS += -mno-shared -march=vr4300 -mfix4300 -mabi=32 -mhard-float -mdivide-breaks -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra -Wno-missing-braces -fno-jump-tables
+else ifeq ($(COMPILER),clang)
+  CFLAGS += -target mips -mabi=32 -G 0 -mhard-float -fomit-frame-pointer -fno-stack-protector -fno-common -I include -I src/ -I $(BUILD_DIR)/include -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra -Wno-missing-braces -fno-jump-tables
 else
   CFLAGS += -non_shared -Wab,-r4300_mul -Xcpluscomm -Xfullwarn -signed -32
 endif
+ASMFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) -mips3 $(DEF_INC_CFLAGS) -mno-shared -march=vr4300 -mfix4300 -mabi=32 -mhard-float -mdivide-breaks -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
 
 ASFLAGS     := -march=vr4300 -mabi=32 $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(foreach d,$(DEFINES),--defsym $(d))
 RSPASMFLAGS := $(foreach d,$(DEFINES),-definelabel $(subst =, ,$(d)))
@@ -479,8 +490,8 @@ YELLOW  := \033[0;33m
 BLINK   := \033[33;5m
 endif
 
-# Use Objcopy instead of extract_data_for_mio
-ifeq ($(COMPILER),gcc)
+# For non-IDO, use objcopy instead of extract_data_for_mio
+ifneq ($(COMPILER),ido)
   EXTRACT_DATA_FOR_MIO := $(OBJCOPY) -O binary --only-section=.data
 endif
 
@@ -746,7 +757,7 @@ $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 # Assemble assembly code
 $(BUILD_DIR)/%.o: %.s
 	$(call print,Assembling:,$<,$@)
-	$(V)$(CC) -c $(CFLAGS) $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
+	$(V)$(CROSS)gcc -c $(ASMFLAGS) $(foreach i,$(INCLUDE_DIRS),-Wa,-I$(i)) -x assembler-with-cpp -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
 
 # Assemble RSP assembly code
 $(BUILD_DIR)/rsp/%.bin $(BUILD_DIR)/rsp/%_data.bin: rsp/%.s
