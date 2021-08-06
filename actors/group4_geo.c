@@ -8,5 +8,6 @@
 #include "group4.h"
 
 #include "clam_shell/geo.inc.c"
+#include "manta/geo.inc.c"
 #include "sushi/geo.inc.c"
 #include "unagi/geo.inc.c"

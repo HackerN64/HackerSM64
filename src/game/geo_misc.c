@@ -96,7 +96,7 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
             }
 
             generatedNode = (struct GraphNodeGenerated *) node;
-            generatedNode->fnNode.node.flags = (generatedNode->fnNode.node.flags & 0xFF) | 0x500;
+            generatedNode->fnNode.node.flags = (generatedNode->fnNode.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8);
 
             gSPDisplayList(displayListHead++, dl_castle_lobby_wing_cap_light);
             gSPEndDisplayList(displayListHead);
@@ -149,7 +149,7 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
             return NULL;
         }
 
-        generatedNode->fnNode.node.flags = (generatedNode->fnNode.node.flags & 0xFF) | 0x100;
+        generatedNode->fnNode.node.flags = (generatedNode->fnNode.node.flags & 0xFF) | (LAYER_OPAQUE << 8);
 
         for (n = 0; n <= 20; n++) {
             row = n / 3;
@@ -202,7 +202,7 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED f3
         displayList = alloc_display_list(3 * sizeof(*displayList));
         displayListHead = displayList;
 
-        generatedNode->fnNode.node.flags = (generatedNode->fnNode.node.flags & 0xFF) | 0x100;
+        generatedNode->fnNode.node.flags = (generatedNode->fnNode.node.flags & 0xFF) | (LAYER_OPAQUE << 8);
 #ifdef VERSION_EU
         gSPDisplayList(displayListHead++, dl_cake_end_screen);
 #else
