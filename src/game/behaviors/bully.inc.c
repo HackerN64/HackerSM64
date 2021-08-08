@@ -64,7 +64,7 @@ void bully_check_mario_collision(void) {
 
         o->oInteractStatus &= ~INT_STATUS_INTERACTED;
         o->oAction = BULLY_ACT_KNOCKBACK;
-        o->oFlags &= ~0x8; /* bit 3 */
+        o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW; /* bit 3 */
         cur_obj_init_animation(3);
         o->oBullyMarioCollisionAngle = o->oMoveAngleYaw;
     }
@@ -98,7 +98,7 @@ void bully_act_knockback(void) {
     if (o->oForwardVel < 10.0 && (s32) o->oVelY == 0) {
         o->oForwardVel = 1.0;
         o->oBullyKBTimerAndMinionKOCounter++;
-        o->oFlags |= 0x8; /* bit 3 */
+        o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW; /* bit 3 */
         o->oMoveAngleYaw = o->oFaceAngleYaw;
         obj_turn_toward_object(o, gMarioObject, 16, 1280);
     } else
@@ -113,7 +113,7 @@ void bully_act_knockback(void) {
 
 void bully_act_back_up(void) {
     if (o->oTimer == 0) {
-        o->oFlags &= ~0x8; /* bit 3 */
+        o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW; /* bit 3 */
         o->oMoveAngleYaw += 0x8000;
     }
 
@@ -128,13 +128,13 @@ void bully_act_back_up(void) {
 
     if (o->oTimer == 15) {
         o->oMoveAngleYaw = o->oFaceAngleYaw;
-        o->oFlags |= 0x8; /* bit 3 */
+        o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW; /* bit 3 */
         o->oAction = BULLY_ACT_PATROL;
     }
 }
 
 void bully_backup_check(s16 collisionFlags) {
-    if (!(collisionFlags & 0x8) && o->oAction != BULLY_ACT_KNOCKBACK) /* bit 3 */
+    if (!(collisionFlags & OBJ_COL_FLAG_NO_Y_VEL) && o->oAction != BULLY_ACT_KNOCKBACK) /* bit 3 */
     {
         o->oPosX = o->oBullyPrevX;
         o->oPosZ = o->oBullyPrevZ;
@@ -346,10 +346,10 @@ void bhv_big_bully_with_minions_loop(void) {
 
         case BULLY_ACT_ACTIVATE_AND_FALL:
             collisionFlags = object_step();
-            if ((collisionFlags & 0x9) == 0x9) /* bits 0 and 3 */
+            if ((collisionFlags & OBJ_COL_FLAGS_LANDED) == OBJ_COL_FLAGS_LANDED) /* bits 0 and 3 */
                 o->oAction = BULLY_ACT_PATROL;
 
-            if (collisionFlags == 1) {
+            if (collisionFlags == OBJ_COL_FLAG_GROUNDED) {
                 cur_obj_play_sound_2(SOUND_OBJ_THWOMP);
                 set_camera_shake_from_point(SHAKE_POS_SMALL, o->oPosX, o->oPosY, o->oPosZ);
                 spawn_mist_particles();
