@@ -594,7 +594,7 @@ static void geo_process_background(struct GraphNodeBackground *node) {
         gDPSetCycleType(gfx++, G_CYC_1CYCLE);
         gSPEndDisplayList(gfx++);
 
-        geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(gfxStart), 0);
+        geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(gfxStart), LAYER_FORCE);
     }
     if (node->fnNode.node.children != NULL) {
         geo_process_node_and_siblings(node->fnNode.node.children);
@@ -762,11 +762,11 @@ static void geo_process_shadow(struct GraphNodeShadow *node) {
             mtxf_to_mtx(mtx, gMatStack[gMatStackIndex]);
             gMatStackFixed[gMatStackIndex] = mtx;
             if (gShadowAboveWaterOrLava == TRUE) {
-                geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), 4);
+                geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), LAYER_ALPHA);
             } else if (gMarioOnIceOrCarpet == 1 || gShadowAboveCustomWater == 1) {
-                geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), 5);
+                geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), LAYER_TRANSPARENT);
             } else {
-                geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), 6);
+                geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), LAYER_TRANSPARENT_DECAL);
             }
             gMatStackIndex--;
         }
