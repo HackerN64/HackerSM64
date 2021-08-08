@@ -163,13 +163,10 @@ void bhv_mips_act_wait_for_animation_done(void) {
  * Handles MIPS falling down after being thrown.
  */
 void bhv_mips_act_fall_down(void) {
-
-    s16 collisionFlags = 0;
-
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
     o->header.gfx.animInfo.animFrame = 0;
 
-    if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == 1) {
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         o->oAction = MIPS_ACT_WAIT_FOR_ANIMATION_DONE;
 
         o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;

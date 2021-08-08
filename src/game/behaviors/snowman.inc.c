@@ -51,7 +51,6 @@ void adjust_rolling_face_pitch(f32 f12) {
 }
 
 void snowmans_bottom_act_1(void) {
-    UNUSED s16 sp26;
     s32 sp20;
     UNUSED s16 sp1E;
 #ifdef AVOID_UB
@@ -59,7 +58,7 @@ void snowmans_bottom_act_1(void) {
 #endif
 
     o->oPathedStartWaypoint = segmented_to_virtual(&ccm_seg7_trajectory_snowman);
-    sp26 = object_step_without_floor_orient();
+    object_step_without_floor_orient();
     sp20 = cur_obj_follow_path(sp20);
     o->oSnowmansBottomUnkF8 = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomUnkF8, 0x400);
@@ -80,9 +79,7 @@ void snowmans_bottom_act_1(void) {
 }
 
 void snowmans_bottom_act_2(void) {
-    UNUSED s16 sp26;
-
-    sp26 = object_step_without_floor_orient();
+    object_step_without_floor_orient();
     if (o->oForwardVel > 70.0)
         o->oForwardVel = 70.0f;
 
@@ -106,15 +103,13 @@ void snowmans_bottom_act_2(void) {
 }
 
 void snowmans_bottom_act_3(void) {
-    UNUSED s16 sp1E;
-
-    sp1E = object_step_without_floor_orient();
-    if ((sp1E & 0x09) == 0x09) {
+    s16 collisionFlags = object_step_without_floor_orient();
+    if ((collisionFlags & OBJ_COL_FLAGS_LANDED) == OBJ_COL_FLAGS_LANDED) {
         o->oAction = 4;
         cur_obj_become_intangible();
     }
 
-    if ((sp1E & 0x01) != 0) {
+    if ((collisionFlags & 0x01) != 0) {
         spawn_mist_particles_variable(0, 0, 70.0f);
         o->oPosX = -4230.0f;
         o->oPosZ = 1813.0f;
@@ -190,7 +185,7 @@ void bhv_snowmans_head_init(void) {
 
 void bhv_snowmans_head_loop(void) {
     UNUSED s16 sp1E;
-    s16 sp1C;
+    s16 collisionFlags;
 
     switch (o->oAction) {
         case 0:
@@ -202,8 +197,8 @@ void bhv_snowmans_head_loop(void) {
             break;
 
         case 2:
-            sp1C = object_step_without_floor_orient();
-            if (sp1C & 0x08)
+            collisionFlags = object_step_without_floor_orient();
+            if (collisionFlags & OBJ_COL_FLAG_NO_Y_VEL)
                 o->oAction = 3;
             break;
 

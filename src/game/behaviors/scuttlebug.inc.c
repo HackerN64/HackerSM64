@@ -77,7 +77,7 @@ void bhv_scuttlebug_loop(void) {
             cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x400);
             break;
         case 3:
-            o->oFlags &= ~8;
+            o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
             o->oForwardVel = -10.0f;
             o->oVelY = 30.0f;
             cur_obj_play_sound_2(SOUND_OBJ2_SCUTTLEBUG_ALERT);
@@ -89,7 +89,7 @@ void bhv_scuttlebug_loop(void) {
                 o->oSubAction++;
                 o->oVelY = 0.0f;
                 o->oScuttlebugUnkFC = 0;
-                o->oFlags |= 8;
+                o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
                 o->oInteractStatus = 0;
             }
             break;

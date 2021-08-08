@@ -6,7 +6,7 @@ struct DoorAction
     s32 action;
 };
 
-static struct DoorAction sDoorActions[] = { { 0x40000, 3 }, { 0x80000, 4 }, { 0x10000, 1 }, { 0x20000, 2 }, { -1, 0 }, };
+static struct DoorAction sDoorActions[] = { { INT_STATUS_WARP_DOOR_PULLED, 3 }, { INT_STATUS_WARP_DOOR_PUSHED, 4 }, { INT_STATUS_DOOR_PULLED, 1 }, { INT_STATUS_DOOR_PUSHED, 2 }, { -1, 0 }, };
 
 static s32 sDoorOpenSounds[] = { SOUND_GENERAL_OPEN_WOOD_DOOR, SOUND_GENERAL_OPEN_IRON_DOOR };
 
