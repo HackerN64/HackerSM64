@@ -17,6 +17,7 @@
 #define OPTION_SCHEME1_EN 		_("Double Tap")
 #define OPTION_SCHEME2_EN 		_("Single Press")
 #define OPTION_SCHEME3_EN 		_("Classic")
+#define NC_WIDE_EN	 			_("Widescreen")
 #define NC_HIGHLIGHT_L 			_(">")
 #define NC_HIGHLIGHT_R 			_("<")
 #define NC_BUTTON_EN 			_("[R]: Options")
@@ -42,6 +43,9 @@
 
 #define NC_SCHEME_FR			_("Control Scheme")
 #define NC_SCHEME_DE			_("Control Scheme")
+
+#define NC_WIDE_FR	 			_("Widescreen")
+#define NC_WIDE_DE	 			_("Widescreen")
 
 #define OPTION_ENABLED_FR _("Active")
 #define OPTION_ENABLED_DE _("Enabled")

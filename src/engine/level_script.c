@@ -24,6 +24,7 @@
 #include "math_util.h"
 #include "surface_collision.h"
 #include "surface_load.h"
+#include "game/puppycam2.h"
 
 #include "config.h"
 
@@ -757,6 +758,40 @@ static void level_cmd_get_or_set_var(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
+static void level_cmd_puppyvolume(void)
+{
+    if ((sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool,sizeof(struct sPuppyVolume))) == NULL)
+    {
+        sCurrentCmd = CMD_NEXT;
+        gPuppyError |= PUPPY_ERROR_POOL_FULL;
+        return;
+    }
+
+    sPuppyVolumeStack[gPuppyVolumeCount]->pos[0] = CMD_GET(s16, 2);
+    sPuppyVolumeStack[gPuppyVolumeCount]->pos[1] = CMD_GET(s16, 4);
+    sPuppyVolumeStack[gPuppyVolumeCount]->pos[2] = CMD_GET(s16, 6);
+
+    sPuppyVolumeStack[gPuppyVolumeCount]->radius[0] = CMD_GET(s16, 8);
+    sPuppyVolumeStack[gPuppyVolumeCount]->radius[1] = CMD_GET(s16, 10);
+    sPuppyVolumeStack[gPuppyVolumeCount]->radius[2] = CMD_GET(s16, 12);
+
+    sPuppyVolumeStack[gPuppyVolumeCount]->rot = CMD_GET(s16, 14);
+
+    sPuppyVolumeStack[gPuppyVolumeCount]->func = CMD_GET(void *, 16);
+    sPuppyVolumeStack[gPuppyVolumeCount]->angles = segmented_to_virtual(CMD_GET(void *, 20));
+
+    sPuppyVolumeStack[gPuppyVolumeCount]->flagsAdd = CMD_GET(s32, 24);
+    sPuppyVolumeStack[gPuppyVolumeCount]->flagsRemove = CMD_GET(s32, 28);
+
+    sPuppyVolumeStack[gPuppyVolumeCount]->flagPersistance = CMD_GET(u8, 32);
+
+    sPuppyVolumeStack[gPuppyVolumeCount]->shape = CMD_GET(u8, 33);
+    sPuppyVolumeStack[gPuppyVolumeCount]->room = CMD_GET(s16, 34);
+
+    gPuppyVolumeCount++;
+    sCurrentCmd = CMD_NEXT;
+}
+
 static void (*LevelScriptJumpTable[])(void) = {
     /*00*/ level_cmd_load_and_execute,
     /*01*/ level_cmd_exit_and_execute,
@@ -819,6 +854,7 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*3A*/ level_cmd_3A,
     /*3B*/ level_cmd_create_whirlpool,
     /*3C*/ level_cmd_get_or_set_var,
+    /*3E*/ level_cmd_puppyvolume,
 };
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {

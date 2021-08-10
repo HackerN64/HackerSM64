@@ -31,6 +31,10 @@
     CMD_W(removeflags), \
     CMD_BBH(flagpersistance, shape, room)
 
+//Some macros for the sake of basic human sanity.
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#define ABS(x) ((x) > 0.f ? (x) : -(x))
+
 struct gPuppyOptions
 {
     s16 analogue;

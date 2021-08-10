@@ -81,7 +81,7 @@ UNUSED static s32 sUnusedGameInitValue = 0;
 // General timer that runs as the game starts
 u32 gGlobalTimer = 0;
 #ifdef WIDE
-u8 gWidescreen;
+s16 gWidescreen;
 #endif
 
 // Framebuffer rendering values (max 3)
