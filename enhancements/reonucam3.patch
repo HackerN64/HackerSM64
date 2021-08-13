@@ -1,9 +1,9 @@
 diff --git a/include/text_strings.h.in b/include/text_strings.h.in
-index d266058..4b12426 100644
+index 8ccc6b1..d2bb516 100644
 --- a/include/text_strings.h.in
 +++ b/include/text_strings.h.in
-@@ -34,6 +34,12 @@
- #define TEXT_HUD_WIDE_INFO2 _("STRETCH THE IMAGE TO 16:9")
+@@ -33,6 +33,12 @@
+ #define TEXT_HUD_WIDE_INFO _("PLEASE CONFIGURE YOUR DISPLAY OR YOUR EMULATOR TO\nSTRETCH THE IMAGE TO 16:9")
  #endif
  
 +#define TEXT_CAM_INFO_SLOWEST _("CAM SPEED: SLOWEST")
@@ -302,13 +302,13 @@ index dfcf16a..e56f8c0 100644
      }
  }
 diff --git a/src/game/game_init.c b/src/game/game_init.c
-index 6cfa8f5..63158e1 100644
+index 8693507..fb8729d 100644
 --- a/src/game/game_init.c
 +++ b/src/game/game_init.c
-@@ -46,6 +46,11 @@ OSContPad gControllerPads[4];
- u8 gControllerBits;
- u8 gIsConsole;
- u8 gBorderHeight;
+@@ -49,6 +49,11 @@ u8 gBorderHeight;
+ #ifdef CUSTOM_DEBUG
+ u8 gCustomDebugMode;
+ #endif
 +u8 gCameraSpeed = 2;
 +u8 gWaterCamOverride;
 +u8 gFlyingCamOverride;
@@ -317,7 +317,7 @@ index 6cfa8f5..63158e1 100644
  #ifdef EEP
  s8 gEepromProbe;
  #endif
-@@ -715,6 +720,7 @@ void thread5_game_loop(UNUSED void *arg) {
+@@ -725,6 +730,7 @@ void thread5_game_loop(UNUSED void *arg) {
  
      play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
      set_sound_mode(save_file_get_sound_mode());
@@ -326,7 +326,7 @@ index 6cfa8f5..63158e1 100644
      gWidescreen = save_file_get_widescreen_mode();
  #endif
 diff --git a/src/game/game_init.h b/src/game/game_init.h
-index 87386ce..47e9724 100644
+index f3f650c..fdf20b6 100644
 --- a/src/game/game_init.h
 +++ b/src/game/game_init.h
 @@ -45,6 +45,10 @@ extern u8 gIsConsole;
@@ -338,14 +338,14 @@ index 87386ce..47e9724 100644
 +extern u8 gFlyingCamOverride;
 +extern u8 gKeepCliffCam;
  extern u8 gBorderHeight;
- #ifdef EEP
- extern s8 gEepromProbe;
+ #ifdef CUSTOM_DEBUG
+ extern u8 gCustomDebugMode;
 diff --git a/src/game/ingame_menu.c b/src/game/ingame_menu.c
-index 9cd458a..ac2d18c 100644
+index 158154c..9ffefec 100644
 --- a/src/game/ingame_menu.c
 +++ b/src/game/ingame_menu.c
-@@ -39,6 +39,12 @@ u8 textWideInfo[] = { TEXT_HUD_WIDE_INFO };
- u8 textWideInfo2[] = { TEXT_HUD_WIDE_INFO2 };
+@@ -38,6 +38,12 @@ u8 textPressL[] = { TEXT_HUD_PRESS_L };
+ u8 textWideInfo[] = { TEXT_HUD_WIDE_INFO };
  #endif
  
 +u8 textCamInfoSlowest[] = { TEXT_CAM_INFO_SLOWEST };
@@ -357,7 +357,7 @@ index 9cd458a..ac2d18c 100644
  extern u8 gLastCompletedCourseNum;
  extern u8 gLastCompletedStarNum;
  
-@@ -1350,6 +1356,45 @@ void reset_red_coins_collected(void) {
+@@ -1434,6 +1440,45 @@ void reset_red_coins_collected(void) {
      gRedCoinsCollected = 0;
  }
  
@@ -403,19 +403,23 @@ index 9cd458a..ac2d18c 100644
  void change_dialog_camera_angle(void) {
      if (cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
          gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
-@@ -1779,6 +1824,7 @@ s16 render_pause_courses_and_castle(void) {
+@@ -1866,6 +1911,11 @@ s16 render_pause_courses_and_castle(void) {
      }
      #ifdef WIDE
          render_widescreen_setting();
 +        render_camera_speed_setting();
-         if (gPlayer1Controller->buttonPressed & L_TRIG){
-             gWidescreen ^= 1;
-             save_file_set_widescreen_mode(gWidescreen);
++        if (gPlayer1Controller->buttonPressed & L_TRIG){
++            gWidescreen ^= 1;
++            save_file_set_widescreen_mode(gWidescreen);
++        }
+     #endif
+     if (gDialogTextAlpha < 250) {
+         gDialogTextAlpha += 25;
 diff --git a/src/game/mario.c b/src/game/mario.c
-index b381afa..7cb9549 100644
+index c0b5f76..b6da9d4 100644
 --- a/src/game/mario.c
 +++ b/src/game/mario.c
-@@ -1443,32 +1443,39 @@ void update_mario_inputs(struct MarioState *m) {
+@@ -1460,32 +1460,39 @@ void update_mario_inputs(struct MarioState *m) {
  void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
      f32 heightBelowWater;
      s16 camPreset;
@@ -550,7 +554,7 @@ index b27d869..7fbf045 100644
      if (save_file_get_flags() & SAVE_FLAG_CAP_ON_GROUND) {
          switch (gSaveBuffer.files[gCurrSaveFileNum - 1][0].capLevel) {
 diff --git a/src/game/save_file.h b/src/game/save_file.h
-index 00fc042..7062ead 100644
+index 3ac0c4d..d46a7e1 100644
 --- a/src/game/save_file.h
 +++ b/src/game/save_file.h
 @@ -62,6 +62,7 @@ struct MainMenuSaveData
@@ -560,7 +564,7 @@ index 00fc042..7062ead 100644
 +    u8 cameraSpeedSetting: 3;
  
  #ifdef VERSION_EU
-     u16 language;
+     u8 language: 2;
 @@ -167,6 +168,8 @@ u16 save_file_get_sound_mode(void);
  u8 save_file_get_widescreen_mode(void);
  void save_file_set_widescreen_mode(u8 mode);
