@@ -98,8 +98,7 @@ void bobomb_act_chase_mario(void) {
 }
 
 void bobomb_act_launched(void) {
-    s16 collisionFlags = 0;
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
     if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED)
         o->oAction = BOBOMB_ACT_EXPLODE; /* bit 0 */
 }
@@ -203,7 +202,7 @@ void bobomb_thrown_loop(void) {
 
     o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
     o->oHeldState = 0;
-    o->oFlags &= ~0x8; /* bit 3 */
+    o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW; /* bit 3 */
     o->oForwardVel = 25.0;
     o->oVelY = 20.0;
     o->oAction = BOBOMB_ACT_LAUNCHED;

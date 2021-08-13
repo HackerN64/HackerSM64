@@ -9,6 +9,7 @@
 #include "platform_displacement.h"
 #include "types.h"
 #include "sm64.h"
+#include "behavior_data.h"
 
 #include "config.h"
 
@@ -144,6 +145,13 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
 		vec3f_sub(pos, platformPos);
 	}
 
+    // Apply displacement specifically for TTC Treadmills
+    if (platform->behavior == segmented_to_virtual(bhvTTCTreadmill)) {
+        pos[0] += platform->oVelX;
+        pos[1] += platform->oVelY;
+        pos[2] += platform->oVelZ;
+    }
+    
 	// Transform from world positions to relative positions for use next frame
 	linear_mtxf_transpose_mul_vec3f(*platform->header.gfx.throwMatrix, scaledPos, pos);
 	scale_vec3f(displaceInfo->prevTransformedPos, scaledPos, platform->header.gfx.scale, TRUE);

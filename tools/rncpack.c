@@ -1641,10 +1641,10 @@ int parse_args(int argc, char **argv, vars_t *vars)
 
 int main(int argc, char *argv[])
 {
-    printf("-= RNC ProPackED v1.5 [by Lab 313] (12/02/2020) =-\n");
-    printf("-----------------------------\n");
 
     if (argc <= 2) {
+        printf("-= RNC ProPackED v1.5 [by Lab 313] (12/02/2020) =-\n");
+        printf("-----------------------------\n");
         printf("Compression type: Huffman + LZ77\n");
         printf("De/Compressor: Dr.MefistO\n");
         printf("Coding: Dr. MefistO\n");
@@ -1725,8 +1725,8 @@ int main(int argc, char *argv[])
         fwrite(v->output, v->output_offset, 1, out);
         fclose(out);
 
-        printf("File successfully %s!\n", ((v->puse_mode == 'p') ? "packed" : "unpacked"));
-        printf("Original/new size: %d/%zd bytes\n", (v->puse_mode == 'u') ? (v->packed_size + RNC_HEADER_SIZE) : v->file_size, v->output_offset);
+//        printf("File successfully %s!\n", ((v->puse_mode == 'p') ? "packed" : "unpacked"));
+//        printf("Original/new size: %d/%zd bytes\n", (v->puse_mode == 'u') ? (v->packed_size + RNC_HEADER_SIZE) : v->file_size, v->output_offset);
     }
     else {
         switch (error_code) {

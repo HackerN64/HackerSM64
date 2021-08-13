@@ -35,7 +35,7 @@ void bhv_fire_piranha_plant_init(void) {
     obj_set_hitbox(o, &sFirePiranhaPlantHitbox);
 
     if ((u16)(o->oBehParams >> 16) != 0) {
-        o->oFlags |= 0x00004000;
+        o->oFlags |= OBJ_FLAG_PERSISTENT_RESPAWN;
         o->oHealth = 1;
 
         if (o->oBehParams & 0x0000FF00) {

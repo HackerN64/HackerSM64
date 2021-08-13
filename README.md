@@ -37,7 +37,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 
 **Hacker QOL:**
 - Global, non-level based, star IDs (off by default) *
-- FPS counter (use the function `print_fps(x,y)` anywhere that runs code every frame)
+- Debug mode: prints mario's coordinates, angle and speed, and a FPS counter.
 - Automatic console/emulator detection. If emulator is detected, LODs are disabled. *
 - Ability to configure whether there's a 100 coin star at all and how many coins are required to spawn it *
 - Ability to easily change the warp that EXIT COURSE takes you to via config.h, or disable it entirely. *
@@ -53,6 +53,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Expanded audio heap allows for a larger concurrent note count and the importing of more m64 sequences and sound banks (By ArcticJaguar725) *
 - You can set a test level in config.h in order to boot straight into it, so you can quickly test the level you're working on. *
 - Allows all surfaces in the game to have a `force` parameter. Activating this doesn't REQUIRE you to set `force` for every surface: If you don't set, it will default to 0x0000 rather than crashing. Increases RAM usage of collision. *
+- The clown font includes the entire English alphabet.
 - Colored ia4 text support. Format: `"@XXXXXXXX[YOUR TEXT]@--------"` (By ArcticJaguar725)
   - Example Text: `"@FF0000FFRED @00FF00FFGREEN @0000FFFFBLUE @FFFFFF00INVISIBLE @--------NORMAL"`
   - NOTE: It is not mandatory to reset the text color with `"@--------"`, but text will need to be recolored each time it scrolls in a dialog box, or the custom color will reset.

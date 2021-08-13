@@ -861,7 +861,7 @@ s32 act_entering_star_door(struct MarioState *m) {
     s16 targetAngle;
 
     if (m->actionTimer++ == 0) {
-        m->interactObj->oInteractStatus = 0x00010000;
+        m->interactObj->oInteractStatus = INT_STATUS_DOOR_PULLED;
 
         // ~30 degrees / 1/12 rot
         targetAngle = m->usedObj->oMoveAngleYaw + 0x1555;
@@ -919,10 +919,10 @@ s32 act_entering_star_door(struct MarioState *m) {
 s32 act_going_through_door(struct MarioState *m) {
     if (m->actionTimer == 0) {
         if (m->actionArg & 1) {
-            m->interactObj->oInteractStatus = 0x00010000;
+            m->interactObj->oInteractStatus = INT_STATUS_DOOR_PULLED;
             set_mario_animation(m, MARIO_ANIM_PULL_DOOR_WALK_IN);
         } else {
-            m->interactObj->oInteractStatus = 0x00020000;
+            m->interactObj->oInteractStatus = INT_STATUS_DOOR_PUSHED;
             set_mario_animation(m, MARIO_ANIM_PUSH_DOOR_WALK_IN);
         }
     }
@@ -952,9 +952,9 @@ s32 act_warp_door_spawn(struct MarioState *m) {
     if (m->actionState == 0) {
         m->actionState = 1;
         if (m->actionArg & 1) {
-            m->usedObj->oInteractStatus = 0x00040000;
+            m->usedObj->oInteractStatus = INT_STATUS_WARP_DOOR_PULLED;
         } else {
-            m->usedObj->oInteractStatus = 0x00080000;
+            m->usedObj->oInteractStatus = INT_STATUS_WARP_DOOR_PUSHED;
         }
     } else if (m->usedObj->oAction == 0) {
         if (gNeverEnteredCastle == TRUE && gCurrLevelNum == LEVEL_CASTLE) {

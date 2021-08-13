@@ -113,8 +113,8 @@ void exclamation_box_spawn_contents(struct Struct802C0DF0 *a0, u8 a1) {
             sp1C->oForwardVel = 3.0f;
             sp1C->oMoveAngleYaw = gMarioObject->oMoveAngleYaw;
             o->oBehParams |= a0->unk2 << 24;
-            if (a0->model == 122)
-                o->oFlags |= 0x4000;
+            if (a0->model == MODEL_STAR)
+                o->oFlags |= OBJ_FLAG_PERSISTENT_RESPAWN;
             break;
         }
         a0++;

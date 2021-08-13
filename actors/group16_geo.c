@@ -7,4 +7,5 @@
 #include "common1.h"
 #include "group16.h"
 
+#include "chillychief/geo.inc.c"
 #include "moneybag/geo.inc.c"

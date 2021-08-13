@@ -46,6 +46,9 @@ extern u8 gIsConsole;
 extern u8 gWidescreen;
 #endif
 extern u8 gBorderHeight;
+#ifdef CUSTOM_DEBUG
+extern u8 gCustomDebugMode;
+#endif
 #ifdef EEP
 extern s8 gEepromProbe;
 #endif
