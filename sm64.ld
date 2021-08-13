@@ -190,6 +190,7 @@ SECTIONS
       lib/PR/hvqm/hvqm2sp1.o(.rodata*);
    }
    END_SEG(main)
+   ASSERT((_mainSegmentRomEnd <= 0x101000), "Error: Please shrink your main segment to under 1MB.")
    BEGIN_NOLOAD(main)
    {
       BUILD_DIR/src/game*.o(.*bss*);
@@ -215,8 +216,6 @@ SECTIONS
    }
    END_NOLOAD(main)
 
-   /*ASSERT((. <= SEG_ENGINE), "Error: main segment extended into engine.")*/
-
    . = _mainSegmentBssEnd;
 
    BEGIN_SEG(engine, .)
@@ -235,8 +234,6 @@ SECTIONS
       . = ALIGN(0x40);
    }
    END_NOLOAD(engine)
-
-   /*ASSERT((. <= SEG_FRAMEBUFFERS), "Error: engine segment extended into framebuffers.")*/
 
    . = _engineSegmentBssEnd;
    BEGIN_NOLOAD(framebuffers)
@@ -301,47 +298,20 @@ SECTIONS
    END_SEG(behavior)
 
    /* 0x8016F000 21D7D0-255EC0 [386F0] */
-   BEGIN_SEG(goddard, SEG_GODDARD)
+   BEGIN_SEG(goddard, RAM_END - GODDARD_SIZE)
    {
-      BUILD_DIR/src/menu*.o(.text);
-      BUILD_DIR/src/menu*.o(.data*);
-      BUILD_DIR/src/menu*.o(.rodata*);
-#ifdef KEEP_MARIO_HEAD
-      BUILD_DIR/libgoddard.a:*.o(.text);
-      /* goddard subsystem data */
-      BUILD_DIR/libgoddard.a:gd_main.o(.data*);
-      BUILD_DIR/libgoddard.a:draw_objects.o(.data*);
-      BUILD_DIR/libgoddard.a:objects.o(.data*);
-      BUILD_DIR/libgoddard.a:particles.o(.data*);
-      BUILD_DIR/libgoddard.a:dynlist_proc.o(.data*);
-      BUILD_DIR/libgoddard.a:debug_utils.o(.data*);
-      BUILD_DIR/libgoddard.a:joints.o(.data*);
-      BUILD_DIR/libgoddard.a:shape_helper.o(.data*);
-      BUILD_DIR/libgoddard.a:renderer.o(.data*);
-      /* goddard subsystem rodata */
-      BUILD_DIR/libgoddard.a:gd_main.o(.rodata*);
-      BUILD_DIR/libgoddard.a:gd_memory.o(.rodata*);
-      BUILD_DIR/libgoddard.a:draw_objects.o(.rodata*);
-      BUILD_DIR/libgoddard.a:objects.o(.rodata*);
-      BUILD_DIR/libgoddard.a:skin_movement.o(.rodata*);
-      BUILD_DIR/libgoddard.a:particles.o(.rodata*);
-      BUILD_DIR/libgoddard.a:dynlist_proc.o(.rodata*);
-      BUILD_DIR/libgoddard.a:old_menu.o(.rodata*);
-      BUILD_DIR/libgoddard.a:debug_utils.o(.rodata*);
-      BUILD_DIR/libgoddard.a:joints.o(.rodata*);
-      BUILD_DIR/libgoddard.a:skin.o(.rodata*);
-      BUILD_DIR/libgoddard.a:gd_math.o(.rodata*);
-      BUILD_DIR/libgoddard.a:shape_helper.o(.rodata*);
-      BUILD_DIR/libgoddard.a:renderer.o(.rodata*);
-#endif
+      #define LOAD
+         #include "goddard.ld.inc"
+      #undef LOAD
+      . = ALIGN(16);
    }
    END_SEG(goddard)
    BEGIN_NOLOAD(goddard)
    {
-      BUILD_DIR/src/menu*.o(.bss*);
-#ifdef KEEP_MARIO_HEAD
-      BUILD_DIR/libgoddard.a:*.o(.bss*);
-#endif
+      #define NOLOAD
+         #include "goddard.ld.inc"
+      #undef NOLOAD
+      . = ALIGN(16);
    }
    END_NOLOAD(goddard)
 
