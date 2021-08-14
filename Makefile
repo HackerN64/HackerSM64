@@ -510,7 +510,7 @@ ifeq ($(COMPARE),1)
 	@$(SHA1SUM) --quiet -c $(TARGET).sha1 && $(PRINT) "$(TARGET): $(GREEN)OK$(NO_COL)\n" || ($(PRINT) "$(YELLOW)Building the ROM file has succeeded, but does not match the original ROM.\nThis is expected, and not an error, if you are making modifications.\nTo silence this message, use 'make COMPARE=0.' $(NO_COL)\n" && false)
 else
 	@$(SHA1SUM) $(ROM)
-	@$(PRINT) "${GREEN}Build succeeded.\n"
+	@$(PRINT) "${GREEN}Build succeeded.$(NO_COL)\n"
 endif
 
 clean:
@@ -779,13 +779,13 @@ $(BUILD_DIR)/libz.a: $(LIBZ_O_FILES)
 	$(V)$(AR) rcs -o $@ $(LIBZ_O_FILES)
 
 # SS2: Goddard rules to get size
-$(BUILD_DIR)/goddard.ld: goddard.ld
+$(BUILD_DIR)/goddard.ld: goddard.ld $(BUILD_DIR)/libgoddard.a
 	$(call print,Preprocessing linker script:,$<,$@)
 	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -MMD -MP -MT $@ -MF $@.d -o $@ $<
 
 $(BUILD_DIR)/goddard.elf: $(BUILD_DIR)/goddard.ld
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $< -Map $(BUILD_DIR)/goddard.map --no-check-sections -o $@ -T tools/hardcoded_syms.txt $(wildcard $(BUILD_DIR)/src/menu/*.o) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
+	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $< -Map $(BUILD_DIR)/goddard.map --no-check-sections -o $@ -T tools/hardcoded_syms.txt $(wildcard $(BUILD_DIR)/src/menu/*.o) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib -lgoddard -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
 
 $(BUILD_DIR)/goddard.txt: $(BUILD_DIR)/goddard.elf
 	$(call print,Getting Goddard size...)
