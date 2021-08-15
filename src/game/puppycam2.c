@@ -23,6 +23,8 @@
 #include "save_file.h"
 #include "mario.h"
 
+#ifdef PUPPYCAM
+
 #define OFFSET 30.0f
 #define STEPS 1
 #define DECELERATION 0.66f
@@ -1590,3 +1592,4 @@ void puppycam_loop(void)
     puppycam_apply();
 }
 
+#endif

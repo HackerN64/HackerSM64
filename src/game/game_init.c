@@ -728,7 +728,9 @@ void thread5_game_loop(UNUSED void *arg) {
     createHvqmThread();
 #endif
     save_file_load_all();
+    #ifdef PUPPYCAM
     puppycam_boot();
+    #endif
 
     set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
 

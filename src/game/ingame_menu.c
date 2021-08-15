@@ -1494,8 +1494,8 @@ void render_pause_red_coins(void) {
     }
 }
 ///By default, not needed as puppycamera has an option, but should you wish to revert that, you are legally allowed.
-/*
-#ifdef WIDE
+
+#if defined(WIDE) && !defined(PUPPYCAM)
 void render_widescreen_setting(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
@@ -1514,7 +1514,7 @@ void render_widescreen_setting(void) {
         save_file_set_widescreen_mode(gWidescreen);
     }
 }
-#endif*/
+#endif
 
 #define CRS_NUM_X1 100
 #define TXT_STAR_X 98
@@ -1802,10 +1802,11 @@ s8 gHudFlash = 0;
 s16 render_pause_courses_and_castle(void) {
     s16 index;
 
-
+    #ifdef PUPPYCAM
     puppycam_check_pause_buttons();
     if (!gPCOptionOpen)
     {
+    #endif
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             gDialogLineNum = MENU_OPT_DEFAULT;
@@ -1870,12 +1871,13 @@ s16 render_pause_courses_and_castle(void) {
             }
             break;
     }
-    #ifdef WIDE
-        //render_widescreen_setting();
+    #if defined(WIDE) && !defined(PUPPYCAM)
+        render_widescreen_setting();
     #endif
     if (gDialogTextAlpha < 250) {
         gDialogTextAlpha += 25;
     }
+    #ifdef PUPPYCAM
     }
     else
     {
@@ -1884,6 +1886,7 @@ s16 render_pause_courses_and_castle(void) {
     }
 
     puppycam_render_option_text();
+    #endif
     return MENU_OPT_NONE;
 }
 

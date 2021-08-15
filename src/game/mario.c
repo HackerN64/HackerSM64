@@ -1417,11 +1417,13 @@ void update_mario_inputs(struct MarioState *m) {
     m->collidedObjInteractTypes = m->marioObj->collidedObjInteractTypes;
     m->flags &= 0xFFFFFF;
 
+    #ifdef PUPPYCAM
     if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ENTER_FIRST_PERSON)
     {
         m->input = INPUT_FIRST_PERSON;
         return;
     }
+    #endif
 
     update_mario_button_inputs(m);
     update_mario_joystick_inputs(m);

@@ -1,6 +1,8 @@
 #ifndef PUPPYCAM2_H
 #define PUPPYCAM2_H
 
+#ifdef PUPPYCAM
+
 #define PUPPYCAM_FLAGS_CUTSCENE    0x0001
 #define PUPPYCAM_FLAGS_SMOOTH      0x0002
 
@@ -171,5 +173,7 @@ extern void puppycam_check_pause_buttons(void);
 extern void puppycam_activate_cutscene(s32 *scene, s32 lockinput);
 extern void puppycam_render_option_text();
 void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacementZ);
+
+#endif
 
 #endif // PUPPYCAM2_H

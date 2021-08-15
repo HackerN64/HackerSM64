@@ -526,7 +526,9 @@ void render_hud(void) {
 
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_CAMERA_AND_POWER) {
             render_hud_power_meter();
+            #ifdef PUPPYCAM
             if (!gPuppyCam.enabled)
+            #endif
                 render_hud_camera_status();
         }
 

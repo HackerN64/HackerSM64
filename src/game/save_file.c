@@ -391,6 +391,7 @@ void save_file_load_all(void) {
     }
 }
 
+#ifdef PUPPYCAM
 void puppycam_check_save(void)
 {
     if (gSaveBuffer.menuData[0].firstBoot != 4 || gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5 || gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5)
@@ -419,6 +420,7 @@ void puppycam_set_save(void)
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }
+#endif
 
 /**
  * Reload the current save file from its backup copy, which is effectively a

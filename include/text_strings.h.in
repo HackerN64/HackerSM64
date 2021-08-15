@@ -3,6 +3,7 @@
 
 #include "text_menu_strings.h"
 
+#ifdef PUPPYCAM
 #define NC_CAMX_EN 				_("Camera X Sensitivity")
 #define NC_CAMY_EN 				_("Camera Y Sensitivity")
 #define NC_INVERTX_EN			_("Invert X Axis")
@@ -70,6 +71,7 @@
 
 #define NC_OPTION_FR 				_("OPTIONS PUPPYCAM")
 #define NC_OPTION_DE 				_("PUPPYCAM OPTIONS")
+#endif
 #endif
 
 /**
