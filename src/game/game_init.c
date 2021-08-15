@@ -29,6 +29,7 @@
 #ifdef SRAM
 #include "sram.h"
 #endif
+#include "puppyprint.h"
 #include <prevent_bss_reordering.h>
 #include "puppycam2.h"
 
@@ -422,6 +423,7 @@ void display_and_vsync(void) {
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
     profiler_log_thread5_time(BEFORE_DISPLAY_LISTS);
+    //gIsConsole = (IO_READ(DPC_PIPEBUSY_REG));
     osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
     if (gGoddardVblankCallback != NULL) {
         gGoddardVblankCallback();
@@ -710,6 +712,9 @@ void setup_game_memory(void) {
  */
 void thread5_game_loop(UNUSED void *arg) {
     struct LevelCommand *addr;
+    #ifdef PUPPYPRINT
+    OSTime lastTime = 0;
+    #endif
 
     setup_game_memory();
 #if ENABLE_RUMBLE
@@ -744,6 +749,14 @@ void thread5_game_loop(UNUSED void *arg) {
             continue;
         }
         profiler_log_thread5_time(THREAD5_START);
+        #ifdef PUPPYPRINT
+        while (TRUE)
+        {
+            lastTime = osGetTime();
+            collisionTime[perfIteration] = 0;
+            behaviourTime[perfIteration] = 0;
+            dmaTime[perfIteration] = 0;
+        #endif
 
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
@@ -758,6 +771,23 @@ void thread5_game_loop(UNUSED void *arg) {
         select_gfx_pool();
         read_controller_inputs();
         addr = level_script_execute(addr);
+        #ifdef PUPPYPRINT
+        profiler_update(scriptTime, lastTime);
+            if (benchmarkLoop > 0 && benchOption == 0)
+            {
+                benchmarkLoop--;
+                benchMark[benchmarkLoop] = osGetTime() - lastTime;
+                if (benchmarkLoop == 0)
+                {
+                    puppyprint_profiler_finished();
+                    break;
+                }
+            }
+            else
+                break;
+        }
+        puppyprint_profiler_process();
+        #endif
 
         display_and_vsync();
 

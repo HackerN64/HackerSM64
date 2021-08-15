@@ -15,6 +15,7 @@
 #include "print.h"
 #include "engine/surface_load.h"
 #include "puppycam2.h"
+#include "puppyprint.h"
 
 #include "config.h"
 
@@ -54,8 +55,12 @@ void print_fps(s32 x, s32 y)
     char text[14];
 
     sprintf(text, "FPS %2.2f", fps);
-
+    #ifdef PUPPYPRINT
+    print_small_text(x, y, text, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL);
+    #else
     print_text(x, y, text);
+    #endif
+
 }
 
 // ------------ END OF FPS COUNER -----------------
@@ -541,6 +546,9 @@ void render_hud(void) {
         if (gCustomDebugMode) {
             render_debug_mode();
         }
+    #endif
+    #ifdef PUPPYPRINT
+    print_set_envcolour(255,255,255,255);
     #endif
     }
 }

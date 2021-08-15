@@ -21,6 +21,7 @@
 #include "usb/usb.h"
 #include "usb/debug.h"
 #endif
+#include "puppyprint.h"
 
 
 // round up to the next multiple
@@ -134,6 +135,9 @@ void main_pool_init(void *start, void *end) {
     sPoolListHeadL->next = NULL;
     sPoolListHeadR->prev = NULL;
     sPoolListHeadR->next = NULL;
+    #ifdef PUPPYPRINT
+    mempool = sPoolFreeSpace;
+    #endif
 }
 
 /**
@@ -256,6 +260,9 @@ u32 main_pool_pop_state(void) {
  */
 void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
     u32 size = ALIGN16(srcEnd - srcStart);
+    #ifdef PUPPYPRINT
+    OSTime first = osGetTime();
+    #endif
 
     osInvalDCache(dest, size);
     while (size != 0) {
@@ -269,6 +276,9 @@ void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
         srcStart += copySize;
         size -= copySize;
     }
+    #ifdef PUPPYPRINT
+    dmaTime[perfIteration] += osGetTime()-first;
+    #endif
 }
 
 /**
@@ -293,6 +303,9 @@ static void *dynamic_dma_read(u8 *srcStart, u8 *srcEnd, u32 side) {
  */
 void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side) {
     void *addr = dynamic_dma_read(srcStart, srcEnd, side);
+    #ifdef PUPPYPRINT
+    ramsizeSegment[segment+nameTable-2] = (s32)srcEnd- (s32)srcStart;
+    #endif
 
     if (addr != NULL) {
         set_segment_base_addr(segment, addr);
@@ -374,6 +387,9 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         }
     } else {
     }
+    #ifdef PUPPYPRINT
+    ramsizeSegment[segment+nameTable-2] = (s32)srcEnd - (s32)srcStart;
+    #endif
     return dest;
 }
 
