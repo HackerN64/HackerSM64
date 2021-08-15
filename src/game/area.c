@@ -23,6 +23,7 @@
 #include "save_file.h"
 #include "level_table.h"
 #include "dialog_ids.h"
+#include "puppyprint.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
@@ -412,6 +413,11 @@ void render_game(void) {
             clear_frame_buffer(gWarpTransFBSetColor);
         }
     }
+
+
+    #ifdef PUPPYPRINT
+    puppyprint_render_profiler();
+    #endif
 
     D_8032CE74 = NULL;
     D_8032CE78 = NULL;
