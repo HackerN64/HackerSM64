@@ -3249,12 +3249,7 @@ void update_camera(struct Camera *c) {
             gPuppyCam.yaw = gMarioState->faceAngle[1]+0x8000;
         }
     }
-    #endif
-    if (c->cutscene == 0 &&
-        #ifdef PUPPYCAM
-        gPuppyCam.enabled &&
-        #endif
-        !(gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON))
+    if (c->cutscene == 0 && gPuppyCam.enabled && !(gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON))
     {
         // Clear the recent cutscene after 8 frames
         if (gRecentCutscene != 0 && sFramesSinceCutsceneEnded < 8) {
@@ -3264,7 +3259,6 @@ void update_camera(struct Camera *c) {
                 sFramesSinceCutsceneEnded = 0;
             }
         }
-        #ifdef PUPPYCAM
         puppycam_loop();
         // Apply camera shakes
         shake_camera_pitch(gLakituState.pos, gLakituState.focus);
@@ -3277,8 +3271,8 @@ void update_camera(struct Camera *c) {
         }
         gLakituState.roll += sHandheldShakeRoll;
         gLakituState.roll += gLakituState.keyDanceRoll;
-        #endif
     }
+    #endif
     gLakituState.lastFrameAction = sMarioCamState->action;
 }
 
