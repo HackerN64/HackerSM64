@@ -31,6 +31,7 @@
 #endif
 #include "puppyprint.h"
 #include <prevent_bss_reordering.h>
+#include "puppycam2.h"
 
 // First 3 controller slots
 struct Controller gControllers[3];
@@ -81,7 +82,7 @@ UNUSED static s32 sUnusedGameInitValue = 0;
 // General timer that runs as the game starts
 u32 gGlobalTimer = 0;
 #ifdef WIDE
-u8 gWidescreen;
+s16 gWidescreen;
 #endif
 
 // Framebuffer rendering values (max 3)
@@ -290,7 +291,7 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.ucode_data = gspF3DEX_fifoDataStart;
 #elif   SUPER3D_GBI
     gGfxSPTask->task.t.ucode = gspSuper3D_fifoTextStart;
-    gGfxSPTask->task.t.ucode_data = gspSuper3D_fifoDataStart; 
+    gGfxSPTask->task.t.ucode_data = gspSuper3D_fifoDataStart;
 #else
     gGfxSPTask->task.t.ucode = gspFast3D_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspFast3D_fifoDataStart;
@@ -727,6 +728,9 @@ void thread5_game_loop(UNUSED void *arg) {
     createHvqmThread();
 #endif
     save_file_load_all();
+    #ifdef PUPPYCAM
+    puppycam_boot();
+    #endif
 
     set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
 

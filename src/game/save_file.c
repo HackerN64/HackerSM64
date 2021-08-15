@@ -15,6 +15,7 @@
 #ifdef SRAM
 #include "sram.h"
 #endif
+#include "puppycam2.h"
 
 #define ALIGN4(val) (((val) + 0x3) & ~0x3)
 
@@ -389,6 +390,37 @@ void save_file_load_all(void) {
         }
     }
 }
+
+#ifdef PUPPYCAM
+void puppycam_check_save(void)
+{
+    if (gSaveBuffer.menuData[0].firstBoot != 4 || gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5 || gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5)
+    {
+        wipe_main_menu_data();
+        gSaveBuffer.menuData[0].firstBoot = 4;
+        puppycam_default_config();
+    }
+}
+
+void puppycam_get_save(void)
+{
+    gPuppyCam.options = gSaveBuffer.menuData[0].saveOptions;
+
+    gSaveBuffer.menuData[0].firstBoot = gSaveBuffer.menuData[0].firstBoot;
+
+    puppycam_check_save();
+}
+
+void puppycam_set_save(void)
+{
+    gSaveBuffer.menuData[0].saveOptions = gPuppyCam.options;
+
+    gSaveBuffer.menuData[0].firstBoot = 4;
+
+    gMainMenuDataModified = TRUE;
+    save_main_menu_data();
+}
+#endif
 
 /**
  * Reload the current save file from its backup copy, which is effectively a
