@@ -476,12 +476,14 @@ void puppyprint_profiler_process(void)
         }
         benchmark_custom();
     }
+    #if PUPPYPRINT_DEBUG
     if (gPlayer1Controller->buttonDown & U_JPAD && gPlayer1Controller->buttonPressed & L_TRIG)
     {
         ramViewer = 0;
         benchViewer = 0;
         fDebug ^= 1;
     }
+    #endif
 
 
     if (perfIteration++ == NUM_PERF_ITERATIONS-1)
