@@ -9,6 +9,11 @@
 #include "make_const_nonconst.h"
 
 // SM64 (US/JP/EU/SH) Segment 02
+#ifdef PUPPYPRINT
+ALIGNED8 const Texture small_font[] = {
+#include "textures/segment2/custom_text.i4.inc.c"
+};
+#endif
 
 ALIGNED8 static const Texture texture_hud_char_0[] = {
 #include "textures/segment2/segment2.00000.rgba16.inc.c"

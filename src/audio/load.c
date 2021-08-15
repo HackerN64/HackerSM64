@@ -7,6 +7,7 @@
 #include "heap.h"
 #include "load.h"
 #include "seqplayer.h"
+#include "game/puppyprint.h"
 
 #define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
@@ -141,8 +142,14 @@ u8 audioString49[] = "BANK LOAD MISS! FOR %d\n";
  * Performs an asynchronus (normal priority) DMA copy
  */
 void audio_dma_copy_async(uintptr_t devAddr, void *vAddr, size_t nbytes, OSMesgQueue *queue, OSIoMesg *mesg) {
+    #ifdef PUPPYPRINT
+    OSTime first = osGetTime();
+    #endif
     osInvalDCache(vAddr, nbytes);
     osPiStartDma(mesg, OS_MESG_PRI_NORMAL, OS_READ, devAddr, vAddr, nbytes, queue);
+    #ifdef PUPPYPRINT
+    dmaAudioTime[perfIteration] += osGetTime()-first;
+    #endif
 }
 
 /**
@@ -150,6 +157,9 @@ void audio_dma_copy_async(uintptr_t devAddr, void *vAddr, size_t nbytes, OSMesgQ
  * to 0x1000 bytes transfer at once.
  */
 void audio_dma_partial_copy_async(uintptr_t *devAddr, u8 **vAddr, ssize_t *remaining, OSMesgQueue *queue, OSIoMesg *mesg) {
+    #ifdef PUPPYPRINT
+    OSTime first = osGetTime();
+    #endif
 #if defined(VERSION_EU)
     ssize_t transfer = (*remaining >= 0x1000 ? 0x1000 : *remaining);
 #else
@@ -160,6 +170,9 @@ void audio_dma_partial_copy_async(uintptr_t *devAddr, u8 **vAddr, ssize_t *remai
     osPiStartDma(mesg, OS_MESG_PRI_NORMAL, OS_READ, *devAddr, *vAddr, transfer, queue);
     *devAddr += transfer;
     *vAddr += transfer;
+    #ifdef PUPPYPRINT
+    dmaAudioTime[perfIteration] += osGetTime()-first;
+    #endif
 }
 
 void decrease_sample_dma_ttls() {
@@ -207,6 +220,9 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
     u32 dmaIndex;
     ssize_t bufferPos;
     UNUSED u32 pad;
+    #ifdef PUPPYPRINT
+    OSTime first = osGetTime();
+    #endif
 
     if (arg2 != 0 || *dmaIndexRef >= sSampleDmaListSize1) {
         for (i = sSampleDmaListSize1; i < gSampleDmaNumListItems; i++) {
@@ -232,8 +248,14 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
                 dma->ttl = 60;
                 *dmaIndexRef = (u8) i;
 #if defined(VERSION_EU)
+                #ifdef PUPPYPRINT
+                dmaAudioTime[perfIteration] += osGetTime()-first;
+                #endif
                 return &dma->buffer[(devAddr - dma->source)];
 #else
+                #ifdef PUPPYPRINT
+                dmaAudioTime[perfIteration] += osGetTime()-first;
+                #endif
                 return (devAddr - dma->source) + dma->buffer;
 #endif
             }
@@ -274,8 +296,14 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
             }
             dma->ttl = 2;
 #if defined(VERSION_EU)
+            #ifdef PUPPYPRINT
+            dmaAudioTime[perfIteration] += osGetTime()-first;
+            #endif
             return dma->buffer + (devAddr - dma->source);
 #else
+            #ifdef PUPPYPRINT
+            dmaAudioTime[perfIteration] += osGetTime()-first;
+            #endif
             return (devAddr - dma->source) + dma->buffer;
 #endif
         }
@@ -301,12 +329,18 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
     osPiStartDma(&gCurrAudioFrameDmaIoMesgBufs[gCurrAudioFrameDmaCount++], OS_MESG_PRI_NORMAL,
                      OS_READ, dmaDevAddr, dma->buffer, transfer, &gCurrAudioFrameDmaQueue);
     *dmaIndexRef = dmaIndex;
+    #ifdef PUPPYPRINT
+    dmaAudioTime[perfIteration] += osGetTime()-first;
+    #endif
     return (devAddr - dmaDevAddr) + dma->buffer;
 #else
     gCurrAudioFrameDmaCount++;
     osPiStartDma(&gCurrAudioFrameDmaIoMesgBufs[gCurrAudioFrameDmaCount - 1], OS_MESG_PRI_NORMAL,
                  OS_READ, dmaDevAddr, dma->buffer, transfer, &gCurrAudioFrameDmaQueue);
     *dmaIndexRef = dmaIndex;
+    #ifdef PUPPYPRINT
+    dmaAudioTime[perfIteration] += osGetTime()-first;
+    #endif
     return dma->buffer + (devAddr - dmaDevAddr);
 #endif
 }
