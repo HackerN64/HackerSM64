@@ -1,6 +1,8 @@
 #ifndef SURFACE_TERRAINS_H
 #define SURFACE_TERRAINS_H
 
+#include "config.h"
+
 // Surface Types
 #define SURFACE_DEFAULT                      0x0000 // Environment default
 #define SURFACE_BURNING                      0x0001 // Lava / Frostbite (in SL), but is used mostly for Lava
@@ -207,7 +209,11 @@
 #define COL_TRI_INIT(surfType, triNum) surfType, triNum
 
 // Collision Tri
+#ifdef ALL_SURFACES_HAVE_FORCE
+#define COL_TRI(v1, v2, v3) v1, v2, v3, 0
+#else
 #define COL_TRI(v1, v2, v3) v1, v2, v3
+#endif
 
 // Collision Tri With Special Params
 #define COL_TRI_SPECIAL(v1, v2, v3, param) v1, v2, v3, param

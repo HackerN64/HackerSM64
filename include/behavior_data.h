@@ -261,7 +261,7 @@ extern const BehaviorScript bhvBoo[];
 extern const BehaviorScript bhvMerryGoRoundBoo[];
 extern const BehaviorScript bhvGhostHuntBoo[];
 extern const BehaviorScript bhvHiddenStaircaseStep[];
-extern const BehaviorScript bhvBooBossSpawnedBridge[];
+extern const BehaviorScript bhvBooStaircase[];
 extern const BehaviorScript bhvBbhTiltingTrapPlatform[];
 extern const BehaviorScript bhvHauntedBookshelf[];
 extern const BehaviorScript bhvMeshElevator[];
@@ -545,5 +545,8 @@ extern const BehaviorScript bhvUnusedFakeStar[];
 extern const BehaviorScript bhvRosedrift[];
 extern const BehaviorScript bhvPiranhaCreeper[];
 extern const BehaviorScript bhvPiranhaCreeperCheckpoint[];
+extern const BehaviorScript bhvCameraController[];
+extern const BehaviorScript bhvCutsceneMario[];
+extern const BehaviorScript bhvCutsceneDoll[];
 
 #endif // BEHAVIOR_DATA_H

@@ -108,7 +108,7 @@ Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *no
         gfxHead = alloc_display_list(3 * sizeof(Gfx));
         gfx = gfxHead;
         obj->header.gfx.node.flags =
-            (obj->header.gfx.node.flags & 0xFF) | (GRAPH_NODE_TYPE_FUNCTIONAL | GRAPH_NODE_TYPE_400);
+            (obj->header.gfx.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8);
 
         gDPSetEnvColor(gfx++, 255, 255, 255, heldObject->oOpacity);
 
@@ -685,14 +685,14 @@ s16 trigger_obj_dialog_when_facing(s32 *inDialog, s16 dialogID, f32 dist, s32 ac
     if ((is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, (s32) dist) == TRUE
          && obj_check_if_facing_toward_angle(o->oFaceAngleYaw, gMarioObject->header.gfx.angle[1] + 0x8000, 0x1000) == TRUE
          && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x1000) == TRUE)
-        || (*inDialog == 1)) {
-        *inDialog = 1;
+        || (*inDialog == TRUE)) {
+        *inDialog = TRUE;
 
-        if (set_mario_npc_dialog(actionArg) == 2) { //If Mario is speaking.
+        if (set_mario_npc_dialog(actionArg) == MARIO_DIALOG_STATUS_SPEAK) { //If Mario is speaking.
             dialogueResponse = cutscene_object_with_dialog(CUTSCENE_DIALOG, o, dialogID);
-            if (dialogueResponse != 0) {
-                set_mario_npc_dialog(0);
-                *inDialog = 0;
+            if (dialogueResponse) {
+                set_mario_npc_dialog(MARIO_DIALOG_STOP);
+                *inDialog = FALSE;
                 return dialogueResponse;
             }
             return 0;

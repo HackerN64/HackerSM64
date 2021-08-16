@@ -53,7 +53,7 @@ int main(int argc, const char **argv, const char **envp)
 	fseek(fp, 0, SEEK_SET);
 	
 	bz = malloc(insize);
-	fread(bz, 1, insize, fp);
+	size_t fread_result = fread(bz, 1, insize, fp);
 	fclose(fp);
 	
 	for (int i = 0; src[i]; i++)
@@ -199,7 +199,7 @@ void encode()
 	}
 	if ( v1 != 0x80000000 )
 		++cp;
-	fprintf(stderr, "IN=%d OUT=%d\n", insize, dp + 2 * pp + 4 * cp + 16);
+	//fprintf(stderr, "IN=%d OUT=%d\n", insize, dp + 2 * pp + 4 * cp + 16);
 }
 
 void search(unsigned int a1, int a2, int *a3, unsigned int *a4)

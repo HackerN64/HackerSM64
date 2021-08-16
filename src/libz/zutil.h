@@ -227,7 +227,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #endif
 
 /* Diagnostic functions */
-#ifdef DEBUG
+#ifdef PCDEBUG
 #  include <stdio.h>
    extern int z_verbose;
    extern void z_error    OF((char *m));

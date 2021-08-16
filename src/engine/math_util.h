@@ -5,13 +5,7 @@
 
 #include "types.h"
 
-/* Scales the world down by this factor, increasing how far you can render on
- * console in exchange for a slight loss in precision.
- * 
- * For double extended boundary hacks, a value of 1.5f or 2.0f is good.
- * For quadruple extended bounds, use 3.f or 4.f
- */
-#define WORLD_SCALE 2.f
+
 
 /*
  * The sine and cosine tables overlap, but "#define gCosineTable (gSineTable +
@@ -37,6 +31,7 @@ extern f32 gCosineTable[];
 
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 #define sqr(x) ((x) * (x))
 

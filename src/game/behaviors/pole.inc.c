@@ -1,3 +1,4 @@
+#include "config.h"
 /**
  * Behaviors for bhvPoleGrabbing and bhvGiantPole.
  *
@@ -16,8 +17,13 @@ void bhv_pole_init(void) {
      * This is equivalent to using `o->oBehParams2ndByte` according to
      * `spawn_objects_from_info`.
      */
+
+#ifdef LONGER_POLES
+    o->hitboxHeight = ((o->oBehParams & 0xFFFF0000) >> 16) * 10;
+#else
     s32 tenthHitboxHeight = o->oBehParams >> 0x10 & 0xFF;
     o->hitboxHeight = tenthHitboxHeight * 10;
+#endif
 }
 
 /**

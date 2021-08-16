@@ -1,3 +1,4 @@
+#include "config.h"
 // tree_particles.c.inc
 
 void bhv_tree_snow_or_leaf_loop(void) {
@@ -10,11 +11,11 @@ void bhv_tree_snow_or_leaf_loop(void) {
     }
     if (o->oPosY < o->oFloorHeight)
         obj_mark_for_deletion(o);
-    if (o->oFloorHeight < -11000.0f)
+    if (o->oFloorHeight < FLOOR_LOWER_LIMIT)
         obj_mark_for_deletion(o);
     if (o->oTimer > 100)
         obj_mark_for_deletion(o);
-    if (gPrevFrameObjectCount > 212)
+    if (gPrevFrameObjectCount > (OBJECT_POOL_CAPACITY - 28))
         obj_mark_for_deletion(o);
     o->oFaceAnglePitch += o->oAngleVelPitch;
     o->oFaceAngleRoll += o->oAngleVelRoll;
@@ -33,15 +34,23 @@ void bhv_tree_snow_or_leaf_loop(void) {
 
 void bhv_snow_leaf_particle_spawn_init(void) {
     struct Object *obj; // Either snow or leaf
+#ifdef TREE_PARTICLE_FIX
+    struct Object *nearestTree = NULL;
+#endif
     UNUSED s32 unused;
     s32 isSnow;
     f32 scale;
     UNUSED s32 unused2;
     gMarioObject->oActiveParticleFlags &= ~0x2000;
+#ifdef TREE_PARTICLE_FIX
+    nearestTree = cur_obj_nearest_object_with_behavior(bhvTree);
+    isSnow = (nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_CCM_SNOW_TREE] || nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_SL_SNOW_TREE]);
+#else
     if (gCurrLevelNum == LEVEL_CCM || gCurrLevelNum == LEVEL_SL)
         isSnow = 1;
     else
         isSnow = 0;
+#endif
     if (isSnow) {
         if (random_float() < 0.5) {
             obj = spawn_object(o, MODEL_WHITE_PARTICLE_DL, bhvTreeSnow);

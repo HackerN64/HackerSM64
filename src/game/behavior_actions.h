@@ -231,7 +231,7 @@ void bhv_big_boo_loop(void);
 void bhv_courtyard_boo_triplet_init(void);
 void obj_set_secondary_camera_focus(void);
 void bhv_boo_loop(void);
-void bhv_boo_boss_spawned_bridge_loop(void);
+void bhv_boo_staircase(void);
 void bhv_bbh_tilting_trap_platform_loop(void);
 void bhv_haunted_bookshelf_loop(void);
 void bhv_merry_go_round_loop(void);
@@ -557,6 +557,9 @@ void rosedrift_loop(void);
 void piranha_creeper_loop(void);
 void piranha_creeper_init(void);
 void piranha_creeper_checkpoint_loop(void);
+void camera_controller(void);
+void cutscene_mario(void);
+void cutscene_doll_loop(void);
 
 Gfx *geo_piranha_creeper_vine(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
 
@@ -569,6 +572,7 @@ Gfx *geo_switch_bowser_eyes(s32 run, struct GraphNode *node, UNUSED Mat4 *mtx);
 
 // Tuxie
 Gfx *geo_switch_tuxie_mother_eyes(s32 run, struct GraphNode *node, UNUSED Mat4 *mtx);
+Gfx *geo_switch_doll_mouth(s32 run, struct GraphNode *node, UNUSED Mat4 *mtx);
 
 // Cap switch
 Gfx *geo_update_held_mario_pos(s32 run, UNUSED struct GraphNode *node, Mat4 mtx);

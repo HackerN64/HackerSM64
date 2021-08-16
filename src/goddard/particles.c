@@ -27,7 +27,7 @@ struct Connection {
 };
 
 // data
-static void *sUnused801A81D0 = NULL;
+UNUSED static void *sUnused801A81D0 = NULL;
 static s32 D_801A81D4[25] = {
     /*  ID?    X    Y    Z */
     9,  3,  12,  -14, 25, 5,  16,  -25, 42, 4,  15, -39, 55,
@@ -492,30 +492,6 @@ void Unknown801835C8(struct ObjParticle *ptc) {
         link = link->next;
     }
     gd_printf("\n");
-}
-
-/**
- * Unused
- */
-void stub_particles_1(UNUSED s32 a) {
-}
-
-/**
- * Unused
- */
-void stub_particles_2(UNUSED s32 a) {
-}
-
-/**
- * Unused
- */
-void stub_particles_3(UNUSED s32 a, UNUSED s32 b, UNUSED s32 c) {
-}
-
-/**
- * Unused
- */
-void stub_particles_4(UNUSED s32 a, UNUSED s32 b, UNUSED s32 c) {
 }
 
 /* 2320A0 -> 2320D4; pad to 2320E0 */

@@ -4795,7 +4795,7 @@ typedef union {
 #define	gDPNoOpTag(pkt, tag)	gDPParam(pkt, G_NOOP, tag)
 #define	gsDPNoOpTag(tag)	gsDPParam(G_NOOP, tag)
 
-#if defined(F3DZEX_GBI_2) || defined(F3DZEX_NON_GBI_2) || defined(L3DZEX_GBI)
+#if defined(F3DZEX_GBI_2) || defined(F3DZEX_NON_GBI_2) || defined(L3DZEX_GBI) || defined(F3DEX2PL_GBI)
 #include "gbi-poslight.h"
 #endif
 

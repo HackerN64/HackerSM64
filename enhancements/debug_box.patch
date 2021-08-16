@@ -2,14 +2,14 @@ diff --git a/src/game/area.c b/src/game/area.c
 index af9d0156..c68a7f6e 100644
 --- a/src/game/area.c
 +++ b/src/game/area.c
-@@ -21,6 +21,7 @@
- #include "engine/geo_layout.h"
+@@ -22,6 +22,7 @@
  #include "save_file.h"
  #include "level_table.h"
+ #include "dialog_ids.h"
 +#include "debug_box.h"
  
  struct SpawnInfo gPlayerSpawnInfos[1];
- struct GraphNode *D_8033A160[0x100];
+ struct GraphNode *gGraphNodePointers[0x100];
 @@ -363,6 +364,8 @@ void render_game(void) {
      if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
          geo_process_root(gCurrentArea->unk04, D_8032CE74, D_8032CE78, gFBSetColor);

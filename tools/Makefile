@@ -7,7 +7,7 @@ CC           := gcc
 CXX          := g++
 CFLAGS       := -I. -O2 -s
 LDFLAGS      := -lm
-ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv patch_libultra_math aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv
+ALL_PROGRAMS := armips filesizer rncpack n64graphics n64graphics_ci mio0 slienc n64cksum textconv patch_elf_32bit aifc_decode aiff_extract_codebook vadpcm_enc tabledesign extract_data_for_mio skyconv
 LIBAUDIOFILE := audiofile/libaudiofile.a
 
 # Only build armips from tools if it is not found on the system
@@ -39,7 +39,7 @@ n64cksum_CFLAGS  := -DN64CKSUM_STANDALONE
 
 textconv_SOURCES := textconv.c utf8.c hashtable.c
 
-patch_libultra_math_SOURCES := patch_libultra_math.c
+patch_elf_32bit_SOURCES := patch_elf_32bit.c
 
 aifc_decode_SOURCES := aifc_decode.c
 
@@ -56,6 +56,7 @@ vadpcm_enc_CFLAGS  := -Wno-unused-result -Wno-uninitialized -Wno-sign-compare -W
 extract_data_for_mio_SOURCES := extract_data_for_mio.c
 
 skyconv_SOURCES := skyconv.c n64graphics.c utils.c
+skyconv_CFLAGS := -g -I../include
 
 armips: CC := $(CXX)
 armips_SOURCES := armips.cpp

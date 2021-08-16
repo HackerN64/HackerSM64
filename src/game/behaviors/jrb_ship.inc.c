@@ -42,7 +42,7 @@ void bhv_jrb_sliding_box_loop(void) {
     struct Surface *sp38;
     UNUSED Vec3f sp2C;
     Vec3f sp20;
-    s16 sp1E;
+    s16 sp1E = 0;
     if (o->oJrbSlidingBoxUnkF4 == NULL) {
         sp3C = cur_obj_nearest_object_with_behavior(bhvInSunkenShip3);
         if (sp3C != NULL) // NULL check only for assignment, not for dereference?

@@ -1,3 +1,5 @@
+#include "config.h"
+
 // spawn_default_star.c.inc
 
 static struct ObjectHitbox sCollectStarHitbox = {
@@ -17,8 +19,13 @@ void bhv_collect_star_init(void) {
     u8 currentLevelStarFlags;
 
     starId = (o->oBehParams >> 24) & 0xFF;
+#ifdef GLOBAL_STAR_IDS
+    currentLevelStarFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, (starId/7) - 1);
+    if (currentLevelStarFlags & (1 << (starId % 7))) {
+#else
     currentLevelStarFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
     if (currentLevelStarFlags & (1 << starId)) {
+#endif
         o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_TRANSPARENT_STAR];
     } else {
         o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_STAR];
@@ -123,18 +130,27 @@ struct Object *spawn_star(struct Object *sp30, f32 sp34, f32 sp38, f32 sp3C) {
 
 void spawn_default_star(f32 sp20, f32 sp24, f32 sp28) {
     struct Object *sp1C;
+#ifdef AVOID_UB
+    sp1C = 0;
+#endif
     sp1C = spawn_star(sp1C, sp20, sp24, sp28);
     sp1C->oBehParams2ndByte = 0;
 }
 
 void spawn_red_coin_cutscene_star(f32 sp20, f32 sp24, f32 sp28) {
     struct Object *sp1C;
+#ifdef AVOID_UB
+    sp1C = 0;
+#endif
     sp1C = spawn_star(sp1C, sp20, sp24, sp28);
     sp1C->oBehParams2ndByte = 1;
 }
 
 void spawn_no_exit_star(f32 sp20, f32 sp24, f32 sp28) {
     struct Object *sp1C;
+#ifdef AVOID_UB
+    sp1C = 0;
+#endif
     sp1C = spawn_star(sp1C, sp20, sp24, sp28);
     sp1C->oBehParams2ndByte = 1;
     sp1C->oInteractionSubtype |= INT_SUBTYPE_NO_EXIT;

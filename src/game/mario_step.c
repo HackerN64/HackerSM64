@@ -9,6 +9,8 @@
 #include "interaction.h"
 #include "mario_step.h"
 
+#include "config.h"
+
 static s16 sMovingSandSpeeds[] = { 12, 8, 4, 0 };
 
 struct Surface gWaterSurfacePseudoFloor = {
@@ -448,8 +450,12 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             m->vel[1] = 0.0f;
 
             //! Uses referenced ceiling instead of ceil (ceiling hang upwarp)
+            #ifdef HANGING_FIX
+            if (m->ceil != NULL && m->ceil->type == SURFACE_HANGABLE) {
+            #else
             if ((stepArg & AIR_STEP_CHECK_HANG) && m->ceil != NULL
                 && m->ceil->type == SURFACE_HANGABLE) {
+            #endif
                 return AIR_STEP_GRABBED_CEILING;
             }
 
@@ -493,7 +499,11 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         if (m->wall->type == SURFACE_THORN_WALL && m->curPatch != 1) {
             return AIR_STEP_HIT_LAVA_WALL;
         }
+    #ifdef WALLKICKS_46_DEGREES
+        if (wallDYaw < -0x5F00 || wallDYaw > 0x5700) {
+    #else
         if (wallDYaw < -0x6000 || wallDYaw > 0x6000) {
+    #endif
             m->flags |= MARIO_UNKNOWN_30;
             return AIR_STEP_HIT_WALL;
         }

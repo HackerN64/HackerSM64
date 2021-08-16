@@ -49,6 +49,8 @@ const LevelScript level_bob_entry[] = {
 		OBJECT(MODEL_NONE, 7610, 47, -6379, 0, 0, 180, 0x30200000, bhvWarp),
 		OBJECT(MODEL_PIRANHA_CREEPER, 3704, 2941, 1996, 0, -89, 0, 0x00000000, bhvPiranhaCreeper),
 		OBJECT(MODEL_NONE, 2096, 2841, 1996, 0, -150, 0, 0x00000000, bhvPiranhaCreeperCheckpoint),
+		OBJECT(MODEL_NONE, -2624, 100, 1444, 0, 0, 0, 0x00000000, bhvCameraController),
+		OBJECT(MODEL_DOLL, -4500, 40, 1398, 0, 0, 0, 0x00000000, bhvCutsceneDoll),
 		OBJECT(MODEL_STAR, 4740, 4155, 1842, 0, 0, 0, 0x00000000, bhvStar),
 		OBJECT(MODEL_NONE, 0, 200, 0, 0, 0, 0, 0x000A0000, bhvSpinAirborneWarp),
 		MARIO_POS(0x01, 0, -3651, 181, 1728),
@@ -64,7 +66,7 @@ const LevelScript level_bob_entry[] = {
 		OBJECT(MODEL_NONE, 0, 200, 0, 0, 0, 0, 0x000A0000, bhvSpinAirborneWarp),
 		TERRAIN(bob_area_2_collision),
 		MACRO_OBJECTS(bob_area_2_macro_objs),
-		SET_BACKGROUND_MUSIC(0x00, SEQ_LEVEL_UNDERGROUND),
+		STOP_MUSIC(0),
 		TERRAIN_TYPE(TERRAIN_GRASS),
 	END_AREA(),
 

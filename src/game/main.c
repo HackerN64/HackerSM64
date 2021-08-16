@@ -18,6 +18,7 @@
 #include "usb/usb.h"
 #include "usb/debug.h"
 #endif
+#include "puppyprint.h"
 
 // Message IDs
 #define MESG_SP_COMPLETE 100
@@ -33,7 +34,7 @@ OSThread gGameLoopThread;
 OSThread gSoundThread;
 
 OSIoMesg gDmaIoMesg;
-OSMesg D_80339BEC;
+OSMesg gMainReceivedMesg;
 
 OSMesgQueue gDmaMesgQueue;
 OSMesgQueue gSIEventMesgQueue;
@@ -60,7 +61,7 @@ struct SPTask *sNextDisplaySPTask = NULL;
 s8 sAudioEnabled = TRUE;
 u32 gNumVblanks = 0;
 s8 gResetTimer = 0;
-s8 D_8032C648 = 0;
+s8 gNmiResetBarsTimer = 0;
 s8 gDebugLevelSelect = FALSE;
 
 s8 gShowProfiler = FALSE;
@@ -128,7 +129,7 @@ extern void func_sh_802f69cc(void);
 
 void handle_nmi_request(void) {
     gResetTimer = 1;
-    D_8032C648 = 0;
+    gNmiResetBarsTimer = 0;
     stop_sounds_in_continuous_banks();
     sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_BACKGROUND);
     fadeout_music(90);
@@ -188,6 +189,9 @@ void start_gfx_sptask(void) {
     if (gActiveSPTask == NULL && sCurrentDisplaySPTask != NULL
         && sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED) {
         profiler_log_gfx_time(TASKS_QUEUED);
+        #ifdef PUPPYPRINT
+        rspDelta = osGetTime();
+        #endif
         start_sptask(M_GFXTASK);
     }
 }
@@ -233,6 +237,9 @@ void handle_vblank(void) {
         if (gActiveSPTask == NULL && sCurrentDisplaySPTask != NULL
             && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
             profiler_log_gfx_time(TASKS_QUEUED);
+            #ifdef PUPPYPRINT
+            rspDelta = osGetTime();
+            #endif
             start_sptask(M_GFXTASK);
         }
     }
@@ -265,6 +272,9 @@ void handle_sp_complete(void) {
             // The gfx task completed before we had time to interrupt it.
             // Mark it finished, just like below.
             curSPTask->state = SPTASK_STATE_FINISHED;
+            #ifdef PUPPYPRINT
+            profiler_update(rspGenTime, rspDelta);
+            #endif
             profiler_log_gfx_time(RSP_COMPLETE);
         }
 
@@ -295,6 +305,9 @@ void handle_sp_complete(void) {
             // The SP process is done, but there is still a Display Processor notification
             // that needs to arrive before we can consider the task completely finished and
             // null out sCurrentDisplaySPTask. That happens in handle_dp_complete.
+            #ifdef PUPPYPRINT
+            profiler_update(rspGenTime, rspDelta);
+            #endif
             profiler_log_gfx_time(RSP_COMPLETE);
         }
     }
@@ -319,11 +332,13 @@ void thread3_main(UNUSED void *arg) {
     crash_screen_init();
 #endif
 
+#ifdef DEBUG
     osSyncPrintf("Super Mario 64\n");
     osSyncPrintf("Built by: %s\n", __username__);
     osSyncPrintf("Date    : %s\n", __datetime__);
     osSyncPrintf("Compiler: %s\n", __compiler__);
     osSyncPrintf("Linker  : %s\n", __linker__);
+#endif
 
     create_thread(&gSoundThread, 4, thread4_sound, NULL, gThread4Stack + 0x2000, 20);
     osStartThread(&gSoundThread);
@@ -384,7 +399,7 @@ void dispatch_audio_sptask(struct SPTask *spTask) {
     }
 }
 
-void send_display_list(struct SPTask *spTask) {
+void exec_display_list(struct SPTask *spTask) {
     if (spTask != NULL) {
         osWritebackDCacheAll();
         spTask->state = SPTASK_STATE_NOT_STARTED;
@@ -474,10 +489,12 @@ void thread1_idle(UNUSED void *arg) {
     }
 }
 
+#if CLEARRAM
 void ClearRAM(void)
 {
     bzero(_mainSegmentEnd, (size_t)osMemSize - (size_t)OS_K0_TO_PHYSICAL(_mainSegmentEnd));
 }
+#endif
 
 #ifdef ISVPRINT
 extern u32 gISVDbgPrnAdrs;
@@ -496,7 +513,9 @@ void osInitialize_fakeisv() {
 #endif
 
 void main_func(void) {
+#if CLEARRAM
     ClearRAM();
+#endif
     __osInitialize_common();
 #ifdef ISVPRINT
     osInitialize_fakeisv();

@@ -5,6 +5,7 @@
 
 #include "internal.h"
 #include "types.h"
+#include "synthesis.h"
 
 #define AUDIO_LOCK_UNINITIALIZED 0
 #define AUDIO_LOCK_NOT_LOADING 0x76557364
@@ -109,6 +110,20 @@ extern u16 gUnused80226E98[0x10];
 
 extern u32 gAudioRandom;
 
+#ifdef EXPAND_AUDIO_HEAP
+#if defined(VERSION_US) || defined(VERSION_JP)
+#define EXT_AUDIO_HEAP_SIZE 0x24400
+#define EXT_AUDIO_INIT_POOL_SIZE 0x8000
+#else
+// EU and SH versions not yet supported for extended audio heap
+#define EXT_AUDIO_HEAP_SIZE 0x0
+#define EXT_AUDIO_INIT_POOL_SIZE 0x0
+#endif
+#else
+#define EXT_AUDIO_HEAP_SIZE 0x0
+#define EXT_AUDIO_INIT_POOL_SIZE 0x0
+#endif
+
 #ifdef VERSION_SH
 extern f32 unk_sh_data_1[];
 
@@ -136,12 +151,12 @@ extern OSMesgQueue *D_SH_80350FA8;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #define UNUSED_COUNT_80333EE8 24
-#define AUDIO_HEAP_SIZE 0x2c500
-#define AUDIO_INIT_POOL_SIZE 0x2c00
+#define AUDIO_HEAP_SIZE (0x2c500 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
+#define AUDIO_INIT_POOL_SIZE (0x2c00 + EXT_AUDIO_INIT_POOL_SIZE)
 #else
 #define UNUSED_COUNT_80333EE8 16
-#define AUDIO_HEAP_SIZE 0x31150
-#define AUDIO_INIT_POOL_SIZE 0x2500
+#define AUDIO_HEAP_SIZE (0x31150 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
+#define AUDIO_INIT_POOL_SIZE (0x2500 + EXT_AUDIO_INIT_POOL_SIZE)
 #endif
 
 #ifdef VERSION_SH

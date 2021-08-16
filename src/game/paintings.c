@@ -254,6 +254,9 @@ f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
             return painting->size / 2.0; // some concentric ripples don't care about Mario
             break;
     }
+#ifdef AVOID_UB
+    return 0.0f;
+#endif
 }
 
 /**
@@ -279,6 +282,9 @@ f32 painting_nearest_4th(struct Painting *painting) {
     } else if (painting->floorEntered & ENTER_RIGHT) {
         return thirdQuarter;
     }
+#ifdef AVOID_UB
+    return 0.0f;
+#endif
 }
 
 /**
@@ -310,6 +316,9 @@ f32 painting_ripple_x(struct Painting *painting, s8 xSource) {
             return painting->size / 2.0;
             break;
     }
+#ifdef AVOID_UB
+    return 0.0f;
+#endif
 }
 
 /**
@@ -1010,7 +1019,7 @@ Gfx *display_painting_rippling(struct Painting *painting) {
     s16 *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris);
     s16 numVtx = mesh[0];
     s16 numTris = mesh[numVtx * 3 + 1];
-    Gfx *dlist;
+    Gfx *dlist = NULL;
 
     // Generate the mesh and its lighting data
     painting_generate_mesh(painting, mesh, numVtx);

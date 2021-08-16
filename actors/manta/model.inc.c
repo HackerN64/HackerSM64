@@ -13,7 +13,7 @@ static const Lights1 manta_seg5_lights_05001770 = gdSPDefLights1(
 );
 
 // Unreferenced light group
-static const Lights1 manta_lights_unused = gdSPDefLights1(
+UNUSED static const Lights1 manta_lights_unused = gdSPDefLights1(
     0x3f, 0x3f, 0x35,
     0xff, 0xff, 0xd7, 0x28, 0x28, 0x28
 );

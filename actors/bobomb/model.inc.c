@@ -180,7 +180,7 @@ static const Lights1 bobomb_seg8_lights_08022E00 = gdSPDefLights1(
 );
 
 // Unreferenced light group
-static const Lights1 bobomb_lights_unused = gdSPDefLights1(
+UNUSED static const Lights1 bobomb_lights_unused = gdSPDefLights1(
     0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x28, 0x28, 0x28
 );

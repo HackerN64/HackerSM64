@@ -29,27 +29,27 @@ void small_breakable_box_spawn_dust(void) {
 }
 
 void small_breakable_box_act_move(void) {
-    s16 sp1E = object_step();
+    s16 collisionFlags = object_step();
 
     obj_attack_collided_from_other_object(o);
-    if (sp1E == 1)
+    if (collisionFlags == OBJ_COL_FLAG_GROUNDED)
         cur_obj_play_sound_2(SOUND_GENERAL_BOX_LANDING_2);
-    if (sp1E & 1) {
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         if (o->oForwardVel > 20.0f) {
             cur_obj_play_sound_2(SOUND_ENV_SLIDING);
             small_breakable_box_spawn_dust();
         }
     }
 
-    if (sp1E & 2) {
+    if (collisionFlags & OBJ_COL_FLAG_HIT_WALL) {
         spawn_mist_particles();
-        spawn_triangle_break_particles(20, 138, 0.7f, 3);
+        spawn_triangle_break_particles(20, MODEL_DIRT_ANIMATION, 0.7f, 3);
         obj_spawn_yellow_coins(o, 3);
         create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 
-    obj_check_floor_death(sp1E, sObjFloor);
+    obj_check_floor_death(collisionFlags, sObjFloor);
 }
 
 void breakable_box_small_released_loop(void) {
@@ -106,7 +106,7 @@ void breakable_box_small_get_thrown(void) {
     cur_obj_enable_rendering();
     o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
     o->oHeldState = 0;
-    o->oFlags &= ~0x08;
+    o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
     o->oForwardVel = 40.0f;
     o->oVelY = 20.0f;
     o->oBreakableBoxSmallReleased = 1;

@@ -23,11 +23,15 @@ glabel gspFast3D_fifoTextEnd
 
 #else /* Use one of the Fast3DEX series grucodes. */
     #ifndef F3DZEX_GBI_2
-    #if F3DEX_GBI_2 == 1
+    #if F3DEX2PL_GBI == 1
+    glabel gspF3DEX2_PosLight_fifoTextStart
+        .incbin "lib/PR/f3dex2pl/F3DEX2_PosLight.bin"
+    glabel gspF3DEX2_PosLight_fifoTextEnd
+    #elif F3DEX_GBI_2 == 1
     glabel gspF3DEX2_fifoTextStart
         .incbin "lib/PR/f3dex2/F3DEX2.bin"
     glabel gspF3DEX2_fifoTextEnd
-    #elseif F3DEX_GBI == 1
+    #elif F3DEX_GBI == 1
     glabel gspF3DEX_fifoTextStart
         .incbin "lib/PR/f3dex/F3DEX.bin"
     glabel gspF3DEX_fifoTextEnd
@@ -175,11 +179,15 @@ glabel gspFast3D_fifoDataEnd
 
 #else /* Using one of the Fast3DEX series grucodes */
     #ifndef F3DZEX_GBI_2
-    #if F3DEX_GBI_2 == 1
+    #if F3DEX2PL_GBI == 1
+    glabel gspF3DEX2_PosLight_fifoDataStart
+        .incbin "lib/PR/f3dex2pl/F3DEX2_PosLight_data.bin"
+    glabel gspF3DEX2_PosLight_fifoDataEnd
+    #elif F3DEX_GBI_2 == 1
     glabel gspF3DEX2_fifoDataStart
         .incbin "lib/PR/f3dex2/F3DEX2_data.bin"
     glabel gspF3DEX2_fifoDataEnd
-    #elseif F3DEX_GBI == 1
+    #elif F3DEX_GBI == 1
     glabel gspF3DEX_fifoDataStart
         .incbin "lib/PR/f3dex/F3DEX_data.bin"
     glabel gspF3DEX_fifoDataEnd

@@ -969,6 +969,8 @@ Gfx *geo_movtex_update_horizontal(s32 callContext, struct GraphNode *node, UNUSE
             case MOVTEX_TREADMILL_SMALL:
                 movtexVerts = segmented_to_virtual(ttc_movtex_tris_small_surface_treadmill);
                 break;
+            default:
+                return NULL;
         }
         update_moving_texture_offset(movtexVerts, MOVTEX_ATTR_COLORED_S);
     }

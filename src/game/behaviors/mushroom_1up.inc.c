@@ -57,11 +57,11 @@ void pole_1up_move_towards_mario(void) {
     bhv_1up_interact();
 }
 
-void one_up_move_away_from_mario(s16 sp1A) {
+void one_up_move_away_from_mario(s16 collisionFlags) {
     o->oForwardVel = 8.0f;
     o->oMoveAngleYaw = o->oAngleToMario + 0x8000;
     bhv_1up_interact();
-    if (sp1A & 0x02)
+    if (collisionFlags & OBJ_COL_FLAG_HIT_WALL)
         o->oAction = 2;
 
     if (!is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 3000))
@@ -105,9 +105,7 @@ void bhv_1up_walking_loop(void) {
 }
 
 void bhv_1up_running_away_loop(void) {
-    s16 sp26;
-
-    sp26 = object_step();
+    s16 collisionFlags = object_step();
     switch (o->oAction) {
         case 0:
             if (o->oTimer >= 18)
@@ -127,7 +125,7 @@ void bhv_1up_running_away_loop(void) {
 
         case 1:
             spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
-            one_up_move_away_from_mario(sp26);
+            one_up_move_away_from_mario(collisionFlags);
             break;
 
         case 2:
@@ -140,10 +138,8 @@ void bhv_1up_running_away_loop(void) {
 }
 
 void sliding_1up_move(void) {
-    s16 sp1E;
-
-    sp1E = object_step();
-    if (sp1E & 0x01) {
+    s16 collisionFlags = object_step();
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         o->oForwardVel += 25.0f;
         o->oVelY = 0;
     } else {
@@ -185,7 +181,7 @@ void bhv_1up_loop(void) {
 }
 
 void bhv_1up_jump_on_approach_loop(void) {
-    s16 sp26;
+    s16 collisionFlags;
 
     switch (o->oAction) {
         case 0:
@@ -196,13 +192,13 @@ void bhv_1up_jump_on_approach_loop(void) {
             break;
 
         case 1:
-            sp26 = object_step();
-            one_up_move_away_from_mario(sp26);
+            collisionFlags = object_step();
+            one_up_move_away_from_mario(collisionFlags);
             spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
             break;
 
         case 2:
-            sp26 = object_step();
+            collisionFlags = object_step();
             bhv_1up_interact();
             obj_flicker_and_disappear(o, 30);
             break;
@@ -212,7 +208,7 @@ void bhv_1up_jump_on_approach_loop(void) {
 }
 
 void bhv_1up_hidden_loop(void) {
-    s16 sp26;
+    s16 collisionFlags;
     switch (o->oAction) {
         case 0:
             o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
@@ -225,19 +221,19 @@ void bhv_1up_hidden_loop(void) {
             break;
 
         case 1:
-            sp26 = object_step();
-            one_up_move_away_from_mario(sp26);
+            collisionFlags = object_step();
+            one_up_move_away_from_mario(collisionFlags);
             spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
             break;
 
         case 2:
-            sp26 = object_step();
+            collisionFlags = object_step();
             bhv_1up_interact();
             obj_flicker_and_disappear(o, 30);
             break;
 
         case 3:
-            sp26 = object_step();
+            collisionFlags = object_step();
             if (o->oTimer >= 18)
                 spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
 
@@ -264,7 +260,6 @@ void bhv_1up_hidden_trigger_loop(void) {
 }
 
 void bhv_1up_hidden_in_pole_loop(void) {
-    UNUSED s16 sp26;
     switch (o->oAction) {
         case 0:
             o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
@@ -278,11 +273,11 @@ void bhv_1up_hidden_in_pole_loop(void) {
 
         case 1:
             pole_1up_move_towards_mario();
-            sp26 = object_step();
+            object_step();
             break;
 
         case 3:
-            sp26 = object_step();
+            object_step();
             if (o->oTimer >= 18)
                 spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
 

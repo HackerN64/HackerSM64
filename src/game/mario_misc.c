@@ -15,6 +15,7 @@
 #include "goddard/renderer.h"
 #include "interaction.h"
 #include "level_update.h"
+#include "mario_actions_cutscene.h"
 #include "mario_misc.h"
 #include "memory.h"
 #include "object_helpers.h"
@@ -23,6 +24,9 @@
 #include "save_file.h"
 #include "skybox.h"
 #include "sound_init.h"
+#include "puppycam2.h"
+
+#include "config.h"
 
 #define TOAD_STAR_1_REQUIREMENT 12
 #define TOAD_STAR_2_REQUIREMENT 25
@@ -78,7 +82,7 @@ struct GraphNodeObject gMirrorMario;  // copy of Mario's geo node for drawing mi
 // (message NPC related things, the Mario head geo, and Mario geo
 // functions)
 
-#ifdef GODDARD
+#ifdef KEEP_MARIO_HEAD
 /**
  * Geo node script that draws Mario's head on the title screen.
  */
@@ -311,7 +315,14 @@ static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
         node->fnNode.node.flags = (node->fnNode.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8);
         gfxHead = alloc_display_list(3 * sizeof(*gfxHead));
         gfx = gfxHead;
-        gDPSetAlphaCompare(gfx++, G_AC_DITHER);
+        if (gMarioState->flags & MARIO_VANISH_CAP)
+        {
+            gDPSetAlphaCompare(gfx++, G_AC_DITHER);
+        }
+        else
+        {
+            gDPSetAlphaCompare(gfx++, G_AC_NONE);
+        }
     }
     gDPSetEnvColor(gfx++, 255, 255, 255, alpha);
     gSPEndDisplayList(gfx);
@@ -331,6 +342,13 @@ Gfx *geo_mirror_mario_set_alpha(s32 callContext, struct GraphNode *node, UNUSED 
 
     if (callContext == GEO_CONTEXT_RENDER) {
         alpha = (bodyState->modelState & 0x100) ? (bodyState->modelState & 0xFF) : 255;
+        #ifdef PUPPYCAM
+        if (alpha > gPuppyCam.opacity)
+        {
+            alpha = gPuppyCam.opacity;
+            bodyState->modelState |= MODEL_STATE_NOISE_ALPHA;
+        }
+        #endif
         gfx = make_gfx_mario_alpha(asGenerated, alpha);
     }
     return gfx;

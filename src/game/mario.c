@@ -63,9 +63,9 @@ s32 is_anim_past_end(struct MarioState *m) {
  */
 s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
     struct Object *o = m->marioObj;
-    struct Animation *targetAnim = m->animation->targetAnim;
+    struct Animation *targetAnim = m->animList->bufTarget;
 
-    if (load_patchable_table(m->animation, targetAnimID)) {
+    if (load_patchable_table(m->animList, targetAnimID)) {
         targetAnim->values = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->values);
         targetAnim->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->index);
     }
@@ -96,9 +96,9 @@ s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
  */
 s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
     struct Object *o = m->marioObj;
-    struct Animation *targetAnim = m->animation->targetAnim;
+    struct Animation *targetAnim = m->animList->bufTarget;
 
-    if (load_patchable_table(m->animation, targetAnimID)) {
+    if (load_patchable_table(m->animList, targetAnimID)) {
         targetAnim->values = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->values);
         targetAnim->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) targetAnim + (uintptr_t) targetAnim->index);
     }
@@ -638,6 +638,11 @@ s32 mario_floor_is_slope(struct MarioState *m) {
 s32 mario_floor_is_steep(struct MarioState *m) {
     f32 normY;
     s32 result = FALSE;
+
+#ifdef JUMP_KICK_FIX
+    if (m->floor->type == SURFACE_NOT_SLIPPERY)
+        return FALSE;
+#endif
 
     // Interestingly, this function does not check for the
     // slide terrain type. This means that steep behavior persists for
@@ -1296,6 +1301,23 @@ void update_mario_button_inputs(struct MarioState *m) {
         m->input |= INPUT_A_DOWN;
     }
 
+#ifdef CUSTOM_DEBUG
+    if (m->controller->buttonPressed & L_JPAD) {
+        gCustomDebugMode ^= 1;
+    }
+    if (gCustomDebugMode) {
+        if (m->controller->buttonPressed & R_JPAD) {
+            if (gMarioState->action == ACT_DEBUG_FREE_MOVE) {
+                set_mario_action(gMarioState, ACT_IDLE, 0);
+            } else {
+                set_mario_action(gMarioState, ACT_DEBUG_FREE_MOVE, 0);
+            }
+        }
+    } else if (gMarioState->action == ACT_DEBUG_FREE_MOVE) {
+        set_mario_action(gMarioState, ACT_IDLE, 0);
+    }
+#endif
+
     // Don't update for these buttons if squished.
     if (m->squishTimer == 0) {
         if (m->controller->buttonPressed & B_BUTTON) {
@@ -1413,6 +1435,14 @@ void update_mario_inputs(struct MarioState *m) {
     m->collidedObjInteractTypes = m->marioObj->collidedObjInteractTypes;
     m->flags &= 0xFFFFFF;
 
+    #ifdef PUPPYCAM
+    if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ENTER_FIRST_PERSON)
+    {
+        m->input = INPUT_FIRST_PERSON;
+        return;
+    }
+    #endif
+
     update_mario_button_inputs(m);
     update_mario_joystick_inputs(m);
     update_mario_geometry_inputs(m);
@@ -1431,9 +1461,10 @@ void update_mario_inputs(struct MarioState *m) {
         m->input |= INPUT_UNKNOWN_5;
     }
 
+    // These 3 flags are defined by Bowser stomping attacks
     if (m->marioObj->oInteractStatus
-        & (INT_STATUS_HOOT_GRABBED_BY_MARIO | INT_STATUS_MARIO_UNK1 | INT_STATUS_HIT_BY_SHOCKWAVE)) {
-        m->input |= INPUT_UNKNOWN_10;
+        & (INT_STATUS_MARIO_STUNNED | INT_STATUS_MARIO_KNOCKBACK_DMG | INT_STATUS_MARIO_SHOCKWAVE)) {
+        m->input |= INPUT_STOMPED;
     }
 
     // This function is located near other unused trampoline functions,
@@ -1698,7 +1729,7 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
  * An unused and possibly a debug function. Z + another button input
  * sets Mario with a different cap.
  */
-static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u16 capMusic) {
+UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u16 capMusic) {
     // This checks for Z_TRIG instead of Z_DOWN flag
     // (which is also what other debug functions do),
     // so likely debug behavior rather than unused behavior.
@@ -1746,6 +1777,10 @@ s32 execute_mario_action(UNUSED struct Object *o) {
     //DEBUG
     if (gPlayer1Controller->buttonDown & D_JPAD) {
         gMarioState->vel[1] = 20.0f;
+    }
+
+    if (gPlayer1Controller->buttonDown & L_JPAD) {
+        initiate_warp(LEVEL_SL, 1, 0x0A, 0);
     }
 
     if (gPlayer1Controller->buttonPressed & L_TRIG) {
@@ -1963,7 +1998,7 @@ void init_mario_from_save_file(void) {
     gMarioState->statusForCamera = &gPlayerCameraState[0];
     gMarioState->marioBodyState = &gBodyStates[0];
     gMarioState->controller = &gControllers[0];
-    gMarioState->animation = &D_80339D10;
+    gMarioState->animList = &gMarioAnimsBuf;
 
     gMarioState->numCoins = 0;
     gMarioState->numStars =

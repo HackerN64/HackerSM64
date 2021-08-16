@@ -72,6 +72,11 @@ build/*
 # libultra
 
 !/lib/*.a
+lib/libs2d_engine.a
+!/lib/gcclib/*.a
+!/lib/gcclib/divbreak/*.a
+!/lib/gcclib/nocheck/*.a
+!/lib/gcclib/trap/*.a
 !/lib/n64/*.a
 !/lib/ique/*.a
 

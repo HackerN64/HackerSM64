@@ -33,6 +33,9 @@ static void fish_spawner_act_spawn(void) {
         case FISH_SPAWNER_BP_FEW_CYAN:
             model = MODEL_CYAN_FISH; schoolQuantity = 5;  minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264;
             break;
+
+        default:
+            return;
     }
 
 

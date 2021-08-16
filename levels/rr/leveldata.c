@@ -66,3 +66,4 @@
 #include "levels/rr/areas/1/collision.inc.c"
 #include "levels/rr/areas/1/macro.inc.c"
 #include "levels/rr/areas/1/trajectory.inc.c"
+#include "levels/rr/leveldata.inc.c"

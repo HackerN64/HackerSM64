@@ -19,6 +19,7 @@
 #include "platform_displacement.h"
 #include "profiler.h"
 #include "spawn_object.h"
+#include "puppyprint.h"
 
 
 /**
@@ -188,7 +189,7 @@ s8 sObjectListUpdateOrder[] = { OBJ_LIST_SPAWNER,
 struct ParticleProperties {
     u32 particleFlag;
     u32 activeParticleFlag;
-    u8 model;
+    ModelID model;
     const BehaviorScript *behavior;
 };
 
@@ -495,7 +496,7 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
             object->respawnInfoType = RESPAWN_INFO_TYPE_32;
             object->respawnInfo = &spawnInfo->behaviorArg;
 
-            if (spawnInfo->behaviorArg & 0x01) {
+            if (object->behavior == segmented_to_virtual(bhvMario)) {
                 gMarioObject = object;
                 geo_make_first_child(&object->header.gfx.node);
             }
@@ -602,7 +603,7 @@ void unload_deactivated_objects(void) {
 /**
  * Unused profiling function.
  */
-static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
+UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
     u16 time;
     f64 cycles;
 
@@ -625,6 +626,10 @@ static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  */
 void update_objects(UNUSED s32 unused) {
     s64 cycleCounts[30];
+    #ifdef PUPPYPRINT
+    OSTime first = osGetTime();
+    OSTime colTime = collisionTime[perfIteration];
+    #endif
 
     cycleCounts[0] = get_current_clock();
 
@@ -683,4 +688,8 @@ void update_objects(UNUSED s32 unused) {
     }
 
     gPrevFrameObjectCount = gObjectCounter;
+    #ifdef PUPPYPRINT
+    profiler_update(behaviourTime, first);
+    behaviourTime[perfIteration] -= collisionTime[perfIteration]+colTime;
+    #endif
 }

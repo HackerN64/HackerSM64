@@ -32,7 +32,7 @@ struct Controller
   /*0x14*/ OSContStatus *statusData;
   /*0x18*/ OSContPad *controllerData;
 #if ENABLE_RUMBLE
-  /*0x1C*/ int port;
+  /*0x1C*/ s32 port;
 #endif
 };
 
@@ -54,6 +54,7 @@ typedef s16 Trajectory;
 typedef s16 PaintingData;
 typedef uintptr_t BehaviorScript;
 typedef u8 Texture;
+typedef u16 ModelID;
 
 enum SpTaskState {
     SPTASK_STATE_NOT_STARTED,
@@ -262,27 +263,6 @@ struct MarioBodyState
     u8 padding[4];
 };
 
-struct OffsetSizePair
-{
-    u32 offset;
-    u32 size;
-};
-
-struct MarioAnimDmaRelatedThing
-{
-    u32 count;
-    u8 *srcAddr;
-    struct OffsetSizePair anim[1]; // dynamic size
-};
-
-struct MarioAnimation
-{
-    struct MarioAnimDmaRelatedThing *animDmaTable;
-    u8 *currentAnimAddr;
-    struct Animation *targetAnim;
-    u8 padding[4];
-};
-
 struct MarioState
 {
     /*0x00*/ u16 unk00;
@@ -328,7 +308,7 @@ struct MarioState
     /*0x94*/ struct PlayerCameraState *statusForCamera;
     /*0x98*/ struct MarioBodyState *marioBodyState;
     /*0x9C*/ struct Controller *controller;
-    /*0xA0*/ struct MarioAnimation *animation;
+    /*0xA0*/ struct DmaHandlerList *animList;
     /*0xA4*/ u32 collidedObjInteractTypes;
     /*0xA8*/ s16 numCoins;
     /*0xAA*/ s16 numStars;
