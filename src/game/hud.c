@@ -14,6 +14,10 @@
 #include "save_file.h"
 #include "print.h"
 #include "engine/surface_load.h"
+#include "puppycam2.h"
+#include "puppyprint.h"
+
+#include "config.h"
 
 /* @file hud.c
  * This file implements HUD rendering and power meter animations.
@@ -48,11 +52,15 @@ f32 calculate_and_update_fps()
 void print_fps(s32 x, s32 y)
 {
     f32 fps = calculate_and_update_fps();
-    char text[10];
+    char text[14];
 
-    sprintf(text, "%2.2f", fps);
-
+    sprintf(text, "FPS %2.2f", fps);
+    #ifdef PUPPYPRINT
+    print_small_text(x, y, text, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL);
+    #else
     print_text(x, y, text);
+    #endif
+
 }
 
 // ------------ END OF FPS COUNER -----------------
@@ -90,7 +98,7 @@ static struct PowerMeterHUD sPowerMeterHUD = {
 // when the power meter is hidden.
 s32 sPowerMeterVisibleTimer = 0;
 
-static struct UnusedHUDStruct sUnusedHUDValues = { 0x00, 0x0A, 0x00 };
+UNUSED static struct UnusedHUDStruct sUnusedHUDValues = { 0x00, 0x0A, 0x00 };
 
 static struct CameraHUD sCameraHUD = { CAM_STATUS_NONE };
 
@@ -308,6 +316,18 @@ void render_hud_mario_lives(void) {
     print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(54), HUD_TOP_Y, "%d", gHudDisplay.lives);
 }
 
+#ifdef CUSTOM_DEBUG
+void render_debug_mode(void) {
+    print_text(180, 40, "DEBUG MODE");
+    print_text_fmt_int(5, 20, "Z %d", gMarioState->pos[2]);
+    print_text_fmt_int(5, 40, "Y %d", gMarioState->pos[1]);
+    print_text_fmt_int(5, 60, "X %d", gMarioState->pos[0]);
+    print_text_fmt_int(10, 100, "SPD %d", (s32) gMarioState->forwardVel);
+    print_text_fmt_int(10, 120, "ANG 0*%04x", (u16) gMarioState->faceAngle[1]);
+    print_fps(10,80);
+}
+#endif
+
 /**
  * Renders the amount of coins collected.
  */
@@ -506,7 +526,10 @@ void render_hud(void) {
 
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_CAMERA_AND_POWER) {
             render_hud_power_meter();
-            render_hud_camera_status();
+            #ifdef PUPPYCAM
+            if (!gPuppyCam.enabled)
+            #endif
+                render_hud_camera_status();
         }
 
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_TIMER) {
@@ -521,5 +544,13 @@ void render_hud(void) {
         {
             print_text(10, 60, "SURFACE NODE POOL FULL");
         }
+    #ifdef CUSTOM_DEBUG
+        if (gCustomDebugMode) {
+            render_debug_mode();
+        }
+    #endif
+    #ifdef PUPPYPRINT
+    print_set_envcolour(255,255,255,255);
+    #endif
     }
 }

@@ -55,18 +55,22 @@
     #undef LEVEL_BOUNDARY_MAX // Undefine the old value to avoid compiler warnings
     #define LEVEL_BOUNDARY_MAX 0x2000L
     #define CELL_SIZE          0x400
+    #define WORLD_SCALE        1.f
 #elif EXTENDED_BOUNDS_MODE == 1
     #undef LEVEL_BOUNDARY_MAX
     #define LEVEL_BOUNDARY_MAX 0x4000L
     #define CELL_SIZE          0x400
+    #define WORLD_SCALE        2.f
 #elif EXTENDED_BOUNDS_MODE == 2
     #undef LEVEL_BOUNDARY_MAX
     #define LEVEL_BOUNDARY_MAX 0x2000L
     #define CELL_SIZE          0x200
+    #define WORLD_SCALE        1.f
 #elif EXTENDED_BOUNDS_MODE == 3
     #undef LEVEL_BOUNDARY_MAX
     #define LEVEL_BOUNDARY_MAX 0x8000L
     #define CELL_SIZE          0x400
+    #define WORLD_SCALE        4.f
 #endif
 
 STATIC_ASSERT(LEVEL_BOUNDARY_MAX != 0, "You must set a valid extended bounds mode!");

@@ -30,7 +30,7 @@ s32 set_and_reset_transition_fade_timer(s8 fadeTimer, u8 transTime) {
 }
 
 u8 set_transition_color_fade_alpha(s8 fadeType, s8 fadeTimer, u8 transTime) {
-    u8 time;
+    u8 time = 0;
 
     switch (fadeType) {
         case 0:
@@ -239,6 +239,9 @@ s32 render_screen_transition(s8 fadeTimer, s8 transType, u8 transTime, struct Wa
             return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR);
             break;
     }
+#ifdef AVOID_UB
+    return 0;
+#endif
 }
 
 Gfx *render_cannon_circle_base(void) {
@@ -294,7 +297,7 @@ Gfx *geo_cannon_circle_base(s32 callContext, struct GraphNode *node, UNUSED Mat4
 
     if (callContext == GEO_CONTEXT_RENDER && gCurrentArea != NULL
         && gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
-        graphNode->fnNode.node.flags = (graphNode->fnNode.node.flags & 0xFF) | 0x500;
+        graphNode->fnNode.node.flags = (graphNode->fnNode.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8);
         dlist = render_cannon_circle_base();
     }
     return dlist;

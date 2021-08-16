@@ -27,12 +27,12 @@ void bhv_spindrift_loop(void) {
             cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x400);
             break;
         case 1:
-            o->oFlags &= ~8;
+            o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
             o->oForwardVel = -10.0f;
             if (o->oTimer > 20) {
                 o->oAction = 0;
                 o->oInteractStatus = 0;
-                o->oFlags |= 8;
+                o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
             }
             break;
     }

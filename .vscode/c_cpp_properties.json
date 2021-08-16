@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/include/n64/**",
+                "${workspaceFolder}/include/**",
+                "${workspaceFolder}/textures/**",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "TARGET_N64=1",
+                "VERSION_US=1",
+                "F3DEX_GBI_2=1",
+                "F3DZEX_GBI_2=1",
+                "F3DEX_GBI_SHARED=1",
+                "NON_MATCHING=1",
+                "AVOID_UB=1"
+            ],
+            "compilerPath": "/usr/bin/mips-linux-gnu-gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

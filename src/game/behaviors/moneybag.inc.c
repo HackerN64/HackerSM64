@@ -74,7 +74,7 @@ void moneybag_jump(s8 collisionFlags) {
         case MONEYBAG_JUMP_JUMP:
             cur_obj_init_animation(2);
 
-            if ((collisionFlags & 1) == 1) /* bit 0 */
+            if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) /* bit 0 */
             {
                 o->oForwardVel = 0;
                 o->oVelY = 0;

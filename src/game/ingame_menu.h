@@ -27,9 +27,13 @@
 #define HUD_LUT_DIFF HUD_LUT_GLOBAL
 #endif
 
-#define RENDER_PAUSE_SCREEN       1
-#define RENDER_COURSE_DONE_SCREEN 2
-
+enum MenuMode {
+    MENU_MODE_NONE = -1,
+    MENU_MODE_UNUSED_0,
+    MENU_MODE_RENDER_PAUSE_SCREEN,
+    MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN,
+    MENU_MODE_UNUSED_3
+};
 
 extern s8 gDialogCourseActNum;
 extern s8 gHudFlash;
@@ -94,6 +98,7 @@ enum DialogSpecialChars {
 #endif
     DIALOG_CHAR_PERIOD = 0x6E,
     DIALOG_CHAR_COMMA = 0x6F,
+    DIALOG_CHAR_COLOR = 0xDF,
     DIALOG_CHAR_SPACE = 0x9E,
     DIALOG_CHAR_STAR_COUNT = 0xE0, // number of stars
     DIALOG_CHAR_UMLAUT = 0xE9,
@@ -103,6 +108,14 @@ enum DialogSpecialChars {
     DIALOG_CHAR_STAR_OPEN = 0xFD,
     DIALOG_CHAR_NEWLINE = 0xFE,
     DIALOG_CHAR_TERMINATOR = 0xFF
+};
+
+// gDialogResponse
+enum DialogResponseDefines {
+    DIALOG_RESPONSE_NONE,
+    DIALOG_RESPONSE_YES,
+    DIALOG_RESPONSE_NO,
+    DIALOG_RESPONSE_NOT_DEFINED
 };
 
 extern s32 gDialogResponse;

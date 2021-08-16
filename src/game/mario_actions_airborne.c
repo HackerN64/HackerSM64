@@ -14,6 +14,8 @@
 #include "save_file.h"
 #include "rumble_init.h"
 
+#include "config.h"
+
 void play_flip_sounds(struct MarioState *m, s16 frame1, s16 frame2, s16 frame3) {
     s32 animFrame = m->marioObj->header.gfx.animInfo.animFrame;
     if (animFrame == frame1 || animFrame == frame2 || animFrame == frame3) {
@@ -61,11 +63,18 @@ s32 lava_boost_on_wall(struct MarioState *m) {
 s32 check_fall_damage(struct MarioState *m, u32 hardFallAction) {
     f32 fallHeight;
     f32 damageHeight;
+#ifdef NO_FALL_DAMAGE
+    return FALSE;
+#endif
 
     fallHeight = m->peakHeight - m->pos[1];
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
 
     //! Never true
     if (m->actionState == ACT_GROUND_POUND) {
@@ -519,7 +528,7 @@ s32 act_backflip(struct MarioState *m) {
 }
 
 s32 act_freefall(struct MarioState *m) {
-    s32 animation;
+    s32 animation = 0;
 
     if (m->input & INPUT_B_PRESSED) {
         return set_mario_action(m, ACT_DIVE, 0);
@@ -1027,7 +1036,7 @@ s32 act_burning_fall(struct MarioState *m) {
 }
 
 s32 act_crazy_box_bounce(struct MarioState *m) {
-    f32 minSpeed;
+    f32 minSpeed = 0.0f;
 
     if (m->actionTimer == 0) {
         switch (m->actionArg) {
@@ -1330,7 +1339,7 @@ s32 act_air_hit_wall(struct MarioState *m) {
         mario_drop_held_object(m);
     }
 
-    if (++(m->actionTimer) <= 2) {
+    if (++(m->actionTimer) <= FIRSTY_LAST_FRAME) {
         if (m->input & INPUT_A_PRESSED) {
             m->vel[1] = 52.0f;
             m->faceAngle[1] += 0x8000;
@@ -1356,10 +1365,15 @@ s32 act_air_hit_wall(struct MarioState *m) {
         return set_mario_action(m, ACT_SOFT_BONK, 0);
     }
 
-#ifdef AVOID_UB
+/*#ifdef AVOID_UB
     return
-#endif
+#endif*/
+#if FIRSTY_LAST_FRAME > 1
     set_mario_animation(m, MARIO_ANIM_START_WALLKICK);
+    m->marioObj->header.gfx.angle[1] = atan2s(m->wall->normal.z, m->wall->normal.x);
+#endif
+
+    return FALSE;
 
     //! Missing return statement. The returned value is the result of the call
     // to set_mario_animation. In practice, this value is nonzero.
@@ -1530,11 +1544,11 @@ s32 act_hold_butt_slide_air(struct MarioState *m) {
 s32 act_lava_boost(struct MarioState *m) {
 #if ENABLE_RUMBLE
     if (!(m->flags & MARIO_MARIO_SOUND_PLAYED)) {
+#endif
         play_sound_if_no_flag(m, SOUND_MARIO_ON_FIRE, MARIO_MARIO_SOUND_PLAYED);
+#if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
     }
-#else
-    play_sound_if_no_flag(m, SOUND_MARIO_ON_FIRE, MARIO_MARIO_SOUND_PLAYED);
 #endif
 
     if (!(m->input & INPUT_NONZERO_ANALOG)) {
@@ -2080,13 +2094,14 @@ s32 check_common_airborne_cancels(struct MarioState *m) {
 }
 
 s32 mario_execute_airborne_action(struct MarioState *m) {
-    u32 cancel;
+    u32 cancel = FALSE;
 
     if (check_common_airborne_cancels(m)) {
         return TRUE;
     }
-
+#ifndef NO_FALL_DAMAGE_SOUND
     play_far_fall_sound(m);
+#endif
 
     /* clang-format off */
     switch (m->action) {

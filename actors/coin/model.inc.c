@@ -1,48 +1,92 @@
-// Coin
+#include "config.h"
 
+// Coin
+#ifdef IA8_COINS
 // 0x030056C0
 static const Vtx coin_seg3_vertex_030056C0[] = {
-    {{{   -32,      0,      0}, 0, {     0,   1984}, {0xff, 0xff, 0x00, 0xff}}},
-    {{{    32,      0,      0}, 0, {  1984,   1984}, {0xff, 0xff, 0x00, 0xff}}},
-    {{{    32,     64,      0}, 0, {  1984,      0}, {0xff, 0xff, 0x00, 0xff}}},
+    {{{   -32,      0,      0}, 0, {     0,   4032}, {0xff, 0xff, 0x00, 0xff}}},
+    {{{    32,      0,      0}, 0, {  4032,   4032}, {0xff, 0xff, 0x00, 0xff}}},
+    {{{    32,     64,      0}, 0, {  4032,      0}, {0xff, 0xff, 0x00, 0xff}}},
     {{{   -32,     64,      0}, 0, {     0,      0}, {0xff, 0xff, 0x00, 0xff}}},
 };
 
 // 0x03005700
 static const Vtx coin_seg3_vertex_03005700[] = {
-    {{{   -50,      0,      0}, 0, {     0,   1984}, {0x78, 0x78, 0xff, 0xff}}},
-    {{{    50,      0,      0}, 0, {  1984,   1984}, {0x78, 0x78, 0xff, 0xff}}},
-    {{{    50,    100,      0}, 0, {  1984,      0}, {0x78, 0x78, 0xff, 0xff}}},
+    {{{   -50,      0,      0}, 0, {     0,   4032}, {0x78, 0x78, 0xff, 0xff}}},
+    {{{    50,      0,      0}, 0, {  4032,   4032}, {0x78, 0x78, 0xff, 0xff}}},
+    {{{    50,    100,      0}, 0, {  4032,      0}, {0x78, 0x78, 0xff, 0xff}}},
     {{{   -50,    100,      0}, 0, {     0,      0}, {0x78, 0x78, 0xff, 0xff}}},
 };
 
 // 0x03005740
 static const Vtx coin_seg3_vertex_03005740[] = {
-    {{{   -35,      0,      0}, 0, {     0,   1984}, {0xff, 0x00, 0x00, 0xff}}},
-    {{{    35,      0,      0}, 0, {  1984,   1984}, {0xff, 0x00, 0x00, 0xff}}},
-    {{{    35,     70,      0}, 0, {  1984,      0}, {0xff, 0x00, 0x00, 0xff}}},
+    {{{   -35,      0,      0}, 0, {     0,   4032}, {0xff, 0x00, 0x00, 0xff}}},
+    {{{    35,      0,      0}, 0, {  4032,   4032}, {0xff, 0x00, 0x00, 0xff}}},
+    {{{    35,     70,      0}, 0, {  4032,      0}, {0xff, 0x00, 0x00, 0xff}}},
     {{{   -35,     70,      0}, 0, {     0,      0}, {0xff, 0x00, 0x00, 0xff}}},
 };
+#else
+static const Vtx coin_seg3_vertex_030056C0[] = {
+    {{{   -32,      0,      0}, 0, {     0,   1984 }, {0xff, 0xff, 0x00, 0xff}}},
+    {{{    32,      0,      0}, 0, {  1984 ,   1984 }, {0xff, 0xff, 0x00, 0xff}}},
+    {{{    32,     64,      0}, 0, {  1984 ,      0}, {0xff, 0xff, 0x00, 0xff}}},
+    {{{   -32,     64,      0}, 0, {     0,      0}, {0xff, 0xff, 0x00, 0xff}}},
+};
+
+// 0x03005700
+static const Vtx coin_seg3_vertex_03005700[] = {
+    {{{   -50,      0,      0}, 0, {     0,   1984 }, {0x78, 0x78, 0xff, 0xff}}},
+    {{{    50,      0,      0}, 0, {  1984 ,   1984 }, {0x78, 0x78, 0xff, 0xff}}},
+    {{{    50,    100,      0}, 0, {  1984 ,      0}, {0x78, 0x78, 0xff, 0xff}}},
+    {{{   -50,    100,      0}, 0, {     0,      0}, {0x78, 0x78, 0xff, 0xff}}},
+};
+
+// 0x03005740
+static const Vtx coin_seg3_vertex_03005740[] = {
+    {{{   -35,      0,      0}, 0, {     0,   1984 }, {0xff, 0x00, 0x00, 0xff}}},
+    {{{    35,      0,      0}, 0, {  1984 ,   1984 }, {0xff, 0x00, 0x00, 0xff}}},
+    {{{    35,     70,      0}, 0, {  1984 ,      0}, {0xff, 0x00, 0x00, 0xff}}},
+    {{{   -35,     70,      0}, 0, {     0,      0}, {0xff, 0x00, 0x00, 0xff}}},
+};
+#endif
 
 // 0x03005780
+#ifdef IA8_COINS
 ALIGNED8 static const Texture coin_seg3_texture_03005780[] = {
-#include "actors/coin/coin_front.ia16.inc.c"
+#include "actors/coin/coin_front.ia8.inc.c"
 };
 
 // 0x03005F80
 ALIGNED8 static const Texture coin_seg3_texture_03005F80[] = {
-#include "actors/coin/coin_tilt_right.ia16.inc.c"
+#include "actors/coin/coin_tilt_right.ia8.inc.c"
 };
 
 // 0x03006780
 ALIGNED8 static const Texture coin_seg3_texture_03006780[] = {
-#include "actors/coin/coin_side.ia16.inc.c"
+#include "actors/coin/coin_side.ia8.inc.c"
 };
 
 // 0x03006F80
 ALIGNED8 static const Texture coin_seg3_texture_03006F80[] = {
+#include "actors/coin/coin_tilt_left.ia8.inc.c"
+};
+#else
+ALIGNED8 static const Texture coin_seg3_texture_03005780[] = {
+#include "actors/coin/coin_front.ia16.inc.c"
+};
+
+ALIGNED8 static const Texture coin_seg3_texture_03005F80[] = {
+#include "actors/coin/coin_tilt_right.ia16.inc.c"
+};
+
+ALIGNED8 static const Texture coin_seg3_texture_03006780[] = {
+#include "actors/coin/coin_side.ia16.inc.c"
+};
+
+ALIGNED8 static const Texture coin_seg3_texture_03006F80[] = {
 #include "actors/coin/coin_tilt_left.ia16.inc.c"
 };
+#endif
 
 // 0x03007780 - 0x030077D0
 const Gfx coin_seg3_dl_03007780[] = {
@@ -50,11 +94,19 @@ const Gfx coin_seg3_dl_03007780[] = {
     gsSPClearGeometryMode(G_LIGHTING),
     gsDPSetCombineMode(G_CC_MODULATEIA, G_CC_MODULATEIA),
     gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
+#ifdef IA8_COINS
+    gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64/2 * 64 - 1, CALC_DXT(64/2, G_IM_SIZ_16b_BYTES)),
+    gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_8b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (64 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC),
+#else
     gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+#endif    
     gsSPEndDisplayList(),
 };
 

@@ -22,8 +22,8 @@ OSMesgQueue gRumbleThreadVIMesgQueue;
 struct RumbleData gRumbleDataQueue[3];
 struct StructSH8031D9B0 gCurrRumbleSettings;
 
-s32 sRumblePakThreadActive = 0;
-s32 sRumblePakActive = 0;
+s32 sRumblePakThreadActive = FALSE;
+s32 sRumblePakActive = FALSE;
 s32 sRumblePakErrorCount = 0;
 s32 gRumblePakTimer = 0;
 
@@ -288,7 +288,7 @@ void create_thread_6(void) {
 }
 
 void rumble_thread_update_vi(void) {
-    if (sRumblePakThreadActive == FALSE) {
+    if (!sRumblePakThreadActive) {
         return;
     }
 

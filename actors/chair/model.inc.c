@@ -23,7 +23,7 @@ ALIGNED8 static const Texture chair_seg5_texture_05004060[] = {
 
 // unreferenced
 // 0x05004460
-ALIGNED8 static const Texture chair_seg5_texture_05004460[] = {
+UNUSED ALIGNED8 static const Texture chair_seg5_texture_05004460[] = {
 #include "actors/chair/chair_surface_unused.rgba16.inc.c"
 };
 

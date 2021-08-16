@@ -126,12 +126,12 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
     u8 sameSound;
     u8 cmd;                             // a0 sp3E, EU s2
     u8 cmdSemitone;                     // sp3D, t0
-    u16 sp3A;                           // t2, a0, a1
+    u16 sp3A = 0;                       // t2, a0, a1
     f32 tuning;                         // f0
-    s32 vel;                            // sp30, t3
+    s32 vel = 0;                        // sp30, t3
     s32 usedSemitone;                   // a1
-    f32 freqScale;                      // sp28, f0
-    f32 sp24;
+    f32 freqScale = 0.0f;               // sp28, f0
+    f32 sp24 = 0.0f;
     f32 temp_f12;
     f32 temp_f2;
 

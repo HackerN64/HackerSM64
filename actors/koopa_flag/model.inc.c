@@ -1,19 +1,19 @@
 // Koopa Flag
 
 // 0x06000000
-static const Lights1 koopa_flag_seg6_lights_06000000 = gdSPDefLights1(
+UNUSED static const Lights1 koopa_flag_seg6_lights_06000000 = gdSPDefLights1(
     0x00, 0x1b, 0x00,
     0x00, 0x6e, 0x00, 0x28, 0x28, 0x28
 );
 
 // 0x06000018
-static const Lights1 koopa_flag_seg6_lights_06000018 = gdSPDefLights1(
+UNUSED static const Lights1 koopa_flag_seg6_lights_06000018 = gdSPDefLights1(
     0x3f, 0x39, 0x15,
     0xff, 0xe6, 0x57, 0x28, 0x28, 0x28
 );
 
 // 0x06000030
-static const Lights1 koopa_flag_seg6_lights_06000030 = gdSPDefLights1(
+UNUSED static const Lights1 koopa_flag_seg6_lights_06000030 = gdSPDefLights1(
     0x2b, 0x15, 0x01,
     0xac, 0x54, 0x05, 0x28, 0x28, 0x28
 );

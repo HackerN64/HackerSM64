@@ -38,7 +38,7 @@ void bhv_rotating_exclamation_box_loop(void) {
 void exclamation_box_act_0(void) {
     if (o->oBehParams2ndByte < 3) {
         o->oAnimState = o->oBehParams2ndByte;
-        if ((save_file_get_flags() & D_8032F0C0[o->oBehParams2ndByte])
+        if ((save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte])
             || ((o->oBehParams >> 24) & 0xFF) != 0)
             o->oAction = 2;
         else
@@ -55,7 +55,7 @@ void exclamation_box_act_1(void) {
         spawn_object(o, MODEL_EXCLAMATION_POINT, bhvRotatingExclamationMark);
         cur_obj_set_model(MODEL_EXCLAMATION_BOX_OUTLINE);
     }
-    if ((save_file_get_flags() & D_8032F0C0[o->oBehParams2ndByte])
+    if ((save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte])
         || ((o->oBehParams >> 24) & 0xFF) != 0) {
         o->oAction = 2;
         cur_obj_set_model(MODEL_EXCLAMATION_BOX);
@@ -113,8 +113,8 @@ void exclamation_box_spawn_contents(struct Struct802C0DF0 *a0, u8 a1) {
             sp1C->oForwardVel = 3.0f;
             sp1C->oMoveAngleYaw = gMarioObject->oMoveAngleYaw;
             o->oBehParams |= a0->unk2 << 24;
-            if (a0->model == 122)
-                o->oFlags |= 0x4000;
+            if (a0->model == MODEL_STAR)
+                o->oFlags |= OBJ_FLAG_PERSISTENT_RESPAWN;
             break;
         }
         a0++;
@@ -124,7 +124,7 @@ void exclamation_box_spawn_contents(struct Struct802C0DF0 *a0, u8 a1) {
 void exclamation_box_act_4(void) {
     exclamation_box_spawn_contents(sExclamationBoxContents, o->oBehParams2ndByte);
     spawn_mist_particles_variable(0, 0, 46.0f);
-    spawn_triangle_break_particles(20, 139, 0.3f, o->oAnimState);
+    spawn_triangle_break_particles(20, MODEL_CARTOON_STAR, 0.3f, o->oAnimState);
     create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
     if (o->oBehParams2ndByte < 3) {
         o->oAction = 5;

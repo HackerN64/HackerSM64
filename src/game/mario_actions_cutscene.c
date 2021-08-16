@@ -18,6 +18,7 @@
 #include "level_table.h"
 #include "level_update.h"
 #include "mario.h"
+#include "mario_actions_cutscene.h"
 #include "mario_actions_moving.h"
 #include "mario_step.h"
 #include "moving_texture.h"
@@ -27,9 +28,6 @@
 #include "seq_ids.h"
 #include "sound_init.h"
 #include "rumble_init.h"
-
-// TODO: put this elsewhere
-enum SaveOption { SAVE_OPT_SAVE_AND_CONTINUE = 1, SAVE_OPT_SAVE_AND_QUIT, SAVE_OPT_CONTINUE_DONT_SAVE };
 
 static struct Object *sIntroWarpPipeObj;
 static struct Object *sEndPeachObj;
@@ -216,9 +214,9 @@ s32 geo_switch_peach_eyes(s32 run, struct GraphNode *node, UNUSED s32 a2) {
 }
 
 // unused
-static void stub_is_textbox_active(u16 *a0) {
-    if (get_dialog_id() == -1) {
-        *a0 = 0;
+UNUSED static void stub_is_textbox_active(u16 *arg) {
+    if (get_dialog_id() == DIALOG_NONE) {
+        *arg = 0;
     }
 }
 
@@ -250,23 +248,23 @@ s32 get_star_collection_dialog(struct MarioState *m) {
 void handle_save_menu(struct MarioState *m) {
     s32 dialogID;
     // wait for the menu to show up
-    if (is_anim_past_end(m) && gSaveOptSelectIndex != 0) {
+    if (is_anim_past_end(m) && gSaveOptSelectIndex != MENU_OPT_NONE) {
         // save and continue / save and quit
-        if (gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_CONTINUE || gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_QUIT) {
+        if (gSaveOptSelectIndex == MENU_OPT_SAVE_AND_CONTINUE || gSaveOptSelectIndex == MENU_OPT_SAVE_AND_QUIT) {
             save_file_do_save(gCurrSaveFileNum - 1);
 
-            if (gSaveOptSelectIndex == SAVE_OPT_SAVE_AND_QUIT) {
+            if (gSaveOptSelectIndex == MENU_OPT_SAVE_AND_QUIT) {
                 fade_into_special_warp(-2, 0); // reset game
             }
         }
 
         // not quitting
-        if (gSaveOptSelectIndex != SAVE_OPT_SAVE_AND_QUIT) {
+        if (gSaveOptSelectIndex != MENU_OPT_SAVE_AND_QUIT) {
             disable_time_stop();
             m->faceAngle[1] += 0x8000;
             // figure out what dialog to show, if we should
             dialogID = get_star_collection_dialog(m);
-            if (dialogID != 0) {
+            if (dialogID) {
                 play_peachs_jingle();
                 // look up for dialog
                 set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, dialogID);
@@ -345,24 +343,24 @@ s32 mario_ready_to_speak(void) {
 // 1 = starting dialog
 // 2 = speaking
 s32 set_mario_npc_dialog(s32 actionArg) {
-    s32 dialogState = 0;
+    s32 dialogState = MARIO_DIALOG_STATUS_NONE;
 
     // in dialog
     if (gMarioState->action == ACT_READING_NPC_DIALOG) {
         if (gMarioState->actionState < 8) {
-            dialogState = 1; // starting dialog
+            dialogState = MARIO_DIALOG_STATUS_START; // starting dialog
         }
         if (gMarioState->actionState == 8) {
-            if (actionArg == 0) {
+            if (actionArg == MARIO_DIALOG_STOP) {
                 gMarioState->actionState++; // exit dialog
             } else {
-                dialogState = 2;
+                dialogState = MARIO_DIALOG_STATUS_SPEAK;
             }
         }
     } else if (actionArg != 0 && mario_ready_to_speak()) {
         gMarioState->usedObj = gCurrentObject;
         set_mario_action(gMarioState, ACT_READING_NPC_DIALOG, actionArg);
-        dialogState = 1; // starting dialog
+        dialogState = MARIO_DIALOG_STATUS_START; // starting dialog
     }
 
     return dialogState;
@@ -381,10 +379,10 @@ s32 act_reading_npc_dialog(struct MarioState *m) {
     s32 headTurnAmount = 0;
     s16 angleToNPC;
 
-    if (m->actionArg == 2) {
+    if (m->actionArg == MARIO_DIALOG_LOOK_UP) {
         headTurnAmount = -1024;
     }
-    if (m->actionArg == 3) {
+    if (m->actionArg == MARIO_DIALOG_LOOK_DOWN) {
         headTurnAmount = 384;
     }
 
@@ -621,8 +619,8 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
                 }
                 break;
         }
-    } else if (m->actionState == 1 && gDialogResponse) {
-        if (gDialogResponse == 1) {
+    } else if (m->actionState == 1 && gDialogResponse != DIALOG_RESPONSE_NONE) {
+        if (gDialogResponse == DIALOG_RESPONSE_YES) {
             save_file_do_save(gCurrSaveFileNum - 1);
         }
         m->actionState = 2;
@@ -630,7 +628,7 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
         disable_time_stop();
         enable_background_sound();
         dialogID = get_star_collection_dialog(m);
-        if (dialogID != 0) {
+        if (dialogID) {
             // look up for dialog
             set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, dialogID);
         } else {
@@ -863,7 +861,7 @@ s32 act_entering_star_door(struct MarioState *m) {
     s16 targetAngle;
 
     if (m->actionTimer++ == 0) {
-        m->interactObj->oInteractStatus = 0x00010000;
+        m->interactObj->oInteractStatus = INT_STATUS_DOOR_PULLED;
 
         // ~30 degrees / 1/12 rot
         targetAngle = m->usedObj->oMoveAngleYaw + 0x1555;
@@ -921,10 +919,10 @@ s32 act_entering_star_door(struct MarioState *m) {
 s32 act_going_through_door(struct MarioState *m) {
     if (m->actionTimer == 0) {
         if (m->actionArg & 1) {
-            m->interactObj->oInteractStatus = 0x00010000;
+            m->interactObj->oInteractStatus = INT_STATUS_DOOR_PULLED;
             set_mario_animation(m, MARIO_ANIM_PULL_DOOR_WALK_IN);
         } else {
-            m->interactObj->oInteractStatus = 0x00020000;
+            m->interactObj->oInteractStatus = INT_STATUS_DOOR_PUSHED;
             set_mario_animation(m, MARIO_ANIM_PUSH_DOOR_WALK_IN);
         }
     }
@@ -954,9 +952,9 @@ s32 act_warp_door_spawn(struct MarioState *m) {
     if (m->actionState == 0) {
         m->actionState = 1;
         if (m->actionArg & 1) {
-            m->usedObj->oInteractStatus = 0x00040000;
+            m->usedObj->oInteractStatus = INT_STATUS_WARP_DOOR_PULLED;
         } else {
-            m->usedObj->oInteractStatus = 0x00080000;
+            m->usedObj->oInteractStatus = INT_STATUS_WARP_DOOR_PUSHED;
         }
     } else if (m->usedObj->oAction == 0) {
         if (gNeverEnteredCastle == TRUE && gCurrLevelNum == LEVEL_CASTLE) {
@@ -1087,8 +1085,8 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
                     enable_time_stop();
                 }
 
-                set_menu_mode(RENDER_COURSE_DONE_SCREEN);
-                gSaveOptSelectIndex = 0;
+                set_menu_mode(MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN);
+                gSaveOptSelectIndex = MENU_OPT_NONE;
 
                 m->actionState = 3; // star exit with cap
                 if (!(m->flags & MARIO_CAP_ON_HEAD)) {

@@ -51,12 +51,14 @@ void adjust_rolling_face_pitch(f32 f12) {
 }
 
 void snowmans_bottom_act_1(void) {
-    UNUSED s16 sp26;
     s32 sp20;
     UNUSED s16 sp1E;
+#ifdef AVOID_UB
+    sp20 = 0;
+#endif
 
     o->oPathedStartWaypoint = segmented_to_virtual(&ccm_seg7_trajectory_snowman);
-    sp26 = object_step_without_floor_orient();
+    object_step_without_floor_orient();
     sp20 = cur_obj_follow_path(sp20);
     o->oSnowmansBottomUnkF8 = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomUnkF8, 0x400);
@@ -77,9 +79,7 @@ void snowmans_bottom_act_1(void) {
 }
 
 void snowmans_bottom_act_2(void) {
-    UNUSED s16 sp26;
-
-    sp26 = object_step_without_floor_orient();
+    object_step_without_floor_orient();
     if (o->oForwardVel > 70.0)
         o->oForwardVel = 70.0f;
 
@@ -103,15 +103,13 @@ void snowmans_bottom_act_2(void) {
 }
 
 void snowmans_bottom_act_3(void) {
-    UNUSED s16 sp1E;
-
-    sp1E = object_step_without_floor_orient();
-    if ((sp1E & 0x09) == 0x09) {
+    s16 collisionFlags = object_step_without_floor_orient();
+    if ((collisionFlags & OBJ_COL_FLAGS_LANDED) == OBJ_COL_FLAGS_LANDED) {
         o->oAction = 4;
         cur_obj_become_intangible();
     }
 
-    if ((sp1E & 0x01) != 0) {
+    if ((collisionFlags & 0x01) != 0) {
         spawn_mist_particles_variable(0, 0, 70.0f);
         o->oPosX = -4230.0f;
         o->oPosZ = 1813.0f;
@@ -125,12 +123,12 @@ void bhv_snowmans_bottom_loop(void) {
     switch (o->oAction) {
         case 0:
             if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 400) == 1
-                && set_mario_npc_dialog(1) == 2) {
+                && set_mario_npc_dialog(MARIO_DIALOG_LOOK_FRONT) == MARIO_DIALOG_STATUS_SPEAK) {
                 sp1E = cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_110);
                 if (sp1E) {
                     o->oForwardVel = 10.0f;
                     o->oAction = 1;
-                    set_mario_npc_dialog(0);
+                    set_mario_npc_dialog(MARIO_DIALOG_STOP);
                 }
             }
             break;
@@ -187,11 +185,11 @@ void bhv_snowmans_head_init(void) {
 
 void bhv_snowmans_head_loop(void) {
     UNUSED s16 sp1E;
-    s16 sp1C;
+    s16 collisionFlags;
 
     switch (o->oAction) {
         case 0:
-            if (trigger_obj_dialog_when_facing(&o->oSnowmansHeadUnkF4, DIALOG_109, 400.0f, 1))
+            if (trigger_obj_dialog_when_facing(&o->oSnowmansHeadDialogActive, DIALOG_109, 400.0f, MARIO_DIALOG_LOOK_FRONT))
                 o->oAction = 1;
             break;
 
@@ -199,8 +197,8 @@ void bhv_snowmans_head_loop(void) {
             break;
 
         case 2:
-            sp1C = object_step_without_floor_orient();
-            if (sp1C & 0x08)
+            collisionFlags = object_step_without_floor_orient();
+            if (collisionFlags & OBJ_COL_FLAG_NO_Y_VEL)
                 o->oAction = 3;
             break;
 
@@ -215,7 +213,7 @@ void bhv_snowmans_head_loop(void) {
             break;
 
         case 4:
-            if (trigger_obj_dialog_when_facing(&o->oSnowmansHeadUnkF4, DIALOG_111, 700.0f, 2)) {
+            if (trigger_obj_dialog_when_facing(&o->oSnowmansHeadDialogActive, DIALOG_111, 700.0f, MARIO_DIALOG_LOOK_UP)) {
                 spawn_mist_particles();
                 spawn_default_star(-4700.0f, -1024.0f, 1890.0f);
                 o->oAction = 1;

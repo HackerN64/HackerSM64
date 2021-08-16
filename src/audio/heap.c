@@ -6,6 +6,8 @@
 #include "synthesis.h"
 #include "seqplayer.h"
 #include "effects.h"
+#include "game/game_init.h"
+#include "game/puppyprint.h"
 
 #define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
@@ -204,8 +206,6 @@ void discard_bank(s32 bankId) {
 
 #if defined(VERSION_EU)
         if (note->noteSubEu.bankId == bankId) {
-#elif defined(VERSION_SH)
-        if (note->unkSH33 == bankId) {
 #else
         if (note->bankId == bankId) {
 #endif
@@ -340,6 +340,10 @@ extern s32 D_SH_80315EE8;
 void sound_init_main_pools(s32 sizeForAudioInitPool) {
     sound_alloc_pool_init(&gAudioInitPool, gAudioHeap, sizeForAudioInitPool);
     sound_alloc_pool_init(&gAudioSessionPool, gAudioHeap + sizeForAudioInitPool, gAudioHeapSize - sizeForAudioInitPool);
+    #ifdef PUPPYPRINT
+    audioPool[0] = sizeForAudioInitPool;
+    audioPool[1] = gAudioHeapSize - sizeForAudioInitPool;
+    #endif
 }
 
 #ifdef VERSION_SH
@@ -352,20 +356,32 @@ void session_pools_init(struct PoolSplit *a) {
     gAudioSessionPool.cur = gAudioSessionPool.start;
     sound_alloc_pool_init(&gNotesAndBuffersPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gSeqAndBankPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantCustom), a->wantCustom);
+    #ifdef PUPPYPRINT
+    audioPool[2] = a->wantSeq;
+    audioPool[3] = a->wantCustom;
+    #endif
 }
 
 void seq_and_bank_pool_init(struct PoolSplit2 *a) {
     gSeqAndBankPool.cur = gSeqAndBankPool.start;
     sound_alloc_pool_init(&gPersistentCommonPool, SOUND_ALLOC_FUNC(&gSeqAndBankPool, a->wantPersistent), a->wantPersistent);
     sound_alloc_pool_init(&gTemporaryCommonPool, SOUND_ALLOC_FUNC(&gSeqAndBankPool, a->wantTemporary), a->wantTemporary);
+    #ifdef PUPPYPRINT
+    audioPool[4] = a->wantPersistent;
+    audioPool[5] = a->wantTemporary;
+    #endif
 }
 
 void persistent_pools_init(struct PoolSplit *a) {
     gPersistentCommonPool.cur = gPersistentCommonPool.start;
     sound_alloc_pool_init(&gSeqLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gBankLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantBank), a->wantBank);
-    sound_alloc_pool_init(&gUnusedLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantUnused),
-                  a->wantUnused);
+    sound_alloc_pool_init(&gUnusedLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantUnused), a->wantUnused);
+    #ifdef PUPPYPRINT
+    audioPool[6] = a->wantSeq;
+    audioPool[7] = a->wantBank;
+    audioPool[8] = a->wantUnused;
+    #endif
     persistent_pool_clear(&gSeqLoadedPool.persistent);
     persistent_pool_clear(&gBankLoadedPool.persistent);
     persistent_pool_clear(&gUnusedLoadedPool.persistent);
@@ -375,8 +391,12 @@ void temporary_pools_init(struct PoolSplit *a) {
     gTemporaryCommonPool.cur = gTemporaryCommonPool.start;
     sound_alloc_pool_init(&gSeqLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gBankLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantBank), a->wantBank);
-    sound_alloc_pool_init(&gUnusedLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantUnused),
-                  a->wantUnused);
+    sound_alloc_pool_init(&gUnusedLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantUnused), a->wantUnused);
+    #ifdef PUPPYPRINT
+    audioPool[9] = a->wantSeq;
+    audioPool[10] = a->wantBank;
+    audioPool[11] = a->wantUnused;
+    #endif
     temporary_pool_clear(&gSeqLoadedPool.temporary);
     temporary_pool_clear(&gBankLoadedPool.temporary);
     temporary_pool_clear(&gUnusedLoadedPool.temporary);
@@ -384,7 +404,7 @@ void temporary_pools_init(struct PoolSplit *a) {
 #undef SOUND_ALLOC_FUNC
 
 #if defined(VERSION_JP) || defined(VERSION_US)
-static void unused_803163D4(void) {
+UNUSED static void unused_803163D4(void) {
 }
 #endif
 
@@ -411,9 +431,9 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
 #endif
     u32 nullID = -1;
     UNUSED s32 i;
-    u8 *table;
+    u8 *table = NULL;
 #ifndef VERSION_SH
-    u8 isSound;
+    u8 isSound = FALSE;
 #endif
 #if defined(VERSION_JP) || defined(VERSION_US)
     u16 firstVal;
@@ -512,7 +532,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
         if (poolIdx == 1) {
             if (firstVal == SOUND_LOAD_STATUS_4) {
                 for (i = 0; i < gMaxSimultaneousNotes; i++) {
-                    if (gNotes[i].unkSH33 == tp->entries[0].id && gNotes[i].noteSubEu.enabled) {
+                    if (gNotes[i].bankId == tp->entries[0].id && gNotes[i].noteSubEu.enabled) {
                         break;
                     }
                 }
@@ -525,7 +545,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
             }
             if (secondVal == SOUND_LOAD_STATUS_4) {
                 for (i = 0; i < gMaxSimultaneousNotes; i++) {
-                    if (gNotes[i].unkSH33 == tp->entries[1].id && gNotes[i].noteSubEu.enabled) {
+                    if (gNotes[i].bankId == tp->entries[1].id && gNotes[i].noteSubEu.enabled) {
                         break;
                     }
                 }
@@ -591,7 +611,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
                 } else if (poolIdx == 1) {
                     if (firstVal == SOUND_LOAD_STATUS_COMPLETE) {
                         for (i = 0; i < gMaxSimultaneousNotes; i++) {
-                            if (gNotes[i].unkSH33 == tp->entries[0].id && gNotes[i].noteSubEu.enabled) {
+                            if (gNotes[i].bankId == tp->entries[0].id && gNotes[i].noteSubEu.enabled) {
                                 break;
                             }
                         }
@@ -602,7 +622,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
                     }
                     if (secondVal == SOUND_LOAD_STATUS_COMPLETE) {
                         for (i = 0; i < gMaxSimultaneousNotes; i++) {
-                            if (gNotes[i].unkSH33 == tp->entries[1].id && gNotes[i].noteSubEu.enabled) {
+                            if (gNotes[i].bankId == tp->entries[1].id && gNotes[i].noteSubEu.enabled) {
                                 break;
                             }
                         }
@@ -1089,6 +1109,11 @@ s32 audio_shut_down_and_reset_step(void) {
  * Waits until a specified number of audio frames have been created
  */
 void wait_for_audio_frames(s32 frames) {
+#ifdef VC_HACKS
+    // VC emulator stubs this function because busy loops are not supported
+    // Technically we can put infinite loop that _looks_ like -O0 for emu but this is cleaner
+    return;
+#endif
     gAudioFrameCount = 0;
     // Sound thread will update gAudioFrameCount
     while (gAudioFrameCount < frames) {
@@ -1119,6 +1144,9 @@ void audio_reset_session(void) {
 #if defined(VERSION_JP) || defined(VERSION_US)
     s32 frames;
     s32 remainingDmas;
+#ifdef BETTER_REVERB
+    s8 reverbConsole;
+#endif
 #else
     struct SynthesisReverb *reverb;
 #endif
@@ -1231,6 +1259,29 @@ void audio_reset_session(void) {
     gMaxSimultaneousNotes = preset->maxSimultaneousNotes;
     gSamplesPerFrameTarget = ALIGN16(gAiFrequency / 60);
     gReverbDownsampleRate = preset->reverbDownsampleRate;
+#ifdef BETTER_REVERB
+    if (gIsConsole)
+        reverbConsole = betterReverbDownsampleConsole; // Console!
+    else
+        reverbConsole = betterReverbDownsampleEmulator; // Setting this to 1 is REALLY slow, please use sparingly!
+
+    if (reverbConsole <= 0) {
+        reverbConsole = 1;
+        toggleBetterReverb = FALSE;
+    }
+    else {
+        toggleBetterReverb = TRUE;
+    }
+
+    if (toggleBetterReverb && betterReverbWindowsSize >= 0)
+        reverbWindowSize = betterReverbWindowsSize;
+    
+    if (gReverbDownsampleRate < (1 << (reverbConsole - 1)))
+        gReverbDownsampleRate = (1 << (reverbConsole - 1));
+    reverbWindowSize /= gReverbDownsampleRate;
+    if (reverbWindowSize < DEFAULT_LEN_2CH) // Minimum window size to not overflow
+        reverbWindowSize = DEFAULT_LEN_2CH;
+#endif
 
     switch (gReverbDownsampleRate) {
         case 1:
@@ -1252,7 +1303,6 @@ void audio_reset_session(void) {
             sReverbDownsampleRateLog = 0;
     }
 
-    gReverbDownsampleRate = preset->reverbDownsampleRate;
     gVolume = preset->volume;
     gMinAiBufferLength = gSamplesPerFrameTarget - 0x10;
     updatesPerFrame = gSamplesPerFrameTarget / 160 + 1;
@@ -1280,7 +1330,7 @@ void audio_reset_session(void) {
     temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporaryBankMem + preset->temporarySeqMem);
 #endif
     totalMem = persistentMem + temporaryMem;
-    wantMisc = gAudioSessionPool.size - totalMem - 0x100;
+    wantMisc = gAudioSessionPool.size - totalMem - 0x100 - BETTER_REVERB_SIZE;
     sSessionPoolSplit.wantSeq = wantMisc;
     sSessionPoolSplit.wantCustom = totalMem;
     session_pools_init(&sSessionPoolSplit);
@@ -1423,6 +1473,24 @@ void audio_reset_session(void) {
                 gSynthesisReverb.items[1][i].toDownsampleRight = mem + DEFAULT_LEN_1CH / sizeof(s16);
             }
         }
+
+ // This does not have to be reset after being initialized for the first time, which would speed up load times dramatically.
+ // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
+#ifdef BETTER_REVERB
+        if (toggleBetterReverb) {
+            for (i = 0; i < NUM_ALLPASS; ++i) {
+                delaysL[i] = delaysBaselineL[i] / gReverbDownsampleRate;
+                delaysR[i] = delaysBaselineR[i] / gReverbDownsampleRate;
+            }
+
+            delayBufsL = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
+            delayBufsR = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
+            for (i = 0; i < NUM_ALLPASS; ++i) {
+                delayBufsL[i] = (s32*) soundAlloc(&gAudioSessionPool, delaysL[i] * sizeof(s32));
+                delayBufsR[i] = (s32*) soundAlloc(&gAudioSessionPool, delaysR[i] * sizeof(s32));
+            }
+        }
+#endif
     }
 #endif
 
@@ -1684,7 +1752,7 @@ void func_sh_802f23ec(void) {
     s32 i;
     s32 idx;
     s32 seqCount;
-    u32 bankId1; // non symmetric fake match? can also change 0xff to 0xffU for same effect
+    s32 bankId1;
     s32 bankId2;
     s32 instId;
     s32 drumId;
@@ -1697,7 +1765,7 @@ void func_sh_802f23ec(void) {
     for (idx = 0; idx < seqCount; idx++) {
         bankId1 = gCtlEntries[idx].bankId1;
         bankId2 = gCtlEntries[idx].bankId2;
-        if ((bankId1 != 0xff && entry->bankId == bankId1) || (bankId2 != 0xff && entry->bankId == bankId2) || entry->bankId == 0) {
+        if ((bankId1 != 0xffu && entry->bankId == bankId1) || (bankId2 != 0xff && entry->bankId == bankId2) || entry->bankId == 0) {
             if (get_bank_or_seq(1, 3, idx) != NULL) {
                 if (IS_BANK_LOAD_COMPLETE(idx) != FALSE) {
                     for (i = 0; i < gUnkPool2.numEntries; i++) {

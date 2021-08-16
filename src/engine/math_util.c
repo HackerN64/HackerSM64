@@ -4,7 +4,7 @@
 #include "engine/graph_node.h"
 #include "math_util.h"
 #include "surface_collision.h"
-
+#include "extended_bounds.h"
 #include "trig_tables.inc.c"
 
 #include "config.h"
@@ -17,7 +17,14 @@ int gSplineState;
 // These functions have bogus return values.
 // Disable the compiler warning.
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-local-addr"
+
+#ifdef __GNUC__
+#if defined(__clang__)
+  #pragma GCC diagnostic ignored "-Wreturn-stack-address"
+#else
+  #pragma GCC diagnostic ignored "-Wreturn-local-addr"
+#endif
+#endif
 
 /// Copy vector 'src' to 'dest'
 void *vec3f_copy(Vec3f dest, Vec3f src) {

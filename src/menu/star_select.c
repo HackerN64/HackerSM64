@@ -54,8 +54,7 @@ static s8 sSelectableStarIndex = 0;
 
 // Act Selector menu timer that keeps counting until you choose an act.
 static s32 sActSelectorMenuTimer = 0;
-#ifdef WIDE
-#endif
+
 /**
  * Act Selector Star Type Loop Action
  * Defines a select type for a star in the act selector.
@@ -96,11 +95,10 @@ void render_100_coin_star(u8 stars) {
     if (stars & (1 << 6)) {
         // If the 100 coin star has been collected, create a new star selector next to the coin score.
     #ifdef WIDE
-        if (gWidescreen){
+        if (gWidescreen) {
             sStarSelectorModels[6] = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR,
                                                             bhvActSelectorStarType, ((370*4.0f)/3), 24, -300, 0, 0, 0);
-        }
-        else{
+        } else {
             sStarSelectorModels[6] = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR,
                                                             bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
         }
@@ -170,8 +168,7 @@ void bhv_act_selector_init(void) {
                                         (((75 + sVisibleStars * -75 + i * 152)*4.0f)/3), 248, -300, 0, 0, 0);
             sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
         }
-    }
-    else {
+    } else {
         for (i = 0; i < sVisibleStars; i++) {
             sStarSelectorModels[i] =
                 spawn_object_abs_with_rot(gCurrentObject, 0, selectorModelIDs[i], bhvActSelectorStarType,

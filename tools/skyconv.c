@@ -12,6 +12,7 @@
 
 #include "n64graphics.h"
 #include "utils.h"
+#include "config.h"
 
 #define SKYCONV_ENCODING ENCODING_U8
 
@@ -45,12 +46,12 @@ typedef struct {
 
 static const ImageProps IMAGE_PROPERTIES[ImageType_MAX][2] = {
     [Skybox] = {
-        {248, 248, 31, 31, 8, 8, true, true},
-        {256, 256, 32, 32, 8, 8, true, true},
+        {(248 * SKYBOX_SIZE), (248 * SKYBOX_SIZE), 31, 31, (8 * SKYBOX_SIZE), (8 * SKYBOX_SIZE), true, true},
+        {(256 * SKYBOX_SIZE), (256 * SKYBOX_SIZE), 32, 32, (8 * SKYBOX_SIZE), (8 * SKYBOX_SIZE), true, true},
     },
     [Cake] = {
-        {316, 228, 79, 19, 4, 12, false, false},
-        {320, 240, 80, 20, 4, 12, false, false},
+        {316, 228, 63, 29, 5, 8, false, false},
+        {320, 240, 64, 30, 5, 8, false, false},
     },
     [CakeEU] = {
         {320, 224, 64, 32, 5, 7, false, false},
@@ -63,8 +64,8 @@ typedef struct {
 } TableDimension;
 
 static const TableDimension TABLE_DIMENSIONS[ImageType_MAX] = {
-    [Skybox]   = {8, 10},
-    [Cake]     = {4, 12},
+    [Skybox]   = {(8 * SKYBOX_SIZE), (10 * SKYBOX_SIZE)},
+    [Cake]     = {5,  8},
     [CakeEU]   = {5,  7},
 };
 
@@ -106,15 +107,29 @@ static void split_tile(int col, int row, rgba *image, bool expanded) {
     int tileWidth = props.tileWidth;
     int tileHeight = props.tileHeight;
     int imageWidth = props.imageWidth;
+    int imageHeight = props.imageHeight;
     int numCols = props.numCols;
 
     int expandedWidth = IMAGE_PROPERTIES[type][true].tileWidth;
+
+    rgba black = {0, 0, 0, 0};
 
     for (int y = 0; y < tileHeight; y++) {
         for (int x = 0; x < tileWidth; x++) {
             int ny = row * tileHeight + y;
             int nx = col * tileWidth + x;
-            tiles[row * numCols + col].px[y * expandedWidth + x] = image[(ny * imageWidth + nx)];
+            if(type == CakeEU) {
+                tiles[row * numCols + col].px[y * expandedWidth + x] = image[(ny * imageWidth + nx)];
+            } else {
+                if (nx < imageWidth && ny < imageHeight)
+                {
+                    tiles[row * numCols + col].px[y * expandedWidth + x] = image[(ny * imageWidth + nx)];
+                }
+                else
+                {
+                    tiles[row * numCols + col].px[y * expandedWidth + x] = black;
+                }
+            }
         }
     }
 }
@@ -307,9 +322,9 @@ static void write_skybox_c() { /* write c data to disc */
 
     fprintf(cFile, "const Texture *const %s_skybox_ptrlist[] = {\n", skyboxName);
 
-    for (int row = 0; row < 8; row++) {
-        for (int col = 0; col < 10; col++) {
-            fprintf(cFile, "%s_skybox_texture_%05X,\n", skyboxName, get_index(tiles, row * 8 + (col % 8)));
+    for (int row = 0; row < (8 * SKYBOX_SIZE); row++) {
+        for (int col = 0; col < (10 * SKYBOX_SIZE); col++) {
+            fprintf(cFile, "%s_skybox_texture_%05X,\n", skyboxName, get_index(tiles, row * (8 * SKYBOX_SIZE) + (col % (8 * SKYBOX_SIZE))));
         }
     }
 
@@ -333,17 +348,24 @@ static void write_cake_c() {
 
     FILE *cFile = fopen(buffer, "w");
 
-    const char *euSuffx = "";
-    if (type == CakeEU) {
-        euSuffx = "eu_";
-    }
-
     int numTiles = TABLE_DIMENSIONS[type].cols * TABLE_DIMENSIONS[type].rows;
-    for (int i = 0; i < numTiles; ++i) {
-        fprintf(cFile, "ALIGNED8 static const Texture cake_end_texture_%s%d[] = {\n", euSuffx, i);
-        print_raw_data(cFile, &tiles[i]);
+
+    if (type == CakeEU) {
+        for (int i = 0; i < numTiles; ++i) {
+            fprintf(cFile, "ALIGNED8 static const Texture cake_end_texture_eu_%d[] = {\n", i);
+            print_raw_data(cFile, &tiles[i]);
+            fputs("};\n\n", cFile);
+        }
+    } else {
+        fprintf(cFile, "ALIGNED8 static const u8 cake_end_texture_data[] = {\n");
+        for (int i = 0; i < numTiles; ++i) {
+            print_raw_data(cFile, &tiles[i]);
+            fputc(',', cFile);
+            fputc('\n', cFile);
+        }
         fputs("};\n\n", cFile);
     }
+
     fclose(cFile);
 }
 
@@ -554,6 +576,7 @@ bool imageMatchesDimensions(int width, int height) {
             break;
         }
     }
+    
     if (!matchesDimensions) {
         if (type != CakeEU) {
             fprintf(stderr, "err: That type of image must be either %d x %d or %d x %d. Yours is %d x %d.\n",

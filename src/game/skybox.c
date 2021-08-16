@@ -60,7 +60,7 @@ struct Skybox {
 
 struct Skybox sSkyBoxInfo[2];
 
-typedef const u8 *const SkyboxTexture[80];
+typedef const u8 *const SkyboxTexture[80 * SKYBOX_SIZE];
 
 extern SkyboxTexture bbh_skybox_ptrlist;
 extern SkyboxTexture bidw_skybox_ptrlist;
@@ -108,21 +108,21 @@ u8 sSkyboxColors[][3] = {
  * The tile's width in world space.
  * By default, two full tiles can fit in the screen.
  */
-#define SKYBOX_TILE_WIDTH (SCREEN_WIDTH / 2)
+#define SKYBOX_TILE_WIDTH (SCREEN_WIDTH / (2 * SKYBOX_SIZE))
 /**
  * The tile's height in world space.
  * By default, two full tiles can fit in the screen.
  */
-#define SKYBOX_TILE_HEIGHT (SCREEN_HEIGHT / 2)
+#define SKYBOX_TILE_HEIGHT (SCREEN_HEIGHT / (2 * SKYBOX_SIZE))
 
 /**
  * The horizontal length of the skybox tilemap in tiles.
  */
-#define SKYBOX_COLS (10)
+#define SKYBOX_COLS (10 * SKYBOX_SIZE)
 /**
  * The vertical length of the skybox tilemap in tiles.
  */
-#define SKYBOX_ROWS (8)
+#define SKYBOX_ROWS (8 * SKYBOX_SIZE)
 
 
 /**
@@ -165,7 +165,7 @@ s32 calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
 
     // Since pitch can be negative, and the tile grid starts 1 octant above the camera's focus, add
     // 5 octants to the y position
-    s32 scaledY = roundedY + 5 * SKYBOX_TILE_HEIGHT;
+    s32 scaledY = roundedY + (5 * SKYBOX_SIZE) * SKYBOX_TILE_HEIGHT;
 
     if (scaledY > SKYBOX_HEIGHT) {
         scaledY = SKYBOX_HEIGHT;
@@ -221,8 +221,8 @@ void draw_skybox_tile_grid(Gfx **dlist, s8 background, s8 player, s8 colorIndex)
     s32 row;
     s32 col;
 
-    for (row = 0; row < 3; row++) {
-        for (col = 0; col < 3; col++) {
+    for (row = 0; row < (3 * SKYBOX_SIZE); row++) {
+        for (col = 0; col < (3 * SKYBOX_SIZE); col++) {
             s32 tileIndex = sSkyBoxInfo[player].upperLeftTile + row * SKYBOX_COLS + col;
             const u8 *const texture =
                 (*(SkyboxTexture *) segmented_to_virtual(sSkyboxTextures[background]))[tileIndex];
@@ -265,7 +265,7 @@ void *create_skybox_ortho_matrix(s8 player) {
  */
 Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
     s32 dlCommandCount = 5 + (3 * 3) * 7; // 5 for the start and end, plus 9 skybox tiles
-    void *skybox = alloc_display_list(dlCommandCount * sizeof(Gfx));
+    void *skybox = alloc_display_list(dlCommandCount * sizeof(Gfx) * sqr(SKYBOX_SIZE));
     Gfx *dlist = skybox;
 
     if (skybox == NULL) {

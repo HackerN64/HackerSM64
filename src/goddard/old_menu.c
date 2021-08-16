@@ -21,9 +21,9 @@
  */
 
 // bss
-static char sDefSettingsMenuStr[0x100];
+UNUSED static char sDefSettingsMenuStr[0x100];
 static struct GdVec3f sStaticVec;
-static struct GdVec3f unusedVec;
+UNUSED static struct GdVec3f unusedVec;
 static struct ObjGadget *sCurGadgetPtr;
 
 // forward declarations
@@ -56,61 +56,6 @@ void Unknown8018B7A8(void *a0) {
     sp1C.y += sStaticVec.y;
     sp1C.z += sStaticVec.z;
     d_set_world_pos(sp1C.x, sp1C.y, sp1C.z);
-}
-
-/**
- * Unused - called when an item is selected from the "Default Settings" menu.
- *
- * @param itemId  ID of the menu item that was clicked
- */
-static void menu_cb_default_settings(intptr_t itemId) {
-    struct ObjGroup *group = (struct ObjGroup *)itemId;  // Unpack pointer from menu item ID
-    apply_to_obj_types_in_group(OBJ_TYPE_GADGETS, (applyproc_t) reset_gadget_default, group);
-    apply_to_obj_types_in_group(OBJ_TYPE_VIEWS, (applyproc_t) stub_renderer_6, gGdViewsGroup);
-}
-
-/**
- * Unused - appends a menu item for the group to sDefSettingsMenuStr.
- */
-static void add_item_to_default_settings_menu(struct ObjGroup *group) {
-    char buf[0x100];
-
-    if (group->debugPrint == 1) {
-        // Convert pointer to integer and store it as the menu item ID.
-        sprintf(buf, "| %s %%x%d", group->name, (u32) (intptr_t) group);
-        gd_strcat(sDefSettingsMenuStr, buf);
-    }
-}
-
-/**
- * Unused - creates a popup menu that allows the user to control some settings.
- */
-long create_gui_menu(struct ObjGroup *grp) {
-    long dynamicsMenuId;
-    long defaultSettingMenuId;
-    long contTypeMenuId;
-
-    gd_strcpy(sDefSettingsMenuStr, "Default Settings %t %F");
-    apply_to_obj_types_in_group(OBJ_TYPE_GROUPS, (applyproc_t) add_item_to_default_settings_menu, grp);
-    defaultSettingMenuId = defpup(sDefSettingsMenuStr, &menu_cb_default_settings);
-
-    contTypeMenuId = defpup(
-        "Control Type %t %F"
-        "| U-64 Analogue Joystick %x1 "
-        "| Keyboard %x2 "
-        "| Mouse %x3",
-        &menu_cb_control_type);
-
-    dynamicsMenuId = defpup(
-        "Dynamics %t "
-        "|\t\t\tReset Positions %f "
-        "|\t\t\tSet Defaults %m "
-        "|\t\t\tSet Controller %m "
-        "|\t\t\tRe-Calibrate Controller %f "
-        "|\t\t\tQuit %f",
-        &menu_cb_reset_positions, defaultSettingMenuId, contTypeMenuId, &menu_cb_recalibrate_controller, &gd_exit);
-
-    return dynamicsMenuId;
 }
 
 /* 23A190 -> 23A250 */

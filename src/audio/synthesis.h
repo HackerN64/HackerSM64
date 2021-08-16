@@ -17,6 +17,42 @@
 #define MAX_UPDATES_PER_FRAME 4
 #endif
 
+#ifdef BETTER_REVERB
+ // Size determined by ((all delaysBaselineL/R values * 8) / (2 ^ Minimum Downsample Factor)) + array pointers.
+ // The default value can be increased or decreased in conjunction with the values in delaysBaselineL/R
+#define BETTER_REVERB_SIZE 0xF200
+
+// #define BETTER_REVERB_SIZE 0x7A00 // Default for use only with a downsampling value of 3 (i.e. double the emulator default)
+// #define BETTER_REVERB_SIZE 0x1E200 // Default for use with a downsampling value of 1 (i.e. no downsampling at all)
+
+#define NUM_ALLPASS 12 // Number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
+
+extern s8 betterReverbDownsampleConsole;
+extern s8 betterReverbDownsampleEmulator;
+extern u32 reverbFilterCountConsole;
+extern u32 reverbFilterCountEmulator;
+extern u8 monoReverbConsole;
+extern u8 monoReverbEmulator;
+extern s32 betterReverbWindowsSize;
+extern s32 gReverbRevIndex;
+extern s32 gReverbGainIndex;
+extern s32 gReverbWetSigna;
+// extern s32 gReverbDrySignal;
+
+extern const s32 delaysBaselineL[NUM_ALLPASS];
+extern const s32 delaysBaselineR[NUM_ALLPASS];
+extern s32 delaysL[NUM_ALLPASS];
+extern s32 delaysR[NUM_ALLPASS];
+extern s32 reverbMultsL[NUM_ALLPASS / 3];
+extern s32 reverbMultsR[NUM_ALLPASS / 3];
+extern s32 **delayBufsL;
+extern s32 **delayBufsR;
+
+extern u8 toggleBetterReverb;
+#else
+#define BETTER_REVERB_SIZE 0
+#endif
+
 struct ReverbRingBufferItem
 {
     s16 numSamplesAfterDownsampling;
@@ -90,7 +126,7 @@ extern s16 D_SH_803479B4;
 u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen);
 #if defined(VERSION_JP) || defined(VERSION_US)
 void note_init_volume(struct Note *note);
-void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb);
+void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverbVol);
 void note_set_frequency(struct Note *note, f32 frequency);
 void note_enable(struct Note *note);
 void note_disable(struct Note *note);

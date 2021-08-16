@@ -113,6 +113,9 @@ void bhv_mips_act_follow_path(void) {
     s32 followStatus;
     struct Waypoint **pathBase;
     struct Waypoint *waypoint;
+#ifdef AVOID_UB
+    followStatus = 0;
+#endif
 
     // Retrieve current waypoint.
     pathBase = segmented_to_virtual(&inside_castle_seg7_trajectory_mips);
@@ -160,13 +163,10 @@ void bhv_mips_act_wait_for_animation_done(void) {
  * Handles MIPS falling down after being thrown.
  */
 void bhv_mips_act_fall_down(void) {
-
-    s16 collisionFlags = 0;
-
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
     o->header.gfx.animInfo.animFrame = 0;
 
-    if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == 1) {
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         o->oAction = MIPS_ACT_WAIT_FOR_ANIMATION_DONE;
 
         o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
@@ -239,13 +239,13 @@ void bhv_mips_held(void) {
         else
             dialogID = DIALOG_162;
 
-        if (set_mario_npc_dialog(1) == 2) {
+        if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_FRONT) == MARIO_DIALOG_STATUS_SPEAK) {
             o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
             if (cutscene_object_with_dialog(CUTSCENE_DIALOG, o, dialogID)) {
                 o->oInteractionSubtype |= INT_SUBTYPE_DROP_IMMEDIATELY;
                 o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
                 o->oMipsStarStatus = MIPS_STAR_STATUS_SHOULD_SPAWN_STAR;
-                set_mario_npc_dialog(0);
+                set_mario_npc_dialog(MARIO_DIALOG_STOP);
             }
         }
     }

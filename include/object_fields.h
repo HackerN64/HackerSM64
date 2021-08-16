@@ -65,8 +65,8 @@
 #define /*0x0B4*/ oVelZ                       OBJECT_FIELD_F32(0x0B)
 #define /*0x0B8*/ oForwardVel                 OBJECT_FIELD_F32(0x0C)
 #define /*0x0B8*/ oForwardVelS32              OBJECT_FIELD_S32(0x0C)
-#define /*0x0BC*/ oUnkBC                      OBJECT_FIELD_F32(0x0D)
-#define /*0x0C0*/ oUnkC0                      OBJECT_FIELD_F32(0x0E)
+#define /*0x0BC*/ oLeftVel                    OBJECT_FIELD_F32(0x0D)
+#define /*0x0C0*/ oUpVel                      OBJECT_FIELD_F32(0x0E)
 #define /*0x0C4*/ O_MOVE_ANGLE_INDEX          0x0F
 #define /*0x0C4*/ O_MOVE_ANGLE_PITCH_INDEX    (O_MOVE_ANGLE_INDEX + 0)
 #define /*0x0C4*/ O_MOVE_ANGLE_YAW_INDEX      (O_MOVE_ANGLE_INDEX + 1)
@@ -274,24 +274,24 @@
 #define /*0x0FC*/ oBBallSpawnerPeriodMinus1 OBJECT_FIELD_S32(0x1D)
 
 /* Bowser */
-#define /*0x088*/ oBowserUnk88           OBJECT_FIELD_S32(0x00)
-#define /*0x0F4*/ oBowserUnkF4           OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oBowserUnkF8           OBJECT_FIELD_S32(0x1C)
+#define /*0x088*/ oBowserCamAct          OBJECT_FIELD_S32(0x00)
+#define /*0x0F4*/ oBowserStatus          OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oBowserTimer           OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oBowserDistToCentre    OBJECT_FIELD_F32(0x1D)
-#define /*0x106*/ oBowserUnk106          OBJECT_FIELD_S16(0x1F, 1)
-#define /*0x108*/ oBowserUnk108          OBJECT_FIELD_S16(0x20, 0)
+#define /*0x106*/ oBowserBitsJustJump    OBJECT_FIELD_S16(0x1F, 1)
+#define /*0x108*/ oBowserRandSplitFloor  OBJECT_FIELD_S16(0x20, 0)
 #define /*0x10A*/ oBowserHeldAnglePitch  OBJECT_FIELD_S16(0x20, 1)
 #define /*0x10D*/ oBowserHeldAngleVelYaw OBJECT_FIELD_S16(0x21, 0)
-#define /*0x10E*/ oBowserUnk10E          OBJECT_FIELD_S16(0x21, 1)
-#define /*0x110*/ oBowserUnk110          OBJECT_FIELD_S16(0x22, 0)
+#define /*0x10E*/ oBowserGrabbedStatus   OBJECT_FIELD_S16(0x21, 1)
+#define /*0x110*/ oBowserIsReacting      OBJECT_FIELD_S16(0x22, 0)
 #define /*0x112*/ oBowserAngleToCentre   OBJECT_FIELD_S16(0x22, 1)
-#define /*0x1AC*/ oBowserUnk1AC          OBJECT_FIELD_S16(0x49, 0)
-#define /*0x1AE*/ oBowserUnk1AE          OBJECT_FIELD_S16(0x49, 1)
+#define /*0x1AC*/ oBowserTargetOpacity   OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oBowserEyesTimer       OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oBowserEyesShut        OBJECT_FIELD_S16(0x4A, 0)
-#define /*0x1B2*/ oBowserUnk1B2          OBJECT_FIELD_S16(0x4A, 1)
+#define /*0x1B2*/ oBowserRainbowLight    OBJECT_FIELD_S16(0x4A, 1)
 
 /* Bowser Shockwave */
-#define /*0x0F4*/ oBowserShockWaveUnkF4 OBJECT_FIELD_F32(0x1B)
+#define /*0x0F4*/ oBowserShockWaveScale OBJECT_FIELD_F32(0x1B)
 
 /* Black Smoke Bowser */
 #define /*0x0F4*/ oBlackSmokeBowserUnkF4 OBJECT_FIELD_F32(0x1B)
@@ -497,7 +497,7 @@
 /* Flame */
 #define /*0x0F4*/ oFlameScale            OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oFlameSpeedTimerOffset OBJECT_FIELD_S32(0x1C)
-#define /*0x0FC*/ oFlameUnkFC            OBJECT_FIELD_F32(0x1D)
+#define /*0x0FC*/ oFlameUnusedRand       OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oFlameBowser           OBJECT_FIELD_OBJ(0x1E)
 
 /* Blue Flame */
@@ -626,7 +626,7 @@
 #define /*0x0F4*/ oKoopaRaceEndpointRaceBegun     OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oKoopaRaceEndpointKoopaFinished OBJECT_FIELD_S32(0x1C)
 #define /*0x0FC*/ oKoopaRaceEndpointRaceStatus    OBJECT_FIELD_S32(0x1D)
-#define /*0x100*/ oKoopaRaceEndpointUnk100        OBJECT_FIELD_S32(0x1E)
+#define /*0x100*/ oKoopaRaceEndpointDialog        OBJECT_FIELD_S32(0x1E)
 #define /*0x104*/ oKoopaRaceEndpointRaceEnded     OBJECT_FIELD_S32(0x1F)
 
 /* Koopa Shell Flame */
@@ -780,10 +780,14 @@
 #define /*0x0F8*/ oPitouneUnkF8 OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oPitouneUnkFC OBJECT_FIELD_F32(0x1D)
 
-/* Platform */
-#define /*0x0F4*/ oPlatformTimer  OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oPlatformUnkF8  OBJECT_FIELD_OBJ(0x1C)
-#define /*0x0FC*/ oPlatformUnkFC  OBJECT_FIELD_S32(0x1D)
+/* Falling Rising Bitfs Platform */
+#define /*0x0F4*/ oBitfsPlatformTimer   OBJECT_FIELD_S32(0x1B)
+
+/* Falling Bowser Bits Platform */
+#define /*0x0F8*/ oBitsPlatformBowser   OBJECT_FIELD_OBJ(0x1C)
+#define /*0x0FC*/ oBitsPlatformTimer    OBJECT_FIELD_S32(0x1D)
+
+/* WF Platform */
 #define /*0x10C*/ oPlatformUnk10C OBJECT_FIELD_F32(0x21)
 #define /*0x110*/ oPlatformUnk110 OBJECT_FIELD_F32(0x22)
 
@@ -887,7 +891,7 @@
 // 0x1D-0x21 reserved for pathing
 
 /* Snowman's Head */
-#define /*0x0F4*/ oSnowmansHeadUnkF4 OBJECT_FIELD_S32(0x1B)
+#define /*0x0F4*/ oSnowmansHeadDialogActive OBJECT_FIELD_S32(0x1B)
 
 /* Snowman Wind Blowing */
 #define /*0x0F4*/ oSLSnowmanWindOriginalYaw OBJECT_FIELD_S32(0x1B)
@@ -1166,5 +1170,88 @@
 #define /*0x0F4*/ oYoshiBlinkTimer OBJECT_FIELD_S32(0x1B)
 #define /*0x0FC*/ oYoshiChosenHome OBJECT_FIELD_S32(0x1D)
 #define /*0x100*/ oYoshiTargetYaw  OBJECT_FIELD_S32(0x1E)
+
+
+/*Custom general defines:
+
+For general s32 ints, use o->oF4, oF8, oFC, o100, o104, o108, o10C, and o110
+
+For floats, apply the prefix "oFloat" before the index. For object pointers, apply "oObj", and for surface pointers, apply "oSurf"
+
+Examples: o->oFloatF4, o->oSurf10C
+
+s16 variables are also supported, and using them effectly can double the number of available members. The full list of s16 defines is:
+
+os16F4
+os16F6
+os16F8
+os16FA
+os16FC
+os16FE
+os16100
+os16102
+os16104
+os16106
+os16108
+os1610A
+os1610C
+os1610E
+os16110
+os16112*/
+
+#define /*0x0F4*/ oF4              OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oF8              OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oFC              OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ o100             OBJECT_FIELD_S32(0x1E)
+#define /*0x104*/ o104             OBJECT_FIELD_S32(0x1F)
+#define /*0x108*/ o108             OBJECT_FIELD_S32(0x20)
+#define /*0x10C*/ o10C             OBJECT_FIELD_S32(0x21)
+#define /*0x110*/ o110             OBJECT_FIELD_S32(0x22)
+
+
+#define /*0x0F4*/ oFloatF4         OBJECT_FIELD_F32(0x1B)
+#define /*0x0F8*/ oFloatF8         OBJECT_FIELD_F32(0x1C)
+#define /*0x0FC*/ oFloatFC         OBJECT_FIELD_F32(0x1D)
+#define /*0x100*/ oFloat100        OBJECT_FIELD_F32(0x1E)
+#define /*0x104*/ oFloat104        OBJECT_FIELD_F32(0x1F)
+#define /*0x108*/ oFloat108        OBJECT_FIELD_F32(0x20)
+#define /*0x10C*/ oFloat10C        OBJECT_FIELD_F32(0x21)
+#define /*0x110*/ oFloat110        OBJECT_FIELD_F32(0x22)
+
+#define /*0x0F4*/ oObjF4           OBJECT_FIELD_OBJ(0x1B)
+#define /*0x0F8*/ oObjF8           OBJECT_FIELD_OBJ(0x1C)
+#define /*0x0FC*/ oObjFC           OBJECT_FIELD_OBJ(0x1D)
+#define /*0x100*/ oObj100          OBJECT_FIELD_OBJ(0x1E)
+#define /*0x104*/ oObj104          OBJECT_FIELD_OBJ(0x1F)
+#define /*0x108*/ oObj108          OBJECT_FIELD_OBJ(0x20)
+#define /*0x10C*/ oObj10C          OBJECT_FIELD_OBJ(0x21)
+#define /*0x110*/ oObj110          OBJECT_FIELD_OBJ(0x22)
+
+#define /*0x0F4*/ oSurfF4           OBJECT_FIELD_SURFACE(0x1B)
+#define /*0x0F8*/ oSurfF8           OBJECT_FIELD_SURFACE(0x1C)
+#define /*0x0FC*/ oSurfFC           OBJECT_FIELD_SURFACE(0x1D)
+#define /*0x100*/ oSurf100          OBJECT_FIELD_SURFACE(0x1E)
+#define /*0x104*/ oSurf104          OBJECT_FIELD_SURFACE(0x1F)
+#define /*0x108*/ oSurf108          OBJECT_FIELD_SURFACE(0x20)
+#define /*0x10C*/ oSurf10C          OBJECT_FIELD_SURFACE(0x21)
+#define /*0x110*/ oSurf110          OBJECT_FIELD_SURFACE(0x22)
+
+#define /*0x0F4*/ os16F4              OBJECT_FIELD_S16(0x1B, 0)
+#define /*0x0F6*/ os16F6              OBJECT_FIELD_S16(0x1B, 1)
+#define /*0x0F8*/ os16F8              OBJECT_FIELD_S16(0x1C, 0)
+#define /*0x0FA*/ os16FA              OBJECT_FIELD_S16(0x1C, 1)
+#define /*0x0FC*/ os16FC              OBJECT_FIELD_S16(0x1D, 0)
+#define /*0x0FE*/ os16FE              OBJECT_FIELD_S16(0x1D, 1)
+#define /*0x100*/ os16100             OBJECT_FIELD_S16(0x1E, 0)
+#define /*0x102*/ os16102             OBJECT_FIELD_S16(0x1E, 1)
+#define /*0x104*/ os16104             OBJECT_FIELD_S16(0x1F, 0)
+#define /*0x106*/ os16106             OBJECT_FIELD_S16(0x1F, 1)
+#define /*0x108*/ os16108             OBJECT_FIELD_S16(0x20, 0)
+#define /*0x10A*/ os1610A             OBJECT_FIELD_S16(0x20, 1)
+#define /*0x10C*/ os1610C             OBJECT_FIELD_S16(0x21, 0)
+#define /*0x10E*/ os1610E             OBJECT_FIELD_S16(0x21, 1)
+#define /*0x110*/ os16110             OBJECT_FIELD_S16(0x22, 0)
+#define /*0x112*/ os16112             OBJECT_FIELD_S16(0x22, 1)
+
 
 #endif // OBJECT_FIELDS_H

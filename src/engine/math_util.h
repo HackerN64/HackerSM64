@@ -31,6 +31,7 @@ extern f32 gCosineTable[];
 
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 #define sqr(x) ((x) * (x))
 

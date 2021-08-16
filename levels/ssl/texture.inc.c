@@ -19,7 +19,7 @@ ALIGNED8 static const Texture ssl_seg7_texture_07001800[] = {
 };
 
 // 0x07002000 - 0x07002800
-ALIGNED8 static const Texture ssl_seg7_texture_07002000[] = {
+UNUSED ALIGNED8 static const Texture ssl_seg7_texture_07002000[] = {
 #include "levels/ssl/4.rgba16.inc.c"
 };
 

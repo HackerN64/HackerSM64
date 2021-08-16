@@ -101,7 +101,7 @@ const LevelScript level_main_scripts_entry[] = {
     LOAD_MODEL_FROM_GEO(MODEL_MARIOS_METAL_CAP,        marios_metal_cap_geo),
     LOAD_MODEL_FROM_GEO(MODEL_MARIOS_WING_CAP,         marios_wing_cap_geo),
     LOAD_MODEL_FROM_GEO(MODEL_MARIOS_CAP,              marios_cap_geo),
-    LOAD_MODEL_FROM_GEO(MODEL_MARIOS_CAP,              marios_cap_geo), // repeated
+    //LOAD_MODEL_FROM_GEO(MODEL_MARIOS_CAP,              marios_cap_geo), // repeated
     LOAD_MODEL_FROM_GEO(MODEL_BOWSER_KEY_CUTSCENE,     bowser_key_cutscene_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BOWSER_KEY,              bowser_key_geo),
     LOAD_MODEL_FROM_GEO(MODEL_RED_FLAME_SHADOW,        red_flame_shadow_geo),
@@ -171,7 +171,7 @@ static const LevelScript script_exec_ ## folder [] = { \
 
 const LevelScript script_func_global_1[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BLUE_COIN_SWITCH,        blue_coin_switch_geo),
-    LOAD_MODEL_FROM_GEO(MODEL_AMP,                     amp_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_AMP,                     dAmpGeo),
     LOAD_MODEL_FROM_GEO(MODEL_PURPLE_SWITCH,           purple_switch_geo),
     LOAD_MODEL_FROM_GEO(MODEL_CHECKERBOARD_PLATFORM,   checkerboard_platform_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BREAKABLE_BOX,           breakable_box_geo),
@@ -304,7 +304,7 @@ const LevelScript script_func_global_13[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BOWSER_SMOKE,            bowser_impact_smoke_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BOWSER_FLAMES,           bowser_flames_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BOWSER_WAVE,             invisible_bowser_accessory_geo),
-    LOAD_MODEL_FROM_GEO(MODEL_BOWSER2,                 bowser2_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_BOWSER_NO_SHADOW,        bowser_geo_no_shadow),
     RETURN(),
 };
 

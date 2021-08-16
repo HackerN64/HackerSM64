@@ -321,26 +321,6 @@ void split_all_timers(void) {
 }
 
 /**
- * Unused - records the start time for all timers
- */
-void start_all_timers(void) {
-    s32 i;
-    struct GdTimer *timer;
-
-    if (!sTimingActive) {
-        return;
-    }
-
-    for (i = 0; i < ARRAY_COUNT(sTimers); i++) {
-        timer = get_timernum(i);
-
-        if (timer->name != NULL) {
-            timer->start = gd_get_ostime();
-        }
-    }
-}
-
-/**
  * Records the current time before performing an operation
  */
 void start_timer(const char *name) {
@@ -432,15 +412,6 @@ f32 get_scaled_timer_total(const char *name) {
     return timer->scaledTotal;
 }
 
-/**
- * Unused - returns the raw total for the specified timer
- */
-f32 get_timer_total(const char *name) {
-    struct GdTimer *timer = get_timer_checked(name);
-
-    return (f32) timer->total;
-}
-
 
 /*
  * Miscellaneous debug functions
@@ -488,7 +459,11 @@ void fatal_printf(const char *fmt, ...) {
                         gd_printf("%s", va_arg(vl, char *));
                         break;
                     case 'c':
+#ifdef AVOID_UB
+                        gd_printf("%c", (char)va_arg(vl, int));
+#else
                         gd_printf("%c", va_arg(vl, char));
+#endif
                         break;
                     case 'x':
                         gd_printf("%x", va_arg(vl, s32));
@@ -849,7 +824,6 @@ struct GdFile *gd_fopen(const char *filename, const char *mode) {
         for (i = 0; i < sizeof(struct UnkBufThing); i++) {
             *bufbytes++ = gGdStreamBuffer[filecsr++];
         }
-        stub_renderer_13(&buf);
         fileposptr = &gGdStreamBuffer[filecsr];
         filecsr += buf.size;
 

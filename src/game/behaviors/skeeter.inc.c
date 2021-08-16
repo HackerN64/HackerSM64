@@ -70,7 +70,7 @@ static void skeeter_act_lunge(void) {
         if (o->oMoveFlags & OBJ_MOVE_HIT_WALL) {
             o->oMoveAngleYaw = cur_obj_reflect_move_angle_off_wall();
             o->oForwardVel *= 0.3f;
-            o->oFlags &= ~0x00000008;
+            o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
         }
 
         if (obj_forward_vel_approach(0.0f, 0.8f) && cur_obj_check_if_at_animation_end()) {
@@ -84,7 +84,7 @@ static void skeeter_act_lunge(void) {
 
             o->oAction = SKEETER_ACT_IDLE;
             o->oSkeeterWaitTime = random_linear_offset(0, 30);
-            o->oFlags |= 0x00000008;
+            o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
         }
     }
 }
