@@ -2830,7 +2830,7 @@ sound_ref .sound_general_grand_star_jump
 sound_ref .sound_general_boat_rock
 sound_ref .sound_stone_patch_break
 sound_ref .sound_stone_patch_deform
-.ifdef VERSION_JP
+#ifdef VERSION_JP
   sound_ref .sound_menu_enter_hole
   sound_ref .sound_menu_enter_hole
   sound_ref .sound_menu_enter_hole

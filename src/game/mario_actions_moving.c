@@ -1406,7 +1406,7 @@ s32 act_stone_patch_air_land(struct MarioState *m) {
     //perform_ground_step(m);
 
     if (m->forwardVel != 0) {
-        common_slide_action(m, ACT_STONE_PATCH_AIR_LAND, ACT_STONE_PATCH_AIRBORNE, m->animation);
+        common_slide_action(m, ACT_STONE_PATCH_AIR_LAND, ACT_STONE_PATCH_AIRBORNE, m->animList);
         update_sliding(m, 7.0f);
     //cur_obj_play_sound_2(SOUND_ENV_SLIDING);
     }
