@@ -70,6 +70,7 @@ extern u16 D_80339ECA;
 extern s16 sTransitionTimer;
 extern void (*sTransitionUpdate)(s16 *);
 extern u8 unused3[4];
+extern void load_language_text(void);
 
 struct WarpDest {
     u8 type;

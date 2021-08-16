@@ -23,6 +23,13 @@
 #include "text_strings.h"
 
 #include "eu_translation.h"
+#if MULTILANG
+#undef LANGUAGE_FUNCTION
+#define LANGUAGE_FUNCTION sLanguageMode
+s8 sLanguageMode = LANGUAGE_ENGLISH;
+#endif
+
+extern void *languageTable[][3];
 
 /**
  * @file file_select.c
@@ -32,7 +39,7 @@
  */
 
 // The current sound mode is automatically centered on US and Shindou.
-static s16 sSoundTextX;
+s16 sSoundTextX;
 
 //! @Bug (UB Array Access) For EU, more buttons were added than the array was extended.
 //! This causes no currently known issues on console (as the other variables are not changed
@@ -41,121 +48,128 @@ static s16 sSoundTextX;
 
 // Amount of main menu buttons defined in the code called by spawn_object_rel_with_rot.
 // See file_select.h for the names in MenuButtonTypes.
-static struct Object *sMainMenuButtons[NUM_BUTTONS];
+struct Object *sMainMenuButtons[NUM_BUTTONS];
 
 // Used to defined yes/no fade colors after a file is selected in the erase menu.
 // sYesNoColor[0]: YES | sYesNoColor[1]: NO
-static u8 sYesNoColor[2];
+u8 sYesNoColor[2];
 
 // The button that is selected when it is clicked.
-static s8 sSelectedButtonID = MENU_BUTTON_NONE;
+s8 sSelectedButtonID = MENU_BUTTON_NONE;
 
 // Whether we are on the main menu or one of the submenus.
-static s8 sCurrentMenuLevel = MENU_LAYER_MAIN;
+s8 sCurrentMenuLevel = MENU_LAYER_MAIN;
 
 // Used for text opacifying. If it is below 250, it is constantly incremented.
-static u8 sTextBaseAlpha = 0;
+u8 sTextBaseAlpha = 0;
 
 // 2D position of the cursor on the screen.
 // sCursorPos[0]: X | sCursorPos[1]: Y
-static f32 sCursorPos[] = {0, 0};
+f32 sCursorPos[] = {0, 0};
 
 // Determines which graphic to use for the cursor.
-static s16 sCursorClickingTimer = 0;
+s16 sCursorClickingTimer = 0;
 
 // Equal to sCursorPos if the cursor gets clicked, {-10000, -10000} otherwise.
-static s16 sClickPos[] = {-10000, -10000};
+s16 sClickPos[] = {-10000, -10000};
 
 // Used for determining which file has been selected during copying and erasing.
-static s8 sSelectedFileIndex = -1;
+s8 sSelectedFileIndex = -1;
 
 // Whether to fade out text or not.
-static s8 sFadeOutText = FALSE;
+s8 sFadeOutText = FALSE;
 
 // The message currently being displayed at the top of a menu.
-static s8 sStatusMessageID = 0;
+s8 sStatusMessageID = 0;
 
 // Used for text fading. The alpha value of text is calculated as
 // sTextBaseAlpha - sTextFadeAlpha.
-static u8 sTextFadeAlpha = 0;
+u8 sTextFadeAlpha = 0;
 
 // File select timer that keeps counting until it reaches 1000.
 // Used to prevent buttons from being clickable as soon as a menu loads.
 // Gets reset when you click an empty save, existing saves in copy and erase menus
 // and when you click yes/no in the erase confirmation prompt.
-static s16 sMainMenuTimer = 0;
+s16 sMainMenuTimer = 0;
 
 // Sound mode menu buttonID, has different values compared to gSoundMode in audio.
 // 0: gSoundMode = 0 (Stereo) | 1: gSoundMode = 3 (Mono) | 2: gSoundMode = 1 (Headset)
-static s8 sSoundMode = 0;
+s8 sSoundMode = 0;
 
 // Active language for EU arrays, values defined similar to sSoundMode
 // 0: English | 1: French | 2: German
 
 // Tracks which button will be pressed in the erase confirmation prompt (yes/no).
-static s8 sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
+s8 sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
 
 // Used for the copy menu, defines if the game as all 4 save slots with data.
 // if TRUE, it doesn't allow copying more files.
-static s8 sAllFilesExist = FALSE;
+s8 sAllFilesExist = FALSE;
 
 // Defines the value of the save slot selected in the menu.
 // Mario A: 1 | Mario B: 2 | Mario C: 3 | Mario D: 4
-static s8 sSelectedFileNum = 0;
+s8 sSelectedFileNum = 0;
 
 // Which coin score mode to use when scoring files. 0 for local
 // coin high score, 1 for high score across all files.
-static s8 sScoreFileCoinScoreMode = 0;
+s8 sScoreFileCoinScoreMode = 0;
 
 // In EU, if no save file exists, open the language menu so the user can find it.
 
-static unsigned char textReturn[] = { TEXT_RETURN };
+unsigned char textReturn[][8] = { {TEXT_RETURN}, };
 
-static unsigned char textViewScore[] = { TEXT_CHECK_SCORE };
+unsigned char textViewScore[] = { TEXT_CHECK_SCORE };
 
-static unsigned char textCopyFileButton[] = { TEXT_COPY_FILE_BUTTON };
+unsigned char textCopyFileButton[] = { TEXT_COPY_FILE_BUTTON };
 
-static unsigned char textEraseFileButton[] = { TEXT_ERASE_FILE_BUTTON };
+unsigned char textEraseFileButton[] = { TEXT_ERASE_FILE_BUTTON };
 
-static unsigned char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO }, { TEXT_HEADSET } };
+unsigned char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO }, { TEXT_HEADSET } };
 
-static unsigned char textMarioA[] = { TEXT_FILE_MARIO_A };
-static unsigned char textMarioB[] = { TEXT_FILE_MARIO_B };
-static unsigned char textMarioC[] = { TEXT_FILE_MARIO_C };
-static unsigned char textMarioD[] = { TEXT_FILE_MARIO_D };
+#if MULTILANG
+unsigned char textLanguageSelect[][17] = {  { TEXT_LANGUAGE_SELECT }};
+#endif
 
-static unsigned char textNew[] = { TEXT_NEW };
-static unsigned char starIcon[] = { GLYPH_STAR, GLYPH_SPACE };
-static unsigned char xIcon[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
+unsigned char textSoundSelect[][13] = { { TEXT_SOUND_SELECT },};
 
-static unsigned char textSelectFile[] = { TEXT_SELECT_FILE };
+unsigned char textMarioA[] = { TEXT_FILE_MARIO_A };
+unsigned char textMarioB[] = { TEXT_FILE_MARIO_B };
+unsigned char textMarioC[] = { TEXT_FILE_MARIO_C };
+unsigned char textMarioD[] = { TEXT_FILE_MARIO_D };
 
-static unsigned char textScore[] = { TEXT_SCORE };
+unsigned char textNew[] = { TEXT_NEW };
+unsigned char starIcon[] = { GLYPH_STAR, GLYPH_SPACE };
+unsigned char xIcon[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
 
-static unsigned char textCopy[] = { TEXT_COPY };
+unsigned char textSelectFile[] = { TEXT_SELECT_FILE };
 
-static unsigned char textErase[] = { TEXT_ERASE };
+unsigned char textScore[] = { TEXT_SCORE };
 
+unsigned char textCopy[] = { TEXT_COPY };
 
-static unsigned char textCheckFile[] = { TEXT_CHECK_FILE };
+unsigned char textErase[] = { TEXT_ERASE };
 
-static unsigned char textNoSavedDataExists[] = { TEXT_NO_SAVED_DATA_EXISTS };
+unsigned char textLanguage[][9] = {{ TEXT_ENGLISH }, { TEXT_FRENCH }, { TEXT_GERMAN }};
 
-static unsigned char textCopyFile[] = { TEXT_COPY_FILE };
+unsigned char textCheckFile[] = { TEXT_CHECK_FILE };
 
-static unsigned char textCopyItToWhere[] = { TEXT_COPY_IT_TO_WHERE };
+unsigned char textNoSavedDataExists[] = { TEXT_NO_SAVED_DATA_EXISTS };
 
-static unsigned char textNoSavedDataExistsCopy[] = { TEXT_NO_SAVED_DATA_EXISTS };
+unsigned char textCopyFile[] = { TEXT_COPY_FILE };
 
-static unsigned char textCopyCompleted[] = { TEXT_COPYING_COMPLETED };
+unsigned char textCopyItToWhere[] = { TEXT_COPY_IT_TO_WHERE };
 
-static unsigned char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
+unsigned char textNoSavedDataExistsCopy[] = { TEXT_NO_SAVED_DATA_EXISTS };
 
-static unsigned char textNoFileToCopyFrom[] = { TEXT_NO_FILE_TO_COPY_FROM };
+unsigned char textCopyCompleted[] = { TEXT_COPYING_COMPLETED };
 
-static unsigned char textYes[] = { TEXT_YES };
+unsigned char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
 
-static unsigned char textNo[] = { TEXT_NO };
+unsigned char textNoFileToCopyFrom[] = { TEXT_NO_FILE_TO_COPY_FROM };
+
+unsigned char textYes[] = { TEXT_YES };
+
+unsigned char textNo[] = { TEXT_NO };
 
 
 /**
@@ -198,7 +212,7 @@ s32 check_clicked_button(s16 x, s16 y, f32 depth) {
 /**
  * Grow from main menu, used by selecting files and menus.
  */
-static void bhv_menu_button_growing_from_main_menu(struct Object *button) {
+void bhv_menu_button_growing_from_main_menu(struct Object *button) {
     if (button->oMenuButtonTimer < 16) {
         button->oFaceAngleYaw += 0x800;
     }
@@ -225,7 +239,7 @@ static void bhv_menu_button_growing_from_main_menu(struct Object *button) {
 /**
  * Shrink back to main menu, used to return back while inside menus.
  */
-static void bhv_menu_button_shrinking_to_main_menu(struct Object *button) {
+void bhv_menu_button_shrinking_to_main_menu(struct Object *button) {
     if (button->oMenuButtonTimer < 16) {
         button->oFaceAngleYaw -= 0x800;
     }
@@ -252,7 +266,7 @@ static void bhv_menu_button_shrinking_to_main_menu(struct Object *button) {
 /**
  * Grow from submenu, used by selecting a file in the score menu.
  */
-static void bhv_menu_button_growing_from_submenu(struct Object *button) {
+void bhv_menu_button_growing_from_submenu(struct Object *button) {
     if (button->oMenuButtonTimer < 16) {
         button->oFaceAngleYaw += 0x800;
     }
@@ -277,7 +291,7 @@ static void bhv_menu_button_growing_from_submenu(struct Object *button) {
 /**
  * Shrink back to submenu, used to return back while inside a score save menu.
  */
-static void bhv_menu_button_shrinking_to_submenu(struct Object *button) {
+void bhv_menu_button_shrinking_to_submenu(struct Object *button) {
     if (button->oMenuButtonTimer < 16) {
         button->oFaceAngleYaw -= 0x800;
     }
@@ -305,7 +319,7 @@ static void bhv_menu_button_shrinking_to_submenu(struct Object *button) {
  * A small increase and decrease in size.
  * Used by failed copy/erase/score operations and sound mode select.
  */
-static void bhv_menu_button_zoom_in_out(struct Object *button) {
+void bhv_menu_button_zoom_in_out(struct Object *button) {
     if (sCurrentMenuLevel == MENU_LAYER_MAIN) {
         if (button->oMenuButtonTimer < 4) {
             button->oParentRelativePosZ -= 20.0f;
@@ -332,7 +346,7 @@ static void bhv_menu_button_zoom_in_out(struct Object *button) {
  * A small temporary increase in size.
  * Used while selecting a target copy/erase file or yes/no erase confirmation prompt.
  */
-static void bhv_menu_button_zoom_in(struct Object *button) {
+void bhv_menu_button_zoom_in(struct Object *button) {
     button->oMenuButtonScale += 0.0022;
     button->oMenuButtonTimer++;
     if (button->oMenuButtonTimer == 10) {
@@ -346,7 +360,7 @@ static void bhv_menu_button_zoom_in(struct Object *button) {
  * Used after selecting a target copy/erase file or
  * yes/no erase confirmation prompt to undo the zoom in.
  */
-static void bhv_menu_button_zoom_out(struct Object *button) {
+void bhv_menu_button_zoom_out(struct Object *button) {
     button->oMenuButtonScale -= 0.0022;
     button->oMenuButtonTimer++;
     if (button->oMenuButtonTimer == 10) {
@@ -888,7 +902,11 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
 #undef ACTION_TIMER
 #undef MAIN_RETURN_TIMER
 
+#if MULTILANG
+    #define SOUND_BUTTON_Y 388
+#else
     #define SOUND_BUTTON_Y 0
+#endif
 
 /**
  * Render buttons for the sound mode menu.
@@ -907,8 +925,28 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
         soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton, -533, SOUND_BUTTON_Y, -100, 0, -0x8000, 0);
     sMainMenuButtons[MENU_BUTTON_HEADSET]->oMenuButtonScale = 0.11111111f;
 
+    #if MULTILANG
+    // English option button
+    sMainMenuButtons[MENU_BUTTON_LANGUAGE_ENGLISH] = spawn_object_rel_with_rot(
+        soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton, 533, -111, -100, 0, -0x8000, 0);
+    sMainMenuButtons[MENU_BUTTON_LANGUAGE_ENGLISH]->oMenuButtonScale = 0.11111111f;
+    // French option button
+    sMainMenuButtons[MENU_BUTTON_LANGUAGE_FRENCH] = spawn_object_rel_with_rot(
+        soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton, 0, -111, -100, 0, -0x8000, 0);
+    sMainMenuButtons[MENU_BUTTON_LANGUAGE_FRENCH]->oMenuButtonScale = 0.11111111f;
+    // German option button
+    sMainMenuButtons[MENU_BUTTON_LANGUAGE_GERMAN] = spawn_object_rel_with_rot(
+        soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton, -533, -111, -100, 0, -0x8000, 0);
+    sMainMenuButtons[MENU_BUTTON_LANGUAGE_GERMAN]->oMenuButtonScale = 0.11111111f;
+
+    // Return button
+    sMainMenuButtons[MENU_BUTTON_LANGUAGE_RETURN] = spawn_object_rel_with_rot(
+        soundModeButton, MODEL_MAIN_MENU_YELLOW_FILE_BUTTON, bhvMenuButton, 0, -533, -100, 0, -0x8000, 0);
+    sMainMenuButtons[MENU_BUTTON_LANGUAGE_RETURN]->oMenuButtonScale = 0.11111111f;
+#else
     // Zoom in current selection
     sMainMenuButtons[MENU_BUTTON_OPTION_MIN + sSoundMode]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
+#endif
 }
 #undef SOUND_BUTTON_Y
 
@@ -934,13 +972,33 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
                         queue_rumble_data(5, 80);
 #endif
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
+#if !MULTILANG
                         // Sound menu buttons don't return to Main Menu in EU
                         // because they don't have a case in bhv_menu_button_manager_loop
                         sSelectedButtonID = buttonID;
+#endif
                         sSoundMode = buttonID - MENU_BUTTON_OPTION_MIN;
                         save_file_set_sound_mode(sSoundMode);
                     }
                 }
+#if MULTILANG
+                // If language mode button clicked, select it and change language
+                if (buttonID == MENU_BUTTON_LANGUAGE_ENGLISH || buttonID == MENU_BUTTON_LANGUAGE_FRENCH
+                         || buttonID == MENU_BUTTON_LANGUAGE_GERMAN) {
+                    if (soundModeButton->oMenuButtonActionPhase == SOUND_MODE_PHASE_MAIN) {
+                        play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
+                        sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
+                        sLanguageMode = buttonID - MENU_BUTTON_LANGUAGE_MIN;
+                        eu_set_language(sLanguageMode);
+                    }
+                }
+                // If neither of the buttons above are pressed, return to main menu
+                if (buttonID == MENU_BUTTON_LANGUAGE_RETURN) {
+                    play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
+                    sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
+                    sSelectedButtonID = buttonID;
+                }
+#endif
                 sCurrentMenuLevel = MENU_LAYER_SUBMENU;
 
                 break;
@@ -1386,6 +1444,11 @@ void bhv_menu_button_manager_loop(void) {
             check_sound_mode_menu_clicked_buttons(sMainMenuButtons[MENU_BUTTON_SOUND_MODE]);
             break;
 
+        #if MULTILANG
+        case MENU_BUTTON_LANGUAGE_RETURN:
+            return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_LANGUAGE_RETURN]);
+            break;
+        #endif
         // STEREO, MONO and HEADSET buttons are undefined so they can be selected without
         // exiting the Options menu, as a result they added a return button
         case MENU_BUTTON_STEREO:
@@ -1999,7 +2062,13 @@ void print_erase_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
-    #define SOUND_HUD_X 88
+#if MULTILANG
+    #define SOUND_HUD_X 96
+    #define SOUND_HUD_Y 141
+#else
+    #define SOUND_HUD_X 47
+    #define SOUND_HUD_Y 87
+#endif
 
 /**
  * Prints sound mode menu strings that shows on the purple background menu screen.
@@ -2008,33 +2077,49 @@ void print_erase_menu_strings(void) {
  */
 void print_sound_mode_menu_strings(void) {
     s32 mode;
-
-    s16 textX;
-
-    unsigned char textSoundSelect[] = { TEXT_SOUND_SELECT };
+    s32 textX;
 
     // Print "SOUND SELECT" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
-    print_hud_lut_string(HUD_LUT_DIFF, SOUND_HUD_X, 35, textSoundSelect);
+    print_hud_lut_string(HUD_LUT_DIFF, SOUND_HUD_X, 32, LANGUAGE_ARRAY(textSoundSelect));
+    #if MULTILANG
+    print_hud_lut_string(HUD_LUT_DIFF, 47, 101, LANGUAGE_ARRAY(textLanguageSelect));
+    #endif
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
     // Print sound mode names
-    for (mode = 0; mode < 3; mode++) {
+    for (mode = 0, textX = 90; mode < 3; textX += 70, mode++) {
         if (mode == sSoundMode) {
             gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
         } else {
             gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
         }
-            // Mode names are centered correctly on US and Shindou
-            textX = get_str_x_pos_from_center(mode * 74 + 87, textSoundModes[mode], 10.0f);
-            print_generic_string(textX, 87, textSoundModes[mode]);
+        print_generic_string(
+            get_str_x_pos_from_center(textX, LANGUAGE_ARRAY(textSoundModes[mode]), 10.0f),
+            SOUND_HUD_Y, LANGUAGE_ARRAY(textSoundModes[mode]));
     }
 
+    #if MULTILANG
+    // In EU, print language mode names
+    for (mode = 0, textX = 90; mode < 3; textX += 70, mode++) {
+        if (mode == LANGUAGE_FUNCTION) {
+            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+        } else {
+            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
+        }
+        print_generic_string(
+            get_str_x_pos_from_center(textX, textLanguage[mode], 10.0f),
+            72, textLanguage[mode]);
+    }
+
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
+    print_generic_string(182, 29, LANGUAGE_ARRAY(textReturn));
+    #endif
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
@@ -2136,7 +2221,7 @@ void print_save_file_scores(s8 fileIndex) {
     unsigned char textHiScore[] = { TEXT_HI_SCORE };
     unsigned char textMyScore[] = { TEXT_MY_SCORE };
     unsigned char textFileLetter[] = { TEXT_ZERO };
-    void **levelNameTable = segmented_to_virtual(seg2_course_name_table);
+    void **levelNameTable = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
     textFileLetter[0] = fileIndex + ASCII_TO_DIALOG('A'); // get letter of file selected
 
@@ -2198,7 +2283,7 @@ void print_save_file_scores(s8 fileIndex) {
  * Prints file select strings depending on the menu selected.
  * Also checks if all saves exists and defines text and main menu timers.
  */
-static void print_file_select_strings(void) {
+void print_file_select_strings(void) {
     UNUSED s32 unused1;
     UNUSED s32 unused2;
 

@@ -22,11 +22,12 @@
 #include "behavior_data.h"
 #include "save_file.h"
 #include "mario.h"
+#include "puppyprint.h"
 
 #ifdef PUPPYCAM
 
 #define OFFSET 30.0f
-#define STEPS 1
+#define STEPS 4
 #define DECELERATION 0.66f
 #define DEADZONE 20
 #define SCRIPT_MEMORY_POOL 0x1000
@@ -44,18 +45,16 @@ struct MemoryPool *gPuppyMemoryPool;
 s32 gPuppyError = 0;
 
 #if defined(VERSION_EU)
-static u8 gPCOptionStringsFR[][64] = {{NC_ANALOGUE_FR}, {NC_CAMX_FR}, {NC_CAMY_FR}, {NC_INVERTX_FR}, {NC_INVERTY_FR}, {NC_CAMC_FR}, {NC_SCHEME_FR}, {NC_WIDE_FR},};
-static u8 gPCOptionStringsDE[][64] = {{NC_ANALOGUE_DE}, {NC_CAMX_DE}, {NC_CAMY_DE}, {NC_INVERTX_DE}, {NC_INVERTY_DE}, {NC_CAMC_DE}, {NC_SCHEME_DE}, {NC_WIDE_DE},};
-static u8 gPCFlagStringsFR[][64] = {{OPTION_DISABLED_FR}, {OPTION_ENABLED_FR}, {OPTION_SCHEME1_FR}, {OPTION_SCHEME2_FR}, {OPTION_SCHEME3_FR}};
-static u8 gPCFlagStringsDE[][64] = {{OPTION_DISABLED_DE}, {OPTION_ENABLED_DE}, {OPTION_SCHEME1_DE}, {OPTION_SCHEME2_DE}, {OPTION_SCHEME3_DE}};
-static u8 gPCToggleStringsFR[][64] = {{NC_ANALOGUE_EN}, {NC_ANALOGUE_EN}, {NC_ANALOGUE_EN}, {NC_ANALOGUE_EN}, {NC_ANALOGUE_EN}};
-static u8 gPCToggleStringsDE[][64] = {{NC_ANALOGUE_EN}, {NC_ANALOGUE_EN}, {NC_ANALOGUE_EN}, {NC_ANALOGUE_EN}, {NC_ANALOGUE_EN}};
-//static u8 gPCToggleStringsFR[][64] = {{NC_BUTTON_FR}, {NC_BUTTON2_FR}, {NC_OPTION_FR}, {NC_HIGHLIGHT_L_FR}, {NC_HIGHLIGHT_R_FR}};
-//static u8 gPCToggleStringsDE[][64] = {{NC_BUTTON_DE}, {NC_BUTTON2_DE}, {NC_OPTION_DE}, {NC_HIGHLIGHT_L_DE}, {NC_HIGHLIGHT_R_DE}};
+static u8 gPCOptionStringsFR[][64] = {{NC_ANALOGUE_FR}, {NC_CAMX_FR}, {NC_CAMY_FR}, {NC_INVERTX_FR}, {NC_INVERTY_FR}, {NC_CAMC_FR}, {NC_SCHEME_FR}, {NC_WIDE_FR}, {OPTION_LANGUAGE_FR}};
+static u8 gPCOptionStringsDE[][64] = {{NC_ANALOGUE_DE}, {NC_CAMX_DE}, {NC_CAMY_DE}, {NC_INVERTX_DE}, {NC_INVERTY_DE}, {NC_CAMC_DE}, {NC_SCHEME_DE}, {NC_WIDE_DE}, {OPTION_LANGUAGE_DE}};
+static u8 gPCFlagStringsFR[][64] = {{OPTION_DISABLED_FR}, {OPTION_ENABLED_FR}, {OPTION_SCHEME1_FR}, {OPTION_SCHEME2_FR}, {OPTION_SCHEME3_FR}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN},};
+static u8 gPCFlagStringsDE[][64] = {{OPTION_DISABLED_DE}, {OPTION_ENABLED_DE}, {OPTION_SCHEME1_DE}, {OPTION_SCHEME2_DE}, {OPTION_SCHEME3_DE}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN},};
+static u8 gPCToggleStringsFR[][64] = {{NC_BUTTON_FR}, {NC_BUTTON2_FR}, {NC_OPTION_FR}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
+static u8 gPCToggleStringsDE[][64] = {{NC_BUTTON_DE}, {NC_BUTTON2_DE}, {NC_OPTION_DE}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
 #endif
-static u8 gPCOptionStringsEN[][64] = {{NC_ANALOGUE_EN}, {NC_CAMX_EN}, {NC_CAMY_EN}, {NC_INVERTX_EN}, {NC_INVERTY_EN}, {NC_CAMC_EN}, {NC_SCHEME_EN}, {NC_WIDE_EN},};
-static u8 gPCFlagStringsEN[][64] = {{OPTION_DISABLED_EN}, {OPTION_ENABLED_EN}, {OPTION_SCHEME1_EN}, {OPTION_SCHEME2_EN}, {OPTION_SCHEME3_EN}};
-static u8 gPCToggleStringsEN[][64] = {{NC_BUTTON_EN}, {NC_BUTTON2_EN}, {NC_OPTION_EN}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R}};
+static u8 gPCOptionStringsEN[][64] = {{NC_ANALOGUE_EN}, {NC_CAMX_EN}, {NC_CAMY_EN}, {NC_INVERTX_EN}, {NC_INVERTY_EN}, {NC_CAMC_EN}, {NC_SCHEME_EN}, {NC_WIDE_EN}, {OPTION_LANGUAGE_EN}};
+static u8 gPCFlagStringsEN[][64] = {{OPTION_DISABLED_EN}, {OPTION_ENABLED_EN}, {OPTION_SCHEME1_EN}, {OPTION_SCHEME2_EN}, {OPTION_SCHEME3_EN}, {TEXT_ENGLISH}, {TEXT_FRENCH}, {TEXT_GERMAN},};
+static u8 gPCToggleStringsEN[][64] = {{NC_BUTTON_EN}, {NC_BUTTON2_EN}, {NC_OPTION_EN}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
 
 
 #define OPT 32 //Just a temp thing
@@ -76,7 +75,12 @@ static const struct gPCOptionStruct
 
 static const struct gPCOptionStruct gPCOptions[]=
 { //If the min and max are 0 and 1, then the value text is used, otherwise it's ignored.
+    #ifdef WIDE
     {/*Option Name*/ 7, /*Option Variable*/ &gWidescreen,       /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
+    #endif
+    #if MULTILANG
+    {/*Option Name*/ 8, /*Option Variable*/ &gInGameLanguage,       /*Option Value Text Start*/ 4, /*Option Minimum*/ 1, /*Option Maximum*/ 3},
+    #endif
     {/*Option Name*/ 0, /*Option Variable*/ &gPuppyCam.options.analogue,       /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
     {/*Option Name*/ 6, /*Option Variable*/ &gPuppyCam.options.inputType,       /*Option Value Text Start*/ 2, /*Option Minimum*/ 0, /*Option Maximum*/ 2},
     {/*Option Name*/ 1, /*Option Variable*/ &gPuppyCam.options.sensitivityX,   /*Option Value Text Start*/ 255, /*Option Minimum*/ 10, /*Option Maximum*/ 500},
@@ -161,10 +165,10 @@ void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacementZ)
     gPuppyCam.floorY[1] += displacementY;
 }
 
-#if defined(VERSION_EU)
+#if MULTILANG
 static void newcam_set_language(void)
 {
-    switch (eu_get_language())
+    switch (gInGameLanguage-1)
     {
     case 0:
         gPCOptionStringsPtr = &gPCOptionStringsEN;
@@ -213,7 +217,7 @@ static void newcam_process_cutscene(void)
 
 #define BLANK 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
 
-static void puppycam_display_box(s16 x1, s16 y1, s16 x2, s16 y2, u8 r, u8 g, u8 b, u8 a)
+static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a)
 {
     gDPSetCombineMode(gDisplayListHead++, BLANK, BLANK);
     gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
@@ -249,11 +253,15 @@ void puppycam_change_setting(s8 toggle)
         *gPCOptions[gPCOptionSelected].gPCOptionVar += toggle;
     //Forgive me father, for I have sinned. I guess if you wanted a selling point for a 21:9 monitor though, "I can view this line in puppycam's code without scrolling!" can be added to it.
     *gPCOptions[gPCOptionSelected].gPCOptionVar = CLAMP(*gPCOptions[gPCOptionSelected].gPCOptionVar, gPCOptions[gPCOptionSelected].gPCOptionMin, gPCOptions[gPCOptionSelected].gPCOptionMax);
+
+    #if defined(VERSION_EU)
+    newcam_set_language();
+    #endif
 }
 
-void puppycam_print_text(s16 x, s16 y, u8 str[], u8 col)
+void puppycam_print_text(s32 x, s32 y, u8 str[], s32 col)
 {
-    u8 textX;
+    s32 textX;
     textX = get_str_x_pos_from_center(x,str,10.0f);
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
     print_generic_string(textX+1,y-1,str);
@@ -271,14 +279,14 @@ void puppycam_print_text(s16 x, s16 y, u8 str[], u8 col)
 //Options menu
 void puppycam_display_options()
 {
-    u8 i = 0;
-    u8 newstring[32];
-    s16 scroll;
-    s16 scrollpos;
+    s32 i = 0;
+    char newstring[32];
+    s32 scroll;
+    s32 scrollpos;
     s16 var = gPCOptions;
-    s16 vr;
-    u16 maxvar;
-    u16 minvar;
+    s32 vr;
+    s32 maxvar;
+    s32 minvar;
     f32 newcam_sinpos;
 
     puppycam_display_box(47,83,281,84,0x0,0x0,0x0, 0xFF);
@@ -290,7 +298,7 @@ void puppycam_display_options()
     puppycam_display_box(48,84,272,218,0x0,0x0,0x0, 0x50);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-    print_hud_lut_string(HUD_LUT_GLOBAL, 64, 40, (*gPCToggleStringsPtr)[2]);
+    print_hud_lut_string(HUD_LUT_GLOBAL, 112, 40, (*gPCToggleStringsPtr)[2]);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     if (gPCOptionCap>4)
@@ -353,14 +361,17 @@ void puppycam_check_pause_buttons()
         if (gPCOptionOpen == 0)
         {
             gPCOptionOpen = 1;
-            #if defined(VERSION_EU)
+            #if MULTILANG
             newcam_set_language();
+            eu_set_language(gInGameLanguage-1);
             #endif
         }
-
         else
         {
             gPCOptionOpen = 0;
+            #if MULTILANG
+            load_language_text();
+            #endif
             puppycam_set_save();
         }
     }

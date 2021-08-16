@@ -801,7 +801,7 @@ $(ELF): $(BUILD_DIR)/sm64_prelim.elf $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $
 $(ROM): $(ELF)
 	$(call print,Building ROM:,$<,$@)
 ifeq      ($(CONSOLE),n64)
-	$(V)$(OBJCOPY) --pad-to=0x800000 --gap-fill=0xFF $< $@ -O binary
+	$(V)$(OBJCOPY) --pad-to=0x101000 --gap-fill=0xFF $< $@ -O binary
 else ifeq ($(CONSOLE),bb)
 	$(V)$(OBJCOPY) --gap-fill=0x00 $< $@ -O binary
 	$(V)dd if=$@ of=tmp bs=16K conv=sync

@@ -37,6 +37,7 @@ enum MenuMode {
 
 extern s8 gDialogCourseActNum;
 extern s8 gHudFlash;
+extern s16 gInGameLanguage;
 
 struct DialogEntry
 {

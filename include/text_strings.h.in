@@ -3,12 +3,10 @@
 
 #include "text_menu_strings.h"
 
-#ifdef PUPPYCAM
+#if defined(PUPPYCAM)
 #define NC_CAMX_EN 				_("Camera X Sensitivity")
 #define NC_CAMY_EN 				_("Camera Y Sensitivity")
 #define NC_INVERTX_EN			_("Invert X Axis")
-#define NC_INVERTX_FR			_("Invertir Axe X")
-#define NC_INVERTX_DE			_("Invert X Axis")
 #define NC_INVERTY_EN			_("Invert Y Axis")
 #define NC_CAMC_EN 				_("Camera Centre Speed")
 #define NC_ANALOGUE_EN			_("Analogue Camera")
@@ -18,59 +16,50 @@
 #define OPTION_SCHEME1_EN 		_("Double Tap")
 #define OPTION_SCHEME2_EN 		_("Single Press")
 #define OPTION_SCHEME3_EN 		_("Classic")
+#define OPTION_LANGUAGE_EN 		_("Language")
 #define NC_WIDE_EN	 			_("Widescreen")
 #define NC_HIGHLIGHT_L 			_(">")
 #define NC_HIGHLIGHT_R 			_("<")
 #define NC_BUTTON_EN 			_("[R]: Options")
 #define NC_BUTTON2_EN 			_("[R]: Return")
-#define NC_OPTION_EN 			_("PUPPYCAM OPTIONS")
+#define NC_OPTION_EN 			_("OPTIONS")
 
-
-#if defined(VERSION_EU)
+#if MULTILANG
 #define NC_CAMX_FR 				_("Sensibilite sur l'axe X")
-#define NC_CAMX_DE 				_("Camera X Sensitivity")
-
 #define NC_CAMY_FR 				_("Sensibilite sur l'axe Y")
-#define NC_CAMY_DE 				_("Camera Y Sensitivity")
-
+#define NC_INVERTX_FR			_("Invertir Axe X")
 #define NC_INVERTY_FR			_("Invertir Axe Y")
-#define NC_INVERTY_DE			_("Invert Y Axis")
-
 #define NC_CAMC_FR 				_("Vitesse de Centrage")
-#define NC_CAMC_DE 				_("Camera Centre Speed")
-
 #define NC_ANALOGUE_FR			_("Camera Analogue")
-#define NC_ANALOGUE_DE			_("Analogue Camera")
-
 #define NC_SCHEME_FR			_("Control Scheme")
-#define NC_SCHEME_DE			_("Control Scheme")
-
+#define OPTION_ENABLED_FR	    _("Active")
+#define OPTION_DISABLED_FR	    _("Desactive")
+#define OPTION_SCHEME1_FR 		_("Double Tap")
+#define OPTION_SCHEME2_FR 		_("Single Press")
+#define OPTION_SCHEME3_FR 		_("Classic")
+#define OPTION_LANGUAGE_FR 		_("Language")
 #define NC_WIDE_FR	 			_("Widescreen")
+#define NC_BUTTON_FR 			_("[R]: Options")
+#define NC_BUTTON2_FR 			_("[R]: Retournez")
+#define NC_OPTION_FR 			_("OPTIONS")
+
+#define NC_CAMX_DE 				_("Camera X Sensitivity")
+#define NC_CAMY_DE 				_("Camera Y Sensitivity")
+#define NC_INVERTY_DE			_("Invert Y Axis")
+#define NC_INVERTX_DE			_("Invert X Axis")
+#define NC_CAMC_DE 				_("Camera Centre Speed")
+#define NC_ANALOGUE_DE			_("Analogue Camera")
+#define NC_SCHEME_DE			_("Control Scheme")
+#define OPTION_ENABLED_DE 		_("Enabled")
+#define OPTION_DISABLED_DE	    _("Disabled")
+#define OPTION_SCHEME1_DE 		_("Double Tap")
+#define OPTION_SCHEME2_DE 		_("Single Press")
+#define OPTION_SCHEME3_DE 		_("Classic")
+#define OPTION_LANGUAGE_DE 		_("Language")
 #define NC_WIDE_DE	 			_("Widescreen")
-
-#define OPTION_ENABLED_FR _("Active")
-#define OPTION_ENABLED_DE _("Enabled")
-
-#define OPTION_DISABLED_FR _("Desactive")
-#define OPTION_DISABLED_DE _("Disabled")
-
-#define OPTION_SCHEME1_FR _("Double Tap")
-#define OPTION_SCHEME1_DE _("Double Tap")
-
-#define OPTION_SCHEME2_FR _("Single Press")
-#define OPTION_SCHEME2_DE _("Single Press")
-
-#define OPTION_SCHEME3_FR _("Classic")
-#define OPTION_SCHEME3_DE _("Classic")
-
-#define NC_BUTTON_FR 				_("[R]: Options")
-#define NC_BUTTON_DE 				_("[R]: Options")
-
-#define NC_BUTTON2_FR 				_("[R]: Retournez")
-#define NC_BUTTON2_DE 				_("[R]: Return")
-
-#define NC_OPTION_FR 				_("OPTIONS PUPPYCAM")
-#define NC_OPTION_DE 				_("PUPPYCAM OPTIONS")
+#define NC_BUTTON_DE 			_("[R]: Options")
+#define NC_BUTTON2_DE 			_("[R]: Return")
+#define NC_OPTION_DE 			_("OPTIONS")
 #endif
 #endif
 
@@ -97,7 +86,7 @@
 #define TEXT_HUD_CONGRATULATIONS _("CONGRATULATIONS") // Course Complete Text, Bowser Courses
 
 //Widescreen stuff
-#ifdef WIDE
+#if defined(WIDE) && !defined(PUPPYCAM)
 #define TEXT_HUD_CURRENT_RATIO_43 _("ASPECT RATIO: 4:3")
 #define TEXT_HUD_CURRENT_RATIO_169 _("ASPECT RATIO: 16:9")
 #define TEXT_HUD_PRESS_L _("PRESS L TO SWITCH")
@@ -303,7 +292,12 @@
 
 #endif
 
-#ifdef VERSION_EU
+
+#define TEXT_ENGLISH _("ENGLISH")
+#define TEXT_FRENCH _("FRANÇAIS")
+#define TEXT_GERMAN _("DEUTSCH")
+
+#if MULTILANG
 
 /**
  * File Select Text
@@ -386,10 +380,6 @@
 #define TEXT_STEREO_DE _("STEREO")
 #define TEXT_MONO_DE _("MONO")
 #define TEXT_HEADSET_DE _("PHONES")
-
-#define TEXT_ENGLISH _("ENGLISH")
-#define TEXT_FRENCH _("FRANÇAIS")
-#define TEXT_GERMAN _("DEUTSCH")
 
 #define TEXT_HI_SCORE_FR _("MEILLEUR SCORE")
 #define TEXT_HI_SCORE_DE _("BESTLEISTUNG")

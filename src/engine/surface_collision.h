@@ -11,7 +11,7 @@
 #define CELL_HEIGHT_LIMIT           20000
 #define FLOOR_LOWER_LIMIT           -11000
 #define FLOOR_LOWER_LIMIT_MISC      (FLOOR_LOWER_LIMIT + 1000)
-// same as FLOOR_LOWER_LIMIT_MISC, explicitly for shadow.c 
+// same as FLOOR_LOWER_LIMIT_MISC, explicitly for shadow.c
 // It doesn't match if ".0" is removed or ".f" is added
 #define FLOOR_LOWER_LIMIT_SHADOW    (FLOOR_LOWER_LIMIT + 1000.0)
 
@@ -40,9 +40,9 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil);
 f32 find_floor_height_and_data(f32 xPos, f32 yPos, f32 zPos, struct FloorGeometry **floorGeo);
 f32 find_floor_height(f32 x, f32 y, f32 z);
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor);
-f32 find_water_level_and_floor(f32 x, f32 z, struct Surface **pfloor);
-f32 find_water_level(f32 x, f32 z);
-f32 find_poison_gas_level(f32 x, f32 z);
+s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor);
+s32 find_water_level(s32 x, s32 z);
+s32 find_poison_gas_level(s32 x, s32 z);
 void debug_surface_list_info(f32 xPos, f32 zPos);
 
 #endif // SURFACE_COLLISION_H
