@@ -28,6 +28,7 @@
 #include "level_table.h"
 #include "course_table.h"
 #include "rumble_init.h"
+#include "puppycam2.h"
 
 #include "config.h"
 
@@ -640,6 +641,18 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 arg3) {
     sWarpDest.areaIdx = destArea;
     sWarpDest.nodeId = destWarpNode;
     sWarpDest.arg = arg3;
+
+    #ifdef PUPPYCAM
+    s32 i = 0;
+    if (sWarpDest.type != WARP_TYPE_SAME_AREA)
+    {
+        for (i = 0; i < gPuppyVolumeCount; i++)
+        {
+            mem_pool_free(gPuppyMemoryPool, sPuppyVolumeStack[i]);
+        }
+        gPuppyVolumeCount = 0;
+    }
+    #endif
 }
 
 // From Surface 0xD3 to 0xFC
