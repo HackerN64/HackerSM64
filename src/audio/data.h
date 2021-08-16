@@ -116,8 +116,8 @@ extern u32 gAudioRandom;
 #define EXT_AUDIO_INIT_POOL_SIZE 0x8000
 #else
 // EU and SH versions not yet supported for extended audio heap
-#define EXT_AUDIO_HEAP_SIZE 0x0
-#define EXT_AUDIO_INIT_POOL_SIZE 0x0
+#define EXT_AUDIO_HEAP_SIZE 0x24400
+#define EXT_AUDIO_INIT_POOL_SIZE 0x8000
 #endif
 #else
 #define EXT_AUDIO_HEAP_SIZE 0x0

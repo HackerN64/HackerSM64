@@ -98,6 +98,8 @@
 #define PARALLEL_LAKITU_CAM
 // Allows Mario to ledgegrab sloped floors
 #define NO_FALSE_LEDGEGRABS
+//Adds multiple languages to the game. Just a placeholder for the most part, because it only works with EU, and must be enabled with EU.
+#define MULTILANG (0 || VERSION_EU)
 //Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 //#define PUPPYCAM
 

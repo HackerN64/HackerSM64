@@ -184,10 +184,10 @@ s32 f32_find_wall_collision(f32 *xPtr, f32 *yPtr, f32 *zPtr, f32 offsetY, f32 ra
  */
 s32 find_wall_collisions(struct WallCollisionData *colData) {
     struct SurfaceNode *node;
-    s16 cellX, cellZ;
+    s32 cellX, cellZ;
     s32 numCollisions = 0;
-    s16 x = colData->x;
-    s16 z = colData->z;
+    s32 x = colData->x;
+    s32 z = colData->z;
     #ifdef PUPPYPRINT
     OSTime first = osGetTime();
     #endif
@@ -271,7 +271,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
 		nx = surf->normal.x;
 		ny = surf->normal.y;
 		nz = surf->normal.z;
-		oo = surf->originOffset;		
+		oo = surf->originOffset;
 		// If a wall, ignore it. Likely a remnant, should never occur.
 		if (ny == 0.0f) {
 			continue;
@@ -301,22 +301,19 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
  * Find the lowest ceiling above a given position and return the height.
  */
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
-    s16 cellZ, cellX;
+    s32 cellZ, cellX;
     struct Surface *ceil, *dynamicCeil;
     struct SurfaceNode *surfaceList;
     f32 height = CELL_HEIGHT_LIMIT;
     f32 dynamicHeight = CELL_HEIGHT_LIMIT;
-    s16 x, y, z;
+    s32 x, y, z;
     #ifdef PUPPYPRINT
     OSTime first = osGetTime();
     #endif
 
-    //! (Parallel Universes) Because position is casted to an s16, reaching higher
-    // float locations  can return ceilings despite them not existing there.
-    //(Dynamic ceilings will unload due to the range.)
-    x = (s16) posX;
-    y = (s16) posY;
-    z = (s16) posZ;
+    x = posX;
+    y = posY;
+    z = posZ;
     *pceil = NULL;
 
     if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) {
@@ -491,17 +488,17 @@ static f32 get_floor_height_at_location(s32 x, s32 z, struct Surface *surf) {
  * Iterate through the list of water floors and find the first water floor under a given point.
  */
 struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z,
-                                            f32 *pheight) {
+                                            s32 *pheight) {
     register struct Surface *surf;
     struct Surface *floor = NULL;
     struct SurfaceNode *topSurfaceNode = surfaceNode;
     struct SurfaceNode *bottomSurfaceNode = surfaceNode;
-    f32 height = FLOOR_LOWER_LIMIT;
-    f32 bottomHeight = FLOOR_LOWER_LIMIT;
+    s32 height = FLOOR_LOWER_LIMIT;
+    s32 bottomHeight = FLOOR_LOWER_LIMIT;
 
     // Iterate through the list of water floors until there are no more water floors.
     while (bottomSurfaceNode != NULL) {
-        f32 curBottomHeight = FLOOR_LOWER_LIMIT;
+        s32 curBottomHeight = FLOOR_LOWER_LIMIT;
         surf = bottomSurfaceNode->surface;
         bottomSurfaceNode = bottomSurfaceNode->next;
 
@@ -515,7 +512,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
 
     // Iterate through the list of water tops until there are no more water tops.
     while (topSurfaceNode != NULL) {
-        f32 curHeight = FLOOR_LOWER_LIMIT;
+        s32 curHeight = FLOOR_LOWER_LIMIT;
         surf = topSurfaceNode->surface;
         topSurfaceNode = topSurfaceNode->next;
 
@@ -556,13 +553,13 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
     f32 floorHeight = FLOOR_LOWER_LIMIT;
 
     // Would normally cause PUs, but dynamic floors unload at that range.
-    s16 x = (s16) xPos;
-    s16 y = (s16) yPos;
-    s16 z = (s16) zPos;
+    s32 x = xPos;
+    s32 y = yPos;
+    s32 z = zPos;
 
     // Each level is split into cells to limit load, find the appropriate cell.
-    s16 cellX = ((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & NUM_CELLS_INDEX;
-    s16 cellZ = ((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & NUM_CELLS_INDEX;
+    s32 cellX = ((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & NUM_CELLS_INDEX;
+    s32 cellZ = ((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & NUM_CELLS_INDEX;
 
     surfaceList = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
     floor = find_floor_from_list(surfaceList, x, y, z, &floorHeight);
@@ -576,7 +573,7 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
  * Find the highest floor under a given position and return the height.
  */
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
-    s16 cellZ, cellX;
+    s32 cellZ, cellX;
     #ifdef PUPPYPRINT
     OSTime first = osGetTime();
     #endif
@@ -590,9 +587,9 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     //! (Parallel Universes) Because position is casted to an s16, reaching higher
     // float locations  can return floors despite them not existing there.
     //(Dynamic floors will unload due to the range.)
-    s16 x = (s16) xPos;
-    s16 y = (s16) yPos;
-    s16 z = (s16) zPos;
+    s32 x = xPos;
+    s32 y = yPos;
+    s32 z = zPos;
 
     *pfloor = NULL;
 
@@ -662,17 +659,17 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
 /**
  * Find the highest water floor under a given position and return the height.
  */
-f32 find_water_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
-    s16 cellZ, cellX;
+s32 find_water_floor(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor) {
+    s32 cellZ, cellX;
 
     struct Surface *floor = NULL;
     struct SurfaceNode *surfaceList;
 
-    f32 height = FLOOR_LOWER_LIMIT;
+    s32 height = FLOOR_LOWER_LIMIT;
 
-    s16 x = (s16) xPos;
-    s16 y = (s16) yPos;
-    s16 z = (s16) zPos;
+    s32 x = xPos;
+    s32 y = yPos;
+    s32 z = zPos;
 
     if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) {
         return height;
@@ -705,12 +702,12 @@ f32 find_water_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
 /**
  * Finds the height of water at a given location.
  */
-f32 find_water_level_and_floor(f32 x, f32 z, struct Surface **pfloor) {
+s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor) {
     s32 i;
     s32 numRegions;
-    s16 val;
-    f32 loX, hiX, loZ, hiZ;
-    f32 waterLevel = FLOOR_LOWER_LIMIT;
+    s32 val;
+    s32 loX, hiX, loZ, hiZ;
+    s32 waterLevel = FLOOR_LOWER_LIMIT;
     s16 *p = gEnvironmentRegions;
     struct Surface *floor = NULL;
     #ifdef PUPPYPRINT
@@ -756,12 +753,12 @@ f32 find_water_level_and_floor(f32 x, f32 z, struct Surface **pfloor) {
 /**
  * Finds the height of water at a given location.
  */
-f32 find_water_level(f32 x, f32 z) {
+s32 find_water_level(s32 x, s32 z) {
     s32 i;
     s32 numRegions;
-    s16 val;
-    f32 loX, hiX, loZ, hiZ;
-    f32 waterLevel = FLOOR_LOWER_LIMIT;
+    s32 val;
+    s32 loX, hiX, loZ, hiZ;
+    s32 waterLevel = FLOOR_LOWER_LIMIT;
     s16 *p = gEnvironmentRegions;
     struct Surface *floor;
     #ifdef PUPPYPRINT
@@ -805,13 +802,13 @@ f32 find_water_level(f32 x, f32 z) {
 /**
  * Finds the height of the poison gas (used only in HMC) at a given location.
  */
-f32 find_poison_gas_level(f32 x, f32 z) {
+s32 find_poison_gas_level(s32 x, s32 z) {
     s32 i;
     s32 numRegions;
     UNUSED s32 unused;
-    s16 val;
-    f32 loX, hiX, loZ, hiZ;
-    f32 gasLevel = FLOOR_LOWER_LIMIT;
+    s32 val;
+    s32 loX, hiX, loZ, hiZ;
+    s32 gasLevel = FLOOR_LOWER_LIMIT;
     s16 *p = gEnvironmentRegions;
     #ifdef PUPPYPRINT
     OSTime first = osGetTime();

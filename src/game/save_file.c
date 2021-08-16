@@ -226,7 +226,7 @@ static void save_main_menu_data(void) {
         add_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
 
         // Back up data
-        bcopy(&gSaveBuffer.menuData[0], &gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]));
+        //bcopy(&gSaveBuffer.menuData[0], &gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]));
 
         // Write to EEPROM
         write_eeprom_data(gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData));
@@ -360,7 +360,7 @@ void save_file_load_all(void) {
 
     // Verify the main menu data and create a backup copy if only one of the slots is valid.
     validSlots = verify_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
-    validSlots |= verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1;
+    //validSlots |= verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1;
     switch (validSlots) {
         case 0: // Neither copy is correct
             wipe_main_menu_data();
@@ -407,6 +407,9 @@ void puppycam_get_save(void)
     gPuppyCam.options = gSaveBuffer.menuData[0].saveOptions;
 
     gSaveBuffer.menuData[0].firstBoot = gSaveBuffer.menuData[0].firstBoot;
+    #ifdef WIDE
+    gWidescreen = save_file_get_widescreen_mode();
+    #endif
 
     puppycam_check_save();
 }
@@ -416,6 +419,10 @@ void puppycam_set_save(void)
     gSaveBuffer.menuData[0].saveOptions = gPuppyCam.options;
 
     gSaveBuffer.menuData[0].firstBoot = 4;
+
+    #ifdef WIDE
+    save_file_set_widescreen_mode(gWidescreen);
+    #endif
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();

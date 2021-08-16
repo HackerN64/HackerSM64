@@ -4,7 +4,8 @@
 // EU changes most text to arrays for each language. This define allows these
 // differences to be combined.
 #ifdef VERSION_EU
-    #define LANGUAGE_ARRAY(cmd) cmd[LANGUAGE_FUNCTION]
+    //#define LANGUAGE_ARRAY(cmd) cmd[LANGUAGE_FUNCTION]
+    #define LANGUAGE_ARRAY(cmd) cmd
 #else
     #define LANGUAGE_ARRAY(cmd) cmd
 #endif
