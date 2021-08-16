@@ -3,6 +3,9 @@
 
 #ifdef PUPPYCAM
 
+//How many times to store the terrain pitch. This stores it over 10 frames to help smooth over changes in curvature.
+#define NUM_PITCH_ITERATIONS 10
+
 #define PUPPYCAM_FLAGS_CUTSCENE    0x0001
 #define PUPPYCAM_FLAGS_SMOOTH      0x0002
 
@@ -56,7 +59,6 @@ struct gPuppyStruct
     s16 pitch; //Vertical Direction the game reads as the active value.
     s16 pitchTarget; //Vertical Direction that pitch tries to be.
     f32 pitchAcceleration; //Vertical Direction that sets pitchTarget.
-    s16 posHeight[2]; //The first index is the ground offset of pos[1], the second index is the ground offset of focus[1].
     s16 zoom; //How far the camera is currently zoomed out
     u8 zoomSet; //The current setting of which zoompoint to set the target to.
     s16 zoomTarget; //The value that zoom tries to be.
@@ -86,7 +88,9 @@ struct gPuppyStruct
     s16 moveZoom; //A small zoom value that's added on top of the regular zoom when moving. It's pretty subtle, but gives the feeling of a bit of speed.
     u8 mode3Flags; //A flagset for classic mode.
     u8 moveFlagAdd; //A bit that multiplies movement rate of axes when moving, to centre them faster.
-    s16 targetDist[2];
+    s16 targetDist[2]; //Used with secondary view targets to smooth out the between status.
+    s16 intendedTerrainPitch; //The pitch that the game wants the game to tilt towards, following the terrain.
+    s16 terrainPitch; //The pitch the game tilts towards, when following terrain inclines.
 
     u8 cutscene; //A boolean that decides whether a cutscene is active
     s32 (*sceneFunc)();

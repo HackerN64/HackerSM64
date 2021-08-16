@@ -101,10 +101,10 @@
 //Adds multiple languages to the game. Just a placeholder for the most part, because it only works with EU, and must be enabled with EU.
 #define MULTILANG (0 || VERSION_EU)
 //Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
-//#define PUPPYCAM
+#define PUPPYCAM
 
 
-// HACKER QOL 
+// HACKER QOL
 // Increase the maximum pole length (it will treat bparam1 and bparam2 as a single value)
 #define LONGER_POLES
 // Number of possible unique model ID's (keep it higher than 256)
@@ -116,8 +116,8 @@
 // Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
 //#define CUSTOM_DEBUG
 // Include Puppyprint, a display library for text and large images. Also includes a custom, enhanced performance profiler.
-//#define PUPPYPRINT
-#define PUPPYPRINT_DEBUG 0
+#define PUPPYPRINT
+#define PUPPYPRINT_DEBUG 1
 
 // BUG/GAME QOL FIXES
 // Fix instant warp offset not working when warping across different areas
