@@ -56,8 +56,6 @@ build/*
 /actors/**/*.png
 /textures/**/*.png
 /assets/**/*.bin
-/sound/**/*.m64
-/sound/**/*.aiff
 !/levels/**/*custom*.png
 !/levels/**/*custom*/**/*.png
 !/actors/**/*custom*.png
