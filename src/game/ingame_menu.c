@@ -22,6 +22,7 @@
 #include "sm64.h"
 #include "text_strings.h"
 #include "types.h"
+#include "config.h"
 
 u16 gDialogColorFadeTimer;
 s8 gLastDialogLineNum;
@@ -34,6 +35,13 @@ s16 gDialogY; // D_8032F69C
 s16 gCutsceneMsgXOffset;
 s16 gCutsceneMsgYOffset;
 s8 gRedCoinsCollected;
+#ifdef WIDE
+u8 textCurrRatio43[] = { TEXT_HUD_CURRENT_RATIO_43 };
+u8 textCurrRatio169[] = { TEXT_HUD_CURRENT_RATIO_169 };
+u8 textPressL[] = { TEXT_HUD_PRESS_L };
+u8 textWideInfo[] = { TEXT_HUD_WIDE_INFO };
+u8 textWideInfo2[] = { TEXT_HUD_WIDE_INFO2 };
+#endif
 
 extern u8 gLastCompletedCourseNum;
 extern u8 gLastCompletedStarNum;
@@ -2266,6 +2274,18 @@ void render_pause_my_score_coins(void) {
         print_generic_string(get_string_width(gTextCourseArr[gInGameLanguage]) + 51, 157, strCourseNum);
 #else
         print_generic_string(CRS_NUM_X1, 157, strCourseNum);
+#ifdef WIDE
+        if (!gWidescreen) {
+                print_generic_string(10, 20, textCurrRatio43);
+                print_generic_string(10, 7, textPressL);           
+        }
+        else {
+                print_generic_string(10, 20, textCurrRatio169);
+                print_generic_string(10, 7, textPressL);
+                print_generic_string(10, 220, textWideInfo);
+                print_generic_string(10, 200, textWideInfo2);
+        }
+#endif
 #endif
 
         actName = segmented_to_virtual(actNameTbl[(gCurrCourseNum - 1) * 6 + gDialogCourseActNum - 1]);
@@ -2557,10 +2577,30 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
             }
         }
     }
-
+#ifdef WIDE
+    if (gPlayer1Controller->buttonPressed & L_TRIG){
+        if (!gWidescreen){
+                gWidescreen = 1;
+            }
+        else{
+                gWidescreen = 0;
+            }
+    }
+#endif
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-
+#ifdef WIDE
+    if (!gWidescreen) {
+            print_generic_string(10, 20, textCurrRatio43);
+            print_generic_string(10, 7, textPressL);           
+    }
+    else {
+            print_generic_string(10, 20, textCurrRatio169);
+            print_generic_string(10, 7, textPressL);
+            print_generic_string(10, 220, textWideInfo);
+            print_generic_string(10, 200, textWideInfo2);
+        }
+#endif
     if (gDialogLineNum < COURSE_STAGES_COUNT) {
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
         render_pause_castle_course_stars(x, y, gCurrSaveFileNum - 1, gDialogLineNum);
@@ -2626,6 +2666,16 @@ s16 render_pause_courses_and_castle(void) {
             shade_screen();
             render_pause_my_score_coins();
             render_pause_red_coins();
+        #ifdef WIDE
+        if (gPlayer1Controller->buttonPressed & L_TRIG){
+                if (!gWidescreen){
+                    gWidescreen = 1;
+                }
+                else{
+                    gWidescreen = 0;
+                }
+            }
+        #endif
 
             if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) {
                 render_pause_course_options(99, 93, &gDialogLineNum, 15);

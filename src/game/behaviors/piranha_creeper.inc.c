@@ -39,7 +39,7 @@ void piranha_creeper_loop(void) {
     }        
     
 
-    print_text_fmt_int(20, 20, "DIST %d", posDiff);
+    //print_text_fmt_int(20, 20, "DIST %d", posDiff);
 
     
     u16 totalVel;

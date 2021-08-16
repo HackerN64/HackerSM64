@@ -221,4 +221,14 @@ extern const Collision unknown_seg8_collision_080262F8[];
 
 
 #include "piranha_creeper/anim_header.h"
+#include "cutscene_mario/geo_header.h"
+
+
+#include "cutscene_mario/anim_header.h"
+#include "cutscene_patch_mario_stone/geo_header.h"
+
+#include "doll/geo_header.h"
+
+
+#include "doll/anim_header.h"
 #endif

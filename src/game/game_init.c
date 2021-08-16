@@ -63,6 +63,9 @@ UNUSED u8 filler80339D30[0x90];
 s32 unused8032C690 = 0;
 u32 gGlobalTimer = 0;
 u8 gIsConsole;
+#ifdef WIDE
+u8 gWidescreen;
+#endif
 
 u16 sCurrFBNum = 0;
 u16 frameBufferIndex = 0;
@@ -243,6 +246,9 @@ void create_task_structure(void) {
 #ifdef  F3DZEX_GBI_2
     gGfxSPTask->task.t.ucode = gspF3DZEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DZEX2_PosLight_fifoDataStart;
+#elif   F3DEX2PL_GBI
+    gGfxSPTask->task.t.ucode = gspF3DEX2_PosLight_fifoTextStart;
+    gGfxSPTask->task.t.ucode_data = gspF3DEX2_PosLight_fifoDataStart;
 #elif   F3DEX_GBI_2
     gGfxSPTask->task.t.ucode = gspF3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_fifoDataStart;
@@ -335,7 +341,10 @@ void rendering_init(void) {
     end_master_display_list();
     send_display_list(&gGfxPool->spTask);
 
-    frameBufferIndex++;
+    // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
+    if ((*(volatile u32 *)0xA4100010) != 0) { // Read RDP Clock Register, has a value of zero on emulators
+        frameBufferIndex++;
+    }
     gGlobalTimer++;
 }
 
@@ -361,11 +370,14 @@ void display_and_vsync(void) {
     osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFrameBuffers[sCurrFBNum]));
     profiler_log_thread5_time(THREAD5_END);
     osRecvMesg(&gGameVblankQueue, &D_80339BEC, OS_MESG_BLOCK);
-    if (++sCurrFBNum == 3) {
-        sCurrFBNum = 0;
-    }
-    if (++frameBufferIndex == 3) {
-        frameBufferIndex = 0;
+    // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
+    if ((*(volatile u32 *)0xA4100010) != 0) { // Read RDP Clock Register, has a value of zero on emulators
+        if (++sCurrFBNum == 3) {
+            sCurrFBNum = 0;
+        }
+        if (++frameBufferIndex == 3) {
+            frameBufferIndex = 0;
+        }
     }
     gGlobalTimer++;
 }

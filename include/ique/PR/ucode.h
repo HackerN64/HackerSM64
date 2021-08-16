@@ -178,6 +178,9 @@ extern u64 gspF3DLX2_Rej_fifoDataStart[],gspF3DLX2_Rej_fifoDataEnd[];
 extern u64 gspL3DEX2_fifoTextStart[],    gspL3DEX2_fifoTextEnd[];
 extern u64 gspL3DEX2_fifoDataStart[],    gspL3DEX2_fifoDataEnd[];
 
+extern u64 gspF3DEX2_PosLight_fifoTextStart[],    gspF3DEX2_PosLight_fifoTextEnd[];
+extern u64 gspF3DEX2_PosLight_fifoDataStart[],    gspF3DEX2_PosLight_fifoDataEnd[];
+
 /* XBUS version */
 extern u64 gspF3DEX2_xbusTextStart[],    gspF3DEX2_xbusTextEnd[];
 extern u64 gspF3DEX2_xbusDataStart[],    gspF3DEX2_xbusDataEnd[];

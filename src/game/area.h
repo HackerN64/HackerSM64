@@ -120,7 +120,7 @@ struct WarpTransition
 
 extern struct GraphNode **gLoadedGraphNodes;
 extern struct SpawnInfo gPlayerSpawnInfos[];
-extern struct GraphNode *D_8033A160[];
+extern struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
 extern struct Area gAreaData[];
 extern struct WarpTransition gWarpTransition;
 extern s16 gCurrCourseNum;

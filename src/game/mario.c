@@ -639,6 +639,11 @@ s32 mario_floor_is_steep(struct MarioState *m) {
     f32 normY;
     s32 result = FALSE;
 
+#ifdef JUMP_KICK_FIX
+    if (m->floor->type == SURFACE_NOT_SLIPPERY)
+        return FALSE;
+#endif
+
     // Interestingly, this function does not check for the
     // slide terrain type. This means that steep behavior persists for
     // non-slippery and slippery surfaces.
@@ -1746,6 +1751,10 @@ s32 execute_mario_action(UNUSED struct Object *o) {
     //DEBUG
     if (gPlayer1Controller->buttonDown & D_JPAD) {
         gMarioState->vel[1] = 20.0f;
+    }
+
+    if (gPlayer1Controller->buttonDown & L_JPAD) {
+        initiate_warp(LEVEL_SL, 1, 0x0A, 0);
     }
 
     if (gPlayer1Controller->buttonPressed & L_TRIG) {

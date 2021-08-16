@@ -568,6 +568,9 @@
 #define MODEL_ROSEDRIFT                  0xFF 
 #define MODEL_PATCH_MARIO_STONE         0xFE
 #define MODEL_PIRANHA_CREEPER                 0xFD
+#define MODEL_CUTSCENE_MARIO                 0xFC
+#define MODEL_CUTSCENE_MARIO_STONE                 0xFB
+#define MODEL_DOLL                 0xFA
 
 // Menu Models (overwrites Level Geometry IDs)
 #define MODEL_MAIN_MENU_MARIO_SAVE_BUTTON         MODEL_LEVEL_GEOMETRY_03   // main_menu_geo_0001D0

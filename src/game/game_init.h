@@ -42,6 +42,9 @@ extern u8 *gGfxPoolEnd;
 extern struct GfxPool *gGfxPool;
 extern u8 gControllerBits;
 extern u8 gIsConsole;
+#ifdef WIDE
+extern u8 gWidescreen;
+#endif
 #ifdef EEP
 extern s8 gEepromProbe;
 #endif

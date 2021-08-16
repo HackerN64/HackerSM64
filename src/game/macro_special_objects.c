@@ -95,7 +95,7 @@ static void spawn_macro_coin_unknown(const BehaviorScript *behavior, s16 a1[]) {
 struct LoadedPreset {
     /*0x00*/ const BehaviorScript *behavior;
     /*0x04*/ s16 param; // huh? why does the below function swap these.. just use the struct..
-    /*0x06*/ s16 model;
+    /*0x06*/ ModelID model;
 };
 
 #define MACRO_OBJ_Y_ROT 0
@@ -245,7 +245,7 @@ void spawn_special_objects(s16 areaIndex, s16 **specialObjList) {
     s16 y;
     s16 z;
     s16 extraParams[4];
-    u8 model;
+    ModelID model;
     u8 type;
     u8 presetID;
     u8 defaultParam;

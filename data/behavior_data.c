@@ -15,6 +15,7 @@
 
 #include "actors/common0.h"
 #include "actors/common1.h"
+#include "actors/group0.h"
 #include "actors/group1.h"
 #include "actors/group2.h"
 #include "actors/group3.h"
@@ -6147,5 +6148,32 @@ const BehaviorScript bhvPiranhaCreeperCheckpoint[] = {
     SET_HITBOX(/*Radius*/ 300, /*Height*/ 300),
     BEGIN_LOOP(),
         CALL_NATIVE(piranha_creeper_checkpoint_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvCameraController[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW),
+    BEGIN_LOOP(),
+        CALL_NATIVE(camera_controller),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvCutsceneMario[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW),
+    LOAD_ANIMATIONS(oAnimations, cutscene_mario_anims),
+    BEGIN_LOOP(),
+        CALL_NATIVE(cutscene_mario),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvCutsceneDoll[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW),
+    LOAD_ANIMATIONS(oAnimations, doll_anims),
+    ANIMATE(0),
+    BEGIN_LOOP(),
+        CALL_NATIVE(cutscene_doll_loop),
     END_LOOP(),
 };

@@ -1,20 +1,36 @@
 # UltraSM64-extbounds
-Fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches: 
+**AFTER CLONING THE REPO, CHECK OUT THE `include/config.h` FILE BEFORE ANYTHING ELSE! IT THERE'S A LOT OF STUFF IN THIS REPO THAT CAN BE TOGGLED THERE.**
+
+This repo needs gcc in order to be able to build it. To install it, run `sudo apt install gcc-mips-linux-gnu`
+
+This is a fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in `config.h`): 
 - slope fix
 - exposed ceilings fix
+- No false ledgegrabs fix * 
+- Jump kick fix * 
+- Instant Input patch by Wiseguy (Removes all input lag caused by good emulators and plugins)
 - pole fix
-- Mario head skip
-- Peach letter cutscene skip
+- Mario head skip *
+- Peach letter cutscene skip *
 - better extended boundaries by anonymous_moose
-- coordinate overflow fix by falcobuster
 - water surface type patch by thecozies
 - platform displacement 2 by arthur. 
 - FPS counter (use the function `print_fps(x,y)` anywhere that runs code every frame)
-- Automatic console/emulator detection. If emulator is detected, LODs are disabled. (If you want to turn this feature off, just set `gIsconsole` to 1)
+- Automatic console/emulator detection. If emulator is detected, LODs are disabled. *
 - Rounded corners by Frame, merged by Cheezepin
+- Widescreen (16:9) support toggleable by pressing `L` in the pause menu. *
+- Removed course-specific camera processing *
+- Increased maximum pole lenght (The game will read bparam1 and bparam2 together as a single value, so you can have a very long pole) *
+- bparam4 fix (the game no longer uses bparam4 to check if an object is mario and therefore you can safely use it)
+- Instant warp offset fix (makes the instant warp offset work even when warping to a different area) *
+- Global star IDs (disabled by default, toggleable in config.h). This allows you to create an open world (MVC-style) hack.
+- Included `actors/group0.c` in `behavior_data.c`
+- 16 bit model IDs by someone2639. This means you can have up to 65536 models (lol)
+- s2dex engine by someone2639! To use it, compile with `make TEXT_ENGINE=s2dex_text_engine` or just set `TEXT_ENGINE` to `s2dex_text_engine` in the makefile.
+- coordinate overflow fix by falcobuster 
+  - If you're planning on making maps bigger than 2x bounds, change the value of `WORLD_SCALE` in `config.h` to a bigger value. `3.5f` should be enough for 4x boundaries but you can go up to `4.0f` if you somehow still get rendering glitches on your map.
 
 It also uncringes the way that apply_patch.sh works, and removes the black border.
-
 # UltraSM64
 
 - This repo contains a full decompilation of Super Mario 64 (J), (U), (E), and (SH).

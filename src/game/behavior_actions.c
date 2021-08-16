@@ -57,7 +57,7 @@ struct Struct8032F34C {
     s16 numBridgeSections;
     s16 bridgeRelativeStartingXorZ;
     s16 platformWidth;
-    s16 model;
+    ModelID model;
     const void *segAddr;
 };
 
@@ -73,7 +73,7 @@ struct Struct802C0DF0 {
     u8 unk0;
     u8 unk1;
     u8 unk2;
-    u8 model;
+    ModelID model;
     const BehaviorScript *behavior;
 };
 
@@ -85,7 +85,7 @@ struct Struct8032F754 {
 
 struct OpenableGrill {
     s16 halfWidth;
-    s16 modelID;
+    ModelID modelID;
     const Collision *collision;
 };
 
@@ -279,3 +279,6 @@ s32 set_obj_anim_with_accel_and_sound(s16 a0, s16 a1, s32 a2) {
 #include "behaviors/strong_wind_particle.inc.c"
 #include "behaviors/sl_snowman_wind.inc.c"
 #include "behaviors/sl_walking_penguin.inc.c"
+#include "behaviors/camera_controller.inc.c"
+#include "behaviors/cutscene_mario.inc.c"
+#include "behaviors/doll.inc.c"

@@ -9,7 +9,7 @@ index af9d0156..c68a7f6e 100644
 +#include "debug_box.h"
  
  struct SpawnInfo gPlayerSpawnInfos[1];
- struct GraphNode *D_8033A160[0x100];
+ struct GraphNode *gGraphNodePointers[0x100];
 @@ -363,6 +364,8 @@ void render_game(void) {
      if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
          geo_process_root(gCurrentArea->unk04, D_8032CE74, D_8032CE78, gFBSetColor);

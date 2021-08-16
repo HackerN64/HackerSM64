@@ -11,6 +11,7 @@
 #include "level_table.h"
 #include "course_table.h"
 #include "rumble_init.h"
+#include "config.h"
 #ifdef SRAM
 #include "sram.h"
 #endif
@@ -413,8 +414,13 @@ void save_file_reload(void) {
 void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
     s32 fileIndex = gCurrSaveFileNum - 1;
     s32 courseIndex = gCurrCourseNum - 1;
-
+#ifdef GLOBAL_STAR_IDS
+    s32 starByte = (starIndex / 7) - 1;
+    s32 starFlag = 1 << (starIndex % 7);
+#else
     s32 starFlag = 1 << starIndex;
+#endif
+
     UNUSED s32 flags = save_file_get_flags();
 
     gLastCompletedCourseNum = courseIndex + 1;
@@ -456,9 +462,15 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
             break;
 
         default:
+#ifdef GLOBAL_STAR_IDS
+            if (!(save_file_get_star_flags(fileIndex, starByte) & starFlag)) {
+                save_file_set_star_flags(fileIndex, starByte, starFlag);
+            }
+#else
             if (!(save_file_get_star_flags(fileIndex, courseIndex) & starFlag)) {
                 save_file_set_star_flags(fileIndex, courseIndex, starFlag);
             }
+#endif
             break;
     }
 }

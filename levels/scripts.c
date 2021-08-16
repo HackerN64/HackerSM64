@@ -197,6 +197,9 @@ const LevelScript script_func_global_1[] = {
     LOAD_MODEL_FROM_GEO(MODEL_ROSEDRIFT,                 rosedrift_geo),
     LOAD_MODEL_FROM_GEO(MODEL_PATCH_MARIO_STONE,                 patch_mario_stone_geo),
     LOAD_MODEL_FROM_GEO(MODEL_PIRANHA_CREEPER,                 piranha_creeper_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_CUTSCENE_MARIO,                 cutscene_mario_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_CUTSCENE_MARIO_STONE,                 cutscene_patch_mario_stone_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_DOLL,                 doll_geo),
     RETURN(),
 };
 

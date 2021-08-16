@@ -74,6 +74,7 @@ build/*
 # libultra
 
 !/lib/*.a
+lib/libs2d_engine.a
 !/lib/n64/*.a
 !/lib/ique/*.a
 

@@ -557,6 +557,9 @@ void rosedrift_loop(void);
 void piranha_creeper_loop(void);
 void piranha_creeper_init(void);
 void piranha_creeper_checkpoint_loop(void);
+void camera_controller(void);
+void cutscene_mario(void);
+void cutscene_doll_loop(void);
 
 Gfx *geo_piranha_creeper_vine(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx);
 
@@ -569,6 +572,7 @@ Gfx *geo_switch_bowser_eyes(s32 run, struct GraphNode *node, UNUSED Mat4 *mtx);
 
 // Tuxie
 Gfx *geo_switch_tuxie_mother_eyes(s32 run, struct GraphNode *node, UNUSED Mat4 *mtx);
+Gfx *geo_switch_doll_mouth(s32 run, struct GraphNode *node, UNUSED Mat4 *mtx);
 
 // Cap switch
 Gfx *geo_update_held_mario_pos(s32 run, UNUSED struct GraphNode *node, Mat4 mtx);

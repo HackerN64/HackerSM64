@@ -1,0 +1,36 @@
+diff --git a/src/game/game_init.c b/src/game/game_init.c
+index b633468..da65e01 100644
+--- a/src/game/game_init.c
++++ b/src/game/game_init.c
+@@ -300,7 +300,10 @@ void rendering_init(void) {
+     end_master_display_list();
+     send_display_list(&gGfxPool->spTask);
+ 
+-    frameBufferIndex++;
++    // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
++    if ((*(volatile u32 *)0xA4100010) != 0) { // Read RDP Clock Register, has a value of zero on emulators
++        frameBufferIndex++;
++    }
+     gGlobalTimer++;
+ }
+ 
+@@ -326,11 +329,14 @@ void display_and_vsync(void) {
+     osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFrameBuffers[sCurrFBNum]));
+     profiler_log_thread5_time(THREAD5_END);
+     osRecvMesg(&gGameVblankQueue, &D_80339BEC, OS_MESG_BLOCK);
+-    if (++sCurrFBNum == 3) {
+-        sCurrFBNum = 0;
+-    }
+-    if (++frameBufferIndex == 3) {
+-        frameBufferIndex = 0;
++    // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
++    if ((*(volatile u32 *)0xA4100010) != 0) { // Read RDP Clock Register, has a value of zero on emulators
++        if (++sCurrFBNum == 3) {
++            sCurrFBNum = 0;
++        }
++        if (++frameBufferIndex == 3) {
++            frameBufferIndex = 0;
++        }
+     }
+     gGlobalTimer++;
+ }

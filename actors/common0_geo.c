@@ -33,3 +33,6 @@
 #include "plush_peach/geo.inc.c"
 #include "plush_bowser/geo.inc.c"
 #include "piranha_creeper/geo.inc.c"
+#include "cutscene_mario/geo.inc.c"
+#include "cutscene_patch_mario_stone/geo.inc.c"
+#include "doll/geo.inc.c"

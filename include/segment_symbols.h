@@ -7,6 +7,7 @@
     extern u8 _##name##SegmentRomEnd[];
 
 #define DECLARE_ACTOR_SEGMENT(name) \
+    DECLARE_SEGMENT(name##_mio0) \
     DECLARE_SEGMENT(name##_yay0) \
     DECLARE_SEGMENT(name##_geo)
 
@@ -94,6 +95,43 @@ DECLARE_SEGMENT(debug_level_select_yay0)
 DECLARE_SEGMENT(translation_de_yay0)
 DECLARE_SEGMENT(translation_en_yay0)
 DECLARE_SEGMENT(translation_fr_yay0)
+#endif
+
+//added for compatibility
+DECLARE_SEGMENT(segment2_mio0)
+
+DECLARE_SEGMENT(water_skybox_mio0)
+DECLARE_SEGMENT(ccm_skybox_mio0)
+DECLARE_SEGMENT(clouds_skybox_mio0)
+DECLARE_SEGMENT(bitfs_skybox_mio0)
+DECLARE_SEGMENT(wdw_skybox_mio0)
+DECLARE_SEGMENT(cloud_floor_skybox_mio0)
+DECLARE_SEGMENT(ssl_skybox_mio0)
+DECLARE_SEGMENT(bbh_skybox_mio0)
+DECLARE_SEGMENT(bidw_skybox_mio0)
+DECLARE_SEGMENT(bits_skybox_mio0)
+
+DECLARE_SEGMENT(fire_mio0)
+DECLARE_SEGMENT(spooky_mio0)
+DECLARE_SEGMENT(generic_mio0)
+DECLARE_SEGMENT(water_mio0)
+DECLARE_SEGMENT(sky_mio0)
+DECLARE_SEGMENT(snow_mio0)
+DECLARE_SEGMENT(cave_mio0)
+DECLARE_SEGMENT(machine_mio0)
+DECLARE_SEGMENT(mountain_mio0)
+DECLARE_SEGMENT(grass_mio0)
+DECLARE_SEGMENT(outside_mio0)
+DECLARE_SEGMENT(inside_mio0)
+DECLARE_SEGMENT(effect_mio0)
+DECLARE_SEGMENT(title_screen_bg_mio0)
+
+DECLARE_SEGMENT(debug_level_select_mio0)
+
+#ifdef VERSION_EU
+DECLARE_SEGMENT(translation_de_mio0)
+DECLARE_SEGMENT(translation_en_mio0)
+DECLARE_SEGMENT(translation_fr_mio0)
 #endif
 
 #endif

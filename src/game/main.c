@@ -319,11 +319,13 @@ void thread3_main(UNUSED void *arg) {
     crash_screen_init();
 #endif
 
+#ifdef DEBUG
     osSyncPrintf("Super Mario 64\n");
     osSyncPrintf("Built by: %s\n", __username__);
     osSyncPrintf("Date    : %s\n", __datetime__);
     osSyncPrintf("Compiler: %s\n", __compiler__);
     osSyncPrintf("Linker  : %s\n", __linker__);
+#endif
 
     create_thread(&gSoundThread, 4, thread4_sound, NULL, gThread4Stack + 0x2000, 20);
     osStartThread(&gSoundThread);
@@ -474,10 +476,12 @@ void thread1_idle(UNUSED void *arg) {
     }
 }
 
+#if CLEARRAM
 void ClearRAM(void)
 {
     bzero(_mainSegmentEnd, (size_t)osMemSize - (size_t)OS_K0_TO_PHYSICAL(_mainSegmentEnd));
 }
+#endif
 
 #ifdef ISVPRINT
 extern u32 gISVDbgPrnAdrs;
@@ -496,7 +500,9 @@ void osInitialize_fakeisv() {
 #endif
 
 void main_func(void) {
+#if CLEARRAM
     ClearRAM();
+#endif
     __osInitialize_common();
 #ifdef ISVPRINT
     osInitialize_fakeisv();

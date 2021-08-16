@@ -2,6 +2,7 @@ OUTPUT_ARCH (mips)
 
 #define LINKER /* Removes externs from preprocessed script */
 #include "segments.h"
+#include "config.h"
 #undef LINKER
 
 #define BEGIN_SEG(name, addr) \
@@ -28,7 +29,9 @@ OUTPUT_ARCH (mips)
       KEEP(BUILD_DIR/bin/name.szp.o(.data)); \
       . = ALIGN(0x10); \
    } \
-   END_SEG(name##_yay0)
+   END_SEG(name##_yay0) \
+   _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
+   _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
 #define YAY0_EU_SEG(name, segAddr) \
    BEGIN_SEG(name##_yay0, segAddr) \
@@ -36,7 +39,9 @@ OUTPUT_ARCH (mips)
       KEEP(BUILD_DIR/bin/eu/name.szp.o(.data)); \
       . = ALIGN(0x10); \
    } \
-   END_SEG(name##_yay0)
+   END_SEG(name##_yay0) \
+   _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
+   _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
 #define STANDARD_LEVEL(name) \
    BEGIN_SEG(name##_segment_7, 0x07000000) \
@@ -63,7 +68,9 @@ OUTPUT_ARCH (mips)
    { \
       KEEP(BUILD_DIR/actors/name##_geo.o(.data)); \
    } \
-   END_SEG(name##_geo)
+   END_SEG(name##_geo) \
+   _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
+   _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
 SECTIONS
 {
@@ -129,6 +136,9 @@ SECTIONS
       BUILD_DIR/src/gdb*.o(.text);
       BUILD_DIR/src/usb*.o(.text);
       BUILD_DIR/src/audio*.o(.text);
+#ifdef S2DEX_TEXT_ENGINE
+      lib/libs2d_engine.a:*(.text);
+#endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(.text);
 #else
@@ -146,6 +156,9 @@ SECTIONS
       BUILD_DIR/src/gdb*.o(.*data*);
       BUILD_DIR/src/usb*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
+#ifdef S2DEX_TEXT_ENGINE
+      lib/libs2d_engine.a:*(.*data*);
+#endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(.*data*);
 #else
@@ -162,6 +175,9 @@ SECTIONS
       BUILD_DIR/src/gdb*.o(.*rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
+#ifdef S2DEX_TEXT_ENGINE
+      lib/libs2d_engine.a:*(.rodata*);
+#endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(.*rodata*);
 #else
@@ -181,6 +197,9 @@ SECTIONS
       BUILD_DIR/src/gdb*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
+#ifdef S2DEX_TEXT_ENGINE
+      lib/libs2d_engine.a:*(.*bss*);
+#endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(COMMON);
       */libultra_d.a:*.o(.scommon);
@@ -213,7 +232,7 @@ SECTIONS
    BEGIN_NOLOAD(engine)
    {
       BUILD_DIR/src/engine*.o(.bss*);
-      . = ALIGN(0x100);
+      . = ALIGN(0x40);
    }
    END_NOLOAD(engine)
 
@@ -230,7 +249,9 @@ SECTIONS
    __mainPoolSize = RAM_END - .;
 
    __expansionRamStart = 0x80400000;
-   ASSERT((. <= __expansionRamStart), "Error: RDRAM expanded into Expansion RAM, despite Expansion RAM not being defined.")
+   #ifndef USE_EXT_RAM
+      ASSERT((. <= __expansionRamStart), "Error: RDRAM expanded into Expansion RAM, despite Expansion RAM not being defined.")
+   #endif
 
 
    BEGIN_SEG(entry, 0x10000000)
@@ -286,7 +307,7 @@ SECTIONS
       BUILD_DIR/src/menu*.o(.text);
       BUILD_DIR/src/menu*.o(.data*);
       BUILD_DIR/src/menu*.o(.rodata*);
-#ifdef GODDARD
+#ifdef KEEP_MARIO_HEAD
       BUILD_DIR/libgoddard.a:*.o(.text);
       /* goddard subsystem data */
       BUILD_DIR/libgoddard.a:gd_main.o(.data*);
@@ -319,7 +340,7 @@ SECTIONS
    BEGIN_NOLOAD(goddard)
    {
       BUILD_DIR/src/menu*.o(.bss*);
-#ifdef GODDARD
+#ifdef KEEP_MARIO_HEAD
       BUILD_DIR/libgoddard.a:*.o(.bss*);
 #endif
    }
@@ -345,7 +366,7 @@ SECTIONS
    YAY0_SEG(debug_level_select, 0x07000000)
    YAY0_SEG(title_screen_bg, 0x0A000000)
 
-#ifdef GODDARD
+#ifdef KEEP_MARIO_HEAD
    BEGIN_SEG(gd_dynlists, 0x04000000)
    {
       BUILD_DIR/libgoddard.a:dynlist_test_cube.o(.data);

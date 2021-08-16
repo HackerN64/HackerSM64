@@ -24,6 +24,8 @@
 #include "skybox.h"
 #include "sound_init.h"
 
+#include "config.h"
+
 #define TOAD_STAR_1_REQUIREMENT 12
 #define TOAD_STAR_2_REQUIREMENT 25
 #define TOAD_STAR_3_REQUIREMENT 35
@@ -78,7 +80,7 @@ struct GraphNodeObject gMirrorMario;  // copy of Mario's geo node for drawing mi
 // (message NPC related things, the Mario head geo, and Mario geo
 // functions)
 
-#ifdef GODDARD
+#ifdef KEEP_MARIO_HEAD
 /**
  * Geo node script that draws Mario's head on the title screen.
  */

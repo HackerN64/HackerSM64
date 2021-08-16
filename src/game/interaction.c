@@ -23,6 +23,7 @@
 #include "sm64.h"
 #include "sound_init.h"
 #include "rumble_init.h"
+#include "config.h"
 
 #define INT_GROUND_POUND_OR_TWIRL (1 << 0) // 0x01
 #define INT_PUNCH                 (1 << 1) // 0x02
@@ -806,8 +807,11 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         o->oInteractStatus = INT_STATUS_INTERACTED;
         m->interactObj = o;
         m->usedObj = o;
-
+#ifdef GLOBAL_STAR_IDS
+        starIndex = (o->oBehParams >> 24) & 0xFF;
+#else
         starIndex = (o->oBehParams >> 24) & 0x1F;
+#endif
         save_file_collect_star_or_key(m->numCoins, starIndex);
 
         m->numStars =

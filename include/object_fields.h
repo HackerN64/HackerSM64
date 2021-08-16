@@ -762,6 +762,8 @@
 #define /*0x0AC*/ oPiranhaCreeperInitY                       OBJECT_FIELD_F32(0x1D)
 #define /*0x0AC*/ oPiranhaCreeperInitZ                       OBJECT_FIELD_F32(0x1E)
 
+#define /*0x0AC*/ oDollCutsceneTimer                       OBJECT_FIELD_S32(0x1B)
+
 /* Piranha Plant */
 #define /*0x0F4*/ oPiranhaPlantSleepMusicState OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oPiranhaPlantScale           OBJECT_FIELD_F32(0x1C)

@@ -188,7 +188,7 @@ s8 sObjectListUpdateOrder[] = { OBJ_LIST_SPAWNER,
 struct ParticleProperties {
     u32 particleFlag;
     u32 activeParticleFlag;
-    u8 model;
+    ModelID model;
     const BehaviorScript *behavior;
 };
 
@@ -495,7 +495,7 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
             object->respawnInfoType = RESPAWN_INFO_TYPE_32;
             object->respawnInfo = &spawnInfo->behaviorArg;
 
-            if (spawnInfo->behaviorArg & 0x01) {
+            if (object->behavior == segmented_to_virtual(bhvMario)) {
                 gMarioObject = object;
                 geo_make_first_child(&object->header.gfx.node);
             }

@@ -25,6 +25,15 @@
 #define TEXT_PAUSE _("PAUSE") // Pause text, Castle Courses
 #define TEXT_HUD_CONGRATULATIONS _("CONGRATULATIONS") // Course Complete Text, Bowser Courses
 
+//Widescreen stuff
+#ifdef WIDE
+#define TEXT_HUD_CURRENT_RATIO_43 _("ASPECT RATIO: 4:3")
+#define TEXT_HUD_CURRENT_RATIO_169 _("ASPECT RATIO: 16:9")
+#define TEXT_HUD_PRESS_L _("PRESS L TO SWITCH")
+#define TEXT_HUD_WIDE_INFO _("PLEASE CONFIGURE YOUR DISPLAY OR YOUR EMULATOR TO")
+#define TEXT_HUD_WIDE_INFO2 _("STRETCH THE IMAGE TO 16:9")
+#endif
+
 #if defined(VERSION_JP) || defined(VERSION_SH)
 
 /**
