@@ -268,6 +268,7 @@ void bhv_goomba_update(void) {
     // PARTIAL_UPDATE
 
     f32 animSpeed;
+    s32 attackType;
 
     if (obj_update_standard_actions(o->oGoombaScale)) {
         // If this goomba has a spawner and mario moved away from the spawner,
@@ -305,9 +306,15 @@ void bhv_goomba_update(void) {
         // without harming it (e.g. by punching it), the goomba will be marked as dead
         // and will not respawn if Mario leaves and re-enters the spawner's radius
         // even though the goomba isn't actually dead.
-        if (obj_handle_attacks(&sGoombaHitbox, GOOMBA_ACT_ATTACKED_MARIO,
-                               sGoombaAttackHandlers[o->oGoombaSize & 1])) {
-            mark_goomba_as_dead();
+        attackType = obj_handle_attacks(&sGoombaHitbox, GOOMBA_ACT_ATTACKED_MARIO, sGoombaAttackHandlers[o->oGoombaSize & 1]);
+        if (attackType == ATTACK_HANDLER_SPECIAL_HUGE_GOOMBA_WEAKLY_ATTACKED)
+        {
+            huge_goomba_weakly_attacked();
+        }
+        else
+        {
+            if (attackType)
+                mark_goomba_as_dead();
         }
 
         cur_obj_move_standard(-78);

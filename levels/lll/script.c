@@ -123,11 +123,11 @@ const LevelScript level_lll_entry[] = {
     LOAD_YAY0(        /*seg*/ 0x0A, _bitfs_skybox_yay0SegmentRomStart, _bitfs_skybox_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x0B, _effect_yay0SegmentRomStart, _effect_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x05, _group2_yay0SegmentRomStart, _group2_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0C, _group2_geoSegmentRomStart,  _group2_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0C, _group2_geoSegmentRomStart,  _group2_geoSegmentRomEnd, _group2_geoSegmentBssStart, _group2_geoSegmentBssEnd),
     LOAD_YAY0(        /*seg*/ 0x06, _group17_yay0SegmentRomStart, _group17_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0D, _group17_geoSegmentRomStart,  _group17_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0D, _group17_geoSegmentRomStart,  _group17_geoSegmentRomEnd, _group17_geoSegmentBssStart, _group17_geoSegmentBssEnd),
     LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd, _common0_geoSegmentBssStart, _common0_geoSegmentBssEnd),
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
     JUMP_LINK(script_func_global_1),
@@ -218,3 +218,15 @@ const LevelScript level_lll_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/lll_octagonal_rotating_mesh.inc.c"
+#include "game/behaviors/lll_sinking_rock_block.inc.c"
+#include "game/behaviors/lll_rotating_hex_flame.inc.c"
+#include "game/behaviors/lll_floating_wood_piece.inc.c"
+#include "game/behaviors/lll_volcano_flames.inc.c"
+#include "game/behaviors/lll_hexagonal_ring.inc.c"
+#include "game/behaviors/lll_sinking_rectangle.inc.c"
+#include "game/behaviors/bowser_puzzle_piece.inc.c"
+#include "game/behaviors/drawbridge.inc.c"

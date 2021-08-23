@@ -97,11 +97,11 @@ const LevelScript level_wf_entry[] = {
     LOAD_YAY0(        /*seg*/ 0x0A, _cloud_floor_skybox_yay0SegmentRomStart, _cloud_floor_skybox_yay0SegmentRomEnd),
     LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _grass_yay0SegmentRomStart, _grass_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x05, _group1_yay0SegmentRomStart, _group1_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0C, _group1_geoSegmentRomStart,  _group1_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0C, _group1_geoSegmentRomStart,  _group1_geoSegmentRomEnd, _group1_geoSegmentBssStart, _group1_geoSegmentBssEnd),
     LOAD_YAY0(        /*seg*/ 0x06, _group14_yay0SegmentRomStart, _group14_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0D, _group14_geoSegmentRomStart,  _group14_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0D, _group14_geoSegmentRomStart,  _group14_geoSegmentRomEnd, _group14_geoSegmentBssStart, _group14_geoSegmentBssEnd),
     LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd, _common0_geoSegmentBssStart, _common0_geoSegmentBssEnd),
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
     JUMP_LINK(script_func_global_1),
@@ -167,3 +167,11 @@ const LevelScript level_wf_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/bomp.inc.c"
+#include "game/behaviors/breakable_wall.inc.c"
+#include "game/behaviors/kickable_board.inc.c"
+#include "game/behaviors/tower_door.inc.c"
+#include "game/behaviors/tower_platform.inc.c"
+

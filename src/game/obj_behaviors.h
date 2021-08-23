@@ -7,6 +7,35 @@
 #include "macros.h"
 #include "types.h"
 
+extern s8 sYoshiDead;
+extern void set_yoshi_as_not_dead(void);
+extern f32 absf_2(f32 f);
+extern void turn_obj_away_from_surface(f32 velX, f32 velZ, f32 nX, UNUSED f32 nY, f32 nZ, f32 *objYawX, f32 *objYawZ);
+extern s8 obj_find_wall(f32 objNewX, f32 objY, f32 objNewZ, f32 objVelX, f32 objVelZ);
+extern s8 turn_obj_away_from_steep_floor(struct Surface *objFloor, f32 floorY, f32 objVelX, f32 objVelZ);
+extern void obj_orient_graph(struct Object *obj, f32 normalX, f32 normalY, f32 normalZ);
+extern void calc_obj_friction(f32 *objFriction, f32 floor_nY);
+extern void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 objVelX, f32 objVelZ);
+extern void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY, f32 objVelX, f32 objVelZ, f32 waterY);
+extern void obj_splash(s32 waterY, s32 objY);
+extern s16 object_step(void);
+extern s16 object_step_without_floor_orient(void);
+extern void obj_move_xyz_using_fvel_and_yaw(struct Object *obj);
+extern s8 is_point_within_radius_of_mario(f32 x, f32 y, f32 z, s32 dist);
+extern s8 is_point_close_to_object(struct Object *obj, f32 x, f32 y, f32 z, s32 dist);
+extern s8 obj_return_home_if_safe(struct Object *obj, f32 homeX, f32 y, f32 homeZ, s32 dist);
+extern void obj_return_and_displace_home(struct Object *obj, f32 homeX, UNUSED f32 homeY, f32 homeZ, s32 baseDisp);
+extern s8 obj_check_if_facing_toward_angle(u32 base, u32 goal, s16 range);
+extern s8 obj_find_wall_displacement(Vec3f dist, f32 x, f32 y, f32 z, f32 radius);
+extern void obj_spawn_yellow_coins(struct Object *obj, s8 nCoins);
+extern s8 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan);
+extern s8 current_mario_room_check(s16 room);
+extern s16 trigger_obj_dialog_when_facing(s32 *inDialog, s16 dialogID, f32 dist, s32 actionArg);
+extern void obj_check_floor_death(s16 collisionFlags, struct Surface *floor);
+extern s8 obj_lava_death(void);
+extern void spawn_orange_number(s8 behParam, s16 relX, s16 relY, s16 relZ);
+extern struct Surface *sObjFloor;
+void set_object_visibility(struct Object *obj, s32 dist);
 void set_yoshi_as_not_dead(void);
 s32 coin_step(s16 *collisionFlagsPtr);
 void moving_coin_flicker(void);
@@ -86,8 +115,6 @@ void bhv_explosion_loop(void);
 void bhv_bobomb_bully_death_smoke_init(void);
 void bhv_bobomb_explosion_bubble_init(void);
 void bhv_bobomb_explosion_bubble_loop(void);
-void bhv_respawner_loop(void);
-void create_respawner(s32 arg0, const BehaviorScript *behToSpawn, s32 minSpawnDist);
 void bhv_small_bully_init(void);
 void bhv_big_bully_init(void);
 void bully_check_mario_collision(void);

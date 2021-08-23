@@ -287,6 +287,7 @@ void shelled_koopa_attack_handler(s32 attackType) {
 static void koopa_shelled_update(void) {
     cur_obj_update_floor_and_walls();
     obj_update_blinking(&o->oKoopaBlinkTimer, 20, 50, 4);
+    s32 attackType;
 
     switch (o->oAction) {
         case KOOPA_SHELLED_ACT_STOPPED:
@@ -308,7 +309,8 @@ static void koopa_shelled_update(void) {
     }
 
     if (o->header.gfx.scale[0] > 0.8f) {
-        obj_handle_attacks(&sKoopaHitbox, o->oAction, sKoopaShelledAttackHandlers);
+        if (obj_handle_attacks(&sKoopaHitbox, o->oAction, sKoopaShelledAttackHandlers) == ATTACK_HANDLER_SPECIAL_KOOPA_LOSE_SHELL)
+            shelled_koopa_attack_handler(attackType);
     } else {
         // If tiny koopa, die after attacking mario.
         obj_handle_attacks(&sKoopaHitbox, KOOPA_SHELLED_ACT_DIE, sKoopaUnshelledAttackHandlers);
@@ -462,33 +464,6 @@ static void koopa_unshelled_update(void) {
 
     obj_handle_attacks(&sKoopaHitbox, o->oAction, sKoopaUnshelledAttackHandlers);
     cur_obj_move_standard(-78);
-}
-
-/**
- * Wait 50 frames, then play the race starting sound, disable time stop, and
- * optionally begin the timer.
- */
-s32 obj_begin_race(s32 noTimer) {
-    if (o->oTimer == 50) {
-        cur_obj_play_sound_2(SOUND_GENERAL_RACE_GUN_SHOT);
-
-        if (!noTimer) {
-            play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(4, SEQ_LEVEL_SLIDE), 0);
-
-            level_control_timer(TIMER_CONTROL_SHOW);
-            level_control_timer(TIMER_CONTROL_START);
-
-            o->parentObj->oKoopaRaceEndpointRaceBegun = TRUE;
-        }
-
-        // Unfreeze mario and disable time stop to begin the race
-        set_mario_npc_dialog(MARIO_DIALOG_STOP);
-        disable_time_stop_including_mario();
-    } else if (o->oTimer > 50) {
-        return TRUE;
-    }
-
-    return FALSE;
 }
 
 /**
@@ -731,7 +706,7 @@ static void koopa_the_quick_act_after_race(void) {
             o->oFlags &= ~OBJ_FLAG_ACTIVE_FROM_AFAR;
         }
     } else if (o->parentObj->oKoopaRaceEndpointDialog > 0) {
-        s32 dialogResponse = cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP, 
+        s32 dialogResponse = cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
             DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, o->parentObj->oKoopaRaceEndpointDialog);
         if (dialogResponse != 0) {
             o->parentObj->oKoopaRaceEndpointDialog = DIALOG_NONE;

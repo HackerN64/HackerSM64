@@ -67,11 +67,11 @@ const LevelScript level_ddd_entry[] = {
     LOAD_YAY0(        /*seg*/ 0x0B, _effect_yay0SegmentRomStart, _effect_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x0A, _water_skybox_yay0SegmentRomStart, _water_skybox_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x05, _group4_yay0SegmentRomStart, _group4_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0C, _group4_geoSegmentRomStart,  _group4_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0C, _group4_geoSegmentRomStart,  _group4_geoSegmentRomEnd, _group4_geoSegmentBssStart, _group4_geoSegmentBssEnd),
     LOAD_YAY0(        /*seg*/ 0x06, _group13_yay0SegmentRomStart, _group13_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0D, _group13_geoSegmentRomStart,  _group13_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0D, _group13_geoSegmentRomStart,  _group13_geoSegmentRomEnd, _group13_geoSegmentBssStart, _group13_geoSegmentBssEnd),
     LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd, _common0_geoSegmentBssStart, _common0_geoSegmentBssEnd),
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
     JUMP_LINK(script_func_global_1),
@@ -120,3 +120,8 @@ const LevelScript level_ddd_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/ddd_sub.inc.c"
+#include "game/behaviors/whirlpool.inc.c"
+#include "game/behaviors/ddd_pole.inc.c"

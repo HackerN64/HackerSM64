@@ -1,6 +1,12 @@
 // checkerboard_platform.c.inc
 
-struct Struct8032F754 D_8032F754[] = { { 145, { 0.7f, 1.5f, 0.7f }, 7.0f },
+struct platformStruct {
+    s32 unk0;
+    Vec3f unk1;
+    f32 unk2;
+};
+
+struct platformStruct D_8032F754[] = { { 145, { 0.7f, 1.5f, 0.7f }, 7.0f },
                                        { 235, { 1.2f, 2.0f, 1.2f }, 11.6f } };
 
 void bhv_checkerboard_elevator_group_init(void) {

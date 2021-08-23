@@ -9,3 +9,9 @@
 
 #include "king_bobomb/geo.inc.c"
 #include "water_bubble/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/king_bobomb.inc.c"
+#include "game/behaviors/water_bomb_cannon.inc.c"
+#include "game/behaviors/water_bomb.inc.c" // TODO: Shadow position

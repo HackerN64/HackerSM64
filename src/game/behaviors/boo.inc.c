@@ -86,9 +86,10 @@ void bhv_courtyard_boo_triplet_init(void) {
     s32 i;
     struct Object *boo;
 
-    if (gHudDisplay.stars < 12) {
-        obj_mark_for_deletion(o);
-    } else {
+    //if (gHudDisplay.stars < 12) {
+    //    obj_mark_for_deletion(o);
+    //} else
+    {
         for (i = 0; i < 3; i++) {
             boo = spawn_object_relative(
                 0x01,
@@ -726,9 +727,10 @@ static void boo_with_cage_act_3(void) {
 void bhv_boo_with_cage_init(void) {
     struct Object* cage;
 
-    if (gHudDisplay.stars < 12) {
-        obj_mark_for_deletion(o);
-    } else {
+    //if (gHudDisplay.stars < 12) {
+    //    obj_mark_for_deletion(o);
+    //} else
+    {
         cage = spawn_object(o, MODEL_HAUNTED_CAGE, bhvBooCage);
         cage->oBehParams = o->oBehParams;
     }
@@ -794,10 +796,6 @@ void bhv_merry_go_round_boo_manager_loop(void) {
     }
 }
 
-void obj_set_secondary_camera_focus(void) {
-    gSecondCameraFocus = o;
-}
-
 void bhv_animated_texture_loop(void) {
     cur_obj_set_pos_to_home_with_debug();
 }
@@ -810,9 +808,9 @@ void bhv_boo_in_castle_loop(void) {
     if (o->oAction == 0) {
         cur_obj_hide();
 
-        if (gHudDisplay.stars < 12) {
+        /*if (gHudDisplay.stars < 12) {
             obj_mark_for_deletion(o);
-        }
+        }*/
 
         if (gMarioCurrentRoom == 1) {
             o->oAction++;

@@ -9,3 +9,8 @@
 
 #include "springboard/geo.inc.c"
 #include "capswitch/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/capswitch.inc.c"
+#include "game/behaviors/beta_trampoline.inc.c"

@@ -73,9 +73,9 @@ const LevelScript level_ssl_entry[] = {
     LOAD_YAY0(        /*seg*/ 0x0A, _ssl_skybox_yay0SegmentRomStart, _ssl_skybox_yay0SegmentRomEnd),
     LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _generic_yay0SegmentRomStart, _generic_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x05, _group5_yay0SegmentRomStart, _group5_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0C, _group5_geoSegmentRomStart,  _group5_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0C, _group5_geoSegmentRomStart,  _group5_geoSegmentRomEnd, _group5_geoSegmentBssStart, _group5_geoSegmentBssEnd),
     LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd, _common0_geoSegmentBssStart, _common0_geoSegmentBssEnd),
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
     JUMP_LINK(script_func_global_1),
@@ -151,3 +151,13 @@ const LevelScript level_ssl_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/tox_box.inc.c"
+#include "game/behaviors/tweester.inc.c"
+#include "game/behaviors/spindel.inc.c"
+#include "game/behaviors/pyramid_wall.inc.c"
+#include "game/behaviors/pyramid_elevator.inc.c"
+#include "game/behaviors/pyramid_top.inc.c"
+#include "game/behaviors/horizontal_grindel.inc.c"

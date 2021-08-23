@@ -67,7 +67,7 @@ u32 gTimeStopState;
 /**
  * The pool that objects are allocated from.
  */
-struct Object gObjectPool[OBJECT_POOL_CAPACITY];
+//struct Object gObjectPool[OBJECT_POOL_CAPACITY];
 
 /**
  * A special object whose purpose is to act as a parent for macro objects.

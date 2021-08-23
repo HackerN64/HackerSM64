@@ -13,3 +13,10 @@
 #include "thwomp/geo.inc.c"
 #include "bullet_bill/geo.inc.c"
 #include "heave_ho/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/hoot.inc.c"
+#include "game/behaviors/thwomp.inc.c"
+#include "game/behaviors/bullet_bill.inc.c"
+#include "game/behaviors/heave_ho.inc.c"

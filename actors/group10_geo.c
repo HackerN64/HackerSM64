@@ -10,3 +10,8 @@
 #include "bird/geo.inc.c"
 #include "peach/geo.inc.c"
 #include "yoshi/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/bird.inc.c"
+#include "game/behaviors/yoshi.inc.c"

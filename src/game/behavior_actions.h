@@ -1,11 +1,32 @@
 #ifndef BEHAVIOR_ACTIONS_H
 #define BEHAVIOR_ACTIONS_H
 
+#define OBJ_COL_FLAG_GROUNDED   (1 << 0)
+#define OBJ_COL_FLAG_HIT_WALL   (1 << 1)
+#define OBJ_COL_FLAG_UNDERWATER (1 << 2)
+#define OBJ_COL_FLAG_NO_Y_VEL   (1 << 3)
+#define OBJ_COL_FLAGS_LANDED    (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
+
 void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size);
 void bhv_spawn_star_no_level_exit(u32);
 void bhv_star_door_loop_2(void);
 void spawn_triangle_break_particles(s16 numTris, s16 triModel, f32 triSize, s16 triAnimState);
-
+extern Gfx *geo_update_held_mario_pos(s32 run, UNUSED struct GraphNode *node, Mat4 mtx);
+extern void bhv_bobomb_anchor_mario_loop(void);
+extern s32 mario_is_far_below_object(f32 arg0);
+extern s32 obj_begin_race(s32 noTimer);
+extern s32 set_obj_anim_with_accel_and_sound(s16 a0, s16 a1, s32 a2);
+extern void bhv_bobomb_bully_death_smoke_init(void);
+extern void bhv_respawner_loop(void);
+extern void create_respawner(s32 model, const BehaviorScript *behToSpawn, s32 minSpawnDist);
+extern struct ObjectHitbox sPiranhaPlantFireHitbox;
+extern void spawn_sparkle_particles(s32 n, s32 a1, s32 a2, s32 r);
+extern void bhv_chuckya_anchor_mario_loop(void);
+extern void spawn_default_star(f32 sp20, f32 sp24, f32 sp28);
+extern void spawn_red_coin_cutscene_star(f32 sp20, f32 sp24, f32 sp28);
+extern void spawn_no_exit_star(f32 sp20, f32 sp24, f32 sp28);
+extern struct Object *spawn_star(struct Object *sp30, f32 sp34, f32 sp38, f32 sp3C);
+extern void bhv_spawn_star_no_level_exit(u32 sp20);
 void spawn_mist_from_global(void);
 void clear_particle_flags(u32 flags);
 void spawn_wind_particles(s16 pitch, s16 yaw);
@@ -13,10 +34,16 @@ s32 check_if_moving_over_floor(f32 a0, f32 a1);
 s32 arc_to_goal_pos(Vec3f a0, Vec3f a1, f32 yVel, f32 gravity);
 void vec3f_copy_2(Vec3f dest, Vec3f src);
 void tox_box_move(f32 forwardVel, f32 a1, s16 deltaPitch, s16 deltaRoll);
-void play_penguin_walking_sound(s32 walk);
+extern void play_penguin_walking_sound(s32 walk);
 s32 update_angle_from_move_flags(s32 *angle);
 void cur_obj_spawn_strong_wind_particles(s32 windSpread, f32 scale, f32 relPosX, f32 relPosY, f32 relPosZ);
-
+extern s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction, u8 *attackHandlers);
+extern s32 sCapSaveFlags[];
+extern s32 update_angle_from_move_flags(s32 *angle);
+extern s16 sBooHitRotations[];
+extern s32 approach_forward_vel(f32 *arr, f32 spC, f32 sp10);
+extern void obj_set_secondary_camera_focus(void);
+extern void obj_set_speed_to_zero(void);
 void bhv_cap_switch_loop(void);
 void bhv_tiny_star_particles_init(void);
 void bhv_grindel_thwomp_loop(void);

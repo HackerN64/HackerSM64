@@ -314,10 +314,6 @@ static void klepto_act_reset_position(void) {
     }
 }
 
-void obj_set_speed_to_zero(void) {
-    o->oForwardVel = o->oVelY = 0.0f;
-}
-
 void bhv_klepto_update(void) {
     UNUSED s32 unused;
 

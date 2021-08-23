@@ -10,3 +10,9 @@
 #include "klepto/geo.inc.c"
 #include "eyerok/geo.inc.c"
 #include "pokey/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/eyerok.inc.c"
+#include "game/behaviors/pokey.inc.c"
+#include "game/behaviors/klepto.inc.c"

@@ -13,3 +13,14 @@
 #include "bowser/geo.inc.c"
 #include "bomb/geo.inc.c"
 #include "impact_smoke/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/grand_star.inc.c"
+#include "game/behaviors/bowser_key.inc.c"
+#include "game/behaviors/bowser_falling_platform.inc.c"
+#include "game/behaviors/bowser_flame.inc.c"
+#include "game/behaviors/shock_wave.inc.c"
+#include "game/behaviors/beta_bowser_anchor.inc.c"
+#include "game/behaviors/bowser_bomb.inc.c"
+#include "game/behaviors/bowser.inc.c" //Hroup 12

@@ -14,3 +14,11 @@
 #include "mad_piano/geo.inc.c"
 #include "boo/geo.inc.c"
 #include "haunted_cage/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/fishing_boo.inc.c"
+#include "game/behaviors/haunted_chair.inc.c"
+#include "game/behaviors/mad_piano.inc.c"
+#include "game/behaviors/flying_bookend_switch.inc.c"
+#include "game/behaviors/beta_boo_key.inc.c"

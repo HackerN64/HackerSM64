@@ -11,3 +11,9 @@
 #include "toad/geo.inc.c"
 #include "mips/geo.inc.c"
 #include "boo_castle/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/camera_lakitu.inc.c" // TODO: 104 label, follow cam documentation
+#include "game/behaviors/mips.inc.c"
+#include "game/behaviors/toad.inc.c"

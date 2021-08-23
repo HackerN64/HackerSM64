@@ -210,12 +210,24 @@ void wiggler_init_segments(void) {
 }
 
 /**
+ * Attack handler for when wiggler is jumped or ground pounded on.
+ * Stop and enter the jumped on action.
+ */
+void wiggler_jumped_on_attack_handler(void) {
+    cur_obj_play_sound_2(SOUND_OBJ_WIGGLER_ATTACKED);
+    o->oAction = WIGGLER_ACT_JUMPED_ON;
+    o->oForwardVel = o->oVelY = 0.0f;
+    o->oWigglerSquishSpeed = 0.4f;
+}
+
+/**
  * Show text if necessary. Then walk toward mario if not at full health, and
  * otherwise wander in random directions.
  * If attacked by mario, enter either the jumped on or knockback action.
  */
 static void wiggler_act_walk(void) {
     s16 yawTurnSpeed;
+    s32 attackType;
 
     o->oWigglerWalkAnimSpeed = 0.06f * o->oForwardVel;
 
@@ -275,14 +287,22 @@ static void wiggler_act_walk(void) {
         // For the first two seconds of walking, stay invulnerable
         if (o->oTimer < 60) {
             obj_check_attacks(&sWigglerHitbox, o->oAction);
-        } else if (obj_handle_attacks(&sWigglerHitbox, o->oAction, sWigglerAttackHandlers)) {
-            if (o->oAction != WIGGLER_ACT_JUMPED_ON) {
-                o->oAction = WIGGLER_ACT_KNOCKBACK;
-            }
+        } else
+        {
+            attackType = obj_handle_attacks(&sWigglerHitbox, o->oAction, sWigglerAttackHandlers);
+            if (attackType == ATTACK_HANDLER_SPECIAL_WIGGLER_JUMPED_ON)
+                wiggler_jumped_on_attack_handler();
+            if (attackType)
+            {
+                if (o->oAction != WIGGLER_ACT_JUMPED_ON) {
+                    o->oAction = WIGGLER_ACT_KNOCKBACK;
+                }
 
-            o->oWigglerWalkAwayFromWallTimer = 0;
-            o->oWigglerWalkAnimSpeed = 0.0f;
+                o->oWigglerWalkAwayFromWallTimer = 0;
+                o->oWigglerWalkAnimSpeed = 0.0f;
+            }
         }
+
     }
 }
 /**
@@ -305,7 +325,7 @@ static void wiggler_act_jumped_on(void) {
     // defeated) or go back to walking
     if (o->header.gfx.scale[1] >= 4.0f) {
         if (o->oTimer > 30) {
-            if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP, 
+            if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
                 DIALOG_FLAG_NONE, CUTSCENE_DIALOG, attackText[o->oHealth - 2])) {
                 // Because we don't want the wiggler to disappear after being
                 // defeated, we leave its health at 1
@@ -384,17 +404,6 @@ static void wiggler_act_fall_through_floor(void) {
 
         cur_obj_move_using_fvel_and_gravity();
     }
-}
-
-/**
- * Attack handler for when wiggler is jumped or ground pounded on.
- * Stop and enter the jumped on action.
- */
-void wiggler_jumped_on_attack_handler(void) {
-    cur_obj_play_sound_2(SOUND_OBJ_WIGGLER_ATTACKED);
-    o->oAction = WIGGLER_ACT_JUMPED_ON;
-    o->oForwardVel = o->oVelY = 0.0f;
-    o->oWigglerSquishSpeed = 0.4f;
 }
 
 /**

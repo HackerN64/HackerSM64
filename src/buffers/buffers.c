@@ -8,6 +8,7 @@
 #endif
 #include "config.h"
 #include "audio/synthesis.h"
+#include "game/object_list_processor.h"
 
 ALIGNED8 u8 gDecompressionHeap[0xD000];
 ALIGNED16 u8 gAudioHeap[DOUBLE_SIZE_ON_64_BIT(0x31200 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)];
@@ -32,3 +33,8 @@ ALIGNED8 u8 gGfxSPTaskYieldBuffer[OS_YIELD_DATA_SIZE];
 struct SaveBuffer __attribute__ ((aligned (8))) gSaveBuffer;
 // 0x190a0 bytes
 struct GfxPool gGfxPools[2];
+
+/**
+ * The pool that objects are allocated from.
+ */
+struct Object gObjectPool[OBJECT_POOL_CAPACITY];

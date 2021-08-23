@@ -1,5 +1,17 @@
 // boulder.c.inc
 
+static struct ObjectHitbox sRollingSphereHitbox2 = {
+    /* interactType:      */ INTERACT_DAMAGE,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 3,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
+    /* radius:            */ 210,
+    /* height:            */ 350,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
+};
+
 void bhv_big_boulder_init(void) {
     o->oHomeX = o->oPosX;
     o->oHomeY = o->oPosY;
@@ -8,6 +20,22 @@ void bhv_big_boulder_init(void) {
     o->oGravity = 8.0f;
     o->oFriction = 0.999f;
     o->oBuoyancy = 2.0f;
+}
+
+void set_rolling_sphere_hitbox2(void) {
+    obj_set_hitbox(o, &sRollingSphereHitbox2);
+
+    if ((o->oInteractStatus & INT_STATUS_INTERACTED) != 0) {
+        o->oInteractStatus = 0;
+    }
+}
+
+void adjust_rolling_face_pitch2(f32 f12) {
+    o->oFaceAnglePitch += (s16)(o->oForwardVel * (100.0f / f12));
+    o->oSnowmansBottomUnkF4 += o->oForwardVel * 1e-4;
+
+    if (o->oSnowmansBottomUnkF4 > 1.0)
+        o->oSnowmansBottomUnkF4 = 1.0f;
 }
 
 void boulder_act_1(void) {
@@ -35,12 +63,12 @@ void bhv_big_boulder_loop(void) {
 
         case 1:
             boulder_act_1();
-            adjust_rolling_face_pitch(1.5f);
+            adjust_rolling_face_pitch2(1.5f);
             cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
             break;
     }
 
-    set_rolling_sphere_hitbox();
+    set_rolling_sphere_hitbox2();
 }
 
 void bhv_big_boulder_generator_loop(void) {

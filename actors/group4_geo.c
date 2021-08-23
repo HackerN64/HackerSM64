@@ -11,3 +11,10 @@
 #include "manta/geo.inc.c"
 #include "sushi/geo.inc.c"
 #include "unagi/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/clam.inc.c"
+#include "game/behaviors/manta_ray.inc.c"
+#include "game/behaviors/sushi.inc.c"
+#include "game/behaviors/unagi.inc.c"

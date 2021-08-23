@@ -224,7 +224,7 @@ const LevelScript level_castle_inside_entry[] = {
     LOAD_YAY0(        /*seg*/ 0x07, _castle_inside_segment_7SegmentRomStart, _castle_inside_segment_7SegmentRomEnd),
     LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _inside_yay0SegmentRomStart, _inside_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x06, _group15_yay0SegmentRomStart, _group15_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0D, _group15_geoSegmentRomStart,  _group15_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0D, _group15_geoSegmentRomStart,  _group15_geoSegmentRomEnd, _group15_geoSegmentBssStart, _group15_geoSegmentBssEnd),
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
     JUMP_LINK(script_func_global_16),
@@ -312,3 +312,12 @@ const LevelScript level_castle_inside_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/star_door.inc.c"
+#include "game/behaviors/ddd_warp.inc.c"
+#include "game/behaviors/water_pillar.inc.c"
+#include "game/behaviors/clock_arm.inc.c"
+#include "game/behaviors/castle_floor_trap.inc.c"
+#include "game/behaviors/decorative_pendulum.inc.c"

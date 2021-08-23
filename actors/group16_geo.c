@@ -9,3 +9,7 @@
 
 #include "chillychief/geo.inc.c"
 #include "moneybag/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/moneybag.inc.c"

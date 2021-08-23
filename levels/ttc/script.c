@@ -36,9 +36,9 @@ const LevelScript level_ttc_entry[] = {
     LOAD_YAY0(        /*seg*/ 0x07, _ttc_segment_7SegmentRomStart, _ttc_segment_7SegmentRomEnd),
     LOAD_YAY0_TEXTURE(/*seg*/ 0x09, _machine_yay0SegmentRomStart, _machine_yay0SegmentRomEnd),
     LOAD_YAY0(        /*seg*/ 0x05, _group1_yay0SegmentRomStart, _group1_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0C, _group1_geoSegmentRomStart,  _group1_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0C, _group1_geoSegmentRomStart,  _group1_geoSegmentRomEnd, _group1_geoSegmentBssStart, _group1_geoSegmentBssEnd),
     LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+    LOAD_RAW_WITH_CODE(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd, _common0_geoSegmentBssStart, _common0_geoSegmentBssEnd),
     ALLOC_LEVEL_POOL(),
     MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
     JUMP_LINK(script_func_global_1),
@@ -80,3 +80,15 @@ const LevelScript level_ttc_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/ttc_rotating_solid.inc.c"
+#include "game/behaviors/ttc_pendulum.inc.c"
+#include "game/behaviors/ttc_treadmill.inc.c" // TODO
+#include "game/behaviors/ttc_moving_bar.inc.c"
+#include "game/behaviors/ttc_cog.inc.c"
+#include "game/behaviors/ttc_pit_block.inc.c"
+#include "game/behaviors/ttc_elevator.inc.c"
+#include "game/behaviors/ttc_2d_rotator.inc.c"
+#include "game/behaviors/ttc_spinner.inc.c"

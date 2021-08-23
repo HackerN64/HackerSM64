@@ -13,3 +13,11 @@
 #include "snufit/geo.inc.c"
 #include "dorrie/geo.inc.c"
 #include "scuttlebug/geo.inc.c"
+
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/mr_i.inc.c"
+#include "game/behaviors/swoop.inc.c"
+#include "game/behaviors/snufit.inc.c"
+#include "game/behaviors/dorrie.inc.c"
+#include "game/behaviors/scuttlebug.inc.c" // :scuttleeyes:
