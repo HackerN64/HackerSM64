@@ -25,13 +25,6 @@
 #define PUPPYCAM_MODE3_ZOOMED_OUT 0x4
 #define PUPPYCAM_MODE3_ENTER_FIRST_PERSON 0x8
 
-#define RAYCAST_FIND_FLOOR  (0x1)
-#define RAYCAST_FIND_WALL   (0x2)
-#define RAYCAST_FIND_CEIL   (0x4)
-#define RAYCAST_FIND_WATER  (0x8)
-#define RAYCAST_FIND_ALL    (0xFFFFFFFF)
-
-
 #include "include/command_macros_base.h"
 
 #define PUPPYVOLUME(x, y, z, length, height, width, yaw, functionptr, anglesptr, addflags, removeflags, flagpersistance, room, shape) \
@@ -42,10 +35,6 @@
     CMD_W(addflags), \
     CMD_W(removeflags), \
     CMD_BBH(flagpersistance, shape, room)
-
-//Some macros for the sake of basic human sanity.
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-#define ABS(x) ((x) > 0.f ? (x) : -(x))
 
 struct gPuppyOptions
 {
@@ -174,7 +163,6 @@ extern void puppycam_boot(void);
 extern void puppycam_init(void);
 extern void puppycam_loop(void);
 extern void puppycam_shake(s16 x, s16 y, s16 z);
-extern void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
 extern f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
 extern void puppycam_default_config(void);
 extern s16 LENCOS(s16 length, s16 direction);

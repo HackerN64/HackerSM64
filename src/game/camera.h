@@ -17,7 +17,6 @@
  * @see camera.c
  */
 
-#define ABS(x) ((x) > 0.f ? (x) : -(x))
 #define ABS2(x) ((x) >= 0.f ? (x) : -(x))
 
 /**

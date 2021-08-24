@@ -32,8 +32,15 @@ extern f32 gCosineTable[];
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#define ABS(x) ((x) > 0.f ? (x) : -(x))
 
 #define sqr(x) ((x) * (x))
+
+#define RAYCAST_FIND_FLOOR  (0x1)
+#define RAYCAST_FIND_WALL   (0x2)
+#define RAYCAST_FIND_CEIL   (0x4)
+#define RAYCAST_FIND_WATER  (0x8)
+#define RAYCAST_FIND_ALL    (0xFFFFFFFF)
 
 void *vec3f_copy(Vec3f dest, Vec3f src);
 void *vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
@@ -73,5 +80,6 @@ f32 atan2f(f32 a, f32 b);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32 anim_spline_poll(Vec3f result);
+extern void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
 
 #endif // MATH_UTIL_H
