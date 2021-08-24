@@ -7,6 +7,7 @@ This repo needs BOTH an US ROM and a JP ROM in order to build. Place baserom.us.
 This repo needs gcc in order to be able to build it. To install it, run `sudo apt install gcc-mips-linux-gnu`
 
 This is a fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in `config.h`): 
+
 **Lighting Engine by Wiseguy**
 - Lighting Engine is NOT finished. It's a WIP. Expect issues and expect it to be somewhat hard to use. Point lights in particular are extremely finnicky. 
 - In order for lighting engine to work, your materials must have Shade Color in the combiner, **but you have to DISABLE Shade Color in sources**. If you leave Shade Color ticked for even a single material, the lighting will break **for the entire mesh**. Until Fast64 gets some sort of Lighting Engine support, it's recommended you create some custom presets to make this less annoying. 
