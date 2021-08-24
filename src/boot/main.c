@@ -5,20 +5,20 @@
 
 #include "sm64.h"
 #include "audio/external.h"
-#include "game_init.h"
-#include "memory.h"
-#include "sound_init.h"
-#include "profiler.h"
+#include "game/game_init.h"
+#include "game/memory.h"
+#include "game/sound_init.h"
+#include "game/profiler.h"
 #include "buffers/buffers.h"
 #include "segments.h"
-#include "main.h"
-#include "rumble_init.h"
-#include "version.h"
+#include "game/main.h"
+#include "game/rumble_init.h"
+#include "game/version.h"
 #ifdef UNF
 #include "usb/usb.h"
 #include "usb/debug.h"
 #endif
-#include "puppyprint.h"
+#include "game/puppyprint.h"
 
 // Message IDs
 #define MESG_SP_COMPLETE 100
