@@ -40,11 +40,13 @@
 #define OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT       (1 <<  9) // 0x00000200
 #define OBJ_FLAG_HOLDABLE                           (1 << 10) // 0x00000400
 #define OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM    (1 << 11) // 0x00000800
-#define OBJ_FLAG_1000                               (1 << 12) // 0x00001000
 #define OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO             (1 << 13) // 0x00002000
 #define OBJ_FLAG_PERSISTENT_RESPAWN                 (1 << 14) // 0x00004000
 #define OBJ_FLAG_8000                               (1 << 15) // 0x00008000
 #define OBJ_FLAG_HITBOX_WAS_SET                     (1 << 30) // 0x40000000
+
+// Flag to make objects emit a point light (was OBJ_FLAG_1000)
+#define OBJ_FLAG_EMIT_LIGHT                       (1 << 12) // 0x00001000
 
 /* oHeldState */
 #define HELD_FREE 0

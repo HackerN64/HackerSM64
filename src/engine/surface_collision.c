@@ -8,6 +8,7 @@
 #include "surface_collision.h"
 #include "surface_load.h"
 #include "game/puppyprint.h"
+#include "math_util.h"
 
 /**************************************************
  *                      WALLS                     *
@@ -962,3 +963,108 @@ s32 unused_resolve_floor_or_ceil_collisions(s32 checkCeil, f32 *px, f32 *py, f32
 
     return 0;
 }
+
+#define EPSILON 0.0001f
+#define VEC3_DOT(a,b) ((a)[0] * (b)[0] + (a)[1] * (b)[1] + (a)[2] * (b)[2])
+#define VEC3_COPY(out,a) \
+    {(out)[0] = (a)[0];           (out)[1] = (a)[1];           (out)[2] = (a)[2];}
+#define VEC3_SCALE(out,a,scale) \
+    {(out)[0] = (a)[0] * (scale); (out)[1] = (a)[1] * (scale); (out)[2] = (a)[2] * (scale);}
+#define VEC3_ADD(out,a,b)  \
+    {(out)[0] = (a)[0] + (b)[0];  (out)[1] = (a)[1] + (b)[1];  (out)[2] = (a)[2] + (b)[2];}
+#define VEC3_DIFF(out,a,b) \
+    {(out)[0] = (a)[0] - (b)[0];  (out)[1] = (a)[1] - (b)[1];  (out)[2] = (a)[2] - (b)[2];}
+#define ABSI(x) ((x) > 0 ? (x) : -(x))
+#define NORMAL_SCALE 1024
+
+f32 ray_surf_intersect(Vec3f rayStart, Vec3f rayDir, f32 rayDist, Vec3f intersectionOut, struct Surface* surf)
+{
+    f32 denom;
+    f32 distOnRay;
+    s16 u[3], v[3]; // Edge vectors
+    s16 w[3]; // Intersection point - vertex1
+    f32 uu, uv, vv, wu, wv; // Dot products
+    f32 s, t; // Barycentric coordinates
+    // Intersect the ray with the plane that the surface lies in
+    // a = -(originOffset + normal dot rayStart) / (normal dot rayDir)
+
+    denom = VEC3_DOT(&surf->normal.x, rayDir);
+    // Prevent division by zero and throw out collision with backfaces (negative denominator)
+    if (denom != denom && denom > -EPSILON)
+    {
+        return -1;
+    }
+    distOnRay = -((surf->originOffset) + VEC3_DOT(&surf->normal.x, rayStart)) / denom;
+    if (distOnRay > rayDist)
+    {
+        return -2;
+    }
+    if (distOnRay < 0)
+    {
+        return -3;
+    }
+
+    // Calculate the intersection point from the calculated distance
+    VEC3_SCALE(intersectionOut, rayDir, distOnRay);
+    VEC3_ADD(intersectionOut, rayStart, intersectionOut);
+
+    // Calculate the barycentric coordinates of the triangle vertices and intersection point
+    VEC3_DIFF(u, surf->vertex2, surf->vertex1); // These 2 could be precalculated :(
+    VEC3_DIFF(v, surf->vertex3, surf->vertex1);
+
+    VEC3_DIFF(w, intersectionOut, surf->vertex1);
+
+    // Calculate the various dot products
+    uu = VEC3_DOT(u, u); // These 3 could also be precalculated :(
+    uv = VEC3_DOT(u, v);
+    vv = VEC3_DOT(v, v);
+    
+    wu = VEC3_DOT(w, u);
+    wv = VEC3_DOT(w, v);
+
+    // Calculate and check the barycentric coordinates
+    denom = (uv * uv - uu * vv); // Doesn't need to be checked for 0 (assuming non-degenerate triangles)
+    s = (uv * wv - vv * wu) / denom;
+    if (s < 0 || s > 1)
+    {
+        return -4;
+    }
+    t = (uv * wu - uu * wv) / denom;
+    if (t < 0 || (s + t) > 1)
+    {
+        return -5;
+    }
+    return distOnRay;
+}
+
+f32 raycast(Vec3f rayStart, Vec3f rayDir, f32 rayDist, Vec3f intersection, struct Surface** surfHit)
+{
+    Vec3f dirNorm;
+    f32 intDist = -1.0f;
+    s32 cellX, cellZ;
+    struct SurfaceNode *node;
+    vec3f_copy(dirNorm, rayDir);
+    vec3f_normalize(dirNorm);
+    for (cellX = 0; cellX < 16; cellX++)
+    {
+        for (cellZ = 0; cellZ < 16; cellZ++)
+        {
+            node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
+            while (node)
+            {
+                Vec3f curHit;
+                f32 curDist;
+                curDist = ray_surf_intersect(rayStart, dirNorm, rayDist, curHit, node->surface);
+                if (curDist >= 0 && (intDist < 0 || curDist < intDist))
+                {
+                    intDist = curDist;
+                    vec3f_copy(intersection, curHit);
+                    *surfHit = node->surface;
+                }
+                node = node->next;
+            }
+        }
+    }
+    return intDist;
+}
+

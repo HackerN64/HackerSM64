@@ -31,6 +31,12 @@
 #endif
 #include "puppyprint.h"
 #include <prevent_bss_reordering.h>
+
+#include <point_lights.h>
+
+// FIXME: I'm not sure all of these variables belong in this file, but I don't
+// know of a good way to split them
+struct Controller gControllers[3];
 #include "puppycam2.h"
 #include "debug_box.h"
 
@@ -144,7 +150,6 @@ void init_rsp(void) {
 
     gSPSetGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING);
 
-    gSPNumLights(gDisplayListHead++, NUMLIGHTS_1);
     gSPTexture(gDisplayListHead++, 0, 0, 0, G_TX_RENDERTILE, G_OFF);
 
     // @bug Failing to set the clip ratio will result in warped triangles in F3DEX2
@@ -776,6 +781,12 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
         read_controller_inputs();
+
+        // Reset the point light count before running the level script
+        // This is because the level script is responsible for calling the function
+        // that updates objects, which is where objects that emit light create their point lights
+        gPointLightCount = gAreaPointLightCount;
+
         addr = level_script_execute(addr);
         #if defined(VISUAL_DEBUG) && !defined(PUPPYPRINT)
         debug_box_input();
