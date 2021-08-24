@@ -22,3 +22,5 @@
 #include "game/behaviors/mad_piano.inc.c"
 #include "game/behaviors/flying_bookend_switch.inc.c"
 #include "game/behaviors/beta_boo_key.inc.c"
+#include "game/behaviors/boo_cage.inc.c"
+#include "game/behaviors/boo.inc.c"

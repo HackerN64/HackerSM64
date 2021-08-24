@@ -19,6 +19,7 @@ extern u8 gThread5Stack[];
 #if ENABLE_RUMBLE
 extern u8 gThread6Stack[];
 #endif
+extern u8 gThread7Stack[];
 
 extern u8 gGfxSPTaskYieldBuffer[];
 

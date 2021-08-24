@@ -58,6 +58,7 @@ void *main_pool_realloc(void *addr, u32 size);
 u32 main_pool_available(void);
 u32 main_pool_push_state(void);
 u32 main_pool_pop_state(void);
+extern void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd);
 
 #ifndef NO_SEGMENTED_MEMORY
 void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart, u8 *bssEnd);

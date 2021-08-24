@@ -42,8 +42,6 @@
 #include "game/behaviors/orange_number.inc.c"
 #include "game/behaviors/mushroom_1up.inc.c"
 #include "game/behaviors/spawn_star_exit.inc.c"
-#include "game/behaviors/boo.inc.c"
-#include "game/behaviors/boo_cage.inc.c"
 #include "game/behaviors/celebration_star.inc.c"
 #include "game/behaviors/flame.inc.c"
 #include "game/behaviors/spawn_star.inc.c"

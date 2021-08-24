@@ -17,3 +17,4 @@
 #include "game/behaviors/camera_lakitu.inc.c" // TODO: 104 label, follow cam documentation
 #include "game/behaviors/mips.inc.c"
 #include "game/behaviors/toad.inc.c"
+#include "game/behaviors/castle_boo.inc.c"

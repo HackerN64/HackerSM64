@@ -381,7 +381,7 @@ SECTIONS
    /* 0x268020 0x268020-0 [0] */
    BEGIN_SEG(intro, 0x14000000)
    {
-      KEEP(BUILD_DIR/levels/intro/script.o(.*data));
+      KEEP(BUILD_DIR/levels/intro/script.o(.*data*));
       KEEP(BUILD_DIR/levels/intro/script.o(.rodata*));
       KEEP(BUILD_DIR/levels/intro/script.o(.text));
       KEEP(BUILD_DIR/levels/intro/geo.o(.data));
@@ -430,10 +430,18 @@ SECTIONS
 
    BEGIN_SEG(menu, 0x14000000)
    {
-      KEEP(BUILD_DIR/levels/menu/script.o(.data));
+      KEEP(BUILD_DIR/levels/menu/script.o(.*data*));
+      KEEP(BUILD_DIR/levels/menu/script.o(.rodata*));
+      KEEP(BUILD_DIR/levels/menu/script.o(.text));
       KEEP(BUILD_DIR/levels/menu/geo.o(.data));
    }
    END_SEG(menu)
+   BEGIN_NOLOAD(menu)
+   {
+      KEEP(BUILD_DIR/levels/menu/script.o(.bss*));
+   }
+   END_NOLOAD(menu)
+
    BEGIN_SEG(menu_segment_7, 0x07000000)
    {
       KEEP(BUILD_DIR/levels/menu/leveldata.szp.o(.data));

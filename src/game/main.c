@@ -19,6 +19,7 @@
 #include "usb/debug.h"
 #endif
 #include "puppyprint.h"
+#include "load_thread.h"
 
 // Message IDs
 #define MESG_SP_COMPLETE 100
@@ -31,6 +32,7 @@ OSThread D_80339210; // unused?
 OSThread gIdleThread;
 OSThread gMainThread;
 OSThread gGameLoopThread;
+OSThread gLoadThread;
 OSThread gSoundThread;
 
 OSIoMesg gDmaIoMesg;
@@ -346,6 +348,9 @@ void thread3_main(UNUSED void *arg) {
     create_thread(&gGameLoopThread, 5, thread5_game_loop, NULL, gThread5Stack + 0x2000, 10);
     osStartThread(&gGameLoopThread);
 
+    create_thread(&gLoadThread, 7, thread7_load, NULL, gThread7Stack + 0x1000, 1);
+    osStartThread(&gLoadThread);
+
     while (TRUE) {
         OSMesg msg;
 
@@ -503,10 +508,10 @@ extern u32 gISVFlag;
 void osInitialize_fakeisv() {
     /* global flag to skip `__checkHardware_isv` from being called. */
     gISVFlag = 0x49533634;  // 'IS64'
- 
+
     /* printf writes go to this address, cen64(1) has this hardcoded. */
     gISVDbgPrnAdrs = 0x13FF0000;
- 
+
     /* `__printfunc`, used by `osSyncPrintf` will be set. */
     __osInitialize_isv();
 }
