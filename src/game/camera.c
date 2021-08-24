@@ -107,68 +107,6 @@ s16 sCreditsPlayer2Yaw;
  */
 u8 sFramesPaused;
 
-extern struct CameraFOVStatus sFOVState;
-extern struct TransitionInfo sModeTransition;
-extern struct PlayerGeometry sMarioGeometry;
-extern s16 unusedFreeRoamWallYaw;
-extern s16 sAvoidYawVel;
-extern s16 sCameraYawAfterDoorCutscene;
-extern s16 unusedSplinePitch;
-extern s16 unusedSplineYaw;
-extern struct HandheldShakePoint sHandheldShakeSpline[4];
-extern s16 sHandheldShakeMag;
-extern f32 sHandheldShakeTimer;
-extern f32 sHandheldShakeInc;
-extern s16 sHandheldShakePitch;
-extern s16 sHandheldShakeYaw;
-extern s16 sHandheldShakeRoll;
-extern u32 unused8033B30C;
-extern u32 unused8033B310;
-extern s16 sSelectionFlags;
-extern s16 unused8033B316;
-extern s16 s2ndRotateFlags;
-extern s16 unused8033B31A;
-extern s16 sCameraSoundFlags;
-extern u16 sCButtonsPressed;
-extern s16 sCutsceneDialogID;
-extern struct LakituState gLakituState;
-extern s16 unused8033B3E8;
-extern s16 sAreaYaw;
-extern s16 sAreaYawChange;
-extern s16 sLakituDist;
-extern s16 sLakituPitch;
-extern f32 sZoomAmount;
-extern s16 sCSideButtonYaw;
-extern s16 sBehindMarioSoundTimer;
-extern f32 sZeroZoomDist;
-extern s16 sCUpCameraPitch;
-extern s16 sModeOffsetYaw;
-extern s16 sSpiralStairsYawOffset;
-extern s16 s8DirModeBaseYaw;
-extern s16 s8DirModeYawOffset;
-extern f32 sPanDistance;
-extern f32 sCannonYOffset;
-extern struct ModeTransitionInfo sModeInfo;
-extern Vec3f sCastleEntranceOffset;
-extern u32 sParTrackIndex;
-extern struct ParallelTrackingPoint *sParTrackPath;
-extern struct CameraStoredInfo sParTrackTransOff;
-extern struct CameraStoredInfo sCameraStoreCUp;
-extern struct CameraStoredInfo sCameraStoreCutscene;
-extern s16 gCameraMovementFlags;
-extern s16 sStatusFlags;
-extern struct CutsceneSplinePoint sCurCreditsSplinePos[32];
-extern struct CutsceneSplinePoint sCurCreditsSplineFocus[32];
-extern s16 sCutsceneSplineSegment;
-extern f32 sCutsceneSplineSegmentProgress;
-extern s16 unused8033B6E8;
-extern s16 sCutsceneShot;
-extern s16 gCutsceneTimer;
-extern struct CutsceneVariable sCutsceneVars[10];
-extern s32 gObjCutsceneDone;
-extern u32 gCutsceneObjSpawn;
-extern struct Camera *gCamera;
-
 /**
  * Lakitu's position and focus.
  * @see LakituState
@@ -11627,9 +11565,3 @@ void obj_rotate_towards_point(struct Object *o, Vec3f point, s16 pitchOff, s16 y
     o->oMoveAnglePitch = approach_s16_asymptotic(o->oMoveAnglePitch, pitchOff - pitch, pitchDiv);
     o->oMoveAngleYaw = approach_s16_asymptotic(o->oMoveAngleYaw, yaw + yawOff, yawDiv);
 }
-
-#include "behaviors/intro_peach.inc.c"
-#include "behaviors/intro_lakitu.inc.c"
-#include "behaviors/end_birds_1.inc.c"
-#include "behaviors/end_birds_2.inc.c"
-#include "behaviors/intro_scene.inc.c"

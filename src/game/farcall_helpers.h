@@ -27,6 +27,7 @@
 #include "seq_ids.h"
 #include "dialog_ids.h"
 #include "debug.h"
+#include "camera.h"
 #include "behavior_actions.h"
 #include "spawn_object.h"
 #include "mario_misc.h"
