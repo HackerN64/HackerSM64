@@ -20,6 +20,12 @@
 #define ABS2(x) ((x) >= 0.f ? (x) : -(x))
 
 /**
+ * Terminates a list of CameraTriggers.
+ */
+#define NULL_TRIGGER                                                                                    \
+    { 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+
+/**
  * Converts an angle in degrees to sm64's s16 angle units. For example, DEGREES(90) == 0x4000
  * This should be used mainly to make camera code clearer at first glance.
  */
@@ -734,6 +740,58 @@ extern struct CutsceneVariable sCutsceneVars[10];
 extern s32 gObjCutsceneDone;
 extern u32 gCutsceneObjSpawn;
 extern struct Camera *gCamera;
+extern u8 sDanceCutsceneIndexTable[][4];
+extern u8 sZoomOutAreaMasks[];
+extern struct CutsceneSplinePoint sBobCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sBobCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sWfCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sWfCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sJrbCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sJrbCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sCcmSlideCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sCcmSlideCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sBbhCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sBbhCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sHmcCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sHmcCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sThiWigglerCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sThiWigglerCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sVolcanoCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sVolcanoCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sSslCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sSslCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sDddCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sDddCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sSlCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sSlCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sWdwCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sWdwCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sTtmCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sTtmCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sThiHugeCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sThiHugeCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sTtcCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sTtcCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sRrCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sRrCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sSaCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sSaCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sCotmcCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sCotmcCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sDddSubCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sDddSubCreditsSplineFocus[];
+extern struct CutsceneSplinePoint sCcmOutsideCreditsSplinePositions[];
+extern struct CutsceneSplinePoint sCcmOutsideCreditsSplineFocus[];
+extern struct ParallelTrackingPoint sBBHLibraryParTrackPath[];
+extern struct CameraTrigger sCamBBH[];
+extern struct CameraTrigger sCamBOB[];
+extern struct CameraTrigger sCamCastle[];
+extern Vec3f sFixedModeBasePosition;
+extern struct Cutscene sCutsceneFallToCastleGrounds[];
+extern struct Cutscene sCutsceneExitWaterfall[];
+extern struct Cutscene sCutsceneIntroPeach[];
+extern struct Cutscene sCutsceneEndWaving[];
+extern struct Cutscene sCutsceneEnding[];
 
 extern struct Object *gCutsceneFocus;
 extern struct Object *gSecondCameraFocus;
@@ -828,6 +886,22 @@ void play_cutscene(struct Camera *c);
 s32 cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
 s32 cutscene_spawn_obj(u32 obj, s16 frame);
 void set_fov_shake(s16 amplitude, s16 decay, s16 shakeSpeed);
+extern void parallel_tracking_init(struct Camera *c, struct ParallelTrackingPoint *path);
+extern void set_camera_mode_close_cam(u8 *mode);
+extern s32 set_camera_mode_fixed(struct Camera *c, s16 x, s16 y, s16 z);
+extern BAD_RETURN(s32) cutscene_bbh_death(struct Camera *c);
+extern void cutscene_goto_cvar_pos(struct Camera *c, f32 goalDist, s16 goalPitch, s16 rotPitch, s16 rotYaw);
+extern void transition_to_camera_mode(struct Camera *c, s16 newMode, s16 numFrames);
+extern BAD_RETURN(s32) cam_castle_hmc_start_pool_cutscene(struct Camera *c);
+extern BAD_RETURN(f32) calc_y_to_curr_floor(f32 *posOff, f32 posMul, f32 posBound, f32 *focOff, f32 focMul, f32 focBound);
+extern void mode_spiral_stairs_camera(struct Camera *c);
+extern BAD_RETURN(s32) cutscene_exit_to_castle_grounds_end(struct Camera *c);
+extern void update_camera_yaw(struct Camera *c);
+extern BAD_RETURN(s32) cutscene_credits_reset_spline(UNUSED struct Camera *c);
+extern void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw, s16 maxYaw);
+extern void cutscene_reset_spline(void);
+extern void cutscene_intro_peach_play_message_music(void);
+extern BAD_RETURN(s32) cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c);
 
 void set_fov_function(u8 func);
 void cutscene_set_fov_shake_preset(u8 preset);

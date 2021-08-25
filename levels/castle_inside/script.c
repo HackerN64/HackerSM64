@@ -16,6 +16,16 @@
 #include "make_const_nonconst.h"
 #include "levels/castle_inside/header.h"
 
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/star_door.inc.c"
+#include "game/behaviors/ddd_warp.inc.c"
+#include "game/behaviors/water_pillar.inc.c"
+#include "game/behaviors/clock_arm.inc.c"
+#include "game/behaviors/castle_floor_trap.inc.c"
+#include "game/behaviors/decorative_pendulum.inc.c"
+#include "camera.inc.c"
+
 static const LevelScript script_func_local_1[] = {
     WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x00, /*flags*/ WARP_NO_CHECKPOINT),
     WARP_NODE(/*id*/ 0x01, /*destLevel*/ LEVEL_CASTLE_GROUNDS, /*destArea*/ 0x01, /*destNode*/ 0x01, /*flags*/ WARP_NO_CHECKPOINT),
@@ -312,12 +322,3 @@ const LevelScript level_castle_inside_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
-
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/star_door.inc.c"
-#include "game/behaviors/ddd_warp.inc.c"
-#include "game/behaviors/water_pillar.inc.c"
-#include "game/behaviors/clock_arm.inc.c"
-#include "game/behaviors/castle_floor_trap.inc.c"
-#include "game/behaviors/decorative_pendulum.inc.c"

@@ -16,6 +16,14 @@
 #include "make_const_nonconst.h"
 #include "levels/bbh/header.h"
 
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/bbh_tilting_trap.inc.c"
+#include "game/behaviors/bbh_haunted_bookshelf.inc.c"
+#include "game/behaviors/bbh_merry_go_round.inc.c"
+#include "game/behaviors/coffin.inc.c"
+#include "camera.inc.c"
+
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_RED_FLAME,                  /*pos*/  2089,  1331, -1125, /*angle*/ 0, 270, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlame),
@@ -127,10 +135,3 @@ const LevelScript level_bbh_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
-
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/bbh_tilting_trap.inc.c"
-#include "game/behaviors/bbh_haunted_bookshelf.inc.c"
-#include "game/behaviors/bbh_merry_go_round.inc.c"
-#include "game/behaviors/coffin.inc.c"

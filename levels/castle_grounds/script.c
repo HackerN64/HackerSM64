@@ -14,6 +14,13 @@
 
 #include "make_const_nonconst.h"
 #include "levels/castle_grounds/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/castle_flag.inc.c"
+#include "game/behaviors/castle_cannon_grate.inc.c"
+#include "game/behaviors/moat_grill.inc.c"
+#include "game/behaviors/moat_drainer.inc.c"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     WARP_NODE(/*id*/ 0x00, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x00, /*flags*/ WARP_NO_CHECKPOINT),
@@ -137,9 +144,3 @@ const LevelScript level_castle_grounds_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/castle_flag.inc.c"
-#include "game/behaviors/castle_cannon_grate.inc.c"
-#include "game/behaviors/moat_grill.inc.c"
-#include "game/behaviors/moat_drainer.inc.c"
