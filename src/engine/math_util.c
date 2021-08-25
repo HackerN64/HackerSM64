@@ -976,7 +976,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     f32 length;
     Vec3f chk_hit_pos;
     f32 top, bottom;
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
     #endif
 
@@ -1010,7 +1010,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
             }
         }
     }
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     collisionTime[perfIteration] += osGetTime()-first;
     #endif
 }

@@ -721,7 +721,7 @@ void setup_game_memory(void) {
  */
 void thread5_game_loop(UNUSED void *arg) {
     struct LevelCommand *addr;
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     OSTime lastTime = 0;
     #endif
 
@@ -760,7 +760,7 @@ void thread5_game_loop(UNUSED void *arg) {
             continue;
         }
         profiler_log_thread5_time(THREAD5_START);
-        #ifdef PUPPYPRINT
+        #if PUPPYPRINT_DEBUG
         while (TRUE)
         {
             lastTime = osGetTime();
@@ -788,10 +788,10 @@ void thread5_game_loop(UNUSED void *arg) {
         gPointLightCount = gAreaPointLightCount;
 
         addr = level_script_execute(addr);
-        #if defined(VISUAL_DEBUG) && !defined(PUPPYPRINT)
+        #if PUPPYPRINT_DEBUG == 0 && defined(VISUAL_DEBUG)
         debug_box_input();
         #endif
-        #ifdef PUPPYPRINT
+        #if PUPPYPRINT_DEBUG
         profiler_update(scriptTime, lastTime);
             if (benchmarkLoop > 0 && benchOption == 0)
             {

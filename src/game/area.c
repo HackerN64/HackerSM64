@@ -425,7 +425,7 @@ void render_game(void) {
     }
 
 
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     puppyprint_render_profiler();
     #endif
 

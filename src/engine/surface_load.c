@@ -604,7 +604,7 @@ u32 get_area_terrain_size(TerrainData *data) {
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
     #endif
 
@@ -654,7 +654,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     collisionTime[perfIteration] += osGetTime()-first;
     #endif
 }
@@ -784,7 +784,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
  */
 void load_object_collision_model(void) {
     TerrainData vertexData[600];
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
     #endif
 
@@ -821,7 +821,7 @@ void load_object_collision_model(void) {
     } else {
         gCurrentObject->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
     }
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     collisionTime[perfIteration] += osGetTime()-first;
     #endif
 }

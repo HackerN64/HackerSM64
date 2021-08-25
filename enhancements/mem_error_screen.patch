@@ -6,7 +6,7 @@ index f50b7622..124c7ec6 100644
  $(BUILD_DIR)/src/menu/file_select.o: $(BUILD_DIR)/include/text_strings.h
  $(BUILD_DIR)/src/menu/star_select.o: $(BUILD_DIR)/include/text_strings.h
  $(BUILD_DIR)/src/game/ingame_menu.o: $(BUILD_DIR)/include/text_strings.h
-+$(BUILD_DIR)/src/game/mem_error_screen.o: $(BUILD_DIR)/include/text_strings.h
++$(BUILD_DIR)/src/boot/mem_error_screen.o: $(BUILD_DIR)/include/text_strings.h
  
  
  #==============================================================================#
@@ -137,14 +137,14 @@ index d41a91c8..7d047236 100644
  
  struct LevelCommand *level_script_execute(struct LevelCommand *cmd);
  
-diff --git a/src/game/main.c b/src/game/main.c
+diff --git a/src/boot/main.c b/src/boot/main.c
 index 1a9d9e7e..f4f7a9e5 100644
---- a/src/game/main.c
-+++ b/src/game/main.c
+--- a/src/boot/main.c
++++ b/src/boot/main.c
 @@ -11,6 +11,7 @@
  #include "segments.h"
- #include "main.h"
- #include "rumble_init.h"
+ #include "game/main.h"
+ #include "game/rumble_init.h"
 +#include "mem_error_screen.h"
  
  // Message IDs
@@ -172,11 +172,11 @@ index 1a9d9e7e..f4f7a9e5 100644
      osStartThread(&gGameLoopThread);
  
      while (TRUE) {
-diff --git a/src/game/mem_error_screen.c b/src/game/mem_error_screen.c
+diff --git a/src/boot/mem_error_screen.c b/src/boot/mem_error_screen.c
 new file mode 100644
 index 00000000..f432927c
 --- /dev/null
-+++ b/src/game/mem_error_screen.c
++++ b/src/boot/mem_error_screen.c
 @@ -0,0 +1,104 @@
 +/* clang-format off */
 +/*

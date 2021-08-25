@@ -1,5 +1,4 @@
 # ![](https://i.imgur.com/CeOukzk.gif) HackerSM64 ![](https://i.imgur.com/s0LUbTo.gif)
-
 **AFTER CLONING THE REPO, CHECK OUT THE `include/config.h` FILE BEFORE ANYTHING ELSE! IT THERE'S A LOT OF STUFF IN THIS REPO THAT CAN BE TOGGLED THERE.**
 
 This repo needs BOTH an US ROM and a JP ROM in order to build. Place baserom.us.z64 in the repo as usual and ALSO place baserom.jp.z64
