@@ -1102,9 +1102,13 @@ void audio_init() {
     // Should probably contain the sizes of the data banks, but those aren't
     // easily accessible from here.
     osSyncPrintf("---------- Init Completed. ------------\n");
-    osSyncPrintf(" Syndrv    :[%6d]\n", 0); // gSoundDataADSR
-    osSyncPrintf(" Seqdrv    :[%6d]\n", 0); // gMusicData
-    osSyncPrintf(" audiodata :[%6d]\n", 0); // gSoundDataRaw
+    osSyncPrintf(" Syndrv    :[%6d]\n", gSoundDataRaw - gSoundDataADSR); // gSoundDataADSR
+#ifndef VERSION_SH
+    osSyncPrintf(" Seqdrv    :[%6d]\n", gBankSetsData - gMusicData); // gMusicData
+#else
+    osSyncPrintf(" Seqdrv    :[%6d]\n", _assetsSegmentRomEnd - gMusicData); // gMusicData
+#endif
+    osSyncPrintf(" audiodata :[%6d]\n", gMusicData - gSoundDataRaw); // gSoundDataRaw
     osSyncPrintf("---------------------------------------\n");
 }
 #endif

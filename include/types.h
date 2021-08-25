@@ -57,6 +57,7 @@ typedef u8 Texture;
 typedef u16 ModelID;
 typedef COLLISION_DATA_TYPE TerrainData;
 typedef ROOM_DATA_TYPE RoomData;
+typedef TerrainData Vec3t[3];
 
 enum SpTaskState {
     SPTASK_STATE_NOT_STARTED,
@@ -231,15 +232,15 @@ struct Waypoint
 
 struct Surface
 {
-    /*0x00*/ s16 type;
-    /*0x02*/ s16 force;
+    /*0x00*/ TerrainData type;
+    /*0x02*/ TerrainData force;
     /*0x04*/ s8 flags;
-    /*0x05*/ s8 room;
+    /*0x05*/ RoomData room;
     /*0x06*/ s16 lowerY;
     /*0x08*/ s16 upperY;
-    /*0x0A*/ Vec3s vertex1;
-    /*0x10*/ Vec3s vertex2;
-    /*0x16*/ Vec3s vertex3;
+    /*0x0A*/ Vec3t vertex1;
+    /*0x10*/ Vec3t vertex2;
+    /*0x16*/ Vec3t vertex3;
     /*0x1C*/ struct {
         f32 x;
         f32 y;
