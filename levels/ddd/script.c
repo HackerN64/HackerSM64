@@ -14,6 +14,12 @@
 
 #include "make_const_nonconst.h"
 #include "levels/ddd/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/ddd_sub.inc.c"
+#include "game/behaviors/whirlpool.inc.c"
+#include "game/behaviors/ddd_pole.inc.c"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_SUSHI,        /*pos*/ -3071,  -270,   0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSushiShark),
@@ -120,8 +126,3 @@ const LevelScript level_ddd_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/ddd_sub.inc.c"
-#include "game/behaviors/whirlpool.inc.c"
-#include "game/behaviors/ddd_pole.inc.c"

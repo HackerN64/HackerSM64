@@ -14,6 +14,16 @@
 
 #include "make_const_nonconst.h"
 #include "levels/ssl/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/tox_box.inc.c"
+#include "game/behaviors/tweester.inc.c"
+#include "game/behaviors/spindel.inc.c"
+#include "game/behaviors/pyramid_wall.inc.c"
+#include "game/behaviors/pyramid_elevator.inc.c"
+#include "game/behaviors/pyramid_top.inc.c"
+#include "game/behaviors/horizontal_grindel.inc.c"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_SSL_PYRAMID_TOP, /*pos*/ -2047, 1536, -1023, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvPyramidTop),
@@ -152,12 +162,3 @@ const LevelScript level_ssl_entry[] = {
     EXIT(),
 };
 
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/tox_box.inc.c"
-#include "game/behaviors/tweester.inc.c"
-#include "game/behaviors/spindel.inc.c"
-#include "game/behaviors/pyramid_wall.inc.c"
-#include "game/behaviors/pyramid_elevator.inc.c"
-#include "game/behaviors/pyramid_top.inc.c"
-#include "game/behaviors/horizontal_grindel.inc.c"

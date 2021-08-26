@@ -14,6 +14,8 @@
 
 #include "make_const_nonconst.h"
 #include "levels/sa/header.h"
+#include "game/farcall_helpers.h"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFishSpawner),

@@ -14,6 +14,13 @@
 
 #include "make_const_nonconst.h"
 #include "levels/rr/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/cruiser.inc.c"
+#include "game/behaviors/swing_platform.inc.c"
+#include "game/behaviors/donut_platform.inc.c"
+#include "camera.inc.c"
+
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_RR_SLIDING_PLATFORM,         /*pos*/ -3400, -2038,  6564, /*angle*/  0,   0,   0, /*behParam*/ 0x02560000, /*beh*/ bhvSlidingPlatform2),
@@ -144,9 +151,3 @@ const LevelScript level_rr_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
-
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/cruiser.inc.c"
-#include "game/behaviors/swing_platform.inc.c"
-#include "game/behaviors/donut_platform.inc.c"

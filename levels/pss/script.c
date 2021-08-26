@@ -14,6 +14,8 @@
 
 #include "make_const_nonconst.h"
 #include "levels/pss/header.h"
+#include "game/farcall_helpers.h"
+#include "camera.inc.c"
 
 const LevelScript level_pss_entry[] = {
     INIT_LEVEL(),

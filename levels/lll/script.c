@@ -15,6 +15,18 @@
 
 #include "make_const_nonconst.h"
 #include "levels/lll/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/lll_octagonal_rotating_mesh.inc.c"
+#include "game/behaviors/lll_sinking_rock_block.inc.c"
+#include "game/behaviors/lll_rotating_hex_flame.inc.c"
+#include "game/behaviors/lll_floating_wood_piece.inc.c"
+#include "game/behaviors/lll_volcano_flames.inc.c"
+#include "game/behaviors/lll_hexagonal_ring.inc.c"
+#include "game/behaviors/lll_sinking_rectangle.inc.c"
+#include "game/behaviors/bowser_puzzle_piece.inc.c"
+#include "game/behaviors/drawbridge.inc.c"
+#include "camera.inc.c"
 
 // Unlike most levels, level geometry objects in LLL are defined as regular objects instead of terrain objects.
 static const LevelScript script_func_local_1[] = {
@@ -219,14 +231,3 @@ const LevelScript level_lll_entry[] = {
     EXIT(),
 };
 
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/lll_octagonal_rotating_mesh.inc.c"
-#include "game/behaviors/lll_sinking_rock_block.inc.c"
-#include "game/behaviors/lll_rotating_hex_flame.inc.c"
-#include "game/behaviors/lll_floating_wood_piece.inc.c"
-#include "game/behaviors/lll_volcano_flames.inc.c"
-#include "game/behaviors/lll_hexagonal_ring.inc.c"
-#include "game/behaviors/lll_sinking_rectangle.inc.c"
-#include "game/behaviors/bowser_puzzle_piece.inc.c"
-#include "game/behaviors/drawbridge.inc.c"

@@ -24,6 +24,7 @@
 #include "obj_behaviors_2.h"
 #include "level_headers.h"
 #include "level_misc_macros.h"
+#include "mario_actions_cutscene.h"
 #include "seq_ids.h"
 #include "dialog_ids.h"
 #include "debug.h"

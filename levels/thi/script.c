@@ -14,6 +14,10 @@
 
 #include "make_const_nonconst.h"
 #include "levels/thi/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/thi_top.inc.c"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     RETURN(),
@@ -163,6 +167,3 @@ const LevelScript level_thi_entry[] = {
     EXIT(),
 };
 
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/thi_top.inc.c"

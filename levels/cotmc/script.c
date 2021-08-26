@@ -15,6 +15,8 @@
 
 #include "make_const_nonconst.h"
 #include "levels/cotmc/header.h"
+#include "game/farcall_helpers.h"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_CAP_SWITCH, /*pos*/ 0,  363, -6144, /*angle*/ 0, 0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvCapSwitch),

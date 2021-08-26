@@ -14,6 +14,18 @@
 
 #include "make_const_nonconst.h"
 #include "levels/ttc/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/ttc_rotating_solid.inc.c"
+#include "game/behaviors/ttc_pendulum.inc.c"
+#include "game/behaviors/ttc_treadmill.inc.c" // TODO
+#include "game/behaviors/ttc_moving_bar.inc.c"
+#include "game/behaviors/ttc_cog.inc.c"
+#include "game/behaviors/ttc_pit_block.inc.c"
+#include "game/behaviors/ttc_elevator.inc.c"
+#include "game/behaviors/ttc_2d_rotator.inc.c"
+#include "game/behaviors/ttc_spinner.inc.c"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_NONE,   /*pos*/ -1080,  -840,  1573, /*angle*/ 0,   0, 0, /*behParam*/ 0x00560000, /*beh*/ bhvPoleGrabbing),
@@ -81,14 +93,3 @@ const LevelScript level_ttc_entry[] = {
     EXIT(),
 };
 
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/ttc_rotating_solid.inc.c"
-#include "game/behaviors/ttc_pendulum.inc.c"
-#include "game/behaviors/ttc_treadmill.inc.c" // TODO
-#include "game/behaviors/ttc_moving_bar.inc.c"
-#include "game/behaviors/ttc_cog.inc.c"
-#include "game/behaviors/ttc_pit_block.inc.c"
-#include "game/behaviors/ttc_elevator.inc.c"
-#include "game/behaviors/ttc_2d_rotator.inc.c"
-#include "game/behaviors/ttc_spinner.inc.c"

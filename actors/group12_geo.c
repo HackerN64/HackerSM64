@@ -23,4 +23,5 @@
 #include "game/behaviors/shock_wave.inc.c"
 #include "game/behaviors/beta_bowser_anchor.inc.c"
 #include "game/behaviors/bowser_bomb.inc.c"
-#include "game/behaviors/bowser.inc.c" //Hroup 12
+#include "game/behaviors/bowser.inc.c"
+#include "game/behaviors/bowser_camera.inc.c"

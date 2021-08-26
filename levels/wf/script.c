@@ -15,6 +15,14 @@
 
 #include "make_const_nonconst.h"
 #include "levels/wf/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/bomp.inc.c"
+#include "game/behaviors/breakable_wall.inc.c"
+#include "game/behaviors/kickable_board.inc.c"
+#include "game/behaviors/tower_door.inc.c"
+#include "game/behaviors/tower_platform.inc.c"
+#include "camera.inc.c"
 
 // Unlike most levels, some of the level geometry objects in WF are defined as regular objects instead of terrain objects.
 // Some of them are still terrain objects, however.
@@ -167,11 +175,4 @@ const LevelScript level_wf_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/bomp.inc.c"
-#include "game/behaviors/breakable_wall.inc.c"
-#include "game/behaviors/kickable_board.inc.c"
-#include "game/behaviors/tower_door.inc.c"
-#include "game/behaviors/tower_platform.inc.c"
 

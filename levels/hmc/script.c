@@ -14,6 +14,11 @@
 
 #include "make_const_nonconst.h"
 #include "levels/hmc/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/boulder.inc.c"
+#include "game/behaviors/controllable_platform.inc.c"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_RED_FLAME, /*pos*/ 4936, -357, -4146, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlame),
@@ -120,8 +125,3 @@ const LevelScript level_hmc_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
-
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/boulder.inc.c"
-#include "game/behaviors/controllable_platform.inc.c"

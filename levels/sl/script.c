@@ -14,6 +14,8 @@
 
 #include "make_const_nonconst.h"
 #include "levels/sl/header.h"
+#include "game/farcall_helpers.h"
+#include "camera.inc.c"
 
 
 static const LevelScript script_func_local_1[] = {

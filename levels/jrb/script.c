@@ -14,6 +14,12 @@
 
 #include "make_const_nonconst.h"
 #include "levels/jrb/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/floating_box.inc.c"
+#include "game/behaviors/jrb_ship.inc.c"
+#include "game/behaviors/falling_pillar.inc.c"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_JRB_SUNKEN_SHIP,          /*pos*/  2385,  3589,  3727, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSunkenShipPart,          /*acts*/ ACT_1),
@@ -178,9 +184,3 @@ const LevelScript level_jrb_entry[] = {
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     EXIT(),
 };
-
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/floating_box.inc.c"
-#include "game/behaviors/jrb_ship.inc.c"
-#include "game/behaviors/falling_pillar.inc.c"

@@ -14,6 +14,11 @@
 
 #include "make_const_nonconst.h"
 #include "levels/wdw/header.h"
+#include "game/farcall_helpers.h"
+
+#include "game/behaviors/wdw_water_level.inc.c"
+#include "game/behaviors/arrow_lift.inc.c"
+#include "camera.inc.c"
 
 static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_WDW_SQUARE_FLOATING_PLATFORM,      /*pos*/  3390,    0,   384, /*angle*/ 0, 180, 0, /*behParam*/ 0x00000000, /*beh*/ bhvWdwSquareFloatingPlatform),
@@ -131,7 +136,3 @@ const LevelScript level_wdw_entry[] = {
     EXIT(),
 };
 
-#include "game/farcall_helpers.h"
-
-#include "game/behaviors/wdw_water_level.inc.c"
-#include "game/behaviors/arrow_lift.inc.c"

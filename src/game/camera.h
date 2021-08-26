@@ -792,6 +792,22 @@ extern struct Cutscene sCutsceneExitWaterfall[];
 extern struct Cutscene sCutsceneIntroPeach[];
 extern struct Cutscene sCutsceneEndWaving[];
 extern struct Cutscene sCutsceneEnding[];
+extern struct CameraTrigger sCamCCM[];
+extern struct CameraTrigger sCamCotMC[];
+extern struct CameraTrigger sCamHMC[];
+extern struct CameraTrigger sCamRR[];
+extern struct CameraTrigger sCamTHI[];
+extern struct CameraTrigger sCamSSL[];
+extern struct CameraTrigger sCamSL[];
+extern BAD_RETURN(s32) cutscene_grand_star_fly_start(struct Camera *c);
+extern BAD_RETURN(s32) cutscene_grand_star_fly_move_to_mario(UNUSED struct Camera *c);
+extern BAD_RETURN(s32) cutscene_grand_star_fly_mario_offscreen(UNUSED struct Camera *c);
+extern BAD_RETURN(s32) cutscene_grand_star_fly_app_cvars(struct Camera *c);
+extern struct Cutscene sCutsceneGrandStar[];
+extern struct Cutscene sCutscenePyramidTopExplode[];
+extern struct Cutscene sCutsceneEnterPyramidTop[];
+extern struct Cutscene sCutsceneEnterBowserArena[];
+extern BAD_RETURN(s32) cutscene_shake_explosion(UNUSED struct Camera *c);
 
 extern struct Object *gCutsceneFocus;
 extern struct Object *gSecondCameraFocus;
@@ -902,6 +918,12 @@ extern void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16
 extern void cutscene_reset_spline(void);
 extern void cutscene_intro_peach_play_message_music(void);
 extern BAD_RETURN(s32) cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c);
+extern void set_camera_mode_8_directions(struct Camera *c);
+extern void reset_pan_distance(UNUSED struct Camera *c);
+extern void store_info_cannon(struct Camera *c);
+extern void cutscene_stop_dialog(UNUSED struct Camera *c);
+extern s16 cutscene_common_set_dialog_state(s32 state);
+extern void stop_cutscene_and_retrieve_stored_info(struct Camera *c);
 
 void set_fov_function(u8 func);
 void cutscene_set_fov_shake_preset(u8 preset);
