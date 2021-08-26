@@ -340,7 +340,7 @@ extern s32 D_SH_80315EE8;
 void sound_init_main_pools(s32 sizeForAudioInitPool) {
     sound_alloc_pool_init(&gAudioInitPool, gAudioHeap, sizeForAudioInitPool);
     sound_alloc_pool_init(&gAudioSessionPool, gAudioHeap + sizeForAudioInitPool, gAudioHeapSize - sizeForAudioInitPool);
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     audioPool[0] = sizeForAudioInitPool;
     audioPool[1] = gAudioHeapSize - sizeForAudioInitPool;
     #endif
@@ -356,7 +356,7 @@ void session_pools_init(struct PoolSplit *a) {
     gAudioSessionPool.cur = gAudioSessionPool.start;
     sound_alloc_pool_init(&gNotesAndBuffersPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gSeqAndBankPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantCustom), a->wantCustom);
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     audioPool[2] = a->wantSeq;
     audioPool[3] = a->wantCustom;
     #endif
@@ -366,7 +366,7 @@ void seq_and_bank_pool_init(struct PoolSplit2 *a) {
     gSeqAndBankPool.cur = gSeqAndBankPool.start;
     sound_alloc_pool_init(&gPersistentCommonPool, SOUND_ALLOC_FUNC(&gSeqAndBankPool, a->wantPersistent), a->wantPersistent);
     sound_alloc_pool_init(&gTemporaryCommonPool, SOUND_ALLOC_FUNC(&gSeqAndBankPool, a->wantTemporary), a->wantTemporary);
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     audioPool[4] = a->wantPersistent;
     audioPool[5] = a->wantTemporary;
     #endif
@@ -377,7 +377,7 @@ void persistent_pools_init(struct PoolSplit *a) {
     sound_alloc_pool_init(&gSeqLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gBankLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantBank), a->wantBank);
     sound_alloc_pool_init(&gUnusedLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantUnused), a->wantUnused);
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     audioPool[6] = a->wantSeq;
     audioPool[7] = a->wantBank;
     audioPool[8] = a->wantUnused;
@@ -392,7 +392,7 @@ void temporary_pools_init(struct PoolSplit *a) {
     sound_alloc_pool_init(&gSeqLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gBankLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantBank), a->wantBank);
     sound_alloc_pool_init(&gUnusedLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantUnused), a->wantUnused);
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     audioPool[9] = a->wantSeq;
     audioPool[10] = a->wantBank;
     audioPool[11] = a->wantUnused;
@@ -1275,7 +1275,7 @@ void audio_reset_session(void) {
 
     if (toggleBetterReverb && betterReverbWindowsSize >= 0)
         reverbWindowSize = betterReverbWindowsSize;
-    
+
     if (gReverbDownsampleRate < (1 << (reverbConsole - 1)))
         gReverbDownsampleRate = (1 << (reverbConsole - 1));
     reverbWindowSize /= gReverbDownsampleRate;

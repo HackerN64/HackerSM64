@@ -29,6 +29,7 @@
 #include "course_table.h"
 #include "rumble_init.h"
 #include "puppycam2.h"
+#include "puppyprint.h"
 
 #include "config.h"
 
@@ -563,7 +564,7 @@ void check_instant_warp(void) {
             #ifdef INSTANT_WARP_OFFSET_FIX
                 gMarioObject->header.gfx.pos[0] = gMarioState->pos[0];
                 gMarioObject->header.gfx.pos[1] = gMarioState->pos[1];
-                gMarioObject->header.gfx.pos[2] = gMarioState->pos[2];               
+                gMarioObject->header.gfx.pos[2] = gMarioState->pos[2];
             #endif
                 cameraAngle = gMarioState->area->camera->yaw;
 
@@ -1187,6 +1188,10 @@ s32 update_level(void) {
 
 s32 init_level(void) {
     s32 val4 = 0;
+    #if PUPPYPRINT_DEBUG
+    char textBytes[64];
+    OSTime first = osGetTime();
+    #endif
 
     set_play_mode(PLAY_MODE_NORMAL);
 
@@ -1260,6 +1265,10 @@ s32 init_level(void) {
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE);
     }
 
+    #if PUPPYPRINT_DEBUG
+    sprintf(textBytes, "Level loaded in %dus", (s32)(OS_CYCLES_TO_USEC(osGetTime() - first)));
+    append_puppyprint_log(textBytes);
+    #endif
     return 1;
 }
 

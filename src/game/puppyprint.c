@@ -12,6 +12,10 @@ Inside this display, if you press up on the dpad again, you can switch between p
 If you press dpad down, you can toggle the benchmarking display.
 You can press dpad left or right to change which option, and you can measure game thread or audio thread performance by default.
 There's also a custom option that's left blank. It runs benchmark_custom which can contain anything of your choice.
+You can press dpad right to cycle between collision visuals, from surface collision, hitbox collision, both, or neither.
+dpad left will toggle the logging view, which will display a number of strings you've sent through for debugging purposes, like
+a modern game engine's developer's console.
+
 - Collision marks the time it takes to generate and process collision.
 - Behaviour marks the time it takes for objects to perform their behaviours. This excludes collision.
 - Graph measures the time it takes to process the node graphs, which is all the 3D geometry and rendering.
@@ -42,9 +46,11 @@ There's also a custom option that's left blank. It runs benchmark_custom which c
 
 u8 currEnv[4];
 u8 fDebug = 0;
+
+#if PUPPYPRINT_DEBUG
 s8 benchViewer = 0;
 u8 benchOption = 0;
-
+s8 logViewer = 0;
 //Profiler values
 s8 perfIteration = 0;
 s16 benchmarkLoop = 0;
@@ -301,6 +307,34 @@ void print_which_benchmark(void)
     print_small_text(160,120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL);
 }
 
+char consoleLogTable[LOG_BUFFER_SIZE][255];
+
+void append_puppyprint_log(char str[255])
+{
+    s32 i;
+    for (i = 0; i < LOG_BUFFER_SIZE-1; i++)
+    {
+        memcpy(consoleLogTable[i], consoleLogTable[i+1], 255);
+    }
+        memcpy(consoleLogTable[LOG_BUFFER_SIZE-1], str, 255);
+}
+
+#define LINE_HEIGHT 8 + ((LOG_BUFFER_SIZE-1)*12)
+void print_console_log(void)
+{
+    s32 i;
+    prepare_blank_box();
+    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 96);
+    finish_blank_box();
+    for (i = 0; i < LOG_BUFFER_SIZE; i++)
+    {
+        if (consoleLogTable[i] == NULL)
+            continue;
+        print_small_text(16, (LINE_HEIGHT)-(i*12), consoleLogTable[i], PRINT_TEXT_ALIGN_LEFT, PRINT_ALL);
+    }
+}
+#undef LINE_HEIGHT
+
 extern void print_fps(s32 x, s32 y);
 
 void puppyprint_render_profiler(void)
@@ -317,7 +351,7 @@ void puppyprint_render_profiler(void)
     sprintf(textBytes, "RAM: %06X /%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available()/(f32)mempool)*100));
     print_small_text(160, 224, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL);
 
-    if (!ramViewer && !benchViewer)
+    if (!ramViewer && !benchViewer && !logViewer)
     {
         print_fps(16,40);
         sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)OS_CYCLES_TO_USEC(cpuTime)/333, (s32)OS_CYCLES_TO_USEC(rspTime), (s32)OS_CYCLES_TO_USEC(rspTime)/333, (s32)OS_CYCLES_TO_USEC(rdpTime), (s32)OS_CYCLES_TO_USEC(rdpTime)/333);
@@ -391,6 +425,9 @@ void puppyprint_render_profiler(void)
     if (ramViewer)
         print_ram_overview();
     else
+    if (logViewer)
+        print_console_log();
+    else
     if (benchViewer)
         print_which_benchmark();
 
@@ -457,18 +494,25 @@ void puppyprint_profiler_process(void)
         {
             benchViewer ^= 1;
             ramViewer = 0;
-            collisionViewer = 0;
+            logViewer = 0;
         }
         else
         if (gPlayer1Controller->buttonPressed & U_JPAD)
         {
             ramViewer ^= 1;
             benchViewer = 0;
-            collisionViewer = 0;
+            logViewer = 0;
+        }
+        else
+        if (gPlayer1Controller->buttonPressed & L_JPAD)
+        {
+            logViewer ^= 1;
+            ramViewer = 0;
+            benchViewer = 0;
         }
         #ifdef VISUAL_DEBUG
         else
-        if (!benchViewer && !ramViewer)
+        if (!benchViewer && !ramViewer && !logViewer)
         {
             debug_box_input();
         }
@@ -491,19 +535,18 @@ void puppyprint_profiler_process(void)
         }
         benchmark_custom();
     }
-    #if PUPPYPRINT_DEBUG
     if (gPlayer1Controller->buttonDown & U_JPAD && gPlayer1Controller->buttonPressed & L_TRIG)
     {
         ramViewer = 0;
         benchViewer = 0;
         fDebug ^= 1;
     }
-    #endif
 
 
     if (perfIteration++ == NUM_PERF_ITERATIONS-1)
         perfIteration = 0;
 }
+#endif
 
 void print_set_envcolour(s32 r, s32 g, s32 b, s32 a)
 {

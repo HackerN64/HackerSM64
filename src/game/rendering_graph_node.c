@@ -1089,7 +1089,7 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
  */
 void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) {
     UNUSED s32 unused;
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
     #endif
 
@@ -1132,7 +1132,7 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         }
         main_pool_free(gDisplayListHeap);
     }
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);
     #endif
 }

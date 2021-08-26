@@ -626,7 +626,7 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  */
 void update_objects(UNUSED s32 unused) {
     s64 cycleCounts[30];
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
     #endif
@@ -688,7 +688,7 @@ void update_objects(UNUSED s32 unused) {
     }
 
     gPrevFrameObjectCount = gObjectCounter;
-    #ifdef PUPPYPRINT
+    #if PUPPYPRINT_DEBUG
     profiler_update(behaviourTime, first);
     behaviourTime[perfIteration] -= collisionTime[perfIteration]+colTime;
     #endif
