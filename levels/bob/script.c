@@ -66,7 +66,7 @@ const LevelScript level_bob_entry[] = {
 		OBJECT(MODEL_NONE, 0, 200, 0, 0, 0, 0, 0x000A0000, bhvSpinAirborneWarp),
 		TERRAIN(bob_area_2_collision),
 		MACRO_OBJECTS(bob_area_2_macro_objs),
-		STOP_MUSIC(0),
+		SET_BACKGROUND_MUSIC(0x00, SEQ_LEVEL_UNDERGROUND),
 		TERRAIN_TYPE(TERRAIN_GRASS),
 	END_AREA(),
 
