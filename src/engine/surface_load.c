@@ -828,13 +828,13 @@ void load_object_collision_model(void) {
 #endif
 
     // If the object collision is supposed to be loaded more than the
-    // drawing distance of 4000, extend the drawing range.
+    // drawing distance, extend the drawing range.
     if (gCurrentObject->oCollisionDistance > gCurrentObject->oDrawingDistance) {
         gCurrentObject->oDrawingDistance = gCurrentObject->oCollisionDistance;
     }
 
     // Update if no Time Stop, in range, and in the current room.
-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && marioDist < gCurrentObject->oCollisionDistance
+    if (!(gTimeStopState & TIME_STOP_ACTIVE) && (marioDist < gCurrentObject->oCollisionDistance)
         && !(gCurrentObject->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         collisionData++;
         transform_object_vertices(&collisionData, vertexData);

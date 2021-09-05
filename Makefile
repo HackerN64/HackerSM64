@@ -20,9 +20,6 @@ USE_DEBUG := 0
 
 # Build for the N64 (turn this off for ports)
 TARGET_N64 ?= 1
-# Virtual Console hacks. Enabling this makes your hack (hopefully) compatible with the Wii Virtual Console.
-# One of the thing this does is disable the instant input patch, so do NOT use this for your normal z64 release.
-VC_HACKS ?= 0
 
 # CONSOLE - selects the console to target
 #   bb - Targets the iQue Player (codenamed BB)
@@ -37,10 +34,6 @@ else ifeq ($(CONSOLE),bb)
   INCLUDE_DIRS   += include/ique
   LIBS_DIR       := lib/ique
   DEFINES        += BBPLAYER=1
-endif
-
-ifeq ($(VC_HACKS), 1)
-  DEFINES += VC_HACKS=1
 endif
 
 # COMPILER - selects the C compiler to use

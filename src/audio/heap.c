@@ -8,6 +8,7 @@
 #include "effects.h"
 #include "game/game_init.h"
 #include "game/puppyprint.h"
+#include "game/vc_check.h"
 
 #define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
@@ -1109,11 +1110,11 @@ s32 audio_shut_down_and_reset_step(void) {
  * Waits until a specified number of audio frames have been created
  */
 void wait_for_audio_frames(s32 frames) {
-#ifdef VC_HACKS
     // VC emulator stubs this function because busy loops are not supported
     // Technically we can put infinite loop that _looks_ like -O0 for emu but this is cleaner
-    return;
-#endif
+    if (gIsVC)
+        return;
+
     gAudioFrameCount = 0;
     // Sound thread will update gAudioFrameCount
     while (gAudioFrameCount < frames) {

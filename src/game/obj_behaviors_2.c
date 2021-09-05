@@ -532,16 +532,33 @@ void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRa
 
 s32 obj_resolve_object_collisions(s32 *targetYaw) {
     struct Object *otherObject;
-    f32 dx;
-    f32 dz;
+    f32 dx, dz;
     s16 angle;
-    f32 radius;
-    f32 otherRadius;
-    f32 relativeRadius;
-    f32 newCenterX;
-    f32 newCenterZ;
+    f32 radius, otherRadius, relativeRadius;
 
     if (o->numCollidedObjs != 0) {
+#ifdef FIX_RESOLVE_OBJ_COLLISIONS
+        s32 i;
+        for ((i = 0); (i < o->numCollidedObjs); (i++)) {
+            otherObject = o->collidedObjs[i];
+            if (otherObject == gMarioObject) continue;
+            if (otherObject->oInteractType & INTERACT_MASK_NO_OBJ_COLLISIONS) continue;
+            dx             = (o->oPosX - otherObject->oPosX);
+            dz             = (o->oPosZ - otherObject->oPosZ);
+            radius         = ((          o->hurtboxRadius > 0) ?           o->hurtboxRadius :           o->hitboxRadius);
+            otherRadius    = ((otherObject->hurtboxRadius > 0) ? otherObject->hurtboxRadius : otherObject->hitboxRadius);
+            relativeRadius = (radius + otherRadius);
+            if ((sqr(dx) + sqr(dz)) > sqr(relativeRadius)) continue;
+            angle    = atan2s(dz, dx);
+            o->oPosX = (otherObject->oPosX + (relativeRadius * sins(angle)));
+            o->oPosZ = (otherObject->oPosZ + (relativeRadius * coss(angle)));
+            if ((targetYaw != NULL) && (abs_angle_diff(o->oMoveAngleYaw, angle) < 0x4000)) {
+                *targetYaw = (s16)((angle - o->oMoveAngleYaw) + angle + 0x8000);
+                return TRUE;
+            }
+        }
+#else
+        f32 newCenterX, newCenterZ;
         otherObject = o->collidedObjs[0];
         if (otherObject != gMarioObject) {
             //! If one object moves after collisions are detected and this code
@@ -571,6 +588,7 @@ s32 obj_resolve_object_collisions(s32 *targetYaw) {
                 return TRUE;
             }
         }
+#endif
     }
 
     return FALSE;

@@ -33,6 +33,7 @@
 #include <prevent_bss_reordering.h>
 #include "puppycam2.h"
 #include "debug_box.h"
+#include "vc_check.h"
 
 // First 3 controller slots
 struct Controller gControllers[3];
@@ -85,6 +86,8 @@ u32 gGlobalTimer = 0;
 #ifdef WIDE
 s16 gWidescreen;
 #endif
+u8 *gAreaSkyboxStart[AREA_COUNT];
+u8 *gAreaSkyboxEnd[AREA_COUNT];
 
 // Framebuffer rendering values (max 3)
 u16 sRenderedFramebuffer = 0;
@@ -392,13 +395,9 @@ void render_init(void) {
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-#ifndef VC_HACKS
     if (gIsConsole) { // Read RDP Clock Register, has a value of zero on emulators
-#endif
         sRenderingFrameBuffer++;
-#ifndef VC_HACKS
     }
-#endif
     gGlobalTimer++;
 }
 
@@ -421,6 +420,7 @@ void select_gfx_pool(void) {
  * - Selects which framebuffer will be rendered and displayed to next time.
  */
 void display_and_vsync(void) {
+    gIsVC = IS_VC();
     if (IO_READ(DPC_PIPEBUSY_REG) && gIsConsole != 1)
     {
         gIsConsole = 1;
@@ -440,18 +440,14 @@ void display_and_vsync(void) {
     profiler_log_thread5_time(THREAD5_END);
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
     // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
-#ifndef VC_HACKS
-    if (gIsConsole) { // Read RDP Clock Register, has a value of zero on emulators
-#endif
+    if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }
         if (++sRenderingFrameBuffer == 3) {
             sRenderingFrameBuffer = 0;
         }
-#ifndef VC_HACKS
     }
-#endif
     gGlobalTimer++;
 }
 

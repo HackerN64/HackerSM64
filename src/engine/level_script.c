@@ -304,11 +304,22 @@ static void level_cmd_load_yay0_texture(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
+static void level_cmd_change_area_skybox(int area, u8 *start, u8 *end) {
+    u8 areaCheck = CMD_GET(s16, 2);
+    gAreaSkyboxStart[areaCheck-1] = CMD_GET(void *, 4);
+    gAreaSkyboxEnd[areaCheck-1] = CMD_GET(void *, 8);
+    sCurrentCmd = CMD_NEXT;
+}
+
 static void level_cmd_init_level(void) {
     init_graph_node_start(NULL, (struct GraphNodeStart *) &gObjParentGraphNode);
     clear_objects();
     clear_areas();
     main_pool_push_state();
+    for (u8 clearPointers = 0; clearPointers < AREA_COUNT; clearPointers++) {
+        gAreaSkyboxStart[clearPointers] = 0;
+        gAreaSkyboxEnd[clearPointers] = 0;
+    }
 
     sCurrentCmd = CMD_NEXT;
 }
@@ -783,9 +794,9 @@ static void level_cmd_get_or_set_var(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
-#ifdef PUPPYCAM
 static void level_cmd_puppyvolume(void)
 {
+#ifdef PUPPYCAM
     if ((sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool,sizeof(struct sPuppyVolume))) == NULL)
     {
         sCurrentCmd = CMD_NEXT;
@@ -815,9 +826,10 @@ static void level_cmd_puppyvolume(void)
     sPuppyVolumeStack[gPuppyVolumeCount]->room = CMD_GET(s16, 34);
 
     gPuppyVolumeCount++;
+#endif
     sCurrentCmd = CMD_NEXT;
 }
-#endif
+
 
 static void (*LevelScriptJumpTable[])(void) = {
     /*00*/ level_cmd_load_and_execute,
@@ -881,9 +893,8 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*3A*/ level_cmd_3A,
     /*3B*/ level_cmd_create_whirlpool,
     /*3C*/ level_cmd_get_or_set_var,
-    #ifdef PUPPYCAM
-    /*3E*/ level_cmd_puppyvolume,
-    #endif
+    /*3D*/ level_cmd_puppyvolume,
+    /*3E*/ level_cmd_change_area_skybox,    
 };
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {

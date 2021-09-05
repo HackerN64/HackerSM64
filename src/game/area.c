@@ -228,7 +228,7 @@ void load_area(s32 index) {
     if (gCurrentArea == NULL && gAreaData[index].unk04 != NULL) {
         gCurrentArea = &gAreaData[index];
         gCurrAreaIndex = gCurrentArea->index;
-
+        
         if (gCurrentArea->terrainData != NULL) {
             load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
                               gCurrentArea->macroObjects);
@@ -239,7 +239,7 @@ void load_area(s32 index) {
         }
 
         load_obj_warp_nodes();
-        geo_call_global_function_nodes(&gCurrentArea->unk04->node, GEO_CONTEXT_AREA_LOAD);
+        geo_call_global_function_nodes(&gCurrentArea->unk04->node, GEO_CONTEXT_AREA_LOAD);      
     }
 }
 
@@ -261,6 +261,9 @@ void load_mario_area(void) {
     if (gCurrentArea->index == gMarioSpawnInfo->areaIndex) {
         gCurrentArea->flags |= 0x01;
         spawn_objects_from_info(0, gMarioSpawnInfo);
+    }
+    if (gAreaSkyboxStart[gCurrAreaIndex-1]) {
+        load_segment_decompress(0x0A, gAreaSkyboxStart[gCurrAreaIndex-1], gAreaSkyboxEnd[gCurrAreaIndex-1]);
     }
 }
 
