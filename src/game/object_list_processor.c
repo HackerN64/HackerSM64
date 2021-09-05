@@ -262,6 +262,13 @@ void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *beh
     }
 }
 
+#include "src/engine/math_util.h"
+#include <stdio.h>
+void print_text(s32, s32, char*);
+
+f32 intDist;
+Vec3f intersect;
+
 /**
  * Mario's primary behavior update function.
  */
@@ -270,6 +277,7 @@ void bhv_mario_update(void) {
     s32 i;
 
     particleFlags = execute_mario_action(gCurrentObject);
+
     gCurrentObject->oMarioParticleFlags = particleFlags;
 
     // Mario code updates MarioState's versions of position etc, so we need

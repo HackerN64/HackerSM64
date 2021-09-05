@@ -54,6 +54,14 @@
 
 // -- HackerSM64 specific settings --
 
+// LIGHTING ENGINE SETTINGS
+// The maximum distance in units that a light will travel to in a model (impacts performance)
+#define MAX_POINT_LIGHT_DIST (3000)
+// The max number of point lights you can have in a scene (impacts RAM)
+#define MAX_POINT_LIGHTS 32
+// The max number of point lights that can be affecting a given model (impacts performance). Can't be higher than 6.
+#define MAX_POINT_LIGHTS_ACTIVE 3
+
 // TEST LEVEL
 // Uncomment this define and set a test level in order to boot straight into said level.
 // This allows you to quickly test the level you're working on.
