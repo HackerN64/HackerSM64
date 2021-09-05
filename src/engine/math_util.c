@@ -8,6 +8,7 @@
 #include "trig_tables.inc.c"
 #include "surface_load.h"
 #include "game/puppyprint.h"
+#include "game/rendering_graph_node.h"
 
 #include "config.h"
 
@@ -583,7 +584,7 @@ void mtxf_to_mtx(Mtx *dest, Mat4 src) {
 
 	for( i = 0; i < 4; i++ ) {
 		for( j = 0; j < 3; j++ ) {
-			temp[i][j] = src[i][j] / WORLD_SCALE;
+			temp[i][j] = src[i][j] / gWorldScale;
 		}
 		temp[i][3] = src[i][3];
 	}

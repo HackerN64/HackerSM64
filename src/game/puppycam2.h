@@ -25,6 +25,9 @@
 #define PUPPYCAM_MODE3_ZOOMED_OUT 0x4
 #define PUPPYCAM_MODE3_ENTER_FIRST_PERSON 0x8
 
+#define PUPPYSPLINE_NONE 1 //Will not write to focus at all.
+#define PUPPYSPLINE_FOLLOW 2 //Focus will follow a separate spline, but will mirror the speed and progress of the pos.
+
 #include "include/command_macros_base.h"
 
 #define PUPPYVOLUME(x, y, z, length, height, width, yaw, functionptr, anglesptr, addflags, removeflags, flagpersistance, room, shape) \
@@ -94,6 +97,8 @@ struct gPuppyStruct
     s32 sceneTimer; //The cutscene timer that goes up during a cutscene.
     Vec3s scenePos; //Where the camera is during a cutscene
     Vec3s sceneFocus; //Where the camera looks during a cutscene
+    u16 splineIndex; //Determines which point of the spline it's at.
+    f32 splineProgress; //Determines how far along the index the spline is.
 
     struct gPuppyOptions options;
 
@@ -107,6 +112,14 @@ struct sPuppyAngles
     s16 yaw;
     s16 pitch;
     s16 zoom;
+};
+
+//Structurally, it's exactly the same as CutsceneSplinePoint
+struct sPuppySpline
+{
+    s8 index; //The index of the spline. Ends with -1
+    u8 speed; //The amount of frames it takes to get through this index.
+    Vec3s pos; //The vector pos of the spline index itself.
 };
 
 //A bounding volume for activating puppycamera scripts and angles.
@@ -172,7 +185,8 @@ extern void puppycam_set_save(void);
 extern void puppycam_check_pause_buttons(void);
 extern void puppycam_activate_cutscene(s32 *scene, s32 lockinput);
 extern void puppycam_render_option_text();
-void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacementZ);
+extern void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacementZ);
+extern s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline splineFocus[], s32 mode, s32 index);
 
 #endif
 

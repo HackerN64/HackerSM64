@@ -1,6 +1,8 @@
 # ![](https://i.imgur.com/CeOukzk.gif) HackerSM64 ![](https://i.imgur.com/s0LUbTo.gif)
 **AFTER CLONING THE REPO, CHECK OUT THE `include/config.h` FILE BEFORE ANYTHING ELSE! IT THERE'S A LOT OF STUFF IN THIS REPO THAT CAN BE TOGGLED THERE.**
 
+HackerSM64 now has a discord server! https://discord.gg/brETAakcXr
+
 This repo needs BOTH an US ROM and a JP ROM in order to build. Place baserom.us.z64 in the repo as usual and ALSO place baserom.jp.z64
 
 This repo needs gcc in order to be able to build it. To install it, run `sudo apt install gcc-mips-linux-gnu`
@@ -25,6 +27,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Platform Displacement 2 by Arthurtilly *
 - Water Surface Type patch by thecozies
 - Rounded corners by FramePerfection, merged by Cheezepin
+- Automatically calculate the optimal collision distance for an object based on its vertices, by Kaze *
 
 **Common Hack Changes:**
 - Better extended boundaries by anonymous_moose

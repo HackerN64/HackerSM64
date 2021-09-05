@@ -1259,7 +1259,7 @@ void audio_reset_session(void) {
     gMaxSimultaneousNotes = preset->maxSimultaneousNotes;
     gSamplesPerFrameTarget = ALIGN16(gAiFrequency / 60);
     gReverbDownsampleRate = preset->reverbDownsampleRate;
-#ifdef BETTER_REVERB
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
     if (gIsConsole)
         reverbConsole = betterReverbDownsampleConsole; // Console!
     else
@@ -1476,7 +1476,7 @@ void audio_reset_session(void) {
 
  // This does not have to be reset after being initialized for the first time, which would speed up load times dramatically.
  // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
-#ifdef BETTER_REVERB
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
         if (toggleBetterReverb) {
             for (i = 0; i < NUM_ALLPASS; ++i) {
                 delaysL[i] = delaysBaselineL[i] / gReverbDownsampleRate;

@@ -46,6 +46,7 @@ s16 gMatStackIndex;
 Mat4 gMatStack[32];
 Mtx *gMatStackFixed[32];
 f32 aspect;
+f32 gWorldScale = 1.0f;
 
 /**
  * Animation nodes have state in global variables, so this struct captures
@@ -259,7 +260,12 @@ static void geo_process_perspective(struct GraphNodePerspective *node) {
         aspect = 1.33333f;
         #endif
 
-        guPerspective(mtx, &perspNorm, node->fov, aspect, node->near / WORLD_SCALE, node->far / WORLD_SCALE, 1.0f);
+        if (gCamera)
+            gWorldScale = MAX(((gCamera->pos[0] * gCamera->pos[0]) + (gCamera->pos[1] * gCamera->pos[1]) + (gCamera->pos[2] * gCamera->pos[2]))/67108864, 1.0f);
+        else
+            gWorldScale = 1.0f;
+
+        guPerspective(mtx, &perspNorm, node->fov, aspect, (node->far/300) / gWorldScale, node->far / gWorldScale, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, perspNorm);
 
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);

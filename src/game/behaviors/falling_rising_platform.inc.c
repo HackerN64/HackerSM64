@@ -3,6 +3,9 @@
 void bhv_squishable_platform_loop(void) {
     o->header.gfx.scale[1] = (sins(o->oBitfsPlatformTimer) + 1.0) * 0.3 + 0.4;
     o->oBitfsPlatformTimer += 0x80;
+#ifdef AUTO_COLLISION_DISTANCE
+    o->oFlags &= ~OBJ_FLAG_DONT_CALC_COLL_DIST;
+#endif
 }
 
 void bhv_bitfs_sinking_platform_loop(void) {

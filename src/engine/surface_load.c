@@ -779,6 +779,30 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
     }
 }
 
+#ifdef AUTO_COLLISION_DISTANCE
+// From Kaze
+static void get_optimal_coll_dist(struct Object *o) {
+    register f32 thisVertDist, maxDist = 0.0f;
+    Vec3f v;
+    TerrainData *collisionData = gCurrentObject->collisionData;
+    o->oFlags |= OBJ_FLAG_DONT_CALC_COLL_DIST;
+    collisionData++;
+    register u32 vertsLeft = *(collisionData);
+    collisionData++;
+    // vertices = *data;
+    while (vertsLeft) {
+        v[0] = *(collisionData + 0) * o->header.gfx.scale[0];
+        v[1] = *(collisionData + 1) * o->header.gfx.scale[1];
+        v[2] = *(collisionData + 2) * o->header.gfx.scale[2];
+        thisVertDist = ((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+        if (thisVertDist > maxDist) maxDist = thisVertDist;
+        collisionData += 3;
+        vertsLeft--;
+    }
+    o->oCollisionDistance = (sqrtf(maxDist) + 100.0f);
+}
+#endif
+
 /**
  * Transform an object's vertices, reload them, and render the object.
  */
@@ -790,7 +814,6 @@ void load_object_collision_model(void) {
 
     TerrainData *collisionData = gCurrentObject->collisionData;
     f32 marioDist = gCurrentObject->oDistanceToMario;
-    f32 tangibleDist = gCurrentObject->oCollisionDistance;
 
     // On an object's first frame, the distance is set to 19000.0f.
     // If the distance hasn't been updated, update it now.
@@ -798,14 +821,20 @@ void load_object_collision_model(void) {
         marioDist = dist_between_objects(gCurrentObject, gMarioObject);
     }
 
+#ifdef AUTO_COLLISION_DISTANCE
+    if (!(gCurrentObject->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
+        get_optimal_coll_dist(gCurrentObject);
+    }
+#endif
+
     // If the object collision is supposed to be loaded more than the
     // drawing distance of 4000, extend the drawing range.
-    if (gCurrentObject->oCollisionDistance > 4000.0f) {
+    if (gCurrentObject->oCollisionDistance > gCurrentObject->oDrawingDistance) {
         gCurrentObject->oDrawingDistance = gCurrentObject->oCollisionDistance;
     }
 
     // Update if no Time Stop, in range, and in the current room.
-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && marioDist < tangibleDist
+    if (!(gTimeStopState & TIME_STOP_ACTIVE) && marioDist < gCurrentObject->oCollisionDistance
         && !(gCurrentObject->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         collisionData++;
         transform_object_vertices(&collisionData, vertexData);

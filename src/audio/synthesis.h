@@ -17,7 +17,7 @@
 #define MAX_UPDATES_PER_FRAME 4
 #endif
 
-#ifdef BETTER_REVERB
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
  // Size determined by ((all delaysBaselineL/R values * 8) / (2 ^ Minimum Downsample Factor)) + array pointers.
  // The default value can be increased or decreased in conjunction with the values in delaysBaselineL/R
 #define BETTER_REVERB_SIZE 0xF200
