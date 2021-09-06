@@ -59,10 +59,12 @@ void whomp_patrol(void) {
 
     marioAngle = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
     distWalked = cur_obj_lateral_dist_to_home();
-    if (gCurrLevelNum == LEVEL_BITS)
-        patrolDist = 200.0f;
-    else
-        patrolDist = 700.0f;
+    patrolDist = 700.0f;
+   // REMOVES VANILLA HARDCODE
+   //if (gCurrLevelNum == LEVEL_BITS)
+   //    patrolDist = 200.0f;
+   //else
+   //    patrolDist = 700.0f;
 
     cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
     o->oForwardVel = 3.0f;
