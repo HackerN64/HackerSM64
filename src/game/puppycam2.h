@@ -135,6 +135,7 @@ struct sPuppyVolume
     u8 flagPersistance; //Decides if adding or removing the flags is temporary or permanent.
     u8 shape;
     s16 room;
+    u8 area;
 };
 
 enum gPuppyCamBeh

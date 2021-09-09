@@ -2,6 +2,7 @@
 #include <PR/os_internal_error.h>
 #include <stdarg.h>
 #include <string.h>
+#include "buffers/framebuffers.h"
 
 #include "sm64.h"
 
@@ -106,7 +107,10 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     char *ptr;
     u32 glyph;
     s32 size;
-    char buf[0x100];
+    char buf[0x108];
+    s32 i = 0;
+
+    memset(buf, 0, sizeof(buf));
 
     va_list args;
     va_start(args, fmt);
@@ -181,11 +185,11 @@ void draw_crash_screen(OSThread *thread) {
         cause = 17;
     }
 
+    osWritebackDCacheAll();
+    crash_screen_sleep(2000);
     crash_screen_draw_rect(25, 20, 270, 25);
     crash_screen_print(30, 25, "THREAD:%d  (%s)", thread->id, gCauseDesc[cause]);
     crash_screen_print(30, 35, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
-    osWritebackDCacheAll();
-    crash_screen_sleep(2000);
     crash_screen_draw_rect(25, 45, 270, 185);
     crash_screen_print(30, 50, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0,
                        (u32) tc->v1);
@@ -243,6 +247,8 @@ OSThread *get_crashed_thread(void) {
     return NULL;
 }
 
+extern u16 sRenderedFramebuffer;
+
 void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread;
@@ -252,6 +258,7 @@ void thread2_crash_screen(UNUSED void *arg) {
     do {
         osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
         thread = get_crashed_thread();
+        gCrashScreen.framebuffer = (u16 *) gFrameBuffers[sRenderedFramebuffer];
     } while (thread == NULL);
     draw_crash_screen(thread);
     for (;;) {
@@ -265,7 +272,7 @@ void crash_screen_set_framebuffer(u16 *framebuffer, u16 width, u16 height) {
 }
 
 void crash_screen_init(void) {
-    gCrashScreen.framebuffer = (u16 *) (osMemSize | 0x80000000) - SCREEN_WIDTH * SCREEN_HEIGHT;
+    gCrashScreen.framebuffer = (u16 *) gFrameBuffers[sRenderedFramebuffer];
     gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);

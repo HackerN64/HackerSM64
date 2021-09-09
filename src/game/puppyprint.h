@@ -67,7 +67,7 @@ extern s32 get_text_width(const char *str);
 extern void prepare_blank_box(void);
 extern void finish_blank_box(void);
 extern void render_blank_box(s16 x1, s16 y1, s16 x2, s16 y2, u8 r, u8 g, u8 b, u8 a);
-extern void append_puppyprint_log(char str[255]);
+extern void append_puppyprint_log(const char *str, ...);
 extern char consoleLogTable[LOG_BUFFER_SIZE][255];
 
 #endif

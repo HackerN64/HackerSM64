@@ -30,6 +30,7 @@
 #include "rumble_init.h"
 #include "puppycam2.h"
 #include "puppyprint.h"
+#include "puppylights.h"
 
 #include "config.h"
 
@@ -642,10 +643,12 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 arg3) {
     sWarpDest.areaIdx = destArea;
     sWarpDest.nodeId = destWarpNode;
     sWarpDest.arg = arg3;
-
-    #ifdef PUPPYCAM
+//lol
+#if defined(PUPPYCAM) || defined(PUPPYLIGHTS)
     s32 i = 0;
-    if (sWarpDest.type != WARP_TYPE_SAME_AREA)
+#endif
+#ifdef PUPPYCAM
+    if (sWarpDest.type == WARP_TYPE_CHANGE_LEVEL)
     {
         for (i = 0; i < gPuppyVolumeCount; i++)
         {
@@ -653,7 +656,18 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 arg3) {
         }
         gPuppyVolumeCount = 0;
     }
-    #endif
+#endif
+#ifdef PUPPYLIGHTS
+    if (sWarpDest.type == WARP_TYPE_CHANGE_LEVEL)
+    {
+        for (i = 0; i < gNumLights; i++)
+        {
+            mem_pool_free(gLightsPool, gPuppyLights[i]);
+        }
+        gNumLights = 0;
+        levelAmbient = FALSE;
+    }
+#endif
 }
 
 // From Surface 0xD3 to 0xFC
@@ -987,6 +1001,9 @@ void update_hud_values(void) {
 void basic_update(UNUSED s16 *arg) {
     area_update_objects();
     update_hud_values();
+#ifdef PUPPYLIGHTS
+    delete_lights();
+#endif
 
     if (gCurrentArea != NULL) {
         update_camera(gCurrentArea->camera);
@@ -1014,6 +1031,9 @@ s32 play_mode_normal(void) {
 
     area_update_objects();
     update_hud_values();
+#ifdef PUPPYLIGHTS
+    delete_lights();
+#endif
 
     if (gCurrentArea != NULL) {
         update_camera(gCurrentArea->camera);
@@ -1189,7 +1209,6 @@ s32 update_level(void) {
 s32 init_level(void) {
     s32 val4 = 0;
     #if PUPPYPRINT_DEBUG
-    char textBytes[64];
     OSTime first = osGetTime();
     #endif
 
@@ -1265,10 +1284,13 @@ s32 init_level(void) {
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE);
     }
 
-    #if PUPPYPRINT_DEBUG
-    sprintf(textBytes, "Level loaded in %dus", (s32)(OS_CYCLES_TO_USEC(osGetTime() - first)));
-    append_puppyprint_log(textBytes);
-    #endif
+#ifdef PUPPYLIGHTS
+    puppylights_allocate();
+#endif
+
+#if PUPPYPRINT_DEBUG
+    append_puppyprint_log("Level loaded in %dus", (s32)(OS_CYCLES_TO_USEC(osGetTime() - first)));
+#endif
     return 1;
 }
 

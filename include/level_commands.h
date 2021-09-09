@@ -5,6 +5,7 @@
 
 #include "level_table.h"
 #include "config.h"
+#include "game/puppylights.h"
 
 #define OP_AND   0
 #define OP_NAND  1

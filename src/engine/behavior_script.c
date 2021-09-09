@@ -13,6 +13,7 @@
 #include "game/object_list_processor.h"
 #include "graph_node.h"
 #include "surface_collision.h"
+#include "game/puppylights.h"
 
 // Macros for retrieving arguments from behavior scripts.
 #define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
@@ -981,6 +982,10 @@ void cur_obj_update(void) {
     if (objFlags & OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE) {
         obj_update_gfx_pos_and_angle(gCurrentObject);
     }
+
+#ifdef PUPPYLIGHTS
+    puppylights_object_emit(gCurrentObject);
+#endif
 
     // Handle visibility of object
     if (gCurrentObject->oRoom != -1) {

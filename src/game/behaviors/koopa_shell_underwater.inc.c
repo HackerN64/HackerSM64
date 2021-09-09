@@ -26,13 +26,13 @@ void bhv_koopa_shell_underwater_loop(void) {
             break;
         case HELD_THROWN:
         case HELD_DROPPED:
-            obj_mark_for_deletion(o);
             spawn_mist_particles();
+            obj_mark_for_deletion(o);
             break;
     }
     if (o->oInteractStatus & INT_STATUS_STOP_RIDING) {
-        obj_mark_for_deletion(o);
         spawn_mist_particles();
+        obj_mark_for_deletion(o);
     }
     o->oInteractStatus = 0;
 }

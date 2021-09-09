@@ -24,7 +24,10 @@
 #include "math_util.h"
 #include "surface_collision.h"
 #include "surface_load.h"
+#include "string.h"
 #include "game/puppycam2.h"
+#include "game/puppyprint.h"
+#include "game/puppylights.h"
 
 #include "config.h"
 
@@ -373,7 +376,7 @@ static void level_cmd_free_level_pool(void) {
     alloc_only_pool_resize(sLevelPool, sLevelPool->usedSpace);
     sLevelPool = NULL;
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < AREA_COUNT; i++) {
         if (gAreaData[i].terrainData != NULL) {
             alloc_surface_pools();
             break;
@@ -387,7 +390,7 @@ static void level_cmd_begin_area(void) {
     u8 areaIndex = CMD_GET(u8, 2);
     void *geoLayoutAddr = CMD_GET(void *, 4);
 
-    if (areaIndex < 8) {
+    if (areaIndex < AREA_COUNT) {
         struct GraphNodeRoot *screenArea =
             (struct GraphNodeRoot *) process_geo_layout(sLevelPool, geoLayoutAddr);
         struct GraphNodeCamera *node = (struct GraphNodeCamera *) screenArea->views[0];
@@ -801,6 +804,9 @@ static void level_cmd_puppyvolume(void)
     {
         sCurrentCmd = CMD_NEXT;
         gPuppyError |= PUPPY_ERROR_POOL_FULL;
+        #if PUPPYPRINT_DEBUG
+        append_puppyprint_log("Puppycamera volume allocation failed.");
+        #endif
         return;
     }
 
@@ -824,12 +830,61 @@ static void level_cmd_puppyvolume(void)
 
     sPuppyVolumeStack[gPuppyVolumeCount]->shape = CMD_GET(u8, 33);
     sPuppyVolumeStack[gPuppyVolumeCount]->room = CMD_GET(s16, 34);
+    sPuppyVolumeStack[gPuppyVolumeCount]->area = sCurrAreaIndex;
 
     gPuppyVolumeCount++;
 #endif
     sCurrentCmd = CMD_NEXT;
 }
 
+static void level_cmd_puppylight_environment(void)
+{
+#ifdef PUPPYLIGHTS
+    Lights1 temp = gdSPDefLights1(CMD_GET(u8, 2), CMD_GET(u8, 3), CMD_GET(u8, 4), CMD_GET(u8, 5), CMD_GET(u8, 6), CMD_GET(u8, 7), CMD_GET(u8, 8), CMD_GET(u8, 9), CMD_GET(u8, 10));
+
+    memcpy(&gLevelLight, &temp, sizeof(Lights1));
+    levelAmbient = TRUE;
+#endif
+    sCurrentCmd = CMD_NEXT;
+}
+
+static void level_cmd_puppylight_node(void)
+{
+#ifdef PUPPYLIGHTS
+    if ((gPuppyLights[gNumLights] = mem_pool_alloc(gLightsPool, sizeof(struct PuppyLight))) == NULL)
+    {
+#if PUPPYPRINT_DEBUG
+        append_puppyprint_log("Puppylight allocation failed.");
+#endif
+        sCurrentCmd = CMD_NEXT;
+        return;
+    }
+
+    gPuppyLights[gNumLights]->rgba[0] = CMD_GET(u8, 2);
+    gPuppyLights[gNumLights]->rgba[1] = CMD_GET(u8, 3);
+    gPuppyLights[gNumLights]->rgba[2] = CMD_GET(u8, 4);
+    gPuppyLights[gNumLights]->rgba[3] = CMD_GET(u8, 5);
+
+    gPuppyLights[gNumLights]->pos[0][0] = CMD_GET(s16, 6);
+    gPuppyLights[gNumLights]->pos[0][1] = CMD_GET(s16, 8);
+    gPuppyLights[gNumLights]->pos[0][2] = CMD_GET(s16, 10);
+
+    gPuppyLights[gNumLights]->pos[1][0] = CMD_GET(s16, 12);
+    gPuppyLights[gNumLights]->pos[1][1] = CMD_GET(s16, 14);
+    gPuppyLights[gNumLights]->pos[1][2] = CMD_GET(s16, 16);
+    gPuppyLights[gNumLights]->yaw = CMD_GET(s16, 18);
+
+    gPuppyLights[gNumLights]->epicentre = CMD_GET(u8, 20);
+    gPuppyLights[gNumLights]->flags = CMD_GET(u8, 21);
+    gPuppyLights[gNumLights]->active = TRUE;
+    gPuppyLights[gNumLights]->area = sCurrAreaIndex;
+    gPuppyLights[gNumLights]->room = CMD_GET(s16, 22);
+
+    gNumLights++;
+
+#endif
+    sCurrentCmd = CMD_NEXT;
+}
 
 static void (*LevelScriptJumpTable[])(void) = {
     /*00*/ level_cmd_load_and_execute,
@@ -894,7 +949,9 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*3B*/ level_cmd_create_whirlpool,
     /*3C*/ level_cmd_get_or_set_var,
     /*3D*/ level_cmd_puppyvolume,
-    /*3E*/ level_cmd_change_area_skybox,    
+    /*3E*/ level_cmd_change_area_skybox,
+    /*3F*/ level_cmd_puppylight_environment,
+    /*40*/ level_cmd_puppylight_node,
 };
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {

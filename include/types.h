@@ -147,8 +147,23 @@ struct ObjectNode
     struct ObjectNode *prev;
 };
 
+#ifdef PUPPYLIGHTS
+struct PuppyLight {
+    Vec3t pos[2]; //The location of the light. First index is the absolute position, second index are offsets.
+    s16 yaw; //Used by cubes. Allows epic rotating of the volume.
+    s16 room; //Which room to use. -1 is visible from all rooms.
+    s8 epicentre; //What percentage inside the volume you'll be before maximum light strength is applied. (E.g: 100 will be full strength always, and 0 will be full strength at the centre.)
+    u8 flags; //Some stuff to define how the volume is used. Mostly just shape stuff, but can potentially have other uses.
+    u8 rgba[4]; //Colour. Go on, take even the tiniest guess as to what this entails.
+    u8 area; //Which section of the level this light is stored in.
+    u8 active:1; //Whether the light will actually work. Mostly intended to be used for objects.
+};
+#endif
+
 // NOTE: Since ObjectNode is the first member of Object, it is difficult to determine
 // whether some of these pointers point to ObjectNode or Object.
+
+#define MAX_OBJECT_FIELDS 0x51
 
 struct Object
 {
@@ -163,33 +178,33 @@ struct Object
     union
     {
         // Object fields. See object_fields.h.
-        u32 asU32[0x50];
-        s32 asS32[0x50];
-        s16 asS16[0x50][2];
-        f32 asF32[0x50];
+        u32 asU32[MAX_OBJECT_FIELDS];
+        s32 asS32[MAX_OBJECT_FIELDS];
+        s16 asS16[MAX_OBJECT_FIELDS][2];
+        f32 asF32[MAX_OBJECT_FIELDS];
 #if !IS_64_BIT
-        s16 *asS16P[0x50];
-        s32 *asS32P[0x50];
-        struct Animation **asAnims[0x50];
-        struct Waypoint *asWaypoint[0x50];
-        struct ChainSegment *asChainSegment[0x50];
-        struct Object *asObject[0x50];
-        struct Surface *asSurface[0x50];
-        void *asVoidPtr[0x50];
-        const void *asConstVoidPtr[0x50];
+        s16 *asS16P[MAX_OBJECT_FIELDS];
+        s32 *asS32P[MAX_OBJECT_FIELDS];
+        struct Animation **asAnims[MAX_OBJECT_FIELDS];
+        struct Waypoint *asWaypoint[MAX_OBJECT_FIELDS];
+        struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
+        struct Object *asObject[MAX_OBJECT_FIELDS];
+        struct Surface *asSurface[MAX_OBJECT_FIELDS];
+        void *asVoidPtr[MAX_OBJECT_FIELDS];
+        const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
 #endif
     } rawData;
 #if IS_64_BIT
     union {
-        s16 *asS16P[0x50];
-        s32 *asS32P[0x50];
-        struct Animation **asAnims[0x50];
-        struct Waypoint *asWaypoint[0x50];
-        struct ChainSegment *asChainSegment[0x50];
-        struct Object *asObject[0x50];
-        struct Surface *asSurface[0x50];
-        void *asVoidPtr[0x50];
-        const void *asConstVoidPtr[0x50];
+        s16 *asS16P[MAX_OBJECT_FIELDS];
+        s32 *asS32P[MAX_OBJECT_FIELDS];
+        struct Animation **asAnims[MAX_OBJECT_FIELDS];
+        struct Waypoint *asWaypoint[MAX_OBJECT_FIELDS];
+        struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
+        struct Object *asObject[MAX_OBJECT_FIELDS];
+        struct Surface *asSurface[MAX_OBJECT_FIELDS];
+        void *asVoidPtr[MAX_OBJECT_FIELDS];
+        const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
     } ptrData;
 #endif
     /*0x1C8*/ u32 unused1;
@@ -209,6 +224,9 @@ struct Object
     /*0x218*/ void *collisionData;
     /*0x21C*/ Mat4 transform;
     /*0x25C*/ void *respawnInfo;
+#ifdef PUPPYLIGHTS
+    struct PuppyLight puppylight;
+#endif
 };
 
 struct ObjectHitbox

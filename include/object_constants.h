@@ -47,6 +47,7 @@
 #ifdef AUTO_COLLISION_DISTANCE
 #define OBJ_FLAG_DONT_CALC_COLL_DIST                (1 << 16) // 0x00010000
 #endif
+#define OBJ_FLAG_EMIT_LIGHT                         (1 << 17) // 0x00020000
 #define OBJ_FLAG_HITBOX_WAS_SET                     (1 << 30) // 0x40000000
 
 /* oHeldState */
@@ -283,7 +284,7 @@
     #define BOWSER_SUB_ACT_HIT_MINE_START           0
     #define BOWSER_SUB_ACT_HIT_MINE_FALL            1
     #define BOWSER_SUB_ACT_HIT_MINE_STOP            2
-    
+
     #define BOWSER_SUB_ACT_JUMP_ON_STAGE_IDLE        0
     #define BOWSER_SUB_ACT_JUMP_ON_STAGE_START       1
     #define BOWSER_SUB_ACT_JUMP_ON_STAGE_LAND        2
@@ -299,7 +300,7 @@
     /* oAction */
     #define FISH_SPAWNER_ACT_SPAWN   0
     #define FISH_SPAWNER_ACT_IDLE    1
-    #define FISH_SPAWNER_ACT_RESPAWN 2    
+    #define FISH_SPAWNER_ACT_RESPAWN 2
     /* oBehParams2ndByte */
     #define FISH_SPAWNER_BP_MANY_BLUE 0
     #define FISH_SPAWNER_BP_FEW_BLUE  1
