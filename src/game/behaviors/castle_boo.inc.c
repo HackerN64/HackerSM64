@@ -19,9 +19,11 @@ void bhv_boo_in_castle_loop(void) {
     if (o->oAction == 0) {
         cur_obj_hide();
 
-        /*if (gHudDisplay.stars < 12) {
+#ifndef UNLOCK_ALL
+        if (gHudDisplay.stars < 12) {
             obj_mark_for_deletion(o);
-        }*/
+        }
+#endif
 
         if (gMarioCurrentRoom == 1) {
             o->oAction++;

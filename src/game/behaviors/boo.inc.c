@@ -802,3 +802,52 @@ void bhv_merry_go_round_boo_manager_loop(void) {
 void bhv_animated_texture_loop(void) {
     cur_obj_set_pos_to_home_with_debug();
 }
+
+void bhv_boo_staircase(void) {
+    f32 targetY;
+
+    switch (o->oBehParams2ndByte) {
+        case 1:
+            targetY = 0.0f;
+            break;
+        case 0:
+            targetY = -206.0f;
+            break;
+        case 2:
+            targetY = -413.0f;
+            break;
+    }
+
+    switch(o->oAction) {
+        case 0:
+            o->oPosY = o->oHomeY - 620.0f;
+            o->oAction++;
+            // fallthrough
+        case 1:
+            o->oPosY += 8.0f;
+            cur_obj_play_sound_1(SOUND_ENV_ELEVATOR2);
+
+            if (o->oPosY > targetY) {
+                o->oPosY = targetY;
+                o->oAction++;
+            }
+
+            break;
+        case 2:
+            if (o->oTimer == 0) {
+                cur_obj_play_sound_2(SOUND_GENERAL_UNKNOWN4_LOWPRIO);
+            }
+
+            if (jiggle_bbh_stair(o->oTimer)) {
+                o->oAction++;
+            }
+
+            break;
+        case 3:
+            if (o->oTimer == 0 && o->oBehParams2ndByte == 1) {
+                play_puzzle_jingle();
+            }
+
+            break;
+    }
+}
