@@ -385,20 +385,7 @@ static void usb_findcart()
     
     // Check if we have an EverDrive
     if (buff == ED7_VERSION || buff == ED3_VERSION)
-    {        
-        // Initialize the PI
-        IO_WRITE(PI_STATUS_REG, 3);
-        IO_WRITE(PI_BSD_DOM1_LAT_REG, 0x40);
-        IO_WRITE(PI_BSD_DOM1_PWD_REG, 0x12);
-        IO_WRITE(PI_BSD_DOM1_PGS_REG, 0x07);
-        IO_WRITE(PI_BSD_DOM1_RLS_REG, 0x03);
-        IO_WRITE(PI_BSD_DOM2_LAT_REG, 0x05);
-        IO_WRITE(PI_BSD_DOM2_PWD_REG, 0x0C);
-        IO_WRITE(PI_BSD_DOM2_PGS_REG, 0x0D);
-        IO_WRITE(PI_BSD_DOM2_RLS_REG, 0x02);
-        IO_WRITE(PI_BSD_DOM1_LAT_REG, 0x04);
-        IO_WRITE(PI_BSD_DOM1_PWD_REG, 0x0C);
-        
+    {
         // Set the USB mode
         usb_everdrive_writereg(ED_REG_SYSCFG, 0);
         usb_everdrive_writereg(ED_REG_USBCFG, ED_USBMODE_RDNOP);
@@ -453,7 +440,7 @@ void usb_write(int datatype, const void* data, int size)
     @return The data header, or 0
 ==============================*/
 
-u32 usb_poll()
+unsigned long usb_poll()
 {
     // If no debug cart exists, stop
     if (usb_cart == CART_NONE)
@@ -604,7 +591,7 @@ static s8 usb_64drive_wait()
         #endif
         
         // Took too long, abort
-        if((timeout++) > 1000000)
+        if((timeout++) > 10000)
             return -1;
     }
     while((ret >> 8) & D64_CI_BUSY);
@@ -642,9 +629,10 @@ static void usb_64drive_setwritable(u8 enable)
     Waits for the 64Drive's USB to be idle
 ==============================*/
 
-static void usb_64drive_waitidle()
+static int usb_64drive_waitidle()
 {
     u32 status __attribute__((aligned(8)));
+    u32 timeout = 0;
     do 
     {
         #ifdef LIBDRAGON
@@ -657,8 +645,11 @@ static void usb_64drive_waitidle()
             #endif
         #endif
         status = (status >> 4) & D64_USB_BUSY;
+        if (timeout++ > 128)
+            return 0;
     }
     while(status != D64_USB_IDLE);
+    return 1;
 }
 
 
@@ -724,7 +715,8 @@ static void usb_64drive_write(int datatype, const void* data, int size)
     int read = 0;
     
     // Spin until the write buffer is free and then set the cartridge to write mode
-    usb_64drive_waitidle();
+    if (!usb_64drive_waitidle())
+        return;
     usb_64drive_setwritable(TRUE);
     
     // Write data to SDRAM until we've finished
@@ -749,7 +741,11 @@ static void usb_64drive_write(int datatype, const void* data, int size)
         }
         
         // Spin until the write buffer is free
-        usb_64drive_waitidle();
+        if (!usb_64drive_waitidle())
+        {
+            usb_64drive_setwritable(FALSE);
+            return;
+        }
         
         // Set up DMA transfer between RDRAM and the PI
         #ifdef LIBDRAGON
@@ -1062,7 +1058,8 @@ static void usb_everdrive_writedata(void* buff, u32 pi_address, u32 len)
 
 static void usb_everdrive_writereg(u64 reg, u32 value) 
 {
-    usb_everdrive_writedata(&value, ED_GET_REGADD(reg), sizeof(u32));
+    u32 val __attribute__((aligned(8))) = value;
+    usb_everdrive_writedata(&val, ED_GET_REGADD(reg), sizeof(u32));
 }
 
 
@@ -1073,12 +1070,15 @@ static void usb_everdrive_writereg(u64 reg, u32 value)
 
 static void usb_everdrive_usbbusy() 
 {
+    u32 timeout = 0;
     u32 val __attribute__((aligned(8)));
-    do 
+    do
     {
         usb_everdrive_readreg(ED_REG_USBCFG, &val);
-    } 
-    while ((val & ED_USBSTAT_ACT) != 0);
+        if (timeout++ != 8192)
+            continue;
+        usb_everdrive_writereg(ED_REG_USBCFG, ED_USBMODE_RDNOP);
+    } while ((val & ED_USBSTAT_ACT) != 0);
 }
 
 

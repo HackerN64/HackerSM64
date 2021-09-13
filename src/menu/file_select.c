@@ -116,7 +116,7 @@ s8 sScoreFileCoinScoreMode = 0;
 
 // In EU, if no save file exists, open the language menu so the user can find it.
 
-unsigned char textReturn[][8] = { {TEXT_RETURN}, };
+unsigned char textReturn[] = { TEXT_RETURN };
 
 unsigned char textViewScore[] = { TEXT_CHECK_SCORE };
 
@@ -130,7 +130,7 @@ unsigned char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO }, { TEXT_HEA
 unsigned char textLanguageSelect[][17] = {  { TEXT_LANGUAGE_SELECT }};
 #endif
 
-unsigned char textSoundSelect[][13] = { { TEXT_SOUND_SELECT },};
+unsigned char textSoundSelect[] = { TEXT_SOUND_SELECT };
 
 unsigned char textMarioA[] = { TEXT_FILE_MARIO_A };
 unsigned char textMarioB[] = { TEXT_FILE_MARIO_B };

@@ -18,6 +18,9 @@
 #define PUPPYLIGHT_SHADOW           0x10
 #define PUPPYLIGHT_WET              0x20
 #define PUPPYLIGHT_DELETE           0x40
+#define PUPPYLIGHT_IGNORE_Y         0x80
+
+#define LIGHTFLAG_DIRECTIONAL_OFFSET    0x1
 
 #define PUPPYLIGHT_ENVIRONMENT(ambientR, ambientG, ambientB, diffuseR, diffuseG, diffuseB, diffuseX, diffuseY, diffuseZ) \
     CMD_BBBB(0x3F, 0x0C, ambientR, ambientG), \

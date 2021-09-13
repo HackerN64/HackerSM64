@@ -338,6 +338,10 @@ void thread3_main(UNUSED void *arg) {
     crash_screen_init();
 #endif
 
+#ifdef UNF
+    debug_initialize();
+#endif
+
 #ifdef DEBUG
     osSyncPrintf("Super Mario 64\n");
     osSyncPrintf("Built by: %s\n", __username__);
@@ -357,6 +361,9 @@ void thread3_main(UNUSED void *arg) {
 
     while (TRUE) {
         OSMesg msg;
+#if PUPPYPRINT_DEBUG
+        OSTime first = osGetTime();
+#endif
 
         osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
         switch ((uintptr_t) msg) {
@@ -376,6 +383,9 @@ void thread3_main(UNUSED void *arg) {
                 handle_nmi_request();
                 break;
         }
+#if PUPPYPRINT_DEBUG
+        profiler_update(taskTime, first);
+#endif
     }
 }
 
@@ -484,9 +494,6 @@ void thread1_idle(UNUSED void *arg) {
     osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
     osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
-#ifdef UNF
-    debug_initialize();
-#endif
     create_thread(&gMainThread, 3, thread3_main, NULL, gThread3Stack + 0x2000, 100);
     osStartThread(&gMainThread);
 

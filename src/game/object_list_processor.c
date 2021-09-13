@@ -20,6 +20,7 @@
 #include "profiler.h"
 #include "spawn_object.h"
 #include "puppyprint.h"
+#include "puppylights.h"
 
 
 /**
@@ -386,6 +387,10 @@ s32 unload_deactivated_objects_in_list(struct ObjectNode *objList) {
         obj = obj->next;
 
         if ((gCurrentObject->activeFlags & ACTIVE_FLAG_ACTIVE) != ACTIVE_FLAG_ACTIVE) {
+#ifdef PUPPYLIGHTS
+            if (gCurrentObject->oLightID != 0xFFFF)
+                obj_disable_light(gCurrentObject);
+#endif
             // Prevent object from respawning after exiting and re-entering the
             // area
             if (!(gCurrentObject->oFlags & OBJ_FLAG_PERSISTENT_RESPAWN)) {

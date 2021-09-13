@@ -22,10 +22,6 @@
 #ifdef HVQM
 #include <hvqm/hvqm.h>
 #endif
-#ifdef UNF
-#include "usb/usb.h"
-#include "usb/debug.h"
-#endif
 #ifdef SRAM
 #include "sram.h"
 #endif

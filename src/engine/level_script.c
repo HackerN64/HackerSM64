@@ -307,7 +307,7 @@ static void level_cmd_load_yay0_texture(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_change_area_skybox(int area, u8 *start, u8 *end) {
+static void level_cmd_change_area_skybox(void) {
     u8 areaCheck = CMD_GET(s16, 2);
     gAreaSkyboxStart[areaCheck-1] = CMD_GET(void *, 4);
     gAreaSkyboxEnd[areaCheck-1] = CMD_GET(void *, 8);

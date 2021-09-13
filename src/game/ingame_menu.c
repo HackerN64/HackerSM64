@@ -281,7 +281,7 @@ u8 *alloc_ia4_tex_from_i1(u8 *in, s16 width, s16 height) {
 void render_generic_char(u8 c) {
     void **fontLUT;
     void *packedTexture;
-    void *unpackedTexture;
+    UNUSED void *unpackedTexture;
 
     fontLUT = segmented_to_virtual(main_font_lut);
     packedTexture = segmented_to_virtual(fontLUT[c]);
