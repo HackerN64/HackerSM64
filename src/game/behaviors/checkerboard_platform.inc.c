@@ -1,9 +1,9 @@
 // checkerboard_platform.c.inc
 
 struct CheckerBoardPlatformInitPosition {
-    s32 unk0;
-    Vec3f unk1;
-    f32 unk2;
+    s32 relPosZ;
+    Vec3f scale;
+    f32 radius;
 };
 
 struct CheckerBoardPlatformInitPosition sCheckerBoardPlatformInitPositions[] = { { 145, { 0.7f, 1.5f, 0.7f }, 7.0f },

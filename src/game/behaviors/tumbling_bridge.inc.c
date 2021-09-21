@@ -1,6 +1,6 @@
 // tumbling_bridge.c.inc
 
-struct Struct8032F34C {
+struct TumblingBridgeParams {
     s16 numBridgeSections;
     s16 bridgeRelativeStartingXorZ;
     s16 platformWidth;

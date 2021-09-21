@@ -13,9 +13,9 @@ struct ObjectHitbox sExclamationBoxHitbox = {
 };
 
 struct ExclamationBoxContents {
-    u8 unk0;
+    u8 id;
     u8 unk1;
-    u8 unk2;
+    u8 behParams;
     ModelID model;
     const BehaviorScript *behavior;
 };
