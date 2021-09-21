@@ -79,9 +79,6 @@ UNUSED static s32 sUnusedGameInitValue = 0;
 
 // General timer that runs as the game starts
 u32 gGlobalTimer = 0;
-#ifdef WIDE
-s16 gWidescreen;
-#endif
 u8 *gAreaSkyboxStart[AREA_COUNT];
 u8 *gAreaSkyboxEnd[AREA_COUNT];
 
@@ -128,9 +125,7 @@ void init_rdp(void) {
     gDPSetColorDither(gDisplayListHead++, G_CD_MAGICSQ);
     gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
 
-#ifdef VERSION_SH
     gDPSetAlphaDither(gDisplayListHead++, G_AD_PATTERN);
-#endif
     gDPPipeSync(gDisplayListHead++);
 }
 
@@ -138,6 +133,7 @@ void init_rdp(void) {
  * Sets the initial RSP (Reality Signal Processor) settings.
  */
 void init_rsp(void) {
+
     gSPClearGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG
                         | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD);
 
@@ -156,13 +152,15 @@ void init_rsp(void) {
 /**
  * Initialize the z buffer for the current frame.
  */
-void init_z_buffer(void) {
+void init_z_buffer(s32 resetZB) {
     gDPPipeSync(gDisplayListHead++);
 
     gDPSetDepthSource(gDisplayListHead++, G_ZS_PIXEL);
     gDPSetDepthImage(gDisplayListHead++, gPhysicalZBuffer);
 
     gDPSetColorImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WIDTH, gPhysicalZBuffer);
+    if (!resetZB)
+        return;
     gDPSetFillColor(gDisplayListHead++,
                     GPACK_ZDZ(G_MAXFBZ, 0) << 16 | GPACK_ZDZ(G_MAXFBZ, 0));
 
@@ -276,7 +274,7 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.type = M_GFXTASK;
     gGfxSPTask->task.t.ucode_boot = rspbootTextStart;
     gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
-    gGfxSPTask->task.t.flags = 0;
+    gGfxSPTask->task.t.flags = OS_TASK_LOADABLE | OS_TASK_DP_WAIT;
 #ifdef  L3DEX2_ALONE
     gGfxSPTask->task.t.ucode = gspL3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspL3DEX2_fifoDataStart;
@@ -315,11 +313,11 @@ void create_gfx_task_structure(void) {
 /**
  * Set default RCP (Reality Co-Processor) settings.
  */
-void init_rcp(void) {
+void init_rcp(s32 resetZB) {
     move_segment_table_to_dmem();
     init_rdp();
     init_rsp();
-    init_z_buffer();
+    init_z_buffer(resetZB);
     select_frame_buffer();
 }
 
@@ -384,14 +382,14 @@ void render_init(void) {
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
     gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
-    init_rcp();
+    init_rcp(CLEAR_ZBUFFER);
     clear_frame_buffer(0);
     end_master_display_list();
     exec_display_list(&gGfxPool->spTask);
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    if (gIsConsole) { // Read RDP Clock Register, has a value of zero on emulators
+    if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
         sRenderingFrameBuffer++;
     }
     gGlobalTimer++;
@@ -579,12 +577,13 @@ void run_demo_inputs(void) {
 /**
  * Update the controller struct with available inputs if present.
  */
-void read_controller_inputs(void) {
+void read_controller_inputs(s32 threadID) {
     s32 i;
 
     // If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
-        osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+        if (threadID == 5)
+            osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
         osContGetReadData(&gControllerPads[0]);
 #if ENABLE_RUMBLE
         release_rumble_pak_control();
@@ -736,7 +735,7 @@ void thread5_game_loop(UNUSED void *arg) {
     play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
     set_sound_mode(save_file_get_sound_mode());
 #ifdef WIDE
-    gWidescreen = save_file_get_widescreen_mode();
+    gConfig.widescreen = save_file_get_widescreen_mode();
 #endif
     render_init();
 
@@ -767,7 +766,7 @@ void thread5_game_loop(UNUSED void *arg) {
 
         audio_game_loop_tick();
         select_gfx_pool();
-        read_controller_inputs();
+        read_controller_inputs(5);
         addr = level_script_execute(addr);
         #if PUPPYPRINT_DEBUG == 0 && defined(VISUAL_DEBUG)
         debug_box_input();

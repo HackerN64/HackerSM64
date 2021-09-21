@@ -16,7 +16,7 @@ static struct ObjectHitbox sTreasureChestBottomHitbox = {
 };
 
 void bhv_treasure_chest_top_loop(void) {
-    struct Object *sp34 = o->parentObj->parentObj;
+    struct Object *parent = o->parentObj->parentObj;
 
     switch (o->oAction) {
         case 0:
@@ -26,7 +26,7 @@ void bhv_treasure_chest_top_loop(void) {
 
         case 1:
             if (o->oTimer == 0) {
-                if (sp34->oTreasureChestUnkFC == 0) {
+                if (parent->oTreasureChestUnkFC == 0) {
                     spawn_object_relative(0, 0, -80, 120, o, MODEL_BUBBLE, bhvWaterAirBubble);
                     play_sound(SOUND_GENERAL_CLAM_SHELL1, o->header.gfx.cameraToObject);
                 } else {
@@ -101,11 +101,11 @@ void bhv_treasure_chest_bottom_loop(void) {
     o->oInteractStatus = 0;
 }
 
-void spawn_treasure_chest(s8 sp3B, s32 sp3C, s32 sp40, s32 sp44, s16 sp4A) {
-    struct Object *sp34;
-    sp34 = spawn_object_abs_with_rot(o, 0, MODEL_TREASURE_CHEST_BASE, bhvTreasureChestBottom, sp3C,
-                                     sp40, sp44, 0, sp4A, 0);
-    sp34->oBehParams2ndByte = sp3B;
+void spawn_treasure_chest(s8 param, s32 x, s32 y, s32 z, s16 ry) {
+    struct Object *chestBaseObj;
+    chestBaseObj = spawn_object_abs_with_rot(o, 0, MODEL_TREASURE_CHEST_BASE, bhvTreasureChestBottom, x,
+                                     y, z, 0, ry, 0);
+    chestBaseObj->oBehParams2ndByte = param;
 }
 
 void bhv_treasure_chest_ship_init(void) {
@@ -137,7 +137,7 @@ void bhv_treasure_chest_ship_loop(void) {
                     o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
                 }
 #if ENABLE_RUMBLE
-                reset_rumble_timers_2(2);
+                reset_rumble_timers_vibrate(2);
 #endif
             }
             break;

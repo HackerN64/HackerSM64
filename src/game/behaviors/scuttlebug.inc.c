@@ -14,7 +14,7 @@ struct ObjectHitbox sScuttlebugHitbox = {
 
 void bhv_scuttlebug_loop(void) {
     UNUSED s32 unused;
-    f32 sp18;
+    f32 animSpeed;
     cur_obj_update_floor_and_walls();
     if (o->oSubAction != 0
         && cur_obj_set_hitbox_and_die_if_attacked(&sScuttlebugHitbox, SOUND_OBJ_DYING_ENEMY1,
@@ -90,10 +90,10 @@ void bhv_scuttlebug_loop(void) {
             break;
     }
     if (o->oForwardVel < 10.0f)
-        sp18 = 1.0f;
+        animSpeed = 1.0f;
     else
-        sp18 = 3.0f;
-    cur_obj_init_animation_with_accel_and_sound(0, sp18);
+        animSpeed = 3.0f;
+    cur_obj_init_animation_with_accel_and_sound(0, animSpeed);
     if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND)
         set_obj_anim_with_accel_and_sound(1, 23, SOUND_OBJ2_SCUTTLEBUG_WALK);
     if (o->parentObj != o) {

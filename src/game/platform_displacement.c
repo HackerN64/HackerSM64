@@ -13,10 +13,6 @@
 
 #include "config.h"
 
-u16 D_8032FEC0 = 0;
-
-u32 unused_8032FEC4[4] = { 0 };
-
 struct Object *gMarioPlatform = NULL;
 
 /**
@@ -256,7 +252,6 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
     rotation[2] = platform->oAngleVelRoll;
 
     if (isMario) {
-        D_8032FEC0 = 0;
         get_mario_pos(&x, &y, &z);
     } else {
         x = gCurrentObject->oPosX;

@@ -42,9 +42,9 @@ static Vp sEndCutsceneVp = { { { 640, 480, 511, 0 }, { 640, 480, 511, 0 } } };
 static struct CreditsEntry *sDispCreditsEntry = NULL;
 
 // related to peach gfx?
-static s8 D_8032CBE4 = 0;
-static s8 D_8032CBE8 = 0;
-static s8 D_8032CBEC[7] = { 2, 3, 2, 1, 2, 3, 2 };
+static s8 sPeachManualBlinkTime = 0;
+static s8 sPeachIsBlinking = 0;
+static s8 sPeachBlinkTimes[7] = { 2, 3, 2, 1, 2, 3, 2 };
 
 static u8 sStarsNeededForDialog[] = { 1, 3, 8, 30, 50, 70 };
 
@@ -116,11 +116,11 @@ void print_displaying_credits_entry(void) {
 #endif
 
     if (sDispCreditsEntry != NULL) {
-        currStrPtr = (char **) sDispCreditsEntry->unk0C;
+        currStrPtr = (char **) sDispCreditsEntry->string;
         titleStr = *currStrPtr++;
         numLines = *titleStr++ - '0';
 
-        strY = (sDispCreditsEntry->unk02 & 0x20 ? 28 : 172) + (numLines == 1) * 16;
+        strY = (sDispCreditsEntry->actNum & 0x20 ? 28 : 172) + (numLines == 1) * 16;
 #ifndef VERSION_JP
         lineHeight = 16;
 #endif
@@ -193,24 +193,24 @@ void bhv_end_toad_loop(void) {
 }
 
 // Geo switch case function for controlling Peach's eye state.
-s32 geo_switch_peach_eyes(s32 run, struct GraphNode *node, UNUSED s32 a2) {
+Gfx *geo_switch_peach_eyes(s32 callContext, struct GraphNode *node, UNUSED s32 context) {
     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node;
     s16 timer;
 
-    if (run == TRUE) {
-        if (D_8032CBE4 == 0) {
+    if (callContext == GEO_CONTEXT_RENDER) {
+        if (sPeachManualBlinkTime == 0) {
             timer = (gAreaUpdateCounter + 0x20) >> 1 & 0x1F;
             if (timer < 7) {
-                switchCase->selectedCase = D_8032CBE8 * 4 + D_8032CBEC[timer];
+                switchCase->selectedCase = sPeachIsBlinking * 4 + sPeachBlinkTimes[timer];
             } else {
-                switchCase->selectedCase = D_8032CBE8 * 4 + 1;
+                switchCase->selectedCase = sPeachIsBlinking * 4 + 1;
             }
         } else {
-            switchCase->selectedCase = D_8032CBE8 * 4 + D_8032CBE4 - 1;
+            switchCase->selectedCase = sPeachIsBlinking * 4 + sPeachManualBlinkTime - 1;
         }
     }
 
-    return 0;
+    return NULL;
 }
 
 // unused
@@ -534,6 +534,7 @@ s32 act_reading_sign(struct MarioState *m) {
 }
 
 s32 act_debug_free_move(struct MarioState *m) {
+    struct WallCollisionData wallData;
     struct Surface *surf;
     f32 floorHeight;
     Vec3f pos;
@@ -561,7 +562,7 @@ s32 act_debug_free_move(struct MarioState *m) {
         pos[2] += 32.0f * speed * coss(m->intendedYaw);
     }
 
-    resolve_and_return_wall_collisions(pos, 60.0f, 50.0f);
+    resolve_and_return_wall_collisions(pos, 60.0f, 50.0f, &wallData);
 
     floorHeight = find_floor(pos[0], pos[1], pos[2], &surf);
     if (surf != NULL) {
@@ -1314,7 +1315,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
                 play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
             }
 
-            m->flags &= ~MARIO_UNKNOWN_08;
+            m->flags &= ~MARIO_JUMPING;
             perform_air_step(m, 0);
             if (m->vel[1] <= 0) {
                 m->actionState = 2;
@@ -1326,7 +1327,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
         case 3:
             m->faceAngle[1] = atan2s(cageDZ, cageDX);
             mario_set_forward_vel(m, forwardVel);
-            m->flags &= ~MARIO_UNKNOWN_08;
+            m->flags &= ~MARIO_JUMPING;
             if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
                 level_trigger_warp(m, WARP_OP_UNKNOWN_02);
 #if ENABLE_RUMBLE
@@ -1378,7 +1379,7 @@ s32 act_bbh_enter_jump(struct MarioState *m) {
         m->faceAngle[1] = atan2s(cageDZ, cageDX);
         mario_set_forward_vel(m, cageDist / 20.0f);
 
-        m->flags &= ~MARIO_UNKNOWN_08;
+        m->flags &= ~MARIO_JUMPING;
         m->actionState = 1;
     }
 
@@ -1400,7 +1401,7 @@ s32 act_teleport_fade_out(struct MarioState *m) {
 #if ENABLE_RUMBLE
     if (m->actionTimer == 0) {
         queue_rumble_data(30, 70);
-        func_sh_8024C89C(2);
+        queue_rumble_decay(2);
     }
 #endif
 
@@ -1426,7 +1427,7 @@ s32 act_teleport_fade_in(struct MarioState *m) {
 #if ENABLE_RUMBLE
     if (m->actionTimer == 0) {
         queue_rumble_data(30, 70);
-        func_sh_8024C89C(2);
+        queue_rumble_decay(2);
     }
 #endif
 
@@ -1982,18 +1983,16 @@ void generate_yellow_sparkles(s16 x, s16 y, s16 z, f32 radius) {
 // (animation related?)
 static f32 end_obj_set_visual_pos(struct Object *o) {
     struct Surface *surf;
-    Vec3s sp24;
-    f32 sp20;
-    f32 sp1C;
-    f32 sp18;
+    Vec3s translation;
+    f32 x, y, z;
 
-    find_mario_anim_flags_and_translation(o, o->header.gfx.angle[1], sp24);
+    find_mario_anim_flags_and_translation(o, o->header.gfx.angle[1], translation);
 
-    sp20 = o->header.gfx.pos[0] + sp24[0];
-    sp1C = o->header.gfx.pos[1] + 10.0f;
-    sp18 = o->header.gfx.pos[2] + sp24[2];
+    x = o->header.gfx.pos[0] + translation[0];
+    y = o->header.gfx.pos[1] + 10.0f;
+    z = o->header.gfx.pos[2] + translation[2];
 
-    return find_floor(sp20, sp1C, sp18, &surf);
+    return find_floor(x, y, z, &surf);
 }
 
 // make Mario fall and soften wing cap gravity
@@ -2089,7 +2088,7 @@ static void end_peach_cutscene_spawn_peach(struct MarioState *m) {
         sEndRightToadObj->oOpacity = 255;
         sEndLeftToadObj->oOpacity = 255;
 
-        D_8032CBE4 = 4;
+        sPeachManualBlinkTime = 4;
         sEndPeachAnimation = 4;
 
         sEndToadAnims[0] = 4;
@@ -2199,7 +2198,7 @@ static void end_peach_cutscene_dialog_1(struct MarioState *m) {
 #else
         case 81:
 #endif
-            D_8032CBE4 = 3;
+            sPeachManualBlinkTime = 3;
             break;
 
 #ifdef VERSION_SH
@@ -2207,7 +2206,7 @@ static void end_peach_cutscene_dialog_1(struct MarioState *m) {
 #else
         case 145:
 #endif
-            D_8032CBE4 = 2;
+            sPeachManualBlinkTime = 2;
             break;
 
 #ifdef VERSION_SH
@@ -2215,8 +2214,8 @@ static void end_peach_cutscene_dialog_1(struct MarioState *m) {
 #else
         case 228:
 #endif
-            D_8032CBE4 = 1;
-            D_8032CBE8 = 1;
+            sPeachManualBlinkTime = 1;
+            sPeachIsBlinking = 1;
             break;
 
 #ifdef VERSION_SH
@@ -2236,8 +2235,8 @@ static void end_peach_cutscene_dialog_1(struct MarioState *m) {
 #else
         case 275:
 #endif
-            D_8032CBE4 = 0;
-            D_8032CBE8 = 0;
+            sPeachManualBlinkTime = 0;
+            sPeachIsBlinking = 0;
             break;
 
 #ifdef VERSION_SH
@@ -2296,7 +2295,7 @@ static void end_peach_cutscene_dialog_2(struct MarioState *m) {
 #else        
         case 45:
 #endif
-            D_8032CBE8 = 1;
+            sPeachIsBlinking = 1;
             break;
 
 #ifdef VERSION_SH
@@ -2345,15 +2344,15 @@ static void end_peach_cutscene_kiss_from_peach(struct MarioState *m) {
 
     switch (m->actionTimer) {
         case 8:
-            D_8032CBE8 = 0;
+            sPeachIsBlinking = 0;
             break;
 
         case 10:
-            D_8032CBE4 = 3;
+            sPeachManualBlinkTime = 3;
             break;
 
         case 50:
-            D_8032CBE4 = 4;
+            sPeachManualBlinkTime = 4;
             break;
 
         case 75:
@@ -2365,11 +2364,11 @@ static void end_peach_cutscene_kiss_from_peach(struct MarioState *m) {
             break;
 
         case 100:
-            D_8032CBE4 = 3;
+            sPeachManualBlinkTime = 3;
             break;
 
         case 136:
-            D_8032CBE4 = 0;
+            sPeachManualBlinkTime = 0;
             break;
 
         case 140:
@@ -2397,19 +2396,19 @@ static void end_peach_cutscene_star_dance(struct MarioState *m) {
 
     switch (m->actionTimer) {
         case 70:
-            D_8032CBE4 = 1;
+            sPeachManualBlinkTime = 1;
             break;
 
         case 86:
-            D_8032CBE4 = 2;
+            sPeachManualBlinkTime = 2;
             break;
 
         case 90:
-            D_8032CBE4 = 3;
+            sPeachManualBlinkTime = 3;
             break;
 
         case 120:
-            D_8032CBE4 = 0;
+            sPeachManualBlinkTime = 0;
             break;
 
         case 140:
@@ -2441,7 +2440,7 @@ static void end_peach_cutscene_dialog_3(struct MarioState *m) {
             sEndPeachAnimation = 0;
             sEndToadAnims[0] = 0;
             sEndToadAnims[1] = 2;
-            D_8032CBE8 = 1;
+            sPeachIsBlinking = 1;
             set_cutscene_message(160, 227, 5, 30);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_BAKE_A_CAKE, sEndPeachObj->header.gfx.cameraToObject);
@@ -2612,9 +2611,9 @@ static s32 act_credits_cutscene(struct MarioState *m) {
         sEndCutsceneVp.vp.vscale[0] = 640 - width;
         sEndCutsceneVp.vp.vscale[1] = 480 - height;
         sEndCutsceneVp.vp.vtrans[0] =
-            (gCurrCreditsEntry->unk02 & 0x10 ? width : -width) * 56 / 100 + 640;
+            (gCurrCreditsEntry->actNum & 0x10 ? width : -width) * 56 / 100 + 640;
         sEndCutsceneVp.vp.vtrans[1] =
-            (gCurrCreditsEntry->unk02 & 0x20 ? height : -height) * 66 / 100 + 480;
+            (gCurrCreditsEntry->actNum & 0x20 ? height : -height) * 66 / 100 + 480;
 
         override_viewport_and_clip(&sEndCutsceneVp, 0, 0, 0, 0);
     }
@@ -2631,7 +2630,7 @@ static s32 act_credits_cutscene(struct MarioState *m) {
         level_trigger_warp(m, WARP_OP_CREDITS_NEXT);
     }
 
-    m->marioObj->header.gfx.angle[1] += (gCurrCreditsEntry->unk02 & 0xC0) << 8;
+    m->marioObj->header.gfx.angle[1] += (gCurrCreditsEntry->actNum & 0xC0) << 8;
 
     return FALSE;
 }

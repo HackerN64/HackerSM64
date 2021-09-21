@@ -1,11 +1,11 @@
 // animated_floor_switch.inc.c
 
-struct Struct80331A54 {
-    const void *unk00;
-    s16 unk04;
+struct FloorSwitchTriggeredAnimationFrame {
+    const void *collisionDataPtr;
+    ModelID model;
 };
 
-struct Struct80331A54 D_80331A54[][5] = {
+struct FloorSwitchTriggeredAnimationFrame sFloorSwitchTriggeredAnimationFrames[][5] = {
     {
         { bits_seg7_collision_0701B734, MODEL_BITS_STAIRCASE_FRAME4 },
         { bits_seg7_collision_0701B59C, MODEL_BITS_STAIRCASE_FRAME3 },
@@ -29,7 +29,7 @@ struct Struct80331A54 D_80331A54[][5] = {
     },
 };
 
-s16 D_80331ACC[] = { 250, 200, 200 };
+s16 sAnimatesOnFloorSwitchPressTimers[] = { 250, 200, 200 };
 
 void bhv_animates_on_floor_switch_press_init(void) {
     o->parentObj = cur_obj_nearest_object_with_behavior(bhvFloorSwitchAnimatesObject);
@@ -42,7 +42,7 @@ void bhv_animates_on_floor_switch_press_loop(void) {
         }
 
         if (o->oFloorSwitchPressAnimationUnkFC != 0) {
-            o->oFloorSwitchPressAnimationUnkF4 = D_80331ACC[o->oBehParams2ndByte];
+            o->oFloorSwitchPressAnimationUnkF4 = sAnimatesOnFloorSwitchPressTimers[o->oBehParams2ndByte];
         } else {
             o->oFloorSwitchPressAnimationUnkF4 = 0;
         }
@@ -71,7 +71,7 @@ void bhv_animates_on_floor_switch_press_loop(void) {
     }
 
     o->collisionData = segmented_to_virtual(
-        D_80331A54[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationUnkF8 / 2].unk00);
+        sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationUnkF8 / 2].collisionDataPtr);
 
-    cur_obj_set_model(D_80331A54[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationUnkF8 / 2].unk04);
+    cur_obj_set_model(sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationUnkF8 / 2].model);
 }

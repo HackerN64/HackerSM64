@@ -13,7 +13,7 @@ static struct ObjectHitbox sRollingSphereHitbox = {
 };
 
 void bhv_snowmans_bottom_init(void) {
-    struct Object *sp34;
+    struct Object *headObj;
 
     o->oHomeX = o->oPosX;
     o->oHomeY = o->oPosY;
@@ -27,9 +27,9 @@ void bhv_snowmans_bottom_init(void) {
     o->oForwardVel = 0;
     o->oSnowmansBottomUnkF4 = 0.4f;
 
-    sp34 = cur_obj_nearest_object_with_behavior(bhvSnowmansHead);
-    if (sp34 != NULL) {
-        o->parentObj = sp34;
+    headObj = cur_obj_nearest_object_with_behavior(bhvSnowmansHead);
+    if (headObj != NULL) {
+        o->parentObj = headObj;
     }
     spawn_object_abs_with_rot(o, 0, MODEL_NONE, bhvSnowmansBodyCheckpoint, -402, 461, -2898, 0, 0, 0);
 }
@@ -51,23 +51,18 @@ void adjust_rolling_face_pitch(f32 f12) {
 }
 
 void snowmans_bottom_act_1(void) {
-    s32 sp20;
-    UNUSED s16 sp1E;
-#ifdef AVOID_UB
-    sp20 = 0;
-#endif
+    s32 pathResult = 0;
 
     o->oPathedStartWaypoint = segmented_to_virtual(&ccm_seg7_trajectory_snowman);
     object_step_without_floor_orient();
-    sp20 = cur_obj_follow_path(sp20);
+    pathResult = cur_obj_follow_path(pathResult);
     o->oSnowmansBottomUnkF8 = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomUnkF8, 0x400);
 
     if (o->oForwardVel > 70.0)
         o->oForwardVel = 70.0f;
 
-    if (sp20 == -1) {
-        sp1E = (u16) o->oAngleToMario - (u16) o->oMoveAngleYaw;
+    if (pathResult == -1) {
         if (obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x2000) == TRUE
             && o->oSnowmansBottomUnk1AC == 1) {
             o->oSnowmansBottomUnkF8 = o->oAngleToMario;
@@ -118,14 +113,11 @@ void snowmans_bottom_act_3(void) {
 }
 
 void bhv_snowmans_bottom_loop(void) {
-    s16 sp1E;
-
     switch (o->oAction) {
         case 0:
             if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 400) == 1
                 && set_mario_npc_dialog(MARIO_DIALOG_LOOK_FRONT) == MARIO_DIALOG_STATUS_SPEAK) {
-                sp1E = cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_110);
-                if (sp1E) {
+                if (cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_110)) {
                     o->oForwardVel = 10.0f;
                     o->oAction = 1;
                     set_mario_npc_dialog(MARIO_DIALOG_STOP);
@@ -161,11 +153,11 @@ void bhv_snowmans_bottom_loop(void) {
 }
 
 void bhv_snowmans_head_init(void) {
-    u8 sp37;
-    s8 sp36;
+    u8 starFlags;
+    s8 behParams;
 
-    sp37 = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
-    sp36 = (o->oBehParams >> 24) & 0xFF;
+    starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
+    behParams = (o->oBehParams >> 24) & 0xFF;
 
     cur_obj_scale(0.7f);
 
@@ -173,7 +165,7 @@ void bhv_snowmans_head_init(void) {
     o->oFriction = 0.999f;
     o->oBuoyancy = 2.0f;
 
-    if ((sp37 & (1 << sp36)) && gCurrActNum != sp36 + 1) {
+    if ((starFlags & (1 << behParams)) && gCurrActNum != behParams + 1) {
         spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole, -4230, -1344, 1813,
                                   0, 0, 0);
         o->oPosX = -4230.0f;
@@ -184,7 +176,6 @@ void bhv_snowmans_head_init(void) {
 }
 
 void bhv_snowmans_head_loop(void) {
-    UNUSED s16 sp1E;
     s16 collisionFlags;
 
     switch (o->oAction) {

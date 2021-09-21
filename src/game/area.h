@@ -41,7 +41,7 @@ struct SpawnInfo
     /*0x0D*/ s8 activeAreaIndex;
     /*0x10*/ u32 behaviorArg;
     /*0x14*/ void *behaviorScript;
-    /*0x18*/ struct GraphNode *unk18;
+    /*0x18*/ struct GraphNode *modelNode;
     /*0x1C*/ struct SpawnInfo *next;
 };
 
@@ -65,7 +65,7 @@ struct Area
     /*0x00*/ s8 index;
     /*0x01*/ s8 flags; // Only has 1 flag: 0x01 = Is this the active area?
     /*0x02*/ u16 terrainType; // default terrain of the level (set from level script cmd 0x31)
-    /*0x04*/ struct GraphNodeRoot *unk04; // geometry layout data
+    /*0x04*/ struct GraphNodeRoot *graphNode; // geometry layout data
     /*0x08*/ s16 *terrainData; // collision data (set from level script cmd 0x2E)
     /*0x0C*/ s8 *surfaceRooms; // (set from level script cmd 0x2F)
     /*0x10*/ s16 *macroObjects; // Macro Objects Ptr (set from level script cmd 0x39)

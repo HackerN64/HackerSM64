@@ -125,9 +125,9 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     vec3f_set(debugPos[1], light->pos[1][0], light->pos[1][1], light->pos[1][2]);
     debug_box_color(0x08FF00FF);
     if (light->flags & PUPPYLIGHT_SHAPE_CYLINDER)
-        debug_box_rot(debugPos[0], debugPos[1], light->yaw, DEBUG_SHAPE_CYLINDER);
+        debug_box_rot(debugPos[0], debugPos[1], light->yaw, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_DEFAULT);
     else
-        debug_box_rot(debugPos[0], debugPos[1], light->yaw, DEBUG_SHAPE_BOX);
+        debug_box_rot(debugPos[0], debugPos[1], light->yaw, DEBUG_SHAPE_BOX | DEBUG_UCODE_DEFAULT);
     #endif
     //Check if the object is inside the box, after correcting it for rotation.
     if (-light->pos[1][0] < lightPos[0] && lightPos[0] < light->pos[1][0] &&

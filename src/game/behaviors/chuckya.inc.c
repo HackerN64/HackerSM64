@@ -12,7 +12,6 @@ struct UnusedChuckyaData sUnusedChuckyaData[] = { { 2, 0.f,  1.f },
                                                   { 2, 20.f, 1.f },
                                                   { 8, 10.f, 1.f }};
 
-
 s32 unknown_chuckya_function(s32 sp20, f32 sp24, f32 sp28, s32 sp2C) {
     s32 sp1C = 0;
     if (o->oChuckyaUnkF8 != 4) {
@@ -39,16 +38,11 @@ s32 unknown_chuckya_function(s32 sp20, f32 sp24, f32 sp28, s32 sp2C) {
 }
 
 void chuckya_act_0(void) {
-    s32 sp3C;
-#ifdef AVOID_UB
-    sp3C = 0;
-#endif
-    UNUSED u8 pad[16];
-    s32 sp28;
+    s32 initialSubAction;
     if (o->oTimer == 0)
         o->oChuckyaUnkFC = 0;
     o->oAngleToMario = obj_angle_to_object(o, gMarioObject);
-    switch (sp28 = o->oSubAction) {
+    switch (initialSubAction = o->oSubAction) {
         case 0:
             o->oForwardVel = 0;
             if (cur_obj_lateral_dist_from_mario_to_home() < 2000.0f) {
@@ -83,14 +77,13 @@ void chuckya_act_0(void) {
                 o->oSubAction = 0;
             break;
     }
-    if (o->oSubAction != sp28)
+    if (o->oSubAction != initialSubAction)
         o->oChuckyaUnkFC = 0;
     else
         o->oChuckyaUnkFC++;
     cur_obj_init_animation_with_sound(4);
     if (o->oForwardVel > 1.0f)
         cur_obj_play_sound_1(SOUND_AIR_CHUCKYA_MOVE);
-    print_debug_bottom_up("fg %d", sp3C);
     print_debug_bottom_up("sp %d", o->oForwardVel);
 }
 
@@ -159,8 +152,6 @@ void chuckya_move(void) {
 }
 
 void bhv_chuckya_loop(void) {
-    f32 sp2C = 20.0f;
-    f32 sp28 = 50.0f;
     cur_obj_scale(2.0f);
     o->oInteractionSubtype |= INT_SUBTYPE_GRABS_MARIO;
     switch (o->oHeldState) {
@@ -172,7 +163,7 @@ void bhv_chuckya_loop(void) {
             break;
         case HELD_THROWN:
         case HELD_DROPPED:
-            cur_obj_get_thrown_or_placed(sp2C, sp28, 2);
+            cur_obj_get_thrown_or_placed(20.0f, 50.0f, 2);
             break;
     }
     o->oInteractStatus = 0;

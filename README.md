@@ -27,7 +27,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Increased maximum pole length (The game will read bparam1 and bparam2 together as a single value, so you can have a very long pole) *
 - Platform Displacement 2 by Arthurtilly *
 - Water Surface Type patch by thecozies
-- Rounded corners by FramePerfection, merged by Cheezepin
+- Better Wall Collision With Rounded Corners by FramePerfection, merged by Cheezepin & Arceveti
 - Automatically calculate the optimal collision distance for an object based on its vertices, by Kaze *
 
 **Common Hack Changes:**
@@ -43,6 +43,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Tighter hanging controls (mario will face the direction of the analog stick directly while hanging from a ceiling) *
 - reonucam3: custom camera by me. This is included as a .patch file in the enhancements folder, you need to apply it if you want this camera.
   This video shows a rundown of the features: https://youtu.be/TQNkznX9Z3k
+- Ability to disable Mario getting suck in snow or sand
 
 **Hacker QOL:**
 - Global, non-level based, star IDs (off by default) *
@@ -54,6 +55,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Apply_patch.sh improved
 - Removed the ifdef hell in `file_select.c` and `ingame_menu.c`
 - Added Blake's custom function for object model stuff: `obj_set_model` and `obj_has_model`
+- Added function to get the model ID from an object: `obj_get_model_id` (by Arceveti)
 - The "far" variable is now u16, allowing you to increase the farclip (the max distance at which geometry is rendered). However, when increasing the farclip, make sure to increase the nearclip by the same ratio, or rendering will break on console and LLE plugins. 
 - Many general use defines for object struct members, meant for use in custom object behaviors. Check `object_fields.h` for more info on this. (By MrComit)
 - Included `actors/group0.c` in `behavior_data.c`
@@ -84,6 +86,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Widescreen (16:9) support toggleable by pressing `L` in the pause menu. *
 - S2DEX engine by someone2639! To use it, compile with `make TEXT_ENGINE=s2dex_text_engine` or just set `TEXT_ENGINE` to `s2dex_text_engine` in the makefile.
 - ia8 coins (64x64), the vanilla coin texture is upgraded to accomodate. *
+- Mario's silhouette is shown when behind most surfaces (By Frame#5375, Axollyon, AloXado320, Wiseguy, Arceveti) *
 - Skybox size modifier. You can have 2x, 3x and 4x size skyboxes (you can select the skybox size in `config.h`.) Please note that this might affect console performance, especially 4x mode. 2x or 3x mode is recommended if aiming for console. By CowQuack *
 - You can set the black border size to different values for console and emulator. It's set to 0 by default for both. *
 - This repo supports much better implementation of reverb over vanilla's fake echo reverb. Great for caves or eerie levels, as well as just a better audio experience in general. See `audio/synthesis.c` for more configuration info. (By ArcticJaguar725) *

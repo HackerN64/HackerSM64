@@ -1,7 +1,7 @@
 // water_bomb_cannon.inc.c
 
 void bhv_bubble_cannon_barrel_loop(void) {
-    struct Object *val04;
+    struct Object *waterBombObj;
 
     if (o->parentObj->oAction == 2) {
         obj_mark_for_deletion(o);
@@ -22,10 +22,10 @@ void bhv_bubble_cannon_barrel_loop(void) {
                 if (o->oForwardVel == 0.0f) {
                     o->oForwardVel = 35.0f;
 
-                    val04 = spawn_object(o, MODEL_WATER_BOMB, bhvWaterBomb);
-                    if (val04 != NULL) {
-                        val04->oForwardVel = -100.0f;
-                        val04->header.gfx.scale[1] = 1.7f;
+                    waterBombObj = spawn_object(o, MODEL_WATER_BOMB, bhvWaterBomb);
+                    if (waterBombObj != NULL) {
+                        waterBombObj->oForwardVel = -100.0f;
+                        waterBombObj->header.gfx.scale[1] = 1.7f;
                     }
 
                     set_camera_shake_from_point(SHAKE_POS_MEDIUM, o->oPosX, o->oPosY, o->oPosZ);

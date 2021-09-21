@@ -18,7 +18,7 @@
 #endif
 
 #if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
- // Size determined by ((all delaysBaselineL/R values * 8) / (2 ^ Minimum Downsample Factor)) + array pointers.
+ // Size determined by ((all delaysBaselineL/R values * 8) / (2 ^ Minimum Downsample Factor)) + array pointers (0x80).
  // The default value can be increased or decreased in conjunction with the values in delaysBaselineL/R
 #define BETTER_REVERB_SIZE 0xF200
 
@@ -34,10 +34,6 @@ extern u32 reverbFilterCountEmulator;
 extern u8 monoReverbConsole;
 extern u8 monoReverbEmulator;
 extern s32 betterReverbWindowsSize;
-extern s32 gReverbRevIndex;
-extern s32 gReverbGainIndex;
-extern s32 gReverbWetSigna;
-// extern s32 gReverbDrySignal;
 
 extern const s32 delaysBaselineL[NUM_ALLPASS];
 extern const s32 delaysBaselineR[NUM_ALLPASS];

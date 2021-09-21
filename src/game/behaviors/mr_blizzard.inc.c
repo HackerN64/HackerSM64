@@ -11,10 +11,7 @@ struct ObjectHitbox sMrBlizzardHitbox = {
     /* hurtboxHeight:     */ 170,
 };
 
-// Mr. Blizzard particle spawner.
-void mr_blizzard_spawn_white_particles(s8 count, s8 offsetY, s8 forwardVelBase, s8 velYBase,
-                                       s8 sizeBase) {
-    static struct SpawnParticlesInfo D_80331A00 = {
+static struct SpawnParticlesInfo sMrBlizzardParticlesInfo = {
         /* behParam:        */ 0,
         /* count:           */ 6,
         /* model:           */ MODEL_WHITE_PARTICLE,
@@ -29,12 +26,14 @@ void mr_blizzard_spawn_white_particles(s8 count, s8 offsetY, s8 forwardVelBase, 
         /* sizeRange:       */ 5.0f,
     };
 
-    D_80331A00.count = count;
-    D_80331A00.offsetY = offsetY;
-    D_80331A00.forwardVelBase = forwardVelBase;
-    D_80331A00.velYBase = velYBase;
-    D_80331A00.sizeBase = sizeBase;
-    cur_obj_spawn_particles(&D_80331A00);
+// Mr. Blizzard particle spawner.
+void mr_blizzard_spawn_white_particles(s8 count, s8 offsetY, s8 forwardVelBase, s8 velYBase, s8 sizeBase) {
+    sMrBlizzardParticlesInfo.count = count;
+    sMrBlizzardParticlesInfo.offsetY = offsetY;
+    sMrBlizzardParticlesInfo.forwardVelBase = forwardVelBase;
+    sMrBlizzardParticlesInfo.velYBase = velYBase;
+    sMrBlizzardParticlesInfo.sizeBase = sizeBase;
+    cur_obj_spawn_particles(&sMrBlizzardParticlesInfo);
 }
 
 /**

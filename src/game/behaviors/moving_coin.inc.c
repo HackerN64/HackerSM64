@@ -1,7 +1,5 @@
 // coin.c.inc
 
-// sp18 = collisionFlagsPtr
-
 static struct ObjectHitbox sMovingYellowCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,
     /* downOffset:        */ 0,

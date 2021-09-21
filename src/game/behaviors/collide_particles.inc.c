@@ -7,12 +7,12 @@ static s16 sTinyStarMovementParams[] = { 0xE000, 0,      0,      0,      0x2000,
                                          0x1666, 0x1666, 0x1666, 0xE99A, 0xE99A, 0x1666, 0xE99A };
 
 void bhv_punch_tiny_triangle_loop(void) {
-    s16 sp1E;
+    s16 yaw;
     if (o->oTimer == 0) {
-        sp1E = o->oMoveAngleYaw;
+        yaw = o->oMoveAngleYaw;
         o->oCollisionParticleUnkF4 = 1.28f;
         cur_obj_set_pos_relative(gMarioObject, 0.0f, 60.0f, 100.0f);
-        o->oMoveAngleYaw = sp1E;
+        o->oMoveAngleYaw = yaw;
     }
     cur_obj_move_using_fvel_and_gravity();
     o->oAnimState = 5;
@@ -35,12 +35,12 @@ void bhv_punch_tiny_triangle_init(void) {
 }
 
 void bhv_wall_tiny_star_particle_loop(void) {
-    s16 sp1E;
+    s16 yaw;
     if (o->oTimer == 0) {
-        sp1E = o->oMoveAngleYaw;
+        yaw = o->oMoveAngleYaw;
         o->oCollisionParticleUnkF4 = 0.28f;
         cur_obj_set_pos_relative(gMarioObject, 0.0f, 30.0f, 110.0f);
-        o->oMoveAngleYaw = sp1E;
+        o->oMoveAngleYaw = yaw;
     }
     cur_obj_move_using_fvel_and_gravity();
     o->oAnimState = 4;
@@ -74,11 +74,11 @@ void bhv_pound_tiny_star_particle_loop(void) {
 }
 
 void bhv_pound_tiny_star_particle_init(void) {
-    s32 sp24;
-    s32 sp20 = 8;
+    s32 i;
+    s32 amt = 8;
     struct Object *particle;
-    for (sp24 = 0; sp24 < sp20; sp24++) {
+    for (i = 0; i < amt; i++) {
         particle = spawn_object(o, MODEL_CARTOON_STAR, bhvPoundTinyStarParticle);
-        particle->oMoveAngleYaw = (sp24 * 65536) / sp20;
+        particle->oMoveAngleYaw = (i * 65536) / amt;
     }
 }

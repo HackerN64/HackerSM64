@@ -1,20 +1,20 @@
 // tox_box.c.inc
 
-s8 D_8032F8F0[] = { 4, 1, 4, 1, 6, 1, 6, 1, 5, 1, 5, 1, 6, 1, 6, 1, 5, 1, 2, 4, 1, 4, 1, 4, 1, 2,
-                    5, 1, 5, 1, 7, 1, 7, 1, 4, 1, 4, 1, 7, 1, 7, 1, 5, 1, 5, 1, 5, 1, 2, 4, 1, -1 };
-s8 D_8032F924[] = { 4, 1, 4, 1, 7, 1, 7, 1, 7, 1, 2, 6, 1, 6, 1, 6, 1, 5,
-                    1, 5, 1, 6, 1, 5, 1, 5, 1, 2, 4, 1, 4, 1, 7, 1, -1 };
-s8 D_8032F948[] = { 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 2, 5, 1, 5, 1, 5, 1, 5,
-                    1, 5, 1, 7, 1, 2, 6, 1, 6, 1, 5, 1, 2, 4, 1, 7, 1, -1 };
-s8 *D_8032F96C[] = { D_8032F8F0, D_8032F924, D_8032F948 };
+s8 sToxBoxDirectionPattern1[] = { 4, 1, 4, 1, 6, 1, 6, 1, 5, 1, 5, 1, 6, 1, 6, 1, 5, 1, 2, 4, 1, 4, 1, 4, 1, 2,
+                                  5, 1, 5, 1, 7, 1, 7, 1, 4, 1, 4, 1, 7, 1, 7, 1, 5, 1, 5, 1, 5, 1, 2, 4, 1, -1 };
+s8 sToxBoxDirectionPattern2[] = { 4, 1, 4, 1, 7, 1, 7, 1, 7, 1, 2, 6, 1, 6, 1, 6, 1, 5,
+                                  1, 5, 1, 6, 1, 5, 1, 5, 1, 2, 4, 1, 4, 1, 7, 1, -1 };
+s8 sToxBoxDirectionPattern3[] = { 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 2, 5, 1, 5, 1, 5, 1, 5,
+                                  1, 5, 1, 7, 1, 2, 6, 1, 6, 1, 5, 1, 2, 4, 1, 7, 1, -1 };
+s8 *sToxBoxDirectionPatterns[] = { sToxBoxDirectionPattern1, sToxBoxDirectionPattern2, sToxBoxDirectionPattern3 };
 
 void tox_box_shake_screen(void) {
-    if (o->oDistanceToMario < 3000.0f)
+    if (o->oDistanceToMario < 3000.0f) {
         cur_obj_shake_screen(SHAKE_POS_SMALL);
+    }
 }
 
-void tox_box_move(f32 forwardVel, f32 a1, s16 deltaPitch, s16 deltaRoll)
-{
+void tox_box_move(f32 forwardVel, f32 a1, s16 deltaPitch, s16 deltaRoll) {
     o->oPosY = 99.41124 * sins((f32)(o->oTimer + 1) / 8 * 0x8000) + o->oHomeY + 3.0f;
     o->oForwardVel = forwardVel;
     o->oUpVel = a1;
@@ -66,8 +66,8 @@ void tox_box_act_3(void) {
 }
 
 void tox_box_act_0(void) {
-    s8 *sp1C = D_8032F96C[o->oBehParams2ndByte];
-    o->oAction = cur_obj_set_direction_table(sp1C);
+    s8 *pattern = sToxBoxDirectionPatterns[o->oBehParams2ndByte];
+    o->oAction = cur_obj_set_direction_table(pattern);
 }
 
 void (*sToxBoxActions[])(void) = { tox_box_act_0, tox_box_act_1, tox_box_act_2, tox_box_act_3,

@@ -397,7 +397,7 @@ static void level_cmd_begin_area(void) {
 
         sCurrAreaIndex = areaIndex;
         screenArea->areaIndex = areaIndex;
-        gAreas[areaIndex].unk04 = screenArea;
+        gAreas[areaIndex].graphNode = screenArea;
 
         if (node != NULL) {
             gAreas[areaIndex].camera = (struct Camera *) node->config.camera;
@@ -468,7 +468,7 @@ static void level_cmd_init_mario(void) {
     gMarioSpawnInfo->areaIndex = 0;
     gMarioSpawnInfo->behaviorArg = CMD_GET(u32, 4);
     gMarioSpawnInfo->behaviorScript = CMD_GET(void *, 8);
-    gMarioSpawnInfo->unk18 = gLoadedGraphNodes[CMD_GET(ModelID, 0x2)];
+    gMarioSpawnInfo->modelNode = gLoadedGraphNodes[CMD_GET(ModelID, 0x2)];
     gMarioSpawnInfo->next = NULL;
 
     sCurrentCmd = CMD_NEXT;
@@ -496,7 +496,7 @@ static void level_cmd_place_object(void) {
 
         spawnInfo->behaviorArg = CMD_GET(u32, 16);
         spawnInfo->behaviorScript = CMD_GET(void *, 20);
-        spawnInfo->unk18 = gLoadedGraphNodes[model];
+        spawnInfo->modelNode = gLoadedGraphNodes[model];
         spawnInfo->next = gAreas[sCurrAreaIndex].objectSpawnInfos;
 
         gAreas[sCurrAreaIndex].objectSpawnInfos = spawnInfo;
@@ -963,7 +963,7 @@ struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
     }
 
     profiler_log_thread5_time(LEVEL_SCRIPT_EXECUTE);
-    init_rcp();
+    init_rcp(CLEAR_ZBUFFER);
     render_game();
     end_master_display_list();
     alloc_display_list(0);

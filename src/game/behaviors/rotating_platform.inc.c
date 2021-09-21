@@ -31,12 +31,12 @@ void bhv_wf_rotating_wooden_platform_loop(void) {
 }
 
 void bhv_rotating_platform_loop(void) {
-    s8 sp1F = o->oBehParams >> 24;
+    s8 param = o->oBehParams >> 24;
     if (o->oTimer == 0) {
         obj_set_collision_data(o, sWFRotatingPlatformData[o->oBehParams2ndByte].collisionData);
         o->oCollisionDistance = sWFRotatingPlatformData[o->oBehParams2ndByte].collisionDistance;
         cur_obj_scale(sWFRotatingPlatformData[o->oBehParams2ndByte].scale * 0.01f);
     }
-    o->oAngleVelYaw = sp1F << 4;
+    o->oAngleVelYaw = param << 4;
     o->oFaceAngleYaw += o->oAngleVelYaw;
 }

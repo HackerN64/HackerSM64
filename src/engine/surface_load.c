@@ -130,10 +130,6 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
     } else {
         listIndex = SPATIAL_PARTITION_WALLS;
         sortDir = 0; // insertion order
-
-        if (surface->normal.x < -0.707 || surface->normal.x > 0.707) {
-            surface->flags |= SURFACE_FLAG_X_PROJECTION;
-        }
     }
 
     //! (Surface Cucking) Surfaces are sorted by the height of their first

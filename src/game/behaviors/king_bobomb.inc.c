@@ -1,7 +1,5 @@
 // king_bobomb.c.inc
 
-// Copy of geo_update_projectile_pos_from_parent
-
 void king_bobomb_act_0(void) {
 #ifndef VERSION_JP
     o->oForwardVel = 0.0f;
@@ -279,9 +277,6 @@ void king_bobomb_move(void) {
 }
 
 void bhv_king_bobomb_loop(void) {
-    f32 sp34 = 20.0f;
-    f32 sp30 = 50.0f;
-    UNUSED u8 pad[8];
     o->oInteractionSubtype |= INT_SUBTYPE_GRABS_MARIO;
     switch (o->oHeldState) {
         case HELD_FREE:
@@ -292,7 +287,7 @@ void bhv_king_bobomb_loop(void) {
             break;
         case HELD_THROWN:
         case HELD_DROPPED:
-            cur_obj_get_thrown_or_placed(sp34, sp30, 4);
+            cur_obj_get_thrown_or_placed(20.0f, 50.0f, 4);
             cur_obj_become_intangible();
             o->oPosY += 20.0f;
             break;

@@ -20,9 +20,7 @@ void grand_star_zero_velocity(void) {
 }
 
 void bhv_grand_star_loop(void) {
-    UNUSED s32 unused;
-    Vec3f sp28;
-    sp28[0] = sp28[1] = sp28[2] = 0.0f;
+    Vec3f dest = { 0.0f, 0.0f, 0.0f };
     if (o->oAction == 0) {
         if (o->oTimer == 0) {
             obj_set_angle(o, 0, 0, 0);
@@ -36,7 +34,7 @@ void bhv_grand_star_loop(void) {
         if (o->oTimer == 0) {
             cur_obj_play_sound_2(SOUND_GENERAL_GRAND_STAR);
             cutscene_object(CUTSCENE_STAR_SPAWN, o);
-            o->oGrandStarUnk108 = arc_to_goal_pos(sp28, &o->oPosX, 80.0f, -2.0f);
+            o->oGrandStarUnk108 = arc_to_goal_pos(dest, &o->oPosX, 80.0f, -2.0f);
         }
         cur_obj_move_using_fvel_and_gravity();
         if (o->oSubAction == 0) {

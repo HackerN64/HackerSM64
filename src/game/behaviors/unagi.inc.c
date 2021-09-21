@@ -140,13 +140,13 @@ void unagi_act_3(void) {
 }
 
 void bhv_unagi_loop(void) {
-    s32 val04;
+    s32 i;
 
     if (o->oUnagiUnk1B2 == 0) {
         o->oUnagiUnk1AC = 99999.0f;
         if (o->oDistanceToMario < 3000.0f) {
-            for (val04 = -4; val04 < 4; val04++) {
-                spawn_object_relative(val04, 0, 0, 0, o, MODEL_NONE, bhvUnagiSubobject);
+            for (i = -4; i < 4; i++) {
+                spawn_object_relative(i, 0, 0, 0, o, MODEL_NONE, bhvUnagiSubobject);
             }
             o->oUnagiUnk1B2 = 1;
         }
@@ -174,19 +174,19 @@ void bhv_unagi_loop(void) {
 }
 
 void bhv_unagi_subobject_loop(void) {
-    f32 val04;
+    f32 offset;
 
     if (o->parentObj->oUnagiUnk1B2 == 0) {
         obj_mark_for_deletion(o);
     } else {
-        val04 = 300.0f * o->oBehParams2ndByte;
+        offset = 300.0f * o->oBehParams2ndByte;
 
-        o->oPosY = o->parentObj->oPosY - val04 * sins(o->parentObj->oFaceAnglePitch) * 1.13f;
+        o->oPosY = o->parentObj->oPosY - offset * sins(o->parentObj->oFaceAnglePitch) * 1.13f;
 
-        val04 = coss(o->parentObj->oFaceAnglePitch / 2) * val04;
+        offset = coss(o->parentObj->oFaceAnglePitch / 2) * offset;
 
-        o->oPosX = o->parentObj->oPosX + val04 * sins(o->parentObj->oFaceAngleYaw);
-        o->oPosZ = o->parentObj->oPosZ + val04 * coss(o->parentObj->oFaceAngleYaw);
+        o->oPosX = o->parentObj->oPosX + offset * sins(o->parentObj->oFaceAngleYaw);
+        o->oPosZ = o->parentObj->oPosZ + offset * coss(o->parentObj->oFaceAngleYaw);
 
         if (o->oBehParams2ndByte == -4) {
             if (o->parentObj->oAnimState != 0 && o->oDistanceToMario < 150.0f) {

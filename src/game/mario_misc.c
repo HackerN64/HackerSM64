@@ -198,18 +198,15 @@ static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
  * Sets the correct blend mode and color for mirror Mario.
  */
 Gfx *geo_mirror_mario_set_alpha(s32 callContext, struct GraphNode *node, UNUSED Mat4 *c) {
-    UNUSED u8 unused1[4];
     Gfx *gfx = NULL;
     struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
     struct MarioBodyState *bodyState = &gBodyStates[asGenerated->parameter];
     s16 alpha;
-    UNUSED u8 unused2[4];
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        alpha = (bodyState->modelState & 0x100) ? (bodyState->modelState & 0xFF) : 255;
+        alpha = (bodyState->modelState & MODEL_STATE_ALPHA) ? (bodyState->modelState & 0xFF) : 0xFF;
         #ifdef PUPPYCAM
-        if (alpha > gPuppyCam.opacity)
-        {
+        if (alpha > gPuppyCam.opacity) {
             alpha = gPuppyCam.opacity;
             bodyState->modelState |= MODEL_STATE_NOISE_ALPHA;
         }

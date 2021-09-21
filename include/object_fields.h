@@ -579,11 +579,11 @@
 #define /*0x110*/ oHootMarioReleaseTime OBJECT_FIELD_S32(0x22)
 
 /* Horizontal Movement */
-#define /*0x0F4*/ oHorizontalMovementUnkF4  OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oHorizontalMovementUnkF8  OBJECT_FIELD_S32(0x1C)
-#define /*0x100*/ oHorizontalMovementUnk100 OBJECT_FIELD_F32(0x1E)
-#define /*0x104*/ oHorizontalMovementUnk104 OBJECT_FIELD_S32(0x1F)
-#define /*0x108*/ oHorizontalMovementUnk108 OBJECT_FIELD_F32(0x20)
+#define /*0x0F4*/ oLllOctMeshWaveTimer  OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oLllOctMeshActionOffset  OBJECT_FIELD_S32(0x1C)
+#define /*0x100*/ oLllOctMeshWaveOffset1 OBJECT_FIELD_F32(0x1E)
+#define /*0x104*/ oLllOctMeshStandTimer OBJECT_FIELD_S32(0x1F)
+#define /*0x108*/ oLllOctMeshWaveOffset2 OBJECT_FIELD_F32(0x20)
 
 /* Kickable Board */
 #define /*0x0F4*/ oKickableBoardF4 OBJECT_FIELD_S32(0x1B)
@@ -924,10 +924,6 @@
 /* Hidden Star */
 // Secrets/Red Coins
 #define /*0x0F4*/ oHiddenStarTriggerCounter OBJECT_FIELD_S32(0x1B)
-
-// Overall very difficult to determine usage, mostly stubbed code.
-/* Sparkle Spawn Star */
-#define /*0x1B0*/ oSparkleSpawnUnk1B0 OBJECT_FIELD_S32(0x4A)
 
 /* Sealed Door Star */
 #define /*0x108*/ oUnlockDoorStarState  OBJECT_FIELD_U32(0x20)

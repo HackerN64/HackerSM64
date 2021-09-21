@@ -53,7 +53,7 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvGoomba, MODEL_GOOMBA, 0},
     {bhvHomingAmp, MODEL_AMP, 0},
     {bhvCirclingAmp, MODEL_AMP, 0},
-    {bhvCarrySomething1, MODEL_UNKNOWN_7D, 0}, // unused
+    {bhvYellowCoin, MODEL_UNKNOWN_7D, 0}, // unused
     {bhvBetaTrampolineTop, MODEL_TRAMPOLINE, 0}, // unused
     {bhvFreeBowlingBall, MODEL_BOWLING_BALL, 0}, // unused
     {bhvSnufit, MODEL_SNUFIT, 0},

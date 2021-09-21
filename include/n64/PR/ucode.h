@@ -226,14 +226,26 @@ extern u64 gspF3DZEX2_PosLight_fifoTextStart[],
            gspF3DZEX2_PosLight_fifoTextEnd[];
 extern u64 gspF3DZEX2_PosLight_fifoDataStart[],
            gspF3DZEX2_PosLight_fifoDataEnd[];
+extern u64 gspF3DZEX2_PosLight_xbusTextStart[],
+           gspF3DZEX2_PosLight_xbusTextEnd[];
+extern u64 gspF3DZEX2_PosLight_xbusDataStart[],
+           gspF3DZEX2_PosLight_xbusDataEnd[];
 extern u64 gspF3DZEX2_NoN_PosLight_fifoTextStart[],
            gspF3DZEX2_NoN_PosLight_fifoTextEnd[];
 extern u64 gspF3DZEX2_NoN_PosLight_fifoDataStart[],
            gspF3DZEX2_NoN_PosLight_fifoDataEnd[];
+extern u64 gspF3DZEX2_NoN_PosLight_xbusTextStart[],
+           gspF3DZEX2_NoN_PosLight_xbusTextEnd[];
+extern u64 gspF3DZEX2_NoN_PosLight_xbusDataStart[],
+           gspF3DZEX2_NoN_PosLight_xbusDataEnd[];
 extern u64 gspL3DZEX2_PosLight_fifoTextStart[],
            gspL3DZEX2_PosLight_fifoTextEnd[];
 extern u64 gspL3DZEX2_PosLight_fifoDataStart[],
            gspL3DZEX2_PosLight_fifoDataEnd[];
+extern u64 gspL3DZEX2_PosLight_xbusTextStart[],
+           gspL3DZEX2_PosLight_xbusTextEnd[];
+extern u64 gspL3DZEX2_PosLight_xbusDataStart[],
+           gspL3DZEX2_PosLight_xbusDataEnd[];
 
 /**************************************************************************
  *

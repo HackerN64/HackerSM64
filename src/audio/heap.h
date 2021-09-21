@@ -129,7 +129,7 @@ void *get_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 id);
 s32 audio_shut_down_and_reset_step(void);
 void audio_reset_session(void);
 #else
-void audio_reset_session(struct AudioSessionSettings *preset);
+void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId);
 #endif
 void discard_bank(s32 bankId);
 

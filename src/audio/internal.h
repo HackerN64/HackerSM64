@@ -84,11 +84,20 @@
 #endif
 #endif
 
+#include "game/puppyprint.h"
+
 #ifdef VERSION_EU
+/*#if PUPPYPRINT_DEBUG
+#define eu_stubbed_printf_0(msg) append_puppyprint_log(msg)
+#define eu_stubbed_printf_1(msg, a) append_puppyprint_log(msg, a)
+#define eu_stubbed_printf_2(msg, a, b) append_puppyprint_log(msg, a, b)
+#define eu_stubbed_printf_3(msg, a, b, c) append_puppyprint_log(msg, a, b, c)
+#else*/
 #define eu_stubbed_printf_0(msg) stubbed_printf(msg)
 #define eu_stubbed_printf_1(msg, a) stubbed_printf(msg, a)
 #define eu_stubbed_printf_2(msg, a, b) stubbed_printf(msg, a, b)
 #define eu_stubbed_printf_3(msg, a, b, c) stubbed_printf(msg, a, b, c)
+//#endif
 #else
 #define eu_stubbed_printf_0(msg)
 #define eu_stubbed_printf_1(msg, a)
@@ -749,6 +758,12 @@ struct ReverbSettingsEU
     u16 gain;
 };
 #else
+struct ReverbSettingsUS
+{
+    u8 downsampleRate;
+    u16 windowSize;
+    u16 gain;
+};
 struct ReverbSettingsEU
 {
     u8 downsampleRate; // always 1

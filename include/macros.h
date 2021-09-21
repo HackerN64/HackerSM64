@@ -69,4 +69,8 @@
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
 #endif
 
+#define MODE_NTSC 0
+#define MODE_MPAL 1
+#define MODE_PAL 2
+
 #endif // MACROS_H

@@ -40,31 +40,71 @@
 #endif
 
 // Layers
-#define LAYER_FORCE             0
-#define LAYER_OPAQUE            1
-#define LAYER_OPAQUE_DECAL      2
-#define LAYER_OPAQUE_INTER      3
-#define LAYER_ALPHA             4
-#define LAYER_TRANSPARENT       5
-#define LAYER_TRANSPARENT_DECAL 6
-#define LAYER_TRANSPARENT_INTER 7
+#if SILHOUETTE
+#define LAYER_FORCE                         0x0 //  is zbuffered
+#define LAYER_OPAQUE                        0x1 //  is zbuffered
+#define LAYER_OPAQUE_INTER                  0x2 //  is zbuffered
+#define LAYER_OPAQUE_DECAL                  0x3 //  is zbuffered
+#define LAYER_ALPHA                         0x4 //  is zbuffered
+#define LAYER_ALPHA_DECAL                   0x5 //  is zbuffered
+#define LAYER_SILHOUETTE_OPAQUE             0x6 //  is zbuffered
+#define LAYER_SILHOUETTE_ALPHA              0x7 //  is zbuffered
+#define LAYER_OCCLUDE_SILHOUETTE_OPAQUE     0x8 //  is zbuffered
+#define LAYER_OCCLUDE_SILHOUETTE_ALPHA      0x9 //  is zbuffered
+#define LAYER_TRANSPARENT_DECAL             0xA // not zbuffered
+#define LAYER_TRANSPARENT                   0xB // not zbuffered
+#define LAYER_TRANSPARENT_INTER             0xC // not zbuffered
 
-#define INPUT_NONZERO_ANALOG         0x0001
-#define INPUT_A_PRESSED              0x0002
-#define INPUT_OFF_FLOOR              0x0004
-#define INPUT_ABOVE_SLIDE            0x0008
-#define INPUT_FIRST_PERSON           0x0010
-#define INPUT_UNKNOWN_5              0x0020
-#define INPUT_SQUISHED               0x0040
-#define INPUT_A_DOWN                 0x0080
-#define INPUT_IN_POISON_GAS          0x0100
-#define INPUT_IN_WATER               0x0200
-#define INPUT_STOMPED                0x0400
-#define INPUT_INTERACT_OBJ_GRABBABLE 0x0800
-#define INPUT_UNKNOWN_12             0x1000
-#define INPUT_B_PRESSED              0x2000
-#define INPUT_Z_DOWN                 0x4000
-#define INPUT_Z_PRESSED              0x8000
+#define LAYER_ZB_LAST                       LAYER_OCCLUDE_SILHOUETTE_ALPHA
+
+#define LAYER_SILHOUETTE_FIRST              LAYER_SILHOUETTE_OPAQUE
+#define LAYER_LAST_BEFORE_SILHOUETTE        (LAYER_SILHOUETTE_FIRST - 1)
+#define LAYER_SILHOUETTE_LAST               LAYER_SILHOUETTE_ALPHA
+#define LAYER_OCCLUDE_SILHOUETTE_FIRST      LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+#define LAYER_OCCLUDE_SILHOUETTE_LAST       LAYER_OCCLUDE_SILHOUETTE_ALPHA
+
+#define LAYER_OPAQUE_ORIG LAYER_OPAQUE
+#define LAYER_ALPHA_ORIG  LAYER_ALPHA
+
+#else
+#define LAYER_FORCE                         0x0 //  is zbuffered
+#define LAYER_OPAQUE                        0x1 //  is zbuffered
+#define LAYER_OPAQUE_DECAL                  0x2 //  is zbuffered
+#define LAYER_OPAQUE_INTER                  0x3 //  is zbuffered
+#define LAYER_ALPHA                         0x4 //  is zbuffered
+#define LAYER_TRANSPARENT                   0x5 // not zbuffered
+#define LAYER_TRANSPARENT_DECAL             0x6 // not zbuffered
+#define LAYER_TRANSPARENT_INTER             0x7 // not zbuffered
+
+#define LAYER_ZB_LAST                       LAYER_ALPHA
+
+#define LAYER_ALPHA_DECAL                   0x4 //  is zbuffered
+#define LAYER_SILHOUETTE_OPAQUE             0x1 //  is zbuffered
+#define LAYER_SILHOUETTE_ALPHA              0x4 //  is zbuffered
+#define LAYER_OCCLUDE_SILHOUETTE_OPAQUE     0x1 //  is zbuffered
+#define LAYER_OCCLUDE_SILHOUETTE_ALPHA      0x4 //  is zbuffered
+
+#endif
+
+#define LAYER_FIRST_NON_ZB                  (LAYER_ZB_LAST + 1)
+#define LAYER_LAST_ALL                      LAYER_TRANSPARENT_INTER
+
+#define INPUT_NONZERO_ANALOG         /* 0x0001 */ (1 <<  0)
+#define INPUT_A_PRESSED              /* 0x0002 */ (1 <<  1)
+#define INPUT_OFF_FLOOR              /* 0x0004 */ (1 <<  2)
+#define INPUT_ABOVE_SLIDE            /* 0x0008 */ (1 <<  3)
+#define INPUT_FIRST_PERSON           /* 0x0010 */ (1 <<  4)
+#define INPUT_UNKNOWN_5              /* 0x0020 */ (1 <<  5)
+#define INPUT_SQUISHED               /* 0x0040 */ (1 <<  6)
+#define INPUT_A_DOWN                 /* 0x0080 */ (1 <<  7)
+#define INPUT_IN_POISON_GAS          /* 0x0100 */ (1 <<  8)
+#define INPUT_IN_WATER               /* 0x0200 */ (1 <<  9)
+#define INPUT_STOMPED                /* 0x0400 */ (1 << 10)
+#define INPUT_INTERACT_OBJ_GRABBABLE /* 0x0800 */ (1 << 11)
+#define INPUT_UNKNOWN_12             /* 0x1000 */ (1 << 12)
+#define INPUT_B_PRESSED              /* 0x2000 */ (1 << 13)
+#define INPUT_Z_DOWN                 /* 0x4000 */ (1 << 14)
+#define INPUT_Z_PRESSED              /* 0x8000 */ (1 << 15)
 
 #define GROUND_STEP_LEFT_GROUND              0
 #define GROUND_STEP_NONE                     1
@@ -81,6 +121,7 @@
 #define AIR_STEP_GRABBED_LEDGE   3
 #define AIR_STEP_GRABBED_CEILING 4
 #define AIR_STEP_HIT_LAVA_WALL   6
+#define AIR_STEP_HIT_CEILING     7
 
 #define WATER_STEP_NONE        0
 #define WATER_STEP_HIT_FLOOR   1
@@ -109,28 +150,29 @@
 #define PARTICLE_TRIANGLE             /* 0x00040000 */ (1 << 18)
 #define PARTICLE_19                   /* 0x00080000 */ (1 << 19)
 
-#define MODEL_STATE_NOISE_ALPHA 0x180
-#define MODEL_STATE_METAL       0x200
+#define MODEL_STATE_ALPHA                (1 << 8)                      //  0x100
+#define MODEL_STATE_NOISE_ALPHA         ((1 << 7) | MODEL_STATE_ALPHA) // (0x080 | MODEL_STATE_ALPHA)
+#define MODEL_STATE_METAL                (1 << 9)                      //  0x200
 
-#define MARIO_NORMAL_CAP                0x00000001
-#define MARIO_VANISH_CAP                0x00000002
-#define MARIO_METAL_CAP                 0x00000004
-#define MARIO_WING_CAP                  0x00000008
-#define MARIO_CAP_ON_HEAD               0x00000010
-#define MARIO_CAP_IN_HAND               0x00000020
-#define MARIO_METAL_SHOCK               0x00000040
-#define MARIO_TELEPORTING               0x00000080
-#define MARIO_UNKNOWN_08                0x00000100
-#define MARIO_UNKNOWN_13                0x00002000
-#define MARIO_ACTION_SOUND_PLAYED       0x00010000
-#define MARIO_MARIO_SOUND_PLAYED        0x00020000
-#define MARIO_UNKNOWN_18                0x00040000
-#define MARIO_PUNCHING                  0x00100000
-#define MARIO_KICKING                   0x00200000
-#define MARIO_TRIPPING                  0x00400000
-#define MARIO_UNKNOWN_25                0x02000000
-#define MARIO_UNKNOWN_30                0x40000000
-#define MARIO_UNKNOWN_31                0x80000000
+#define MARIO_NORMAL_CAP                /* 0x00000001 */ (1 <<  0)
+#define MARIO_VANISH_CAP                /* 0x00000002 */ (1 <<  1)
+#define MARIO_METAL_CAP                 /* 0x00000004 */ (1 <<  2)
+#define MARIO_WING_CAP                  /* 0x00000008 */ (1 <<  3)
+#define MARIO_CAP_ON_HEAD               /* 0x00000010 */ (1 <<  4)
+#define MARIO_CAP_IN_HAND               /* 0x00000020 */ (1 <<  5)
+#define MARIO_METAL_SHOCK               /* 0x00000040 */ (1 <<  6)
+#define MARIO_TELEPORTING               /* 0x00000080 */ (1 <<  7)
+#define MARIO_JUMPING                   /* 0x00000100 */ (1 <<  8)
+#define MARIO_NO_PURPLE_SWITCH          /* 0x00002000 */ (1 << 13)
+#define MARIO_ACTION_SOUND_PLAYED       /* 0x00010000 */ (1 << 16)
+#define MARIO_MARIO_SOUND_PLAYED        /* 0x00020000 */ (1 << 17)
+#define MARIO_FALL_SOUND_PLAYED         /* 0x00040000 */ (1 << 18)
+#define MARIO_PUNCHING                  /* 0x00100000 */ (1 << 20)
+#define MARIO_KICKING                   /* 0x00200000 */ (1 << 21)
+#define MARIO_TRIPPING                  /* 0x00400000 */ (1 << 22)
+#define MARIO_LEDGE_CLIMB_CAMERA        /* 0x02000000 */ (1 << 25)
+#define MARIO_AIR_HIT_WALL              /* 0x40000000 */ (1 << 30)
+#define MARIO_PUSHING                   /* 0x80000000 */ (1 << 31)
 
 #define MARIO_SPECIAL_CAPS (MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP)
 #define MARIO_CAPS (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS)

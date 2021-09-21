@@ -10,10 +10,7 @@ void bhv_butterfly_init(void) {
     o->oHomeZ = o->oPosZ;
 }
 
-// sp28 = speed
-
 void butterfly_step(s32 speed) {
-    struct FloorGeometry *sp24;
     s16 yaw = o->oMoveAngleYaw;
     s16 pitch = o->oMoveAnglePitch;
     s16 yPhase = o->oButterflyYPhase;
@@ -31,7 +28,7 @@ void butterfly_step(s32 speed) {
     else
         o->oPosY -= o->oVelY;
 
-    floorY = find_floor_height_and_data(o->oPosX, o->oPosY, o->oPosZ, &sp24);
+    floorY = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
 
     if (o->oPosY < floorY + 2.0f)
         o->oPosY = floorY + 2.0f;

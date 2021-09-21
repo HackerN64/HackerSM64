@@ -324,8 +324,7 @@ void reset_debug_objectinfo(void) {
     gUnknownWallCount = 0;
     gObjectCounter = 0;
     sDebugStringArrPrinted = FALSE;
-    D_8035FEE2 = 0;
-    D_8035FEE4 = 0;
+    gDoorRenderingTimer = 0;
 
     set_print_state_info(gDebugPrintState1, 20, 185, 40, 200, -15);
     set_print_state_info(gDebugPrintState2, 180, 30, 0, 150, 15);
@@ -396,15 +395,15 @@ UNUSED static void try_change_debug_page(void) {
 UNUSED static
 #endif
 void try_modify_debug_controls(void) {
-    s32 sp4;
+    s32 modifier;
 
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
         sNoExtraDebug ^= 1;
     }
     if (!(gPlayer1Controller->buttonDown & (L_TRIG | R_TRIG)) && !sNoExtraDebug) {
-        sp4 = 1;
+        modifier = 1;
         if (gPlayer1Controller->buttonDown & B_BUTTON) {
-            sp4 = 100;
+            modifier = 100;
         }
 
         if (sDebugInfoDPadMask & U_JPAD) {
@@ -429,12 +428,12 @@ void try_modify_debug_controls(void) {
                 gDebugInfo[sDebugPage][sDebugSysCursor] =
                     gDebugInfoOverwrite[sDebugPage][sDebugSysCursor];
             } else {
-                gDebugInfo[sDebugPage][sDebugSysCursor] = gDebugInfo[sDebugPage][sDebugSysCursor] - sp4;
+                gDebugInfo[sDebugPage][sDebugSysCursor] = gDebugInfo[sDebugPage][sDebugSysCursor] - modifier;
             }
         }
 
         if (sDebugInfoDPadMask & R_JPAD) {
-            gDebugInfo[sDebugPage][sDebugSysCursor] = gDebugInfo[sDebugPage][sDebugSysCursor] + sp4;
+            gDebugInfo[sDebugPage][sDebugSysCursor] = gDebugInfo[sDebugPage][sDebugSysCursor] + modifier;
         }
     }
 }

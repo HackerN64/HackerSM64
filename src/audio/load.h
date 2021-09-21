@@ -13,6 +13,7 @@
 #define IS_SEQUENCE_CHANNEL_VALID(ptr) ((uintptr_t)(ptr) != (uintptr_t)&gSequenceChannelNone)
 
 extern struct Note *gNotes;
+extern u8 sAudioFirstBoot;
 
 // Music in SM64 is played using 3 players:
 // gSequencePlayers[0] is level background music

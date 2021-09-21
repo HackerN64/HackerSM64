@@ -117,21 +117,20 @@ void bhv_star_spawn_loop(void) {
 }
 
 void bhv_hidden_red_coin_star_init(void) {
-    s16 sp36;
-    struct Object *sp30;
+    s16 numRedCoinsRemaining;
+    struct Object *starObj;
 
     if (gCurrCourseNum != COURSE_JRB)
         spawn_object(o, MODEL_TRANSPARENT_STAR, bhvRedCoinStarMarker);
 
-    sp36 = count_objects_with_behavior(bhvRedCoin);
-    if (sp36 == 0) {
-        sp30 =
-            spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStar, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
-        sp30->oBehParams = o->oBehParams;
+    numRedCoinsRemaining = count_objects_with_behavior(bhvRedCoin);
+    if (numRedCoinsRemaining == 0) {
+        starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStar, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
+        starObj->oBehParams = o->oBehParams;
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 
-    o->oHiddenStarTriggerCounter = 8 - sp36;
+    o->oHiddenStarTriggerCounter = 8 - numRedCoinsRemaining;
 }
 
 void bhv_hidden_red_coin_star_loop(void) {

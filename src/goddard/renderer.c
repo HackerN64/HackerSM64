@@ -510,11 +510,11 @@ static Gfx gd_dl_sparkle[] = {
     gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
     gsDPSetRenderMode(G_RM_AA_ZB_TEX_EDGE, G_RM_NOOP2),
     gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, 
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, 
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPVertex(gd_vertex_sparkle, 4, 0),
@@ -663,7 +663,7 @@ static Gfx gd_dl_mario_face_shine[] = {
     gsDPSetTexturePersp(G_TP_PERSP),
     gsDPSetTextureFilter(G_TF_BILERP),
     gsDPSetCombineMode(G_CC_HILITERGBA, G_CC_HILITERGBA),
-    gsDPLoadTextureBlock(gd_texture_mario_face_shine, G_IM_FMT_IA, G_IM_SIZ_8b, 32, 32, 0, 
+    gsDPLoadTextureBlock(gd_texture_mario_face_shine, G_IM_FMT_IA, G_IM_SIZ_8b, 32, 32, 0,
                         G_TX_WRAP | G_TX_NOMIRROR, G_TX_WRAP | G_TX_NOMIRROR, 5, 5, G_TX_NOLOD, G_TX_NOLOD),
     gsDPPipeSync(),
     gsSPEndDisplayList(),
@@ -1192,7 +1192,7 @@ void print_gdm_stats(void) {
 
 /* 24AC80 -> 24AD14; orig name: func_8019C4B0 */
 struct ObjView *make_view_withgrp(char *name, struct ObjGroup *grp) {
-    struct ObjView *view = make_view(name, (VIEW_DRAW | VIEW_ALLOC_ZBUF | VIEW_MOVEMENT), 1, 0, 0, 320, 240, grp);
+    struct ObjView *view = make_view(name, (VIEW_DRAW | VIEW_ALLOC_ZBUF | VIEW_MOVEMENT), 1, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, grp);
     UNUSED struct ObjGroup *viewgrp = make_group(2, grp, view);
 
     view->lights = gGdLightGroup;
@@ -1270,7 +1270,7 @@ void gd_vblank(void) {
 }
 
 /**
- * Copies the player1 controller data from p1cont to sGdContPads[0]. 
+ * Copies the player1 controller data from p1cont to sGdContPads[0].
  */
 void gd_copy_p1_contpad(OSContPad *p1cont) {
     u32 i;                                    // 24
@@ -1942,7 +1942,7 @@ Vtx *gd_dl_make_vertex(f32 x, f32 y, f32 z, f32 alpha) {
 /* 24E6C0 -> 24E724 */
 void func_8019FEF0(void) {
     sTriangleBufCount++;
-    if (sVertexBufCount >= 12) {
+    if (sVertexBufCount >= 30) {
         gd_dl_flush_vertices();
         func_801A0038();
     }
@@ -2366,7 +2366,7 @@ void parse_p1_controller(void) {
     OSContPad *currInputs;
     OSContPad *prevInputs;
 
-    // Copy current inputs to previous 
+    // Copy current inputs to previous
     u8 *src = (u8 *) gdctrl;
     u8 *dest = (u8 *) gdctrl->prevFrame;
     for (i = 0; i < sizeof(struct GdControl); i++) {
@@ -2891,7 +2891,7 @@ void Unknown801A4F58(void) {
     cbufOn = sScreenView->colourBufs[gGdFrameBufNum];
     zbuf = sScreenView->zbuf;
 
-    for (i = 0; i < (320 * 240); i++) { // L801A4FCC
+    for (i = 0; i < (SCREEN_WIDTH * SCREEN_HEIGHT); i++) { // L801A4FCC
         colour = cbufOff[i];
         if (colour) {
             r = (s16)(colour >> 11 & 0x1F);
@@ -3000,7 +3000,7 @@ void gd_init(void) {
 
     sScreenView =
         make_view("screenview2", (VIEW_2_COL_BUF | VIEW_UNK_1000 | VIEW_COLOUR_BUF | VIEW_Z_BUF), 0, 0,
-                  0, 320, 240, NULL);
+                  0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL);
     sScreenView->colour.r = 0.0f;
     sScreenView->colour.g = 0.0f;
     sScreenView->colour.b = 0.0f;
@@ -3033,7 +3033,7 @@ void gd_init(void) {
  * functions from IRIS GL.
  * @param buf  pointer to an array of 16-bit values
  * @param len  maximum number of values to store
- */ 
+ */
 void init_pick_buf(s16 *buf, s32 len) {
     buf[0] = 0;
     buf[1] = 0;
@@ -3105,8 +3105,8 @@ void Unknown801A5C80(struct ObjGroup *parentGroup) {
     d_end_group("debugg");
 
     debugGroup = (struct ObjGroup *) d_use_obj("debugg");
-    make_view("debugview", (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_1_CYCLE | VIEW_DRAW), 2, 0, 0, 320,
-              240, debugGroup);
+    make_view("debugview", (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_1_CYCLE | VIEW_DRAW), 2, 0, 0, SCREEN_WIDTH,
+              SCREEN_HEIGHT, debugGroup);
 
     if (parentGroup != NULL) {
         addto_group(parentGroup, &debugGroup->header);
@@ -3149,7 +3149,7 @@ void Unknown801A5D90(struct ObjGroup *arg0) {
                 d_add_valproc(cvrt_val_to_kb);
                 sp23C = TRUE;
                 sp244 += 14;
-                if (sp244 > 200) {
+                if (sp244 > SCREEN_HEIGHT) {
                     break;
                 }
             }
@@ -3167,7 +3167,7 @@ void Unknown801A5D90(struct ObjGroup *arg0) {
             memview = make_view("memview",
                                 (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_UNK_2000 | VIEW_UNK_4000
                                  | VIEW_1_CYCLE | VIEW_DRAW),
-                                2, 0, 10, 320, 200, labelgrp);
+                                2, 0, 10, SCREEN_WIDTH, SCREEN_HEIGHT-40, labelgrp);
             memview->colour.r = 0.0f;
             memview->colour.g = 0.0f;
             memview->colour.b = 0.0f;
@@ -3407,7 +3407,7 @@ void make_timer_gadgets(void) {
     timerg = (struct ObjGroup *) d_use_obj("timerg");
     timersview = make_view(
         "timersview", (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_1_CYCLE | VIEW_MOVEMENT | VIEW_DRAW), 2,
-        0, 10, 320, 270, timerg);
+        0, 10, SCREEN_WIDTH, SCREEN_HEIGHT+30, timerg);
     timersview->colour.r = 0.0f;
     timersview->colour.g = 0.0f;
     timersview->colour.b = 0.0f;
@@ -3472,7 +3472,7 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
             fatal_printf("load_dynlist() unkown bank");
     }
 
-#define PAGE_SIZE 65536  // size of a 64K TLB page 
+#define PAGE_SIZE 65536  // size of a 64K TLB page
 
     segSize = dynlistSegEnd - dynlistSegStart;
     allocSegSpace = gd_malloc_temp(segSize + PAGE_SIZE);

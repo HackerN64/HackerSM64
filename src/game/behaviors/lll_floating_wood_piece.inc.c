@@ -10,15 +10,14 @@ void bhv_lll_wood_piece_loop(void) {
 }
 
 void bhv_lll_floating_wood_bridge_loop(void) {
-    struct Object *sp3C;
+    struct Object *woodPieceObj;
     s32 i;
     switch (o->oAction) {
         case 0:
             if (o->oDistanceToMario < 2500.0f) {
                 for (i = 1; i < 4; i++) {
-                    sp3C = spawn_object_relative(0, (i - 2) * 300, 0, 0, o, MODEL_LLL_WOOD_BRIDGE,
-                                                 bhvLllWoodPiece);
-                    sp3C->oLllWoodPieceOscillationTimer = i * 4096;
+                    woodPieceObj = spawn_object_relative(0, (i - 2) * 300, 0, 0, o, MODEL_LLL_WOOD_BRIDGE, bhvLllWoodPiece);
+                    woodPieceObj->oLllWoodPieceOscillationTimer = i * 4096;
                 }
                 o->oAction = 1;
             }

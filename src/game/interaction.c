@@ -289,7 +289,7 @@ void mario_stop_riding_object(struct MarioState *m) {
 void mario_grab_used_object(struct MarioState *m) {
     if (m->heldObj == NULL) {
         m->heldObj = m->usedObj;
-        obj_set_held_state(m->heldObj, bhvCarrySomething3);
+        obj_set_held_state(m->heldObj, bhvCarrySomethingHeld);
     }
 }
 
@@ -299,7 +299,7 @@ void mario_drop_held_object(struct MarioState *m) {
             stop_shell_music();
         }
 
-        obj_set_held_state(m->heldObj, bhvCarrySomething4);
+        obj_set_held_state(m->heldObj, bhvCarrySomethingDropped);
 
         // ! When dropping an object instead of throwing it, it will be put at Mario's
         // y-positon instead of the HOLP's y-position. This fact is often exploited when
@@ -320,7 +320,7 @@ void mario_throw_held_object(struct MarioState *m) {
             stop_shell_music();
         }
 
-        obj_set_held_state(m->heldObj, bhvCarrySomething5);
+        obj_set_held_state(m->heldObj, bhvCarrySomethingThrown);
 
         m->heldObj->oPosX = m->marioBodyState->heldObjLastPosition[0] + 32.0f * sins(m->faceAngle[1]);
         m->heldObj->oPosY = m->marioBodyState->heldObjLastPosition[1];
@@ -517,7 +517,7 @@ void bounce_off_object(struct MarioState *m, struct Object *o, f32 velY) {
     m->pos[1] = o->oPosY + o->hitboxHeight;
     m->vel[1] = velY;
 
-    m->flags &= ~MARIO_UNKNOWN_08;
+    m->flags &= ~MARIO_JUMPING;
 
     play_sound(SOUND_ACTION_BOUNCE_OFF_OBJECT, m->marioObj->header.gfx.cameraToObject);
 }
@@ -1158,7 +1158,7 @@ u32 interact_strong_wind(struct MarioState *m, UNUSED u32 interactType, struct O
         m->usedObj = o;
 
         m->faceAngle[1] = o->oMoveAngleYaw + 0x8000;
-        m->unkC4 = 0.4f;
+        m->windGravity = 0.4f;
         m->forwardVel = -24.0f;
         m->vel[1] = 12.0f;
 
@@ -1771,12 +1771,14 @@ u32 interact_text(struct MarioState *m, UNUSED u32 interactType, struct Object *
 
 void check_kick_or_punch_wall(struct MarioState *m) {
     if (m->flags & (MARIO_PUNCHING | MARIO_KICKING | MARIO_TRIPPING)) {
-        Vec3f detector;
-        detector[0] = m->pos[0] + 50.0f * sins(m->faceAngle[1]);
-        detector[2] = m->pos[2] + 50.0f * coss(m->faceAngle[1]);
-        detector[1] = m->pos[1];
+        struct WallCollisionData detector;
+        detector.x = m->pos[0] + 50.0f * sins(m->faceAngle[1]);
+        detector.z = m->pos[2] + 50.0f * coss(m->faceAngle[1]);
+        detector.y = m->pos[1];
+		detector.offsetY = 80.0f;
+		detector.radius = 5.0f;
 
-        if (resolve_and_return_wall_collisions(detector, 80.0f, 5.0f) != NULL) {
+        if (find_wall_collisions(&detector) > 0) {
             if (m->action != ACT_MOVE_PUNCHING || m->forwardVel >= 0.0f) {
                 if (m->action == ACT_PUNCHING) {
                     m->action = ACT_MOVE_PUNCHING;
@@ -1835,7 +1837,7 @@ void mario_process_interactions(struct MarioState *m) {
 
 void check_death_barrier(struct MarioState *m) {
     if (m->pos[1] < m->floorHeight + 2048.0f) {
-        if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m->flags & MARIO_UNKNOWN_18)) {
+        if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m->flags & MARIO_FALL_SOUND_PLAYED)) {
             play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
         }
     }

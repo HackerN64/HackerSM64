@@ -32,6 +32,74 @@
 
 #include "debug_box.h"
 
+Vtx debug_box_mesh[32] = {
+	{{{0, 0, -100},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{50, 100, -87},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{50, 0, -87},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{0, 100, -100},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-50, 0, -87},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-50, 100, -87},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-87, 0, -50},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-87, 100, -50},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-100, 0, 0},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-100, 100, 0},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-87, 0, 50},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-87, 100, 50},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-50, 0, 87},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-50, 100, 87},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{0, 0, 100},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{0, 100, 100},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{50, 0, 87},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{50, 100, 87},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{87, 0, 50},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{87, 100, 50},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{100, 0, 0},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{100, 100, 0},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{87, 0, -50},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{87, 100, -50},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},
+	{{{-100, 0, 100},0, {-16, 1008},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{-100, 100, 100},0, {-16, 1008},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{-100, 100, -100},0, {-16, 1008},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{100, 0, 100},0, {-16, 1008},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{-100, 0, -100},0, {-16, 1008},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{100, 100, -100},0, {-16, 1008},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{100, 100, 100},0, {-16, 1008},{0xFF, 0xFF, 0xFF, 0xFF}}},
+	{{{100, 0, -100},0, {-16, 1008},{0xFF, 0xFF, 0xFF, 0xFF}}},
+};
+
+Gfx dl_debug_box_verts[] = {
+	gsSPVertex(debug_box_mesh, 32, 0),
+	gsSP2Triangles(24, 25, 26, 0, 27, 25, 24, 0),
+	gsSP2Triangles(28, 27, 24, 0, 24, 26, 28, 0),
+	gsSP2Triangles(28, 26, 29, 0, 29, 26, 25, 0),
+	gsSP2Triangles(29, 25, 30, 0, 27, 30, 25, 0),
+	gsSP2Triangles(31, 30, 27, 0, 28, 31, 27, 0),
+	gsSP2Triangles(28, 29, 31, 0, 31, 29, 30, 0),
+	gsSPEndDisplayList(),
+};
+
+Gfx dl_debug_cylinder_verts[] = {
+	gsSPVertex(debug_box_mesh, 24, 0),
+	gsSP2Triangles(0, 1, 2, 0, 0, 3, 1, 0),
+	gsSP2Triangles(4, 3, 0, 0, 4, 5, 3, 0),
+	gsSP2Triangles(6, 5, 4, 0, 6, 7, 5, 0),
+	gsSP2Triangles(8, 7, 6, 0, 8, 9, 7, 0),
+	gsSP2Triangles(10, 9, 8, 0, 10, 11, 9, 0),
+	gsSP2Triangles(12, 11, 10, 0, 12, 13, 11, 0),
+	gsSP2Triangles(14, 13, 12, 0, 14, 15, 13, 0),
+	gsSP2Triangles(16, 15, 14, 0, 16, 17, 15, 0),
+	gsSP2Triangles(18, 17, 16, 0, 18, 19, 17, 0),
+	gsSP2Triangles(20, 19, 18, 0, 20, 21, 19, 0),
+	gsSP2Triangles(22, 21, 20, 0, 22, 23, 21, 0),
+	gsSP2Triangles(2, 23, 22, 0, 2, 1, 23, 0),
+	gsSP2Triangles(23, 1, 3, 0, 23, 3, 7, 0),
+	gsSP2Triangles(3, 5, 7, 0, 7, 15, 23, 0),
+	gsSP2Triangles(7, 11, 15, 0, 7, 9, 11, 0),
+	gsSP2Triangles(11, 13, 15, 0, 15, 17, 19, 0),
+	gsSP2Triangles(15, 19, 23, 0, 19, 21, 23, 0),
+	gsSPEndDisplayList(),
+};
+
 u8 hitboxView = 0;
 u8 surfaceView = 0;
 
@@ -82,10 +150,10 @@ u32 sCurBoxColor = DBG_BOX_ALPHA << 24 | DBG_BOX_DEF_COLOR;
 static const Gfx dl_debug_box_begin[] = {
     gsDPPipeSync(),
     gsDPSetRenderMode(G_RM_ZB_XLU_SURF, G_RM_NOOP2),
-    gsSPClearGeometryMode(G_LIGHTING | G_CULL_BACK),
-    gsSPSetGeometryMode(G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH),
+    gsSPClearGeometryMode(G_CULL_BACK),
+    gsSPSetGeometryMode(G_ZBUFFER),
     gsSPTexture(0, 0, 0, 0, G_OFF),
-    gsDPSetCombineMode(G_CC_FADE, G_CC_FADE),
+    gsDPSetCombineLERP(0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT),
     gsSPEndDisplayList(),
 };
 
@@ -371,6 +439,8 @@ static void append_debug_box(Vec3f center, Vec3f bounds, s16 yaw, s32 type)
         sBoxes[sNumBoxes].yaw = yaw;
         sBoxes[sNumBoxes].color = sCurBoxColor;
         sBoxes[sNumBoxes].type = type;
+        if (!(sBoxes[sNumBoxes].type & DEBUG_UCODE_REJ) && !(sBoxes[sNumBoxes].type & DEBUG_UCODE_DEFAULT))
+            sBoxes[sNumBoxes].type |= DEBUG_UCODE_DEFAULT;
 
         ++sNumBoxes;
     }
@@ -437,11 +507,7 @@ void debug_box_pos_rot(Vec3f pMin, Vec3f pMax, s16 yaw, s32 type)
     append_debug_box(center, bounds, yaw, type);
 }
 
-#define DBG_BOX_VTX_BOX(i, x, y, z) make_vertex(debugBoxVtx, i, x, y, z, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF)
-#define DBG_BOX_VTX_CYL(i, x, y, z) make_vertex(debugCylinderVtx, i, x, y, z, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF)
-#define CYLINDER_VERTS 24
-
-static void render_box(int index, Vtx *vbox, Vtx *vcylinder)
+static void render_box(int index)
 {
     Mtx *translate;
     Mtx *rotate;
@@ -472,100 +538,40 @@ static void render_box(int index, Vtx *vbox, Vtx *vcylinder)
 
     gDPSetEnvColor(gDisplayListHead++, (color >> 16) & 0xFF, (color >> 8) & 0xFF, (color) & 0xFF, (color >> 24) & 0xFF);
 
-    if (box->type == DEBUG_SHAPE_BOX)
+    if (box->type & DEBUG_SHAPE_BOX)
     {
-
-        gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(vbox), 8, 0);
-        gSP2Triangles(gDisplayListHead++, 5, 4, 6, 0x0, 5, 6, 7, 0x0); // front
-        gSP2Triangles(gDisplayListHead++, 0, 1, 2, 0x0, 2, 1, 3, 0x0); // back
-
-        gSP2Triangles(gDisplayListHead++, 4, 0, 2, 0x0, 2, 6, 4, 0x0); // left
-        gSP2Triangles(gDisplayListHead++, 1, 5, 3, 0x0, 3, 5, 7, 0x0); // right
-
-        gSP2Triangles(gDisplayListHead++, 1, 0, 4, 0x0, 1, 4, 5, 0x0); // top
-        gSP2Triangles(gDisplayListHead++, 2, 3, 6, 0x0, 6, 3, 7, 0x0); // bottom
+        gSPDisplayList(gDisplayListHead++, dl_debug_box_verts);
     }
-    else
+    if (box->type & DEBUG_SHAPE_CYLINDER)
     {
-        gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(vcylinder), 26, 0);
-        //Bottom
-        /*gSP2Triangles(gDisplayListHead++, 0, 1, 3, 0, 0, 3, 5, 0);
-        gSP2Triangles(gDisplayListHead++, 0, 5, 7, 0, 0, 7, 9, 0);
-        gSP2Triangles(gDisplayListHead++, 0, 9, 11, 0, 0, 11, 13, 0);
-        gSP2Triangles(gDisplayListHead++, 0, 13, 15, 0, 0, 15, 17, 0);
-        gSP2Triangles(gDisplayListHead++, 0, 17, 19, 0, 0, 19, 21, 0);
-        gSP2Triangles(gDisplayListHead++, 0, 21, 23, 0, 0, 23, 1, 0);*/
-
-        //Side
-        gSP2Triangles(gDisplayListHead++, 1, 2, 3, 0, 2, 3, 4, 0);
-        gSP2Triangles(gDisplayListHead++, 3, 4, 5, 0, 4, 5, 6, 0);
-        gSP2Triangles(gDisplayListHead++, 5, 6, 7, 0, 6, 7, 8, 0);
-        gSP2Triangles(gDisplayListHead++, 7, 8, 9, 0, 8, 9, 10, 0);
-        gSP2Triangles(gDisplayListHead++, 9, 10, 11, 0, 10, 11, 12, 0);
-        gSP2Triangles(gDisplayListHead++, 11, 12, 13, 0, 12, 13, 14, 0);
-        gSP2Triangles(gDisplayListHead++, 13, 14, 15, 0, 14, 15, 16, 0);
-        gSP2Triangles(gDisplayListHead++, 15, 16, 17, 0, 16, 17, 18, 0);
-        gSP2Triangles(gDisplayListHead++, 17, 18, 19, 0, 18, 19, 20, 0);
-        gSP2Triangles(gDisplayListHead++, 19, 20, 21, 0, 20, 21, 22, 0);
-        gSP2Triangles(gDisplayListHead++, 21, 22, 23, 0, 22, 23, 24, 0);
-        gSP2Triangles(gDisplayListHead++, 23, 24, 1, 0, 24, 1, 2, 0);
-
-        //Top
-        gSP2Triangles(gDisplayListHead++, 25, 2, 4, 0, 25, 4, 6, 0);
-        gSP2Triangles(gDisplayListHead++, 25, 6, 8, 0, 25, 8, 10, 0);
-        gSP2Triangles(gDisplayListHead++, 25, 10, 12, 0, 25, 12, 14, 0);
-        gSP2Triangles(gDisplayListHead++, 25, 14, 16, 0, 25, 16, 18, 0);
-        gSP2Triangles(gDisplayListHead++, 25, 18, 20, 0, 25, 20, 22, 0);
-        gSP2Triangles(gDisplayListHead++, 25, 22, 24, 0, 25, 24, 2, 0);
+        gSPDisplayList(gDisplayListHead++, dl_debug_cylinder_verts);
     }
 
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
-void render_debug_boxes(void)
+void render_debug_boxes(s32 type)
 {
     s32 i;
-    Vtx *debugBoxVtx;
-    Vtx *debugCylinderVtx;
 
     debug_box_color(DBG_BOX_DEF_COLOR);
 
     if (sNumBoxes == 0)
         return;
-
-    //Create the vertices for the box.
-    debugBoxVtx = alloc_display_list(8 * sizeof(Vtx));
-    debugCylinderVtx = alloc_display_list(26 * sizeof(Vtx));
-
-    if (debugBoxVtx == NULL || debugCylinderVtx == NULL)
+    if (gAreaUpdateCounter < 3)
         return;
-
-    DBG_BOX_VTX_BOX(0, -100, 100, -100);
-    DBG_BOX_VTX_BOX(1, 100, 100, -100);
-    DBG_BOX_VTX_BOX(2, -100, -100, -100);
-    DBG_BOX_VTX_BOX(3, 100, -100, -100);
-    DBG_BOX_VTX_BOX(4, -100, 100, 100);
-    DBG_BOX_VTX_BOX(5, 100, 100, 100);
-    DBG_BOX_VTX_BOX(6, -100, -100, 100);
-    DBG_BOX_VTX_BOX(7, 100, -100, 100);
-
-    DBG_BOX_VTX_CYL(0, 0, 0, 0);
-    for (i = 0; i < (CYLINDER_VERTS); i++)
-    {
-        DBG_BOX_VTX_CYL(1+i,
-        0 + (100 * coss((0xFFFF/((CYLINDER_VERTS)/2))*(i / 2))),
-        0 + (100 * (i % 2)),
-        0 + (100 * sins((0xFFFF/((CYLINDER_VERTS)/2))*(i / 2))));
-    }
-    DBG_BOX_VTX_CYL(CYLINDER_VERTS+1, 0, 100, 0);
 
     gSPDisplayList(gDisplayListHead++, dl_debug_box_begin);
 
     for (i = 0; i < sNumBoxes; ++i) {
-        render_box(i, debugBoxVtx, debugCylinderVtx);
+        if (type & DEBUG_UCODE_DEFAULT && sBoxes[i].type & DEBUG_UCODE_DEFAULT)
+            render_box(i);
+        if (type & DEBUG_UCODE_REJ && sBoxes[i].type & DEBUG_UCODE_REJ)
+            render_box(i);
     }
 
-    sNumBoxes = 0;
+    if (type & DEBUG_BOX_CLEAR)
+        sNumBoxes = 0;
 
     gSPDisplayList(gDisplayListHead++, dl_debug_box_end);
 }

@@ -3580,10 +3580,6 @@ void unused_object_angle_to_vec3s(Vec3s dst, struct Object *o) {
  */
 void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f a0, Vec3f a1, Vec3f a2, Vec3f a3) {
     f32 B[4];
-    f32 x;
-    f32 y;
-    f32 z;
-    UNUSED u8 unused[16];
 
     if (u > 1.f) {
         u = 1.f;
@@ -3597,19 +3593,6 @@ void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f a0, Vec3f a1, Vec3f a2, Vec3f a
     Q[0] = B[0] * a0[0] + B[1] * a1[0] + B[2] * a2[0] + B[3] * a3[0];
     Q[1] = B[0] * a0[1] + B[1] * a1[1] + B[2] * a2[1] + B[3] * a3[1];
     Q[2] = B[0] * a0[2] + B[1] * a1[2] + B[2] * a2[2] + B[3] * a3[2];
-
-    // Unused code
-    B[0] = -0.5f * u * u + u - 0.33333333f;
-    B[1] = 1.5f * u * u - 2.f * u - 0.5f;
-    B[2] = -1.5f * u * u + u + 1.f;
-    B[3] = 0.5f * u * u - 0.16666667f;
-
-    x = B[0] * a0[0] + B[1] * a1[0] + B[2] * a2[0] + B[3] * a3[0];
-    y = B[0] * a0[1] + B[1] * a1[1] + B[2] * a2[1] + B[3] * a3[1];
-    z = B[0] * a0[2] + B[1] * a1[2] + B[2] * a2[2] + B[3] * a3[2];
-
-    unusedSplinePitch = atan2s(sqrtf(x * x + z * z), y);
-    unusedSplineYaw = atan2s(z, x);
 }
 
 /**
@@ -3934,7 +3917,7 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
     f32 originOffset;
     f32 offset;
     f32 offsetAbsolute;
-    Vec3f newPos[4];
+    Vec3f newPos[MAX_REFEREMCED_WALLS];
     s32 i;
     s32 numCollisions = 0;
 

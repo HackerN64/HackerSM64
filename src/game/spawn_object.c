@@ -282,6 +282,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->oRoom = -1;
 
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+    obj->header.gfx.node.flags |=  GRAPH_RENDER_UCODE_REJ;
     obj->header.gfx.pos[0] = -10000.0f;
     obj->header.gfx.pos[1] = -10000.0f;
     obj->header.gfx.pos[2] = -10000.0f;

@@ -1,7 +1,7 @@
 // heave_ho.c.inc
 
-s16 D_8032F460[][2] = { { 30, 0 }, { 42, 1 }, { 52, 0 },  { 64, 1 },  { 74, 0 },
-                        { 86, 1 }, { 96, 0 }, { 108, 1 }, { 118, 0 }, { -1, 0 }, };
+s16 sHeaveHoTimings[][2] = { { 30, 0 }, { 42, 1 }, { 52, 0 },  { 64, 1 },  { 74, 0 },
+                             { 86, 1 }, { 96, 0 }, { 108, 1 }, { 118, 0 }, { -1, 0 }, };
 
 void bhv_heave_ho_throw_mario_loop(void) {
     o->oParentRelativePosX = 200.0f;
@@ -24,19 +24,19 @@ void bhv_heave_ho_throw_mario_loop(void) {
 }
 
 void heave_ho_act_1(void) {
-    s32 sp1C = 0;
+    s32 i = 0;
     o->oForwardVel = 0.0f;
     cur_obj_reverse_animation();
     while (TRUE) {
-        if (D_8032F460[sp1C][0] == -1) {
+        if (sHeaveHoTimings[i][0] == -1) {
             o->oAction = 2;
             break;
         }
-        if (o->oTimer < D_8032F460[sp1C][0]) {
-            cur_obj_init_animation_with_accel_and_sound(2, D_8032F460[sp1C][1]);
+        if (o->oTimer < sHeaveHoTimings[i][0]) {
+            cur_obj_init_animation_with_accel_and_sound(2, sHeaveHoTimings[i][1]);
             break;
         }
-        sp1C++;
+        i++;
     }
 }
 

@@ -408,7 +408,7 @@ void puppycam_get_save(void)
 
     gSaveBuffer.menuData[0].firstBoot = gSaveBuffer.menuData[0].firstBoot;
     #ifdef WIDE
-    gWidescreen = save_file_get_widescreen_mode();
+    gConfig.widescreen = save_file_get_widescreen_mode();
     #endif
 
     puppycam_check_save();
@@ -421,7 +421,7 @@ void puppycam_set_save(void)
     gSaveBuffer.menuData[0].firstBoot = 4;
 
     #ifdef WIDE
-    save_file_set_widescreen_mode(gWidescreen);
+    save_file_set_widescreen_mode(gConfig.widescreen);
     #endif
 
     gMainMenuDataModified = TRUE;

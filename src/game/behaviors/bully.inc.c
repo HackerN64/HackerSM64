@@ -143,10 +143,10 @@ void bully_backup_check(s16 collisionFlags) {
 }
 
 void bully_play_stomping_sound(void) {
-    s16 sp26 = o->header.gfx.animInfo.animFrame;
+    s16 animFrame = o->header.gfx.animInfo.animFrame;
     switch (o->oAction) {
         case BULLY_ACT_PATROL:
-            if (sp26 == 0 || sp26 == 12) {
+            if (animFrame == 0 || animFrame == 12) {
                 if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL)
                     cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALK);
                 else
@@ -156,7 +156,7 @@ void bully_play_stomping_sound(void) {
 
         case BULLY_ACT_CHASE_MARIO:
         case BULLY_ACT_BACK_UP:
-            if (sp26 == 0 || sp26 == 5) {
+            if (animFrame == 0 || animFrame == 5) {
                 if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL)
                     cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALK);
                 else
@@ -264,14 +264,9 @@ void bhv_bully_loop(void) {
     set_object_visibility(o, 3000);
 }
 
-// sp38 = arg0
-// sp3c = arg1
-// sp40 = arg2
-// sp44 = arg3
-
-void big_bully_spawn_minion(s32 arg0, s32 arg1, s32 arg2, s16 arg3) {
+void big_bully_spawn_minion(s32 x, s32 y, s32 z, s16 ry) {
     struct Object *bully =
-        spawn_object_abs_with_rot(o, 0, MODEL_BULLY, bhvSmallBully, arg0, arg1, arg2, 0, arg3, 00);
+        spawn_object_abs_with_rot(o, 0, MODEL_BULLY, bhvSmallBully, x, y, z, 0, ry, 0);
     bully->oBullySubtype = BULLY_STYPE_MINION;
     bully->oBehParams2ndByte = BULLY_BP_SIZE_SMALL;
 }

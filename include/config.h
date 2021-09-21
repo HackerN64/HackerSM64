@@ -76,12 +76,16 @@
 #define HANGING_SPEED 12.f
 // Makes Mario face the direction of the analog stick directly while hanging from a ceiling, without doing "semicircles"
 #define TIGHTER_HANGING_CONTROLS
+// Fixes Mario's turn radius by making it dependent on forward speed.
+#define FIX_GROUND_TURN_RADIUS
 // Makes Mario turn around instantly when moving on the ground
 //#define SUPER_RESPONSIVE_CONTROLS
 // Disables fall damage
 #define NO_FALL_DAMAGE
 // Disables the scream that mario makes when falling off a great height (this is separate from actual fall damage)
 //#define NO_FALL_DAMAGE_SOUND
+// Disables Mario getting stuck in snow and sand when falling
+//#define NO_GETTING_BURIED
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
 #define X_COIN_STAR 100
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!
@@ -102,10 +106,10 @@
 #define MULTILANG (0 || VERSION_EU)
 // Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 //#define PUPPYCAM
+// Allows Mario's shadow to be transparent on top of transparent surfaces, such as water, lava, and ice
+#define FIX_SHADOW_TRANSPARENCY
 // Automatically calculate the optimal collision distance for an object based on its vertices.
 #define AUTO_COLLISION_DISTANCE
-// Makes obj_resolve_object_collisions work consistently
-#define FIX_RESOLVE_OBJ_COLLISIONS
 
 
 // HACKER QOL
@@ -113,7 +117,7 @@
 #define LONGER_POLES
 // Number of possible unique model ID's (keep it higher than 256)
 #define MODEL_ID_COUNT 256
-// Increase audio heap size to allow for more concurrent notes to be played and for more custom sequences/banks to be imported (does nothing with EU and SH versions)
+// Increase audio heap size to allow for more concurrent notes to be played and for more custom sequences/banks to be imported (not supported for SH)
 #define EXPAND_AUDIO_HEAP
 // Allow all surfaces types to have force, (doesn't require setting force, just allows it to be optional).
 #define ALL_SURFACES_HAVE_FORCE
@@ -127,6 +131,8 @@
 //#define VISUAL_DEBUG
 // Number of supported areas per level.
 #define AREA_COUNT 8
+// Number of walls that can push Mario at once.
+#define MAX_REFEREMCED_WALLS 4
 // Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
 //#define PUPPYLIGHTS
 // Open all courses and doors. Used for debugging purposes to unlock all content.
@@ -175,6 +181,12 @@
 #define DISABLE_AA
 // Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
 #define IA8_COINS
+// Mario's silhouette when behind solid objects/surfaces
+// Also enables new render layers, such as LAYER_ALPHA_DECAL.
+// The number is the intensity of the silhouette, from 0-255.
+// NOTE: The overlap between Mario's model parts is visible on certain HLE plugins.
+// Also, this also disables anti-aliasing on Mario, and the outermost pixel edges of the silhouette are slightly visible on Mario's normal model at lower resolutions.
+#define SILHOUETTE 127
 // Use a much better implementation of reverb over vanilla's fake echo reverb. Great for caves or eerie levels, as well as just a better audio experience in general.
 // Reverb parameters can be configured in audio/synthesis.c to meet desired aesthetic/performance needs. Currently US/JP only.
 //#define BETTER_REVERB

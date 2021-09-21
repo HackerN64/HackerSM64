@@ -10,11 +10,6 @@ struct ObjectHitbox sFirePiranhaPlantHitbox = {
     /* hurtboxHeight:     */ 150,
 };
 
-f32 D_80331B5C[] = {
-    0.5f,
-    2.0f,
-};
-
 struct ObjectHitbox sPiranhaPlantFireHitbox = {
     /* interactType:      */ INTERACT_FLAME,
     /* downOffset:        */ 10,
@@ -31,7 +26,7 @@ s32 sNumActiveFirePiranhaPlants;
 s32 sNumKilledFirePiranhaPlants;
 
 void bhv_fire_piranha_plant_init(void) {
-    o->oFirePiranhaPlantNeutralScale = D_80331B5C[(u16)(o->oBehParams >> 16)];
+    o->oFirePiranhaPlantNeutralScale = (((u16)(o->oBehParams >> 16)) ? 2.0f : 0.5f);
     obj_set_hitbox(o, &sFirePiranhaPlantHitbox);
 
     if ((u16)(o->oBehParams >> 16) != 0) {

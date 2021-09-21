@@ -8,6 +8,17 @@
                 "${workspaceFolder}/textures/**",
                 "${workspaceFolder}/**"
             ],
+            "forcedInclude": [
+                "${workspaceFolder}/include/types.h",
+                "${workspaceFolder}/include/n64/ultra64.h",
+                "${workspaceFolder}/include/sm64.h",
+                "${workspaceFolder}/include/config.h",
+                "${workspaceFolder}/include/make_const_nonconst.h",
+                "${workspaceFolder}/include/geo_commands.h",
+                "${workspaceFolder}/include/level_commands.h",
+                "${workspaceFolder}/include/segment_symbols.h",
+                "${workspaceFolder}/include/command_macros_base.h"
+            ],
             "defines": [
                 "TARGET_N64=1",
                 "VERSION_US=1",

@@ -20,7 +20,7 @@
 #include "star_select.h"
 #include "text_strings.h"
 #include "prevent_bss_reordering.h"
-#include "game/game_init.h"
+#include "game/main.h"
 
 /**
  * @file star_select.c
@@ -94,7 +94,7 @@ void render_100_coin_star(u8 stars) {
     if (stars & (1 << 6)) {
         // If the 100 coin star has been collected, create a new star selector next to the coin score.
     #ifdef WIDE
-        if (gWidescreen) {
+        if (gConfig.widescreen) {
             sStarSelectorModels[6] = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR,
                                                             bhvActSelectorStarType, ((370*4.0f)/3), 24, -300, 0, 0, 0);
         } else {
@@ -160,7 +160,7 @@ void bhv_act_selector_init(void) {
 
     // Render star selector objects
     #ifdef WIDE
-    if (gWidescreen) {
+    if (gConfig.widescreen) {
         for (i = 0; i < sVisibleStars; i++) {
             sStarSelectorModels[i] =
                 spawn_object_abs_with_rot(gCurrentObject, 0, selectorModelIDs[i], bhvActSelectorStarType,
@@ -453,7 +453,7 @@ s32 lvl_update_obj_and_load_act_button_actions(UNUSED s32 arg, UNUSED s32 unused
 #endif
 #if ENABLE_RUMBLE
             queue_rumble_data(60, 70);
-            func_sh_8024C89C(1);
+            queue_rumble_decay(1);
 #endif
             if (sInitSelectedActNum >= sSelectedActIndex + 1) {
                 sLoadedActNum = sSelectedActIndex + 1;

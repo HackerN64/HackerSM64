@@ -21,8 +21,8 @@ void bullet_bill_act_0(void) {
 }
 
 void bullet_bill_act_1(void) {
-    s16 sp1E = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
-    if (sp1E < 0x2000 && 400.0f < o->oDistanceToMario && o->oDistanceToMario < 1500.0f)
+    s16 dYaw = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
+    if (dYaw < 0x2000 && 400.0f < o->oDistanceToMario && o->oDistanceToMario < 1500.0f)
         o->oAction = 2;
 }
 

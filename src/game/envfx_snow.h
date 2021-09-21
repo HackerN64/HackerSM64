@@ -29,7 +29,6 @@ struct EnvFxParticle {
 };
 
 extern s8 gEnvFxMode;
-extern UNUSED s32 D_80330644;
 
 extern struct EnvFxParticle *gEnvFxBuffer;
 extern Vec3i gSnowCylinderLastPos;

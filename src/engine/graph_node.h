@@ -5,6 +5,8 @@
 #include <PR/gbi.h>
 
 #include "types.h"
+#include "sm64.h"
+#include "geo_commands.h"
 #include "game/memory.h"
 
 #define GRAPH_RENDER_ACTIVE         (1 << 0)
@@ -13,6 +15,8 @@
 #define GRAPH_RENDER_Z_BUFFER       (1 << 3)
 #define GRAPH_RENDER_INVISIBLE      (1 << 4)
 #define GRAPH_RENDER_HAS_ANIMATION  (1 << 5)
+#define GRAPH_RENDER_UCODE_REJ      (1 << 6)
+#define GRAPH_RENDER_SILHOUETTE     (1 << 7)
 
 // Whether the node type has a function pointer of type GraphNodeFunc
 #define GRAPH_NODE_TYPE_FUNCTIONAL            0x100
@@ -31,6 +35,7 @@
 #define GRAPH_NODE_TYPE_ROTATION              0x017
 #define GRAPH_NODE_TYPE_OBJECT                0x018
 #define GRAPH_NODE_TYPE_ANIMATED_PART         0x019
+#define GRAPH_NODE_TYPE_BONE                  GEO_BONE_ID
 #define GRAPH_NODE_TYPE_BILLBOARD             0x01A
 #define GRAPH_NODE_TYPE_DISPLAY_LIST          0x01B
 #define GRAPH_NODE_TYPE_SCALE                 0x01C
@@ -43,7 +48,7 @@
 
 // The number of master lists. A master list determines the order and render
 // mode with which display lists are drawn.
-#define GFX_NUM_MASTER_LISTS 8
+#define GFX_NUM_MASTER_LISTS (LAYER_LAST_ALL + 1)
 
 // Passed as first argument to a GraphNodeFunc to give information about in
 // which context it was called and what it is expected to do.
@@ -126,8 +131,8 @@ struct DisplayListNode
 struct GraphNodeMasterList
 {
     /*0x00*/ struct GraphNode node;
-    /*0x14*/ struct DisplayListNode *listHeads[GFX_NUM_MASTER_LISTS];
-    /*0x34*/ struct DisplayListNode *listTails[GFX_NUM_MASTER_LISTS];
+    /*0x14*/ struct DisplayListNode *listHeads[2][GFX_NUM_MASTER_LISTS];
+    /*0x34*/ struct DisplayListNode *listTails[2][GFX_NUM_MASTER_LISTS];
 };
 
 /** Simply used as a parent to group multiple children.
@@ -238,6 +243,15 @@ struct GraphNodeAnimatedPart
     /*0x14*/ void *displayList;
     /*0x18*/ Vec3s translation;
 };
+
+struct GraphNodeBone
+{
+    struct GraphNode node;
+    void *displayList;
+    Vec3s translation;
+    Vec3s rotation;
+};
+
 
 /** A GraphNode that draws a display list rotated in a way to always face the
  *  camera. Note that if the entire object is a billboard (like a coin or 1-up)
@@ -387,6 +401,8 @@ struct GraphNodeObject *init_graph_node_object(struct AllocOnlyPool *pool, struc
 struct GraphNodeCullingRadius *init_graph_node_culling_radius(struct AllocOnlyPool *pool, struct GraphNodeCullingRadius *graphNode, s16 radius);
 struct GraphNodeAnimatedPart *init_graph_node_animated_part(struct AllocOnlyPool *pool, struct GraphNodeAnimatedPart *graphNode,
                                                             s32 drawingLayer, void *displayList, Vec3s translation);
+struct GraphNodeBone *init_graph_node_bone(struct AllocOnlyPool *pool, struct GraphNodeBone *graphNode,
+                                           s32 drawingLayer, void *displayList, Vec3s translation, Vec3s rotation);
 struct GraphNodeBillboard *init_graph_node_billboard(struct AllocOnlyPool *pool, struct GraphNodeBillboard *graphNode,
                                                      s32 drawingLayer, void *displayList, Vec3s translation);
 struct GraphNodeDisplayList *init_graph_node_display_list(struct AllocOnlyPool *pool, struct GraphNodeDisplayList *graphNode,

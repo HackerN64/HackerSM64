@@ -12,7 +12,7 @@ struct ObjectHitbox sExclamationBoxHitbox = {
     /* hurtboxHeight: */ 30,
 };
 
-struct Struct802C0DF0 {
+struct ExclamationBoxContents {
     u8 unk0;
     u8 unk1;
     u8 unk2;
@@ -20,7 +20,7 @@ struct Struct802C0DF0 {
     const BehaviorScript *behavior;
 };
 
-struct Struct802C0DF0 sExclamationBoxContents[] = { { 0, 0, 0, MODEL_MARIOS_WING_CAP, bhvWingCap },
+struct ExclamationBoxContents sExclamationBoxContents[] = { { 0, 0, 0, MODEL_MARIOS_WING_CAP, bhvWingCap },
                                                     { 1, 0, 0, MODEL_MARIOS_METAL_CAP, bhvMetalCap },
                                                     { 2, 0, 0, MODEL_MARIOS_CAP, bhvVanishCap },
                                                     { 3, 0, 0, MODEL_KOOPA_SHELL, bhvKoopaShell },
@@ -111,21 +111,21 @@ void exclamation_box_act_3(void) {
         o->oAction = 4;
 }
 
-void exclamation_box_spawn_contents(struct Struct802C0DF0 *a0, u8 a1) {
-    struct Object *sp1C = NULL;
+void exclamation_box_spawn_contents(struct ExclamationBoxContents *contentsList, u8 boxType) {
+    struct Object *contentsObj = NULL;
 
-    while (a0->unk0 != 99) {
-        if (a1 == a0->unk0) {
-            sp1C = spawn_object(o, a0->model, a0->behavior);
-            sp1C->oVelY = 20.0f;
-            sp1C->oForwardVel = 3.0f;
-            sp1C->oMoveAngleYaw = gMarioObject->oMoveAngleYaw;
-            o->oBehParams |= a0->unk2 << 24;
-            if (a0->model == MODEL_STAR)
+    while (contentsList->id != 99) {
+        if (boxType == contentsList->id) {
+            contentsObj = spawn_object(o, contentsList->model, contentsList->behavior);
+            contentsObj->oVelY = 20.0f;
+            contentsObj->oForwardVel = 3.0f;
+            contentsObj->oMoveAngleYaw = gMarioObject->oMoveAngleYaw;
+            o->oBehParams |= contentsList->behParams << 24;
+            if (contentsList->model == MODEL_STAR)
                 o->oFlags |= OBJ_FLAG_PERSISTENT_RESPAWN;
             break;
         }
-        a0++;
+        contentsList++;
     }
 }
 

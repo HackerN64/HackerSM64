@@ -847,7 +847,7 @@ void preload_sequence(u32 seqId, u8 preloadMask) {
 
     if (preloadMask & PRELOAD_SEQUENCE) {
         // @bug should be IS_SEQ_LOAD_COMPLETE
-        if (IS_BANK_LOAD_COMPLETE(seqId) == TRUE) {
+        if (IS_SEQ_LOAD_COMPLETE(seqId) == TRUE) {
             eu_stubbed_printf_1("SEQ  %d ALREADY CACHED\n", seqId);
             sequenceData = get_bank_or_seq(&gSeqLoadedPool, 2, seqId);
         } else {
@@ -929,7 +929,7 @@ void load_sequence_internal(u32 player, u32 seqId, s32 loadAsync) {
         }
     }
 
-    eu_stubbed_printf_1("SEQ  %d ALREADY CACHED\n", seqId);
+    eu_stubbed_printf_1("SEQ  %d ALREADY CACHED2\n", seqId);
     init_sequence_player(player);
     seqPlayer->scriptState.depth = 0;
     seqPlayer->delay = 0;
@@ -948,7 +948,7 @@ void audio_init() {
 #if defined(VERSION_JP) || defined(VERSION_US)
     u8 buf[0x10];
 #endif
-    s32 i, j, k;
+    s32 i, /*j,*/ k;
     UNUSED s32 lim1; // lim1 unused in EU
 #if defined(VERSION_EU)
     UNUSED u8 buf[0x10];
@@ -1019,7 +1019,7 @@ void audio_init() {
     eu_stubbed_printf_1("AudioHeap is %x\n", gAudioHeapSize);
 
     for (i = 0; i < NUMAIBUFFERS; i++) {
-        gAiBufferLengths[i] = 0xa0;
+        gAiBufferLengths[i] = 10;
     }
 
     gAudioFrameCount = 0;
@@ -1037,12 +1037,13 @@ void audio_init() {
 
     sound_init_main_pools(gAudioInitPoolSize);
 
+    bzero(&gAiBuffers, sizeof(gAiBuffers));
     for (i = 0; i < NUMAIBUFFERS; i++) {
         gAiBuffers[i] = soundAlloc(&gAudioInitPool, AIBUFFER_LEN);
 
-        for (j = 0; j < (s32) (AIBUFFER_LEN / sizeof(s16)); j++) {
+        /*for (j = 0; j < (s32) (AIBUFFER_LEN / sizeof(s16)); j++) {
             gAiBuffers[i][j] = 0;
-        }
+        }*/
     }
 
 #if defined(VERSION_EU)
@@ -1050,7 +1051,7 @@ void audio_init() {
     gAudioResetStatus = 1;
     audio_shut_down_and_reset_step();
 #else
-    audio_reset_session(&gAudioSessionPresets[0]);
+    audio_reset_session(&gAudioSessionPresets[0], 0);
 #endif
 
     // Not sure about these prints

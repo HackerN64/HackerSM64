@@ -48,8 +48,6 @@ struct GraphNode gObjParentGraphNode;
 struct AllocOnlyPool *gGraphNodePool;
 struct GraphNode *gCurRootGraphNode;
 
-UNUSED s32 D_8038BCA8;
-
 /* The gGeoViews array is a mysterious one. Some background:
  *
  * If there are e.g. multiple Goombas, the multiple Goomba objects share one
@@ -96,11 +94,8 @@ uintptr_t gGeoLayoutStack[16];
 struct GraphNode *gCurGraphNodeList[32];
 s16 gCurGraphNodeIndex;
 s16 gGeoLayoutStackIndex; // similar to SP register in MIPS
-UNUSED s16 D_8038BD7C;
 s16 gGeoLayoutReturnIndex; // similar to RA register in MIPS
 u8 *gGeoLayoutCommand;
-
-u32 unused_8038B894[3] = { 0 };
 
 /*
   0x00: Branch and store return address
@@ -504,14 +499,14 @@ void geo_layout_cmd_node_translation(void) {
 void geo_layout_cmd_node_rotation(void) {
     struct GraphNodeRotation *graphNode;
 
-    Vec3s sp2c;
+    Vec3s angle;
 
     s16 drawingLayer = 0;
     s16 params = cur_geo_cmd_u8(0x01);
     s16 *cmdPos = (s16 *) gGeoLayoutCommand;
     void *displayList = NULL;
 
-    cmdPos = read_vec3s_angle(sp2c, &cmdPos[1]);
+    cmdPos = read_vec3s_angle(angle, &cmdPos[1]);
 
     if (params & 0x80) {
         displayList = *(void **) &cmdPos[0];
@@ -519,7 +514,7 @@ void geo_layout_cmd_node_rotation(void) {
         cmdPos += 2 << CMD_SIZE_SHIFT;
     }
 
-    graphNode = init_graph_node_rotation(gGraphNodePool, NULL, drawingLayer, displayList, sp2c);
+    graphNode = init_graph_node_rotation(gGraphNodePool, NULL, drawingLayer, displayList, angle);
 
     register_scene_graph_node(&graphNode->node);
 
@@ -767,6 +762,30 @@ void geo_layout_cmd_node_culling_radius(void) {
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
+/*
+  Create a scene graph node that is rotated by the object's animation + an initial rotation.
+*/
+void geo_layout_cmd_bone(void) {
+    struct GraphNodeBone *graphNode;
+    Vec3s translation;
+    Vec3s rotation;
+    s32 drawingLayer = cur_geo_cmd_u8(0x01);
+    void *displayList;
+    s16 *cmdPos = (s16 *) gGeoLayoutCommand;
+
+    cmdPos = read_vec3s(translation, &cmdPos[2]);
+    cmdPos = read_vec3s(rotation, &cmdPos[0]);
+    displayList = *(void **) &cmdPos[0];
+    cmdPos += 2 << CMD_SIZE_SHIFT;
+
+    graphNode =
+        init_graph_node_bone(gGraphNodePool, NULL, drawingLayer, displayList, translation, rotation);
+
+    register_scene_graph_node(&graphNode->node);
+
+    gGeoLayoutCommand = (u8 *) cmdPos;
+}
+
 struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     // set by register_scene_graph_node when gCurGraphNodeIndex is 0
     // and gCurRootGraphNode is NULL
@@ -788,7 +807,14 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     gGeoLayoutStack[1] = 0;
 
     while (gGeoLayoutCommand != NULL) {
-        GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
+        // Custom geo commands can be a part of the switch-case, otherwise use GeoLayoutJumpTable
+        switch (gGeoLayoutCommand[0x00]) {
+            case GEO_BONE_ID:
+                geo_layout_cmd_bone();
+                break;
+            default:
+                GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
+        }
     }
 
     return gCurRootGraphNode;

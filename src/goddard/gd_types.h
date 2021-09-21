@@ -47,28 +47,28 @@ struct DynList {
 /* Goddard Code Object Structs */
 /* Object Type Flags */
 enum ObjTypeFlag {
-    OBJ_TYPE_GROUPS    = 0x00000001,
-    OBJ_TYPE_BONES     = 0x00000002,
-    OBJ_TYPE_JOINTS    = 0x00000004,
-    OBJ_TYPE_PARTICLES = 0x00000008,
-    OBJ_TYPE_SHAPES    = 0x00000010,
-    OBJ_TYPE_NETS      = 0x00000020,
-    OBJ_TYPE_PLANES    = 0x00000040,
-    OBJ_TYPE_FACES     = 0x00000080,
-    OBJ_TYPE_VERTICES  = 0x00000100,
-    OBJ_TYPE_CAMERAS   = 0x00000200,
-    // 0x400 was not used
-    OBJ_TYPE_MATERIALS = 0x00000800,
-    OBJ_TYPE_WEIGHTS   = 0x00001000,
-    OBJ_TYPE_GADGETS   = 0x00002000,
-    OBJ_TYPE_VIEWS     = 0x00004000,
-    OBJ_TYPE_LABELS    = 0x00008000,
-    OBJ_TYPE_ANIMATORS = 0x00010000,
-    OBJ_TYPE_VALPTRS   = 0x00020000,
-    // 0x40000 was not used
-    OBJ_TYPE_LIGHTS    = 0x00080000,
-    OBJ_TYPE_ZONES     = 0x00100000,
-    OBJ_TYPE_UNK200000 = 0x00200000
+    OBJ_TYPE_GROUPS    = (1 <<  0), // 0x00000001
+    OBJ_TYPE_BONES     = (1 <<  1), // 0x00000002 // unused
+    OBJ_TYPE_JOINTS    = (1 <<  2), // 0x00000004
+    OBJ_TYPE_PARTICLES = (1 <<  3), // 0x00000008
+    OBJ_TYPE_SHAPES    = (1 <<  4), // 0x00000010
+    OBJ_TYPE_NETS      = (1 <<  5), // 0x00000020
+    OBJ_TYPE_PLANES    = (1 <<  6), // 0x00000040 // unused
+    OBJ_TYPE_FACES     = (1 <<  7), // 0x00000080
+    OBJ_TYPE_VERTICES  = (1 <<  8), // 0x00000100
+    OBJ_TYPE_CAMERAS   = (1 <<  9), // 0x00000200
+    OBJ_TYPE_UNUSED_10 = (1 << 10), // 0x00000400 // unused
+    OBJ_TYPE_MATERIALS = (1 << 11), // 0x00000800
+    OBJ_TYPE_WEIGHTS   = (1 << 12), // 0x00001000
+    OBJ_TYPE_GADGETS   = (1 << 13), // 0x00002000 // unused
+    OBJ_TYPE_VIEWS     = (1 << 14), // 0x00004000
+    OBJ_TYPE_LABELS    = (1 << 15), // 0x00008000
+    OBJ_TYPE_ANIMATORS = (1 << 16), // 0x00010000
+    OBJ_TYPE_VALPTRS   = (1 << 17), // 0x00020000
+    OBJ_TYPE_UNUSED_18 = (1 << 18), // 0x00040000 // unused
+    OBJ_TYPE_LIGHTS    = (1 << 19), // 0x00080000
+    OBJ_TYPE_ZONES     = (1 << 20), // 0x00100000 // unused
+    OBJ_TYPE_UNK200000 = (1 << 21), // 0x00200000 // unused
 };
 /* This constant seems to be used to indicate the type of any or all objects */
 #define OBJ_TYPE_ALL 0x00FFFFFF
@@ -78,11 +78,11 @@ enum ObjTypeFlag {
 typedef void (*drawmethod_t)(void *);
 /// Flags for the drawFlags field of an GdObj
 enum ObjDrawingFlags {
-    OBJ_DRAW_UNK01  = 0x01,
-    OBJ_INVISIBLE   = 0x02, ///< This `GdObj` shouldn't be drawn when updating a scene
-    OBJ_PICKED      = 0x04, ///< This `GdObj` is held by the cursor
-    OBJ_IS_GRABBALE = 0x08, ///< This `GdObj` can be grabbed/picked by the cursor
-    OBJ_HIGHLIGHTED = 0x10
+    OBJ_DRAW_UNK01  = (1 << 0), // 0x01
+    OBJ_INVISIBLE   = (1 << 1), // 0x02 ///< This `GdObj` shouldn't be drawn when updating a scene
+    OBJ_PICKED      = (1 << 2), // 0x04 ///< This `GdObj` is held by the cursor
+    OBJ_IS_GRABBALE = (1 << 3), // 0x08 ///< This `GdObj` can be grabbed/picked by the cursor
+    OBJ_HIGHLIGHTED = (1 << 4)  // 0x10
 };
 
 /**
@@ -481,22 +481,22 @@ struct ObjGadget {
 }; /* sizeof = 0x60 */
 
 enum GdViewFlags {
-    VIEW_2_COL_BUF      = 0x000008,
-    VIEW_ALLOC_ZBUF     = 0x000010,
-    VIEW_SAVE_TO_GLOBAL = 0x000040,
-    VIEW_DEFAULT_PARENT = 0x000100,
-    VIEW_BORDERED       = 0x000400,
-    VIEW_UPDATE         = 0x000800,
-    VIEW_UNK_1000       = 0x001000, // used in setup_view_buffers
-    VIEW_UNK_2000       = 0x002000, // only see together with 0x4000
-    VIEW_UNK_4000       = 0x004000,
-    VIEW_COLOUR_BUF     = 0x008000,
-    VIEW_Z_BUF          = 0x010000,
-    VIEW_1_CYCLE        = 0x020000,
-    VIEW_MOVEMENT       = 0x040000,
-    VIEW_DRAW           = 0x080000,
-    VIEW_WAS_UPDATED    = 0x100000,
-    VIEW_LIGHT          = 0x200000
+    VIEW_2_COL_BUF      = (1 <<  3), // 0x000008
+    VIEW_ALLOC_ZBUF     = (1 <<  4), // 0x000010
+    VIEW_SAVE_TO_GLOBAL = (1 <<  6), // 0x000040
+    VIEW_DEFAULT_PARENT = (1 <<  8), // 0x000100
+    VIEW_BORDERED       = (1 << 10), // 0x000400
+    VIEW_UPDATE         = (1 << 11), // 0x000800
+    VIEW_UNK_1000       = (1 << 12), // 0x001000 // used in setup_view_buffers
+    VIEW_UNK_2000       = (1 << 13), // 0x002000 // only see together with 0x4000
+    VIEW_UNK_4000       = (1 << 14), // 0x004000
+    VIEW_COLOUR_BUF     = (1 << 15), // 0x008000
+    VIEW_Z_BUF          = (1 << 16), // 0x010000
+    VIEW_1_CYCLE        = (1 << 17), // 0x020000
+    VIEW_MOVEMENT       = (1 << 18), // 0x040000
+    VIEW_DRAW           = (1 << 19), // 0x080000
+    VIEW_WAS_UPDATED    = (1 << 20), // 0x100000
+    VIEW_LIGHT          = (1 << 21)  // 0x200000
 };
 
 struct ObjView {

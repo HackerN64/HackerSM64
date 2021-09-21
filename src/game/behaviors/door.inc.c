@@ -12,8 +12,8 @@ static s32 sDoorOpenSounds[] = { SOUND_GENERAL_OPEN_WOOD_DOOR, SOUND_GENERAL_OPE
 
 static s32 sDoorCloseSounds[] = { SOUND_GENERAL_CLOSE_WOOD_DOOR, SOUND_GENERAL_CLOSE_IRON_DOOR };
 
-void door_animation_and_reset(s32 sp18) {
-    cur_obj_init_animation_with_sound(sp18);
+void door_animation_and_reset(s32 animIndex) {
+    cur_obj_init_animation_with_sound(animIndex);
     if (cur_obj_check_if_near_animation_end())
         o->oAction = 0;
 }
@@ -27,31 +27,31 @@ void set_door_camera_event(void) {
 }
 
 void play_door_open_noise(void) {
-    s32 sp1C = cur_obj_has_model(MODEL_HMC_METAL_DOOR);
+    s32 isMetalDoor = cur_obj_has_model(MODEL_HMC_METAL_DOOR);
     if (o->oTimer == 0) {
-        cur_obj_play_sound_2(sDoorOpenSounds[sp1C]);
+        cur_obj_play_sound_2(sDoorOpenSounds[isMetalDoor]);
         gTimeStopState |= TIME_STOP_MARIO_OPENED_DOOR;
     }
     if (o->oTimer == 70) {
-        cur_obj_play_sound_2(sDoorCloseSounds[sp1C]);
+        cur_obj_play_sound_2(sDoorCloseSounds[isMetalDoor]);
     }
 }
 
 void play_warp_door_open_noise(void) {
-    s32 sp1C = cur_obj_has_model(MODEL_HMC_METAL_DOOR);
+    s32 isMetalDoor = cur_obj_has_model(MODEL_HMC_METAL_DOOR);
     if (o->oTimer == 30)
-        cur_obj_play_sound_2(sDoorCloseSounds[sp1C]);
+        cur_obj_play_sound_2(sDoorCloseSounds[isMetalDoor]);
 }
 
 void bhv_door_loop(void) {
-    s32 sp1C = 0;
+    s32 index = 0;
     
-    while (sDoorActions[sp1C].flag != (u32)~0) {
-        if (cur_obj_clear_interact_status_flag(sDoorActions[sp1C].flag)) {
+    while (sDoorActions[index].flag != (u32)~0) {
+        if (cur_obj_clear_interact_status_flag(sDoorActions[index].flag)) {
             set_door_camera_event();
-            cur_obj_change_action(sDoorActions[sp1C].action);
+            cur_obj_change_action(sDoorActions[index].action);
         }
-        sp1C++;
+        index++;
     }
 
     switch (o->oAction) {
@@ -110,30 +110,29 @@ void bhv_door_init(void) {
 }
 
 void bhv_star_door_loop_2(void) {
-    s32 sp4 = 0;
+    s32 doorIsRendering = FALSE;
     if (gMarioCurrentRoom != 0) {
         if (o->oDoorUnkF8 == gMarioCurrentRoom)
-            sp4 = 1;
+            doorIsRendering = TRUE;
         else if (gMarioCurrentRoom == o->oDoorUnkFC)
-            sp4 = 1;
+            doorIsRendering = TRUE;
         else if (gMarioCurrentRoom == o->oDoorUnk100)
-            sp4 = 1;
+            doorIsRendering = TRUE;
         else if (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorUnkFC)
-            sp4 = 1;
+            doorIsRendering = TRUE;
         else if (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorUnk100)
-            sp4 = 1;
+            doorIsRendering = TRUE;
         else if (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorUnkFC)
-            sp4 = 1;
+            doorIsRendering = TRUE;
         else if (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorUnk100)
-            sp4 = 1;
+            doorIsRendering = TRUE;
     } else
-        sp4 = 1;
-    if (sp4 == 1) {
+        doorIsRendering = TRUE;
+    if (doorIsRendering) {
         o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
-        D_8035FEE4++;
-    }
-    if (sp4 == 0) {
+        gDoorRenderingTimer++;
+    } else {
         o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
     }
-    o->oDoorUnk88 = sp4;
+    o->oDoorUnk88 = doorIsRendering;
 }

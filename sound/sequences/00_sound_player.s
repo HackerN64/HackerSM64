@@ -2113,9 +2113,6 @@ chan_setlayer 0, .layer_C6C
 chan_end
 
 .layer_C6C:
-#if defined(VERSION_EU) || defined(VERSION_SH)
-  layer_transpose 1
-#endif
 layer_portamento 0x82, 44, 200
 layer_note1 39, 0x30, 127
 layer_end

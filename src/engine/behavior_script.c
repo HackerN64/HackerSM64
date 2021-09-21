@@ -905,9 +905,7 @@ static BhvCommandProc BehaviorCmdTable[] = {
 
 // Execute the behavior script of the current object, process the object flags, and other miscellaneous code for updating objects.
 void cur_obj_update(void) {
-    UNUSED u32 unused;
-
-    s16 objFlags = gCurrentObject->oFlags;
+    u32 objFlags = gCurrentObject->oFlags;
     f32 distanceFromMario;
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
@@ -953,7 +951,7 @@ void cur_obj_update(void) {
     }
 
     // Execute various code based on object flags.
-    objFlags = (s16) gCurrentObject->oFlags;
+    objFlags = gCurrentObject->oFlags;
 
     if (objFlags & OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE) {
         obj_set_face_angle_to_move_angle(gCurrentObject);
@@ -981,6 +979,18 @@ void cur_obj_update(void) {
 
     if (objFlags & OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE) {
         obj_update_gfx_pos_and_angle(gCurrentObject);
+    }
+
+    if (objFlags & OBJ_FLAG_UCODE_LARGE) {
+        gCurrentObject->header.gfx.node.flags &= ~GRAPH_RENDER_UCODE_REJ;
+    } else {
+        gCurrentObject->header.gfx.node.flags |=  GRAPH_RENDER_UCODE_REJ;
+    }
+
+    if (objFlags & OBJ_FLAG_SILHOUETTE) {
+        gCurrentObject->header.gfx.node.flags |=  GRAPH_RENDER_SILHOUETTE;
+    } else {
+        gCurrentObject->header.gfx.node.flags &= ~GRAPH_RENDER_SILHOUETTE;
     }
 
 #ifdef PUPPYLIGHTS

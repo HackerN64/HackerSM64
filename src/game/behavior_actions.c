@@ -218,32 +218,33 @@ void create_respawner(s32 model, const BehaviorScript *behToSpawn, s32 minSpawnD
 
 // not sure what this is doing here. not in a behavior file.
 Gfx *geo_move_mario_part_from_parent(s32 run, UNUSED struct GraphNode *node, Mat4 mtx) {
-    Mat4 sp20;
-    struct Object *sp1C;
+    Mat4 mtx2;
+    struct Object *obj;
 
     if (run == TRUE) {
-        sp1C = (struct Object *) gCurGraphNodeObject;
-        if (sp1C == gMarioObject && sp1C->prevObj != NULL) {
-            create_transformation_from_matrices(sp20, mtx, *gCurGraphNodeCamera->matrixPtr);
-            obj_update_pos_from_parent_transformation(sp20, sp1C->prevObj);
-            obj_set_gfx_pos_from_pos(sp1C->prevObj);
+        obj = (struct Object *) gCurGraphNodeObject;
+        if (obj == gMarioObject && obj->prevObj != NULL) {
+            create_transformation_from_matrices(mtx2, mtx, *gCurGraphNodeCamera->matrixPtr);
+            obj_update_pos_from_parent_transformation(mtx2, obj->prevObj);
+            obj_set_gfx_pos_from_pos(obj->prevObj);
         }
     }
     return NULL;
 }
 
+static s16 sSpawnSparkleParticleAngle = 0x0;
+
 // not in behavior file
 // n is the number of objects to spawn, r if the rate of change of phase (frequency?)
-void spawn_sparkle_particles(s32 n, s32 a1, s32 a2, s32 r) {
-    static s16 D_8035FF10;
+void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
     s32 i;
     s16 separation = 0x10000 / n; // Evenly spread around a circle
     for (i = 0; i < n; i++) {
-        spawn_object_relative(0, sins(D_8035FF10 + i * separation) * a1, (i + 1) * a2,
-                              coss(D_8035FF10 + i * separation) * a1, o, MODEL_NONE, bhvSparkleSpawn);
+        spawn_object_relative(0, sins(sSpawnSparkleParticleAngle + i * separation) * radius, (i + 1) * height,
+                              coss(sSpawnSparkleParticleAngle + i * separation) * radius, o, MODEL_NONE, bhvSparkleSpawn);
     }
 
-    D_8035FF10 += r * 0x100;
+    sSpawnSparkleParticleAngle += r * 0x100;
 }
 
 // Not in behavior file, duplicate of vec3f_copy except without bad return.
@@ -255,14 +256,14 @@ void vec3f_copy_2(Vec3f dest, Vec3f src) {
 }
 
 s32 set_obj_anim_with_accel_and_sound(s16 a0, s16 a1, s32 a2) {
-    f32 sp1C;
-    if ((sp1C = o->header.gfx.animInfo.animAccel / (f32) 0x10000) == 0)
-        sp1C = 1.0f;
-    if (cur_obj_check_anim_frame_in_range(a0, sp1C) || cur_obj_check_anim_frame_in_range(a1, sp1C)) {
+    f32 range;
+    if ((range = o->header.gfx.animInfo.animAccel / (f32) 0x10000) == 0)
+        range = 1.0f;
+    if (cur_obj_check_anim_frame_in_range(a0, range) || cur_obj_check_anim_frame_in_range(a1, range)) {
         cur_obj_play_sound_2(a2);
-        return 1;
+		return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 
 void spawn_default_star(f32 sp20, f32 sp24, f32 sp28) {

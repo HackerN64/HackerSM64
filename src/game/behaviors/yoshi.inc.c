@@ -19,7 +19,7 @@ void bhv_yoshi_init(void) {
 
 void yoshi_walk_loop(void) {
     UNUSED s16 collisionFlags;
-    s16 sp24 = o->header.gfx.animInfo.animFrame;
+    s16 animFrame = o->header.gfx.animInfo.animFrame;
 
     o->oForwardVel = 10.0f;
     collisionFlags = object_step();
@@ -28,7 +28,7 @@ void yoshi_walk_loop(void) {
         o->oAction = YOSHI_ACT_IDLE;
 
     cur_obj_init_animation(1);
-    if (sp24 == 0 || sp24 == 15)
+    if (animFrame == 0 || animFrame == 15)
         cur_obj_play_sound_2(SOUND_GENERAL_YOSHI_WALK);
 
     if (o->oInteractStatus == INT_STATUS_INTERACTED)
@@ -42,7 +42,6 @@ void yoshi_walk_loop(void) {
 
 void yoshi_idle_loop(void) {
     s16 chosenHome;
-    UNUSED s16 sp1C = o->header.gfx.animInfo.animFrame;
 
     if (o->oTimer > 90) {
         chosenHome = random_float() * 3.99;
@@ -95,7 +94,7 @@ void yoshi_talk_loop(void) {
 }
 
 void yoshi_walk_and_jump_off_roof_loop(void) {
-    s16 sp26 = o->header.gfx.animInfo.animFrame;
+    s16 animFrame = o->header.gfx.animInfo.animFrame;
 
     o->oForwardVel = 10.0f;
     object_step();
@@ -113,7 +112,7 @@ void yoshi_walk_and_jump_off_roof_loop(void) {
         o->oAction = YOSHI_ACT_FINISH_JUMPING_AND_DESPAWN;
     }
 
-    if (sp26 == 0 || sp26 == 15) {
+    if (animFrame == 0 || animFrame == 15) {
         cur_obj_play_sound_2(SOUND_GENERAL_YOSHI_WALK);
     }
 }
@@ -131,7 +130,7 @@ void yoshi_finish_jumping_and_despawn_loop(void) {
 }
 
 void yoshi_give_present_loop(void) {
-    s32 sp1C = gGlobalTimer;
+    s32 timer = gGlobalTimer;
 
     if (gHudDisplay.lives == 100) {
         play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
@@ -140,7 +139,7 @@ void yoshi_give_present_loop(void) {
         return;
     }
 
-    if ((sp1C & 0x03) == 0) {
+    if ((timer & 0x03) == 0) {
         play_sound(SOUND_MENU_YOSHI_GAIN_LIVES, gGlobalSoundSource);
         gMarioState->numLives++;
     }

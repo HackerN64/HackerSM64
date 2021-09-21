@@ -25,9 +25,6 @@ static Gfx *sGfxCursor; // points to end of display list for bubble particles
 static s32 sBubbleParticleCount;
 static s32 sBubbleParticleMaxCount;
 
-UNUSED s32 D_80330690 = 0;
-UNUSED s32 D_80330694 = 0;
-
 /// Template for a bubble particle triangle
 Vtx_t gBubbleTempVtx[3] = {
     { { 0, 0, 0 }, 0, { 1544, 964 }, { 0xFF, 0xFF, 0xFF, 0xFF } },
@@ -72,11 +69,9 @@ s32 random_flower_offset(void) {
  */
 void envfx_update_flower(Vec3s centerPos) {
     s32 i;
-    struct FloorGeometry *floorGeo; // unused
     s32 timer = gGlobalTimer;
 
     s16 centerX = centerPos[0];
-    UNUSED s16 centerY = centerPos[1];
     s16 centerZ = centerPos[2];
 
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
@@ -84,8 +79,7 @@ void envfx_update_flower(Vec3s centerPos) {
         if ((gEnvFxBuffer + i)->isAlive == 0) {
             (gEnvFxBuffer + i)->xPos = random_flower_offset() + centerX;
             (gEnvFxBuffer + i)->zPos = random_flower_offset() + centerZ;
-            (gEnvFxBuffer + i)->yPos = find_floor_height_and_data((gEnvFxBuffer + i)->xPos, 10000.0f,
-                                                                  (gEnvFxBuffer + i)->zPos, &floorGeo);
+            (gEnvFxBuffer + i)->yPos = find_floor_height((gEnvFxBuffer + i)->xPos, 10000.0f, (gEnvFxBuffer + i)->zPos);
             (gEnvFxBuffer + i)->isAlive = 1;
             (gEnvFxBuffer + i)->animFrame = random_float() * 5.0f;
         } else if ((timer & 0x03) == 0) {
@@ -205,17 +199,15 @@ void envfx_rotate_around_whirlpool(s32 *x, s32 *y, s32 *z) {
  * low or close to the center.
  */
 s32 envfx_is_whirlpool_bubble_alive(s32 index) {
-    s32 UNUSED sp4;
-
     if ((gEnvFxBuffer + index)->bubbleY < gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y] - 100) {
-        return 0;
+        return FALSE;
     }
 
     if ((gEnvFxBuffer + index)->angleAndDist[1] < 10) {
-        return 0;
+        return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }
 
 /**

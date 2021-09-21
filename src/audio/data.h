@@ -16,8 +16,10 @@
 // constant .data
 #if defined(VERSION_EU) || defined(VERSION_SH)
 extern struct AudioSessionSettingsEU gAudioSessionPresets[];
+extern struct ReverbSettingsEU sReverbSettings[8];
 #else
-extern struct AudioSessionSettings gAudioSessionPresets[18];
+extern struct AudioSessionSettings gAudioSessionPresets[1];
+extern struct ReverbSettingsUS gReverbSettings[18];
 #endif
 extern u16 D_80332388[128]; // unused
 
@@ -111,13 +113,13 @@ extern u16 gUnused80226E98[0x10];
 extern u32 gAudioRandom;
 
 #ifdef EXPAND_AUDIO_HEAP
-#if defined(VERSION_US) || defined(VERSION_JP)
-#define EXT_AUDIO_HEAP_SIZE 0x24400
+#if defined(VERSION_US) || defined(VERSION_JP) || defined(VERSION_EU)
+#define EXT_AUDIO_HEAP_SIZE 0x27400
 #define EXT_AUDIO_INIT_POOL_SIZE 0x8000
 #else
-// EU and SH versions not yet supported for extended audio heap
-#define EXT_AUDIO_HEAP_SIZE 0x24400
-#define EXT_AUDIO_INIT_POOL_SIZE 0x8000
+// SH not yet supported for expanded audio heap
+#define EXT_AUDIO_HEAP_SIZE 0x0
+#define EXT_AUDIO_INIT_POOL_SIZE 0x0
 #endif
 #else
 #define EXT_AUDIO_HEAP_SIZE 0x0
@@ -151,11 +153,11 @@ extern OSMesgQueue *D_SH_80350FA8;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #define UNUSED_COUNT_80333EE8 24
-#define AUDIO_HEAP_SIZE (0x2c500 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
-#define AUDIO_INIT_POOL_SIZE (0x2c00 + EXT_AUDIO_INIT_POOL_SIZE)
+#define AUDIO_HEAP_SIZE (0x3AB00 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
+#define AUDIO_INIT_POOL_SIZE (0x2C00 + EXT_AUDIO_INIT_POOL_SIZE)
 #else
 #define UNUSED_COUNT_80333EE8 16
-#define AUDIO_HEAP_SIZE (0x31150 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
+#define AUDIO_HEAP_SIZE (0x34750 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
 #define AUDIO_INIT_POOL_SIZE (0x2500 + EXT_AUDIO_INIT_POOL_SIZE)
 #endif
 

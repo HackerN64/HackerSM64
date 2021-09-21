@@ -336,30 +336,30 @@ static s32 boo_get_attack_status(void) {
 }
 
 // boo idle/chasing movement?
-static void boo_chase_mario(f32 a0, s16 a1, f32 a2) {
-    f32 sp1C;
-    s16 sp1A;
+static void boo_chase_mario(f32 minDY, s16 yawIncrement, f32 mul) {
+    f32 dy;
+    s16 targetYaw;
 
     if (boo_vanish_or_appear()) {
         o->oInteractType = 0x8000;
 
         if (cur_obj_lateral_dist_from_mario_to_home() > 1500.0f) {
-            sp1A = cur_obj_angle_to_home();
+            targetYaw = cur_obj_angle_to_home();
         } else {
-            sp1A = o->oAngleToMario;
+            targetYaw = o->oAngleToMario;
         }
 
-        cur_obj_rotate_yaw_toward(sp1A, a1);
+        cur_obj_rotate_yaw_toward(targetYaw, yawIncrement);
         o->oVelY = 0.0f;
 
         if (mario_is_in_air_action() == 0) {
-            sp1C = o->oPosY - gMarioObject->oPosY;
-            if (a0 < sp1C && sp1C < 500.0f) {
+            dy = o->oPosY - gMarioObject->oPosY;
+            if (minDY < dy && dy < 500.0f) {
                 o->oVelY = increment_velocity_toward_range(o->oPosY, gMarioObject->oPosY + 50.0f, 10.f, 2.0f);
             }
         }
 
-        cur_obj_set_vel_from_mario_vel(10.0f - o->oBooNegatedAggressiveness, a2);
+        cur_obj_set_vel_from_mario_vel(10.0f - o->oBooNegatedAggressiveness, mul);
 
         if (o->oForwardVel != 0.0f) {
             boo_oscillate(FALSE);
@@ -540,18 +540,18 @@ static void big_boo_act_0(void) {
 
 static void big_boo_act_1(void) {
     s32 attackStatus;
-    s16 sp22;
-    f32 sp1C;
+    s16 yawIncrement;
+    f32 mul;
 
     if (o->oHealth == 3) {
-        sp22 = 0x180; sp1C = 0.5f;
+        yawIncrement = 0x180; mul = 0.5f;
     } else if (o->oHealth == 2) {
-        sp22 = 0x240; sp1C = 0.6f;
+        yawIncrement = 0x240; mul = 0.6f;
     } else {
-        sp22 = 0x300; sp1C = 0.8f;
+        yawIncrement = 0x300; mul = 0.8f;
     }
 
-    boo_chase_mario(-100.0f, sp22, sp1C);
+    boo_chase_mario(-100.0f, yawIncrement, mul);
 
     attackStatus = boo_get_attack_status();
 

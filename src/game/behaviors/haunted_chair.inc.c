@@ -13,34 +13,34 @@ struct ObjectHitbox sHauntedChairHitbox = {
 };
 
 void bhv_haunted_chair_init(void) {
-    struct Object *val04;
-    f32 val00;
+    struct Object *pianoObj;
+    f32 dist;
 
-    val04 = cur_obj_find_nearest_object_with_behavior(bhvMadPiano, &val00);
-    if (val04 != NULL && val00 < 300.0f) {
-        o->parentObj = val04;
+    pianoObj = cur_obj_find_nearest_object_with_behavior(bhvMadPiano, &dist);
+    if (pianoObj != NULL && dist < 300.0f) {
+        o->parentObj = pianoObj;
     } else {
         o->oHauntedChairUnkF4 = 1;
     }
 }
 
 void haunted_chair_act_0(void) {
-    s16 val0E;
+    s16 dAngleToPiano;
 
     if (o->parentObj != o) {
         if (o->oHauntedChairUnk104 == 0) {
             if (lateral_dist_between_objects(o, o->parentObj) < 250.0f) {
-                val0E = obj_angle_to_object(o, o->parentObj) - o->oFaceAngleYaw + 0x2000;
-                if (val0E & 0x4000) {
+                dAngleToPiano = obj_angle_to_object(o, o->parentObj) - o->oFaceAngleYaw + 0x2000;
+                if (dAngleToPiano & 0x4000) {
                     o->oHauntedChairUnk100 = &o->oFaceAngleRoll;
-                    if (val0E > 0) {
+                    if (dAngleToPiano > 0) {
                         o->oHauntedChairUnk104 = 0x4000;
                     } else {
                         o->oHauntedChairUnk104 = -0x4000;
                     }
                 } else {
                     o->oHauntedChairUnk100 = &o->oFaceAnglePitch;
-                    if (val0E < 0) {
+                    if (dAngleToPiano < 0) {
                         o->oHauntedChairUnk104 = 0x5000;
                     } else {
                         o->oHauntedChairUnk104 = -0x4000;
@@ -64,19 +64,19 @@ void haunted_chair_act_0(void) {
         o->oTimer = 0.0f;
     } else {
         if ((o->oTimer & 0x8) != 0) {
-            f32 val08;
+            f32 offset;
 
             if (o->oFaceAnglePitch < 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_HAUNTED_CHAIR_MOVE);
-                val08 = 4.0f;
+                offset = 4.0f;
             } else {
-                val08 = -4.0f;
+                offset = -4.0f;
             }
 
-            o->oHomeX -= val08;
-            o->oHomeZ -= val08;
+            o->oHomeX -= offset;
+            o->oHomeZ -= offset;
 
-            o->oFaceAnglePitch = o->oFaceAngleRoll = (s32)(50.0f * val08);
+            o->oFaceAnglePitch = o->oFaceAngleRoll = (s32)(50.0f * offset);
         } else {
             o->oFaceAnglePitch = o->oFaceAngleRoll = 0;
         }

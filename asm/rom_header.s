@@ -26,13 +26,13 @@
     .ascii "E"                  /* NTSC-U (North America) */
 #endif
 #if defined(SRAM)
-    .byte  0x30                 /* Version */
+    .byte  0x32                 /* Version */
 #elif defined(EEP16K)
-    .byte  0x20                 /* Version */
+    .byte  0x22                 /* Version */
 #elif defined(SRAM768K)
-    .byte  0x40                 /* Version */
+    .byte  0x42                 /* Version */
 #elif defined(FLASHRAM)
-    .byte  0x50                 /* Version */
+    .byte  0x52                 /* Version */
 #else
-    .byte  0x10                 /* Version */
+    .byte  0x12                 /* Version */
 #endif

@@ -17,12 +17,13 @@ struct ChainSegment
     s16 roll;
 };
 
-#define WATER_DROPLET_FLAG_RAND_ANGLE                0x02
-#define WATER_DROPLET_FLAG_RAND_OFFSET_XZ            0x04 // Unused
-#define WATER_DROPLET_FLAG_RAND_OFFSET_XYZ           0x08 // Unused
-#define WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL      0x20
-#define WATER_DROPLET_FLAG_RAND_ANGLE_INCR_PLUS_8000 0x40
-#define WATER_DROPLET_FLAG_RAND_ANGLE_INCR           0x80 // Unused
+#define WATER_DROPLET_FLAG_RAND_ANGLE               (1 << 1) // 0x02
+#define WATER_DROPLET_FLAG_RAND_OFFSET_XZ           (1 << 2) // 0x04 // Unused
+#define WATER_DROPLET_FLAG_RAND_OFFSET_XYZ          (1 << 3) // 0x08 // Unused
+#define WATER_DROPLET_FLAG_UNUSED                   (1 << 4) // 0x10 // Unused
+#define WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL     (1 << 5) // 0x20
+#define WATER_DROPLET_FLAG_RAND_ANGLE_INCR_BACKWARD (1 << 6) // 0x40
+#define WATER_DROPLET_FLAG_RAND_ANGLE_INCR_FORWARD  (1 << 7) // 0x80 // Unused
 
 // Call spawn_water_droplet with this struct to spawn an object.
 struct WaterDropletParams
@@ -38,16 +39,6 @@ struct WaterDropletParams
     f32 randYVelScale;
     f32 randSizeOffset;
     f32 randSizeScale;
-};
-
-struct struct802A1230 {
-    /*0x00*/ s16 unk00;
-    /*0x02*/ s16 unk02;
-};
-
-struct Struct802A272C {
-    Vec3f vecF;
-    Vec3s vecS;
 };
 
 // TODO: Field names
@@ -76,9 +67,9 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
 Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node);
 Gfx *geo_switch_area(s32 callContext, struct GraphNode *node);
 #endif
-void obj_update_pos_from_parent_transformation(Mat4 a0, struct Object *a1);
+void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj);
 void obj_apply_scale_to_matrix(struct Object *obj, Mat4 dst, Mat4 src);
-void create_transformation_from_matrices(Mat4 a0, Mat4 a1, Mat4 a2);
+void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);
 void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior);
 f32 lateral_dist_between_objects(struct Object *obj1, struct Object *obj2);
 f32 dist_between_objects(struct Object *obj1, struct Object *obj2);
@@ -97,7 +88,7 @@ struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, 
                                          s16 x, s16 y, s16 z, s16 rx, s16 ry, s16 rz);
 struct Object *spawn_object_rel_with_rot(struct Object *parent, u32 model, const BehaviorScript *behavior,
                                          s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, UNUSED s16 rz);
-struct Object *spawn_obj_with_transform_flags(struct Object *sp20, s32 model, const BehaviorScript *sp28);
+struct Object *spawn_obj_with_transform_flags(struct Object *sp20, s32 model, const BehaviorScript *behavior);
 struct Object *spawn_water_droplet(struct Object *parent, struct WaterDropletParams *params);
 struct Object *spawn_object_at_origin(struct Object *, s32, u32, const BehaviorScript *);
 struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedArg, u32 model, const BehaviorScript *behavior);
@@ -153,8 +144,8 @@ s32 cur_obj_check_anim_frame_in_range(s32 startFrame, s32 rangeLength);
 s32 cur_obj_check_frame_prior_current_frame(s16 *a0);
 s32 mario_is_in_air_action(void);
 s32 mario_is_dive_sliding(void);
-void cur_obj_set_y_vel_and_animation(f32 sp18, s32 sp1C);
-void cur_obj_unrender_set_action_and_anim(s32 sp18, s32 sp1C);
+void cur_obj_set_y_vel_and_animation(f32 yVel, s32 animIndex);
+void cur_obj_unrender_set_action_and_anim(s32 animIndex, s32 action);
 void cur_obj_get_thrown_or_placed(f32 forwardVel, f32 velY, s32 thrownAction);
 void cur_obj_get_dropped(void);
 void cur_obj_set_model(s32 modelID);
@@ -190,8 +181,8 @@ void set_mario_interact_true_if_in_range(UNUSED s32 sp0, UNUSED s32 sp4, f32 sp8
 void obj_set_billboard(struct Object *obj);
 void cur_obj_set_hitbox_radius_and_height(f32 radius, f32 height);
 void cur_obj_set_hurtbox_radius_and_height(f32 radius, f32 height);
-void obj_spawn_loot_blue_coins(struct Object *obj, s32 numCoins, f32 sp28, s16 posJitter);
-void obj_spawn_loot_yellow_coins(struct Object *obj, s32 numCoins, f32 sp28);
+void obj_spawn_loot_blue_coins(struct Object *obj, s32 numCoins, f32 baseYVel, s16 posJitter);
+void obj_spawn_loot_yellow_coins(struct Object *obj, s32 numCoins, f32 baseYVel);
 void cur_obj_spawn_loot_coin_at_mario_pos(void);
 s32 cur_obj_advance_looping_anim(void);
 s32 cur_obj_resolve_wall_collisions(void);
@@ -243,30 +234,29 @@ s32 absi(s32 a0);
 s32 cur_obj_wait_then_blink(s32 timeUntilBlinking, s32 numBlinks);
 s32 cur_obj_is_mario_ground_pounding_platform(void);
 void spawn_mist_particles(void);
-void spawn_mist_particles_with_sound(u32 sp18);
+void spawn_mist_particles_with_sound(u32 soundMagic);
 void cur_obj_push_mario_away(f32 radius);
 void cur_obj_push_mario_away_from_cylinder(f32 radius, f32 extentY);
 s32 cur_obj_set_direction_table(s8 *a0);
 s32 cur_obj_progress_direction_table(void);
 void stub_obj_helpers_3(UNUSED s32 sp0, UNUSED s32 sp4);
-void cur_obj_scale_over_time(s32 a0, s32 a1, f32 sp10, f32 sp14);
+void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end);
 void cur_obj_set_pos_to_home_with_debug(void);
 s32 cur_obj_is_mario_on_platform(void);
-s32 jiggle_bbh_stair(s32 a0);
+s32 jiggle_bbh_stair(s32 timer);
 void cur_obj_call_action_function(void (*actionFunctions[])(void));
 void spawn_base_star_with_no_lvl_exit(void);
-s32 bit_shift_left(s32 a0);
 s32 cur_obj_mario_far_away(void);
 s32 is_mario_moving_fast_or_in_air(s32 speedThreshold);
 s32 is_item_in_array(s8 item, s8 *array);
 void cur_obj_enable_rendering_if_mario_in_room(void);
 s32 cur_obj_set_hitbox_and_die_if_attacked(struct ObjectHitbox *hitbox, s32 deathSound, s32 noLootCoins);
-void obj_explode_and_spawn_coins(f32 sp18, s32 sp1C);
+void obj_explode_and_spawn_coins(f32 mistSize, s32 coinType);
 void obj_set_collision_data(struct Object *obj, const void *segAddr);
 void cur_obj_if_hit_wall_bounce_away(void);
 s32 cur_obj_hide_if_mario_far_away_y(f32 distY);
 Gfx *geo_offset_klepto_held_object(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
-s32 geo_offset_klepto_debug(s32 a0, struct GraphNode *a1, UNUSED s32 sp8);
+Gfx *geo_offset_klepto_debug(s32 callContext, struct GraphNode *node, UNUSED s32 context);
 s32 obj_is_hidden(struct Object *obj);
 void enable_time_stop(void);
 void disable_time_stop(void);
@@ -298,9 +288,10 @@ void cur_obj_spawn_loot_blue_coin(void);
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY);
 #endif
 
-// Extra functions for ultrasm64-extbounds
+// Extra functions for HackerSM64
 void obj_set_model(struct Object *obj, s32 modelID);
 s32 obj_has_model(struct Object *obj, u16 modelID);
-// End of ultrasm64-extbounds stuff
+u32 obj_get_model_id(struct Object *obj);
+// End of HackerSM64 stuff
 
 #endif // OBJECT_HELPERS_H

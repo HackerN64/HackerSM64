@@ -76,9 +76,76 @@ s16 *gCurAnimData;
 struct AllocOnlyPool *gDisplayListHeap;
 
 struct RenderModeContainer {
-    u32 modes[8];
+    u32 modes[GFX_NUM_MASTER_LISTS];
 };
 
+#if SILHOUETTE
+/* Rendermode settings for cycle 1 for all 13 layers. */
+struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
+    G_RM_OPA_SURF,                      // LAYER_FORCE
+    G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE
+    G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_INTER
+    G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_DECAL
+    G_RM_AA_TEX_EDGE,                   // LAYER_ALPHA
+    G_RM_AA_TEX_EDGE | ZMODE_DEC,       // LAYER_ALPHA_DECAL
+    G_RM_AA_OPA_SURF,                   // LAYER_SILHOUETTE_OPAQUE
+    G_RM_AA_TEX_EDGE,                   // LAYER_SILHOUETTE_ALPHA
+    G_RM_AA_OPA_SURF,                   // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+    G_RM_AA_TEX_EDGE,                   // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+    G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_DECAL
+    G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT
+    G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_INTER
+    } },
+    { {
+    /* z-buffered */
+    G_RM_ZB_OPA_SURF,                   // LAYER_FORCE
+    G_RM_AA_ZB_OPA_SURF,                // LAYER_OPAQUE
+    G_RM_AA_ZB_OPA_INTER,               // LAYER_OPAQUE_INTER
+    G_RM_AA_ZB_OPA_DECAL,               // LAYER_OPAQUE_DECAL
+    G_RM_AA_ZB_TEX_EDGE,                // LAYER_ALPHA
+    G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,    // LAYER_ALPHA_DECAL
+    G_RM_AA_ZB_OPA_SURF,                // LAYER_SILHOUETTE_OPAQUE
+    G_RM_AA_ZB_TEX_EDGE,                // LAYER_SILHOUETTE_ALPHA
+    G_RM_AA_ZB_OPA_SURF,                // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+    G_RM_AA_ZB_TEX_EDGE,                // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+    G_RM_AA_ZB_XLU_DECAL,               // LAYER_TRANSPARENT_DECAL
+    G_RM_AA_ZB_XLU_SURF,                // LAYER_TRANSPARENT
+    G_RM_AA_ZB_XLU_INTER,               // LAYER_TRANSPARENT_INTER
+    } } };
+
+/* Rendermode settings for cycle 2 for all 13 layers. */
+struct RenderModeContainer renderModeTable_2Cycle[2] = { { {
+    G_RM_OPA_SURF2,                     // LAYER_FORCE
+    G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE
+    G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_INTER
+    G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_DECAL
+    G_RM_AA_TEX_EDGE2,                  // LAYER_ALPHA
+    G_RM_AA_TEX_EDGE2 | ZMODE_DEC,      // LAYER_ALPHA_DECAL
+    G_RM_AA_OPA_SURF2,                  // LAYER_SILHOUETTE_OPAQUE
+    G_RM_AA_TEX_EDGE2,                  // LAYER_SILHOUETTE_ALPHA
+    G_RM_AA_OPA_SURF2,                  // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+    G_RM_AA_TEX_EDGE2,                  // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+    G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_DECAL
+    G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT
+    G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_INTER
+    } },
+    { {
+    /* z-buffered */
+    G_RM_ZB_OPA_SURF2,                  // LAYER_FORCE
+    G_RM_AA_ZB_OPA_SURF2,               // LAYER_OPAQUE
+    G_RM_AA_ZB_OPA_INTER2,              // LAYER_OPAQUE_INTER
+    G_RM_AA_ZB_OPA_DECAL2,              // LAYER_OPAQUE_DECAL
+    G_RM_AA_ZB_TEX_EDGE2,               // LAYER_ALPHA
+    G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC,   // LAYER_ALPHA_DECAL
+    G_RM_AA_ZB_OPA_SURF2,               // LAYER_SILHOUETTE_OPAQUE
+    G_RM_AA_ZB_TEX_EDGE2,               // LAYER_SILHOUETTE_ALPHA
+    G_RM_AA_ZB_OPA_SURF2,               // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+    G_RM_AA_ZB_TEX_EDGE2,               // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+    G_RM_AA_ZB_XLU_DECAL2,              // LAYER_TRANSPARENT_DECAL
+    G_RM_AA_ZB_XLU_SURF2,               // LAYER_TRANSPARENT
+    G_RM_AA_ZB_XLU_INTER2,              // LAYER_TRANSPARENT_INTER
+    } } };
+#else
 /* Rendermode settings for cycle 1 for all 8 layers. */
 struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
     G_RM_OPA_SURF,
@@ -124,29 +191,56 @@ struct RenderModeContainer renderModeTable_2Cycle[2] = { { {
     G_RM_AA_ZB_XLU_DECAL2,
     G_RM_AA_ZB_XLU_INTER2,
     } } };
+#endif
 
-struct GraphNodeRoot *gCurGraphNodeRoot = NULL;
-struct GraphNodeMasterList *gCurGraphNodeMasterList = NULL;
+struct GraphNodeRoot        *gCurGraphNodeRoot       = NULL;
+struct GraphNodeMasterList  *gCurGraphNodeMasterList = NULL;
 struct GraphNodePerspective *gCurGraphNodeCamFrustum = NULL;
-struct GraphNodeCamera *gCurGraphNodeCamera = NULL;
-struct GraphNodeObject *gCurGraphNodeObject = NULL;
-struct GraphNodeHeldObject *gCurGraphNodeHeldObject = NULL;
+struct GraphNodeCamera      *gCurGraphNodeCamera     = NULL;
+struct GraphNodeObject      *gCurGraphNodeObject     = NULL;
+struct GraphNodeHeldObject  *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
 
 #ifdef F3DEX_GBI_2
 LookAt lookAt;
 #endif
 
+#if SILHOUETTE
+#define SIL_CVG_THRESHOLD    0x3F // 32..255, 63 seems to give best results
+#define SCHWA (AA_EN | IM_RD | CLR_ON_CVG | CVG_DST_WRAP | CVG_X_ALPHA | FORCE_BL)
+#define SET_SILHOUETTE_F3D(gfx) {                                                                    \
+    gDPSetRenderMode(  (gfx)++, (SCHWA | GBL_c1(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA)),  \
+                                (SCHWA | GBL_c2(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA))); \
+    gSPSetGeometryMode((gfx)++, G_FOG);                      /* Enable fog                  */       \
+    gSPFogPosition(    (gfx)++, 0, 1 );                      /* Fox position                */       \
+    gDPSetFogColor(    (gfx)++, 0, 0, 0, SILHOUETTE       ); /* silhouette color & alpha    */       \
+    gDPSetEnvColor(    (gfx)++, 0, 0, 0, SIL_CVG_THRESHOLD); /* silhouette env transparency */       \
+}
+#define CLEAR_SILHOUETTE_F3D(gfx, i) {                                                                 \
+    gSPClearGeometryMode((gfx)++, G_FOG             );               /* Disable fog                 */ \
+    gDPSetEnvColor(      (gfx)++, 255, 255, 255, 255);               /* Reset env color & alpha     */ \
+    gDPSetRenderMode(    (gfx)++, (mode1List->modes[(i)] & ~IM_RD),                                    \
+                                  (mode2List->modes[(i)] & ~IM_RD)); /* Use normal mode list, no AA */ \
+}
+#endif
+
+u8 ucodeTestSwitch = 1;
+
 /**
- * Process a master list node.
+ * Process a master list node. This has been modified, so now it runs twice, for each microcode.
+ It iterates through the first 5 layers of if the first index using F3DLX2.Rej, then it switches
+ to F3DZEX and iterates through all layers, then switches back to F3DLX2.Rej and finishes the last
+ 3. It does this, because layers 5-7 are non zbuffered, and just doing 0-7 of ZEX, then 0-7 of REJ
+ would make the ZEX 0-4 render on top of Rej's 5-7.
  */
 static void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     struct DisplayListNode *currList;
-    s32 i;
+    s32 startLayer, endLayer, currLayer = LAYER_FORCE;
+    s32 headsIndex = 1;
+    s32 renderPhase = 0;
     s32 enableZBuffer = (node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0;
-    struct RenderModeContainer *modeList = &renderModeTable_1Cycle[enableZBuffer];
+    struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
-
     // @bug This is where the LookAt values should be calculated but aren't.
     // As a result, environment mapping is broken on Fast3DEX2 without the
     // changes below.
@@ -154,52 +248,139 @@ static void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     Mtx lMtx;
     guLookAtReflect(&lMtx, &lookAt, 0, 0, 0, /* eye */ 0, 0, 1, /* at */ 1, 0, 0 /* up */);
 #endif
-
-    if (enableZBuffer != 0) {
+    //if (gPlayer1Controller->buttonPressed & L_TRIG)
+    //    ucodeTestSwitch ^= 1;
+    //print_text_fmt_int(32,32,"%d",ucodeTestSwitch);
+#ifdef F3DZEX_GBI_2
+    loopBegin:
+    switch (renderPhase) {
+#if SILHOUETTE
+        case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FORCE;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
+        case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FORCE;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
+        case RENDER_PHASE_REJ_SILHOUETTE:         headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
+        case RENDER_PHASE_REJ_NON_SILHOUETTE:     headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
+        case RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE: headsIndex = LIST_HEADS_REJ; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_OCCLUDE_SILHOUETTE_LAST; break;
+        case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_LAST_ALL;                break;
+        case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST_NON_ZB;             endLayer = LAYER_LAST_ALL;                break;
+#else
+        case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FORCE;                    endLayer = LAYER_ZB_LAST;                 break;
+        case RENDER_PHASE_ZEX_ALL:                headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FORCE;                    endLayer = LAYER_LAST_ALL;                break;
+        case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST_NON_ZB;             endLayer = LAYER_LAST_ALL;                break;
+#endif
+    }
+    // Load rejection on pass 2. ZEX is loaded afterwards.
+    if (headsIndex == LIST_HEADS_REJ) {
+        if (gIsConsole) {
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo);
+        } else {
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo);
+        }
+        init_rcp(KEEP_ZBUFFER);
+        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
+    } else {
+        gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
+        init_rcp(KEEP_ZBUFFER);
+        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
+    }
+    gSPLookAt(gDisplayListHead++, &lookAt);
+#endif
+    if (enableZBuffer) {
         gDPPipeSync(gDisplayListHead++);
         gSPSetGeometryMode(gDisplayListHead++, G_ZBUFFER);
     }
-
-    for (i = 0; i < GFX_NUM_MASTER_LISTS; i++) {
-        if ((currList = node->listHeads[i]) != NULL) {
-            gDPSetRenderMode(gDisplayListHead++, modeList->modes[i], mode2List->modes[i]);
-            while (currList != NULL) {
-                gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
-                          G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-                gSPDisplayList(gDisplayListHead++, currList->displayList);
-                currList = currList->next;
+    for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
+        currList = node->listHeads[headsIndex][currLayer];
+        while (currList != NULL) {
+#if SILHOUETTE
+            if (renderPhase == RENDER_PHASE_REJ_SILHOUETTE) {
+                SET_SILHOUETTE_F3D(gDisplayListHead);
+            } else if (renderPhase == RENDER_PHASE_REJ_NON_SILHOUETTE) {
+                CLEAR_SILHOUETTE_F3D(gDisplayListHead, currLayer);
+            } else {
+#endif
+                gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer], mode2List->modes[currLayer]);
+#if SILHOUETTE
             }
+#endif
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform), G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+            gSPDisplayList(gDisplayListHead++, currList->displayList);
+            currList = currList->next;
         }
     }
-    if (enableZBuffer != 0) {
+    if (renderPhase < RENDER_PHASE_LAST) {
+        renderPhase++;
+        goto loopBegin;
+    }
+#ifdef F3DZEX_GBI_2
+    if (enableZBuffer) {
         gDPPipeSync(gDisplayListHead++);
         gSPClearGeometryMode(gDisplayListHead++, G_ZBUFFER);
     }
+#ifdef VISUAL_DEBUG
+    if (hitboxView) {
+        render_debug_boxes(DEBUG_UCODE_REJ);
+    }
+#endif
+    gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
+    init_rcp(KEEP_ZBUFFER);
+    gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
+#endif
+
+#ifdef VISUAL_DEBUG
+    if (hitboxView) {
+        render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
+    }
+    if (surfaceView) {
+        visual_surface_loop();
+    }
+#endif
 }
+#if SILHOUETTE
+#undef SIL_CVG_THRESHOLD
+#undef SCHWA
+#undef SET_SILHOUETTE_F3D
+#undef CLEAR_SILHOUETTE_F3D
+#endif
 
 /**
  * Appends the display list to one of the master lists based on the layer
  * parameter. Look at the RenderModeContainer struct to see the corresponding
  * render modes of layers.
  */
-static void geo_append_display_list(void *displayList, s16 layer) {
-
+static void geo_append_display_list(void *displayList, s32 layer) {
+    s32 index = 0;
 #ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);
 #endif
+#if defined(F3DZEX_GBI_2) || (SILHOUETTE > 0)
+    if (gCurGraphNodeObject != NULL) {
+#ifdef F3DZEX_GBI_2
+        if (gCurGraphNodeObject->node.flags & GRAPH_RENDER_UCODE_REJ && ucodeTestSwitch) {
+            index = 1;
+        }
+#endif
+#if SILHOUETTE
+        if (gCurGraphNodeObject->node.flags & GRAPH_RENDER_SILHOUETTE) {
+            switch (layer) {
+                case LAYER_OPAQUE: layer = LAYER_SILHOUETTE_OPAQUE; break;
+                case LAYER_ALPHA:  layer = LAYER_SILHOUETTE_ALPHA;  break;
+            }
+        }
+#endif
+    }
+#endif
     if (gCurGraphNodeMasterList != 0) {
-        struct DisplayListNode *listNode =
-            alloc_only_pool_alloc(gDisplayListHeap, sizeof(struct DisplayListNode));
+        struct DisplayListNode *listNode = alloc_only_pool_alloc(gDisplayListHeap, sizeof(struct DisplayListNode));
 
         listNode->transform = gMatStackFixed[gMatStackIndex];
         listNode->displayList = displayList;
         listNode->next = 0;
-        if (gCurGraphNodeMasterList->listHeads[layer] == 0) {
-            gCurGraphNodeMasterList->listHeads[layer] = listNode;
+        if (gCurGraphNodeMasterList->listHeads[index][layer] == 0) {
+            gCurGraphNodeMasterList->listHeads[index][layer] = listNode;
         } else {
-            gCurGraphNodeMasterList->listTails[layer]->next = listNode;
+            gCurGraphNodeMasterList->listTails[index][layer]->next = listNode;
         }
-        gCurGraphNodeMasterList->listTails[layer] = listNode;
+        gCurGraphNodeMasterList->listTails[index][layer] = listNode;
     }
 }
 
@@ -208,15 +389,15 @@ static void geo_append_display_list(void *displayList, s16 layer) {
  */
 static void geo_process_master_list(struct GraphNodeMasterList *node) {
     s32 i;
-    UNUSED s32 sp1C;
 
     if (gCurGraphNodeMasterList == NULL && node->node.children != NULL) {
         gCurGraphNodeMasterList = node;
         for (i = 0; i < GFX_NUM_MASTER_LISTS; i++) {
-            node->listHeads[i] = NULL;
+            node->listHeads[LIST_HEADS_ZEX][i] = NULL;
+            node->listHeads[LIST_HEADS_REJ][i] = NULL;
         }
         geo_process_node_and_siblings(node->node.children);
-        geo_process_master_list_sub(node);
+        geo_process_master_list_sub(gCurGraphNodeMasterList);
         gCurGraphNodeMasterList = NULL;
     }
 }
@@ -251,19 +432,21 @@ static void geo_process_perspective(struct GraphNodePerspective *node) {
         u16 perspNorm;
         Mtx *mtx = alloc_display_list(sizeof(*mtx));
         #ifdef WIDE
-        if (gWidescreen && (gCurrLevelNum != 0x01)){
-            aspect = 1.775f;
+        if (gConfig.widescreen && (gCurrLevelNum != 0x01)){
+            aspect = (16.0f / 9.0f); // 1.775f
         } else {
-            aspect = 1.33333f;
+            aspect = (4.0f / 3.0f); // 1.33333f
         }
         #else
-        aspect = 1.33333f;
+        aspect = (4.0f / 3.0f); // 1.33333f
         #endif
 
-        if (gCamera)
-            gWorldScale = MAX(((gCamera->pos[0] * gCamera->pos[0]) + (gCamera->pos[1] * gCamera->pos[1]) + (gCamera->pos[2] * gCamera->pos[2]))/67108864, 1.0f);
-        else
+        if (gCamera) {
+            gWorldScale = ((sqr(gCamera->pos[0]) + sqr(gCamera->pos[1]) + sqr(gCamera->pos[2])) / sqr(0x2000));
+            gWorldScale = MAX(gWorldScale, 1.0f);
+        } else {
             gWorldScale = 1.0f;
+        }
 
         guPerspective(mtx, &perspNorm, node->fov, aspect, (node->far/300) / gWorldScale, node->far / gWorldScale, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, perspNorm);
@@ -627,6 +810,70 @@ static void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
 }
 
 /**
+ * Render an animated part that has an initial rotation value
+ */
+static void geo_process_bone(struct GraphNodeBone *node) {
+    Mat4 matrix;
+    Vec3s rotation;
+    Vec3f translation;
+    Mtx *matrixPtr = alloc_display_list(sizeof(*matrixPtr));
+
+    vec3s_copy(rotation, node->rotation);
+    vec3f_set(translation, node->translation[0], node->translation[1], node->translation[2]);
+    if (gCurAnimType == ANIM_TYPE_TRANSLATION) {
+        translation[0] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
+                          * gCurAnimTranslationMultiplier;
+        translation[1] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
+                          * gCurAnimTranslationMultiplier;
+        translation[2] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
+                          * gCurAnimTranslationMultiplier;
+        gCurAnimType = ANIM_TYPE_ROTATION;
+    } else {
+        if (gCurAnimType == ANIM_TYPE_LATERAL_TRANSLATION) {
+            translation[0] +=
+                gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
+                * gCurAnimTranslationMultiplier;
+            gCurrAnimAttribute += 2;
+            translation[2] +=
+                gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
+                * gCurAnimTranslationMultiplier;
+            gCurAnimType = ANIM_TYPE_ROTATION;
+        } else {
+            if (gCurAnimType == ANIM_TYPE_VERTICAL_TRANSLATION) {
+                gCurrAnimAttribute += 2;
+                translation[1] +=
+                    gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]
+                    * gCurAnimTranslationMultiplier;
+                gCurrAnimAttribute += 2;
+                gCurAnimType = ANIM_TYPE_ROTATION;
+            } else if (gCurAnimType == ANIM_TYPE_NO_TRANSLATION) {
+                gCurrAnimAttribute += 6;
+                gCurAnimType = ANIM_TYPE_ROTATION;
+            }
+        }
+    }
+
+    if (gCurAnimType == ANIM_TYPE_ROTATION) {
+        rotation[0] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+        rotation[1] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+        rotation[2] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+    }
+
+    mtxf_rotate_xyz_and_translate(matrix, translation, rotation);
+    mtxf_mul(gMatStack[gMatStackIndex + 1], matrix, gMatStack[gMatStackIndex]);
+    gMatStackIndex++;
+    mtxf_to_mtx(matrixPtr, gMatStack[gMatStackIndex]);
+    gMatStackFixed[gMatStackIndex] = matrixPtr;
+    if (node->displayList != NULL) {
+        geo_append_display_list(node->displayList, node->node.flags >> 8);
+    }
+    if (node->node.children != NULL) {
+        geo_process_node_and_siblings(node->node.children);
+    }
+    gMatStackIndex--;
+}
+
+/**
  * Initialize the animation-related global variables for the currently drawn
  * object's animation.
  */
@@ -641,14 +888,14 @@ void geo_set_animation_globals(struct AnimInfo *node, s32 hasAnimation) {
         gCurAnimType = ANIM_TYPE_VERTICAL_TRANSLATION;
     } else if (anim->flags & ANIM_FLAG_VERT_TRANS) {
         gCurAnimType = ANIM_TYPE_LATERAL_TRANSLATION;
-    } else if (anim->flags & ANIM_FLAG_6) {
+    } else if (anim->flags & ANIM_FLAG_NO_TRANS) {
         gCurAnimType = ANIM_TYPE_NO_TRANSLATION;
     } else {
         gCurAnimType = ANIM_TYPE_TRANSLATION;
     }
 
     gCurrAnimFrame = node->animFrame;
-    gCurAnimEnabled = (anim->flags & ANIM_FLAG_5) == 0;
+    gCurAnimEnabled = (anim->flags & ANIM_FLAG_DISABLED) == 0;
     gCurrAnimAttribute = segmented_to_virtual((void *) anim->index);
     gCurAnimData = segmented_to_virtual((void *) anim->values);
 
@@ -722,13 +969,17 @@ static void geo_process_shadow(struct GraphNodeShadow *node) {
             mtxf_mul(gMatStack[gMatStackIndex], mtxf, *gCurGraphNodeCamera->matrixPtr);
             mtxf_to_mtx(mtx, gMatStack[gMatStackIndex]);
             gMatStackFixed[gMatStackIndex] = mtx;
+#ifdef FIX_SHADOW_TRANSPARENCY
+            geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), ((gShadowAboveWaterOrLava || gShadowAboveCustomWater || gMarioOnIceOrCarpet) ? LAYER_TRANSPARENT : LAYER_TRANSPARENT_DECAL));
+#else
             if (gShadowAboveWaterOrLava == TRUE) {
                 geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), LAYER_ALPHA);
-            } else if (gMarioOnIceOrCarpet == 1 || gShadowAboveCustomWater == 1) {
+            } else if (gMarioOnIceOrCarpet == TRUE || gShadowAboveCustomWater == TRUE) {
                 geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), LAYER_TRANSPARENT);
             } else {
                 geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), LAYER_TRANSPARENT_DECAL);
             }
+#endif
             gMatStackIndex--;
         }
     }
@@ -769,8 +1020,8 @@ static void geo_process_shadow(struct GraphNodeShadow *node) {
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
 static s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
-    s16 cullingRadius;
-    s16 halfFov; // half of the fov in in-game angle units instead of degrees
+    s32 cullingRadius;
+    s32 halfFov; // half of the fov in in-game angle units instead of degrees
     struct GraphNode *geo;
     f32 hScreenEdge;
 
@@ -873,18 +1124,18 @@ static void geo_process_object(struct Object *node) {
                         vec3f_set(bnds1, node->oPosX, node->oPosY - node->hitboxDownOffset, node->oPosZ);
                         vec3f_set(bnds2, node->hitboxRadius, node->hitboxHeight-node->hitboxDownOffset, node->hitboxRadius);
                         debug_box_color(0x800000FF);
-                        debug_box(bnds1, bnds2, DEBUG_SHAPE_CYLINDER);
+                        debug_box(bnds1, bnds2, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_REJ);
                         vec3f_set(bnds1, node->oPosX, node->oPosY - node->hitboxDownOffset, node->oPosZ);
                         vec3f_set(bnds2, node->hurtboxRadius, node->hurtboxHeight, node->hurtboxRadius);
                         debug_box_color(0x8FF00000);
-                        debug_box(bnds1, bnds2, DEBUG_SHAPE_CYLINDER);
+                        debug_box(bnds1, bnds2, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_REJ);
                     }
                     else
                     {
                         vec3f_set(bnds1, node->oPosX, node->oPosY - 15, node->oPosZ);
                         vec3f_set(bnds2, 30, 30, 30);
                         debug_box_color(0x80FFFFFF);
-                    debug_box(bnds1, bnds2, DEBUG_SHAPE_BOX);
+                    debug_box(bnds1, bnds2, DEBUG_SHAPE_BOX | DEBUG_UCODE_REJ);
                     }
                 }
                 #endif
@@ -1017,67 +1268,27 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                 geo_try_process_children(curGraphNode);
             } else {
                 switch (curGraphNode->type) {
-                    case GRAPH_NODE_TYPE_ORTHO_PROJECTION:
-                        geo_process_ortho_projection((struct GraphNodeOrthoProjection *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_PERSPECTIVE:
-                        geo_process_perspective((struct GraphNodePerspective *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_MASTER_LIST:
-                        geo_process_master_list((struct GraphNodeMasterList *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:
-                        geo_process_level_of_detail((struct GraphNodeLevelOfDetail *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_SWITCH_CASE:
-                        geo_process_switch((struct GraphNodeSwitchCase *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_CAMERA:
-                        geo_process_camera((struct GraphNodeCamera *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_TRANSLATION_ROTATION:
-                        geo_process_translation_rotation(
-                            (struct GraphNodeTranslationRotation *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_TRANSLATION:
-                        geo_process_translation((struct GraphNodeTranslation *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_ROTATION:
-                        geo_process_rotation((struct GraphNodeRotation *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_OBJECT:
-                        geo_process_object((struct Object *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_ANIMATED_PART:
-                        geo_process_animated_part((struct GraphNodeAnimatedPart *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_BILLBOARD:
-                        geo_process_billboard((struct GraphNodeBillboard *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_DISPLAY_LIST:
-                        geo_process_display_list((struct GraphNodeDisplayList *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_SCALE:
-                        geo_process_scale((struct GraphNodeScale *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_SHADOW:
-                        geo_process_shadow((struct GraphNodeShadow *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_OBJECT_PARENT:
-                        geo_process_object_parent((struct GraphNodeObjectParent *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_GENERATED_LIST:
-                        geo_process_generated_list((struct GraphNodeGenerated *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_BACKGROUND:
-                        geo_process_background((struct GraphNodeBackground *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_HELD_OBJ:
-                        geo_process_held_object((struct GraphNodeHeldObject *) curGraphNode);
-                        break;
-                    default:
-                        geo_try_process_children((struct GraphNode *) curGraphNode);
-                        break;
+                    case GRAPH_NODE_TYPE_ORTHO_PROJECTION:     geo_process_ortho_projection    ((struct GraphNodeOrthoProjection     *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_PERSPECTIVE:          geo_process_perspective         ((struct GraphNodePerspective         *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_MASTER_LIST:          geo_process_master_list         ((struct GraphNodeMasterList          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:      geo_process_level_of_detail     ((struct GraphNodeLevelOfDetail       *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_SWITCH_CASE:          geo_process_switch              ((struct GraphNodeSwitchCase          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_CAMERA:               geo_process_camera              ((struct GraphNodeCamera              *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_TRANSLATION_ROTATION: geo_process_translation_rotation((struct GraphNodeTranslationRotation *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_TRANSLATION:          geo_process_translation         ((struct GraphNodeTranslation         *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_ROTATION:             geo_process_rotation            ((struct GraphNodeRotation            *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_OBJECT:               geo_process_object              ((struct Object                       *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_ANIMATED_PART:        geo_process_animated_part       ((struct GraphNodeAnimatedPart        *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_BILLBOARD:            geo_process_billboard           ((struct GraphNodeBillboard           *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_DISPLAY_LIST:         geo_process_display_list        ((struct GraphNodeDisplayList         *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_SCALE:                geo_process_scale               ((struct GraphNodeScale               *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_SHADOW:               geo_process_shadow              ((struct GraphNodeShadow              *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_OBJECT_PARENT:        geo_process_object_parent       ((struct GraphNodeObjectParent        *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_GENERATED_LIST:       geo_process_generated_list      ((struct GraphNodeGenerated           *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_BACKGROUND:           geo_process_background          ((struct GraphNodeBackground          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_HELD_OBJ:             geo_process_held_object         ((struct GraphNodeHeldObject          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_BONE:                 geo_process_bone                ((struct GraphNodeBone                *) curGraphNode); break;
+                    default:                                   geo_try_process_children        ((struct GraphNode                    *) curGraphNode); break;
                 }
             }
         } else {

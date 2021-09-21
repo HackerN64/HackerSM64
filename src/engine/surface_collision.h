@@ -7,13 +7,17 @@
 
 #include "engine/extended_bounds.h"
 
-
 #define CELL_HEIGHT_LIMIT           20000
 #define FLOOR_LOWER_LIMIT           -11000
 #define FLOOR_LOWER_LIMIT_MISC      (FLOOR_LOWER_LIMIT + 1000)
 // same as FLOOR_LOWER_LIMIT_MISC, explicitly for shadow.c
-// It doesn't match if ".0" is removed or ".f" is added
-#define FLOOR_LOWER_LIMIT_SHADOW    (FLOOR_LOWER_LIMIT + 1000.0)
+#define FLOOR_LOWER_LIMIT_SHADOW    (FLOOR_LOWER_LIMIT + 1000)
+
+#define is_outside_level_bounds(x, z) (((x) <= -LEVEL_BOUNDARY_MAX) || ((x) >=  LEVEL_BOUNDARY_MAX) || ((z) <= -LEVEL_BOUNDARY_MAX) || ((z) >=  LEVEL_BOUNDARY_MAX))
+
+#define get_surface_height_at_location(x, z, surf) (-((x) * (surf)->normal.x + (surf)->normal.z * (z) + (surf)->originOffset) / (surf)->normal.y);
+
+#define SURFACE_YAW(s) (atan2s(((s)->normal.z), ((s)->normal.x)))
 
 struct WallCollisionData
 {
@@ -22,22 +26,13 @@ struct WallCollisionData
     /*0x10*/ f32 radius;
     /*0x14*/ s16 unused;
     /*0x16*/ s16 numWalls;
-    /*0x18*/ struct Surface *walls[4];
-};
-
-struct FloorGeometry
-{
-    f32 unused[4]; // possibly position data?
-    f32 normalX;
-    f32 normalY;
-    f32 normalZ;
-    f32 originOffset;
+    /*0x18*/ struct Surface *walls[MAX_REFEREMCED_WALLS];
 };
 
 s32 f32_find_wall_collision(f32 *xPtr, f32 *yPtr, f32 *zPtr, f32 offsetY, f32 radius);
 s32 find_wall_collisions(struct WallCollisionData *colData);
+void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struct WallCollisionData *collisionData);
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil);
-f32 find_floor_height_and_data(f32 xPos, f32 yPos, f32 zPos, struct FloorGeometry **floorGeo);
 f32 find_floor_height(f32 x, f32 y, f32 z);
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor);
 s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor);

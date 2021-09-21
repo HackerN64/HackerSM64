@@ -47,12 +47,12 @@ void bhv_koopa_shell_flame_spawn(void) {
 }
 
 void koopa_shell_spawn_sparkles(f32 a) {
-    struct Object *sp1C = spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
-    sp1C->oPosY += a;
+    struct Object *sparkleObj = spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
+    sparkleObj->oPosY += a;
 }
 
 void bhv_koopa_shell_loop(void) {
-    struct Surface *sp34;
+    struct Surface *floor;
     obj_set_hitbox(o, &sKoopaShellHitbox);
     cur_obj_scale(1.0f);
     switch (o->oAction) {
@@ -67,11 +67,11 @@ void bhv_koopa_shell_loop(void) {
             break;
         case 1:
             obj_copy_pos(o, gMarioObject);
-            sp34 = cur_obj_update_floor_height_and_get_floor();
+            floor = cur_obj_update_floor_height_and_get_floor();
             if (absf(find_water_level(o->oPosX, o->oPosZ) - o->oPosY) < 10.0f)
                 koopa_shell_spawn_water_drop();
             else if (5.0f > absf(o->oPosY - o->oFloorHeight)) {
-                if (sp34 != NULL && sp34->type == 1)
+                if (floor != NULL && floor->type == 1)
                     bhv_koopa_shell_flame_spawn();
                 else
                     koopa_shell_spawn_sparkles(10.0f);

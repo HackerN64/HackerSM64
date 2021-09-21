@@ -92,8 +92,8 @@ void elevator_act_3(void) // nearly identical to action 2
 }
 
 void bhv_elevator_init(void) {
-    s32 sp1C = sElevatorHeights[o->oBehParams2ndByte * 3 + 2];
-    if (sp1C == 0) {
+    s32 index = sElevatorHeights[o->oBehParams2ndByte * 3 + 2];
+    if (index == 0) {
         o->oElevatorUnkF4 = sElevatorHeights[o->oBehParams2ndByte * 3];
         o->oElevatorUnkF8 = o->oHomeY;
         o->oElevatorUnkFC = (o->oElevatorUnkF4 + o->oElevatorUnkF8) / 2;

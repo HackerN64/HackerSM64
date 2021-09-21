@@ -6,28 +6,28 @@
 #include "types.h"
 
 
-#define TIMER_CONTROL_SHOW  0
-#define TIMER_CONTROL_START 1
-#define TIMER_CONTROL_STOP  2
-#define TIMER_CONTROL_HIDE  3
+#define TIMER_CONTROL_SHOW                0x00
+#define TIMER_CONTROL_START               0x01
+#define TIMER_CONTROL_STOP                0x02
+#define TIMER_CONTROL_HIDE                0x03
 
-#define WARP_OP_NONE          0x00
-#define WARP_OP_UNKNOWN_01    0x01
-#define WARP_OP_UNKNOWN_02    0x02
-#define WARP_OP_WARP_DOOR     0x03
-#define WARP_OP_WARP_OBJECT   0x04
-#define WARP_OP_TELEPORT      0x05
-#define WARP_OP_STAR_EXIT     0x11
-#define WARP_OP_DEATH         0x12
-#define WARP_OP_WARP_FLOOR    0x13
-#define WARP_OP_GAME_OVER     0x14
-#define WARP_OP_CREDITS_END   0x15
-#define WARP_OP_DEMO_NEXT     0x16
-#define WARP_OP_CREDITS_START 0x17
-#define WARP_OP_CREDITS_NEXT  0x18
-#define WARP_OP_DEMO_END      0x19
+#define WARP_OP_NONE                      0x00
+#define WARP_OP_UNKNOWN_01                0x01
+#define WARP_OP_UNKNOWN_02                0x02
+#define WARP_OP_WARP_DOOR                 0x03
+#define WARP_OP_WARP_OBJECT               0x04
+#define WARP_OP_TELEPORT                  0x05
+#define WARP_OP_STAR_EXIT                 0x11
+#define WARP_OP_DEATH                     0x12
+#define WARP_OP_WARP_FLOOR                0x13
+#define WARP_OP_GAME_OVER                 0x14
+#define WARP_OP_CREDITS_END               0x15
+#define WARP_OP_DEMO_NEXT                 0x16
+#define WARP_OP_CREDITS_START             0x17
+#define WARP_OP_CREDITS_NEXT              0x18
+#define WARP_OP_DEMO_END                  0x19
 
-#define WARP_OP_TRIGGERS_LEVEL_SELECT 0x10
+#define WARP_OP_TRIGGERS_LEVEL_SELECT     0x10
 
 #define MARIO_SPAWN_DOOR_WARP             0x01
 #define MARIO_SPAWN_UNKNOWN_02            0x02
@@ -47,17 +47,17 @@
 #define MARIO_SPAWN_AIRBORNE_DEATH        0x23
 #define MARIO_SPAWN_LAUNCH_STAR_COLLECT   0x24
 #define MARIO_SPAWN_LAUNCH_DEATH          0x25
-#define MARIO_SPAWN_UNKNOWN_27            0x27
+#define MARIO_SPAWN_FADE_FROM_BLACK       0x27
 
 
 struct CreditsEntry
 {
     /*0x00*/ u8 levelNum;
     /*0x01*/ u8 areaIndex;
-    /*0x02*/ u8 unk02;
+    /*0x02*/ u8 actNum;
     /*0x03*/ s8 marioAngle;
     /*0x04*/ Vec3s marioPos;
-    /*0x0C*/ const char **unk0C;
+    /*0x0C*/ const char **string;
 };
 
 extern struct CreditsEntry *gCurrCreditsEntry;
@@ -66,7 +66,6 @@ extern struct MarioState gMarioStates[];
 extern struct MarioState *gMarioState;
 
 extern s16 sCurrPlayMode;
-extern u16 D_80339ECA;
 extern s16 sTransitionTimer;
 extern void (*sTransitionUpdate)(s16 *);
 extern u8 unused3[4];
@@ -82,7 +81,7 @@ struct WarpDest {
 
 extern struct WarpDest sWarpDest;
 
-extern s16 D_80339EE0;
+extern s16 sSpecialWarpDest;
 extern s16 sDelayedWarpOp;
 extern s16 sDelayedWarpTimer;
 extern s16 sSourceWarpNodeId;
@@ -104,16 +103,16 @@ extern struct HudDisplay gHudDisplay;
 extern s8 gNeverEnteredCastle;
 
 enum HUDDisplayFlag {
-    HUD_DISPLAY_FLAG_LIVES = 0x0001,
-    HUD_DISPLAY_FLAG_COIN_COUNT = 0x0002,
-    HUD_DISPLAY_FLAG_STAR_COUNT = 0x0004,
-    HUD_DISPLAY_FLAG_CAMERA_AND_POWER = 0x0008,
-    HUD_DISPLAY_FLAG_KEYS = 0x0010,
-    HUD_DISPLAY_FLAG_UNKNOWN_0020 = 0x0020,
-    HUD_DISPLAY_FLAG_TIMER = 0x0040,
-    HUD_DISPLAY_FLAG_EMPHASIZE_POWER = 0x8000,
+    HUD_DISPLAY_FLAG_LIVES            = (1 <<  0), // 0x0001
+    HUD_DISPLAY_FLAG_COIN_COUNT       = (1 <<  1), // 0x0002
+    HUD_DISPLAY_FLAG_STAR_COUNT       = (1 <<  2), // 0x0004
+    HUD_DISPLAY_FLAG_CAMERA_AND_POWER = (1 <<  3), // 0x0008
+    HUD_DISPLAY_FLAG_KEYS             = (1 <<  4), // 0x0010
+    HUD_DISPLAY_FLAG_UNKNOWN_0020     = (1 <<  5), // 0x0020
+    HUD_DISPLAY_FLAG_TIMER            = (1 <<  6), // 0x0040
+    HUD_DISPLAY_FLAG_EMPHASIZE_POWER  = (1 << 15), // 0x8000
 
-    HUD_DISPLAY_NONE = 0x0000,
+    HUD_DISPLAY_NONE                  = (0 <<  0), // 0x0000
     HUD_DISPLAY_DEFAULT = HUD_DISPLAY_FLAG_LIVES | HUD_DISPLAY_FLAG_COIN_COUNT | HUD_DISPLAY_FLAG_STAR_COUNT | HUD_DISPLAY_FLAG_CAMERA_AND_POWER | HUD_DISPLAY_FLAG_KEYS | HUD_DISPLAY_FLAG_UNKNOWN_0020
 };
 

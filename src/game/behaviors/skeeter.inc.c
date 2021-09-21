@@ -1,6 +1,6 @@
-struct Struct80331C38 {
-    s16 unk00;
-    s16 unk02;
+struct SkeeterRelPos {
+    s16 relPosX;
+    s16 relPosZ;
 };
 
 struct ObjectHitbox sSkeeterHitbox = {
@@ -15,7 +15,7 @@ struct ObjectHitbox sSkeeterHitbox = {
     /* hurtboxHeight:     */ 90,
 };
 
-struct Struct80331C38 D_80331C38[] = {
+struct SkeeterRelPos sSkeeterRelPositions[] = {
     { 0xFF7E, 0xFF42 },
     { 0x0082, 0xFF42 },
     { 0xFF4C, 0x0082 },
@@ -26,7 +26,7 @@ static void skeeter_spawn_waves(void) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        spawn_object_relative_with_scale(0, D_80331C38[i].unk00, 0, D_80331C38[i].unk02, 0.8f, o,
+        spawn_object_relative_with_scale(0, sSkeeterRelPositions[i].relPosX, 0, sSkeeterRelPositions[i].relPosZ, 0.8f, o,
                                          MODEL_IDLE_WATER_WAVE, bhvSkeeterWave);
     }
 }
@@ -90,15 +90,15 @@ static void skeeter_act_lunge(void) {
 }
 
 static void skeeter_act_walk(void) {
-    f32 sp24;
+    f32 accel;
 
     if (!(o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND)) {
         o->oAction = SKEETER_ACT_IDLE;
     } else {
         obj_forward_vel_approach(o->oSkeeterUnkFC, 0.4f);
-        sp24 = 0.12f * o->oForwardVel;
+        accel = 0.12f * o->oForwardVel;
 
-        cur_obj_init_animation_with_accel_and_sound(2, sp24);
+        cur_obj_init_animation_with_accel_and_sound(2, accel);
         cur_obj_play_sound_at_anim_range(3, 13, SOUND_OBJ_SKEETER_WALK);
 
         if (o->oSkeeterUnkF8 != 0) {

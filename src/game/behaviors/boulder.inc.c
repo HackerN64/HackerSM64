@@ -72,7 +72,7 @@ void bhv_big_boulder_loop(void) {
 }
 
 void bhv_big_boulder_generator_loop(void) {
-    struct Object *sp1C;
+    struct Object *boulderObj;
     if (o->oTimer >= 256) {
         o->oTimer = 0;
     }
@@ -82,13 +82,13 @@ void bhv_big_boulder_generator_loop(void) {
 
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 6000)) {
         if ((o->oTimer & 0x3F) == 0) {
-            sp1C = spawn_object(o, MODEL_HMC_ROLLING_ROCK, bhvBigBoulder);
-            sp1C->oMoveAngleYaw = random_float() * 4096.0f;
+            boulderObj = spawn_object(o, MODEL_HMC_ROLLING_ROCK, bhvBigBoulder);
+            boulderObj->oMoveAngleYaw = random_float() * 4096.0f;
         }
     } else {
         if ((o->oTimer & 0x7F) == 0) {
-            sp1C = spawn_object(o, MODEL_HMC_ROLLING_ROCK, bhvBigBoulder);
-            sp1C->oMoveAngleYaw = random_float() * 4096.0f;
+            boulderObj = spawn_object(o, MODEL_HMC_ROLLING_ROCK, bhvBigBoulder);
+            boulderObj->oMoveAngleYaw = random_float() * 4096.0f;
         }
     }
 }

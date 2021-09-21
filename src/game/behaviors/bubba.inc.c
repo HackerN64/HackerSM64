@@ -13,13 +13,11 @@ static struct ObjectHitbox sBubbaHitbox = {
 };
 
 void bubba_act_0(void) {
-    f32 sp24;
-
-    sp24 = cur_obj_lateral_dist_to_home();
+    f32 lateralDistToHome = cur_obj_lateral_dist_to_home();
     treat_far_home_as_mario(2000.0f);
     o->oAnimState = 0;
 
-    o->oBubbaUnk1AC = obj_get_pitch_to_home(sp24);
+    o->oBubbaUnk1AC = obj_get_pitch_to_home(lateralDistToHome);
 
     approach_f32_ptr(&o->oBubbaUnkF4, 5.0f, 0.5f);
 
@@ -57,8 +55,8 @@ void bubba_act_1(void) {
         } else if (o->oBubbaUnk100 < 15) {
             o->oAnimState = 1;
         } else if (o->oBubbaUnk100 == 20) {
-            s16 val06 = 10000 - (s16)(20.0f * (find_water_level(o->oPosX, o->oPosZ) - o->oPosY));
-            o->oBubbaUnk1AC -= val06;
+            s16 targetPitch = 10000 - (s16)(20.0f * (find_water_level(o->oPosX, o->oPosZ) - o->oPosY));
+            o->oBubbaUnk1AC -= targetPitch;
             o->oMoveAnglePitch = o->oBubbaUnk1AC;
             o->oBubbaUnkF4 = 40.0f;
             obj_compute_vel_from_move_pitch(o->oBubbaUnkF4);
@@ -72,12 +70,12 @@ void bubba_act_1(void) {
         }
     } else {
         if (abs_angle_diff(gMarioObject->oFaceAngleYaw, o->oAngleToMario) < 0x3000) {
-            s16 val04 = 0x4000 - atan2s(800.0f, o->oDistanceToMario - 800.0f);
+            s16 targetDYaw = 0x4000 - atan2s(800.0f, o->oDistanceToMario - 800.0f);
             if ((s16)(o->oMoveAngleYaw - o->oAngleToMario) < 0) {
-                val04 = -val04;
+                targetDYaw = -targetDYaw;
             }
 
-            o->oBubbaUnk1AE = o->oAngleToMario + val04;
+            o->oBubbaUnk1AE = o->oAngleToMario + targetDYaw;
         } else {
             o->oBubbaUnk1AE = o->oAngleToMario;
         }
@@ -96,8 +94,6 @@ void bubba_act_1(void) {
 }
 
 void bhv_bubba_loop(void) {
-    UNUSED s32 unused;
-
     o->oInteractionSubtype &= ~INT_SUBTYPE_EATS_MARIO;
     o->oBubbaUnk104 = obj_turn_pitch_toward_mario(120.0f, 0);
 
@@ -125,9 +121,9 @@ void bhv_bubba_loop(void) {
 
     if (o->oMoveFlags & OBJ_MOVE_MASK_IN_WATER) {
         if (o->oMoveFlags & OBJ_MOVE_ENTERED_WATER) {
-            struct Object *sp38 = spawn_object(o, MODEL_WATER_SPLASH, bhvWaterSplash);
-            if (sp38 != NULL) {
-                obj_scale(sp38, 3.0f);
+            struct Object *splashObj = spawn_object(o, MODEL_WATER_SPLASH, bhvWaterSplash);
+            if (splashObj != NULL) {
+                obj_scale(splashObj, 3.0f);
             }
 
             o->oBubbaUnk108 = o->oVelY;
@@ -135,9 +131,9 @@ void bhv_bubba_loop(void) {
         } else {
             approach_f32_ptr(&o->oBubbaUnk108, 0.0f, 4.0f);
             if ((o->oBubbaUnk10C -= o->oBubbaUnk108) > 1.0f) {
-                s16 sp36 = random_u16();
+                s16 rand = random_u16();
                 o->oBubbaUnk10C -= 1.0f;
-                spawn_object_relative(0, 150.0f * coss(sp36), 0x64, 150.0f * sins(sp36), o,
+                spawn_object_relative(0, 150.0f * coss(rand), 0x64, 150.0f * sins(rand), o,
                                       MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleSnow);
             }
         }

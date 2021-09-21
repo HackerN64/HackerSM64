@@ -1286,28 +1286,28 @@ void check_main_menu_clicked_buttons(void) {
                 play_sound(SAVE_FILE_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
                 queue_rumble_data(60, 70);
-                func_sh_8024C89C(1);
+                queue_rumble_decay(1);
 #endif
                 break;
             case MENU_BUTTON_PLAY_FILE_B:
                 play_sound(SAVE_FILE_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
                 queue_rumble_data(60, 70);
-                func_sh_8024C89C(1);
+                queue_rumble_decay(1);
 #endif
                 break;
             case MENU_BUTTON_PLAY_FILE_C:
                 play_sound(SAVE_FILE_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
                 queue_rumble_data(60, 70);
-                func_sh_8024C89C(1);
+                queue_rumble_decay(1);
 #endif
                 break;
             case MENU_BUTTON_PLAY_FILE_D:
                 play_sound(SAVE_FILE_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
                 queue_rumble_data(60, 70);
-                func_sh_8024C89C(1);
+                queue_rumble_decay(1);
 #endif
                 break;
             // Play sound of the button clicked and render buttons of that menu.

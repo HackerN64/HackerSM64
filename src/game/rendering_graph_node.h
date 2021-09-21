@@ -28,6 +28,31 @@ extern f32 gWorldScale;
 // translation types the type is set to this
 #define ANIM_TYPE_ROTATION              5
 
+#define LIST_HEADS_ZEX  0
+#define LIST_HEADS_REJ  1
+
+#define IS_LAYER_ZB(    layer) (((layer) >= LAYER_FORCE       ) || ((layer) <= LAYER_ZB_LAST ))
+#define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_FIRST_NON_ZB) || ((layer) <= LAYER_LAST_ALL))
+
+#if SILHOUETTE
+#define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))
+
+#define RENDER_PHASE_REJ_ZB                 0
+#define RENDER_PHASE_ZEX_BEFORE_SILHOUETTE  1
+#define RENDER_PHASE_REJ_SILHOUETTE         2
+#define RENDER_PHASE_REJ_NON_SILHOUETTE     3
+#define RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE 4
+#define RENDER_PHASE_ZEX_AFTER_SILHOUETTE   5
+#define RENDER_PHASE_REJ_NON_ZB             6
+#else
+#define RENDER_PHASE_REJ_ZB                 0
+#define RENDER_PHASE_ZEX_ALL                1
+#define RENDER_PHASE_REJ_NON_ZB             2
+#endif
+
+#define RENDER_PHASE_FIRST RENDER_PHASE_REJ_ZB
+#define RENDER_PHASE_LAST  RENDER_PHASE_REJ_NON_ZB
+
 void geo_process_node_and_siblings(struct GraphNode *firstNode);
 void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor);
 

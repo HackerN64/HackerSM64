@@ -166,7 +166,6 @@
 
 #define SURFACE_FLAG_DYNAMIC          (1 << 0)
 #define SURFACE_FLAG_NO_CAM_COLLISION (1 << 1)
-#define SURFACE_FLAG_X_PROJECTION     (1 << 3)
 
 // These are effectively unique "surface" types like those defined higher
 // And they are used as collision commands to load certain functions

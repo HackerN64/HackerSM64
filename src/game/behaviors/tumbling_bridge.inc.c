@@ -13,7 +13,7 @@ struct Struct8032F34C {
 #include "levels/lll/header.h"
 #include "levels/bitfs/header.h"
 
-struct Struct8032F34C sTumblingBridgeParams[] = {
+struct TumblingBridgeParams sTumblingBridgeParams[] = {
     { 9, -512, 0x80, MODEL_WF_TUMBLING_BRIDGE_PART, wf_seg7_collision_tumbling_bridge },
     { 9, -412, 103, MODEL_BBH_TUMBLING_PLATFORM_PART, bbh_seg7_collision_07026B1C },
     { 9, -512, 0x80, MODEL_LLL_FALLING_PLATFORM, lll_seg7_collision_0701D21C },

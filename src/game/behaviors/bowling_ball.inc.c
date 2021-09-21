@@ -78,16 +78,16 @@ void bowling_ball_set_waypoints(void) {
 
 void bhv_bowling_ball_roll_loop(void) {
     s16 collisionFlags;
-    s32 sp18;
+    s32 pathResult;
 #ifdef AVOID_UB
-    sp18 = 0;
+    pathResult = 0;
 #endif
 
     bowling_ball_set_waypoints();
     collisionFlags = object_step();
 
     //! Uninitialzed parameter, but the parameter is unused in the called function
-    sp18 = cur_obj_follow_path(sp18);
+    pathResult = cur_obj_follow_path(pathResult);
 
     o->oBowlingBallTargetYaw = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oBowlingBallTargetYaw, 0x400);
@@ -97,7 +97,7 @@ void bhv_bowling_ball_roll_loop(void) {
 
     bowling_ball_set_hitbox();
 
-    if (sp18 == -1) {
+    if (pathResult == -1) {
         if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 7000)) {
             spawn_mist_particles();
             spawn_mist_particles_variable(0, 0, 92.0f);
@@ -111,15 +111,15 @@ void bhv_bowling_ball_roll_loop(void) {
 }
 
 void bhv_bowling_ball_initializeLoop(void) {
-    s32 sp1c;
+    s32 pathResult;
 #ifdef AVOID_UB
-    sp1c = 0;
+    pathResult = 0;
 #endif
 
     bowling_ball_set_waypoints();
 
     //! Uninitialzed parameter, but the parameter is unused in the called function
-    sp1c = cur_obj_follow_path(sp1c);
+    pathResult = cur_obj_follow_path(pathResult);
 
     o->oMoveAngleYaw = o->oPathedTargetYaw;
 
@@ -233,11 +233,11 @@ void bhv_bob_pit_bowling_ball_init(void) {
 }
 
 void bhv_bob_pit_bowling_ball_loop(void) {
-    struct FloorGeometry *sp1c;
-    UNUSED s16 collisionFlags = object_step();
+    struct Surface *floor;
+    object_step();
 
-    find_floor_height_and_data(o->oPosX, o->oPosY, o->oPosZ, &sp1c);
-    if ((sp1c->normalX == 0) && (sp1c->normalZ == 0))
+    find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
+    if ((floor->normal.x == 0) && (floor->normal.z == 0))
         o->oForwardVel = 28.0f;
 
     bowling_ball_set_hitbox();

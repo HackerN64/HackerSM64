@@ -26,10 +26,10 @@ void play_flip_sounds(struct MarioState *m, s16 frame1, s16 frame2, s16 frame3) 
 void play_far_fall_sound(struct MarioState *m) {
     u32 action = m->action;
     if (!(action & ACT_FLAG_INVULNERABLE) && action != ACT_TWIRLING && action != ACT_FLYING
-        && !(m->flags & MARIO_UNKNOWN_18)) {
+        && !(m->flags & MARIO_FALL_SOUND_PLAYED)) {
         if (m->peakHeight - m->pos[1] > 1150.0f) {
             play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
-            m->flags |= MARIO_UNKNOWN_18;
+            m->flags |= MARIO_FALL_SOUND_PLAYED;
         }
     }
 }
@@ -123,6 +123,9 @@ s32 should_get_stuck_in_ground(struct MarioState *m) {
     s32 flags = floor->flags;
     s32 type = floor->type;
 
+#ifdef NO_GETTING_BURIED
+    return FALSE;
+#else
     if (floor != NULL && (terrainType == TERRAIN_SNOW || terrainType == TERRAIN_SAND)
         && type != SURFACE_BURNING && SURFACE_IS_NOT_HARD(type)) {
         if (!(flags & 0x01) && m->peakHeight - m->pos[1] > 1000.0f && floor->normal.y >= 0.8660254f) {
@@ -131,6 +134,7 @@ s32 should_get_stuck_in_ground(struct MarioState *m) {
     }
 
     return FALSE;
+#endif
 }
 
 s32 check_fall_damage_or_get_stuck(struct MarioState *m, u32 hardFallAction) {
@@ -722,7 +726,7 @@ s32 act_twirling(struct MarioState *m) {
 
     m->marioObj->header.gfx.angle[1] += m->twirlYaw;
 #if ENABLE_RUMBLE
-    reset_rumble_timers();
+    reset_rumble_timers_slip();
 #endif
     return FALSE;
 }
@@ -1008,7 +1012,7 @@ s32 act_burning_jump(struct MarioState *m) {
         m->health = 0xFF;
     }
 #if ENABLE_RUMBLE
-    reset_rumble_timers();
+    reset_rumble_timers_slip();
 #endif
     return FALSE;
 }
@@ -1030,7 +1034,7 @@ s32 act_burning_fall(struct MarioState *m) {
         m->health = 0xFF;
     }
 #if ENABLE_RUMBLE
-    reset_rumble_timers();
+    reset_rumble_timers_slip();
 #endif
     return FALSE;
 }
@@ -1276,8 +1280,8 @@ s32 act_getting_blown(struct MarioState *m) {
             m->forwardVel += 0.8f;
         }
 
-        if (m->vel[1] < 0.0f && m->unkC4 < 4.0f) {
-            m->unkC4 += 0.05f;
+        if (m->vel[1] < 0.0f && m->windGravity < 4.0f) {
+            m->windGravity += 0.05f;
         }
     }
 
@@ -1582,7 +1586,7 @@ s32 act_lava_boost(struct MarioState *m) {
 
     m->marioBodyState->eyeState = MARIO_EYES_DEAD;
 #if ENABLE_RUMBLE
-    reset_rumble_timers();
+    reset_rumble_timers_slip();
 #endif
     return FALSE;
 }
@@ -1728,7 +1732,7 @@ s32 act_shot_from_cannon(struct MarioState *m) {
         m->particleFlags |= PARTICLE_DUST;
     }
 #if ENABLE_RUMBLE
-    reset_rumble_timers();
+    reset_rumble_timers_slip();
 #endif
     return FALSE;
 }

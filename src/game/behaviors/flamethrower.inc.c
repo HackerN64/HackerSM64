@@ -2,7 +2,7 @@
 
 void bhv_flamethrower_flame_loop(void) {
     f32 size;
-    s32 sp18;
+    s32 remainingTime;
     if (o->oTimer == 0) {
         o->oAnimState = (s32)(random_float() * 10.0f);
         obj_translate_xyz_random(o, 10.0f);
@@ -20,15 +20,15 @@ void bhv_flamethrower_flame_loop(void) {
             o->oVelY = 0;
             o->oPosY = o->oFloorHeight + 25.0f * size;
         }
-        sp18 = o->parentObj->oFlameThowerFlameUnk110 / 1.2;
+        remainingTime = o->parentObj->oFlameThowerFlameUnk110 / 1.2;
     } else
-        sp18 = o->parentObj->oFlameThowerFlameUnk110;
+        remainingTime = o->parentObj->oFlameThowerFlameUnk110;
     cur_obj_scale(size);
     if (o->oBehParams2ndByte == 4)
         o->oPosY += o->oForwardVel; // weird?
     else
         cur_obj_move_using_fvel_and_gravity();
-    if (o->oTimer > sp18)
+    if (o->oTimer > remainingTime)
         obj_mark_for_deletion(o);
     o->oInteractStatus = 0;
 }
@@ -36,7 +36,7 @@ void bhv_flamethrower_flame_loop(void) {
 void bhv_flamethrower_loop(void) {
     struct Object *flame;
     f32 flameVel;
-    s32 sp34;
+    s32 flameTimeRemaining;
     s32 model;
     UNUSED u8 pad[8];
     if (o->oAction == 0) {
@@ -50,14 +50,14 @@ void bhv_flamethrower_loop(void) {
             model = MODEL_BLUE_FLAME;
         if (o->oBehParams2ndByte == 2)
             flameVel = 50.0f;
-        sp34 = 1;
+        flameTimeRemaining = 1;
         if (o->oTimer < 60)
-            sp34 = 15;
+            flameTimeRemaining = 15;
         else if (o->oTimer < 74)
-            sp34 = 75 - o->oTimer; // Range: [15..2]
+            flameTimeRemaining = 75 - o->oTimer; // Range: [15..2]
         else
             o->oAction++;
-        o->oFlameThowerUnk110 = sp34;
+        o->oFlameThowerUnk110 = flameTimeRemaining;
         flame = spawn_object_relative(o->oBehParams2ndByte, 0, 0, 0, o, model, bhvFlamethrowerFlame);
         flame->oForwardVel = flameVel;
         cur_obj_play_sound_1(SOUND_AIR_BLOW_FIRE);

@@ -35,15 +35,15 @@ void bhv_wf_elevator_tower_platform_loop(void) {
 }
 
 void bhv_wf_sliding_tower_platform_loop(void) {
-    s32 sp24 = o->oPlatformUnk110 / o->oPlatformUnk10C;
+    s32 moveTimer = o->oPlatformUnk110 / o->oPlatformUnk10C;
     switch (o->oAction) {
         case 0:
-            if (o->oTimer > sp24)
+            if (o->oTimer > moveTimer)
                 o->oAction++;
             o->oForwardVel = -o->oPlatformUnk10C;
             break;
         case 1:
-            if (o->oTimer > sp24)
+            if (o->oTimer > moveTimer)
                 o->oAction = 0;
             o->oForwardVel = o->oPlatformUnk10C;
             break;

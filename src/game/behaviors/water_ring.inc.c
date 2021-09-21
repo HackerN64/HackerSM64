@@ -41,9 +41,6 @@ void bhv_jet_stream_water_ring_init(void) {
     o->oFaceAnglePitch = 0x8000;
 }
 
-// sp28 = arg0
-// sp2c = ringManager
-
 void water_ring_check_collection(f32 avgScale, struct Object *ringManager) {
     f32 marioDistInFront = water_ring_calc_mario_dist();
     struct Object *ringSpawner;
