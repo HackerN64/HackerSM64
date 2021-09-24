@@ -95,7 +95,7 @@ void obj_set_secondary_camera_focus(void) {
 }
 
 void common_anchor_mario_behavior(f32 sp28, f32 sp2C, s32 sp30) {
-    switch (o->parentObj->oChuckyaUnk88) {
+    switch (o->parentObj->oCommonAnchorAction) {
         case 0:
             break;
         case 1:
@@ -105,14 +105,14 @@ void common_anchor_mario_behavior(f32 sp28, f32 sp2C, s32 sp30) {
             gMarioObject->oInteractStatus |= (sp30 + INT_STATUS_MARIO_UNK2);
             gMarioStates[0].forwardVel = sp28;
             gMarioStates[0].vel[1] = sp2C;
-            o->parentObj->oChuckyaUnk88 = 0;
+            o->parentObj->oCommonAnchorAction = 0;
             break;
         case 3:
             gMarioObject->oInteractStatus |=
                 (INT_STATUS_MARIO_UNK2 + INT_STATUS_MARIO_UNK6); // loads 2 interactions at once?
             gMarioStates[0].forwardVel = 10.0f;
             gMarioStates[0].vel[1] = 10.0f;
-            o->parentObj->oChuckyaUnk88 = 0;
+            o->parentObj->oCommonAnchorAction = 0;
             break;
     }
     o->oMoveAngleYaw = o->parentObj->oMoveAngleYaw;

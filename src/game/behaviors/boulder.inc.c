@@ -32,10 +32,10 @@ void set_rolling_sphere_hitbox2(void) {
 
 void adjust_rolling_face_pitch2(f32 f12) {
     o->oFaceAnglePitch += (s16)(o->oForwardVel * (100.0f / f12));
-    o->oSnowmansBottomUnkF4 += o->oForwardVel * 1e-4;
+    o->oSnowmansBottomRollingFacePitch += o->oForwardVel * 1e-4;
 
-    if (o->oSnowmansBottomUnkF4 > 1.0)
-        o->oSnowmansBottomUnkF4 = 1.0f;
+    if (o->oSnowmansBottomRollingFacePitch > 1.0)
+        o->oSnowmansBottomRollingFacePitch = 1.0f;
 }
 
 void boulder_act_1(void) {

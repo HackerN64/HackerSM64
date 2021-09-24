@@ -37,7 +37,7 @@ extern s16 obj_get_pitch_from_vel(void);
 extern s32 obj_update_race_proposition_dialog(s16 dialogID);
 extern void obj_set_dist_from_home(f32 distFromHome);
 extern s32 obj_is_near_to_and_facing_mario(f32 maxDist, s16 maxAngleDiff);
-extern BAD_RETURN(u32) obj_perform_position_op(s32 op);
+extern void obj_perform_position_op(s32 op);
 extern void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, f32 x, f32 y, f32 z);
 extern void cur_obj_spin_all_dimensions(f32 arg0, f32 arg1);
 extern void obj_rotate_yaw_and_bounce_off_walls(s16 targetYaw, s16 turnAmount);

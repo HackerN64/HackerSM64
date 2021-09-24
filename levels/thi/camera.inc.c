@@ -2,7 +2,7 @@
 /**
  * Moves the camera to through the tunnel by forcing sModeOffsetYaw
  */
-BAD_RETURN(s32) cam_thi_move_cam_through_tunnel(UNUSED struct Camera *c) {
+void cam_thi_move_cam_through_tunnel(UNUSED struct Camera *c) {
     if (sModeOffsetYaw < DEGREES(60)) {
         sModeOffsetYaw = DEGREES(60);
     }
@@ -11,7 +11,7 @@ BAD_RETURN(s32) cam_thi_move_cam_through_tunnel(UNUSED struct Camera *c) {
 /**
  * Aligns the camera to look through the tunnel
  */
-BAD_RETURN(s32) cam_thi_look_through_tunnel(UNUSED struct Camera *c) {
+void cam_thi_look_through_tunnel(UNUSED struct Camera *c) {
     // ~82.5 degrees
     if (sModeOffsetYaw > 0x3AAA) {
         sModeOffsetYaw = 0x3AAA;

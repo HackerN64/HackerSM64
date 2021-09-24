@@ -4,7 +4,7 @@
  * cvar0 is a relative offset from Mario.
  * cvar1 is the is the camera's goal position.
  */
-BAD_RETURN(s32) cutscene_grand_star_start(UNUSED struct Camera *c) {
+void cutscene_grand_star_start(UNUSED struct Camera *c) {
     vec3f_set(sCutsceneVars[0].point, 0.f, 150.f, -600.f);
     offset_rotated(sCutsceneVars[1].point, sMarioCamState->pos, sCutsceneVars[0].point, sMarioCamState->faceAngle);
     sCutsceneVars[1].point[1] = 457.f;
@@ -13,7 +13,7 @@ BAD_RETURN(s32) cutscene_grand_star_start(UNUSED struct Camera *c) {
 /**
  * Make the camera fly to the front of Mario.
  */
-BAD_RETURN(s32) cutscene_grand_star_front_of_mario(struct Camera *c) {
+void cutscene_grand_star_front_of_mario(struct Camera *c) {
     f32 goalDist;
     s16 goalPitch, goalYaw;
     f32 dist;
@@ -30,7 +30,7 @@ BAD_RETURN(s32) cutscene_grand_star_front_of_mario(struct Camera *c) {
 /**
  * Started shortly after Mario starts the triple jump. Stores Mario's face angle and zeros cvar2.
  */
-BAD_RETURN(s32) cutscene_grand_star_mario_jump(UNUSED struct Camera *c) {
+void cutscene_grand_star_mario_jump(UNUSED struct Camera *c) {
     vec3s_set(sCutsceneVars[0].angle, 0, sMarioCamState->faceAngle[1], 0);
     vec3f_set(sCutsceneVars[2].point, 0.f, 0.f, 0.f);
 }
@@ -38,7 +38,7 @@ BAD_RETURN(s32) cutscene_grand_star_mario_jump(UNUSED struct Camera *c) {
 /**
  * Accelerate cvar2 to point back and to the left (relative to the camera).
  */
-BAD_RETURN(s32) cutscene_grand_star_accel_cvar2(UNUSED struct Camera *c) {
+void cutscene_grand_star_accel_cvar2(UNUSED struct Camera *c) {
     camera_approach_f32_symmetric_bool(&sCutsceneVars[2].point[2], -40.f, 2.0f);
     sCutsceneVars[2].point[0] = 5.0f;
 }
@@ -46,7 +46,7 @@ BAD_RETURN(s32) cutscene_grand_star_accel_cvar2(UNUSED struct Camera *c) {
 /**
  * Decrease cvar2 offset, follow Mario by directly updating the camera's pos.
  */
-BAD_RETURN(s32) cutscene_grand_star_approach_mario(struct Camera *c) {
+void cutscene_grand_star_approach_mario(struct Camera *c) {
     camera_approach_f32_symmetric_bool(&sCutsceneVars[2].point[2], 0.f, 2.f);
     sCutsceneVars[2].point[0] = 0.f;
     approach_f32_asymptotic_bool(&c->pos[0], sMarioCamState->pos[0], 0.01f);
@@ -57,11 +57,11 @@ BAD_RETURN(s32) cutscene_grand_star_approach_mario(struct Camera *c) {
  * Offset the camera's position by cvar2. Before Mario triple jumps, this moves back and to the left.
  * After the triple jump, cvar2 decelerates to 0.
  */
-BAD_RETURN(s32) cutscene_grand_star_move_cvar2(struct Camera *c) {
+void cutscene_grand_star_move_cvar2(struct Camera *c) {
     offset_rotated(c->pos, c->pos, sCutsceneVars[2].point, sCutsceneVars[0].angle);
 }
 
-BAD_RETURN(s32) cutscene_grand_star_focus_mario(struct Camera *c) {
+void cutscene_grand_star_focus_mario(struct Camera *c) {
     Vec3f foc;
 
     vec3f_set(foc, sMarioCamState->pos[0], (sMarioCamState->pos[1] - 307.f) * 0.5f + 407.f, sMarioCamState->pos[2]);
@@ -71,7 +71,7 @@ BAD_RETURN(s32) cutscene_grand_star_focus_mario(struct Camera *c) {
 /**
  * The first part of the grand star cutscene, after Mario has collected the grand star.
  */
-BAD_RETURN(s32) cutscene_grand_star(struct Camera *c) {
+void cutscene_grand_star(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     cutscene_event(cutscene_grand_star_start, c, 0, 0);
     cutscene_event(cutscene_grand_star_front_of_mario, c, 0, 109);
@@ -85,7 +85,7 @@ BAD_RETURN(s32) cutscene_grand_star(struct Camera *c) {
 /**
  * Zero the cvars that are used when Mario is flying.
  */
-BAD_RETURN(s32) cutscene_grand_star_fly_start(struct Camera *c) {
+void cutscene_grand_star_fly_start(struct Camera *c) {
     //! cvar7 is unused in grand star
     vec3f_set(sCutsceneVars[7].point, 0.5f, 0.5f, 0.5f);
     //! cvar6 is unused in grand star
@@ -99,7 +99,7 @@ BAD_RETURN(s32) cutscene_grand_star_fly_start(struct Camera *c) {
 /**
  * Decrease the cvar offsets so that Lakitu flies closer to Mario.
  */
-BAD_RETURN(s32) cutscene_grand_star_fly_move_to_mario(UNUSED struct Camera *c) {
+void cutscene_grand_star_fly_move_to_mario(UNUSED struct Camera *c) {
     Vec3f posOff;
 
     vec3f_set(posOff, -600.f, 0.f, -400.f);
@@ -115,7 +115,7 @@ BAD_RETURN(s32) cutscene_grand_star_fly_move_to_mario(UNUSED struct Camera *c) {
  * cvar5 is the focus offset from Mario.
  * cvar8.point[0] is the approach velocity.
  */
-BAD_RETURN(s32) cutscene_grand_star_fly_mario_offscreen(UNUSED struct Camera *c) {
+void cutscene_grand_star_fly_mario_offscreen(UNUSED struct Camera *c) {
     camera_approach_f32_symmetric_bool(&sCutsceneVars[8].point[0], 15.f, 0.1f);
 
     camera_approach_f32_symmetric_bool(&sCutsceneVars[4].point[0], -2000.f, sCutsceneVars[8].point[0]);
@@ -132,7 +132,7 @@ BAD_RETURN(s32) cutscene_grand_star_fly_mario_offscreen(UNUSED struct Camera *c)
  * cvar4 is the position offset.
  * cvar5 is the focus offset.
  */
-BAD_RETURN(s32) cutscene_grand_star_fly_app_cvars(struct Camera *c) {
+void cutscene_grand_star_fly_app_cvars(struct Camera *c) {
     Vec3f goalPos, goalFoc;
     f32 dist;
     s16 pitch, yaw;
@@ -159,7 +159,7 @@ BAD_RETURN(s32) cutscene_grand_star_fly_app_cvars(struct Camera *c) {
  *
  * cvar8.point[2] is Lakitu's speed.
  */
-BAD_RETURN(s32) cutscene_grand_star_fly(struct Camera *c) {
+void cutscene_grand_star_fly(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     cutscene_event(cutscene_grand_star_fly_start, c, 0, 0);
     cutscene_event(cutscene_grand_star_fly_move_to_mario, c, 0, 140);

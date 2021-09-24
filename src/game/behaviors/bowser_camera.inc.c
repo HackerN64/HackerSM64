@@ -3,7 +3,7 @@ static UNUSED void unused_start_bowser_bounce_shake(UNUSED struct Camera *c) {
     set_environmental_camera_shake(SHAKE_ENV_BOWSER_THROW_BOUNCE);
 }
 
-BAD_RETURN(s32) cutscene_bowser_area_shake_fov(UNUSED struct Camera *c) {
+void cutscene_bowser_area_shake_fov(UNUSED struct Camera *c) {
     cutscene_set_fov_shake_preset(2);
 }
 
@@ -11,7 +11,7 @@ BAD_RETURN(s32) cutscene_bowser_area_shake_fov(UNUSED struct Camera *c) {
 /**
  * Set oBowserCamAct to 1, which causes bowser to start walking.
  */
-BAD_RETURN(s32) cutscene_bowser_area_start_bowser_walking(UNUSED struct Camera *c) {
+void cutscene_bowser_area_start_bowser_walking(UNUSED struct Camera *c) {
     gSecondCameraFocus->oBowserCamAct = BOWSER_CAM_ACT_WALK;
 }
 
@@ -20,7 +20,7 @@ BAD_RETURN(s32) cutscene_bowser_area_start_bowser_walking(UNUSED struct Camera *
  * @bug cvar2.point is (0,0,0) on the first frame, but because of the warp transition, this behavior
  *      isn't seen. After the first frame, cvar2.point is bowser's position.
  */
-BAD_RETURN(s32) cutscene_bowser_arena_set_pos(struct Camera *c) {
+void cutscene_bowser_arena_set_pos(struct Camera *c) {
     vec3f_set_dist_and_angle(sCutsceneVars[2].point, c->pos, sCutsceneVars[3].point[2],
                                   sCutsceneVars[3].angle[0], sCutsceneVars[3].angle[1]);
     vec3f_set(sCutsceneVars[2].point, gSecondCameraFocus->oPosX, gSecondCameraFocus->oPosY,
@@ -31,7 +31,7 @@ BAD_RETURN(s32) cutscene_bowser_arena_set_pos(struct Camera *c) {
  * Apply a sine wave to the focus's y coordinate.
  * The y offset starts at 120, then decreases to 0 before reaching ~240 on the last frame.
  */
-BAD_RETURN(s32) cutscene_bowser_arena_focus_sine(UNUSED struct Camera *c) {
+void cutscene_bowser_arena_focus_sine(UNUSED struct Camera *c) {
     //! unused initialization
     f32 yOff = 150.0f;
 
@@ -44,7 +44,7 @@ BAD_RETURN(s32) cutscene_bowser_arena_focus_sine(UNUSED struct Camera *c) {
 /**
  * Set the camera focus according to cvar0 and cvar2.
  */
-BAD_RETURN(s32) cutscene_bowser_arena_set_focus(struct Camera *c) {
+void cutscene_bowser_arena_set_focus(struct Camera *c) {
     offset_rotated(c->focus, sCutsceneVars[2].point, sCutsceneVars[0].point, sCutsceneVars[2].angle);
 }
 
@@ -52,7 +52,7 @@ BAD_RETURN(s32) cutscene_bowser_arena_set_focus(struct Camera *c) {
  * Adjust the cvar offsets, making the camera look up, move slightly further back, and focus a little
  * further in front of bowser.
  */
-BAD_RETURN(s32) cutscene_bowser_arena_adjust_offsets(UNUSED struct Camera *c) {
+void cutscene_bowser_arena_adjust_offsets(UNUSED struct Camera *c) {
     approach_s16_asymptotic_bool(&sCutsceneVars[3].angle[0], 0x6C8, 30);
     approach_f32_asymptotic_bool(&sCutsceneVars[0].point[2], -200.f, 0.02f);
     approach_f32_asymptotic_bool(&sCutsceneVars[3].point[2], 550.f, 0.02f);
@@ -61,14 +61,14 @@ BAD_RETURN(s32) cutscene_bowser_arena_adjust_offsets(UNUSED struct Camera *c) {
 /**
  * Decrease cvar0's z offset, making the camera focus pan left towards bowser.
  */
-BAD_RETURN(s32) cutscene_bowser_arena_pan_left(UNUSED struct Camera *c) {
+void cutscene_bowser_arena_pan_left(UNUSED struct Camera *c) {
     approach_f32_asymptotic_bool(&sCutsceneVars[0].point[2], 0.f, 0.05f);
 }
 
 /**
  * Duplicate of cutscene_mario_dialog().
  */
-BAD_RETURN(s32) cutscene_bowser_arena_mario_dialog(UNUSED struct Camera *c) {
+void cutscene_bowser_arena_mario_dialog(UNUSED struct Camera *c) {
     cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_FRONT);
 }
 
@@ -79,7 +79,7 @@ BAD_RETURN(s32) cutscene_bowser_arena_mario_dialog(UNUSED struct Camera *c) {
  *
  * cvar0 is the focus offset from bowser
  */
-BAD_RETURN(s32) cutscene_bowser_arena_start(struct Camera *c) {
+void cutscene_bowser_arena_start(struct Camera *c) {
     sCutsceneVars[3].point[2] = 430.f;
     sCutsceneVars[3].angle[1] = gSecondCameraFocus->oMoveAngleYaw - DEGREES(45);
     sCutsceneVars[3].angle[0] = 0xD90;
@@ -100,7 +100,7 @@ BAD_RETURN(s32) cutscene_bowser_arena_start(struct Camera *c) {
 /**
  * Create the dialog box depending on which bowser fight Mario is in.
  */
-BAD_RETURN(s32) bowser_fight_intro_dialog(UNUSED struct Camera *c) {
+void bowser_fight_intro_dialog(UNUSED struct Camera *c) {
     s16 dialog;
 
     switch (gCurrLevelNum) {
@@ -120,7 +120,7 @@ BAD_RETURN(s32) bowser_fight_intro_dialog(UNUSED struct Camera *c) {
 /**
  * Create the dialog box and wait until it's gone.
  */
-BAD_RETURN(s32) cutscene_bowser_arena_dialog(struct Camera *c) {
+void cutscene_bowser_arena_dialog(struct Camera *c) {
     cutscene_event(bowser_fight_intro_dialog, c, 0, 0);
 
     if (get_dialog_id() == DIALOG_NONE) {
@@ -131,7 +131,7 @@ BAD_RETURN(s32) cutscene_bowser_arena_dialog(struct Camera *c) {
 /**
  * End the bowser arena cutscene.
  */
-BAD_RETURN(s32) cutscene_bowser_arena_end(struct Camera *c) {
+void cutscene_bowser_arena_end(struct Camera *c) {
     cutscene_stop_dialog(c);
     c->cutscene = 0;
     transition_next_state(c, 20);
@@ -143,7 +143,7 @@ BAD_RETURN(s32) cutscene_bowser_arena_end(struct Camera *c) {
 /**
  * Cutscene that plays when Mario enters a bowser fight.
  */
-BAD_RETURN(s32) cutscene_bowser_arena(struct Camera *c) {
+void cutscene_bowser_arena(struct Camera *c) {
     //! This does nothing, but may have been used in development
     cutscene_spawn_obj(2, 0);
 

@@ -7057,22 +7057,11 @@ void cutscene_enter_pool(struct Camera *c) {
 /**
  * End the cutscene, used by cutscenes that play when Mario exits a course to castle grounds.
  */
-void cutscene_enter_pyramid_top(struct Camera *c) {
-    cutscene_event(cutscene_enter_pyramid_top_start, c, 0, 0);
-    // Move to cvar3
-    cutscene_goto_cvar_pos(c, 200.f, 0x3000, 0, 0);
+void cutscene_exit_to_castle_grounds_end(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     gCutsceneTimer = CUTSCENE_STOP;
     c->cutscene = 0;
     update_camera_yaw(c);
-}
-
-UNUSED static void unused_cutscene_goto_cvar(struct Camera *c) {
-    f32 dist;
-
-    dist = calc_abs_dist(sCutsceneVars[3].point, sMarioCamState->pos);
-    dist = calc_abs_dist(sCutsceneVars[9].point, sMarioCamState->pos) + 200.f;
-    cutscene_goto_cvar_pos(c, dist, 0x1000, 0x300, 0);
 }
 
 /**

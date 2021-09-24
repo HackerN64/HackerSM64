@@ -1,5 +1,5 @@
 
-BAD_RETURN(s32) cam_hmc_enter_maze(struct Camera *c) {
+void cam_hmc_enter_maze(struct Camera *c) {
     s16 pitch, yaw;
     f32 dist;
 
@@ -29,19 +29,19 @@ void move_camera_through_floor_while_descending(struct Camera *c, f32 height) {
     }
 }
 
-BAD_RETURN(s32) cam_hmc_elevator_black_hole(struct Camera *c) {
+void cam_hmc_elevator_black_hole(struct Camera *c) {
     move_camera_through_floor_while_descending(c, 1536.f);
 }
 
-BAD_RETURN(s32) cam_hmc_elevator_maze_emergency_exit(struct Camera *c) {
+void cam_hmc_elevator_maze_emergency_exit(struct Camera *c) {
     move_camera_through_floor_while_descending(c, 2355.f);
 }
 
-BAD_RETURN(s32) cam_hmc_elevator_lake(struct Camera *c) {
+void cam_hmc_elevator_lake(struct Camera *c) {
     move_camera_through_floor_while_descending(c, 1843.f);
 }
 
-BAD_RETURN(s32) cam_hmc_elevator_maze(struct Camera *c) {
+void cam_hmc_elevator_maze(struct Camera *c) {
     move_camera_through_floor_while_descending(c, 1843.f);
 }
 

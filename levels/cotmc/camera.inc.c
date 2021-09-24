@@ -2,7 +2,7 @@
 /**
  * Fix the camera in place as Mario gets exits out the MC cave into the waterfall.
  */
-BAD_RETURN(s32) cam_cotmc_exit_waterfall(UNUSED struct Camera *c) {
+void cam_cotmc_exit_waterfall(UNUSED struct Camera *c) {
     gCameraMovementFlags |= CAM_MOVE_FIX_IN_PLACE;
 }
 

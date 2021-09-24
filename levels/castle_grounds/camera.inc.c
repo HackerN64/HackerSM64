@@ -120,7 +120,7 @@ void cutscene_intro_peach_play_lakitu_flying_music(void) {
 /**
  * Lower the volume (US only) and start the peach letter background music
  */
-BAD_RETURN(s32) cutscene_intro_peach_start_letter_music(UNUSED struct Camera *c) {
+void cutscene_intro_peach_start_letter_music(UNUSED struct Camera *c) {
 #if defined(VERSION_US) || defined(VERSION_SH)
     seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
 #endif
@@ -130,7 +130,7 @@ BAD_RETURN(s32) cutscene_intro_peach_start_letter_music(UNUSED struct Camera *c)
 /**
  * Raise the volume (not in JP) and start the flying music.
  */
-BAD_RETURN(s32) cutscene_intro_peach_start_flying_music(UNUSED struct Camera *c) {
+void cutscene_intro_peach_start_flying_music(UNUSED struct Camera *c) {
 #ifndef VERSION_JP
     seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
 #endif
@@ -142,7 +142,7 @@ BAD_RETURN(s32) cutscene_intro_peach_start_flying_music(UNUSED struct Camera *c)
  * Lower the volume for the letter background music. In US, this happens on the same frame as the music
  * starts.
  */
-BAD_RETURN(s32) cutscene_intro_peach_eu_lower_volume(UNUSED struct Camera *c) {
+void cutscene_intro_peach_eu_lower_volume(UNUSED struct Camera *c) {
     seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
 }
 #endif
@@ -181,12 +181,12 @@ s32 intro_peach_move_camera_start_to_pipe(struct Camera *c, struct CutsceneSplin
 /**
  * Create a dialog box with the letter text
  */
-BAD_RETURN(s32) peach_letter_text(UNUSED struct Camera *c) {
+void peach_letter_text(UNUSED struct Camera *c) {
     create_dialog_box(DIALOG_020);
 }
 
 #ifndef VERSION_JP
-BAD_RETURN(s32) play_sound_peach_reading_letter(UNUSED struct Camera *c) {
+void play_sound_peach_reading_letter(UNUSED struct Camera *c) {
     play_sound(SOUND_PEACH_DEAR_MARIO, gGlobalSoundSource);
 }
 #endif
@@ -195,7 +195,7 @@ BAD_RETURN(s32) play_sound_peach_reading_letter(UNUSED struct Camera *c) {
  * Move the camera from peach reading the letter all the way to Mario's warp pipe. Follow the
  * sIntroStartToPipe splines.
  */
-BAD_RETURN(s32) cutscene_intro_peach_start_to_pipe_spline(struct Camera *c) {
+void cutscene_intro_peach_start_to_pipe_spline(struct Camera *c) {
     if (intro_peach_move_camera_start_to_pipe(c, sIntroStartToPipePosition, sIntroStartToPipeFocus) != 0) {
         gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE;
         gCutsceneTimer = CUTSCENE_LOOP;
@@ -205,7 +205,7 @@ BAD_RETURN(s32) cutscene_intro_peach_start_to_pipe_spline(struct Camera *c) {
 /**
  * Loop the cutscene until Mario exits the dialog.
  */
-BAD_RETURN(s32) cutscene_intro_peach_dialog(struct Camera *c) {
+void cutscene_intro_peach_dialog(struct Camera *c) {
     if (get_dialog_id() == DIALOG_NONE) {
         vec3f_copy(gLakituState.goalPos, c->pos);
         vec3f_copy(gLakituState.goalFocus, c->focus);
@@ -215,19 +215,19 @@ BAD_RETURN(s32) cutscene_intro_peach_dialog(struct Camera *c) {
     }
 }
 
-BAD_RETURN(s32) cutscene_intro_peach_follow_pipe_spline(struct Camera *c) {
+void cutscene_intro_peach_follow_pipe_spline(struct Camera *c) {
     move_point_along_spline(c->pos, sIntroPipeToDialogPosition, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     move_point_along_spline(c->focus, sIntroPipeToDialogFocus, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
 }
 
-BAD_RETURN(s32) cutscene_intro_peach_clear_cutscene_status(UNUSED struct Camera *c) {
+void cutscene_intro_peach_clear_cutscene_status(UNUSED struct Camera *c) {
     sMarioCamState->cameraEvent = 0;
 }
 
 /**
  * Set fov to 8 degrees, then zoom out to 30.
  */
-BAD_RETURN(s32) cutscene_intro_peach_zoom_fov(UNUSED struct Camera *c) {
+void cutscene_intro_peach_zoom_fov(UNUSED struct Camera *c) {
     sFOVState.fov = 8.f;
     set_fov_function(CAM_FOV_ZOOM_30);
 }
@@ -235,7 +235,7 @@ BAD_RETURN(s32) cutscene_intro_peach_zoom_fov(UNUSED struct Camera *c) {
 /**
  * Reset the spline progress, turn on handheld shake.
  */
-BAD_RETURN(s32) cutscene_intro_peach_reset_spline(UNUSED struct Camera *c) {
+void cutscene_intro_peach_reset_spline(UNUSED struct Camera *c) {
     sCutsceneSplineSegment = 0;
     sCutsceneSplineSegmentProgress = 0.1f;
     //! @bug since this event is only called for one frame, this handheld shake is turned off on the
@@ -247,16 +247,16 @@ BAD_RETURN(s32) cutscene_intro_peach_reset_spline(UNUSED struct Camera *c) {
  * Turn off handheld shake. This was likely written before handheld shake was changed to turn off every
  * frame, as it's the only instance of HAND_CAM_SHAKE_OFF.
  */
-BAD_RETURN(s32) cutscene_intro_peach_handheld_shake_off(UNUSED struct Camera *c) {
+void cutscene_intro_peach_handheld_shake_off(UNUSED struct Camera *c) {
     set_handheld_shake(HAND_CAM_SHAKE_OFF);
 }
 
-BAD_RETURN(s32) intro_pipe_exit_text(UNUSED struct Camera *c) {
+void intro_pipe_exit_text(UNUSED struct Camera *c) {
     create_dialog_box(DIALOG_033);
 }
 
 #ifndef VERSION_JP
-BAD_RETURN(s32) play_sound_intro_turn_on_hud(UNUSED struct Camera *c) {
+void play_sound_intro_turn_on_hud(UNUSED struct Camera *c) {
     play_sound_rbutton_changed();
 }
 #endif
@@ -264,7 +264,7 @@ BAD_RETURN(s32) play_sound_intro_turn_on_hud(UNUSED struct Camera *c) {
 /**
  * Fly to the pipe. Near the end, the camera jumps to Lakitu's position and the hud turns on.
  */
-BAD_RETURN(s32) cutscene_intro_peach_fly_to_pipe(struct Camera *c) {
+void cutscene_intro_peach_fly_to_pipe(struct Camera *c) {
 #if defined(VERSION_US) || defined(VERSION_SH)
     cutscene_event(play_sound_intro_turn_on_hud, c, 818, 818);
 #elif defined(VERSION_EU)
@@ -285,7 +285,7 @@ BAD_RETURN(s32) cutscene_intro_peach_fly_to_pipe(struct Camera *c) {
 /**
  * Lakitu flies around the warp pipe, then Mario jumps out.
  */
-BAD_RETURN(s32) cutscene_intro_peach_mario_appears(struct Camera *c) {
+void cutscene_intro_peach_mario_appears(struct Camera *c) {
     UNUSED u32 pad[2];
 
     sMarioCamState->cameraEvent = 0;
@@ -308,14 +308,14 @@ BAD_RETURN(s32) cutscene_intro_peach_mario_appears(struct Camera *c) {
 /**
  * Reset the fov. This gives the effect of peach zooming out as she fades.
  */
-BAD_RETURN(s32) cutscene_intro_peach_reset_fov(UNUSED struct Camera *c) {
+void cutscene_intro_peach_reset_fov(UNUSED struct Camera *c) {
     set_fov_function(CAM_FOV_DEFAULT);
 }
 
 /**
  * Peach reads the letter to Mario.
  */
-BAD_RETURN(s32) cutscene_intro_peach_letter(struct Camera *c) {
+void cutscene_intro_peach_letter(struct Camera *c) {
     cutscene_spawn_obj(5, 0);
     cutscene_event(cutscene_intro_peach_zoom_fov, c, 0, 0);
     cutscene_event(cutscene_intro_peach_start_letter_music, c, 65, 65);
@@ -339,7 +339,7 @@ BAD_RETURN(s32) cutscene_intro_peach_letter(struct Camera *c) {
 /**
  * Reset the spline progress.
  */
-BAD_RETURN(s32) cutscene_end_waving_start(UNUSED struct Camera *c) {
+void cutscene_end_waving_start(UNUSED struct Camera *c) {
     cutscene_reset_spline();
 }
 
@@ -386,14 +386,14 @@ struct CutsceneSplinePoint gEndWavingFocus[] = {
     { 0, 0, { -156, 1718, 5086 } }, { 0, 0, { -156, 1718, 5086 } },  { 0, 0, { -156, 1718, 5086 } }
 };
 
-BAD_RETURN(s32) cutscene_end_waving(struct Camera *c) {
+void cutscene_end_waving(struct Camera *c) {
     cutscene_event(cutscene_end_waving_start, c, 0, 0);
     move_point_along_spline(c->pos, gEndWavingPos, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     move_point_along_spline(c->focus, gEndWavingFocus, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     cutscene_spawn_obj(6, 120);
 }
 
-BAD_RETURN(s32) cutscene_exit_fall_to_castle_grounds_warp(struct Camera *c) {
+void cutscene_exit_fall_to_castle_grounds_warp(struct Camera *c) {
     //! hardcoded position
     vec3f_set(c->pos, 5830.f, 32.f, 3985.f);
 }
@@ -401,7 +401,7 @@ BAD_RETURN(s32) cutscene_exit_fall_to_castle_grounds_warp(struct Camera *c) {
 /**
  * Cutscene that plays when Mario falls from WMOTR.
  */
-BAD_RETURN(s32) cutscene_exit_fall_to_castle_grounds(struct Camera *c) {
+void cutscene_exit_fall_to_castle_grounds(struct Camera *c) {
     cutscene_event(cutscene_exit_fall_to_castle_grounds_warp, c, 0, 0);
     cutscene_event(cutscene_exit_to_castle_grounds_focus_mario, c, 0, -1);
     update_camera_yaw(c);
@@ -410,7 +410,7 @@ BAD_RETURN(s32) cutscene_exit_fall_to_castle_grounds(struct Camera *c) {
 /**
  * Set the camera position and focus for when Mario falls from the sky.
  */
-BAD_RETURN(s32) cutscene_ending_mario_fall_start(struct Camera *c) {
+void cutscene_ending_mario_fall_start(struct Camera *c) {
     vec3f_set(c->focus, -26.f, 0.f, -137.f);
     vec3f_set(c->pos, 165.f, 4725.f, 324.f);
 }
@@ -418,7 +418,7 @@ BAD_RETURN(s32) cutscene_ending_mario_fall_start(struct Camera *c) {
 /**
  * Focus on Mario when he's falling from the sky.
  */
-BAD_RETURN(s32) cutscene_ending_mario_fall_focus_mario(struct Camera *c) {
+void cutscene_ending_mario_fall_focus_mario(struct Camera *c) {
     Vec3f offset;
     vec3f_set(offset, 0.f, 80.f, 0.f);
 
@@ -433,7 +433,7 @@ BAD_RETURN(s32) cutscene_ending_mario_fall_focus_mario(struct Camera *c) {
 /**
  * Mario falls from the sky after the grand star cutscene.
  */
-BAD_RETURN(s32) cutscene_ending_mario_fall(struct Camera *c) {
+void cutscene_ending_mario_fall(struct Camera *c) {
     cutscene_event(cutscene_ending_mario_fall_start, c, 0, 0);
     cutscene_event(cutscene_ending_mario_fall_focus_mario, c, 0, -1);
     player2_rotate_cam(c, -0x2000, 0x2000, -0x2000, 0x2000);
@@ -442,7 +442,7 @@ BAD_RETURN(s32) cutscene_ending_mario_fall(struct Camera *c) {
 /**
  * Closeup of Mario as the wing cap fades and Mario looks up.
  */
-BAD_RETURN(s32) cutscene_ending_mario_land_closeup(struct Camera *c) {
+void cutscene_ending_mario_land_closeup(struct Camera *c) {
     vec3f_set(c->focus, 85.f, 826.f, 250.f);
     vec3f_set(c->pos, -51.f, 988.f, -202.f);
     player2_rotate_cam(c, -0x2000, 0x2000, -0x2000, 0x2000);
@@ -451,7 +451,7 @@ BAD_RETURN(s32) cutscene_ending_mario_land_closeup(struct Camera *c) {
 /**
  * Reset the spline progress and cvar9.
  */
-BAD_RETURN(s32) cutscene_ending_reset_spline(UNUSED struct Camera *c) {
+void cutscene_ending_reset_spline(UNUSED struct Camera *c) {
     sCutsceneVars[9].point[0] = 0.f;
     cutscene_reset_spline();
 }
@@ -459,7 +459,7 @@ BAD_RETURN(s32) cutscene_ending_reset_spline(UNUSED struct Camera *c) {
 /**
  * Follow sEndingFlyToWindowPos/Focus up to the window.
  */
-BAD_RETURN(s32) cutscene_ending_fly_up_to_window(struct Camera *c) {
+void cutscene_ending_fly_up_to_window(struct Camera *c) {
     move_point_along_spline(c->pos, sEndingFlyToWindowPos, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     move_point_along_spline(c->focus, sEndingFlyToWindowFocus, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
 }
@@ -467,7 +467,7 @@ BAD_RETURN(s32) cutscene_ending_fly_up_to_window(struct Camera *c) {
 /**
  * Move the camera up to the window as the star power frees peach.
  */
-BAD_RETURN(s32) cutscene_ending_stars_free_peach(struct Camera *c) {
+void cutscene_ending_stars_free_peach(struct Camera *c) {
     cutscene_event(cutscene_ending_reset_spline, c, 0, 0);
     cutscene_event(cutscene_ending_fly_up_to_window, c, 0, -1);
     player2_rotate_cam(c, -0x2000, 0x2000, -0x2000, 0x2000);
@@ -476,7 +476,7 @@ BAD_RETURN(s32) cutscene_ending_stars_free_peach(struct Camera *c) {
 /**
  * Move the camera to the ground as Mario lands.
  */
-BAD_RETURN(s32) cutscene_ending_mario_land(struct Camera *c) {
+void cutscene_ending_mario_land(struct Camera *c) {
     vec3f_set(c->focus, sEndingFlyToWindowFocus[0].point[0], sEndingFlyToWindowFocus[0].point[1] + 80.f, sEndingFlyToWindowFocus[0].point[2]);
     vec3f_set(c->pos, sEndingFlyToWindowPos[0].point[0], sEndingFlyToWindowPos[0].point[1], sEndingFlyToWindowPos[0].point[2] + 150.f);
     player2_rotate_cam(c, -0x800, 0x2000, -0x2000, 0x2000);
@@ -485,7 +485,7 @@ BAD_RETURN(s32) cutscene_ending_mario_land(struct Camera *c) {
 /**
  * Move the camera closer to peach appearing.
  */
-BAD_RETURN(s32) cutscene_ending_peach_appear_closeup(struct Camera *c) {
+void cutscene_ending_peach_appear_closeup(struct Camera *c) {
     vec3f_set(c->pos, 179.f, 2463.f, -1216.f);
     c->pos[1] = gCutsceneFocus->oPosY + 35.f;
     vec3f_set(c->focus, gCutsceneFocus->oPosX, gCutsceneFocus->oPosY + 125.f, gCutsceneFocus->oPosZ);
@@ -494,7 +494,7 @@ BAD_RETURN(s32) cutscene_ending_peach_appear_closeup(struct Camera *c) {
 /**
  * Peach fades in, the camera focuses on her.
  */
-BAD_RETURN(s32) cutscene_ending_peach_appears(struct Camera *c) {
+void cutscene_ending_peach_appears(struct Camera *c) {
     cutscene_event(cutscene_ending_peach_appear_closeup, c, 0, 0);
     approach_f32_asymptotic_bool(&c->pos[1], gCutsceneFocus->oPosY + 35.f, 0.02f);
     approach_f32_asymptotic_bool(&c->focus[1], gCutsceneFocus->oPosY + 125.f, 0.15f);
@@ -504,7 +504,7 @@ BAD_RETURN(s32) cutscene_ending_peach_appears(struct Camera *c) {
 /**
  * Reset spline progress, set cvar2 y offset.
  */
-BAD_RETURN(s32) cutscene_ending_peach_descends_start(UNUSED struct Camera *c) {
+void cutscene_ending_peach_descends_start(UNUSED struct Camera *c) {
     cutscene_reset_spline();
     sCutsceneVars[2].point[1] = 150.f;
 }
@@ -512,7 +512,7 @@ BAD_RETURN(s32) cutscene_ending_peach_descends_start(UNUSED struct Camera *c) {
 /**
  * Follow the sEndingPeachDescentCamPos spline, which rotates around peach.
  */
-BAD_RETURN(s32) cutscene_ending_follow_peach_descent(struct Camera *c) {
+void cutscene_ending_follow_peach_descent(struct Camera *c) {
     move_point_along_spline(c->pos, sEndingPeachDescentCamPos, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     c->pos[1] += gCutsceneFocus->oPosY + sCutsceneVars[3].point[1];
 }
@@ -520,14 +520,14 @@ BAD_RETURN(s32) cutscene_ending_follow_peach_descent(struct Camera *c) {
 /**
  * Decrease cvar2's y offset while the camera flies backwards to Mario.
  */
-BAD_RETURN(s32) cutscene_ending_peach_descent_lower_focus(UNUSED struct Camera *c) {
+void cutscene_ending_peach_descent_lower_focus(UNUSED struct Camera *c) {
     camera_approach_f32_symmetric_bool(&(sCutsceneVars[2].point[1]), 90.f, 0.5f);
 }
 
 /**
  * Keep following the sEndingPeachDescentCamPos spline, which leads back to Mario.
  */
-BAD_RETURN(s32) cutscene_ending_peach_descent_back_to_mario(struct Camera *c) {
+void cutscene_ending_peach_descent_back_to_mario(struct Camera *c) {
     Vec3f pos;
 
     move_point_along_spline(pos, sEndingPeachDescentCamPos, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
@@ -540,7 +540,7 @@ BAD_RETURN(s32) cutscene_ending_peach_descent_back_to_mario(struct Camera *c) {
  * Peach starts floating to the ground. Rotate the camera around her, then fly backwards to Mario when
  * she lands.
  */
-BAD_RETURN(s32) cutscene_ending_peach_descends(struct Camera *c) {
+void cutscene_ending_peach_descends(struct Camera *c) {
     cutscene_event(cutscene_ending_peach_descends_start, c, 0, 0);
     cutscene_event(cutscene_ending_follow_peach_descent, c, 0, 299);
     cutscene_event(cutscene_ending_peach_descent_back_to_mario, c, 300, -1);
@@ -554,14 +554,14 @@ BAD_RETURN(s32) cutscene_ending_peach_descends(struct Camera *c) {
  * Mario runs across the bridge to peach, and takes off his cap.
  * Follow the sEndingMarioToPeach* splines while Mario runs across.
  */
-BAD_RETURN(s32) cutscene_ending_mario_to_peach(struct Camera *c) {
+void cutscene_ending_mario_to_peach(struct Camera *c) {
     cutscene_event(cutscene_ending_reset_spline, c, 0, 0);
     move_point_along_spline(c->pos, sEndingMarioToPeachPos, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     move_point_along_spline(c->focus, sEndingMarioToPeachFocus, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     player2_rotate_cam(c, -0x2000, 0x2000, -0x2000, 0x2000);
 }
 
-BAD_RETURN(s32) cutscene_exit_waterfall_warp(struct Camera *c) {
+void cutscene_exit_waterfall_warp(struct Camera *c) {
     //! hardcoded position
     vec3f_set(c->pos, -3899.f, 39.f, -5671.f);
 }
@@ -569,7 +569,7 @@ BAD_RETURN(s32) cutscene_exit_waterfall_warp(struct Camera *c) {
 /**
  * Look at Mario, used by cutscenes that play when Mario exits a course to castle grounds.
  */
-BAD_RETURN(s32) cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c) {
+void cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c) {
     vec3f_copy(c->focus, sMarioCamState->pos);
     c->focus[1] = c->pos[1] + (sMarioCamState->pos[1] + 125.f - c->pos[1]) * 0.5f;
     approach_vec3f_asymptotic(c->focus, sMarioCamState->pos, 0.05f, 0.4f, 0.05f);
@@ -578,7 +578,7 @@ BAD_RETURN(s32) cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c) {
 /**
  * Cutscene that plays when Mario leaves CotMC through the waterfall.
  */
-BAD_RETURN(s32) cutscene_exit_waterfall(struct Camera *c) {
+void cutscene_exit_waterfall(struct Camera *c) {
     cutscene_event(cutscene_exit_waterfall_warp, c, 0, 0);
     cutscene_event(cutscene_exit_to_castle_grounds_focus_mario, c, 0, -1);
     update_camera_yaw(c);
@@ -587,7 +587,7 @@ BAD_RETURN(s32) cutscene_exit_waterfall(struct Camera *c) {
 /**
  * Make the focus follow the sEndingLookUpAtCastle spline.
  */
-BAD_RETURN(s32) cutscene_ending_look_up_at_castle(UNUSED struct Camera *c) {
+void cutscene_ending_look_up_at_castle(UNUSED struct Camera *c) {
     move_point_along_spline(c->focus, sEndingLookUpAtCastle, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
 }
 
@@ -595,7 +595,7 @@ BAD_RETURN(s32) cutscene_ending_look_up_at_castle(UNUSED struct Camera *c) {
 /**
  * Peach opens her eyes and the camera looks at the castle window again.
  */
-BAD_RETURN(s32) cutscene_ending_peach_wakeup(struct Camera *c) {
+void cutscene_ending_peach_wakeup(struct Camera *c) {
     cutscene_event(cutscene_ending_reset_spline, c, 0, 0);
     cutscene_event(cutscene_ending_look_up_at_castle, c, 0, 0);
 #ifdef VERSION_EU
@@ -614,7 +614,7 @@ BAD_RETURN(s32) cutscene_ending_peach_wakeup(struct Camera *c) {
 /**
  * Side view of peach and Mario. Peach thanks Mario for saving her.
  */
-BAD_RETURN(s32) cutscene_ending_dialog(struct Camera *c) {
+void cutscene_ending_dialog(struct Camera *c) {
     vec3f_set(c->focus, 11.f, 983.f, -1273.f);
     vec3f_set(c->pos, -473.f, 970.f, -1152.f);
     player2_rotate_cam(c, -0x800, 0x2000, -0x2000, 0x2000);
@@ -623,7 +623,7 @@ BAD_RETURN(s32) cutscene_ending_dialog(struct Camera *c) {
 /**
  * Zoom in and move the camera close to Mario and peach.
  */
-BAD_RETURN(s32) cutscene_ending_kiss_closeup(struct Camera *c) {
+void cutscene_ending_kiss_closeup(struct Camera *c) {
     set_fov_function(CAM_FOV_SET_29);
     vec3f_set(c->focus, 350.f, 1034.f, -1216.f);
     vec3f_set(c->pos, -149.f, 1021.f, -1216.f);
@@ -632,7 +632,7 @@ BAD_RETURN(s32) cutscene_ending_kiss_closeup(struct Camera *c) {
 /**
  * Fly back and zoom out for Mario's spin after the kiss.
  */
-BAD_RETURN(s32) cutscene_ending_kiss_here_we_go(struct Camera *c) {
+void cutscene_ending_kiss_here_we_go(struct Camera *c) {
     Vec3f pos, foc;
 
     set_fov_function(CAM_FOV_DEFAULT);
@@ -646,7 +646,7 @@ BAD_RETURN(s32) cutscene_ending_kiss_here_we_go(struct Camera *c) {
 /**
  * Peach kisses Mario on the nose.
  */
-BAD_RETURN(s32) cutscene_ending_kiss(struct Camera *c) {
+void cutscene_ending_kiss(struct Camera *c) {
     cutscene_event(cutscene_ending_kiss_closeup, c, 0, 0);
 #ifdef VERSION_EU
     cutscene_event(cutscene_ending_kiss_here_we_go, c, 185, -1);
@@ -659,7 +659,7 @@ BAD_RETURN(s32) cutscene_ending_kiss(struct Camera *c) {
 /**
  * Make the focus follow sEndingLookAtSkyFocus.
  */
-BAD_RETURN(s32) cutscene_ending_look_at_sky(struct Camera *c) {
+void cutscene_ending_look_at_sky(struct Camera *c) {
     move_point_along_spline(c->focus, sEndingLookAtSkyFocus, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
     vec3f_set(c->pos, 699.f, 1680.f, -703.f);
 }
@@ -668,14 +668,14 @@ BAD_RETURN(s32) cutscene_ending_look_at_sky(struct Camera *c) {
  * Zoom in the fov. The fovFunc was just set to default, so it wants to approach 45. But while this is
  * called, it will stay at about 37.26f
  */
-BAD_RETURN(s32) cutscene_ending_zoom_fov(UNUSED struct Camera *c) {
+void cutscene_ending_zoom_fov(UNUSED struct Camera *c) {
     sFOVState.fov = 37.f;
 }
 
 /**
  * Peach suggests baking a cake for Mario. Mario looks back at the camera before going inside the castle.
  */
-BAD_RETURN(s32) cutscene_ending_cake_for_mario(struct Camera *c) {
+void cutscene_ending_cake_for_mario(struct Camera *c) {
     cutscene_event(cutscene_ending_reset_spline, c, 0, 0);
     cutscene_event(cutscene_ending_look_at_sky, c, 0, 0);
     cutscene_event(cutscene_ending_zoom_fov, c, 0, 499);
@@ -689,7 +689,7 @@ BAD_RETURN(s32) cutscene_ending_cake_for_mario(struct Camera *c) {
 /**
  * Stop the ending cutscene, reset the fov.
  */
-BAD_RETURN(s32) cutscene_ending_stop(struct Camera *c) {
+void cutscene_ending_stop(struct Camera *c) {
     set_fov_function(CAM_FOV_SET_45);
     c->cutscene = 0;
     gCutsceneTimer = CUTSCENE_STOP;

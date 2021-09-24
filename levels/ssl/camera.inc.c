@@ -2,7 +2,7 @@
 /**
  * Starts the "Enter Pyramid Top" cutscene.
  */
-BAD_RETURN(s32) cam_ssl_enter_pyramid_top(UNUSED struct Camera *c) {
+void cam_ssl_enter_pyramid_top(UNUSED struct Camera *c) {
     start_object_cutscene_without_focus(CUTSCENE_ENTER_PYRAMID_TOP);
 }
 
@@ -10,7 +10,7 @@ BAD_RETURN(s32) cam_ssl_enter_pyramid_top(UNUSED struct Camera *c) {
  * Change to close mode in the center of the pyramid. Outside this trigger, the default mode is outwards
  * radial.
  */
-BAD_RETURN(s32) cam_ssl_pyramid_center(struct Camera *c) {
+void cam_ssl_pyramid_center(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 90);
 }
@@ -18,7 +18,7 @@ BAD_RETURN(s32) cam_ssl_pyramid_center(struct Camera *c) {
 /**
  * Changes the mode back to outward radial in the boss room inside the pyramid.
  */
-BAD_RETURN(s32) cam_ssl_boss_room(struct Camera *c) {
+void cam_ssl_boss_room(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     transition_to_camera_mode(c, CAMERA_MODE_OUTWARD_RADIAL, 90);
 }
@@ -39,7 +39,7 @@ struct CameraTrigger sCamSSL[] = {
 /**
  * Cause Mario to enter the normal dialog state.
  */
-static BAD_RETURN(s32) cutscene_mario_dialog(UNUSED struct Camera *c) {
+static void cutscene_mario_dialog(UNUSED struct Camera *c) {
     gCutsceneTimer = cutscene_common_set_dialog_state(MARIO_DIALOG_LOOK_FRONT);
 }
 
@@ -57,7 +57,7 @@ static UNUSED void unused_cutscene_mario_dialog_looking_up(UNUSED struct Camera 
  * Store the camera focus in cvar1.
  * Store the area's center position (which happens to be the pyramid, in SSL) in cvar3.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode_start(struct Camera *c) {
+void cutscene_pyramid_top_explode_start(struct Camera *c) {
     reset_pan_distance(c);
     store_info_cannon(c);
 
@@ -68,14 +68,14 @@ BAD_RETURN(s32) cutscene_pyramid_top_explode_start(struct Camera *c) {
 /**
  * Zoom in on the pyramid.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode_zoom_in(UNUSED struct Camera *c) {
+void cutscene_pyramid_top_explode_zoom_in(UNUSED struct Camera *c) {
     set_fov_function(CAM_FOV_APP_30);
 }
 
 /**
  * Look at the pyramid top.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode_focus(struct Camera *c) {
+void cutscene_pyramid_top_explode_focus(struct Camera *c) {
     approach_vec3f_asymptotic(c->focus, sCutsceneVars[3].point, 0.02f, 0.02f, 0.02f);
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
 }
@@ -83,7 +83,7 @@ BAD_RETURN(s32) cutscene_pyramid_top_explode_focus(struct Camera *c) {
 /**
  * Store the old pos and focus, then warp to the pyramid top.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode_warp(struct Camera *c) {
+void cutscene_pyramid_top_explode_warp(struct Camera *c) {
     s16 pitch, yaw;
     f32 dist;
 
@@ -102,7 +102,7 @@ BAD_RETURN(s32) cutscene_pyramid_top_explode_warp(struct Camera *c) {
 /**
  * Close up view of the spinning pyramid top as it rises.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode_closeup(struct Camera *c) {
+void cutscene_pyramid_top_explode_closeup(struct Camera *c) {
     s16 pitch, yaw;
     f32 dist;
 
@@ -119,14 +119,14 @@ BAD_RETURN(s32) cutscene_pyramid_top_explode_closeup(struct Camera *c) {
 /**
  * Shake the camera during the closeup.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode_cam_shake(UNUSED struct Camera *c) {
+void cutscene_pyramid_top_explode_cam_shake(UNUSED struct Camera *c) {
     set_environmental_camera_shake(SHAKE_ENV_PYRAMID_EXPLODE);
 }
 
 /**
  * Warp back to the old position, and start a heavy camera shake.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode_warp_back(struct Camera *c) {
+void cutscene_pyramid_top_explode_warp_back(struct Camera *c) {
     UNUSED u32 pad[2];
 
     vec3f_copy(c->pos, sCutsceneVars[4].point);
@@ -137,7 +137,7 @@ BAD_RETURN(s32) cutscene_pyramid_top_explode_warp_back(struct Camera *c) {
 /**
  * An unused cutscene for when the pyramid explodes.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode(struct Camera *c) {
+void cutscene_pyramid_top_explode(struct Camera *c) {
     cutscene_event(cutscene_pyramid_top_explode_start, c, 0, 0);
     cutscene_event(cutscene_pyramid_top_explode_focus, c, 0, 30);
     cutscene_event(cutscene_pyramid_top_explode_warp, c, 31, 31);
@@ -150,7 +150,7 @@ BAD_RETURN(s32) cutscene_pyramid_top_explode(struct Camera *c) {
 /**
  * End the pyramid top explosion cutscene.
  */
-BAD_RETURN(s32) cutscene_pyramid_top_explode_end(struct Camera *c) {
+void cutscene_pyramid_top_explode_end(struct Camera *c) {
     cutscene_stop_dialog(c);
     stop_cutscene_and_retrieve_stored_info(c);
     // Move the camera back to Mario
@@ -160,7 +160,7 @@ BAD_RETURN(s32) cutscene_pyramid_top_explode_end(struct Camera *c) {
 /**
  * Store the camera focus in cvar0, and store the top of the pyramid in cvar3.
  */
-BAD_RETURN(s32) cutscene_enter_pyramid_top_start(struct Camera *c) {
+void cutscene_enter_pyramid_top_start(struct Camera *c) {
     vec3f_copy(sCutsceneVars[0].point, c->focus);
     vec3f_set(sCutsceneVars[3].point, c->areaCenX, 1280.f, c->areaCenZ);
 }
@@ -168,8 +168,8 @@ BAD_RETURN(s32) cutscene_enter_pyramid_top_start(struct Camera *c) {
 /**
  * Cutscene that plays when Mario enters the top of the pyramid.
  */
-BAD_RETURN(s32) cutscene_enter_pyramid_top(struct Camera *c) {
-    cutscene_event(cutscene_enter_pyramid_top_start, c, 0, 0);
+void cutscene_enter_pyramid_top(struct Camera *c) {
+    cutscene_event(cutscene_enter_pyramid_top, c, 0, 0);
     // Move to cvar3
     cutscene_goto_cvar_pos(c, 200.f, 0x3000, 0, 0);
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
@@ -204,7 +204,7 @@ struct CutsceneSplinePoint sSslCreditsSplineFocus[] = {
  * Cutscene that plays when Mario enters the pyramid through the hole at the top.
  */
 struct Cutscene sCutsceneEnterPyramidTop[] = {
-    { cutscene_enter_pyramid_top, 90 },
+    { cutscene_enter_pyramid_top_start, 90 },
     { cutscene_exit_to_castle_grounds_end, 0 }
 };
 

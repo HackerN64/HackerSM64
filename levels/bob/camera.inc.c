@@ -4,7 +4,7 @@
  *
  * @see sCamBOB for bounds.
  */
-BAD_RETURN(s32) cam_bob_tower(struct Camera *c) {
+void cam_bob_tower(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     transition_to_camera_mode(c, CAMERA_MODE_RADIAL, 90);
 }
@@ -17,7 +17,7 @@ BAD_RETURN(s32) cam_bob_tower(struct Camera *c) {
  *
  * @see sCamBOB
  */
-BAD_RETURN(s32) cam_bob_default_free_roam(struct Camera *c) {
+void cam_bob_default_free_roam(struct Camera *c) {
     transition_to_camera_mode(c, CAMERA_MODE_FREE_ROAM, 90);
 }
 
