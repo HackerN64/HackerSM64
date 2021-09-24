@@ -17,9 +17,9 @@ index 0ea6be6..bba0a94 100644
 --- a/levels/ending/leveldata.c
 +++ b/levels/ending/leveldata.c
 @@ -250,389 +250,63 @@ const Gfx dl_cake_end_screen_eu_070297D8[] = {
- 
+
  #include "levels/ending/cake.inc.c"
- 
+
 -// 0x07025800 - 0x07025840
 -static const Vtx cake_end_vertex_07025800[] = {
 -    {{{     0,    220,     -1}, 0, {     0,    608}, {0xff, 0xff, 0xff, 0xff}}},
@@ -460,7 +460,7 @@ index 0ea6be6..bba0a94 100644
 +    CAKE_RECT((row) * NUM_CAKE_TEXTURES_X + 2),\
 +    CAKE_RECT((row) * NUM_CAKE_TEXTURES_X + 3),\
 +    CAKE_RECT((row) * NUM_CAKE_TEXTURES_X + 4)
- 
+
  // 0x07026400 - 0x07027350
  const Gfx dl_cake_end_screen[] = {
 @@ -640,198 +314,27 @@ const Gfx dl_cake_end_screen[] = {
@@ -659,7 +659,7 @@ index 0ea6be6..bba0a94 100644
 -    gsDPLoadTextureBlock(cake_end_texture_47, G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 20, 0, G_TX_CLAMP, G_TX_CLAMP, 7, 6, G_TX_NOLOD, G_TX_NOLOD),
 -    gsSPVertex(cake_end_vertex_070263C0, 4, 0),
 -    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-+    
++
 +    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b_LOAD_BLOCK, 0, 0,
 +        G_TX_LOADTILE, 0,
 +        G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD,
@@ -680,7 +680,7 @@ index 0ea6be6..bba0a94 100644
 +    CAKE_ROW(5),
 +    CAKE_ROW(6),
 +    CAKE_ROW(7),
- 
+
      gsDPPipeSync(),
      gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
 diff --git a/tools/skyconv.c b/tools/skyconv.c
@@ -699,23 +699,23 @@ index b515373..1fdf027 100644
      [CakeEU] = {
          {320, 224, 64, 32, 5, 7, false, false},
 @@ -62,7 +62,7 @@ typedef struct {
- 
+
  static const TableDimension TABLE_DIMENSIONS[ImageType_MAX] = {
      [Skybox]   = {8, 10},
 -    [Cake]     = {4, 12},
 +    [Cake]     = {5,  8},
      [CakeEU]   = {5,  7},
  };
- 
+
 @@ -104,15 +104,26 @@ static void split_tile(int col, int row, rgba *image, bool expanded) {
      int tileWidth = props.tileWidth;
      int tileHeight = props.tileHeight;
      int imageWidth = props.imageWidth;
 +    int imageHeight = props.imageHeight;
      int numCols = props.numCols;
- 
+
      int expandedWidth = IMAGE_PROPERTIES[type][true].tileWidth;
- 
+
 +    rgba black = {0, 0, 0, 0};
 +
      for (int y = 0; y < tileHeight; y++) {
@@ -731,13 +731,13 @@ index b515373..1fdf027 100644
 +            {
 +                tiles[row * numCols + col].px[y * expandedWidth + x] = black;
 +            }
-+            
++
          }
      }
  }
 @@ -339,11 +350,12 @@ static void write_cake_c() {
      }
- 
+
      int numTiles = TABLE_DIMENSIONS[type].cols * TABLE_DIMENSIONS[type].rows;
 +    fprintf(cFile, "ALIGNED8 static const u8 cake_end_texture_%sdata[] = {\n", euSuffx);
      for (int i = 0; i < numTiles; ++i) {
@@ -749,4 +749,4 @@ index b515373..1fdf027 100644
 +    fputs("};\n\n", cFile);
      fclose(cFile);
  }
- 
+

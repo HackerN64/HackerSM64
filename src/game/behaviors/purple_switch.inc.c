@@ -7,7 +7,6 @@
  */
 
 void bhv_purple_switch_loop(void) {
-    UNUSED s32 unused;
     switch (o->oAction) {
         /**
          * Set the switch's model and scale. If Mario is standing near the

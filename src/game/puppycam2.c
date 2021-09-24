@@ -544,7 +544,7 @@ void puppycam_init(void)
 
     gPuppyCam.intendedFlags = PUPPYCAM_BEHAVIOUR_DEFAULT;
 
-    if (gCurrLevelNum == 27 || (gCurrLevelNum == 36 && gCurrAreaIndex == 2) || (gCurrLevelNum == 5 && gCurrAreaIndex == 2))
+    if (gCurrLevelNum == LEVEL_PSS || (gCurrLevelNum == LEVEL_TTM && gCurrAreaIndex == 2) || (gCurrLevelNum == LEVEL_CCM && gCurrAreaIndex == 2))
         gPuppyCam.intendedFlags |= PUPPYCAM_BEHAVIOUR_SLIDE_CORRECTION;
     gPuppyCam.flags = gPuppyCam.intendedFlags;
     gPuppyCam.zoom = gPuppyCam.zoomPoints[1];

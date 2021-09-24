@@ -91,10 +91,10 @@ void s2d_print(int x, int y, char *str) {
 
 				// s2d_blue = s2d_atoi(p, &p);
 				// CH_SKIP(p);	CH_SKIP(p);
-				
+
 				// s2d_alpha = s2d_atoi(p, &p);
 				// break;
-				
+
 				// break;
 			default:
 				break;
@@ -197,12 +197,12 @@ int main(void) {
 	// s2d_print(0,0, t);
 	char laStrBuf[0x100];
 	char ff[0x100];
-	sprintf(ff, 
+	sprintf(ff,
             "%s %d:"
             TRANSLATE "134 93" "%s:"
         , "Floor", 213, "Seed");
 	sprintf(
-        laStrBuf, 
+        laStrBuf,
             "%s"
             TRANSLATE "138 93" "%s"
             TRANSLATE "138 110" "%s"

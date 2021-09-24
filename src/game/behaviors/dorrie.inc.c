@@ -68,7 +68,7 @@ void dorrie_act_lower_head(void) {
         if (o->oTimer > 150) {
             dorrie_begin_head_raise(FALSE);
         } else if (gMarioObject->platform == o) {
-            if (o->oDorrieForwardDistToMario > 830.0f 
+            if (o->oDorrieForwardDistToMario > 830.0f
                 && set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_START) {
                 dorrie_begin_head_raise(TRUE);
             } else if (o->oDorrieForwardDistToMario > 320.0f) {
@@ -112,8 +112,6 @@ void dorrie_act_raise_head(void) {
 
 void bhv_dorrie_update(void) {
     f32 boundsShift;
-    UNUSED s32 unused1;
-    UNUSED s32 unused2;
     f32 maxOffsetY;
 
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {

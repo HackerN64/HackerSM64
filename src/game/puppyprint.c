@@ -78,6 +78,8 @@ OSTime dmaTime[NUM_PERF_ITERATIONS+1];
 OSTime dmaAudioTime[NUM_PERF_ITERATIONS+1];
 OSTime faultTime[NUM_PERF_ITERATIONS+1];
 OSTime taskTime[NUM_PERF_ITERATIONS+1];
+OSTime profilerTime[NUM_PERF_ITERATIONS+1];
+OSTime profilerTime2[NUM_PERF_ITERATIONS+1];
 //RSP
 OSTime audioTime[NUM_PERF_ITERATIONS+1];
 OSTime rspGenTime[NUM_PERF_ITERATIONS+1];
@@ -364,11 +366,16 @@ void puppyprint_render_profiler(void)
     s32 perfPercentage[5];
     s32 graphPos;
     s32 prevGraph;
-    OSTime cpuCount = OS_CYCLES_TO_USEC(cpuTime+audioTime[NUM_PERF_ITERATIONS]+dmaAudioTime[NUM_PERF_ITERATIONS]+faultTime[NUM_PERF_ITERATIONS]+taskTime[NUM_PERF_ITERATIONS]);
+    OSTime cpuCount = OS_CYCLES_TO_USEC(cpuTime+audioTime[NUM_PERF_ITERATIONS]+dmaAudioTime[NUM_PERF_ITERATIONS]+faultTime[NUM_PERF_ITERATIONS]
+                                        +taskTime[NUM_PERF_ITERATIONS]-profilerTime[NUM_PERF_ITERATIONS]-profilerTime2[NUM_PERF_ITERATIONS]);
+    OSTime first = osGetTime();
     char textBytes[80];
 
     if (!fDebug)
+    {
+        profiler_update(profilerTime, first);
         return;
+    }
 
     sprintf(textBytes, "RAM: %06X /%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available()/(f32)mempool)*100));
     print_small_text(160, 224, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL);
@@ -454,6 +461,7 @@ void puppyprint_render_profiler(void)
         print_which_benchmark();
 
     print_ram_bar();
+    profiler_update(profilerTime, first);
 }
 
 void profiler_update(OSTime *time, OSTime time2)
@@ -491,6 +499,8 @@ void puppyprint_profiler_process(void)
         get_average_perf_time(dmaAudioTime);
         get_average_perf_time(faultTime);
         get_average_perf_time(taskTime);
+        get_average_perf_time(profilerTime);
+        get_average_perf_time(profilerTime2);
 
         dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
 
@@ -569,6 +579,7 @@ void puppyprint_profiler_process(void)
 
     if (perfIteration++ == NUM_PERF_ITERATIONS-1)
         perfIteration = 0;
+    profiler_update(profilerTime2, newTime);
 }
 #endif
 

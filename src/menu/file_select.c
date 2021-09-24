@@ -2284,9 +2284,6 @@ void print_save_file_scores(s8 fileIndex) {
  * Also checks if all saves exists and defines text and main menu timers.
  */
 void print_file_select_strings(void) {
-    UNUSED s32 unused1;
-    UNUSED s32 unused2;
-
     create_dl_ortho_matrix();
     switch (sSelectedButtonID) {
         case MENU_BUTTON_NONE:
@@ -2386,10 +2383,7 @@ s32 lvl_init_menu_values_and_cursor_pos(UNUSED s32 arg, UNUSED s32 unused) {
     sMainMenuTimer = 0;
     sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
     sSoundMode = save_file_get_sound_mode();
-    //! no return value
-#ifdef AVOID_UB
     return 0;
-#endif
 }
 
 /**

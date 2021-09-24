@@ -13,9 +13,9 @@
 // same as FLOOR_LOWER_LIMIT_MISC, explicitly for shadow.c
 #define FLOOR_LOWER_LIMIT_SHADOW    (FLOOR_LOWER_LIMIT + 1000)
 
-#define is_outside_level_bounds(x, z) (((x) <= -LEVEL_BOUNDARY_MAX) || ((x) >=  LEVEL_BOUNDARY_MAX) || ((z) <= -LEVEL_BOUNDARY_MAX) || ((z) >=  LEVEL_BOUNDARY_MAX))
+#define is_outside_level_bounds(xPos, zPos) (((xPos) <= -LEVEL_BOUNDARY_MAX) || ((xPos) >=  LEVEL_BOUNDARY_MAX) || ((zPos) <= -LEVEL_BOUNDARY_MAX) || ((zPos) >=  LEVEL_BOUNDARY_MAX))
 
-#define get_surface_height_at_location(x, z, surf) (-((x) * (surf)->normal.x + (surf)->normal.z * (z) + (surf)->originOffset) / (surf)->normal.y);
+#define get_surface_height_at_location(xPos, zPos, surf) (-((xPos) * (surf)->normal.x + (surf)->normal.z * (zPos) + (surf)->originOffset) / (surf)->normal.y)
 
 #define SURFACE_YAW(s) (atan2s(((s)->normal.z), ((s)->normal.x)))
 

@@ -81,7 +81,7 @@ void exclamation_box_act_2(void) {
     }
     if (cur_obj_was_attacked_or_ground_pounded()) {
         cur_obj_become_intangible();
-        o->oExclamationBoxUnkFC = 0x4000;
+        o->oExclamationBoxScaleAngle = 0x4000;
         o->oVelY = 30.0f;
         o->oGravity = -8.0f;
         o->oFloorHeight = o->oPosY;
@@ -94,19 +94,18 @@ void exclamation_box_act_2(void) {
 }
 
 void exclamation_box_act_3(void) {
-    UNUSED s32 unused;
     cur_obj_move_using_fvel_and_gravity();
     if (o->oVelY < 0.0f) {
         o->oVelY = 0.0f;
         o->oGravity = 0.0f;
     }
-    o->oExclamationBoxUnkF8 = (sins(o->oExclamationBoxUnkFC) + 1.0) * 0.3 + 0.0;
-    o->oExclamationBoxUnkF4 = (-sins(o->oExclamationBoxUnkFC) + 1.0) * 0.5 + 1.0;
-    o->oGraphYOffset = (-sins(o->oExclamationBoxUnkFC) + 1.0) * 26.0;
-    o->oExclamationBoxUnkFC += 0x1000;
-    o->header.gfx.scale[0] = o->oExclamationBoxUnkF4 * 2.0f;
-    o->header.gfx.scale[1] = o->oExclamationBoxUnkF8 * 2.0f;
-    o->header.gfx.scale[2] = o->oExclamationBoxUnkF4 * 2.0f;
+    o->oExclamationBoxVerticalScale = (sins(o->oExclamationBoxScaleAngle) + 1.0) * 0.3 + 0.0;
+    o->oExclamationBoxHorizontalScale = (-sins(o->oExclamationBoxScaleAngle) + 1.0) * 0.5 + 1.0;
+    o->oGraphYOffset = (-sins(o->oExclamationBoxScaleAngle) + 1.0) * 26.0;
+    o->oExclamationBoxScaleAngle += 0x1000;
+    o->header.gfx.scale[0] = o->oExclamationBoxHorizontalScale * 2.0f;
+    o->header.gfx.scale[1] = o->oExclamationBoxVerticalScale * 2.0f;
+    o->header.gfx.scale[2] = o->oExclamationBoxHorizontalScale * 2.0f;
     if (o->oTimer == 7)
         o->oAction = 4;
 }

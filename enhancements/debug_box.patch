@@ -7,17 +7,17 @@ index af9d0156..c68a7f6e 100644
  #include "level_table.h"
  #include "dialog_ids.h"
 +#include "debug_box.h"
- 
+
  struct SpawnInfo gPlayerSpawnInfos[1];
  struct GraphNode *gGraphNodePointers[0x100];
 @@ -363,6 +364,8 @@ void render_game(void) {
      if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
          geo_process_root(gCurrentArea->unk04, D_8032CE74, D_8032CE78, gFBSetColor);
- 
+
 +        render_debug_boxes();
 +
          gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&D_8032CF00));
- 
+
          gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
 diff --git a/src/game/debug_box.c b/src/game/debug_box.c
 new file mode 100644

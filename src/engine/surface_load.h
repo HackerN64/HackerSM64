@@ -27,9 +27,6 @@ enum
 
 typedef struct SurfaceNode SpatialPartitionCell[4];
 
-// Needed for bs bss reordering memes.
-extern s32 unused8038BE90;
-
 extern SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 extern SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
 extern struct SurfaceNode *sSurfaceNodePool;

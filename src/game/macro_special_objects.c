@@ -171,8 +171,6 @@ void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
 }
 
 void spawn_macro_objects_hardcoded(s32 areaIndex, s16 *macroObjList) {
-    UNUSED u8 pad[8];
-
     // This version of macroObjList has the preset and Y-Rotation separated,
     // and lacks behavior params. Might be an early version of the macro object list?
     s16 macroObjX;
@@ -180,8 +178,6 @@ void spawn_macro_objects_hardcoded(s32 areaIndex, s16 *macroObjList) {
     s16 macroObjZ;
     s16 macroObjPreset;
     s16 macroObjRY; // Y Rotation
-
-    UNUSED u8 pad2[10];
 
     gMacroObjectDefaultParent.header.gfx.areaIndex = areaIndex;
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;

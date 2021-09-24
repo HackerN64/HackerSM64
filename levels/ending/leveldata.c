@@ -319,7 +319,7 @@ const Gfx dl_cake_end_screen[] = {
     gsDPSetCombineMode(G_CC_DECALRGB, G_CC_DECALRGB),
     gsDPSetRenderMode(G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
-    
+
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b_LOAD_BLOCK, 0, 0,
         G_TX_LOADTILE, 0,
         G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD,

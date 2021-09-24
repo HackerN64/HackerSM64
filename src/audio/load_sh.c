@@ -127,7 +127,7 @@ void func_sh_802f4dcc(s32 audioResetStatus);
 void func_sh_802f4e50(struct PendingDmaAudioBank *audioBank, s32 audioResetStatus);
 void func_sh_802f50ec(struct PendingDmaAudioBank *arg0, size_t len);
 void func_sh_802f517c(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 arg3);
-BAD_RETURN(s32) func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *patchInfo, s32 arg3);
+void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *patchInfo, s32 arg3);
 s32 func_sh_802f573c(s32 audioResetStatus);
 void *func_sh_802f3564(s32 seqId);
 s32 func_sh_802f3ec4(s32 arg0, uintptr_t *arg1);
@@ -365,9 +365,7 @@ s32 func_sh_802f2f38(struct AudioBankSample *sample, s32 bankId) {
         sample->medium = 0;
         sample->sampleAddr = sp24;
     }
-#ifdef AVOID_UB
     return 0;
-#endif
 }
 
 s32 func_sh_802f3024(s32 bankId, s32 instId, s32 arg2) {
@@ -395,9 +393,7 @@ s32 func_sh_802f3024(s32 bankId, s32 instId, s32 arg2) {
         func_sh_802f2f38(drum->sound.sample, bankId);
         return 0;
     }
-#ifdef AVOID_UB
     return 0;
-#endif
 }
 
 void func_sh_802f30f4(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3) {
@@ -452,7 +448,7 @@ void func_sh_802f3288(s32 idx) {
     }
 }
 
-BAD_RETURN(s32) func_sh_802f3368(s32 bankId) {
+void func_sh_802f3368(s32 bankId) {
     struct SoundMultiPool *pool = &gBankLoadedPool;
     struct TemporaryPool *temporary = &pool->temporary;
     struct PersistentPool *persistent;
@@ -1428,7 +1424,7 @@ void patch_sound(struct AudioBankSound *sound, struct AudioBank *memBase, struct
 #undef PATCH
 }
 
-BAD_RETURN(s32) func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *patchInfo, s32 arg3) {
+void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *patchInfo, s32 arg3) {
     UNUSED u32 pad[2];
     u8 *addr;
     UNUSED u32 pad1[3];

@@ -13,15 +13,14 @@ struct ObjectHitbox sScuttlebugHitbox = {
 };
 
 void bhv_scuttlebug_loop(void) {
-    UNUSED s32 unused;
     f32 animSpeed;
     cur_obj_update_floor_and_walls();
     if (o->oSubAction != 0
         && cur_obj_set_hitbox_and_die_if_attacked(&sScuttlebugHitbox, SOUND_OBJ_DYING_ENEMY1,
-                                              o->oScuttlebugUnkF4))
+                                              o->oScuttlebugHasNoLootCoins))
         o->oSubAction = 3;
     if (o->oSubAction != 1)
-        o->oScuttlebugUnkF8 = 0;
+        o->oScuttlebugIsAtttacking = 0;
     switch (o->oSubAction) {
         case 0:
             if (o->oMoveFlags & OBJ_MOVE_LANDED)
@@ -38,19 +37,19 @@ void bhv_scuttlebug_loop(void) {
             if (cur_obj_lateral_dist_from_mario_to_home() > 1000.0f)
                 o->oAngleToMario = cur_obj_angle_to_home();
             else {
-                if (o->oScuttlebugUnkF8 == 0) {
-                    o->oScuttlebugUnkFC = 0;
+                if (o->oScuttlebugIsAtttacking == 0) {
+                    o->oScuttlebugTimer = 0;
                     o->oAngleToMario = obj_angle_to_object(o, gMarioObject);
                     if (abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw) < 0x800) {
-                        o->oScuttlebugUnkF8 = 1;
+                        o->oScuttlebugIsAtttacking = 1;
                         o->oVelY = 20.0f;
                         cur_obj_play_sound_2(SOUND_OBJ2_SCUTTLEBUG_ALERT);
                     }
-                } else if (o->oScuttlebugUnkF8 == 1) {
+                } else if (o->oScuttlebugIsAtttacking == 1) {
                     o->oForwardVel = 15.0f;
-                    o->oScuttlebugUnkFC++;
-                    if (o->oScuttlebugUnkFC > 50)
-                        o->oScuttlebugUnkF8 = 0;
+                    o->oScuttlebugTimer++;
+                    if (o->oScuttlebugTimer > 50)
+                        o->oScuttlebugIsAtttacking = 0;
                 }
             }
             if (update_angle_from_move_flags(&o->oAngleToMario))
@@ -77,15 +76,15 @@ void bhv_scuttlebug_loop(void) {
             if (o->oMoveFlags & OBJ_MOVE_LANDED) {
                 o->oSubAction++;
                 o->oVelY = 0.0f;
-                o->oScuttlebugUnkFC = 0;
+                o->oScuttlebugTimer = 0;
                 o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
                 o->oInteractStatus = 0;
             }
             break;
         case 5:
             o->oForwardVel = 2.0f;
-            o->oScuttlebugUnkFC++;
-            if (o->oScuttlebugUnkFC > 30)
+            o->oScuttlebugTimer++;
+            if (o->oScuttlebugTimer > 30)
                 o->oSubAction = 0;
             break;
     }
@@ -100,7 +99,7 @@ void bhv_scuttlebug_loop(void) {
         if (obj_is_hidden(o))
             obj_mark_for_deletion(o);
         if (o->activeFlags == ACTIVE_FLAG_DEACTIVATED)
-            o->parentObj->oScuttlebugSpawnerUnk88 = 1;
+            o->parentObj->oScuttlebugSpawnerIsDeactivated = 1;
     }
     cur_obj_move_standard(-50);
 }
@@ -111,14 +110,14 @@ void bhv_scuttlebug_spawn_loop(void) {
         if (o->oTimer > 30 && 500.0f < o->oDistanceToMario && o->oDistanceToMario < 1500.0f) {
             cur_obj_play_sound_2(SOUND_OBJ2_SCUTTLEBUG_ALERT);
             scuttlebug = spawn_object(o, MODEL_SCUTTLEBUG, bhvScuttlebug);
-            scuttlebug->oScuttlebugUnkF4 = o->oScuttlebugSpawnerUnkF4;
+            scuttlebug->oScuttlebugHasNoLootCoins = o->oScuttlebugSpawnerSpawnWithNoLootCoins;
             scuttlebug->oForwardVel = 30.0f;
             scuttlebug->oVelY = 80.0f;
             o->oAction++;
-            o->oScuttlebugUnkF4 = 1;
+            o->oScuttlebugHasNoLootCoins = 1;
         }
-    } else if (o->oScuttlebugSpawnerUnk88 != 0) {
-        o->oScuttlebugSpawnerUnk88 = 0;
+    } else if (o->oScuttlebugSpawnerIsDeactivated != 0) {
+        o->oScuttlebugSpawnerIsDeactivated = 0;
         o->oAction = 0;
     }
 }

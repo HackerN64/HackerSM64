@@ -153,9 +153,7 @@ void wiggler_init_segments(void) {
         cur_obj_unhide();
     }
 
-#if defined(VERSION_EU) || defined(AVOID_UB)
     o->oHealth = 4; // This fixes Wiggler reading UB on his first frame of his acceleration, as his health is not set.
-#endif
 }
 
 /**
@@ -194,7 +192,7 @@ void wiggler_init_segments(void) {
         bodyPart->yaw = prevBodyPart->yaw + dyaw;
 
         // As the head tilts, propagate the tilt backward
-        dxz = sqrtf(dx * dx + dz * dz);
+        dxz = sqrtf(sqr(dx) + sqr(dz));
         dpitch = atan2s(dxz, dy) - prevBodyPart->pitch;
         clamp_s16(&dpitch, -0x2000, 0x2000);
         bodyPart->pitch = prevBodyPart->pitch + dpitch;
@@ -245,10 +243,6 @@ static void wiggler_act_walk(void) {
             o->oWigglerTextStatus = WIGGLER_TEXT_STATUS_COMPLETED_DIALOG;
         }
     } else {
-        //! Every object's health is initially 2048, and wiggler's doesn't change
-        //  to 4 until after this runs the first time. It indexes out of bounds
-        //  and uses the value 113762.3 for one frame on US. This is fixed up
-        //  in wiggler_init_segments if AVOID_UB is defined.
         obj_forward_vel_approach(sWigglerSpeeds[o->oHealth - 1], 1.0f);
 
         if (o->oWigglerWalkAwayFromWallTimer != 0) {

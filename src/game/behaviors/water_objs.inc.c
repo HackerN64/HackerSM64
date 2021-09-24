@@ -9,9 +9,9 @@ void bhv_water_air_bubble_init(void) {
 
 void bhv_water_air_bubble_loop(void) {
     s32 i;
-    o->header.gfx.scale[0] = sins(o->oWaterObjUnkF4) * 0.5 + 4.0;
-    o->header.gfx.scale[1] = -sins(o->oWaterObjUnkF4) * 0.5 + 4.0;
-    o->oWaterObjUnkF4 += 0x400;
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.5 + 4.0;
+    o->header.gfx.scale[1] = -sins(o->oWaterObjScaleXAngle) * 0.5 + 4.0;
+    o->oWaterObjScaleXAngle += 0x400;
     if (o->oTimer < 30) {
         cur_obj_become_intangible();
         o->oPosY += 3.0f;
@@ -35,8 +35,8 @@ void bhv_water_air_bubble_loop(void) {
 }
 
 void bhv_bubble_wave_init(void) {
-    o->oWaterObjUnkFC  = 0x800 + (s32)(random_float() * 2048.0f);
-    o->oWaterObjUnk100 = 0x800 + (s32)(random_float() * 2048.0f);
+    o->oWaterObjScaleXAngleVel  = 0x800 + (s32)(random_float() * 2048.0f);
+    o->oWaterObjScaleYAngleVel = 0x800 + (s32)(random_float() * 2048.0f);
     cur_obj_play_sound_2(SOUND_GENERAL_QUIET_BUBBLE);
 }
 
@@ -48,18 +48,18 @@ void bhv_bubble_maybe_loop(void) {
     o->oPosY += random_float() * 3.0f + 6.0f;
     o->oPosX += random_float() * 10.0f - 5.0f;
     o->oPosZ += random_float() * 10.0f - 5.0f;
-    o->header.gfx.scale[0] = sins(o->oWaterObjUnkF4) * 0.2 + 1.0;
-    o->oWaterObjUnkF4 += o->oWaterObjUnkFC;
-    o->header.gfx.scale[1] = sins(o->oWaterObjUnkF8) * 0.2 + 1.0;
-    o->oWaterObjUnkF8 += o->oWaterObjUnk100;
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.2 + 1.0;
+    o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2 + 1.0;
+    o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
 }
 
 void bhv_small_water_wave_loop(void) {
     f32 waterLevel = find_water_level(o->oPosX, o->oPosZ);
-    o->header.gfx.scale[0] = sins(o->oWaterObjUnkF4) * 0.2 + 1.0;
-    o->oWaterObjUnkF4 += o->oWaterObjUnkFC;
-    o->header.gfx.scale[1] = sins(o->oWaterObjUnkF8) * 0.2 + 1.0;
-    o->oWaterObjUnkF8 += o->oWaterObjUnk100;
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.2 + 1.0;
+    o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2 + 1.0;
+    o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
     if (o->oPosY > waterLevel) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
         o->oPosY += 5.0f;
@@ -71,16 +71,16 @@ void bhv_small_water_wave_loop(void) {
 }
 
 void scale_bubble_sin(void) {
-    o->header.gfx.scale[0] = sins(o->oWaterObjUnkF4) * 0.5 + 2.0;
-    o->oWaterObjUnkF4 += o->oWaterObjUnkFC;
-    o->header.gfx.scale[1] = sins(o->oWaterObjUnkF8) * 0.5 + 2.0;
-    o->oWaterObjUnkF8 += o->oWaterObjUnk100;
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.5 + 2.0;
+    o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.5 + 2.0;
+    o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
 }
 
 void bhv_particle_init(void) {
     obj_scale_xyz(o, 2.0f, 2.0f, 1.0f);
-    o->oWaterObjUnkFC = 0x800 + (s32)(random_float() * 2048.0f);
-    o->oWaterObjUnk100 = 0x800 + (s32)(random_float() * 2048.0f);
+    o->oWaterObjScaleXAngleVel = 0x800 + (s32)(random_float() * 2048.0f);
+    o->oWaterObjScaleYAngleVel = 0x800 + (s32)(random_float() * 2048.0f);
     obj_translate_xyz_random(o, 100.0f);
 }
 

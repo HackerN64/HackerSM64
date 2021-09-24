@@ -36,42 +36,42 @@ void bhv_animates_on_floor_switch_press_init(void) {
 }
 
 void bhv_animates_on_floor_switch_press_loop(void) {
-    if (o->oFloorSwitchPressAnimationUnk100 != 0) {
+    if (o->oFloorSwitchPressAnimationSwitchNotTicking != 0) {
         if (o->parentObj->oAction != 2) {
-            o->oFloorSwitchPressAnimationUnk100 = 0;
+            o->oFloorSwitchPressAnimationSwitchNotTicking = 0;
         }
 
-        if (o->oFloorSwitchPressAnimationUnkFC != 0) {
-            o->oFloorSwitchPressAnimationUnkF4 = sAnimatesOnFloorSwitchPressTimers[o->oBehParams2ndByte];
+        if (o->oFloorSwitchPressAnimationDoResetTime != 0) {
+            o->oFloorSwitchPressAnimationTickTimer = sAnimatesOnFloorSwitchPressTimers[o->oBehParams2ndByte];
         } else {
-            o->oFloorSwitchPressAnimationUnkF4 = 0;
+            o->oFloorSwitchPressAnimationTickTimer = 0;
         }
     } else if (o->parentObj->oAction == 2) {
-        o->oFloorSwitchPressAnimationUnkFC ^= 1;
-        o->oFloorSwitchPressAnimationUnk100 = 1;
+        o->oFloorSwitchPressAnimationDoResetTime ^= 1;
+        o->oFloorSwitchPressAnimationSwitchNotTicking = 1;
     }
 
-    if (o->oFloorSwitchPressAnimationUnkF4 != 0) {
-        if (o->oFloorSwitchPressAnimationUnkF4 < 60) {
+    if (o->oFloorSwitchPressAnimationTickTimer != 0) {
+        if (o->oFloorSwitchPressAnimationTickTimer < 60) {
             cur_obj_play_sound_1(SOUND_GENERAL2_SWITCH_TICK_SLOW);
         } else {
             cur_obj_play_sound_1(SOUND_GENERAL2_SWITCH_TICK_FAST);
         }
 
-        if (--o->oFloorSwitchPressAnimationUnkF4 == 0) {
-            o->oFloorSwitchPressAnimationUnkFC = 0;
+        if (--o->oFloorSwitchPressAnimationTickTimer == 0) {
+            o->oFloorSwitchPressAnimationDoResetTime = 0;
         }
 
-        if (o->oFloorSwitchPressAnimationUnkF8 < 9) {
-            o->oFloorSwitchPressAnimationUnkF8 += 1;
+        if (o->oFloorSwitchPressAnimationDoubleFrame < 9) {
+            o->oFloorSwitchPressAnimationDoubleFrame += 1;
         }
-    } else if ((o->oFloorSwitchPressAnimationUnkF8 -= 2) < 0) {
-        o->oFloorSwitchPressAnimationUnkF8 = 0;
-        o->oFloorSwitchPressAnimationUnkFC = 1;
+    } else if ((o->oFloorSwitchPressAnimationDoubleFrame -= 2) < 0) {
+        o->oFloorSwitchPressAnimationDoubleFrame = 0;
+        o->oFloorSwitchPressAnimationDoResetTime = 1;
     }
 
     o->collisionData = segmented_to_virtual(
-        sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationUnkF8 / 2].collisionDataPtr);
+        sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationDoubleFrame / 2].collisionDataPtr);
 
-    cur_obj_set_model(sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationUnkF8 / 2].model);
+    cur_obj_set_model(sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationDoubleFrame / 2].model);
 }

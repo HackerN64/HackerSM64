@@ -223,9 +223,9 @@
 #define CHANGE_AREA_SKYBOX(area, segStart, segEnd) \
     CMD_BBH(0x3E, 0x0C, area), \
     CMD_PTR(segStart), \
-    CMD_PTR(segEnd) 
-    
-    
+    CMD_PTR(segEnd)
+
+
 #define INIT_LEVEL() \
     CMD_BBH(0x1B, 0x04, 0x0000)
 

@@ -63,7 +63,6 @@ void _Ldtob(printf_struct *args, u8 type) {
     u8 drop;
     s32 n2;
     /* */
-    UNUSED u8 unused[0x4];
     ptr = buff;
     val = args->value.f64;
     if (args->precision < 0) {

@@ -675,7 +675,7 @@ u32 should_push_or_pull_door(struct MarioState *m, struct Object *o) {
 
     s16 dYaw = o->oMoveAngleYaw - atan2s(dz, dx);
 
-    return (dYaw >= -0x4000 && dYaw <= 0x4000) ? 0x00000001 : 0x00000002;
+    return (dYaw >= -0x4000 && dYaw <= 0x4000) ? WARP_FLAG_DOOR_PULLED : WARP_FLAG_DOOR_FLIP_MARIO;
 }
 
 u32 take_damage_from_interact_object(struct MarioState *m) {
@@ -947,10 +947,10 @@ u32 interact_warp_door(struct MarioState *m, UNUSED u32 interactType, struct Obj
 #endif
 
         if (m->action == ACT_WALKING || m->action == ACT_DECELERATING) {
-            actionArg = should_push_or_pull_door(m, o) + 0x00000004;
+            actionArg = should_push_or_pull_door(m, o) + WARP_FLAG_DOOR_IS_WARP;
 
             if (doorAction == 0) {
-                if (actionArg & 0x00000001) {
+                if (actionArg & WARP_FLAG_DOOR_PULLED) {
                     doorAction = ACT_PULLING_DOOR;
                 } else {
                     doorAction = ACT_PUSHING_DOOR;
@@ -1018,7 +1018,7 @@ u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *
             u32 enterDoorAction;
             u32 doorSaveFileFlag;
 
-            if (actionArg & 0x00000001) {
+            if (actionArg & WARP_FLAG_DOOR_PULLED) {
                 enterDoorAction = ACT_PULLING_DOOR;
             } else {
                 enterDoorAction = ACT_PUSHING_DOOR;
@@ -1242,8 +1242,6 @@ u32 interact_clam_or_bubba(struct MarioState *m, UNUSED u32 interactType, struct
 }
 
 u32 interact_bully(struct MarioState *m, UNUSED u32 interactType, struct Object *o) {
-    UNUSED u32 unused;
-
     u32 interaction;
     if (m->flags & MARIO_METAL_CAP) {
         interaction = INT_FAST_ATTACK_OR_SHELL;
@@ -1337,8 +1335,6 @@ u32 interact_mr_blizzard(struct MarioState *m, UNUSED u32 interactType, struct O
 }
 
 u32 interact_hit_from_below(struct MarioState *m, UNUSED u32 interactType, struct Object *o) {
-    UNUSED u32 unused;
-
     u32 interaction;
     if (m->flags & MARIO_METAL_CAP) {
         interaction = INT_FAST_ATTACK_OR_SHELL;
@@ -1775,8 +1771,8 @@ void check_kick_or_punch_wall(struct MarioState *m) {
         detector.x = m->pos[0] + 50.0f * sins(m->faceAngle[1]);
         detector.z = m->pos[2] + 50.0f * coss(m->faceAngle[1]);
         detector.y = m->pos[1];
-		detector.offsetY = 80.0f;
-		detector.radius = 5.0f;
+        detector.offsetY = 80.0f;
+        detector.radius = 5.0f;
 
         if (find_wall_collisions(&detector) > 0) {
             if (m->action != ACT_MOVE_PUNCHING || m->forwardVel >= 0.0f) {

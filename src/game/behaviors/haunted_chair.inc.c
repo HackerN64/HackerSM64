@@ -20,7 +20,7 @@ void bhv_haunted_chair_init(void) {
     if (pianoObj != NULL && dist < 300.0f) {
         o->parentObj = pianoObj;
     } else {
-        o->oHauntedChairUnkF4 = 1;
+        o->oHauntedChairSpinTimer = 1;
     }
 }
 
@@ -28,38 +28,38 @@ void haunted_chair_act_0(void) {
     s16 dAngleToPiano;
 
     if (o->parentObj != o) {
-        if (o->oHauntedChairUnk104 == 0) {
+        if (o->oHauntedChairFallTargetAngle == 0) {
             if (lateral_dist_between_objects(o, o->parentObj) < 250.0f) {
                 dAngleToPiano = obj_angle_to_object(o, o->parentObj) - o->oFaceAngleYaw + 0x2000;
                 if (dAngleToPiano & 0x4000) {
-                    o->oHauntedChairUnk100 = &o->oFaceAngleRoll;
+                    o->oHauntedChairFallFromPianoAngle = &o->oFaceAngleRoll;
                     if (dAngleToPiano > 0) {
-                        o->oHauntedChairUnk104 = 0x4000;
+                        o->oHauntedChairFallTargetAngle = 0x4000;
                     } else {
-                        o->oHauntedChairUnk104 = -0x4000;
+                        o->oHauntedChairFallTargetAngle = -0x4000;
                     }
                 } else {
-                    o->oHauntedChairUnk100 = &o->oFaceAnglePitch;
+                    o->oHauntedChairFallFromPianoAngle = &o->oFaceAnglePitch;
                     if (dAngleToPiano < 0) {
-                        o->oHauntedChairUnk104 = 0x5000;
+                        o->oHauntedChairFallTargetAngle = 0x5000;
                     } else {
-                        o->oHauntedChairUnk104 = -0x4000;
+                        o->oHauntedChairFallTargetAngle = -0x4000;
                     }
                 }
 
-                if (o->oHauntedChairUnk104 < 0) {
-                    o->oHauntedChairUnkF8 = -1500.0f;
+                if (o->oHauntedChairFallTargetAngle < 0) {
+                    o->oHauntedChairPitchVel = -1500.0f;
                 } else {
-                    o->oHauntedChairUnkF8 = 1500.0f;
+                    o->oHauntedChairPitchVel = 1500.0f;
                 }
             }
         } else {
-            oscillate_toward(o->oHauntedChairUnk100, &o->oHauntedChairUnkF8, o->oHauntedChairUnk104,
+            oscillate_toward(o->oHauntedChairFallFromPianoAngle, &o->oHauntedChairPitchVel, o->oHauntedChairFallTargetAngle,
                              4000.0f, 20.0f, 2.0f);
         }
-    } else if (o->oHauntedChairUnkF4 != 0) {
+    } else if (o->oHauntedChairSpinTimer != 0) {
         if (o->oDistanceToMario < 500.0f) {
-            o->oHauntedChairUnkF4 -= 1;
+            o->oHauntedChairSpinTimer -= 1;
         }
         o->oTimer = 0.0f;
     } else {
@@ -83,9 +83,9 @@ void haunted_chair_act_0(void) {
 
         if (o->oTimer > 30) {
             o->oAction = 1;
-            o->oHauntedChairUnkF8 = 0.0f;
-            o->oHauntedChairUnkFC = 200.0f;
-            o->oHauntedChairUnkF4 = 40;
+            o->oHauntedChairPitchVel = 0.0f;
+            o->oHauntedChairRollVel = 200.0f;
+            o->oHauntedChairSpinTimer = 40;
         }
     }
 
@@ -103,16 +103,16 @@ void haunted_chair_act_1(void) {
         }
 
         o->oGravity = 0.0f;
-        oscillate_toward(&o->oFaceAnglePitch, &o->oHauntedChairUnkF8, -4000, 200.0f, 20.0f, 2.0f);
-        oscillate_toward(&o->oFaceAngleRoll, &o->oHauntedChairUnkFC, 0, 0.0f, 20.0f, 1.0f);
+        oscillate_toward(&o->oFaceAnglePitch, &o->oHauntedChairPitchVel, -4000, 200.0f, 20.0f, 2.0f);
+        oscillate_toward(&o->oFaceAngleRoll, &o->oHauntedChairRollVel, 0, 0.0f, 20.0f, 1.0f);
     } else {
-        if (o->oHauntedChairUnkF4 != 0) {
-            if (--o->oHauntedChairUnkF4 == 0) {
+        if (o->oHauntedChairSpinTimer != 0) {
+            if (--o->oHauntedChairSpinTimer == 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_HAUNTED_CHAIR);
                 o->oMoveAnglePitch = obj_turn_pitch_toward_mario(120.0f, 0);
                 o->oMoveAngleYaw = o->oAngleToMario;
                 obj_compute_vel_from_move_pitch(50.0f);
-            } else if (o->oHauntedChairUnkF4 > 20) {
+            } else if (o->oHauntedChairSpinTimer > 20) {
                 if (gGlobalTimer % 4 == 0) {
                     cur_obj_play_sound_2(SOUND_GENERAL_SWISH_AIR_2);
                 }

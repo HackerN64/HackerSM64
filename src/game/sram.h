@@ -20,11 +20,11 @@ extern int nuPiReadWriteSram(u32 addr, void* buf_ptr, u32 size, s32 flag);
 /*----------------------------------------------------------------------*/
 #define nuPiReadSram(addr, buf_ptr, size)				\
 	nuPiReadWriteSram(addr, buf_ptr, size, OS_READ)
-    
+
 /*----------------------------------------------------------------------*/
 /*	nuPiWriteSram - Write to SRAM				*/
 /*----------------------------------------------------------------------*/
 #define nuPiWriteSram(addr, buf_ptr, size)				\
-    nuPiReadWriteSram(addr, buf_ptr, size, OS_WRITE)    
+    nuPiReadWriteSram(addr, buf_ptr, size, OS_WRITE)
 
 #endif // SRAM_H

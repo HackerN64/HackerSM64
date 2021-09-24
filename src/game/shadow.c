@@ -187,11 +187,6 @@ f32 get_water_level_below_shadow(struct Shadow *s, struct Surface **waterFloor) 
         return waterLevel;
     }
     return waterLevel;
-    //! @bug Missing return statement. This compiles to return `waterLevel`
-    //! incidentally.
-#ifdef AVOID_UB
-    return waterLevel;
-#endif
 }
 
 /**

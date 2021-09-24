@@ -63,7 +63,6 @@ extern struct ObjectNode gObjectListArray[];
 
 extern s32 gDebugInfoFlags;
 extern s32 gNumFindFloorMisses;
-extern UNUSED s32 unused_8033BEF8;
 extern s32 gUnknownWallCount;
 extern u32 gObjectCounter;
 

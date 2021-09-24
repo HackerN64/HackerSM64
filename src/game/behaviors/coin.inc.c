@@ -49,7 +49,7 @@ void bhv_temp_coin_loop(void) {
 }
 
 void bhv_coin_init(void) {
-    o->oVelY = random_float() * 10.0f + 30 + o->oCoinUnk110;
+    o->oVelY = random_float() * 10.0f + 30 + o->oCoinBaseYVel;
     o->oForwardVel = random_float() * 10.0f;
     o->oMoveAngleYaw = random_u16();
     cur_obj_set_behavior(bhvYellowCoin);
@@ -94,9 +94,9 @@ void bhv_coin_loop(void) {
     }
 #ifndef VERSION_JP
     if (o->oMoveFlags & OBJ_MOVE_BOUNCE) {
-        if (o->oCoinUnk1B0 < 5)
+        if (o->oCoinBounceTimer < 5)
             cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP);
-        o->oCoinUnk1B0++;
+        o->oCoinBounceTimer++;
     }
 #else
     if (o->oMoveFlags & OBJ_MOVE_BOUNCE)
@@ -112,7 +112,7 @@ void bhv_coin_formation_spawn_loop(void) {
         cur_obj_set_behavior(bhvYellowCoin);
         obj_set_hitbox(o, &sYellowCoinHitbox);
         bhv_init_room();
-        if (o->oCoinUnkF8) {
+        if (o->oCoinSnapToGround) {
             o->oPosY += 300.0f;
             cur_obj_update_floor_height();
             if (o->oPosY < o->oFloorHeight || o->oFloorHeight < FLOOR_LOWER_LIMIT_MISC)
@@ -126,7 +126,7 @@ void bhv_coin_formation_spawn_loop(void) {
         }
     } else {
         if (bhv_coin_sparkles_init())
-            o->parentObj->oCoinUnkF4 |= (1 << o->oBehParams2ndByte);
+            o->parentObj->oCoinRespawnBits |= (1 << o->oBehParams2ndByte);
         o->oAnimState++;
     }
     if (o->parentObj->oAction == 2)
@@ -170,12 +170,12 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
     if (spawnCoin) {
         newCoin = spawn_object_relative(index, pos[0], pos[1], pos[2], o, MODEL_YELLOW_COIN,
                                      bhvCoinFormationSpawn);
-        newCoin->oCoinUnkF8 = snapToGround;
+        newCoin->oCoinSnapToGround = snapToGround;
     }
 }
 
 void bhv_coin_formation_init(void) {
-    o->oCoinUnkF4 = (o->oBehParams >> 8) & 0xFF;
+    o->oCoinRespawnBits = (o->oBehParams >> 8) & 0xFF;
 }
 
 void bhv_coin_formation_loop(void) {
@@ -184,7 +184,7 @@ void bhv_coin_formation_loop(void) {
         case 0:
             if (o->oDistanceToMario < 2000.0f) {
                 for (bitIndex = 0; bitIndex < 8; bitIndex++) {
-                    if (!(o->oCoinUnkF4 & (1 << bitIndex)))
+                    if (!(o->oCoinRespawnBits & (1 << bitIndex)))
                         spawn_coin_in_formation(bitIndex, o->oBehParams2ndByte);
                 }
                 o->oAction++;
@@ -200,7 +200,7 @@ void bhv_coin_formation_loop(void) {
     }
 
     // Casting to u8 doesn't seem to match
-    set_object_respawn_info_bits(o, o->oCoinUnkF4 & 0xFF);
+    set_object_respawn_info_bits(o, o->oCoinRespawnBits & 0xFF);
 }
 
 void coin_inside_boo_act_1(void) {

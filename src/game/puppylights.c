@@ -220,7 +220,7 @@ void puppylights_run(Lights1 *src, struct Object *obj, s32 flags, u32 baseColour
     s32 offsetPlaced = 0;
     s32 lightFlags = flags;
 
-    if (gCurrLevelNum < 4)
+    if (gCurrLevelNum < LEVEL_BBH)
         return;
     //Checks if there's a hardset colour. Colours are only the first 3 bytes, so you can really put whatever you want in the last.
     //If there isn't a colour, then it decides whether to apply the ambient lighting, or the default lighting as the baseline.
@@ -272,7 +272,7 @@ void puppylights_run(Lights1 *src, struct Object *obj, s32 flags, u32 baseColour
 void puppylights_object_emit(struct Object *obj)
 {
     s32 i;
-    if (gCurrLevelNum < 4)
+    if (gCurrLevelNum < LEVEL_BBH)
         return;
 
     if (obj->oFlags & OBJ_FLAG_EMIT_LIGHT)

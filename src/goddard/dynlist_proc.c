@@ -1,7 +1,6 @@
 #include <PR/ultratypes.h>
 #include <stdio.h>
 
-#include "bad_declarations.h"
 #include "debug_utils.h"
 #include "draw_objects.h"
 #include "dynlist_proc.h"
@@ -159,8 +158,6 @@ void reset_dynlist(void) {
  *          Normally the dynlist specifically sets an object for return.
  */
 struct GdObj *proc_dynlist(struct DynList *dylist) {
-    UNUSED u32 pad[2];
-
     if (dylist++->cmd != 0xD1D4) {
         fatal_printf("proc_dynlist() not a valid dyn list");
     }
@@ -627,12 +624,7 @@ struct GdObj *d_makeobj(enum DObjTypes type, DynObjName name) {
         case D_DATA_GRP:
             d_makeobj(D_GROUP, name);
             ((struct ObjGroup *) sDynListCurObj)->linkType = 1;
-//! @bug Returns garbage when making `D_DATA_GRP` object
-#ifdef AVOID_UB
             return NULL;
-#else
-            return;
-#endif
         case D_CAMERA:
             dobj = &make_camera(0, NULL)->header;
             break;
@@ -1230,7 +1222,7 @@ void d_map_materials(DynObjName name) {
 
 /**
  * For all faces in the current `ObjGroup`, resolve their vertex indices to
- * `ObjVertex` pointers that point to vertices in the specified vertex group. 
+ * `ObjVertex` pointers that point to vertices in the specified vertex group.
  * Also compute normals for all faces in the current `ObjGroup` and all vertices
  * in the specified vertex group.
  * See `map_vertices()` for more info.
@@ -2637,7 +2629,7 @@ void d_set_parm_ptr(enum DParmPtr param, void *ptr) {
                         fatal_printf("dsetparmp() too many points");
                     }
                     // `ptr` here is a vertex index, not an actual pointer.
-                    // These vertex indices later get converted to `ObjVertex` pointers when `find_thisface_verts` is called. 
+                    // These vertex indices later get converted to `ObjVertex` pointers when `find_thisface_verts` is called.
                     ((struct ObjFace *) sDynListCurObj)->vertices[((struct ObjFace *) sDynListCurObj)->vtxCount++] = ptr;
                     break;
                 default:

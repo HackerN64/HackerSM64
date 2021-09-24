@@ -6,7 +6,7 @@ void spawn_child_obj_relative(struct Object *parent, s16 xOffset, s16 yOffset, s
     struct Object *obj = spawn_object(parent, model, behavior);
 
     obj->header.gfx.animInfo.animFrame = random_float() * 6.f;
-    obj->oEndBirdUnk104 = sCutsceneVars[9].point[0];
+    obj->oEndBirdCutsceneVars9PointX = sCutsceneVars[9].point[0];
     sCutsceneVars[9].point[0] += 1.f;
     obj->oPosX += xOffset;
     obj->oPosY += yOffset;

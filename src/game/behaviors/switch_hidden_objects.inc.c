@@ -13,7 +13,7 @@ struct ObjectHitbox sBreakableBoxHitbox = {
 };
 
 void breakable_box_init(void) {
-    o->oHiddenObjectUnkF4 = NULL;
+    o->oHiddenObjectSwitchObj = NULL;
     o->oAnimState = 1;
     switch (o->oBehParams2ndByte) {
         case 0:
@@ -32,7 +32,7 @@ void breakable_box_init(void) {
 }
 
 void hidden_breakable_box_actions(void) {
-    struct Object *sp1C;
+    struct Object *switchObj;
     obj_set_hitbox(o, &sBreakableBoxHitbox);
     cur_obj_set_model(MODEL_BREAKABLE_BOX_SMALL);
     if (o->oAction == 0) {
@@ -40,10 +40,10 @@ void hidden_breakable_box_actions(void) {
         cur_obj_become_intangible();
         if (o->oTimer == 0)
             breakable_box_init();
-        if (o->oHiddenObjectUnkF4 == NULL)
-            o->oHiddenObjectUnkF4 = cur_obj_nearest_object_with_behavior(bhvFloorSwitchHiddenObjects);
-        if ((sp1C = o->oHiddenObjectUnkF4) != NULL)
-            if (sp1C->oAction == 2) {
+        if (o->oHiddenObjectSwitchObj == NULL)
+            o->oHiddenObjectSwitchObj = cur_obj_nearest_object_with_behavior(bhvFloorSwitchHiddenObjects);
+        if ((switchObj = o->oHiddenObjectSwitchObj) != NULL)
+            if (switchObj->oAction == 2) {
                 o->oAction++;
                 cur_obj_enable_rendering();
                 cur_obj_unhide();
@@ -63,22 +63,22 @@ void hidden_breakable_box_actions(void) {
         cur_obj_become_intangible();
         cur_obj_disable_rendering();
         o->oInteractStatus = 0;
-        if ((sp1C = o->oHiddenObjectUnkF4) != NULL)
-            if (sp1C->oAction == 0)
+        if ((switchObj = o->oHiddenObjectSwitchObj) != NULL)
+            if (switchObj->oAction == 0)
                 o->oAction = 0;
     }
 }
 
 void hidden_unbreakable_box_actions(void) {
-    struct Object *sp1C;
+    struct Object *switchObj;
     obj_set_collision_data(o, wdw_seg7_collision_07018528);
     if (o->oAction == 0) {
         cur_obj_disable_rendering();
         cur_obj_become_intangible();
-        if (o->oHiddenObjectUnkF4 == NULL)
-            o->oHiddenObjectUnkF4 = cur_obj_nearest_object_with_behavior(bhvFloorSwitchHiddenObjects);
-        if ((sp1C = o->oHiddenObjectUnkF4) != NULL)
-            if (sp1C->oAction == 2) {
+        if (o->oHiddenObjectSwitchObj == NULL)
+            o->oHiddenObjectSwitchObj = cur_obj_nearest_object_with_behavior(bhvFloorSwitchHiddenObjects);
+        if ((switchObj = o->oHiddenObjectSwitchObj) != NULL)
+            if (switchObj->oAction == 2) {
                 o->oAction++;
                 cur_obj_enable_rendering();
                 cur_obj_unhide();

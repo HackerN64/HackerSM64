@@ -25,7 +25,7 @@ void bhv_snowmans_bottom_init(void) {
 
     o->oVelY = 0;
     o->oForwardVel = 0;
-    o->oSnowmansBottomUnkF4 = 0.4f;
+    o->oSnowmansBottomRollingFacePitch = 0.4f;
 
     headObj = cur_obj_nearest_object_with_behavior(bhvSnowmansHead);
     if (headObj != NULL) {
@@ -44,10 +44,10 @@ void set_rolling_sphere_hitbox(void) {
 
 void adjust_rolling_face_pitch(f32 f12) {
     o->oFaceAnglePitch += (s16)(o->oForwardVel * (100.0f / f12));
-    o->oSnowmansBottomUnkF4 += o->oForwardVel * 1e-4;
+    o->oSnowmansBottomRollingFacePitch += o->oForwardVel * 1e-4;
 
-    if (o->oSnowmansBottomUnkF4 > 1.0)
-        o->oSnowmansBottomUnkF4 = 1.0f;
+    if (o->oSnowmansBottomRollingFacePitch > 1.0)
+        o->oSnowmansBottomRollingFacePitch = 1.0f;
 }
 
 void snowmans_bottom_act_1(void) {
@@ -56,18 +56,18 @@ void snowmans_bottom_act_1(void) {
     o->oPathedStartWaypoint = segmented_to_virtual(&ccm_seg7_trajectory_snowman);
     object_step_without_floor_orient();
     pathResult = cur_obj_follow_path(pathResult);
-    o->oSnowmansBottomUnkF8 = o->oPathedTargetYaw;
-    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomUnkF8, 0x400);
+    o->oSnowmansBottomTargetYaw = o->oPathedTargetYaw;
+    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomTargetYaw, 0x400);
 
     if (o->oForwardVel > 70.0)
         o->oForwardVel = 70.0f;
 
     if (pathResult == -1) {
         if (obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x2000) == TRUE
-            && o->oSnowmansBottomUnk1AC == 1) {
-            o->oSnowmansBottomUnkF8 = o->oAngleToMario;
+            && o->oSnowmansBottomHitCheckpointNearMario == 1) {
+            o->oSnowmansBottomTargetYaw = o->oAngleToMario;
         } else {
-            o->oSnowmansBottomUnkF8 = o->oMoveAngleYaw;
+            o->oSnowmansBottomTargetYaw = o->oMoveAngleYaw;
         }
         o->oAction = 2;
     }
@@ -78,7 +78,7 @@ void snowmans_bottom_act_2(void) {
     if (o->oForwardVel > 70.0)
         o->oForwardVel = 70.0f;
 
-    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomUnkF8, 0x400);
+    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomTargetYaw, 0x400);
     if (is_point_close_to_object(o, -4230.0f, -1344.0f, 1813.0f, 300)) {
         spawn_mist_particles_variable(0, 0, 70.0f);
         o->oMoveAngleYaw = atan2s(1813.0f - o->oPosZ, -4230.0f - o->oPosX);
@@ -127,13 +127,13 @@ void bhv_snowmans_bottom_loop(void) {
 
         case 1:
             snowmans_bottom_act_1();
-            adjust_rolling_face_pitch(o->oSnowmansBottomUnkF4);
+            adjust_rolling_face_pitch(o->oSnowmansBottomRollingFacePitch);
             cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
             break;
 
         case 2:
             snowmans_bottom_act_2();
-            adjust_rolling_face_pitch(o->oSnowmansBottomUnkF4);
+            adjust_rolling_face_pitch(o->oSnowmansBottomRollingFacePitch);
             cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
             break;
 
@@ -148,8 +148,8 @@ void bhv_snowmans_bottom_loop(void) {
 
     set_rolling_sphere_hitbox();
     set_object_visibility(o, 8000);
-    cur_obj_scale(o->oSnowmansBottomUnkF4);
-    o->oGraphYOffset = o->oSnowmansBottomUnkF4 * 180.0f;
+    cur_obj_scale(o->oSnowmansBottomRollingFacePitch);
+    o->oGraphYOffset = o->oSnowmansBottomRollingFacePitch * 180.0f;
 }
 
 void bhv_snowmans_head_init(void) {
@@ -217,7 +217,7 @@ void bhv_snowmans_head_loop(void) {
 
 void bhv_snowmans_body_checkpoint_loop(void) {
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 800)) {
-        o->parentObj->oSnowmansBottomUnk1AC++;
+        o->parentObj->oSnowmansBottomHitCheckpointNearMario++;
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 

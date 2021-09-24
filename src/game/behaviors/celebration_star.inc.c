@@ -12,13 +12,13 @@ void bhv_celebration_star_init(void) {
         o->oFaceAnglePitch = 0;
         o->oFaceAngleRoll = 49152;
         cur_obj_scale(0.1f);
-        o->oCelebStarUnkF4 = 1;
+        o->oCelebStarIsBowserKey = 1;
     } else {
         o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_STAR];
         o->oFaceAnglePitch = 0;
         o->oFaceAngleRoll = 0;
         cur_obj_scale(0.4f);
-        o->oCelebStarUnkF4 = 0;
+        o->oCelebStarIsBowserKey = 0;
     }
 #else
     o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_STAR];
@@ -48,7 +48,7 @@ void celeb_star_act_face_camera(void) {
 
     if (o->oTimer < 10) {
 #if BUGFIX_STAR_BOWSER_KEY
-        if (o->oCelebStarUnkF4 == 0) {
+        if (o->oCelebStarIsBowserKey == 0) {
             cur_obj_scale((f32) o->oTimer / 10.0);
         } else {
             cur_obj_scale((f32) o->oTimer / 30.0);

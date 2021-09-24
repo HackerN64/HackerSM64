@@ -7,7 +7,7 @@ This repo needs BOTH an US ROM and a JP ROM in order to build. Place baserom.us.
 
 This repo needs gcc in order to be able to build it. To install it, run `sudo apt install gcc-mips-linux-gnu`
 
-This is a fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in `config.h`): 
+This is a fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in `config.h`):
 
 **Lighting Engine by Wiseguy**
 - Lighting Engine is available on a separate branch `(lighting-engine)`. Instructions on how to use it are in the readme of that branch.
@@ -18,9 +18,9 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 
 **Collision:**
 - Slope fix and exposed ceilings fix
-- No false ledgegrabs fix * 
-- Jump kick fix * 
-- 46 degree wallkicks * 
+- No false ledgegrabs fix *
+- Jump kick fix *
+- 46 degree wallkicks *
 - Pole fix
 - Possibility of disabling BLJs *
 - Hanging fix (mario can grab hangable ceilings from any state, instead of only jump or double jump) *
@@ -51,12 +51,12 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Automatic console/emulator detection. If emulator is detected, LODs are disabled. *
 - Ability to configure whether there's a 100 coin star at all and how many coins are required to spawn it *
 - Ability to easily change the warp that EXIT COURSE takes you to via config.h, or disable it entirely. *
-- 16 bit model IDs by someone2639. This means you can have up to 65536 models (lol). You can set the maximum number of model IDs in `config.h`. 
+- 16 bit model IDs by someone2639. This means you can have up to 65536 models (lol). You can set the maximum number of model IDs in `config.h`.
 - Apply_patch.sh improved
 - Removed the ifdef hell in `file_select.c` and `ingame_menu.c`
 - Added Blake's custom function for object model stuff: `obj_set_model` and `obj_has_model`
 - Added function to get the model ID from an object: `obj_get_model_id` (by Arceveti)
-- The "far" variable is now u16, allowing you to increase the farclip (the max distance at which geometry is rendered). However, when increasing the farclip, make sure to increase the nearclip by the same ratio, or rendering will break on console and LLE plugins. 
+- The "far" variable is now u16, allowing you to increase the farclip (the max distance at which geometry is rendered). However, when increasing the farclip, make sure to increase the nearclip by the same ratio, or rendering will break on console and LLE plugins.
 - Many general use defines for object struct members, meant for use in custom object behaviors. Check `object_fields.h` for more info on this. (By MrComit)
 - Included `actors/group0.c` in `behavior_data.c`
 - The internal ROM name is now set with a define in `config.h` to make it simpler
@@ -91,7 +91,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - You can set the black border size to different values for console and emulator. It's set to 0 by default for both. *
 - This repo supports much better implementation of reverb over vanilla's fake echo reverb. Great for caves or eerie levels, as well as just a better audio experience in general. See `audio/synthesis.c` for more configuration info. (By ArcticJaguar725) *
 - Fazana's "puppyprint" text engine. *
-  - Use `print_small_text` to print normal text. The two last params are aligment and how many characters to print (-1 means PRINT_ALL). 
+  - Use `print_small_text` to print normal text. The two last params are aligment and how many characters to print (-1 means PRINT_ALL).
   - Use `render_multi_image` to draw large texture rectangles consisting of multiple images on the screen.
   - More info in `puppyprint.c`
 - Wiseguy's Farcall TLB mapping allows to store executable code inside uncompressed segments, that can be loaded and ran as needed, instead of it having to be loaded at all times. See `farcall.h` in the include folder for instructions and details.
@@ -119,7 +119,7 @@ Requirements are the same as regular SM64, however a GCC MIPS cross compiler is 
 
 BinPNG (the CI texture converter) requires some python3 dependencies. Use pip to install them.
 
-``pip install pypng bitstring`` 
+``pip install pypng bitstring``
 
 ## UNFLoader support
 
@@ -142,7 +142,7 @@ To target iQue, run make with the ``CONSOLE=bb`` argument.
 
 ## Compression
 
-The repo also supports RNC (Rob Northen Compression). RNC has two methods. 
+The repo also supports RNC (Rob Northen Compression). RNC has two methods.
 
 Method 1 is designed to compress as small as possible, while method 2 is designed so that decompression is as fast as possible.
 

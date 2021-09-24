@@ -174,8 +174,6 @@ void ukiki_act_idle(void) {
  * Only used for the cap ukiki.
  */
 void ukiki_act_return_home(void) {
-    UNUSED s32 unused;
-
     cur_obj_init_animation_with_sound(UKIKI_ANIM_RUN);
     o->oMoveAngleYaw = cur_obj_angle_to_home();
     o->oForwardVel = 10.0f;
@@ -383,7 +381,7 @@ void ukiki_act_go_to_cage(void) {
         case UKIKI_SUB_ACT_CAGE_TALK_TO_MARIO:
             cur_obj_init_animation_with_sound(UKIKI_ANIM_HANDSTAND);
 
-            if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_DOWN, 
+            if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_DOWN,
                 DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, DIALOG_080)) {
                 o->oSubAction++;
             }
@@ -578,7 +576,7 @@ void cap_ukiki_held_loop(void) {
             break;
 
         case UKIKI_TEXT_HAS_CAP:
-            if (cur_obj_update_dialog(MARIO_DIALOG_LOOK_UP, 
+            if (cur_obj_update_dialog(MARIO_DIALOG_LOOK_UP,
                 (DIALOG_FLAG_TEXT_DEFAULT | DIALOG_FLAG_TIME_STOP_ENABLED), DIALOG_101, 0)) {
                 mario_retrieve_cap();
                 set_mario_npc_dialog(MARIO_DIALOG_STOP);

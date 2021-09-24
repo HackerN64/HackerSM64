@@ -22,7 +22,7 @@ extern OSPiHandle*		nuPiSramHandle;
 /*	RET:	None							*/
 /*----------------------------------------------------------------------*/
 int nuPiReadWriteSram(u32 addr, void* buf_ptr, u32 size, s32 flag)
-{  
+{
     OSIoMesg	dmaIoMesgBuf;
     OSMesgQueue dmaMesgQ;
     OSMesg	dmaMesgBuf;

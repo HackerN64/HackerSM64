@@ -153,9 +153,7 @@ void remove_all_memtrackers(void) {
         sMemTrackers[i].total = 0.0f;
     }
 
-#ifdef AVOID_UB
     sNumActiveMemTrackers = 0;
-#endif
 }
 
 /**
@@ -441,7 +439,6 @@ void print_stack_trace(void) {
  */
 void fatal_printf(const char *fmt, ...) {
     char cur;
-    UNUSED u8 pad[4];
     va_list vl;
 
     va_start(vl, fmt);
@@ -459,11 +456,7 @@ void fatal_printf(const char *fmt, ...) {
                         gd_printf("%s", va_arg(vl, char *));
                         break;
                     case 'c':
-#ifdef AVOID_UB
                         gd_printf("%c", (char)va_arg(vl, int));
-#else
-                        gd_printf("%c", va_arg(vl, char));
-#endif
                         break;
                     case 'x':
                         gd_printf("%x", va_arg(vl, s32));
@@ -675,7 +668,6 @@ char *sprint_val_withspecifiers(char *str, union PrintVal val, char *specifiers)
     s32 intPart;  // sp38
     s32 intPrec;  // sp34
     s32 fracPrec; // sp30
-    UNUSED u8 pad[4];
     char cur; // sp2B
 
     fracPrec = 6;

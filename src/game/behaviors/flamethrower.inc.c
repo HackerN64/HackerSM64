@@ -20,9 +20,9 @@ void bhv_flamethrower_flame_loop(void) {
             o->oVelY = 0;
             o->oPosY = o->oFloorHeight + 25.0f * size;
         }
-        remainingTime = o->parentObj->oFlameThowerFlameUnk110 / 1.2;
+        remainingTime = o->parentObj->oFlameThowerTimeRemaining / 1.2;
     } else
-        remainingTime = o->parentObj->oFlameThowerFlameUnk110;
+        remainingTime = o->parentObj->oFlameThowerTimeRemaining;
     cur_obj_scale(size);
     if (o->oBehParams2ndByte == 4)
         o->oPosY += o->oForwardVel; // weird?
@@ -38,7 +38,6 @@ void bhv_flamethrower_loop(void) {
     f32 flameVel;
     s32 flameTimeRemaining;
     s32 model;
-    UNUSED u8 pad[8];
     if (o->oAction == 0) {
         if (gCurrLevelNum != LEVEL_BBH || gMarioOnMerryGoRound == TRUE)
             if (o->oDistanceToMario < 2000.0f)
@@ -57,7 +56,7 @@ void bhv_flamethrower_loop(void) {
             flameTimeRemaining = 75 - o->oTimer; // Range: [15..2]
         else
             o->oAction++;
-        o->oFlameThowerUnk110 = flameTimeRemaining;
+        o->oFlameThowerTimeRemaining = flameTimeRemaining;
         flame = spawn_object_relative(o->oBehParams2ndByte, 0, 0, 0, o, model, bhvFlamethrowerFlame);
         flame->oForwardVel = flameVel;
         cur_obj_play_sound_1(SOUND_AIR_BLOW_FIRE);

@@ -115,6 +115,5 @@ const GeoLayout king_bobomb_geo[] = {
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
    GEO_CLOSE_NODE(),
-GEO_CLOSE_NODE(), //! more close than open nodes
-GEO_END(),
+   GEO_END(),
 };

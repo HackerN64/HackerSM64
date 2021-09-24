@@ -45,7 +45,7 @@ void play_warp_door_open_noise(void) {
 
 void bhv_door_loop(void) {
     s32 index = 0;
-    
+
     while (sDoorActions[index].flag != (u32)~0) {
         if (cur_obj_clear_interact_status_flag(sDoorActions[index].flag)) {
             set_door_camera_event();
@@ -86,45 +86,45 @@ void bhv_door_init(void) {
     struct Surface *floor;
     find_floor(x, o->oPosY, z, &floor);
     if (floor != NULL) {
-        o->oDoorUnkF8 = floor->room;
+        o->oDoorSelfRoom = floor->room;
     }
 
     x = o->oPosX + sins(o->oMoveAngleYaw) * 200.0f;
     z = o->oPosZ + coss(o->oMoveAngleYaw) * 200.0f;
     find_floor(x, o->oPosY, z, &floor);
     if (floor != NULL) {
-        o->oDoorUnkFC = floor->room;
+        o->oDoorForwardRoom = floor->room;
     }
 
     x = o->oPosX + sins(o->oMoveAngleYaw) * -200.0f;
     z = o->oPosZ + coss(o->oMoveAngleYaw) * -200.0f;
     find_floor(x, o->oPosY, z, &floor);
     if (floor != NULL) {
-        o->oDoorUnk100 = floor->room;
+        o->oDoorBackwardRoom = floor->room;
     }
 
-    if (o->oDoorUnkF8 > 0 && o->oDoorUnkF8 < 60) {
-        gDoorAdjacentRooms[o->oDoorUnkF8][0] = o->oDoorUnkFC;
-        gDoorAdjacentRooms[o->oDoorUnkF8][1] = o->oDoorUnk100;
+    if (o->oDoorSelfRoom > 0 && o->oDoorSelfRoom < 60) {
+        gDoorAdjacentRooms[o->oDoorSelfRoom][0] = o->oDoorForwardRoom;
+        gDoorAdjacentRooms[o->oDoorSelfRoom][1] = o->oDoorBackwardRoom;
     }
 }
 
 void bhv_star_door_loop_2(void) {
     s32 doorIsRendering = FALSE;
     if (gMarioCurrentRoom != 0) {
-        if (o->oDoorUnkF8 == gMarioCurrentRoom)
+        if (o->oDoorSelfRoom == gMarioCurrentRoom)
             doorIsRendering = TRUE;
-        else if (gMarioCurrentRoom == o->oDoorUnkFC)
+        else if (gMarioCurrentRoom == o->oDoorForwardRoom)
             doorIsRendering = TRUE;
-        else if (gMarioCurrentRoom == o->oDoorUnk100)
+        else if (gMarioCurrentRoom == o->oDoorBackwardRoom)
             doorIsRendering = TRUE;
-        else if (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorUnkFC)
+        else if (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorForwardRoom)
             doorIsRendering = TRUE;
-        else if (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorUnk100)
+        else if (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorBackwardRoom)
             doorIsRendering = TRUE;
-        else if (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorUnkFC)
+        else if (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorForwardRoom)
             doorIsRendering = TRUE;
-        else if (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorUnk100)
+        else if (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorBackwardRoom)
             doorIsRendering = TRUE;
     } else
         doorIsRendering = TRUE;
@@ -134,5 +134,5 @@ void bhv_star_door_loop_2(void) {
     } else {
         o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
     }
-    o->oDoorUnk88 = doorIsRendering;
+    o->oDoorIsRendering = doorIsRendering;
 }

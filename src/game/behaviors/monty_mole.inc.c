@@ -372,12 +372,10 @@ void bhv_monty_mole_update(void) {
             f32 dy = o->oPosY - sMontyMoleLastKilledPosY;
             f32 dz = o->oPosZ - sMontyMoleLastKilledPosZ;
 
-            f32 distToLastKill = sqrtf(dx * dx + dy * dy + dz * dz);
-
             //! The two farthest holes on the bottom level of TTM are more than
             //  1500 units away from each other, so the counter resets if you
             //  attack moles in these holes consecutively.
-            if (distToLastKill < 1500.0f) {
+            if ((sqr(dx) + sqr(dy) + sqr(dz)) < sqr(1500.0f)) {
                 if (sMontyMoleKillStreak == 7) {
                     play_puzzle_jingle();
                     spawn_object(o, MODEL_1UP, bhv1upWalking);
@@ -387,8 +385,9 @@ void bhv_monty_mole_update(void) {
             }
         }
 
-        //! No overflow check
-        sMontyMoleKillStreak += 1;
+        if (sMontyMoleKillStreak < (1 << 15)) {
+            sMontyMoleKillStreak++;
+        }
 
         sMontyMoleLastKilledPosX = o->oPosX;
         sMontyMoleLastKilledPosY = o->oPosY;

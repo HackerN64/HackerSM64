@@ -6,8 +6,8 @@ void bhv_tree_snow_or_leaf_loop(void) {
     if (o->oTimer == 0) {
         o->oAngleVelPitch = (random_float() - 0.5) * 0x1000;
         o->oAngleVelRoll = (random_float() - 0.5) * 0x1000;
-        o->oTreeSnowOrLeafUnkF8 = 4;
-        o->oTreeSnowOrLeafUnkFC = random_float() * 0x400 + 0x600;
+        o->oTreeSnowOrLeafSidewardVel = 4;
+        o->oTreeSnowOrLeafSidewardAngleVel = random_float() * 0x400 + 0x600;
     }
     if (o->oPosY < o->oFloorHeight)
         obj_mark_for_deletion(o);
@@ -26,9 +26,9 @@ void bhv_tree_snow_or_leaf_loop(void) {
         o->oForwardVel -= 0.3;
     else
         o->oForwardVel = 0;
-    o->oPosX += sins(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafUnkF4) * o->oTreeSnowOrLeafUnkF8;
-    o->oPosZ += coss(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafUnkF4) * o->oTreeSnowOrLeafUnkF8;
-    o->oTreeSnowOrLeafUnkF4 += o->oTreeSnowOrLeafUnkFC;
+    o->oPosX += sins(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafSidewardAngle) * o->oTreeSnowOrLeafSidewardVel;
+    o->oPosZ += coss(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafSidewardAngle) * o->oTreeSnowOrLeafSidewardVel;
+    o->oTreeSnowOrLeafSidewardAngle += o->oTreeSnowOrLeafSidewardAngleVel;
     o->oPosY += o->oVelY;
 }
 
@@ -37,10 +37,8 @@ void bhv_snow_leaf_particle_spawn_init(void) {
 #ifdef TREE_PARTICLE_FIX
     struct Object *nearestTree = NULL;
 #endif
-    UNUSED s32 unused;
     s32 isSnow;
     f32 scale;
-    UNUSED s32 unused2;
     gMarioObject->oActiveParticleFlags &= ~0x2000;
 #ifdef TREE_PARTICLE_FIX
     nearestTree = cur_obj_nearest_object_with_behavior(bhvTree);

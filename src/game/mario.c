@@ -718,7 +718,7 @@ void set_steep_jump_action(struct MarioState *m) {
         f32 y = sins(faceAngleTemp) * m->forwardVel;
         f32 x = coss(faceAngleTemp) * m->forwardVel * 0.75f;
 
-        m->forwardVel = sqrtf(y * y + x * x);
+        m->forwardVel = sqrtf(sqr(y) + sqr(x));
         m->faceAngle[1] = atan2s(x, y) + angleTemp;
     }
 
@@ -1664,8 +1664,8 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
         m->marioObj->hitboxHeight = 160.0f;
     }
 
-    if ((m->flags & MARIO_TELEPORTING) && (m->fadeWarpOpacity != 0xFF)) {
-        bodyState->modelState &= ~0xFF;
+    if ((m->flags & MARIO_TELEPORTING) && (m->fadeWarpOpacity != MODEL_STATE_MASK)) {
+        bodyState->modelState &= ~MODEL_STATE_MASK;
         bodyState->modelState |= (MODEL_STATE_ALPHA | m->fadeWarpOpacity);
     }
 }
@@ -1834,10 +1834,10 @@ void init_mario(void) {
     gMarioState->area = gCurrentArea;
     gMarioState->marioObj = gMarioObject;
     gMarioState->marioObj->header.gfx.animInfo.animID = -1;
-    vec3s_copy(gMarioState->faceAngle, gMarioSpawnInfo->startAngle);
-    vec3s_set(gMarioState->angleVel, 0, 0, 0);
-    vec3s_to_vec3f(gMarioState->pos, gMarioSpawnInfo->startPos);
-    vec3f_set(gMarioState->vel, 0, 0, 0);
+    vec3_copy(gMarioState->faceAngle, gMarioSpawnInfo->startAngle);
+    vec3_zero(gMarioState->angleVel);
+    vec3_copy(gMarioState->pos, gMarioSpawnInfo->startPos);
+    vec3_zero(gMarioState->vel);
     gMarioState->floorHeight = find_floor(gMarioState->pos[0], gMarioState->pos[1], gMarioState->pos[2], &gMarioState->floor);
 
     if (gMarioState->pos[1] < gMarioState->floorHeight) {
@@ -1871,7 +1871,7 @@ void init_mario(void) {
         capObject->oPosY = capPos[1];
         capObject->oPosZ = capPos[2];
 
-        capObject->oForwardVelS32 = 0;
+        capObject->oForwardVel = 0;
 
         capObject->oMoveAngleYaw = 0;
     }

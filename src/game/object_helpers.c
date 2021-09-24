@@ -73,21 +73,17 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
 
         if (objectOpacity == 0xFF) {
             if (currentGraphNode->parameter == 20) {
-                currentGraphNode->fnNode.node.flags =
-                (LAYER_TRANSPARENT_DECAL << 8) | (currentGraphNode->fnNode.node.flags & 0xFF);
+                SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT_DECAL);
             } else {
-                currentGraphNode->fnNode.node.flags =
-                (LAYER_OPAQUE << 8) | (currentGraphNode->fnNode.node.flags & 0xFF);
+                SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_OPAQUE);
             }
 
             objectGraphNode->oAnimState = 0;
         } else {
             if (currentGraphNode->parameter == 20) {
-                currentGraphNode->fnNode.node.flags =
-                (LAYER_TRANSPARENT_DECAL << 8) | (currentGraphNode->fnNode.node.flags & 0xFF);
+                SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT_DECAL);
             } else {
-                currentGraphNode->fnNode.node.flags =
-                (LAYER_TRANSPARENT << 8) | (currentGraphNode->fnNode.node.flags & 0xFF);
+                SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT);
             }
 
             objectGraphNode->oAnimState = 1;
@@ -124,18 +120,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
     return dlStart;
 }
 
-/**
- * @bug Every geo function declares the 3 parameters of callContext, node, and
- * the matrix array. This one (see also geo_switch_area) doesn't. When executed,
- * the node function executor passes the 3rd argument to a function that doesn't
- * declare it. This is undefined behavior, but harmless in practice due to the
- * o32 calling convention.
- */
-#ifdef AVOID_UB
 Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-#else
-Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node) {
-#endif
     struct Object *obj;
     struct GraphNodeSwitchCase *switchCase;
 
@@ -163,16 +148,10 @@ Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node) {
     return NULL;
 }
 
-//! @bug Same issue as geo_switch_anim_state.
-#ifdef AVOID_UB
 Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-#else
-Gfx *geo_switch_area(s32 callContext, struct GraphNode *node) {
-#endif
     s16 roomCase;
     struct Surface *floor;
-    UNUSED struct Object *sp1C =
-        (struct Object *) gCurGraphNodeObject; // TODO: change global type to Object pointer
+    UNUSED struct Object *obj = (struct Object *) gCurGraphNodeObject; // TODO: change global type to Object pointer
     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node;
 
     if (callContext == GEO_CONTEXT_RENDER) {
@@ -284,7 +263,7 @@ f32 lateral_dist_between_objects(struct Object *obj1, struct Object *obj2) {
     f32 dx = obj1->oPosX - obj2->oPosX;
     f32 dz = obj1->oPosZ - obj2->oPosZ;
 
-    return sqrtf(dx * dx + dz * dz);
+    return sqrtf(sqr(dx) + sqr(dz));
 }
 
 f32 dist_between_objects(struct Object *obj1, struct Object *obj2) {
@@ -292,7 +271,7 @@ f32 dist_between_objects(struct Object *obj1, struct Object *obj2) {
     f32 dy = obj1->oPosY - obj2->oPosY;
     f32 dz = obj1->oPosZ - obj2->oPosZ;
 
-    return sqrtf(dx * dx + dy * dy + dz * dz);
+    return sqrtf(sqr(dx) + sqr(dy) + sqr(dz));
 }
 
 void cur_obj_forward_vel_approach_upward(f32 target, f32 increment) {
@@ -389,7 +368,6 @@ s16 obj_angle_to_object(struct Object *obj1, struct Object *obj2) {
 
 s16 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleIndex, s16 turnAmount) {
     f32 a, b, c, d;
-    UNUSED s32 unused;
     s16 targetAngle = 0;
     s16 startAngle;
 
@@ -1207,9 +1185,6 @@ static s32 cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlop
     f32 intendedFloorHeight = find_floor(intendedX, o->oPosY, intendedZ, &intendedFloor);
     f32 deltaFloorHeight = intendedFloorHeight - o->oFloorHeight;
 
-    UNUSED f32 unused;
-    UNUSED f32 ny;
-
     o->oMoveFlags &= ~OBJ_MOVE_HIT_EDGE;
 
     if (o->oRoom != -1 && intendedFloor != NULL) {
@@ -1243,7 +1218,7 @@ static s32 cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlop
             o->oMoveFlags |= OBJ_MOVE_HIT_EDGE;
             return FALSE;
         }
-    } else if ((ny = intendedFloor->normal.y) > steepSlopeNormalY || o->oPosY > intendedFloorHeight) {
+    } else if (intendedFloor->normal.y > steepSlopeNormalY || o->oPosY > intendedFloorHeight) {
         // Allow movement upward, provided either:
         // - The target floor is flat enough (e.g. walking up stairs)
         // - We are above the target floor (most likely in the air)
@@ -1318,7 +1293,7 @@ static f32 cur_obj_move_y_and_get_water_level(f32 gravity, f32 buoyancy) {
     }
 
     o->oPosY += o->oVelY;
-    if (o->activeFlags & ACTIVE_FLAG_UNK10) {
+    if (o->activeFlags & ACTIVE_FLAG_IGNORE_ENV_BOXES) {
         waterLevel = FLOOR_LOWER_LIMIT;
     } else {
         waterLevel = find_water_level(o->oPosX, o->oPosZ);
@@ -1487,7 +1462,7 @@ f32 cur_obj_lateral_dist_from_mario_to_home(void) {
     f32 dx = o->oHomeX - gMarioObject->oPosX;
     f32 dz = o->oHomeZ - gMarioObject->oPosZ;
 
-    dist = sqrtf(dx * dx + dz * dz);
+    dist = sqrtf(sqr(dx) + sqr(dz));
     return dist;
 }
 
@@ -1496,7 +1471,7 @@ f32 cur_obj_lateral_dist_to_home(void) {
     f32 dx = o->oHomeX - o->oPosX;
     f32 dz = o->oHomeZ - o->oPosZ;
 
-    dist = sqrtf(dx * dx + dz * dz);
+    dist = sqrtf(sqr(dx) + sqr(dz));
     return dist;
 }
 
@@ -1611,7 +1586,7 @@ static void obj_spawn_loot_coins(struct Object *obj, s32 numCoins, f32 baseYVel,
         coin = spawn_object(obj, model, coinBehavior);
         obj_translate_xz_random(coin, posJitter);
         coin->oPosY = spawnHeight;
-        coin->oCoinUnk110 = baseYVel;
+        coin->oCoinBaseYVel = baseYVel;
     }
 }
 
@@ -1905,8 +1880,8 @@ void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateInd
 }
 
 void obj_build_transform_from_pos_and_angle(struct Object *obj, s16 posIndex, s16 angleIndex) {
-    f32 translate[3];
-    s16 rotation[3];
+    Vec3f translate;
+    Vec3s rotation;
 
     translate[0] = obj->rawData.asF32[posIndex + 0];
     translate[1] = obj->rawData.asF32[posIndex + 1];
@@ -1945,9 +1920,7 @@ void obj_build_transform_relative_to_parent(struct Object *obj) {
 
     obj->header.gfx.throwMatrix = &obj->transform;
 
-    //! Sets scale of gCurrentObject instead of obj. Not exploitable since this
-    //  function is only called with obj = gCurrentObject
-    cur_obj_scale(1.0f);
+    obj_scale(obj, 1.0f);
 }
 
 void obj_create_transform_from_self(struct Object *obj) {
@@ -2061,10 +2034,9 @@ static void obj_build_vel_from_transform(struct Object *obj) {
     f32 left = obj->oLeftVel;
     f32 forward = obj->oForwardVel;
 
-    //! Typo, up and left should be swapped
-    obj->oVelX = obj->transform[0][0] * up + obj->transform[1][0] * left + obj->transform[2][0] * forward;
-    obj->oVelY = obj->transform[0][1] * up + obj->transform[1][1] * left + obj->transform[2][1] * forward;
-    obj->oVelZ = obj->transform[0][2] * up + obj->transform[1][2] * left + obj->transform[2][2] * forward;
+    obj->oVelX = obj->transform[0][0] * left + obj->transform[1][0] * up + obj->transform[2][0] * forward;
+    obj->oVelY = obj->transform[0][1] * left + obj->transform[1][1] * up + obj->transform[2][1] * forward;
+    obj->oVelZ = obj->transform[0][2] * left + obj->transform[1][2] * up + obj->transform[2][2] * forward;
 }
 
 void cur_obj_set_pos_via_transform(void) {
@@ -2837,7 +2809,7 @@ void cur_obj_init_animation_and_extend_if_at_end(s32 animIndex) {
 
 s32 cur_obj_check_grabbed_mario(void) {
     if (o->oInteractStatus & INT_STATUS_GRABBED_MARIO) {
-        o->oKingBobombUnk88 = 1;
+        o->oKingBobombHoldingMarioState = 1;
         cur_obj_become_intangible();
         return TRUE;
     }

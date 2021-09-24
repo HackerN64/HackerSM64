@@ -1,17 +1,17 @@
 // cruiser.c.inc
 
 void bhv_rr_cruiser_wing_init(void) {
-    o->oRRCruiserWingUnkF4 = o->oFaceAngleYaw;
-    o->oRRCruiserWingUnkF8 = o->oFaceAnglePitch;
+    o->oRRCruiserWingInitYaw = o->oFaceAngleYaw;
+    o->oRRCruiserWingInitPitch = o->oFaceAnglePitch;
 }
 
 void bhv_rr_cruiser_wing_loop(void) {
     if (o->oBehParams2ndByte == 0) {
-        o->oFaceAngleYaw = o->oRRCruiserWingUnkF4 + sins(o->oTimer * 0x400) * 8192.0f;
-        o->oFaceAnglePitch = o->oRRCruiserWingUnkF8 + coss(o->oTimer * 0x400) * 2048.0f;
+        o->oFaceAngleYaw = o->oRRCruiserWingInitYaw + sins(o->oTimer * 0x400) * 8192.0f;
+        o->oFaceAnglePitch = o->oRRCruiserWingInitPitch + coss(o->oTimer * 0x400) * 2048.0f;
     } else {
-        o->oFaceAngleYaw = o->oRRCruiserWingUnkF4 - sins(o->oTimer * 0x400) * 8192.0f;
-        o->oFaceAnglePitch = o->oRRCruiserWingUnkF8 + coss(o->oTimer * 0x400) * 2048.0f;
+        o->oFaceAngleYaw = o->oRRCruiserWingInitYaw - sins(o->oTimer * 0x400) * 8192.0f;
+        o->oFaceAnglePitch = o->oRRCruiserWingInitPitch + coss(o->oTimer * 0x400) * 2048.0f;
     }
 #ifndef VERSION_JP
     if (o->oTimer == 64) {

@@ -337,7 +337,7 @@ void save_file_erase(s32 fileIndex) {
 }
 
 //! Needs to be s32 to match on -O2, despite no return value.
-BAD_RETURN(s32) save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
+void save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
     UNUSED s32 pad;
 
     touch_high_score_ages(destFileIndex);

@@ -51,7 +51,7 @@ expand_gzip(char *in, char *outbuf, unsigned int inLength, unsigned int outbufLe
     d_stream.avail_out = outbufLength;
 
     /*
-     * Must pass -ve window bits to tell inflate not to expect 
+     * Must pass -ve window bits to tell inflate not to expect
      * a gzip or zlib header
      */
     err = inflateInit2(&d_stream, -MAX_WBITS);

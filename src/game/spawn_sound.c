@@ -51,7 +51,7 @@ void exec_anim_sound_state(struct SoundState *soundStates) {
 void create_sound_spawner(s32 soundMagic) {
     struct Object *obj = spawn_object(gCurrentObject, 0, bhvSoundSpawner);
 
-    obj->oSoundEffectUnkF4 = soundMagic;
+    obj->oSoundEffectBits = soundMagic;
 }
 
 /*

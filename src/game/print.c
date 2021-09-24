@@ -254,8 +254,6 @@ void print_text(s32 x, s32 y, const char *str) {
  */
 void print_text_centered(s32 x, s32 y, const char *str) {
     char c = 0;
-    UNUSED s8 unused1 = 0;
-    UNUSED s32 unused2 = 0;
     s32 length = 0;
     s32 srcIndex = 0;
 

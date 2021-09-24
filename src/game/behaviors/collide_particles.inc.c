@@ -10,21 +10,20 @@ void bhv_punch_tiny_triangle_loop(void) {
     s16 yaw;
     if (o->oTimer == 0) {
         yaw = o->oMoveAngleYaw;
-        o->oCollisionParticleUnkF4 = 1.28f;
+        o->oCollisionParticleScale = 1.28f;
         cur_obj_set_pos_relative(gMarioObject, 0.0f, 60.0f, 100.0f);
         o->oMoveAngleYaw = yaw;
     }
     cur_obj_move_using_fvel_and_gravity();
     o->oAnimState = 5;
-    cur_obj_scale(o->oCollisionParticleUnkF4);
-    o->oCollisionParticleUnkF4 -= 0.2f;
+    cur_obj_scale(o->oCollisionParticleScale);
+    o->oCollisionParticleScale -= 0.2f;
     if (gDebugInfo[4][0] + 6 < o->oTimer)
         obj_mark_for_deletion(o);
 }
 
 void bhv_punch_tiny_triangle_init(void) {
     s32 i;
-    UNUSED s32 unused;
     struct Object *triangle;
     for (i = 0; i < 6; i++) {
         triangle = spawn_object(o, MODEL_DIRT_ANIMATION, bhvPunchTinyTriangle);
@@ -38,19 +37,18 @@ void bhv_wall_tiny_star_particle_loop(void) {
     s16 yaw;
     if (o->oTimer == 0) {
         yaw = o->oMoveAngleYaw;
-        o->oCollisionParticleUnkF4 = 0.28f;
+        o->oCollisionParticleScale = 0.28f;
         cur_obj_set_pos_relative(gMarioObject, 0.0f, 30.0f, 110.0f);
         o->oMoveAngleYaw = yaw;
     }
     cur_obj_move_using_fvel_and_gravity();
     o->oAnimState = 4;
-    cur_obj_scale(o->oCollisionParticleUnkF4);
-    o->oCollisionParticleUnkF4 -= 0.015f;
+    cur_obj_scale(o->oCollisionParticleScale);
+    o->oCollisionParticleScale -= 0.015f;
 }
 
 void bhv_tiny_star_particles_init(void) {
     s32 i;
-    UNUSED s32 unused;
     struct Object *particle;
     for (i = 0; i < 7; i++) {
         particle = spawn_object(o, MODEL_CARTOON_STAR, bhvWallTinyStarParticle);
@@ -62,15 +60,15 @@ void bhv_tiny_star_particles_init(void) {
 
 void bhv_pound_tiny_star_particle_loop(void) {
     if (o->oTimer == 0) {
-        o->oCollisionParticleUnkF4 = 0.28f;
+        o->oCollisionParticleScale = 0.28f;
         o->oForwardVel = 25.0f;
         o->oPosY -= 20.0f;
         o->oVelY = 14.0f;
     }
     cur_obj_move_using_fvel_and_gravity();
     o->oAnimState = 4;
-    cur_obj_scale(o->oCollisionParticleUnkF4);
-    o->oCollisionParticleUnkF4 -= 0.015f;
+    cur_obj_scale(o->oCollisionParticleScale);
+    o->oCollisionParticleScale -= 0.015f;
 }
 
 void bhv_pound_tiny_star_particle_init(void) {

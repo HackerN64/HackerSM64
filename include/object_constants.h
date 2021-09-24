@@ -5,27 +5,26 @@
 // field-specific and object-specific constants, e.g. actions.
 
 /* activeFlags */
-#define ACTIVE_FLAG_DEACTIVATED            0         // 0x0000
-#define ACTIVE_FLAG_ACTIVE                 (1 <<  0) // 0x0001
-#define ACTIVE_FLAG_FAR_AWAY               (1 <<  1) // 0x0002
-#define ACTIVE_FLAG_UNK2                   (1 <<  2) // 0x0004
-#define ACTIVE_FLAG_IN_DIFFERENT_ROOM      (1 <<  3) // 0x0008
-#define ACTIVE_FLAG_UNIMPORTANT            (1 <<  4) // 0x0010
-#define ACTIVE_FLAG_INITIATED_TIME_STOP    (1 <<  5) // 0x0020
-#define ACTIVE_FLAG_MOVE_THROUGH_GRATE     (1 <<  6) // 0x0040
-#define ACTIVE_FLAG_DITHERED_ALPHA         (1 <<  7) // 0x0080
-#define ACTIVE_FLAG_UNK8                   (1 <<  8) // 0x0100
-#define ACTIVE_FLAG_UNK9                   (1 <<  9) // 0x0200
-#define ACTIVE_FLAG_UNK10                  (1 << 10) // 0x0400
-
+#define ACTIVE_FLAG_DEACTIVATED                     (0 <<  0) // 0x0000
+#define ACTIVE_FLAG_ACTIVE                          (1 <<  0) // 0x0001
+#define ACTIVE_FLAG_FAR_AWAY                        (1 <<  1) // 0x0002
+#define ACTIVE_FLAG_UNUSED                          (1 <<  2) // 0x0004
+#define ACTIVE_FLAG_IN_DIFFERENT_ROOM               (1 <<  3) // 0x0008
+#define ACTIVE_FLAG_UNIMPORTANT                     (1 <<  4) // 0x0010
+#define ACTIVE_FLAG_INITIATED_TIME_STOP             (1 <<  5) // 0x0020
+#define ACTIVE_FLAG_MOVE_THROUGH_GRATE              (1 <<  6) // 0x0040
+#define ACTIVE_FLAG_DITHERED_ALPHA                  (1 <<  7) // 0x0080
+#define ACTIVE_FLAG_ALLOCATED                       (1 <<  8) // 0x0100
+#define ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY    (1 <<  9) // 0x0200
+#define ACTIVE_FLAG_IGNORE_ENV_BOXES                (1 << 10) // 0x0400
 
 /* respawnInfoType */
-#define RESPAWN_INFO_TYPE_NULL 0
-#define RESPAWN_INFO_TYPE_32   1
-#define RESPAWN_INFO_TYPE_16   2
+#define RESPAWN_INFO_TYPE_NULL                      0x00
+#define RESPAWN_INFO_TYPE_32                        0x01
+#define RESPAWN_INFO_TYPE_16                        0x02
 
 /* respawnInfo */
-#define RESPAWN_INFO_DONT_RESPAWN 0xFF
+#define RESPAWN_INFO_DONT_RESPAWN                   0xFF
 
 /* oFlags */
 #define OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE           (1 <<  0) // 0x00000001
@@ -51,42 +50,42 @@
 #define OBJ_FLAG_HITBOX_WAS_SET                     (1 << 30) // 0x40000000
 
 /* oHeldState */
-#define HELD_FREE    0
-#define HELD_HELD    1
-#define HELD_THROWN  2
-#define HELD_DROPPED 3
+#define HELD_FREE                                   0x00
+#define HELD_HELD                                   0x01
+#define HELD_THROWN                                 0x02
+#define HELD_DROPPED                                0x03
 
 /* oDialogState */
-#define DIALOG_STATUS_ENABLE_TIME_STOP  0
-#define DIALOG_STATUS_INTERRUPT         1
-#define DIALOG_STATUS_START_DIALOG      2
-#define DIALOG_STATUS_STOP_DIALOG       3
-#define DIALOG_STATUS_DISABLE_TIME_STOP 4
+#define DIALOG_STATUS_ENABLE_TIME_STOP              0x00
+#define DIALOG_STATUS_INTERRUPT                     0x01
+#define DIALOG_STATUS_START_DIALOG                  0x02
+#define DIALOG_STATUS_STOP_DIALOG                   0x03
+#define DIALOG_STATUS_DISABLE_TIME_STOP             0x04
 
-#define DIALOG_FLAG_NONE                0
-#define DIALOG_FLAG_TURN_TO_MARIO       (1 << 0) // 0x01 // cutscene only
-#define DIALOG_FLAG_TEXT_DEFAULT        (1 << 1) // 0x02
-#define DIALOG_FLAG_TEXT_RESPONSE       (1 << 2) // 0x04 // non-cutscene only
-#define DIALOG_FLAG_UNK_CAPSWITCH       (1 << 3) // 0x08 // not defined
-#define DIALOG_FLAG_TIME_STOP_ENABLED   (1 << 4) // 0x10
+#define DIALOG_FLAG_NONE                            (0 << 0) // 0x00
+#define DIALOG_FLAG_TURN_TO_MARIO                   (1 << 0) // 0x01 // cutscene only
+#define DIALOG_FLAG_TEXT_DEFAULT                    (1 << 1) // 0x02
+#define DIALOG_FLAG_TEXT_RESPONSE                   (1 << 2) // 0x04 // non-cutscene only
+#define DIALOG_FLAG_UNK_CAPSWITCH                   (1 << 3) // 0x08 // not defined
+#define DIALOG_FLAG_TIME_STOP_ENABLED               (1 << 4) // 0x10
 
 /* oMoveFlags */
-#define OBJ_MOVE_LANDED                (1 <<  0) // 0x0001
-#define OBJ_MOVE_ON_GROUND             (1 <<  1) // 0x0002  // mutually exclusive to OBJ_MOVE_LANDED
-#define OBJ_MOVE_LEFT_GROUND           (1 <<  2) // 0x0004
-#define OBJ_MOVE_ENTERED_WATER         (1 <<  3) // 0x0008
-#define OBJ_MOVE_AT_WATER_SURFACE      (1 <<  4) // 0x0010
-#define OBJ_MOVE_UNDERWATER_OFF_GROUND (1 <<  5) // 0x0020
-#define OBJ_MOVE_UNDERWATER_ON_GROUND  (1 <<  6) // 0x0040
-#define OBJ_MOVE_IN_AIR                (1 <<  7) // 0x0080
-#define OBJ_MOVE_OUT_SCOPE             (1 <<  8) // 0x0100
-#define OBJ_MOVE_HIT_WALL              (1 <<  9) // 0x0200
-#define OBJ_MOVE_HIT_EDGE              (1 << 10) // 0x0400
-#define OBJ_MOVE_ABOVE_LAVA            (1 << 11) // 0x0800
-#define OBJ_MOVE_LEAVING_WATER         (1 << 12) // 0x1000
-#define OBJ_MOVE_BOUNCE                (1 << 13) // 0x2000
+#define OBJ_MOVE_LANDED                             (1 <<  0) // 0x0001
+#define OBJ_MOVE_ON_GROUND                          (1 <<  1) // 0x0002  // mutually exclusive to OBJ_MOVE_LANDED
+#define OBJ_MOVE_LEFT_GROUND                        (1 <<  2) // 0x0004
+#define OBJ_MOVE_ENTERED_WATER                      (1 <<  3) // 0x0008
+#define OBJ_MOVE_AT_WATER_SURFACE                   (1 <<  4) // 0x0010
+#define OBJ_MOVE_UNDERWATER_OFF_GROUND              (1 <<  5) // 0x0020
+#define OBJ_MOVE_UNDERWATER_ON_GROUND               (1 <<  6) // 0x0040
+#define OBJ_MOVE_IN_AIR                             (1 <<  7) // 0x0080
+#define OBJ_MOVE_OUT_SCOPE                          (1 <<  8) // 0x0100
+#define OBJ_MOVE_HIT_WALL                           (1 <<  9) // 0x0200
+#define OBJ_MOVE_HIT_EDGE                           (1 << 10) // 0x0400
+#define OBJ_MOVE_ABOVE_LAVA                         (1 << 11) // 0x0800
+#define OBJ_MOVE_LEAVING_WATER                      (1 << 12) // 0x1000
+#define OBJ_MOVE_BOUNCE                             (1 << 13) // 0x2000
 #ifndef VERSION_JP
-#define OBJ_MOVE_ABOVE_DEATH_BARRIER   (1 << 14) // 0x4000
+#define OBJ_MOVE_ABOVE_DEATH_BARRIER                (1 << 14) // 0x4000
 #endif
 
 #define OBJ_MOVE_MASK_ON_GROUND (OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND)
@@ -97,26 +96,26 @@
     OBJ_MOVE_UNDERWATER_ON_GROUND)
 
 /* oActiveParticleFlags */
-#define ACTIVE_PARTICLE_DUST                 (1 <<  0) // 0x00000001
-#define ACTIVE_PARTICLE_UNUSED_1             (1 <<  1) // 0x00000002
-#define ACTIVE_PARTICLE_UNUSED_2             (1 <<  2) // 0x00000004
-#define ACTIVE_PARTICLE_SPARKLES             (1 <<  3) // 0x00000008
-#define ACTIVE_PARTICLE_H_STAR               (1 <<  4) // 0x00000010
-#define ACTIVE_PARTICLE_BUBBLE               (1 <<  5) // 0x00000020
-#define ACTIVE_PARTICLE_WATER_SPLASH         (1 <<  6) // 0x00000040
-#define ACTIVE_PARTICLE_IDLE_WATER_WAVE      (1 <<  7) // 0x00000080
-#define ACTIVE_PARTICLE_SHALLOW_WATER_WAVE   (1 <<  8) // 0x00000100
-#define ACTIVE_PARTICLE_PLUNGE_BUBBLE        (1 <<  9) // 0x00000200
-#define ACTIVE_PARTICLE_WAVE_TRAIL           (1 << 10) // 0x00000400
-#define ACTIVE_PARTICLE_FIRE                 (1 << 11) // 0x00000800
-#define ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH (1 << 12) // 0x00001000
-#define ACTIVE_PARTICLE_LEAF                 (1 << 13) // 0x00002000
-#define ACTIVE_PARTICLE_DIRT                 (1 << 14) // 0x00004000
-#define ACTIVE_PARTICLE_MIST_CIRCLE          (1 << 15) // 0x00008000
-#define ACTIVE_PARTICLE_SNOW                 (1 << 16) // 0x00010000
-#define ACTIVE_PARTICLE_BREATH               (1 << 17) // 0x00020000
-#define ACTIVE_PARTICLE_V_STAR               (1 << 18) // 0x00040000
-#define ACTIVE_PARTICLE_TRIANGLE             (1 << 19) // 0x00080000
+#define ACTIVE_PARTICLE_DUST                        (1 <<  0) // 0x00000001
+#define ACTIVE_PARTICLE_UNUSED_1                    (1 <<  1) // 0x00000002
+#define ACTIVE_PARTICLE_UNUSED_2                    (1 <<  2) // 0x00000004
+#define ACTIVE_PARTICLE_SPARKLES                    (1 <<  3) // 0x00000008
+#define ACTIVE_PARTICLE_H_STAR                      (1 <<  4) // 0x00000010
+#define ACTIVE_PARTICLE_BUBBLE                      (1 <<  5) // 0x00000020
+#define ACTIVE_PARTICLE_WATER_SPLASH                (1 <<  6) // 0x00000040
+#define ACTIVE_PARTICLE_IDLE_WATER_WAVE             (1 <<  7) // 0x00000080
+#define ACTIVE_PARTICLE_SHALLOW_WATER_WAVE          (1 <<  8) // 0x00000100
+#define ACTIVE_PARTICLE_PLUNGE_BUBBLE               (1 <<  9) // 0x00000200
+#define ACTIVE_PARTICLE_WAVE_TRAIL                  (1 << 10) // 0x00000400
+#define ACTIVE_PARTICLE_FIRE                        (1 << 11) // 0x00000800
+#define ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH        (1 << 12) // 0x00001000
+#define ACTIVE_PARTICLE_LEAF                        (1 << 13) // 0x00002000
+#define ACTIVE_PARTICLE_DIRT                        (1 << 14) // 0x00004000
+#define ACTIVE_PARTICLE_MIST_CIRCLE                 (1 << 15) // 0x00008000
+#define ACTIVE_PARTICLE_SNOW                        (1 << 16) // 0x00010000
+#define ACTIVE_PARTICLE_BREATH                      (1 << 17) // 0x00020000
+#define ACTIVE_PARTICLE_V_STAR                      (1 << 18) // 0x00040000
+#define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
 
 /* oAction */
 #define OBJ_ACT_LAVA_DEATH 100

@@ -1,9 +1,9 @@
 // lll_rotating_hex_flame.c.inc
 
 void bhv_lll_rotating_hex_flame_loop(void) {
-    f32 relPosX = o->oLllRotatingHexFlameUnkF4;
-    f32 relPosY = o->oLllRotatingHexFlameUnkF8;
-    f32 relPosZ = o->oLllRotatingHexFlameUnkFC;
+    f32 relPosX = o->oLllRotatingHexFlameRelativePosX;
+    f32 relPosY = o->oLllRotatingHexFlameRelativePosY;
+    f32 relPosZ = o->oLllRotatingHexFlameRelativePosZ;
     cur_obj_set_pos_relative(o->parentObj, relPosX, relPosY, relPosZ);
     o->oPosY = o->parentObj->oPosY + 100.0f;
     if (o->parentObj->oAction == 3)
@@ -18,9 +18,9 @@ void fire_bar_spawn_flames(s16 yaw) {
     s32 amt = (o->oBehParams2ndByte == 0) ? 4 : 3;
     for (i = 0; i < amt; i++) {
         flameObj = spawn_object(o, MODEL_RED_FLAME, bhvLllRotatingHexFlame);
-        flameObj->oLllRotatingHexFlameUnkF4 += xOffset;
-        flameObj->oLllRotatingHexFlameUnkF8 = o->oPosY - 200.0f;
-        flameObj->oLllRotatingHexFlameUnkFC += zOffset;
+        flameObj->oLllRotatingHexFlameRelativePosX += xOffset;
+        flameObj->oLllRotatingHexFlameRelativePosY = o->oPosY - 200.0f;
+        flameObj->oLllRotatingHexFlameRelativePosZ += zOffset;
         obj_scale_xyz(flameObj, 6.0f, 6.0f, 6.0f);
         xOffset += sins(yaw) * 150.0f;
         zOffset += coss(yaw) * 150.0f;

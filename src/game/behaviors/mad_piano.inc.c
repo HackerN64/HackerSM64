@@ -44,7 +44,7 @@ static void mad_piano_act_attack(void) {
     } else {
         f32 dx = o->oPosX - o->oHomeX;
         f32 dz = o->oPosZ - o->oHomeZ;
-        f32 distToHome = sqrtf(dx * dx + dz * dz);
+        f32 distToHome = sqrtf(sqr(dx) + sqr(dz));
 
         if (distToHome > 400.0f) {
             distToHome = 400.0f / distToHome;

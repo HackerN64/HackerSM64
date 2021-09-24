@@ -29,9 +29,7 @@ static void camera_lakitu_intro_act_trigger_cutscene(void) {
     //! These bounds are slightly smaller than the actual bridge bounds, allowing
     //  the RTA speedrunning method of lakitu skip
     if (gMarioObject->oPosX > -544.0f && gMarioObject->oPosX < 545.0f && gMarioObject->oPosY > 800.0f
-        && gMarioObject->oPosZ > -2000.0f && gMarioObject->oPosZ < -177.0f
-        && gMarioObject->oPosZ < -177.0f) // always double check your conditions
-    {
+        && gMarioObject->oPosZ > -2000.0f && gMarioObject->oPosZ < -177.0f)  {
         if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_START) {
             o->oAction = CAMERA_LAKITU_INTRO_ACT_SPAWN_CLOUD;
         }
@@ -61,12 +59,8 @@ static void camera_lakitu_intro_act_spawn_cloud(void) {
  * Circle down to mario, show the dialog, then fly away.
  */
 static void camera_lakitu_intro_act_show_dialog(void) {
-    s16 targetMovePitch;
-    s16 targetMoveYaw;
-#ifdef AVOID_UB
-    targetMovePitch = 0;
-    targetMoveYaw = 0;
-#endif
+    s16 targetMovePitch = 0;
+    s16 targetMoveYaw = 0;
 
     cur_obj_play_sound_1(SOUND_AIR_LAKITU_FLY);
 
@@ -103,9 +97,9 @@ static void camera_lakitu_intro_act_show_dialog(void) {
                 approach_f32_ptr(&o->oCameraLakituCircleRadius, 200.0f, 50.0f);
                 if (o->oDistanceToMario < 1000.0f) {
 #ifndef VERSION_JP
-                    if (!o->oCameraLakituUnk104) {
+                    if (!o->oCameraLakituIntroMusicPlayed) {
                         play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_LAKITU), 0);
-                        o->oCameraLakituUnk104 = TRUE;
+                        o->oCameraLakituIntroMusicPlayed = TRUE;
                     }
 #endif
 
@@ -119,7 +113,7 @@ static void camera_lakitu_intro_act_show_dialog(void) {
                     }
                 }
             }
-        } else if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP, 
+        } else if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
             DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, DIALOG_034)) {
             o->oCameraLakituFinishedDialog = TRUE;
         }

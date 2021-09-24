@@ -25,7 +25,7 @@ void bhv_donut_platform_spawner_update(void) {
             dx = gMarioObject->oPosX - sDonutPlatformPositions[i][0];
             dy = gMarioObject->oPosY - sDonutPlatformPositions[i][1];
             dz = gMarioObject->oPosZ - sDonutPlatformPositions[i][2];
-            marioSqDist = dx * dx + dy * dy + dz * dz;
+            marioSqDist = sqr(dx) + sqr(dy) + sqr(dz);
 
             // dist > 1000 and dist < 2000
             if (marioSqDist > 1000000.0f && marioSqDist < 4000000.0f) {

@@ -168,7 +168,6 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
                 f32 i, f32 j, f32 k, // translate shape
                 f32 l, f32 m, f32 n, // rotate x, y, z
                 s32 colorIdx, Mat4f *rotMtx) {
-    UNUSED u8 unused[8];
     struct GdVec3f sp1C;
 
     restart_timer("drawshape");
@@ -245,7 +244,6 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
 void draw_shape_2d(struct ObjShape *shape, s32 flag, UNUSED f32 c, UNUSED f32 d, UNUSED f32 e, f32 f,
                    f32 g, f32 h, UNUSED f32 i, UNUSED f32 j, UNUSED f32 k, UNUSED f32 l, UNUSED f32 m,
                    UNUSED f32 n, UNUSED s32 color, UNUSED s32 p) {
-    UNUSED u8 unused[8];
     struct GdVec3f sp1C;
 
     restart_timer("drawshape2d");
@@ -437,7 +435,6 @@ void draw_face(struct ObjFace *face) {
     f32 z;                 // 38
     f32 y;                 // 34
     f32 x;                 // 30
-    UNUSED u8 pad[12];
     s32 i;             // 20; also used to store mtl's gddl number
     s32 hasTextCoords; // 1c
     Vtx *gbiVtx;       // 18
@@ -536,7 +533,6 @@ void Unknown801792F0(struct GdObj *obj) {
 void draw_label(struct ObjLabel *label) {
     struct GdVec3f position;
     char strbuf[0x100];
-    UNUSED u8 unused[16];
     struct ObjValPtr *valptr;
     union ObjVarVal varval;
     valptrproc_t valfn = label->valfn;
@@ -593,7 +589,6 @@ void draw_label(struct ObjLabel *label) {
 void draw_net(struct ObjNet *self) {
     struct ObjNet *net = self;
     s32 netColor;
-    UNUSED u8 unused[80];
 
     if (sSceneProcessType == FIND_PICKS) {
         return;
@@ -729,7 +724,6 @@ void world_pos_to_screen_coords(struct GdVec3f *pos, struct ObjCamera *cam, stru
  */
 void check_grabable_click(struct GdObj *input) {
     struct GdVec3f objPos;
-    UNUSED u8 unused[12];
     struct GdObj *obj;
     Mat4f *mtx;
 
@@ -772,8 +766,6 @@ void check_grabable_click(struct GdObj *input) {
  * @param lightgrp lights of `ObjView
  */
 void drawscene(enum SceneType process, struct ObjGroup *interactables, struct ObjGroup *lightgrp) {
-    UNUSED u8 unused[16];
-
     restart_timer("drawscene");
     imin("draw_scene()");
     sUnreadShapeFlag = 0;
@@ -868,11 +860,9 @@ void draw_shape_faces(struct ObjShape *shape) {
  */
 void draw_particle(struct GdObj *obj) {
     struct ObjParticle *ptc = (struct ObjParticle *) obj;
-    UNUSED u8 unused1[16];
     struct GdColour *white;
     struct GdColour *black;
     f32 brightness;
-    UNUSED u8 unused2[16];
 
     if (ptc->timeout > 0) {
         white = sColourPalette[0];
@@ -906,32 +896,8 @@ void draw_particle(struct GdObj *obj) {
  * @note This function returns before doing any work. It seems
  *       that Goddard moved away from using bones in the final code
  */
-void draw_bone(struct GdObj *obj) {
-    struct ObjBone *bone = (struct ObjBone *) obj;
-    UNUSED u8 unused1[4];
-    s32 colour;
-    UNUSED u8 unused2[4];
-    struct GdVec3f scale; // guess
-
+void draw_bone(UNUSED struct GdObj *obj) {
     return;
-
-    // dead code
-    scale.x = 1.0f;
-    scale.y = 1.0f;
-    scale.z = bone->unkF8 / 50.0f;
-
-    if (bone->header.drawFlags & OBJ_HIGHLIGHTED) {
-        colour = COLOUR_YELLOW;
-    } else {
-        colour = bone->colourNum;
-    }
-    bone->header.drawFlags &= ~OBJ_HIGHLIGHTED;
-
-    if (sSceneProcessType != FIND_PICKS) {
-        draw_shape(bone->shapePtr, 0x1B, scale.x, scale.y, scale.z, bone->worldPos.x, bone->worldPos.y,
-                   bone->worldPos.z, 0.0f, 0.0f, 0.0f, bone->unk28.x, bone->unk28.y, bone->unk28.z, colour,
-                   &bone->mat70);
-    }
 }
 
 /**
@@ -939,14 +905,10 @@ void draw_bone(struct GdObj *obj) {
  */
 void draw_joint(struct GdObj *obj) {
     struct ObjJoint *joint = (struct ObjJoint *) obj;
-    UNUSED u8 unused1[4];
     UNUSED f32 sp7C = 70.0f;
-    UNUSED u8 unused2[4];
     UNUSED s32 sp74 = 1;
     s32 colour;
-    UNUSED u8 unused[8];
     struct ObjShape *boneShape;
-    UNUSED u8 unused3[28];
 
     if ((boneShape = joint->shapePtr) == NULL) {
         return;
@@ -1125,12 +1087,7 @@ void unref_8017AEDC(struct ObjGroup *grp) {
  * @bug Nothing is returned if the DL is created
  * @note Contains string literals that suggest a removed `printf` call
  */
-#ifdef AVOID_UB
-void
-#else
-s32
-#endif
-create_shape_gddl(struct ObjShape *s) {
+void create_shape_gddl(struct ObjShape *s) {
     struct ObjShape *shape = s; // 24
     s32 shapedl;                // 20
     UNUSED s32 enddl;           // 1C
@@ -1138,11 +1095,7 @@ create_shape_gddl(struct ObjShape *s) {
     create_shape_mtl_gddls(shape);
     shapedl = gd_startdisplist(7);
     if (shapedl == 0) {
-#ifdef AVOID_UB
         return;
-#else
-        return -1;
-#endif
     }
 
     setup_lights();
@@ -1269,7 +1222,7 @@ static void find_thisface_verts(struct ObjFace *face, struct ObjGroup *vertexGrp
     struct ListNode *node;
 
     for (i = 0; i < face->vtxCount; i++) {
-        // find the vertex or particle whose index in vertexGrp equals face->vertices[i] 
+        // find the vertex or particle whose index in vertexGrp equals face->vertices[i]
         node = vertexGrp->firstMember;
         currIndex = 0;
         while (node != NULL) {
@@ -1356,7 +1309,6 @@ void unpick_obj(struct GdObj *obj) {
  */
 void find_closest_pickable_obj(struct GdObj *input) {
     struct GdObj *obj = input;
-    UNUSED u8 unused[12];
     f32 distance;
 
     if (obj->drawFlags & OBJ_IS_GRABBALE) {

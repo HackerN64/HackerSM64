@@ -212,12 +212,11 @@ void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
  * @return Mario's y position inside the painting (bounded).
  */
 f32 painting_mario_y(struct Painting *painting) {
-    //! Unnecessary use of double constants
     // Add 50 to make the ripple closer to Mario's center of mass.
-    f32 relY = gPaintingMarioYPos - painting->posY + 50.0;
+    f32 relY = gPaintingMarioYPos - painting->posY + 50.0f;
 
-    if (relY < 0.0) {
-        relY = 0.0;
+    if (relY < 0.0f) {
+        relY = 0.0f;
     } else if (relY > painting->size) {
         relY = painting->size;
     }
@@ -254,9 +253,7 @@ f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
             return painting->size / 2.0; // some concentric ripples don't care about Mario
             break;
     }
-#ifdef AVOID_UB
     return 0.0f;
-#endif
 }
 
 /**
@@ -282,9 +279,7 @@ f32 painting_nearest_4th(struct Painting *painting) {
     } else if (painting->floorEntered & ENTER_RIGHT) {
         return thirdQuarter;
     }
-#ifdef AVOID_UB
     return 0.0f;
-#endif
 }
 
 /**
@@ -316,9 +311,7 @@ f32 painting_ripple_x(struct Painting *painting, s8 xSource) {
             return painting->size / 2.0;
             break;
     }
-#ifdef AVOID_UB
     return 0.0f;
-#endif
 }
 
 /**
@@ -777,7 +770,6 @@ s8 normalize_component(f32 comp) {
  * The table used in game, seg2_painting_mesh_neighbor_tris, is in bin/segment2.c.
  */
 void painting_average_vertex_normals(s16 *neighborTris, s16 numVtx) {
-    UNUSED s16 unused;
     s16 tri;
     s16 i;
     s16 j;
@@ -1144,10 +1136,10 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
 void set_painting_layer(struct GraphNodeGenerated *gen, struct Painting *painting) {
     switch (painting->alpha) {
         case 0xFF: // Opaque
-            gen->fnNode.node.flags = (gen->fnNode.node.flags & 0xFF) | (LAYER_OPAQUE << 8);
+            SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_OPAQUE);
             break;
         default:
-            gen->fnNode.node.flags = (gen->fnNode.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8);
+            SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_TRANSPARENT);
             break;
     }
 }

@@ -24,7 +24,6 @@ s32 check_if_moving_over_floor(f32 maxDist, f32 offset) {
 }
 
 void bhv_pushable_loop(void) {
-    UNUSED s16 unused;
     s16 angleToMario;
     obj_set_hitbox(o, &sMetalBoxHitbox);
     o->oForwardVel = 0.0f;

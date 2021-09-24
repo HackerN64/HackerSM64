@@ -27,7 +27,6 @@ void falling_bowser_plat_act_start(void) {
 }
 
 void falling_bowser_plat_act_check(void) {
-    UNUSED s32 unused;
     struct Object *bowser = o->oBitsPlatformBowser;
     if (bowser->platform == o) {
         if (bowser->oAction == BOWSER_ACT_BIG_JUMP && bowser->oBowserStatus & BOWSER_STATUS_BIG_JUMP) {

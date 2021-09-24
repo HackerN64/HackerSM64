@@ -32,12 +32,16 @@ static char sLevelSelectStageNames[64][16] = {
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
 
+#ifdef KEEP_MARIO_HEAD
+#ifndef DISABLE_DEMO
 static u16 sDemoCountdown = 0;
+#endif
 #ifndef VERSION_JP
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
 #endif
 
+#ifndef DISABLE_DEMO
 #define PRESS_START_DEMO_TIMER 800
 
 /**
@@ -77,13 +81,15 @@ s32 run_level_id_or_demo(s32 level) {
     }
     return level;
 }
+#endif
+#endif
 
 /**
  * Level select intro function, updates the selected stage
  * count if an input was received. signals the stage to be started
  * or the level select to be exited if start or the quit combo is pressed.
  */
-s16 intro_level_select(void) {
+s16 intro_level_select(void) { //! this function runs and crashes on save+quit even if level select is disabled
     s32 stageChanged = FALSE;
 
     // perform the ID updates per each button press.
@@ -130,22 +136,21 @@ s16 intro_level_select(void) {
     print_text_fmt_int(40, 60, "%2d", gCurrLevelNum);
     print_text(80, 60, sLevelSelectStageNames[gCurrLevelNum - 1]); // print stage name
 
-#define QUIT_LEVEL_SELECT_COMBO (Z_TRIG | START_BUTTON | L_CBUTTONS | R_CBUTTONS)
-
     // start being pressed signals the stage to be started. that is, unless...
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         // ... the level select quit combo is being pressed, which uses START. If this
         // is the case, quit the menu instead.
-        if (gPlayer1Controller->buttonDown == QUIT_LEVEL_SELECT_COMBO) {
+        if (gPlayer1Controller->buttonDown == (Z_TRIG | START_BUTTON | L_CBUTTONS | R_CBUTTONS)) {
             gDebugLevelSelect = FALSE;
-            return -1;
+            return LEVEL_RESTART_GAME;
         }
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
         return gCurrLevelNum;
     }
-    return 0;
+    return LEVEL_NONE;
 }
 
+#ifdef KEEP_MARIO_HEAD
 /**
  * Regular intro function that handles Mario's greeting voice and game start.
  */
@@ -177,12 +182,16 @@ s32 intro_regular(void) {
         // calls level ID 100 (or 101 adding level select bool value)
         // defined in level_intro_mario_head_regular JUMP_IF commands
         // 100 is File Select - 101 is Level Select
-        level = 100 + gDebugLevelSelect;
+        level = (LEVEL_FILE_SELECT + gDebugLevelSelect);
 #ifndef VERSION_JP
         sPlayMarioGreeting = TRUE;
 #endif
     }
+#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     return run_level_id_or_demo(level);
+#else
+    return level;
+#endif
 }
 
 /**
@@ -207,13 +216,19 @@ s32 intro_game_over(void) {
         queue_rumble_decay(1);
 #endif
         // same criteria as intro_regular
-        level = 100 + gDebugLevelSelect;
+        level = LEVEL_FILE_SELECT + gDebugLevelSelect;
 #ifndef VERSION_JP
         sPlayMarioGameOver = TRUE;
 #endif
     }
+#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     return run_level_id_or_demo(level);
+#else
+    return level;
+#endif
 }
+
+#endif
 
 /**
  * Plays the casual "It's a me mario" when the game stars.
@@ -221,7 +236,7 @@ s32 intro_game_over(void) {
 s32 intro_play_its_a_me_mario(void) {
     set_background_music(0, SEQ_SOUND_PLAYER, 0);
     play_sound(SOUND_MENU_COIN_ITS_A_ME_MARIO, gGlobalSoundSource);
-    return 1;
+    return (LEVEL_NONE + 1);
 }
 
 /**
@@ -229,29 +244,18 @@ s32 intro_play_its_a_me_mario(void) {
  * Returns a level ID after their criteria is met.
  */
 s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
-    s32 retVar = 0;
+    s32 retVar = LEVEL_NONE;
 
     switch (arg) {
-        case LVL_INTRO_PLAY_ITS_A_ME_MARIO:
-            retVar = intro_play_its_a_me_mario();
-            break;
+        case LVL_INTRO_PLAY_ITS_A_ME_MARIO: retVar = intro_play_its_a_me_mario(); break;
 #ifdef KEEP_MARIO_HEAD
-        case LVL_INTRO_REGULAR:
-            retVar = intro_regular();
-            break;
-        case LVL_INTRO_GAME_OVER:
-            retVar = intro_game_over();
-            break;
+        case LVL_INTRO_REGULAR:             retVar = intro_regular();             break;
+        case LVL_INTRO_GAME_OVER:           retVar = intro_game_over();           break;
 #else
-        case LVL_INTRO_REGULAR:
-            // fall through
-        case LVL_INTRO_GAME_OVER:
-            retVar = (100 + gDebugLevelSelect);
-            break;
+        case LVL_INTRO_REGULAR:             // fall through
+        case LVL_INTRO_GAME_OVER:           retVar = (LEVEL_FILE_SELECT + gDebugLevelSelect);   break;
 #endif
-        case LVL_INTRO_LEVEL_SELECT:
-            retVar = intro_level_select();
-            break;
+        case LVL_INTRO_LEVEL_SELECT:        retVar = intro_level_select();        break; //! this runs on save and quit for some reason?
     }
     return retVar;
 }

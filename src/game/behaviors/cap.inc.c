@@ -109,11 +109,11 @@ void bhv_wing_cap_init(void) {
 }
 
 void cap_scale_vertically(void) {
-    o->oCapUnkF8 += 0x2000;
-    o->header.gfx.scale[1] = coss(o->oCapUnkF8) * 0.3 + 0.7;
-    if (o->oCapUnkF8 == 0x10000) {
-        o->oCapUnkF8 = 0;
-        o->oCapUnkF4 = 2;
+    o->oCapScaleAngle += 0x2000;
+    o->header.gfx.scale[1] = coss(o->oCapScaleAngle) * 0.3 + 0.7;
+    if (o->oCapScaleAngle == 0x10000) {
+        o->oCapScaleAngle = 0;
+        o->oCapDoScaleVertically = 2;
     }
 }
 
@@ -125,12 +125,12 @@ void wing_vanish_cap_act_0(void) {
     if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         cap_check_quicksand();
         if (o->oVelY != 0.0f) {
-            o->oCapUnkF4 = 1;
+            o->oCapDoScaleVertically = 1;
             o->oVelY = 0.0f;
         }
     }
 
-    if (o->oCapUnkF4 == 1)
+    if (o->oCapDoScaleVertically == 1)
         cap_scale_vertically();
 }
 
@@ -229,13 +229,13 @@ void normal_cap_act_0(void) {
         cap_check_quicksand();
 
         if (o->oVelY != 0.0f) {
-            o->oCapUnkF4 = 1;
+            o->oCapDoScaleVertically = 1;
             o->oVelY = 0.0f;
             o->oFaceAnglePitch = 0;
         }
     }
 
-    if (o->oCapUnkF4 == 1)
+    if (o->oCapDoScaleVertically == 1)
         cap_scale_vertically();
 }
 

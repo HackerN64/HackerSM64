@@ -70,11 +70,11 @@ void bhv_controllable_platform_init(void) {
 
     sControllablePlatformDirectionState = 0;
 
-    o->oControllablePlatformUnkFC = o->oPosY;
+    o->oControllablePlatformInitPosY = o->oPosY;
 }
 
 void controllable_platform_hit_wall(s8 nextDirection) {
-    o->oControllablePlatformUnkF8 = nextDirection;
+    o->oControllablePlatformWallHitDirection = nextDirection;
     o->oTimer = 0;
     sControllablePlatformDirectionState = 5;
 
@@ -111,25 +111,25 @@ void controllable_platform_check_walls(s8 nextDirection, s8 wallDisplacement[3],
 
     if (!is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 400)) {
         sControllablePlatformDirectionState = 6;
-        o->oControllablePlatformUnk100 = 1;
+        o->oControllablePlatformIsFarFromMario = 1;
         o->oTimer = 0;
     }
 }
 
 void controllable_platform_shake_on_wall_hit(void) {
-    if (o->oControllablePlatformUnkF8 == 1 || o->oControllablePlatformUnkF8 == 2) {
+    if (o->oControllablePlatformWallHitDirection == 1 || o->oControllablePlatformWallHitDirection == 2) {
         o->oFaceAnglePitch = sins(o->oTimer * 0x1000) * 182.04444 * 10.0;
-        o->oPosY = o->oControllablePlatformUnkFC + sins(o->oTimer * 0x2000) * 20.0f;
+        o->oPosY = o->oControllablePlatformInitPosY + sins(o->oTimer * 0x2000) * 20.0f;
     } else {
         o->oFaceAngleRoll = sins(o->oTimer * 0x1000) * 182.04444 * 10.0;
-        o->oPosY = o->oControllablePlatformUnkFC + sins(o->oTimer * 0x2000) * 20.0f;
+        o->oPosY = o->oControllablePlatformInitPosY + sins(o->oTimer * 0x2000) * 20.0f;
     }
 
     if (o->oTimer == 32) {
-        sControllablePlatformDirectionState = o->oControllablePlatformUnkF8;
+        sControllablePlatformDirectionState = o->oControllablePlatformWallHitDirection;
         o->oFaceAnglePitch = 0;
         o->oFaceAngleRoll = 0;
-        o->oPosY = o->oControllablePlatformUnkFC;
+        o->oPosY = o->oControllablePlatformInitPosY;
     }
 }
 
@@ -163,7 +163,7 @@ void bhv_controllable_platform_loop(void) {
         case 0:
             o->oFaceAnglePitch /= 2;
             o->oFaceAngleRoll /= 2;
-            if (o->oControllablePlatformUnk100 == 1 && o->oTimer > 30) {
+            if (o->oControllablePlatformIsFarFromMario == 1 && o->oTimer > 30) {
                 sControllablePlatformDirectionState = 6;
                 o->oTimer = 0;
             }

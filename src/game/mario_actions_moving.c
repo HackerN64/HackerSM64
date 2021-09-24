@@ -511,8 +511,6 @@ s32 should_begin_sliding(struct MarioState *m) {
 }
 
 s32 check_ground_dive_or_punch(struct MarioState *m) {
-    UNUSED s32 unused;
-
     if (m->input & INPUT_B_PRESSED) {
         //! Speed kick (shoutouts to SimpleFlips)
         if (m->forwardVel >= 29.0f && m->controller->stickMag > 48.0f) {
@@ -696,7 +694,7 @@ void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
     s16 dWallAngle;
     f32 dx = m->pos[0] - startPos[0];
     f32 dz = m->pos[2] - startPos[2];
-    f32 movedDistance = sqrtf(dx * dx + dz * dz);
+    f32 movedDistance = sqrtf(sqr(dx) + sqr(dz));
     //! (Speed Crash) If a wall is after moving 16384 distance, this crashes.
     s32 animSpeed = (s32)(movedDistance * 2.0f * 0x10000);
 

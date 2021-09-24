@@ -26,7 +26,6 @@ Gfx *geo_envfx_main(s32 callContext, struct GraphNode *node, Mat4 mtxf) {
                                             // casting to a local struct as necessary.
 
         if (GET_HIGH_U16_OF_32(*params) != gAreaUpdateCounter) {
-            UNUSED struct Camera *sp2C = gCurGraphNodeCamera->config.camera;
             s32 snowMode = GET_LOW_U16_OF_32(*params);
 
             vec3f_to_vec3s(camTo, gCurGraphNodeCamera->focus);
@@ -40,7 +39,7 @@ Gfx *geo_envfx_main(s32 callContext, struct GraphNode *node, Mat4 mtxf) {
                 mtxf_to_mtx(mtx, mtxf);
                 gSPMatrix(&gfx[0], VIRTUAL_TO_PHYSICAL(mtx), G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
                 gSPBranchList(&gfx[1], VIRTUAL_TO_PHYSICAL(particleList));
-                execNode->fnNode.node.flags = (execNode->fnNode.node.flags & 0xFF) | (LAYER_ALPHA << 8);
+                SET_GRAPH_NODE_LAYER(execNode->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_ALPHA);
             }
             SET_HIGH_U16_OF_32(*params, gAreaUpdateCounter);
         }

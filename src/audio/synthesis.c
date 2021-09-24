@@ -780,13 +780,9 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
 }
 #else
 u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateIndex) {
-    UNUSED s32 pad1[1];
     s16 ra;
     s16 t4;
-    UNUSED s32 pad[2];
     struct ReverbRingBufferItem *v1;
-    UNUSED s32 pad2[1];
-    s16 temp;
 
     v1 = &gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex];
 
@@ -800,7 +796,6 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
             if (v1->lengthB != 0) {
                 // Ring buffer wrapped
                 aSetLoadBufferPair(cmd++, v1->lengthA, 0);
-                temp = 0;
             }
 
             // Use the reverb sound as initial sound for this audio update
@@ -814,18 +809,12 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
                  /*out*/ DMEM_ADDR_WET_LEFT_CH);
         } else {
             // Same as above but upsample the previously downsampled samples used for reverb first
-            temp = 0; //! jesus christ
             t4 = (v1->startPos & 7) * 2;
             ra = AUDIO_ALIGN(v1->lengthA + t4, 4);
             aSetLoadBufferPair(cmd++, 0, v1->startPos - t4 / 2);
             if (v1->lengthB != 0) {
                 // Ring buffer wrapped
                 aSetLoadBufferPair(cmd++, ra, 0);
-                //! We need an empty statement (even an empty ';') here to make the function match (because IDO).
-                //! However, copt removes extraneous statements and dead code. So we need to trick copt
-                //! into thinking 'temp' could be undefined, and luckily the compiler optimizes out the
-                //! useless assignment.
-                ra = ra + temp;
             }
             aSetBuffer(cmd++, 0, t4 + DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_LEFT_CH, bufLen << 1);
             aResample(cmd++, gSynthesisReverb.resampleFlags, (u16) gSynthesisReverb.resampleRate, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.resampleStateLeft));
@@ -1652,10 +1641,6 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct Note *note, s32 bufLen, s32
                 pitch = (bufLen << 0xf) / (bufLen + panShift - prevPanShift);
             }
 
-#if defined(VERSION_EU) && !defined(AVOID_UB)
-            if (unkDebug) { // UB
-            }
-#endif
             aSetBuffer(cmd++, 0, DMEM_ADDR_NOTE_PAN_TEMP, DMEM_ADDR_TEMP, panShift + bufLen - prevPanShift);
             aResample(cmd++, 0, pitch, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->panResampleState));
         }

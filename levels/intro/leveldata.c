@@ -3298,7 +3298,7 @@ static const Gfx intro_seg7_dl_0700ADC0[] = {
 };
 
 // 0x0700B3A0 - 0x0700B420
-const Gfx intro_seg7_dl_0700B3A0[] = {
+const Gfx intro_seg7_dl_main_logo[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
     gsSPClearGeometryMode(G_LIGHTING),
@@ -3363,7 +3363,7 @@ ALIGNED8 static const Texture intro_seg7_texture_0700C4A0[] = {
 #endif
 
 // 0x0700C6A0 - 0x0700C790
-const Gfx intro_seg7_dl_0700C6A0[] = {
+const Gfx intro_seg7_dl_copyright_trademark[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_DECALFADE, G_CC_DECALFADE),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -3386,7 +3386,7 @@ const Gfx intro_seg7_dl_0700C6A0[] = {
 };
 
 // 0x0700C790
-const f32 intro_seg7_table_0700C790[] = {
+const f32 intro_seg7_table_scale_1[] = {
     0.016000f, 0.052000f, 0.002500f, 0.148300f,
     0.189200f, 0.035200f, 0.471600f, 0.525300f,
     0.116600f, 0.875800f, 0.947000f, 0.222100f,
@@ -3405,7 +3405,7 @@ const f32 intro_seg7_table_0700C790[] = {
 };
 
 // 0x0700C880
-const f32 intro_seg7_table_0700C880[] = {
+const f32 intro_seg7_table_scale_2[] = {
     1.000000f, 1.000000f, 1.000000f, 0.987300f,
     0.987300f, 0.987300f, 0.951400f, 0.951400f,
     0.951400f, 0.896000f, 0.896000f, 0.896000f,

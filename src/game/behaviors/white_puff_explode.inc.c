@@ -4,17 +4,17 @@ void bhv_white_puff_exploding_loop(void) {
     f32 scale;
     if (o->oTimer == 0) {
         cur_obj_compute_vel_xz();
-        o->oWhitePuffUnkF4 = o->header.gfx.scale[0];
+        o->oWhitePuffScaleX = o->header.gfx.scale[0];
         switch (o->oBehParams2ndByte) {
             case 2:
                 o->oOpacity = 254;
-                o->oWhitePuffUnkF8 = -21;
-                o->oWhitePuffUnkFC = 0;
+                o->oWhitePuffOpacityDiff = -21;
+                o->oWhitePuffSlowFade = 0;
                 break;
             case 3:
                 o->oOpacity = 254;
-                o->oWhitePuffUnkF8 = -13;
-                o->oWhitePuffUnkFC = 1;
+                o->oWhitePuffOpacityDiff = -13;
+                o->oWhitePuffSlowFade = 1;
                 break;
         }
     }
@@ -25,13 +25,13 @@ void bhv_white_puff_exploding_loop(void) {
     if (o->oTimer > 20)
         obj_mark_for_deletion(o);
     if (o->oOpacity) {
-        o->oOpacity += o->oWhitePuffUnkF8;
+        o->oOpacity += o->oWhitePuffOpacityDiff;
         if (o->oOpacity < 2)
             obj_mark_for_deletion(o);
-        if (o->oWhitePuffUnkFC)
-            scale = o->oWhitePuffUnkF4 * ((254 - o->oOpacity) / 254.0);
+        if (o->oWhitePuffSlowFade)
+            scale = o->oWhitePuffScaleX * ((254 - o->oOpacity) / 254.0);
         else
-            scale = o->oWhitePuffUnkF4 * (o->oOpacity / 254.0);
+            scale = o->oWhitePuffScaleX * (o->oOpacity / 254.0);
         cur_obj_scale(scale);
     }
 }

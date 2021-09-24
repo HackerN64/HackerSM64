@@ -4,12 +4,12 @@ f32 floating_platform_find_home_y(void) {
     struct Surface *floor;
     f32 waterLevel = find_water_level(o->oPosX, o->oPosZ);
     f32 floorHeight = find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
-    if (waterLevel > floorHeight + o->oFloatingPlatformUnkFC) {
-        o->oFloatingPlatformUnkF4 = 0;
-        return waterLevel + o->oFloatingPlatformUnkFC;
+    if (waterLevel > floorHeight + o->oFloatingPlatformHeightOffset) {
+        o->oFloatingPlatformIsOnFloor = 0;
+        return waterLevel + o->oFloatingPlatformHeightOffset;
     } else {
-        o->oFloatingPlatformUnkF4 = 1;
-        return floorHeight + o->oFloatingPlatformUnkFC;
+        o->oFloatingPlatformIsOnFloor = 1;
+        return floorHeight + o->oFloatingPlatformHeightOffset;
     }
 }
 
@@ -25,27 +25,27 @@ void floating_platform_act_0(void) {
         if (o->oVelY < 0.0f)
             o->oVelY = 0.0f;
 
-        o->oFloatingPlatformUnkF8 += o->oVelY;
-        if (o->oFloatingPlatformUnkF8 > 90.0f)
-            o->oFloatingPlatformUnkF8 = 90.0f;
+        o->oFloatingPlatformMarioWeightWobbleOffset += o->oVelY;
+        if (o->oFloatingPlatformMarioWeightWobbleOffset > 90.0f)
+            o->oFloatingPlatformMarioWeightWobbleOffset = 90.0f;
     } else {
         o->oFaceAnglePitch /= 2;
         o->oFaceAngleRoll /= 2;
-        o->oFloatingPlatformUnkF8 -= 5.0;
+        o->oFloatingPlatformMarioWeightWobbleOffset -= 5.0;
         o->oVelY = 10.0f;
-        if (o->oFloatingPlatformUnkF8 < 0.0f)
-            o->oFloatingPlatformUnkF8 = 0.0f;
+        if (o->oFloatingPlatformMarioWeightWobbleOffset < 0.0f)
+            o->oFloatingPlatformMarioWeightWobbleOffset = 0.0f;
     }
 
-    o->oPosY = o->oHomeY - 64.0f - o->oFloatingPlatformUnkF8 + sins(o->oFloatingPlatformUnk100 * 0x800) * 10.0f;
-    o->oFloatingPlatformUnk100++;
-    if (o->oFloatingPlatformUnk100 == 32)
-        o->oFloatingPlatformUnk100 = 0;
+    o->oPosY = o->oHomeY - 64.0f - o->oFloatingPlatformMarioWeightWobbleOffset + sins(o->oFloatingPlatformWaterSurfaceWobbleOffset * 0x800) * 10.0f;
+    o->oFloatingPlatformWaterSurfaceWobbleOffset++;
+    if (o->oFloatingPlatformWaterSurfaceWobbleOffset == 32)
+        o->oFloatingPlatformWaterSurfaceWobbleOffset = 0;
 }
 
 void bhv_floating_platform_loop(void) {
     o->oHomeY = floating_platform_find_home_y();
-    if (o->oFloatingPlatformUnkF4 == 0)
+    if (o->oFloatingPlatformIsOnFloor == 0)
         o->oAction = 0;
     else
         o->oAction = 1;

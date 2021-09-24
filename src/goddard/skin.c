@@ -300,10 +300,8 @@ void func_80192CCC(struct ObjNet *net) {
 
 /* 241768 -> 241AB4; orig name: func_80192F98 */
 void convert_gd_verts_to_Vn(struct ObjGroup *grp) {
-    UNUSED u8 pad[0x40 - 0x2c];
     Vtx *vn;       // 28
     u8 nx, ny, nz; // 24, 25, 26
-    UNUSED u32 pad20;
     register struct VtxLink *vtxlink; // a1
 #ifndef GBI_FLOATS
     register s16 *vnPos;              // a2

@@ -360,7 +360,6 @@ ALIGNED8 static const Texture hoot_seg5_texture_05002650[] = {
 #include "actors/hoot/hoot_wing_tip.rgba16.inc.c"
 };
 
-// //! The vertex macro which calls this has too large of a size.
 // 0x05002E50
 static const Vtx hoot_seg5_vertex_05002E50[] = {
     {{{   126,      0,    -62}, 0, {  1780,    228}, {0x00, 0x7f, 0x00, 0x00}}},
@@ -370,13 +369,6 @@ static const Vtx hoot_seg5_vertex_05002E50[] = {
     {{{     0,      0,     78}, 0, {   304,   1824}, {0x00, 0x7f, 0x00, 0x00}}},
     {{{   168,      0,    125}, 0, {  2288,   2352}, {0x00, 0x7f, 0x00, 0x00}}},
 };
-
-// vertex   -752,      0,   1280,  -2800,      0,  0x07, 0x00, 0x00, 0x00
-// vertex  -6656,      0,      0,  -3328,      0,  0x07, 0x3F, 0xF1, 0x00
-// vertex  -2800,   4096,      0,  -3584,      0,  0x00, 0x07, 0xC0, 0x7C
-// vertex    902,     16,   1280,    904,     16,  0x05, 0x00, 0x1E, 0x38
-// vertex   1200,    192,   1280, -16640,      0,  0x00, 0x00, 0x0A, 0x14
-// vertex -16640,      0,     30, -18432,      0,  0x00, 0x00, 0x00, 0x00
 
 // 0x05002EB0 - 0x05002F10
 const Gfx hoot_seg5_dl_05002EB0[] = {
@@ -388,7 +380,7 @@ const Gfx hoot_seg5_dl_05002EB0[] = {
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPLight(&hoot_seg5_lights_05001E38.l, 1),
     gsSPLight(&hoot_seg5_lights_05001E38.a, 2),
-    gsSPVertex(hoot_seg5_vertex_05002E50, 12, 0),
+    gsSPVertex(hoot_seg5_vertex_05002E50, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
 };
@@ -413,7 +405,6 @@ static const Lights1 hoot_seg5_lights_05002F60 = gdSPDefLights1(
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
 
-// //! The vertex macro which calls this has too large of a size.
 // 0x05002F78
 static const Vtx hoot_seg5_vertex_05002F78[] = {
     {{{   119,      0,    -85}, 0, {  1972,     68}, {0x00, 0x7f, 0x00, 0x00}}},
@@ -423,13 +414,6 @@ static const Vtx hoot_seg5_vertex_05002F78[] = {
     {{{     0,      0,    -47}, 0, {   960,    484}, {0x00, 0x7f, 0x00, 0x00}}},
     {{{     0,      0,     96}, 0, {   964,   2040}, {0x00, 0x7f, 0x00, 0x00}}},
 };
-
-// vertex   -752,      0,   1280,  -2800,      0,  0x07, 0x00, 0x00, 0x00
-// vertex  -6656,      0,      0,  -3328,      0,  0x07, 0x3F, 0xF1, 0x00
-// vertex  -2800,   4096,      0,  -3584,      0,  0x00, 0x07, 0xC0, 0x7C
-// vertex    902,     16,   1280,    904,     16,  0x05, 0x00, 0x2F, 0x60
-// vertex   1200,    192,   1280, -16640,      0,  0x00, 0x00, 0x0A, 0x14
-// vertex -16640,      0,     30, -18432,      0,  0x00, 0x00, 0x00, 0x00
 
 // 0x05002FD8 - 0x05003038
 const Gfx hoot_seg5_dl_05002FD8[] = {
@@ -441,7 +425,7 @@ const Gfx hoot_seg5_dl_05002FD8[] = {
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPLight(&hoot_seg5_lights_05002F60.l, 1),
     gsSPLight(&hoot_seg5_lights_05002F60.a, 2),
-    gsSPVertex(hoot_seg5_vertex_05002F78, 12, 0),
+    gsSPVertex(hoot_seg5_vertex_05002F78, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
 };
@@ -466,7 +450,6 @@ static const Lights1 hoot_seg5_lights_05003088 = gdSPDefLights1(
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
 
-// //! The vertex macro which calls this has too large of a size.
 // 0x050030A0
 static const Vtx hoot_seg5_vertex_050030A0[] = {
     {{{    89,      1,    -46}, 0, {   928,    456}, {0x00, 0x7f, 0x00, 0x00}}},
@@ -476,13 +459,6 @@ static const Vtx hoot_seg5_vertex_050030A0[] = {
     {{{    37,      1,     29}, 0, {   348,   1324}, {0x00, 0x7f, 0x00, 0x00}}},
     {{{    89,      1,     95}, 0, {   924,   2076}, {0x00, 0x7f, 0x00, 0x00}}},
 };
-
-// vertex   -752,      0,   1280,  -2800,      0,  0x07, 0x00, 0x00, 0x00
-// vertex  -6656,      0,      0,  -3328,      0,  0x07, 0x3F, 0xF1, 0x00
-// vertex  -2800,   4096,      0,  -3584,      0,  0x00, 0x07, 0xC0, 0x7C
-// vertex    902,     16,   1280,    904,     16,  0x05, 0x00, 0x30, 0x88
-// vertex   1200,    192,   1280, -16640,      0,  0x00, 0x00, 0x0A, 0x14
-// vertex -16640,      0,     30, -18432,      0,  0x00, 0x00, 0x00, 0x00
 
 // 0x05003100 - 0x05003160
 const Gfx hoot_seg5_dl_05003100[] = {
@@ -494,7 +470,7 @@ const Gfx hoot_seg5_dl_05003100[] = {
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPLight(&hoot_seg5_lights_05003088.l, 1),
     gsSPLight(&hoot_seg5_lights_05003088.a, 2),
-    gsSPVertex(hoot_seg5_vertex_050030A0, 12, 0),
+    gsSPVertex(hoot_seg5_vertex_050030A0, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
 };
@@ -519,7 +495,6 @@ static const Lights1 hoot_seg5_lights_050031B0 = gdSPDefLights1(
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
 
-// //! The vertex macro which calls this has too large of a size.
 // 0x050031C8
 static const Vtx hoot_seg5_vertex_050031C8[] = {
     {{{    37,      1,    -66}, 0, {   380,    184}, {0x00, 0x7f, 0x00, 0x00}}},
@@ -529,13 +504,6 @@ static const Vtx hoot_seg5_vertex_050031C8[] = {
     {{{     1,      1,     72}, 0, {   -56,   1904}, {0x00, 0x7f, 0x00, 0x00}}},
     {{{    37,      1,     28}, 0, {   400,   1356}, {0x00, 0x7f, 0x00, 0x00}}},
 };
-
-// vertex   -752,      0,   1280,  -2800,      0,  0x07, 0x00, 0x00, 0x00
-// vertex  -6656,      0,      0,  -3328,      0,  0x07, 0x3F, 0xF1, 0x00
-// vertex  -2800,   4096,      0,  -3584,      0,  0x00, 0x07, 0xC0, 0x7C
-// vertex    902,     16,   1280,    904,     16,  0x05, 0x00, 0x31, 0xB0
-// vertex   1200,    192,   1280, -16640,      0,  0x00, 0x00, 0x0A, 0x14
-// vertex -16640,      0,     30, -18432,      0,  0x00, 0x00, 0x00, 0x00
 
 // 0x05003228 - 0x05003288
 const Gfx hoot_seg5_dl_05003228[] = {
@@ -547,7 +515,7 @@ const Gfx hoot_seg5_dl_05003228[] = {
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPLight(&hoot_seg5_lights_050031B0.l, 1),
     gsSPLight(&hoot_seg5_lights_050031B0.a, 2),
-    gsSPVertex(hoot_seg5_vertex_050031C8, 12, 0),
+    gsSPVertex(hoot_seg5_vertex_050031C8, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
 };
@@ -572,7 +540,6 @@ static const Lights1 hoot_seg5_lights_050032D8 = gdSPDefLights1(
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
 
-// //! The vertex macro which calls this has too large of a size.
 // 0x050032F0
 static const Vtx hoot_seg5_vertex_050032F0[] = {
     {{{   168,      0,   -124}, 0, {  2340,   2408}, {0x00, 0x7f, 0x00, 0x00}}},
@@ -582,13 +549,6 @@ static const Vtx hoot_seg5_vertex_050032F0[] = {
     {{{     0,      0,    -77}, 0, {   348,   1884}, {0x00, 0x7f, 0x00, 0x00}}},
     {{{     0,      0,     88}, 0, {   424,     -4}, {0x00, 0x7f, 0x00, 0x00}}},
 };
-
-// vertex   -752,      0,   1280,  -2800,      0,  0x07, 0x00, 0x00, 0x00
-// vertex  -6656,      0,      0,  -3328,      0,  0x07, 0x3F, 0xF1, 0x00
-// vertex  -2800,   4096,      0,  -3584,      0,  0x00, 0x07, 0xC0, 0x7C
-// vertex    902,     16,   1280,    904,     16,  0x05, 0x00, 0x32, 0xD8
-// vertex   1200,    192,   1280, -16640,      0,  0x00, 0x00, 0x0A, 0x14
-// vertex -16640,      0,     30, -18432,      0,  0x00, 0x00, 0x00, 0x00
 
 // 0x05003350 - 0x050033B0
 const Gfx hoot_seg5_dl_05003350[] = {
@@ -600,7 +560,7 @@ const Gfx hoot_seg5_dl_05003350[] = {
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPLight(&hoot_seg5_lights_050032D8.l, 1),
     gsSPLight(&hoot_seg5_lights_050032D8.a, 2),
-    gsSPVertex(hoot_seg5_vertex_050032F0, 12, 0),
+    gsSPVertex(hoot_seg5_vertex_050032F0, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
 };
@@ -625,7 +585,6 @@ static const Lights1 hoot_seg5_lights_05003400 = gdSPDefLights1(
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
 
-// //! The vertex macro which calls this has too large of a size.
 // 0x05003418
 static const Vtx hoot_seg5_vertex_05003418[] = {
     {{{   119,      0,    -76}, 0, {  1988,   1892}, {0x00, 0x7f, 0x00, 0x00}}},
@@ -635,13 +594,6 @@ static const Vtx hoot_seg5_vertex_05003418[] = {
     {{{     0,      0,     48}, 0, {  1000,    468}, {0x00, 0x7f, 0x00, 0x00}}},
     {{{   119,      0,     86}, 0, {  1984,     36}, {0x00, 0x7f, 0x00, 0x00}}},
 };
-
-// vertex   -752,      0,   1280,  -2800,      0,  0x07, 0x00, 0x00, 0x00
-// vertex  -6656,      0,      0,  -3328,      0,  0x07, 0x3F, 0xF1, 0x00
-// vertex  -2800,   4096,      0,  -3584,      0,  0x00, 0x07, 0xC0, 0x7C
-// vertex    902,     16,   1280,    904,     16,  0x05, 0x00, 0x34, 0x00
-// vertex   1200,    192,   1280, -16640,      0,  0x00, 0x00, 0x0A, 0x14
-// vertex -16640,      0,     30, -18432,      0,  0x00, 0x00, 0x00, 0x00
 
 // 0x05003478 - 0x050034D8
 const Gfx hoot_seg5_dl_05003478[] = {
@@ -653,7 +605,7 @@ const Gfx hoot_seg5_dl_05003478[] = {
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPLight(&hoot_seg5_lights_05003400.l, 1),
     gsSPLight(&hoot_seg5_lights_05003400.a, 2),
-    gsSPVertex(hoot_seg5_vertex_05003418, 12, 0),
+    gsSPVertex(hoot_seg5_vertex_05003418, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
 };
@@ -678,7 +630,6 @@ static const Lights1 hoot_seg5_lights_05003528 = gdSPDefLights1(
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
 
-// //! The vertex macro which calls this has too large of a size.
 // 0x05003540
 static const Vtx hoot_seg5_vertex_05003540[] = {
     {{{    89,      1,    -94}, 0, {   984,   2096}, {0x00, 0x7f, 0x00, 0x00}}},
@@ -688,13 +639,6 @@ static const Vtx hoot_seg5_vertex_05003540[] = {
     {{{    37,      1,    -28}, 0, {   360,   1324}, {0x00, 0x7f, 0x00, 0x00}}},
     {{{    37,      1,     67}, 0, {   368,    192}, {0x00, 0x7f, 0x00, 0x00}}},
 };
-
-// vertex   -752,      0,   1280,  -2800,      0,  0x07, 0x00, 0x00, 0x00
-// vertex  -6656,      0,      0,  -3328,      0,  0x07, 0x3F, 0xF1, 0x00
-// vertex  -2800,   4096,      0,  -3584,      0,  0x00, 0x07, 0xC0, 0x7C
-// vertex    902,     16,   1280,    904,     16,  0x05, 0x00, 0x35, 0x28
-// vertex   1200,    192,   1280, -16640,      0,  0x00, 0x00, 0x0A, 0x14
-// vertex -16640,      0,     30, -18432,      0,  0x00, 0x00, 0x00, 0x00
 
 // 0x050035A0 - 0x05003600
 const Gfx hoot_seg5_dl_050035A0[] = {
@@ -706,7 +650,7 @@ const Gfx hoot_seg5_dl_050035A0[] = {
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPLight(&hoot_seg5_lights_05003528.l, 1),
     gsSPLight(&hoot_seg5_lights_05003528.a, 2),
-    gsSPVertex(hoot_seg5_vertex_05003540, 12, 0),
+    gsSPVertex(hoot_seg5_vertex_05003540, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
 };
@@ -731,7 +675,6 @@ static const Lights1 hoot_seg5_lights_05003650 = gdSPDefLights1(
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
 
-// //! The vertex macro which calls this has too large of a size.
 // 0x05003668
 static const Vtx hoot_seg5_vertex_05003668[] = {
     {{{    37,      1,    -27}, 0, {   428,   1324}, {0x00, 0x7f, 0x00, 0x00}}},
@@ -741,13 +684,6 @@ static const Vtx hoot_seg5_vertex_05003668[] = {
     {{{     1,      1,    -71}, 0, {   -40,   1848}, {0x00, 0x7f, 0x00, 0x00}}},
     {{{     2,      1,     40}, 0, {   -24,    512}, {0x00, 0x7f, 0x00, 0x00}}},
 };
-
-// vertex   -752,      0,   1280,  -2800,      0,  0x07, 0x00, 0x00, 0x00
-// vertex  -6656,      0,      0,  -3328,      0,  0x07, 0x3F, 0xF1, 0x00
-// vertex  -2800,   4096,      0,  -3584,      0,  0x00, 0x07, 0xC0, 0x7C
-// vertex    902,     16,   1280,    904,     16,  0x05, 0x00, 0x36, 0x50
-// vertex   1200,    192,   1280, -16640,      0,  0x00, 0x00, 0x0A, 0x14
-// vertex -16640,      0,     30, -18432,      0,  0x00, 0x00, 0x00, 0x00
 
 // 0x050036C8 - 0x05003728
 const Gfx hoot_seg5_dl_050036C8[] = {
@@ -759,7 +695,7 @@ const Gfx hoot_seg5_dl_050036C8[] = {
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPLight(&hoot_seg5_lights_05003650.l, 1),
     gsSPLight(&hoot_seg5_lights_05003650.a, 2),
-    gsSPVertex(hoot_seg5_vertex_05003668, 12, 0),
+    gsSPVertex(hoot_seg5_vertex_05003668, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
 };

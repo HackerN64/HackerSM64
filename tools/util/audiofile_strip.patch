@@ -36,10 +36,10 @@ index 64e798b..374838b 100644
 @@ -47,7 +47,7 @@ AUpvlist AUpvnew (int maxitems)
  	if (aupvlist == NULL)
  		return AU_NULL_PVLIST;
- 
+
 -	aupvlist->items = calloc(maxitems, sizeof (struct _AUpvitem));
 +	aupvlist->items = (struct _AUpvitem *)calloc(maxitems, sizeof (struct _AUpvitem));
- 
+
  	assert(aupvlist->items);
  	if (aupvlist->items == NULL)
 diff --git a/libaudiofile/g711.c b/libaudiofile/g711.c
@@ -72,7 +72,7 @@ index ffd0a63..51d2dc3 100644
 +++ b/libaudiofile/units.cpp
 @@ -32,24 +32,12 @@
  #include "units.h"
- 
+
  #include "AIFF.h"
 -#include "AVR.h"
 -#include "CAF.h"
@@ -85,16 +85,16 @@ index ffd0a63..51d2dc3 100644
 -#include "SampleVision.h"
 -#include "VOC.h"
  #include "WAVE.h"
- 
+
  #include "compression.h"
- 
+
 -#include "modules/ALAC.h"
 -#include "modules/FLAC.h"
  #include "modules/G711.h"
 -#include "modules/IMA.h"
  #include "modules/MSADPCM.h"
  #include "modules/PCM.h"
- 
+
 @@ -99,20 +87,6 @@ const Unit _af_units[_AF_NUM_UNITS] =
  		_AF_AIFF_NUM_INSTPARAMS,
  		_af_aiff_inst_params
@@ -259,7 +259,7 @@ index ffd0a63..51d2dc3 100644
 -		NULL	// instrument parameters
 -	}
  };
- 
+
  const CompressionUnit _af_compression[_AF_NUM_COMPRESSION] =
 @@ -309,19 +145,6 @@ const CompressionUnit _af_compression[_AF_NUM_COMPRESSION] =
  		_af_g711_format_ok,

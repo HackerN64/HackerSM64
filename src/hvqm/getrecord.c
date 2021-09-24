@@ -1,10 +1,10 @@
-/* 
+/*
  *  N64-HVQM2 library Sample program
- * 
+ *
  *  FILE : getrecord.c (module for reading HVQM2 records)
- * 
+ *
  *  Copyright (C) 1998,1999 NINTENDO Co.,Ltd.
- * 
+ *
  */
 
 /* 1999-02-22 */
@@ -14,7 +14,7 @@
 #include "hvqm.h"
 
 /*
- * u8 *get_record(HVQM2Record *headerbuf, void *bodybuf, 
+ * u8 *get_record(HVQM2Record *headerbuf, void *bodybuf,
  *                u16 type, u8 *stream, OSIoMesg *mb, OSMesgQueue *mq)
  *
  * Arguments
@@ -24,20 +24,20 @@
  *     stream    The current HVQM2 record address
  *     mb        I/O message block request sent to PI manager
  *     mq        Message queue receiving notice of DMA end from PI manager
- *  
+ *
  * Explanation:
  *   Finds the next record of the specified "type" from the HVQM2 data
  * address "stream" in ROM, and reads the record header into "headerbuf"
  * and the data body into "bodybuf."  Specify HVQM2_AUDIO for "type" to
  * read an audio record, and specify HVQM2_VIDEO to read a video record.
  *
- *   This function assumes that the reading of audio records and video 
- * records is performed in parallel by separate threads.  Accordingly, 
+ *   This function assumes that the reading of audio records and video
+ * records is performed in parallel by separate threads.  Accordingly,
  * you must prepare in advance a separate mb (I/O message block request
  * sent to PI manager) and separate mq (message queue receiving notice
  * of DMA end from PI manager) for audio records and video records.
  *
- *   The reading of audio records has priority over the reading of 
+ *   The reading of audio records has priority over the reading of
  * video records.
  *
  *   "stream" must have 2byte alignment.  Please give headerbuf and
@@ -45,7 +45,7 @@
  * size.
  *
  *   Please be sure to reserve sufficient space for bodybuf.
- * 
+ *
  *
  * Returned value:
  *     The address of the next record
@@ -65,7 +65,7 @@ get_record( HVQM2Record *headerbuf, void *bodybuf, u16 type, u8 *stream, OSIoMes
     record_size = load32( headerbuf->size );
     if ( record_type == type ) break;
     stream += record_size;
-  } 
+  }
 
   if ( record_size > 0 ) {
     romcpy( bodybuf, stream, record_size, pri, mb, mq );

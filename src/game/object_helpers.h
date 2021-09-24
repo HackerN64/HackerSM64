@@ -60,13 +60,8 @@ struct SpawnParticlesInfo
 
 Gfx *geo_update_projectile_pos_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx);
 Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUSED void *context);
-#ifdef AVOID_UB
 Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void *context);
 Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *context);
-#else
-Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node);
-Gfx *geo_switch_area(s32 callContext, struct GraphNode *node);
-#endif
 void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj);
 void obj_apply_scale_to_matrix(struct Object *obj, Mat4 dst, Mat4 src);
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);
@@ -135,8 +130,8 @@ s32 count_objects_with_behavior(const BehaviorScript *behavior);
 struct Object *cur_obj_find_nearby_held_actor(const BehaviorScript *behavior, f32 maxDist);
 void cur_obj_change_action(s32 action);
 void cur_obj_set_vel_from_mario_vel(f32 f12,f32 f14);
-BAD_RETURN(s16) cur_obj_reverse_animation(void);
-BAD_RETURN(s32) cur_obj_extend_animation_if_at_end(void);
+void cur_obj_reverse_animation(void);
+void cur_obj_extend_animation_if_at_end(void);
 s32 cur_obj_check_if_near_animation_end(void);
 s32 cur_obj_check_if_at_animation_end(void);
 s32 cur_obj_check_anim_frame(s32 frame);

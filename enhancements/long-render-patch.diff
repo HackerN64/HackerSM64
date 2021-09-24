@@ -25,7 +25,7 @@ index e5d59d8b5..75cd43a09 100644
 -#endif
 +	Mat4 temp;
 +	register s32 i, j;
-+	
++
 +	for( i = 0; i < 4; i++ ) {
 +		for( j = 0; j < 3; j++ ) {
 +			temp[i][j] = src[i][j] / WORLD_SCALE;
@@ -35,19 +35,19 @@ index e5d59d8b5..75cd43a09 100644
 +
 +	guMtxF2L( temp, dest );
  }
- 
+
  /**
 diff --git a/src/engine/math_util.h b/src/engine/math_util.h
 index cb37d52d1..0826a8407 100644
 --- a/src/engine/math_util.h
 +++ b/src/engine/math_util.h
 @@ -5,6 +5,14 @@
- 
+
  #include "types.h"
- 
+
 +/* Scales the world down by this factor, increasing how far you can render on
 + * console in exchange for a slight loss in precision.
-+ * 
++ *
 + * For double extended boundary hacks, a value of 1.5f or 2.0f is good.
 + * For quadruple extended bounds, use 3.f or 4.f
 + */
@@ -63,11 +63,11 @@ index 58238e83f..150cff68b 100644
 @@ -249,7 +249,7 @@ static void geo_process_perspective(struct GraphNodePerspective *node) {
          f32 aspect = (f32) gCurGraphNodeRoot->width / (f32) gCurGraphNodeRoot->height;
  #endif
- 
+
 -        guPerspective(mtx, &perspNorm, node->fov, aspect, node->near, node->far, 1.0f);
 +        guPerspective(mtx, &perspNorm, node->fov, aspect, node->near / WORLD_SCALE, node->far / WORLD_SCALE, 1.0f);
          gSPPerspNormalize(gDisplayListHead++, perspNorm);
- 
+
          gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
 @@ -267,17 +267,8 @@ static void geo_process_perspective(struct GraphNodePerspective *node) {
   * range of this node.
@@ -92,7 +92,7 @@ index 58238e83f..150cff68b 100644
 @@ -304,6 +295,17 @@ static void geo_process_switch(struct GraphNodeSwitchCase *node) {
      }
  }
- 
+
 +static void make_roll_matrix(Mtx *mtx, s16 angle) {
 +    Mat4 temp;
 +
@@ -113,6 +113,6 @@ index 58238e83f..150cff68b 100644
      }
 -    mtxf_rotate_xy(rollMtx, node->rollScreen);
 +    make_roll_matrix(rollMtx, node->rollScreen);
- 
+
      gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
- 
+

@@ -352,7 +352,7 @@ struct HandheldShakePoint
  * A function that is called by CameraTriggers and cutscene shots.
  * These are concurrent: multiple CameraEvents can occur on the same frame.
  */
-typedef BAD_RETURN(s32) (*CameraEvent)(struct Camera *c);
+typedef void (*CameraEvent)(struct Camera *c);
 /**
  * The same type as a CameraEvent, but because these are generally longer, and happen in sequential
  * order, they're are called "shots," a term taken from cinematography.
@@ -880,7 +880,7 @@ void play_sound_cbutton_side(void);
 void play_sound_button_change_blocked(void);
 void play_sound_rbutton_changed(void);
 void play_sound_if_cam_switched_to_lakitu_or_mario(void);
-s32 radial_camera_input(struct Camera *c, UNUSED f32 unused);
+void radial_camera_input(struct Camera *c);
 s32 trigger_cutscene_dialog(s32 trigger);
 void handle_c_button_movement(struct Camera *c);
 void start_cutscene(struct Camera *c, u8 cutscene);

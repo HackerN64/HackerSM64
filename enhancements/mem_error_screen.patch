@@ -7,17 +7,17 @@ index f50b7622..124c7ec6 100644
  $(BUILD_DIR)/src/menu/star_select.o: $(BUILD_DIR)/include/text_strings.h
  $(BUILD_DIR)/src/game/ingame_menu.o: $(BUILD_DIR)/include/text_strings.h
 +$(BUILD_DIR)/src/boot/mem_error_screen.o: $(BUILD_DIR)/include/text_strings.h
- 
- 
+
+
  #==============================================================================#
 diff --git a/include/segments.h b/include/segments.h
 index a97d6ee8..186c968e 100644
 --- a/include/segments.h
 +++ b/include/segments.h
 @@ -3,6 +3,9 @@
- 
+
  #include "config.h"
- 
+
 +/* Use expansion pack RAM */
 +#define USE_EXT_RAM 1
 +
@@ -31,14 +31,14 @@ index 749179b1..2f6f7a3c 100644
 @@ -25,6 +25,11 @@
  #define TEXT_PAUSE _("PAUSE") // Pause text, Castle Courses
  #define TEXT_HUD_CONGRATULATIONS _("CONGRATULATIONS") // Course Complete Text, Bowser Courses
- 
+
 +// Memory Expansion Error Screen
 +#define TEXT_CONSOLE_8MB _("If you're using an N64 console, then you will need to buy an\nExpansion Pak to play this ROM hack.")
 +#define TEXT_PJ64 _("If you are using PJ64 1.6, go to:\nOptions > Settings > Rom Settings Tab > Memory Size\nthen select 8 MB from the drop-down box.")
 +#define TEXT_PJ64_2 _("If you are using PJ64 2.X, go to:\nOptions > Settings > Config: > Memory Size, select 8 MB")
 +
  #if defined(VERSION_JP) || defined(VERSION_SH)
- 
+
  /**
 diff --git a/levels/entry.c b/levels/entry.c
 index 17c773ed..677a5ae9 100644
@@ -62,9 +62,9 @@ index 30a87806..6bf7b79a 100644
 --- a/levels/intro/geo.c
 +++ b/levels/intro/geo.c
 @@ -15,6 +15,24 @@
- 
+
  #include "levels/intro/header.h"
- 
+
 +const GeoLayout intro_geo_error_screen[] = {
 +    GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
 +    GEO_OPEN_NODE(),
@@ -84,16 +84,16 @@ index 30a87806..6bf7b79a 100644
 +};
 +
  // 0x0E0002D0
- const GeoLayout intro_geo_0002D0[] = {
+ const GeoLayout intro_geo_splash_screen[] = {
     GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
 diff --git a/levels/intro/header.h b/levels/intro/header.h
 index 99277e86..04797cd7 100644
 --- a/levels/intro/header.h
 +++ b/levels/intro/header.h
-@@ -26,4 +26,8 @@ extern const LevelScript script_intro_L3[];
- extern const LevelScript script_intro_L4[];
- extern const LevelScript script_intro_L5[];
- 
+@@ -26,4 +26,8 @@ extern const LevelScript script_intro_main_level_entry_stop_music[];
+ extern const LevelScript script_intro_main_level_entry[];
+ extern const LevelScript script_intro_splash_screen[];
+
 +extern const GeoLayout intro_geo_error_screen[];
 +extern const LevelScript level_intro_entry_error_screen[];
 +extern Gfx *geo18_display_error_message(u32 run, UNUSED struct GraphNode *sp44, UNUSED u32 sp48);
@@ -106,7 +106,7 @@ index 04b8fc4c..ca9058c4 100644
 @@ -18,6 +18,21 @@
  #include "make_const_nonconst.h"
  #include "levels/intro/header.h"
- 
+
 +const LevelScript level_intro_entry_error_screen[] = {
 +    INIT_LEVEL(),
 +    FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
@@ -131,12 +131,12 @@ index d41a91c8..7d047236 100644
 +++ b/src/engine/level_script.h
 @@ -6,6 +6,7 @@
  struct LevelCommand;
- 
+
  extern u8 level_script_entry[];
 +extern u8 level_script_entry_error_screen[];
- 
+
  struct LevelCommand *level_script_execute(struct LevelCommand *cmd);
- 
+
 diff --git a/src/boot/main.c b/src/boot/main.c
 index 1a9d9e7e..f4f7a9e5 100644
 --- a/src/boot/main.c
@@ -146,13 +146,13 @@ index 1a9d9e7e..f4f7a9e5 100644
  #include "game/main.h"
  #include "game/rumble_init.h"
 +#include "mem_error_screen.h"
- 
+
  // Message IDs
  #define MESG_SP_COMPLETE 100
 @@ -131,6 +132,10 @@ void alloc_pool(void) {
      void *start = (void *) SEG_POOL_START;
      void *end = (void *) SEG_POOL_END;
- 
+
 +    // Detect memory size
 +    if (does_pool_end_lie_out_of_bounds(end))
 +        end = (void *)SEG_POOL_END_4MB;
@@ -163,14 +163,14 @@ index 1a9d9e7e..f4f7a9e5 100644
 @@ -336,7 +341,10 @@ void thread3_main(UNUSED void *arg) {
      create_thread(&gSoundThread, 4, thread4_sound, NULL, gThread4Stack + 0x2000, 20);
      osStartThread(&gSoundThread);
- 
+
 -    create_thread(&gGameLoopThread, 5, thread5_game_loop, NULL, gThread5Stack + 0x2000, 10);
 +    if (!gNotEnoughMemory)
 +        create_thread(&gGameLoopThread, 5, thread5_game_loop, NULL, gThread5Stack + 0x2000, 10);
 +    else
 +        create_thread(&gGameLoopThread, 5, thread5_mem_error_message_loop, NULL, gThread5Stack + 0x2000, 10);
      osStartThread(&gGameLoopThread);
- 
+
      while (TRUE) {
 diff --git a/src/boot/mem_error_screen.c b/src/boot/mem_error_screen.c
 new file mode 100644

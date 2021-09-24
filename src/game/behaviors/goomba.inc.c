@@ -67,9 +67,7 @@ static u8 sGoombaAttackHandlers[][6] = {
  * Update function for goomba triplet spawner.
  */
 void bhv_goomba_triplet_spawner_update(void) {
-    UNUSED s32 unused1;
     s16 goombaFlag;
-    UNUSED s16 unused2;
     s32 angle;
     s32 dAngle;
     s16 dx;

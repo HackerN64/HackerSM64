@@ -264,12 +264,12 @@ Refresh #7
 38.) Fix BBH texture (#908)
 
 Refresh #6
-1.) Make tools work on MinGW (#804) 
-2.) Document mario_misc (#628) 
-3.) add patch_libmalloc.py script to work around compiler crashes (#811) 
-4.) Label the coffins file. (#829) 
-5.) Convert enhancements into patches (#827) 
-6.) Document Tweester.inc.c (#840) 
+1.) Make tools work on MinGW (#804)
+2.) Document mario_misc (#628)
+3.) add patch_libmalloc.py script to work around compiler crashes (#811)
+4.) Label the coffins file. (#829)
+5.) Convert enhancements into patches (#827)
+6.) Document Tweester.inc.c (#840)
 7.) EU OK and cleanup EU (#782)
 
 Refresh #5
@@ -300,21 +300,21 @@ Refresh #4
 10.) Very minor white space fixes in Mario.c (#752)
 11.) Renamed GRAVITY to OBJ_PHYSICS (#755)
 12.) Use defined macros instead of literal values for interactions in behavior_data.c (#754)
-13.) iQue Player console detection + full support (#756) 
-14.) Fix Goddard Mario head for little endian etc. (#757) 
+13.) iQue Player console detection + full support (#756)
+14.) Fix Goddard Mario head for little endian etc. (#757)
 15.) Small bits of audio doc (#749)
-16.) Update diff script (#750) 
-17.) Nicer format for course/dialog text, enum for dialog IDs (#753) 
+16.) Update diff script (#750)
+17.) Nicer format for course/dialog text, enum for dialog IDs (#753)
 18.) first-diff: store most recent mtime during check (#759)
 19.) Use Lights1 struct for light values (#760)
-20.) Detect mips64-elf in diff.py (#761) 
-21.) Name display lists in gd renderer.c (#764) 
-22.) Document a variety of PU type crashes. (#765) 
-23.) Label object_behaviors. (#716) 
-24.) Update swoop.inc.c (#767) 
-25.) Label tilting_pyramid.inc.c (#768) 
-26.) Label red_coin.inc.c (#770) 
-27.) Use more level defines (#758) 
+20.) Detect mips64-elf in diff.py (#761)
+21.) Name display lists in gd renderer.c (#764)
+22.) Document a variety of PU type crashes. (#765)
+23.) Label object_behaviors. (#716)
+24.) Update swoop.inc.c (#767)
+25.) Label tilting_pyramid.inc.c (#768)
+26.) Label red_coin.inc.c (#770)
+27.) Use more level defines (#758)
 28.) Named Mario actions 6, 7, and 8 and noted causes of hands-free holding glitch (#769)
 
 Refresh #3
@@ -360,7 +360,7 @@ Changes from Refresh #1:
 6.) Merge ucode.bin and ucode_unk.bin
 7.) 64-bit fixes
 8.) [AUDIO] Match func_80316928
-9.) Documented bug in Tuxie's mother's code 
+9.) Documented bug in Tuxie's mother's code
 10.) [AUDIO] Slightly closer matching for process_level_music_dynamics
 11.) Name channel scripts in sequence 0
 12.) Nicer error message when sha1sum doesn't match

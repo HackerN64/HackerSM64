@@ -212,9 +212,6 @@
 
 // vcutm
 #define MODEL_VCUTM_SEESAW_PLATFORM               0x36        // vcutm_geo_0001F0
-#define MODEL_VCUTM_CHECKERBOARD_PLATFORM_SPAWNER 0x37        //! @bug this object doesn't have a geo associated with it, yet is placed in vcutm.
-                                                              //  This causes a crash when the player quickly looks towards the
-                                                              //  checkerboard platforms after spawning but before it is unloaded.
 
 // bitfs
 #define MODEL_BITFS_PLATFORM_ON_TRACK             0x36        // bitfs_geo_000758

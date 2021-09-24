@@ -12,7 +12,7 @@ f32 round_double_to_float(f64);
  * This check forces RTZ bug on vc
  * If console is N64/adequate Emu round-to-nearest (RTN) rounding mode is used
  * If console is VC round-to-zero (RTZ) mode is used
- * 
+ *
  * The double value 0.9999999999999999 used is 0x3FEFFFFFFFFFFFFF in binary
  * Exponent=01111111110, Mantissa=1111111111111111111111111111111111111111111111111111
  * RTZ will output not 1.0f, RTN will output exactly 1.0f

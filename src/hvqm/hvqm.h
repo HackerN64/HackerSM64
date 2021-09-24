@@ -8,7 +8,7 @@
 #define HVQ_SPFIFO_SIZE   30000
 
 /*
- * Size of buffer for video records 
+ * Size of buffer for video records
  */
 #define HVQ_DATASIZE_MAX  40000
 
@@ -58,7 +58,7 @@
 #define  PCMBUF_SIZE     0xA00
 
 /*
- * Macro for loading multi-byte data from buffer holding data from stream 
+ * Macro for loading multi-byte data from buffer holding data from stream
  */
 #define load32(from) (*(u32*)&(from))
 #define load16(from) (*(u16*)&(from))

@@ -12,8 +12,8 @@
 #define TIMER_CONTROL_HIDE                0x03
 
 #define WARP_OP_NONE                      0x00
-#define WARP_OP_UNKNOWN_01                0x01
-#define WARP_OP_UNKNOWN_02                0x02
+#define WARP_OP_LOOK_UP                   0x01
+#define WARP_OP_SPIN_SHRINK               0x02
 #define WARP_OP_WARP_DOOR                 0x03
 #define WARP_OP_WARP_OBJECT               0x04
 #define WARP_OP_TELEPORT                  0x05
@@ -28,6 +28,18 @@
 #define WARP_OP_DEMO_END                  0x19
 
 #define WARP_OP_TRIGGERS_LEVEL_SELECT     0x10
+
+#define WARP_SPECIAL_LEVEL_SELECT           -9
+#define WARP_SPECIAL_INTRO_SPLASH_SCREEN    -8
+#define WARP_SPECIAL_MARIO_HEAD_DIZZY       -3
+#define WARP_SPECIAL_MARIO_HEAD_REGULAR     -2
+#define WARP_SPECIAL_ENDING                 -1
+#define WARP_SPECIAL_NONE                    0
+
+#define WARP_FLAGS_NONE                   (0 << 0) // 0x00
+#define WARP_FLAG_DOOR_PULLED             (1 << 0) // 0x01
+#define WARP_FLAG_DOOR_FLIP_MARIO         (1 << 1) // 0x02
+#define WARP_FLAG_DOOR_IS_WARP            (1 << 2) // 0x04
 
 #define MARIO_SPAWN_DOOR_WARP             0x01
 #define MARIO_SPAWN_UNKNOWN_02            0x02
@@ -68,7 +80,6 @@ extern struct MarioState *gMarioState;
 extern s16 sCurrPlayMode;
 extern s16 sTransitionTimer;
 extern void (*sTransitionUpdate)(s16 *);
-extern u8 unused3[4];
 extern void load_language_text(void);
 
 struct WarpDest {
@@ -86,7 +97,6 @@ extern s16 sDelayedWarpOp;
 extern s16 sDelayedWarpTimer;
 extern s16 sSourceWarpNodeId;
 extern s32 sDelayedWarpArg;
-extern u8 unused4[2];
 extern s8 sTimerRunning;
 
 struct HudDisplay {

@@ -105,9 +105,9 @@ void bhv_lll_moving_octagonal_mesh_platform_loop(void) {
             lll_octagonal_mesh_move(gLllOctagonalMeshActionList[o->oBehParams2ndByte], o->oLllOctMeshActionOffset);
     print_debug_top_down_objectinfo("number %d\n", o->oLllOctMeshActionOffset);
     cur_obj_move_using_fvel_and_gravity();
-    if (lll_octagonal_mesh_find_y_offset(&o->oLllOctMeshStandTimer, &o->oLllOctMeshWaveOffset2, 0x400, -80)) {
+    if (lll_octagonal_mesh_find_y_offset(&o->oLllOctMeshStandTimer, &o->oLllOctMeshYOffsetFromHome, 0x400, -80)) {
         o->oLllOctMeshWaveTimer += 0x800;
-        o->oLllOctMeshWaveOffset1 -= sins(o->oLllOctMeshWaveTimer) * 2;
+        o->oLllOctMeshWaveYOffset -= sins(o->oLllOctMeshWaveTimer) * 2;
     }
-    o->oPosY = o->oLllOctMeshWaveOffset1 + o->oHomeY + o->oLllOctMeshWaveOffset2;
+    o->oPosY = o->oLllOctMeshWaveYOffset + o->oHomeY + o->oLllOctMeshYOffsetFromHome;
 }

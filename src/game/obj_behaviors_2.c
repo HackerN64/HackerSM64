@@ -109,7 +109,7 @@ s32 obj_is_near_to_and_facing_mario(f32 maxDist, s16 maxAngleDiff) {
 
 //! Although having no return value, this function
 //! must be u32 to match other functions on -O2.
-BAD_RETURN(u32) obj_perform_position_op(s32 op) {
+static void obj_perform_position_op(s32 op) {
     switch (op) {
         case POS_OP_SAVE_POSITION:
             sObjSavedPosX = o->oPosX;
@@ -136,7 +136,6 @@ void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, f32 x, f32 y, f32
     struct Waypoint *initialPrevWaypoint;
     struct Waypoint *nextWaypoint;
     struct Waypoint *prevWaypoint;
-    UNUSED s32 unused;
     f32 amountToMove;
     f32 dx;
     f32 dy;
@@ -175,7 +174,7 @@ void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, f32 x, f32 y, f32
             dy = nextWaypoint->pos[1] - y;
             dz = nextWaypoint->pos[2] - z;
 
-            distToNextWaypoint = sqrtf(dx * dx + dy * dy + dz * dz);
+            distToNextWaypoint = sqrtf(sqr(dx) + sqr(dy) + sqr(dz));
 
             // Move directly to the next waypoint, even if it's farther away
             // than amountToMove
@@ -840,7 +839,7 @@ void treat_far_home_as_mario(f32 threshold) {
     f32 dx = o->oHomeX - o->oPosX;
     f32 dy = o->oHomeY - o->oPosY;
     f32 dz = o->oHomeZ - o->oPosZ;
-    f32 distance = sqrtf(dx * dx + dy * dy + dz * dz);
+    f32 distance = sqrtf(sqr(dx) + sqr(dy) + sqr(dz));
 
     if (distance > threshold) {
         o->oAngleToMario = atan2s(dz, dx);
@@ -849,7 +848,7 @@ void treat_far_home_as_mario(f32 threshold) {
         dx = o->oHomeX - gMarioObject->oPosX;
         dy = o->oHomeY - gMarioObject->oPosY;
         dz = o->oHomeZ - gMarioObject->oPosZ;
-        distance = sqrtf(dx * dx + dy * dy + dz * dz);
+        distance = sqrtf(sqr(dx) + sqr(dy) + sqr(dz));
 
         if (distance > threshold) {
             o->oDistanceToMario = 20000.0f;

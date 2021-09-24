@@ -76,7 +76,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     f32 floorHeight;
 
     resolve_and_return_wall_collisions(nextPos, 10.0f, 110.0f, &wallData);
-	wall = wallData.numWalls == 0 ? NULL : wallData.walls[0];
+    wall = wallData.numWalls == 0 ? NULL : wallData.walls[0];
     floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
 
@@ -139,8 +139,8 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
             f32 dy = whirlpool->pos[1] - m->pos[1];
             f32 dz = whirlpool->pos[2] - m->pos[2];
 
-            f32 lateralDist = sqrtf(dx * dx + dz * dz);
-            f32 distance = sqrtf(lateralDist * lateralDist + dy * dy);
+            f32 lateralDist = sqrtf(sqr(dx) + sqr(dz));
+            f32 distance = sqrtf(lateralDist * lateralDist + sqr(dy));
 
             s16 pitchToWhirlpool = atan2s(lateralDist, dy);
             s16 yawToWhirlpool = atan2s(dz, dx);
@@ -167,7 +167,6 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
 }
 
 static u32 perform_water_step(struct MarioState *m) {
-    UNUSED u32 unused;
     u32 stepResult;
     Vec3f nextPos;
     Vec3f step;
@@ -196,7 +195,7 @@ static u32 perform_water_step(struct MarioState *m) {
     return stepResult;
 }
 
-static BAD_RETURN(u32) update_water_pitch(struct MarioState *m) {
+static void update_water_pitch(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
 
     if (marioObj->header.gfx.angle[0] > 0) {
@@ -1050,7 +1049,7 @@ static s32 act_caught_in_whirlpool(struct MarioState *m) {
 
     f32 dx = m->pos[0] - whirlpool->oPosX;
     f32 dz = m->pos[2] - whirlpool->oPosZ;
-    f32 distance = sqrtf(dx * dx + dz * dz);
+    f32 distance = sqrtf(sqr(dx) + sqr(dz));
 
     if ((marioObj->oMarioWhirlpoolPosY += m->vel[1]) < 0.0f) {
         marioObj->oMarioWhirlpoolPosY = 0.0f;

@@ -151,8 +151,8 @@ void orbit_from_positions(Vec3s from, Vec3s to, s16 *radius, s16 *pitch, s16 *ya
     f32 dy = to[1] - from[1];
     f32 dz = to[2] - from[2];
 
-    *radius = (s16) sqrtf(dx * dx + dy * dy + dz * dz);
-    *pitch = atan2s(sqrtf(dx * dx + dz * dz), dy);
+    *radius = (s16) sqrtf(sqr(dx) + sqr(dy) + sqr(dz));
+    *pitch = atan2s(sqrtf(sqr(dx) + sqr(dz)), dy);
     *yaw = atan2s(dz, dx);
 }
 

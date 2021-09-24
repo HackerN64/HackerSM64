@@ -239,9 +239,7 @@ s32 render_screen_transition(s8 fadeTimer, s8 transType, u8 transTime, struct Wa
             return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR);
             break;
     }
-#ifdef AVOID_UB
     return 0;
-#endif
 }
 
 Gfx *render_cannon_circle_base(void) {
@@ -297,7 +295,7 @@ Gfx *geo_cannon_circle_base(s32 callContext, struct GraphNode *node, UNUSED Mat4
 
     if (callContext == GEO_CONTEXT_RENDER && gCurrentArea != NULL
         && gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
-        graphNode->fnNode.node.flags = (graphNode->fnNode.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8);
+        SET_GRAPH_NODE_LAYER(graphNode->fnNode.node.flags, LAYER_TRANSPARENT);
 #ifndef L3DEX2_ALONE
         dlist = render_cannon_circle_base();
 #endif

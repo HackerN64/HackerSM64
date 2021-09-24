@@ -9,7 +9,7 @@ void bhv_black_smoke_bowser_loop(void) {
         o->oForwardVel = random_float() * 2 + 0.5;
         o->oMoveAngleYaw = random_u16();
         o->oVelY = 8;
-        o->oBlackSmokeBowserUnkF4 = o->header.gfx.scale[0];
+        o->oFlameScale = o->header.gfx.scale[0];
     }
     o->oMoveAngleYaw += o->oAngleVelYaw;
     o->oPosY += o->oVelY;

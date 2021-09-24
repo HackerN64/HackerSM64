@@ -21,8 +21,8 @@ s32 check_mario_attacking(void) {
 }
 
 void init_kickable_board_rock(void) {
-    o->oKickableBoardF8 = 1600;
-    o->oKickableBoardF4 = 0;
+    o->oKickableBoardRockingTimer = 1600;
+    o->oKickableBoardRockingAngleAmount = 0;
 }
 
 void bhv_kickable_board_loop(void) {
@@ -39,7 +39,7 @@ void bhv_kickable_board_loop(void) {
         case 1:
             o->oFaceAnglePitch = 0;
             load_object_collision_model();
-            o->oFaceAnglePitch = -sins(o->oKickableBoardF4) * o->oKickableBoardF8;
+            o->oFaceAnglePitch = -sins(o->oKickableBoardRockingAngleAmount) * o->oKickableBoardRockingTimer;
             if (o->oTimer > 30 && (attackValue = check_mario_attacking())) {
                 if (gMarioObject->oPosY > o->oPosY + 160.0f && attackValue == 2) {
                     o->oAction++;
@@ -48,14 +48,14 @@ void bhv_kickable_board_loop(void) {
                     o->oTimer = 0;
             }
             if (o->oTimer != 0) {
-                o->oKickableBoardF8 -= 8;
-                if (o->oKickableBoardF8 < 0)
+                o->oKickableBoardRockingTimer -= 8;
+                if (o->oKickableBoardRockingTimer < 0)
                     o->oAction = 0;
             } else
                 init_kickable_board_rock();
-            if (!(o->oKickableBoardF4 & 0x7FFF))
+            if (!(o->oKickableBoardRockingAngleAmount & 0x7FFF))
                 cur_obj_play_sound_2(SOUND_GENERAL_BUTTON_PRESS_2);
-            o->oKickableBoardF4 += 0x400;
+            o->oKickableBoardRockingAngleAmount += 0x400;
             break;
         case 2:
             cur_obj_become_intangible();

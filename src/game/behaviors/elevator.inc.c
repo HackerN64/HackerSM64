@@ -1,11 +1,11 @@
 // elevator.c.inc
 
-static s16 sElevatorHeights[] = {   -51,    0, 0, 
-                                    -461,    0, 0, 
-                                    -512,    0, 0, 
-                                   -2611,    0, 0, 
-                                   -2360,    0, 0, 
-                                     214,    0, 0, 
+static s16 sElevatorHeights[] = {   -51,    0, 0,
+                                    -461,    0, 0,
+                                    -512,    0, 0,
+                                   -2611,    0, 0,
+                                   -2360,    0, 0,
+                                     214,    0, 0,
                                      -50, 1945, 1 };
 
 void elevator_starting_shake(void) {
@@ -15,19 +15,19 @@ void elevator_starting_shake(void) {
 
 void elevator_act_0(void) {
     o->oVelY = 0;
-    if (o->oElevatorUnk100 == 2) {
+    if (o->oElevatorType == 2) {
         if (gMarioObject->platform == o) {
-            if (o->oPosY > o->oElevatorUnkFC)
+            if (o->oPosY > o->oElevatorMidY)
                 o->oAction = 2;
             else
                 o->oAction = 1;
         }
-    } else if (gMarioObject->oPosY > o->oElevatorUnkFC || o->oElevatorUnk100 == 1) {
-        o->oPosY = o->oElevatorUnkF8;
+    } else if (gMarioObject->oPosY > o->oElevatorMidY || o->oElevatorType == 1) {
+        o->oPosY = o->oElevatorMaxY;
         if (gMarioObject->platform == o)
             o->oAction = 2;
     } else {
-        o->oPosY = o->oElevatorUnkF4;
+        o->oPosY = o->oElevatorMinY;
         if (gMarioObject->platform == o)
             o->oAction = 1;
     }
@@ -39,11 +39,11 @@ void elevator_act_1(void) {
         elevator_starting_shake();
     approach_f32_signed(&o->oVelY, 10.0f, 2.0f);
     o->oPosY += o->oVelY;
-    if (o->oPosY > o->oElevatorUnkF8) {
-        o->oPosY = o->oElevatorUnkF8;
-        if (o->oElevatorUnk100 == 2 || o->oElevatorUnk100 == 1)
+    if (o->oPosY > o->oElevatorMaxY) {
+        o->oPosY = o->oElevatorMaxY;
+        if (o->oElevatorType == 2 || o->oElevatorType == 1)
             o->oAction = 3;
-        else if (gMarioObject->oPosY < o->oElevatorUnkFC)
+        else if (gMarioObject->oPosY < o->oElevatorMidY)
             o->oAction = 2;
         else
             o->oAction = 3;
@@ -57,13 +57,13 @@ void elevator_act_2(void) // Pretty similar code to action 1
         elevator_starting_shake();
     approach_f32_signed(&o->oVelY, -10.0f, -2.0f);
     o->oPosY += o->oVelY;
-    if (o->oPosY < o->oElevatorUnkF4) {
-        o->oPosY = o->oElevatorUnkF4;
-        if (o->oElevatorUnk100 == 1)
+    if (o->oPosY < o->oElevatorMinY) {
+        o->oPosY = o->oElevatorMinY;
+        if (o->oElevatorType == 1)
             o->oAction = 4;
-        else if (o->oElevatorUnk100 == 2)
+        else if (o->oElevatorType == 2)
             o->oAction = 3;
-        else if (gMarioObject->oPosY > o->oElevatorUnkFC)
+        else if (gMarioObject->oPosY > o->oElevatorMidY)
             o->oAction = 1;
         else
             o->oAction = 3;
@@ -94,15 +94,15 @@ void elevator_act_3(void) // nearly identical to action 2
 void bhv_elevator_init(void) {
     s32 index = sElevatorHeights[o->oBehParams2ndByte * 3 + 2];
     if (index == 0) {
-        o->oElevatorUnkF4 = sElevatorHeights[o->oBehParams2ndByte * 3];
-        o->oElevatorUnkF8 = o->oHomeY;
-        o->oElevatorUnkFC = (o->oElevatorUnkF4 + o->oElevatorUnkF8) / 2;
-        o->oElevatorUnk100 = cur_obj_has_behavior(bhvRrElevatorPlatform);
+        o->oElevatorMinY = sElevatorHeights[o->oBehParams2ndByte * 3];
+        o->oElevatorMaxY = o->oHomeY;
+        o->oElevatorMidY = (o->oElevatorMinY + o->oElevatorMaxY) / 2;
+        o->oElevatorType = cur_obj_has_behavior(bhvRrElevatorPlatform);
     } else {
-        o->oElevatorUnkF4 = sElevatorHeights[o->oBehParams2ndByte * 3];
-        o->oElevatorUnkF8 = sElevatorHeights[o->oBehParams2ndByte * 3 + 1];
-        o->oElevatorUnkFC = (o->oElevatorUnkF4 + o->oElevatorUnkF8) / 2;
-        o->oElevatorUnk100 = 2;
+        o->oElevatorMinY = sElevatorHeights[o->oBehParams2ndByte * 3];
+        o->oElevatorMaxY = sElevatorHeights[o->oBehParams2ndByte * 3 + 1];
+        o->oElevatorMidY = (o->oElevatorMinY + o->oElevatorMaxY) / 2;
+        o->oElevatorType = 2;
     }
 }
 

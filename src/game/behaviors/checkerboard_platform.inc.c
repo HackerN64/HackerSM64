@@ -27,7 +27,7 @@ void bhv_checkerboard_elevator_group_init(void) {
 
         platformObj = spawn_object_relative(i, 0, i * relativePosY, relativePosZ, o, MODEL_CHECKERBOARD_PLATFORM,
                                      bhvCheckerboardPlatformSub);
-        platformObj->oCheckerBoardPlatformUnk1AC = sCheckerBoardPlatformInitPositions[type].radius;
+        platformObj->oCheckerBoardPlatformRadius = sCheckerBoardPlatformInitPositions[type].radius;
         vec3f_copy_2(platformObj->header.gfx.scale, sCheckerBoardPlatformInitPositions[type].scale);
     }
 }
@@ -46,16 +46,16 @@ void checkerboard_plat_act_rotate(s32 nextAction, s16 pitch) {
     o->oAngleVelPitch = pitch;
     if (o->oTimer + 1 == 0x8000 / absi(pitch))
         o->oAction = nextAction;
-    o->oCheckerBoardPlatformUnkF8 = nextAction;
+    o->oCheckerBoardPlatformRotateAction = nextAction;
 }
 
 void bhv_checkerboard_platform_init(void) {
-    o->oCheckerBoardPlatformUnkFC = o->parentObj->oBehParams2ndByte;
+    o->oCheckerBoardPlatformHeight = o->parentObj->oBehParams2ndByte;
 }
 
 void bhv_checkerboard_platform_loop(void) {
-    f32 radius = o->oCheckerBoardPlatformUnk1AC;
-    o->oCheckerBoardPlatformUnkF8 = 0;
+    f32 radius = o->oCheckerBoardPlatformRadius;
+    o->oCheckerBoardPlatformRotateAction = 0;
     if (o->oDistanceToMario < 1000.0f)
         cur_obj_play_sound_1(SOUND_ENV_ELEVATOR4);
     switch (o->oAction) {
@@ -66,13 +66,13 @@ void bhv_checkerboard_platform_loop(void) {
                 o->oAction = 3;
             break;
         case 1:
-            checkerboard_plat_act_move_y(2, 10.0f, o->oCheckerBoardPlatformUnkFC);
+            checkerboard_plat_act_move_y(2, 10.0f, o->oCheckerBoardPlatformHeight);
             break;
         case 2:
             checkerboard_plat_act_rotate(3, 512);
             break;
         case 3:
-            checkerboard_plat_act_move_y(4, -10.0f, o->oCheckerBoardPlatformUnkFC);
+            checkerboard_plat_act_move_y(4, -10.0f, o->oCheckerBoardPlatformHeight);
             break;
         case 4:
             checkerboard_plat_act_rotate(1, -512);
@@ -85,7 +85,7 @@ void bhv_checkerboard_platform_loop(void) {
         o->oForwardVel = signum_positive(o->oAngleVelPitch) * sins(o->oMoveAnglePitch) * radius;
         o->oVelY = signum_positive(o->oAngleVelPitch) * coss(o->oMoveAnglePitch) * radius;
     }
-    if (o->oCheckerBoardPlatformUnkF8 == 1) {
+    if (o->oCheckerBoardPlatformRotateAction == 1) {
         o->oAngleVelPitch = 0;
         o->oFaceAnglePitch &= ~0x7FFF;
         cur_obj_move_using_fvel_and_gravity();

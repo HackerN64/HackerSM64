@@ -80,7 +80,7 @@ struct ar_header {
 
 //These constants found by inspecting output of objdump
 #define FLAGS_MIPS3 0x20
-#define FLAGS_O32ABI 0x100000 
+#define FLAGS_O32ABI 0x100000
 
 int fix_mips_elf(FILE *f, size_t filesize)
 {

@@ -174,7 +174,7 @@ SECTIONS
       */libgcc.a:*.o(.text);
       */libz.a:*.o(.text);
       */libhvqm2.a:*.o(.text);
-      BUILD_DIR/lib/rsp.o(.text);   
+      BUILD_DIR/lib/rsp.o(.text);
       lib/PR/hvqm/hvqm2sp1.o(.text);
       _mainSegmentTextEnd = .;
 
@@ -508,7 +508,7 @@ SECTIONS
       KEEP(BUILD_DIR/sound/sound_data.o(.data));
    }
    END_SEG(assets)
-#ifdef HVQM 
+#ifdef HVQM
    BEGIN_SEG(capcom, __romPos) SUBALIGN(2)
    {
       KEEP(BUILD_DIR/data/capcom.o(.data));

@@ -237,7 +237,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
 
     // Initialize object fields
 
-    obj->activeFlags = ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_UNK8;
+    obj->activeFlags = ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_ALLOCATED;
     obj->parentObj = obj;
     obj->prevObj = NULL;
     obj->collidedObjInteractTypes = 0;

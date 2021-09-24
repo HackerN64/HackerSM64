@@ -13,7 +13,7 @@ index b961ca52..adfde049 100644
 @@ -386,6 +387,45 @@ void display_and_vsync(void) {
  // Controls
  // ----------------------------------------------------------------------------------------------------
- 
+
 +/*
 + * This enhancement allows you to record gameplay demos for the mario head screen.
 + *
@@ -59,7 +59,7 @@ index b961ca52..adfde049 100644
 @@ -420,6 +460,118 @@ UNUSED static void record_demo(void) {
      gRecordedDemoInput.timer++;
  }
- 
+
 +void record_new_demo_input(void) {
 +    if (gRecordedDemoInput.timer == 1 && gRecordedDemoInputCopy.timer > 0) {
 +        gRecordedInputs[gNumOfRecordedInputs].timer = gRecordedDemoInputCopy.timer;
@@ -181,5 +181,5 @@ index b961ca52..adfde049 100644
          read_controller_inputs();
 +        recordingDemo();
          addr = level_script_execute(addr);
- 
+
          display_and_vsync();

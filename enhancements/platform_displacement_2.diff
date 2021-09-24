@@ -11,7 +11,7 @@ index 0000000..6bf33a8
 +@@ -972,6 +972,8 @@ s32 bowser_check_fallen_off_stage(void) // bowser off stage?
 +     return 0;
 + }
-+ 
++
 ++struct PlatformDisplacementInfo sBowserDisplacementInfo;
 ++
 + void (*sBowserActions[])(void) = { bowser_act_default,  bowser_act_thrown_dropped,  bowser_act_jump_onto_stage,  bowser_act_dance,
@@ -37,7 +37,7 @@ index 0000000..6bf33a8
 +-        set_mario_pos(mx, my, mz);
 ++        //set_mario_pos(mx, my, mz);
 +     }
-+ 
++
 +     o->header.gfx.throwMatrix = transform;
 +diff --git a/src/game/platform_displacement.c b/src/game/platform_displacement.c
 +index 29a741c..d1bb016 100644
@@ -48,13 +48,13 @@ index 0000000..6bf33a8
 + #include "platform_displacement.h"
 + #include "types.h"
 ++#include "sm64.h"
-+ 
++
 + u16 D_8032FEC0 = 0;
-+ 
++
 +@@ -84,96 +85,139 @@ void set_mario_pos(f32 x, f32 y, f32 z) {
 +     gMarioStates[0].pos[2] = z;
 + }
-+ 
++
 +-/**
 +- * Apply one frame of platform rotation to Mario or an object using the given
 +- * platform. If isMario is 0, use gCurrentObject.
@@ -92,13 +92,13 @@ index 0000000..6bf33a8
 +-    z += platform->oVelZ;
 ++static struct PlatformDisplacementInfo sMarioDisplacementInfo;
 ++static Vec3f sMarioAmountDisplaced;
-+ 
++
 +-    if (rotation[0] != 0 || rotation[1] != 0 || rotation[2] != 0) {
 +-        unused1 = rotation[0];
 +-        unused2 = rotation[2];
 +-        unused3 = platform->oFaceAngleYaw;
 ++extern s32 gGlobalTimer;
-+ 
++
 +-        if (isMario) {
 +-            gMarioStates[0].faceAngle[1] += rotation[1];
 +-        }
@@ -131,7 +131,7 @@ index 0000000..6bf33a8
 ++		dst[2] = src[2] * scale[2];
 ++	}
 ++}
-+ 
++
 +-        rotation[0] = platform->oFaceAnglePitch;
 +-        rotation[1] = platform->oFaceAngleYaw;
 +-        rotation[2] = platform->oFaceAngleRoll;
@@ -202,19 +202,19 @@ index 0000000..6bf33a8
 ++	displaceInfo->prevPlatform = platform;
 ++	displaceInfo->prevTimer = gGlobalTimer;
 ++}
-+ 
++
 +-        mtxf_rotate_zxy_and_translate(displaceMatrix, currentObjectOffset, rotation);
 +-        linear_mtxf_mul_vec3f(displaceMatrix, newObjectOffset, relativeOffset);
 ++// Doesn't change in the code, set this to FALSE if you don't want inertia
 ++u8 gDoInertia = TRUE;
-+ 
++
 +-        x = platformPosX + newObjectOffset[0];
 +-        y = platformPosY + newObjectOffset[1];
 +-        z = platformPosZ + newObjectOffset[2];
 +-    }
 ++static u8 sShouldApplyInertia = FALSE;
 ++static u8 sInertiaFirstFrame = FALSE;
-+ 
++
 +-    if (isMario) {
 +-        set_mario_pos(x, y, z);
 +-    } else {
@@ -244,14 +244,14 @@ index 0000000..6bf33a8
 ++		sShouldApplyInertia = FALSE;
 ++	}
 + }
-+ 
++
 + /**
 +- * If Mario's platform is not null, apply platform displacement.
 ++ * Apply platform displacement or inertia if required.
 +  */
 + void apply_mario_platform_displacement(void) {
 +     struct Object *platform;
-+ 
++
 +     platform = gMarioPlatform;
 +-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL && platform != NULL) {
 +-        apply_platform_displacement(1, platform);
@@ -266,15 +266,15 @@ index 0000000..6bf33a8
 ++		}
 +     }
 + }
-+ 
++
 +diff --git a/src/game/platform_displacement.h b/src/game/platform_displacement.h
 +index 556192b..3609e2d 100644
 +--- a/src/game/platform_displacement.h
 ++++ b/src/game/platform_displacement.h
 +@@ -5,10 +5,19 @@
-+ 
++
 + #include "types.h"
-+ 
++
 ++struct PlatformDisplacementInfo {
 ++	Vec3f prevPos;
 ++	Vec3f prevTransformedPos;
@@ -299,7 +299,7 @@ index 97cba2a..410e612 100644
 @@ -972,6 +972,8 @@ s32 bowser_check_fallen_off_stage(void) // bowser off stage?
      return 0;
  }
- 
+
 +struct PlatformDisplacementInfo sBowserDisplacementInfo;
 +
  void (*sBowserActions[])(void) = { bowser_act_default,  bowser_act_thrown_dropped,  bowser_act_jump_onto_stage,  bowser_act_dance,
@@ -1595,9 +1595,9 @@ index 0000000..97cba2a
 +        if (gCurGraphNodeHeldObject != 0)
 +            sp24 = gCurGraphNodeHeldObject->objNode;
 +        if (sp24->oOpacity == 0xFF)
-+            sp20->fnNode.node.flags = (sp20->fnNode.node.flags & 0xFF) | GRAPH_NODE_TYPE_FUNCTIONAL;
++            SET_GRAPH_NODE_LAYER(sp20->fnNode.node.flags, LAYER_OPAQUE);
 +        else
-+            sp20->fnNode.node.flags = (sp20->fnNode.node.flags & 0xFF) | (GRAPH_NODE_TYPE_FUNCTIONAL | GRAPH_NODE_TYPE_400);
++            SET_GRAPH_NODE_LAYER(sp20->fnNode.node.flags, LAYER_TRANSPARENT);
 +        sp28 = sp2C = alloc_display_list(2 * sizeof(Gfx));
 +
 +        if (sp24->oBowserUnk1B2 != 0) {
@@ -1938,7 +1938,7 @@ index ebce64f..29136e9 100644
 -        set_mario_pos(mx, my, mz);
 +        //set_mario_pos(mx, my, mz);
      }
- 
+
      o->header.gfx.throwMatrix = transform;
 diff --git a/src/game/platform_displacement.c b/src/game/platform_displacement.c
 index 9153bc4..1e8cd86 100644
@@ -1949,13 +1949,13 @@ index 9153bc4..1e8cd86 100644
  #include "platform_displacement.h"
  #include "types.h"
 +#include "sm64.h"
- 
+
  u16 D_8032FEC0 = 0;
- 
+
 @@ -84,98 +85,144 @@ void set_mario_pos(f32 x, f32 y, f32 z) {
      gMarioStates[0].pos[2] = z;
  }
- 
+
 -/**
 - * Apply one frame of platform rotation to Mario or an object using the given
 - * platform. If isMario is false, use gCurrentObject.
@@ -1998,12 +1998,12 @@ index 9153bc4..1e8cd86 100644
 -        unused3 = platform->oFaceAngleYaw;
 +static struct PlatformDisplacementInfo sMarioDisplacementInfo;
 +static Vec3f sMarioAmountDisplaced;
- 
+
 -        if (isMario) {
 -            gMarioStates[0].faceAngle[1] += rotation[1];
 -        }
 +extern s32 gGlobalTimer;
- 
+
 -        platformPosX = platform->oPosX;
 -        platformPosY = platform->oPosY;
 -        platformPosZ = platform->oPosZ;
@@ -2032,7 +2032,7 @@ index 9153bc4..1e8cd86 100644
 +		dst[2] = src[2] * scale[2];
 +	}
 +}
- 
+
 -        rotation[0] = platform->oFaceAnglePitch;
 -        rotation[1] = platform->oFaceAngleYaw;
 -        rotation[2] = platform->oFaceAngleRoll;
@@ -2103,19 +2103,19 @@ index 9153bc4..1e8cd86 100644
 +	displaceInfo->prevPlatform = platform;
 +	displaceInfo->prevTimer = gGlobalTimer;
 +}
- 
+
 -        mtxf_rotate_zxy_and_translate(displaceMatrix, currentObjectOffset, rotation);
 -        linear_mtxf_mul_vec3f(displaceMatrix, newObjectOffset, relativeOffset);
 +// Doesn't change in the code, set this to FALSE if you don't want inertia
 +u8 gDoInertia = TRUE;
- 
+
 -        x = platformPosX + newObjectOffset[0];
 -        y = platformPosY + newObjectOffset[1];
 -        z = platformPosZ + newObjectOffset[2];
 -    }
 +static u8 sShouldApplyInertia = FALSE;
 +static u8 sInertiaFirstFrame = FALSE;
- 
+
 -    if (isMario) {
 -        set_mario_pos(x, y, z);
 -    } else {
@@ -2145,7 +2145,7 @@ index 9153bc4..1e8cd86 100644
 +		sShouldApplyInertia = FALSE;
 +	}
  }
- 
+
  /**
 - * If Mario's platform is not null, apply platform displacement.
 + * Apply platform displacement or inertia if required.
@@ -2169,7 +2169,7 @@ index 9153bc4..1e8cd86 100644
 +		}
      }
  }
- 
+
 +
 +
  #ifndef VERSION_JP
@@ -2378,7 +2378,7 @@ index 0000000..ff20eca
 +@@ -85,96 +86,139 @@ void set_mario_pos(f32 x, f32 y, f32 z) {
 +     gMarioStates[0].pos[2] = z;
 + }
-+ 
++
 +-/**
 +- * Apply one frame of platform rotation to Mario or an object using the given
 +- * platform. If isMario is 0, use gCurrentObject.
@@ -2416,13 +2416,13 @@ index 0000000..ff20eca
 +-    z += platform->oVelZ;
 ++static struct PlatformDisplacementInfo sMarioDisplacementInfo;
 ++static Vec3f sMarioAmountDisplaced;
-+ 
++
 +-    if (rotation[0] != 0 || rotation[1] != 0 || rotation[2] != 0) {
 +-        unused1 = rotation[0];
 +-        unused2 = rotation[2];
 +-        unused3 = platform->oFaceAngleYaw;
 ++extern s32 gGlobalTimer;
-+ 
++
 +-        if (isMario) {
 +-            gMarioStates[0].faceAngle[1] += rotation[1];
 +-        }
@@ -2455,7 +2455,7 @@ index 0000000..ff20eca
 ++		dst[2] = src[2] * scale[2];
 ++	}
 ++}
-+ 
++
 +-        rotation[0] = platform->oFaceAnglePitch;
 +-        rotation[1] = platform->oFaceAngleYaw;
 +-        rotation[2] = platform->oFaceAngleRoll;
@@ -2526,19 +2526,19 @@ index 0000000..ff20eca
 ++	displaceInfo->prevPlatform = platform;
 ++	displaceInfo->prevTimer = gGlobalTimer;
 ++}
-+ 
++
 +-        mtxf_rotate_zxy_and_translate(displaceMatrix, currentObjectOffset, rotation);
 +-        linear_mtxf_mul_vec3f(displaceMatrix, newObjectOffset, relativeOffset);
 ++// Doesn't change in the code, set this to FALSE if you don't want inertia
 ++u8 gDoInertia = TRUE;
-+ 
++
 +-        x = platformPosX + newObjectOffset[0];
 +-        y = platformPosY + newObjectOffset[1];
 +-        z = platformPosZ + newObjectOffset[2];
 +-    }
 ++static u8 sShouldApplyInertia = FALSE;
 ++static u8 sInertiaFirstFrame = FALSE;
-+ 
++
 +-    if (isMario) {
 +-        set_mario_pos(x, y, z);
 +-    } else {
@@ -2568,14 +2568,14 @@ index 0000000..ff20eca
 ++		sShouldApplyInertia = FALSE;
 ++	}
 + }
-+ 
++
 + /**
 +- * If Mario's platform is not null, apply platform displacement.
 ++ * Apply platform displacement or inertia if required.
 +  */
 + void apply_mario_platform_displacement(void) {
 +     struct Object *platform;
-+ 
++
 +     platform = gMarioPlatform;
 +-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL && platform != NULL) {
 +-        apply_platform_displacement(1, platform);
@@ -2590,15 +2590,15 @@ index 0000000..ff20eca
 ++		}
 +     }
 + }
-+ 
++
 diff --git a/src/game/platform_displacement.h b/src/game/platform_displacement.h
 index 556192b..3609e2d 100644
 --- a/src/game/platform_displacement.h
 +++ b/src/game/platform_displacement.h
 @@ -5,10 +5,19 @@
- 
+
  #include "types.h"
- 
+
 +struct PlatformDisplacementInfo {
 +	Vec3f prevPos;
 +	Vec3f prevTransformedPos;

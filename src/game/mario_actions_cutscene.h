@@ -24,5 +24,7 @@ Gfx *geo_switch_peach_eyes(s32 callContext, struct GraphNode *node, UNUSED s32 c
 s32 mario_ready_to_speak(void);
 s32 set_mario_npc_dialog(s32 actionArg);
 s32 mario_execute_cutscene_action(struct MarioState *m);
+extern Vp sEndCutsceneVp;
+extern struct CreditsEntry *sDispCreditsEntry;
 
 #endif // MARIO_ACTIONS_CUTSCENE_H

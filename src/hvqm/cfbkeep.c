@@ -1,10 +1,10 @@
-/* 
+/*
  *  N64-HVQM2 library  Sample program
- * 
+ *
  *  FILE : cfbkeep.c (frame buffer management)
- * 
+ *
  *  Copyright (C) 1998,1999 NINTENDO Co.,Ltd.
- * 
+ *
  */
 
 /* 1998-12-16 */

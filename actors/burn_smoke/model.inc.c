@@ -8,9 +8,9 @@ static const Vtx burn_smoke_seg4_vertex_040217C0[] = {
     {{{   -50,     50,      0}, 0, {     0,      0}, {0x14, 0x0a, 0x0a, 0xff}}},
 };
 
-// //! Wrong texture format. Called as rgba16, which makes the burn smoke appear
-//     as a transparent black burn smoke. Probably meant to show up as white-ish
-//     burn smoke, but mistakened for being intended as black smoke.
+// Wrong texture format. Called as rgba16, which makes the burn smoke appear
+// as a transparent black burn smoke. Probably meant to show up as white-ish
+// burn smoke, but mistakened for being intended as black smoke.
 // 0x04021800
 ALIGNED8 static const Texture burn_smoke_seg4_texture_04021800[] = {
 #include "actors/burn_smoke/burn_smoke.ia16.inc.c"
@@ -19,8 +19,12 @@ ALIGNED8 static const Texture burn_smoke_seg4_texture_04021800[] = {
 // 0x04022000 - 0x04022028
 const Gfx burn_smoke_seg4_dl_04022000[] = {
     gsDPPipeSync(),
+#ifdef BURN_SMOKE_FIX
     gsDPSetCombineMode(G_CC_MODULATEIA, G_CC_MODULATEIA),
-    gsSPClearGeometryMode(G_LIGHTING | G_CULL_BACK),
+#else
+    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
+#endif
+    gsSPClearGeometryMode(G_LIGHTING),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsSPEndDisplayList(),
 };
@@ -44,7 +48,11 @@ const Gfx burn_smoke_seg4_dl_04022048[] = {
 // 0x04022070 - 0x040220C8
 const Gfx burn_smoke_seg4_dl_04022070[] = {
     gsSPDisplayList(burn_smoke_seg4_dl_04022000),
+#ifdef BURN_SMOKE_FIX
     gsDPLoadTextureBlock(burn_smoke_seg4_texture_04021800, G_IM_FMT_IA, G_IM_SIZ_16b, 32, 32, 0, G_TX_CLAMP, G_TX_CLAMP, 5, 5, G_TX_NOLOD, G_TX_NOLOD),
+#else
+    gsDPLoadTextureBlock(burn_smoke_seg4_texture_04021800, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 32, 0, G_TX_CLAMP, G_TX_CLAMP, 5, 5, G_TX_NOLOD, G_TX_NOLOD),
+#endif
     gsSPDisplayList(burn_smoke_seg4_dl_04022028),
     gsSPDisplayList(burn_smoke_seg4_dl_04022048),
     gsSPEndDisplayList(),

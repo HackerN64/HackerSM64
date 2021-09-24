@@ -23,7 +23,7 @@ def main():
             prog_args.append(a)
 
     defines = [d.split("=")[0] for d in defines]
-    
+
     if len(prog_args) < 1 or need_help:
         print("Usage: {} <demo_data.json> [-D <symbol>] > <demo_data.c>".format(sys.argv[0]))
         sys.exit(0 if need_help else 1)

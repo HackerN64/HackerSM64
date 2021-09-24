@@ -39,7 +39,6 @@ void bhv_seesaw_platform_update(void) {
     if (gMarioObject->platform == o) {
         // Rotate toward mario
         f32 rotation = o->oDistanceToMario * coss(o->oAngleToMario - o->oMoveAngleYaw);
-        UNUSED s32 unused;
 
         // Deceleration is faster than acceleration
         if (o->oSeesawPlatformPitchVel * rotation < 0) {

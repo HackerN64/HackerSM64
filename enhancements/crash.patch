@@ -163,7 +163,7 @@ index c3b97993..c552a485 100644
 +++ b/lib/asm/__osExceptionPreamble.s
 @@ -11,8 +11,8 @@
  #endif
- 
+
  glabel __osExceptionPreamble
 -    lui   $k0, %hi(__osException)
 -    addiu $k0, %lo(__osException)
@@ -171,7 +171,7 @@ index c3b97993..c552a485 100644
 +    addiu $k0, %lo(__crash_handler_entry)
      jr    $k0
       nop
- 
+
 diff --git a/sm64.ld b/sm64.ld
 index 7d9b5b4a..c7bb81b9 100755
 --- a/sm64.ld

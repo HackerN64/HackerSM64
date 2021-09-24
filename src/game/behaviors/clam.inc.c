@@ -18,13 +18,13 @@ void clam_act_0(void) {
         spawn_mist_from_global();
         cur_obj_become_tangible();
 
-        o->oClamUnkF4 = 10;
+        o->oClamShakeTimer = 10;
         o->oTimer = 0;
     } else if (o->oTimer > 150 && o->oDistanceToMario < 500.0f) {
         cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL2);
         o->oAction = 1;
-    } else if (o->oClamUnkF4 != 0) {
-        o->oClamUnkF4 -= 1;
+    } else if (o->oClamShakeTimer != 0) {
+        o->oClamShakeTimer -= 1;
         cur_obj_shake_y(3.0f);
     }
 }

@@ -161,7 +161,7 @@ void calc_face_normal(struct ObjFace *face) {
         p3.z = vtx3->pos.z;
 
         // calculate the cross product of edges (p2 - p1) and (p3 - p2)
-        // not sure why each component is multiplied by 1000. maybe to avoid loss of precision when normalizing? 
+        // not sure why each component is multiplied by 1000. maybe to avoid loss of precision when normalizing?
         normal.x = (((p2.y - p1.y) * (p3.z - p2.z)) - ((p2.z - p1.z) * (p3.y - p2.y))) * mul;
         normal.y = (((p2.z - p1.z) * (p3.x - p2.x)) - ((p2.x - p1.x) * (p3.z - p2.z))) * mul;
         normal.z = (((p2.x - p1.x) * (p3.y - p2.y)) - ((p2.y - p1.y) * (p3.x - p2.x))) * mul;
@@ -358,7 +358,6 @@ s32 scan_to_next_non_whitespace(void) {
 
         if (curChar == '\x1a') { //'SUB' character: "soft EOF" in older systems
             return FALSE;
-            continue; // unreachable
         }
 
         if (is_line_end(curChar)) {
@@ -383,7 +382,6 @@ s32 is_next_buf_word(char *a0) {
     for (curChar = get_and_advance_buf(); curChar != '\0'; curChar = get_and_advance_buf()) {
         if (is_white_space(curChar) || is_line_end(curChar)) {
             break;
-            continue; // unreachable + nonsensical
         }
         wordBuf[bufLength] = curChar;
         bufLength++;

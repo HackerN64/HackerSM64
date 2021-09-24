@@ -57,6 +57,5 @@ const GeoLayout hoot_geo[] = {
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
    GEO_CLOSE_NODE(),
-GEO_CLOSE_NODE(), //! more close than open nodes
-GEO_END(),
+   GEO_END(),
 };

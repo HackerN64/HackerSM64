@@ -17,9 +17,9 @@ index 0000000..d7f27ad
 ++#define TEXT_HUD_CURRENT_RATIO_169 _("CURRENT ASPECT RATIO: 16:9. PRESS L TO SWITCH TO 4:3")
 ++#define TEXT_HUD_WIDE_INFO _("PLEASE CONFIGURE YOUR DISPLAY OR YOUR EMULATOR TO")
 ++#define TEXT_HUD_WIDE_INFO2 _("STRETCH THE IMAGE TO 16:9")
-+ 
++
 + #if defined(VERSION_JP) || defined(VERSION_SH)
-+ 
++
 +diff --git a/src/game/ingame_menu.c b/src/game/ingame_menu.c
 +index 8190f88..deb69f5 100644
 +--- a/src/game/ingame_menu.c
@@ -33,7 +33,7 @@ index 0000000..d7f27ad
 ++u8 textWideInfo[] = { TEXT_HUD_WIDE_INFO };
 ++u8 textWideInfo2[] = { TEXT_HUD_WIDE_INFO2 };
 ++extern u8 widescreen = 0;
-+ 
++
 + extern u8 gLastCompletedCourseNum;
 + extern u8 gLastCompletedStarNum;
 +@@ -2266,6 +2271,14 @@ void render_pause_my_score_coins(void) {
@@ -49,7 +49,7 @@ index 0000000..d7f27ad
 ++            print_generic_string(10, 180, textWideInfo2);
 ++        }
 + #endif
-+ 
++
 +         actName = segmented_to_virtual(actNameTbl[(gCurrCourseNum - 1) * 6 + gDialogCourseActNum - 1]);
 +@@ -2557,10 +2570,25 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 +             }
@@ -63,7 +63,7 @@ index 0000000..d7f27ad
 ++                widescreen = 0;
 ++            }
 ++    }
-+ 
++
 +     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 +     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 +-
@@ -90,7 +90,7 @@ index 0000000..d7f27ad
 ++                    widescreen = 0;
 ++                }
 ++            }
-+ 
++
 +             if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) {
 +                 render_pause_course_options(99, 93, &gDialogLineNum, 15);
 +diff --git a/src/game/rendering_graph_node.c b/src/game/rendering_graph_node.c
@@ -102,7 +102,7 @@ index 0000000..d7f27ad
 + #include "shadow.h"
 + #include "sm64.h"
 ++#define WIDESCREEN
-+ 
++
 + /**
 +  * This file contains the code that processes the scene graph for rendering.
 +@@ -235,6 +236,7 @@ static void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node)
@@ -126,7 +126,7 @@ index 0000000..d7f27ad
 ++            aspect = 1.33333f;
 ++        }
 + #endif
-+ 
++
 +         guPerspective(mtx, &perspNorm, node->fov, aspect, node->near, node->far, 1.0f);
 +diff --git a/src/menu/file_select.c b/src/menu/file_select.c
 +index c894797..dc759f7 100644
@@ -150,7 +150,7 @@ index 0000000..d7f27ad
 +--- a/src/menu/star_select.c
 ++++ b/src/menu/star_select.c
 +@@ -52,7 +52,7 @@ static s8 sSelectableStarIndex = 0;
-+ 
++
 + // Act Selector menu timer that keeps counting until you choose an act.
 + static s32 sActSelectorMenuTimer = 0;
 +-
@@ -178,7 +178,7 @@ index 0000000..d7f27ad
 +     }
 +@@ -147,11 +154,21 @@ void bhv_act_selector_init(void) {
 +     }
-+ 
++
 +     // Render star selector objects
 +-    for (i = 0; i < sVisibleStars; i++) {
 +-        sStarSelectorModels[i] =
@@ -201,7 +201,7 @@ index 0000000..d7f27ad
 ++            sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
 ++        }
 +     }
-+ 
++
 +     render_100_coin_star(stars);
 diff --git a/enhancements/widescreenv2_ultrasm64.patch b/enhancements/widescreenv2_ultrasm64.patch
 new file mode 100644
@@ -221,9 +221,9 @@ index 0000000..667e6e2
 ++#define TEXT_HUD_CURRENT_RATIO_169 _("CURRENT ASPECT RATIO: 16:9. PRESS L TO SWITCH TO 4:3")
 ++#define TEXT_HUD_WIDE_INFO _("PLEASE CONFIGURE YOUR DISPLAY OR YOUR EMULATOR TO")
 ++#define TEXT_HUD_WIDE_INFO2 _("STRETCH THE IMAGE TO 16:9")
-+ 
++
 + #if defined(VERSION_JP) || defined(VERSION_SH)
-+ 
++
 +diff --git a/src/game/ingame_menu.c b/src/game/ingame_menu.c
 +index 9344738..37bc1d1 100644
 +--- a/src/game/ingame_menu.c
@@ -237,13 +237,13 @@ index 0000000..667e6e2
 ++u8 textWideInfo[] = { TEXT_HUD_WIDE_INFO };
 ++u8 textWideInfo2[] = { TEXT_HUD_WIDE_INFO2 };
 ++extern s32 widescreen = 0;
-+ 
++
 + extern u8 gLastCompletedCourseNum;
 + extern u8 gLastCompletedStarNum;
 +@@ -1672,6 +1677,7 @@ s8 gDialogCourseActNum = 1;
 + #define DIAG_VAL2 240 // JP & US
 + #endif
-+ 
++
 ++
 + void render_dialog_entries(void) {
 + #ifdef VERSION_EU
@@ -256,7 +256,7 @@ index 0000000..667e6e2
 ++                //play_dialog_sound(gDialogID);
 +                 play_sound(SOUND_MENU_MESSAGE_APPEAR, gGlobalSoundSource);
 +             }
-+ 
++
 +@@ -2199,6 +2205,7 @@ void render_pause_my_score_coins(void) {
 + #else
 +     u8 textCourse[] = { TEXT_COURSE };
@@ -277,12 +277,12 @@ index 0000000..667e6e2
 ++            print_generic_string(10, 200, textWideInfo);
 ++            print_generic_string(10, 180, textWideInfo2);
 ++        }
-++        
+++
 + #endif
-+ 
++
 ++
 +         actName = segmented_to_virtual(actNameTbl[(gCurrCourseNum - 1) * 6 + gDialogCourseActNum - 1]);
-+ 
++
 +         if (starFlags & (1 << (gDialogCourseActNum - 1))) {
 +@@ -2557,10 +2574,25 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 +             }
@@ -299,7 +299,7 @@ index 0000000..667e6e2
 ++    }
 +     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 +     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-+ 
++
 ++        if (widescreen == 0) {
 ++            print_generic_string(10, 20, textCurrRatio43);
 ++        }
@@ -336,7 +336,7 @@ index 0000000..667e6e2
 + #include "shadow.h"
 + #include "sm64.h"
 ++#define WIDESCREEN
-+ 
++
 + /**
 +  * This file contains the code that processes the scene graph for rendering.
 +@@ -235,6 +236,8 @@ static void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node)
@@ -361,7 +361,7 @@ index 0000000..667e6e2
 ++            aspect = 1.33333f;
 ++        }
 + #endif
-+ 
++
 +         guPerspective(mtx, &perspNorm, node->fov, aspect, node->near, node->far, 1.0f);
 +diff --git a/src/menu/file_select.c b/src/menu/file_select.c
 +index 9437dcc..6ba1845 100644
@@ -385,11 +385,11 @@ index 0000000..667e6e2
 +--- a/src/menu/star_select.c
 ++++ b/src/menu/star_select.c
 +@@ -52,6 +52,7 @@ static s8 sSelectableStarIndex = 0;
-+ 
++
 + // Act Selector menu timer that keeps counting until you choose an act.
 + static s32 sActSelectorMenuTimer = 0;
 ++extern s32 widescreen;
-+ 
++
 + /**
 +  * Act Selector Star Type Loop Action
 +@@ -92,8 +93,14 @@ void bhv_act_selector_star_type_loop(void) {
@@ -411,7 +411,7 @@ index 0000000..667e6e2
 +     }
 +@@ -147,11 +154,21 @@ void bhv_act_selector_init(void) {
 +     }
-+ 
++
 +     // Render star selector objects
 +-    for (i = 0; i < sVisibleStars; i++) {
 +-        sStarSelectorModels[i] =
@@ -434,7 +434,7 @@ index 0000000..667e6e2
 ++            sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
 ++        }
 +     }
-+ 
++
 +     render_100_coin_star(stars);
 diff --git a/include/config.h b/include/config.h
 index 211a086..d1eb721 100644
@@ -464,9 +464,9 @@ index 749179b..3b23b41 100644
 +#define TEXT_HUD_CURRENT_RATIO_169 _("CURRENT ASPECT RATIO: 16:9. PRESS L TO SWITCH TO 4:3")
 +#define TEXT_HUD_WIDE_INFO _("PLEASE CONFIGURE YOUR DISPLAY OR YOUR EMULATOR TO")
 +#define TEXT_HUD_WIDE_INFO2 _("STRETCH THE IMAGE TO 16:9")
- 
+
  #if defined(VERSION_JP) || defined(VERSION_SH)
- 
+
 diff --git a/levels/castle_grounds/script.c b/levels/castle_grounds/script.c
 index 626bece..b8191ea 100644
 --- a/levels/castle_grounds/script.c
@@ -492,7 +492,7 @@ index 8190f88..e4d0f32 100644
 +u8 textWideInfo[] = { TEXT_HUD_WIDE_INFO };
 +u8 textWideInfo2[] = { TEXT_HUD_WIDE_INFO2 };
 +u8 widescreen = 1;
- 
+
  extern u8 gLastCompletedCourseNum;
  extern u8 gLastCompletedStarNum;
 @@ -2266,6 +2271,24 @@ void render_pause_my_score_coins(void) {
@@ -505,7 +505,7 @@ index 8190f88..e4d0f32 100644
 +            } else {
 +                print_generic_string(10, 20, textCurrRatio43);
 +            }
-+            
++
 +        }
 +        else {
 +            if (COURSE_IS_MAIN_COURSE(gCurrCourseNum)) {
@@ -513,12 +513,12 @@ index 8190f88..e4d0f32 100644
 +            } else {
 +                print_generic_string(10, 20, textCurrRatio169);
 +            }
-+            
++
 +            print_generic_string(10, 200, textWideInfo);
 +            print_generic_string(10, 180, textWideInfo2);
 +        }
  #endif
- 
+
          actName = segmented_to_virtual(actNameTbl[(gCurrCourseNum - 1) * 6 + gDialogCourseActNum - 1]);
 @@ -2557,10 +2580,25 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
              }
@@ -532,7 +532,7 @@ index 8190f88..e4d0f32 100644
 +                widescreen = 0;
 +            }
 +    }
- 
+
      gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
      gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 -
@@ -559,7 +559,7 @@ index 8190f88..e4d0f32 100644
 +                    widescreen = 0;
 +                }
 +            }
- 
+
              if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) {
                  render_pause_course_options(99, 93, &gDialogLineNum, 15);
 diff --git a/src/game/level_update.c b/src/game/level_update.c
@@ -567,14 +567,14 @@ index 4ecb902..b2d6e53 100644
 --- a/src/game/level_update.c
 +++ b/src/game/level_update.c
 @@ -1247,6 +1247,10 @@ s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 unused) {
- 
+
      return result;
  }
 +extern u8 widescreen;
 +void lvl_set_widescreen(void) {
 +    widescreen = 1;
 +}
- 
+
  s32 lvl_init_from_save_file(UNUSED s16 arg0, s32 levelNum) {
  #ifdef VERSION_EU
 diff --git a/src/game/level_update.h b/src/game/level_update.h
@@ -586,7 +586,7 @@ index 521b4ef..58d4e75 100644
  s32 lvl_play_the_end_screen_sound(UNUSED s16 arg0, UNUSED s32 arg1);
  void basic_update(UNUSED s16 *arg);
 +void lvl_set_widescreen(void);
- 
+
  #endif // LEVEL_UPDATE_H
 diff --git a/src/game/rendering_graph_node.c b/src/game/rendering_graph_node.c
 index 58238e8..09a6c87 100644
@@ -597,7 +597,7 @@ index 58238e8..09a6c87 100644
  #include "shadow.h"
  #include "sm64.h"
 +#define WIDESCREEN
- 
+
  /**
   * This file contains the code that processes the scene graph for rendering.
 @@ -39,6 +40,7 @@
@@ -605,7 +605,7 @@ index 58238e8..09a6c87 100644
  Mat4 gMatStack[32];
  Mtx *gMatStackFixed[32];
 +f32 aspect;
- 
+
  /**
   * Animation nodes have state in global variables, so this struct captures
 @@ -235,6 +237,7 @@ static void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node)
@@ -628,7 +628,7 @@ index 58238e8..09a6c87 100644
 +            aspect = 1.33333f;
 +        }
  #endif
- 
+
          guPerspective(mtx, &perspNorm, node->fov, aspect, node->near, node->far, 1.0f);
 @@ -755,7 +763,7 @@ static s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
      // ! @bug The aspect ratio is not accounted for. When the fov value is 45,
@@ -636,7 +636,7 @@ index 58238e8..09a6c87 100644
      // visibly pop in or out at the edge of the screen.
 -    halfFov = (gCurGraphNodeCamFrustum->fov / 2.0f + 1.0f) * 32768.0f / 180.0f + 0.5f;
 +    halfFov = ((gCurGraphNodeCamFrustum->fov*aspect) / 2.0f + 1.0f) * 32768.0f / 180.0f + 0.5f;
- 
+
      hScreenEdge = -matrix[3][2] * sins(halfFov) / coss(halfFov);
      // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get
 diff --git a/src/menu/file_select.c b/src/menu/file_select.c
@@ -661,7 +661,7 @@ index 025dbf2..4840898 100644
 --- a/src/menu/star_select.c
 +++ b/src/menu/star_select.c
 @@ -52,7 +52,7 @@ static s8 sSelectableStarIndex = 0;
- 
+
  // Act Selector menu timer that keeps counting until you choose an act.
  static s32 sActSelectorMenuTimer = 0;
 -
@@ -689,7 +689,7 @@ index 025dbf2..4840898 100644
      }
 @@ -147,11 +154,21 @@ void bhv_act_selector_init(void) {
      }
- 
+
      // Render star selector objects
 -    for (i = 0; i < sVisibleStars; i++) {
 -        sStarSelectorModels[i] =
@@ -712,5 +712,5 @@ index 025dbf2..4840898 100644
 +            sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
 +        }
      }
- 
+
      render_100_coin_star(stars);

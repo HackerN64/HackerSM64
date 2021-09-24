@@ -61,8 +61,6 @@ void bhv_activated_back_and_forth_platform_init(void) {
  * Activated back-and-forth platform update function.
  */
 void bhv_activated_back_and_forth_platform_update(void) {
-    UNUSED s32 unused[3];
-
     // oVelY is used for vertical platforms' movement and also for
     // horizontal platforms' dipping up/down when Mario gets on/off them
     if (gMarioObject->platform == o) {

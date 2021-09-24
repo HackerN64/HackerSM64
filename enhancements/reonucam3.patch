@@ -5,7 +5,7 @@ index 711d4562..f1c83171 100644
 @@ -93,6 +93,12 @@
  #define TEXT_HUD_WIDE_INFO _("PLEASE CONFIGURE YOUR DISPLAY OR YOUR EMULATOR TO\nSTRETCH THE IMAGE TO 16:9")
  #endif
- 
+
 +#define TEXT_CAM_INFO_SLOWEST _("CAM SPEED: SLOWEST")
 +#define TEXT_CAM_INFO_SLOW _("CAM SPEED: SLOW")
 +#define TEXT_CAM_INFO_MEDIUM _("CAM SPEED: MEDIUM")
@@ -13,7 +13,7 @@ index 711d4562..f1c83171 100644
 +#define TEXT_CAM_INFO_FASTEST _("CAM SPEED: FASTEST")
 +
  #if defined(VERSION_JP) || defined(VERSION_SH)
- 
+
  /**
 diff --git a/src/game/camera.c b/src/game/camera.c
 index 25b27983..2ff11930 100644
@@ -30,7 +30,7 @@ index 25b27983..2ff11930 100644
 @@ -107,6 +108,7 @@ s16 sCreditsPlayer2Yaw;
   */
  u8 sFramesPaused;
- 
+
 +
  extern struct CameraFOVStatus sFOVState;
  extern struct TransitionInfo sModeTransition;
@@ -56,7 +56,7 @@ index 25b27983..2ff11930 100644
      f32 baseOff = 125.f;
      f32 camCeilHeight = find_ceil(c->pos[0], gLakituState.goalPos[1] - 50.f, c->pos[2], &surface);
 +    f32 approachRate = 20.0f;
- 
+
      if (sMarioCamState->action & ACT_FLAG_HANGING) {
          marioCeilHeight = sMarioGeometry.currCeilHeight;
 @@ -790,7 +795,8 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
@@ -76,7 +76,7 @@ index 25b27983..2ff11930 100644
 -    f32 yOff = 125.f;
 +    f32 yOff;
      f32 baseDist = 1000.f;
- 
+
 +    if (gMarioState->action & ACT_FLAG_SWIMMING) {
 +        yOff = -125.f;
 +    } else {
@@ -99,7 +99,7 @@ index 25b27983..2ff11930 100644
 @@ -1170,6 +1192,28 @@ void mode_radial_camera(struct Camera *c) {
      pan_ahead_of_player(c);
  }
- 
+
 +// Returns the camera speed based on the user's camera speed setting
 +f32 set_camera_speed(void) {
 +    switch(gCameraSpeed) {
@@ -131,9 +131,9 @@ index 25b27983..2ff11930 100644
      s16 oldAreaYaw = sAreaYaw;
 +    // Get the camera speed based on the user's setting
 +    f32 cameraSpeed = set_camera_speed();
- 
-     radial_camera_input(c, 0.f);
- 
+
+     radial_camera_input(c);
+
 -    if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
 -        s8DirModeYawOffset += DEGREES(45);
 -        play_sound_cbutton_side();
@@ -193,7 +193,7 @@ index 25b27983..2ff11930 100644
 +        s8DirModeBaseYaw = (s8DirModeBaseYaw + 0x1000) & 0xE000; // Lock the camera to the nearest 45deg axis
      }
 -#endif
- 
+
      lakitu_zoom(400.f, 0x900);
      c->nextYaw = update_8_directions_camera(c, c->focus, pos);
 +    set_camera_height(c, pos[1]);
@@ -202,7 +202,7 @@ index 25b27983..2ff11930 100644
      sAreaYawChange = sAreaYaw - oldAreaYaw;
 -    set_camera_height(c, pos[1]);
  }
- 
+
 +
  /**
   * Updates the camera in outward radial mode.
@@ -212,14 +212,14 @@ index 25b27983..2ff11930 100644
                                 gLakituState.goalPos[2], &ceil);
      s16 yawDir;
 -
-+    
++
      handle_c_button_movement(c);
      vec3f_get_dist_and_angle(sMarioCamState->pos, c->pos, &dist, &pitch, &yaw);
- 
+
 @@ -3036,6 +3097,8 @@ void update_lakitu(struct Camera *c) {
  void update_camera(struct Camera *c) {
      UNUSED u8 unused[24];
- 
+
 +    extern s16 s8DirModeBaseYaw;
 +
      gCamera = c;
@@ -241,7 +241,7 @@ index 25b27983..2ff11930 100644
 -        play_sound_if_cam_switched_to_lakitu_or_mario();
 +        //play_sound_if_cam_switched_to_lakitu_or_mario();
      }
- 
+
      // Initialize the camera
 @@ -3356,7 +3418,6 @@ void init_camera(struct Camera *c) {
      struct Surface *floor = 0;
@@ -253,45 +253,45 @@ index 25b27983..2ff11930 100644
      gPrevLevel = gCurrLevelArea / 16;
 @@ -4901,15 +4962,15 @@ void play_camera_buzz_if_c_sideways(void) {
  }
- 
+
  void play_sound_cbutton_up(void) {
 -    play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
-+    //play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);    
++    //play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
  }
- 
+
  void play_sound_cbutton_down(void) {
 -    play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
 +    //play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
  }
- 
+
  void play_sound_cbutton_side(void) {
 -    play_sound(SOUND_MENU_CAMERA_TURN, gGlobalSoundSource);
 +    //play_sound(SOUND_MENU_CAMERA_TURN, gGlobalSoundSource);
  }
- 
+
  void play_sound_button_change_blocked(void) {
-@@ -5013,7 +5074,7 @@ s32 radial_camera_input(struct Camera *c, UNUSED f32 unused) {
+@@ -5013,7 +5074,7 @@ void radial_camera_input(struct Camera *c) {
      }
- 
+
      // Zoom in / enter C-Up
 -    if (gPlayer1Controller->buttonPressed & U_CBUTTONS) {
 +    if (((gPlayer1Controller->buttonPressed & U_CBUTTONS) || (gPlayer2Controller->rawStickY > 40)) && (stickReset) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
          if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
              gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
              play_sound_cbutton_up();
-@@ -5023,7 +5084,7 @@ s32 radial_camera_input(struct Camera *c, UNUSED f32 unused) {
+@@ -5023,7 +5084,7 @@ void radial_camera_input(struct Camera *c) {
      }
- 
+
      // Zoom out
 -    if (gPlayer1Controller->buttonPressed & D_CBUTTONS) {
 +    if ((gPlayer1Controller->buttonPressed & D_CBUTTONS) || (gPlayer2Controller->rawStickY < -40)) {
          if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
              gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
  #ifndef VERSION_JP
-@@ -5035,6 +5096,12 @@ s32 radial_camera_input(struct Camera *c, UNUSED f32 unused) {
+@@ -5035,6 +5096,12 @@ void radial_camera_input(struct Camera *c) {
          }
      }
- 
+
 +    if ((gPlayer2Controller->rawStickY > 40) || (gPlayer2Controller->rawStickY < -40)) {
 +        stickReset = 0;
 +    } else  {
@@ -327,7 +327,7 @@ index 317e33bf..6687016d 100644
  s8 gEepromProbe;
  #endif
 @@ -739,6 +744,7 @@ void thread5_game_loop(UNUSED void *arg) {
- 
+
      play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
      set_sound_mode(save_file_get_sound_mode());
 +    gCameraSpeed = (save_file_get_camera_speed());
@@ -356,7 +356,7 @@ index 6cbfd8e1..01dd4de8 100644
 @@ -59,6 +59,12 @@ void *languageTable[][3] =
      #endif
  };
- 
+
 +u8 textCamInfoSlowest[] = { TEXT_CAM_INFO_SLOWEST };
 +u8 textCamInfoSlow[] = { TEXT_CAM_INFO_SLOW };
 +u8 textCamInfoMedium[] = { TEXT_CAM_INFO_MEDIUM };
@@ -365,11 +365,11 @@ index 6cbfd8e1..01dd4de8 100644
 +
  extern u8 gLastCompletedCourseNum;
  extern u8 gLastCompletedStarNum;
- 
+
 @@ -1504,6 +1510,45 @@ void reset_red_coins_collected(void) {
      gRedCoinsCollected = 0;
  }
- 
+
 +void render_camera_speed_setting(void) {
 +    gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 +    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
@@ -391,7 +391,7 @@ index 6cbfd8e1..01dd4de8 100644
 +            break;
 +    }
 +    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-+    
++
 +    if (gPlayer1Controller->buttonPressed & R_JPAD) {
 +        if (gCameraSpeed < 4) {
 +            gCameraSpeed += 1;
@@ -406,7 +406,7 @@ index 6cbfd8e1..01dd4de8 100644
 +            gCameraSpeed = 4;
 +        }
 +        save_file_set_camera_speed(gCameraSpeed);
-+    }    
++    }
 +}
 +
  void change_dialog_camera_angle(void) {
@@ -445,7 +445,7 @@ index 31e97bce..29b5e9c4 100644
 +                if ((heightBelowWater > 800.0f) && (camPreset != CAMERA_MODE_BEHIND_MARIO)) {
 +                    set_camera_mode(m->area->camera, CAMERA_MODE_BEHIND_MARIO, 1);
 +                }
- 
+
 -    if ((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) {
 -        heightBelowWater = (f32)(m->waterLevel - 80) - m->pos[1];
 -        camPreset = m->area->camera->mode;
@@ -465,7 +465,7 @@ index 31e97bce..29b5e9c4 100644
 +                if ((heightBelowWater < 400.0f) && (camPreset != CAMERA_MODE_WATER_SURFACE)) {
 +                    set_camera_mode(m->area->camera, CAMERA_MODE_WATER_SURFACE, 1);
 +                }
- 
+
 -            // As long as Mario isn't drowning or at the top
 -            // of the water with his head out, spawn bubbles.
 -            if (!(m->action & ACT_FLAG_INTANGIBLE)) {
@@ -488,7 +488,7 @@ index 31e97bce..29b5e9c4 100644
 +        gWaterCamOverride ^= 1;
      }
  }
- 
+
 diff --git a/src/game/mario_actions_airborne.c b/src/game/mario_actions_airborne.c
 index ce6467ef..c7e998c1 100644
 --- a/src/game/mario_actions_airborne.c
@@ -496,7 +496,7 @@ index ce6467ef..c7e998c1 100644
 @@ -1736,6 +1736,10 @@ s32 act_shot_from_cannon(struct MarioState *m) {
  s32 act_flying(struct MarioState *m) {
      s16 startPitch = m->faceAngle[0];
- 
+
 +    if (gPlayer1Controller->buttonPressed & R_TRIG) {
 +        gFlyingCamOverride ^= 1;
 +    }
@@ -507,33 +507,33 @@ index ce6467ef..c7e998c1 100644
 @@ -1750,8 +1754,10 @@ s32 act_flying(struct MarioState *m) {
          return set_mario_action(m, ACT_FREEFALL, 0);
      }
- 
+
 -    if (m->area->camera->mode != CAMERA_MODE_BEHIND_MARIO) {
 +    if (!gFlyingCamOverride) {
          set_camera_mode(m->area->camera, CAMERA_MODE_BEHIND_MARIO, 1);
 +    } else {
 +        set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
      }
- 
+
      if (m->actionState == 0) {
 @@ -1933,7 +1939,7 @@ s32 act_flying_triple_jump(struct MarioState *m) {
      }
- 
+
      if (m->vel[1] < 4.0f) {
 -        if (m->area->camera->mode != CAMERA_MODE_BEHIND_MARIO) {
 +        if ((m->area->camera->mode != CAMERA_MODE_BEHIND_MARIO) && (!gFlyingCamOverride)) {
              set_camera_mode(m->area->camera, CAMERA_MODE_BEHIND_MARIO, 1);
          }
- 
+
 @@ -1944,7 +1950,7 @@ s32 act_flying_triple_jump(struct MarioState *m) {
          set_mario_action(m, ACT_FLYING, 1);
      }
- 
+
 -    if (m->actionTimer++ == 10 && m->area->camera->mode != CAMERA_MODE_BEHIND_MARIO) {
 +    if (m->actionTimer++ == 10 && m->area->camera->mode != CAMERA_MODE_BEHIND_MARIO && (!gFlyingCamOverride)) {
          set_camera_mode(m->area->camera, CAMERA_MODE_BEHIND_MARIO, 1);
      }
- 
+
 diff --git a/src/game/save_file.c b/src/game/save_file.c
 index bcdcdbaf..3f0b8ca1 100644
 --- a/src/game/save_file.c
@@ -541,7 +541,7 @@ index bcdcdbaf..3f0b8ca1 100644
 @@ -673,6 +673,12 @@ u8 save_file_get_widescreen_mode(void) {
      return gSaveBuffer.menuData[0].wideMode;
  }
- 
+
 +void save_file_set_camera_speed(u8 speed) {
 +    gSaveBuffer.menuData[0].cameraSpeedSetting = speed;
 +    gMainMenuDataModified = TRUE;
@@ -550,11 +550,11 @@ index bcdcdbaf..3f0b8ca1 100644
 +
  void save_file_set_widescreen_mode(u8 mode) {
      gSaveBuffer.menuData[0].wideMode = mode;
- 
+
 @@ -685,6 +691,10 @@ u16 save_file_get_sound_mode(void) {
      return gSaveBuffer.menuData[0].soundMode;
  }
- 
+
 +u8 save_file_get_camera_speed(void) {
 +    return gSaveBuffer.menuData[0].cameraSpeedSetting;
 +}
@@ -571,7 +571,7 @@ index 64cf0c63..085ec1d9 100644
      u8 wideMode: 1;
  #endif
 +    u8 cameraSpeedSetting: 3;
- 
+
  #ifdef VERSION_EU
      u8 language: 2;
 @@ -178,6 +179,8 @@ u16 save_file_get_sound_mode(void);
@@ -581,5 +581,5 @@ index 64cf0c63..085ec1d9 100644
 +u8 save_file_get_camera_speed(void);
 +void save_file_set_camera_speed(u8 speed);
  void save_file_move_cap_to_default_location(void);
- 
+
  void disable_warp_checkpoint(void);

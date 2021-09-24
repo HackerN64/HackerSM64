@@ -173,7 +173,7 @@ s32 check_horizontal_wind(struct MarioState *m) {
         if (speed > 48.0f) {
             m->slideVelX = m->slideVelX * 48.0f / speed;
             m->slideVelZ = m->slideVelZ * 48.0f / speed;
-            speed = 32.0f; //! This was meant to be 48?
+            speed = 48.0f;
         } else if (speed > 32.0f) {
             speed = 32.0f;
         }
@@ -340,8 +340,6 @@ void update_flying_pitch(struct MarioState *m) {
 }
 
 void update_flying(struct MarioState *m) {
-    UNUSED u32 unused;
-
     update_flying_pitch(m);
     update_flying_yaw(m);
 
@@ -603,10 +601,12 @@ s32 act_hold_freefall(struct MarioState *m) {
 
 s32 act_side_flip(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
+        m->marioObj->header.gfx.angle[1] += 0x8000;
         return set_mario_action(m, ACT_DIVE, 0);
     }
 
     if (m->input & INPUT_Z_PRESSED) {
+        m->marioObj->header.gfx.angle[1] += 0x8000;
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
@@ -1346,22 +1346,12 @@ s32 act_air_hit_wall(struct MarioState *m) {
         return set_mario_action(m, ACT_SOFT_BONK, 0);
     }
 
-/*#ifdef AVOID_UB
-    return
-#endif*/
 #if FIRSTY_LAST_FRAME > 1
     set_mario_animation(m, MARIO_ANIM_START_WALLKICK);
     m->marioObj->header.gfx.angle[1] = atan2s(m->wall->normal.z, m->wall->normal.x);
 #endif
 
     return FALSE;
-
-    //! Missing return statement. The returned value is the result of the call
-    // to set_mario_animation. In practice, this value is nonzero.
-    // This results in this action "cancelling" into itself. It is supposed to
-    // execute on two frames, but instead it executes twice on the same frame.
-    // This results in firsties only being possible for a single frame, instead
-    // of two.
 }
 
 s32 act_forward_rollout(struct MarioState *m) {

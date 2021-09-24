@@ -21,6 +21,7 @@
 #include "graph_node.h"
 #include "level_script.h"
 #include "level_misc_macros.h"
+#include "level_commands.h"
 #include "math_util.h"
 #include "surface_collision.h"
 #include "surface_load.h"
@@ -296,7 +297,6 @@ static void level_cmd_load_mario_head(void) {
         gd_add_to_heap(gFrameBuffer0, 3 * sizeof(gFrameBuffer0)); // 0x70800
         gdm_setup();
         gdm_maketestdl(CMD_GET(s16, 2));
-    } else {
     }
 #endif
     sCurrentCmd = CMD_NEXT;
@@ -756,39 +756,39 @@ static void level_cmd_38(void) {
 }
 
 static void level_cmd_get_or_set_var(void) {
-    if (CMD_GET(u8, 2) == 0) {
+    if (CMD_GET(u8, 2) == OP_SET) {
         switch (CMD_GET(u8, 3)) {
-            case 0:
+            case VAR_CURR_SAVE_FILE_NUM:
                 gCurrSaveFileNum = sRegister;
                 break;
-            case 1:
+            case VAR_CURR_COURSE_NUM:
                 gCurrCourseNum = sRegister;
                 break;
-            case 2:
+            case VAR_CURR_ACT_NUM:
                 gCurrActNum = sRegister;
                 break;
-            case 3:
+            case VAR_CURR_LEVEL_NUM:
                 gCurrLevelNum = sRegister;
                 break;
-            case 4:
+            case VAR_CURR_AREA_INDEX:
                 gCurrAreaIndex = sRegister;
                 break;
         }
     } else {
         switch (CMD_GET(u8, 3)) {
-            case 0:
+            case VAR_CURR_SAVE_FILE_NUM:
                 sRegister = gCurrSaveFileNum;
                 break;
-            case 1:
+            case VAR_CURR_COURSE_NUM:
                 sRegister = gCurrCourseNum;
                 break;
-            case 2:
+            case VAR_CURR_ACT_NUM:
                 sRegister = gCurrActNum;
                 break;
-            case 3:
+            case VAR_CURR_LEVEL_NUM:
                 sRegister = gCurrLevelNum;
                 break;
-            case 4:
+            case VAR_CURR_AREA_INDEX:
                 sRegister = gCurrAreaIndex;
                 break;
         }

@@ -30,7 +30,7 @@ struct ObjectHitbox sSnufitBulletHitbox = {
 };
 
 /**
- * This geo function shifts snufit's mask when it shrinks down, 
+ * This geo function shifts snufit's mask when it shrinks down,
  * since the parts move independently.
  */
 Gfx *geo_snufit_move_mask(s32 callContext, struct GraphNode *node, UNUSED Mat4 *c) {
@@ -77,7 +77,7 @@ void snufit_act_idle(void) {
     // if the game would not have already crashed.
     marioDist = (s32)(o->oDistanceToMario / 10.0f);
     if (o->oTimer > marioDist && o->oDistanceToMario < 800.0f) {
-        
+
         // Controls an alternating scaling factor in a cos.
         o->oSnufitBodyScalePeriod
             = approach_s16_symmetric(o->oSnufitBodyScalePeriod, 0, 1500);
@@ -121,7 +121,7 @@ void bhv_snufit_loop(void) {
     // Only update if Mario is in the current room.
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         o->oDeathSound = SOUND_OBJ_SNUFIT_SKEETER_DEATH;
-        
+
         // Face Mario if he is within range.
         if (o->oDistanceToMario < 800.0f) {
             obj_turn_pitch_toward_mario(120.0f, 2000);
@@ -198,7 +198,7 @@ void bhv_snufit_balls_loop(void) {
             o->oGravity = -4.0f;
 
             cur_obj_become_intangible();
-        } else if (o->oAction == 1 
+        } else if (o->oAction == 1
                || (o->oMoveFlags & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_HIT_WALL))) {
             // The Snufit shot Mario and has fulfilled its lonely existance.
             //! The above check could theoretically be avoided by finding a geometric

@@ -18,7 +18,7 @@
 #include "config.h"
 
 // 0x0E0002D0
-const GeoLayout intro_geo_0002D0[] = {
+const GeoLayout intro_geo_splash_screen[] = {
    GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
@@ -113,7 +113,7 @@ const GeoLayout intro_geo_mario_head_dizzy[] = {
 };
 
 // 0x0E000414
-const GeoLayout intro_geo_000414[] = {
+const GeoLayout intro_geo_debug_level_select[] = {
    GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),

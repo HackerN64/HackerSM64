@@ -14,15 +14,15 @@ struct ObjectHitbox sJumpingBoxHitbox = {
 
 void jumping_box_act_0(void) {
     if (o->oSubAction == 0) {
-        if (o->oJumpingBoxUnkF8-- < 0)
+        if (o->oJumpingBoxRandomTimer-- < 0)
             o->oSubAction++;
-        if (o->oTimer > o->oJumpingBoxUnkF4) {
+        if (o->oTimer > o->oJumpingBoxUnusedTimerMin) {
             o->oVelY = random_float() * 5.0f + 15.0f;
             o->oSubAction++;
         }
     } else if (o->oMoveFlags & OBJ_MOVE_ON_GROUND) {
         o->oSubAction = 0;
-        o->oJumpingBoxUnkF8 = random_float() * 60.0f + 30.0f;
+        o->oJumpingBoxRandomTimer = random_float() * 60.0f + 30.0f;
     }
 }
 

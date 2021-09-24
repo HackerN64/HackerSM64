@@ -72,12 +72,6 @@ struct PowerMeterHUD {
     f32 unused;
 };
 
-struct UnusedHUDStruct {
-    u32 unused1;
-    u16 unused2;
-    u16 unused3;
-};
-
 struct CameraHUD {
     s16 status;
 };
@@ -97,8 +91,6 @@ static struct PowerMeterHUD sPowerMeterHUD = {
 // Gets reset when the health is filled and stops counting
 // when the power meter is hidden.
 s32 sPowerMeterVisibleTimer = 0;
-
-UNUSED static struct UnusedHUDStruct sUnusedHUDValues = { 0x00, 0x0A, 0x00 };
 
 static struct CameraHUD sCameraHUD = { CAM_STATUS_NONE };
 

@@ -41,7 +41,7 @@ void set_home_to_mario(void) {
     o->oPosY = o->oHomeY;
     dx = o->oHomeX - o->oPosX;
     dz = o->oHomeZ - o->oPosZ;
-    o->oForwardVel = sqrtf(dx * dx + dz * dz) / 23.0f;
+    o->oForwardVel = sqrtf(sqr(dx) + sqr(dz)) / 23.0f;
 }
 
 void set_y_home_to_pos(void) {

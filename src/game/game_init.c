@@ -75,7 +75,6 @@ struct DmaHandlerList gDemoInputsBuf;
 
 // fillers
 UNUSED static u8 sfillerGameInit[0x90];
-UNUSED static s32 sUnusedGameInitValue = 0;
 
 // General timer that runs as the game starts
 u32 gGlobalTimer = 0;
@@ -415,8 +414,7 @@ void select_gfx_pool(void) {
  */
 void display_and_vsync(void) {
     gIsVC = IS_VC();
-    if (IO_READ(DPC_PIPEBUSY_REG) && gIsConsole != 1)
-    {
+    if (IO_READ(DPC_PIPEBUSY_REG) && gIsConsole != 1) {
         gIsConsole = 1;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
@@ -445,6 +443,7 @@ void display_and_vsync(void) {
     gGlobalTimer++;
 }
 
+#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
 // this function records distinct inputs over a 255-frame interval to RAM locations and was likely
 // used to record the demo sequences seen in the final game. This function is unused.
 UNUSED static void record_demo(void) {
@@ -475,46 +474,6 @@ UNUSED static void record_demo(void) {
         gRecordedDemoInput.rawStickY = rawStickY;
     }
     gRecordedDemoInput.timer++;
-}
-
-/**
- * Take the updated controller struct and calculate the new x, y, and distance floats.
- */
-void adjust_analog_stick(struct Controller *controller) {
-    UNUSED u8 pad[8];
-
-    // Reset the controller's x and y floats.
-    controller->stickX = 0;
-    controller->stickY = 0;
-
-    // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
-    if (controller->rawStickX <= -8) {
-        controller->stickX = controller->rawStickX + 6;
-    }
-
-    if (controller->rawStickX >= 8) {
-        controller->stickX = controller->rawStickX - 6;
-    }
-
-    if (controller->rawStickY <= -8) {
-        controller->stickY = controller->rawStickY + 6;
-    }
-
-    if (controller->rawStickY >= 8) {
-        controller->stickY = controller->rawStickY - 6;
-    }
-
-    // Calculate f32 magnitude from the center by vector length.
-    controller->stickMag =
-        sqrtf(controller->stickX * controller->stickX + controller->stickY * controller->stickY);
-
-    // Magnitude cannot exceed 64.0f: if it does, modify the values
-    // appropriately to flatten the values down to the allowed maximum value.
-    if (controller->stickMag > 64) {
-        controller->stickX *= 64 / controller->stickMag;
-        controller->stickY *= 64 / controller->stickMag;
-        controller->stickMag = 64;
-    }
 }
 
 /**
@@ -574,6 +533,46 @@ void run_demo_inputs(void) {
     }
 }
 
+#endif
+
+/**
+ * Take the updated controller struct and calculate the new x, y, and distance floats.
+ */
+void adjust_analog_stick(struct Controller *controller) {
+    // Reset the controller's x and y floats.
+    controller->stickX = 0;
+    controller->stickY = 0;
+
+    // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
+    if (controller->rawStickX <= -8) {
+        controller->stickX = controller->rawStickX + 6;
+    }
+
+    if (controller->rawStickX >= 8) {
+        controller->stickX = controller->rawStickX - 6;
+    }
+
+    if (controller->rawStickY <= -8) {
+        controller->stickY = controller->rawStickY + 6;
+    }
+
+    if (controller->rawStickY >= 8) {
+        controller->stickY = controller->rawStickY - 6;
+    }
+
+    // Calculate f32 magnitude from the center by vector length.
+    controller->stickMag =
+        sqrtf(controller->stickX * controller->stickX + controller->stickY * controller->stickY);
+
+    // Magnitude cannot exceed 64.0f: if it does, modify the values
+    // appropriately to flatten the values down to the allowed maximum value.
+    if (controller->stickMag > 64) {
+        controller->stickX *= 64 / controller->stickMag;
+        controller->stickY *= 64 / controller->stickMag;
+        controller->stickMag = 64;
+    }
+}
+
 /**
  * Update the controller struct with available inputs if present.
  */
@@ -589,7 +588,9 @@ void read_controller_inputs(s32 threadID) {
         release_rumble_pak_control();
 #endif
     }
+#if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     run_demo_inputs();
+#endif
 
     for (i = 0; i < 2; i++) {
         struct Controller *controller = &gControllers[i];
@@ -676,8 +677,6 @@ void init_controllers(void) {
  * Setup main segments and framebuffers.
  */
 void setup_game_memory(void) {
-    UNUSED u64 padding;
-
     // Setup general Segment 0
     set_segment_base_addr(0, (void *) 0x80000000);
     // Create Mesg Queues

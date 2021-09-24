@@ -98,6 +98,8 @@
 //#define SKIP_TITLE_SCREEN
 // Uncomment this if you want to keep the mario head and not skip it
 //#define KEEP_MARIO_HEAD
+// Disables the demo that plays when idle on the start screen (Arceveti)
+#define DISABLE_DEMO
 // Enables "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the dpad
 #define PARALLEL_LAKITU_CAM
 // Allows Mario to ledgegrab sloped floors
@@ -108,6 +110,10 @@
 //#define PUPPYCAM
 // Allows Mario's shadow to be transparent on top of transparent surfaces, such as water, lava, and ice
 #define FIX_SHADOW_TRANSPARENCY
+// Fixes the game reading the ia8 burn smoke texture as an rgba16
+#define BURN_SMOKE_FIX
+// Disable the fix to Koopa's unshelled model
+#define KOOPA_KEEP_PINK_SHORTS
 // Automatically calculate the optimal collision distance for an object based on its vertices.
 #define AUTO_COLLISION_DISTANCE
 

@@ -46,7 +46,7 @@ extern const u8 eu_course_strings_de_table[];
 #endif
 
 // script
-extern const LevelScript level_main_menu_entry_1[];
-extern const LevelScript level_main_menu_entry_2[];
+extern const LevelScript level_main_menu_entry_file_select[];
+extern const LevelScript level_main_menu_entry_act_select[];
 
 #endif

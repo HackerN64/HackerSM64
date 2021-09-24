@@ -154,7 +154,7 @@ extern s8 gSaveFileModified;
 
 void save_file_do_save(s32 fileIndex);
 void save_file_erase(s32 fileIndex);
-BAD_RETURN(s32) save_file_copy(s32 srcFileIndex, s32 destFileIndex);
+void save_file_copy(s32 srcFileIndex, s32 destFileIndex);
 void save_file_load_all(void);
 void save_file_reload(void);
 void save_file_collect_star_or_key(s16 coinScore, s16 starIndex);

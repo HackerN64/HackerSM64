@@ -331,7 +331,6 @@ void func_8018F4CC(struct ObjJoint *j) {
 void func_8018F520(struct ObjBone *b) {
     struct ObjJoint *joint1;
     struct ObjJoint *joint2;
-    UNUSED u32 pad[3];
     struct GdVec3f sp90;
     struct GdVec3f sp84;
     struct GdVec3f sp78;
@@ -956,7 +955,6 @@ void func_80191220(struct ObjJoint *j) {
 
 /* 23FB90 -> 23FBC0 */
 void func_801913C0(struct ObjJoint *j) {
-    UNUSED u32 pad[4];
     func_80181894(j);
 }
 

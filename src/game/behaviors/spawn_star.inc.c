@@ -48,7 +48,7 @@ void bhv_star_spawn_init(void) {
     o->oStarSpawnDisFromHome = sqrtf(sqr(o->oHomeX - o->oPosX) + sqr(o->oHomeZ - o->oPosZ));
     o->oVelY = (o->oHomeY - o->oPosY) / 30.0f;
     o->oForwardVel = o->oStarSpawnDisFromHome / 30.0f;
-    o->oStarSpawnUnkFC = o->oPosY;
+    o->oStarSpawnVelY = o->oPosY;
     if (o->oBehParams2ndByte == 0 || gCurrCourseNum == COURSE_BBH)
         cutscene_object(CUTSCENE_STAR_SPAWN, o);
     else
@@ -69,8 +69,8 @@ void bhv_star_spawn_loop(void) {
 
         case 1:
             obj_move_xyz_using_fvel_and_yaw(o);
-            o->oStarSpawnUnkFC += o->oVelY;
-            o->oPosY = o->oStarSpawnUnkFC + sins((o->oTimer * 0x8000) / 30) * 400.0f;
+            o->oStarSpawnVelY += o->oVelY;
+            o->oPosY = o->oStarSpawnVelY + sins((o->oTimer * 0x8000) / 30) * 400.0f;
             o->oFaceAngleYaw += 0x1000;
             spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
             cur_obj_play_sound_1(SOUND_ENV_STAR);
@@ -118,11 +118,11 @@ void bhv_star_spawn_loop(void) {
 
 void bhv_hidden_red_coin_star_init(void) {
     s16 numRedCoinsRemaining;
-    struct Object *starObj;
+    struct Object *starObj = NULL;
 
-    if (gCurrCourseNum != COURSE_JRB)
+    if (gCurrCourseNum != COURSE_JRB) {
         spawn_object(o, MODEL_TRANSPARENT_STAR, bhvRedCoinStarMarker);
-
+    }
     numRedCoinsRemaining = count_objects_with_behavior(bhvRedCoin);
     if (numRedCoinsRemaining == 0) {
         starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStar, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);

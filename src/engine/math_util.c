@@ -20,108 +20,60 @@ Vec4s *gSplineKeyframe;
 float gSplineKeyframeFraction;
 int gSplineState;
 
-// These functions have bogus return values.
-// Disable the compiler warning.
-#pragma GCC diagnostic push
-
-#ifdef __GNUC__
-#if defined(__clang__)
-  #pragma GCC diagnostic ignored "-Wreturn-stack-address"
-#else
-  #pragma GCC diagnostic ignored "-Wreturn-local-addr"
-#endif
-#endif
-
 /// Copy vector 'src' to 'dest'
-void *vec3f_copy(Vec3f dest, Vec3f src) {
-    dest[0] = src[0];
-    dest[1] = src[1];
-    dest[2] = src[2];
-    return &dest; //! warning: function returns address of local variable
+void vec3f_copy(Vec3f dest, Vec3f src) {
+    vec3_copy(dest, src);
 }
 
 /// Set vector 'dest' to (x, y, z)
-void *vec3f_set(Vec3f dest, f32 x, f32 y, f32 z) {
-    dest[0] = x;
-    dest[1] = y;
-    dest[2] = z;
-    return &dest; //! warning: function returns address of local variable
+void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z) {
+    vec3_set(dest, x, y, z);
 }
 
 /// Add vector 'a' to 'dest'
-void *vec3f_add(Vec3f dest, Vec3f a) {
-    dest[0] += a[0];
-    dest[1] += a[1];
-    dest[2] += a[2];
-    return &dest; //! warning: function returns address of local variable
+void vec3f_add(Vec3f dest, Vec3f a) {
+    vec3_add(dest, a);
 }
 
 /// Make 'dest' the sum of vectors a and b.
-void *vec3f_sum(Vec3f dest, Vec3f a, Vec3f b) {
-    dest[0] = a[0] + b[0];
-    dest[1] = a[1] + b[1];
-    dest[2] = a[2] + b[2];
-    return &dest; //! warning: function returns address of local variable
+void vec3f_sum(Vec3f dest, Vec3f a, Vec3f b) {
+    vec3_sum(dest, a, b);
 }
 
 /// Copy vector src to dest
-void *vec3s_copy(Vec3s dest, Vec3s src) {
-    dest[0] = src[0];
-    dest[1] = src[1];
-    dest[2] = src[2];
-    return &dest; //! warning: function returns address of local variable
+void vec3s_copy(Vec3s dest, Vec3s src) {
+    vec3_copy(dest, src);
 }
 
 /// Set vector 'dest' to (x, y, z)
-void *vec3s_set(Vec3s dest, s16 x, s16 y, s16 z) {
-    dest[0] = x;
-    dest[1] = y;
-    dest[2] = z;
-    return &dest; //! warning: function returns address of local variable
+void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z) {
+    vec3_set(dest, x, y, z);
 }
 
 /// Add vector a to 'dest'
-void *vec3s_add(Vec3s dest, Vec3s a) {
-    dest[0] += a[0];
-    dest[1] += a[1];
-    dest[2] += a[2];
-    return &dest; //! warning: function returns address of local variable
+void vec3s_add(Vec3s dest, Vec3s a) {
+    vec3_add(dest, a);
 }
 
 /// Make 'dest' the sum of vectors a and b.
-void *vec3s_sum(Vec3s dest, Vec3s a, Vec3s b) {
-    dest[0] = a[0] + b[0];
-    dest[1] = a[1] + b[1];
-    dest[2] = a[2] + b[2];
-    return &dest; //! warning: function returns address of local variable
+void vec3s_sum(Vec3s dest, Vec3s a, Vec3s b) {
+    vec3_sum(dest, a, b);
 }
 
 /// Subtract vector a from 'dest'
-void *vec3s_sub(Vec3s dest, Vec3s a) {
-    dest[0] -= a[0];
-    dest[1] -= a[1];
-    dest[2] -= a[2];
-    return &dest; //! warning: function returns address of local variable
-}
-
-/// Convert short vector a to float vector 'dest'
-void *vec3s_to_vec3f(Vec3f dest, Vec3s a) {
-    dest[0] = a[0];
-    dest[1] = a[1];
-    dest[2] = a[2];
-    return &dest; //! warning: function returns address of local variable
+void vec3s_sub(Vec3s dest, Vec3s a) {
+    vec3_sub(dest, a);
 }
 
 /**
  * Convert float vector a to a short vector 'dest' by rounding the components
  * to the nearest integer.
  */
-void *vec3f_to_vec3s(Vec3s dest, Vec3f a) {
+void vec3f_to_vec3s(Vec3s dest, Vec3f a) {
     // add/subtract 0.5 in order to round to the nearest s32 instead of truncating
     dest[0] = a[0] + ((a[0] > 0) ? 0.5f : -0.5f);
     dest[1] = a[1] + ((a[1] > 0) ? 0.5f : -0.5f);
     dest[2] = a[2] + ((a[2] > 0) ? 0.5f : -0.5f);
-    return &dest; //! warning: function returns address of local variable
 }
 
 /**
@@ -129,33 +81,24 @@ void *vec3f_to_vec3s(Vec3s dest, Vec3f a) {
  * It is similar to vec3f_cross, but it calculates the vectors (c-b) and (b-a)
  * at the same time.
  */
-void *find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c) {
+void find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c) {
     dest[0] = (b[1] - a[1]) * (c[2] - b[2]) - (c[1] - b[1]) * (b[2] - a[2]);
     dest[1] = (b[2] - a[2]) * (c[0] - b[0]) - (c[2] - b[2]) * (b[0] - a[0]);
     dest[2] = (b[0] - a[0]) * (c[1] - b[1]) - (c[0] - b[0]) * (b[1] - a[1]);
-    return &dest; //! warning: function returns address of local variable
 }
 
 /// Make vector 'dest' the cross product of vectors a and b.
-void *vec3f_cross(Vec3f dest, Vec3f a, Vec3f b) {
-    dest[0] = a[1] * b[2] - b[1] * a[2];
-    dest[1] = a[2] * b[0] - b[2] * a[0];
-    dest[2] = a[0] * b[1] - b[0] * a[1];
-    return &dest; //! warning: function returns address of local variable
+void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b) {
+    vec3_cross(dest, a, b);
 }
 
 /// Scale vector 'dest' so it has length 1
-void *vec3f_normalize(Vec3f dest) {
-    //! Possible division by zero
-    f32 invsqrt = 1.0f / sqrtf(dest[0] * dest[0] + dest[1] * dest[1] + dest[2] * dest[2]);
-
-    dest[0] *= invsqrt;
-    dest[1] *= invsqrt;
-    dest[2] *= invsqrt;
-    return &dest; //! warning: function returns address of local variable
+void vec3f_normalize(Vec3f dest) {
+    f32 invsqrt = sqrtf(sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
+    if (invsqrt < 0.00001f) return;
+    invsqrt = 1.0f / invsqrt;
+    vec3_mul_val(dest, invsqrt);
 }
-
-#pragma GCC diagnostic pop
 
 /// Copy matrix 'src' to 'dest'
 void mtxf_copy(Mat4 dest, Mat4 src) {
@@ -188,9 +131,7 @@ void mtxf_identity(Mat4 mtx) {
  */
 void mtxf_translate(Mat4 dest, Vec3f b) {
     mtxf_identity(dest);
-    dest[3][0] = b[0];
-    dest[3][1] = b[1];
-    dest[3][2] = b[2];
+    vec3_copy(dest[3], b);
 }
 
 /**
@@ -200,72 +141,47 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
  * angle allows a bank rotation of the camera.
  */
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
-    register f32 invLength;
-    f32 dx;
-    f32 dz;
-    f32 xColY;
-    f32 yColY;
-    f32 zColY;
-    f32 xColZ;
-    f32 yColZ;
-    f32 zColZ;
-    f32 xColX;
-    f32 yColX;
-    f32 zColX;
+    Vec3f colX, colY, colZ;
 
-    dx = to[0] - from[0];
-    dz = to[2] - from[2];
+    f32 dx = to[0] - from[0];
+    f32 dz = to[2] - from[2];
 
-    invLength = -1.0f / MAX(sqrtf(dx * dx + dz * dz), 0.00001f);
+    register f32 invLength = -1.0f / MAX(sqrtf(sqr(dx) + sqr(dz)), 0.00001f);
     dx *= invLength;
     dz *= invLength;
 
-    yColY = coss(roll);
-    xColY = sins(roll) * dz;
-    zColY = -sins(roll) * dx;
+    colY[1] = coss(roll);
+    colY[0] = sins(roll) * dz;
+    colY[2] = -sins(roll) * dx;
+    vec3_diff(colZ, to, from);
 
-    xColZ = to[0] - from[0];
-    yColZ = to[1] - from[1];
-    zColZ = to[2] - from[2];
+    invLength = -1.0f / MAX(sqrtf(sqr(colZ[0]) + sqr(colZ[1]) + sqr(colZ[2])), 0.00001f);
+    vec3_mul_val(colZ, invLength);
 
-    invLength = -1.0f / MAX(sqrtf(xColZ * xColZ + yColZ * yColZ + zColZ * zColZ), 0.00001f);
-    xColZ *= invLength;
-    yColZ *= invLength;
-    zColZ *= invLength;
+    vec3_cross(colX, colY, colZ);
 
-    xColX = yColY * zColZ - zColY * yColZ;
-    yColX = zColY * xColZ - xColY * zColZ;
-    zColX = xColY * yColZ - yColY * xColZ;
+    invLength = 1.0f / MAX(sqrtf(sqr(colX[0]) + sqr(colX[1]) + sqr(colX[2])), 0.00001f);
+    vec3_mul_val(colX, invLength);
 
-    invLength = 1.0f / MAX(sqrtf(xColX * xColX + yColX * yColX + zColX * zColX), 0.00001f);
+    vec3_cross(colY, colZ, colX);
 
-    xColX *= invLength;
-    yColX *= invLength;
-    zColX *= invLength;
+    invLength = 1.0f / MAX(sqrtf(sqr(colY[0]) + sqr(colY[1]) + sqr(colY[2])), 0.00001f);
+    vec3_mul_val(colY, invLength);
 
-    xColY = yColZ * zColX - zColZ * yColX;
-    yColY = zColZ * xColX - xColZ * zColX;
-    zColY = xColZ * yColX - yColZ * xColX;
+    mtx[0][0] = colX[0];
+    mtx[1][0] = colX[1];
+    mtx[2][0] = colX[2];
 
-    invLength = 1.0f / MAX(sqrtf(xColY * xColY + yColY * yColY + zColY * zColY), 0.00001f);
-    xColY *= invLength;
-    yColY *= invLength;
-    zColY *= invLength;
+    mtx[0][1] = colY[0];
+    mtx[1][1] = colY[1];
+    mtx[2][1] = colY[2];
 
-    mtx[0][0] = xColX;
-    mtx[1][0] = yColX;
-    mtx[2][0] = zColX;
-    mtx[3][0] = -(from[0] * xColX + from[1] * yColX + from[2] * zColX);
-
-    mtx[0][1] = xColY;
-    mtx[1][1] = yColY;
-    mtx[2][1] = zColY;
-    mtx[3][1] = -(from[0] * xColY + from[1] * yColY + from[2] * zColY);
-
-    mtx[0][2] = xColZ;
-    mtx[1][2] = yColZ;
-    mtx[2][2] = zColZ;
-    mtx[3][2] = -(from[0] * xColZ + from[1] * yColZ + from[2] * zColZ);
+    mtx[0][2] = colZ[0];
+    mtx[1][2] = colZ[1];
+    mtx[2][2] = colZ[2];
+    mtx[3][0] = -vec3_dot(from, colX);
+    mtx[3][1] = -vec3_dot(from, colY);
+    mtx[3][2] = -vec3_dot(from, colZ);
 
     mtx[0][3] = 0;
     mtx[1][3] = 0;
@@ -348,8 +264,13 @@ void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f b, Vec3s c) {
  * 'angle' rotates the object while still facing the camera.
  */
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s16 angle) {
-    dest[0][0] = coss(angle);
-    dest[0][1] = sins(angle);
+    if (angle == 0x0) {
+        dest[0][0] = 1;
+        dest[0][1] = 0;
+    } else {
+        dest[0][0] = coss(angle);
+        dest[0][1] = sins(angle);
+    }
     dest[0][2] = 0;
     dest[0][3] = 0;
 
@@ -363,12 +284,9 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s16 angle) {
     dest[2][2] = 1;
     dest[2][3] = 0;
 
-    dest[3][0] =
-        mtx[0][0] * position[0] + mtx[1][0] * position[1] + mtx[2][0] * position[2] + mtx[3][0];
-    dest[3][1] =
-        mtx[0][1] * position[0] + mtx[1][1] * position[1] + mtx[2][1] * position[2] + mtx[3][1];
-    dest[3][2] =
-        mtx[0][2] * position[0] + mtx[1][2] * position[1] + mtx[2][2] * position[2] + mtx[3][2];
+    dest[3][0] = mtx[0][0] * position[0] + mtx[1][0] * position[1] + mtx[2][0] * position[2] + mtx[3][0];
+    dest[3][1] = mtx[0][1] * position[0] + mtx[1][1] * position[1] + mtx[2][1] * position[2] + mtx[3][1];
+    dest[3][2] = mtx[0][2] * position[0] + mtx[1][2] * position[1] + mtx[2][2] * position[2] + mtx[3][2];
     dest[3][3] = 1;
 }
 
@@ -384,29 +302,19 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s16 yaw) {
     Vec3f leftDir;
     Vec3f forwardDir;
 
-    vec3f_set(lateralDir, sins(yaw), 0, coss(yaw));
+    vec3_set(lateralDir, sins(yaw), 0, coss(yaw));
     vec3f_normalize(upDir);
 
-    vec3f_cross(leftDir, upDir, lateralDir);
+    vec3_cross(leftDir, upDir, lateralDir);
     vec3f_normalize(leftDir);
 
-    vec3f_cross(forwardDir, leftDir, upDir);
+    vec3_cross(forwardDir, leftDir, upDir);
     vec3f_normalize(forwardDir);
 
-    dest[0][0] = leftDir[0];
-    dest[0][1] = leftDir[1];
-    dest[0][2] = leftDir[2];
-    dest[3][0] = pos[0];
-
-    dest[1][0] = upDir[0];
-    dest[1][1] = upDir[1];
-    dest[1][2] = upDir[2];
-    dest[3][1] = pos[1];
-
-    dest[2][0] = forwardDir[0];
-    dest[2][1] = forwardDir[1];
-    dest[2][2] = forwardDir[2];
-    dest[3][2] = pos[2];
+    vec3_copy(dest[0], leftDir);
+    vec3_copy(dest[1], upDir);
+    vec3_copy(dest[2], forwardDir);
+    vec3_copy(dest[3], pos);
 
     dest[0][3] = 0.0f;
     dest[1][3] = 0.0f;
@@ -423,14 +331,10 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s16 yaw) {
  * 'radius' is the distance from each triangle vertex to the center
  */
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
-    struct Surface *sp74;
-    Vec3f point0;
-    Vec3f point1;
-    Vec3f point2;
+    struct Surface *floor;
+    Vec3f point0, point1, point2;
     Vec3f forward;
-    Vec3f xColumn;
-    Vec3f yColumn;
-    Vec3f zColumn;
+    Vec3f xColumn, yColumn, zColumn;
     f32 avgY;
     f32 minY = -radius * 3;
 
@@ -441,9 +345,9 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
     point2[0] = pos[0] + radius * sins(yaw + 0xD555);
     point2[2] = pos[2] + radius * coss(yaw + 0xD555);
 
-    point0[1] = find_floor(point0[0], pos[1] + 150, point0[2], &sp74);
-    point1[1] = find_floor(point1[0], pos[1] + 150, point1[2], &sp74);
-    point2[1] = find_floor(point2[0], pos[1] + 150, point2[2], &sp74);
+    point0[1] = find_floor(point0[0], pos[1] + 150, point0[2], &floor);
+    point1[1] = find_floor(point1[0], pos[1] + 150, point1[2], &floor);
+    point2[1] = find_floor(point2[0], pos[1] + 150, point2[2], &floor);
 
     if (point0[1] - pos[1] < minY) {
         point0[1] = pos[1];
@@ -459,27 +363,19 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
 
     avgY = (point0[1] + point1[1] + point2[1]) / 3;
 
-    vec3f_set(forward, sins(yaw), 0, coss(yaw));
+    vec3_set(forward, sins(yaw), 0, coss(yaw));
     find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
     vec3f_normalize(yColumn);
-    vec3f_cross(xColumn, yColumn, forward);
+    vec3_cross(xColumn, yColumn, forward);
     vec3f_normalize(xColumn);
-    vec3f_cross(zColumn, xColumn, yColumn);
+    vec3_cross(zColumn, xColumn, yColumn);
     vec3f_normalize(zColumn);
+    vec3_copy(mtx[0], xColumn);
+    vec3_copy(mtx[1], yColumn);
+    vec3_copy(mtx[2], zColumn);
 
-    mtx[0][0] = xColumn[0];
-    mtx[0][1] = xColumn[1];
-    mtx[0][2] = xColumn[2];
     mtx[3][0] = pos[0];
-
-    mtx[1][0] = yColumn[0];
-    mtx[1][1] = yColumn[1];
-    mtx[1][2] = yColumn[2];
     mtx[3][1] = (avgY < pos[1]) ? pos[1] : avgY;
-
-    mtx[2][0] = zColumn[0];
-    mtx[2][1] = zColumn[1];
-    mtx[2][2] = zColumn[2];
     mtx[3][2] = pos[2];
 
     mtx[0][3] = 0;
@@ -498,41 +394,31 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
  */
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
     Mat4 temp;
-    register f32 entry0;
-    register f32 entry1;
-    register f32 entry2;
+    register Vec3f entry;
 
     // column 0
-    entry0 = a[0][0];
-    entry1 = a[0][1];
-    entry2 = a[0][2];
-    temp[0][0] = entry0 * b[0][0] + entry1 * b[1][0] + entry2 * b[2][0];
-    temp[0][1] = entry0 * b[0][1] + entry1 * b[1][1] + entry2 * b[2][1];
-    temp[0][2] = entry0 * b[0][2] + entry1 * b[1][2] + entry2 * b[2][2];
+    vec3_copy(entry, a[0]);
+    temp[0][0] = entry[0] * b[0][0] + entry[1] * b[1][0] + entry[2] * b[2][0];
+    temp[0][1] = entry[0] * b[0][1] + entry[1] * b[1][1] + entry[2] * b[2][1];
+    temp[0][2] = entry[0] * b[0][2] + entry[1] * b[1][2] + entry[2] * b[2][2];
 
     // column 1
-    entry0 = a[1][0];
-    entry1 = a[1][1];
-    entry2 = a[1][2];
-    temp[1][0] = entry0 * b[0][0] + entry1 * b[1][0] + entry2 * b[2][0];
-    temp[1][1] = entry0 * b[0][1] + entry1 * b[1][1] + entry2 * b[2][1];
-    temp[1][2] = entry0 * b[0][2] + entry1 * b[1][2] + entry2 * b[2][2];
+    vec3_copy(entry, a[1]);
+    temp[1][0] = entry[0] * b[0][0] + entry[1] * b[1][0] + entry[2] * b[2][0];
+    temp[1][1] = entry[0] * b[0][1] + entry[1] * b[1][1] + entry[2] * b[2][1];
+    temp[1][2] = entry[0] * b[0][2] + entry[1] * b[1][2] + entry[2] * b[2][2];
 
     // column 2
-    entry0 = a[2][0];
-    entry1 = a[2][1];
-    entry2 = a[2][2];
-    temp[2][0] = entry0 * b[0][0] + entry1 * b[1][0] + entry2 * b[2][0];
-    temp[2][1] = entry0 * b[0][1] + entry1 * b[1][1] + entry2 * b[2][1];
-    temp[2][2] = entry0 * b[0][2] + entry1 * b[1][2] + entry2 * b[2][2];
+    vec3_copy(entry, a[2]);
+    temp[2][0] = entry[0] * b[0][0] + entry[1] * b[1][0] + entry[2] * b[2][0];
+    temp[2][1] = entry[0] * b[0][1] + entry[1] * b[1][1] + entry[2] * b[2][1];
+    temp[2][2] = entry[0] * b[0][2] + entry[1] * b[1][2] + entry[2] * b[2][2];
 
     // column 3
-    entry0 = a[3][0];
-    entry1 = a[3][1];
-    entry2 = a[3][2];
-    temp[3][0] = entry0 * b[0][0] + entry1 * b[1][0] + entry2 * b[2][0] + b[3][0];
-    temp[3][1] = entry0 * b[0][1] + entry1 * b[1][1] + entry2 * b[2][1] + b[3][1];
-    temp[3][2] = entry0 * b[0][2] + entry1 * b[1][2] + entry2 * b[2][2] + b[3][2];
+    vec3_copy(entry, a[3]);
+    temp[3][0] = entry[0] * b[0][0] + entry[1] * b[1][0] + entry[2] * b[2][0] + b[3][0];
+    temp[3][1] = entry[0] * b[0][1] + entry[1] * b[1][1] + entry[2] * b[2][1] + b[3][1];
+    temp[3][2] = entry[0] * b[0][2] + entry[1] * b[1][2] + entry[2] * b[2][2] + b[3][2];
 
     temp[0][3] = temp[1][3] = temp[2][3] = 0;
     temp[3][3] = 1;
@@ -579,17 +465,17 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
  * and no crashes occur.
  */
 void mtxf_to_mtx(Mtx *dest, Mat4 src) {
-	Mat4 temp;
-	register s32 i, j;
+    Mat4 temp;
+    register s32 i, j;
 
-	for( i = 0; i < 4; i++ ) {
-		for( j = 0; j < 3; j++ ) {
-			temp[i][j] = src[i][j] / gWorldScale;
-		}
-		temp[i][3] = src[i][3];
-	}
+    for( i = 0; i < 4; i++ ) {
+        for( j = 0; j < 3; j++ ) {
+            temp[i][j] = src[i][j] / gWorldScale;
+        }
+        temp[i][3] = src[i][3];
+    }
 
-	guMtxF2L( temp, dest );
+    guMtxF2L( temp, dest );
 }
 
 /**
@@ -619,12 +505,9 @@ void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx) {
     f32 camY = camMtx[3][0] * camMtx[1][0] + camMtx[3][1] * camMtx[1][1] + camMtx[3][2] * camMtx[1][2];
     f32 camZ = camMtx[3][0] * camMtx[2][0] + camMtx[3][1] * camMtx[2][1] + camMtx[3][2] * camMtx[2][2];
 
-    dest[0] =
-        objMtx[3][0] * camMtx[0][0] + objMtx[3][1] * camMtx[0][1] + objMtx[3][2] * camMtx[0][2] - camX;
-    dest[1] =
-        objMtx[3][0] * camMtx[1][0] + objMtx[3][1] * camMtx[1][1] + objMtx[3][2] * camMtx[1][2] - camY;
-    dest[2] =
-        objMtx[3][0] * camMtx[2][0] + objMtx[3][1] * camMtx[2][1] + objMtx[3][2] * camMtx[2][2] - camZ;
+    dest[0] = objMtx[3][0] * camMtx[0][0] + objMtx[3][1] * camMtx[0][1] + objMtx[3][2] * camMtx[0][2] - camX;
+    dest[1] = objMtx[3][0] * camMtx[1][0] + objMtx[3][1] * camMtx[1][1] + objMtx[3][2] * camMtx[1][2] - camY;
+    dest[2] = objMtx[3][0] * camMtx[2][0] + objMtx[3][1] * camMtx[2][1] + objMtx[3][2] * camMtx[2][2] - camZ;
 }
 
 /**
@@ -637,8 +520,8 @@ void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *
     register f32 y = to[1] - from[1];
     register f32 z = to[2] - from[2];
 
-    *dist = sqrtf(x * x + y * y + z * z);
-    *pitch = atan2s(sqrtf(x * x + z * z), y);
+    *dist = sqrtf(sqr(x) + sqr(y) + sqr(z));
+    *pitch = atan2s(sqrtf(sqr(x) + sqr(z)), y);
     *yaw = atan2s(z, x);
 }
 
@@ -657,19 +540,11 @@ void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, s16 pitch, s16 yaw
  * most 'inc' and going down at most 'dec'.
  */
 s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec) {
-    //! If target is close to the max or min s32, then it's possible to overflow
-    // past it without stopping.
-
-    if (current < target) {
-        current += inc;
-        if (current > target) {
-            current = target;
-        }
-    } else {
-        current -= dec;
-        if (current < target) {
-            current = target;
-        }
+    s32 dist = (target - current);
+    if (dist > 0) { // current < target
+        current = ((dist >  inc) ? (current + inc) : target);
+    } else if (dist < 0) { // current > target
+        current = ((dist < -dec) ? (current - dec) : target);
     }
     return current;
 }
@@ -679,16 +554,11 @@ s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec) {
  * most 'inc' and going down at most 'dec'.
  */
 f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec) {
-    if (current < target) {
-        current += inc;
-        if (current > target) {
-            current = target;
-        }
-    } else {
-        current -= dec;
-        if (current < target) {
-            current = target;
-        }
+    f32 dist = (target - current);
+    if (dist >= 0.0f) { // target >= current
+        current = ((dist >  inc) ? (current + inc) : target);
+    } else { // target < current
+        current = ((dist < -dec) ? (current - dec) : target);
     }
     return current;
 }
@@ -697,16 +567,7 @@ f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec) {
  * Helper function for atan2s. Does a look up of the arctangent of y/x assuming
  * the resulting angle is in range [0, 0x2000] (1/8 of a circle).
  */
-static u16 atan2_lookup(f32 y, f32 x) {
-    u16 ret;
-
-    if (x == 0) {
-        ret = gArctanTable[0];
-    } else {
-        ret = gArctanTable[(s32)(y / x * 1024 + 0.5f)];
-    }
-    return ret;
-}
+#define atan2_lookup(y, x) ((x == 0) ? 0x0 : atans((y) / (x)))
 
 /**
  * Compute the angle from (0, 0) to (x, y) as a s16. Given that terrain is in
@@ -757,11 +618,11 @@ f32 atan2f(f32 y, f32 x) {
     return (f32) atan2s(y, x) * M_PI / 0x8000;
 }
 
-#define CURVE_BEGIN_1 1
-#define CURVE_BEGIN_2 2
-#define CURVE_MIDDLE 3
-#define CURVE_END_1 4
-#define CURVE_END_2 5
+#define CURVE_BEGIN_1 0x1
+#define CURVE_BEGIN_2 0x2
+#define CURVE_MIDDLE  0x3
+#define CURVE_END_1   0x4
+#define CURVE_END_2   0x5
 
 /**
  * Set 'result' to a 4-vector with weights corresponding to interpolation
@@ -852,7 +713,7 @@ s32 anim_spline_poll(Vec3f result) {
     s32 i;
     s32 hasEnded = FALSE;
 
-    vec3f_copy(result, gVec3fZero);
+    vec3_zero(result);
     spline_get_weights(weights, gSplineKeyframeFraction, gSplineState);
     for (i = 0; i < 4; i++) {
         result[0] += weights[i] * gSplineKeyframe[i][1];
@@ -882,37 +743,27 @@ s32 anim_spline_poll(Vec3f result) {
 }
 
 /// Multiply vector 'dest' by a
-void *vec3f_mul(Vec3f dest, f32 a)
-{
-    dest[0] *= a;
-    dest[1] *= a;
-    dest[2] *= a;
-    return dest; //! warning: function returns address of local variable
+void vec3f_mul(Vec3f dest, f32 a) {
+    vec3_mul_val(dest, a);
 }
 
 /// Get length of vector 'a'
-f32 vec3f_length(Vec3f a)
-{
-	return sqrtf(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+f32 vec3f_length(Vec3f a) {
+    return sqrtf(sqr(a[0]) + sqr(a[1]) + sqr(a[2]));
 }
 
 /// Get dot product of vectors 'a' and 'b'
-f32 vec3f_dot(Vec3f a, Vec3f b)
-{
-	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+f32 vec3f_dot(Vec3f a, Vec3f b) {
+    return vec3_dot(a, b);
 }
 
 /// Make 'dest' the difference of vectors a and b.
-void *vec3f_dif(Vec3f dest, Vec3f a, Vec3f b) {
-    dest[0] = a[0] - b[0];
-    dest[1] = a[1] - b[1];
-    dest[2] = a[2] - b[2];
-    return dest; //! warning: function returns address of local variable
+void vec3f_dif(Vec3f dest, Vec3f a, Vec3f b) {
+    vec3_diff(dest, a, b);
 }
 
-//Raycasting
-s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface *surface, Vec3f hit_pos, f32 *length)
-{
+// Raycasting
+s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface *surface, Vec3f hit_pos, f32 *length) {
     Vec3f v0, v1, v2, e1, e2, h, s, q;
     f32 a, f, u, v;
     Vec3f add_dir;
@@ -923,56 +774,53 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
         return FALSE;
 
     // Get surface normal and some other stuff
-    norm[0] = 0;
-    norm[1] = surface->normal.y;
-    norm[2] = 0;
-    vec3f_mul(norm,RAY_OFFSET);
+    vec3_set(norm, 0, surface->normal.y, 0);
+    vec3_mul_val(norm, RAY_OFFSET);
 
-    vec3s_to_vec3f(v0, surface->vertex1);
-    vec3s_to_vec3f(v1, surface->vertex2);
-    vec3s_to_vec3f(v2, surface->vertex3);
+    vec3_copy(v0, surface->vertex1);
+    vec3_copy(v1, surface->vertex2);
+    vec3_copy(v2, surface->vertex3);
 
-    vec3f_add(v0, norm);
-    vec3f_add(v1, norm);
-    vec3f_add(v2, norm);
+    vec3_add(v0, norm);
+    vec3_add(v1, norm);
+    vec3_add(v2, norm);
 
-    vec3f_dif(e1, v1, v0);
-    vec3f_dif(e2, v2, v0);
+    vec3_diff(e1, v1, v0);
+    vec3_diff(e2, v2, v0);
 
-    vec3f_cross(h, dir, e2);
+    vec3_cross(h, dir, e2);
 
     // Check if we're perpendicular from the surface
-    a = vec3f_dot(e1, h);
-    if (a > -0.00001f && a < 0.00001f)
+    a = vec3_dot(e1, h);
+    if (a > -0.00001f && a < 0.00001f) {
         return FALSE;
-
+    }
     // Check if we're making contact with the surface
     f = 1.0f / a;
 
-    vec3f_dif(s, orig, v0);
-    u = f * vec3f_dot(s, h);
-    if (u < 0.0f || u > 1.0f)
+    vec3_diff(s, orig, v0);
+    u = f * vec3_dot(s, h);
+    if (u < 0.0f || u > 1.0f) {
         return FALSE;
-
-    vec3f_cross(q, s, e1);
-    v = f * vec3f_dot(dir, q);
-    if (v < 0.0f || u + v > 1.0f)
+    }
+    vec3_cross(q, s, e1);
+    v = f * vec3_dot(dir, q);
+    if (v < 0.0f || u + v > 1.0f) {
         return FALSE;
-
+    }
     // Get the length between our origin and the surface contact point
-    *length = f * vec3f_dot(e2, q);
-    if (*length <= 0.00001 || *length > dir_length)
+    *length = f * vec3_dot(e2, q);
+    if (*length <= 0.00001 || *length > dir_length) {
         return FALSE;
-
+    }
     // Successful contact
-    vec3f_copy(add_dir, dir);
-    vec3f_mul(add_dir, *length);
-    vec3f_sum(hit_pos, orig, add_dir);
+    vec3_copy(add_dir, dir);
+    vec3_mul_val(add_dir, *length);
+    vec3_sum(hit_pos, orig, add_dir);
     return TRUE;
 }
 
-void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length)
-{
+void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length) {
     s32 hit;
     f32 length;
     Vec3f chk_hit_pos;
@@ -982,31 +830,25 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     #endif
 
     // Get upper and lower bounds of ray
-    if (dir[1] >= 0.0f)
-    {
+    if (dir[1] >= 0.0f) {
         top = orig[1] + dir[1] * dir_length;
         bottom = orig[1];
-    }
-    else
-    {
+    } else {
         top = orig[1];
         bottom = orig[1] + dir[1] * dir_length;
     }
 
     // Iterate through every surface of the list
-    for (; list != NULL; list = list->next)
-    {
+    for (; list != NULL; list = list->next) {
         // Reject surface if out of vertical bounds
-        if (list->surface->lowerY > top || list->surface->upperY < bottom)
+        if (list->surface->lowerY > top || list->surface->upperY < bottom) {
             continue;
-
+        }
         // Check intersection between the ray and this surface
-        if ((hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length)) != 0)
-        {
-            if (length <= *max_length)
-            {
+        if ((hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length)) != 0) {
+            if (length <= *max_length) {
                 *hit_surface = list->surface;
-                vec3f_copy(hit_pos, chk_hit_pos);
+                vec3_copy(hit_pos, chk_hit_pos);
                 *max_length = length;
             }
         }
@@ -1016,37 +858,30 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     #endif
 }
 
-void find_surface_on_ray_cell(s16 cellX, s16 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags)
-{
-	// Skip if OOB
-	if (cellX >= 0 && cellX <= (NUM_CELLS - 1) && cellZ >= 0 && cellZ <= (NUM_CELLS - 1))
-	{
-		// Iterate through each surface in this partition
-		if (normalized_dir[1] > -0.99999f && flags & RAYCAST_FIND_CEIL)
-		{
-			find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-			find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-		}
-		if (normalized_dir[1] < 0.99999f && flags & RAYCAST_FIND_FLOOR)
-		{
-			find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-			find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-		}
-		if (flags & RAYCAST_FIND_WALL)
-        {
+void find_surface_on_ray_cell(s16 cellX, s16 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
+    // Skip if OOB
+    if (cellX >= 0 && cellX <= (NUM_CELLS - 1) && cellZ >= 0 && cellZ <= (NUM_CELLS - 1)) {
+        // Iterate through each surface in this partition
+        if (normalized_dir[1] > -0.99999f && flags & RAYCAST_FIND_CEIL) {
+            find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+        }
+        if (normalized_dir[1] < 0.99999f && flags & RAYCAST_FIND_FLOOR) {
+            find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+        }
+        if (flags & RAYCAST_FIND_WALL) {
             find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
             find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
         }
-        if (flags & RAYCAST_FIND_WATER)
-        {
+        if (flags & RAYCAST_FIND_WATER) {
             find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
             find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
         }
-	}
+    }
 }
 
-void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags)
-{
+void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags) {
     f32 max_length;
     s32 cellZ, cellX, cellPrevX, cellPrevZ;
     f32 fCellZ, fCellX;
@@ -1057,12 +892,12 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
 
     // Set that no surface has been hit
     *hit_surface = NULL;
-    vec3f_sum(hit_pos, orig, dir);
+    vec3_sum(hit_pos, orig, dir);
 
     // Get normalized direction
     dir_length = vec3f_length(dir);
     max_length = dir_length;
-    vec3f_copy(normalized_dir, dir);
+    vec3_copy(normalized_dir, dir);
     vec3f_normalize(normalized_dir);
 
     // Get our cell coordinate
@@ -1074,23 +909,21 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     cellPrevZ = cellZ;
 
     // Don't do DDA if straight down
-    if (normalized_dir[1] >= 0.99999f || normalized_dir[1] <= -0.99999f)
-    {
-		find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
-		return;
-	}
+    if (normalized_dir[1] >= 0.99999f || normalized_dir[1] <= -0.99999f) {
+        find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        return;
+    }
 
     // Get cells we cross using DDA
     if (ABS(dir[0]) >= ABS(dir[2]))
-        step = RAY_STEPS*ABS(dir[0]) / CELL_SIZE;
+        step = RAY_STEPS * ABS(dir[0]) / CELL_SIZE;
     else
-        step = RAY_STEPS*ABS(dir[2]) / CELL_SIZE;
+        step = RAY_STEPS * ABS(dir[2]) / CELL_SIZE;
 
     dx = dir[0] / step / CELL_SIZE;
     dz = dir[2] / step / CELL_SIZE;
 
-    for (i = 0; i < step && *hit_surface == NULL; i++)
-    {
+    for (i = 0; i < step && *hit_surface == NULL; i++) {
         find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
 
         // Move cell coordinate
@@ -1101,8 +934,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
         cellX = fCellX;
         cellZ = fCellZ;
 
-        if ((cellPrevX != cellX) && (cellPrevZ != cellZ))
-        {
+        if ((cellPrevX != cellX) && (cellPrevZ != cellZ)) {
             find_surface_on_ray_cell(cellX, cellPrevZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
             find_surface_on_ray_cell(cellPrevX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
         }

@@ -17,29 +17,29 @@ void bubba_act_0(void) {
     treat_far_home_as_mario(2000.0f);
     o->oAnimState = 0;
 
-    o->oBubbaUnk1AC = obj_get_pitch_to_home(lateralDistToHome);
+    o->oBubbaTargetPitch = obj_get_pitch_to_home(lateralDistToHome);
 
-    approach_f32_ptr(&o->oBubbaUnkF4, 5.0f, 0.5f);
+    approach_f32_ptr(&o->oBubbaMovePitch, 5.0f, 0.5f);
 
-    if (o->oBubbaUnkFC != 0) {
-        if (abs_angle_diff(o->oMoveAngleYaw, o->oBubbaUnk1AE) < 800) {
-            o->oBubbaUnkFC = 0;
+    if (o->oBubbaHitWall != 0) {
+        if (abs_angle_diff(o->oMoveAngleYaw, o->oBubbaTargetYaw) < 800) {
+            o->oBubbaHitWall = 0;
         }
     } else {
         if (o->oDistanceToMario >= 25000.0f) {
-            o->oBubbaUnk1AE = o->oAngleToMario;
-            o->oBubbaUnkF8 = random_linear_offset(20, 30);
+            o->oBubbaTargetYaw = o->oAngleToMario;
+            o->oBubbaRandomTimer = random_linear_offset(20, 30);
         }
 
-        if ((o->oBubbaUnkFC = o->oMoveFlags & OBJ_MOVE_HIT_WALL) != 0) {
-            o->oBubbaUnk1AE = cur_obj_reflect_move_angle_off_wall();
+        if ((o->oBubbaHitWall = o->oMoveFlags & OBJ_MOVE_HIT_WALL) != 0) {
+            o->oBubbaTargetYaw = cur_obj_reflect_move_angle_off_wall();
         } else if (o->oTimer > 30 && o->oDistanceToMario < 2000.0f) {
             o->oAction = 1;
-        } else if (o->oBubbaUnkF8 != 0) {
-            o->oBubbaUnkF8 -= 1;
+        } else if (o->oBubbaRandomTimer != 0) {
+            o->oBubbaRandomTimer -= 1;
         } else {
-            o->oBubbaUnk1AE = obj_random_fixed_turn(0x2000);
-            o->oBubbaUnkF8 = random_linear_offset(100, 100);
+            o->oBubbaTargetYaw = obj_random_fixed_turn(0x2000);
+            o->oBubbaRandomTimer = random_linear_offset(100, 100);
         }
     }
 }
@@ -48,25 +48,25 @@ void bubba_act_1(void) {
     treat_far_home_as_mario(2500.0f);
     if (o->oDistanceToMario > 2500.0f) {
         o->oAction = 0;
-    } else if (o->oBubbaUnk100 != 0) {
-        if (--o->oBubbaUnk100 == 0) {
+    } else if (o->oBubbaLungeTimer != 0) {
+        if (--o->oBubbaLungeTimer == 0) {
             cur_obj_play_sound_2(SOUND_OBJ_BUBBA_CHOMP);
             o->oAction = 0;
-        } else if (o->oBubbaUnk100 < 15) {
+        } else if (o->oBubbaLungeTimer < 15) {
             o->oAnimState = 1;
-        } else if (o->oBubbaUnk100 == 20) {
+        } else if (o->oBubbaLungeTimer == 20) {
             s16 targetPitch = 10000 - (s16)(20.0f * (find_water_level(o->oPosX, o->oPosZ) - o->oPosY));
-            o->oBubbaUnk1AC -= targetPitch;
-            o->oMoveAnglePitch = o->oBubbaUnk1AC;
-            o->oBubbaUnkF4 = 40.0f;
-            obj_compute_vel_from_move_pitch(o->oBubbaUnkF4);
+            o->oBubbaTargetPitch -= targetPitch;
+            o->oMoveAnglePitch = o->oBubbaTargetPitch;
+            o->oBubbaMovePitch = 40.0f;
+            obj_compute_vel_from_move_pitch(o->oBubbaMovePitch);
             o->oAnimState = 0;
         } else {
-            o->oBubbaUnk1AE = o->oAngleToMario;
-            o->oBubbaUnk1AC = o->oBubbaUnk104;
+            o->oBubbaTargetYaw = o->oAngleToMario;
+            o->oBubbaTargetPitch = o->oBubbaNextTargetPitchTowardMario;
 
-            cur_obj_rotate_yaw_toward(o->oBubbaUnk1AE, 400);
-            obj_move_pitch_approach(o->oBubbaUnk1AC, 400);
+            cur_obj_rotate_yaw_toward(o->oBubbaTargetYaw, 400);
+            obj_move_pitch_approach(o->oBubbaTargetPitch, 400);
         }
     } else {
         if (abs_angle_diff(gMarioObject->oFaceAngleYaw, o->oAngleToMario) < 0x3000) {
@@ -75,30 +75,30 @@ void bubba_act_1(void) {
                 targetDYaw = -targetDYaw;
             }
 
-            o->oBubbaUnk1AE = o->oAngleToMario + targetDYaw;
+            o->oBubbaTargetYaw = o->oAngleToMario + targetDYaw;
         } else {
-            o->oBubbaUnk1AE = o->oAngleToMario;
+            o->oBubbaTargetYaw = o->oAngleToMario;
         }
 
-        o->oBubbaUnk1AC = o->oBubbaUnk104;
+        o->oBubbaTargetPitch = o->oBubbaNextTargetPitchTowardMario;
 
         if (obj_is_near_to_and_facing_mario(500.0f, 3000)
-            && abs_angle_diff(o->oBubbaUnk1AC, o->oMoveAnglePitch) < 3000) {
-            o->oBubbaUnk100 = 30;
-            o->oBubbaUnkF4 = 0;
+            && abs_angle_diff(o->oBubbaTargetPitch, o->oMoveAnglePitch) < 3000) {
+            o->oBubbaLungeTimer = 30;
+            o->oBubbaMovePitch = 0;
             o->oAnimState = 1;
         } else {
-            approach_f32_ptr(&o->oBubbaUnkF4, 20.0f, 0.5f);
+            approach_f32_ptr(&o->oBubbaMovePitch, 20.0f, 0.5f);
         }
     }
 }
 
 void bhv_bubba_loop(void) {
     o->oInteractionSubtype &= ~INT_SUBTYPE_EATS_MARIO;
-    o->oBubbaUnk104 = obj_turn_pitch_toward_mario(120.0f, 0);
+    o->oBubbaNextTargetPitchTowardMario = obj_turn_pitch_toward_mario(120.0f, 0);
 
     if (abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw) < 0x1000
-        && abs_angle_diff(o->oBubbaUnk104 + 0x800, o->oMoveAnglePitch) < 0x2000) {
+        && abs_angle_diff(o->oBubbaNextTargetPitchTowardMario + 0x800, o->oMoveAnglePitch) < 0x2000) {
         if (o->oAnimState != 0 && o->oDistanceToMario < 250.0f) {
             o->oInteractionSubtype |= INT_SUBTYPE_EATS_MARIO;
         }
@@ -126,26 +126,26 @@ void bhv_bubba_loop(void) {
                 obj_scale(splashObj, 3.0f);
             }
 
-            o->oBubbaUnk108 = o->oVelY;
-            o->oBubbaUnk10C = 0.0f;
+            o->oBubbaAirVelY = o->oVelY;
+            o->oBubbaJumpHeight = 0.0f;
         } else {
-            approach_f32_ptr(&o->oBubbaUnk108, 0.0f, 4.0f);
-            if ((o->oBubbaUnk10C -= o->oBubbaUnk108) > 1.0f) {
+            approach_f32_ptr(&o->oBubbaAirVelY, 0.0f, 4.0f);
+            if ((o->oBubbaJumpHeight -= o->oBubbaAirVelY) > 1.0f) {
                 s16 rand = random_u16();
-                o->oBubbaUnk10C -= 1.0f;
+                o->oBubbaJumpHeight -= 1.0f;
                 spawn_object_relative(0, 150.0f * coss(rand), 0x64, 150.0f * sins(rand), o,
                                       MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleSnow);
             }
         }
 
-        obj_smooth_turn(&o->oBubbaUnk1B0, &o->oMoveAnglePitch, o->oBubbaUnk1AC, 0.05f, 10, 50, 2000);
-        obj_smooth_turn(&o->oBubbaUnk1B2, &o->oMoveAngleYaw, o->oBubbaUnk1AE, 0.05f, 10, 50, 2000);
-        obj_compute_vel_from_move_pitch(o->oBubbaUnkF4);
+        obj_smooth_turn(&o->oBubbaPitchVel, &o->oMoveAnglePitch, o->oBubbaTargetPitch, 0.05f, 10, 50, 2000);
+        obj_smooth_turn(&o->oBubbaYawVel, &o->oMoveAngleYaw, o->oBubbaTargetYaw, 0.05f, 10, 50, 2000);
+        obj_compute_vel_from_move_pitch(o->oBubbaMovePitch);
     } else {
-        o->oBubbaUnkF4 = sqrtf(o->oForwardVel * o->oForwardVel + o->oVelY * o->oVelY);
+        o->oBubbaMovePitch = sqrtf(o->oForwardVel * o->oForwardVel + o->oVelY * o->oVelY);
         o->oMoveAnglePitch = obj_get_pitch_from_vel();
         obj_face_pitch_approach(o->oMoveAnglePitch, 400);
-        o->oBubbaUnk1B0 = 0;
+        o->oBubbaPitchVel = 0;
     }
 
     obj_face_pitch_approach(o->oMoveAnglePitch, 400);

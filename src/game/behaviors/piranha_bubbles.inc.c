@@ -33,7 +33,6 @@ void bhv_piranha_plant_bubble_loop(void) {
     s32 frame = parent->header.gfx.animInfo.animFrame;
     // TODO: rename lastFrame if it is inaccurate
     s32 lastFrame = parent->header.gfx.animInfo.curAnim->loopEnd - 2;
-    s32 UNUSED unused;
     f32 doneShrinkingFrame; // the first frame after shrinking is done
     f32 beginGrowingFrame;  // the frame just before growing begins
 

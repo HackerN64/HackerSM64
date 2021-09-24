@@ -47,6 +47,7 @@ extern OSTime dmaTime[NUM_PERF_ITERATIONS+1];
 extern OSTime dmaAudioTime[NUM_PERF_ITERATIONS+1];
 extern OSTime faultTime[NUM_PERF_ITERATIONS+1];
 extern OSTime taskTime[NUM_PERF_ITERATIONS+1];
+extern OSTime profilerTime[NUM_PERF_ITERATIONS+1];
 //RSP
 extern OSTime rspGenTime[NUM_PERF_ITERATIONS+1];
 //RDP

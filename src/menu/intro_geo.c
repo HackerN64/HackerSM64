@@ -44,8 +44,8 @@ Gfx *geo_intro_super_mario_64_logo(s32 state, struct GraphNode *node, UNUSED voi
     Gfx *dl = NULL;
     Gfx *dlIter = NULL;
     Mtx *scaleMat;
-    f32 *scaleTable1 = segmented_to_virtual(intro_seg7_table_0700C790);
-    f32 *scaleTable2 = segmented_to_virtual(intro_seg7_table_0700C880);
+    f32 *scaleTable1 = segmented_to_virtual(intro_seg7_table_scale_1);
+    f32 *scaleTable2 = segmented_to_virtual(intro_seg7_table_scale_2);
     f32 scaleX;
     f32 scaleY;
     f32 scaleZ;
@@ -53,7 +53,7 @@ Gfx *geo_intro_super_mario_64_logo(s32 state, struct GraphNode *node, UNUSED voi
     if (state != 1) {
         sIntroFrameCounter = 0;
     } else if (state == 1) {
-        graphNode->flags = (graphNode->flags & 0xFF) | (LAYER_OPAQUE << 8);
+        SET_GRAPH_NODE_LAYER(graphNode->flags, LAYER_OPAQUE);
         scaleMat = alloc_display_list(sizeof(*scaleMat));
         dl = alloc_display_list(4 * sizeof(*dl));
         dlIter = dl;
@@ -83,7 +83,7 @@ Gfx *geo_intro_super_mario_64_logo(s32 state, struct GraphNode *node, UNUSED voi
         guScale(scaleMat, scaleX, scaleY, scaleZ);
 
         gSPMatrix(dlIter++, scaleMat, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-        gSPDisplayList(dlIter++, &intro_seg7_dl_0700B3A0);  // draw model
+        gSPDisplayList(dlIter++, &intro_seg7_dl_main_logo);  // draw model
         gSPPopMatrix(dlIter++, G_MTX_MODELVIEW);
         gSPEndDisplayList(dlIter);
 
@@ -109,15 +109,15 @@ Gfx *geo_intro_tm_copyright(s32 state, struct GraphNode *node, UNUSED void *cont
         gDPSetEnvColor(dlIter++, 255, 255, 255, sTmCopyrightAlpha);
         switch (sTmCopyrightAlpha) {
             case 255: // opaque
-                graphNode->flags = (graphNode->flags & 0xFF) | (LAYER_OPAQUE << 8);
+                SET_GRAPH_NODE_LAYER(graphNode->flags, LAYER_OPAQUE);
                 gDPSetRenderMode(dlIter++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
                 break;
             default: // blend
-                graphNode->flags = (graphNode->flags & 0xFF) | (LAYER_TRANSPARENT << 8);
+                SET_GRAPH_NODE_LAYER(graphNode->flags, LAYER_TRANSPARENT);
                 gDPSetRenderMode(dlIter++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
                 break;
         }
-        gSPDisplayList(dlIter++, &intro_seg7_dl_0700C6A0);  // draw model
+        gSPDisplayList(dlIter++, &intro_seg7_dl_copyright_trademark);  // draw model
         gSPEndDisplayList(dlIter);
 
         // Once the "Super Mario 64" logo has just about zoomed fully, fade in the "TM" and copyright text
@@ -202,7 +202,7 @@ Gfx *geo_intro_regular_backdrop(s32 state, struct GraphNode *node, UNUSED void *
     if (state == 1) {  // draw
         dl = alloc_display_list(16 * sizeof(*dl));
         dlIter = dl;
-        graphNode->node.flags = (graphNode->node.flags & 0xFF) | (LAYER_OPAQUE << 8);
+        SET_GRAPH_NODE_LAYER(graphNode->node.flags, LAYER_OPAQUE);
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
         gSPDisplayList(dlIter++, &title_screen_bg_dl_0A000100);
         for (i = 0; i < 12; ++i) {
@@ -258,7 +258,7 @@ Gfx *geo_intro_gameover_backdrop(s32 state, struct GraphNode *node, UNUSED void 
         if (sGameOverTableIndex != 11) {
             sGameOverFrameCounter++;
         }
-        graphNode->flags = (graphNode->flags & 0xFF) | (LAYER_OPAQUE << 8);
+        SET_GRAPH_NODE_LAYER(graphNode->flags, LAYER_OPAQUE);
 
         // draw all the tiles
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
@@ -424,7 +424,7 @@ Gfx *geo_intro_face_easter_egg(s32 state, struct GraphNode *node, UNUSED void *c
         if (sFaceVisible[0] == 1 || sFaceVisible[17] == 1) {
             image = intro_sample_frame_buffer(40, 40, 2, 2);
             if (image != NULL) {
-                genNode->fnNode.node.flags = (genNode->fnNode.node.flags & 0xFF) | (LAYER_OPAQUE << 8);
+                SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
                 dl = intro_draw_face(image, 40, 40);
             }
         }
@@ -436,18 +436,14 @@ Gfx *geo_intro_face_easter_egg(s32 state, struct GraphNode *node, UNUSED void *c
 Gfx *geo_intro_rumble_pak_graphic(s32 state, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
     Gfx *dlIter;
-    Gfx *dl;
+    Gfx *dl = NULL;
     s32 introContext;
-    s8 backgroundTileSix;
-#ifdef AVOID_UB
-    dl = NULL;
-    backgroundTileSix = 0;
-#endif
+    s8 backgroundTileSix = 0;
 
     if (state != 1) {
         dl = NULL;
     } else if (state == 1) {
-        genNode->fnNode.node.flags = (genNode->fnNode.node.flags & 0xFF) | (LAYER_OPAQUE << 8);
+        SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
         introContext = genNode->parameter & 0xFF;
         if (introContext == 0) {
             backgroundTileSix = introBackgroundIndexTable[6];

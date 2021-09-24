@@ -54,7 +54,6 @@ void bhv_castle_floor_trap_rotate(void) {
 }
 
 void bhv_castle_floor_trap_loop(void) {
-    UNUSED s32 unused[3];
     switch (o->oAction) {
         case 0:
             bhv_castle_floor_trap_open_detect();

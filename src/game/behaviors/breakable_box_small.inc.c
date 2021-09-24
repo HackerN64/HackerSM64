@@ -19,7 +19,7 @@ void bhv_breakable_box_small_init(void) {
     cur_obj_scale(0.4f);
     obj_set_hitbox(o, &sBreakableBoxSmallHitbox);
     o->oAnimState = 1;
-    o->activeFlags |= ACTIVE_FLAG_UNK9;
+    o->activeFlags |= ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY;
 }
 
 void small_breakable_box_spawn_dust(void) {
@@ -111,7 +111,7 @@ void breakable_box_small_get_thrown(void) {
     o->oVelY = 20.0f;
     o->oBreakableBoxSmallReleased = 1;
     o->oBreakableBoxSmallFramesSinceReleased = 0;
-    o->activeFlags &= ~ACTIVE_FLAG_UNK9;
+    o->activeFlags &= ~ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY;
 }
 
 void bhv_breakable_box_small_loop(void) {

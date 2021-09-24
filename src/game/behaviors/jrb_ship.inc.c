@@ -24,9 +24,9 @@ void bhv_ship_part_3_loop(void) {
     s16 initialPitch = o->oFaceAnglePitch;
     s16 initialRoll = o->oFaceAngleRoll;
     cur_obj_set_pos_to_home_with_debug();
-    o->oShipPart3UnkF4 += 0x100;
-    o->oFaceAnglePitch = sins(o->oShipPart3UnkF4) * 1024.0f;
-    o->oFaceAngleRoll = sins(o->oShipPart3UnkF8) * 1024.0f;
+    o->oShipPart3LoopPitch += 0x100;
+    o->oFaceAnglePitch = sins(o->oShipPart3LoopPitch) * 1024.0f;
+    o->oFaceAngleRoll = sins(o->oShipPart3LoopRoll) * 1024.0f;
     o->oAngleVelPitch = o->oFaceAnglePitch - initialPitch;
     o->oAngleVelRoll = o->oFaceAngleRoll - initialRoll;
     if (gMarioObject->oPosY > 1000.0f)
@@ -39,16 +39,16 @@ void bhv_jrb_sliding_box_loop(void) {
     Vec3f shipToBoxPos2;
     Vec3s shipRotation;
     struct Object *shipObj;
-    if (o->oJrbSlidingBoxUnkF4 == NULL) {
+    if (o->oJrbSlidingBoxShipObj == NULL) {
         shipObj = cur_obj_nearest_object_with_behavior(bhvInSunkenShip3);
         if (shipObj != NULL) {
-            o->oJrbSlidingBoxUnkF4 = shipObj;
+            o->oJrbSlidingBoxShipObj = shipObj;
             o->oParentRelativePosX = o->oPosX - shipObj->oPosX;
             o->oParentRelativePosY = o->oPosY - shipObj->oPosY;
             o->oParentRelativePosZ = o->oPosZ - shipObj->oPosZ;
         }
     } else {
-        shipObj = o->oJrbSlidingBoxUnkF4;
+        shipObj = o->oJrbSlidingBoxShipObj;
         shipRotation[0] = shipObj->oFaceAnglePitch;
         shipRotation[1] = shipObj->oFaceAngleYaw;
         shipRotation[2] = shipObj->oFaceAngleRoll;
@@ -62,14 +62,14 @@ void bhv_jrb_sliding_box_loop(void) {
         o->oPosZ = shipObj->oPosZ + shipToBoxPos2[2];
         o->oFaceAnglePitch = shipObj->oFaceAnglePitch;
     }
-    o->oJrbSlidingBoxUnkFC = sins(o->oJrbSlidingBoxUnkF8) * 20.0f;
-    o->oJrbSlidingBoxUnkF8 += 0x100;
-    o->oParentRelativePosZ += o->oJrbSlidingBoxUnkFC;
+    o->oJrbSlidingBoxAdditiveZ = sins(o->oJrbSlidingBoxAngle) * 20.0f;
+    o->oJrbSlidingBoxAngle += 0x100;
+    o->oParentRelativePosZ += o->oJrbSlidingBoxAdditiveZ;
     if (gMarioObject->oPosY > 1000.0f)
-        if (absf(o->oJrbSlidingBoxUnkFC) > 3.0f)
+        if (absf(o->oJrbSlidingBoxAdditiveZ) > 3.0f)
             cur_obj_play_sound_1(SOUND_AIR_ROUGH_SLIDE);
     obj_set_hitbox(o, &sSkullSlidingBoxHitbox);
-    if (!(o->oJrbSlidingBoxUnkF8 & 0x7FFF))
+    if (!(o->oJrbSlidingBoxAngle & 0x7FFF))
         cur_obj_become_tangible();
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
         o->oInteractStatus = 0;

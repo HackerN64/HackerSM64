@@ -501,27 +501,27 @@ void get_audio_frequency(void)
 void thread1_idle(UNUSED void *arg) {
 
     osCreateViManager(OS_PRIORITY_VIMGR);
-	switch ( osTvType ) {
-	case OS_TV_NTSC:
-		// NTSC
+    switch ( osTvType ) {
+    case OS_TV_NTSC:
+        // NTSC
         //osViSetMode(&osViModeTable[OS_VI_NTSC_LAN1]);
         VI = osViModeTable[OS_VI_NTSC_LAN1];
         gConfig.tvType = MODE_NTSC;
-		break;
-	case OS_TV_MPAL:
-		// MPAL
+        break;
+    case OS_TV_MPAL:
+        // MPAL
         //osViSetMode(&osViModeTable[OS_VI_MPAL_LAN1]);
         VI = osViModeTable[OS_VI_NTSC_LAN1];
         gConfig.tvType = MODE_MPAL;
-		break;
-	case OS_TV_PAL:
-		// PAL
-		//osViSetMode(&osViModeTable[OS_VI_PAL_LAN1]);
+        break;
+    case OS_TV_PAL:
+        // PAL
+        //osViSetMode(&osViModeTable[OS_VI_PAL_LAN1]);
         VI = osViModeTable[OS_VI_NTSC_LAN1];
         gConfig.tvType = MODE_PAL;
-		break;
-	}
-	get_audio_frequency();
+        break;
+    }
+    get_audio_frequency();
     change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
     osViSetMode(&VI);
     osViBlack(TRUE);
