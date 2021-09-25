@@ -140,7 +140,7 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
  * at the position 'to'. The up-vector is assumed to be (0, 1, 0), but the 'roll'
  * angle allows a bank rotation of the camera.
  */
-void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s16 roll) {
+void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
     Vec3f colX, colY, colZ;
 
     f32 dx = to[0] - from[0];
@@ -263,7 +263,7 @@ void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f b, Vec3s c) {
  * 'position' is the position of the object in the world
  * 'angle' rotates the object while still facing the camera.
  */
-void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s16 angle) {
+void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
     if (angle == 0x0) {
         dest[0][0] = 1;
         dest[0][1] = 0;
@@ -297,7 +297,7 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s16 angle) {
  * 'yaw' is the angle which it should face
  * 'pos' is the object's position in the world
  */
-void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s16 yaw) {
+void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
@@ -330,7 +330,7 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s16 yaw) {
  * 'pos' is the object's position in the world
  * 'radius' is the distance from each triangle vertex to the center
  */
-void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s16 yaw, f32 radius) {
+void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     struct Surface *floor;
     Vec3f point0, point1, point2;
     Vec3f forward;
@@ -463,14 +463,19 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
  * integer. If this doesn't fit, the N64 and iQue consoles will throw an
  * exception. On Wii and Wii U Virtual Console the value will simply be clamped
  * and no crashes occur.
+
+ * Modified into a hybrid of the original function and the worldscale altered function.
+ * Will check if the worldscale is below what's considered safe in vanilla bounds and
+ * just run the faster vanilla function, otherwise it'll run the slower, but safer scale
+ * function, for extended boundaries.
  */
-void mtxf_to_mtx(Mtx *dest, Mat4 src) {
+void mtxf_to_mtx_scale(Mtx *dest, Mat4 src) {
     Mat4 temp;
     register s32 i, j;
 
     for( i = 0; i < 4; i++ ) {
         for( j = 0; j < 3; j++ ) {
-            temp[i][j] = src[i][j] / gWorldScale;
+                temp[i][j] = src[i][j] / gWorldScale;
         }
         temp[i][3] = src[i][3];
     }
@@ -478,10 +483,29 @@ void mtxf_to_mtx(Mtx *dest, Mat4 src) {
     guMtxF2L( temp, dest );
 }
 
+void mtxf_to_mtx_constant(register s16 *dest, register f32 *src) {
+    s32 asFixedPoint;
+    s32 i;
+    for (i = 0; i < 16; i++)
+    {
+        asFixedPoint = src[i] * (1 << 16);
+        dest[i] = asFixedPoint >> 16;
+        dest[i + 16] = asFixedPoint & 0xFFFF;
+    }
+}
+
+void mtxf_to_mtx(void *dest, void *src)
+{
+    if (gWorldScale > 2.0f)
+        mtxf_to_mtx_scale(dest, src);
+    else
+        mtxf_to_mtx_constant(dest, src);
+}
+
 /**
  * Set 'mtx' to a transformation matrix that rotates around the z axis.
  */
-void mtxf_rotate_xy(Mtx *mtx, s16 angle) {
+void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
     Mat4 temp;
 
     mtxf_identity(temp);
@@ -529,7 +553,7 @@ void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *
  * Construct the 'to' point which is distance 'dist' away from the 'from' position,
  * and has the angles pitch and yaw.
  */
-void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, s16 pitch, s16 yaw) {
+void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, s32 pitch, s32 yaw) {
     to[0] = from[0] + dist * coss(pitch) * sins(yaw);
     to[1] = from[1] + dist * sins(pitch);
     to[2] = from[2] + dist * coss(pitch) * coss(yaw);
@@ -561,6 +585,25 @@ f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec) {
         current = ((dist < -dec) ? (current - dec) : target);
     }
     return current;
+}
+
+/**
+ * Similar to approach_s32, but converts to s16 and allows for overflow between 32767 and -32768
+ */
+s32 approach_angle(s32 current, s32 target, s32 inc) {
+    s32 dist = (s16)(target - current);
+    if (dist < 0) {
+        dist += inc;
+        if (dist > 0) {
+            dist = 0;
+        }
+    } else if (dist > 0) {
+        dist -= inc;
+        if (dist < 0) {
+            dist = 0;
+        }
+    }
+    return (target - dist);
 }
 
 /**
@@ -858,7 +901,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     #endif
 }
 
-void find_surface_on_ray_cell(s16 cellX, s16 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
+void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
     // Skip if OOB
     if (cellX >= 0 && cellX <= (NUM_CELLS - 1) && cellZ >= 0 && cellZ <= (NUM_CELLS - 1)) {
         // Iterate through each surface in this partition

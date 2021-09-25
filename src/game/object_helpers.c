@@ -1709,12 +1709,10 @@ static void cur_obj_update_floor(void) {
         if (floor->type == SURFACE_BURNING) {
             o->oMoveFlags |= OBJ_MOVE_ABOVE_LAVA;
         }
-#ifndef VERSION_JP
         else if (floor->type == SURFACE_DEATH_PLANE) {
             //! This misses SURFACE_VERTICAL_WIND (and maybe SURFACE_WARP)
             o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
         }
-#endif
 
         o->oFloorType = floor->type;
         o->oFloorRoom = floor->room;
@@ -1725,11 +1723,7 @@ static void cur_obj_update_floor(void) {
 }
 
 static void cur_obj_update_floor_and_resolve_wall_collisions(s16 steepSlopeDegrees) {
-#ifdef VERSION_JP
-    o->oMoveFlags &= ~OBJ_MOVE_ABOVE_LAVA;
-#else
     o->oMoveFlags &= ~(OBJ_MOVE_ABOVE_LAVA | OBJ_MOVE_ABOVE_DEATH_BARRIER);
-#endif
 
     if (o->activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         cur_obj_update_floor();
@@ -2539,7 +2533,6 @@ s32 cur_obj_update_dialog(s32 actionArg, s32 dialogFlags, s32 dialogID, UNUSED s
     UNUSED s32 doneTurning = TRUE;
 
     switch (o->oDialogState) {
-#if BUGFIX_DIALOG_TIME_STOP
         case DIALOG_STATUS_ENABLE_TIME_STOP:
             // Patched :(
             // Wait for Mario to be ready to speak, and then enable time stop
@@ -2552,18 +2545,6 @@ s32 cur_obj_update_dialog(s32 actionArg, s32 dialogFlags, s32 dialogID, UNUSED s
             }
             // Fall through so that Mario's action is interrupted immediately
             // after time is stopped
-#else
-        case DIALOG_STATUS_ENABLE_TIME_STOP:
-            //! We enable time stop even if Mario is not ready to speak. This
-            //  allows us to move during time stop as long as Mario never enters
-            //  an action that can be interrupted with text.
-            if (gMarioState->health >= 0x100) {
-                gTimeStopState |= TIME_STOP_ENABLED;
-                o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
-                o->oDialogState++;
-            }
-            break;
-#endif
         case DIALOG_STATUS_INTERRUPT:
             // Interrupt until Mario is actually speaking with the NPC
             if (set_mario_npc_dialog(actionArg) == MARIO_DIALOG_STATUS_SPEAK) {
@@ -2624,7 +2605,6 @@ s32 cur_obj_update_dialog_with_cutscene(s32 actionArg, s32 dialogFlags, s32 cuts
     s32 doneTurning = TRUE;
 
     switch (o->oDialogState) {
-#if BUGFIX_DIALOG_TIME_STOP
         case DIALOG_STATUS_ENABLE_TIME_STOP:
             // Wait for Mario to be ready to speak, and then enable time stop
             if (mario_ready_to_speak() || gMarioState->action == ACT_READING_NPC_DIALOG) {
@@ -2637,19 +2617,6 @@ s32 cur_obj_update_dialog_with_cutscene(s32 actionArg, s32 dialogFlags, s32 cuts
             }
             // Fall through so that Mario's action is interrupted immediately
             // after time is stopped
-#else
-        case DIALOG_STATUS_ENABLE_TIME_STOP:
-            //! We enable time stop even if Mario is not ready to speak. This
-            //  allows us to move during time stop as long as Mario never enters
-            //  an action that can be interrupted with text.
-            if (gMarioState->health >= 0x0100) {
-                gTimeStopState |= TIME_STOP_ENABLED;
-                o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
-                o->oDialogState++;
-                o->oDialogResponse = DIALOG_RESPONSE_NONE;
-            }
-            break;
-#endif
         case DIALOG_STATUS_INTERRUPT:
             // Additional flag that makes the NPC rotate towards to Mario
             if (dialogFlags & DIALOG_FLAG_TURN_TO_MARIO) {
@@ -2869,14 +2836,12 @@ void cur_obj_spawn_loot_blue_coin(void) {
     }
 }
 
-#ifndef VERSION_JP
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY) {
     f32 objectPosY = o->oPosY;
     o->oPosY += offsetY + gDebugInfo[5][0];
     spawn_default_star(targetX, targetY, targetZ);
     o->oPosY = objectPosY;
 }
-#endif
 
 // Extra functions for HackerSM64
 void obj_set_model(struct Object *obj, s32 modelID) {

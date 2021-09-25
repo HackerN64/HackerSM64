@@ -283,13 +283,9 @@ static s32 boo_update_during_death(void) {
             if (o->oBooParentBigBoo != NULL) {
                 parentBigBoo = o->oBooParentBigBoo;
 
-#ifndef VERSION_JP
                 if (!cur_obj_has_behavior(bhvBoo)) {
                     parentBigBoo->oBigBooNumMinionBoosKilled++;
                 }
-#else
-                parentBigBoo->oBigBooNumMinionBoosKilled++;
-#endif
             }
 
             return TRUE;
@@ -513,11 +509,7 @@ static void big_boo_act_0(void) {
 
     o->oBooParentBigBoo = NULL;
 
-#ifndef VERSION_JP
     if (boo_should_be_active() && gDebugInfo[5][0] + 5 <= o->oBigBooNumMinionBoosKilled) {
-#else
-    if (boo_should_be_active() && o->oBigBooNumMinionBoosKilled >= 5) {
-#endif
         o->oAction = 1;
 
         cur_obj_set_pos_to_home();
@@ -637,9 +629,7 @@ static void big_boo_act_3(void) {
 }
 
 static void big_boo_act_4(void) {
-#ifndef VERSION_JP
     boo_stop();
-#endif
 
     if (o->oBehParams2ndByte == 0) {
         obj_set_pos(o, 973, 0, 626);

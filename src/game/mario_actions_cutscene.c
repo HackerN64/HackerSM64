@@ -253,7 +253,6 @@ void handle_save_menu(struct MarioState *m) {
             save_file_do_save(gCurrSaveFileNum - 1);
 
             if (gSaveOptSelectIndex == MENU_OPT_SAVE_AND_QUIT) {
-                //! crashes
                 fade_into_special_warp(WARP_SPECIAL_MARIO_HEAD_REGULAR, 0); // reset game
             }
         }
@@ -377,7 +376,6 @@ s32 set_mario_npc_dialog(s32 actionArg) {
 // 23: end
 s32 act_reading_npc_dialog(struct MarioState *m) {
     s32 headTurnAmount = 0;
-    s16 angleToNPC;
 
     if (m->actionArg == MARIO_DIALOG_LOOK_UP) {
         headTurnAmount = -1024;
@@ -388,9 +386,7 @@ s32 act_reading_npc_dialog(struct MarioState *m) {
 
     if (m->actionState < 8) {
         // turn to NPC
-        angleToNPC = mario_obj_angle_to_object(m, m->usedObj);
-        m->faceAngle[1] =
-            angleToNPC - approach_s32((angleToNPC - m->faceAngle[1]) << 16 >> 16, 0, 2048, 2048);
+        m->faceAngle[1] = approach_angle(m->faceAngle[1], mario_obj_angle_to_object(m, m->usedObj), 0x800);
         // turn head to npc
         m->actionTimer += headTurnAmount;
         // set animation

@@ -268,13 +268,13 @@ extern const Gfx tiny_bubble_dl_0B006D38[];
 extern const Gfx tiny_bubble_dl_0B006D68[];
 
 // title_screen_bg
-extern const Gfx title_screen_bg_dl_0A000100[];
+extern const Gfx title_screen_bg_dl_start[];
 extern const Gfx title_screen_bg_dl_0A000118[];
 extern const Gfx title_screen_bg_dl_0A000130[];
 extern const Gfx title_screen_bg_dl_0A000148[];
 extern const Gfx title_screen_bg_dl_0A000160[];
 extern const Gfx title_screen_bg_dl_0A000178[];
-extern const Gfx title_screen_bg_dl_0A000190[];
+extern const Gfx title_screen_bg_dl_end[];
 extern const u8 *const mario_title_texture_table[];
 extern const u8 *const game_over_texture_table[];
 

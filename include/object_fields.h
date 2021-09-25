@@ -462,9 +462,7 @@
 #define /*0x0F4*/ oCoinRespawnBits                              OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oCoinSnapToGround                             OBJECT_FIELD_S32(0x1C)
 #define /*0x110*/ oCoinBaseYVel                                 OBJECT_FIELD_F32(0x22)
-#ifndef VERSION_JP
 #define /*0x1B0*/ oCoinBounceTimer                              OBJECT_FIELD_S32(0x4A)
-#endif
 
 /* Collision Particle */
 #define /*0x0F4*/ oCollisionParticleScale                       OBJECT_FIELD_F32(0x1B)
@@ -702,9 +700,7 @@
 #define /*0x0F8*/ oCameraLakituSpeed                            OBJECT_FIELD_F32(0x1C)
 #define /*0x0FC*/ oCameraLakituCircleRadius                     OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oCameraLakituFinishedDialog                   OBJECT_FIELD_S32(0x1E)
-#ifndef VERSION_JP
 #define /*0x104*/ oCameraLakituIntroMusicPlayed                 OBJECT_FIELD_S32(0x1F)
-#endif
 #define /*0x1AC*/ oCameraLakituPitchVel                         OBJECT_FIELD_S16(0x49,   0)
 #define /*0x1AE*/ oCameraLakituYawVel                           OBJECT_FIELD_S16(0x49, + 1)
 

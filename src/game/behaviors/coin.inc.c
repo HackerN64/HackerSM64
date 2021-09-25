@@ -85,23 +85,14 @@ void bhv_coin_loop(void) {
     if (o->oVelY < 0)
         cur_obj_become_tangible();
     if (o->oMoveFlags & OBJ_MOVE_LANDED) {
-#ifndef VERSION_JP
         if (o->oMoveFlags & (OBJ_MOVE_ABOVE_DEATH_BARRIER | OBJ_MOVE_ABOVE_LAVA))
-#else
-        if (o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA)
-#endif
             obj_mark_for_deletion(o);
     }
-#ifndef VERSION_JP
     if (o->oMoveFlags & OBJ_MOVE_BOUNCE) {
         if (o->oCoinBounceTimer < 5)
             cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP);
         o->oCoinBounceTimer++;
     }
-#else
-    if (o->oMoveFlags & OBJ_MOVE_BOUNCE)
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP);
-#endif
     if (cur_obj_wait_then_blink(400, 20))
         obj_mark_for_deletion(o);
     bhv_coin_sparkles_init();

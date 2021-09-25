@@ -62,17 +62,9 @@ const GeoLayout toad_geo_00027C[] = {
          GEO_OPEN_NODE(),
             GEO_ANIMATED_PART(LAYER_TRANSPARENT, 83, 0, 0, NULL),
             GEO_OPEN_NODE(),
-#ifdef VERSION_JP
-               GEO_ANIMATED_PART(LAYER_TRANSPARENT, 126, -37, 0, toad_seg6_dl_06007710),
-#else
                GEO_ANIMATED_PART(LAYER_TRANSPARENT, 126, -37, 0, toad_seg6_us_dl_06007788),
-#endif
             GEO_CLOSE_NODE(),
-#ifdef VERSION_JP
-            GEO_ANIMATED_PART(LAYER_TRANSPARENT, 25, 8, 0, toad_seg6_dl_06007A48),
-#else
             GEO_ANIMATED_PART(LAYER_TRANSPARENT, 25, 8, 0, toad_seg6_us_dl_06007B00),
-#endif
             GEO_ANIMATED_PART(LAYER_TRANSPARENT, 34, 8, 0, toad_seg6_dl_06007EB0),
             GEO_ANIMATED_PART(LAYER_TRANSPARENT, 4, 7, 38, NULL),
             GEO_OPEN_NODE(),
@@ -105,11 +97,7 @@ const GeoLayout toad_geo_00027C[] = {
             GEO_OPEN_NODE(),
                GEO_ANIMATED_PART(LAYER_TRANSPARENT, 0, 0, 0, NULL),
                GEO_OPEN_NODE(),
-#ifdef VERSION_JP
-                  GEO_ANIMATED_PART(LAYER_TRANSPARENT, 17, 0, -4, toad_seg6_dl_06008520),
-#else
                   GEO_ANIMATED_PART(LAYER_TRANSPARENT, 17, 0, -4, toad_seg6_us_dl_06008608),
-#endif
                GEO_CLOSE_NODE(),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),

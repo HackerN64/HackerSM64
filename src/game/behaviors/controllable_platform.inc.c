@@ -29,9 +29,7 @@ void bhv_controllable_platform_sub_loop(void) {
 
             if (gMarioObject->platform == o) {
                 sControllablePlatformDirectionState = o->oBehParams2ndByte;
-#ifdef VERSION_SH
                 o->parentObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-#endif
                 o->oAction = 1;
                 cur_obj_play_sound_2(SOUND_GENERAL_MOVING_PLATFORM_SWITCH);
             }

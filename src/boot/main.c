@@ -213,15 +213,9 @@ void pretend_audio_sptask_done(void) {
 void handle_vblank(void) {
 
     gNumVblanks++;
-#ifdef VERSION_SH
     if (gResetTimer > 0 && gResetTimer < 100) {
         gResetTimer++;
     }
-#else
-    if (gResetTimer > 0) {
-        gResetTimer++;
-    }
-#endif
 
     receive_new_tasks();
 

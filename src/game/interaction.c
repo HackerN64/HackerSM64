@@ -1522,7 +1522,7 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
     s32 actionId = m->action & ACT_ID_MASK;
     if (actionId >= 0x080 && actionId < 0x0A0) {
         if (!(m->prevAction & ACT_FLAG_ON_POLE) || m->usedObj != o) {
-#ifdef VERSION_SH
+#if defined(VERSION_SH) || defined(SHINDOU_POLES)
             f32 velConv = m->forwardVel; // conserve the velocity.
             struct Object *marioObj = m->marioObj;
             u32 lowSpeed;
@@ -1533,7 +1533,7 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
 
             mario_stop_riding_and_holding(m);
 
-#ifdef VERSION_SH
+#if defined(VERSION_SH) || defined(SHINDOU_POLES)
             lowSpeed = (velConv <= 10.0f);
 #endif
 
@@ -1554,7 +1554,7 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
 
             //! @bug Using m->forwardVel here is assumed to be 0.0f due to the set from earlier.
             //       This is fixed in the Shindou version.
-#ifdef VERSION_SH
+#if defined(VERSION_SH) || defined(SHINDOU_POLES)
             marioObj->oMarioPoleYawVel = (s32)(velConv * 0x100 + 0x1000);
 #else
             marioObj->oMarioPoleYawVel = (s32)(m->forwardVel * 0x100 + 0x1000);

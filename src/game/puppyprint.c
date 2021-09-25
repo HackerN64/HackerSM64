@@ -109,11 +109,11 @@ extern u8 _goddardSegmentEnd[];
 
 //Here is stored the rom addresses of the global code segments. If you get rid of any, it's best to just write them as NULL.
 s32 ramP[5][2] = {
-    {&_buffersSegmentBssStart, &_buffersSegmentBssEnd},
-    {&_mainSegmentStart, &_mainSegmentEnd},
-    {&_engineSegmentStart, &_engineSegmentEnd},
-    {&_framebuffersSegmentBssStart, &_framebuffersSegmentBssEnd},
-    {&_goddardSegmentStart, &_goddardSegmentEnd},
+    {(u32)&_buffersSegmentBssStart,      (u32)&_buffersSegmentBssEnd},
+    {(u32)&_mainSegmentStart,            (u32)&_mainSegmentEnd},
+    {(u32)&_engineSegmentStart,          (u32)&_engineSegmentEnd},
+    {(u32)&_framebuffersSegmentBssStart, (u32)&_framebuffersSegmentBssEnd},
+    {(u32)&_goddardSegmentStart,         (u32)&_goddardSegmentEnd},
 };
 
 void puppyprint_calculate_ram_usage(void)
@@ -383,7 +383,7 @@ void puppyprint_render_profiler(void)
     if (!ramViewer && !benchViewer && !logViewer)
     {
         print_fps(16,40);
-        sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)OS_CYCLES_TO_USEC(cpuTime)/248, (s32)OS_CYCLES_TO_USEC(rspTime), (s32)OS_CYCLES_TO_USEC(rspTime)/333, (s32)OS_CYCLES_TO_USEC(rdpTime), (s32)OS_CYCLES_TO_USEC(rdpTime)/333);
+        sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)(cpuCount/333), (s32)OS_CYCLES_TO_USEC(rspTime), (s32)OS_CYCLES_TO_USEC(rspTime)/333, (s32)OS_CYCLES_TO_USEC(rdpTime), (s32)OS_CYCLES_TO_USEC(rdpTime)/333);
         print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL);
 
         sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
@@ -984,7 +984,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount)
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
-void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, s32 scaleX, s32 scaleY, s32 mode)
+void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNUSED s32 scaleX, UNUSED s32 scaleY, s32 mode)
 {
     s32 posW, posH, imW, imH, peakH, maskW, maskH, cycles, num, i, modeSC, mOne;
     i = 0;

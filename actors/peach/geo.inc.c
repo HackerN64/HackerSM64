@@ -68,11 +68,7 @@ const GeoLayout peach_geo_000254[] = {
    GEO_OPEN_NODE(),
       GEO_ANIMATED_PART(LAYER_TRANSPARENT, 0, 0, 0, NULL),
       GEO_OPEN_NODE(),
-#ifdef VERSION_JP
-         GEO_ANIMATED_PART(LAYER_TRANSPARENT, 0, 0, 0, peach_seg5_dl_05007230),
-#else
          GEO_ANIMATED_PART(LAYER_TRANSPARENT, 0, 0, 0, peach_seg5_us_dl_05007288),
-#endif
          GEO_OPEN_NODE(),
             GEO_ANIMATED_PART(LAYER_TRANSPARENT, 78, 0, 0, peach_seg5_dl_05006A18),
             GEO_OPEN_NODE(),
@@ -122,11 +118,7 @@ const GeoLayout peach_geo_000254[] = {
             GEO_ANIMATED_PART(LAYER_TRANSPARENT, 78, 0, 0, peach_seg5_dl_050060E0),
             GEO_ANIMATED_PART(LAYER_TRANSPARENT, -23, -1, 0, NULL),
             GEO_OPEN_NODE(),
-#ifdef VERSION_JP
-               GEO_ANIMATED_PART(LAYER_TRANSPARENT, 0, 0, 0, peach_seg5_dl_0500A0A8),
-#else
                GEO_ANIMATED_PART(LAYER_TRANSPARENT, 0, 0, 0, peach_seg5_us_dl_0500A188),
-#endif
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

@@ -165,7 +165,6 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     struct Surface *floor = m->floor;
     s16 slopeAngle = atan2s(floor->normal.z, floor->normal.x);
     f32 steepness = sqrtf(floor->normal.x * floor->normal.x + floor->normal.z * floor->normal.z);
-    UNUSED f32 normalY = floor->normal.y;
 
     m->slideVelX += accel * steepness * sins(slopeAngle);
     m->slideVelZ += accel * steepness * coss(slopeAngle);
@@ -207,7 +206,7 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     mario_update_windy_ground(m);
 
     //! Speed is capped a frame late (butt slide HSG)
-    m->forwardVel = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+    m->forwardVel = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
     if (m->forwardVel > 100.0f) {
         m->slideVelX = m->slideVelX * 100.0f / m->forwardVel;
         m->slideVelZ = m->slideVelZ * 100.0f / m->forwardVel;
@@ -257,7 +256,7 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
             break;
     }
 
-    oldSpeed = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+    oldSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
     //! This is attempting to use trig derivatives to rotate Mario's speed.
     // It is slightly off/asymmetric since it uses the new X speed, but the old
@@ -265,7 +264,7 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
     m->slideVelX += m->slideVelZ * (m->intendedMag / 32.0f) * sideward * 0.05f;
     m->slideVelZ -= m->slideVelX * (m->intendedMag / 32.0f) * sideward * 0.05f;
 
-    newSpeed = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+    newSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
     if (oldSpeed > 0.0f && newSpeed > 0.0f) {
         m->slideVelX = m->slideVelX * oldSpeed / newSpeed;
@@ -286,9 +285,8 @@ void apply_slope_accel(struct MarioState *m) {
     f32 slopeAccel;
 
     struct Surface *floor = m->floor;
-    f32 steepness = sqrtf(floor->normal.x * floor->normal.x + floor->normal.z * floor->normal.z);
+    f32 steepness = sqrtf(sqr(floor->normal.x) + sqr(floor->normal.z));
 
-    UNUSED f32 normalY = floor->normal.y;
     s16 floorDYaw = m->floorAngle - m->faceAngle[1];
 
     if (mario_floor_is_slope(m)) {
@@ -386,9 +384,7 @@ void update_shell_speed(struct MarioState *m) {
         m->forwardVel = 64.0f;
     }
 
-    m->faceAngle[1] =
-        m->intendedYaw - approach_s32((s16)(m->intendedYaw - m->faceAngle[1]), 0, 0x800, 0x800);
-
+    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x800);
 
     apply_slope_accel(m);
 }
@@ -485,14 +481,10 @@ void update_walking_speed(struct MarioState *m) {
         } else if (turnRange > 0xFFF) {
             turnRange = 0xFFF;
         }
-        m->faceAngle[1] =
-            m->intendedYaw - approach_s32((s16)(m->intendedYaw - m->faceAngle[1]), 0, 0x800, 0x800);
+        m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
     }
-#elif SUPER_RESPONSIVE_CONTROLS
-    m->faceAngle[1] =  m->intendedYaw;
 #else
-    m->faceAngle[1] =
-        m->intendedYaw - approach_s32((s16)(m->intendedYaw - m->faceAngle[1]), 0, 0x800, 0x800);
+    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x800);
 #endif
     apply_slope_accel(m);
 }
@@ -1345,8 +1337,7 @@ s32 act_burning_ground(struct MarioState *m) {
     m->forwardVel = approach_f32(m->forwardVel, 32.0f, 4.0f, 1.0f);
 
     if (m->input & INPUT_NONZERO_ANALOG) {
-        m->faceAngle[1] =
-            m->intendedYaw - approach_s32((s16)(m->intendedYaw - m->faceAngle[1]), 0, 0x600, 0x600);
+        m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x600);
     }
 
     apply_slope_accel(m);
@@ -1407,13 +1398,9 @@ void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32
 
         case GROUND_STEP_HIT_WALL:
             if (!mario_floor_is_slippery(m)) {
-#ifdef VERSION_JP
-                m->particleFlags |= PARTICLE_VERTICAL_STAR;
-#else
                 if (m->forwardVel > 16.0f) {
                     m->particleFlags |= PARTICLE_VERTICAL_STAR;
                 }
-#endif
                 slide_bonk(m, ACT_GROUND_BONK, endAction);
             } else if (m->wall != NULL) {
                 s16 wallAngle = atan2s(m->wall->normal.z, m->wall->normal.x);

@@ -125,7 +125,6 @@ void bhv_bowser_body_anchor_loop(void) {
     // If Bowser is dead, set interaction type to text
     // so that he can be ready to speak his dialog
     if (o->parentObj->oAction == BOWSER_ACT_DEAD) {
-#if BUGFIX_BOWSER_COLLIDE_BITS_DEAD
         // Clear interaction type at the last sub action in BITS
         // Fixes collision coliding after defeating him
         if (o->parentObj->oSubAction == BOWSER_SUB_ACT_DEAD_FINAL_END_OVER) {
@@ -133,9 +132,6 @@ void bhv_bowser_body_anchor_loop(void) {
         } else {
             o->oInteractType = INTERACT_TEXT;
         }
-#else
-        o->oInteractType = INTERACT_TEXT;
-#endif
     } else {
         // Do damage if Mario touches Bowser
         o->oInteractType = INTERACT_DAMAGE;
@@ -447,7 +443,6 @@ void bowser_bits_actions(void) {
 /**
  * Reset Bowser position and speed if he wasn't able to land properly on stage
  */
-#if BUGFIX_BOWSER_FALLEN_OFF_STAGE
 void bowser_reset_fallen_off_stage(void) {
     if (o->oVelY < 0 && o->oPosY < (o->oHomeY - 300.0f)) {
         o->oPosX = o->oPosZ = 0;
@@ -456,7 +451,6 @@ void bowser_reset_fallen_off_stage(void) {
         o->oForwardVel = 0;
     }
 }
-#endif
 
 /**
  * Unused, makes Bowser be in idle and after it returns to default action
@@ -740,12 +734,10 @@ void bowser_act_big_jump(void) {
             o->oSubAction++;
         }
     } else if (o->oSubAction == 1) {
-#if BUGFIX_BOWSER_FALLEN_OFF_STAGE
         // Reset Bowser back on stage in BITS if he doesn't land properly
         if (o->oBehParams2ndByte == BOWSER_BP_BITS && o->oBowserStatus & BOWSER_STATUS_BIG_JUMP) {
             bowser_reset_fallen_off_stage();
         }
-#endif
         // Land on stage, reset status jump and velocity
         if (bowser_land()) {
             o->oBowserStatus &= ~BOWSER_STATUS_BIG_JUMP;
@@ -1094,15 +1086,7 @@ void bowser_act_jump_onto_stage(void) {
             }
             // Reset him back on stage if he still didn't landed yet
             // Post-JP made this check as a separate function
-#if BUGFIX_BOWSER_FALLEN_OFF_STAGE
             bowser_reset_fallen_off_stage();
-#else
-            if (o->oVelY < 0.0f && o->oPosY < o->oHomeY - 300.0f) {
-                o->oPosZ = 0.0f, o->oPosX = o->oPosZ;
-                o->oPosY = o->oHomeY + 2000.0f;
-                o->oVelY = 0.0f;
-            }
-#endif
             break;
         // Bowser landed, so reset action after he's done jumping
         case BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP:

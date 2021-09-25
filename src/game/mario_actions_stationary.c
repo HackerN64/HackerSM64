@@ -179,9 +179,7 @@ void play_anim_sound(struct MarioState *m, u32 actionState, s32 animFrame, u32 s
 }
 
 s32 act_start_sleeping(struct MarioState *m) {
-#ifndef VERSION_JP
     s32 animFrame = 0;
-#endif
 
     if (check_common_idle_cancels(m)) {
         return TRUE;
@@ -197,32 +195,20 @@ s32 act_start_sleeping(struct MarioState *m) {
 
     switch (m->actionState) {
         case 0:
-#ifndef VERSION_JP
-            animFrame =
-#endif
-            set_mario_animation(m, MARIO_ANIM_START_SLEEP_IDLE);
+            animFrame = set_mario_animation(m, MARIO_ANIM_START_SLEEP_IDLE);
             break;
 
         case 1:
-#ifndef VERSION_JP
-            animFrame =
-#endif
-            set_mario_animation(m, MARIO_ANIM_START_SLEEP_SCRATCH);
+            animFrame = set_mario_animation(m, MARIO_ANIM_START_SLEEP_SCRATCH);
             break;
 
         case 2:
-#ifndef VERSION_JP
-            animFrame =
-#endif
-            set_mario_animation(m, MARIO_ANIM_START_SLEEP_YAWN);
+            animFrame = set_mario_animation(m, MARIO_ANIM_START_SLEEP_YAWN);
             m->marioBodyState->eyeState = MARIO_EYES_HALF_CLOSED;
             break;
 
         case 3:
-#ifndef VERSION_JP
-            animFrame =
-#endif
-            set_mario_animation(m, MARIO_ANIM_START_SLEEP_SITTING);
+            animFrame = set_mario_animation(m, MARIO_ANIM_START_SLEEP_SITTING);
             m->marioBodyState->eyeState = MARIO_EYES_HALF_CLOSED;
             break;
     }

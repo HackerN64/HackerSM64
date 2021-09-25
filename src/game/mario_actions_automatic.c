@@ -114,19 +114,6 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
 s32 act_holding_pole(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
 
-#ifdef VERSION_JP
-    if (m->input & INPUT_A_PRESSED) {
-        add_tree_leaf_particles(m);
-        m->faceAngle[1] += 0x8000;
-        return set_mario_action(m, ACT_WALL_KICK_AIR, 0);
-    }
-
-    if (m->input & INPUT_Z_PRESSED) {
-        add_tree_leaf_particles(m);
-        m->forwardVel = -2.0f;
-        return set_mario_action(m, ACT_SOFT_BONK, 0);
-    }
-#else
     if ((m->input & INPUT_Z_PRESSED) || m->health < 0x100) {
         add_tree_leaf_particles(m);
         m->forwardVel = -2.0f;
@@ -138,7 +125,6 @@ s32 act_holding_pole(struct MarioState *m) {
         m->faceAngle[1] += 0x8000;
         return set_mario_action(m, ACT_WALL_KICK_AIR, 0);
     }
-#endif
 
     if (m->controller->stickY > 16.0f) {
         f32 poleTop = m->usedObj->hitboxHeight - 100.0f;
@@ -191,13 +177,11 @@ s32 act_climbing_pole(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
     s16 cameraAngle = m->area->camera->yaw;
 
-#ifndef VERSION_JP
     if (m->health < 0x100) {
         add_tree_leaf_particles(m);
         m->forwardVel = -2.0f;
         return set_mario_action(m, ACT_SOFT_BONK, 0);
     }
-#endif
 
     if (m->input & INPUT_A_PRESSED) {
         add_tree_leaf_particles(m);
@@ -211,7 +195,7 @@ s32 act_climbing_pole(struct MarioState *m) {
 
     marioObj->oMarioPolePos += m->controller->stickY / 8.0f;
     marioObj->oMarioPoleYawVel = 0;
-    m->faceAngle[1] = cameraAngle - approach_s32((s16)(cameraAngle - m->faceAngle[1]), 0, 0x400, 0x400);
+    m->faceAngle[1] = approach_angle(m->faceAngle[1], cameraAngle, 0x400);
 
     if (set_pole_position(m, 0.0f) == POLE_NONE) {
         animSpeed = m->controller->stickY / 4.0f * 0x10000;
@@ -353,12 +337,11 @@ s32 update_hang_moving(struct MarioState *m) {
         m->forwardVel = maxSpeed;
     }
 
-    m->faceAngle[1] =
-    #ifdef TIGHTER_HANGING_CONTROLS
-        m->intendedYaw;
-    #else
-        m->intendedYaw - approach_s32((s16)(m->intendedYaw - m->faceAngle[1]), 0, 0x800, 0x800);
-    #endif
+#ifdef TIGHTER_HANGING_CONTROLS
+    m->faceAngle[1] = m->intendedYaw;
+#else
+    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x800);
+#endif
 
     m->slideYaw = m->faceAngle[1];
     m->slideVelX = m->forwardVel * sins(m->faceAngle[1]);

@@ -34,22 +34,12 @@ void bhv_tree_snow_or_leaf_loop(void) {
 
 void bhv_snow_leaf_particle_spawn_init(void) {
     struct Object *obj; // Either snow or leaf
-#ifdef TREE_PARTICLE_FIX
     struct Object *nearestTree = NULL;
-#endif
-    s32 isSnow;
     f32 scale;
     gMarioObject->oActiveParticleFlags &= ~0x2000;
-#ifdef TREE_PARTICLE_FIX
+    // Whether a tree uses snow particles or not is decided via the model IDs instead of the course number
     nearestTree = cur_obj_nearest_object_with_behavior(bhvTree);
-    isSnow = (nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_CCM_SNOW_TREE] || nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_SL_SNOW_TREE]);
-#else
-    if (gCurrLevelNum == LEVEL_CCM || gCurrLevelNum == LEVEL_SL)
-        isSnow = 1;
-    else
-        isSnow = 0;
-#endif
-    if (isSnow) {
+    if (nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_CCM_SNOW_TREE] || nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_SL_SNOW_TREE]) {
         if (random_float() < 0.5) {
             obj = spawn_object(o, MODEL_WHITE_PARTICLE_DL, bhvTreeSnow);
             scale = random_float();

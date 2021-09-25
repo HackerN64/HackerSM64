@@ -13,14 +13,12 @@ void piranha_plant_act_idle(void) {
     cur_obj_become_intangible();
     cur_obj_init_animation_with_sound(8);
 
-#if BUGFIX_PIRANHA_PLANT_STATE_RESET
     /**
      * This call is necessary because a Piranha Plant may enter this state
      * with a scale below 1, which would cause it to appear shrunken. See
      * documentation for, and calls to, piranha_plant_reset_when_far().
      */
     cur_obj_scale(1);
-#endif
 
     if (o->oDistanceToMario < 1200.0f) {
         o->oAction = PIRANHA_PLANT_ACT_SLEEPING;
@@ -75,17 +73,10 @@ void piranha_plant_act_sleeping(void) {
     cur_obj_set_hitbox_radius_and_height(250.0f, 200.0f);
     cur_obj_set_hurtbox_radius_and_height(150.0f, 100.0f);
 
-#if BUGFIX_PIRANHA_PLANT_SLEEP_DAMAGE
     /**
      * Make Piranha Plants harmless, but tangible, while they sleep.
      */
     o->oDamageOrCoinValue = 0;
-#elif defined(VERSION_EU)
-    /**
-     * Make Piranha Plants harmful when sleeping - but do it explicitly.
-     */
-    o->oDamageOrCoinValue = 3;
-#endif
 
     if (o->oDistanceToMario < 400.0f) {
         if (mario_moving_fast_enough_to_make_piranha_plant_bite()) {
@@ -106,14 +97,10 @@ void piranha_plant_act_sleeping(void) {
  * to the biting state.
  */
 void piranha_plant_act_woken_up(void) {
-#if BUGFIX_PIRANHA_PLANT_SLEEP_DAMAGE || defined(VERSION_EU)
     /**
-     * Make Piranha Plants damage the player while awake. This call is only
-     * necessary in the US version because it is set to 3 by default and is
-     * never changed in the JP version.
+     * Make Piranha Plants damage the player while awake.
      */
     o->oDamageOrCoinValue = 3;
-#endif
     if (o->oTimer == 0)
         func_80321080(50);
 
@@ -122,7 +109,6 @@ void piranha_plant_act_woken_up(void) {
             o->oAction = PIRANHA_PLANT_ACT_BITING;
 }
 
-#if BUGFIX_PIRANHA_PLANT_STATE_RESET
 /**
  * If the Piranha Plant is far from the player, move it to the idle state.
  *
@@ -143,7 +129,6 @@ void piranha_plant_reset_when_far(void) {
         o->oAction = PIRANHA_PLANT_ACT_IDLE;
     }
 }
-#endif
 
 /**
  * Make the Piranha Plant play a falling-over animation and move to the dying
@@ -155,9 +140,7 @@ void piranha_plant_attacked(void) {
     o->oInteractStatus = 0;
     if (cur_obj_check_if_near_animation_end())
         o->oAction = PIRANHA_PLANT_ACT_SHRINK_AND_DIE;
-#if BUGFIX_PIRANHA_PLANT_STATE_RESET
     piranha_plant_reset_when_far(); // see this function's comment
-#endif
 }
 
 /**
@@ -187,9 +170,7 @@ void piranha_plant_act_shrink_and_die(void) {
 
     cur_obj_scale(o->oPiranhaPlantScale);
 
-#if BUGFIX_PIRANHA_PLANT_STATE_RESET
     piranha_plant_reset_when_far(); // see this function's comment
-#endif
 }
 
 /**

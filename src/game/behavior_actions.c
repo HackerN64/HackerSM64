@@ -58,14 +58,14 @@ void obj_set_speed_to_zero(void) {
 
 Gfx *geo_update_held_mario_pos(s32 run, UNUSED struct GraphNode *node, Mat4 mtx) {
     Mat4 sp20;
-    struct Object *sp1C;
+    struct Object *obj;
 
     if (run == TRUE) {
-        sp1C = (struct Object *) gCurGraphNodeObject;
-        if (sp1C->prevObj != NULL) {
+        obj = (struct Object *) gCurGraphNodeObject;
+        if (obj->prevObj != NULL) {
             create_transformation_from_matrices(sp20, mtx, *gCurGraphNodeCamera->matrixPtr);
-            obj_update_pos_from_parent_transformation(sp20, sp1C->prevObj);
-            obj_set_gfx_pos_from_pos(sp1C->prevObj);
+            obj_update_pos_from_parent_transformation(sp20, obj->prevObj);
+            obj_set_gfx_pos_from_pos(obj->prevObj);
         }
     }
     return NULL;
@@ -94,7 +94,7 @@ void obj_set_secondary_camera_focus(void) {
     gSecondCameraFocus = o;
 }
 
-void common_anchor_mario_behavior(f32 sp28, f32 sp2C, s32 sp30) {
+void common_anchor_mario_behavior(f32 sp28, f32 sp2C, s32 obj) {
     switch (o->parentObj->oCommonAnchorAction) {
         case 0:
             break;
@@ -102,7 +102,7 @@ void common_anchor_mario_behavior(f32 sp28, f32 sp2C, s32 sp30) {
             obj_set_gfx_pos_at_obj_pos(gMarioObject, o);
             break;
         case 2:
-            gMarioObject->oInteractStatus |= (sp30 + INT_STATUS_MARIO_UNK2);
+            gMarioObject->oInteractStatus |= (obj + INT_STATUS_MARIO_UNK2);
             gMarioStates[0].forwardVel = sp28;
             gMarioStates[0].vel[1] = sp2C;
             o->parentObj->oCommonAnchorAction = 0;
@@ -267,50 +267,40 @@ s32 set_obj_anim_with_accel_and_sound(s16 a0, s16 a1, s32 a2) {
 }
 
 void spawn_default_star(f32 sp20, f32 sp24, f32 sp28) {
-    struct Object *sp1C;
-#ifdef AVOID_UB
-    sp1C = 0;
-#endif
-    sp1C = spawn_star(sp1C, sp20, sp24, sp28);
-    sp1C->oBehParams2ndByte = 0;
+    struct Object *obj = NULL;
+    obj = spawn_star(obj, sp20, sp24, sp28);
+    obj->oBehParams2ndByte = 0;
 }
 
 void spawn_red_coin_cutscene_star(f32 sp20, f32 sp24, f32 sp28) {
-    struct Object *sp1C;
-#ifdef AVOID_UB
-    sp1C = 0;
-#endif
-    sp1C = spawn_star(sp1C, sp20, sp24, sp28);
-    sp1C->oBehParams2ndByte = 1;
+    struct Object *obj = NULL;
+    obj = spawn_star(obj, sp20, sp24, sp28);
+    obj->oBehParams2ndByte = 1;
 }
 
 void spawn_no_exit_star(f32 sp20, f32 sp24, f32 sp28) {
-    struct Object *sp1C;
-#ifdef AVOID_UB
-    sp1C = 0;
-#endif
-    sp1C = spawn_star(sp1C, sp20, sp24, sp28);
-    sp1C->oBehParams2ndByte = 1;
-    sp1C->oInteractionSubtype |= INT_SUBTYPE_NO_EXIT;
+    struct Object *obj = NULL;
+    obj = spawn_star(obj, sp20, sp24, sp28);
+    obj->oBehParams2ndByte = 1;
+    obj->oInteractionSubtype |= INT_SUBTYPE_NO_EXIT;
 }
 
-struct Object *spawn_star(struct Object *sp30, f32 sp34, f32 sp38, f32 sp3C) {
-    sp30 = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStarSpawnCoordinates, o->oPosX, o->oPosY,
-                                     o->oPosZ, 0, 0, 0);
-    sp30->oBehParams = o->oBehParams;
-    sp30->oHomeX = sp34;
-    sp30->oHomeY = sp38;
-    sp30->oHomeZ = sp3C;
-    sp30->oFaceAnglePitch = 0;
-    sp30->oFaceAngleRoll = 0;
-    return sp30;
+struct Object *spawn_star(struct Object *obj, f32 sp34, f32 sp38, f32 sp3C) {
+    obj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStarSpawnCoordinates, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
+    obj->oBehParams = o->oBehParams;
+    obj->oHomeX = sp34;
+    obj->oHomeY = sp38;
+    obj->oHomeZ = sp3C;
+    obj->oFaceAnglePitch = 0;
+    obj->oFaceAngleRoll = 0;
+    return obj;
 }
 
 void bhv_spawn_star_no_level_exit(u32 sp20) {
-    struct Object *sp1C = spawn_object(o, MODEL_STAR, bhvSpawnedStarNoLevelExit);
-    sp1C->oBehParams = sp20 << 24;
-    sp1C->oInteractionSubtype = INT_SUBTYPE_NO_EXIT;
-    obj_set_angle(sp1C, 0, 0, 0);
+    struct Object *obj = spawn_object(o, MODEL_STAR, bhvSpawnedStarNoLevelExit);
+    obj->oBehParams = sp20 << 24;
+    obj->oInteractionSubtype = INT_SUBTYPE_NO_EXIT;
+    obj_set_angle(obj, 0, 0, 0);
 }
 
 //These are very commonly used and are better placed here.

@@ -204,11 +204,11 @@ Gfx *geo_intro_regular_backdrop(s32 state, struct GraphNode *node, UNUSED void *
         dlIter = dl;
         SET_GRAPH_NODE_LAYER(graphNode->node.flags, LAYER_OPAQUE);
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
-        gSPDisplayList(dlIter++, &title_screen_bg_dl_0A000100);
+        gSPDisplayList(dlIter++, &title_screen_bg_dl_start);
         for (i = 0; i < 12; ++i) {
             gSPDisplayList(dlIter++, intro_backdrop_one_image(i, backgroundTable));
         }
-        gSPDisplayList(dlIter++, &title_screen_bg_dl_0A000190);
+        gSPDisplayList(dlIter++, &title_screen_bg_dl_end);
         gSPEndDisplayList(dlIter);
     }
     return dl;
@@ -262,19 +262,21 @@ Gfx *geo_intro_gameover_backdrop(s32 state, struct GraphNode *node, UNUSED void 
 
         // draw all the tiles
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
-        gSPDisplayList(dlIter++, &title_screen_bg_dl_0A000100);
+        gSPDisplayList(dlIter++, &title_screen_bg_dl_start);
         for (j = 0; j < ARRAY_COUNT(gameOverBackgroundTable); ++j)
             gSPDisplayList(dlIter++, intro_backdrop_one_image(j, gameOverBackgroundTable));
-        gSPDisplayList(dlIter++, &title_screen_bg_dl_0A000190);
+        gSPDisplayList(dlIter++, &title_screen_bg_dl_end);
         gSPEndDisplayList(dlIter);
     }
     return dl;
 }
 
-#ifdef VERSION_SH
-extern Gfx title_screen_bg_dl_0A0065E8[];
-extern Gfx title_screen_bg_dl_0A006618[];
-extern Gfx title_screen_bg_dl_0A007548[];
+#if ENABLE_RUMBLE
+extern Gfx title_screen_bg_dl_rumble_pak[];
+#endif
+#ifdef GODDARD_EASTER_EGG
+extern Gfx title_screen_bg_dl_face_easter_egg_begin[];
+extern Gfx title_screen_bg_dl_face_easter_egg_end[];
 
 //Data
 s8 sFaceVisible[] = {
@@ -296,8 +298,7 @@ s8 sFaceToggleOrder[] = {
 
 s8 sFaceCounter = 0;
 
-void intro_gen_face_texrect(Gfx **dlIter)
-{
+void intro_gen_face_texrect(Gfx **dlIter) {
     s32 x;
     s32 y;
 
@@ -311,8 +312,7 @@ void intro_gen_face_texrect(Gfx **dlIter)
     }
 }
 
-Gfx *intro_draw_face(u16 *image, s32 imageW, s32 imageH)
-{
+Gfx *intro_draw_face(u16 *image, s32 imageW, s32 imageH) {
     Gfx *dl;
     Gfx *dlIter;
 
@@ -324,13 +324,13 @@ Gfx *intro_draw_face(u16 *image, s32 imageW, s32 imageH)
         dlIter = dl;
     }
 
-    gSPDisplayList(dlIter++, title_screen_bg_dl_0A0065E8);
+    gSPDisplayList(dlIter++, title_screen_bg_dl_face_easter_egg_begin);
 
     gDPLoadTextureBlock(dlIter++, VIRTUAL_TO_PHYSICAL(image), G_IM_FMT_RGBA, G_IM_SIZ_16b, imageW, imageH, 0, G_TX_CLAMP | G_TX_NOMIRROR, G_TX_CLAMP | G_TX_NOMIRROR, 6, 6, G_TX_NOLOD, G_TX_NOLOD);
 
     intro_gen_face_texrect(&dlIter);
 
-    gSPDisplayList(dlIter++, title_screen_bg_dl_0A006618);
+    gSPDisplayList(dlIter++, title_screen_bg_dl_face_easter_egg_end);
 
     gSPEndDisplayList(dlIter++);
 
@@ -348,7 +348,7 @@ u16 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH)
     s32 xOffset = 120;
     s32 yOffset = 80;
 
-    fb = sFrameBuffers[sRenderingFrameBuffer];
+    fb = gFrameBuffers[sRenderingFrameBuffer];
     image = alloc_display_list(imageW * imageH * sizeof(u16));
 
     if (image == NULL) {
@@ -398,10 +398,6 @@ Gfx *geo_intro_face_easter_egg(s32 state, struct GraphNode *node, UNUSED void *c
     s32 i;
 
     if (state != 1) {
-        sFrameBuffers[0] = gFrameBuffer0;
-        sFrameBuffers[1] = gFrameBuffer1;
-        sFrameBuffers[2] = gFrameBuffer2;
-
         for (i = 0; i < 48; i++) {
             sFaceVisible[i] = 0;
         }
@@ -432,7 +428,9 @@ Gfx *geo_intro_face_easter_egg(s32 state, struct GraphNode *node, UNUSED void *c
 
     return dl;
 }
+#endif
 
+#if ENABLE_RUMBLE
 Gfx *geo_intro_rumble_pak_graphic(s32 state, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
     Gfx *dlIter;
@@ -454,7 +452,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 state, struct GraphNode *node, UNUSED void
             dl = alloc_display_list(3 * sizeof(*dl));
             if (dl != NULL) {
                 dlIter = dl;
-                gSPDisplayList(dlIter++, &title_screen_bg_dl_0A007548);
+                gSPDisplayList(dlIter++, &title_screen_bg_dl_rumble_pak);
                 gSPEndDisplayList(dlIter);
             }
         } else {
