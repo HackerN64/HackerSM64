@@ -1,5 +1,4 @@
-#ifndef GAME_INIT_H
-#define GAME_INIT_H
+#pragma once
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
@@ -89,5 +88,3 @@ void end_master_display_list(void);
 void render_init(void);
 void select_gfx_pool(void);
 void display_and_vsync(void);
-
-#endif // GAME_INIT_H

@@ -1,5 +1,4 @@
-#ifndef TEXTURES_H
-#define TEXTURES_H
+#pragma once
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
@@ -277,5 +276,3 @@ extern const Gfx title_screen_bg_dl_0A000178[];
 extern const Gfx title_screen_bg_dl_end[];
 extern const u8 *const mario_title_texture_table[];
 extern const u8 *const game_over_texture_table[];
-
-#endif // TEXTURES_H

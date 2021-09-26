@@ -27,8 +27,7 @@
         $Date: 2002/05/02 03:28:25 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_PFS_H_
-#define	_OS_PFS_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -170,5 +169,3 @@ extern s32 osPfsNumFiles(OSPfs *, s32 *, s32 *);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_PFS_H_ */

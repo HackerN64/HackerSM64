@@ -1,5 +1,4 @@
-#ifndef GD_SFX_H
-#define GD_SFX_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -21,5 +20,3 @@ void gd_reset_sfx(void);
 u32 gd_new_sfx_to_play(void);
 void gd_sfx_update(void);
 void gd_play_sfx(enum GdSfx sfx);
-
-#endif // GD_SFX_H

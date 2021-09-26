@@ -6,8 +6,7 @@
         $Date: 2000/06/15 06:24:55 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_FLASH_H_
-#define	_OS_FLASH_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -67,5 +66,3 @@ extern s32     osFlashCheckEraseEnd(void);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_FLASH_H_ */

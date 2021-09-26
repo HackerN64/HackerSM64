@@ -1,6 +1,3 @@
-#ifndef OBJECT_COLLISION_H
-#define OBJECT_COLLISION_H
+#pragma once
 
 void detect_object_collisions(void);
-
-#endif // OBJECT_COLLISION_H

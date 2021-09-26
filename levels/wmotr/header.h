@@ -1,5 +1,4 @@
-#ifndef WMOTR_HEADER_H
-#define WMOTR_HEADER_H
+#pragma once
 
 #include "types.h"
 
@@ -15,5 +14,3 @@ extern const MacroObject wmotr_seg7_macro_objs[];
 
 // script
 extern const LevelScript level_wmotr_entry[];
-
-#endif

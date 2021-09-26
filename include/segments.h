@@ -1,5 +1,4 @@
-#ifndef SEGMENTS_H
-#define SEGMENTS_H
+#pragma once
 
 #ifndef LINKER
 #include "segment_symbols.h"
@@ -28,5 +27,3 @@
 
 #define SEG_POOL_START   _framebuffersSegmentBssEnd // 0x0165000 in size
 #define POOL_SIZE        RAM_END - SEG_POOL_START
-
-#endif // SEGMENTS_H

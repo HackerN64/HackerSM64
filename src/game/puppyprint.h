@@ -1,5 +1,4 @@
-#ifndef PUPPYPRINT_H
-#define PUPPYPRINT_H
+#pragma once
 
 #ifdef PUPPYPRINT
 
@@ -74,5 +73,3 @@ extern void append_puppyprint_log(const char *str, ...);
 extern char consoleLogTable[LOG_BUFFER_SIZE][255];
 
 #endif
-
-#endif // PUPPYPRINT_H

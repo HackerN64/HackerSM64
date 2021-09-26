@@ -1,5 +1,4 @@
-#ifndef BITS_HEADER_H
-#define BITS_HEADER_H
+#pragma once
 
 #include "types.h"
 
@@ -88,5 +87,3 @@ extern const Collision bits_seg7_collision_0701B734[];
 
 // script
 extern const LevelScript level_bits_entry[];
-
-#endif

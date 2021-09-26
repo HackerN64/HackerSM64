@@ -1,5 +1,4 @@
-#ifndef THI_HEADER_H
-#define THI_HEADER_H
+#pragma once
 
 #include "types.h"
 #include "game/moving_texture.h"
@@ -38,5 +37,3 @@ extern const struct MovtexQuadCollection thi_movtex_area2_water[];
 
 // script
 extern const LevelScript level_thi_entry[];
-
-#endif

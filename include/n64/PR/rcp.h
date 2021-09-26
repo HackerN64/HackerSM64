@@ -1,5 +1,4 @@
-#ifndef _RCP_H_
-#define _RCP_H_
+#pragma once
 
 /**************************************************************************
  *                                                                        *
@@ -880,6 +879,3 @@ The Indy development board use cartridge domain 1:
         IO_READ(SP_STATUS_REG))
 
 #endif
-
-#endif  /* _RCP_H_ */
-

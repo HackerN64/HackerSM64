@@ -27,8 +27,7 @@
         $Date: 2004/10/29 00:51:42 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_CONT_H_
-#define	_OS_CONT_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -215,5 +214,3 @@ extern void		osContGetReadData(OSContPad *);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_CONT_H_ */

@@ -1,5 +1,4 @@
-#ifndef _VERIFY_H_
-#define	_VERIFY_H_
+#pragma once
 
 /**************************************************************************
  *									  *
@@ -116,5 +115,3 @@ struct CVGHeader {
 #define	ZB_END_ADDR			0x125800
 #define	EVAN_START_ADDR			0x130000
 #define	EVAN_END_ADDR			0x140000
-
-#endif /* !_VERIFY_H_ */

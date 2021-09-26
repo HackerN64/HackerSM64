@@ -1,5 +1,4 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+#pragma once
 
 // #define init_cond (CONTROLLER_HELD_INPUT & R_CBUTTONS)
 // #define tex_cond (CONTROLLER_HELD_INPUT & D_CBUTTONS)
@@ -11,5 +10,3 @@
 #define spr_cond (1)
 #define init_cond (1)
 #define deinit_cond (1)
-
-#endif

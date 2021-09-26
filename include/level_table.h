@@ -1,5 +1,4 @@
-#ifndef LEVEL_TABLE_H
-#define LEVEL_TABLE_H
+#pragma once
 
 // For LEVEL_NAME defines, see level_defines.h.
 // Please include this file if you want to use them.
@@ -21,5 +20,3 @@ enum LevelNum
 
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
-
-#endif // LEVEL_TABLE_H

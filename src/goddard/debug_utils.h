@@ -1,5 +1,4 @@
-#ifndef GD_DEBUGGING_UTILS_H
-#define GD_DEBUGGING_UTILS_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -89,5 +88,3 @@ extern s32 gd_fread(s8 *, s32, s32, struct GdFile *);
 extern void gd_fclose(struct GdFile *);
 extern u32 gd_get_file_size(struct GdFile *);
 extern s32 gd_fread_line(char *, u32, struct GdFile *);
-
-#endif // GD_DEBUGGING_UTILS_H

@@ -1,5 +1,4 @@
-#ifndef DDD_HEADER_H
-#define DDD_HEADER_H
+#pragma once
 
 #include "types.h"
 #include "game/moving_texture.h"
@@ -39,5 +38,3 @@ extern const struct MovtexQuadCollection ddd_movtex_area2_water[];
 
 // script
 extern const LevelScript level_ddd_entry[];
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef OBJECT_HELPERS_H
-#define OBJECT_HELPERS_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -285,5 +284,3 @@ void obj_set_model(struct Object *obj, s32 modelID);
 s32 obj_has_model(struct Object *obj, u16 modelID);
 u32 obj_get_model_id(struct Object *obj);
 // End of HackerSM64 stuff
-
-#endif // OBJECT_HELPERS_H

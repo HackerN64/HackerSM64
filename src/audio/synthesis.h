@@ -1,5 +1,4 @@
-#ifndef AUDIO_SYNTHESIS_H
-#define AUDIO_SYNTHESIS_H
+#pragma once
 
 #include "internal.h"
 
@@ -127,5 +126,3 @@ void note_set_frequency(struct Note *note, f32 frequency);
 void note_enable(struct Note *note);
 void note_disable(struct Note *note);
 #endif
-
-#endif // AUDIO_SYNTHESIS_H

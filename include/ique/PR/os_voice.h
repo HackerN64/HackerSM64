@@ -7,8 +7,7 @@
         $Date: 2002/10/29 08:06:34 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_VOICE_H_
-#define	_OS_VOICE_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -104,5 +103,3 @@ extern void osVoiceCountSyllables(u8 *, u32 *);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_VOICE_H_ */

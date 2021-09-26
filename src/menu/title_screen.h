@@ -1,5 +1,4 @@
-#ifndef TITLE_SCREEN_H
-#define TITLE_SCREEN_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -13,5 +12,3 @@ enum LevelScriptIntroArgs {
 };
 
 s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg);
-
-#endif // TITLE_SCREEN_H

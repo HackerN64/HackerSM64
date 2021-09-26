@@ -1,5 +1,4 @@
-#ifndef SEGMENT2_H
-#define SEGMENT2_H
+#pragma once
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
@@ -63,5 +62,3 @@ extern Gfx dl_billboard_num_6[];
 extern Gfx dl_billboard_num_7[];
 extern Gfx dl_billboard_num_8[];
 extern Gfx dl_billboard_num_9[];
-
-#endif // SEGMENT2_H

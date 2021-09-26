@@ -1,5 +1,4 @@
-#ifndef SOUND_INIT_H
-#define SOUND_INIT_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -38,5 +37,3 @@ void fadeout_cap_music(void);
 void stop_cap_music(void);
 void audio_game_loop_tick(void);
 void thread4_sound(UNUSED void *arg);
-
-#endif // SOUND_INIT_H

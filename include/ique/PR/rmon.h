@@ -18,8 +18,7 @@
  *
  **************************************************************************/
 
-#ifndef _RMON_H_
-#define	_RMON_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -49,5 +48,3 @@ extern void rmonPrintf( const char *, ... );
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_H */

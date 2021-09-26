@@ -1,5 +1,4 @@
-#ifndef OBJ_BEHAVIORS_2_H
-#define OBJ_BEHAVIORS_2_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -19,5 +18,3 @@ void shelled_koopa_attack_handler(s32 attackType);
 void obj_spit_fire(s16 relativePosX, s16 relativePosY, s16 relativePosZ, f32 scale, s32 model,
                    f32 startSpeed, f32 endSpeed, s16 movePitch);
 void obj_set_speed_to_zero(void);
-
-#endif // OBJ_BEHAVIORS_2_H

@@ -18,8 +18,7 @@
         $Date: 1999/03/10 12:19:14 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_INTERNAL_REG_H_
-#define	_OS_INTERNAL_REG_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -55,5 +54,3 @@ extern u32              __osGetFpcCsr(void);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_INTERNAL_REG_H */

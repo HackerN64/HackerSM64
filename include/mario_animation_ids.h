@@ -1,5 +1,4 @@
-#ifndef MARIO_ANIMATION_IDS_H
-#define MARIO_ANIMATION_IDS_H
+#pragma once
 
 /* Mario Animation IDs */
 
@@ -215,5 +214,3 @@ enum MarioAnimID
     /* 0xCF */ MARIO_ANIM_FORWARD_SPINNING_FLIP,
     /* 0xD0 */ MARIO_ANIM_TRIPLE_JUMP_FLY
 };
-
-#endif // MARIO_ANIMATION_IDS_H

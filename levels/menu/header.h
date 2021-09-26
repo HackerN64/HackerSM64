@@ -1,5 +1,4 @@
-#ifndef MENU_HEADER_H
-#define MENU_HEADER_H
+#pragma once
 
 #include "types.h"
 
@@ -48,5 +47,3 @@ extern const u8 eu_course_strings_de_table[];
 // script
 extern const LevelScript level_main_menu_entry_file_select[];
 extern const LevelScript level_main_menu_entry_act_select[];
-
-#endif

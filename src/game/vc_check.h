@@ -1,5 +1,4 @@
-#ifndef VC_CHECK_H
-#define VC_CHECK_H
+#pragma once
 
 #include "sm64.h"
 
@@ -18,5 +17,3 @@ f32 round_double_to_float(f64);
  * RTZ will output not 1.0f, RTN will output exactly 1.0f
  */
 #define IS_VC() (1.0f != round_double_to_float(0.9999999999999999))
-
-#endif

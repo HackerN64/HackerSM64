@@ -1,5 +1,4 @@
-#ifndef SURFACE_COLLISION_H
-#define SURFACE_COLLISION_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -40,5 +39,3 @@ s32 find_water_level(s32 x, s32 z);
 s32 find_poison_gas_level(s32 x, s32 z);
 void debug_surface_list_info(f32 xPos, f32 zPos);
 void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
-
-#endif // SURFACE_COLLISION_H

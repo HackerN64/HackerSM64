@@ -1,5 +1,4 @@
-#ifndef BITDW_HEADER_H
-#define BITDW_HEADER_H
+#pragma once
 
 #include "types.h"
 
@@ -73,5 +72,3 @@ extern const Collision bitdw_seg7_collision_0700FD9C[];
 
 // script
 extern const LevelScript level_bitdw_entry[];
-
-#endif

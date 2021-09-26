@@ -1,5 +1,4 @@
-#ifndef SPECIAL_PRESETS_H
-#define SPECIAL_PRESETS_H
+#pragma once
 
 #include "special_preset_names.h"
 #include "behavior_data.h"
@@ -109,5 +108,3 @@ static struct SpecialPreset SpecialObjectPresets[] =
     {0x87, SPTYPE_PARAMS_AND_YROT   , 0x00, MODEL_UNKNOWN_DOOR_2B, bhvDoorWarp},
     {0xFF, SPTYPE_NO_YROT_OR_PARAMS , 0x00, MODEL_NONE, NULL}
 };
-
-#endif // SPECIAL_PRESETS_H

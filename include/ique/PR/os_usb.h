@@ -26,8 +26,7 @@
         $Date: 2004/09/03 03:52:47 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_USB_H_
-#define	_OS_USB_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -168,5 +167,3 @@ extern s32	osBbUsbDevWrite(OSBbUsbHandle, u8 *, s32, u64);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_USB_H_ */

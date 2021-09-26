@@ -1,5 +1,4 @@
-#ifndef __GZIP_H__
-#define	__GZIP_H__
+#pragma once
 
 
 #ifndef NULL
@@ -54,6 +53,3 @@ extern int	flush_window(void);
 //
 //
 u32   expand_gzip(u8 *src_addr, u8 *dst_addr, u32 size, u32 outbytes_limit);
-
-
-#endif

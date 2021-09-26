@@ -1,5 +1,4 @@
-#ifndef GD_MEMORY_H
-#define GD_MEMORY_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -31,5 +30,3 @@ extern void *gd_request_mem(u32 size, u8 permanence);
 extern struct GMemBlock *gd_add_mem_to_heap(u32 size, void *addr, u8 permanence);
 extern void init_mem_block_lists(void);
 extern void mem_stats(void);
-
-#endif // GD_MEMORY_H

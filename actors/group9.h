@@ -1,5 +1,4 @@
-#ifndef GROUP9_H
-#define GROUP9_H
+#pragma once
 
 #include "types.h"
 
@@ -80,5 +79,3 @@ extern const Gfx small_key_seg5_dl_05006A08[];
 extern const Gfx small_key_seg5_dl_05006A28[];
 extern const Gfx small_key_seg5_dl_05006A48[];
 extern const Gfx small_key_seg5_dl_05006A68[];
-
-#endif

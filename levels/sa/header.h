@@ -1,5 +1,4 @@
-#ifndef SA_HEADER_H
-#define SA_HEADER_H
+#pragma once
 
 #include "types.h"
 
@@ -14,5 +13,3 @@ extern const MacroObject sa_seg7_macro_objs[];
 
 // script
 extern const LevelScript level_sa_entry[];
-
-#endif

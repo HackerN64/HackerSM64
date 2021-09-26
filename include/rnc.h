@@ -1,5 +1,4 @@
-#ifndef _IE_PACK_H
-#define _IE_PACK_H
+#pragma once
 
 typedef struct s_Propack
 {
@@ -20,5 +19,3 @@ typedef struct s_Propack
 
 extern void Propack_UnpackM1(void *FilePtr, void *OutputBuffer);
 extern void Propack_UnpackM2(void *FilePtr, void *OutputBuffer);
-
-#endif // _IE_PACK_H

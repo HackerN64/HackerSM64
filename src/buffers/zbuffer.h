@@ -1,5 +1,4 @@
-#ifndef ZBUFFER_H
-#define ZBUFFER_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -7,5 +6,3 @@
 #include "macros.h"
 
 extern u16 gZBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
-
-#endif // ZBUFFER_H

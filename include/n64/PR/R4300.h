@@ -18,8 +18,7 @@
  *
  **************************************************************************/
 
-#ifndef __R4300_H__
-#define __R4300_H__
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -449,5 +448,3 @@
 #define	FPCSR_RM_RZ	0x00000001	/* round to zero */
 #define	FPCSR_RM_RP	0x00000002	/* round to positive infinity */
 #define	FPCSR_RM_RM	0x00000003	/* round to negative infinity */
-
-#endif /* __R4300_H */

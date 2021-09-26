@@ -18,8 +18,7 @@
         $Date: 1998/10/09 08:01:11 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_INTERNAL_GIO_H_
-#define	_OS_INTERNAL_GIO_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -41,5 +40,3 @@ extern void		__osGIORawInterrupt(s32);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_INTERNAL_GIO_H */

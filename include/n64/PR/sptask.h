@@ -18,8 +18,7 @@
  *
  **************************************************************************/
 
-#ifndef _SPTASK_H_
-#define	_SPTASK_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -197,5 +196,3 @@ extern OSYieldResult	osSpTaskYielded(OSTask *tp);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_SPTASK_H */

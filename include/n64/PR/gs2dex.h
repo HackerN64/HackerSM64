@@ -9,8 +9,7 @@
 	$Id: gs2dex.h,v 1.21 1998/05/28 00:14:49 has Exp $
   ---------------------------------------------------------------------*/
 
-#ifndef	_GS2DEX_H_
-#define	_GS2DEX_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -387,6 +386,5 @@ extern	void	guS2DInitBg(uObjBg *);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-#endif /* _GS2DEX_H_ */
 
 /*======== End of gs2dex.h ========*/

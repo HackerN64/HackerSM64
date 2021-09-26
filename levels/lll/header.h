@@ -1,5 +1,4 @@
-#ifndef LLL_HEADER_H
-#define LLL_HEADER_H
+#pragma once
 
 #include "types.h"
 #include "game/moving_texture.h"
@@ -127,5 +126,3 @@ extern const Gfx lll_dl_lavafall_volcano[];
 
 // script
 extern const LevelScript level_lll_entry[];
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef OBJECT_CONSTANTS_H
-#define OBJECT_CONSTANTS_H
+#pragma once
 
 // This file contains macros that provide descriptive names for
 // field-specific and object-specific constants, e.g. actions.
@@ -1140,5 +1139,3 @@
     /* oBehParams2ndByte */
     #define MR_BLIZZARD_STYPE_NO_CAP 0
     #define MR_BLIZZARD_STYPE_JUMPING 1
-
-#endif // OBJECT_CONSTANTS_H

@@ -1,5 +1,4 @@
-#ifndef S2D_DRAW_H
-#define S2D_DRAW_H
+#pragma once
 #include <ultra64.h>
 
 extern float myScale;
@@ -19,5 +18,3 @@ extern void mtx_pipeline(uObjMtx *m, int x, int y);
 
 extern void draw_s2d_glyph(char c, int x, int y, uObjMtx *mt);
 extern void draw_s2d_shadow(char c, int x, int y, uObjMtx *ds);
-
-#endif

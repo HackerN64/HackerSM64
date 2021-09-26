@@ -19,8 +19,7 @@
  *
  **************************************************************************/
 
-#ifndef _ULTRA64_H_
-#define _ULTRA64_H_
+#pragma once
 
 #include <PR/ultratypes.h>
 #include <PR/rcp.h>
@@ -36,5 +35,3 @@
 #include <PR/ucode.h>
 #include <PR/ultraerror.h>
 #include <PR/ultralog.h>
-
-#endif

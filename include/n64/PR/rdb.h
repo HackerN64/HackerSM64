@@ -7,8 +7,7 @@
  *
  **************************************************************************/
 
-#ifndef _RDB_H
-#define _RDB_H
+#pragma once
 
 /* U64 side address */
 #define	RDB_BASE_REG		0xc0000000
@@ -89,5 +88,3 @@ extern unsigned int	__osRdbWriteOK;
 extern unsigned int	__osRdbSendMessage;
 
 #endif /* _LANGUAGE_C */
-
-#endif /* !_RDB_H */

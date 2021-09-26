@@ -1,5 +1,4 @@
-#ifndef GROUP15_H
-#define GROUP15_H
+#pragma once
 
 #include "types.h"
 
@@ -85,5 +84,3 @@ extern const Gfx toad_seg6_dl_06008890[];
 extern const Gfx toad_seg6_dl_06008A90[];
 extern const Gfx toad_seg6_dl_06008BD8[];
 extern const struct Animation *const toad_seg6_anims_0600FB58[];
-
-#endif

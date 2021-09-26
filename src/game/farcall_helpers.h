@@ -1,5 +1,4 @@
-#ifndef OBJ_BEHAVIORS_2_NONSTATIC_H
-#define OBJ_BEHAVIORS_2_NONSTATIC_H
+#pragma once
 
 #include "object_fields.h"
 #include "object_constants.h"
@@ -80,5 +79,3 @@ s32 obj_update_standard_actions(f32 scale);
 s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction);
 s32 obj_move_for_one_second(s32 endAction);
 void treat_far_home_as_mario(f32 threshold);
-
-#endif

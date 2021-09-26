@@ -1,7 +1,6 @@
 #include <ultra64.h>
 
-#ifndef S2D_CONFIG_H
-#define S2D_CONFIG_H
+#pragma once
 
 /**
  * SET YOUR FONT NAME HERE
@@ -94,5 +93,3 @@ extern char *proutSprintf(char *dst, const char *src, size_t count);
 #define TEX_RES 1
 
 #define _NUM_CACHE (4096 / (TEX_WIDTH * TEX_HEIGHT * (TEX_BITDEPTH / 8)))
-
-#endif

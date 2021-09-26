@@ -1,5 +1,4 @@
-#ifndef UTILS_H_
-#define UTILS_H_
+#pragma once
 
 #include <stdio.h>
 #include <stdint.h>
@@ -148,5 +147,3 @@ void dir_list_free(dir_list *list);
 // suffix: string to see if 'str' ends with
 // returns 1 if 'str' ends with 'suffix'
 int str_ends_with(const char *str, const char *suffix);
-
-#endif // UTILS_H_

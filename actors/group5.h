@@ -1,5 +1,4 @@
-#ifndef GROUP5_H
-#define GROUP5_H
+#pragma once
 
 #include "types.h"
 
@@ -81,5 +80,3 @@ extern const Gfx pokey_seg5_dl_050130B0[];
 extern const Gfx tornado_seg5_dl_05014450[];
 extern const Gfx tornado_seg5_dl_050145C0[];
 extern const GeoLayout tweester_geo[];
-
-#endif

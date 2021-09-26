@@ -18,8 +18,7 @@
         $Date: 1998/10/09 08:01:09 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_INTERNAL_DEBUG_H_
-#define	_OS_INTERNAL_DEBUG_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -39,5 +38,3 @@ extern int		__osAtomicDec(unsigned int *p);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_INTERNAL_DEBUG_H */

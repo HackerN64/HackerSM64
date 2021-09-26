@@ -1,5 +1,4 @@
-#ifndef LEVEL_COMMANDS_H
-#define LEVEL_COMMANDS_H
+#pragma once
 
 #include "command_macros_base.h"
 
@@ -361,5 +360,3 @@
 
 #define GET_OR_SET(op, var) \
     CMD_BBBB(0x3C, 0x04, op, var)
-
-#endif // LEVEL_COMMANDS_H

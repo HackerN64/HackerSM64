@@ -1,5 +1,4 @@
-#ifndef BEHAVIOR_SCRIPT_H
-#define BEHAVIOR_SCRIPT_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -24,5 +23,3 @@ float random_float(void);
 s32 random_sign(void);
 
 void cur_obj_update(void);
-
-#endif // BEHAVIOR_SCRIPT_H
