@@ -39,7 +39,7 @@ void bhv_alpha_boo_key_loop(void) {
 
         // Delete the object and spawn sparkles
         obj_mark_for_deletion(o);
-        spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles);
+        spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
     }
 }
 
@@ -98,7 +98,7 @@ static void beta_boo_key_dropped_loop(void) {
 
             // Delete the object and spawn sparkles
             obj_mark_for_deletion(o);
-            spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles);
+            spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
         }
     }
 }

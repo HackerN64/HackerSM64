@@ -1,5 +1,4 @@
-#ifndef _MBI_H_
-#define	_MBI_H_
+#pragma once
 
 /**************************************************************************
  *									  *
@@ -96,5 +95,3 @@
 #ifndef NULL
 #define NULL 0
 #endif
-
-#endif /* !_MBI_H_ */

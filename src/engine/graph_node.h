@@ -1,5 +1,4 @@
-#ifndef GRAPH_NODE_H
-#define GRAPH_NODE_H
+#pragma once
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
@@ -455,5 +454,3 @@ s16 *read_vec3s_to_vec3f(Vec3f, s16 *src);
 s16 *read_vec3s(Vec3s dst, s16 *src);
 s16 *read_vec3s_angle(Vec3s dst, s16 *src);
 void register_scene_graph_node(struct GraphNode *graphNode);
-
-#endif // GRAPH_NODE_H

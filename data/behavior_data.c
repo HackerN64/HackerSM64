@@ -973,7 +973,7 @@ const BehaviorScript bhvSingleCoinGetsSpawned[] = {
 };
 
 const BehaviorScript bhvCoinSparkles[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, 25),
@@ -987,7 +987,7 @@ const BehaviorScript bhvCoinSparkles[] = {
     DEACTIVATE(),
 };
 
-const BehaviorScript bhvGoldenCoinSparkles[] = {
+const BehaviorScript bhvCoinSparklesSpawner[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     DISABLE_RENDERING(),
@@ -1909,7 +1909,7 @@ const BehaviorScript bhvBulletBill[] = {
 };
 
 const BehaviorScript bhvWhitePuffSmoke[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     ADD_FLOAT(oPosY, -100),
@@ -3127,7 +3127,7 @@ const BehaviorScript bhvFloorTrapInCastle[] = {
 const BehaviorScript bhvTree[] = {
     BEGIN(OBJ_LIST_POLELIKE),
     BILLBOARD(),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_OPACITY_FROM_CAMERA_DIST)),
     SET_INT(oInteractType, INTERACT_POLE),
     SET_HITBOX(/*Radius*/ 80, /*Height*/ 500),
     SET_INT(oIntangibleTimer, 0),
@@ -3250,7 +3250,7 @@ const BehaviorScript bhvWaterDroplet[] = {
 
 // Small splashes that are seen when a water droplet lands back into the water.
 const BehaviorScript bhvWaterDropletSplash[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oFaceAnglePitch, 0),
     SET_INT(oFaceAngleYaw, 0),
@@ -3266,7 +3266,7 @@ const BehaviorScript bhvWaterDropletSplash[] = {
 
 // The splash created when an air bubble hits the surface of the water.
 const BehaviorScript bhvBubbleSplash[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oFaceAnglePitch, 0),
     SET_INT(oFaceAngleYaw, 0),
@@ -3297,7 +3297,6 @@ const BehaviorScript bhvIdleWaterWave[] = {
 };
 
 // Water splashes similar to the splashes created by water droplets, but are created by other objects.
-// Unlike water droplet splashes, they are unimportant objects.
 const BehaviorScript bhvObjectWaterSplash[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -3341,7 +3340,6 @@ const BehaviorScript bhvShallowWaterSplash[] = {
 };
 
 // Waves created by other objects along the water's surface, specifically the koopa shell and Sushi.
-// Unlike Mario's waves, they are unimportant objects.
 const BehaviorScript bhvObjectWaveTrail[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -3350,7 +3348,7 @@ const BehaviorScript bhvObjectWaveTrail[] = {
 
 // The waves created by Mario while he is swimming.
 const BehaviorScript bhvWaveTrail[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     PARENT_BIT_CLEAR(oActiveParticleFlags, ACTIVE_PARTICLE_WAVE_TRAIL),
     // Wave trail - common:
@@ -3422,7 +3420,6 @@ const BehaviorScript bhvYellowBall[] = {
     BREAK(),
 };
 
-UNUSED static const u64 behavior_data_unused_0 = 0;
 const BehaviorScript bhvMario[] = {
     BEGIN(OBJ_LIST_PLAYER),
     SET_INT(oIntangibleTimer, 0),
@@ -3516,7 +3513,6 @@ const BehaviorScript bhvSwimmingWarp[] = {
     BREAK(),
 };
 
-UNUSED static const u64 behavior_data_unused_1 = 0;
 const BehaviorScript bhvRandomAnimatedTexture[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -3664,7 +3660,7 @@ const BehaviorScript bhvBobomb[] = {
 };
 
 const BehaviorScript bhvBobombFuseSmoke[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_INT(oAnimState, -1),
@@ -4084,7 +4080,7 @@ const BehaviorScript bhvBowserBombExplosion[] = {
 };
 
 const BehaviorScript bhvBowserBombSmoke[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
+    BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_FLOAT(oGraphYOffset, -288),

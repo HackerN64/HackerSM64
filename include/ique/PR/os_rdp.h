@@ -27,8 +27,7 @@
         $Date: 2002/05/02 03:28:25 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_RDP_H_
-#define	_OS_RDP_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -88,5 +87,3 @@ extern s32		osDpSetNextBuffer(void *, u64);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_RDP_H_ */

@@ -40,7 +40,6 @@ void bhv_rotating_clock_arm_loop(void) {
 
             // Increment the action to stop animating the hands.
             o->oAction++;
-        } else {
         }
     }
 

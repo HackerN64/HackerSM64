@@ -1,5 +1,4 @@
-#ifndef GROUP6_H
-#define GROUP6_H
+#pragma once
 
 #include "types.h"
 
@@ -83,5 +82,3 @@ extern const Gfx ukiki_seg5_dl_0500CFF0[];
 extern const Gfx ukiki_seg5_dl_0500D078[];
 extern const Gfx ukiki_seg5_dl_0500D108[];
 extern const struct Animation *const ukiki_seg5_anims_05015784[];
-
-#endif

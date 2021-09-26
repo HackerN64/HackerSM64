@@ -238,18 +238,8 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 
             case 0xc4: // layer_somethingon
             case 0xc5: // layer_somethingoff
-                //! copt needs a ternary:
-                //layer->continuousNotes = (cmd == 0xc4) ? TRUE : FALSE;
-                {
-                    u8 setting;
-                    if (cmd == 0xc4) {
-                        setting = TRUE;
-                    } else {
-                        setting = FALSE;
-                    }
-                    layer->continuousNotes = setting;
-                    seq_channel_layer_note_decay(layer);
-                }
+                layer->continuousNotes = (cmd == 0xc4);
+                seq_channel_layer_note_decay(layer);
                 break;
 
             case 0xc3: // layer_setshortnotedefaultplaypercentage
@@ -400,13 +390,7 @@ l1138:
                     }
 
                     if (layer->portamento.mode != 0) {
-                        //! copt needs a ternary:
-                        //usedSemitone = (layer->portamentoTargetNote < cmdSemitone) ? cmdSemitone : layer->portamentoTargetNote;
-                        if (layer->portamentoTargetNote < cmdSemitone) {
-                            usedSemitone = cmdSemitone;
-                        } else {
-                            usedSemitone = layer->portamentoTargetNote;
-                        }
+                        usedSemitone = (layer->portamentoTargetNote < cmdSemitone) ? cmdSemitone : layer->portamentoTargetNote;
 
                         if (instrument != NULL) {
                             sound = (u8) usedSemitone < instrument->normalRangeLo ? &instrument->lowNotesSound

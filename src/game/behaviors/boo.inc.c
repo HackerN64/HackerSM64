@@ -362,10 +362,7 @@ static void boo_chase_mario(f32 minDY, s16 yawIncrement, f32 mul) {
         }
     } else {
         o->oInteractType = 0;
-        // why is boo_stop not used here
-        o->oForwardVel = 0.0f;
-        o->oVelY = 0.0f;
-        o->oGravity = 0.0f;
+        boo_stop();
     }
 }
 

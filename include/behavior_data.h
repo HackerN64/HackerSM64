@@ -1,5 +1,4 @@
-#ifndef BEHAVIOR_DATA_H
-#define BEHAVIOR_DATA_H
+#pragma once
 
 #include "types.h"
 
@@ -61,7 +60,7 @@ extern const BehaviorScript bhvThreeCoinsSpawn[];
 extern const BehaviorScript bhvTenCoinsSpawn[];
 extern const BehaviorScript bhvSingleCoinGetsSpawned[];
 extern const BehaviorScript bhvCoinSparkles[];
-extern const BehaviorScript bhvGoldenCoinSparkles[];
+extern const BehaviorScript bhvCoinSparklesSpawner[];
 extern const BehaviorScript bhvWallTinyStarParticle[];
 extern const BehaviorScript bhvVertStarParticleSpawner[];
 extern const BehaviorScript bhvPoundTinyStarParticle[];
@@ -530,5 +529,3 @@ extern const BehaviorScript bhvEndBirds1[];
 extern const BehaviorScript bhvEndBirds2[];
 extern const BehaviorScript bhvIntroScene[];
 extern const BehaviorScript bhvUnusedFakeStar[];
-
-#endif // BEHAVIOR_DATA_H

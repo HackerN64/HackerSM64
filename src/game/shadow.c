@@ -198,7 +198,7 @@ f32 get_water_level_below_shadow(struct Shadow *s, struct Surface **waterFloor) 
  *                          be dimmed based on its distance to the floor
  */
 s8 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 overwriteSolidity) {
-    f32 waterLevel;
+    f32 waterLevel = FLOOR_LOWER_LIMIT_SHADOW;
     f32 floorSteepness;
     struct Surface *floor;
     struct Surface *waterFloor = NULL;
@@ -216,7 +216,6 @@ s8 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, 
     // }
 
     if (gShadowAboveWaterOrLava) {
-        //! @bug Use of potentially undefined variable `waterLevel`
         s->floorHeight = waterLevel;
 
         if (waterFloor != NULL) {

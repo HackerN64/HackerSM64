@@ -1,5 +1,4 @@
-#ifndef BITFS_HEADER_H
-#define BITFS_HEADER_H
+#pragma once
 
 #include "types.h"
 
@@ -93,5 +92,3 @@ extern const Gfx bitfs_dl_lava_floor[];
 
 // script
 extern const LevelScript level_bitfs_entry[];
-
-#endif

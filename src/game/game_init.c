@@ -73,9 +73,6 @@ void *gDemoInputsMemAlloc;
 struct DmaHandlerList gMarioAnimsBuf;
 struct DmaHandlerList gDemoInputsBuf;
 
-// fillers
-UNUSED static u8 sfillerGameInit[0x90];
-
 // General timer that runs as the game starts
 u32 gGlobalTimer = 0;
 u8 *gAreaSkyboxStart[AREA_COUNT];

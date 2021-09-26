@@ -573,19 +573,14 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 2) {
-        if (currentIndex[0] == maxIndex) {
-            //! Probably originally a >=, but later replaced with an == and an else statement.
-            currentIndex[0] = maxIndex;
-        } else {
+        if (currentIndex[0] != maxIndex) {
             play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
             currentIndex[0]++;
         }
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 1) {
-        if (currentIndex[0] == minIndex) {
-            // Same applies to here as above
-        } else {
+        if (currentIndex[0] != minIndex) {
             play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
             currentIndex[0]--;
         }
@@ -813,8 +808,7 @@ void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum, u8 *cust
 #define X_VAL3 0.0f
 #define Y_VAL3 16
 
-void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s8 *xMatrix, s16 *linePos)
-{
+void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s8 *xMatrix, s16 *linePos) {
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
     if (lineNum == totalLines) {
@@ -828,8 +822,7 @@ void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s
 }
 
 
-void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos)
-{
+void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos) {
     s8 tensDigit = gDialogVariable / 10;
     s8 onesDigit = gDialogVariable - (tensDigit * 10); // remainder
 
@@ -843,9 +836,6 @@ void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos)
         xMatrix[0] = 1;
         linePos[0]++;
     }
-    else {
-    }
-
 
     if (xMatrix[0] != 1) {
         create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * (xMatrix[0] - 1)), 0, 0);
@@ -858,8 +848,7 @@ void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos)
     xMatrix[0] = 1;
 }
 
-void render_multi_text_string_lines(s8 multiTextId, s8 lineNum, s16 *linePos, s8 linesPerBox, s8 xMatrix, s8 lowerBound)
-{
+void render_multi_text_string_lines(s8 multiTextId, s8 lineNum, s16 *linePos, s8 linesPerBox, s8 xMatrix, s8 lowerBound) {
     s8 i;
     struct MultiTextEntry textLengths[2] = {
         { 3, { TEXT_THE_RAW } },
@@ -2038,8 +2027,7 @@ void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
 
 void render_course_complete_lvl_info_and_hud_str(void) {
     u8 textCourse[] = { TEXT_COURSE };
-    UNUSED u8 textCatch[] = { TEXT_CATCH }; // unused in US
-    UNUSED u8 textClear[] = { TEXT_CLEAR };
+    u8 textClear[] = { TEXT_CLEAR };
     u8 textSymStar[] = { GLYPH_STAR, GLYPH_SPACE };
 
     void **actNameTbl;

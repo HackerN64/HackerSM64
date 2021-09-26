@@ -892,7 +892,6 @@ u16 unk_sh_data_4[] = {
 
 #ifndef VERSION_SH
 s16 gTatumsPerBeat = TATUMS_PER_BEAT;
-s8 gUnusedCount80333EE8 = UNUSED_COUNT_80333EE8;
 s32 gAudioHeapSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE);
 s32 gAudioInitPoolSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_INIT_POOL_SIZE);
 volatile s32 gAudioLoadLock = AUDIO_LOCK_UNINITIALIZED;
@@ -904,8 +903,6 @@ u8 D_EU_80302010 = 0;
 u8 D_EU_80302014 = 0;
 
 struct OSMesgQueue *OSMesgQueues[4] = { &OSMesgQueue0, &OSMesgQueue1, &OSMesgQueue2, &OSMesgQueue3 };
-#elif defined(VERSION_JP) || defined(VERSION_US)
-s8 sUnused8033EF8 = 24;
 #endif
 
 // .bss
@@ -934,11 +931,6 @@ s32 gRefreshRate;
 
 ALIGNED8 s16 *gAiBuffers[NUMAIBUFFERS];
 s16 gAiBufferLengths[NUMAIBUFFERS];
-
-#if defined(VERSION_JP) || defined(VERSION_US)
-u32 gUnused80226E58[0x10];
-u16 gUnused80226E98[0x10];
-#endif
 
 u32 gAudioRandom;
 

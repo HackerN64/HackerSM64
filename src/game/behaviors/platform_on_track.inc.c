@@ -243,7 +243,6 @@ static void platform_on_track_act_fall(void) {
  */
 static void platform_on_track_rock_ski_lift(void) {
     s32 targetRoll = 0;
-    UNUSED s32 initialRoll = o->oFaceAngleRoll;
 
     o->oFaceAngleRoll += (s32) o->oPlatformOnTrackSkiLiftRollVel;
 

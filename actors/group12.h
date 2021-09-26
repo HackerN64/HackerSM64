@@ -1,5 +1,4 @@
-#ifndef GROUP12_H
-#define GROUP12_H
+#pragma once
 
 #include "types.h"
 
@@ -134,5 +133,3 @@ extern const Gfx impact_smoke_seg6_dl_06062D18[];
 extern const GeoLayout bowser_1_yellow_sphere_geo[];
 extern const Gfx yellow_sphere_seg6_dl_0601F388[];
 extern const Gfx yellow_sphere_seg6_dl_0601F3C0[];
-
-#endif

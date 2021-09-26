@@ -59,7 +59,6 @@ static struct GdColour sClrYellow = { 1.0, 1.0, 0.0 };           // @ 801A80DC
 static struct GdColour sLightColours[1] = { { 1.0, 1.0, 0.0 } }; // @ 801A80E8
 static struct GdColour *sSelectedColour = &sClrRed;              // @ 801A80F4
 struct ObjCamera *gViewUpdateCamera = NULL;                      // @ 801A80F8
-UNUSED static void *sUnref801A80FC = NULL;
 static s32 sUnreadShapeFlag = 0;       // @ 801A8100
 struct GdColour *sColourPalette[5] = { // @ 801A8104
     &sClrWhite, &sClrYellow, &sClrRed, &sClrBlack, &sClrBlack
@@ -69,20 +68,12 @@ struct GdColour *sWhiteBlack[2] = {
     &sClrWhite,
     &sClrBlack,
 };
-UNUSED static Mat4f sUnref801A8120 = {
-    { 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0 }
-};
-UNUSED static Mat4f sUnrefIden801A8160 = {
-    { 1.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0 }
-};
+
 static s32 sLightDlCounter = 1; // @ 801A81A0
-UNUSED static s32 sUnref801A81A4[4] = { 0 };
 
 // bss
-u8 gUnref_801B9B30[0x88];
 struct ObjGroup *gGdLightGroup; // @ 801B9BB8; is this the main light group? only light group?
 
-UNUSED static u8 sUnref_801B9BBC[0x40];
 static enum SceneType sSceneProcessType; // @ 801B9C00
 static s32 sUseSelectedColor;            // @ 801B9C04
 static s16 sPickBuffer[100];             ///< buffer of objects near click
@@ -113,12 +104,6 @@ void setup_lights(void) {
     set_light_num(NUMLIGHTS_2);
     gd_setproperty(GD_PROP_AMB_COLOUR, 0.5f, 0.5f, 0.5f);
     gd_setproperty(GD_PROP_CULLING, 1.0f, 0.0f, 0.0f); // set G_CULL_BACK
-    return;
-
-    // dead code
-    gd_setproperty(GD_PROP_STUB17, 2.0f, 0.0f, 0.0f);
-    gd_setproperty(GD_PROP_ZBUF_FN, 24.0f, 0.0f, 0.0f);
-    gd_setproperty(GD_PROP_CULLING, 1.0f, 0.0f, 0.0f);
     return;
 }
 
@@ -269,8 +254,6 @@ void draw_shape_2d(struct ObjShape *shape, s32 flag, UNUSED f32 c, UNUSED f32 d,
 void draw_light(struct ObjLight *light) {
     struct GdVec3f sp94;
     Mat4f sp54;
-    UNUSED Mat4f *uMatPtr;
-    UNUSED f32 uMultiplier;
     struct ObjShape *shape;
 
     if (sSceneProcessType == FIND_PICKS) {
@@ -287,13 +270,9 @@ void draw_light(struct ObjLight *light) {
         sp94.y = -light->unk80.y;
         sp94.z = -light->unk80.z;
         gd_create_origin_lookat(&sp54, &sp94, 0.0f);
-        uMultiplier = light->unk38 / 45.0;
         shape = gSpotShape;
-        uMatPtr = &sp54;
     } else {
-        uMultiplier = 1.0f;
         shape = light->unk9C;
-        uMatPtr = NULL;
         if (++sLightDlCounter >= 17) {
             sLightDlCounter = 1;
         }
@@ -432,9 +411,7 @@ void Unknown80178ECC(f32 v0X, f32 v0Y, f32 v0Z, f32 v1X, f32 v1Y, f32 v1Z) {
  */
 void draw_face(struct ObjFace *face) {
     struct ObjVertex *vtx; // 3c
-    f32 z;                 // 38
-    f32 y;                 // 34
-    f32 x;                 // 30
+    f32 x, y, z;           // 30, 34, 38
     s32 i;             // 20; also used to store mtl's gddl number
     s32 hasTextCoords; // 1c
     Vtx *gbiVtx;       // 18
@@ -451,9 +428,6 @@ void draw_face(struct ObjFace *face) {
                     sUpdateViewState.mtlDlNum = i;
                 }
             }
-        }
-
-        if (FALSE) {
         }
     }
 
@@ -524,7 +498,6 @@ void Unknown801792F0(struct GdObj *obj) {
     set_cur_dynobj(obj);
     d_get_world_pos(&objPos);
     func_801A4438(objPos.x, objPos.y, objPos.z);
-    stub_draw_label_text(objId);
 }
 
 /**
@@ -582,7 +555,6 @@ void draw_label(struct ObjLabel *label) {
     position.y += label->position.y;
     position.z += label->position.z;
     func_801A4438(position.x, position.y, position.z);
-    stub_draw_label_text(strbuf);
 }
 
 /* 227DF8 -> 227F3C; orig name: Proc80179628 */
@@ -655,11 +627,6 @@ void draw_camera(struct ObjCamera *cam) {
         sp44.x = cam->lookAt.x;
         sp44.y = cam->lookAt.y;
         sp44.z = cam->lookAt.z;
-    }
-
-    if (0) {
-        // dead code
-        gd_printf("%f,%f,%f\n", cam->worldPos.x, cam->worldPos.y, cam->worldPos.z);
     }
 
     if (ABS(cam->worldPos.x - sp44.x) + ABS(cam->worldPos.z - sp44.z) == 0.0f) {
@@ -843,7 +810,6 @@ void draw_nothing(UNUSED struct GdObj *nop) {
 void draw_shape_faces(struct ObjShape *shape) {
     sUpdateViewState.mtlDlNum = 0;
     sUpdateViewState.unreadCounter = 0;
-    gddl_is_loading_stub_dl(FALSE);
     sUnreadShapeFlag = (s32) shape->flag & 1;
     set_render_alpha(shape->alpha);
     if (shape->dlNums[gGdFrameBufNum] != 0) {
@@ -905,8 +871,6 @@ void draw_bone(UNUSED struct GdObj *obj) {
  */
 void draw_joint(struct GdObj *obj) {
     struct ObjJoint *joint = (struct ObjJoint *) obj;
-    UNUSED f32 sp7C = 70.0f;
-    UNUSED s32 sp74 = 1;
     s32 colour;
     struct ObjShape *boneShape;
 
@@ -1055,25 +1019,6 @@ void create_shape_mtl_gddls(struct ObjShape *shape) {
     if (shape->mtlGroup != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_MATERIALS, (applyproc_t) create_mtl_gddl_if_empty,
                                     shape->mtlGroup);
-    }
-}
-
-/**
- * Uncalled function that calls a stubbed function (`stub_objects_1()`) for all
- * `GdObj`s in @p grp
- *
- * @param grp Unknown group of objects
- * @return void
- * @note Not called
- */
-void unref_8017AEDC(struct ObjGroup *grp) {
-    register struct ListNode *link = grp->firstMember;
-
-    while (link != NULL) {
-        struct GdObj *obj = link->obj;
-
-        stub_objects_1(grp, obj);
-        link = link->next;
     }
 }
 
@@ -1484,10 +1429,4 @@ void update_view(struct ObjView *view) {
     gd_enddlsplist_parent();
     imout();
     return;
-}
-/**
- * Stub function.
- * @note Not Called
- */
-void stub_draw_objects_1(void) {
 }

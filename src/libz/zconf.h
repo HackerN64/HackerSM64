@@ -5,8 +5,7 @@
 
 /* @(#) $Id: zconf.h,v 1.1 2004/06/24 00:04:39 jprincen Exp $ */
 
-#ifndef ZCONF_H
-#define ZCONF_H
+#pragma once
 
 /*
  * If you *really* need a unique prefix for all types and library functions,
@@ -319,5 +318,3 @@ typedef uLong FAR uLongf;
 #   pragma map(inflate_fast,"INFA")
 #   pragma map(inflate_copyright,"INCOPY")
 #endif
-
-#endif /* ZCONF_H */

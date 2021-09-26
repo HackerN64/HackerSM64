@@ -655,16 +655,25 @@ f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f
  * Returns the slope of the floor based off points around Mario.
  */
 s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
-    struct Surface *floor;
+    struct Surface *floor = m->floor;
     f32 forwardFloorY, backwardFloorY;
     f32 forwardYDelta, backwardYDelta;
     s16 result;
 
     f32 x = sins(m->faceAngle[1] + yawOffset) * 5.0f;
     f32 z = coss(m->faceAngle[1] + yawOffset) * 5.0f;
-
-    forwardFloorY = find_floor(m->pos[0] + x, m->pos[1] + 100.0f, m->pos[2] + z, &floor);
-    backwardFloorY = find_floor(m->pos[0] - x, m->pos[1] + 100.0f, m->pos[2] - z, &floor);
+#ifdef FAST_FLOOR_ALIGN
+    if (ABS(m->forwardVel) > FAST_FLOOR_ALIGN) {
+        forwardFloorY  = get_surface_height_at_location((m->pos[0] + x), (m->pos[2] + z), floor);
+        backwardFloorY = get_surface_height_at_location((m->pos[0] - x), (m->pos[2] - z), floor);
+    } else {
+        forwardFloorY  = find_floor((m->pos[0] + x), (m->pos[1] + 100.0f), (m->pos[2] + z), &floor);
+        backwardFloorY = find_floor((m->pos[0] - x), (m->pos[1] + 100.0f), (m->pos[2] - z), &floor);
+    }
+#else
+    forwardFloorY  = find_floor((m->pos[0] + x), (m->pos[1] + 100.0f), (m->pos[2] + z), &floor);
+    backwardFloorY = find_floor((m->pos[0] - x), (m->pos[1] + 100.0f), (m->pos[2] - z), &floor);
+#endif
 
     //! If Mario is near OOB, these floorY's can sometimes be -11000.
     //  This will cause these to be off and give improper slopes.
@@ -742,7 +751,7 @@ static void set_mario_y_vel_based_on_fspeed(struct MarioState *m, f32 initialVel
  * Transitions for a variety of airborne actions.
  */
 static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actionArg) {
-    f32 fowardVel;
+    f32 forwardVel;
 
     if ((m->squishTimer != 0 || m->quicksandDepth >= 1.0f)
         && (action == ACT_DOUBLE_JUMP || action == ACT_TWIRLING)) {
@@ -822,10 +831,10 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
             break;
 
         case ACT_DIVE:
-            if ((fowardVel = m->forwardVel + 15.0f) > 48.0f) {
-                fowardVel = 48.0f;
+            if ((forwardVel = m->forwardVel + 15.0f) > 48.0f) {
+                forwardVel = 48.0f;
             }
-            mario_set_forward_vel(m, fowardVel);
+            mario_set_forward_vel(m, forwardVel);
             break;
 
         case ACT_LONG_JUMP:
@@ -1040,8 +1049,6 @@ s32 set_jump_from_landing(struct MarioState *m) {
  * either a quicksand or steep jump.
  */
 s32 set_jumping_action(struct MarioState *m, u32 action, u32 actionArg) {
-    UNUSED u32 currAction = m->action;
-
     if (m->quicksandDepth >= 11.0f) {
         // Checks whether Mario is holding an object or not.
         if (m->heldObj == NULL) {

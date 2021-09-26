@@ -681,7 +681,6 @@ static void level_cmd_set_macro_objects(void) {
 
 static void level_cmd_load_area(void) {
     s16 areaIndex = CMD_GET(u8, 2);
-    UNUSED void *unused = (u8 *) sCurrentCmd + 4;
 
     stop_sounds_in_continuous_banks();
     load_area(areaIndex);

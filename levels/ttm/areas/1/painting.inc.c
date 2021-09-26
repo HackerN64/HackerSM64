@@ -525,9 +525,6 @@ static const PaintingData *const ttm_seg7_painting_texture_maps_07012E88[] = {
     ttm_seg7_painting_top_0701296C,
 };
 
-UNUSED static const u64 ttm_unused_0 = 0x0;
-
-
 // 0x07012E98 - 0x07012EF8
 static const Gfx ttm_seg7_painting_dl_07012E98[] = {
     gsSPDisplayList(ttm_seg7_dl_070123B8),

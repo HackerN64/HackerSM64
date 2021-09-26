@@ -301,11 +301,8 @@ void mario_drop_held_object(struct MarioState *m) {
 
         obj_set_held_state(m->heldObj, bhvCarrySomethingDropped);
 
-        // ! When dropping an object instead of throwing it, it will be put at Mario's
-        // y-positon instead of the HOLP's y-position. This fact is often exploited when
-        // cloning objects.
         m->heldObj->oPosX = m->marioBodyState->heldObjLastPosition[0];
-        m->heldObj->oPosY = m->pos[1];
+        m->heldObj->oPosY = m->marioBodyState->heldObjLastPosition[1];
         m->heldObj->oPosZ = m->marioBodyState->heldObjLastPosition[2];
 
         m->heldObj->oMoveAngleYaw = m->faceAngle[1];
@@ -454,7 +451,6 @@ u32 bully_knock_back_mario(struct MarioState *mario) {
     s16 newMarioYaw;
     s16 newBullyYaw;
     s16 marioDYaw;
-    UNUSED s16 bullyDYaw;
 
     u32 bonkAction = 0;
 
@@ -481,7 +477,6 @@ u32 bully_knock_back_mario(struct MarioState *mario) {
     newBullyYaw = atan2s(bullyData.velZ, bullyData.velX);
 
     marioDYaw = newMarioYaw - mario->faceAngle[1];
-    bullyDYaw = newBullyYaw - bully->oMoveAngleYaw;
 
     mario->faceAngle[1] = newMarioYaw;
     mario->forwardVel = sqrtf(marioData.velX * marioData.velX + marioData.velZ * marioData.velZ);

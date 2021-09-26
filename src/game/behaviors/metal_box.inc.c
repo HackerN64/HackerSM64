@@ -13,10 +13,10 @@ struct ObjectHitbox sMetalBoxHitbox = {
 };
 
 s32 check_if_moving_over_floor(f32 maxDist, f32 offset) {
-    struct Surface *sp24;
+    struct Surface *floor;
     f32 xPos = o->oPosX + sins(o->oMoveAngleYaw) * offset;
     f32 zPos = o->oPosZ + coss(o->oMoveAngleYaw) * offset;
-    f32 floorHeight = find_floor(xPos, o->oPosY, zPos, &sp24);
+    f32 floorHeight = find_floor(xPos, o->oPosY, zPos, &floor);
     if (absf(floorHeight - o->oPosY) < maxDist) // abs
         return 1;
     else

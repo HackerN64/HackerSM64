@@ -68,12 +68,12 @@ static unsigned char  gPCToggleStringsEN[][64] = {{NC_BUTTON_EN}, {NC_BUTTON2_EN
 
 #define OPT 32 //Just a temp thing
 
-static unsigned char  (*gPCOptionStringsPtr)[OPT][64] = &gPCOptionStringsEN;
-static unsigned char  (*gPCFlagStringsPtr)[OPT][64] = &gPCFlagStringsEN;
-static unsigned char  (*gPCToggleStringsPtr)[OPT][64] = &gPCToggleStringsEN;
+static unsigned char  (*gPCOptionStringsPtr)[OPT][64] = (unsigned char (*)[OPT][64])&gPCOptionStringsEN;
+static unsigned char  (*gPCFlagStringsPtr  )[OPT][64] = (unsigned char (*)[OPT][64])&gPCFlagStringsEN;
+static unsigned char  (*gPCToggleStringsPtr)[OPT][64] = (unsigned char (*)[OPT][64])&gPCToggleStringsEN;
 
 
-static const struct gPCOptionStruct
+struct gPCOptionStruct
 {
     u8 gPCOptionName; //This is the position in the newcam_options text array. It doesn't have to directly correlate with its position in the struct
     s16 *gPCOptionVar; //This is the value that the option is going to directly affect.
@@ -82,8 +82,7 @@ static const struct gPCOptionStruct
     s32 gPCOptionMax; //The maximum value of the option.
 };
 
-static const struct gPCOptionStruct gPCOptions[]=
-{ //If the min and max are 0 and 1, then the value text is used, otherwise it's ignored.
+static const struct gPCOptionStruct gPCOptions[] = { //If the min and max are 0 and 1, then the value text is used, otherwise it's ignored.
     #ifdef WIDE
     {/*Option Name*/ 7, /*Option Variable*/ &gConfig.widescreen,       /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
     #endif
@@ -200,8 +199,7 @@ static void newcam_set_language(void)
 
 ///CUTSCENE
 
-void puppycam_activate_cutscene(s32 *scene, s32 lockinput)
-{
+void puppycam_activate_cutscene(s32 (*scene)(), s32 lockinput) {
     gPuppyCam.cutscene = 1;
     gPuppyCam.sceneTimer = 0;
     gPuppyCam.sceneFunc = scene;
@@ -211,8 +209,7 @@ void puppycam_activate_cutscene(s32 *scene, s32 lockinput)
 //If you've read camera.c this will look familiar.
 //It takes the next 4 spline points and extrapolates a curvature based positioning of the camera vector that's passed through.
 //It's a standard B spline
-static void puppycam_evaluate_spline(f32 progress, Vec3s cameraPos, Vec3f spline1, Vec3f spline2, Vec3f spline3, Vec3f spline4)
-{
+static void puppycam_evaluate_spline(f32 progress, Vec3s cameraPos, Vec3f spline1, Vec3f spline2, Vec3f spline3, Vec3f spline4) {
     f32 tempP[4];
 
     if (progress > 1.0f) {
@@ -367,8 +364,8 @@ void puppycam_display_options()
     unsigned char newstring[32];
     s32 scroll;
     s32 scrollpos;
-    s16 var;
-    s32 vr;
+    u32 var; // should be s16, but gives a build warning otherwise?
+    // s32 vr;
     s32 maxvar;
     s32 minvar;
     f32 newcam_sinpos;
@@ -1112,7 +1109,7 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index)
     else
     if (sPuppyVolumeStack[index]->shape == PUPPYVOLUME_SHAPE_CYLINDER)
     {
-        s16 dir;
+        // s16 dir;
         f32 dist;
         rel[0] = sPuppyVolumeStack[index]->pos[0] - gPuppyCam.targetObj->oPosX;
         rel[1] = sPuppyVolumeStack[index]->pos[1] - gPuppyCam.targetObj->oPosY;
@@ -1285,7 +1282,7 @@ void puppycam_projection_behaviours(void)
     }
 }
 
-void puppycam_shake(s16 x, s16 y, s16 z)
+void puppycam_shake(UNUSED s16 x, UNUSED s16 y, UNUSED s16 z)
 {
 
 }
@@ -1373,7 +1370,6 @@ static void puppycam_script(void)
 {
     u16 i = 0;
     struct sPuppyVolume volume;
-    void (*func)();
 
     if (gPuppyVolumeCount == 0 || !gPuppyCam.targetObj)
         return;
@@ -1439,10 +1435,8 @@ static void puppycam_script(void)
             }
 
             //Last and probably least, check if there's a function attached, and call it, if so.
-            if (volume.func)
-            {
-                func = volume.func;
-                (func)();
+            if (volume.func) {
+                (volume.func)();
             }
         }
     }

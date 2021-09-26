@@ -15,8 +15,7 @@
  *
  **************************************************************************/
 
-#ifndef _RSP_IPC_H_
-#define _RSP_IPC_H_ 1
+#pragma once
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
 
@@ -63,7 +62,5 @@ extern int	sem_close(int id);
 extern int	sem_wait(int id);
 extern int	sem_signal(int id);
 extern int	sem_op(int id, int value);
-
-#endif
 
 #endif

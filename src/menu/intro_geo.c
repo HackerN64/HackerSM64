@@ -3,6 +3,7 @@
 #include "game/memory.h"
 #include "game/segment2.h"
 #include "game/segment7.h"
+#include "engine/math_util.h"
 #include "intro_geo.h"
 #include "sm64.h"
 #include "textures.h"
@@ -28,9 +29,6 @@ struct GraphNodeMore {
 };
 
 // intro geo bss
-#ifdef VERSION_SH
-static u16 *sFrameBuffers[3];
-#endif
 static s32 sGameOverFrameCounter;
 static s32 sGameOverTableIndex;
 static s16 sIntroFrameCounter;
@@ -46,9 +44,6 @@ Gfx *geo_intro_super_mario_64_logo(s32 state, struct GraphNode *node, UNUSED voi
     Mtx *scaleMat;
     f32 *scaleTable1 = segmented_to_virtual(intro_seg7_table_scale_1);
     f32 *scaleTable2 = segmented_to_virtual(intro_seg7_table_scale_2);
-    f32 scaleX;
-    f32 scaleY;
-    f32 scaleZ;
 
     if (state != 1) {
         sIntroFrameCounter = 0;
@@ -57,30 +52,23 @@ Gfx *geo_intro_super_mario_64_logo(s32 state, struct GraphNode *node, UNUSED voi
         scaleMat = alloc_display_list(sizeof(*scaleMat));
         dl = alloc_display_list(4 * sizeof(*dl));
         dlIter = dl;
+        Vec3f scale;
 
         // determine scale based on the frame counter
         if (sIntroFrameCounter >= 0 && sIntroFrameCounter < INTRO_STEPS_ZOOM_IN) {
             // zooming in
-            scaleX = scaleTable1[sIntroFrameCounter * 3];
-            scaleY = scaleTable1[sIntroFrameCounter * 3 + 1];
-            scaleZ = scaleTable1[sIntroFrameCounter * 3 + 2];
+            vec3_copy(scale, &scaleTable1[sIntroFrameCounter * 3]);
         } else if (sIntroFrameCounter >= INTRO_STEPS_ZOOM_IN && sIntroFrameCounter < INTRO_STEPS_HOLD_1) {
             // holding
-            scaleX = 1.0f;
-            scaleY = 1.0f;
-            scaleZ = 1.0f;
+            vec3_same(scale, 1.0f);
         } else if (sIntroFrameCounter >= INTRO_STEPS_HOLD_1 && sIntroFrameCounter < INTRO_STEPS_ZOOM_OUT) {
             // zooming out
-            scaleX = scaleTable2[(sIntroFrameCounter - INTRO_STEPS_HOLD_1) * 3];
-            scaleY = scaleTable2[(sIntroFrameCounter - INTRO_STEPS_HOLD_1) * 3 + 1];
-            scaleZ = scaleTable2[(sIntroFrameCounter - INTRO_STEPS_HOLD_1) * 3 + 2];
+            vec3_copy(scale, &scaleTable2[(sIntroFrameCounter - INTRO_STEPS_HOLD_1) * 3]);
         } else {
             // disappeared
-            scaleX = 0.0f;
-            scaleY = 0.0f;
-            scaleZ = 0.0f;
+            vec3_zero(scale);
         }
-        guScale(scaleMat, scaleX, scaleY, scaleZ);
+        guScale(scaleMat, scale[0], scale[1], scale[2]);
 
         gSPMatrix(dlIter++, scaleMat, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
         gSPDisplayList(dlIter++, &intro_seg7_dl_main_logo);  // draw model

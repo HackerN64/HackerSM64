@@ -26,8 +26,6 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
 #ifdef VERSION_EU
     u16 unkMask = ~0x80;
 #else
-    UNUSED u32 pad;
-    UNUSED u32 pad1;
     f32 velocity;
     u8 pan;
     u8 reverbVol;
@@ -359,12 +357,9 @@ void process_notes(void) {
     struct NotePlaybackState *playbackState;
     struct NoteSubEu *noteSubEu;
 #ifndef VERSION_SH
-    UNUSED u8 pad[12];
     u8 reverbVol;
-    UNUSED u8 pad3;
     u8 pan;
 #else
-    UNUSED u8 pad[8];
     struct ReverbInfo reverbInfo;
 #endif
     u8 bookOffset;
@@ -456,9 +451,6 @@ void process_notes(void) {
 #endif
         d:
         if (playbackState->priority != NOTE_PRIORITY_DISABLED) {
-#ifdef VERSION_SH
-            if (1) {}
-#endif
             noteSubEu = &note->noteSubEu;
 #ifdef VERSION_SH
             if (playbackState->unkSH34 >= 1 || noteSubEu->finished) {
@@ -490,10 +482,6 @@ void process_notes(void) {
                         goto skip;
                     }
                 }
-#ifndef VERSION_SH
-                if (1) {
-                }
-#endif
             } else if (playbackState->adsr.state == ADSR_STATE_DISABLED) {
                 note_disable(note);
                 audio_list_remove(&note->listItem);
@@ -540,8 +528,6 @@ void process_notes(void) {
                 velocity = attributes->velocity;
                 pan = attributes->pan;
                 reverbVol = attributes->reverbVol;
-                if (1) {
-                }
                 bookOffset = noteSubEu->bookOffset;
             } else {
                 frequency = playbackState->parentLayer->noteFreqScale;
@@ -1130,7 +1116,6 @@ struct Note *pop_node_with_lower_prio(struct AudioListItem *list, s32 limit) {
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLayer) {
-    UNUSED s32 pad[4];
     s16 instId;
     struct NoteSubEu *sub = &note->noteSubEu;
 

@@ -148,11 +148,6 @@ void envfx_update_lava(Vec3s centerPos) {
     s32 i;
     s32 timer = gGlobalTimer;
     s8 chance;
-    UNUSED s16 centerX, centerY, centerZ;
-
-    centerX = centerPos[0];
-    centerY = centerPos[1];
-    centerZ = centerPos[2];
 
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
         if ((gEnvFxBuffer + i)->isAlive == 0) {
@@ -260,8 +255,6 @@ void envfx_update_whirlpool(void) {
  * 1000 units away from the source or 1500 units above it.
  */
 s32 envfx_is_jestream_bubble_alive(s32 index) {
-    UNUSED s32 unk;
-
     if (!particle_is_laterally_close(index, gEnvFxBubbleConfig[ENVFX_STATE_SRC_X],
                                      gEnvFxBubbleConfig[ENVFX_STATE_SRC_Z], 1000)
         || gEnvFxBubbleConfig[ENVFX_STATE_SRC_Y] + 1500 < (gEnvFxBuffer + index)->yPos) {

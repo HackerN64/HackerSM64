@@ -26,7 +26,7 @@ void bhv_spawned_star_init(void) {
 void set_sparkle_spawn_star_hitbox(void) {
     obj_set_hitbox(o, &sSparkleSpawnStarHitbox);
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-        mark_obj_for_deletion(o);
+        obj_mark_for_deletion(o);
         o->oInteractStatus = 0;
     }
 }

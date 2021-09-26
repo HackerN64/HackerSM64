@@ -1,5 +1,4 @@
-#ifndef PLATFORM_DISPLACEMENT_H
-#define PLATFORM_DISPLACEMENT_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -26,5 +25,3 @@ void set_mario_pos(f32 x, f32 y, f32 z);
 #endif
 void apply_mario_platform_displacement(void);
 void clear_mario_platform(void);
-
-#endif // PLATFORM_DISPLACEMENT_H

@@ -158,7 +158,6 @@ static void fish_act_roam(void) {
  */
 static void fish_act_flee(void) {
     f32 fishY = o->oPosY - gMarioObject->oPosY;
-    UNUSED s32 distance;
     o->oFishGoalY = gMarioObject->oPosY + o->oFishHeightOffset;
 
     // Initialize some variables when the flee action first starts.
@@ -166,12 +165,6 @@ static void fish_act_flee(void) {
         o->oFishActiveDistance = random_float() * 300.0f;
         o->oFishYawVel = random_float() * 1024.0f + 1024.0f;
         o->oFishGoalVel = random_float() * 4.0f + 8.0f + 5.0f;
-        if (o->oDistanceToMario < 600.0f) {
-            distance = 1;
-        } else {
-            distance = (s32)(1.0 / (o->oDistanceToMario / 600.0));
-        }
-        distance *= 127;
         cur_obj_play_sound_2(SOUND_GENERAL_MOVING_WATER);
     }
 

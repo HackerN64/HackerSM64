@@ -27,8 +27,7 @@
  **************************************************************************/
 
 
-#ifndef _REGION_H_
-#define _REGION_H_
+#pragma once
 
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
@@ -116,8 +115,3 @@ extern s32	osGetRegionBufSize(void *);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-
-#endif  /* _REGION_H_ */
-
-

@@ -497,9 +497,6 @@ static const PaintingData *const hmc_seg7_painting_texture_maps_07024CD4[] = {
     hmc_seg7_pool_texture_map_070242F0,
 };
 
-UNUSED static const u64 hmc_unused_0 = 0;
-
-
 // 0x07024CE0 - 0x070254E0
 ALIGNED8 static const Texture hmc_seg7_texture_07024CE0[] = {
 #include "levels/hmc/7.rgba16.inc.c"

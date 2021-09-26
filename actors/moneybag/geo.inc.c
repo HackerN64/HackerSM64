@@ -54,5 +54,3 @@ const GeoLayout moneybag_geo[] = {
    GEO_CLOSE_NODE(),
    GEO_END(),
 };
-
-UNUSED static const u64 moneybag_unused_1 = 0;

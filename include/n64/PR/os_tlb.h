@@ -27,8 +27,7 @@
         $Date: 1998/10/09 08:01:20 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_TLB_H_
-#define	_OS_TLB_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -103,5 +102,3 @@ extern void		osSetTLBASID(s32);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_TLB_H_ */

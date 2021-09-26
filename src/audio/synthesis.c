@@ -310,7 +310,6 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex, s32 reverbIndex) 
     s32 dstPos;
     s32 nSamples;
     s32 excessiveSamples;
-    s32 UNUSED pad[3];
     if (reverb->downsampleRate != 1) {
         if (reverb->framesLeftToIgnore == 0) {
             // Now that the RSP has finished, downsample the samples produced two frames ago by skipping
@@ -846,20 +845,14 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
 #ifdef VERSION_EU
 // Processes just one note, not all
 u64 *synthesis_process_note(struct Note *note, struct NoteSubEu *noteSubEu, struct NoteSynthesisState *synthesisState, UNUSED s16 *aiBuf, s32 bufLen, u64 *cmd) {
-    UNUSED s32 pad0[3];
 #else
 u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
     s32 noteIndex;                           // sp174
     struct Note *note;                       // s7
-    UNUSED u8 pad0[0x08];
 #endif
     struct AudioBankSample *audioBookSample; // sp164, sp138
     struct AdpcmLoop *loopInfo;              // sp160, sp134
     s16 *curLoadedBook = NULL;               // sp154, sp130
-#ifdef VERSION_EU
-    UNUSED u8 padEU[0x04];
-#endif
-    UNUSED u8 pad8[0x04];
 #ifndef VERSION_EU
     u16 resamplingRateFixedPoint;            // sp5c, sp11A
 #endif
@@ -869,15 +862,8 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
 #ifdef VERSION_EU
     u16 resamplingRateFixedPoint;            // sp5c, sp11A
 #endif
-    UNUSED u8 pad7[0x0c];                    // sp100
     UNUSED s32 tempBufLen;
-#ifdef VERSION_EU
     s32 sp130 = 0;  //sp128, sp104
-    UNUSED u32 pad9;
-#else
-    UNUSED u32 pad9;
-    s32 sp130 = 0;  //sp128, sp104
-#endif
     s32 nAdpcmSamplesProcessed; // signed required for US
     s32 t0;
 #ifdef VERSION_EU
@@ -1404,9 +1390,7 @@ u64 *final_resample(u64 *cmd, struct Note *note, s32 count, u16 pitch, u16 dmemI
 #endif
 
 #ifndef VERSION_EU
-u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings,
-                      UNUSED u32 flags) {
-    UNUSED u8 pad[16];
+u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 headsetPanSettings, UNUSED u32 flags) {
     struct VolumeChange vol;
     vol.sourceLeft = note->curVolLeft;
     vol.sourceRight = note->curVolRight;
@@ -1419,16 +1403,12 @@ u64 *process_envelope(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf, s32 
 
 u64 *process_envelope_inner(u64 *cmd, struct Note *note, s32 nSamples, u16 inBuf,
                             s32 headsetPanSettings, struct VolumeChange *vol) {
-    UNUSED u8 pad[3];
     u8 mixerFlags;
-    UNUSED u8 pad2[8];
     s32 rampLeft, rampRight;
 #elif defined(VERSION_EU)
 u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisState *synthesisState, s32 nSamples, u16 inBuf, s32 headsetPanSettings, UNUSED u32 flags) {
-    UNUSED u8 pad1[20];
     u16 sourceRight;
     u16 sourceLeft;
-    UNUSED u8 pad2[4];
     u16 targetLeft;
     u16 targetRight;
     s32 mixerFlags;
@@ -1627,8 +1607,6 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct Note *note, s32 bufLen, s32
 
 #ifdef VERSION_EU
             pitch = (bufLen << 0xf) / (bufLen + panShift - prevPanShift + 8);
-            if (pitch) {
-            }
 #else
             pitch = (bufLen << 0xf) / (panShift + bufLen - prevPanShift + 8);
 #endif

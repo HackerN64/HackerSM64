@@ -27,8 +27,7 @@
         $Date: 1999/06/24 09:23:06 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_HOST_H_
-#define	_OS_HOST_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -157,5 +156,3 @@ extern void             osInitRdb(u8 *sendBuf, u32 sendSize);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_HOST_H_ */

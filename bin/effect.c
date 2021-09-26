@@ -6,8 +6,6 @@
 
 #include "make_const_nonconst.h"
 
-UNUSED static const u64 effect_unused_0 = 0;
-
 // Flower (Unused)
 // 0x0B000008
 ALIGNED8 static const Texture effect_0B000008[] = {

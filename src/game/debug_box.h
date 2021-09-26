@@ -1,5 +1,4 @@
-#ifndef DEBUG_BOX_H
-#define DEBUG_BOX_H
+#pragma once
 
 #ifdef VISUAL_DEBUG
 
@@ -37,5 +36,3 @@ void render_debug_boxes(s32 type);
 extern void visual_surface_loop(void);
 
 #endif
-
-#endif /* DEBUG_BOX_H */

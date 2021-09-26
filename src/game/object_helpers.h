@@ -1,5 +1,4 @@
-#ifndef OBJECT_HELPERS_H
-#define OBJECT_HELPERS_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -82,7 +81,7 @@ struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, 
                                          const BehaviorScript *behavior,
                                          s16 x, s16 y, s16 z, s16 rx, s16 ry, s16 rz);
 struct Object *spawn_object_rel_with_rot(struct Object *parent, u32 model, const BehaviorScript *behavior,
-                                         s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, UNUSED s16 rz);
+                                         s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, s16 rz);
 struct Object *spawn_obj_with_transform_flags(struct Object *sp20, s32 model, const BehaviorScript *behavior);
 struct Object *spawn_water_droplet(struct Object *parent, struct WaterDropletParams *params);
 struct Object *spawn_object_at_origin(struct Object *, s32, u32, const BehaviorScript *);
@@ -234,7 +233,6 @@ void cur_obj_push_mario_away(f32 radius);
 void cur_obj_push_mario_away_from_cylinder(f32 radius, f32 extentY);
 s32 cur_obj_set_direction_table(s8 *a0);
 s32 cur_obj_progress_direction_table(void);
-void stub_obj_helpers_3(UNUSED s32 sp0, UNUSED s32 sp4);
 void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end);
 void cur_obj_set_pos_to_home_with_debug(void);
 s32 cur_obj_is_mario_on_platform(void);
@@ -286,5 +284,3 @@ void obj_set_model(struct Object *obj, s32 modelID);
 s32 obj_has_model(struct Object *obj, u16 modelID);
 u32 obj_get_model_id(struct Object *obj);
 // End of HackerSM64 stuff
-
-#endif // OBJECT_HELPERS_H

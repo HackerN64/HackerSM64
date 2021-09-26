@@ -803,7 +803,6 @@ struct GdFile *gd_fopen(const char *filename, const char *mode) {
     struct GdFile *f; // sp74
     char *loadedname; // sp70
     u32 i;            // sp6C
-    UNUSED u32 pad68;
     struct UnkBufThing buf; // sp24
     u8 *bufbytes;           // sp20
     u8 *fileposptr;         // sp1C
@@ -894,7 +893,6 @@ s32 is_newline(char c) {
 s32 gd_fread_line(char *buf, u32 size, struct GdFile *f) {
     signed char c;
     u32 pos = 0;
-    UNUSED u32 pad1c;
 
     do {
         if (gd_fread(&c, 1, 1, f) == -1) {

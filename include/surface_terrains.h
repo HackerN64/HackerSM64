@@ -1,5 +1,4 @@
-#ifndef SURFACE_TERRAINS_H
-#define SURFACE_TERRAINS_H
+#pragma once
 
 #include "config.h"
 
@@ -226,5 +225,3 @@
 
 // Water Box
 #define COL_WATER_BOX(id, x1, z1, x2, z2, y) id, x1, z1, x2, z2, y
-
-#endif // SURFACE_TERRAINS_H

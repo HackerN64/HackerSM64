@@ -1,5 +1,4 @@
-#ifndef TEXT_STRINGS_H
-#define TEXT_STRINGS_H
+#pragma once
 
 #include "text_menu_strings.h"
 
@@ -539,5 +538,3 @@
 #define TEXT_MENU_NONE_DE _("")
 #define TEXT_MENU_STARS_DE _("   GEHEIME STERNE")
 #endif // VERSION_EU
-
-#endif // TEXT_STRINGS_H

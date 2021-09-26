@@ -80,9 +80,7 @@ void spawn_macro_abs_special(s32 model, const BehaviorScript *behavior, s16 x, s
 
 UNUSED static void spawn_macro_coin_unknown(const BehaviorScript *behavior, s16 a1[]) {
     struct Object *obj;
-    s16 model;
-
-    model = bhvYellowCoin == behavior ? MODEL_YELLOW_COIN : MODEL_NONE;
+    ModelID model = bhvYellowCoin == behavior ? MODEL_YELLOW_COIN : MODEL_NONE;
 
     obj = spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior,
                                     a1[1], a1[2], a1[3], 0, convert_rotation(a1[0]), 0);
@@ -104,7 +102,6 @@ struct LoadedPreset {
 #define MACRO_OBJ_PARAMS 4
 
 void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
-    UNUSED u32 pad5C;
     s32 presetID;
 
     s16 macroObject[5]; // see the 5 #define statements above
@@ -267,10 +264,6 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
             if (SpecialObjectPresets[offset].preset_id == presetID) {
                 break;
             }
-
-            if (SpecialObjectPresets[offset].preset_id == 0xFF) {
-            }
-
             offset++;
         }
 

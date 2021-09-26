@@ -326,7 +326,6 @@ u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
 #define TARGET_VOLUME_UNSET 0x00
 
 f32 gGlobalSoundSource[3] = { 0.0f, 0.0f, 0.0f };
-f32 sUnusedSoundArgs[3] = { 1.0f, 1.0f, 1.0f };
 u8 sSoundBankDisabled[16] = { 0 };
 u8 D_80332108 = 0;
 u8 sHasStartedFadeOut = FALSE;
@@ -340,11 +339,6 @@ u8 D_EU_80300558 = 0;
 #endif
 
 u8 sBackgroundMusicQueueSize = 0;
-
-#ifndef VERSION_JP
-u8 sUnused8033323C = 0; // never read, set to 0
-#endif
-
 
 // bss
 #if defined(VERSION_JP) || defined(VERSION_US)
@@ -392,9 +386,7 @@ extern OSMesgQueue *OSMesgQueues[];
 struct EuAudioCmd sAudioCmd[0x100];
 
 OSMesg OSMesg0;
-s32 pad1; // why is there 1 s32 here
 OSMesg OSMesg1;
-s32 pad2[2];    // it's not just that the struct is bigger than we think, because there are 2 here
 OSMesg OSMesg2; // and none here. wth nintendo
 OSMesg OSMesg3;
 #else // VERSION_SH
@@ -1824,15 +1816,12 @@ static void func_8031F96C(u8 player) {
 void process_level_music_dynamics(void) {
     u32 conditionBits;
     u16 tempBits;
-    UNUSED u16 pad;
     u8 musicDynIndex;
     u8 condIndex;
-    u8 i;
-    u8 j;
+    u8 i, j;
     s16 conditionValues[8];
     u8 conditionTypes[8];
-    s16 dur1;
-    s16 dur2;
+    s16 dur1, dur2;
     u16 bit;
 
     func_8031F96C(0);
@@ -2668,7 +2657,6 @@ void sound_reset(u8 presetId) {
 #ifndef VERSION_JP
     if (presetId >= 8) {
         presetId = 0;
-        sUnused8033323C = 0;
     }
 #endif
     sGameLoopTicked = 0;
@@ -2701,11 +2689,3 @@ void audio_set_sound_mode(u8 soundMode) {
     D_80332108 = (D_80332108 & 0xf) + (soundMode << 4);
     gSoundMode = soundMode;
 }
-
-#if defined(VERSION_JP) || defined(VERSION_US)
-void unused_80321460(UNUSED s32 arg0, UNUSED s32 arg1, UNUSED s32 arg2, UNUSED s32 arg3) {
-}
-
-void unused_80321474(UNUSED s32 arg0) {
-}
-#endif

@@ -1,5 +1,4 @@
-#ifndef MATH_UTIL_H
-#define MATH_UTIL_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -350,6 +349,7 @@ void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z);
 void vec3s_add(Vec3s dest, Vec3s a);
 void vec3s_sum(Vec3s dest, Vec3s a, Vec3s b);
 void vec3s_sub(Vec3s dest, Vec3s a);
+void vec3f_sub(Vec3f dest, Vec3f src);
 void vec3f_to_vec3s(Vec3s dest, Vec3f a);
 void find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c);
 void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b);
@@ -382,5 +382,3 @@ void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32 anim_spline_poll(Vec3f result);
 extern void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
-
-#endif // MATH_UTIL_H

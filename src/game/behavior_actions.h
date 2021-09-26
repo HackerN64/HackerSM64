@@ -1,5 +1,4 @@
-#ifndef BEHAVIOR_ACTIONS_H
-#define BEHAVIOR_ACTIONS_H
+#pragma once
 
 #define OBJ_COL_FLAG_GROUNDED   (1 << 0)
 #define OBJ_COL_FLAG_HIT_WALL   (1 << 1)
@@ -32,7 +31,6 @@ void clear_particle_flags(u32 flags);
 void spawn_wind_particles(s16 pitch, s16 yaw);
 s32 check_if_moving_over_floor(f32 a0, f32 a1);
 s32 arc_to_goal_pos(Vec3f a0, Vec3f a1, f32 yVel, f32 gravity);
-void vec3f_copy_2(Vec3f dest, Vec3f src);
 void tox_box_move(f32 forwardVel, f32 a1, s16 deltaPitch, s16 deltaRoll);
 extern void play_penguin_walking_sound(s32 walk);
 s32 update_angle_from_move_flags(s32 *angle);
@@ -602,5 +600,3 @@ Gfx *geo_scale_bowser_key(s32 run, struct GraphNode *node, UNUSED f32 mtx[4][4])
 // Water splash
 extern struct WaterDropletParams gShallowWaterSplashDropletParams;
 extern struct WaterDropletParams gShallowWaterWaveDropletParams;
-
-#endif // BEHAVIOR_ACTIONS_H

@@ -49,9 +49,7 @@ static struct GdAnimTransform unusedAnimData3[] = {
 
 UNUSED static struct AnimDataInfo unusedAnim3 = { ARRAY_COUNT(unusedAnimData3), GD_ANIM_SCALE3F_ROT3F_POS3F_2, unusedAnimData3 };
 
-UNUSED static s32 sUnref801A838C[6] = { 0 };
 struct ObjShape *sSimpleShape = NULL;
-UNUSED static s32 sUnref801A83A8[31] = { 0 };
 UNUSED static struct DynList sSimpleDylist[8] = {  // unused
     BeginList(),
     StartGroup("simpleg"),
@@ -86,35 +84,24 @@ UNUSED static struct DynList sDynlist801A8604[4] = {
 static f64 D_801A8668 = 0.0;
 
 // bss
-UNUSED static u8 sUnrefSpaceB00[0x2C];    // @ 801BAB00
 static struct ObjGroup *sCubeShapeGroup;  // @ 801BAB2C
-UNUSED static u8 sUnrefSpaceB30[0xC];     // @ 801BAB30
 static struct ObjShape *sCubeShape;       // @ 801BAB3C
-UNUSED static u8 sUnrefSpaceB40[0x8];     // @ 801BAB40
 static char sGdLineBuf[0x100];            // @ 801BAB48
 static s32 sGdLineBufCsr;                 // @ 801BAC48
 static struct GdFile *sGdShapeFile;       // @ 801BAC4C
 static struct ObjShape *sGdShapeListHead; // @ 801BAC50
 static u32 sGdShapeCount;                 // @ 801BAC54
-UNUSED static u8 sUnrefSpaceC58[0x8];     // @ 801BAC58
 static struct GdVec3f D_801BAC60;
-UNUSED static u32 sUnrefSpaceC6C;         // @ 801BAC6C
-UNUSED static u32 sUnrefSpaceC70;         // @ 801BAC70
 static struct ObjPlane *D_801BAC74;
 static struct ObjPlane *D_801BAC78; // sShapeNetHead?
-UNUSED static u8 sUnrefSpaceC80[0x1C];    // @ 801BAC80
 static struct ObjFace *D_801BAC9C;
 static struct ObjFace *D_801BACA0;
-UNUSED static u8 sUnrefSpaceCA8[0x10];    // @ 801BACA8
 /// factor for scaling vertices in an `ObjShape` when calling `scale_verts_in_shape()`
 static struct GdVec3f sVertexScaleFactor;
 /// factor for translating vertices in an `ObjShape` when calling `translate_verts_in_shape()`
 static struct GdVec3f sVertexTranslateOffset;
-UNUSED static u8 sUnrefSpaceCD8[0x30];    // @ 801BACD8
 static struct ObjGroup *D_801BAD08; // group of planes from make_netfromshape
-UNUSED static u8 sUnrefSpaceD10[0x20];    // @ 801BAD10
 static struct GdVec3f sShapeCenter;   // printed with "c="
-UNUSED static u8 sUnrefSpaceD40[0x120];   // @ 801BAD40
 
 // Forward Declarations
 struct ObjMaterial *find_or_add_new_mtl(struct ObjGroup *, s32, f32, f32, f32);
@@ -131,7 +118,6 @@ void func_80197280(void) {
  * Computes the normal vector for a face based on three of its vertices.
  */
 void calc_face_normal(struct ObjFace *face) {
-    UNUSED u32 pad5C;
     struct GdVec3f p1;
     struct GdVec3f p2;
     struct GdVec3f p3;
@@ -139,7 +125,6 @@ void calc_face_normal(struct ObjFace *face) {
     struct ObjVertex *vtx1;
     struct ObjVertex *vtx2;
     struct ObjVertex *vtx3;
-    UNUSED u32 pad1C;
     f32 mul = 1000.0f;
 
     imin("calc_facenormal");
@@ -260,7 +245,6 @@ void add_3_vtx_to_face(struct ObjFace *face, struct ObjVertex *vtx1, struct ObjV
 struct ObjShape *make_shape(s32 flag, const char *name) {
     struct ObjShape *newShape;
     struct ObjShape *curShapeHead;
-    UNUSED u32 pad;
 
     newShape = (struct ObjShape *) make_object(OBJ_TYPE_SHAPES);
 
@@ -463,11 +447,6 @@ s32 getint(s32 *intPtr) {
     return !!bufCsr;
 }
 
-/* @ 246838 for 0x14 */
-void Unknown80198068(UNUSED f32 a0) {
-    printf("max=%f\n", a0);
-}
-
 /* @ 24684C for 0x6C */
 void func_8019807C(struct ObjVertex *vtx) {
     gd_rot_2d_vec(D_801BAC60.x, &vtx->pos.y, &vtx->pos.z);
@@ -602,7 +581,6 @@ void Unknown801985E8(struct ObjShape *shape) {
 
 /* @ 246ED4 for 0x4FC; orig name: func_80198704 */
 void get_3DG1_shape(struct ObjShape *shape) {
-    UNUSED u8 pad78[8];
     struct GdVec3f tempNormal; /* maybe? */
     s32 curFaceVtx;
     s32 faceVtxID;
@@ -721,7 +699,6 @@ void get_3DG1_shape(struct ObjShape *shape) {
 
 /* @ 2473D0 for 0x390; orig name: func_80198C00 */
 void get_OBJ_shape(struct ObjShape *shape) {
-    UNUSED u8 pad7D54[4];
     struct GdColour faceClr;
     s32 curFaceVtx;
     s32 faceVtxIndex;
@@ -909,15 +886,12 @@ void read_ARK_shape(struct ObjShape *shape, char *fileName) {
         } data;
     } vtx;
 
-    UNUSED u8 pad54[4];
     struct GdVec3f sp48;
     struct ObjFace *sp44;          // newly made face with mtl sp34;
     struct ObjFace *sp40 = NULL;   // first made face
     struct ObjVertex *sp3C;        // newly made vtx
     struct ObjVertex *sp38 = NULL; // first made vtx
     struct ObjMaterial *sp34;      // found or new mtl for face
-    UNUSED s32 sp30 = 0;
-    UNUSED s32 sp2C = 0;
 
     shape->mtlGroup = make_group(0);
 
@@ -1028,29 +1002,23 @@ struct GdFile *get_shape_from_file(struct ObjShape *shape, char *fileName) {
 
 /* @ 247F78 for 0x69c; orig name: Unknown801997A8 */
 struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 a3, s32 a4) {
-    UNUSED u32 pad1074;
     void *objBuf[32][32]; // vertex or particle depending on gridType
     f32 sp70;
     f32 sp6C;
     f32 sp68;
-    UNUSED u32 pad64;
-    UNUSED u32 pad60;
     f32 sp5C;
     s32 parI;
     s32 row;
     s32 col;
-    UNUSED s32 sp4C = 0;
     struct ObjShape *gridShape;
     f32 sp44;
     struct ObjFace *sp40 = NULL;  // first made shape?
     struct ObjGroup *parOrVtxGrp; // group of made particles or vertices (based on gridType)
-    UNUSED u32 pad38;
     struct ObjGroup *mtlGroup;
     struct GdVec3f *sp30;     // GdVec3f* ? from gd_get_colour
     struct GdVec3f *sp2C;     //^
     struct ObjMaterial *mtl1; // first made material
     struct ObjMaterial *mtl2; // second made material
-    UNUSED u32 pad20;
 
     sp30 = (struct GdVec3f *) gd_get_colour(a1);
     sp2C = (struct GdVec3f *) gd_get_colour(a2);
@@ -1138,11 +1106,6 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
 
     printf("grid: points=%d, faces=%d\n", gridShape->vtxGroup->id, gridShape->faceGroup->id);
     return gridShape;
-}
-
-/* @ 248614 for 0x44 */
-void Unknown80199E44(UNUSED s32 a0, struct GdObj *a1, struct GdObj *a2, UNUSED s32 a3) {
-    UNUSED struct ObjGroup *sp1C = make_group(2, a1, a2);
 }
 
 /* @ 248658 for 0x5c */
@@ -1280,9 +1243,7 @@ void animate_mario_head_normal(struct ObjAnimator *self) {
  */
 s32 load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
     struct ObjNet *sp54; // net made with sp48 group
-    UNUSED u8 pad4C[0x54 - 0x4c];
     struct ObjGroup *sp48; // Joint group
-    UNUSED u8 pad40[0x48 - 0x40];
     struct ObjGroup *mainShapesGrp;
     struct GdObj *sp38;       // object list head before making a bunch of joints
     struct GdObj *faceJoint;        // joint on the face that `grabberJoint` pulls
@@ -1503,16 +1464,5 @@ struct ObjGroup *Unknown8019ADC4(UNUSED u32 a0) {
 
     gGdLightGroup = make_group_of_type(OBJ_TYPE_LIGHTS, oldObjHead, NULL);
 
-    return gGdLightGroup;
-}
-
-/* @ 249694 for 0x5c */
-struct ObjGroup *Unknown8019AEC4(UNUSED u32 a0) {
-    UNUSED u32 sp24;
-    UNUSED u32 sp20;
-    UNUSED struct GdObj *sp1C;
-
-    sp1C = gGdObjectList;
-    gGdLightGroup = make_group(0);
     return gGdLightGroup;
 }

@@ -7,8 +7,7 @@
 
 /*  revision 1.1  1999-02-12  */
 
-#ifndef __HVQM2FILE_H__
-#define __HVQM2FILE_H__
+#pragma once
 
 #include <HVQmd.h>
 
@@ -118,5 +117,3 @@ typedef struct {
 #define HVQM2_NESTSIZE_L 70	/* Number of elements on long side */
 #define HVQM2_NESTSIZE_S 38	/* Number of elements on shot side */
 #define HVQM2_NESTSIZE   (HVQM2_NESTSIZE_L * HVQM2_NESTSIZE_S)
-
-#endif /* __HVQM2FILE_H__ */

@@ -118,13 +118,6 @@ void get_some_bounding_box(struct GdBoundingBox *a0) {
     a0->maxZ = gSomeBoundingBox.maxZ;
 }
 
-/* @ 22A6A0 for 0x24 */
-void stub_objects_1(UNUSED struct ObjGroup *a0, UNUSED struct GdObj *a1) {
-    UNUSED u8 sp00[8];
-    /* Debug stub? */
-    return;
-}
-
 /**
  * Returns a string containing the name of the the object type
  */
@@ -747,11 +740,7 @@ void format_object_id(char *str, struct GdObj *obj) {
 struct ObjGroup *make_group(s32 count, ...) {
     va_list args;
     s32 i;
-    UNUSED u32 sp5C;
     struct GdObj *curObj;
-    UNUSED u32 sp54;
-    UNUSED u32 sp50;
-    UNUSED u32 sp4C;
     struct ObjGroup *newGroup;
     struct ObjGroup *oldGroupListHead;
     struct GdObj *vargObj;
@@ -811,7 +800,6 @@ struct ObjGroup *make_group(s32 count, ...) {
  */
 void addto_group(struct ObjGroup *group, struct GdObj *obj) {
     char strbuf[0x20];
-    UNUSED u8 pad[0x8];
 
     imin("addto_group");
 
@@ -875,12 +863,6 @@ s32 group_contains_obj(struct ObjGroup *group, struct GdObj *obj) {
     return FALSE;
 }
 
-/* @ 22C9B8 for 0x24 */
-s32 stub_objects_2(void) {
-    s32 sp4 = 0;
-    return sp4;
-}
-
 /* @ 22CA00 for 0x88 */
 static void reset_joint_or_net(struct GdObj *obj) {
     struct GdObj *localObjPtr = obj;
@@ -915,7 +897,6 @@ s32 apply_to_obj_types_in_group(s32 types, applyproc_t func, struct ObjGroup *gr
     struct GdObj *linkedObj;
     enum ObjTypeFlag linkedObjType;
     applyproc_t objFn;
-    UNUSED u8 pad2C[0x20];
     s32 fnAppliedCount;
 
     fnAppliedCount = 0;
@@ -960,9 +941,7 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     struct GdVec3f sp88;
     struct GdVec3f sp7C;
     struct GdVec3f sp70;
-    UNUSED u8 pad30[0x40]; // unused MyMatrix4x4? f32[4][4]
     f32 sp2C;
-    UNUSED u32 sp28;
     struct GdVec3f sp1C;
 
     sp70.x = a2->x;
@@ -1012,12 +991,8 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
 
 /* @ 22D008 for 0x1B4 */
 void func_8017E838(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
-    UNUSED u32 sp84;
-    UNUSED u32 sp80;
-    UNUSED u32 sp7C;
     struct GdVec3f sp70;
     struct GdVec3f sp64;
-    UNUSED u8 pad24[0x40];
     struct GdVec3f sp18;
 
     sp64.x = a1->x;
@@ -1066,13 +1041,11 @@ void func_8017E9EC(struct ObjNet *net) {
 s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj) {
     struct ListNode *curLink;
     struct ObjGroup *curGroup;
-    UNUSED u32 sp54;
     Mat4f *parentUnkMtx;
     Mat4f *iMtx;
     Mat4f *unkMtx;
     Mat4f *rotMtx;
     Mat4f *rotMtx2;
-    UNUSED u8 pad20[0x18];
     struct GdVec3f scale;
 
     if (parentObj != NULL) {
@@ -1120,13 +1093,11 @@ s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj
 s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
     struct ListNode *sp6C;
     struct ObjGroup *sp68;
-    UNUSED u32 sp64;
     UNUSED Mat4f *sp60;
     Mat4f *sp5C;
     UNUSED Mat4f *sp58;
     Mat4f *sp54;
     Mat4f *sp50;
-    UNUSED u8 pad38[0x18];
     struct GdVec3f sp2C;
     s32 count = 0;
 
@@ -1171,11 +1142,6 @@ s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
 /* @ 22DB9C for 0x38; a0 might be ObjUnk200000* */
 void func_8017F3CC(struct Unk8017F3CC *a0) {
     gd_rotate_and_translate_vec3f(&a0->unk20, D_801B9E48);
-}
-
-/* @ 22DBD4 for 0x20 */
-void stub_objects_3(UNUSED f32 a0, UNUSED struct GdObj *a1, UNUSED struct GdObj *a2) {
-    UNUSED u8 pad[0x30];
 }
 
 /**
@@ -1228,10 +1194,6 @@ void move_animator(struct ObjAnimator *animObj) {
     s16(*animDataCam)[6];         // camera GdPlaneH[]?
     struct GdObj *stubObj1 = NULL; // used only for call to stubbed function
     struct GdObj *stubObj2 = NULL; // used only for call to stubbed function
-    UNUSED s32 sp50;
-    UNUSED s32 sp4C;
-    UNUSED s32 sp48;
-    UNUSED struct GdVec3f unusedVec;
     s32 currKeyFrame;
     s32 nextKeyFrame;
     f32 dt;
@@ -1259,10 +1221,6 @@ void move_animator(struct ObjAnimator *animObj) {
     if (animData->type == 0) {
         return;
     }
-
-    unusedVec.x = 4.0f;
-    unusedVec.y = 1.0f;
-    unusedVec.z = 1.0f;
 
     if (animObj->frame > (f32) animData->count) {
         animObj->frame = 1.0f;
@@ -1448,7 +1406,6 @@ void move_animator(struct ObjAnimator *animObj) {
                 } else {
                     if (stubObj2 == NULL) {
                         stubObj2 = linkedObj;
-                        stub_objects_3(animObj->frame, stubObj1, stubObj2);
                     } else {
                         fatal_printf("Too many objects to morph");
                     }

@@ -54,7 +54,6 @@ Vtx *vertex_transition_color(struct WarpTransitionData *transData, u8 alpha) {
         make_vertex(verts, 1, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), 0, -1, 0, 0, r, g, b, alpha);
         make_vertex(verts, 2, GFX_DIMENSIONS_FROM_RIGHT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0, r, g, b, alpha);
         make_vertex(verts, 3, GFX_DIMENSIONS_FROM_LEFT_EDGE(0), SCREEN_HEIGHT, -1, 0, 0, r, g, b, alpha);
-    } else {
     }
     return verts;
 }
@@ -201,7 +200,6 @@ s32 render_textured_transition(s8 fadeTimer, s8 transTime, struct WarpTransition
         gSPTexture(gDisplayListHead++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF);
         gSPDisplayList(gDisplayListHead++, dl_screen_transition_end);
         sTransitionTextureFadeCount[fadeTimer] += transData->texTimer;
-    } else {
     }
     return set_and_reset_transition_fade_timer(fadeTimer, transTime);
 }

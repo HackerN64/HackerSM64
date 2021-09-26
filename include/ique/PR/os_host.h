@@ -27,8 +27,7 @@
         $Date: 2004/06/28 22:34:42 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_HOST_H_
-#define	_OS_HOST_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -166,5 +165,3 @@ extern void             osResetRdb();
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_HOST_H_ */

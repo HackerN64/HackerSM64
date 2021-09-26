@@ -66,8 +66,6 @@ void scale_verts(struct ObjGroup *a0) {
 
 /* @ 23000C for 0x58; orig name: func8018183C*/
 void move_skin(struct ObjNet *net) {
-    UNUSED u8 pad1C[8];
-
     if (net->shapePtr != NULL) {
         scale_verts(net->shapePtr->scaledVtxGroup);
     }
@@ -110,7 +108,6 @@ void func_80181894(struct ObjJoint *joint) {
 /* @ 2301A0 for 0x110 */
 void reset_weight_vtx(struct ObjVertex *vtx) {
     struct GdVec3f localVec;
-    UNUSED u8 pad24[0x10];
 
     if (sResetWeightVtxNum++ == sResetCurWeight->vtxId) {  // found matching vertex
         sResetCurWeight->vtx = vtx;
@@ -128,16 +125,13 @@ void reset_weight_vtx(struct ObjVertex *vtx) {
 }
 
 void reset_weight(struct ObjWeight *weight) {
-    UNUSED u32 vtxCount;
-    UNUSED u32 pad20;
     struct ObjGroup *skinGroup;
 
     sResetCurWeight = weight;
     sResetWeightVtxNum = 0;
     if ((skinGroup = gGdSkinNet->skinGrp) != NULL) {
         // Go through every vertex in the skin group, and reset the weight if the vertex is managed by the weight
-        vtxCount =
-            apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) reset_weight_vtx, skinGroup);
+        apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) reset_weight_vtx, skinGroup);
     } else {
         fatal_printf("reset_weight(): Skin net has no SkinGroup");
     }

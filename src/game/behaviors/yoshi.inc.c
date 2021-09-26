@@ -18,11 +18,10 @@ void bhv_yoshi_init(void) {
 }
 
 void yoshi_walk_loop(void) {
-    UNUSED s16 collisionFlags;
     s16 animFrame = o->header.gfx.animInfo.animFrame;
 
     o->oForwardVel = 10.0f;
-    collisionFlags = object_step();
+    object_step();
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oYoshiTargetYaw, 0x500);
     if (is_point_close_to_object(o, o->oHomeX, 3174.0f, o->oHomeZ, 200))
         o->oAction = YOSHI_ACT_IDLE;

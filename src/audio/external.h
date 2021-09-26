@@ -1,5 +1,4 @@
-#ifndef AUDIO_EXTERNAL_H
-#define AUDIO_EXTERNAL_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -65,10 +64,3 @@ void sound_reset(u8 presetId);
 void audio_set_sound_mode(u8 arg0);
 
 void audio_init(void); // in load.c
-
-#if defined(VERSION_EU) || defined(VERSION_SH)
-struct SPTask *unused_80321460();
-struct SPTask *unused_80321460(void);
-#endif
-
-#endif // AUDIO_EXTERNAL_H

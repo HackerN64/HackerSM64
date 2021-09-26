@@ -1,5 +1,4 @@
-#ifndef __EXTENDED_BOUNDS_H__
-#define __EXTENDED_BOUNDS_H__
+#pragma once
 
 /*
     Better Extended Bounds by anonymous_moose
@@ -75,6 +74,3 @@ STATIC_ASSERT(LEVEL_BOUNDARY_MAX != 0, "You must set a valid extended bounds mod
 
 #define NOT_ENOUGH_ROOM_FOR_SURFACES (1 << 0)
 #define NOT_ENOUGH_ROOM_FOR_NODES    (1 << 1)
-
-
-#endif // __EXTENDED_BOUNDS_H__

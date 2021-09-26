@@ -1,5 +1,4 @@
-#ifndef OBJ_BEHAVIORS_2_H
-#define OBJ_BEHAVIORS_2_H
+#pragma once
 
 #include <PR/ultratypes.h>
 

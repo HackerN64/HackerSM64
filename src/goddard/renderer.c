@@ -91,20 +91,12 @@ struct DynListBankInfo {
 #if defined(VERSION_EU) || defined(VERSION_SH)
 static OSMesgQueue D_801BE830; // controller msg queue
 static OSMesg D_801BE848[10];
-u8 EUpad1[0x40];
 static OSMesgQueue D_801BE8B0;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
-// static u32 unref_801be870[16];
-// static u32 unref_801be8e0[25];
-// static u32 unref_801be948[13];
-u8 EUpad2[0x64];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
-u8 EUpad3[0x34];
 static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
 static OSIoMesg sGdDMAReqMesg;
 static struct ObjView *D_801BE994; // store if View flag 0x40 set
-
-u8 EUpad4[0x88];
 #endif
 static OSContStatus D_801BAE60[4];
 static OSContPad sGdContPads[4];    // @ 801BAE70
@@ -113,10 +105,8 @@ static u8 D_801BAEA0;
 static struct ObjGadget *sTimerGadgets[GD_NUM_TIMERS]; // @ 801BAEA8
 static u32 D_801BAF28;                                 // RAM addr offset?
 static s16 sTriangleBuf[13][8];                          // [[s16; 8]; 13]? vert indices?
-UNUSED static u32 unref_801bb000[3];
 static u8 *sMemBlockPoolBase; // @ 801BB00C
 static u32 sAllocMemory;      // @ 801BB010; malloc-ed bytes
-UNUSED static u32 unref_801bb014;
 static s32 D_801BB018;
 static s32 D_801BB01C;
 static void *sLoadedTextures[0x10];          // texture pointers
@@ -136,11 +126,8 @@ static s32 sVertexBufStartIndex;                  // Vtx start in GD Dl
 static struct ObjView *sCarSceneView;   // @ 801BB0D0
 static s32 sUpdateYoshiScene;           // @ 801BB0D4; update dl Vtx from ObjVertex?
 static s32 sUpdateMarioScene;           // @ 801BB0D8; update dl Vtx from ObjVertex?
-UNUSED static u32 unref_801bb0dc;
 static s32 sUpdateCarScene; // @ 801BB0E0; guess, not really used
-UNUSED static u32 unref_801bb0e4;
 static struct GdVec3f sTextDrawPos;  // position to draw text? only set in one function, never used
-UNUSED static u32 unref_801bb0f8[2];
 static Mtx sIdnMtx;           // @ 801BB100
 static Mat4f sInitIdnMat4;    // @ 801BB140
 static s8 sVtxCvrtNormBuf[3]; // @ 801BB180
@@ -170,21 +157,16 @@ static LookAt D_801BE7D0[3];
 #if defined(VERSION_JP) || defined(VERSION_US)
 static OSMesgQueue D_801BE830; // controller msg queue
 static OSMesg D_801BE848[10];
-UNUSED static u32 unref_801be870[16];
 UNUSED static OSMesgQueue D_801BE8B0;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
-UNUSED static u32 unref_801be8e0[25];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
-UNUSED static u32 unref_801be948[13];
 static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
 static OSIoMesg sGdDMAReqMesg;
 static struct ObjView *D_801BE994; // store if View flag 0x40 set
 #endif
 
 // data
-UNUSED static u32 unref_801a8670 = 0;
 static s32 D_801A8674 = 0;
-UNUSED static u32 unref_801a8678 = 0;
 static s32 D_801A867C = 0;
 static s32 D_801A8680 = 0;
 static f32 sTracked1FrameTime = 0.0f; // @ 801A8684
@@ -199,11 +181,9 @@ static struct GdTimer *D_801A86A4 = NULL; // timer for dlgen, dynamics, or rcp
 static struct GdTimer *D_801A86A8 = NULL; // timer for dlgen, dynamics, or rcp
 static struct GdTimer *D_801A86AC = NULL; // timer for dlgen, dynamics, or rcp
 s32 gGdFrameBufNum = 0;                      // @ 801A86B0
-UNUSED static u32 unref_801a86B4 = 0;
 static struct ObjShape *sHandShape = NULL; // @ 801A86B8
 static s32 D_801A86BC = 1;
 static s32 D_801A86C0 = 0; // gd_dl id for something?
-UNUSED static u32 unref_801a86C4 = 10;
 static s32 sMtxParamType = G_MTX_PROJECTION;
 UNUSED static struct GdVec3f D_801A86CC = { 1.0f, 1.0f, 1.0f };
 static struct ObjView *sActiveView = NULL;  // @ 801A86D8 current view? used when drawing dl
@@ -214,7 +194,6 @@ static struct ObjView *sMenuView = NULL; // @ 801A86E8
 static u32 sItemsInMenu = 0;             // @ 801A86EC
 static s32 sDebugViewsCount = 0;               // number of elements in the sDebugViews array
 static s32 sCurrDebugViewIndex = 0;             // @ 801A86F4; timing activate cool down counter?
-UNUSED static u32 unref_801a86F8 = 0;
 static struct GdDisplayList *sCurrentGdDl = NULL; // @ 801A86FC
 static u32 sGdDlCount = 0;                        // @ 801A8700
 static struct DynListBankInfo sDynLists[] = {     // @ 801A8704
@@ -310,14 +289,6 @@ static Vtx_t gd_vertex_star[] = {
     {{ 64,   0, 0}, 0, {992, 992}, {0x00, 0x00, 0x7F}},
     {{ 64, 128, 0}, 0, {992,   0}, {0x00, 0x00, 0x7F}},
     {{-64, 128, 0}, 0, {  0,   0}, {0x00, 0x00, 0x7F}},
-};
-
-//! no references to these vertices
-UNUSED static Vtx_t gd_unused_vertex[] = {
-    {{16384, 0,     0}, 0, {0, 16384}, {0x00, 0x00, 0x00}},
-    {{    0, 0, 16384}, 0, {0,     0}, {0x00, 0x00, 0x40}},
-    {{    0, 0,     0}, 0, {0,     0}, {0x00, 0x00, 0x00}},
-    {{    0, 0,     0}, 0, {0,     0}, {0x00, 0x00, 0x00}},
 };
 
 static Gfx gd_dl_star_common[] = {
@@ -694,39 +665,10 @@ static Gfx gd_dl_rdp_init[] = {
     gsSPEndDisplayList(),
 };
 
-UNUSED static u32 gd_unused_pad1 = 0;
-
 float sGdPerspTimer = 1.0;
-
-UNUSED static u32 gd_unused_pad2 = 0;
 
 UNUSED static Gfx gd_texture4_dummy_aligner1[] = {
     gsDPPipeSync(),
-    gsSPEndDisplayList(),
-};
-
-static Vtx_t gd_unused_mesh_vertex_group1[] = {
-    {{-8,  8,  0}, 0, {  0,  0}, {  0x00, 0x00, 0x00, 0xFF}},
-    {{ 8, -2,  0}, 0, {  0,  0}, {  0x00, 0x00, 0x00, 0xFF}},
-    {{ 2, -8,  0}, 0, {  0,  0}, {  0x00, 0x00, 0x00, 0xFF}},
-};
-
-static Vtx_t gd_unused_mesh_vertex_group2[] = {
-    {{-6,  6,  0}, 0, {  0,  0}, {  0xFF, 0xFF, 0xFF, 0xFF}},
-    {{ 7, -3,  0}, 0, {  0,  0}, {  0xFF, 0x00, 0x00, 0xFF}},
-    {{ 3, -7,  0}, 0, {  0,  0}, {  0xFF, 0x00, 0x00, 0xFF}},
-};
-
-UNUSED static Gfx gd_dl_unused_mesh[] = {
-    gsDPPipeSync(),
-    gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
-    gsSPClearGeometryMode(0xFFFFFFFF),
-    gsSPSetGeometryMode(G_SHADING_SMOOTH | G_SHADE),
-    gsDPPipeSync(),
-    gsSPVertex(gd_unused_mesh_vertex_group1, 3, 0),
-    gsSP1Triangle(0,  1,  2, 0x0),
-    gsSPVertex(gd_unused_mesh_vertex_group2, 3, 0),
-    gsSP1Triangle(0,  1,  2, 0x0),
     gsSPEndDisplayList(),
 };
 
@@ -870,14 +812,11 @@ f64 gd_sqrt_d(f64 x) {
 /* 249BCC -> 24A19C */
 void gd_printf(const char *format, ...) {
     s32 i;
-    UNUSED u32 pad158;
     char c;
     char f;
-    UNUSED u32 pad150;
     char buf[0x100];
     char *csr = buf;
     char spec[8];    // specifier string
-    UNUSED u32 pad40;
     union PrintVal val;
     va_list args;
 
@@ -970,8 +909,7 @@ void gd_printf(const char *format, ...) {
 /* 24A19C -> 24A1D4 */
 void gd_exit(UNUSED s32 code) {
     gd_printf("exit\n");
-    while (TRUE) {
-    }
+    while (TRUE) {}
 }
 
 /* 24A1D4 -> 24A220; orig name: func_8019BA04 */
@@ -1051,10 +989,7 @@ void draw_indexed_dl(s32 dlNum, s32 gfxIdx) {
 
 /* 24A598 -> 24A610; orig name: func_8019BDC8 */
 void branch_cur_dl_to_num(s32 dlNum) {
-    Gfx *dl;
-    UNUSED u32 pad[2];
-
-    dl = sGdDLArray[dlNum]->gfx;
+    Gfx *dl = sGdDLArray[dlNum]->gfx;
     gSPDisplayList(next_gfx(), GD_VIRTUAL_TO_PHYSICAL(dl));
 }
 
@@ -1144,8 +1079,6 @@ void gd_add_to_heap(void *addr, u32 size) {
 
 /* 24AAE0 -> 24AB7C */
 void gdm_init(void *blockpool, u32 size) {
-    UNUSED u32 pad;
-
     imin("gdm_init");
     // Align downwards?
     size = (size - 8) & ~7;
@@ -1199,8 +1132,6 @@ struct ObjView *make_view_withgrp(char *name, struct ObjGroup *grp) {
 
 /* 24AD14 -> 24AEB8 */
 void gdm_maketestdl(s32 id) {
-    UNUSED u32 pad[3];
-
     imin("gdm_maketestdl");
     switch (id) {
         case 0:
@@ -1293,7 +1224,6 @@ s32 gd_sfx_to_play(void) {
 Gfx *gdm_gettestdl(s32 id) {
     struct GdObj *dobj;
     struct GdDisplayList *gddl;
-    UNUSED u32 pad28[2];
     struct GdVec3f vec;
 
     start_timer("dlgen");
@@ -1966,9 +1896,7 @@ void func_801A0038(void) {
 
 /* 24E840 -> 24E9BC */
 void gd_dl_flush_vertices(void) {
-    UNUSED u32 pad;
     s32 i;
-    UNUSED s32 startvtx = sVertexBufStartIndex;
 
     if (sVertexBufCount != 0) {
         // load vertex data
@@ -2030,16 +1958,13 @@ void branch_to_gddl(s32 dlNum) {
 // phong shading function?
 void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
                    struct ObjCamera *cam, UNUSED struct GdVec3f *arg2, UNUSED struct GdVec3f *arg3,
-                   struct GdVec3f *arg4,   // vector to light source?
-                   struct GdColour *colour // light color
-) {
-    UNUSED u32 pad2[24];
+                   struct GdVec3f *arg4,      // vector to light source?
+                   struct GdColour *colour) { // light color
     Hilite *hilite; // 4c
     struct GdVec3f sp40;
     f32 sp3C; // magnitude of sp40
     f32 sp38;
     f32 sp34;
-    UNUSED u32 pad[6];
 
     sp38 = 32.0f; // x scale factor?
     sp34 = 32.0f; // y scale factor?
@@ -2078,7 +2003,6 @@ void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
  * Adds some display list commands that perform lighting for a material
  */
 s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
-    UNUSED u32 pad60[2];
     s32 i;
     s32 numLights = sNumLights;
     s32 scaledColours[3];
@@ -2089,10 +2013,6 @@ s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
     }
     switch (material) {
         case GD_MTL_TEX_OFF:
-            gddl_is_loading_stub_dl(FALSE);
-            gddl_is_loading_stub_dl(FALSE);
-            gddl_is_loading_stub_dl(FALSE);
-            gddl_is_loading_stub_dl(FALSE);
             gddl_is_loading_shine_dl(FALSE);
             gddl_is_loading_shine_dl(FALSE);
             gddl_is_loading_shine_dl(FALSE);
@@ -2100,7 +2020,6 @@ s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
             numLights = NUMLIGHTS_2;
             break;
         case GD_MTL_STUB_DL:
-            gddl_is_loading_stub_dl(TRUE);
             break;
         case GD_MTL_SHINE_DL:
             gddl_is_loading_shine_dl(TRUE);
@@ -2112,7 +2031,6 @@ s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
         case GD_MTL_BREAK:
             break;
         default:
-            gddl_is_loading_stub_dl(FALSE);
             gddl_is_loading_shine_dl(FALSE);
 
             DL_CURRENT_LIGHT(sCurrentGdDl).a.l.col[0] = colour->r * 255.0f;
@@ -2285,10 +2203,6 @@ void Unknown801A1E70(void) {
 void gd_set_one_cycle(void) {
     gDPSetCycleType(next_gfx(), G_CYC_1CYCLE);
     update_render_mode();
-}
-
-/* 250B44 -> 250B58 */
-void gddl_is_loading_stub_dl(UNUSED s32 dlLoad) {
 }
 
 /* 250B58 -> 250C18 */
@@ -2529,7 +2443,6 @@ s32 gd_getproperty(s32 prop, UNUSED void *arg1) {
 
 /* 251E18 -> 2522B0 */
 void gd_setproperty(enum GdProperty prop, f32 f1, f32 f2, f32 f3) {
-    UNUSED f32 sp3C = 1.0f;
     s32 parm;
 
     switch (prop) {
@@ -2736,8 +2649,6 @@ void func_801A4438(f32 x, f32 y, f32 z) {
 
 /* 252C70 -> 252DB4 */
 s32 gd_gentexture(void *texture, s32 fmt, s32 size, UNUSED u32 arg3, UNUSED u32 arg4) {
-    UNUSED s32 sp2C;
-    UNUSED s32 sp28 = 1;
     s32 dl; // 24
 
     switch (fmt) {
@@ -2754,7 +2665,6 @@ s32 gd_gentexture(void *texture, s32 fmt, s32 size, UNUSED u32 arg3, UNUSED u32 
     switch (size) {
         case 33:
             size = 2;
-            sp2C = 16;
             break;
         default:
             fatal_printf("gd_gentexture(): bad size");
@@ -2787,13 +2697,6 @@ void func_801A4848(s32 linkDl) {
     sCurrentGdDl = sMHeadMainDls[gGdFrameBufNum];
     branch_cur_dl_to_num(linkDl);
     sCurrentGdDl = curDl;
-}
-
-/* 2530A8 -> 2530C0 */
-void stub_draw_label_text(UNUSED char *s) {
-    UNUSED u32 pad2;
-    UNUSED char *save = s;
-    UNUSED u8 pad[0x18];
 }
 
 /* 2530C0 -> 2530D8; orig name: func_801A48F0 */
@@ -2908,10 +2811,7 @@ void Proc801A5110(struct ObjView *view) {
 
 /* 253938 -> 2539DC; orig name: func_801A5168 */
 void update_view_and_dl(struct ObjView *view) {
-    UNUSED u32 pad;
-    s32 prevFlags; // 18
-
-    prevFlags = view->flags;
+    s32 prevFlags = view->flags;
     update_view(view);
     if (prevFlags & VIEW_UPDATE) {
         sCurrentGdDl = sMHeadMainDls[gGdFrameBufNum];
@@ -2924,7 +2824,6 @@ void update_view_and_dl(struct ObjView *view) {
 /* 253BC8 -> 2540E0 */
 void gd_init(void) {
     s32 i; // 34
-    UNUSED u32 pad30;
     s8 *data; // 2c
 
     imin("gd_init");
@@ -3166,7 +3065,6 @@ void Unknown801A5FF8(struct ObjGroup *arg0) {
     struct ObjView *menuview;      // 3c
     UNUSED struct ObjLabel *label; // 38
     struct ObjGroup *menugrp;      // 34
-    UNUSED u32 pad2C[2];
 
     d_start_group("menug");
     sMenuGadgets[0] = d_makeobj(D_GADGET, "menu0");
@@ -3284,7 +3182,6 @@ void view_proc_print_timers(struct ObjView *self) {
 void make_timer_gadgets(void) {
     struct ObjLabel *timerLabel;
     struct ObjGroup *timerg;
-    UNUSED u32 pad6C;
     struct ObjView *timersview;
     struct ObjGadget *bar1;
     struct ObjGadget *bar2;

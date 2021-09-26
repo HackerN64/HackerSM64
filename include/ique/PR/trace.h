@@ -1,5 +1,4 @@
-#ifndef _TRACE_H_
-#define _TRACE_H_
+#pragma once
 
 
 /**************************************************************************
@@ -76,7 +75,3 @@ extern unsigned long	Dflags;		/* Global debug flag */
  * Extern function prototypes
  *
  */
-
-
-#endif  /* _TRACE_H_ */
-

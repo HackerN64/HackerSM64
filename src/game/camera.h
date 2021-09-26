@@ -1,5 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -826,9 +825,6 @@ void reset_camera(struct Camera *c);
 void init_camera(struct Camera *c);
 void select_mario_cam_mode(void);
 Gfx *geo_camera_main(s32 callContext, struct GraphNode *g, void *context);
-void stub_camera_2(UNUSED struct Camera *c);
-void stub_camera_3(UNUSED struct Camera *c);
-void vec3f_sub(Vec3f dst, Vec3f src);
 void object_pos_to_vec3f(Vec3f dst, struct Object *o);
 void vec3f_to_object_pos(struct Object *o, Vec3f src);
 s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
@@ -931,5 +927,3 @@ void set_fov_shake_from_point_preset(u8 preset, f32 posX, f32 posY, f32 posZ);
 void obj_rotate_towards_point(struct Object *o, Vec3f point, s16 pitchOff, s16 yawOff, s16 pitchDiv, s16 yawDiv);
 
 Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context);
-
-#endif // CAMERA_H

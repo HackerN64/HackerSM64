@@ -1,5 +1,4 @@
-#ifndef GD_JOINTS_H
-#define GD_JOINTS_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -27,5 +26,3 @@ void reset_joint(struct ObjJoint *j);
 void func_80191824(struct ObjJoint *j);
 void func_80191E88(struct ObjGroup *grp);
 void reset_joint_counts(void);
-
-#endif // GD_JOINTS_H

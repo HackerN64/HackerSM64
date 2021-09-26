@@ -207,7 +207,6 @@ Vtx *make_skybox_rect(s32 tileIndex, s8 colorIndex) {
                     sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
         make_vertex(verts, 3, x + SKYBOX_TILE_WIDTH, y, -1, 31 << 5, 0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1],
                     sSkyboxColors[colorIndex][2], 255);
-    } else {
     }
     return verts;
 }
@@ -254,7 +253,6 @@ void *create_skybox_ortho_matrix(s8 player) {
 
     if (mtx != NULL) {
         guOrtho(mtx, left, right, bottom, top, 0.0f, 3.0f, 1.0f);
-    } else {
     }
 
     return mtx;

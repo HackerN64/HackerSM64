@@ -59,8 +59,9 @@ void transfer_bully_speed(struct BullyCollisionData *obj1, struct BullyCollision
     f32 rz = obj2->posZ - obj1->posZ;
 
     //! Bully NaN crash
-    f32 projectedV1 = (rx * obj1->velX + rz * obj1->velZ) / (rx * rx + rz * rz);
-    f32 projectedV2 = (-rx * obj2->velX - rz * obj2->velZ) / (rx * rx + rz * rz);
+    f32 rzx = (sqr(rx) + sqr(rz));
+    f32 projectedV1 = ( rx * obj1->velX + rz * obj1->velZ) / rzx;
+    f32 projectedV2 = (-rx * obj2->velX - rz * obj2->velZ) / rzx;
 
     // Kill speed along r. Convert one object's speed along r and transfer it to
     // the other object.

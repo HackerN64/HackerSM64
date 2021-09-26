@@ -68,7 +68,6 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex, s32 reverbIndex) 
     s32 dstPos;
     s32 nSamples;
     s32 excessiveSamples;
-    s32 UNUSED pad[3];
     if (reverb->downsampleRate != 1) {
         if (reverb->framesLeftToIgnore == 0) {
             // Now that the RSP has finished, downsample the samples produced two frames ago by skipping
@@ -382,21 +381,16 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
 }
 
 u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct NoteSynthesisState *synthesisState, UNUSED s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateIndex) {
-    UNUSED s32 pad0[3];
     struct AudioBankSample *audioBookSample; // sp164, sp138
     struct AdpcmLoop *loopInfo; // sp160, sp134
     s16 *curLoadedBook; // sp154, sp130
-    UNUSED u8 padEU[0x04];
-    UNUSED u8 pad8[0x04];
     s32 noteFinished; // 150 t2, sp124
     s32 restart; // 14c t3, sp120
     s32 flags; // sp148, sp11C, t8
     u16 resamplingRateFixedPoint; // sp5c, sp11A
     s32 nSamplesToLoad; //s0, Ec
-    UNUSED u8 pad7[0x0c]; // sp100
     s32 sp130; //sp128, sp104
     UNUSED s32 tempBufLen;
-    UNUSED u32 pad9;
     s32 t0;
     u8 *sampleAddr; // sp120, spF4
     s32 s6;
@@ -423,12 +417,8 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
     s32 nParts; // spE8, spBC
     s32 curPart; // spE4, spB8
     s32 aligned;
-    UNUSED u32 padSH1;
     s32 resampledTempLen; // spD8, spAC, sp6c
     u16 noteSamplesDmemAddrBeforeResampling; // spD6, spAA, sp6a -- 6C
-    UNUSED u32 padSH2;
-    UNUSED u32 padSH3;
-    UNUSED u32 padSH4;
     struct Note *note;  // sp58
     u16 sp56;           // sp56
     u16 addr;

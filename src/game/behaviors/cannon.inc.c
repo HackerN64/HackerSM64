@@ -56,14 +56,12 @@ void opened_cannon_act_6(void) {
         o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5) * 4.0f;
         o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5) * 4.0f;
     } else {
-        if (o->oTimer < 6) {
-        } else {
+        if (o->oTimer >= 6) {
             if (o->oTimer < 22) {
                 o->oMoveAngleYaw =
                     sins(o->oCannonAngle) * 0x4000 + ((s16)(o->oBehParams2ndByte << 8));
                 o->oCannonAngle += 0x400;
-            } else if (o->oTimer < 26) {
-            } else {
+            } else if (o->oTimer >= 26) {
                 o->oCannonAngle = 0;
                 o->oAction = 5;
             }
@@ -74,14 +72,13 @@ void opened_cannon_act_6(void) {
 void opened_cannon_act_5(void) {
     if (o->oTimer == 0)
         cur_obj_play_sound_2(SOUND_OBJ_CANNON3);
-    if (o->oTimer < 4) {
-    } else {
+    if (o->oTimer >= 4) {
         if (o->oTimer < 20) {
             o->oCannonAngle += 0x400;
             o->oMoveAnglePitch = sins(o->oCannonAngle) * 0x2000;
-        } else if (o->oTimer < 25) {
-        } else
+        } else if (o->oTimer >= 25) {
             o->oAction = 1;
+        }
     }
 }
 

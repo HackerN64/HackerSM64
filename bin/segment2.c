@@ -2079,8 +2079,6 @@ const Texture *const main_hud_camera_lut[] = {
 #include "text/us/define_text.inc.c"
 #endif
 
-UNUSED static const u64 segment2_unused_0 = 0;
-
 // 0x0200EC60 - 0x0200EC98
 const Gfx dl_hud_img_begin[] = {
     gsDPPipeSync(),

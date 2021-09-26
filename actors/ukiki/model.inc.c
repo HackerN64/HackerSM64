@@ -18,9 +18,6 @@ static const Lights1 ukiki_seg5_lights_05007BA0 = gdSPDefLights1(
     0xe7, 0x93, 0x61, 0x28, 0x28, 0x28
 );
 
-// The hell?
-UNUSED static const u64 ukiki_unused_1 = 1;
-
 // 0x05007BC0
 ALIGNED8 static const Texture ukiki_seg5_texture_05007BC0[] = {
 #include "actors/ukiki/ukiki_face.rgba16.inc.c"

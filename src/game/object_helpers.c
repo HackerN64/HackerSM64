@@ -442,11 +442,11 @@ struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, 
  * a copy-paste typo by one of the programmers.
  */
 struct Object *spawn_object_rel_with_rot(struct Object *parent, u32 model, const BehaviorScript *behavior,
-                                         s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, UNUSED s16 rz) {
+                                         s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, s16 rz) {
     struct Object *newObj = spawn_object_at_origin(parent, 0, model, behavior);
     newObj->oFlags |= OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT;
     obj_set_parent_relative_pos(newObj, xOff, yOff, zOff);
-    obj_set_angle(newObj, rx, ry, zOff); // Nice typo you got there Nintendo.
+    obj_set_angle(newObj, rx, ry, rz);
 
     return newObj;
 }
@@ -1062,10 +1062,8 @@ static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
 
 void cur_obj_get_thrown_or_placed(f32 forwardVel, f32 velY, s32 thrownAction) {
     if (o->behavior == segmented_to_virtual(bhvBowser)) {
-        // Interestingly, when bowser is thrown, he is offset slightly to
-        // Mario's right
+        // Interestingly, when bowser is thrown, he is offset slightly to Mario's right
         cur_obj_set_pos_relative_to_parent(-41.684f, 85.859f, 321.577f);
-    } else {
     }
 
     cur_obj_become_tangible();
@@ -1109,14 +1107,11 @@ s32 cur_obj_clear_interact_status_flag(s32 flag) {
  * Mark an object to be unloaded at the end of the frame.
  */
 void obj_mark_for_deletion(struct Object *obj) {
-    //! This clears all activeFlags. Since some of these flags disable behavior,
-    //  setting it to 0 could potentially enable unexpected behavior. After an
-    //  object is marked for deletion, it still updates on that frame (I think),
-    //  so this is worth looking into.
 #ifdef PUPPYLIGHTS
     obj_disable_light(obj);
 #endif
-    obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+    obj->activeFlags &= ~(ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_INITIATED_TIME_STOP);
+    // obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
 }
 
 void cur_obj_disable(void) {
@@ -1350,9 +1345,6 @@ void cur_obj_move_y(f32 gravity, f32 bounciness, f32 buoyancy) {
     } else {
         o->oMoveFlags |= OBJ_MOVE_IN_AIR;
     }
-}
-
-UNUSED static void stub_obj_helpers_1(void) {
 }
 
 static s32 clear_move_flag(u32 *bitSet, s32 flag) {
@@ -2198,9 +2190,6 @@ void bhv_dust_smoke_loop(void) {
     o->oSmokeTimer++;
 }
 
-UNUSED static void stub_obj_helpers_2(void) {
-}
-
 s32 cur_obj_set_direction_table(s8 *pattern) {
     o->oToxBoxMovementPattern = pattern;
     o->oToxBoxMovementStep = 0;
@@ -2222,9 +2211,6 @@ s32 cur_obj_progress_direction_table(void) {
     }
 
     return action;
-}
-
-void stub_obj_helpers_3(UNUSED s32 sp0, UNUSED s32 sp4) {
 }
 
 void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end) {
@@ -2249,9 +2235,6 @@ void cur_obj_set_pos_to_home_with_debug(void) {
     o->oPosY = o->oHomeY + gDebugInfo[5][1];
     o->oPosZ = o->oHomeZ + gDebugInfo[5][2];
     cur_obj_scale(gDebugInfo[5][3] / 100.0f + 1.0l);
-}
-
-void stub_obj_helpers_4(void) {
 }
 
 s32 cur_obj_is_mario_on_platform(void) {
@@ -2339,9 +2322,6 @@ s32 is_item_in_array(s8 item, s8 *array) {
     }
 
     return FALSE;
-}
-
-UNUSED static void stub_obj_helpers_5(void) {
 }
 
 void bhv_init_room(void) {
@@ -2501,12 +2481,8 @@ void clear_time_stop_flags(s32 flags) {
 
 s32 cur_obj_can_mario_activate_textbox(f32 radius, f32 height, UNUSED s32 unused) {
     if (o->oDistanceToMario < 1500.0f) {
-        f32 latDistToMario = lateral_dist_between_objects(o, gMarioObject);
-        UNUSED s16 angleFromMario = obj_angle_to_object(gMarioObject, o);
-
-        if (latDistToMario < radius && o->oPosY < gMarioObject->oPosY + 160.0f
-            && gMarioObject->oPosY < o->oPosY + height && !(gMarioStates[0].action & ACT_FLAG_AIR)
-            && mario_ready_to_speak()) {
+        if (o->oPosY < gMarioObject->oPosY + 160.0f && gMarioObject->oPosY < o->oPosY + height && !(gMarioStates[0].action & ACT_FLAG_AIR)
+         && lateral_dist_between_objects(o, gMarioObject) < radius && mario_ready_to_speak()) {
             return TRUE;
         }
     }
@@ -2530,7 +2506,6 @@ static void cur_obj_end_dialog(s32 dialogFlags, s32 dialogResult) {
 
 s32 cur_obj_update_dialog(s32 actionArg, s32 dialogFlags, s32 dialogID, UNUSED s32 unused) {
     s32 dialogResponse = DIALOG_RESPONSE_NONE;
-    UNUSED s32 doneTurning = TRUE;
 
     switch (o->oDialogState) {
         case DIALOG_STATUS_ENABLE_TIME_STOP:

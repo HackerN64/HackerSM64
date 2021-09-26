@@ -1,5 +1,4 @@
-#ifndef TYPES_H
-#define TYPES_H
+#pragma once
 
 // This file contains various data types used in Super Mario 64 that don't yet
 // have an appropriate header.
@@ -378,5 +377,3 @@ struct MarioState
     /*0xC0*/ f32 quicksandDepth;
     /*0xC4*/ f32 windGravity;
 };
-
-#endif // TYPES_H

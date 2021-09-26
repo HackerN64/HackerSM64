@@ -18,8 +18,7 @@
         $Date: 2002/05/02 03:28:24 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_INTERNAL_HOST_H_
-#define	_OS_INTERNAL_HOST_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -38,5 +37,3 @@ extern u32             __osRdbSend(u8 *buf, u32 size, u32 type);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_INTERNAL_HOST_H */

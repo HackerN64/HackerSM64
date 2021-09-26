@@ -148,12 +148,12 @@ void generic_bobomb_free_loop(void) {
             bobomb_act_explode();
             break;
 
-        case BOBOMB_ACT_LAVA_DEATH:
+        case OBJ_ACT_LAVA_DEATH:
             if (obj_lava_death() == 1)
                 create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, 3000);
             break;
 
-        case BOBOMB_ACT_DEATH_PLANE_DEATH:
+        case OBJ_ACT_DEATH_PLANE_DEATH:
             o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
             create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, 3000);
             break;
@@ -175,12 +175,12 @@ void stationary_bobomb_free_loop(void) {
             bobomb_act_explode();
             break;
 
-        case BOBOMB_ACT_LAVA_DEATH:
+        case OBJ_ACT_LAVA_DEATH:
             if (obj_lava_death() == 1)
                 create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, 3000);
             break;
 
-        case BOBOMB_ACT_DEATH_PLANE_DEATH:
+        case OBJ_ACT_DEATH_PLANE_DEATH:
             o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
             create_respawner(MODEL_BLACK_BOBOMB, bhvBobomb, 3000);
             break;
@@ -312,13 +312,12 @@ void bhv_bobomb_buddy_init(void) {
 
 void bobomb_buddy_act_idle(void) {
     s16 animFrame = o->header.gfx.animInfo.animFrame;
-    UNUSED s16 collisionFlags = 0;
 
     o->oBobombBuddyPosXCopy = o->oPosX;
     o->oBobombBuddyPosYCopy = o->oPosY;
     o->oBobombBuddyPosZCopy = o->oPosZ;
 
-    collisionFlags = object_step();
+    object_step();
 
     if ((animFrame == 5) || (animFrame == 16))
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK);

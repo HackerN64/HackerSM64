@@ -11,6 +11,7 @@
 #include "game/object_helpers.h"
 #include "game/macro_special_objects.h"
 #include "surface_collision.h"
+#include "math_util.h"
 #include "game/mario.h"
 #include "game/object_list_processor.h"
 #include "surface_load.h"
@@ -47,9 +48,6 @@ static struct SurfaceNode *alloc_surface_node(void) {
 
     node->next = NULL;
 
-    //! A bounds check! If there's more surface nodes than 7000 allowed,
-    //  we, um...
-    // Perhaps originally just debug feedback?
     if (gSurfaceNodesAllocated >= SURFACE_NODE_POOL_SIZE) {
         gSurfacePoolError |= NOT_ENOUGH_ROOM_FOR_NODES;
     }
@@ -66,9 +64,6 @@ static struct Surface *alloc_surface(void) {
     struct Surface *surface = &sSurfacePool[gSurfacesAllocated];
     gSurfacesAllocated++;
 
-    //! A bounds check! If there's more surfaces than the 2300 allowed,
-    //  we, um...
-    // Perhaps originally just debug feedback?
     if (gSurfacesAllocated >= sSurfacePoolSize) {
         gSurfacePoolError |= NOT_ENOUGH_ROOM_FOR_SURFACES;
     }
@@ -317,7 +312,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     nx = (y2 - y1) * (z3 - z2) - (z2 - z1) * (y3 - y2);
     ny = (z2 - z1) * (x3 - x2) - (x2 - x1) * (z3 - z2);
     nz = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
-    mag = sqrtf(nx * nx + ny * ny + nz * nz);
+    mag = sqrtf(sqr(nx) + sqr(ny) + sqr(nz));
 
     // Could have used min_3 and max_3 for this...
     minY = y1;
@@ -694,10 +689,6 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
     s32 surfaceType;
     s32 i;
     s32 numSurfaces;
-#ifndef ALL_SURFACES_HAVE_FORCE
-    TerrainData hasForce;
-#endif
-    s32 flags;
     s32 room;
 
     surfaceType = *(*data);
@@ -707,11 +698,10 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
     (*data)++;
 
 #ifndef ALL_SURFACES_HAVE_FORCE
-    hasForce = surface_has_force(surfaceType);
+    TerrainData hasForce = surface_has_force(surfaceType);
 #endif
 
-    flags = surf_has_no_cam_collision(surfaceType);
-    flags |= SURFACE_FLAG_DYNAMIC;
+    s32 flags = surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC;
 
     // The DDD warp is initially loaded at the origin and moved to the proper
     // position in paintings.c and doesn't update its room, so set it here.
@@ -770,7 +760,7 @@ static void get_optimal_coll_dist(struct Object *o) {
         v[0] = *(collisionData + 0) * o->header.gfx.scale[0];
         v[1] = *(collisionData + 1) * o->header.gfx.scale[1];
         v[2] = *(collisionData + 2) * o->header.gfx.scale[2];
-        thisVertDist = ((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+        thisVertDist = (sqr(v[0]) + sqr(v[1]) + sqr(v[2]));
         if (thisVertDist > maxDist) maxDist = thisVertDist;
         collisionData += 3;
         vertsLeft--;

@@ -1,5 +1,4 @@
-#ifndef CCM_HEADER_H
-#define CCM_HEADER_H
+#pragma once
 
 #include "types.h"
 #include "game/moving_texture.h"
@@ -56,5 +55,3 @@ extern const Trajectory ccm_seg7_trajectory_penguin_race[];
 
 // script
 extern const LevelScript level_ccm_entry[];
-
-#endif

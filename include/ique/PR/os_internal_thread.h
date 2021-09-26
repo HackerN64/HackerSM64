@@ -18,8 +18,7 @@
         $Date: 2002/05/02 03:28:25 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_INTERNAL_THREAD_H_
-#define	_OS_INTERNAL_THREAD_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -39,5 +38,3 @@ extern OSThread *	__osGetActiveQueue(void);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_INTERNAL_THREAD_H */

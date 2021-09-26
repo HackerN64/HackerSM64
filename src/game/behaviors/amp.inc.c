@@ -155,8 +155,6 @@ static void homing_amp_chase_loop(void) {
  * Give up on chasing Mario.
  */
 static void homing_amp_give_up_loop(void) {
-    UNUSED u8 filler[8];
-
     // Move forward for 152 frames
     o->oForwardVel = 15.0f;
 

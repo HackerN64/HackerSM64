@@ -28,7 +28,7 @@ void bhv_checkerboard_elevator_group_init(void) {
         platformObj = spawn_object_relative(i, 0, i * relativePosY, relativePosZ, o, MODEL_CHECKERBOARD_PLATFORM,
                                      bhvCheckerboardPlatformSub);
         platformObj->oCheckerBoardPlatformRadius = sCheckerBoardPlatformInitPositions[type].radius;
-        vec3f_copy_2(platformObj->header.gfx.scale, sCheckerBoardPlatformInitPositions[type].scale);
+        vec3f_copy(platformObj->header.gfx.scale, sCheckerBoardPlatformInitPositions[type].scale);
     }
 }
 

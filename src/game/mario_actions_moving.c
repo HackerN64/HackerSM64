@@ -64,9 +64,7 @@ struct LandingAction sBackflipLandAction = {
 Mat4 sFloorAlignMatrix[2];
 
 s16 tilt_body_running(struct MarioState *m) {
-    s16 pitch = find_floor_slope(m, 0);
-    pitch = pitch * m->forwardVel / 40.0f;
-    return -pitch;
+    return -(find_floor_slope(m, 0) * m->forwardVel / 40.0f);
 }
 
 void play_step_sound(struct MarioState *m, s16 frame1, s16 frame2) {
@@ -88,9 +86,21 @@ void play_step_sound(struct MarioState *m, s16 frame1, s16 frame2) {
 }
 
 void align_with_floor(struct MarioState *m) {
-    m->pos[1] = m->floorHeight;
-    mtxf_align_terrain_triangle(sFloorAlignMatrix[m->playerID], m->pos, m->faceAngle[1], 40.0f);
-    m->marioObj->header.gfx.throwMatrix = &sFloorAlignMatrix[m->playerID];
+    struct Surface *floor = m->floor;
+    if ((floor != NULL) && (m->pos[1] < (m->floorHeight + 80.0f))) {
+        m->pos[1] = m->floorHeight;
+#ifdef FAST_FLOOR_ALIGN
+        if (ABS(m->forwardVel) > FAST_FLOOR_ALIGN) {
+            Vec3f floorNormal = { floor->normal.x, floor->normal.y, floor->normal.z };
+            mtxf_align_terrain_normal(sFloorAlignMatrix[m->playerID], floorNormal, m->pos, m->faceAngle[1]);
+        } else {
+            mtxf_align_terrain_triangle(sFloorAlignMatrix[m->playerID], m->pos, m->faceAngle[1], 40.0f);
+        }
+#else
+        mtxf_align_terrain_triangle(sFloorAlignMatrix[m->playerID], m->pos, m->faceAngle[1], 40.0f);
+#endif
+        m->marioObj->header.gfx.throwMatrix = &sFloorAlignMatrix[m->playerID];
+    }
 }
 
 s32 begin_walking_action(struct MarioState *m, f32 forwardVel, u32 action, u32 actionArg) {
@@ -159,9 +169,6 @@ s32 set_triple_jump_action(struct MarioState *m, UNUSED u32 action, UNUSED u32 a
 }
 
 void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
-    s32 newFacingDYaw;
-    s16 facingDYaw;
-
     struct Surface *floor = m->floor;
     s16 slopeAngle = atan2s(floor->normal.z, floor->normal.x);
     f32 steepness = sqrtf(floor->normal.x * floor->normal.x + floor->normal.z * floor->normal.z);
@@ -174,23 +181,22 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
 
     m->slideYaw = atan2s(m->slideVelZ, m->slideVelX);
 
-    facingDYaw = m->faceAngle[1] - m->slideYaw;
-    newFacingDYaw = facingDYaw;
+    s16 facingDYaw = m->faceAngle[1] - m->slideYaw;
+    s32 newFacingDYaw = facingDYaw;
 
-    //! -0x4000 not handled - can slide down a slope while facing perpendicular to it
-    if (newFacingDYaw > 0 && newFacingDYaw <= 0x4000) {
+    if (newFacingDYaw > 0 && newFacingDYaw <= 0x4000) { // (0..0x4000]
         if ((newFacingDYaw -= 0x200) < 0) {
             newFacingDYaw = 0;
         }
-    } else if (newFacingDYaw > -0x4000 && newFacingDYaw < 0) {
+    } else if (newFacingDYaw >= -0x4000 && newFacingDYaw < 0) { // [-0x4000..0)
         if ((newFacingDYaw += 0x200) > 0) {
             newFacingDYaw = 0;
         }
-    } else if (newFacingDYaw > 0x4000 && newFacingDYaw < 0x8000) {
+    } else if (newFacingDYaw > 0x4000 && newFacingDYaw < 0x8000) { // (0x4000..0x8000)
         if ((newFacingDYaw += 0x200) > 0x8000) {
             newFacingDYaw = 0x8000;
         }
-    } else if (newFacingDYaw > -0x8000 && newFacingDYaw < -0x4000) {
+    } else if (newFacingDYaw > -0x8000 && newFacingDYaw < -0x4000) { // (-0x8000..-0x4000)
         if ((newFacingDYaw -= 0x200) < -0x8000) {
             newFacingDYaw = -0x8000;
         }
@@ -220,14 +226,11 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
 s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
     f32 lossFactor;
     f32 accel;
-    f32 oldSpeed;
-    f32 newSpeed;
 
     s32 stopped = FALSE;
 
     s16 intendedDYaw = m->intendedYaw - m->slideYaw;
     f32 forward = coss(intendedDYaw);
-    f32 sideward = sins(intendedDYaw);
 
     //! 10k glitch
     if (forward < 0.0f && m->forwardVel >= 0.0f) {
@@ -256,15 +259,16 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
             break;
     }
 
-    oldSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
+    f32 oldSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
-    //! This is attempting to use trig derivatives to rotate Mario's speed.
-    // It is slightly off/asymmetric since it uses the new X speed, but the old
-    // Z speed.
-    m->slideVelX += m->slideVelZ * (m->intendedMag / 32.0f) * sideward * 0.05f;
-    m->slideVelZ -= m->slideVelX * (m->intendedMag / 32.0f) * sideward * 0.05f;
+    f32 sideward          = ((m->intendedMag / 32.0f) * sins(intendedDYaw) * 0.05f);
+    f32 slideVelXModifier = (m->slideVelZ * sideward);
+    f32 slideVelZModifier = (m->slideVelX * sideward);
 
-    newSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
+    m->slideVelX         += slideVelXModifier;
+    m->slideVelZ         -= slideVelZModifier;
+
+    f32 newSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
     if (oldSpeed > 0.0f && newSpeed > 0.0f) {
         m->slideVelX = m->slideVelX * oldSpeed / newSpeed;
@@ -431,13 +435,12 @@ s32 update_decelerating_speed(struct MarioState *m) {
 }
 
 s32 analog_stick_held_back(struct MarioState *m) {
-    s16 intendedDYaw = m->intendedYaw - m->faceAngle[1];
-    return intendedDYaw < -0x471C || intendedDYaw > 0x471C;
+    s16 intendedDYaw = (m->intendedYaw - m->faceAngle[1]);
+    return ((intendedDYaw < -0x471C) || (intendedDYaw > 0x471C));
 }
 
 void update_walking_speed(struct MarioState *m) {
     f32 maxTargetSpeed;
-    f32 targetSpeed;
 
     if (m->floor != NULL && m->floor->type == SURFACE_SLOW) {
         maxTargetSpeed = 24.0f;
@@ -445,7 +448,7 @@ void update_walking_speed(struct MarioState *m) {
         maxTargetSpeed = 32.0f;
     }
 
-    targetSpeed = m->intendedMag < maxTargetSpeed ? m->intendedMag : maxTargetSpeed;
+    f32 targetSpeed = m->intendedMag < maxTargetSpeed ? m->intendedMag : maxTargetSpeed;
 
     if (m->quicksandDepth > 10.0f) {
         targetSpeed *= 6.25 / m->quicksandDepth;
@@ -463,28 +466,46 @@ void update_walking_speed(struct MarioState *m) {
         m->forwardVel = 48.0f;
     }
 
-#ifdef FIX_GROUND_TURN_RADIUS
+#if GROUND_TURN_MODE == 0 // Vanilla behavior.
+    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x800);
+#elif GROUND_TURN_MODE == 1 // Similar to vanilla, but prevents Mario from moving in the wrong direction when turning around, and allows finer control with the analog stick.
+    s16 turnRange = 0x800;
+    s16 dYaw = abs_angle_diff(m->faceAngle[1], m->intendedYaw); // 0x0 is turning forwards, 0x8000 is turning backwards
+    if (m->forwardVel < 0.0f) { // Don't modify Mario's speed and turn radius if Mario is moving backwards
+        // Flip controls when moving backwards so Mario still moves towards intendedYaw
+        m->intendedYaw += 0x8000;
+    } else if (dYaw > 0x4000) { // Only modify Mario's speed and turn radius if Mario is turning around
+        // Reduce Mario's forward speed by the turn amount, so Mario won't move off sideward from the intended angle when turning around.
+        m->forwardVel *= ((coss(dYaw) + 1.0f) / 2.0f); // 1.0f is turning forwards, 0.0f is turning backwards
+        // Increase turn speed if forwardVel is lower and intendedMag is higher
+        turnRange     *= (2.0f - (ABSF(m->forwardVel) / MAX(m->intendedMag, __FLT_EPSILON__))); // 1.0f front, 2.0f back
+    }
+    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
+#elif GROUND_TURN_MODE == 2 // similar to mode 1, but a bit further from vanilla, and allows instant turnaround if Mario is moving slower than a certain threshold.
     if ((m->forwardVel < 0.0f) && (m->heldObj == NULL) && !(m->action & ACT_FLAG_SHORT_HITBOX)) {
+        // Flip Mario if he is moving backwards
         m->faceAngle[1] += 0x8000;
         m->forwardVel *= -1.0f;
     }
     if (analog_stick_held_back(m) && (m->heldObj == NULL) && !(m->action & ACT_FLAG_SHORT_HITBOX)) {
+        // Turn around instantly
         set_mario_action(m, ACT_TURNING_AROUND, 0);
         if (m->forwardVel < 10.0f) {
             m->faceAngle[1] = m->intendedYaw;
         }
     } else {
-        s16 turnRange = (0xFFF - (m->forwardVel * 0x20));
+        // Scale the turn radius by forwardVel
+        s16 turnRange = (0x1000 - (m->forwardVel * 0x20));
         if (turnRange < 0x800) {
-            turnRange = 0x800;
+            turnRange = 0x800; // Clamp the minimum radius (vanilla radius, 0x800)
             set_mario_action(m, ACT_TURNING_AROUND, 0);
-        } else if (turnRange > 0xFFF) {
-            turnRange = 0xFFF;
+        } else if (turnRange > 0x1000) {
+            turnRange = 0x1000; // Clamp the maximum radius (0x1000)
         }
         m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
     }
-#else
-    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x800);
+#elif GROUND_TURN_MODE == 3 // Instant turn.
+    m->faceAngle[1] = m->intendedYaw;
 #endif
     apply_slope_accel(m);
 }

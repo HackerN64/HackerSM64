@@ -6,8 +6,7 @@
         $Date: 2004/06/28 22:34:42 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_BB_H_
-#define	_OS_BB_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -107,5 +106,3 @@ extern void osBbRtcGet(u8* year, u8* month, u8* day, u8* dow, u8* hour, u8* min,
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_BB_H_ */

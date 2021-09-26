@@ -17,10 +17,6 @@ void bhv_haunted_bookshelf_loop(void) {
 
     switch (o->oAction) {
         case HAUNTED_BOOKSHELF_ACT_IDLE:
-            // ???
-            if (o->oTimer == 0) {
-            }
-
             // This code never runs, since the action is set to 1 directly
             // by bhvHauntedBookshelfManager. Maybe this was
             // intended to be used to set the action instead?

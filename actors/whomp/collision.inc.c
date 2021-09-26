@@ -29,5 +29,3 @@ const Collision whomp_seg6_collision_06020A0C[] = {
     COL_TRI_STOP(),
     COL_END(),
 };
-
-UNUSED static const u32 whomp_unused_2 = 0;

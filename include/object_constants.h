@@ -1,5 +1,4 @@
-#ifndef OBJECT_CONSTANTS_H
-#define OBJECT_CONSTANTS_H
+#pragma once
 
 // This file contains macros that provide descriptive names for
 // field-specific and object-specific constants, e.g. actions.
@@ -47,6 +46,7 @@
 #define OBJ_FLAG_EMIT_LIGHT                         (1 << 17) // 0x00020000
 #define OBJ_FLAG_UCODE_LARGE                        (1 << 18) // 0x00040000
 #define OBJ_FLAG_SILHOUETTE                         (1 << 19) // 0x00080000
+#define OBJ_FLAG_OPACITY_FROM_CAMERA_DIST           (1 << 20) // 0x00100000
 #define OBJ_FLAG_HITBOX_WAS_SET                     (1 << 30) // 0x40000000
 
 /* oHeldState */
@@ -117,55 +117,100 @@
 #define ACTIVE_PARTICLE_V_STAR                      (1 << 18) // 0x00040000
 #define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
 
-/* oAction */
-#define OBJ_ACT_LAVA_DEATH 100
-#define OBJ_ACT_DEATH_PLANE_DEATH 101
+/* oBehParams2ndByte */
+#define OBJ_BP_NONE                                         0x0
 
-#define OBJ_ACT_HORIZONTAL_KNOCKBACK 100
-#define OBJ_ACT_VERTICAL_KNOCKBACK 101
-#define OBJ_ACT_SQUISHED 102
+/* oAction */
+#define OBJ_ACT_PROJECTILE_HIT_MARIO                       -0x1
+
+/* oAction */
+#define OBJ_ACT_LAVA_DEATH                                  100
+#define OBJ_ACT_DEATH_PLANE_DEATH                           101
+
+#define OBJ_ACT_HORIZONTAL_KNOCKBACK                        100
+#define OBJ_ACT_VERTICAL_KNOCKBACK                          101
+#define OBJ_ACT_SQUISHED                                    102
+
+/* oAnimState */
+#define OBJ_ANIM_STATE_INIT_ANIM                           -0x1
+#define OBJ_ANIM_STATE_DEFAULT                              0x0
+    /* cur_obj_update_blinking */
+#define OBJ_BLINKING_ANIM_STATE_EYES_OPEN                   0x0
+#define OBJ_BLINKING_ANIM_STATE_EYES_CLOSED                 0x1
+
+/* Animations */
+#define OBJ_ANIM_NONE                                      -0x1
 
 /* gTTCSpeedSetting */
-#define TTC_SPEED_SLOW    0
-#define TTC_SPEED_FAST    1
-#define TTC_SPEED_RANDOM  2
-#define TTC_SPEED_STOPPED 3
+#define TTC_SPEED_SLOW                                      0x0
+#define TTC_SPEED_FAST                                      0x1
+#define TTC_SPEED_RANDOM                                    0x2
+#define TTC_SPEED_STOPPED                                   0x3
 
-/* Bob-omb */
-    /* oBehParams2ndByte */
-    #define BOBOMB_BP_STYPE_GENERIC 0
-    #define BOBOMB_BP_STYPE_STATIONARY 1
-    /* oAction */
-    #define BOBOMB_ACT_PATROL 0
-    #define BOBOMB_ACT_LAUNCHED 1
-    #define BOBOMB_ACT_CHASE_MARIO 2
-    #define BOBOMB_ACT_EXPLODE 3
-    #define BOBOMB_ACT_LAVA_DEATH 100
-    #define BOBOMB_ACT_DEATH_PLANE_DEATH 101
+/* geo_update_layer_transparency */
+#define TRANSPARENCY_ANIM_STATE_OPAQUE                      0x0
+#define TRANSPARENCY_ANIM_STATE_TRANSPARENT                 0x1
+
+/* Orange Number */
+    /* oBehParams2ndByte, oAnimState */
+    #define ORANGE_NUMBER_0                                 0x0
+    #define ORANGE_NUMBER_1                                 0x1
+    #define ORANGE_NUMBER_2                                 0x2
+    #define ORANGE_NUMBER_3                                 0x3
+    #define ORANGE_NUMBER_4                                 0x4
+    #define ORANGE_NUMBER_5                                 0x5
+    #define ORANGE_NUMBER_6                                 0x6
+    #define ORANGE_NUMBER_7                                 0x7
+    #define ORANGE_NUMBER_8                                 0x8
+    #define ORANGE_NUMBER_9                                 0x9
+    #define ORANGE_NUMBER_A                                 0xA
+    #define ORANGE_NUMBER_B                                 0xB
+    #define ORANGE_NUMBER_C                                 0xC
+    #define ORANGE_NUMBER_D                                 0xD
+    #define ORANGE_NUMBER_E                                 0xE
+    #define ORANGE_NUMBER_F                                 0xF
+
+/* Coin Type */
+    /* coinType */
+    #define COIN_TYPE_NONE                                  0x0
+    #define COIN_TYPE_YELLOW                                0x1
+    #define COIN_TYPE_BLUE                                  0x2
 
 /* Hidden Blue Coin */
     /* oAction */
-    #define HIDDEN_BLUE_COIN_ACT_INACTIVE 0
-    #define HIDDEN_BLUE_COIN_ACT_WAITING 1
-    #define HIDDEN_BLUE_COIN_ACT_ACTIVE 2
+    #define HIDDEN_BLUE_COIN_ACT_INACTIVE                   0x0
+    #define HIDDEN_BLUE_COIN_ACT_WAITING                    0x1
+    #define HIDDEN_BLUE_COIN_ACT_ACTIVE                     0x2
 
 /* Blue Coin Switch */
     /* oAction */
-    #define BLUE_COIN_SWITCH_ACT_IDLE 0
-    #define BLUE_COIN_SWITCH_ACT_RECEDING 1
-    #define BLUE_COIN_SWITCH_ACT_TICKING 2
+    #define BLUE_COIN_SWITCH_ACT_IDLE                       0x0
+    #define BLUE_COIN_SWITCH_ACT_RECEDING                   0x1
+    #define BLUE_COIN_SWITCH_ACT_TICKING                    0x2
+    #define BLUE_COIN_SWITCH_ACT_EXTENDING                  0x3
 
 /* Moving Blue Coin */
     /* oAction */
-    #define MOV_BCOIN_ACT_STILL 0
-    #define MOV_BCOIN_ACT_MOVING 1
+    #define MOV_BCOIN_ACT_STILL                             0x0
+    #define MOV_BCOIN_ACT_MOVING                            0x1
+    #define MOV_BCOIN_ACT_SLOWING_DOWN                      0x2
+    #define MOV_BCOIN_ACT_STOPPED                           0x3
+    #define MOV_BCOIN_ACT_FLICKERING                        0x4
+
+/* Bob-omb */
+    /* oBehParams2ndByte */
+    #define BOBOMB_BP_STYPE_GENERIC    0x0
+    #define BOBOMB_BP_STYPE_STATIONARY 0x1
+    /* oAction */
+    #define BOBOMB_ACT_PATROL      0x0
+    #define BOBOMB_ACT_LAUNCHED    0x1
+    #define BOBOMB_ACT_CHASE_MARIO 0x2
+    #define BOBOMB_ACT_EXPLODE     0x3
 
 /* Moving Yellow Coin */
     /* oAction */
     #define MOV_YCOIN_ACT_IDLE 0
     #define MOV_YCOIN_ACT_BLINKING 1
-    #define MOV_YCOIN_ACT_LAVA_DEATH 100
-    #define MOV_YCOIN_ACT_DEATH_PLANE_DEATH 101
 
 /* Bob-omb Buddy */
     /* oBehParams2ndByte */
@@ -377,8 +422,6 @@
     #define BULLY_ACT_BACK_UP 3
     #define BULLY_ACT_INACTIVE 4
     #define BULLY_ACT_ACTIVATE_AND_FALL 5
-    #define BULLY_ACT_LAVA_DEATH 100
-    #define BULLY_ACT_DEATH_PLANE_DEATH 101
     /* oBullySubtype */
     #define BULLY_STYPE_GENERIC 0
     #define BULLY_STYPE_MINION 1
@@ -1096,5 +1139,3 @@
     /* oBehParams2ndByte */
     #define MR_BLIZZARD_STYPE_NO_CAP 0
     #define MR_BLIZZARD_STYPE_JUMPING 1
-
-#endif // OBJECT_CONSTANTS_H

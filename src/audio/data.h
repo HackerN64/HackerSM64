@@ -1,5 +1,4 @@
-#ifndef AUDIO_DATA_H
-#define AUDIO_DATA_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -68,7 +67,6 @@ extern f32 gVolRampingRhs128[128];
 
 // non-constant .data
 extern s16 gTatumsPerBeat;
-extern s8 gUnusedCount80333EE8;
 extern s32 gAudioHeapSize; // AUDIO_HEAP_SIZE
 extern s32 gAudioInitPoolSize; // AUDIO_INIT_POOL_SIZE
 extern volatile s32 gAudioLoadLock;
@@ -106,9 +104,6 @@ extern s16 gAiBufferLengths[NUMAIBUFFERS];
 #else
 #define AIBUFFER_LEN (0xa0 * 16)
 #endif
-
-extern u32 gUnused80226E58[0x10];
-extern u16 gUnused80226E98[0x10];
 
 extern u32 gAudioRandom;
 
@@ -152,11 +147,9 @@ extern OSMesgQueue *D_SH_80350FA8;
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#define UNUSED_COUNT_80333EE8 24
 #define AUDIO_HEAP_SIZE (0x3AB00 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
 #define AUDIO_INIT_POOL_SIZE (0x2C00 + EXT_AUDIO_INIT_POOL_SIZE)
 #else
-#define UNUSED_COUNT_80333EE8 16
 #define AUDIO_HEAP_SIZE (0x34750 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
 #define AUDIO_INIT_POOL_SIZE (0x2500 + EXT_AUDIO_INIT_POOL_SIZE)
 #endif
@@ -167,5 +160,3 @@ extern u16 D_SH_80315EF4;
 extern u16 D_SH_80315EF8;
 extern u16 D_SH_80315EFC;
 #endif
-
-#endif // AUDIO_DATA_H

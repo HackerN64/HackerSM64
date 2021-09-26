@@ -1,5 +1,4 @@
-#ifndef VCUTM_HEADER_H
-#define VCUTM_HEADER_H
+#pragma once
 
 #include "types.h"
 
@@ -19,5 +18,3 @@ extern const Collision vcutm_seg7_collision_0700AC44[];
 
 // script
 extern const LevelScript level_vcutm_entry[];
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _EM_H_
-#define	_EM_H_
+#pragma once
 
 /**************************************************************************
  *									  *
@@ -98,5 +97,3 @@ extern void	emPause(void);
 
 
 #endif /* _LANGUAGE_C */
-
-#endif /* !_EM_H_ */

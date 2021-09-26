@@ -29,9 +29,7 @@
  **************************************************************************/
 
 
-
-#ifndef __ULTRAPORTALS_H__
-#define __ULTRAPORTALS_H__
+#pragma once
 
 #include <ultra64.h>
 #include "matrix.h"
@@ -129,6 +127,4 @@ extern upLocateData 	upLocator;	/* also extern by test_portals.h */
 
 #ifdef __Cplusplus
 }
-#endif
-
 #endif

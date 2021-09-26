@@ -919,7 +919,7 @@ s32 unused_resolve_floor_or_ceil_collisions(s32 checkCeil, f32 *px, f32 *py, f32
     nz = (*psurface)->normal.z;
     oo = (*psurface)->originOffset;
 
-    offset = nx * x + ny * y + nz * z + oo;
+    offset = (nx * x) + (ny * y) + (nz * z) + oo;
     distance = offset >= 0 ? offset : -offset;
 
     // Interesting surface interaction that should be surf type independent.

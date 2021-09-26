@@ -131,8 +131,6 @@ f64 kth_root(f64 d, s32 k) {
         root = 1.0;
     } else {
         for (i = 0; i < 64; i++) {
-            if (1) {
-            }
             next = root_newton_step(root, k, d);
             diff = next - root;
 
@@ -381,11 +379,6 @@ void temporary_pools_init(struct PoolSplit *a) {
 }
 #undef SOUND_ALLOC_FUNC
 
-#if defined(VERSION_JP) || defined(VERSION_US)
-UNUSED static void unused_803163D4(void) {
-}
-#endif
-
 #ifdef VERSION_SH
 void *alloc_bank_or_seq(s32 poolIdx, s32 size, s32 arg3, s32 id) {
 #else
@@ -497,14 +490,6 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
             return NULL;
         }
 #else
-#ifdef VERSION_EU
-        if (0) {
-            // It's unclear where these string literals go.
-            eu_stubbed_printf_0("DataHeap Not Allocate \n");
-            eu_stubbed_printf_1("StayHeap Not Allocate %d\n", 0);
-            eu_stubbed_printf_1("AutoHeap Not Allocate %d\n", 0);
-        }
-#endif
 
 #ifdef VERSION_SH
         if (poolIdx == 1) {
@@ -1753,7 +1738,6 @@ void func_sh_802f23ec(void) {
     s32 drumId;
     struct Drum *drum;
     struct Instrument *inst;
-    UNUSED s32 pad;
     struct UnkEntry *entry; //! @bug: not initialized but nevertheless used
 
     seqCount = gAlCtlHeader->seqCount;

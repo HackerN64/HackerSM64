@@ -515,9 +515,6 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
     }
 }
 
-void stub_obj_list_processor_1(void) {
-}
-
 /**
  * Clear objects, dynamic surfaces, and some miscellaneous level data used by objects.
  */
@@ -538,9 +535,6 @@ void clear_objects(void) {
 
     init_free_object_list();
     clear_object_lists(gObjectListArray);
-
-    stub_behavior_script_2();
-    stub_obj_list_processor_1();
 
     for (i = 0; i < OBJECT_POOL_CAPACITY; i++) {
         gObjectPool[i].activeFlags = ACTIVE_FLAG_DEACTIVATED;
@@ -644,10 +638,8 @@ void update_objects(UNUSED s32 unused) {
     cycleCounts[2] = get_clock_difference(cycleCounts[0]);
     update_terrain_objects();
 
-    // If Mario was touching a moving platform at the end of last frame, apply
-    // displacement now
-    //! If the platform object unloaded and a different object took its place,
-    //  displacement could be applied incorrectly
+    // If Mario was touching a moving platform at the end of last frame, apply displacement now
+    //! If the platform object unloaded and a different object took its place, displacement could be applied incorrectly
     apply_mario_platform_displacement();
 
     // Detect which objects are intersecting

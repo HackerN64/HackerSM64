@@ -1,5 +1,4 @@
-#ifndef PSS_HEADER_H
-#define PSS_HEADER_H
+#pragma once
 
 #include "types.h"
 
@@ -19,5 +18,3 @@ extern const MacroObject pss_seg7_macro_objs[];
 
 // script
 extern const LevelScript level_pss_entry[];
-
-#endif

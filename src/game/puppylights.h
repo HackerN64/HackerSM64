@@ -1,6 +1,6 @@
+#pragma once
+
 #ifdef PUPPYLIGHTS
-#ifndef PUPPYLIGHTS_H
-#define PUPPYLIGHTS_H
 
 #include "types.h"
 #include "command_macros_base.h"
@@ -53,5 +53,4 @@ extern void set_light_properties(struct PuppyLight *light, s32 x, s32 y, s32 z, 
 extern void puppylights_allocate(void);
 extern void delete_lights(void);
 
-#endif
 #endif

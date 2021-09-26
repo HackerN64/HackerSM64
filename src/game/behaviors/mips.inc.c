@@ -77,10 +77,8 @@ s16 bhv_mips_find_furthest_waypoint_to_mario(void) {
  * Wait until Mario comes close, then resume following our path.
  */
 void bhv_mips_act_wait_for_nearby_mario(void) {
-    UNUSED s16 collisionFlags = 0;
-
     o->oForwardVel = 0.0f;
-    collisionFlags = object_step();
+    object_step();
 
     // If Mario is within 500 units...
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 500)) {
@@ -165,10 +163,8 @@ void bhv_mips_act_fall_down(void) {
  * Idle loop, after you catch MIPS and put him down.
  */
 void bhv_mips_act_idle(void) {
-    UNUSED s16 collisionFlags = 0;
-
     o->oForwardVel = 0;
-    collisionFlags = object_step();
+    object_step();
 
     // Spawn a star if he was just picked up for the first time.
     if (o->oMipsStarStatus == MIPS_STAR_STATUS_SHOULD_SPAWN_STAR) {

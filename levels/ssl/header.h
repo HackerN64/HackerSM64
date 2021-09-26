@@ -1,5 +1,4 @@
-#ifndef SSL_HEADER_H
-#define SSL_HEADER_H
+#pragma once
 
 #include "types.h"
 #include "game/moving_texture.h"
@@ -84,5 +83,3 @@ extern const Gfx ssl_dl_pyramid_sand_pathway_side_end[];
 
 // script
 extern const LevelScript level_ssl_entry[];
-
-#endif

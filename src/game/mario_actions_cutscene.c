@@ -212,13 +212,6 @@ Gfx *geo_switch_peach_eyes(s32 callContext, struct GraphNode *node, UNUSED s32 c
     return NULL;
 }
 
-// unused
-UNUSED static void stub_is_textbox_active(u16 *arg) {
-    if (get_dialog_id() == DIALOG_NONE) {
-        *arg = 0;
-    }
-}
-
 /**
  * get_star_collection_dialog: Determine what dialog should show when Mario
  * collects a star.
@@ -1479,7 +1472,6 @@ s32 act_shocked(struct MarioState *m) {
 }
 
 s32 act_squished(struct MarioState *m) {
-    UNUSED s32 pad;
     f32 squishAmount;
     f32 spaceUnderCeil;
     s16 surfAngle;

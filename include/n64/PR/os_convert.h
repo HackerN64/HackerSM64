@@ -27,8 +27,7 @@
         $Date: 1999/04/21 02:53:11 $
  *---------------------------------------------------------------------*/
 
-#ifndef _OS_CONVERT_H_
-#define	_OS_CONVERT_H_
+#pragma once
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -107,5 +106,3 @@ extern void *		 osPhysicalToVirtual(u32);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
-
-#endif /* !_OS_CONVERT_H_ */

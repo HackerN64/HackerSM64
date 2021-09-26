@@ -1,5 +1,4 @@
-#ifndef GD_DRAW_OBJECTS_H
-#define GD_DRAW_OBJECTS_H
+#pragma once
 
 #include <PR/ultratypes.h>
 
@@ -23,8 +22,6 @@
 extern struct ObjCamera *gViewUpdateCamera;
 
 // bss
-// this is unused, but it needs to be declared before gGdLightGroup
-extern u8 gUnref_801B9B30[0x88];
 extern struct ObjGroup *gGdLightGroup;  // ObjGroup* of ObjLights
 
 // functions
@@ -48,5 +45,3 @@ void create_gddl_for_shapes(struct ObjGroup *grp);
 void map_face_materials(struct ObjGroup *faces, struct ObjGroup *mtls);
 void map_vertices(struct ObjGroup *facegrp, struct ObjGroup *vtxgrp);
 void update_view(struct ObjView *view);
-
-#endif // GD_DRAW_OBJECTS_H

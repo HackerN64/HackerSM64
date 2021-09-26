@@ -1,5 +1,4 @@
-#ifndef COMMAND_MACROS_BASE_H
-#define COMMAND_MACROS_BASE_H
+#pragma once
 
 #include "platform_info.h"
 
@@ -24,5 +23,3 @@
 #define CMD_PTR(a) ((uintptr_t)(a))
 
 #define CMD_HHHHHH(a, b, c, d, e, f) CMD_HH(a, b), CMD_HH(c, d), CMD_HH(e, f)
-
-#endif // COMMAND_MACROS_BASE_H

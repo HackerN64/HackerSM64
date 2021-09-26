@@ -243,9 +243,6 @@ void fade_into_special_warp(u32 arg, u32 color) {
     warp_special(arg);
 }
 
-void stub_level_update_1(void) {
-}
-
 void load_level_init_text(u32 arg) {
     s32 gotAchievement;
     u32 dialogID = gCurrentArea->dialog[arg];

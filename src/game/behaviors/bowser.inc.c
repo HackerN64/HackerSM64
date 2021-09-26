@@ -661,7 +661,6 @@ void bowser_act_hit_mine(void) {
             }
             o->oBowserEyesShut = FALSE; // open eyes
         }
-    } else {
     }
 }
 
@@ -749,7 +748,6 @@ void bowser_act_big_jump(void) {
             if (o->oBehParams2ndByte == BOWSER_BP_BITFS) {
                 o->oAction = BOWSER_ACT_TILT_LAVA_PLATFORM;
             }
-        } else {
         }
     // Set to default action when the animation is over
     } else if (cur_obj_check_if_near_animation_end()) {

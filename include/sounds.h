@@ -1,5 +1,4 @@
-#ifndef SOUNDS_H
-#define SOUNDS_H
+#pragma once
 
 // Sound Magic Definition:
 // First Byte (Upper Nibble): Sound Bank (not the same as audio bank!)
@@ -592,5 +591,3 @@
 #define SOUND_OBJ2_MONTY_MOLE_APPEAR             /* 0x90678080 */ SOUND_ARG_LOAD(SOUND_BANK_OBJ2,     0x67, 0x80, SOUND_DISCRETE)
 #define SOUND_OBJ2_BOSS_DIALOG_GRUNT             /* 0x90694080 */ SOUND_ARG_LOAD(SOUND_BANK_OBJ2,     0x69, 0x40, SOUND_DISCRETE)
 #define SOUND_OBJ2_MRI_SPINNING                  /* 0x906B0080 */ SOUND_ARG_LOAD(SOUND_BANK_OBJ2,     0x6B, 0x00, SOUND_DISCRETE)
-
-#endif // SOUNDS_H

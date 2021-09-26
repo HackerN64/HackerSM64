@@ -584,8 +584,6 @@ s8 obj_check_if_facing_toward_angle(u32 base, u32 goal, s16 range) {
  */
 s8 obj_find_wall_displacement(Vec3f dist, f32 x, f32 y, f32 z, f32 radius) {
     struct WallCollisionData hitbox;
-    UNUSED u8 filler[0x20];
-
     hitbox.x = x;
     hitbox.y = y;
     hitbox.z = z;

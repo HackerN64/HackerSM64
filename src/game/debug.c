@@ -57,34 +57,17 @@ s8 sDebugSysCursor = 0;
 s8 sDebugInfoButtonSeqID = 0;
 s16 sDebugInfoButtonSeq[] = { U_CBUTTONS, L_CBUTTONS, D_CBUTTONS, R_CBUTTONS, -1 };
 
-// most likely present in an ifdef DEBUG build. TODO: check DD version?
-void stub_debug_1(void) {
-}
-
-void stub_debug_2(void) {
-}
-
-void stub_debug_3(void) {
-}
-
-void stub_debug_4(void) {
-}
-
 /*
  * These 2 functions are called from the object list processor in regards to cycle
  * counts. They likely have stubbed out code that calculated the clock count and
  * its difference for consecutive calls.
  */
 s64 get_current_clock(void) {
-    s64 wtf = 0;
-
-    return wtf;
+    return 0;
 }
 
-s64 get_clock_difference(UNUSED s64 arg0) {
-    s64 wtf = 0;
-
-    return wtf;
+s64 get_clock_difference(UNUSED s64 cycles) {
+    return 0;
 }
 
 /*

@@ -1,5 +1,4 @@
-#ifndef LIBMIO0_H_
-#define LIBMIO0_H_
+#pragma once
 
 // defines
 
@@ -46,5 +45,3 @@ int mio0_decode_file(const char *in_file, unsigned long offset, const char *out_
 // in_file: input filename containing raw data to be encoded
 // out_file: output filename to write MIO0 compressed data to
 int mio0_encode_file(const char *in_file, const char *out_file);
-
-#endif // LIBMIO0_H_

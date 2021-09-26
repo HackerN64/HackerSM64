@@ -6,8 +6,7 @@
  *
  **************************************************************************/
 
-#ifndef	__GL_IMAGE_H__
-#define	__GL_IMAGE_H__
+#pragma once
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -123,4 +122,3 @@ unsigned short *ibufalloc();
 #ifdef __cplusplus
 }
 #endif
-#endif	/* !__GL_IMAGE_H__ */

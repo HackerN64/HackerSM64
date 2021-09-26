@@ -29,7 +29,6 @@ void bhv_seesaw_platform_init(void) {
  * Update function for bhvSeesawPlatform.
  */
 void bhv_seesaw_platform_update(void) {
-    UNUSED s32 startPitch = o->oFaceAnglePitch;
     o->oFaceAnglePitch += (s32) o->oSeesawPlatformPitchVel;
 
     if (absf(o->oSeesawPlatformPitchVel) > 10.0f) {

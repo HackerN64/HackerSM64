@@ -47,13 +47,9 @@ void set_joint_vecs(struct ObjJoint *, f32, f32, f32);
  * Controls movement of grabbable joints
  */
 void grabbable_joint_update_func(struct ObjJoint *self) {
-    UNUSED u8 pad78[0xC8 - 0x78];
     Mat4f *attObjMtx;
-    UNUSED u8 pad70[4];
     struct GdVec3f offset;  // difference between current position and initial position
-    UNUSED u8 pad50[0x10];
     register struct ListNode *att;
-    UNUSED u8 pad48[0x8];
     struct GdObj *attobj;
 
     // The joint acts somewhat like a spring in that the further it is moved
@@ -137,7 +133,6 @@ void eye_joint_update_func(struct ObjJoint *self) {
     Mat4f *sp5C;
     struct GdVec3f sp50;
     struct GdVec3f sp44;
-    UNUSED u8 pad2c[0x18];
     register struct ListNode *att;
     struct GdObj *attobj;
 
@@ -230,7 +225,6 @@ void set_joint_vecs(struct ObjJoint *j, f32 x, f32 y, f32 z) {
 struct ObjJoint *make_joint(s32 flags, f32 x, f32 y, f32 z) {
     struct ObjJoint *j; // sp24
     struct ObjJoint *oldhead;
-    UNUSED u32 pad1C;
 
     j = (struct ObjJoint *) make_object(OBJ_TYPE_JOINTS);
     sJointCount++;
@@ -396,7 +390,6 @@ void func_8018F520(struct ObjBone *b) {
 void func_8018F89C(struct ObjBone *b) {
     struct ObjJoint *spAC;
     struct ObjJoint *spA8;
-    UNUSED u8 pad64[0x44];
     struct ObjGroup *grp; // sp60
     struct ListNode *link;   // sp5c
     Mat4f mtx;            // sp1c
@@ -493,7 +486,6 @@ void add_joint2bone(struct ObjBone *b, struct ObjJoint *j) {
 struct ObjBone *make_bone(s32 a0, struct ObjJoint *j1, struct ObjJoint *j2, UNUSED s32 a3) {
     struct ObjBone *b; // sp34
     struct ObjBone *oldhead;
-    UNUSED u32 pad1C[5];
 
     b = (struct ObjBone *) make_object(OBJ_TYPE_BONES);
     sBoneCount++;
@@ -521,10 +513,6 @@ struct ObjBone *make_bone(s32 a0, struct ObjJoint *j1, struct ObjJoint *j2, UNUS
 
     printf("Made bone %d\n", b->id);
     return b;
-}
-
-/* 23E6E4 -> 23E6F8; not called */
-void stub_joints_1(UNUSED u32 a0) {
 }
 
 /* 23E6F8 -> 23E758; not called */
@@ -583,11 +571,9 @@ s32 func_8018FFE8(struct ObjBone **a0, struct ObjJoint **a1, struct ObjJoint *a2
 void func_80190168(struct ObjBone *b, UNUSED struct ObjJoint *a1, UNUSED struct ObjJoint *a2,
                    struct GdVec3f *a3) {
     struct GdVec3f sp7C;
-    UNUSED u8 pad64[0x7c - 0x64];
     f32 sp60;
     f32 sp5C;
     f32 sp58;
-    UNUSED u8 pad1C[0x58 - 0x1C];
 
     return;
 
@@ -664,16 +650,11 @@ void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 
     struct ObjJoint *sp274; // = a2?
     struct ObjJoint *sp270; // mid-point of stack array?
     struct ObjJoint *sp26C; // jointstackarr[i]? curjoint?
-    UNUSED u32 pad268;
-    UNUSED u32 sp264 = 0;
-    UNUSED u32 sp258[3]; // unused vec?
     struct GdVec3f sp24C = {0, 0, 0};
     struct GdVec3f sp240;
-    UNUSED u32 pad238[2];
     s32 sp234; // i?
     s32 sp230;
     s32 sp22C = 1;
-    UNUSED u32 pad228;
     s32 sp224;
     s32 sp220;
     struct ObjJoint *sp120[0x40];
@@ -775,7 +756,6 @@ void func_801909B4(void) {
 /* 23F1F0 -> 23F324; not called */
 void func_80190A20(void) {
     struct ObjJoint *j; // sp3c
-    UNUSED u32 pad38;
     struct GdVec3f vec; // sp2C
     struct ObjGroup *grp;
     struct ListNode *link;
@@ -799,16 +779,13 @@ void func_80190A20(void) {
 }
 
 /* 23F324 -> 23F638 */
-void func_80190B54(struct ObjJoint *a0, struct ObjJoint *a1, struct GdVec3f *a2) // b0
-{
+void func_80190B54(struct ObjJoint *a0, struct ObjJoint *a1, struct GdVec3f *a2) { // b0
     struct GdVec3f spA4;
-    UNUSED struct GdVec3f pad98;
     struct GdVec3f sp8C;
     struct GdVec3f sp80;
     f32 sp7C;
     f32 sp78;
     Mat4f sp38;
-    UNUSED u8 pad1C[0x1C];
 
     if (a1 != NULL) {
         spA4.x = a1->unk3C.x;
@@ -865,7 +842,6 @@ void func_80190E68(struct GdObj *obj, f32 x, f32 y, f32 z) {
     struct ObjJoint *sp44;
     struct GdObj *sp40;
     struct GdVec3f vec;
-    UNUSED u32 pad1C[6];
 
     vec.x = x;
     vec.y = y;
@@ -1025,10 +1001,6 @@ void reset_joint(struct ObjJoint *j) {
 
 /* 23FFF4 -> 2400C4 */
 void func_80191824(struct ObjJoint *j) {
-    UNUSED struct ObjNet *sp14;
-    UNUSED u32 pad00[4];
-
-    sp14 = gGdSkinNet->unk1F0;
     if (j->flags & 0x1) {
         j->worldPos.x = gGdSkinNet->worldPos.x;
         j->worldPos.y = gGdSkinNet->worldPos.y;

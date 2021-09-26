@@ -22,7 +22,8 @@ int gSplineState;
 
 /// Copy vector 'src' to 'dest'
 void vec3f_copy(Vec3f dest, Vec3f src) {
-    vec3_copy(dest, src);
+    ((u64 *) dest)[0] = ((u64 *) src)[0];
+    ((u32 *) dest)[2] = ((u32 *) src)[2];
 }
 
 /// Set vector 'dest' to (x, y, z)
@@ -32,7 +33,16 @@ void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z) {
 
 /// Add vector 'a' to 'dest'
 void vec3f_add(Vec3f dest, Vec3f a) {
-    vec3_add(dest, a);
+    register f32 *temp = dest;
+    register s32 j;
+    register f32 sum, sum2;
+    for (j = 0; j < 3; j++) {
+        sum = *a;
+        a++;
+        sum2 = *temp;
+        temp++;
+        temp[-1] = (sum + sum2);
+    }
 }
 
 /// Make 'dest' the sum of vectors a and b.
@@ -63,6 +73,10 @@ void vec3s_sum(Vec3s dest, Vec3s a, Vec3s b) {
 /// Subtract vector a from 'dest'
 void vec3s_sub(Vec3s dest, Vec3s a) {
     vec3_sub(dest, a);
+}
+
+void vec3f_sub(Vec3f dest, Vec3f src) {
+    vec3_sub(dest, src);
 }
 
 /**
@@ -131,7 +145,7 @@ void mtxf_identity(Mat4 mtx) {
  */
 void mtxf_translate(Mat4 dest, Vec3f b) {
     mtxf_identity(dest);
-    vec3_copy(dest[3], b);
+    vec3f_copy(dest[3], b);
 }
 
 /**
@@ -311,10 +325,10 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
     vec3_cross(forwardDir, leftDir, upDir);
     vec3f_normalize(forwardDir);
 
-    vec3_copy(dest[0], leftDir);
-    vec3_copy(dest[1], upDir);
-    vec3_copy(dest[2], forwardDir);
-    vec3_copy(dest[3], pos);
+    vec3f_copy(dest[0], leftDir);
+    vec3f_copy(dest[1], upDir);
+    vec3f_copy(dest[2], forwardDir);
+    vec3f_copy(dest[3], pos);
 
     dest[0][3] = 0.0f;
     dest[1][3] = 0.0f;
@@ -370,9 +384,9 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     vec3f_normalize(xColumn);
     vec3_cross(zColumn, xColumn, yColumn);
     vec3f_normalize(zColumn);
-    vec3_copy(mtx[0], xColumn);
-    vec3_copy(mtx[1], yColumn);
-    vec3_copy(mtx[2], zColumn);
+    vec3f_copy(mtx[0], xColumn);
+    vec3f_copy(mtx[1], yColumn);
+    vec3f_copy(mtx[2], zColumn);
 
     mtx[3][0] = pos[0];
     mtx[3][1] = (avgY < pos[1]) ? pos[1] : avgY;
@@ -857,7 +871,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
         return FALSE;
     }
     // Successful contact
-    vec3_copy(add_dir, dir);
+    vec3f_copy(add_dir, dir);
     vec3_mul_val(add_dir, *length);
     vec3_sum(hit_pos, orig, add_dir);
     return TRUE;
@@ -891,7 +905,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
         if ((hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length)) != 0) {
             if (length <= *max_length) {
                 *hit_surface = list->surface;
-                vec3_copy(hit_pos, chk_hit_pos);
+                vec3f_copy(hit_pos, chk_hit_pos);
                 *max_length = length;
             }
         }
@@ -940,7 +954,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     // Get normalized direction
     dir_length = vec3f_length(dir);
     max_length = dir_length;
-    vec3_copy(normalized_dir, dir);
+    vec3f_copy(normalized_dir, dir);
     vec3f_normalize(normalized_dir);
 
     // Get our cell coordinate

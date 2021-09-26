@@ -1,5 +1,4 @@
-#ifndef GD_RENDERER_H
-#define GD_RENDERER_H
+#pragma once
 
 #include <PR/ultratypes.h>
 #include <PR/os_cont.h>
@@ -98,7 +97,6 @@ void set_Vtx_norm_buf_1(struct GdVec3f *norm);
 void set_Vtx_norm_buf_2(struct GdVec3f *norm);
 void set_gd_mtx_parameters(s32 params);
 void gd_set_one_cycle(void);
-void gddl_is_loading_stub_dl(UNUSED s32 dlLoad);
 void start_view_dl(struct ObjView *view);
 void border_active_view(void);
 void gd_shading(s32 model);
@@ -113,7 +111,6 @@ long defpup(UNUSED const char *menufmt, ...);
 void menu_cb_control_type(u32);
 void menu_cb_recalibrate_controller(u32);
 void func_801A4438(f32 x, f32 y, f32 z);
-void stub_draw_label_text(UNUSED char *s);
 void set_active_view(struct ObjView *v);
 void func_801A520C(void);
 void gd_init(void);
@@ -122,5 +119,3 @@ void store_in_pickbuf(s16 data);
 s32 get_cur_pickbuf_offset(UNUSED s16 *arg0);
 void set_vtx_tc_buf(f32 tcS, f32 tcT);
 struct GdObj *load_dynlist(struct DynList *dynlist);
-
-#endif // GD_RENDERER_H

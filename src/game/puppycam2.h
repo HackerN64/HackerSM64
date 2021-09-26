@@ -1,5 +1,4 @@
-#ifndef PUPPYCAM2_H
-#define PUPPYCAM2_H
+#pragma once
 
 #ifdef PUPPYCAM
 
@@ -132,7 +131,7 @@ struct sPuppyVolume
     Vec3s pos; //The set position of the volume
     Vec3s radius; //Where it extends.
     s16 rot; //The rotational angle of the volume.
-    s32 *func; //a pointer to a function. Optional.
+    s32 (*func)(); //a pointer to a function. Optional.
     struct sPuppyAngles *angles; //A pointer to a gPuppyAngles struct. Optional
     s32 flagsAdd; //Adds behaviour flags.
     s32 flagsRemove; //Removes behaviour flags.
@@ -189,11 +188,9 @@ extern s16 LENSIN(s16 length, s16 direction);
 extern void puppycam_display_options(void);
 extern void puppycam_set_save(void);
 extern void puppycam_check_pause_buttons(void);
-extern void puppycam_activate_cutscene(s32 *scene, s32 lockinput);
+extern void puppycam_activate_cutscene(s32 (*scene)(), s32 lockinput);
 extern void puppycam_render_option_text();
 extern void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacementZ);
 extern s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline splineFocus[], s32 mode, s32 index);
 
 #endif
-
-#endif // PUPPYCAM2_H

@@ -1,5 +1,4 @@
-#ifndef PROFILER_H
-#define PROFILER_H
+#pragma once
 
 #include <PR/ultratypes.h>
 #include <PR/os_time.h>
@@ -47,5 +46,3 @@ void profiler_log_thread4_time(void);
 void profiler_log_gfx_time(enum ProfilerGfxEvent eventID);
 void profiler_log_vblank_time(void);
 void draw_profiler(void);
-
-#endif // PROFILER_H

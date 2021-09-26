@@ -125,5 +125,3 @@ const GeoLayout toad_geo[] = {
    GEO_CLOSE_NODE(),
    GEO_END(),
 };
-
-UNUSED static const u64 toad_unused_1 = 0;
