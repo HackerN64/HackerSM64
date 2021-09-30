@@ -361,7 +361,12 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
             set_mario_action(m, ACT_SPECIAL_DEATH_EXIT, 0);
             break;
     }
-
+#ifdef PREVENT_DEATH_LOOP
+    if (gMarioState->isDead) {
+        gMarioState->health = 0x880;
+        gMarioState->isDead = 0;
+    }
+#endif
     set_mario_initial_cap_powerup(m);
 }
 
