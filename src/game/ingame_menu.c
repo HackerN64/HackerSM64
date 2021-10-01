@@ -1490,16 +1490,16 @@ void print_animated_red_coin(s16 x, s16 y) {
 
     switch (timer & 6) {
         case 0:
-            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_03007940);
+            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_front);
             break;
         case 2:
-            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_03007968);
+            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_tilt_right);
             break;
         case 4:
-            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_03007990);
+            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_side);
             break;
         case 6:
-            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_030079B8);
+            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_tilt_left);
             break;
     }
 
