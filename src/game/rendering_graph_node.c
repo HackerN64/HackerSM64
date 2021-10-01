@@ -89,13 +89,13 @@ struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
     G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_INTER
     G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_DECAL
     G_RM_AA_TEX_EDGE,                   // LAYER_ALPHA
-    #if SILHOUETTE
+#if SILHOUETTE
     G_RM_AA_TEX_EDGE | ZMODE_DEC,       // LAYER_ALPHA_DECAL
     G_RM_AA_OPA_SURF,                   // LAYER_SILHOUETTE_OPAQUE
     G_RM_AA_TEX_EDGE,                   // LAYER_SILHOUETTE_ALPHA
     G_RM_AA_OPA_SURF,                   // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
     G_RM_AA_TEX_EDGE,                   // LAYER_OCCLUDE_SILHOUETTE_ALPHA
-    #endif
+#endif
     G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_DECAL
     G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT
     G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_INTER
@@ -107,13 +107,13 @@ struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
     G_RM_AA_ZB_OPA_INTER,               // LAYER_OPAQUE_INTER
     G_RM_AA_ZB_OPA_DECAL,               // LAYER_OPAQUE_DECAL
     G_RM_AA_ZB_TEX_EDGE,                // LAYER_ALPHA
-    #if SILHOUETTE
+#if SILHOUETTE
     G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,    // LAYER_ALPHA_DECAL
     G_RM_AA_ZB_OPA_SURF,                // LAYER_SILHOUETTE_OPAQUE
     G_RM_AA_ZB_TEX_EDGE,                // LAYER_SILHOUETTE_ALPHA
     G_RM_AA_ZB_OPA_SURF,                // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
     G_RM_AA_ZB_TEX_EDGE,                // LAYER_OCCLUDE_SILHOUETTE_ALPHA
-    #endif
+#endif
     G_RM_AA_ZB_XLU_DECAL,               // LAYER_TRANSPARENT_DECAL
     G_RM_AA_ZB_XLU_SURF,                // LAYER_TRANSPARENT
     G_RM_AA_ZB_XLU_INTER,               // LAYER_TRANSPARENT_INTER
@@ -809,16 +809,15 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
     if (gCurGraphNodeCamera != NULL && gCurGraphNodeObject != NULL) {
         if (gCurGraphNodeHeldObject != NULL) {
             get_pos_from_transform_mtx(shadowPos, gMatStack[gMatStackIndex], *gCurGraphNodeCamera->matrixPtr);
-            shadowScale = node->shadowScale;
+            shadowScale = (node->shadowScale * gCurGraphNodeHeldObject->objNode->header.gfx.scale[0]);
         } else {
             vec3f_copy(shadowPos, gCurGraphNodeObject->pos);
-            shadowScale = node->shadowScale * gCurGraphNodeObject->scale[0];
+            shadowScale = (node->shadowScale * gCurGraphNodeObject->scale[0]);
         }
 
         f32 objScale = 1.0f;
         if (gCurAnimEnabled) {
-            if (gCurAnimType == ANIM_TYPE_TRANSLATION
-                || gCurAnimType == ANIM_TYPE_LATERAL_TRANSLATION) {
+            if (gCurAnimType == ANIM_TYPE_TRANSLATION || gCurAnimType == ANIM_TYPE_LATERAL_TRANSLATION) {
                 geo = node->node.children;
                 if (geo != NULL && geo->type == GRAPH_NODE_TYPE_SCALE) {
                     objScale = ((struct GraphNodeScale *) geo)->scale;
@@ -833,8 +832,8 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                 f32 sinAng = sins(gCurGraphNodeObject->angle[1]);
                 f32 cosAng = coss(gCurGraphNodeObject->angle[1]);
 
-                shadowPos[0] +=  animOffset[0] * cosAng + animOffset[2] * sinAng;
-                shadowPos[2] += -animOffset[0] * sinAng + animOffset[2] * cosAng;
+                shadowPos[0] += ( animOffset[0] * cosAng) + (animOffset[2] * sinAng);
+                shadowPos[2] += (-animOffset[0] * sinAng) + (animOffset[2] * cosAng);
             }
         }
         Gfx *shadowList = create_shadow_below_xyz(shadowPos[0], shadowPos[1], shadowPos[2], shadowScale, node->shadowSolidity, node->shadowType);
@@ -1108,70 +1107,27 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                 geo_try_process_children(curGraphNode);
             } else {
                 switch (curGraphNode->type) {
-                    case GRAPH_NODE_TYPE_ORTHO_PROJECTION:
-                        geo_process_ortho_projection((struct GraphNodeOrthoProjection *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_PERSPECTIVE:
-                        geo_process_perspective((struct GraphNodePerspective *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_MASTER_LIST:
-                        geo_process_master_list((struct GraphNodeMasterList *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:
-                        geo_process_level_of_detail((struct GraphNodeLevelOfDetail *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_SWITCH_CASE:
-                        geo_process_switch((struct GraphNodeSwitchCase *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_CAMERA:
-                        geo_process_camera((struct GraphNodeCamera *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_TRANSLATION_ROTATION:
-                        geo_process_translation_rotation(
-                            (struct GraphNodeTranslationRotation *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_TRANSLATION:
-                        geo_process_translation((struct GraphNodeTranslation *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_ROTATION:
-                        geo_process_rotation((struct GraphNodeRotation *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_OBJECT:
-                        geo_process_object((struct Object *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_ANIMATED_PART:
-                        geo_process_animated_part((struct GraphNodeAnimatedPart *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_BILLBOARD:
-                        geo_process_billboard((struct GraphNodeBillboard *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_DISPLAY_LIST:
-                        geo_process_display_list((struct GraphNodeDisplayList *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_SCALE:
-                        geo_process_scale((struct GraphNodeScale *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_SHADOW:
-                        geo_process_shadow((struct GraphNodeShadow *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_OBJECT_PARENT:
-                        geo_process_object_parent((struct GraphNodeObjectParent *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_GENERATED_LIST:
-                        geo_process_generated_list((struct GraphNodeGenerated *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_BACKGROUND:
-                        geo_process_background((struct GraphNodeBackground *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_HELD_OBJ:
-                        geo_process_held_object((struct GraphNodeHeldObject *) curGraphNode);
-                        break;
-                    case GRAPH_NODE_TYPE_BONE:
-                        geo_process_bone((struct GraphNodeBone *) curGraphNode);
-                        break;
-                    default:
-                        geo_try_process_children((struct GraphNode *) curGraphNode);
-                        break;
+                    case GRAPH_NODE_TYPE_ORTHO_PROJECTION:     geo_process_ortho_projection    ((struct GraphNodeOrthoProjection     *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_PERSPECTIVE:          geo_process_perspective         ((struct GraphNodePerspective         *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_MASTER_LIST:          geo_process_master_list         ((struct GraphNodeMasterList          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_LEVEL_OF_DETAIL:      geo_process_level_of_detail     ((struct GraphNodeLevelOfDetail       *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_SWITCH_CASE:          geo_process_switch              ((struct GraphNodeSwitchCase          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_CAMERA:               geo_process_camera              ((struct GraphNodeCamera              *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_TRANSLATION_ROTATION: geo_process_translation_rotation((struct GraphNodeTranslationRotation *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_TRANSLATION:          geo_process_translation         ((struct GraphNodeTranslation         *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_ROTATION:             geo_process_rotation            ((struct GraphNodeRotation            *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_OBJECT:               geo_process_object              ((struct Object                       *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_ANIMATED_PART:        geo_process_animated_part       ((struct GraphNodeAnimatedPart        *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_BILLBOARD:            geo_process_billboard           ((struct GraphNodeBillboard           *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_DISPLAY_LIST:         geo_process_display_list        ((struct GraphNodeDisplayList         *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_SCALE:                geo_process_scale               ((struct GraphNodeScale               *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_SHADOW:               geo_process_shadow              ((struct GraphNodeShadow              *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_OBJECT_PARENT:        geo_process_object_parent       ((struct GraphNodeObjectParent        *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_GENERATED_LIST:       geo_process_generated_list      ((struct GraphNodeGenerated           *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_BACKGROUND:           geo_process_background          ((struct GraphNodeBackground          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_HELD_OBJ:             geo_process_held_object         ((struct GraphNodeHeldObject          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_BONE:                 geo_process_bone                ((struct GraphNodeBone                *) curGraphNode); break;
+                    default:                                   geo_try_process_children        ((struct GraphNode                    *) curGraphNode); break;
                 }
             }
         } else {
