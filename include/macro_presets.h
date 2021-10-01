@@ -85,7 +85,7 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvBreakableBox, MODEL_BREAKABLE_BOX, 0},
     {bhvBreakableBox, MODEL_BREAKABLE_BOX, 1},
     {bhvPushableMetalBox, MODEL_METAL_BOX, 0},
-    {bhvBreakableBoxSmall, MODEL_BREAKABLE_BOX_SMALL, 0},
+    {bhvBreakableBoxSmall, MODEL_BREAKABLE_BOX, 0},
     {bhvFloorSwitchHiddenObjects, MODEL_PURPLE_SWITCH, 0},
     {bhvHiddenObject, MODEL_BREAKABLE_BOX, 0},
     {bhvHiddenObject, MODEL_BREAKABLE_BOX, 1}, // unused

@@ -1188,7 +1188,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     if ((v < 0.0f) || ((u + v) > 1.0f)) return FALSE;
     // Get the length between our origin and the surface contact point
     *length = f * vec3f_dot(e2, q);
-    if (*length <= 0.00001 || *length > dir_length) return FALSE;
+    if (*length <= NEAR_ZERO || *length > dir_length) return FALSE;
     // Successful contact
     vec3f_copy(add_dir, dir);
     vec3_mul_val(add_dir, *length);

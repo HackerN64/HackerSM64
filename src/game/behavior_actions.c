@@ -110,7 +110,6 @@ void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
 #include "behaviors/piranha_bubbles.inc.c"
 #include "behaviors/purple_switch.inc.c"
 #include "behaviors/metal_box.inc.c"
-#include "behaviors/switch_hidden_objects.inc.c"
 #include "behaviors/breakable_box.inc.c"
 
 // not sure what this is doing here. not in a behavior file.

@@ -336,7 +336,7 @@ static void eyerok_hand_act_become_active(void) {
 static void eyerok_hand_act_die(void) {
     if (cur_obj_init_anim_and_check_if_end(1)) {
         o->parentObj->oEyerokBossActiveHandId = 0;
-        obj_explode_and_spawn_coins(150.0f, 1);
+        obj_explode_and_spawn_coins(150.0f, COIN_TYPE_YELLOW);
         create_sound_spawner(SOUND_OBJ2_EYEROK_SOUND_LONG);
     }
 

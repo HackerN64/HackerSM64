@@ -648,7 +648,7 @@ Gfx *create_shadow_circle_9_verts(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
     Gfx *displayList = alloc_display_list(5 * sizeof(Gfx));
 
     if (verts == NULL || displayList == NULL) {
-        return 0;
+        return NULL;
     }
     for (i = 0; i < 9; i++) {
         make_shadow_vertex(verts, i, shadow, SHADOW_WITH_9_VERTS);
@@ -672,7 +672,7 @@ Gfx *create_shadow_circle_4_verts(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
     Gfx *displayList = alloc_display_list(5 * sizeof(Gfx));
 
     if (verts == NULL || displayList == NULL) {
-        return 0;
+        return NULL;
     }
 
     for (i = 0; i < 4; i++) {

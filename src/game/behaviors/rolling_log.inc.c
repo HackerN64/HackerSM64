@@ -81,7 +81,7 @@ void bhv_rolling_log_loop(void) {
     }
 
     o->oFaceAnglePitch += o->oAngleVelPitch;
-    if (absf_2(o->oFaceAnglePitch & 0x1FFF) < 528.0f && o->oAngleVelPitch != 0) {
+    if (absf(o->oFaceAnglePitch & 0x1FFF) < 528.0f && o->oAngleVelPitch != 0) {
         cur_obj_play_sound_2(SOUND_GENERAL_UNKNOWN1_2);
     }
 }

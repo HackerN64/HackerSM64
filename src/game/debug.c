@@ -455,12 +455,10 @@ void try_do_mario_debug_object_spawn(void) {
             spawn_object_relative(0, 0, 100, 200, gCurrentObject, MODEL_KOOPA_SHELL, bhvKoopaShell);
         }
         if (gPlayer1Controller->buttonPressed & L_JPAD) {
-            spawn_object_relative(0, 0, 100, 200, gCurrentObject, MODEL_BREAKABLE_BOX_SMALL,
-                                  bhvJumpingBox);
+            spawn_object_relative(0, 0, 100, 200, gCurrentObject, MODEL_BREAKABLE_BOX, bhvJumpingBox);
         }
         if (gPlayer1Controller->buttonPressed & D_JPAD) {
-            spawn_object_relative(0, 0, 100, 200, gCurrentObject, MODEL_KOOPA_SHELL,
-                                  bhvKoopaShellUnderwater);
+            spawn_object_relative(0, 0, 100, 200, gCurrentObject, MODEL_KOOPA_SHELL, bhvKoopaShellUnderwater);
         }
     }
 }
