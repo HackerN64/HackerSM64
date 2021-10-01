@@ -97,7 +97,7 @@
 //#define NO_GETTING_BURIED
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!
 #define PLATFORM_DISPLACEMENT_2
-// Allows Mario to ledgegrab sloped floors
+// Prevents Mario from being able to grab floors that would kick him off immediately.
 #define NO_FALSE_LEDGEGRABS
 // Use Shindou's pole behavior
 //#define SHINDOU_POLES

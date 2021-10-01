@@ -547,22 +547,19 @@ void update_ledge_climb(struct MarioState *m, s32 animation, u32 endAction) {
 }
 
 s32 act_ledge_grab(struct MarioState *m) {
-    f32 heightAboveFloor;
-    s16 intendedDYaw = m->intendedYaw - m->faceAngle[1];
-    s32 hasSpaceForMario = (m->ceilHeight - m->floorHeight >= 160.0f);
-
     if (m->actionTimer < 10) {
         m->actionTimer++;
     }
-#ifndef NO_FALSE_LEDGEGRABS
+
     if (m->floor->normal.y < COS25) {
         return let_go_of_ledge(m);
     }
-#endif
+
     if (m->input & (INPUT_Z_PRESSED | INPUT_OFF_FLOOR)) {
         return let_go_of_ledge(m);
     }
 
+    s32 hasSpaceForMario = (m->ceilHeight - m->floorHeight >= 160.0f);
     if ((m->input & INPUT_A_PRESSED) && hasSpaceForMario) {
         return set_mario_action(m, ACT_LEDGE_CLIMB_FAST, 0);
     }
@@ -573,14 +570,8 @@ s32 act_ledge_grab(struct MarioState *m) {
         }
         return let_go_of_ledge(m);
     }
-#ifdef VERSION_EU
-    // On EU, you can't slow climb up ledges while holding A.
-    if (m->actionTimer == 10 && (m->input & INPUT_NONZERO_ANALOG) && !(m->input & INPUT_A_DOWN))
-#else
-    if (m->actionTimer == 10 && (m->input & INPUT_NONZERO_ANALOG))
-#endif
-    {
-        if (intendedDYaw >= -0x4000 && intendedDYaw <= 0x4000) {
+    if (m->actionTimer == 10 && (m->input & INPUT_NONZERO_ANALOG)) {
+        if (abs_angle_diff(m->intendedYaw, m->faceAngle[1]) <= 0x4000) {
             if (hasSpaceForMario) {
                 return set_mario_action(m, ACT_LEDGE_CLIMB_SLOW_1, 0);
             }
@@ -589,7 +580,7 @@ s32 act_ledge_grab(struct MarioState *m) {
         }
     }
 
-    heightAboveFloor = m->pos[1] - find_floor_height_relative_polar(m, -0x8000, 30.0f);
+    f32 heightAboveFloor = m->pos[1] - find_floor_height_relative_polar(m, -0x8000, 30.0f);
     if (hasSpaceForMario && heightAboveFloor < 100.0f) {
         return set_mario_action(m, ACT_LEDGE_CLIMB_FAST, 0);
     }

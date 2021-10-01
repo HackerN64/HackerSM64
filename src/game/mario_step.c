@@ -356,33 +356,32 @@ s32 perform_ground_step(struct MarioState *m) {
 }
 
 struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *grabbedWall, struct Surface *wall, Vec3f intendedPos, Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
-    f32 displacementX, displacementZ;
-
-    if (m->vel[1] > 0) {
-        return FALSE;
-    }
-
+    if (m->vel[1] > 0) return FALSE;
     // Return the already grabbed wall if Mario is moving into it more than the newly tested wall
-    if (grabbedWall != NULL &&
-        grabbedWall->normal.x * m->vel[0] + grabbedWall->normal.z * m->vel[2] < wall->normal.x * m->vel[0] + wall->normal.z * m->vel[2])
+    if ((grabbedWall != NULL) && (((grabbedWall->normal.x * m->vel[0]) + (grabbedWall->normal.z * m->vel[2])) < ((wall->normal.x * m->vel[0]) + (wall->normal.z * m->vel[2])))) {
         return grabbedWall;
+    }
+    f32 displacementX = (nextPos[0] - intendedPos[0]);
+    f32 displacementZ = (nextPos[2] - intendedPos[2]);
 
-    displacementX = nextPos[0] - intendedPos[0];
-    displacementZ = nextPos[2] - intendedPos[2];
-
-    // Only ledge grab if the wall displaced Mario in the opposite direction of
-    // his velocity.
-    if (displacementX * m->vel[0] + displacementZ * m->vel[2] > 0.0f) {
+    // Only ledge grab if the wall displaced Mario in the opposite direction of his velocity.
+    if (((displacementX * m->vel[0]) + (displacementZ * m->vel[2])) > 0.0f) {
         return grabbedWall;
     }
 
     //! Since the search for floors starts at y + 160, we will sometimes grab
     // a higher ledge than expected (glitchy ledge grab)
-    ledgePos[0] = nextPos[0] - wall->normal.x * 60.0f;
-    ledgePos[2] = nextPos[2] - wall->normal.z * 60.0f;
-    ledgePos[1] = find_floor(ledgePos[0], nextPos[1] + 160.0f, ledgePos[2], ledgeFloor);
+    ledgePos[0] = (nextPos[0] - (wall->normal.x * 60.0f));
+    ledgePos[2] = (nextPos[2] - (wall->normal.z * 60.0f));
+    ledgePos[1] = find_floor(ledgePos[0], (nextPos[1] + 160.0f), ledgePos[2], ledgeFloor);
 
-    if (ledgePos[1] - nextPos[1] <= 100.0f) {
+#ifdef NO_FALSE_LEDGEGRABS
+    if ((ledgeFloor == NULL)|| (*ledgeFloor)->normal.y < COS25) {
+        return grabbedWall;
+    }
+#endif
+
+    if ((ledgePos[1] - nextPos[1]) <= 100.0f) {
         return grabbedWall;
     }
     return wall;
@@ -508,17 +507,17 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     //! When the wall is not completely vertical or there is a slight wall
     // misalignment, you can activate these conditions in unexpected situations
 
-    if ((stepArg & AIR_STEP_CHECK_LEDGE_GRAB) && upperWall.numWalls == 0) {
+    if ((stepArg & AIR_STEP_CHECK_LEDGE_GRAB) && upperWall.numWalls == 0 && lowerWall.numWalls != 0) {
         for (i = 0; i < lowerWall.numWalls; i++) {
             if ((grabbedWall = check_ledge_grab(m, grabbedWall, lowerWall.walls[i], intendedPos, nextPos, ledgePos, &ledgeFloor))) {
                 stepResult = AIR_STEP_GRABBED_LEDGE;
             }
         }
-        if (stepResult == AIR_STEP_GRABBED_LEDGE) {
+        if (stepResult == AIR_STEP_GRABBED_LEDGE && grabbedWall != NULL && ledgeFloor != NULL && ledgePos != NULL) {
             vec3f_copy(m->pos, ledgePos);
             set_mario_floor(m, floor, ledgePos[1]);
-            m->faceAngle[0] = 0;
-            m->faceAngle[1] = atan2s(grabbedWall->normal.z, grabbedWall->normal.x) + 0x8000;
+            m->faceAngle[0] = 0x0;
+            m->faceAngle[1] = SURFACE_YAW(grabbedWall) + 0x8000;
         } else {
             vec3f_copy(m->pos, nextPos);
             set_mario_floor(m, floor, floorHeight);

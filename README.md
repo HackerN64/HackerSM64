@@ -23,8 +23,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Slope fix and exposed ceilings fix
 - No false ledgegrabs fix *
 - Jump kick fix *
-- 46 degree wallkicks *
-- Pole fix
+- Configurable wallkick angle, in degrees *
 - Possibility of disabling BLJs *
 - Hanging fix (mario can grab hangable ceilings from any state, instead of only jump or double jump) *
 - Increased maximum pole length (The game will read bparam1 and bparam2 together as a single value, so you can have a very long pole) *
