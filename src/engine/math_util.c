@@ -776,7 +776,7 @@ void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *
     register f32 xs = x * x;
     register f32 zs = z * z;
 
-    *dist = sqrtf(xs + zs + y * y)
+    *dist = sqrtf(xs + zs + y * y);
     *pitch = atan2s(sqrtf(xs + zs), y);
     *yaw = atan2s(z, x);
 }
