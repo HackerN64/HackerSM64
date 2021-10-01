@@ -177,8 +177,7 @@ void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
     s32 srcIndex = 0;
 
     // Don't continue if there is no memory to do so.
-    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
-                                                        sizeof(struct TextLabel))) == NULL) {
+    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool, sizeof(struct TextLabel))) == NULL) {
         return;
     }
 

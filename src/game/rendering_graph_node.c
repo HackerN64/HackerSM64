@@ -961,7 +961,7 @@ void geo_process_object(struct Object *node) {
             gMatStackIndex--;
             inc_mat_stack();
             if (node->header.gfx.sharedChild != NULL) {
-                #ifdef VISUAL_DEBUG
+#ifdef VISUAL_DEBUG
                 if (hitboxView) {
                     Vec3f bnds1, bnds2;
                     // This will create a cylinder that visualises their hitbox.
@@ -969,10 +969,11 @@ void geo_process_object(struct Object *node) {
                     if (node->oIntangibleTimer != -1) {
                         vec3f_set(bnds1, node->oPosX, node->oPosY - node->hitboxDownOffset, node->oPosZ);
                         vec3f_set(bnds2, node->hitboxRadius, node->hitboxHeight-node->hitboxDownOffset, node->hitboxRadius);
-                        if (node->behavior == segmented_to_virtual(bhvWarp) || node->behavior == segmented_to_virtual(bhvDoorWarp) || node->behavior == segmented_to_virtual(bhvFadingWarp))
+                        if (node->behavior == segmented_to_virtual(bhvWarp) || node->behavior == segmented_to_virtual(bhvDoorWarp) || node->behavior == segmented_to_virtual(bhvFadingWarp)) {
                             debug_box_color(0x80FFA500);
-                        else
+                        } else {
                             debug_box_color(0x800000FF);
+                        }
                         debug_box(bnds1, bnds2, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_REJ);
                         vec3f_set(bnds1, node->oPosX, node->oPosY - node->hitboxDownOffset, node->oPosZ);
                         vec3f_set(bnds2, node->hurtboxRadius, node->hurtboxHeight, node->hurtboxRadius);
@@ -985,7 +986,7 @@ void geo_process_object(struct Object *node) {
                         debug_box(bnds1, bnds2, DEBUG_SHAPE_BOX | DEBUG_UCODE_REJ);
                     }
                 }
-                #endif
+#endif
                 gCurGraphNodeObject = (struct GraphNodeObject *) node;
                 node->header.gfx.sharedChild->parent = &node->header.gfx.node;
                 geo_process_node_and_siblings(node->header.gfx.sharedChild);
