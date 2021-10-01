@@ -95,17 +95,13 @@ VERSION ?= us
 $(eval $(call validate-option,VERSION,jp us eu sh))
 
 ifeq      ($(VERSION),jp)
-  DEFINES   += VERSION_JP=1
-  GRUCODE   ?= f3dzex
+  DEFINES += VERSION_JP=1
 else ifeq ($(VERSION),us)
-  DEFINES   += VERSION_US=1
-  GRUCODE   ?= f3dzex
+  DEFINES += VERSION_US=1
 else ifeq ($(VERSION),eu)
-  DEFINES   += VERSION_EU=1
-  GRUCODE   ?= f3dzex
+  DEFINES += VERSION_EU=1
 else ifeq ($(VERSION),sh)
-  DEFINES   += VERSION_SH=1
-  GRUCODE   ?= f3dzex
+  DEFINES += VERSION_SH=1
 endif
 
 DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
@@ -119,6 +115,7 @@ TARGET := sm64.$(VERSION)
 #   l3dex2  - F3DEX2 version that only renders in wireframe
 #   f3dzex  - newer, experimental microcode used in Animal Crossing
 #   super3d - extremely experimental version of Fast3D lacking many features for speed
+GRUCODE ?= f3dzex
 $(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2))
 
 ifeq ($(GRUCODE),f3dex) # Fast3DEX
