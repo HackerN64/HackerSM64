@@ -31,6 +31,47 @@ extern const GeoLayout blue_coin_geo[];
 extern const GeoLayout blue_coin_no_shadow_geo[];
 extern const GeoLayout red_coin_geo[];
 extern const GeoLayout red_coin_no_shadow_geo[];
+#ifdef IA8_30FPS_COINS
+extern const GeoLayout silver_coin_geo[];
+extern const GeoLayout silver_coin_no_shadow_geo[];
+
+extern const Gfx coin_seg3_dl_yellow_0[];
+extern const Gfx coin_seg3_dl_yellow_22_5[];
+extern const Gfx coin_seg3_dl_yellow_45[];
+extern const Gfx coin_seg3_dl_yellow_67_5[];
+extern const Gfx coin_seg3_dl_yellow_90[];
+extern const Gfx coin_seg3_dl_yellow_67_5_r[];
+extern const Gfx coin_seg3_dl_yellow_45_r[];
+extern const Gfx coin_seg3_dl_yellow_22_5_r[];
+
+extern const Gfx coin_seg3_dl_blue_0[];
+extern const Gfx coin_seg3_dl_blue_22_5[];
+extern const Gfx coin_seg3_dl_blue_45[];
+extern const Gfx coin_seg3_dl_blue_67_5[];
+extern const Gfx coin_seg3_dl_blue_90[];
+extern const Gfx coin_seg3_dl_blue_67_5_r[];
+extern const Gfx coin_seg3_dl_blue_45_r[];
+extern const Gfx coin_seg3_dl_blue_22_5_r[];
+
+extern const Gfx coin_seg3_dl_red_0[];
+extern const Gfx coin_seg3_dl_red_22_5[];
+extern const Gfx coin_seg3_dl_red_45[];
+extern const Gfx coin_seg3_dl_red_67_5[];
+extern const Gfx coin_seg3_dl_red_90[];
+extern const Gfx coin_seg3_dl_red_67_5_r[];
+extern const Gfx coin_seg3_dl_red_45_r[];
+extern const Gfx coin_seg3_dl_red_22_5_r[];
+
+extern const Gfx coin_seg3_dl_secret_0[];
+extern const Gfx coin_seg3_dl_secret_22_5[];
+extern const Gfx coin_seg3_dl_secret_45[];
+extern const Gfx coin_seg3_dl_secret_67_5[];
+extern const Gfx coin_seg3_dl_secret_90[];
+extern const Gfx coin_seg3_dl_secret_67_5_r[];
+extern const Gfx coin_seg3_dl_secret_45_r[];
+extern const Gfx coin_seg3_dl_secret_22_5_r[];
+
+#else
 extern const Gfx coin_seg3_sub_dl_begin[];
 extern const Gfx coin_seg3_sub_dl_end[];
 extern const Gfx coin_seg3_dl_yellow_front[];
@@ -45,11 +86,12 @@ extern const Gfx coin_seg3_dl_red_front[];
 extern const Gfx coin_seg3_dl_red_tilt_right[];
 extern const Gfx coin_seg3_dl_red_side[];
 extern const Gfx coin_seg3_dl_red_tilt_left[];
+#endif
 
 // dirt
 extern const GeoLayout dirt_animation_geo[];
 extern const GeoLayout cartoon_star_geo[];
-extern const Gfx dirt_seg3_dl_0302BFF8[];
+extern const Gfx dirt_seg3_sub_dl_dirt_particle[];
 extern const Gfx dirt_seg3_dl_dirt_particle[];
 extern const Gfx dirt_seg3_sub_dl_cartoon_star[];
 extern const Gfx dirt_seg3_dl_cartoon_star_red[];
