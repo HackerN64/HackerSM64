@@ -182,6 +182,8 @@
 // NOTE: The overlap between Mario's model parts is visible on certain HLE plugins.
 // Also, this also disables anti-aliasing on Mario.
 #define SILHOUETTE 127
+// Use 64x64 quarter shadow textures (Vanilla are 16x16)
+#define HD_SHADOWS
 // Makes certain objects (mainly trees) transparent when the camera gets close
 #define OBJ_OPACITY_BY_CAM_DIST
 // Fixes the game reading the ia8 burn smoke texture as an rgba16

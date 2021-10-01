@@ -273,8 +273,13 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
  *      6 = (-15,  15)         7 = (0,  15)         8 = (15,  15)
  */
 void get_texture_coords_9_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
-    *textureX = vertexNum % 3 * 15 - 15;
-    *textureY = vertexNum / 3 * 15 - 15;
+#ifdef HD_SHADOWS
+    *textureX = (((vertexNum % 3) * 63) - 63);
+    *textureY = (((vertexNum / 3) * 63) - 63);
+#else
+    *textureX = (((vertexNum % 3) * 15) - 15);
+    *textureY = (((vertexNum / 3) * 15) - 15);
+#endif
 }
 
 /**
@@ -284,8 +289,13 @@ void get_texture_coords_9_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
  *      2 = (-15,  15)         3 = (15,  15)
  */
 void get_texture_coords_4_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
-    *textureX = (vertexNum % 2) * 2 * 15 - 15;
-    *textureY = (vertexNum / 2) * 2 * 15 - 15;
+#ifdef HD_SHADOWS
+    *textureX = (((vertexNum & 0x1) * 2 * 63) - 63);
+    *textureY = (((vertexNum /   2) * 2 * 63) - 63);
+#else
+    *textureX = (((vertexNum & 0x1) * 2 * 15) - 15);
+    *textureY = (((vertexNum /   2) * 2 * 15) - 15);
+#endif
 }
 
 /**

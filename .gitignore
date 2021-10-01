@@ -71,7 +71,14 @@ build/*
 !/assets/**/*custom*.bin
 !/assets/**/*custom*/**/*.bin
 !/textures/crash_custom/*.png
+
+# Specific assets
 !/actors/breath_meter/breath_meter_*.png
+!/textures/segment2/shadow_quarter_circle_64.ia8.png
+!/textures/segment2/shadow_quarter_square_64.ia8.png
+
+
+
 # libultra
 
 !/lib/*.a
