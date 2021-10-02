@@ -8,7 +8,7 @@
 
 .balign 32
 glabel mtxf_to_mtx_asm
-    lwc1 $f6, gWorldScale
+    li.s $f6, 4.0
     li.s $f8, 1.0
     li $v0, 1
     li.s $f4, 65536.0

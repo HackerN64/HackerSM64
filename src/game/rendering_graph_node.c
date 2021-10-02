@@ -49,7 +49,6 @@ s16 gMatStackIndex;
 Mat4 gMatStack[32];
 Mtx *gMatStackFixed[32];
 f32 sAspectRatio;
-f32 gWorldScale = 1.0f;
 
 /**
  * Animation nodes have state in global variables, so this struct captures
@@ -435,20 +434,7 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
 #else
         sAspectRatio = (4.0f / 3.0f); // 1.33333f
 #endif
-        if (gCamera) {
-            // gWorldScale = ((sqr(gCamera->pos[0]) + sqr(gCamera->pos[1]) + sqr(gCamera->pos[2])) / sqr(0x2000));
-            gWorldScale = (max_3f(ABS(gCamera->pos[0]), ABS(gCamera->pos[1]), ABS(gCamera->pos[2])) / (f32)0x2000);
-        } else {
-            gWorldScale = 1.0f;
-        }
-        farClip = CLAMP(farClip / gWorldScale, 4096, 61440);
-        if (farClip / farClipDelta != 1) {
-            farClipDelta /= farClip;
-            gWorldScale *= farClipDelta;
-        }
-        gWorldScale = MAX(gWorldScale, 1.0f);
-
-        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, ((farClip / 300) / gWorldScale), (farClip / gWorldScale), 1.0f);
+        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, ((farClip / 300) / 4), (farClip / 4), 1.0f);
         gSPPerspNormalize(gDisplayListHead++, perspNorm);
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
         gCurGraphNodeCamFrustum = node;

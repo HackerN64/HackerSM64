@@ -493,8 +493,6 @@ extern void mtxf_to_mtx_asm(register s16 *dest, register f32 *src);
 inline void mtxf_to_mtx(register s16 *dest, register f32 *src) {
     mtxf_to_mtx_asm(dest, src);
 }
-void mtxf_to_mtx_constant(register s16 *dest, register f32 *src);
-void mtxf_to_mtx_scale(Mtx *dest, Mat4 src);
 void mtxf_rotate_xy(Mtx *mtx, s32 angle);
 void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx);
 

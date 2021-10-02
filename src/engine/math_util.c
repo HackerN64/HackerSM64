@@ -582,42 +582,6 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
 }
 
 /**
- * Convert float matrix 'src' to fixed point matrix 'dest'.
- * The float matrix may not contain entries larger than 65536 or the console
- * crashes. The fixed point matrix has entries with a 16-bit integer part, so
- * the floating point numbers are multiplied by 2^16 before being cast to a s32
- * integer. If this doesn't fit, the N64 and iQue consoles will throw an
- * exception. On Wii and Wii U Virtual Console the value will simply be clamped
- * and no crashes occur.
-
- * Modified into a hybrid of the original function and the worldscale altered function.
- * Will check if the worldscale is below what's considered safe in vanilla bounds and
- * just run the faster vanilla function, otherwise it'll run the slower, but safer scale
- * function, for extended boundaries.
- */
-void mtxf_to_mtx_scale(Mtx *dest, Mat4 src) {
-    Mat4 temp;
-    register s32 i, j;
-    for(i = 0; i < 4; i++) {
-        for(j = 0; j < 3; j++) {
-            temp[i][j] = (src[i][j] / gWorldScale);
-        }
-        temp[i][3] = src[i][3];
-    }
-    guMtxF2L(temp, dest);
-}
-
-void mtxf_to_mtx_constant(register s16 *dest, register f32 *src) { //! TODO: asm
-    s32 asFixedPoint;
-    s32 i;
-    for (i = 0; i < 16; i++) {
-        asFixedPoint = (src[i] * (1 << 16));
-        dest[i     ] = (asFixedPoint >> 16);
-        dest[i + 16] = (asFixedPoint & 0xFFFF);
-    }
-}
-
-/**
  * Set 'mtx' to a transformation matrix that rotates around the z axis.
  */
 #define MATENTRY(a, b)                          \
