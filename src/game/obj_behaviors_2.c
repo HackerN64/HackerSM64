@@ -328,10 +328,8 @@ static s32 cur_obj_play_sound_at_anim_range(s8 startFrame1, s8 startFrame2, u32 
 }
 
 static s16 obj_turn_pitch_toward_mario(f32 targetOffsetY, s16 turnAmount) {
-    s16 targetPitch;
-
     o->oPosY -= targetOffsetY;
-    targetPitch = obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, turnAmount);
+    s16 targetPitch = obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, turnAmount);
     o->oPosY += targetOffsetY;
 
     return targetPitch;

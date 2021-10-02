@@ -37,21 +37,13 @@ static u8 sSpinyWalkAttackHandlers[] = {
  * If the spiny was spawned by lakitu and mario is far away, despawn.
  */
 static s32 spiny_check_active(void) {
-    if (o->parentObj != o) {
-        if (o->oDistanceToMario > 2500.0f) {
-            //! It's possible for the lakitu to despawn while the spiny still
-            //  references it. This line allows us to decrement the 0x1B field
-            //  in an object that loads into the lakitu's former slot.
-            //  This can be used in practice to corrupt a huge goomba to
-            //  behave similar to a regular goomba.
-            //  It can also be used on a bob-omb respawner to change its model
-            //  to a butterfly or fish.
+    if ((o->parentObj != o) && (o->oDistanceToMario > 2500.0f)) {
+        if (obj_has_behavior(o->parentObj, bhvEnemyLakitu)) {
             o->parentObj->oEnemyLakituNumSpinies--;
-            obj_mark_for_deletion(o);
-            return FALSE;
         }
+        obj_mark_for_deletion(o);
+        return FALSE;
     }
-
     return TRUE;
 }
 

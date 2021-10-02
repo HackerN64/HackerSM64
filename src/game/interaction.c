@@ -607,35 +607,21 @@ u32 determine_knockback_action(struct MarioState *m, UNUSED s32 arg) {
 }
 
 void push_mario_out_of_object(struct MarioState *m, struct Object *obj, f32 padding) {
-    f32 minDistance = obj->hitboxRadius + m->marioObj->hitboxRadius + padding;
-
-    f32 offsetX = m->pos[0] - obj->oPosX;
-    f32 offsetZ = m->pos[2] - obj->oPosZ;
+    f32 minDistance = (obj->hitboxRadius + m->marioObj->hitboxRadius + padding);
+    f32 offsetX = (m->pos[0] - obj->oPosX);
+    f32 offsetZ = (m->pos[2] - obj->oPosZ);
     f32 distance = (sqr(offsetX) + sqr(offsetZ));
-
     if (distance < sqr(minDistance)) {
         struct Surface *floor;
-        s16 pushAngle;
-        f32 newMarioX;
-        f32 newMarioZ;
-
-        if (distance == 0.0f) {
-            pushAngle = m->faceAngle[1];
-        } else {
-            pushAngle = atan2s(offsetZ, offsetX);
-        }
-
-        newMarioX = obj->oPosX + minDistance * sins(pushAngle);
-        newMarioZ = obj->oPosZ + minDistance * coss(pushAngle);
-
+        s16 pushAngle = ((distance == 0.0f) ? m->faceAngle[1] : atan2s(offsetZ, offsetX));
+        f32 newMarioX = obj->oPosX + minDistance * sins(pushAngle);
+        f32 newMarioZ = obj->oPosZ + minDistance * coss(pushAngle);
         f32_find_wall_collision(&newMarioX, &m->pos[1], &newMarioZ, 60.0f, 50.0f);
-
-        find_floor(newMarioX, m->pos[1], newMarioZ, &floor);
+        f32 floorHeight = find_floor(newMarioX, m->pos[1], newMarioZ, &floor);
         if (floor != NULL) {
-            //! Doesn't update Mario's referenced floor (allows oob death when
-            // an object pushes you into a steep slope while in a ground action)
             m->pos[0] = newMarioX;
             m->pos[2] = newMarioZ;
+            set_mario_floor(m, floor, floorHeight);
         }
     }
 }
@@ -645,12 +631,7 @@ void bounce_back_from_attack(struct MarioState *m, u32 interaction) {
         if (m->action == ACT_PUNCHING) {
             m->action = ACT_MOVE_PUNCHING;
         }
-
-        if (m->action & ACT_FLAG_AIR) {
-            mario_set_forward_vel(m, -16.0f);
-        } else {
-            mario_set_forward_vel(m, -48.0f);
-        }
+        mario_set_forward_vel(m, ((m->action & ACT_FLAG_AIR) ? -16.0f : 48.0f));
 
         set_camera_shake_from_hit(SHAKE_ATTACK);
         m->particleFlags |= PARTICLE_TRIANGLE;
@@ -1480,27 +1461,21 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
     s32 actionId = (m->action & ACT_ID_MASK);
     if (actionId >= ACT_GROUP_AIRBORNE && actionId < (ACT_HOLD_JUMP & ACT_ID_MASK)) {
         if (!(m->prevAction & ACT_FLAG_ON_POLE) || m->usedObj != obj) {
+            struct Object *marioObj = m->marioObj;
 #if defined(POLE_SWING)
 
             f32 velConv = m->forwardVel; // conserve the velocity.
-            struct Object *marioObj = m->marioObj;
             Angle dAngleToPole = (mario_obj_angle_to_object(m, obj) - m->faceAngle[1]);
             if ((dAngleToPole < -0x2AAA) || (dAngleToPole > 0x2AAA)) return FALSE;
 #elif defined(VERSION_SH) || defined(SHINDOU_POLES)
             f32 velConv = m->forwardVel; // conserve the velocity.
-            u32 lowSpeed;
-            struct Object *marioObj = m->marioObj;
 #else
             u32 lowSpeed = (m->forwardVel <= 10.0f);
-            struct Object *marioObj = m->marioObj;
 #endif
-
             mario_stop_riding_and_holding(m);
-
 #if defined(VERSION_SH) || defined(SHINDOU_POLES)
-            lowSpeed = (velConv <= 10.0f);
+            u32 lowSpeed = (velConv <= 10.0f);
 #endif
-
             m->interactObj = obj;
             m->usedObj     = obj;
             m->vel[1]      = 0.0f;
@@ -1513,16 +1488,12 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
             m->angleVel[1] = (s32)((velConv * 0x80) + 0x1000);
             if (dAngleToPole < 0x0) m->angleVel[1] = -m->angleVel[1];
 #else
-            if (lowSpeed) {
-                return set_mario_action(m, ACT_GRAB_POLE_SLOW, 0);
-            }
+            if (lowSpeed) return set_mario_action(m, ACT_GRAB_POLE_SLOW, 0);
 
-            //! @bug Using m->forwardVel here is assumed to be 0.0f due to the set from earlier.
-            //       This is fixed in the Shindou version.
 #if defined(VERSION_SH) || defined(SHINDOU_POLES)
             m->angleVel[1] = (s32)(velConv * 0x100 + 0x1000);
 #else
-            m->angleVel[1] = (s32)(m->forwardVel * 0x100 + 0x1000);
+            m->angleVel[1] = 0x1000;
 #endif
 #endif
             reset_mario_pitch(m);

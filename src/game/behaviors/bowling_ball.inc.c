@@ -77,14 +77,10 @@ void bowling_ball_set_waypoints(void) {
 }
 
 void bhv_bowling_ball_roll_loop(void) {
-    s16 collisionFlags;
-    s32 pathResult = 0;
-
     bowling_ball_set_waypoints();
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
 
-    //! Uninitialzed parameter, but the parameter is unused in the called function
-    pathResult = cur_obj_follow_path(pathResult);
+    s32 pathResult = cur_obj_follow_path(0);
 
     o->oBowlingBallTargetYaw = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oBowlingBallTargetYaw, 0x400);
@@ -108,12 +104,9 @@ void bhv_bowling_ball_roll_loop(void) {
 }
 
 void bhv_bowling_ball_initializeLoop(void) {
-    s32 pathResult = 0;
-
     bowling_ball_set_waypoints();
 
-    //! Uninitialzed parameter, but the parameter is unused in the called function
-    pathResult = cur_obj_follow_path(pathResult);
+    cur_obj_follow_path(0);
 
     o->oMoveAngleYaw = o->oPathedTargetYaw;
 

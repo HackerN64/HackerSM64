@@ -70,10 +70,10 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
                 if (gCurrentObject == gMarioObject && (gMarioState->flags & MARIO_VANISH_CAP)) continue;
             }
         }
-        if (pos[1] < surf->lowerY || pos[1] > surf->upperY) continue;
+        if ((pos[1] < surf->lowerY) || (pos[1] > surf->upperY)) continue;
         // Dot of normal and pos, + origin offset
-        offset = (surf->normal.x * pos[0]) + (surf->normal.y * pos[1]) + (surf->normal.z * pos[2]) + surf->originOffset;
-        if (offset < -radius || offset > radius) continue;
+        offset = ((surf->normal.x * pos[0]) + (surf->normal.y * pos[1]) + (surf->normal.z * pos[2]) + surf->originOffset);
+        if ((offset < -radius) || (offset > radius)) continue;
         vec3_diff(v0, surf->vertex2, surf->vertex1);
         vec3_diff(v1, surf->vertex3, surf->vertex1);
         vec3_diff(v2, pos,           surf->vertex1);
@@ -83,13 +83,13 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         d11 = vec3_dot(v1, v1);
         d20 = vec3_dot(v2, v0);
         d21 = vec3_dot(v2, v1);
-        invDenom = 1.0f / ((d00 * d11) - (d01 * d01));
-        v = ((d11 * d20) - (d01 * d21)) * invDenom;
-        if (v < 0.0f || v > 1.0f) goto edge_1_2;
-        w = ((d00 * d21) - (d01 * d20)) * invDenom;
-        if (w < 0.0f || w > 1.0f || v + w > 1.0f) goto edge_1_2;
-        pos[0] += surf->normal.x * (radius - offset);
-        pos[2] += surf->normal.z * (radius - offset);
+        invDenom = (1.0f / ((d00 * d11) - (d01 * d01)));
+        v = (((d11 * d20) - (d01 * d21)) * invDenom);
+        if ((v < 0.0f) || (v > 1.0f)) goto edge_1_2;
+        w = (((d00 * d21) - (d01 * d20)) * invDenom);
+        if ((w < 0.0f) || (w > 1.0f) || ((v + w) > 1.0f)) goto edge_1_2;
+        pos[0] += (surf->normal.x * (radius - offset));
+        pos[2] += (surf->normal.z * (radius - offset));
         goto hasCollision;
     edge_1_2:
         if (offset < 0) continue;
@@ -101,15 +101,12 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         vec3_diff(v2, pos, surf->vertex2);
         CALC_OFFSET(v1, continue);
     check_collision:
-        invDenom = offset / invDenom;
+        invDenom = (offset / invDenom);
         pos[0] += (d00 *= invDenom);
         pos[2] += (d01 *= invDenom);
         margin_radius += 0.01f;
-        if ((d00 * surf->normal.x) + (d01 * surf->normal.z) < (corner_threshold * offset)) continue;
+        if (((d00 * surf->normal.x) + (d01 * surf->normal.z)) < (corner_threshold * offset)) continue;
     hasCollision:
-        // (Unreferenced Walls) Since this only returns the first MAX_REFEREMCED_WALLS walls,
-        // this can lead to wall interaction being missed. Typically unreferenced walls
-        // come from only using one wall, however.
         if (data->numWalls < MAX_REFEREMCED_WALLS) {
             data->walls[data->numWalls++] = surf;
         }
@@ -174,7 +171,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     gNumCalls.wall++;
 
 #if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
+    collisionTime[perfIteration] += (osGetTime() - first);
 #endif
 
     return numCollisions;
@@ -203,11 +200,11 @@ void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struc
 
 void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
     register f32 diff_x, diff_z, invDenom;
-    diff_x = target1[0] - *x + target2[0] - *x;
-    diff_z = target1[2] - *z + target2[2] - *z;
-    invDenom = margin / sqrtf(sqr(diff_x) + sqr(diff_z));
-    *x += diff_x * invDenom;
-    *z += diff_z * invDenom;
+    diff_x = (target1[0] - *x + target2[0] - *x);
+    diff_z = (target1[2] - *z + target2[2] - *z);
+    invDenom = (margin / sqrtf(sqr(diff_x) + sqr(diff_z)));
+    *x += (diff_x * invDenom);
+    *z += (diff_z * invDenom);
 }
 
 /**

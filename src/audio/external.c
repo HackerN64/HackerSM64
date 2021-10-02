@@ -380,7 +380,7 @@ struct EuAudioCmd sAudioCmd[0x100];
 
 OSMesg OSMesg0;
 OSMesg OSMesg1;
-OSMesg OSMesg2; // and none here. wth nintendo
+OSMesg OSMesg2;
 OSMesg OSMesg3;
 #else // VERSION_SH
 extern OSMesgQueue *D_SH_80350F88;

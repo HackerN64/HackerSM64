@@ -3345,7 +3345,7 @@ void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f a0, Vec3f a1, Vec3f a2, Vec3f a
  * the 4th CutsceneSplinePoint in the current segment away from spline[splineSegment] has an index of -1.
  */
 s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress) {
-    s32 finished = 0;
+    s32 finished = FALSE;
     Vec3f controlPoints[4];
     s32 i = 0;
     f32 u = *progress;
@@ -3381,7 +3381,7 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
         (*splineSegment)++;
         if (spline[*splineSegment + 3].index == -1) {
             *splineSegment = 0;
-            finished = 1;
+            finished = TRUE;
         }
         (*progress)--;
     }
@@ -7763,13 +7763,6 @@ void water_death_move_to_mario_side(struct Camera *c) {
     vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
 }
 
-/**
- * Unnecessary, only used in cutscene_death_standing_goto_mario()
- */
-void death_goto_mario(struct Camera *c) {
-    cutscene_goto_cvar_pos(c, 400.f, 0x1000, 0x300, 0);
-}
-
 void cutscene_death_standing_start(struct Camera *c) {
     vec3f_copy(sCutsceneVars[0].point, c->focus);
     vec3f_copy(sCutsceneVars[3].point, sMarioCamState->pos);
@@ -7780,7 +7773,7 @@ void cutscene_death_standing_start(struct Camera *c) {
  * Fly to Mario and turn on handheld shake.
  */
 void cutscene_death_standing_goto_mario(struct Camera *c) {
-    death_goto_mario(c);
+    cutscene_goto_cvar_pos(c, 400.f, 0x1000, 0x300, 0);
     set_handheld_shake(HAND_CAM_SHAKE_HIGH);
 }
 
@@ -7802,13 +7795,6 @@ void cutscene_death_stomach_start(struct Camera *c) {
 
 void cutscene_death_stomach_goto_mario(struct Camera *c) {
     cutscene_goto_cvar_pos(c, 400.f, 0x1800, 0, -0x400);
-}
-
-/**
- * Ah, yes
- */
-UNUSED static void unused_water_death_move_to_side_of_mario(struct Camera *c) {
-    water_death_move_to_mario_side(c);
 }
 
 /**
@@ -8348,11 +8334,8 @@ void cutscene_exit_bowser_succ_focus_left(UNUSED struct Camera *c) {
  * Instead of focusing on the key, just start a pitch shake. Clever!
  * The shake lasts 32 frames.
  */
-void cutscene_exit_bowser_key_toss_shake(struct Camera *c) {
-    //! Unnecessary check.
-    if (c->cutscene == CUTSCENE_EXIT_BOWSER_SUCC) {
-        set_camera_pitch_shake(0x800, 0x40, 0x800);
-    }
+void cutscene_exit_bowser_key_toss_shake(UNUSED struct Camera *c) {
+    set_camera_pitch_shake(0x800, 0x40, 0x800);
 }
 
 /**
@@ -8651,19 +8634,16 @@ void cutscene_unlock_key_door(UNUSED struct Camera *c) {
  * Move the camera along `positionSpline` and point its focus at the corresponding point along
  * `focusSpline`. sCutsceneSplineSegmentProgress is updated after pos and focus are calculated.
  */
-s32 intro_peach_move_camera_start_to_pipe(struct Camera *c, struct CutsceneSplinePoint positionSpline[],
-                  struct CutsceneSplinePoint focusSpline[]) {
+s32 intro_peach_move_camera_start_to_pipe(struct Camera *c, struct CutsceneSplinePoint positionSpline[], struct CutsceneSplinePoint focusSpline[]) {
     Vec3f offset;
-    s32 posReturn = 0;
-    s32 focusReturn = 0;
 
     /**
      * The position spline's speed parameters are all 0, so sCutsceneSplineSegmentProgress doesn't get
      * updated. Otherwise position would move two frames ahead, and c->focus would always be one frame
      * further along the spline than c->pos.
      */
-    posReturn = move_point_along_spline(c->pos, positionSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
-    focusReturn = move_point_along_spline(c->focus, focusSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
+    UNUSED s32 posReturn = move_point_along_spline(c->pos, positionSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
+    s32 focusReturn = move_point_along_spline(c->focus, focusSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
 
     // The two splines used by this function are reflected in the horizontal plane for some reason,
     // so they are rotated every frame. Why do this, Nintendo?
@@ -8674,7 +8654,6 @@ s32 intro_peach_move_camera_start_to_pipe(struct Camera *c, struct CutsceneSplin
     vec3f_add(c->focus, offset);
     vec3f_add(c->pos, offset);
 
-    posReturn += focusReturn; // Unused
     return focusReturn;
 }
 
@@ -9342,8 +9321,7 @@ void cutscene_door_fix_cam(struct Camera *c) {
  * Loop until Mario is no longer using the door.
  */
 void cutscene_door_loop(struct Camera *c) {
-    //! bitwise AND instead of boolean
-    if ((sMarioCamState->action != ACT_PULLING_DOOR) & (sMarioCamState->action != ACT_PUSHING_DOOR)) {
+    if ((sMarioCamState->action != ACT_PULLING_DOOR) && (sMarioCamState->action != ACT_PUSHING_DOOR)) {
         gCutsceneTimer = CUTSCENE_STOP;
         c->cutscene = 0;
     }
@@ -10338,13 +10316,8 @@ void set_fov_shake(s16 amplitude, s16 decay, s16 shakeSpeed) {
  */
 void set_fov_shake_from_point(s16 amplitude, s16 decay, s16 shakeSpeed, f32 maxDist, f32 posX, f32 posY, f32 posZ) {
     amplitude = reduce_by_dist_from_camera(amplitude, maxDist, posX, posY, posZ);
-
     if (amplitude != 0) {
-        if (amplitude > sFOVState.shakeAmplitude) { // literally use the function above you silly nintendo, smh
-            sFOVState.shakeAmplitude = amplitude;
-            sFOVState.decay = decay;
-            sFOVState.shakeSpeed = shakeSpeed;
-        }
+        set_fov_shake(amplitude, decay, shakeSpeed);
     }
 }
 
