@@ -19,7 +19,6 @@ glabel mtxf_to_mtx_asm
     lwc1 $f0, ($a1)
     lwc1 $f2, 0x04($a1)
     bc1f 3f
-    nop
 2:
     andi $t0, $v0, (1 << 1)
     mul.s $f0, $f4
@@ -42,7 +41,7 @@ glabel mtxf_to_mtx_asm
 loopend:
 .set noreorder
     bnel $v0, 0x11, 1b
-    addiu $a0, 4
+     addiu $a0, 4
 .set reorder
 
     li $t1, 1
