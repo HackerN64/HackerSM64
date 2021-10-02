@@ -617,14 +617,6 @@ void mtxf_to_mtx_constant(register s16 *dest, register f32 *src) { //! TODO: asm
     }
 }
 
-void mtxf_to_mtx(void *dest, void *src) {
-    if (gWorldScale > 2.0f) {
-        mtxf_to_mtx_scale(dest, src);
-    } else {
-        mtxf_to_mtx_constant(dest, src);
-    }
-}
-
 /**
  * Set 'mtx' to a transformation matrix that rotates around the z axis.
  */
