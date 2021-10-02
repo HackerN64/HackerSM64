@@ -74,6 +74,7 @@ s16 round_float(f32 num) {
     }
 }
 
+#define NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT 10
 /**
  * Create a display list for the light in the castle lobby that shows the
  * player where to look to enter Tower of the Wing Cap.
@@ -86,7 +87,7 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
 
     if (callContext == GEO_CONTEXT_RENDER) {
         flags = save_file_get_flags();
-        if (gHudDisplay.stars >= 10 && !(flags & SAVE_FLAG_HAVE_WING_CAP)) {
+        if (gHudDisplay.stars >= NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT && !(flags & SAVE_FLAG_HAVE_WING_CAP)) {
             displayList = alloc_display_list(2 * sizeof(*displayList));
 
             if (displayList == NULL) {
@@ -105,12 +106,12 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
 
     return displayList;
 }
+#undef NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT
 
 /**
  * Update static timer variables that control the flying carpets' ripple effect.
  */
-Gfx *geo_exec_flying_carpet_timer_update(s32 callContext, UNUSED struct GraphNode *node,
-                                         UNUSED Mat4 mtx) {
+Gfx *geo_exec_flying_carpet_timer_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     if (callContext != GEO_CONTEXT_RENDER) {
         sFlyingCarpetRippleTimer = 0;
         sPrevAreaTimer = gAreaUpdateCounter - 1;
@@ -154,9 +155,9 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
             row = n / 3;
             col = n % 3;
 
-            x = sp64[n * 4 + 0];
-            y = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0);
-            z = sp64[n * 4 + 1];
+            x  = sp64[n * 4 + 0];
+            y  = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0);
+            z  = sp64[n * 4 + 1];
             tx = sp64[n * 4 + 2];
             ty = sp64[n * 4 + 3];
 

@@ -25,8 +25,8 @@
 
 
 // round up to the next multiple
-#define ALIGN4(val) (((val) + 0x3) & ~0x3)
-#define ALIGN8(val) (((val) + 0x7) & ~0x7)
+#define ALIGN4(val)  (((val) + 0x3) & ~0x3)
+#define ALIGN8(val)  (((val) + 0x7) & ~0x7)
 #define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
 struct MainPoolState {
@@ -52,7 +52,7 @@ struct MemoryPool {
     struct MemoryBlock freeList;
 };
 
-extern uintptr_t sSegmentTable[32];
+extern uintptr_t sSegmentTable[NUM_TLB_SEGMENTS];
 extern u32 sPoolFreeSpace;
 extern u8 *sPoolStart;
 extern u8 *sPoolEnd;
@@ -67,7 +67,7 @@ extern struct MainPoolBlock *sPoolListHeadR;
 struct MemoryPool *gEffectsMemoryPool;
 
 
-uintptr_t sSegmentTable[32];
+uintptr_t sSegmentTable[NUM_TLB_SEGMENTS];
 u32 sPoolFreeSpace;
 u8 *sPoolStart;
 u8 *sPoolEnd;
@@ -135,9 +135,9 @@ void main_pool_init(void *start, void *end) {
     sPoolListHeadL->next = NULL;
     sPoolListHeadR->prev = NULL;
     sPoolListHeadR->next = NULL;
-    #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
     mempool = sPoolFreeSpace;
-    #endif
+#endif
 }
 
 /**
@@ -217,11 +217,10 @@ void *main_pool_realloc(void *addr, u32 size) {
 }
 
 /**
- * Return the size of the largest block that can currently be allocated from the
- * pool.
+ * Return the size of the largest block that can currently be allocated from the pool.
  */
 u32 main_pool_available(void) {
-    return sPoolFreeSpace - 16;
+    return (sPoolFreeSpace - 16);
 }
 
 /**
@@ -260,25 +259,24 @@ u32 main_pool_pop_state(void) {
  */
 void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
     u32 size = ALIGN16(srcEnd - srcStart);
-    #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
-    #endif
+#endif
 
     osInvalDCache(dest, size);
     while (size != 0) {
         u32 copySize = (size >= 0x1000) ? 0x1000 : size;
 
-        osPiStartDma(&gDmaIoMesg, OS_MESG_PRI_NORMAL, OS_READ, (uintptr_t) srcStart, dest, copySize,
-                     &gDmaMesgQueue);
+        osPiStartDma(&gDmaIoMesg, OS_MESG_PRI_NORMAL, OS_READ, (uintptr_t) srcStart, dest, copySize, &gDmaMesgQueue);
         osRecvMesg(&gDmaMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 
         dest += copySize;
         srcStart += copySize;
         size -= copySize;
     }
-    #if PUPPYPRINT_DEBUG
-    dmaTime[perfIteration] += osGetTime()-first;
-    #endif
+#if PUPPYPRINT_DEBUG
+    dmaTime[perfIteration] += osGetTime() - first;
+#endif
 }
 
 /**
@@ -306,7 +304,7 @@ void *dynamic_dma_read(u8 *srcStart, u8 *srcEnd, u32 side, u32 alignment, u32 bs
 
 #define TLB_PAGE_SIZE 4096 //Blocksize of TLB transfers. Larger values can be faster to transfer, but more wasteful of RAM.
 s32 gTlbEntries = 0;
-u8 gTlbSegments[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+u8 gTlbSegments[NUM_TLB_SEGMENTS] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 void mapTLBPages(uintptr_t virtualAddress, uintptr_t physicalAddress, s32 length, s32 segment) {
     while (length > 0) {
@@ -320,7 +318,7 @@ void mapTLBPages(uintptr_t virtualAddress, uintptr_t physicalAddress, s32 length
             osMapTLB(gTlbEntries++, OS_PM_4K, (void *)virtualAddress, physicalAddress, -1, -1);
             gTlbSegments[segment]++;
         }
-        virtualAddress += TLB_PAGE_SIZE;
+        virtualAddress  += TLB_PAGE_SIZE;
         physicalAddress += TLB_PAGE_SIZE;
         length -= TLB_PAGE_SIZE;
     }
@@ -347,9 +345,9 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart
             set_segment_base_addr(segment, addr);
         }
     }
-    #if PUPPYPRINT_DEBUG
-    ramsizeSegment[segment+nameTable-2] = (s32)srcEnd- (s32)srcStart;
-    #endif
+#if PUPPYPRINT_DEBUG
+    ramsizeSegment[segment + nameTable - 2] = (s32)srcEnd - (s32)srcStart;
+#endif
     return addr;
 }
 
@@ -491,9 +489,9 @@ struct AllocOnlyPool *alloc_only_pool_init(u32 size, u32 side) {
     if (addr != NULL) {
         subPool = (struct AllocOnlyPool *) addr;
         subPool->totalSpace = size;
-        subPool->usedSpace = 0;
-        subPool->startPtr = (u8 *) addr + sizeof(struct AllocOnlyPool);
-        subPool->freePtr = (u8 *) addr + sizeof(struct AllocOnlyPool);
+        subPool->usedSpace  = 0;
+        subPool->startPtr   = (u8 *) addr + sizeof(struct AllocOnlyPool);
+        subPool->freePtr    = (u8 *) addr + sizeof(struct AllocOnlyPool);
     }
     return subPool;
 }
@@ -546,8 +544,8 @@ struct MemoryPool *mem_pool_init(u32 size, u32 side) {
     if (addr != NULL) {
         pool = (struct MemoryPool *) addr;
 
-        pool->totalSpace = size;
-        pool->firstBlock = (struct MemoryBlock *) ((u8 *) addr + sizeof(struct MemoryPool));
+        pool->totalSpace    = size;
+        pool->firstBlock    = (struct MemoryBlock *) ((u8 *) addr + sizeof(struct MemoryPool));
         pool->freeList.next = (struct MemoryBlock *) ((u8 *) addr + sizeof(struct MemoryPool));
 
         block = pool->firstBlock;

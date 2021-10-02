@@ -201,7 +201,7 @@ void print_ram_bar(void) {
     s32 i = 0;
     f32 perfPercentage;
     s32 graphPos = 0;
-    s32 prevGraph = (SCREEN_WIDTH/2) - (BAR_LENGTH / 2);
+    s32 prevGraph = (SCREEN_WIDTH / 2) - (BAR_LENGTH / 2);
     s32 ramsize = osGetMemSize();
 
     prepare_blank_box();
@@ -211,16 +211,16 @@ void print_ram_bar(void) {
             continue;
         }
         perfPercentage = (f32)ramsizeSegment[i]/ramsize;
-        graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_WIDTH/2) + (BAR_LENGTH / 2));
-        render_blank_box(prevGraph, SCREEN_HEIGHT-30, graphPos, SCREEN_HEIGHT-22, colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
+        graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_WIDTH / 2) + (BAR_LENGTH / 2));
+        render_blank_box(prevGraph, SCREEN_HEIGHT - 30, graphPos, SCREEN_HEIGHT - 22, colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
         prevGraph = graphPos;
     }
-    perfPercentage = (f32)ramsizeSegment[32]/ramsize;
-    graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_WIDTH/2) + (BAR_LENGTH / 2));
-    render_blank_box(prevGraph, SCREEN_HEIGHT-30, graphPos, SCREEN_HEIGHT-22, 255, 255, 255, 255);
+    perfPercentage = (f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize;
+    graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_WIDTH / 2) + (BAR_LENGTH / 2));
+    render_blank_box(prevGraph, SCREEN_HEIGHT - 30, graphPos, SCREEN_HEIGHT-22, 255, 255, 255, 255);
     prevGraph = graphPos;
 
-    render_blank_box(prevGraph, SCREEN_HEIGHT-30, (SCREEN_WIDTH/2)+(BAR_LENGTH / 2), SCREEN_HEIGHT-22, 0, 0, 0, 255);
+    render_blank_box(prevGraph, SCREEN_HEIGHT - 30, (SCREEN_WIDTH / 2) + (BAR_LENGTH / 2), SCREEN_HEIGHT-22, 0, 0, 0, 255);
 
     finish_blank_box();
 }
@@ -250,7 +250,7 @@ void print_ram_overview(void) {
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
     finish_blank_box();
 
-    for (i = 0; i < 33; i++) {
+    for (i = 0; i <= NUM_TLB_SEGMENTS; i++) {
         if (drawn == 16) {
             x = 240;
             y = 16;
@@ -302,10 +302,10 @@ void print_which_benchmark(void) {
     char textBytes[40];
 
     prepare_blank_box();
-    render_blank_box((SCREEN_WIDTH/2)-50, 115, (SCREEN_WIDTH/2)+50, 160, 0, 0, 0, 255);
+    render_blank_box((SCREEN_WIDTH / 2) - 50, 115, (SCREEN_WIDTH / 2) + 50, 160, 0, 0, 0, 255);
     finish_blank_box();
     sprintf(textBytes, "Select Option#%s#L: Confirm", benchNames[benchOption]);
-    print_small_text((SCREEN_WIDTH/2),120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    print_small_text((SCREEN_WIDTH / 2), 120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
 }
 
 char consoleLogTable[LOG_BUFFER_SIZE][255];

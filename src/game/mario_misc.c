@@ -638,12 +638,11 @@ Gfx *geo_mirror_mario_backface_culling(s32 callContext, struct GraphNode *node, 
         if (asGenerated->parameter == 0) {
             gSPClearGeometryMode(&gfx[0], G_CULL_BACK);
             gSPSetGeometryMode(&gfx[1], G_CULL_FRONT);
-            gSPEndDisplayList(&gfx[2]);
         } else {
             gSPClearGeometryMode(&gfx[0], G_CULL_FRONT);
             gSPSetGeometryMode(&gfx[1], G_CULL_BACK);
-            gSPEndDisplayList(&gfx[2]);
         }
+        gSPEndDisplayList(&gfx[2]);
         SET_GRAPH_NODE_LAYER(asGenerated->fnNode.node.flags, LAYER_OPAQUE);
     }
     return gfx;

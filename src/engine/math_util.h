@@ -144,6 +144,13 @@ extern f32 gSineTable[];
     (dst)[2] = (((a)[0] * (b)[1]) - ((a)[1] * (b)[0])); \
 }
 
+
+#define find_vector_perpendicular_to_plane(dest, a, b, c) {                                     \
+    (dest)[0] = ((b)[1] - (a)[1]) * ((c)[2] - (b)[2]) - ((c)[1] - (b)[1]) * ((b)[2] - (a)[2]);  \
+    (dest)[1] = ((b)[2] - (a)[2]) * ((c)[0] - (b)[0]) - ((c)[2] - (b)[2]) * ((b)[0] - (a)[0]);  \
+    (dest)[2] = ((b)[0] - (a)[0]) * ((c)[1] - (b)[1]) - ((c)[0] - (b)[0]) * ((b)[1] - (a)[1]);  \
+}
+
 /**
  * | ? ? ? 0 |
  * | ? ? ? 0 |
@@ -454,6 +461,7 @@ s32 min_3i(s32 a0, s32 a1, s32 a2);
 f32 min_3f(f32 a0, f32 a1, f32 a2);
 s32 max_3i(s32 a0, s32 a1, s32 a2);
 f32 max_3f(f32 a0, f32 a1, f32 a2);
+void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max);
 void vec3f_copy(Vec3f dest, Vec3f src);
 void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
 void vec3f_add(Vec3f dest, Vec3f a);
@@ -466,7 +474,8 @@ void vec3s_sub(Vec3s dest, Vec3s a);
 void vec3f_sub(Vec3f dest, Vec3f src);
 void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_to_vec3s(Vec3s dest, Vec3f a);
-void find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c);
+void vec3f_find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c);
+void vec3i_find_vector_perpendicular_to_plane(Vec3f dest, Vec3i a, Vec3i b, Vec3i c);
 f32  vec3f_dot(Vec3f a, Vec3f b);
 void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_normalize(Vec3f dest);

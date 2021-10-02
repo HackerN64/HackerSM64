@@ -364,7 +364,7 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
 #ifdef PREVENT_DEATH_LOOP
     if (gMarioState->isDead) {
         gMarioState->health = 0x880;
-        gMarioState->isDead = 0;
+        gMarioState->isDead = FALSE;
     }
 #endif
     set_mario_initial_cap_powerup(m);
@@ -757,9 +757,9 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 sSourceWarpNodeId = WARP_NODE_DEATH;
                 play_transition(WARP_TRANSITION_FADE_INTO_BOWSER, sDelayedWarpTimer, 0x00, 0x00, 0x00);
                 play_sound(SOUND_MENU_BOWSER_LAUGH, gGlobalSoundSource);
-            #ifdef PREVENT_DEATH_LOOP
-                gMarioState->isDead = 1;
-            #endif
+#ifdef PREVENT_DEATH_LOOP
+                gMarioState->isDead = TRUE;
+#endif
                 break;
 
             case WARP_OP_WARP_FLOOR:

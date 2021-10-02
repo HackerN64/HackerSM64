@@ -653,8 +653,7 @@ s32 act_fall_after_star_grab(struct MarioState *m) {
     }
     if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
-        set_mario_action(m, m->actionArg & 1 ? ACT_STAR_DANCE_NO_EXIT : ACT_STAR_DANCE_EXIT,
-                         m->actionArg);
+        set_mario_action(m, m->actionArg & 1 ? ACT_STAR_DANCE_NO_EXIT : ACT_STAR_DANCE_EXIT, m->actionArg);
     }
     set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
     return FALSE;
@@ -668,7 +667,7 @@ s32 common_death_handler(struct MarioState *m, s32 animation, s32 frameToDeathWa
     m->marioBodyState->eyeState = MARIO_EYES_DEAD;
     stop_and_set_height_to_floor(m);
 #ifdef PREVENT_DEATH_LOOP
-    gMarioState->isDead = 1;
+    gMarioState->isDead = TRUE;
 #endif
     return animFrame;
 }

@@ -49,7 +49,7 @@
     #define CELL_SIZE          0x400   //  1024, NUM_CELLS = 64
 #endif
 
-STATIC_ASSERT((EXTENDED_BOUNDS_MODE >= 0 && EXTENDED_BOUNDS_MODE <= 3), "You must set a valid extended bounds mode!");
+STATIC_ASSERT(((EXTENDED_BOUNDS_MODE >= 0) && (EXTENDED_BOUNDS_MODE <= 3)), "You must set a valid extended bounds mode!");
 
 // The amount of cells in each axis in an area.
 #define NUM_CELLS                   (2 * LEVEL_BOUNDARY_MAX / CELL_SIZE)

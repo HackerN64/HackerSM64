@@ -31,6 +31,8 @@
 
 #include "config.h"
 
+#define NUM_PAINTINGS 45
+
 #define CMD_GET(type, offset) (*(type *) (CMD_PROCESS_OFFSET(offset) + (u8 *) sCurrentCmd))
 
 // These are equal
@@ -45,7 +47,7 @@ struct LevelCommand {
 
 enum ScriptStatus { SCRIPT_RUNNING = 1, SCRIPT_PAUSED = 0, SCRIPT_PAUSED2 = -1 };
 
-static uintptr_t sStack[32];
+static uintptr_t sStack[NUM_TLB_SEGMENTS];
 
 static struct AllocOnlyPool *sLevelPool = NULL;
 
@@ -63,34 +65,16 @@ static struct LevelCommand *sCurrentCmd;
 
 static s32 eval_script_op(s8 op, s32 arg) {
     s32 result = 0;
-
     switch (op) {
-        case 0:
-            result = sRegister & arg;
-            break;
-        case 1:
-            result = !(sRegister & arg);
-            break;
-        case 2:
-            result = sRegister == arg;
-            break;
-        case 3:
-            result = sRegister != arg;
-            break;
-        case 4:
-            result = sRegister < arg;
-            break;
-        case 5:
-            result = sRegister <= arg;
-            break;
-        case 6:
-            result = sRegister > arg;
-            break;
-        case 7:
-            result = sRegister >= arg;
-            break;
+        case OP_AND:  result =  (sRegister &  arg); break;
+        case OP_NAND: result = !(sRegister &  arg); break;
+        case OP_EQ:   result =  (sRegister == arg); break;
+        case OP_NEQ:  result =  (sRegister != arg); break;
+        case OP_LT:   result =  (sRegister <  arg); break;
+        case OP_LEQ:  result =  (sRegister <= arg); break;
+        case OP_GT:   result =  (sRegister >  arg); break;
+        case OP_GEQ:  result =  (sRegister >= arg); break;
     }
-
     return result;
 }
 
@@ -308,8 +292,8 @@ static void level_cmd_load_yay0_texture(void) {
 
 static void level_cmd_change_area_skybox(void) {
     u8 areaCheck = CMD_GET(s16, 2);
-    gAreaSkyboxStart[areaCheck-1] = CMD_GET(void *, 4);
-    gAreaSkyboxEnd[areaCheck-1] = CMD_GET(void *, 8);
+    gAreaSkyboxStart[areaCheck - 1] = CMD_GET(void *, 4);
+    gAreaSkyboxEnd[areaCheck - 1] = CMD_GET(void *, 8);
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -327,26 +311,20 @@ static void level_cmd_init_level(void) {
 }
 
 extern s32 gTlbEntries;
-extern u8 gTlbSegments[32];
+extern u8 gTlbSegments[NUM_TLB_SEGMENTS];
 
-//This clears all the temporary bank TLB maps. group0, common1 and behavourdata are always loaded,
-//and they're also loaded first, so that means we just leave the first 3 indexes mapped.
-void unmap_tlbs(void)
-{
+// This clears all the temporary bank TLB maps. group0, common1 and behavourdata are always loaded,
+// and they're also loaded first, so that means we just leave the first 3 indexes mapped.
+void unmap_tlbs(void) {
     s32 i;
-    for (i = 0; i < 32; i++)
-    {
-        if (gTlbSegments[i] && i != 0x17 && i != 0x16 && i != 0x13)
-        {
-            while (gTlbSegments[i] > 0)
-            {
+    for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
+        if (gTlbSegments[i] && i != 0x17 && i != 0x16 && i != 0x13) {
+            while (gTlbSegments[i] > 0) {
                 osUnmapTLB(gTlbEntries);
                 gTlbSegments[i]--;
                 gTlbEntries--;
             }
-
         }
-
     }
 }
 
@@ -362,8 +340,7 @@ static void level_cmd_clear_level(void) {
 
 static void level_cmd_alloc_level_pool(void) {
     if (sLevelPool == NULL) {
-        sLevelPool = alloc_only_pool_init(main_pool_available() - sizeof(struct AllocOnlyPool),
-                                          MEMORY_POOL_LEFT);
+        sLevelPool = alloc_only_pool_init((main_pool_available() - sizeof(struct AllocOnlyPool)), MEMORY_POOL_LEFT);
     }
 
     sCurrentCmd = CMD_NEXT;
@@ -438,22 +415,15 @@ static void level_cmd_load_model_from_geo(void) {
 }
 
 static void level_cmd_23(void) {
-    union {
-        s32 i;
-        f32 f;
-    } arg2;
-
-    ModelID16 model = CMD_GET(s16, 2) & 0x0FFF;
-    s16 arg0H = ((u16)CMD_GET(s16, 2)) >> 12;
-    void *arg1 = CMD_GET(void *, 4);
-    // load an f32, but using an integer load instruction for some reason (hence the union)
-    arg2.i = CMD_GET(s32, 8);
+    ModelID16 model = (CMD_GET(ModelID16, 2) & 0x0FFF);
+    s16 layer = (((u16)CMD_GET(s16, 2)) >> 12);
+    void *dl = CMD_GET(void *, 4);
+    s32 scale = CMD_GET(s32, 8);
 
     if (model < MODEL_ID_COUNT) {
         // GraphNodeScale has a GraphNode at the top. This
         // is being stored to the array, so cast the pointer.
-        gLoadedGraphNodes[model] =
-            (struct GraphNode *) init_graph_node_scale(sLevelPool, 0, arg0H, arg1, arg2.f);
+        gLoadedGraphNodes[model] = (struct GraphNode *) init_graph_node_scale(sLevelPool, 0, layer, dl, scale);
     }
 
     sCurrentCmd = CMD_NEXT;
@@ -474,7 +444,7 @@ static void level_cmd_init_mario(void) {
 }
 
 static void level_cmd_place_object(void) {
-    u8 val7 = 1 << (gCurrActNum - 1);
+    u8 val7 = (1 << (gCurrActNum - 1));
     u16 model;
     struct SpawnInfo *spawnInfo;
 
@@ -530,7 +500,7 @@ static void level_cmd_create_instant_warp(void) {
     if (sCurrAreaIndex != -1) {
         if (gAreas[sCurrAreaIndex].instantWarps == NULL) {
             gAreas[sCurrAreaIndex].instantWarps =
-                alloc_only_pool_alloc(sLevelPool, 4 * sizeof(struct InstantWarp));
+                alloc_only_pool_alloc(sLevelPool, INSTANT_WARP_INDEX_STOP * sizeof(struct InstantWarp));
 
             for (i = INSTANT_WARP_INDEX_START; i < INSTANT_WARP_INDEX_STOP; i++) {
                 gAreas[sCurrAreaIndex].instantWarps[i].id = 0;
@@ -565,9 +535,9 @@ static void level_cmd_create_painting_warp_node(void) {
     if (sCurrAreaIndex != -1) {
         if (gAreas[sCurrAreaIndex].paintingWarpNodes == NULL) {
             gAreas[sCurrAreaIndex].paintingWarpNodes =
-                alloc_only_pool_alloc(sLevelPool, 45 * sizeof(struct WarpNode));
+                alloc_only_pool_alloc(sLevelPool, NUM_PAINTINGS * sizeof(struct WarpNode));
 
-            for (i = 0; i < 45; i++) {
+            for (i = 0; i < NUM_PAINTINGS; i++) {
                 gAreas[sCurrAreaIndex].paintingWarpNodes[i].id = 0;
             }
         }
@@ -639,12 +609,9 @@ static void level_cmd_set_terrain_data(void) {
 #ifndef NO_SEGMENTED_MEMORY
         gAreas[sCurrAreaIndex].terrainData = segmented_to_virtual(CMD_GET(void *, 4));
 #else
-        Collision *data;
-        u32 size;
-
         // The game modifies the terrain data and must be reset upon level reload.
-        data = segmented_to_virtual(CMD_GET(void *, 4));
-        size = get_area_terrain_size(data) * sizeof(Collision);
+        Collision *data = segmented_to_virtual(CMD_GET(void *, 4));
+        u32 size = get_area_terrain_size(data) * sizeof(Collision);
         gAreas[sCurrAreaIndex].terrainData = alloc_only_pool_alloc(sLevelPool, size);
         memcpy(gAreas[sCurrAreaIndex].terrainData, data, size);
 #endif
@@ -756,55 +723,33 @@ static void level_cmd_38(void) {
 static void level_cmd_get_or_set_var(void) {
     if (CMD_GET(u8, 2) == OP_SET) {
         switch (CMD_GET(u8, 3)) {
-            case VAR_CURR_SAVE_FILE_NUM:
-                gCurrSaveFileNum = sRegister;
-                break;
-            case VAR_CURR_COURSE_NUM:
-                gCurrCourseNum = sRegister;
-                break;
-            case VAR_CURR_ACT_NUM:
-                gCurrActNum = sRegister;
-                break;
-            case VAR_CURR_LEVEL_NUM:
-                gCurrLevelNum = sRegister;
-                break;
-            case VAR_CURR_AREA_INDEX:
-                gCurrAreaIndex = sRegister;
-                break;
+            case VAR_CURR_SAVE_FILE_NUM: gCurrSaveFileNum = sRegister; break;
+            case VAR_CURR_COURSE_NUM:    gCurrCourseNum   = sRegister; break;
+            case VAR_CURR_ACT_NUM:       gCurrActNum      = sRegister; break;
+            case VAR_CURR_LEVEL_NUM:     gCurrLevelNum    = sRegister; break;
+            case VAR_CURR_AREA_INDEX:    gCurrAreaIndex   = sRegister; break;
         }
     } else {
         switch (CMD_GET(u8, 3)) {
-            case VAR_CURR_SAVE_FILE_NUM:
-                sRegister = gCurrSaveFileNum;
-                break;
-            case VAR_CURR_COURSE_NUM:
-                sRegister = gCurrCourseNum;
-                break;
-            case VAR_CURR_ACT_NUM:
-                sRegister = gCurrActNum;
-                break;
-            case VAR_CURR_LEVEL_NUM:
-                sRegister = gCurrLevelNum;
-                break;
-            case VAR_CURR_AREA_INDEX:
-                sRegister = gCurrAreaIndex;
-                break;
+            case VAR_CURR_SAVE_FILE_NUM: sRegister = gCurrSaveFileNum; break;
+            case VAR_CURR_COURSE_NUM:    sRegister = gCurrCourseNum;   break;
+            case VAR_CURR_ACT_NUM:       sRegister = gCurrActNum;      break;
+            case VAR_CURR_LEVEL_NUM:     sRegister = gCurrLevelNum;    break;
+            case VAR_CURR_AREA_INDEX:    sRegister = gCurrAreaIndex;   break;
         }
     }
 
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_puppyvolume(void)
-{
+static void level_cmd_puppyvolume(void) {
 #ifdef PUPPYCAM
-    if ((sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool,sizeof(struct sPuppyVolume))) == NULL)
-    {
+    if ((sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool, sizeof(struct sPuppyVolume))) == NULL) {
         sCurrentCmd = CMD_NEXT;
         gPuppyError |= PUPPY_ERROR_POOL_FULL;
-        #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
         append_puppyprint_log("Puppycamera volume allocation failed.");
-        #endif
+#endif
         return;
     }
 
@@ -835,8 +780,7 @@ static void level_cmd_puppyvolume(void)
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_puppylight_environment(void)
-{
+static void level_cmd_puppylight_environment(void) {
 #ifdef PUPPYLIGHTS
     Lights1 temp = gdSPDefLights1(CMD_GET(u8, 2), CMD_GET(u8, 3), CMD_GET(u8, 4), CMD_GET(u8, 5), CMD_GET(u8, 6), CMD_GET(u8, 7), CMD_GET(u8, 8), CMD_GET(u8, 9), CMD_GET(u8, 10));
 
@@ -846,11 +790,9 @@ static void level_cmd_puppylight_environment(void)
     sCurrentCmd = CMD_NEXT;
 }
 
-static void level_cmd_puppylight_node(void)
-{
+static void level_cmd_puppylight_node(void) {
 #ifdef PUPPYLIGHTS
-    if ((gPuppyLights[gNumLights] = mem_pool_alloc(gLightsPool, sizeof(struct PuppyLight))) == NULL)
-    {
+    if ((gPuppyLights[gNumLights] = mem_pool_alloc(gLightsPool, sizeof(struct PuppyLight))) == NULL) {
 #if PUPPYPRINT_DEBUG
         append_puppyprint_log("Puppylight allocation failed.");
 #endif

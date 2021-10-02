@@ -8,6 +8,8 @@
 #define MEMORY_POOL_LEFT  0
 #define MEMORY_POOL_RIGHT 1
 
+#define NUM_TLB_SEGMENTS 32
+
 struct AllocOnlyPool
 {
     s32 totalSpace;

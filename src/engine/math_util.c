@@ -55,6 +55,19 @@ f32 min_3f(f32 a0, f32 a1, f32 a2) { if (a1 < a0) a0 = a1; if (a2 < a0) a0 = a2;
 s32 max_3i(s32 a0, s32 a1, s32 a2) { if (a1 > a0) a0 = a1; if (a2 > a0) a0 = a2; return a0; }
 f32 max_3f(f32 a0, f32 a1, f32 a2) { if (a1 > a0) a0 = a1; if (a2 > a0) a0 = a2; return a0; }
 
+/// A combination of the above.
+void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max) {
+    *min = a;
+    *max = a;
+    if (b < a) {
+        *min = b;
+    } else {
+        *max = b;
+    }
+    if (c < *min) *min = c;
+    if (c > *max) *max = c;
+}
+
 /// Copy vector 'src' to 'dest'
 void vec3f_copy(Vec3f dest, Vec3f src) {
     register u32 x = ((u32 *) src)[0];
@@ -158,7 +171,12 @@ void vec3f_to_vec3s(Vec3s dest, Vec3f a) {
  * It is similar to vec3f_cross, but it calculates the vectors (c-b) and (b-a)
  * at the same time.
  */
-void find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c) {
+void vec3f_find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c) {
+    dest[0] = (b[1] - a[1]) * (c[2] - b[2]) - (c[1] - b[1]) * (b[2] - a[2]);
+    dest[1] = (b[2] - a[2]) * (c[0] - b[0]) - (c[2] - b[2]) * (b[0] - a[0]);
+    dest[2] = (b[0] - a[0]) * (c[1] - b[1]) - (c[0] - b[0]) * (b[1] - a[1]);
+}
+void vec3i_find_vector_perpendicular_to_plane(Vec3f dest, Vec3i a, Vec3i b, Vec3i c) {
     dest[0] = (b[1] - a[1]) * (c[2] - b[2]) - (c[1] - b[1]) * (b[2] - a[2]);
     dest[1] = (b[2] - a[2]) * (c[0] - b[0]) - (c[2] - b[2]) * (b[0] - a[0]);
     dest[2] = (b[0] - a[0]) * (c[1] - b[1]) - (c[0] - b[0]) * (b[1] - a[1]);
@@ -465,7 +483,6 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     Vec3f point0, point1, point2;
     Vec3f forward;
     Vec3f xColumn, yColumn, zColumn;
-    f32 avgY;
     f32 minY = -radius * 3;
 
     point0[0] = pos[0] + radius * sins(yaw + 0x2AAA);
@@ -479,22 +496,14 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     point1[1] = find_floor(point1[0], pos[1] + 150, point1[2], &floor);
     point2[1] = find_floor(point2[0], pos[1] + 150, point2[2], &floor);
 
-    if (point0[1] - pos[1] < minY) {
-        point0[1] = pos[1];
-    }
+    if (point0[1] - pos[1] < minY) point0[1] = pos[1];
+    if (point1[1] - pos[1] < minY) point1[1] = pos[1];
+    if (point2[1] - pos[1] < minY) point2[1] = pos[1];
 
-    if (point1[1] - pos[1] < minY) {
-        point1[1] = pos[1];
-    }
-
-    if (point2[1] - pos[1] < minY) {
-        point2[1] = pos[1];
-    }
-
-    avgY = (point0[1] + point1[1] + point2[1]) / 3;
+    f32 avgY = (point0[1] + point1[1] + point2[1]) / 3;
 
     vec3_set(forward, sins(yaw), 0, coss(yaw));
-    find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
+    vec3f_find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
     vec3f_normalize(yColumn);
     vec3_cross(xColumn, yColumn, forward);
     vec3f_normalize(xColumn);

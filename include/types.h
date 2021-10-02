@@ -461,7 +461,7 @@ struct MarioState
              u8  breathCounter;
 #endif
 #ifdef PREVENT_DEATH_LOOP
-             u8  isDead: 1;
+             u8  isDead: TRUE;
 #endif
            Vec3f lastSafePos;
            Vec3f prevPos;

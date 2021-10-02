@@ -283,7 +283,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     if ((m->action & ACT_FLAG_RIDING_SHELL) && floorHeight < waterLevel) {
         floorHeight = waterLevel;
         floor = &gWaterSurfacePseudoFloor;
-        floor->originOffset = floorHeight; //! Wrong origin offset (no effect)
+        floor->originOffset = -floorHeight;
     }
 
     if (nextPos[1] > floorHeight + 100.0f) {

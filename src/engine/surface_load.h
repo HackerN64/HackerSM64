@@ -19,15 +19,17 @@ enum
     SPATIAL_PARTITION_FLOORS,
     SPATIAL_PARTITION_CEILS,
     SPATIAL_PARTITION_WALLS,
-    SPATIAL_PARTITION_WATER
+    SPATIAL_PARTITION_WATER,
+    MUM_SPATIAL_PARTITIONS
 };
 
-typedef struct SurfaceNode SpatialPartitionCell[4];
+typedef struct SurfaceNode SpatialPartitionCell[MUM_SPATIAL_PARTITIONS];
 
-extern SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
+extern SpatialPartitionCell  gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 extern SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
 extern struct SurfaceNode *sSurfaceNodePool;
-extern struct Surface *sSurfacePool;
+extern struct Surface     *sSurfacePool;
+extern s16 sSurfaceNodePoolSize;
 extern s16 sSurfacePoolSize;
 
 void alloc_surface_pools(void);
