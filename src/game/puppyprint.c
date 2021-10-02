@@ -483,7 +483,7 @@ void get_average_perf_time(OSTime *time) {
     for (i = 0; i < NUM_PERF_ITERATIONS - 1; i++) {
         total += time[i];
     }
-    time[NUM_PERF_ITERATIONS] = total / NUM_PERF_ITERATIONS;
+    time[NUM_PERF_ITERATIONS] = MAX(total / NUM_PERF_ITERATIONS, 0);
 }
 
 void puppyprint_profiler_process(void) {
