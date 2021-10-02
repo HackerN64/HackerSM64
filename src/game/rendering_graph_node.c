@@ -423,7 +423,6 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
     if (node->fnNode.node.children != NULL) {
         u16 perspNorm;
         f32 farClip = node->far;
-        f32 farClipDelta = farClip;
         Mtx *mtx = alloc_display_list(sizeof(*mtx));
 #ifdef WIDE
         if (gConfig.widescreen && (gCurrLevelNum != 0x01)){
