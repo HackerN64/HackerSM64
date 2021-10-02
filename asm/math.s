@@ -12,8 +12,8 @@ glabel mtxf_to_mtx_asm
     li.s $f8, 1.0
     li $v0, 1
     li.s $f4, 65536.0
-    # flags will never update in this loop, so do the compare only once
-    # if this ever breaks contact someone2639, and then maybe MIPS Technologies, Inc.
+    // flags will never update in this loop, so do the compare only once.
+    // if this ever breaks contact someone2639, and then maybe MIPS Technologies, Inc.
     c.eq.s $f6, $f8
 1:
     lwc1 $f0, ($a1)
