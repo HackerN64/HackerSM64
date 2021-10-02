@@ -591,7 +591,7 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
 
 // EU has both get_str_x_pos_from_center and get_str_x_pos_from_center_scale
 // US and JP only implement one or the other
-s16 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
+s32 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
     s16 strPos = 0;
     f32 spacesWidth = 0.0f;
 
@@ -605,7 +605,7 @@ s16 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
 }
 
 
-s16 get_string_width(u8 *str) {
+s32 get_string_width(u8 *str) {
     s16 strPos = 0;
     s16 width = 0;
 
@@ -681,7 +681,7 @@ void int_to_str(s32 num, u8 *dst) {
     dst[pos] = DIALOG_CHAR_TERMINATOR;
 }
 
-s16 get_dialog_id(void) {
+s32 get_dialog_id(void) {
     return gDialogID;
 }
 
@@ -2136,7 +2136,7 @@ s16 render_course_complete_screen(void) {
     return MENU_OPT_NONE;
 }
 
-s16 render_menus_and_dialogs(void) {
+s32 render_menus_and_dialogs(void) {
     s16 index = MENU_OPT_NONE;
 
     create_dl_ortho_matrix();

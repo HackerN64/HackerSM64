@@ -380,8 +380,7 @@ s32 iterate_surface_count(s32 x, s32 z)
     return j;
 }
 
-void visual_surface_loop(void)
-{
+void visual_surface_loop(void) {
     Vtx *verts;
     Mtx *mtx;
 

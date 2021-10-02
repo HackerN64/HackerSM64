@@ -137,17 +137,17 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, const u8 *str);
 void print_menu_generic_string(s16 x, s16 y, const u8 *str);
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex);
 #if defined(VERSION_US) || defined(VERSION_EU)
-s16 get_str_x_pos_from_center(s16 centerPos, u8 *str, f32 scale);
+s32 get_str_x_pos_from_center(s16 centerPos, u8 *str, f32 scale);
 #endif
 #if defined(VERSION_JP) || defined(VERSION_SH)
 #define get_str_x_pos_from_center get_str_x_pos_from_center_scale
 #endif
 #if defined(VERSION_JP) || defined(VERSION_EU) || defined(VERSION_SH)
-s16 get_str_x_pos_from_center_scale(s16 centerPos, u8 *str, f32 scale);
+s32 get_str_x_pos_from_center_scale(s16 centerPos, u8 *str, f32 scale);
 #endif
 void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileNum, s8 courseNum, s16 x, s16 y);
 void int_to_str(s32 num, u8 *dst);
-s16 get_dialog_id(void);
+s32 get_dialog_id(void);
 void create_dialog_box(s16 dialog);
 void create_dialog_box_with_var(s16 dialog, s32 dialogVar);
 void create_dialog_inverted_box(s16 dialog);
@@ -162,6 +162,6 @@ void set_cutscene_message(s16 xOffset, s16 yOffset, s16 msgIndex, s16 msgDuratio
 void do_cutscene_handler(void);
 void render_hud_cannon_reticle(void);
 void reset_red_coins_collected(void);
-s16 render_menus_and_dialogs(void);
+s32 render_menus_and_dialogs(void);
 
 #endif // INGAME_MENU_H
