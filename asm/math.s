@@ -7,16 +7,20 @@
 .section .text, "ax"
 
 .balign 32
-# glabel mtxf_to_mtx_asm
-.globl mtxf_to_mtx_asm
-mtxf_to_mtx_asm:
+glabel mtxf_to_mtx_asm
+    lwc1 $f6, gWorldScale
+    li.s $f8, 1.0
     li $v0, 1
     li.s $f4, 65536.0
 1:
     lwc1 $f0, ($a1)
+    lwc1 $f2, 0x04($a1)
+    c.eq.s $f6, $f8
+    bc1f 3f
+    nop
+2:
     andi $t0, $v0, (1 << 1)
     mul.s $f0, $f4
-    lwc1 $f2, 0x04($a1)
     trunc.w.s $f0, $f0
     mfc1 $t3, $f0
     addiu $a1, 8
@@ -46,3 +50,8 @@ storezero:
     sh $zero, 0x02($a0)
     sh $zero, 0x22($a0)
     j loopend
+3:
+    div.s $f0, $f6
+    div.s $f2, $f6
+    b 2b
+
