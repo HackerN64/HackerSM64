@@ -599,8 +599,7 @@ static s32 obj_die_if_above_lava_and_health_non_positive(void) {
     return TRUE;
 }
 
-static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction,
-                              u8 *attackHandlers) {
+static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction, u8 *attackHandlers) {
     s32 attackType;
 
     obj_set_hitbox(o, hitbox);
@@ -655,12 +654,12 @@ static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActi
                     break;
             }
 
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
             return attackType;
         }
     }
 
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
     return 0;
 }
 
@@ -740,12 +739,12 @@ static s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActio
         } else {
             attackType = o->oInteractStatus & INT_STATUS_ATTACK_MASK;
             obj_die_if_health_non_positive();
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
             return attackType;
         }
     }
 
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
     return 0;
 }
 

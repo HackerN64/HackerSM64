@@ -1770,7 +1770,7 @@ s32 execute_mario_action(struct MarioState *m) {
         }
 
         play_infinite_stairs_music();
-        m->marioObj->oInteractStatus = 0;
+        m->marioObj->oInteractStatus = INT_STATUS_NONE;
 #if ENABLE_RUMBLE
         queue_rumble_particles();
 #endif

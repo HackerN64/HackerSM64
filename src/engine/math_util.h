@@ -424,11 +424,9 @@ extern f32 gSineTable[];
     MAT4_DOT_PROD((R), (A), (B), 3, 3); \
 }
 
-#define MTXF_END(mtx) { \
-    (mtx)[0][3] = 0.0f; \
-    (mtx)[1][3] = 0.0f; \
-    (mtx)[2][3] = 0.0f; \
-    (mtx)[3][3] = 1.0f; \
+#define MTXF_END(mtx) {                         \
+    (mtx)[0][3] = (mtx)[1][3] = (mtx)[2][3] = 0;\
+    ((u32 *)(mtx))[15] = 0x3F800000;            \
 }
 
 #define NAME_INVMAG(v) v##_invmag
@@ -540,6 +538,8 @@ f32 atan2f(f32 a, f32 b);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32 anim_spline_poll(Vec3f result);
+void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
+void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void mtxf_rot_trans_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
 

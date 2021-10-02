@@ -315,19 +315,22 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
  * render modes of layers.
  */
 void geo_append_display_list(void *displayList, s32 layer) {
-    s32 index = 0;
+    s32 index = LIST_HEADS_ZEX;
 #ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);
 #endif
 #if defined(F3DZEX_GBI_2) || (SILHOUETTE > 0)
     if (gCurGraphNodeObject != NULL) {
 #ifdef F3DZEX_GBI_2
-        if ((gCurGraphNodeObject->node.flags & GRAPH_RENDER_UCODE_REJ) && ucodeTestSwitch) {
-            index = 1;
+        if (/* gIsConsole && */ (gCurGraphNodeObject->node.flags & GRAPH_RENDER_UCODE_REJ) && ucodeTestSwitch) {
+            index = LIST_HEADS_REJ;
         }
 #endif
 #if SILHOUETTE
         if (gCurGraphNodeObject->node.flags & GRAPH_RENDER_SILHOUETTE) {
+// #ifdef F3DZEX_GBI_2
+//             index = LIST_HEADS_REJ;
+// #endif
             switch (layer) {
                 case LAYER_OPAQUE: layer = LAYER_SILHOUETTE_OPAQUE; break;
                 case LAYER_ALPHA:  layer = LAYER_SILHOUETTE_ALPHA;  break;
