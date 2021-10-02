@@ -1,7 +1,5 @@
 #include <ultra64.h>
 
-#ifdef VISUAL_DEBUG
-
 /**
  * @file debug_box.c
  * Draws 3D boxes for debugging purposes
@@ -32,6 +30,8 @@
 #include "behavior_data.h"
 
 #include "debug_box.h"
+
+#ifdef VISUAL_DEBUG
 
 Vtx debug_box_mesh[32] = {
 	{{{0, 0, -100},0, {-16, 1008},{0x0, 0x0, 0x0, 0xFF}}},

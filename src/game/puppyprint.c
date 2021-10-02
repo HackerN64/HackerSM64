@@ -25,8 +25,6 @@ a modern game engine's developer's console.
 
 #include <ultra64.h>
 
-#ifdef PUPPYPRINT
-
 #include "config.h"
 #include "game_init.h"
 #include "memory.h"
@@ -44,6 +42,8 @@ a modern game engine's developer's console.
 #include "audio/data.h"
 #include "hud.h"
 #include "debug_box.h"
+
+#ifdef PUPPYPRINT
 
 ColorRGBA currEnv;
 u8 fDebug = FALSE;
@@ -516,6 +516,9 @@ void puppyprint_profiler_process(void) {
         rdpTime = bufferTime[NUM_PERF_ITERATIONS];
         rdpTime = MAX(rdpTime, tmemTime[NUM_PERF_ITERATIONS]);
         rdpTime = MAX(rdpTime, busTime[NUM_PERF_ITERATIONS]);
+#if CONSOLE == IQUE //iQue RDP registers need to be halved to be correct.
+        rdpTime /= 2;
+#endif
         cpuTime = scriptTime[NUM_PERF_ITERATIONS];
         rspTime = rspGenTime[NUM_PERF_ITERATIONS];
         puppyprint_calculate_ram_usage();
