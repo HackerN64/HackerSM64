@@ -5,6 +5,7 @@
 #include <PR/gbi.h>
 
 #include "types.h"
+#include "geo_commands.h"
 #include "game/memory.h"
 
 #define GRAPH_RENDER_ACTIVE         (1 << 0)
@@ -34,6 +35,7 @@
 #define GRAPH_NODE_TYPE_ROTATION              0x017
 #define GRAPH_NODE_TYPE_OBJECT                0x018
 #define GRAPH_NODE_TYPE_ANIMATED_PART         0x019
+#define GRAPH_NODE_TYPE_BONE                  GEO_BONE_ID
 #define GRAPH_NODE_TYPE_BILLBOARD             0x01A
 #define GRAPH_NODE_TYPE_DISPLAY_LIST          0x01B
 #define GRAPH_NODE_TYPE_SCALE                 0x01C
@@ -242,6 +244,14 @@ struct GraphNodeAnimatedPart
     /*0x18*/ Vec3s translation;
 };
 
+struct GraphNodeBone
+{
+    struct GraphNode node;
+    void *displayList;
+    Vec3s translation;
+    Vec3s rotation;
+};
+
 /** A GraphNode that draws a display list rotated in a way to always face the
  *  camera. Note that if the entire object is a billboard (like a coin or 1-up)
  *  then it simply sets the billboard flag for the entire object, this node is
@@ -390,6 +400,8 @@ struct GraphNodeObject *init_graph_node_object(struct AllocOnlyPool *pool, struc
 struct GraphNodeCullingRadius *init_graph_node_culling_radius(struct AllocOnlyPool *pool, struct GraphNodeCullingRadius *graphNode, s16 radius);
 struct GraphNodeAnimatedPart *init_graph_node_animated_part(struct AllocOnlyPool *pool, struct GraphNodeAnimatedPart *graphNode,
                                                             s32 drawingLayer, void *displayList, Vec3s translation);
+struct GraphNodeBone *init_graph_node_bone(struct AllocOnlyPool *pool, struct GraphNodeBone *graphNode,
+                                           s32 drawingLayer, void *displayList, Vec3s translation, Vec3s rotation);
 struct GraphNodeBillboard *init_graph_node_billboard(struct AllocOnlyPool *pool, struct GraphNodeBillboard *graphNode,
                                                      s32 drawingLayer, void *displayList, Vec3s translation);
 struct GraphNodeDisplayList *init_graph_node_display_list(struct AllocOnlyPool *pool, struct GraphNodeDisplayList *graphNode,
