@@ -1847,7 +1847,7 @@ s32 act_flying(struct MarioState *m) {
 
 s32 act_riding_hoot(struct MarioState *m) {
     if (!(m->input & INPUT_A_DOWN) || (m->marioObj->oInteractStatus & INT_STATUS_MARIO_UNK7)) {
-        m->usedObj->oInteractStatus = 0;
+        m->usedObj->oInteractStatus = INT_STATUS_NONE;
         m->usedObj->oHootMarioReleaseTime = gGlobalTimer;
 
         play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED);

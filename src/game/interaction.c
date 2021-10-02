@@ -67,7 +67,7 @@ u32 interact_shock         (struct MarioState *m, u32 interactType, struct Objec
 u32 interact_mr_blizzard   (struct MarioState *m, u32 interactType, struct Object *obj);
 u32 interact_hit_from_below(struct MarioState *m, u32 interactType, struct Object *obj);
 u32 interact_bounce_top    (struct MarioState *m, u32 interactType, struct Object *obj);
-u32 interact_spiny_walking    (struct MarioState *m, u32 interactType, struct Object *obj);
+u32 interact_spiny_walking (struct MarioState *m, u32 interactType, struct Object *obj);
 u32 interact_damage        (struct MarioState *m, u32 interactType, struct Object *obj);
 u32 interact_breakable     (struct MarioState *m, u32 interactType, struct Object *obj);
 u32 interact_koopa_shell   (struct MarioState *m, u32 interactType, struct Object *obj);
@@ -1477,13 +1477,19 @@ u32 check_object_grab_mario(struct MarioState *m, UNUSED u32 interactType, struc
 }
 
 u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    s32 actionId = m->action & ACT_ID_MASK;
-    if (actionId >= 0x080 && actionId < 0x0A0) {
+    s32 actionId = (m->action & ACT_ID_MASK);
+    if (actionId >= ACT_GROUP_AIRBORNE && actionId < (ACT_HOLD_JUMP & ACT_ID_MASK)) {
         if (!(m->prevAction & ACT_FLAG_ON_POLE) || m->usedObj != obj) {
-#if defined(VERSION_SH) || defined(SHINDOU_POLES)
+#if defined(POLE_SWING)
+
             f32 velConv = m->forwardVel; // conserve the velocity.
             struct Object *marioObj = m->marioObj;
+            Angle dAngleToPole = (mario_obj_angle_to_object(m, obj) - m->faceAngle[1]);
+            if ((dAngleToPole < -0x2AAA) || (dAngleToPole > 0x2AAA)) return FALSE;
+#elif defined(VERSION_SH) || defined(SHINDOU_POLES)
+            f32 velConv = m->forwardVel; // conserve the velocity.
             u32 lowSpeed;
+            struct Object *marioObj = m->marioObj;
 #else
             u32 lowSpeed = (m->forwardVel <= 10.0f);
             struct Object *marioObj = m->marioObj;
@@ -1499,11 +1505,14 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
             m->usedObj     = obj;
             m->vel[1]      = 0.0f;
             m->forwardVel  = 0.0f;
-
-            marioObj->oMarioPoleUnk108 = 0;
-            marioObj->oMarioPoleYawVel = 0;
-            marioObj->oMarioPolePos = ((m->pos[1] - obj->oPosY) < 0) ? -obj->hitboxDownOffset : (m->pos[1] - obj->oPosY);
-
+            f32 poleBottom = (-m->usedObj->hitboxDownOffset - 100.0f);
+            marioObj->oMarioPolePos = (m->pos[1] - obj->oPosY);
+            marioObj->oMarioPolePos = MAX(marioObj->oMarioPolePos, poleBottom);
+            // marioObj->oMarioPolePos = ((m->pos[1] - obj->oPosY) < 0) ? -obj->hitboxDownOffset : (m->pos[1] - obj->oPosY);
+#ifdef POLE_SWING
+            m->angleVel[1] = (s32)((velConv * 0x80) + 0x1000);
+            if (dAngleToPole < 0x0) m->angleVel[1] = -m->angleVel[1];
+#else
             if (lowSpeed) {
                 return set_mario_action(m, ACT_GRAB_POLE_SLOW, 0);
             }
@@ -1511,9 +1520,10 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
             //! @bug Using m->forwardVel here is assumed to be 0.0f due to the set from earlier.
             //       This is fixed in the Shindou version.
 #if defined(VERSION_SH) || defined(SHINDOU_POLES)
-            marioObj->oMarioPoleYawVel = (s32)(velConv * 0x100 + 0x1000);
+            m->angleVel[1] = (s32)(velConv * 0x100 + 0x1000);
 #else
-            marioObj->oMarioPoleYawVel = (s32)(m->forwardVel * 0x100 + 0x1000);
+            m->angleVel[1] = (s32)(m->forwardVel * 0x100 + 0x1000);
+#endif
 #endif
             reset_mario_pitch(m);
 #if ENABLE_RUMBLE

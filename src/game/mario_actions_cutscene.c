@@ -498,7 +498,7 @@ s32 act_reading_sign(struct MarioState *m) {
             // intentional fall through
         // turn toward sign
         case 1:
-            m->faceAngle[1] += marioObj->oMarioPoleUnk108 / 11;
+            m->faceAngle[1] += marioObj->oMarioReadingSignDYaw / 11;
             m->pos[0] += marioObj->oMarioReadingSignDPosX / 11.0f;
             m->pos[2] += marioObj->oMarioReadingSignDPosZ / 11.0f;
             // create the text box

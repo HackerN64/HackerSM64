@@ -101,6 +101,8 @@
 #define NO_FALSE_LEDGEGRABS
 // Use Shindou's pole behavior
 //#define SHINDOU_POLES
+// Mario can swing around poles and jump off them while swinging.
+#define POLE_SWING
 // Allows Mario to jump kick on steep surfaces that are set to be non slippery, instead of being forced to dive
 #define JUMP_KICK_FIX
 // Allow Mario to grab hangable ceilings from any state
@@ -187,7 +189,7 @@
 // Use 64x64 quarter shadow textures (Vanilla are 16x16)
 //#define HD_SHADOWS
 // Makes certain objects (mainly trees) transparent when the camera gets close
-#define OBJ_OPACITY_BY_CAM_DIST
+//#define OBJ_OPACITY_BY_CAM_DIST
 // Fixes the game reading the ia8 burn smoke texture as an rgba16
 #define BURN_SMOKE_FIX
 // Disable the fix to Koopa's unshelled model
