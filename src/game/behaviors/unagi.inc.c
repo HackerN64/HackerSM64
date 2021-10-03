@@ -176,19 +176,17 @@ void bhv_unagi_loop(void) {
 }
 
 void bhv_unagi_subobject_loop(void) {
-    f32 offset;
-
     if (!o->parentObj->oUnagiHasStar) {
         obj_mark_for_deletion(o);
     } else {
-        offset = 300.0f * o->oBehParams2ndByte;
+        f32 offset = (300.0f * o->oBehParams2ndByte);
 
-        o->oPosY = o->parentObj->oPosY - offset * sins(o->parentObj->oFaceAnglePitch) * 1.13f;
+        o->oPosY = (o->parentObj->oPosY - (offset * sins(o->parentObj->oFaceAnglePitch) * 1.13f));
 
-        offset = coss(o->parentObj->oFaceAnglePitch / 2) * offset;
+        offset = (coss(o->parentObj->oFaceAnglePitch / 2) * offset);
 
-        o->oPosX = o->parentObj->oPosX + offset * sins(o->parentObj->oFaceAngleYaw);
-        o->oPosZ = o->parentObj->oPosZ + offset * coss(o->parentObj->oFaceAngleYaw);
+        o->oPosX = (o->parentObj->oPosX + (offset * sins(o->parentObj->oFaceAngleYaw)));
+        o->oPosZ = (o->parentObj->oPosZ + (offset * coss(o->parentObj->oFaceAngleYaw)));
 
         if (o->oBehParams2ndByte == UNAGI_PART_BP_BACK) {
             if (o->parentObj->oAnimState != UNAGI_ANIM_STATE_NO_STAR && o->oDistanceToMario < 150.0f) {
