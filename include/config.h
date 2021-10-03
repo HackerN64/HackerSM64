@@ -143,6 +143,8 @@
 // -- SPECIFIC OBJECT SETTINGS --
 // Allow for retries on collecting the remaining blue coins from a blue coin switch
 #define BLUE_COIN_SWITCH_RETRY
+// Use intendedYaw to control Hoot instead of raw left and right inputs
+#define HOOT_YAW_FIX
 // Collecting a 1-Up Mushroom will fully heal Mario
 #define MUSHROOMS_HEAL
 // Collecting a Power Star will fully heal Mario
