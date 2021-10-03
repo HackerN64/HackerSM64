@@ -91,9 +91,8 @@
 #define GROUND_TURN_MODE 0
 // Improved hanging:
 // - Doesn't require holding down the A button
-// - Percise turning control ()
+// - Percise turning control
 // - Preventis falling from the edges
-// (Arceveti)
 #define BETTER_HANGING
 // Change the movement speed when hanging from a ceiling (the vanilla value is 4.0f, has no effect if BETTER_HANGING is enabled)
 #define HANGING_SPEED 12.0f
@@ -140,6 +139,8 @@
 // -- SPECIFIC OBJECT SETTINGS --
 // Allow for retries on collecting the remaining blue coins from a blue coin switch
 #define BLUE_COIN_SWITCH_RETRY
+// Collecting a 1-Up Mushroom will fully heal Mario
+#define MUSHROOMS_HEAL
 // The number of chain balls the Chain Chomp has.  Vanilla is 5.
 #define CHAIN_CHOMP_NUM_SEGMENTS 5
 
