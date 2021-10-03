@@ -355,36 +355,26 @@ s32 perform_ground_step(struct MarioState *m) {
     return stepResult;
 }
 
-struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *grabbedWall, struct Surface *wall, Vec3f intendedPos, Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
-    if (m->vel[1] > 0) return FALSE;
+struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *prevWall, struct Surface *wall, Vec3f intendedPos, Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
+    struct Surface *returnedWall = wall;
+    if ((m->vel[1] > 0.0f) || (wall == NULL)) return NULL;
+    if (prevWall == NULL) prevWall = wall;
     // Return the already grabbed wall if Mario is moving into it more than the newly tested wall
-    if ((grabbedWall != NULL) && (((grabbedWall->normal.x * m->vel[0]) + (grabbedWall->normal.z * m->vel[2])) < ((wall->normal.x * m->vel[0]) + (wall->normal.z * m->vel[2])))) {
-        return grabbedWall;
-    }
+    if (((prevWall->normal.x * m->vel[0]) + (prevWall->normal.z * m->vel[2])) < ((wall->normal.x * m->vel[0]) + (wall->normal.z * m->vel[2]))) returnedWall = prevWall;
     f32 displacementX = (nextPos[0] - intendedPos[0]);
     f32 displacementZ = (nextPos[2] - intendedPos[2]);
-
     // Only ledge grab if the wall displaced Mario in the opposite direction of his velocity.
-    if (((displacementX * m->vel[0]) + (displacementZ * m->vel[2])) > 0.0f) {
-        return grabbedWall;
-    }
-
-    //! Since the search for floors starts at y + 160, we will sometimes grab
-    // a higher ledge than expected (glitchy ledge grab)
+    if (((displacementX * m->vel[0]) + (displacementZ * m->vel[2])) > 0.0f) returnedWall = prevWall;
     ledgePos[0] = (nextPos[0] - (wall->normal.x * 60.0f));
     ledgePos[2] = (nextPos[2] - (wall->normal.z * 60.0f));
     ledgePos[1] = find_floor(ledgePos[0], (nextPos[1] + 160.0f), ledgePos[2], ledgeFloor);
-
-#ifdef NO_FALSE_LEDGEGRABS
-    if ((ledgeFloor == NULL)|| (*ledgeFloor)->normal.y < COS25) {
-        return grabbedWall;
+    if (ledgeFloor == NULL) return NULL;
+    if ((ledgePos[1] < (nextPos[1] + 100.0f))
+    || ((*ledgeFloor)->normal.y < COS25)
+    || SURFACE_IS_UNSAFE((*ledgeFloor)->type)) {
+        return NULL;
     }
-#endif
-
-    if ((ledgePos[1] - nextPos[1]) <= 100.0f) {
-        return grabbedWall;
-    }
-    return wall;
+    return returnedWall;
 }
 
 s32 bonk_or_hit_lava_wall(struct MarioState *m, struct WallCollisionData *wallData) {
@@ -507,7 +497,8 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
 
     if ((stepArg & AIR_STEP_CHECK_LEDGE_GRAB) && upperWall.numWalls == 0 && lowerWall.numWalls != 0) {
         for (i = 0; i < lowerWall.numWalls; i++) {
-            if ((grabbedWall = check_ledge_grab(m, grabbedWall, lowerWall.walls[i], intendedPos, nextPos, ledgePos, &ledgeFloor))) {
+            grabbedWall = check_ledge_grab(m, grabbedWall, lowerWall.walls[i], intendedPos, nextPos, ledgePos, &ledgeFloor);
+            if (grabbedWall != NULL) {
                 stepResult = AIR_STEP_GRABBED_LEDGE;
             }
         }
@@ -522,15 +513,13 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         }
         return stepResult;
     }
-
-    vec3f_copy(m->pos, nextPos);
+    vec3_copy(m->pos, nextPos);
     set_mario_floor(m, floor, floorHeight);
-
-    stepResult = bonk_or_hit_lava_wall(m, &upperWall);
-    if (stepResult != AIR_STEP_NONE) {
-        return stepResult;
+    if (upperWall.numWalls > 0) {
+        stepResult  = bonk_or_hit_lava_wall(m, &upperWall);
+        if (stepResult != AIR_STEP_NONE) return stepResult;
     }
-    return bonk_or_hit_lava_wall(m, &lowerWall);
+    return ((lowerWall.numWalls > 0) ? bonk_or_hit_lava_wall(m, &lowerWall) : AIR_STEP_NONE);
 }
 
 void apply_twirl_gravity(struct MarioState *m) {
