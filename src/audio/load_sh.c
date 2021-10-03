@@ -1285,12 +1285,6 @@ void func_sh_802f4e50(struct PendingDmaAudioBank *audioBank, s32 audioResetStatu
     encodedInfo = &audioBank->encodedInfo;
     if (audioBank->remaining == 0) {
         mesg = (OSMesg) audioBank->encodedInfo;
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma GCC diagnostic ignored "-Wself-assign"
-#endif
-        mesg = mesg;    //! needs an extra read from mesg here to match...
-#pragma GCC diagnostic pop
         temp = *encodedInfo;
         bankId = (temp >> 8) & 0xFF;
         switch ((u8) (temp >> 0x10)) {

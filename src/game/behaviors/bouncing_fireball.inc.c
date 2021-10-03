@@ -24,7 +24,7 @@ void bhv_bouncing_fireball_flame_loop(void) {
     if (o->oTimer > 300)
         obj_mark_for_deletion(o);
     cur_obj_move_standard(78);
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void bhv_bouncing_fireball_spawner_loop(void) {

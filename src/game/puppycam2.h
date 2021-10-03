@@ -108,7 +108,7 @@ struct gPuppyStruct
 
 };
 
-//A second container for bounds that have 2 pairs of coordinates. Optional.
+// A second container for bounds that have 2 pairs of coordinates. Optional.
 struct sPuppyAngles
 {
     Vec3s pos;
@@ -118,7 +118,7 @@ struct sPuppyAngles
     s16 zoom;
 };
 
-//Structurally, it's exactly the same as CutsceneSplinePoint
+// Structurally, it's exactly the same as CutsceneSplinePoint
 struct sPuppySpline
 {
     s8 index;  // The index of the spline. Ends with -1
@@ -126,7 +126,7 @@ struct sPuppySpline
     Vec3s pos; // The vector pos of the spline index itself.
 };
 
-//A bounding volume for activating puppycamera scripts and angles.
+// A bounding volume for activating puppycamera scripts and angles.
 struct sPuppyVolume
 {
     Vec3s pos;                   // The set position of the volume
@@ -138,7 +138,7 @@ struct sPuppyVolume
     s32 flagsRemove;             // Removes behaviour flags.
     u8 flagPersistance;          // Decides if adding or removing the flags is temporary or permanent.
     u8 shape;
-    s16 room;
+    RoomData room;
     u8 area;
 };
 

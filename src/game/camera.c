@@ -617,12 +617,10 @@ void unused_set_camera_pitch_shake_env(s16 shake) {
  */
 void calc_y_to_curr_floor(f32 *posOff, f32 posMul, f32 posBound, f32 *focOff, f32 focMul, f32 focBound) {
     f32 floorHeight = sMarioGeometry.currFloorHeight;
-    f32 waterHeight;
 
     if (!(sMarioCamState->action & ACT_FLAG_METAL_WATER)) {
-        //! @bug this should use sMarioGeometry.waterHeight
-        if (floorHeight < (waterHeight = find_water_level(sMarioCamState->pos[0], sMarioCamState->pos[2]))) {
-            floorHeight = waterHeight;
+        if (floorHeight < sMarioGeometry.waterHeight) {
+            floorHeight = sMarioGeometry.waterHeight;
         }
     }
 
@@ -1474,14 +1472,12 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     pos[1] = find_floor(c->areaCenX, CELL_HEIGHT_LIMIT, c->areaCenZ, &floor);
     if (floor != NULL) {
         pos[1] = 300.0f + get_surface_height_at_location(pos[0], pos[2], floor);
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
         switch (gCurrLevelArea) {
-            case AREA_BOB:
-                pos[1] += 125.f;
-                // fall through
-                //! makes the BoB boss fight camera move up twice as high as it should
-            case AREA_WF:
-                pos[1] += 125.f;
+            case AREA_BOB: pos[1] += 125.f; break;
+            case AREA_WF:  pos[1] += 125.f; break;
         }
+#endif
     }
 #ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
     // Prevent the camera from going to the ground in the outside boss fight

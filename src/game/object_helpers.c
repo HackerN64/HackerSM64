@@ -1461,9 +1461,8 @@ void cur_obj_move_standard(s16 steepSlopeAngleDegrees) {
     //  Objects that do this will be marked with //PARTIAL_UPDATE.
     if (!(o->activeFlags & (ACTIVE_FLAG_FAR_AWAY | ACTIVE_FLAG_IN_DIFFERENT_ROOM))) {
         if (steepSlopeAngleDegrees < 0) {
-            // clang-format off
-            careAboutEdgesAndSteepSlopes = TRUE; steepSlopeAngleDegrees = -steepSlopeAngleDegrees;
-            // clang-format on
+            careAboutEdgesAndSteepSlopes = TRUE;
+            steepSlopeAngleDegrees = -steepSlopeAngleDegrees;
         }
         if (steepSlopeAngleDegrees == 78) {
             steepSlopeNormalY =  COS78;

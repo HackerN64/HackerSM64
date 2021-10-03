@@ -207,6 +207,6 @@ void bhv_chuckya_loop(void) {
             cur_obj_get_thrown_or_placed(20.0f, 50.0f, 2);
             break;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
     print_debug_bottom_up("md %d", o->oAction);
 }

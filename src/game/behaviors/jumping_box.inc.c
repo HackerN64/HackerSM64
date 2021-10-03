@@ -64,5 +64,5 @@ void bhv_jumping_box_loop(void) {
         create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
         obj_explode_and_spawn_coins(46.0f, COIN_TYPE_YELLOW);
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

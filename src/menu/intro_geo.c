@@ -221,9 +221,10 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     if (callContext != GEO_CONTEXT_RENDER) {  // reset
         sGameOverFrameCounter = 0;
         sGameOverTableIndex = -2;
-        for (i = 0; i < ARRAY_COUNT(gameOverBackgroundTable); ++i)
+        for (i = 0; i < ARRAY_COUNT(gameOverBackgroundTable); ++i) {
             gameOverBackgroundTable[i] = INTRO_BACKGROUND_GAME_OVER;
-    } else {  // draw
+        }
+    } else { // draw
         dl = alloc_display_list(16 * sizeof(*dl));
         dlIter = dl;
         if (sGameOverTableIndex == -2) {
@@ -238,8 +239,7 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
                 static s8 flipOrder[] = { 0, 1, 2, 3, 7, 11, 10, 9, 8, 4, 5, 6 };
 
                 sGameOverTableIndex++;
-                gameOverBackgroundTable[flipOrder[sGameOverTableIndex]] =
-                    INTRO_BACKGROUND_SUPER_MARIO;
+                gameOverBackgroundTable[flipOrder[sGameOverTableIndex]] = INTRO_BACKGROUND_SUPER_MARIO;
             }
         }
         if (sGameOverTableIndex != 11) {
@@ -250,8 +250,9 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
         // draw all the tiles
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
         gSPDisplayList(dlIter++, &title_screen_bg_dl_start);
-        for (j = 0; j < ARRAY_COUNT(gameOverBackgroundTable); ++j)
+        for (j = 0; j < ARRAY_COUNT(gameOverBackgroundTable); ++j) {
             gSPDisplayList(dlIter++, intro_backdrop_one_image(j, gameOverBackgroundTable));
+        }
         gSPDisplayList(dlIter++, &title_screen_bg_dl_end);
         gSPEndDisplayList(dlIter);
     }
@@ -265,7 +266,7 @@ extern Gfx title_screen_bg_dl_rumble_pak[];
 extern Gfx title_screen_bg_dl_face_easter_egg_begin[];
 extern Gfx title_screen_bg_dl_face_easter_egg_end[];
 
-//Data
+// Data
 s8 sFaceVisible[] = {
     1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,

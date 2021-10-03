@@ -13,7 +13,7 @@ void bhv_warp_loop(void) {
         }
         o->hitboxHeight = 50.0f;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void bhv_fading_warp_loop() { // identical to the above function except for o->hitboxRadius
@@ -29,5 +29,5 @@ void bhv_fading_warp_loop() { // identical to the above function except for o->h
         }
         o->hitboxHeight = 50.0f;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

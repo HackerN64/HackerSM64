@@ -632,7 +632,7 @@ void bhv_ukiki_loop(void) {
         o->oAnimState = UKIKI_ANIM_STATE_DEFAULT;
     }
 
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
     print_debug_bottom_up("mode   %d\n", o->oAction);
     print_debug_bottom_up("action %d\n", o->oHeldState);
 }

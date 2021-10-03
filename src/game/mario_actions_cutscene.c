@@ -1770,7 +1770,7 @@ static void intro_cutscene_set_mario_to_idle(struct MarioState *m) {
     stop_and_set_height_to_floor(m);
 }
 
-enum {
+enum IntroCutsceneArgs {
     INTRO_CUTSCENE_HIDE_HUD_AND_MARIO,
     INTRO_CUTSCENE_PEACH_LAKITU_SCENE,
     INTRO_CUTSCENE_RAISE_PIPE,
@@ -1938,7 +1938,11 @@ static s32 jumbo_star_cutscene_flying(struct MarioState *m) {
     return FALSE;
 }
 
-enum { JUMBO_STAR_CUTSCENE_FALLING, JUMBO_STAR_CUTSCENE_TAKING_OFF, JUMBO_STAR_CUTSCENE_FLYING };
+enum JumboStarCutsceneArgs {
+    JUMBO_STAR_CUTSCENE_FALLING,
+    JUMBO_STAR_CUTSCENE_TAKING_OFF,
+    JUMBO_STAR_CUTSCENE_FLYING
+};
 
 static s32 act_jumbo_star_cutscene(struct MarioState *m) {
     switch (m->actionArg) {
@@ -2482,7 +2486,7 @@ static void end_peach_cutscene_fade_out(struct MarioState *m) {
     }
 }
 
-enum {
+enum EndPeachCutsceneArgs {
     END_PEACH_CUTSCENE_MARIO_FALLING,
     END_PEACH_CUTSCENE_MARIO_LANDING,
     END_PEACH_CUTSCENE_SUMMON_JUMBO_STAR,

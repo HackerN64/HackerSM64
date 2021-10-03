@@ -128,7 +128,7 @@ void (*sTweesterActions[])(void) = { tweester_act_idle, tweester_act_chase, twee
 void bhv_tweester_loop(void) {
     obj_set_hitbox(o, &sTweesterHitbox);
     cur_obj_call_action_function(sTweesterActions);
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 /**

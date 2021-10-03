@@ -38,7 +38,7 @@ void set_rolling_sphere_hitbox(void) {
     obj_set_hitbox(o, &sRollingSphereHitbox);
 
     if ((o->oInteractStatus & INT_STATUS_INTERACTED) != 0) {
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     }
 }
 

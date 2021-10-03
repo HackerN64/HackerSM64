@@ -450,7 +450,6 @@ struct PlayerGeometry
     /*0x24*/ struct Surface *prevCeil;
     /*0x28*/ f32 prevCeilHeight;
     /*0x2C*/ s16 prevCeilType;
-    /// Unused, but recalculated every frame
     /*0x30*/ f32 waterHeight;
 };
 

@@ -192,14 +192,10 @@ void hoot_action_loop(void) {
 }
 
 void hoot_turn_to_home(void) {
-    f32 homeDistX = o->oHomeX - o->oPosX;
-    f32 homeDistY = o->oHomeY - o->oPosY;
-    f32 homeDistZ = o->oHomeZ - o->oPosZ;
-    s16 hAngleToHome = atan2s(homeDistZ, homeDistX);
-    s16 vAngleToHome = atan2s(sqrtf(homeDistX * homeDistX + homeDistZ * homeDistZ), -homeDistY);
-
-    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, hAngleToHome, 0x140);
-    o->oMoveAnglePitch = approach_s16_symmetric(o->oMoveAnglePitch, vAngleToHome, 0x140);
+    Angle pitchToHome, yawToHome;
+    vec3f_get_angle(&o->oPosVec, &o->oHomeVec, &pitchToHome, &yawToHome);
+    o->oMoveAngleYaw   = approach_s16_symmetric(o->oMoveAngleYaw,    yawToHome,   0x140);
+    o->oMoveAnglePitch = approach_s16_symmetric(o->oMoveAnglePitch, -pitchToHome, 0x140);
 }
 
 void hoot_awake_loop(void) {

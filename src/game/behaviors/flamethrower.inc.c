@@ -30,7 +30,7 @@ void bhv_flamethrower_flame_loop(void) {
         cur_obj_move_using_fvel_and_gravity();
     if (o->oTimer > remainingTime)
         obj_mark_for_deletion(o);
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void bhv_flamethrower_loop(void) {

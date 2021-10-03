@@ -202,7 +202,7 @@ static void big_boo_shake_after_hit(void) {
 static void boo_reset_after_hit(void) {
     o->oMoveAngleYaw = o->oBooMoveYawBeforeHit;
     o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 // called iff boo/big boo/cage boo is in action 2, which only occurs if it was non-attack-ly interacted with/bounced on?
@@ -298,7 +298,7 @@ static s32 boo_get_attack_status(void) {
         if ((o->oInteractStatus & INT_STATUS_WAS_ATTACKED) && !obj_has_attack_type(ATTACK_FROM_ABOVE)) {
             cur_obj_become_intangible();
 
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
 
             cur_obj_play_sound_2(SOUND_OBJ_BOO_LAUGH_SHORT);
 
@@ -306,7 +306,7 @@ static s32 boo_get_attack_status(void) {
         } else {
             cur_obj_play_sound_2(SOUND_OBJ_BOO_BOUNCE_TOP);
 
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
 
             attackStatus = BOO_BOUNCED_ON;
         }
@@ -477,7 +477,7 @@ void bhv_boo_loop(void) {
         }
     }
 
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 static void big_boo_act_0(void) {
@@ -649,7 +649,7 @@ void bhv_big_boo_loop(void) {
     cur_obj_move_standard(78);
 
     boo_approach_target_opacity_and_update_scale();
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 static void boo_with_cage_act_0(void) {
@@ -726,7 +726,7 @@ void bhv_boo_with_cage_loop(void)
     cur_obj_move_standard(78);
 
     boo_approach_target_opacity_and_update_scale();
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void bhv_merry_go_round_boo_manager_loop(void) {

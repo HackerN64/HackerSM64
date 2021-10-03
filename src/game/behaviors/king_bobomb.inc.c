@@ -307,5 +307,5 @@ void bhv_king_bobomb_loop(void) {
             o->oPosY += 20.0f;
             break;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
