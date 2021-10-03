@@ -12,12 +12,8 @@ struct ObjectHitbox sEyerokHitbox = {
 
 s8 sEyerokAnimStatesList[] = { 0, 1, 3, 2, 1, 0 };
 
-static s32 eyerok_check_mario_relative_z(s32 arg0) {
-    if (gMarioObject->oPosZ - o->oHomeZ < arg0) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+static s32 eyerok_check_mario_relative_z(s32 relZ) {
+    return ((gMarioObject->oPosZ - o->oHomeZ) < relZ);
 }
 
 static void eyerok_spawn_hand(s16 side, s32 model, const BehaviorScript *behavior) {

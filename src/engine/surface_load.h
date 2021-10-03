@@ -14,7 +14,7 @@ struct SurfaceNode
     struct Surface *surface;
 };
 
-enum
+enum SpatialPartitions
 {
     SPATIAL_PARTITION_FLOORS,
     SPATIAL_PARTITION_CEILS,

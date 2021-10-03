@@ -825,7 +825,7 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
         case ACT_LONG_JUMP:
             m->marioObj->header.gfx.animInfo.animID = -1;
             set_mario_y_vel_based_on_fspeed(m, 30.0f, 0.0f);
-            m->marioObj->oMarioLongJumpIsSlow = m->forwardVel > 16.0f ? FALSE : TRUE;
+            m->marioObj->oMarioLongJumpIsSlow = !(m->forwardVel > 16.0f);
 
             //! (BLJ's) This properly handles long jumps from getting forward speed with
             //  too much velocity, but misses backwards longs allowing high negative speeds.

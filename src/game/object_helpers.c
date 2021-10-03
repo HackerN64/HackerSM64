@@ -147,7 +147,7 @@ Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void 
 
 //! rename to geo_switch_room?
 Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    s16 roomCase;
+    RoomData roomCase;
     struct Surface *floor;
     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node;
 
@@ -184,12 +184,7 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
 }
 
 void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
-    Vec3f rel;
-    vec3_copy(rel, &obj->oParentRelativePosVec);
-
-    obj->oPosX = rel[0] * mtx[0][0] + rel[1] * mtx[1][0] + rel[2] * mtx[2][0] + mtx[3][0];
-    obj->oPosY = rel[0] * mtx[0][1] + rel[1] * mtx[1][1] + rel[2] * mtx[2][1] + mtx[3][1];
-    obj->oPosZ = rel[0] * mtx[0][2] + rel[1] * mtx[1][2] + rel[2] * mtx[2][2] + mtx[3][2];
+    linear_mtxf_mul_vec3_and_translate(mtx, &obj->oPosVec,  &obj->oParentRelativePosVec);
 }
 
 void obj_apply_scale_to_matrix(struct Object *obj, Mat4 dst, Mat4 src) {
@@ -259,11 +254,11 @@ s32 cur_obj_rotate_yaw_toward(s16 target, s16 increment) {
     return ((o->oAngleVelYaw = (s16)((s16) o->oMoveAngleYaw - startYaw)) == 0);
 }
 
-s16 obj_angle_to_object(struct Object *obj1, struct Object *obj2) {
+s32 obj_angle_to_object(struct Object *obj1, struct Object *obj2) {
     return atan2s((obj2->oPosZ - obj1->oPosZ), (obj2->oPosX - obj1->oPosX));
 }
 
-s16 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleIndex, s16 turnAmount) {
+s32 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleIndex, s16 turnAmount) {
     f32 a, b, c, d;
     s16 targetAngle = 0;
     s16 startAngle;
@@ -1525,7 +1520,7 @@ void obj_set_pos_relative(struct Object *obj, struct Object *other, f32 dleft, f
     obj->oPosZ = other->oPosZ + dz;
 }
 
-s16 cur_obj_angle_to_home(void) {
+s32 cur_obj_angle_to_home(void) {
     f32 dx = o->oHomeX - o->oPosX;
     f32 dz = o->oHomeZ - o->oPosZ;
     return atan2s(dz, dx);

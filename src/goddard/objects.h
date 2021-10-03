@@ -66,8 +66,8 @@ struct ObjView *make_view(const char *name, s32 flags, s32 a2, s32 ulx, s32 uly,
                           struct ObjGroup *parts);
 struct ObjAnimator *make_animator(void);
 struct ObjWeight *make_weight(UNUSED s32 a0, s32 id, struct ObjVertex *vtx, f32 weight);
-struct ObjGroup *make_group_of_type(enum ObjTypeFlag, struct GdObj*, struct GdObj*);
-void format_object_id(char*, struct GdObj*);
+struct ObjGroup *make_group_of_type(enum ObjTypeFlag type, struct GdObj *fromObj, struct GdObj *toObj);
+void format_object_id(char *str, struct GdObj *obj);
 struct ObjGroup* make_group(s32 count, ...);
 void addto_group(struct ObjGroup *group, struct GdObj *obj);
 void addto_groupfirst(struct ObjGroup *group, struct GdObj *obj);

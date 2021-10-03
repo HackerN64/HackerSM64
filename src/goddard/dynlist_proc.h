@@ -80,7 +80,7 @@ void d_set_world_pos(f32 x, f32 y, f32 z);
 void d_get_world_pos(struct GdVec3f *dst);
 void d_set_scale(f32 x, f32 y, f32 z);
 void d_add_valptr(DynObjName name, u32 vflags, enum ValPtrType type, size_t offset);
-void d_add_valproc(union ObjVarVal * (*)(union ObjVarVal *, union ObjVarVal));
+void d_add_valproc(valptrproc_t proc);
 void d_set_flags(s32 flags);
 void d_set_parm_f(enum DParmF param, f32 val);
 void d_set_parm_ptr(enum DParmPtr param, void *ptr);

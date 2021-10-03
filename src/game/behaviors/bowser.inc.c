@@ -187,11 +187,7 @@ s32 bowser_set_anim_look_up_and_walk(void) {
     if (cur_obj_check_anim_frame(21)) {
         o->oForwardVel = 3.0f;
     }
-    if (cur_obj_check_if_near_animation_end()) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+    return cur_obj_check_if_near_animation_end();
 }
 
 /**
@@ -201,11 +197,7 @@ s32 bowser_set_anim_look_up_and_walk(void) {
 s32 bowser_set_anim_slow_gait(void) {
     o->oForwardVel = 3.0f;
     cur_obj_init_animation_with_sound(BOWSER_ANIM_SLOW_GAIT);
-    if (cur_obj_check_if_near_animation_end()) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+    return cur_obj_check_if_near_animation_end();
 }
 
 /**
@@ -217,11 +209,7 @@ s32 bowser_set_anim_look_down_stop_walk(void) {
     if (cur_obj_check_anim_frame(20)) {
         o->oForwardVel = 0.0f;
     }
-    if (cur_obj_check_if_near_animation_end()) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+    return cur_obj_check_if_near_animation_end();
 }
 
 
@@ -669,11 +657,7 @@ void bowser_act_hit_mine(void) {
  */
 s32 bowser_set_anim_jump(void) {
     cur_obj_init_animation_with_sound(BOWSER_ANIM_JUMP_START);
-    if (cur_obj_check_anim_frame(11)) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+    return (cur_obj_check_anim_frame(11));
 }
 
 /**
@@ -859,11 +843,7 @@ s32 bowser_turn_on_timer(s32 time, s16 yaw) {
     }
     o->oForwardVel = 0.0f;
     o->oMoveAngleYaw += yaw;
-    if (o->oTimer >= time) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+    return (o->oTimer >= time);
 }
 
 /**
