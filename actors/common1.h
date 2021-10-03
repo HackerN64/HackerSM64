@@ -266,12 +266,14 @@ extern const GeoLayout bubbly_tree_geo[];
 extern const GeoLayout spiky_tree_geo[];
 extern const GeoLayout snow_tree_geo[];
 extern const GeoLayout palm_tree_geo[];
-extern const Gfx tree_seg3_sub_dl_bubbly_left_side[];
-extern const Gfx tree_seg3_sub_dl_bubbly_right_side[];
 extern const Gfx tree_seg3_dl_bubbly[];
+extern const Gfx tree_seg3_dl_bubbly_transparent[];
 extern const Gfx tree_seg3_dl_spiky[];
+extern const Gfx tree_seg3_dl_spiky_transparent[];
 extern const Gfx tree_seg3_dl_snowy_pine[];
+extern const Gfx tree_seg3_dl_snowy_pine_transparent[];
 extern const Gfx tree_seg3_dl_palm[];
+extern const Gfx tree_seg3_dl_palm_transparent[];
 
 // warp_pipe
 extern const GeoLayout warp_pipe_geo[];

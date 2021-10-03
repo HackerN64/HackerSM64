@@ -91,18 +91,17 @@ void obj_update_gfx_pos_and_angle(struct Object *obj) {
 }
 
 #ifdef OBJ_OPACITY_BY_CAM_DIST
+#define OBJ_OPACITY_NEAR   128.0f
+#define OBJ_OPACITY_LENGTH 512.0f
 void obj_set_opacity_from_cam_dist(struct Object *obj) {
-    f32 dist = -obj->header.gfx.cameraToObject[2];
-    if (dist > 0.0f) {
+    s32 opacityDist = ((-obj->header.gfx.cameraToObject[2] - OBJ_OPACITY_NEAR) * (256.0f / OBJ_OPACITY_LENGTH));
+    if (opacityDist > 0) {
         obj->header.gfx.node.flags &= ~GRAPH_RENDER_UCODE_REJ;
     }
-#ifdef PUPPYCAM
-    s32 opacityDist = ((gPuppyCam.zoom > 0) ? ((dist / gPuppyCam.zoom) * 255.0f) : 255);
-#else
-    s32 opacityDist = (dist * (255.0f / 1024.0f));
-#endif
     obj->oOpacity = CLAMP(opacityDist, 0x00, 0xFF);
 }
+#undef OBJ_OPACITY_NEAR
+#undef OBJ_OPACITY_LENGTH
 #endif
 
 // Push the address of a behavior command to the object's behavior stack.
