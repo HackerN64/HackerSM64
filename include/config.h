@@ -145,16 +145,16 @@
 #define BLUE_COIN_SWITCH_RETRY
 // Use intendedYaw to control Hoot instead of raw left and right inputs
 #define HOOT_YAW_FIX
+// Tiny Goombas (from THI) always drop their coin
+#define TINY_GOOMBA_ALWAYS_DROPS_COIN
 // Collecting a 1-Up Mushroom will fully heal Mario
 #define MUSHROOMS_HEAL
 // Collecting a Power Star will fully heal Mario
 #define POWER_STARS_HEAL
 // The number of chain balls the Chain Chomp has.  Vanilla is 5.
 #define CHAIN_CHOMP_NUM_SEGMENTS 5
-
 // The number of parts Pokey has, including the head. Vanilla is 5, max is 30.
 #define POKEY_NUM_SEGMENTS       5
-
 // The number of segments Wiggler has, not including the head. Vanilla is 4.
 #define WIGGLER_NUM_SEGMENTS     4
 
