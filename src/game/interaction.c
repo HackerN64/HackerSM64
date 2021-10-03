@@ -776,9 +776,10 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         } else { 
             starGrabAction = ACT_STAR_DANCE_NO_EXIT;
         }
-        if (m->action & ACT_FLAG_SWIMMING   ) starGrabAction = ACT_STAR_DANCE_WATER;
-        if (m->action & ACT_FLAG_METAL_WATER) starGrabAction = ACT_STAR_DANCE_WATER;
-        if (m->action & ACT_FLAG_AIR        ) starGrabAction = ACT_FALL_AFTER_STAR_GRAB;
+        if (m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) starGrabAction = ACT_STAR_DANCE_WATER;
+        if (m->action & ACT_FLAG_AIR) {
+            starGrabAction = ((m->pos[1] < (m->floorHeight + 1024.0f)) ? ACT_FALL_AFTER_STAR_GRAB : ACT_STAR_DANCE_WATER);
+        }
 
         spawn_object(obj, MODEL_NONE, bhvStarKeyCollectionPuffSpawner);
 
