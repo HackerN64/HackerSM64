@@ -103,7 +103,7 @@
 // Disables Mario getting stuck in snow and sand when falling
 //#define NO_GETTING_BURIED
 // Detect Mario's collision with lava regardless of action
-#define FIX_LAVA_INTERACTION
+#define LAVA_INTERACTION_FIX
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!
 #define PLATFORM_DISPLACEMENT_2
 // Use Shindou's pole behavior

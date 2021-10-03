@@ -1760,7 +1760,7 @@ void check_death_barrier(struct MarioState *m) {
 }
 
 void check_lava_boost(struct MarioState *m) {
-#ifdef FIX_LAVA_INTERACTION
+#ifdef LAVA_INTERACTION_FIX
     if ((m->floor->type == SURFACE_BURNING) && !(m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_RIDING_SHELL)) && (m->pos[1] < (m->floorHeight + 10.0f))) {
         if (!(m->flags & MARIO_METAL_CAP)) m->hurtCounter = ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
 #else
