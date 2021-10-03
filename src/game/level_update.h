@@ -41,6 +41,7 @@
 #define WARP_FLAG_DOOR_FLIP_MARIO         (1 << 1) // 0x02
 #define WARP_FLAG_DOOR_IS_WARP            (1 << 2) // 0x04
 
+#define MARIO_SPAWN_NONE                  0x00
 #define MARIO_SPAWN_DOOR_WARP             0x01
 #define MARIO_SPAWN_IDLE                  0x02
 #define MARIO_SPAWN_PIPE                  0x03
@@ -137,12 +138,12 @@ u32 level_control_timer(s32 timerOp);
 void fade_into_special_warp(u32 arg, u32 color);
 void load_level_init_text(u32 arg);
 s32 level_trigger_warp(struct MarioState *m, s32 warpOp);
-void level_set_transition(s16 length, void (*updateFunction)(s16 *));
+void level_set_transition(s16 length, void (*updateFunction)());
 
-s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 unused);
-s32 lvl_init_from_save_file(UNUSED s16 arg0, s32 levelNum);
-s32 lvl_set_current_level(UNUSED s16 arg0, s32 levelNum);
-s32 lvl_play_the_end_screen_sound(UNUSED s16 arg0, UNUSED s32 arg1);
-void basic_update(UNUSED s16 *arg);
+s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 levelNum);
+s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum);
+s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum);
+s32 lvl_play_the_end_screen_sound(UNUSED s16 initOrUpdate, UNUSED s32 levelNum);
+void basic_update(void);
 
 #endif // LEVEL_UPDATE_H

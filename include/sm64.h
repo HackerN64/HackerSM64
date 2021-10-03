@@ -161,6 +161,7 @@ enum RenderLayers
 
 #define MODEL_STATE_MASK                0xFF
 
+#define MARIO_NONE                      /* 0x00000000 */ (0 <<  0)
 #define MARIO_NORMAL_CAP                /* 0x00000001 */ (1 <<  0)
 #define MARIO_VANISH_CAP                /* 0x00000002 */ (1 <<  1)
 #define MARIO_METAL_CAP                 /* 0x00000004 */ (1 <<  2)

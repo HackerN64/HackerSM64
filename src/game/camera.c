@@ -3315,7 +3315,7 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
         u = 0;
     }
     if (spline[segment].index == -1 || spline[segment + 1].index == -1 || spline[segment + 2].index == -1) {
-        return 1;
+        return TRUE;
     }
 
     for (i = 0; i < 4; i++) {
@@ -4507,7 +4507,7 @@ s32 determine_dance_cutscene(UNUSED struct Camera *c) {
 /**
  * @return `pullResult` or `pushResult` depending on Mario's door action
  */
-u8 open_door_cutscene(u8 pullResult, u8 pushResult) {
+u32 open_door_cutscene(u8 pullResult, u8 pushResult) {
     if (sMarioCamState->action == ACT_PULLING_DOOR) return pullResult;
     if (sMarioCamState->action == ACT_PUSHING_DOOR) return pushResult;
     return 0;

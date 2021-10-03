@@ -148,7 +148,7 @@ u32 get_mario_cap_flag(struct Object *capObject) {
         return MARIO_VANISH_CAP;
     }
 
-    return 0;
+    return MARIO_NONE;
 }
 
 /**

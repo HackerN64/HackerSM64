@@ -414,7 +414,7 @@ void set_object_respawn_info_bits(struct Object *obj, u8 bits) {
 /**
  * Unload all objects whose activeAreaIndex is areaIndex.
  */
-void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex) {
+void unload_objects_from_area(s32 areaIndex) {
     struct Object *obj;
     struct ObjectNode *node;
     struct ObjectNode *list;
@@ -439,7 +439,7 @@ void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex) {
 /**
  * Spawn objects given a list of SpawnInfos. Called when loading an area.
  */
-void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
+void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
     gObjectLists = gObjectListArray;
     gTimeStopState = 0;
 
@@ -588,7 +588,7 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  * Update all objects. This includes script execution, object collision detection,
  * and object surface management.
  */
-void update_objects(UNUSED s32 unused) {
+void update_objects(void) {
     s64 cycleCounts[30];
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();

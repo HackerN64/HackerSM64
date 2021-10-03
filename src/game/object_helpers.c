@@ -1352,17 +1352,18 @@ static s32 cur_obj_detect_steep_floor(s16 steepAngleDegrees) {
 
         if (intendedFloorHeight < FLOOR_LOWER_LIMIT_MISC) {
             o->oWallAngle = o->oMoveAngleYaw + 0x8000;
-            return 2;
-        } else if (intendedFloor->normal.y < coss((s16)(steepAngleDegrees * (0x10000 / 360))) && deltaFloorHeight > 0
+            return TRUE;
+        } else if (intendedFloor->normal.y < coss((s16)(steepAngleDegrees * (0x10000 / 360)))
+                   && deltaFloorHeight > 0
                    && intendedFloorHeight > o->oPosY) {
             o->oWallAngle = atan2s(intendedFloor->normal.z, intendedFloor->normal.x);
-            return 1;
+            return TRUE;
         } else {
-            return 0;
+            return FALSE;
         }
     }
 
-    return 0;
+    return FALSE;
 }
 
 s32 cur_obj_resolve_wall_collisions(void) {
@@ -1493,8 +1494,8 @@ UNUSED static s32 cur_obj_within_bounds(f32 bounds) {
 }
 
 void cur_obj_move_using_vel_and_gravity(void) {
-        o->oVelY += o->oGravity; //! No terminal velocity
-        vec3_add(&o->oPosVec, &o->oVelVec);
+    o->oVelY += o->oGravity; //! No terminal velocity
+    vec3_add(&o->oPosVec, &o->oVelVec);
 }
 
 void cur_obj_move_using_fvel_and_gravity(void) {
@@ -1665,13 +1666,8 @@ void obj_translate_xz_random(struct Object *obj, f32 rangeLength) {
 }
 
 static void obj_build_vel_from_transform(struct Object *obj) {
-    f32 up = obj->oUpVel;
-    f32 left = obj->oLeftVel;
-    f32 forward = obj->oForwardVel;
-
-    obj->oVelX = obj->transform[0][0] * left + obj->transform[1][0] * up + obj->transform[2][0] * forward;
-    obj->oVelY = obj->transform[0][1] * left + obj->transform[1][1] * up + obj->transform[2][1] * forward;
-    obj->oVelZ = obj->transform[0][2] * left + obj->transform[1][2] * up + obj->transform[2][2] * forward;
+    Vec3f vel = { obj->oLeftVel, obj->oUpVel, obj->oForwardVel };
+    linear_mtxf_mul_vec3(obj->transform, &obj->oVelVec, vel);
 }
 
 void cur_obj_set_pos_via_transform(void) {
@@ -2044,8 +2040,11 @@ void clear_time_stop_flags(s32 flags) {
 
 s32 cur_obj_can_mario_activate_textbox(f32 radius, f32 height, UNUSED s32 unused) {
     if (o->oDistanceToMario < 1500.0f) {
-        if (o->oPosY < gMarioObject->oPosY + 160.0f && gMarioObject->oPosY < o->oPosY + height && !(gMarioStates[0].action & ACT_FLAG_AIR)
-         && lateral_dist_between_objects(o, gMarioObject) < radius && mario_ready_to_speak()) {
+        if (o->oPosY < gMarioObject->oPosY + 160.0f
+         && gMarioObject->oPosY < o->oPosY + height
+         && !(gMarioStates[0].action & ACT_FLAG_AIR)
+         && lateral_dist_between_objects(o, gMarioObject) < radius
+         && mario_ready_to_speak()) {
             return TRUE;
         }
     }
@@ -2221,10 +2220,7 @@ void cur_obj_align_gfx_with_floor(void) {
     struct Surface *floor;
     Vec3f floorNormal;
     Vec3f position;
-
-    position[0] = o->oPosX;
-    position[1] = o->oPosY;
-    position[2] = o->oPosZ;
+    vec3_copy(position, &o->oPosVec);
 
     find_floor(position[0], position[1], position[2], &floor);
     if (floor != NULL) {
@@ -2302,7 +2298,7 @@ void cur_obj_init_animation_and_extend_if_at_end(s32 animIndex) {
 
 s32 cur_obj_check_grabbed_mario(void) {
     if (o->oInteractStatus & INT_STATUS_GRABBED_MARIO) {
-        o->oKingBobombHoldingMarioState = 1;
+        o->oKingBobombHoldingMarioState = HELD_HELD;
         cur_obj_become_intangible();
         return TRUE;
     }
@@ -2315,11 +2311,11 @@ s32 player_performed_grab_escape_action(void) {
     s32 result = FALSE;
 
     if (gPlayer1Controller->stickMag < 30.0f) {
-        grabReleaseState = 0;
+        grabReleaseState = FALSE;
     }
 
-    if (grabReleaseState == 0 && gPlayer1Controller->stickMag > 40.0f) {
-        grabReleaseState = 1;
+    if (grabReleaseState == FALSE && gPlayer1Controller->stickMag > 40.0f) {
+        grabReleaseState = TRUE;
         result = TRUE;
     }
 
@@ -2379,10 +2375,12 @@ s32 obj_has_model(struct Object *obj, ModelID16 modelID) {
 }
 
 u32 obj_get_model_id(struct Object *obj) {
-    s32 i;
-    for (i = MODEL_NONE; i < MODEL_ID_COUNT; i++) {
-        if (obj->header.gfx.sharedChild == gLoadedGraphNodes[i]) {
-            return i;
+    if (!obj->header.gfx.sharedChild) {
+        s32 i;
+        for (i = MODEL_NONE; i < MODEL_ID_COUNT; i++) {
+            if (obj->header.gfx.sharedChild == gLoadedGraphNodes[i]) {
+                return i;
+            }
         }
     }
     return MODEL_NONE;

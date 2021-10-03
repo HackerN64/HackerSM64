@@ -209,7 +209,7 @@ s32 render_screen_transition(s8 fadeTimer, s8 transType, u8 transTime, struct Wa
         case WARP_TRANSITION_FADE_FROM_BOWSER: return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR); break;
         case WARP_TRANSITION_FADE_INTO_BOWSER: return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR); break;
     }
-    return 0;
+    return FALSE;
 }
 
 Gfx *render_cannon_circle_base(void) {

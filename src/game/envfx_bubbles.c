@@ -42,10 +42,10 @@ s32 particle_is_laterally_close(s32 index, s32 x, s32 z, s32 distance) {
     s32 zPos = (gEnvFxBuffer + index)->zPos;
 
     if (sqr(xPos - x) + sqr(zPos - z) > sqr(distance)) {
-        return 0;
+        return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }
 
 /**
@@ -258,10 +258,10 @@ s32 envfx_is_jestream_bubble_alive(s32 index) {
     if (!particle_is_laterally_close(index, gEnvFxBubbleConfig[ENVFX_STATE_SRC_X],
                                      gEnvFxBubbleConfig[ENVFX_STATE_SRC_Z], 1000)
         || gEnvFxBubbleConfig[ENVFX_STATE_SRC_Y] + 1500 < (gEnvFxBuffer + index)->yPos) {
-        return 0;
+        return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }
 
 /**
@@ -303,7 +303,7 @@ s32 envfx_init_bubble(s32 mode) {
 
     switch (mode) {
         case ENVFX_MODE_NONE:
-            return 0;
+            return FALSE;
 
         case ENVFX_FLOWERS:
             sBubbleParticleCount = 30;
@@ -326,7 +326,7 @@ s32 envfx_init_bubble(s32 mode) {
 
     gEnvFxBuffer = mem_pool_alloc(gEffectsMemoryPool, sBubbleParticleCount * sizeof(struct EnvFxParticle));
     if (!gEnvFxBuffer) {
-        return 0;
+        return FALSE;
     }
 
     bzero(gEnvFxBuffer, sBubbleParticleCount * sizeof(struct EnvFxParticle));
@@ -341,7 +341,7 @@ s32 envfx_init_bubble(s32 mode) {
     }
 
     gEnvFxMode = mode;
-    return 1;
+    return TRUE;
 }
 
 /**

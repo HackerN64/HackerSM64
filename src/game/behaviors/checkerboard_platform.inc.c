@@ -32,13 +32,14 @@ void bhv_checkerboard_elevator_group_init(void) {
     }
 }
 
-void checkerboard_plat_act_move_y(UNUSED s32 unused, f32 vel, s32 time) {
+void checkerboard_plat_act_move_y(f32 vel, s32 time) {
     o->oMoveAnglePitch = 0;
     o->oAngleVelPitch = 0;
     o->oForwardVel = 0.0f;
     o->oVelY = vel;
-    if (o->oTimer > time)
+    if (o->oTimer > time) {
         o->oAction++;
+    }
 }
 
 void checkerboard_plat_act_rotate(s32 nextAction, s16 pitch) {
@@ -61,19 +62,20 @@ void bhv_checkerboard_platform_loop(void) {
         cur_obj_play_sound_1(SOUND_ENV_ELEVATOR4);
     switch (o->oAction) {
         case 0:
-            if (o->oBehParams2ndByte == 0)
+            if (o->oBehParams2ndByte == 0) {
                 o->oAction = 1;
-            else
+            } else {
                 o->oAction = 3;
+            }
             break;
         case 1:
-            checkerboard_plat_act_move_y(2, 10.0f, o->oCheckerBoardPlatformHeight);
+            checkerboard_plat_act_move_y( 10.0f, o->oCheckerBoardPlatformHeight);
             break;
         case 2:
             checkerboard_plat_act_rotate(3, 512);
             break;
         case 3:
-            checkerboard_plat_act_move_y(4, -10.0f, o->oCheckerBoardPlatformHeight);
+            checkerboard_plat_act_move_y(-10.0f, o->oCheckerBoardPlatformHeight);
             break;
         case 4:
             checkerboard_plat_act_rotate(1, -512);
@@ -83,9 +85,9 @@ void bhv_checkerboard_platform_loop(void) {
     o->oFaceAnglePitch += ABSI(o->oAngleVelPitch);
     o->oFaceAngleYaw = o->oMoveAngleYaw;
     if (o->oMoveAnglePitch != 0) {
-        f32 mul = (o->oAngleVelPitch >= 0) ? 1.0f : -1.0f;
-        o->oForwardVel = mul * sins(o->oMoveAnglePitch) * radius;
-        o->oVelY = mul * coss(o->oMoveAnglePitch) * radius;
+        f32 mul = ((o->oAngleVelPitch >= 0) ? 1.0f : -1.0f) * radius;
+        o->oForwardVel = mul * sins(o->oMoveAnglePitch);
+        o->oVelY       = mul * coss(o->oMoveAnglePitch);
     }
     if (o->oCheckerBoardPlatformRotateAction == 1) {
         o->oAngleVelPitch = 0;

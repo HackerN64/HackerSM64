@@ -1505,13 +1505,12 @@ s32 func_sh_802f573c(s32 audioResetStatus) {
 
     if (D_SH_8034F68C > 0) {
         if (audioResetStatus != 0) {
-            if (osRecvMesg(&gUnkQueue2, (OSMesg *) &idx, OS_MESG_NOBLOCK)){
-            }
+            osRecvMesg(&gUnkQueue2, (OSMesg *) &idx, OS_MESG_NOBLOCK);
             D_SH_8034F68C = 0;
-            return 0;
+            return FALSE;
         }
         if (osRecvMesg(&gUnkQueue2, (OSMesg *) &idx, OS_MESG_NOBLOCK) == -1) {
-            return 0;
+            return FALSE;
         }
         idx >>= 0x18;
         if (D_SH_8034EC88[idx].isFree == FALSE) {
@@ -1546,7 +1545,7 @@ next:
                              unk, &gUnkQueue2, D_SH_8034EC88[D_SH_8034F68C - 1].encodedInfo);
         }
     }
-    return 1;
+    return TRUE;
 }
 
 s32 func_sh_802f5900(struct AudioBankSample *sample, s32 numLoaded, struct AudioBankSample *arg2[]) {

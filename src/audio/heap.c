@@ -961,8 +961,7 @@ void decrease_reverb_gain(void) {
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 s32 audio_shut_down_and_reset_step(void) {
-    s32 i;
-    s32 j;
+    s32 i, j;
 
     switch (gAudioResetStatus) {
         case 5:
@@ -996,10 +995,7 @@ s32 audio_shut_down_and_reset_step(void) {
             bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
             gAudioResetStatus = 0;
     }
-    if (gAudioResetStatus < 3) {
-        return 0;
-    }
-    return 1;
+    return (gAudioResetStatus < 3);
 }
 #else
 /**

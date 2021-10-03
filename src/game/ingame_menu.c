@@ -224,10 +224,9 @@ UNUSED
 static Texture *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) { //! Texture type for *in?
     s32 inPos;
     u16 bitMask;
-    Texture *out;
     s16 outPos = 0;
 
-    out = alloc_display_list((u32) width * (u32) height);
+    Texture *out = alloc_display_list((u32) width * (u32) height);
 
     if (out == NULL) {
         return NULL;
@@ -253,13 +252,11 @@ static Texture *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) { //! Tex
 
 Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     u32 size = (u32) width * (u32) height;
-    Texture *out;
     s32 inPos;
-    s16 outPos;
+    s16 outPos = 0;
     u8 bitMask;
 
-    outPos = 0;
-    out = (Texture *) alloc_display_list(size);
+    Texture *out = (Texture *) alloc_display_list(size);
 
     if (out == NULL) {
         return NULL;
@@ -280,20 +277,16 @@ Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
 }
 
 void render_generic_char(u8 c) {
-    void **fontLUT;
-    void *packedTexture;
-    UNUSED void *unpackedTexture;
-
-    fontLUT = segmented_to_virtual(main_font_lut);
-    packedTexture = segmented_to_virtual(fontLUT[c]);
-    #ifdef VERSION_EU
-    unpackedTexture = alloc_ia4_tex_from_i1(packedTexture, 8, 8);
+    void **fontLUT = segmented_to_virtual(main_font_lut);
+    void *packedTexture = segmented_to_virtual(fontLUT[c]);
+#ifdef VERSION_EU
+    void *unpackedTexture = alloc_ia4_tex_from_i1(packedTexture, 8, 8);
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));
-    #else
+#else
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(packedTexture));
-    #endif
+#endif
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
 }
@@ -314,8 +307,7 @@ enum MultiStringIDs { STRING_THE, STRING_YOU };
  * 0: 'the'
  * 1: 'you'
  */
-void render_multi_text_string(s8 multiTextID)
-{
+void render_multi_text_string(s8 multiTextID) {
     s8 i;
     struct MultiTextEntry textLengths[2] = {
         { 3, { TEXT_THE_RAW } },
@@ -335,12 +327,12 @@ void render_multi_text_string(s8 multiTextID)
  * In JP/EU a IA1 texture is used but in US a IA4 texture is used.
  */
 void print_generic_string(s16 x, s16 y, const u8 *str) {
-    UNUSED s8 mark = DIALOG_MARK_NONE; // unused in EU
+    s8 mark = DIALOG_MARK_NONE; // unused in EU
     s32 strPos = 0;
     u8 lineNum = 1;
 
     s16 colorLoop;
-    u8 rgbaColors[4] = {0, 0, 0, 0};
+    ColorRGBA rgbaColors = {0, 0, 0, 0};
     u8 customColor = FALSE;
     u8 diffTmp = 0;
 
@@ -789,7 +781,6 @@ void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum, u8 *cust
     }
 }
 
-
 #define X_VAL3 0.0f
 #define Y_VAL3 16
 
@@ -800,7 +791,7 @@ void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s
         pageState[0] = DIALOG_PAGE_STATE_SCROLL;
         return;
     }
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, 2 - (lineNum * Y_VAL3), 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, 0.0f, 2 - (lineNum * 16), 0);
 
     linePos[0] = 0;
     xMatrix[0] = 1;

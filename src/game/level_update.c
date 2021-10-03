@@ -969,7 +969,7 @@ void update_hud_values(void) {
  * presumably to allow painting and camera updating while avoiding triggering the
  * warp twice.
  */
-void basic_update(UNUSED s16 *arg) {
+void basic_update(void) {
     area_update_objects();
     update_hud_values();
 #ifdef PUPPYLIGHTS
@@ -1072,7 +1072,7 @@ s32 play_mode_frame_advance(void) {
         gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN;
     }
 
-    return 0;
+    return FALSE;
 }
 
 /**
@@ -1080,7 +1080,7 @@ s32 play_mode_frame_advance(void) {
  * but before it actually occurs. If updateFunction is not NULL, it will be
  * called each frame during the transition.
  */
-void level_set_transition(s16 length, void (*updateFunction)(s16 *)) {
+void level_set_transition(s16 length, void (*updateFunction)()) {
     sTransitionTimer = length;
     sTransitionUpdate = updateFunction;
 }

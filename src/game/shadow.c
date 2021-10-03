@@ -236,7 +236,7 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
         // Don't draw a shadow if the floor is lower than expected possible,
         // or if the y-normal is negative (an unexpected result).
         if (s->floorHeight < FLOOR_LOWER_LIMIT_SHADOW || floor->normal.y <= 0.0f) {
-            return 1;
+            return TRUE;
         }
 
         s->floorNormalX = floor->normal.x;
@@ -262,7 +262,7 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
         floorSteepness = sqrtf(floorSteepness);
         s->floorTilt = 90.0f - atan2_deg(floorSteepness, s->floorNormalY);
     }
-    return 0;
+    return FALSE;
 }
 
 /**
