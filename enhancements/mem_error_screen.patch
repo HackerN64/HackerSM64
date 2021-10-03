@@ -258,7 +258,7 @@ index 00000000..f432927c
 +                           dl_ia_text_end); // Reset back to default render settings.
 +            gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 +        } else {
-+            gDelayForErrorMessage++;
++            gDelayForErrorMessage += 1;
 +        }
 +    }
 +

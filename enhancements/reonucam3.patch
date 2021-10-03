@@ -394,14 +394,14 @@ index 6cbfd8e1..01dd4de8 100644
 +
 +    if (gPlayer1Controller->buttonPressed & R_JPAD) {
 +        if (gCameraSpeed < 4) {
-+            gCameraSpeed++;
++            gCameraSpeed += 1;
 +        } else {
 +            gCameraSpeed = 0;
 +        }
 +        save_file_set_camera_speed(gCameraSpeed);
 +    } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
 +        if (gCameraSpeed > 0) {
-+            gCameraSpeed--;
++            gCameraSpeed -= 1;
 +        } else {
 +            gCameraSpeed = 4;
 +        }

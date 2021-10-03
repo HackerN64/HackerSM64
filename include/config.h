@@ -103,7 +103,7 @@
 // Disables Mario getting stuck in snow and sand when falling
 //#define NO_GETTING_BURIED
 // Detect Mario's collision with lava regardless of action
-#define LAVA_INTERACTION_FIX
+//#define LAVA_INTERACTION_FIX
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!
 #define PLATFORM_DISPLACEMENT_2
 // Use Shindou's pole behavior
@@ -146,7 +146,7 @@
 // Allow for retries on collecting the remaining blue coins from a blue coin switch.
 #define BLUE_COIN_SWITCH_RETRY
 // Fixes shell cancel
-#define SHELL_CANCEL_FIX
+//#define SHELL_CANCEL_FIX
 // Use intendedYaw to control Hoot instead of raw left and right inputs.
 #define HOOT_YAW_FIX
 // Tiny Goombas (from THI) always drop their coin.

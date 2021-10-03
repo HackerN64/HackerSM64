@@ -39,7 +39,7 @@ static u8 sSpinyWalkAttackHandlers[] = {
 static s32 spiny_check_active(void) {
     if ((o->parentObj != o) && (o->oDistanceToMario > 2500.0f)) {
         if (obj_has_behavior(o->parentObj, bhvEnemyLakitu)) {
-            o->parentObj->oEnemyLakituNumSpinies--;
+            o->parentObj->oEnemyLakituNumSpinies -= 1;
         }
         obj_mark_for_deletion(o);
         return FALSE;

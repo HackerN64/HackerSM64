@@ -2943,7 +2943,7 @@ void Unknown801A5D90(struct ObjGroup *arg0) {
         sp23C = FALSE;
 
         for (;;) {
-            trackerNum++;
+            trackerNum += 1;
             mt = get_memtracker_by_index(trackerNum);
 
             if (mt->name != NULL) {

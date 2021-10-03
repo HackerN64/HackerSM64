@@ -511,7 +511,7 @@ s32 adsr_update(struct AdsrState *adsr) {
         }
 
         case ADSR_STATE_SUSTAIN:
-            adsr->delay--;
+            adsr->delay -= 1;
             if (adsr->delay == 0) {
                 adsr->state = ADSR_STATE_RELEASE;
             }

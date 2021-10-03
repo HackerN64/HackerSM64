@@ -1062,7 +1062,7 @@ void animate_mario_head_normal(struct ObjAnimator *self) {
 
             if (self->frame == 810.0f) {
                 self->frame = 750.0f;
-                self->nods--;
+                self->nods -= 1;
                 if (self->nods == 0) {
                     state = 3;
                 }

@@ -2211,7 +2211,7 @@ void print_file_select_strings(void) {
         sTextBaseAlpha += 10;
     }
     if (sMainMenuTimer < 1000) {
-        sMainMenuTimer++;
+        sMainMenuTimer += 1;
     }
 }
 

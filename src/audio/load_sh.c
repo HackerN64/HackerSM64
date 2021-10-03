@@ -1482,7 +1482,7 @@ void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
     if (D_SH_8034F68C != 0 && sp4C == 0) {
         temp_s0 = D_SH_8034EC88[D_SH_8034F68C - 1].sample;
         temp = (temp_s0->size >> 12);
-        temp++;
+        temp += 1;
         count = (uintptr_t) temp_s0->sampleAddr;
         func_sh_802f4cb4(
             count,
@@ -1534,7 +1534,7 @@ next:
             sampleAddr = sample->sampleAddr;
             size = sample->size;
             unk = size >> 0xC;
-            unk++;
+            unk += 1;
             added = ((sampleAddr + size) + sample->medium);
             if (added != D_SH_8034EC88[D_SH_8034F68C - 1].endAndMediumIdentification) {
                 D_SH_8034EC88[D_SH_8034F68C - 1].isFree = TRUE;

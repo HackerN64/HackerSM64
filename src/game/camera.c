@@ -3983,14 +3983,14 @@ s32 is_pos_in_bounds(Vec3f pos, Vec3f center, Vec3f bounds, s16 boundsYaw) {
             -bounds[2] < rel[2] && rel[2] < bounds[2]);
 }
 
-s16 calculate_pitch(Vec3f from, Vec3f to) {
+s32 calculate_pitch(Vec3f from, Vec3f to) {
     f32 dx = to[0] - from[0];
     f32 dy = to[1] - from[1];
     f32 dz = to[2] - from[2];
     return atan2s(sqrtf(sqr(dx) + sqr(dz)), dy);
 }
 
-s16 calculate_yaw(Vec3f from, Vec3f to) {
+s32 calculate_yaw(Vec3f from, Vec3f to) {
     f32 dx = to[0] - from[0];
     f32 dz = to[2] - from[2];
     return atan2s(dz, dx);
