@@ -456,6 +456,7 @@ struct MarioState
     /*0xBC*/ f32 peakHeight;
     /*0xC0*/ f32 quicksandDepth;
     /*0xC4*/ f32 windGravity;
+    // -- HackerSM64 MarioState fields begin --
 #ifdef BREATH_METER
              s16 breath;
              u8  breathCounter;
@@ -471,6 +472,7 @@ struct MarioState
            Angle moveYaw;
            Angle ceilYaw;
            Angle wallYaw;
+    // -- HackerSM64 MarioState fields end --
 };
 
 #endif // TYPES_H
