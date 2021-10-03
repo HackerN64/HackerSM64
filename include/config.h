@@ -141,6 +141,8 @@
 #define BLUE_COIN_SWITCH_RETRY
 // Collecting a 1-Up Mushroom will fully heal Mario
 #define MUSHROOMS_HEAL
+// Collecting a Power Star will fully heal Mario
+#define POWER_STARS_HEAL
 // The number of chain balls the Chain Chomp has.  Vanilla is 5.
 #define CHAIN_CHOMP_NUM_SEGMENTS 5
 

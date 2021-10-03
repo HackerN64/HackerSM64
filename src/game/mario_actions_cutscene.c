@@ -1822,6 +1822,12 @@ static s32 act_intro_cutscene(struct MarioState *m) {
 // jumbo star cutscene: Mario lands after grabbing the jumbo star
 static void jumbo_star_cutscene_falling(struct MarioState *m) {
     if (m->actionState == 0) {
+#ifdef POWER_STARS_HEAL
+        m->healCounter   = 31;
+#ifdef BREATH_METER
+        m->breathCounter = 31;
+#endif
+#endif
         m->input |= INPUT_A_DOWN;
         m->flags |= (MARIO_WING_CAP | MARIO_CAP_ON_HEAD);
 
