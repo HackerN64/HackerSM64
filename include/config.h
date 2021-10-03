@@ -87,7 +87,7 @@
 // 1 is similar to vanilla, but prevents Mario from moving in the wrong direction, and allows finer control with the analog stick.
 // 2 is similar to mode 1, but a bit further from vanilla, and allows instant turnaround if Mario is moving slower than a certain threshold.
 // 3 is instant turning to the intended direction regardless of speed and angle.
-// 4 is an expeimental asymptotic turn.
+// 4 is an experimental asymptotic turn.
 #define GROUND_TURN_MODE 0
 // Improved hanging:
 // - Doesn't require holding down the A button
@@ -118,7 +118,7 @@
 #define HANGING_FIX
 // The last frame that will be considered a firsty when wallkicking
 #define FIRSTY_LAST_FRAME 1
-// The maximum angle the player can wall kick, in degrees. 0..90
+// The maximum angle the player can wall kick, in degrees. 0..90. To allow 45 degree wall kicks, you must supply `46` to allow 45 and under.
 #define WALL_KICK_DEGREES 45
 // Disable BLJs and crush SimpleFlips's dreams
 //#define DISABLE_BLJ

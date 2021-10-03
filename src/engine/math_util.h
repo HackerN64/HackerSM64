@@ -454,6 +454,7 @@ extern f32 gSineTable[];
     }                                   \
 }
 
+f32 roundf(f32 x);
 f32 absf(f32 x);
 s32 min_3i(s32 a0, s32 a1, s32 a2);
 f32 min_3f(f32 a0, f32 a1, f32 a2);

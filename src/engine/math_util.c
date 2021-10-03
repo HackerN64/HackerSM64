@@ -37,6 +37,10 @@ static inline s32 asm_roundf(f32 in) {
     return out;
 }
 
+f32 roundf(f32 x) {
+    return asm_roundf(x);
+}
+
 static inline float asm_absf(float in) {
     f32 out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));

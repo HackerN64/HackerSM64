@@ -857,13 +857,7 @@ void radial_camera_move(struct Camera *c) {
 
     // How much the camera's yaw changed
     s16 yawOffset = calculate_yaw(sMarioCamState->pos, c->pos) - atan2s(areaDistZ, areaDistX);
-
-    if (yawOffset > maxAreaYaw) {
-        yawOffset = maxAreaYaw;
-    }
-    if (yawOffset < minAreaYaw) {
-        yawOffset = minAreaYaw;
-    }
+    yawOffset = CLAMP(yawOffset, minAreaYaw, maxAreaYaw);
 
     // Check if Mario stepped on a surface that rotates the camera. For example, when Mario enters the
     // gate in BoB, the camera turns right to face up the hill path
@@ -3821,23 +3815,16 @@ s32 clamp_positions_and_find_yaw(Vec3f pos, Vec3f origin, f32 xMax, f32 xMin, f3
 /**
  * The yaw passed here is the yaw of the direction FROM Mario TO Lakitu.
  *
- * wallYaw always has 90 degrees added to it before this is called -- it's parallel to the wall.
- *
  * @return the new yaw from Mario to rotate towards.
- *
- * @warning this is jank. It actually returns the yaw that will rotate further INTO the wall. So, the
- *          developers just add 180 degrees to the result.
  */
 s32 calc_avoid_yaw(s16 yawFromMario, s16 wallYaw) {
-    s16 yawDiff = wallYaw - yawFromMario + DEGREES(90);
-
-    if (yawDiff < 0) {
+    if (yawFromMario < (s16)(wallYaw + DEGREES(180))) {
         // Deflect to the right
-        yawFromMario = wallYaw;
+        yawFromMario = wallYaw + DEGREES(90);
     } else {
         // Note: this favors the left side if the wall is exactly perpendicular to the camera.
         // Deflect to the left
-        yawFromMario = wallYaw + DEGREES(180);
+        yawFromMario = wallYaw - DEGREES(90);
     }
     return yawFromMario;
 }
@@ -6057,7 +6044,7 @@ void resolve_geometry_collisions(Vec3f pos) {
 s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYaw, s16 yawRange) {
     struct WallCollisionData colData;
     struct Surface *wall;
-    s16 wallYaw, horWallNorm;
+    s16 wallYaw;
     // The yaw of the vector from Mario to the camera.
     s16 yawFromMario;
     s32 status = 0;
@@ -6095,10 +6082,9 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
                     status = 1;
                     wall = colData.walls[colData.numWalls - 1];
                     // wallYaw is parallel to the wall, not perpendicular
-                    wallYaw = atan2s(wall->normal.z, wall->normal.x) + DEGREES(90);
-                    // Calculate the avoid direction. The function returns the opposite direction so add 180
-                    // degrees.
-                    *avoidYaw = calc_avoid_yaw(yawFromMario, wallYaw) + DEGREES(180);
+                    wallYaw = SURFACE_YAW(wall);
+                    // Calculate the avoid direction. The function returns the opposite direction so add 180 degrees.
+                    *avoidYaw = calc_avoid_yaw(yawFromMario, wallYaw);
                 }
             }
 
@@ -6111,8 +6097,7 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
 
             if (find_wall_collisions(&colData) != 0) {
                 wall = colData.walls[colData.numWalls - 1];
-                horWallNorm = atan2s(wall->normal.z, wall->normal.x);
-                wallYaw = horWallNorm + DEGREES(90);
+                wallYaw = SURFACE_YAW(wall);
                 // If Mario would be blocked by the surface, then avoid it
                 if ((is_range_behind_surface(sMarioCamState->pos, cPos, wall, yawRange, SURFACE_WALL_MISC) == 0)
                     && (is_behind_surface(sMarioCamState->pos, wall))
@@ -6120,8 +6105,8 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
                     && (!is_surf_within_bounding_box(wall, -1.f, 150.f, -1.f))) {
                     // Calculate the avoid direction. The function returns the opposite direction so add 180
                     // degrees.
-                    *avoidYaw = calc_avoid_yaw(yawFromMario, wallYaw) + DEGREES(180);
-                    camera_approach_s16_symmetric_bool(avoidYaw, horWallNorm, yawRange);
+                    *avoidYaw = calc_avoid_yaw(yawFromMario, wallYaw);
+                    camera_approach_s16_symmetric_bool(avoidYaw, wallYaw, yawRange);
                     status = 3;
                     step = 8;
                 }

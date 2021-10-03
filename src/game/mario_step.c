@@ -672,15 +672,6 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
     vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
 
-    /*if (stepResult == AIR_STEP_HIT_WALL && m->wall != NULL) {
-        wallDYaw = abs_angle_diff(atan2s(m->wall->normal.z, m->wall->normal.x), m->faceAngle[1]);
-        if ((stepArg & AIR_STEP_CHECK_BONK) && (wallDYaw > DEGREES(180 - WALL_KICK_DEGREES))) {
-            if (m->forwardVel > 16.0f) {
-                mario_bonk_reflection(m, (stepArg & AIR_STEP_BONK_NEGATE_SPEED), m->wall);
-            }
-        }
-    }*/
-
     return stepResult;
 }
 

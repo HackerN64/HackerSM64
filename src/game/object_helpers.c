@@ -228,15 +228,15 @@ void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior) 
 }
 
 f32 lateral_dist_between_objects(struct Object *obj1, struct Object *obj2) {
-    f32 lateralDist;
-    vec3f_get_lateral_dist(&obj1->oPosVec, &obj2->oPosVec, &lateralDist);
-    return lateralDist;
+    register f32 dx = (obj2->oPosX - obj1->oPosX);
+    register f32 dz = (obj2->oPosZ - obj1->oPosZ);
+    return sqrtf(sqr(dx) + sqr(dz));
 }
 
 f32 dist_between_objects(struct Object *obj1, struct Object *obj2) {
-    f32 dist;
-    vec3f_get_dist(&obj1->oPosVec, &obj2->oPosVec, &dist);
-    return dist;
+    register Vec3f d;
+    vec3_diff(d, &obj2->oPosVec, &obj1->oPosVec);
+    return vec3_mag(d);
 }
 
 void cur_obj_forward_vel_approach_upward(f32 target, f32 increment) {
