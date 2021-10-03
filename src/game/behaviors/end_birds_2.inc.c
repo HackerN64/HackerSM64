@@ -10,7 +10,7 @@ void bhv_end_birds_2_loop(void) {
     switch (gCurrentObject->oAction) {
         case 0:
             cur_obj_scale(0.7f);
-            gCurrentObject->oAction = 1;
+            gCurrentObject->oAction += 1;
             break;
         case 1:
             vec3f_get_dist_and_angle(gCamera->pos, gCamera->focus, &dist, &pitch, &yaw);

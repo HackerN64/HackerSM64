@@ -170,7 +170,9 @@ static s32 lower_cell_index(s32 coord) {
     // Include extra cell if close to boundary
     //! Some wall checks are larger than the buffer, meaning wall checks can
     //  miss walls that are near a cell border.
-    if ((coord % CELL_SIZE) < 50) index--;
+    if (coord % CELL_SIZE < 50) {
+        index -= 1;
+    }
 
     if (index < 0) index = 0;
 
@@ -196,7 +198,9 @@ static s32 upper_cell_index(s32 coord) {
     // Include extra cell if close to boundary
     //! Some wall checks are larger than the buffer, meaning wall checks can
     //  miss walls that are near a cell border.
-    if ((coord % CELL_SIZE) > (CELL_SIZE - 50)) index++;
+    if (coord % CELL_SIZE > CELL_SIZE - 50) {
+        index += 1;
+    }
 
     if (index > (NUM_CELLS - 1)) {
         index = (NUM_CELLS - 1);
@@ -333,12 +337,12 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
     s32 flags = surf_has_no_cam_collision(surfaceType);
 
     numSurfaces = *(*data);
-    (*data)++;
+    *data += 1;
 
     for (i = 0; i < numSurfaces; i++) {
         if (*surfaceRooms != NULL) {
             room = *(*surfaceRooms);
-            (*surfaceRooms)++;
+            *surfaceRooms += 1;
         }
 
         surface = read_surface_data(vertexData, data);
@@ -365,7 +369,7 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
 #else
         *data += 3;
         if (hasForce) {
-            (*data)++;
+            *data += 1;
         }
 #endif
     }

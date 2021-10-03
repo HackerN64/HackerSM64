@@ -156,7 +156,7 @@ void mr_i_act_2(void) {
         o->oMrISpinAngle = 120;
     if (o->oMrISpinAmount > 1 << 16)
         o->oAction = 3;
-    o->oMrISpinAngle--;
+    o->oMrISpinAngle -= 1;
     if (!o->oMrISpinAngle) {
         o->oMrISpinAngle = 120;
         o->oMrISpinAmount = 0;

@@ -270,7 +270,7 @@ void bhv_book_switch_loop(void) {
                 if (o->oAction != 0) {
                     if (o->parentObj->oBookSwitchManagerNumCorrectChoices == o->oBehParams2ndByte) {
                         play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource);
-                        o->parentObj->oBookSwitchManagerNumCorrectChoices++;
+                        o->parentObj->oBookSwitchManagerNumCorrectChoices += 1;
                     } else {
                         rand01 = random_u16() & 0x1;
                         z = gMarioObject->oPosZ + 1.5f * gMarioStates[0].vel[2];

@@ -116,7 +116,7 @@ static void mr_blizzard_act_rise_from_ground(void) {
 
     // If the timer is not 0, decrement by 1 until it reaches 0.
     if (o->oMrBlizzardTimer != 0) {
-        o->oMrBlizzardTimer--;
+        o->oMrBlizzardTimer -= 1;
     } else if ((o->oMrBlizzardGraphYOffset += o->oMrBlizzardGraphYVel) > 24.0f) {
         // Increments GraphYOffset by GraphYVel until it is greater than 24,
         // moving Mr. Blizzard's graphical position upward each frame.

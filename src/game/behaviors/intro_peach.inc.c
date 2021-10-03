@@ -20,7 +20,7 @@ void intro_peach_set_pos_and_opacity(struct Object *obj, f32 targetOpacity, f32 
 void bhv_intro_peach_loop(void) {
     switch (gCurrentObject->oAction) {
         case 0:
-            gCurrentObject->oAction = 1;
+            gCurrentObject->oAction += 1;
             gCurrentObject->oFaceAnglePitch = 0x400;
             gCurrentObject->oFaceAngleYaw = 0x7500;
             gCurrentObject->oFaceAngleRoll = -0x3700;
@@ -34,13 +34,13 @@ void bhv_intro_peach_loop(void) {
             intro_peach_set_pos_and_opacity(gCurrentObject, 0.f, 0.f);
 
             if (gCurrentObject->oTimer > 20)
-                gCurrentObject->oAction = 2;
+                gCurrentObject->oAction += 1;
             break;
         case 2:
             intro_peach_set_pos_and_opacity(gCurrentObject, 255.f, 3.f);
 
             if ((gCurrentObject->oTimer > 100) && (get_dialog_id() == DIALOG_NONE))
-                gCurrentObject->oAction = 3;
+                gCurrentObject->oAction += 1;
             break;
         case 3:
             intro_peach_set_pos_and_opacity(gCurrentObject, 0.f, 8.f);

@@ -9,7 +9,7 @@ void bhv_end_birds_1_loop(void) {
             gCurrentObject->oIntroLakituEndBirds1DestX = -554.f;
             gCurrentObject->oIntroLakituEndBirds1DestY = 3044.f;
             gCurrentObject->oIntroLakituEndBirds1DestZ = -1314.f;
-            gCurrentObject->oAction = 1;
+            gCurrentObject->oAction += 1;
             break;
         case 1:
             vec3f_set(pos, gCurrentObject->oIntroLakituEndBirds1DestX, gCurrentObject->oIntroLakituEndBirds1DestY,
