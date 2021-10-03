@@ -58,15 +58,12 @@ static void racing_penguin_act_prepare_for_race(void) {
 }
 
 static void racing_penguin_act_race(void) {
-    f32 targetSpeed;
-    f32 minSpeed;
-
-    if (cur_obj_follow_path(0) == PATH_REACHED_END) {
+    if (cur_obj_follow_path() == PATH_REACHED_END) {
         o->oRacingPenguinReachedBottom = TRUE;
         o->oAction = RACING_PENGUIN_ACT_FINISH_RACE;
     } else {
-        targetSpeed = o->oPosY - gMarioObject->oPosY;
-        minSpeed = 70.0f;
+        f32 targetSpeed = o->oPosY - gMarioObject->oPosY;
+        f32 minSpeed = 70.0f;
 
         cur_obj_play_sound_1(SOUND_AIR_ROUGH_SLIDE);
 

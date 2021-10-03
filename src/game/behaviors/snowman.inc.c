@@ -51,18 +51,16 @@ void adjust_rolling_face_pitch(f32 f12) {
 }
 
 void snowmans_bottom_act_1(void) {
-    s32 pathResult = 0;
-
     o->oPathedStartWaypoint = segmented_to_virtual(&ccm_seg7_trajectory_snowman);
     object_step_without_floor_orient();
-    pathResult = cur_obj_follow_path(pathResult);
+    s32 pathResult = cur_obj_follow_path();
     o->oSnowmansBottomTargetYaw = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomTargetYaw, 0x400);
 
     if (o->oForwardVel > 70.0f)
         o->oForwardVel = 70.0f;
 
-    if (pathResult == -1) {
+    if (pathResult == PATH_REACHED_END) {
         if (obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x2000) == TRUE
             && o->oSnowmansBottomHitCheckpointNearMario == 1) {
             o->oSnowmansBottomTargetYaw = o->oAngleToMario;

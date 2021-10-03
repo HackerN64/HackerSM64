@@ -1366,26 +1366,20 @@ static s32 cur_obj_detect_steep_floor(s16 steepAngleDegrees) {
 }
 
 s32 cur_obj_resolve_wall_collisions(void) {
-    s32 numCollisions;
-    struct Surface *wall;
-    struct WallCollisionData collisionData;
-
-    f32 offsetY = 10.0f;
     f32 radius = o->oWallHitboxRadius;
-
     if (radius > 0.1L) {
-        collisionData.offsetY = offsetY;
+        struct WallCollisionData collisionData;
+        collisionData.offsetY = 10.0f;
         collisionData.radius = radius;
         collisionData.x = (s16) o->oPosX;
         collisionData.y = (s16) o->oPosY;
         collisionData.z = (s16) o->oPosZ;
-
-        numCollisions = find_wall_collisions(&collisionData);
+        s32 numCollisions = find_wall_collisions(&collisionData);
         if (numCollisions != 0) {
             o->oPosX = collisionData.x;
             o->oPosY = collisionData.y;
             o->oPosZ = collisionData.z;
-            wall = collisionData.walls[collisionData.numWalls - 1];
+            struct Surface *wall = collisionData.walls[collisionData.numWalls - 1];
 
             o->oWallAngle = SURFACE_YAW(wall);
             return (abs_angle_diff(o->oWallAngle, o->oMoveAngleYaw) > 0x4000);
@@ -1529,9 +1523,7 @@ s32 cur_obj_angle_to_home(void) {
 }
 
 void obj_set_gfx_pos_at_obj_pos(struct Object *obj1, struct Object *obj2) {
-    obj1->header.gfx.pos[0] = obj2->oPosX;
-    obj1->header.gfx.pos[1] = obj2->oPosY + obj2->oGraphYOffset;
-    obj1->header.gfx.pos[2] = obj2->oPosZ;
+    vec3_copy_y_off(obj1->header.gfx.pos, &obj2->oPosVec, obj2->oGraphYOffset);
 
     obj1->header.gfx.angle[0] = obj2->oMoveAnglePitch & 0xFFFF;
     obj1->header.gfx.angle[1] = obj2->oMoveAngleYaw   & 0xFFFF;
@@ -1594,24 +1586,18 @@ void obj_create_transform_from_self(struct Object *obj) {
 }
 
 void cur_obj_rotate_move_angle_using_vel(void) {
-    o->oMoveAnglePitch += o->oAngleVelPitch;
-    o->oMoveAngleYaw += o->oAngleVelYaw;
-    o->oMoveAngleRoll += o->oAngleVelRoll;
+    vec3_add(&o->oMoveAngleVec, &o->oAngleVelVec);
 }
 
 void cur_obj_rotate_face_angle_using_vel(void) {
-    o->oFaceAnglePitch += o->oAngleVelPitch;
-    o->oFaceAngleYaw += o->oAngleVelYaw;
-    o->oFaceAngleRoll += o->oAngleVelRoll;
+    vec3_add(&o->oFaceAngleVec, &o->oAngleVelVec);
 }
 
 void cur_obj_set_face_angle_to_move_angle(void) {
-    o->oFaceAnglePitch = o->oMoveAnglePitch;
-    o->oFaceAngleYaw = o->oMoveAngleYaw;
-    o->oFaceAngleRoll = o->oMoveAngleRoll;
+    vec3_copy(&o->oFaceAngleVec, &o->oMoveAngleVec);
 }
 
-s32 cur_obj_follow_path(UNUSED s32 unusedArg) {
+s32 cur_obj_follow_path(void) {
     if (o->oPathedPrevWaypointFlags == 0) {
         o->oPathedPrevWaypoint = o->oPathedStartWaypoint;
         o->oPathedPrevWaypointFlags = WAYPOINT_FLAGS_INITIALIZED;

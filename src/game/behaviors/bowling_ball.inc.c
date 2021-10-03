@@ -80,7 +80,7 @@ void bhv_bowling_ball_roll_loop(void) {
     bowling_ball_set_waypoints();
     s16 collisionFlags = object_step();
 
-    s32 pathResult = cur_obj_follow_path(0);
+    s32 pathResult = cur_obj_follow_path();
 
     o->oBowlingBallTargetYaw = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oBowlingBallTargetYaw, 0x400);
@@ -90,7 +90,7 @@ void bhv_bowling_ball_roll_loop(void) {
 
     bowling_ball_set_hitbox();
 
-    if (pathResult == -1) {
+    if (pathResult == PATH_REACHED_END) {
         if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 7000)) {
             spawn_mist_particles();
             spawn_mist_particles_variable(0, 0, 92.0f);
@@ -106,7 +106,7 @@ void bhv_bowling_ball_roll_loop(void) {
 void bhv_bowling_ball_initializeLoop(void) {
     bowling_ball_set_waypoints();
 
-    cur_obj_follow_path(0);
+    cur_obj_follow_path();
 
     o->oMoveAngleYaw = o->oPathedTargetYaw;
 

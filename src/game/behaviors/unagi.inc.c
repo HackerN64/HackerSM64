@@ -63,7 +63,7 @@ void unagi_act_1_4(s32 nextAction) {
         cur_obj_play_sound_2(SOUND_GENERAL_MOVING_WATER);
     }
 
-    if (cur_obj_follow_path(0) == PATH_REACHED_END) {
+    if (cur_obj_follow_path() == PATH_REACHED_END) {
         o->oAction = nextAction;
     }
 

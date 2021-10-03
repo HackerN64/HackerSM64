@@ -98,23 +98,18 @@ void bhv_mips_act_wait_for_nearby_mario(void) {
  * Continue to follow our path around the basement area.
  */
 void bhv_mips_act_follow_path(void) {
-    s16 collisionFlags = 0;
-    s32 followStatus = 0;
-    struct Waypoint **pathBase;
-    struct Waypoint *waypoint;
-
     // Retrieve current waypoint.
-    pathBase = segmented_to_virtual(&inside_castle_seg7_trajectory_mips);
-    waypoint = segmented_to_virtual(*(pathBase + o->oMipsStartWaypointIndex));
+    struct Waypoint **pathBase = segmented_to_virtual(&inside_castle_seg7_trajectory_mips);
+    struct Waypoint *waypoint = segmented_to_virtual(*(pathBase + o->oMipsStartWaypointIndex));
 
     // Set start waypoint and follow the path from there.
     o->oPathedStartWaypoint = waypoint;
-    followStatus = cur_obj_follow_path(followStatus);
+    s32 followStatus = cur_obj_follow_path();
 
     // Update velocity and angle and do movement.
     o->oForwardVel = o->oMipsForwardVelocity;
     o->oMoveAngleYaw = o->oPathedTargetYaw;
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
 
     // If we are at the end of the path, do idle animation and wait for Mario.
     if (followStatus == PATH_REACHED_END) {
