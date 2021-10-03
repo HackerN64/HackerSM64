@@ -24,7 +24,7 @@ void clam_act_0(void) {
         cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL2);
         o->oAction = 1;
     } else if (o->oClamShakeTimer != 0) {
-        o->oClamShakeTimer--;
+        o->oClamShakeTimer -= 1;
         cur_obj_shake_y(3.0f);
     }
 }

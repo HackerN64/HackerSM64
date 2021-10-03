@@ -96,7 +96,7 @@ void print_text_array_info(s16 *printState, const char *str, s32 number) {
             || (printState[DEBUG_PSTATE_MAX_X_CURSOR] < printState[DEBUG_PSTATE_Y_CURSOR])) {
             print_text(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                        "DPRINT OVER");
-            printState[DEBUG_PSTATE_DISABLED] = TRUE;
+            printState[DEBUG_PSTATE_DISABLED] += 1; // why not just = TRUE...
         } else {
             print_text_fmt_int(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                                str, number);
@@ -201,7 +201,7 @@ void print_string_array_info(const char **strArr) {
     s32 i;
 
     if (!sDebugStringArrPrinted) {
-        sDebugStringArrPrinted = TRUE;
+        sDebugStringArrPrinted += 1; // again, why not = TRUE...
         for (i = 0; i < 8; i++) {
             // sDebugPage is assumed to be 4 or 5 here.
             print_debug_top_down_mapinfo(strArr[i], gDebugInfo[sDebugPage][i]);
@@ -240,7 +240,7 @@ void update_debug_dpadmask(void) {
         } else {
             sDebugInfoDPadMask = 0;
         }
-        sDebugInfoDPadUpdID++;
+        sDebugInfoDPadUpdID += 1;
         if (sDebugInfoDPadUpdID >= 8) {
             sDebugInfoDPadUpdID = 6; // rapidly set to 6 from 8 as long as dPadMask is being set.
         }
@@ -249,7 +249,7 @@ void update_debug_dpadmask(void) {
 
 void debug_unknown_level_select_check(void) {
     if (!sDebugLvSelectCheckFlag) {
-        sDebugLvSelectCheckFlag = TRUE;
+        sDebugLvSelectCheckFlag += 1; // again, just do = TRUE...
 
         if (!gDebugLevelSelect) {
             gDebugInfoFlags = DEBUG_INFO_NOFLAGS;
@@ -291,7 +291,7 @@ UNUSED static void check_debug_button_seq(void) {
     } else {
         if ((s16)(cButtonMask = (gPlayer1Controller->buttonPressed & C_BUTTONS))) {
             if (buttonArr[sDebugInfoButtonSeqID] == cButtonMask) {
-                sDebugInfoButtonSeqID++;
+                sDebugInfoButtonSeqID += 1;
                 if (buttonArr[sDebugInfoButtonSeqID] == -1) {
                     if (gDebugInfoFlags == DEBUG_INFO_FLAG_ALL) {
                         gDebugInfoFlags = DEBUG_INFO_FLAG_LSELECT;
@@ -314,11 +314,11 @@ UNUSED static void try_change_debug_page(void) {
     if (gDebugInfoFlags & DEBUG_INFO_FLAG_DPRINT) {
         if ((gPlayer1Controller->buttonPressed & L_JPAD)
             && (gPlayer1Controller->buttonDown & (L_TRIG | R_TRIG))) {
-            sDebugPage++;
+            sDebugPage += 1;
         }
         if ((gPlayer1Controller->buttonPressed & R_JPAD)
             && (gPlayer1Controller->buttonDown & (L_TRIG | R_TRIG))) {
-            sDebugPage--;
+            sDebugPage -= 1;
         }
         if (sDebugPage >= (DEBUG_PAGE_MAX + 1)) {
             sDebugPage = DEBUG_PAGE_MIN;
@@ -351,14 +351,14 @@ void try_modify_debug_controls(void) {
         }
 
         if (sDebugInfoDPadMask & U_JPAD) {
-            sDebugSysCursor--;
+            sDebugSysCursor -= 1;
             if (sDebugSysCursor < 0) {
                 sDebugSysCursor = 0;
             }
         }
 
         if (sDebugInfoDPadMask & D_JPAD) {
-            sDebugSysCursor++;
+            sDebugSysCursor += 1;
             if (sDebugSysCursor >= 8) {
                 sDebugSysCursor = 7;
             }

@@ -63,7 +63,7 @@ static void klepto_anim_dive(void) {
         obj_move_pitch_approach(o->oKleptoPitchToTarget, 600);
         if (klepto_set_and_check_if_anim_at_end() != 0) {
             if (o->oKleptoDiveTimer != 0) {
-                o->oKleptoDiveTimer++;
+                o->oKleptoDiveTimer += 1;
             } else if (o->oKleptoPitchToTarget > -100) {
                 o->oKleptoDiveTimer = random_linear_offset(60, 60);
             }
@@ -234,7 +234,7 @@ static void klepto_act_dive_at_mario(void) {
                 o->oKleptoYawToTarget = o->oAngleToMario;
 
                 if (dy < 160.0f) {
-                    o->oSubAction++;
+                    o->oSubAction += 1;
                 }
             }
 

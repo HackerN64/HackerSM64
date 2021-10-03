@@ -133,7 +133,7 @@ static void koopa_walk_start(void) {
     obj_forward_vel_approach(3.0f * o->oKoopaAgility, 0.3f * o->oKoopaAgility);
 
     if (cur_obj_init_anim_and_check_if_end(11)) {
-        o->oSubAction++;
+        o->oSubAction += 1;
         o->oKoopaCountdown = random_linear_offset(30, 100);
     }
 }
@@ -146,9 +146,9 @@ static void koopa_walk(void) {
     koopa_play_footstep_sound(2, 17);
 
     if (o->oKoopaCountdown != 0) {
-        o->oKoopaCountdown--;
+        o->oKoopaCountdown -= 1;
     } else if (cur_obj_check_if_near_animation_end()) {
-        o->oSubAction++;
+        o->oSubAction += 1;
     }
 }
 
@@ -244,7 +244,7 @@ static void koopa_shelled_act_lying(void) {
         cur_obj_init_anim_extend(5);
         koopa_dive_update_speed(0.3f);
     } else if (o->oKoopaCountdown != 0) {
-        o->oKoopaCountdown--;
+        o->oKoopaCountdown -= 1;
         cur_obj_extend_animation_if_at_end();
     } else if (cur_obj_init_anim_and_check_if_end(6)) {
         o->oAction = KOOPA_SHELLED_ACT_STOPPED;
@@ -350,7 +350,7 @@ static void koopa_unshelled_act_run(void) {
                          obj_bounce_off_walls_edges_objects(&o->oKoopaTargetYaw))) {
             // Otherwise run around randomly
             if (o->oKoopaUnshelledTimeUntilTurn != 0) {
-                o->oKoopaUnshelledTimeUntilTurn--;
+                o->oKoopaUnshelledTimeUntilTurn -= 1;
             } else {
                 o->oKoopaTargetYaw = obj_random_fixed_turn(0x2000);
             }
@@ -424,7 +424,7 @@ static void koopa_unshelled_act_dive(void) {
         }
         koopa_dive_update_speed(0.5f);
     } else if (o->oKoopaCountdown != 0) {
-        o->oKoopaCountdown--;
+        o->oKoopaCountdown -= 1;
         cur_obj_extend_animation_if_at_end();
     } else if (cur_obj_init_anim_and_check_if_end(6)) {
         o->oAction = KOOPA_UNSHELLED_ACT_RUN;
@@ -491,7 +491,7 @@ static void koopa_the_quick_act_wait_before_race(void) {
     koopa_shelled_act_stopped();
 
     if (o->oKoopaTheQuickInitTextboxCooldown != 0) {
-        o->oKoopaTheQuickInitTextboxCooldown--;
+        o->oKoopaTheQuickInitTextboxCooldown -= 1;
     } else if (cur_obj_can_mario_activate_textbox_2(400.0f, 400.0f)) {
         //! The next action doesn't execute until next frame, giving mario one
         //  frame where he can jump, and thus no longer be ready to speak.
@@ -650,10 +650,11 @@ static void koopa_the_quick_act_race(void) {
                     break;
 
                 case KOOPA_THE_QUICK_SUB_ACT_JUMP:
-                    // We could perform a goomba double jump if we could deactivate ktq
+                    // We could perform a goomba double jump if we could deactivate
+                    // ktq
                     if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
                         if (cur_obj_init_anim_and_check_if_end(13)) {
-                            o->oSubAction--;
+                            o->oSubAction -= 1;
                         }
 
                         koopa_the_quick_detect_bowling_ball();

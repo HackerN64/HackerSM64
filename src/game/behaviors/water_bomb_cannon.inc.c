@@ -52,14 +52,14 @@ void water_bomb_cannon_act_1(void) {
         o->oAction = 2;
     } else if (o->oBehParams2ndByte == 0) {
         if (o->oWaterCannonIdleTimer != 0) {
-            o->oWaterCannonIdleTimer--;
+            o->oWaterCannonIdleTimer -= 1;
         } else {
             obj_move_pitch_approach(o->oWaterCannonTargetMovePitch, 0x80);
             obj_face_yaw_approach(o->oWaterCannonTargetFaceYaw, 0x100);
 
             if ((s16) o->oFaceAngleYaw == (s16) o->oWaterCannonTargetFaceYaw) {
                 if (o->oWaterCannonRotationTimer != 0) {
-                    o->oWaterCannonRotationTimer--;
+                    o->oWaterCannonRotationTimer -= 1;
                 } else {
                     cur_obj_play_sound_2(SOUND_OBJ_CANNON4);
                     o->oWaterCannonIdleTimer = 70;

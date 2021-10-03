@@ -1411,8 +1411,8 @@ u32 interact_koopa_shell(struct MarioState *m, UNUSED u32 interactType, struct O
         if (interaction == INT_HIT_FROM_ABOVE || m->action == ACT_WALKING
             || m->action == ACT_HOLD_WALKING) {
             m->interactObj = obj;
-            m->usedObj     = obj;
-            m->riddenObj   = obj;
+            m->usedObj = obj;
+            m->riddenObj = obj;
 
             attack_object(obj, interaction);
             update_mario_sound_and_camera(m);
@@ -1620,10 +1620,22 @@ u32 mario_can_talk(struct MarioState *m, u32 arg) {
     return FALSE;
 }
 
+#ifdef VERSION_JP
+#define READ_MASK (INPUT_B_PRESSED)
+#else
+#define READ_MASK (INPUT_B_PRESSED | INPUT_A_PRESSED)
+#endif
+
+#ifdef VERSION_JP
+#define SIGN_RANGE 0x38E3
+#else
+#define SIGN_RANGE 0x4000
+#endif
+
 u32 check_read_sign(struct MarioState *m, struct Object *obj) {
-    if ((m->input & (INPUT_B_PRESSED | INPUT_A_PRESSED)) && mario_can_talk(m, 0) && object_facing_mario(m, obj, 0x4000)) {
+    if ((m->input & READ_MASK) && mario_can_talk(m, 0) && object_facing_mario(m, obj, SIGN_RANGE)) {
         s16 facingDYaw = (s16)(obj->oMoveAngleYaw + 0x8000) - m->faceAngle[1];
-        if (facingDYaw >= -0x4000 && facingDYaw <= 0x4000) {
+        if (facingDYaw >= -SIGN_RANGE && facingDYaw <= SIGN_RANGE) {
             f32 targetX = obj->oPosX + 105.0f * sins(obj->oMoveAngleYaw);
             f32 targetZ = obj->oPosZ + 105.0f * coss(obj->oMoveAngleYaw);
 
@@ -1641,7 +1653,7 @@ u32 check_read_sign(struct MarioState *m, struct Object *obj) {
 }
 
 u32 check_npc_talk(struct MarioState *m, struct Object *obj) {
-    if ((m->input & (INPUT_B_PRESSED | INPUT_A_PRESSED)) && mario_can_talk(m, 1)) {
+    if ((m->input & READ_MASK) && mario_can_talk(m, 1)) {
         s16 facingDYaw = mario_obj_angle_to_object(m, obj) - m->faceAngle[1];
         if (facingDYaw >= -0x4000 && facingDYaw <= 0x4000) {
             obj->oInteractStatus = INT_STATUS_INTERACTED;
@@ -1722,7 +1734,7 @@ void mario_process_interactions(struct MarioState *m) {
     }
 
     if (m->invincTimer > 0 && !sDelayInvincTimer) {
-        m->invincTimer--;
+        m->invincTimer -= 1;
     }
 
     //! If the kick/punch flags are set and an object collision changes Mario's
@@ -1804,8 +1816,12 @@ void mario_handle_special_floors(struct MarioState *m) {
                 break;
         }
 
-        if (!(m->action & ACT_FLAG_AIR) && !(m->action & ACT_FLAG_SWIMMING) && (floorType == SURFACE_BURNING)) {
-            check_lava_boost(m);
+        if (!(m->action & ACT_FLAG_AIR) && !(m->action & ACT_FLAG_SWIMMING)) {
+            switch (floorType) {
+                case SURFACE_BURNING:
+                    check_lava_boost(m);
+                    break;
+            }
         }
     }
 }

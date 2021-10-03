@@ -49,7 +49,7 @@ void bhv_coffin_spawner_loop(void) {
                 }
             }
 
-            o->oAction++;
+            o->oAction += 1;
         }
     } else if (o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) {
         o->oAction = COFFIN_SPAWNER_ACT_COFFINS_UNLOADED;

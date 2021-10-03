@@ -83,7 +83,7 @@ void envfx_update_flower(Vec3s centerPos) {
             (gEnvFxBuffer + i)->isAlive = 1;
             (gEnvFxBuffer + i)->animFrame = random_float() * 5.0f;
         } else if ((timer & 0x03) == 0) {
-            (gEnvFxBuffer + i)->animFrame++;
+            (gEnvFxBuffer + i)->animFrame += 1;
             if ((gEnvFxBuffer + i)->animFrame > 5) {
                 (gEnvFxBuffer + i)->animFrame = 0;
             }
@@ -154,7 +154,7 @@ void envfx_update_lava(Vec3s centerPos) {
             envfx_set_lava_bubble_position(i, centerPos);
             (gEnvFxBuffer + i)->isAlive = 1;
         } else if ((timer & 0x01) == 0) {
-            (gEnvFxBuffer + i)->animFrame++;
+            (gEnvFxBuffer + i)->animFrame += 1;
             if ((gEnvFxBuffer + i)->animFrame > 8) {
                 (gEnvFxBuffer + i)->isAlive = 0;
                 (gEnvFxBuffer + i)->animFrame = 0;

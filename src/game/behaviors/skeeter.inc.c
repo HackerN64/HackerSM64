@@ -48,7 +48,7 @@ static void skeeter_act_idle(void) {
                 && obj_smooth_turn(&o->oSkeeterAngleVel, &o->oMoveAngleYaw, o->oSkeeterTargetAngle, 0.02f,
                                    5, 50, 200)) {
                 if (o->oSkeeterWaitTime != 0) {
-                    o->oSkeeterWaitTime--;
+                    o->oSkeeterWaitTime -= 1;
                 } else if (cur_obj_check_if_near_animation_end()) {
                     cur_obj_play_sound_2(SOUND_OBJ_WALKING_WATER);
                     o->oAction = SKEETER_ACT_LUNGE;
@@ -116,7 +116,7 @@ static void skeeter_act_walk(void) {
                 } else {
                     o->oSkeeterTargetForwardVel = 10.0f;
                     if (o->oSkeeterWaitTime != 0) {
-                        o->oSkeeterWaitTime--;
+                        o->oSkeeterWaitTime -= 1;
                     } else if (cur_obj_check_if_near_animation_end() != 0) {
                         if (random_u16() & 0x0003) {
                             o->oSkeeterTargetAngle = obj_random_fixed_turn(0x2000);

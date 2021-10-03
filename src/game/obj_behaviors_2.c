@@ -141,7 +141,7 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, f32 x, f32
         do {
             prevWaypoint = nextWaypoint;
 
-            nextWaypoint++;
+            nextWaypoint += 1;
             if (nextWaypoint->flags == WAYPOINT_FLAGS_END) {
                 if (ballIndex == 0) {
                     o->oPlatformOnTrackPrevWaypointFlags = WAYPOINT_FLAGS_END;
@@ -457,9 +457,10 @@ static s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero
     return FALSE;
 }
 
-static void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange, s16 blinkLength) {
+static void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange,
+                                s16 blinkLength) {
     if (*blinkTimer != 0) {
-        (*blinkTimer)--;
+        *blinkTimer -= 1;
     } else {
         *blinkTimer = random_linear_offset(baseCycleLength, cycleLengthRange);
     }

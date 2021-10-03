@@ -31,7 +31,7 @@ void bhv_thi_tiny_island_top_loop(void) {
             } else {
                 gTHIWaterDrained |= 1;
                 play_puzzle_jingle();
-                o->oAction++;
+                o->oAction += 1;
             }
         }
     } else {

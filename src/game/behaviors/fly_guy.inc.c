@@ -45,7 +45,7 @@ static void fly_guy_act_idle(void) {
                 o->oAction = FLY_GUY_ACT_APPROACH_MARIO;
             } else {
                 o->oFlyGuyUnusedJitter = o->oMoveAngleYaw + sFlyGuyJitterAmounts[o->oFlyGuyIdleTimer];
-                o->oFlyGuyIdleTimer++;
+                o->oFlyGuyIdleTimer += 1;
             }
         }
     }
@@ -190,7 +190,7 @@ void bhv_fly_guy_update(void) {
         }
 
         // Oscillate up and down
-        o->oFlyGuyOscTimer++;
+        o->oFlyGuyOscTimer += 1;
         o->oPosY += coss(0x400 * o->oFlyGuyOscTimer) * 1.5f;
 
         switch (o->oAction) {

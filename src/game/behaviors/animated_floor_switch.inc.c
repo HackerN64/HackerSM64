@@ -63,7 +63,7 @@ void bhv_animates_on_floor_switch_press_loop(void) {
         }
 
         if (o->oFloorSwitchPressAnimationDoubleFrame < 9) {
-            o->oFloorSwitchPressAnimationDoubleFrame++;
+            o->oFloorSwitchPressAnimationDoubleFrame += 1;
         }
     } else if ((o->oFloorSwitchPressAnimationDoubleFrame -= 2) < 0) {
         o->oFloorSwitchPressAnimationDoubleFrame = 0;

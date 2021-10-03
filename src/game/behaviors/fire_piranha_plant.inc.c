@@ -56,7 +56,7 @@ static void fire_piranha_plant_act_hide(void) {
                                 0.04f * o->oFirePiranhaPlantNeutralScale)) {
         cur_obj_become_intangible();
         if (o->oFirePiranhaPlantActive) {
-            sNumActiveFirePiranhaPlants--;
+            sNumActiveFirePiranhaPlants -= 1;
             o->oFirePiranhaPlantActive = FALSE;
 
             if ((u16)(o->oBehParams >> 16) != 0 && o->oHealth == 0) {
@@ -72,7 +72,7 @@ static void fire_piranha_plant_act_hide(void) {
             cur_obj_play_sound_2(SOUND_OBJ_PIRANHA_PLANT_APPEAR);
 
             o->oFirePiranhaPlantActive = TRUE;
-            sNumActiveFirePiranhaPlants++;
+            sNumActiveFirePiranhaPlants += 1;
 
             cur_obj_unhide();
             o->oAction = FIRE_PIRANHA_PLANT_ACT_GROW;
@@ -127,7 +127,7 @@ void bhv_fire_piranha_plant_update(void) {
     if (obj_check_attacks(&sFirePiranhaPlantHitbox, o->oAction)) {
         if (--o->oHealth < 0) {
             if (o->oFirePiranhaPlantActive) {
-                sNumActiveFirePiranhaPlants--;
+                sNumActiveFirePiranhaPlants -= 1;
             }
         } else {
             cur_obj_init_animation_with_sound(2);

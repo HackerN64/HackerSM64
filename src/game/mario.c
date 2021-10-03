@@ -1165,10 +1165,11 @@ void squish_mario_model(struct MarioState *m) {
     if (m->squishTimer != 0xFF) {
         // If no longer squished, scale back to default.
         if (m->squishTimer == 0) {
-            vec3_same(m->marioObj->header.gfx.scale, 1.0f);
+            vec3f_set(m->marioObj->header.gfx.scale, 1.0f, 1.0f, 1.0f);
+        }
         // If timer is less than 16, rubber-band Mario's size scale up and down.
-        } else if (m->squishTimer <= 16) {
-            m->squishTimer--;
+        else if (m->squishTimer <= 16) {
+            m->squishTimer -= 1;
 
             m->marioObj->header.gfx.scale[1] =
                 1.0f - ((sSquishScaleOverTime[15 - m->squishTimer] * 0.6f) / 100.0f);
@@ -1177,7 +1178,7 @@ void squish_mario_model(struct MarioState *m) {
 
             m->marioObj->header.gfx.scale[2] = m->marioObj->header.gfx.scale[0];
         } else {
-            m->squishTimer--;
+            m->squishTimer -= 1;
 
             vec3f_set(m->marioObj->header.gfx.scale, 1.4f, 0.4f, 1.4f);
         }
@@ -1239,13 +1240,13 @@ void update_mario_button_inputs(struct MarioState *m) {
     if (m->input & INPUT_A_PRESSED) {
         m->framesSinceA = 0;
     } else if (m->framesSinceA < 0xFF) {
-        m->framesSinceA++;
+        m->framesSinceA += 1;
     }
 
     if (m->input & INPUT_B_PRESSED) {
         m->framesSinceB = 0;
     } else if (m->framesSinceB < 0xFF) {
-        m->framesSinceB++;
+        m->framesSinceB += 1;
     }
 }
 
@@ -1581,7 +1582,7 @@ u32 update_and_return_cap_flags(struct MarioState *m) {
         if ((m->capTimer <= 60)
             || ((action != ACT_READING_AUTOMATIC_DIALOG) && (action != ACT_READING_NPC_DIALOG)
                 && (action != ACT_READING_SIGN) && (action != ACT_IN_CANNON))) {
-            m->capTimer--;
+            m->capTimer -= 1;
         }
 
         if (m->capTimer == 0) {

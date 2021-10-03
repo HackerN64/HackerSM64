@@ -76,7 +76,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
         // and one more frame of "lag" after it finally reaches 0 here,
         // Mario actually has to wait 22 frames before the platform starts moving.
         if (o->oActivatedBackAndForthPlatformCountdown != 0) {
-            o->oActivatedBackAndForthPlatformCountdown--;
+            o->oActivatedBackAndForthPlatformCountdown -= 1;
         } else {
             // After the wait period is over, we start moving, by adding the velocity
             // to the positional offset.

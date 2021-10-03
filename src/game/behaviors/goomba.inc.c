@@ -95,7 +95,7 @@ void bhv_goomba_triplet_spawner_update(void) {
                 }
             }
 
-            o->oAction++;
+            o->oAction += 1;
         }
     } else if (o->oDistanceToMario > 4000.0f) {
         // If mario is too far away, enter the unloaded action. The goombas
@@ -194,7 +194,7 @@ static void goomba_act_walk(void) {
 
                 o->oGoombaRelativeSpeed = 4.0f / 3.0f;
                 if (o->oGoombaWalkTimer != 0) {
-                    o->oGoombaWalkTimer--;
+                    o->oGoombaWalkTimer -= 1;
                 } else {
                     if (random_u16() & 3) {
                         o->oGoombaTargetYaw = obj_random_fixed_turn(0x2000);
