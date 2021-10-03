@@ -368,8 +368,9 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *prevWall,
     ledgePos[0] = (nextPos[0] - (wall->normal.x * 60.0f));
     ledgePos[2] = (nextPos[2] - (wall->normal.z * 60.0f));
     ledgePos[1] = find_floor(ledgePos[0], (nextPos[1] + 160.0f), ledgePos[2], ledgeFloor);
-    if (ledgeFloor == NULL) return NULL;
-    if ((ledgePos[1] < (nextPos[1] + 100.0f))
+    if ((ledgeFloor == NULL)
+    || ((*ledgeFloor) == NULL)
+    || (ledgePos[1] < (nextPos[1] + 100.0f))
     || ((*ledgeFloor)->normal.y < COS25)
     || SURFACE_IS_UNSAFE((*ledgeFloor)->type)) {
         return NULL;
