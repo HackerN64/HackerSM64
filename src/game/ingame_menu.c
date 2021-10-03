@@ -1819,19 +1819,18 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-s8 gCourseCompleteCoinsEqual = 0;
+s8 gCourseCompleteCoinsEqual = FALSE;
 s32 gCourseDoneMenuTimer = 0;
 s32 gCourseCompleteCoins = 0;
 s8 gHudFlash = 0;
 
-s16 render_pause_courses_and_castle(void) {
+s32 render_pause_courses_and_castle(void) {
     s16 index;
 
-    #ifdef PUPPYCAM
+#ifdef PUPPYCAM
     puppycam_check_pause_buttons();
-    if (!gPCOptionOpen)
-    {
-    #endif
+    if (!gPCOptionOpen) {
+#endif
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             gDialogLineNum = MENU_OPT_DEFAULT;
@@ -1851,19 +1850,18 @@ s16 render_pause_courses_and_castle(void) {
             shade_screen();
             render_pause_my_score_coins();
             render_pause_red_coins();
-        #ifndef EXIT_COURSE_WHILE_MOVING
-            s32 exitCheck = gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT;
-        #else
-            s32 exitCheck = 1;
-        #endif
-            #ifndef DISABLE_EXIT_COURSE
+#ifndef EXIT_COURSE_WHILE_MOVING
+            s32 exitCheck = (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT);
+#else
+            s32 exitCheck = TRUE;
+#endif
+#ifndef DISABLE_EXIT_COURSE
             if (exitCheck)
                 render_pause_course_options(99, 93, &gDialogLineNum, 15);
-            #endif
+#endif
 
             if (gPlayer3Controller->buttonPressed & A_BUTTON
-             || gPlayer3Controller->buttonPressed & START_BUTTON)
-            {
+             || gPlayer3Controller->buttonPressed & START_BUTTON) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;
@@ -1885,8 +1883,7 @@ s16 render_pause_courses_and_castle(void) {
             render_pause_castle_main_strings(104, 60);
 
             if (gPlayer3Controller->buttonPressed & A_BUTTON
-             || gPlayer3Controller->buttonPressed & START_BUTTON)
-            {
+             || gPlayer3Controller->buttonPressed & START_BUTTON) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource);
                 gMenuMode = MENU_MODE_NONE;
@@ -1896,16 +1893,14 @@ s16 render_pause_courses_and_castle(void) {
             }
             break;
     }
-    #if defined(WIDE) && !defined(PUPPYCAM)
+#if defined(WIDE) && !defined(PUPPYCAM)
         render_widescreen_setting();
-    #endif
+#endif
     if (gDialogTextAlpha < 250) {
         gDialogTextAlpha += 25;
     }
     #ifdef PUPPYCAM
-    }
-    else
-    {
+    } else {
         shade_screen();
         puppycam_display_options();
     }
@@ -1957,7 +1952,7 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     if (gCourseCompleteCoins >= gHudDisplay.coins) {
-        gCourseCompleteCoinsEqual = 1;
+        gCourseCompleteCoinsEqual = TRUE;
         gCourseCompleteCoins = gHudDisplay.coins;
 
         if (gGotFileCoinHiScore) {
@@ -2090,13 +2085,16 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 sp6e)
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
-s16 render_course_complete_screen(void) {
+s32 render_course_complete_screen(void) {
     s16 index;
 
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             render_course_complete_lvl_info_and_hud_str();
-            if (gCourseDoneMenuTimer > 100 && gCourseCompleteCoinsEqual == 1) {
+            if (gCourseDoneMenuTimer > 100 && gCourseCompleteCoinsEqual) {
+#ifdef SAVE_NUM_LIVES
+                save_file_set_num_lives(gMarioState->numLives);
+#endif
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 level_set_transition(-1, NULL);
                 gDialogTextAlpha = 0;
@@ -2119,7 +2117,7 @@ s16 render_course_complete_screen(void) {
                 index = gDialogLineNum;
                 gCourseDoneMenuTimer = 0;
                 gCourseCompleteCoins = 0;
-                gCourseCompleteCoinsEqual = 0;
+                gCourseCompleteCoinsEqual = FALSE;
                 gHudFlash = 0;
 
                 return index;

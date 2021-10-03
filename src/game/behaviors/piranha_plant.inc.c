@@ -49,7 +49,7 @@ s32 piranha_plant_check_interactions(void) {
         } else {
             o->oAction = PIRANHA_PLANT_ACT_WOKEN_UP;
         }
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     } else {
         interacted = 0;
     }
@@ -137,7 +137,7 @@ void piranha_plant_reset_when_far(void) {
 void piranha_plant_attacked(void) {
     cur_obj_become_intangible();
     cur_obj_init_animation_with_sound(2);
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
     if (cur_obj_check_if_near_animation_end())
         o->oAction = PIRANHA_PLANT_ACT_SHRINK_AND_DIE;
     piranha_plant_reset_when_far(); // see this function's comment
@@ -319,5 +319,5 @@ void bhv_piranha_plant_loop(void) {
         }
     }
 #endif
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

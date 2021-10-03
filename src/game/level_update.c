@@ -183,7 +183,7 @@ s8 gNeverEnteredCastle;
 struct MarioState *gMarioState = &gMarioStates[0];
 s8 sWarpCheckpointActive = FALSE;
 
-u16 level_control_timer(s32 timerOp) {
+u32 level_control_timer(s32 timerOp) {
     switch (timerOp) {
         case TIMER_CONTROL_SHOW:
             gHudDisplay.flags |= HUD_DISPLAY_FLAG_TIMER;
@@ -309,10 +309,10 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
         case MARIO_SPAWN_DOOR_WARP:
             set_mario_action(m, ACT_WARP_DOOR_SPAWN, actionArg);
             break;
-        case MARIO_SPAWN_UNKNOWN_02:
+        case MARIO_SPAWN_IDLE:
             set_mario_action(m, ACT_IDLE, 0);
             break;
-        case MARIO_SPAWN_UNKNOWN_03:
+        case MARIO_SPAWN_PIPE:
             set_mario_action(m, ACT_EMERGE_FROM_PIPE, 0);
             break;
         case MARIO_SPAWN_TELEPORT:
@@ -404,7 +404,7 @@ void init_mario_after_warp(void) {
     sDelayedWarpOp = WARP_OP_NONE;
 
     switch (marioSpawnType) {
-        case MARIO_SPAWN_UNKNOWN_03:
+        case MARIO_SPAWN_PIPE:
             play_transition(WARP_TRANSITION_FADE_FROM_STAR, 0x10, 0x00, 0x00, 0x00);
             break;
         case MARIO_SPAWN_DOOR_WARP:
@@ -570,7 +570,7 @@ void check_instant_warp(void) {
     }
 }
 
-s16 music_unchanged_through_warp(s16 arg) {
+s32 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
     s16 levelNum = warpNode->node.destLevel & 0x7F;
 
@@ -714,10 +714,13 @@ void initiate_painting_warp(void) {
  * based on the warp operation and sometimes Mario's used object.
  * Return the time left until the delayed warp is initiated.
  */
-s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
+s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
     s32 fadeMusic = TRUE;
 
     if (sDelayedWarpOp == WARP_OP_NONE) {
+#ifdef SAVE_NUM_LIVES
+        save_file_set_num_lives(m->numLives);
+#endif
         m->invincTimer = -1;
         sDelayedWarpArg = WARP_FLAGS_NONE;
         sDelayedWarpOp = warpOp;
@@ -933,18 +936,16 @@ void update_hud_values(void) {
                 play_sound(coinSound, gMarioState->marioObj->header.gfx.cameraToObject);
             }
         }
-
-        if (gMarioState->numLives > 100) {
-            gMarioState->numLives = 100;
+#ifdef SAVE_NUM_LIVES
+        if (gMarioState->numLives > MAX_NUM_LIVES) {
+            gMarioState->numLives = MAX_NUM_LIVES;
+            save_file_set_num_lives(MAX_NUM_LIVES);
         }
-
-        if (gMarioState->numCoins > 999) {
-            gMarioState->numCoins = 999;
-        }
-
-        if (gHudDisplay.coins > 999) {
-            gHudDisplay.coins = 999;
-        }
+#else
+        if (gMarioState->numLives > MAX_NUM_LIVES) gMarioState->numLives = MAX_NUM_LIVES;
+#endif
+        if (gMarioState->numCoins > MAX_NUM_COINS) gMarioState->numCoins = MAX_NUM_COINS;
+        if (gHudDisplay.coins     > MAX_NUM_COINS) gHudDisplay.coins     = MAX_NUM_COINS;
 
         gHudDisplay.stars = gMarioState->numStars;
         gHudDisplay.lives = gMarioState->numLives;

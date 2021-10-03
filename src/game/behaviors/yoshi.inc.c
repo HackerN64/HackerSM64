@@ -78,7 +78,7 @@ void yoshi_talk_loop(void) {
             o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
             if (cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_161)) {
                 o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
-                o->oInteractStatus = 0;
+                o->oInteractStatus = INT_STATUS_NONE;
                 o->oHomeX = sYoshiHomeLocations[2];
                 o->oHomeZ = sYoshiHomeLocations[3];
                 o->oYoshiTargetYaw = atan2s(o->oHomeZ - o->oPosZ, o->oHomeX - o->oPosX);
@@ -132,6 +132,9 @@ void yoshi_give_present_loop(void) {
     s32 timer = gGlobalTimer;
 
     if (gHudDisplay.lives == 100) {
+#ifdef SAVE_NUM_LIVES
+        save_file_set_num_lives(gMarioState->numLives);
+#endif
         play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
         gSpecialTripleJump = TRUE;
         o->oAction = YOSHI_ACT_WALK_JUMP_OFF_ROOF;

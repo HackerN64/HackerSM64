@@ -1,6 +1,6 @@
 // lll_octagonal_rotating_mesh.c.inc
 
-enum {
+enum LLLOctagonalMeshInstructions {
     LLL_OCTMESH_CHANGE_DIR = 1, // 1
     LLL_OCTMESH_LINEAR_MOVE,    // 2
     LLL_OCTMESH_RESET,          // 3

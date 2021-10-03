@@ -90,5 +90,5 @@ void bhv_koopa_shell_loop(void) {
             }
             break;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

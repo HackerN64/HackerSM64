@@ -49,7 +49,7 @@ void bowling_ball_set_hitbox(void) {
     obj_set_hitbox(o, &sBowlingBallHitbox);
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED)
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void bowling_ball_set_waypoints(void) {

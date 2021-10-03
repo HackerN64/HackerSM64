@@ -76,6 +76,6 @@ void bhv_red_coin_loop(void) {
 
         coin_collected();
         // Despawn the coin.
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     }
 }

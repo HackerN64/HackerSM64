@@ -48,7 +48,7 @@ void bhv_star_door_loop(void) {
                 o->oAction++;
             break;
         case 4:
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
             o->oAction = 0;
             break;
     }

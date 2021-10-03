@@ -83,7 +83,7 @@ void bub_act_2(void) {
         if (o->oInteractStatus & INT_STATUS_INTERACTED)
             spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleSnow);
     } else
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     if (o->oTimer == 0)
         cur_obj_play_sound_2(SOUND_GENERAL_MOVING_WATER);
     if (o->oForwardVel == 0.0f)

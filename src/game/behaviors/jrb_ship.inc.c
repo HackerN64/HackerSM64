@@ -73,7 +73,7 @@ void bhv_jrb_sliding_box_loop(void) {
         cur_obj_become_tangible();
     }
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
         cur_obj_become_intangible();
     }
 }

@@ -367,7 +367,7 @@ index 0000000..97cba2a
 +    o->oParentRelativePosX = 90.0f;
 +    if (o->parentObj->oAction == 4)
 +        o->parentObj->oIntangibleTimer = -1;
-+    o->oInteractStatus = 0;
++    o->oInteractStatus = INT_STATUS_NONE;
 +}
 +
 +void bhv_bowser_flame_spawn_loop(void) {
@@ -417,7 +417,7 @@ index 0000000..97cba2a
 +    }
 +    if (o->parentObj->oHeldState != HELD_FREE)
 +        cur_obj_become_intangible();
-+    o->oInteractStatus = 0;
++    o->oInteractStatus = INT_STATUS_NONE;
 +}
 +
 +s32 bowser_spawn_shockwave(void) {

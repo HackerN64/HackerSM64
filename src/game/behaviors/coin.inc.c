@@ -230,7 +230,6 @@ void coin_inside_boo_act_1(void) {
 }
 
 void coin_inside_boo_act_0(void) {
-    s16 marioMoveYaw;
     struct Object *parent = o->parentObj;
     cur_obj_become_intangible();
 #ifdef DISABLE_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
@@ -244,7 +243,7 @@ void coin_inside_boo_act_0(void) {
     obj_copy_pos(o, parent);
     if (parent->oBooDeathStatus == BOO_DEATH_STATUS_DYING) {
         o->oAction = COIN_INSIDE_BOO_ACT_DROPPED;
-        marioMoveYaw = gMarioObject->oMoveAngleYaw;
+        s16 marioMoveYaw = gMarioObject->oMoveAngleYaw;
         o->oVelX = (sins(marioMoveYaw) * 3.0f);
         o->oVelZ = (coss(marioMoveYaw) * 3.0f);
         o->oVelY = 35.0f;

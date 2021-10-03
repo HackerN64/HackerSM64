@@ -98,7 +98,7 @@ void bhv_treasure_chest_bottom_loop(void) {
     }
 
     cur_obj_push_mario_away_from_cylinder(150.0f, 150.0f);
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void spawn_treasure_chest(s8 param, s32 x, s32 y, s32 z, s16 ry) {

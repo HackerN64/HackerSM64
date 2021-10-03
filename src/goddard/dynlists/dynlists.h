@@ -4,7 +4,7 @@
 #include "../gd_types.h"
 
 // Dynamic Object names
-enum {
+enum DynObjNames {
     DYNOBJ_MARIO_RIGHT_MUSTACHE_JOINT_2          = 3,
     DYNOBJ_MARIO_RIGHT_MUSTACHE_JOINT_1          = 6,
     DYNOBJ_MARIO_RIGHT_MUSTACHE_ANIMDATA_GROUP   = 7,

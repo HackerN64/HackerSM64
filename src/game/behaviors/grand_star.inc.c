@@ -49,7 +49,7 @@ void bhv_grand_star_loop(void) {
             gObjCutsceneDone = 1;
             set_mario_npc_dialog(MARIO_DIALOG_STOP);
             o->oAction++;
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
             cur_obj_play_sound_2(SOUND_GENERAL_GRAND_STAR_JUMP);
         }
         spawn_sparkle_particles(3, 200, 80, -60);
@@ -57,7 +57,7 @@ void bhv_grand_star_loop(void) {
         cur_obj_become_tangible();
         if (o->oInteractStatus & INT_STATUS_INTERACTED) {
             obj_mark_for_deletion(o);
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
         }
     }
     if (o->oAngleVelYaw > 0x400)

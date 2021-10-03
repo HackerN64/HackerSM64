@@ -575,9 +575,9 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
         vz = *(vertices++);
 
         //! No bounds check on vertex data
-        *vertexData++ = (TerrainData)(vx * m[0][0] + vy * m[1][0] + vz * m[2][0] + m[3][0]);
-        *vertexData++ = (TerrainData)(vx * m[0][1] + vy * m[1][1] + vz * m[2][1] + m[3][1]);
-        *vertexData++ = (TerrainData)(vx * m[0][2] + vy * m[1][2] + vz * m[2][2] + m[3][2]);
+        *vertexData++ = (TerrainData)((vx * m[0][0]) + (vy * m[1][0]) + (vz * m[2][0]) + m[3][0]);
+        *vertexData++ = (TerrainData)((vx * m[0][1]) + (vy * m[1][1]) + (vz * m[2][1]) + m[3][1]);
+        *vertexData++ = (TerrainData)((vx * m[0][2]) + (vy * m[1][2]) + (vz * m[2][2]) + m[3][2]);
     }
 
     *data = vertices;

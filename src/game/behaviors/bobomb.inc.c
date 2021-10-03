@@ -57,7 +57,7 @@ void bobomb_check_interactions(void) {
         if ((o->oInteractStatus & INT_STATUS_TOUCHED_BOB_OMB) != 0)
             o->oAction = BOBOMB_ACT_EXPLODE;
 
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     }
 
     if (obj_attack_collided_from_other_object(o) == 1)
@@ -341,7 +341,7 @@ void bobomb_buddy_cannon_dialog(s16 dialogFirstText, s16 dialogSecondText) {
 
             o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
             o->oBobombBuddyHasTalkedToMario = BOBOMB_BUDDY_HAS_TALKED;
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
             o->oAction = BOBOMB_BUDDY_ACT_IDLE;
             o->oBobombBuddyCannonStatus = BOBOMB_BUDDY_CANNON_OPENED;
             break;
@@ -360,7 +360,7 @@ void bobomb_buddy_act_talk(void) {
 
                     o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
                     o->oBobombBuddyHasTalkedToMario = BOBOMB_BUDDY_HAS_TALKED;
-                    o->oInteractStatus = 0;
+                    o->oInteractStatus = INT_STATUS_NONE;
                     o->oAction = BOBOMB_BUDDY_ACT_IDLE;
                 }
                 break;
@@ -411,5 +411,5 @@ void bhv_bobomb_buddy_loop(void) {
 
     curr_obj_random_blink(&o->oBobombBuddyBlinkTimer);
 
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

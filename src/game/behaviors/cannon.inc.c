@@ -6,7 +6,7 @@ void bhv_cannon_base_unused_loop(void) {
 
 void opened_cannon_act_0(void) {
     if (o->oTimer == 0) {
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
         o->oPosX = o->oHomeX;
         o->oPosY = o->oHomeY;
         o->oPosZ = o->oHomeZ;
@@ -28,7 +28,7 @@ void opened_cannon_act_0(void) {
             o->oCannonIsActive = 1;
             o->oCannonTimeSinceActivated = 1;
         } else
-            o->oInteractStatus = 0;
+            o->oInteractStatus = INT_STATUS_NONE;
     } else {
         cur_obj_become_intangible();
         cur_obj_disable_rendering();
@@ -108,7 +108,7 @@ void bhv_cannon_base_loop(void) {
     if (o->oCannonTimeSinceActivated) {
         o->oCannonTimeSinceActivated++;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void bhv_cannon_barrel_loop(void) {
