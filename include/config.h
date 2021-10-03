@@ -151,6 +151,8 @@
 #define BLUE_COIN_SWITCH_RETRY
 // Fixes shell cancel
 //#define SHELL_CANCEL_FIX
+// Fix DDD water rings by checking for interaction rather than normals.
+#define FIX_WATER_RINGS
 // Use intendedYaw to control Hoot instead of raw left and right inputs.
 #define HOOT_YAW_FIX
 // Tiny Goombas (from THI) always drop their coin.
