@@ -108,6 +108,8 @@
 //#define SHINDOU_POLES
 // Mario can swing around poles and jump off them while swinging.
 #define POLE_SWING
+// If A and Z are pressed on the same frame, Mario will long jump instead of ground pound.
+#define EASIER_LONG_JUMPS
 // Allows Mario to jump kick on steep surfaces that are set to be non slippery, instead of being forced to dive
 #define JUMP_KICK_FIX
 // Allow Mario to grab hangable ceilings from any state
