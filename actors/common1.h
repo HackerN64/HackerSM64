@@ -252,14 +252,14 @@ extern const Gfx sand_seg3_dl_0302BCD0[];
 // star
 extern const GeoLayout star_geo[];
 extern const Gfx star_seg3_dl_0302B7B0[];
-extern const Gfx star_seg3_dl_0302B870[];
+extern const Gfx star_seg3_dl_body[];
 extern const Gfx star_seg3_dl_0302B9C0[];
-extern const Gfx star_seg3_dl_0302BA18[];
+extern const Gfx star_seg3_dl_eyes[];
 
 // transparent_star
 extern const GeoLayout transparent_star_geo[];
 extern const Gfx transparent_star_seg3_dl_0302C560[];
-extern const Gfx transparent_star_seg3_dl_0302C620[];
+extern const Gfx transparent_star_seg3_dl_body[];
 
 // tree
 extern const GeoLayout bubbly_tree_geo[];

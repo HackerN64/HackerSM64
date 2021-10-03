@@ -74,13 +74,14 @@ static void klepto_anim_dive(void) {
 }
 
 void bhv_klepto_init(void) {
-    if (o->oBehParams2ndByte != 0) {
-        o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_STAR;
+    if (o->oBehParams2ndByte != KLEPTO_BP_NO_STAR) {
+        if (save_file_get_star_flags((gCurrSaveFileNum - 1), (COURSE_SSL - 1)) & STAR_FLAG_ACT_1) {
+            o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_TRANSPARENT_STAR;
+        } else {
+            o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_STAR;
+        }
     } else {
-        o->oKleptoStartPosX = o->oPosX;
-        o->oKleptoStartPosY = o->oPosY;
-        o->oKleptoStartPosZ = o->oPosZ;
-
+        vec3_copy(&o->oKleptoStartPosVec, &o->oPosVec);
         if (save_file_get_flags() & SAVE_FLAG_CAP_ON_KLEPTO) {
             o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_CAP;
         } else {
@@ -92,8 +93,7 @@ void bhv_klepto_init(void) {
 static void klepto_change_target(void) {
     s32 newTarget = 0;
     s32 i;
-    f32 dx;
-    f32 dz;
+    f32 dx, dz;
     f32 targetDist;
     f32 minTargetDist;
 

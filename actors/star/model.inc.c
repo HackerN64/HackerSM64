@@ -51,7 +51,7 @@ const Gfx star_seg3_dl_0302B7B0[] = {
 };
 
 // 0x0302B870 - 0x0302B908
-const Gfx star_seg3_dl_0302B870[] = {
+const Gfx star_seg3_dl_body[] = {
     gsDPPipeSync(),
     gsSPSetGeometryMode(G_TEXTURE_GEN),
     gsDPSetEnvColor(255, 255, 255, 255),
@@ -101,7 +101,7 @@ const Gfx star_seg3_dl_0302B9C0[] = {
 };
 
 // 0x0302BA18 - 0x0302BA88
-const Gfx star_seg3_dl_0302BA18[] = {
+const Gfx star_seg3_dl_eyes[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
     gsSPClearGeometryMode(G_SHADING_SMOOTH),
