@@ -21,6 +21,7 @@
  * @see camera.c
  */
 
+#define ABS2(x) ((x) >= 0.f ? (x) : -(x))
 #define LEVEL_AREA_INDEX(levelNum, areaNum) (((levelNum) << 4) + (areaNum))
 
 /**
@@ -702,6 +703,12 @@ void random_vec3s(Vec3s dst, s16 xRange, s16 yRange, s16 zRange);
 s32 clamp_positions_and_find_yaw(Vec3f pos, Vec3f origin, f32 xMax, f32 xMin, f32 zMax, f32 zMin);
 s32 is_range_behind_surface(Vec3f from, Vec3f to, struct Surface *surf, s16 range, s16 surfType);
 void scale_along_line(Vec3f dest, Vec3f from, Vec3f to, f32 scale);
+s16 calculate_pitch(Vec3f from, Vec3f to);
+s16 calculate_yaw(Vec3f from, Vec3f to);
+void calculate_angles(Vec3f from, Vec3f to, s16 *pitch, s16 *yaw);
+f32 calc_abs_dist(Vec3f a, Vec3f b);
+f32 calc_abs_dist_squared(Vec3f a, Vec3f b);
+f32 calc_hor_dist(Vec3f a, Vec3f b);
 void rotate_in_xz(Vec3f dst, Vec3f src, s16 yaw);
 void rotate_in_yz(Vec3f dst, Vec3f src, s16 pitch);
 void set_camera_pitch_shake(s16 mag, s16 decay, s16 inc);

@@ -575,7 +575,7 @@ $(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := -O0
 $(BUILD_DIR)/src/usb/debug.o: CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
 $(BUILD_DIR)/src/audio/*.o: OPT_FLAGS := -Os -fno-jump-tables
 $(BUILD_DIR)/src/engine/math_util.o: OPT_FLAGS := -Ofast -fno-unroll-loops -fno-peel-loops --param case-values-threshold=20
-$(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := -Ofast -fno-unroll-loops -fno-peel-loops --param case-values-threshold=20
+$(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := -Ofast --param case-values-threshold=20
 
 ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) asm/debug $(GODDARD_SRC_DIRS) $(LIBZ_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) rsp include) $(YAY0_DIR) $(addprefix $(YAY0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION)
 
