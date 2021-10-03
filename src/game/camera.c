@@ -3584,7 +3584,6 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
     f32 normX, normY, normZ;
     f32 originOffset;
     f32 offset;
-    f32 offsetAbsolute;
     Vec3f newPos[MAX_REFEREMCED_WALLS];
     s32 i;
     s32 numCollisions = 0;
@@ -3604,8 +3603,7 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
             normZ = wall->normal.z;
             originOffset = wall->originOffset;
             offset = normX * newPos[i][0] + normY * newPos[i][1] + normZ * newPos[i][2] + originOffset;
-            offsetAbsolute = ABS2(offset);
-            if (offsetAbsolute < radius) {
+            if (ABSF(offset) < radius) {
                 newPos[i][0] += normX * (radius - offset);
                 newPos[i][2] += normZ * (radius - offset);
                 vec3f_copy(pos, newPos[i]);

@@ -1387,7 +1387,7 @@ s32 cur_obj_resolve_wall_collisions(void) {
             o->oPosZ = collisionData.z;
             wall = collisionData.walls[collisionData.numWalls - 1];
 
-            o->oWallAngle = atan2s(wall->normal.z, wall->normal.x);
+            o->oWallAngle = SURFACE_YAW(wall);
             return (abs_angle_diff(o->oWallAngle, o->oMoveAngleYaw) > 0x4000);
         }
     }

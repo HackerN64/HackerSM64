@@ -680,8 +680,7 @@ void anim_and_audio_for_heavy_walk(struct MarioState *m) {
 }
 
 void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
-    s16 wallAngle;
-    s16 dWallAngle;
+    s16 wallAngle, dWallAngle;
     f32 dx = m->pos[0] - startPos[0];
     f32 dz = m->pos[2] - startPos[2];
     f32 movedDistance = sqrtf(sqr(dx) + sqr(dz));
@@ -693,8 +692,8 @@ void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
     }
 
     if (m->wall != NULL) {
-        wallAngle = atan2s(m->wall->normal.z, m->wall->normal.x);
-        dWallAngle = wallAngle - m->faceAngle[1];
+        wallAngle  = m->wallYaw;
+        dWallAngle = (wallAngle - m->faceAngle[1]);
     }
 
     if (m->wall == NULL || dWallAngle <= -0x71C8 || dWallAngle >= 0x71C8) {
@@ -1401,7 +1400,7 @@ void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32
                 }
                 slide_bonk(m, ACT_GROUND_BONK, endAction);
             } else if (m->wall != NULL) {
-                s16 wallAngle = atan2s(m->wall->normal.z, m->wall->normal.x);
+                s16 wallAngle = m->wallYaw;
                 f32 slideSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
                 if ((slideSpeed *= 0.9f) < 4.0f) {

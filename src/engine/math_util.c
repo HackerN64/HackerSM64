@@ -29,9 +29,9 @@ Vec3i gVec3iZero = {     0,     0,     0 };
 Vec3s gVec3sOne  = {     1,     1,     1 };
 
 /// From Wiseguy
-static inline s32 asm_roundf(f32 in) {
-    f32 tmp;
-    s32 out;
+static inline int asm_roundf(float in) {
+    float tmp;
+    int out;
     __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in));
     __asm__("mfc1 %0,%1" : "=r" (out) : "f" (tmp));
     return out;
@@ -42,7 +42,7 @@ f32 roundf(f32 x) {
 }
 
 static inline float asm_absf(float in) {
-    f32 out;
+    float out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
     return out;
 }
@@ -105,13 +105,13 @@ void vec3f_add(Vec3f dest, Vec3f a) {
 void vec3f_sum(Vec3f dest, Vec3f a, Vec3f b) {
     register f32 *temp = (f32 *)dest;
     register s32 j;
-    register f32 x, y;
+    register f32 sum, sum2;
     for (j = 0; j < 3; j++) {
-        x = *a;
+        sum = *a;
         a++;
-        y = *b;
+        sum2 = *b;
         b++;
-        *temp = x + y;
+        *temp = (sum + sum2);
         temp++;
     }
 }
@@ -167,22 +167,6 @@ void vec3f_to_vec3s(Vec3s dest, Vec3f a) {
     dest[0] = asm_roundf(a[0]);
     dest[1] = asm_roundf(a[1]);
     dest[2] = asm_roundf(a[2]);
-}
-
-/**
- * Set 'dest' the normal vector of a triangle with vertices a, b and c.
- * It is similar to vec3f_cross, but it calculates the vectors (c-b) and (b-a)
- * at the same time.
- */
-void vec3f_find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c) {
-    dest[0] = (b[1] - a[1]) * (c[2] - b[2]) - (c[1] - b[1]) * (b[2] - a[2]);
-    dest[1] = (b[2] - a[2]) * (c[0] - b[0]) - (c[2] - b[2]) * (b[0] - a[0]);
-    dest[2] = (b[0] - a[0]) * (c[1] - b[1]) - (c[0] - b[0]) * (b[1] - a[1]);
-}
-void vec3i_find_vector_perpendicular_to_plane(Vec3f dest, Vec3i a, Vec3i b, Vec3i c) {
-    dest[0] = (b[1] - a[1]) * (c[2] - b[2]) - (c[1] - b[1]) * (b[2] - a[2]);
-    dest[1] = (b[2] - a[2]) * (c[0] - b[0]) - (c[2] - b[2]) * (b[0] - a[0]);
-    dest[2] = (b[0] - a[0]) * (c[1] - b[1]) - (c[0] - b[0]) * (b[1] - a[1]);
 }
 
 /// Make vector 'dest' the cross product of vectors a and b.
@@ -501,7 +485,7 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     f32 avgY = ((point0[1] + point1[1] + point2[1]) / 3);
 
     vec3_set(forward, sins(yaw), 0, coss(yaw));
-    vec3f_find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
+    find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
     vec3f_normalize(yColumn);
     vec3_cross(xColumn, yColumn, forward);
     vec3f_normalize(xColumn);

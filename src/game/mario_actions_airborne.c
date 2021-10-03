@@ -45,7 +45,7 @@ void play_knockback_sound(struct MarioState *m) {
 #endif
 
 s32 lava_boost_on_wall(struct MarioState *m) {
-    m->faceAngle[1] = atan2s(m->wall->normal.z, m->wall->normal.x);
+    m->faceAngle[1] = m->wallYaw;
 
     if (m->forwardVel < 24.0f) {
         m->forwardVel = 24.0f;
@@ -1321,7 +1321,7 @@ s32 act_air_hit_wall(struct MarioState *m) {
 
 #if FIRSTY_LAST_FRAME > 1
     set_mario_animation(m, MARIO_ANIM_START_WALLKICK);
-    m->marioObj->header.gfx.angle[1] = atan2s(m->wall->normal.z, m->wall->normal.x);
+    m->marioObj->header.gfx.angle[1] = m->wallYaw;
 #endif
 
     return FALSE;

@@ -55,6 +55,8 @@ extern f32 gSineTable[];
 #define degrees_to_radians(x) (f32)(   (f32)(x) * RAD_PER_DEG       )
 #define radians_to_degrees(x) (f32)(   (f32)(x) * DEG_PER_RAD       )
 
+#define asm_abs_s(dst, src), __asm__("abs.s %0,%1" : "=f" (dst) : "f" (src));
+#define asm_abs_d(dst, src), __asm__("abs.d %0,%1" : "=f" (dst) : "f" (src));
 #define ABSF(x) ((x) > 0.0f ? (x) : -(x))
 #define ABSI(x) ((x) > 0    ? (x) : -(x))
 #define ABS(x)  ABSF((x))
@@ -144,7 +146,11 @@ extern f32 gSineTable[];
     (dst)[2] = (((a)[0] * (b)[1]) - ((a)[1] * (b)[0])); \
 }
 
-
+/**
+ * Set 'dest' the normal vector of a triangle with vertices a, b and c.
+ * It is similar to vec3f_cross, but it calculates the vectors (c-b) and (b-a)
+ * at the same time.
+ */
 #define find_vector_perpendicular_to_plane(dest, a, b, c) {                                     \
     (dest)[0] = ((b)[1] - (a)[1]) * ((c)[2] - (b)[2]) - ((c)[1] - (b)[1]) * ((b)[2] - (a)[2]);  \
     (dest)[1] = ((b)[2] - (a)[2]) * ((c)[0] - (b)[0]) - ((c)[2] - (b)[2]) * ((b)[0] - (a)[0]);  \
@@ -473,8 +479,6 @@ void vec3s_sub(Vec3s dest, Vec3s a);
 void vec3f_sub(Vec3f dest, Vec3f src);
 void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_to_vec3s(Vec3s dest, Vec3f a);
-void vec3f_find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c);
-void vec3i_find_vector_perpendicular_to_plane(Vec3f dest, Vec3i a, Vec3i b, Vec3i c);
 f32  vec3f_dot(Vec3f a, Vec3f b);
 void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_normalize(Vec3f dest);
