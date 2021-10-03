@@ -110,7 +110,6 @@ static s32 sTextureDisplayLists[0x10];            // gd_dl indices
 static s16 sVtxCvrtTCBuf[2];            // @ 801BB0A0
 static s32 sCarGdDlNum;                 // @ 801BB0A4
 static struct ObjGroup *sYoshiSceneGrp; // @ 801BB0A8
-static s32 unusedDl801BB0AC;                  // unused DL number
 static struct ObjGroup *sMarioSceneGrp; // @ 801BB0B0
 static s32 D_801BB0B4;                  // second offset into sTriangleBuf
 static struct ObjGroup *sCarSceneGrp;   // @ 801BB0B8
@@ -616,10 +615,6 @@ static Gfx *gd_silver_sparkle_dl_array[] = {
     gd_dl_silver_sparkle_4_dup,
 };
 
-UNUSED static Gfx gd_texture3_dummy_aligner1[] = {
-    gsSPEndDisplayList(),
-};
-
 ALIGNED8 static Texture gd_texture_mario_face_shine[] = {
 #include "textures/intro_raw/mario_face_shine.ia8.inc.c"
 };
@@ -636,37 +631,7 @@ static Gfx gd_dl_mario_face_shine[] = {
     gsSPEndDisplayList(),
 };
 
-static Gfx gd_dl_rsp_init[] = {
-    gsSPClearGeometryMode(0xFFFFFFFF),
-    gsSPSetGeometryMode(G_SHADING_SMOOTH | G_SHADE),
-    gsSPEndDisplayList(),
-};
-
-static Gfx gd_dl_rdp_init[] = {
-    gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsDPSetCycleType(G_CYC_1CYCLE),
-    gsDPSetTextureLOD(G_TL_TILE),
-    gsDPSetTextureLUT(G_TT_NONE),
-    gsDPSetTextureDetail(G_TD_CLAMP),
-    gsDPSetTexturePersp(G_TP_PERSP),
-    gsDPSetTextureFilter(G_TF_BILERP),
-    gsDPSetTextureConvert(G_TC_FILT),
-    gsDPSetCombineKey(G_CK_NONE),
-    gsDPSetAlphaCompare(G_AC_NONE),
-    gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
-    gsDPNoOp(),
-    gsDPSetColorDither(G_CD_MAGICSQ),
-    gsDPPipeSync(),
-    gsSPEndDisplayList(),
-};
-
 float sGdPerspTimer = 1.0f;
-
-UNUSED static Gfx gd_texture4_dummy_aligner1[] = {
-    gsDPPipeSync(),
-    gsSPEndDisplayList(),
-};
 
 static Gfx gd_dl_sprite_start_tex_block[] = {
     gsDPPipeSync(),
@@ -1097,15 +1062,6 @@ void gdm_setup(void) {
     imout();
 }
 
-/* 24AC2C -> 24AC80; not called; orig name: Unknown8019C45C */
-void print_gdm_stats(void) {
-    stop_memtracker("total");
-    gd_printf("\ngdm stats:\n");
-    print_all_memtrackers();
-    mem_stats();
-    start_memtracker("total");
-}
-
 /* 24AC80 -> 24AD14; orig name: func_8019C4B0 */
 struct ObjView *make_view_withgrp(char *name, struct ObjGroup *grp) {
     struct ObjView *view = make_view(name, (VIEW_DRAW | VIEW_ALLOC_ZBUF | VIEW_MOVEMENT), 1, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, grp);
@@ -1425,18 +1381,6 @@ struct GdDisplayList *new_gd_dl(s32 id, s32 gfxs, s32 verts, s32 mtxs, s32 light
 
     dl->dlptr = NULL;
     return dl;
-}
-
-/* 24BA48 -> 24BABC; not called */
-void gd_rsp_init(void) {
-    gSPDisplayList(next_gfx(), osVirtualToPhysical(&gd_dl_rsp_init));
-    gDPPipeSync(next_gfx());
-}
-
-/* 24BABC -> 24BB30; not called */
-void gd_rdp_init(void) {
-    gSPDisplayList(next_gfx(), osVirtualToPhysical(&gd_dl_rdp_init));
-    gDPPipeSync(next_gfx());
 }
 
 /* 24BB30 -> 24BED8; orig name: func_8019D360 */
@@ -2100,10 +2044,6 @@ void set_Vtx_norm_buf_2(struct GdVec3f *norm) {
     sVtxCvrtNormBuf[0] = (s8)(norm->x * 127.0f);
     sVtxCvrtNormBuf[1] = (s8)(norm->y * 127.0f);
     sVtxCvrtNormBuf[2] = (s8)(norm->z * 127.0f);
-
-    //? are these stub functions?
-    return; // @ 801A17A0
-    return; // @ 801A17A8
 }
 
 /* 24FF80 -> 24FFDC; orig name: func_801A17B0 */
@@ -2891,7 +2831,7 @@ void gd_init(void) {
     gGdCtrl.csrX = 160;
     gGdCtrl.csrY = 120;
     gGdCtrl.dragStartFrame = -1000;
-    unusedDl801BB0AC = create_mtl_gddl(4);
+    create_mtl_gddl(4);
     imout();
 }
 

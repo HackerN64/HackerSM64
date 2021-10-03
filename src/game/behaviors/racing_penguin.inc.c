@@ -134,11 +134,9 @@ static void racing_penguin_act_show_final_text(void) {
                 }
             }
         } else {
-            cur_obj_init_animation_with_sound(0);
+            cur_obj_init_animation_with_sound(PENGUIN_ANIM_WALK);
 
-#ifndef VERSION_JP
-            play_penguin_walking_sound(1);
-#endif
+            play_penguin_walking_sound(PENGUIN_SOUND_WALK_BIG);
 
             o->oForwardVel = 4.0f;
         }

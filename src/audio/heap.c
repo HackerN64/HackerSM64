@@ -34,7 +34,6 @@ struct PoolSplit2 {
 #if defined(VERSION_JP) || defined(VERSION_US)
 s16 gVolume;
 s8 gReverbDownsampleRate;
-u8 sReverbDownsampleRateLog; // never read
 #endif
 
 struct SoundAllocPool gAudioSessionPool;
@@ -1128,27 +1127,6 @@ void init_reverb_us(s32 presetId)
     if (reverbWindowSize < DEFAULT_LEN_2CH) // Minimum window size to not overflow
         reverbWindowSize = DEFAULT_LEN_2CH;
 #endif
-
-    switch (gReverbDownsampleRate) {
-        case 1:
-            sReverbDownsampleRateLog = 0;
-            break;
-        case 2:
-            sReverbDownsampleRateLog = 1;
-            break;
-        case 4:
-            sReverbDownsampleRateLog = 2;
-            break;
-        case 8:
-            sReverbDownsampleRateLog = 3;
-            break;
-        case 16:
-            sReverbDownsampleRateLog = 4;
-            break;
-        default:
-            sReverbDownsampleRateLog = 0;
-    }
-
     if (reverbWindowSize == 0) {
         gSynthesisReverb.useReverb = 0;
     } else {
