@@ -27,7 +27,7 @@ void play_far_fall_sound(struct MarioState *m) {
     u32 action = m->action;
     if (!(action & ACT_FLAG_INVULNERABLE) && action != ACT_TWIRLING && action != ACT_FLYING
         && !(m->flags & MARIO_FALL_SOUND_PLAYED)) {
-        if (m->peakHeight - m->pos[1] > 1150.0f) {
+        if (m->peakHeight - m->pos[1] > FALL_DAMAGE_HEIGHT_SMALL) {
             play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
             m->flags |= MARIO_FALL_SOUND_PLAYED;
         }
@@ -66,7 +66,7 @@ s32 check_fall_damage(struct MarioState *m, u32 hardFallAction) {
 #endif
     if (m->action != ACT_TWIRLING && m->floor->type != SURFACE_BURNING && (m->vel[1] < -55.0f)) {
         f32 fallHeight = (m->peakHeight - m->pos[1]);
-        if (fallHeight > 3000.0f) {
+        if (fallHeight > FALL_DAMAGE_HEIGHT_LARGE) {
             m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 16 : 24;
 #if ENABLE_RUMBLE
             queue_rumble_data(5, 80);
@@ -74,7 +74,7 @@ s32 check_fall_damage(struct MarioState *m, u32 hardFallAction) {
             set_camera_shake_from_hit(SHAKE_FALL_DAMAGE);
             play_sound(SOUND_MARIO_ATTACKED, m->marioObj->header.gfx.cameraToObject);
             return drop_and_set_mario_action(m, hardFallAction, 4);
-        } else if (fallHeight > 1150.0f && !mario_floor_is_slippery(m)) {
+        } else if (fallHeight > FALL_DAMAGE_HEIGHT_SMALL && !mario_floor_is_slippery(m)) {
             m->hurtCounter += ((m->flags & MARIO_CAP_ON_HEAD) ? 8 : 12);
             m->squishTimer = 30;
 #if ENABLE_RUMBLE

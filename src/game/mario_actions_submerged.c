@@ -974,7 +974,7 @@ static s32 act_water_plunge(struct MarioState *m) {
 
     if (m->actionState == 0) {
         play_sound(SOUND_ACTION_UNKNOWN430, m->marioObj->header.gfx.cameraToObject);
-        if (m->peakHeight - m->pos[1] > 1150.0f) {
+        if (m->peakHeight - m->pos[1] > FALL_DAMAGE_HEIGHT_SMALL) {
             play_sound(SOUND_MARIO_HAHA_2, m->marioObj->header.gfx.cameraToObject);
         }
 
