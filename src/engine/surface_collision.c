@@ -152,6 +152,9 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     colData->numWalls = 0;
 
     if (is_outside_level_bounds(x, z)) {
+#if PUPPYPRINT_DEBUG
+        collisionTime[perfIteration] += osGetTime() - first;
+#endif
         return numCollisions;
     }
 
@@ -277,6 +280,9 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     *pceil = NULL;
 
     if (is_outside_level_bounds(x, z)) {
+#if PUPPYPRINT_DEBUG
+        collisionTime[perfIteration] += osGetTime() - first;
+#endif
         return height;
     }
 

@@ -516,7 +516,7 @@ void puppyprint_profiler_process(void) {
         rdpTime = bufferTime[NUM_PERF_ITERATIONS];
         rdpTime = MAX(rdpTime, tmemTime[NUM_PERF_ITERATIONS]);
         rdpTime = MAX(rdpTime, busTime[NUM_PERF_ITERATIONS]);
-#if CONSOLE == IQUE //iQue RDP registers need to be halved to be correct.
+#if BBPLAYER == 1 //iQue RDP registers need to be halved to be correct.
         rdpTime /= 2;
 #endif
         cpuTime = scriptTime[NUM_PERF_ITERATIONS];
