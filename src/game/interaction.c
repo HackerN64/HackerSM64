@@ -610,10 +610,10 @@ void push_mario_out_of_object(struct MarioState *m, struct Object *obj, f32 padd
     f32 minDistance = (obj->hitboxRadius + m->marioObj->hitboxRadius + padding);
     f32 offsetX = (m->pos[0] - obj->oPosX);
     f32 offsetZ = (m->pos[2] - obj->oPosZ);
-    f32 distance = (sqr(offsetX) + sqr(offsetZ));
-    if (distance < sqr(minDistance)) {
+    f32 distanceSquared = (sqr(offsetX) + sqr(offsetZ));
+    if (distanceSquared < sqr(minDistance)) {
         struct Surface *floor;
-        s16 pushAngle = ((distance == 0.0f) ? m->faceAngle[1] : atan2s(offsetZ, offsetX));
+        s16 pushAngle = ((distanceSquared == 0.0f) ? m->faceAngle[1] : atan2s(offsetZ, offsetX));
         f32 newMarioX = obj->oPosX + minDistance * sins(pushAngle);
         f32 newMarioZ = obj->oPosZ + minDistance * coss(pushAngle);
         f32_find_wall_collision(&newMarioX, &m->pos[1], &newMarioZ, 60.0f, 50.0f);
@@ -1409,8 +1409,7 @@ u32 interact_koopa_shell(struct MarioState *m, UNUSED u32 interactType, struct O
     if (!(m->action & ACT_FLAG_RIDING_SHELL)) {
         u32 interaction = determine_interaction(m, obj);
 
-        if (interaction == INT_HIT_FROM_ABOVE || m->action == ACT_WALKING
-            || m->action == ACT_HOLD_WALKING) {
+        if (interaction == INT_HIT_FROM_ABOVE || m->action == ACT_WALKING || m->action == ACT_HOLD_WALKING) {
             m->interactObj = obj;
             m->usedObj = obj;
             m->riddenObj = obj;
@@ -1419,8 +1418,13 @@ u32 interact_koopa_shell(struct MarioState *m, UNUSED u32 interactType, struct O
             update_mario_sound_and_camera(m);
             play_shell_music();
             mario_drop_held_object(m);
-
+#ifdef SHELL_CANCEL_FIX
             return set_mario_action(m, ((m->pos[0] > m->floorHeight) ? ACT_RIDING_SHELL_FALL : ACT_RIDING_SHELL_GROUND), 0);
+#else
+            // Puts Mario in ground action even when in air, making it easy to
+            // escape air actions into crouch slide (shell cancel)
+            return set_mario_action(m, ACT_RIDING_SHELL_GROUND, 0);
+#endif
         }
 
         push_mario_out_of_object(m, obj, 2.0f);
@@ -1621,17 +1625,9 @@ u32 mario_can_talk(struct MarioState *m, u32 arg) {
     return FALSE;
 }
 
-#ifdef VERSION_JP
-#define READ_MASK (INPUT_B_PRESSED)
-#else
-#define READ_MASK (INPUT_B_PRESSED | INPUT_A_PRESSED)
-#endif
+#define READ_MASK (INPUT_A_PRESSED | INPUT_B_PRESSED)
 
-#ifdef VERSION_JP
-#define SIGN_RANGE 0x38E3
-#else
-#define SIGN_RANGE 0x4000
-#endif
+#define SIGN_RANGE DEGREES(45)
 
 u32 check_read_sign(struct MarioState *m, struct Object *obj) {
     if ((m->input & READ_MASK) && mario_can_talk(m, 0) && object_facing_mario(m, obj, SIGN_RANGE)) {
@@ -1818,13 +1814,14 @@ void mario_handle_special_floors(struct MarioState *m) {
                 pss_end_slide(m);
                 break;
         }
-
-        if (!(m->action & ACT_FLAG_AIR) && !(m->action & ACT_FLAG_SWIMMING)) {
-            switch (floorType) {
-                case SURFACE_BURNING:
-                    check_lava_boost(m);
-                    break;
+#ifdef LAVA_INTERACTION_FIX
+        check_lava_boost(m);
+#else
+        if (!(m->action & (ACT_FLAG_AIR | ACT_FLAG_SWIMMING))) {
+            if (floorType == SURFACE_BURNING) {
+                check_lava_boost(m);
             }
         }
+#endif
     }
 }

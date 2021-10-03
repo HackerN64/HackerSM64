@@ -121,14 +121,14 @@ void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
         // If object has been killed, prevent it from respawning
         if (((macroObject[MACRO_OBJ_PARAMS] >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
             // Spawn the new macro object.
-            newObj = spawn_object_abs_with_rot(&gMacroObjectDefaultParent, // Parent object
-                                          0,                          // Unused
-                                          MacroObjectPresets[presetID].model,             // Model ID
-                                          MacroObjectPresets[presetID].behavior,          // Behavior address
-                                          macroObject[MACRO_OBJ_X],   // X-position
-                                          macroObject[MACRO_OBJ_Y],   // Y-position
-                                          macroObject[MACRO_OBJ_Z],   // Z-position
-                                          0,                          // X-rotation
+            newObj = spawn_object_abs_with_rot(&gMacroObjectDefaultParent,                // Parent object
+                                          0,                                              // Unused
+                                          preset.model,                                   // Model ID
+                                          preset.behavior,                                // Behavior address
+                                          macroObject[MACRO_OBJ_X],                       // X-position
+                                          macroObject[MACRO_OBJ_Y],                       // Y-position
+                                          macroObject[MACRO_OBJ_Z],                       // Z-position
+                                          0,                                              // X-rotation
                                           convert_rotation(macroObject[MACRO_OBJ_Y_ROT]), // Y-rotation
                                           0                                               // Z-rotation
                 );

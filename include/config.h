@@ -145,6 +145,8 @@
 #define COIN_LAVA_FLICKER
 // Allow for retries on collecting the remaining blue coins from a blue coin switch.
 #define BLUE_COIN_SWITCH_RETRY
+// Fixes shell cancel
+#define SHELL_CANCEL_FIX
 // Use intendedYaw to control Hoot instead of raw left and right inputs.
 #define HOOT_YAW_FIX
 // Tiny Goombas (from THI) always drop their coin.

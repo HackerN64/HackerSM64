@@ -2802,8 +2802,8 @@ void update_camera(struct Camera *c) {
 
     c->yaw = gLakituState.yaw;
     c->nextYaw = gLakituState.nextYaw;
-    c->mode = gLakituState.mode;// = c->mode;
-    c->defMode = gLakituState.defMode;// = c->defMode;
+    c->mode = gLakituState.mode;
+    c->defMode = gLakituState.defMode;
 #ifdef CAMERA_FIX
     if (gCurrDemoInput != NULL) camera_course_processing(c);
 #else
@@ -3812,19 +3812,8 @@ s32 reduce_by_dist_from_camera(s16 value, f32 maxDist, f32 posX, f32 posY, f32 p
 
 s32 clamp_positions_and_find_yaw(Vec3f pos, Vec3f origin, f32 xMax, f32 xMin, f32 zMax, f32 zMin) {
     s16 yaw = gCamera->nextYaw;
-
-    if (pos[0] >= xMax) {
-        pos[0] = xMax;
-    }
-    if (pos[0] <= xMin) {
-        pos[0] = xMin;
-    }
-    if (pos[2] >= zMax) {
-        pos[2] = zMax;
-    }
-    if (pos[2] <= zMin) {
-        pos[2] = zMin;
-    }
+    pos[0] = CLAMP(pos[0], xMin, xMax);
+    pos[2] = CLAMP(pos[2], zMin, zMax);
     yaw = calculate_yaw(origin, pos);
     return yaw;
 }
@@ -4964,19 +4953,17 @@ void set_fixed_cam_axis_sa_lobby(UNUSED s16 preset) {
  *      or if the camera is in Mario mode and Mario is not swimming or in water with the metal cap
  */
 #ifdef CAMERA_FIX
-void check_blocking_area_processing(UNUSED const UNUSED u8 *mode) {
+void check_blocking_area_processing(UNUSED const u8 *mode) {
     sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
 #else
-void check_blocking_area_processing(UNUSED const u8 *mode) {
+void check_blocking_area_processing(const u8 *mode) {
     if ((sMarioCamState->action & ACT_FLAG_METAL_WATER) || (sMarioCamState->action == ACT_DEBUG_FREE_MOVE) ||
                         *mode == CAMERA_MODE_BEHIND_MARIO || *mode == CAMERA_MODE_WATER_SURFACE) {
         sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelNum == LEVEL_DDD || gCurrLevelNum == LEVEL_WDW || gCurrLevelNum == LEVEL_COTMC) {
         sStatusFlags &= ~CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
-#endif
     if ((*mode == CAMERA_MODE_BEHIND_MARIO &&
             !(sMarioCamState->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))) ||
          *mode == CAMERA_MODE_INSIDE_CANNON) {
@@ -5929,7 +5916,10 @@ s32 camera_course_processing(struct Camera *c) {
 
             case AREA_BBH:
                 // if camera is fixed at bbh_room_13_balcony_camera (but as floats)
-                if (sFixedModeBasePosition[0] == 210.f && sFixedModeBasePosition[1] == 420.f && sFixedModeBasePosition[2] == 3109.f && sMarioCamState->pos[1] < 1800.f) {
+                if (sFixedModeBasePosition[0] == 210.f
+                 && sFixedModeBasePosition[1] == 420.f
+                 && sFixedModeBasePosition[2] == 3109.f
+                 && sMarioCamState->pos[1] < 1800.f) {
                     transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 30);
                 }
                 break;
@@ -7058,6 +7048,7 @@ void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax) {
  * Store the camera's focus in cvar9.
  */
 void cutscene_dance_closeup_start(struct Camera *c) {
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
     if ((gLastCompletedStarNum == 4) && (gCurrCourseNum == COURSE_JRB)) {
         star_dance_bound_yaw(c, 0x0, 0x4000);
     }
@@ -7067,7 +7058,7 @@ void cutscene_dance_closeup_start(struct Camera *c) {
     if ((gLastCompletedStarNum == 5) && (gCurrCourseNum == COURSE_WDW)) {
         star_dance_bound_yaw(c, 0x8000, 0x800);
     }
-
+#endif
     vec3f_copy(sCutsceneVars[9].point, c->focus);
     //! cvar8 is unused in the closeup cutscene
     sCutsceneVars[8].angle[0] = 0x2000;
@@ -7091,12 +7082,12 @@ void cutscene_dance_closeup_fly_above(struct Camera *c) {
     s16 pitch, yaw;
     f32 dist;
     s16 goalPitch = 0x1800;
-
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
     if ((gLastCompletedStarNum == 6 && gCurrCourseNum == COURSE_SL) ||
         (gLastCompletedStarNum == 4 && gCurrCourseNum == COURSE_TTC)) {
         goalPitch = 0x800;
     }
-
+#endif
     vec3f_get_dist_and_angle(sMarioCamState->pos, c->pos, &dist, &pitch, &yaw);
     approach_f32_asymptotic_bool(&dist, 800.f, 0.05f);
     approach_s16_asymptotic_bool(&pitch, goalPitch, 16);
@@ -7171,12 +7162,13 @@ void cutscene_dance_fly_away_start(struct Camera *c) {
         c->yaw = calculate_yaw(areaCenter, c->pos);
         c->nextYaw = c->yaw;
     }
-
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
     // Restrict the camera yaw in tight spaces
     if ((gLastCompletedStarNum == 6) && (gCurrCourseNum == COURSE_CCM)) star_dance_bound_yaw(c, 0x5600, 0x800);
     if ((gLastCompletedStarNum == 2) && (gCurrCourseNum == COURSE_TTM)) star_dance_bound_yaw(c, 0x0,    0x800);
     if ((gLastCompletedStarNum == 1) && (gCurrCourseNum == COURSE_SL )) star_dance_bound_yaw(c, 0x2000, 0x800);
     if ((gLastCompletedStarNum == 3) && (gCurrCourseNum == COURSE_RR )) star_dance_bound_yaw(c, 0x0,    0x800);
+#endif
 }
 
 void cutscene_dance_fly_away_approach_mario(struct Camera *c) {

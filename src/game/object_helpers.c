@@ -754,7 +754,10 @@ s32 cur_obj_check_if_near_animation_end(void) {
     u32 animFlags = (s32) o->header.gfx.animInfo.curAnim->flags;
     s32 animFrame = o->header.gfx.animInfo.animFrame;
     s32 nearLoopEnd = o->header.gfx.animInfo.curAnim->loopEnd - 2;
-    return ((animFlags & ANIM_FLAG_NOLOOP && nearLoopEnd + 1 == animFrame) || animFrame == nearLoopEnd);
+    if ((animFlags & ANIM_FLAG_NOLOOP) && ((nearLoopEnd + 1) == animFrame)) {
+        return TRUE;
+    }
+    return (animFrame == nearLoopEnd);
 }
 
 s32 cur_obj_check_if_at_animation_end(void) {
@@ -1899,7 +1902,10 @@ s32 cur_obj_mario_far_away(void) {
 }
 
 s32 is_mario_moving_fast_or_in_air(s32 speedThreshold) {
-    return ((gMarioStates[0].forwardVel > speedThreshold) || (gMarioStates[0].action & ACT_FLAG_AIR));
+    return (
+        (gMarioState->forwardVel > speedThreshold) ||
+        (gMarioState->action & ACT_FLAG_AIR)
+    );
 }
 
 s32 is_item_in_array(s8 item, s8 *array) {
@@ -1977,12 +1983,12 @@ s32 cur_obj_set_hitbox_and_die_if_attacked(struct ObjectHitbox *hitbox, s32 deat
 
 void obj_explode_and_spawn_coins(f32 mistSize, s32 coinType) {
     spawn_mist_particles_variable(0, 0, mistSize);
-    spawn_triangle_break_particles(30, MODEL_DIRT_ANIMATION, 3.0f, 4);
+    spawn_triangle_break_particles(30, MODEL_DIRT_ANIMATION, 3.0f, TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW);
     obj_mark_for_deletion(o);
 
-    if (coinType == 1) {
+    if (coinType == COIN_TYPE_YELLOW) {
         obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
-    } else if (coinType == 2) {
+    } else if (coinType == COIN_TYPE_BLUE) {
         obj_spawn_loot_blue_coins(o, o->oNumLootCoins, 20.0f, 150);
     }
 }

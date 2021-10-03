@@ -940,10 +940,10 @@ static u32 set_mario_action_cutscene(struct MarioState *m, u32 action, UNUSED u3
  */
 u32 set_mario_action(struct MarioState *m, u32 action, u32 actionArg) {
     switch (action & ACT_GROUP_MASK) {
-        case ACT_GROUP_MOVING:    action = set_mario_action_moving   (m, action, actionArg); break;
-        case ACT_GROUP_AIRBORNE:  action = set_mario_action_airborne (m, action, actionArg); break;
+        case ACT_GROUP_MOVING:    action = set_mario_action_moving(   m, action, actionArg); break;
+        case ACT_GROUP_AIRBORNE:  action = set_mario_action_airborne( m, action, actionArg); break;
         case ACT_GROUP_SUBMERGED: action = set_mario_action_submerged(m, action, actionArg); break;
-        case ACT_GROUP_CUTSCENE:  action = set_mario_action_cutscene (m, action, actionArg); break;
+        case ACT_GROUP_CUTSCENE:  action = set_mario_action_cutscene( m, action, actionArg); break;
     }
 
     // Resets the sound played flags, meaning Mario can play those sound types again.
@@ -954,9 +954,9 @@ u32 set_mario_action(struct MarioState *m, u32 action, u32 actionArg) {
     }
 
     // Initialize the action information.
-    m->prevAction = m->action;
-    m->action = action;
-    m->actionArg = actionArg;
+    m->prevAction  = m->action;
+    m->action      = action;
+    m->actionArg   = actionArg;
     m->actionState = 0;
     m->actionTimer = 0;
 
@@ -1735,12 +1735,12 @@ s32 execute_mario_action(struct MarioState *m) {
         while (inLoop) {
             switch (m->action & ACT_GROUP_MASK) {
                 case ACT_GROUP_STATIONARY: inLoop = mario_execute_stationary_action(m); break;
-                case ACT_GROUP_MOVING:     inLoop = mario_execute_moving_action    (m); break;
-                case ACT_GROUP_AIRBORNE:   inLoop = mario_execute_airborne_action  (m); break;
-                case ACT_GROUP_SUBMERGED:  inLoop = mario_execute_submerged_action (m); break;
-                case ACT_GROUP_CUTSCENE:   inLoop = mario_execute_cutscene_action  (m); break;
-                case ACT_GROUP_AUTOMATIC:  inLoop = mario_execute_automatic_action (m); break;
-                case ACT_GROUP_OBJECT:     inLoop = mario_execute_object_action    (m); break;
+                case ACT_GROUP_MOVING:     inLoop = mario_execute_moving_action(m);     break;
+                case ACT_GROUP_AIRBORNE:   inLoop = mario_execute_airborne_action(m);   break;
+                case ACT_GROUP_SUBMERGED:  inLoop = mario_execute_submerged_action(m);  break;
+                case ACT_GROUP_CUTSCENE:   inLoop = mario_execute_cutscene_action(m);   break;
+                case ACT_GROUP_AUTOMATIC:  inLoop = mario_execute_automatic_action(m);  break;
+                case ACT_GROUP_OBJECT:     inLoop = mario_execute_object_action(m);     break;
             }
         }
 
