@@ -39,6 +39,14 @@
 // #define DISABLE_LEVEL_SPECIFIC_CHECKS
 // Disable lives and hide the lives counter
 #define DISABLE_LIVES
+// Save number of lives to the save file (Does nothing if DISABLE_LIVES is enabled)
+#define SAVE_NUM_LIVES
+// The number of lives Mario starts with after a game over or starting the game for the first time.
+#define DEFAULT_NUM_LIVES 4
+// This can be 0..127
+#define MAX_NUM_LIVES   100
+// This can be 0..32767
+#define MAX_NUM_COINS   999
 // Air/Breath meter is separate from health meter when underwater
 //#define BREATH_METER
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
@@ -233,6 +241,9 @@
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
+#ifdef DISABLE_LIVES
+#undef SAVE_NUM_LIVES
+#endif
 #ifndef KEEP_MARIO_HEAD
 #undef GODDARD_EASTER_EGG
 #define DISABLE_DEMO
