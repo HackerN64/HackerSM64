@@ -141,15 +141,17 @@
 #define ROOM_DATA_TYPE s8
 
 // -- SPECIFIC OBJECT SETTINGS --
-// Allow for retries on collecting the remaining blue coins from a blue coin switch
+// Moving Coins flicker and disappear when they hit lava instead of being instantly deleted.
+#define COIN_LAVA_FLICKER
+// Allow for retries on collecting the remaining blue coins from a blue coin switch.
 #define BLUE_COIN_SWITCH_RETRY
-// Use intendedYaw to control Hoot instead of raw left and right inputs
+// Use intendedYaw to control Hoot instead of raw left and right inputs.
 #define HOOT_YAW_FIX
-// Tiny Goombas (from THI) always drop their coin
+// Tiny Goombas (from THI) always drop their coin.
 #define TINY_GOOMBA_ALWAYS_DROPS_COIN
-// Collecting a 1-Up Mushroom will fully heal Mario
+// Collecting a 1-Up Mushroom will fully heal Mario.
 #define MUSHROOMS_HEAL
-// Collecting a Power Star will fully heal Mario
+// Collecting a Power Star will fully heal Mario.
 #define POWER_STARS_HEAL
 // The number of chain balls the Chain Chomp has.  Vanilla is 5.
 #define CHAIN_CHOMP_NUM_SEGMENTS 5
