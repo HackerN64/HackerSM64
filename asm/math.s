@@ -9,7 +9,6 @@
 .balign 32
 glabel mtxf_to_mtx_asm
     li.s $f6, 0.25
-    li.s $f8, 1.0
     li $v0, 1
     li.s $f4, 65536.0
 1:
