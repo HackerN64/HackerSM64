@@ -9,6 +9,7 @@
 #include "save_file.h"
 #include "segment2.h"
 #include "sm64.h"
+#include "color_presets.h"
 
 
 /**
@@ -90,9 +91,9 @@ SkyboxTexture *sSkyboxTextures[10] = {
  * The skybox color mask.
  * The final color of each pixel is computed from the bitwise AND of the color and the texture.
  */
-u8 sSkyboxColors[][3] = {
-    { 0x50, 0x64, 0x5A },
-    { 0xFF, 0xFF, 0xFF },
+ColorRGB sSkyboxColors[] = {
+    COLOR_RGB_JRB_SKY,
+    COLOR_RGB_WHITE,
 };
 
 /**
