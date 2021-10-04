@@ -15,8 +15,11 @@
 #define GLYPH_QUESTION_MARK   38
 #define GLYPH_AMPERSAND       39
 #define GLYPH_PERCENT         40
-#define GLYPH_MULTIPLY        50
-#define GLYPH_COIN            51
+#define GLYPH_MINUS           47
+#define GLYPH_MULTIPLY        48
+#define GLYPH_COIN            49
+#define GLYPH_RED_COIN        50
+#define GLYPH_SILVER_COIN     51
 #define GLYPH_MARIO_HEAD      52
 #define GLYPH_STAR            53
 #define GLYPH_PERIOD          54
