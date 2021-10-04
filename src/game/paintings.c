@@ -213,7 +213,7 @@ void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
  */
 f32 painting_mario_y(struct Painting *painting) {
     // Add 50 to make the ripple closer to Mario's center of mass.
-    f32 relY = gPaintingMarioYPos - painting->posY + 50.0f;
+    f32 relY = ((gPaintingMarioPos[1] - painting->posY) + 50.0f);
 
     if (relY < 0.0f) {
         relY = 0.0f;
@@ -227,7 +227,7 @@ f32 painting_mario_y(struct Painting *painting) {
  * @return Mario's z position inside the painting (bounded).
  */
 f32 painting_mario_z(struct Painting *painting) {
-    f32 relZ = painting->posZ - gPaintingMarioZPos;
+    f32 relZ = (painting->posZ - gPaintingMarioPos[2]);
 
     if (relZ < 0.0f) {
         relZ = 0.0f;
@@ -345,7 +345,7 @@ void painting_state(s8 state, struct Painting *painting, struct Painting *painti
     painting->state = state;
     painting->rippleX = painting_ripple_x(painting, xSource);
     painting->rippleY = painting_ripple_y(painting, ySource);
-    gPaintingMarioYEntry = gPaintingMarioYPos;
+    gPaintingMarioYEntry = gPaintingMarioPos[1];
 
     // Because true or false would be too simple...
     if (resetTimer == RESET_TIMER) {
@@ -555,11 +555,7 @@ void painting_update_floors(struct Painting *painting) {
 
     painting->marioWasUnder = painting->marioIsUnder;
     // Check if Mario has fallen below the painting (used for floor paintings)
-    if (gPaintingMarioYPos < painting->posY) {
-        painting->marioIsUnder = TRUE;
-    } else {
-        painting->marioIsUnder = FALSE;
-    }
+    painting->marioIsUnder = (gPaintingMarioPos[1] < painting->posY);
 
     // Mario "went under" if he was not under last frame, but is under now
     painting->marioWentUnder = (painting->marioWasUnder ^ painting->marioIsUnder) & painting->marioIsUnder;
