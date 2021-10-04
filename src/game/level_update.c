@@ -274,8 +274,8 @@ void load_level_init_text(u32 arg) {
     }
 }
 
-void init_door_warp(struct SpawnInfo *spawnInfo, u32 arg1) {
-    if (arg1 & WARP_FLAG_DOOR_FLIP_MARIO) {
+void init_door_warp(struct SpawnInfo *spawnInfo, u32 warpDestFlags) {
+    if (warpDestFlags & WARP_FLAG_DOOR_FLIP_MARIO) {
         spawnInfo->startAngle[1] += 0x8000;
     }
 
@@ -1287,7 +1287,7 @@ void load_language_text(void) {
 }
 #endif
 
-s32 lvl_init_from_save_file(UNUSED s16 arg0, s32 levelNum) {
+s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
 #if MULTILANG
     gInGameLanguage = eu_get_language()+1;
     load_language_text();
@@ -1314,7 +1314,7 @@ s32 lvl_init_from_save_file(UNUSED s16 arg0, s32 levelNum) {
     return levelNum;
 }
 
-s32 lvl_set_current_level(UNUSED s16 arg0, s32 levelNum) {
+s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     s32 warpCheckpointActive = sWarpCheckpointActive;
 
     sWarpCheckpointActive = FALSE;
@@ -1340,17 +1340,13 @@ s32 lvl_set_current_level(UNUSED s16 arg0, s32 levelNum) {
         return FALSE;
     }
 
-    if (gDebugLevelSelect) {
-        return FALSE;
-    }
-
-    return TRUE;
+    return (!gDebugLevelSelect);
 }
 
 /**
  * Play the "thank you so much for to playing my game" sound.
  */
-s32 lvl_play_the_end_screen_sound(UNUSED s16 arg0, UNUSED s32 arg1) {
+s32 lvl_play_the_end_screen_sound(UNUSED s16 initOrUpdate, UNUSED s32 levelNum) {
     play_sound(SOUND_MENU_THANK_YOU_PLAYING_MY_GAME, gGlobalSoundSource);
     return TRUE;
 }

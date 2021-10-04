@@ -161,7 +161,6 @@ void cur_obj_set_pos_to_home(void);
 void cur_obj_set_pos_to_home_and_stop(void);
 void cur_obj_shake_y(f32 amount);
 void cur_obj_start_cam_event(UNUSED struct Object *obj, s32 cameraEvent);
-void set_mario_interact_true_if_in_range(UNUSED s32 sp0, UNUSED s32 sp4, f32 sp8);
 void obj_set_billboard(struct Object *obj);
 void cur_obj_set_hitbox_radius_and_height(f32 radius, f32 height);
 void cur_obj_set_hurtbox_radius_and_height(f32 radius, f32 height);

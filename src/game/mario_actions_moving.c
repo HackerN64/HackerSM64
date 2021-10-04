@@ -1592,14 +1592,14 @@ s32 act_dive_slide(struct MarioState *m) {
     return FALSE;
 }
 
-s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 arg2, s32 arg3, s32 arg4) {
+s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 checkFrame, s32 playLandingSound, s32 actionArg) {
     s32 animFrame;
 
-    if (arg3) {
+    if (playLandingSound) {
         play_mario_heavy_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
     }
 
-    if (arg4 > 0) {
+    if (actionArg > 0) {
         play_sound_if_no_flag(m, SOUND_MARIO_ATTACKED, MARIO_MARIO_SOUND_PLAYED);
     } else {
 #ifdef VERSION_JP
@@ -1617,7 +1617,7 @@ s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 arg2
     }
 
     animFrame = set_mario_animation(m, animation);
-    if (animFrame < arg2) {
+    if (animFrame < checkFrame) {
         apply_landing_accel(m, 0.9f);
     } else if (m->forwardVel >= 0.0f) {
         mario_set_forward_vel(m, 0.1f);
@@ -1627,15 +1627,15 @@ s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 arg2
 
     if (perform_ground_step(m) == GROUND_STEP_LEFT_GROUND) {
         if (m->forwardVel >= 0.0f) {
-            set_mario_action(m, ACT_FORWARD_AIR_KB, arg4);
+            set_mario_action(m, ACT_FORWARD_AIR_KB, actionArg);
         } else {
-            set_mario_action(m, ACT_BACKWARD_AIR_KB, arg4);
+            set_mario_action(m, ACT_BACKWARD_AIR_KB, actionArg);
         }
     } else if (is_anim_at_end(m)) {
         if (m->health < 0x100) {
             set_mario_action(m, ACT_STANDING_DEATH, 0);
         } else {
-            if (arg4 > 0) {
+            if (actionArg > 0) {
                 m->invincTimer = 30;
             }
             set_mario_action(m, ACT_IDLE, 0);
@@ -1705,12 +1705,10 @@ s32 act_ground_bonk(struct MarioState *m) {
 }
 
 s32 act_death_exit_land(struct MarioState *m) {
-    s32 animFrame;
-
     apply_landing_accel(m, 0.9f);
     play_mario_heavy_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
 
-    animFrame = set_mario_animation(m, MARIO_ANIM_FALL_OVER_BACKWARDS);
+    s32 animFrame = set_mario_animation(m, MARIO_ANIM_FALL_OVER_BACKWARDS);
 
     if (animFrame == 54) {
         play_sound(SOUND_MARIO_MAMA_MIA, m->marioObj->header.gfx.cameraToObject);
@@ -1763,7 +1761,7 @@ u32 common_landing_action(struct MarioState *m, s16 animation, u32 airAction) {
 }
 
 s32 common_landing_cancels(struct MarioState *m, struct LandingAction *landingAction,
-                           s32 (*setAPressAction)(struct MarioState *m, u32, u32)) {
+                           s32 (*setAPressAction)(struct MarioState *m, u32 action, u32 actionArg)) {
     //! Everything here, including floor steepness, is checked before checking
     // if Mario is actually on the floor. This leads to e.g. remote sliding.
 

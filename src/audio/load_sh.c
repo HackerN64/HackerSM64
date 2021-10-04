@@ -107,10 +107,10 @@ extern u8 gSoundDataADSR[]; // ctl
 extern u8 gSoundDataRaw[];  // tbl
 extern u8 gMusicData[];     // sequences
 
-ALSeqFile *get_audio_file_header(s32 arg0);
+ALSeqFile *get_audio_file_header(s32 poolIdx);
 
 void *func_sh_802f3688(s32 bankId);
-void *get_bank_or_seq_wrapper(s32 arg0, s32 arg1);
+void *get_bank_or_seq_wrapper(s32 poolIdx, s32 id);
 void func_sh_802f3d78(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 arg3);
 void func_sh_802f3c38(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 medium);
 s32 func_sh_802f3dd0(OSIoMesg *m, s32 pri, s32 direction, uintptr_t devAddr,

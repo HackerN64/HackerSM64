@@ -1244,13 +1244,6 @@ void cur_obj_start_cam_event(UNUSED struct Object *obj, s32 cameraEvent) {
     gSecondCameraFocus = o;
 }
 
-// unused, self explanatory, maybe oInteractStatus originally had TRUE/FALSE statements
-void set_mario_interact_true_if_in_range(UNUSED s32 arg0, UNUSED s32 arg1, f32 range) {
-    if (o->oDistanceToMario < range) {
-        gMarioObject->oInteractStatus = TRUE;
-    }
-}
-
 void obj_set_billboard(struct Object *obj) {
     obj->header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD;
 }
