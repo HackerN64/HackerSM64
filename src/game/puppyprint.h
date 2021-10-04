@@ -1,7 +1,5 @@
-#ifndef PUPPYPRINT_H
-#define PUPPYPRINT_H
+#pragma once
 
-#ifdef PUPPYPRINT
 #include "segment2.h"
 
 // This is how many indexes of timers are saved at once. higher creates a smoother average, but naturally uses more RAM. 15's fine.
@@ -36,33 +34,33 @@ extern s32 mempool;
 extern u8 benchOption;
 
 //General
-extern OSTime cpuTime;
-extern OSTime rspTime;
-extern OSTime rdpTime;
-extern OSTime ramTime;
-extern OSTime loadTime;
-extern OSTime rspDelta;
+extern u32 cpuTime;
+extern u32 rspTime;
+extern u32 rdpTime;
+extern u32 ramTime;
+extern u32 loadTime;
+extern u32 rspDelta;
 extern s32       benchMark[NUM_BENCH_ITERATIONS + 2];
 
 // CPU
-extern OSTime collisionTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime behaviourTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime    scriptTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime     graphTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime     audioTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime       dmaTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime     faultTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime      taskTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime  profilerTime[NUM_PERF_ITERATIONS + 1];
+extern u32 collisionTime[NUM_PERF_ITERATIONS + 1];
+extern u32 behaviourTime[NUM_PERF_ITERATIONS + 1];
+extern u32    scriptTime[NUM_PERF_ITERATIONS + 1];
+extern u32     graphTime[NUM_PERF_ITERATIONS + 1];
+extern u32     audioTime[NUM_PERF_ITERATIONS + 1];
+extern u32       dmaTime[NUM_PERF_ITERATIONS + 1];
+extern u32  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
+extern u32     faultTime[NUM_PERF_ITERATIONS + 1];
+extern u32      taskTime[NUM_PERF_ITERATIONS + 1];
+extern u32    cameraTime[NUM_PERF_ITERATIONS + 1];
 // RSP
-extern OSTime    rspGenTime[NUM_PERF_ITERATIONS + 1];
+extern u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
 // RDP
-extern OSTime    bufferTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime      tmemTime[NUM_PERF_ITERATIONS + 1];
-extern OSTime       busTime[NUM_PERF_ITERATIONS + 1];
+extern u32    bufferTime[NUM_PERF_ITERATIONS + 1];
+extern u32      tmemTime[NUM_PERF_ITERATIONS + 1];
+extern u32       busTime[NUM_PERF_ITERATIONS + 1];
 
-extern void profiler_update(OSTime *time, OSTime time2);
+extern void profiler_update(u32 *time, OSTime time2);
 extern void puppyprint_profiler_process(void);
 extern void puppyprint_render_profiler(void);
 extern void puppyprint_profiler_finished(void);
@@ -78,7 +76,3 @@ extern void finish_blank_box(void);
 extern void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a);
 extern void append_puppyprint_log(const char *str, ...);
 extern char consoleLogTable[LOG_BUFFER_SIZE][255];
-
-#endif
-
-#endif // PUPPYPRINT_H

@@ -59,33 +59,34 @@ s32 benchmarkTimer = 0;
 s32 benchmarkProgramTimer = 0;
 s8  benchmarkType = 0;
 // General
-OSTime cpuTime = 0;
-OSTime rspTime = 0;
-OSTime rdpTime = 0;
-OSTime ramTime = 0;
-OSTime loadTime = 0;
-OSTime gLastOSTime = 0;
-OSTime rspDelta = 0;
+u32 cpuTime = 0;
+u32 rspTime = 0;
+u32 rdpTime = 0;
+u32 ramTime = 0;
+u32 loadTime = 0;
+u32 gLastOSTime = 0;
+u32 rspDelta = 0;
 s32       benchMark[NUM_BENCH_ITERATIONS + 2];
 // CPU
-OSTime collisionTime[NUM_PERF_ITERATIONS + 1];
-OSTime behaviourTime[NUM_PERF_ITERATIONS + 1];
-OSTime    scriptTime[NUM_PERF_ITERATIONS + 1];
-OSTime     graphTime[NUM_PERF_ITERATIONS + 1];
-OSTime     audioTime[NUM_PERF_ITERATIONS + 1];
-OSTime       dmaTime[NUM_PERF_ITERATIONS + 1];
-OSTime  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
-OSTime     faultTime[NUM_PERF_ITERATIONS + 1];
-OSTime      taskTime[NUM_PERF_ITERATIONS + 1];
-OSTime  profilerTime[NUM_PERF_ITERATIONS + 1];
-OSTime profilerTime2[NUM_PERF_ITERATIONS + 1];
+u32 collisionTime[NUM_PERF_ITERATIONS + 1];
+u32 behaviourTime[NUM_PERF_ITERATIONS + 1];
+u32    scriptTime[NUM_PERF_ITERATIONS + 1];
+u32     graphTime[NUM_PERF_ITERATIONS + 1];
+u32     audioTime[NUM_PERF_ITERATIONS + 1];
+u32       dmaTime[NUM_PERF_ITERATIONS + 1];
+u32  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
+u32     faultTime[NUM_PERF_ITERATIONS + 1];
+u32      taskTime[NUM_PERF_ITERATIONS + 1];
+u32  profilerTime[NUM_PERF_ITERATIONS + 1];
+u32 profilerTime2[NUM_PERF_ITERATIONS + 1];
+u32    cameraTime[NUM_PERF_ITERATIONS + 1];
 // RSP
-OSTime     audioTime[NUM_PERF_ITERATIONS + 1];
-OSTime    rspGenTime[NUM_PERF_ITERATIONS + 1];
+u32     audioTime[NUM_PERF_ITERATIONS + 1];
+u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
 // RDP
-OSTime    bufferTime[NUM_PERF_ITERATIONS + 1];
-OSTime      tmemTime[NUM_PERF_ITERATIONS + 1];
-OSTime       busTime[NUM_PERF_ITERATIONS + 1];
+u32    bufferTime[NUM_PERF_ITERATIONS + 1];
+u32      tmemTime[NUM_PERF_ITERATIONS + 1];
+u32       busTime[NUM_PERF_ITERATIONS + 1];
 // RAM
 s8  ramViewer = FALSE;
 s32 ramsizeSegment[33] = { 0, 0, 0,
@@ -144,6 +145,12 @@ void puppyprint_calculate_ram_usage(void) {
                         audioPool[6] + audioPool[7] + audioPool[8] + audioPool[9] + audioPool[10] + audioPool[11];
 }
 
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+    #define CYCLE_CONV
+#else
+    #define CYCLE_CONV OS_CYCLES_TO_USEC
+#endif
+
 void puppyprint_profiler_finished(void) {
     s32 i = 0;
     benchMark[NUM_BENCH_ITERATIONS] = 0;
@@ -157,7 +164,7 @@ void puppyprint_profiler_finished(void) {
         }
     }
     benchMark[NUM_BENCH_ITERATIONS] /= NUM_BENCH_ITERATIONS;
-    benchmarkProgramTimer = OS_CYCLES_TO_USEC(osGetTime() - benchmarkProgramTimer);
+    benchmarkProgramTimer = CYCLE_CONV(osGetTime() - benchmarkProgramTimer);
 }
 
 // RGB colour lookup table for colouring all the funny ram prints.
@@ -350,19 +357,34 @@ void print_console_log(void) {
 }
 #undef LINE_HEIGHT
 
+struct CPUBar {
+    u32 *time;
+    u8 colour[3];
+    const char str[32];
+};
+
 extern void print_fps(s32 x, s32 y);
 
+struct CPUBar cpu_ordering_table[] = {
+    {collisionTime, {255, 0, 0}, {"Collision: <COL_99505099>"}},
+    {graphTime, {0, 0, 255}, {"Graph: <COL_50509999>"}},
+    {behaviourTime, {0, 255, 0}, {"Behaviour: <COL_50995099>"}},
+    {audioTime, {255, 255, 0}, {"Audio: <COL_99995099>"}},
+    {cameraTime, {0, 255, 255}, {"Camera: <COL_50999999>"}},
+    {dmaTime, {255, 0, 255}, {"DMA: <COL_99509999>"}},
+};
+
+#define CPU_TABLE_MAX sizeof(cpu_ordering_table)/sizeof(struct CPUBar)
+#define ADDTIMES MAX((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX])/80, 1)
+
 void puppyprint_render_profiler(void) {
-    s32 perfPercentage[5];
+    s32 perfPercentage[CPU_TABLE_MAX];
     s32 graphPos;
     s32 prevGraph;
-#ifdef PUPPYPRINT_DEBUG_CYCLES
-    OSTime cpuCount = (cpuTime + audioTime[NUM_PERF_ITERATIONS] + dmaAudioTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS]
-                               + taskTime[NUM_PERF_ITERATIONS] - profilerTime[NUM_PERF_ITERATIONS] - profilerTime2[NUM_PERF_ITERATIONS]);
-#else
-    OSTime cpuCount = OS_CYCLES_TO_USEC(cpuTime+audioTime[NUM_PERF_ITERATIONS] + dmaAudioTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS]
+    u32 i;
+    s32 viewedNums;
+    OSTime cpuCount = CYCLE_CONV(cpuTime+audioTime[NUM_PERF_ITERATIONS] + dmaAudioTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS]
                                         + taskTime[NUM_PERF_ITERATIONS] - profilerTime[NUM_PERF_ITERATIONS] - profilerTime2[NUM_PERF_ITERATIONS]);
-#endif
     OSTime first = osGetTime();
     char textBytes[80];
 
@@ -376,11 +398,7 @@ void puppyprint_render_profiler(void) {
 
     if (!ramViewer && !benchViewer && !logViewer) {
         print_fps(16,40);
-#ifdef PUPPYPRINT_DEBUG_CYCLES
-        sprintf(textBytes, "CPU: %dc (%d_)#RSP: %dc (%d_)#RDP: %dc (%d_)", (s32)cpuCount, (s32)(cpuCount/333), (s32)(rspTime), (s32)(rspTime)/333, (s32)(rdpTime), (s32)(rdpTime)/333);
-#else
-        sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)(cpuCount / 333), (s32)OS_CYCLES_TO_USEC(rspTime), (s32)OS_CYCLES_TO_USEC(rspTime) / 333, (s32)OS_CYCLES_TO_USEC(rdpTime), (s32)OS_CYCLES_TO_USEC(rdpTime) / 333);
-#endif
+        sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)(cpuCount / 333), (s32)CYCLE_CONV(rspTime), (s32)CYCLE_CONV(rspTime) / 333, (s32)CYCLE_CONV(rdpTime), (s32)CYCLE_CONV(rdpTime) / 333);
         print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
         sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
@@ -400,67 +418,61 @@ void puppyprint_render_profiler(void) {
         if (benchmarkTimer > 0) {
             benchmarkTimer--;
             prepare_blank_box();
-#ifdef PUPPYPRINT_DEBUG_CYCLES
-            // sprintf(textBytes, "Benchmark: %dus#High: %dc", (s32)(benchMark[NUM_BENCH_ITERATIONS]), (s32)(benchMark[NUM_BENCH_ITERATIONS + 1]));
-            sprintf(textBytes, "Done in %0.000f seconds#Benchmark: %dc#High: %dc", (f32)(benchmarkProgramTimer) * 0.000001f, (s32)(benchMark[NUM_BENCH_ITERATIONS]), (s32)(benchMark[NUM_BENCH_ITERATIONS + 1]));
-#else
-            // sprintf(textBytes, "Benchmark: %dus#High: %dus", (s32)OS_CYCLES_TO_USEC(benchMark[NUM_BENCH_ITERATIONS]), (s32)OS_CYCLES_TO_USEC(benchMark[NUM_BENCH_ITERATIONS+1]));
-            sprintf(textBytes, "Done in %0.000f seconds#Benchmark: %dus#High: %dus", (f32)(benchmarkProgramTimer) * 0.000001f, (s32)OS_CYCLES_TO_USEC(benchMark[NUM_BENCH_ITERATIONS]), (s32)OS_CYCLES_TO_USEC(benchMark[NUM_BENCH_ITERATIONS + 1]));
-#endif
+            sprintf(textBytes, "Done in %0.000f seconds#Benchmark: %dus#High: %dus", (f32)(benchmarkProgramTimer) * 0.000001f, (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS]), (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS + 1]));
             render_blank_box((SCREEN_WIDTH/2) - (get_text_width(textBytes, FONT_OUTLINE) / 2) - 4, 158, (SCREEN_WIDTH/2) + (get_text_width(textBytes, FONT_OUTLINE) / 2) + 4, 196, 0, 0, 0, 255);
             print_set_envcolour(255, 255, 255, 255);
             print_small_text((SCREEN_WIDTH/2), 160, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
             finish_blank_box();
         }
 
-        #define ADDTIMES MAX((collisionTime[NUM_PERF_ITERATIONS] + graphTime[NUM_PERF_ITERATIONS] + behaviourTime[NUM_PERF_ITERATIONS] + audioTime[NUM_PERF_ITERATIONS] + dmaTime[NUM_PERF_ITERATIONS])/80, 1)
-        perfPercentage[0] = MAX((collisionTime[NUM_PERF_ITERATIONS] / ADDTIMES), 1);
-        perfPercentage[1] = MAX((    graphTime[NUM_PERF_ITERATIONS] / ADDTIMES), 1);
-        perfPercentage[2] = MAX((behaviourTime[NUM_PERF_ITERATIONS] / ADDTIMES), 1);
-        perfPercentage[3] = MAX((    audioTime[NUM_PERF_ITERATIONS] / ADDTIMES), 1);
-        perfPercentage[4] = MAX((      dmaTime[NUM_PERF_ITERATIONS] / ADDTIMES), 1);
-        #undef ADDTIMES
+        //Just to keep screen estate a little friendlier.
+#define MX NUM_PERF_ITERATIONS
+        for (i = 0; i < CPU_TABLE_MAX; i++)
+        {
+            perfPercentage[i] = MAX((cpu_ordering_table[i].time[MX] / ADDTIMES), 0);
+        }
+#undef ADDTIMES
+#undef MX
 
-#ifdef PUPPYPRINT_DEBUG_CYCLES
-        sprintf(textBytes, "Collision: <COL_99505099>%dc", (s32)(collisionTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 40, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "Graph: <COL_50509999>%dc", (s32)(graphTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 52, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "Behaviour: <COL_50995099>%dc", (s32)(behaviourTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 64, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "Audio: <COL_99995099>%dc", (s32)(audioTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 76, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "DMA: <COL_99509999>%dc", (s32)(dmaTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 88, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-#else
-        sprintf(textBytes, "Collision: <COL_99505099>%dus", (s32)OS_CYCLES_TO_USEC(collisionTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 40, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "Graph: <COL_50509999>%dus", (s32)OS_CYCLES_TO_USEC(graphTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 52, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "Behaviour: <COL_50995099>%dus", (s32)OS_CYCLES_TO_USEC(behaviourTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 64, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "Audio: <COL_99995099>%dus", (s32)OS_CYCLES_TO_USEC(audioTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 76, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        sprintf(textBytes, "DMA: <COL_99509999>%dus", (s32)OS_CYCLES_TO_USEC(dmaTime[NUM_PERF_ITERATIONS]));
-        print_small_text(SCREEN_WIDTH-16, 88, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-#endif
-
-        // Render CPU breakdown bar.
+        viewedNums = 0;
+        for (i = 0; i < CPU_TABLE_MAX; i++)
+        {
+            s32 num = CYCLE_CONV(cpu_ordering_table[i].time[NUM_PERF_ITERATIONS]);
+            if (num != 0)
+            {
+                sprintf(textBytes, "%s%dus", cpu_ordering_table[i].str, num);
+                print_small_text(SCREEN_WIDTH-16, 40+(viewedNums*12), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+                viewedNums++;
+            }
+        }
+        s32 barY = (28+(viewedNums*12)) + 16;
         prepare_blank_box();
-        graphPos = SCREEN_WIDTH-96 + perfPercentage[0];
-        render_blank_box(SCREEN_WIDTH-96, 104, graphPos, 112, 255, 0, 0, 255);
-        prevGraph = graphPos;
-        graphPos += perfPercentage[1];
-        render_blank_box(prevGraph, 104, graphPos, 112, 0, 0, 255, 255);
-        prevGraph = graphPos;
-        graphPos += perfPercentage[2];
-        render_blank_box(prevGraph, 104, graphPos, 112, 0, 255, 0, 255);
-        prevGraph = graphPos;
-        graphPos += perfPercentage[3];
-        render_blank_box(prevGraph, 104, graphPos, 112, 255, 255, 0, 255);
-        prevGraph = graphPos;
-        graphPos += perfPercentage[4];
-        render_blank_box(prevGraph, 104, SCREEN_WIDTH-16, 112, 255, 0, 255, 255);
+        viewedNums = 0;
+        // Render CPU breakdown bar.
+        for (i = 0; i < CPU_TABLE_MAX; i++)
+        {
+            if (perfPercentage[i] == 0 && i != CPU_TABLE_MAX-1)
+                continue;
+            if (viewedNums == 0)
+            {
+                graphPos = SCREEN_WIDTH-96 + perfPercentage[i];
+                render_blank_box(SCREEN_WIDTH-96, barY, graphPos, barY+8, cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+            }
+            else
+            if (i == CPU_TABLE_MAX-1)
+            {
+                graphPos = SCREEN_WIDTH-96 + perfPercentage[i];
+                render_blank_box(prevGraph, barY, SCREEN_WIDTH-16, barY+8, cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+            }
+            else
+            {
+                graphPos += perfPercentage[i];
+                render_blank_box(prevGraph, barY, graphPos, barY+8, cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+            }
+            viewedNums++;
+            prevGraph = graphPos;
+        }
+        finish_blank_box();
     } else if (ramViewer) {
         print_ram_overview();
     } else if (logViewer) {
@@ -472,11 +484,11 @@ void puppyprint_render_profiler(void) {
     profiler_update(profilerTime, first);
 }
 
-void profiler_update(OSTime *time, OSTime time2) {
+void profiler_update(u32 *time, OSTime time2) {
     time[perfIteration] = osGetTime() - time2;
 }
 
-void get_average_perf_time(OSTime *time) {
+void get_average_perf_time(u32 *time) {
     // This takes all but the last index of the timer array, and creates an average value, which is written to the last index.
     s32 i = 0;
     s32 total = 0;
@@ -504,6 +516,7 @@ void puppyprint_profiler_process(void) {
         get_average_perf_time(taskTime);
         get_average_perf_time(profilerTime);
         get_average_perf_time(profilerTime2);
+        get_average_perf_time(cameraTime);
 
         dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
 
