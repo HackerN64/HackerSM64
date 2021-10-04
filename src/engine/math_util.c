@@ -614,7 +614,7 @@ void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
         temp3++;
         x = (f32 *)(((u32)x) + 4);
     }
-    temp2 -=3;;
+    temp2 -= 3;
     for (i = 0; i < 3; i++) {
         *temp1 = (x[-3] * temp2[0]) + (x[-2] * temp2[1]) + (x[-1] * temp2[2]);
         temp1++;
@@ -959,7 +959,7 @@ s16 atan2s(f32 y, f32 x) {
  * Compute the atan2 in radians by calling atan2s and converting the result.
  */
 f32 atan2f(f32 y, f32 x) {
-    return ((f32) atan2s(y, x) * M_PI / 0x8000);
+    return angle_to_radians(atan2s(y, x));
 }
 
 // Variables for a spline curve animation (used for the flight path in the grand star cutscene)

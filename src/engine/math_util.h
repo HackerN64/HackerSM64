@@ -45,8 +45,8 @@ extern f32 gSineTable[];
 #define coss(x) gCosineTable[(u16) (x) >> 4]
 #define atans(x) gArctanTable[(s32)((((x) * 1024) + 0.5f))] // is this correct? used for atan2_lookup
 
-#define DEG_PER_RAD 57.29577950560105
-#define RAD_PER_DEG (1.0 / DEG_PER_RAD)
+#define RAD_PER_DEG (M_PI / 180.0)
+#define DEG_PER_RAD (180.0 / M_PI)
 
 #define angle_to_degrees(  x) (f32)(((Angle)(x) / 65536.0f) * 360.0f)
 #define degrees_to_angle(  x) (Angle)(((f32)(x) * 0x10000 ) / 360   )

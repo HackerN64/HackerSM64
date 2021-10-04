@@ -114,8 +114,8 @@ void rotate_rectangle(f32 *newZ, f32 *newX, f32 oldZ, f32 oldX) {
     struct Object *obj = (struct Object *) gCurGraphNodeObject;
     f32 s = sins(obj->oFaceAngleYaw);
     f32 c = coss(obj->oFaceAngleYaw);
-    *newZ = oldZ * c - oldX * s;
-    *newX = oldZ * s + oldX * c;
+    *newZ = (oldZ * c) - (oldX * s);
+    *newX = (oldZ * s) + (oldX * c);
 }
 
 /**
@@ -123,7 +123,7 @@ void rotate_rectangle(f32 *newZ, f32 *newX, f32 oldZ, f32 oldX) {
  * the standard atan2.
  */
 f32 atan2_deg(f32 a, f32 b) {
-    return ((f32) atan2s(a, b) / 65535.0 * 360.0);
+    return angle_to_degrees(atan2s(a, b));
 }
 
 /**
@@ -370,8 +370,8 @@ void get_vertex_coords(s8 index, s8 shadowVertexType, s8 *xCoord, s8 *zCoord) {
  * behavior is overwritten.
  */
 void calculate_vertex_xyz(s8 index, struct Shadow s, f32 *xPosVtx, f32 *yPosVtx, f32 *zPosVtx, s8 shadowVertexType) {
-    f32 tiltedScale = cosf(s.floorTilt * M_PI / 180.0) * s.shadowScale;
-    f32 downwardAngle = s.floorDownwardAngle * M_PI / 180.0;
+    f32 tiltedScale = cosf(degrees_to_radians(s.floorTilt)) * s.shadowScale;
+    f32 downwardAngle = degrees_to_radians(s.floorDownwardAngle);
     s8 xCoordUnit, zCoordUnit;
 
     // This makes xCoordUnit and yCoordUnit each one of -1, 0, or 1.

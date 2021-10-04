@@ -13,6 +13,7 @@
 #include "mario.h"
 #include "memory.h"
 #include "moving_texture.h"
+#include "level_update.h"
 #include "object_list_processor.h"
 #include "paintings.h"
 #include "save_file.h"
@@ -138,9 +139,7 @@
 /// A copy of the type of floor Mario is standing on.
 s16 gPaintingMarioFloorType;
 // A copy of Mario's position
-f32 gPaintingMarioXPos;
-f32 gPaintingMarioYPos;
-f32 gPaintingMarioZPos;
+Vec3f gPaintingMarioPos;
 
 /**
  * When a painting is rippling, this mesh is generated each frame using the Painting's parameters.
@@ -287,8 +286,7 @@ f32 painting_nearest_4th(struct Painting *painting) {
  * @return Mario's x position inside the painting (bounded).
  */
 f32 painting_mario_x(struct Painting *painting) {
-    f32 relX = gPaintingMarioXPos - painting->posX;
-
+    f32 relX = (gPaintingMarioPos[0] - painting->posX);
     if (relX < 0.0f) {
         relX = 0.0f;
     } else if (relX > painting->size) {
@@ -699,33 +697,19 @@ void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
  *
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
-void painting_calculate_triangle_normals(s16 *mesh, s16 numVtx, s16 numTris) {
+void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx, PaintingData numTris) {
     s16 i;
-
-    gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, numTris * sizeof(Vec3f));
-
+    Vec3s v;
+    Vec3f vp0, vp1, vp2;
+    gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
     for (i = 0; i < numTris; i++) {
-        s16 tri = numVtx * 3 + i * 3 + 2; // Add 2 because of the 2 length entries preceding the list
-        s16 v0 = mesh[tri];
-        s16 v1 = mesh[tri + 1];
-        s16 v2 = mesh[tri + 2];
-
-        f32 x0 = gPaintingMesh[v0].pos[0];
-        f32 y0 = gPaintingMesh[v0].pos[1];
-        f32 z0 = gPaintingMesh[v0].pos[2];
-
-        f32 x1 = gPaintingMesh[v1].pos[0];
-        f32 y1 = gPaintingMesh[v1].pos[1];
-        f32 z1 = gPaintingMesh[v1].pos[2];
-
-        f32 x2 = gPaintingMesh[v2].pos[0];
-        f32 y2 = gPaintingMesh[v2].pos[1];
-        f32 z2 = gPaintingMesh[v2].pos[2];
-
+        PaintingData tri = (numVtx * 3) + (i * 3) + 2; // Add 2 because of the 2 length entries preceding the list
+        vec3_copy(v, &mesh[tri]);
+        vec3_copy(vp0, gPaintingMesh[v[0]].pos);
+        vec3_copy(vp1, gPaintingMesh[v[1]].pos);
+        vec3_copy(vp2, gPaintingMesh[v[2]].pos);
         // Cross product to find each triangle's normal vector
-        gPaintingTriNorms[i][0] = (y1 - y0) * (z2 - z1) - (z1 - z0) * (y2 - y1);
-        gPaintingTriNorms[i][1] = (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1);
-        gPaintingTriNorms[i][2] = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
+        find_vector_perpendicular_to_plane(gPaintingTriNorms[i], vp0, vp1, vp2);
     }
 }
 
@@ -1110,7 +1094,7 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
     } else if (bowsersSubBeaten && dddBack) {
         // If the painting has already moved back, place it in the back position.
         painting->posX = backPos;
-        gDddPaintingStatus = BOWSERS_SUB_BEATEN | DDD_BACK;
+        gDddPaintingStatus = (BOWSERS_SUB_BEATEN | DDD_BACK);
     }
 }
 
@@ -1118,13 +1102,10 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
  * Set the painting's node's layer based on its alpha
  */
 void set_painting_layer(struct GraphNodeGenerated *gen, struct Painting *painting) {
-    switch (painting->alpha) {
-        case 0xFF: // Opaque
-            SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_OPAQUE);
-            break;
-        default:
-            SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_TRANSPARENT);
-            break;
+    if (painting->alpha == 0xFF) { // Opaque
+        SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_OPAQUE);
+    } else {
+        SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_TRANSPARENT);
     }
 }
 
@@ -1242,8 +1223,6 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
  * Update the painting system's local copy of Mario's current floor and position.
  */
 Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 c) {
-    struct Surface *surface;
-
     // Reset the update counter
     if (callContext != GEO_CONTEXT_RENDER) {
         gLastPaintingUpdateCounter = gAreaUpdateCounter - 1;
@@ -1253,11 +1232,8 @@ Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED 
         gPaintingUpdateCounter = gAreaUpdateCounter;
 
         // Store Mario's floor and position
-        find_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &surface);
-        gPaintingMarioFloorType = surface->type;
-        gPaintingMarioXPos = gMarioObject->oPosX;
-        gPaintingMarioYPos = gMarioObject->oPosY;
-        gPaintingMarioZPos = gMarioObject->oPosZ;
+        if (gMarioState->floor != NULL) gPaintingMarioFloorType = gMarioState->floor->type;
+        vec3_copy(gPaintingMarioPos, &gMarioObject->oPosVec);
     }
     return NULL;
 }

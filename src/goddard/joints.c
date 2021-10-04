@@ -586,8 +586,6 @@ void func_801903E8(struct ObjJoint *j, struct GdVec3f *a1, f32 x, f32 y, f32 z) 
         j->unk3C.y += y;
         j->unk3C.z += z;
         a1->x = a1->y = a1->z = 0.0f;
-        ;
-
     } else {
         sp14 = (j->unkB4.x * x) + (j->unkB4.y * y) + (j->unkB4.z * z);
         sp8.x = j->unkB4.x * sp14;
