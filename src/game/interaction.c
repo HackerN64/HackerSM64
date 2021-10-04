@@ -249,7 +249,7 @@ u32 determine_interaction(struct MarioState *m, struct Object *obj) {
  * Sets the interaction types for INT_STATUS_INTERACTED, INT_STATUS_WAS_ATTACKED
  */
 u32 attack_object(struct Object *obj, s32 interaction) {
-    u32 attackType = 0;
+    u32 attackType = ATTACK_NONE;
 
     switch (interaction) {
         case INT_GROUND_POUND_OR_TWIRL:

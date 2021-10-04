@@ -164,9 +164,7 @@ static void platform_on_track_act_move_along_track(void) {
             if (approach_f32_ptr(&o->oPlatformOnTrackDistMovedSinceLastBall, 300.0f, o->oForwardVel)) {
                 o->oPlatformOnTrackDistMovedSinceLastBall -= 300.0f;
 
-                o->oHomeX = o->oPosX;
-                o->oHomeY = o->oPosY;
-                o->oHomeZ = o->oPosZ;
+                vec3_copy(&o->oHomeVec, &o->oPosVec);
                 o->oPlatformOnTrackBaseBallIndex = (u16)(o->oPlatformOnTrackBaseBallIndex + 1);
 
                 platform_on_track_update_pos_or_spawn_ball(5, o->oHomeX, o->oHomeY, o->oHomeZ);
@@ -234,7 +232,7 @@ static void platform_on_track_act_fall(void) {
         platform_on_track_mario_not_on_platform();
     } else {
         o->oTimer = 0;
-        //! Doesn't ensure visibility
+        o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
     }
 }
 

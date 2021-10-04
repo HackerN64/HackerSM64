@@ -7,8 +7,6 @@ enum LLLOctagonalMeshInstructions {
     LLL_OCTMESH_WAIT_FOR_MARIO  // 4
 };
 
-//! Note: useless zero at the reset instruction, there's no accesses beyond that anyway
-
 struct LllOctagonalMeshAction {
     s16   instruction;
     s16   time;
@@ -70,7 +68,7 @@ s32 lll_octagonal_mesh_move(struct LllOctagonalMeshAction *actionTable, s32 acti
             }
             break;
         case LLL_OCTMESH_RESET:
-            o->oForwardVel = 0.0f;
+            o->oForwardVel = action->forwardVel;
             actionOffset = 0;
             break;
     }
@@ -107,7 +105,7 @@ void bhv_lll_moving_octagonal_mesh_platform_loop(void) {
     cur_obj_move_using_fvel_and_gravity();
     if (lll_octagonal_mesh_find_y_offset(&o->oLllOctMeshStandTimer, &o->oLllOctMeshYOffsetFromHome, 0x400, -80)) {
         o->oLllOctMeshWaveTimer += 0x800;
-        o->oLllOctMeshWaveYOffset -= sins(o->oLllOctMeshWaveTimer) * 2;
+        o->oLllOctMeshWaveYOffset -= (sins(o->oLllOctMeshWaveTimer) * 2);
     }
     o->oPosY = o->oLllOctMeshWaveYOffset + o->oHomeY + o->oLllOctMeshYOffsetFromHome;
 }

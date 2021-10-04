@@ -137,12 +137,10 @@ void bhv_pokey_body_part_update(void) {
  */
 static void pokey_act_uninitialized(void) {
     struct Object *bodyPart;
-    s32 i;
-    s16 partModel;
 
     if (o->oDistanceToMario < o->oDrawingDistance) {
-        partModel = MODEL_POKEY_HEAD;
-
+        ModelID16 partModel = MODEL_POKEY_HEAD;
+        s32 i;
         for (i = 0; i < POKEY_NUM_SEGMENTS; i++) {
             // Spawn body parts at y offsets 480, 360, 240, 120, 0
             // behavior param POKEY_PART_BP_HEAD = head, POKEY_PART_BP_LOWEST = lowest body part

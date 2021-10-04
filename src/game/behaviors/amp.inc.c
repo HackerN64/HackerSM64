@@ -152,9 +152,7 @@ static void homing_amp_give_up_loop(void) {
 
     if (o->oTimer >= 151) {
         // Hide the amp and reset it back to its inactive state
-        o->oPosX = o->oHomeX;
-        o->oPosY = o->oHomeY;
-        o->oPosZ = o->oHomeZ;
+        vec3_copy(&o->oPosVec, &o->oHomeVec);
         o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
         o->oAction = HOMING_AMP_ACT_INACTIVE;
         o->oAnimState = 0;
@@ -225,9 +223,7 @@ void bhv_homing_amp_loop(void) {
  * Circling amp initialization function.
  */
 void bhv_circling_amp_init(void) {
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
     o->oAnimState = 1;
 
     // Determine the radius of the circling amp's circle

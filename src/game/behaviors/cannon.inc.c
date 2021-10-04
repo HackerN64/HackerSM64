@@ -7,9 +7,7 @@ void bhv_cannon_base_unused_loop(void) {
 void opened_cannon_act_0(void) {
     if (o->oTimer == 0) {
         o->oInteractStatus = INT_STATUS_NONE;
-        o->oPosX = o->oHomeX;
-        o->oPosY = o->oHomeY;
-        o->oPosZ = o->oHomeZ;
+        vec3_copy(&o->oPosVec, &o->oHomeVec);
         o->oMoveAnglePitch = 0;
         o->oMoveAngleYaw = (s16)(o->oBehParams2ndByte << 8);
         o->oCannonAngle = 0;
@@ -22,13 +20,13 @@ void opened_cannon_act_0(void) {
         cur_obj_enable_rendering();
         if (o->oInteractStatus & INT_STATUS_INTERACTED
             && (!(o->oInteractStatus
-                  & INT_STATUS_TOUCHED_BOB_OMB))) // bob-omb explodes when it gets into a cannon
-        {
+                  & INT_STATUS_TOUCHED_BOB_OMB))) { // bob-omb explodes when it gets into a cannon
             o->oAction = 4;
             o->oCannonIsActive = 1;
             o->oCannonTimeSinceActivated = 1;
-        } else
+        } else {
             o->oInteractStatus = INT_STATUS_NONE;
+        }
     } else {
         cur_obj_become_intangible();
         cur_obj_disable_rendering();

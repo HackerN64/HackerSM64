@@ -442,28 +442,20 @@ s32 object_step(void) {
  * Used for boulders, falling pillars, and the rolling snowman body.
  */
 s32 object_step_without_floor_orient(void) {
-    s16 collisionFlags = 0;
     sOrientObjWithFloor = FALSE;
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
     sOrientObjWithFloor = TRUE;
-
     return collisionFlags;
 }
 
 /**
  * Uses an object's forward velocity and yaw to move its X, Y, and Z positions.
  * This does accept an object as an argument, though it is always called with `o`.
- * If it wasn't called with `o`, it would modify `o`'s X and Z velocities based on
- * `obj`'s forward velocity and yaw instead of `o`'s, and wouldn't update `o`'s
- * position.
  */
 void obj_move_xyz_using_fvel_and_yaw(struct Object *obj) {
-    o->oVelX = obj->oForwardVel * sins(obj->oMoveAngleYaw);
-    o->oVelZ = obj->oForwardVel * coss(obj->oMoveAngleYaw);
-
-    obj->oPosX += o->oVelX;
-    obj->oPosY += obj->oVelY;
-    obj->oPosZ += o->oVelZ;
+    obj->oVelX = obj->oForwardVel * sins(obj->oMoveAngleYaw);
+    obj->oVelZ = obj->oForwardVel * coss(obj->oMoveAngleYaw);
+    vec3_add(&obj->oPosVec, &obj->oVelVec);
 }
 
 /**
@@ -514,17 +506,14 @@ s32 obj_return_home_if_safe(struct Object *obj, f32 homeX, f32 y, f32 homeZ, s32
  * Randomly displaces an objects home if RNG says to, and turns the object towards its home.
  */
 void obj_return_and_displace_home(struct Object *obj, f32 homeX, UNUSED f32 homeY, f32 homeZ, s32 baseDisp) {
-    s16 angleToNewHome;
-    f32 homeDistX, homeDistZ;
-
     if ((s32)(random_float() * 50.0f) == 0) {
         obj->oHomeX = (f32)(baseDisp * 2) * random_float() - (f32) baseDisp + homeX;
         obj->oHomeZ = (f32)(baseDisp * 2) * random_float() - (f32) baseDisp + homeZ;
     }
 
-    homeDistX = obj->oHomeX - obj->oPosX;
-    homeDistZ = obj->oHomeZ - obj->oPosZ;
-    angleToNewHome = atan2s(homeDistZ, homeDistX);
+    f32 homeDistX = obj->oHomeX - obj->oPosX;
+    f32 homeDistZ = obj->oHomeZ - obj->oPosZ;
+    s16 angleToNewHome = atan2s(homeDistZ, homeDistX);
     obj->oMoveAngleYaw = approach_s16_symmetric(obj->oMoveAngleYaw, angleToNewHome, 320);
 }
 
@@ -622,9 +611,9 @@ s32 current_mario_room_check(RoomData room) {
 s32 trigger_obj_dialog_when_facing(s32 *inDialog, s16 dialogID, f32 dist, s32 actionArg) {
     s16 dialogueResponse;
 
-    if ((is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, (s32) dist) == TRUE
-         && obj_check_if_facing_toward_angle(o->oFaceAngleYaw, gMarioObject->header.gfx.angle[1] + 0x8000, 0x1000) == TRUE
-         && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x1000) == TRUE)
+    if ((is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, (s32) dist)
+         && obj_check_if_facing_toward_angle(o->oFaceAngleYaw, gMarioObject->header.gfx.angle[1] + 0x8000, 0x1000)
+         && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x1000))
         || (*inDialog == TRUE)) {
         *inDialog = TRUE;
 

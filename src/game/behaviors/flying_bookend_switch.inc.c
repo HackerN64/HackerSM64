@@ -231,18 +231,13 @@ void bhv_haunted_bookshelf_manager_loop(void) {
 }
 
 void bhv_book_switch_loop(void) {
-    s32 attackType;
-    struct Object *bookendObj;
-    s16 rand01;
-    s16 z;
-
     o->header.gfx.scale[0] = 2.0f;
     o->header.gfx.scale[1] = 0.9f;
 
     if (o->parentObj->oAction == 4) {
         obj_mark_for_deletion(o);
     } else {
-        attackType = obj_check_attacks(&sBookSwitchHitbox, o->oAction);
+        s32 attackType = obj_check_attacks(&sBookSwitchHitbox, o->oAction);
         if (o->parentObj->oBookSwitchManagerIsActive != 0 || o->oAction == 1) {
             if (o->oDistanceToMario < 100.0f) {
                 cur_obj_become_tangible();
@@ -257,7 +252,7 @@ void bhv_book_switch_loop(void) {
 
             if (approach_f32_ptr(&o->oBookSwitchDistFromHome, 50.0f, 20.0f)) {
                 if (o->parentObj->oBookSwitchManagerNumCorrectChoices >= 0 && o->oTimer > 60) {
-                    if (attackType == 1 || attackType == 2 || attackType == 6) {
+                    if (attackType == ATTACK_PUNCH || attackType == ATTACK_KICK_OR_TRIP || attackType == ATTACK_FROM_BELOW) {
                         o->oAction = 2;
                     }
                 }
@@ -272,15 +267,13 @@ void bhv_book_switch_loop(void) {
                         play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource);
                         o->parentObj->oBookSwitchManagerNumCorrectChoices += 1;
                     } else {
-                        rand01 = random_u16() & 0x1;
-                        z = gMarioObject->oPosZ + 1.5f * gMarioStates[0].vel[2];
+                        s16 rand01 = random_u16() & 0x1;
+                        s16 z = gMarioObject->oPosZ + 1.5f * gMarioStates[0].vel[2];
 
                         play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
-                        if (z > 0) {
-                            z = 0;
-                        }
+                        if (z > 0) z = 0;
 
-                        bookendObj = spawn_object_abs_with_rot(o, 0, MODEL_BOOKEND, bhvFlyingBookend,
+                        struct Object *bookendObj = spawn_object_abs_with_rot(o, 0, MODEL_BOOKEND, bhvFlyingBookend,
                                                          0x1FC * rand01 - 0x8CA, 890, z, 0,
                                                          0x8000 * rand01 + 0x4000, 0);
 

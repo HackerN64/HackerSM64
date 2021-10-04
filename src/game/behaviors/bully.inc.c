@@ -26,9 +26,7 @@ static struct ObjectHitbox sBigBullyHitbox = {
 
 void bhv_small_bully_init(void) {
     cur_obj_init_animation(0);
-
-    o->oHomeX = o->oPosX;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
     o->oBehParams2ndByte = BULLY_BP_SIZE_SMALL;
     o->oGravity  = 4.0f;
     o->oFriction = 0.91f;
@@ -127,8 +125,7 @@ void bully_act_back_up(void) {
 }
 
 void bully_backup_check(s16 collisionFlags) {
-    if (!(collisionFlags & OBJ_COL_FLAG_NO_Y_VEL) && o->oAction != BULLY_ACT_KNOCKBACK) /* bit 3 */
-    {
+    if (!(collisionFlags & OBJ_COL_FLAG_NO_Y_VEL) && o->oAction != BULLY_ACT_KNOCKBACK) { /* bit 3 */
         o->oPosX = o->oBullyPrevX;
         o->oPosZ = o->oBullyPrevZ;
         o->oAction = BULLY_ACT_BACK_UP;
@@ -188,7 +185,7 @@ void bully_spawn_coin(void) {
 }
 
 void bully_act_level_death(void) {
-    if (obj_lava_death() == 1) {
+    if (obj_lava_death()) {
         if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL) {
             if (o->oBullySubtype == BULLY_STYPE_MINION)
                 o->parentObj->oBullyKBTimerAndMinionKOCounter++;
@@ -196,21 +193,18 @@ void bully_act_level_death(void) {
         } else {
             spawn_mist_particles();
 
-            if (o->oBullySubtype == BULLY_STYPE_CHILL)
+            if (o->oBullySubtype == BULLY_STYPE_CHILL) {
                 spawn_default_star(130.0f, 1600.0f, -4335.0f);
-            else {
+            } else {
                 spawn_default_star(0, 950.0f, -6800.0f);
-                spawn_object_abs_with_rot(o, 0, MODEL_NONE, bhvLllTumblingBridge, 0, 154, -5631, 0, 0,
-                                          0);
+                spawn_object_abs_with_rot(o, 0, MODEL_NONE, bhvLllTumblingBridge, 0, 154, -5631, 0, 0, 0);
             }
         }
     }
 }
 
 void bhv_bully_loop(void) {
-    o->oBullyPrevX = o->oPosX;
-    o->oBullyPrevY = o->oPosY;
-    o->oBullyPrevZ = o->oPosZ;
+    vec3_copy(&o->oBullyPrevVec, &o->oPosVec);
 
     //! Because this function runs no matter what, Mario is able to interrupt the bully's
     //  death action by colliding with it. Since the bully hitbox is tall enough to collide
@@ -222,7 +216,7 @@ void bhv_bully_loop(void) {
         case BULLY_ACT_PATROL:
             o->oForwardVel = 5.0f;
 
-            if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 800) == 1) {
+            if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 800)) {
                 o->oAction = BULLY_ACT_CHASE_MARIO;
                 cur_obj_init_animation(1);
             }
@@ -277,18 +271,15 @@ void bhv_big_bully_with_minions_init(void) {
 }
 
 void big_bully_spawn_star(void) {
-    if (obj_lava_death() == 1) {
+    if (obj_lava_death()) {
         spawn_mist_particles();
         spawn_default_star(3700.0f, 600.0f, -5500.0f);
     }
 }
 
 void bhv_big_bully_with_minions_loop(void) {
-    s16 collisionFlags;
-
-    o->oBullyPrevX = o->oPosX;
-    o->oBullyPrevY = o->oPosY;
-    o->oBullyPrevZ = o->oPosZ;
+    s16 collisionFlags = 0;
+    vec3_copy(&o->oBullyPrevVec, &o->oPosVec);
 
     bully_check_mario_collision();
 
@@ -296,7 +287,7 @@ void bhv_big_bully_with_minions_loop(void) {
         case BULLY_ACT_PATROL:
             o->oForwardVel = 5.0f;
 
-            if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 1000) == 1) {
+            if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 1000)) {
                 o->oAction = BULLY_ACT_CHASE_MARIO;
                 cur_obj_init_animation(1);
             }

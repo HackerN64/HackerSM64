@@ -262,11 +262,9 @@ static void klepto_act_struck_by_mario(void) {
         o->oGravity = 0.0f;
 
         o->oMoveAnglePitch = -obj_get_pitch_from_vel();
-        o->oKleptoSpeed = sqrtf(o->oForwardVel * o->oForwardVel + o->oVelY * o->oVelY);
-
-        o->oHomeX = o->oPosX;
-        o->oHomeY = o->oPosY + 500.0f;
-        o->oHomeZ = o->oPosZ;
+        o->oKleptoSpeed = sqrtf(sqr(o->oForwardVel) + sqr(o->oVelY));
+        
+        vec3_copy_y_off(&o->oHomeVec, &o->oPosVec, 500.0f);
     }
 }
 

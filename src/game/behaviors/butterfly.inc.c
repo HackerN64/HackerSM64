@@ -5,9 +5,7 @@ void bhv_butterfly_init(void) {
 
     o->oButterflyYPhase = random_float() * 100.0f;
     o->header.gfx.animInfo.animFrame = random_float() * 7.0f;
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
 }
 
 void butterfly_step(s32 speed) {
@@ -84,9 +82,7 @@ void butterfly_act_return_home(void) {
         cur_obj_init_animation(1);
 
         o->oAction = BUTTERFLY_ACT_RESTING;
-        o->oPosX = o->oHomeX;
-        o->oPosY = o->oHomeY;
-        o->oPosZ = o->oHomeZ;
+        vec3_copy(&o->oPosVec, &o->oHomeVec);
     }
 }
 

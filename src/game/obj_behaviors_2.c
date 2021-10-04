@@ -603,9 +603,9 @@ static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActi
 
     obj_set_hitbox(o, hitbox);
 
-    //! Die immediately if above lava
+    //! Dies immediately if above lava
     if (obj_die_if_above_lava_and_health_non_positive()) {
-        return 1;
+        return ATTACK_PUNCH;
     } else if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         if (o->oInteractStatus & INT_STATUS_ATTACKED_MARIO) {
             if (o->oAction != attackedMarioAction) {
@@ -659,7 +659,7 @@ static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActi
     }
 
     o->oInteractStatus = INT_STATUS_NONE;
-    return 0;
+    return ATTACK_NONE;
 }
 
 static void obj_act_knockback(UNUSED f32 baseScale) {
@@ -728,7 +728,7 @@ static s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActio
 
     //! Dies immediately if above lava
     if (obj_die_if_above_lava_and_health_non_positive()) {
-        return 1;
+        return ATTACK_PUNCH;
     } else if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         if (o->oInteractStatus & INT_STATUS_ATTACKED_MARIO) {
             if (o->oAction != attackedMarioAction) {
@@ -736,7 +736,7 @@ static s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActio
                 o->oTimer = 0;
             }
         } else {
-            attackType = o->oInteractStatus & INT_STATUS_ATTACK_MASK;
+            attackType = (o->oInteractStatus & INT_STATUS_ATTACK_MASK);
             obj_die_if_health_non_positive();
             o->oInteractStatus = INT_STATUS_NONE;
             return attackType;
@@ -744,7 +744,7 @@ static s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActio
     }
 
     o->oInteractStatus = INT_STATUS_NONE;
-    return 0;
+    return ATTACK_NONE;
 }
 
 static s32 obj_move_for_one_second(s32 endAction) {

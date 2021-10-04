@@ -15,9 +15,7 @@ static struct ObjectHitbox sRollingSphereHitbox = {
 void bhv_snowmans_bottom_init(void) {
     struct Object *headObj;
 
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
 
     o->oGravity = 10.0f;
     o->oFriction = 0.999f;
@@ -61,7 +59,7 @@ void snowmans_bottom_act_1(void) {
         o->oForwardVel = 70.0f;
 
     if (pathResult == PATH_REACHED_END) {
-        if (obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x2000) == TRUE
+        if (obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x2000)
             && o->oSnowmansBottomHitCheckpointNearMario == 1) {
             o->oSnowmansBottomTargetYaw = o->oAngleToMario;
         } else {

@@ -35,16 +35,13 @@ void bhv_moneybag_init(void) {
 void moneybag_check_mario_collision(void) {
     obj_set_hitbox(o, &sMoneybagHitbox);
 
-    if (o->oInteractStatus & INT_STATUS_INTERACTED) /* bit 15 */
-    {
-        if (o->oInteractStatus & INT_STATUS_ATTACKED_MARIO) /* bit 13 */
-        {
+    if (o->oInteractStatus & INT_STATUS_INTERACTED) { /* bit 15 */
+        if (o->oInteractStatus & INT_STATUS_ATTACKED_MARIO) { /* bit 13 */
             o->oMoveAngleYaw = o->oAngleToMario + 0x8000;
             o->oVelY = 30.0f;
         }
 
-        if (o->oInteractStatus & INT_STATUS_WAS_ATTACKED) /* bit 14 */
-        {
+        if (o->oInteractStatus & INT_STATUS_WAS_ATTACKED) { /* bit 14 */
             o->oAction = MONEYBAG_ACT_DEATH;
         }
 
@@ -72,8 +69,7 @@ void moneybag_jump(s8 collisionFlags) {
         case MONEYBAG_JUMP_JUMP:
             cur_obj_init_animation(2);
 
-            if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) /* bit 0 */
-            {
+            if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) { /* bit 0 */
                 o->oForwardVel = 0;
                 o->oVelY = 0;
                 o->oMoneybagJumpState = MONEYBAG_JUMP_LANDING;
@@ -117,8 +113,9 @@ void moneybag_act_move_around(void) {
         if ((s32)(random_float() * 6.0f) == 1) {
             o->oMoneybagJumpState = MONEYBAG_JUMP_WALK_AROUND;
             o->oTimer = 0;
-        } else
+        } else {
             o->oMoneybagJumpState = MONEYBAG_JUMP_PREPARE;
+        }
     }
 
     moneybag_jump(collisionFlags);

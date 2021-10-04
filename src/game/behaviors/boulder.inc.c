@@ -1,9 +1,7 @@
 // boulder.c.inc
 
 void bhv_big_boulder_init(void) {
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
 
     o->oGravity = 8.0f;
     o->oFriction = 0.999f;
