@@ -223,9 +223,7 @@ static void goomba_act_attacked_mario(void) {
 #endif
         obj_die_if_health_non_positive();
     } else {
-        //! This can happen even when the goomba is already in the air. It's
-        //  hard to chain these in practice
-        goomba_begin_jump();
+        if (o->oPosY <= o->oFloorHeight) goomba_begin_jump();
         o->oGoombaTargetYaw = o->oAngleToMario;
         o->oGoombaTurningAwayFromWall = FALSE;
     }
