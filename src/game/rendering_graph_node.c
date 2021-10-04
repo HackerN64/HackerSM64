@@ -1139,6 +1139,7 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
 void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) {
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
+    OSTime colTime = collisionTime[perfIteration];
 #endif
 
     if (node->node.flags & GRAPH_RENDER_ACTIVE) {
@@ -1180,5 +1181,6 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
     }
     #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);
+    graphTime[perfIteration] -= collisionTime[perfIteration]-colTime;
     #endif
 }
