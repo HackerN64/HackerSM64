@@ -366,6 +366,10 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 }
 
 void render_game(void) {
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+    OSTime colTime = collisionTime[perfIteration];
+#endif
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
         if (gCurrentArea->graphNode) {
             geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);
@@ -419,11 +423,13 @@ void render_game(void) {
         }
     }
 
-
-    #if PUPPYPRINT_DEBUG
-    puppyprint_render_profiler();
-    #endif
-
     gViewportOverride = NULL;
     gViewportClip = NULL;
+#if PUPPYPRINT_DEBUG
+    profiler_update(graphTime, first);
+    graphTime[perfIteration] -= collisionTime[perfIteration]-colTime;
+#endif
+#if PUPPYPRINT_DEBUG
+    puppyprint_render_profiler();
+#endif
 }
