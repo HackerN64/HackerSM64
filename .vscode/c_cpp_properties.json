@@ -18,7 +18,6 @@
                 "${workspaceFolder}/include/level_commands.h",
                 "${workspaceFolder}/include/segment_symbols.h",
                 "${workspaceFolder}/include/command_macros_base.h",
-                "${workspaceFolder}/include/interaction.h",
                 "${workspaceFolder}/include/object_constants.h"
             ],
             "defines": [
