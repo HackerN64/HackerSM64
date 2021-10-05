@@ -3318,7 +3318,7 @@ const Gfx intro_seg7_dl_main_logo[] = {
 };
 
 // 0x0700B420 - 0x0700B460
-static const Vtx intro_seg7_vertex_0700B420[] = {
+static const Vtx intro_seg7_vertex_copyright[] = {
     {{{    96,     42,     -1}, 0, {     0,    512}, {0xff, 0xff, 0xff, 0xff}}},
     {{{   224,     42,     -1}, 0, {  4096,    512}, {0xff, 0xff, 0xff, 0xff}}},
     {{{   224,     58,     -1}, 0, {  4096,      0}, {0xff, 0xff, 0xff, 0xff}}},
@@ -3326,7 +3326,7 @@ static const Vtx intro_seg7_vertex_0700B420[] = {
 };
 
 // 0x0700B460 - 0x0700B4A0
-static const Vtx intro_seg7_vertex_0700B460[] = {
+static const Vtx intro_seg7_vertex_trademark[] = {
     {{{   268,    180,     -1}, 0, {     0,    512}, {0xff, 0xff, 0xff, 0xff}}},
     {{{   284,    180,     -1}, 0, {   544,    512}, {0xff, 0xff, 0xff, 0xff}}},
     {{{   284,    196,     -1}, 0, {   544,      0}, {0xff, 0xff, 0xff, 0xff}}},
@@ -3335,29 +3335,29 @@ static const Vtx intro_seg7_vertex_0700B460[] = {
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 // 0x0700B4A0 - 0x0700B4A2
-ALIGNED8 static const Texture intro_seg7_texture_0700B4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 #include "levels/intro/2_eu_copyright.rgba16.inc.c"
 };
 
 #else
 // 0x0700B4A0 - 0x0700B4A2
-ALIGNED8 static const Texture intro_seg7_texture_0700B4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 #include "levels/intro/2_copyright.rgba16.inc.c"
 };
 #endif
 
 #if defined(VERSION_EU)
 // 0x0700C4A0 - 0x0700D4A0
-ALIGNED8 static const Texture intro_seg7_texture_0700C4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/3_eu_tm.rgba16.inc.c"
 };
 #elif defined(VERSION_SH)
-ALIGNED8 static const Texture intro_seg7_texture_0700C4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/3_sh_tm.rgba16.inc.c"
 };
 #else
 // 0x0700C4A0 - 0x0700D4A0
-ALIGNED8 static const Texture intro_seg7_texture_0700C4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/3_tm.rgba16.inc.c"
 };
 #endif
@@ -3368,12 +3368,12 @@ const Gfx intro_seg7_dl_copyright_trademark[] = {
     gsDPSetCombineMode(G_CC_DECALFADE, G_CC_DECALFADE),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
 
-    gsDPLoadTextureBlock(intro_seg7_texture_0700B4A0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 7, 4, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPVertex(intro_seg7_vertex_0700B420, 4, 0),
+    gsDPLoadTextureBlock(intro_seg7_texture_copyright, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 7, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPVertex(intro_seg7_vertex_copyright, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
 
-    gsDPLoadTextureBlock(intro_seg7_texture_0700C4A0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPVertex(intro_seg7_vertex_0700B460, 4, 0),
+    gsDPLoadTextureBlock(intro_seg7_texture_trademark, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPVertex(intro_seg7_vertex_trademark, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
 
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
