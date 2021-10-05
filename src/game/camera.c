@@ -3595,13 +3595,11 @@ s32 update_camera_hud_status(struct Camera *c) {
 s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
     struct WallCollisionData collisionData;
     struct Surface *wall = NULL;
-    f32 normX, normY, normZ;
+    Vec3f norm;
     f32 originOffset;
     f32 offset;
     Vec3f newPos[MAX_REFEREMCED_WALLS];
     s32 i;
-    s32 numCollisions = 0;
-
     collisionData.x = pos[0];
     collisionData.y = pos[1];
     collisionData.z = pos[2];
@@ -3612,14 +3610,14 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
         for (i = 0; i < collisionData.numWalls; i++) {
             wall = collisionData.walls[collisionData.numWalls - 1];
             vec3f_copy(newPos[i], pos);
-            normX = wall->normal.x;
-            normY = wall->normal.y;
-            normZ = wall->normal.z;
+            norm[0] = wall->normal.x;
+            norm[1] = wall->normal.y;
+            norm[2] = wall->normal.z;
             originOffset = wall->originOffset;
-            offset = normX * newPos[i][0] + normY * newPos[i][1] + normZ * newPos[i][2] + originOffset;
+            offset = (vec3_dot(norm, newPos[i]) + originOffset);
             if (ABSF(offset) < radius) {
-                newPos[i][0] += (normX * (radius - offset));
-                newPos[i][2] += (normZ * (radius - offset));
+                newPos[i][0] += (norm[0] * (radius - offset));
+                newPos[i][2] += (norm[2] * (radius - offset));
                 vec3f_copy(pos, newPos[i]);
             }
         }
