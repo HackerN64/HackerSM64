@@ -196,12 +196,11 @@ void bhv_generic_bowling_ball_spawner_loop(void) {
 void bhv_thi_bowling_ball_spawner_loop(void) {
     struct Object *bowlingBall;
 
-    if (o->oTimer == 256)
+    if (o->oTimer == 256) {
         o->oTimer = 0;
-
+    }
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 800)
-        || (o->oPosY < gMarioObject->header.gfx.pos[1]))
-        return;
+        || (o->oPosY < gMarioObject->header.gfx.pos[1])) return;
 
     if ((o->oTimer % 64) == 0) {
         if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 12000)) {
@@ -214,9 +213,9 @@ void bhv_thi_bowling_ball_spawner_loop(void) {
 }
 
 void bhv_bob_pit_bowling_ball_init(void) {
-    o->oGravity = 12.0f;
-    o->oFriction = 1.0f;
-    o->oBuoyancy = 2.0f;
+    o->oGravity  = 12.0f;
+    o->oFriction =  1.0f;
+    o->oBuoyancy =  2.0f;
 }
 
 void bhv_bob_pit_bowling_ball_loop(void) {
@@ -224,7 +223,7 @@ void bhv_bob_pit_bowling_ball_loop(void) {
     object_step();
 
     find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
-    if ((floor->normal.x == 0) && (floor->normal.z == 0))
+    if ((floor != NULL) && (floor->normal.x == 0) && (floor->normal.z == 0)) {
         o->oForwardVel = 28.0f;
 
     bowling_ball_set_hitbox();
@@ -234,12 +233,12 @@ void bhv_bob_pit_bowling_ball_loop(void) {
 }
 
 void bhv_free_bowling_ball_init(void) {
-    o->oGravity = 5.5f;
+    o->oGravity  = 5.5f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 2.0f;
     vec3_copy(&o->oHomeVec, &o->oPosVec);
-    o->oForwardVel = 0;
-    o->oMoveAngleYaw = 0;
+    o->oForwardVel   = 0x0;
+    o->oMoveAngleYaw = 0x0;
 }
 
 void bhv_free_bowling_ball_roll_loop(void) {
