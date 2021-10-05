@@ -1299,7 +1299,11 @@ u32 interact_hit_from_below(struct MarioState *m, UNUSED u32 interactType, struc
 #endif
                 return drop_and_set_mario_action(m, ACT_TWIRLING, 0);
             } else {
+#ifdef BETTER_BOUNCE
+                bounce_off_object(m, obj, (m->input & INPUT_A_DOWN) ? 60.0f : 30.0f);
+#else
                 bounce_off_object(m, obj, 30.0f);
+#endif
             }
         }
     } else if (take_damage_and_knock_back(m, obj)) {
@@ -1337,7 +1341,11 @@ u32 interact_bounce_top(struct MarioState *m, UNUSED u32 interactType, struct Ob
 #endif
                 return drop_and_set_mario_action(m, ACT_TWIRLING, 0);
             } else {
+#ifdef BETTER_BOUNCE
+                bounce_off_object(m, obj, (m->input & INPUT_A_DOWN) ? 60.0f : 30.0f);
+#else
                 bounce_off_object(m, obj, 30.0f);
+#endif
             }
         }
     } else if (take_damage_and_knock_back(m, obj)) {
