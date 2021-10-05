@@ -286,7 +286,7 @@ void change_area(s32 index) {
         gMarioObject->oActiveParticleFlags = 0;
     }
 
-    if (areaFlags & 0x01) {
+    if (areaFlags & AREA_FLAG_LOAD) {
         gMarioObject->header.gfx.areaIndex = index, gMarioSpawnInfo->areaIndex = index;
     }
 }

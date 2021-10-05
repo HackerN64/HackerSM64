@@ -100,7 +100,7 @@ void snowmans_bottom_act_3(void) {
         cur_obj_become_intangible();
     }
 
-    if ((collisionFlags & 0x01) != 0) {
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         spawn_mist_particles_variable(0, 0, 70.0f);
         o->oPosX = -4230.0f;
         o->oPosZ = 1813.0f;

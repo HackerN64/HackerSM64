@@ -1725,7 +1725,7 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileNum, s16 courseNum) 
 
     u16 nextStar = 0;
 
-    if (starFlags & 0x40) {
+    if (starFlags & STAR_FLAG_ACT_100_COINS) {
         starCount--;
         print_generic_string(x + 89, y - 5, textStar);
     }
