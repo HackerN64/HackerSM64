@@ -276,17 +276,17 @@ extern u32		osViGetCurrentLine(void);
 extern u32		osViGetCurrentField(void);
 extern void		*osViGetCurrentFramebuffer(void);
 extern void		*osViGetNextFramebuffer(void);
-extern void		osViSetXScale(f32);
-extern void		osViSetYScale(f32);
-extern void		osViExtendVStart(u32);
-extern void		osViSetSpecialFeatures(u32);
-extern void		osViSetMode(OSViMode *);
-extern void		osViSetEvent(OSMesgQueue *, OSMesg, u32);
-extern void		osViSwapBuffer(void *);
-extern void		osViBlack(u8);
-extern void		osViFade(u8, u16);
-extern void		osViRepeatLine(u8);
-extern void		osCreateViManager(OSPri);
+extern void		osViSetXScale(f32 xscale);
+extern void		osViSetYScale(f32 yscale);
+extern void		osViExtendVStart(u32 value);
+extern void		osViSetSpecialFeatures(u32 func);
+extern void		osViSetMode(OSViMode *mode);
+extern void		osViSetEvent(OSMesgQueue *mq, OSMesg msg, u32 retraceCount);
+extern void		osViSwapBuffer(void *vaddr);
+extern void		osViBlack(u8 active);
+extern void		osViFade(u8 active, u16 factor);
+extern void		osViRepeatLine(u8 active);
+extern void		osCreateViManager(OSPri pri);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
