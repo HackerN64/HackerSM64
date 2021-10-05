@@ -63,7 +63,7 @@
 // J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
 // [MAKE SURE TO ALSO BUILD FROM JP/SH AND EU TO OBTAIN THE ASSETS]
 // If this is disabled, backup assets will be used.
-#define COMPLETE_EN_US_SEGMENT2
+//#define COMPLETE_EN_US_SEGMENT2
 /// Removes multi-language cake screen
 #define EU_CUSTOM_CAKE_FIX 1
 // Adds multiple languages to the game. Just a placeholder for the most part, because it only works with EU, and must be enabled with EU.
