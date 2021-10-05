@@ -2,14 +2,14 @@
 
 struct ObjectHitbox sYellowCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
+    /* downOffset:        */   0,
+    /* damageOrCoinValue: */   1,
+    /* health:            */   0,
+    /* numLootCoins:      */   0,
     /* radius:            */ 100,
-    /* height:            */ 64,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    /* height:            */  64,
+    /* hurtboxRadius:     */   0,
+    /* hurtboxHeight:     */   0,
 };
 
 s16 sCoinArrowPositions[][2] = { {   0, -150 }, {    0, -50 }, {  0,  50 }, {   0, 150 },
@@ -71,17 +71,20 @@ void bhv_coin_init(void) {
 }
 
 void bhv_coin_loop(void) {
-    struct Surface *floor;
-    s16 targetYaw;
     cur_obj_update_floor_and_walls();
     cur_obj_if_hit_wall_bounce_away();
     cur_obj_move_standard(-62);
-    floor = o->oFloor;
+    struct Surface *floor = o->oFloor;
     if (floor != NULL) {
-        o->oBounciness = 0;
-        if (floor->normal.y < 0.9f) {
-            targetYaw = SURFACE_YAW(floor);
-            cur_obj_rotate_yaw_toward(targetYaw, 0x400);
+        if (o->oMoveFlags & OBJ_MOVE_ON_GROUND) {
+            o->oAction = BOUNCING_COIN_ACT_BOUNCING;
+        }
+        if (o->oAction == BOUNCING_COIN_ACT_BOUNCING) {
+            o->oBounciness = 0;
+            if (floor->normal.y < 0.9f) {
+                s16 targetYaw = SURFACE_YAW(floor);
+                cur_obj_rotate_yaw_toward(targetYaw, 0x400);
+            }
         }
     }
     if (o->oTimer == 0)
@@ -127,7 +130,7 @@ void bhv_coin_formation_spawn_loop(void) {
                 obj_mark_for_deletion(o);
             } else {
                 o->oPosY = o->oFloorHeight;
-                }
+            }
         } else {
             cur_obj_update_floor_height();
             if (absf(o->oPosY - o->oFloorHeight) > 250.0f) {
@@ -147,33 +150,33 @@ void bhv_coin_formation_spawn_loop(void) {
 
 void spawn_coin_in_formation(s32 index, s32 shape) {
     Vec3i pos = { 0, 0, 0 };
-    s32 spawnCoin = TRUE;
+    s32 spawnCoin    = TRUE;
     s32 snapToGround = TRUE;
-    switch (shape & 0x7) {
-        case COIN_FORMATION_BP_HORIZONTAL_LINE:
+    switch (shape & COIN_FORMATION_BP_SHAPE_MASK) {
+        case COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE:
             pos[2] = (160 * (index - 2));
             if (index > 4) spawnCoin = FALSE;
             break;
-        case COIN_FORMATION_BP_VERTICAL_LINE:
+        case COIN_FORMATION_BP_SHAPE_VERTICAL_LINE:
             snapToGround = FALSE;
             pos[1] = (160 * index * 0.8f); // 128 * index
             if (index > 4) spawnCoin = FALSE;
             break;
-        case COIN_FORMATION_BP_HORIZONTAL_RING:
+        case COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING:
             pos[0] = (sins(index << 13) * 300.0f);
             pos[2] = (coss(index << 13) * 300.0f);
             break;
-        case COIN_FORMATION_BP_VERTICAL_RING:
+        case COIN_FORMATION_BP_SHAPE_VERTICAL_RING:
             snapToGround = FALSE;
             pos[0] = (coss(index << 13) * 200.0f);
             pos[1] = (sins(index << 13) * 200.0f) + 200.0f;
             break;
-        case COIN_FORMATION_BP_ARROW:
+        case COIN_FORMATION_BP_SHAPE_ARROW:
             pos[0] = sCoinArrowPositions[index][0];
             pos[2] = sCoinArrowPositions[index][1];
             break;
     }
-    if (shape & 0x10) snapToGround = FALSE;
+    if (shape & COIN_FORMATION_BP_FLYING) snapToGround = FALSE;
     if (spawnCoin) {
         struct Object *newCoin = spawn_object_relative(index, pos[0], pos[1], pos[2], o, MODEL_YELLOW_COIN, bhvCoinFormationSpawn);
         newCoin->oCoinSnapToGround = snapToGround;
