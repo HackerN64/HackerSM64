@@ -3342,7 +3342,7 @@ ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 #else
 // 0x0700B4A0 - 0x0700B4A2
 ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
-#include "levels/intro/2_copyright.rgba16.inc.c"
+#include "levels/intro/made_with_hackersm64.custom.rgba16.inc.c"
 };
 #endif
 
@@ -3366,6 +3366,7 @@ ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 const Gfx intro_seg7_dl_copyright_trademark[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_DECALFADE, G_CC_DECALFADE),
+    gsDPSetTextureFilter(G_TF_POINT),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
 
     gsDPLoadTextureBlock(intro_seg7_texture_copyright, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 7, 4, G_TX_NOLOD, G_TX_NOLOD),
@@ -3382,6 +3383,7 @@ const Gfx intro_seg7_dl_copyright_trademark[] = {
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsDPSetEnvColor(255, 255, 255, 255),
     gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetTextureFilter(G_TF_BILERP),
     gsSPEndDisplayList(),
 };
 
