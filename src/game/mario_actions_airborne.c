@@ -668,7 +668,11 @@ s32 act_riding_shell_air(struct MarioState *m) {
 s32 act_twirling(struct MarioState *m) {
     s16 startTwirlYaw = m->twirlYaw;
     s16 yawVelTarget;
-
+#ifdef Z_TWIRL
+    if (m->input & INPUT_Z_DOWN) {
+        yawVelTarget = 0x2800;
+    } else
+#endif
     if (m->input & INPUT_A_DOWN) {
         yawVelTarget = 0x2000;
     } else {

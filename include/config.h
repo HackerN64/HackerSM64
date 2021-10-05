@@ -123,6 +123,8 @@
 #define EASIER_LONG_JUMPS
 // Holding A while bouncing on an enemy will bounce Mario higher
 #define BETTER_BOUNCE
+// Hold Z while twirling to descend faster
+#define Z_TWIRL
 // Allows Mario to jump kick on steep surfaces that are set to be non slippery, instead of being forced to dive
 #define JUMP_KICK_FIX
 // Allow Mario to grab hangable ceilings from any state
