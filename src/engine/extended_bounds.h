@@ -54,11 +54,13 @@ STATIC_ASSERT(((EXTENDED_BOUNDS_MODE >= 0) && (EXTENDED_BOUNDS_MODE <= 3)), "You
 // The amount of cells in each axis in an area.
 #define NUM_CELLS                   (2 * LEVEL_BOUNDARY_MAX / CELL_SIZE)
 // The maximum amount of collision surfaces (static and dynamic combined)
-#define SURFACE_POOL_SIZE           (LEVEL_BOUNDARY_MAX / 2) // Vanilla: 2300. Modes: 0: 4096, 1: 8192, 2: 8192, 3: 16384
-// How many SurfaceNodes can fit in Surface. This is done so that the maximum sizes for both can contain the same amount.
-#define SURFACE_NODE_STRUCT_DIFF    3.5 // = (56 / 16) = (sizeof(struct Surface) / sizeof(struct SurfaceNode))
-// The maximum amount of SurfaceNodes (static and dynamic combined)
-#define SURFACE_NODE_POOL_SIZE      (s32)(SURFACE_POOL_SIZE * SURFACE_NODE_STRUCT_DIFF) // Vanilla: 7000. Modes: 0: 14336, 1: 28672, 2: 28672, 3: 57344
+#define SURFACE_POOL_SIZE           (LEVEL_BOUNDARY_MAX / 2) // Vanilla: 2300
+// The maximum amount of SurfaceNodes (static and dynamic combined).
+// Each cell has a SurfaceNode for every surface which intersects it,
+// so each cell a surface intersects with gets its own SurfaceNode.
+// Larger surfaces means more SurfaceNodes.
+// Multiply SURFACE_POOL_SIZE by the average amount of cells the surfaces intersect.
+#define SURFACE_NODE_POOL_SIZE      (SURFACE_POOL_SIZE * 4) // Vanilla: 7000
 
 // Flags for error messages
 #define NOT_ENOUGH_ROOM_FOR_SURFACES (1 << 0)

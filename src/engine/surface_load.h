@@ -29,8 +29,8 @@ extern SpatialPartitionCell  gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 extern SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
 extern struct SurfaceNode *sSurfaceNodePool;
 extern struct Surface     *sSurfacePool;
-extern s16 sSurfaceNodePoolSize;
-extern s16 sSurfacePoolSize;
+extern s32 sSurfaceNodePoolSize;
+extern s32 sSurfacePoolSize;
 
 void alloc_surface_pools(void);
 #ifdef NO_SEGMENTED_MEMORY

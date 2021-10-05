@@ -216,7 +216,7 @@
     #define MOV_YCOIN_ACT_BLINKING                          0x1
 
 /* Coin Formation */
-    /* (oBehParams2ndByte & 0x7) */
+    /* oBehParams2ndByte */
     #define COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE         0x00
     #define COIN_FORMATION_BP_SHAPE_VERTICAL_LINE           0x01
     #define COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING         0x02

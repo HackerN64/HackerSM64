@@ -19,8 +19,8 @@
 // Macros for retrieving arguments from behavior scripts.
 #define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
 #define BHV_CMD_GET_2ND_U8(index)  (u8)((gCurBhvCommand[index] >> 16) & 0xFF)
-#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >> 8) & 0xFF)
-#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index]) & 0xFF)
+#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >>  8) & 0xFF)
+#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index]      ) & 0xFF)
 
 #define BHV_CMD_GET_1ST_S16(index) (s16)(gCurBhvCommand[index] >> 16)
 #define BHV_CMD_GET_2ND_S16(index) (s16)(gCurBhvCommand[index] & 0xFFFF)

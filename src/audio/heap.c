@@ -1709,7 +1709,6 @@ struct UnkEntry *unk_pool2_alloc(u32 size) {
 void func_sh_802f23ec(void) {
     s32 i;
     s32 idx;
-    s32 seqCount;
     s32 bankId1;
     s32 bankId2;
     s32 instId;
@@ -1718,7 +1717,7 @@ void func_sh_802f23ec(void) {
     struct Instrument *inst;
     struct UnkEntry *entry = NULL; //! @bug: not initialized but nevertheless used
 
-    seqCount = gAlCtlHeader->seqCount;
+    s32 seqCount = gAlCtlHeader->seqCount;
     for (idx = 0; idx < seqCount; idx++) {
         bankId1 = gCtlEntries[idx].bankId1;
         bankId2 = gCtlEntries[idx].bankId2;

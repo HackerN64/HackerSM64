@@ -35,12 +35,12 @@ struct Surface     *sSurfacePool;
 /**
  * The size of the surface node pool (SURFACE_NODE_POOL_SIZE).
  */
-s16 sSurfaceNodePoolSize = SURFACE_NODE_POOL_SIZE;
+s32 sSurfaceNodePoolSize = SURFACE_NODE_POOL_SIZE;
 
 /**
  * The size of the surface pool (SURFACE_POOL_SIZE).
  */
-s16 sSurfacePoolSize = SURFACE_POOL_SIZE;
+s32 sSurfacePoolSize = SURFACE_POOL_SIZE;
 
 u8 gSurfacePoolError = 0;
 
