@@ -263,6 +263,8 @@
 //#define VISUAL_DEBUG
 // Open all courses and doors. Used for debugging purposes to unlock all content.
 //#define UNLOCK_ALL
+// Use HD versions of the intro splash screen textures. This includes "Made with HackerSM64".
+#define HD_INTRO_TEXTURES
 
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
 

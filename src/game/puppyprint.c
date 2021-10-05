@@ -858,7 +858,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
         textPos[0] = -wideX[0];
     }
     lines = 0;
-    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, 0, 0, 0, 0, 0);
+    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     for (i = 0; i < tx; i++) {
         if (str[i] == '#') {
             i++;
