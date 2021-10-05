@@ -16,12 +16,12 @@
 #include "make_const_nonconst.h"
 #include "levels/totwc/header.h"
 
-static const LevelScript script_func_local_hmc_flames_and_poles[] = {
+static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_CAP_SWITCH, /*pos*/   0, -2047, 10, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvCapSwitch),
     RETURN(),
 };
 
-static const LevelScript script_func_local_hmc_platforms[] = {
+static const LevelScript script_func_local_2[] = {
     OBJECT(/*model*/ MODEL_NONE,       /*pos*/ 800, -1700,  0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenRedCoinStar),
     RETURN(),
 };
@@ -47,8 +47,8 @@ const LevelScript level_totwc_entry[] = {
         WARP_NODE(/*id*/ 0xF3, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x20, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x26, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x23, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_hmc_platforms),
-        JUMP_LINK(script_func_local_hmc_flames_and_poles),
+        JUMP_LINK(script_func_local_2),
+        JUMP_LINK(script_func_local_1),
         TERRAIN(/*terrainData*/ totwc_seg7_collision),
         MACRO_OBJECTS(/*objList*/ totwc_seg7_macro_objs),
         SHOW_DIALOG(/*index*/ 0x00, DIALOG_131),

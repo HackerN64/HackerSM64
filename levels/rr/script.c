@@ -15,7 +15,7 @@
 #include "make_const_nonconst.h"
 #include "levels/rr/header.h"
 
-static const LevelScript script_func_local_hmc_flames_and_poles[] = {
+static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_RR_SLIDING_PLATFORM,         /*pos*/ -3400, -2038,  6564, /*angle*/  0,   0,   0, /*behParam*/ 0x02560000, /*beh*/ bhvSlidingPlatform2),
     OBJECT(/*model*/ MODEL_RR_SLIDING_PLATFORM,         /*pos*/ -2684, -1423,   -36, /*angle*/  0,   0,   0, /*behParam*/ 0x02590000, /*beh*/ bhvSlidingPlatform2),
     OBJECT(/*model*/ MODEL_RR_FLYING_CARPET,            /*pos*/  4571, -1782,  2036, /*angle*/  0, 180,   0, /*behParam*/ 0x00000000, /*beh*/ bhvPlatformOnTrack),
@@ -50,7 +50,7 @@ static const LevelScript script_func_local_hmc_flames_and_poles[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_hmc_platforms[] = {
+static const LevelScript script_func_local_2[] = {
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -5809, -1834,  5719, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlamethrower),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -4838, -1015,  4081, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlamethrower),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/  3301, -1834,  5617, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlamethrower),
@@ -59,7 +59,7 @@ static const LevelScript script_func_local_hmc_platforms[] = {
     RETURN(),
 };
 
-static const LevelScript script_func_local_hmc_dorrie_and_spawners[] = {
+static const LevelScript script_func_local_3[] = {
     OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/  1450,  3400, -2352, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
     OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/ -4200,  6700, -4450, /*angle*/ 0, 0, 0, /*behParam*/ 0x01000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE, /*pos*/ -5150, -1400,     0, /*angle*/ 0, 0, 0, /*behParam*/ 0x02000000, /*beh*/ bhvHiddenRedCoinStar, /*acts*/ ALL_ACTS),
@@ -127,9 +127,9 @@ const LevelScript level_rr_entry[] = {
         WARP_NODE(/*id*/ 0x0C, /*destLevel*/ LEVEL_RR, /*destArea*/ 0x01, /*destNode*/ 0x0B, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x3A, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x02, /*destNode*/ 0x6C, /*flags*/ WARP_NO_CHECKPOINT),
-        JUMP_LINK(script_func_local_hmc_flames_and_poles),
-        JUMP_LINK(script_func_local_hmc_platforms),
-        JUMP_LINK(script_func_local_hmc_dorrie_and_spawners),
+        JUMP_LINK(script_func_local_1),
+        JUMP_LINK(script_func_local_2),
+        JUMP_LINK(script_func_local_3),
         TERRAIN(/*terrainData*/ rr_seg7_collision_level),
         MACRO_OBJECTS(/*objList*/ rr_seg7_macro_objs),
         SET_BACKGROUND_MUSIC(/*settingsPreset*/ 0x0000, /*seq*/ SEQ_LEVEL_SLIDE),

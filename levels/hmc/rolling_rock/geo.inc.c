@@ -1,5 +1,5 @@
 // 0x0E000548
-const GeoLayout hmc_geo_rolling_rock[] = {
+const GeoLayout hmc_geo_000548[] = {
    GEO_CULLING_RADIUS(300),
    GEO_OPEN_NODE(),
       GEO_SHADOW(SHADOW_CIRCLE_9_VERTS, 0xB4, 400),

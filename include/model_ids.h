@@ -110,13 +110,13 @@
 #define MODEL_CASTLE_CLOCK_PENDULUM            0x39        // castle_geo_001518
 
 // hmc
-#define MODEL_HMC_METAL_PLATFORM               0x36        // hmc_geo_controllable_arrow_platform
-#define MODEL_HMC_METAL_ARROW_PLATFORM         0x37        // hmc_geo_controllable_arrow_platform_button
-#define MODEL_HMC_ELEVATOR_PLATFORM            0x38        // hmc_geo_elevator_platform
-#define MODEL_HMC_ROLLING_ROCK                 0x39        // hmc_geo_rolling_rock
-#define MODEL_HMC_ROCK_PIECE                   0x3A        // hmc_geo_rolling_rock_fragment_large - unused
-#define MODEL_HMC_ROCK_SMALL_PIECE             0x3B        // hmc_geo_rolling_rock_fragment_small - unused
-#define MODEL_HMC_RED_GRILLS                   0x3C        // hmc_geo_grill_door
+#define MODEL_HMC_METAL_PLATFORM               0x36        // hmc_geo_0005A0
+#define MODEL_HMC_METAL_ARROW_PLATFORM         0x37        // hmc_geo_0005B8
+#define MODEL_HMC_ELEVATOR_PLATFORM            0x38        // hmc_geo_0005D0
+#define MODEL_HMC_ROLLING_ROCK                 0x39        // hmc_geo_000548
+#define MODEL_HMC_ROCK_PIECE                   0x3A        // hmc_geo_000570 - unused
+#define MODEL_HMC_ROCK_SMALL_PIECE             0x3B        // hmc_geo_000588 - unused
+#define MODEL_HMC_RED_GRILLS                   0x3C        // hmc_geo_000530
 
 // ssl
 #define MODEL_SSL_PYRAMID_TOP                  0x3A        // ssl_geo_000618
