@@ -1270,11 +1270,6 @@ void update_mario_joystick_inputs(struct MarioState *m) {
     }
 }
 
-Bool32 analog_stick_held_back(struct MarioState *m) {
-    s16 intendedDYaw = (m->intendedYaw - m->faceAngle[1]);
-    return ((intendedDYaw < -0x471C) || (intendedDYaw > 0x471C));
-}
-
 /**
  * Resolves wall collisions, and updates a variety of inputs.
  */

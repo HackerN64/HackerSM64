@@ -90,14 +90,11 @@
 #endif // DISABLE_EXIT_COURSE
 
 // -- MOVEMENT SETTINGS --
-// Fixes Mario's turn radius by making it dependent on forward speed.
-// Modes:
-// 0 is vanilla behavior.
-// 1 is similar to vanilla, but prevents Mario from moving in the wrong direction, and allows finer control with the analog stick.
-// 2 is similar to mode 1, but a bit further from vanilla, and allows instant turnaround if Mario is moving slower than a certain threshold.
-// 3 is instant turning to the intended direction regardless of speed and angle.
-// 4 is an experimental asymptotic turn.
-#define GROUND_TURN_MODE 0
+// Fixes Mario's turn ground radius by making it dependent on the analog stick magnitude.
+#define GROUND_TURN_FIX
+// Flips Mario around when running backwards really fast.
+// This can happen when sliding backwards off a slope onto a floor.
+//#define GROUND_SPEED_FLIP
 // Improved hanging:
 // - Doesn't require holding down the A button
 // - Percise turning control
