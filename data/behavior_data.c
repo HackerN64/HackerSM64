@@ -5072,6 +5072,20 @@ const BehaviorScript bhvGoombaTripletSpawner[] = {
     END_LOOP(),
 };
 
+#ifdef FLOOMBAS
+const BehaviorScript bhvFloomba[] = {
+    BEGIN(OBJ_LIST_PUSHABLE),
+    SET_INT(oIsFloomba, 1),
+    GOTO(bhvGoomba + 1),
+};
+
+const BehaviorScript bhvFloombaTripletSpawner[] = {
+    BEGIN(OBJ_LIST_PUSHABLE),
+    SET_INT(oIsFloomba, 1),
+    GOTO(bhvGoombaTripletSpawner + 1),
+};
+#endif
+
 const BehaviorScript bhvChainChomp[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),

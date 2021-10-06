@@ -89,9 +89,20 @@ void bhv_goomba_triplet_spawner_update(void) {
                     dx = 500.0f * coss(angle);
                     dz = 500.0f * sins(angle);
 
+#ifdef FLOOMBAS
+                    if (o->oIsFloomba)
+                        spawn_object_relative((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK)
+                                                | (goombaFlag >> 6),
+                                            dx, 0, dz, o, MODEL_GOOMBA, bhvFloomba);
+                    else
+                        spawn_object_relative((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK)
+                                                | (goombaFlag >> 6),
+                                            dx, 0, dz, o, MODEL_GOOMBA, bhvGoomba);
+#else
                     spawn_object_relative((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK)
                                               | (goombaFlag >> 6),
                                           dx, 0, dz, o, MODEL_GOOMBA, bhvGoomba);
+#endif
                 }
             }
 
@@ -119,6 +130,11 @@ void bhv_goomba_init(void) {
     o->oDamageOrCoinValue = sGoombaProperties[o->oGoombaSize].damage;
 
     o->oGravity = -8.0f / 3.0f * o->oGoombaScale;
+
+#ifdef FLOOMBAS
+    if (o->oIsFloomba)
+        o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
+#endif
 }
 
 /**
@@ -278,6 +294,10 @@ void bhv_goomba_update(void) {
 
         cur_obj_scale(o->oGoombaScale);
         obj_update_blinking(&o->oGoombaBlinkTimer, 30, 50, 5);
+#ifdef FLOOMBAS
+        if (o->oIsFloomba)
+            o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
+#endif
         cur_obj_update_floor_and_walls();
 
         if ((animSpeed = o->oForwardVel / o->oGoombaScale * 0.4f) < 1.0f) {
@@ -311,5 +331,9 @@ void bhv_goomba_update(void) {
         cur_obj_move_standard(-78);
     } else {
         o->oAnimState = TRUE;
+#ifdef FLOOMBAS
+        if (o->oIsFloomba)
+            o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
+#endif
     }
 }

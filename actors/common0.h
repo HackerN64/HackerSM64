@@ -146,6 +146,10 @@ extern const Gfx goomba_seg8_dl_0801B560[];
 extern const Gfx goomba_seg8_dl_0801B5A0[];
 extern const Gfx goomba_seg8_dl_0801B5C8[];
 extern const Gfx goomba_seg8_dl_0801B5F0[];
+#ifdef FLOOMBAS
+extern const Gfx floomba_seg8_dl_face[];
+extern const Gfx floomba_seg8_dl_blink[];
+#endif
 extern const Gfx goomba_seg8_dl_0801B658[];
 extern const Gfx goomba_seg8_dl_0801B690[];
 extern const Gfx goomba_seg8_dl_0801CE20[];

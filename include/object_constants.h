@@ -1332,6 +1332,10 @@
     /* oAnimState */
     #define GOOMBA_ANIM_STATE_EYES_OPEN                     OBJ_BLINKING_ANIM_STATE_EYES_OPEN
     #define GOOMBA_ANIM_STATE_EYES_CLOSED                   OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
+#ifdef FLOOMBAS
+    #define FLOOMBA_ANIM_STATE_EYES_OPEN                    (OBJ_BLINKING_ANIM_STATE_EYES_OPEN + 2)
+    #define FLOOMBA_ANIM_STATE_EYES_CLOSED                  (OBJ_BLINKING_ANIM_STATE_EYES_CLOSED + 2)
+#endif
     /* Animations */
     #define GOOMBA_ANIM_DEFAULT                             0x0
 
