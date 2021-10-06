@@ -25,6 +25,7 @@
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "main.h"
+#include "color_presets.h"
 
 #ifdef PUPPYCAM
 
