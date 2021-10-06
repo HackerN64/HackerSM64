@@ -2482,6 +2482,62 @@ const Gfx dl_billboard_num_9[] = {
     gsSPEndDisplayList(),
 };
 
+#ifdef DIALOG_INDICATOR
+const Gfx dl_billboard_num_A[] = {
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_A),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_billboard_num_B[] = {
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_B),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_billboard_num_C[] = {
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_C),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_billboard_num_D[] = {
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_D),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_billboard_num_E[] = {
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_E),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+};
+
+const Gfx dl_billboard_num_F[] = {
+    gsSPDisplayList(dl_billboard_num_begin),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_hud_char_F),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
+    gsSPDisplayList(dl_billboard_num_end),
+    gsSPEndDisplayList(),
+};
+#endif
+
 #ifdef HD_SHADOWS
 ALIGNED8 static const Texture texture_shadow_quarter_circle_64[] = {
 #include "textures/segment2/shadow_quarter_circle_64.ia8.inc.c"
