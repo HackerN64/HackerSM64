@@ -279,6 +279,6 @@
 #undef GODDARD_EASTER_EGG
 #define DISABLE_DEMO
 #endif
-#ifdef HD_INTRO_TEXTURES
+#if defined(HD_INTRO_TEXTURES) && !defined(FLOOMBAS)
 #define FLOOMBAS
 #endif
