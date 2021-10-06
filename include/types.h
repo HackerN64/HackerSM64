@@ -377,6 +377,12 @@ struct Surface
     /*0x2C*/ struct Object *object;
 };
 
+#define PUNCH_STATE_TIMER_MASK          0b00111111
+#define PUNCH_STATE_TYPES_MASK          0b11000000
+#define PUNCH_STATE_TYPE_FIRST_PUNCH    (0 << 6)
+#define PUNCH_STATE_TYPE_SECOND_PUNCH   (1 << 6)
+#define PUNCH_STATE_TYPE_KICK           (2 << 6)
+
 struct MarioBodyState
 {
     /*0x00*/ u32 action;

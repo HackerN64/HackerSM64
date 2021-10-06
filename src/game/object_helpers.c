@@ -1684,8 +1684,7 @@ void cur_obj_spawn_particles(struct SpawnParticlesInfo *info) {
         numParticles = 10;
     }
 
-    // We're close to running out of object slots, so don't spawn particles at
-    // all
+    // We're close to running out of object slots, so don't spawn particles at all
     if (gPrevFrameObjectCount > (OBJECT_POOL_CAPACITY - 30)) {
         numParticles = 0;
     }
