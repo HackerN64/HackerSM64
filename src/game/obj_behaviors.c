@@ -40,6 +40,7 @@
  * specific behaviors. Few functions besides the bhv_ functions are used elsewhere in the repo.
  */
 
+#define OBJ_COL_FLAGS_NONE      (0 << 0)
 #define OBJ_COL_FLAG_GROUNDED   (1 << 0)
 #define OBJ_COL_FLAG_HIT_WALL   (1 << 1)
 #define OBJ_COL_FLAG_UNDERWATER (1 << 2)
@@ -166,7 +167,7 @@ s32 obj_find_wall(f32 objNewX, f32 objY, f32 objNewZ, f32 objVelX, f32 objVelZ) 
 /**
  * Turns an object away from steep floors, similarly to walls.
  */
-s8 turn_obj_away_from_steep_floor(struct Surface *objFloor, f32 floorY, f32 objVelX, f32 objVelZ) {
+s32 turn_obj_away_from_steep_floor(struct Surface *objFloor, f32 floorY, f32 objVelX, f32 objVelZ) {
     f32 floor_nX, floor_nY, floor_nZ, objVelXCopy, objVelZCopy, objYawX, objYawZ;
 
     if (objFloor == NULL) {
@@ -214,13 +215,8 @@ void obj_orient_graph(struct Object *obj, f32 normalX, f32 normalY, f32 normalZ)
         return;
     }
 
-    objVisualPosition[0] = obj->oPosX;
-    objVisualPosition[1] = obj->oPosY + obj->oGraphYOffset;
-    objVisualPosition[2] = obj->oPosZ;
-
-    surfaceNormals[0] = normalX;
-    surfaceNormals[1] = normalY;
-    surfaceNormals[2] = normalZ;
+    vec3_copy_y_off(objVisualPosition, &obj->oPosVec, obj->oGraphYOffset);
+    vec3_set(surfaceNormals, normalX, normalY, normalZ);
 
     mtxf_align_terrain_normal(*throwMatrix, surfaceNormals, objVisualPosition, obj->oFaceAngleYaw);
     obj->header.gfx.throwMatrix = throwMatrix;
@@ -331,9 +327,9 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
 
         // Adds horizontal component of gravity for horizontal speed.
         f32 nxz = (sqr(floor_nX) + sqr(floor_nZ));
-        f32 nxyz = (nxz + sqr(floor_nY));
-        objVelX += floor_nX * (nxz) / (nxyz) * netYAccel * 2;
-        objVelZ += floor_nZ * (nxz) / (nxyz) * netYAccel * 2;
+        f32 velm = ((nxz / (nxz + sqr(floor_nY))) * netYAccel * 2);
+        objVelX += (floor_nX * velm);
+        objVelZ += (floor_nZ * velm);
     }
 
     if (objVelX < NEAR_ZERO && objVelX > -NEAR_ZERO) objVelX = 0;
@@ -391,27 +387,27 @@ void obj_splash(s32 waterY, s32 objY) {
  * Returns flags for certain interactions.
  */
 s32 object_step(void) {
-    f32 objX = o->oPosX;
-    f32 objY = o->oPosY;
-    f32 objZ = o->oPosZ;
+    Vec3f pos;
+    vec3_copy(pos, &o->oPosVec);
 
-    f32 floorY;
     f32 waterY = FLOOR_LOWER_LIMIT_MISC;
 
-    f32 objVelX = o->oForwardVel * sins(o->oMoveAngleYaw);
-    f32 objVelZ = o->oForwardVel * coss(o->oMoveAngleYaw);
+    f32 objVelX = (o->oForwardVel * sins(o->oMoveAngleYaw));
+    f32 objVelZ = (o->oForwardVel * coss(o->oMoveAngleYaw));
+    f32 nextX = (pos[0] + objVelX);
+    f32 nextZ = (pos[2] + objVelZ);
 
-    s16 collisionFlags = 0;
+    s16 collisionFlags = OBJ_COL_FLAGS_NONE;
 
     // Find any wall collisions, receive the push, and set the flag.
-    if (obj_find_wall(objX + objVelX, objY, objZ + objVelZ, objVelX, objVelZ) == 0) {
+    if (obj_find_wall(nextX, pos[1], nextZ, objVelX, objVelZ) == 0) {
         collisionFlags += OBJ_COL_FLAG_HIT_WALL;
     }
 
-    floorY = find_floor(objX + objVelX, objY, objZ + objVelZ, &sObjFloor);
-    if (turn_obj_away_from_steep_floor(sObjFloor, floorY, objVelX, objVelZ) == 1) {
-        waterY = find_water_level(objX + objVelX, objZ + objVelZ);
-        if (waterY > objY) {
+    f32 floorY = find_floor(nextX, pos[1], nextZ, &sObjFloor);
+    if (turn_obj_away_from_steep_floor(sObjFloor, floorY, objVelX, objVelZ)) {
+        waterY = find_water_level(nextX, nextZ);
+        if (waterY > pos[1]) {
             calc_new_obj_vel_and_pos_y_underwater(sObjFloor, floorY, objVelX, objVelZ, waterY);
             collisionFlags += OBJ_COL_FLAG_UNDERWATER;
         } else {
@@ -419,8 +415,7 @@ s32 object_step(void) {
         }
     } else {
         // Treat any awkward floors similar to a wall.
-        collisionFlags +=
-            ((collisionFlags & OBJ_COL_FLAG_HIT_WALL) ^ OBJ_COL_FLAG_HIT_WALL);
+        collisionFlags += ((collisionFlags & OBJ_COL_FLAG_HIT_WALL) ^ OBJ_COL_FLAG_HIT_WALL);
     }
 
     obj_update_pos_vel_xz();
