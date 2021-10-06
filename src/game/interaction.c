@@ -631,7 +631,7 @@ void bounce_back_from_attack(struct MarioState *m, u32 interaction) {
         if (m->action == ACT_PUNCHING) {
             m->action = ACT_MOVE_PUNCHING;
         }
-        mario_set_forward_vel(m, ((m->action & ACT_FLAG_AIR) ? -16.0f : 48.0f));
+        mario_set_forward_vel(m, ((m->action & ACT_FLAG_AIR) ? -16.0f : -48.0f));
 
         set_camera_shake_from_hit(SHAKE_ATTACK);
         m->particleFlags |= PARTICLE_TRIANGLE;
@@ -1691,18 +1691,14 @@ u32 interact_text(struct MarioState *m, UNUSED u32 interactType, struct Object *
 void check_kick_or_punch_wall(struct MarioState *m) {
     if (m->flags & (MARIO_PUNCHING | MARIO_KICKING | MARIO_TRIPPING)) {
         struct WallCollisionData detector;
-        detector.x = m->pos[0] + 50.0f * sins(m->faceAngle[1]);
-        detector.z = m->pos[2] + 50.0f * coss(m->faceAngle[1]);
+        detector.x = m->pos[0] + (50.0f * sins(m->faceAngle[1]));
+        detector.z = m->pos[2] + (50.0f * coss(m->faceAngle[1]));
         detector.y = m->pos[1];
         detector.offsetY = 80.0f;
         detector.radius = 5.0f;
-
         if (find_wall_collisions(&detector) > 0) {
             if (m->action != ACT_MOVE_PUNCHING || m->forwardVel >= 0.0f) {
-                if (m->action == ACT_PUNCHING) {
-                    m->action = ACT_MOVE_PUNCHING;
-                }
-
+                if (m->action == ACT_PUNCHING) m->action = ACT_MOVE_PUNCHING;
                 mario_set_forward_vel(m, -48.0f);
                 play_sound(SOUND_ACTION_HIT_2, m->marioObj->header.gfx.cameraToObject);
                 m->particleFlags |= PARTICLE_TRIANGLE;

@@ -52,7 +52,6 @@ s32 is_anim_at_end(struct MarioState *m) {
  */
 s32 is_anim_past_end(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
-
     return marioObj->header.gfx.animInfo.animFrame >= (marioObj->header.gfx.animInfo.curAnim->loopEnd - 2);
 }
 
@@ -1837,7 +1836,7 @@ void init_mario(void) {
 
     mario_reset_bodystate(gMarioState);
     update_mario_info_for_cam(gMarioState);
-    gMarioState->marioBodyState->punchState = 0;
+    gMarioState->marioBodyState->punchState = 0x0;
 
     vec3_copy(&gMarioState->marioObj->oPosVec, gMarioState->pos);
     vec3_copy(&gMarioState->marioObj->oMoveAngleVec, gMarioState->faceAngle);

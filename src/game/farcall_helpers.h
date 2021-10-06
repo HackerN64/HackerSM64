@@ -70,8 +70,7 @@ void obj_unused_die(void);
 void obj_set_knockback_action(s32 attackType);
 void obj_set_squished_action(void);
 s32 obj_die_if_above_lava_and_health_non_positive(void);
-s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction,
-                              u8 *attackHandlers);
+s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction, u8 *attackHandlers);
 void obj_act_knockback(UNUSED f32 baseScale);
 void obj_act_squished(f32 baseScale);
 s32 obj_update_standard_actions(f32 scale);

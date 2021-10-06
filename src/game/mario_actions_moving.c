@@ -206,8 +206,8 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     //! Speed is capped a frame late (butt slide HSG)
     m->forwardVel = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
     if (m->forwardVel > 100.0f) {
-        m->slideVelX = m->slideVelX * 100.0f / m->forwardVel;
-        m->slideVelZ = m->slideVelZ * 100.0f / m->forwardVel;
+        m->slideVelX = ((m->slideVelX * 100.0f) / m->forwardVel);
+        m->slideVelZ = ((m->slideVelZ * 100.0f) / m->forwardVel);
     }
 
     if (newFacingDYaw < -0x4000 || newFacingDYaw > 0x4000) {
@@ -226,7 +226,7 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
 
     //! 10k glitch
     if (forward < 0.0f && m->forwardVel >= 0.0f) {
-        forward *= 0.5f + 0.5f * m->forwardVel / 100.0f;
+        forward *= (0.5f + ((0.5f * m->forwardVel) / 100.0f));
     }
 
     switch (mario_get_floor_class(m)) {
@@ -269,7 +269,7 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
 
     update_sliding_angle(m, accel, lossFactor);
 
-    if (!mario_floor_is_slope(m) && m->forwardVel * m->forwardVel < stopSpeed * stopSpeed) {
+    if (!mario_floor_is_slope(m) && sqr(m->forwardVel) < sqr(stopSpeed)) {
         mario_set_forward_vel(m, 0.0f);
         stopped = TRUE;
     }

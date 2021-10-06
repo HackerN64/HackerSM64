@@ -406,7 +406,7 @@ void puppyprint_render_profiler(void) {
 
         // Very little point printing useless info if Mayro doesn't even exist.
         if (gMarioState->marioObj) {
-            sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X", (s32)(gMarioState->pos[0]), (s32)(gMarioState->pos[1]), (s32)(gMarioState->pos[2]), (u16)(gMarioState->faceAngle[1]));
+            sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x", (s32)(gMarioState->pos[0]), (s32)(gMarioState->pos[1]), (s32)(gMarioState->pos[2]), (u16)(gMarioState->faceAngle[1]), (u32)(gMarioState->action & ACT_ID_MASK));
             print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
         }
         // Same for the camera, especially so because this will crash otherwise.
