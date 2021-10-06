@@ -5079,6 +5079,21 @@ const BehaviorScript bhvFloomba[] = {
     GOTO(bhvGoomba + 1),
 };
 
+#ifdef HD_INTRO_TEXTURES
+const BehaviorScript bhvFloombaStartup[] = {
+    BEGIN(OBJ_LIST_PUSHABLE),
+    SET_INT(oIsFloomba, 1),
+    SET_FLOAT(oDrawingDistance, 20000),
+    OR_INT(oFlags, OBJ_FLAG_ACTIVE_FROM_AFAR),
+    LOAD_ANIMATIONS(oAnimations, goomba_seg8_anims_0801DA4C),
+    SET_HOME(),
+    CALL_NATIVE(bhv_goomba_init),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_goomba_update),
+    END_LOOP(),
+};
+#endif
+
 const BehaviorScript bhvFloombaTripletSpawner[] = {
     BEGIN(OBJ_LIST_PUSHABLE),
     SET_INT(oIsFloomba, 1),
