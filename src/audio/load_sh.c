@@ -375,14 +375,12 @@ s32 func_sh_802f3024(s32 bankId, s32 instId, s32 arg2) {
         if (instr->normalRangeHi != 0x7F) {
             func_sh_802f2f38(instr->highNotesSound.sample, bankId);
         }
-        //! @bug missing return
     } else if (instId == 0x7F) {
         drum = get_drum(bankId, arg2);
         if (drum == NULL) {
             return -1;
         }
         func_sh_802f2f38(drum->sound.sample, bankId);
-        return 0;
     }
     return 0;
 }

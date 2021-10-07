@@ -1056,13 +1056,7 @@ static void select_current_sounds(u8 bank) {
                                       & (SOUND_DISCRETE | SOUNDARGS_MASK_STATUS);
                 if (isDiscreteAndStatus >= (SOUND_DISCRETE | SOUND_STATUS_PLAYING)
                     && sSoundBanks[bank][sCurrentSound[bank][i]].soundStatus != SOUND_STATUS_STOPPED) {
-//! @bug On JP, if a discrete sound that lowers the background music is
-//  interrupted in this way, it will keep the background music low afterward.
-//  There are only a few of these sounds, and it probably isn't possible to do
-//  it in practice without using a time stop glitch like triple star spawn.
-#ifndef VERSION_JP
                     update_background_music_after_sound(bank, sCurrentSound[bank][i]);
-#endif
 
                     sSoundBanks[bank][sCurrentSound[bank][i]].soundBits = NO_SOUND;
                     sSoundBanks[bank][sCurrentSound[bank][i]].soundStatus = SOUND_STATUS_STOPPED;
@@ -1197,14 +1191,7 @@ static f32 get_sound_volume(u8 bank, u8 soundIndex, f32 volumeRange) {
 #endif
 
         if (sSoundBanks[bank][soundIndex].soundBits & SOUND_VIBRATO) {
-#ifdef VERSION_JP
-            //! @bug Intensity is 0 when the sound is far away. Due to the subtraction below, it is possible to end up with a negative intensity.
-            // When it is, objects with a volumeRange of 1 can still occasionally be lightly heard.
-            if (intensity != 0.0)
-#else
-            if (intensity >= 0.08f)
-#endif
-            {
+            if (intensity >= 0.08f) {
                 intensity -= (f32)(gAudioRandom & 0xf) / US_FLOAT(192.0);
             }
         }
