@@ -2424,7 +2424,7 @@ void drop_queued_background_music(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-u16 get_current_background_music(void) {
+u32 get_current_background_music(void) {
     if (sBackgroundMusicQueueSize != 0) {
         return (sBackgroundMusicQueue[0].priority << 8) + sBackgroundMusicQueue[0].seqId;
     }

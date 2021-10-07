@@ -417,12 +417,12 @@ void calculate_vertex_xyz(s8 index, struct Shadow s, f32 *xPosVtx, f32 *yPosVtx,
  * center vertex, as in the case with SHADOW_WITH_9_VERTS, which sets
  * the y-value from `find_floor`. (See the bottom of `calculate_vertex_xyz`.)
  */
-s16 floor_local_tilt(struct Shadow s, f32 vtxX, f32 vtxY, f32 vtxZ) {
+s32 floor_local_tilt(struct Shadow s, f32 vtxX, f32 vtxY, f32 vtxZ) {
     f32 relX = vtxX - s.parentX;
     f32 relY = vtxY - s.floorHeight;
     f32 relZ = vtxZ - s.parentZ;
 
-    return ((relX * s.floorNormalX) + (relY * s.floorNormalY) + (relZ * s.floorNormalZ));
+    return (s16)((relX * s.floorNormalX) + (relY * s.floorNormalY) + (relZ * s.floorNormalZ));
 }
 
 /**

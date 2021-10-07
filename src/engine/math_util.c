@@ -902,7 +902,7 @@ s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
     return current;
 }
 
-s16 abs_angle_diff(s16 a0, s16 a1) {
+s32 abs_angle_diff(s16 a0, s16 a1) {
     s16 diff = (a1 - a0);
     if (diff == -0x8000) diff = -0x7FFF;
     return ABSI(diff);
@@ -918,7 +918,7 @@ s16 abs_angle_diff(s16 a0, s16 a1) {
  * Compute the angle from (0, 0) to (x, y) as a s16. Given that terrain is in
  * the xz-plane, this is commonly called with (z, x) to get a yaw angle.
  */
-s16 atan2s(f32 y, f32 x) {
+s32 atan2s(f32 y, f32 x) {
     u16 ret;
     if (x >= 0) {
         if (y >= 0) {

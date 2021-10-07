@@ -15,7 +15,7 @@
  * Converts the rotation value supplied by macro objects into one
  * that can be used by in-game objects.
  */
-s16 convert_rotation(s16 inRotation) {
+s32 convert_rotation(s16 inRotation) {
     u16 rotation = ((u16)(inRotation & 0xFF) << 8);
     switch (rotation) {
         case 0x3F00: rotation = 0x4000; break;

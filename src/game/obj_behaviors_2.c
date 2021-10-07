@@ -77,7 +77,7 @@ static s32 obj_is_rendering_enabled(void) {
     return (o->header.gfx.node.flags & GRAPH_RENDER_ACTIVE);
 }
 
-static s16 obj_get_pitch_from_vel(void) {
+static s32 obj_get_pitch_from_vel(void) {
     return -atan2s(o->oForwardVel, o->oVelY);
 }
 
@@ -258,7 +258,7 @@ static void obj_rotate_yaw_and_bounce_off_walls(s16 targetYaw, s16 turnAmount) {
     cur_obj_rotate_yaw_toward(targetYaw, turnAmount);
 }
 
-static s16 obj_get_pitch_to_home(f32 latDistToHome) {
+static s32 obj_get_pitch_to_home(f32 latDistToHome) {
     return atan2s(latDistToHome, o->oPosY - o->oHomeY);
 }
 
@@ -327,7 +327,7 @@ static s32 cur_obj_play_sound_at_anim_range(s8 startFrame1, s8 startFrame2, u32 
     return FALSE;
 }
 
-static s16 obj_turn_pitch_toward_mario(f32 targetOffsetY, s16 turnAmount) {
+static s32 obj_turn_pitch_toward_mario(f32 targetOffsetY, s16 turnAmount) {
     o->oPosY -= targetOffsetY;
     s16 targetPitch = obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, turnAmount);
     o->oPosY += targetOffsetY;
@@ -395,16 +395,16 @@ static void obj_roll_to_match_yaw_turn(s16 targetYaw, s16 maxRoll, s16 rollSpeed
     obj_face_roll_approach(targetRoll, rollSpeed);
 }
 
-static s16 random_linear_offset(s16 base, s16 range) {
-    return base + (s16)(range * random_float());
+static s32 random_linear_offset(s16 base, s16 range) {
+    return (s16)(base + (s16)(range * random_float()));
 }
 
-static s16 random_mod_offset(s16 base, s16 step, s16 mod) {
-    return base + step * (random_u16() % mod);
+static s32 random_mod_offset(s16 base, s16 step, s16 mod) {
+    return (s16)(base + (step * (random_u16() % mod)));
 }
 
-static s16 obj_random_fixed_turn(s16 delta) {
-    return o->oMoveAngleYaw + (s16) random_sign() * delta;
+static s32 obj_random_fixed_turn(s16 delta) {
+    return (s16)(o->oMoveAngleYaw + ((s16) random_sign() * delta));
 }
 
 /**

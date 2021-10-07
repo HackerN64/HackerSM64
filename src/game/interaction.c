@@ -165,7 +165,7 @@ u32 object_facing_mario(struct MarioState *m, struct Object *obj, s16 angleRange
     return (dAngle <= angleRange);
 }
 
-s16 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj) {
+s32 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj) {
     f32 dx = obj->oPosX - m->pos[0];
     f32 dz = obj->oPosZ - m->pos[2];
 

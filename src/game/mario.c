@@ -58,7 +58,7 @@ s32 is_anim_past_end(struct MarioState *m) {
 /**
  * Sets Mario's animation without any acceleration, running at its default rate.
  */
-s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
+s32 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
     struct Object *marioObj = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -91,7 +91,7 @@ s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
  * Sets Mario's animation where the animation is sped up or
  * slowed down via acceleration.
  */
-s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
+s32 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
     struct Object *marioObj = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -176,7 +176,7 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
  * Rotates the animation's translation into the global coordinate system
  * and returns the animation's flags.
  */
-s16 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
+s32 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
     f32 dx, dz;
 
     struct Animation *curAnim = (void *) obj->header.gfx.animInfo.curAnim;
@@ -219,7 +219,7 @@ void update_mario_pos_for_anim(struct MarioState *m) {
 /**
  * Finds the vertical translation from Mario's animation.
  */
-s16 return_mario_anim_y_translation(struct MarioState *m) {
+s32 return_mario_anim_y_translation(struct MarioState *m) {
     Vec3s translation;
     find_mario_anim_flags_and_translation(m->marioObj, 0, translation);
 
@@ -612,7 +612,7 @@ f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f
 /**
  * Returns the slope of the floor based off points around Mario.
  */
-s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
+s32 find_floor_slope(struct MarioState *m, s16 yawOffset) {
     struct Surface *floor = m->floor;
     f32 forwardFloorY, backwardFloorY;
     s16 result;

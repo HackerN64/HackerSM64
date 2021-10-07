@@ -64,8 +64,8 @@ struct LandingAction sBackflipLandAction = {
 
 Mat4 sFloorAlignMatrix[2];
 
-s16 tilt_body_running(struct MarioState *m) {
-    return -(find_floor_slope(m, 0) * m->forwardVel / 40.0f);
+s32 tilt_body_running(struct MarioState *m) {
+    return (s16)(-(find_floor_slope(m, 0) * m->forwardVel / 40.0f));
 }
 
 void play_step_sound(struct MarioState *m, s16 frame1, s16 frame2) {

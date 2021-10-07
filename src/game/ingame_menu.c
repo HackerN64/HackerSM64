@@ -1228,7 +1228,7 @@ void dl_rgba16_stop_cutscene_msg_fade(void) {
     }
 }
 
-u8 ascii_to_credits_char(u8 c) {
+u32 ascii_to_credits_char(u8 c) {
     if (c >= 'A' && c <= 'Z') return (c - ('A' - 0xA));
     if (c >= 'a' && c <= 'z') return (c - ('a' - 0xA)); // remap lower to upper case
     if (c == ' ') return GLOBAL_CHAR_SPACE;

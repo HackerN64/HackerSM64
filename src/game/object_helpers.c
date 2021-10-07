@@ -1667,8 +1667,8 @@ void cur_obj_set_pos_via_transform(void) {
     vec3_add(&o->oPosVec, &o->oVelVec);
 }
 
-s16 cur_obj_reflect_move_angle_off_wall(void) {
-    return (o->oWallAngle - ((s16) o->oMoveAngleYaw - (s16) o->oWallAngle) + 0x8000);
+s32 cur_obj_reflect_move_angle_off_wall(void) {
+    return (s16)(o->oWallAngle - ((s16) o->oMoveAngleYaw - (s16) o->oWallAngle) + 0x8000);
 }
 
 void cur_obj_spawn_particles(struct SpawnParticlesInfo *info) {

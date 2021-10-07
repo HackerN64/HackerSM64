@@ -10,13 +10,13 @@
 
 s32 is_anim_at_end(struct MarioState *m);
 s32 is_anim_past_end(struct MarioState *m);
-s16 set_mario_animation(struct MarioState *m, s32 targetAnimID);
-s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel);
+s32 set_mario_animation(struct MarioState *m, s32 targetAnimID);
+s32 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel);
 void set_anim_to_frame(struct MarioState *m, s16 animFrame);
 s32 is_anim_past_frame(struct MarioState *m, s16 animFrame);
-s16 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation);
+s32 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation);
 void update_mario_pos_for_anim(struct MarioState *m);
-s16 return_mario_anim_y_translation(struct MarioState *m);
+s32 return_mario_anim_y_translation(struct MarioState *m);
 void play_sound_if_no_flag(struct MarioState *m, u32 soundBits, u32 flags);
 void play_mario_jump_sound(struct MarioState *m);
 void adjust_sound_for_speed(struct MarioState *m);
@@ -35,7 +35,7 @@ u32 mario_floor_is_slippery(struct MarioState *m);
 s32 mario_floor_is_slope(struct MarioState *m);
 s32 mario_floor_is_steep(struct MarioState *m);
 f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f32 distFromMario);
-s16 find_floor_slope(struct MarioState *m, s16 yawOffset);
+s32 find_floor_slope(struct MarioState *m, s16 yawOffset);
 Bool32 set_mario_wall(struct MarioState *m, struct Surface *wall);
 Bool32 set_mario_ceil(struct MarioState *m, struct Surface *ceil,  f32 ceilHeight);
 Bool32 set_mario_floor(struct MarioState *m, struct Surface *floor, f32 floorHeight);
