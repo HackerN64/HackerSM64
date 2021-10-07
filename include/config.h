@@ -171,6 +171,8 @@
 #define MUSHROOMS_HEAL
 // Collecting a Power Star will fully heal Mario.
 #define POWER_STARS_HEAL
+// The speed of a platform on a track can be controlled by standing near the front or back of it
+//#define CONTROLLABLE_PLATFORM_SPEED
 // The number of chain balls the Chain Chomp has.  Vanilla is 5.
 #define CHAIN_CHOMP_NUM_SEGMENTS 5
 // The number of parts Pokey has, including the head. Vanilla is 5, max is 30.
@@ -249,9 +251,9 @@
 // If you want the game to boot normally, just comment out the define again.
 //#define TEST_LEVEL LEVEL_BOB
 // Enable debug level select
-//#define DEBUG_LEVEL_SELECT
+#define DEBUG_LEVEL_SELECT
 // Enable debug free move (DPad up to enter, A to exit)
-//#define ENABLE_DEBUG_FREE_MOVE
+#define ENABLE_DEBUG_FREE_MOVE
 // Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
 //#define CUSTOM_DEBUG
 // Include Puppyprint, a display library for text and large images. Also includes a custom, enhanced performance profiler.

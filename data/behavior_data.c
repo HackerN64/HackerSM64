@@ -2119,7 +2119,7 @@ const BehaviorScript bhvCheckerboardElevatorGroup[] = {
 const BehaviorScript bhvCheckerboardPlatformSub[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_UCODE_LARGE)),
-    LOAD_COLLISION_DATA(checkerboard_platform_seg8_collision_0800D710),
+    LOAD_COLLISION_DATA(checkerboard_platform_seg8_collision_platform),
     CALL_NATIVE(bhv_checkerboard_platform_init),
     SET_HOME(),
     BEGIN_LOOP(),
@@ -3068,7 +3068,7 @@ const BehaviorScript bhvBetaBowserAnchor[] = {
 const BehaviorScript bhvStaticCheckeredPlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    LOAD_COLLISION_DATA(checkerboard_platform_seg8_collision_0800D710),
+    LOAD_COLLISION_DATA(checkerboard_platform_seg8_collision_platform),
     SET_HOME(),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_static_checkered_platform_loop),

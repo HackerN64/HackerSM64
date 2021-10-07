@@ -83,7 +83,7 @@ extern const Collision hmc_seg7_collision_elevator[];
 extern const Collision hmc_seg7_collision_0702B65C[];
 extern const Collision hmc_seg7_collision_controllable_platform[];
 extern const Collision hmc_seg7_collision_controllable_platform_sub[];
-extern const Trajectory hmc_seg7_trajectory_0702B86C[];
+extern const Trajectory hmc_seg7_trajectory_checkerboard_platform[];
 extern const struct MovtexQuadCollection hmc_movtex_dorrie_pool_water[];
 extern const struct MovtexQuadCollection hmc_movtex_toxic_maze_mist[];
 
