@@ -34,7 +34,7 @@ static void set_swimming_at_surface_particles(struct MarioState *m, u32 particle
     if (atSurface) {
         m->particleFlags |= particleFlag;
         if (atSurface ^ sWasAtSurface) {
-            play_sound(SOUND_ACTION_UNKNOWN431, m->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_ACTION_SWIM_SURFACE, m->marioObj->header.gfx.cameraToObject);
         }
     }
 
@@ -484,7 +484,7 @@ static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
 static void play_swimming_noise(struct MarioState *m) {
     s16 animFrame = m->marioObj->header.gfx.animInfo.animFrame;
     if (animFrame == 0 || animFrame == 12) {
-        play_sound(SOUND_ACTION_UNKNOWN434, m->marioObj->header.gfx.cameraToObject);
+        play_sound(SOUND_ACTION_FLUTTER_KICK, m->marioObj->header.gfx.cameraToObject);
     }
 }
 
@@ -973,9 +973,9 @@ static s32 act_water_plunge(struct MarioState *m) {
     stepResult = perform_water_step(m);
 
     if (m->actionState == 0) {
-        play_sound(SOUND_ACTION_UNKNOWN430, m->marioObj->header.gfx.cameraToObject);
+        play_sound(SOUND_ACTION_WATER_PLUNGE, m->marioObj->header.gfx.cameraToObject);
         if (m->peakHeight - m->pos[1] > FALL_DAMAGE_HEIGHT_SMALL) {
-            play_sound(SOUND_MARIO_HAHA_2, m->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_MARIO_HAHA_WATER, m->marioObj->header.gfx.cameraToObject);
         }
 
         m->particleFlags |= PARTICLE_WATER_SPLASH;

@@ -48,11 +48,11 @@ void bhv_big_bully_init(void) {
 
 void bully_check_mario_collision(void) {
     if (o->oAction != OBJ_ACT_LAVA_DEATH && o->oAction != OBJ_ACT_DEATH_PLANE_DEATH && o->oInteractStatus & INT_STATUS_INTERACTED) {
-        if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL)
-            cur_obj_play_sound_2(SOUND_OBJ2_BULLY_ATTACKED);
-        else
+        if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL) {
+            cur_obj_play_sound_2(SOUND_OBJ2_SMALL_BULLY_ATTACKED);
+        } else {
             cur_obj_play_sound_2(SOUND_OBJ2_LARGE_BULLY_ATTACKED);
-
+        }
         o->oInteractStatus &= ~INT_STATUS_INTERACTED;
         o->oAction = BULLY_ACT_KNOCKBACK;
         o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW; /* bit 3 */
@@ -138,9 +138,9 @@ void bully_play_stomping_sound(void) {
         case BULLY_ACT_PATROL:
             if (animFrame == 0 || animFrame == 12) {
                 if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL)
-                    cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALK);
+                    cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALK_SMALL);
                 else
-                    cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALKING);
+                    cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALK_LARGE);
             }
             break;
 
@@ -148,9 +148,9 @@ void bully_play_stomping_sound(void) {
         case BULLY_ACT_BACK_UP:
             if (animFrame == 0 || animFrame == 5) {
                 if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL)
-                    cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALK);
+                    cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALK_SMALL);
                 else
-                    cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALKING);
+                    cur_obj_play_sound_2(SOUND_OBJ_BULLY_WALK_LARGE);
             }
             break;
     }
@@ -172,11 +172,11 @@ void bully_step(void) {
 void bully_spawn_coin(void) {
     struct Object *coin = spawn_object(o, MODEL_YELLOW_COIN, bhvMovingYellowCoin);
 #ifdef VERSION_JP // TODO: maybe move this ifdef logic to the header?
-    cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT);
+    cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_JP);
 #elif defined(VERSION_EU) || defined(VERSION_SH)
-    cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_EU);
+    cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_EU_SH);
 #else
-    cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_2);
+    cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_US);
 #endif
     coin->oForwardVel = 10.0f;
     coin->oVelY = 100.0f;

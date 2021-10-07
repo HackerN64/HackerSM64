@@ -89,11 +89,11 @@ void bhv_coin_loop(void) {
     }
     if (o->oTimer == 0)
 #if defined(VERSION_US)
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_2);
+        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_US);
 #elif defined(VERSION_EU) || defined(VERSION_SH)
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_EU);
+        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_EU_SH);
 #else
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT);
+        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_JP);
 #endif
     if (o->oVelY < 0) {
         cur_obj_become_tangible();

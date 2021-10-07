@@ -106,7 +106,7 @@ void unagi_act_3(void) {
             cur_obj_init_animation_with_sound(UNAGI_ANIM_IDLE_2);
 
             if (o->oTimer > 60 && o->oUnagiDistanceToMario < 1000.0f) {
-                cur_obj_play_sound_2(SOUND_OBJ_EEL_2);
+                cur_obj_play_sound_2(SOUND_OBJ_EEL_EXIT_CAVE);
                 o->oUnagiNextForwardVel = o->oUnagiTargetNextForwardVel = 30.0f;
             } else {
                 o->oUnagiTargetNextForwardVel = 0.0f;

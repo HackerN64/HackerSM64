@@ -286,23 +286,23 @@ struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, s32 model, const
 /**
  * cutscene_take_cap_off: Put Mario's cap on.
  * Clears "cap on head" flag, sets "cap in hand" flag, plays sound
- * SOUND_ACTION_UNKNOWN43D.
+ * SOUND_ACTION_TAKE_OFF_CAP.
  */
 void cutscene_take_cap_off(struct MarioState *m) {
     m->flags &= ~MARIO_CAP_ON_HEAD;
     m->flags |= MARIO_CAP_IN_HAND;
-    play_sound(SOUND_ACTION_UNKNOWN43D, m->marioObj->header.gfx.cameraToObject);
+    play_sound(SOUND_ACTION_TAKE_OFF_CAP, m->marioObj->header.gfx.cameraToObject);
 }
 
 /**
  * cutscene_put_cap_on: Put Mario's cap on.
  * Clears "cap in hand" flag, sets "cap on head" flag, plays sound
- * SOUND_ACTION_UNKNOWN43E.
+ * SOUND_ACTION_PUT_ON_CAP.
  */
 void cutscene_put_cap_on(struct MarioState *m) {
     m->flags &= ~MARIO_CAP_IN_HAND;
     m->flags |= MARIO_CAP_ON_HEAD;
-    play_sound(SOUND_ACTION_UNKNOWN43E, m->marioObj->header.gfx.cameraToObject);
+    play_sound(SOUND_ACTION_PUT_ON_CAP, m->marioObj->header.gfx.cameraToObject);
 }
 
 /**
@@ -647,7 +647,7 @@ s32 act_star_dance_water(struct MarioState *m) {
 
 s32 act_fall_after_star_grab(struct MarioState *m) {
     if (m->pos[1] < m->waterLevel - 130) {
-        play_sound(SOUND_ACTION_UNKNOWN430, m->marioObj->header.gfx.cameraToObject);
+        play_sound(SOUND_ACTION_WATER_PLUNGE, m->marioObj->header.gfx.cameraToObject);
         m->particleFlags |= PARTICLE_WATER_SPLASH;
         return set_mario_action(m, ACT_STAR_DANCE_WATER, m->actionArg);
     }
@@ -1111,7 +1111,7 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
                     play_sound(SOUND_ACTION_PAT_BACK, m->marioObj->header.gfx.cameraToObject);
                     //! fall through
                 case 111:
-                    play_sound(SOUND_ACTION_UNKNOWN45C, m->marioObj->header.gfx.cameraToObject);
+                    play_sound(SOUND_ACTION_KEY_UNKNOWN45C, m->marioObj->header.gfx.cameraToObject);
                     // no break
             }
             handle_save_menu(m);

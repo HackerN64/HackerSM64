@@ -63,7 +63,7 @@ void bhv_boo_cage_loop(void) {
 
             // When the cage lands/bounces, play a landing/bouncing sound.
             if (o->oMoveFlags & OBJ_MOVE_LANDED) {
-                cur_obj_play_sound_2(SOUND_GENERAL_SOFT_LANDING);
+                cur_obj_play_sound_2(SOUND_GENERAL_BOO_CAGE_SOFT_LANDING);
             }
 
             // Once the cage stops bouncing and settles on the ground,

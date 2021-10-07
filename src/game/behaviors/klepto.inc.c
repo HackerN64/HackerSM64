@@ -30,12 +30,12 @@ static s32 klepto_set_and_check_if_anim_at_end(void) {
         cur_obj_set_anim_if_at_end(5);
     } else if (o->oSoundStateID == 5) {
         if (cur_obj_set_anim_if_at_end(0)) {
-            cur_obj_play_sound_2(SOUND_GENERAL_SWISH_WATER);
+            cur_obj_play_sound_2(SOUND_GENERAL_WING_FLAP);
             o->header.gfx.animInfo.animFrame = 9;
         }
     } else {
         if (cur_obj_check_anim_frame(9)) {
-            cur_obj_play_sound_2(SOUND_GENERAL_SWISH_WATER);
+            cur_obj_play_sound_2(SOUND_GENERAL_WING_FLAP);
         }
         return TRUE;
     }
@@ -50,7 +50,7 @@ static void klepto_anim_dive(void) {
         } else {
             if (o->oSoundStateID == 0) {
                 if (cur_obj_check_anim_frame(9)) {
-                    cur_obj_play_sound_2(SOUND_GENERAL_SWISH_WATER);
+                    cur_obj_play_sound_2(SOUND_GENERAL_WING_FLAP);
                     cur_obj_init_animation_with_sound(6);
                 }
             } else if (--o->oKleptoDiveTimer == 0) {
@@ -189,7 +189,7 @@ static void klepto_act_turn_toward_mario(void) {
 
     if (klepto_set_and_check_if_anim_at_end() && cur_obj_check_if_at_animation_end() && o->oKleptoDistanceToTarget > 800.0f
         && abs_angle_diff(o->oAngleToMario, o->oFaceAngleYaw) < 0x800 && o->oKleptoPitchToTarget < 0x400) {
-        cur_obj_play_sound_2(SOUND_OBJ_KLEPTO1);
+        cur_obj_play_sound_2(SOUND_OBJ_KLEPTO_TURN);
         o->oAction = KLEPTO_ACT_DIVE_AT_MARIO;
         o->oMoveAngleYaw = o->oFaceAngleYaw;
         o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
@@ -205,7 +205,7 @@ static void klepto_act_dive_at_mario(void) {
     approach_f32_ptr(&o->oKleptoSpeed, 60.0f, 10.0f);
     if (o->oSoundStateID == 2) {
         if (cur_obj_check_anim_frame(11)) {
-            cur_obj_play_sound_2(SOUND_GENERAL_SWISH_WATER);
+            cur_obj_play_sound_2(SOUND_GENERAL_WING_FLAP);
         }
 
         if (cur_obj_set_anim_if_at_end(0)) {
@@ -350,7 +350,7 @@ void bhv_klepto_update(void) {
         }
 
         if (obj_handle_attacks(&sKleptoHitbox, o->oAction, sKleptoAttackHandlers)) {
-            cur_obj_play_sound_2(SOUND_OBJ_KLEPTO2);
+            cur_obj_play_sound_2(SOUND_OBJ_KLEPTO_ATTACKED);
 
             if (o->oAnimState == KLEPTO_ANIM_STATE_HOLDING_CAP) {
                 save_file_clear_flags(SAVE_FLAG_CAP_ON_KLEPTO);

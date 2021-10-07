@@ -665,7 +665,7 @@ s32 obj_lava_death(void) {
     }
 
     if ((o->oTimer % 8) == 0) {
-        cur_obj_play_sound_2(SOUND_OBJ_BULLY_EXPLODE_2);
+        cur_obj_play_sound_2(SOUND_OBJ_BULLY_EXPLODE_LAVA);
         deathSmoke = spawn_object(o, MODEL_SMOKE, bhvBobombBullyDeathSmoke);
         deathSmoke->oPosX += random_float() * 20.0f;
         deathSmoke->oPosY += random_float() * 20.0f;

@@ -124,13 +124,13 @@ void bhv_snowmans_bottom_loop(void) {
         case 1:
             snowmans_bottom_act_1();
             adjust_rolling_face_pitch(o->oSnowmansBottomRollingFacePitch);
-            cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
+            cur_obj_play_sound_1(SOUND_ENV_BOWLING_BALL_ROLL);
             break;
 
         case 2:
             snowmans_bottom_act_2();
             adjust_rolling_face_pitch(o->oSnowmansBottomRollingFacePitch);
-            cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
+            cur_obj_play_sound_1(SOUND_ENV_BOWLING_BALL_ROLL);
             break;
 
         case 3:

@@ -1795,7 +1795,7 @@ s32 render_pause_courses_and_castle(void) {
             gDialogLineNum = MENU_OPT_DEFAULT;
             gDialogTextAlpha = 0;
             level_set_transition(-1, NULL);
-            play_sound(SOUND_MENU_PAUSE_HIGHPRIO, gGlobalSoundSource);
+            play_sound(SOUND_MENU_PAUSE_OPEN, gGlobalSoundSource);
 
             if (gCurrCourseNum >= COURSE_MIN && gCurrCourseNum <= COURSE_MAX) {
                 change_dialog_camera_angle();
@@ -1822,7 +1822,7 @@ s32 render_pause_courses_and_castle(void) {
             if (gPlayer3Controller->buttonPressed & A_BUTTON
              || gPlayer3Controller->buttonPressed & START_BUTTON) {
                 level_set_transition(0, NULL);
-                play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource);
+                play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;
                 gMenuMode = MENU_MODE_NONE;
 
@@ -1844,7 +1844,7 @@ s32 render_pause_courses_and_castle(void) {
             if (gPlayer3Controller->buttonPressed & A_BUTTON
              || gPlayer3Controller->buttonPressed & START_BUTTON) {
                 level_set_transition(0, NULL);
-                play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource);
+                play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gMenuMode = MENU_MODE_NONE;
                 gDialogBoxState = DIALOG_STATE_OPENING;
 
@@ -1929,7 +1929,7 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
         }
 
         if (gHudDisplay.coins == gCourseCompleteCoins && gGotFileCoinHiScore) {
-            play_sound(SOUND_MENU_MARIO_CASTLE_WARP2, gGlobalSoundSource);
+            play_sound(SOUND_MENU_HIGH_SCORE, gGlobalSoundSource);
         }
     }
 }
