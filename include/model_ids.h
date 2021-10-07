@@ -492,7 +492,7 @@
 #define MODEL_BURN_SMOKE_UNUSED           0x9C        // burn_smoke_geo - unused & duplicated
 // find me
 #define MODEL_WHITE_PARTICLE_DL           0x9E        // white_particle_dl
-#define MODEL_SAND_DUST                   0x9F        // sand_seg3_dl_0302BCD0
+#define MODEL_SAND_DUST                   0x9F        // sand_seg3_dl_particle
 #define MODEL_WHITE_PARTICLE              0xA0        // white_particle_dl
 #define MODEL_PEBBLE                      0xA1        // pebble_seg3_dl_0301CB00
 #define MODEL_LEAVES                      0xA2        // leaves_geo

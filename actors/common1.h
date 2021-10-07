@@ -247,18 +247,18 @@ extern const Gfx dl_breath_meter_health_segments_end[];
 #endif
 
 // sand
-extern const Gfx sand_seg3_dl_0302BCD0[];
+extern const Gfx sand_seg3_dl_particle[];
 
 // star
 extern const GeoLayout star_geo[];
-extern const Gfx star_seg3_dl_0302B7B0[];
+extern const Gfx star_seg3_sub_dl_body[];
 extern const Gfx star_seg3_dl_body[];
-extern const Gfx star_seg3_dl_0302B9C0[];
+extern const Gfx star_seg3_sub_dl_eyes[];
 extern const Gfx star_seg3_dl_eyes[];
 
 // transparent_star
 extern const GeoLayout transparent_star_geo[];
-extern const Gfx transparent_star_seg3_dl_0302C560[];
+extern const Gfx transparent_star_seg3_sub_dl_body[];
 extern const Gfx transparent_star_seg3_dl_body[];
 
 // tree

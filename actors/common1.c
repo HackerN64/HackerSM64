@@ -5,6 +5,7 @@
 #include "surface_terrains.h"
 #include "types.h"
 #include "make_const_nonconst.h"
+#include "common1.h"
 
 #include "mist/model.inc.c"
 UNUSED static const u64 binid_0 = 0;
