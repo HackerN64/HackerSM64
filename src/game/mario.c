@@ -615,7 +615,6 @@ f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f
 s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
     struct Surface *floor = m->floor;
     f32 forwardFloorY, backwardFloorY;
-    f32 forwardYDelta, backwardYDelta;
     s16 result;
 
     f32 x = sins(m->faceAngle[1] + yawOffset) * 5.0f;
@@ -637,8 +636,8 @@ s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
     if (floor == NULL) backwardFloorY = m->floorHeight; // handle OOB slopes
 #endif
 
-    forwardYDelta = forwardFloorY - m->pos[1];
-    backwardYDelta = m->pos[1] - backwardFloorY;
+    f32 forwardYDelta = forwardFloorY - m->pos[1];
+    f32 backwardYDelta = m->pos[1] - backwardFloorY;
 
     if (sqr(forwardYDelta) < sqr(backwardYDelta)) {
         result = atan2s(5.0f, forwardYDelta);

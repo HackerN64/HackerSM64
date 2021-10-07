@@ -54,9 +54,6 @@ void play_climbing_sounds(struct MarioState *m, s32 b) {
 s32 set_pole_position(struct MarioState *m, f32 offsetY) {
     struct Surface *floor;
     struct Surface *ceil;
-    f32 floorHeight;
-    f32 ceilHeight;
-    s32 collided;
     s32 result = POLE_NONE;
     f32 poleTop = m->usedObj->hitboxHeight - 100.0f;
     struct Object *marioObj = m->marioObj;
@@ -69,16 +66,16 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
     m->pos[2] = m->usedObj->oPosZ;
     m->pos[1] = m->usedObj->oPosY + marioObj->oMarioPolePos + offsetY;
 
-    collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f);
+    s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f);
     collided |= f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
 
-    ceilHeight = find_ceil(m->pos[0], m->pos[1] + 3.0f, m->pos[2], &ceil);
+    f32 ceilHeight = find_ceil(m->pos[0], m->pos[1] + 3.0f, m->pos[2], &ceil);
     if (m->pos[1] > ceilHeight - 160.0f) {
         m->pos[1] = ceilHeight - 160.0f;
         marioObj->oMarioPolePos = m->pos[1] - m->usedObj->oPosY;
     }
 
-    floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
+    f32 floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
     if (m->pos[1] < floorHeight) {
         m->pos[1] = floorHeight;
         set_mario_action(m, ACT_IDLE, 0);
@@ -536,7 +533,6 @@ s32 act_hang_moving(struct MarioState *m) {
 }
 
 s32 let_go_of_ledge(struct MarioState *m) {
-    f32 floorHeight;
     struct Surface *floor;
 
     m->vel[1] = 0.0f;
@@ -544,7 +540,7 @@ s32 let_go_of_ledge(struct MarioState *m) {
     m->pos[0] -= 60.0f * sins(m->faceAngle[1]);
     m->pos[2] -= 60.0f * coss(m->faceAngle[1]);
 
-    floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
+    f32 floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
     if (floorHeight < m->pos[1] - 100.0f) {
         m->pos[1] -= 100.0f;
     } else {
