@@ -189,12 +189,12 @@ LookAt lookAt;
 
 u8 ucodeTestSwitch = 1;
 
-void reset_clipping(void)
-{
-    if (gMarioState->action == ACT_CREDITS_CUTSCENE)
+void reset_clipping(void) {
+    if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
         make_viewport_clip_rect(&sEndCutsceneVp);
-    else
+    } else {
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, SCREEN_HEIGHT - gBorderHeight);
+    }
 }
 
 /**
