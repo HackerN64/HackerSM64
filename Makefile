@@ -95,17 +95,13 @@ VERSION ?= us
 $(eval $(call validate-option,VERSION,jp us eu sh))
 
 ifeq      ($(VERSION),jp)
-  DEFINES   += VERSION_JP=1
-  GRUCODE   ?= f3dzex
+  DEFINES += VERSION_JP=1
 else ifeq ($(VERSION),us)
-  DEFINES   += VERSION_US=1
-  GRUCODE   ?= f3dzex
+  DEFINES += VERSION_US=1
 else ifeq ($(VERSION),eu)
-  DEFINES   += VERSION_EU=1
-  GRUCODE   ?= f3dzex
+  DEFINES += VERSION_EU=1
 else ifeq ($(VERSION),sh)
-  DEFINES   += VERSION_SH=1
-  GRUCODE   ?= f3dzex
+  DEFINES += VERSION_SH=1
 endif
 
 DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
@@ -119,6 +115,7 @@ TARGET := sm64.$(VERSION)
 #   l3dex2  - F3DEX2 version that only renders in wireframe
 #   f3dzex  - newer, experimental microcode used in Animal Crossing
 #   super3d - extremely experimental version of Fast3D lacking many features for speed
+GRUCODE ?= f3dzex
 $(eval $(call validate-option,GRUCODE,f3dex f3dex2 f3dex2pl f3dzex super3d l3dex2))
 
 ifeq ($(GRUCODE),f3dex) # Fast3DEX
@@ -805,7 +802,7 @@ $(BUILD_DIR)/asm/debug/map.o: asm/debug/map.s $(BUILD_DIR)/sm64_prelim.elf
 # Link SM64 ELF file
 $(ELF): $(BUILD_DIR)/sm64_prelim.elf $(BUILD_DIR)/asm/debug/map.o $(O_FILES) $(YAY0_OBJ_FILES) $(SEG_FILES) $(BUILD_DIR)/$(LD_SCRIPT) undefined_syms.txt $(BUILD_DIR)/libz.a $(BUILD_DIR)/libgoddard.a
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc
+	$(V)$(LD) --gc-sections -L $(BUILD_DIR) -T undefined_syms.txt -T $(BUILD_DIR)/$(LD_SCRIPT) -T goddard.txt -Map $(BUILD_DIR)/sm64.$(VERSION).map --no-check-sections $(addprefix -R ,$(SEG_FILES)) -o $@ $(O_FILES) -L$(LIBS_DIR) -l$(ULTRALIB) -Llib $(LINK_LIBRARIES) -u sprintf -u osMapTLB -Llib/gcclib/$(LIBGCCDIR) -lgcc -lrtc
 
 # Build ROM
 $(ROM): $(ELF)

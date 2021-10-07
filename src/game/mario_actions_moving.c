@@ -8,6 +8,7 @@
 #include "mario_step.h"
 #include "area.h"
 #include "interaction.h"
+#include "mario_actions_moving.h"
 #include "mario_actions_object.h"
 #include "memory.h"
 #include "behavior_data.h"
@@ -63,8 +64,8 @@ struct LandingAction sBackflipLandAction = {
 
 Mat4 sFloorAlignMatrix[2];
 
-s16 tilt_body_running(struct MarioState *m) {
-    return -(find_floor_slope(m, 0) * m->forwardVel / 40.0f);
+s32 tilt_body_running(struct MarioState *m) {
+    return (s16)(-(find_floor_slope(m, 0) * m->forwardVel / 40.0f));
 }
 
 void play_step_sound(struct MarioState *m, s16 frame1, s16 frame2) {
@@ -111,32 +112,24 @@ s32 begin_walking_action(struct MarioState *m, f32 forwardVel, u32 action, u32 a
 
 void check_ledge_climb_down(struct MarioState *m) {
     struct WallCollisionData wallCols;
-    struct Surface *floor;
-    f32 floorHeight;
-    struct Surface *wall;
-    s16 wallAngle;
-    s16 wallDYaw;
-
+    struct Surface *floor, *wall;
     if (m->forwardVel < 10.0f) {
         wallCols.x = m->pos[0];
         wallCols.y = m->pos[1];
         wallCols.z = m->pos[2];
-        wallCols.radius = 10.0f;
+        wallCols.radius  =  10.0f;
         wallCols.offsetY = -10.0f;
-
         if (find_wall_collisions(&wallCols) != 0) {
-            floorHeight = find_floor(wallCols.x, wallCols.y, wallCols.z, &floor);
-            if (floor != NULL && (wallCols.y - floorHeight > 160.0f)) {
+            f32 floorHeight = find_floor(wallCols.x, wallCols.y, wallCols.z, &floor);
+            if ((floor != NULL) && ((wallCols.y - floorHeight) > 160.0f)) {
                 wall = wallCols.walls[wallCols.numWalls - 1];
-                wallAngle = atan2s(wall->normal.z, wall->normal.x);
-                wallDYaw = wallAngle - m->faceAngle[1];
+                s16 wallAngle = SURFACE_YAW(wall);
+                if (abs_angle_diff(wallAngle, m->faceAngle[1]) < 0x4000) {
+                    m->pos[0] = (wallCols.x - (20.0f * wall->normal.x));
+                    m->pos[2] = (wallCols.z - (20.0f * wall->normal.z));
 
-                if (wallDYaw > -0x4000 && wallDYaw < 0x4000) {
-                    m->pos[0] = wallCols.x - 20.0f * wall->normal.x;
-                    m->pos[2] = wallCols.z - 20.0f * wall->normal.z;
-
-                    m->faceAngle[0] = 0;
-                    m->faceAngle[1] = wallAngle + 0x8000;
+                    m->faceAngle[0] = 0x0;
+                    m->faceAngle[1] = (wallAngle + 0x8000);
 
                     set_mario_action(m, ACT_LEDGE_CLIMB_DOWN, 0);
                     set_mario_animation(m, MARIO_ANIM_CLIMB_DOWN_LEDGE);
@@ -214,8 +207,8 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     //! Speed is capped a frame late (butt slide HSG)
     m->forwardVel = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
     if (m->forwardVel > 100.0f) {
-        m->slideVelX = m->slideVelX * 100.0f / m->forwardVel;
-        m->slideVelZ = m->slideVelZ * 100.0f / m->forwardVel;
+        m->slideVelX = ((m->slideVelX * 100.0f) / m->forwardVel);
+        m->slideVelZ = ((m->slideVelZ * 100.0f) / m->forwardVel);
     }
 
     if (newFacingDYaw < -0x4000 || newFacingDYaw > 0x4000) {
@@ -234,7 +227,7 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
 
     //! 10k glitch
     if (forward < 0.0f && m->forwardVel >= 0.0f) {
-        forward *= 0.5f + 0.5f * m->forwardVel / 100.0f;
+        forward *= (0.5f + ((0.5f * m->forwardVel) / 100.0f));
     }
 
     switch (mario_get_floor_class(m)) {
@@ -277,7 +270,7 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
 
     update_sliding_angle(m, accel, lossFactor);
 
-    if (!mario_floor_is_slope(m) && m->forwardVel * m->forwardVel < stopSpeed * stopSpeed) {
+    if (!mario_floor_is_slope(m) && sqr(m->forwardVel) < sqr(stopSpeed)) {
         mario_set_forward_vel(m, 0.0f);
         stopped = TRUE;
     }
@@ -291,7 +284,7 @@ void apply_slope_accel(struct MarioState *m) {
     struct Surface *floor = m->floor;
     f32 steepness = sqrtf(sqr(floor->normal.x) + sqr(floor->normal.z));
 
-    s16 floorDYaw = m->floorYaw - m->faceAngle[1];
+    s16 floorDYaw = abs_angle_diff(m->floorYaw, m->faceAngle[1]);
 
     if (mario_floor_is_slope(m)) {
         s16 slopeClass = 0;
@@ -307,17 +300,17 @@ void apply_slope_accel(struct MarioState *m) {
             case SURFACE_CLASS_NOT_SLIPPERY:  slopeAccel = 0.0f; break;
         }
 
-        if (floorDYaw > -0x4000 && floorDYaw < 0x4000) {
-            m->forwardVel += slopeAccel * steepness;
+        if (floorDYaw < 0x4000) {
+            m->forwardVel += (slopeAccel * steepness);
         } else {
-            m->forwardVel -= slopeAccel * steepness;
+            m->forwardVel -= (slopeAccel * steepness);
         }
     }
 
     m->slideYaw = m->faceAngle[1];
 
-    m->slideVelX = m->forwardVel * sins(m->faceAngle[1]);
-    m->slideVelZ = m->forwardVel * coss(m->faceAngle[1]);
+    m->slideVelX = (m->forwardVel * sins(m->faceAngle[1]));
+    m->slideVelZ = (m->forwardVel * coss(m->faceAngle[1]));
 
     m->vel[0] = m->slideVelX;
     m->vel[1] = 0.0f;
@@ -349,7 +342,7 @@ void update_shell_speed(struct MarioState *m) {
 
     if (m->floorHeight < m->waterLevel) {
         set_mario_floor(m, &gWaterSurfacePseudoFloor, m->waterLevel);
-        m->floor->originOffset = m->waterLevel; //! Negative origin offset
+        m->floor->originOffset = -m->waterLevel;
     }
 
     if (m->floor != NULL && m->floor->type == SURFACE_SLOW) {
@@ -428,10 +421,10 @@ s32 update_decelerating_speed(struct MarioState *m) {
 void update_walking_speed(struct MarioState *m) {
     f32 maxTargetSpeed = ((m->floor != NULL && m->floor->type == SURFACE_SLOW) ? 24.0f : 32.0f);
 
-    f32 targetSpeed = ((m->intendedMag < maxTargetSpeed) ? m->intendedMag : maxTargetSpeed);
+    f32 targetSpeed = MIN(m->intendedMag, maxTargetSpeed);
 
     if (m->quicksandDepth > 10.0f) {
-        targetSpeed *= 6.25 / m->quicksandDepth;
+        targetSpeed *= (6.25 / m->quicksandDepth);
     }
 
     if (m->forwardVel <= 0.0f) {
@@ -439,7 +432,7 @@ void update_walking_speed(struct MarioState *m) {
         m->forwardVel += 1.1f;
     } else if (m->forwardVel <= targetSpeed) {
         // If accelerating
-        m->forwardVel += 1.1f - m->forwardVel / 43.0f;
+        m->forwardVel += (1.1f - (m->forwardVel / 43.0f));
     } else if (m->floor->normal.y >= 0.95f) {
         m->forwardVel -= 1.0f;
     }
@@ -448,56 +441,32 @@ void update_walking_speed(struct MarioState *m) {
         m->forwardVel = 48.0f;
     }
 
-#if GROUND_TURN_MODE == 0 // Vanilla behavior.
-    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x800);
-#elif GROUND_TURN_MODE == 1 // Similar to vanilla, but prevents Mario from moving in the wrong direction when turning around, and allows finer control with the analog stick.
-    s16 turnRange = 0x800;
-    s16 dYaw = abs_angle_diff(m->faceAngle[1], m->intendedYaw); // 0x0 is turning forwards, 0x8000 is turning backwards
-    if (m->forwardVel < 0.0f) { // Don't modify Mario's speed and turn radius if Mario is moving backwards
-        // Flip controls when moving backwards so Mario still moves towards intendedYaw
-        m->intendedYaw += 0x8000;
-    } else if (dYaw > 0x4000) { // Only modify Mario's speed and turn radius if Mario is turning around
-        // Reduce Mario's forward speed by the turn amount, so Mario won't move off sideward from the intended angle when turning around.
-        m->forwardVel *= ((coss(dYaw) + 1.0f) / 2.0f); // 1.0f is turning forwards, 0.0f is turning backwards
-        // Increase turn speed if forwardVel is lower and intendedMag is higher
-        turnRange     *= (2.0f - (ABSF(m->forwardVel) / MAX(m->intendedMag, NEAR_ZERO))); // 1.0f front, 2.0f back
-    }
-    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
-#elif GROUND_TURN_MODE == 2 // similar to mode 1, but a bit further from vanilla, and allows instant turnaround if Mario is moving slower than a certain threshold.
-    Bool32 doFullTurn = (m->heldObj == NULL) && !(m->action & ACT_FLAG_SHORT_HITBOX);
-    if ((m->forwardVel < 0.0f) && doFullTurn) {
+#ifdef GROUND_SPEED_FLIP
+    if (m->forwardVel < -10.0f && analog_stick_held_back(m)) {
         // Flip Mario if he is moving backwards
         m->faceAngle[1] += 0x8000;
         m->forwardVel *= -1.0f;
     }
-    if (analog_stick_held_back(m) && doFullTurn) {
-        // Turn around instantly
-        // set_mario_action(m, ACT_TURNING_AROUND, 0);
-        if (m->forwardVel < 10.0f) {
-            m->faceAngle[1] = m->intendedYaw;
-        }
-    } else {
-        // Scale the turn radius by forwardVel
-        s16 turnRange = (0x1000 - (m->forwardVel * 0x20));
-        if (turnRange < 0x800) {
-            turnRange = 0x800; // Clamp the minimum radius (vanilla radius, 0x800)
-            set_mario_action(m, ACT_TURNING_AROUND, 0);
-        } else if (turnRange > 0x1000) {
-            turnRange = 0x1000; // Clamp the maximum radius (0x1000)
-        }
-        m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
-    }
-#elif GROUND_TURN_MODE == 3 // Instant turn.
-    m->faceAngle[1] = m->intendedYaw;
-#elif GROUND_TURN_MODE == 4 // Experimental.
-    m->faceAngle[1] = approach_s16_asymptotic(m->faceAngle[1], m->intendedYaw, m->forwardVel / 8.0f); // should be max speed for the current action instead of m->forwardVel
 #endif
+
+    s16 turnRange = 0x800;
+#ifdef GROUND_TURN_FIX
+    if (m->action == ACT_WALKING) {
+        turnRange = abs_angle_diff(m->faceAngle[1], m->intendedYaw);
+        f32 fac = MIN(m->forwardVel, m->intendedMag);
+        fac = (CLAMP(fac, 10.0f, 32.0f) / 32.0f);
+        turnRange *= (1.0f - fac);
+        turnRange = MAX(turnRange, 0x800);
+    }
+#endif
+    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
+
     apply_slope_accel(m);
 }
 
 s32 should_begin_sliding(struct MarioState *m) {
     if (m->input & INPUT_ABOVE_SLIDE) {
-        s32 slideLevel = (m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE;
+        s32 slideLevel = ((m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE);
         s32 movingBackward = m->forwardVel <= -1.0f;
 
         if (slideLevel || movingBackward || mario_facing_downhill(m, FALSE)) {
@@ -511,7 +480,7 @@ s32 should_begin_sliding(struct MarioState *m) {
 s32 check_ground_dive_or_punch(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
         //! Speed kick (shoutouts to SimpleFlips)
-        if (m->forwardVel >= 29.0f && m->controller->stickMag > 48.0f) {
+        if ((m->forwardVel >= 29.0f) && (m->controller->stickMag > 48.0f)) {
             m->vel[1] = 20.0f;
             return set_mario_action(m, ACT_DIVE, 1);
         }
@@ -525,12 +494,12 @@ s32 check_ground_dive_or_punch(struct MarioState *m) {
 s32 begin_braking_action(struct MarioState *m) {
     mario_drop_held_object(m);
 
-    if (m->actionState == 1) {
+    if (m->actionState == ACT_WALKING_STATE_REACH_WALL) {
         m->faceAngle[1] = m->actionArg;
         return set_mario_action(m, ACT_STANDING_AGAINST_WALL, 0);
     }
 
-    if (m->forwardVel >= 16.0f && m->floor->normal.y >= COS80) {
+    if ((m->forwardVel >= 16.0f) && (m->floor->normal.y >= COS80)) {
         return set_mario_action(m, ACT_BRAKING, 0);
     }
 
@@ -542,7 +511,7 @@ void anim_and_audio_for_walk(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
     s32 inLoop = TRUE;
     s16 targetPitch = 0;
-    f32 intendedSpeed = m->intendedMag > m->forwardVel ? m->intendedMag : m->forwardVel;
+    f32 intendedSpeed = MAX(m->intendedMag, m->forwardVel);
 
     if (intendedSpeed < 4.0f) {
         intendedSpeed = 4.0f;
@@ -629,7 +598,7 @@ void anim_and_audio_for_walk(struct MarioState *m) {
 void anim_and_audio_for_hold_walk(struct MarioState *m) {
     s32 animSpeed;
     s32 inLoop = TRUE;
-    f32 intendedSpeed = m->intendedMag > m->forwardVel ? m->intendedMag : m->forwardVel;
+    f32 intendedSpeed = MAX(m->intendedMag, m->forwardVel);
 
     if (intendedSpeed < 2.0f) {
         intendedSpeed = 2.0f;
@@ -688,8 +657,7 @@ void anim_and_audio_for_heavy_walk(struct MarioState *m) {
 }
 
 void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
-    s16 wallAngle;
-    s16 dWallAngle;
+    s16 wallAngle, dWallAngle;
     f32 dx = m->pos[0] - startPos[0];
     f32 dz = m->pos[2] - startPos[2];
     f32 movedDistance = sqrtf(sqr(dx) + sqr(dz));
@@ -701,8 +669,8 @@ void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
     }
 
     if (m->wall != NULL) {
-        wallAngle = atan2s(m->wall->normal.z, m->wall->normal.x);
-        dWallAngle = wallAngle - m->faceAngle[1];
+        wallAngle  = m->wallYaw;
+        dWallAngle = (wallAngle - m->faceAngle[1]);
     }
 
     if (m->wall == NULL || dWallAngle <= -0x71C8 || dWallAngle >= 0x71C8) {
@@ -754,7 +722,7 @@ void tilt_body_walking(struct MarioState *m, s16 startYaw) {
             nextBodyPitch = 0;
         }
 
-        marioBodyState->torsoAngle[2] = approach_s32(marioBodyState->torsoAngle[2], nextBodyRoll, 0x400, 0x400);
+        marioBodyState->torsoAngle[2] = approach_s32(marioBodyState->torsoAngle[2], nextBodyRoll,  0x400, 0x400);
         marioBodyState->torsoAngle[0] = approach_s32(marioBodyState->torsoAngle[0], nextBodyPitch, 0x400, 0x400);
     } else {
         marioBodyState->torsoAngle[2] = 0;
@@ -1409,7 +1377,7 @@ void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32
                 }
                 slide_bonk(m, ACT_GROUND_BONK, endAction);
             } else if (m->wall != NULL) {
-                s16 wallAngle = atan2s(m->wall->normal.z, m->wall->normal.x);
+                s16 wallAngle = m->wallYaw;
                 f32 slideSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
                 if ((slideSpeed *= 0.9f) < 4.0f) {
@@ -1418,8 +1386,8 @@ void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32
 
                 m->slideYaw = wallAngle - (s16)(m->slideYaw - wallAngle) + 0x8000;
 
-                m->vel[0] = m->slideVelX = slideSpeed * sins(m->slideYaw);
-                m->vel[2] = m->slideVelZ = slideSpeed * coss(m->slideYaw);
+                m->vel[0] = m->slideVelX = (slideSpeed * sins(m->slideYaw));
+                m->vel[2] = m->slideVelZ = (slideSpeed * coss(m->slideYaw));
             }
 
             align_with_floor(m);
@@ -1601,14 +1569,14 @@ s32 act_dive_slide(struct MarioState *m) {
     return FALSE;
 }
 
-s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 arg2, s32 arg3, s32 arg4) {
+s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 checkFrame, s32 playLandingSound, s32 actionArg) {
     s32 animFrame;
 
-    if (arg3) {
+    if (playLandingSound) {
         play_mario_heavy_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
     }
 
-    if (arg4 > 0) {
+    if (actionArg > 0) {
         play_sound_if_no_flag(m, SOUND_MARIO_ATTACKED, MARIO_MARIO_SOUND_PLAYED);
     } else {
 #ifdef VERSION_JP
@@ -1626,7 +1594,7 @@ s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 arg2
     }
 
     animFrame = set_mario_animation(m, animation);
-    if (animFrame < arg2) {
+    if (animFrame < checkFrame) {
         apply_landing_accel(m, 0.9f);
     } else if (m->forwardVel >= 0.0f) {
         mario_set_forward_vel(m, 0.1f);
@@ -1636,15 +1604,15 @@ s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 arg2
 
     if (perform_ground_step(m) == GROUND_STEP_LEFT_GROUND) {
         if (m->forwardVel >= 0.0f) {
-            set_mario_action(m, ACT_FORWARD_AIR_KB, arg4);
+            set_mario_action(m, ACT_FORWARD_AIR_KB, actionArg);
         } else {
-            set_mario_action(m, ACT_BACKWARD_AIR_KB, arg4);
+            set_mario_action(m, ACT_BACKWARD_AIR_KB, actionArg);
         }
     } else if (is_anim_at_end(m)) {
         if (m->health < 0x100) {
             set_mario_action(m, ACT_STANDING_DEATH, 0);
         } else {
-            if (arg4 > 0) {
+            if (actionArg > 0) {
                 m->invincTimer = 30;
             }
             set_mario_action(m, ACT_IDLE, 0);
@@ -1714,12 +1682,10 @@ s32 act_ground_bonk(struct MarioState *m) {
 }
 
 s32 act_death_exit_land(struct MarioState *m) {
-    s32 animFrame;
-
     apply_landing_accel(m, 0.9f);
     play_mario_heavy_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
 
-    animFrame = set_mario_animation(m, MARIO_ANIM_FALL_OVER_BACKWARDS);
+    s32 animFrame = set_mario_animation(m, MARIO_ANIM_FALL_OVER_BACKWARDS);
 
     if (animFrame == 54) {
         play_sound(SOUND_MARIO_MAMA_MIA, m->marioObj->header.gfx.cameraToObject);
@@ -1772,7 +1738,7 @@ u32 common_landing_action(struct MarioState *m, s16 animation, u32 airAction) {
 }
 
 s32 common_landing_cancels(struct MarioState *m, struct LandingAction *landingAction,
-                           s32 (*setAPressAction)(struct MarioState *m, u32, u32)) {
+                           s32 (*setAPressAction)(struct MarioState *m, u32 action, u32 actionArg)) {
     //! Everything here, including floor steepness, is checked before checking
     // if Mario is actually on the floor. This leads to e.g. remote sliding.
 
@@ -1877,7 +1843,7 @@ s32 act_long_jump_land(struct MarioState *m) {
     }
 
     if (!(m->input & INPUT_NONZERO_ANALOG)) {
-        play_sound_if_no_flag(m, SOUND_MARIO_UH2_2, MARIO_MARIO_SOUND_PLAYED);
+        play_sound_if_no_flag(m, SOUND_MARIO_UH_LONG_JUMP_LAND, MARIO_MARIO_SOUND_PLAYED);
     }
 
     common_landing_action(m,

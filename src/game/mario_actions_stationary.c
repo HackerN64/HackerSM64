@@ -810,9 +810,9 @@ s32 act_shockwave_bounce(struct MarioState *m) {
     return FALSE;
 }
 
-s32 landing_step(struct MarioState *m, s32 arg1, u32 action) {
+s32 landing_step(struct MarioState *m, s32 animID, u32 action) {
     stationary_ground_step(m);
-    set_mario_animation(m, arg1);
+    set_mario_animation(m, animID);
     if (is_anim_at_end(m)) {
         return set_mario_action(m, action, 0);
     }

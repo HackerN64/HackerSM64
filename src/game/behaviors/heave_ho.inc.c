@@ -15,7 +15,7 @@ void bhv_heave_ho_throw_mario_loop(void) {
             break;
         case 2:
             cur_obj_play_sound_2(SOUND_OBJ_HEAVEHO_TOSSED);
-            gMarioObject->oInteractStatus |= INT_STATUS_MARIO_UNK2;
+            gMarioObject->oInteractStatus |= INT_STATUS_MARIO_THROWN_BY_OBJ;
             gMarioStates[0].forwardVel = -45.0f;
             gMarioStates[0].vel[1] = 95.0f;
             o->parentObj->oHeaveHoThrowState = 0;
@@ -97,7 +97,7 @@ void heave_ho_move(void) {
     if (o->oAction != 0 && o->oMoveFlags & OBJ_MOVE_MASK_IN_WATER)
         o->oAction = 0;
     if (o->oInteractStatus & INT_STATUS_GRABBED_MARIO) {
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
         o->oHeaveHoThrowState = 1;
         o->oAction = 3;
     }
@@ -119,5 +119,5 @@ void bhv_heave_ho_loop(void) {
             cur_obj_get_dropped();
             break;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

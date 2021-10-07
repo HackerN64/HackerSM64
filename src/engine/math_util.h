@@ -45,8 +45,8 @@ extern f32 gSineTable[];
 #define coss(x) gCosineTable[(u16) (x) >> 4]
 #define atans(x) gArctanTable[(s32)((((x) * 1024) + 0.5f))] // is this correct? used for atan2_lookup
 
-#define DEG_PER_RAD 57.29577950560105
-#define RAD_PER_DEG (1.0 / DEG_PER_RAD)
+#define RAD_PER_DEG (M_PI / 180.0)
+#define DEG_PER_RAD (180.0 / M_PI)
 
 #define angle_to_degrees(  x) (f32)(((Angle)(x) / 65536.0f) * 360.0f)
 #define degrees_to_angle(  x) (Angle)(((f32)(x) * 0x10000 ) / 360   )
@@ -55,6 +55,8 @@ extern f32 gSineTable[];
 #define degrees_to_radians(x) (f32)(   (f32)(x) * RAD_PER_DEG       )
 #define radians_to_degrees(x) (f32)(   (f32)(x) * DEG_PER_RAD       )
 
+#define asm_abs_s(dst, src), __asm__("abs.s %0,%1" : "=f" (dst) : "f" (src));
+#define asm_abs_d(dst, src), __asm__("abs.d %0,%1" : "=f" (dst) : "f" (src));
 #define ABSF(x) ((x) > 0.0f ? (x) : -(x))
 #define ABSI(x) ((x) > 0    ? (x) : -(x))
 #define ABS(x)  ABSF((x))
@@ -145,6 +147,17 @@ extern f32 gSineTable[];
 }
 
 /**
+ * Set 'dest' the normal vector of a triangle with vertices a, b and c.
+ * It is similar to vec3f_cross, but it calculates the vectors (c-b) and (b-a)
+ * at the same time.
+ */
+#define find_vector_perpendicular_to_plane(dest, a, b, c) {                                     \
+    (dest)[0] = ((b)[1] - (a)[1]) * ((c)[2] - (b)[2]) - ((c)[1] - (b)[1]) * ((b)[2] - (a)[2]);  \
+    (dest)[1] = ((b)[2] - (a)[2]) * ((c)[0] - (b)[0]) - ((c)[2] - (b)[2]) * ((b)[0] - (a)[0]);  \
+    (dest)[2] = ((b)[0] - (a)[0]) * ((c)[1] - (b)[1]) - ((c)[0] - (b)[0]) * ((b)[1] - (a)[1]);  \
+}
+
+/**
  * | ? ? ? 0 |
  * | ? ? ? 0 |
  * | ? ? ? 0 |
@@ -159,7 +172,7 @@ extern f32 gSineTable[];
 }
 
 #define linear_mtxf_mul_vec3_and_translate(mtx, dstV, srcV) {   \
-    linear_mtxf_mul_vec3f((mtx), (dstV), (srcV));               \
+    linear_mtxf_mul_vec3((mtx), (dstV), (srcV));               \
     vec3_add((dstV), (mtx)[3]);                                 \
 }
 
@@ -417,11 +430,9 @@ extern f32 gSineTable[];
     MAT4_DOT_PROD((R), (A), (B), 3, 3); \
 }
 
-#define MTXF_END(mtx) { \
-    (mtx)[0][3] = 0.0f; \
-    (mtx)[1][3] = 0.0f; \
-    (mtx)[2][3] = 0.0f; \
-    (mtx)[3][3] = 1.0f; \
+#define MTXF_END(mtx) {                         \
+    (mtx)[0][3] = (mtx)[1][3] = (mtx)[2][3] = 0;\
+    ((u32 *)(mtx))[15] = 0x3F800000;            \
 }
 
 #define NAME_INVMAG(v) v##_invmag
@@ -455,6 +466,7 @@ s32 min_3i(s32 a0, s32 a1, s32 a2);
 f32 min_3f(f32 a0, f32 a1, f32 a2);
 s32 max_3i(s32 a0, s32 a1, s32 a2);
 f32 max_3f(f32 a0, f32 a1, f32 a2);
+void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max);
 void vec3f_copy(Vec3f dest, Vec3f src);
 void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
 void vec3f_add(Vec3f dest, Vec3f a);
@@ -467,7 +479,6 @@ void vec3s_sub(Vec3s dest, Vec3s a);
 void vec3f_sub(Vec3f dest, Vec3f src);
 void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_to_vec3s(Vec3s dest, Vec3f a);
-void find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c);
 f32  vec3f_dot(Vec3f a, Vec3f b);
 void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_normalize(Vec3f dest);
@@ -527,12 +538,14 @@ s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier);
 f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
 s32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor);
 s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor);
-s16 abs_angle_diff(s16 a0, s16 a1);
-s16 atan2s(f32 y, f32 x);
+s32 abs_angle_diff(s16 a0, s16 a1);
+s32 atan2s(f32 y, f32 x);
 f32 atan2f(f32 a, f32 b);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32 anim_spline_poll(Vec3f result);
+void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
+void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void mtxf_rot_trans_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
 

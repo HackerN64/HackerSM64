@@ -19,8 +19,7 @@ extern u8 _mapDataSegmentRomStart[];
 
 
 // code provided by Wiseguy
-static s32 headless_dma(u32 devAddr, void *dramAddr, u32 size)
-{
+static s32 headless_dma(u32 devAddr, void *dramAddr, u32 size) {
     register u32 stat;
     stat = IO_READ(PI_STATUS_REG);
 	while (stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY)) {
@@ -31,8 +30,7 @@ static s32 headless_dma(u32 devAddr, void *dramAddr, u32 size)
     IO_WRITE(PI_WR_LEN_REG, size - 1);
     return 0;
 }
-static u32 headless_pi_status(void)
-{
+static u32 headless_pi_status(void) {
     return IO_READ(PI_STATUS_REG);
 }
 // end of code provided by Wiseguy

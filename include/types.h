@@ -258,14 +258,14 @@ struct ObjectNode
 
 #ifdef PUPPYLIGHTS
 struct PuppyLight {
-    Vec3t pos[2]; //The location of the light. First index is the absolute position, second index are offsets.
-    s16 yaw; //Used by cubes. Allows epic rotating of the volume.
-    s16 room; //Which room to use. -1 is visible from all rooms.
-    s8 epicentre; //What percentage inside the volume you'll be before maximum light strength is applied. (E.g: 100 will be full strength always, and 0 will be full strength at the centre.)
-    u8 flags; //Some stuff to define how the volume is used. Mostly just shape stuff, but can potentially have other uses.
-    u8 rgba[4]; //Colour. Go on, take even the tiniest guess as to what this entails.
-    u8 area; //Which section of the level this light is stored in.
-    u8 active:1; //Whether the light will actually work. Mostly intended to be used for objects.
+    Vec3t pos[2];    // The location of the light. First index is the absolute position, second index are offsets.
+    s16 yaw;         // Used by cubes. Allows epic rotating of the volume.
+    RoomData room;   // Which room to use. -1 is visible from all rooms.
+    s8 epicentre;    // What percentage inside the volume you'll be before maximum light strength is applied. (E.g: 100 will be full strength always, and 0 will be full strength at the centre.)
+    u8 flags;        // Some stuff to define how the volume is used. Mostly just shape stuff, but can potentially have other uses.
+    ColorRGBA rgba;  // Colour. Go on, take even the tiniest guess as to what this entails.
+    u8 area;         // Which section of the level this light is stored in.
+    u8 active: TRUE; // Whether the light will actually work. Mostly intended to be used for objects.
 };
 #endif
 
@@ -377,6 +377,12 @@ struct Surface
     /*0x2C*/ struct Object *object;
 };
 
+#define PUNCH_STATE_TIMER_MASK          0b00111111
+#define PUNCH_STATE_TYPES_MASK          0b11000000
+#define PUNCH_STATE_TYPE_FIRST_PUNCH    (0 << 6)
+#define PUNCH_STATE_TYPE_SECOND_PUNCH   (1 << 6)
+#define PUNCH_STATE_TYPE_KICK           (2 << 6)
+
 struct MarioBodyState
 {
     /*0x00*/ u32 action;
@@ -456,9 +462,13 @@ struct MarioState
     /*0xBC*/ f32 peakHeight;
     /*0xC0*/ f32 quicksandDepth;
     /*0xC4*/ f32 windGravity;
+    // -- HackerSM64 MarioState fields begin --
 #ifdef BREATH_METER
              s16 breath;
              u8  breathCounter;
+#endif
+#ifdef PREVENT_DEATH_LOOP
+             u8  isDead: TRUE;
 #endif
            Vec3f lastSafePos;
            Vec3f prevPos;
@@ -468,6 +478,7 @@ struct MarioState
            Angle moveYaw;
            Angle ceilYaw;
            Angle wallYaw;
+    // -- HackerSM64 MarioState fields end --
 };
 
 #endif // TYPES_H

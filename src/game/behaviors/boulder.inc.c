@@ -1,9 +1,7 @@
 // boulder.c.inc
 
 void bhv_big_boulder_init(void) {
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
 
     o->oGravity = 8.0f;
     o->oFriction = 0.999f;
@@ -36,7 +34,7 @@ void bhv_big_boulder_loop(void) {
         case 1:
             boulder_act_1();
             adjust_rolling_face_pitch(1.5f);
-            cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
+            cur_obj_play_sound_1(SOUND_ENV_BOWLING_BALL_ROLL);
             break;
     }
 

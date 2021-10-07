@@ -48,9 +48,9 @@ void set_sound_moving_speed(u8 bank, u8 speed);
 void play_dialog_sound(u8 dialogID);
 void play_music(u8 player, u16 seqArgs, u16 fadeTimer);
 void stop_background_music(u16 seqId);
-void fadeout_background_music(u16 arg0, u16 fadeOut);
+void fadeout_background_music(u16 seqId, u16 fadeOut);
 void drop_queued_background_music(void);
-u16 get_current_background_music(void);
+u32 get_current_background_music(void);
 void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer);
 void func_80321080(u16 fadeTimer);
 void func_803210D4(u16 fadeOutTime);
@@ -58,11 +58,11 @@ void play_course_clear(void);
 void play_peachs_jingle(void);
 void play_puzzle_jingle(void);
 void play_star_fanfare(void);
-void play_power_star_jingle(u8 arg0);
+void play_power_star_jingle(u8 keepBackgroundMusic);
 void play_race_fanfare(void);
 void play_toads_jingle(void);
 void sound_reset(u8 presetId);
-void audio_set_sound_mode(u8 arg0);
+void audio_set_sound_mode(u8 soundMode);
 
 void audio_init(void); // in load.c
 

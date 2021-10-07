@@ -30,7 +30,7 @@ const u32 flags_arr[] = { FLAGS_SPACE, FLAGS_PLUS, FLAGS_MINUS, FLAGS_HASH, FLAG
 char _spaces[] = "                                ";
 char _zeroes[] = "00000000000000000000000000000000";
 
-static void _Putfld(printf_struct *, va_list *, u8, u8 *);
+static void _Putfld(printf_struct *a0, va_list *args, u8 type, u8 *buf);
 
 s32 _Printf(char *(*prout)(char *, const char *, size_t), char *dst, const char *fmt, va_list args) {
     printf_struct sp78;

@@ -367,7 +367,7 @@ index 0000000..97cba2a
 +    o->oParentRelativePosX = 90.0f;
 +    if (o->parentObj->oAction == 4)
 +        o->parentObj->oIntangibleTimer = -1;
-+    o->oInteractStatus = 0;
++    o->oInteractStatus = INT_STATUS_NONE;
 +}
 +
 +void bhv_bowser_flame_spawn_loop(void) {
@@ -417,7 +417,7 @@ index 0000000..97cba2a
 +    }
 +    if (o->parentObj->oHeldState != HELD_FREE)
 +        cur_obj_become_intangible();
-+    o->oInteractStatus = 0;
++    o->oInteractStatus = INT_STATUS_NONE;
 +}
 +
 +s32 bowser_spawn_shockwave(void) {
@@ -1638,7 +1638,7 @@ index 0000000..97cba2a
 +    f32 sp1C;
 +    UNUSED struct Object *sp18 = o->oPlatformUnkF8;
 +    if (o->oTimer == 0 || o->oTimer == 22)
-+        cur_obj_play_sound_2(SOUND_GENERAL_BOWSER_PLATFORM_2);
++        cur_obj_play_sound_2(SOUND_GENERAL_BOWSER_PLATFORM_FALL);
 +    if (o->oTimer < 22) {
 +        set_environmental_camera_shake(SHAKE_ENV_FALLING_BITS_PLAT);
 +        o->oVelY = 8.0f;

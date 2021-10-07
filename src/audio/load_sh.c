@@ -107,10 +107,10 @@ extern u8 gSoundDataADSR[]; // ctl
 extern u8 gSoundDataRaw[];  // tbl
 extern u8 gMusicData[];     // sequences
 
-ALSeqFile *get_audio_file_header(s32 arg0);
+ALSeqFile *get_audio_file_header(s32 poolIdx);
 
 void *func_sh_802f3688(s32 bankId);
-void *get_bank_or_seq_wrapper(s32 arg0, s32 arg1);
+void *get_bank_or_seq_wrapper(s32 poolIdx, s32 id);
 void func_sh_802f3d78(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 arg3);
 void func_sh_802f3c38(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 medium);
 s32 func_sh_802f3dd0(OSIoMesg *m, s32 pri, s32 direction, uintptr_t devAddr,
@@ -375,14 +375,12 @@ s32 func_sh_802f3024(s32 bankId, s32 instId, s32 arg2) {
         if (instr->normalRangeHi != 0x7F) {
             func_sh_802f2f38(instr->highNotesSound.sample, bankId);
         }
-        //! @bug missing return
     } else if (instId == 0x7F) {
         drum = get_drum(bankId, arg2);
         if (drum == NULL) {
             return -1;
         }
         func_sh_802f2f38(drum->sound.sample, bankId);
-        return 0;
     }
     return 0;
 }
@@ -1285,12 +1283,6 @@ void func_sh_802f4e50(struct PendingDmaAudioBank *audioBank, s32 audioResetStatu
     encodedInfo = &audioBank->encodedInfo;
     if (audioBank->remaining == 0) {
         mesg = (OSMesg) audioBank->encodedInfo;
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma GCC diagnostic ignored "-Wself-assign"
-#endif
-        mesg = mesg;    //! needs an extra read from mesg here to match...
-#pragma GCC diagnostic pop
         temp = *encodedInfo;
         bankId = (temp >> 8) & 0xFF;
         switch ((u8) (temp >> 0x10)) {
@@ -1511,13 +1503,12 @@ s32 func_sh_802f573c(s32 audioResetStatus) {
 
     if (D_SH_8034F68C > 0) {
         if (audioResetStatus != 0) {
-            if (osRecvMesg(&gUnkQueue2, (OSMesg *) &idx, OS_MESG_NOBLOCK)){
-            }
+            osRecvMesg(&gUnkQueue2, (OSMesg *) &idx, OS_MESG_NOBLOCK);
             D_SH_8034F68C = 0;
-            return 0;
+            return FALSE;
         }
         if (osRecvMesg(&gUnkQueue2, (OSMesg *) &idx, OS_MESG_NOBLOCK) == -1) {
-            return 0;
+            return FALSE;
         }
         idx >>= 0x18;
         if (D_SH_8034EC88[idx].isFree == FALSE) {
@@ -1552,7 +1543,7 @@ next:
                              unk, &gUnkQueue2, D_SH_8034EC88[D_SH_8034F68C - 1].encodedInfo);
         }
     }
-    return 1;
+    return TRUE;
 }
 
 s32 func_sh_802f5900(struct AudioBankSample *sample, s32 numLoaded, struct AudioBankSample *arg2[]) {

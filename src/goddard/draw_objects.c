@@ -317,8 +317,7 @@ void draw_face(struct ObjFace *face) {
 
     imin("draw_face");
     hasTextCoords = FALSE;
-    if (sUseSelectedColor == FALSE && face->mtlId >= 0) // -1 == colored face
-    {
+    if (sUseSelectedColor == FALSE && face->mtlId >= 0) { // -1 == colored face
         if (face->mtl != NULL) {
             if ((i = face->mtl->gddlNumber) != 0) {
                 if (i != sUpdateViewState.mtlDlNum) {

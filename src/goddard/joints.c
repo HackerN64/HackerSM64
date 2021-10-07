@@ -586,8 +586,6 @@ void func_801903E8(struct ObjJoint *j, struct GdVec3f *a1, f32 x, f32 y, f32 z) 
         j->unk3C.y += y;
         j->unk3C.z += z;
         a1->x = a1->y = a1->z = 0.0f;
-        ;
-
     } else {
         sp14 = (j->unkB4.x * x) + (j->unkB4.y * y) + (j->unkB4.z * z);
         sp8.x = j->unkB4.x * sp14;
@@ -878,9 +876,9 @@ void reset_joint(struct ObjJoint *j) {
     j->unk3C.z = j->initPos.z;
 
     j->velocity.x = j->velocity.y = j->velocity.z = 0.0f;
-    j->unk84.x = j->unk84.y = j->unk84.z = 0.0f;
-    j->unk90.x = j->unk90.y = j->unk90.z = 0.0f;
-    j->unk1A8.x = j->unk1A8.y = j->unk1A8.z = 0.0f;
+    j->unk84.x    = j->unk84.y    = j->unk84.z    = 0.0f;
+    j->unk90.x    = j->unk90.y    = j->unk90.z    = 0.0f;
+    j->unk1A8.x   = j->unk1A8.y   = j->unk1A8.z   = 0.0f;
 
     gd_set_identity_mat4(&j->mat168);
     gd_scale_mat4f_by_vec3f(&j->mat168, (struct GdVec3f *) &j->scale);
@@ -890,66 +888,6 @@ void reset_joint(struct ObjJoint *j) {
 
     gd_set_identity_mat4(&j->mat128);
     gd_add_vec3f_to_mat4f_offset(&j->mat128, &j->initPos);
-}
-
-/* 23FFF4 -> 2400C4 */
-void func_80191824(struct ObjJoint *j) {
-    if (j->flags & 0x1) {
-        j->worldPos.x = gGdSkinNet->worldPos.x;
-        j->worldPos.y = gGdSkinNet->worldPos.y;
-        j->worldPos.z = gGdSkinNet->worldPos.z;
-
-        j->unk3C.x = gGdSkinNet->worldPos.x;
-        j->unk3C.y = gGdSkinNet->worldPos.y;
-        j->unk3C.z = gGdSkinNet->worldPos.z;
-    }
-}
-
-/* 2403C8 -> 240530 */
-void func_80191BF8(struct ObjJoint *j) {
-    f32 sp1C;
-    f32 sp18 = -2.0f;
-
-    if (!(j->flags & 0x1)) {
-        j->unk3C.y += sp18;
-    }
-
-    if ((sp1C = j->unk3C.y - (D_801A8058 + 30.0f)) < 0.0f && j->velocity.y < 0.0f) {
-        sp1C += j->velocity.y;
-        sp1C *= 0.8f;
-        func_80190F3C(j, -j->velocity.x * 0.7f, -sp1C, -j->velocity.z * 0.7f);
-    }
-
-    func_80190F3C(j, 0.0f, 0.0f, 0.0f);
-}
-
-/* 240530 -> 240624 */
-void func_80191D60(struct ObjJoint *j) {
-    j->velocity.x += j->unk3C.x - j->worldPos.x;
-    j->velocity.y += j->unk3C.y - j->worldPos.y;
-    j->velocity.z += j->unk3C.z - j->worldPos.z;
-
-    j->velocity.x *= 0.9f;
-    j->velocity.y *= 0.9f;
-    j->velocity.z *= 0.9f;
-
-    j->worldPos.x += j->velocity.x;
-    j->worldPos.y += j->velocity.y;
-    j->worldPos.z += j->velocity.z;
-}
-
-/* 240624 -> 240658 */
-void func_80191E54(struct ObjJoint *j) {
-    j->unk3C.x = j->worldPos.x;
-    j->unk3C.y = j->worldPos.y;
-    j->unk3C.z = j->worldPos.z;
-}
-
-/* 240658 -> 2406B8 */
-void func_80191E88(struct ObjGroup *grp) {
-    apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191BF8, grp);
-    apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191D60, grp);
-    apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191E54, grp);
 }
 
 /* 2406B8 -> 2406E0; orig name: func_80191EE8 */

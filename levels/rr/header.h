@@ -85,7 +85,7 @@ extern const Gfx rr_seg7_dl_07021100[];
 extern const Gfx rr_seg7_dl_07023B90[];
 extern const Gfx rr_seg7_dl_07026630[];
 extern const Gfx rr_seg7_dl_07028FA8[];
-extern const Collision rr_seg7_collision_07029038[];
+extern const Collision rr_seg7_collision_flying_carpet[];
 extern const Collision rr_seg7_collision_pendulum[];
 extern const Collision rr_seg7_collision_rotating_platform_with_fire[];
 extern const Collision rr_seg7_collision_07029508[];

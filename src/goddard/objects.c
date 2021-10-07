@@ -20,50 +20,29 @@
 #include "shape_helper.h"
 #include "skin.h"
 
-// structs
-struct Unk801B9E68 {
-    /* 0x00 */ s32 count;
-    /* 0x04 */ u8 pad[0x14];
-}; /* sizeof() = 0x18 */
-
-struct Unk8017F3CC {
-    /*0x00*/ u8 pad[0x20];
-    /*0x20*/ struct GdVec3f unk20;
-};
-
-// data
-f32 D_801A81C0 = 0.0f;
-f32 D_801A81C4 = 0.0f;
-
 // bss
 struct GdBoundingBox gSomeBoundingBox;
-struct ObjCamera *sCurrentMoveCamera; // @ 801B9DB8
-struct ObjView *sCurrentMoveView;     // @ 801B9DBC
-struct DebugCounters gGdCounter;      // @ 801B9DC0
+struct ObjCamera *sCurrentMoveCamera;
+struct ObjView *sCurrentMoveView;
+struct DebugCounters gGdCounter;
 Mat4f D_801B9DC8;
 struct GdVec3f D_801B9E08;
-struct ObjGroup *sCurrentMoveGrp; // @ 801B9E14
+struct ObjGroup *sCurrentMoveGrp;
 struct GdVec3f D_801B9E18;
 struct GdVec3f D_801B9E28;
 f32 D_801B9E34;
-Mat4f *D_801B9E38;
-struct ObjParticle *D_801B9E3C;
-s32 D_801B9E40;
-s32 D_801B9E44;
-Mat4f *D_801B9E48;
-struct ObjCamera *gGdCameraList; // @ 801B9E4C
-void *D_801B9E50;
-struct ObjGroup *gGdGroupList;  // @ 801B9E54
-s32 gGdObjCount;                // @ 801B9E58
-s32 gGdGroupCount;              // @ 801B9E5C
-s32 gGdPlaneCount;              // @ 801B9E60
-s32 gGdCameraCount;             // @ 801B9E64
-struct Unk801B9E68 sGdViewInfo; // @ 801B9E68
-void *D_801B9E80;
-struct ObjJoint *gGdJointList;  // @ 801B9E84
-struct ObjBone *gGdBoneList;    // @ 801B9E88
+s32 gGdParticleCount;
+struct ObjCamera *gGdCameraList;
+struct ObjGroup *gGdGroupList;
+s32 gGdObjCount;
+s32 gGdGroupCount;
+s32 gGdPlaneCount;
+s32 gGdCameraCount;
+s32 sGdViewCount;
+struct ObjJoint *gGdJointList;
+struct ObjBone *gGdBoneList;
 struct GdObj *gGdObjectList;    // head of linked list containing every single GdObj that was created
-struct ObjGroup *gGdViewsGroup; // @ 801B9E90
+struct ObjGroup *gGdViewsGroup;
 
 /* @ 22A480 for 0x70 */
 void reset_bounding_box(void) { /* Initialize Plane? */
@@ -82,29 +61,12 @@ void add_obj_pos_to_bounding_box(struct GdObj *obj) {
     set_cur_dynobj(obj);
     d_get_world_pos(&pos);
 
-    if (pos.x < gSomeBoundingBox.minX) {
-        gSomeBoundingBox.minX = pos.x;
-    }
-
-    if (pos.y < gSomeBoundingBox.minY) {
-        gSomeBoundingBox.minY = pos.y;
-    }
-
-    if (pos.z < gSomeBoundingBox.minZ) {
-        gSomeBoundingBox.minZ = pos.z;
-    }
-
-    if (pos.x > gSomeBoundingBox.maxX) {
-        gSomeBoundingBox.maxX = pos.x;
-    }
-
-    if (pos.y > gSomeBoundingBox.maxY) {
-        gSomeBoundingBox.maxY = pos.y;
-    }
-
-    if (pos.z > gSomeBoundingBox.maxZ) {
-        gSomeBoundingBox.maxZ = pos.z;
-    }
+    if (pos.x < gSomeBoundingBox.minX) gSomeBoundingBox.minX = pos.x;
+    if (pos.y < gSomeBoundingBox.minY) gSomeBoundingBox.minY = pos.y;
+    if (pos.z < gSomeBoundingBox.minZ) gSomeBoundingBox.minZ = pos.z;
+    if (pos.x > gSomeBoundingBox.maxX) gSomeBoundingBox.maxX = pos.x;
+    if (pos.y > gSomeBoundingBox.maxY) gSomeBoundingBox.maxY = pos.y;
+    if (pos.z > gSomeBoundingBox.maxZ) gSomeBoundingBox.maxZ = pos.z;
 }
 
 /* @ 22A630 for 0x70 */
@@ -124,66 +86,26 @@ void get_some_bounding_box(struct GdBoundingBox *a0) {
 static const char *get_obj_name_str(enum ObjTypeFlag objFlag) {
     const char *objName;
     switch (objFlag) {
-        case OBJ_TYPE_JOINTS:
-            objName = "joints";
-            break;
-        case OBJ_TYPE_BONES:
-            objName = "bones";
-            break;
-        case OBJ_TYPE_GROUPS:
-            objName = "groups";
-            break;
-        case OBJ_TYPE_PARTICLES:
-            objName = "particles";
-            break;
-        case OBJ_TYPE_SHAPES:
-            objName = "shapes";
-            break;
-        case OBJ_TYPE_NETS:
-            objName = "nets";
-            break;
-        case OBJ_TYPE_PLANES:
-            objName = "planes";
-            break;
-        case OBJ_TYPE_VERTICES:
-            objName = "vertices";
-            break;
-        case OBJ_TYPE_CAMERAS:
-            objName = "cameras";
-            break;
-        case OBJ_TYPE_FACES:
-            objName = "faces";
-            break;
-        case OBJ_TYPE_MATERIALS:
-            objName = "materials";
-            break;
-        case OBJ_TYPE_LIGHTS:
-            objName = "lights";
-            break;
-        case OBJ_TYPE_WEIGHTS:
-            objName = "weights";
-            break;
-        case OBJ_TYPE_GADGETS:
-            objName = "gadgets";
-            break;
-        case OBJ_TYPE_VIEWS:
-            objName = "views";
-            break;
-        case OBJ_TYPE_LABELS:
-            objName = "labels";
-            break;
-        case OBJ_TYPE_ANIMATORS:
-            objName = "animators";
-            break;
-        case OBJ_TYPE_VALPTRS:
-            objName = "valptrs";
-            break;
-        case OBJ_TYPE_ZONES:
-            objName = "zones";
-            break;
-        default:
-            objName = "unkown";
-            break;
+        case OBJ_TYPE_JOINTS:    objName = "joints";    break;
+        case OBJ_TYPE_BONES:     objName = "bones";     break;
+        case OBJ_TYPE_GROUPS:    objName = "groups";    break;
+        case OBJ_TYPE_PARTICLES: objName = "particles"; break;
+        case OBJ_TYPE_SHAPES:    objName = "shapes";    break;
+        case OBJ_TYPE_NETS:      objName = "nets";      break;
+        case OBJ_TYPE_PLANES:    objName = "planes";    break;
+        case OBJ_TYPE_VERTICES:  objName = "vertices";  break;
+        case OBJ_TYPE_CAMERAS:   objName = "cameras";   break;
+        case OBJ_TYPE_FACES:     objName = "faces";     break;
+        case OBJ_TYPE_MATERIALS: objName = "materials"; break;
+        case OBJ_TYPE_LIGHTS:    objName = "lights";    break;
+        case OBJ_TYPE_WEIGHTS:   objName = "weights";   break;
+        case OBJ_TYPE_GADGETS:   objName = "gadgets";   break;
+        case OBJ_TYPE_VIEWS:     objName = "views";     break;
+        case OBJ_TYPE_LABELS:    objName = "labels";    break;
+        case OBJ_TYPE_ANIMATORS: objName = "animators"; break;
+        case OBJ_TYPE_VALPTRS:   objName = "valptrs";   break;
+        case OBJ_TYPE_ZONES:     objName = "zones";     break;
+        default:                 objName = "unkown";    break;
     }
     return objName;
 }
@@ -341,16 +263,6 @@ struct ObjZone *make_zone(struct ObjGroup *a0, struct GdBoundingBox *bbox, struc
     newZone->unk30 = a0;
 
     return newZone;
-}
-
-/* @ 22AF70 for 0x60 */
-struct ObjUnk200000 *func_8017C7A0(struct ObjVertex *a0, struct ObjFace *a1) {
-    struct ObjUnk200000 *unk = (struct ObjUnk200000 *) make_object(OBJ_TYPE_UNK200000);
-
-    unk->unk30 = a0;
-    unk->unk34 = a1;
-
-    return unk;
 }
 
 /**
@@ -611,7 +523,7 @@ struct ObjView *make_view(const char *name, s32 flags, s32 projectionType, s32 u
     addto_group(gGdViewsGroup, &newView->header);
 
     newView->flags = flags | VIEW_UPDATE | VIEW_LIGHT;
-    newView->id = sGdViewInfo.count++;
+    newView->id = sGdViewCount++;
 
     if ((newView->components = parts) != NULL) {
         reset_nets_and_gadgets(parts);
@@ -1087,61 +999,6 @@ s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj
         }
     }
     return 0;
-}
-
-/* @ 22D9E0 for 0x1BC */
-s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
-    struct ListNode *sp6C;
-    struct ObjGroup *sp68;
-    UNUSED Mat4f *sp60;
-    Mat4f *sp5C;
-    UNUSED Mat4f *sp58;
-    Mat4f *sp54;
-    Mat4f *sp50;
-    struct GdVec3f sp2C;
-    s32 count = 0;
-
-    count++;
-
-    if (a1 != NULL) {
-        set_cur_dynobj(a1);
-        sp60 = d_get_matrix_ptr();
-        sp54 = (Mat4f *) d_get_rot_mtx_ptr();
-
-        set_cur_dynobj(a0);
-        sp5C = d_get_i_mtx_ptr();
-        sp50 = (Mat4f *) d_get_rot_mtx_ptr();
-
-        d_get_scale(&sp2C);
-        gd_mult_mat4f(sp5C, sp54, sp50);
-        gd_scale_mat4f_by_vec3f(sp50, &sp2C);
-    } else {
-        set_cur_dynobj(a0);
-        sp58 = d_get_matrix_ptr();
-        sp5C = d_get_i_mtx_ptr();
-        sp54 = (Mat4f *) d_get_rot_mtx_ptr();
-
-        d_get_scale(&sp2C);
-        gd_copy_mat4f(sp5C, sp54);
-        gd_scale_mat4f_by_vec3f(sp54, &sp2C);
-    }
-
-    set_cur_dynobj(a0);
-    sp68 = d_get_att_objgroup();
-
-    if (sp68 != NULL) {
-        sp6C = sp68->firstMember;
-        while (sp6C != NULL) {
-            count += func_8017F210(sp6C->obj, a0);
-            sp6C = sp6C->next;
-        }
-    }
-    return count;
-}
-
-/* @ 22DB9C for 0x38; a0 might be ObjUnk200000* */
-void func_8017F3CC(struct Unk8017F3CC *a0) {
-    gd_rotate_and_translate_vec3f(&a0->unk20, D_801B9E48);
 }
 
 /**
@@ -1679,19 +1536,16 @@ void reset_nets_and_gadgets(struct ObjGroup *group) {
 
 /* @ 22FD08 for 0x9C; orig name: func_80181538*/
 void null_obj_lists(void) {
-    D_801B9E44 = 0;
     gGdObjCount = 0;
     gGdGroupCount = 0;
     gGdPlaneCount = 0;
     gGdCameraCount = 0;
-    sGdViewInfo.count = 0;
+    sGdViewCount = 0;
 
     gGdCameraList = NULL;
-    D_801B9E50 = NULL;
     gGdBoneList = NULL;
     gGdJointList = NULL;
     gGdGroupList = NULL;
-    D_801B9E80 = NULL;
     gGdObjectList = NULL;
     gGdViewsGroup = NULL;
 

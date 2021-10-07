@@ -237,12 +237,12 @@ void clear_buf_to_cr(void) {
 }
 
 /* @ 2461D4 for 0x2c; orig name: func_80197A04 */
-s8 get_current_buf_char(void) {
+s32 get_current_buf_char(void) {
     return sGdLineBuf[sGdLineBufCsr];
 }
 
 /* @ 246200 for 0x64; orig name: func_80197A30 */
-s8 get_and_advance_buf(void) {
+s32 get_and_advance_buf(void) {
     if (get_current_buf_char() == '\0') {
         return '\0';
     }
@@ -251,7 +251,7 @@ s8 get_and_advance_buf(void) {
 }
 
 /* @ 246264 for 0x80; orig name: func_80197A94 */
-s8 load_next_line_into_buf(void) {
+s32 load_next_line_into_buf(void) {
     sGdLineBufCsr = 0;
 
     if (gd_feof(sGdShapeFile) != 0) {

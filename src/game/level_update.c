@@ -141,29 +141,29 @@ const char *credits20[] = { "1EXECUTIVE PRODUCER", "HIROSHI YAMAUCHI" };
 
 
 struct CreditsEntry sCreditsSequence[] = {
-    { LEVEL_CASTLE_GROUNDS, 1, 1, -128, { 0, 8000, 0 }, NULL },
-    { LEVEL_BOB, 1, 1, 117, { 713, 3918, -3889 }, credits01 },
-    { LEVEL_WF, 1, 50, 46, { 347, 5376, 326 }, credits02 },
-    { LEVEL_JRB, 1, 18, 22, { 3800, -4840, 2727 }, credits03 },
-    { LEVEL_CCM, 2, 34, 25, { -5464, 6656, -6575 }, credits04 },
-    { LEVEL_BBH, 1, 1, 60, { 257, 1922, 2580 }, credits05 },
-    { LEVEL_HMC, 1, -15, 123, { -6469, 1616, -6054 }, credits06 },
-    { LEVEL_THI, 3, 17, -32, { 508, 1024, 1942 }, credits07 },
-    { LEVEL_LLL, 2, 33, 124, { -73, 82, -1467 }, credits08 },
-    { LEVEL_SSL, 1, 65, 98, { -5906, 1024, -2576 }, credits09 },
-    { LEVEL_DDD, 1, 50, 47, { -4884, -4607, -272 }, credits10 },
-    { LEVEL_SL, 1, 17, -34, { 1925, 3328, 563 }, credits11 },
-    { LEVEL_WDW, 1, 33, 105, { -537, 1850, 1818 }, credits12 },
-    { LEVEL_TTM, 1, 2, -33, { 2613, 313, 1074 }, credits13 },
-    { LEVEL_THI, 1, 51, 54, { -2609, 512, 856 }, credits14 },
-    { LEVEL_TTC, 1, 17, -72, { -1304, -71, -967 }, credits15 },
-    { LEVEL_RR, 1, 33, 64, { 1565, 1024, -148 }, credits16 },
-    { LEVEL_SA, 1, 1, 24, { -1050, -1330, -1559 }, credits17 },
-    { LEVEL_COTMC, 1, 49, -16, { -254, 415, -6045 }, credits18 },
-    { LEVEL_DDD, 2, -111, -64, { 3948, 1185, -104 }, credits19 },
-    { LEVEL_CCM, 1, 33, 31, { 3169, -4607, 5240 }, credits20 },
-    { LEVEL_CASTLE_GROUNDS, 1, 1, -128, { 0, 906, -1200 }, NULL },
-    { LEVEL_NONE, 0, 1, 0, { 0, 0, 0 }, NULL },
+    { LEVEL_CASTLE_GROUNDS, 1,    1, -128, {     0,  8000,     0 }, NULL      },
+    { LEVEL_BOB,            1,    1,  117, {   713,  3918, -3889 }, credits01 },
+    { LEVEL_WF,             1,   50,   46, {   347,  5376,   326 }, credits02 },
+    { LEVEL_JRB,            1,   18,   22, {  3800, -4840,  2727 }, credits03 },
+    { LEVEL_CCM,            2,   34,   25, { -5464,  6656, -6575 }, credits04 },
+    { LEVEL_BBH,            1,    1,   60, {   257,  1922,  2580 }, credits05 },
+    { LEVEL_HMC,            1,  -15,  123, { -6469,  1616, -6054 }, credits06 },
+    { LEVEL_THI,            3,   17,  -32, {   508,  1024,  1942 }, credits07 },
+    { LEVEL_LLL,            2,   33,  124, {   -73,    82, -1467 }, credits08 },
+    { LEVEL_SSL,            1,   65,   98, { -5906,  1024, -2576 }, credits09 },
+    { LEVEL_DDD,            1,   50,   47, { -4884, -4607,  -272 }, credits10 },
+    { LEVEL_SL,             1,   17,  -34, {  1925,  3328,   563 }, credits11 },
+    { LEVEL_WDW,            1,   33,  105, {  -537,  1850,  1818 }, credits12 },
+    { LEVEL_TTM,            1,    2,  -33, {  2613,   313,  1074 }, credits13 },
+    { LEVEL_THI,            1,   51,   54, { -2609,   512,   856 }, credits14 },
+    { LEVEL_TTC,            1,   17,  -72, { -1304,   -71,  -967 }, credits15 },
+    { LEVEL_RR,             1,   33,   64, {  1565,  1024,  -148 }, credits16 },
+    { LEVEL_SA,             1,    1,   24, { -1050, -1330, -1559 }, credits17 },
+    { LEVEL_COTMC,          1,   49,  -16, {  -254,   415, -6045 }, credits18 },
+    { LEVEL_DDD,            2, -111,  -64, {  3948,  1185,  -104 }, credits19 },
+    { LEVEL_CCM,            1,   33,   31, {  3169, -4607,  5240 }, credits20 },
+    { LEVEL_CASTLE_GROUNDS, 1,    1, -128, {     0,   906, -1200 }, NULL      },
+    { LEVEL_NONE,           0,    1,    0, {     0,     0,     0 }, NULL      },
 };
 
 struct MarioState gMarioStates[1];
@@ -183,7 +183,7 @@ s8 gNeverEnteredCastle;
 struct MarioState *gMarioState = &gMarioStates[0];
 s8 sWarpCheckpointActive = FALSE;
 
-u16 level_control_timer(s32 timerOp) {
+u32 level_control_timer(s32 timerOp) {
     switch (timerOp) {
         case TIMER_CONTROL_SHOW:
             gHudDisplay.flags |= HUD_DISPLAY_FLAG_TIMER;
@@ -274,8 +274,8 @@ void load_level_init_text(u32 arg) {
     }
 }
 
-void init_door_warp(struct SpawnInfo *spawnInfo, u32 arg1) {
-    if (arg1 & WARP_FLAG_DOOR_FLIP_MARIO) {
+void init_door_warp(struct SpawnInfo *spawnInfo, u32 warpDestFlags) {
+    if (warpDestFlags & WARP_FLAG_DOOR_FLIP_MARIO) {
         spawnInfo->startAngle[1] += 0x8000;
     }
 
@@ -309,10 +309,10 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
         case MARIO_SPAWN_DOOR_WARP:
             set_mario_action(m, ACT_WARP_DOOR_SPAWN, actionArg);
             break;
-        case MARIO_SPAWN_UNKNOWN_02:
+        case MARIO_SPAWN_IDLE:
             set_mario_action(m, ACT_IDLE, 0);
             break;
-        case MARIO_SPAWN_UNKNOWN_03:
+        case MARIO_SPAWN_PIPE:
             set_mario_action(m, ACT_EMERGE_FROM_PIPE, 0);
             break;
         case MARIO_SPAWN_TELEPORT:
@@ -361,7 +361,12 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
             set_mario_action(m, ACT_SPECIAL_DEATH_EXIT, 0);
             break;
     }
-
+#ifdef PREVENT_DEATH_LOOP
+    if (m->isDead) {
+        m->health = 0x880;
+        m->isDead = FALSE;
+    }
+#endif
     set_mario_initial_cap_powerup(m);
 }
 
@@ -399,7 +404,7 @@ void init_mario_after_warp(void) {
     sDelayedWarpOp = WARP_OP_NONE;
 
     switch (marioSpawnType) {
-        case MARIO_SPAWN_UNKNOWN_03:
+        case MARIO_SPAWN_PIPE:
             play_transition(WARP_TRANSITION_FADE_FROM_STAR, 0x10, 0x00, 0x00, 0x00);
             break;
         case MARIO_SPAWN_DOOR_WARP:
@@ -565,7 +570,7 @@ void check_instant_warp(void) {
     }
 }
 
-s16 music_unchanged_through_warp(s16 arg) {
+s32 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
     s16 levelNum = warpNode->node.destLevel & 0x7F;
 
@@ -709,10 +714,13 @@ void initiate_painting_warp(void) {
  * based on the warp operation and sometimes Mario's used object.
  * Return the time left until the delayed warp is initiated.
  */
-s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
+s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
     s32 fadeMusic = TRUE;
 
     if (sDelayedWarpOp == WARP_OP_NONE) {
+#ifdef SAVE_NUM_LIVES
+        save_file_set_num_lives(m->numLives);
+#endif
         m->invincTimer = -1;
         sDelayedWarpArg = WARP_FLAGS_NONE;
         sDelayedWarpOp = warpOp;
@@ -752,6 +760,9 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 sSourceWarpNodeId = WARP_NODE_DEATH;
                 play_transition(WARP_TRANSITION_FADE_INTO_BOWSER, sDelayedWarpTimer, 0x00, 0x00, 0x00);
                 play_sound(SOUND_MENU_BOWSER_LAUGH, gGlobalSoundSource);
+#ifdef PREVENT_DEATH_LOOP
+                m->isDead = TRUE;
+#endif
                 break;
 
             case WARP_OP_WARP_FLOOR:
@@ -925,18 +936,16 @@ void update_hud_values(void) {
                 play_sound(coinSound, gMarioState->marioObj->header.gfx.cameraToObject);
             }
         }
-
-        if (gMarioState->numLives > 100) {
-            gMarioState->numLives = 100;
+#ifdef SAVE_NUM_LIVES
+        if (gMarioState->numLives > MAX_NUM_LIVES) {
+            gMarioState->numLives = MAX_NUM_LIVES;
+            save_file_set_num_lives(MAX_NUM_LIVES);
         }
-
-        if (gMarioState->numCoins > 999) {
-            gMarioState->numCoins = 999;
-        }
-
-        if (gHudDisplay.coins > 999) {
-            gHudDisplay.coins = 999;
-        }
+#else
+        if (gMarioState->numLives > MAX_NUM_LIVES) gMarioState->numLives = MAX_NUM_LIVES;
+#endif
+        if (gMarioState->numCoins > MAX_NUM_COINS) gMarioState->numCoins = MAX_NUM_COINS;
+        if (gHudDisplay.coins     > MAX_NUM_COINS) gHudDisplay.coins     = MAX_NUM_COINS;
 
         gHudDisplay.stars = gMarioState->numStars;
         gHudDisplay.lives = gMarioState->numLives;
@@ -960,7 +969,7 @@ void update_hud_values(void) {
  * presumably to allow painting and camera updating while avoiding triggering the
  * warp twice.
  */
-void basic_update(UNUSED s16 *arg) {
+void basic_update(void) {
     area_update_objects();
     update_hud_values();
 #ifdef PUPPYLIGHTS
@@ -1063,7 +1072,7 @@ s32 play_mode_frame_advance(void) {
         gCameraMovementFlags |= CAM_MOVE_PAUSE_SCREEN;
     }
 
-    return 0;
+    return FALSE;
 }
 
 /**
@@ -1071,7 +1080,7 @@ s32 play_mode_frame_advance(void) {
  * but before it actually occurs. If updateFunction is not NULL, it will be
  * called each frame during the transition.
  */
-void level_set_transition(s16 length, void (*updateFunction)(s16 *)) {
+void level_set_transition(s16 length, void (*updateFunction)()) {
     sTransitionTimer = length;
     sTransitionUpdate = updateFunction;
 }
@@ -1278,7 +1287,7 @@ void load_language_text(void) {
 }
 #endif
 
-s32 lvl_init_from_save_file(UNUSED s16 arg0, s32 levelNum) {
+s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
 #if MULTILANG
     gInGameLanguage = eu_get_language()+1;
     load_language_text();
@@ -1305,7 +1314,7 @@ s32 lvl_init_from_save_file(UNUSED s16 arg0, s32 levelNum) {
     return levelNum;
 }
 
-s32 lvl_set_current_level(UNUSED s16 arg0, s32 levelNum) {
+s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     s32 warpCheckpointActive = sWarpCheckpointActive;
 
     sWarpCheckpointActive = FALSE;
@@ -1331,17 +1340,13 @@ s32 lvl_set_current_level(UNUSED s16 arg0, s32 levelNum) {
         return FALSE;
     }
 
-    if (gDebugLevelSelect) {
-        return FALSE;
-    }
-
-    return TRUE;
+    return (!gDebugLevelSelect);
 }
 
 /**
  * Play the "thank you so much for to playing my game" sound.
  */
-s32 lvl_play_the_end_screen_sound(UNUSED s16 arg0, UNUSED s32 arg1) {
+s32 lvl_play_the_end_screen_sound(UNUSED s16 initOrUpdate, UNUSED s32 levelNum) {
     play_sound(SOUND_MENU_THANK_YOU_PLAYING_MY_GAME, gGlobalSoundSource);
     return TRUE;
 }

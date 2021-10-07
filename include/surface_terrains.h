@@ -190,14 +190,17 @@
 #define TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH(cmd) (cmd >= 0x65)
 
 // Terrain types defined by the level script command terrain_type (cmd_31)
-#define TERRAIN_GRASS  0x0000
-#define TERRAIN_STONE  0x0001
-#define TERRAIN_SNOW   0x0002
-#define TERRAIN_SAND   0x0003
-#define TERRAIN_SPOOKY 0x0004
-#define TERRAIN_WATER  0x0005
-#define TERRAIN_SLIDE  0x0006
-#define TERRAIN_MASK   0x0007
+enum TerrainType
+{
+    TERRAIN_GRASS,
+    TERRAIN_STONE,
+    TERRAIN_SNOW,
+    TERRAIN_SAND,
+    TERRAIN_SPOOKY,
+    TERRAIN_WATER,
+    TERRAIN_SLIDE,
+    TERRAIN_MASK = 0x7
+};
 
 // These collision commands are unique "surface" types like those defined higher
 

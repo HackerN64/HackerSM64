@@ -25,6 +25,7 @@
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "main.h"
+#include "color_presets.h"
 
 #ifdef PUPPYCAM
 
@@ -100,11 +101,11 @@ static const struct gPCOptionStruct gPCOptions[] = { //If the min and max are 0 
 
 u8 gPCOptionCap = sizeof(gPCOptions) / sizeof(struct gPCOptionStruct); //How many options there are in newcam_uptions.
 
-s16 LENSIN(s16 length, s16 direction) {
-    return (length * sins(direction));
+inline s32 LENSIN(s16 length, s16 direction) {
+    return (s16)(length * sins(direction));
 }
-s16 LENCOS(s16 length, s16 direction) {
-    return (length * coss(direction));
+inline s32 LENCOS(s16 length, s16 direction) {
+    return (s16)(length * coss(direction));
 }
 
 static void puppycam_analogue_stick(void) {
@@ -918,7 +919,7 @@ const struct sPuppyAngles puppyAnglesNull = {
 
 // Checks the bounding box of a puppycam volume. If it's inside, then set the pointer to the current index.
 static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) {
-    s32 rel[3];
+    Vec3i rel;
     s32 pos[2];
 
     if (sPuppyVolumeStack[index]->room != gMarioCurrentRoom && sPuppyVolumeStack[index]->room != -1) {
@@ -934,7 +935,7 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         Vec3f debugPos[2];
         vec3f_set(debugPos[0], sPuppyVolumeStack[index]->pos[0],    sPuppyVolumeStack[index]->pos[1],    sPuppyVolumeStack[index]->pos[2]);
         vec3f_set(debugPos[1], sPuppyVolumeStack[index]->radius[0], sPuppyVolumeStack[index]->radius[1], sPuppyVolumeStack[index]->radius[2]);
-        debug_box_color(0x0000FF00);
+        debug_box_color(COLOR_RGBA32_DEBUG_PUPPYVOLUME);
         debug_box_rot(debugPos[0], debugPos[1], sPuppyVolumeStack[index]->rot, DEBUG_SHAPE_BOX | DEBUG_UCODE_DEFAULT);
 #endif
         // Now compare values.
@@ -952,7 +953,7 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         Vec3f debugPos[2];
         vec3f_set(debugPos[0], sPuppyVolumeStack[index]->pos[0],    sPuppyVolumeStack[index]->pos[1],    sPuppyVolumeStack[index]->pos[2]);
         vec3f_set(debugPos[1], sPuppyVolumeStack[index]->radius[0], sPuppyVolumeStack[index]->radius[1], sPuppyVolumeStack[index]->radius[2]);
-        debug_box_color(0x0000FF00);
+        debug_box_color(COLOR_RGBA32_DEBUG_PUPPYVOLUME);
         debug_box_rot(debugPos[0], debugPos[1], sPuppyVolumeStack[index]->rot, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_DEFAULT);
 #endif
         f32 distCheck = (dist < sqr(sPuppyVolumeStack[index]->radius[0]));
@@ -986,7 +987,7 @@ void puppycam_wall_angle(void) {
     } else {
         return;
     }
-    s16 wallYaw = atan2s(wall->normal.z, wall->normal.x) + 0x4000;
+    s16 wallYaw = SURFACE_YAW(wall) + 0x4000;
 
     wallYaw -= gPuppyCam.yawTarget;
     if (wallYaw % 0x4000) {

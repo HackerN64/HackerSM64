@@ -218,48 +218,13 @@ void create_dl_ortho_matrix(void) {
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH)
 }
 
-#if !defined(VERSION_JP) && !defined(VERSION_SH)
-UNUSED
-#endif
-static Texture *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) { //! Texture type for *in?
-    s32 inPos;
-    u16 bitMask;
-    Texture *out;
-    s16 outPos = 0;
-
-    out = alloc_display_list((u32) width * (u32) height);
-
-    if (out == NULL) {
-        return NULL;
-    }
-
-    for (inPos = 0; inPos < (width * height) / 16; inPos++) {
-        bitMask = 0x8000;
-
-        while (bitMask != 0) {
-            if (in[inPos] & bitMask) {
-                out[outPos] = 0xFF;
-            } else {
-                out[outPos] = 0x00;
-            }
-
-            bitMask /= 2;
-            outPos++;
-        }
-    }
-
-    return out;
-}
-
 Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     u32 size = (u32) width * (u32) height;
-    Texture *out;
     s32 inPos;
-    s16 outPos;
+    s16 outPos = 0;
     u8 bitMask;
 
-    outPos = 0;
-    out = (Texture *) alloc_display_list(size);
+    Texture *out = (Texture *) alloc_display_list(size);
 
     if (out == NULL) {
         return NULL;
@@ -280,20 +245,16 @@ Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
 }
 
 void render_generic_char(u8 c) {
-    void **fontLUT;
-    void *packedTexture;
-    UNUSED void *unpackedTexture;
-
-    fontLUT = segmented_to_virtual(main_font_lut);
-    packedTexture = segmented_to_virtual(fontLUT[c]);
-    #ifdef VERSION_EU
-    unpackedTexture = alloc_ia4_tex_from_i1(packedTexture, 8, 8);
+    void **fontLUT = segmented_to_virtual(main_font_lut);
+    void *packedTexture = segmented_to_virtual(fontLUT[c]);
+#ifdef VERSION_EU
+    void *unpackedTexture = alloc_ia4_tex_from_i1(packedTexture, 8, 8);
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));
-    #else
+#else
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(packedTexture));
-    #endif
+#endif
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
 }
@@ -314,8 +275,7 @@ enum MultiStringIDs { STRING_THE, STRING_YOU };
  * 0: 'the'
  * 1: 'you'
  */
-void render_multi_text_string(s8 multiTextID)
-{
+void render_multi_text_string(s8 multiTextID) {
     s8 i;
     struct MultiTextEntry textLengths[2] = {
         { 3, { TEXT_THE_RAW } },
@@ -335,12 +295,12 @@ void render_multi_text_string(s8 multiTextID)
  * In JP/EU a IA1 texture is used but in US a IA4 texture is used.
  */
 void print_generic_string(s16 x, s16 y, const u8 *str) {
-    UNUSED s8 mark = DIALOG_MARK_NONE; // unused in EU
+    s8 mark = DIALOG_MARK_NONE; // unused in EU
     s32 strPos = 0;
     u8 lineNum = 1;
 
     s16 colorLoop;
-    u8 rgbaColors[4] = {0, 0, 0, 0};
+    ColorRGBA rgbaColors = {0, 0, 0, 0};
     u8 customColor = FALSE;
     u8 diffTmp = 0;
 
@@ -591,7 +551,7 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
 
 // EU has both get_str_x_pos_from_center and get_str_x_pos_from_center_scale
 // US and JP only implement one or the other
-s16 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
+s32 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
     s16 strPos = 0;
     f32 spacesWidth = 0.0f;
 
@@ -605,7 +565,7 @@ s16 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
 }
 
 
-s16 get_string_width(u8 *str) {
+s32 get_string_width(u8 *str) {
     s16 strPos = 0;
     s16 width = 0;
 
@@ -681,7 +641,7 @@ void int_to_str(s32 num, u8 *dst) {
     dst[pos] = DIALOG_CHAR_TERMINATOR;
 }
 
-s16 get_dialog_id(void) {
+s32 get_dialog_id(void) {
     return gDialogID;
 }
 
@@ -789,7 +749,6 @@ void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum, u8 *cust
     }
 }
 
-
 #define X_VAL3 0.0f
 #define Y_VAL3 16
 
@@ -800,7 +759,7 @@ void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s
         pageState[0] = DIALOG_PAGE_STATE_SCROLL;
         return;
     }
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, 2 - (lineNum * Y_VAL3), 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, 0.0f, 2 - (lineNum * 16), 0);
 
     linePos[0] = 0;
     xMatrix[0] = 1;
@@ -1269,7 +1228,7 @@ void dl_rgba16_stop_cutscene_msg_fade(void) {
     }
 }
 
-u8 ascii_to_credits_char(u8 c) {
+u32 ascii_to_credits_char(u8 c) {
     if (c >= 'A' && c <= 'Z') return (c - ('A' - 0xA));
     if (c >= 'a' && c <= 'z') return (c - ('a' - 0xA)); // remap lower to upper case
     if (c == ' ') return GLOBAL_CHAR_SPACE;
@@ -1488,20 +1447,25 @@ void print_animated_red_coin(s16 x, s16 y) {
     create_dl_scale_matrix(MENU_MTX_NOPUSH, 0.2f, 0.2f, 1.0f);
     gDPSetRenderMode(gDisplayListHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
 
-    switch (timer & 6) {
-        case 0:
-            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_03007940);
-            break;
-        case 2:
-            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_03007968);
-            break;
-        case 4:
-            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_03007990);
-            break;
-        case 6:
-            gSPDisplayList(gDisplayListHead++, coin_seg3_dl_030079B8);
-            break;
+#ifdef IA8_30FPS_COINS
+    switch (timer & 0x7) {
+        case 0: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_0     ); break;
+        case 1: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_22_5  ); break;
+        case 2: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_45    ); break;
+        case 3: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_67_5  ); break;
+        case 4: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_90    ); break;
+        case 5: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_67_5_r); break;
+        case 6: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_45_r  ); break;
+        case 7: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_22_5_r); break;
     }
+#else
+    switch (timer & 0x6) {
+        case 0: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_front     ); break;
+        case 2: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_tilt_right); break;
+        case 4: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_side      ); break;
+        case 6: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_tilt_left ); break;
+    }
+#endif
 
     gDPSetRenderMode(gDisplayListHead++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
@@ -1729,7 +1693,7 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileNum, s16 courseNum) 
 
     u16 nextStar = 0;
 
-    if (starFlags & 0x40) {
+    if (starFlags & STAR_FLAG_ACT_100_COINS) {
         starCount--;
         print_generic_string(x + 89, y - 5, textStar);
     }
@@ -1814,25 +1778,24 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-s8 gCourseCompleteCoinsEqual = 0;
+s8 gCourseCompleteCoinsEqual = FALSE;
 s32 gCourseDoneMenuTimer = 0;
 s32 gCourseCompleteCoins = 0;
 s8 gHudFlash = 0;
 
-s16 render_pause_courses_and_castle(void) {
+s32 render_pause_courses_and_castle(void) {
     s16 index;
 
-    #ifdef PUPPYCAM
+#ifdef PUPPYCAM
     puppycam_check_pause_buttons();
-    if (!gPCOptionOpen)
-    {
-    #endif
+    if (!gPCOptionOpen) {
+#endif
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             gDialogLineNum = MENU_OPT_DEFAULT;
             gDialogTextAlpha = 0;
             level_set_transition(-1, NULL);
-            play_sound(SOUND_MENU_PAUSE_HIGHPRIO, gGlobalSoundSource);
+            play_sound(SOUND_MENU_PAUSE_OPEN, gGlobalSoundSource);
 
             if (gCurrCourseNum >= COURSE_MIN && gCurrCourseNum <= COURSE_MAX) {
                 change_dialog_camera_angle();
@@ -1846,21 +1809,20 @@ s16 render_pause_courses_and_castle(void) {
             shade_screen();
             render_pause_my_score_coins();
             render_pause_red_coins();
-        #ifndef EXIT_COURSE_WHILE_MOVING
-            s32 exitCheck = gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT;
-        #else
-            s32 exitCheck = 1;
-        #endif
-            #ifndef DISABLE_EXIT_COURSE
+#ifndef EXIT_COURSE_WHILE_MOVING
+            s32 exitCheck = (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT);
+#else
+            s32 exitCheck = TRUE;
+#endif
+#ifndef DISABLE_EXIT_COURSE
             if (exitCheck)
                 render_pause_course_options(99, 93, &gDialogLineNum, 15);
-            #endif
+#endif
 
             if (gPlayer3Controller->buttonPressed & A_BUTTON
-             || gPlayer3Controller->buttonPressed & START_BUTTON)
-            {
+             || gPlayer3Controller->buttonPressed & START_BUTTON) {
                 level_set_transition(0, NULL);
-                play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource);
+                play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;
                 gMenuMode = MENU_MODE_NONE;
 
@@ -1880,10 +1842,9 @@ s16 render_pause_courses_and_castle(void) {
             render_pause_castle_main_strings(104, 60);
 
             if (gPlayer3Controller->buttonPressed & A_BUTTON
-             || gPlayer3Controller->buttonPressed & START_BUTTON)
-            {
+             || gPlayer3Controller->buttonPressed & START_BUTTON) {
                 level_set_transition(0, NULL);
-                play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource);
+                play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gMenuMode = MENU_MODE_NONE;
                 gDialogBoxState = DIALOG_STATE_OPENING;
 
@@ -1891,16 +1852,14 @@ s16 render_pause_courses_and_castle(void) {
             }
             break;
     }
-    #if defined(WIDE) && !defined(PUPPYCAM)
+#if defined(WIDE) && !defined(PUPPYCAM)
         render_widescreen_setting();
-    #endif
+#endif
     if (gDialogTextAlpha < 250) {
         gDialogTextAlpha += 25;
     }
     #ifdef PUPPYCAM
-    }
-    else
-    {
+    } else {
         shade_screen();
         puppycam_display_options();
     }
@@ -1952,7 +1911,7 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     if (gCourseCompleteCoins >= gHudDisplay.coins) {
-        gCourseCompleteCoinsEqual = 1;
+        gCourseCompleteCoinsEqual = TRUE;
         gCourseCompleteCoins = gHudDisplay.coins;
 
         if (gGotFileCoinHiScore) {
@@ -1970,7 +1929,7 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
         }
 
         if (gHudDisplay.coins == gCourseCompleteCoins && gGotFileCoinHiScore) {
-            play_sound(SOUND_MENU_MARIO_CASTLE_WARP2, gGlobalSoundSource);
+            play_sound(SOUND_MENU_HIGH_SCORE, gGlobalSoundSource);
         }
     }
 }
@@ -2085,13 +2044,16 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 sp6e)
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
-s16 render_course_complete_screen(void) {
+s32 render_course_complete_screen(void) {
     s16 index;
 
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             render_course_complete_lvl_info_and_hud_str();
-            if (gCourseDoneMenuTimer > 100 && gCourseCompleteCoinsEqual == 1) {
+            if (gCourseDoneMenuTimer > 100 && gCourseCompleteCoinsEqual) {
+#ifdef SAVE_NUM_LIVES
+                save_file_set_num_lives(gMarioState->numLives);
+#endif
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 level_set_transition(-1, NULL);
                 gDialogTextAlpha = 0;
@@ -2114,7 +2076,7 @@ s16 render_course_complete_screen(void) {
                 index = gDialogLineNum;
                 gCourseDoneMenuTimer = 0;
                 gCourseCompleteCoins = 0;
-                gCourseCompleteCoinsEqual = 0;
+                gCourseCompleteCoinsEqual = FALSE;
                 gHudFlash = 0;
 
                 return index;
@@ -2131,7 +2093,7 @@ s16 render_course_complete_screen(void) {
     return MENU_OPT_NONE;
 }
 
-s16 render_menus_and_dialogs(void) {
+s32 render_menus_and_dialogs(void) {
     s16 index = MENU_OPT_NONE;
 
     create_dl_ortho_matrix();

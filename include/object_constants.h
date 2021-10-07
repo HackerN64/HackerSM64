@@ -180,6 +180,11 @@
     #define COIN_TYPE_YELLOW                                0x1
     #define COIN_TYPE_BLUE                                  0x2
 
+/* Bouncing Coin */
+    /* oAction */
+    #define BOUNCING_COIN_ACT_FALLING                       0x0
+    #define BOUNCING_COIN_ACT_BOUNCING                      0x1
+
 /* Hidden Blue Coin */
     /* oAction */
     #define HIDDEN_BLUE_COIN_ACT_INACTIVE                   0x0
@@ -209,19 +214,20 @@
     /* oAction */
     #define MOV_YCOIN_ACT_IDLE                              0x0
     #define MOV_YCOIN_ACT_BLINKING                          0x1
-    /* oSubAction */
 
 /* Coin Formation */
-    /* (oBehParams2ndByte & 0x7) */
-    #define COIN_FORMATION_BP_HORIZONTAL_LINE               0x0
-    #define COIN_FORMATION_BP_VERTICAL_LINE                 0x1
-    #define COIN_FORMATION_BP_HORIZONTAL_RING               0x2
-    #define COIN_FORMATION_BP_VERTICAL_RING                 0x3
-    #define COIN_FORMATION_BP_ARROW                         0x4
+    /* oBehParams2ndByte */
+    #define COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE         0x00
+    #define COIN_FORMATION_BP_SHAPE_VERTICAL_LINE           0x01
+    #define COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING         0x02
+    #define COIN_FORMATION_BP_SHAPE_VERTICAL_RING           0x03
+    #define COIN_FORMATION_BP_SHAPE_ARROW                   0x04
+    #define COIN_FORMATION_BP_SHAPE_MASK                    0x07
+    #define COIN_FORMATION_BP_FLYING                        0x10
     /* oAction */
-    #define COIN_FORMATION_ACT_INACTIVE                     0x0
-    #define COIN_FORMATION_ACT_ACTIVE                       0x1
-    #define COIN_FORMATION_ACT_DEACTIVATE                   0x2
+    #define COIN_FORMATION_ACT_INACTIVE                     0x00
+    #define COIN_FORMATION_ACT_ACTIVE                       0x01
+    #define COIN_FORMATION_ACT_DEACTIVATE                   0x02
 
 /* Coin Inside Boo */
     /* oAction */

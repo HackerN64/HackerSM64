@@ -49,7 +49,7 @@ s32 piranha_plant_check_interactions(void) {
         } else {
             o->oAction = PIRANHA_PLANT_ACT_WOKEN_UP;
         }
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     } else {
         interacted = 0;
     }
@@ -137,7 +137,7 @@ void piranha_plant_reset_when_far(void) {
 void piranha_plant_attacked(void) {
     cur_obj_become_intangible();
     cur_obj_init_animation_with_sound(2);
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
     if (cur_obj_check_if_near_animation_end())
         o->oAction = PIRANHA_PLANT_ACT_SHRINK_AND_DIE;
     piranha_plant_reset_when_far(); // see this function's comment
@@ -246,9 +246,11 @@ void piranha_plant_act_biting(void) {
 
     // If the player is wearing the Metal Cap and interacts with the Piranha
     // Plant, the Piranha Plant will die.
-    if (o->oInteractStatus & INT_STATUS_INTERACTED)
-        if (gMarioState->flags & MARIO_METAL_CAP)
+    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
+        if (gMarioState->flags & MARIO_METAL_CAP) {
             o->oAction = PIRANHA_PLANT_ACT_ATTACKED;
+        }
+    }
 }
 
 /**
@@ -258,11 +260,9 @@ void piranha_plant_act_biting(void) {
  * This is called from both the "stopped biting" state and the "sleeping" state.
  */
 s32 mario_moving_fast_enough_to_make_piranha_plant_bite(void) {
-    if (gMarioStates[0].vel[1] > 10.0f)
-        return 1;
-    if (gMarioStates[0].forwardVel > 10.0f)
-        return 1;
-    return 0;
+    if (gMarioStates[0].vel[1]     > 10.0f) return TRUE;
+    if (gMarioStates[0].forwardVel > 10.0f) return TRUE;
+    return FALSE;
 }
 
 /**
@@ -319,5 +319,5 @@ void bhv_piranha_plant_loop(void) {
         }
     }
 #endif
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

@@ -114,8 +114,8 @@ void rotate_rectangle(f32 *newZ, f32 *newX, f32 oldZ, f32 oldX) {
     struct Object *obj = (struct Object *) gCurGraphNodeObject;
     f32 s = sins(obj->oFaceAngleYaw);
     f32 c = coss(obj->oFaceAngleYaw);
-    *newZ = oldZ * c - oldX * s;
-    *newX = oldZ * s + oldX * c;
+    *newZ = (oldZ * c) - (oldX * s);
+    *newX = (oldZ * s) + (oldX * c);
 }
 
 /**
@@ -123,7 +123,7 @@ void rotate_rectangle(f32 *newZ, f32 *newX, f32 oldZ, f32 oldX) {
  * the standard atan2.
  */
 f32 atan2_deg(f32 a, f32 b) {
-    return ((f32) atan2s(a, b) / 65535.0 * 360.0);
+    return angle_to_degrees(atan2s(a, b));
 }
 
 /**
@@ -236,7 +236,7 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
         // Don't draw a shadow if the floor is lower than expected possible,
         // or if the y-normal is negative (an unexpected result).
         if (s->floorHeight < FLOOR_LOWER_LIMIT_SHADOW || floor->normal.y <= 0.0f) {
-            return 1;
+            return TRUE;
         }
 
         s->floorNormalX = floor->normal.x;
@@ -262,7 +262,7 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
         floorSteepness = sqrtf(floorSteepness);
         s->floorTilt = 90.0f - atan2_deg(floorSteepness, s->floorNormalY);
     }
-    return 0;
+    return FALSE;
 }
 
 /**
@@ -273,8 +273,13 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
  *      6 = (-15,  15)         7 = (0,  15)         8 = (15,  15)
  */
 void get_texture_coords_9_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
-    *textureX = vertexNum % 3 * 15 - 15;
-    *textureY = vertexNum / 3 * 15 - 15;
+#ifdef HD_SHADOWS
+    *textureX = (((vertexNum % 3) * 63) - 63);
+    *textureY = (((vertexNum / 3) * 63) - 63);
+#else
+    *textureX = (((vertexNum % 3) * 15) - 15);
+    *textureY = (((vertexNum / 3) * 15) - 15);
+#endif
 }
 
 /**
@@ -284,8 +289,13 @@ void get_texture_coords_9_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
  *      2 = (-15,  15)         3 = (15,  15)
  */
 void get_texture_coords_4_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
-    *textureX = (vertexNum % 2) * 2 * 15 - 15;
-    *textureY = (vertexNum / 2) * 2 * 15 - 15;
+#ifdef HD_SHADOWS
+    *textureX = (((vertexNum & 0x1) * 2 * 63) - 63);
+    *textureY = (((vertexNum /   2) * 2 * 63) - 63);
+#else
+    *textureX = (((vertexNum & 0x1) * 2 * 15) - 15);
+    *textureY = (((vertexNum /   2) * 2 * 15) - 15);
+#endif
 }
 
 /**
@@ -360,8 +370,8 @@ void get_vertex_coords(s8 index, s8 shadowVertexType, s8 *xCoord, s8 *zCoord) {
  * behavior is overwritten.
  */
 void calculate_vertex_xyz(s8 index, struct Shadow s, f32 *xPosVtx, f32 *yPosVtx, f32 *zPosVtx, s8 shadowVertexType) {
-    f32 tiltedScale = cosf(s.floorTilt * M_PI / 180.0) * s.shadowScale;
-    f32 downwardAngle = s.floorDownwardAngle * M_PI / 180.0;
+    f32 tiltedScale = cosf(degrees_to_radians(s.floorTilt)) * s.shadowScale;
+    f32 downwardAngle = degrees_to_radians(s.floorDownwardAngle);
     s8 xCoordUnit, zCoordUnit;
 
     // This makes xCoordUnit and yCoordUnit each one of -1, 0, or 1.
@@ -407,12 +417,12 @@ void calculate_vertex_xyz(s8 index, struct Shadow s, f32 *xPosVtx, f32 *yPosVtx,
  * center vertex, as in the case with SHADOW_WITH_9_VERTS, which sets
  * the y-value from `find_floor`. (See the bottom of `calculate_vertex_xyz`.)
  */
-s16 floor_local_tilt(struct Shadow s, f32 vtxX, f32 vtxY, f32 vtxZ) {
+s32 floor_local_tilt(struct Shadow s, f32 vtxX, f32 vtxY, f32 vtxZ) {
     f32 relX = vtxX - s.parentX;
     f32 relY = vtxY - s.floorHeight;
     f32 relZ = vtxZ - s.parentZ;
 
-    return ((relX * s.floorNormalX) + (relY * s.floorNormalY) + (relZ * s.floorNormalZ));
+    return (s16)((relX * s.floorNormalX) + (relY * s.floorNormalY) + (relZ * s.floorNormalZ));
 }
 
 /**
@@ -638,7 +648,7 @@ Gfx *create_shadow_circle_9_verts(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
     Gfx *displayList = alloc_display_list(5 * sizeof(Gfx));
 
     if (verts == NULL || displayList == NULL) {
-        return 0;
+        return NULL;
     }
     for (i = 0; i < 9; i++) {
         make_shadow_vertex(verts, i, shadow, SHADOW_WITH_9_VERTS);
@@ -662,7 +672,7 @@ Gfx *create_shadow_circle_4_verts(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
     Gfx *displayList = alloc_display_list(5 * sizeof(Gfx));
 
     if (verts == NULL || displayList == NULL) {
-        return 0;
+        return NULL;
     }
 
     for (i = 0; i < 4; i++) {

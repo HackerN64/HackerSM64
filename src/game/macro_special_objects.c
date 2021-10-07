@@ -15,7 +15,7 @@
  * Converts the rotation value supplied by macro objects into one
  * that can be used by in-game objects.
  */
-s16 convert_rotation(s16 inRotation) {
+s32 convert_rotation(s16 inRotation) {
     u16 rotation = ((u16)(inRotation & 0xFF) << 8);
     switch (rotation) {
         case 0x3F00: rotation = 0x4000; break;
@@ -83,11 +83,14 @@ struct LoadedPreset {
     /*0x06*/ ModelID16 model;
 };
 
-#define MACRO_OBJ_Y_ROT 0
-#define MACRO_OBJ_X 1
-#define MACRO_OBJ_Y 2
-#define MACRO_OBJ_Z 3
-#define MACRO_OBJ_PARAMS 4
+enum MacroObjectIndex
+{
+    MACRO_OBJ_Y_ROT,
+    MACRO_OBJ_X,
+    MACRO_OBJ_Y,
+    MACRO_OBJ_Z,
+    MACRO_OBJ_PARAMS
+};
 
 void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
     s32 presetID;
@@ -121,14 +124,14 @@ void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
         // If object has been killed, prevent it from respawning
         if (((macroObject[MACRO_OBJ_PARAMS] >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
             // Spawn the new macro object.
-            newObj = spawn_object_abs_with_rot(&gMacroObjectDefaultParent, // Parent object
-                                          0,                          // Unused
-                                          preset.model,               // Model ID
-                                          preset.behavior,            // Behavior address
-                                          macroObject[MACRO_OBJ_X],   // X-position
-                                          macroObject[MACRO_OBJ_Y],   // Y-position
-                                          macroObject[MACRO_OBJ_Z],   // Z-position
-                                          0,                          // X-rotation
+            newObj = spawn_object_abs_with_rot(&gMacroObjectDefaultParent,                // Parent object
+                                          0,                                              // Unused
+                                          preset.model,                                   // Model ID
+                                          preset.behavior,                                // Behavior address
+                                          macroObject[MACRO_OBJ_X],                       // X-position
+                                          macroObject[MACRO_OBJ_Y],                       // Y-position
+                                          macroObject[MACRO_OBJ_Z],                       // Z-position
+                                          0,                                              // X-rotation
                                           convert_rotation(macroObject[MACRO_OBJ_Y_ROT]), // Y-rotation
                                           0                                               // Z-rotation
                 );

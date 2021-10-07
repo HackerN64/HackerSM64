@@ -153,11 +153,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         return;
     }
 
-    if (sub->needsInit) {
-        sub->envMixerNeedsInit = TRUE;
-    } else {
-        sub->envMixerNeedsInit = FALSE;
-    }
+    sub->envMixerNeedsInit = sub->needsInit;
 }
 
 #ifdef VERSION_SH

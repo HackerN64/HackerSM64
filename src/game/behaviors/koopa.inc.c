@@ -411,7 +411,7 @@ static void koopa_unshelled_act_dive(void) {
 
             cur_obj_set_model(MODEL_KOOPA_WITH_SHELL);
             obj_mark_for_deletion(shell);
-            goto end;
+            return;
         }
     }
 
@@ -429,8 +429,6 @@ static void koopa_unshelled_act_dive(void) {
     } else if (cur_obj_init_anim_and_check_if_end(6)) {
         o->oAction = KOOPA_UNSHELLED_ACT_RUN;
     }
-
-end:;
 }
 
 /**
@@ -533,15 +531,11 @@ static void koopa_the_quick_act_show_init_text(void) {
  * indicate that the ball is likely to collide.
  */
 static s32 koopa_the_quick_detect_bowling_ball(void) {
-    struct Object *ball;
     f32 distToBall;
-    s16 angleToBall;
-    f32 ballSpeedInKoopaRunDir;
-
-    ball = cur_obj_find_nearest_object_with_behavior(bhvBowlingBall, &distToBall);
+    struct Object *ball = cur_obj_find_nearest_object_with_behavior(bhvBowlingBall, &distToBall);
     if (ball != NULL) {
-        angleToBall = obj_turn_toward_object(o, ball, O_MOVE_ANGLE_YAW_INDEX, 0);
-        ballSpeedInKoopaRunDir = ball->oForwardVel * coss(ball->oMoveAngleYaw - o->oMoveAngleYaw);
+        s16 angleToBall = obj_turn_toward_object(o, ball, O_MOVE_ANGLE_YAW_INDEX, 0);
+        f32 ballSpeedInKoopaRunDir = ball->oForwardVel * coss(ball->oMoveAngleYaw - o->oMoveAngleYaw);
 
         if (abs_angle_diff(o->oMoveAngleYaw, angleToBall) < 0x4000) {
             // The ball is in front of ktq
@@ -591,7 +585,7 @@ static void koopa_the_quick_act_race(void) {
         // Hitbox is slightly larger while racing
         cur_obj_push_mario_away_from_cylinder(180.0f, 300.0f);
 
-        if (cur_obj_follow_path(0) == PATH_REACHED_END) {
+        if (cur_obj_follow_path() == PATH_REACHED_END) {
             o->oAction = KOOPA_THE_QUICK_ACT_DECELERATE;
         } else {
             downhillSteepness = 1.0f + sins((s16)(f32) o->oPathedTargetPitch);

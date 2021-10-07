@@ -100,7 +100,7 @@ extern u8 gSoundDataRaw[];  // sound_data.tbl
 extern u8 gMusicData[];     // sequences.s
 extern u8 gBankSetsData[];  // bank_sets.s
 
-ALSeqFile *get_audio_file_header(s32 arg0);
+ALSeqFile *get_audio_file_header(s32 poolIdx);
 
 /**
  * Performs an immediate DMA copy

@@ -380,7 +380,7 @@ struct EuAudioCmd sAudioCmd[0x100];
 
 OSMesg OSMesg0;
 OSMesg OSMesg1;
-OSMesg OSMesg2; // and none here. wth nintendo
+OSMesg OSMesg2;
 OSMesg OSMesg3;
 #else // VERSION_SH
 extern OSMesgQueue *D_SH_80350F88;
@@ -1056,13 +1056,7 @@ static void select_current_sounds(u8 bank) {
                                       & (SOUND_DISCRETE | SOUNDARGS_MASK_STATUS);
                 if (isDiscreteAndStatus >= (SOUND_DISCRETE | SOUND_STATUS_PLAYING)
                     && sSoundBanks[bank][sCurrentSound[bank][i]].soundStatus != SOUND_STATUS_STOPPED) {
-//! @bug On JP, if a discrete sound that lowers the background music is
-//  interrupted in this way, it will keep the background music low afterward.
-//  There are only a few of these sounds, and it probably isn't possible to do
-//  it in practice without using a time stop glitch like triple star spawn.
-#ifndef VERSION_JP
                     update_background_music_after_sound(bank, sCurrentSound[bank][i]);
-#endif
 
                     sSoundBanks[bank][sCurrentSound[bank][i]].soundBits = NO_SOUND;
                     sSoundBanks[bank][sCurrentSound[bank][i]].soundStatus = SOUND_STATUS_STOPPED;
@@ -1197,14 +1191,7 @@ static f32 get_sound_volume(u8 bank, u8 soundIndex, f32 volumeRange) {
 #endif
 
         if (sSoundBanks[bank][soundIndex].soundBits & SOUND_VIBRATO) {
-#ifdef VERSION_JP
-            //! @bug Intensity is 0 when the sound is far away. Due to the subtraction below, it is possible to end up with a negative intensity.
-            // When it is, objects with a volumeRange of 1 can still occasionally be lightly heard.
-            if (intensity != 0.0)
-#else
-            if (intensity >= 0.08f)
-#endif
-            {
+            if (intensity >= 0.08f) {
                 intensity -= (f32)(gAudioRandom & 0xf) / US_FLOAT(192.0);
             }
         }
@@ -1274,9 +1261,6 @@ static u8 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelIndex
     return reverb;
 }
 
-static void noop_8031EEC8(void) {
-}
-
 /**
  * Called from the game loop thread to inform the audio thread that a new game
  * frame has started.
@@ -1288,7 +1272,6 @@ void audio_signal_game_loop_tick(void) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
     maybe_tick_game_sound();
 #endif
-    noop_8031EEC8();
 }
 
 /**
@@ -2441,7 +2424,7 @@ void drop_queued_background_music(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-u16 get_current_background_music(void) {
+u32 get_current_background_music(void) {
     if (sBackgroundMusicQueueSize != 0) {
         return (sBackgroundMusicQueue[0].priority << 8) + sBackgroundMusicQueue[0].seqId;
     }
@@ -2607,8 +2590,8 @@ void play_star_fanfare(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-void play_power_star_jingle(u8 arg0) {
-    if (!arg0) {
+void play_power_star_jingle(u8 keepBackgroundMusic) {
+    if (!keepBackgroundMusic) {
         sBackgroundMusicTargetVolume = 0;
     }
     seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_CUTSCENE_STAR_SPAWN, 0);

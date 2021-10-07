@@ -71,8 +71,8 @@ const BehaviorScript *sWarpBhvSpawnTable[] = {
 };
 
 u8 sSpawnTypeFromWarpBhv[] = {
-    MARIO_SPAWN_DOOR_WARP,             MARIO_SPAWN_UNKNOWN_02,           MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_UNKNOWN_03,
-    MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_TELEPORT,             MARIO_SPAWN_INSTANT_ACTIVE,        MARIO_SPAWN_AIRBORNE,
+    MARIO_SPAWN_DOOR_WARP,             MARIO_SPAWN_IDLE,                 MARIO_SPAWN_PIPE,                  MARIO_SPAWN_PIPE,
+    MARIO_SPAWN_PIPE,                  MARIO_SPAWN_TELEPORT,             MARIO_SPAWN_INSTANT_ACTIVE,        MARIO_SPAWN_AIRBORNE,
     MARIO_SPAWN_HARD_AIR_KNOCKBACK,    MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE, MARIO_SPAWN_DEATH,                 MARIO_SPAWN_SPIN_AIRBORNE,
     MARIO_SPAWN_FLYING,                MARIO_SPAWN_SWIMMING,             MARIO_SPAWN_PAINTING_STAR_COLLECT, MARIO_SPAWN_PAINTING_DEATH,
     MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
@@ -139,7 +139,7 @@ u32 get_mario_spawn_type(struct Object *obj) {
             return sSpawnTypeFromWarpBhv[i];
         }
     }
-    return 0;
+    return MARIO_SPAWN_NONE;
 }
 
 struct ObjectWarpNode *area_get_warp_node(u8 id) {
@@ -233,7 +233,7 @@ void load_area(s32 index) {
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {
-            spawn_objects_from_info(0, gCurrentArea->objectSpawnInfos);
+            spawn_objects_from_info(gCurrentArea->objectSpawnInfos);
         }
 
         load_obj_warp_nodes();
@@ -243,7 +243,7 @@ void load_area(s32 index) {
 
 void unload_area(void) {
     if (gCurrentArea != NULL) {
-        unload_objects_from_area(0, gCurrentArea->index);
+        unload_objects_from_area(gCurrentArea->index);
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
 
         gCurrentArea->flags = AREA_FLAG_UNLOAD;
@@ -258,7 +258,7 @@ void load_mario_area(void) {
 
     if (gCurrentArea->index == gMarioSpawnInfo->areaIndex) {
         gCurrentArea->flags |= AREA_FLAG_LOAD;
-        spawn_objects_from_info(0, gMarioSpawnInfo);
+        spawn_objects_from_info(gMarioSpawnInfo);
     }
     if (gAreaSkyboxStart[gCurrAreaIndex - 1]) {
         load_segment_decompress(0x0A, gAreaSkyboxStart[gCurrAreaIndex - 1], gAreaSkyboxEnd[gCurrAreaIndex - 1]);
@@ -267,7 +267,7 @@ void load_mario_area(void) {
 
 void unload_mario_area(void) {
     if (gCurrentArea != NULL && (gCurrentArea->flags & AREA_FLAG_LOAD)) {
-        unload_objects_from_area(0, gMarioSpawnInfo->activeAreaIndex);
+        unload_objects_from_area(gMarioSpawnInfo->activeAreaIndex);
         gCurrentArea->flags &= ~AREA_FLAG_LOAD;
         if (gCurrentArea->flags == AREA_FLAG_UNLOAD) {
             unload_area();
@@ -286,14 +286,14 @@ void change_area(s32 index) {
         gMarioObject->oActiveParticleFlags = 0;
     }
 
-    if (areaFlags & 0x01) {
+    if (areaFlags & AREA_FLAG_LOAD) {
         gMarioObject->header.gfx.areaIndex = index, gMarioSpawnInfo->areaIndex = index;
     }
 }
 
 void area_update_objects(void) {
     gAreaUpdateCounter++;
-    update_objects(0);
+    update_objects();
 }
 
 /*
@@ -366,6 +366,10 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 }
 
 void render_game(void) {
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+    OSTime colTime = collisionTime[perfIteration];
+#endif
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
         if (gCurrentArea->graphNode) {
             geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);
@@ -419,11 +423,13 @@ void render_game(void) {
         }
     }
 
-
-    #if PUPPYPRINT_DEBUG
-    puppyprint_render_profiler();
-    #endif
-
     gViewportOverride = NULL;
     gViewportClip = NULL;
+#if PUPPYPRINT_DEBUG
+    profiler_update(graphTime, first);
+    graphTime[perfIteration] -= collisionTime[perfIteration]-colTime;
+#endif
+#if PUPPYPRINT_DEBUG
+    puppyprint_render_profiler();
+#endif
 }

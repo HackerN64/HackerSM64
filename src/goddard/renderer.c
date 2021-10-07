@@ -103,14 +103,11 @@ static u32 D_801BAF28;                                 // RAM addr offset?
 static s16 sTriangleBuf[13][8];                          // [[s16; 8]; 13]? vert indices?
 static u8 *sMemBlockPoolBase; // @ 801BB00C
 static u32 sAllocMemory;      // @ 801BB010; malloc-ed bytes
-static s32 D_801BB018;
-static s32 D_801BB01C;
 static void *sLoadedTextures[0x10];          // texture pointers
 static s32 sTextureDisplayLists[0x10];            // gd_dl indices
 static s16 sVtxCvrtTCBuf[2];            // @ 801BB0A0
 static s32 sCarGdDlNum;                 // @ 801BB0A4
 static struct ObjGroup *sYoshiSceneGrp; // @ 801BB0A8
-static s32 unusedDl801BB0AC;                  // unused DL number
 static struct ObjGroup *sMarioSceneGrp; // @ 801BB0B0
 static s32 D_801BB0B4;                  // second offset into sTriangleBuf
 static struct ObjGroup *sCarSceneGrp;   // @ 801BB0B8
@@ -616,10 +613,6 @@ static Gfx *gd_silver_sparkle_dl_array[] = {
     gd_dl_silver_sparkle_4_dup,
 };
 
-UNUSED static Gfx gd_texture3_dummy_aligner1[] = {
-    gsSPEndDisplayList(),
-};
-
 ALIGNED8 static Texture gd_texture_mario_face_shine[] = {
 #include "textures/intro_raw/mario_face_shine.ia8.inc.c"
 };
@@ -636,37 +629,7 @@ static Gfx gd_dl_mario_face_shine[] = {
     gsSPEndDisplayList(),
 };
 
-static Gfx gd_dl_rsp_init[] = {
-    gsSPClearGeometryMode(0xFFFFFFFF),
-    gsSPSetGeometryMode(G_SHADING_SMOOTH | G_SHADE),
-    gsSPEndDisplayList(),
-};
-
-static Gfx gd_dl_rdp_init[] = {
-    gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsDPSetCycleType(G_CYC_1CYCLE),
-    gsDPSetTextureLOD(G_TL_TILE),
-    gsDPSetTextureLUT(G_TT_NONE),
-    gsDPSetTextureDetail(G_TD_CLAMP),
-    gsDPSetTexturePersp(G_TP_PERSP),
-    gsDPSetTextureFilter(G_TF_BILERP),
-    gsDPSetTextureConvert(G_TC_FILT),
-    gsDPSetCombineKey(G_CK_NONE),
-    gsDPSetAlphaCompare(G_AC_NONE),
-    gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
-    gsDPNoOp(),
-    gsDPSetColorDither(G_CD_MAGICSQ),
-    gsDPPipeSync(),
-    gsSPEndDisplayList(),
-};
-
 float sGdPerspTimer = 1.0f;
-
-UNUSED static Gfx gd_texture4_dummy_aligner1[] = {
-    gsDPPipeSync(),
-    gsSPEndDisplayList(),
-};
 
 static Gfx gd_dl_sprite_start_tex_block[] = {
     gsDPPipeSync(),
@@ -1043,19 +1006,6 @@ void setup_timers(void) {
     stop_timer("dynamics");
 }
 
-/* 24AA40 -> 24AA58 */
-void Unknown8019C270(u8 *buf) {
-    gGdStreamBuffer = buf;
-}
-
-/* 24AA58 -> 24AAA8 */
-void Unknown8019C288(s32 stickX, s32 stickY) {
-    struct GdControl *ctrl = &gGdCtrl; // 4
-
-    ctrl->stickXf = (f32) stickX;
-    ctrl->stickYf = (f32)(stickY / 2);
-}
-
 /* 24AAA8 -> 24AAE0; orig name: func_8019C2D8 */
 void gd_add_to_heap(void *addr, u32 size) {
     // TODO: is this `1` for permanence special?
@@ -1095,15 +1045,6 @@ void gdm_setup(void) {
     reset_cur_dl_indices();
     setup_stars();
     imout();
-}
-
-/* 24AC2C -> 24AC80; not called; orig name: Unknown8019C45C */
-void print_gdm_stats(void) {
-    stop_memtracker("total");
-    gd_printf("\ngdm stats:\n");
-    print_all_memtrackers();
-    mem_stats();
-    start_memtracker("total");
 }
 
 /* 24AC80 -> 24AD14; orig name: func_8019C4B0 */
@@ -1427,18 +1368,6 @@ struct GdDisplayList *new_gd_dl(s32 id, s32 gfxs, s32 verts, s32 mtxs, s32 light
     return dl;
 }
 
-/* 24BA48 -> 24BABC; not called */
-void gd_rsp_init(void) {
-    gSPDisplayList(next_gfx(), osVirtualToPhysical(&gd_dl_rsp_init));
-    gDPPipeSync(next_gfx());
-}
-
-/* 24BABC -> 24BB30; not called */
-void gd_rdp_init(void) {
-    gSPDisplayList(next_gfx(), osVirtualToPhysical(&gd_dl_rdp_init));
-    gDPPipeSync(next_gfx());
-}
-
 /* 24BB30 -> 24BED8; orig name: func_8019D360 */
 void gd_draw_rect(f32 ulx, f32 uly, f32 lrx, f32 lry) {
     clamp_coords_to_active_view(&ulx, &uly);
@@ -1538,9 +1467,6 @@ void pop_gddl_stash(void) {
 
 /* 24D084 -> 24D1D4 */
 s32 gd_startdisplist(s32 memarea) {
-    D_801BB018 = 0;
-    D_801BB01C = 1;
-
     switch (memarea) {
         case 7:  // Create new display list as a child of sStaticDl
             sCurrentGdDl = create_child_gdl(0, sStaticDl);
@@ -1586,26 +1512,12 @@ s32 gd_enddlsplist_parent(void) {
     return curDlIdx;
 }
 
-/* 24D39C -> 24D3D8 */
-void Unknown8019EBCC(s32 num, uintptr_t gfxptr) {
-    sGdDLArray[num]->gfx = (Gfx *) (GD_LOWER_24(gfxptr) + D_801BAF28);
-}
-
 /* 24D3D8 -> 24D458; orig name: func_8019EC08 */
 u32 new_gddl_from(Gfx *dl, UNUSED s32 arg1) {
     struct GdDisplayList *gddl;
 
     gddl = new_gd_dl(0, 0, 0, 0, 0, 0);
     gddl->gfx = (Gfx *) (GD_LOWER_24((uintptr_t) dl) + D_801BAF28);
-    return gddl->number;
-}
-
-/* 24D458 -> 24D4C4 */
-u32 Unknown8019EC88(Gfx *dl, UNUSED s32 arg1) {
-    struct GdDisplayList *gddl;
-
-    gddl = new_gd_dl(0, 0, 0, 0, 0, 0);
-    gddl->gfx = dl;
     return gddl->number;
 }
 
@@ -1802,9 +1714,6 @@ void check_tri_display(s32 vtxcount) {
     if (vtxcount != 3) {
         fatal_printf("cant display no tris\n");
     }
-    if (D_801BB018 != 0 || D_801BB01C != 0) {
-        ;
-    }
 }
 
 /**
@@ -1854,7 +1763,6 @@ void func_8019FEF0(void) {
         gd_dl_flush_vertices();
         func_801A0038();
     }
-    D_801BB018 = 0;
 }
 
 /**
@@ -2100,10 +2008,6 @@ void set_Vtx_norm_buf_2(struct GdVec3f *norm) {
     sVtxCvrtNormBuf[0] = (s8)(norm->x * 127.0f);
     sVtxCvrtNormBuf[1] = (s8)(norm->y * 127.0f);
     sVtxCvrtNormBuf[2] = (s8)(norm->z * 127.0f);
-
-    //? are these stub functions?
-    return; // @ 801A17A0
-    return; // @ 801A17A8
 }
 
 /* 24FF80 -> 24FFDC; orig name: func_801A17B0 */
@@ -2634,8 +2538,6 @@ void func_801A4438(f32 x, f32 y, f32 z) {
 
 /* 252C70 -> 252DB4 */
 s32 gd_gentexture(void *texture, s32 fmt, s32 size, UNUSED u32 arg3, UNUSED u32 arg4) {
-    s32 dl; // 24
-
     switch (fmt) {
         case 29:
             fmt = 0;
@@ -2656,7 +2558,7 @@ s32 gd_gentexture(void *texture, s32 fmt, s32 size, UNUSED u32 arg3, UNUSED u32 
     }
 
     sLoadedTextures[++sTextureCount] = texture;
-    dl = gd_startdisplist(7);
+    s32 dl = gd_startdisplist(7);
 
     if (dl == 0) {
         fatal_printf("Cant generate DL for texture");
@@ -2891,7 +2793,7 @@ void gd_init(void) {
     gGdCtrl.csrX = 160;
     gGdCtrl.csrY = 120;
     gGdCtrl.dragStartFrame = -1000;
-    unusedDl801BB0AC = create_mtl_gddl(4);
+    create_mtl_gddl(4);
     imout();
 }
 
@@ -2923,20 +2825,6 @@ void store_in_pickbuf(s16 data) {
 ** (datasize is always 2) */
 s32 get_cur_pickbuf_offset(UNUSED s16 *arg0) {
     return sPickBufPosition / 3;
-}
-
-/* 254288 -> 2542B0 */
-void *Unknown801A5AB8(s32 texnum) {
-    return sLoadedTextures[texnum];
-}
-
-/* 2542B0 -> 254328 */
-void Unknown801A5AE0(s32 arg0) {
-    D_801BB018 = arg0;
-    if (D_801BB01C != D_801BB018) {
-        branch_cur_dl_to_num(sTextureDisplayLists[arg0]);
-        D_801BB01C = D_801BB018;
-    }
 }
 
 /* 254328 -> 2543B8; orig name: func_801A5B58 */

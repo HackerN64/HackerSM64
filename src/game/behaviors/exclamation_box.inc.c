@@ -75,7 +75,7 @@ void exclamation_box_act_2(void) {
     if (o->oTimer == 0) {
         cur_obj_unhide();
         cur_obj_become_tangible();
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
         o->oPosY = o->oHomeY;
         o->oGraphYOffset = 0.0f;
     }

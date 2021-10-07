@@ -15,9 +15,7 @@ static struct ObjectHitbox sRollingSphereHitbox = {
 void bhv_snowmans_bottom_init(void) {
     struct Object *headObj;
 
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
 
     o->oGravity = 10.0f;
     o->oFriction = 0.999f;
@@ -38,7 +36,7 @@ void set_rolling_sphere_hitbox(void) {
     obj_set_hitbox(o, &sRollingSphereHitbox);
 
     if ((o->oInteractStatus & INT_STATUS_INTERACTED) != 0) {
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     }
 }
 
@@ -51,19 +49,17 @@ void adjust_rolling_face_pitch(f32 f12) {
 }
 
 void snowmans_bottom_act_1(void) {
-    s32 pathResult = 0;
-
     o->oPathedStartWaypoint = segmented_to_virtual(&ccm_seg7_trajectory_snowman);
     object_step_without_floor_orient();
-    pathResult = cur_obj_follow_path(pathResult);
+    s32 pathResult = cur_obj_follow_path();
     o->oSnowmansBottomTargetYaw = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomTargetYaw, 0x400);
 
     if (o->oForwardVel > 70.0f)
         o->oForwardVel = 70.0f;
 
-    if (pathResult == -1) {
-        if (obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x2000) == TRUE
+    if (pathResult == PATH_REACHED_END) {
+        if (obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x2000)
             && o->oSnowmansBottomHitCheckpointNearMario == 1) {
             o->oSnowmansBottomTargetYaw = o->oAngleToMario;
         } else {
@@ -104,7 +100,7 @@ void snowmans_bottom_act_3(void) {
         cur_obj_become_intangible();
     }
 
-    if ((collisionFlags & 0x01) != 0) {
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         spawn_mist_particles_variable(0, 0, 70.0f);
         o->oPosX = -4230.0f;
         o->oPosZ = 1813.0f;
@@ -128,13 +124,13 @@ void bhv_snowmans_bottom_loop(void) {
         case 1:
             snowmans_bottom_act_1();
             adjust_rolling_face_pitch(o->oSnowmansBottomRollingFacePitch);
-            cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
+            cur_obj_play_sound_1(SOUND_ENV_BOWLING_BALL_ROLL);
             break;
 
         case 2:
             snowmans_bottom_act_2();
             adjust_rolling_face_pitch(o->oSnowmansBottomRollingFacePitch);
-            cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
+            cur_obj_play_sound_1(SOUND_ENV_BOWLING_BALL_ROLL);
             break;
 
         case 3:

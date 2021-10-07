@@ -28,7 +28,7 @@ void bhv_treasure_chest_top_loop(void) {
             if (o->oTimer == 0) {
                 if (parent->oTreasureChestAboveWater == 0) {
                     spawn_object_relative(0, 0, -80, 120, o, MODEL_BUBBLE, bhvWaterAirBubble);
-                    play_sound(SOUND_GENERAL_CLAM_SHELL1, o->header.gfx.cameraToObject);
+                    play_sound(SOUND_GENERAL_OPEN_CHEST_WATER, o->header.gfx.cameraToObject);
                 } else {
                     play_sound(SOUND_GENERAL_OPEN_CHEST, o->header.gfx.cameraToObject);
                 }
@@ -38,14 +38,16 @@ void bhv_treasure_chest_top_loop(void) {
             if (o->oFaceAnglePitch < -0x4000) {
                 o->oFaceAnglePitch = -0x4000;
                 o->oAction++;
-                if (o->parentObj->oBehParams2ndByte != 4)
+                if (o->parentObj->oBehParams2ndByte != 4) {
                     spawn_orange_number(o->parentObj->oBehParams2ndByte, 0, -40, 0);
+                }
             }
             break;
 
         case 2:
-            if (o->parentObj->oAction == 0)
+            if (o->parentObj->oAction == 0) {
                 o->oAction = 3;
+            }
             break;
 
         case 3:
@@ -98,7 +100,7 @@ void bhv_treasure_chest_bottom_loop(void) {
     }
 
     cur_obj_push_mario_away_from_cylinder(150.0f, 150.0f);
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void spawn_treasure_chest(s8 param, s32 x, s32 y, s32 z, s16 ry) {

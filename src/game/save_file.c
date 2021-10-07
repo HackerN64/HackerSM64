@@ -357,7 +357,7 @@ void save_file_load_all(void) {
 
     // Verify the main menu data and create a backup copy if only one of the slots is valid.
     validSlots = verify_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
-    //validSlots |= verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1;
+    // validSlots |= verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1;
     switch (validSlots) {
         case 0: // Neither copy is correct
             wipe_main_menu_data();
@@ -389,37 +389,33 @@ void save_file_load_all(void) {
 }
 
 #ifdef PUPPYCAM
-void puppycam_check_save(void)
-{
-    if (gSaveBuffer.menuData[0].firstBoot != 4 || gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5 || gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5)
-    {
+void puppycam_check_save(void) {
+    if (gSaveBuffer.menuData[0].firstBoot != 4 || gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5 || gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5) {
         wipe_main_menu_data();
         gSaveBuffer.menuData[0].firstBoot = 4;
         puppycam_default_config();
     }
 }
 
-void puppycam_get_save(void)
-{
+void puppycam_get_save(void) {
     gPuppyCam.options = gSaveBuffer.menuData[0].saveOptions;
 
     gSaveBuffer.menuData[0].firstBoot = gSaveBuffer.menuData[0].firstBoot;
-    #ifdef WIDE
+#ifdef WIDE
     gConfig.widescreen = save_file_get_widescreen_mode();
-    #endif
+#endif
 
     puppycam_check_save();
 }
 
-void puppycam_set_save(void)
-{
+void puppycam_set_save(void) {
     gSaveBuffer.menuData[0].saveOptions = gPuppyCam.options;
 
     gSaveBuffer.menuData[0].firstBoot = 4;
 
-    #ifdef WIDE
+#ifdef WIDE
     save_file_set_widescreen_mode(gConfig.widescreen);
-    #endif
+#endif
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
@@ -634,12 +630,17 @@ void save_file_set_cannon_unlocked(void) {
     gSaveFileModified = TRUE;
 }
 
+#ifdef SAVE_NUM_LIVES
+void save_file_set_cap_pos(UNUSED s16 x, UNUSED s16 y, UNUSED s16 z) {
+#else
 void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
+#endif
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
-
     saveFile->capLevel = gCurrLevelNum;
-    saveFile->capArea = gCurrAreaIndex;
-    vec3s_set(saveFile->capPos, x, y, z);
+    saveFile->capArea  = gCurrAreaIndex;
+#ifndef SAVE_NUM_LIVES
+    vec3_set(saveFile->capPos, x, y, z);
+#endif
     save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
 }
 
@@ -649,11 +650,29 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
 
     if (saveFile->capLevel == gCurrLevelNum && saveFile->capArea == gCurrAreaIndex
         && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
-        vec3s_copy(capPos, saveFile->capPos);
+#ifdef SAVE_NUM_LIVES
+        vec3_zero(capPos);
+#else
+        vec3_copy(capPos, saveFile->capPos);
+#endif
         return TRUE;
     }
     return FALSE;
 }
+
+#ifdef SAVE_NUM_LIVES
+void save_file_set_num_lives(s8 numLives) {
+    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+    saveFile->numLives = numLives;
+    saveFile->flags |= SAVE_FLAG_FILE_EXISTS;
+    gSaveFileModified = TRUE;
+}
+
+s32 save_file_get_num_lives(void) {
+    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+    return saveFile->numLives;
+}
+#endif
 
 void save_file_set_sound_mode(u16 mode) {
     set_sound_mode(mode);
@@ -664,7 +683,7 @@ void save_file_set_sound_mode(u16 mode) {
 }
 
 #ifdef WIDE
-u8 save_file_get_widescreen_mode(void) {
+u32 save_file_get_widescreen_mode(void) {
     return gSaveBuffer.menuData[0].wideMode;
 }
 
@@ -676,7 +695,7 @@ void save_file_set_widescreen_mode(u8 mode) {
 }
 #endif
 
-u16 save_file_get_sound_mode(void) {
+u32 save_file_get_sound_mode(void) {
     return gSaveBuffer.menuData[0].soundMode;
 }
 
@@ -698,7 +717,7 @@ void eu_set_language(u16 language) {
     save_main_menu_data();
 }
 
-u16 eu_get_language(void) {
+u32 eu_get_language(void) {
     return gSaveBuffer.menuData[0].language;
 }
 #endif

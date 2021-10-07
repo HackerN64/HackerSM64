@@ -37,7 +37,7 @@ ALIGNED8 static const Texture dirt_seg3_texture_0302BDF8[] = {
 };
 
 // 0x0302BFF8 - 0x0302C028
-const Gfx dirt_seg3_dl_0302BFF8[] = {
+const Gfx dirt_seg3_sub_dl_dirt_particle[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dirt_seg3_texture_0302BDF8),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 16 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
@@ -56,7 +56,7 @@ const Gfx dirt_seg3_dl_dirt_particle[] = {
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 4, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 4, G_TX_NOLOD, G_TX_CLAMP, 4, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (16 - 1) << G_TEXTURE_IMAGE_FRAC, (16 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsSPDisplayList(dirt_seg3_dl_0302BFF8),
+    gsSPDisplayList(dirt_seg3_sub_dl_dirt_particle),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),

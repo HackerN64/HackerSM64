@@ -73,15 +73,17 @@ void bhv_koopa_shell_loop(void) {
         case 1:
             obj_copy_pos(o, gMarioObject);
             floor = cur_obj_update_floor_height_and_get_floor();
-            if (absf(find_water_level(o->oPosX, o->oPosZ) - o->oPosY) < 10.0f)
+            if (absf(find_water_level(o->oPosX, o->oPosZ) - o->oPosY) < 10.0f) {
                 koopa_shell_spawn_water_drop();
-            else if (5.0f > absf(o->oPosY - o->oFloorHeight)) {
-                if (floor != NULL && floor->type == 1)
+            } else if (5.0f > absf(o->oPosY - o->oFloorHeight)) {
+                if (floor != NULL && floor->type == SURFACE_BURNING) {
                     bhv_koopa_shell_flame_spawn();
-                else
+                } else {
                     koopa_shell_spawn_sparkles(10.0f);
-            } else
+                }
+            } else {
                 koopa_shell_spawn_sparkles(10.0f);
+            }
             o->oFaceAngleYaw = gMarioObject->oMoveAngleYaw;
             if (o->oInteractStatus & INT_STATUS_STOP_RIDING) {
                 obj_mark_for_deletion(o);
@@ -90,5 +92,5 @@ void bhv_koopa_shell_loop(void) {
             }
             break;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

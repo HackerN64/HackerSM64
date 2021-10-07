@@ -27,120 +27,60 @@ void animated_stationary_ground_step(struct MarioState *m, s32 animation, u32 en
 s32 mario_update_punch_sequence(struct MarioState *m) {
     u32 endAction, crouchEndAction;
     s32 animFrame;
-
     if (m->action & ACT_FLAG_MOVING) {
         endAction = ACT_WALKING, crouchEndAction = ACT_CROUCH_SLIDE;
     } else {
-        endAction = ACT_IDLE, crouchEndAction = ACT_CROUCHING;
+        endAction = ACT_IDLE,    crouchEndAction = ACT_CROUCHING;
     }
-
     switch (m->actionArg) {
         case 0:
             play_sound(SOUND_MARIO_PUNCH_YAH, m->marioObj->header.gfx.cameraToObject);
             // fall through
         case 1:
             set_mario_animation(m, MARIO_ANIM_FIRST_PUNCH);
-            if (is_anim_past_end(m)) {
-                m->actionArg = 2;
-            } else {
-                m->actionArg = 1;
-            }
-
+            m->actionArg = (is_anim_past_end(m) ? 2 : 1);
             if (m->marioObj->header.gfx.animInfo.animFrame >= 2) {
-                if (mario_check_object_grab(m)) {
-                    return TRUE;
-                }
-
+                if (mario_check_object_grab(m)) return TRUE;
                 m->flags |= MARIO_PUNCHING;
             }
-
-            if (m->actionArg == 2) {
-                m->marioBodyState->punchState = (0 << 6) | 4;
-            }
+            if (m->actionArg == 2) m->marioBodyState->punchState = (PUNCH_STATE_TYPE_FIRST_PUNCH | 0x4);
             break;
-
         case 2:
             set_mario_animation(m, MARIO_ANIM_FIRST_PUNCH_FAST);
-
-            if (m->marioObj->header.gfx.animInfo.animFrame <= 0) {
-                m->flags |= MARIO_PUNCHING;
-            }
-
-            if (m->input & INPUT_B_PRESSED) {
-                m->actionArg = 3;
-            }
-
-            if (is_anim_at_end(m)) {
-                set_mario_action(m, endAction, 0);
-            }
+            if (m->marioObj->header.gfx.animInfo.animFrame <= 0) m->flags |= MARIO_PUNCHING;
+            if (m->input & INPUT_B_PRESSED) m->actionArg = 3;
+            if (is_anim_at_end(m)) set_mario_action(m, endAction, 0);
             break;
-
         case 3:
             play_sound(SOUND_MARIO_PUNCH_WAH, m->marioObj->header.gfx.cameraToObject);
             // fall through
         case 4:
             set_mario_animation(m, MARIO_ANIM_SECOND_PUNCH);
-            if (is_anim_past_end(m)) {
-                m->actionArg = 5;
-            } else {
-                m->actionArg = 4;
-            }
-
-            if (m->marioObj->header.gfx.animInfo.animFrame > 0) {
-                m->flags |= MARIO_PUNCHING;
-            }
-
-            if (m->actionArg == 5) {
-                m->marioBodyState->punchState = (1 << 6) | 4;
-            }
+            m->actionArg = (is_anim_past_end(m) ? 5 : 4);
+            if (m->marioObj->header.gfx.animInfo.animFrame > 0) m->flags |= MARIO_PUNCHING;
+            if (m->actionArg == 5) m->marioBodyState->punchState = (PUNCH_STATE_TYPE_SECOND_PUNCH | 0x4);
             break;
-
         case 5:
             set_mario_animation(m, MARIO_ANIM_SECOND_PUNCH_FAST);
-            if (m->marioObj->header.gfx.animInfo.animFrame <= 0) {
-                m->flags |= MARIO_PUNCHING;
-            }
-
-            if (m->input & INPUT_B_PRESSED) {
-                m->actionArg = 6;
-            }
-
-            if (is_anim_at_end(m)) {
-                set_mario_action(m, endAction, 0);
-            }
+            if (m->marioObj->header.gfx.animInfo.animFrame <= 0) m->flags |= MARIO_PUNCHING;
+            if (m->input & INPUT_B_PRESSED) m->actionArg = 6;
+            if (is_anim_at_end(m)) set_mario_action(m, endAction, 0);
             break;
-
         case 6:
             play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1);
             animFrame = set_mario_animation(m, MARIO_ANIM_GROUND_KICK);
-            if (animFrame == 0) {
-                m->marioBodyState->punchState = (2 << 6) | 6;
-            }
-
-            if (animFrame >= 0 && animFrame < 8) {
-                m->flags |= MARIO_KICKING;
-            }
-
-            if (is_anim_at_end(m)) {
-                set_mario_action(m, endAction, 0);
-            }
+            if (animFrame == 0) m->marioBodyState->punchState = (PUNCH_STATE_TYPE_KICK | 0x6);
+            if (animFrame >= 0 && animFrame < 8) m->flags |= MARIO_KICKING;
+            if (is_anim_at_end(m)) set_mario_action(m, endAction, 0);
             break;
-
         case 9:
             play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1);
             set_mario_animation(m, MARIO_ANIM_BREAKDANCE);
             animFrame = m->marioObj->header.gfx.animInfo.animFrame;
-
-            if (animFrame >= 2 && animFrame < 8) {
-                m->flags |= MARIO_TRIPPING;
-            }
-
-            if (is_anim_at_end(m)) {
-                set_mario_action(m, crouchEndAction, 0);
-            }
+            if (animFrame >= 2 && animFrame < 8) m->flags |= MARIO_TRIPPING;
+            if (is_anim_at_end(m)) set_mario_action(m, crouchEndAction, 0);
             break;
     }
-
     return FALSE;
 }
 
@@ -153,11 +93,11 @@ s32 act_punching(struct MarioState *m) {
         return check_common_action_exits(m);
     }
 
-    if (m->actionState == 0 && (m->input & INPUT_A_DOWN)) {
+    if (m->actionState == ACT_PUNCHING_STATE_CAN_JUMP_KICK && (m->input & INPUT_A_DOWN)) {
         return set_mario_action(m, ACT_JUMP_KICK, 0);
     }
 
-    m->actionState = 1;
+    m->actionState = ACT_PUNCHING_STATE_NO_JUMP_KICK;
     if (m->actionArg == 0) {
         m->actionTimer = 7;
     }
@@ -181,16 +121,16 @@ s32 act_picking_up(struct MarioState *m) {
         return drop_and_set_mario_action(m, ACT_FREEFALL, 0);
     }
 
-    if (m->actionState == 0 && is_anim_at_end(m)) {
+    if (m->actionState == ACT_PICKING_UP_STATE_GRAB && is_anim_at_end(m)) {
         //! While the animation is playing, it is possible for the used object
         // to unload. This allows you to pick up a vacant or newly loaded object
         // slot (cloning via fake object).
         mario_grab_used_object(m);
         play_sound_if_no_flag(m, SOUND_MARIO_HRMM, MARIO_MARIO_SOUND_PLAYED);
-        m->actionState = 1;
+        m->actionState = ACT_PICKING_UP_STATE_HAS_OBJ;
     }
 
-    if (m->actionState == 1) {
+    if (m->actionState == ACT_PICKING_UP_STATE_HAS_OBJ) {
         if (m->heldObj->oInteractionSubtype & INT_SUBTYPE_GRABS_MARIO) {
             m->marioBodyState->grabPos = GRAB_POS_HEAVY_OBJ;
             set_mario_animation(m, MARIO_ANIM_GRAB_HEAVY_OBJECT);

@@ -32,7 +32,14 @@ struct SaveFile
     // cap can always be found in a fixed spot within the course
     u8 capLevel;
     u8 capArea;
+#ifdef SAVE_NUM_LIVES
+    s8 numLives;
+    u8 pad[5];
+#else
+    // Note: the coordinates get set, but are never actually used, since the
+    // cap can always be found in a fixed spot within the course
     Vec3s capPos;
+#endif
 
     u32 flags;
 
@@ -133,6 +140,16 @@ extern s8 gLevelToCourseNumTable[];
 #define SAVE_FLAG_COLLECTED_MIPS_STAR_1  /* 0x08000000 */ (1 << 27)
 #define SAVE_FLAG_COLLECTED_MIPS_STAR_2  /* 0x10000000 */ (1 << 28)
 
+#define STAR_FLAGS_NONE         (0 << 0) // 0x00
+#define STAR_FLAG_ACT_1         (1 << 0) // 0x01
+#define STAR_FLAG_ACT_2         (1 << 1) // 0x02
+#define STAR_FLAG_ACT_3         (1 << 2) // 0x04
+#define STAR_FLAG_ACT_4         (1 << 3) // 0x08
+#define STAR_FLAG_ACT_5         (1 << 4) // 0x10
+#define STAR_FLAG_ACT_6         (1 << 5) // 0x20
+#define STAR_FLAG_ACT_100_COINS (1 << 6) // 0x40
+#define STAR_FLAG_LAST          STAR_FLAG_ACT_100_COINS
+
 #define SAVE_FLAG_TO_STAR_FLAG(cmd) (((cmd) >> 24) & 0x7F)
 #define STAR_FLAG_TO_SAVE_FLAG(cmd) ((cmd) << 24)
 
@@ -172,10 +189,14 @@ s32 save_file_is_cannon_unlocked(void);
 void save_file_set_cannon_unlocked(void);
 void save_file_set_cap_pos(s16 x, s16 y, s16 z);
 s32 save_file_get_cap_pos(Vec3s capPos);
+#ifdef SAVE_NUM_LIVES
+s32 save_file_get_num_lives(void);
+void save_file_set_num_lives(s8 numLives);
+#endif
 void save_file_set_sound_mode(u16 mode);
-u16 save_file_get_sound_mode(void);
+u32 save_file_get_sound_mode(void);
 #ifdef WIDE
-u8 save_file_get_widescreen_mode(void);
+u32 save_file_get_widescreen_mode(void);
 void save_file_set_widescreen_mode(u8 mode);
 #endif
 void save_file_move_cap_to_default_location(void);
@@ -192,7 +213,7 @@ enum EuLanguages {
 };
 
 void eu_set_language(u16 language);
-u16 eu_get_language(void);
+u32 eu_get_language(void);
 #endif
 
 #endif // SAVE_FILE_H

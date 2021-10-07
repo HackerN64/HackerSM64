@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-s16 convert_rotation(s16 inRotation);
+s32 convert_rotation(s16 inRotation);
 
 void spawn_macro_abs_yrot_2params(s32 model, const BehaviorScript *behavior, s16 x, s16 y, s16 z, s16 ry, s16 params);
 void spawn_macro_abs_yrot_param1(s32 model, const BehaviorScript *behavior, s16 x, s16 y, s16 z, s16 ry, s16 params);

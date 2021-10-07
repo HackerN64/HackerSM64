@@ -17,10 +17,7 @@ s32 check_if_moving_over_floor(f32 maxDist, f32 offset) {
     f32 xPos = o->oPosX + sins(o->oMoveAngleYaw) * offset;
     f32 zPos = o->oPosZ + coss(o->oMoveAngleYaw) * offset;
     f32 floorHeight = find_floor(xPos, o->oPosY, zPos, &floor);
-    if (absf(floorHeight - o->oPosY) < maxDist) // abs
-        return 1;
-    else
-        return 0;
+    return (absf(floorHeight - o->oPosY) < maxDist); // abs
 }
 
 void bhv_pushable_loop(void) {

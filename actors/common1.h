@@ -31,25 +31,67 @@ extern const GeoLayout blue_coin_geo[];
 extern const GeoLayout blue_coin_no_shadow_geo[];
 extern const GeoLayout red_coin_geo[];
 extern const GeoLayout red_coin_no_shadow_geo[];
-extern const Gfx coin_seg3_dl_03007780[];
-extern const Gfx coin_seg3_dl_030077D0[];
-extern const Gfx coin_seg3_dl_03007800[];
-extern const Gfx coin_seg3_dl_03007828[];
-extern const Gfx coin_seg3_dl_03007850[];
-extern const Gfx coin_seg3_dl_03007878[];
-extern const Gfx coin_seg3_dl_030078A0[];
-extern const Gfx coin_seg3_dl_030078C8[];
-extern const Gfx coin_seg3_dl_030078F0[];
-extern const Gfx coin_seg3_dl_03007918[];
-extern const Gfx coin_seg3_dl_03007940[];
-extern const Gfx coin_seg3_dl_03007968[];
-extern const Gfx coin_seg3_dl_03007990[];
-extern const Gfx coin_seg3_dl_030079B8[];
+#ifdef IA8_30FPS_COINS
+extern const GeoLayout silver_coin_geo[];
+extern const GeoLayout silver_coin_no_shadow_geo[];
+
+extern const Gfx coin_seg3_dl_yellow_0[];
+extern const Gfx coin_seg3_dl_yellow_22_5[];
+extern const Gfx coin_seg3_dl_yellow_45[];
+extern const Gfx coin_seg3_dl_yellow_67_5[];
+extern const Gfx coin_seg3_dl_yellow_90[];
+extern const Gfx coin_seg3_dl_yellow_67_5_r[];
+extern const Gfx coin_seg3_dl_yellow_45_r[];
+extern const Gfx coin_seg3_dl_yellow_22_5_r[];
+
+extern const Gfx coin_seg3_dl_blue_0[];
+extern const Gfx coin_seg3_dl_blue_22_5[];
+extern const Gfx coin_seg3_dl_blue_45[];
+extern const Gfx coin_seg3_dl_blue_67_5[];
+extern const Gfx coin_seg3_dl_blue_90[];
+extern const Gfx coin_seg3_dl_blue_67_5_r[];
+extern const Gfx coin_seg3_dl_blue_45_r[];
+extern const Gfx coin_seg3_dl_blue_22_5_r[];
+
+extern const Gfx coin_seg3_dl_red_0[];
+extern const Gfx coin_seg3_dl_red_22_5[];
+extern const Gfx coin_seg3_dl_red_45[];
+extern const Gfx coin_seg3_dl_red_67_5[];
+extern const Gfx coin_seg3_dl_red_90[];
+extern const Gfx coin_seg3_dl_red_67_5_r[];
+extern const Gfx coin_seg3_dl_red_45_r[];
+extern const Gfx coin_seg3_dl_red_22_5_r[];
+
+extern const Gfx coin_seg3_dl_secret_0[];
+extern const Gfx coin_seg3_dl_secret_22_5[];
+extern const Gfx coin_seg3_dl_secret_45[];
+extern const Gfx coin_seg3_dl_secret_67_5[];
+extern const Gfx coin_seg3_dl_secret_90[];
+extern const Gfx coin_seg3_dl_secret_67_5_r[];
+extern const Gfx coin_seg3_dl_secret_45_r[];
+extern const Gfx coin_seg3_dl_secret_22_5_r[];
+
+#else
+extern const Gfx coin_seg3_sub_dl_begin[];
+extern const Gfx coin_seg3_sub_dl_end[];
+extern const Gfx coin_seg3_dl_yellow_front[];
+extern const Gfx coin_seg3_dl_yellow_tilt_right[];
+extern const Gfx coin_seg3_dl_yellow_side[];
+extern const Gfx coin_seg3_dl_yellow_tilt_left[];
+extern const Gfx coin_seg3_dl_blue_front[];
+extern const Gfx coin_seg3_dl_blue_tilt_right[];
+extern const Gfx coin_seg3_dl_blue_side[];
+extern const Gfx coin_seg3_dl_blue_tilt_left[];
+extern const Gfx coin_seg3_dl_red_front[];
+extern const Gfx coin_seg3_dl_red_tilt_right[];
+extern const Gfx coin_seg3_dl_red_side[];
+extern const Gfx coin_seg3_dl_red_tilt_left[];
+#endif
 
 // dirt
 extern const GeoLayout dirt_animation_geo[];
 extern const GeoLayout cartoon_star_geo[];
-extern const Gfx dirt_seg3_dl_0302BFF8[];
+extern const Gfx dirt_seg3_sub_dl_dirt_particle[];
 extern const Gfx dirt_seg3_dl_dirt_particle[];
 extern const Gfx dirt_seg3_sub_dl_cartoon_star[];
 extern const Gfx dirt_seg3_dl_cartoon_star_red[];
@@ -205,31 +247,33 @@ extern const Gfx dl_breath_meter_health_segments_end[];
 #endif
 
 // sand
-extern const Gfx sand_seg3_dl_0302BCD0[];
+extern const Gfx sand_seg3_dl_particle[];
 
 // star
 extern const GeoLayout star_geo[];
-extern const Gfx star_seg3_dl_0302B7B0[];
-extern const Gfx star_seg3_dl_0302B870[];
-extern const Gfx star_seg3_dl_0302B9C0[];
-extern const Gfx star_seg3_dl_0302BA18[];
+extern const Gfx star_seg3_sub_dl_body[];
+extern const Gfx star_seg3_dl_body[];
+extern const Gfx star_seg3_sub_dl_eyes[];
+extern const Gfx star_seg3_dl_eyes[];
 
 // transparent_star
 extern const GeoLayout transparent_star_geo[];
-extern const Gfx transparent_star_seg3_dl_0302C560[];
-extern const Gfx transparent_star_seg3_dl_0302C620[];
+extern const Gfx transparent_star_seg3_sub_dl_body[];
+extern const Gfx transparent_star_seg3_dl_body[];
 
 // tree
 extern const GeoLayout bubbly_tree_geo[];
 extern const GeoLayout spiky_tree_geo[];
 extern const GeoLayout snow_tree_geo[];
 extern const GeoLayout palm_tree_geo[];
-extern const Gfx tree_seg3_sub_dl_bubbly_left_side[];
-extern const Gfx tree_seg3_sub_dl_bubbly_right_side[];
 extern const Gfx tree_seg3_dl_bubbly[];
+extern const Gfx tree_seg3_dl_bubbly_transparent[];
 extern const Gfx tree_seg3_dl_spiky[];
+extern const Gfx tree_seg3_dl_spiky_transparent[];
 extern const Gfx tree_seg3_dl_snowy_pine[];
+extern const Gfx tree_seg3_dl_snowy_pine_transparent[];
 extern const Gfx tree_seg3_dl_palm[];
+extern const Gfx tree_seg3_dl_palm_transparent[];
 
 // warp_pipe
 extern const GeoLayout warp_pipe_geo[];

@@ -218,12 +218,12 @@ static void goomba_act_walk(void) {
 static void goomba_act_attacked_mario(void) {
     if (o->oGoombaSize == GOOMBA_SIZE_TINY) {
         mark_goomba_as_dead();
+#ifndef TINY_GOOMBA_ALWAYS_DROPS_COIN
         o->oNumLootCoins = 0;
+#endif
         obj_die_if_health_non_positive();
     } else {
-        //! This can happen even when the goomba is already in the air. It's
-        //  hard to chain these in practice
-        goomba_begin_jump();
+        if (o->oPosY <= o->oFloorHeight) goomba_begin_jump();
         o->oGoombaTargetYaw = o->oAngleToMario;
         o->oGoombaTurningAwayFromWall = FALSE;
     }
@@ -268,8 +268,7 @@ void bhv_goomba_update(void) {
     f32 animSpeed;
 
     if (obj_update_standard_actions(o->oGoombaScale)) {
-        // If this goomba has a spawner and mario moved away from the spawner,
-        // unload
+        // If this goomba has a spawner and mario moved away from the spawner, unload
         if (o->parentObj != o) {
             if (o->parentObj->oAction == GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED) {
                 obj_mark_for_deletion(o);

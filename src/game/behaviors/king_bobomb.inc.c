@@ -15,54 +15,51 @@ Gfx *geo_update_held_mario_pos(s32 callContext, UNUSED struct GraphNode *node, M
 }
 
 void bhv_bobomb_anchor_mario_loop(void) {
-    common_anchor_mario_behavior(50.0f, 50.0f, 64);
+    common_anchor_mario_behavior(50.0f, 50.0f, INT_STATUS_MARIO_DROPPED_BY_OBJ);
 }
 
-void king_bobomb_act_0(void) {
+void king_bobomb_act_inactive(void) { // act 0
     o->oForwardVel = 0.0f;
-    o->oVelY = 0.0f;
-    if (o->oSubAction == 0) {
+    o->oVelY       = 0.0f;
+    if (o->oSubAction == KING_BOBOMB_SUB_ACT_INACTIVE_INIT) {
         cur_obj_become_intangible();
         gSecondCameraFocus = o;
-        cur_obj_init_animation_with_sound(5);
+        cur_obj_init_animation_with_sound(KING_BOBOMB_ANIM_IDLE);
         cur_obj_set_pos_to_home();
         o->oHealth = 3;
         if (cur_obj_can_mario_activate_textbox_2(500.0f, 100.0f)) {
-            o->oSubAction++;
+            o->oSubAction = KING_BOBOMB_SUB_ACT_INACTIVE_DIALOG;
             seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
         }
     } else if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
         DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, DIALOG_017)) {
-        o->oAction = 2;
+        o->oAction = KING_BOBOMB_ACT_ACTIVE;
         o->oFlags |= OBJ_FLAG_HOLDABLE;
     }
 }
 
-s32 mario_is_far_below_object(f32 arg0) {
-    if (arg0 < o->oPosY - gMarioObject->oPosY) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+s32 mario_is_far_below_object(f32 min) {
+    return (min < (o->oPosY - gMarioObject->oPosY));
 }
 
-void king_bobomb_act_2(void) {
+void king_bobomb_act_active(void) { // act 2
     cur_obj_become_tangible();
-    if (o->oPosY - o->oHomeY < -100.0f) { // Thrown off hill
-        o->oAction = 5;
+    if ((o->oPosY - o->oHomeY) < -100.0f) { // Thrown off hill
+        o->oAction = KING_BOBOMB_ACT_RETURN_HOME;
         cur_obj_become_intangible();
     }
     if (o->oKingBobombShouldStomp == 0) {
         if (cur_obj_check_anim_frame(15))
             cur_obj_shake_screen(SHAKE_POS_SMALL);
-        if (cur_obj_init_animation_and_check_if_near_end(4))
+        if (cur_obj_init_animation_and_check_if_near_end(KING_BOBOMB_ANIM_STOMP))
             o->oKingBobombShouldStomp++;
     } else {
         if (o->oKingBobombShouldStomp == 1) {
-            cur_obj_init_animation_and_anim_frame(11, 7);
+            cur_obj_init_animation_and_anim_frame(KING_BOBOMB_ANIM_WALKING, 7);
             o->oKingBobombShouldStomp = 2;
-        } else
-            cur_obj_init_animation_with_sound(11);
+        } else {
+            cur_obj_init_animation_with_sound(KING_BOBOMB_ANIM_WALKING);
+        }
         if (o->oKingBobombPlayerGrabEscapeCooldown == 0) {
             o->oForwardVel = 3.0f;
             cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x100);
@@ -72,227 +69,237 @@ void king_bobomb_act_2(void) {
         }
     }
     if (cur_obj_check_grabbed_mario())
-        o->oAction = 3;
+        o->oAction = KING_BOBOMB_ACT_GRABBED_MARIO;
     if (mario_is_far_below_object(1200.0f)) {
-        o->oAction = 0;
+        o->oAction = KING_BOBOMB_ACT_INACTIVE;
         stop_background_music(SEQUENCE_ARGS(4, SEQ_EVENT_BOSS));
     }
 }
 
-void king_bobomb_act_3(void) {
-    if (o->oSubAction == 0) {
-        o->oForwardVel = 0;
+void king_bobomb_act_grabbed_mario(void) { // act 3
+    if (o->oSubAction == KING_BOBOMB_SUB_ACT_GRABBED_MARIO_GRAB) {
+        o->oForwardVel = 0.0f;
         o->oKingBobombStationaryTimer = 0;
         o->oKingBobombPlayerGrabEscapeActions = 0;
         if (o->oTimer == 0)
-            cur_obj_play_sound_2(SOUND_OBJ_UNKNOWN3);
-        if (cur_obj_init_animation_and_check_if_near_end(0)) {
-            o->oSubAction++;
-            cur_obj_init_animation_and_anim_frame(1, 0);
+            cur_obj_play_sound_2(SOUND_OBJ_GRAB_MARIO);
+        if (cur_obj_init_animation_and_check_if_near_end(KING_BOBOMB_ANIM_GRAB_MARIO)) {
+            o->oSubAction = KING_BOBOMB_SUB_ACT_GRABBED_MARIO_HOLDING;
+            cur_obj_init_animation_and_anim_frame(KING_BOBOMB_ANIM_HOLDING_MARIO, 0);
         }
     } else {
-        if (o->oSubAction == 1) {
-            cur_obj_init_animation_with_sound(1);
+        if (o->oSubAction == KING_BOBOMB_SUB_ACT_GRABBED_MARIO_HOLDING) {
+            cur_obj_init_animation_with_sound(KING_BOBOMB_ANIM_HOLDING_MARIO);
             o->oKingBobombPlayerGrabEscapeActions += player_performed_grab_escape_action();
             print_debug_bottom_up("%d", o->oKingBobombPlayerGrabEscapeActions);
             if (o->oKingBobombPlayerGrabEscapeActions > 10) {
-                o->oKingBobombHoldingMarioState = 3;
-                o->oAction = 2;
+                o->oKingBobombHoldingMarioState = HELD_DROPPED;
+                o->oAction = KING_BOBOMB_ACT_ACTIVE;
                 o->oKingBobombPlayerGrabEscapeCooldown = 35;
                 o->oInteractStatus &= ~(INT_STATUS_GRABBED_MARIO);
             } else {
                 o->oForwardVel = 3.0f;
-                if (o->oKingBobombStationaryTimer > 20 && cur_obj_rotate_yaw_toward(0, 0x400)) {
-                    o->oSubAction++;
-                    cur_obj_init_animation_and_anim_frame(9, 22);
+                if (o->oKingBobombStationaryTimer > 20 && cur_obj_rotate_yaw_toward(0x0, 0x400)) {
+                    o->oSubAction = KING_BOBOMB_SUB_ACT_GRABBED_MARIO_THROW;
+                    cur_obj_init_animation_and_anim_frame(KING_BOBOMB_ANIM_THROW_MARIO, 22);
                 }
             }
             o->oKingBobombStationaryTimer++;
         } else {
-            cur_obj_init_animation_with_sound(9);
+            cur_obj_init_animation_with_sound(KING_BOBOMB_ANIM_THROW_MARIO);
             if (cur_obj_check_anim_frame(31)) {
-                o->oKingBobombHoldingMarioState = 2;
-                cur_obj_play_sound_2(SOUND_OBJ_UNKNOWN4);
+                o->oKingBobombHoldingMarioState = HELD_THROWN;
+                cur_obj_play_sound_2(SOUND_OBJ_RELEASE_MARIO);
             } else if (cur_obj_check_if_near_animation_end()) {
-                o->oAction = 1;
+                o->oAction = KING_BOBOMB_ACT_ACTIVATE;
                 o->oInteractStatus &= ~(INT_STATUS_GRABBED_MARIO);
             }
         }
     }
 }
 
-void king_bobomb_act_1(void) {
-    o->oForwardVel = 0;
-    o->oVelY = 0;
-    cur_obj_init_animation_with_sound(11);
+void king_bobomb_act_activate(void) { // act 1
+    o->oForwardVel = 0.0f;
+    o->oVelY       = 0.0f;
+    cur_obj_init_animation_with_sound(KING_BOBOMB_ANIM_WALKING);
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oAngleToMario, 512);
     if (o->oDistanceToMario < 2500.0f)
-        o->oAction = 2;
+        o->oAction = KING_BOBOMB_ACT_ACTIVE;
     if (mario_is_far_below_object(1200.0f)) {
-        o->oAction = 0;
+        o->oAction = KING_BOBOMB_ACT_INACTIVE;
         stop_background_music(SEQUENCE_ARGS(4, SEQ_EVENT_BOSS));
     }
 }
 
-void king_bobomb_act_6(void) {
-    if (o->oSubAction == 0) {
+void king_bobomb_act_hit_ground(void) { // act 6
+    if (o->oSubAction == KING_BOBOMB_SUB_ACT_HIT_GROUND_HIT) {
         if (o->oTimer == 0) {
             o->oKingBobombStationaryTimer = 0;
             cur_obj_play_sound_2(SOUND_OBJ_KING_BOBOMB);
             cur_obj_play_sound_2(SOUND_OBJ2_KING_BOBOMB_DAMAGE);
             cur_obj_shake_screen(SHAKE_POS_SMALL);
             spawn_mist_particles_variable(0, 0, 100.0f);
-            o->oInteractType = 8;
+            o->oInteractType = INTERACT_DAMAGE;
             cur_obj_become_tangible();
         }
-        if (cur_obj_init_animation_and_check_if_near_end(2))
+        if (cur_obj_init_animation_and_check_if_near_end(KING_BOBOMB_ANIM_HIT_GROUND))
             o->oKingBobombStationaryTimer++;
         if (o->oKingBobombStationaryTimer > 3) {
-            o->oSubAction++;
+            o->oSubAction = KING_BOBOMB_SUB_ACT_HIT_GROUND_STAND_UP;
         }
     } else {
-        if (o->oSubAction == 1) {
-            if (cur_obj_init_animation_and_check_if_near_end(10)) {
-                o->oSubAction++;
-                o->oInteractType = 2;
+        if (o->oSubAction == KING_BOBOMB_SUB_ACT_HIT_GROUND_STAND_UP) {
+            if (cur_obj_init_animation_and_check_if_near_end(KING_BOBOMB_ANIM_STAND_UP)) {
+                o->oSubAction = KING_BOBOMB_SUB_ACT_HIT_GROUND_START_WALKING;
+                o->oInteractType = INTERACT_GRABBABLE;
                 cur_obj_become_intangible();
             }
         } else {
-            cur_obj_init_animation_with_sound(11);
-            if (cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x800) == 1)
-                o->oAction = 2;
+            cur_obj_init_animation_with_sound(KING_BOBOMB_ANIM_WALKING);
+            if (cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x800)) {
+                o->oAction = KING_BOBOMB_ACT_ACTIVE;
+            }
         }
     }
 }
 
-void king_bobomb_act_7(void) {
-    cur_obj_init_animation_with_sound(2);
+void king_bobomb_act_death(void) { // act 7
+    cur_obj_init_animation_with_sound(KING_BOBOMB_ANIM_HIT_GROUND);
     if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
         DIALOG_FLAG_TEXT_DEFAULT, CUTSCENE_DIALOG, DIALOG_116)) {
         create_sound_spawner(SOUND_OBJ_KING_WHOMP_DEATH);
         cur_obj_hide();
         cur_obj_become_intangible();
         spawn_mist_particles_variable(0, 0, 200.0f);
-        spawn_triangle_break_particles(20, MODEL_DIRT_ANIMATION, 3.0f, 4);
+        spawn_triangle_break_particles(20, MODEL_DIRT_ANIMATION, 3.0f, TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW);
         cur_obj_shake_screen(SHAKE_POS_SMALL);
         cur_obj_spawn_star_at_y_offset(2000.0f, 4500.0f, -4500.0f, 200.0f);
-        o->oAction = 8;
+        o->oAction = KING_BOBOMB_ACT_STOP_MUSIC;
     }
 }
 
-void king_bobomb_act_8(void) {
-    if (o->oTimer == 60)
+void king_bobomb_act_stop_music(void) { // act 8
+    if (o->oTimer == 60) {
         stop_background_music(SEQUENCE_ARGS(4, SEQ_EVENT_BOSS));
+    }
 }
 
-void king_bobomb_act_4(void) { // bobomb been thrown
-    if (o->oPosY - o->oHomeY > -100.0f) { // not thrown off hill
+void king_bobomb_act_been_thrown(void) { // act 4
+    if ((o->oPosY - o->oHomeY) > -100.0f) { // not thrown off hill
         if (o->oMoveFlags & OBJ_MOVE_LANDED) {
             o->oHealth--;
-            o->oForwardVel = 0;
-            o->oVelY = 0;
+            o->oForwardVel = 0.0f;
+            o->oVelY       = 0.0f;
             cur_obj_play_sound_2(SOUND_OBJ_KING_BOBOMB);
-            if (o->oHealth)
-                o->oAction = 6;
-            else
-                o->oAction = 7;
+            o->oAction = (o->oHealth ? KING_BOBOMB_ACT_HIT_GROUND : KING_BOBOMB_ACT_DEATH);
         }
-    } else {
-        if (o->oSubAction == 0) {
+    } else { // thrown off hill
+        if (o->oSubAction == KING_BOBOMB_SUB_ACT_THROWN_FALL) {
             if (o->oMoveFlags & OBJ_MOVE_ON_GROUND) {
-                o->oForwardVel = 0;
-                o->oVelY = 0;
-                o->oSubAction++;
+                o->oForwardVel = 0.0f;
+                o->oVelY       = 0.0f;
+                o->oSubAction  = KING_BOBOMB_SUB_ACT_THROWN_STAND_UP;
             } else if (o->oMoveFlags & OBJ_MOVE_LANDED)
                 cur_obj_play_sound_2(SOUND_OBJ_KING_BOBOMB);
         } else {
-            if (cur_obj_init_animation_and_check_if_near_end(10))
-                o->oAction = 5; // Go back to top of hill
-            o->oSubAction++;
+            if (cur_obj_init_animation_and_check_if_near_end(10)) {
+                o->oAction = KING_BOBOMB_ACT_RETURN_HOME; // Go back to top of hill
+            }
+            o->oSubAction = KING_BOBOMB_SUB_ACT_THROWN_END;
         }
     }
 }
 
-void king_bobomb_act_5(void) { // bobomb returns home
+void king_bobomb_act_return_home(void) { // act 5
     switch (o->oSubAction) {
-        case 0:
+        case KING_BOBOMB_SUB_ACT_RETURN_HOME_JUMP:
             if (o->oTimer == 0)
                 cur_obj_play_sound_2(SOUND_OBJ_KING_BOBOMB_JUMP);
-            o->oKingBobombIsJumping = 1;
-            cur_obj_init_animation_and_extend_if_at_end(8);
+            o->oKingBobombIsJumping = TRUE;
+            cur_obj_init_animation_and_extend_if_at_end(KING_BOBOMB_ANIM_JUMP);
             o->oMoveAngleYaw =  cur_obj_angle_to_home();
-            if (o->oPosY < o->oHomeY)
+            if (o->oPosY < o->oHomeY) {
                 o->oVelY = 100.0f;
-            else {
+            } else {
                 arc_to_goal_pos(&o->oHomeX, &o->oPosVec, 100.0f, -4.0f);
-                o->oSubAction++;
+                o->oSubAction = KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING;
             }
             break;
-        case 1:
-            cur_obj_init_animation_and_extend_if_at_end(8);
-            if (o->oVelY < 0 && o->oPosY < o->oHomeY) {
-                o->oPosY = o->oHomeY;
-                o->oVelY = 0;
-                o->oForwardVel = 0;
-                o->oGravity = -4.0f;
-                o->oKingBobombIsJumping = 0;
-                cur_obj_init_animation_with_sound(7);
+        case KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING:
+            cur_obj_init_animation_and_extend_if_at_end(KING_BOBOMB_ANIM_JUMP);
+            if ((o->oVelY < 0) && (o->oPosY < o->oHomeY)) {
+                o->oPosY       = o->oHomeY;
+                o->oVelY       =  0.0f;
+                o->oForwardVel =  0.0f;
+                o->oGravity    = -4.0f;
+                o->oKingBobombIsJumping = FALSE;
+                cur_obj_init_animation_with_sound(KING_BOBOMB_ANIM_T_POSE);
                 cur_obj_play_sound_2(SOUND_OBJ_KING_BOBOMB);
                 cur_obj_shake_screen(SHAKE_POS_SMALL);
-                o->oSubAction++;
+                o->oSubAction = KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING_END;
             }
             break;
-        case 2:
-            if (cur_obj_init_animation_and_check_if_near_end(7))
-                o->oSubAction++;
+        case KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING_END:
+            if (cur_obj_init_animation_and_check_if_near_end(KING_BOBOMB_ANIM_T_POSE))
+                o->oSubAction = KING_BOBOMB_SUB_ACT_RETURN_HOME_WAIT_FOR_DIALOG;
             break;
-        case 3:
+        case KING_BOBOMB_SUB_ACT_RETURN_HOME_WAIT_FOR_DIALOG:
             if (mario_is_far_below_object(1200.0f)) {
-                o->oAction = 0;
+                o->oAction = KING_BOBOMB_ACT_INACTIVE;
                 stop_background_music(SEQUENCE_ARGS(4, SEQ_EVENT_BOSS));
             }
             if (cur_obj_can_mario_activate_textbox_2(500.0f, 100.0f))
-                o->oSubAction++;
+                o->oSubAction = KING_BOBOMB_SUB_ACT_RETURN_HOME_DIALOG;
             break;
-        case 4:
+        case KING_BOBOMB_SUB_ACT_RETURN_HOME_DIALOG:
             if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
-                DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, DIALOG_128))
-                o->oAction = 2;
+                DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, DIALOG_128)) {
+                o->oAction = KING_BOBOMB_ACT_ACTIVE;
+            }
             break;
     }
 }
 
 void (*sKingBobombActions[])(void) = {
-    king_bobomb_act_0, king_bobomb_act_1, king_bobomb_act_2, king_bobomb_act_3, king_bobomb_act_4,
-    king_bobomb_act_5, king_bobomb_act_6, king_bobomb_act_7, king_bobomb_act_8,
+    king_bobomb_act_inactive,
+    king_bobomb_act_activate,
+    king_bobomb_act_active,
+    king_bobomb_act_grabbed_mario,
+    king_bobomb_act_been_thrown,
+    king_bobomb_act_return_home,
+    king_bobomb_act_hit_ground,
+    king_bobomb_act_death,
+    king_bobomb_act_stop_music,
 };
 struct SoundState sKingBobombSoundStates[] = {
-    { 0, 0, 0, NO_SOUND },
-    { 1, 1, 20, SOUND_OBJ_POUNDING1_HIGHPRIO },
-    { 0, 0, 0, NO_SOUND },
-    { 0, 0, 0, NO_SOUND },
-    { 1, 15, -1, SOUND_OBJ_POUNDING1_HIGHPRIO },
-    { 0, 0, 0, NO_SOUND },
-    { 0, 0, 0, NO_SOUND },
-    { 0, 0, 0, NO_SOUND },
-    { 0, 0, 0, NO_SOUND },
-    { 1, 33, -1, SOUND_OBJ_POUNDING1_HIGHPRIO },
-    { 0, 0, 0, NO_SOUND },
-    { 1, 1, 15, SOUND_OBJ_POUNDING1_HIGHPRIO },
+    { 0,  0,  0, NO_SOUND                     },
+    { 1,  1, 20, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO },
+    { 0,  0,  0, NO_SOUND                     },
+    { 0,  0,  0, NO_SOUND                     },
+    { 1, 15, -1, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO },
+    { 0,  0,  0, NO_SOUND                     },
+    { 0,  0,  0, NO_SOUND                     },
+    { 0,  0,  0, NO_SOUND                     },
+    { 0,  0,  0, NO_SOUND                     },
+    { 1, 33, -1, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO },
+    { 0,  0,  0, NO_SOUND                     },
+    { 1,  1, 15, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO },
 };
 
 void king_bobomb_move(void) {
     cur_obj_update_floor_and_walls();
-    if (o->oKingBobombIsJumping == 0)
+    if (!o->oKingBobombIsJumping) {
         cur_obj_move_standard(-78);
-    else
+    } else {
         cur_obj_move_using_fvel_and_gravity();
+    }
     cur_obj_call_action_function(sKingBobombActions);
     exec_anim_sound_state(sKingBobombSoundStates);
-    if (o->oDistanceToMario < 5000.0f)
+    if (o->oDistanceToMario < 5000.0f) { //! oDrawingDistance?
         cur_obj_enable_rendering();
-    else
+    } else {
         cur_obj_disable_rendering();
+    }
 }
 
 void bhv_king_bobomb_loop(void) {
@@ -311,5 +318,6 @@ void bhv_king_bobomb_loop(void) {
             o->oPosY += 20.0f;
             break;
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
+    cur_obj_random_blink(&o->oKingBobombBlinkTimer);
 }

@@ -351,7 +351,7 @@ void ukiki_act_go_to_cage(void) {
 
             o->oPathedStartWaypoint = (struct Waypoint *) sCageUkikiPath;
 
-            if (cur_obj_follow_path(0) != PATH_REACHED_END) {
+            if (cur_obj_follow_path() != PATH_REACHED_END) {
                 o->oForwardVel = 10.0f;
                 cur_obj_rotate_yaw_toward(o->oPathedTargetYaw, 0x400);
                 o->oPosY = o->oFloorHeight;
@@ -632,7 +632,7 @@ void bhv_ukiki_loop(void) {
         o->oAnimState = UKIKI_ANIM_STATE_DEFAULT;
     }
 
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
     print_debug_bottom_up("mode   %d\n", o->oAction);
     print_debug_bottom_up("action %d\n", o->oHeldState);
 }

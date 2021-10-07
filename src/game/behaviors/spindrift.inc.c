@@ -19,7 +19,7 @@ void bhv_spindrift_loop(void) {
     cur_obj_update_floor_and_walls();
     switch (o->oAction) {
         case 0:
-            approach_forward_vel(&o->oForwardVel, 4.0f, 1.0f);
+            approach_f32_symmetric_bool(&o->oForwardVel, 4.0f, 1.0f);
             if (cur_obj_lateral_dist_from_mario_to_home() > 1000.0f)
                 o->oAngleToMario = cur_obj_angle_to_home();
             else if (o->oDistanceToMario > 300.0f)
@@ -31,7 +31,7 @@ void bhv_spindrift_loop(void) {
             o->oForwardVel = -10.0f;
             if (o->oTimer > 20) {
                 o->oAction = 0;
-                o->oInteractStatus = 0;
+                o->oInteractStatus = INT_STATUS_NONE;
                 o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
             }
             break;

@@ -77,7 +77,7 @@ extern const Collision bits_seg7_collision_0701AA0C[];
 extern const Collision bits_seg7_collision_0701AA84[];
 extern const Collision bits_seg7_collision_0701AC28[];
 extern const Collision bits_seg7_collision_0701ACAC[];
-extern const Collision bits_seg7_collision_0701AD54[];
+extern const Collision bits_seg7_collision_arrow_platform[];
 extern const Collision bits_seg7_collision_0701ADD8[];
 extern const Collision bits_seg7_collision_0701AE5C[];
 extern const Collision bits_seg7_collision_0701B0D4[];

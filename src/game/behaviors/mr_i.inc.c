@@ -237,8 +237,8 @@ struct ObjectHitbox sMrIHitbox = {
 void bhv_mr_i_loop(void) {
     obj_set_hitbox(o, &sMrIHitbox);
     cur_obj_call_action_function(sMrIActions);
-    if (o->oAction != 3)
-        if (o->oDistanceToMario > 3000.0f || o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
-            o->oAction = 0;
-    o->oInteractStatus = 0;
+    if ((o->oAction != 3) && (o->oDistanceToMario > 3000.0f || o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+        o->oAction = 0;
+    }
+    o->oInteractStatus = INT_STATUS_NONE;
 }

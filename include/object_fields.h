@@ -193,9 +193,7 @@
 
 /* Mario */
 #define /*0x0F4*/ oMarioParticleFlags                           OBJECT_FIELD_S32(0x1B)
-#define /*0x108*/ oMarioPoleUnk108                              OBJECT_FIELD_S32(0x20)
 #define /*0x108*/ oMarioReadingSignDYaw                         OBJECT_FIELD_S32(0x20)
-#define /*0x10C*/ oMarioPoleYawVel                              OBJECT_FIELD_S32(0x21)
 #define /*0x10C*/ oMarioCannonObjectYaw                         OBJECT_FIELD_S32(0x21)
 #define /*0x10C*/ oMarioTornadoYawVel                           OBJECT_FIELD_S32(0x21)
 #define /*0x10C*/ oMarioReadingSignDPosX                        OBJECT_FIELD_F32(0x21)

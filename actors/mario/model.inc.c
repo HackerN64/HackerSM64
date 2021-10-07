@@ -76,13 +76,13 @@ ALIGNED8 static const Texture mario_texture_eyes_closed[] = {
 #include "actors/mario/mario_eyes_closed.rgba16.inc.c"
 };
 
-// Unreferenced
+// Unreferenced texture
 // 0x04004890
 UNUSED ALIGNED8 static const Texture mario_texture_eyes_closed_unused1[] = {
 #include "actors/mario/mario_eyes_closed_unused_0.rgba16.inc.c"
 };
 
-// Unreferenced
+// Unreferenced texture
 // 0x04005090
 UNUSED ALIGNED8 static const Texture mario_texture_eyes_closed_unused2[] = {
 #include "actors/mario/mario_eyes_closed_unused_1.rgba16.inc.c"

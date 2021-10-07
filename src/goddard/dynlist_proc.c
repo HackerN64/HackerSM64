@@ -479,7 +479,6 @@ void d_end_net_with_subgroup(DynObjName name) {
  * @param name   Name for created `ObjJoint`
  */
 void d_attach_joint_to_net(UNUSED s32 arg0, DynObjName name) {
-    UNUSED struct DynObjInfo *curInfo = sDynListCurInfo;
     d_makeobj(D_JOINT, name);
     d_set_type(3);
     d_set_shapeptrptr(NULL);
@@ -595,7 +594,6 @@ static char *integer_name_to_string(DynObjName name) {
  */
 struct GdObj *d_makeobj(enum DObjTypes type, DynObjName name) {
     struct GdObj *dobj;
-    UNUSED struct ObjGroup *dgroup;
 
     switch (type) {
         case D_CAR_DYNAMICS:
@@ -612,7 +610,6 @@ struct GdObj *d_makeobj(enum DObjTypes type, DynObjName name) {
             break;
         case D_GROUP:
             dobj = &make_group(0)->header;
-            dgroup = (struct ObjGroup *) dobj;
             break;
         case D_DATA_GRP:
             d_makeobj(D_GROUP, name);
@@ -705,7 +702,6 @@ void d_attach(DynObjName name) {
  */
 void d_attach_to(s32 flag, struct GdObj *obj) {
     struct ObjGroup *attgrp;
-    UNUSED struct DynObjInfo *curInfo = sDynListCurInfo;
     struct GdVec3f currObjPos; // transformed into attach offset
     struct GdVec3f objPos;
 

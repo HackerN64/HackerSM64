@@ -36,7 +36,6 @@ void jumping_box_act_1(void) {
 void (*sJumpingBoxActions[])(void) = { jumping_box_act_0, jumping_box_act_1 };
 
 void jumping_box_free_update(void) {
-    cur_obj_set_model(MODEL_BREAKABLE_BOX);
     cur_obj_scale(0.5f);
     obj_set_hitbox(o, &sJumpingBoxHitbox);
     cur_obj_update_floor_and_walls();
@@ -51,7 +50,6 @@ void bhv_jumping_box_loop(void) {
             break;
         case HELD_HELD:
             obj_copy_pos(o, gMarioObject);
-            cur_obj_set_model(MODEL_BREAKABLE_BOX_SMALL);
             cur_obj_unrender_set_action_and_anim(-1, 0);
             break;
         case HELD_THROWN:
@@ -64,7 +62,7 @@ void bhv_jumping_box_loop(void) {
     }
     if (o->oInteractStatus & INT_STATUS_STOP_RIDING) {
         create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
-        obj_explode_and_spawn_coins(46.0f, 1);
+        obj_explode_and_spawn_coins(46.0f, COIN_TYPE_YELLOW);
     }
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }

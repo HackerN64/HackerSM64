@@ -34,7 +34,6 @@ struct PoolSplit2 {
 #if defined(VERSION_JP) || defined(VERSION_US)
 s16 gVolume;
 s8 gReverbDownsampleRate;
-u8 sReverbDownsampleRateLog; // never read
 #endif
 
 struct SoundAllocPool gAudioSessionPool;
@@ -962,8 +961,7 @@ void decrease_reverb_gain(void) {
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 s32 audio_shut_down_and_reset_step(void) {
-    s32 i;
-    s32 j;
+    s32 i, j;
 
     switch (gAudioResetStatus) {
         case 5:
@@ -997,10 +995,7 @@ s32 audio_shut_down_and_reset_step(void) {
             bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
             gAudioResetStatus = 0;
     }
-    if (gAudioResetStatus < 3) {
-        return 0;
-    }
-    return 1;
+    return (gAudioResetStatus < 3);
 }
 #else
 /**
@@ -1128,27 +1123,6 @@ void init_reverb_us(s32 presetId)
     if (reverbWindowSize < DEFAULT_LEN_2CH) // Minimum window size to not overflow
         reverbWindowSize = DEFAULT_LEN_2CH;
 #endif
-
-    switch (gReverbDownsampleRate) {
-        case 1:
-            sReverbDownsampleRateLog = 0;
-            break;
-        case 2:
-            sReverbDownsampleRateLog = 1;
-            break;
-        case 4:
-            sReverbDownsampleRateLog = 2;
-            break;
-        case 8:
-            sReverbDownsampleRateLog = 3;
-            break;
-        case 16:
-            sReverbDownsampleRateLog = 4;
-            break;
-        default:
-            sReverbDownsampleRateLog = 0;
-    }
-
     if (reverbWindowSize == 0) {
         gSynthesisReverb.useReverb = 0;
     } else {
@@ -1735,7 +1709,6 @@ struct UnkEntry *unk_pool2_alloc(u32 size) {
 void func_sh_802f23ec(void) {
     s32 i;
     s32 idx;
-    s32 seqCount;
     s32 bankId1;
     s32 bankId2;
     s32 instId;
@@ -1744,7 +1717,7 @@ void func_sh_802f23ec(void) {
     struct Instrument *inst;
     struct UnkEntry *entry = NULL; //! @bug: not initialized but nevertheless used
 
-    seqCount = gAlCtlHeader->seqCount;
+    s32 seqCount = gAlCtlHeader->seqCount;
     for (idx = 0; idx < seqCount; idx++) {
         bankId1 = gCtlEntries[idx].bankId1;
         bankId2 = gCtlEntries[idx].bankId2;

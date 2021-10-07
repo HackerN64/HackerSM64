@@ -177,8 +177,7 @@ void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
     s32 srcIndex = 0;
 
     // Don't continue if there is no memory to do so.
-    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
-                                                        sizeof(struct TextLabel))) == NULL) {
+    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool, sizeof(struct TextLabel))) == NULL) {
         return;
     }
 
@@ -283,22 +282,25 @@ void print_text_centered(s32 x, s32 y, const char *str) {
 /**
  * Converts a char into the proper colorful glyph for the char.
  */
-s8 char_to_glyph_index(char c) {
+s32 char_to_glyph_index(char c) {
     if (c >= 'A' && c <= 'Z') return c - 55;
     if (c >= 'a' && c <= 'z') return c - 87;
     if (c >= '0' && c <= '9') return c - 48;
     if (c == ' ') return GLYPH_SPACE;
     if (c == '!') return GLYPH_EXCLAMATION_PNT; // !, JP only
     if (c == '#') return GLYPH_TWO_EXCLAMATION; // !!, JP only
-    if (c == '?') return GLYPH_QUESTION_MARK; // ?, JP only
-    if (c == '&') return GLYPH_AMPERSAND; // &, JP only
-    if (c == '%') return GLYPH_PERCENT; // %, JP only
-    if (c == '*') return GLYPH_MULTIPLY; // x
-    if (c == '+') return GLYPH_COIN; // coin
-    if (c == ',') return GLYPH_MARIO_HEAD; // Imagine I drew Mario's head
-    if (c == '-') return GLYPH_STAR; // star
-    if (c == '.') return GLYPH_PERIOD; // large shaded dot, JP only
-    if (c == '/') return GLYPH_BETA_KEY; // beta key, JP only. Reused for Ü in EU.
+    if (c == '?') return GLYPH_QUESTION_MARK;   // ?, JP only
+    if (c == '&') return GLYPH_AMPERSAND;       // &, JP only
+    if (c == '/') return GLYPH_PERCENT;         // %, JP only
+    if (c == '-') return GLYPH_MINUS;           // minus
+    if (c == '*') return GLYPH_MULTIPLY;        // x
+    if (c == '$') return GLYPH_COIN;            // coin
+    if (c == '@') return GLYPH_RED_COIN;        // red coin
+    if (c == '+') return GLYPH_SILVER_COIN;     // silver coin
+    if (c == ',') return GLYPH_MARIO_HEAD;      // Imagine I drew Mario's head
+    if (c == '^') return GLYPH_STAR;            // star
+    if (c == '.') return GLYPH_PERIOD;          // large shaded dot, JP only
+    if (c == '|') return GLYPH_BETA_KEY;        // beta key, JP only. Reused for Ü in EU.
     return GLYPH_SPACE;
 }
 

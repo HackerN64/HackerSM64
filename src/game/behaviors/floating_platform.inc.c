@@ -5,10 +5,10 @@ f32 floating_platform_find_home_y(void) {
     f32 waterLevel = find_water_level(o->oPosX, o->oPosZ);
     f32 floorHeight = find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
     if (waterLevel > floorHeight + o->oFloatingPlatformHeightOffset) {
-        o->oFloatingPlatformIsOnFloor = 0;
+        o->oFloatingPlatformIsOnFloor = FALSE;
         return waterLevel + o->oFloatingPlatformHeightOffset;
     } else {
-        o->oFloatingPlatformIsOnFloor = 1;
+        o->oFloatingPlatformIsOnFloor = TRUE;
         return floorHeight + o->oFloatingPlatformHeightOffset;
     }
 }
@@ -45,7 +45,7 @@ void floating_platform_act_0(void) {
 
 void bhv_floating_platform_loop(void) {
     o->oHomeY = floating_platform_find_home_y();
-    o->oAction = (o->oFloatingPlatformIsOnFloor ? 1 : 0);
+    o->oAction = o->oFloatingPlatformIsOnFloor;
 
     switch (o->oAction) {
         case 0:

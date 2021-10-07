@@ -12,8 +12,6 @@ OSThread gRumblePakThread;
 
 OSPfs gRumblePakPfs;
 
-s8 D_SH_8031D8F8[0x60];
-
 OSMesg gRumblePakSchedulerMesgBuf[1];
 OSMesgQueue gRumblePakSchedulerMesgQueue;
 OSMesg gRumbleThreadVIMesgBuf[1];
@@ -154,7 +152,7 @@ void queue_rumble_decay(s16 decay) {
     gRumbleDataQueue[2].decay = decay;
 }
 
-u8 is_rumble_finished_and_queue_empty(void) {
+u32 is_rumble_finished_and_queue_empty(void) {
     if (gCurrRumbleSettings.start + gCurrRumbleSettings.timer >= 4) {
         return FALSE;
     }

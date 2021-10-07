@@ -23,8 +23,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Slope fix and exposed ceilings fix
 - No false ledgegrabs fix *
 - Jump kick fix *
-- 46 degree wallkicks *
-- Pole fix
+- Configurable wallkick angle, in degrees *
 - Possibility of disabling BLJs *
 - Hanging fix (mario can grab hangable ceilings from any state, instead of only jump or double jump) *
 - Increased maximum pole length (The game will read bparam1 and bparam2 together as a single value, so you can have a very long pole) *
@@ -72,6 +71,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
   - Example Text: `"@FF0000FFRED @00FF00FFGREEN @0000FFFFBLUE @FFFFFF00INVISIBLE @--------NORMAL"`
   - NOTE: It is not mandatory to reset the text color with `"@--------"`, but text will need to be recolored each time it scrolls in a dialog box, or the custom color will reset.
 - Toggle visiblity of collision surfaces and object hitboxes with Visual Surface Debug. `config.h` has VISUAL_DEBUG which can be turned on to enable this feature.
+- Workaround for infinite death loops caused by using the wrong warp type for death warps. Mario's HP will be restored when being warped to any warp if (and only if) he was warped while dead. *
 
 **Other Bugfixes:**
 - Castle music fix (Fixes the castle music sometimes triggering after getting a dialog) *
@@ -89,6 +89,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Widescreen (16:9) support toggleable by pressing `L` in the pause menu. *
 - S2DEX engine by someone2639! To use it, compile with `make TEXT_ENGINE=s2dex_text_engine` or just set `TEXT_ENGINE` to `s2dex_text_engine` in the makefile.
 - ia8 coins (64x64), the vanilla coin texture is upgraded to accomodate. *
+- ia8 30 FPS (64x64) coins (Textures by InTheBeef, cleaned up by Arceveti). *
 - Mario's silhouette is shown when behind most surfaces (By Frame#5375, Axollyon, AloXado320, Wiseguy, Arceveti) *
 - Skybox size modifier. You can have 2x, 3x and 4x size skyboxes (you can select the skybox size in `config.h`.) Please note that this might affect console performance, especially 4x mode. 2x or 3x mode is recommended if aiming for console. By CowQuack *
 - You can set the black border size to different values for console and emulator. It's set to 0 by default for both. *

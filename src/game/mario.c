@@ -52,14 +52,13 @@ s32 is_anim_at_end(struct MarioState *m) {
  */
 s32 is_anim_past_end(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
-
     return marioObj->header.gfx.animInfo.animFrame >= (marioObj->header.gfx.animInfo.curAnim->loopEnd - 2);
 }
 
 /**
  * Sets Mario's animation without any acceleration, running at its default rate.
  */
-s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
+s32 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
     struct Object *marioObj = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -92,7 +91,7 @@ s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
  * Sets Mario's animation where the animation is sped up or
  * slowed down via acceleration.
  */
-s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
+s32 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
     struct Object *marioObj = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -177,7 +176,7 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
  * Rotates the animation's translation into the global coordinate system
  * and returns the animation's flags.
  */
-s16 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
+s32 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
     f32 dx, dz;
 
     struct Animation *curAnim = (void *) obj->header.gfx.animInfo.curAnim;
@@ -220,7 +219,7 @@ void update_mario_pos_for_anim(struct MarioState *m) {
 /**
  * Finds the vertical translation from Mario's animation.
  */
-s16 return_mario_anim_y_translation(struct MarioState *m) {
+s32 return_mario_anim_y_translation(struct MarioState *m) {
     Vec3s translation;
     find_mario_anim_flags_and_translation(m->marioObj, 0, translation);
 
@@ -613,10 +612,9 @@ f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f
 /**
  * Returns the slope of the floor based off points around Mario.
  */
-s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
+s32 find_floor_slope(struct MarioState *m, s16 yawOffset) {
     struct Surface *floor = m->floor;
     f32 forwardFloorY, backwardFloorY;
-    f32 forwardYDelta, backwardYDelta;
     s16 result;
 
     f32 x = sins(m->faceAngle[1] + yawOffset) * 5.0f;
@@ -638,8 +636,8 @@ s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
     if (floor == NULL) backwardFloorY = m->floorHeight; // handle OOB slopes
 #endif
 
-    forwardYDelta = forwardFloorY - m->pos[1];
-    backwardYDelta = m->pos[1] - backwardFloorY;
+    f32 forwardYDelta = forwardFloorY - m->pos[1];
+    f32 backwardYDelta = m->pos[1] - backwardFloorY;
 
     if (sqr(forwardYDelta) < sqr(backwardYDelta)) {
         result = atan2s(5.0f, forwardYDelta);
@@ -825,7 +823,7 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
         case ACT_LONG_JUMP:
             m->marioObj->header.gfx.animInfo.animID = -1;
             set_mario_y_vel_based_on_fspeed(m, 30.0f, 0.0f);
-            m->marioObj->oMarioLongJumpIsSlow = m->forwardVel > 16.0f ? FALSE : TRUE;
+            m->marioObj->oMarioLongJumpIsSlow = !(m->forwardVel > 16.0f);
 
             //! (BLJ's) This properly handles long jumps from getting forward speed with
             //  too much velocity, but misses backwards longs allowing high negative speeds.
@@ -954,9 +952,9 @@ u32 set_mario_action(struct MarioState *m, u32 action, u32 actionArg) {
     }
 
     // Initialize the action information.
-    m->prevAction = m->action;
-    m->action = action;
-    m->actionArg = actionArg;
+    m->prevAction  = m->action;
+    m->action      = action;
+    m->actionArg   = actionArg;
     m->actionState = 0;
     m->actionTimer = 0;
 
@@ -1269,11 +1267,6 @@ void update_mario_joystick_inputs(struct MarioState *m) {
     } else {
         m->intendedYaw = m->faceAngle[1];
     }
-}
-
-Bool32 analog_stick_held_back(struct MarioState *m) {
-    s16 intendedDYaw = (m->intendedYaw - m->faceAngle[1]);
-    return ((intendedDYaw < -0x471C) || (intendedDYaw > 0x471C));
 }
 
 /**
@@ -1771,7 +1764,7 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
         }
 
         play_infinite_stairs_music();
-        gMarioState->marioObj->oInteractStatus = 0;
+        gMarioState->marioObj->oInteractStatus = INT_STATUS_NONE;
 #if ENABLE_RUMBLE
         queue_rumble_particles();
 #endif
@@ -1837,7 +1830,7 @@ void init_mario(void) {
 
     mario_reset_bodystate(gMarioState);
     update_mario_info_for_cam(gMarioState);
-    gMarioState->marioBodyState->punchState = 0;
+    gMarioState->marioBodyState->punchState = 0x0;
 
     vec3_copy(&gMarioState->marioObj->oPosVec, gMarioState->pos);
     vec3_copy(&gMarioState->marioObj->oMoveAngleVec, gMarioState->faceAngle);
@@ -1866,8 +1859,12 @@ void init_mario_from_save_file(void) {
     gMarioState->numCoins = 0;
     gMarioState->numStars = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
     gMarioState->numKeys = 0;
-
-    gMarioState->numLives = 4;
+#ifdef SAVE_NUM_LIVES
+    s8 savedLives                      = save_file_get_num_lives();
+    gMarioState->numLives              = ((savedLives > 0) ? savedLives : DEFAULT_NUM_LIVES);
+#else
+    gMarioState->numLives              = DEFAULT_NUM_LIVES;
+#endif
     gMarioState->health = 0x880;
 #ifdef BREATH_METER
     gMarioState->breath                = 0x880;

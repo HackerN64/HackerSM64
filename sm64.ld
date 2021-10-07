@@ -172,6 +172,7 @@ SECTIONS
 #endif
       */libnustd.a:*.o(.text);
       */libgcc.a:*.o(.text);
+      */librtc.a:*.o(.text);
       */libz.a:*.o(.text);
       */libhvqm2.a:*.o(.text);
       BUILD_DIR/lib/rsp.o(.text);
@@ -179,19 +180,19 @@ SECTIONS
       _mainSegmentTextEnd = .;
 
       /* data */
-      BUILD_DIR/src/boot*.o(.*data*);
-      BUILD_DIR/src/usb*.o(.*data*);
-      BUILD_DIR/src/audio*.o(.*data*);
+      BUILD_DIR/src/boot*.o(.data*);
+      BUILD_DIR/src/audio*.o(.data*);
 #ifdef S2DEX_TEXT_ENGINE
-      lib/libs2d_engine.a:*(.*data*);
+      lib/libs2d_engine.a:*(.data*);
 #endif
 #if defined(ISVPRINT) || defined(UNF)
-      */libultra_d.a:*.o(.*data*);
+      */libultra_d.a:*.o(.data*);
 #else
-      */libultra_rom.a:*.o(.*data*);
+      */libultra_rom.a:*.o(.data*);
 #endif
-      */libhvqm2.a:*.o(.*data*);
-      */libz.a:*.o(.*data*);
+      */libhvqm2.a:*.o(.data*);
+      */librtc.a:*.o(.data*);
+      */libz.a:*.o(.data*);
 
       BUILD_DIR/lib/rsp.o(.data*);
       lib/PR/hvqm/hvqm2sp1.o(.data*);
@@ -204,11 +205,12 @@ SECTIONS
       lib/libs2d_engine.a:*(.rodata*);
 #endif
 #if defined(ISVPRINT) || defined(UNF)
-      */libultra_d.a:*.o(.*rodata*);
+      */libultra_d.a:*.o(.rodata*);
 #else
-      */libultra_rom.a:*.o(.*rodata*);
+      */libultra_rom.a:*.o(.rodata*);
 #endif
       */libgcc.a:*.o(.rodata*);
+      */librtc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
 
       BUILD_DIR/lib/rsp.o(.rodata*);
@@ -234,6 +236,7 @@ SECTIONS
       */libultra_rom.a:*.o(.*bss*);
 #endif
       */libhvqm2.a:*.o(.bss*);
+      */librtc.a:*.o(.bss*);
       */libz.a:*.o(.bss*);
       . = ALIGN(0x8);
    }
@@ -248,9 +251,10 @@ SECTIONS
       BUILD_DIR/asm/math.o(.text);
       _engineSegmentTextEnd = .;
       /* data */
-      BUILD_DIR/src/game*.o(.*data*);
+      BUILD_DIR/src/game*.o(.data*);
       BUILD_DIR/src/engine*.o(.data*);
       BUILD_DIR/src/engine*.o(.sdata*);
+      BUILD_DIR/src/usb*.o(.data*);
       /* rodata */
       BUILD_DIR/src/game*.o(.rodata*);
       BUILD_DIR/src/engine*.o(.rodata*);

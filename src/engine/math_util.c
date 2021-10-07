@@ -29,9 +29,9 @@ Vec3i gVec3iZero = {     0,     0,     0 };
 Vec3s gVec3sOne  = {     1,     1,     1 };
 
 /// From Wiseguy
-static inline s32 asm_roundf(f32 in) {
-    f32 tmp;
-    s32 out;
+static inline int asm_roundf(float in) {
+    float tmp;
+    int out;
     __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in));
     __asm__("mfc1 %0,%1" : "=r" (out) : "f" (tmp));
     return out;
@@ -42,7 +42,7 @@ f32 roundf(f32 x) {
 }
 
 static inline float asm_absf(float in) {
-    f32 out;
+    float out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
     return out;
 }
@@ -58,6 +58,19 @@ f32 min_3f(f32 a0, f32 a1, f32 a2) { if (a1 < a0) a0 = a1; if (a2 < a0) a0 = a2;
 /// Returns the highest of three values.
 s32 max_3i(s32 a0, s32 a1, s32 a2) { if (a1 > a0) a0 = a1; if (a2 > a0) a0 = a2; return a0; }
 f32 max_3f(f32 a0, f32 a1, f32 a2) { if (a1 > a0) a0 = a1; if (a2 > a0) a0 = a2; return a0; }
+
+/// A combination of the above.
+void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max) {
+    *min = a;
+    *max = a;
+    if (b < a) {
+        *min = b;
+    } else {
+        *max = b;
+    }
+    if (c < *min) *min = c;
+    if (c > *max) *max = c;
+}
 
 /// Copy vector 'src' to 'dest'
 void vec3f_copy(Vec3f dest, Vec3f src) {
@@ -92,13 +105,13 @@ void vec3f_add(Vec3f dest, Vec3f a) {
 void vec3f_sum(Vec3f dest, Vec3f a, Vec3f b) {
     register f32 *temp = (f32 *)dest;
     register s32 j;
-    register f32 x, y;
+    register f32 sum, sum2;
     for (j = 0; j < 3; j++) {
-        x = *a;
+        sum = *a;
         a++;
-        y = *b;
+        sum2 = *b;
         b++;
-        *temp = x + y;
+        *temp = (sum + sum2);
         temp++;
     }
 }
@@ -151,21 +164,9 @@ f32 vec3f_dot(Vec3f a, Vec3f b) {
  * to the nearest integer.
  */
 void vec3f_to_vec3s(Vec3s dest, Vec3f a) {
-    // add/subtract 0.5 in order to round to the nearest s32 instead of truncating
-    dest[0] = a[0] + ((a[0] > 0) ? 0.5f : -0.5f);
-    dest[1] = a[1] + ((a[1] > 0) ? 0.5f : -0.5f);
-    dest[2] = a[2] + ((a[2] > 0) ? 0.5f : -0.5f);
-}
-
-/**
- * Set 'dest' the normal vector of a triangle with vertices a, b and c.
- * It is similar to vec3f_cross, but it calculates the vectors (c-b) and (b-a)
- * at the same time.
- */
-void find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c) {
-    dest[0] = (b[1] - a[1]) * (c[2] - b[2]) - (c[1] - b[1]) * (b[2] - a[2]);
-    dest[1] = (b[2] - a[2]) * (c[0] - b[0]) - (c[2] - b[2]) * (b[0] - a[0]);
-    dest[2] = (b[0] - a[0]) * (c[1] - b[1]) - (c[0] - b[0]) * (b[1] - a[1]);
+    dest[0] = asm_roundf(a[0]);
+    dest[1] = asm_roundf(a[1]);
+    dest[2] = asm_roundf(a[2]);
 }
 
 /// Make vector 'dest' the cross product of vectors a and b.
@@ -177,7 +178,7 @@ void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b) {
 void vec3f_normalize(Vec3f dest) {
     f32 mag = sqrtf(sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
     if (mag > NEAR_ZERO) {
-        register f32 invsqrt = 1.0f / mag;
+        register f32 invsqrt = ( 1.0f / mag);
         vec3_mul_val(dest, invsqrt);
     } else {
         dest[0] = 0;
@@ -190,7 +191,7 @@ void vec3f_normalize(Vec3f dest) {
 void vec3f_normalize_negative(Vec3f dest) {
     f32 mag = sqrtf(sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
     if (mag > NEAR_ZERO) {
-        register f32 invsqrt = -1.0f / mag;
+        register f32 invsqrt = (-1.0f / mag);
         vec3_mul_val(dest, invsqrt);
     } else {
         dest[0] = 0;
@@ -200,7 +201,7 @@ void vec3f_normalize_negative(Vec3f dest) {
 }
 
 struct CopyMe {
-    f32 a[4 * 4];
+    f32 a[0x10];
 };
 
 /// Copy matrix 'src' to 'dest'
@@ -237,6 +238,36 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
     vec3f_copy(&dest[3][0], &b[0]);
 }
 
+/**
+ * Multiply a vector by a matrix of the form
+ * | ? ? ? 0 |
+ * | ? ? ? 0 |
+ * | ? ? ? 0 |
+ * | 0 0 0 1 |
+ * i.e. a matrix representing a linear transformation over 3 space.
+ */
+void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        dst[i] = (m[0][i] * v[0]) + (m[1][i] * v[1]) + (m[2][i] * v[2]);
+    }
+}
+
+/**
+ * Multiply a vector by the transpose of a matrix of the form
+ * | ? ? ? 0 |
+ * | ? ? ? 0 |
+ * | ? ? ? 0 |
+ * | 0 0 0 1 |
+ * i.e. a matrix representing a linear transformation over 3 space.
+ */
+void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        dst[i] = vec3_dot(m[i], v);
+    }
+}
+
 void mtxf_rot_trans_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
     register f32 sx = sins(rot[0]);
     register f32 cx = coss(rot[0]);
@@ -245,36 +276,23 @@ void mtxf_rot_trans_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
     register f32 sz = sins(rot[2]);
     register f32 cz = coss(rot[2]);
     register Vec3f entry;
-
     entry[0] = (cy * cz);
     entry[1] = (cy * sz);
     entry[2] = -sy;
-    dest[0][0] = entry[0] * src[0][0] + entry[1] * src[1][0] + entry[2] * src[2][0];
-    dest[0][1] = entry[0] * src[0][1] + entry[1] * src[1][1] + entry[2] * src[2][1];
-    dest[0][2] = entry[0] * src[0][2] + entry[1] * src[1][2] + entry[2] * src[2][2];
-
+    linear_mtxf_mul_vec3(src, dest[0], entry);
     entry[1] = (sx * sy);
     entry[0] = (entry[1] * cz) - (cx * sz);
     entry[1] = (entry[1] * sz) + (cx * cz);
     entry[2] = (sx * cy);
-    dest[1][0] = entry[0] * src[0][0] + entry[1] * src[1][0] + entry[2] * src[2][0];
-    dest[1][1] = entry[0] * src[0][1] + entry[1] * src[1][1] + entry[2] * src[2][1];
-    dest[1][2] = entry[0] * src[0][2] + entry[1] * src[1][2] + entry[2] * src[2][2];
-
+    linear_mtxf_mul_vec3(src, dest[1], entry);
     entry[1] = (cx * sy);
     entry[0] = (entry[1] * cz) + (sx * sz);
     entry[1] = (entry[1] * sz) - (sx * cz);
     entry[2] = (cx * cy);
-    dest[2][0] = entry[0] * src[0][0] + entry[1] * src[1][0] + entry[2] * src[2][0];
-    dest[2][1] = entry[0] * src[0][1] + entry[1] * src[1][1] + entry[2] * src[2][1];
-    dest[2][2] = entry[0] * src[0][2] + entry[1] * src[1][2] + entry[2] * src[2][2];
-
-    vec3_copy(entry, trans);
-    dest[3][0] = entry[0] * src[0][0] + entry[1] * src[1][0] + entry[2] * src[2][0] + src[3][0];
-    dest[3][1] = entry[0] * src[0][1] + entry[1] * src[1][1] + entry[2] * src[2][1] + src[3][1];
-    dest[3][2] = entry[0] * src[0][2] + entry[1] * src[1][2] + entry[2] * src[2][2] + src[3][2];
-    dest[0][3] = dest[1][3] = dest[2][3] = 0;
-    ((u32 *) dest)[15] = 0x3F800000;
+    linear_mtxf_mul_vec3(src, dest[2], entry);
+    linear_mtxf_mul_vec3(src, dest[3], trans);
+    vec3f_add(dest[3], src[3]);
+    MTXF_END(dest);
 }
 
 /**
@@ -339,10 +357,9 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f translate, Vec3s rotate) {
     dest[2][1] = -sx;
     dest[0][2] = ((sx * cysz) - sycz);
     dest[1][2] = ((sx * cycz) + sysz);
-    dest[2][2] = cx * cy;
+    dest[2][2] = (cx * cy);
     vec3_copy(dest[3], translate);
-    dest[0][3] = dest[1][3] = dest[2][3] = 0.;
-    ((u32 *) dest)[15] = 0x3F800000;
+    MTXF_END(dest);
 }
 
 /**
@@ -369,11 +386,8 @@ void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f b, Vec3s c) {
     dest[2][0] = ((cxcz * sy) + sxsz);
     dest[2][1] = ((cxsz * sy) - sxcz);
     dest[2][2] = (cx * cy);
-    dest[0][3] = 0;
-    dest[1][3] = 0;
-    dest[2][3] = 0;
     vec3_copy(dest[3], b);
-    ((u32 *) dest)[15] = 0x3F800000;
+    MTXF_END(dest);
 }
 
 /**
@@ -391,10 +405,10 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
         temp++;
     }
     if (angle == 0x0) {
-        dest[0][0] = 1;
+        ((u32 *) dest)[0] = 0x3F800000;
         dest[0][1] = 0;
         dest[1][0] = 0;
-        dest[1][1] = 1;
+        ((u32 *) dest)[5] = 0x3F800000;
     } else {
         dest[0][0] = coss(angle);
         dest[0][1] = sins(angle);
@@ -405,7 +419,7 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
     dest[2][3] = 0;
     ((u32 *) dest)[15] = 0x3F800000;
 
-    temp = (f32 *)dest;
+    temp  = (f32 *)dest;
     temp2 = (f32 *)mtx;
     for (i = 0; i < 3; i++) {
         temp[12] = (temp2[0] * position[0]) + (temp2[4] * position[1]) + (temp2[8] * position[2]) + temp2[12];
@@ -425,35 +439,17 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
-
     vec3_set(lateralDir, sins(yaw), 0, coss(yaw));
     vec3f_normalize(upDir);
-
     vec3_cross(leftDir, upDir, lateralDir);
     vec3f_normalize(leftDir);
-
     vec3_cross(forwardDir, leftDir, upDir);
     vec3f_normalize(forwardDir);
-
-    dest[0][0] = leftDir[0];
-    dest[0][1] = leftDir[1];
-    dest[0][2] = leftDir[2];
-    dest[3][0] = pos[0];
-
-    dest[1][0] = upDir[0];
-    dest[1][1] = upDir[1];
-    dest[1][2] = upDir[2];
-    dest[3][1] = pos[1];
-
-    dest[2][0] = forwardDir[0];
-    dest[2][1] = forwardDir[1];
-    dest[2][2] = forwardDir[2];
-    dest[3][2] = pos[2];
-
-    dest[0][3] = 0;
-    dest[1][3] = 0;
-    dest[2][3] = 0;
-    ((u32 *) dest)[15] = 0x3F800000;
+    vec3f_copy(dest[0], leftDir);
+    vec3f_copy(dest[1], upDir);
+    vec3f_copy(dest[2], forwardDir);
+    vec3f_copy(dest[3], pos);
+    MTXF_END(dest);
 }
 
 /**
@@ -469,33 +465,24 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     Vec3f point0, point1, point2;
     Vec3f forward;
     Vec3f xColumn, yColumn, zColumn;
-    f32 avgY;
-    f32 minY = -radius * 3;
+    f32 minY = (-radius * 3);
 
-    point0[0] = pos[0] + radius * sins(yaw + 0x2AAA);
-    point0[2] = pos[2] + radius * coss(yaw + 0x2AAA);
-    point1[0] = pos[0] + radius * sins(yaw + 0x8000);
-    point1[2] = pos[2] + radius * coss(yaw + 0x8000);
-    point2[0] = pos[0] + radius * sins(yaw + 0xD555);
-    point2[2] = pos[2] + radius * coss(yaw + 0xD555);
+    point0[0] = (pos[0] + (radius * sins(yaw + 0x2AAA)));
+    point0[2] = (pos[2] + (radius * coss(yaw + 0x2AAA)));
+    point1[0] = (pos[0] + (radius * sins(yaw + 0x8000)));
+    point1[2] = (pos[2] + (radius * coss(yaw + 0x8000)));
+    point2[0] = (pos[0] + (radius * sins(yaw + 0xD555)));
+    point2[2] = (pos[2] + (radius * coss(yaw + 0xD555)));
 
     point0[1] = find_floor(point0[0], pos[1] + 150, point0[2], &floor);
     point1[1] = find_floor(point1[0], pos[1] + 150, point1[2], &floor);
     point2[1] = find_floor(point2[0], pos[1] + 150, point2[2], &floor);
 
-    if (point0[1] - pos[1] < minY) {
-        point0[1] = pos[1];
-    }
+    if (point0[1] - pos[1] < minY) point0[1] = pos[1];
+    if (point1[1] - pos[1] < minY) point1[1] = pos[1];
+    if (point2[1] - pos[1] < minY) point2[1] = pos[1];
 
-    if (point1[1] - pos[1] < minY) {
-        point1[1] = pos[1];
-    }
-
-    if (point2[1] - pos[1] < minY) {
-        point2[1] = pos[1];
-    }
-
-    avgY = (point0[1] + point1[1] + point2[1]) / 3;
+    f32 avgY = ((point0[1] + point1[1] + point2[1]) / 3);
 
     vec3_set(forward, sins(yaw), 0, coss(yaw));
     find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
@@ -509,13 +496,10 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     vec3f_copy(mtx[2], zColumn);
 
     mtx[3][0] = pos[0];
-    mtx[3][1] = (avgY < pos[1]) ? pos[1] : avgY;
+    mtx[3][1] = MAX(pos[1], avgY);
     mtx[3][2] = pos[2];
 
-    mtx[0][3] = 0;
-    mtx[1][3] = 0;
-    mtx[2][3] = 0;
-    ((u32 *) mtx)[15] = 0x3F800000;
+    MTXF_END(mtx);
 }
 
 /**
@@ -536,7 +520,7 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
         vec3_copy(entry, temp);
         temp3 = (f32 *)b;
         for (; (i & 3) !=3; i++) {
-            *temp2 = entry[0] * temp3[0] + entry[1] * temp3[4] + entry[2] * temp3[8];
+            *temp2 = (entry[0] * temp3[0]) + (entry[1] * temp3[4]) + (entry[2] * temp3[8]);
             temp2++;
             temp3++;
         }
@@ -557,9 +541,9 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
     register s32 i;
 
     for (i = 0; i < 4; i++) {
-        temp[0] = temp2[0] * s[0];
-        temp[4] = temp2[4] * s[1];
-        temp[8] = temp2[8] * s[2];
+        temp[0] = (temp2[0] * s[0]);
+        temp[4] = (temp2[4] * s[1]);
+        temp[8] = (temp2[8] * s[2]);
         temp[12] = temp2[12];
         temp++;
         temp2++;
@@ -592,8 +576,8 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
     ((s16 *) mtx)[a     ] = (((s32) b) >> 16);  \
     ((s16 *) mtx)[a + 16] = (((s32) b) & 0xFFFF);
 void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
-    register s32 i = coss(angle) * 65536;
-    register s32 j = sins(angle) * 65536;
+    register s32 i = (coss(angle) * 65536);
+    register s32 j = (sins(angle) * 65536);
     register f32 *temp = (f32 *)mtx;
     register s32 k;
     for (k = 0; k < 16; k++) {
@@ -630,9 +614,9 @@ void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
         temp3++;
         x = (f32 *)(((u32)x) + 4);
     }
-    temp2 -=3;;
+    temp2 -= 3;
     for (i = 0; i < 3; i++) {
-        *temp1 = x[-3] * temp2[0] + x[-2] * temp2[1] + x[-1] * temp2[2];
+        *temp1 = (x[-3] * temp2[0]) + (x[-2] * temp2[1]) + (x[-1] * temp2[2]);
         temp1++;
         temp2 += 4;
     }
@@ -700,15 +684,15 @@ void vec3f_get_angle(Vec3f from, Vec3f to, s16 *pitch, s16 *yaw) {
     register Vec3f d;
     vec3_diff(d, to, from);
     *pitch = atan2s(sqrtf(sqr(d[0]) + sqr(d[2])), d[1]);
-    *yaw = atan2s(d[2], d[0]);
+    *yaw   = atan2s(d[2], d[0]);
 }
 
 /// Finds the horizontal distance and pitch between two vectors.
 void vec3f_get_lateral_dist_and_pitch(Vec3f from, Vec3f to, f32 *lateralDist, Angle *pitch) {
-    Vec3f d;
+    register Vec3f d;
     vec3_diff(d, to, from);
     *lateralDist = sqrtf(sqr(d[0]) + sqr(d[2]));
-    *pitch          = atan2s(*lateralDist, d[1]);
+    *pitch       = atan2s(*lateralDist, d[1]);
 }
 
 /// Finds the horizontal distance and yaw between two vectors.
@@ -721,7 +705,7 @@ void vec3f_get_lateral_dist_and_yaw(Vec3f from, Vec3f to, f32 *lateralDist, Angl
 
 /// Finds the horizontal distance and angles between two vectors.
 void vec3f_get_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *lateralDist, Angle *pitch, Angle *yaw) {
-    Vec3f d;
+    register Vec3f d;
     vec3_diff(d, to, from);
     *lateralDist = sqrtf(sqr(d[0]) + sqr(d[2]));
     *pitch       = atan2s(*lateralDist, d[1]);
@@ -730,18 +714,15 @@ void vec3f_get_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *lateralDist, An
 
 /// Finds the distance and angles between two vectors.
 void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *yaw) {
-    register f32 x = to[0] - from[0];
-    register f32 y = to[1] - from[1];
-    register f32 z = to[2] - from[2];
-    register f32 xs = x * x;
-    register f32 zs = z * z;
-
-    *dist = sqrtf(xs + zs + y * y);
-    *pitch = atan2s(sqrtf(xs + zs), y);
-    *yaw = atan2s(z, x);
+    register Vec3f d;
+    vec3_diff(d, to, from);
+    register f32 xz = (sqr(d[0]) + sqr(d[2]));
+    *dist           = sqrtf(xz + sqr(d[1]));
+    *pitch          = atan2s(sqrtf(xz), d[1]);
+    *yaw            = atan2s(d[2], d[0]);
 }
 void vec3s_get_dist_and_angle(Vec3s from, Vec3s to, s16 *dist, Angle *pitch, Angle *yaw) {
-    Vec3s d;
+    register Vec3s d;
     vec3_diff(d, to, from);
     register f32 xz = (sqr(d[0]) + sqr(d[2]));
     *dist           = sqrtf(xz + sqr(d[1]));
@@ -751,7 +732,7 @@ void vec3s_get_dist_and_angle(Vec3s from, Vec3s to, s16 *dist, Angle *pitch, Ang
 
 /// Finds the distance, horizontal distance, and angles between two vectors.
 void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, Angle *pitch, Angle *yaw) {
-    Vec3f d;
+    register Vec3f d;
     vec3_diff(d, to, from);
     register f32 xz = (sqr(d[0]) + sqr(d[2]));
     *dist           = sqrtf(xz + sqr(d[1]));
@@ -765,9 +746,10 @@ void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, 
  * and has the angles pitch and yaw.
  */
 void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, s32 pitch, s32 yaw) {
-    to[0] = from[0] + dist * coss(pitch) * sins(yaw);
-    to[1] = from[1] + dist * sins(pitch);
-    to[2] = from[2] + dist * coss(pitch) * coss(yaw);
+    register f32 dcos = (dist * coss(pitch));
+    to[0] = (from[0] + (dcos * sins(yaw  )));
+    to[1] = (from[1] + (dist * sins(pitch)));
+    to[2] = (from[2] + (dcos * coss(yaw  )));
 }
 void vec3s_set_dist_and_angle(Vec3s from, Vec3s to, s16 dist, Angle32 pitch, Angle32 yaw) {
     register f32 dcos = (dist * coss(pitch));
@@ -920,7 +902,7 @@ s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
     return current;
 }
 
-s16 abs_angle_diff(s16 a0, s16 a1) {
+s32 abs_angle_diff(s16 a0, s16 a1) {
     s16 diff = (a1 - a0);
     if (diff == -0x8000) diff = -0x7FFF;
     return ABSI(diff);
@@ -936,7 +918,7 @@ s16 abs_angle_diff(s16 a0, s16 a1) {
  * Compute the angle from (0, 0) to (x, y) as a s16. Given that terrain is in
  * the xz-plane, this is commonly called with (z, x) to get a yaw angle.
  */
-s16 atan2s(f32 y, f32 x) {
+s32 atan2s(f32 y, f32 x) {
     u16 ret;
     if (x >= 0) {
         if (y >= 0) {
@@ -977,7 +959,7 @@ s16 atan2s(f32 y, f32 x) {
  * Compute the atan2 in radians by calling atan2s and converting the result.
  */
 f32 atan2f(f32 y, f32 x) {
-    return ((f32) atan2s(y, x) * M_PI / 0x8000);
+    return angle_to_radians(atan2s(y, x));
 }
 
 // Variables for a spline curve animation (used for the flight path in the grand star cutscene)
@@ -1083,9 +1065,7 @@ s32 anim_spline_poll(Vec3f result) {
     vec3_zero(result);
     spline_get_weights(weights, gSplineKeyframeFraction, gSplineState);
     for (i = 0; i < 4; i++) {
-        result[0] += weights[i] * gSplineKeyframe[i][1];
-        result[1] += weights[i] * gSplineKeyframe[i][2];
-        result[2] += weights[i] * gSplineKeyframe[i][3];
+        vec3_sum_val(result, gSplineKeyframe[i], weights[i]);
     }
 
     if ((gSplineKeyframeFraction += gSplineKeyframe[0][0] / 1000.0f) >= 1) {
@@ -1122,7 +1102,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     Vec3f add_dir;
     Vec3f norm;
     // Ignore certain surface types.
-    if (surface->type == SURFACE_INTANGIBLE || surface->flags & SURFACE_FLAG_NO_CAM_COLLISION) return FALSE;
+    if ((surface->type == SURFACE_INTANGIBLE) || (surface->flags & SURFACE_FLAG_NO_CAM_COLLISION)) return FALSE;
     // Get surface normal and some other stuff
     vec3_set(norm, 0, surface->normal.y, 0);
     vec3_mul_val(norm, RAY_OFFSET);
@@ -1139,16 +1119,16 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     a = vec3f_dot(e1, h);
     if ((a > -NEAR_ZERO) && (a < NEAR_ZERO)) return FALSE;
     // Check if we're making contact with the surface
-    f = 1.0f / a;
+    f = (1.0f / a);
     vec3f_diff(s, orig, v0);
-    u = f * vec3f_dot(s, h);
+    u = (f * vec3f_dot(s, h));
     if ((u < 0.0f) || (u > 1.0f)) return FALSE;
     vec3f_cross(q, s, e1);
-    v = f * vec3f_dot(dir, q);
+    v = (f * vec3f_dot(dir, q));
     if ((v < 0.0f) || ((u + v) > 1.0f)) return FALSE;
     // Get the length between our origin and the surface contact point
-    *length = f * vec3f_dot(e2, q);
-    if (*length <= 0.00001 || *length > dir_length) return FALSE;
+    *length = (f * vec3f_dot(e2, q));
+    if ((*length <= NEAR_ZERO) || (*length > dir_length)) return FALSE;
     // Successful contact
     vec3f_copy(add_dir, dir);
     vec3_mul_val(add_dir, *length);
@@ -1177,7 +1157,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     // Iterate through every surface of the list
     for (; list != NULL; list = list->next) {
         // Reject surface if out of vertical bounds
-        if (list->surface->lowerY > top || list->surface->upperY < bottom) continue;
+        if ((list->surface->lowerY > top) || (list->surface->upperY < bottom)) continue;
         // Check intersection between the ray and this surface
         if ((hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length)) && (length <= *max_length)) {
             *hit_surface = list->surface;
@@ -1219,6 +1199,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     Vec3f normalized_dir;
     f32 step;
     s32 i;
+    const f32 invcell = (1.0f / CELL_SIZE);
 
     // Set that no surface has been hit
     *hit_surface = NULL;
@@ -1231,27 +1212,27 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     vec3f_normalize(normalized_dir);
 
     // Get our cell coordinate
-    fCellX = (orig[0] + LEVEL_BOUNDARY_MAX) / CELL_SIZE;
-    fCellZ = (orig[2] + LEVEL_BOUNDARY_MAX) / CELL_SIZE;
+    fCellX = ((orig[0] + LEVEL_BOUNDARY_MAX) * invcell);
+    fCellZ = ((orig[2] + LEVEL_BOUNDARY_MAX) * invcell);
     cellX = fCellX;
     cellZ = fCellZ;
     cellPrevX = cellX;
     cellPrevZ = cellZ;
 
     // Don't do DDA if straight down
-    if (normalized_dir[1] >= NEAR_ONE || normalized_dir[1] <= -NEAR_ONE) {
+    if ((normalized_dir[1] >= NEAR_ONE) || (normalized_dir[1] <= -NEAR_ONE)) {
         find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
         return;
     }
 
     // Get cells we cross using DDA
     if (ABS(dir[0]) >= ABS(dir[2])) {
-        step = RAY_STEPS * ABS(dir[0]) / CELL_SIZE;
+        step = ((RAY_STEPS * ABS(dir[0])) * invcell);
     } else {
-        step = RAY_STEPS * ABS(dir[2]) / CELL_SIZE;
+        step = ((RAY_STEPS * ABS(dir[2])) * invcell);
     }
-    f32 dx = (dir[0] / step) / CELL_SIZE;
-    f32 dz = (dir[2] / step) / CELL_SIZE;
+    f32 dx = ((dir[0] / step) * invcell);
+    f32 dz = ((dir[2] / step) * invcell);
 
     for (i = 0; i < step && *hit_surface == NULL; i++) {
         find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);

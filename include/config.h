@@ -39,6 +39,14 @@
 // #define DISABLE_LEVEL_SPECIFIC_CHECKS
 // Disable lives and hide the lives counter
 #define DISABLE_LIVES
+// Save number of lives to the save file (Does nothing if DISABLE_LIVES is enabled)
+#define SAVE_NUM_LIVES
+// The number of lives Mario starts with after a game over or starting the game for the first time.
+#define DEFAULT_NUM_LIVES 4
+// This can be 0..127
+#define MAX_NUM_LIVES   100
+// This can be 0..32767
+#define MAX_NUM_COINS   999
 // Air/Breath meter is separate from health meter when underwater
 //#define BREATH_METER
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
@@ -51,10 +59,21 @@
 #define MODEL_ID_COUNT 256
 // Number of supported areas per level.
 #define AREA_COUNT 8
+// Makes signs and NPCs easier to talk to.
+#define EASIER_DIALOG_TRIGGER
+// Show an "A" when Mario is able to talk [requires EASIER_DIALOG_TRIGGER]
+#define DIALOG_INDICATOR
+// Include the English characters that were missing from US segment2
+// J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
+// [MAKE SURE TO ALSO BUILD FROM JP/SH AND EU TO OBTAIN THE ASSETS]
+// If this is disabled, backup assets will be used.
+//#define COMPLETE_EN_US_SEGMENT2
 /// Removes multi-language cake screen
 #define EU_CUSTOM_CAKE_FIX 1
 // Adds multiple languages to the game. Just a placeholder for the most part, because it only works with EU, and must be enabled with EU.
 #define MULTILANG (0 || VERSION_EU)
+// Prevents infinite death loops by always restoring Mario's health when he's warped to any kind of warp while dead.
+#define PREVENT_DEATH_LOOP
 
 // -- EXIT COURSE SETTINGS --
 // Disable exit course
@@ -71,19 +90,15 @@
 #endif // DISABLE_EXIT_COURSE
 
 // -- MOVEMENT SETTINGS --
-// Fixes Mario's turn radius by making it dependent on forward speed.
-// Modes:
-// 0 is vanilla behavior.
-// 1 is similar to vanilla, but prevents Mario from moving in the wrong direction, and allows finer control with the analog stick.
-// 2 is similar to mode 1, but a bit further from vanilla, and allows instant turnaround if Mario is moving slower than a certain threshold.
-// 3 is instant turning to the intended direction regardless of speed and angle.
-// 4 is an experimental asymptotic turn.
-#define GROUND_TURN_MODE 0
+// Fixes Mario's turn ground radius by making it dependent on the analog stick magnitude.
+#define GROUND_TURN_FIX
+// Flips Mario around when running backwards really fast.
+// This can happen when sliding backwards off a slope onto a floor.
+//#define GROUND_SPEED_FLIP
 // Improved hanging:
 // - Doesn't require holding down the A button
-// - Percise turning control ()
+// - Percise turning control
 // - Preventis falling from the edges
-// (Arceveti)
 #define BETTER_HANGING
 // Change the movement speed when hanging from a ceiling (the vanilla value is 4.0f, has no effect if BETTER_HANGING is enabled)
 #define HANGING_SPEED 12.0f
@@ -91,14 +106,26 @@
 #define NO_FALL_DAMAGE
 // Disables the scream that mario makes when falling off a great height (this is separate from actual fall damage)
 //#define NO_FALL_DAMAGE_SOUND
+// Fall height for normal fall damage. Vanilla is 1150.0f
+#define FALL_DAMAGE_HEIGHT_SMALL 1150.0f
+// Fall height for double fall damage. Vanilla is 3000.0f
+#define FALL_DAMAGE_HEIGHT_LARGE 3000.0f
 // Disables Mario getting stuck in snow and sand when falling
 //#define NO_GETTING_BURIED
+// Detect Mario's collision with lava regardless of action
+//#define LAVA_INTERACTION_FIX
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!
 #define PLATFORM_DISPLACEMENT_2
-// Allows Mario to ledgegrab sloped floors
-#define NO_FALSE_LEDGEGRABS
 // Use Shindou's pole behavior
 //#define SHINDOU_POLES
+// Mario can swing around poles and jump off them while swinging.
+#define POLE_SWING
+// If A and Z are pressed on the same frame, Mario will long jump instead of ground pound.
+#define EASIER_LONG_JUMPS
+// Holding A while bouncing on an enemy will bounce Mario higher
+#define BETTER_BOUNCE
+// Hold Z while twirling to descend faster
+#define Z_TWIRL
 // Allows Mario to jump kick on steep surfaces that are set to be non slippery, instead of being forced to dive
 #define JUMP_KICK_FIX
 // Allow Mario to grab hangable ceilings from any state
@@ -128,10 +155,24 @@
 #define ROOM_DATA_TYPE s8
 
 // -- SPECIFIC OBJECT SETTINGS --
-// Allow for retries on collecting the remaining blue coins from a blue coin switch
+// Moving Coins flicker and disappear when they hit lava instead of being instantly deleted.
+#define COIN_LAVA_FLICKER
+// Allow for retries on collecting the remaining blue coins from a blue coin switch.
 #define BLUE_COIN_SWITCH_RETRY
 // Fixes shell cancel
 //#define SHELL_CANCEL_FIX
+// Fix DDD water rings by checking for interaction rather than normals.
+#define FIX_WATER_RINGS
+// Use intendedYaw to control Hoot instead of raw left and right inputs.
+#define HOOT_YAW_FIX
+// Tiny Goombas (from THI) always drop their coin.
+#define TINY_GOOMBA_ALWAYS_DROPS_COIN
+// Collecting a 1-Up Mushroom will fully heal Mario.
+#define MUSHROOMS_HEAL
+// Collecting a Power Star will fully heal Mario.
+#define POWER_STARS_HEAL
+// The speed of a platform on a track can be controlled by standing near the front or back of it
+//#define CONTROLLABLE_PLATFORM_SPEED
 // The number of chain balls the Chain Chomp has.  Vanilla is 5.
 #define CHAIN_CHOMP_NUM_SEGMENTS 5
 // The number of parts Pokey has, including the head. Vanilla is 5, max is 30.
@@ -174,12 +215,16 @@
 #define DISABLE_AA
 // Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
 #define IA8_COINS
+// Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti)
+#define IA8_30FPS_COINS
 // Mario's silhouette when behind solid objects/surfaces
 // Also enables new render layers, such as LAYER_ALPHA_DECAL.
 // The number is the intensity of the silhouette, from 0-255.
 // NOTE: The overlap between Mario's model parts is visible on certain HLE plugins.
 // Also, this also disables anti-aliasing on Mario.
 #define SILHOUETTE 127
+// Use 64x64 quarter shadow textures (Vanilla are 16x16)
+//#define HD_SHADOWS
 // Makes certain objects (mainly trees) transparent when the camera gets close
 #define OBJ_OPACITY_BY_CAM_DIST
 // Fixes the game reading the ia8 burn smoke texture as an rgba16
@@ -206,9 +251,9 @@
 // If you want the game to boot normally, just comment out the define again.
 //#define TEST_LEVEL LEVEL_BOB
 // Enable debug level select
-//#define DEBUG_LEVEL_SELECT
+#define DEBUG_LEVEL_SELECT
 // Enable debug free move (DPad up to enter, A to exit)
-//#define ENABLE_DEBUG_FREE_MOVE
+#define ENABLE_DEBUG_FREE_MOVE
 // Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
 //#define CUSTOM_DEBUG
 // Include Puppyprint, a display library for text and large images. Also includes a custom, enhanced performance profiler.
@@ -221,10 +266,15 @@
 //#define VISUAL_DEBUG
 // Open all courses and doors. Used for debugging purposes to unlock all content.
 //#define UNLOCK_ALL
+// Use HD versions of the intro splash screen textures. This includes "Made with HackerSM64".
+#define HD_INTRO_TEXTURES
 
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
+#ifdef DISABLE_LIVES
+#undef SAVE_NUM_LIVES
+#endif
 #ifndef KEEP_MARIO_HEAD
 #undef GODDARD_EASTER_EGG
 #define DISABLE_DEMO

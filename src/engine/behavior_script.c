@@ -19,8 +19,8 @@
 // Macros for retrieving arguments from behavior scripts.
 #define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
 #define BHV_CMD_GET_2ND_U8(index)  (u8)((gCurBhvCommand[index] >> 16) & 0xFF)
-#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >> 8) & 0xFF)
-#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index]) & 0xFF)
+#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >>  8) & 0xFF)
+#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index]      ) & 0xFF)
 
 #define BHV_CMD_GET_1ST_S16(index) (s16)(gCurBhvCommand[index] >> 16)
 #define BHV_CMD_GET_2ND_S16(index) (s16)(gCurBhvCommand[index] & 0xFFFF)
@@ -91,27 +91,17 @@ void obj_update_gfx_pos_and_angle(struct Object *obj) {
 }
 
 #ifdef OBJ_OPACITY_BY_CAM_DIST
+#define OBJ_OPACITY_NEAR   128.0f
+#define OBJ_OPACITY_LENGTH 512.0f
 void obj_set_opacity_from_cam_dist(struct Object *obj) {
-    f32 dist; //! Should this be done via LOD's instead?
-    Vec3f d;
-    if (obj->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
-        d[0] = (obj->oPosX - gCamera->pos[0]);
-        d[2] = (obj->oPosZ - gCamera->pos[2]);
-        dist = (sqr(d[0]) + sqr(d[2]));
-    } else {
-        vec3_diff(d, &obj->oPosVec, gCamera->pos);
-        dist = (sqr(d[0]) + sqr(d[1]) + sqr(d[2]));
-    }
-    if (dist > 0.0f) {
+    s32 opacityDist = ((-obj->header.gfx.cameraToObject[2] - OBJ_OPACITY_NEAR) * (256.0f / OBJ_OPACITY_LENGTH));
+    if (opacityDist > 0) {
         obj->header.gfx.node.flags &= ~GRAPH_RENDER_UCODE_REJ;
     }
-#ifdef PUPPYCAM
-    s32 opacityDist = ((gPuppyCam.zoom > 0) ? ((dist / sqr(gPuppyCam.zoom)) * 255.0f) : 255);
-#else
-    s32 opacityDist = (dist * (255.0f / sqr(1024.0f)));
-#endif
     obj->oOpacity = CLAMP(opacityDist, 0x00, 0xFF);
 }
+#undef OBJ_OPACITY_NEAR
+#undef OBJ_OPACITY_LENGTH
 #endif
 
 // Push the address of a behavior command to the object's behavior stack.

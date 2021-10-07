@@ -12,18 +12,12 @@ struct ObjectHitbox sEyerokHitbox = {
 
 s8 sEyerokAnimStatesList[] = { 0, 1, 3, 2, 1, 0 };
 
-static s32 eyerok_check_mario_relative_z(s32 arg0) {
-    if (gMarioObject->oPosZ - o->oHomeZ < arg0) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+static s32 eyerok_check_mario_relative_z(s32 relZ) {
+    return ((gMarioObject->oPosZ - o->oHomeZ) < relZ);
 }
 
 static void eyerok_spawn_hand(s16 side, s32 model, const BehaviorScript *behavior) {
-    struct Object *hand;
-
-    hand = spawn_object_relative_with_scale(side, -500 * side, 0, 300, 1.5f, o, model, behavior);
+    struct Object *hand = spawn_object_relative_with_scale(side, -500 * side, 0, 300, 1.5f, o, model, behavior);
     if (hand != NULL) {
         hand->oFaceAngleYaw -= 0x4000 * side;
     }
@@ -336,7 +330,7 @@ static void eyerok_hand_act_become_active(void) {
 static void eyerok_hand_act_die(void) {
     if (cur_obj_init_anim_and_check_if_end(1)) {
         o->parentObj->oEyerokBossActiveHandId = 0;
-        obj_explode_and_spawn_coins(150.0f, 1);
+        obj_explode_and_spawn_coins(150.0f, COIN_TYPE_YELLOW);
         create_sound_spawner(SOUND_OBJ2_EYEROK_SOUND_LONG);
     }
 

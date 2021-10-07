@@ -17,9 +17,9 @@
  * forgot to remove its entry in this table.
  */
 static void const *sActivatedBackAndForthPlatformCollisionModels[] = {
-    /* ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT */ bits_seg7_collision_0701AD54,
-    /* ACTIVATED_BF_PLAT_TYPE_BITFS_MESH_PLAT */ bitfs_seg7_collision_070157E0,
-    /* ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR  */ bitfs_seg7_collision_07015124
+    /* ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT */ bits_seg7_collision_arrow_platform,
+    /* ACTIVATED_BF_PLAT_TYPE_BITFS_MESH_PLAT */ bitfs_seg7_collision_platform_on_track,
+    /* ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR  */ bitfs_seg7_collision_elevator
 };
 
 /**
@@ -27,7 +27,7 @@ static void const *sActivatedBackAndForthPlatformCollisionModels[] = {
  */
 void bhv_activated_back_and_forth_platform_init(void) {
     // Equivalent to the first behavior param byte & 3 (last 2 bits of the byte).
-    s32 platformType = ((u16)(o->oBehParams >> 16) & 0x0300) >> 8;
+    s32 platformType = (((u16)(o->oBehParams >> 16) & 0x0300) >> 8);
 
     // The BitS arrow platform should flip 180º (0x8000 angle units), but
     // there is no reason for the other platforms to flip.
@@ -63,11 +63,7 @@ void bhv_activated_back_and_forth_platform_init(void) {
 void bhv_activated_back_and_forth_platform_update(void) {
     // oVelY is used for vertical platforms' movement and also for
     // horizontal platforms' dipping up/down when Mario gets on/off them
-    if (gMarioObject->platform == o) {
-        o->oVelY = -6.0f;
-    } else {
-        o->oVelY = 6.0f;
-    }
+    o->oVelY = ((gMarioObject->platform == o) ? -6.0f : 6.0f);
 
     // If the platform's velocity is set...
     if (o->oActivatedBackAndForthPlatformVel != 0.0f) {
@@ -131,7 +127,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
         // Otherwise, dip down 20 units if Mario gets on the horizontal platform, and undo if he gets
         // off.
         o->oPosY += o->oVelY;
-        clamp_f32(&o->oPosY, o->oHomeY - 20.0f, o->oHomeY);
+        clamp_f32(&o->oPosY, (o->oHomeY - 20.0f), o->oHomeY);
 
         // Update the position using the object's home (original position), facing angle, and offset.
         // This has to be done manually when the platform is vertical because only the yaw is used

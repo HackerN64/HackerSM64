@@ -67,7 +67,7 @@ void bhv_kickable_board_loop(void) {
                 o->oAngleVelPitch = 0;
                 o->oAction++;
                 cur_obj_shake_screen(SHAKE_POS_SMALL);
-                cur_obj_play_sound_2(SOUND_GENERAL_UNKNOWN4);
+                cur_obj_play_sound_2(SOUND_GENERAL_KICKABLE_BOARD_FALL);
             }
             load_object_collision_model();
             break;

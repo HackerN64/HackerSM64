@@ -71,13 +71,16 @@
 // INTERACT_CLAM_OR_BUBBA
 #define INT_SUBTYPE_EATS_MARIO          /* 0x00002000 */ (1 << 13)
 
-
-#define ATTACK_PUNCH                    0x01
-#define ATTACK_KICK_OR_TRIP             0x02
-#define ATTACK_FROM_ABOVE               0x03
-#define ATTACK_GROUND_POUND_OR_TWIRL    0x04
-#define ATTACK_FAST_ATTACK              0x05
-#define ATTACK_FROM_BELOW               0x06
+enum AttackType
+{
+    ATTACK_NONE,
+    ATTACK_PUNCH,
+    ATTACK_KICK_OR_TRIP,
+    ATTACK_FROM_ABOVE,
+    ATTACK_GROUND_POUND_OR_TWIRL,
+    ATTACK_FAST_ATTACK,
+    ATTACK_FROM_BELOW
+};
 
 #define INT_STATUS_ATTACK_MASK                       0x000000FF
 
@@ -85,12 +88,12 @@
 #define INT_STATUS_NONE                  (0 <<  0) /* 0x00000000 */
 #define INT_STATUS_MARIO_STUNNED         (1 <<  0) /* 0x00000001 */
 #define INT_STATUS_MARIO_KNOCKBACK_DMG   (1 <<  1) /* 0x00000002 */
-#define INT_STATUS_MARIO_UNK2            (1 <<  2) /* 0x00000004 */
+#define INT_STATUS_MARIO_THROWN_BY_OBJ   (1 <<  2) /* 0x00000004 */
 #define INT_STATUS_MARIO_DROP_OBJECT     (1 <<  3) /* 0x00000008 */
 #define INT_STATUS_MARIO_SHOCKWAVE       (1 <<  4) /* 0x00000010 */
 #define INT_STATUS_MARIO_UNK5            (1 <<  5) /* 0x00000020 */
-#define INT_STATUS_MARIO_UNK6            (1 <<  6) /* 0x00000040 */
-#define INT_STATUS_MARIO_UNK7            (1 <<  7) /* 0x00000080 */
+#define INT_STATUS_MARIO_DROPPED_BY_OBJ  (1 <<  6) /* 0x00000040 */
+#define INT_STATUS_MARIO_DROP_FROM_HOOT  (1 <<  7) /* 0x00000080 */
 
 // Object Interaction Status
 #define INT_STATUS_GRABBED_MARIO         (1 << 11) /* 0x00000800 */
@@ -107,7 +110,7 @@
 #define INT_STATUS_TOUCHED_BOB_OMB       (1 << 23) /* 0x00800000 */
 
 
-s16  mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
+s32  mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
 void mario_stop_riding_object(struct MarioState *m);
 void mario_grab_used_object(struct MarioState *m);
 void mario_drop_held_object(struct MarioState *m);

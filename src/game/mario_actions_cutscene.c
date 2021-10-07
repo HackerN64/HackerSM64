@@ -286,23 +286,23 @@ struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, s32 model, const
 /**
  * cutscene_take_cap_off: Put Mario's cap on.
  * Clears "cap on head" flag, sets "cap in hand" flag, plays sound
- * SOUND_ACTION_UNKNOWN43D.
+ * SOUND_ACTION_TAKE_OFF_CAP.
  */
 void cutscene_take_cap_off(struct MarioState *m) {
     m->flags &= ~MARIO_CAP_ON_HEAD;
     m->flags |= MARIO_CAP_IN_HAND;
-    play_sound(SOUND_ACTION_UNKNOWN43D, m->marioObj->header.gfx.cameraToObject);
+    play_sound(SOUND_ACTION_TAKE_OFF_CAP, m->marioObj->header.gfx.cameraToObject);
 }
 
 /**
  * cutscene_put_cap_on: Put Mario's cap on.
  * Clears "cap in hand" flag, sets "cap on head" flag, plays sound
- * SOUND_ACTION_UNKNOWN43E.
+ * SOUND_ACTION_PUT_ON_CAP.
  */
 void cutscene_put_cap_on(struct MarioState *m) {
     m->flags &= ~MARIO_CAP_IN_HAND;
     m->flags |= MARIO_CAP_ON_HEAD;
-    play_sound(SOUND_ACTION_UNKNOWN43E, m->marioObj->header.gfx.cameraToObject);
+    play_sound(SOUND_ACTION_PUT_ON_CAP, m->marioObj->header.gfx.cameraToObject);
 }
 
 /**
@@ -498,7 +498,7 @@ s32 act_reading_sign(struct MarioState *m) {
             // intentional fall through
         // turn toward sign
         case 1:
-            m->faceAngle[1] += marioObj->oMarioPoleUnk108 / 11;
+            m->faceAngle[1] += marioObj->oMarioReadingSignDYaw / 11;
             m->pos[0] += marioObj->oMarioReadingSignDPosX / 11.0f;
             m->pos[2] += marioObj->oMarioReadingSignDPosZ / 11.0f;
             // create the text box
@@ -527,7 +527,7 @@ s32 act_debug_free_move(struct MarioState *m) {
     struct Surface *floor, *ceil;
     Vec3f pos;
     f32 speed = ((gPlayer1Controller->buttonDown & B_BUTTON) ? 4.0f : 1.0f);
-    if (gPlayer1Controller->buttonDown & L_TRIG) speed = 0.01f;
+    if (gPlayer1Controller->buttonDown & Z_TRIG) speed = 0.01f;
     if (m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     vec3f_copy(pos, m->pos);
@@ -647,14 +647,13 @@ s32 act_star_dance_water(struct MarioState *m) {
 
 s32 act_fall_after_star_grab(struct MarioState *m) {
     if (m->pos[1] < m->waterLevel - 130) {
-        play_sound(SOUND_ACTION_UNKNOWN430, m->marioObj->header.gfx.cameraToObject);
+        play_sound(SOUND_ACTION_WATER_PLUNGE, m->marioObj->header.gfx.cameraToObject);
         m->particleFlags |= PARTICLE_WATER_SPLASH;
         return set_mario_action(m, ACT_STAR_DANCE_WATER, m->actionArg);
     }
     if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
-        set_mario_action(m, m->actionArg & 1 ? ACT_STAR_DANCE_NO_EXIT : ACT_STAR_DANCE_EXIT,
-                         m->actionArg);
+        set_mario_action(m, m->actionArg & 1 ? ACT_STAR_DANCE_NO_EXIT : ACT_STAR_DANCE_EXIT, m->actionArg);
     }
     set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
     return FALSE;
@@ -667,6 +666,9 @@ s32 common_death_handler(struct MarioState *m, s32 animation, s32 frameToDeathWa
     }
     m->marioBodyState->eyeState = MARIO_EYES_DEAD;
     stop_and_set_height_to_floor(m);
+#ifdef PREVENT_DEATH_LOOP
+    m->isDead = TRUE;
+#endif
     return animFrame;
 }
 
@@ -1109,7 +1111,7 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
                     play_sound(SOUND_ACTION_PAT_BACK, m->marioObj->header.gfx.cameraToObject);
                     //! fall through
                 case 111:
-                    play_sound(SOUND_ACTION_UNKNOWN45C, m->marioObj->header.gfx.cameraToObject);
+                    play_sound(SOUND_ACTION_KEY_UNKNOWN45C, m->marioObj->header.gfx.cameraToObject);
                     // no break
             }
             handle_save_menu(m);
@@ -1164,6 +1166,9 @@ s32 act_death_exit(struct MarioState *m) {
         queue_rumble_data(5, 80);
 #endif
         m->numLives--;
+#ifdef SAVE_NUM_LIVES
+        save_file_set_num_lives(m->numLives);
+#endif
         // restore 7.75 units of health
         m->healCounter = 31;
     }
@@ -1183,6 +1188,9 @@ s32 act_unused_death_exit(struct MarioState *m) {
         play_sound(SOUND_MARIO_OOOF2, m->marioObj->header.gfx.cameraToObject);
 #endif
         m->numLives--;
+#ifdef SAVE_NUM_LIVES
+        save_file_set_num_lives(m->numLives);
+#endif
         // restore 7.75 units of health
         m->healCounter = 31;
     }
@@ -1205,6 +1213,9 @@ s32 act_falling_death_exit(struct MarioState *m) {
         queue_rumble_data(5, 80);
 #endif
         m->numLives--;
+#ifdef SAVE_NUM_LIVES
+        save_file_set_num_lives(m->numLives);
+#endif
         // restore 7.75 units of health
         m->healCounter = 31;
     }
@@ -1258,6 +1269,9 @@ s32 act_special_death_exit(struct MarioState *m) {
         queue_rumble_data(5, 80);
 #endif
         m->numLives--;
+#ifdef SAVE_NUM_LIVES
+        save_file_set_num_lives(m->numLives);
+#endif
         m->healCounter = 31;
     }
     // show Mario
@@ -1552,12 +1566,12 @@ s32 act_squished(struct MarioState *m) {
 
     // steep floor
     if (m->floor != NULL && m->floor->normal.y < 0.5f) {
-        surfAngle = atan2s(m->floor->normal.z, m->floor->normal.x);
+        surfAngle = m->floorYaw;
         underSteepSurf = TRUE;
     }
     // steep ceiling
     if (m->ceil != NULL && -0.5f < m->ceil->normal.y) {
-        surfAngle = atan2s(m->ceil->normal.z, m->ceil->normal.x);
+        surfAngle = m->ceilYaw;
         underSteepSurf = TRUE;
     }
 
@@ -1768,7 +1782,7 @@ static void intro_cutscene_set_mario_to_idle(struct MarioState *m) {
     stop_and_set_height_to_floor(m);
 }
 
-enum {
+enum IntroCutsceneArgs {
     INTRO_CUTSCENE_HIDE_HUD_AND_MARIO,
     INTRO_CUTSCENE_PEACH_LAKITU_SCENE,
     INTRO_CUTSCENE_RAISE_PIPE,
@@ -1808,6 +1822,12 @@ static s32 act_intro_cutscene(struct MarioState *m) {
 // jumbo star cutscene: Mario lands after grabbing the jumbo star
 static void jumbo_star_cutscene_falling(struct MarioState *m) {
     if (m->actionState == 0) {
+#ifdef POWER_STARS_HEAL
+        m->healCounter   = 31;
+#ifdef BREATH_METER
+        m->breathCounter = 31;
+#endif
+#endif
         m->input |= INPUT_A_DOWN;
         m->flags |= (MARIO_WING_CAP | MARIO_CAP_ON_HEAD);
 
@@ -1936,7 +1956,11 @@ static s32 jumbo_star_cutscene_flying(struct MarioState *m) {
     return FALSE;
 }
 
-enum { JUMBO_STAR_CUTSCENE_FALLING, JUMBO_STAR_CUTSCENE_TAKING_OFF, JUMBO_STAR_CUTSCENE_FLYING };
+enum JumboStarCutsceneArgs {
+    JUMBO_STAR_CUTSCENE_FALLING,
+    JUMBO_STAR_CUTSCENE_TAKING_OFF,
+    JUMBO_STAR_CUTSCENE_FLYING
+};
 
 static s32 act_jumbo_star_cutscene(struct MarioState *m) {
     switch (m->actionArg) {
@@ -2480,7 +2504,7 @@ static void end_peach_cutscene_fade_out(struct MarioState *m) {
     }
 }
 
-enum {
+enum EndPeachCutsceneArgs {
     END_PEACH_CUTSCENE_MARIO_FALLING,
     END_PEACH_CUTSCENE_MARIO_LANDING,
     END_PEACH_CUTSCENE_SUMMON_JUMBO_STAR,

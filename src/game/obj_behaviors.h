@@ -7,6 +7,7 @@
 #include "macros.h"
 #include "types.h"
 
+//! Lots of these are duplicates
 void set_yoshi_as_not_dead(void);
 s32 coin_step(s16 *collisionFlagsPtr);
 void moving_coin_flicker(void);
@@ -35,7 +36,7 @@ void bobomb_free_loop(void);
 void bobomb_held_loop(void);
 void bobomb_dropped_loop(void);
 void bobomb_thrown_loop(void);
-void curr_obj_random_blink(s32 *blinkTimer);
+void cur_obj_random_blink(s32 *blinkTimer);
 void bhv_bobomb_loop(void);
 void bhv_bobomb_fuse_smoke_init(void);
 void bhv_bobomb_buddy_init(void);
@@ -87,7 +88,7 @@ void bhv_bobomb_bully_death_smoke_init(void);
 void bhv_bobomb_explosion_bubble_init(void);
 void bhv_bobomb_explosion_bubble_loop(void);
 void bhv_respawner_loop(void);
-void create_respawner(s32 arg0, const BehaviorScript *behToSpawn, s32 minSpawnDist);
+void create_respawner(s32 model, const BehaviorScript *behToSpawn, s32 minSpawnDist);
 void bhv_small_bully_init(void);
 void bhv_big_bully_init(void);
 void bully_check_mario_collision(void);
@@ -100,7 +101,7 @@ void bully_step(void);
 void bully_spawn_coin(void);
 void bully_act_level_death(void);
 void bhv_bully_loop(void);
-void big_bully_spawn_minion(s32 arg0, s32 arg1, s32 arg2, s16 arg3);
+void big_bully_spawn_minion(s32 x, s32 y, s32 z, s16 ry);
 void bhv_big_bully_with_minions_init(void);
 void big_bully_spawn_star(void);
 void bhv_big_bully_with_minions_loop(void);

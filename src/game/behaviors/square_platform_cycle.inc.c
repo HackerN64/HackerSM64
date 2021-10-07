@@ -2,10 +2,7 @@
 
 s32 square_plat_set_yaw_until_timer(u16 yaw, s32 a) {
     o->oMoveAngleYaw = yaw;
-    if (a < o->oTimer)
-        return 1;
-    else
-        return 0;
+    return (a < o->oTimer);
 }
 
 void bhv_squarish_path_moving_loop(void) {

@@ -25,7 +25,7 @@ struct DemoInput
 };
 
 enum ZBmodes {
-    KEEP_ZBUFFER = 0,
+    KEEP_ZBUFFER  = 0,
     CLEAR_ZBUFFER = 1,
 };
 

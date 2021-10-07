@@ -16,11 +16,11 @@ s32 cap_set_hitbox(void) {
     obj_set_hitbox(o, &sCapHitbox);
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-        o->oInteractStatus = 0;
-        return 1;
+        o->oInteractStatus = INT_STATUS_NONE;
+        return TRUE;
     }
 
-    return 0;
+    return FALSE;
 }
 
 void cap_despawn(void) {

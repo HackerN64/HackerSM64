@@ -31,7 +31,7 @@ void bhv_water_air_bubble_loop(void) {
     }
     if (find_water_level(o->oPosX, o->oPosZ) < o->oPosY)
         obj_mark_for_deletion(o);
-    o->oInteractStatus = 0;
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
 void bhv_bubble_wave_init(void) {

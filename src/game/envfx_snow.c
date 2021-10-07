@@ -61,7 +61,7 @@ extern void *tiny_bubble_dl_0B006CD8;
 s32 envfx_init_snow(s32 mode) {
     switch (mode) {
         case ENVFX_MODE_NONE:
-            return 0;
+            return FALSE;
 
         case ENVFX_SNOW_NORMAL:
             gSnowParticleMaxCount = 140;
@@ -81,13 +81,13 @@ s32 envfx_init_snow(s32 mode) {
 
     gEnvFxBuffer = mem_pool_alloc(gEffectsMemoryPool, gSnowParticleMaxCount * sizeof(struct EnvFxParticle));
     if (!gEnvFxBuffer) {
-        return 0;
+        return FALSE;
     }
 
     bzero(gEnvFxBuffer, gSnowParticleMaxCount * sizeof(struct EnvFxParticle));
 
     gEnvFxMode = mode;
-    return 1;
+    return TRUE;
 }
 
 /**
@@ -177,14 +177,14 @@ s32 envfx_is_snowflake_alive(s32 index, s32 snowCylinderX, s32 snowCylinderY, s3
     s32 z = (gEnvFxBuffer + index)->zPos;
 
     if (sqr(x - snowCylinderX) + sqr(z - snowCylinderZ) > sqr(300)) {
-        return 0;
+        return FALSE;
     }
 
     if ((y < snowCylinderY - 201) || (snowCylinderY + 201 < y)) {
-        return 0;
+        return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }
 
 /**
@@ -273,10 +273,7 @@ void envfx_update_snow_blizzard(s32 snowCylinderX, s32 snowCylinderY, s32 snowCy
  *  more than half of the mirror room.
  */
 UNUSED static s32 is_in_mystery_snow_area(s32 x, UNUSED s32 y, s32 z) {
-    if (sqr(x - 3380) + sqr(z + 520) < sqr(3000)) {
-        return 1;
-    }
-    return 0;
+    return (sqr(x - 3380) + sqr(z + 520) < sqr(3000));
 }
 
 /**

@@ -48,7 +48,6 @@ void func_80182088(struct Connection *cxn);
 void move_particle(struct ObjParticle *ptc);
 int  func_80182778(struct ObjParticle *ptc);
 void func_80182A08(struct ObjParticle *ptc, struct GdVec3f *b);
-void func_801838D0(struct ObjParticle *ptc);
 
 static void connect_vertices(struct ObjVertex *vtx1, struct ObjVertex *vtx2) {
     struct Connection *newConn;
@@ -209,7 +208,7 @@ struct ObjParticle *make_particle(u32 flags, s32 colourNum, f32 x, f32 y, f32 z)
     particle->colourNum = colourNum;
     particle->flags = flags | 8;
     particle->timeout = -1;
-    particle->id = D_801B9E40; /* should this be D_801B9E40++? */
+    particle->id = gGdParticleCount++;
     particle->shapePtr = NULL;
     particle->unkB0 = 1;
     return particle;
@@ -357,7 +356,6 @@ void move_particle(struct ObjParticle *ptc) {
     if (ptc->flags & 1) {
         ptc->unk38.y += sp7C;
     }
-    func_801838D0(ptc);
     switch (ptc->unkB0) {
         case 1:
             ptc->unkB0 = 2;
@@ -449,9 +447,4 @@ void move_particles_in_grp(struct ObjGroup *group) {
     gGdSkinNet = NULL;
     apply_to_obj_types_in_group(OBJ_TYPE_PARTICLES, (applyproc_t) move_particle, group);
     stop_timer("particles");
-}
-
-/* 2320A0 -> 2320D4; pad to 2320E0 */
-void func_801838D0(struct ObjParticle *ptc) {
-    D_801B9E3C = ptc;
 }
