@@ -13,7 +13,6 @@ extern struct GraphNodeObject *gCurGraphNodeObject;
 extern struct GraphNodeHeldObject *gCurGraphNodeHeldObject;
 #define gCurGraphNodeObjectNode ((struct Object *)gCurGraphNodeObject)
 extern u16 gAreaUpdateCounter;
-extern f32 gWorldScale;
 
 // after processing an object, the type is reset to this
 #define ANIM_TYPE_NONE                  0
