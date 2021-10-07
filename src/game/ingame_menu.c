@@ -218,38 +218,6 @@ void create_dl_ortho_matrix(void) {
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH)
 }
 
-#if !defined(VERSION_JP) && !defined(VERSION_SH)
-UNUSED
-#endif
-static Texture *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) { //! Texture type for *in?
-    s32 inPos;
-    u16 bitMask;
-    s16 outPos = 0;
-
-    Texture *out = alloc_display_list((u32) width * (u32) height);
-
-    if (out == NULL) {
-        return NULL;
-    }
-
-    for (inPos = 0; inPos < (width * height) / 16; inPos++) {
-        bitMask = 0x8000;
-
-        while (bitMask != 0) {
-            if (in[inPos] & bitMask) {
-                out[outPos] = 0xFF;
-            } else {
-                out[outPos] = 0x00;
-            }
-
-            bitMask /= 2;
-            outPos++;
-        }
-    }
-
-    return out;
-}
-
 Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     u32 size = (u32) width * (u32) height;
     s32 inPos;
