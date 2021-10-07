@@ -172,7 +172,7 @@ extern f32 gSineTable[];
 }
 
 #define linear_mtxf_mul_vec3_and_translate(mtx, dstV, srcV) {   \
-    linear_mtxf_mul_vec3f((mtx), (dstV), (srcV));               \
+    linear_mtxf_mul_vec3((mtx), (dstV), (srcV));               \
     vec3_add((dstV), (mtx)[3]);                                 \
 }
 
