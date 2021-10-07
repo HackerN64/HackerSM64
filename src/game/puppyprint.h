@@ -7,9 +7,12 @@
 #define NUM_BENCH_ITERATIONS 150
 #define LOG_BUFFER_SIZE       16
 
-#define BENCHMARK_GAME     1
-#define BENCHMARK_AUDIO    2
-#define BENCHMARK_GRAPHICS 3
+enum Benchmark {
+    BENCHMARK_NONE,
+    BENCHMARK_GAME,  
+    BENCHMARK_AUDIO,
+    BENCHMARK_GRAPHICS
+};
 
 #define PRINT_TEXT_ALIGN_LEFT   0
 #define PRINT_TEXT_ALIGN_CENTRE 1
@@ -40,7 +43,7 @@ extern u32 rdpTime;
 extern u32 ramTime;
 extern u32 loadTime;
 extern u32 rspDelta;
-extern s32       benchMark[NUM_BENCH_ITERATIONS + 2];
+extern s32     benchMark[NUM_BENCH_ITERATIONS + 2];
 
 // CPU
 extern u32 collisionTime[NUM_PERF_ITERATIONS + 1];

@@ -14,22 +14,26 @@ extern struct GraphNodeHeldObject *gCurGraphNodeHeldObject;
 #define gCurGraphNodeObjectNode ((struct Object *)gCurGraphNodeObject)
 extern u16 gAreaUpdateCounter;
 
-// after processing an object, the type is reset to this
-#define ANIM_TYPE_NONE                  0
+enum AnimType
+{
+    // after processing an object, the type is reset to this
+    ANIM_TYPE_NONE,
+    // Not all parts have full animation: to save space, some animations only
+    // have xz, y, or no translation at all. All animations have rotations though
+    ANIM_TYPE_TRANSLATION,
+    ANIM_TYPE_VERTICAL_TRANSLATION,
+    ANIM_TYPE_LATERAL_TRANSLATION,
+    ANIM_TYPE_NO_TRANSLATION,
+    // Every animation includes rotation, after processing any of the above
+    // translation types the type is set to this
+    ANIM_TYPE_ROTATION
+};
 
-// Not all parts have full animation: to save space, some animations only
-// have xz, y, or no translation at all. All animations have rotations though
-#define ANIM_TYPE_TRANSLATION           1
-#define ANIM_TYPE_VERTICAL_TRANSLATION  2
-#define ANIM_TYPE_LATERAL_TRANSLATION   3
-#define ANIM_TYPE_NO_TRANSLATION        4
-
-// Every animation includes rotation, after processing any of the above
-// translation types the type is set to this
-#define ANIM_TYPE_ROTATION              5
-
-#define LIST_HEADS_ZEX  0
-#define LIST_HEADS_REJ  1
+enum HeadsList
+{
+    LIST_HEADS_ZEX,
+    LIST_HEADS_REJ,
+};
 
 #define IS_LAYER_ZB(    layer) (((layer) >= LAYER_FORCE       ) || ((layer) <= LAYER_ZB_LAST ))
 #define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_FIRST_NON_ZB) || ((layer) <= LAYER_LAST_ALL))
@@ -37,7 +41,8 @@ extern u16 gAreaUpdateCounter;
 #if SILHOUETTE
 #define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))
 
-enum RenderPhase {
+enum RenderPhase
+{
     RENDER_PHASE_ZEX_BG,
     RENDER_PHASE_REJ_ZB,
     RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
@@ -48,7 +53,8 @@ enum RenderPhase {
     RENDER_PHASE_REJ_NON_ZB,
 };
 #else
-enum RenderPhase {
+enum RenderPhase
+{
     RENDER_PHASE_ZEX_BG,
     RENDER_PHASE_REJ_ZB,
     RENDER_PHASE_ZEX_ALL,

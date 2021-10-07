@@ -4,7 +4,8 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
 
-enum PowerMeterAnimation {
+enum PowerMeterAnimation
+{
     POWER_METER_HIDDEN,
     POWER_METER_EMPHASIZED,
     POWER_METER_DEEMPHASIZING,
@@ -13,7 +14,8 @@ enum PowerMeterAnimation {
 };
 
 #ifdef BREATH_METER
-enum AirMeterAnimation {
+enum AirMeterAnimation
+{
     BREATH_METER_HIDDEN,
     BREATH_METER_SHOWING,
     BREATH_METER_HIDING,
@@ -21,7 +23,8 @@ enum AirMeterAnimation {
 };
 #endif
 
-enum CameraHUDLut {
+enum CameraHUDLUT
+{
     GLYPH_CAM_CAMERA,
     GLYPH_CAM_MARIO_HEAD,
     GLYPH_CAM_LAKITU_HEAD,

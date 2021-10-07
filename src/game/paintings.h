@@ -20,9 +20,12 @@
 #define BOWSERS_SUB_BEATEN 0x2
 #define DDD_BACK 0x1
 
-#define PAINTING_IDLE 0
-#define PAINTING_RIPPLE 1
-#define PAINTING_ENTERED 2
+enum PaintingState
+{
+    PAINTING_IDLE,
+    PAINTING_RIPPLE,
+    PAINTING_ENTERED
+};
 
 #define RIPPLE_TRIGGER_PROXIMITY 10
 #define RIPPLE_TRIGGER_CONTINUOUS 20
@@ -121,8 +124,8 @@ struct Painting
  * Contains the position and normal of a vertex in the painting's generated mesh.
  */
 struct PaintingMeshVertex {
-    /*0x00*/ s16 pos[3];
-    /*0x06*/ s8 norm[3];
+    /*0x00*/ Vec3s pos;
+    /*0x06*/ Vec3c norm;
 };
 
 extern s16 gPaintingMarioFloorType;

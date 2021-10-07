@@ -112,7 +112,8 @@ enum RenderLayers
 #define INPUT_Z_DOWN                        /* 0x4000 */ (1 << 14)
 #define INPUT_Z_PRESSED                     /* 0x8000 */ (1 << 15)
 
-enum GroundStep {
+enum GroundStep
+{
     GROUND_STEP_LEFT_GROUND,
     GROUND_STEP_NONE,
     GROUND_STEP_HIT_WALL,
@@ -120,13 +121,15 @@ enum GroundStep {
     GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS
 };
 
-enum AirStepCheck {
+enum AirStepCheck
+{
     AIR_STEP_CHECK_NONE,
     AIR_STEP_CHECK_LEDGE_GRAB,
     AIR_STEP_CHECK_HANG
 };
 
-enum AirStep {
+enum AirStep
+{
     AIR_STEP_NONE,
     AIR_STEP_LANDED,
     AIR_STEP_HIT_WALL,
@@ -137,7 +140,8 @@ enum AirStep {
     AIR_STEP_HIT_CEILING
 };
 
-enum WaterStep {
+enum WaterStep
+{
     WATER_STEP_NONE,
     WATER_STEP_HIT_FLOOR,
     WATER_STEP_HIT_CEILING,
@@ -492,5 +496,7 @@ enum WaterStep {
                        U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS   )
 
 #define C_BUTTONS     (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS   )
+
+#define JPAD_BUTTONS  (U_JPAD     | D_JPAD     | L_JPAD     | R_JPAD       )
 
 #endif // SM64_H

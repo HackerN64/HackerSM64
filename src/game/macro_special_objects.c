@@ -83,11 +83,14 @@ struct LoadedPreset {
     /*0x06*/ ModelID16 model;
 };
 
-#define MACRO_OBJ_Y_ROT 0
-#define MACRO_OBJ_X 1
-#define MACRO_OBJ_Y 2
-#define MACRO_OBJ_Z 3
-#define MACRO_OBJ_PARAMS 4
+enum MacroObjectIndex
+{
+    MACRO_OBJ_Y_ROT,
+    MACRO_OBJ_X,
+    MACRO_OBJ_Y,
+    MACRO_OBJ_Z,
+    MACRO_OBJ_PARAMS
+};
 
 void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
     s32 presetID;

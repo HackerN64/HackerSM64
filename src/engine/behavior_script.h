@@ -3,8 +3,11 @@
 
 #include <PR/ultratypes.h>
 
-#define BHV_PROC_CONTINUE 0
-#define BHV_PROC_BREAK    1
+enum BhvProc
+{
+    BHV_PROC_CONTINUE,
+    BHV_PROC_BREAK
+};
 
 #define cur_obj_get_int(offset) gCurrentObject->OBJECT_FIELD_S32(offset)
 #define cur_obj_get_float(offset) gCurrentObject->OBJECT_FIELD_F32(offset)
@@ -19,9 +22,9 @@
 
 #define obj_and_int(object, offset, value) object->OBJECT_FIELD_S32(offset) &= (s32)(value)
 
-u16 random_u16(void);
+u16   random_u16(void);
 float random_float(void);
-s32 random_sign(void);
+s32   random_sign(void);
 
 void cur_obj_update(void);
 
