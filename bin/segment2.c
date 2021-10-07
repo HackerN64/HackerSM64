@@ -2556,6 +2556,10 @@ ALIGNED8 static const Texture texture_shadow_quarter_square[] = {
 };
 #endif
 
+ALIGNED8 static const Texture texture_radial_light[] = {
+#include "textures/segment2/light_quarter_circle.ia16.inc.c"
+};
+
 const Texture texture_transition_star_half[] = {
 #include "textures/segment2/segment2.0F458.ia8.inc.c"
 };

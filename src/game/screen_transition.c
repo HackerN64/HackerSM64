@@ -133,21 +133,21 @@ void load_tex_transition_vertex(Vtx *verts, s8 fadeTimer, struct WarpTransitionD
     switch (transTexType) {
         case TRANS_TYPE_MIRROR:
             make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius, -31, 63);
-            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, -texTransRadius, 31, 63);
-            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, texTransRadius, 31, 0);
-            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, texTransRadius, -31, 0);
+            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius, -texTransRadius,  31, 63);
+            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius,  texTransRadius,  31,  0);
+            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius,  texTransRadius, -31,  0);
             break;
         case TRANS_TYPE_CLAMP:
-            make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius, 0, 63);
-            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, -texTransRadius, 63, 63);
-            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, texTransRadius, 63, 0);
-            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, texTransRadius, 0, 0);
+            make_tex_transition_vertex(verts, 0, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius, -texTransRadius,  0, 63);
+            make_tex_transition_vertex(verts, 1, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius, -texTransRadius, 63, 63);
+            make_tex_transition_vertex(verts, 2, fadeTimer, transData, centerTransX, centerTransY,  texTransRadius,  texTransRadius, 63,  0);
+            make_tex_transition_vertex(verts, 3, fadeTimer, transData, centerTransX, centerTransY, -texTransRadius,  texTransRadius,  0,  0);
             break;
     }
     make_tex_transition_vertex(verts, 4, fadeTimer, transData, centerTransX, centerTransY, -2000, -2000, 0, 0);
-    make_tex_transition_vertex(verts, 5, fadeTimer, transData, centerTransX, centerTransY, 2000, -2000, 0, 0);
-    make_tex_transition_vertex(verts, 6, fadeTimer, transData, centerTransX, centerTransY, 2000, 2000, 0, 0);
-    make_tex_transition_vertex(verts, 7, fadeTimer, transData, centerTransX, centerTransY, -2000, 2000, 0, 0);
+    make_tex_transition_vertex(verts, 5, fadeTimer, transData, centerTransX, centerTransY,  2000, -2000, 0, 0);
+    make_tex_transition_vertex(verts, 6, fadeTimer, transData, centerTransX, centerTransY,  2000,  2000, 0, 0);
+    make_tex_transition_vertex(verts, 7, fadeTimer, transData, centerTransX, centerTransY, -2000,  2000, 0, 0);
 }
 
 void *sTextureTransitionID[] = {

@@ -13,6 +13,7 @@ extern Gfx dl_rgba16_text_begin[];
 extern Gfx dl_rgba16_text_end[];
 extern Gfx dl_ia_text_begin[];
 extern Gfx dl_ia_text_end[];
+extern Texture texture_radial_light[];
 extern Texture texture_transition_star_half[];
 extern Texture texture_transition_circle_half[];
 extern Texture texture_transition_mario[];

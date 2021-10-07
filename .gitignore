@@ -75,6 +75,7 @@ build/*
 # Specific assets
 !/actors/breath_meter/breath_meter_*.png
 !/actors/coin/coin_*.ia8.png
+!/textures/segment2/light_quarter_circle.ia16.png
 !/textures/segment2/segment2.hud_char_j.rgba16.png
 !/textures/segment2/segment2.hud_char_q.rgba16.png
 !/textures/segment2/segment2.hud_char_v.rgba16.png
