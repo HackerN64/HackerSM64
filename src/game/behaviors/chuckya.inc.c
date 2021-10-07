@@ -145,7 +145,7 @@ void chuckya_move(void) {
     if (o->oInteractStatus & INT_STATUS_GRABBED_MARIO) {
         o->oAction = 1;
         o->oCommonAnchorAction = 1;
-        cur_obj_play_sound_2(SOUND_OBJ_UNKNOWN3);
+        cur_obj_play_sound_2(SOUND_OBJ_GRAB_MARIO);
     }
 }
 

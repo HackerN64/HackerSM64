@@ -2296,20 +2296,21 @@ s32 cur_obj_check_grabbed_mario(void) {
     return FALSE;
 }
 
+s32 sPlayerGrabReleaseState;
+
 s32 player_performed_grab_escape_action(void) {
-    static s32 grabReleaseState;
     s32 result = FALSE;
 
     if (gPlayer1Controller->stickMag < 30.0f) {
-        grabReleaseState = FALSE;
+        sPlayerGrabReleaseState = FALSE;
     }
 
-    if (grabReleaseState == FALSE && gPlayer1Controller->stickMag > 40.0f) {
-        grabReleaseState = TRUE;
+    if (sPlayerGrabReleaseState && gPlayer1Controller->stickMag > 40.0f) {
+        sPlayerGrabReleaseState = TRUE;
         result = TRUE;
     }
 
-    if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+    if (gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON | Z_TRIG)) {
         result = TRUE;
     }
 

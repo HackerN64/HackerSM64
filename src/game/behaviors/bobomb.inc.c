@@ -204,7 +204,7 @@ void bobomb_thrown_loop(void) {
 
 // sp18 = blinkTimer
 
-void curr_obj_random_blink(s32 *blinkTimer) {
+void cur_obj_random_blink(s32 *blinkTimer) {
     if (*blinkTimer == 0) {
         if ((s16)(random_float() * 100.0f) == 0) {
             o->oAnimState = 1;
@@ -244,7 +244,7 @@ void bhv_bobomb_loop(void) {
                 break;
         }
 
-        curr_obj_random_blink(&o->oBobombBlinkTimer);
+        cur_obj_random_blink(&o->oBobombBlinkTimer);
 
         if (o->oBobombFuseLit == 1) {
             if (o->oBobombFuseTimer >= 121)
@@ -407,7 +407,7 @@ void bobomb_buddy_actions(void) {
 void bhv_bobomb_buddy_loop(void) {
     bobomb_buddy_actions();
 
-    curr_obj_random_blink(&o->oBobombBuddyBlinkTimer);
+    cur_obj_random_blink(&o->oBobombBuddyBlinkTimer);
 
     o->oInteractStatus = INT_STATUS_NONE;
 }
