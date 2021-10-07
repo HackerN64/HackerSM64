@@ -302,6 +302,10 @@ void bhv_goomba_update(void) {
         if ((animSpeed = o->oForwardVel / o->oGoombaScale * 0.4f) < 1.0f) {
             animSpeed = 1.0f;
         }
+#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+        if (o->oAction == FLOOMBA_ACT_STARTUP)
+            animSpeed = (f32) ((u32) o->oBehParams >> 24) / 16.0f;
+#endif
         cur_obj_init_animation_with_accel_and_sound(0, animSpeed);
 
         switch (o->oAction) {

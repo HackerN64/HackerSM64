@@ -1329,6 +1329,9 @@
     #define GOOMBA_ACT_WALK                                 0x0
     #define GOOMBA_ACT_ATTACKED_MARIO                       0x1
     #define GOOMBA_ACT_JUMP                                 0x2
+#if defined(HD_INTRO_TEXTURES) && defined(FLOOMBAS)
+    #define FLOOMBA_ACT_STARTUP                             0x3
+#endif
     /* oAnimState */
     #define GOOMBA_ANIM_STATE_EYES_OPEN                     OBJ_BLINKING_ANIM_STATE_EYES_OPEN
     #define GOOMBA_ANIM_STATE_EYES_CLOSED                   OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
