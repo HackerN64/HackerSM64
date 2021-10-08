@@ -25,6 +25,7 @@
 #include "dialog_ids.h"
 #include "puppyprint.h"
 #include "debug_box.h"
+#include "engine/colors.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
@@ -47,11 +48,11 @@ struct CreditsEntry *gCurrCreditsEntry = NULL;
 Vp *gViewportOverride = NULL;
 Vp *gViewportClip = NULL;
 s16 gWarpTransDelay = 0;
-u32 gFBSetColor = 0;
-u32 gWarpTransFBSetColor = 0;
-u8 gWarpTransRed = 0;
-u8 gWarpTransGreen = 0;
-u8 gWarpTransBlue = 0;
+RGBA16FILL gFBSetColor          = 0;
+RGBA16FILL gWarpTransFBSetColor = 0;
+Color gWarpTransRed   = 0;
+Color gWarpTransGreen = 0;
+Color gWarpTransBlue  = 0;
 s16 gCurrSaveFileNum = 1;
 s16 gCurrLevelNum = LEVEL_MIN;
 
@@ -91,18 +92,18 @@ const char *gNoControllerMsg[] = {
 };
 #endif
 
-void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, u8 red, u8 green, u8 blue) {
-    u16 color = ((red >> 3) << 11) | ((green >> 3) << 6) | ((blue >> 3) << 1) | 1;
+void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
+    RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
 
     gFBSetColor = (color << 16) | color;
     gViewportOverride = vpOverride;
     gViewportClip = vpClip;
 }
 
-void set_warp_transition_rgb(u8 red, u8 green, u8 blue) {
-    u16 warpTransitionRGBA16 = ((red >> 3) << 11) | ((green >> 3) << 6) | ((blue >> 3) << 1) | 1;
+void set_warp_transition_rgb(Color red, Color green, Color blue) {
+    RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
 
-    gWarpTransFBSetColor = (warpTransitionRGBA16 << 16) | warpTransitionRGBA16;
+    gWarpTransFBSetColor = (color << 16) | color;
     gWarpTransRed = red;
     gWarpTransGreen = green;
     gWarpTransBlue = blue;
@@ -115,9 +116,9 @@ void print_intro_text(void) {
     if ((gGlobalTimer & 0x1F) < 20) {
         if (gControllerBits == 0) {
 #ifdef VERSION_EU
-            print_text_centered(SCREEN_WIDTH / 2, 20, gNoControllerMsg[language]);
+            print_text_centered((SCREEN_WIDTH / 2), 20, gNoControllerMsg[language]);
 #else
-            print_text_centered(SCREEN_WIDTH / 2, 20, "NO CONTROLLER");
+            print_text_centered((SCREEN_WIDTH / 2), 20, "NO CONTROLLER");
 #endif
         } else {
 #ifdef VERSION_EU
@@ -300,8 +301,10 @@ void area_update_objects(void) {
  * Sets up the information needed to play a warp transition, including the
  * transition type, time in frames, and the RGB color that will fill the screen.
  */
-void play_transition(s16 transType, s16 time, u8 red, u8 green, u8 blue) {
-#ifndef L3DEX2_ALONE
+#ifdef L3DEX2_ALONE
+void play_transition(UNUSED s16 transType, UNUSED s16 time, UNUSED Color red, UNUSED Color green, UNUSED Color blue) {
+#else
+void play_transition(s16 transType, s16 time, Color red, Color green, Color blue) {
     gWarpTransition.isActive = TRUE;
     gWarpTransition.type = transType;
     gWarpTransition.time = time;
@@ -378,7 +381,7 @@ void render_game(void) {
         gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&gViewport));
 
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
-                      SCREEN_HEIGHT - gBorderHeight);
+                      (SCREEN_HEIGHT - gBorderHeight));
         render_hud();
 
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -386,7 +389,7 @@ void render_game(void) {
         do_cutscene_handler();
         print_displaying_credits_entry();
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
-                      SCREEN_HEIGHT - gBorderHeight);
+                      (SCREEN_HEIGHT - gBorderHeight));
         gMenuOptSelectIndex = render_menus_and_dialogs();
 
         if (gMenuOptSelectIndex != 0) {
@@ -427,7 +430,7 @@ void render_game(void) {
     gViewportClip = NULL;
 #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);
-    graphTime[perfIteration] -= collisionTime[perfIteration]-colTime;
+    graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
 #endif
 #if PUPPYPRINT_DEBUG
     puppyprint_render_profiler();

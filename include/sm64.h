@@ -71,9 +71,13 @@ enum RenderLayers
     LAYER_TRANSPARENT_DECAL,
     LAYER_TRANSPARENT,
     LAYER_TRANSPARENT_INTER,
-    LAYER_COUNT,
+    LAYER_COUNT
 };
 
+#define LAYER_FIRST                         LAYER_FORCE
+#define LAYER_LAST                          (LAYER_COUNT - 1)
+
+#define LAYER_ZB_FIRST                      LAYER_OPAQUE
 #if SILHOUETTE
 #define LAYER_ZB_LAST                       LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #define LAYER_SILHOUETTE_FIRST              LAYER_SILHOUETTE_OPAQUE
@@ -84,7 +88,7 @@ enum RenderLayers
 #define LAYER_OPAQUE_ORIG                   LAYER_OPAQUE
 #define LAYER_ALPHA_ORIG                    LAYER_ALPHA
 #else
-#define LAYER_ZB_LAST LAYER_ALPHA
+#define LAYER_ZB_LAST                       LAYER_ALPHA
 #define LAYER_ALPHA_DECAL                   LAYER_ALPHA
 #define LAYER_SILHOUETTE_OPAQUE             LAYER_OPAQUE // is zbuffered
 #define LAYER_SILHOUETTE_ALPHA              LAYER_ALPHA  // is zbuffered
@@ -92,8 +96,8 @@ enum RenderLayers
 #define LAYER_OCCLUDE_SILHOUETTE_ALPHA      LAYER_ALPHA  // is zbuffered
 #endif
 
-
-#define LAYER_FIRST_NON_ZB                  (LAYER_ZB_LAST + 1)
+#define LAYER_NON_ZB_FIRST                  (LAYER_ZB_LAST + 1)
+#define LAYER_NON_ZB_LAST                   LAYER_LAST
 
 #define INPUT_NONZERO_ANALOG                /* 0x0001 */ (1 <<  0)
 #define INPUT_A_PRESSED                     /* 0x0002 */ (1 <<  1)

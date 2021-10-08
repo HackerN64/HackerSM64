@@ -35,8 +35,8 @@ enum HeadsList
     LIST_HEADS_REJ,
 };
 
-#define IS_LAYER_ZB(    layer) (((layer) >= LAYER_FORCE       ) || ((layer) <= LAYER_ZB_LAST ))
-#define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_FIRST_NON_ZB) || ((layer) <= LAYER_LAST_ALL))
+#define IS_LAYER_ZB(    layer) (((layer) >= LAYER_ZB_FIRST    ) || ((layer) <= LAYER_ZB_LAST))
+#define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_NON_ZB_FIRST) || ((layer) <= LAYER_LAST   ))
 
 #if SILHOUETTE
 #define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))

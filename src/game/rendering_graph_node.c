@@ -83,78 +83,82 @@ struct RenderModeContainer {
 };
 
 /* Rendermode settings for cycle 1 for all 13 layers. */
-struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
-    G_RM_OPA_SURF,                      // LAYER_FORCE
-    G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE
-    G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_INTER
-    G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_DECAL
-    G_RM_AA_TEX_EDGE,                   // LAYER_ALPHA
+struct RenderModeContainer renderModeTable_1Cycle[2] = {
+    { {
+        G_RM_OPA_SURF,                      // LAYER_FORCE
+        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE
+        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_INTER
+        G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE_DECAL
+        G_RM_AA_TEX_EDGE,                   // LAYER_ALPHA
 #if SILHOUETTE
-    G_RM_AA_TEX_EDGE | ZMODE_DEC,       // LAYER_ALPHA_DECAL
-    G_RM_AA_OPA_SURF,                   // LAYER_SILHOUETTE_OPAQUE
-    G_RM_AA_TEX_EDGE,                   // LAYER_SILHOUETTE_ALPHA
-    G_RM_AA_OPA_SURF,                   // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-    G_RM_AA_TEX_EDGE,                   // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        G_RM_AA_TEX_EDGE | ZMODE_DEC,       // LAYER_ALPHA_DECAL
+        G_RM_AA_OPA_SURF,                   // LAYER_SILHOUETTE_OPAQUE
+        G_RM_AA_TEX_EDGE,                   // LAYER_SILHOUETTE_ALPHA
+        G_RM_AA_OPA_SURF,                   // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+        G_RM_AA_TEX_EDGE,                   // LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #endif
-    G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_DECAL
-    G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT
-    G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_INTER
+        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_DECAL
+        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT
+        G_RM_AA_XLU_SURF,                   // LAYER_TRANSPARENT_INTER
     } },
     { {
-    /* z-buffered */
-    G_RM_ZB_OPA_SURF,                   // LAYER_FORCE
-    G_RM_AA_ZB_OPA_SURF,                // LAYER_OPAQUE
-    G_RM_AA_ZB_OPA_INTER,               // LAYER_OPAQUE_INTER
-    G_RM_AA_ZB_OPA_DECAL,               // LAYER_OPAQUE_DECAL
-    G_RM_AA_ZB_TEX_EDGE,                // LAYER_ALPHA
+        /* z-buffered */
+        G_RM_ZB_OPA_SURF,                   // LAYER_FORCE
+        G_RM_AA_ZB_OPA_SURF,                // LAYER_OPAQUE
+        G_RM_AA_ZB_OPA_INTER,               // LAYER_OPAQUE_INTER
+        G_RM_AA_ZB_OPA_DECAL,               // LAYER_OPAQUE_DECAL
+        G_RM_AA_ZB_TEX_EDGE,                // LAYER_ALPHA
 #if SILHOUETTE
-    G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,    // LAYER_ALPHA_DECAL
-    G_RM_AA_ZB_OPA_SURF,                // LAYER_SILHOUETTE_OPAQUE
-    G_RM_AA_ZB_TEX_EDGE,                // LAYER_SILHOUETTE_ALPHA
-    G_RM_AA_ZB_OPA_SURF,                // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-    G_RM_AA_ZB_TEX_EDGE,                // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        G_RM_AA_ZB_TEX_EDGE | ZMODE_DEC,    // LAYER_ALPHA_DECAL
+        G_RM_AA_ZB_OPA_SURF,                // LAYER_SILHOUETTE_OPAQUE
+        G_RM_AA_ZB_TEX_EDGE,                // LAYER_SILHOUETTE_ALPHA
+        G_RM_AA_ZB_OPA_SURF,                // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+        G_RM_AA_ZB_TEX_EDGE,                // LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #endif
-    G_RM_AA_ZB_XLU_DECAL,               // LAYER_TRANSPARENT_DECAL
-    G_RM_AA_ZB_XLU_SURF,                // LAYER_TRANSPARENT
-    G_RM_AA_ZB_XLU_INTER,               // LAYER_TRANSPARENT_INTER
-    } } };
+        G_RM_AA_ZB_XLU_DECAL,               // LAYER_TRANSPARENT_DECAL
+        G_RM_AA_ZB_XLU_SURF,                // LAYER_TRANSPARENT
+        G_RM_AA_ZB_XLU_INTER,               // LAYER_TRANSPARENT_INTER
+    } }
+};
 
 /* Rendermode settings for cycle 2 for all 13 layers. */
-struct RenderModeContainer renderModeTable_2Cycle[2] = { { {
-    G_RM_OPA_SURF2,                     // LAYER_FORCE
-    G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE
-    G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_INTER
-    G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_DECAL
-    G_RM_AA_TEX_EDGE2,                  // LAYER_ALPHA
+struct RenderModeContainer renderModeTable_2Cycle[2] = {
+    { {
+        G_RM_OPA_SURF2,                     // LAYER_FORCE
+        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE
+        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_INTER
+        G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE_DECAL
+        G_RM_AA_TEX_EDGE2,                  // LAYER_ALPHA
 #if SILHOUETTE
-    G_RM_AA_TEX_EDGE2 | ZMODE_DEC,      // LAYER_ALPHA_DECAL
-    G_RM_AA_OPA_SURF2,                  // LAYER_SILHOUETTE_OPAQUE
-    G_RM_AA_TEX_EDGE2,                  // LAYER_SILHOUETTE_ALPHA
-    G_RM_AA_OPA_SURF2,                  // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-    G_RM_AA_TEX_EDGE2,                  // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        G_RM_AA_TEX_EDGE2 | ZMODE_DEC,      // LAYER_ALPHA_DECAL
+        G_RM_AA_OPA_SURF2,                  // LAYER_SILHOUETTE_OPAQUE
+        G_RM_AA_TEX_EDGE2,                  // LAYER_SILHOUETTE_ALPHA
+        G_RM_AA_OPA_SURF2,                  // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+        G_RM_AA_TEX_EDGE2,                  // LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #endif
-    G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_DECAL
-    G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT
-    G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_INTER
+        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_DECAL
+        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT
+        G_RM_AA_XLU_SURF2,                  // LAYER_TRANSPARENT_INTER
     } },
     { {
-    /* z-buffered */
-    G_RM_ZB_OPA_SURF2,                  // LAYER_FORCE
-    G_RM_AA_ZB_OPA_SURF2,               // LAYER_OPAQUE
-    G_RM_AA_ZB_OPA_INTER2,              // LAYER_OPAQUE_INTER
-    G_RM_AA_ZB_OPA_DECAL2,              // LAYER_OPAQUE_DECAL
-    G_RM_AA_ZB_TEX_EDGE2,               // LAYER_ALPHA
+        /* z-buffered */
+        G_RM_ZB_OPA_SURF2,                  // LAYER_FORCE
+        G_RM_AA_ZB_OPA_SURF2,               // LAYER_OPAQUE
+        G_RM_AA_ZB_OPA_INTER2,              // LAYER_OPAQUE_INTER
+        G_RM_AA_ZB_OPA_DECAL2,              // LAYER_OPAQUE_DECAL
+        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_ALPHA
 #if SILHOUETTE
-    G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC,   // LAYER_ALPHA_DECAL
-    G_RM_AA_ZB_OPA_SURF2,               // LAYER_SILHOUETTE_OPAQUE
-    G_RM_AA_ZB_TEX_EDGE2,               // LAYER_SILHOUETTE_ALPHA
-    G_RM_AA_ZB_OPA_SURF2,               // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
-    G_RM_AA_ZB_TEX_EDGE2,               // LAYER_OCCLUDE_SILHOUETTE_ALPHA
+        G_RM_AA_ZB_TEX_EDGE2 | ZMODE_DEC,   // LAYER_ALPHA_DECAL
+        G_RM_AA_ZB_OPA_SURF2,               // LAYER_SILHOUETTE_OPAQUE
+        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_SILHOUETTE_ALPHA
+        G_RM_AA_ZB_OPA_SURF2,               // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
+        G_RM_AA_ZB_TEX_EDGE2,               // LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #endif
-    G_RM_AA_ZB_XLU_DECAL2,              // LAYER_TRANSPARENT_DECAL
-    G_RM_AA_ZB_XLU_SURF2,               // LAYER_TRANSPARENT
-    G_RM_AA_ZB_XLU_INTER2,              // LAYER_TRANSPARENT_INTER
-    } } };
+        G_RM_AA_ZB_XLU_DECAL2,              // LAYER_TRANSPARENT_DECAL
+        G_RM_AA_ZB_XLU_SURF2,               // LAYER_TRANSPARENT
+        G_RM_AA_ZB_XLU_INTER2,              // LAYER_TRANSPARENT_INTER
+    } }
+};
 
 struct GraphNodeRoot        *gCurGraphNodeRoot       = NULL;
 struct GraphNodeMasterList  *gCurGraphNodeMasterList = NULL;
@@ -163,6 +167,16 @@ struct GraphNodeCamera      *gCurGraphNodeCamera     = NULL;
 struct GraphNodeObject      *gCurGraphNodeObject     = NULL;
 struct GraphNodeHeldObject  *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
+
+u8 ucodeTestSwitch = 1;
+
+void reset_clipping(void) {
+    if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
+        make_viewport_clip_rect(&sEndCutsceneVp);
+    } else {
+        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, SCREEN_HEIGHT - gBorderHeight);
+    }
+}
 
 #ifdef F3DEX_GBI_2
 LookAt lookAt;
@@ -187,16 +201,6 @@ LookAt lookAt;
 }
 #endif
 
-u8 ucodeTestSwitch = 1;
-
-void reset_clipping(void) {
-    if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
-        make_viewport_clip_rect(&sEndCutsceneVp);
-    } else {
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, SCREEN_HEIGHT - gBorderHeight);
-    }
-}
-
 /**
  * Process a master list node. This has been modified, so now it runs twice, for each microcode.
  It iterates through the first 5 layers of if the first index using F3DLX2.Rej, then it switches
@@ -206,7 +210,9 @@ void reset_clipping(void) {
  */
 void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     struct DisplayListNode *currList;
-    s32 startLayer, endLayer, currLayer = LAYER_FORCE;
+    s32 currLayer     = LAYER_FIRST;
+    s32 startLayer    = LAYER_FIRST;
+    s32 endLayer      = LAYER_LAST;
     s32 headsIndex    = LIST_HEADS_ZEX;
     s32 renderPhase   = RENDER_PHASE_ZEX_BG;
     s32 enableZBuffer = (node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0;
@@ -222,25 +228,25 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     // if (gPlayer1Controller->buttonPressed & L_TRIG)
     //     ucodeTestSwitch ^= 1;
     // print_text_fmt_int(32,32,"%d",ucodeTestSwitch);
-#ifdef F3DZEX_GBI_2
     loopBegin:
     switch (renderPhase) {
 #if SILHOUETTE
-        case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FORCE;                    endLayer = LAYER_FORCE;  break;
-        case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FORCE;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
-        case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OPAQUE;                   endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
+        case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
+        case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
+        case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
         case RENDER_PHASE_REJ_SILHOUETTE:         headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
         case RENDER_PHASE_REJ_NON_SILHOUETTE:     headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
         case RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE: headsIndex = LIST_HEADS_REJ; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_OCCLUDE_SILHOUETTE_LAST; break;
-        case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = (LAYER_COUNT - 1);             break;
-        case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST_NON_ZB;             endLayer = (LAYER_COUNT - 1);             break;
+        case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_LAST;                    break;
+        case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
 #else
-        case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FORCE;                    endLayer = LAYER_FORCE;                 break;
-        case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FORCE;                    endLayer = LAYER_ZB_LAST;                 break;
-        case RENDER_PHASE_ZEX_ALL:                headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OPAQUE;                   endLayer = (LAYER_COUNT - 1);             break;
-        case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST_NON_ZB;             endLayer = (LAYER_COUNT - 1);             break;
+        case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
+        case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_ZB_LAST;                 break;
+        case RENDER_PHASE_ZEX_ALL:                headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST;                    break;
+        case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
 #endif
     }
+#ifdef F3DZEX_GBI_2
     // Load rejection on pass 2. ZEX is loaded afterwards.
     if (headsIndex == LIST_HEADS_REJ) {
         if (gIsConsole) {
@@ -285,11 +291,11 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         renderPhase++;
         goto loopBegin;
     }
-#ifdef F3DZEX_GBI_2
     if (enableZBuffer) {
         gDPPipeSync(gDisplayListHead++);
         gSPClearGeometryMode(gDisplayListHead++, G_ZBUFFER);
     }
+#ifdef F3DZEX_GBI_2
 #ifdef VISUAL_DEBUG
     if (hitboxView) render_debug_boxes(DEBUG_UCODE_REJ);
 #endif
@@ -330,9 +336,9 @@ void geo_append_display_list(void *displayList, s32 layer) {
 #endif
 #if SILHOUETTE
         if (gCurGraphNodeObject->node.flags & GRAPH_RENDER_SILHOUETTE) {
-// #ifdef F3DZEX_GBI_2
-//             index = LIST_HEADS_REJ;
-// #endif
+#ifndef F3DZEX_GBI_2
+            index = LIST_HEADS_REJ;
+#endif
             switch (layer) {
                 case LAYER_OPAQUE: layer = LAYER_SILHOUETTE_OPAQUE; break;
                 case LAYER_ALPHA:  layer = LAYER_SILHOUETTE_ALPHA;  break;
@@ -1143,19 +1149,17 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         Mtx *initialMatrix;
         Vp *viewport = alloc_display_list(sizeof(*viewport));
 
-        gDisplayListHeap = alloc_only_pool_init(main_pool_available() - sizeof(struct AllocOnlyPool), MEMORY_POOL_LEFT);
+        gDisplayListHeap = alloc_only_pool_init((main_pool_available() - sizeof(struct AllocOnlyPool)), MEMORY_POOL_LEFT);
         initialMatrix = alloc_display_list(sizeof(*initialMatrix));
         gMatStackIndex = 0;
         gCurAnimType = 0;
-        vec3s_set(viewport->vp.vtrans, node->x     * 4, node->y      * 4, 511);
-        vec3s_set(viewport->vp.vscale, node->width * 4, node->height * 4, 511);
+        vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), 511);
+        vec3s_set(viewport->vp.vscale, (node->width * 4), (node->height * 4), 511);
         if (b != NULL) {
             clear_frame_buffer(clearColor);
             make_viewport_clip_rect(b);
             *viewport = *b;
-        }
-
-        else if (c != NULL) {
+        } else if (c != NULL) {
             clear_frame_buffer(clearColor);
             make_viewport_clip_rect(c);
         }

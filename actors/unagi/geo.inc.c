@@ -27,7 +27,7 @@ const GeoLayout unagi_geo[] = {
                            GEO_CLOSE_NODE(),
                            GEO_NODE_START(),
                            GEO_OPEN_NODE(),
-                              GEO_SCALE(LAYER_FORCE, 16384),
+                              GEO_SCALE(0x00, 16384),
                               GEO_OPEN_NODE(),
                                  GEO_TRANSLATE_ROTATE_WITH_DL(LAYER_TRANSPARENT, 2000, 0, 0, 0, 0, 0, transparent_star_seg3_dl_body),
                               GEO_CLOSE_NODE(),

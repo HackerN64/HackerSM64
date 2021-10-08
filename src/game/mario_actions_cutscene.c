@@ -2611,7 +2611,7 @@ static s32 act_credits_cutscene(struct MarioState *m) {
             m->actionState += 2;
         }
 
-        width = m->actionState * 640 / 100;
+        width  = m->actionState * 640 / 100;
         height = m->actionState * 480 / 100;
 
         sEndCutsceneVp.vp.vscale[0] = 640 - width;

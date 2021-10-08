@@ -40,11 +40,6 @@ glabel gspSuper3D_fifoTextEnd
 #endif
 
 .balign 16
-glabel gspF3DEX2_fifoTextStart
-	.incbin "lib/PR/f3dex2/fifo/F3DEX2.bin"
-glabel gspF3DEX2_fifoTextEnd
-
-.balign 16
 glabel gspF3DEX2_Rej_fifoTextStart
 	.incbin "lib/PR/f3dex2/fifo/F3DEX2_Rej.bin"
 glabel gspF3DEX2_Rej_fifoTextEnd
@@ -215,11 +210,6 @@ glabel gspSuper3D_fifoDataEnd
     glabel gspF3DZEX2_PosLight_fifoDataEnd
     #endif
 #endif
-
-.balign 16
-glabel gspF3DEX2_fifoDataStart
-	.incbin "lib/PR/f3dex2/fifo/F3DEX2_data.bin"
-glabel gspF3DEX2_fifoDataEnd
 
 .balign 16
 glabel gspF3DEX2_Rej_fifoDataStart

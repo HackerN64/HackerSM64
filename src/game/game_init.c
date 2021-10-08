@@ -129,7 +129,6 @@ void init_rdp(void) {
  * Sets the initial RSP (Reality Signal Processor) settings.
  */
 void init_rsp(void) {
-
     gSPClearGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG
                         | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD);
 
