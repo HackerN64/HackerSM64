@@ -292,8 +292,8 @@ Gfx *geo_mario_head_rotation(s32 callContext, struct GraphNode *node, UNUSED Mat
             rotNode->rotation[1] = bodyState->headAngle[2];
             rotNode->rotation[2] = bodyState->headAngle[0];
         } else {
-            vec3s_set(bodyState->headAngle, 0, 0, 0);
-            vec3s_set(rotNode->rotation, 0, 0, 0);
+            vec3_zero(bodyState->headAngle);
+            vec3_zero(rotNode->rotation);
         }
     }
     return NULL;
@@ -379,11 +379,7 @@ Gfx *geo_switch_mario_cap_on_off(s32 callContext, struct GraphNode *node, UNUSED
         switchCase->selectedCase = bodyState->capState & 1;
         while (next != node) {
             if (next->type == GRAPH_NODE_TYPE_TRANSLATION_ROTATION) {
-                if (bodyState->capState & 2) {
-                    next->flags |= GRAPH_RENDER_ACTIVE;
-                } else {
-                    next->flags &= ~GRAPH_RENDER_ACTIVE;
-                }
+                COND_BIT((bodyState->capState & 0x2), next->flags, GRAPH_RENDER_ACTIVE);
             }
             next = next->next;
         }
@@ -454,9 +450,6 @@ Gfx *geo_switch_mario_hand_grab_pos(s32 callContext, struct GraphNode *b, Mat4 *
     return NULL;
 }
 
-// X position of the mirror
-#define MIRROR_X 4331.53
-
 /**
  * Geo node that creates a clone of Mario's geo node and updates it to becomes
  * a mirror image of the player.
@@ -485,8 +478,8 @@ Gfx *geo_render_mirror_mario(s32 callContext, struct GraphNode *node, UNUSED Mat
                 vec3f_copy(gMirrorMario.scale, mario->header.gfx.scale);
 
                 gMirrorMario.animInfo = mario->header.gfx.animInfo;
-                mirroredX = MIRROR_X - gMirrorMario.pos[0];
-                gMirrorMario.pos[0] = mirroredX + MIRROR_X;
+                mirroredX = CASTLE_MIRROR_X - gMirrorMario.pos[0];
+                gMirrorMario.pos[0] = mirroredX + CASTLE_MIRROR_X;
                 gMirrorMario.angle[1] = -gMirrorMario.angle[1];
                 gMirrorMario.scale[0] *= -1.0f;
                 ((struct GraphNode *) &gMirrorMario)->flags |= GRAPH_RENDER_ACTIVE;

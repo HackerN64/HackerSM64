@@ -130,9 +130,9 @@ void print_intro_text(void) {
     }
 }
 
-u32 get_mario_spawn_type(struct Object *o) {
+u32 get_mario_spawn_type(struct Object *obj) {
     s32 i;
-    const BehaviorScript *behavior = virtual_to_segmented(0x13, o->behavior);
+    const BehaviorScript *behavior = virtual_to_segmented(0x13, obj->behavior);
 
     for (i = 0; i < 20; i++) {
         if (sWarpBhvSpawnTable[i] == behavior) {
@@ -153,10 +153,8 @@ struct ObjectWarpNode *area_get_warp_node(u8 id) {
     return node;
 }
 
-struct ObjectWarpNode *area_get_warp_node_from_params(struct Object *o) {
-    u8 id = (o->oBehParams & 0x00FF0000) >> 16;
-
-    return area_get_warp_node(id);
+struct ObjectWarpNode *area_get_warp_node_from_params(struct Object *obj) {
+    return area_get_warp_node((obj->oBehParams & 0x00FF0000) >> 16);
 }
 
 void load_obj_warp_nodes(void) {
@@ -248,7 +246,7 @@ void unload_area(void) {
         unload_objects_from_area(0, gCurrentArea->index);
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
 
-        gCurrentArea->flags = 0;
+        gCurrentArea->flags = AREA_FLAG_UNLOAD;
         gCurrentArea = NULL;
         gWarpTransition.isActive = FALSE;
     }
@@ -259,20 +257,19 @@ void load_mario_area(void) {
     load_area(gMarioSpawnInfo->areaIndex);
 
     if (gCurrentArea->index == gMarioSpawnInfo->areaIndex) {
-        gCurrentArea->flags |= 0x01;
+        gCurrentArea->flags |= AREA_FLAG_LOAD;
         spawn_objects_from_info(0, gMarioSpawnInfo);
     }
-    if (gAreaSkyboxStart[gCurrAreaIndex-1]) {
-        load_segment_decompress(0x0A, gAreaSkyboxStart[gCurrAreaIndex-1], gAreaSkyboxEnd[gCurrAreaIndex-1]);
+    if (gAreaSkyboxStart[gCurrAreaIndex - 1]) {
+        load_segment_decompress(0x0A, gAreaSkyboxStart[gCurrAreaIndex - 1], gAreaSkyboxEnd[gCurrAreaIndex - 1]);
     }
 }
 
 void unload_mario_area(void) {
-    if (gCurrentArea != NULL && (gCurrentArea->flags & 0x01)) {
+    if (gCurrentArea != NULL && (gCurrentArea->flags & AREA_FLAG_LOAD)) {
         unload_objects_from_area(0, gMarioSpawnInfo->activeAreaIndex);
-
-        gCurrentArea->flags &= ~0x01;
-        if (gCurrentArea->flags == 0) {
+        gCurrentArea->flags &= ~AREA_FLAG_LOAD;
+        if (gCurrentArea->flags == AREA_FLAG_UNLOAD) {
             unload_area();
         }
     }
@@ -370,7 +367,9 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 
 void render_game(void) {
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
-        geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);
+        if (gCurrentArea->graphNode) {
+            geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);
+        }
 
         gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&gViewport));
 

@@ -18,7 +18,8 @@
  *
  **************************************************************************/
 
-#pragma once
+#ifndef _DBGDEFS_H_
+#define	_DBGDEFS_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -32,4 +33,6 @@ typedef unsigned char TVuchar;
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
+#endif
+
 #endif

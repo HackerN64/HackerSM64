@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENVFX_BUBBLES_H
+#define ENVFX_BUBBLES_H
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
@@ -17,3 +18,5 @@
 // Used to communicate from whirlpool behavior to envfx
 extern s16 gEnvFxBubbleConfig[10];
 Gfx *envfx_update_bubbles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom);
+
+#endif // ENVFX_BUBBLES_H

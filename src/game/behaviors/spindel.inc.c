@@ -67,7 +67,7 @@ void bhv_spindel_loop(void) {
             cur_obj_play_sound_2(SOUND_GENERAL2_SPINDEL_ROLL);
         }
 
-        homeYOffset = sins(o->oMoveAnglePitch * 4) * 23.0;
+        homeYOffset = sins(o->oMoveAnglePitch * 4) * 23.0f;
         if (homeYOffset < 0.0f)
             homeYOffset *= -1.0f;
 

@@ -33,7 +33,7 @@ s8 gSaveFileModified;
 
 u8 gLastCompletedCourseNum = COURSE_NONE;
 u8 gLastCompletedStarNum = 0;
-s8 sUnusedGotGlobalCoinHiScore = 0;
+s8 sUnusedGotGlobalCoinHiScore = FALSE;
 u8 gGotFileCoinHiScore = FALSE;
 u8 gCurrCourseStarFlags = 0;
 
@@ -457,17 +457,17 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
     s32 starFlag = 1 << starIndex;
 #endif
 
-    gLastCompletedCourseNum = courseIndex + 1;
-    gLastCompletedStarNum = starIndex + 1;
-    sUnusedGotGlobalCoinHiScore = 0;
-    gGotFileCoinHiScore = FALSE;
+    gLastCompletedCourseNum     = courseIndex + 1;
+    gLastCompletedStarNum       = starIndex + 1;
+    sUnusedGotGlobalCoinHiScore = FALSE;
+    gGotFileCoinHiScore         = FALSE;
 
     if (courseIndex >= 0 && courseIndex < COURSE_STAGES_COUNT) {
         //! Compares the coin score as a 16 bit value, but only writes the 8 bit
         // truncation. This can allow a high score to decrease.
 
         if (coinScore > ((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF)) {
-            sUnusedGotGlobalCoinHiScore = 1;
+            sUnusedGotGlobalCoinHiScore = TRUE;
         }
 
         if (coinScore > save_file_get_course_coin_score(fileIndex, courseIndex)) {
@@ -475,7 +475,7 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
             touch_coin_score_age(fileIndex, courseIndex);
 
             gGotFileCoinHiScore = TRUE;
-            gSaveFileModified = TRUE;
+            gSaveFileModified   = TRUE;
         }
     }
 
@@ -521,7 +521,7 @@ s32 save_file_exists(s32 fileIndex) {
 u32 save_file_get_max_coin_score(s32 courseIndex) {
     s32 fileIndex;
     s32 maxCoinScore = -1;
-    s32 maxScoreAge = -1;
+    s32 maxScoreAge  = -1;
     s32 maxScoreFileNum = 0;
 
     for (fileIndex = 0; fileIndex < NUM_SAVE_FILES; fileIndex++) {
@@ -683,15 +683,9 @@ u16 save_file_get_sound_mode(void) {
 void save_file_move_cap_to_default_location(void) {
     if (save_file_get_flags() & SAVE_FLAG_CAP_ON_GROUND) {
         switch (gSaveBuffer.files[gCurrSaveFileNum - 1][0].capLevel) {
-            case LEVEL_SSL:
-                save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
-                break;
-            case LEVEL_SL:
-                save_file_set_flags(SAVE_FLAG_CAP_ON_MR_BLIZZARD);
-                break;
-            case LEVEL_TTM:
-                save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI);
-                break;
+            case LEVEL_SSL: save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO     ); break;
+            case LEVEL_SL:  save_file_set_flags(SAVE_FLAG_CAP_ON_MR_BLIZZARD); break;
+            case LEVEL_TTM: save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI      ); break;
         }
         save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
     }
@@ -721,11 +715,11 @@ void disable_warp_checkpoint(void) {
 void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
     if (warpNode->destLevel & 0x80) {
         // Overwrite the warp checkpoint variables.
-        gWarpCheckpoint.actNum = gCurrActNum;
+        gWarpCheckpoint.actNum    = gCurrActNum;
         gWarpCheckpoint.courseNum = gCurrCourseNum;
-        gWarpCheckpoint.levelID = warpNode->destLevel & 0x7F;
-        gWarpCheckpoint.areaNum = warpNode->destArea;
-        gWarpCheckpoint.warpNode = warpNode->destNode;
+        gWarpCheckpoint.levelID   = warpNode->destLevel & 0x7F;
+        gWarpCheckpoint.areaNum   = warpNode->destArea;
+        gWarpCheckpoint.warpNode  = warpNode->destNode;
     }
 }
 

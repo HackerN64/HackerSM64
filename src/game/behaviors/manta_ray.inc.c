@@ -41,12 +41,9 @@ void bhv_manta_ray_init(void) {
 }
 
 static void manta_ray_move(void) {
-    s16 animFrame;
-    s32 pathStatus = 0;
-
-    animFrame = o->header.gfx.animInfo.animFrame;
+    s16 animFrame = o->header.gfx.animInfo.animFrame;
     gCurrentObject->oPathedStartWaypoint = (struct Waypoint *) sMantaRayTraj;
-    pathStatus = cur_obj_follow_path(pathStatus);
+    cur_obj_follow_path(0);
     o->oMantaTargetYaw   = o->oPathedTargetYaw;
     o->oMantaTargetPitch = o->oPathedTargetPitch;
     o->oForwardVel = 10.0f;
@@ -56,13 +53,13 @@ static void manta_ray_move(void) {
 
     // This causes the ray to tilt as it turns.
     if ((s16) o->oMantaTargetYaw != (s16) o->oMoveAngleYaw) {
-        o->oMoveAngleRoll -= 91;
-        if (o->oMoveAngleRoll < -5461.3332) {
+        o->oMoveAngleRoll -= 0x5B;
+        if (o->oMoveAngleRoll < -DEGREES(30)) {
             o->oMoveAngleRoll = -0x4000 / 3;
         }
     } else {
-        o->oMoveAngleRoll += 91;
-        if (o->oMoveAngleRoll > 5461.3332) {
+        o->oMoveAngleRoll += 0x5B;
+        if (o->oMoveAngleRoll > DEGREES(30)) {
             o->oMoveAngleRoll = 0x4000 / 3;
         }
     }

@@ -18,6 +18,7 @@ enum crashPages {
     PAGE_CONTEXT,
     PAGE_LOG,
     PAGE_STACKTRACE,
+    PAGE_DISASM,
     PAGE_COUNT
 };
 
@@ -193,19 +194,16 @@ void draw_crash_context(OSThread *thread, s32 cause)
 {
     __OSThreadContext *tc = &thread->context;
 
-    crash_screen_draw_rect(25, 20, 270, 25);
-    crash_screen_print(30, 25, "THREAD:%d  (%s)", thread->id, gCauseDesc[cause]);
-    crash_screen_print(30, 35, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
+    crash_screen_draw_rect(15, 20, 270, 210);
+    crash_screen_print(30, 20, "THREAD:%d  (%s)", thread->id, gCauseDesc[cause]);
+    crash_screen_print(30, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
-    crash_screen_draw_rect(25, 45, 270, 185);
-    if ((u32)parse_map == 0x80345678) {
-        crash_screen_print(30, 50, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0,
-                       (u32) tc->v1);
-    } else {
+    crash_screen_draw_rect(15, 45, 270, 185);
+    if ((u32)parse_map != 0x80345678) {
         char *fname = parse_map(tc->pc);
-        crash_screen_print(30, 50, "CRASH AT: %s", fname == NULL ? "UNKNOWN" : fname);
+        crash_screen_print(30, 40, "CRASH AT: %s", fname == NULL ? "UNKNOWN" : fname);
     }
-    // crash_screen_print(30, 50, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
+    crash_screen_print(30, 50, "AT:%08XH   V0:%08XH   V1:%08XH", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
     crash_screen_print(30, 60, "A0:%08XH   A1:%08XH   A2:%08XH", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
     crash_screen_print(30, 70, "A3:%08XH   T0:%08XH   T1:%08XH", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
     crash_screen_print(30, 80, "T2:%08XH   T3:%08XH   T4:%08XH", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
@@ -263,7 +261,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = tc->sp + 0x14;
 
-    crash_screen_draw_rect(25, 20, 270, 25);
+    crash_screen_draw_rect(25, 20, 270, 210);
     crash_screen_print(30, 25, "STACK TRACE FROM %08X:", temp_sp);
     if ((u32) parse_map == 0x80345678) {
         crash_screen_print(30, 35, "CURRFUNC: NONE");
@@ -290,8 +288,30 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
             }
         }
     }
+}
+
+extern char *insn_disasm(u32 insn, u32 isPC);
+static u32 sProgramPosition = 0;
+void draw_disasm(OSThread *thread) {
+    __OSThreadContext *tc = &thread->context;
+    // u32 insn = *(u32*)tc->pc;
+
+    crash_screen_draw_rect(25, 20, 270, 210);
+    if (sProgramPosition == 0) {
+        sProgramPosition = tc->pc - 36;
+    }
+    crash_screen_print(30, 25, "DISASM %08X", sProgramPosition);
+    osWritebackDCacheAll();
 
 
+    for (int i = 0; i < 19; i++) {
+        u32 addr = sProgramPosition + (i * 4);
+        u32 toDisasm = *(u32*)(addr);
+
+        crash_screen_print(30, 35 + (i * 10), "%s", insn_disasm(toDisasm, addr == tc->pc));
+    }
+
+    osWritebackDCacheAll();
 }
 
 
@@ -321,6 +341,14 @@ void draw_crash_screen(OSThread *thread)
         crashPage--;
         updateBuffer = TRUE;
     }
+    if (gPlayer1Controller->buttonDown & D_CBUTTONS) {
+        sProgramPosition += 4;
+        updateBuffer = TRUE;
+    }
+    if (gPlayer1Controller->buttonDown & U_CBUTTONS) {
+        sProgramPosition -= 4;
+        updateBuffer = TRUE;
+    }
 
     if (crashPage >= PAGE_COUNT && crashPage != 255)
         crashPage = 0;
@@ -331,11 +359,11 @@ void draw_crash_screen(OSThread *thread)
     {
         crash_screen_draw_rect(25, 8, 270, 12);
         crash_screen_print(30, 10, "Page:%02d                L/Z: Left   R: Right", crashPage);
-        switch (crashPage)
-        {
-        case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
-        case PAGE_LOG: 		  draw_crash_log(); break;
-        case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
+        switch (crashPage) {
+            case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
+            case PAGE_LOG: 		  draw_crash_log(); break;
+            case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
+            case PAGE_DISASM:     draw_disasm(thread); break;
         }
 
         osWritebackDCacheAll();

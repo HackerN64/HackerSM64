@@ -1,4 +1,6 @@
-#pragma once
+#ifndef HVQM_H
+#define HVQM_H
+
 
 /*
  * Size of the data area for the HVQ microcode
@@ -111,3 +113,6 @@ int get_cfb();
 
 typedef u32 (*tkAudioProc)(void *pcmbuf);
 typedef tkAudioProc (*tkRewindProc)(void);
+
+
+#endif // HVQM_H

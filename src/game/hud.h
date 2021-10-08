@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HUD_H
+#define HUD_H
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
@@ -11,6 +12,15 @@ enum PowerMeterAnimation {
     POWER_METER_VISIBLE
 };
 
+#ifdef BREATH_METER
+enum AirMeterAnimation {
+    BREATH_METER_HIDDEN,
+    BREATH_METER_SHOWING,
+    BREATH_METER_HIDING,
+    BREATH_METER_VISIBLE
+};
+#endif
+
 enum CameraHUDLut {
     GLYPH_CAM_CAMERA,
     GLYPH_CAM_MARIO_HEAD,
@@ -22,3 +32,5 @@ enum CameraHUDLut {
 
 void set_hud_camera_status(s16 status);
 void render_hud(void);
+
+#endif // HUD_H

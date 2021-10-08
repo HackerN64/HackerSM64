@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GD_DYNLIST_MACROS_H
+#define GD_DYNLIST_MACROS_H
 
 /* DynListCmd Macros */
 
@@ -397,3 +398,5 @@
 /* Make a new Net from Shape double pointer PTR */
 #define MakeNetFromShapePtrPtr(w1) \
     { 55, {(void *)(w1)}, {0}, {0.0, 0.0, 0.0} }
+
+#endif // GD_DYNLIST_MACROS_H

@@ -27,7 +27,8 @@
         $Date: 2002/05/02 03:28:24 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_EEPROM_H_
+#define	_OS_EEPROM_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -102,3 +103,5 @@ extern s32 osEepromLongWrite(OSMesgQueue *, u8, u8 *, int);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_EEPROM_H_ */

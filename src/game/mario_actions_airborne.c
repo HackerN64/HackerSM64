@@ -128,7 +128,7 @@ s32 should_get_stuck_in_ground(struct MarioState *m) {
 #else
     if (floor != NULL && (terrainType == TERRAIN_SNOW || terrainType == TERRAIN_SAND)
         && type != SURFACE_BURNING && SURFACE_IS_NOT_HARD(type)) {
-        if (!(flags & 0x01) && m->peakHeight - m->pos[1] > 1000.0f && floor->normal.y >= 0.8660254f) {
+        if (!(flags & 0x01) && m->peakHeight - m->pos[1] > 1000.0f && floor->normal.y >= COS30) {
             return TRUE;
         }
     }
@@ -156,21 +156,18 @@ s32 check_fall_damage_or_get_stuck(struct MarioState *m, u32 hardFallAction) {
 }
 
 s32 check_horizontal_wind(struct MarioState *m) {
-    struct Surface *floor;
-    f32 speed;
-    s16 pushAngle;
-
-    floor = m->floor;
+    struct Surface *floor = m->floor;
 
     if (floor->type == SURFACE_HORIZONTAL_WIND) {
-        pushAngle = floor->force << 8;
+        s16 pushAngle = floor->force << 8;
 
         m->slideVelX += 1.2f * sins(pushAngle);
         m->slideVelZ += 1.2f * coss(pushAngle);
 
-        speed = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+        f32 speed = (sqr(m->slideVelX) + sqr(m->slideVelZ));
 
-        if (speed > 48.0f) {
+        if (speed > sqr(48.0f)) {
+            speed = sqrtf(speed);
             m->slideVelX = m->slideVelX * 48.0f / speed;
             m->slideVelZ = m->slideVelZ * 48.0f / speed;
             speed = 48.0f;
@@ -376,11 +373,9 @@ void update_flying(struct MarioState *m) {
 }
 
 u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, u32 stepArg) {
-    u32 stepResult;
-
     update_air_without_turn(m);
 
-    stepResult = perform_air_step(m, stepArg);
+    u32 stepResult = perform_air_step(m, stepArg);
     switch (stepResult) {
         case AIR_STEP_NONE:
             set_mario_animation(m, animation);
@@ -617,10 +612,9 @@ s32 act_side_flip(struct MarioState *m) {
         m->marioObj->header.gfx.angle[1] += 0x8000;
     }
 
-    // This must be one line to match on -O2
-    // clang-format off
-    if (m->marioObj->header.gfx.animInfo.animFrame == 6) play_sound(SOUND_ACTION_SIDE_FLIP_UNK, m->marioObj->header.gfx.cameraToObject);
-    // clang-format on
+    if (m->marioObj->header.gfx.animInfo.animFrame == 6) {
+        play_sound(SOUND_ACTION_SIDE_FLIP_UNK, m->marioObj->header.gfx.cameraToObject);
+    }
     return FALSE;
 }
 
@@ -1445,7 +1439,7 @@ s32 act_butt_slide_air(struct MarioState *m) {
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
-            if (m->actionState == 0 && m->vel[1] < 0.0f && m->floor->normal.y >= 0.9848077f) {
+            if (m->actionState == 0 && m->vel[1] < 0.0f && m->floor->normal.y >= COS10) {
                 m->vel[1] = -m->vel[1] / 2.0f;
                 m->actionState = 1;
             } else {
@@ -1484,7 +1478,7 @@ s32 act_hold_butt_slide_air(struct MarioState *m) {
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_LANDED:
-            if (m->actionState == 0 && m->vel[1] < 0.0f && m->floor->normal.y >= 0.9848077f) {
+            if (m->actionState == 0 && m->vel[1] < 0.0f && m->floor->normal.y >= COS10) {
                 m->vel[1] = -m->vel[1] / 2.0f;
                 m->actionState = 1;
             } else {
@@ -1714,7 +1708,7 @@ s32 act_shot_from_cannon(struct MarioState *m) {
         set_mario_action(m, ACT_FLYING, 0);
     }
 
-    if ((m->forwardVel -= 0.05) < 10.0f) {
+    if ((m->forwardVel -= 0.05f) < 10.0f) {
         mario_set_forward_vel(m, 10.0f);
     }
 
@@ -1862,10 +1856,7 @@ s32 act_riding_hoot(struct MarioState *m) {
 #endif
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
-
-    m->pos[0] = m->usedObj->oPosX;
-    m->pos[1] = m->usedObj->oPosY - 92.5f;
-    m->pos[2] = m->usedObj->oPosZ;
+    vec3_copy_y_off(m->pos, &m->usedObj->oPosVec, -92.5f);
 
     m->faceAngle[1] = 0x4000 - m->usedObj->oMoveAngleYaw;
 
@@ -1877,7 +1868,7 @@ s32 act_riding_hoot(struct MarioState *m) {
         }
     }
 
-    vec3f_set(m->vel, 0.0f, 0.0f, 0.0f);
+    vec3_zero(m->vel);
     vec3f_set(m->marioObj->header.gfx.pos, m->pos[0], m->pos[1], m->pos[2]);
     vec3s_set(m->marioObj->header.gfx.angle, 0, 0x4000 - m->faceAngle[1], 0);
     return FALSE;

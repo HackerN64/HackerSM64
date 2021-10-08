@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GD_SHAPE_HELPER_H
+#define GD_SHAPE_HELPER_H
 
 #include <PR/ultratypes.h>
 
@@ -24,3 +25,5 @@ void animate_mario_head_normal(struct ObjAnimator *self);
 s32 load_mario_head(void (*aniFn)(struct ObjAnimator *));
 void load_shapes2(void);
 struct ObjFace* make_face_with_colour(f32 r, f32 g, f32 b);
+
+#endif // GD_SHAPE_HELPER_H

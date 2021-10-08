@@ -2,15 +2,14 @@
 
 void hexagonal_ring_spawn_flames(void) {
     struct Object *flameObj;
-    f32 size;
     flameObj = spawn_object(o, MODEL_RED_FLAME, bhvVolcanoFlames);
     flameObj->oPosY += 550.0f;
     flameObj->oMoveAngleYaw = random_u16() << 0x10 >> 0x10;
     flameObj->oForwardVel = random_float() * 40.0f + 20.0f;
     flameObj->oVelY = random_float() * 50.0f + 10.0f;
-    size = random_float() * 6.0 + 3.0;
+    f32 size = random_float() * 6.0f + 3.0f;
     obj_scale_xyz(flameObj, size, size, size);
-    if (random_float() < 0.1)
+    if (random_float() < 0.1f)
         cur_obj_play_sound_2(SOUND_GENERAL_VOLCANO_EXPLOSION);
 }
 

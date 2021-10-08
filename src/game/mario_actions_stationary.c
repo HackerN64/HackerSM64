@@ -19,7 +19,7 @@
 
 s32 check_common_idle_cancels(struct MarioState *m) {
     mario_drop_held_object(m);
-    if (m->floor->normal.y < 0.29237169f) {
+    if (m->floor->normal.y < COS73) {
         return mario_push_off_steep_floor(m, ACT_FREEFALL, 0);
     }
 
@@ -60,7 +60,7 @@ s32 check_common_idle_cancels(struct MarioState *m) {
 }
 
 s32 check_common_hold_idle_cancels(struct MarioState *m) {
-    if (m->floor->normal.y < 0.29237169f) {
+    if (m->floor->normal.y < COS73) {
         return mario_push_off_steep_floor(m, ACT_HOLD_FREEFALL, 0);
     }
 
@@ -774,9 +774,6 @@ s32 act_stop_crawling(struct MarioState *m) {
 }
 
 s32 act_shockwave_bounce(struct MarioState *m) {
-    s16 bounceTimer;
-    f32 bounceAmt;
-
     if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_SHOCKWAVE) {
 #if ENABLE_RUMBLE
         queue_rumble_data(70, 40);
@@ -797,10 +794,10 @@ s32 act_shockwave_bounce(struct MarioState *m) {
         return set_mario_action(m, ACT_IDLE, 0);
     }
 
-    bounceTimer = (m->actionTimer % 16) << 12;
-    bounceAmt = (f32)(((f32)(6 - m->actionTimer / 8) * 8.0f) + 4.0f);
+    s16 bounceTimer = (m->actionTimer % 16) << 12;
+    f32 bounceAmt = (f32)(((f32)(6 - m->actionTimer / 8) * 8.0f) + 4.0f);
     mario_set_forward_vel(m, 0);
-    vec3f_set(m->vel, 0.0f, 0.0f, 0.0f);
+    vec3_zero(m->vel);
     if (sins(bounceTimer) >= 0.0f) {
         m->pos[1] = sins(bounceTimer) * bounceAmt + m->floorHeight;
     } else {
@@ -1080,7 +1077,7 @@ s32 check_common_stationary_cancels(struct MarioState *m) {
         return drop_and_set_mario_action(m, ACT_SQUISHED, 0);
     }
 
-    if (m->action != ACT_UNKNOWN_0002020E) {
+    if (m->action != ACT_NO_STANDING_DEATH) {
         if (m->health < 0x100) {
             update_mario_sound_and_camera(m);
             return drop_and_set_mario_action(m, ACT_STANDING_DEATH, 0);

@@ -37,7 +37,7 @@ void bhv_bouncing_fireball_spawner_loop(void) {
             break;
         case 1:
             flameObj = spawn_object(o, MODEL_RED_FLAME, bhvBouncingFireballFlame);
-            scale = (10 - o->oTimer) * 0.5;
+            scale = (10 - o->oTimer) * 0.5f;
             obj_scale_xyz(flameObj, scale, scale, scale);
             if (o->oTimer == 0)
                 obj_become_tangible(flameObj);

@@ -6,7 +6,8 @@
 	
 	$Id: ucode_debug.h,v 1.1.1.1 2002/05/02 03:28:25 blythe Exp $
  *---------------------------------------------------------------------*/
-#pragma once
+#ifndef _UCODE_DEBUG_H_
+#define	_UCODE_DEBUG_H_
 
 #define	DEBUG_DL_PTR()		IO_READ(SP_DMEM_START+0xfc0)
 
@@ -48,5 +49,6 @@ extern long long int gspS2DEX2d_xbusDataStart[],    gspS2DEX2d_xbusDataEnd[];
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+#endif /* !_UCODE_DEBUG_H */
 
 /*======== End of ucode_debug.h ========*/

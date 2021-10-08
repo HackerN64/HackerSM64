@@ -97,7 +97,7 @@ void bhv_tilting_inverted_pyramid_loop(void) {
         //! Always true since dy = 500, making d >= 500.
         if (d != 0.0f) {
             // Normalizing
-            d = 1.0 / d;
+            d = 1.0f / d;
             dx *= d;
             dy *= d;
             dz *= d;

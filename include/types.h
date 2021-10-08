@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TYPES_H
+#define TYPES_H
 
 // This file contains various data types used in Super Mario 64 that don't yet
 // have an appropriate header.
@@ -9,6 +10,7 @@
 
 #define BIT(i)  (1 << (i))
 #define BITMASK(size) ((BIT(size)) - 1)
+#define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
 
 struct Config
 {
@@ -68,26 +70,103 @@ typedef f32 Mat2[2][2];
 typedef f32 Mat3[3][3];
 typedef f32 Mat4[4][4];
 
+// -- Scripts --
 typedef uintptr_t GeoLayout;
 typedef uintptr_t LevelScript;
-typedef s16 Movtex;
-typedef s16 MacroObject;
-typedef COLLISION_DATA_TYPE Collision; //Collision is by default an s16, but it's best to have it match the type of COLLISION_DATA_TYPE
-typedef s16 Trajectory;
-typedef s16 PaintingData;
 typedef uintptr_t BehaviorScript;
-typedef u8 Texture;
-typedef u16 ModelID;
-typedef COLLISION_DATA_TYPE TerrainData;
-typedef ROOM_DATA_TYPE RoomData;
-typedef TerrainData Vec3t[3];
+
+// -- Mario/Objects --
+typedef s32 MarioAction;
+typedef s32 MarioActionArg;
+typedef u32 MarioInteraction;
+typedef u32 InteractType;
+typedef u32 MarioStep;
+
+typedef s8  ObjAction8;
+typedef s32 ObjAction32;
+typedef s16 ColFlags;
 
 // -- Angle --
-
 typedef s16 Angle;
 typedef u16 UAngle;
 typedef s32 Angle32;
 typedef Angle Vec3a[3];
+
+// -- Collision --
+typedef ROOM_DATA_TYPE RoomData;
+typedef COLLISION_DATA_TYPE Collision; // Collision is by default an s16, but it's best to have it match the type of COLLISION_DATA_TYPE
+typedef Collision TerrainData;
+typedef Collision Vec3t[3];
+typedef Collision SurfaceType;
+
+typedef f32       Normal;
+typedef Normal    Vec3n[3];
+
+// -- Colors/Textures --
+
+// 0.0f to 1.0f
+typedef f32    ColorF;
+typedef ColorF AlphaF;
+typedef ColorF ColorRGBf[3];
+typedef ColorF ColorRGBAf[4];
+typedef ColorF ColorHSVf[3];
+typedef ColorF ColorHSVAf[4];
+
+// 0 to 255
+typedef u8    Color;
+typedef Color Alpha;
+typedef Color ColorRGB[3];
+typedef Color ColorRGBA[4];
+typedef Color ColorHSV[3];
+typedef Color ColorHSVA[4];
+
+// Formats:
+typedef u32   CompositeColor;  // to be casted to one of the following:
+typedef u8    I4;              // u4
+typedef u8    I8;
+typedef u8    IA4;             // u4, components u3 & u1
+typedef u8    IA8;
+typedef u8    IA16Component;
+typedef u16   IA16;
+typedef u8    RGBA16Component; // components u5 & u1
+typedef u16   RGBA16;
+typedef u32   RGBA16FILL;      // RGBA16 but twice, Used for gDPSetFillColor
+typedef u8    RGBA32Component;
+typedef u32   RGBA32;
+typedef u8    CI4;             // u4
+typedef u8    CI8;
+typedef Color Texture;
+
+typedef s16   TextureCoord;
+
+// -- Models --
+
+typedef u8  ModelID8;
+typedef u16 ModelID16;
+typedef u32 ModelID32;
+
+// -- Animations --
+typedef s16 AnimValue;
+typedef u16 AnimIndex;
+typedef s16 AnimID16;
+typedef s32 AnimID32;
+typedef s16 AnimFrame16;
+typedef s32 AnimFrame32;
+typedef s32 AnimAccel;
+
+// -- Misc. Data --
+
+typedef s16 DialogID16;
+typedef s32 DialogID;
+typedef s32 DrawingLayer;
+typedef s16 PaintingData;
+typedef s32 CameraTransitionAngle;
+typedef s16 Movtex;
+typedef s16 MacroObject;
+typedef s16 Trajectory;
+typedef u8  CutsceneID;
+
+typedef u8 uchar;
 
 enum SpTaskState {
     SPTASK_STATE_NOT_STARTED,
@@ -347,7 +426,8 @@ struct MarioState
     /*0x68*/ struct Surface *floor;
     /*0x6C*/ f32 ceilHeight;
     /*0x70*/ f32 floorHeight;
-    /*0x74*/ s16 floorAngle;
+    /*0x74*/ s16 floorYaw;
+    #define floorAngle floorYaw
     /*0x76*/ s16 waterLevel;
     /*0x78*/ struct Object *interactObj;
     /*0x7C*/ struct Object *heldObj;
@@ -363,17 +443,31 @@ struct MarioState
     /*0xA4*/ u32 collidedObjInteractTypes;
     /*0xA8*/ s16 numCoins;
     /*0xAA*/ s16 numStars;
-    /*0xAC*/ s8 numKeys; // Unused key mechanic
-    /*0xAD*/ s8 numLives;
+    /*0xAC*/ s8  numKeys; // Unused key mechanic
+    /*0xAD*/ s8  numLives;
     /*0xAE*/ s16 health;
     /*0xB0*/ s16 animYTrans;
-    /*0xB2*/ u8 hurtCounter;
-    /*0xB3*/ u8 healCounter;
-    /*0xB4*/ u8 squishTimer;
-    /*0xB5*/ u8 fadeWarpOpacity;
+    /*0xB2*/ u8  hurtCounter;
+    /*0xB3*/ u8  healCounter;
+    /*0xB4*/ u8  squishTimer;
+    /*0xB5*/ u8  fadeWarpOpacity;
     /*0xB6*/ u16 capTimer;
     /*0xB8*/ s16 prevNumStarsForDialog;
     /*0xBC*/ f32 peakHeight;
     /*0xC0*/ f32 quicksandDepth;
     /*0xC4*/ f32 windGravity;
+#ifdef BREATH_METER
+             s16 breath;
+             u8  breathCounter;
+#endif
+           Vec3f lastSafePos;
+           Vec3f prevPos;
+             f32 lateralSpeed;
+             f32 moveSpeed;
+           Angle movePitch;
+           Angle moveYaw;
+           Angle ceilYaw;
+           Angle wallYaw;
 };
+
+#endif // TYPES_H

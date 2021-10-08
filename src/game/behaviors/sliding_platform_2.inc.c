@@ -42,7 +42,7 @@ void bhv_sliding_plat_2_loop(void) {
         }
     }
 
-    obj_perform_position_op(0);
+    obj_perform_position_op(POS_OP_SAVE_POSITION);
 
     if (o->oBackAndForthPlatformDirection != 0.0f) {
         o->oPosY = o->oHomeY + o->oBackAndForthPlatformDistance * o->oBackAndForthPlatformDirection;
@@ -50,5 +50,5 @@ void bhv_sliding_plat_2_loop(void) {
         obj_set_dist_from_home(o->oBackAndForthPlatformDistance);
     }
 
-    obj_perform_position_op(1);
+    obj_perform_position_op(POS_OP_COMPUTE_VELOCITY);
 }

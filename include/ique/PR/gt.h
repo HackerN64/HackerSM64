@@ -44,7 +44,8 @@
  *
  **************************************************************************/
 
-#pragma once
+#ifndef _GT_H_
+#define	_GT_H_
 
 /* this file should be #included AFTER gbi.h */
 
@@ -360,3 +361,5 @@ typedef union {
 
 #ifdef	_LANGUAGE_MAKEROM
 #endif	/* _LANGUAGE_MAKEROM */
+
+#endif	/* _GT_H_ */

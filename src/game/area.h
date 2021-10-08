@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AREA_H
+#define AREA_H
 
 #include <PR/ultratypes.h>
 
@@ -59,15 +60,18 @@ struct Whirlpool
     /*0x03*/ s16 strength;
 };
 
+#define AREA_FLAG_UNLOAD    0x0
+#define AREA_FLAG_LOAD      0x1
+
 struct Area
 {
     /*0x00*/ s8 index;
     /*0x01*/ s8 flags; // Only has 1 flag: 0x01 = Is this the active area?
-    /*0x02*/ u16 terrainType; // default terrain of the level (set from level script cmd 0x31)
+    /*0x02*/ TerrainData terrainType; // default terrain of the level (set from level script cmd 0x31)
     /*0x04*/ struct GraphNodeRoot *graphNode; // geometry layout data
-    /*0x08*/ s16 *terrainData; // collision data (set from level script cmd 0x2E)
-    /*0x0C*/ s8 *surfaceRooms; // (set from level script cmd 0x2F)
-    /*0x10*/ s16 *macroObjects; // Macro Objects Ptr (set from level script cmd 0x39)
+    /*0x08*/ TerrainData *terrainData; // collision data (set from level script cmd 0x2E)
+    /*0x0C*/ RoomData *surfaceRooms; // (set from level script cmd 0x2F)
+    /*0x10*/ MacroObject *macroObjects; // Macro Objects Ptr (set from level script cmd 0x39)
     /*0x14*/ struct ObjectWarpNode *warpNodes;
     /*0x18*/ struct WarpNode *paintingWarpNodes;
     /*0x1C*/ struct InstantWarp *instantWarps;
@@ -117,6 +121,13 @@ struct WarpTransition
     /*0x04*/ struct WarpTransitionData data;
 };
 
+enum CurrSaveFileNum {
+    SAVE_FILE_NUM_A = 0x1,
+    SAVE_FILE_NUM_B,
+    SAVE_FILE_NUM_C,
+    SAVE_FILE_NUM_D,
+};
+
 enum MenuOption {
     MENU_OPT_NONE,
     MENU_OPT_1,
@@ -158,7 +169,7 @@ extern s16 gCurrLevelNum;
 
 void override_viewport_and_clip(Vp *a, Vp *b, u8 c, u8 d, u8 e);
 void print_intro_text(void);
-u32 get_mario_spawn_type(struct Object *o);
+u32 get_mario_spawn_type(struct Object *obj);
 struct ObjectWarpNode *area_get_warp_node(u8 id);
 void clear_areas(void);
 void clear_area_graph_nodes(void);
@@ -171,3 +182,5 @@ void area_update_objects(void);
 void play_transition(s16 transType, s16 time, u8 red, u8 green, u8 blue);
 void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 blue, s16 delay);
 void render_game(void);
+
+#endif // AREA_H

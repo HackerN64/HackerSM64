@@ -84,21 +84,21 @@ void bhv_door_init(void) {
     f32 x = o->oPosX;
     f32 z = o->oPosZ;
     struct Surface *floor;
-    find_floor(x, o->oPosY, z, &floor);
+    find_room_floor(x, o->oPosY, z, &floor);
     if (floor != NULL) {
         o->oDoorSelfRoom = floor->room;
     }
 
     x = o->oPosX + sins(o->oMoveAngleYaw) * 200.0f;
     z = o->oPosZ + coss(o->oMoveAngleYaw) * 200.0f;
-    find_floor(x, o->oPosY, z, &floor);
+    find_room_floor(x, o->oPosY, z, &floor);
     if (floor != NULL) {
         o->oDoorForwardRoom = floor->room;
     }
 
     x = o->oPosX + sins(o->oMoveAngleYaw) * -200.0f;
     z = o->oPosZ + coss(o->oMoveAngleYaw) * -200.0f;
-    find_floor(x, o->oPosY, z, &floor);
+    find_room_floor(x, o->oPosY, z, &floor);
     if (floor != NULL) {
         o->oDoorBackwardRoom = floor->room;
     }

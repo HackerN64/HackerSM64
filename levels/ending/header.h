@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENDING_HEADER_H
+#define ENDING_HEADER_H
 
 #include "types.h"
 
@@ -18,3 +19,5 @@ extern const Gfx dl_cake_end_screen[];
 
 // script
 extern const LevelScript level_ending_entry[];
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CASTLE_GROUNDS_HEADER_H
+#define CASTLE_GROUNDS_HEADER_H
 
 #include "types.h"
 #include "game/moving_texture.h"
@@ -39,3 +40,5 @@ extern const Gfx castle_grounds_dl_waterfall[];
 
 // script
 extern const LevelScript level_castle_grounds_entry[];
+
+#endif

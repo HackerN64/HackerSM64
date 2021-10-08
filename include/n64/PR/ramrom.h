@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _RAMROM_H
+#define	_RAMROM_H
 
 /**************************************************************************
  *									  *
@@ -108,3 +109,5 @@ typedef struct {
 void __RamRomInit(int key, void *romaddr);
 void __RamRomDestroy(int key);
 #endif /* _EMULATOR */
+
+#endif /* !_RAMROM_H */

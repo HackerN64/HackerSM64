@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SAVE_FILE_H
+#define SAVE_FILE_H
 
 #include <PR/ultratypes.h>
 
@@ -193,3 +194,5 @@ enum EuLanguages {
 void eu_set_language(u16 language);
 u16 eu_get_language(void);
 #endif
+
+#endif // SAVE_FILE_H

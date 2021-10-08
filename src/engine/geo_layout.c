@@ -172,15 +172,9 @@ void geo_layout_cmd_update_node_flags(void) {
     u16 flagBits = cur_geo_cmd_s16(0x02);
 
     switch (operation) {
-        case GEO_CMD_FLAGS_RESET:
-            gCurGraphNodeList[gCurGraphNodeIndex]->flags = flagBits;
-            break;
-        case GEO_CMD_FLAGS_SET:
-            gCurGraphNodeList[gCurGraphNodeIndex]->flags |= flagBits;
-            break;
-        case GEO_CMD_FLAGS_CLEAR:
-            gCurGraphNodeList[gCurGraphNodeIndex]->flags &= ~flagBits;
-            break;
+        case GEO_CMD_FLAGS_RESET: gCurGraphNodeList[gCurGraphNodeIndex]->flags  =  flagBits; break;
+        case GEO_CMD_FLAGS_SET:   gCurGraphNodeList[gCurGraphNodeIndex]->flags |=  flagBits; break;
+        case GEO_CMD_FLAGS_CLEAR: gCurGraphNodeList[gCurGraphNodeIndex]->flags &= ~flagBits; break;
     }
 
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;

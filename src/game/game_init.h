@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAME_INIT_H
+#define GAME_INIT_H
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
@@ -8,7 +9,7 @@
 #include "types.h"
 #include "memory.h"
 
-#define GFX_POOL_SIZE 10000 // Size of how large the master display list (gDisplayListHead) can be
+#define GFX_POOL_SIZE 10000 // Size of how large the master display list (gDisplayListHead) can be. 6400 is vanilla
 
 struct GfxPool {
     Gfx buffer[GFX_POOL_SIZE];
@@ -88,3 +89,5 @@ void end_master_display_list(void);
 void render_init(void);
 void select_gfx_pool(void);
 void display_and_vsync(void);
+
+#endif // GAME_INIT_H

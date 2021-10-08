@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GROUP17_H
+#define GROUP17_H
 
 #include "types.h"
 
@@ -100,3 +101,5 @@ extern const Gfx swoop_seg6_dl_06006BD0[];
 extern const Gfx swoop_seg6_dl_06006CC8[];
 extern const Gfx swoop_seg6_dl_06006D00[];
 extern const struct Animation *const swoop_seg6_anims_060070D0[];
+
+#endif

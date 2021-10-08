@@ -179,7 +179,7 @@ struct SpawnParticlesInfo sMistParticles = { 2, 20, MODEL_MIST, 0, 40, 5, 30, 20
 // generate_wind_puffs/dust (something like that)
 void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
     sMistParticles.sizeBase = size;
-    sMistParticles.sizeRange = size / 20.0;
+    sMistParticles.sizeRange = size / 20.0f;
     sMistParticles.offsetY = offsetY;
     if (count == 0) {
         sMistParticles.count = 20;
@@ -217,12 +217,11 @@ void create_respawner(s32 model, const BehaviorScript *behToSpawn, s32 minSpawnD
 }
 
 // not sure what this is doing here. not in a behavior file.
-Gfx *geo_move_mario_part_from_parent(s32 run, UNUSED struct GraphNode *node, Mat4 mtx) {
+Gfx *geo_move_mario_part_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
     Mat4 mtx2;
-    struct Object *obj;
 
-    if (run == TRUE) {
-        obj = (struct Object *) gCurGraphNodeObject;
+    if (callContext == GEO_CONTEXT_RENDER) {
+        struct Object *obj = (struct Object *) gCurGraphNodeObject;
         if (obj == gMarioObject && obj->prevObj != NULL) {
             create_transformation_from_matrices(mtx2, mtx, *gCurGraphNodeCamera->matrixPtr);
             obj_update_pos_from_parent_transformation(mtx2, obj->prevObj);

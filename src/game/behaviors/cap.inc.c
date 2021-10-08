@@ -110,7 +110,7 @@ void bhv_wing_cap_init(void) {
 
 void cap_scale_vertically(void) {
     o->oCapScaleAngle += 0x2000;
-    o->header.gfx.scale[1] = coss(o->oCapScaleAngle) * 0.3 + 0.7;
+    o->header.gfx.scale[1] = coss(o->oCapScaleAngle) * 0.3f + 0.7f;
     if (o->oCapScaleAngle == 0x10000) {
         o->oCapScaleAngle = 0;
         o->oCapDoScaleVertically = 2;

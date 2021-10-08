@@ -27,7 +27,8 @@
         $Date: 1998/10/09 08:01:07 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_EXCEPTION_H_
+#define	_OS_EXCEPTION_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -114,3 +115,5 @@ extern OSIntMask	osSetIntMask(OSIntMask);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_EXCEPTION_H_ */

@@ -7,7 +7,8 @@
         $Date: 1998/12/21 07:30:15 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _LEO_H_
+#define _LEO_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -275,3 +276,5 @@ extern  void LeoBootGame(void *entry);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_LEO_H */

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GEO_COMMANDS_H
+#define GEO_COMMANDS_H
 
 #include "command_macros_base.h"
 
@@ -445,3 +446,5 @@
     CMD_BBH(GEO_BONE_ID, layer, 0x0000), \
     CMD_HHHHHH(tx, ty, tz, rx, ry, rz), \
     CMD_PTR(displayList)
+
+#endif // GEO_COMMANDS_H

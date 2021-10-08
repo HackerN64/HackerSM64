@@ -30,23 +30,20 @@ void bhv_small_bully_init(void) {
     o->oHomeX = o->oPosX;
     o->oHomeZ = o->oPosZ;
     o->oBehParams2ndByte = BULLY_BP_SIZE_SMALL;
-    o->oGravity = 4.0;
-    o->oFriction = 0.91;
-    o->oBuoyancy = 1.3;
+    o->oGravity  = 4.0f;
+    o->oFriction = 0.91f;
+    o->oBuoyancy = 1.3f;
 
     obj_set_hitbox(o, &sSmallBullyHitbox);
 }
 
 void bhv_big_bully_init(void) {
     cur_obj_init_animation(0);
-
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
     o->oBehParams2ndByte = BULLY_BP_SIZE_BIG;
-    o->oGravity = 5.0;
-    o->oFriction = 0.93;
-    o->oBuoyancy = 1.3;
+    o->oGravity  = 5.0f;
+    o->oFriction = 0.93f;
+    o->oBuoyancy = 1.3f;
 
     obj_set_hitbox(o, &sBigBullyHitbox);
 }
@@ -72,14 +69,14 @@ void bully_act_chase_mario(void) {
     f32 homeZ = o->oHomeZ;
 
     if (o->oTimer < 10) {
-        o->oForwardVel = 3.0;
+        o->oForwardVel = 3.0f;
         obj_turn_toward_object(o, gMarioObject, 16, 4096);
     } else if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL) {
-        o->oForwardVel = 20.0;
+        o->oForwardVel = 20.0f;
         if (o->oTimer >= 31)
             o->oTimer = 0;
     } else {
-        o->oForwardVel = 30.0;
+        o->oForwardVel = 30.0f;
         if (o->oTimer >= 36)
             o->oTimer = 0;
     }
@@ -91,8 +88,8 @@ void bully_act_chase_mario(void) {
 }
 
 void bully_act_knockback(void) {
-    if (o->oForwardVel < 10.0 && (s32) o->oVelY == 0) {
-        o->oForwardVel = 1.0;
+    if (o->oForwardVel < 10.0f && (s32) o->oVelY == 0) {
+        o->oForwardVel = 1.0f;
         o->oBullyKBTimerAndMinionKOCounter++;
         o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW; /* bit 3 */
         o->oMoveAngleYaw = o->oFaceAngleYaw;
@@ -113,7 +110,7 @@ void bully_act_back_up(void) {
         o->oMoveAngleYaw += 0x8000;
     }
 
-    o->oForwardVel = 5.0;
+    o->oForwardVel = 5.0f;
 
     //! bully_backup_check() happens after this function, and has the potential to reset
     //  the bully's action to BULLY_ACT_BACK_UP. Because the back up action is only
@@ -223,7 +220,7 @@ void bhv_bully_loop(void) {
 
     switch (o->oAction) {
         case BULLY_ACT_PATROL:
-            o->oForwardVel = 5.0;
+            o->oForwardVel = 5.0f;
 
             if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 800) == 1) {
                 o->oAction = BULLY_ACT_CHASE_MARIO;
@@ -297,7 +294,7 @@ void bhv_big_bully_with_minions_loop(void) {
 
     switch (o->oAction) {
         case BULLY_ACT_PATROL:
-            o->oForwardVel = 5.0;
+            o->oForwardVel = 5.0f;
 
             if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 1000) == 1) {
                 o->oAction = BULLY_ACT_CHASE_MARIO;

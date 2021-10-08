@@ -27,7 +27,8 @@
         $Date: 1998/10/09 08:01:15 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_MESSAGE_H_
+#define	_OS_MESSAGE_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -143,14 +144,14 @@ typedef struct OSMesgQueue_s {
 
 /* Message operations */
 
-extern void		osCreateMesgQueue(OSMesgQueue *, OSMesg *, s32);
-extern s32		osSendMesg(OSMesgQueue *, OSMesg, s32);
-extern s32		osJamMesg(OSMesgQueue *, OSMesg, s32);
-extern s32		osRecvMesg(OSMesgQueue *, OSMesg *, s32);
+extern void		osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 count);
+extern s32		osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
+extern s32		osJamMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
+extern s32		osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 
 /* Event operations */
 
-extern void		osSetEventMesg(OSEvent, OSMesgQueue *, OSMesg);
+extern void		osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg m);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */
@@ -158,3 +159,5 @@ extern void		osSetEventMesg(OSEvent, OSMesgQueue *, OSMesg);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_MESSAGE_H_ */

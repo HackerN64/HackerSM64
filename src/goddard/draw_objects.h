@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GD_DRAW_OBJECTS_H
+#define GD_DRAW_OBJECTS_H
 
 #include <PR/ultratypes.h>
 
@@ -45,3 +46,5 @@ void create_gddl_for_shapes(struct ObjGroup *grp);
 void map_face_materials(struct ObjGroup *faces, struct ObjGroup *mtls);
 void map_vertices(struct ObjGroup *facegrp, struct ObjGroup *vtxgrp);
 void update_view(struct ObjView *view);
+
+#endif // GD_DRAW_OBJECTS_H

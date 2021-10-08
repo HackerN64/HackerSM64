@@ -1,24 +1,24 @@
-#pragma once
-
 #ifdef PUPPYLIGHTS
+#ifndef PUPPYLIGHTS_H
+#define PUPPYLIGHTS_H
 
 #include "types.h"
 #include "command_macros_base.h"
 
-//The maximum number of lights that can be loaded at once. Any further lights that attempt to be created past this will simply not spawn.
+// The maximum number of lights that can be loaded at once. Any further lights that attempt to be created past this will simply not spawn.
 #define MAX_LIGHTS 32
-//The maximum number of dynamic lights available at one time.
+// The maximum number of dynamic lights available at one time.
 #define MAX_LIGHTS_DYNAMIC 8
 
-//Two shapes. Choose your destiny.
-#define PUPPYLIGHT_SHAPE_CUBE       0x1
-#define PUPPYLIGHT_SHAPE_CYLINDER   0x2
-#define PUPPYLIGHT_DYNAMIC          0x4
-#define PUPPYLIGHT_DIRECTIONAL      0x8
-#define PUPPYLIGHT_SHADOW           0x10
-#define PUPPYLIGHT_WET              0x20
-#define PUPPYLIGHT_DELETE           0x40
-#define PUPPYLIGHT_IGNORE_Y         0x80
+// Two shapes. Choose your destiny.
+#define PUPPYLIGHT_SHAPE_CUBE     (1 << 0) // 0x01
+#define PUPPYLIGHT_SHAPE_CYLINDER (1 << 1) // 0x02
+#define PUPPYLIGHT_DYNAMIC        (1 << 2) // 0x04
+#define PUPPYLIGHT_DIRECTIONAL    (1 << 3) // 0x08
+#define PUPPYLIGHT_SHADOW         (1 << 4) // 0x10
+#define PUPPYLIGHT_WET            (1 << 5) // 0x20
+#define PUPPYLIGHT_DELETE         (1 << 6) // 0x40
+#define PUPPYLIGHT_IGNORE_Y       (1 << 7) // 0x80
 
 #define LIGHTFLAG_DIRECTIONAL_OFFSET    0x1
 
@@ -53,4 +53,5 @@ extern void set_light_properties(struct PuppyLight *light, s32 x, s32 y, s32 z, 
 extern void puppylights_allocate(void);
 extern void delete_lights(void);
 
+#endif
 #endif

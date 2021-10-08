@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MACRO_SPECIAL_OBJECTS_H
+#define MACRO_SPECIAL_OBJECTS_H
 
 #include <PR/ultratypes.h>
 
@@ -16,3 +17,5 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList);
 #ifdef NO_SEGMENTED_MEMORY
 u32 get_special_objects_size(s16 *data);
 #endif
+
+#endif // MACRO_SPECIAL_OBJECTS_H

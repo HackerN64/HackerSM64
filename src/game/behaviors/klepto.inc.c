@@ -104,9 +104,9 @@ static void klepto_change_target(void) {
             dx = gMarioObject->oPosX - sKleptoTargetPositions[i][0];
             dz = gMarioObject->oPosZ - sKleptoTargetPositions[i][2];
 
-            targetDist = sqrtf(sqr(dx) + sqr(dz));
-            if (targetDist < minTargetDist) {
-                minTargetDist = targetDist;
+            targetDist = (sqr(dx) + sqr(dz));
+            if (targetDist < sqr(minTargetDist)) {
+                minTargetDist = sqrtf(targetDist);
                 newTarget = i;
             }
         }
@@ -114,7 +114,7 @@ static void klepto_change_target(void) {
         newTarget = random_u16() % 3;
     }
 
-    o->oKleptoHomeYOffset = 400 * absi(newTarget - o->oKleptoTargetNumber);
+    o->oKleptoHomeYOffset  = 400 * ABSI(newTarget - o->oKleptoTargetNumber);
     o->oKleptoTargetNumber = newTarget;
 
     o->oHomeX = sKleptoTargetPositions[o->oKleptoTargetNumber][0];

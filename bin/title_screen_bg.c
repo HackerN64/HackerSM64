@@ -139,13 +139,13 @@ const Gfx title_screen_bg_dl_face_easter_egg_end[] = {
     gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
     gsSPEndDisplayList(),
 };
-
-ALIGNED8 static const u8 title_texture_rumble_pak[] = {
-#include "textures/title_screen_bg/title_screen_bg.06648.rgba16.inc.c"
-};
 #endif
 
 #if ENABLE_RUMBLE
+ALIGNED8 static const Texture title_texture_rumble_pak[] = {
+#include "textures/title_screen_bg/title_screen_bg.06648.rgba16.inc.c"
+};
+
 const Gfx title_screen_bg_dl_rumble_pak[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_COPY),

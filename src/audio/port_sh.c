@@ -398,9 +398,8 @@ void func_802ad7ec(u32 arg0) {
                         }
                         break;
                     case 5:
-                        //! @bug u8 s8 comparison (but harmless)
-                        if (chan->reverbVol != cmd->u2.as_s8) {
-                            chan->reverbVol = cmd->u2.as_s8;
+                        if (chan->reverbVol != cmd->u2.as_u8) {
+                            chan->reverbVol = cmd->u2.as_u8;
                         }
                         break;
                     case 6:

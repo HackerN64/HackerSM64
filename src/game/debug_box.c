@@ -29,6 +29,7 @@
 #include "engine/surface_collision.h"
 #include "engine/surface_load.h"
 #include "object_list_processor.h"
+#include "behavior_data.h"
 
 #include "debug_box.h"
 
@@ -100,8 +101,8 @@ Gfx dl_debug_cylinder_verts[] = {
 	gsSPEndDisplayList(),
 };
 
-u8 hitboxView = 0;
-u8 surfaceView = 0;
+u8 hitboxView = FALSE;
+u8 surfaceView = FALSE;
 
 /**
  * Internal struct containing box info
@@ -189,22 +190,15 @@ static const Gfx dl_visual_surface[] = {
 
 u8 viewCycle = 0;
 
-//Puppyprint will call this from elsewhere.
-void debug_box_input(void)
-{
-    if (gPlayer1Controller->buttonPressed & R_JPAD)
-    {
+// Puppyprint will call this from elsewhere.
+void debug_box_input(void) {
+    if (gPlayer1Controller->buttonPressed & R_JPAD) {
         viewCycle++;
-        if (viewCycle > 3)
+        if (viewCycle > 3) {
             viewCycle = 0;
-
-        hitboxView = 0;
-        surfaceView = 0;
-
-        if (viewCycle == 1 || viewCycle == 3)
-            hitboxView = 1;
-        if (viewCycle == 2 || viewCycle == 3)
-            surfaceView = 1;
+        }
+        hitboxView  = (viewCycle == 1 || viewCycle == 3);
+        surfaceView = (viewCycle == 2 || viewCycle == 3);
     }
 }
 
@@ -213,11 +207,9 @@ s32 gVisualOffset;
 extern s32 gSurfaceNodesAllocated;
 extern s32 gSurfacesAllocated;
 
-void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts)
-{
+void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
     struct SurfaceNode *node;
     struct Surface *surf;
-    s32 cellX, cellZ;
     s32 i = 0;
     s32 col[3] = {0xFF, 0x00, 0x00};
 
@@ -228,31 +220,37 @@ void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts)
         return;
     }
 
-    cellX = ((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & NUM_CELLS_INDEX;
-    cellZ = ((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & NUM_CELLS_INDEX;
+    s32 cellX = GET_CELL_COORD(x);
+    s32 cellZ = GET_CELL_COORD(z);
 
-    for (i = 0; i < 8; i++)
-    {
-        switch (i)
-        {
-        case 0: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next; col[0] = 0x00; col[1] = 0xFF; col[2] = 0x00; break;
-        case 1: node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next; col[0] = 0x00; col[1] = 0xFF; col[2] = 0x00; break;
-        case 2: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next; col[0] = 0x00; col[1] = 0x00; col[2] = 0xFF; break;
-        case 3: node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next; col[0] = 0x00; col[1] = 0x00; col[2] = 0xFF; break;
-        case 4: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next; col[0] = 0xFF; col[1] = 0x00; col[2] = 0x00; break;
-        case 5: node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next; col[0] = 0xFF; col[1] = 0x00; col[2] = 0x00; break;
-        case 6: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER].next; col[0] = 0xFF; col[1] = 0xFF; col[2] = 0x00; break;
-        case 7: node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER].next; col[0] = 0xFF; col[1] = 0xFF; col[2] = 0x00; break;
+    for (i = 0; i < 8; i++) {
+        switch (i) {
+            case 0: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next; col[0] = 0x00; col[1] = 0xFF; col[2] = 0x00; break;
+            case 1: node =  gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next; col[0] = 0x00; col[1] = 0xFF; col[2] = 0x00; break;
+            case 2: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next; col[0] = 0x00; col[1] = 0x00; col[2] = 0xFF; break;
+            case 3: node =  gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next; col[0] = 0x00; col[1] = 0x00; col[2] = 0xFF; break;
+            case 4: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS ].next; col[0] = 0xFF; col[1] = 0x00; col[2] = 0x00; break;
+            case 5: node =  gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS ].next; col[0] = 0xFF; col[1] = 0x00; col[2] = 0x00; break;
+            case 6: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER ].next; col[0] = 0xFF; col[1] = 0xFF; col[2] = 0x00; break;
+            case 7: node =  gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER ].next; col[0] = 0xFF; col[1] = 0xFF; col[2] = 0x00; break;
         }
 
-        while (node != NULL)
-        {
+        while (node != NULL) {
             surf = node->surface;
             node = node->next;
 
-            make_vertex(verts, gVisualSurfaceCount, surf->vertex1[0], surf->vertex1[1], surf->vertex1[2], 0, 0, col[0], col[1], col[2], 0x80);
-            make_vertex(verts, gVisualSurfaceCount+1, surf->vertex2[0], surf->vertex2[1], surf->vertex2[2], 0, 0, col[0], col[1], col[2], 0x80);
-            make_vertex(verts, gVisualSurfaceCount+2, surf->vertex3[0], surf->vertex3[1], surf->vertex3[2], 0, 0, col[0], col[1], col[2], 0x80);
+            if (surf->type >= SURFACE_INSTANT_WARP_1B && surf->type <= SURFACE_INSTANT_WARP_1E)
+            {
+                make_vertex(verts, gVisualSurfaceCount, surf->vertex1[0], surf->vertex1[1], surf->vertex1[2], 0, 0, 0xFF, 0xA0, 0x00, 0x80);
+                make_vertex(verts, gVisualSurfaceCount+1, surf->vertex2[0], surf->vertex2[1], surf->vertex2[2], 0, 0, 0xFF, 0xA0, 0x00, 0x80);
+                make_vertex(verts, gVisualSurfaceCount+2, surf->vertex3[0], surf->vertex3[1], surf->vertex3[2], 0, 0, 0xFF, 0xA0, 0x00, 0x80);
+            }
+            else
+            {
+                make_vertex(verts, gVisualSurfaceCount, surf->vertex1[0], surf->vertex1[1], surf->vertex1[2], 0, 0, col[0], col[1], col[2], 0x80);
+                make_vertex(verts, gVisualSurfaceCount+1, surf->vertex2[0], surf->vertex2[1], surf->vertex2[2], 0, 0, col[0], col[1], col[2], 0x80);
+                make_vertex(verts, gVisualSurfaceCount+2, surf->vertex3[0], surf->vertex3[1], surf->vertex3[2], 0, 0, col[0], col[1], col[2], 0x80);
+            }
 
             gVisualSurfaceCount+=3;
         }
@@ -338,7 +336,6 @@ void visual_surface_display(Vtx *verts, s32 iteration)
 s32 iterate_surface_count(s32 x, s32 z)
 {
     struct SurfaceNode *node;
-    s32 cellX, cellZ;
     s32 i = 0;
     s32 j = 0;
     TerrainData *p = gEnvironmentRegions;
@@ -351,8 +348,8 @@ s32 iterate_surface_count(s32 x, s32 z)
         return 0;
     }
 
-    cellX = ((x + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & NUM_CELLS_INDEX;
-    cellZ = ((z + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & NUM_CELLS_INDEX;
+    s32 cellX = GET_CELL_COORD(x);
+    s32 cellZ = GET_CELL_COORD(z);
 
     for (i = 0; i < 8; i++)
     {

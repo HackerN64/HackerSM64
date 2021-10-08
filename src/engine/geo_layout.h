@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GEO_LAYOUT_H
+#define GEO_LAYOUT_H
 
 #include <PR/ultratypes.h>
 
@@ -76,3 +77,5 @@ void geo_layout_cmd_node_culling_radius(void);
 void geo_layout_cmd_bone(void);
 
 struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr);
+
+#endif // GEO_LAYOUT_H

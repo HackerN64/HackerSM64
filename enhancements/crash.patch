@@ -182,7 +182,6 @@ index 7d9b5b4a..c7bb81b9 100755
        BUILD_DIR/asm/decompress.o(.text);
 +      BUILD_DIR/asm/crash.o(.text);
        BUILD_DIR/src/game/camera.o(.text);
-       BUILD_DIR/src/game/debug_course.o(.text);
        BUILD_DIR/src/game/object_list_processor.o(.text);
 diff --git a/src/game/crash.c b/src/game/crash.c
 new file mode 100644

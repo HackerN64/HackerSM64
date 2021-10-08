@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BOWSER_2_HEADER_H
+#define BOWSER_2_HEADER_H
 
 #include "types.h"
 
@@ -15,3 +16,5 @@ extern const Collision bowser_2_seg7_collision_tilting_platform[];
 
 // script
 extern const LevelScript level_bowser_2_entry[];
+
+#endif

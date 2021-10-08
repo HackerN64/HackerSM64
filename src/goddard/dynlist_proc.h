@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GD_DYNLIST_PROCESSOR_H
+#define GD_DYNLIST_PROCESSOR_H
 
 #include <PR/ultratypes.h>
 
@@ -94,3 +95,5 @@ void d_set_i_matrix(Mat4f *src);
 Mat4f *d_get_matrix_ptr(void);
 Mat4f *d_get_i_mtx_ptr(void);
 f32 d_calc_world_dist_btwn(struct GdObj *obj1, struct GdObj *obj2);
+
+#endif // GD_DYNLIST_PROCESSOR_H

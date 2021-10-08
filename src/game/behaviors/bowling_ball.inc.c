@@ -88,8 +88,8 @@ void bhv_bowling_ball_roll_loop(void) {
 
     o->oBowlingBallTargetYaw = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oBowlingBallTargetYaw, 0x400);
-    if (o->oForwardVel > 70.0) {
-        o->oForwardVel = 70.0;
+    if (o->oForwardVel > 70.0f) {
+        o->oForwardVel = 70.0f;
     }
 
     bowling_ball_set_hitbox();
@@ -212,7 +212,7 @@ void bhv_thi_bowling_ball_spawner_loop(void) {
 
     if ((o->oTimer % 64) == 0) {
         if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 12000)) {
-            if ((s32)(random_float() * 1.5) == 0) {
+            if ((s32)(random_float() * 1.5f) == 0) {
                 bowlingBall = spawn_object(o, MODEL_BOWLING_BALL, bhvBowlingBall);
                 bowlingBall->oBehParams2ndByte = o->oBehParams2ndByte;
             }

@@ -16,7 +16,7 @@ void bhv_sunken_ship_part_loop(void) {
     if (o->oDistanceToMario > 10000.0f)
         o->oOpacity = 140;
     else
-        o->oOpacity = o->oDistanceToMario * 140.0f / 10000.0;
+        o->oOpacity = o->oDistanceToMario * 140.0f / 10000.0f;
     cur_obj_disable_rendering();
 }
 
@@ -65,12 +65,13 @@ void bhv_jrb_sliding_box_loop(void) {
     o->oJrbSlidingBoxAdditiveZ = sins(o->oJrbSlidingBoxAngle) * 20.0f;
     o->oJrbSlidingBoxAngle += 0x100;
     o->oParentRelativePosZ += o->oJrbSlidingBoxAdditiveZ;
-    if (gMarioObject->oPosY > 1000.0f)
-        if (absf(o->oJrbSlidingBoxAdditiveZ) > 3.0f)
-            cur_obj_play_sound_1(SOUND_AIR_ROUGH_SLIDE);
+    if ((gMarioObject->oPosY > 1000.0f) && (ABSF(o->oJrbSlidingBoxAdditiveZ) > 3.0f)) {
+        cur_obj_play_sound_1(SOUND_AIR_ROUGH_SLIDE);
+    }
     obj_set_hitbox(o, &sSkullSlidingBoxHitbox);
-    if (!(o->oJrbSlidingBoxAngle & 0x7FFF))
+    if (!(o->oJrbSlidingBoxAngle & 0x7FFF)) {
         cur_obj_become_tangible();
+    }
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
         o->oInteractStatus = 0;
         cur_obj_become_intangible();

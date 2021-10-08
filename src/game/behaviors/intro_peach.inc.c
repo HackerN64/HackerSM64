@@ -4,18 +4,17 @@
  * Set peach's location relative to the camera focus.
  * If nonzero, make peach's opacity approach targetOpacity by increment
  */
-void intro_peach_set_pos_and_opacity(struct Object *o, f32 targetOpacity, f32 increment) {
+void intro_peach_set_pos_and_opacity(struct Object *obj, f32 targetOpacity, f32 increment) {
     Vec3f newPos;
     s16 focusPitch, focusYaw;
-    f32 UNUSED dist, newOpacity;
 
-    vec3f_get_dist_and_angle(gLakituState.pos, gLakituState.focus, &dist, &focusPitch, &focusYaw);
-    vec3f_set_dist_and_angle(gLakituState.pos, newPos, o->oIntroPeachDistToCamera, o->oIntroPeachPitchFromFocus + focusPitch,
-                             o->oIntroPeachYawFromFocus + focusYaw);
-    vec3f_to_object_pos(o, newPos);
-    newOpacity = o->oOpacity;
+    vec3f_get_angle(gLakituState.pos, gLakituState.focus, &focusPitch, &focusYaw);
+    vec3f_set_dist_and_angle(gLakituState.pos, newPos, obj->oIntroPeachDistToCamera, obj->oIntroPeachPitchFromFocus + focusPitch,
+                             obj->oIntroPeachYawFromFocus + focusYaw);
+    vec3f_copy(&obj->oPosVec, newPos);
+    f32 newOpacity = obj->oOpacity;
     camera_approach_f32_symmetric_bool(&newOpacity, targetOpacity, increment);
-    o->oOpacity = newOpacity;
+    obj->oOpacity = newOpacity;
 }
 
 void bhv_intro_peach_loop(void) {

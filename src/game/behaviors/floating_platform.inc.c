@@ -31,7 +31,7 @@ void floating_platform_act_0(void) {
     } else {
         o->oFaceAnglePitch /= 2;
         o->oFaceAngleRoll /= 2;
-        o->oFloatingPlatformMarioWeightWobbleOffset -= 5.0;
+        o->oFloatingPlatformMarioWeightWobbleOffset -= 5.0f;
         o->oVelY = 10.0f;
         if (o->oFloatingPlatformMarioWeightWobbleOffset < 0.0f)
             o->oFloatingPlatformMarioWeightWobbleOffset = 0.0f;
@@ -45,10 +45,7 @@ void floating_platform_act_0(void) {
 
 void bhv_floating_platform_loop(void) {
     o->oHomeY = floating_platform_find_home_y();
-    if (o->oFloatingPlatformIsOnFloor == 0)
-        o->oAction = 0;
-    else
-        o->oAction = 1;
+    o->oAction = (o->oFloatingPlatformIsOnFloor ? 1 : 0);
 
     switch (o->oAction) {
         case 0:

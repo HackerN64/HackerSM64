@@ -7,7 +7,8 @@
  *
  **************************************************************************/
 
-#pragma once
+#ifndef _LEOSP_H_
+#define _LEOSP_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -45,3 +46,5 @@ extern  s32 LeoSysReadWrite(LEOCmd *cmdBlock, s32 direction,
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_LEOSP_H */

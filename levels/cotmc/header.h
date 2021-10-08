@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COTMC_HEADER_H
+#define COTMC_HEADER_H
 
 #include "types.h"
 
@@ -18,3 +19,5 @@ extern const Gfx cotmc_dl_water[];
 
 // script
 extern const LevelScript level_cotmc_entry[];
+
+#endif

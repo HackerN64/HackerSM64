@@ -1,6 +1,13 @@
 #pragma once
 
 /**
+ * Thank you to Kaze Emanuar for these major optimizations!
+ * https://www.youtube.com/watch?v=uYPH-NH3B6k
+ *
+ * If you are making a hack with this repo, it is recommended to credit Kaze Emanuar.
+ */
+
+/**
  * @file config.h
  * A catch-all file for configuring various bugfixes and other settings in SM64
  */
@@ -26,8 +33,14 @@
 #endif // TARGET_N64
 
 // -- GAME SETTINGS --
+// Disables some mechanics that change behavior depending on hardcoded level numbers.
+// You may also need to change sLevelsWithRooms in object_helpers.c
+// TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic
+// #define DISABLE_LEVEL_SPECIFIC_CHECKS
 // Disable lives and hide the lives counter
 #define DISABLE_LIVES
+// Air/Breath meter is separate from health meter when underwater
+//#define BREATH_METER
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
 #define X_COIN_STAR 100
 // Stars don't kick you out of the level
@@ -58,17 +71,22 @@
 #endif // DISABLE_EXIT_COURSE
 
 // -- MOVEMENT SETTINGS --
-// Change the movement speed when hanging from a ceiling (the vanilla value is 4.f)
-#define HANGING_SPEED 12.f
-// Makes Mario face the direction of the analog stick directly while hanging from a ceiling, without doing "semicircles"
-#define TIGHTER_HANGING_CONTROLS
 // Fixes Mario's turn radius by making it dependent on forward speed.
 // Modes:
 // 0 is vanilla behavior.
 // 1 is similar to vanilla, but prevents Mario from moving in the wrong direction, and allows finer control with the analog stick.
 // 2 is similar to mode 1, but a bit further from vanilla, and allows instant turnaround if Mario is moving slower than a certain threshold.
 // 3 is instant turning to the intended direction regardless of speed and angle.
-#define GROUND_TURN_MODE    0
+// 4 is an experimental asymptotic turn.
+#define GROUND_TURN_MODE 0
+// Improved hanging:
+// - Doesn't require holding down the A button
+// - Percise turning control ()
+// - Preventis falling from the edges
+// (Arceveti)
+#define BETTER_HANGING
+// Change the movement speed when hanging from a ceiling (the vanilla value is 4.0f, has no effect if BETTER_HANGING is enabled)
+#define HANGING_SPEED 12.0f
 // Disables fall damage
 #define NO_FALL_DAMAGE
 // Disables the scream that mario makes when falling off a great height (this is separate from actual fall damage)
@@ -87,8 +105,8 @@
 #define HANGING_FIX
 // The last frame that will be considered a firsty when wallkicking
 #define FIRSTY_LAST_FRAME 1
-// 46 degree walkicks
-//#define WALLKICKS_46_DEGREES
+// The maximum angle the player can wall kick, in degrees. 0..90. To allow 45 degree wall kicks, you must supply `46` to allow 45 and under.
+#define WALL_KICK_DEGREES 45
 // Disable BLJs and crush SimpleFlips's dreams
 //#define DISABLE_BLJ
 
@@ -112,6 +130,14 @@
 // -- SPECIFIC OBJECT SETTINGS --
 // Allow for retries on collecting the remaining blue coins from a blue coin switch
 #define BLUE_COIN_SWITCH_RETRY
+// Fixes shell cancel
+//#define SHELL_CANCEL_FIX
+// The number of chain balls the Chain Chomp has.  Vanilla is 5.
+#define CHAIN_CHOMP_NUM_SEGMENTS 5
+// The number of parts Pokey has, including the head. Vanilla is 5, max is 30.
+#define POKEY_NUM_SEGMENTS       5
+// The number of segments Wiggler has, not including the head. Vanilla is 4.
+#define WIGGLER_NUM_SEGMENTS     4
 
 // -- CUTSCENE SKIPS --
 // Skip peach letter cutscene
@@ -120,12 +146,10 @@
 //#define SKIP_TITLE_SCREEN
 // Uncomment this if you want to keep the mario head and not skip it
 //#define KEEP_MARIO_HEAD
-#ifdef KEEP_MARIO_HEAD // safeguard
-//Goddard easter egg from Shindou (has no effect if KEEP_MARIO_HEAD is disabled)
+// Goddard easter egg from Shindou (has no effect if KEEP_MARIO_HEAD is disabled)
 #define GODDARD_EASTER_EGG
 // Disables the demo that plays when idle on the start screen (has no effect if KEEP_MARIO_HEAD is disabled)
 #define DISABLE_DEMO
-#endif // KEEP_MARIO_HEAD
 
 // -- CAMERA SETTINGS --
 // Remove course specific camera processing
@@ -181,11 +205,17 @@
 // This allows you to quickly test the level you're working on.
 // If you want the game to boot normally, just comment out the define again.
 //#define TEST_LEVEL LEVEL_BOB
+// Enable debug level select
+//#define DEBUG_LEVEL_SELECT
+// Enable debug free move (DPad up to enter, A to exit)
+//#define ENABLE_DEBUG_FREE_MOVE
 // Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
 //#define CUSTOM_DEBUG
 // Include Puppyprint, a display library for text and large images. Also includes a custom, enhanced performance profiler.
-//#define PUPPYPRINT
-#define PUPPYPRINT_DEBUG 0
+#define PUPPYPRINT
+#define PUPPYPRINT_DEBUG 1
+// Use cycles instead of microseconds
+//#define PUPPYPRINT_DEBUG_CYCLES
 // Visual debug enables some collision visuals. Tapping Right on the dpad will cycle between visual hitboxes, visual surfaces, both, and neither.
 // If puppyprint is enabled, then this can be cycled only while the screen is active.
 //#define VISUAL_DEBUG
@@ -193,3 +223,9 @@
 //#define UNLOCK_ALL
 
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
+
+// -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
+#ifndef KEEP_MARIO_HEAD
+#undef GODDARD_EASTER_EGG
+#define DISABLE_DEMO
+#endif

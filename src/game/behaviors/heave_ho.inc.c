@@ -46,8 +46,8 @@ void heave_ho_act_2(void) {
         o->oAngleToMario = cur_obj_angle_to_home();
     if (o->oTimer > 150) {
         o->oHeaveHoTimedSpeed = (302 - o->oTimer) / 152.0f;
-        if (o->oHeaveHoTimedSpeed < 0.1) {
-            o->oHeaveHoTimedSpeed = 0.1;
+        if (o->oHeaveHoTimedSpeed < 0.1f) {
+            o->oHeaveHoTimedSpeed = 0.1f;
             o->oAction = 1;
         }
     } else

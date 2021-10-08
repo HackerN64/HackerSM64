@@ -94,8 +94,9 @@ void opened_cannon_act_2(void) {
 }
 
 void opened_cannon_act_3(void) {
-    if (o->oTimer > 3)
+    if (o->oTimer > 3) {
         o->oAction = 0;
+    }
 }
 
 void (*sOpenedCannonActions[])(void) = { opened_cannon_act_0, opened_cannon_act_1, opened_cannon_act_2,
@@ -104,8 +105,9 @@ void (*sOpenedCannonActions[])(void) = { opened_cannon_act_0, opened_cannon_act_
 
 void bhv_cannon_base_loop(void) {
     cur_obj_call_action_function(sOpenedCannonActions);
-    if (o->oCannonTimeSinceActivated)
+    if (o->oCannonTimeSinceActivated) {
         o->oCannonTimeSinceActivated++;
+    }
     o->oInteractStatus = 0;
 }
 
@@ -116,6 +118,7 @@ void bhv_cannon_barrel_loop(void) {
         obj_copy_pos(o, o->parentObj);
         o->oMoveAngleYaw = o->parentObj->oMoveAngleYaw;
         o->oFaceAnglePitch = o->parentObj->oMoveAnglePitch;
-    } else
+    } else {
         cur_obj_disable_rendering();
+    }
 }

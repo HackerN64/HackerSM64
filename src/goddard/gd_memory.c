@@ -20,10 +20,10 @@ static struct GMemBlock *sUsedBlockListHead;
 static struct GMemBlock *sEmptyBlockListHead;
 
 /* Forward Declarations */
-void empty_mem_block(struct GMemBlock *);
-struct GMemBlock *into_free_memblock(struct GMemBlock *);
-struct GMemBlock *make_mem_block(u32, u8);
-u32 print_list_stats(struct GMemBlock *, s32, s32);
+void empty_mem_block(struct GMemBlock *block);
+struct GMemBlock *into_free_memblock(struct GMemBlock *block);
+struct GMemBlock *make_mem_block(u32 blockType, u8 permFlag);
+u32 print_list_stats(struct GMemBlock *block, s32 printBlockInfo, s32 permanence);
 
 /**
  * Empty a `GMemBlock` into a default state. This empty block

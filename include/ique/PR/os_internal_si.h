@@ -18,7 +18,8 @@
         $Date: 2002/05/02 03:28:25 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_INTERNAL_SI_H_
+#define	_OS_INTERNAL_SI_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -41,3 +42,5 @@ extern s32		__osSiRawStartDma(s32, void *);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_INTERNAL_SI_H */

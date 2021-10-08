@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GD_RENDERER_H
+#define GD_RENDERER_H
 
 #include <PR/ultratypes.h>
 #include <PR/os_cont.h>
@@ -89,7 +90,7 @@ void set_light_id(s32 index);
 void set_light_num(s32 n);
 s32 create_mtl_gddl(s32 mtlType);
 void branch_to_gddl(s32 dlNum);
-void gd_dl_hilite(s32, struct ObjCamera *, struct GdVec3f *, struct GdVec3f *, struct GdVec3f *, struct GdColour *);
+void gd_dl_hilite(s32, struct ObjCamera *cam, struct GdVec3f *arg2, struct GdVec3f *arg3, struct GdVec3f *arg4, struct GdColour *colour);
 void gd_dl_hilite(s32 idx, struct ObjCamera *cam, UNUSED struct GdVec3f *arg2, UNUSED struct GdVec3f *arg3,
                    struct GdVec3f *arg4, struct GdColour *colour);
 s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material);
@@ -119,3 +120,5 @@ void store_in_pickbuf(s16 data);
 s32 get_cur_pickbuf_offset(UNUSED s16 *arg0);
 void set_vtx_tc_buf(f32 tcS, f32 tcT);
 struct GdObj *load_dynlist(struct DynList *dynlist);
+
+#endif // GD_RENDERER_H

@@ -182,7 +182,7 @@ static void mr_blizzard_act_rotate(void) {
         // If Dizziness is not 0 and Mr. Blizzard's FaceRollAngle has a magnitude greater than
         // 67.5 degrees move to death action, delete the snowball, and make Mr. Blizzard intangible.
         if (o->oMrBlizzardDizziness != 0.0f) {
-            if (absi(o->oFaceAngleRoll) > 0x3000) {
+            if (ABSI(o->oFaceAngleRoll) > 0x3000) {
                 o->oAction = MR_BLIZZARD_ACT_DEATH;
                 o->prevObj = o->oMrBlizzardHeldObj = NULL;
                 cur_obj_become_intangible();
@@ -249,7 +249,7 @@ static void mr_blizzard_act_death(void) {
                 o->oMrBlizzardScale = 0.0f;
                 if (!(o->oBehParams & 0x0000FF00)) {
                     obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);
-                    set_object_respawn_info_bits(o, 1);
+                    set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_32);
                 }
             }
             // Reset Mr. Blizzard if Mario leaves its radius.

@@ -18,7 +18,7 @@ void bhv_bowser_key_unlock_door_loop(void) {
     else if (animTimer < 49)
         o->oBowserKeyScale = 0.2f;
     else if (animTimer < 58)
-        o->oBowserKeyScale = (animTimer - 53) * 0.11875f + 0.2; // 0.11875?
+        o->oBowserKeyScale = (animTimer - 53) * 0.11875f + 0.2f; // 0.11875f?
     else if (animTimer < 59)
         o->oBowserKeyScale = 1.1f;
     else if (animTimer < 60)
@@ -35,11 +35,11 @@ void bhv_bowser_key_course_exit_loop(void) {
     if (animTimer < 38)
         o->oBowserKeyScale = 0.2f;
     else if (animTimer < 52)
-        o->oBowserKeyScale = (animTimer - 42) * 0.042857f + 0.2; // TODO 3/70?
+        o->oBowserKeyScale = (animTimer - 42) * (3.0f / 70.0f) + 0.2f;
     else if (animTimer < 94)
         o->oBowserKeyScale = 0.8f;
     else if (animTimer < 101)
-        o->oBowserKeyScale = (101 - animTimer) * 0.085714f + 0.2; // TODO 6/70?
+        o->oBowserKeyScale = (101 - animTimer) * (6.0f / 70.0f) + 0.2f;
     else
         o->oBowserKeyScale = 0.2f;
     if (o->oTimer > 138)

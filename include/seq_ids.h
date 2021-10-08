@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SEQ_IDS_H
+#define SEQ_IDS_H
 
 // Sometimes a sequence id is represented as one of the below ids (the base id),
 // optionally OR'd with SEQ_VARIATION.
@@ -45,3 +46,5 @@ enum SeqId {
     SEQ_EVENT_CUTSCENE_LAKITU,        // 0x22 (not in JP)
     SEQ_COUNT
 };
+
+#endif // SEQ_IDS_H

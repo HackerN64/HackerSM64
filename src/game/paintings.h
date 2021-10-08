@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PAINTINGS_H
+#define PAINTINGS_H
 
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
@@ -136,3 +137,5 @@ extern s8 gDddPaintingStatus;
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
 Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 c);
+
+#endif // PAINTINGS_H

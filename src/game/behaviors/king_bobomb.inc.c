@@ -198,7 +198,7 @@ void king_bobomb_act_5(void) { // bobomb returns home
             if (o->oPosY < o->oHomeY)
                 o->oVelY = 100.0f;
             else {
-                arc_to_goal_pos(&o->oHomeX, &o->oPosX, 100.0f, -4.0f);
+                arc_to_goal_pos(&o->oHomeX, &o->oPosVec, 100.0f, -4.0f);
                 o->oSubAction++;
             }
             break;

@@ -2,10 +2,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#if defined(VERSION_JP) || defined(VERSION_US)
-#include "prevent_bss_reordering.h"
-#endif
-
 #include "debug_utils.h"
 #include "draw_objects.h"
 #include "dynlist_proc.h"
@@ -665,7 +661,7 @@ static Gfx gd_dl_rdp_init[] = {
     gsSPEndDisplayList(),
 };
 
-float sGdPerspTimer = 1.0;
+float sGdPerspTimer = 1.0f;
 
 UNUSED static Gfx gd_texture4_dummy_aligner1[] = {
     gsDPPipeSync(),
@@ -690,15 +686,15 @@ extern u8 _gd_dynlistsSegmentRomStart[];
 extern u8 _gd_dynlistsSegmentRomEnd[];
 
 // forward declarations
-u32 new_gddl_from(Gfx *, s32);
-void gd_setup_cursor(struct ObjGroup *);
+u32 new_gddl_from(Gfx *dl, s32 arg1);
+void gd_setup_cursor(struct ObjGroup *parentgrp);
 void parse_p1_controller(void);
 void update_cursor(void);
-void update_view_and_dl(struct ObjView *);
+void update_view_and_dl(struct ObjView *view);
 static void update_render_mode(void);
-void gddl_is_loading_shine_dl(s32);
-void func_801A3370(f32, f32, f32);
-void gd_put_sprite(u16 *, s32, s32, s32, s32);
+void gddl_is_loading_shine_dl(s32 dlLoad);
+void func_801A3370(f32 x, f32 y, f32 z);
+void gd_put_sprite(u16 *sprite, s32 x, s32 y, s32 wx, s32 wy);
 void reset_cur_dl_indices(void);
 
 // TODO: make a gddl_num_t?
@@ -858,7 +854,6 @@ void gd_printf(const char *format, ...) {
                         csr++;
                         *csr = '\0';
                         break;
-                        break; // needed to match
                     case 'f':
                         val.f = (f32) va_arg(args, double);
                         csr = sprint_val_withspecifiers(csr, val, spec);
@@ -963,16 +958,6 @@ void *gd_malloc_perm(u32 size) {
 /* 24A420 -> 24A458; orig name: func_8019BC50 */
 void *gd_malloc_temp(u32 size) {
     return gd_malloc(size, TEMP_G_MEM_BLOCK);
-}
-
-/* 24A458 -> 24A4A4 */
-void *Unknown8019BC88(u32 size, u32 count) {
-    return gd_malloc_perm(size * count);
-}
-
-/* 24A4A4 -> 24A4DC */
-void *Unknown8019BCD4(u32 size) {
-    return gd_malloc_perm(size);
 }
 
 /* 24A4DC -> 24A598 */
@@ -1979,8 +1964,8 @@ void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
     sp40.y = cam->unkE8[1][2] + arg4->y;
     sp40.x = cam->unkE8[2][2] + arg4->z;
     sp3C = sqrtf(SQ(sp40.z) + SQ(sp40.y) + SQ(sp40.x));
-    if (sp3C > 0.1) {
-        sp3C = 1.0 / sp3C; //? 1.0f
+    if (sp3C > 0.1f) {
+        sp3C = 1.0f / sp3C;
         sp40.z *= sp3C;
         sp40.y *= sp3C;
         sp40.x *= sp3C;
@@ -2362,10 +2347,10 @@ void parse_p1_controller(void) {
 
     // deadzone checks
     if (ABS(gdctrl->stickX) >= 6) {
-        gdctrl->csrX += gdctrl->stickX * 0.1;
+        gdctrl->csrX += gdctrl->stickX * 0.1f;
     }
     if (ABS(gdctrl->stickY) >= 6) {
-        gdctrl->csrY -= gdctrl->stickY * 0.1;
+        gdctrl->csrY -= gdctrl->stickY * 0.1f;
     }
 
     // clamp cursor position within screen view bounds
@@ -2549,7 +2534,7 @@ void gd_create_perspective_matrix(f32 fovy, f32 aspect, f32 near, f32 far) {
     uintptr_t perspecMtx;
     uintptr_t rotMtx;
 
-    sGdPerspTimer += 0.1;
+    sGdPerspTimer += 0.1f;
     guPerspective(&DL_CURRENT_MTX(sCurrentGdDl), &perspNorm, fovy, aspect, near, far, 1.0f);
 
     gSPPerspNormalize(next_gfx(), perspNorm);
@@ -2969,7 +2954,7 @@ void add_debug_view(struct ObjView *view) {
 union ObjVarVal *cvrt_val_to_kb(union ObjVarVal *dst, union ObjVarVal src) {
     union ObjVarVal temp;
 
-    temp.f = src.f / 1024.0; //? 1024.0f
+    temp.f = src.f / 1024.0f;
     return (*dst = temp, dst);
 }
 

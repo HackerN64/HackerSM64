@@ -87,8 +87,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     if (nextPos[1] >= floorHeight) {
         if (ceilHeight - nextPos[1] >= 160.0f) {
             vec3f_copy(m->pos, nextPos);
-            m->floor = floor;
-            m->floorHeight = floorHeight;
+            set_mario_floor(m, floor, floorHeight);
 
             if (wall != NULL) {
                 return WATER_STEP_HIT_WALL;
@@ -103,8 +102,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
 
         //! Water ceiling downwarp
         vec3f_set(m->pos, nextPos[0], ceilHeight - 160.0f, nextPos[2]);
-        m->floor = floor;
-        m->floorHeight = floorHeight;
+        set_mario_floor(m, floor, floorHeight);
         return WATER_STEP_HIT_CEILING;
     } else {
         if (ceilHeight - floorHeight < 160.0f) {
@@ -112,8 +110,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
         }
 
         vec3f_set(m->pos, nextPos[0], floorHeight, nextPos[2]);
-        m->floor = floor;
-        m->floorHeight = floorHeight;
+        set_mario_floor(m, floor, floorHeight);
         return WATER_STEP_HIT_FLOOR;
     }
 }
@@ -140,7 +137,7 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
             f32 dz = whirlpool->pos[2] - m->pos[2];
 
             f32 lateralDist = sqrtf(sqr(dx) + sqr(dz));
-            f32 distance = sqrtf(lateralDist * lateralDist + sqr(dy));
+            f32 distance = sqrtf(sqr(lateralDist) + sqr(dy));
 
             s16 pitchToWhirlpool = atan2s(lateralDist, dy);
             s16 yawToWhirlpool = atan2s(dz, dx);
@@ -148,10 +145,11 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
             yawToWhirlpool -= (s16)(0x2000 * 1000.0f / (distance + 1000.0f));
 
             if (whirlpool->strength >= 0) {
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
                 if (gCurrLevelNum == LEVEL_DDD && gCurrAreaIndex == 2) {
                     whirlpoolRadius = 4000.0f;
                 }
-
+#endif
                 if (distance >= 26.0f && distance < whirlpoolRadius) {
                     strength = whirlpool->strength * (1.0f - distance / whirlpoolRadius);
                 }
@@ -485,9 +483,9 @@ static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
 
 static void play_swimming_noise(struct MarioState *m) {
     s16 animFrame = m->marioObj->header.gfx.animInfo.animFrame;
-
-    // This must be one line to match on -O2
-    if (animFrame == 0 || animFrame == 12) play_sound(SOUND_ACTION_UNKNOWN434, m->marioObj->header.gfx.cameraToObject);
+    if (animFrame == 0 || animFrame == 12) {
+        play_sound(SOUND_ACTION_UNKNOWN434, m->marioObj->header.gfx.cameraToObject);
+    }
 }
 
 static s32 check_water_jump(struct MarioState *m) {
@@ -495,7 +493,7 @@ static s32 check_water_jump(struct MarioState *m) {
 
     if (m->input & INPUT_A_PRESSED) {
         if (probe >= m->waterLevel - 80 && m->faceAngle[0] >= 0 && m->controller->stickY < -60.0f) {
-            vec3s_set(m->angleVel, 0, 0, 0);
+            vec3_zero(m->angleVel);
 
             m->vel[1] = 62.0f;
 
@@ -1242,7 +1240,7 @@ static s32 act_metal_water_walking(struct MarioState *m) {
         return set_mario_action(m, ACT_METAL_WATER_JUMP, 0);
     }
 
-    if (m->input & INPUT_UNKNOWN_5) {
+    if (m->input & INPUT_IDLE) {
         return set_mario_action(m, ACT_METAL_WATER_STANDING, 0);
     }
 
@@ -1282,7 +1280,7 @@ static s32 act_hold_metal_water_walking(struct MarioState *m) {
         return set_mario_action(m, ACT_HOLD_METAL_WATER_JUMP, 0);
     }
 
-    if (m->input & INPUT_UNKNOWN_5) {
+    if (m->input & INPUT_IDLE) {
         return set_mario_action(m, ACT_HOLD_METAL_WATER_STANDING, 0);
     }
 

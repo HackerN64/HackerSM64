@@ -521,9 +521,7 @@ void imout(void) {
  * TODO: figure out type of rng generator?
  */
 f32 gd_rand_float(void) {
-    u32 temp;
     u32 i;
-    f32 val;
 
     for (i = 0; i < 4; i++) {
         if (sPrimarySeed & 0x80000000) {
@@ -536,14 +534,12 @@ f32 gd_rand_float(void) {
 
     /* Seed Switch */
     if ((sPrimarySeed ^= gd_get_ostime()) & 1) {
-        temp = sPrimarySeed;
+        u32 temp = sPrimarySeed;
         sPrimarySeed = sSecondarySeed;
         sSecondarySeed = temp;
     }
 
-    val = (sPrimarySeed & 0xFFFF) / 65535.0; // 65535.0f
-
-    return val;
+    return (sPrimarySeed & 0xFFFF) / 65535.0f;
 }
 
 /**

@@ -9,7 +9,6 @@
 #include "main.h"
 #include "paintings.h"
 #include "print.h"
-#include "profiler.h"
 #include "save_file.h"
 #include "seq_ids.h"
 #include "sm64.h"
@@ -19,7 +18,6 @@
 
 #define MUSIC_NONE 0xFFFF
 
-static Vec3f unused80339DC0;
 static OSMesgQueue sSoundMesgQueue;
 static OSMesg sSoundMesgBuf[1];
 static struct VblankHandler sSoundVblankHandler;
@@ -32,7 +30,6 @@ static u16 sCurrentMusic = MUSIC_NONE;
 static u16 sCurrentShellMusic = MUSIC_NONE;
 static u16 sCurrentCapMusic = MUSIC_NONE;
 static u8 sPlayingInfiniteStairs = FALSE;
-UNUSED static u8 unused8032C6D8[16] = { 0 };
 static s16 sSoundMenuModeToSoundMode[] = { SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET };
 // Only the 20th array element is used.
 static u32 sMenuSoundsExtra[] = {
@@ -118,7 +115,7 @@ void raise_background_noise(s32 a) {
  * Called from threads: thread5_game_loop
  */
 void disable_background_sound(void) {
-    if (sBgMusicDisabled == FALSE) {
+    if (!sBgMusicDisabled) {
         sBgMusicDisabled = TRUE;
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_BACKGROUND);
     }
@@ -128,7 +125,7 @@ void disable_background_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void enable_background_sound(void) {
-    if (sBgMusicDisabled == TRUE) {
+    if (sBgMusicDisabled) {
         sBgMusicDisabled = FALSE;
         sound_banks_enable(SEQ_PLAYER_SFX, SOUND_BANKS_BACKGROUND);
     }
@@ -336,54 +333,45 @@ void audio_game_loop_tick(void) {
 void thread4_sound(UNUSED void *arg) {
     audio_init();
     sound_init();
-    #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
     OSTime lastTime;
-    #endif
-
-    // Zero-out unused vector
-    vec3f_copy(unused80339DC0, gVec3fZero);
+#endif
 
     osCreateMesgQueue(&sSoundMesgQueue, sSoundMesgBuf, ARRAY_COUNT(sSoundMesgBuf));
     set_vblank_handler(1, &sSoundVblankHandler, &sSoundMesgQueue, (OSMesg) 512);
 
-    while (TRUE)
-    {
+    while (TRUE) {
         OSMesg msg;
 
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
-        #if PUPPYPRINT_DEBUG
-        while (TRUE)
-        {
+#if PUPPYPRINT_DEBUG
+        while (TRUE) {
             lastTime = osGetTime();
             dmaAudioTime[perfIteration] = 0;
-            #endif
+#endif
             if (gResetTimer < 25) {
                 struct SPTask *spTask;
-                profiler_log_thread4_time();
                 spTask = create_next_audio_frame_task();
                 if (spTask != NULL) {
                     dispatch_audio_sptask(spTask);
                 }
-                profiler_log_thread4_time();
-                #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
                 profiler_update(audioTime, lastTime);
                 audioTime[perfIteration] -= dmaAudioTime[perfIteration];
-                if (benchmarkLoop > 0 && benchOption == 1)
-                {
+                if (benchmarkLoop > 0 && benchOption == 1) {
                     benchmarkLoop--;
                     benchMark[benchmarkLoop] = osGetTime() - lastTime;
-                    if (benchmarkLoop == 0)
-                    {
+                    if (benchmarkLoop == 0) {
                         puppyprint_profiler_finished();
                         break;
                     }
-                }
-                else
+                } else {
                     break;
-                #endif
+                }
+#endif
             }
-        #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
         }
-        #endif
+#endif
     }
 }

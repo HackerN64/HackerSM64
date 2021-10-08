@@ -8,7 +8,6 @@
 #include "game/game_init.h"
 #include "game/memory.h"
 #include "game/sound_init.h"
-#include "game/profiler.h"
 #include "buffers/buffers.h"
 #include "segments.h"
 #include "game/main.h"
@@ -67,29 +66,20 @@ s8 sAudioEnabled = TRUE;
 u32 gNumVblanks = 0;
 s8 gResetTimer = 0;
 s8 gNmiResetBarsTimer = 0;
+#ifdef DEBUG_LEVEL_SELECT
+s8 gDebugLevelSelect = TRUE;
+#else
 s8 gDebugLevelSelect = FALSE;
+#endif
 
-s8 gShowProfiler = FALSE;
 s8 gShowDebugText = FALSE;
 
 // unused
 void handle_debug_key_sequences(void) {
-    static u16 sProfilerKeySequence[] = {
-        U_JPAD, U_JPAD, D_JPAD, D_JPAD, L_JPAD, R_JPAD, L_JPAD, R_JPAD
-    };
     static u16 sDebugTextKeySequence[] = { D_JPAD, D_JPAD, U_JPAD, U_JPAD,
                                            L_JPAD, R_JPAD, L_JPAD, R_JPAD };
-    static s16 sProfilerKey = 0;
     static s16 sDebugTextKey = 0;
     if (gPlayer3Controller->buttonPressed != 0) {
-        if (sProfilerKeySequence[sProfilerKey++] == gPlayer3Controller->buttonPressed) {
-            if (sProfilerKey == ARRAY_COUNT(sProfilerKeySequence)) {
-                sProfilerKey = 0, gShowProfiler ^= 1;
-            }
-        } else {
-            sProfilerKey = 0;
-        }
-
         if (sDebugTextKeySequence[sDebugTextKey++] == gPlayer3Controller->buttonPressed) {
             if (sDebugTextKey == ARRAY_COUNT(sDebugTextKeySequence)) {
                 sDebugTextKey = 0, gShowDebugText ^= 1;
@@ -152,12 +142,8 @@ void receive_new_tasks(void) {
     while (osRecvMesg(&gSPTaskMesgQueue, (OSMesg *) &spTask, OS_MESG_NOBLOCK) != -1) {
         spTask->state = SPTASK_STATE_NOT_STARTED;
         switch (spTask->task.t.type) {
-            case 2:
-                sNextAudioSPTask = spTask;
-                break;
-            case 1:
-                sNextDisplaySPTask = spTask;
-                break;
+            case 2:   sNextAudioSPTask = spTask; break;
+            case 1: sNextDisplaySPTask = spTask; break;
         }
     }
 
@@ -173,8 +159,6 @@ void receive_new_tasks(void) {
 }
 
 void start_sptask(s32 taskType) {
-    UNUSED s32 pad; // needed to pad the stack
-
     if (taskType == M_AUDTASK) {
         gActiveSPTask = sCurrentAudioSPTask;
     } else {
@@ -196,10 +180,9 @@ void interrupt_gfx_sptask(void) {
 void start_gfx_sptask(void) {
     if (gActiveSPTask == NULL && sCurrentDisplaySPTask != NULL
         && sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED) {
-        profiler_log_gfx_time(TASKS_QUEUED);
-        #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
         rspDelta = osGetTime();
-        #endif
+#endif
         start_sptask(M_GFXTASK);
     }
 }
@@ -228,7 +211,6 @@ void handle_vblank(void) {
         if (gActiveSPTask != NULL) {
             interrupt_gfx_sptask();
         } else {
-            profiler_log_vblank_time();
             if (sAudioEnabled) {
                 start_sptask(M_AUDTASK);
             } else {
@@ -238,10 +220,9 @@ void handle_vblank(void) {
     } else {
         if (gActiveSPTask == NULL && sCurrentDisplaySPTask != NULL
             && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
-            profiler_log_gfx_time(TASKS_QUEUED);
-            #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
             rspDelta = osGetTime();
-            #endif
+#endif
             start_sptask(M_GFXTASK);
         }
     }
@@ -250,15 +231,9 @@ void handle_vblank(void) {
 #endif
 
     // Notify the game loop about the vblank.
-    if (gVblankHandler1 != NULL) {
-        osSendMesg(gVblankHandler1->queue, gVblankHandler1->msg, OS_MESG_NOBLOCK);
-    }
-    if (gVblankHandler2 != NULL) {
-        osSendMesg(gVblankHandler2->queue, gVblankHandler2->msg, OS_MESG_NOBLOCK);
-    }
-    if (gVblankHandler3 != NULL) {
-        osSendMesg(gVblankHandler3->queue, gVblankHandler3->msg, OS_MESG_NOBLOCK);
-    }
+    if (gVblankHandler1 != NULL) osSendMesg(gVblankHandler1->queue, gVblankHandler1->msg, OS_MESG_NOBLOCK);
+    if (gVblankHandler2 != NULL) osSendMesg(gVblankHandler2->queue, gVblankHandler2->msg, OS_MESG_NOBLOCK);
+    if (gVblankHandler3 != NULL) osSendMesg(gVblankHandler3->queue, gVblankHandler3->msg, OS_MESG_NOBLOCK);
 }
 
 void handle_sp_complete(void) {
@@ -277,11 +252,9 @@ void handle_sp_complete(void) {
             #if PUPPYPRINT_DEBUG
             profiler_update(rspGenTime, rspDelta);
             #endif
-            profiler_log_gfx_time(RSP_COMPLETE);
         }
 
         // Start the audio task, as expected by handle_vblank.
-        profiler_log_vblank_time();
         if (sAudioEnabled) {
             start_sptask(M_AUDTASK);
         } else {
@@ -291,12 +264,8 @@ void handle_sp_complete(void) {
         curSPTask->state = SPTASK_STATE_FINISHED;
         if (curSPTask->task.t.type == M_AUDTASK) {
             // After audio tasks come gfx tasks.
-            profiler_log_vblank_time();
             if (sCurrentDisplaySPTask != NULL
                 && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
-                if (sCurrentDisplaySPTask->state != SPTASK_STATE_INTERRUPTED) {
-                    profiler_log_gfx_time(TASKS_QUEUED);
-                }
                 start_sptask(M_GFXTASK);
             }
             sCurrentAudioSPTask = NULL;
@@ -307,10 +276,9 @@ void handle_sp_complete(void) {
             // The SP process is done, but there is still a Display Processor notification
             // that needs to arrive before we can consider the task completely finished and
             // null out sCurrentDisplaySPTask. That happens in handle_dp_complete.
-            #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
             profiler_update(rspGenTime, rspDelta);
-            #endif
-            profiler_log_gfx_time(RSP_COMPLETE);
+#endif
         }
     }
 }
@@ -320,7 +288,6 @@ void handle_dp_complete(void) {
     if (sCurrentDisplaySPTask->msgqueue != NULL) {
         osSendMesg(sCurrentDisplaySPTask->msgqueue, sCurrentDisplaySPTask->msg, OS_MESG_NOBLOCK);
     }
-    profiler_log_gfx_time(RDP_COMPLETE);
     sCurrentDisplaySPTask->state = SPTASK_STATE_FINISHED_DP;
     sCurrentDisplaySPTask = NULL;
 }
@@ -346,10 +313,10 @@ void thread3_main(UNUSED void *arg) {
     osSyncPrintf("Linker  : %s\n", __linker__);
 #endif
 
-    create_thread(&gSoundThread, 4, thread4_sound, NULL, gThread4Stack + 0x2000, 20);
+    create_thread(&gSoundThread, 4, thread4_sound, NULL, (gThread4Stack + 0x2000), 20);
     osStartThread(&gSoundThread);
 
-    create_thread(&gGameLoopThread, 5, thread5_game_loop, NULL, gThread5Stack + 0x2000, 10);
+    create_thread(&gGameLoopThread, 5, thread5_game_loop, NULL, (gThread5Stack + 0x2000), 10);
     osStartThread(&gGameLoopThread);
 
     create_thread(&gLoadThread, 7, thread7_load, NULL, gThread7Stack + 0x1000, 1);
@@ -360,24 +327,13 @@ void thread3_main(UNUSED void *arg) {
 #if PUPPYPRINT_DEBUG
         OSTime first = osGetTime();
 #endif
-
         osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
         switch ((uintptr_t) msg) {
-            case MESG_VI_VBLANK:
-                handle_vblank();
-                break;
-            case MESG_SP_COMPLETE:
-                handle_sp_complete();
-                break;
-            case MESG_DP_COMPLETE:
-                handle_dp_complete();
-                break;
-            case MESG_START_GFX_SPTASK:
-                start_gfx_sptask();
-                break;
-            case MESG_NMI_REQUEST:
-                handle_nmi_request();
-                break;
+            case MESG_VI_VBLANK:        handle_vblank();      break;
+            case MESG_SP_COMPLETE:      handle_sp_complete(); break;
+            case MESG_DP_COMPLETE:      handle_dp_complete(); break;
+            case MESG_START_GFX_SPTASK: start_gfx_sptask();   break;
+            case MESG_NMI_REQUEST:      handle_nmi_request(); break;
         }
 #if PUPPYPRINT_DEBUG
         profiler_update(taskTime, first);
@@ -390,15 +346,9 @@ void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *q
     handler->msg = msg;
 
     switch (index) {
-        case 1:
-            gVblankHandler1 = handler;
-            break;
-        case 2:
-            gVblankHandler2 = handler;
-            break;
-        case 3:
-            gVblankHandler3 = handler;
-            break;
+        case 1: gVblankHandler1 = handler; break;
+        case 2: gVblankHandler2 = handler; break;
+        case 3: gVblankHandler3 = handler; break;
     }
 }
 
@@ -440,52 +390,34 @@ void turn_off_audio(void) {
 }
 
 void change_vi(OSViMode *mode, int width, int height){
-
-    mode->comRegs.width = width;
-    mode->comRegs.xScale = (width*512)/320;
-    if(height > 240)
-    {
-        mode->comRegs.ctrl |= 0x40;
-        mode->fldRegs[0].origin = width*2;
-        mode->fldRegs[1].origin = width*4;
-        mode->fldRegs[0].yScale = 0x2000000|((height*1024)/240);
-        mode->fldRegs[1].yScale = 0x2000000|((height*1024)/240);
-        mode->fldRegs[0].vStart = mode->fldRegs[1].vStart-0x20002;
-    }
-    else
-    {
-        mode->fldRegs[0].origin = width*2;
-        mode->fldRegs[1].origin = width*4;
-        mode->fldRegs[0].yScale = ((height*1024)/240);
-        mode->fldRegs[1].yScale = ((height*1024)/240);
+    mode->comRegs.width  = width;
+    mode->comRegs.xScale = ((width * 512) / 320);
+    if (height > 240) {
+        mode->comRegs.ctrl     |= 0x40;
+        mode->fldRegs[0].origin = (width * 2);
+        mode->fldRegs[1].origin = (width * 4);
+        mode->fldRegs[0].yScale = (0x2000000 | ((height * 1024) / 240));
+        mode->fldRegs[1].yScale = (0x2000000 | ((height * 1024) / 240));
+        mode->fldRegs[0].vStart = (mode->fldRegs[1].vStart - 0x20002);
+    } else {
+        mode->fldRegs[0].origin = (width * 2);
+        mode->fldRegs[1].origin = (width * 4);
+        mode->fldRegs[0].yScale = ((height * 1024) / 240);
+        mode->fldRegs[1].yScale = ((height * 1024) / 240);
     }
 }
 
-void get_audio_frequency(void)
-{
-    switch (gConfig.tvType)
-    {
-    #if defined(VERSION_JP) || defined(VERSION_US)
-    case MODE_NTSC:
-        gConfig.audioFrequency = 1.0f;
-        break;
-    case MODE_MPAL:
-        gConfig.audioFrequency = 0.9915f;
-        break;
-    case MODE_PAL:
-        gConfig.audioFrequency = 0.9876f;
-        break;
-    #else
-    case MODE_NTSC:
-        gConfig.audioFrequency = 1.0126f;
-        break;
-    case MODE_MPAL:
-        gConfig.audioFrequency = 1.0086f;
-        break;
-    case MODE_PAL:
-        gConfig.audioFrequency = 1.0f;
-        break;
-    #endif
+void get_audio_frequency(void) {
+    switch (gConfig.tvType) {
+#if defined(VERSION_JP) || defined(VERSION_US)
+    case MODE_NTSC: gConfig.audioFrequency = 1.0f;    break;
+    case MODE_MPAL: gConfig.audioFrequency = 0.9915f; break;
+    case MODE_PAL:  gConfig.audioFrequency = 0.9876f; break;
+#else
+    case MODE_NTSC: gConfig.audioFrequency = 1.0126f; break;
+    case MODE_MPAL: gConfig.audioFrequency = 1.0086f; break;
+    case MODE_PAL:  gConfig.audioFrequency = 1.0f;    break;
+#endif
     }
 }
 
@@ -534,8 +466,7 @@ void thread1_idle(UNUSED void *arg) {
 }
 
 #if CLEARRAM
-void ClearRAM(void)
-{
+void ClearRAM(void) {
     bzero(_mainSegmentEnd, (size_t)osMemSize - (size_t)OS_K0_TO_PHYSICAL(_mainSegmentEnd));
 }
 #endif
@@ -564,7 +495,6 @@ void main_func(void) {
 #ifdef ISVPRINT
     osInitialize_fakeisv();
 #endif
-
     create_thread(&gIdleThread, 1, thread1_idle, NULL, gIdleThreadStack + 0x800, 100);
     osStartThread(&gIdleThread);
 }

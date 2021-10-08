@@ -41,9 +41,9 @@ void celeb_star_act_face_camera(void) {
 
     if (o->oTimer < 10) {
         if (o->oCelebStarIsBowserKey == 0) {
-            cur_obj_scale((f32) o->oTimer / 10.0);
+            cur_obj_scale((f32) o->oTimer / 10.0f);
         } else {
-            cur_obj_scale((f32) o->oTimer / 30.0);
+            cur_obj_scale((f32) o->oTimer / 30.0f);
         }
         o->oFaceAngleYaw += 0x1000;
     } else {

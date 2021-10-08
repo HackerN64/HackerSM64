@@ -46,7 +46,7 @@ void adjust_rolling_face_pitch(f32 f12) {
     o->oFaceAnglePitch += (s16)(o->oForwardVel * (100.0f / f12));
     o->oSnowmansBottomRollingFacePitch += o->oForwardVel * 1e-4;
 
-    if (o->oSnowmansBottomRollingFacePitch > 1.0)
+    if (o->oSnowmansBottomRollingFacePitch > 1.0f)
         o->oSnowmansBottomRollingFacePitch = 1.0f;
 }
 
@@ -59,7 +59,7 @@ void snowmans_bottom_act_1(void) {
     o->oSnowmansBottomTargetYaw = o->oPathedTargetYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomTargetYaw, 0x400);
 
-    if (o->oForwardVel > 70.0)
+    if (o->oForwardVel > 70.0f)
         o->oForwardVel = 70.0f;
 
     if (pathResult == -1) {
@@ -75,7 +75,7 @@ void snowmans_bottom_act_1(void) {
 
 void snowmans_bottom_act_2(void) {
     object_step_without_floor_orient();
-    if (o->oForwardVel > 70.0)
+    if (o->oForwardVel > 70.0f)
         o->oForwardVel = 70.0f;
 
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomTargetYaw, 0x400);
@@ -153,11 +153,8 @@ void bhv_snowmans_bottom_loop(void) {
 }
 
 void bhv_snowmans_head_init(void) {
-    u8 starFlags;
-    s8 behParams;
-
-    starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
-    behParams = (o->oBehParams >> 24) & 0xFF;
+    u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
+    s8 behParams = (o->oBehParams >> 24) & 0xFF;
 
     cur_obj_scale(0.7f);
 
@@ -166,11 +163,8 @@ void bhv_snowmans_head_init(void) {
     o->oBuoyancy = 2.0f;
 
     if ((starFlags & (1 << behParams)) && gCurrActNum != behParams + 1) {
-        spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole, -4230, -1344, 1813,
-                                  0, 0, 0);
-        o->oPosX = -4230.0f;
-        o->oPosY = -994.0f;
-        o->oPosZ = 1813.0f;
+        spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole, -4230, -1344, 1813, 0, 0, 0);
+        vec3_set(&o->oPosVec, -4230.0f, -994.0f, 1813.0f);
         o->oAction = 1;
     }
 }

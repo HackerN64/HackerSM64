@@ -17,7 +17,8 @@
  *
  **************************************************************************/
 
-#pragma once
+#ifndef _RSP_H_
+#define _RSP_H_ 1
 
 #define RSP_DMEM_BASE	0x04000000
 #define RSP_IMEM_BASE	0x04001000
@@ -77,5 +78,8 @@
     .name	CMD_BUSY,		$c13
     .name	CMD_PIPE_BUSY,		$c14
     .name	CMD_TMEM_BUSY,		$c15
+
+#endif
+
 
 #endif

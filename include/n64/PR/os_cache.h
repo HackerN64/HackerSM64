@@ -27,7 +27,8 @@
         $Date: 1998/10/09 08:01:04 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_CACHE_H_
+#define	_OS_CACHE_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -91,3 +92,5 @@ extern void		osWritebackDCacheAll(void);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_CACHE_H_ */

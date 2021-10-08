@@ -27,7 +27,8 @@
         $Date: 1998/10/09 08:01:04 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_AI_H_
+#define	_OS_AI_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -87,3 +88,5 @@ extern s32		osAiSetNextBuffer(void *, u32);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_AI_H_ */

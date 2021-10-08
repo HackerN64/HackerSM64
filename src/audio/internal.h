@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AUDIO_INTERNAL_H
+#define AUDIO_INTERNAL_H
 
 #include <ultra64.h>
 
@@ -45,27 +46,15 @@
 #define CODEC_S8 1
 #define CODEC_SKIP 2
 
-#ifdef VERSION_JP
-#define TEMPO_SCALE 1
-#else
 #define TEMPO_SCALE TATUMS_PER_BEAT
-#endif
 
 // TODO: US_FLOAT should probably be renamed to JP_DOUBLE since eu seems to use floats too
-#ifdef VERSION_JP
-#define US_FLOAT(x) x
-#else
 #define US_FLOAT(x) x ## f
-#endif
 
 // Convert u8 or u16 to f32. On JP, this uses a u32->f32 conversion,
 // resulting in more bloated codegen, while on US it goes through s32.
 // Since u8 and u16 fit losslessly in both, behavior is the same.
-#ifdef VERSION_JP
-#define FLOAT_CAST(x) (f32) (x)
-#else
 #define FLOAT_CAST(x) (f32) (s32) (x)
-#endif
 
 #if defined(ISVPRINT) || defined(UNF)
 #define stubbed_printf osSyncPrintf
@@ -896,3 +885,5 @@ struct UnkStruct80343D00 {
 extern s32 D_SH_80343CF0;
 extern struct UnkStruct80343D00 D_SH_80343D00;
 #endif
+
+#endif // AUDIO_INTERNAL_H

@@ -27,7 +27,8 @@
         $Date: 2002/05/02 03:28:25 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_VI_H_
+#define	_OS_VI_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -293,3 +294,5 @@ extern void		osCreateViManager(OSPri);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_VI_H_ */

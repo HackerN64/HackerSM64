@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COURSE_TABLE_H
+#define COURSE_TABLE_H
 
 // Start of the 3 cap courses in a row.
 #define COURSE_CAP_COURSES COURSE_COTMC
@@ -27,3 +28,5 @@ enum CourseNum
 #undef DEFINE_BONUS_COURSE
 
 #define COURSE_IS_MAIN_COURSE(cmd) (cmd >= COURSE_MIN && cmd <= COURSE_STAGES_MAX)
+
+#endif // COURSE_TABLE_H

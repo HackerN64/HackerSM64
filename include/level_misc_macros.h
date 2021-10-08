@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LEVEL_MISC_MACROS_H
+#define LEVEL_MISC_MACROS_H
 
 #define MACRO_OBJECT_WITH_BEH_PARAM(preset, yaw, posX, posY, posZ, behParam) \
     ((s16)((yaw * 0x10 / 45) << 9) | (preset + 0x1F)), posX, posY, posZ, behParam
@@ -23,3 +24,5 @@
 
 #define TRAJECTORY_END() \
     -1
+
+#endif // LEVEL_MISC_MACROS_H

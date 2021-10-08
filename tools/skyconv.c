@@ -357,7 +357,7 @@ static void write_cake_c() {
             fputs("};\n\n", cFile);
         }
     } else {
-        fprintf(cFile, "ALIGNED8 static const u8 cake_end_texture_data[] = {\n");
+        fprintf(cFile, "ALIGNED8 static const Texture cake_end_texture_data[] = {\n");
         for (int i = 0; i < numTiles; ++i) {
             print_raw_data(cFile, &tiles[i]);
             fputc(',', cFile);

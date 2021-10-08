@@ -55,7 +55,7 @@ void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 y
         d.x = norm.z;
     }
 
-    invLength = -1.0 / gd_sqrt_f(SQ(d.z) + SQ(d.y) + SQ(d.x));
+    invLength = -1.0f / gd_sqrt_f(SQ(d.z) + SQ(d.y) + SQ(d.x));
     d.z *= invLength;
     d.y *= invLength;
     d.x *= invLength;
@@ -64,7 +64,7 @@ void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 y
     colX.y = xColY * d.z - zColY * d.x;
     colX.x = zColY * d.y - yColY * d.z;
 
-    invLength = 1.0 / gd_sqrt_f(SQ(colX.z) + SQ(colX.y) + SQ(colX.x));
+    invLength = 1.0f / gd_sqrt_f(SQ(colX.z) + SQ(colX.y) + SQ(colX.x));
 
     colX.z *= invLength;
     colX.y *= invLength;
@@ -74,7 +74,7 @@ void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 y
     yColY = d.x * colX.z - d.z * colX.x;
     xColY = d.z * colX.y - d.y * colX.z;
 
-    invLength = 1.0 / gd_sqrt_f(SQ(zColY) + SQ(yColY) + SQ(xColY));
+    invLength = 1.0f / gd_sqrt_f(SQ(zColY) + SQ(yColY) + SQ(xColY));
 
     zColY *= invLength;
     yColY *= invLength;
@@ -136,7 +136,6 @@ void gd_rot_mat_about_vec(Mat4f *mtx, struct GdVec3f *vec) {
  * translation column of a mat4f matrix.
  */
 void gd_add_vec3f_to_mat4f_offset(Mat4f *mtx, struct GdVec3f *vec) {
-    UNUSED Mat4f temp;
     f32 z, y, x;
 
     x = vec->x;
@@ -230,7 +229,6 @@ f32 gd_clamp_f32(f32 a, f32 b) {
     } else if (a < -b) {
         a = -b;
     }
-
     return a;
 }
 
@@ -375,8 +373,7 @@ f32 gd_dot_vec3f(struct GdVec3f *a, struct GdVec3f *b) {
  * Inverts each element of src into dst.
  */
 void UNUSED gd_invert_elements_mat4f(Mat4f *src, Mat4f *dst) {
-    s32 i;
-    s32 j;
+    s32 i, j;
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
@@ -397,8 +394,7 @@ void gd_inverse_mat4f(Mat4f *src, Mat4f *dst) {
     gd_adjunct_mat4f(src, dst);
     determinant = gd_mat4f_det(dst);
 
-    if (ABS(determinant) < 1e-5) //? 1e-5f
-    {
+    if (ABS(determinant) < 1e-5) { //? 1e-5f
         fatal_print("Non-singular matrix, no inverse!\n");
     }
 
@@ -530,9 +526,7 @@ f32 gd_3x3_det(f32 r0c0, f32 r0c1, f32 r0c2,
  * returns the determinant.
  */
 f32 gd_2x2_det(f32 a, f32 b, f32 c, f32 d) {
-    f32 det = a * d - b * c;
-
-    return det;
+    return (a * d) - (b * c);
 }
 
 /**
@@ -552,46 +546,6 @@ void UNUSED gd_create_neg_vec_zero_first_mat_row(Mat4f *mtx, struct GdVec3f *vec
     for (i = 1; i < 4; i++) {
         (*mtx)[0][i] = 0.0f;
     }
-}
-
-/**
- * This function quite literally does nothing.
- * Seems to have been meant to create a vector from a quaternion?
- */
-void UNUSED gd_broken_quat_to_vec3f(f32 quat[4], struct GdVec3f *vec, f32 zHalf, s32 i, s32 run) {
-    s32 j;
-    s32 k;
-    UNUSED f32 jVal;
-    UNUSED f32 kVal;
-    UNUSED struct GdVec3f uVec;
-    struct GdVec3f tVec;
-
-    tVec.x = vec->x;
-    tVec.y = vec->y;
-    tVec.z = vec->z;
-
-    if (run < 0) {
-        goto end;
-    }
-
-    if ((j = i + 1) >= 4) {
-        j = 1;
-    }
-
-    if ((k = j + 1) >= 4) {
-        k = 1;
-    }
-
-    jVal = quat[j];
-    kVal = quat[k];
-    uVec.x = quat[0];
-    uVec.y = quat[i];
-    uVec.z = zHalf + zHalf;
-
-end:
-    vec->x = tVec.x;
-    vec->y = tVec.y;
-    vec->z = tVec.z;
 }
 
 /**
@@ -676,8 +630,8 @@ void UNUSED gd_create_quat_rot_mat(f32 quat[4], UNUSED s32 unused, Mat4f *mtx) {
             k = 1;
         }
 
-        twoIJ = 2.0 * quat[i] * quat[j];
-        two0K = 2.0 * quat[k] * quat[0];
+        twoIJ = 2.0f * quat[i] * quat[j];
+        two0K = 2.0f * quat[k] * quat[0];
 
         (*mtx)[j][i] = twoIJ - two0K;
         (*mtx)[i][j] = twoIJ + two0K;
@@ -712,7 +666,7 @@ void gd_create_rot_matrix(Mat4f *mtx, struct GdVec3f *vec, f32 s, f32 c) {
     rev.y = vec->y;
     rev.x = vec->z;
 
-    oneMinusCos = 1.0 - c;
+    oneMinusCos = 1.0f - c;
 
     (*mtx)[0][0] = oneMinusCos * rev.z * rev.z + c;
     (*mtx)[0][1] = oneMinusCos * rev.z * rev.y + s * rev.x;
@@ -896,8 +850,7 @@ void gd_print_bounding_box(UNUSED const char *prefix, UNUSED const struct GdBoun
  * does have a "Matrix:" prefix, so it was definitely used at one point.
  */
 void gd_print_mtx(UNUSED const char *prefix, const Mat4f *mtx) {
-    s32 i;
-    s32 j;
+    s32 i, j;
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
@@ -927,13 +880,9 @@ void UNUSED gd_print_quat(const char *prefix, const f32 f[4]) {
 void UNUSED gd_rot_mat_offset(Mat4f *dst, f32 x, f32 y, f32 z, s32 copy) {
     f32 adj = 100.0f;
     Mat4f rot;
-    f32 c;
-    f32 s;
-    f32 opp;
-    f32 mag;
     struct GdVec3f vec;
 
-    opp = gd_sqrt_f(SQ(x) + SQ(y) + SQ(z));
+    f32 opp = gd_sqrt_f(SQ(x) + SQ(y) + SQ(z));
 
     if (opp == 0.0f) {
         if (copy) {
@@ -942,9 +891,9 @@ void UNUSED gd_rot_mat_offset(Mat4f *dst, f32 x, f32 y, f32 z, s32 copy) {
         return;
     }
 
-    mag = gd_sqrt_f(SQ(adj) + SQ(opp));
-    c = adj / mag;
-    s = opp / mag;
+    f32 mag = gd_sqrt_f(SQ(adj) + SQ(opp));
+    f32 c = adj / mag;
+    f32 s = opp / mag;
 
     vec.x = -y / opp;
     vec.y = -x / opp;

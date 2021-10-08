@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GD_MACROS_H
+#define GD_MACROS_H
 
 /**
  * @file gd_macros.h
@@ -14,3 +15,5 @@
 #ifndef ALIGN
 #define ALIGN(VAL_, ALIGNMENT_) (((VAL_) + ((ALIGNMENT_) - 1)) & ~((ALIGNMENT_) - 1))
 #endif
+
+#endif // GD_MACROS_H

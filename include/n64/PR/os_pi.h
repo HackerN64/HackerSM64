@@ -27,7 +27,8 @@
         $Date: 1998/10/09 08:01:16 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_PI_H_
+#define	_OS_PI_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -219,3 +220,5 @@ extern s32 osEPiLinkHandle(OSPiHandle *);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_PI_H_ */

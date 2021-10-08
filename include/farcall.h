@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __FARCALL_H__
+#define __FARCALL_H__
 
 #ifdef __GNUC__
 #define farcall(x) x
@@ -9,6 +10,8 @@
 #define farcall(x) (*(&(x)))
 #define far
 #define near
+#endif
+
 #endif
 
 /*

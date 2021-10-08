@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _ULTRATYPES_H_
+#define _ULTRATYPES_H_
 
 
 /**************************************************************************
@@ -91,3 +92,6 @@ typedef volatile s64 vs64;
 #ifndef NULL
 #define NULL    (void *)0
 #endif
+
+#endif  /* _ULTRATYPES_H_ */
+

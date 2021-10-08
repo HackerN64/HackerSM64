@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _GU_H_
+#define _GU_H_
 
 /**************************************************************************
  *									  *
@@ -264,3 +265,5 @@ void guSprite2DInit(uSprite *SpritePointer,
 		    int SourceImageBitSize,
 		    int SourceImageOffsetS,
 		    int SourceImageOffsetT);
+
+#endif /* !_GU_H_ */

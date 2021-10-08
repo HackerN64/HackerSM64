@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GD_ANIMDATA_H
+#define GD_ANIMDATA_H
 
 #include "../gd_types.h"
 #define END_ANIMDATA_INFO_ARR { -1, GD_ANIM_EMPTY, NULL }
@@ -28,3 +29,5 @@ extern struct AnimDataInfo anim_mario_eyelid_right[];
 extern struct AnimDataInfo anim_mario_intro[];
 extern struct AnimDataInfo anim_silver_star[];
 extern struct AnimDataInfo anim_red_star[];
+
+#endif // GD_ANIMDATA_H

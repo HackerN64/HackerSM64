@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STRING_H
+#define STRING_H
 
 #include "PR/ultratypes.h"
 
@@ -9,3 +10,5 @@ int memcmp(const void *buf1, const void *buf2, size_t count);
 void    *memset(void* dst, int c, size_t count);
 char  *strcat(char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, int n);
+
+#endif

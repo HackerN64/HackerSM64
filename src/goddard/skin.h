@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GD_SKIN_H
+#define GD_SKIN_H
 
 #include <PR/ultratypes.h>
 
@@ -15,3 +16,5 @@ void convert_net_verts(struct ObjNet *net);
 void move_nets(struct ObjGroup *group);
 void func_80193848(struct ObjGroup *group);
 void reset_net_count(void);
+
+#endif // GD_SKIN_H

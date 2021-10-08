@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _GBI_POSLIGHT_H_
+#define _GBI_POSLIGHT_H_
 
 /* version 990705 */
 #define G_LIGHTING_POSITIONAL 0x00400000
@@ -124,3 +125,5 @@ typedef struct {
       _gdSPDefPosLight(r5,g5,b5,x5,y5,z5,c5,l5,q5), \
       _gdSPDefPosLight(r6,g6,b6,x6,y6,z6,c6,l6,q6), \
       _gdSPDefPosLight(r7,g7,b7,x7,y7,z7,c7,l7,q7)} }
+
+#endif /* _GBI_POSLIGHT_H_ */

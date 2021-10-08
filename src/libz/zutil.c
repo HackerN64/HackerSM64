@@ -7,9 +7,9 @@
 
 #include "zutil.h"
 
-// #ifndef NO_DUMMY_DECL
-// struct internal_state      {int dummy;}; /* for buggy compilers */
-// #endif
+#ifndef NO_DUMMY_DECL
+struct internal_state      {int dummy;}; /* for buggy compilers */
+#endif
 
 #ifndef STDC
 extern void exit OF((int));

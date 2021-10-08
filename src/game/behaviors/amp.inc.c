@@ -21,12 +21,10 @@ static struct ObjectHitbox sAmpHitbox = {
  * Homing amp initialization function.
  */
 void bhv_homing_amp_init(void) {
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3_copy(&o->oHomeVec, &o->oPosVec);
     o->oGravity = 0;
-    o->oFriction = 1.0;
-    o->oBuoyancy = 1.0;
+    o->oFriction = 1.0f;
+    o->oBuoyancy = 1.0f;
     o->oHomingAmpAvgY = o->oHomeY;
 
     // Homing amps start at 1/10th their normal size.
@@ -81,7 +79,7 @@ static void homing_amp_appear_loop(void) {
     // evaluates to 0.1, which is the same as it was before. After 30 frames, it ends at
     // a scale factor of 0.97. The amp remains at 97% of its real height for 60 more frames.
     if (o->oTimer < 30) {
-        cur_obj_scale(0.1 + 0.9 * (f32)(o->oTimer / 30.0f));
+        cur_obj_scale(0.1f + 0.9f * (f32)(o->oTimer / 30.0f));
     } else {
         o->oAnimState = 1;
     }

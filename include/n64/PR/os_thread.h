@@ -27,7 +27,8 @@
         $Date: 1999/06/15 12:39:40 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_THREAD_H_
+#define	_OS_THREAD_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -149,3 +150,5 @@ extern OSPri		osGetThreadPri(OSThread *);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_THREAD_H_ */

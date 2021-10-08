@@ -221,10 +221,10 @@ void create_dl_ortho_matrix(void) {
 #if !defined(VERSION_JP) && !defined(VERSION_SH)
 UNUSED
 #endif
-static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
+static Texture *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) { //! Texture type for *in?
     s32 inPos;
     u16 bitMask;
-    u8 *out;
+    Texture *out;
     s16 outPos = 0;
 
     out = alloc_display_list((u32) width * (u32) height);
@@ -251,15 +251,15 @@ static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
     return out;
 }
 
-u8 *alloc_ia4_tex_from_i1(u8 *in, s16 width, s16 height) {
+Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     u32 size = (u32) width * (u32) height;
-    u8 *out;
+    Texture *out;
     s32 inPos;
     s16 outPos;
     u8 bitMask;
 
     outPos = 0;
-    out = (u8 *) alloc_display_list(size);
+    out = (Texture *) alloc_display_list(size);
 
     if (out == NULL) {
         return NULL;
@@ -555,21 +555,11 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     u8 index = 0;
 
     if (scrollDirection == MENU_SCROLL_VERTICAL) {
-        if (gPlayer3Controller->rawStickY > 60) {
-            index++;
-        }
-
-        if (gPlayer3Controller->rawStickY < -60) {
-            index += 2;
-        }
+        if (gPlayer3Controller->rawStickY >  60) index++;
+        if (gPlayer3Controller->rawStickY < -60) index += 2;
     } else if (scrollDirection == MENU_SCROLL_HORIZONTAL) {
-        if (gPlayer3Controller->rawStickX > 60) {
-            index += 2;
-        }
-
-        if (gPlayer3Controller->rawStickX < -60) {
-            index++;
-        }
+        if (gPlayer3Controller->rawStickX >  60) index += 2;
+        if (gPlayer3Controller->rawStickX < -60) index++;
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 2) {
@@ -611,7 +601,7 @@ s16 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
     }
     // return the x position of where the string starts as half the string's
     // length from the position of the provided center.
-    return (s16)(centerPos - (s16)(spacesWidth / 2.0));
+    return (s16)(centerPos - (s16)(spacesWidth / 2.0f));
 }
 
 
@@ -742,17 +732,13 @@ void reset_dialog_render_state(void) {
     gDialogResponse = DIALOG_RESPONSE_NONE;
 }
 
-#define X_VAL1 -7.0f
-#define Y_VAL1 5.0
-#define Y_VAL2 5.0f
-
 void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
     create_dl_translation_matrix(MENU_MTX_NOPUSH, dialog->leftOffset, dialog->width, 0);
 
     switch (gDialogBoxType) {
         case DIALOG_TYPE_ROTATE: // Renders a dialog black box with zoom and rotation
             if (gDialogBoxState == DIALOG_STATE_OPENING || gDialogBoxState == DIALOG_STATE_CLOSING) {
-                create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0 / gDialogBoxScale, 1.0 / gDialogBoxScale, 1.0f);
+                create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0f / gDialogBoxScale, 1.0f / gDialogBoxScale, 1.0f);
                 // convert the speed into angle
                 create_dl_rotation_matrix(MENU_MTX_NOPUSH, gDialogBoxOpenTimer * 4.0f, 0, 0, 1.0f);
             }
@@ -760,16 +746,15 @@ void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
             break;
         case DIALOG_TYPE_ZOOM: // Renders a dialog white box with zoom
             if (gDialogBoxState == DIALOG_STATE_OPENING || gDialogBoxState == DIALOG_STATE_CLOSING) {
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, 65.0 - (65.0 / gDialogBoxScale),
-                                              (40.0 / gDialogBoxScale) - 40, 0);
-                create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0 / gDialogBoxScale, 1.0 / gDialogBoxScale, 1.0f);
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, 65.0f - (65.0f / gDialogBoxScale), (40.0f / gDialogBoxScale) - 40, 0);
+                create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0f / gDialogBoxScale, 1.0f / gDialogBoxScale, 1.0f);
             }
             gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 150);
             break;
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL1, Y_VAL1, 0);
-    create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.1f, ((f32) linesPerBox / Y_VAL2) + 0.1, 1.0f);
+    create_dl_translation_matrix(MENU_MTX_PUSH, -7.0f, 5.0f, 0);
+    create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.1f, ((f32) linesPerBox / 5.0f) + 0.1f, 1.0f);
 
     gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
@@ -869,11 +854,7 @@ void render_multi_text_string_lines(s8 multiTextId, s8 lineNum, s16 *linePos, s8
 
 
 u32 ensure_nonnegative(s16 value) {
-    if (value < 0) {
-        value = 0;
-    }
-
-    return value;
+    return ((value < 0) ? 0 : value);
 }
 
 void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 lowerBound) {
@@ -1170,11 +1151,11 @@ void render_dialog_entries(void) {
             }
 
             if (gDialogBoxType == DIALOG_TYPE_ROTATE) {
-                gDialogBoxOpenTimer -= 7.5;
-                gDialogBoxScale -= 1.5;
+                gDialogBoxOpenTimer -= 7.5f;
+                gDialogBoxScale -= 1.5f;
             } else {
-                gDialogBoxOpenTimer -= 10.0;
-                gDialogBoxScale -= 2.0;
+                gDialogBoxOpenTimer -= 10.0f;
+                gDialogBoxScale -= 2.0f;
             }
 
             if (gDialogBoxOpenTimer == 0.0f) {
@@ -1289,29 +1270,13 @@ void dl_rgba16_stop_cutscene_msg_fade(void) {
 }
 
 u8 ascii_to_credits_char(u8 c) {
-    if (c >= 'A' && c <= 'Z') {
-        return (c - ('A' - 0xA));
-    }
-
-    if (c >= 'a' && c <= 'z') { // remap lower to upper case
-        return (c - ('a' - 0xA));
-    }
-
-    if (c == ' ') {
-        return GLOBAL_CHAR_SPACE;
-    }
-    if (c == '.') {
-        return 0x24;
-    }
-    if (c == '3') {
-        return ASCII_TO_DIALOG('3');
-    }
-    if (c == '4') {
-        return ASCII_TO_DIALOG('4');
-    }
-    if (c == '6') {
-        return ASCII_TO_DIALOG('6');
-    }
+    if (c >= 'A' && c <= 'Z') return (c - ('A' - 0xA));
+    if (c >= 'a' && c <= 'z') return (c - ('a' - 0xA)); // remap lower to upper case
+    if (c == ' ') return GLOBAL_CHAR_SPACE;
+    if (c == '.') return 0x24;
+    if (c == '3') return ASCII_TO_DIALOG('3');
+    if (c == '4') return ASCII_TO_DIALOG('4');
+    if (c == '6') return ASCII_TO_DIALOG('6');
 
     return GLOBAL_CHAR_SPACE;
 }
@@ -1348,8 +1313,7 @@ void do_cutscene_handler(void) {
 
     create_dl_ortho_matrix();
 
-    if (gMarioState->action == ACT_CREDITS_CUTSCENE || gMarioState->action == ACT_END_PEACH_CUTSCENE || gMarioState->action == ACT_END_WAVING_CUTSCENE)
-    {
+    if (gMarioState->action == ACT_CREDITS_CUTSCENE || gMarioState->action == ACT_END_PEACH_CUTSCENE || gMarioState->action == ACT_END_WAVING_CUTSCENE) {
         gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
         gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
 

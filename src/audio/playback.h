@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AUDIO_PLAYBACK_H
+#define AUDIO_PLAYBACK_H
 
 #include <PR/ultratypes.h>
 
@@ -44,3 +45,6 @@ void note_set_frequency(struct Note *note, f32 frequency);
 void note_enable(struct Note *note);
 void note_disable(struct Note *note);
 #endif
+
+
+#endif // AUDIO_PLAYBACK_H

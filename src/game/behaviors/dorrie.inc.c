@@ -104,15 +104,14 @@ void bhv_dorrie_update(void) {
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         o->oDorrieForwardDistToMario = o->oDistanceToMario * coss(o->oAngleToMario - o->oMoveAngleYaw);
 
-        obj_perform_position_op(0);
+        obj_perform_position_op(POS_OP_SAVE_POSITION);
         cur_obj_move_using_fvel_and_gravity();
 
         o->oDorrieAngleToHome = cur_obj_angle_to_home();
         o->oDorrieDistToHome = cur_obj_lateral_dist_to_home();
 
         // Shift dorrie's bounds to account for her neck
-        boundsShift =
-            440.0f * coss(o->oDorrieNeckAngle) * coss(o->oMoveAngleYaw - o->oDorrieAngleToHome);
+        boundsShift = 440.0f * coss(o->oDorrieNeckAngle) * coss(o->oMoveAngleYaw - o->oDorrieAngleToHome);
 
         if (clamp_f32(&o->oDorrieDistToHome, 1650.0f + boundsShift, 2300.0f + boundsShift)) {
             o->oPosX = o->oHomeX - o->oDorrieDistToHome * sins(o->oDorrieAngleToHome);
@@ -154,6 +153,6 @@ void bhv_dorrie_update(void) {
                 break;
         }
 
-        obj_perform_position_op(1);
+        obj_perform_position_op(POS_OP_COMPUTE_VELOCITY);
     }
 }

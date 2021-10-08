@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SSL_HEADER_H
+#define SSL_HEADER_H
 
 #include "types.h"
 #include "game/moving_texture.h"
@@ -17,8 +18,8 @@ extern const GeoLayout ssl_geo_0007CC[];
 extern const GeoLayout ssl_geo_00088C[];
 
 // leveldata
-extern const u8 ssl_pyramid_sand[];
-extern const u8 ssl_quicksand[];
+extern const Texture ssl_pyramid_sand[];
+extern const Texture ssl_quicksand[];
 extern const Gfx ssl_dl_quicksand_pit_begin[];
 extern const Gfx ssl_dl_quicksand_pit_end[];
 extern const Gfx ssl_dl_pyramid_quicksand_pit_begin[];
@@ -83,3 +84,5 @@ extern const Gfx ssl_dl_pyramid_sand_pathway_side_end[];
 
 // script
 extern const LevelScript level_ssl_entry[];
+
+#endif

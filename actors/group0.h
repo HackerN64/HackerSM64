@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GROUP0_H
+#define GROUP0_H
 
 #include "types.h"
 
@@ -340,3 +341,5 @@ extern const Gfx white_particle_small_dl_begin[];
 extern const Gfx white_particle_small_dl_end[];
 extern const Gfx white_particle_small_dl[];
 extern const Gfx white_particle_small_unused_dl[];
+
+#endif

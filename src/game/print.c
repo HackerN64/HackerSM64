@@ -52,7 +52,7 @@ void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 
     s8 negative = FALSE;
     char pad;
 
-    if (zeroPad == TRUE) {
+    if (zeroPad) {
         pad = '0';
     } else {
         pad = -1;
@@ -106,8 +106,7 @@ void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 
 
             n -= digit * powBase;
         }
-    } else // n is zero.
-    {
+    } else { // n is zero.
         numDigits = 1;
         if (width > numDigits) {
             for (len = 0; len < width - numDigits; len++) dest[len] = pad;
@@ -134,11 +133,13 @@ void parse_width_field(const char *str, s32 *srcIndex, u8 *width, s8 *zeroPad) {
     }
 
     // Read width digits up until the 'd' or 'x' format specifier.
-    while (str[*srcIndex] != 'd' && str[*srcIndex] != 'x') {
+    while ((str[*srcIndex] != 'b')
+        && (str[*srcIndex] != 'o')
+        && (str[*srcIndex] != 'd')
+        && (str[*srcIndex] != 'x')) {
         digits[digitsLen] = str[*srcIndex] - '0';
 
-        if (digits[digitsLen] < 0 || digits[digitsLen] >= 10) // not a valid digit
-        {
+        if (digits[digitsLen] < 0 || digits[digitsLen] >= 10) { // not a valid digit
             *width = 0;
             return;
         }
@@ -192,21 +193,21 @@ void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
 
             parse_width_field(str, &srcIndex, &width, &zeroPad);
 
-            if (str[srcIndex] != 'd' && str[srcIndex] != 'x') {
+            if ((str[srcIndex] != 'b')
+             && (str[srcIndex] != 'o')
+             && (str[srcIndex] != 'd')
+             && (str[srcIndex] != 'x')) {
                 break;
             }
-            if (str[srcIndex] == 'd') {
-                base = 10;
-            }
-            if (str[srcIndex] == 'x') {
-                base = 16;
-            }
+            if (str[srcIndex] == 'b') base =  2;
+            if (str[srcIndex] == 'o') base =  8;
+            if (str[srcIndex] == 'd') base = 10;
+            if (str[srcIndex] == 'x') base = 16;
 
             srcIndex++;
 
             format_integer(n, base, sTextLabels[sTextLabelsCount]->buffer + len, &len, width, zeroPad);
-        } else // straight copy
-        {
+        } else { // straight copy
             sTextLabels[sTextLabelsCount]->buffer[len] = c;
             len++;
             srcIndex++;
@@ -283,66 +284,21 @@ void print_text_centered(s32 x, s32 y, const char *str) {
  * Converts a char into the proper colorful glyph for the char.
  */
 s8 char_to_glyph_index(char c) {
-    if (c >= 'A' && c <= 'Z') {
-        return c - 55;
-    }
-
-    if (c >= 'a' && c <= 'z') {
-        return c - 87;
-    }
-
-    if (c >= '0' && c <= '9') {
-        return c - 48;
-    }
-
-    if (c == ' ') {
-        return GLYPH_SPACE;
-    }
-
-    if (c == '!') {
-        return GLYPH_EXCLAMATION_PNT; // !, JP only
-    }
-
-    if (c == '#') {
-        return GLYPH_TWO_EXCLAMATION; // !!, JP only
-    }
-
-    if (c == '?') {
-        return GLYPH_QUESTION_MARK; // ?, JP only
-    }
-
-    if (c == '&') {
-        return GLYPH_AMPERSAND; // &, JP only
-    }
-
-    if (c == '%') {
-        return GLYPH_PERCENT; // %, JP only
-    }
-
-    if (c == '*') {
-        return GLYPH_MULTIPLY; // x
-    }
-
-    if (c == '+') {
-        return GLYPH_COIN; // coin
-    }
-
-    if (c == ',') {
-        return GLYPH_MARIO_HEAD; // Imagine I drew Mario's head
-    }
-
-    if (c == '-') {
-        return GLYPH_STAR; // star
-    }
-
-    if (c == '.') {
-        return GLYPH_PERIOD; // large shaded dot, JP only
-    }
-
-    if (c == '/') {
-        return GLYPH_BETA_KEY; // beta key, JP only. Reused for Ü in EU.
-    }
-
+    if (c >= 'A' && c <= 'Z') return c - 55;
+    if (c >= 'a' && c <= 'z') return c - 87;
+    if (c >= '0' && c <= '9') return c - 48;
+    if (c == ' ') return GLYPH_SPACE;
+    if (c == '!') return GLYPH_EXCLAMATION_PNT; // !, JP only
+    if (c == '#') return GLYPH_TWO_EXCLAMATION; // !!, JP only
+    if (c == '?') return GLYPH_QUESTION_MARK; // ?, JP only
+    if (c == '&') return GLYPH_AMPERSAND; // &, JP only
+    if (c == '%') return GLYPH_PERCENT; // %, JP only
+    if (c == '*') return GLYPH_MULTIPLY; // x
+    if (c == '+') return GLYPH_COIN; // coin
+    if (c == ',') return GLYPH_MARIO_HEAD; // Imagine I drew Mario's head
+    if (c == '-') return GLYPH_STAR; // star
+    if (c == '.') return GLYPH_PERIOD; // large shaded dot, JP only
+    if (c == '/') return GLYPH_BETA_KEY; // beta key, JP only. Reused for Ü in EU.
     return GLYPH_SPACE;
 }
 
@@ -350,7 +306,7 @@ s8 char_to_glyph_index(char c) {
  * Adds an individual glyph to be rendered.
  */
 void add_glyph_texture(s8 glyphIndex) {
-    const u8 *const *glyphs = segmented_to_virtual(main_hud_lut);
+    const Texture *const *glyphs = segmented_to_virtual(main_hud_lut);
 
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, glyphs[glyphIndex]);
@@ -362,21 +318,10 @@ void add_glyph_texture(s8 glyphIndex) {
  * Clips textrect into the boundaries defined.
  */
 void clip_to_bounds(s32 *x, s32 *y) {
-    if (*x < TEXRECT_MIN_X) {
-        *x = TEXRECT_MIN_X;
-    }
-
-    if (*x > TEXRECT_MAX_X) {
-        *x = TEXRECT_MAX_X;
-    }
-
-    if (*y < TEXRECT_MIN_Y) {
-        *y = TEXRECT_MIN_Y;
-    }
-
-    if (*y > TEXRECT_MAX_Y) {
-        *y = TEXRECT_MAX_Y;
-    }
+    if (*x < TEXRECT_MIN_X) *x = TEXRECT_MIN_X;
+    if (*x > TEXRECT_MAX_X) *x = TEXRECT_MAX_X;
+    if (*y < TEXRECT_MIN_Y) *y = TEXRECT_MIN_Y;
+    if (*y > TEXRECT_MAX_Y) *y = TEXRECT_MAX_Y;
 }
 #endif
 
@@ -386,8 +331,7 @@ void clip_to_bounds(s32 *x, s32 *y) {
 void render_textrect(s32 x, s32 y, s32 pos) {
     s32 rectBaseX = x + pos * 12;
     s32 rectBaseY = 224 - y;
-    s32 rectX;
-    s32 rectY;
+    s32 rectX, rectY;
 
 #ifndef WIDESCREEN
     // For widescreen we must allow drawing outside the usual area
@@ -404,8 +348,7 @@ void render_textrect(s32 x, s32 y, s32 pos) {
  * a for loop.
  */
 void render_text_labels(void) {
-    s32 i;
-    s32 j;
+    s32 i, j;
     s8 glyphIndex;
     Mtx *mtx;
 

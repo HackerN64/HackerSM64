@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SL_HEADER_H
+#define SL_HEADER_H
 
 #include "types.h"
 #include "game/moving_texture.h"
@@ -35,3 +36,5 @@ extern const struct MovtexQuadCollection sl_movtex_water[];
 
 // script
 extern const LevelScript level_sl_entry[];
+
+#endif

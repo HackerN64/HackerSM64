@@ -8,10 +8,10 @@
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "engine/level_script.h"
+#include "engine/math_util.h"
 #include "game_init.h"
 #include "main.h"
 #include "memory.h"
-#include "profiler.h"
 #include "save_file.h"
 #include "seq_ids.h"
 #include "sound_init.h"
@@ -322,9 +322,6 @@ void init_rcp(s32 resetZB) {
  */
 void end_master_display_list(void) {
     draw_screen_borders();
-    if (gShowProfiler) {
-        draw_profiler();
-    }
 
     gDPFullSync(gDisplayListHead++);
     gSPEndDisplayList(gDisplayListHead++);
@@ -351,8 +348,9 @@ void draw_reset_bars(void) {
         fbPtr += gNmiResetBarsTimer++ * (SCREEN_WIDTH / 4);
 
         for (width = 0; width < ((SCREEN_HEIGHT / 16) + 1); width++) {
-            // Loop must be one line to match on -O2
-            for (height = 0; height < (SCREEN_WIDTH / 4); height++) *fbPtr++ = 0;
+            for (height = 0; height < (SCREEN_WIDTH / 4); height++) {
+                *fbPtr++ = 0;
+            }
             fbPtr += ((SCREEN_WIDTH / 4) * 14);
         }
     }
@@ -397,9 +395,9 @@ void render_init(void) {
 void select_gfx_pool(void) {
     gGfxPool = &gGfxPools[gGlobalTimer % ARRAY_COUNT(gGfxPools)];
     set_segment_base_addr(1, gGfxPool->buffer);
-    gGfxSPTask = &gGfxPool->spTask;
+    gGfxSPTask       = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxPoolEnd      = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
 }
 
 /**
@@ -415,7 +413,6 @@ void display_and_vsync(void) {
         gIsConsole = 1;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
-    profiler_log_thread5_time(BEFORE_DISPLAY_LISTS);
     //gIsConsole = (IO_READ(DPC_PIPEBUSY_REG));
     osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
     if (gGoddardVblankCallback != NULL) {
@@ -423,10 +420,8 @@ void display_and_vsync(void) {
         gGoddardVblankCallback = NULL;
     }
     exec_display_list(&gGfxPool->spTask);
-    profiler_log_thread5_time(AFTER_DISPLAY_LISTS);
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
     osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFrameBuffers[sRenderedFramebuffer]));
-    profiler_log_thread5_time(THREAD5_END);
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
     // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
     if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
@@ -503,7 +498,7 @@ void run_demo_inputs(void) {
         } else {
             // Backup the start button if it is pressed, since we don't want the
             // demo input to override the mask where start may have been pressed.
-            u16 startPushed = gControllers[0].controllerData->button & START_BUTTON;
+            u16 startPushed = (gControllers[0].controllerData->button & START_BUTTON);
 
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
             gControllers[0].controllerData->stick_x = gCurrDemoInput->rawStickX;
@@ -541,25 +536,13 @@ void adjust_analog_stick(struct Controller *controller) {
     controller->stickY = 0;
 
     // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
-    if (controller->rawStickX <= -8) {
-        controller->stickX = controller->rawStickX + 6;
-    }
-
-    if (controller->rawStickX >= 8) {
-        controller->stickX = controller->rawStickX - 6;
-    }
-
-    if (controller->rawStickY <= -8) {
-        controller->stickY = controller->rawStickY + 6;
-    }
-
-    if (controller->rawStickY >= 8) {
-        controller->stickY = controller->rawStickY - 6;
-    }
+    if (controller->rawStickX <= -8) controller->stickX = controller->rawStickX + 6;
+    if (controller->rawStickX >=  8) controller->stickX = controller->rawStickX - 6;
+    if (controller->rawStickY <= -8) controller->stickY = controller->rawStickY + 6;
+    if (controller->rawStickY >=  8) controller->stickY = controller->rawStickY - 6;
 
     // Calculate f32 magnitude from the center by vector length.
-    controller->stickMag =
-        sqrtf(controller->stickX * controller->stickX + controller->stickY * controller->stickY);
+    controller->stickMag = sqrtf(sqr(controller->stickX) + sqr(controller->stickY));
 
     // Magnitude cannot exceed 64.0f: if it does, modify the values
     // appropriately to flatten the values down to the allowed maximum value.
@@ -601,28 +584,27 @@ void read_controller_inputs(s32 threadID) {
             // 0.5x A presses are a good meme
             controller->buttonDown = controller->controllerData->button;
             adjust_analog_stick(controller);
-        } else // otherwise, if the controllerData is NULL, 0 out all of the inputs.
-        {
-            controller->rawStickX = 0;
-            controller->rawStickY = 0;
+        } else { // otherwise, if the controllerData is NULL, 0 out all of the inputs.
+            controller->rawStickX     = 0;
+            controller->rawStickY     = 0;
             controller->buttonPressed = 0;
-            controller->buttonDown = 0;
-            controller->stickX = 0;
-            controller->stickY = 0;
-            controller->stickMag = 0;
+            controller->buttonDown    = 0;
+            controller->stickX        = 0;
+            controller->stickY        = 0;
+            controller->stickMag      = 0;
         }
     }
 
     // For some reason, player 1's inputs are copied to player 3's port.
     // This potentially may have been a way the developers "recorded"
     // the inputs for demos, despite record_demo existing.
-    gPlayer3Controller->rawStickX = gPlayer1Controller->rawStickX;
-    gPlayer3Controller->rawStickY = gPlayer1Controller->rawStickY;
-    gPlayer3Controller->stickX = gPlayer1Controller->stickX;
-    gPlayer3Controller->stickY = gPlayer1Controller->stickY;
-    gPlayer3Controller->stickMag = gPlayer1Controller->stickMag;
+    gPlayer3Controller->rawStickX     = gPlayer1Controller->rawStickX;
+    gPlayer3Controller->rawStickY     = gPlayer1Controller->rawStickY;
+    gPlayer3Controller->stickX        = gPlayer1Controller->stickX;
+    gPlayer3Controller->stickY        = gPlayer1Controller->stickY;
+    gPlayer3Controller->stickMag      = gPlayer1Controller->stickMag;
     gPlayer3Controller->buttonPressed = gPlayer1Controller->buttonPressed;
-    gPlayer3Controller->buttonDown = gPlayer1Controller->buttonDown;
+    gPlayer3Controller->buttonDown    = gPlayer1Controller->buttonDown;
 }
 
 /**
@@ -703,9 +685,9 @@ void setup_game_memory(void) {
  */
 void thread5_game_loop(UNUSED void *arg) {
     struct LevelCommand *addr;
-    #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
     OSTime lastTime = 0;
-    #endif
+#endif
 
     setup_game_memory();
 #if ENABLE_RUMBLE
@@ -719,9 +701,9 @@ void thread5_game_loop(UNUSED void *arg) {
     createHvqmThread();
 #endif
     save_file_load_all();
-    #ifdef PUPPYCAM
+#ifdef PUPPYCAM
     puppycam_boot();
-    #endif
+#endif
 
     set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
 
@@ -741,15 +723,13 @@ void thread5_game_loop(UNUSED void *arg) {
             draw_reset_bars();
             continue;
         }
-        profiler_log_thread5_time(THREAD5_START);
-        #if PUPPYPRINT_DEBUG
-        while (TRUE)
-        {
+#if PUPPYPRINT_DEBUG
+        while (TRUE) {
             lastTime = osGetTime();
             collisionTime[perfIteration] = 0;
             behaviourTime[perfIteration] = 0;
             dmaTime[perfIteration] = 0;
-        #endif
+#endif
 
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
@@ -764,26 +744,24 @@ void thread5_game_loop(UNUSED void *arg) {
         select_gfx_pool();
         read_controller_inputs(5);
         addr = level_script_execute(addr);
-        #if PUPPYPRINT_DEBUG == 0 && defined(VISUAL_DEBUG)
+#if PUPPYPRINT_DEBUG == 0 && defined(VISUAL_DEBUG)
         debug_box_input();
-        #endif
-        #if PUPPYPRINT_DEBUG
+#endif
+#if PUPPYPRINT_DEBUG
         profiler_update(scriptTime, lastTime);
-            if (benchmarkLoop > 0 && benchOption == 0)
-            {
+            if (benchmarkLoop > 0 && benchOption == 0) {
                 benchmarkLoop--;
                 benchMark[benchmarkLoop] = osGetTime() - lastTime;
-                if (benchmarkLoop == 0)
-                {
+                if (benchmarkLoop == 0) {
                     puppyprint_profiler_finished();
                     break;
                 }
-            }
-            else
+            } else {
                 break;
+            }
         }
         puppyprint_profiler_process();
-        #endif
+#endif
 
         display_and_vsync();
 

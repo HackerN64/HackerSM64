@@ -333,7 +333,7 @@ void bowser_bitdw_actions(void) {
         // dancing after the introduction
 #ifndef VERSION_JP
         if (!gCurrDemoInput) { // demo check because entry exits post JP
-            if (rand < 0.1) {
+            if (rand < 0.1f) {
                 o->oAction = BOWSER_ACT_DANCE; // 10% chance
             } else {
                 o->oAction = BOWSER_ACT_WALK_TO_MARIO; // common
@@ -342,7 +342,7 @@ void bowser_bitdw_actions(void) {
             o->oAction = BOWSER_ACT_WALK_TO_MARIO;
         }
 #else
-        if (rand < 0.1) {
+        if (rand < 0.1f) {
             o->oAction = BOWSER_ACT_DANCE; // 10% chance
         } else {
             o->oAction = BOWSER_ACT_WALK_TO_MARIO; // common
@@ -361,15 +361,14 @@ void bowser_bitfs_actions(void) {
     if (o->oBowserIsReacting == FALSE) {
         if (o->oBowserStatus & BOWSER_STATUS_ANGLE_MARIO) {
             if (o->oDistanceToMario < 1300.0f) {  // nearby
-                if (rand < 0.5) { // 50% chance
+                if (rand < 0.5f) { // 50% chance
                     o->oAction = BOWSER_ACT_TELEPORT;
                 } else {
                     o->oAction = BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR;
                 }
             } else { // far away
                 o->oAction = BOWSER_ACT_CHARGE_MARIO;
-                if (500.0f < o->oBowserDistToCentre && o->oBowserDistToCentre < 1500.0f
-                    && rand < 0.5) { // 50% chance
+                if (500.0f < o->oBowserDistToCentre && o->oBowserDistToCentre < 1500.0f && rand < 0.5f) { // 50% chance
                     o->oAction = BOWSER_ACT_BIG_JUMP;
                 }
             }
@@ -392,14 +391,14 @@ void bowser_bits_action_list(void) {
     f32 rand = random_float();
     if (o->oBowserStatus & BOWSER_STATUS_ANGLE_MARIO) {
         if (o->oDistanceToMario < 1000.0f) { // nearby
-            if (rand < 0.4) {
+            if (rand < 0.4f) {
                 o->oAction = BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR; // 40% chance
-            } else if (rand < 0.8) {
+            } else if (rand < 0.8f) {
                 o->oAction = BOWSER_ACT_SPIT_FIRE_INTO_SKY; // 80% chance
             } else {
                 o->oAction = BOWSER_ACT_BREATH_FIRE;
             } // far away
-        } else if (rand < 0.5) {
+        } else if (rand < 0.5f) {
             o->oAction = BOWSER_ACT_BIG_JUMP; // 50% chance
         } else {
             o->oAction = BOWSER_ACT_CHARGE_MARIO;
@@ -1186,21 +1185,21 @@ s32 bowser_dead_wait_for_mario(void) {
 s32 bowser_dead_twirl_up(void) {
     s32 ret = FALSE;
     // Set angle rotation once he has low X scale value
-    if (o->header.gfx.scale[0] < 0.8) {
+    if (o->header.gfx.scale[0] < 0.8f) {
         o->oAngleVelYaw += 0x80;
     }
     // Slowly scale down his X and Z value
-    if (o->header.gfx.scale[0] > 0.2) {
-        o->header.gfx.scale[0] = o->header.gfx.scale[0] - 0.02;
-        o->header.gfx.scale[2] = o->header.gfx.scale[2] - 0.02;
+    if (o->header.gfx.scale[0] > 0.2f) {
+        o->header.gfx.scale[0] = o->header.gfx.scale[0] - 0.02f;
+        o->header.gfx.scale[2] = o->header.gfx.scale[2] - 0.02f;
     } else {
         // Now scale down his Y value (and send Bowser up)
-        o->header.gfx.scale[1] = o->header.gfx.scale[1] - 0.01;
+        o->header.gfx.scale[1] = o->header.gfx.scale[1] - 0.01f;
         o->oVelY = 20.0f;
         o->oGravity = 0.0f;
     }
     // At half Y scale value, he is high enough, so we are done
-    if (o->header.gfx.scale[1] < 0.5) {
+    if (o->header.gfx.scale[1] < 0.5f) {
         ret = TRUE;
     }
     // Copy angle rotation to moving rotation
@@ -1538,12 +1537,11 @@ s8 sBowserHealth[] = { 1, 1, 3 };
 void bowser_free_update(void) {
     struct Surface *floor;
     struct Object *platform;
-    UNUSED f32 floorHeight;
 #ifdef PLATFORM_DISPLACEMENT_2
     s16 tmpOFaceAngleYaw = (s16) o->oFaceAngleYaw;
     if ((platform = o->platform) != NULL) {
         // NOTE: This function was at one point using '&o->oFaceAngleYaw', which is a s32 address. Should tmpOFaceAngleYaw be using the first 16 bits instead, or was that a bug?
-        apply_platform_displacement(&sBowserDisplacementInfo, &o->oPosX, &tmpOFaceAngleYaw, platform);
+        apply_platform_displacement(&sBowserDisplacementInfo, &o->oPosVec, &tmpOFaceAngleYaw, platform);
         o->oFaceAngleYaw = tmpOFaceAngleYaw;
     }
 #else
@@ -1562,7 +1560,7 @@ void bowser_free_update(void) {
         o->oAction = BOWSER_ACT_JUMP_ONTO_STAGE;
     }
     // Check floor height and platform
-    floorHeight = find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
+    find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
     if ((floor != NULL) && (floor->object != NULL)) {
         o->platform = floor->object;
     } else {
@@ -1615,14 +1613,14 @@ void bowser_thrown_dropped_update(void) {
     // Set throw action and vel values
     cur_obj_get_thrown_or_placed(1.0f, 1.0f, BOWSER_ACT_THROWN);
     // Set swing speed based of angle
-    swingSpd = o->oBowserHeldAngleVelYaw / 3000.0 * 70.0f;
+    swingSpd = o->oBowserHeldAngleVelYaw / 3000.0f * 70.0f;
     // If less than 0, reduce speed
     if (swingSpd < 0.0f) {
         swingSpd = -swingSpd;
     }
     // If more than 90, increase speed
     if (swingSpd > 90.0f) {
-        swingSpd *= 2.5;
+        swingSpd *= 2.5f;
     }
     // Set distance speed when throwing
     o->oForwardVel = coss(o->oBowserHeldAnglePitch) * swingSpd;

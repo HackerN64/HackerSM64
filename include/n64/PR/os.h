@@ -27,7 +27,8 @@
         $Date: 2000/06/15 06:24:52 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_H_
+#define	_OS_H_
 
 #include <PR/os_thread.h>
 #include <PR/os_message.h>
@@ -103,3 +104,5 @@ extern "C" {
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_H */

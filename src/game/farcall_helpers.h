@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OBJ_BEHAVIORS_2_NONSTATIC_H
+#define OBJ_BEHAVIORS_2_NONSTATIC_H
 
 #include "object_fields.h"
 #include "object_constants.h"
@@ -77,8 +78,6 @@
 #include "levels/bowser_2/header.h"
 #include "levels/ttm/header.h"
 
-#define o gCurrentObject
-
 s32 obj_is_rendering_enabled(void);
 s16 obj_get_pitch_from_vel(void);
 s32 obj_update_race_proposition_dialog(s16 dialogID);
@@ -132,3 +131,5 @@ s32 obj_update_standard_actions(f32 scale);
 s32 obj_check_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction);
 s32 obj_move_for_one_second(s32 endAction);
 void treat_far_home_as_mario(f32 threshold);
+
+#endif

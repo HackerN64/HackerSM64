@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AUDIO_LOAD_H
+#define AUDIO_LOAD_H
 
 #include <PR/ultratypes.h>
 
@@ -110,3 +111,5 @@ void func_sh_802f30f4(s32 arg0, s32 arg1, s32 arg2, OSMesgQueue *arg3);
 void func_sh_802f3288(s32 idx);
 
 #endif
+
+#endif // AUDIO_LOAD_H

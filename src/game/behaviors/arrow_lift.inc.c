@@ -13,7 +13,7 @@
  * Move the arrow lift away from its original position.
  */
 static s32 arrow_lift_move_away(void) {
-    s8 status = ARROW_LIFT_NOT_DONE_MOVING;
+    s8 doneMoving = FALSE;
 
     o->oMoveAngleYaw = o->oFaceAngleYaw - 0x4000;
     o->oVelY = 0;
@@ -26,18 +26,18 @@ static s32 arrow_lift_move_away(void) {
     if (o->oArrowLiftDisplacement > 384) {
         o->oForwardVel = 0;
         o->oArrowLiftDisplacement = 384;
-        status = ARROW_LIFT_DONE_MOVING;
+        doneMoving = TRUE;
     }
 
     obj_move_xyz_using_fvel_and_yaw(o);
-    return status;
+    return doneMoving;
 }
 
 /**
  * Move the arrow lift back to its original position.
  */
 static s8 arrow_lift_move_back(void) {
-    s8 status = ARROW_LIFT_NOT_DONE_MOVING;
+    s8 doneMoving = FALSE;
 
     o->oMoveAngleYaw = o->oFaceAngleYaw + 0x4000;
     o->oVelY = 0;
@@ -48,11 +48,11 @@ static s8 arrow_lift_move_back(void) {
     if (o->oArrowLiftDisplacement < 0) {
         o->oForwardVel = 0;
         o->oArrowLiftDisplacement = 0;
-        status = ARROW_LIFT_DONE_MOVING;
+        doneMoving = TRUE;
     }
 
     obj_move_xyz_using_fvel_and_yaw(o);
-    return status;
+    return doneMoving;
 }
 
 /**
@@ -71,7 +71,7 @@ void bhv_arrow_lift_loop(void) {
             break;
 
         case ARROW_LIFT_ACT_MOVING_AWAY:
-            if (arrow_lift_move_away() == ARROW_LIFT_DONE_MOVING) {
+            if (arrow_lift_move_away()) {
                 o->oAction = ARROW_LIFT_ACT_MOVING_BACK;
             }
 
@@ -80,7 +80,7 @@ void bhv_arrow_lift_loop(void) {
         case ARROW_LIFT_ACT_MOVING_BACK:
             // Wait 61 frames before moving (after stopping after moving forwards).
             if (o->oTimer > 60) {
-                if (arrow_lift_move_back() == ARROW_LIFT_DONE_MOVING) {
+                if (arrow_lift_move_back()) {
                     o->oAction = ARROW_LIFT_ACT_IDLE;
                 }
             }

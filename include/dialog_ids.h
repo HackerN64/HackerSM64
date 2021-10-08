@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DIALOG_IDS_H
+#define DIALOG_IDS_H
 
 enum DialogId {
     DIALOG_NONE = -1,
@@ -174,3 +175,5 @@ enum DialogId {
     DIALOG_169,
     DIALOG_COUNT
 };
+
+#endif // DIALOG_IDS_H

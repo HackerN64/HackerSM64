@@ -26,7 +26,8 @@
  *
  **************************************************************************/
 
-#pragma once
+#ifndef __ULTRAERROR_H__
+#define __ULTRAERROR_H__
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -174,3 +175,5 @@ OSErrorHandler	osSetErrorHandler(OSErrorHandler);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif	/* __ULTRAERROR_H__ */

@@ -8,9 +8,9 @@ void bhv_flamethrower_flame_loop(void) {
         obj_translate_xyz_random(o, 10.0f);
     }
     if (o->oBehParams2ndByte == 2)
-        size = o->oTimer * (o->oForwardVel - 6.0f) / 100.0 + 2.0;
+        size = o->oTimer * (o->oForwardVel -  6.0f) / 100.0f + 2.0f;
     else
-        size = o->oTimer * (o->oForwardVel - 20.0) / 100.0 + 1.0;
+        size = o->oTimer * (o->oForwardVel - 20.0f) / 100.0f + 1.0f;
     if (o->oBehParams2ndByte == 3) {
         o->hitboxHeight = 200.0f;
         o->hitboxDownOffset = 150.0f;
@@ -20,7 +20,7 @@ void bhv_flamethrower_flame_loop(void) {
             o->oVelY = 0;
             o->oPosY = o->oFloorHeight + 25.0f * size;
         }
-        remainingTime = o->parentObj->oFlameThowerTimeRemaining / 1.2;
+        remainingTime = o->parentObj->oFlameThowerTimeRemaining / 1.2f;
     } else
         remainingTime = o->parentObj->oFlameThowerTimeRemaining;
     cur_obj_scale(size);
@@ -39,9 +39,13 @@ void bhv_flamethrower_loop(void) {
     s32 flameTimeRemaining;
     s32 model;
     if (o->oAction == 0) {
-        if (gCurrLevelNum != LEVEL_BBH || gMarioOnMerryGoRound == TRUE)
-            if (o->oDistanceToMario < 2000.0f)
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+        if (gCurrLevelNum != LEVEL_BBH || gMarioOnMerryGoRound == TRUE) {
+            if (o->oDistanceToMario < 2000.0f) {
                 o->oAction++;
+            }
+        }
+#endif
     } else if (o->oAction == 1) {
         model = MODEL_RED_FLAME;
         flameVel = 95.0f;
@@ -50,12 +54,13 @@ void bhv_flamethrower_loop(void) {
         if (o->oBehParams2ndByte == 2)
             flameVel = 50.0f;
         flameTimeRemaining = 1;
-        if (o->oTimer < 60)
+        if (o->oTimer < 60) {
             flameTimeRemaining = 15;
-        else if (o->oTimer < 74)
+        } else if (o->oTimer < 74) {
             flameTimeRemaining = 75 - o->oTimer; // Range: [15..2]
-        else
+        } else {
             o->oAction++;
+        }
         o->oFlameThowerTimeRemaining = flameTimeRemaining;
         flame = spawn_object_relative(o->oBehParams2ndByte, 0, 0, 0, o, model, bhvFlamethrowerFlame);
         flame->oForwardVel = flameVel;

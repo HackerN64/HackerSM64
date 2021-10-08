@@ -6,7 +6,8 @@
         
         $Id: gzsort.h,v 1.11 1998/01/06 01:28:21 yasu Exp $
  *---------------------------------------------------------------------*/
-#pragma once
+#ifndef _GZSORT_H_
+#define _GZSORT_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -625,5 +626,6 @@ extern  u64     gspZSort_pl_fifoDataStart[], gspZSort_pl_fifoDataEnd[];
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+#endif /* _GZSORT_H_ */
 
 /*======== End of gzsort.h ========*/

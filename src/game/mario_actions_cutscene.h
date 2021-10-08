@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MARIO_ACTIONS_CUTSCENE_H
+#define MARIO_ACTIONS_CUTSCENE_H
 
 #include <PR/ultratypes.h>
 
@@ -25,3 +26,5 @@ s32 set_mario_npc_dialog(s32 actionArg);
 s32 mario_execute_cutscene_action(struct MarioState *m);
 extern Vp sEndCutsceneVp;
 extern struct CreditsEntry *sDispCreditsEntry;
+
+#endif // MARIO_ACTIONS_CUTSCENE_H

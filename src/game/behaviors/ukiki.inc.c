@@ -27,25 +27,18 @@ void handle_cap_ukiki_reset(void) {
  * the cap ukiki.
  */
 s32 is_cap_ukiki_and_mario_has_normal_cap_on_head(void) {
-    if (o->oBehParams2ndByte == UKIKI_CAP) {
-        if (does_mario_have_normal_cap_on_head(gMarioState)) {
-            return TRUE;
-        }
-    }
-
-    return FALSE;
+    return ((o->oBehParams2ndByte == UKIKI_CAP) && does_mario_have_normal_cap_on_head(gMarioState));
 }
 
 /**
  * Unused copy of geo_update_projectile_pos_from_parent. Perhaps a copy paste mistake.
  */
-Gfx *geo_update_projectile_pos_from_parent_copy(s32 run,UNUSED struct GraphNode *node, Mat4 mtx) {
+Gfx *geo_update_projectile_pos_from_parent_copy(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
     Mat4 mtx2;
-    struct Object* obj;
 
-    if (run == TRUE) {
+    if (callContext == GEO_CONTEXT_RENDER) {
         // TODO: change global type to Object pointer
-        obj = (struct Object *) gCurGraphNodeObject;
+        struct Object *obj = (struct Object *) gCurGraphNodeObject;
 
         if (obj->prevObj != NULL) {
             create_transformation_from_matrices(mtx2, mtx, *gCurGraphNodeCamera->matrixPtr);
@@ -562,7 +555,7 @@ void cap_ukiki_held_loop(void) {
             if (mario_lose_cap_to_enemy(2)) {
                 o->oUkikiTextState = UKIKI_TEXT_STEAL_CAP;
                 o->oUkikiHasCap |= UKIKI_CAP_ON;
-            } else {}
+            }
             break;
 
         case UKIKI_TEXT_STEAL_CAP:

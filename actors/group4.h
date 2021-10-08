@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GROUP4_H
+#define GROUP4_H
 
 #include "types.h"
 
@@ -103,3 +104,5 @@ extern const struct Animation *const unagi_seg5_anims_05012824[];
 // whirlpool
 extern const Gfx whirlpool_seg5_dl_05013B58[];
 extern const Gfx whirlpool_seg5_dl_05013CB8[];
+
+#endif

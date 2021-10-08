@@ -41,6 +41,11 @@
  */
 
 #define o gCurrentObject
+#define OBJ_COL_FLAG_GROUNDED   (1 << 0)
+#define OBJ_COL_FLAG_HIT_WALL   (1 << 1)
+#define OBJ_COL_FLAG_UNDERWATER (1 << 2)
+#define OBJ_COL_FLAG_NO_Y_VEL   (1 << 3)
+#define OBJ_COL_FLAGS_LANDED    (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
 
 /**
  * Current object floor as defined in object_step.
@@ -184,7 +189,7 @@ s8 turn_obj_away_from_steep_floor(struct Surface *objFloor, f32 floorY, f32 objV
     floor_nZ = objFloor->normal.z;
 
     // If the floor is steep and we are below it (i.e. walking into it), turn away from the floor.
-    if (floor_nY < 0.5 && floorY > o->oPosY) {
+    if (floor_nY < 0.5f && floorY > o->oPosY) {
         objVelXCopy = objVelX;
         objVelZCopy = objVelZ;
         turn_obj_away_from_surface(objVelXCopy, objVelZCopy, floor_nX, floor_nY, floor_nZ, &objYawX, &objYawZ);
@@ -235,7 +240,7 @@ void obj_orient_graph(struct Object *obj, f32 normalX, f32 normalY, f32 normalZ)
  * Determines an object's forward speed multiplier.
  */
 void calc_obj_friction(f32 *objFriction, f32 floor_nY) {
-    if (floor_nY < 0.2 && o->oFriction < 0.9999) {
+    if (floor_nY < 0.2f && o->oFriction < 0.9999f) {
         *objFriction = 0;
     } else {
         *objFriction = o->oFriction;
@@ -253,21 +258,21 @@ void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 obj
 
     // Caps vertical speed with a "terminal velocity".
     o->oVelY -= o->oGravity;
-    if (o->oVelY > 75.0) {
-        o->oVelY = 75.0;
+    if (o->oVelY > 75.0f) {
+        o->oVelY = 75.0f;
     }
-    if (o->oVelY < -75.0) {
-        o->oVelY = -75.0;
+    if (o->oVelY < -75.0f) {
+        o->oVelY = -75.0f;
     }
 
     o->oPosY += o->oVelY;
 
-    //Snap the object up to the floor.
+    // Snap the object up to the floor.
     if (o->oPosY < objFloorY) {
         o->oPosY = objFloorY;
 
         // Bounces an object if the ground is hit fast enough.
-        if (o->oVelY < -17.5) {
+        if (o->oVelY < -17.5f) {
             o->oVelY = -(o->oVelY / 2);
         } else {
             o->oVelY = 0;
@@ -279,31 +284,24 @@ void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 obj
         obj_orient_graph(o, floor_nX, floor_nY, floor_nZ);
 
         // Adds horizontal component of gravity for horizontal speed.
-        objVelX += floor_nX * (floor_nX * floor_nX + floor_nZ * floor_nZ)
-                   / (floor_nX * floor_nX + floor_nY * floor_nY + floor_nZ * floor_nZ) * o->oGravity
-                   * 2;
-        objVelZ += floor_nZ * (floor_nX * floor_nX + floor_nZ * floor_nZ)
-                   / (floor_nX * floor_nX + floor_nY * floor_nY + floor_nZ * floor_nZ) * o->oGravity
-                   * 2;
+        f32 nxz = (sqr(floor_nX) + sqr(floor_nZ));
+        f32 nxyz = (nxz + sqr(floor_nY));
+        objVelX += floor_nX * (nxz) / (nxyz) * o->oGravity * 2;
+        objVelZ += floor_nZ * (nxz) / (nxyz) * o->oGravity * 2;
 
-        if (objVelX < 0.000001 && objVelX > -0.000001) {
-            objVelX = 0;
-        }
-        if (objVelZ < 0.000001 && objVelZ > -0.000001) {
-            objVelZ = 0;
-        }
+        if (objVelX < 0.000001f && objVelX > -0.000001f) objVelX = 0;
+        if (objVelZ < 0.000001f && objVelZ > -0.000001f) objVelZ = 0;
 
         if (objVelX != 0 || objVelZ != 0) {
             o->oMoveAngleYaw = atan2s(objVelZ, objVelX);
         }
 
         calc_obj_friction(&objFriction, floor_nY);
-        o->oForwardVel = sqrtf(objVelX * objVelX + objVelZ * objVelZ) * objFriction;
+        o->oForwardVel = sqrtf(sqr(objVelX) + sqr(objVelZ)) * objFriction;
     }
 }
 
-void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY, f32 objVelX, f32 objVelZ,
-                                    f32 waterY) {
+void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY, f32 objVelX, f32 objVelZ, f32 waterY) {
     f32 floor_nX = objFloor->normal.x;
     f32 floor_nY = objFloor->normal.y;
     f32 floor_nZ = objFloor->normal.z;
@@ -312,21 +310,21 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
     o->oVelY -= netYAccel;
 
     // Caps vertical speed with a "terminal velocity".
-    if (o->oVelY > 75.0) {
-        o->oVelY = 75.0;
+    if (o->oVelY > 75.0f) {
+        o->oVelY = 75.0f;
     }
-    if (o->oVelY < -75.0) {
-        o->oVelY = -75.0;
+    if (o->oVelY < -75.0f) {
+        o->oVelY = -75.0f;
     }
 
     o->oPosY += o->oVelY;
 
-    //Snap the object up to the floor.
+    // Snap the object up to the floor.
     if (o->oPosY < floorY) {
         o->oPosY = floorY;
 
         // Bounces an object if the ground is hit fast enough.
-        if (o->oVelY < -17.5) {
+        if (o->oVelY < -17.5f) {
             o->oVelY = -(o->oVelY / 2);
         } else {
             o->oVelY = 0;
@@ -334,7 +332,7 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
     }
 
     // If moving fast near the surface of the water, flip vertical speed? To emulate skipping?
-    if (o->oForwardVel > 12.5 && (waterY + 30.0f) > o->oPosY && (waterY - 30.0f) < o->oPosY) {
+    if (o->oForwardVel > 12.5f && (waterY + 30.0f) > o->oPosY && (waterY - 30.0f) < o->oPosY) {
         o->oVelY = -o->oVelY;
     }
 
@@ -342,20 +340,16 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
         obj_orient_graph(o, floor_nX, floor_nY, floor_nZ);
 
         // Adds horizontal component of gravity for horizontal speed.
-        objVelX += floor_nX * (floor_nX * floor_nX + floor_nZ * floor_nZ)
-                   / (floor_nX * floor_nX + floor_nY * floor_nY + floor_nZ * floor_nZ) * netYAccel * 2;
-        objVelZ += floor_nZ * (floor_nX * floor_nX + floor_nZ * floor_nZ)
-                   / (floor_nX * floor_nX + floor_nY * floor_nY + floor_nZ * floor_nZ) * netYAccel * 2;
+        f32 nxz = (sqr(floor_nX) + sqr(floor_nZ));
+        f32 nxyz = (nxz + sqr(floor_nY));
+        objVelX += floor_nX * (nxz) / (nxyz) * netYAccel * 2;
+        objVelZ += floor_nZ * (nxz) / (nxyz) * netYAccel * 2;
     }
 
-    if (objVelX < 0.000001 && objVelX > -0.000001) {
-        objVelX = 0;
-    }
-    if (objVelZ < 0.000001 && objVelZ > -0.000001) {
-        objVelZ = 0;
-    }
+    if (objVelX < 0.000001f && objVelX > -0.000001f) objVelX = 0;
+    if (objVelZ < 0.000001f && objVelZ > -0.000001f) objVelZ = 0;
 
-    if (o->oVelY < 0.000001 && o->oVelY > -0.000001) {
+    if (o->oVelY < 0.000001f && o->oVelY > -0.000001f) {
         o->oVelY = 0;
     }
 
@@ -365,8 +359,8 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
 
     // Decreases both vertical velocity and forward velocity. Likely so that skips above
     // don't loop infinitely.
-    o->oForwardVel = sqrtf(objVelX * objVelX + objVelZ * objVelZ) * 0.8;
-    o->oVelY *= 0.8;
+    o->oForwardVel = sqrtf(sqr(objVelX) + sqr(objVelZ)) * 0.8f;
+    o->oVelY *= 0.8f;
 }
 
 /**
@@ -518,15 +512,7 @@ s8 is_point_close_to_object(struct Object *obj, f32 x, f32 y, f32 z, s32 dist) {
  * Sets an object as visible if within a certain distance of Mario's graphical position.
  */
 void set_object_visibility(struct Object *obj, s32 dist) {
-    f32 objX = obj->oPosX;
-    f32 objY = obj->oPosY;
-    f32 objZ = obj->oPosZ;
-
-    if (is_point_within_radius_of_mario(objX, objY, objZ, dist) == TRUE) {
-        obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-    } else {
-        obj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
-    }
+    COND_BIT((!is_point_within_radius_of_mario(obj->oPosX, obj->oPosY, obj->oPosZ, dist)), obj->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE);
 }
 
 /**
@@ -625,11 +611,7 @@ s8 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan) {
     }
 
     if (obj->oTimer < lifeSpan + 40) {
-        if (obj->oTimer % 2 != 0) {
-            obj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
-        } else {
-            obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-        }
+        COND_BIT((obj->oTimer & 0x1), obj->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE);
     } else {
         obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
         return TRUE;
@@ -647,18 +629,9 @@ s8 current_mario_room_check(s16 room) {
     // Since object surfaces have room 0, this tests if the surface is an
     // object first and uses the last room if so.
     if (gMarioCurrentRoom == 0) {
-        if (room == sPrevCheckMarioRoom) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        return (room == sPrevCheckMarioRoom);
     } else {
-        if (room == gMarioCurrentRoom) {
-            result = TRUE;
-        } else {
-            result = FALSE;
-        }
-
+        result = (room == gMarioCurrentRoom);
         sPrevCheckMarioRoom = gMarioCurrentRoom;
     }
 
@@ -704,7 +677,7 @@ void obj_check_floor_death(s16 collisionFlags, struct Surface *floor) {
             case SURFACE_BURNING:
                 o->oAction = OBJ_ACT_LAVA_DEATH;
                 break;
-            //! @BUG Doesn't check for the vertical wind death floor.
+            case SURFACE_VERTICAL_WIND: // fall through
             case SURFACE_DEATH_PLANE:
                 o->oAction = OBJ_ACT_DEATH_PLANE_DEATH;
                 break;

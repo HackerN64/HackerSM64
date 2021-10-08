@@ -68,7 +68,7 @@ void bhv_coin_loop(void) {
             o->oSubAction = 1;
         if (o->oSubAction == 1) {
             o->oBounciness = 0;
-            if (floor->normal.y < 0.9) {
+            if (floor->normal.y < 0.9f) {
                 targetYaw = atan2s(floor->normal.z, floor->normal.x);
                 cur_obj_rotate_yaw_toward(targetYaw, 0x400);
             }
@@ -138,7 +138,7 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
             break;
         case 1:
             snapToGround = FALSE;
-            pos[1] = 160 * index * 0.8; // 128 * index
+            pos[1] = 160 * index * 0.8f; // 128 * index
             if (index > 4)
                 spawnCoin = FALSE;
             break;
@@ -216,9 +216,13 @@ void coin_inside_boo_act_0(void) {
     s16 marioMoveYaw;
     struct Object *parent = o->parentObj;
     cur_obj_become_intangible();
+#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
+    if (o->oTimer == 0) {
+#else
     if (o->oTimer == 0 && gCurrLevelNum == LEVEL_BBH) {
+#endif
         cur_obj_set_model(MODEL_BLUE_COIN);
-        cur_obj_scale(0.7);
+        cur_obj_scale(0.7f);
     }
     obj_copy_pos(o, parent);
     if (parent->oBooDeathStatus == BOO_DEATH_STATUS_DYING) {

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MACRO_PRESET_NAMES_H
+#define MACRO_PRESET_NAMES_H
 
 enum MacroPresets {
     macro_yellow_coin,
@@ -368,3 +369,5 @@ enum MacroPresets {
     macro_empty_364,
     macro_empty_365
 };
+
+#endif // MACRO_PRESET_NAMES_H

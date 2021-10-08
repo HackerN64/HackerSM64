@@ -52,23 +52,19 @@ void whomp_turn(void) {
 }
 
 void whomp_patrol(void) {
-    s16 marioAngle;
-    f32 distWalked;
-    f32 patrolDist;
-
-    marioAngle = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
-    distWalked = cur_obj_lateral_dist_to_home();
-    if (gCurrLevelNum == LEVEL_BITS)
-        patrolDist = 200.0f;
-    else
-        patrolDist = 700.0f;
-
+    s16 marioAngle = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
+    f32 distWalked = cur_obj_lateral_dist_to_home();
+#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS // Make this a behavior param?
+    f32 patrolDist = 700.0f;
+#else
+    f32 patrolDist = ((gCurrLevelNum == LEVEL_BITS) ? 200.0f : 700.0f);
+#endif
     cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
     o->oForwardVel = 3.0f;
 
-    if (distWalked > patrolDist)
+    if (distWalked > patrolDist) {
         o->oAction = 7;
-    else if (marioAngle < 0x2000) {
+    } else if (marioAngle < 0x2000) {
         if (o->oDistanceToMario < 1500.0f) {
             o->oForwardVel = 9.0f;
             cur_obj_init_animation_with_accel_and_sound(0, 3.0f);
@@ -146,12 +142,12 @@ void king_whomp_on_ground(void) {
             if (o->oHealth == 0)
                 o->oAction = 8;
             else {
-                vec3f_copy(pos, &o->oPosX);
-                vec3f_copy(&o->oPosX, &gMarioObject->oPosX);
+                vec3f_copy(pos, &o->oPosVec);
+                vec3f_copy(&o->oPosVec, &gMarioObject->oPosVec);
                 spawn_mist_particles_variable(0, 0, 100.0f);
                 spawn_triangle_break_particles(20, MODEL_DIRT_ANIMATION, 3.0f, 4);
                 cur_obj_shake_screen(SHAKE_POS_SMALL);
-                vec3f_copy(&o->oPosX, pos);
+                vec3f_copy(&o->oPosVec, pos);
             }
             o->oSubAction++;
         }

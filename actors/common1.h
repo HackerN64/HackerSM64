@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMMON1_H
+#define COMMON1_H
 
 #include "types.h"
 
@@ -49,18 +50,18 @@ extern const Gfx coin_seg3_dl_030079B8[];
 extern const GeoLayout dirt_animation_geo[];
 extern const GeoLayout cartoon_star_geo[];
 extern const Gfx dirt_seg3_dl_0302BFF8[];
-extern const Gfx dirt_seg3_dl_0302C028[];
-extern const Gfx dirt_seg3_dl_0302C238[];
-extern const Gfx dirt_seg3_dl_0302C298[];
-extern const Gfx dirt_seg3_dl_0302C2B8[];
-extern const Gfx dirt_seg3_dl_0302C2D8[];
-extern const Gfx dirt_seg3_dl_0302C2F8[];
-extern const Gfx dirt_seg3_dl_0302C318[];
-extern const Gfx dirt_seg3_dl_0302C378[];
-extern const Gfx dirt_seg3_dl_0302C3B0[];
-extern const Gfx dirt_seg3_dl_0302C3E8[];
-extern const Gfx dirt_seg3_dl_0302C420[];
-extern const Gfx dirt_seg3_dl_0302C458[];
+extern const Gfx dirt_seg3_dl_dirt_particle[];
+extern const Gfx dirt_seg3_sub_dl_cartoon_star[];
+extern const Gfx dirt_seg3_dl_cartoon_star_red[];
+extern const Gfx dirt_seg3_dl_cartoon_star_green[];
+extern const Gfx dirt_seg3_dl_cartoon_star_blue[];
+extern const Gfx dirt_seg3_dl_cartoon_star_yellow[];
+extern const Gfx dirt_seg3_dl_cartoon_star_billboard[];
+extern const Gfx dirt_seg3_dl_tiny_particle_red[];
+extern const Gfx dirt_seg3_dl_tiny_particle_green[];
+extern const Gfx dirt_seg3_dl_tiny_particle_blue[];
+extern const Gfx dirt_seg3_dl_tiny_particle_yellow[];
+extern const Gfx dirt_seg3_dl_tiny_particle_billboard[];
 
 // door
 extern const GeoLayout castle_door_geo[];
@@ -112,6 +113,7 @@ extern const Gfx door_seg3_dl_03015078[];
 extern const Gfx door_seg3_dl_030150E8[];
 extern const Gfx door_seg3_dl_03015158[];
 extern const struct Animation *const door_seg3_anims_030156C0[];
+extern const Collision door_seg3_collision_door[];
 
 // explosion
 extern const GeoLayout explosion_geo[];
@@ -189,10 +191,18 @@ extern const GeoLayout number_geo[];
 extern const Gfx pebble_seg3_dl_0301CB00[];
 
 // power_meter
-extern const u8 *const power_meter_health_segments_lut[];
+extern const Texture *const power_meter_health_segments_lut[];
 extern const Gfx dl_power_meter_base[];
 extern const Gfx dl_power_meter_health_segments_begin[];
 extern const Gfx dl_power_meter_health_segments_end[];
+
+#ifdef BREATH_METER
+// breath_meter
+extern const Texture *const breath_meter_segments_lut[];
+extern const Gfx dl_breath_meter_base[];
+extern const Gfx dl_breath_meter_health_segments_begin[];
+extern const Gfx dl_breath_meter_health_segments_end[];
+#endif
 
 // sand
 extern const Gfx sand_seg3_dl_0302BCD0[];
@@ -221,10 +231,6 @@ extern const Gfx tree_seg3_dl_spiky[];
 extern const Gfx tree_seg3_dl_snowy_pine[];
 extern const Gfx tree_seg3_dl_palm[];
 
-// warp_collision
-extern const Collision door_seg3_collision_0301CE78[];
-extern const Collision lll_hexagonal_mesh_seg3_collision_0301CECC[];
-
 // warp_pipe
 extern const GeoLayout warp_pipe_geo[];
 extern const Gfx warp_pipe_seg3_dl_03008E40[];
@@ -246,3 +252,5 @@ extern const Gfx wooden_signpost_seg3_dl_0302DC40[];
 extern const Gfx wooden_signpost_seg3_dl_0302DCD0[];
 extern const Gfx wooden_signpost_seg3_dl_0302DD08[];
 extern const Collision wooden_signpost_seg3_collision_0302DD80[];
+
+#endif

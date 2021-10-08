@@ -27,7 +27,8 @@
         $Date: 1998/10/09 08:01:18 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_SYSTEM_H_
+#define	_OS_SYSTEM_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -113,3 +114,5 @@ extern s32		osAfterPreNMI(void);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_SYSTEM_H_ */

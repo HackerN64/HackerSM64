@@ -18,7 +18,8 @@
         $Date: 2002/05/02 03:28:24 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_INTERNAL_H_
+#define	_OS_INTERNAL_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -44,3 +45,5 @@ extern "C" {
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_INTERNAL_H */

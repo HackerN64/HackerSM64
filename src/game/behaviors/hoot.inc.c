@@ -18,21 +18,21 @@ f32 hoot_find_next_floor(f32 dist) {
 }
 
 void hoot_floor_bounce(void) {
-    f32 floorY;
-
-    floorY = hoot_find_next_floor(375.0f);
-    if (floorY + 75.0f > o->oPosY)
-        o->oMoveAnglePitch -= 3640.8888;
-
+    f32 floorY = hoot_find_next_floor(375.0f);
+    if (floorY + 75.0f > o->oPosY) {
+        o->oMoveAnglePitch -= DEGREES(20);
+    }
     floorY = hoot_find_next_floor(200.0f);
-    if (floorY + 125.0f > o->oPosY)
-        o->oMoveAnglePitch -= 7281.7776;
-
+    if (floorY + 125.0f > o->oPosY) {
+        o->oMoveAnglePitch -= DEGREES(40);
+    }
     floorY = hoot_find_next_floor(0.0f);
-    if (floorY + 125.0f > o->oPosY)
+    if (floorY + 125.0f > o->oPosY) {
         o->oPosY = floorY + 125.0f;
-    if (o->oMoveAnglePitch < -21845.3328)
-        o->oMoveAnglePitch = -21845;
+    }
+    if (o->oMoveAnglePitch < -DEGREES(120)) {
+        o->oMoveAnglePitch = -DEGREES(120);
+    }
 }
 
 void hoot_free_step(s16 fastOscY, s32 speed) {
@@ -51,9 +51,9 @@ void hoot_free_step(s16 fastOscY, s32 speed) {
 
     o->oPosX += o->oVelX;
     if (fastOscY == 0)
-        o->oPosY -= o->oVelY + coss((s32)(animFrame * 3276.8)) * 50.0f / 4;
+        o->oPosY -= o->oVelY + coss((s32)(animFrame * 3276.8f)) * 50.0f / 4;
     else
-        o->oPosY -= o->oVelY + coss((s32)(animFrame * 6553.6)) * 50.0f / 4;
+        o->oPosY -= o->oVelY + coss((s32)(animFrame * 6553.6f)) * 50.0f / 4;
     o->oPosZ += o->oVelZ;
 
     find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
@@ -89,7 +89,7 @@ void hoot_carry_step(s32 speed, UNUSED f32 xPrev, UNUSED f32 zPrev) {
     o->oVelZ = coss(yaw) * hSpeed;
 
     o->oPosX += o->oVelX;
-    o->oPosY -= o->oVelY + coss((s32)(animFrame * 6553.6)) * 50.0f / 4;
+    o->oPosY -= o->oVelY + coss((s32)(animFrame * 6553.6f)) * 50.0f / 4;
     o->oPosZ += o->oVelZ;
 
     if (animFrame == 0)
@@ -104,8 +104,8 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
     hitbox.x = o->oPosX;
     hitbox.y = o->oPosY;
     hitbox.z = o->oPosZ;
-    hitbox.offsetY = 10.0;
-    hitbox.radius = 50.0;
+    hitbox.offsetY = 10.0f;
+    hitbox.radius  = 50.0f;
 
     if (find_wall_collisions(&hitbox) != 0) {
         o->oPosX = hitbox.x;

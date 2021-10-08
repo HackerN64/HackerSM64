@@ -9,15 +9,6 @@
 #include "game/area.h"
 #include "geo_layout.h"
 
-// unused Mtx(s)
-s16 identityMtx[4][4] = { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-s16 zeroMtx[4][4] = { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
-
-Vec3f gVec3fZero = { 0.0f, 0.0f, 0.0f };
-Vec3s gVec3sZero = { 0, 0, 0 };
-Vec3f gVec3fOne = { 1.0f, 1.0f, 1.0f };
-UNUSED Vec3s gVec3sOne = { 1, 1, 1 };
-
 /**
  * Initialize a geo node with a given type. Sets all links such that there
  * are no siblings, parent or children for this node.
@@ -722,9 +713,9 @@ void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f po
     graphNode->throwMatrix = NULL;
     graphNode->animInfo.curAnim = NULL;
 
-    graphNode->node.flags |= GRAPH_RENDER_ACTIVE;
+    graphNode->node.flags |=  GRAPH_RENDER_ACTIVE;
     graphNode->node.flags &= ~GRAPH_RENDER_INVISIBLE;
-    graphNode->node.flags |= GRAPH_RENDER_HAS_ANIMATION;
+    graphNode->node.flags |=  GRAPH_RENDER_HAS_ANIMATION;
     graphNode->node.flags &= ~GRAPH_RENDER_BILLBOARD;
 }
 
@@ -887,7 +878,7 @@ void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f posit
         position[1] = (f32) values[retrieve_animation_index(frame, &attribute)];
         position[2] = (f32) values[retrieve_animation_index(frame, &attribute)];
     } else {
-        vec3f_set(position, 0, 0, 0);
+        vec3_zero(position);
     }
 }
 

@@ -9,8 +9,8 @@ void bhv_water_air_bubble_init(void) {
 
 void bhv_water_air_bubble_loop(void) {
     s32 i;
-    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.5 + 4.0;
-    o->header.gfx.scale[1] = -sins(o->oWaterObjScaleXAngle) * 0.5 + 4.0;
+    o->header.gfx.scale[0] =  sins(o->oWaterObjScaleXAngle) * 0.5f + 4.0f;
+    o->header.gfx.scale[1] = -sins(o->oWaterObjScaleXAngle) * 0.5f + 4.0f;
     o->oWaterObjScaleXAngle += 0x400;
     if (o->oTimer < 30) {
         cur_obj_become_intangible();
@@ -41,24 +41,24 @@ void bhv_bubble_wave_init(void) {
 }
 
 void scale_bubble_random(void) {
-    cur_obj_scale(random_float() + 1.0);
+    cur_obj_scale(random_float() + 1.0f);
 }
 
 void bhv_bubble_maybe_loop(void) {
-    o->oPosY += random_float() * 3.0f + 6.0f;
+    o->oPosY += random_float() *  3.0f + 6.0f;
     o->oPosX += random_float() * 10.0f - 5.0f;
     o->oPosZ += random_float() * 10.0f - 5.0f;
-    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.2 + 1.0;
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
-    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2 + 1.0;
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
 }
 
 void bhv_small_water_wave_loop(void) {
     f32 waterLevel = find_water_level(o->oPosX, o->oPosZ);
-    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.2 + 1.0;
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
-    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2 + 1.0;
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
     if (o->oPosY > waterLevel) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
@@ -71,9 +71,9 @@ void bhv_small_water_wave_loop(void) {
 }
 
 void scale_bubble_sin(void) {
-    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.5 + 2.0;
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.5f + 2.0f;
     o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
-    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.5 + 2.0;
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.5f + 2.0f;
     o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
 }
 
@@ -102,13 +102,16 @@ void bhv_small_bubbles_loop(void) {
 }
 
 void bhv_fish_group_loop(void) {
-    if (gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7)
-        if (gGlobalTimer & 1)
+    if (gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) {
+        if (gGlobalTimer & 1) {
             spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleBubbles);
+        }
+    }
 }
 
 void bhv_water_waves_init(void) {
     s32 i;
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++) {
         spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticle);
+    }
 }

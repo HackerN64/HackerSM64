@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OBJECT_LIST_PROCESSOR_H
+#define OBJECT_LIST_PROCESSOR_H
 
 #include <PR/ultratypes.h>
 
@@ -85,6 +86,7 @@ extern struct ObjectNode gFreeObjectList;
 extern struct Object *gMarioObject;
 extern struct Object *gLuigiObject;
 extern struct Object *gCurrentObject;
+#define o gCurrentObject
 
 extern const BehaviorScript *gCurBhvCommand;
 extern s16 gPrevFrameObjectCount;
@@ -98,6 +100,7 @@ extern struct MemoryPool *gObjectMemoryPool;
 
 extern s16 gCheckingSurfaceCollisionsForCamera;
 extern s16 gFindFloorIncludeSurfaceIntangible;
+extern s16 gFindFloorExcludeDynamic;
 extern TerrainData *gEnvironmentRegions;
 extern s32 gEnvironmentLevels[20];
 extern RoomData gDoorAdjacentRooms[60][2];
@@ -119,3 +122,6 @@ void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex);
 void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo);
 void clear_objects(void);
 void update_objects(UNUSED s32 unused);
+
+
+#endif // OBJECT_LIST_PROCESSOR_H

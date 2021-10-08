@@ -65,7 +65,7 @@ static void fire_piranha_plant_act_hide(void) {
                 }
 
                 obj_die_if_health_non_positive();
-                set_object_respawn_info_bits(o, 1);
+                set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_32);
             }
         } else if (sNumActiveFirePiranhaPlants < 2 && o->oTimer > 100 && o->oDistanceToMario > 100.0f
                    && o->oDistanceToMario < 800.0f) {

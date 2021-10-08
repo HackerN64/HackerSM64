@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MENU_HEADER_H
+#define MENU_HEADER_H
 
 #include "types.h"
 
@@ -29,8 +30,8 @@ extern const Gfx dl_menu_sound_button[];
 extern const Gfx dl_menu_generic_button[];
 extern const Gfx dl_menu_idle_hand[];
 extern const Gfx dl_menu_grabbing_hand[];
-extern const u8 *const menu_hud_lut[];
-extern const u8 *const menu_font_lut[];
+extern const Texture *const menu_hud_lut[];
+extern const Texture *const menu_font_lut[];
 extern const Gfx dl_menu_ia8_text_begin[];
 extern const Gfx dl_menu_ia8_text_end[];
 extern const Gfx dl_menu_rgba16_wood_course[];
@@ -47,3 +48,5 @@ extern const u8 eu_course_strings_de_table[];
 // script
 extern const LevelScript level_main_menu_entry_file_select[];
 extern const LevelScript level_main_menu_entry_act_select[];
+
+#endif

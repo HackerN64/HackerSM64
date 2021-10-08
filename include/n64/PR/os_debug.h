@@ -27,7 +27,9 @@
         $Date: 1999/06/30 03:04:08 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_DEBUG_H_
+#define	_OS_DEBUG_H_
+
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -112,3 +114,5 @@ extern OSTime           osThreadProfileReadTimeTh(OSThread*);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_DEBUG_H_ */

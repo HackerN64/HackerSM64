@@ -109,8 +109,8 @@ s16 gMovtexCounterPrev = 0;
 
 // Vertex colors for rectangles. Used to give mist a tint
 #define MOVTEX_VTX_COLOR_DEFAULT 0 // no tint (white vertex colors)
-#define MOVTEX_VTX_COLOR_YELLOW 1  // used for Hazy Maze Cave toxic haze
-#define MOVTEX_VTX_COLOR_RED 2     // used for Shifting Sand Land around the Tox box maze
+#define MOVTEX_VTX_COLOR_YELLOW  1 // used for Hazy Maze Cave toxic haze
+#define MOVTEX_VTX_COLOR_RED     2 // used for Shifting Sand Land around the Tox box maze
 
 s8 gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT;
 
@@ -120,71 +120,71 @@ float gPaintingMarioYEntry = 0.0f;
 /// Variable to ensure the initial Wet-Dry World water level is set only once
 s32 gWdwWaterLevelSet = FALSE;
 
-extern u8 ssl_quicksand[];
-extern u8 ssl_pyramid_sand[];
-extern u8 ttc_yellow_triangle[];
+extern Texture ssl_quicksand[];
+extern Texture ssl_pyramid_sand[];
+extern Texture ttc_yellow_triangle[];
 
 /**
  * An array for converting a movtex texture id to a pointer that can
  * be passed to gDPSetTextureImage.
  */
-u8 *gMovtexIdToTexture[] = { texture_waterbox_water,     texture_waterbox_mist,
-                             texture_waterbox_jrb_water, texture_waterbox_unknown_water,
-                             texture_waterbox_lava,      ssl_quicksand,
-                             ssl_pyramid_sand,           ttc_yellow_triangle };
+Texture *gMovtexIdToTexture[] = { texture_waterbox_water,     texture_waterbox_mist,
+                                  texture_waterbox_jrb_water, texture_waterbox_unknown_water,
+                                  texture_waterbox_lava,      ssl_quicksand,
+                                  ssl_pyramid_sand,           ttc_yellow_triangle };
 
-extern Gfx castle_grounds_dl_waterfall[];
-extern s16 castle_grounds_movtex_tris_waterfall[];
-extern s16 ssl_movtex_tris_pyramid_sand_pathway_front[];
-extern Gfx ssl_dl_pyramid_sand_pathway_begin[];
-extern Gfx ssl_dl_pyramid_sand_pathway_end[];
-extern Gfx ssl_dl_pyramid_sand_pathway_front_end[];
-extern s16 ssl_movtex_tris_pyramid_sand_pathway_floor[];
-extern Gfx ssl_dl_pyramid_sand_pathway_floor_begin[];
-extern Gfx ssl_dl_pyramid_sand_pathway_floor_end[];
-extern s16 ssl_movtex_tris_pyramid_sand_pathway_side[];
-extern Gfx ssl_dl_pyramid_sand_pathway_side_end[];
-extern s16 bitfs_movtex_tris_lava_first_section[];
-extern Gfx bitfs_dl_lava_sections[];
-extern s16 bitfs_movtex_tris_lava_second_section[];
-extern s16 bitfs_movtex_tris_lava_floor[];
-extern Gfx bitfs_dl_lava_floor[];
-extern s16 lll_movtex_tris_lava_floor[];
-extern Gfx lll_dl_lava_floor[];
-extern s16 lll_movtex_tris_lavafall_volcano[];
-extern Gfx lll_dl_lavafall_volcano[];
-extern s16 cotmc_movtex_tris_water[];
-extern Gfx cotmc_dl_water_begin[];
-extern Gfx cotmc_dl_water_end[];
-extern Gfx cotmc_dl_water[];
-extern s16 ttm_movtex_tris_begin_waterfall[];
-extern Gfx ttm_dl_waterfall[];
-extern s16 ttm_movtex_tris_end_waterfall[];
-extern s16 ttm_movtex_tris_begin_puddle_waterfall[];
-extern Gfx ttm_dl_bottom_waterfall[];
-extern s16 ttm_movtex_tris_end_puddle_waterfall[];
-extern s16 ttm_movtex_tris_puddle_waterfall[];
-extern Gfx ttm_dl_puddle_waterfall[];
-extern s16 ssl_movtex_tris_pyramid_quicksand[];
-extern Gfx ssl_dl_quicksand_begin[];
-extern Gfx ssl_dl_quicksand_end[];
-extern Gfx ssl_dl_pyramid_quicksand[];
-extern s16 ssl_movtex_tris_pyramid_corners_quicksand[];
-extern Gfx ssl_dl_pyramid_corners_quicksand[];
-extern s16 ssl_movtex_tris_sides_quicksand[];
-extern Gfx ssl_dl_sides_quicksand[];
-extern s16 ttc_movtex_tris_big_surface_treadmill[];
-extern Gfx ttc_dl_surface_treadmill_begin[];
-extern Gfx ttc_dl_surface_treadmill_end[];
-extern Gfx ttc_dl_surface_treadmill[];
-extern s16 ttc_movtex_tris_small_surface_treadmill[];
-extern s16 ssl_movtex_tris_quicksand_pit[];
-extern Gfx ssl_dl_quicksand_pit_begin[];
-extern Gfx ssl_dl_quicksand_pit_end[];
-extern Gfx ssl_dl_quicksand_pit[];
-extern s16 ssl_movtex_tris_pyramid_quicksand_pit[];
-extern Gfx ssl_dl_pyramid_quicksand_pit_begin[];
-extern Gfx ssl_dl_pyramid_quicksand_pit_end[];
+extern Gfx    castle_grounds_dl_waterfall[];
+extern Movtex castle_grounds_movtex_tris_waterfall[];
+extern Movtex ssl_movtex_tris_pyramid_sand_pathway_front[];
+extern Gfx    ssl_dl_pyramid_sand_pathway_begin[];
+extern Gfx    ssl_dl_pyramid_sand_pathway_end[];
+extern Gfx    ssl_dl_pyramid_sand_pathway_front_end[];
+extern Movtex ssl_movtex_tris_pyramid_sand_pathway_floor[];
+extern Gfx    ssl_dl_pyramid_sand_pathway_floor_begin[];
+extern Gfx    ssl_dl_pyramid_sand_pathway_floor_end[];
+extern Movtex ssl_movtex_tris_pyramid_sand_pathway_side[];
+extern Gfx    ssl_dl_pyramid_sand_pathway_side_end[];
+extern Movtex bitfs_movtex_tris_lava_first_section[];
+extern Gfx    bitfs_dl_lava_sections[];
+extern Movtex bitfs_movtex_tris_lava_second_section[];
+extern Movtex bitfs_movtex_tris_lava_floor[];
+extern Gfx    bitfs_dl_lava_floor[];
+extern Movtex lll_movtex_tris_lava_floor[];
+extern Gfx    lll_dl_lava_floor[];
+extern Movtex lll_movtex_tris_lavafall_volcano[];
+extern Gfx    lll_dl_lavafall_volcano[];
+extern Movtex cotmc_movtex_tris_water[];
+extern Gfx    cotmc_dl_water_begin[];
+extern Gfx    cotmc_dl_water_end[];
+extern Gfx    cotmc_dl_water[];
+extern Movtex ttm_movtex_tris_begin_waterfall[];
+extern Gfx    ttm_dl_waterfall[];
+extern Movtex ttm_movtex_tris_end_waterfall[];
+extern Movtex ttm_movtex_tris_begin_puddle_waterfall[];
+extern Gfx    ttm_dl_bottom_waterfall[];
+extern Movtex ttm_movtex_tris_end_puddle_waterfall[];
+extern Movtex ttm_movtex_tris_puddle_waterfall[];
+extern Gfx    ttm_dl_puddle_waterfall[];
+extern Movtex ssl_movtex_tris_pyramid_quicksand[];
+extern Gfx    ssl_dl_quicksand_begin[];
+extern Gfx    ssl_dl_quicksand_end[];
+extern Gfx    ssl_dl_pyramid_quicksand[];
+extern Movtex ssl_movtex_tris_pyramid_corners_quicksand[];
+extern Gfx    ssl_dl_pyramid_corners_quicksand[];
+extern Movtex ssl_movtex_tris_sides_quicksand[];
+extern Gfx    ssl_dl_sides_quicksand[];
+extern Movtex ttc_movtex_tris_big_surface_treadmill[];
+extern Gfx    ttc_dl_surface_treadmill_begin[];
+extern Gfx    ttc_dl_surface_treadmill_end[];
+extern Gfx    ttc_dl_surface_treadmill[];
+extern Movtex ttc_movtex_tris_small_surface_treadmill[];
+extern Movtex ssl_movtex_tris_quicksand_pit[];
+extern Gfx    ssl_dl_quicksand_pit_begin[];
+extern Gfx    ssl_dl_quicksand_pit_end[];
+extern Gfx    ssl_dl_quicksand_pit[];
+extern Movtex ssl_movtex_tris_pyramid_quicksand_pit[];
+extern Gfx    ssl_dl_pyramid_quicksand_pit_begin[];
+extern Gfx    ssl_dl_pyramid_quicksand_pit_end[];
 
 /**
  * MovtexObjects that have no color attributes per vertex (though the mesh
@@ -310,9 +310,9 @@ Gfx *geo_wdw_set_initial_water_level(s32 callContext, UNUSED struct GraphNode *n
         gWdwWaterLevelSet = FALSE;
     } else if (callContext == GEO_CONTEXT_RENDER && gEnvironmentRegions != NULL
                && !gWdwWaterLevelSet) {
-        if (gPaintingMarioYEntry <= 1382.4) {
+        if (gPaintingMarioYEntry <= 1382.4f) {
             wdwWaterHeight = 31;
-        } else if (gPaintingMarioYEntry >= 1600.0) {
+        } else if (gPaintingMarioYEntry >= 1600.0f) {
             wdwWaterHeight = 2816;
         } else {
             wdwWaterHeight = 1024;
@@ -509,30 +509,30 @@ Gfx *movtex_gen_quads_id(s16 id, s16 y, void *movetexQuadsSegmented) {
     return NULL;
 }
 
-extern u8 bbh_movtex_merry_go_round_water_entrance[];
-extern u8 bbh_movtex_merry_go_round_water_side[];
-extern u8 ccm_movtex_penguin_puddle_water[];
-extern u8 inside_castle_movtex_green_room_water[];
-extern u8 inside_castle_movtex_moat_water[];
-extern u8 hmc_movtex_dorrie_pool_water[];
-extern u8 hmc_movtex_toxic_maze_mist[];
-extern u8 ssl_movtex_puddle_water[];
-extern u8 ssl_movtex_toxbox_quicksand_mist[];
-extern u8 sl_movtex_water[];
-extern u8 wdw_movtex_area1_water[];
-extern u8 wdw_movtex_area2_water[];
-extern u8 jrb_movtex_water[];
-extern u8 jrb_movtex_intial_mist[];
-extern u8 jrb_movtex_sinked_boat_water[];
-extern u8 thi_movtex_area1_water[];
-extern u8 thi_movtex_area2_water[];
-extern u8 castle_grounds_movtex_water[];
-extern u8 lll_movtex_volcano_floor_lava[];
-extern u8 ddd_movtex_area1_water[];
-extern u8 ddd_movtex_area2_water[];
-extern u8 wf_movtex_water[];
-extern u8 castle_courtyard_movtex_star_statue_water[];
-extern u8 ttm_movtex_puddle[];
+extern Movtex bbh_movtex_merry_go_round_water_entrance[];
+extern Movtex bbh_movtex_merry_go_round_water_side[];
+extern Movtex ccm_movtex_penguin_puddle_water[];
+extern Movtex inside_castle_movtex_green_room_water[];
+extern Movtex inside_castle_movtex_moat_water[];
+extern Movtex hmc_movtex_dorrie_pool_water[];
+extern Movtex hmc_movtex_toxic_maze_mist[];
+extern Movtex ssl_movtex_puddle_water[];
+extern Movtex ssl_movtex_toxbox_quicksand_mist[];
+extern Movtex sl_movtex_water[];
+extern Movtex wdw_movtex_area1_water[];
+extern Movtex wdw_movtex_area2_water[];
+extern Movtex jrb_movtex_water[];
+extern Movtex jrb_movtex_intial_mist[];
+extern Movtex jrb_movtex_sinked_boat_water[];
+extern Movtex thi_movtex_area1_water[];
+extern Movtex thi_movtex_area2_water[];
+extern Movtex castle_grounds_movtex_water[];
+extern Movtex lll_movtex_volcano_floor_lava[];
+extern Movtex ddd_movtex_area1_water[];
+extern Movtex ddd_movtex_area2_water[];
+extern Movtex wf_movtex_water[];
+extern Movtex castle_courtyard_movtex_star_statue_water[];
+extern Movtex ttm_movtex_puddle[];
 
 /**
  * Find the quadCollection for a given quad collection id.
@@ -643,7 +643,7 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
         }
         asGenerated = (struct GraphNodeGenerated *) node;
         if (asGenerated->parameter == JRB_MOVTEX_INTIAL_MIST) {
-            if (gLakituState.goalPos[1] < 1024.0) { // if camera under water
+            if (gLakituState.goalPos[1] < 1024.0f) { // if camera under water
                 return NULL;
             }
             if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_JRB - 1) & 1) { // first star in JRB complete

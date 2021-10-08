@@ -47,7 +47,7 @@ void water_ring_check_collection(f32 avgScale, struct Object *ringManager) {
 
     if (!is_point_close_to_object(o, gMarioObject->header.gfx.pos[0],
                               gMarioObject->header.gfx.pos[1] + 80.0f, gMarioObject->header.gfx.pos[2],
-                              (avgScale + 0.2) * 120.0)) {
+                              (avgScale + 0.2f) * 120.0f)) {
         o->oWaterRingMarioDistInFront = marioDistInFront;
         return;
     }
@@ -81,16 +81,16 @@ void water_ring_check_collection(f32 avgScale, struct Object *ringManager) {
 }
 
 void water_ring_set_scale(f32 avgScale) {
-    o->header.gfx.scale[0] = sins(o->oWaterRingScalePhaseX) * 0.1 + avgScale;
-    o->header.gfx.scale[1] = sins(o->oWaterRingScalePhaseY) * 0.5 + avgScale;
-    o->header.gfx.scale[2] = sins(o->oWaterRingScalePhaseZ) * 0.1 + avgScale;
+    o->header.gfx.scale[0] = sins(o->oWaterRingScalePhaseX) * 0.1f + avgScale;
+    o->header.gfx.scale[1] = sins(o->oWaterRingScalePhaseY) * 0.5f + avgScale;
+    o->header.gfx.scale[2] = sins(o->oWaterRingScalePhaseZ) * 0.1f + avgScale;
     o->oWaterRingScalePhaseX += 0x1700;
     o->oWaterRingScalePhaseY += 0x1700;
     o->oWaterRingScalePhaseZ += 0x1700;
 }
 
 void water_ring_act_collected(void) {
-    f32 avgScale = (f32) o->oTimer * 0.2 + o->oWaterRingAvgScale;
+    f32 avgScale = (f32) o->oTimer * 0.2f + o->oWaterRingAvgScale;
 
     if (o->oTimer >= 21)
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
@@ -103,7 +103,7 @@ void water_ring_act_collected(void) {
 }
 
 void water_ring_act_not_collected(void) {
-    f32 avgScale = (f32) o->oTimer / 225.0 * 3.0 + 0.5;
+    f32 avgScale = (f32) o->oTimer / 225.0f * 3.0f + 0.5f;
 
     //! In this case ringSpawner and ringManager are the same object,
     //  because the Jet Stream Ring Spawner is its own parent object.
@@ -194,12 +194,12 @@ void bhv_manta_ray_water_ring_init(void) {
 }
 
 void manta_water_ring_act_not_collected(void) {
-    f32 avgScale = (f32) o->oTimer / 50.0f * 1.3 + 0.1;
+    f32 avgScale = (f32) o->oTimer / 50.0f * 1.3f + 0.1f;
     struct Object *ringSpawner = o->parentObj;
     struct Object *ringManager = ringSpawner->parentObj;
 
-    if (avgScale > 1.3)
-        avgScale = 1.3;
+    if (avgScale > 1.3f)
+        avgScale = 1.3f;
 
     if (o->oTimer >= 151) {
         o->oOpacity -= 2;

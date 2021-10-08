@@ -38,7 +38,6 @@
 #include "levels/hmc/areas/1/26/model.inc.c"
 #include "levels/hmc/areas/1/27/model.inc.c"
 #include "levels/hmc/areas/1/28/model.inc.c"
-#include "levels/hmc/areas/1/grill_door/model.inc.c"
 #include "levels/hmc/areas/1/29/model.inc.c"
 #include "levels/hmc/areas/1/30/model.inc.c"
 #include "levels/hmc/areas/1/31/model.inc.c"
@@ -54,7 +53,8 @@
 #include "levels/hmc/areas/1/macro.inc.c"
 #include "levels/hmc/areas/1/room.inc.c"
 #include "levels/hmc/elevator_platform/collision.inc.c"
-#include "levels/hmc/areas/1/grill_door/collision.inc.c" // This is odd, but the model data for this is in the middle of area 1. I have to conclude it is an area local object, despite the fact it has collision. Let's hope this is the only oddity...
+#include "levels/hmc/grill_door/model.inc.c"
+#include "levels/hmc/grill_door/collision.inc.c" // This is odd, but the model data for this is in the middle of area 1. I have to conclude it is an area local object, despite the fact it has collision. Let's hope this is the only oddity...
 #include "levels/hmc/arrow_platform/collision.inc.c"
 #include "levels/hmc/arrow_platform_button/collision.inc.c"
 #include "levels/hmc/areas/1/trajectory.inc.c"

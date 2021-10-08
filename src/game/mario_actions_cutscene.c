@@ -273,14 +273,14 @@ void handle_save_menu(struct MarioState *m) {
  * and yaw plus relative yaw.
  */
 struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, s32 model, const BehaviorScript *behavior, s16 relYaw) {
-    struct Object *o = spawn_object(m->marioObj, model, behavior);
+    struct Object *obj = spawn_object(m->marioObj, model, behavior);
 
-    o->oFaceAngleYaw = m->faceAngle[1] + relYaw;
-    o->oPosX = m->pos[0];
-    o->oPosY = m->pos[1];
-    o->oPosZ = m->pos[2];
+    obj->oFaceAngleYaw = m->faceAngle[1] + relYaw;
+    obj->oPosX = m->pos[0];
+    obj->oPosY = m->pos[1];
+    obj->oPosZ = m->pos[2];
 
-    return o;
+    return obj;
 }
 
 /**
@@ -524,55 +524,48 @@ s32 act_reading_sign(struct MarioState *m) {
 
 s32 act_debug_free_move(struct MarioState *m) {
     struct WallCollisionData wallData;
-    struct Surface *surf;
-    f32 floorHeight;
+    struct Surface *floor, *ceil;
     Vec3f pos;
-    f32 speed;
-    u32 action;
-
-    // integer immediates, generates convert instructions for some reason
-    speed = gPlayer1Controller->buttonDown & B_BUTTON ? 4 : 1;
-    if (gPlayer1Controller->buttonDown & L_TRIG) {
-        speed = 0.01f;
-    }
-
+    f32 speed = ((gPlayer1Controller->buttonDown & B_BUTTON) ? 4.0f : 1.0f);
+    if (gPlayer1Controller->buttonDown & L_TRIG) speed = 0.01f;
+    if (m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     vec3f_copy(pos, m->pos);
-
     if (gPlayer1Controller->buttonDown & U_JPAD) {
         pos[1] += 16.0f * speed;
+    } else if (gPlayer1Controller->buttonPressed == A_BUTTON) {
+        m->vel[1] = 0.0f;
+        set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+        m->input &= ~INPUT_A_PRESSED;
+        if (m->pos[1] <= (m->waterLevel - 100)) {
+            return set_mario_action(m, ACT_WATER_IDLE, 0);
+        } else if (m->pos[1] <= m->floorHeight) {
+            return set_mario_action(m, ACT_IDLE, 0);
+        } else {
+            gPlayer1Controller->buttonDown &= ~U_JPAD;
+            return set_mario_action(m, ACT_FREEFALL, 0);
+        }
     }
     if (gPlayer1Controller->buttonDown & D_JPAD) {
         pos[1] -= 16.0f * speed;
     }
-
     if (m->intendedMag > 0) {
-        pos[0] += 32.0f * speed * sins(m->intendedYaw);
-        pos[2] += 32.0f * speed * coss(m->intendedYaw);
+        pos[0] += (2.0f * speed * sins(m->intendedYaw) * m->intendedMag);
+        pos[2] += (2.0f * speed * coss(m->intendedYaw) * m->intendedMag);
     }
-
     resolve_and_return_wall_collisions(pos, 60.0f, 50.0f, &wallData);
-
-    floorHeight = find_floor(pos[0], pos[1], pos[2], &surf);
-    if (surf != NULL) {
-        if (pos[1] < floorHeight) {
-            pos[1] = floorHeight;
-        }
-        vec3f_copy(m->pos, pos);
+    set_mario_wall(m, ((wallData.numWalls > 0) ? wallData.walls[0] : NULL));
+    f32 floorHeight = find_floor(pos[0], pos[1], pos[2], &floor);
+    f32 ceilHeight  = find_ceil( pos[0], pos[1], pos[2], &ceil);
+    if (floor == NULL) return FALSE;
+    if ((ceilHeight - floorHeight) >= 160.0f) {
+        if ((floor != NULL) && ( pos[1] < floorHeight)) pos[1] = floorHeight;
+        if (( ceil != NULL) && ((pos[1] + 160.0f) > ceilHeight)) pos[1] = (ceilHeight - 160.0f);
+        vec3_copy(m->pos, pos);
     }
-
     m->faceAngle[1] = m->intendedYaw;
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
     vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
-
-    if (gPlayer1Controller->buttonPressed == A_BUTTON) {
-        if (m->pos[1] <= m->waterLevel - 100) {
-            action = ACT_WATER_IDLE;
-        } else {
-            action = ACT_IDLE;
-        }
-        set_mario_action(m, action, 0);
-    }
 
     return FALSE;
 }
@@ -742,6 +735,9 @@ s32 act_eaten_by_bubba(struct MarioState *m) {
     play_sound_if_no_flag(m, SOUND_MARIO_DYING, MARIO_ACTION_SOUND_PLAYED);
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     m->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
+#ifdef BREATH_METER
+    m->breath = 0xFF;
+#endif
     m->health = 0xFF;
     if (m->actionTimer++ == 60) {
         level_trigger_warp(m, WARP_OP_DEATH);
@@ -947,11 +943,15 @@ s32 act_warp_door_spawn(struct MarioState *m) {
             m->usedObj->oInteractStatus = INT_STATUS_WARP_DOOR_PUSHED;
         }
     } else if (m->usedObj->oAction == 0) {
+#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
+        set_mario_action(m, ACT_IDLE, 0);
+#else
         if (gNeverEnteredCastle == TRUE && gCurrLevelNum == LEVEL_CASTLE) {
             set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, DIALOG_021);
         } else {
             set_mario_action(m, ACT_IDLE, 0);
         }
+#endif
     }
     set_mario_animation(m, MARIO_ANIM_FIRST_PERSON);
     stop_and_set_height_to_floor(m);
@@ -969,7 +969,7 @@ s32 act_emerge_from_pipe(struct MarioState *m) {
     marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 
     play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED);
-
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelNum == LEVEL_THI) {
         if (gCurrAreaIndex == 2) {
             play_sound_if_no_flag(m, SOUND_MENU_EXIT_PIPE, MARIO_ACTION_SOUND_PLAYED);
@@ -977,6 +977,7 @@ s32 act_emerge_from_pipe(struct MarioState *m) {
             play_sound_if_no_flag(m, SOUND_MENU_ENTER_PIPE, MARIO_ACTION_SOUND_PLAYED);
         }
     }
+#endif
 
     if (launch_mario_until_land(m, ACT_JUMP_LAND_STOP, MARIO_ANIM_SINGLE_JUMP, 8.0f)) {
         mario_set_forward_vel(m, 0.0f);
@@ -996,7 +997,7 @@ s32 act_spawn_spin_airborne(struct MarioState *m) {
     mario_set_forward_vel(m, m->forwardVel);
 
     // landed on floor, play spawn land animation
-    if (perform_air_step(m, 0.0) == AIR_STEP_LANDED) {
+    if (perform_air_step(m, 0.0f) == AIR_STEP_LANDED) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
         set_mario_action(m, ACT_SPAWN_SPIN_LANDING, 0);
     }
@@ -1038,6 +1039,9 @@ s32 act_spawn_spin_landing(struct MarioState *m) {
  * particle flag that generates sparkles.
  */
 s32 act_exit_airborne(struct MarioState *m) {
+#ifdef BREATH_METER
+    m->breath = 0x880;
+#endif
     if (15 < m->actionTimer++
         && launch_mario_until_land(m, ACT_EXIT_LAND_SAVE_DIALOG, MARIO_ANIM_GENERAL_FALL, -32.0f)) {
         // heal Mario
@@ -1050,6 +1054,9 @@ s32 act_exit_airborne(struct MarioState *m) {
 }
 
 s32 act_falling_exit_airborne(struct MarioState *m) {
+#ifdef BREATH_METER
+    m->breath = 0x880;
+#endif
     if (launch_mario_until_land(m, ACT_EXIT_LAND_SAVE_DIALOG, MARIO_ANIM_GENERAL_FALL, 0.0f)) {
         // heal Mario
         m->healCounter = 31;
@@ -1144,8 +1151,10 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
 }
 
 s32 act_death_exit(struct MarioState *m) {
-    if (15 < m->actionTimer++
-        && launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, -32.0f)) {
+#ifdef BREATH_METER
+    m->breath = 0x880;
+#endif
+    if (15 < m->actionTimer++ && launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, -32.0f)) {
 #ifdef VERSION_JP
         play_sound(SOUND_MARIO_OOOF, m->marioObj->header.gfx.cameraToObject);
 #else
@@ -1164,6 +1173,9 @@ s32 act_death_exit(struct MarioState *m) {
 }
 
 s32 act_unused_death_exit(struct MarioState *m) {
+#ifdef BREATH_METER
+    m->breath = 0x880;
+#endif
     if (launch_mario_until_land(m, ACT_FREEFALL_LAND_STOP, MARIO_ANIM_GENERAL_FALL, 0.0f)) {
 #ifdef VERSION_JP
         play_sound(SOUND_MARIO_OOOF, m->marioObj->header.gfx.cameraToObject);
@@ -1180,6 +1192,9 @@ s32 act_unused_death_exit(struct MarioState *m) {
 }
 
 s32 act_falling_death_exit(struct MarioState *m) {
+#ifdef BREATH_METER
+    m->breath = 0x880;
+#endif
     if (launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, 0.0f)) {
 #ifdef VERSION_JP
         play_sound(SOUND_MARIO_OOOF, m->marioObj->header.gfx.cameraToObject);
@@ -1200,6 +1215,9 @@ s32 act_falling_death_exit(struct MarioState *m) {
 
 // waits 11 frames before actually executing, also has reduced fvel
 s32 act_special_exit_airborne(struct MarioState *m) {
+#ifdef BREATH_METER
+    m->breath = 0x880;
+#endif
     struct Object *marioObj = m->marioObj;
 
     play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED);
@@ -1225,6 +1243,9 @@ s32 act_special_exit_airborne(struct MarioState *m) {
 }
 
 s32 act_special_death_exit(struct MarioState *m) {
+#ifdef BREATH_METER
+    m->breath = 0x880;
+#endif
     struct Object *marioObj = m->marioObj;
 
     if (m->actionTimer++ < 11) {
@@ -1269,19 +1290,18 @@ s32 act_spawn_no_spin_landing(struct MarioState *m) {
 s32 act_bbh_enter_spin(struct MarioState *m) {
     f32 floorDist;
     f32 scale;
-    f32 cageDX;
-    f32 cageDZ;
+    f32 cageDX, cageDZ;
     f32 cageDist;
     f32 forwardVel;
 
     cageDX = m->usedObj->oPosX - m->pos[0];
     cageDZ = m->usedObj->oPosZ - m->pos[2];
-    cageDist = sqrtf(cageDX * cageDX + cageDZ * cageDZ);
+    cageDist = (sqr(cageDX) + sqr(cageDZ));
 
-    if (cageDist > 20.0f) {
+    if (cageDist > sqr(20.0f)) {
         forwardVel = 10.0f;
     } else {
-        forwardVel = cageDist / 2.0f;
+        forwardVel = sqrtf(cageDist) / 2.0f;
     }
     if (forwardVel < 0.5f) {
         forwardVel = 0.0f;
@@ -1351,8 +1371,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
 }
 
 s32 act_bbh_enter_jump(struct MarioState *m) {
-    f32 cageDX;
-    f32 cageDZ;
+    f32 cageDX, cageDZ;
     f32 cageDist;
 
     play_mario_action_sound(
@@ -1362,7 +1381,7 @@ s32 act_bbh_enter_jump(struct MarioState *m) {
     if (m->actionState == 0) {
         cageDX = m->usedObj->oPosX - m->pos[0];
         cageDZ = m->usedObj->oPosZ - m->pos[2];
-        cageDist = sqrtf(cageDX * cageDX + cageDZ * cageDZ);
+        cageDist = sqrtf(sqr(cageDX) + sqr(cageDZ));
 
         m->vel[1] = 60.0f;
         m->faceAngle[1] = atan2s(cageDZ, cageDX);
@@ -1502,9 +1521,7 @@ s32 act_squished(struct MarioState *m) {
                     play_sound_if_no_flag(m, SOUND_MARIO_ATTACKED, MARIO_MARIO_SOUND_PLAYED);
                 }
 
-                // Both of the 1.8's are really floats, but one of them has to
-                // be written as a double for this to match on -O2.
-                vec3f_set(m->marioObj->header.gfx.scale, 1.8, 0.05f, 1.8f);
+                vec3f_set(m->marioObj->header.gfx.scale, 1.8f, 0.05f, 1.8f);
 #if ENABLE_RUMBLE
                 queue_rumble_data(10, 80);
 #endif
@@ -1893,7 +1910,7 @@ static s32 jumbo_star_cutscene_flying(struct MarioState *m) {
                 targetDX = targetPos[0] - m->pos[0];
                 targetDY = targetPos[1] - m->pos[1];
                 targetDZ = targetPos[2] - m->pos[2];
-                targetHyp = sqrtf(targetDX * targetDX + targetDZ * targetDZ);
+                targetHyp = sqrtf(sqr(targetDX) + sqr(targetDZ));
                 targetAngle = atan2s(targetDZ, targetDX);
 
                 vec3f_copy(m->pos, targetPos);
@@ -1960,16 +1977,16 @@ void generate_yellow_sparkles(s16 x, s16 y, s16 z, f32 radius) {
 
 // not sure what this does, returns the height of the floor.
 // (animation related?)
-static f32 end_obj_set_visual_pos(struct Object *o) {
+static f32 end_obj_set_visual_pos(struct Object *obj) {
     struct Surface *surf;
     Vec3s translation;
     f32 x, y, z;
 
-    find_mario_anim_flags_and_translation(o, o->header.gfx.angle[1], translation);
+    find_mario_anim_flags_and_translation(obj, obj->header.gfx.angle[1], translation);
 
-    x = o->header.gfx.pos[0] + translation[0];
-    y = o->header.gfx.pos[1] + 10.0f;
-    z = o->header.gfx.pos[2] + translation[2];
+    x = obj->header.gfx.pos[0] + translation[0];
+    y = obj->header.gfx.pos[1] + 10.0f;
+    z = obj->header.gfx.pos[2] + translation[2];
 
     return find_floor(x, y, z, &surf);
 }
@@ -2003,7 +2020,7 @@ static void end_peach_cutscene_mario_landing(struct MarioState *m) {
 
         sEndJumboStarObj = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR, bhvStaticObject, 0,
                                                      2528, -1800, 0, 0, 0);
-        obj_scale(sEndJumboStarObj, 3.0);
+        obj_scale(sEndJumboStarObj, 3.0f);
         advance_cutscene_step(m);
     }
 }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SURFACE_LOAD_H
+#define SURFACE_LOAD_H
 
 #include <PR/ultratypes.h>
 
@@ -6,9 +7,6 @@
 #include "types.h"
 
 extern u8 gSurfacePoolError;
-
-#define NUM_CELLS       (2 * LEVEL_BOUNDARY_MAX / CELL_SIZE)
-#define NUM_CELLS_INDEX (NUM_CELLS - 1)
 
 struct SurfaceNode
 {
@@ -39,3 +37,5 @@ u32 get_area_terrain_size(TerrainData *data);
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects);
 void clear_dynamic_surfaces(void);
 void load_object_collision_model(void);
+
+#endif // SURFACE_LOAD_H

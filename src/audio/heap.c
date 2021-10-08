@@ -1493,7 +1493,11 @@ void audio_reset_session(void) {
     }
 #endif
 #if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+    append_puppyprint_log("Audio Initialised in %dc.", (s32)(osGetTime() - first));
+#else
     append_puppyprint_log("Audio Initialised in %dus.", (s32)OS_CYCLES_TO_USEC(osGetTime() - first));
+#endif
 #endif
     sAudioFirstBoot = 1;
 }
@@ -1738,7 +1742,7 @@ void func_sh_802f23ec(void) {
     s32 drumId;
     struct Drum *drum;
     struct Instrument *inst;
-    struct UnkEntry *entry; //! @bug: not initialized but nevertheless used
+    struct UnkEntry *entry = NULL; //! @bug: not initialized but nevertheless used
 
     seqCount = gAlCtlHeader->seqCount;
     for (idx = 0; idx < seqCount; idx++) {

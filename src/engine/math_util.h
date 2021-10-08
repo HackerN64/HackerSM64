@@ -1,9 +1,30 @@
-#pragma once
+#ifndef MATH_UTIL_H
+#define MATH_UTIL_H
 
 #include <PR/ultratypes.h>
 
 #include "types.h"
 
+#define NEAR_ZERO   __FLT_EPSILON__
+#define NEAR_ONE    (1.0f - __FLT_EPSILON__)
+
+extern Vec3f gVec3fX;
+extern Vec3f gVec3fY;
+extern Vec3f gVec3fZ;
+extern Vec3f gVec3fNX;
+extern Vec3f gVec3fNY;
+extern Vec3f gVec3fNZ;
+extern Vec3f gVec3fZero;
+extern Vec3s gVec3sZero;
+extern Vec3i gVec3iZero;
+extern Vec3f gVec3fOne;
+extern Vec3s gVec3sOne;
+
+/**
+ * Converts an angle in degrees to sm64's s16 angle units. For example, DEGREES(90) == 0x4000
+ * This should be used mainly to make camera code clearer at first glance.
+ */
+#define DEGREES(x) ((x) * 0x10000 / 360)
 
 /*
  * The sine and cosine tables overlap, but "#define gCosineTable (gSineTable +
@@ -37,6 +58,11 @@ extern f32 gSineTable[];
 #define ABSF(x) ((x) > 0.0f ? (x) : -(x))
 #define ABSI(x) ((x) > 0    ? (x) : -(x))
 #define ABS(x)  ABSF((x))
+// #define absf(x) ABSF((x))
+#define absi(x) ABSI((x))
+#define abs(x)  ABS((x))
+
+#define signum_positive(x) ((x < 0) ? -1 : 1)
 
 #define min(a, b) MIN((a), (b)) // ((a) < (b) ? (a) : (b))
 #define max(a, b) MAX((a), (b)) // ((a) > (b) ? (a) : (b))
@@ -116,6 +142,32 @@ extern f32 gSineTable[];
     (dst)[0] = (((a)[1] * (b)[2]) - ((a)[2] * (b)[1])); \
     (dst)[1] = (((a)[2] * (b)[0]) - ((a)[0] * (b)[2])); \
     (dst)[2] = (((a)[0] * (b)[1]) - ((a)[1] * (b)[0])); \
+}
+
+/**
+ * | ? ? ? 0 |
+ * | ? ? ? 0 |
+ * | ? ? ? 0 |
+ * | 0 0 0 1 |
+ * i.e. a matrix representing a linear transformation over 3 space.
+ */
+// Multiply a vector by a matrix of the form
+#define linear_mtxf_mul_vec3(mtx, dstV, srcV) {                                                     \
+    (dstV)[0] = (((mtx)[0][0] * (srcV)[0]) + ((mtx)[1][0] * (srcV)[1]) + ((mtx)[2][0] * (srcV)[2]));\
+    (dstV)[1] = (((mtx)[0][1] * (srcV)[0]) + ((mtx)[1][1] * (srcV)[1]) + ((mtx)[2][1] * (srcV)[2]));\
+    (dstV)[2] = (((mtx)[0][2] * (srcV)[0]) + ((mtx)[1][2] * (srcV)[1]) + ((mtx)[2][2] * (srcV)[2]));\
+}
+
+#define linear_mtxf_mul_vec3_and_translate(mtx, dstV, srcV) {   \
+    linear_mtxf_mul_vec3f((mtx), (dstV), (srcV));               \
+    vec3_add((dstV), (mtx)[3]);                                 \
+}
+
+// Multiply a vector by the transpose of a matrix of the form
+#define linear_mtxf_transpose_mul_vec3(mtx, dstV, srcV) {   \
+    (dstV)[0] = vec3_dot((mtx)[0], (srcV));                 \
+    (dstV)[1] = vec3_dot((mtx)[1], (srcV));                 \
+    (dstV)[2] = vec3_dot((mtx)[2], (srcV));                 \
 }
 
 #define vec2_set(dst, x, y) {           \
@@ -334,12 +386,75 @@ extern f32 gSineTable[];
 #define vec3_div_val(dst, x) vec3_quot_val((dst), (dst), (x))
 #define vec4_div_val(dst, x) vec4_quot_val((dst), (dst), (x))
 
-#define RAYCAST_FIND_FLOOR  (0x1)
-#define RAYCAST_FIND_WALL   (0x2)
-#define RAYCAST_FIND_CEIL   (0x4)
-#define RAYCAST_FIND_WATER  (0x8)
-#define RAYCAST_FIND_ALL    (0xFFFFFFFF)
+#define MAT4_VEC_DOT_PROD(R, A, B, row, col) {              \
+    (R)[(row)][(col)]  = ((A)[(row)][0] * (B)[0][(col)]);   \
+    (R)[(row)][(col)] += ((A)[(row)][1] * (B)[1][(col)]);   \
+    (R)[(row)][(col)] += ((A)[(row)][2] * (B)[2][(col)]);   \
+}
+#define MAT4_DOT_PROD(R, A, B, row, col) {                  \
+    (R)[(row)][(col)]  = ((A)[(row)][0] * (B)[0][(col)]);   \
+    (R)[(row)][(col)] += ((A)[(row)][1] * (B)[1][(col)]);   \
+    (R)[(row)][(col)] += ((A)[(row)][2] * (B)[2][(col)]);   \
+    (R)[(row)][(col)] += ((A)[(row)][3] * (B)[3][(col)]);   \
+}
 
+#define MAT4_MULTIPLY(R, A, B) {        \
+    MAT4_DOT_PROD((R), (A), (B), 0, 0); \
+    MAT4_DOT_PROD((R), (A), (B), 0, 1); \
+    MAT4_DOT_PROD((R), (A), (B), 0, 2); \
+    MAT4_DOT_PROD((R), (A), (B), 0, 3); \
+    MAT4_DOT_PROD((R), (A), (B), 1, 0); \
+    MAT4_DOT_PROD((R), (A), (B), 1, 1); \
+    MAT4_DOT_PROD((R), (A), (B), 1, 2); \
+    MAT4_DOT_PROD((R), (A), (B), 1, 3); \
+    MAT4_DOT_PROD((R), (A), (B), 2, 0); \
+    MAT4_DOT_PROD((R), (A), (B), 2, 1); \
+    MAT4_DOT_PROD((R), (A), (B), 2, 2); \
+    MAT4_DOT_PROD((R), (A), (B), 2, 3); \
+    MAT4_DOT_PROD((R), (A), (B), 3, 0); \
+    MAT4_DOT_PROD((R), (A), (B), 3, 1); \
+    MAT4_DOT_PROD((R), (A), (B), 3, 2); \
+    MAT4_DOT_PROD((R), (A), (B), 3, 3); \
+}
+
+#define MTXF_END(mtx) { \
+    (mtx)[0][3] = 0.0f; \
+    (mtx)[1][3] = 0.0f; \
+    (mtx)[2][3] = 0.0f; \
+    (mtx)[3][3] = 1.0f; \
+}
+
+#define NAME_INVMAG(v) v##_invmag
+
+/// Scale vector 'v' so it has length  1
+#define vec3_normalize(v) {                                     \
+    register f32 NAME_INVMAG(v) = vec3_mag((v));                \
+    NAME_INVMAG(v) = (1.0f / MAX(NAME_INVMAG(v), NEAR_ZERO));   \
+    vec3_mul_val((v), NAME_INVMAG(v));                          \
+}
+
+/// Scale vector 'v' so it has length -1
+#define vec3_normalize_negative(v) {                    \
+    register f32 v##_invmag = vec3_mag((v));            \
+    v##_invmag = -(1.0f / MAX(v##_invmag, NEAR_ZERO));  \
+    vec3_mul_val((v), v##_invmag);                      \
+}
+
+#define vec3_normalize_max(v, max) {    \
+    register f32 v##_mag = vec3_mag(v); \
+    v##_mag = MAX(v##_mag, NEAR_ZERO);  \
+    if (v##_mag > max) {                \
+        v##_mag = (max / v##_mag);      \
+        vec3_mul_val(v, v##_mag);       \
+    }                                   \
+}
+
+f32 roundf(f32 x);
+f32 absf(f32 x);
+s32 min_3i(s32 a0, s32 a1, s32 a2);
+f32 min_3f(f32 a0, f32 a1, f32 a2);
+s32 max_3i(s32 a0, s32 a1, s32 a2);
+f32 max_3f(f32 a0, f32 a1, f32 a2);
 void vec3f_copy(Vec3f dest, Vec3f src);
 void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
 void vec3f_add(Vec3f dest, Vec3f a);
@@ -350,8 +465,10 @@ void vec3s_add(Vec3s dest, Vec3s a);
 void vec3s_sum(Vec3s dest, Vec3s a, Vec3s b);
 void vec3s_sub(Vec3s dest, Vec3s a);
 void vec3f_sub(Vec3f dest, Vec3f src);
+void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_to_vec3s(Vec3s dest, Vec3f a);
 void find_vector_perpendicular_to_plane(Vec3f dest, Vec3f a, Vec3f b, Vec3f c);
+f32  vec3f_dot(Vec3f a, Vec3f b);
 void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_normalize(Vec3f dest);
 void mtxf_copy(Mat4 dest, Mat4 src);
@@ -366,19 +483,57 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius);
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b);
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s);
 void mtxf_mul_vec3s(Mat4 mtx, Vec3s b);
-void mtxf_to_mtx(void *dest, void *src);
-void mtxf_to_mtx_constant(register s16 *dest, register f32 *src);
-void mtxf_to_mtx_scale(Mtx *dest, Mat4 src);
+extern void mtxf_to_mtx_asm(register void *dest, register void *src);
+inline void mtxf_to_mtx(register void *dest, register void *src) {
+    mtxf_to_mtx_asm(dest, src);
+}
 void mtxf_rotate_xy(Mtx *mtx, s32 angle);
 void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx);
-void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *yaw);
-void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32  dist, s32  pitch, s32  yaw);
+
+void vec2f_get_lateral_dist(                   Vec2f from, Vec2f to,            f32 *lateralDist                            );
+void vec3f_get_lateral_dist(                   Vec3f from, Vec3f to,            f32 *lateralDist                            );
+void vec3f_get_lateral_dist_squared(           Vec3f from, Vec3f to,            f32 *lateralDist                            );
+void vec3f_get_dist(                           Vec3f from, Vec3f to, f32 *dist                                              );
+void vec3f_get_dist_squared(                   Vec3f from, Vec3f to, f32 *dist                                              );
+void vec3f_get_dist_and_yaw(                   Vec3f from, Vec3f to, f32 *dist,                                  Angle  *yaw);
+void vec3f_get_pitch(                          Vec3f from, Vec3f to,                              Angle  *pitch             );
+void vec3f_get_yaw(                            Vec3f from, Vec3f to,                                             Angle  *yaw);
+void vec3f_get_angle(                          Vec3f from, Vec3f to,                              Angle  *pitch, Angle  *yaw);
+void vec3f_get_lateral_dist_and_pitch(         Vec3f from, Vec3f to,            f32 *lateralDist, Angle  *pitch             );
+void vec3f_get_lateral_dist_and_yaw(           Vec3f from, Vec3f to,            f32 *lateralDist,                Angle  *yaw);
+void vec3f_get_lateral_dist_and_angle(         Vec3f from, Vec3f to,            f32 *lateralDist, Angle  *pitch, Angle  *yaw);
+void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, Angle  *pitch, Angle  *yaw);
+void vec3s_get_dist_and_angle(                 Vec3s from, Vec3s to, s16 *dist,                   Angle  *pitch, Angle  *yaw);
+void vec3f_get_dist_and_angle(                 Vec3f from, Vec3f to, f32 *dist,                   Angle  *pitch, Angle  *yaw);
+void vec3s_set_dist_and_angle(                 Vec3s from, Vec3s to, s16  dist,                   Angle32 pitch, Angle32 yaw);
+void vec3f_set_dist_and_angle(                 Vec3f from, Vec3f to, f32  dist,                   Angle32 pitch, Angle32 yaw);
+
+s32 approach_angle(s32 current, s32 target, s32 inc);
+s32 approach_s16(s32 current, s32 target, s32 inc, s32 dec);
 s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec);
 f32 approach_f32(f32 current, f32 target, f32 inc, f32 dec);
-s32 approach_angle(s32 current, s32 target, s32 inc);
+Bool32 approach_angle_bool(s16 *current, s32 target, s32 inc);
+Bool32 approach_s16_bool(s16 *current, s32 target, s32 inc, s32 dec);
+Bool32 approach_s32_bool(s32 *current, s32 target, s32 inc, s32 dec);
+Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec);
+#define approach_s16_symmetric(current, target, inc) approach_s16((current), (target), (inc), (inc))
+#define approach_s32_symmetric(current, target, inc) approach_s32((current), (target), (inc), (inc))
+#define approach_f32_symmetric(current, target, inc) approach_f32((current), (target), (inc), (inc))
+#define approach_s16_symmetric_bool(current, target, inc) approach_s16_bool((current), (target), (inc), (inc))
+#define approach_s32_symmetric_bool(current, target, inc) approach_s32_bool((current), (target), (inc), (inc))
+#define approach_f32_symmetric_bool(current, target, inc) approach_f32_bool((current), (target), (inc), (inc))
+s32 approach_f32_signed(f32 *current, f32 target, f32 inc);
+s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier);
+f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
+s32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor);
+s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor);
+s16 abs_angle_diff(s16 a0, s16 a1);
 s16 atan2s(f32 y, f32 x);
 f32 atan2f(f32 a, f32 b);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32 anim_spline_poll(Vec3f result);
-extern void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
+void mtxf_rot_trans_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
+void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
+
+#endif // MATH_UTIL_H

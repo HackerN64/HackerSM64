@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AUDIO_DATA_H
+#define AUDIO_DATA_H
 
 #include <PR/ultratypes.h>
 
@@ -160,3 +161,5 @@ extern u16 D_SH_80315EF4;
 extern u16 D_SH_80315EF8;
 extern u16 D_SH_80315EFC;
 #endif
+
+#endif // AUDIO_DATA_H

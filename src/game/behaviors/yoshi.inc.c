@@ -43,7 +43,7 @@ void yoshi_idle_loop(void) {
     s16 chosenHome;
 
     if (o->oTimer > 90) {
-        chosenHome = random_float() * 3.99;
+        chosenHome = random_float() * 3.99f;
 
         if (o->oYoshiChosenHome == chosenHome) {
             return;
@@ -119,7 +119,7 @@ void yoshi_walk_and_jump_off_roof_loop(void) {
 void yoshi_finish_jumping_and_despawn_loop(void) {
     cur_obj_extend_animation_if_at_end();
     obj_move_xyz_using_fvel_and_yaw(o);
-    o->oVelY -= 2.0;
+    o->oVelY -= 2.0f;
     if (o->oPosY < 2100.0f) {
         set_mario_npc_dialog(MARIO_DIALOG_STOP);
         gObjCutsceneDone = TRUE;

@@ -18,7 +18,8 @@
  *
  **************************************************************************/
 
-#pragma once
+#ifndef _UCODE_H_
+#define	_UCODE_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -258,3 +259,5 @@ extern u64 rspF3DDataStart[], rspF3DDataEnd[];
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_UCODE_H */

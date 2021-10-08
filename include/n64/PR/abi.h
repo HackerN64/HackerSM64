@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _ABI_H_
+#define _ABI_H_
 
 /**************************************************************************
  *                                                                        *
@@ -991,3 +992,5 @@ typedef short ENVMIX_STATE[40];
 #endif
 
 #endif /* _LANGUAGE_C */
+
+#endif /* !_ABI_H_ */

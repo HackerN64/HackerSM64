@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STDLIB_H
+#define STDLIB_H
 
 typedef struct lldiv_t
 {
@@ -14,3 +15,5 @@ typedef struct ldiv_t
 
 lldiv_t lldiv(long long num, long long denom);
 ldiv_t ldiv(long num, long denom);
+
+#endif

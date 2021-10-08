@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AUDIO_HEAP_H
+#define AUDIO_HEAP_H
 
 #include <PR/ultratypes.h>
 
@@ -139,3 +140,5 @@ u8 *func_sh_802f1d90(u32 size, s32 bank, u8 *arg2, s8 medium);
 void *unk_pool1_lookup(s32 poolIdx, s32 id);
 void *unk_pool1_alloc(s32 poolIndex, s32 arg1, u32 size);
 #endif
+
+#endif // AUDIO_HEAP_H

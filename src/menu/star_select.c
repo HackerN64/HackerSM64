@@ -62,17 +62,17 @@ void bhv_act_selector_star_type_loop(void) {
     switch (gCurrentObject->oStarSelectorType) {
         // If a star is not selected, don't rotate or change size
         case STAR_SELECTOR_NOT_SELECTED:
-            gCurrentObject->oStarSelectorSize -= 0.1;
-            if (gCurrentObject->oStarSelectorSize < 1.0) {
-                gCurrentObject->oStarSelectorSize = 1.0;
+            gCurrentObject->oStarSelectorSize -= 0.1f;
+            if (gCurrentObject->oStarSelectorSize < 1.0f) {
+                gCurrentObject->oStarSelectorSize = 1.0f;
             }
             gCurrentObject->oFaceAngleYaw = 0;
             break;
         // If a star is selected, rotate and slightly increase size
         case STAR_SELECTOR_SELECTED:
-            gCurrentObject->oStarSelectorSize += 0.1;
-            if (gCurrentObject->oStarSelectorSize > 1.3) {
-                gCurrentObject->oStarSelectorSize = 1.3;
+            gCurrentObject->oStarSelectorSize += 0.1f;
+            if (gCurrentObject->oStarSelectorSize > 1.3f) {
+                gCurrentObject->oStarSelectorSize = 1.3f;
             }
             gCurrentObject->oFaceAngleYaw += 0x800;
             break;
@@ -106,7 +106,7 @@ void render_100_coin_star(u8 stars) {
                                                         bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
     #endif
 
-        sStarSelectorModels[6]->oStarSelectorSize = 0.8;
+        sStarSelectorModels[6]->oStarSelectorSize = 0.8f;
         sStarSelectorModels[6]->oStarSelectorType = STAR_SELECTOR_100_COINS;
     }
 }

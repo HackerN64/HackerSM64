@@ -18,7 +18,8 @@
         $Date: 2002/05/02 03:28:25 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_INTERNAL_TLB_H_
+#define	_OS_INTERNAL_TLB_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -42,3 +43,5 @@ extern u32		__osGetTLBLo1(s32);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_INTERNAL_TLB_H */

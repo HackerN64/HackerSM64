@@ -179,7 +179,7 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
         curGraphNodeObject = (struct Object *) gCurGraphNodeObject;
         if (gMarioObject->platform == curGraphNodeObject) {
             gFlyingCarpetState = FLYING_CARPET_MOVING_WITH_MARIO;
-        } else if (curGraphNodeObject->oForwardVel != 0.0) {
+        } else if (curGraphNodeObject->oForwardVel != 0.0f) {
             gFlyingCarpetState = FLYING_CARPET_MOVING_WITHOUT_MARIO;
         } else {
             gFlyingCarpetState = FLYING_CARPET_IDLE;

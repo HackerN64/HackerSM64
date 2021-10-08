@@ -127,7 +127,7 @@ static void boo_approach_target_opacity_and_update_scale(void) {
         }
     }
 
-    scale = (o->oOpacity/255.0f * 0.4 + 0.6) * o->oBooBaseScale;
+    scale = (o->oOpacity / 255.0f * 0.4f + 0.6f) * o->oBooBaseScale;
     obj_scale(o, scale); // why no cur_obj_scale? was cur_obj_scale written later?
 }
 
@@ -135,8 +135,8 @@ static void boo_oscillate(s32 ignoreOpacity) {
     o->oFaceAnglePitch = sins(o->oBooOscillationTimer) * 0x400;
 
     if (o->oOpacity == 0xFF || ignoreOpacity == TRUE) {
-        o->header.gfx.scale[0] = sins(o->oBooOscillationTimer) * 0.08 + o->oBooBaseScale;
-        o->header.gfx.scale[1] = -sins(o->oBooOscillationTimer) * 0.08 + o->oBooBaseScale;
+        o->header.gfx.scale[0] =  sins(o->oBooOscillationTimer) * 0.08f + o->oBooBaseScale;
+        o->header.gfx.scale[1] = -sins(o->oBooOscillationTimer) * 0.08f + o->oBooBaseScale;
         o->header.gfx.scale[2] = o->header.gfx.scale[0];
         o->oGravity = sins(o->oBooOscillationTimer) * o->oBooBaseScale;
         o->oBooOscillationTimer += 0x400;
@@ -186,6 +186,11 @@ static void boo_set_move_yaw_for_during_hit(s32 hurt) {
         o->oBooMoveYawDuringHit = (s16)(o->oMoveAngleYaw + 0x8000);
     }
 }
+
+// Boo Roll
+static s16 sBooHitRotations[] = { 6047, 5664, 5292, 4934, 4587, 4254, 3933, 3624, 3329, 3046, 2775,
+                     2517, 2271, 2039, 1818, 1611, 1416, 1233, 1063, 906,  761,  629,
+                     509,  402,  308,  226,  157,  100,  56,   25,   4,    0 };
 
 static void boo_move_during_hit(s32 roll, f32 fVel) {
     // Boos seem to have been supposed to oscillate up then down then back again
@@ -616,7 +621,7 @@ static void big_boo_act_3(void) {
     } else {
         if (o->oTimer == 0) {
             spawn_mist_particles();
-            o->oBooBaseScale -= 0.5;
+            o->oBooBaseScale -= 0.5f;
         }
 
         if (big_boo_update_during_nonlethal_hit(40.0f)) {

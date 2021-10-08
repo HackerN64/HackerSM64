@@ -739,9 +739,9 @@ index b515373..1fdf027 100644
      }
 
      int numTiles = TABLE_DIMENSIONS[type].cols * TABLE_DIMENSIONS[type].rows;
-+    fprintf(cFile, "ALIGNED8 static const u8 cake_end_texture_%sdata[] = {\n", euSuffx);
++    fprintf(cFile, "ALIGNED8 static const Texture cake_end_texture_%sdata[] = {\n", euSuffx);
      for (int i = 0; i < numTiles; ++i) {
--        fprintf(cFile, "ALIGNED8 static const u8 cake_end_texture_%s%d[] = {\n", euSuffx, i);
+-        fprintf(cFile, "ALIGNED8 static const Texture cake_end_texture_%s%d[] = {\n", euSuffx, i);
          print_raw_data(cFile, &tiles[i]);
 -        fputs("};\n\n", cFile);
 +        fputc('\n', cFile);

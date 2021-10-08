@@ -18,7 +18,8 @@
         $Date: 2002/05/02 03:28:25 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_INTERNAL_RSP_H_
+#define	_OS_INTERNAL_RSP_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -43,3 +44,5 @@ extern s32		__osSpRawStartDma(s32, u32, void *, u32);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_INTERNAL_RSP_H */

@@ -6,7 +6,8 @@
 
 /*  revision 1.2  1999-03-26  */
 
-#pragma once
+#ifndef __HVQM2DEC_H__
+#define __HVQM2DEC_H__
 
 #include <ultra64.h>
 #include <HVQM2File.h>
@@ -97,5 +98,7 @@ extern  u8  hvqm2sp1DataStart[], hvqm2sp1DataEnd[];
  */
 extern  u8  hvqm2sp2TextStart[], hvqm2sp2TextEnd[];
 extern  u8  hvqm2sp2DataStart[], hvqm2sp2DataEnd[];
+
+#endif /* __HVQM2DEC_H__ */
 
 /* end */

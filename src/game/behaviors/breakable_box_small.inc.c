@@ -57,10 +57,7 @@ void breakable_box_small_released_loop(void) {
 
     // Begin flashing
     if (o->oBreakableBoxSmallFramesSinceReleased > 810) {
-        if (o->oBreakableBoxSmallFramesSinceReleased & 1)
-            o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
-        else
-            o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+        COND_BIT((o->oBreakableBoxSmallFramesSinceReleased & 0X1), o->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE);
     }
 
     // Despawn, and create a corkbox respawner

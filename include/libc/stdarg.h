@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STDARG_H
+#define STDARG_H
 
 // When not building with IDO, use the builtin vaarg macros for portability.
 #ifndef __sgi
@@ -37,4 +38,5 @@ typedef char *va_list;
                                           : __va_stack_arg(list, mode))))[-1]
 #define va_end(__list)
 
+#endif
 #endif

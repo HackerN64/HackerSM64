@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BEHAVIOR_DATA_H
+#define BEHAVIOR_DATA_H
 
 #include "types.h"
 
@@ -175,7 +176,6 @@ extern const BehaviorScript bhvMoatGrills[];
 extern const BehaviorScript bhvClockMinuteHand[];
 extern const BehaviorScript bhvClockHourHand[];
 extern const BehaviorScript bhvMacroUkiki[];
-extern const BehaviorScript bhvStub1D0C[];
 extern const BehaviorScript bhvLllRotatingHexagonalPlatform[];
 extern const BehaviorScript bhvLllSinkingRockBlock[];
 extern const BehaviorScript bhvStub1D70[];
@@ -194,7 +194,6 @@ extern const BehaviorScript bhvKoopaShell[];
 extern const BehaviorScript bhvKoopaShellFlame[];
 extern const BehaviorScript bhvToxBox[];
 extern const BehaviorScript bhvPiranhaPlant[];
-extern const BehaviorScript bhvLllHexagonalMesh[];
 extern const BehaviorScript bhvLllBowserPuzzlePiece[];
 extern const BehaviorScript bhvLllBowserPuzzle[];
 extern const BehaviorScript bhvTuxiesMother[];
@@ -529,3 +528,5 @@ extern const BehaviorScript bhvEndBirds1[];
 extern const BehaviorScript bhvEndBirds2[];
 extern const BehaviorScript bhvIntroScene[];
 extern const BehaviorScript bhvUnusedFakeStar[];
+
+#endif // BEHAVIOR_DATA_H

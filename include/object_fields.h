@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OBJECT_FIELDS_H
+#define OBJECT_FIELDS_H
 
 /**
  * The array [0x88, 0x1C8) in struct Object consists of fields that can vary by
@@ -166,7 +167,7 @@
 #define /*0x19C*/ oDrawingDistance                              OBJECT_FIELD_F32(0x45)
 #define /*0x1A0*/ oRoom                                         OBJECT_FIELD_S32(0x46)
 // 0x1A4 is unused, possibly related to 0x1A8 in removed macro purposes.
-#define /*0x1A8*/ oUnk1A8                                       OBJECT_FIELD_U32(0x48)
+#define /*0x1A8*/ oUnusedCoinParams                             OBJECT_FIELD_U32(0x48)
 // 0x1AC-0x1B2 (0x48-0x4A) are object specific and defined below the common fields.
 #define /*0x1B4*/ oWallAngle                                    OBJECT_FIELD_S32(0x4B)
 #define /*0x1B8*/ oFloorType                                    OBJECT_FIELD_S16(0x4C, 0)
@@ -1340,3 +1341,6 @@ os16112*/
 #define /*0x10E*/ os1610E                                       OBJECT_FIELD_S16(0x21, 1)
 #define /*0x110*/ os16110                                       OBJECT_FIELD_S16(0x22, 0)
 #define /*0x112*/ os16112                                       OBJECT_FIELD_S16(0x22, 1)
+
+
+#endif // OBJECT_FIELDS_H

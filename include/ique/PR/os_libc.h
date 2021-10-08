@@ -27,7 +27,8 @@
         $Date: 2004/11/16 01:47:19 $
  *---------------------------------------------------------------------*/
 
-#pragma once
+#ifndef _OS_LIBC_H_
+#define	_OS_LIBC_H_
 
 #include "os_pfs.h"
 
@@ -98,3 +99,5 @@ extern void		osSyncPrintf(const char *fmt, ...);
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* !_OS_LIBC_H_ */

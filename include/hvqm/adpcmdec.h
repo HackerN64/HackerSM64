@@ -7,7 +7,8 @@
 
 /*  revision 1.0  1998-12-17  */
 
-#pragma once
+#ifndef   __ADPCMDEC_H__
+#define   __ADPCMDEC_H__
 
 #include <ultra64.h>
 
@@ -26,5 +27,7 @@ void adpcmDecode(void *instream, u32 format, u32 samples, s16 *outstream, u32 ex
 /* adpcmDecode() format argument */
 #define  ADPCM_RESET     0
 #define  ADPCM_CONTINUE  1
+
+#endif /* __ADPCMDEC_H__ */
 
 /* end */

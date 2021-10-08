@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DEBUG_H
+#define DEBUG_H
 
 #include <PR/ultratypes.h>
 
@@ -23,3 +24,5 @@ void stub_debug_5(void);
 void try_print_debug_mario_object_info(void);
 void try_do_mario_debug_object_spawn(void);
 void try_print_debug_mario_level_info(void);
+
+#endif // DEBUG_H

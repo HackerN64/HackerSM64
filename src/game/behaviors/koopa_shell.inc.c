@@ -39,14 +39,15 @@ void bhv_koopa_shell_flame_loop(void) {
     cur_obj_move_using_fvel_and_gravity();
     if (o->oFloorHeight > o->oPosY || o->oTimer > 10)
         obj_mark_for_deletion(o);
-    o->oKoopaShellFlameScale += -0.3;
+    o->oKoopaShellFlameScale += -0.3f;
     cur_obj_scale(o->oKoopaShellFlameScale);
 }
 
 void bhv_koopa_shell_flame_spawn(void) {
     s32 i;
-    for (i = 0; i < 2; i++)
+    for (i = 0; i < 2; i++) {
         spawn_object(o, MODEL_RED_FLAME, bhvKoopaShellFlame);
+    }
 }
 
 void koopa_shell_spawn_sparkles(f32 a) {

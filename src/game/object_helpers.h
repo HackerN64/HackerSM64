@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OBJECT_HELPERS_H
+#define OBJECT_HELPERS_H
 
 #include <PR/ultratypes.h>
 
@@ -8,12 +9,8 @@
 // used for chain chomp and wiggler
 struct ChainSegment
 {
-    f32 posX;
-    f32 posY;
-    f32 posZ;
-    s16 pitch;
-    s16 yaw;
-    s16 roll;
+    Vec3f pos;
+    Vec3s angle;
 };
 
 #define WATER_DROPLET_FLAG_RAND_ANGLE               (1 << 1) // 0x02
@@ -45,7 +42,7 @@ struct SpawnParticlesInfo
 {
     /*0x00*/ s8 behParam;
     /*0x01*/ s8 count;
-    /*0x02*/ ModelID model;
+    /*0x02*/ ModelID16 model;
     /*0x03*/ s8 offsetY;
     /*0x04*/ s8 forwardVelBase;
     /*0x05*/ s8 forwardVelRange;
@@ -68,9 +65,6 @@ void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior);
 f32 lateral_dist_between_objects(struct Object *obj1, struct Object *obj2);
 f32 dist_between_objects(struct Object *obj1, struct Object *obj2);
 void cur_obj_forward_vel_approach_upward(f32 target, f32 increment);
-s32 approach_f32_signed(f32 *value, f32 target, f32 increment);
-f32 approach_f32_symmetric(f32 value, f32 target, f32 increment);
-s16 approach_s16_symmetric(s16 value, s16 target, s16 increment);
 s32 cur_obj_rotate_yaw_toward(s16 target, s16 increment);
 s16 obj_angle_to_object(struct Object *obj1, struct Object *obj2);
 s16 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleIndex, s16 turnAmount);
@@ -155,7 +149,6 @@ struct Surface *cur_obj_update_floor_height_and_get_floor(void);
 void cur_obj_apply_drag_xz(f32 dragStrength);
 void cur_obj_move_y(f32 gravity, f32 bounciness, f32 buoyancy);
 void cur_obj_unused_resolve_wall_collisions(f32 offsetY, f32 radius);
-s16 abs_angle_diff(s16 x0, s16 x1);
 void cur_obj_move_xz_using_fvel_and_yaw(void);
 void cur_obj_move_y_with_terminal_vel(void);
 void cur_obj_compute_vel_xz(void);
@@ -222,9 +215,6 @@ struct GraphNode_802A45E4 {
 };
 
 void obj_set_hitbox(struct Object *obj, struct ObjectHitbox *hitbox);
-s32 signum_positive(s32 x);
-f32 absf(f32 x);
-s32 absi(s32 a0);
 s32 cur_obj_wait_then_blink(s32 timeUntilBlinking, s32 numBlinks);
 s32 cur_obj_is_mario_ground_pounding_platform(void);
 void spawn_mist_particles(void);
@@ -236,7 +226,6 @@ s32 cur_obj_progress_direction_table(void);
 void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end);
 void cur_obj_set_pos_to_home_with_debug(void);
 s32 cur_obj_is_mario_on_platform(void);
-s32 jiggle_bbh_stair(s32 timer);
 void cur_obj_call_action_function(void (*actionFunctions[])(void));
 void spawn_base_star_with_no_lvl_exit(void);
 s32 cur_obj_mario_far_away(void);
@@ -280,7 +269,9 @@ void cur_obj_spawn_loot_blue_coin(void);
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY);
 
 // Extra functions for HackerSM64
-void obj_set_model(struct Object *obj, s32 modelID);
-s32 obj_has_model(struct Object *obj, u16 modelID);
+void obj_set_model(struct Object *obj, ModelID16 modelID);
+s32 obj_has_model(struct Object *obj, ModelID16 modelID);
 u32 obj_get_model_id(struct Object *obj);
 // End of HackerSM64 stuff
+
+#endif // OBJECT_HELPERS_H

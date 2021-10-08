@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GROUP7_H
+#define GROUP7_H
 
 #include "types.h"
 
@@ -59,3 +60,5 @@ extern const Gfx spindrift_seg5_dl_05002B30[];
 extern const Gfx spindrift_seg5_dl_05002C98[];
 extern const Gfx spindrift_seg5_dl_05002D08[];
 extern const struct Animation *const spindrift_seg5_anims_05002D68[];
+
+#endif

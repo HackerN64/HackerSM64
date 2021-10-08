@@ -21,7 +21,7 @@ void bhv_small_bomp_loop(void) {
                 o->oForwardVel = 0;
             }
 
-            if (o->oTimer == 15.0) {
+            if (o->oTimer == 15) {
                 o->oAction = BOMP_ACT_EXTEND;
                 o->oForwardVel = 40.0f;
                 cur_obj_play_sound_2(SOUND_OBJ_UNKNOWN2);
@@ -77,7 +77,7 @@ void bhv_large_bomp_loop(void) {
                 o->oForwardVel = 0;
             }
 
-            if (o->oTimer == 15.0) {
+            if (o->oTimer == 15) {
                 o->oAction = BOMP_ACT_EXTEND;
                 o->oForwardVel = 10.0f;
                 cur_obj_play_sound_2(SOUND_OBJ_UNKNOWN2);

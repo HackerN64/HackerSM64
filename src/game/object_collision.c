@@ -28,34 +28,26 @@ s32 detect_object_hitbox_overlap(struct Object *a, struct Object *b) {
     f32 dx = a->oPosX - b->oPosX;
     f32 dz = a->oPosZ - b->oPosZ;
     f32 collisionRadius = a->hitboxRadius + b->hitboxRadius;
-    f32 distance = sqrtf(sqr(dx) + sqr(dz));
+    f32 distance = (sqr(dx) + sqr(dz));
 
-    if (collisionRadius > distance) {
+    if (sqr(collisionRadius) > distance) {
         f32 dya_top = a->hitboxHeight + dya_bottom;
         f32 dyb_top = b->hitboxHeight + dyb_bottom;
 
-        if (dya_bottom > dyb_top) {
-            return 0;
-        }
-        if (dya_top < dyb_bottom) {
-            return 0;
-        }
-        if (a->numCollidedObjs >= 4) {
-            return 0;
-        }
-        if (b->numCollidedObjs >= 4) {
-            return 0;
-        }
+        if (dya_bottom > dyb_top) return FALSE;
+        if (dya_top < dyb_bottom) return FALSE;
+        if (a->numCollidedObjs >= 4) return FALSE;
+        if (b->numCollidedObjs >= 4) return FALSE;
         a->collidedObjs[a->numCollidedObjs] = b;
         b->collidedObjs[b->numCollidedObjs] = a;
         a->collidedObjInteractTypes |= b->oInteractType;
         b->collidedObjInteractTypes |= a->oInteractType;
         a->numCollidedObjs++;
         b->numCollidedObjs++;
-        return 1;
+        return TRUE;
     }
 
-    return 0;
+    return FALSE;
 }
 
 s32 detect_object_hurtbox_overlap(struct Object *a, struct Object *b) {
@@ -64,29 +56,25 @@ s32 detect_object_hurtbox_overlap(struct Object *a, struct Object *b) {
     f32 dx = a->oPosX - b->oPosX;
     f32 dz = a->oPosZ - b->oPosZ;
     f32 collisionRadius = a->hurtboxRadius + b->hurtboxRadius;
-    f32 distance = sqrtf(sqr(dx) + sqr(dz));
+    f32 distance = (sqr(dx) + sqr(dz));
 
     if (a == gMarioObject) {
         b->oInteractionSubtype |= INT_SUBTYPE_DELAY_INVINCIBILITY;
     }
 
-    if (collisionRadius > distance) {
+    if (sqr(collisionRadius) > distance) {
         f32 dya_top = a->hitboxHeight + dya_bottom;
         f32 dyb_top = b->hurtboxHeight + dyb_bottom;
 
-        if (dya_bottom > dyb_top) {
-            return 0;
-        }
-        if (dya_top < dyb_bottom) {
-            return 0;
-        }
+        if (dya_bottom > dyb_top) return FALSE;
+        if (dya_top < dyb_bottom) return FALSE;
         if (a == gMarioObject) {
             b->oInteractionSubtype &= ~INT_SUBTYPE_DELAY_INVINCIBILITY;
         }
-        return 1;
+        return TRUE;
     }
 
-    return 0;
+    return FALSE;
 }
 
 void clear_object_collision(struct Object *a) {

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef N64GRAPHICS_H_
+#define N64GRAPHICS_H_
 
 #include <stdint.h>
 
@@ -95,3 +96,5 @@ const char *n64graphics_get_read_version(void);
 
 // get version of underlying graphics writing library
 const char *n64graphics_get_write_version(void);
+
+#endif // N64GRAPHICS_H_

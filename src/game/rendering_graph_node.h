@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RENDERING_GRAPH_NODE_H
+#define RENDERING_GRAPH_NODE_H
 
 #include <PR/ultratypes.h>
 
@@ -10,6 +11,7 @@ extern struct GraphNodePerspective *gCurGraphNodeCamFrustum;
 extern struct GraphNodeCamera *gCurGraphNodeCamera;
 extern struct GraphNodeObject *gCurGraphNodeObject;
 extern struct GraphNodeHeldObject *gCurGraphNodeHeldObject;
+#define gCurGraphNodeObjectNode ((struct Object *)gCurGraphNodeObject)
 extern u16 gAreaUpdateCounter;
 extern f32 gWorldScale;
 
@@ -36,17 +38,19 @@ extern f32 gWorldScale;
 #if SILHOUETTE
 #define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))
 
-#define RENDER_PHASE_REJ_ZB                 0
-#define RENDER_PHASE_ZEX_BEFORE_SILHOUETTE  1
-#define RENDER_PHASE_REJ_SILHOUETTE         2
-#define RENDER_PHASE_REJ_NON_SILHOUETTE     3
-#define RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE 4
-#define RENDER_PHASE_ZEX_AFTER_SILHOUETTE   5
-#define RENDER_PHASE_REJ_NON_ZB             6
+#define RENDER_PHASE_ZEX_BG                 0
+#define RENDER_PHASE_REJ_ZB                 1
+#define RENDER_PHASE_ZEX_BEFORE_SILHOUETTE  2
+#define RENDER_PHASE_REJ_SILHOUETTE         3
+#define RENDER_PHASE_REJ_NON_SILHOUETTE     4
+#define RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE 5
+#define RENDER_PHASE_ZEX_AFTER_SILHOUETTE   6
+#define RENDER_PHASE_REJ_NON_ZB             7
 #else
-#define RENDER_PHASE_REJ_ZB                 0
-#define RENDER_PHASE_ZEX_ALL                1
-#define RENDER_PHASE_REJ_NON_ZB             2
+#define RENDER_PHASE_ZEX_BG                 0
+#define RENDER_PHASE_REJ_ZB                 1
+#define RENDER_PHASE_ZEX_ALL                2
+#define RENDER_PHASE_REJ_NON_ZB             3
 #endif
 
 #define RENDER_PHASE_FIRST RENDER_PHASE_REJ_ZB
@@ -54,3 +58,5 @@ extern f32 gWorldScale;
 
 void geo_process_node_and_siblings(struct GraphNode *firstNode);
 void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor);
+
+#endif // RENDERING_GRAPH_NODE_H

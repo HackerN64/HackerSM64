@@ -20,7 +20,8 @@
  *
  **************************************************************************/
 
-#pragma once
+#ifndef _SP_H_
+#define _SP_H_
 
 #ifdef _LANGUAGE_C_PLUS_PLUS
 extern "C" {
@@ -191,3 +192,5 @@ void spFinish( Gfx **glistp );
 #ifdef _LANGUAGE_C_PLUS_PLUS
 }
 #endif
+
+#endif /* _SP_H_ */

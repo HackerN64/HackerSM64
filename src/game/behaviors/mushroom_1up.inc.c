@@ -141,10 +141,10 @@ void sliding_1up_move(void) {
         o->oForwardVel += 25.0f;
         o->oVelY = 0;
     } else {
-        o->oForwardVel *= 0.98;
+        o->oForwardVel *= 0.98f;
     }
 
-    if (o->oForwardVel > 40.0)
+    if (o->oForwardVel > 40.0f)
         o->oForwardVel = 40.0f;
 
     if (!is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 5000))

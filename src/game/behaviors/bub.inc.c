@@ -4,13 +4,13 @@
 // value. The later action functions seem to check Y distance to Mario and proceed
 // to do nothing, which indicates this behavior set is incomplete.
 
-// TODO: Rename these. These have nothing to do with birds.
 void bub_spawner_act_0(void) {
     s32 i;
     s32 amt = o->oCheepCheepSpawnerSpawnAmount;
     if (o->oDistanceToMario < 1500.0f) {
-        for (i = 0; i < amt; i++)
+        for (i = 0; i < amt; i++) {
             spawn_object(o, MODEL_BUB, bhvBub);
+        }
         o->oAction = 1;
     }
 }
@@ -71,7 +71,7 @@ void bub_act_1(void) {
         o->oAngleToMario = cur_obj_angle_to_home();
     cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x100);
     if (o->oDistanceToMario < 200.0f)
-        if (o->oCheepCheepRandomSwimAway < 0.5)
+        if (o->oCheepCheepRandomSwimAway < 0.5f)
             o->oAction = 2;
     if (o->oInteractStatus & INT_STATUS_INTERACTED)
         o->oAction = 2;

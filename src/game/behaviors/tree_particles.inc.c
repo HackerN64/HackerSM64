@@ -4,8 +4,8 @@
 void bhv_tree_snow_or_leaf_loop(void) {
     cur_obj_update_floor_height();
     if (o->oTimer == 0) {
-        o->oAngleVelPitch = (random_float() - 0.5) * 0x1000;
-        o->oAngleVelRoll = (random_float() - 0.5) * 0x1000;
+        o->oAngleVelPitch = (random_float() - 0.5f) * 0x1000;
+        o->oAngleVelRoll  = (random_float() - 0.5f) * 0x1000;
         o->oTreeSnowOrLeafSidewardVel = 4;
         o->oTreeSnowOrLeafSidewardAngleVel = random_float() * 0x400 + 0x600;
     }
@@ -23,7 +23,7 @@ void bhv_tree_snow_or_leaf_loop(void) {
     if (o->oVelY < -8.0f)
         o->oVelY = -8.0f;
     if (o->oForwardVel > 0)
-        o->oForwardVel -= 0.3;
+        o->oForwardVel -= 0.3f;
     else
         o->oForwardVel = 0;
     o->oPosX += sins(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafSidewardAngle) * o->oTreeSnowOrLeafSidewardVel;
@@ -36,11 +36,11 @@ void bhv_snow_leaf_particle_spawn_init(void) {
     struct Object *obj; // Either snow or leaf
     struct Object *nearestTree = NULL;
     f32 scale;
-    gMarioObject->oActiveParticleFlags &= ~0x2000;
+    gMarioObject->oActiveParticleFlags &= ~ACTIVE_PARTICLE_LEAF;
     // Whether a tree uses snow particles or not is decided via the model IDs instead of the course number
     nearestTree = cur_obj_nearest_object_with_behavior(bhvTree);
     if (nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_CCM_SNOW_TREE] || nearestTree->header.gfx.sharedChild == gLoadedGraphNodes[MODEL_SL_SNOW_TREE]) {
-        if (random_float() < 0.5) {
+        if (random_float() < 0.5f) {
             obj = spawn_object(o, MODEL_WHITE_PARTICLE_DL, bhvTreeSnow);
             scale = random_float();
             obj_scale_xyz(obj, scale, scale, scale);
@@ -49,7 +49,7 @@ void bhv_snow_leaf_particle_spawn_init(void) {
             obj->oVelY = random_float() * 15.0f;
         }
     } else {
-        if (random_float() < 0.3) {
+        if (random_float() < 0.3f) {
             obj = spawn_object(o, MODEL_LEAVES, bhvTreeLeaf);
             scale = random_float() * 3.0f;
             obj_scale_xyz(obj, scale, scale, scale);

@@ -16,33 +16,21 @@ static void fish_spawner_act_spawn(void) {
     struct Object *fishObject;
 
     switch (o->oBehParams2ndByte) {
-
-        // Cases need to be on one line to match with and without optimizations.
-        case FISH_SPAWNER_BP_MANY_BLUE:
-            model = MODEL_FISH;      schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0;
-            break;
-
-        case FISH_SPAWNER_BP_FEW_BLUE:
-            model = MODEL_FISH;      schoolQuantity = 5;  minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0;
-            break;
-
-        case FISH_SPAWNER_BP_MANY_CYAN:
-            model = MODEL_CYAN_FISH; schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264;
-            break;
-
-        case FISH_SPAWNER_BP_FEW_CYAN:
-            model = MODEL_CYAN_FISH; schoolQuantity = 5;  minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264;
-            break;
-
-        default:
-            return;
+        case FISH_SPAWNER_BP_MANY_BLUE: model = MODEL_FISH;      schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0; break;
+        case FISH_SPAWNER_BP_FEW_BLUE:  model = MODEL_FISH;      schoolQuantity =  5; minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0; break;
+        case FISH_SPAWNER_BP_MANY_CYAN: model = MODEL_CYAN_FISH; schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264; break;
+        case FISH_SPAWNER_BP_FEW_CYAN:  model = MODEL_CYAN_FISH; schoolQuantity =  5; minDistToMario = 1500.0f; fishAnimation = cyan_fish_seg6_anims_0600E264; break;
+        default: return;
     }
-
 
     // Spawn and animate the schoolQuantity of fish if Mario enters render distance
     // or the stage is Secret Aquarium.
     // Fish moves randomly within a range of 700.0f.
+#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
+    if (o->oDistanceToMario < minDistToMario) {
+#else
     if (o->oDistanceToMario < minDistToMario || gCurrLevelNum == LEVEL_SA) {
+#endif
         for (i = 0; i < schoolQuantity; i++) {
             fishObject = spawn_object(o, model, bhvFish);
             fishObject->oBehParams2ndByte = o->oBehParams2ndByte;
@@ -83,7 +71,7 @@ void bhv_fish_spawner_loop(void) {
  */
 static void fish_vertical_roam(s32 speed) {
     f32 parentY = o->parentObj->oPosY;
-
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
     // If the stage is Secret Aquarium, the fish can
     // travel as far vertically as they wish.
     if (gCurrLevelNum == LEVEL_SA) {
@@ -92,9 +80,10 @@ static void fish_vertical_roam(s32 speed) {
         }
         o->oPosY = approach_f32_symmetric(o->oPosY, o->oFishGoalY, speed);
 
-     // Allow the fish to roam vertically if within
-     // range of the fish spawner.
-     } else if (parentY - 100.0f - o->oFishDepthDistance < o->oPosY
+    // Allow the fish to roam vertically if within range of the fish spawner.
+    } else
+#endif
+    if (parentY - 100.0f - o->oFishDepthDistance < o->oPosY
                && o->oPosY < parentY + 1000.0f + o->oFishDepthDistance) {
         o->oPosY = approach_f32_symmetric(o->oPosY, o->oFishGoalY, speed);
     }
@@ -116,11 +105,11 @@ static void fish_act_roam(void) {
     // Initializes some variables when the fish first begins roaming.
     if (o->oTimer == 0) {
         o->oForwardVel = random_float() * 2 + 3.0f;
-        if (gCurrLevelNum == LEVEL_SA) {
-            o->oFishHeightOffset = random_float() * 700.0f;
-        } else {
-            o->oFishHeightOffset = random_float() * 100.0f;
-        }
+#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
+        o->oFishHeightOffset = random_float() * 100.0f;
+#else
+        o->oFishHeightOffset = random_float() * ((gCurrLevelNum == LEVEL_SA) ? 700.0f : 100.0f);
+#endif
         o->oFishRoamDistance = random_float() * 500 + 200.0f;
     }
 
@@ -177,7 +166,7 @@ static void fish_act_flee(void) {
 
     // Accelerate over time.
     if (o->oForwardVel < o->oFishGoalVel) {
-        o->oForwardVel = o->oForwardVel + 0.5;
+        o->oForwardVel = o->oForwardVel + 0.5f;
     }
     o->oFishGoalY = gMarioObject->oPosY + o->oFishHeightOffset;
 
@@ -216,7 +205,7 @@ static void fish_act_init(void) {
     cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
     o->header.gfx.animInfo.animFrame = (s16)(random_float() * 28.0f);
     o->oFishDepthDistance = random_float() * 300.0f;
-    cur_obj_scale(random_float() * 0.4 + 0.8);
+    cur_obj_scale(random_float() * 0.4f + 0.8f);
     o->oAction = FISH_ACT_ROAM;
 }
 
@@ -233,25 +222,29 @@ void bhv_fish_loop(void) {
     // oFishWaterLevel tracks if a fish has roamed out of water.
     // This can't happen in Secret Aquarium, so set it to 0.
     o->oFishWaterLevel = find_water_level(o->oPosX, o->oPosZ);
+#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelNum == LEVEL_SA) {
         o->oFishWaterLevel = 0.0f;
     }
+#endif
 
     // Apply hitbox and resolve wall collisions
     o->oWallHitboxRadius = 30.0f;
     cur_obj_resolve_wall_collisions();
-
+#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
+    if (o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC) {
+        obj_mark_for_deletion(o);
+        return;
+    }
+#else
     // Delete fish if it's drifted to an area with no water.
     if (gCurrLevelNum != LEVEL_UNKNOWN_32) {
         if (o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC) {
             obj_mark_for_deletion(o);
             return;
         }
-
-    // Unreachable code, perhaps for debugging or testing.
-    } else {
-        o->oFishWaterLevel = 1000.0f;
     }
+#endif
 
     // Call fish action methods and apply physics engine.
     cur_obj_call_action_function(sFishActions);

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef N64CKSUM_H_
+#define N64CKSUM_H_
 
 #include <stdint.h>
 
@@ -11,3 +12,5 @@ void n64cksum_calc_6102(unsigned char *buf, unsigned int cksum[]);
 // buf: buffer containing ROM data
 // checksums are written into the buffer
 void n64cksum_update_checksums(uint8_t *buf);
+
+#endif // N64CKSUM_H_

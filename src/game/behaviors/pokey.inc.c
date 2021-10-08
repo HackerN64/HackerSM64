@@ -36,14 +36,11 @@ static u8 sPokeyBodyPartAttackHandlers[] = {
 
 /**
  * Update function for pokey body part.
- * The behavior parameter is the body part's index from 0 to 4, with 0 at the
- * top.
+ * The behavior parameter is the body part's index from POKEY_PART_BP_HEAD to POKEY_PART_BP_LOWEST,
+ * with POKEY_PART_BP_HEAD at the top.
  */
 void bhv_pokey_body_part_update(void) {
     // PARTIAL_UPDATE
-
-    s16 offsetAngle;
-    f32 baseHeight;
 
     if (obj_update_standard_actions(3.0f)) {
         if (o->parentObj->oAction == POKEY_ACT_UNLOAD_PARTS) {
@@ -82,12 +79,12 @@ void bhv_pokey_body_part_update(void) {
             }
 
             //! Pausing causes jumps in offset angle
-            offsetAngle = o->oBehParams2ndByte * 0x4000 + gGlobalTimer * 0x800;
+            s16 offsetAngle = o->oBehParams2ndByte * 0x4000 + gGlobalTimer * 0x800;
             o->oPosX = o->parentObj->oPosX + coss(offsetAngle) * 6.0f;
             o->oPosZ = o->parentObj->oPosZ + sins(offsetAngle) * 6.0f;
 
             // This is the height of the tower beneath the body part
-            baseHeight = o->parentObj->oPosY
+            f32 baseHeight = o->parentObj->oPosY
                          + (120 * (o->parentObj->oPokeyNumAliveBodyParts - o->oBehParams2ndByte) - 240)
                          + 120.0f * o->parentObj->oPokeyBottomBodyPartSize;
 
@@ -99,18 +96,14 @@ void bhv_pokey_body_part_update(void) {
             }
 
             // Only the head has loot coins
-            if (o->oBehParams2ndByte == 0) {
-                o->oNumLootCoins = 1;
-            } else {
-                o->oNumLootCoins = 0;
-            }
+            o->oNumLootCoins = (o->oBehParams2ndByte == POKEY_PART_BP_HEAD);
 
             // If the body part was attacked, then die. If the head was killed,
             // then die after a delay.
 
             if (obj_handle_attacks(&sPokeyBodyPartHitbox, o->oAction, sPokeyBodyPartAttackHandlers)) {
-                o->parentObj->oPokeyNumAliveBodyParts -= 1;
-                if (o->oBehParams2ndByte == 0) {
+                o->parentObj->oPokeyNumAliveBodyParts--;
+                if (o->oBehParams2ndByte == POKEY_PART_BP_HEAD) {
                     o->parentObj->oPokeyHeadWasKilled = TRUE;
                     // Last minute change to blue coins - not sure why they didn't
                     // just set it to -1 above
@@ -143,20 +136,19 @@ void bhv_pokey_body_part_update(void) {
 }
 
 /**
- * When mario gets within range, spawn the 5 body parts and enter the wander
- * action.
+ * When mario gets within range, spawn the POKEY_NUM_SEGMENTS body parts and enter the wander action.
  */
 static void pokey_act_uninitialized(void) {
     struct Object *bodyPart;
     s32 i;
     s16 partModel;
 
-    if (o->oDistanceToMario < 2000.0f) {
+    if (o->oDistanceToMario < o->oDrawingDistance) {
         partModel = MODEL_POKEY_HEAD;
 
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < POKEY_NUM_SEGMENTS; i++) {
             // Spawn body parts at y offsets 480, 360, 240, 120, 0
-            // behavior param 0 = head, 4 = lowest body part
+            // behavior param POKEY_PART_BP_HEAD = head, POKEY_PART_BP_LOWEST = lowest body part
             bodyPart = spawn_object_relative(i, 0, -i * 120 + 480, 0, o, partModel, bhvPokeyBodyPart);
 
             if (bodyPart != NULL) {
@@ -166,8 +158,8 @@ static void pokey_act_uninitialized(void) {
             partModel = MODEL_POKEY_BODY_PART;
         }
 
-        o->oPokeyAliveBodyPartFlags = 0x1F;
-        o->oPokeyNumAliveBodyParts = 5;
+        o->oPokeyAliveBodyPartFlags = BITMASK(POKEY_NUM_SEGMENTS);
+        o->oPokeyNumAliveBodyParts = POKEY_NUM_SEGMENTS;
         o->oPokeyBottomBodyPartSize = 1.0f;
         o->oAction = POKEY_ACT_WANDER;
     }
@@ -183,9 +175,9 @@ static void pokey_act_wander(void) {
     s32 targetAngleOffset;
     struct Object *bodyPart;
 
-    if (o->oPokeyNumAliveBodyParts == 0) {
+    if (o->oPokeyNumAliveBodyParts == POKEY_PART_BP_HEAD) {
         obj_mark_for_deletion(o);
-    } else if (o->oDistanceToMario > 2500.0f) {
+    } else if (o->oDistanceToMario > (o->oDrawingDistance + 500.0f)) {
         o->oAction = POKEY_ACT_UNLOAD_PARTS;
         o->oForwardVel = 0.0f;
     } else {
@@ -198,7 +190,7 @@ static void pokey_act_wander(void) {
             o->oForwardVel = 5.0f;
 
             // If a body part is missing, replenish it after 100 frames
-            if (o->oPokeyNumAliveBodyParts < 5) {
+            if (o->oPokeyNumAliveBodyParts < POKEY_NUM_SEGMENTS) {
                 if (o->oTimer > 100) {
                     // Because the body parts shift index whenever a body part
                     // is killed, the new part's index is equal to the number

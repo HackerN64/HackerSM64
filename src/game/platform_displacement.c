@@ -21,9 +21,7 @@ struct Object *gMarioPlatform = NULL;
  */
 void update_mario_platform(void) {
     struct Surface *floor;
-    f32 marioX;
-    f32 marioY;
-    f32 marioZ;
+    f32 marioX, marioY, marioZ;
     f32 floorHeight;
     u32 awayFromFloor;
 
@@ -41,27 +39,19 @@ void update_mario_platform(void) {
     marioZ = gMarioObject->oPosZ;
     floorHeight = find_floor(marioX, marioY, marioZ, &floor);
 
-    if (absf(marioY - floorHeight) < 4.0f) {
-        awayFromFloor = 0;
-    } else {
-        awayFromFloor = 1;
-    }
+    awayFromFloor =  (absf(marioY - floorHeight) >= 4.0f);
 
-    switch (awayFromFloor) {
-        case 1:
+    if (awayFromFloor) {
+        gMarioPlatform = NULL;
+        gMarioObject->platform = NULL;
+    } else {
+        if (floor != NULL && floor->object != NULL) {
+            gMarioPlatform = floor->object;
+            gMarioObject->platform = floor->object;
+        } else {
             gMarioPlatform = NULL;
             gMarioObject->platform = NULL;
-            break;
-
-        case 0:
-            if (floor != NULL && floor->object != NULL) {
-                gMarioPlatform = floor->object;
-                gMarioObject->platform = floor->object;
-            } else {
-                gMarioPlatform = NULL;
-                gMarioObject->platform = NULL;
-            }
-            break;
+        }
     }
 }
 
@@ -160,7 +150,7 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
 
         // Make sure inertia isn't set on the first frame otherwise the previous value isn't cleared
         if ((platform != displaceInfo->prevPlatform) || (gGlobalTimer != displaceInfo->prevTimer + 1)) {
-            vec3f_set(sMarioAmountDisplaced, 0.f, 0.f, 0.f);
+            vec3_zero(sMarioAmountDisplaced);
         }
     }
 
@@ -231,17 +221,13 @@ void apply_mario_platform_displacement(void) {
  * platform. If isMario is false, use gCurrentObject.
  */
 void apply_platform_displacement(u32 isMario, struct Object *platform) {
-    f32 x;
-    f32 y;
-    f32 z;
-    f32 platformPosX;
-    f32 platformPosY;
-    f32 platformPosZ;
+    f32 x, y, z;
+    f32 platformPosX, platformPosY, platformPosZ;
     Vec3f currentObjectOffset;
     Vec3f relativeOffset;
     Vec3f newObjectOffset;
     Vec3s rotation;
-    f32 displaceMatrix[4][4];
+    Mat4 displaceMatrix;
 
     rotation[0] = platform->oAngleVelPitch;
     rotation[1] = platform->oAngleVelYaw;

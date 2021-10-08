@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MACRO_PRESETS_H
+#define MACRO_PRESETS_H
 
 #include "macro_preset_names.h"
 #include "behavior_data.h"
@@ -7,7 +8,7 @@
 struct MacroPreset
 {
     /*0x00*/ const BehaviorScript *behavior;
-    /*0x04*/ s16 model;
+    /*0x04*/ ModelID16 model;
     /*0x06*/ s16 param;
 };
 
@@ -108,7 +109,7 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvSmallBully, MODEL_BULLY, 0},
     {bhvSmallBully, MODEL_BULLY_BOSS, 0}, // unused
     {bhvYellowCoin, MODEL_YELLOW_COIN, 0},
-    {bhvStub1D0C, MODEL_UNKNOWN_58, 0}, // unused
+    {bhvYellowCoin, MODEL_UNKNOWN_58, 0}, // unused
     {bhvBouncingFireball, MODEL_NONE, 0},
     {bhvFlamethrower, MODEL_NONE, 4},
     {bhvYellowCoin, MODEL_YELLOW_COIN, 0},
@@ -379,3 +380,5 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvYellowCoin, MODEL_YELLOW_COIN, 0},
     {bhvYellowCoin, MODEL_YELLOW_COIN, 0}
 };
+
+#endif // MACRO_PRESETS_H
