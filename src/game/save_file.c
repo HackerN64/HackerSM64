@@ -717,7 +717,7 @@ void eu_set_language(u16 language) {
     save_main_menu_data();
 }
 
-u16 eu_get_language(void) {
+u32 eu_get_language(void) {
     return gSaveBuffer.menuData[0].language;
 }
 #endif

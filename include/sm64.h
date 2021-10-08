@@ -73,6 +73,7 @@ enum RenderLayers
     LAYER_TRANSPARENT_INTER,
     LAYER_COUNT,
 };
+
 #if SILHOUETTE
 #define LAYER_ZB_LAST                       LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #define LAYER_SILHOUETTE_FIRST              LAYER_SILHOUETTE_OPAQUE
@@ -111,28 +112,42 @@ enum RenderLayers
 #define INPUT_Z_DOWN                        /* 0x4000 */ (1 << 14)
 #define INPUT_Z_PRESSED                     /* 0x8000 */ (1 << 15)
 
-#define GROUND_STEP_LEFT_GROUND              0
-#define GROUND_STEP_NONE                     1
-#define GROUND_STEP_HIT_WALL                 2
-#define GROUND_STEP_HIT_WALL_STOP_QSTEPS     2
-#define GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS 3
+enum GroundStep
+{
+    GROUND_STEP_LEFT_GROUND,
+    GROUND_STEP_NONE,
+    GROUND_STEP_HIT_WALL,
+    GROUND_STEP_HIT_WALL_STOP_QSTEPS = GROUND_STEP_HIT_WALL,
+    GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS
+};
 
-#define AIR_STEP_CHECK_LEDGE_GRAB       0x1
-#define AIR_STEP_CHECK_HANG             0x2
+enum AirStepCheck
+{
+    AIR_STEP_CHECK_NONE,
+    AIR_STEP_CHECK_LEDGE_GRAB,
+    AIR_STEP_CHECK_HANG
+};
 
-#define AIR_STEP_NONE                   0x0
-#define AIR_STEP_LANDED                 0x1
-#define AIR_STEP_HIT_WALL               0x2
-#define AIR_STEP_GRABBED_LEDGE          0x3
-#define AIR_STEP_GRABBED_CEILING        0x4
-#define AIR_STEP_HIT_LAVA_WALL          0x6
-#define AIR_STEP_HIT_CEILING            0x7
+enum AirStep
+{
+    AIR_STEP_NONE,
+    AIR_STEP_LANDED,
+    AIR_STEP_HIT_WALL,
+    AIR_STEP_GRABBED_LEDGE,
+    AIR_STEP_GRABBED_CEILING,
+    AIR_STEP_UNK,
+    AIR_STEP_HIT_LAVA_WALL,
+    AIR_STEP_HIT_CEILING
+};
 
-#define WATER_STEP_NONE                 0x0
-#define WATER_STEP_HIT_FLOOR            0x1
-#define WATER_STEP_HIT_CEILING          0x2
-#define WATER_STEP_CANCELLED            0x3
-#define WATER_STEP_HIT_WALL             0x4
+enum WaterStep
+{
+    WATER_STEP_NONE,
+    WATER_STEP_HIT_FLOOR,
+    WATER_STEP_HIT_CEILING,
+    WATER_STEP_CANCELLED,
+    WATER_STEP_HIT_WALL
+};
 
 #define PARTICLE_DUST                   /* 0x00000001 */ (1 <<  0)
 #define PARTICLE_VERTICAL_STAR          /* 0x00000002 */ (1 <<  1)
@@ -481,5 +496,7 @@ enum RenderLayers
                        U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS   )
 
 #define C_BUTTONS     (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS   )
+
+#define JPAD_BUTTONS  (U_JPAD     | D_JPAD     | L_JPAD     | R_JPAD       )
 
 #endif // SM64_H

@@ -1,5 +1,5 @@
 // 0x070163F8 - 0x070165A8
-const Collision ccm_seg7_collision_070163F8[] = {
+const Collision ccm_seg7_collision_ropeway_lift[] = {
     COL_INIT(),
     COL_VERTEX_INIT(0x18),
     COL_VERTEX(-204, -204, -101),

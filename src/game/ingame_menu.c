@@ -218,38 +218,6 @@ void create_dl_ortho_matrix(void) {
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH)
 }
 
-#if !defined(VERSION_JP) && !defined(VERSION_SH)
-UNUSED
-#endif
-static Texture *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) { //! Texture type for *in?
-    s32 inPos;
-    u16 bitMask;
-    s16 outPos = 0;
-
-    Texture *out = alloc_display_list((u32) width * (u32) height);
-
-    if (out == NULL) {
-        return NULL;
-    }
-
-    for (inPos = 0; inPos < (width * height) / 16; inPos++) {
-        bitMask = 0x8000;
-
-        while (bitMask != 0) {
-            if (in[inPos] & bitMask) {
-                out[outPos] = 0xFF;
-            } else {
-                out[outPos] = 0x00;
-            }
-
-            bitMask /= 2;
-            outPos++;
-        }
-    }
-
-    return out;
-}
-
 Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     u32 size = (u32) width * (u32) height;
     s32 inPos;
@@ -1260,7 +1228,7 @@ void dl_rgba16_stop_cutscene_msg_fade(void) {
     }
 }
 
-u8 ascii_to_credits_char(u8 c) {
+u32 ascii_to_credits_char(u8 c) {
     if (c >= 'A' && c <= 'Z') return (c - ('A' - 0xA));
     if (c >= 'a' && c <= 'z') return (c - ('a' - 0xA)); // remap lower to upper case
     if (c == ' ') return GLOBAL_CHAR_SPACE;
@@ -1827,7 +1795,7 @@ s32 render_pause_courses_and_castle(void) {
             gDialogLineNum = MENU_OPT_DEFAULT;
             gDialogTextAlpha = 0;
             level_set_transition(-1, NULL);
-            play_sound(SOUND_MENU_PAUSE_HIGHPRIO, gGlobalSoundSource);
+            play_sound(SOUND_MENU_PAUSE_OPEN, gGlobalSoundSource);
 
             if (gCurrCourseNum >= COURSE_MIN && gCurrCourseNum <= COURSE_MAX) {
                 change_dialog_camera_angle();
@@ -1854,7 +1822,7 @@ s32 render_pause_courses_and_castle(void) {
             if (gPlayer3Controller->buttonPressed & A_BUTTON
              || gPlayer3Controller->buttonPressed & START_BUTTON) {
                 level_set_transition(0, NULL);
-                play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource);
+                play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;
                 gMenuMode = MENU_MODE_NONE;
 
@@ -1876,7 +1844,7 @@ s32 render_pause_courses_and_castle(void) {
             if (gPlayer3Controller->buttonPressed & A_BUTTON
              || gPlayer3Controller->buttonPressed & START_BUTTON) {
                 level_set_transition(0, NULL);
-                play_sound(SOUND_MENU_PAUSE_2, gGlobalSoundSource);
+                play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gMenuMode = MENU_MODE_NONE;
                 gDialogBoxState = DIALOG_STATE_OPENING;
 
@@ -1961,7 +1929,7 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
         }
 
         if (gHudDisplay.coins == gCourseCompleteCoins && gGotFileCoinHiScore) {
-            play_sound(SOUND_MENU_MARIO_CASTLE_WARP2, gGlobalSoundSource);
+            play_sound(SOUND_MENU_HIGH_SCORE, gGlobalSoundSource);
         }
     }
 }

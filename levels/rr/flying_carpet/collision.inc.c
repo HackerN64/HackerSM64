@@ -1,5 +1,5 @@
 // 0x07029038 - 0x07029152
-const Collision rr_seg7_collision_07029038[] = {
+const Collision rr_seg7_collision_flying_carpet[] = {
     COL_INIT(),
     COL_VERTEX_INIT(0x15),
     COL_VERTEX(-101, 20, 0),

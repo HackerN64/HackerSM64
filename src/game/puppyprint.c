@@ -168,7 +168,7 @@ void puppyprint_profiler_finished(void) {
 }
 
 // RGB colour lookup table for colouring all the funny ram prints.
-u8 colourChart[33][3] = {
+ColorRGB colourChart[33] = {
     { 255,   0,   0 },
     {   0,   0, 255 },
     {   0, 255,   0 },

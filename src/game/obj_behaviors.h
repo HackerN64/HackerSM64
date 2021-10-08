@@ -36,7 +36,7 @@ void bobomb_free_loop(void);
 void bobomb_held_loop(void);
 void bobomb_dropped_loop(void);
 void bobomb_thrown_loop(void);
-void curr_obj_random_blink(s32 *blinkTimer);
+void cur_obj_random_blink(s32 *blinkTimer);
 void bhv_bobomb_loop(void);
 void bhv_bobomb_fuse_smoke_init(void);
 void bhv_bobomb_buddy_init(void);

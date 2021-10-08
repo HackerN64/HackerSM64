@@ -59,6 +59,10 @@
 #define MODEL_ID_COUNT 256
 // Number of supported areas per level.
 #define AREA_COUNT 8
+// Makes signs and NPCs easier to talk to.
+#define EASIER_DIALOG_TRIGGER
+// Show an "A" when Mario is able to talk [requires EASIER_DIALOG_TRIGGER]
+#define DIALOG_INDICATOR
 // Include the English characters that were missing from US segment2
 // J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
 // [MAKE SURE TO ALSO BUILD FROM JP/SH AND EU TO OBTAIN THE ASSETS]
@@ -86,14 +90,11 @@
 #endif // DISABLE_EXIT_COURSE
 
 // -- MOVEMENT SETTINGS --
-// Fixes Mario's turn radius by making it dependent on forward speed.
-// Modes:
-// 0 is vanilla behavior.
-// 1 is similar to vanilla, but prevents Mario from moving in the wrong direction, and allows finer control with the analog stick.
-// 2 is similar to mode 1, but a bit further from vanilla, and allows instant turnaround if Mario is moving slower than a certain threshold.
-// 3 is instant turning to the intended direction regardless of speed and angle.
-// 4 is an experimental asymptotic turn.
-#define GROUND_TURN_MODE 0
+// Fixes Mario's turn ground radius by making it dependent on the analog stick magnitude.
+#define GROUND_TURN_FIX
+// Flips Mario around when running backwards really fast.
+// This can happen when sliding backwards off a slope onto a floor.
+//#define GROUND_SPEED_FLIP
 // Improved hanging:
 // - Doesn't require holding down the A button
 // - Percise turning control
@@ -170,6 +171,8 @@
 #define MUSHROOMS_HEAL
 // Collecting a Power Star will fully heal Mario.
 #define POWER_STARS_HEAL
+// The speed of a platform on a track can be controlled by standing near the front or back of it
+//#define CONTROLLABLE_PLATFORM_SPEED
 // The number of chain balls the Chain Chomp has.  Vanilla is 5.
 #define CHAIN_CHOMP_NUM_SEGMENTS 5
 // The number of parts Pokey has, including the head. Vanilla is 5, max is 30.
@@ -251,9 +254,9 @@
 // If you want the game to boot normally, just comment out the define again.
 //#define TEST_LEVEL LEVEL_BOB
 // Enable debug level select
-//#define DEBUG_LEVEL_SELECT
+#define DEBUG_LEVEL_SELECT
 // Enable debug free move (DPad up to enter, A to exit)
-//#define ENABLE_DEBUG_FREE_MOVE
+#define ENABLE_DEBUG_FREE_MOVE
 // Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
 //#define CUSTOM_DEBUG
 // Include Puppyprint, a display library for text and large images. Also includes a custom, enhanced performance profiler.

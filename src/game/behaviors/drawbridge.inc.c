@@ -32,7 +32,7 @@ void bhv_lll_drawbridge_loop(void) {
 
         if (o->oTimer >= 51 && (o->oTimer % 8) == 0) {
             o->oAction = LLL_DRAWBRIDGE_ACT_LOWER;
-            cur_obj_play_sound_2(SOUND_GENERAL_BOAT_TILT1);
+            cur_obj_play_sound_2(SOUND_GENERAL_DRAWBRIDGE_LOWER);
         }
     }
 
@@ -41,7 +41,7 @@ void bhv_lll_drawbridge_loop(void) {
 
         if (o->oTimer >= 51 && (o->oTimer % 8) == 0) {
             o->oAction = LLL_DRAWBRIDGE_ACT_RAISE;
-            cur_obj_play_sound_2(SOUND_GENERAL_BOAT_TILT2);
+            cur_obj_play_sound_2(SOUND_GENERAL_DRAWBRIDGE_RAISE);
         }
     }
 }

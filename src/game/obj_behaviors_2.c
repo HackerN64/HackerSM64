@@ -77,7 +77,7 @@ static s32 obj_is_rendering_enabled(void) {
     return (o->header.gfx.node.flags & GRAPH_RENDER_ACTIVE);
 }
 
-static s16 obj_get_pitch_from_vel(void) {
+static s32 obj_get_pitch_from_vel(void) {
     return -atan2s(o->oForwardVel, o->oVelY);
 }
 
@@ -114,92 +114,6 @@ static void obj_perform_position_op(s32 op) {
         case POS_OP_SAVE_POSITION:    vec3_copy(sObjSavedPos, &o->oPosVec); break;
         case POS_OP_COMPUTE_VELOCITY: vec3_diff(&o->oVelVec, &o->oPosVec, sObjSavedPos); break;
         case POS_OP_RESTORE_POSITION: vec3_copy(&o->oPosVec, sObjSavedPos); break;
-    }
-}
-
-static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, f32 x, f32 y, f32 z) {
-    struct Object *trackBall;
-    struct Waypoint *initialPrevWaypoint;
-    struct Waypoint *nextWaypoint;
-    struct Waypoint *prevWaypoint;
-    f32 amountToMove;
-    f32 dx, dy, dz;
-    f32 distToNextWaypoint;
-
-    if (ballIndex == 0 || ((u16)(o->oBehParams >> 16) & 0x0080)) {
-        initialPrevWaypoint = o->oPlatformOnTrackPrevWaypoint;
-        nextWaypoint = initialPrevWaypoint;
-
-        if (ballIndex != 0) {
-            amountToMove = 300.0f * ballIndex;
-        } else {
-            obj_perform_position_op(POS_OP_SAVE_POSITION);
-            o->oPlatformOnTrackPrevWaypointFlags = 0;
-            amountToMove = o->oForwardVel;
-        }
-
-        do {
-            prevWaypoint = nextWaypoint;
-
-            nextWaypoint += 1;
-            if (nextWaypoint->flags == WAYPOINT_FLAGS_END) {
-                if (ballIndex == 0) {
-                    o->oPlatformOnTrackPrevWaypointFlags = WAYPOINT_FLAGS_END;
-                }
-
-                if (((u16)(o->oBehParams >> 16) & PLATFORM_ON_TRACK_BP_RETURN_TO_START)) {
-                    nextWaypoint = o->oPlatformOnTrackStartWaypoint;
-                } else {
-                    return;
-                }
-            }
-
-            dx = nextWaypoint->pos[0] - x;
-            dy = nextWaypoint->pos[1] - y;
-            dz = nextWaypoint->pos[2] - z;
-
-            distToNextWaypoint = sqrtf(sqr(dx) + sqr(dy) + sqr(dz));
-
-            // Move directly to the next waypoint, even if it's farther away
-            // than amountToMove
-            amountToMove -= distToNextWaypoint;
-            x += dx;
-            y += dy;
-            z += dz;
-        } while (amountToMove > 0.0f);
-
-        // If we moved farther than amountToMove, move in the opposite direction
-        // No risk of near-zero division: If distToNextWaypoint is close to
-        // zero, then that means we didn't cross a waypoint this frame (since
-        // otherwise distToNextWaypoint would equal the distance between two
-        // waypoints, which should never be that small). But this implies that
-        // amountToMove - distToNextWaypoint <= 0, and amountToMove is at least
-        // 0.1 (from platform on track behavior).
-        distToNextWaypoint = amountToMove / distToNextWaypoint;
-        x += dx * distToNextWaypoint;
-        y += dy * distToNextWaypoint;
-        z += dz * distToNextWaypoint;
-
-        if (ballIndex != 0) {
-            trackBall = spawn_object_relative(o->oPlatformOnTrackBaseBallIndex + ballIndex, 0, 0, 0, o,
-                                              MODEL_TRAJECTORY_MARKER_BALL, bhvTrackBall);
-
-            if (trackBall != NULL) {
-                vec3_set(&trackBall->oPosVec, x, y, z);
-            }
-        } else {
-            if (prevWaypoint != initialPrevWaypoint) {
-                if (o->oPlatformOnTrackPrevWaypointFlags == 0) {
-                    o->oPlatformOnTrackPrevWaypointFlags = initialPrevWaypoint->flags;
-                }
-                o->oPlatformOnTrackPrevWaypoint = prevWaypoint;
-            }
-            vec3_set(&o->oPosVec, x, y, z);
-            obj_perform_position_op(POS_OP_COMPUTE_VELOCITY);
-
-            o->oPlatformOnTrackPitch = atan2s(sqrtf(sqr(o->oVelX) + sqr(o->oVelZ)), -o->oVelY);
-            o->oPlatformOnTrackYaw = atan2s(o->oVelZ, o->oVelX);
-        }
     }
 }
 
@@ -258,7 +172,7 @@ static void obj_rotate_yaw_and_bounce_off_walls(s16 targetYaw, s16 turnAmount) {
     cur_obj_rotate_yaw_toward(targetYaw, turnAmount);
 }
 
-static s16 obj_get_pitch_to_home(f32 latDistToHome) {
+static s32 obj_get_pitch_to_home(f32 latDistToHome) {
     return atan2s(latDistToHome, o->oPosY - o->oHomeY);
 }
 
@@ -327,7 +241,7 @@ static s32 cur_obj_play_sound_at_anim_range(s8 startFrame1, s8 startFrame2, u32 
     return FALSE;
 }
 
-static s16 obj_turn_pitch_toward_mario(f32 targetOffsetY, s16 turnAmount) {
+static s32 obj_turn_pitch_toward_mario(f32 targetOffsetY, s16 turnAmount) {
     o->oPosY -= targetOffsetY;
     s16 targetPitch = obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, turnAmount);
     o->oPosY += targetOffsetY;
@@ -395,16 +309,16 @@ static void obj_roll_to_match_yaw_turn(s16 targetYaw, s16 maxRoll, s16 rollSpeed
     obj_face_roll_approach(targetRoll, rollSpeed);
 }
 
-static s16 random_linear_offset(s16 base, s16 range) {
-    return base + (s16)(range * random_float());
+static s32 random_linear_offset(s16 base, s16 range) {
+    return (s16)(base + (s16)(range * random_float()));
 }
 
-static s16 random_mod_offset(s16 base, s16 step, s16 mod) {
-    return base + step * (random_u16() % mod);
+static s32 random_mod_offset(s16 base, s16 step, s16 mod) {
+    return (s16)(base + (step * (random_u16() % mod)));
 }
 
-static s16 obj_random_fixed_turn(s16 delta) {
-    return o->oMoveAngleYaw + (s16) random_sign() * delta;
+static s32 obj_random_fixed_turn(s16 delta) {
+    return (s16)(o->oMoveAngleYaw + ((s16) random_sign() * delta));
 }
 
 /**

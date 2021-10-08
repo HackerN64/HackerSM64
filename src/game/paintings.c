@@ -599,7 +599,7 @@ void painting_update_ripple_state(struct Painting *painting) {
  * @return the ripple function at posX, posY
  * note that posX and posY correspond to a point on the face of the painting, not actual axes
  */
-s16 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
+s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
     /// Controls the peaks of the ripple.
     f32 rippleMag = painting->currRippleMag;
     /// Controls the ripple's frequency
@@ -636,7 +636,7 @@ s16 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
  * If movable, return the ripple function at (posX, posY)
  * else return 0
  */
-s16 ripple_if_movable(struct Painting *painting, s16 movable, s16 posX, s16 posY) {
+s32 ripple_if_movable(struct Painting *painting, s16 movable, s16 posX, s16 posY) {
     if (movable) {
         return calculate_ripple_at_point(painting, posX, posY);
     }
@@ -713,7 +713,7 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
  * Rounds a floating-point component of a normal vector to an s8 by multiplying it by 127 or 128 and
  * rounding away from 0.
  */
-s8 normalize_component(f32 comp) {
+s32 normalize_component(f32 comp) {
     s8 rounded;
 
     if (comp > 0.0) {
@@ -741,11 +741,11 @@ s8 normalize_component(f32 comp) {
  *
  * The table used in game, seg2_painting_mesh_neighbor_tris, is in bin/segment2.c.
  */
-void painting_average_vertex_normals(s16 *neighborTris, s16 numVtx) {
-    s16 tri;
-    s16 i, j;
-    s16 neighbors;
-    s16 entry = 0;
+void painting_average_vertex_normals(PaintingData *neighborTris, PaintingData numVtx) {
+    PaintingData tri;
+    PaintingData i, j;
+    PaintingData neighbors;
+    PaintingData entry = 0;
 
     for (i = 0; i < numVtx; i++) {
         f32 nx = 0.0f;
@@ -789,21 +789,21 @@ void painting_average_vertex_normals(s16 *neighborTris, s16 numVtx) {
  * If the textureMap doesn't describe the whole mesh, then multiple calls are needed to draw the whole
  * painting.
  */
-Gfx *render_painting(u8 *img, s16 tWidth, s16 tHeight, s16 *textureMap, s16 mapVerts, s16 mapTris, u8 alpha) {
-    s16 group;
-    s16 map;
-    s16 triGroup;
-    s16 mapping;
-    s16 meshVtx;
-    s16 tx, ty;
+Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, PaintingData *textureMap, PaintingData mapVerts, PaintingData mapTris, Alpha alpha) {
+    PaintingData group;
+    PaintingData map;
+    PaintingData triGroup;
+    PaintingData mapping;
+    PaintingData meshVtx;
+    PaintingData tx, ty;
 
     // We can fit 15 (16 / 3) vertices in the RSP's vertex buffer.
     // Group triangles by 5, with one remainder group.
-    s16 triGroups = mapTris / 5;
-    s16 remGroupTris = mapTris % 5;
-    s16 numVtx = mapTris * 3;
+    PaintingData triGroups = mapTris / 5;
+    PaintingData remGroupTris = mapTris % 5;
+    PaintingData numVtx = mapTris * 3;
 
-    s16 commands = triGroups * 2 + remGroupTris + 7;
+    PaintingData commands = triGroups * 2 + remGroupTris + 7;
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
     Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -892,15 +892,15 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
  * Ripple a painting that has 1 or more images that need to be mapped
  */
 Gfx *painting_ripple_image(struct Painting *painting) {
-    s16 meshVerts;
-    s16 meshTris;
-    s16 i;
-    s16 *textureMap;
-    s16 imageCount = painting->imageCount;
-    s16 tWidth = painting->textureWidth;
-    s16 tHeight = painting->textureHeight;
-    s16 **textureMaps = segmented_to_virtual(painting->textureMaps);
-    u8 **textures = segmented_to_virtual(painting->textureArray);
+    PaintingData meshVerts;
+    PaintingData meshTris;
+    PaintingData i;
+    PaintingData *textureMap;
+    PaintingData imageCount = painting->imageCount;
+    PaintingData tWidth = painting->textureWidth;
+    PaintingData tHeight = painting->textureHeight;
+    PaintingData **textureMaps = segmented_to_virtual(painting->textureMaps);
+    Texture **textures = segmented_to_virtual(painting->textureArray);
     Gfx *dlist = alloc_display_list((imageCount + 6) * sizeof(Gfx));
     Gfx *gfx = dlist;
 
@@ -933,13 +933,13 @@ Gfx *painting_ripple_image(struct Painting *painting) {
  * Ripple a painting that has 1 "environment map" texture.
  */
 Gfx *painting_ripple_env_mapped(struct Painting *painting) {
-    s16 meshVerts;
-    s16 meshTris;
-    s16 *textureMap;
-    s16 tWidth = painting->textureWidth;
-    s16 tHeight = painting->textureHeight;
-    s16 **textureMaps = segmented_to_virtual(painting->textureMaps);
-    u8 **tArray = segmented_to_virtual(painting->textureArray);
+    PaintingData meshVerts;
+    PaintingData meshTris;
+    PaintingData *textureMap;
+    PaintingData tWidth = painting->textureWidth;
+    PaintingData tHeight = painting->textureHeight;
+    PaintingData **textureMaps = segmented_to_virtual(painting->textureMaps);
+    Texture **tArray = segmented_to_virtual(painting->textureArray);
     Gfx *dlist = alloc_display_list(7 * sizeof(Gfx));
     Gfx *gfx = dlist;
 
@@ -971,10 +971,10 @@ Gfx *painting_ripple_env_mapped(struct Painting *painting) {
  * The mesh and vertex normals are regenerated and freed every frame.
  */
 Gfx *display_painting_rippling(struct Painting *painting) {
-    s16 *mesh = segmented_to_virtual(seg2_painting_triangle_mesh);
-    s16 *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris);
-    s16 numVtx = mesh[0];
-    s16 numTris = mesh[numVtx * 3 + 1];
+    PaintingData *mesh = segmented_to_virtual(seg2_painting_triangle_mesh);
+    PaintingData *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris);
+    PaintingData numVtx = mesh[0];
+    PaintingData numTris = mesh[numVtx * 3 + 1];
     Gfx *dlist = NULL;
 
     // Generate the mesh and its lighting data
@@ -1202,14 +1202,11 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
         // Update the painting
         painting_update_floors(painting);
-        switch ((s16) painting->pitch) {
+        if (painting->pitch == 0x0) {
             // only paintings with 0 pitch are treated as walls
-            case 0:
-                wall_painting_update(painting, paintingGroup);
-                break;
-            default:
-                floor_painting_update(painting, paintingGroup);
-                break;
+            wall_painting_update(painting, paintingGroup);
+        } else {
+            floor_painting_update(painting, paintingGroup);
         }
     }
     return paintingDlist;

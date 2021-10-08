@@ -41,14 +41,11 @@ void bhv_falling_pillar_spawn_hitboxes(void) {
  * Computes the angle from current pillar position to 500 units in front of
  * Mario.
  */
-s16 bhv_falling_pillar_calculate_angle_in_front_of_mario(void) {
-    f32 targetX;
-    f32 targetZ;
-
+s32 bhv_falling_pillar_calculate_angle_in_front_of_mario(void) {
     // Calculate target to be 500 units in front of Mario in
     // the direction he is facing (angle[1] is yaw).
-    targetX = sins(gMarioObject->header.gfx.angle[1]) * 500.0f + gMarioObject->header.gfx.pos[0];
-    targetZ = coss(gMarioObject->header.gfx.angle[1]) * 500.0f + gMarioObject->header.gfx.pos[2];
+    f32 targetX = sins(gMarioObject->header.gfx.angle[1]) * 500.0f + gMarioObject->header.gfx.pos[0];
+    f32 targetZ = coss(gMarioObject->header.gfx.angle[1]) * 500.0f + gMarioObject->header.gfx.pos[2];
 
     // Calculate the angle to the target from the pillar's current location.
     return atan2s(targetZ - o->oPosZ, targetX - o->oPosX);

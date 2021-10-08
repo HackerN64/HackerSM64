@@ -305,7 +305,7 @@ static s32 surface_has_force(s32 surfaceType) {
  * SURFACE_FLAG_NO_CAM_COLLISION flag.
  */
 static s32 surf_has_no_cam_collision(s32 surfaceType) {
-    s32 flags = 0;
+    s32 flags = SURFACE_FLAGS_NONE;
 
     switch (surfaceType) {
         case SURFACE_NO_CAM_COLLISION:
@@ -328,15 +328,14 @@ static s32 surf_has_no_cam_collision(s32 surfaceType) {
  */
 static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s32 surfaceType, RoomData **surfaceRooms) {
     s32 i;
-    s32 numSurfaces;
     struct Surface *surface;
-    s32 room = 0;
+    RoomData room = 0;
 #ifndef ALL_SURFACES_HAVE_FORCE
     s16 hasForce = surface_has_force(surfaceType);
 #endif
     s32 flags = surf_has_no_cam_collision(surfaceType);
 
-    numSurfaces = *(*data);
+    s32 numSurfaces = *(*data);
     *data += 1;
 
     for (i = 0; i < numSurfaces; i++) {
@@ -349,16 +348,12 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
         if (surface != NULL) {
             surface->room = room;
             surface->type = surfaceType;
-            surface->flags = (s8) flags;
+            surface->flags = flags;
 
 #ifdef ALL_SURFACES_HAVE_FORCE
             surface->force = *(*data + 3);
 #else
-            if (hasForce) {
-                surface->force = *(*data + 3);
-            } else {
-                surface->force = 0;
-            }
+            surface->force = (hasForce ? *(*data + 3) : 0);
 #endif
 
             add_surface(surface, FALSE);
@@ -367,10 +362,7 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
 #ifdef ALL_SURFACES_HAVE_FORCE
         *data += 4;
 #else
-        *data += 3;
-        if (hasForce) {
-            *data += 1;
-        }
+        *data += (hasForce ? 4 : 3);
 #endif
     }
 }
@@ -379,14 +371,11 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
  * Read the data for vertices for reference by triangles.
  */
 static TerrainData *read_vertex_data(TerrainData **data) {
-    s32 numVertices;
-    TerrainData *vertexData;
-
-    numVertices = *(*data);
+    s32 numVertices = *(*data);
     (*data)++;
 
-    vertexData = *data;
-    *data += 3 * numVertices;
+    TerrainData *vertexData = *data;
+    *data += (3 * numVertices);
 
     return vertexData;
 }
@@ -439,7 +428,7 @@ u32 get_area_terrain_size(TerrainData *data) {
         switch (terrainLoadType) {
             case TERRAIN_LOAD_VERTICES:
                 numVertices = *data++;
-                data += 3 * numVertices;
+                data += (3 * numVertices);
                 break;
 
             case TERRAIN_LOAD_OBJECTS:
@@ -448,7 +437,7 @@ u32 get_area_terrain_size(TerrainData *data) {
 
             case TERRAIN_LOAD_ENVIRONMENT:
                 numRegions = *data++;
-                data += 6 * numRegions;
+                data += (6 * numRegions);
                 break;
 
             case TERRAIN_LOAD_CONTINUE:
@@ -461,16 +450,16 @@ u32 get_area_terrain_size(TerrainData *data) {
             default:
                 numSurfaces = *data++;
 #ifdef ALL_SURFACES_HAVE_FORCE
-                data += 4 * numSurfaces;
+                data += (4 * numSurfaces);
 #else
                 hasForce = surface_has_force(terrainLoadType);
-                data += (3 + hasForce) * numSurfaces;
+                data += ((3 + hasForce) * numSurfaces);
 #endif
                 break;
         }
     }
 
-    return data - startPos;
+    return (data - startPos);
 }
 #endif
 
@@ -531,7 +520,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces     = gSurfacesAllocated;
 #if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
+    collisionTime[perfIteration] += (osGetTime() - first);
 #endif
 }
 
@@ -551,37 +540,34 @@ void clear_dynamic_surfaces(void) {
  * Applies an object's transformation to the object's vertices.
  */
 void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
-    register TerrainData *vertices;
-    register f32 vx, vy, vz;
-    register s32 numVertices;
+    Mat4 *objectTransform = &gCurrentObject->transform;
 
-    Mat4 *objectTransform;
-    Mat4 m;
-
-    objectTransform = &gCurrentObject->transform;
-
-    numVertices = *(*data);
+    register s32 numVertices = *(*data);
     (*data)++;
 
-    vertices = *data;
+    register TerrainData *vertices = *data;
 
     if (gCurrentObject->header.gfx.throwMatrix == NULL) {
         gCurrentObject->header.gfx.throwMatrix = objectTransform;
         obj_build_transform_from_pos_and_angle(gCurrentObject, O_POS_INDEX, O_FACE_ANGLE_INDEX);
     }
 
+    Mat4 m;
     obj_apply_scale_to_matrix(gCurrentObject, m, *objectTransform);
 
     // Go through all vertices, rotating and translating them to transform the object.
+    register Vec3f v;
     while (numVertices--) {
-        vx = *(vertices++);
-        vy = *(vertices++);
-        vz = *(vertices++);
+        vec3_copy(v, vertices);
+        vertices += 3;
 
         //! No bounds check on vertex data
-        *vertexData++ = (TerrainData)((vx * m[0][0]) + (vy * m[1][0]) + (vz * m[2][0]) + m[3][0]);
-        *vertexData++ = (TerrainData)((vx * m[0][1]) + (vy * m[1][1]) + (vz * m[2][1]) + m[3][1]);
-        *vertexData++ = (TerrainData)((vx * m[0][2]) + (vy * m[1][2]) + (vz * m[2][2]) + m[3][2]);
+        if ((v[0] == 0) && (v[1] == 0) && (v[2] == 0)) {
+            vec3_copy(vertexData, m[3]);
+        } else {
+            linear_mtxf_mul_vec3_and_translate(m, vertexData, v);
+        }
+        vertexData += 3;
     }
 
     *data = vertices;
@@ -591,30 +577,23 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
  * Load in the surfaces for the gCurrentObject. This includes setting the flags, exertion, and room.
  */
 void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
-    s32 surfaceType;
     s32 i;
-    s32 numSurfaces;
-    s32 room;
 
-    surfaceType = *(*data);
+    s32 surfaceType = *(*data);
     (*data)++;
 
-    numSurfaces = *(*data);
+    s32 numSurfaces = *(*data);
     (*data)++;
 
 #ifndef ALL_SURFACES_HAVE_FORCE
     TerrainData hasForce = surface_has_force(surfaceType);
 #endif
 
-    s32 flags = surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC;
+    s32 flags = (surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC);
 
     // The DDD warp is initially loaded at the origin and moved to the proper
     // position in paintings.c and doesn't update its room, so set it here.
-    if (gCurrentObject->behavior == segmented_to_virtual(bhvDddWarp)) {
-        room = 5;
-    } else {
-        room = 0;
-    }
+    RoomData room = ((gCurrentObject->behavior == segmented_to_virtual(bhvDddWarp)) ? 5 : 0);
 
     for (i = 0; i < numSurfaces; i++) {
         struct Surface *surface = read_surface_data(vertexData, data);
@@ -626,26 +605,17 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
 #ifdef ALL_SURFACES_HAVE_FORCE
             surface->force = *(*data + 3);
 #else
-            if (hasForce) {
-                surface->force = *(*data + 3);
-            } else {
-                surface->force = 0;
-            }
+            surface->force = (hasForce ? *(*data + 3) : 0);
 #endif
-
             surface->flags |= flags;
-            surface->room = (s8) room;
+            surface->room = room;
             add_surface(surface, TRUE);
         }
 
 #ifdef ALL_SURFACES_HAVE_FORCE
         *data += 4;
 #else
-        if (hasForce) {
-            *data += 4;
-        } else {
-            *data += 3;
-        }
+        *data += (hasForce ? 4 : 3);
 #endif
     }
 }
@@ -662,10 +632,8 @@ static void get_optimal_coll_dist(struct Object *obj) {
     collisionData++;
     // vertices = *data;
     while (vertsLeft) {
-        v[0] = *(collisionData + 0) * obj->header.gfx.scale[0];
-        v[1] = *(collisionData + 1) * obj->header.gfx.scale[1];
-        v[2] = *(collisionData + 2) * obj->header.gfx.scale[2];
-        thisVertDist = (sqr(v[0]) + sqr(v[1]) + sqr(v[2]));
+        vec3_prod(v, collisionData, obj->header.gfx.scale);
+        thisVertDist = vec3_sumsq(v);
         if (thisVertDist > maxDist) maxDist = thisVertDist;
         collisionData += 3;
         vertsLeft--;
@@ -717,6 +685,6 @@ void load_object_collision_model(void) {
     }
     COND_BIT((marioDist < gCurrentObject->oDrawingDistance), gCurrentObject->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
 #if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime()-first;
+    collisionTime[perfIteration] += (osGetTime() - first);
 #endif
 }

@@ -111,7 +111,7 @@ void chuckya_act_1(void) {
         } else {
             cur_obj_init_animation_with_sound(3);
             if (cur_obj_check_anim_frame(18)) {
-                cur_obj_play_sound_2(SOUND_OBJ_UNKNOWN4);
+                cur_obj_play_sound_2(SOUND_OBJ_RELEASE_MARIO);
                 o->oCommonAnchorAction = 2;
                 o->oAction = 3;
                 o->oInteractStatus &= ~(INT_STATUS_GRABBED_MARIO);
@@ -145,7 +145,7 @@ void chuckya_move(void) {
     if (o->oInteractStatus & INT_STATUS_GRABBED_MARIO) {
         o->oAction = 1;
         o->oCommonAnchorAction = 1;
-        cur_obj_play_sound_2(SOUND_OBJ_UNKNOWN3);
+        cur_obj_play_sound_2(SOUND_OBJ_GRAB_MARIO);
     }
 }
 

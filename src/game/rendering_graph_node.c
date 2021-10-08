@@ -189,12 +189,12 @@ LookAt lookAt;
 
 u8 ucodeTestSwitch = 1;
 
-void reset_clipping(void)
-{
-    if (gMarioState->action == ACT_CREDITS_CUTSCENE)
+void reset_clipping(void) {
+    if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
         make_viewport_clip_rect(&sEndCutsceneVp);
-    else
+    } else {
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, SCREEN_HEIGHT - gBorderHeight);
+    }
 }
 
 /**
@@ -716,7 +716,7 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
  * Render an animated part that has an initial rotation value
  */
 void geo_process_bone(struct GraphNodeBone *node) {
-    Vec3s rotation = {0, 0, 0};
+    Vec3s rotation =    {node->rotation[0],    node->rotation[1],    node->rotation[2] };
     Vec3f translation = {node->translation[0], node->translation[1], node->translation[2]};
 
     if (gCurAnimType == ANIM_TYPE_TRANSLATION) {
@@ -743,9 +743,9 @@ void geo_process_bone(struct GraphNodeBone *node) {
         }
     }
     if (gCurAnimType == ANIM_TYPE_ROTATION) {
-        rotation[0] = gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
-        rotation[1] = gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
-        rotation[2] = gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+        rotation[0] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+        rotation[1] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+        rotation[2] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
     }
     mtxf_rot_trans_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();

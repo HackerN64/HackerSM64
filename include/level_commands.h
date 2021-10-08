@@ -7,34 +7,50 @@
 #include "config.h"
 #include "game/puppylights.h"
 
-#define OP_AND   0
-#define OP_NAND  1
-#define OP_EQ    2
-#define OP_NEQ   3
-#define OP_LT    4
-#define OP_LEQ   5
-#define OP_GT    6
-#define OP_GEQ   7
+enum LevelCommandEvalOperation
+{
+    OP_AND,
+    OP_NAND,
+    OP_EQ,
+    OP_NEQ,
+    OP_LT,
+    OP_LEQ,
+    OP_GT,
+    OP_GEQ
+};
 
-#define OP_SET   0
-#define OP_GET   1
+enum LevelCommandGetOrSet
+{
+    OP_SET,
+    OP_GET
+};
 
-#define VAR_CURR_SAVE_FILE_NUM  0
-#define VAR_CURR_COURSE_NUM     1
-#define VAR_CURR_ACT_NUM        2
-#define VAR_CURR_LEVEL_NUM      3
-#define VAR_CURR_AREA_INDEX     4
+enum LevelCommandVar
+{
+    VAR_CURR_SAVE_FILE_NUM,
+    VAR_CURR_COURSE_NUM,
+    VAR_CURR_ACT_NUM,
+    VAR_CURR_LEVEL_NUM,
+    VAR_CURR_AREA_INDEX
+};
 
-#define WARP_CHECKPOINT 0x80
-#define WARP_NO_CHECKPOINT 0x00
+#define WARP_CHECKPOINT    (1 << 7) // 0x80
+#define WARP_NO_CHECKPOINT (0 << 7) // 0x00
 
-#define WHIRLPOOL_COND_ALWAYS 0
-#define WHIRLPOOL_COND_BOWSER2_BEATEN 2
-#define WHIRLPOOL_COND_AT_LEAST_SECOND_STAR 3
+enum LevelCommandCreateWhirlpoolCondition
+{
+    WHIRLPOOL_COND_ALWAYS,
+    WHIRLPOOL_COND_BOWSER2_NOT_BEATEN,
+    WHIRLPOOL_COND_BOWSER2_BEATEN,
+    WHIRLPOOL_COND_AT_LEAST_SECOND_STAR
+};
 
 // Head defines
-#define REGULAR_FACE 0x0002
-#define DIZZY_FACE 0x0003
+enum GoddardScene
+{
+    REGULAR_FACE = 0x0002,
+    DIZZY_FACE   = 0x0003,
+};
 
 #ifdef NO_SEGMENTED_MEMORY
 #define EXECUTE(seg, script, scriptEnd, entry) \

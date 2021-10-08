@@ -34,7 +34,7 @@ void bhv_big_boulder_loop(void) {
         case 1:
             boulder_act_1();
             adjust_rolling_face_pitch(1.5f);
-            cur_obj_play_sound_1(SOUND_ENV_UNKNOWN2);
+            cur_obj_play_sound_1(SOUND_ENV_BOWLING_BALL_ROLL);
             break;
     }
 

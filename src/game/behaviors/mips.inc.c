@@ -38,7 +38,7 @@ void bhv_mips_init(void) {
  * Helper function that finds the waypoint that is both within 800 units of MIPS
  * and furthest from Mario's current location.
  */
-s16 bhv_mips_find_furthest_waypoint_to_mario(void) {
+s32 bhv_mips_find_furthest_waypoint_to_mario(void) {
     s8 i;
     s16 x, y, z;
     s16 furthestWaypointIndex = -1;

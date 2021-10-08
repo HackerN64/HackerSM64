@@ -48,7 +48,7 @@ static u32 sMenuSoundsExtra[] = {
     NO_SOUND,
     SOUND_ENV_BOAT_ROCKING1,
     SOUND_ENV_ELEVATOR3,
-    SOUND_ENV_UNKNOWN2,
+    SOUND_ENV_BOWLING_BALL_ROLL,
     SOUND_ENV_WATERFALL1,
     SOUND_ENV_WATERFALL2,
     SOUND_ENV_ELEVATOR1,
@@ -153,7 +153,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
     } else if (soundMenuFlags & SOUND_MENU_FLAG_HANDISAPPEAR) {
         play_sound(SOUND_MENU_HAND_DISAPPEAR, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_UNKNOWN1) {
-        play_sound(SOUND_MENU_UNK0C, gGlobalSoundSource);
+        play_sound(SOUND_MENU_UNK0C_FLAG_UNKNOWN1, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_PINCHMARIOFACE) {
         play_sound(SOUND_MENU_PINCH_MARIO_FACE, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_PINCHMARIOFACE2) {

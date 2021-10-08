@@ -58,7 +58,7 @@ s32 is_anim_past_end(struct MarioState *m) {
 /**
  * Sets Mario's animation without any acceleration, running at its default rate.
  */
-s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
+s32 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
     struct Object *marioObj = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -91,7 +91,7 @@ s16 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
  * Sets Mario's animation where the animation is sped up or
  * slowed down via acceleration.
  */
-s16 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
+s32 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel) {
     struct Object *marioObj = m->marioObj;
     struct Animation *targetAnim = m->animList->bufTarget;
 
@@ -176,7 +176,7 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
  * Rotates the animation's translation into the global coordinate system
  * and returns the animation's flags.
  */
-s16 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
+s32 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
     f32 dx, dz;
 
     struct Animation *curAnim = (void *) obj->header.gfx.animInfo.curAnim;
@@ -219,7 +219,7 @@ void update_mario_pos_for_anim(struct MarioState *m) {
 /**
  * Finds the vertical translation from Mario's animation.
  */
-s16 return_mario_anim_y_translation(struct MarioState *m) {
+s32 return_mario_anim_y_translation(struct MarioState *m) {
     Vec3s translation;
     find_mario_anim_flags_and_translation(m->marioObj, 0, translation);
 
@@ -612,10 +612,9 @@ f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f
 /**
  * Returns the slope of the floor based off points around Mario.
  */
-s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
+s32 find_floor_slope(struct MarioState *m, s16 yawOffset) {
     struct Surface *floor = m->floor;
     f32 forwardFloorY, backwardFloorY;
-    f32 forwardYDelta, backwardYDelta;
     s16 result;
 
     f32 x = sins(m->faceAngle[1] + yawOffset) * 5.0f;
@@ -637,8 +636,8 @@ s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
     if (floor == NULL) backwardFloorY = m->floorHeight; // handle OOB slopes
 #endif
 
-    forwardYDelta = forwardFloorY - m->pos[1];
-    backwardYDelta = m->pos[1] - backwardFloorY;
+    f32 forwardYDelta = forwardFloorY - m->pos[1];
+    f32 backwardYDelta = m->pos[1] - backwardFloorY;
 
     if (sqr(forwardYDelta) < sqr(backwardYDelta)) {
         result = atan2s(5.0f, forwardYDelta);
@@ -1270,11 +1269,6 @@ void update_mario_joystick_inputs(struct MarioState *m) {
     }
 }
 
-Bool32 analog_stick_held_back(struct MarioState *m) {
-    s16 intendedDYaw = (m->intendedYaw - m->faceAngle[1]);
-    return ((intendedDYaw < -0x471C) || (intendedDYaw > 0x471C));
-}
-
 /**
  * Resolves wall collisions, and updates a variety of inputs.
  */
@@ -1703,79 +1697,79 @@ void queue_rumble_particles(void) {
 /**
  * Main function for executing Mario's behavior. Returns particleFlags.
  */
-s32 execute_mario_action(struct MarioState *m) {
+s32 execute_mario_action(UNUSED struct Object *obj) {
     s32 inLoop = TRUE;
     // Updates once per frame:
-    vec3f_get_dist_and_lateral_dist_and_angle(m->prevPos, m->pos, &m->moveSpeed, &m->lateralSpeed, &m->movePitch, &m->moveYaw);
-    vec3_copy(m->prevPos, m->pos);
-    if (m->action) {
+    vec3f_get_dist_and_lateral_dist_and_angle(gMarioState->prevPos, gMarioState->pos, &gMarioState->moveSpeed, &gMarioState->lateralSpeed, &gMarioState->movePitch, &gMarioState->moveYaw);
+    vec3_copy(gMarioState->prevPos, gMarioState->pos);
+    if (gMarioState->action) {
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (gPlayer1Controller->buttonDown & U_JPAD) {
-            set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
-            set_mario_action(m, ACT_DEBUG_FREE_MOVE, 0);
+            set_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+            set_mario_action(gMarioState, ACT_DEBUG_FREE_MOVE, 0);
         }
 #endif
-        m->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-        mario_reset_bodystate(m);
-        update_mario_inputs(m);
+        gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+        mario_reset_bodystate(gMarioState);
+        update_mario_inputs(gMarioState);
 #ifdef PUPPYCAM
         if (!(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_FREE))
 #endif
-        mario_handle_special_floors(m);
-        mario_process_interactions(m);
+        mario_handle_special_floors(gMarioState);
+        mario_process_interactions(gMarioState);
 
         // If Mario is OOB, stop executing actions.
-        if (m->floor == NULL) {
+        if (gMarioState->floor == NULL) {
             return ACTIVE_PARTICLE_NONE;
         }
         // The function can loop through many action shifts in one frame,
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
         while (inLoop) {
-            switch (m->action & ACT_GROUP_MASK) {
-                case ACT_GROUP_STATIONARY: inLoop = mario_execute_stationary_action(m); break;
-                case ACT_GROUP_MOVING:     inLoop = mario_execute_moving_action(m);     break;
-                case ACT_GROUP_AIRBORNE:   inLoop = mario_execute_airborne_action(m);   break;
-                case ACT_GROUP_SUBMERGED:  inLoop = mario_execute_submerged_action(m);  break;
-                case ACT_GROUP_CUTSCENE:   inLoop = mario_execute_cutscene_action(m);   break;
-                case ACT_GROUP_AUTOMATIC:  inLoop = mario_execute_automatic_action(m);  break;
-                case ACT_GROUP_OBJECT:     inLoop = mario_execute_object_action(m);     break;
+            switch (gMarioState->action & ACT_GROUP_MASK) {
+                case ACT_GROUP_STATIONARY: inLoop = mario_execute_stationary_action(gMarioState); break;
+                case ACT_GROUP_MOVING:     inLoop = mario_execute_moving_action(gMarioState);     break;
+                case ACT_GROUP_AIRBORNE:   inLoop = mario_execute_airborne_action(gMarioState);   break;
+                case ACT_GROUP_SUBMERGED:  inLoop = mario_execute_submerged_action(gMarioState);  break;
+                case ACT_GROUP_CUTSCENE:   inLoop = mario_execute_cutscene_action(gMarioState);   break;
+                case ACT_GROUP_AUTOMATIC:  inLoop = mario_execute_automatic_action(gMarioState);  break;
+                case ACT_GROUP_OBJECT:     inLoop = mario_execute_object_action(gMarioState);     break;
             }
         }
 
-        sink_mario_in_quicksand(m);
-        squish_mario_model(m);
-        set_submerged_cam_preset_and_spawn_bubbles(m);
-        update_mario_health(m);
+        sink_mario_in_quicksand(gMarioState);
+        squish_mario_model(gMarioState);
+        set_submerged_cam_preset_and_spawn_bubbles(gMarioState);
+        update_mario_health(gMarioState);
 #ifdef BREATH_METER
-        update_mario_breath(m);
+        update_mario_breath(gMarioState);
 #endif
-        update_mario_info_for_cam(m);
-        mario_update_hitbox_and_cap_model(m);
+        update_mario_info_for_cam(gMarioState);
+        mario_update_hitbox_and_cap_model(gMarioState);
 
         // Both of the wind handling portions play wind audio only in
         // non-Japanese releases.
-        if (m->floor->type == SURFACE_HORIZONTAL_WIND) {
-            spawn_wind_particles(0, (m->floor->force << 8));
+        if (gMarioState->floor->type == SURFACE_HORIZONTAL_WIND) {
+            spawn_wind_particles(0, (gMarioState->floor->force << 8));
 #ifndef VERSION_JP
-            play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_ENV_WIND2, gMarioState->marioObj->header.gfx.cameraToObject);
 #endif
         }
 
-        if (m->floor->type == SURFACE_VERTICAL_WIND) {
+        if (gMarioState->floor->type == SURFACE_VERTICAL_WIND) {
             spawn_wind_particles(1, 0);
 #ifndef VERSION_JP
-            play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_ENV_WIND2, gMarioState->marioObj->header.gfx.cameraToObject);
 #endif
         }
 
         play_infinite_stairs_music();
-        m->marioObj->oInteractStatus = INT_STATUS_NONE;
+        gMarioState->marioObj->oInteractStatus = INT_STATUS_NONE;
 #if ENABLE_RUMBLE
         queue_rumble_particles();
 #endif
 
-        return m->particleFlags;
+        return gMarioState->particleFlags;
     }
 
     return ACTIVE_PARTICLE_NONE;

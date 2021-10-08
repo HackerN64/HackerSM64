@@ -6,15 +6,22 @@ void bhv_orange_number_init(void) {
 }
 
 void bhv_orange_number_loop(void) {
-    struct Object *sparkleObj;
-    o->oPosY += o->oVelY;
-    o->oVelY -= 2.0f;
-    if (o->oVelY < -21.0f)
-        o->oVelY = 14.0f;
-
-    if (o->oTimer == 35) {
-        sparkleObj = spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
-        sparkleObj->oPosY -= 30.f;
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+#ifdef DIALOG_INDICATOR
+    if (o->oAnimState <= ORANGE_NUMBER_9) {
+#endif
+        o->oPosY += o->oVelY;
+        o->oVelY -= 2.0f;
+        if (o->oVelY < -21.0f) {
+            o->oVelY = 14.0f;
+        }
+        if (o->oTimer == 35) {
+            struct Object *sparkleObj = spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
+            sparkleObj->oPosY -= 30.f;
+            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        }
+#ifdef DIALOG_INDICATOR
+    } else if (o->oTimer >= 1 || gMarioState->action == ACT_READING_SIGN) {
+        obj_mark_for_deletion(o);
     }
+#endif
 }

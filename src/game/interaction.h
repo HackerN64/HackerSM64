@@ -71,13 +71,16 @@
 // INTERACT_CLAM_OR_BUBBA
 #define INT_SUBTYPE_EATS_MARIO          /* 0x00002000 */ (1 << 13)
 
-#define ATTACK_NONE                     0x00
-#define ATTACK_PUNCH                    0x01
-#define ATTACK_KICK_OR_TRIP             0x02
-#define ATTACK_FROM_ABOVE               0x03
-#define ATTACK_GROUND_POUND_OR_TWIRL    0x04
-#define ATTACK_FAST_ATTACK              0x05
-#define ATTACK_FROM_BELOW               0x06
+enum AttackType
+{
+    ATTACK_NONE,
+    ATTACK_PUNCH,
+    ATTACK_KICK_OR_TRIP,
+    ATTACK_FROM_ABOVE,
+    ATTACK_GROUND_POUND_OR_TWIRL,
+    ATTACK_FAST_ATTACK,
+    ATTACK_FROM_BELOW
+};
 
 #define INT_STATUS_ATTACK_MASK                       0x000000FF
 
@@ -107,7 +110,7 @@
 #define INT_STATUS_TOUCHED_BOB_OMB       (1 << 23) /* 0x00800000 */
 
 
-s16  mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
+s32  mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
 void mario_stop_riding_object(struct MarioState *m);
 void mario_grab_used_object(struct MarioState *m);
 void mario_drop_held_object(struct MarioState *m);

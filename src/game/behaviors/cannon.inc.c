@@ -36,7 +36,7 @@ void opened_cannon_act_0(void) {
 
 void opened_cannon_act_4(void) {
     if (o->oTimer == 0)
-        cur_obj_play_sound_2(SOUND_OBJ_CANNON1);
+        cur_obj_play_sound_2(SOUND_OBJ_CANNON_RISE);
     o->oPosY += 5.0f;
     o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5) * 2;
     o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5) * 2;
@@ -49,7 +49,7 @@ void opened_cannon_act_4(void) {
 
 void opened_cannon_act_6(void) {
     if (o->oTimer == 0)
-        cur_obj_play_sound_2(SOUND_OBJ_CANNON2);
+        cur_obj_play_sound_2(SOUND_OBJ_CANNON_TURN);
     if (o->oTimer < 4) {
         o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5) * 4.0f;
         o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5) * 4.0f;
@@ -69,7 +69,7 @@ void opened_cannon_act_6(void) {
 
 void opened_cannon_act_5(void) {
     if (o->oTimer == 0)
-        cur_obj_play_sound_2(SOUND_OBJ_CANNON3);
+        cur_obj_play_sound_2(SOUND_OBJ_CANNON_BARREL_PITCH);
     if (o->oTimer >= 4) {
         if (o->oTimer < 20) {
             o->oCannonAngle += 0x400;

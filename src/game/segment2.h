@@ -13,6 +13,7 @@ extern Gfx dl_rgba16_text_begin[];
 extern Gfx dl_rgba16_text_end[];
 extern Gfx dl_ia_text_begin[];
 extern Gfx dl_ia_text_end[];
+extern Texture texture_radial_light[];
 extern Texture texture_transition_star_half[];
 extern Texture texture_transition_circle_half[];
 extern Texture texture_transition_mario[];
@@ -66,5 +67,13 @@ extern Gfx dl_billboard_num_6[];
 extern Gfx dl_billboard_num_7[];
 extern Gfx dl_billboard_num_8[];
 extern Gfx dl_billboard_num_9[];
+#ifdef DIALOG_INDICATOR
+extern Gfx dl_billboard_num_A[];
+extern Gfx dl_billboard_num_B[];
+extern Gfx dl_billboard_num_C[];
+extern Gfx dl_billboard_num_D[];
+extern Gfx dl_billboard_num_E[];
+extern Gfx dl_billboard_num_F[];
+#endif
 
 #endif // SEGMENT2_H

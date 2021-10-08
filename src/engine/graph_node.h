@@ -62,12 +62,15 @@
 
 // Passed as first argument to a GraphNodeFunc to give information about in
 // which context it was called and what it is expected to do.
-#define GEO_CONTEXT_CREATE        0 // called when node is created from a geo command
-#define GEO_CONTEXT_RENDER        1 // called from rendering_graph_node.c
-#define GEO_CONTEXT_AREA_UNLOAD   2 // called when unloading an area
-#define GEO_CONTEXT_AREA_LOAD     3 // called when loading an area
-#define GEO_CONTEXT_AREA_INIT     4 // called when initializing the 8 areas
-#define GEO_CONTEXT_HELD_OBJ      5 // called when processing a GraphNodeHeldObj
+enum GeoContext
+{
+    GEO_CONTEXT_CREATE,      // called when node is created from a geo command
+    GEO_CONTEXT_RENDER,      // called from rendering_graph_node.c
+    GEO_CONTEXT_AREA_UNLOAD, // called when unloading an area
+    GEO_CONTEXT_AREA_LOAD,   // called when loading an area
+    GEO_CONTEXT_AREA_INIT,   // called when initializing the 8 areas
+    GEO_CONTEXT_HELD_OBJ     // called when processing a GraphNodeHeldObj
+};
 
 // The signature for a function stored in a geo node
 // The context argument depends on the callContext:
@@ -437,7 +440,7 @@ void geo_obj_init_animation_accel(struct GraphNodeObject *graphNode, struct Anim
 
 s32 retrieve_animation_index(s32 frame, u16 **attributes);
 
-s16 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist);
+s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist);
 void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f position);
 
 struct GraphNodeRoot *geo_find_root(struct GraphNode *graphNode);

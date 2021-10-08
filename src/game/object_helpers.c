@@ -628,12 +628,10 @@ f32 cur_obj_dist_to_nearest_object_with_behavior(const BehaviorScript *behavior)
 struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *behavior, f32 *dist) {
     uintptr_t *behaviorAddr = segmented_to_virtual(behavior);
     struct Object *closestObj = NULL;
-    struct Object *obj;
-    struct ObjectNode *listHead;
     f32 minDist = 0x20000;
 
-    listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
-    obj = (struct Object *) listHead->next;
+    struct ObjectNode *listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
+    struct Object *obj = (struct Object *) listHead->next;
 
     while (obj != (struct Object *) listHead) {
         if (obj->behavior == behaviorAddr) {
@@ -1669,8 +1667,8 @@ void cur_obj_set_pos_via_transform(void) {
     vec3_add(&o->oPosVec, &o->oVelVec);
 }
 
-s16 cur_obj_reflect_move_angle_off_wall(void) {
-    return (o->oWallAngle - ((s16) o->oMoveAngleYaw - (s16) o->oWallAngle) + 0x8000);
+s32 cur_obj_reflect_move_angle_off_wall(void) {
+    return (s16)(o->oWallAngle - ((s16) o->oMoveAngleYaw - (s16) o->oWallAngle) + 0x8000);
 }
 
 void cur_obj_spawn_particles(struct SpawnParticlesInfo *info) {
@@ -2298,20 +2296,21 @@ s32 cur_obj_check_grabbed_mario(void) {
     return FALSE;
 }
 
+s32 sPlayerGrabReleaseState;
+
 s32 player_performed_grab_escape_action(void) {
-    static s32 grabReleaseState;
     s32 result = FALSE;
 
     if (gPlayer1Controller->stickMag < 30.0f) {
-        grabReleaseState = FALSE;
+        sPlayerGrabReleaseState = FALSE;
     }
 
-    if (grabReleaseState == FALSE && gPlayer1Controller->stickMag > 40.0f) {
-        grabReleaseState = TRUE;
+    if (sPlayerGrabReleaseState && gPlayer1Controller->stickMag > 40.0f) {
+        sPlayerGrabReleaseState = TRUE;
         result = TRUE;
     }
 
-    if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+    if (gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON | Z_TRIG)) {
         result = TRUE;
     }
 

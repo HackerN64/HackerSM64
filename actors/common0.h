@@ -69,7 +69,7 @@ extern const GeoLayout checkerboard_platform_geo[];
 extern const Gfx checkerboard_platform_seg8_dl_0800D5C0[];
 extern const Gfx checkerboard_platform_seg8_dl_0800D618[];
 extern const Gfx checkerboard_platform_seg8_dl_0800D680[];
-extern const Collision checkerboard_platform_seg8_collision_0800D710[];
+extern const Collision checkerboard_platform_seg8_collision_platform[];
 
 // chuckya
 extern const GeoLayout chuckya_geo[];

@@ -25,6 +25,7 @@
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "main.h"
+#include "color_presets.h"
 
 #ifdef PUPPYCAM
 
@@ -100,11 +101,11 @@ static const struct gPCOptionStruct gPCOptions[] = { //If the min and max are 0 
 
 u8 gPCOptionCap = sizeof(gPCOptions) / sizeof(struct gPCOptionStruct); //How many options there are in newcam_uptions.
 
-s16 LENSIN(s16 length, s16 direction) {
-    return (length * sins(direction));
+inline s32 LENSIN(s16 length, s16 direction) {
+    return (s16)(length * sins(direction));
 }
-s16 LENCOS(s16 length, s16 direction) {
-    return (length * coss(direction));
+inline s32 LENCOS(s16 length, s16 direction) {
+    return (s16)(length * coss(direction));
 }
 
 static void puppycam_analogue_stick(void) {
