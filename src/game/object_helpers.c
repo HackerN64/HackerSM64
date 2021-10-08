@@ -259,31 +259,24 @@ s32 obj_angle_to_object(struct Object *obj1, struct Object *obj2) {
 }
 
 s32 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleIndex, s16 turnAmount) {
-    f32 a, b, c, d;
-    s16 targetAngle = 0;
+    Vec3f d;
+    s16 targetAngle = 0x0;
     s16 startAngle;
 
     switch (angleIndex) {
         case O_MOVE_ANGLE_PITCH_INDEX:
         case O_FACE_ANGLE_PITCH_INDEX:
-            a = target->oPosX - obj->oPosX;
-            c = target->oPosZ - obj->oPosZ;
-            a = sqrtf(sqr(a) + sqr(c));
-
-            b = -obj->oPosY;
-            d = -target->oPosY;
-
-            targetAngle = atan2s(a, (d - b));
+            d[0] =  (target->oPosX - obj->oPosX);
+            d[1] = -(target->oPosY - obj->oPosY);
+            d[2] =  (target->oPosZ - obj->oPosZ);
+            targetAngle = atan2s(sqrtf(sqr(d[0]) + sqr(d[2])), d[1]);
             break;
 
         case O_MOVE_ANGLE_YAW_INDEX:
         case O_FACE_ANGLE_YAW_INDEX:
-            a = obj->oPosZ;
-            c = target->oPosZ;
-            b = obj->oPosX;
-            d = target->oPosX;
-
-            targetAngle = atan2s((c - a), (d - b));
+            d[0] = (target->oPosX - obj->oPosX);
+            d[2] = (target->oPosZ - obj->oPosZ);
+            targetAngle = atan2s((d[2]), (d[0]));
             break;
     }
 
@@ -566,8 +559,8 @@ void cur_obj_set_pos_relative(struct Object *other, f32 dleft, f32 dy, f32 dforw
     f32 facingZ = coss(other->oMoveAngleYaw);
     f32 facingX = sins(other->oMoveAngleYaw);
 
-    f32 dz = dforward * facingZ - dleft * facingX;
-    f32 dx = dforward * facingX + dleft * facingZ;
+    f32 dz = ((dforward * facingZ) - (dleft * facingX));
+    f32 dx = ((dforward * facingX) + (dleft * facingZ));
 
     o->oMoveAngleYaw = other->oMoveAngleYaw;
 

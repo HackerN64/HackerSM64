@@ -59,8 +59,8 @@ static void camera_lakitu_intro_act_spawn_cloud(void) {
  * Circle down to mario, show the dialog, then fly away.
  */
 static void camera_lakitu_intro_act_show_dialog(void) {
-    s16 targetMovePitch = 0;
-    s16 targetMoveYaw = 0;
+    s16 targetMovePitch = 0x0;
+    s16 targetMoveYaw = 0x0;
 
     cur_obj_play_sound_1(SOUND_AIR_LAKITU_FLY);
 
@@ -150,15 +150,12 @@ void bhv_camera_lakitu_update(void) {
                     break;
             }
         } else {
-            f32 mirroredX = CASTLE_MIRROR_X - gLakituState.curPos[0];
+            f32 mirroredX = (CASTLE_MIRROR_X - gLakituState.curPos[0]);
             if (gLakituState.curPos[0] < 1700.0f || mirroredX < 0.0f) {
                 cur_obj_hide();
             } else {
                 cur_obj_unhide();
-
-                o->oPosX = gLakituState.curPos[0];
-                o->oPosY = gLakituState.curPos[1];
-                o->oPosZ = gLakituState.curPos[2];
+                vec3_copy(&o->oPosVec, gLakituState.curPos);
 
                 o->oHomeX = gLakituState.curFocus[0];
                 o->oHomeZ = gLakituState.curFocus[2];
