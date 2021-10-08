@@ -202,6 +202,7 @@
 #define /*0x110*/ oMarioTornadoPosY                             OBJECT_FIELD_F32(0x22)
 #define /*0x110*/ oMarioReadingSignDPosZ                        OBJECT_FIELD_F32(0x22)
 #define /*0x110*/ oMarioWhirlpoolPosY                           OBJECT_FIELD_F32(0x22)
+#define /*0x110*/ oMarioJumboStarCutscenePosZ                   OBJECT_FIELD_F32(0x22)
 #define /*0x110*/ oMarioBurnTimer                               OBJECT_FIELD_S32(0x22)
 #define /*0x110*/ oMarioLongJumpIsSlow                          OBJECT_FIELD_S32(0x22)
 #define /*0x110*/ oMarioSteepJumpYaw                            OBJECT_FIELD_S32(0x22)

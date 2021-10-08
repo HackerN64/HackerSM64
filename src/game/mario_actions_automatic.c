@@ -1,8 +1,8 @@
 #include <PR/ultratypes.h>
 
 #include "sm64.h"
-#include "behavior_data.h"
 #include "mario_actions_automatic.h"
+#include "behavior_data.h"
 #include "audio/external.h"
 #include "area.h"
 #include "mario.h"
@@ -18,14 +18,6 @@
 #include "rumble_init.h"
 
 #include "config.h"
-
-#define POLE_NONE          0
-#define POLE_TOUCHED_FLOOR 1
-#define POLE_FELL_OFF      2
-
-#define HANG_NONE            0
-#define HANG_HIT_CEIL_OR_OOB 1
-#define HANG_LEFT_CEIL       2
 
 void add_tree_leaf_particles(struct MarioState *m) {
     if (m->usedObj->behavior == segmented_to_virtual(bhvTree)) {
@@ -55,7 +47,7 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
     struct Surface *floor;
     struct Surface *ceil;
     s32 result = POLE_NONE;
-    f32 poleTop = m->usedObj->hitboxHeight - 100.0f;
+    f32 poleTop = (m->usedObj->hitboxHeight - 100.0f);
     struct Object *marioObj = m->marioObj;
 
     if (marioObj->oMarioPolePos > poleTop) {
@@ -70,9 +62,9 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
     collided |= f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
 
     f32 ceilHeight = find_ceil(m->pos[0], m->pos[1] + 3.0f, m->pos[2], &ceil);
-    if (m->pos[1] > ceilHeight - 160.0f) {
-        m->pos[1] = ceilHeight - 160.0f;
-        marioObj->oMarioPolePos = m->pos[1] - m->usedObj->oPosY;
+    if (m->pos[1] > (ceilHeight - 160.0f)) {
+        m->pos[1] = (ceilHeight - 160.0f);
+        marioObj->oMarioPolePos = (m->pos[1] - m->usedObj->oPosY);
     }
 
     f32 floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
@@ -81,11 +73,11 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
         set_mario_action(m, ACT_IDLE, 0);
         result = POLE_TOUCHED_FLOOR;
     } else if (marioObj->oMarioPolePos < -m->usedObj->hitboxDownOffset) {
-        m->pos[1] = m->usedObj->oPosY - m->usedObj->hitboxDownOffset;
+        m->pos[1] = (m->usedObj->oPosY - m->usedObj->hitboxDownOffset);
         set_mario_action(m, ACT_FREEFALL, 0);
         result = POLE_FELL_OFF;
     } else if (collided) {
-        if (m->pos[1] > floorHeight + 20.0f) {
+        if (m->pos[1] > (floorHeight + 20.0f)) {
             m->forwardVel = -2.0f;
             set_mario_action(m, ACT_SOFT_BONK, 0);
             result = POLE_FELL_OFF;
@@ -713,7 +705,7 @@ s32 act_in_cannon(struct MarioState *m) {
     s16 startFaceYaw = m->faceAngle[1];
 
     switch (m->actionState) {
-        case 0:
+        case ACT_STATE_IN_CANNON_INIT:
             m->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
             m->usedObj->oInteractStatus = INT_STATUS_INTERACTED;
 
@@ -725,10 +717,10 @@ s32 act_in_cannon(struct MarioState *m) {
 
             m->forwardVel = 0.0f;
 
-            m->actionState = 1;
+            m->actionState = ACT_STATE_IN_CANNON_WAIT_FOR_CANNON;
             break;
 
-        case 1:
+        case ACT_STATE_IN_CANNON_WAIT_FOR_CANNON:
             if (m->usedObj->oAction == 1) {
                 m->faceAngle[0] = m->usedObj->oMoveAnglePitch;
                 m->faceAngle[1] = m->usedObj->oMoveAngleYaw;
@@ -736,11 +728,11 @@ s32 act_in_cannon(struct MarioState *m) {
                 marioObj->oMarioCannonObjectYaw = m->usedObj->oMoveAngleYaw;
                 marioObj->oMarioCannonInputYaw = 0;
 
-                m->actionState = 2;
+                m->actionState = ACT_STATE_IN_CANNON_READY;
             }
             break;
 
-        case 2:
+        case ACT_STATE_IN_CANNON_READY:
             m->faceAngle[0] -= (s16)(m->controller->stickY * 10.0f);
             marioObj->oMarioCannonInputYaw -= (s16)(m->controller->stickX * 10.0f);
 
@@ -777,7 +769,7 @@ s32 act_in_cannon(struct MarioState *m) {
 #if ENABLE_RUMBLE
                 queue_rumble_data(60, 70);
 #endif
-                m->usedObj->oAction = 2;
+                m->usedObj->oAction = OPENED_CANNON_ACT_SHOOT;
                 return FALSE;
             } else if (m->faceAngle[0] != startFacePitch || m->faceAngle[1] != startFaceYaw) {
                 play_sound(SOUND_MOVING_AIM_CANNON, m->marioObj->header.gfx.cameraToObject);

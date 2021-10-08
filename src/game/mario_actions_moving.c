@@ -1,6 +1,8 @@
 #include <PR/ultratypes.h>
 
 #include "sm64.h"
+#include "mario_actions_moving.h"
+#include "mario_actions_object.h"
 #include "mario.h"
 #include "audio/external.h"
 #include "engine/math_util.h"
@@ -8,8 +10,6 @@
 #include "mario_step.h"
 #include "area.h"
 #include "interaction.h"
-#include "mario_actions_moving.h"
-#include "mario_actions_object.h"
 #include "memory.h"
 #include "behavior_data.h"
 #include "rumble_init.h"
@@ -494,7 +494,7 @@ s32 check_ground_dive_or_punch(struct MarioState *m) {
 s32 begin_braking_action(struct MarioState *m) {
     mario_drop_held_object(m);
 
-    if (m->actionState == ACT_WALKING_STATE_REACH_WALL) {
+    if (m->actionState == ACT_STATE_WALKING_REACH_WALL) {
         m->faceAngle[1] = m->actionArg;
         return set_mario_action(m, ACT_STANDING_AGAINST_WALL, 0);
     }
@@ -658,8 +658,8 @@ void anim_and_audio_for_heavy_walk(struct MarioState *m) {
 
 void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
     s16 wallAngle, dWallAngle;
-    f32 dx = m->pos[0] - startPos[0];
-    f32 dz = m->pos[2] - startPos[2];
+    f32 dx = (m->pos[0] - startPos[0]);
+    f32 dz = (m->pos[2] - startPos[2]);
     f32 movedDistance = sqrtf(sqr(dx) + sqr(dz));
     //! (Speed Crash) If a wall is after moving 16384 distance, this crashes.
     s32 animSpeed = (s32)(movedDistance * 2.0f * 0x10000);
@@ -673,7 +673,7 @@ void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
         dWallAngle = (wallAngle - m->faceAngle[1]);
     }
 
-    if (m->wall == NULL || dWallAngle <= -0x71C8 || dWallAngle >= 0x71C8) {
+    if ((m->wall == NULL) || (dWallAngle <= -0x71C8) || (dWallAngle >= 0x71C8)) {
         m->flags |= MARIO_PUSHING;
         set_mario_animation(m, MARIO_ANIM_PUSHING);
         play_step_sound(m, 6, 18);
@@ -689,9 +689,9 @@ void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
             m->particleFlags |= PARTICLE_DUST;
         }
 
-        m->actionState = 1;
-        m->actionArg = wallAngle + 0x8000;
-        m->marioObj->header.gfx.angle[1] = wallAngle + 0x8000;
+        m->actionState = ACT_STATE_PUSH_OR_SIDLE_WALL_SIDLING;
+        m->actionArg                     = (wallAngle + 0x8000);
+        m->marioObj->header.gfx.angle[1] = (wallAngle + 0x8000);
         m->marioObj->header.gfx.angle[2] = find_floor_slope(m, 0x4000);
     }
 }
@@ -796,7 +796,7 @@ s32 act_walking(struct MarioState *m) {
         return set_mario_action(m, ACT_CROUCH_SLIDE, 0);
     }
 
-    m->actionState = 0;
+    m->actionState = ACT_STATE_WALKING_NO_WALL;
 
     vec3f_copy(startPos, m->pos);
     update_walking_speed(m);
@@ -830,11 +830,11 @@ s32 act_move_punching(struct MarioState *m) {
         return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
     }
 
-    if (m->actionState == 0 && (m->input & INPUT_A_DOWN)) {
+    if ((m->actionState == ACT_STATE_MOVE_PUNCHING_CAN_JUMP_KICK) && (m->input & INPUT_A_DOWN)) {
         return set_mario_action(m, ACT_JUMP_KICK, 0);
     }
 
-    m->actionState = 1;
+    m->actionState = ACT_STATE_MOVE_PUNCHING_NO_JUMP_KICK;
 
     mario_update_punch_sequence(m);
 
