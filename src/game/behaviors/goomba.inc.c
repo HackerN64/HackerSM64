@@ -276,8 +276,7 @@ static void goomba_act_jump(void) {
 static void floomba_act_startup(void) {
     if (o->oBehParams & 0x00008000) {
         struct Animation *curAnim = o->header.gfx.animInfo.curAnim;
-        s16 frameDiff = (curAnim->loopEnd - curAnim->loopStart) / 2
-            + (curAnim->loopStart - curAnim->startFrame);
+        s16 frameDiff = (curAnim->loopEnd - curAnim->loopStart) / 2;
 
         o->header.gfx.animInfo.animFrameAccelAssist += (frameDiff << 16);
         o->header.gfx.animInfo.animFrame += frameDiff;
