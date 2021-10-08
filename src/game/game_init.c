@@ -364,8 +364,8 @@ void draw_reset_bars(void) {
  * Initial settings for the first rendered frame.
  */
 void render_init(void) {
-#ifdef DEBUG_FORCE_CRASH
-    *(vs8*)0=0;
+#ifdef DEBUG_FORCE_CRASH_ON_BOOT
+    FORCE_CRASH
 #endif
     if (IO_READ(DPC_PIPEBUSY_REG) == 0) {
         gIsConsole = FALSE;

@@ -11,6 +11,7 @@
 #define BIT(i)  (1 << (i))
 #define BITMASK(size) ((BIT(size)) - 1)
 #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
+#define FORCE_CRASH { *(vs8*)0 = 0; }
 
 struct Config
 {

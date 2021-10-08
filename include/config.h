@@ -269,7 +269,7 @@
 // Open all courses and doors. Used for debugging purposes to unlock all content.
 //#define UNLOCK_ALL
 // Forces a crash when the game starts. Useful for debugging the crash screen.
-//#define DEBUG_FORCE_CRASH
+//#define DEBUG_FORCE_CRASH_ON_BOOT
 
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
 
