@@ -138,11 +138,11 @@ void puppyprint_calculate_ram_usage(void) {
 
     // These are a bit hacky, but what can ye do eh?
     // gEffectsMemoryPool is 0x4000, gObjectsMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
-    ramsizeSegment[5] = 0x4000 + 0x800 + 0x4000 + 0x800;
+    ramsizeSegment[5] = (0x4000 + 0x800 + 0x4000 + 0x800);
     ramsizeSegment[6] = (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + (SURFACE_POOL_SIZE * sizeof(struct Surface));
     ramsizeSegment[7] = gAudioHeapSize + gAudioInitPoolSize;
-    ramsizeSegment[8] = audioPool[0] + audioPool[1] + audioPool[2] + audioPool[3] + audioPool[4] + audioPool[5] +
-                        audioPool[6] + audioPool[7] + audioPool[8] + audioPool[9] + audioPool[10] + audioPool[11];
+    ramsizeSegment[8] = audioPool[ 0] + audioPool[ 1] + audioPool[ 2] + audioPool[ 3] + audioPool[ 4] + audioPool[ 5]
+                      + audioPool[ 6] + audioPool[ 7] + audioPool[ 8] + audioPool[ 9] + audioPool[10] + audioPool[11];
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -154,7 +154,7 @@ void puppyprint_calculate_ram_usage(void) {
 void puppyprint_profiler_finished(void) {
     s32 i = 0;
     benchMark[NUM_BENCH_ITERATIONS] = 0;
-    benchMark[NUM_BENCH_ITERATIONS+1] = 0;
+    benchMark[NUM_BENCH_ITERATIONS + 1] = 0;
     benchmarkTimer = 300;
     benchViewer = FALSE;
     for (i = 0; i < NUM_BENCH_ITERATIONS - 2; i++) {
@@ -245,7 +245,7 @@ const char ramNames[9][32] = {
     "Audio Pools",
 };
 
-s8 nameTable = sizeof(ramNames) / 32;
+s8 nameTable = (sizeof(ramNames) / 32);
 
 void print_ram_overview(void) {
     s32 i = 0;
@@ -260,7 +260,7 @@ void print_ram_overview(void) {
     for (i = 0; i <= NUM_TLB_SEGMENTS; i++) {
         if (drawn == 16) {
             x = 240;
-            y = 16;
+            y =  16;
         }
         if (ramsizeSegment[i] == 0) {
             continue;
@@ -288,7 +288,7 @@ void benchmark_custom(void) {
 
         if (benchmarkLoop > 0 && benchOption == 2) {
             benchmarkLoop--;
-            benchMark[benchmarkLoop] = osGetTime() - lastTime;
+            benchMark[benchmarkLoop] = (osGetTime() - lastTime);
             if (benchmarkLoop == 0) {
                 puppyprint_profiler_finished();
                 break;
@@ -338,7 +338,7 @@ void append_puppyprint_log(const char *str, ...) {
     for (i = 0; i < LOG_BUFFER_SIZE-1; i++) {
         memcpy(consoleLogTable[i], consoleLogTable[i + 1], 255);
     }
-        memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, 255);
+    memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, 255);
     va_end(arguments);
 }
 
@@ -359,19 +359,19 @@ void print_console_log(void) {
 
 struct CPUBar {
     u32 *time;
-    u8 colour[3];
+    ColorRGB colour;
     const char str[32];
 };
 
 extern void print_fps(s32 x, s32 y);
 
 struct CPUBar cpu_ordering_table[] = {
-    {collisionTime, {255, 0, 0}, {"Collision: <COL_99505099>"}},
-    {graphTime, {0, 0, 255}, {"Graph: <COL_50509999>"}},
-    {behaviourTime, {0, 255, 0}, {"Behaviour: <COL_50995099>"}},
-    {audioTime, {255, 255, 0}, {"Audio: <COL_99995099>"}},
-    {cameraTime, {0, 255, 255}, {"Camera: <COL_50999999>"}},
-    {dmaTime, {255, 0, 255}, {"DMA: <COL_99509999>"}},
+    { collisionTime, { 255,   0,   0 }, { "Collision: <COL_99505099>" }},
+    {     graphTime, {   0,   0, 255 }, {     "Graph: <COL_50509999>" }},
+    { behaviourTime, {   0, 255,   0 }, { "Behaviour: <COL_50995099>" }},
+    {     audioTime, { 255, 255,   0 }, {     "Audio: <COL_99995099>" }},
+    {    cameraTime, {   0, 255, 255 }, {    "Camera: <COL_50999999>" }},
+    {       dmaTime, { 255,   0, 255 }, {       "DMA: <COL_99509999>" }},
 };
 
 #define CPU_TABLE_MAX sizeof(cpu_ordering_table)/sizeof(struct CPUBar)
@@ -412,62 +412,53 @@ void puppyprint_render_profiler(void) {
         // Same for the camera, especially so because this will crash otherwise.
         if (gCamera) {
             sprintf(textBytes, "Camera Pos#X: %d#Y: %d#Z: %d#D: %X", (s32)(gCamera->pos[0]), (s32)(gCamera->pos[1]), (s32)(gCamera->pos[2]), (u16)(gCamera->yaw));
-            print_small_text(SCREEN_WIDTH-16, 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+            print_small_text((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
         }
 
         if (benchmarkTimer > 0) {
             benchmarkTimer--;
             prepare_blank_box();
             sprintf(textBytes, "Done in %0.000f seconds#Benchmark: %dus#High: %dus", (f32)(benchmarkProgramTimer) * 0.000001f, (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS]), (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS + 1]));
-            render_blank_box((SCREEN_WIDTH/2) - (get_text_width(textBytes, FONT_OUTLINE) / 2) - 4, 158, (SCREEN_WIDTH/2) + (get_text_width(textBytes, FONT_OUTLINE) / 2) + 4, 196, 0, 0, 0, 255);
+            render_blank_box((SCREEN_WIDTH / 2) - (get_text_width(textBytes, FONT_OUTLINE) / 2) - 4, 158, (SCREEN_WIDTH / 2) + (get_text_width(textBytes, FONT_OUTLINE) / 2) + 4, 196, 0, 0, 0, 255);
             print_set_envcolour(255, 255, 255, 255);
-            print_small_text((SCREEN_WIDTH/2), 160, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+            print_small_text((SCREEN_WIDTH / 2), 160, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
             finish_blank_box();
         }
 
         //Just to keep screen estate a little friendlier.
 #define MX NUM_PERF_ITERATIONS
-        for (i = 0; i < CPU_TABLE_MAX; i++)
-        {
+        for (i = 0; i < CPU_TABLE_MAX; i++) {
             perfPercentage[i] = MAX((cpu_ordering_table[i].time[MX] / ADDTIMES), 0);
         }
 #undef ADDTIMES
 #undef MX
 
         viewedNums = 0;
-        for (i = 0; i < CPU_TABLE_MAX; i++)
-        {
+        for (i = 0; i < CPU_TABLE_MAX; i++) {
             s32 num = CYCLE_CONV(cpu_ordering_table[i].time[NUM_PERF_ITERATIONS]);
-            if (num != 0)
-            {
+            if (num != 0) {
                 sprintf(textBytes, "%s%dus", cpu_ordering_table[i].str, num);
                 print_small_text(SCREEN_WIDTH-16, 40+(viewedNums*12), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
                 viewedNums++;
             }
         }
-        s32 barY = (28+(viewedNums*12)) + 16;
+        s32 barY = (28 + (viewedNums * 12)) + 16;
         prepare_blank_box();
         viewedNums = 0;
         // Render CPU breakdown bar.
-        for (i = 0; i < CPU_TABLE_MAX; i++)
-        {
-            if (perfPercentage[i] == 0 && i != CPU_TABLE_MAX-1)
+        for (i = 0; i < CPU_TABLE_MAX; i++) {
+            if ((perfPercentage[i] == 0) && (i != (CPU_TABLE_MAX - 1))) {
                 continue;
-            if (viewedNums == 0)
-            {
-                graphPos = SCREEN_WIDTH-96 + perfPercentage[i];
-                render_blank_box(SCREEN_WIDTH-96, barY, graphPos, barY+8, cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
             }
-            else
-            if (i == CPU_TABLE_MAX-1)
-            {
-                graphPos = SCREEN_WIDTH-96 + perfPercentage[i];
-                render_blank_box(prevGraph, barY, SCREEN_WIDTH-16, barY+8, cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
-            }
-            else
-            {
+            if (viewedNums == 0) {
+                graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
+                render_blank_box((SCREEN_WIDTH - 96), barY, graphPos, (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+            } else if (i == (CPU_TABLE_MAX - 1)) {
+                graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
+                render_blank_box(prevGraph, barY, (SCREEN_WIDTH - 16), (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+            } else {
                 graphPos += perfPercentage[i];
-                render_blank_box(prevGraph, barY, graphPos, barY+8, cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+                render_blank_box(prevGraph, barY, graphPos, (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
             }
             viewedNums++;
             prevGraph = graphPos;
@@ -485,14 +476,14 @@ void puppyprint_render_profiler(void) {
 }
 
 void profiler_update(u32 *time, OSTime time2) {
-    time[perfIteration] = osGetTime() - time2;
+    time[perfIteration] = (osGetTime() - time2);
 }
 
 void get_average_perf_time(u32 *time) {
     // This takes all but the last index of the timer array, and creates an average value, which is written to the last index.
     s32 i = 0;
     s32 total = 0;
-    for (i = 0; i < NUM_PERF_ITERATIONS - 1; i++) {
+    for (i = 0; i < (NUM_PERF_ITERATIONS - 1); i++) {
         total += time[i];
     }
     time[NUM_PERF_ITERATIONS] = MAX(total / NUM_PERF_ITERATIONS, 0);
@@ -577,9 +568,7 @@ void puppyprint_profiler_process(void) {
         benchViewer = FALSE;
         fDebug ^= TRUE;
     }
-
-
-    if (perfIteration++ == NUM_PERF_ITERATIONS - 1) {
+    if (perfIteration++ == (NUM_PERF_ITERATIONS - 1)) {
         perfIteration = 0;
     }
     profiler_update(profilerTime2, newTime);
