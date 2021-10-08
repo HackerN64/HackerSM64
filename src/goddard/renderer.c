@@ -1411,11 +1411,9 @@ void gd_draw_border_rect(f32 ulx, f32 uly, f32 lrx, f32 lry) {
 
 /* 24CAC8 -> 24CDB4; orig name: func_8019E2F8 */
 void gd_dl_set_fill(struct GdColour *colour) {
-    u8 r, g, b;
-
-    r = colour->r * 255.0f;
-    g = colour->g * 255.0f;
-    b = colour->b * 255.0f;
+    u8 r = colour->r * 255.0f;
+    u8 g = colour->g * 255.0f;
+    u8 b = colour->b * 255.0f;
 
     gDPPipeSync(next_gfx());
     gDPSetCycleType(next_gfx(), G_CYC_FILL);
@@ -1524,17 +1522,15 @@ u32 new_gddl_from(Gfx *dl, UNUSED s32 arg1) {
 /* 24D4C4 -> 24D63C; orig name: func_8019ECF4 */
 void mat4_to_mtx(Mat4f *src, Mtx *dst) {
 #ifndef GBI_FLOATS
-    s32 i; // 14
-    s32 j; // 10
-    s32 w1;
-    s32 w2;
+    s32 i, j;
+    s32 w1, w2;
     s32 *mtxInt = (s32 *) dst->m[0]; // s32 part
     s32 *mtxFrc = (s32 *) dst->m[2]; // frac part
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 2; j++) {
-            w1 = (s32)((*src)[i][j * 2] * 65536.0f);
-            w2 = (s32)((*src)[i][j * 2 + 1] * 65536.0f);
+            w1 = (s32)((*src)[i][(j * 2) + 0] * 65536.0f);
+            w2 = (s32)((*src)[i][(j * 2) + 1] * 65536.0f);
             *mtxInt = MTX_INTPART_PACK(w1, w2);
             mtxInt++;
             *mtxFrc = MTX_FRACPART_PACK(w1, w2);

@@ -244,7 +244,7 @@ void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
                 make_vertex(verts, (gVisualSurfaceCount + 2), surf->vertex3[0], surf->vertex3[1], surf->vertex3[2], 0, 0, col[0], col[1], col[2], 0x80);
             }
 
-            gVisualSurfaceCount+=3;
+            gVisualSurfaceCount += 3;
         }
     }
 }
@@ -266,9 +266,9 @@ void iterate_surfaces_envbox(Vtx *verts) {
             make_vertex(verts, (gVisualSurfaceCount + 4), p[1], p[5], p[4], 0, 0, col[0], col[1], col[2], 0x80);
             make_vertex(verts, (gVisualSurfaceCount + 5), p[3], p[5], p[4], 0, 0, col[0], col[1], col[2], 0x80);
 
-            gVisualSurfaceCount+=6;
-            gVisualOffset+=6;
-            p+= 6;
+            gVisualSurfaceCount += 6;
+            gVisualOffset += 6;
+            p += 6;
         }
     }
 }
