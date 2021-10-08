@@ -420,7 +420,6 @@ void get_audio_frequency(void) {
  * Initialize hardware, start main thread, then idle.
  */
 void thread1_idle(UNUSED void *arg) {
-
     osCreateViManager(OS_PRIORITY_VIMGR);
     switch ( osTvType ) {
     case OS_TV_NTSC:
@@ -449,15 +448,13 @@ void thread1_idle(UNUSED void *arg) {
     osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
     osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
-    create_thread(&gMainThread, 3, thread3_main, NULL, gThread3Stack + 0x2000, 100);
+    create_thread(&gMainThread, 3, thread3_main, NULL, (gThread3Stack + 0x2000), 100);
     osStartThread(&gMainThread);
 
     osSetThreadPri(NULL, 0);
 
     // halt
-    while (TRUE) {
-        ;
-    }
+    while (TRUE) { ; }
 }
 
 #if CLEARRAM
@@ -490,6 +487,6 @@ void main_func(void) {
 #ifdef ISVPRINT
     osInitialize_fakeisv();
 #endif
-    create_thread(&gIdleThread, 1, thread1_idle, NULL, gIdleThreadStack + 0x800, 100);
+    create_thread(&gIdleThread, 1, thread1_idle, NULL, (gIdleThreadStack + 0x800), 100);
     osStartThread(&gIdleThread);
 }

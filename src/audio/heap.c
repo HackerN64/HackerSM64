@@ -11,11 +11,7 @@
 #include "game/vc_check.h"
 #include "string.h"
 
-#ifdef VERSION_EU
 #define REVERB_WINDOW_SIZE_MAX 0x1000
-#else
-#define REVERB_WINDOW_SIZE_MAX 0x1000
-#endif
 
 #define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
@@ -89,8 +85,7 @@ void unk_pools_init(u32 size1, u32 size2);
  * Assuming 'k' in [9, 24],
  * Computes a newton's method step for f(x) = x^k - d
  */
-f64 root_newton_step(f64 x, s32 k, f64 d)
-{
+f64 root_newton_step(f64 x, s32 k, f64 d) {
     f64 deg2 = x * x;
     f64 deg4 = deg2 * deg2;
     f64 deg8 = deg4 * deg4;
@@ -306,12 +301,6 @@ void temporary_pool_clear(struct TemporaryPool *temporary) {
     temporary->entries[1].id = -1;
 }
 
-void unused_803160F8(struct SoundAllocPool *pool) {
-    pool->numAllocatedEntries = 0;
-    pool->cur = pool->start;
-}
-
-extern s32 D_SH_80315EE8;
 void sound_init_main_pools(s32 sizeForAudioInitPool) {
     sound_alloc_pool_init(&gAudioInitPool, gAudioHeap, sizeForAudioInitPool);
     sound_alloc_pool_init(&gAudioSessionPool, gAudioHeap + sizeForAudioInitPool, gAudioHeapSize - sizeForAudioInitPool);

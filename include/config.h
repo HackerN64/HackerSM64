@@ -201,6 +201,8 @@
 //#define PUPPYCAM
 
 // -- GRAPHICS SETTINGS --
+// Use HD versions of the intro splash screen textures. This includes "Made with HackerSM64".
+#define HD_INTRO_TEXTURES
 // Enable widescreen (16:9) support
 #define WIDE
 // Skybox size modifier, changing this will add support for larger skybox images. NOTE: Vanilla skyboxes may break if you change this option. Be sure to rescale them accordingly.
@@ -266,8 +268,8 @@
 //#define VISUAL_DEBUG
 // Open all courses and doors. Used for debugging purposes to unlock all content.
 //#define UNLOCK_ALL
-// Use HD versions of the intro splash screen textures. This includes "Made with HackerSM64".
-#define HD_INTRO_TEXTURES
+// Forces a crash when the game starts. Useful for debugging the crash screen.
+//#define DEBUG_FORCE_CRASH
 
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
 

@@ -364,11 +364,14 @@ void draw_reset_bars(void) {
  * Initial settings for the first rendered frame.
  */
 void render_init(void) {
+#ifdef DEBUG_FORCE_CRASH
+    *(vs8*)0=0;
+#endif
     if (IO_READ(DPC_PIPEBUSY_REG) == 0) {
-        gIsConsole = 0;
+        gIsConsole = FALSE;
         gBorderHeight = BORDER_HEIGHT_EMULATOR;
     } else {
-        gIsConsole = 1;
+        gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
     gGfxPool = &gGfxPools[0];
@@ -410,10 +413,10 @@ void select_gfx_pool(void) {
 void display_and_vsync(void) {
     gIsVC = IS_VC();
     if (IO_READ(DPC_PIPEBUSY_REG) && gIsConsole != 1) {
-        gIsConsole = 1;
+        gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
-    //gIsConsole = (IO_READ(DPC_PIPEBUSY_REG));
+    // gIsConsole = (IO_READ(DPC_PIPEBUSY_REG));
     osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
     if (gGoddardVblankCallback != NULL) {
         gGoddardVblankCallback();
