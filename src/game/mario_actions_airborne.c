@@ -204,15 +204,15 @@ void update_air_without_turn(struct MarioState *m) {
     f32 intendedMag;
 
     if (!check_horizontal_wind(m)) {
-        dragThreshold = m->action == ACT_LONG_JUMP ? 48.0f : 32.0f;
+        dragThreshold = ((m->action == ACT_LONG_JUMP) ? 48.0f : 32.0f);
         m->forwardVel = approach_f32(m->forwardVel, 0.0f, 0.35f, 0.35f);
 
         if (m->input & INPUT_NONZERO_ANALOG) {
             intendedDYaw = m->intendedYaw - m->faceAngle[1];
-            intendedMag = m->intendedMag / 32.0f;
+            intendedMag = (m->intendedMag / 32.0f);
 
-            m->forwardVel += intendedMag * coss(intendedDYaw) * 1.5f;
-            sidewaysSpeed = intendedMag * sins(intendedDYaw) * 10.0f;
+            m->forwardVel += intendedMag * coss(intendedDYaw) *  1.5f;
+            sidewaysSpeed  = intendedMag * sins(intendedDYaw) * 10.0f;
         }
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -381,24 +381,14 @@ u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, 
                     if (m->vel[1] > 0.0f) {
                         m->vel[1] = 0.0f;
                     }
-
-                    //! Hands-free holding. Bonking while no wall is referenced
-                    // sets Mario's action to a non-holding action without
-                    // dropping the object, causing the hands-free holding
-                    // glitch. This can be achieved using an exposed ceiling,
-                    // out of bounds, grazing the bottom of a wall while
-                    // falling such that the final quarter step does not find a
-                    // wall collision, or by rising into the top of a wall such
-                    // that the final quarter step detects a ledge, but you are
-                    // not able to ledge grab it.
                     if (m->forwardVel >= 38.0f) {
                         m->particleFlags |= PARTICLE_VERTICAL_STAR;
-                        set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
+                        drop_and_set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
                     } else {
                         if (m->forwardVel > 8.0f) {
                             mario_set_forward_vel(m, -8.0f);
                         }
-                        return set_mario_action(m, ACT_SOFT_BONK, 0);
+                        return drop_and_set_mario_action(m, ACT_SOFT_BONK, 0);
                     }
                 }
             } else {
