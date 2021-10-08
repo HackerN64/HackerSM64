@@ -49,9 +49,12 @@
 
 //! TODO: remove static
 
-#define POS_OP_SAVE_POSITION    0x0
-#define POS_OP_COMPUTE_VELOCITY 0x1
-#define POS_OP_RESTORE_POSITION 0x2
+enum ObjPositionOperation
+{
+    POS_OP_SAVE_POSITION,
+    POS_OP_COMPUTE_VELOCITY,
+    POS_OP_RESTORE_POSITION
+};
 
 /* BSS (declared to force order) */
 extern s32 sNumActiveFirePiranhaPlants;
@@ -143,21 +146,21 @@ static void cur_obj_spin_all_dimensions(f32 pitchSpeed, f32 rollSpeed) {
 
         c = coss(o->oFaceAnglePitch);
         s = sins(o->oFaceAnglePitch);
-        nz = pitch * c + yaw * s;
-        ny = yaw * c - pitch * s;
+        nz = (pitch * c) + (yaw   * s);
+        ny = (yaw   * c) - (pitch * s);
 
         c = coss(o->oFaceAngleRoll);
         s = sins(o->oFaceAngleRoll);
-        nx = roll * c + ny * s;
-        ny = ny * c - roll * s;
+        nx = (roll * c) + (ny   * s);
+        ny = (ny   * c) - (roll * s);
 
         c = coss(o->oFaceAngleYaw);
         s = sins(o->oFaceAngleYaw);
-        px = nx * c - nz * s;
-        nz = nz * c + nx * s;
+        px = (nx * c) - (nz * s);
+        nz = (nz * c) + (nx * s);
 
-        nx = roll * c - pitch * s;
-        pz = pitch * c + roll * s;
+        nx = (roll  * c) - (pitch * s);
+        pz = (pitch * c) + (roll  * s);
 
         o->oPosX = o->oHomeX - nx + px;
         o->oGraphYOffset = yaw - ny;
@@ -173,12 +176,12 @@ static void obj_rotate_yaw_and_bounce_off_walls(s16 targetYaw, s16 turnAmount) {
 }
 
 static s32 obj_get_pitch_to_home(f32 latDistToHome) {
-    return atan2s(latDistToHome, o->oPosY - o->oHomeY);
+    return atan2s(latDistToHome, (o->oPosY - o->oHomeY));
 }
 
 static void obj_compute_vel_from_move_pitch(f32 speed) {
-    o->oForwardVel = speed *  coss(o->oMoveAnglePitch);
-    o->oVelY       = speed * -sins(o->oMoveAnglePitch);
+    o->oForwardVel = (speed *  coss(o->oMoveAnglePitch));
+    o->oVelY       = (speed * -sins(o->oMoveAnglePitch));
 }
 
 static s32 clamp_s16(s16 *value, s16 minimum, s16 maximum) { // move to math_util?
@@ -291,12 +294,11 @@ static s32 obj_face_roll_approach(s16 targetRoll, s16 deltaRoll) {
 
 static s32 obj_smooth_turn(s16 *angleVel, s32 *angle, s16 targetAngle, f32 targetSpeedProportion,
                            s16 accel, s16 minSpeed, s16 maxSpeed) {
-    s16 currentSpeed;
     s16 currentAngle = (s16)(*angle);
 
     *angleVel = approach_s16_symmetric(*angleVel, (targetAngle - currentAngle) * targetSpeedProportion, accel);
 
-    currentSpeed = ABSI(*angleVel);
+    s16 currentSpeed = ABSI(*angleVel);
     clamp_s16(&currentSpeed, minSpeed, maxSpeed);
 
     *angle = approach_angle(*angle, targetAngle, currentSpeed);
@@ -493,8 +495,8 @@ static void obj_set_squished_action(void) {
 
 static s32 obj_die_if_above_lava_and_health_non_positive(void) {
     if (o->oMoveFlags & OBJ_MOVE_UNDERWATER_ON_GROUND) {
-        if (o->oGravity + o->oBuoyancy > 0.0f
-            || find_water_level(o->oPosX, o->oPosZ) - o->oPosY < 150.0f) {
+        if ((o->oGravity + o->oBuoyancy) > 0.0f
+            || (find_water_level(o->oPosX, o->oPosZ) - o->oPosY) < 150.0f) {
             return FALSE;
         }
     } else if (!(o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA)) {

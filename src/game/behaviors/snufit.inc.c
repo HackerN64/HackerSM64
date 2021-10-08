@@ -33,17 +33,14 @@ struct ObjectHitbox sSnufitBulletHitbox = {
  * This geo function shifts snufit's mask when it shrinks down,
  * since the parts move independently.
  */
-Gfx *geo_snufit_move_mask(s32 callContext, struct GraphNode *node, UNUSED Mat4 *c) {
+Gfx *geo_snufit_move_mask(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
     struct Object *obj;
     struct GraphNodeTranslationRotation *transNode;
 
     if (callContext == GEO_CONTEXT_RENDER) {
         obj = (struct Object *) gCurGraphNodeObject;
         transNode = (struct GraphNodeTranslationRotation *) node->next;
-
-        transNode->translation[0] = obj->oSnufitXOffset;
-        transNode->translation[1] = obj->oSnufitYOffset;
-        transNode->translation[2] = obj->oSnufitZOffset;
+        vec3_copy(transNode->translation, &obj->oSnufitOffsetVec);
     }
 
     return NULL;
@@ -52,7 +49,7 @@ Gfx *geo_snufit_move_mask(s32 callContext, struct GraphNode *node, UNUSED Mat4 *
 /**
  * This function scales the body of snufit, which needs done seperately from its mask.
  */
-Gfx *geo_snufit_scale_body(s32 callContext, struct GraphNode *node, UNUSED Mat4 *c) {
+Gfx *geo_snufit_scale_body(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
     struct Object *obj;
     struct GraphNodeScale *scaleNode;
 
@@ -71,11 +68,9 @@ Gfx *geo_snufit_scale_body(s32 callContext, struct GraphNode *node, UNUSED Mat4 
  * then prepares to shoot after a period.
  */
 void snufit_act_idle(void) {
-    s32 marioDist;
-
     // This line would could cause a crash in certain PU situations,
     // if the game would not have already crashed.
-    marioDist = (s32)(o->oDistanceToMario / 10.0f);
+    s32 marioDist = (s32)(o->oDistanceToMario / 10.0f);
     if (o->oTimer > marioDist && o->oDistanceToMario < 800.0f) {
 
         // Controls an alternating scaling factor in a cos.

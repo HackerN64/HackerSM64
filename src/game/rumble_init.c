@@ -120,7 +120,7 @@ static void update_rumble_data_queue(void) {
     if (gRumbleDataQueue[0].comm) {
         gCurrRumbleSettings.count = 0;
         gCurrRumbleSettings.start = 4;
-        gCurrRumbleSettings.comm = gRumbleDataQueue[0].comm;
+        gCurrRumbleSettings.comm  = gRumbleDataQueue[0].comm;
         gCurrRumbleSettings.timer = gRumbleDataQueue[0].time;
         gCurrRumbleSettings.level = gRumbleDataQueue[0].level;
         gCurrRumbleSettings.decay = gRumbleDataQueue[0].decay;
@@ -201,24 +201,12 @@ void reset_rumble_timers_vibrate(s32 level) {
         gCurrRumbleSettings.slip = 4;
     }
 
-    if (level == 4) {
-        gCurrRumbleSettings.vibrate = 1;
-    }
-
-    if (level == 3) {
-        gCurrRumbleSettings.vibrate = 2;
-    }
-
-    if (level == 2) {
-        gCurrRumbleSettings.vibrate = 3;
-    }
-
-    if (level == 1) {
-        gCurrRumbleSettings.vibrate = 4;
-    }
-
-    if (level == 0) {
-        gCurrRumbleSettings.vibrate = 5;
+    switch (level) {
+        case 0: gCurrRumbleSettings.vibrate = 5; break;
+        case 1: gCurrRumbleSettings.vibrate = 4; break;
+        case 2: gCurrRumbleSettings.vibrate = 3; break;
+        case 3: gCurrRumbleSettings.vibrate = 2; break;
+        case 4: gCurrRumbleSettings.vibrate = 1; break;
     }
 }
 

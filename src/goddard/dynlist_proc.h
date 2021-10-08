@@ -27,10 +27,10 @@ enum DParmPtr {
 
 /// parameters for `d_set_parm_f()`
 enum DParmF {
-    PARM_F_ALPHA = 1,       ///< Set the alpha value for an `ObjShape` or `ObjVertex`
-    PARM_F_RANGE_MIN = 2,  ///< Set the left range for an `ObjGadget`
+    PARM_F_ALPHA     = 1, ///< Set the alpha value for an `ObjShape` or `ObjVertex`
+    PARM_F_RANGE_MIN = 2, ///< Set the left range for an `ObjGadget`
     PARM_F_RANGE_MAX = 3, ///< Set the right range for an `ObjGadget`
-    PARM_F_VARVAL = 6       ///< Set the float variable value union in an `ObjGadget`
+    PARM_F_VARVAL    = 6  ///< Set the float variable value union in an `ObjGadget`
 };
 
 /// `d_makeobj()` object types
