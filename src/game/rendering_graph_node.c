@@ -437,7 +437,7 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         if (gConfig.widescreen && (gCurrLevelNum != 0x01)){
             sAspectRatio = (16.0f / 9.0f); // 1.775f
         } else {
-            sAspectRatio = (4.0f / 3.0f); // 1.33333f
+            sAspectRatio = ( 4.0f / 3.0f); // 1.33333f
         }
 #else
         sAspectRatio = (4.0f / 3.0f); // 1.33333f
@@ -463,7 +463,6 @@ void geo_process_level_of_detail(struct GraphNodeLevelOfDetail *node) {
 #else
     f32 distanceFromCam = -gMatStack[gMatStackIndex][3][2];
 #endif
-
     if ((f32)node->minDistance <= distanceFromCam && distanceFromCam < (f32)node->maxDistance) {
         if (node->node.children != 0) {
             geo_process_node_and_siblings(node->node.children);
@@ -491,16 +490,6 @@ void geo_process_switch(struct GraphNodeSwitchCase *node) {
     }
 }
 
-void make_roll_matrix(Mtx *mtx, s32 angle) {
-    Mat4 temp;
-    mtxf_identity(temp);
-    temp[0][0] = coss(angle);
-    temp[0][1] = sins(angle);
-    temp[1][0] = -temp[0][1];
-    temp[1][1] = temp[0][0];
-    guMtxF2L(temp, mtx);
-}
-
 /**
  * Process a camera node.
  */
@@ -512,7 +501,7 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     if (node->fnNode.func != NULL) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);
     }
-    make_roll_matrix(rollMtx, node->rollScreen);
+    mtxf_rotate_xy(rollMtx, node->rollScreen);
 
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
 

@@ -576,8 +576,8 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
     ((s16 *) mtx)[a     ] = (((s32) b) >> 16);  \
     ((s16 *) mtx)[a + 16] = (((s32) b) & 0xFFFF);
 void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
-    register s32 i = (coss(angle) * 65536);
-    register s32 j = (sins(angle) * 65536);
+    register s32 i = (coss(angle) * 0x10000);
+    register s32 j = (sins(angle) * 0x10000);
     register f32 *temp = (f32 *)mtx;
     register s32 k;
     for (k = 0; k < 16; k++) {
