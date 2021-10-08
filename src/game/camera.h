@@ -798,8 +798,8 @@ s32 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID);
 s32 cutscene_object_without_dialog(u8 cutscene, struct Object *obj);
 s32 cutscene_object(u8 cutscene, struct Object *obj);
 void play_cutscene(struct Camera *c);
-s32 cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
-s32 cutscene_spawn_obj(u32 obj, s16 frame);
+void cutscene_event(CameraEvent event, struct Camera * c, s16 start, s16 end);
+void cutscene_spawn_obj(u32 obj, s16 frame);
 void set_fov_shake(s16 amplitude, s16 decay, s16 shakeSpeed);
 
 void set_fov_function(u8 func);

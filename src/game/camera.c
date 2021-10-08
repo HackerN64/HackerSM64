@@ -6066,7 +6066,6 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
     // The distance from Mario to Lakitu
     f32 checkDist = 0.0f;
     /// The radius used to find potential walls to avoid.
-    /// @bug Increases to 250.f, but the max collision radius is 200.f
     f32 coarseRadius = 150.0f;
     /// This only increases when there is a wall collision found in the coarse pass
     f32 fineRadius = 100.0f;
@@ -6078,7 +6077,7 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
         colData.z = sMarioCamState->pos[2] + ((cPos[2] - sMarioCamState->pos[2]) * checkDist);
         colData.radius = coarseRadius;
         // Increase the coarse check radius
-        camera_approach_f32_symmetric_bool(&coarseRadius, 250.f, 30.f);
+        camera_approach_f32_symmetric_bool(&coarseRadius, 200.f, 30.f);
 
         if (find_wall_collisions(&colData) != 0) {
             wall = colData.walls[colData.numWalls - 1];
@@ -10304,13 +10303,12 @@ void play_cutscene(struct Camera *c) {
  * Call the event while `start` <= gCutsceneTimer <= `end`
  * If `end` is -1, call for the rest of the shot.
  */
-s32 cutscene_event(CameraEvent event, struct Camera *c, s16 start, s16 end) {
+void cutscene_event(CameraEvent event, struct Camera *c, s16 start, s16 end) {
     if (start <= gCutsceneTimer) {
         if (end == -1 || end >= gCutsceneTimer) {
             event(c);
         }
     }
-    return 0;
 }
 
 /**
@@ -10318,11 +10316,10 @@ s32 cutscene_event(CameraEvent event, struct Camera *c, s16 start, s16 end) {
  *
  * @see intro_scene.inc.c for details on which objects are spawned.
  */
-s32 cutscene_spawn_obj(u32 obj, s16 frame) {
+void cutscene_spawn_obj(u32 obj, s16 frame) {
     if (frame == gCutsceneTimer) {
         gCutsceneObjSpawn = obj;
     }
-    return 0;
 }
 
 /**

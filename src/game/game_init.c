@@ -129,11 +129,10 @@ void init_rdp(void) {
  * Sets the initial RSP (Reality Signal Processor) settings.
  */
 void init_rsp(void) {
+    // G_ZBUFFER | G_CLIPPING
     gSPClearGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG
                         | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD);
-
     gSPSetGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING);
-
     gSPNumLights(gDisplayListHead++, NUMLIGHTS_1);
     gSPTexture(gDisplayListHead++, 0, 0, 0, G_TX_RENDERTILE, G_OFF);
 
@@ -154,8 +153,7 @@ void init_z_buffer(s32 resetZB) {
     gDPSetDepthImage(gDisplayListHead++, gPhysicalZBuffer);
 
     gDPSetColorImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WIDTH, gPhysicalZBuffer);
-    if (!resetZB)
-        return;
+    if (!resetZB) return;
     gDPSetFillColor(gDisplayListHead++,
                     GPACK_ZDZ(G_MAXFBZ, 0) << 16 | GPACK_ZDZ(G_MAXFBZ, 0));
 
