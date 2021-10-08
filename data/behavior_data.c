@@ -5075,7 +5075,7 @@ const BehaviorScript bhvGoombaTripletSpawner[] = {
 #ifdef FLOOMBAS
 const BehaviorScript bhvFloomba[] = {
     BEGIN(OBJ_LIST_PUSHABLE),
-    SET_INT(oIsFloomba, 1),
+    SET_INT(oIsFloomba, TRUE),
     GOTO(bhvGoomba + 1),
 };
 
@@ -5099,7 +5099,7 @@ const BehaviorScript bhvFloombaStartup[] = {
 
 const BehaviorScript bhvFloombaTripletSpawner[] = {
     BEGIN(OBJ_LIST_PUSHABLE),
-    SET_INT(oIsFloomba, 1),
+    SET_INT(oIsFloomba, TRUE),
     GOTO(bhvGoombaTripletSpawner + 1),
 };
 #endif

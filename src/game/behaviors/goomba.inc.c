@@ -134,6 +134,13 @@ void bhv_goomba_init(void) {
 #ifdef FLOOMBAS
     if (o->oIsFloomba)
         o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
+#ifdef HD_INTRO_TEXTURES
+    if (o->oAction == FLOOMBA_ACT_STARTUP) {
+        o->oZoomPosZ = o->oPosZ;
+        o->oGoombaScale = 0.0f;
+        cur_obj_hide();
+    }
+#endif
 #endif
 }
 
@@ -265,6 +272,39 @@ static void goomba_act_jump(void) {
     }
 }
 
+#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+static void floomba_act_startup(void) {
+    if (o->oBehParams & 0x00008000) {
+        struct Animation *curAnim = o->header.gfx.animInfo.curAnim;
+        s16 frameDiff = (curAnim->loopEnd - curAnim->loopStart) / 2
+            + (curAnim->loopStart - curAnim->startFrame);
+
+        o->header.gfx.animInfo.animFrameAccelAssist += (frameDiff << 16);
+        o->header.gfx.animInfo.animFrame += frameDiff;
+
+        o->oBehParams &= ~0x00008000;
+    }
+
+    if ((o->oBehParams & 0xFF) > 0x00) {
+        o->oBehParams--;
+        return;
+    }
+    
+    cur_obj_unhide();
+
+    if (((o->oBehParams >> 8) & 0x7F) > o->oZoomCounter) {
+        f32 frac = (f32) o->oZoomCounter / (f32) ((o->oBehParams >> 8) & 0x7F);
+        o->oPosZ = o->oZoomPosZ - 300.0f * (1.0f - frac);
+        o->oGoombaScale = sGoombaProperties[o->oGoombaSize].scale * frac * frac;
+        o->oZoomCounter++;
+    }
+    else {
+        o->oPosZ = o->oZoomPosZ;
+        o->oGoombaScale = sGoombaProperties[o->oGoombaSize].scale;
+    }
+}
+#endif
+
 /**
  * Attack handler for when mario attacks a huge goomba with an attack that
  * doesn't kill it.
@@ -318,6 +358,11 @@ void bhv_goomba_update(void) {
             case GOOMBA_ACT_JUMP:
                 goomba_act_jump();
                 break;
+#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+            case FLOOMBA_ACT_STARTUP:
+                floomba_act_startup();
+                break;
+#endif
         }
 
         //! @bug Weak attacks on huge goombas in a triplet mark them as dead even if they're not.

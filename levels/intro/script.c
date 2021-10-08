@@ -41,7 +41,8 @@ const LevelScript level_intro_splash_screen[] = {
     ALLOC_LEVEL_POOL(),
     LOAD_MODEL_FROM_GEO(MODEL_GOOMBA, goomba_geo),
     AREA(/*index*/ 1, intro_geo_splash_screen),
-        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/ 0, 0, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x10010000, /*beh*/ bhvFloombaStartup),
+        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/ -570, -480, 1500, /*angle*/ 0,  50, 0, /*behParam*/ 0x1800100B, /*beh*/ bhvFloombaStartup),
+        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/  570, -480, 1500, /*angle*/ 0, -50, 0, /*behParam*/ 0x1800900B, /*beh*/ bhvFloombaStartup),
     END_AREA(),
     FREE_LEVEL_POOL(),
 
