@@ -2700,6 +2700,7 @@ void set_camera_mode(struct Camera *c, s16 mode, s16 frames) {
 void update_lakitu(struct Camera *c) {
     struct Surface *floor = NULL;
     Vec3f newPos, newFoc;
+	s16 newYaw;
 
     if (gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
     } else {
@@ -2900,7 +2901,6 @@ void update_camera(struct Camera *c) {
 #endif
     // Start any Mario-related cutscenes
     start_cutscene(c, get_cutscene_from_mario_status(c));
-    stub_camera_2(c);
     gCheckingSurfaceCollisionsForCamera = FALSE;
 #ifdef PUPPYCAM
     if (!gPuppyCam.enabled || c->cutscene != 0 || gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {

@@ -61,7 +61,7 @@ Vec3f sObjSavedPos;
 void wiggler_jumped_on_attack_handler(void);
 void huge_goomba_weakly_attacked(void);
 
-static s32 obj_is_rendering_enabled(void) {
+s32 obj_is_rendering_enabled(void) {
     return (o->header.gfx.node.flags & GRAPH_RENDER_ACTIVE);
 }
 

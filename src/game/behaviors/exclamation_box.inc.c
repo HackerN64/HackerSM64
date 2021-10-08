@@ -20,14 +20,6 @@ struct ObjectHitbox sExclamationBoxHitbox = {
     /* hurtboxHeight: */ 30,
 };
 
-struct ExclamationBoxContents {
-    u8 id;
-    u8 unk1;
-    u8 behParams;
-    ModelID model;
-    const BehaviorScript *behavior;
-};
-
 struct ExclamationBoxContents sExclamationBoxContents[] = { { 0, 0, 0, MODEL_MARIOS_WING_CAP, bhvWingCap },
                                                     { 1, 0, 0, MODEL_MARIOS_METAL_CAP, bhvMetalCap },
                                                     { 2, 0, 0, MODEL_MARIOS_CAP, bhvVanishCap },

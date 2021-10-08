@@ -1,13 +1,5 @@
 // tumbling_bridge.c.inc
 
-struct TumblingBridgeParams {
-    s16 numBridgeSections;
-    s16 bridgeRelativeStartingXorZ;
-    s16 platformWidth;
-    ModelID model;
-    const void *segAddr;
-};
-
 #include "levels/wf/header.h"
 #include "levels/bbh/header.h"
 #include "levels/lll/header.h"

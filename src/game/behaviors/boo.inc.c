@@ -188,7 +188,7 @@ static void boo_set_move_yaw_for_during_hit(s32 hurt) {
 }
 
 // Boo Roll
-static s16 sBooHitRotations[] = { 6047, 5664, 5292, 4934, 4587, 4254, 3933, 3624, 3329, 3046, 2775,
+s16 sBooHitRotations[] = { 6047, 5664, 5292, 4934, 4587, 4254, 3933, 3624, 3329, 3046, 2775,
                      2517, 2271, 2039, 1818, 1611, 1416, 1233, 1063, 906,  761,  629,
                      509,  402,  308,  226,  157,  100,  56,   25,   4,    0 };
 
@@ -793,6 +793,17 @@ void bhv_merry_go_round_boo_manager_loop(void) {
 
 void bhv_animated_texture_loop(void) {
     cur_obj_set_pos_to_home_with_debug();
+}
+
+static s8 sBbhStairJiggleOffsets[] = { -8, 8, -4, 4 };
+
+s32 jiggle_bbh_stair(s32 index) {
+    if (index >= 4 || index < 0) {
+        return TRUE;
+    }
+
+    o->oPosY += sBbhStairJiggleOffsets[index];
+    return FALSE;
 }
 
 void bhv_boo_staircase(void) {

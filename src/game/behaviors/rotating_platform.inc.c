@@ -1,12 +1,5 @@
 // rotating_platform.c.inc
 
-struct WFRotatingPlatformData {
-    s16 pad;
-    s16 scale;
-    const Collision *collisionData;
-    s16 collisionDistance;
-};
-
 #include "levels/wf/header.h"
 #include "levels/wdw/header.h"
 

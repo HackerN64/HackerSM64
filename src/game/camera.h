@@ -23,6 +23,7 @@
 
 #define ABS2(x) ((x) >= 0.f ? (x) : -(x))
 #define LEVEL_AREA_INDEX(levelNum, areaNum) (((levelNum) << 4) + (areaNum))
+#define NULL_TRIGGER { 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
 
 /**
  * Helper macro for defining which areas of a level should zoom out the camera when the game is paused.
