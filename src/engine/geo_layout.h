@@ -23,11 +23,17 @@ enum GeoCommandFlags
 #define cur_geo_cmd_s16(offset) \
     (*(s16 *) &gGeoLayoutCommand[CMD_PROCESS_OFFSET(offset)])
 
+#define cur_geo_cmd_u16(offset) \
+    (*(u16 *) &gGeoLayoutCommand[CMD_PROCESS_OFFSET(offset)])
+
 #define cur_geo_cmd_s32(offset) \
     (*(s32 *) &gGeoLayoutCommand[CMD_PROCESS_OFFSET(offset)])
 
 #define cur_geo_cmd_u32(offset) \
     (*(u32 *) &gGeoLayoutCommand[CMD_PROCESS_OFFSET(offset)])
+
+#define cur_geo_cmd_f32(offset) \
+    (*(f32 *) &gGeoLayoutCommand[CMD_PROCESS_OFFSET(offset)])
 
 #define cur_geo_cmd_ptr(offset) \
     (*(void **) &gGeoLayoutCommand[CMD_PROCESS_OFFSET(offset)])

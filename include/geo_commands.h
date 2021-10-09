@@ -113,8 +113,8 @@ enum SkyBackgroundParams {
  * 0x0A: Create camera frustum scene graph node
  *   0x01: u8  if nonzero, enable function field
  *   0x02: s16 field of view
- *   0x04: s16 near
- *   0x06: s16 far
+ *   0x04: u16 near
+ *   0x06: u16 far
  *   0x08: [GraphNodeFunc function]
 */
 #define GEO_CAMERA_FRUSTUM(fov, near, far) \
