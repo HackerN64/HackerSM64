@@ -444,8 +444,6 @@ static void surface_swim_bob(struct MarioState *m) {
 
 static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
     s16 floorPitch;
-    UNUSED struct Object *marioObj = m->marioObj;
-
     update_swimming_yaw(m);
     update_swimming_pitch(m);
     update_swimming_speed(m, swimStrength / 10.0f);
@@ -454,7 +452,8 @@ static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
         case WATER_STEP_HIT_FLOOR:
             floorPitch = -find_floor_slope(m, -0x8000);
             if (m->faceAngle[0] < floorPitch) {
-                m->faceAngle[0] = floorPitch;
+                // m->faceAngle[0] = floorPitch;
+                approach_angle_bool(&m->faceAngle[0], floorPitch, 0x800);
             }
             break;
 
