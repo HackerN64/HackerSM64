@@ -87,7 +87,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     }
 
     if (nextPos[1] >= floorHeight) {
-        if (ceilHeight - nextPos[1] >= 160.0f) {
+        if ((ceilHeight - nextPos[1]) >= 160.0f) {
             vec3f_copy(m->pos, nextPos);
             set_mario_floor(m, floor, floorHeight);
 
@@ -98,16 +98,21 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
             }
         }
 
-        if (ceilHeight - floorHeight < 160.0f) {
+        if ((ceilHeight - floorHeight) <= 160.0f) {
             return WATER_STEP_CANCELLED;
         }
 
-        //! Water ceiling downwarp
-        vec3f_set(m->pos, nextPos[0], ceilHeight - 160.0f, nextPos[2]);
-        set_mario_floor(m, floor, floorHeight);
-        return WATER_STEP_HIT_CEILING;
+        if (nextPos[1] >= (ceilHeight - 160.0f)) {
+            vec3f_set(m->pos, nextPos[0], (ceilHeight - 160.0f), nextPos[2]);
+            set_mario_floor(m, floor, floorHeight);
+            return WATER_STEP_HIT_CEILING;
+        } else {
+            vec3f_set(m->pos, nextPos[0], nextPos[1], nextPos[2]);
+            set_mario_floor(m, floor, floorHeight);
+            return WATER_STEP_NONE;
+        }
     } else {
-        if (ceilHeight - floorHeight < 160.0f) {
+        if ((ceilHeight - floorHeight) < 160.0f) {
             return WATER_STEP_CANCELLED;
         }
 
@@ -1495,12 +1500,12 @@ static s32 act_hold_metal_water_fall_land(struct MarioState *m) {
 }
 
 static s32 check_common_submerged_cancels(struct MarioState *m) {
-    if (m->pos[1] > m->waterLevel - 80) {
-        if (m->waterLevel - 80 > m->floorHeight) {
-            if (m->pos[1] - (m->waterLevel - 80) < 50) {
-                m->pos[1] = m->waterLevel - 80; // lock mario to top if the falloff isn't big enough
+    s16 waterHeight = (m->waterLevel - 80);
+    if (m->pos[1] > waterHeight) {
+        if (waterHeight > m->floorHeight) {
+            if ((m->pos[1] - waterHeight) < 50) {
+                m->pos[1] = waterHeight; // lock mario to top if the falloff isn't big enough
             } else {
-                // m->pos[1] = m->waterLevel - 80; //! BUG: Downwarp swimming out of waterfalls
                 return transition_submerged_to_airborne(m);
             }
         } else {

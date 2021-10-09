@@ -60,18 +60,18 @@ void transfer_bully_speed(struct BullyCollisionData *obj1, struct BullyCollision
 
     //! Bully NaN crash
     f32 rzx = (sqr(rx) + sqr(rz));
-    f32 projectedV1 = ( rx * obj1->velX + rz * obj1->velZ) / rzx;
-    f32 projectedV2 = (-rx * obj2->velX - rz * obj2->velZ) / rzx;
+    f32 projectedV1 = ((( rx * obj1->velX) + (rz * obj1->velZ)) / rzx);
+    f32 projectedV2 = (((-rx * obj2->velX) - (rz * obj2->velZ)) / rzx);
 
     // Kill speed along r. Convert one object's speed along r and transfer it to the other object.
-    f32 p1x = projectedV1 *  rx;
-    f32 p1z = projectedV1 *  rz;
-    f32 p2x = projectedV2 * -rx;
-    f32 p2z = projectedV2 * -rz;
-    obj2->velX += (obj2->conversionRatio * p1x) - p2x;
-    obj2->velZ += (obj2->conversionRatio * p1z) - p2z;
-    obj1->velX += -p1x + (obj1->conversionRatio * p2x);
-    obj1->velZ += -p1z + (obj1->conversionRatio * p2z);
+    f32 p1x = (projectedV1 *  rx);
+    f32 p1z = (projectedV1 *  rz);
+    f32 p2x = (projectedV2 * -rx);
+    f32 p2z = (projectedV2 * -rz);
+    obj2->velX += ((obj2->conversionRatio * p1x) - p2x);
+    obj2->velZ += ((obj2->conversionRatio * p1z) - p2z);
+    obj1->velX += (-p1x + (obj1->conversionRatio * p2x));
+    obj1->velZ += (-p1z + (obj1->conversionRatio * p2z));
 
     //! Bully battery
 }
@@ -87,8 +87,8 @@ void init_bully_collision_data(struct BullyCollisionData *data, f32 posX, f32 po
     data->conversionRatio = conversionRatio;
     data->posX = posX;
     data->posZ = posZ;
-    data->velX = forwardVel * sins(yaw);
-    data->velZ = forwardVel * coss(yaw);
+    data->velX = (forwardVel * sins(yaw));
+    data->velZ = (forwardVel * coss(yaw));
 }
 
 void mario_bonk_reflection(struct MarioState *m, u32 negateSpeed) {
@@ -180,11 +180,11 @@ u32 mario_update_moving_sand(struct MarioState *m) {
 
     if (floorType == SURFACE_DEEP_MOVING_QUICKSAND || floorType == SURFACE_SHALLOW_MOVING_QUICKSAND
         || floorType == SURFACE_MOVING_QUICKSAND || floorType == SURFACE_INSTANT_MOVING_QUICKSAND) {
-        s16 pushAngle = floor->force << 8;
+        s16 pushAngle = (floor->force << 8);
         f32 pushSpeed = sMovingSandSpeeds[floor->force >> 8];
 
-        m->vel[0] += pushSpeed * sins(pushAngle);
-        m->vel[2] += pushSpeed * coss(pushAngle);
+        m->vel[0] += (pushSpeed * sins(pushAngle));
+        m->vel[2] += (pushSpeed * coss(pushAngle));
 
         return TRUE;
     }
@@ -231,8 +231,9 @@ void stop_and_set_height_to_floor(struct MarioState *m) {
     mario_set_forward_vel(m, 0.0f);
     m->vel[1] = 0.0f;
 
-    //! This is responsible for some downwarps.
-    m->pos[1] = m->floorHeight;
+    if (m->pos[1] <= (m->floorHeight + 160.0f)) {
+        m->pos[1] = m->floorHeight;
+    }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
@@ -250,8 +251,9 @@ s32 stationary_ground_step(struct MarioState *m) {
     if (takeStep) {
         stepResult = perform_ground_step(m);
     } else {
-        //! This is responsible for several stationary downwarps.
-        m->pos[1] = m->floorHeight;
+        if (m->pos[1] <= (m->floorHeight + 160.0f)) {
+            m->pos[1] = m->floorHeight;
+        }
 
         vec3f_copy(marioObj->header.gfx.pos, m->pos);
         vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
@@ -423,10 +425,10 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     vec3f_copy(nextPos, intendedPos);
 
     resolve_and_return_wall_collisions(nextPos, 150.0f, 50.0f, &upperWall);
-    resolve_and_return_wall_collisions(nextPos, 30.0f, 50.0f, &lowerWall);
+    resolve_and_return_wall_collisions(nextPos,  30.0f, 50.0f, &lowerWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
+    f32 ceilHeight = find_ceil(nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
 
     f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
 
@@ -453,7 +455,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
 
     //! This check uses f32, but findFloor uses short (overflow jumps)
     if (nextPos[1] <= floorHeight) {
-        if (ceilHeight - floorHeight > 160.0f) {
+        if ((ceilHeight - floorHeight) > 160.0f) {
             m->pos[0] = nextPos[0];
             m->pos[2] = nextPos[2];
             set_mario_floor(m, floor, floorHeight);
@@ -466,7 +468,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         return AIR_STEP_LANDED;
     }
 
-    if (nextPos[1] + 160.0f > ceilHeight) {
+    if ((nextPos[1] + 160.0f) > ceilHeight) {
         if (m->vel[1] >= 0.0f) {
             m->vel[1] = 0.0f;
 
@@ -481,8 +483,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             return AIR_STEP_NONE;
         }
 
-        //! Potential subframe downwarp->upwarp?
-        if (nextPos[1] <= m->floorHeight) {
+        if ((nextPos[1] <= m->floorHeight) && (nextPos[1] > (m->floorHeight - 160.0f))) {
             m->pos[1] = m->floorHeight;
             return AIR_STEP_LANDED;
         }

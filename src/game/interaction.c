@@ -1021,9 +1021,8 @@ u32 interact_cannon_base(struct MarioState *m, UNUSED u32 interactType, struct O
 }
 
 u32 interact_igloo_barrier(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    //! Sets used object without changing action (LOTS of interesting glitches,
-    // but unfortunately the igloo barrier is the only object with this interaction
-    // type)
+    //! Sets used object without changing action (LOTS of interesting glitches, but
+    // unfortunately the igloo barrier is the only object with this interaction type)
     m->interactObj = obj;
     m->usedObj     = obj;
     push_mario_out_of_object(m, obj, 5.0f);

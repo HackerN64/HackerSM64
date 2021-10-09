@@ -876,9 +876,9 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     struct GraphNode *geo = node->sharedChild;
 
     // half of the fov in in-game angle units instead of degrees
-    s32 halfFov = ((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f + 1.0f) * 32768.0f / 180.0f + 0.5f;
+    s32 halfFov = ((((((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f) + 1.0f) * 32768.0f) / 180.0f) + 0.5f);
 
-    f32 hScreenEdge = -matrix[3][2] * sins(halfFov) / coss(halfFov);
+    f32 hScreenEdge = (-matrix[3][2] * sins(halfFov) / coss(halfFov));
     // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get
     // the amount of units between the center of the screen and the horizontal edge
     // given the distance from the object to the camera.
@@ -888,7 +888,7 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     // HackerSM64: This multiplication is done regardless of aspect ratio to fix object pop-in on the edges of the screen (which happens at 4:3 too)
     // hScreenEdge *= GFX_DIMENSIONS_ASPECT_RATIO;
 
-    if (geo != NULL && geo->type == GRAPH_NODE_TYPE_CULLING_RADIUS) {
+    if ((geo != NULL) && (geo->type == GRAPH_NODE_TYPE_CULLING_RADIUS)) {
         cullingRadius = ((struct GraphNodeCullingRadius *) geo)->cullingRadius;
     } else {
         cullingRadius = 300;
