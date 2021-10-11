@@ -473,9 +473,9 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             m->vel[1] = 0.0f;
 
 #ifdef HANGING_FIX
-            if (ceil != NULL && ceil->type == SURFACE_HANGABLE) {
+            if (!(m->prevAction & ACT_FLAG_HANGING) && (ceil != NULL) && (ceil->type == SURFACE_HANGABLE)) {
 #else
-            if ((stepArg & AIR_STEP_CHECK_HANG) && ceil != NULL && ceil->type == SURFACE_HANGABLE) {
+            if ((stepArg & AIR_STEP_CHECK_HANG) && (ceil != NULL) && (ceil->type == SURFACE_HANGABLE)) {
 #endif
                 return AIR_STEP_GRABBED_CEILING;
             }

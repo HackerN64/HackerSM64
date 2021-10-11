@@ -1370,7 +1370,7 @@ static s32 act_metal_water_falling(struct MarioState *m) {
     }
 
     if (m->input & INPUT_NONZERO_ANALOG) {
-        m->faceAngle[1] += 0x400 * sins(m->intendedYaw - m->faceAngle[1]);
+        m->faceAngle[1] += (0x400 * sins(m->intendedYaw - m->faceAngle[1]));
     }
 
     set_mario_animation(m, m->actionArg == 0 ? MARIO_ANIM_GENERAL_FALL : MARIO_ANIM_FALL_FROM_WATER);
@@ -1393,7 +1393,7 @@ static s32 act_hold_metal_water_falling(struct MarioState *m) {
     }
 
     if (m->input & INPUT_NONZERO_ANALOG) {
-        m->faceAngle[1] += 0x400 * sins(m->intendedYaw - m->faceAngle[1]);
+        m->faceAngle[1] += (0x400 * sins(m->intendedYaw - m->faceAngle[1]));
     }
 
     set_mario_animation(m, MARIO_ANIM_FALL_WITH_LIGHT_OBJ);
@@ -1522,7 +1522,7 @@ static s32 check_common_submerged_cancels(struct MarioState *m) {
         }
     }
 
-    if (m->health < 0x100 && !(m->action & (ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE))) {
+    if ((m->health < 0x100) && !(m->action & (ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE))) {
         set_mario_action(m, ACT_DROWNING, 0);
     }
 
