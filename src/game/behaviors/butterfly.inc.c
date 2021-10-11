@@ -12,7 +12,6 @@ void butterfly_step(s32 speed) {
     s16 yaw = o->oMoveAngleYaw;
     s16 pitch = o->oMoveAnglePitch;
     s16 yPhase = o->oButterflyYPhase;
-    f32 floorY;
 
     o->oVelX = sins(yaw) * (f32) speed;
     o->oVelY = sins(pitch) * (f32) speed;
@@ -21,19 +20,20 @@ void butterfly_step(s32 speed) {
     o->oPosX += o->oVelX;
     o->oPosZ += o->oVelZ;
 
-    if (o->oAction == BUTTERFLY_ACT_FOLLOW_MARIO)
-        o->oPosY -= o->oVelY + coss((s32)(yPhase * 655.36)) * 20.0f / 4;
-    else
+    if (o->oAction == BUTTERFLY_ACT_FOLLOW_MARIO) {
+        o->oPosY -= o->oVelY + coss((s32)(yPhase * 655.36f)) * 20.0f / 4;
+    } else {
         o->oPosY -= o->oVelY;
+    }
+    f32 floorY = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
 
-    floorY = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
-
-    if (o->oPosY < floorY + 2.0f)
+    if (o->oPosY < floorY + 2.0f) {
         o->oPosY = floorY + 2.0f;
-
+    }
     o->oButterflyYPhase++;
-    if (o->oButterflyYPhase >= 101)
+    if (o->oButterflyYPhase >= 101) {
         o->oButterflyYPhase = 0;
+    }
 }
 
 void butterfly_calculate_angle(void) {

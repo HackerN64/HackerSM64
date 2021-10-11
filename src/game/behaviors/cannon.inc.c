@@ -38,11 +38,11 @@ void opened_cannon_act_4(void) {
     if (o->oTimer == 0)
         cur_obj_play_sound_2(SOUND_OBJ_CANNON_RISE);
     o->oPosY += 5.0f;
-    o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5) * 2;
-    o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5) * 2;
+    o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5f) * 2;
+    o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5f) * 2;
     if (o->oTimer > 67) {
-        o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5) * 4;
-        o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5) * 4;
+        o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5f) * 4;
+        o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5f) * 4;
         o->oAction = 6;
     }
 }
@@ -51,8 +51,8 @@ void opened_cannon_act_6(void) {
     if (o->oTimer == 0)
         cur_obj_play_sound_2(SOUND_OBJ_CANNON_TURN);
     if (o->oTimer < 4) {
-        o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5) * 4.0f;
-        o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5) * 4.0f;
+        o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5f) * 4.0f;
+        o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5f) * 4.0f;
     } else {
         if (o->oTimer >= 6) {
             if (o->oTimer < 22) {
@@ -83,8 +83,8 @@ void opened_cannon_act_5(void) {
 void opened_cannon_act_1(void) {
     cur_obj_become_intangible();
     cur_obj_disable_rendering();
-    o->oCannonIsActive = 0;
-    gMarioShotFromCannon = 1;
+    o->oCannonIsActive = FALSE;
+    gMarioShotFromCannon = TRUE;
 }
 
 void opened_cannon_act_2(void) {

@@ -259,13 +259,9 @@ void gd_clamp_vec3f(struct GdVec3f *vec, f32 limit) {
  * Rotates a 2D vector by some angle in degrees.
  */
 void gd_rot_2d_vec(f32 deg, f32 *x, f32 *y) {
-    f32 xP;
-    f32 yP;
-    f32 rad;
-
-    rad = deg / DEG_PER_RAD;
-    xP = (*x * gd_cos_d(rad)) - (*y * gd_sin_d(rad));
-    yP = (*x * gd_sin_d(rad)) + (*y * gd_cos_d(rad));
+    f32 rad = deg / DEG_PER_RAD;
+    f32 xP = (*x * gd_cos_d(rad)) - (*y * gd_sin_d(rad));
+    f32 yP = (*x * gd_sin_d(rad)) + (*y * gd_cos_d(rad));
     *x = xP;
     *y = yP;
 }
@@ -281,7 +277,7 @@ void UNUSED gd_rot_mat_about_row(Mat4f *mat, s32 row, f32 ang) {
     vec.y = (*mat)[row][1];
     vec.z = (*mat)[row][2];
 
-    gd_create_rot_mat_angular(&rot, &vec, ang / 2.0);
+    gd_create_rot_mat_angular(&rot, &vec, ang / 2.0f);
     gd_mult_mat4f(mat, &rot, mat);
 }
 
@@ -313,7 +309,7 @@ void gd_absrot_mat4(Mat4f *mtx, s32 axisnum, f32 ang) {
             fatal_printf("absrot_matrix4(): Bad axis num");
     }
 
-    gd_create_rot_mat_angular(&rMat, &rot, ang / 2.0); //? 2.0f
+    gd_create_rot_mat_angular(&rMat, &rot, (ang / 2.0f));
     gd_mult_mat4f(mtx, &rMat, mtx);
 }
 
@@ -696,8 +692,8 @@ void gd_create_rot_mat_angular(Mat4f *mtx, struct GdVec3f *vec, f32 ang) {
     f32 s;
     f32 c;
 
-    s = gd_sin_d(ang / (DEG_PER_RAD / 2.0));
-    c = gd_cos_d(ang / (DEG_PER_RAD / 2.0));
+    s = gd_sin_d(ang / (DEG_PER_RAD / 2.0f));
+    c = gd_cos_d(ang / (DEG_PER_RAD / 2.0f));
 
     gd_create_rot_matrix(mtx, vec, s, c);
 }

@@ -34,10 +34,10 @@ u32 set_transition_color_fade_alpha(s8 fadeType, s8 fadeTimer, u8 transTime) {
 
     switch (fadeType) {
         case 0:
-            time = (f32) sTransitionColorFadeCount[fadeTimer] * 255.0 / (f32)(transTime - 1) + 0.5; // fade in
+            time = (f32) sTransitionColorFadeCount[fadeTimer] * 255.0f / (f32)(transTime - 1) + 0.5f; // fade in
             break;
         case 1:
-            time = (1.0 - sTransitionColorFadeCount[fadeTimer] / (f32)(transTime - 1)) * 255.0 + 0.5; // fade out
+            time = (1.0f - sTransitionColorFadeCount[fadeTimer] / (f32)(transTime - 1)) * 255.0f + 0.5f; // fade out
             break;
     }
     return time;

@@ -424,7 +424,7 @@ void update_walking_speed(struct MarioState *m) {
     f32 targetSpeed = MIN(m->intendedMag, maxTargetSpeed);
 
     if (m->quicksandDepth > 10.0f) {
-        targetSpeed *= (6.25 / m->quicksandDepth);
+        targetSpeed *= (6.25f / m->quicksandDepth);
     }
 
     if (m->forwardVel <= 0.0f) {

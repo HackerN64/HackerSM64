@@ -260,9 +260,9 @@ f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
  * Return the quarter of the painting that is closest to the floor Mario entered.
  */
 f32 painting_nearest_4th(struct Painting *painting) {
-    f32 firstQuarter = painting->size / 4.0;       // 1/4 of the way across the painting
-    f32 secondQuarter = painting->size / 2.0;      // 1/2 of the way across the painting
-    f32 thirdQuarter = painting->size * 3.0 / 4.0; // 3/4 of the way across the painting
+    f32 firstQuarter  = painting->size / 4.0f;        // 1/4 of the way across the painting
+    f32 secondQuarter = painting->size / 2.0f;        // 1/2 of the way across the painting
+    f32 thirdQuarter  = painting->size * 3.0f / 4.0f; // 3/4 of the way across the painting
 
     if (painting->floorEntered & RIPPLE_LEFT) {
         return firstQuarter;
@@ -716,12 +716,12 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
 s32 normalize_component(f32 comp) {
     s8 rounded;
 
-    if (comp > 0.0) {
-        rounded = comp * 127.0 + 0.5; // round up
-    } else if (comp < 0.0) {
-        rounded = comp * 128.0 - 0.5; // round down
+    if (comp > 0.0f) {
+        rounded = comp * 127.0f + 0.5f; // round up
+    } else if (comp < 0.0f) {
+        rounded = comp * 128.0f - 0.5f; // round down
     } else {
-        rounded = 0;                  // don't round 0
+        rounded = 0;                    // don't round 0
     }
     return rounded;
 }

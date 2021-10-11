@@ -237,7 +237,7 @@ void ukiki_act_turn_to_mario(void) {
  */
 void ukiki_act_run(void) {
     s32 fleeMario = TRUE;
-    s16 goalYaw = o->oAngleToMario + 0x8000;
+    s16 goalYaw = (o->oAngleToMario + 0x8000);
 
     if (is_cap_ukiki_and_mario_has_normal_cap_on_head()) {
         fleeMario = FALSE;
@@ -251,7 +251,7 @@ void ukiki_act_run(void) {
     cur_obj_init_animation_with_sound(UKIKI_ANIM_RUN);
     cur_obj_rotate_yaw_toward(goalYaw, 0x800);
 
-    //! @bug (Ukikispeedia) This function sets forward speed to 0.9 * Mario's
+    //! @bug (Ukikispeedia) This function sets forward speed to 0.9f * Mario's
     //! forward speed, which means ukiki can move at hyperspeed rates.
     cur_obj_set_vel_from_mario_vel(20.0f, 0.9f);
 
