@@ -131,7 +131,7 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
     Vtx *verts;
     struct GraphNodeGenerated *generatedNode = (struct GraphNodeGenerated *) node;
 
-    s16 *sp64 = segmented_to_virtual(&flying_carpet_static_vertex_data);
+    s16 *vertexData = segmented_to_virtual(&flying_carpet_static_vertex_data);
     Gfx *displayList = NULL;
     Gfx *displayListHead = NULL;
     struct Object *curGraphNodeObject;
@@ -150,11 +150,11 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
             row = n / 3;
             col = n % 3;
 
-            x  = sp64[n * 4 + 0];
+            x  = vertexData[(n * 4) + 0];
             y  = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0f);
-            z  = sp64[n * 4 + 1];
-            tx = sp64[n * 4 + 2];
-            ty = sp64[n * 4 + 3];
+            z  = vertexData[(n * 4) + 1];
+            tx = vertexData[(n * 4) + 2];
+            ty = vertexData[(n * 4) + 3];
 
             make_vertex(verts, n, x, y, z, tx, ty, 0, 127, 0, 255);
         }
@@ -208,13 +208,13 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Ma
 #else
     switch (eu_get_language()) {
             case LANGUAGE_ENGLISH:
-                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_070296F8);
+                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_english);
                 break;
             case LANGUAGE_FRENCH:
-                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_07029768);
+                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_french );
                 break;
             case LANGUAGE_GERMAN:
-                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_070297D8);
+                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_german );
                 break;
         }
 #endif

@@ -21,7 +21,7 @@ const LevelScript level_ending_entry[] = {
     /*1*/ LOAD_YAY0(/*seg*/ 0x07, _ending_segment_7SegmentRomStart, _ending_segment_7SegmentRomEnd),
     /*4*/ ALLOC_LEVEL_POOL(),
 
-    /*5*/ AREA(/*index*/ 1, ending_geo_000050),
+    /*5*/ AREA(/*index*/ 1, ending_geo_area_1),
     /*7*/ END_AREA(),
 
     /*8*/ FREE_LEVEL_POOL(),
