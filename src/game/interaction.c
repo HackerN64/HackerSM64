@@ -732,14 +732,13 @@ u32 interact_water_ring(struct MarioState *m, UNUSED u32 interactType, struct Ob
 }
 
 u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    u32 starIndex;
     u32 starGrabAction = ACT_STAR_DANCE_EXIT;
 #ifdef NON_STOP_STARS
-    u32 noExit = 1;
+    u32 noExit = TRUE;
 #else
-    u32 noExit = (obj->oInteractionSubtype & INT_SUBTYPE_NO_EXIT) != 0;
+    u32 noExit = ((obj->oInteractionSubtype & INT_SUBTYPE_NO_EXIT) != 0);
 #endif
-    u32 grandStar = (obj->oInteractionSubtype & INT_SUBTYPE_GRAND_STAR) != 0;
+    u32 grandStar = ((obj->oInteractionSubtype & INT_SUBTYPE_GRAND_STAR) != 0);
 
     if (m->health >= 0x100) {
         mario_stop_riding_and_holding(m);
@@ -776,9 +775,9 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         m->interactObj       = obj;
         m->usedObj           = obj;
 #ifdef GLOBAL_STAR_IDS
-        starIndex = ((obj->oBehParams >> 24) & 0xFF);
+        u32 starIndex = ((obj->oBehParams >> 24) & 0xFF);
 #else
-        starIndex = ((obj->oBehParams >> 24) & 0x1F);
+        u32 starIndex = ((obj->oBehParams >> 24) & 0x1F);
 #endif
         save_file_collect_star_or_key(m->numCoins, starIndex);
 
@@ -824,10 +823,8 @@ u32 interact_bbh_entrance(struct MarioState *m, UNUSED u32 interactType, struct 
 }
 
 u32 interact_warp(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    u32 action;
-
     if (obj->oInteractionSubtype & INT_SUBTYPE_FADING_WARP) {
-        action = m->action;
+        u32 action = m->action;
 
         if (action == ACT_TELEPORT_FADE_IN) {
             sJustTeleported = TRUE;
@@ -931,17 +928,14 @@ u32 interact_warp_door(struct MarioState *m, UNUSED u32 interactType, struct Obj
 
 u32 get_door_save_file_flag(struct Object *door) {
     u32 saveFileFlag = 0;
-    s16 requiredNumStars = door->oBehParams >> 24;
-
-    s16 isCcmDoor = door->oPosX < 0.0f;
-    s16 isPssDoor = door->oPosY > 500.0f;
+    s16 requiredNumStars = (door->oBehParams >> 24);
 
     switch (requiredNumStars) {
-        case  1: saveFileFlag = (isPssDoor ? SAVE_FLAG_UNLOCKED_PSS_DOOR : SAVE_FLAG_UNLOCKED_WF_DOOR ); break;
-        case  3: saveFileFlag = (isCcmDoor ? SAVE_FLAG_UNLOCKED_CCM_DOOR : SAVE_FLAG_UNLOCKED_JRB_DOOR); break;
-        case  8: saveFileFlag = SAVE_FLAG_UNLOCKED_BITDW_DOOR;                                           break;
-        case 30: saveFileFlag = SAVE_FLAG_UNLOCKED_BITFS_DOOR;                                           break;
-        case 50: saveFileFlag = SAVE_FLAG_UNLOCKED_50_STAR_DOOR;                                         break;
+        case  1: saveFileFlag = ((door->oPosY > 500.0f) ? SAVE_FLAG_UNLOCKED_PSS_DOOR : SAVE_FLAG_UNLOCKED_WF_DOOR ); break;
+        case  3: saveFileFlag = ((door->oPosX <   0.0f) ? SAVE_FLAG_UNLOCKED_CCM_DOOR : SAVE_FLAG_UNLOCKED_JRB_DOOR); break;
+        case  8: saveFileFlag = SAVE_FLAG_UNLOCKED_BITDW_DOOR;                                                        break;
+        case 30: saveFileFlag = SAVE_FLAG_UNLOCKED_BITFS_DOOR;                                                        break;
+        case 50: saveFileFlag = SAVE_FLAG_UNLOCKED_50_STAR_DOOR;                                                      break;
     }
 
     return saveFileFlag;
@@ -982,7 +976,7 @@ u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *
             return set_mario_action(m, enterDoorAction, actionArg);
 #ifndef UNLOCK_ALL
         } else if (!sDisplayingDoorText) {
-            u32 text = DIALOG_022 << 16;
+            u32 text = (DIALOG_022 << 16);
 
             switch (requiredNumStars) {
                 case  1: text = (DIALOG_024 << 16); break;
@@ -993,13 +987,13 @@ u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *
                 case 70: text = (DIALOG_029 << 16); break;
             }
 
-            text += requiredNumStars - numStars;
+            text += (requiredNumStars - numStars);
 
             sDisplayingDoorText = TRUE;
             return set_mario_action(m, ACT_READING_AUTOMATIC_DIALOG, text);
         }
 #endif
-    } else if (m->action == ACT_IDLE && sDisplayingDoorText == TRUE && requiredNumStars == 70) {
+    } else if ((m->action == ACT_IDLE) && sDisplayingDoorText && (requiredNumStars == 70)) {
         m->interactObj = obj;
         m->usedObj     = obj;
         return set_mario_action(m, ACT_ENTERING_STAR_DOOR, should_push_or_pull_door(m, obj));
@@ -1042,13 +1036,13 @@ u32 interact_tornado(struct MarioState *m, UNUSED u32 interactType, struct Objec
         m->usedObj           = obj;
 
         marioObj->oMarioTornadoYawVel = 0x400;
-        marioObj->oMarioTornadoPosY = m->pos[1] - obj->oPosY;
+        marioObj->oMarioTornadoPosY = (m->pos[1] - obj->oPosY);
 
         play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
 #if ENABLE_RUMBLE
         queue_rumble_data(30, 60);
 #endif
-        return set_mario_action(m, ACT_TORNADO_TWIRLING, m->action == ACT_TWIRLING);
+        return set_mario_action(m, ACT_TORNADO_TWIRLING, (m->action == ACT_TWIRLING));
     }
 
     return FALSE;

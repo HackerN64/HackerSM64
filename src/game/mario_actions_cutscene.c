@@ -908,8 +908,8 @@ s32 act_going_through_door(struct MarioState *m) {
         }
     }
     m->faceAngle[1] = m->usedObj->oMoveAngleYaw;
-    m->pos[0] = m->usedObj->oPosX;
-    m->pos[2] = m->usedObj->oPosZ;
+    m->pos[0]       = m->usedObj->oPosX;
+    m->pos[2]       = m->usedObj->oPosZ;
 
     update_mario_pos_for_anim(m);
     stop_and_set_height_to_floor(m);
@@ -998,7 +998,7 @@ s32 act_spawn_spin_airborne(struct MarioState *m) {
     }
 
     // is 300 units above floor, spin and play woosh sounds
-    if (m->actionState == ACT_STATE_SPAWN_SPIN_AIRBORNE_SPINNING && m->pos[1] - m->floorHeight > 300.0f) {
+    if (m->actionState == ACT_STATE_SPAWN_SPIN_AIRBORNE_SPINNING && (m->pos[1] - m->floorHeight) > 300.0f) {
         if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 0) { // first anim frame
             play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
         }
@@ -2595,7 +2595,7 @@ static s32 act_credits_cutscene(struct MarioState *m) {
         sEndCutsceneVp.vp.vscale[0] = 640 - width;
         sEndCutsceneVp.vp.vscale[1] = 480 - height;
         sEndCutsceneVp.vp.vtrans[0] =
-            (gCurrCreditsEntry->actNum & 0x10 ? width : -width) * 56 / 100 + 640;
+            (gCurrCreditsEntry->actNum & 0x10 ?  width :  -width) * 56 / 100 + 640;
         sEndCutsceneVp.vp.vtrans[1] =
             (gCurrCreditsEntry->actNum & 0x20 ? height : -height) * 66 / 100 + 480;
 

@@ -1385,12 +1385,9 @@ void update_mario_inputs(struct MarioState *m) {
  * Set's the camera preset for submerged action behaviors.
  */
 void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
-    f32 heightBelowWater;
-    s16 camPreset;
-
     if ((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) {
-        heightBelowWater = (f32)(m->waterLevel - 80) - m->pos[1];
-        camPreset = m->area->camera->mode;
+        f32 heightBelowWater = (f32)(m->waterLevel - 80) - m->pos[1];
+        s16 camPreset = m->area->camera->mode;
 
         if (m->action & ACT_FLAG_METAL_WATER) {
             if (camPreset != CAMERA_MODE_CLOSE) {
