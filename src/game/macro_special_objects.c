@@ -137,11 +137,11 @@ void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
                 );
 
             newObj->oUnusedCoinParams = macroObject[MACRO_OBJ_PARAMS];
-            newObj->oBehParams = ((macroObject[MACRO_OBJ_PARAMS] & 0x00FF) << 16)
-                                 + (macroObject[MACRO_OBJ_PARAMS] & 0xFF00);
-            newObj->oBehParams2ndByte = macroObject[MACRO_OBJ_PARAMS] & 0x00FF;
-            newObj->respawnInfoType = RESPAWN_INFO_TYPE_16;
-            newObj->respawnInfo = macroObjList - 1;
+            newObj->oBehParams = (((macroObject[MACRO_OBJ_PARAMS] & 0x00FF) << 16)
+                                 + (macroObject[MACRO_OBJ_PARAMS] & 0xFF00));
+            newObj->oBehParams2ndByte = (macroObject[MACRO_OBJ_PARAMS] & 0x00FF);
+            newObj->respawnInfoType = RESPAWN_INFO_TYPE_MACRO_OBJECT;
+            newObj->respawnInfo = (macroObjList - 1);
             newObj->parentObj = newObj;
         }
     }

@@ -19,9 +19,11 @@
 #define ACTIVE_FLAG_IGNORE_ENV_BOXES                (1 << 10) // 0x0400
 
 /* respawnInfoType */
-#define RESPAWN_INFO_TYPE_NULL                      0x00
-#define RESPAWN_INFO_TYPE_32                        0x01
-#define RESPAWN_INFO_TYPE_16                        0x02
+enum RespawnInfoType {
+    RESPAWN_INFO_TYPE_NULL,
+    RESPAWN_INFO_TYPE_NORMAL,
+    RESPAWN_INFO_TYPE_MACRO_OBJECT
+};
 
 /* respawnInfo */
 #define RESPAWN_INFO_DONT_RESPAWN                   0xFF
@@ -44,33 +46,37 @@
 #define OBJ_FLAG_PERSISTENT_RESPAWN                 (1 << 14) // 0x00004000
 #define OBJ_FLAG_VELOCITY_PLATFORM                  (1 << 15) // 0x00008000
 #define OBJ_FLAG_DONT_CALC_COLL_DIST                (1 << 16) // 0x00010000
-#define OBJ_FLAG_EMIT_LIGHT                         (1 << 17) // 0x00020000
+#define OBJ_FLAG_UCODE_SMALL                        (1 << 17) // 0x00020000
 #define OBJ_FLAG_UCODE_LARGE                        (1 << 18) // 0x00040000
 #define OBJ_FLAG_SILHOUETTE                         (1 << 19) // 0x00080000
 #define OBJ_FLAG_OCCLUDE_SILHOUETTE                 (1 << 20) // 0x00100000
 #define OBJ_FLAG_OPACITY_FROM_CAMERA_DIST           (1 << 21) // 0x00200000
-#define OBJ_FLAG_UCODE_SMALL                        (1 << 22) // 0x00400000
+#define OBJ_FLAG_EMIT_LIGHT                         (1 << 22) // 0x00400000
 #define OBJ_FLAG_HITBOX_WAS_SET                     (1 << 30) // 0x40000000
 
 /* oHeldState */
-#define HELD_FREE                                   0x00
-#define HELD_HELD                                   0x01
-#define HELD_THROWN                                 0x02
-#define HELD_DROPPED                                0x03
+enum HeldState {
+    HELD_FREE,
+    HELD_HELD,
+    HELD_THROWN,
+    HELD_DROPPED
+};
 
 /* oDialogState */
-#define DIALOG_STATUS_ENABLE_TIME_STOP              0x00
-#define DIALOG_STATUS_INTERRUPT                     0x01
-#define DIALOG_STATUS_START_DIALOG                  0x02
-#define DIALOG_STATUS_STOP_DIALOG                   0x03
-#define DIALOG_STATUS_DISABLE_TIME_STOP             0x04
+enum DialogState {
+    DIALOG_STATUS_ENABLE_TIME_STOP,
+    DIALOG_STATUS_INTERRUPT,
+    DIALOG_STATUS_START_DIALOG,
+    DIALOG_STATUS_STOP_DIALOG,
+    DIALOG_STATUS_DISABLE_TIME_STOP
+};
 
-#define DIALOG_FLAG_NONE                            (0 << 0) // 0x00
-#define DIALOG_FLAG_TURN_TO_MARIO                   (1 << 0) // 0x01 // cutscene only
-#define DIALOG_FLAG_TEXT_DEFAULT                    (1 << 1) // 0x02
-#define DIALOG_FLAG_TEXT_RESPONSE                   (1 << 2) // 0x04 // non-cutscene only
-#define DIALOG_FLAG_UNK_CAPSWITCH                   (1 << 3) // 0x08 // not defined
-#define DIALOG_FLAG_TIME_STOP_ENABLED               (1 << 4) // 0x10
+#define DIALOG_FLAG_NONE                            (0 <<  0) // 0x00
+#define DIALOG_FLAG_TURN_TO_MARIO                   (1 <<  0) // 0x01 // cutscene only
+#define DIALOG_FLAG_TEXT_DEFAULT                    (1 <<  1) // 0x02
+#define DIALOG_FLAG_TEXT_RESPONSE                   (1 <<  2) // 0x04 // non-cutscene only
+#define DIALOG_FLAG_UNK_CAPSWITCH                   (1 <<  3) // 0x08 // not defined
+#define DIALOG_FLAG_TIME_STOP_ENABLED               (1 <<  4) // 0x10
 
 /* oMoveFlags */
 #define OBJ_MOVE_LANDED                             (1 <<  0) // 0x0001
@@ -138,22 +144,29 @@
 /* oAnimState */
 #define OBJ_ANIM_STATE_INIT_ANIM                           -0x1
 #define OBJ_ANIM_STATE_DEFAULT                              0x0
-    /* cur_obj_update_blinking */
-#define OBJ_BLINKING_ANIM_STATE_EYES_OPEN                   0x0
-#define OBJ_BLINKING_ANIM_STATE_EYES_CLOSED                 0x1
+
+/* cur_obj_update_blinking */
+enum AnimStateBlinking {
+    OBJ_BLINKING_ANIM_STATE_EYES_OPEN,
+    OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
+};
+
+/* geo_update_layer_transparency */
+enum AnimStateLayerTransparency {
+    TRANSPARENCY_ANIM_STATE_OPAQUE,
+    TRANSPARENCY_ANIM_STATE_TRANSPARENT
+};
 
 /* Animations */
 #define OBJ_ANIM_NONE                                      -0x1
 
 /* gTTCSpeedSetting */
-#define TTC_SPEED_SLOW                                      0x0
-#define TTC_SPEED_FAST                                      0x1
-#define TTC_SPEED_RANDOM                                    0x2
-#define TTC_SPEED_STOPPED                                   0x3
-
-/* geo_update_layer_transparency */
-#define TRANSPARENCY_ANIM_STATE_OPAQUE                      0x0
-#define TRANSPARENCY_ANIM_STATE_TRANSPARENT                 0x1
+enum TTCSpeedSetting {
+    TTC_SPEED_SLOW,
+    TTC_SPEED_FAST,
+    TTC_SPEED_RANDOM,
+    TTC_SPEED_STOPPED
+};
 
 /* Orange Number */
     /* oBehParams2ndByte, oAnimState */

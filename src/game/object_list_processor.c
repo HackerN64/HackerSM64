@@ -361,7 +361,7 @@ s32 update_objects_in_list(struct ObjectNode *objList) {
 /**
  * Unload any objects in the list that have been deactivated.
  */
-s32 unload_deactivated_objects_in_list(struct ObjectNode *objList) {
+void unload_deactivated_objects_in_list(struct ObjectNode *objList) {
     struct ObjectNode *obj = objList->next;
 
     while (objList != obj) {
@@ -374,8 +374,7 @@ s32 unload_deactivated_objects_in_list(struct ObjectNode *objList) {
             if (gCurrentObject->oLightID != 0xFFFF)
                 obj_disable_light(gCurrentObject);
 #endif
-            // Prevent object from respawning after exiting and re-entering the
-            // area
+            // Prevent object from respawning after exiting and re-entering the area
             if (!(gCurrentObject->oFlags & OBJ_FLAG_PERSISTENT_RESPAWN)) {
                 set_object_respawn_info_bits(gCurrentObject, RESPAWN_INFO_DONT_RESPAWN);
             }
@@ -383,8 +382,6 @@ s32 unload_deactivated_objects_in_list(struct ObjectNode *objList) {
             unload_object(gCurrentObject);
         }
     }
-
-    return 0;
 }
 
 /**
@@ -399,14 +396,14 @@ void set_object_respawn_info_bits(struct Object *obj, u8 bits) {
     u16 *info16;
 
     switch (obj->respawnInfoType) {
-        case RESPAWN_INFO_TYPE_32:
+        case RESPAWN_INFO_TYPE_NORMAL:
             info32 = (u32 *) obj->respawnInfo;
-            *info32 |= bits << 8;
+            *info32 |= (bits << 8);
             break;
 
-        case RESPAWN_INFO_TYPE_16:
+        case RESPAWN_INFO_TYPE_MACRO_OBJECT:
             info16 = (u16 *) obj->respawnInfo;
-            *info16 |= bits << 8;
+            *info16 |= (bits << 8);
             break;
     }
 }
@@ -422,7 +419,7 @@ void unload_objects_from_area(s32 areaIndex) {
     gObjectLists = gObjectListArray;
 
     for (i = 0; i < NUM_OBJ_LISTS; i++) {
-        list = gObjectLists + i;
+        list = (gObjectLists + i);
         node = list->next;
 
         while (node != list) {
@@ -449,32 +446,29 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
     clear_mario_platform();
 
     if (gCurrAreaIndex == 2) {
-        gCCMEnteredSlide |= 1;
+        gCCMEnteredSlide = TRUE;
     }
 
     while (spawnInfo != NULL) {
-        struct Object *object;
-        const BehaviorScript *script;
-
-        script = segmented_to_virtual(spawnInfo->behaviorScript);
+        const BehaviorScript *script = segmented_to_virtual(spawnInfo->behaviorScript);
 
         // If the object was previously killed/collected, don't respawn it
         if ((spawnInfo->behaviorArg & (RESPAWN_INFO_DONT_RESPAWN << 8))
             != (RESPAWN_INFO_DONT_RESPAWN << 8)) {
-            object = create_object(script);
+            struct Object *object = create_object(script);
 
             // Behavior parameters are often treated as four separate bytes, but
             // are stored as an s32.
             object->oBehParams = spawnInfo->behaviorArg;
             // The second byte of the behavior parameters is copied over to a special field
             // as it is the most frequently used by objects.
-            object->oBehParams2ndByte = ((spawnInfo->behaviorArg) >> 16) & 0xFF;
+            object->oBehParams2ndByte = (((spawnInfo->behaviorArg) >> 16) & 0xFF);
 
             object->behavior = script;
             object->unused1 = 0;
 
             // Record death/collection in the SpawnInfo
-            object->respawnInfoType = RESPAWN_INFO_TYPE_32;
+            object->respawnInfoType = RESPAWN_INFO_TYPE_NORMAL;
             object->respawnInfo = &spawnInfo->behaviorArg;
 
             if (object->behavior == segmented_to_virtual(bhvMario)) {
@@ -568,19 +562,10 @@ void unload_deactivated_objects(void) {
  * Unused profiling function.
  */
 UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
-    u16 time;
-    f64 cycles;
-
-    cycles = cycleCounts[index] - cycleCounts[index - 1];
-    if (cycles < 0) {
-        cycles = 0;
-    }
-
-    time = (u16)(((u64) cycles * 1000000 / osClockRate) / 16667.0 * 1000.0);
-    if (time > 999) {
-        time = 999;
-    }
-
+    f64 cycles = (cycleCounts[index] - cycleCounts[index - 1]);
+    if (cycles < 0) cycles = 0;
+    u16 time = (u16)(((u64) cycles * 1000000 / osClockRate) / 16667.0 * 1000.0);
+    if (time > 999) time = 999;
     return time;
 }
 
