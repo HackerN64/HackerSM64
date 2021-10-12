@@ -483,6 +483,7 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
 }
 
 s32 act_reading_sign(struct MarioState *m) {
+    if (m->pos[1] < (m->floorHeight + m->usedObj->hitboxHeight)) m->pos[1] = m->floorHeight; // Fixes sign on slopes
     struct Object *marioObj = m->marioObj;
 
     play_sound_if_no_flag(m, SOUND_ACTION_READ_SIGN, MARIO_ACTION_SOUND_PLAYED);

@@ -1731,7 +1731,7 @@ u32 common_landing_action(struct MarioState *m, s16 animation, u32 airAction) {
     play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING);
 
     if (m->floor->type >= SURFACE_SHALLOW_QUICKSAND && m->floor->type <= SURFACE_MOVING_QUICKSAND) {
-        m->quicksandDepth += (4 - m->actionTimer) * 3.5f - 0.5f;
+        m->quicksandDepth += (((4 - m->actionTimer) * 3.5f) - 0.5f);
     }
 
     return stepResult;
