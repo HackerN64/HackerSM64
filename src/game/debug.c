@@ -147,17 +147,13 @@ void print_debug_top_down_normal(const char *str, s32 number) {
 
 void print_mapinfo(void) {
     struct Surface *pfloor;
-    f32 bgY;
-    f32 water;
-    s32 area;
-    s32 angY;
 
-    angY = gCurrentObject->oMoveAngleYaw / 182.044000;
-    area = ((s32) gCurrentObject->oPosX + 0x2000) / 1024
-           + ((s32) gCurrentObject->oPosZ + 0x2000) / 1024 * 16;
+    s32 angY = gCurrentObject->oMoveAngleYaw / 182.044000;
+    s32 area = ((s32) gCurrentObject->oPosX + 0x2000) / 1024
+             + ((s32) gCurrentObject->oPosZ + 0x2000) / 1024 * 16;
 
-    bgY = find_floor(gCurrentObject->oPosX, gCurrentObject->oPosY, gCurrentObject->oPosZ, &pfloor);
-    water = find_water_level(gCurrentObject->oPosX, gCurrentObject->oPosZ);
+    f32 bgY   = find_floor(gCurrentObject->oPosX, gCurrentObject->oPosY, gCurrentObject->oPosZ, &pfloor);
+    f32 water = find_water_level(gCurrentObject->oPosX, gCurrentObject->oPosZ);
 
     print_debug_top_down_normal("mapinfo", 0);
     print_debug_top_down_mapinfo("area %x", area);
@@ -167,8 +163,7 @@ void print_mapinfo(void) {
     print_debug_top_down_mapinfo("bgY  %d", bgY);
     print_debug_top_down_mapinfo("angY %d", angY);
 
-    if (pfloor) // not null
-    {
+    if (pfloor) { // not null
         print_debug_top_down_mapinfo("bgcode   %d", pfloor->type);
         print_debug_top_down_mapinfo("bgstatus %d", pfloor->flags);
         print_debug_top_down_mapinfo("bgarea   %d", pfloor->room);

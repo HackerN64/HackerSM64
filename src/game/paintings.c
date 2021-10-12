@@ -250,7 +250,7 @@ f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
             return painting_mario_z(painting); // floor paintings use X and Z
             break;
         case MIDDLE_Y:
-            return painting->size / 2.0; // some concentric ripples don't care about Mario
+            return (painting->size / 2.0f); // some concentric ripples don't care about Mario
             break;
     }
     return 0.0f;
@@ -260,9 +260,9 @@ f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
  * Return the quarter of the painting that is closest to the floor Mario entered.
  */
 f32 painting_nearest_4th(struct Painting *painting) {
-    f32 firstQuarter  = painting->size / 4.0f;        // 1/4 of the way across the painting
-    f32 secondQuarter = painting->size / 2.0f;        // 1/2 of the way across the painting
-    f32 thirdQuarter  = painting->size * 3.0f / 4.0f; // 3/4 of the way across the painting
+    f32 firstQuarter  = (painting->size / 4.0f);        // 1/4 of the way across the painting
+    f32 secondQuarter = (painting->size / 2.0f);        // 1/2 of the way across the painting
+    f32 thirdQuarter  = (painting->size * 3.0f / 4.0f); // 3/4 of the way across the painting
 
     if (painting->floorEntered & RIPPLE_LEFT) {
         return firstQuarter;
@@ -307,7 +307,7 @@ f32 painting_ripple_x(struct Painting *painting, s8 xSource) {
             return painting_mario_x(painting);
             break;
         case MIDDLE_X: // concentric rippling may not care about Mario
-            return painting->size / 2.0f;
+            return (painting->size / 2.0f);
             break;
     }
     return 0.0f;
