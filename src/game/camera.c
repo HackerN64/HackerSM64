@@ -9498,8 +9498,10 @@ struct Cutscene sCutsceneDoorPush[] = {
  * Cutscene that plays when Mario pulls open a door that has some special mode requirement on the other side.
  */
 struct Cutscene sCutsceneDoorPullMode[] = {
+#ifndef CAMERA_FIX
     { cutscene_door_start, 1 },
     { cutscene_door_fix_cam, 30 },
+#endif
     { cutscene_door_mode, CUTSCENE_LOOP }
 };
 
@@ -9508,8 +9510,10 @@ struct Cutscene sCutsceneDoorPullMode[] = {
  * side.
  */
 struct Cutscene sCutsceneDoorPushMode[] = {
+#ifndef CAMERA_FIX
     { cutscene_door_start, 1 },
     { cutscene_door_fix_cam, 20 },
+#endif
     { cutscene_door_mode, CUTSCENE_LOOP }
 };
 
@@ -9726,7 +9730,9 @@ struct Cutscene sCutsceneCapSwitchPress[] = {
  * Cutscene that plays when Mario opens a sliding star door.
  */
 struct Cutscene sCutsceneSlidingDoorsOpen[] = {
+#ifndef CAMERA_FIX
     { cutscene_sliding_doors_open, 50 },
+#endif
     { cutscene_double_doors_end, 0 }
 };
 
