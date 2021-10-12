@@ -20,9 +20,7 @@ s32 sMontyMoleKillStreak;
  * The position of the last killed monty mole, used for determining whether
  * the next killed monty mole is nearby.
  */
-f32 sMontyMoleLastKilledPosX;
-f32 sMontyMoleLastKilledPosY;
-f32 sMontyMoleLastKilledPosZ;
+Vec3f sMontyMoleLastKilledPos;
 
 /**
  * Link all objects with the given behavior using parentObj.
@@ -368,14 +366,13 @@ void bhv_monty_mole_update(void) {
     // Spawn a 1-up if you kill 8 monty moles
     if (obj_check_attacks(&sMontyMoleHitbox, o->oAction)) {
         if (sMontyMoleKillStreak != 0) {
-            f32 dx = o->oPosX - sMontyMoleLastKilledPosX;
-            f32 dy = o->oPosY - sMontyMoleLastKilledPosY;
-            f32 dz = o->oPosZ - sMontyMoleLastKilledPosZ;
+            Vec3f d;
+            vec3_diff(d, &o->oPosVec, sMontyMoleLastKilledPos);
 
             //! The two farthest holes on the bottom level of TTM are more than
             //  1500 units away from each other, so the counter resets if you
             //  attack moles in these holes consecutively.
-            if ((sqr(dx) + sqr(dy) + sqr(dz)) < sqr(1500.0f)) {
+            if (vec3_sumsq(d) < sqr(1500.0f)) {
                 if (sMontyMoleKillStreak == 7) {
                     play_puzzle_jingle();
                     spawn_object(o, MODEL_1UP, bhv1upWalking);
@@ -389,9 +386,7 @@ void bhv_monty_mole_update(void) {
             sMontyMoleKillStreak++;
         }
 
-        sMontyMoleLastKilledPosX = o->oPosX;
-        sMontyMoleLastKilledPosY = o->oPosY;
-        sMontyMoleLastKilledPosZ = o->oPosZ;
+        vec3f_copy(sMontyMoleLastKilledPos, &o->oPosVec);
 
         monty_mole_hide_in_hole();
 

@@ -56,21 +56,6 @@ enum ObjPositionOperation
     POS_OP_RESTORE_POSITION
 };
 
-/* BSS (declared to force order) */
-extern s32 sNumActiveFirePiranhaPlants;
-extern s32 sNumKilledFirePiranhaPlants;
-extern struct Object *sMontyMoleHoleList;
-extern s32 sMontyMoleKillStreak;
-extern f32 sMontyMoleLastKilledPosX;
-extern f32 sMontyMoleLastKilledPosY;
-extern f32 sMontyMoleLastKilledPosZ;
-extern struct Object *sMasterTreadmill;
-
-/**
- * The treadmill that plays sounds and controls the others on random setting.
- */
-struct Object *sMasterTreadmill;
-
 Vec3f sObjSavedPos;
 
 void wiggler_jumped_on_attack_handler(void);
@@ -104,8 +89,8 @@ static s32 obj_update_race_proposition_dialog(s16 dialogID) {
 }
 
 static void obj_set_dist_from_home(f32 distFromHome) {
-    o->oPosX = o->oHomeX + distFromHome * coss(o->oMoveAngleYaw);
-    o->oPosZ = o->oHomeZ + distFromHome * sins(o->oMoveAngleYaw);
+    o->oPosX = (o->oHomeX + (distFromHome * coss(o->oMoveAngleYaw)));
+    o->oPosZ = (o->oHomeZ + (distFromHome * sins(o->oMoveAngleYaw)));
 }
 
 static s32 obj_is_near_to_and_facing_mario(f32 maxDist, s16 maxAngleDiff) {
@@ -373,8 +358,7 @@ static s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero
     return FALSE;
 }
 
-static void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange,
-                                s16 blinkLength) {
+static void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange, s16 blinkLength) {
     if (*blinkTimer != 0) {
         *blinkTimer -= 1;
     } else {
