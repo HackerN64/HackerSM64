@@ -667,32 +667,34 @@ void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
     if (m->forwardVel > 6.0f) {
         mario_set_forward_vel(m, 6.0f);
     }
+    
+    if (m->forwardVel > 0.0f) {
+        if (m->wall != NULL) {
+            wallAngle  = m->wallYaw;
+            dWallAngle = (wallAngle - m->faceAngle[1]);
+        }
 
-    if (m->wall != NULL) {
-        wallAngle  = m->wallYaw;
-        dWallAngle = (wallAngle - m->faceAngle[1]);
-    }
-
-    if ((m->wall == NULL) || (dWallAngle <= -0x71C8) || (dWallAngle >= 0x71C8)) {
-        m->flags |= MARIO_PUSHING;
-        set_mario_animation(m, MARIO_ANIM_PUSHING);
-        play_step_sound(m, 6, 18);
-    } else {
-        if (dWallAngle < 0) {
-            set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_RIGHT, animSpeed);
+        if ((m->wall == NULL) || (dWallAngle <= -0x71C8) || (dWallAngle >= 0x71C8)) {
+            m->flags |= MARIO_PUSHING;
+            set_mario_animation(m, MARIO_ANIM_PUSHING);
+            play_step_sound(m, 6, 18);
         } else {
-            set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_LEFT, animSpeed);
-        }
+            if (dWallAngle < 0) {
+                set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_RIGHT, animSpeed);
+            } else {
+                set_mario_anim_with_accel(m, MARIO_ANIM_SIDESTEP_LEFT, animSpeed);
+            }
 
-        if (m->marioObj->header.gfx.animInfo.animFrame < 20) {
-            play_sound(SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend, m->marioObj->header.gfx.cameraToObject);
-            m->particleFlags |= PARTICLE_DUST;
-        }
+            if (m->marioObj->header.gfx.animInfo.animFrame < 20) {
+                play_sound(SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend, m->marioObj->header.gfx.cameraToObject);
+                m->particleFlags |= PARTICLE_DUST;
+            }
 
-        m->actionState = ACT_STATE_PUSH_OR_SIDLE_WALL_SIDLING;
-        m->actionArg                     = (wallAngle + 0x8000);
-        m->marioObj->header.gfx.angle[1] = (wallAngle + 0x8000);
-        m->marioObj->header.gfx.angle[2] = find_floor_slope(m, 0x4000);
+            m->actionState = ACT_STATE_PUSH_OR_SIDLE_WALL_SIDLING;
+            m->actionArg                     = (wallAngle + 0x8000);
+            m->marioObj->header.gfx.angle[1] = (wallAngle + 0x8000);
+            m->marioObj->header.gfx.angle[2] = find_floor_slope(m, 0x4000);
+        }
     }
 }
 
@@ -702,26 +704,13 @@ void tilt_body_walking(struct MarioState *m, s16 startYaw) {
     s16 animID = m->marioObj->header.gfx.animInfo.animID;
 
     if (animID == MARIO_ANIM_WALKING || animID == MARIO_ANIM_RUNNING) {
-        s16 dYaw = m->faceAngle[1] - startYaw;
+        s16 dYaw = (m->faceAngle[1] - startYaw);
         //! (Speed Crash) These casts can cause a crash if (dYaw * forwardVel / 12) or
         //! (forwardVel * 170) exceed or equal 2^31.
         s16 nextBodyRoll = -(s16)(dYaw * m->forwardVel / 12.0f);
         s16 nextBodyPitch = (s16)(m->forwardVel * 170.0f);
-
-        if (nextBodyRoll > 0x1555) {
-            nextBodyRoll = 0x1555;
-        }
-        if (nextBodyRoll < -0x1555) {
-            nextBodyRoll = -0x1555;
-        }
-
-        if (nextBodyPitch > 0x1555) {
-            nextBodyPitch = 0x1555;
-        }
-        if (nextBodyPitch < 0) {
-            nextBodyPitch = 0;
-        }
-
+        nextBodyRoll  = CLAMP(nextBodyRoll, -0x1555, 0x1555);
+        nextBodyPitch = CLAMP(nextBodyPitch,      0, 0x1555);
         marioBodyState->torsoAngle[2] = approach_s32(marioBodyState->torsoAngle[2], nextBodyRoll,  0x400, 0x400);
         marioBodyState->torsoAngle[0] = approach_s32(marioBodyState->torsoAngle[0], nextBodyPitch, 0x400, 0x400);
     } else {
@@ -739,21 +728,8 @@ void tilt_body_ground_shell(struct MarioState *m, s16 startYaw) {
     //! while on a Koopa Shell making this less of an issue.
     s16 nextBodyRoll = -(s16)(dYaw * m->forwardVel / 12.0f);
     s16 nextBodyPitch = (s16)(m->forwardVel * 170.0f);
-
-    if (nextBodyRoll > 0x1800) {
-        nextBodyRoll = 0x1800;
-    }
-    if (nextBodyRoll < -0x1800) {
-        nextBodyRoll = -0x1800;
-    }
-
-    if (nextBodyPitch > 0x1000) {
-        nextBodyPitch = 0x1000;
-    }
-    if (nextBodyPitch < 0) {
-        nextBodyPitch = 0;
-    }
-
+    nextBodyRoll  = CLAMP(nextBodyRoll, -0x1800, 0x1800);
+    nextBodyPitch = CLAMP(nextBodyPitch,      0, 0x1000);
     marioBodyState->torsoAngle[2] = approach_s32(marioBodyState->torsoAngle[2], nextBodyRoll, 0x200, 0x200);
     marioBodyState->torsoAngle[0] = approach_s32(marioBodyState->torsoAngle[0], nextBodyPitch, 0x200, 0x200);
     marioBodyState->headAngle[2] = -marioBodyState->torsoAngle[2];
