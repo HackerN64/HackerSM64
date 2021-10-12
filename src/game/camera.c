@@ -9378,6 +9378,9 @@ void cutscene_door_end(struct Camera *c) {
  */
 void cutscene_door_mode(struct Camera *c) {
     reset_pan_distance(c);
+#ifdef CAMERA_FIX
+    c->mode = c->defMode;
+#else
     camera_course_processing(c);
 
     if (c->mode == CAMERA_MODE_FIXED) {
@@ -9386,6 +9389,7 @@ void cutscene_door_mode(struct Camera *c) {
     if (c->mode == CAMERA_MODE_PARALLEL_TRACKING) {
         c->nextYaw = update_parallel_tracking_camera(c, c->focus, c->pos);
     }
+#endif
 
     c->yaw = c->nextYaw;
 
@@ -9468,10 +9472,12 @@ struct Cutscene sCutsceneCredits[] = {
  * Cutscene that plays when Mario pulls open a door.
  */
 struct Cutscene sCutsceneDoorPull[] = {
+#ifndef CAMERA_FIX
     { cutscene_door_start, 1 },
     { cutscene_door_fix_cam, 30 },
     { cutscene_door_move_behind_mario, 1 },
     { cutscene_door_follow_mario, 50 },
+#endif
     { cutscene_door_end, 0 }
 };
 
@@ -9479,16 +9485,17 @@ struct Cutscene sCutsceneDoorPull[] = {
  * Cutscene that plays when Mario pushes open a door.
  */
 struct Cutscene sCutsceneDoorPush[] = {
+#ifndef CAMERA_FIX
     { cutscene_door_start, 1 },
     { cutscene_door_fix_cam, 20 },
     { cutscene_door_move_behind_mario, 1 },
     { cutscene_door_follow_mario, 50 },
+#endif
     { cutscene_door_end, 0 }
 };
 
 /**
- * Cutscene that plays when Mario pulls open a door that has some special mode requirement on the other
- * side.
+ * Cutscene that plays when Mario pulls open a door that has some special mode requirement on the other side.
  */
 struct Cutscene sCutsceneDoorPullMode[] = {
     { cutscene_door_start, 1 },
