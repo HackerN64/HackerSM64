@@ -59,11 +59,11 @@ s32 benchmarkTimer = 0;
 s32 benchmarkProgramTimer = 0;
 s8  benchmarkType = 0;
 // General
-u32 cpuTime = 0;
-u32 rspTime = 0;
-u32 rdpTime = 0;
-u32 ramTime = 0;
-u32 loadTime = 0;
+u32     cpuTime = 0;
+u32     rspTime = 0;
+u32     rdpTime = 0;
+u32     ramTime = 0;
+u32    loadTime = 0;
 u32 gLastOSTime = 0;
 u32 rspDelta = 0;
 s32       benchMark[NUM_BENCH_ITERATIONS + 2];
@@ -89,17 +89,17 @@ u32      tmemTime[NUM_PERF_ITERATIONS + 1];
 u32       busTime[NUM_PERF_ITERATIONS + 1];
 // RAM
 s8  ramViewer = FALSE;
-s32 ramsizeSegment[33] = { 0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0,
-                           0, 0, 0 };
+s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = { 0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0,
+                                             0, 0, 0 };
 s32 audioPool[12];
 s32 mempool;
 
@@ -168,7 +168,7 @@ void puppyprint_profiler_finished(void) {
 }
 
 // RGB colour lookup table for colouring all the funny ram prints.
-ColorRGB colourChart[33] = {
+ColorRGB colourChart[NUM_TLB_SEGMENTS + 1] = {
     { 255,   0,   0 },
     {   0,   0, 255 },
     {   0, 255,   0 },
@@ -213,7 +213,7 @@ void print_ram_bar(void) {
 
     prepare_blank_box();
 
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
         if (ramsizeSegment[i] == 0) {
             continue;
         }
@@ -245,7 +245,7 @@ const char ramNames[9][32] = {
     "Audio Pools",
 };
 
-s8 nameTable = (sizeof(ramNames) / 32);
+s8 nameTable = (sizeof(ramNames) / NUM_TLB_SEGMENTS);
 
 void print_ram_overview(void) {
     s32 i = 0;
@@ -309,7 +309,7 @@ void print_which_benchmark(void) {
     char textBytes[40];
 
     prepare_blank_box();
-    render_blank_box((SCREEN_WIDTH / 2) - 50, 115, (SCREEN_WIDTH / 2) + 50, 160, 0, 0, 0, 255);
+    render_blank_box(((SCREEN_WIDTH / 2) - 50), 115, (SCREEN_WIDTH / 2) + 50, 160, 0, 0, 0, 255);
     finish_blank_box();
     sprintf(textBytes, "Select Option#%s#L: Confirm", benchNames[benchOption]);
     print_small_text((SCREEN_WIDTH / 2), 120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
@@ -335,14 +335,14 @@ void append_puppyprint_log(const char *str, ...) {
 #ifdef UNF
     osSyncPrintf(textBytes);
 #endif
-    for (i = 0; i < LOG_BUFFER_SIZE-1; i++) {
+    for (i = 0; i < (LOG_BUFFER_SIZE - 1); i++) {
         memcpy(consoleLogTable[i], consoleLogTable[i + 1], 255);
     }
     memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, 255);
     va_end(arguments);
 }
 
-#define LINE_HEIGHT 8 + ((LOG_BUFFER_SIZE - 1) * 12)
+#define LINE_HEIGHT (8 + ((LOG_BUFFER_SIZE - 1) * 12))
 void print_console_log(void) {
     s32 i;
     prepare_blank_box();
@@ -352,7 +352,7 @@ void print_console_log(void) {
         if (consoleLogTable[i] == NULL) {
             continue;
         }
-        print_small_text(16, (LINE_HEIGHT) - (i * 12), consoleLogTable[i], PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+        print_small_text(16, (LINE_HEIGHT - (i * 12)), consoleLogTable[i], PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
     }
 }
 #undef LINE_HEIGHT
@@ -383,8 +383,8 @@ void puppyprint_render_profiler(void) {
     s32 prevGraph;
     u32 i;
     s32 viewedNums;
-    OSTime cpuCount = CYCLE_CONV(cpuTime+audioTime[NUM_PERF_ITERATIONS] + dmaAudioTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS]
-                                        + taskTime[NUM_PERF_ITERATIONS] - profilerTime[NUM_PERF_ITERATIONS] - profilerTime2[NUM_PERF_ITERATIONS]);
+    OSTime cpuCount = CYCLE_CONV(cpuTime + audioTime[NUM_PERF_ITERATIONS] + dmaAudioTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS]
+                                         +  taskTime[NUM_PERF_ITERATIONS] - profilerTime[NUM_PERF_ITERATIONS] - profilerTime2[NUM_PERF_ITERATIONS]);
     OSTime first = osGetTime();
     char textBytes[80];
 
@@ -397,7 +397,7 @@ void puppyprint_render_profiler(void) {
     print_small_text((SCREEN_WIDTH/2), SCREEN_HEIGHT-16, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
 
     if (!ramViewer && !benchViewer && !logViewer) {
-        print_fps(16,40);
+        print_fps(16, 40);
         sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)(cpuCount / 333), (s32)CYCLE_CONV(rspTime), (s32)CYCLE_CONV(rspTime) / 333, (s32)CYCLE_CONV(rdpTime), (s32)CYCLE_CONV(rdpTime) / 333);
         print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
@@ -425,7 +425,7 @@ void puppyprint_render_profiler(void) {
             finish_blank_box();
         }
 
-        //Just to keep screen estate a little friendlier.
+        // Just to keep screen estate a little friendlier.
 #define MX NUM_PERF_ITERATIONS
         for (i = 0; i < CPU_TABLE_MAX; i++) {
             perfPercentage[i] = MAX((cpu_ordering_table[i].time[MX] / ADDTIMES), 0);
@@ -519,8 +519,8 @@ void puppyprint_profiler_process(void) {
 
         rdpTime = bufferTime[NUM_PERF_ITERATIONS];
         rdpTime = MAX(rdpTime, tmemTime[NUM_PERF_ITERATIONS]);
-        rdpTime = MAX(rdpTime, busTime[NUM_PERF_ITERATIONS]);
-#if BBPLAYER == 1 //iQue RDP registers need to be halved to be correct.
+        rdpTime = MAX(rdpTime,  busTime[NUM_PERF_ITERATIONS]);
+#if BBPLAYER == 1 // iQue RDP registers need to be halved to be correct.
         rdpTime /= 2;
 #endif
         cpuTime = scriptTime[NUM_PERF_ITERATIONS];
@@ -532,7 +532,7 @@ void puppyprint_profiler_process(void) {
     if (gGlobalTimer > 5) {
         IO_WRITE(DPC_STATUS_REG, DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR);
     }
-    if (fDebug) {
+    if (fDebug/* && (gMarioState->action != ACT_DEBUG_FREE_MOVE)*/) {
         if (gPlayer1Controller->buttonPressed & D_JPAD) {
             benchViewer ^= TRUE;
             ramViewer = FALSE;
@@ -540,10 +540,10 @@ void puppyprint_profiler_process(void) {
         } else if (gPlayer1Controller->buttonPressed & U_JPAD) {
             ramViewer ^= TRUE;
             benchViewer = FALSE;
-            logViewer = FALSE;
+            logViewer   = FALSE;
         } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
             logViewer ^= TRUE;
-            ramViewer = FALSE;
+            ramViewer   = FALSE;
             benchViewer = FALSE;
         }
 #ifdef VISUAL_DEBUG
@@ -563,8 +563,8 @@ void puppyprint_profiler_process(void) {
         }
         benchmark_custom();
     }
-    if (gPlayer1Controller->buttonDown & U_JPAD && gPlayer1Controller->buttonPressed & L_TRIG) {
-        ramViewer = FALSE;
+    if (gPlayer1Controller->buttonDown & (U_JPAD | L_TRIG)) {
+        ramViewer   = FALSE;
         benchViewer = FALSE;
         fDebug ^= TRUE;
     }
@@ -578,10 +578,7 @@ void puppyprint_profiler_process(void) {
 void print_set_envcolour(s32 r, s32 g, s32 b, s32 a) {
     if (r != currEnv[0] || g != currEnv[1] || b != currEnv[2] || a != currEnv[3]) {
         gDPSetEnvColor(gDisplayListHead++, (u8)r, (u8)g, (u8)b, (u8)a);
-        currEnv[0] = r;
-        currEnv[1] = g;
-        currEnv[2] = b;
-        currEnv[3] = a;
+        vec4_set(currEnv, r, g, b, a);
     }
 }
 
@@ -601,7 +598,7 @@ void finish_blank_box(void) {
 // Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
 void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a) {
     s32 cycleadd = 0;
-    if (ABS(x1 - x2) % 4 == 0 && a == 255) {
+    if (((ABS(x1 - x2) % 4) == 0) && (a == 255)) {
         gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP);
         cycleadd = 1;
@@ -615,9 +612,9 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
         cycleadd = 0;
     }
     gDPPipeSync(gDisplayListHead++);
-    gDPSetFillColor(gDisplayListHead++, GPACK_RGBA5551(r, g, b, 1) << 16 | GPACK_RGBA5551(r, g, b, 1));
+    gDPSetFillColor(gDisplayListHead++, ((GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1)));
     print_set_envcolour(r, g, b, a);
-    gDPFillRectangle(gDisplayListHead++, x1, y1, x2-cycleadd, y2-cycleadd);
+    gDPFillRectangle(gDisplayListHead++, x1, y1, (x2 - cycleadd), (y2 - cycleadd));
 }
 
 #include "level_update.h"
@@ -627,38 +624,38 @@ void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *off
     u8 **textKern = segmented_to_virtual(puppyprint_kerning_lut);
     u8 *textLen = segmented_to_virtual(textKern[font]);
     if (letter >= '0' && letter <= '9') { // Line 1
-        *textX = (letter - '0') * 4;
+        *textX = ((letter - '0') * 4);
         *textY = 0;
-        *spaceX = textLen[letter - '0'];
+        *spaceX = textLen[(letter - '0') +  0];
     } else if (letter >= 'A' && letter <= 'P') { // Line 2
         *textX = ((letter - 'A') * 4);
         *textY = 6;
-        *spaceX = textLen[letter - 'A' + 16];
+        *spaceX = textLen[(letter - 'A') + 16];
     } else if (letter >= 'Q' && letter <= 'Z') { // Line 3
         *textX = ((letter - 'Q') * 4);
         *textY = 12;
-        *spaceX = textLen[letter - 'Q' + 32];
+        *spaceX = textLen[(letter - 'Q') + 32];
     } else if (letter >= 'a' && letter <= 'p') { // Line 4
         *textX = ((letter - 'a') * 4);
         *textY = 18;
-        *spaceX = textLen[letter - 'a' + 48];
+        *spaceX = textLen[(letter - 'a') + 48];
     } else if (letter >= 'q' && letter <= 'z') { // Line 5
         *textX = ((letter - 'q') * 4);
         *textY = 24;
-        *spaceX = textLen[letter - 'q' + 64];
+        *spaceX = textLen[(letter - 'q') + 64];
     } else { // Space, the final frontier.
-        *textX = 128;
-        *textY = 12;
-        *spaceX = 2;
+        *textX  = 128;
+        *textY  =  12;
+        *spaceX =   2;
     }
 
     switch (letter) {
-        case '-': *textX = 40; *textY = 0; *spaceX = textLen[10]; break; // Hyphen
-        case '+': *textX = 44; *textY = 0; *spaceX = textLen[11]; break; // Plus
-        case '(': *textX = 48; *textY = 0; *spaceX = textLen[12]; break; // Open Bracket
-        case ')': *textX = 52; *textY = 0; *spaceX = textLen[13]; break; // Close Bracket
-        case '!': *textX = 56; *textY = 0; *spaceX = textLen[14]; break; // Exclamation mark
-        case '?': *textX = 60; *textY = 0; *spaceX = textLen[15]; break; // Question mark
+        case '-': *textX = 40; *textY =  0; *spaceX = textLen[10]; break; // Hyphen
+        case '+': *textX = 44; *textY =  0; *spaceX = textLen[11]; break; // Plus
+        case '(': *textX = 48; *textY =  0; *spaceX = textLen[12]; break; // Open Bracket
+        case ')': *textX = 52; *textY =  0; *spaceX = textLen[13]; break; // Close Bracket
+        case '!': *textX = 56; *textY =  0; *spaceX = textLen[14]; break; // Exclamation mark
+        case '?': *textX = 60; *textY =  0; *spaceX = textLen[15]; break; // Question mark
 
         case '"': *textX = 40; *textY = 12; *spaceX = textLen[42]; break; // Speech mark
         case'\'': *textX = 44; *textY = 12; *spaceX = textLen[43]; break; // Apostrophe
@@ -683,70 +680,70 @@ void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *off
 }
 
 s8 shakeToggle = 0;
-s8 waveToggle = 0;
+s8  waveToggle = 0;
 
 s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     s32 len = 0;
-    while (str[i+len] != '>' && i+len < (signed)strlen(str)) len++;
+    while (str[i + len] != '>' && (i + len) < (signed)strlen(str)) len++;
     len++;
 
     if (runCMD) {
-        if (strncmp(str+i, "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
+        if (strncmp((str + i), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
             s32 r, g, b, a;
             // Each value is taken from the strong. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
             r  = ((str[i +  5] - '0') * 10);
-            r +=   str[i +  6] - '0';
+            r +=  (str[i +  6] - '0');
             g  = ((str[i +  7] - '0') * 10);
-            g +=   str[i +  8] - '0';
+            g +=  (str[i +  8] - '0');
             b  = ((str[i +  9] - '0') * 10);
-            b +=   str[i + 10] - '0';
+            b +=  (str[i + 10] - '0');
             a  = ((str[i + 11] - '0') * 10);
-            a +=   str[i + 12] - '0';
+            a +=  (str[i + 12] - '0');
             // Multiply each value afterwards by 2.575f to make 255.
             print_set_envcolour((r * 2.575f), (g * 2.575f), (b * 2.575f), (a * 2.575f));
-        } else if (strncmp(str+i, "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
+        } else if (strncmp((str + i), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
             s32 r, g, b, a, r2, g2, b2, a2, spd, r3, g3, b3, a3, r4, g4, b4, a4;
             r    = ((str[i +  6] - '0') * 10);
-            r   +=   str[i +  7] - '0';
+            r   +=  (str[i +  7] - '0');
             g    = ((str[i +  8] - '0') * 10);
-            g   +=   str[i +  9] - '0';
+            g   +=  (str[i +  9] - '0');
             b    = ((str[i + 10] - '0') * 10);
-            b   +=   str[i + 11] - '0';
+            b   +=  (str[i + 11] - '0');
             a    = ((str[i + 12] - '0') * 10);
-            a   +=   str[i + 13] - '0';
+            a   +=  (str[i + 13] - '0');
             r2   = ((str[i + 15] - '0') * 10);
-            r2  +=   str[i + 16] - '0';
+            r2  +=  (str[i + 16] - '0');
             g2   = ((str[i + 17] - '0') * 10);
-            g2  +=   str[i + 18] - '0';
+            g2  +=  (str[i + 18] - '0');
             b2   = ((str[i + 19] - '0') * 10);
-            b2  +=   str[i + 20] - '0';
+            b2  +=  (str[i + 20] - '0');
             a2   = ((str[i + 21] - '0') * 10);
-            a2  +=   str[i + 22] - '0';
+            a2  +=  (str[i + 22] - '0');
             spd  = ((str[i + 24] - '0') * 10);
-            spd +=   str[i + 25] - '0';
+            spd +=  (str[i + 25] - '0');
 
             // Find the median.
-            r3 = (r + r2) * 1.2875f;
-            g3 = (g + g2) * 1.2875f;
-            b3 = (b + b2) * 1.2875f;
-            a3 = (a + a2) * 1.2875f;
+            r3 = ((r + r2) * 1.2875f);
+            g3 = ((g + g2) * 1.2875f);
+            b3 = ((b + b2) * 1.2875f);
+            a3 = ((a + a2) * 1.2875f);
             // Find the difference.
-            r4 = (r - r2) * 1.2875f;
-            g4 = (g - g2) * 1.2875f;
-            b4 = (b - b2) * 1.2875f;
-            a4 = (a - a2) * 1.2875f;
+            r4 = ((r - r2) * 1.2875f);
+            g4 = ((g - g2) * 1.2875f);
+            b4 = ((b - b2) * 1.2875f);
+            a4 = ((a - a2) * 1.2875f);
             // Now start from the median, and wave from end to end with the difference, to create the fading effect.
             print_set_envcolour(r3 + ((sins(gGlobalTimer * spd * 50)) * r4), g3 + ((sins(gGlobalTimer * spd * 50)) * g4), b3 + ((sins(gGlobalTimer * spd * 50)) * b4), a3 + ((sins(gGlobalTimer * spd * 50)) * a4));
         }
         else
-        if (strncmp(str+i, "<RAINBOW>", 8) == 0) { // Toggles the happy colours :o) Do it again to disable it.
-            s32 r = (coss(gGlobalTimer * 600) + 1) * 127;
+        if (strncmp((str + i), "<RAINBOW>", 8) == 0) { // Toggles the happy colours :o) Do it again to disable it.
+            s32 r = (coss( gGlobalTimer * 600) + 1) * 127;
             s32 g = (coss((gGlobalTimer * 600) + 21845) + 1) * 127;
             s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
             print_set_envcolour(r, g, b, 255);
-        } else if (strncmp(str + i, "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
+        } else if (strncmp((str + i), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
             shakeToggle ^= 1;
-        } else if (strncmp(str + i, "<WAVE>", 6) == 0) { // Toggles text that waves around. Do it again to disable it.
+        } else if (strncmp((str + i), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
             waveToggle ^= 1;
         }
     }
@@ -754,7 +751,7 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
 }
 
 s32 get_text_width(const char *str, s32 font) {
-    s32 i= 0;
+    s32 i = 0;
     s32 textPos = 0;
     s32 wideX = 0;
     s32 textX, textY, offsetY, spaceX;
@@ -793,9 +790,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     s32 textY = 0;
     s32 offsetY = 0;
     s32 i = 0;
-    s32 textPos[2] = {0,0};
+    s32 textPos[2] = { 0, 0 };
     s32 spaceX = 0;
-    s32 wideX[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+    s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     s32 tx = amount;
     s32 shakePos[2];
     s32 wavePos;
@@ -807,8 +804,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     shakeToggle = 0;
     waveToggle = 0;
 
-    if (amount == PRINT_ALL)
+    if (amount == PRINT_ALL) {
         tx = (signed)strlen(str);
+    }
     gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
     gDPSetTexturePersp(gDisplayListHead++, G_TP_NONE);
     gDPSetCombineMode(gDisplayListHead++, G_CC_FADEA, G_CC_FADEA);
@@ -824,7 +822,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
                 i += text_iterate_command(str, i, FALSE);
             }
             get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
-            textPos[0] += spaceX + 1;
+            textPos[0] += (spaceX + 1);
             wideX[lines] = MAX(textPos[0], wideX[lines]);
         }
         textPos[0] = -(wideX[0] / 2);
@@ -835,7 +833,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
                 textPos[0] = 0;
                 lines++;
             } else {
-                textPos[0]+=spaceX+1;
+                textPos[0] += (spaceX + 1);
             }
             if (str[i] == '<') {
                 i += text_iterate_command(str, i, FALSE);
@@ -853,9 +851,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
             i++;
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
-                textPos[0] = -(wideX[lines]);
+                textPos[0] = -(wideX[lines]    );
             } else {
-                textPos[0] = -(wideX[lines]/2);
+                textPos[0] = -(wideX[lines] / 2);
             }
             textPos[1] += 12;
         }
@@ -863,8 +861,8 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
             i += text_iterate_command(str, i, TRUE);
         }
         if (shakeToggle) {
-            shakePos[0] = -1 + (random_u16() % 2);
-            shakePos[1] = -1 + (random_u16() % 2);
+            shakePos[0] = (-1 + (random_u16() % 2));
+            shakePos[1] = (-1 + (random_u16() % 2));
         } else {
             shakePos[0] = 0;
             shakePos[1] = 0;
@@ -883,8 +881,8 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
                 gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF);
             }
         }
-        gSPScisTextureRectangle(gDisplayListHead++, (x+shakePos[0]+textPos[0]) << 2, (y+shakePos[1]+offsetY+textPos[1]+wavePos) << 2, (x+textPos[0]+shakePos[0]+8) << 2, (y+wavePos+offsetY+shakePos[1]+12+textPos[1]) << 2, G_TX_RENDERTILE, textX << 6, textY << 6, 1 << 10, 1 << 10);
-        textPos[0]+=spaceX+1;
+        gSPScisTextureRectangle(gDisplayListHead++, (x + shakePos[0] + textPos[0]) << 2, (y + shakePos[1] + offsetY + textPos[1] + wavePos) << 2, (x + textPos[0] + shakePos[0] + 8) << 2, (y + wavePos + offsetY + shakePos[1] + 12 + textPos[1]) << 2, G_TX_RENDERTILE, (textX << 6), (textY << 6), (1 << 10), (1 << 10));
+        textPos[0] += (spaceX + 1);
     }
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
@@ -900,12 +898,12 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
         gDPSetCycleType(gDisplayListHead++, mode);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP2);
         modeSC = 4;
-        mOne = 1;
+        mOne   = 1;
     } else {
         gDPSetCycleType(gDisplayListHead++, mode);
         gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         modeSC = 1;
-        mOne = 0;
+        mOne   = 0;
     }
 
 
@@ -924,7 +922,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
         }
     }
     // Find the tile height
-    imH = 64 / (imW / 32); // This gets the vertical amount.
+    imH = (64 / (imW / 32)); // This gets the vertical amount.
 
     num = 2;
     // Find the width mask
@@ -954,30 +952,30 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     }
     num = height;
     // Find the height remainder
-    peakH = height - (height % imH);
-    cycles = (width * peakH) / (imW * imH);
+    peakH = (height - (height % imH));
+    cycles = ((width * peakH) / (imW * imH));
 
     // Pass 1
     for (i = 0; i < cycles; i++) {
         posW = 0;
-        posH = (i*imH);
+        posH = (i * imH);
         while (posH >= peakH) {
             posW += imW;
             posH -= peakH;
         }
         gDPLoadSync(gDisplayListHead++);
-        gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, posW+imW-1, posH+imH-1, 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
-        gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW+imW-mOne) << 2,(y + posH + imH-mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
+        gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, posW + imW - 1, posH + imH - 1, 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
+        gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW + imW - mOne) << 2, (y + posH + imH-mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
     }
     // If there's a remainder on the vertical side, then it will cycle through that too.
     if (height-peakH != 0) {
         posW = 0;
         posH = peakH;
         for (i = 0; i < (width / imW); i++) {
-            posW = i * imW;
+            posW = (i * imW);
             gDPLoadSync(gDisplayListHead++);
-            gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, posW+imW-1, height-1, 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
-            gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW+imW-mOne) << 2,(y + posH + imH-mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
+            gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, posW + imW - 1, height-1, 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
+            gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW + imW - mOne) << 2, (y + posH + imH - mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
         }
     }
 }
