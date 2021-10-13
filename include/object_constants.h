@@ -80,7 +80,7 @@ enum DialogState {
 
 /* oMoveFlags */
 #define OBJ_MOVE_LANDED                             (1 <<  0) // 0x0001
-#define OBJ_MOVE_ON_GROUND                          (1 <<  1) // 0x0002  // mutually exclusive to OBJ_MOVE_LANDED
+#define OBJ_MOVE_ON_GROUND                          (1 <<  1) // 0x0002 // mutually exclusive to OBJ_MOVE_LANDED
 #define OBJ_MOVE_LEFT_GROUND                        (1 <<  2) // 0x0004
 #define OBJ_MOVE_ENTERED_WATER                      (1 <<  3) // 0x0008
 #define OBJ_MOVE_AT_WATER_SURFACE                   (1 <<  4) // 0x0010
@@ -93,9 +93,8 @@ enum DialogState {
 #define OBJ_MOVE_ABOVE_LAVA                         (1 << 11) // 0x0800
 #define OBJ_MOVE_LEAVING_WATER                      (1 << 12) // 0x1000
 #define OBJ_MOVE_BOUNCE                             (1 << 13) // 0x2000
-#ifndef VERSION_JP
 #define OBJ_MOVE_ABOVE_DEATH_BARRIER                (1 << 14) // 0x4000
-#endif
+#define OBJ_MOVE_UNUSED                             (1 << 15) // 0x8000
 
 #define OBJ_MOVE_MASK_ON_GROUND (OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND)
 #define OBJ_MOVE_MASK_IN_WATER (\
@@ -128,22 +127,32 @@ enum DialogState {
 #define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
 
 /* oBehParams2ndByte */
-#define OBJ_BP_NONE                                         0x0
+enum ObjGeneralBehParams {
+    OBJ_BP_NONE
+};
 
 /* oAction */
-#define OBJ_ACT_PROJECTILE_HIT_MARIO                       -0x1
+enum ObjGeneralProjectileActions {
+    OBJ_ACT_PROJECTILE_HIT_MARIO = -1
+};
 
 /* oAction */
-#define OBJ_ACT_LAVA_DEATH                                  100
-#define OBJ_ACT_DEATH_PLANE_DEATH                           101
+enum ObjGeneralDeathActions {
+    OBJ_ACT_LAVA_DEATH = 100,
+    OBJ_ACT_DEATH_PLANE_DEATH
+};
 
-#define OBJ_ACT_HORIZONTAL_KNOCKBACK                        100
-#define OBJ_ACT_VERTICAL_KNOCKBACK                          101
-#define OBJ_ACT_SQUISHED                                    102
+enum ObjGeneralKnockbackActions {
+    OBJ_ACT_HORIZONTAL_KNOCKBACK = 100,
+    OBJ_ACT_VERTICAL_KNOCKBACK,
+    OBJ_ACT_SQUISHED
+};
 
 /* oAnimState */
-#define OBJ_ANIM_STATE_INIT_ANIM                           -0x1
-#define OBJ_ANIM_STATE_DEFAULT                              0x0
+enum ObjGeneralAnimStates {
+    OBJ_ANIM_STATE_INIT_ANIM = -1,
+    OBJ_ANIM_STATE_DEFAULT   =  0
+};
 
 /* cur_obj_update_blinking */
 enum AnimStateBlinking {
@@ -158,7 +167,9 @@ enum AnimStateLayerTransparency {
 };
 
 /* Animations */
-#define OBJ_ANIM_NONE                                      -0x1
+enum ObjGeneralAnimations {
+    OBJ_ANIM_NONE = -1
+};
 
 /* gTTCSpeedSetting */
 enum TTCSpeedSetting {
@@ -169,29 +180,31 @@ enum TTCSpeedSetting {
 };
 
 /* Orange Number */
-    /* oBehParams2ndByte, oAnimState */
-    #define ORANGE_NUMBER_0                                 0x0
-    #define ORANGE_NUMBER_1                                 0x1
-    #define ORANGE_NUMBER_2                                 0x2
-    #define ORANGE_NUMBER_3                                 0x3
-    #define ORANGE_NUMBER_4                                 0x4
-    #define ORANGE_NUMBER_5                                 0x5
-    #define ORANGE_NUMBER_6                                 0x6
-    #define ORANGE_NUMBER_7                                 0x7
-    #define ORANGE_NUMBER_8                                 0x8
-    #define ORANGE_NUMBER_9                                 0x9
-    #define ORANGE_NUMBER_A                                 0xA
-    #define ORANGE_NUMBER_B                                 0xB
-    #define ORANGE_NUMBER_C                                 0xC
-    #define ORANGE_NUMBER_D                                 0xD
-    #define ORANGE_NUMBER_E                                 0xE
-    #define ORANGE_NUMBER_F                                 0xF
+enum OrangeNumbers { // oBehParams2ndByte, oAnimState
+    ORANGE_NUMBER_0,
+    ORANGE_NUMBER_1,
+    ORANGE_NUMBER_2,
+    ORANGE_NUMBER_3,
+    ORANGE_NUMBER_4,
+    ORANGE_NUMBER_5,
+    ORANGE_NUMBER_6,
+    ORANGE_NUMBER_7,
+    ORANGE_NUMBER_8,
+    ORANGE_NUMBER_9,
+    ORANGE_NUMBER_A,
+    ORANGE_NUMBER_B,
+    ORANGE_NUMBER_C,
+    ORANGE_NUMBER_D,
+    ORANGE_NUMBER_E,
+    ORANGE_NUMBER_F
+};
 
 /* Coin Type */
-    /* coinType */
-    #define COIN_TYPE_NONE                                  0x0
-    #define COIN_TYPE_YELLOW                                0x1
-    #define COIN_TYPE_BLUE                                  0x2
+enum CoinTypes { // coinType
+    COIN_TYPE_NONE,
+    COIN_TYPE_YELLOW,
+    COIN_TYPE_BLUE
+};
 
 /* Bouncing Coin */
     /* oAction */
