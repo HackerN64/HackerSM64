@@ -37,7 +37,7 @@ static inline int asm_roundf(float in) {
     return out;
 }
 
-f32 roundf(f32 x) {
+inline f32 roundf(f32 x) {
     return asm_roundf(x);
 }
 
@@ -47,7 +47,7 @@ static inline float asm_absf(float in) {
     return out;
 }
 
-f32 absf(f32 x) {
+inline f32 absf(f32 x) {
     return asm_absf(x);
 }
 
@@ -850,10 +850,8 @@ s32 approach_f32_signed(f32 *current, f32 target, f32 inc) {
  * Edits the current value directly, returns TRUE if the target has been reached, FALSE otherwise.
  */
 s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier) {
-    if (multiplier > 1.f) {
-        multiplier = 1.f;
-    }
-    *current = *current + (target - *current) * multiplier;
+    if (multiplier > 1.f) multiplier = 1.f;
+    *current = (*current + ((target - *current) * multiplier));
     return (*current != target);
 }
 
@@ -861,7 +859,7 @@ s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier) {
  * Nearly the same as the above function, returns new value instead.
  */
 f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier) {
-    current = current + (target - current) * multiplier;
+    current = (current + ((target - current) * multiplier));
     return current;
 }
 
@@ -877,7 +875,7 @@ s32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor) {
         *current = target;
     } else {
         temp -= target;
-        temp -= temp / divisor;
+        temp -= (temp / divisor);
         temp += target;
         *current = temp;
     }
@@ -895,7 +893,7 @@ s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
         current = target;
     } else {
         temp -= target;
-        temp -= temp / divisor;
+        temp -= (temp / divisor);
         temp += target;
         current = temp;
     }
@@ -904,7 +902,7 @@ s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
 
 s32 abs_angle_diff(s16 a0, s16 a1) {
     s16 diff = (a1 - a0);
-    if (diff == -0x8000) diff = -0x7FFF;
+    if (diff == -0x8000) return 0x7FFF;
     return ABSI(diff);
 }
 
