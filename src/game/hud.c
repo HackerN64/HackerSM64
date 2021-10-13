@@ -410,10 +410,10 @@ void render_hud_coins(void) {
  * Disables "X" glyph when Mario has 100 stars or more.
  */
 void render_hud_stars(void) {
-    if ((gHudFlash == 1) && (gGlobalTimer & 0x08)) return;
+    if ((gHudFlash == HUD_FLASH_STARS) && (gGlobalTimer & 0x08)) return;
     s8 showX =  (gHudDisplay.stars < 100);
     print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, "^"); // 'Star' glyph
-    if (showX) print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X) + 16, HUD_TOP_Y, "*"); // 'X' glyph
+    if (showX) print_text((GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X) + 16), HUD_TOP_Y, "*"); // 'X' glyph
     print_text_fmt_int((showX * 14) + GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X - 16),
                        HUD_TOP_Y, "%d", gHudDisplay.stars);
 }
@@ -425,7 +425,7 @@ void render_hud_stars(void) {
 void render_hud_keys(void) {
     s16 i;
     for (i = 0; i < gHudDisplay.keys; i++) {
-        print_text((i * 16) + 220, 142, "|"); // unused glyph - beta key
+        print_text(((i * 16) + 220), 142, "|"); // unused glyph - beta key
     }
 }
 
@@ -443,10 +443,10 @@ void render_hud_timer(void) {
         case LANGUAGE_GERMAN:  print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185,  "ZEIT"); break;
     }
 #endif
-    u16 timerMins = timerValFrames / (30 * 60);
-    u16 timerSecs = (timerValFrames - (timerMins * 1800)) / 30;
+    u16 timerMins = (timerValFrames / (30 * 60));
+    u16 timerSecs = ((timerValFrames - (timerMins * 1800)) / 30);
 
-    u16 timerFracSecs = ((timerValFrames - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) / 3;
+    u16 timerFracSecs = (((timerValFrames - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) / 3);
 #ifndef VERSION_EU
     print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185, "TIME");
 #endif
@@ -535,7 +535,7 @@ void render_hud(void) {
         mtx = alloc_display_list(sizeof(*mtx));
         if (mtx == NULL) return;
         create_dl_identity_matrix();
-        guOrtho(mtx, -16.0f, SCREEN_WIDTH + 16, 0, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
+        guOrtho(mtx, -16.0f, (SCREEN_WIDTH + 16), 0, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx),
                 G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);

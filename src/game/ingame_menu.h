@@ -35,17 +35,24 @@ enum MenuMode {
     MENU_MODE_UNUSED_3
 };
 
-extern s8 gDialogCourseActNum;
+enum HUDFlashModes {
+    HUD_FLASH_NONE,
+    HUD_FLASH_STARS,
+    HUD_FLASH_KEYS
+};
+
 extern s8 gHudFlash;
+
+extern s8 gDialogCourseActNum;
 extern s16 gInGameLanguage;
 
 struct DialogEntry
 {
- /*0x00*/ u32 unused;
- /*0x04*/ s8 linesPerBox;
- /*0x06*/ s16 leftOffset;
- /*0x08*/ s16 width;
- /*0x0C*/ const u8 *str;
+    /*0x00*/ u32 unused;
+    /*0x04*/ s8 linesPerBox;
+    /*0x06*/ s16 leftOffset;
+    /*0x08*/ s16 width;
+    /*0x0C*/ const u8 *str;
 };
 
 // EU only
@@ -56,41 +63,41 @@ enum HudSpecialHUDChars {
 };
 
 enum SpecialFontChars {
-    GLOBAL_CHAR_SPACE = 0x9E,
+    GLOBAL_CHAR_SPACE      = 0x9E,
     GLOBAR_CHAR_TERMINATOR = 0xFF
 };
 
 // definitions for some of the special characters defined in charmap.txt
 enum DialogSpecialChars {
 #ifdef VERSION_EU
-    DIALOG_CHAR_LOWER_A_GRAVE      = 0x60, // 'a' grave
-    DIALOG_CHAR_LOWER_A_CIRCUMFLEX = 0x61, // 'a' circumflex
-    DIALOG_CHAR_LOWER_A_UMLAUT     = 0x62, // 'a' umlaut
-    DIALOG_CHAR_UPPER_A_GRAVE      = 0x64, // 'A' grave
-    DIALOG_CHAR_UPPER_A_CIRCUMFLEX = 0x65, // 'A' circumflex
-    DIALOG_CHAR_UPPER_A_UMLAUT     = 0x66, // 'A' umlaut
-    DIALOG_CHAR_LOWER_E_GRAVE      = 0x70, // 'e' grave
-    DIALOG_CHAR_LOWER_E_CIRCUMFLEX = 0x71, // 'e' circumflex
-    DIALOG_CHAR_LOWER_E_UMLAUT     = 0x72, // 'e' umlaut
-    DIALOG_CHAR_LOWER_E_ACUTE      = 0x73, // 'e' acute
-    DIALOG_CHAR_UPPER_E_GRAVE      = 0x74, // 'E' grave
-    DIALOG_CHAR_UPPER_E_CIRCUMFLEX = 0x75, // 'E' circumflex
-    DIALOG_CHAR_UPPER_E_UMLAUT     = 0x76, // 'E' umlaut
-    DIALOG_CHAR_UPPER_E_ACUTE      = 0x77, // 'E' acute
-    DIALOG_CHAR_LOWER_U_GRAVE      = 0x80, // 'u' grave
-    DIALOG_CHAR_LOWER_U_CIRCUMFLEX = 0x81, // 'u' circumflex
-    DIALOG_CHAR_LOWER_U_UMLAUT     = 0x82, // 'u' umlaut
-    DIALOG_CHAR_UPPER_U_GRAVE      = 0x84, // 'U' grave
-    DIALOG_CHAR_UPPER_U_CIRCUMFLEX = 0x85, // 'U' circumflex
-    DIALOG_CHAR_UPPER_U_UMLAUT     = 0x86, // 'U' umlaut
-    DIALOG_CHAR_LOWER_O_CIRCUMFLEX = 0x91, // 'o' circumflex
-    DIALOG_CHAR_LOWER_O_UMLAUT     = 0x92, // 'o' umlaut
-    DIALOG_CHAR_UPPER_O_CIRCUMFLEX = 0x95, // 'O' circumflex
-    DIALOG_CHAR_UPPER_O_UMLAUT     = 0x96, // 'O' umlaut
-    DIALOG_CHAR_LOWER_I_CIRCUMFLEX = 0xA1, // 'i' circumflex
-    DIALOG_CHAR_LOWER_I_UMLAUT     = 0xA2, // 'i' umlaut
-    DIALOG_CHAR_I_NO_DIA           = 0xEB, // 'i' without diacritic
-    DIALOG_CHAR_DOUBLE_LOW_QUOTE   = 0xF0, // German opening quotation mark
+    DIALOG_CHAR_LOWER_A_GRAVE        = 0x60, // 'a' grave
+    DIALOG_CHAR_LOWER_A_CIRCUMFLEX   = 0x61, // 'a' circumflex
+    DIALOG_CHAR_LOWER_A_UMLAUT       = 0x62, // 'a' umlaut
+    DIALOG_CHAR_UPPER_A_GRAVE        = 0x64, // 'A' grave
+    DIALOG_CHAR_UPPER_A_CIRCUMFLEX   = 0x65, // 'A' circumflex
+    DIALOG_CHAR_UPPER_A_UMLAUT       = 0x66, // 'A' umlaut
+    DIALOG_CHAR_LOWER_E_GRAVE        = 0x70, // 'e' grave
+    DIALOG_CHAR_LOWER_E_CIRCUMFLEX   = 0x71, // 'e' circumflex
+    DIALOG_CHAR_LOWER_E_UMLAUT       = 0x72, // 'e' umlaut
+    DIALOG_CHAR_LOWER_E_ACUTE        = 0x73, // 'e' acute
+    DIALOG_CHAR_UPPER_E_GRAVE        = 0x74, // 'E' grave
+    DIALOG_CHAR_UPPER_E_CIRCUMFLEX   = 0x75, // 'E' circumflex
+    DIALOG_CHAR_UPPER_E_UMLAUT       = 0x76, // 'E' umlaut
+    DIALOG_CHAR_UPPER_E_ACUTE        = 0x77, // 'E' acute
+    DIALOG_CHAR_LOWER_U_GRAVE        = 0x80, // 'u' grave
+    DIALOG_CHAR_LOWER_U_CIRCUMFLEX   = 0x81, // 'u' circumflex
+    DIALOG_CHAR_LOWER_U_UMLAUT       = 0x82, // 'u' umlaut
+    DIALOG_CHAR_UPPER_U_GRAVE        = 0x84, // 'U' grave
+    DIALOG_CHAR_UPPER_U_CIRCUMFLEX   = 0x85, // 'U' circumflex
+    DIALOG_CHAR_UPPER_U_UMLAUT       = 0x86, // 'U' umlaut
+    DIALOG_CHAR_LOWER_O_CIRCUMFLEX   = 0x91, // 'o' circumflex
+    DIALOG_CHAR_LOWER_O_UMLAUT       = 0x92, // 'o' umlaut
+    DIALOG_CHAR_UPPER_O_CIRCUMFLEX   = 0x95, // 'O' circumflex
+    DIALOG_CHAR_UPPER_O_UMLAUT       = 0x96, // 'O' umlaut
+    DIALOG_CHAR_LOWER_I_CIRCUMFLEX   = 0xA1, // 'i' circumflex
+    DIALOG_CHAR_LOWER_I_UMLAUT       = 0xA2, // 'i' umlaut
+    DIALOG_CHAR_I_NO_DIA             = 0xEB, // 'i' without diacritic
+    DIALOG_CHAR_DOUBLE_LOW_QUOTE     = 0xF0, // German opening quotation mark
 #endif
 #if defined(VERSION_US) || defined(VERSION_EU)
     DIALOG_CHAR_SLASH                = 0xD0,

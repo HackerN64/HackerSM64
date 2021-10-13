@@ -23,9 +23,9 @@ void bhv_intro_peach_loop(void) {
         case PEACH_ACT_INIT:
             o->oAction = PEACH_ACT_FADE_1;
             vec3_set(&o->oFaceAngleVec, 0x400, 0x7500, -0x3700);
-            o->oIntroPeachDistToCamera   = 186.f;
+            o->oIntroPeachDistToCamera   =   186.f;
             o->oIntroPeachPitchFromFocus = -9984.f;
-            o->oIntroPeachYawFromFocus   = -768.f;
+            o->oIntroPeachYawFromFocus   =  -768.f;
             o->oOpacity = 255;
             o->header.gfx.animInfo.animFrame = 100;
             break;

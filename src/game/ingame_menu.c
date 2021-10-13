@@ -1331,13 +1331,10 @@ void do_cutscene_handler(void) {
 
 // "Dear Mario" message handler
 void print_peach_letter_message(void) {
-    void **dialogTable;
-    struct DialogEntry *dialog;
-    u8 *str;
-    dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
-    dialog = segmented_to_virtual(dialogTable[gDialogID]);
+    void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
+    struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
 
-    str = segmented_to_virtual(dialog->str);
+    u8 *str = segmented_to_virtual(dialog->str);
 
     create_dl_translation_matrix(MENU_MTX_PUSH, 97.0f, 118.0f, 0);
 
@@ -1781,7 +1778,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 s8 gCourseCompleteCoinsEqual = FALSE;
 s32 gCourseDoneMenuTimer = 0;
 s32 gCourseCompleteCoins = 0;
-s8 gHudFlash = 0;
+s8 gHudFlash = HUD_FLASH_NONE;
 
 s32 render_pause_courses_and_castle(void) {
     s16 index;
@@ -1873,14 +1870,16 @@ s32 render_pause_courses_and_castle(void) {
 #define TXT_HISCORE_Y 36
 #define TXT_CONGRATS_X 70
 
-#define HUD_PRINT_HISCORE         0
-#define HUD_PRINT_CONGRATULATIONS 1
+enum HUDCourseCompleteStringIDs {
+    HUD_PRINT_HISCORE,
+    HUD_PRINT_CONGRATULATIONS
+};
 
 void print_hud_course_complete_string(s8 str) {
     u8 textHiScore[] = { TEXT_HUD_HI_SCORE };
     u8 textCongratulations[] = { TEXT_HUD_CONGRATULATIONS };
 
-    u8 colorFade = sins(gDialogColorFadeTimer) * 50.0f + 200.0f;
+    u8 colorFade = ((sins(gDialogColorFadeTimer) * 50.0f) + 200.0f);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, colorFade, colorFade, colorFade, 255);
@@ -1935,7 +1934,7 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
 }
 
 void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
-    if (gHudDisplay.coins == gCourseCompleteCoins && (gCurrCourseStarFlags & starNum) == 0 && gHudFlash == 0) {
+    if (gHudDisplay.coins == gCourseCompleteCoins && (gCurrCourseStarFlags & starNum) == 0 && gHudFlash == HUD_FLASH_NONE) {
         play_star_fanfare();
         gHudFlash = arg;
     }
@@ -1945,31 +1944,29 @@ void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
 #define TXT_NAME_X2 69
 #define CRS_NUM_X2 104
 #define CRS_NUM_X3 102
-#define TXT_CLEAR_X1 get_string_width(name) + 81
-#define TXT_CLEAR_X2 get_string_width(name) + 79
+#define TXT_CLEAR_X1 (get_string_width(name) + 81)
+#define TXT_CLEAR_X2 (get_string_width(name) + 79)
 
 void render_course_complete_lvl_info_and_hud_str(void) {
     u8 textCourse[] = { TEXT_COURSE };
     u8 textClear[] = { TEXT_CLEAR };
     u8 textSymStar[] = { GLYPH_STAR, GLYPH_SPACE };
 
-    void **actNameTbl;
-    void **courseNameTbl;
     u8 *name;
 
     u8 strCourseNum[4];
 
-    actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
-    courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
+    void **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
+    void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
     if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) {
         print_hud_course_complete_coins(118, 103);
-        play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
+        play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, (1 << (gLastCompletedStarNum - 1)));
 
         if (gLastCompletedStarNum == 7) {
-            name = segmented_to_virtual(actNameTbl[COURSE_STAGES_MAX * 6 + 1]);
+            name = segmented_to_virtual(actNameTbl[(COURSE_STAGES_MAX * 6) + 1]);
         } else {
-            name = segmented_to_virtual(actNameTbl[(gLastCompletedCourseNum - 1) * 6 + gLastCompletedStarNum - 1]);
+            name = segmented_to_virtual(actNameTbl[(((gLastCompletedCourseNum - 1) * 6) + gLastCompletedStarNum) - 1]);
         }
 
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
@@ -1993,12 +1990,12 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
         print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
         print_hud_course_complete_coins(118, 111);
-        play_star_fanfare_and_flash_hud(2, 0); //! 2 isn't defined, originally for key hud?
+        play_star_fanfare_and_flash_hud(HUD_FLASH_KEYS, 0);
         return;
     } else {
         name = segmented_to_virtual(actNameTbl[COURSE_STAGES_MAX * 6]);
         print_hud_course_complete_coins(118, 103);
-        play_star_fanfare_and_flash_hud(1, 1 << (gLastCompletedStarNum - 1));
+        play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, (1 << (gLastCompletedStarNum - 1)));
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
@@ -2013,14 +2010,13 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-#define TXT_SAVEOPTIONS_X x + 12
+#define TXT_SAVEOPTIONS_X (x + 12)
 #define TXT_SAVECONT_Y 0
 #define TXT_SAVEQUIT_Y 20
 #define TXT_CONTNOSAVE_Y 40
 
 #define X_VAL9 x
-void render_save_confirmation(s16 x, s16 y, s8 *index, s16 sp6e)
-{
+void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     u8 textSaveAndContinue[] = { TEXT_SAVE_AND_CONTINUE };
     u8 textSaveAndQuit[] = { TEXT_SAVE_AND_QUIT };
     u8 textContinueWithoutSave[] = { TEXT_CONTINUE_WITHOUT_SAVING };
@@ -2030,13 +2026,13 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 sp6e)
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(TXT_SAVEOPTIONS_X, y + TXT_SAVECONT_Y, textSaveAndContinue);
-    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVEQUIT_Y, textSaveAndQuit);
-    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_CONTNOSAVE_Y, textContinueWithoutSave);
+    print_generic_string(TXT_SAVEOPTIONS_X, (y + TXT_SAVECONT_Y  ), textSaveAndContinue);
+    print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_SAVEQUIT_Y  ), textSaveAndQuit);
+    print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_CONTNOSAVE_Y), textContinueWithoutSave);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL9, y - ((*index - 1) * sp6e), 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL9, (y - ((*index - 1) * yPos)), 0);
 
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
@@ -2045,8 +2041,6 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 sp6e)
 }
 
 s32 render_course_complete_screen(void) {
-    s16 index;
-
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             render_course_complete_lvl_info_and_hud_str();
@@ -2073,13 +2067,12 @@ s32 render_course_complete_screen(void) {
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;
                 gMenuMode = MENU_MODE_NONE;
-                index = gDialogLineNum;
                 gCourseDoneMenuTimer = 0;
                 gCourseCompleteCoins = 0;
                 gCourseCompleteCoinsEqual = FALSE;
-                gHudFlash = 0;
+                gHudFlash = HUD_FLASH_NONE;
 
-                return index;
+                return gDialogLineNum;
             }
             break;
     }
@@ -2094,36 +2087,34 @@ s32 render_course_complete_screen(void) {
 }
 
 s32 render_menus_and_dialogs(void) {
-    s16 index = MENU_OPT_NONE;
-
     create_dl_ortho_matrix();
 
     if (gMenuMode != MENU_MODE_NONE) {
         switch (gMenuMode) {
             case MENU_MODE_UNUSED_0:
-                index = render_pause_courses_and_castle();
+                return render_pause_courses_and_castle();
                 break;
             case MENU_MODE_RENDER_PAUSE_SCREEN:
-                index = render_pause_courses_and_castle();
+                return render_pause_courses_and_castle();
                 break;
             case MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN:
-                index = render_course_complete_screen();
+                return render_course_complete_screen();
                 break;
             case MENU_MODE_UNUSED_3:
-                index = render_course_complete_screen();
+                return render_course_complete_screen();
                 break;
         }
 
-        gDialogColorFadeTimer = (s16) gDialogColorFadeTimer + 0x1000;
+        gDialogColorFadeTimer = ((s16) gDialogColorFadeTimer + 0x1000);
     } else if (gDialogID != DIALOG_NONE) {
         // The Peach "Dear Mario" message needs to be repositioned separately
         if (gDialogID == DIALOG_020) {
             print_peach_letter_message();
-            return index;
+            return MENU_OPT_NONE;
         }
 
         render_dialog_entries();
-        gDialogColorFadeTimer = (s16) gDialogColorFadeTimer + 0x1000;
+        gDialogColorFadeTimer = ((s16) gDialogColorFadeTimer + 0x1000);
     }
-    return index;
+    return MENU_OPT_NONE;
 }

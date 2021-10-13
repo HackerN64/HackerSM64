@@ -14,7 +14,7 @@ enum PowerMeterAnimation
 };
 
 #ifdef BREATH_METER
-enum AirMeterAnimation
+enum BreathMeterAnimation
 {
     BREATH_METER_HIDDEN,
     BREATH_METER_SHOWING,
