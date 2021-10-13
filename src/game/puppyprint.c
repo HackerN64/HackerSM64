@@ -40,6 +40,7 @@ a modern game engine's developer's console.
 #include "object_list_processor.h"
 #include "engine/surface_load.h"
 #include "audio/data.h"
+#include "audio/heap.h"
 #include "hud.h"
 #include "debug_box.h"
 
@@ -100,7 +101,7 @@ s32 ramsizeSegment[33] = { 0, 0, 0,
                            0, 0, 0,
                            0, 0, 0,
                            0, 0, 0 };
-s32 audioPool[12];
+s8  audioRamViewer = FALSE;
 s32 mempool;
 
 extern u8 _mainSegmentStart[];
@@ -140,9 +141,7 @@ void puppyprint_calculate_ram_usage(void) {
     // gEffectsMemoryPool is 0x4000, gObjectsMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
     ramsizeSegment[5] = 0x4000 + 0x800 + 0x4000 + 0x800;
     ramsizeSegment[6] = (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + (SURFACE_POOL_SIZE * sizeof(struct Surface));
-    ramsizeSegment[7] = gAudioHeapSize + gAudioInitPoolSize;
-    ramsizeSegment[8] = audioPool[0] + audioPool[1] + audioPool[2] + audioPool[3] + audioPool[4] + audioPool[5] +
-                        audioPool[6] + audioPool[7] + audioPool[8] + audioPool[9] + audioPool[10] + audioPool[11];
+    ramsizeSegment[7] = gAudioHeapSize;
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -233,7 +232,7 @@ void print_ram_bar(void) {
 }
 
 // Another epic lookup table, for text this time.
-const char ramNames[9][32] = {
+const char ramNames[8][32] = {
     "Buffers",
     "Main",
     "Engine",
@@ -242,7 +241,6 @@ const char ramNames[9][32] = {
     "Pools",
     "Collision",
     "Audio Heap",
-    "Audio Pools",
 };
 
 s8 nameTable = sizeof(ramNames) / 32;
@@ -265,7 +263,7 @@ void print_ram_overview(void) {
         if (ramsizeSegment[i] == 0) {
             continue;
         }
-        if (i < 9) {
+        if (i < 8) {
             sprintf(textBytes, "%s: %X", ramNames[i], ramsizeSegment[i]);
         } else {
             sprintf(textBytes, "Segment %02X: %X", i - nameTable + 2, ramsizeSegment[i]);
@@ -275,6 +273,66 @@ void print_ram_overview(void) {
         y += 12;
         drawn++;
     }
+}
+
+const char *audioPoolNames[NUM_AUDIO_POOLS] = {
+    "gAudioInitPool",
+    "gNotesAndBuffersPool",
+    "gSeqLoadedPool.persistent.pool",
+    "gSeqLoadedPool.temporary.pool",
+    "gBankLoadedPool.persistent.pool",
+    "gBankLoadedPool.temporary.pool"
+};
+
+void print_audio_ram_overview(void) {
+    char textBytes[128];
+    const s32 x = 16;
+    s32 y = 16;
+    s32 i = 0;
+    s32 percentage = 0;
+    s32 tmpY = y;
+    s32 totalMemory[2] = {0, 0};
+    s32 audioPoolSizes[NUM_AUDIO_POOLS][2];
+    prepare_blank_box();
+    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
+    finish_blank_box();
+
+    puppyprint_get_allocated_pools(audioPoolSizes[0]);
+
+    y += 24;
+    for (i = 0; i < NUM_AUDIO_POOLS; i++) {
+        if (audioPoolSizes[i][0] == 0)
+            percentage = 1000;
+        else
+            percentage = ((s64) audioPoolSizes[i][1] * 1000) / audioPoolSizes[i][0];
+
+        sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
+            audioPoolSizes[i][1], audioPoolSizes[i][0], percentage / 10, percentage % 10);
+        
+        print_set_envcolour(colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
+        print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+
+        y += 12;
+
+        totalMemory[0] += audioPoolSizes[i][0];
+        totalMemory[1] += audioPoolSizes[i][1];
+    }
+    
+    if (totalMemory[0] == 0)
+        percentage = 0;
+    else
+        percentage = ((s64) totalMemory[1] * 1000) / totalMemory[0];
+
+    if (totalMemory[0] == gAudioHeapSize) {
+        sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d_)",
+            totalMemory[1], totalMemory[0], percentage / 10, percentage % 10);
+    } else {
+        sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (Incorrect!)",
+            totalMemory[1], totalMemory[0]);
+    }
+    
+    print_set_envcolour(colourChart[30][0], colourChart[30][1], colourChart[30][2], 255);
+    print_small_text(x, tmpY, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
 void benchmark_custom(void) {
@@ -396,7 +454,7 @@ void puppyprint_render_profiler(void) {
     sprintf(textBytes, "RAM: %06X/%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available() / (f32)mempool) * 100));
     print_small_text((SCREEN_WIDTH/2), SCREEN_HEIGHT-16, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
 
-    if (!ramViewer && !benchViewer && !logViewer) {
+    if (!ramViewer && !audioRamViewer && !benchViewer && !logViewer) {
         print_fps(16,40);
         sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)(cpuCount / 333), (s32)CYCLE_CONV(rspTime), (s32)CYCLE_CONV(rspTime) / 333, (s32)CYCLE_CONV(rdpTime), (s32)CYCLE_CONV(rdpTime) / 333);
         print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
@@ -475,6 +533,8 @@ void puppyprint_render_profiler(void) {
         finish_blank_box();
     } else if (ramViewer) {
         print_ram_overview();
+    } else if (audioRamViewer) {
+        print_audio_ram_overview();
     } else if (logViewer) {
         print_console_log();
     } else if (benchViewer) {
@@ -545,18 +605,37 @@ void puppyprint_profiler_process(void) {
         if (gPlayer1Controller->buttonPressed & D_JPAD) {
             benchViewer ^= TRUE;
             ramViewer = FALSE;
+            audioRamViewer = FALSE;
             logViewer = FALSE;
         } else if (gPlayer1Controller->buttonPressed & U_JPAD) {
-            ramViewer ^= TRUE;
+            if (audioRamViewer) {
+                ramViewer = FALSE;
+            } else {
+                ramViewer ^= TRUE;
+            }
+            audioRamViewer = FALSE;
             benchViewer = FALSE;
             logViewer = FALSE;
         } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
-            logViewer ^= TRUE;
-            ramViewer = FALSE;
+            if (audioRamViewer) {
+                ramViewer = TRUE;
+                logViewer = FALSE;
+            } else {
+                logViewer ^= TRUE;
+                ramViewer = FALSE;
+            }
+            audioRamViewer = FALSE;
             benchViewer = FALSE;
+        } else if (gPlayer1Controller->buttonPressed & R_JPAD) {
+            if (ramViewer) {
+                audioRamViewer ^= TRUE;
+                logViewer = FALSE;
+                ramViewer = FALSE;
+                benchViewer = FALSE;
+            }
         }
 #ifdef VISUAL_DEBUG
-        else if (!benchViewer && !ramViewer && !logViewer) {
+        else if (!benchViewer && !ramViewer && !audioRamViewer && !logViewer) {
             debug_box_input();
         }
 #endif
@@ -574,7 +653,9 @@ void puppyprint_profiler_process(void) {
     }
     if (gPlayer1Controller->buttonDown & U_JPAD && gPlayer1Controller->buttonPressed & L_TRIG) {
         ramViewer = FALSE;
+        audioRamViewer = FALSE;
         benchViewer = FALSE;
+        logViewer = FALSE;
         fDebug ^= TRUE;
     }
 

@@ -19,6 +19,10 @@ enum Benchmark {
 #define PRINT_TEXT_ALIGN_RIGHT  2
 #define PRINT_ALL              -1
 
+#if PUPPYPRINT_DEBUG
+#define NUM_AUDIO_POOLS 6
+#endif
+
 enum PuppyFont {
     FONT_DEFAULT,
     FONT_OUTLINE,
@@ -31,7 +35,6 @@ extern s16 benchmarkLoop;
 extern s32 benchmarkTimer;
 extern u8 currEnv[4];
 extern s32 ramsizeSegment[33];
-extern s32 audioPool[12];
 extern s8 nameTable;
 extern s32 mempool;
 extern u8 benchOption;
