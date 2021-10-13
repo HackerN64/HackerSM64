@@ -148,9 +148,9 @@
 #define SURFACE_PAINTING_WARP_F7             0x00F7 // Painting warp (SL Left)
 #define SURFACE_PAINTING_WARP_F8             0x00F8 // Painting warp (SL Middle)
 #define SURFACE_PAINTING_WARP_F9             0x00F9 // Painting warp (SL Right)
-#define SURFACE_PAINTING_WARP_FA             0x00FA // Painting warp (THI Tiny - Left)
-#define SURFACE_PAINTING_WARP_FB             0x00FB // Painting warp (THI Tiny - Middle)
-#define SURFACE_PAINTING_WARP_FC             0x00FC // Painting warp (THI Tiny - Right)
+#define SURFACE_PAINTING_WARP_FA             0x00FA // Painting warp (THI Huge - Left)
+#define SURFACE_PAINTING_WARP_FB             0x00FB // Painting warp (THI Huge - Middle)
+#define SURFACE_PAINTING_WARP_FC             0x00FC // Painting warp (THI Huge - Right)
 #define SURFACE_WOBBLING_WARP                0x00FD // Pool warp (HMC & DDD)
 #define SURFACE_TRAPDOOR                     0x00FF // Bowser Left trapdoor, has no action defined
 
