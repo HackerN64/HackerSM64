@@ -1677,15 +1677,15 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
 }
 
 #if ENABLE_RUMBLE
-void queue_rumble_particles(void) {
-    if (gMarioState->particleFlags & PARTICLE_HORIZONTAL_STAR) {
+void queue_rumble_particles(struct MarioState *m) {
+    if (m->particleFlags & PARTICLE_HORIZONTAL_STAR) {
         queue_rumble_data(5, 80);
-    } else if (gMarioState->particleFlags & PARTICLE_VERTICAL_STAR) {
+    } else if (m->particleFlags & PARTICLE_VERTICAL_STAR) {
         queue_rumble_data(5, 80);
-    } else if (gMarioState->particleFlags & PARTICLE_TRIANGLE) {
+    } else if (m->particleFlags & PARTICLE_TRIANGLE) {
         queue_rumble_data(5, 80);
     }
-    if (gMarioState->heldObj && gMarioState->heldObj->behavior == segmented_to_virtual(bhvBobomb)) {
+    if (m->heldObj && m->heldObj->behavior == segmented_to_virtual(bhvBobomb)) {
         reset_rumble_timers_slip();
     }
 }
@@ -1763,7 +1763,7 @@ s32 execute_mario_action(struct MarioState *m) {
         play_infinite_stairs_music();
         m->marioObj->oInteractStatus = INT_STATUS_NONE;
 #if ENABLE_RUMBLE
-        queue_rumble_particles();
+        queue_rumble_particles(m);
 #endif
 
         return m->particleFlags;
