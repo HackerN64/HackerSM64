@@ -950,7 +950,7 @@ void func_8017E9EC(struct ObjNet *net) {
 }
 
 /* @ 22D824 for 0x1BC */
-s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj) {
+void transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj) {
     struct ListNode *curLink;
     struct ObjGroup *curGroup;
     Mat4f *parentUnkMtx;
@@ -998,7 +998,6 @@ s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj
             curLink = curLink->next;
         }
     }
-    return 0;
 }
 
 /**

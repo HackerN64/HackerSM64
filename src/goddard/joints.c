@@ -488,7 +488,7 @@ struct ObjBone *make_bone(s32 a0, struct ObjJoint *j1, struct ObjJoint *j2, UNUS
 s32 func_8018FFE8(struct ObjBone **a0, struct ObjJoint **a1, struct ObjJoint *a2, struct ObjJoint *a3) {
     struct ObjBone *b; // 1C
     struct ObjJoint *sp18;
-    s32 sp14 = 0;
+    s32 index = 0;
     struct ObjGroup *bonegrp; // 10
     struct ObjGroup *grp;     // 0c
     struct ListNode *bonelink;   // 08
@@ -513,9 +513,9 @@ s32 func_8018FFE8(struct ObjBone **a0, struct ObjJoint **a1, struct ObjJoint *a2
                 sp18 = (struct ObjJoint *) bonelink->obj;
 
                 if (sp18 != a3 && sp18 != a2) {
-                    a1[sp14] = sp18;
-                    a0[sp14] = b;
-                    sp14++;
+                    a1[index] = sp18;
+                    a0[index] = b;
+                    index++;
                 }
 
                 bonelink = bonelink->next;
@@ -524,7 +524,7 @@ s32 func_8018FFE8(struct ObjBone **a0, struct ObjJoint **a1, struct ObjJoint *a2
         link = link->next;
     }
 
-    return sp14;
+    return index;
 }
 
 /* 23E938 -> 23EBB8 */

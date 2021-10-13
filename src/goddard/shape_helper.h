@@ -22,7 +22,7 @@ void scale_verts_in_shape(struct ObjShape *shape, f32 x, f32 y, f32 z);
 struct ObjNet *make_netfromshape(struct ObjShape *shape);
 void animate_mario_head_gameover(struct ObjAnimator *self);
 void animate_mario_head_normal(struct ObjAnimator *self);
-s32 load_mario_head(void (*aniFn)(struct ObjAnimator *));
+void load_mario_head(void (*aniFn)(struct ObjAnimator *));
 void load_shapes2(void);
 struct ObjFace* make_face_with_colour(f32 r, f32 g, f32 b);
 

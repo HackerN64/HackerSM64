@@ -204,11 +204,9 @@ void move_bonesnet(struct ObjNet *net) {
 /* 24149C -> 241768 */
 void func_80192CCC(struct ObjNet *net) {
     Mat4f sp38;
-    UNUSED struct GdControl *ctrl; // 34
     struct ObjGroup *group;        // 30
     struct GdVec3f sp24;
 
-    ctrl = &gGdCtrl;
     if (gGdCtrl.unk2C != NULL) {
         menu_cb_reset_positions();
     }

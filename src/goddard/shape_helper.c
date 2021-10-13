@@ -1122,7 +1122,7 @@ void animate_mario_head_normal(struct ObjAnimator *self) {
  * Loads the Mario head from `dynlist_mario_master`, sets up grabbers, and makes
  * sparkle particles
  */
-s32 load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
+void load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
     struct ObjNet *sp54; // net made with sp48 group
     struct ObjGroup *sp48; // Joint group
     struct ObjGroup *mainShapesGrp;
@@ -1255,8 +1255,6 @@ s32 load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
     sp54->netType = 3;
     addto_group(gMarioFaceGrp, &sp48->header);
     addto_groupfirst(gMarioFaceGrp, &sp54->header);
-
-    return 0;
 }
 
 /* @ 249288 for 0xe0 */
