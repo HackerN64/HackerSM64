@@ -8582,23 +8582,22 @@ void cutscene_unlock_key_door(UNUSED struct Camera *c) {
  */
 s32 intro_peach_move_camera_start_to_pipe(struct Camera *c, struct CutsceneSplinePoint positionSpline[], struct CutsceneSplinePoint focusSpline[]) {
     Vec3f offset;
-
     /**
      * The position spline's speed parameters are all 0, so sCutsceneSplineSegmentProgress doesn't get
      * updated. Otherwise position would move two frames ahead, and c->focus would always be one frame
      * further along the spline than c->pos.
      */
-    UNUSED s32 posReturn = move_point_along_spline(c->pos, positionSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
-    s32 focusReturn = move_point_along_spline(c->focus, focusSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
+    UNUSED s32 posReturn   = move_point_along_spline(c->pos, positionSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
+           s32 focusReturn = move_point_along_spline(c->focus,  focusSpline, &sCutsceneSplineSegment, &sCutsceneSplineSegmentProgress);
 
     // The two splines used by this function are reflected in the horizontal plane for some reason,
     // so they are rotated every frame. Why do this, Nintendo?
     rotate_in_xz(c->focus, c->focus, DEGREES(-180));
-    rotate_in_xz(c->pos, c->pos, DEGREES(-180));
+    rotate_in_xz(c->pos,   c->pos,   DEGREES(-180));
 
     vec3f_set(offset, -1328.f, 260.f, 4664.f);
     vec3f_add(c->focus, offset);
-    vec3f_add(c->pos, offset);
+    vec3f_add(c->pos,   offset);
 
     return focusReturn;
 }
