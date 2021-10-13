@@ -251,12 +251,11 @@ void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
 
 void iterate_surfaces_envbox(Vtx *verts) {
     TerrainData *p = gEnvironmentRegions;
-    s32 numRegions;
-    ColorRGB col = {0xFF, 0xFF, 0x00};
+    ColorRGB col = COLOR_RGB_YELLOW;
     s32 i = 0;
 
     if (p != NULL) {
-        numRegions = *p++;
+        s32 numRegions = *p++;
         for (i = 0; i < numRegions; i++) {
             make_vertex(verts, (gVisualSurfaceCount + 0), p[1], p[5], p[2], 0, 0, col[0], col[1], col[2], 0x80);
             make_vertex(verts, (gVisualSurfaceCount + 1), p[1], p[5], p[4], 0, 0, col[0], col[1], col[2], 0x80);

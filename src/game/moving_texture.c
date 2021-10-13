@@ -54,24 +54,27 @@
 #define MOVTEX_ATTR_SPEED 0
 
 // Different layouts for vertices
-#define MOVTEX_LAYOUT_NOCOLOR 0
-#define MOVTEX_LAYOUT_COLORED 1
+enum MovtexLayouts {
+    MOVTEX_LAYOUT_NOCOLOR,
+    MOVTEX_LAYOUT_COLORED
+};
 
-// Attributes for movtex vertices
-#define MOVTEX_ATTR_X 1
-#define MOVTEX_ATTR_Y 2
-#define MOVTEX_ATTR_Z 3
-
-// For MOVTEX_LAYOUT_NOCOLOR only
-#define MOVTEX_ATTR_NOCOLOR_S 4
-#define MOVTEX_ATTR_NOCOLOR_T 5
-
-// For MOVTEX_LAYOUT_COLORED only
-#define MOVTEX_ATTR_COLORED_R 4
-#define MOVTEX_ATTR_COLORED_G 5
-#define MOVTEX_ATTR_COLORED_B 6
-#define MOVTEX_ATTR_COLORED_S 7
-#define MOVTEX_ATTR_COLORED_T 8
+enum MovtexAttributes {
+    MOVTEX_ATTR_NONE,
+    // Attributes for movtex vertices
+    MOVTEX_ATTR_X,
+    MOVTEX_ATTR_Y,
+    MOVTEX_ATTR_Z,
+    // For MOVTEX_LAYOUT_NOCOLOR only
+    MOVTEX_ATTR_NOCOLOR_S = 4,
+    MOVTEX_ATTR_NOCOLOR_T,
+    // For MOVTEX_LAYOUT_COLORED only
+    MOVTEX_ATTR_COLORED_R = 4,
+    MOVTEX_ATTR_COLORED_G,
+    MOVTEX_ATTR_COLORED_B,
+    MOVTEX_ATTR_COLORED_S,
+    MOVTEX_ATTR_COLORED_T
+};
 
 /**
  * An object containing all info for a mesh with moving textures.
@@ -108,9 +111,11 @@ s16 gMovtexCounter = 1;
 s16 gMovtexCounterPrev = 0;
 
 // Vertex colors for rectangles. Used to give mist a tint
-#define MOVTEX_VTX_COLOR_DEFAULT 0 // no tint (white vertex colors)
-#define MOVTEX_VTX_COLOR_YELLOW  1 // used for Hazy Maze Cave toxic haze
-#define MOVTEX_VTX_COLOR_RED     2 // used for Shifting Sand Land around the Tox box maze
+enum MovtexVtxColors {
+    MOVTEX_VTX_COLOR_DEFAULT, // no tint (white vertex colors)
+    MOVTEX_VTX_COLOR_YELLOW,  // used for Hazy Maze Cave toxic haze
+    MOVTEX_VTX_COLOR_RED      // used for Shifting Sand Land around the Tox box maze
+};
 
 s8 gMovtexVtxColor = MOVTEX_VTX_COLOR_DEFAULT;
 
@@ -318,7 +323,7 @@ Gfx *geo_wdw_set_initial_water_level(s32 callContext, UNUSED struct GraphNode *n
             wdwWaterHeight = 1024;
         }
         for (i = 0; i < *gEnvironmentRegions; i++) {
-            gEnvironmentRegions[i * 6 + 6] = wdwWaterHeight;
+            gEnvironmentRegions[(i * 6) + 6] = wdwWaterHeight;
         }
         gWdwWaterLevelSet = TRUE;
     }
@@ -351,9 +356,9 @@ Gfx *geo_movtex_pause_control(s32 callContext, UNUSED struct GraphNode *node, UN
  * scale: how often the texture repeats, 1 = no repeat
  */
 void movtex_make_quad_vertex(Vtx *verts, s32 index, s16 x, s16 y, s16 z, s16 rot, s16 rotOffset, f32 scale, u8 alpha) {
-    scale = 32.0f * (32.0f * scale - 1.0f);
-    s16 s = scale * sins(rot + rotOffset);
-    s16 t = scale * coss(rot + rotOffset);
+    scale = (32.0f * ((32.0f * scale) - 1.0f));
+    s16 s = (scale * sins(rot + rotOffset));
+    s16 t = (scale * coss(rot + rotOffset));
 
     if (gMovtexVtxColor == MOVTEX_VTX_COLOR_YELLOW) {
         make_vertex(verts, index, x, y, z, s, t, 255, 255,   0, alpha);
@@ -430,15 +435,15 @@ Gfx *movtex_gen_from_quad(s16 y, struct MovtexQuad *quad) {
     }
     rot = quad->rot;
     if (rotDir == ROTATE_CLOCKWISE) {
-        movtex_make_quad_vertex(verts, 0, x1, y, z1, rot, 0, scale, alpha);
-        movtex_make_quad_vertex(verts, 1, x2, y, z2, rot, 16384, scale, alpha);
+        movtex_make_quad_vertex(verts, 0, x1, y, z1, rot,      0, scale, alpha);
+        movtex_make_quad_vertex(verts, 1, x2, y, z2, rot,  16384, scale, alpha);
         movtex_make_quad_vertex(verts, 2, x3, y, z3, rot, -32768, scale, alpha);
         movtex_make_quad_vertex(verts, 3, x4, y, z4, rot, -16384, scale, alpha);
     } else { // ROTATE_COUNTER_CLOCKWISE
-        movtex_make_quad_vertex(verts, 0, x1, y, z1, rot, 0, scale, alpha);
+        movtex_make_quad_vertex(verts, 0, x1, y, z1, rot,      0, scale, alpha);
         movtex_make_quad_vertex(verts, 1, x2, y, z2, rot, -16384, scale, alpha);
         movtex_make_quad_vertex(verts, 2, x3, y, z3, rot, -32768, scale, alpha);
-        movtex_make_quad_vertex(verts, 3, x4, y, z4, rot, 16384, scale, alpha);
+        movtex_make_quad_vertex(verts, 3, x4, y, z4, rot,  16384, scale, alpha);
     }
 
     // Only add commands to change the texture when necessary
@@ -664,7 +669,7 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
         gMovetexLastTextureId = -1;
         for (i = 0; i < numWaterBoxes; i++) {
             waterId = gEnvironmentRegions[i * 6 + 1];
-            waterY = gEnvironmentRegions[i * 6 + 6];
+            waterY  = gEnvironmentRegions[i * 6 + 6];
             subList = movtex_gen_quads_id(waterId, waterY, quadCollection);
             if (subList != NULL)
                 gSPDisplayList(gfx++, VIRTUAL_TO_PHYSICAL(subList));
@@ -708,14 +713,9 @@ void movtex_write_vertex_first(Vtx *vtx, s16 *movtexVerts, struct MovtexObject *
     s16 y = movtexVerts[MOVTEX_ATTR_Y];
     s16 z = movtexVerts[MOVTEX_ATTR_Z];
     u8 alpha = c->a;
-    u8 r1;
-    u8 g1;
-    u8 b1;
-    s8 r2;
-    s8 g2;
-    s8 b2;
-    s16 s;
-    s16 t;
+    u8 r1, g1, b1;
+    s8 r2, g2, b2;
+    s16 s, t;
 
     switch (attrLayout) {
         case MOVTEX_LAYOUT_NOCOLOR:

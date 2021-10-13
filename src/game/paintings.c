@@ -512,13 +512,13 @@ void floor_painting_continuous_rippling(struct Painting *painting, struct Painti
  * Check for Mario entering one of the special floors associated with the painting.
  */
 void painting_update_floors(struct Painting *painting) {
-    s16 paintingId = painting->id;
-    s8 rippleLeft = 0;
+    s16 paintingId  = painting->id;
+    s8 rippleLeft   = 0;
     s8 rippleMiddle = 0;
-    s8 rippleRight = 0;
-    s8 enterLeft = 0;
-    s8 enterMiddle = 0;
-    s8 enterRight = 0;
+    s8 rippleRight  = 0;
+    s8 enterLeft    = 0;
+    s8 enterMiddle  = 0;
+    s8 enterRight   = 0;
 
     /* The area in front of every painting in the game (except HMC and CotMC, which   *\
     |* act a little differently) is made up of 3 special floor triangles with special *|
@@ -526,22 +526,22 @@ void painting_update_floors(struct Painting *painting) {
     \* and sets a bitfield accordingly.                                               */
 
     // check if Mario's current floor is one of the special floors
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A6) {
+    if (gPaintingMarioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WOBBLE_A6)) {
         rippleLeft = RIPPLE_LEFT;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A7) {
+    if (gPaintingMarioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WOBBLE_A7)) {
         rippleMiddle = RIPPLE_MIDDLE;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WOBBLE_A8) {
+    if (gPaintingMarioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WOBBLE_A8)) {
         rippleRight = RIPPLE_RIGHT;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D3) {
+    if (gPaintingMarioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WARP_D3)) {
         enterLeft = ENTER_LEFT;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D4) {
+    if (gPaintingMarioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WARP_D4)) {
         enterMiddle = ENTER_MIDDLE;
     }
-    if (gPaintingMarioFloorType == paintingId * 3 + SURFACE_PAINTING_WARP_D5) {
+    if (gPaintingMarioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WARP_D5)) {
         enterRight = ENTER_RIGHT;
     }
 
@@ -612,8 +612,8 @@ s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
     f32 rippleX = painting->rippleX;
     f32 rippleY = painting->rippleY;
 
-    posX *= painting->size / PAINTING_SIZE;
-    posY *= painting->size / PAINTING_SIZE;
+    posX *= (painting->size / PAINTING_SIZE);
+    posY *= (painting->size / PAINTING_SIZE);
     f32 dx = (posX - rippleX);
     f32 dy = (posY - rippleY);
     f32 distanceToOrigin = sqrtf(sqr(dx) + sqr(dy));
@@ -669,11 +669,11 @@ void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
 
     // accesses are off by 1 since the first entry is the number of vertices
     for (i = 0; i < numTris; i++) {
-        gPaintingMesh[i].pos[0] = mesh[i * 3 + 1];
-        gPaintingMesh[i].pos[1] = mesh[i * 3 + 2];
+        gPaintingMesh[i].pos[0] = mesh[(i * 3) + 1];
+        gPaintingMesh[i].pos[1] = mesh[(i * 3) + 2];
         // The "z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
         // actual coordinate, it just determines whether the vertex moves
-        gPaintingMesh[i].pos[2] = ripple_if_movable(painting, mesh[i * 3 + 3],
+        gPaintingMesh[i].pos[2] = ripple_if_movable(painting, mesh[(i * 3) + 3],
                                                     gPaintingMesh[i].pos[0], gPaintingMesh[i].pos[1]);
     }
 }
@@ -699,7 +699,7 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
     Vec3f vp0, vp1, vp2;
     gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
     for (i = 0; i < numTris; i++) {
-        PaintingData tri = (numVtx * 3) + (i * 3) + 2; // Add 2 because of the 2 length entries preceding the list
+        PaintingData tri = ((numVtx * 3) + (i * 3) + 2); // Add 2 because of the 2 length entries preceding the list
         vec3_copy(v, &mesh[tri]);
         vec3_copy(vp0, gPaintingMesh[v[0]].pos);
         vec3_copy(vp1, gPaintingMesh[v[1]].pos);
@@ -761,7 +761,7 @@ void painting_average_vertex_normals(PaintingData *neighborTris, PaintingData nu
             nz += gPaintingTriNorms[tri][2];
         }
         // Move to the next vertex's entry
-        entry += neighbors + 1;
+        entry += (neighbors + 1);
 
         // average the surface normals from each neighboring tri
         nx /= neighbors;
@@ -799,12 +799,12 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
 
     // We can fit 15 (16 / 3) vertices in the RSP's vertex buffer.
     // Group triangles by 5, with one remainder group.
-    PaintingData triGroups = mapTris / 5;
-    PaintingData remGroupTris = mapTris % 5;
-    PaintingData numVtx = mapTris * 3;
+    PaintingData triGroups    = (mapTris / 5);
+    PaintingData remGroupTris = (mapTris % 5);
+    PaintingData numVtx       = (mapTris * 3);
 
-    PaintingData commands = triGroups * 2 + remGroupTris + 7;
-    Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
+    PaintingData commands = ((triGroups * 2) + remGroupTris + 7);
+    Vtx *verts = alloc_display_list(numVtx   * sizeof(Vtx));
     Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
 
@@ -815,47 +815,47 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
 
         // The triangle groups are the second part of the texture map.
         // Each group is a list of 15 mappings
-        triGroup = mapVerts * 3 + group * 15 + 2;
+        triGroup = ((mapVerts * 3) + (group * 15) + 2);
         for (map = 0; map < 15; map++) {
             // The mapping is just an index into the earlier part of the textureMap
             // Some mappings are repeated, for example, when multiple triangles share a vertex
             mapping = textureMap[triGroup + map];
 
             // The first entry is the ID of the vertex in the mesh
-            meshVtx = textureMap[mapping * 3 + 1];
+            meshVtx = textureMap[(mapping * 3) + 1];
 
             // The next two are the texture coordinates for that vertex
-            tx = textureMap[mapping * 3 + 2];
-            ty = textureMap[mapping * 3 + 3];
+            tx = textureMap[(mapping * 3) + 2];
+            ty = textureMap[(mapping * 3) + 3];
 
             // Map the texture and place it in the verts array
-            make_vertex(verts, group * 15 + map, gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
+            make_vertex(verts, ((group * 15) + map), gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
                         gPaintingMesh[meshVtx].pos[2], tx, ty, gPaintingMesh[meshVtx].norm[0],
                         gPaintingMesh[meshVtx].norm[1], gPaintingMesh[meshVtx].norm[2], alpha);
         }
 
         // Load the vertices and draw the 5 triangles
-        gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + group * 15), 15, 0);
+        gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + (group * 15)), 15, 0);
         gSPDisplayList(gfx++, dl_paintings_draw_ripples);
     }
 
     // One group left with < 5 triangles
-    triGroup = mapVerts * 3 + triGroups * 15 + 2;
+    triGroup = ((mapVerts * 3) + (triGroups * 15) + 2);
     // Map the texture to the triangles
-    for (map = 0; map < remGroupTris * 3; map++) {
+    for (map = 0; map < (remGroupTris * 3); map++) {
         mapping = textureMap[triGroup + map];
-        meshVtx = textureMap[mapping * 3 + 1];
-        tx = textureMap[mapping * 3 + 2];
-        ty = textureMap[mapping * 3 + 3];
-        make_vertex(verts, triGroups * 15 + map, gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
+        meshVtx = textureMap[(mapping * 3) + 1];
+        tx = textureMap[(mapping * 3) + 2];
+        ty = textureMap[(mapping * 3) + 3];
+        make_vertex(verts, ((triGroups * 15) + map), gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
                     gPaintingMesh[meshVtx].pos[2], tx, ty, gPaintingMesh[meshVtx].norm[0],
                     gPaintingMesh[meshVtx].norm[1], gPaintingMesh[meshVtx].norm[2], alpha);
     }
 
     // Draw the triangles individually
-    gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + triGroups * 15), remGroupTris * 3, 0);
+    gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + (triGroups * 15)), (remGroupTris * 3), 0);
     for (group = 0; group < remGroupTris; group++) {
-        gSP1Triangle(gfx++, group * 3, group * 3 + 1, group * 3 + 2, 0);
+        gSP1Triangle(gfx++, (group * 3), ((group * 3) + 1), ((group * 3) + 2), 0);
     }
 
     gSPEndDisplayList(gfx);
@@ -876,10 +876,10 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
 
     guTranslate(translate, painting->posX, painting->posY, painting->posZ);
     guRotate(rotX, painting->pitch, 1.0f, 0.0f, 0.0f);
-    guRotate(rotY, painting->yaw, 0.0f, 1.0f, 0.0f);
+    guRotate(rotY, painting->yaw,   0.0f, 1.0f, 0.0f);
     guScale(scale, sizeRatio, sizeRatio, sizeRatio);
 
-    gSPMatrix(gfx++, translate, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
+    gSPMatrix(gfx++, translate, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH  );
     gSPMatrix(gfx++, rotX,      G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
     gSPMatrix(gfx++, rotY,      G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
     gSPMatrix(gfx++, scale,     G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
@@ -916,7 +916,7 @@ Gfx *painting_ripple_image(struct Painting *painting) {
     for (i = 0; i < imageCount; i++) {
         textureMap = segmented_to_virtual(textureMaps[i]);
         meshVerts = textureMap[0];
-        meshTris = textureMap[meshVerts * 3 + 1];
+        meshTris = textureMap[(meshVerts * 3) + 1];
         gSPDisplayList(gfx++, render_painting(textures[i], tWidth, tHeight, textureMap, meshVerts, meshTris, painting->alpha));
     }
 
@@ -933,9 +933,6 @@ Gfx *painting_ripple_image(struct Painting *painting) {
  * Ripple a painting that has 1 "environment map" texture.
  */
 Gfx *painting_ripple_env_mapped(struct Painting *painting) {
-    PaintingData meshVerts;
-    PaintingData meshTris;
-    PaintingData *textureMap;
     PaintingData tWidth = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
     PaintingData **textureMaps = segmented_to_virtual(painting->textureMaps);
@@ -952,9 +949,9 @@ Gfx *painting_ripple_env_mapped(struct Painting *painting) {
     gSPDisplayList(gfx++, painting->rippleDisplayList);
 
     // Map the image to the mesh's vertices
-    textureMap = segmented_to_virtual(textureMaps[0]);
-    meshVerts = textureMap[0];
-    meshTris = textureMap[meshVerts * 3 + 1];
+    PaintingData *textureMap = segmented_to_virtual(textureMaps[0]);
+    PaintingData meshVerts = textureMap[0];
+    PaintingData meshTris = textureMap[(meshVerts * 3) + 1];
     gSPDisplayList(gfx++, render_painting(tArray[0], tWidth, tHeight, textureMap, meshVerts, meshTris, painting->alpha));
 
     // Update the ripple, may automatically reset the painting's state.
@@ -974,7 +971,7 @@ Gfx *display_painting_rippling(struct Painting *painting) {
     PaintingData *mesh = segmented_to_virtual(seg2_painting_triangle_mesh);
     PaintingData *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris);
     PaintingData numVtx = mesh[0];
-    PaintingData numTris = mesh[numVtx * 3 + 1];
+    PaintingData numTris = mesh[(numVtx * 3) + 1];
     Gfx *dlist = NULL;
 
     // Generate the mesh and its lighting data
@@ -1179,8 +1176,8 @@ void floor_painting_update(struct Painting *painting, struct Painting *paintingG
  */
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *gen = (struct GraphNodeGenerated *) node;
-    s32 group = (gen->parameter >> 8) & 0xFF;
-    s32 id = gen->parameter & 0xFF;
+    s32 group = ((gen->parameter >> 8) & 0xFF);
+    s32 id = (gen->parameter & 0xFF);
     Gfx *paintingDlist = NULL;
     struct Painting **paintingGroup = sPaintingGroups[group];
     struct Painting *painting = segmented_to_virtual(paintingGroup[id]);

@@ -24,20 +24,24 @@
 
 #define NO_LAYER ((struct SequenceChannelLayer *)(-1))
 
-#define MUTE_BEHAVIOR_STOP_SCRIPT 0x80 // stop processing sequence/channel scripts
-#define MUTE_BEHAVIOR_STOP_NOTES 0x40  // prevent further notes from playing
-#define MUTE_BEHAVIOR_SOFTEN 0x20      // lower volume, by default to half
+#define MUTE_BEHAVIOR_STOP_SCRIPT (1 << 7) // 0x80 // stop processing sequence/channel scripts
+#define MUTE_BEHAVIOR_STOP_NOTES  (1 << 6) // 0x40 // prevent further notes from playing
+#define MUTE_BEHAVIOR_SOFTEN      (1 << 5) // 0x20 // lower volume, by default to half
 
-#define SEQUENCE_PLAYER_STATE_0 0
-#define SEQUENCE_PLAYER_STATE_FADE_OUT 1
-#define SEQUENCE_PLAYER_STATE_2 2
-#define SEQUENCE_PLAYER_STATE_3 3
-#define SEQUENCE_PLAYER_STATE_4 4
+enum SequencePlayerStates {
+    SEQUENCE_PLAYER_STATE_0,
+    SEQUENCE_PLAYER_STATE_FADE_OUT,
+    SEQUENCE_PLAYER_STATE_2,
+    SEQUENCE_PLAYER_STATE_3,
+    SEQUENCE_PLAYER_STATE_4
+};
 
-#define NOTE_PRIORITY_DISABLED 0
-#define NOTE_PRIORITY_STOPPING 1
-#define NOTE_PRIORITY_MIN 2
-#define NOTE_PRIORITY_DEFAULT 3
+enum NotePriority {
+    NOTE_PRIORITY_DISABLED,
+    NOTE_PRIORITY_STOPPING,
+    NOTE_PRIORITY_MIN,
+    NOTE_PRIORITY_DEFAULT
+};
 
 #define TATUMS_PER_BEAT 48
 
