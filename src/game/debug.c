@@ -14,10 +14,10 @@
 #include "sm64.h"
 #include "types.h"
 
-#define DEBUG_INFO_NOFLAGS (0 << 0)
-#define DEBUG_INFO_FLAG_DPRINT (1 << 0)
+#define DEBUG_INFO_NOFLAGS      (0 << 0)
+#define DEBUG_INFO_FLAG_DPRINT  (1 << 0)
 #define DEBUG_INFO_FLAG_LSELECT (1 << 1)
-#define DEBUG_INFO_FLAG_ALL 0xFF
+#define DEBUG_INFO_FLAG_ALL     0xFF
 
 s16 gDebugPrintState1[6]; // prints top-down?
 s16 gDebugPrintState2[6]; // prints bottom-up?
@@ -253,20 +253,20 @@ void debug_unknown_level_select_check(void) {
         }
 
         gNumCalls.floor = 0;
-        gNumCalls.ceil = 0;
-        gNumCalls.wall = 0;
+        gNumCalls.ceil  = 0;
+        gNumCalls.wall  = 0;
     }
 }
 
 void reset_debug_objectinfo(void) {
-    gNumFindFloorMisses = 0;
-    gUnknownWallCount = 0;
-    gObjectCounter = 0;
+    gNumFindFloorMisses    = 0;
+    gUnknownWallCount      = 0;
+    gObjectCounter         = 0;
     sDebugStringArrPrinted = FALSE;
-    gDoorRenderingTimer = 0;
+    gDoorRenderingTimer    = 0;
 
-    set_print_state_info(gDebugPrintState1, 20, 185, 40, 200, -15);
-    set_print_state_info(gDebugPrintState2, 180, 30, 0, 150, 15);
+    set_print_state_info(gDebugPrintState1,  20, 185, 40, 200, -15);
+    set_print_state_info(gDebugPrintState2, 180,  30,  0, 150,  15);
     update_debug_dpadmask();
 }
 
@@ -276,15 +276,12 @@ void reset_debug_objectinfo(void) {
  * despite so this has no effect, being called. (unused)
  */
 UNUSED static void check_debug_button_seq(void) {
-    s16 *buttonArr;
-    s16 cButtonMask;
-
-    buttonArr = sDebugInfoButtonSeq;
-
+    s16 *buttonArr = sDebugInfoButtonSeq;
     if (!(gPlayer1Controller->buttonDown & L_TRIG)) {
         sDebugInfoButtonSeqID = 0;
     } else {
-        if ((s16)(cButtonMask = (gPlayer1Controller->buttonPressed & C_BUTTONS))) {
+        s16 cButtonMask = (gPlayer1Controller->buttonPressed & C_BUTTONS);
+        if (cButtonMask) {
             if (buttonArr[sDebugInfoButtonSeqID] == cButtonMask) {
                 sDebugInfoButtonSeqID += 1;
                 if (buttonArr[sDebugInfoButtonSeqID] == -1) {
@@ -309,11 +306,11 @@ UNUSED static void try_change_debug_page(void) {
     if (gDebugInfoFlags & DEBUG_INFO_FLAG_DPRINT) {
         if ((gPlayer1Controller->buttonPressed & L_JPAD)
             && (gPlayer1Controller->buttonDown & (L_TRIG | R_TRIG))) {
-            sDebugPage += 1;
+            sDebugPage++;
         }
         if ((gPlayer1Controller->buttonPressed & R_JPAD)
             && (gPlayer1Controller->buttonDown & (L_TRIG | R_TRIG))) {
-            sDebugPage -= 1;
+            sDebugPage--;
         }
         if (sDebugPage >= (DEBUG_PAGE_MAX + 1)) {
             sDebugPage = DEBUG_PAGE_MIN;
@@ -378,7 +375,7 @@ void try_modify_debug_controls(void) {
 }
 
 // possibly a removed debug control (TODO: check DD)
-void stub_debug_5(void) {
+void stub_debug_control(void) {
 }
 
 /*

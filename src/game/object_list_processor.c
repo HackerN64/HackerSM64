@@ -196,42 +196,36 @@ struct ParticleProperties {
  * A table mapping particle flags to various properties use when spawning a particle.
  */
 struct ParticleProperties sParticleTypes[] = {
-    { PARTICLE_DUST,                 ACTIVE_PARTICLE_DUST,                 MODEL_MIST,                 bhvMistParticleSpawner },
+    { PARTICLE_DUST,                 ACTIVE_PARTICLE_DUST,                 MODEL_MIST,                 bhvMistParticleSpawner     },
     { PARTICLE_VERTICAL_STAR,        ACTIVE_PARTICLE_V_STAR,               MODEL_NONE,                 bhvVertStarParticleSpawner },
-    { PARTICLE_HORIZONTAL_STAR,      ACTIVE_PARTICLE_H_STAR,               MODEL_NONE,                 bhvHorStarParticleSpawner },
-    { PARTICLE_SPARKLES,             ACTIVE_PARTICLE_SPARKLES,             MODEL_SPARKLES,             bhvSparkleParticleSpawner },
-    { PARTICLE_BUBBLE,               ACTIVE_PARTICLE_BUBBLE,               MODEL_BUBBLE,               bhvBubbleParticleSpawner },
-    { PARTICLE_WATER_SPLASH,         ACTIVE_PARTICLE_WATER_SPLASH,         MODEL_WATER_SPLASH,         bhvWaterSplash },
-    { PARTICLE_IDLE_WATER_WAVE,      ACTIVE_PARTICLE_IDLE_WATER_WAVE,      MODEL_IDLE_WATER_WAVE,      bhvIdleWaterWave },
-    { PARTICLE_PLUNGE_BUBBLE,        ACTIVE_PARTICLE_PLUNGE_BUBBLE,        MODEL_WHITE_PARTICLE_SMALL, bhvPlungeBubble },
-    { PARTICLE_WAVE_TRAIL,           ACTIVE_PARTICLE_WAVE_TRAIL,           MODEL_WAVE_TRAIL,           bhvWaveTrail },
-    { PARTICLE_FIRE,                 ACTIVE_PARTICLE_FIRE,                 MODEL_RED_FLAME,            bhvFireParticleSpawner },
-    { PARTICLE_SHALLOW_WATER_WAVE,   ACTIVE_PARTICLE_SHALLOW_WATER_WAVE,   MODEL_NONE,                 bhvShallowWaterWave },
-    { PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, MODEL_NONE,                 bhvShallowWaterSplash },
-    { PARTICLE_LEAF,                 ACTIVE_PARTICLE_LEAF,                 MODEL_NONE,                 bhvLeafParticleSpawner },
-    { PARTICLE_SNOW,                 ACTIVE_PARTICLE_SNOW,                 MODEL_NONE,                 bhvSnowParticleSpawner },
-    { PARTICLE_BREATH,               ACTIVE_PARTICLE_BREATH,               MODEL_NONE,                 bhvBreathParticleSpawner },
-    { PARTICLE_DIRT,                 ACTIVE_PARTICLE_DIRT,                 MODEL_NONE,                 bhvDirtParticleSpawner },
+    { PARTICLE_HORIZONTAL_STAR,      ACTIVE_PARTICLE_H_STAR,               MODEL_NONE,                 bhvHorStarParticleSpawner  },
+    { PARTICLE_SPARKLES,             ACTIVE_PARTICLE_SPARKLES,             MODEL_SPARKLES,             bhvSparkleParticleSpawner  },
+    { PARTICLE_BUBBLE,               ACTIVE_PARTICLE_BUBBLE,               MODEL_BUBBLE,               bhvBubbleParticleSpawner   },
+    { PARTICLE_WATER_SPLASH,         ACTIVE_PARTICLE_WATER_SPLASH,         MODEL_WATER_SPLASH,         bhvWaterSplash             },
+    { PARTICLE_IDLE_WATER_WAVE,      ACTIVE_PARTICLE_IDLE_WATER_WAVE,      MODEL_IDLE_WATER_WAVE,      bhvIdleWaterWave           },
+    { PARTICLE_PLUNGE_BUBBLE,        ACTIVE_PARTICLE_PLUNGE_BUBBLE,        MODEL_WHITE_PARTICLE_SMALL, bhvPlungeBubble            },
+    { PARTICLE_WAVE_TRAIL,           ACTIVE_PARTICLE_WAVE_TRAIL,           MODEL_WAVE_TRAIL,           bhvWaveTrail               },
+    { PARTICLE_FIRE,                 ACTIVE_PARTICLE_FIRE,                 MODEL_RED_FLAME,            bhvFireParticleSpawner     },
+    { PARTICLE_SHALLOW_WATER_WAVE,   ACTIVE_PARTICLE_SHALLOW_WATER_WAVE,   MODEL_NONE,                 bhvShallowWaterWave        },
+    { PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, MODEL_NONE,                 bhvShallowWaterSplash      },
+    { PARTICLE_LEAF,                 ACTIVE_PARTICLE_LEAF,                 MODEL_NONE,                 bhvLeafParticleSpawner     },
+    { PARTICLE_SNOW,                 ACTIVE_PARTICLE_SNOW,                 MODEL_NONE,                 bhvSnowParticleSpawner     },
+    { PARTICLE_BREATH,               ACTIVE_PARTICLE_BREATH,               MODEL_NONE,                 bhvBreathParticleSpawner   },
+    { PARTICLE_DIRT,                 ACTIVE_PARTICLE_DIRT,                 MODEL_NONE,                 bhvDirtParticleSpawner     },
     { PARTICLE_MIST_CIRCLE,          ACTIVE_PARTICLE_MIST_CIRCLE,          MODEL_NONE,                 bhvMistCircParticleSpawner },
     { PARTICLE_TRIANGLE,             ACTIVE_PARTICLE_TRIANGLE,             MODEL_NONE,                 bhvTriangleParticleSpawner },
-    { 0, 0, MODEL_NONE, NULL },
+    { PARTICLE_NONE,                 ACTIVE_PARTICLE_NONE,                 MODEL_NONE,                 NULL                       },
 };
 
 /**
- * Copy position, velocity, and angle variables from MarioState to the Mario
- * object.
+ * Copy position, velocity, and angle variables from MarioState to the Mario object.
  */
-void copy_mario_state_to_object(void) {
-    s32 i = 0;
-    // L is real
-    if (gCurrentObject != gMarioObject) {
-        i++;
-    }
-    vec3_copy(&gCurrentObject->oVelVec, gMarioStates[i].vel);
-    vec3_copy(&gCurrentObject->oPosVec, gMarioStates[i].pos);
-    vec3_copy(&gCurrentObject->oMoveAngleVec, gCurrentObject->header.gfx.angle);
-    vec3_copy(&gCurrentObject->oFaceAngleVec, gCurrentObject->header.gfx.angle);
-    vec3_copy(&gCurrentObject->oAngleVelVec, gMarioStates[i].angleVel);
+void copy_mario_state_to_object(struct MarioState *m) {
+    vec3_copy(&o->oVelVec, m->vel);
+    vec3_copy(&o->oPosVec, m->pos);
+    vec3_copy(&o->oMoveAngleVec, o->header.gfx.angle);
+    vec3_copy(&o->oFaceAngleVec, o->header.gfx.angle);
+    vec3_copy(&o->oAngleVelVec, m->angleVel);
 }
 
 /**
@@ -239,9 +233,8 @@ void copy_mario_state_to_object(void) {
  */
 void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *behavior) {
     if (!(gCurrentObject->oActiveParticleFlags & activeParticleFlag)) {
-        struct Object *particle;
         gCurrentObject->oActiveParticleFlags |= activeParticleFlag;
-        particle = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
+        struct Object *particle = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
         obj_copy_pos_and_angle(particle, gCurrentObject);
     }
 }
@@ -250,24 +243,18 @@ void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *beh
  * Mario's primary behavior update function.
  */
 void bhv_mario_update(void) {
-    u32 particleFlags = 0;
-    s32 i;
-
-    particleFlags = execute_mario_action(gMarioState);
+    u32 particleFlags = execute_mario_action(gMarioState);
     gCurrentObject->oMarioParticleFlags = particleFlags;
 
     // Mario code updates MarioState's versions of position etc, so we need
     // to sync it with the Mario object
-    copy_mario_state_to_object();
+    copy_mario_state_to_object(gMarioState);
 
-    i = 0;
-    while (sParticleTypes[i].particleFlag != 0) {
+    for (s32 i = 0; (sParticleTypes[i].particleFlag != 0); i++) {
         if (particleFlags & sParticleTypes[i].particleFlag) {
             spawn_particle(sParticleTypes[i].activeParticleFlag, sParticleTypes[i].model,
                            sParticleTypes[i].behavior);
         }
-
-        i++;
     }
 }
 
@@ -285,7 +272,7 @@ s32 update_objects_starting_at(struct ObjectNode *objList, struct ObjectNode *fi
         cur_obj_update();
 
         firstObj = firstObj->next;
-        count += 1;
+        count++;
     }
 
     return count;
@@ -394,13 +381,11 @@ void unload_deactivated_objects_in_list(struct ObjectNode *objList) {
 void set_object_respawn_info_bits(struct Object *obj, u8 bits) {
     u32 *info32;
     u16 *info16;
-
     switch (obj->respawnInfoType) {
         case RESPAWN_INFO_TYPE_NORMAL:
             info32 = (u32 *) obj->respawnInfo;
             *info32 |= (bits << 8);
             break;
-
         case RESPAWN_INFO_TYPE_MACRO_OBJECT:
             info16 = (u16 *) obj->respawnInfo;
             *info16 |= (bits << 8);
@@ -533,11 +518,8 @@ void update_terrain_objects(void) {
  */
 void update_non_terrain_objects(void) {
     s32 listIndex;
-
-    s32 i = 2;
-    while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
+    for (s32 i = 2; ((listIndex = sObjectListUpdateOrder[i]) != -1); i++) {
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
-        i += 1;
     }
 }
 
@@ -546,11 +528,8 @@ void update_non_terrain_objects(void) {
  */
 void unload_deactivated_objects(void) {
     s32 listIndex;
-
-    s32 i = 0;
-    while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
+    for (s32 i = 0; ((listIndex = sObjectListUpdateOrder[i]) != -1); i++) {
         unload_deactivated_objects_in_list(&gObjectLists[listIndex]);
-        i += 1;
     }
 
     // TIME_STOP_UNKNOWN_0 was most likely intended to be used to track whether
@@ -589,7 +568,7 @@ void update_objects(void) {
     gCheckingSurfaceCollisionsForCamera = FALSE;
 
     reset_debug_objectinfo();
-    stub_debug_5();
+    stub_debug_control();
 
     gObjectLists = gObjectListArray;
 
@@ -632,6 +611,6 @@ void update_objects(void) {
     gPrevFrameObjectCount = gObjectCounter;
 #if PUPPYPRINT_DEBUG
     profiler_update(behaviourTime, first);
-    behaviourTime[perfIteration] -= collisionTime[perfIteration]-colTime;
+    behaviourTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
 #endif
 }
