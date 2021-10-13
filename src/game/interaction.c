@@ -495,7 +495,7 @@ u32 bully_knock_back_mario(struct MarioState *mario) {
 }
 
 void bounce_off_object(struct MarioState *m, struct Object *obj, f32 velY) {
-    m->pos[1] = obj->oPosY + obj->hitboxHeight;
+    m->pos[1] = (obj->oPosY + obj->hitboxHeight);
     m->vel[1] = velY;
 
     m->flags &= ~MARIO_JUMPING;
@@ -1282,7 +1282,7 @@ u32 interact_hit_from_below(struct MarioState *m, UNUSED u32 interactType, struc
                 return drop_and_set_mario_action(m, ACT_TWIRLING, 0);
             } else {
 #ifdef BETTER_BOUNCE
-                bounce_off_object(m, obj, (m->input & INPUT_A_DOWN) ? 60.0f : 30.0f);
+                bounce_off_object(m, obj, (m->input & INPUT_A_DOWN) ? 50.0f : 30.0f);
 #else
                 bounce_off_object(m, obj, 30.0f);
 #endif
@@ -1324,7 +1324,7 @@ u32 interact_bounce_top(struct MarioState *m, UNUSED u32 interactType, struct Ob
                 return drop_and_set_mario_action(m, ACT_TWIRLING, 0);
             } else {
 #ifdef BETTER_BOUNCE
-                bounce_off_object(m, obj, (m->input & INPUT_A_DOWN) ? 60.0f : 30.0f);
+                bounce_off_object(m, obj, (m->input & INPUT_A_DOWN) ? 50.0f : 30.0f);
 #else
                 bounce_off_object(m, obj, 30.0f);
 #endif
