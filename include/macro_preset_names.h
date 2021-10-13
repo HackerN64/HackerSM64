@@ -236,7 +236,7 @@ enum MacroPresets {
     macro_empty_231,
     macro_empty_232,
     macro_empty_233,
-    macro_chirp_chirp,
+    macro_bub_spawner,
     macro_seaweed_bundle,
     macro_beta_chest,
     macro_water_mine,

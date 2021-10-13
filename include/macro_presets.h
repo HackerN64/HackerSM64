@@ -247,7 +247,7 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_231
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_232
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_233
-    {bhvChirpChirp,                     MODEL_NONE,                         0}, // macro_chirp_chirp
+    {bhvBubSpawner,                     MODEL_NONE,                         0}, // macro_bub_spawner
     {bhvSeaweedBundle,                  MODEL_NONE,                         0}, // macro_seaweed_bundle
     {bhvBetaChestBottom,                MODEL_TREASURE_CHEST_BASE,          0}, // macro_beta_chest - unused
     {bhvBowserBomb,                     MODEL_WATER_MINE,                   0}, // macro_water_mine - unused

@@ -2530,13 +2530,9 @@ const BehaviorScript bhvWdwExpressElevatorPlatform[] = {
     END_LOOP(),
 };
 
-const BehaviorScript bhvChirpChirp[] = {
+const BehaviorScript bhvBubSpawner[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     SET_INT(oCheepCheepSpawnerSpawnAmount, 1),
-    GOTO(bhvChirpChirpUnused),
-};
-
-const BehaviorScript bhvChirpChirpUnused[] = {
     DISABLE_RENDERING(),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BEGIN_LOOP(),
