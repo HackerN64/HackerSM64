@@ -646,35 +646,21 @@ void focus_on_mario(Vec3f focus, Vec3f pos, f32 posYOff, f32 focYOff, f32 dist, 
     vec3_copy_y_off(focus, sMarioCamState->pos, focYOff);
 }
 
-static UNUSED void set_pos_to_mario(Vec3f foc, Vec3f pos, f32 yOff, f32 focYOff, f32 dist, s16 pitch, s16 yaw) {
-    Vec3f marioPos;
-    f32 posDist;
-    s16 posPitch, posYaw;
-
-    vec3f_copy(marioPos, sMarioCamState->pos);
-    marioPos[1] += yOff;
-
-    vec3f_set_dist_and_angle(marioPos, pos, dist, pitch + sLakituPitch, yaw);
-    vec3f_get_dist_and_angle(pos, sMarioCamState->pos, &posDist, &posPitch, &posYaw);
-
-    foc[1] = sMarioCamState->pos[1] + focYOff;
-}
-
 /**
  * Set the camera's y coordinate to goalHeight, respecting floors and ceilings in the way
  */
 void set_camera_height(struct Camera *c, f32 goalHeight) {
     struct Surface *surface;
     f32 marioFloorHeight, marioCeilHeight, camFloorHeight;
-    f32 baseOff = 125.f;
-    f32 camCeilHeight = find_ceil(c->pos[0], gLakituState.goalPos[1] - 50.f, c->pos[2], &surface);
+    f32 baseOff       = 125.f;
+    f32 camCeilHeight = find_ceil(c->pos[0], (gLakituState.goalPos[1] - 50.f), c->pos[2], &surface);
 
     if (sMarioCamState->action & ACT_FLAG_HANGING) {
         marioCeilHeight = sMarioGeometry.currCeilHeight;
         marioFloorHeight = sMarioGeometry.currFloorHeight;
 
-        if (marioFloorHeight < marioCeilHeight - 400.f) {
-            marioFloorHeight = marioCeilHeight - 400.f;
+        if (marioFloorHeight < (marioCeilHeight - 400.f)) {
+            marioFloorHeight = (marioCeilHeight - 400.f);
         }
 
         goalHeight = marioFloorHeight + (marioCeilHeight - marioFloorHeight) * 0.4f;
@@ -685,7 +671,7 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
 
         approach_camera_height(c, goalHeight, 5.f);
     } else {
-        camFloorHeight = find_floor(c->pos[0], c->pos[1] + 100.f, c->pos[2], &surface) + baseOff;
+        camFloorHeight = find_floor(c->pos[0], (c->pos[1] + 100.f), c->pos[2], &surface) + baseOff;
         marioFloorHeight = baseOff + sMarioGeometry.currFloorHeight;
 
         if (camFloorHeight < marioFloorHeight) {
@@ -1678,29 +1664,27 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
  * "Behind Mario" mode: used when Mario is flying, on the water's surface, or shot from a cannon
  */
 s32 mode_behind_mario(struct Camera *c) {
-    struct MarioState *marioState = &gMarioStates[0];
     struct Surface *floor;
     Vec3f newPos;
-    f32 waterHeight, floorHeight;
     f32 distCamToFocus;
-    s16 camPitch, camYaw, yaw;
+    s16 camPitch, camYaw;
 
     gCameraMovementFlags &= ~CAM_MOVING_INTO_MODE;
     vec3f_copy(newPos, c->pos);
-    yaw = update_behind_mario_camera(c, c->focus, newPos);
+    s16 yaw = update_behind_mario_camera(c, c->focus, newPos);
     c->pos[0] = newPos[0];
     c->pos[2] = newPos[2];
 
     // Keep the camera above the water surface if swimming
     if (c->mode == CAMERA_MODE_WATER_SURFACE) {
-        floorHeight = find_floor(c->pos[0], c->pos[1], c->pos[2], &floor);
-        newPos[1] = marioState->waterLevel + 120;
+        f32 floorHeight = find_floor(c->pos[0], c->pos[1], c->pos[2], &floor);
+        newPos[1] = (gMarioState->waterLevel + 120);
         if (newPos[1] < (floorHeight += 120.f)) {
             newPos[1] = floorHeight;
         }
     }
     approach_camera_height(c, newPos[1], 50.f);
-    waterHeight = find_water_level(c->pos[0], c->pos[2]) + 100.f;
+    f32 waterHeight = (find_water_level(c->pos[0], c->pos[2]) + 100.f);
     if (c->pos[1] <= waterHeight) {
         gCameraMovementFlags |= CAM_MOVE_SUBMERGED;
     } else {
@@ -4586,7 +4570,7 @@ void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ) {
     struct LinearTransitionPoint *start = &sModeInfo.transitionStart;
     struct LinearTransitionPoint *end = &sModeInfo.transitionEnd;
 
-    gCurrLevelArea = gCurrLevelNum * 16 + gCurrentArea->index;
+    gCurrLevelArea = ((gCurrLevelNum * 16) + gCurrentArea->index);
     displacement[0] = displacementX;
     displacement[1] = displacementY;
     displacement[2] = displacementZ;
@@ -4608,15 +4592,11 @@ void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ) {
  */
 void approach_camera_height(struct Camera *c, f32 goal, f32 inc) {
     if (sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
-        if (c->pos[1] < goal) {
-            if ((c->pos[1] += inc) > goal) {
-                c->pos[1] = goal;
-            }
-        } else {
-            if ((c->pos[1] -= inc) < goal) {
-                c->pos[1] = goal;
-            }
-        }
+#ifdef FAST_VERTICAL_CAMERA_MOVEMENT
+        approach_f32_asymptotic_bool(&c->pos[1], goal, inc);
+#else
+        approach_f32_symmetric_bool(&c->pos[1], goal, inc);
+#endif
     } else {
         c->pos[1] = goal;
     }
