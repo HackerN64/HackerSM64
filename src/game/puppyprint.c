@@ -438,11 +438,11 @@ void puppyprint_render_profiler(void) {
             s32 num = CYCLE_CONV(cpu_ordering_table[i].time[NUM_PERF_ITERATIONS]);
             if (num != 0) {
                 sprintf(textBytes, "%s%dus", cpu_ordering_table[i].str, num);
-                print_small_text(SCREEN_WIDTH-16, 40+(viewedNums*12), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+                print_small_text((SCREEN_WIDTH - 16), (40 + (viewedNums * 12)), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
                 viewedNums++;
             }
         }
-        s32 barY = (28 + (viewedNums * 12)) + 16;
+        s32 barY = ((28 + (viewedNums * 12)) + 16);
         prepare_blank_box();
         viewedNums = 0;
         // Render CPU breakdown bar.

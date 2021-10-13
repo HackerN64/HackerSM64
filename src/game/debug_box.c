@@ -234,7 +234,7 @@ void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
             surf = node->surface;
             node = node->next;
 
-            if (surf->type >= SURFACE_INSTANT_WARP_1B && surf->type <= SURFACE_INSTANT_WARP_1E) {
+            if (SURFACE_IS_INSTANT_WARP(surf->type)) {
                 make_vertex(verts, (gVisualSurfaceCount + 0), surf->vertex1[0], surf->vertex1[1], surf->vertex1[2], 0, 0, 0xFF, 0xA0, 0x00, 0x80);
                 make_vertex(verts, (gVisualSurfaceCount + 1), surf->vertex2[0], surf->vertex2[1], surf->vertex2[2], 0, 0, 0xFF, 0xA0, 0x00, 0x80);
                 make_vertex(verts, (gVisualSurfaceCount + 2), surf->vertex3[0], surf->vertex3[1], surf->vertex3[2], 0, 0, 0xFF, 0xA0, 0x00, 0x80);
@@ -266,8 +266,8 @@ void iterate_surfaces_envbox(Vtx *verts) {
             make_vertex(verts, (gVisualSurfaceCount + 5), p[3], p[5], p[4], 0, 0, col[0], col[1], col[2], 0x80);
 
             gVisualSurfaceCount += 6;
-            gVisualOffset += 6;
-            p += 6;
+            gVisualOffset       += 6;
+            p                   += 6;
         }
     }
 }
@@ -337,7 +337,7 @@ s32 iterate_surface_count(s32 x, s32 z) {
     }
     if (p != NULL) {
         numRegions = *p++;
-        j += numRegions * 6;
+        j += (numRegions * 6);
     }
 
     return j;
@@ -396,7 +396,6 @@ static void append_debug_box(Vec3f center, Vec3f bounds, s16 yaw, s32 type) {
         }
         ++sNumBoxes;
     }
-
 }
 
 /**

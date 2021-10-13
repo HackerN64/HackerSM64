@@ -96,7 +96,7 @@ void render_100_coin_star(u8 stars) {
     #ifdef WIDE
         if (gConfig.widescreen) {
             sStarSelectorModels[6] = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR,
-                                                            bhvActSelectorStarType, ((370*4.0f)/3), 24, -300, 0, 0, 0);
+                                                            bhvActSelectorStarType, ((370 * 4.0f) / 3), 24, -300, 0, 0, 0);
         } else {
             sStarSelectorModels[6] = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR,
                                                             bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
@@ -164,14 +164,14 @@ void bhv_act_selector_init(void) {
         for (i = 0; i < sVisibleStars; i++) {
             sStarSelectorModels[i] =
                 spawn_object_abs_with_rot(gCurrentObject, 0, selectorModelIDs[i], bhvActSelectorStarType,
-                                        (((75 + sVisibleStars * -75 + i * 152)*4.0f)/3), 248, -300, 0, 0, 0);
+                                        (((75 + (sVisibleStars * -75) + (i * 152)) * 4.0f) / 3), 248, -300, 0, 0, 0);
             sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
         }
     } else {
         for (i = 0; i < sVisibleStars; i++) {
             sStarSelectorModels[i] =
                 spawn_object_abs_with_rot(gCurrentObject, 0, selectorModelIDs[i], bhvActSelectorStarType,
-                                        75 + sVisibleStars * -75 + i * 152, 248, -300, 0, 0, 0);
+                                        (75 + (sVisibleStars * -75) + (i * 152)), 248, -300, 0, 0, 0);
             sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
         }
     }
@@ -179,7 +179,7 @@ void bhv_act_selector_init(void) {
     for (i = 0; i < sVisibleStars; i++) {
         sStarSelectorModels[i] =
             spawn_object_abs_with_rot(gCurrentObject, 0, selectorModelIDs[i], bhvActSelectorStarType,
-                                    75 + sVisibleStars * -75 + i * 152, 248, -300, 0, 0, 0);
+                                    (75 + (sVisibleStars * -75) + (i * 152)), 248, -300, 0, 0, 0);
         sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
     }
     #endif
@@ -370,7 +370,7 @@ void print_act_selector_strings(void) {
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
     // Print the name of the selected act.
     if (sVisibleStars != 0) {
-        selectedActName = segmented_to_virtual(actNameTbl[(gCurrCourseNum - 1) * 6 + sSelectedActIndex]);
+        selectedActName = segmented_to_virtual(actNameTbl[((gCurrCourseNum - 1) * 6) + sSelectedActIndex]);
 
 #ifdef VERSION_EU
         print_menu_generic_string(get_str_x_pos_from_center(ACT_NAME_X, selectedActName, 8.0f), 81, selectedActName);
@@ -384,9 +384,9 @@ void print_act_selector_strings(void) {
     for (i = 1; i <= sVisibleStars; i++) {
         starNumbers[0] = i;
 #ifdef VERSION_EU
-        print_menu_generic_string(143 - sVisibleStars * 15 + i * 30, 38, starNumbers);
+        print_menu_generic_string((143 - (sVisibleStars * 15) + (i * 30)), 38, starNumbers);
 #else
-        print_menu_generic_string(139 - sVisibleStars * 17 + i * 34, 38, starNumbers);
+        print_menu_generic_string((139 - (sVisibleStars * 17) + (i * 34)), 38, starNumbers);
 #endif
     }
 
@@ -417,7 +417,7 @@ s32 lvl_init_act_selector_values_and_stars(UNUSED s32 arg, UNUSED s32 unused) {
     sObtainedStars = save_file_get_course_star_count(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
 
     // Don't count 100 coin star
-    if (stars & (1 << 6)) {
+    if (stars & STAR_FLAG_ACT_100_COINS) {
         sObtainedStars--;
     }
 
@@ -448,11 +448,11 @@ s32 lvl_update_obj_and_load_act_button_actions(UNUSED s32 arg, UNUSED s32 unused
             queue_rumble_decay(1);
 #endif
             if (sInitSelectedActNum >= sSelectedActIndex + 1) {
-                sLoadedActNum = sSelectedActIndex + 1;
+                sLoadedActNum = (sSelectedActIndex + 1);
             } else {
                 sLoadedActNum = sInitSelectedActNum;
             }
-            gDialogCourseActNum = sSelectedActIndex + 1;
+            gDialogCourseActNum = (sSelectedActIndex + 1);
         }
     }
 
