@@ -10,13 +10,18 @@
 // bit which may be read by the sequence script.
 #define SEQUENCE_ARGS(priority, seqId) ((priority << 8) | seqId)
 
-#define SOUND_MODE_STEREO           0
-#define SOUND_MODE_MONO             3
-#define SOUND_MODE_HEADSET          1
+enum SoundModes {
+    SOUND_MODE_STEREO,
+    SOUND_MODE_HEADSET,
+    SOUND_MODE_UNUSED,
+    SOUND_MODE_MONO,
+};
 
-#define SEQ_PLAYER_LEVEL            0  // Level background music
-#define SEQ_PLAYER_ENV              1  // Misc music like the puzzle jingle
-#define SEQ_PLAYER_SFX              2  // Sound effects
+enum SequencePlayers {
+    SEQ_PLAYER_LEVEL, // Level background music
+    SEQ_PLAYER_ENV,   // Misc music like the puzzle jingle
+    SEQ_PLAYER_SFX    // Sound effects
+};
 
 struct SequenceQueueItem {
     u8 seqId;

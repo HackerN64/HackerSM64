@@ -10,16 +10,16 @@
 #include "external.h"
 
 
-#define DMEM_ADDR_TEMP 0x450
-#define DMEM_ADDR_RESAMPLED 0x470
-#define DMEM_ADDR_RESAMPLED2 0x5f0
-#define DMEM_ADDR_UNCOMPRESSED_NOTE 0x5f0
-#define DMEM_ADDR_NOTE_PAN_TEMP 0x650
+#define DMEM_ADDR_TEMP                  0x450
+#define DMEM_ADDR_RESAMPLED             0x470
+#define DMEM_ADDR_RESAMPLED2            0x5F0
+#define DMEM_ADDR_UNCOMPRESSED_NOTE     0x5F0
+#define DMEM_ADDR_NOTE_PAN_TEMP         0x650
 #define DMEM_ADDR_COMPRESSED_ADPCM_DATA 0x990
-#define DMEM_ADDR_LEFT_CH 0x990
-#define DMEM_ADDR_RIGHT_CH 0xb10
-#define DMEM_ADDR_WET_LEFT_CH 0xc90
-#define DMEM_ADDR_WET_RIGHT_CH 0xe10
+#define DMEM_ADDR_LEFT_CH               0x990
+#define DMEM_ADDR_RIGHT_CH              0xB10
+#define DMEM_ADDR_WET_LEFT_CH           0xC90
+#define DMEM_ADDR_WET_RIGHT_CH          0xE10
 
 #define aSetLoadBufferPair(pkt, c, off)                                                                \
     aSetBuffer(pkt, 0, c + DMEM_ADDR_WET_LEFT_CH, 0, DEFAULT_LEN_1CH - c);                             \

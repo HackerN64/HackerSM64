@@ -1081,8 +1081,7 @@ void init_reverb_eu(void)
     }
 }
 #else
-void init_reverb_us(s32 presetId)
-{
+void init_reverb_us(s32 presetId) {
     s32 reverbWindowSize;
     s16 *mem;
     s32 i;
@@ -1094,16 +1093,15 @@ void init_reverb_us(s32 presetId)
     reverbWindowSize = gReverbSettings[presetId].windowSize;
     gReverbDownsampleRate = gReverbSettings[presetId].downsampleRate;
 #ifdef BETTER_REVERB
-    if (gIsConsole)
+    if (gIsConsole) {
         reverbConsole = betterReverbDownsampleConsole; // Console!
-    else
+    } else {
         reverbConsole = betterReverbDownsampleEmulator; // Setting this to 1 is REALLY slow, please use sparingly!
-
+    }
     if (reverbConsole <= 0) {
         reverbConsole = 1;
         toggleBetterReverb = FALSE;
-    }
-    else {
+    } else {
         toggleBetterReverb = TRUE;
     }
 
@@ -1139,8 +1137,7 @@ void init_reverb_us(s32 presetId)
                 gSynthesisReverb.items[1][i].toDownsampleLeft = mem;
                 gSynthesisReverb.items[1][i].toDownsampleRight = mem + DEFAULT_LEN_1CH / sizeof(s16);
             }
-        }
-        else {
+        } else {
             bzero(gSynthesisReverb.ringBuffer.left, REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16));
         }
 
@@ -1165,16 +1162,15 @@ void init_reverb_us(s32 presetId)
             }
         }
 
- // This does not have to be reset after being initialized for the first time, which would speed up load times dramatically.
- // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
+        // This does not have to be reset after being initialized for the first time, which would speed up load times dramatically.
+        // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
 #ifdef BETTER_REVERB
         if (toggleBetterReverb) {
             if (!sAudioFirstBoot) {
                 delayBufsL = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
                 delayBufsR = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
                 delayBufsL[0] = (s32*) soundAlloc(&gAudioSessionPool, ALIGN16(BETTER_REVERB_SIZE - 0x80));
-            }
-            else {
+            } else {
                 bzero(delayBufsL[0], ALIGN16(BETTER_REVERB_SIZE - 0x80)); // Can maybe be simplified to clear only the previous allocation size
             }
 
@@ -1195,8 +1191,7 @@ void init_reverb_us(s32 presetId)
 
 #if defined(VERSION_JP) || defined(VERSION_US)
 void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
-    if (sAudioFirstBoot)
-    {
+    if (sAudioFirstBoot) {
         bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
         gAudioSessionPool.cur = gAudioSessionPool.start;
         gSeqAndBankPool.cur = gSeqAndBankPool.start;
@@ -1222,8 +1217,7 @@ void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
     }
 #else
 void audio_reset_session(void) {
-    if (sAudioFirstBoot)
-    {
+    if (sAudioFirstBoot) {
         gAudioSessionPool.cur = gAudioSessionPool.start;
         gSeqAndBankPool.cur = gSeqAndBankPool.start;
         gPersistentCommonPool.cur = gPersistentCommonPool.start;

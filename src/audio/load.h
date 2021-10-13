@@ -7,8 +7,8 @@
 
 #define AUDIO_FRAME_DMA_QUEUE_SIZE 0x40
 
-#define PRELOAD_BANKS 2
-#define PRELOAD_SEQUENCE 1
+#define PRELOAD_BANKS    0x2
+#define PRELOAD_SEQUENCE 0x1
 
 #define IS_SEQUENCE_CHANNEL_VALID(ptr) ((uintptr_t)(ptr) != (uintptr_t)&gSequenceChannelNone)
 

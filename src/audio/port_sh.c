@@ -11,7 +11,7 @@
 #include "seqplayer.h"
 
 #define EXTRA_BUFFERED_AI_SAMPLES_TARGET 0x80
-#define SAMPLES_TO_OVERPRODUCE 0x10
+#define SAMPLES_TO_OVERPRODUCE           0x10
 
 extern s32 D_SH_80314FC8;
 extern struct SPTask *D_SH_80314FCC;
@@ -333,16 +333,13 @@ void func_802ad7ec(u32 arg0) {
         if (cmd->u.s.op == 0xf8) {
             D_SH_8031509C = 1;
             break;
-        }
-        else if ((cmd->u.s.op & 0xf0) == 0xf0) {
+        } else if ((cmd->u.s.op & 0xf0) == 0xf0) {
             eu_process_audio_cmd(cmd);
-        }
-        else if (cmd->u.s.arg1 < SEQUENCE_PLAYERS) {
+        } else if (cmd->u.s.arg1 < SEQUENCE_PLAYERS) {
             seqPlayer = &gSequencePlayers[cmd->u.s.arg1];
             if ((cmd->u.s.op & 0x80) != 0) {
                 eu_process_audio_cmd(cmd);
-            }
-            else if ((cmd->u.s.op & 0x40) != 0) {
+            } else if ((cmd->u.s.op & 0x40) != 0) {
                 switch (cmd->u.s.op) {
                 case 0x41:
                     if (seqPlayer->fadeVolumeScale != cmd->u2.as_f32) {
@@ -367,11 +364,9 @@ void func_802ad7ec(u32 arg0) {
                     seqPlayer->seqVariationEu[cmd->u.s.arg3] = cmd->u2.as_s8;
                     break;
                 }
-            }
-            else if (seqPlayer->enabled != FALSE && cmd->u.s.arg2 < 0x10) {
+            } else if (seqPlayer->enabled != FALSE && cmd->u.s.arg2 < 0x10) {
                 chan = seqPlayer->channels[cmd->u.s.arg2];
-                if (IS_SEQUENCE_CHANNEL_VALID(chan))
-                {
+                if (IS_SEQUENCE_CHANNEL_VALID(chan)) {
                     switch (cmd->u.s.op) {
                     case 1:
                         if (chan->volumeScale != cmd->u2.as_f32) {

@@ -46,9 +46,11 @@ enum NotePriority {
 #define TATUMS_PER_BEAT 48
 
 // abi.h contains more details about the ADPCM and S8 codecs, "skip" skips codec processing
-#define CODEC_ADPCM 0
-#define CODEC_S8 1
-#define CODEC_SKIP 2
+enum Codecs {
+    CODEC_ADPCM,
+    CODEC_S8,
+    CODEC_SKIP
+};
 
 #define TEMPO_SCALE TATUMS_PER_BEAT
 

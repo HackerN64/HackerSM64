@@ -11,14 +11,6 @@
 #include "audio/external.h"
 #include "audio/effects.h"
 
-#define PORTAMENTO_IS_SPECIAL(x) ((x).mode & 0x80)
-#define PORTAMENTO_MODE(x) ((x).mode & ~0x80)
-#define PORTAMENTO_MODE_1 1
-#define PORTAMENTO_MODE_2 2
-#define PORTAMENTO_MODE_3 3
-#define PORTAMENTO_MODE_4 4
-#define PORTAMENTO_MODE_5 5
-
 #define COPT 0
 #if COPT
 #define M64_READ_U8(state, dst) \
@@ -34,7 +26,6 @@
     dst = _pc;                  \
 }
 #endif
-
 
 #if COPT
 #define M64_READ_S16(state, dst) \
@@ -75,8 +66,7 @@ struct AdsrSettings *adsr = _adsr; \
 struct Instrument **instOut = _instOut;\
     u8 _instId = instId; \
     struct Instrument *inst; \
-    UNUSED u32 pad; \
-        /* copt inlines instId here  */ \
+    /* copt inlines instId here  */ \
     if (instId >= gCtlEntries[(*seqChannel).bankId].numInstruments) { \
         _instId = gCtlEntries[(*seqChannel).bankId].numInstruments; \
         if (_instId == 0) { \
@@ -170,7 +160,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
     seqPlayer = (*seqChannel).seqPlayer;
     for (;;) {
         state = &layer->scriptState;
-        //M64_READ_U8(state, cmd);
+        // M64_READ_U8(state, cmd);
         {
             u8 *_ptr_pc;
             _ptr_pc = (*state).pc++;

@@ -6,12 +6,6 @@
 #include "seqplayer.h"
 #include "game/main.h"
 
-#ifdef VERSION_JP
-#define US_FLOAT2(x) x##.0
-#else
-#define US_FLOAT2(x) x
-#endif
-
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 recalculateVolume) {
     f32 channelVolume;
@@ -91,8 +85,8 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
         seqPlayer->recalculateVolume = TRUE;
 #endif
 
-        if (seqPlayer->fadeVolume > US_FLOAT2(1)) {
-            seqPlayer->fadeVolume = US_FLOAT2(1);
+        if (seqPlayer->fadeVolume > 1) {
+            seqPlayer->fadeVolume = 1;
         }
         if (seqPlayer->fadeVolume < 0) {
             seqPlayer->fadeVolume = 0;

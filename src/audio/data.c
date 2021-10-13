@@ -8,19 +8,19 @@ extern struct OSMesgQueue OSMesgQueue1;
 extern struct OSMesgQueue OSMesgQueue2;
 extern struct OSMesgQueue OSMesgQueue3;
 
-//Since the audio session is just one now, the reverb settings are duplicated to match the original audio setting scenario.
-//It's a bit hacky but whatever lol. Index range must be defined, since it's needed by the compiler.
-//To increase reverb window sizes beyond 64, please increase the REVERB_WINDOW_SIZE_MAX in heap.c by a factor of 0x40 and update AUDIO_HEAP_SIZE by 4x the same amount.
+// Since the audio session is just one now, the reverb settings are duplicated to match the original audio setting scenario.
+// It's a bit hacky but whatever lol. Index range must be defined, since it's needed by the compiler.
+// To increase reverb window sizes beyond 64, please increase the REVERB_WINDOW_SIZE_MAX in heap.c by a factor of 0x40 and update AUDIO_HEAP_SIZE by 4x the same amount.
 #ifdef VERSION_EU
 struct ReverbSettingsEU sReverbSettings[8] = {
-    {/*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF },
-    {/*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x47FF },
-    {/*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF },
-    {/*Downsample Rate*/ 1,/*Window Size*/ 60,/*Gain*/ 0x3FFF },
-    {/*Downsample Rate*/ 1,/*Window Size*/ 48,/*Gain*/ 0x4FFF },
-    {/*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF }, //Duplicate of the first index
-    {/*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x47FF }, //Duplicate of the second index
-    {/*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x37FF },
+    { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF },
+    { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x47FF },
+    { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF },
+    { /*Downsample Rate*/ 1,/*Window Size*/ 60,/*Gain*/ 0x3FFF },
+    { /*Downsample Rate*/ 1,/*Window Size*/ 48,/*Gain*/ 0x4FFF },
+    { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF }, //Duplicate of the first index
+    { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x47FF }, //Duplicate of the second index
+    { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x37FF },
 };
 /**
 1: Frequency
@@ -59,8 +59,7 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 
 // To increase reverb window sizes beyond 0x1000, please increase the REVERB_WINDOW_SIZE_MAX in heap.c and update AUDIO_HEAP_SIZE by the same amount.
 #if defined(VERSION_JP) || defined(VERSION_US)
-struct ReverbSettingsUS gReverbSettings[18] =
-{
+struct ReverbSettingsUS gReverbSettings[18] = {
     {1, 0x0C00, 0x2FFF},
     {1, 0x0A00, 0x47FF},
     {1, 0x1000, 0x2FFF},

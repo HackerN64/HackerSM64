@@ -11,18 +11,18 @@
 #include "game/game_init.h"
 
 
-#define DMEM_ADDR_TEMP 0x0
-#define DMEM_ADDR_RESAMPLED 0x20
-#define DMEM_ADDR_RESAMPLED2 0x160
-#define DMEM_ADDR_UNCOMPRESSED_NOTE 0x180
-#define DMEM_ADDR_NOTE_PAN_TEMP 0x200
+#define DMEM_ADDR_TEMP                   0x000
+#define DMEM_ADDR_RESAMPLED              0x020
+#define DMEM_ADDR_RESAMPLED2             0x160
+#define DMEM_ADDR_UNCOMPRESSED_NOTE      0x180
+#define DMEM_ADDR_NOTE_PAN_TEMP          0x200
 #define DMEM_ADDR_STEREO_STRONG_TEMP_DRY 0x200
 #define DMEM_ADDR_STEREO_STRONG_TEMP_WET 0x340
-#define DMEM_ADDR_COMPRESSED_ADPCM_DATA 0x3f0
-#define DMEM_ADDR_LEFT_CH 0x4c0
-#define DMEM_ADDR_RIGHT_CH 0x600
-#define DMEM_ADDR_WET_LEFT_CH 0x740
-#define DMEM_ADDR_WET_RIGHT_CH 0x880
+#define DMEM_ADDR_COMPRESSED_ADPCM_DATA  0x3F0
+#define DMEM_ADDR_LEFT_CH                0x4C0
+#define DMEM_ADDR_RIGHT_CH               0x600
+#define DMEM_ADDR_WET_LEFT_CH            0x740
+#define DMEM_ADDR_WET_RIGHT_CH           0x880
 
 #define aSetLoadBufferPair(pkt, c, off)                                                                \
     aSetBuffer(pkt, 0, c + DMEM_ADDR_WET_LEFT_CH, 0, DEFAULT_LEN_1CH - c);                             \
@@ -104,7 +104,7 @@ s32 betterReverbWindowsSize = -1;
 
 // These are set to defines rather than variables to increase performance. Change these to s32 if you want them to be configurable in-game. (Maybe extern them in synthesis.h)
 // Setting these to values larger than 0xFF (255) or less than 0 may cause issues and is not recommended.
-#define REVERB_REV_INDEX 0x60 // Affects decay time mostly (large values can cause terrible feedback!); can be messed with at any time
+#define REVERB_REV_INDEX  0x60 // Affects decay time mostly (large values can cause terrible feedback!); can be messed with at any time
 #define REVERB_GAIN_INDEX 0xA0 // Affects signal immediately retransmitted back into buffers (mid-high values yield the strongest effect); can be messed with at any time
 #define REVERB_WET_SIGNAL 0xE8 // Amount of reverb specific output in final signal (also affects decay); can be messed with at any time, also very easy to control
 
@@ -123,11 +123,11 @@ s32 delaysL[NUM_ALLPASS] = {
     1080, 1352, 1200,
     1200, 1232, 1432,
     1384, 1048, 1352,
-    928, 1504, 1512
+     928, 1504, 1512
 };
 s32 delaysR[NUM_ALLPASS] = {
     1384, 1352, 1048,
-    928, 1512, 1504,
+     928, 1512, 1504,
     1080, 1200, 1352,
     1200, 1432, 1232
 };
@@ -139,11 +139,11 @@ const s32 delaysBaselineL[NUM_ALLPASS] = {
     1080, 1352, 1200,
     1200, 1232, 1432,
     1384, 1048, 1352,
-    928, 1504, 1512
+     928, 1504, 1512
 };
 const s32 delaysBaselineR[NUM_ALLPASS] = {
     1384, 1352, 1048,
-    928, 1512, 1504,
+     928, 1512, 1504,
     1080, 1200, 1352,
     1200, 1432, 1232
 };

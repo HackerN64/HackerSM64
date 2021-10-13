@@ -13,11 +13,10 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput);
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #ifdef VERSION_SH
-void note_set_vel_pan_reverb(struct Note *note, struct ReverbInfo *reverbInfo)
+void note_set_vel_pan_reverb(struct Note *note, struct ReverbInfo *reverbInfo) {
 #else
-void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbVol)
+void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbVol) {
 #endif
-{
     struct NoteSubEu *sub = &note->noteSubEu;
     f32 volRight, volLeft;
     u8 strongRight;
