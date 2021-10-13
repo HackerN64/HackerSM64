@@ -1624,7 +1624,7 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
     //  this can be paused through to give continual invisibility. This leads to
     //  no interaction with objects.
     if ((m->invincTimer >= 3) && (gGlobalTimer & 1)) {
-        gMarioState->marioObj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+        m->marioObj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
     }
 
     if (flags & MARIO_CAP_IN_HAND) {
@@ -1694,79 +1694,79 @@ void queue_rumble_particles(void) {
 /**
  * Main function for executing Mario's behavior. Returns particleFlags.
  */
-s32 execute_mario_action(UNUSED struct Object *obj) {
+s32 execute_mario_action(struct MarioState *m) {
     s32 inLoop = TRUE;
     // Updates once per frame:
-    vec3f_get_dist_and_lateral_dist_and_angle(gMarioState->prevPos, gMarioState->pos, &gMarioState->moveSpeed, &gMarioState->lateralSpeed, &gMarioState->movePitch, &gMarioState->moveYaw);
-    vec3_copy(gMarioState->prevPos, gMarioState->pos);
-    if (gMarioState->action) {
+    vec3f_get_dist_and_lateral_dist_and_angle(m->prevPos, m->pos, &m->moveSpeed, &m->lateralSpeed, &m->movePitch, &m->moveYaw);
+    vec3_copy(m->prevPos, m->pos);
+    if (m->action) {
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (gPlayer1Controller->buttonDown & U_JPAD) {
-            set_camera_mode(gMarioState->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
-            set_mario_action(gMarioState, ACT_DEBUG_FREE_MOVE, 0);
+            set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+            set_mario_action(m, ACT_DEBUG_FREE_MOVE, 0);
         }
 #endif
-        gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-        mario_reset_bodystate(gMarioState);
-        update_mario_inputs(gMarioState);
+        m->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+        mario_reset_bodystate(m);
+        update_mario_inputs(m);
 #ifdef PUPPYCAM
         if (!(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_FREE))
 #endif
-        mario_handle_special_floors(gMarioState);
-        mario_process_interactions(gMarioState);
+        mario_handle_special_floors(m);
+        mario_process_interactions(m);
 
         // If Mario is OOB, stop executing actions.
-        if (gMarioState->floor == NULL) {
+        if (m->floor == NULL) {
             return ACTIVE_PARTICLE_NONE;
         }
         // The function can loop through many action shifts in one frame,
         // which can lead to unexpected sub-frame behavior. Could potentially hang
         // if a loop of actions were found, but there has not been a situation found.
         while (inLoop) {
-            switch (gMarioState->action & ACT_GROUP_MASK) {
-                case ACT_GROUP_STATIONARY: inLoop = mario_execute_stationary_action(gMarioState); break;
-                case ACT_GROUP_MOVING:     inLoop = mario_execute_moving_action(gMarioState);     break;
-                case ACT_GROUP_AIRBORNE:   inLoop = mario_execute_airborne_action(gMarioState);   break;
-                case ACT_GROUP_SUBMERGED:  inLoop = mario_execute_submerged_action(gMarioState);  break;
-                case ACT_GROUP_CUTSCENE:   inLoop = mario_execute_cutscene_action(gMarioState);   break;
-                case ACT_GROUP_AUTOMATIC:  inLoop = mario_execute_automatic_action(gMarioState);  break;
-                case ACT_GROUP_OBJECT:     inLoop = mario_execute_object_action(gMarioState);     break;
+            switch (m->action & ACT_GROUP_MASK) {
+                case ACT_GROUP_STATIONARY: inLoop = mario_execute_stationary_action(m); break;
+                case ACT_GROUP_MOVING:     inLoop = mario_execute_moving_action(m);     break;
+                case ACT_GROUP_AIRBORNE:   inLoop = mario_execute_airborne_action(m);   break;
+                case ACT_GROUP_SUBMERGED:  inLoop = mario_execute_submerged_action(m);  break;
+                case ACT_GROUP_CUTSCENE:   inLoop = mario_execute_cutscene_action(m);   break;
+                case ACT_GROUP_AUTOMATIC:  inLoop = mario_execute_automatic_action(m);  break;
+                case ACT_GROUP_OBJECT:     inLoop = mario_execute_object_action(m);     break;
             }
         }
 
-        sink_mario_in_quicksand(gMarioState);
-        squish_mario_model(gMarioState);
-        set_submerged_cam_preset_and_spawn_bubbles(gMarioState);
-        update_mario_health(gMarioState);
+        sink_mario_in_quicksand(m);
+        squish_mario_model(m);
+        set_submerged_cam_preset_and_spawn_bubbles(m);
+        update_mario_health(m);
 #ifdef BREATH_METER
-        update_mario_breath(gMarioState);
+        update_mario_breath(m);
 #endif
-        update_mario_info_for_cam(gMarioState);
-        mario_update_hitbox_and_cap_model(gMarioState);
+        update_mario_info_for_cam(m);
+        mario_update_hitbox_and_cap_model(m);
 
         // Both of the wind handling portions play wind audio only in
         // non-Japanese releases.
-        if (gMarioState->floor->type == SURFACE_HORIZONTAL_WIND) {
-            spawn_wind_particles(0, (gMarioState->floor->force << 8));
+        if (m->floor->type == SURFACE_HORIZONTAL_WIND) {
+            spawn_wind_particles(0, (m->floor->force << 8));
 #ifndef VERSION_JP
-            play_sound(SOUND_ENV_WIND2, gMarioState->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
 #endif
         }
 
-        if (gMarioState->floor->type == SURFACE_VERTICAL_WIND) {
+        if (m->floor->type == SURFACE_VERTICAL_WIND) {
             spawn_wind_particles(1, 0);
 #ifndef VERSION_JP
-            play_sound(SOUND_ENV_WIND2, gMarioState->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
 #endif
         }
 
         play_infinite_stairs_music();
-        gMarioState->marioObj->oInteractStatus = INT_STATUS_NONE;
+        m->marioObj->oInteractStatus = INT_STATUS_NONE;
 #if ENABLE_RUMBLE
         queue_rumble_particles();
 #endif
 
-        return gMarioState->particleFlags;
+        return m->particleFlags;
     }
 
     return ACTIVE_PARTICLE_NONE;
