@@ -724,15 +724,13 @@ void patch_audio_bank(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
     s32 i;
     void *patched;
     struct Drum *drum;
-    s32 numDrums;
-    s32 numInstruments;
 
 #define BASE_OFFSET(x, base) (void *)((uintptr_t) (x) + (uintptr_t) base)
 #define PATCH(x, base) (patched = BASE_OFFSET(x, base))
 #define PATCH_MEM(x) x = PATCH(x, mem)
 
-    numDrums = gCtlEntries[bankId].numDrums;
-    numInstruments = gCtlEntries[bankId].numInstruments;
+    s32 numDrums = gCtlEntries[bankId].numDrums;
+    s32 numInstruments = gCtlEntries[bankId].numInstruments;
     itInstrs = (void **) mem->drums;
     if (itInstrs != NULL && numDrums != 0) {
         mem->drums = PATCH(itInstrs, mem);
