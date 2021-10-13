@@ -338,7 +338,7 @@ void bhv_goomba_update(void) {
 #endif
         cur_obj_update_floor_and_walls();
 
-        if ((animSpeed = o->oForwardVel / o->oGoombaScale * 0.4f) < 1.0f) {
+        if (o->oGoombaScale == 0.0f || (animSpeed = o->oForwardVel / o->oGoombaScale * 0.4f) < 1.0f) {
             animSpeed = 1.0f;
         }
 #if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
