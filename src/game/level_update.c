@@ -202,15 +202,11 @@ u32 level_control_timer(s32 timerOp) {
 }
 
 u32 pressed_pause(void) {
-    u32 dialogActive = get_dialog_id() >= 0;
-    u32 intangible = (gMarioState->action & ACT_FLAG_INTANGIBLE) != 0;
-
-    if (!intangible && !dialogActive && !gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
-        && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
-        return TRUE;
-    }
-
-    return FALSE;
+    return (!(gMarioState->action & ACT_FLAG_INTANGIBLE)
+        && (get_dialog_id() < 0)
+        && !gWarpTransition.isActive
+        && (sDelayedWarpOp == WARP_OP_NONE)
+        && (gPlayer1Controller->buttonPressed & START_BUTTON));
 }
 
 void set_play_mode(s16 playMode) {
@@ -472,7 +468,7 @@ void warp_level(struct MarioState *m) {
 }
 
 void warp_credits(struct MarioState *m) {
-    s32 marioAction = 0;
+    s32 marioAction = ACT_UNINITIALIZED;
 
     switch (sWarpDest.nodeId) {
         case WARP_NODE_CREDITS_START:
@@ -521,15 +517,13 @@ void warp_credits(struct MarioState *m) {
 }
 
 void check_instant_warp(struct MarioState *m) {
-    s16 cameraAngle;
-    struct Surface *floor;
-
     if (gCurrLevelNum == LEVEL_CASTLE && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 70) {
         return;
     }
 
-    if ((floor = m->floor) != NULL) {
-        s32 index = floor->type - SURFACE_INSTANT_WARP_1B;
+    struct Surface *floor = m->floor;
+    if (floor != NULL) {
+        s32 index = (floor->type - SURFACE_INSTANT_WARP_1B);
         if (index >= INSTANT_WARP_INDEX_START && index < INSTANT_WARP_INDEX_STOP
             && gCurrentArea->instantWarps != NULL) {
             struct InstantWarp *warp = &gCurrentArea->instantWarps[index];
@@ -539,7 +533,7 @@ void check_instant_warp(struct MarioState *m) {
                 vec3f_copy(&m->marioObj->oPosVec, m->pos);
                 // Fix instant warp offset not working when warping across different areas
                 vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-                cameraAngle = m->area->camera->yaw;
+                s16 cameraAngle = m->area->camera->yaw;
 
                 change_area(warp->area);
                 m->area = gCurrentArea;
@@ -563,7 +557,7 @@ s32 music_unchanged_through_warp(s16 arg) {
     if (levelNum == LEVEL_BOB && levelNum == gCurrLevelNum && destArea == gCurrAreaIndex) {
         currBgMusic = get_current_background_music();
         if (currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP | SEQ_VARIATION)
-            || currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP)) {
+         || currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP)) {
             unchanged = FALSE;
         }
     } else {
@@ -727,11 +721,11 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 break;
 
             case WARP_OP_DEATH:
-            #ifndef DISABLE_LIVES
+#ifndef DISABLE_LIVES
                 if (m->numLives == 0) {
                     sDelayedWarpOp = WARP_OP_GAME_OVER;
                 }
-            #endif
+#endif
                 sDelayedWarpTimer = 48;
                 sSourceWarpNodeId = WARP_NODE_DEATH;
                 play_transition(WARP_TRANSITION_FADE_INTO_BOWSER, sDelayedWarpTimer, 0x00, 0x00, 0x00);
@@ -1070,6 +1064,7 @@ s32 play_mode_change_area(void) {
     if (sTransitionUpdate != NULL) {
         sTransitionUpdate(&sTransitionTimer);
     }
+
     if (--sTransitionTimer == -1) {
         update_camera(gCurrentArea->camera);
         sTransitionTimer  = 0;
@@ -1185,7 +1180,7 @@ s32 init_level(void) {
 #ifdef PEACH_SKIP
         if (gCurrDemoInput != NULL) {
             set_mario_action(gMarioState, ACT_IDLE, 0);
-        } else if (gDebugLevelSelect == 0) {
+        } else if (!gDebugLevelSelect) {
             if (gMarioState->action != ACT_UNINITIALIZED) {
                 set_mario_action(gMarioState, ACT_IDLE, 0);
             }
@@ -1194,7 +1189,7 @@ s32 init_level(void) {
 #else
         if (gCurrDemoInput != NULL) {
             set_mario_action(gMarioState, ACT_IDLE, 0);
-        } else if (gDebugLevelSelect == 0) {
+        } else if (!gDebugLevelSelect) {
             if (gMarioState->action != ACT_UNINITIALIZED) {
                 if (save_file_exists(gCurrSaveFileNum - 1)) {
                     set_mario_action(gMarioState, ACT_IDLE, 0);
@@ -1265,7 +1260,7 @@ void load_language_text(void) {
 
 s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
 #if MULTILANG
-    gInGameLanguage = eu_get_language()+1;
+    gInGameLanguage = (eu_get_language() + 1);
     load_language_text();
 #endif
     sWarpDest.type = WARP_TYPE_NOT_WARPING;

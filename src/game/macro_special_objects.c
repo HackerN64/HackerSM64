@@ -74,7 +74,7 @@ UNUSED static void spawn_macro_coin_unknown(const BehaviorScript *behavior, s16 
                                     a1[1], a1[2], a1[3], 0, convert_rotation(a1[0]), 0);
 
     obj->oUnusedCoinParams = a1[4];
-    obj->oBehParams = (a1[4] & 0xFF) >> 16;
+    obj->oBehParams = ((a1[4] & 0xFF) >> 16);
 }
 
 struct LoadedPreset {
@@ -187,7 +187,7 @@ void spawn_macro_objects_hardcoded(s32 areaIndex, s16 *macroObjList) {
 void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
     s32 i;
     s32 offset;
-    s16 x, y, z;
+    Vec3s pos;
     s16 extraParams[4];
     ModelID16 model;
     u8 type;
@@ -204,11 +204,11 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
     for (i = 0; i < numOfSpecialObjects; i++) {
         presetID = (u8) **specialObjList;
         (*specialObjList)++;
-        x = **specialObjList;
+        pos[0] = **specialObjList;
         (*specialObjList)++;
-        y = **specialObjList;
+        pos[1] = **specialObjList;
         (*specialObjList)++;
-        z = **specialObjList;
+        pos[2] = **specialObjList;
         (*specialObjList)++;
 
         offset = 0;
@@ -226,19 +226,19 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
 
         switch (type) {
             case SPTYPE_NO_YROT_OR_PARAMS:
-                spawn_macro_abs_yrot_2params(model, behavior, x, y, z, 0, 0);
+                spawn_macro_abs_yrot_2params(model, behavior, pos[0], pos[1], pos[2], 0, 0);
                 break;
             case SPTYPE_YROT_NO_PARAMS:
                 extraParams[0] = **specialObjList; // Y-rotation
                 (*specialObjList)++;
-                spawn_macro_abs_yrot_2params(model, behavior, x, y, z, extraParams[0], 0);
+                spawn_macro_abs_yrot_2params(model, behavior, pos[0], pos[1], pos[2], extraParams[0], 0);
                 break;
             case SPTYPE_PARAMS_AND_YROT:
                 extraParams[0] = **specialObjList; // Y-rotation
                 (*specialObjList)++;
                 extraParams[1] = **specialObjList; // Params
                 (*specialObjList)++;
-                spawn_macro_abs_yrot_2params(model, behavior, x, y, z, extraParams[0], extraParams[1]);
+                spawn_macro_abs_yrot_2params(model, behavior, pos[0], pos[1], pos[2], extraParams[0], extraParams[1]);
                 break;
             case SPTYPE_UNKNOWN:
                 extraParams[0] = **specialObjList; // Unknown, gets put into obj->oMacroUnk108 as a float
@@ -247,13 +247,12 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
                 (*specialObjList)++;
                 extraParams[2] = **specialObjList; // Unknown, gets put into obj->oMacroUnk110 as a float
                 (*specialObjList)++;
-                spawn_macro_abs_special(model, behavior, x, y, z, extraParams[0], extraParams[1],
-                                        extraParams[2]);
+                spawn_macro_abs_special(model, behavior, pos[0], pos[1], pos[2], extraParams[0], extraParams[1], extraParams[2]);
                 break;
             case SPTYPE_DEF_PARAM_AND_YROT:
                 extraParams[0] = **specialObjList; // Y-rotation
                 (*specialObjList)++;
-                spawn_macro_abs_yrot_param1(model, behavior, x, y, z, extraParams[0], defaultParam);
+                spawn_macro_abs_yrot_param1(model, behavior, pos[0], pos[1], pos[2], extraParams[0], defaultParam);
                 break;
             default:
                 break;

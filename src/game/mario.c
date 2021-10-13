@@ -1838,7 +1838,7 @@ void init_mario(struct MarioState *m) {
     if (save_file_get_cap_pos(capPos)) {
         capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
         vec3_copy(&capObject->oPosVec, capPos);
-        capObject->oForwardVel = 0;
+        capObject->oForwardVel   = 0;
         capObject->oMoveAngleYaw = 0;
     }
 }
@@ -1862,7 +1862,7 @@ void init_mario_from_save_file(struct MarioState *m) {
 #else
     m->numLives   = DEFAULT_NUM_LIVES;
 #endif
-    m->health = 0x880;
+    m->health     = 0x880;
 #ifdef BREATH_METER
     m->breath          = 0x880;
     gHudDisplay.breath = 8;

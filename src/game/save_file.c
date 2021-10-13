@@ -736,7 +736,7 @@ void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
         // Overwrite the warp checkpoint variables.
         gWarpCheckpoint.actNum    = gCurrActNum;
         gWarpCheckpoint.courseNum = gCurrCourseNum;
-        gWarpCheckpoint.levelID   = warpNode->destLevel & 0x7F;
+        gWarpCheckpoint.levelID   = (warpNode->destLevel & 0x7F);
         gWarpCheckpoint.areaNum   = warpNode->destArea;
         gWarpCheckpoint.warpNode  = warpNode->destNode;
     }

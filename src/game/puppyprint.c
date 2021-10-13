@@ -394,7 +394,7 @@ void puppyprint_render_profiler(void) {
     }
 
     sprintf(textBytes, "RAM: %06X/%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available() / (f32)mempool) * 100));
-    print_small_text((SCREEN_WIDTH/2), SCREEN_HEIGHT-16, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+    print_small_text((SCREEN_WIDTH / 2), (SCREEN_HEIGHT - 16), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
 
     if (!ramViewer && !benchViewer && !logViewer) {
         print_fps(16, 40);
