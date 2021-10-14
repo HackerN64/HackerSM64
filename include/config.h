@@ -167,6 +167,8 @@
 #define FIX_WATER_RINGS
 // Use intendedYaw to control Hoot instead of raw left and right inputs.
 #define HOOT_YAW_FIX
+// Leaf particles occasionally fall from trees which contain Hoot.
+#define HOOT_TREE_PARTICLES
 // Tiny Goombas (from THI) always drop their coin.
 #define TINY_GOOMBA_ALWAYS_DROPS_COIN
 // Collecting a 1-Up Mushroom will fully heal Mario.

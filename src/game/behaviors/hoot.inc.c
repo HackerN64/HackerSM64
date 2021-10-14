@@ -224,6 +224,19 @@ void bhv_hoot_loop(void) {
                 o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
                 o->oHootAvailability = HOOT_AVAIL_WANTS_TO_TALK;
             }
+#ifdef HOOT_TREE_PARTICLES
+            if (random_float() < 0.05f) {
+                struct Object *obj   = spawn_object(o, MODEL_LEAVES, bhvTreeLeaf);
+                f32 scale            = (random_float() * 3.0f);
+                obj_scale(obj, scale);
+                obj->oMoveAngleYaw   = random_u16();
+                obj->oForwardVel     = ((random_float() *  5.0f) + 5.0f);
+                obj->oVelY           =  (random_float() * 15.0f);
+                obj->oFaceAnglePitch = random_u16();
+                obj->oFaceAngleRoll  = random_u16();
+                obj->oFaceAngleYaw   = random_u16();
+            }
+#endif
             break;
 
         case HOOT_AVAIL_WANTS_TO_TALK:
