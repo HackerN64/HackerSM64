@@ -449,18 +449,23 @@ void update_walking_speed(struct MarioState *m) {
     }
 #endif
 
-    s16 turnRange = 0x800;
 #ifdef GROUND_TURN_FIX
-    if (m->action == ACT_WALKING) {
-        turnRange = abs_angle_diff(m->faceAngle[1], m->intendedYaw);
-        f32 fac = MIN(m->forwardVel, m->intendedMag);
-        fac = (CLAMP(fac, 10.0f, 32.0f) / 32.0f);
-        turnRange *= (1.0f - fac);
-        turnRange = MAX(turnRange, 0x800);
+    if ((m->usedObj == NULL) && !(m->action & ACT_FLAG_SHORT_HITBOX)) {
+        if (m->forwardVel >= 16.0f) {
+            s16 turnRange = abs_angle_diff(m->faceAngle[1], m->intendedYaw);
+            f32 fac = (m->forwardVel + m->intendedMag);
+            turnRange *= (1.0f - (CLAMP(fac, 0.0f, 32.0f) / 32.0f));
+            turnRange = MAX(turnRange, 0x800);
+            approach_angle_bool(&m->faceAngle[1], m->intendedYaw, turnRange);
+        } else {
+            m->faceAngle[1] = m->intendedYaw;
+        }
+    } else {
+        approach_angle_bool(&m->faceAngle[1], m->intendedYaw, 0x800);
     }
+#else
+    approach_angle_bool(&m->faceAngle[1], m->intendedYaw, 0x800);
 #endif
-    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
-
     apply_slope_accel(m);
 }
 
@@ -785,7 +790,7 @@ s32 act_walking(struct MarioState *m) {
 
         case GROUND_STEP_NONE:
             anim_and_audio_for_walk(m);
-            if (m->intendedMag - m->forwardVel > 16.0f) {
+            if ((m->intendedMag - m->forwardVel) > 16.0f) {
                 m->particleFlags |= PARTICLE_DUST;
             }
             break;
@@ -883,7 +888,7 @@ s32 act_hold_walking(struct MarioState *m) {
 
     anim_and_audio_for_hold_walk(m);
 
-    if (0.4f * m->intendedMag - m->forwardVel > 10.0f) {
+    if (((0.4f * m->intendedMag) - m->forwardVel) > 10.0f) {
         m->particleFlags |= PARTICLE_DUST;
     }
 
