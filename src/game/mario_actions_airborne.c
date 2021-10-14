@@ -890,10 +890,12 @@ s32 act_ground_pound(struct MarioState *m) {
                 vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
             }
         }
-
+#ifdef GROUND_POUND_WALL_FIX
+        mario_set_forward_vel(m, -0.1f);
+#else
         m->vel[1] = -50.0f;
         mario_set_forward_vel(m, 0.0f);
-
+#endif
         set_mario_animation(m, ((m->actionArg == ACT_ARG_GROUND_POUND_NORMAL) ? MARIO_ANIM_START_GROUND_POUND
                                                                               : MARIO_ANIM_TRIPLE_JUMP_GROUND_POUND));
         if (m->actionTimer == 0) {
@@ -902,6 +904,9 @@ s32 act_ground_pound(struct MarioState *m) {
 
         m->actionTimer++;
         if (m->actionTimer >= m->marioObj->header.gfx.animInfo.curAnim->loopEnd + 4) {
+#ifdef GROUND_POUND_WALL_FIX
+            m->vel[1] = -50.0f;
+#endif
             play_sound(SOUND_MARIO_GROUND_POUND_WAH, m->marioObj->header.gfx.cameraToObject);
             m->actionState = ACT_STATE_GROUND_POUND_FALL;
         }

@@ -126,6 +126,8 @@
 #define BETTER_BOUNCE
 // Hold Z while twirling to descend faster
 #define Z_TWIRL
+// Prevents bonks when ground pounding next to a wall
+#define GROUND_POUND_WALL_FIX
 // Allows Mario to jump kick on steep surfaces that are set to be non slippery, instead of being forced to dive
 #define JUMP_KICK_FIX
 // Allow Mario to grab hangable ceilings from any state
