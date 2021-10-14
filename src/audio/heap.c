@@ -638,22 +638,14 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
                     // Throw out the entry on the other side if it doesn't fit.
                     // (possible @bug: what if it's currently being loaded?)
                     table[tp->entries[1].id] = SOUND_LOAD_STATUS_NOT_LOADED;
-
-                    switch (isSound) {
-                        case FALSE:
-                            discard_sequence(tp->entries[1].id);
-                            break;
-                        case TRUE:
-                            discard_bank(tp->entries[1].id);
-                            break;
+                    if (isSound) {
+                        discard_bank(tp->entries[1].id);
+                    } else {
+                        discard_sequence(tp->entries[1].id);
                     }
 
                     tp->entries[1].id = (s32)nullID;
-#if defined(VERSION_EU) || defined(VERSION_SH)
-                    tp->entries[1].ptr = pool->start + pool->size;
-#else
-                    tp->entries[1].ptr = pool->size + pool->start;
-#endif
+                    tp->entries[1].ptr = (pool->start + pool->size);
                 }
 
                 ret = tp->entries[0].ptr;
@@ -678,15 +670,11 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
 
                     table[tp->entries[0].id] = SOUND_LOAD_STATUS_NOT_LOADED;
 
-                    switch (isSound) {
-                        case FALSE:
-                            discard_sequence(tp->entries[0].id);
-                            break;
-                        case TRUE:
-                            discard_bank(tp->entries[0].id);
-                            break;
+                    if (isSound) {
+                        discard_bank(tp->entries[0].id);
+                    } else {
+                        discard_sequence(tp->entries[0].id);
                     }
-
                     tp->entries[0].id = (s32)nullID;
                     pool->cur = pool->start;
                 }

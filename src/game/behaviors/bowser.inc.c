@@ -409,21 +409,18 @@ void bowser_set_act_big_jump(void) {
  * Set actions (and attacks) for Bowser in "Bowser in the Sky"
  */
 void bowser_bits_actions(void) {
-    switch (o->oBowserIsReacting) {
-        case FALSE:
-            // oBowserBitsJustJump never changes value,
-            // so its always FALSE, maybe a debug define
-            if (o->oBowserBitsJustJump == FALSE) {
-                bowser_bits_action_list();
-            } else {
-                bowser_set_act_big_jump();
-            }
-            o->oBowserIsReacting = TRUE;
-            break;
-        case TRUE:
-            o->oBowserIsReacting = FALSE;
-            o->oAction = BOWSER_ACT_WALK_TO_MARIO;
-            break;
+    if (o->oBowserIsReacting) {
+        o->oBowserIsReacting = FALSE;
+        o->oAction = BOWSER_ACT_WALK_TO_MARIO;
+    } else {
+        // oBowserBitsJustJump never changes value,
+        // so its always FALSE, maybe a debug define
+        if (o->oBowserBitsJustJump == FALSE) {
+            bowser_bits_action_list();
+        } else {
+            bowser_set_act_big_jump();
+        }
+        o->oBowserIsReacting = TRUE;
     }
 }
 
@@ -1754,18 +1751,14 @@ enum BowserEyesGSCId
  * Controls Bowser's eye open stage, including blinking and look directions
  */
 void bowser_open_eye_switch(struct Object *obj, struct GraphNodeSwitchCase *switchCase) {
-    s32 eyeCase;
-    s16 angleFromMario;
-    angleFromMario = abs_angle_diff(obj->oMoveAngleYaw, obj->oAngleToMario);
-    eyeCase = switchCase->selectedCase;
+    s16 angleFromMario = abs_angle_diff(obj->oMoveAngleYaw, obj->oAngleToMario);
+    s32 eyeCase = switchCase->selectedCase;
     switch (eyeCase) {
         case BOWSER_EYES_OPEN:
             // Mario is in Bowser's field of view
             if (angleFromMario > 0x2000) {
-                if (obj->oAngleVelYaw > 0)
-                    switchCase->selectedCase = BOWSER_EYES_RIGHT;
-                if (obj->oAngleVelYaw < 0)
-                    switchCase->selectedCase = BOWSER_EYES_LEFT;
+                if (obj->oAngleVelYaw > 0) switchCase->selectedCase = BOWSER_EYES_RIGHT;
+                if (obj->oAngleVelYaw < 0) switchCase->selectedCase = BOWSER_EYES_LEFT;
             }
             // Half close, start blinking
             if (obj->oBowserEyesTimer > 50)
@@ -1773,46 +1766,53 @@ void bowser_open_eye_switch(struct Object *obj, struct GraphNodeSwitchCase *swit
             break;
         case BOWSER_EYES_HALF_CLOSED:
             // Close, blinking
-            if (obj->oBowserEyesTimer > 2)
+            if (obj->oBowserEyesTimer > 2) {
                 switchCase->selectedCase = BOWSER_EYES_CLOSED;
+            }
             break;
         case BOWSER_EYES_CLOSED:
             // Reset blinking
-            if (obj->oBowserEyesTimer > 2)
+            if (obj->oBowserEyesTimer > 2) {
                 switchCase->selectedCase = BOWSER_EYES_RESET;
+            }
             break;
         case BOWSER_EYES_RESET:
             // Open, no longer blinking
-            if (obj->oBowserEyesTimer > 2)
+            if (obj->oBowserEyesTimer > 2) {
                 switchCase->selectedCase = BOWSER_EYES_OPEN;
+            }
             break;
         case BOWSER_EYES_RIGHT:
             // Look more on the right if angle didn't change
             // Otherwise, look at the center (open)
             if (obj->oBowserEyesTimer > 2) {
                 switchCase->selectedCase = BOWSER_EYES_FAR_RIGHT;
-                if (obj->oAngleVelYaw <= 0)
+                if (obj->oAngleVelYaw <= 0) {
                     switchCase->selectedCase = BOWSER_EYES_OPEN;
+                }
             }
             break;
         case BOWSER_EYES_FAR_RIGHT:
             // Look close right if angle was drastically changed
-            if (obj->oAngleVelYaw <= 0)
+            if (obj->oAngleVelYaw <= 0) {
                 switchCase->selectedCase = BOWSER_EYES_RIGHT;
+            }
             break;
         case BOWSER_EYES_LEFT:
             // Look more on the left if angle didn't change
             // Otherwise, look at the center (open)
             if (obj->oBowserEyesTimer > 2) {
                 switchCase->selectedCase = BOWSER_EYES_FAR_LEFT;
-                if (obj->oAngleVelYaw >= 0)
+                if (obj->oAngleVelYaw >= 0) {
                     switchCase->selectedCase = BOWSER_EYES_OPEN;
+                }
             }
             break;
         case BOWSER_EYES_FAR_LEFT:
             // Look close left if angle was drastically changed
-            if (obj->oAngleVelYaw >= 0)
+            if (obj->oAngleVelYaw >= 0) {
                 switchCase->selectedCase = BOWSER_EYES_LEFT;
+            }
             break;
         default:
             switchCase->selectedCase = BOWSER_EYES_OPEN;
@@ -1832,15 +1832,13 @@ Gfx *geo_switch_bowser_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4
     struct Object *obj = (struct Object *) gCurGraphNodeObject;
     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node;
     if (callContext == GEO_CONTEXT_RENDER) {
-        if (gCurGraphNodeHeldObject != NULL)
+        if (gCurGraphNodeHeldObject != NULL) {
             obj = gCurGraphNodeHeldObject->objNode;
-        switch (obj->oBowserEyesShut) {
-            case FALSE: // eyes open, handle eye looking direction
-                bowser_open_eye_switch(obj, switchCase);
-                break;
-            case TRUE: // eyes closed, blinking
-                switchCase->selectedCase = BOWSER_EYES_CLOSED;
-                break;
+        }
+        if (obj->oBowserEyesShut) { // eyes closed, blinking
+            switchCase->selectedCase = BOWSER_EYES_CLOSED;
+        } else { // eyes open, handle eye looking direction
+            bowser_open_eye_switch(obj, switchCase);
         }
         obj->oBowserEyesTimer++;
     }
@@ -1852,13 +1850,10 @@ Gfx *geo_switch_bowser_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4
  */
 Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s32 context) {
     Gfx *gfxHead = NULL;
-    Gfx *gfx;
-    struct Object *obj;
-    struct GraphNodeGenerated *graphNode;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        obj = (struct Object *) gCurGraphNodeObject;
-        graphNode = (struct GraphNodeGenerated *) node;
+        struct Object *obj = (struct Object *) gCurGraphNodeObject;
+        struct GraphNodeGenerated *graphNode = (struct GraphNodeGenerated *) node;
         if (gCurGraphNodeHeldObject != 0) {
             obj = gCurGraphNodeHeldObject->objNode;
         }
@@ -1868,7 +1863,7 @@ Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s3
         } else {
             SET_GRAPH_NODE_LAYER(graphNode->fnNode.node.flags, LAYER_TRANSPARENT);
         }
-        gfx = gfxHead = alloc_display_list(2 * sizeof(Gfx));
+        Gfx *gfx = gfxHead = alloc_display_list(2 * sizeof(Gfx));
         // If TRUE, clear lighting to give rainbow color
         if (obj->oBowserRainbowLight != 0) {
             gSPClearGeometryMode(gfx++, G_LIGHTING);
