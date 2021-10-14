@@ -1089,11 +1089,7 @@ DEFINE_DIALOG(DIALOG_094, 1, 3, 30, 200, _("\
 はしりながら　Ｚボタンで\n\
 しゃがんで　ジャンプだ！"))
 
-#ifdef VERSION_JP
-#define HOW_TO_READ_SIGNS_2 "　Ｂボタンをおすと"
-#else
 #define HOW_TO_READ_SIGNS_2 "ＡかＢボタンをおし"
-#endif
 
 DEFINE_DIALOG(DIALOG_095, 1, 3, 30, 200, _("\
 このように　カンバンの\n\
@@ -1881,15 +1877,6 @@ DEFINE_DIALOG(DIALOG_166, 1, 6, 30, 200, _("\
 くるといいッス！\n\
 　　　　　　　ノコノコ"))
 
-#ifdef VERSION_JP
-#define A_BUTTON_ACT "\
-Ａボタン『ジャンプ』\n"
-#define B_BUTTON_ACT "\
-Ｂボタン『カンバンよむ』\n\
-　　　　『パンチ』\n\
-　　　　『ものをもつ』\n\
-もういちどおす『なげる』"
-#else
 #define A_BUTTON_ACT "\
 Ａボタン『ジャンプ』\n\
 　　　　『カンバンよむ』\n"
@@ -1899,7 +1886,6 @@ DEFINE_DIALOG(DIALOG_166, 1, 6, 30, 200, _("\
 　　　　『ものをもつ』\n\
 　もういちどおすと\n\
 　　　　『なげる』"
-#endif
 
 DEFINE_DIALOG(DIALOG_167, 1, 4, 30, 200, _("\
 『ピーチの　おしろ』\n\

@@ -444,8 +444,8 @@ u32 bully_knock_back_mario(struct MarioState *mario) {
 
     //! Conversion ratios multiply to more than 1 (could allow unbounded speed
     // with bonk cancel - but this isn't important for regular bully battery)
-    f32 bullyToMarioRatio = bully->hitboxRadius * 3 / 53;
-    f32 marioToBullyRatio = 53.0f / bully->hitboxRadius;
+    f32 bullyToMarioRatio = (bully->hitboxRadius * 3 / 53);
+    f32 marioToBullyRatio = (53.0f / bully->hitboxRadius);
 
     init_bully_collision_data(&marioData, mario->pos[0], mario->pos[2], mario->forwardVel,
                               mario->faceAngle[1], bullyToMarioRatio, 52.0f);
@@ -1498,11 +1498,11 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
 }
 
 u32 interact_hoot(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    s32 actionId = m->action & ACT_ID_MASK;
+    s32 actionId = (m->action & ACT_ID_MASK);
 
     //! Can pause to advance the global timer without falling too far, allowing
     // you to regrab after letting go.
-    if (actionId >= 0x080 && actionId < 0x098
+    if (actionId >= (ACT_JUMP & ACT_ID_MASK) && actionId < (ACT_SHOT_FROM_CANNON & ACT_ID_MASK)
         && (gGlobalTimer - m->usedObj->oHootMarioReleaseTime > 30)) {
         mario_stop_riding_and_holding(m);
 

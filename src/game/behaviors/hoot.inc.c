@@ -101,7 +101,6 @@ void hoot_carry_step(s32 speed, UNUSED f32 xPrev, UNUSED f32 zPrev) {
 void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
     struct Surface *floor;
     struct WallCollisionData hitbox;
-    f32 floorY;
 
     hitbox.x = o->oPosX;
     hitbox.y = o->oPosY;
@@ -116,7 +115,7 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
         gMarioObject->oInteractStatus |= INT_STATUS_MARIO_DROP_FROM_HOOT; /* bit 7 */
     }
 
-    floorY = find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
+    f32 floorY = find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
     if (floor == NULL) {
         o->oPosX = xPrev;
         o->oPosZ = zPrev;

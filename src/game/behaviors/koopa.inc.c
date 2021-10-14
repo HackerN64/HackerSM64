@@ -375,7 +375,7 @@ static void koopa_unshelled_act_run(void) {
         o->oMoveAngleYaw = o->oKoopaTargetYaw;
         o->oAction = KOOPA_UNSHELLED_ACT_DIVE;
         o->oForwardVel *= 1.2f;
-        o->oVelY = distToShell / 20.0f;
+        o->oVelY = (distToShell / 20.0f);
         o->oKoopaCountdown = 20;
     }
 }
@@ -385,15 +385,13 @@ static void koopa_unshelled_act_run(void) {
  * and otherwise enter the running action.
  */
 static void koopa_unshelled_act_dive(void) {
-    struct Object *shell;
-    f32 distToShell;
-
     if (o->oTimer > 10) {
         cur_obj_become_tangible();
     }
 
     if (o->oTimer > 10) {
-        shell = cur_obj_find_nearest_object_with_behavior(bhvKoopaShell, &distToShell);
+        f32 distToShell;
+        struct Object *shell = cur_obj_find_nearest_object_with_behavior(bhvKoopaShell, &distToShell);
 
         // If we got the shell and mario didn't, put on the shell
         //! The shell comes after koopa in processing order, and the shell is
@@ -403,8 +401,8 @@ static void koopa_unshelled_act_dive(void) {
         //  units behind mario.
         //  Using this, we can get the koopa to pick up and despawn its shell
         //  while mario is riding it.
-        if (shell != NULL && dist_between_objects(shell, gMarioObject) > 200.0f
-            && distToShell < 50.0f) {
+        if ((shell != NULL) && (dist_between_objects(shell, gMarioObject) > 200.0f)
+            && (distToShell < 50.0f)) {
             o->oKoopaMovementType = KOOPA_BP_NORMAL;
             o->oAction = KOOPA_SHELLED_ACT_LYING;
             o->oForwardVel *= 0.5f;
@@ -417,14 +415,14 @@ static void koopa_unshelled_act_dive(void) {
 
     if (o->oForwardVel != 0.0f) {
         if (o->oAction == KOOPA_UNSHELLED_ACT_LYING) {
-            o->oAnimState = 1;
-            cur_obj_init_anim_extend(2);
+            o->oAnimState = KOOPA_ANIM_STATE_EYES_CLOSED;
+            cur_obj_init_anim_extend(KOOPA_ANIM_UNSHELLED_LYING);
         } else {
-            cur_obj_init_anim_extend(5);
+            cur_obj_init_anim_extend(KOOPA_ANIM_SHELLED_LYING);
         }
         koopa_dive_update_speed(0.5f);
     } else if (o->oKoopaCountdown != 0) {
-        o->oKoopaCountdown -= 1;
+        o->oKoopaCountdown--;
         cur_obj_extend_animation_if_at_end();
     } else if (cur_obj_init_anim_and_check_if_end(6)) {
         o->oAction = KOOPA_UNSHELLED_ACT_RUN;

@@ -1748,16 +1748,12 @@ s32 execute_mario_action(struct MarioState *m) {
         // non-Japanese releases.
         if (m->floor->type == SURFACE_HORIZONTAL_WIND) {
             spawn_wind_particles(0, (m->floor->force << 8));
-#ifndef VERSION_JP
             play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
-#endif
         }
 
         if (m->floor->type == SURFACE_VERTICAL_WIND) {
             spawn_wind_particles(1, 0);
-#ifndef VERSION_JP
             play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
-#endif
         }
 
         play_infinite_stairs_music();

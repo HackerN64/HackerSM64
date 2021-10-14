@@ -157,14 +157,9 @@ s32 check_horizontal_wind(struct MarioState *m) {
         m->vel[0] = m->slideVelX;
         m->vel[2] = m->slideVelZ;
         m->slideYaw = atan2s(m->slideVelZ, m->slideVelX);
-        m->forwardVel = speed * coss(m->faceAngle[1] - m->slideYaw);
-
-#ifdef VERSION_JP
-        play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
-#endif
+        m->forwardVel = (speed * coss(m->faceAngle[1] - m->slideYaw));
         return TRUE;
     }
-
     return FALSE;
 }
 

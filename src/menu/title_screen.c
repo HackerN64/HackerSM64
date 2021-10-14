@@ -221,7 +221,7 @@ s32 intro_game_over(void) {
         queue_rumble_decay(1);
 #endif
         // same criteria as intro_regular
-        level = LEVEL_FILE_SELECT + gDebugLevelSelect;
+        level = (LEVEL_FILE_SELECT + gDebugLevelSelect);
 #ifndef VERSION_JP
         sPlayMarioGameOver = TRUE;
 #endif
