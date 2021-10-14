@@ -21,11 +21,13 @@
 #include "game/puppylights.h"
 
 // Message IDs
-#define MESG_SP_COMPLETE 100
-#define MESG_DP_COMPLETE 101
-#define MESG_VI_VBLANK 102
-#define MESG_START_GFX_SPTASK 103
-#define MESG_NMI_REQUEST 104
+enum MessageIDs {
+    MESG_SP_COMPLETE = 100,
+    MESG_DP_COMPLETE,
+    MESG_VI_VBLANK,
+    MESG_START_GFX_SPTASK,
+    MESG_NMI_REQUEST,
+};
 
 // OSThread gUnkThread; // unused?
 OSThread gIdleThread;
@@ -52,19 +54,19 @@ OSViMode VI;
 
 struct Config gConfig;
 
-struct VblankHandler *gVblankHandler1 = NULL;
-struct VblankHandler *gVblankHandler2 = NULL;
-struct VblankHandler *gVblankHandler3 = NULL;
-struct SPTask *gActiveSPTask = NULL;
-struct SPTask *sCurrentAudioSPTask = NULL;
-struct SPTask *sCurrentDisplaySPTask = NULL;
-struct SPTask *sNextAudioSPTask = NULL;
-struct SPTask *sNextDisplaySPTask = NULL;
-s8 sAudioEnabled = TRUE;
-u32 gNumVblanks = 0;
-s8 gResetTimer = 0;
-s8 gNmiResetBarsTimer = 0;
-s8 gDebugLevelSelect  = FALSE;
+struct VblankHandler *gVblankHandler1       = NULL;
+struct VblankHandler *gVblankHandler2       = NULL;
+struct VblankHandler *gVblankHandler3       = NULL;
+struct SPTask        *gActiveSPTask         = NULL;
+struct SPTask        *sCurrentAudioSPTask   = NULL;
+struct SPTask        *sCurrentDisplaySPTask = NULL;
+struct SPTask        *sNextAudioSPTask      = NULL;
+struct SPTask        *sNextDisplaySPTask    = NULL;
+s8  sAudioEnabled      = TRUE;
+u32 gNumVblanks        = 0;
+s8  gResetTimer        = 0;
+s8  gNmiResetBarsTimer = 0;
+s8  gDebugLevelSelect  = FALSE;
 
 #ifdef VANILLA_DEBUG
 s8 gShowDebugText = FALSE;
@@ -180,8 +182,9 @@ void interrupt_gfx_sptask(void) {
 }
 
 void start_gfx_sptask(void) {
-    if (gActiveSPTask == NULL && sCurrentDisplaySPTask != NULL
-        && sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED) {
+    if (gActiveSPTask == NULL
+     && sCurrentDisplaySPTask != NULL
+     && sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED) {
 #if PUPPYPRINT_DEBUG
         rspDelta = osGetTime();
 #endif
@@ -196,7 +199,6 @@ void pretend_audio_sptask_done(void) {
 }
 
 void handle_vblank(void) {
-
     gNumVblanks++;
     if (gResetTimer > 0 && gResetTimer < 100) {
         gResetTimer++;
@@ -220,8 +222,9 @@ void handle_vblank(void) {
             }
         }
     } else {
-        if (gActiveSPTask == NULL && sCurrentDisplaySPTask != NULL
-            && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
+        if (gActiveSPTask == NULL
+         && sCurrentDisplaySPTask != NULL
+         && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
 #if PUPPYPRINT_DEBUG
             rspDelta = osGetTime();
 #endif
@@ -244,9 +247,8 @@ void handle_sp_complete(void) {
     gActiveSPTask = NULL;
 
     if (curSPTask->state == SPTASK_STATE_INTERRUPTED) {
-        // handle_vblank tried to start an audio task while there was already a
-        // gfx task running, so it had to interrupt the gfx task. That interruption
-        // just finished.
+        // handle_vblank tried to start an audio task while there was already a gfx task
+        // running, so it had to interrupt the gfx task. That interruption just finished.
         if (osSpTaskYielded(&curSPTask->task) == 0) {
             // The gfx task completed before we had time to interrupt it.
             // Mark it finished, just like below.
@@ -266,8 +268,8 @@ void handle_sp_complete(void) {
         curSPTask->state = SPTASK_STATE_FINISHED;
         if (curSPTask->task.t.type == M_AUDTASK) {
             // After audio tasks come gfx tasks.
-            if (sCurrentDisplaySPTask != NULL
-                && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
+            if ((sCurrentDisplaySPTask != NULL)
+             && (sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED)) {
                 start_sptask(M_GFXTASK);
             }
             sCurrentAudioSPTask = NULL;
@@ -315,10 +317,10 @@ void thread3_main(UNUSED void *arg) {
     osSyncPrintf("Linker  : %s\n", __linker__);
 #endif
 
-    create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, (gThread4Stack + 0x2000), 20);
+    create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, gThread4Stack + 0x2000, 20);
     osStartThread(&gSoundThread);
 
-    create_thread(&gGameLoopThread, THREAD_5_GAME_LOOP, thread5_game_loop, NULL, (gThread5Stack + 0x2000), 10);
+    create_thread(&gGameLoopThread, THREAD_5_GAME_LOOP, thread5_game_loop, NULL, gThread5Stack + 0x2000, 10);
     osStartThread(&gGameLoopThread);
 
     while (TRUE) {
@@ -440,7 +442,6 @@ void get_audio_frequency(void) {
  * Initialize hardware, start main thread, then idle.
  */
 void thread1_idle(UNUSED void *arg) {
-
     osCreateViManager(OS_PRIORITY_VIMGR);
     switch (osTvType) {
         case OS_TV_NTSC:

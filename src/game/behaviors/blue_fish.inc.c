@@ -1,3 +1,4 @@
+
 /**
  * @file blue_fish.inc.c
  * Implements behaviour and spawning for bhvBlueFish located in the castle aquarium outside of SA.
@@ -8,6 +9,7 @@
  */
 void bhv_blue_fish_movement_loop(void) {
     f32 randomSwitch;
+
     switch (o->oAction) {
         // Initial dive phase after spawning
         case BLUE_FISH_ACT_DIVE:
@@ -15,7 +17,7 @@ void bhv_blue_fish_movement_loop(void) {
 
             // Assigns random values to variables that help determine natural motion.
             if (o->oTimer == 0) {
-                o->oBlueFishRandomAngle = random_sign() << 11;
+                o->oBlueFishRandomAngle = random_sign() * 0x800;
                 o->oBlueFishRandomVel = random_float() * 2;
                 o->oBlueFishRandomTime = (s32)(random_float() * 30) & 0xFE;
 
@@ -44,6 +46,7 @@ void bhv_blue_fish_movement_loop(void) {
             // Calculate new Y velocity
             o->oVelY = -sins(o->oFaceAnglePitch) * o->oForwardVel;
             break;
+
         // Animates and adjusts fish yaw angle.
         case BLUE_FISH_ACT_TURN:
             cur_obj_init_animation_with_accel_and_sound(0, 2.0f);
@@ -52,6 +55,7 @@ void bhv_blue_fish_movement_loop(void) {
                 o->oAction++;
             }
             break;
+
         // Animates and adjusts pitch to an upward direction.
         case BLUE_FISH_ACT_ASCEND:
             cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
@@ -68,6 +72,7 @@ void bhv_blue_fish_movement_loop(void) {
                 o->oFaceAnglePitch += o->oAngleVelPitch;
             }
             break;
+
         // Animates and turns fish around
         case BLUE_FISH_ACT_TURN_BACK:
             cur_obj_init_animation_with_accel_and_sound(0, 2.0f);
@@ -97,6 +102,7 @@ void bhv_blue_fish_movement_loop(void) {
 void bhv_tank_fish_group_loop(void) {
     struct Object *fish;
     s32 i;
+
     switch (o->oAction) {
         case BLUE_FISH_ACT_SPAWN:
             if (gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) {

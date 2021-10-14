@@ -65,13 +65,27 @@
 #include "behaviors/white_puff_explode.inc.c"
 
 // not in behavior file
-struct SpawnParticlesInfo sMistParticles = { 2, 20, MODEL_MIST, 0, 40, 5, 30, 20, 252, 30, 330.0f, 10.0f };
+static struct SpawnParticlesInfo sMistParticles = {
+    /* behParam:        */ 2,
+    /* count:           */ 20,
+    /* model:           */ MODEL_MIST,
+    /* offsetY:         */ 0,
+    /* forwardVelBase:  */ 40,
+    /* forwardVelRange: */ 5,
+    /* velYBase:        */ 30,
+    /* velYRange:       */ 20,
+    /* gravity:         */ 252,
+    /* dragStrength:    */ 30,
+    /* sizeBase:        */ 330.0f,
+    /* sizeRange:       */ 10.0f,
+};
 
 // generate_wind_puffs/dust (something like that)
 void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
     sMistParticles.sizeBase = size;
     sMistParticles.sizeRange = size / 20.0f;
     sMistParticles.offsetY = offsetY;
+
     if (count == 0) {
         sMistParticles.count = 20;
     } else if (count > 20) {
@@ -79,6 +93,7 @@ void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
     } else {
         sMistParticles.count = 4;
     }
+
     cur_obj_spawn_particles(&sMistParticles);
 }
 
@@ -125,6 +140,7 @@ Gfx *geo_move_mario_part_from_parent(s32 callContext, UNUSED struct GraphNode *n
             obj_set_gfx_pos_from_pos(obj->prevObj);
         }
     }
+
     return NULL;
 }
 
@@ -142,6 +158,7 @@ static s16 sSpawnSparkleParticleAngle = 0x0;
 void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
     s32 i;
     s16 separation = 0x10000 / n; // Evenly spread around a circle
+
     for (i = 0; i < n; i++) {
         spawn_object_relative(0, sins(sSpawnSparkleParticleAngle + i * separation) * radius, (i + 1) * height,
                               coss(sSpawnSparkleParticleAngle + i * separation) * radius, o, MODEL_NONE, bhvSparkleSpawn);

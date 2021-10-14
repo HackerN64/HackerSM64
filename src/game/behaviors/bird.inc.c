@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvBird. These are the birds in the castle grounds
  * that fly away and scatter when Mario comes near them. There are

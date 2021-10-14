@@ -1,7 +1,5 @@
 #include <PR/ultratypes.h>
 
-#include "prevent_bss_reordering.h"
-
 #include "sm64.h"
 #include "game/ingame_menu.h"
 #include "graph_node.h"
@@ -173,7 +171,7 @@ static s32 lower_cell_index(s32 coord) {
     //! Some wall checks are larger than the buffer, meaning wall checks can
     //  miss walls that are near a cell border.
     if (coord % CELL_SIZE < 50) {
-        index -= 1;
+        index--;
     }
 
     if (index < 0) {
@@ -205,7 +203,7 @@ static s32 upper_cell_index(s32 coord) {
     //! Some wall checks are larger than the buffer, meaning wall checks can
     //  miss walls that are near a cell border.
     if (coord % CELL_SIZE > CELL_SIZE - 50) {
-        index += 1;
+        index++;
     }
 
     if (index > (NUM_CELLS - 1)) {
@@ -372,12 +370,12 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
     s32 flags = surf_has_no_cam_collision(surfaceType);
 
     numSurfaces = *(*data);
-    *data += 1;
+    (*data)++;
 
     for (i = 0; i < numSurfaces; i++) {
         if (*surfaceRooms != NULL) {
             room = *(*surfaceRooms);
-            *surfaceRooms += 1;
+            (*surfaceRooms)++;
         }
 
         surface = read_surface_data(vertexData, data);
@@ -404,7 +402,7 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
 #else
         *data += 3;
         if (hasForce) {
-            *data += 1;
+            (*data)++;
         }
 #endif
     }

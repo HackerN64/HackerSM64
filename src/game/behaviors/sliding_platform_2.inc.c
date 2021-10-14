@@ -1,6 +1,6 @@
 // sliding_platform_2.inc.c
 
-static void const *sSlidingPlatform2CollisionData[] = {
+static Collision const *sSlidingPlatformsCollisionData[] = {
     bits_seg7_collision_0701A9A0,
     bits_seg7_collision_0701AA0C,
     bitfs_seg7_collision_07015714,
@@ -11,21 +11,20 @@ static void const *sSlidingPlatform2CollisionData[] = {
     bitdw_seg7_collision_0700F688,
 };
 
-void bhv_sliding_plat_2_init(void) {
-    s32 collisionDataIndex;
+void bhv_sliding_platform_init(void) {
+    s32 collisionDataIndex = GET_BPARAM1(o->oBehParams) & SLIDING_PLATFORM_BP1_TYPES_MASK;
 
-    collisionDataIndex = ((u16)(o->oBehParams >> 16) & 0x0380) >> 7;
-    o->collisionData = segmented_to_virtual(sSlidingPlatform2CollisionData[collisionDataIndex]);
-    o->oBackAndForthPlatformPathLength = 50.0f * ((u16)(o->oBehParams >> 16) & 0x003F);
+    o->collisionData = segmented_to_virtual(sSlidingPlatformsCollisionData[collisionDataIndex]);
+    o->oBackAndForthPlatformPathLength = 50.0f * (GET_BPARAM2(o->oBehParams) & SLIDING_PLATFORM_BP2_LENGTH_MASK);
 
-    if (collisionDataIndex < 5 || collisionDataIndex > 6) {
+    if (collisionDataIndex < SLIDING_PLATFORM_BP1_RR_PYRAMID || collisionDataIndex > SLIDING_PLATFORM_BP1_NULL) {
         o->oBackAndForthPlatformVel = 15.0f;
-        if ((u16)(o->oBehParams >> 16) & 0x0040) {
+        if (GET_BPARAM2(o->oBehParams) & SLIDING_PLATFORM_BP2_FLAG_INVERTED) {
             o->oMoveAngleYaw += 0x8000;
         }
-    } else {
+    } else { // Applies to both unused types:
         o->oBackAndForthPlatformVel = 10.0f;
-        if ((u16)(o->oBehParams >> 16) & 0x0040) {
+        if (GET_BPARAM2(o->oBehParams) & SLIDING_PLATFORM_BP2_FLAG_INVERTED) {
             o->oBackAndForthPlatformDirection = -1.0f;
         } else {
             o->oBackAndForthPlatformDirection = 1.0f;
@@ -33,7 +32,7 @@ void bhv_sliding_plat_2_init(void) {
     }
 }
 
-void bhv_sliding_plat_2_loop(void) {
+void bhv_sliding_platform_loop(void) {
     if (o->oTimer > 10) {
         o->oBackAndForthPlatformDistance += o->oBackAndForthPlatformVel;
         if (clamp_f32(&o->oBackAndForthPlatformDistance, -o->oBackAndForthPlatformPathLength, 0.0f)) {

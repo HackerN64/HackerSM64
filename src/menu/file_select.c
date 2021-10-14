@@ -559,6 +559,7 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
         }
     }
 }
+
 #undef SCORE_TIMER
 
 /**
@@ -849,6 +850,7 @@ void erase_action_file_button(struct Object *eraseButton, s32 eraseFileButtonID)
             break;
     }
 }
+
 #undef BUZZ_TIMER
 
 /**
@@ -894,6 +896,7 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
         }
     }
 }
+
 #undef ACTION_TIMER
 #undef MAIN_RETURN_TIMER
 
@@ -943,6 +946,7 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
     sMainMenuButtons[MENU_BUTTON_OPTION_MIN + sSoundMode]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
 #endif
 }
+
 #undef SOUND_BUTTON_Y
 
 /**
@@ -1330,6 +1334,7 @@ void check_main_menu_clicked_buttons(void) {
                 break;
         }
 }
+
 #undef SAVE_FILE_SOUND
 
 /**
@@ -2179,6 +2184,7 @@ void print_save_file_scores(s8 fileIndex) {
     } else {
         print_menu_generic_string(HISCORE_X, 24, textHiScore);
     }
+
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -2211,7 +2217,7 @@ void print_file_select_strings(void) {
         sTextBaseAlpha += 10;
     }
     if (sMainMenuTimer < 1000) {
-        sMainMenuTimer += 1;
+        sMainMenuTimer++;
     }
 }
 

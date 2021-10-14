@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvFloorSwitchHardcodedModel, bhvFloorSwitchGrills, and
  * bhvFloorSwitchAnimatesObject.
@@ -15,18 +16,21 @@ void bhv_purple_switch_loop(void) {
         case PURPLE_SWITCH_ACT_IDLE:
             cur_obj_set_model(MODEL_PURPLE_SWITCH);
             cur_obj_scale(1.5f);
-            if (gMarioObject->platform == o && !(gMarioStates[0].action & MARIO_NO_PURPLE_SWITCH)) {
-                if (lateral_dist_between_objects(o, gMarioObject) < 127.5f) {
-                    o->oAction = PURPLE_SWITCH_ACT_PRESSED;
-                }
+            if (
+                gMarioObject->platform == o
+                && !(gMarioStates[0].action & MARIO_NO_PURPLE_SWITCH)
+                && lateral_dist_between_objects(o, gMarioObject) < 127.5f
+            ) {
+                o->oAction = PURPLE_SWITCH_ACT_PRESSED;
             }
             break;
+
         /**
          * Collapse the switch downward, play a sound, and shake the screen.
          * Immediately transition to the ticking state.
          */
         case PURPLE_SWITCH_ACT_PRESSED:
-            cur_obj_scale_over_time(2, 3, 1.5f, 0.2f);
+            cur_obj_scale_over_time(SCALE_AXIS_Y, 3, 1.5f, 0.2f);
             if (o->oTimer == 3) {
                 cur_obj_play_sound_2(SOUND_GENERAL2_PURPLE_SWITCH);
                 o->oAction = PURPLE_SWITCH_ACT_TICKING;
@@ -36,6 +40,7 @@ void bhv_purple_switch_loop(void) {
 #endif
             }
             break;
+
         /**
          * Play a continuous ticking sound that gets faster when time is almost
          * up. When time is up, move to a waiting-while-pressed state.
@@ -56,16 +61,18 @@ void bhv_purple_switch_loop(void) {
                 }
             }
             break;
+
         /**
          * Make the switch look unpressed again, and transition back to the
          * idle state.
          */
         case PURPLE_SWITCH_ACT_UNPRESSED:
-            cur_obj_scale_over_time(2, 3, 0.2f, 1.5f);
+            cur_obj_scale_over_time(SCALE_AXIS_Y, 3, 0.2f, 1.5f);
             if (o->oTimer == 3) {
                 o->oAction = PURPLE_SWITCH_ACT_IDLE;
             }
             break;
+
         /**
          * Mario is standing on the switch, but time has expired. Wait for
          * him to get off the switch, and when he does so, transition to the

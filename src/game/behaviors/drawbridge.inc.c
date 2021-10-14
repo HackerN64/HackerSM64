@@ -1,4 +1,4 @@
-// drawbridge.c.inc
+// drawbridge.inc.c
 
 void bhv_lll_drawbridge_spawner_loop(void) {
     struct Object *drawbridge1, *drawbridge2;
@@ -30,18 +30,18 @@ void bhv_lll_drawbridge_loop(void) {
     if ((s16) o->oFaceAngleRoll < -0x1FFD) {
         o->oFaceAngleRoll = 0xDFFF;
 
-        if (o->oTimer >= 51 && (o->oTimer % 8) == 0) {
+        if (o->oTimer > 50 && !(o->oTimer & 0x7)) {
             o->oAction = LLL_DRAWBRIDGE_ACT_LOWER;
-            cur_obj_play_sound_2(SOUND_GENERAL_BOAT_TILT1);
+            cur_obj_play_sound_2(SOUND_GENERAL_DRAWBRIDGE_LOWER);
         }
     }
 
     if ((s16) o->oFaceAngleRoll >= 0) {
         o->oFaceAngleRoll = 0;
 
-        if (o->oTimer >= 51 && (o->oTimer % 8) == 0) {
+        if (o->oTimer > 50 && !(o->oTimer & 0x7)) {
             o->oAction = LLL_DRAWBRIDGE_ACT_RAISE;
-            cur_obj_play_sound_2(SOUND_GENERAL_BOAT_TILT2);
+            cur_obj_play_sound_2(SOUND_GENERAL_DRAWBRIDGE_RAISE);
         }
     }
 }

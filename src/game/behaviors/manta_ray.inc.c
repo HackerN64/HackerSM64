@@ -1,3 +1,4 @@
+
 /**
  * @file Behavior file for the manta ray in DDD.
  *
@@ -5,15 +6,15 @@
  * These rings contain a significant bug that is documented in water_ring.inc.c
  */
 
-static Trajectory sMantaRayTraj[] = {
-    TRAJECTORY_POS(0, /*pos*/ -4500, -1380,   -40),
-    TRAJECTORY_POS(1, /*pos*/ -4120, -2240,   740),
-    TRAJECTORY_POS(2, /*pos*/ -3280, -3080,  1040),
-    TRAJECTORY_POS(3, /*pos*/ -2240, -3320,   720),
-    TRAJECTORY_POS(4, /*pos*/ -1840, -3140,  -280),
-    TRAJECTORY_POS(5, /*pos*/ -2320, -2480, -1100),
-    TRAJECTORY_POS(6, /*pos*/ -3220, -1600, -1360),
-    TRAJECTORY_POS(7, /*pos*/ -4180, -1020, -1040),
+static Trajectory sMantaRayTraj[] = { 
+    TRAJECTORY_POS(0, /*pos*/ -4500, -1380,   -40), 
+    TRAJECTORY_POS(1, /*pos*/ -4120, -2240,   740), 
+    TRAJECTORY_POS(2, /*pos*/ -3280, -3080,  1040), 
+    TRAJECTORY_POS(3, /*pos*/ -2240, -3320,   720), 
+    TRAJECTORY_POS(4, /*pos*/ -1840, -3140,  -280), 
+    TRAJECTORY_POS(5, /*pos*/ -2320, -2480, -1100), 
+    TRAJECTORY_POS(6, /*pos*/ -3220, -1600, -1360), 
+    TRAJECTORY_POS(7, /*pos*/ -4180, -1020, -1040), 
     TRAJECTORY_END(),
 };
 
@@ -33,8 +34,7 @@ static struct ObjectHitbox sMantaRayHitbox = {
  * Initializes the manta ray when spawned.
  */
 void bhv_manta_ray_init(void) {
-    struct Object *ringManager;
-    ringManager = spawn_object(o, MODEL_NONE, bhvMantaRayRingManager);
+    struct Object *ringManager = spawn_object(o, MODEL_NONE, bhvMantaRayRingManager);
     o->parentObj = ringManager;
     obj_set_hitbox(o, &sMantaRayHitbox);
     cur_obj_scale(2.5f);
@@ -42,13 +42,15 @@ void bhv_manta_ray_init(void) {
 
 static void manta_ray_move(void) {
     s16 animFrame = o->header.gfx.animInfo.animFrame;
-    gCurrentObject->oPathedStartWaypoint = (struct Waypoint *) sMantaRayTraj;
-    cur_obj_follow_path(0);
+
+    o->oPathedStartWaypoint = (struct Waypoint *) sMantaRayTraj;
+    cur_obj_follow_path();
+
     o->oMantaTargetYaw   = o->oPathedTargetYaw;
     o->oMantaTargetPitch = o->oPathedTargetPitch;
     o->oForwardVel = 10.0f;
 
-    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oMantaTargetYaw, 0x80);
+    o->oMoveAngleYaw   = approach_s16_symmetric(o->oMoveAngleYaw, o->oMantaTargetYaw, 0x80);
     o->oMoveAnglePitch = approach_s16_symmetric(o->oMoveAnglePitch, o->oMantaTargetPitch, 0x80);
 
     // This causes the ray to tilt as it turns.
@@ -72,14 +74,13 @@ static void manta_ray_move(void) {
 
 static void manta_ray_act_spawn_ring(void) {
     struct Object *ringManager = o->parentObj;
-    struct Object *ring;
 
     if (o->oTimer == 300) {
         o->oTimer = 0;
     }
 
     if (o->oTimer == 0 || o->oTimer == 50 || o->oTimer == 150 || o->oTimer == 200 || o->oTimer == 250) {
-        ring = spawn_object(o, MODEL_WATER_RING, bhvMantaRayWaterRing);
+        struct Object *ring = spawn_object(o, MODEL_WATER_RING, bhvMantaRayWaterRing);
 
         ring->oFaceAngleYaw = o->oMoveAngleYaw;
         ring->oFaceAnglePitch = o->oMoveAnglePitch + 0x4000;
@@ -119,6 +120,6 @@ void bhv_manta_ray_loop(void) {
     }
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     }
 }

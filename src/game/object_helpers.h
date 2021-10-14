@@ -22,8 +22,7 @@ struct ChainSegment
 #define WATER_DROPLET_FLAG_RAND_ANGLE_INCR_FORWARD  (1 << 7) // 0x80 // Unused
 
 // Call spawn_water_droplet with this struct to spawn an object.
-struct WaterDropletParams
-{
+struct WaterDropletParams {
     s16 flags; // Droplet spawn flags, see defines above
     s16 model;
     const BehaviorScript *behavior;
@@ -73,7 +72,7 @@ void obj_set_pos(struct Object *obj, s16 x, s16 y, s16 z);
 void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll);
 struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, u32 model,
                                          const BehaviorScript *behavior,
-                                         s16 x, s16 y, s16 z, s16 rx, s16 ry, s16 rz);
+                                         s16 x, s16 y, s16 z, s16 pitch, s16 yaw, s16 roll);
 struct Object *spawn_object_rel_with_rot(struct Object *parent, u32 model, const BehaviorScript *behavior,
                                          s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, s16 rz);
 struct Object *spawn_obj_with_transform_flags(struct Object *sp20, s32 model, const BehaviorScript *behavior);
@@ -98,7 +97,7 @@ void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void obj_apply_scale_to_transform(struct Object *obj);
 void obj_copy_scale(struct Object *dst, struct Object *src);
-void obj_scale_xyz(struct Object* obj, f32 xScale, f32 yScale, f32 zScale);
+void obj_scale_xyz(struct Object *obj, f32 xScale, f32 yScale, f32 zScale);
 void obj_scale(struct Object *obj, f32 scale);
 void cur_obj_scale(f32 scale);
 void cur_obj_init_animation_with_sound(s32 animIndex);
@@ -203,16 +202,6 @@ s16 cur_obj_reflect_move_angle_off_wall(void);
 #define PATH_NONE 0
 #define PATH_REACHED_END -1
 #define PATH_REACHED_WAYPOINT 1
-
-struct GraphNode_802A45E4 {
-    /*0x00*/ s8 filler0[0x18 - 0x00];
-    /*0x18*/ s16 unk18;
-    /*0x1A*/ s16 unk1A;
-    /*0x1C*/ s16 unk1C;
-    /*0x1E*/ s16 unk1E;
-    /*0x20*/ s16 unk20;
-    /*0x22*/ s16 unk22;
-};
 
 void obj_set_hitbox(struct Object *obj, struct ObjectHitbox *hitbox);
 s32 cur_obj_wait_then_blink(s32 timeUntilBlinking, s32 numBlinks);

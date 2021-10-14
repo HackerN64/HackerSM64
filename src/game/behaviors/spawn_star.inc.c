@@ -1,6 +1,4 @@
-#include "config.h"
-
-// spawn_default_star.c.inc
+// spawn_star.inc.c
 
 static struct ObjectHitbox sCollectStarHitbox = {
     /* interactType:      */ INTERACT_STAR_OR_KEY,
@@ -15,12 +13,12 @@ static struct ObjectHitbox sCollectStarHitbox = {
 };
 
 void bhv_collect_star_init(void) {
-    s8 starId = (o->oBehParams >> 24) & 0xFF;
+    s8 starId = GET_BPARAM1(o->oBehParams);
 #ifdef GLOBAL_STAR_IDS
-    u8 currentLevelStarFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, (starId/7) - 1);
+    u8 currentLevelStarFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(starId / 7));
     if (currentLevelStarFlags & (1 << (starId % 7))) {
 #else
-    u8 currentLevelStarFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
+    u8 currentLevelStarFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
     if (currentLevelStarFlags & (1 << starId)) {
 #endif
         o->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_TRANSPARENT_STAR];
@@ -41,17 +39,17 @@ void bhv_collect_star_loop(void) {
 }
 
 void bhv_star_spawn_init(void) {
-    f32 dx = (o->oHomeX - o->oPosX);
-    f32 dz = (o->oHomeZ - o->oPosZ);
-    o->oMoveAngleYaw = atan2s(dz, dx);
-    o->oStarSpawnDisFromHome = sqrtf(sqr(dx) + sqr(dz));
+    Angle yaw;
+    vec3f_get_lateral_dist_and_yaw(&o->oPosVec, &o->oHomeVec, &o->oStarSpawnDisFromHome, &yaw);
+    o->oMoveAngleYaw = yaw;
     o->oVelY = (o->oHomeY - o->oPosY) / 30.0f;
     o->oForwardVel = o->oStarSpawnDisFromHome / 30.0f;
     o->oStarSpawnVelY = o->oPosY;
-#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
-    if (o->oBehParams2ndByte == 0) {
+
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR || gCurrCourseNum == COURSE_BBH) {
 #else
-    if (o->oBehParams2ndByte == 0 || gCurrCourseNum == COURSE_BBH) {
+    if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR) {
 #endif
         cutscene_object(CUTSCENE_STAR_SPAWN, o);
     } else {
@@ -83,9 +81,8 @@ void bhv_star_spawn_loop(void) {
                 o->oAction = SPAWN_STAR_ARC_CUTSCENE_ACT_BOUNCE;
                 o->oForwardVel = 0;
                 // Set to exact home coordinates
-                o->oPosX = o->oHomeX;
-                o->oPosZ = o->oHomeZ;
-                play_power_star_jingle(TRUE);
+                vec3f_copy(&o->oPosVec, &o->oHomeVec);
+                play_power_star_jingle();
             }
             break;
 
@@ -95,6 +92,7 @@ void bhv_star_spawn_loop(void) {
             } else {
                 o->oVelY = -10.0f;
             }
+
             spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
             obj_move_xyz_using_fvel_and_yaw(o);
             o->oFaceAngleYaw = o->oFaceAngleYaw - o->oTimer * 0x10 + 0x1000;
@@ -127,7 +125,7 @@ void bhv_star_spawn_loop(void) {
 struct Object *spawn_star(struct Object *starObj, f32 x, f32 y, f32 z) {
     starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStarSpawnCoordinates, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
     starObj->oBehParams = o->oBehParams;
-    vec3_set(&starObj->oHomeVec, x, y, z);
+    vec3f_set(&starObj->oHomeVec, x, y, z);
     starObj->oFaceAnglePitch = 0;
     starObj->oFaceAngleRoll = 0;
     return starObj;
@@ -154,9 +152,11 @@ void spawn_no_exit_star(f32 x, f32 y, f32 z) {
 
 void bhv_hidden_red_coin_star_init(void) {
     struct Object *starObj = NULL;
+
     if (gCurrCourseNum != COURSE_JRB) {
         spawn_object(o, MODEL_TRANSPARENT_STAR, bhvRedCoinStarMarker);
     }
+
     s16 numRedCoinsRemaining = count_objects_with_behavior(bhvRedCoin);
     if (numRedCoinsRemaining == 0) {
         starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStar, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
@@ -169,12 +169,14 @@ void bhv_hidden_red_coin_star_init(void) {
 
 void bhv_hidden_red_coin_star_loop(void) {
     gRedCoinsCollected = o->oHiddenStarTriggerCounter;
+
     switch (o->oAction) {
         case HIDDEN_STAR_ACT_INACTIVE:
             if (o->oHiddenStarTriggerCounter == 8) {
                 o->oAction = HIDDEN_STAR_ACT_ACTIVE;
             }
             break;
+
         case HIDDEN_STAR_ACT_ACTIVE:
             if (o->oTimer > 2) {
                 spawn_red_coin_cutscene_star(o->oPosX, o->oPosY, o->oPosZ);

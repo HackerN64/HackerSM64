@@ -20,9 +20,7 @@ s32 sMontyMoleKillStreak;
  * The position of the last killed monty mole, used for determining whether
  * the next killed monty mole is nearby.
  */
-f32 sMontyMoleLastKilledPosX;
-f32 sMontyMoleLastKilledPosY;
-f32 sMontyMoleLastKilledPosZ;
+Vec3f sMontyMoleLastKilledPos;
 
 /**
  * Link all objects with the given behavior using parentObj.
@@ -30,15 +28,10 @@ f32 sMontyMoleLastKilledPosZ;
  * start of this list.
  */
 static struct Object *link_objects_with_behavior(const BehaviorScript *behavior) {
-    const BehaviorScript *behaviorAddr;
+    const BehaviorScript *behaviorAddr = segmented_to_virtual(behavior);
     struct Object *obj;
-    struct Object *lastObject;
-    struct ObjectNode *listHead;
-
-    behaviorAddr = segmented_to_virtual(behavior);
-    lastObject = NULL;
-
-    listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
+    struct Object *lastObject = NULL;
+    struct ObjectNode *listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
 
     obj = (struct Object *) listHead->next;
     while (obj != (struct Object *) listHead) {
@@ -104,31 +97,32 @@ void bhv_monty_mole_hole_update(void) {
         sMontyMoleHoleList = link_objects_with_behavior(bhvMontyMoleHole);
         sMontyMoleKillStreak = 0;
     } else if (o->oMontyMoleHoleCooldown > 0) {
-        o->oMontyMoleHoleCooldown -= 1;
+        o->oMontyMoleHoleCooldown--;
     }
 }
+
+static struct SpawnParticlesInfo sMontyMoleRiseFromGroundParticles = {
+    /* behParam:        */ 0,
+    /* count:           */ 3,
+    /* model:           */ MODEL_SAND_DUST,
+    /* offsetY:         */ 0,
+    /* forwardVelBase:  */ 4,
+    /* forwardVelRange: */ 4,
+    /* velYBase:        */ 10,
+    /* velYRange:       */ 15,
+    /* gravity:         */ -4,
+    /* dragStrength:    */ 0,
+    /* sizeBase:        */ 10.0f,
+    /* sizeRange:       */ 7.0f,
+};
 
 /**
  * Spawn dirt particles when rising out of the ground.
  */
 void monty_mole_spawn_dirt_particles(s8 offsetY, s8 velYBase) {
-    static struct SpawnParticlesInfo sMontyMoleRiseFromGroundParticles = {
-        /* behParam:        */ 0,
-        /* count:           */ 3,
-        /* model:           */ MODEL_SAND_DUST,
-        /* offsetY:         */ 0,
-        /* forwardVelBase:  */ 4,
-        /* forwardVelRange: */ 4,
-        /* velYBase:        */ 10,
-        /* velYRange:       */ 15,
-        /* gravity:         */ -4,
-        /* dragStrength:    */ 0,
-        /* sizeBase:        */ 10.0f,
-        /* sizeRange:       */ 7.0f,
-    };
-
     sMontyMoleRiseFromGroundParticles.offsetY = offsetY;
     sMontyMoleRiseFromGroundParticles.velYBase = velYBase;
+
     cur_obj_spawn_particles(&sMontyMoleRiseFromGroundParticles);
 }
 
@@ -148,7 +142,7 @@ static void monty_mole_act_select_hole(void) {
 
     if (o->oBehParams2ndByte != MONTY_MOLE_BP_NO_ROCK) {
         minDistToMario = 200.0f;
-    } else if (gMarioStates[0].forwardVel < 8.0f) {
+    } else if (gMarioState->forwardVel < 8.0f) {
         minDistToMario = 100.0f;
     } else {
         minDistToMario = 500.0f;
@@ -368,14 +362,13 @@ void bhv_monty_mole_update(void) {
     // Spawn a 1-up if you kill 8 monty moles
     if (obj_check_attacks(&sMontyMoleHitbox, o->oAction)) {
         if (sMontyMoleKillStreak != 0) {
-            f32 dx = o->oPosX - sMontyMoleLastKilledPosX;
-            f32 dy = o->oPosY - sMontyMoleLastKilledPosY;
-            f32 dz = o->oPosZ - sMontyMoleLastKilledPosZ;
+            Vec3f d;
+            vec3_diff(d, &o->oPosVec, sMontyMoleLastKilledPos);
 
             //! The two farthest holes on the bottom level of TTM are more than
             //  1500 units away from each other, so the counter resets if you
             //  attack moles in these holes consecutively.
-            if ((sqr(dx) + sqr(dy) + sqr(dz)) < sqr(1500.0f)) {
+            if (vec3_sumsq(d) < sqr(1500.0f)) {
                 if (sMontyMoleKillStreak == 7) {
                     play_puzzle_jingle();
                     spawn_object(o, MODEL_1UP, bhv1upWalking);
@@ -385,13 +378,10 @@ void bhv_monty_mole_update(void) {
             }
         }
 
-        if (sMontyMoleKillStreak < (1 << 15)) {
-            sMontyMoleKillStreak++;
-        }
+        //! No overflow check
+        sMontyMoleKillStreak++;
 
-        sMontyMoleLastKilledPosX = o->oPosX;
-        sMontyMoleLastKilledPosY = o->oPosY;
-        sMontyMoleLastKilledPosZ = o->oPosZ;
+        vec3f_copy(sMontyMoleLastKilledPos, &o->oPosVec);
 
         monty_mole_hide_in_hole();
 
@@ -420,12 +410,12 @@ static void monty_mole_rock_act_held(void) {
         o->oAction = MONTY_MOLE_ROCK_ACT_MOVE;
 
         // The angle is adjusted to compensate for the start position offset
-        o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 0x1F4 - distToMario * 0.1f);
+        o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 500 - distToMario * 0.1f);
 
         o->oForwardVel = 40.0f;
         o->oVelY = distToMario * 0.08f + 8.0f;
 
-        o->oMoveFlags = 0;
+        o->oMoveFlags = OBJ_MOVE_NONE;
     }
 }
 

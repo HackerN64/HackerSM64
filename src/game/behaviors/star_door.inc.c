@@ -1,4 +1,4 @@
-// star_door.c.inc
+// star_door.inc.c
 
 void star_door_update_pos(void) {
     o->oVelX = (o->oLeftVel) * coss(o->oMoveAngleYaw);
@@ -8,18 +8,21 @@ void star_door_update_pos(void) {
 }
 
 void bhv_star_door_loop(void) {
-    struct Object *doorObj;
-    doorObj = cur_obj_nearest_object_with_behavior(bhvStarDoor);
+    struct Object *doorObj = cur_obj_nearest_object_with_behavior(bhvStarDoor);
+
     switch (o->oAction) {
-        case 0:
+        case STAR_DOOR_ACT_CLOSED:
             cur_obj_become_tangible();
-            if (0x30000 & o->oInteractStatus)
-                o->oAction = 1;
-            if (doorObj != NULL && doorObj->oAction != 0)
-                o->oAction = 1;
+            if (o->oInteractStatus & (INT_STATUS_DOOR_PULLED | INT_STATUS_DOOR_PUSHED)) {
+                o->oAction = STAR_DOOR_ACT_OPENING;
+            }
+            if (doorObj != NULL && doorObj->oAction != STAR_DOOR_ACT_CLOSED) {
+                o->oAction = STAR_DOOR_ACT_OPENING;
+            }
             break;
-        case 1:
-            if (o->oTimer == 0 && (s16)(o->oMoveAngleYaw) >= 0) {
+
+        case STAR_DOOR_ACT_OPENING:
+            if (o->oTimer == 0 && (s16) o->oMoveAngleYaw >= 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_OPEN);
 #if ENABLE_RUMBLE
                 queue_rumble_data(35, 30);
@@ -28,15 +31,19 @@ void bhv_star_door_loop(void) {
             cur_obj_become_intangible();
             o->oLeftVel = -8.0f;
             star_door_update_pos();
-            if (o->oTimer >= 16)
-                o->oAction++;
+            if (o->oTimer > 15) {
+                o->oAction++; // STAR_DOOR_ACT_OPEN
+            }
             break;
-        case 2:
-            if (o->oTimer >= 31)
-                o->oAction++;
+
+        case STAR_DOOR_ACT_OPEN:
+            if (o->oTimer > 30) {
+                o->oAction++; // STAR_DOOR_ACT_CLOSING
+            }
             break;
-        case 3:
-            if (o->oTimer == 0 && (s16)(o->oMoveAngleYaw) >= 0) {
+
+        case STAR_DOOR_ACT_CLOSING:
+            if (o->oTimer == 0 && (s16) o->oMoveAngleYaw >= 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_CLOSE);
 #if ENABLE_RUMBLE
                 queue_rumble_data(35, 30);
@@ -44,12 +51,14 @@ void bhv_star_door_loop(void) {
             }
             o->oLeftVel = 8.0f;
             star_door_update_pos();
-            if (o->oTimer >= 16)
-                o->oAction++;
+            if (o->oTimer > 15) {
+                o->oAction++; // STAR_DOOR_ACT_RESET
+            }
             break;
-        case 4:
-            o->oInteractStatus = 0;
-            o->oAction = 0;
+
+        case STAR_DOOR_ACT_RESET:
+            o->oInteractStatus = INT_STATUS_NONE;
+            o->oAction = STAR_DOOR_ACT_CLOSED;
             break;
     }
 }

@@ -1,6 +1,6 @@
 #include <PR/ultratypes.h>
 
-#if defined(VERSION_EU) || defined(VERSION_SH)
+#ifdef VERSION_EU
 #include "prevent_bss_reordering.h"
 #endif
 
@@ -90,6 +90,8 @@ void func_80192294(struct ObjNet *net) {
 /* 240ACC -> 240B84 */
 void func_801922FC(struct ObjNet *net) {
     struct ObjGroup *group; // 24
+    UNUSED u8 filler[8];
+
     gGdSkinNet = net;
     // TODO: netype constants?
     if (net->netType == 4) {
@@ -189,14 +191,46 @@ void collision_something_801926A4(struct ObjNet *net) {
     net->worldPos.z += net->collDisp.z;
     func_8017E9EC(net);
 
-    net->torque.x *= 0.98f;
-    net->torque.z *= 0.98f;
-    net->torque.y *= 0.9f;
+    net->torque.x *= 0.98; //? 0.98f
+    net->torque.z *= 0.98; //? 0.98f
+    net->torque.y *= 0.9;  //? 0.9f
+}
+
+/* 2412A0 -> 24142C; not called */
+void func_80192AD0(struct ObjNet *net) {
+    UNUSED u8 filler1[4];
+    struct ObjGroup *sp60;
+    UNUSED u8 filler2[68];
+    struct ObjNet *sp18;
+
+    if ((sp60 = net->unk1C8) == NULL) {
+        return;
+    }
+
+    sp18 = net->unk1F0;
+    net->worldPos.x = net->unk1F4.x;
+    net->worldPos.y = net->unk1F4.y;
+    net->worldPos.z = net->unk1F4.z;
+    gd_rotate_and_translate_vec3f(&net->worldPos, &sp18->mat128);
+
+    net->worldPos.x += net->unk1F0->worldPos.x;
+    net->worldPos.y += net->unk1F0->worldPos.y;
+    net->worldPos.z += net->unk1F0->worldPos.z;
+    net->unk200.x = 0.0f;
+    net->unk200.y = 10.0f;
+    net->unk200.z = -4.0f;
+    gd_rotate_and_translate_vec3f(&net->unk200, &sp18->mat128);
+
+    apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191824, sp60);
+    func_80191E88(sp60);
+    apply_to_obj_types_in_group(OBJ_TYPE_BONES, (applyproc_t) func_8018F328, net->unk20C);
 }
 
 /* 24142C -> 24149C; orig name: func_80192C5C */
 void move_bonesnet(struct ObjNet *net) {
-    struct ObjGroup *group;
+    struct ObjGroup *sp24;
+    UNUSED u8 filler[12];
+
     imin("move_bonesnet");
     gd_set_identity_mat4(&D_801B9DC8);
     if ((group = net->unk1C8) != NULL) {
@@ -262,8 +296,10 @@ void func_80192CCC(struct ObjNet *net) {
 
 /* 241768 -> 241AB4; orig name: func_80192F98 */
 void convert_gd_verts_to_Vn(struct ObjGroup *grp) {
+    UNUSED u8 filler1[20];
     Vtx *vn;       // 28
     u8 nx, ny, nz; // 24, 25, 26
+    UNUSED u8 filler2[4];
     register struct VtxLink *vtxlink; // a1
 #ifndef GBI_FLOATS
     register s16 *vnPos;              // a2
@@ -308,6 +344,7 @@ void convert_gd_verts_to_Vn(struct ObjGroup *grp) {
 
 /* 241AB4 -> 241BCC; orig name: func_801932E4 */
 void convert_gd_verts_to_Vtx(struct ObjGroup *grp) {
+    UNUSED u8 filler[24];
     register struct VtxLink *vtxlink; // a1
 #ifndef GBI_FLOATS
     register s16 *vtxcoords;          // a2

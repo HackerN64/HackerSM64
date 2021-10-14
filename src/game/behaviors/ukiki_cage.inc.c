@@ -1,4 +1,3 @@
-// ukiki_cage.c.inc
 
 /**
  * @file Contains behavior for the ukiki's cage
@@ -18,10 +17,9 @@ void bhv_ukiki_cage_star_loop(void) {
     switch (o->oAction) {
         case UKIKI_CAGE_STAR_ACT_IN_CAGE:
             // Initialization to see if the star is collected (blue) or not (yellow).
-            if (o->oTimer == 0) {
-                if (0x2 & save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1)) {
-                    cur_obj_set_model(MODEL_TRANSPARENT_STAR);
-                }
+            if (o->oTimer == 0
+                && (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum)) & STAR_FLAG_ACT_2)) {
+                cur_obj_set_model(MODEL_TRANSPARENT_STAR);
             }
 
             obj_copy_pos(o, o->parentObj);
@@ -32,10 +30,11 @@ void bhv_ukiki_cage_star_loop(void) {
                 o->oAction++;
             }
             break;
+
         case UKIKI_CAGE_STAR_ACT_SPAWN_STAR:
             obj_mark_for_deletion(o);
             spawn_mist_particles();
-            spawn_triangle_break_particles(20, MODEL_DIRT_ANIMATION, 0.7, 3);
+            spawn_triangle_break_particles(20, MODEL_DIRT_ANIMATION, 0.7f, 3);
             spawn_default_star(2500.0f, -1200.0f, 1300.0f);
             break;
     }
@@ -92,9 +91,11 @@ void ukiki_cage_act_hide(void) {
 /**
  * An array of the cage's actions.
  */
-void (*sUkikiCageActions[])(void) = {
-    ukiki_cage_act_wait_for_ukiki, ukiki_cage_act_spin,
-    ukiki_cage_act_fall,           ukiki_cage_act_hide,
+ObjActionFunc sUkikiCageActions[] = {
+    ukiki_cage_act_wait_for_ukiki,
+    ukiki_cage_act_spin,
+    ukiki_cage_act_fall,
+    ukiki_cage_act_hide,
 };
 
 /**

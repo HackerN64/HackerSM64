@@ -806,7 +806,7 @@ s16 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
     }
 
     if (anim->flags & ANIM_FLAG_FORWARD) {
-        if (obj->animAccel) {
+        if (obj->animAccel != 0) {
             result = obj->animFrameAccelAssist - obj->animAccel;
         } else {
             result = (obj->animFrame - 1) << 16;

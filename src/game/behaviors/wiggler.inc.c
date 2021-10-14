@@ -63,9 +63,7 @@ static f32 sWigglerSpeeds[] = { 2.0f, 40.0f, 30.0f, 16.0f };
  */
 void bhv_wiggler_body_part_update(void) {
     Vec3f d;
-    f32 dxz;
     struct ChainSegment *segment = &o->parentObj->oWigglerSegments[o->oBehParams2ndByte];
-    f32 posOffset;
 
     cur_obj_scale(o->parentObj->header.gfx.scale[0]);
 
@@ -73,18 +71,19 @@ void bhv_wiggler_body_part_update(void) {
     o->oFaceAngleYaw = segment->angle[1];
 
     // TODO: What is this for?
-    posOffset = -37.5f * o->header.gfx.scale[0];
+    f32 posOffset = -37.5f * o->header.gfx.scale[0];
     d[1] = posOffset * coss(o->oFaceAnglePitch) - posOffset;
-    dxz = posOffset * sins(o->oFaceAnglePitch);
+    f32 dxz = posOffset * sins(o->oFaceAnglePitch);
     d[0] = dxz * sins(o->oFaceAngleYaw);
     d[2] = dxz * coss(o->oFaceAngleYaw);
-    vec3_sum(&o->oPosVec, segment->pos, d);
+
+    vec3f_sum(&o->oPosVec, segment->pos, d);
 
     if (o->oPosY < o->parentObj->oWigglerFallThroughFloorsHeight) {
         //! Since position is recomputed each frame, tilting the wiggler up
         //  while on the ground could cause the tail segments to clip through
         //  the floor
-        o->oPosY += -30.0f;
+        o->oPosY -= 30.0f;
         cur_obj_update_floor_height();
         if (o->oFloorHeight > o->oPosY) { // TODO: Check ineq swap
             o->oPosY = o->oFloorHeight;
@@ -111,10 +110,9 @@ void bhv_wiggler_body_part_update(void) {
  */
 void wiggler_init_segments(void) {
     s32 i;
-    struct ChainSegment *segments;
     struct Object *bodyPart;
+    struct ChainSegment *segments = mem_pool_alloc(gObjectMemoryPool, WIGGLER_NUM_SEGMENTS * sizeof(struct ChainSegment));
 
-    segments = mem_pool_alloc(gObjectMemoryPool, WIGGLER_NUM_SEGMENTS * sizeof(struct ChainSegment));
     if (segments != NULL) {
         // Each segment represents the global position and orientation of each
         // object. Segment 0 represents the wiggler's head, and segment i>0
@@ -122,7 +120,9 @@ void wiggler_init_segments(void) {
         o->oWigglerSegments = segments;
         for (i = 0; i < WIGGLER_NUM_SEGMENTS; i++) {
             chain_segment_init(segments + i);
-            vec3_copy((segments + i)->pos, &o->oPosVec);
+
+            vec3f_copy((segments + i)->pos, &o->oPosVec);
+
             (segments + i)->angle[0] = o->oFaceAnglePitch;
             (segments + i)->angle[1] = o->oFaceAngleYaw;
         }
@@ -157,13 +157,10 @@ void wiggler_init_segments(void) {
     struct ChainSegment *prevBodyPart;
     struct ChainSegment *bodyPart;
     Vec3f d;
-    s16 dpitch;
-    s16 dyaw;
+    s16 dpitch, dyaw;
     f32 dxz;
     s32 i;
-    f32 segmentLength;
-
-    segmentLength = 35.0f * o->header.gfx.scale[0];
+    f32 segmentLength = (35.0f * o->header.gfx.scale[0]);
 
     for (i = 1; i < WIGGLER_NUM_SEGMENTS; i++) {
         prevBodyPart = &o->oWigglerSegments[i - 1];
@@ -218,7 +215,7 @@ static void wiggler_act_walk(void) {
         obj_forward_vel_approach(sWigglerSpeeds[o->oHealth - 1], 1.0f);
 
         if (o->oWigglerWalkAwayFromWallTimer != 0) {
-            o->oWigglerWalkAwayFromWallTimer -= 1;
+            o->oWigglerWalkAwayFromWallTimer--;
         } else {
             if (o->oDistanceToMario >= 25000.0f) {
                 // If >1200 away from home, turn to home
@@ -234,7 +231,7 @@ static void wiggler_act_walk(void) {
                 if (o->oHealth < 4) {
                     o->oWigglerTargetYaw = o->oAngleToMario;
                 } else if (o->oWigglerTimeUntilRandomTurn != 0) {
-                    o->oWigglerTimeUntilRandomTurn -= 1;
+                    o->oWigglerTimeUntilRandomTurn--;
                 } else {
                     o->oWigglerTargetYaw = o->oMoveAngleYaw + 0x4000 * (s16) random_sign();
                     o->oWigglerTimeUntilRandomTurn = random_linear_offset(30, 50);
@@ -283,7 +280,7 @@ static void wiggler_act_jumped_on(void) {
     // defeated) or go back to walking
     if (o->header.gfx.scale[1] >= 4.0f) {
         if (o->oTimer > 30) {
-            if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
+            if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP, 
                 DIALOG_FLAG_NONE, CUTSCENE_DIALOG, attackText[o->oHealth - 2])) {
                 // Because we don't want the wiggler to disappear after being
                 // defeated, we leave its health at 1
@@ -421,7 +418,7 @@ void bhv_wiggler_update(void) {
         }
 
         // Update segment 0 with data from the wiggler object
-        vec3_copy(o->oWigglerSegments[0].pos, &o->oPosVec);
+        vec3f_copy(o->oWigglerSegments[0].pos, &o->oPosVec);
         o->oWigglerSegments[0].angle[0] = o->oFaceAnglePitch;
         o->oWigglerSegments[0].angle[1] = o->oFaceAngleYaw;
 

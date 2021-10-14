@@ -59,7 +59,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
         objectGraphNode = (struct Object *) gCurGraphNodeObject; // TODO: change this to object pointer?
         currentGraphNode = (struct GraphNodeGenerated *) node;
 
-        if (gCurGraphNodeHeldObject) {
+        if (gCurGraphNodeHeldObject != NULL) {
             objectGraphNode = gCurGraphNodeHeldObject->objNode;
         }
 
@@ -326,18 +326,18 @@ void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll) {
  */
 struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, u32 model,
                                          const BehaviorScript *behavior,
-                                         s16 x, s16 y, s16 z, s16 rx, s16 ry, s16 rz) {
+                                         s16 x, s16 y, s16 z, s16 pitch, s16 yaw, s16 roll) {
     // 'uselessArg' is unused in the function spawn_object_at_origin()
     struct Object *newObj = spawn_object_at_origin(parent, uselessArg, model, behavior);
     obj_set_pos(newObj, x, y, z);
-    obj_set_angle(newObj, rx, ry, rz);
+    obj_set_angle(newObj, pitch, yaw, roll);
 
     return newObj;
 }
 
 /*
  * Spawns an object relative to the parent with a specified angle... is what it is supposed to do.
- * The rz argument is never used, and the z offset is used for z-rotation instead. This is most likely
+ * The roll argument is never used, and the z offset is used for z-rotation instead. This is most likely
  * a copy-paste typo by one of the programmers.
  */
 struct Object *spawn_object_rel_with_rot(struct Object *parent, u32 model, const BehaviorScript *behavior,
@@ -917,7 +917,7 @@ void mario_set_flag(s32 flag) {
 
 s32 cur_obj_clear_interact_status_flag(s32 flag) {
     if (o->oInteractStatus & flag) {
-        o->oInteractStatus &= flag ^ ~(0);
+        o->oInteractStatus &= flag ^ 0xFFFFFFFF;
         return TRUE;
     }
     return FALSE;
@@ -1922,10 +1922,10 @@ void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end) {
 }
 
 void cur_obj_set_pos_to_home_with_debug(void) {
-    o->oPosX = o->oHomeX + gDebugInfo[5][0];
-    o->oPosY = o->oHomeY + gDebugInfo[5][1];
-    o->oPosZ = o->oHomeZ + gDebugInfo[5][2];
-    cur_obj_scale(gDebugInfo[5][3] / 100.0f + 1.0l);
+    o->oPosX = o->oHomeX + gDebugInfo[DEBUG_PAGE_ENEMYINFO][0];
+    o->oPosY = o->oHomeY + gDebugInfo[DEBUG_PAGE_ENEMYINFO][1];
+    o->oPosZ = o->oHomeZ + gDebugInfo[DEBUG_PAGE_ENEMYINFO][2];
+    cur_obj_scale(gDebugInfo[DEBUG_PAGE_ENEMYINFO][3] / 100.0f + 1.0l);
 }
 
 s32 cur_obj_is_mario_on_platform(void) {
@@ -2455,7 +2455,7 @@ void cur_obj_spawn_loot_blue_coin(void) {
 
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY) {
     f32 objectPosY = o->oPosY;
-    o->oPosY += offsetY + gDebugInfo[5][0];
+    o->oPosY += offsetY + gDebugInfo[DEBUG_PAGE_ENEMYINFO][0];
     spawn_default_star(targetX, targetY, targetZ);
     o->oPosY = objectPosY;
 }

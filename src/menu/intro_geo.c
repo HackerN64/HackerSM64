@@ -11,7 +11,6 @@
 #include "buffers/framebuffers.h"
 #include "game/game_init.h"
 #include "audio/external.h"
-#include "prevent_bss_reordering.h"
 
 // frame counts for the zoom in, hold, and zoom out of title model
 #define INTRO_STEPS_ZOOM_IN 20
@@ -264,7 +263,7 @@ extern Gfx title_screen_bg_dl_rumble_pak[];
 extern Gfx title_screen_bg_dl_face_easter_egg_begin[];
 extern Gfx title_screen_bg_dl_face_easter_egg_end[];
 
-//Data
+// Data
 s8 sFaceVisible[] = {
     1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,
@@ -442,4 +441,3 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
 }
 
 #endif
-

@@ -86,7 +86,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
             if (clamp_f32(&o->oActivatedBackAndForthPlatformOffset, 0.0f,
                           o->oActivatedBackAndForthPlatformMaxOffset)
                 // The platform will not reset if Mario goes far away and it's travelling backwards
-                || (o->oActivatedBackAndForthPlatformVel > 0.0f && o->oDistanceToMario > 3000.0f)) {
+                || ((o->oActivatedBackAndForthPlatformVel > 0.0f) && (o->oDistanceToMario > 3000.0f))) {
                 // Reset the wait timer
                 o->oActivatedBackAndForthPlatformCountdown = 20;
 
@@ -125,8 +125,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
         // ...set its position to its original position + the offset.
         o->oPosY = o->oHomeY + o->oActivatedBackAndForthPlatformOffset;
     } else {
-        // Otherwise, dip down 20 units if Mario gets on the horizontal platform, and undo if he gets
-        // off.
+        // Otherwise, dip down 20 units if Mario gets on the horizontal platform, and undo if he gets off.
         o->oPosY += o->oVelY;
         clamp_f32(&o->oPosY, o->oHomeY - 20.0f, o->oHomeY);
 

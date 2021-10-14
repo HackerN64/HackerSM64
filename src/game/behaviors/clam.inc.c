@@ -14,17 +14,17 @@ struct ObjectHitbox sClamShellHitbox = {
 
 void clam_act_0(void) {
     if (cur_obj_init_anim_check_frame(0, 25)) {
-        cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL3);
+        cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL_CLOSE);
         spawn_mist_from_global();
         cur_obj_become_tangible();
 
         o->oClamShakeTimer = 10;
         o->oTimer = 0;
     } else if (o->oTimer > 150 && o->oDistanceToMario < 500.0f) {
-        cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL2);
+        cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL_OPEN);
         o->oAction = 1;
     } else if (o->oClamShakeTimer != 0) {
-        o->oClamShakeTimer -= 1;
+        o->oClamShakeTimer--;
         cur_obj_shake_y(3.0f);
     }
 }

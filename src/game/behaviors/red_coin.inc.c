@@ -1,3 +1,4 @@
+
 /**
  * This file contains the initialization and behavior for red coins.
  * Behavior controls audio and the orange number spawned, as well as interacting with
@@ -23,23 +24,14 @@ static struct ObjectHitbox sRedCoinHitbox = {
  * Red coin initialization function. Sets the coin's hitbox and parent object.
  */
 void bhv_red_coin_init(void) {
-    // This floor and floor height are unused. Perhaps for orange number spawns originally?
-    struct Surface *dummyFloor;
-    UNUSED f32 floorHeight = find_floor(o->oPosX, o->oPosY, o->oPosZ, &dummyFloor);
-
-    struct Object *hiddenRedCoinStar;
-
     // Set the red coins to have a parent of the closest red coin star.
-    hiddenRedCoinStar = cur_obj_nearest_object_with_behavior(bhvHiddenRedCoinStar);
-    if (hiddenRedCoinStar != NULL)
+    struct Object *hiddenRedCoinStar = cur_obj_nearest_object_with_behavior(bhvHiddenRedCoinStar);
+    if (hiddenRedCoinStar != NULL) {
         o->parentObj = hiddenRedCoinStar;
-    else {
-        hiddenRedCoinStar = cur_obj_nearest_object_with_behavior(bhvBowserCourseRedCoinStar);
-        if (hiddenRedCoinStar != NULL) {
-            o->parentObj = hiddenRedCoinStar;
-        } else {
-            o->parentObj = NULL;
-        }
+    } else if ((hiddenRedCoinStar = cur_obj_nearest_object_with_behavior(bhvBowserCourseRedCoinStar)) != NULL) {
+        o->parentObj = hiddenRedCoinStar;
+    } else {
+        o->parentObj = NULL;
     }
 
     obj_set_hitbox(o, &sRedCoinHitbox);
@@ -57,25 +49,19 @@ void bhv_red_coin_loop(void) {
             // ...increment the star's counter.
             o->parentObj->oHiddenStarTriggerCounter++;
 
-            // For JP version, play an identical sound for all coins.
-#ifdef VERSION_JP
-            create_sound_spawner(SOUND_GENERAL_RED_COIN);
-#endif
             // Spawn the orange number counter, as long as it isn't the last coin.
             if (o->parentObj->oHiddenStarTriggerCounter != 8) {
                 spawn_orange_number(o->parentObj->oHiddenStarTriggerCounter, 0, 0, 0);
             }
 
             // On all versions but the JP version, each coin collected plays a higher noise.
-#ifndef VERSION_JP
             play_sound(SOUND_MENU_COLLECT_RED_COIN
-                           + (((u8) o->parentObj->oHiddenStarTriggerCounter - 1) << 16),
+                       + (((u8) o->parentObj->oHiddenStarTriggerCounter - 1) << 16),
                        gGlobalSoundSource);
-#endif
         }
 
         coin_collected();
         // Despawn the coin.
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     }
 }

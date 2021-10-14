@@ -1,3 +1,5 @@
+// eyerok.inc.c
+
 struct ObjectHitbox sEyerokHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
     /* downOffset:        */ 0,
@@ -12,18 +14,13 @@ struct ObjectHitbox sEyerokHitbox = {
 
 s8 sEyerokAnimStatesList[] = { 0, 1, 3, 2, 1, 0 };
 
-static s32 eyerok_check_mario_relative_z(s32 arg0) {
-    if (gMarioObject->oPosZ - o->oHomeZ < arg0) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+static s32 eyerok_check_mario_relative_z(s32 relZ) {
+    return gMarioObject->oPosZ - o->oHomeZ < relZ;
 }
 
-static void eyerok_spawn_hand(s16 side, s32 model, const BehaviorScript *behavior) {
-    struct Object *hand;
+static void eyerok_spawn_hand(s16 side, ModelID32 model, const BehaviorScript *behavior) {
+    struct Object *hand = spawn_object_relative_with_scale(side, -500 * side, 0, 300, 1.5f, o, model, behavior);
 
-    hand = spawn_object_relative_with_scale(side, -500 * side, 0, 300, 1.5f, o, model, behavior);
     if (hand != NULL) {
         hand->oFaceAngleYaw -= 0x4000 * side;
     }
@@ -44,17 +41,17 @@ static void eyerok_boss_act_wake_up(void) {
         if (o->oTimer > 5) {
             if (o->oSubAction == 0) {
                 seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
-                o->oSubAction += 1;
+                o->oSubAction++;
             }
 
-            if (o->oEyerokBossOffsetFromHome == 0.0f && mario_ready_to_speak() != 0) {
+            if (o->oEyerokBossOffsetFromHome == 0.0f && mario_ready_to_speak()) {
                 o->oAction = EYEROK_BOSS_ACT_SHOW_INTRO_TEXT;
             } else if (o->oTimer > 150) {
                 if (approach_f32_ptr(&o->oEyerokBossOffsetFromHome, 0.0f, 10.0f)) {
                     o->oTimer = 0;
                 }
             } else if (o->oTimer > 90) {
-                approach_f32_ptr(&o->oEyerokBossOffsetFromHome, 300.f, 10.0f);
+                approach_f32_ptr(&o->oEyerokBossOffsetFromHome, 300.0f, 10.0f);
             }
         }
     } else {
@@ -79,18 +76,18 @@ static void eyerok_boss_act_fight(void) {
                         o->oEyerokBossAttackCountdown = 1;
                     }
                 } else {
-                    o->oEyerokBossAttackCountdown -= 1;
+                    o->oEyerokBossAttackCountdown--;
                 }
 
                 if (o->oEyerokBossAttackCountdown != 0 && o->oEyerokBossAttackCountdown != 1) {
-                    o->oEyerokBossAttackPhase += 1;
+                    o->oEyerokBossAttackPhase++;
                     if ((o->oEyerokBossActiveHand = o->oEyerokBossAttackPhase & 0x1) == 0) {
                         o->oEyerokBossActiveHand = -1;
                     }
                 }
             }
         } else {
-            o->oEyerokBossAttackPhase += 1;
+            o->oEyerokBossAttackPhase++;
 
             if (eyerok_check_mario_relative_z(400)) {
                 o->oEyerokBossAttackCountdown = -8;
@@ -120,7 +117,7 @@ static void eyerok_boss_act_die(void) {
         if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP, DIALOG_FLAG_NONE, CUTSCENE_DIALOG, DIALOG_118)) {
             spawn_default_star(0.0f, -900.0f, -3700.0f);
         } else {
-            o->oTimer -= 1;
+            o->oTimer--;
         }
     } else if (o->oTimer > 120) {
         stop_background_music(SEQUENCE_ARGS(4, SEQ_EVENT_BOSS));
@@ -156,14 +153,14 @@ static s32 eyerok_hand_check_attacked(void) {
             o->oAction = EYEROK_HAND_ACT_ATTACKED;
             o->oVelY = 30.0f;
         } else {
-            o->parentObj->oEyerokBossNumHands -= 1;
+            o->parentObj->oEyerokBossNumHands--;
             o->oAction = EYEROK_HAND_ACT_DIE;
             o->oVelY = 50.0f;
         }
 
         o->oForwardVel *= 0.2f;
         o->oMoveAngleYaw = o->oFaceAngleYaw + 0x8000;
-        o->oMoveFlags = 0;
+        o->oMoveFlags = OBJ_MOVE_NONE;
         o->oGravity = -4.0f;
         o->oAnimState = 3;
 
@@ -183,7 +180,7 @@ static void eyerok_hand_act_sleep(void) {
     if (o->parentObj->oAction != EYEROK_BOSS_ACT_SLEEP
         && ++o->oEyerokHandWakeUpTimer > -3 * o->oBehParams2ndByte) {
         if (cur_obj_check_if_near_animation_end()) {
-            o->parentObj->oEyerokBossNumHands += 1;
+            o->parentObj->oEyerokBossNumHands++;
             o->oAction = EYEROK_HAND_ACT_IDLE;
             o->collisionData = segmented_to_virtual(&ssl_seg7_collision_07028274);
         } else {
@@ -216,7 +213,7 @@ static void eyerok_hand_act_idle(void) {
             }
         } else if (o->parentObj->oEyerokBossActiveHandId == 0 && o->parentObj->oEyerokBossActiveHand != 0) {
             if (o->parentObj->oEyerokBossActiveHand == o->oBehParams2ndByte) {
-                if (eyerok_check_mario_relative_z(400) != 0 || random_u16() % 2 != 0) {
+                if (eyerok_check_mario_relative_z(400) || random_u16() % 2 != 0) {
                     o->oAction = EYEROK_HAND_ACT_TARGET_MARIO;
                     o->oMoveAngleYaw = o->oAngleToMario;
                     o->oGravity = 0.0f;
@@ -268,14 +265,14 @@ static void eyerok_hand_act_show_eye(void) {
     if (!eyerok_hand_check_attacked()) {
         if (o->parentObj->oEyerokBossActiveHand == 0) {
             if (o->oAnimState < 3) {
-                o->oAnimState += 1;
+                o->oAnimState++;
             } else if (cur_obj_check_if_near_animation_end()) {
                 o->oAction = EYEROK_HAND_ACT_CLOSE;
             }
         } else {
             if (o->oEyerokHandEyeShownTimer--) {
                 if (o->oEyerokHandAnimStateIndex != 0) {
-                    o->oEyerokHandAnimStateIndex -= 1;
+                    o->oEyerokHandAnimStateIndex--;
                 }
                 o->oAnimState = sEyerokAnimStatesList[o->oEyerokHandAnimStateIndex];
             } else {
@@ -336,7 +333,7 @@ static void eyerok_hand_act_become_active(void) {
 static void eyerok_hand_act_die(void) {
     if (cur_obj_init_anim_and_check_if_end(1)) {
         o->parentObj->oEyerokBossActiveHandId = 0;
-        obj_explode_and_spawn_coins(150.0f, 1);
+        obj_explode_and_spawn_coins(150.0f, COIN_TYPE_YELLOW);
         create_sound_spawner(SOUND_OBJ2_EYEROK_SOUND_LONG);
     }
 
@@ -370,9 +367,13 @@ static void eyerok_hand_act_retreat(void) {
 }
 
 static void eyerok_hand_act_target_mario(void) {
-    if (eyerok_check_mario_relative_z(400) != 0 || o->oPosZ - gMarioObject->oPosZ > 0.0f
-        || o->oPosZ - o->parentObj->oPosZ > 1700.0f || absf(o->oPosX - o->parentObj->oPosX) > 900.0f
-        || (o->oMoveFlags & OBJ_MOVE_HIT_WALL)) {
+    if (
+        eyerok_check_mario_relative_z(400)
+        || o->oPosZ - gMarioObject->oPosZ > 0.0f
+        || o->oPosZ - o->parentObj->oPosZ > 1700.0f
+        || absf(o->oPosX - o->parentObj->oPosX) > 900.0f
+        || o->oMoveFlags & OBJ_MOVE_HIT_WALL
+    ) {
         o->oForwardVel = 0.0f;
         if (approach_f32_ptr(&o->oPosY, o->oHomeY + 300.0f, 20.0f)) {
             o->oAction = EYEROK_HAND_ACT_SMASH;
@@ -385,16 +386,18 @@ static void eyerok_hand_act_target_mario(void) {
 }
 
 static void eyerok_hand_act_smash(void) {
-    s16 dYawToMario;
-
     if (o->oTimer > 20) {
         if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
             if (o->oGravity < -4.0f) {
                 eyerok_hand_pound_ground();
                 o->oGravity = -4.0f;
             } else {
-                dYawToMario = abs_angle_diff(o->oFaceAngleYaw, o->oAngleToMario);
-                if (o->oDistanceToMario < 300.0f && dYawToMario > 0x2000 && dYawToMario < 0x6000) {
+                s16 dYawToMario = abs_angle_diff(o->oFaceAngleYaw, o->oAngleToMario);
+                if (
+                    o->oDistanceToMario < 300.0f
+                    && dYawToMario > 0x2000
+                    && dYawToMario < 0x6000
+                ) {
                     o->oAction = EYEROK_HAND_ACT_FIST_SWEEP;
                     if ((s16)(o->oFaceAngleYaw - o->oAngleToMario) < 0) {
                         o->oMoveAngleYaw = 0x4000;
@@ -438,20 +441,17 @@ static void eyerok_hand_act_fist_sweep(void) {
 }
 
 static void eyerok_hand_act_begin_double_pound(void) {
-    f32 homeXOffset;
-
-    if (o->parentObj->oEyerokBossAttackCountdown < 0
+    if (
+        o->parentObj->oEyerokBossAttackCountdown < 0
         || o->parentObj->oEyerokBossActiveHand == o->oBehParams2ndByte) {
         o->oAction = EYEROK_HAND_ACT_DOUBLE_POUND;
-        o->oMoveAngleYaw = (s32)(o->oFaceAngleYaw - 0x4000 * o->parentObj->oEyerokBossFightSideZ);
+        o->oMoveAngleYaw = (s32)(o->oFaceAngleYaw - (0x4000 * o->parentObj->oEyerokBossFightSideZ));
     } else {
-        homeXOffset = o->parentObj->oPosX + 400.0f * o->parentObj->oEyerokBossFightSideZ
-              - 180.0f * o->oBehParams2ndByte;
+        f32 homeXOffset = o->parentObj->oPosX + (400.0f * o->parentObj->oEyerokBossFightSideZ) - (180.0f * o->oBehParams2ndByte);
 
-        o->oPosX = o->oHomeX + (homeXOffset - o->oHomeX) * o->parentObj->oEyerokBossOffsetFromHome;
-        o->oPosY = o->oHomeY + 300.0f * o->parentObj->oEyerokBossOffsetFromHome;
-        o->oPosZ =
-            o->oHomeZ + (o->parentObj->oEyerokBossClampedMarioPosZ - o->oHomeZ) * o->parentObj->oEyerokBossOffsetFromHome;
+        o->oPosX = o->oHomeX + ((homeXOffset - o->oHomeX) * o->parentObj->oEyerokBossOffsetFromHome);
+        o->oPosY = o->oHomeY + (300.0f * o->parentObj->oEyerokBossOffsetFromHome);
+        o->oPosZ = o->oHomeZ + ((o->parentObj->oEyerokBossClampedMarioPosZ - o->oHomeZ) * o->parentObj->oEyerokBossOffsetFromHome);
     }
 }
 
@@ -473,7 +473,7 @@ static void eyerok_hand_act_double_pound(void) {
             } else {
                 o->oForwardVel = 30.0f * absf(o->parentObj->oEyerokBossFightSideZ);
                 o->oVelY = 100.0f;
-                o->oMoveFlags = 0;
+                o->oMoveFlags = OBJ_MOVE_NONE;
             }
         } else if (o->oVelY <= 0.0f) {
             o->oGravity = -20.0f;

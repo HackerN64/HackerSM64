@@ -1,21 +1,22 @@
-// jumping_box.c.inc
+// jumping_box.inc.c
 
 struct ObjectHitbox sJumpingBoxHitbox = {
-    /* interactType: */ INTERACT_GRABBABLE,
-    /* downOffset: */ 20,
+    /* interactType:      */ INTERACT_GRABBABLE,
+    /* downOffset:        */ 20,
     /* damageOrCoinValue: */ 0,
-    /* health: */ 1,
-    /* numLootCoins: */ 5,
-    /* radius: */ 150,
-    /* height: */ 250,
-    /* hurtboxRadius: */ 150,
-    /* hurtboxHeight: */ 250,
+    /* health:            */ 1,
+    /* numLootCoins:      */ 5,
+    /* radius:            */ 150,
+    /* height:            */ 250,
+    /* hurtboxRadius:     */ 150,
+    /* hurtboxHeight:     */ 250,
 };
 
 void jumping_box_act_0(void) {
     if (o->oSubAction == 0) {
-        if (o->oJumpingBoxRandomTimer-- < 0)
+        if (o->oJumpingBoxRandomTimer-- < 0) {
             o->oSubAction++;
+        }
         if (o->oTimer > o->oJumpingBoxUnusedTimerMin) {
             o->oVelY = random_float() * 5.0f + 15.0f;
             o->oSubAction++;
@@ -33,10 +34,12 @@ void jumping_box_act_1(void) {
     }
 }
 
-void (*sJumpingBoxActions[])(void) = { jumping_box_act_0, jumping_box_act_1 };
+ObjActionFunc sJumpingBoxActions[] = {
+    jumping_box_act_0,
+    jumping_box_act_1
+};
 
 void jumping_box_free_update(void) {
-    cur_obj_set_model(MODEL_BREAKABLE_BOX);
     cur_obj_scale(0.5f);
     obj_set_hitbox(o, &sJumpingBoxHitbox);
     cur_obj_update_floor_and_walls();
@@ -49,22 +52,26 @@ void bhv_jumping_box_loop(void) {
         case HELD_FREE:
             jumping_box_free_update();
             break;
+
         case HELD_HELD:
             obj_copy_pos(o, gMarioObject);
-            cur_obj_set_model(MODEL_BREAKABLE_BOX_SMALL);
             cur_obj_unrender_set_action_and_anim(-1, 0);
             break;
+
         case HELD_THROWN:
             cur_obj_get_thrown_or_placed(40.0f, 20.0f, 1);
             break;
+
         case HELD_DROPPED:
             cur_obj_get_dropped();
             o->oAction = 1;
             break;
     }
+
     if (o->oInteractStatus & INT_STATUS_STOP_RIDING) {
         create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
-        obj_explode_and_spawn_coins(46.0f, 1);
+        obj_explode_and_spawn_coins(46.0f, COIN_TYPE_YELLOW);
     }
-    o->oInteractStatus = 0;
+
+    o->oInteractStatus = INT_STATUS_NONE;
 }

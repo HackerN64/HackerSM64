@@ -68,12 +68,12 @@ struct GeoAnimState {
 // of separate global variables. It won't match EU otherwise.
 struct GeoAnimState gGeoTempState;
 
-u8 gCurAnimType;
-u8 gCurAnimEnabled;
+u8 gCurrAnimType;
+u8 gCurrAnimEnabled;
 s16 gCurrAnimFrame;
-f32 gCurAnimTranslationMultiplier;
+f32 gCurrAnimTranslationMultiplier;
 u16 *gCurrAnimAttribute;
-s16 *gCurAnimData;
+s16 *gCurrAnimData;
 
 struct AllocOnlyPool *gDisplayListHeap;
 
@@ -687,14 +687,14 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
             translation[2] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurAnimTranslationMultiplier;
             gCurAnimType = ANIM_TYPE_ROTATION;
         } else {
-            if (gCurAnimType == ANIM_TYPE_VERTICAL_TRANSLATION) {
+            if (gCurrAnimType == ANIM_TYPE_VERTICAL_TRANSLATION) {
                 gCurrAnimAttribute += 2;
                 translation[1] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurAnimTranslationMultiplier;
                 gCurrAnimAttribute += 2;
-                gCurAnimType = ANIM_TYPE_ROTATION;
-            } else if (gCurAnimType == ANIM_TYPE_NO_TRANSLATION) {
+                gCurrAnimType = ANIM_TYPE_ROTATION;
+            } else if (gCurrAnimType == ANIM_TYPE_NO_TRANSLATION) {
                 gCurrAnimAttribute += 6;
-                gCurAnimType = ANIM_TYPE_ROTATION;
+                gCurrAnimType = ANIM_TYPE_ROTATION;
             }
         }
     }
@@ -760,24 +760,24 @@ void geo_set_animation_globals(struct AnimInfo *node, s32 hasAnimation) {
     }
     node->animTimer = gAreaUpdateCounter;
     if (anim->flags & ANIM_FLAG_HOR_TRANS) {
-        gCurAnimType = ANIM_TYPE_VERTICAL_TRANSLATION;
+        gCurrAnimType = ANIM_TYPE_VERTICAL_TRANSLATION;
     } else if (anim->flags & ANIM_FLAG_VERT_TRANS) {
         gCurAnimType = ANIM_TYPE_LATERAL_TRANSLATION;
     } else if (anim->flags & ANIM_FLAG_NO_TRANS) {
         gCurAnimType = ANIM_TYPE_NO_TRANSLATION;
     } else {
-        gCurAnimType = ANIM_TYPE_TRANSLATION;
+        gCurrAnimType = ANIM_TYPE_TRANSLATION;
     }
 
     gCurrAnimFrame = node->animFrame;
     gCurAnimEnabled = (anim->flags & ANIM_FLAG_DISABLED) == 0;
     gCurrAnimAttribute = segmented_to_virtual((void *) anim->index);
-    gCurAnimData = segmented_to_virtual((void *) anim->values);
+    gCurrAnimData = segmented_to_virtual((void *) anim->values);
 
     if (anim->animYTransDivisor == 0) {
-        gCurAnimTranslationMultiplier = 1.0f;
+        gCurrAnimTranslationMultiplier = 1.0f;
     } else {
-        gCurAnimTranslationMultiplier = (f32) node->animYTrans / (f32) anim->animYTransDivisor;
+        gCurrAnimTranslationMultiplier = (f32) node->animYTrans / (f32) anim->animYTransDivisor;
     }
 }
 
@@ -990,7 +990,7 @@ void geo_process_object(struct Object *node) {
         }
 
         gMatStackIndex--;
-        gCurAnimType = ANIM_TYPE_NONE;
+        gCurrAnimType = ANIM_TYPE_NONE;
         node->header.gfx.throwMatrix = NULL;
     }
 }
@@ -1054,12 +1054,12 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
 
         geo_process_node_and_siblings(node->objNode->header.gfx.sharedChild);
         gCurGraphNodeHeldObject = NULL;
-        gCurAnimType = gGeoTempState.type;
-        gCurAnimEnabled = gGeoTempState.enabled;
+        gCurrAnimType = gGeoTempState.type;
+        gCurrAnimEnabled = gGeoTempState.enabled;
         gCurrAnimFrame = gGeoTempState.frame;
-        gCurAnimTranslationMultiplier = gGeoTempState.translationMultiplier;
+        gCurrAnimTranslationMultiplier = gGeoTempState.translationMultiplier;
         gCurrAnimAttribute = gGeoTempState.attribute;
-        gCurAnimData = gGeoTempState.data;
+        gCurrAnimData = gGeoTempState.data;
         gMatStackIndex--;
     }
 
@@ -1194,13 +1194,13 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         vec3s_set(viewport->vp.vtrans, node->x     * 4, node->y      * 4, 511);
         vec3s_set(viewport->vp.vscale, node->width * 4, node->height * 4, 511);
         if (b != NULL) {
-            clear_frame_buffer(clearColor);
+            clear_framebuffer(clearColor);
             make_viewport_clip_rect(b);
             *viewport = *b;
         }
 
         else if (c != NULL) {
-            clear_frame_buffer(clearColor);
+            clear_framebuffer(clearColor);
             make_viewport_clip_rect(c);
         }
 

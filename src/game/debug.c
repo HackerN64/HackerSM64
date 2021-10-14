@@ -96,7 +96,7 @@ void print_text_array_info(s16 *printState, const char *str, s32 number) {
             || (printState[DEBUG_PSTATE_MAX_X_CURSOR] < printState[DEBUG_PSTATE_Y_CURSOR])) {
             print_text(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                        "DPRINT OVER");
-            printState[DEBUG_PSTATE_DISABLED] += 1; // why not just = TRUE...
+            printState[DEBUG_PSTATE_DISABLED]++; // why not just = TRUE...
         } else {
             print_text_fmt_int(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                                str, number);
@@ -146,11 +146,12 @@ void print_debug_top_down_normal(const char *str, s32 number) {
 }
 
 void print_mapinfo(void) {
+    // EU mostly stubbed this function out.
     struct Surface *pfloor;
-    f32 bgY;
-    f32 water;
-    s32 area;
-    s32 angY;
+    UNUSED f32 bgY;   // unused in EU
+    UNUSED f32 water; // unused in EU
+    UNUSED s32 area;  // unused in EU
+    UNUSED s32 angY;  // unused in EU
 
     angY = gCurrentObject->oMoveAngleYaw / 182.044000;
     area = ((s32) gCurrentObject->oPosX + 0x2000) / 1024
@@ -160,6 +161,7 @@ void print_mapinfo(void) {
     water = find_water_level(gCurrentObject->oPosX, gCurrentObject->oPosZ);
 
     print_debug_top_down_normal("mapinfo", 0);
+#ifndef VERSION_EU
     print_debug_top_down_mapinfo("area %x", area);
     print_debug_top_down_mapinfo("wx   %d", gCurrentObject->oPosX);
     print_debug_top_down_mapinfo("wy   %d", gCurrentObject->oPosY);
@@ -167,8 +169,7 @@ void print_mapinfo(void) {
     print_debug_top_down_mapinfo("bgY  %d", bgY);
     print_debug_top_down_mapinfo("angY %d", angY);
 
-    if (pfloor) // not null
-    {
+    if (pfloor != NULL) {
         print_debug_top_down_mapinfo("bgcode   %d", pfloor->type);
         print_debug_top_down_mapinfo("bgstatus %d", pfloor->flags);
         print_debug_top_down_mapinfo("bgarea   %d", pfloor->room);
@@ -201,7 +202,7 @@ void print_string_array_info(const char **strArr) {
     s32 i;
 
     if (!sDebugStringArrPrinted) {
-        sDebugStringArrPrinted += 1; // again, why not = TRUE...
+        sDebugStringArrPrinted++; // again, why not = TRUE...
         for (i = 0; i < 8; i++) {
             // sDebugPage is assumed to be 4 or 5 here.
             print_debug_top_down_mapinfo(strArr[i], gDebugInfo[sDebugPage][i]);
@@ -240,7 +241,7 @@ void update_debug_dpadmask(void) {
         } else {
             sDebugInfoDPadMask = 0;
         }
-        sDebugInfoDPadUpdID += 1;
+        sDebugInfoDPadUpdID++;
         if (sDebugInfoDPadUpdID >= 8) {
             sDebugInfoDPadUpdID = 6; // rapidly set to 6 from 8 as long as dPadMask is being set.
         }
@@ -249,7 +250,7 @@ void update_debug_dpadmask(void) {
 
 void debug_unknown_level_select_check(void) {
     if (!sDebugLvSelectCheckFlag) {
-        sDebugLvSelectCheckFlag += 1; // again, just do = TRUE...
+        sDebugLvSelectCheckFlag++; // again, just do = TRUE...
 
         if (!gDebugLevelSelect) {
             gDebugInfoFlags = DEBUG_INFO_NOFLAGS;
@@ -281,17 +282,15 @@ void reset_debug_objectinfo(void) {
  * despite so this has no effect, being called. (unused)
  */
 UNUSED static void check_debug_button_seq(void) {
-    s16 *buttonArr;
+    s16 *buttonArr = sDebugInfoButtonSeq;
     s16 cButtonMask;
-
-    buttonArr = sDebugInfoButtonSeq;
 
     if (!(gPlayer1Controller->buttonDown & L_TRIG)) {
         sDebugInfoButtonSeqID = 0;
     } else {
         if ((s16)(cButtonMask = (gPlayer1Controller->buttonPressed & C_BUTTONS))) {
             if (buttonArr[sDebugInfoButtonSeqID] == cButtonMask) {
-                sDebugInfoButtonSeqID += 1;
+                sDebugInfoButtonSeqID++;
                 if (buttonArr[sDebugInfoButtonSeqID] == -1) {
                     if (gDebugInfoFlags == DEBUG_INFO_FLAG_ALL) {
                         gDebugInfoFlags = DEBUG_INFO_FLAG_LSELECT;
@@ -314,11 +313,11 @@ UNUSED static void try_change_debug_page(void) {
     if (gDebugInfoFlags & DEBUG_INFO_FLAG_DPRINT) {
         if ((gPlayer1Controller->buttonPressed & L_JPAD)
             && (gPlayer1Controller->buttonDown & (L_TRIG | R_TRIG))) {
-            sDebugPage += 1;
+            sDebugPage++;
         }
         if ((gPlayer1Controller->buttonPressed & R_JPAD)
             && (gPlayer1Controller->buttonDown & (L_TRIG | R_TRIG))) {
-            sDebugPage -= 1;
+            sDebugPage--;
         }
         if (sDebugPage >= (DEBUG_PAGE_MAX + 1)) {
             sDebugPage = DEBUG_PAGE_MIN;
@@ -351,14 +350,14 @@ void try_modify_debug_controls(void) {
         }
 
         if (sDebugInfoDPadMask & U_JPAD) {
-            sDebugSysCursor -= 1;
+            sDebugSysCursor--;
             if (sDebugSysCursor < 0) {
                 sDebugSysCursor = 0;
             }
         }
 
         if (sDebugInfoDPadMask & D_JPAD) {
-            sDebugSysCursor += 1;
+            sDebugSysCursor++;
             if (sDebugSysCursor >= 8) {
                 sDebugSysCursor = 7;
             }
@@ -410,11 +409,11 @@ void try_print_debug_mario_object_info(void) {
 
     print_debug_top_down_mapinfo("obj  %d", gObjectCounter);
 
-    if (gNumFindFloorMisses) {
+    if (gNumFindFloorMisses != 0) {
         print_debug_bottom_up("NULLBG %d", gNumFindFloorMisses);
     }
 
-    if (gUnknownWallCount) {
+    if (gUnknownWallCount != 0) {
         print_debug_bottom_up("WALL   %d", gUnknownWallCount);
     }
 }

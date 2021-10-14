@@ -1,9 +1,9 @@
-// warp.c.inc
+// warp.inc.c
 
 void bhv_warp_loop(void) {
-    u16 radius;
     if (o->oTimer == 0) {
-        radius = (o->oBehParams >> 24) & 0xFF;
+        u16 radius = GET_BPARAM1(o->oBehParams);
+
         if (radius == 0) {
             o->hitboxRadius = 50.0f;
         } else if (radius == 0xFF) {
@@ -13,13 +13,15 @@ void bhv_warp_loop(void) {
         }
         o->hitboxHeight = 50.0f;
     }
-    o->oInteractStatus = 0;
+
+    o->oInteractStatus = INT_STATUS_NONE;
 }
 
-void bhv_fading_warp_loop() { // identical to the above function except for o->hitboxRadius
-    u16 radius;
+// identical to the above function except for o->hitboxRadius
+void bhv_fading_warp_loop() {
     if (o->oTimer == 0) {
-        radius = (o->oBehParams >> 24) & 0xFF;
+        u16 radius = GET_BPARAM1(o->oBehParams);
+
         if (radius == 0) {
             o->hitboxRadius = 85.0f;
         } else if (radius == 0xFF) {
@@ -29,5 +31,6 @@ void bhv_fading_warp_loop() { // identical to the above function except for o->h
         }
         o->hitboxHeight = 50.0f;
     }
-    o->oInteractStatus = 0;
+
+    o->oInteractStatus = INT_STATUS_NONE;
 }

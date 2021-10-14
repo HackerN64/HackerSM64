@@ -464,14 +464,14 @@ struct MarioState {
     /*0xA4*/ u32 collidedObjInteractTypes;
     /*0xA8*/ s16 numCoins;
     /*0xAA*/ s16 numStars;
-    /*0xAC*/ s8  numKeys; // Unused key mechanic
-    /*0xAD*/ s8  numLives;
+    /*0xAC*/ s8 numKeys; // Unused key mechanic
+    /*0xAD*/ s8 numLives;
     /*0xAE*/ s16 health;
     /*0xB0*/ s16 animYTrans;
-    /*0xB2*/ u8  hurtCounter;
-    /*0xB3*/ u8  healCounter;
-    /*0xB4*/ u8  squishTimer;
-    /*0xB5*/ u8  fadeWarpOpacity;
+    /*0xB2*/ u8 hurtCounter;
+    /*0xB3*/ u8 healCounter;
+    /*0xB4*/ u8 squishTimer;
+    /*0xB5*/ u8 fadeWarpOpacity;
     /*0xB6*/ u16 capTimer;
     /*0xB8*/ s16 prevNumStarsForDialog;
     /*0xBC*/ f32 peakHeight;

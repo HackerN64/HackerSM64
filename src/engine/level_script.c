@@ -585,8 +585,7 @@ static void level_cmd_3A(void) {
     struct UnusedArea28 *val4;
 
     if (sCurrAreaIndex != -1) {
-        val4 = gAreas[sCurrAreaIndex].unused;
-        if (val4 == NULL) {
+        if ((val4 = gAreas[sCurrAreaIndex].unused) == NULL) {
             val4 = gAreas[sCurrAreaIndex].unused =
                 alloc_only_pool_alloc(sLevelPool, sizeof(struct UnusedArea28));
         }

@@ -31,6 +31,7 @@ u8 gCrashScreenCharToGlyph[128] = {
     23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
 };
 
+// A height of seven pixels for each Character * nine rows of characters + one row unused.
 u32 gCrashScreenFont[7 * 9 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };

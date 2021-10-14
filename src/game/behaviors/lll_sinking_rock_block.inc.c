@@ -1,4 +1,4 @@
-// lll_sinking_rock_block.c.inc
+// lll_sinking_rock_block.inc.c
 
 void bhv_lll_sinking_rock_block_loop(void) {
     lll_octagonal_mesh_find_y_offset(&o->oSinkWhenSteppedOnTimer, &o->oSinkWhenSteppedOnYOffsetFromHome, 124, -110);

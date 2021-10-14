@@ -1,8 +1,6 @@
 // water_bomb_cannon.inc.c
 
 void bhv_bubble_cannon_barrel_loop(void) {
-    struct Object *waterBombObj;
-
     if (o->parentObj->oAction == 2) {
         obj_mark_for_deletion(o);
     } else {
@@ -22,10 +20,10 @@ void bhv_bubble_cannon_barrel_loop(void) {
                 if (o->oForwardVel == 0.0f) {
                     o->oForwardVel = 35.0f;
 
-                    waterBombObj = spawn_object(o, MODEL_WATER_BOMB, bhvWaterBomb);
-                    if (waterBombObj != NULL) {
-                        waterBombObj->oForwardVel = -100.0f;
-                        waterBombObj->header.gfx.scale[1] = 1.7f;
+                    struct Object *waterBomb = spawn_object(o, MODEL_WATER_BOMB, bhvWaterBomb);
+                    if (waterBomb != NULL) {
+                        waterBomb->oForwardVel = -100.0f;
+                        waterBomb->header.gfx.scale[1] = 1.7f;
                     }
 
                     set_camera_shake_from_point(SHAKE_POS_MEDIUM, o->oPosX, o->oPosY, o->oPosZ);
@@ -52,16 +50,16 @@ void water_bomb_cannon_act_1(void) {
         o->oAction = 2;
     } else if (o->oBehParams2ndByte == 0) {
         if (o->oWaterCannonIdleTimer != 0) {
-            o->oWaterCannonIdleTimer -= 1;
+            o->oWaterCannonIdleTimer--;
         } else {
             obj_move_pitch_approach(o->oWaterCannonTargetMovePitch, 0x80);
             obj_face_yaw_approach(o->oWaterCannonTargetFaceYaw, 0x100);
 
             if ((s16) o->oFaceAngleYaw == (s16) o->oWaterCannonTargetFaceYaw) {
                 if (o->oWaterCannonRotationTimer != 0) {
-                    o->oWaterCannonRotationTimer -= 1;
+                    o->oWaterCannonRotationTimer--;
                 } else {
-                    cur_obj_play_sound_2(SOUND_OBJ_CANNON4);
+                    cur_obj_play_sound_2(SOUND_OBJ_WATER_BOMB_CANNON);
                     o->oWaterCannonIdleTimer = 70;
                     o->oWaterCannonTargetMovePitch = 0x1000 + 0x400 * (random_u16() & 0x3);
                     o->oWaterCannonTargetFaceYaw = -0x2000 + o->oMoveAngleYaw + 0x1000 * (random_u16() % 5);

@@ -1,3 +1,4 @@
+
 /**
  * @file fish.inc.c
  * Implements behaviour and spawning for fish located in the Secret Aquarium and other levels.
@@ -10,10 +11,9 @@
 static void fish_spawner_act_spawn(void) {
     s32 i;
     s32 schoolQuantity;
-    s16 model;
+    ModelID16 model;
     f32 minDistToMario;
-    const struct Animation * const *fishAnimation;
-    struct Object *fishObject;
+    const struct Animation *const *fishAnimation;
 
     switch (o->oBehParams2ndByte) {
         case FISH_SPAWNER_BP_MANY_BLUE: model = MODEL_FISH;      schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0; break;
@@ -26,11 +26,12 @@ static void fish_spawner_act_spawn(void) {
     // Spawn and animate the schoolQuantity of fish if Mario enters render distance
     // or the stage is Secret Aquarium.
     // Fish moves randomly within a range of 700.0f.
-#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
-    if (o->oDistanceToMario < minDistToMario) {
-#else
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
     if (o->oDistanceToMario < minDistToMario || gCurrLevelNum == LEVEL_SA) {
+#else
+    if (o->oDistanceToMario < minDistToMario) {
 #endif
+        struct Object *fishObject;
         for (i = 0; i < schoolQuantity; i++) {
             fishObject = spawn_object(o, model, bhvFish);
             fishObject->oBehParams2ndByte = o->oBehParams2ndByte;
@@ -58,8 +59,10 @@ static void fish_spawner_act_respawn(void) {
     o->oAction = FISH_SPAWNER_ACT_SPAWN;
 }
 
-static void (*sFishSpawnerActions[])(void) = {
-    fish_spawner_act_spawn, fish_spawner_act_idle, fish_spawner_act_respawn,
+static ObjActionFunc sFishSpawnerActions[] = {
+    fish_spawner_act_spawn,
+    fish_spawner_act_idle,
+    fish_spawner_act_respawn,
 };
 
 void bhv_fish_spawner_loop(void) {
@@ -71,7 +74,7 @@ void bhv_fish_spawner_loop(void) {
  */
 static void fish_vertical_roam(s32 speed) {
     f32 parentY = o->parentObj->oPosY;
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
     // If the stage is Secret Aquarium, the fish can
     // travel as far vertically as they wish.
     if (gCurrLevelNum == LEVEL_SA) {
@@ -84,7 +87,7 @@ static void fish_vertical_roam(s32 speed) {
     } else
 #endif
     if (parentY - 100.0f - o->oFishDepthDistance < o->oPosY
-               && o->oPosY < parentY + 1000.0f + o->oFishDepthDistance) {
+        && o->oPosY < parentY + 1000.0f + o->oFishDepthDistance) {
         o->oPosY = approach_f32_symmetric(o->oPosY, o->oFishGoalY, speed);
     }
 }
@@ -105,10 +108,10 @@ static void fish_act_roam(void) {
     // Initializes some variables when the fish first begins roaming.
     if (o->oTimer == 0) {
         o->oForwardVel = random_float() * 2 + 3.0f;
-#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
-        o->oFishHeightOffset = random_float() * 100.0f;
-#else
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
         o->oFishHeightOffset = random_float() * ((gCurrLevelNum == LEVEL_SA) ? 700.0f : 100.0f);
+#else
+        o->oFishHeightOffset = random_float() * 100.0f;
 #endif
         o->oFishRoamDistance = random_float() * 500 + 200.0f;
     }
@@ -119,10 +122,7 @@ static void fish_act_roam(void) {
     cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x400);
 
     if (o->oPosY < o->oFishWaterLevel - 50.0f) {
-        if (fishY < 0.0f) {
-            fishY = 0.0f - fishY;
-        }
-        if (fishY < 500.0f) {
+        if (absf(fishY) < 500.0f) {
             fish_vertical_roam(2);
         } else {
             fish_vertical_roam(4);
@@ -147,6 +147,7 @@ static void fish_act_roam(void) {
  */
 static void fish_act_flee(void) {
     f32 fishY = o->oPosY - gMarioObject->oPosY;
+
     o->oFishGoalY = gMarioObject->oPosY + o->oFishHeightOffset;
 
     // Initialize some variables when the flee action first starts.
@@ -154,6 +155,7 @@ static void fish_act_flee(void) {
         o->oFishActiveDistance = random_float() * 300.0f;
         o->oFishYawVel = random_float() * 1024.0f + 1024.0f;
         o->oFishGoalVel = random_float() * 4.0f + 8.0f + 5.0f;
+
         cur_obj_play_sound_2(SOUND_GENERAL_MOVING_WATER);
     }
 
@@ -166,7 +168,7 @@ static void fish_act_flee(void) {
 
     // Accelerate over time.
     if (o->oForwardVel < o->oFishGoalVel) {
-        o->oForwardVel = o->oForwardVel + 0.5f;
+        o->oForwardVel += 0.5f;
     }
     o->oFishGoalY = gMarioObject->oPosY + o->oFishHeightOffset;
 
@@ -174,11 +176,7 @@ static void fish_act_flee(void) {
     cur_obj_rotate_yaw_toward(o->oAngleToMario + 0x8000, o->oFishYawVel);
 
     if (o->oPosY < o->oFishWaterLevel - 50.0f) {
-        if (fishY < 0.0f) {
-            fishY = 0.0f - fishY;
-        }
-
-        if (fishY < 500.0f) {
+        if (absf(fishY) < 500.0f) {
             fish_vertical_roam(2);
         } else {
             fish_vertical_roam(4);
@@ -186,6 +184,7 @@ static void fish_act_flee(void) {
 
     // Don't let the fish leave the water vertically.
     } else {
+        // Don't let the fish leave the water vertically.
         o->oPosY = o->oFishWaterLevel - 50.0f;
         if (fishY > 300.0f) {
             o->oPosY -= 1.0f;
@@ -209,8 +208,10 @@ static void fish_act_init(void) {
     o->oAction = FISH_ACT_ROAM;
 }
 
-static void (*sFishActions[])(void) = {
-    fish_act_init, fish_act_roam, fish_act_flee,
+static ObjActionFunc sFishActions[] = {
+    fish_act_init,
+    fish_act_roam,
+    fish_act_flee,
 };
 
 /**
@@ -222,7 +223,7 @@ void bhv_fish_loop(void) {
     // oFishWaterLevel tracks if a fish has roamed out of water.
     // This can't happen in Secret Aquarium, so set it to 0.
     o->oFishWaterLevel = find_water_level(o->oPosX, o->oPosZ);
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
     if (gCurrLevelNum == LEVEL_SA) {
         o->oFishWaterLevel = 0.0f;
     }
@@ -231,18 +232,16 @@ void bhv_fish_loop(void) {
     // Apply hitbox and resolve wall collisions
     o->oWallHitboxRadius = 30.0f;
     cur_obj_resolve_wall_collisions();
-#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
-    if (o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
+    // Delete fish if it's drifted to an area with no water.
+    if (gCurrLevelNum != LEVEL_UNKNOWN_32 && o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC) {
         obj_mark_for_deletion(o);
         return;
     }
 #else
-    // Delete fish if it's drifted to an area with no water.
-    if (gCurrLevelNum != LEVEL_UNKNOWN_32) {
-        if (o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC) {
-            obj_mark_for_deletion(o);
-            return;
-        }
+    if (o->oFishWaterLevel < FLOOR_LOWER_LIMIT_MISC) {
+        obj_mark_for_deletion(o);
+        return;
     }
 #endif
 

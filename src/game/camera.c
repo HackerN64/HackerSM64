@@ -3392,7 +3392,7 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
             *splineSegment = 0;
             finished = 1;
         }
-        *progress -= 1;
+        (*progress)--;
     }
     return finished;
 }
@@ -4538,15 +4538,15 @@ s32 determine_dance_cutscene(UNUSED struct Camera *c) {
     u8 cutscene = 0;
     u8 cutsceneIndex = 0;
     u8 starIndex = (gLastCompletedStarNum - 1) / 2;
-    u8 courseIndex = gCurrCourseNum;
+    u8 courseNum = gCurrCourseNum;
 
     if (starIndex > 3) {
         starIndex = 0;
     }
-    if (courseIndex > COURSE_MAX) {
-        courseIndex = COURSE_NONE;
+    if (courseNum > COURSE_MAX) {
+        courseNum = COURSE_NONE;
     }
-    cutsceneIndex = sDanceCutsceneIndexTable[courseIndex][starIndex];
+    cutsceneIndex = sDanceCutsceneIndexTable[courseNum][starIndex];
 
     if (gLastCompletedStarNum & 1) {
         // Odd stars take the lower four bytes
@@ -5469,17 +5469,17 @@ u32 surface_type_modes(struct Camera *c) {
     switch (sMarioGeometry.currFloorType) {
         case SURFACE_CLOSE_CAMERA:
             transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 90);
-            modeChanged += 1;
+            modeChanged++;
             break;
 
         case SURFACE_CAMERA_FREE_ROAM:
             transition_to_camera_mode(c, CAMERA_MODE_FREE_ROAM, 90);
-            modeChanged += 1;
+            modeChanged++;
             break;
 
         case SURFACE_NO_CAM_COL_SLIPPERY:
             transition_to_camera_mode(c, CAMERA_MODE_CLOSE, 90);
-            modeChanged += 1;
+            modeChanged++;
             break;
     }
     return modeChanged;
@@ -5932,7 +5932,7 @@ s16 camera_course_processing(struct Camera *c) {
                 }
             }
 
-            b += 1;
+            b++;
         }
     }
 #if !defined(CAMERA_FIX) && !defined(DISABLE_LEVEL_SPECIFIC_CHECKS)
@@ -6327,7 +6327,7 @@ void copy_spline_segment(struct CutsceneSplinePoint dst[], struct CutsceneSpline
     s32 i = 0;
 
     init_spline_point(&dst[i], src[j].index, src[j].speed, src[j].point);
-    i += 1;
+    i++;
     do {
         do {
             init_spline_point(&dst[i], src[j].index, src[j].speed, src[j].point);
@@ -7726,6 +7726,7 @@ void cutscene_goto_cvar_pos(struct Camera *c, f32 goalDist, s16 goalPitch, s16 r
     f32 curDist;
     s16 curPitch, curYaw;
     vec3f_get_dist_and_angle(sCutsceneVars[3].point, c->pos, &nextDist, &nextPitch, &nextYaw);
+
     // If over 8000 units away from the cannon, just teleport there
     if ((nextDist > 8000.f) && (c->cutscene == CUTSCENE_PREPARE_CANNON)) {
         nextDist = goalDist * 4.f;
@@ -8334,7 +8335,7 @@ void cutscene_read_message(struct Camera *c) {
         // Do nothing until message is gone.
         case 0:
             if (get_dialog_id() != DIALOG_NONE) {
-                sCutsceneVars[0].angle[0] += 1;
+                sCutsceneVars[0].angle[0]++;
                 set_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_DIALOG);
             }
             break;
@@ -10373,7 +10374,7 @@ void play_cutscene(struct Camera *c) {
         //! Because gCutsceneTimer is often set to 0x7FFF (CUTSCENE_LOOP), this conditional can only
         //! check for == due to overflow
         if (gCutsceneTimer == cutsceneDuration) {
-            sCutsceneShot += 1;
+            sCutsceneShot++;
             gCutsceneTimer = 0;
         }
     } else {
@@ -10629,6 +10630,8 @@ void obj_rotate_towards_point(struct Object *obj, Vec3f point, s16 pitchOff, s16
     obj->oMoveAnglePitch = approach_s16_asymptotic(obj->oMoveAnglePitch, pitchOff - pitch, pitchDiv);
     obj->oMoveAngleYaw = approach_s16_asymptotic(obj->oMoveAngleYaw, yaw + yawOff, yawDiv);
 }
+
+#define o gCurrentObject
 
 #include "behaviors/intro_peach.inc.c"
 #include "behaviors/intro_lakitu.inc.c"

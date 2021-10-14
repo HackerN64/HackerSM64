@@ -1,3 +1,4 @@
+
 /**
  * Behavior file for bhvSnufit and bhvSnufitBalls.
  * Snufits are present in HMC and CotMC, and are the fly guy
@@ -30,20 +31,14 @@ struct ObjectHitbox sSnufitBulletHitbox = {
 };
 
 /**
- * This geo function shifts snufit's mask when it shrinks down,
+ * This geo function shifts snufit's mask when it shrinks down, 
  * since the parts move independently.
  */
-Gfx *geo_snufit_move_mask(s32 callContext, struct GraphNode *node, UNUSED Mat4 *c) {
-    struct Object *obj;
-    struct GraphNodeTranslationRotation *transNode;
-
+Gfx *geo_snufit_move_mask(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
     if (callContext == GEO_CONTEXT_RENDER) {
-        obj = (struct Object *) gCurGraphNodeObject;
-        transNode = (struct GraphNodeTranslationRotation *) node->next;
-
-        transNode->translation[0] = obj->oSnufitXOffset;
-        transNode->translation[1] = obj->oSnufitYOffset;
-        transNode->translation[2] = obj->oSnufitZOffset;
+        struct Object *obj = (struct Object *) gCurGraphNodeObject;
+        struct GraphNodeTranslationRotation *transNode = (struct GraphNodeTranslationRotation *) node->next;
+        vec3s_copy(transNode->translation, &obj->oSnufitOffsetVec);
     }
 
     return NULL;
@@ -52,13 +47,10 @@ Gfx *geo_snufit_move_mask(s32 callContext, struct GraphNode *node, UNUSED Mat4 *
 /**
  * This function scales the body of snufit, which needs done seperately from its mask.
  */
-Gfx *geo_snufit_scale_body(s32 callContext, struct GraphNode *node, UNUSED Mat4 *c) {
-    struct Object *obj;
-    struct GraphNodeScale *scaleNode;
-
+Gfx *geo_snufit_scale_body(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
     if (callContext == GEO_CONTEXT_RENDER) {
-        obj = (struct Object *) gCurGraphNodeObject;
-        scaleNode = (struct GraphNodeScale *) node->next;
+        struct Object *obj = (struct Object *) gCurGraphNodeObject;
+        struct GraphNodeScale *scaleNode = (struct GraphNodeScale *) node->next;
 
         scaleNode->scale = obj->oSnufitBodyScale / 1000.0f;
     }
@@ -71,11 +63,10 @@ Gfx *geo_snufit_scale_body(s32 callContext, struct GraphNode *node, UNUSED Mat4 
  * then prepares to shoot after a period.
  */
 void snufit_act_idle(void) {
-    s32 marioDist;
-
     // This line would could cause a crash in certain PU situations,
     // if the game would not have already crashed.
-    marioDist = (s32)(o->oDistanceToMario / 10.0f);
+    s32 marioDist = (s32)(o->oDistanceToMario / 10.0f);
+
     if (o->oTimer > marioDist && o->oDistanceToMario < 800.0f) {
 
         // Controls an alternating scaling factor in a cos.
@@ -105,7 +96,7 @@ void snufit_act_shoot(void) {
     if ((u16) o->oSnufitBodyScalePeriod == 0x8000 && o->oSnufitBodyBaseScale == 167) {
         o->oAction = SNUFIT_ACT_IDLE;
     } else if (o->oSnufitBullets < 3 && o->oTimer >= 3) {
-        o->oSnufitBullets += 1;
+        o->oSnufitBullets++;
         cur_obj_play_sound_2(SOUND_OBJ_SNUFIT_SHOOT);
         spawn_object_relative(0, 0, -20, 40, o, MODEL_BOWLING_BALL, bhvSnufitBalls);
         o->oSnufitRecoil = -30;
@@ -198,8 +189,8 @@ void bhv_snufit_balls_loop(void) {
             o->oGravity = -4.0f;
 
             cur_obj_become_intangible();
-        } else if (o->oAction == 1
-               || (o->oMoveFlags & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_HIT_WALL))) {
+        } else if (o->oAction == 1 
+                   || (o->oMoveFlags & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_HIT_WALL))) {
             // The Snufit shot Mario and has fulfilled its lonely existance.
             //! The above check could theoretically be avoided by finding a geometric
             //! situation that does not trigger those flags (Water?). If found,

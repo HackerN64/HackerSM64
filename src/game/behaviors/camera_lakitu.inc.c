@@ -28,8 +28,11 @@ void bhv_camera_lakitu_init(void) {
 static void camera_lakitu_intro_act_trigger_cutscene(void) {
     //! These bounds are slightly smaller than the actual bridge bounds, allowing
     //  the RTA speedrunning method of lakitu skip
-    if (gMarioObject->oPosX > -544.0f && gMarioObject->oPosX < 545.0f && gMarioObject->oPosY > 800.0f
-        && gMarioObject->oPosZ > -2000.0f && gMarioObject->oPosZ < -177.0f)  {
+    if (gMarioObject->oPosX >  -544.0f
+        && gMarioObject->oPosX <   545.0f
+        && gMarioObject->oPosY >   800.0f
+        && gMarioObject->oPosZ > -2000.0f
+        && gMarioObject->oPosZ <  -177.0f) {
         if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_START) {
             o->oAction = CAMERA_LAKITU_INTRO_ACT_SPAWN_CLOUD;
         }
@@ -59,8 +62,8 @@ static void camera_lakitu_intro_act_spawn_cloud(void) {
  * Circle down to mario, show the dialog, then fly away.
  */
 static void camera_lakitu_intro_act_show_dialog(void) {
-    s16 targetMovePitch = 0;
-    s16 targetMoveYaw = 0;
+    s16 targetMovePitch = 0x0;
+    s16 targetMoveYaw = 0x0;
 
     cur_obj_play_sound_1(SOUND_AIR_LAKITU_FLY);
 
@@ -102,13 +105,11 @@ static void camera_lakitu_intro_act_show_dialog(void) {
                         o->oCameraLakituIntroMusicPlayed = TRUE;
                     }
 #endif
-
                     // Once within 1000 units, slow down
                     approach_f32_ptr(&o->oCameraLakituSpeed, 20.0f, 1.0f);
                     if (o->oDistanceToMario < 500.0f
                         && abs_angle_diff(gMarioObject->oFaceAngleYaw, o->oFaceAngleYaw) > 0x7000) {
-                        // Once within 500 units and facing toward mario, come
-                        // to a stop
+                        // Once within 500 units and facing toward mario, come to a stop
                         approach_f32_ptr(&o->oCameraLakituSpeed, 0.0f, 5.0f);
                     }
                 }
@@ -119,10 +120,10 @@ static void camera_lakitu_intro_act_show_dialog(void) {
         }
     }
 
-    o->oCameraLakituPitchVel = approach_s16_symmetric(o->oCameraLakituPitchVel, 0x7D0, 0x190);
+    o->oCameraLakituPitchVel = approach_s16_symmetric(o->oCameraLakituPitchVel, 2000, 400);
     obj_move_pitch_approach(targetMovePitch, o->oCameraLakituPitchVel);
 
-    o->oCameraLakituYawVel = approach_s16_symmetric(o->oCameraLakituYawVel, 0x7D0, 0x64);
+    o->oCameraLakituYawVel = approach_s16_symmetric(o->oCameraLakituYawVel, 2000, 100);
     cur_obj_rotate_yaw_toward(targetMoveYaw, o->oCameraLakituYawVel);
 
     // vel y is explicitly computed, so gravity doesn't apply
@@ -151,14 +152,12 @@ void bhv_camera_lakitu_update(void) {
             }
         } else {
             f32 mirroredX = CASTLE_MIRROR_X - gLakituState.curPos[0];
+
             if (gLakituState.curPos[0] < 1700.0f || mirroredX < 0.0f) {
                 cur_obj_hide();
             } else {
                 cur_obj_unhide();
-
-                o->oPosX = gLakituState.curPos[0];
-                o->oPosY = gLakituState.curPos[1];
-                o->oPosZ = gLakituState.curPos[2];
+                vec3f_copy(&o->oPosVec, gLakituState.curPos);
 
                 o->oHomeX = gLakituState.curFocus[0];
                 o->oHomeZ = gLakituState.curFocus[2];

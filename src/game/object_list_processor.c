@@ -285,7 +285,7 @@ s32 update_objects_starting_at(struct ObjectNode *objList, struct ObjectNode *fi
         cur_obj_update();
 
         firstObj = firstObj->next;
-        count += 1;
+        count++;
     }
 
     return count;
@@ -543,7 +543,7 @@ void update_non_terrain_objects(void) {
     s32 i = 2;
     while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
-        i += 1;
+        i++;
     }
 }
 
@@ -556,7 +556,7 @@ void unload_deactivated_objects(void) {
     s32 i = 0;
     while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
         unload_deactivated_objects_in_list(&gObjectLists[listIndex]);
-        i += 1;
+        i++;
     }
 
     // TIME_STOP_UNKNOWN_0 was most likely intended to be used to track whether

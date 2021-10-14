@@ -29,17 +29,14 @@ static struct ObjectHitbox sWaterBombHitbox = {
  * Spawn water bombs targeting mario when he comes in range.
  */
 void bhv_water_bomb_spawner_update(void) {
-    f32 latDistToMario;
-    f32 spawnerRadius;
-
-    spawnerRadius = 50 * (u16)(o->oBehParams >> 16) + 200.0f;
-    latDistToMario = lateral_dist_between_objects(o, gMarioObject);
+    f32 spawnerRadius = 50 * GET_BPARAM2(o->oBehParams) + 200.0f;
+    f32 latDistToMario = lateral_dist_between_objects(o, gMarioObject);
 
     // When mario is in range and a water bomb isn't already active
     if (!o->oWaterBombSpawnerBombActive && latDistToMario < spawnerRadius
         && gMarioObject->oPosY - o->oPosY < 1000.0f) {
         if (o->oWaterBombSpawnerTimeToSpawn != 0) {
-            o->oWaterBombSpawnerTimeToSpawn -= 1;
+            o->oWaterBombSpawnerTimeToSpawn--;
         } else {
             struct Object *waterBomb =
                 spawn_object_relative(0, 0, 2000, 0, o, MODEL_WATER_BOMB, bhvWaterBomb);
@@ -86,6 +83,7 @@ void water_bomb_spawn_explode_particles(s8 offsetY, s8 forwardVelRange, s8 velYB
     sWaterBombExplodeParticles.offsetY = offsetY;
     sWaterBombExplodeParticles.forwardVelRange = forwardVelRange;
     sWaterBombExplodeParticles.velYBase = velYBase;
+
     cur_obj_spawn_particles(&sWaterBombExplodeParticles);
 }
 
@@ -96,7 +94,7 @@ static void water_bomb_act_init(void) {
     cur_obj_play_sound_2(SOUND_OBJ_SOMETHING_LANDING);
 
     o->oAction = WATER_BOMB_ACT_DROP;
-    o->oMoveFlags = 0;
+    o->oMoveFlags = OBJ_MOVE_NONE;
     o->oVelY = -40.0f;
 }
 

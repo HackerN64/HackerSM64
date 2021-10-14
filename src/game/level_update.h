@@ -62,8 +62,7 @@
 #define MARIO_SPAWN_FADE_FROM_BLACK       0x27
 
 
-struct CreditsEntry
-{
+struct CreditsEntry {
     /*0x00*/ u8 levelNum;
     /*0x01*/ u8 areaIndex;
     /*0x02*/ u8 actNum;
