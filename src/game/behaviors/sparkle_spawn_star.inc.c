@@ -77,14 +77,7 @@ void bhv_spawned_star_loop(void) {
             o->oForwardVel = 0;
             o->oVelY = 20.0f;
             o->oGravity = -1.0f;
-            if (o->oInteractionSubtype & INT_SUBTYPE_NO_EXIT)
-#ifdef VERSION_JP
-                play_power_star_jingle(FALSE);
-#else
-                play_power_star_jingle(TRUE);
-#endif
-            else
-                play_power_star_jingle(TRUE);
+            play_power_star_jingle();
         }
     } else if (o->oAction == 1) {
         if (o->oVelY < -4.0f)

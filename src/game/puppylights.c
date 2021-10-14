@@ -95,12 +95,12 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     // same result no matter the yaw. If neither is true, then it simply checks if it's 180 degrees, since
     // That will just be the same as 0.
     if (light->pos[1][0] == light->pos[1][2]) {
-        if (light->yaw % 0x4000 == 0 || light->flags & PUPPYLIGHT_SHAPE_CYLINDER) {
+        if ((light->yaw % 0x4000) == 0 || light->flags & PUPPYLIGHT_SHAPE_CYLINDER) {
             lightPos[0] = lightRelative[0];
             lightPos[1] = lightRelative[2];
             goto skippingTrig;
         }
-    } else if (light->yaw % 0x8000 == 0) {
+    } else if ((light->yaw % 0x8000) == 0) {
         lightPos[0] = lightRelative[0];
         lightPos[1] = lightRelative[2];
         goto skippingTrig;
@@ -153,11 +153,10 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
                 return;
             }
         }
-    }
-    else
+    } else {
         return;
-
-    f32 epc = (f32)(light->epicentre/100.0f);
+    }
+    f32 epc = (f32)(light->epicentre / 100.0f);
     tempLight = segmented_to_virtual(src);
     //Now we have a scale value and a scale factor, we can start lighting things up.
     // Convert to a percentage.

@@ -1035,8 +1035,7 @@ void init_reverb_eu(void)
 
         if (sAudioFirstBoot) {
             bzero(reverb->ringBuffer.left, REVERB_WINDOW_SIZE_MAX * 4);
-        }
-        else {
+        } else {
             reverb->resampleRate = 0x8000 / reverb->downsampleRate;
             reverb->resampleStateLeft = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
             reverb->resampleStateRight = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));

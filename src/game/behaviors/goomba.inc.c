@@ -293,8 +293,7 @@ static void floomba_act_startup(void) {
         o->oPosZ = (o->oZoomPosZ - (300.0f * (1.0f - frac)));
         o->oGoombaScale = (sGoombaProperties[o->oGoombaSize].scale * frac * frac);
         o->oZoomCounter++;
-    }
-    else {
+    } else {
         o->oPosZ = o->oZoomPosZ;
         o->oGoombaScale = sGoombaProperties[o->oGoombaSize].scale;
     }

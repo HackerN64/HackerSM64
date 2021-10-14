@@ -235,8 +235,7 @@ static inline void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSample
                 tmpCarryoverL = (tmpBufL[i] * REVERB_REV_INDEX) / 256;
                 tmpCarryoverR = (tmpBufR[i] * REVERB_REV_INDEX) / 256;
             }
-        }
-        else {
+        } else {
             delayBufsL[i][allpassIdxL[i]] = (tmpBufL[i] * (-REVERB_GAIN_INDEX)) / 256 + tmpCarryoverL;
             delayBufsR[i][allpassIdxR[i]] = (tmpBufR[i] * (-REVERB_GAIN_INDEX)) / 256 + tmpCarryoverR;
             tmpCarryoverL = (delayBufsL[i][allpassIdxL[i]] * REVERB_GAIN_INDEX) / 256 + tmpBufL[i];
@@ -269,8 +268,7 @@ static inline void reverb_mono_sample(s16 *outSample, s32 inSample) {
             delayBufsL[i][allpassIdxL[i]] = tmpCarryover;
             if (i != reverbFilterCountm1)
                 tmpCarryover = (tmpBufL[i] * REVERB_REV_INDEX) / 256;
-        }
-        else {
+        } else {
             delayBufsL[i][allpassIdxL[i]] = (tmpBufL[i] * (-REVERB_GAIN_INDEX)) / 256 + tmpCarryover;
             tmpCarryover = (delayBufsL[i][allpassIdxL[i]] * REVERB_GAIN_INDEX) / 256 + tmpBufL[i];
         }
@@ -402,8 +400,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                     reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) item->toDownsampleLeft[srcPos] + (s32) item->toDownsampleRight[srcPos]) / 2);
                     gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
                 }
-            }
-            else { // Too slow for practical use, not recommended most of the time.
+            } else { // Too slow for practical use, not recommended most of the time.
                 for (dstPos = item->startPos; dstPos < item->lengthA / 2 + item->startPos; dstPos++) {
                     reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) gSynthesisReverb.ringBuffer.left[dstPos] + (s32) gSynthesisReverb.ringBuffer.right[dstPos]) / 2);
                     gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
@@ -413,16 +410,14 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                     gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
                 }
             }
-        }
-        else {
+        } else {
             if (gReverbDownsampleRate != 1) {
                 osInvalDCache(item->toDownsampleLeft, DEFAULT_LEN_2CH);
                 for (srcPos = 0, dstPos = item->startPos; dstPos < item->lengthA / 2 + item->startPos; srcPos += gReverbDownsampleRate, dstPos++)
                     reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
                 for (dstPos = 0; dstPos < item->lengthB / 2; srcPos += gReverbDownsampleRate, dstPos++)
                     reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
-            }
-            else { // Too slow for practical use, not recommended most of the time.
+            } else { // Too slow for practical use, not recommended most of the time.
                 for (dstPos = item->startPos; dstPos < item->lengthA / 2 + item->startPos; dstPos++)
                     reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
                 for (dstPos = 0; dstPos < item->lengthB / 2; dstPos++)
@@ -593,8 +588,7 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
     if (gIsConsole) {
         reverbFilterCount = (s32) reverbFilterCountConsole;
         monoReverb = monoReverbConsole;
-    }
-    else {
+    } else {
         reverbFilterCount = (s32) reverbFilterCountEmulator;
         monoReverb = monoReverbEmulator;
     }
@@ -1023,8 +1017,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
                         samplesLenAdjusted = samplesLenFixedPoint >> 0x10;
                     } else if ((samplesLenFixedPoint >> 0x10) & 1) {
                         samplesLenAdjusted = ((samplesLenFixedPoint >> 0x10) & ~1) + (curPart * 2);
-                    }
-                    else {
+                    } else {
                         samplesLenAdjusted = (samplesLenFixedPoint >> 0x10);
                     }
 
@@ -1664,19 +1657,13 @@ void note_init_volume(struct Note *note) {
 }
 
 void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverbVol) {
-    s32 panIndex;
-    f32 volLeft;
-    f32 volRight;
+    f32 volLeft, volRight;
     // Anding with 127 avoids out-of-bounds reads when pan is outside of [0, 1].
     // This can occur during PU movement -- see the bug comment in get_sound_pan
     // in external.c. An out-of-bounds read by itself doesn't crash, but if the
     // resulting value is a nan or denormal, performing arithmetic on it crashes
     // on console.
-#ifdef VERSION_JP
-    panIndex = MIN((s32)(pan * 127.5), 127);
-#else
-    panIndex = (s32)(pan * 127.5f) & 127;
-#endif
+    s32 panIndex = (s32)(pan * 127.5f) & 127;
     if (note->stereoHeadsetEffects && gSoundMode == SOUND_MODE_HEADSET) {
         s8 smallPanIndex;
         s8 temp = (s8)(pan * 10.0f);
@@ -1720,13 +1707,8 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
     if (velocity < 0) {
         velocity = 0;
     }
-#ifdef VERSION_JP
-    note->targetVolLeft = (u16)(velocity * volLeft) & ~0x80FF; // 0x7F00, but that doesn't match
-    note->targetVolRight = (u16)(velocity * volRight) & ~0x80FF;
-#else
-    note->targetVolLeft = (u16)(s32)(velocity * volLeft) & ~0x80FF;
+    note->targetVolLeft  = (u16)(s32)(velocity * volLeft ) & ~0x80FF;
     note->targetVolRight = (u16)(s32)(velocity * volRight) & ~0x80FF;
-#endif
     if (note->targetVolLeft == 0) {
         note->targetVolLeft++;
     }

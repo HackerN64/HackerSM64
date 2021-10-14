@@ -526,8 +526,7 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
 #endif
                     sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                     sSelectedButtonID = buttonID;
-                }
-                else { // Check if a save file is clicked
+                } else { // Check if a save file is clicked
                     if (sMainMenuTimer >= SCORE_TIMER) {
                         // If clicked in a existing save file, select it too see it's score
                         if (save_file_exists(buttonID - MENU_BUTTON_SCORE_MIN) == TRUE) {
@@ -537,8 +536,7 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
 #endif
                             sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_GROWING;
                             sSelectedButtonID = buttonID;
-                        }
-                        else {
+                        } else {
                             // If clicked in a non-existing save file, play buzz sound
                             play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
 #if ENABLE_RUMBLE
@@ -718,8 +716,7 @@ void check_copy_menu_clicked_buttons(struct Object *copyButton) {
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                         sSelectedButtonID = buttonID;
                     }
-                }
-                else {
+                } else {
                     // Check if a file button is clicked to play a copy action
                     if (sMainMenuButtons[buttonID]->oMenuButtonState == MENU_BUTTON_STATE_DEFAULT
                         && sMainMenuTimer >= ACTION_TIMER) {
@@ -874,8 +871,7 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
                         sSelectedButtonID = buttonID;
                     }
-                }
-                else {
+                } else {
                     // Check if a file button is clicked to play an erase action
                     if (sMainMenuTimer >= ACTION_TIMER) {
                         erase_action_file_button(eraseButton, buttonID);

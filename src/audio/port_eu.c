@@ -21,11 +21,7 @@
 #define SAMPLES_TO_OVERPRODUCE           0x10
 #define EXTRA_BUFFERED_AI_SAMPLES_TARGET 0x40
 
-#ifdef VERSION_JP
-typedef u16 FadeT;
-#else
 typedef s32 FadeT;
-#endif
 
 extern volatile u8 gAudioResetStatus;
 extern u8 gAudioResetPresetIdToLoad;
@@ -153,8 +149,7 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
         if (gSequencePlayers[cmd->u.s.arg1].enabled != FALSE) {
             if (cmd->u2.as_s32 == 0) {
                 sequence_player_disable(&gSequencePlayers[cmd->u.s.arg1]);
-            }
-            else {
+            } else {
                 seq_player_fade_to_zero_volume(cmd->u.s.arg1, cmd->u2.as_s32);
             }
         }

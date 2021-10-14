@@ -68,31 +68,28 @@ s32 sGameLoopTicked = 0;
 // You're no slouch, but I'm a better sledder! Better luck next time!"), spoken
 // by Koopa instead of the penguin in JP.
 
-#define UKIKI 0
-#define TUXIE 1
-#define BOWS1 2 // Bowser Intro / Doors Laugh
-#define KOOPA 3
-#define KBOMB 4
-#define BOO 5
-#define BOMB 6
-#define BOWS2 7 // Bowser Battle Laugh
-#define GRUNT 8
-#define WIGLR 9
-#define YOSHI 10
-#define _ 0xFF
+enum DialogSpeakers {
+    UKIKI,
+    TUXIE,
+    BOWS1, // Bowser Intro / Doors Laugh
+    KOOPA,
+    KBOMB,
+    BOO,
+    BOMB,
+    BOWS2, // Bowser Battle Laugh
+    GRUNT,
+    WIGLR,
+    YOSHI
+};
 
-#ifdef VERSION_JP
-#define DIFF KOOPA
-#else
-#define DIFF TUXIE
-#endif
+#define _ 0xFF
 
 u8 sDialogSpeaker[] = {
     //       0      1      2      3      4      5      6      7      8      9
     /* 0*/ _,     BOMB,  BOMB,  BOMB,  BOMB,  KOOPA, KOOPA, KOOPA, _,     KOOPA,
     /* 1*/ _,     _,     _,     _,     _,     _,     _,     KBOMB, _,     _,
     /* 2*/ _,     BOWS1, BOWS1, BOWS1, BOWS1, BOWS1, BOWS1, BOWS1, BOWS1, BOWS1,
-    /* 3*/ _,     _,     _,     _,     _,     _,     _,     DIFF,  _,     _,
+    /* 3*/ _,     _,     _,     _,     _,     _,     _,     TUXIE, _,     _,
     /* 4*/ _,     KOOPA, _,     _,     _,     _,     _,     BOMB,  _,     _,
     /* 5*/ _,     _,     _,     _,     _,     TUXIE, TUXIE, TUXIE, TUXIE, TUXIE,
     /* 6*/ _,     _,     _,     _,     _,     _,     _,     BOWS2, _,     _,
@@ -2590,10 +2587,7 @@ void play_star_fanfare(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-void play_power_star_jingle(u8 keepBackgroundMusic) {
-    if (!keepBackgroundMusic) {
-        sBackgroundMusicTargetVolume = 0;
-    }
+void play_power_star_jingle(void) {
     seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_CUTSCENE_STAR_SPAWN, 0);
     sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 20;
 #if defined(VERSION_EU) || defined(VERSION_SH)

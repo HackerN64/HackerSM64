@@ -285,7 +285,7 @@ void *dma_sample_data(uintptr_t devAddr, u32 size, s32 arg2, u8 *dmaIndexRef) {
             dma->ttl = 2;
 #if defined(VERSION_EU)
     #if PUPPYPRINT_DEBUG
-            dmaAudioTime[perfIteration] += (osGetTime()-first);
+            dmaAudioTime[perfIteration] += (osGetTime() - first);
     #endif
             return dma->buffer + (devAddr - dma->source);
 #else

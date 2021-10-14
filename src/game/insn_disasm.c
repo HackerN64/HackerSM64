@@ -144,8 +144,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
             }
             successful_print = 1;
             break;
-        }
-        else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
+        } else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
                 strp += sprintf(strp, "%-8s %s %s %s", insn_db[i].name,
                                                    registerMaps[insn.i.rdata.rd],
                                                    registerMaps[insn.i.rs],

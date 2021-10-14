@@ -106,28 +106,17 @@ s32 get_credits_str_width(char *str) {
  * by the value of lineHeight.
  */
 void print_displaying_credits_entry(void) {
-    char **currStrPtr;
-    char *titleStr;
-    s16 numLines;
-    s16 strY;
-#ifndef VERSION_JP
-    s16 lineHeight;
-#endif
-
     if (sDispCreditsEntry != NULL) {
-        currStrPtr = (char **) sDispCreditsEntry->string;
-        titleStr = *currStrPtr++;
-        numLines = *titleStr++ - '0';
+        char **currStrPtr = (char **) sDispCreditsEntry->string;
+        char *titleStr = *currStrPtr++;
+        s16 numLines = *titleStr++ - '0';
 
-        strY = (sDispCreditsEntry->actNum & 0x20 ? 28 : 172) + (numLines == 1) * 16;
-#ifndef VERSION_JP
-        lineHeight = 16;
-#endif
+        s16 strY = (((sDispCreditsEntry->actNum & 0x20) ? 28 : 172) + ((numLines == 1) * 16));
+        s16 lineHeight = 16;
 
         dl_rgba16_begin_cutscene_msg_fade();
         print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY, titleStr);
 
-#ifndef VERSION_JP
         switch (numLines) {
             case 4:
                 print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 24, *currStrPtr++);
@@ -150,16 +139,11 @@ void print_displaying_credits_entry(void) {
                 break;
 #endif
         }
-#endif
 
         while (numLines-- > 0) {
             print_credits_str_ascii(CREDIT_TEXT_X_RIGHT - get_credits_str_width(*currStrPtr), strY, *currStrPtr);
 
-#ifdef VERSION_JP
-            strY += 16;
-#else
             strY += lineHeight;
-#endif
 
             currStrPtr++;
         }
@@ -194,18 +178,17 @@ void bhv_end_toad_loop(void) {
 // Geo switch case function for controlling Peach's eye state.
 Gfx *geo_switch_peach_eyes(s32 callContext, struct GraphNode *node, UNUSED s32 context) {
     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node;
-    s16 timer;
 
     if (callContext == GEO_CONTEXT_RENDER) {
         if (sPeachManualBlinkTime == 0) {
-            timer = (gAreaUpdateCounter + 0x20) >> 1 & 0x1F;
+            s16 timer = ((gAreaUpdateCounter + 0x20) >> 1 & 0x1F);
             if (timer < 7) {
-                switchCase->selectedCase = sPeachIsBlinking * 4 + sPeachBlinkTimes[timer];
+                switchCase->selectedCase = ((sPeachIsBlinking * 4) + sPeachBlinkTimes[timer]);
             } else {
-                switchCase->selectedCase = sPeachIsBlinking * 4 + 1;
+                switchCase->selectedCase = ((sPeachIsBlinking * 4) + 1);
             }
         } else {
-            switchCase->selectedCase = sPeachIsBlinking * 4 + sPeachManualBlinkTime - 1;
+            switchCase->selectedCase = (((sPeachIsBlinking * 4) + sPeachManualBlinkTime) - 1);
         }
     }
 
@@ -227,7 +210,7 @@ s32 get_star_collection_dialog(struct MarioState *m) {
     for (i = 0; i < ARRAY_COUNT(sStarsNeededForDialog); i++) {
         numStarsRequired = sStarsNeededForDialog[i];
         if (m->prevNumStarsForDialog < numStarsRequired && m->numStars >= numStarsRequired) {
-            dialogID = i + DIALOG_141;
+            dialogID = (i + DIALOG_141);
             break;
         }
     }
@@ -275,11 +258,8 @@ void handle_save_menu(struct MarioState *m) {
 struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, s32 model, const BehaviorScript *behavior, s16 relYaw) {
     struct Object *obj = spawn_object(m->marioObj, model, behavior);
 
-    obj->oFaceAngleYaw = m->faceAngle[1] + relYaw;
-    obj->oPosX = m->pos[0];
-    obj->oPosY = m->pos[1];
-    obj->oPosZ = m->pos[2];
-
+    obj->oFaceAngleYaw = (m->faceAngle[1] + relYaw);
+    vec3_copy(&obj->oPosVec, m->pos);
     return obj;
 }
 
@@ -450,19 +430,13 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
             } else {
                 create_dialog_box_with_var(GET_HIGH_U16_OF_32(actionArg), GET_LOW_U16_OF_32(actionArg));
             }
-        }
-        // wait until dialog is done
-        else if (m->actionState == 10) {
+        } else if (m->actionState == 10) { // wait until dialog is done
             if (get_dialog_id() >= 0) {
                 m->actionState--;
             }
-        }
-        // look back down
-        else if (m->actionState < 19) {
+        } else if (m->actionState < 19) { // look back down
             m->actionTimer += 1024;
-        }
-        // finished action
-        else if (m->actionState == 25) {
+        } else if (m->actionState == 25) { // finished action
             disable_time_stop();
             if (gNeverEnteredCastle) {
                 gNeverEnteredCastle = FALSE;
@@ -866,17 +840,12 @@ s32 act_entering_star_door(struct MarioState *m) {
     // set Mario's animation
     if (m->actionTimer < 15) {
         set_mario_animation(m, MARIO_ANIM_FIRST_PERSON);
-    }
-
-    // go through door? for 20 frames
-    else if (m->actionTimer < 35) {
+    } else if (m->actionTimer < 35) { // go through door? for 20 frames
         m->pos[0] += m->marioObj->oMarioReadingSignDPosX;
         m->pos[2] += m->marioObj->oMarioReadingSignDPosZ;
 
         set_mario_anim_with_accel(m, MARIO_ANIM_WALKING, 0x00028000);
-    }
-
-    else {
+    } else {
         m->faceAngle[1] = m->usedObj->oMoveAngleYaw;
 
         if (m->actionArg & WARP_FLAG_DOOR_FLIP_MARIO) {
@@ -1145,11 +1114,7 @@ s32 act_death_exit(struct MarioState *m) {
     m->breath = 0x880;
 #endif
     if (15 < m->actionTimer++ && launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, -32.0f)) {
-#ifdef VERSION_JP
-        play_sound(SOUND_MARIO_OOOF, m->marioObj->header.gfx.cameraToObject);
-#else
         play_sound(SOUND_MARIO_OOOF2, m->marioObj->header.gfx.cameraToObject);
-#endif
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
@@ -1170,11 +1135,7 @@ s32 act_unused_death_exit(struct MarioState *m) {
     m->breath = 0x880;
 #endif
     if (launch_mario_until_land(m, ACT_FREEFALL_LAND_STOP, MARIO_ANIM_GENERAL_FALL, 0.0f)) {
-#ifdef VERSION_JP
-        play_sound(SOUND_MARIO_OOOF, m->marioObj->header.gfx.cameraToObject);
-#else
         play_sound(SOUND_MARIO_OOOF2, m->marioObj->header.gfx.cameraToObject);
-#endif
         m->numLives--;
 #ifdef SAVE_NUM_LIVES
         save_file_set_num_lives(m->numLives);
@@ -1192,11 +1153,7 @@ s32 act_falling_death_exit(struct MarioState *m) {
     m->breath = 0x880;
 #endif
     if (launch_mario_until_land(m, ACT_DEATH_EXIT_LAND, MARIO_ANIM_GENERAL_FALL, 0.0f)) {
-#ifdef VERSION_JP
-        play_sound(SOUND_MARIO_OOOF, m->marioObj->header.gfx.cameraToObject);
-#else
         play_sound(SOUND_MARIO_OOOF2, m->marioObj->header.gfx.cameraToObject);
-#endif
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif

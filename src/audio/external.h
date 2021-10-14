@@ -63,7 +63,7 @@ void play_course_clear(void);
 void play_peachs_jingle(void);
 void play_puzzle_jingle(void);
 void play_star_fanfare(void);
-void play_power_star_jingle(u8 keepBackgroundMusic);
+void play_power_star_jingle(void);
 void play_race_fanfare(void);
 void play_toads_jingle(void);
 void sound_reset(u8 presetId);

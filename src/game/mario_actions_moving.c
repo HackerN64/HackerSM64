@@ -1555,11 +1555,7 @@ s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 chec
     if (actionArg > 0) {
         play_sound_if_no_flag(m, SOUND_MARIO_ATTACKED, MARIO_MARIO_SOUND_PLAYED);
     } else {
-#ifdef VERSION_JP
-        play_sound_if_no_flag(m, SOUND_MARIO_OOOF, MARIO_MARIO_SOUND_PLAYED);
-#else
         play_sound_if_no_flag(m, SOUND_MARIO_OOOF2, MARIO_MARIO_SOUND_PLAYED);
-#endif
     }
 
     if (m->forwardVel > 32.0f) {
@@ -1599,8 +1595,7 @@ s32 common_ground_knockback_action(struct MarioState *m, s32 animation, s32 chec
 }
 
 s32 act_hard_backward_ground_kb(struct MarioState *m) {
-    s32 animFrame =
-        common_ground_knockback_action(m, MARIO_ANIM_FALL_OVER_BACKWARDS, 43, TRUE, m->actionArg);
+    s32 animFrame = common_ground_knockback_action(m, MARIO_ANIM_FALL_OVER_BACKWARDS, 43, TRUE, m->actionArg);
     if (animFrame == 43 && m->health < 0x100) {
         set_mario_action(m, ACT_DEATH_ON_BACK, 0);
     }

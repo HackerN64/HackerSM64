@@ -99,9 +99,8 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
             if (objectOpacity == 0 && segmented_to_virtual(bhvBowser) == objectGraphNode->behavior) {
                 objectGraphNode->oAnimState = 2;
             }
-            // the debug info check was removed in US. so we need to
-            // perform the only necessary check instead of the debuginfo
-            // one.
+            // the debug info check was removed in US. so we need to perform
+            // the only necessary check instead of the debuginfo one.
             if (currentGraphNode->parameter != 10) {
                 if (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA) {
                     gDPSetAlphaCompare(dlHead++, G_AC_DITHER);
