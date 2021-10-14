@@ -687,6 +687,11 @@ static void treat_far_home_as_mario(f32 threshold) {
         o->oAngleToMario = atan2s(d[2], d[0]);
         o->oDistanceToMario = 25000.0f;
     } else {
+        if (!gMarioObject) {
+            o->oDistanceToMario = 20000.0f;
+            return;
+        }
+
         vec3_diff(d, &o->oHomeVec, &gMarioObject->oPosVec);
         distance = vec3_sumsq(d);
 

@@ -10,10 +10,10 @@
  */
 static struct ObjectHitbox sGoombaHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 1,
+    /* downOffset:        */  0,
+    /* damageOrCoinValue: */  1,
+    /* health:            */  0,
+    /* numLootCoins:      */  1,
     /* radius:            */ 72,
     /* height:            */ 50,
     /* hurtboxRadius:     */ 42,
@@ -35,7 +35,7 @@ struct GoombaProperties {
  */
 static struct GoombaProperties sGoombaProperties[] = {
     { 1.5f, SOUND_OBJ_ENEMY_DEATH_HIGH, 4000, 1 },
-    { 3.5f, SOUND_OBJ_ENEMY_DEATH_LOW, 4000, 2 },
+    { 3.5f, SOUND_OBJ_ENEMY_DEATH_LOW,  4000, 2 },
     { 0.5f, SOUND_OBJ_ENEMY_DEATH_HIGH, 1500, 0 },
 };
 
@@ -70,8 +70,7 @@ void bhv_goomba_triplet_spawner_update(void) {
     s16 goombaFlag;
     s32 angle;
     s32 dAngle;
-    s16 dx;
-    s16 dz;
+    s16 dx, dz;
 
     // If mario is close enough and the goombas aren't currently loaded, then
     // spawn them
@@ -89,13 +88,22 @@ void bhv_goomba_triplet_spawner_update(void) {
                     dx = 500.0f * coss(angle);
                     dz = 500.0f * sins(angle);
 
-                    spawn_object_relative((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK)
-                                              | (goombaFlag >> 6),
+#ifdef FLOOMBAS
+                    if (o->oIsFloomba) {
+                        spawn_object_relative((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK) | (goombaFlag >> 6),
+                                            dx, 0, dz, o, MODEL_GOOMBA, bhvFloomba);
+                    } else {
+                        spawn_object_relative((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK) | (goombaFlag >> 6),
+                                            dx, 0, dz, o, MODEL_GOOMBA, bhvGoomba);
+                    }
+#else
+                    spawn_object_relative((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK) | (goombaFlag >> 6),
                                           dx, 0, dz, o, MODEL_GOOMBA, bhvGoomba);
+#endif
                 }
             }
 
-            o->oAction += 1;
+            o->oAction = GOOMBA_TRIPLET_SPAWNER_ACT_LOADED;
         }
     } else if (o->oDistanceToMario > 4000.0f) {
         // If mario is too far away, enter the unloaded action. The goombas
@@ -108,7 +116,7 @@ void bhv_goomba_triplet_spawner_update(void) {
  * Initialization function for goomba.
  */
 void bhv_goomba_init(void) {
-    o->oGoombaSize = o->oBehParams2ndByte & GOOMBA_BP_SIZE_MASK;
+    o->oGoombaSize = (o->oBehParams2ndByte & GOOMBA_BP_SIZE_MASK);
 
     o->oGoombaScale = sGoombaProperties[o->oGoombaSize].scale;
     o->oDeathSound = sGoombaProperties[o->oGoombaSize].deathSound;
@@ -118,7 +126,19 @@ void bhv_goomba_init(void) {
     o->oDrawingDistance = sGoombaProperties[o->oGoombaSize].drawDistance;
     o->oDamageOrCoinValue = sGoombaProperties[o->oGoombaSize].damage;
 
-    o->oGravity = -8.0f / 3.0f * o->oGoombaScale;
+    o->oGravity = ((-8.0f / 3.0f) * o->oGoombaScale);
+
+#ifdef FLOOMBAS
+    if (o->oIsFloomba)
+        o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
+#ifdef HD_INTRO_TEXTURES
+    if (o->oAction == FLOOMBA_ACT_STARTUP) {
+        o->oZoomPosZ = o->oPosZ;
+        o->oGoombaScale = 0.0f;
+        cur_obj_hide();
+    }
+#endif
+#endif
 }
 
 /**
@@ -128,7 +148,7 @@ static void goomba_begin_jump(void) {
     cur_obj_play_sound_2(SOUND_OBJ_GOOMBA_ALERT);
     o->oAction = GOOMBA_ACT_JUMP;
     o->oForwardVel = 0.0f;
-    o->oVelY = 50.0f / 3.0f * o->oGoombaScale;
+    o->oVelY = ((50.0f / 3.0f) * o->oGoombaScale);
 }
 
 /**
@@ -192,9 +212,9 @@ static void goomba_act_walk(void) {
                 // If mario is far away, walk at a normal pace, turning randomly
                 // and occasionally jumping
 
-                o->oGoombaRelativeSpeed = 4.0f / 3.0f;
+                o->oGoombaRelativeSpeed = (4.0f / 3.0f);
                 if (o->oGoombaWalkTimer != 0) {
-                    o->oGoombaWalkTimer -= 1;
+                    o->oGoombaWalkTimer--;
                 } else {
                     if (random_u16() & 3) {
                         o->oGoombaTargetYaw = obj_random_fixed_turn(0x2000);
@@ -249,6 +269,38 @@ static void goomba_act_jump(void) {
     }
 }
 
+#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+static void floomba_act_startup(void) {
+    if (o->oBehParams & 0x00008000) { //! TODO: Flag name
+        struct Animation *curAnim = o->header.gfx.animInfo.curAnim;
+        s16 frameDiff = ((curAnim->loopEnd - curAnim->loopStart) / 2);
+
+        o->header.gfx.animInfo.animFrameAccelAssist += (frameDiff << 16);
+        o->header.gfx.animInfo.animFrame += frameDiff;
+
+        o->oBehParams &= ~0x00008000;
+    }
+
+    if ((o->oBehParams & 0xFF) > 0x00) { //! TODO: Mask name
+        o->oBehParams--;
+        return;
+    }
+    
+    cur_obj_unhide();
+
+    if (((o->oBehParams >> 8) & 0x7F) > o->oZoomCounter) {
+        f32 frac = (f32) o->oZoomCounter / (f32) ((o->oBehParams >> 8) & 0x7F);
+        o->oPosZ = (o->oZoomPosZ - (300.0f * (1.0f - frac)));
+        o->oGoombaScale = (sGoombaProperties[o->oGoombaSize].scale * frac * frac);
+        o->oZoomCounter++;
+    }
+    else {
+        o->oPosZ = o->oZoomPosZ;
+        o->oGoombaScale = sGoombaProperties[o->oGoombaSize].scale;
+    }
+}
+#endif
+
 /**
  * Attack handler for when mario attacks a huge goomba with an attack that
  * doesn't kill it.
@@ -277,11 +329,19 @@ void bhv_goomba_update(void) {
 
         cur_obj_scale(o->oGoombaScale);
         obj_update_blinking(&o->oGoombaBlinkTimer, 30, 50, 5);
+#ifdef FLOOMBAS
+        if (o->oIsFloomba)
+            o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
+#endif
         cur_obj_update_floor_and_walls();
 
-        if ((animSpeed = o->oForwardVel / o->oGoombaScale * 0.4f) < 1.0f) {
+        if (o->oGoombaScale == 0.0f || (animSpeed = o->oForwardVel / o->oGoombaScale * 0.4f) < 1.0f) {
             animSpeed = 1.0f;
         }
+#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+        if (o->oAction == FLOOMBA_ACT_STARTUP)
+            animSpeed = (f32) ((u32) o->oBehParams >> 24) / 16.0f;
+#endif
         cur_obj_init_animation_with_accel_and_sound(0, animSpeed);
 
         switch (o->oAction) {
@@ -294,6 +354,11 @@ void bhv_goomba_update(void) {
             case GOOMBA_ACT_JUMP:
                 goomba_act_jump();
                 break;
+#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+            case FLOOMBA_ACT_STARTUP:
+                floomba_act_startup();
+                break;
+#endif
         }
 
         //! @bug Weak attacks on huge goombas in a triplet mark them as dead even if they're not.
@@ -310,5 +375,10 @@ void bhv_goomba_update(void) {
         cur_obj_move_standard(-78);
     } else {
         o->oAnimState = TRUE;
+#ifdef FLOOMBAS
+        if (o->oIsFloomba) {
+            o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
+        }
+#endif
     }
 }

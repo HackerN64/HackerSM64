@@ -378,7 +378,16 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_362
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_363
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_364
+#ifdef FLOOMBAS
+    {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_365
+    {bhvFloomba,                        MODEL_GOOMBA,                       0}, // macro_floomba
+    {bhvFloomba,                        MODEL_GOOMBA,                       1}, // macro_huge_floomba
+    {bhvFloomba,                        MODEL_GOOMBA,                       2}, // macro_tiny_floomba
+    {bhvFloombaTripletSpawner,          MODEL_NONE,                         0}, // macro_floomba_triplet_spawner
+    {bhvFloombaTripletSpawner,          MODEL_NONE,                         8}  // macro_floomba_quintuplet_spawner - unused
+#else
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}  // macro_empty_365
+#endif
 };
 
 #endif // MACRO_PRESETS_H

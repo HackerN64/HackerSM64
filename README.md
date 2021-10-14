@@ -90,6 +90,8 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - S2DEX engine by someone2639! To use it, compile with `make TEXT_ENGINE=s2dex_text_engine` or just set `TEXT_ENGINE` to `s2dex_text_engine` in the makefile.
 - ia8 coins (64x64), the vanilla coin texture is upgraded to accomodate. *
 - ia8 30 FPS (64x64) coins (Textures by InTheBeef, cleaned up by Arceveti). *
+- Floombas! Simply just retextured goombas with custom behaviors (does not overwrite standard goombas). *
+- HD texture support for intro splash screen (with floombas if enabled). *
 - Mario's silhouette is shown when behind most surfaces (By Frame#5375, Axollyon, AloXado320, Wiseguy, Arceveti) *
 - Skybox size modifier. You can have 2x, 3x and 4x size skyboxes (you can select the skybox size in `config.h`.) Please note that this might affect console performance, especially 4x mode. 2x or 3x mode is recommended if aiming for console. By CowQuack *
 - You can set the black border size to different values for console and emulator. It's set to 0 by default for both. *

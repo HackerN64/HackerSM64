@@ -13,6 +13,7 @@
 #include "levels/scripts.h"
 #include "levels/menu/header.h"
 
+#include "actors/common0.h"
 #include "actors/common1.h"
 
 #include "make_const_nonconst.h"
@@ -22,6 +23,8 @@
 #include "config.h"
 #include "game/print.h"
 
+#include "game/object_list_processor.h"
+
 const LevelScript level_intro_splash_screen[] = {
     INIT_LEVEL(),
 #ifdef SKIP_TITLE_SCREEN
@@ -30,7 +33,35 @@ const LevelScript level_intro_splash_screen[] = {
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
     LOAD_RAW(/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
     LOAD_YAY0(/*seg*/ 0x07, _intro_segment_7SegmentRomStart, _intro_segment_7SegmentRomEnd),
+#if defined(HD_INTRO_TEXTURES) && defined(FLOOMBAS)
+    LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
+    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
 
+    // Load "Super Mario 64" logo
+    ALLOC_LEVEL_POOL(),
+    LOAD_MODEL_FROM_GEO(MODEL_GOOMBA, goomba_geo),
+    AREA(/*index*/ 1, intro_geo_splash_screen),
+        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/ -570, -480, 1500, /*angle*/ 0,  50, 0, /*behParam*/ 0x1800100B, /*beh*/ bhvFloombaStartup),
+        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/  570, -480, 1500, /*angle*/ 0, -50, 0, /*behParam*/ 0x1800900B, /*beh*/ bhvFloombaStartup),
+    END_AREA(),
+    FREE_LEVEL_POOL(),
+
+    // Start animation
+    LOAD_AREA(/*area*/ 1),
+
+    CALL(/*arg*/ LVL_INTRO_PLAY_ITS_A_ME_MARIO, /*func*/ lvl_intro_update),
+    CALL(/*arg*/ 0, /*func*/ load_mario_area),
+    
+    JUMP_LINK_PUSH_ARG(75),
+        CALL(/*arg*/ 0, /*func*/ area_update_objects),
+        SLEEP(/*frames*/ 1),
+    JUMP_N_TIMES(),
+    TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0x00, 0x00, 0x00),
+    JUMP_LINK_PUSH_ARG(16),
+        CALL(/*arg*/ 0, /*func*/ area_update_objects),
+        SLEEP(/*frames*/ 1),
+    JUMP_N_TIMES(),
+#else
     // Load "Super Mario 64" logo
     ALLOC_LEVEL_POOL(),
     AREA(/*index*/ 1, intro_geo_splash_screen),
@@ -44,6 +75,7 @@ const LevelScript level_intro_splash_screen[] = {
     SLEEP(/*frames*/ 75),
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0x00, 0x00, 0x00),
     SLEEP(/*frames*/ 16),
+#endif
     CMD2A(/*unk2*/ 1),
     CLEAR_LEVEL(),
     SLEEP(/*frames*/ 2),

@@ -5068,6 +5068,38 @@ const BehaviorScript bhvGoombaTripletSpawner[] = {
     END_LOOP(),
 };
 
+#ifdef FLOOMBAS
+const BehaviorScript bhvFloomba[] = {
+    BEGIN(OBJ_LIST_PUSHABLE),
+    SET_INT(oIsFloomba, TRUE),
+    GOTO(bhvGoomba + 1),
+};
+
+#ifdef HD_INTRO_TEXTURES
+const BehaviorScript bhvFloombaStartup[] = {
+    BEGIN(OBJ_LIST_PUSHABLE),
+    SET_INT(oIsFloomba, TRUE),
+    SET_INT(oAction, FLOOMBA_ACT_STARTUP),
+    OR_INT(oFlags, OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    LOAD_ANIMATIONS(oAnimations, goomba_seg8_anims_0801DA4C),
+    SET_HOME(),
+    CALL_NATIVE(bhv_goomba_init),
+    SET_FLOAT(oDrawingDistance, 30000),
+    SET_INT(oIntangibleTimer, -1),
+    SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ 0, /*Bounciness*/ 0, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 0, /*Unused*/ 0, 0),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_goomba_update),
+    END_LOOP(),
+};
+#endif
+
+const BehaviorScript bhvFloombaTripletSpawner[] = {
+    BEGIN(OBJ_LIST_PUSHABLE),
+    SET_INT(oIsFloomba, TRUE),
+    GOTO(bhvGoombaTripletSpawner + 1),
+};
+#endif
+
 const BehaviorScript bhvChainChomp[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),

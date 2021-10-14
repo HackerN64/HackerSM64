@@ -46,9 +46,9 @@ struct SoundAllocPool gTemporaryCommonPool;
 
 struct SoundMultiPool gSeqLoadedPool;
 struct SoundMultiPool gBankLoadedPool;
-struct SoundMultiPool gUnusedLoadedPool;
 
 #ifdef VERSION_SH
+struct SoundMultiPool gUnusedLoadedPool;
 struct Unk1Pool gUnkPool1;
 struct UnkPool gUnkPool2;
 struct UnkPool gUnkPool3;
@@ -307,12 +307,27 @@ void temporary_pool_clear(struct TemporaryPool *temporary) {
 
 void sound_init_main_pools(s32 sizeForAudioInitPool) {
     sound_alloc_pool_init(&gAudioInitPool, gAudioHeap, sizeForAudioInitPool);
-    sound_alloc_pool_init(&gAudioSessionPool, (gAudioHeap + sizeForAudioInitPool), gAudioHeapSize - sizeForAudioInitPool);
-#if PUPPYPRINT_DEBUG
-    audioPool[0] = sizeForAudioInitPool;
-    audioPool[1] = gAudioHeapSize - sizeForAudioInitPool;
-#endif
+    sound_alloc_pool_init(&gAudioSessionPool, (gAudioHeap + sizeForAudioInitPool), (gAudioHeapSize - sizeForAudioInitPool));
 }
+
+#if PUPPYPRINT_DEBUG
+void puppyprint_get_allocated_pools(s32 *audioPoolList) {
+    u32 i, j;
+    const struct SoundAllocPool *pools[NUM_AUDIO_POOLS] = {
+        &gAudioInitPool,
+        &gNotesAndBuffersPool,
+        &gSeqLoadedPool.persistent.pool,
+        &gSeqLoadedPool.temporary.pool,
+        &gBankLoadedPool.persistent.pool,
+        &gBankLoadedPool.temporary.pool
+    };
+
+    for (i = 0, j = 0; j < NUM_AUDIO_POOLS; i += 2, j++) {
+        audioPoolList[i] = (s32) pools[j]->size;
+        audioPoolList[i+1] = (s32) (pools[j]->cur - pools[j]->start);
+    }
+}
+#endif
 
 #ifdef VERSION_SH
 #define SOUND_ALLOC_FUNC sound_alloc_uninitialized
@@ -324,50 +339,40 @@ void session_pools_init(struct PoolSplit *a) {
     gAudioSessionPool.cur = gAudioSessionPool.start;
     sound_alloc_pool_init(&gNotesAndBuffersPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gSeqAndBankPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantCustom), a->wantCustom);
-#if PUPPYPRINT_DEBUG
-    audioPool[2] = a->wantSeq;
-    audioPool[3] = a->wantCustom;
-#endif
 }
 
 void seq_and_bank_pool_init(struct PoolSplit2 *a) {
     gSeqAndBankPool.cur = gSeqAndBankPool.start;
     sound_alloc_pool_init(&gPersistentCommonPool, SOUND_ALLOC_FUNC(&gSeqAndBankPool, a->wantPersistent), a->wantPersistent);
     sound_alloc_pool_init(&gTemporaryCommonPool, SOUND_ALLOC_FUNC(&gSeqAndBankPool, a->wantTemporary), a->wantTemporary);
-#if PUPPYPRINT_DEBUG
-    audioPool[4] = a->wantPersistent;
-    audioPool[5] = a->wantTemporary;
-#endif
 }
 
 void persistent_pools_init(struct PoolSplit *a) {
     gPersistentCommonPool.cur = gPersistentCommonPool.start;
     sound_alloc_pool_init(&gSeqLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gBankLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantBank), a->wantBank);
+#ifdef VERSION_SH
     sound_alloc_pool_init(&gUnusedLoadedPool.persistent.pool, SOUND_ALLOC_FUNC(&gPersistentCommonPool, a->wantUnused), a->wantUnused);
-#if PUPPYPRINT_DEBUG
-    audioPool[6] = a->wantSeq;
-    audioPool[7] = a->wantBank;
-    audioPool[8] = a->wantUnused;
 #endif
     persistent_pool_clear(&gSeqLoadedPool.persistent);
     persistent_pool_clear(&gBankLoadedPool.persistent);
+#ifdef VERSION_SH
     persistent_pool_clear(&gUnusedLoadedPool.persistent);
+#endif
 }
 
 void temporary_pools_init(struct PoolSplit *a) {
     gTemporaryCommonPool.cur = gTemporaryCommonPool.start;
     sound_alloc_pool_init(&gSeqLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gBankLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantBank), a->wantBank);
+#ifdef VERSION_SH
     sound_alloc_pool_init(&gUnusedLoadedPool.temporary.pool, SOUND_ALLOC_FUNC(&gTemporaryCommonPool, a->wantUnused), a->wantUnused);
-#if PUPPYPRINT_DEBUG
-    audioPool[9] = a->wantSeq;
-    audioPool[10] = a->wantBank;
-    audioPool[11] = a->wantUnused;
 #endif
     temporary_pool_clear(&gSeqLoadedPool.temporary);
     temporary_pool_clear(&gBankLoadedPool.temporary);
+#ifdef VERSION_SH
     temporary_pool_clear(&gUnusedLoadedPool.temporary);
+#endif
 }
 #undef SOUND_ALLOC_FUNC
 
@@ -1181,16 +1186,10 @@ void init_reverb_us(s32 presetId) {
 void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
     if (sAudioFirstBoot) {
         bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
-        gAudioSessionPool.cur = gAudioSessionPool.start;
-        gSeqAndBankPool.cur = gSeqAndBankPool.start;
-        gPersistentCommonPool.cur = gPersistentCommonPool.start;
-        gTemporaryCommonPool.cur = gTemporaryCommonPool.start;
         persistent_pool_clear(&gSeqLoadedPool.persistent);
         persistent_pool_clear(&gBankLoadedPool.persistent);
-        persistent_pool_clear(&gUnusedLoadedPool.persistent);
         temporary_pool_clear(&gSeqLoadedPool.temporary);
         temporary_pool_clear(&gBankLoadedPool.temporary);
-        temporary_pool_clear(&gUnusedLoadedPool.temporary);
         reset_bank_and_seq_load_status();
 
         init_reverb_us(presetId);
@@ -1206,16 +1205,14 @@ void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
 #else
 void audio_reset_session(void) {
     if (sAudioFirstBoot) {
-        gAudioSessionPool.cur = gAudioSessionPool.start;
-        gSeqAndBankPool.cur = gSeqAndBankPool.start;
-        gPersistentCommonPool.cur = gPersistentCommonPool.start;
-        gTemporaryCommonPool.cur = gTemporaryCommonPool.start;
         persistent_pool_clear(&gSeqLoadedPool.persistent);
         persistent_pool_clear(&gBankLoadedPool.persistent);
-        persistent_pool_clear(&gUnusedLoadedPool.persistent);
         temporary_pool_clear(&gSeqLoadedPool.temporary);
         temporary_pool_clear(&gBankLoadedPool.temporary);
+#ifdef VERSION_SH
+        persistent_pool_clear(&gUnusedLoadedPool.persistent);
         temporary_pool_clear(&gUnusedLoadedPool.temporary);
+#endif
         reset_bank_and_seq_load_status();
 
         init_reverb_eu();
@@ -1373,7 +1370,7 @@ void audio_reset_session(void) {
     temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporaryBankMem + preset->temporarySeqMem);
 #endif
     totalMem = persistentMem + temporaryMem;
-    wantMisc = gAudioSessionPool.size - totalMem - 0x100 - BETTER_REVERB_SIZE;
+    wantMisc = gAudioSessionPool.size - totalMem - BETTER_REVERB_SIZE;
     sSessionPoolSplit.wantSeq = wantMisc;
     sSessionPoolSplit.wantCustom = totalMem;
     session_pools_init(&sSessionPoolSplit);

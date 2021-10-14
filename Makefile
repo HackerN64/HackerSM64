@@ -522,6 +522,9 @@ distclean: clean
 test: $(ROM)
 	$(EMULATOR) $(EMU_FLAGS) $<
 
+test-pj64: $(ROM)
+	wine ~/Desktop/new64/Project64.exe $<
+
 load: $(ROM)
 	$(LOADER) $(LOADER_FLAGS) $<
 

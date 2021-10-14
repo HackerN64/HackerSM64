@@ -449,7 +449,7 @@ void patch_sound(UNUSED struct AudioBankSound *sound, UNUSED u8 *memBase, UNUSED
 #if defined(VERSION_EU)
         else if (sample->loaded == 0x80) {
             PATCH(sample->sampleAddr, offsetBase);
-            u8 *mem = soundAlloc(&gNotesAndBuffersPool, sample->sampleSize);
+            u8 *mem = soundAlloc(&gNotesAndBuffersPool, sample->sampleSize); // TODO: Memory leak!
             if (mem == NULL) {
                 sample->sampleAddr = patched;
                 sample->loaded = 1;
@@ -1018,8 +1018,13 @@ void audio_init() {
     alSeqFileNew(gAlTbl, gSoundDataRaw);
 
     // Load bank sets for each sequence
+#ifdef EXPAND_AUDIO_HEAP
+    gAlBankSets = soundAlloc(&gAudioInitPool, 0x400);
+    audio_dma_copy_immediate((uintptr_t) gBankSetsData, gAlBankSets, 0x400);
+#else
     gAlBankSets = soundAlloc(&gAudioInitPool, 0x100);
     audio_dma_copy_immediate((uintptr_t) gBankSetsData, gAlBankSets, 0x100);
+#endif
 
     init_sequence_players();
     gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;
