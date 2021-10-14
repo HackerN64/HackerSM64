@@ -87,7 +87,7 @@ void bobomb_act_chase_mario(void) {
     if (animFrame == 5 || animFrame == 16)
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK);
 
-    obj_turn_toward_object(o, gMarioObject, 16, 0x800);
+    obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 0x800);
     obj_check_floor_death(collisionFlags, sObjFloor);
 }
 

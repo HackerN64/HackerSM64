@@ -53,11 +53,11 @@ void one_up_loop_in_air(void) {
 
 void pole_1up_move_towards_mario(void) {
     f32 dx = gMarioObject->header.gfx.pos[0] - o->oPosX;
-    f32 dy = gMarioObject->header.gfx.pos[1] + 120.0f - o->oPosY;
+    f32 dy = gMarioObject->header.gfx.pos[1] - o->oPosY + 120.0f;
     f32 dz = gMarioObject->header.gfx.pos[2] - o->oPosZ;
     s16 targetPitch = atan2s(sqrtf(sqr(dx) + sqr(dz)), dy);
 
-    obj_turn_toward_object(o, gMarioObject, 16, 0x1000);
+    obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 0x1000);
     o->oMoveAnglePitch = approach_s16_symmetric(o->oMoveAnglePitch, targetPitch, 0x1000);
     o->oVelY = sins(o->oMoveAnglePitch) * 30.0f;
     o->oForwardVel = coss(o->oMoveAnglePitch) * 30.0f;

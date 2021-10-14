@@ -39,12 +39,12 @@ void butterfly_step(s32 speed) {
 void butterfly_calculate_angle(void) {
     gMarioObject->oPosX += 5 * o->oButterflyYPhase / 4;
     gMarioObject->oPosZ += 5 * o->oButterflyYPhase / 4;
-    obj_turn_toward_object(o, gMarioObject, 16, 0x300);
+    obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 0x300);
     gMarioObject->oPosX -= 5 * o->oButterflyYPhase / 4;
     gMarioObject->oPosZ -= 5 * o->oButterflyYPhase / 4;
 
     gMarioObject->oPosY += (5 * o->oButterflyYPhase + 0x100) / 4;
-    obj_turn_toward_object(o, gMarioObject, 15, 0x500);
+    obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, 0x500);
     gMarioObject->oPosY -= (5 * o->oButterflyYPhase + 0x100) / 4;
 }
 

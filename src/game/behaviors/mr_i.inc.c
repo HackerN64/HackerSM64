@@ -133,8 +133,8 @@ void mr_i_act_2(void) {
         o->oMrISpinDirection = 0;
         o->oMrIParticleTimer = 0;
     }
-    obj_turn_toward_object(o, gMarioObject, 0x10, 0x800);
-    obj_turn_toward_object(o, gMarioObject, 0x0F, 0x400);
+    obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX,   0x800);
+    obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, 0x400);
     dYaw = startYaw - (s16)(o->oMoveAngleYaw);
     if (!dYaw) {
         o->oMrISpinAmount = 0;

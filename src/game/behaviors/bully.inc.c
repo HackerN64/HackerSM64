@@ -68,7 +68,7 @@ void bully_act_chase_mario(void) {
 
     if (o->oTimer < 10) {
         o->oForwardVel = 3.0f;
-        obj_turn_toward_object(o, gMarioObject, 16, 4096);
+        obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 4096);
     } else if (o->oBehParams2ndByte == BULLY_BP_SIZE_SMALL) {
         o->oForwardVel = 20.0f;
         if (o->oTimer >= 31)
@@ -91,7 +91,7 @@ void bully_act_knockback(void) {
         o->oBullyKBTimerAndMinionKOCounter++;
         o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW; /* bit 3 */
         o->oMoveAngleYaw = o->oFaceAngleYaw;
-        obj_turn_toward_object(o, gMarioObject, 16, 1280);
+        obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 1280);
     } else
         o->header.gfx.animInfo.animFrame = 0;
 
