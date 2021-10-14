@@ -450,7 +450,7 @@ void update_walking_speed(struct MarioState *m) {
 #endif
 
 #ifdef GROUND_TURN_FIX
-    if ((m->usedObj == NULL) && !(m->action & ACT_FLAG_SHORT_HITBOX)) {
+    if ((m->heldObj == NULL) && !(m->action & ACT_FLAG_SHORT_HITBOX)) {
         if (m->forwardVel >= 16.0f) {
             s16 turnRange = abs_angle_diff(m->faceAngle[1], m->intendedYaw);
             f32 fac = (m->forwardVel + m->intendedMag);
