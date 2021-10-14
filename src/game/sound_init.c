@@ -166,7 +166,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
         play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
     }
 
-    if (soundMenuFlags & 0x100) {
+    if (soundMenuFlags & SOUND_MENU_FLAG_EXTRA) {
         play_menu_sounds_extra(20, NULL);
     }
 #if ENABLE_RUMBLE

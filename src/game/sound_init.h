@@ -5,14 +5,15 @@
 
 #include "macros.h"
 
-#define SOUND_MENU_FLAG_HANDAPPEAR      (1 << 0) // 0x01
-#define SOUND_MENU_FLAG_HANDISAPPEAR    (1 << 1) // 0x02
-#define SOUND_MENU_FLAG_UNKNOWN1        (1 << 2) // 0x04
-#define SOUND_MENU_FLAG_PINCHMARIOFACE  (1 << 3) // 0x08
-#define SOUND_MENU_FLAG_PINCHMARIOFACE2 (1 << 4) // 0x10
-#define SOUND_MENU_FLAG_LETGOMARIOFACE  (1 << 5) // 0x20
-#define SOUND_MENU_FLAG_CAMERAZOOMIN    (1 << 6) // 0x40
-#define SOUND_MENU_FLAG_CAMERAZOOMOUT   (1 << 7) // 0x80
+#define SOUND_MENU_FLAG_HANDAPPEAR      (1 << 0) // 0x001
+#define SOUND_MENU_FLAG_HANDISAPPEAR    (1 << 1) // 0x002
+#define SOUND_MENU_FLAG_UNKNOWN1        (1 << 2) // 0x004
+#define SOUND_MENU_FLAG_PINCHMARIOFACE  (1 << 3) // 0x008
+#define SOUND_MENU_FLAG_PINCHMARIOFACE2 (1 << 4) // 0x010
+#define SOUND_MENU_FLAG_LETGOMARIOFACE  (1 << 5) // 0x020
+#define SOUND_MENU_FLAG_CAMERAZOOMIN    (1 << 6) // 0x040
+#define SOUND_MENU_FLAG_CAMERAZOOMOUT   (1 << 7) // 0x080
+#define SOUND_MENU_FLAG_EXTRA           (1 << 8) // 0x100
 
 enum SoundMenuMode
 {
