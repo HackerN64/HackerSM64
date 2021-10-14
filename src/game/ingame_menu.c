@@ -1798,18 +1798,18 @@ s32 render_pause_courses_and_castle(void) {
             shade_screen();
             render_pause_my_score_coins();
             render_pause_red_coins();
-#ifndef EXIT_COURSE_WHILE_MOVING
-            s32 exitCheck = (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT);
-#else
-            s32 exitCheck = TRUE;
-#endif
 #ifndef DISABLE_EXIT_COURSE
-            if (exitCheck)
+#ifdef EXIT_COURSE_WHILE_MOVING
+            if ((gMarioStates[0].action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER | ACT_FLAG_PAUSE_EXIT))
+             || (gMarioStates[0].pos[1] <= gMarioStates[0].floorHeight)) {
+#else
+            if (gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT) {
+#endif
                 render_pause_course_options(99, 93, &gDialogLineNum, 15);
+            }
 #endif
 
-            if (gPlayer3Controller->buttonPressed & A_BUTTON
-             || gPlayer3Controller->buttonPressed & START_BUTTON) {
+            if (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON)) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;
@@ -1830,8 +1830,7 @@ s32 render_pause_courses_and_castle(void) {
             render_pause_castle_menu_box(160, 143);
             render_pause_castle_main_strings(104, 60);
 
-            if (gPlayer3Controller->buttonPressed & A_BUTTON
-             || gPlayer3Controller->buttonPressed & START_BUTTON) {
+            if (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON)) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gMenuMode = MENU_MODE_NONE;
@@ -1847,14 +1846,14 @@ s32 render_pause_courses_and_castle(void) {
     if (gDialogTextAlpha < 250) {
         gDialogTextAlpha += 25;
     }
-    #ifdef PUPPYCAM
+#ifdef PUPPYCAM
     } else {
         shade_screen();
         puppycam_display_options();
     }
 
     puppycam_render_option_text();
-    #endif
+#endif
     return MENU_OPT_NONE;
 }
 
