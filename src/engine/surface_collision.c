@@ -161,13 +161,16 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
 
-    // Check for surfaces belonging to objects.
-    node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
-    numCollisions += find_wall_collisions_from_list(node, colData);
-
     // Check for surfaces that are a part of level geometry.
     node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
     numCollisions += find_wall_collisions_from_list(node, colData);
+
+    if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
+        // Check for surfaces belonging to objects.
+        node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
+        numCollisions += find_wall_collisions_from_list(node, colData);
+    }
+    gCollisionFlags &= ~(COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 
     // Increment the debug tracker.
     gNumCalls.wall++;
@@ -186,7 +189,7 @@ void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struc
     collisionData->x = pos[0];
     collisionData->y = pos[1];
     collisionData->z = pos[2];
-    collisionData->radius = radius;
+    collisionData->radius  = radius;
     collisionData->offsetY = offset;
 
     find_wall_collisions(collisionData);
@@ -202,8 +205,8 @@ void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struc
 
 void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
     register f32 diff_x, diff_z, invDenom;
-    diff_x = (target1[0] - *x + target2[0] - *x);
-    diff_z = (target1[2] - *z + target2[2] - *z);
+    diff_x = ((target1[0] - *x) + (target2[0] - *x));
+    diff_z = ((target1[2] - *z) + (target2[2] - *z));
     invDenom = (margin / sqrtf(sqr(diff_x) + sqr(diff_z)));
     *x += (diff_x * invDenom);
     *z += (diff_z * invDenom);
@@ -274,9 +277,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
  * Find the lowest ceiling above a given position and return the height.
  */
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
-    struct Surface *ceil, *dynamicCeil;
-    struct SurfaceNode *surfaceList;
-    f32 height = CELL_HEIGHT_LIMIT;
+    f32 height        = CELL_HEIGHT_LIMIT;
     f32 dynamicHeight = CELL_HEIGHT_LIMIT;
     s32 x, y, z;
 #if PUPPYPRINT_DEBUG
@@ -298,18 +299,19 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
 
-    // Check for surfaces belonging to objects.
-    surfaceList = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next;
-    dynamicCeil = find_ceil_from_list(surfaceList, x, y, z, &dynamicHeight);
-
     // Check for surfaces that are a part of level geometry.
-    surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next;
-    ceil = find_ceil_from_list(surfaceList, x, y, z, &height);
-
-    if (dynamicHeight < height) {
-        ceil   = dynamicCeil;
-        height = dynamicHeight;
+    struct SurfaceNode *surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next;
+    struct Surface *ceil = find_ceil_from_list(surfaceList, x, y, z, &height);
+    if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
+        // Check for surfaces belonging to objects.
+        surfaceList = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next;
+        struct Surface *dynamicCeil = find_ceil_from_list(surfaceList, x, y, z, &dynamicHeight);
+        if (dynamicHeight < height) {
+            ceil   = dynamicCeil;
+            height = dynamicHeight;
+        }
     }
+    gCollisionFlags &= ~(COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 
     *pceil = ceil;
 
