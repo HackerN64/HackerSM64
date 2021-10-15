@@ -193,7 +193,7 @@ void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
  */
 f32 painting_mario_y(struct Painting *painting) {
     // Add 50 to make the ripple closer to Mario's center of mass.
-    f32 relY = ((gPaintingMarioPos[1] - painting->posY) + 50.0f);
+    f32 relY = ((gPaintingMarioPos[1] - painting->pos[1]) + 50.0f);
 
     if (relY < 0.0f) {
         relY = 0.0f;
@@ -207,7 +207,7 @@ f32 painting_mario_y(struct Painting *painting) {
  * @return Mario's z position inside the painting (bounded).
  */
 f32 painting_mario_z(struct Painting *painting) {
-    f32 relZ = (painting->posZ - gPaintingMarioPos[2]);
+    f32 relZ = (painting->pos[2] - gPaintingMarioPos[2]);
     if (relZ < 0.0f) {
         relZ = 0.0f;
     } else if (relZ > painting->size) {
@@ -265,7 +265,7 @@ f32 painting_nearest_4th(struct Painting *painting) {
  * @return Mario's x position inside the painting (bounded).
  */
 f32 painting_mario_x(struct Painting *painting) {
-    f32 relX = (gPaintingMarioPos[0] - painting->posX);
+    f32 relX = (gPaintingMarioPos[0] - painting->pos[0]);
     if (relX < 0.0f) {
         relX = 0.0f;
     } else if (relX > painting->size) {
@@ -520,7 +520,7 @@ void painting_update_floors(struct Painting *painting) {
 
     painting->marioWasUnder = painting->marioIsUnder;
     // Check if Mario has fallen below the painting (used for floor paintings)
-    painting->marioIsUnder = (gPaintingMarioPos[1] < painting->posY);
+    painting->marioIsUnder = (gPaintingMarioPos[1] < painting->pos[1]);
 
     // Mario "went under" if he was not under last frame, but is under now
     painting->marioWentUnder = ((painting->marioWasUnder ^ painting->marioIsUnder) & painting->marioIsUnder);
@@ -827,7 +827,7 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
     Gfx *dlist = alloc_display_list(5 * sizeof(Gfx));
     Gfx *gfx = dlist;
 
-    guTranslate(translate, painting->posX, painting->posY, painting->posZ);
+    guTranslate(translate, painting->pos[0], painting->pos[1], painting->pos[2]);
     guRotate(rotX, painting->pitch, 1.0f, 0.0f, 0.0f);
     guRotate(rotY, painting->yaw,   0.0f, 1.0f, 0.0f);
     guScale(scale, sizeRatio, sizeRatio, sizeRatio);
@@ -993,7 +993,7 @@ void reset_painting(struct Painting *painting) {
     if (painting == &ddd_painting) {
         // Move DDD painting to initial position, in case the animation
         // that moves the painting stops during level unload.
-        painting->posX = 3456.0f;
+        painting->pos[0] = 3456.0f;
     }
 #endif
 }
@@ -1025,21 +1025,21 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
 
     if (!bowsersSubBeaten && !dddBack) {
         // If we haven't collected the star or moved the painting, put the painting at the front
-        painting->posX = frontPos;
+        painting->pos[0] = frontPos;
         gDddPaintingStatus = DDD_FLAGS_NONE;
     } else if (bowsersSubBeaten && !dddBack) {
         // If we've collected the star but not moved the painting back,
         // Each frame, move the painting by a certain speed towards the back area.
-        painting->posX += speed;
+        painting->pos[0] += speed;
         gDddPaintingStatus = DDD_FLAG_BOWSERS_SUB_BEATEN;
-        if (painting->posX >= backPos) {
-            painting->posX = backPos;
+        if (painting->pos[0] >= backPos) {
+            painting->pos[0] = backPos;
             // Tell the save file that we've moved DDD back.
             save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
         }
     } else if (bowsersSubBeaten && dddBack) {
         // If the painting has already moved back, place it in the back position.
-        painting->posX = backPos;
+        painting->pos[0] = backPos;
         gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
     }
 }

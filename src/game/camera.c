@@ -9005,13 +9005,11 @@ void cutscene_enter_painting(struct Camera *c) {
         paintingAngle[1] = (s32)((gRipplingPainting->yaw / 360.f) * 65536.f); // convert degrees to IAU
         paintingAngle[2] = 0;
 
-        focusOffset[0] = gRipplingPainting->size / 2;
+        focusOffset[0] = (gRipplingPainting->size * 0.5f);
         focusOffset[1] = focusOffset[0];
         focusOffset[2] = 0;
 
-        paintingPos[0] = gRipplingPainting->posX;
-        paintingPos[1] = gRipplingPainting->posY;
-        paintingPos[2] = gRipplingPainting->posZ;
+        vec3f_copy(paintingPos, gRipplingPainting->pos);
 
         offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
         approach_vec3f_asymptotic(c->focus, focus, 0.1f, 0.1f, 0.1f);
@@ -9053,16 +9051,14 @@ void cutscene_exit_painting_start(struct Camera *c) {
     struct Surface *floor;
 
     vec3f_set(sCutsceneVars[2].point, 258.f, -352.f, 1189.f);
-    vec3f_set(sCutsceneVars[1].point, 65.f, -155.f, 444.f);
+    vec3f_set(sCutsceneVars[1].point,  65.f, -155.f,  444.f);
 
     if (gPrevLevel == LEVEL_TTM) {
         sCutsceneVars[1].point[1] = 0.f;
         sCutsceneVars[1].point[2] = 0.f;
     }
-    vec3f_copy(sCutsceneVars[0].point, sMarioCamState->pos);
-    sCutsceneVars[0].angle[0] = 0;
-    sCutsceneVars[0].angle[1] = sMarioCamState->faceAngle[1];
-    sCutsceneVars[0].angle[2] = 0;
+    vec3_copy(sCutsceneVars[0].point, sMarioCamState->pos);
+    vec3_set(sCutsceneVars[0].angle, 0, sMarioCamState->faceAngle[1], 0);
     offset_rotated(c->focus, sCutsceneVars[0].point, sCutsceneVars[1].point, sCutsceneVars[0].angle);
     offset_rotated(c->pos, sCutsceneVars[0].point, sCutsceneVars[2].point, sCutsceneVars[0].angle);
     f32 floorHeight = find_floor(c->pos[0], (c->pos[1] + 10.f), c->pos[2], &floor);
@@ -9101,10 +9097,10 @@ void cutscene_exit_painting_move_to_floor(struct Camera *c) {
     Vec3f floorHeight;
 
     vec3f_copy(floorHeight, sMarioCamState->pos);
-    floorHeight[1] = find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 10.f, sMarioCamState->pos[2], &floor);
+    floorHeight[1] = find_floor(sMarioCamState->pos[0], (sMarioCamState->pos[1] + 10.f), sMarioCamState->pos[2], &floor);
 
     if (floor != NULL) {
-        floorHeight[1] = floorHeight[1] + (sMarioCamState->pos[1] - floorHeight[1]) * 0.7f + 125.f;
+        floorHeight[1] = (floorHeight[1] + ((sMarioCamState->pos[1] - floorHeight[1]) * 0.7f) + 125.f);
         approach_vec3f_asymptotic(c->focus, floorHeight, 0.2f, 0.2f, 0.2f);
 
         if (floorHeight[1] < c->pos[1]) {

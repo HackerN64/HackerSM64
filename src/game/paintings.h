@@ -62,9 +62,7 @@ struct Painting
     f32 yaw;
 
     /// The painting's position
-    f32 posX;
-    f32 posY;
-    f32 posZ;
+    Vec3f pos;
 
     /// Controls how high the peaks of the ripple are.
     f32 currRippleMag;
