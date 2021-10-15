@@ -40,7 +40,6 @@ enum HeadsList
 
 #if SILHOUETTE
 #define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))
-
 enum RenderPhase
 {
     RENDER_PHASE_ZEX_BG,
@@ -51,6 +50,7 @@ enum RenderPhase
     RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE,
     RENDER_PHASE_ZEX_AFTER_SILHOUETTE,
     RENDER_PHASE_REJ_NON_ZB,
+    RENDER_PHASE_END,
 };
 #else
 enum RenderPhase
@@ -59,11 +59,9 @@ enum RenderPhase
     RENDER_PHASE_REJ_ZB,
     RENDER_PHASE_ZEX_ALL,
     RENDER_PHASE_REJ_NON_ZB,
+    RENDER_PHASE_END,
 };
 #endif
-
-#define RENDER_PHASE_FIRST RENDER_PHASE_REJ_ZB
-#define RENDER_PHASE_LAST  RENDER_PHASE_REJ_NON_ZB
 
 void geo_process_node_and_siblings(struct GraphNode *firstNode);
 void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor);

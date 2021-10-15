@@ -228,68 +228,65 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     // if (gPlayer1Controller->buttonPressed & L_TRIG)
     //     ucodeTestSwitch ^= 1;
     // print_text_fmt_int(32,32,"%d",ucodeTestSwitch);
-    loopBegin:
-    switch (renderPhase) {
+    for (renderPhase = 0; renderPhase < RENDER_PHASE_END; renderPhase++) {
+        switch (renderPhase) {
 #if SILHOUETTE
-        case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
-        case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
-        case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
-        case RENDER_PHASE_REJ_SILHOUETTE:         headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
-        case RENDER_PHASE_REJ_NON_SILHOUETTE:     headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
-        case RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE: headsIndex = LIST_HEADS_REJ; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_OCCLUDE_SILHOUETTE_LAST; break;
-        case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_LAST;                    break;
-        case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
+            case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
+            case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
+            case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
+            case RENDER_PHASE_REJ_SILHOUETTE:         headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
+            case RENDER_PHASE_REJ_NON_SILHOUETTE:     headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
+            case RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE: headsIndex = LIST_HEADS_REJ; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_OCCLUDE_SILHOUETTE_LAST; break;
+            case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_LAST;                    break;
+            case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
 #else
-        case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
-        case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_ZB_LAST;                 break;
-        case RENDER_PHASE_ZEX_ALL:                headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST;                    break;
-        case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
+            case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
+            case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_ZB_LAST;                 break;
+            case RENDER_PHASE_ZEX_ALL:                headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST;                    break;
+            case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
 #endif
-    }
+        }
 #ifdef F3DZEX_GBI_2
-    // Load rejection on pass 2. ZEX is loaded afterwards.
-    if (headsIndex == LIST_HEADS_REJ) {
-        if (gIsConsole) {
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo);
-        } else {
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo);
-        }
-        init_rcp(KEEP_ZBUFFER);
-        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
-    } else {
-        gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
-        init_rcp(KEEP_ZBUFFER);
-        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
-    }
-    gSPLookAt(gDisplayListHead++, &lookAt);
-    reset_clipping();
-#endif
-    if (enableZBuffer) {
-        gDPPipeSync(gDisplayListHead++);
-        gSPSetGeometryMode(gDisplayListHead++, G_ZBUFFER);
-    }
-    for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
-        currList = node->listHeads[headsIndex][currLayer];
-        while (currList != NULL) {
-#if SILHOUETTE
-            if (renderPhase == RENDER_PHASE_REJ_SILHOUETTE) {
-                SET_SILHOUETTE_F3D(gDisplayListHead);
-            } else if (renderPhase == RENDER_PHASE_REJ_NON_SILHOUETTE) {
-                CLEAR_SILHOUETTE_F3D(gDisplayListHead, currLayer);
+        // Load rejection on pass 2. ZEX is loaded afterwards.
+        if (headsIndex == LIST_HEADS_REJ) {
+            if (gIsConsole) {
+                gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo);
             } else {
-#endif
-                gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer], mode2List->modes[currLayer]);
-#if SILHOUETTE
+                gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo);
             }
-#endif
-            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform), G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-            gSPDisplayList(gDisplayListHead++, currList->displayList);
-            currList = currList->next;
+            init_rcp(KEEP_ZBUFFER);
+            gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
+        } else {
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
+            init_rcp(KEEP_ZBUFFER);
+            gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
         }
-    }
-    if (renderPhase < RENDER_PHASE_LAST) {
-        renderPhase++;
-        goto loopBegin;
+        gSPLookAt(gDisplayListHead++, &lookAt);
+        reset_clipping();
+#endif
+        if (enableZBuffer) {
+            gDPPipeSync(gDisplayListHead++);
+            gSPSetGeometryMode(gDisplayListHead++, G_ZBUFFER);
+        }
+        for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
+            currList = node->listHeads[headsIndex][currLayer];
+            while (currList != NULL) {
+#if SILHOUETTE
+                if (renderPhase == RENDER_PHASE_REJ_SILHOUETTE) {
+                    SET_SILHOUETTE_F3D(gDisplayListHead);
+                } else if (renderPhase == RENDER_PHASE_REJ_NON_SILHOUETTE) {
+                    CLEAR_SILHOUETTE_F3D(gDisplayListHead, currLayer);
+                } else {
+#endif
+                    gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer], mode2List->modes[currLayer]);
+#if SILHOUETTE
+                }
+#endif
+                gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform), G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+                gSPDisplayList(gDisplayListHead++, currList->displayList);
+                currList = currList->next;
+            }
+        }
     }
     if (enableZBuffer) {
         gDPPipeSync(gDisplayListHead++);
