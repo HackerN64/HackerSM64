@@ -4803,7 +4803,7 @@ s32 set_camera_mode_fixed(struct Camera *c, s16 x, s16 y, s16 z) {
 
 void set_camera_mode_8_directions(struct Camera *c) {
     if (c->mode != CAMERA_MODE_8_DIRECTIONS) {
-        c->mode = CAMERA_MODE_8_DIRECTIONS;
+        c->mode  = CAMERA_MODE_8_DIRECTIONS;
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
         s8DirModeBaseYaw   = 0;
         s8DirModeYawOffset = 0;
@@ -8320,7 +8320,11 @@ void cutscene_non_painting_end(struct Camera *c) {
     if (c->defMode == CAMERA_MODE_CLOSE) {
         c->mode = CAMERA_MODE_CLOSE;
     } else {
+#ifdef CAMERA_FIX
+        c->mode = CAMERA_MODE_8_DIRECTIONS;
+#else
         c->mode = CAMERA_MODE_FREE_ROAM;
+#endif
     }
 
     sStatusFlags |= CAM_FLAG_UNUSED_CUTSCENE_ACTIVE;
@@ -9047,7 +9051,6 @@ void cutscene_enter_painting(struct Camera *c) {
  */
 void cutscene_exit_painting_start(struct Camera *c) {
     struct Surface *floor;
-    f32 floorHeight;
 
     vec3f_set(sCutsceneVars[2].point, 258.f, -352.f, 1189.f);
     vec3f_set(sCutsceneVars[1].point, 65.f, -155.f, 444.f);
@@ -9062,7 +9065,7 @@ void cutscene_exit_painting_start(struct Camera *c) {
     sCutsceneVars[0].angle[2] = 0;
     offset_rotated(c->focus, sCutsceneVars[0].point, sCutsceneVars[1].point, sCutsceneVars[0].angle);
     offset_rotated(c->pos, sCutsceneVars[0].point, sCutsceneVars[2].point, sCutsceneVars[0].angle);
-    floorHeight = find_floor(c->pos[0], c->pos[1] + 10.f, c->pos[2], &floor);
+    f32 floorHeight = find_floor(c->pos[0], (c->pos[1] + 10.f), c->pos[2], &floor);
 
     if (floorHeight != FLOOR_LOWER_LIMIT) {
         if (c->pos[1] < (floorHeight += 60.f)) {
@@ -9155,7 +9158,11 @@ void cutscene_unused_exit_focus_mario(struct Camera *c) {
  * Give control back to the player.
  */
 void cutscene_exit_painting_end(struct Camera *c) {
+#ifdef CAMERA_FIX
+    c->mode = CAMERA_MODE_8_DIRECTIONS;
+#else
     c->mode = CAMERA_MODE_CLOSE;
+#endif
     c->cutscene = 0;
     gCutsceneTimer = CUTSCENE_STOP;
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
