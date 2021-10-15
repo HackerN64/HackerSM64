@@ -347,6 +347,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
     f32 height;
     s16 type = SURFACE_DEFAULT;
     *pheight = FLOOR_LOWER_LIMIT;
+    f32 bufferY = (y + 78.0f);
     // Iterate through the list of floors until there are no more floors.
     while (surfaceNode != NULL) {
         surf = surfaceNode->surface;
@@ -364,15 +365,16 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         }
         if (y < (surf->lowerY - 30)) continue;
         // Check that the point is within the triangle bounds.
-        check_within_triangle_bounds(x, z, surf);
+        if (!check_within_triangle_bounds(x, z, surf)) continue;
         // Find the height of the floor at a given location.
         height = get_surface_height_at_location(x, z, surf);
         if (height < *pheight) continue;
         // Checks for floor interaction with a 78 unit buffer.
-        if (y < (height - 78.0f)) continue;
+        if (bufferY < height) continue;
         *pheight = height;
         floor = surf;
-        if ((height - 78.0f) == y) break;
+        // Exit the loop if it's not possible for another floor to be closer to the original point
+        if (height == bufferY) break;
     }
     return floor;
 }
@@ -383,11 +385,11 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
 struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
     register struct Surface *surf;
     struct Surface *floor = NULL;
-    struct SurfaceNode *topSurfaceNode = surfaceNode;
+    struct SurfaceNode *topSurfaceNode    = surfaceNode;
     struct SurfaceNode *bottomSurfaceNode = surfaceNode;
-    f32 height = FLOOR_LOWER_LIMIT;
-    f32 curHeight = FLOOR_LOWER_LIMIT;
-    f32 bottomHeight = FLOOR_LOWER_LIMIT;
+    f32 height          = FLOOR_LOWER_LIMIT;
+    f32 curHeight       = FLOOR_LOWER_LIMIT;
+    f32 bottomHeight    = FLOOR_LOWER_LIMIT;
     f32 curBottomHeight = FLOOR_LOWER_LIMIT;
 
     // Iterate through the list of water floors until there are no more water floors.
@@ -399,8 +401,11 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
 
         curBottomHeight = get_surface_height_at_location(x, z, surf);
 
-        if (curBottomHeight < y - 78.0f) continue;
-        if (curBottomHeight >= y - 78.0f) bottomHeight = curBottomHeight;
+        if (curBottomHeight <  (y - 78.0f)) {
+            continue;
+        } else {
+            bottomHeight = curBottomHeight;
+        }
     }
 
     // Iterate through the list of water tops until there are no more water tops.
@@ -449,9 +454,8 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
     s32 cellZ = GET_CELL_COORD(z);
 
     struct SurfaceNode *surfaceList = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
-    struct Surface *floor = find_floor_from_list(surfaceList, x, y, z, &floorHeight);
 
-    *pfloor = floor;
+    *pfloor = find_floor_from_list(surfaceList, x, y, z, &floorHeight);
 
     return floorHeight;
 }
@@ -460,7 +464,6 @@ f32 unused_find_dynamic_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfl
  * Find the highest floor under a given position and return the height.
  */
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
-    s32 cellZ, cellX;
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
@@ -484,8 +487,8 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
         return height;
     }
     // Each level is split into cells to limit load, find the appropriate cell.
-    cellX = GET_CELL_COORD(x);
-    cellZ = GET_CELL_COORD(z);
+    s32 cellX = GET_CELL_COORD(x);
+    s32 cellZ = GET_CELL_COORD(z);
     // Check for surfaces that are a part of level geometry.
     struct SurfaceNode *surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
     struct Surface *floor = find_floor_from_list(surfaceList, x, y, z, &height);
