@@ -15,7 +15,8 @@
 
 #define is_outside_level_bounds(xPos, zPos) (((xPos) <= -LEVEL_BOUNDARY_MAX) || ((xPos) >=  LEVEL_BOUNDARY_MAX) || ((zPos) <= -LEVEL_BOUNDARY_MAX) || ((zPos) >=  LEVEL_BOUNDARY_MAX))
 
-#define get_surface_height_at_location(xPos, zPos, surf) (-((xPos) * (surf)->normal.x + (surf)->normal.z * (zPos) + (surf)->originOffset) / (surf)->normal.y)
+#define get_surface_height_at_location(xPos, zPos, surf) (-(((xPos) * (surf)->normal.x) + ((surf)->normal.z * (zPos)) + (surf)->originOffset) / (surf)->normal.y)
+#define get_surface_height_at_location_ny(xPos, zPos, surf, ny) (-(((xPos) * (surf)->normal.x) + ((surf)->normal.z * (zPos)) + (surf)->originOffset) / ny)
 
 #define SURFACE_YAW(s) (atan2s(((s)->normal.z), ((s)->normal.x)))
 

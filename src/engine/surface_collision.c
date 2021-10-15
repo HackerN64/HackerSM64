@@ -209,15 +209,32 @@ void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
     *z += (diff_z * invDenom);
 }
 
+static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf, const f32 margin) {
+    Vec3i vx, vz;
+    vx[0] = surf->vertex1[0];
+    vz[0] = surf->vertex1[2];
+    if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[0], &vz[0], surf->vertex2, surf->vertex3, margin);
+    vx[1] = surf->vertex2[0];
+    vz[1] = surf->vertex2[2];
+    if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[1], &vz[1], surf->vertex3, surf->vertex1, margin);
+    // Checking if point is in bounds of the triangle laterally.
+    if ((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0]) > 0) return FALSE;
+    // Slight optimization by checking these later.
+    vx[2] = surf->vertex3[0];
+    vz[2] = surf->vertex3[2];
+    if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[2], &vz[2], surf->vertex1, surf->vertex2, margin);
+    if ((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1]) > 0) return FALSE;
+    if ((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2]) > 0) return FALSE;
+    return TRUE;
+}
+
 /**
  * Iterate through the list of ceilings and find the first ceiling over a given point.
  */
 static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
-    const f32 margin = 1.5f;
     register struct Surface *surf, *ceil = NULL;
-    Vec3i vx, vz;
-    f32 height;
-    s16 type;
+    register f32 height, ny;
+    SurfaceType type = SURFACE_DEFAULT;
     *pheight = CELL_HEIGHT_LIMIT;
     // Stay in this loop until out of ceilings.
     while (surfaceNode != NULL) {
@@ -233,22 +250,15 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
             continue;
         }
         if (y > surf->upperY) continue;
-        vx[0] = surf->vertex1[0];
-        vz[0] = surf->vertex1[2];
-        if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[0], &vz[0], surf->vertex2, surf->vertex3, margin);
-        vx[1] = surf->vertex2[0];
-        vz[1] = surf->vertex2[2];
-        if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[1], &vz[1], surf->vertex3, surf->vertex1, margin);
-        // Checking if point is in bounds of the triangle laterally.
-        if ((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0]) > 0) continue;
-        // Slight optimization by checking these later.
-        vx[2] = surf->vertex3[0];
-        vz[2] = surf->vertex3[2];
-        if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[2], &vz[2], surf->vertex1, surf->vertex2, margin);
-        if ((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1]) > 0) continue;
-        if ((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2]) > 0) continue;
-        // Find the ceil height at the specific point.
-        height = get_surface_height_at_location(x, z, surf);
+        if (!check_within_ceil_triangle_bounds(x, z, surf, 1.5f)) continue;
+        ny = surf->normal.y;
+        if (ny > NEAR_ONE) {
+            // If the surface is flat, use the height of the first vertex.
+            height = surf->vertex1[1];
+        } else {
+            // Find the height of the ceil at the given location.
+            height = get_surface_height_at_location_ny(x, z, surf, ny);
+        }
         if (height > *pheight) continue;
         // Checks for ceiling interaction
         if (y > height) continue;
@@ -325,7 +335,7 @@ f32 unused_obj_find_floor_height(struct Object *obj) {
     return find_floor(obj->oPosX, obj->oPosY, obj->oPosZ, &floor);
 }
 
-static s32 check_within_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
+static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
     register Vec3i vx, vz;
     vx[0] = surf->vertex1[0];
     vz[0] = surf->vertex1[2];
@@ -344,8 +354,8 @@ static s32 check_within_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
  */
 static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32 x, s32 y, s32 z, f32 *pheight) {
     register struct Surface *surf, *floor = NULL;
-    f32 height;
-    s16 type = SURFACE_DEFAULT;
+    register f32 height, ny;
+    register SurfaceType type = SURFACE_DEFAULT;
     *pheight = FLOOR_LOWER_LIMIT;
     f32 bufferY = (y + 78.0f);
     // Iterate through the list of floors until there are no more floors.
@@ -360,14 +370,20 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         // Determine if we are checking for the camera or not.
         if (gCollisionFlags & COLLISION_FLAG_CAMERA) {
             if ((surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) || SURFACE_IS_NEW_WATER(type)) continue;
-        } else if (surf->type == SURFACE_CAMERA_BOUNDARY) {
+        } else if (type == SURFACE_CAMERA_BOUNDARY) {
             continue; // If we are not checking for the camera, ignore camera only floors.
         }
         if (y < (surf->lowerY - 30)) continue;
         // Check that the point is within the triangle bounds.
-        if (!check_within_triangle_bounds(x, z, surf)) continue;
-        // Find the height of the floor at a given location.
-        height = get_surface_height_at_location(x, z, surf);
+        if (!check_within_floor_triangle_bounds(x, z, surf)) continue;
+        ny = surf->normal.y;
+        if (ny > NEAR_ONE) {
+            // If the surface is flat, use the height of the first vertex.
+            height = surf->vertex1[1];
+        } else {
+            // Find the height of the floor at the given location.
+            height = get_surface_height_at_location_ny(x, z, surf, ny);
+        }
         if (height < *pheight) continue;
         // Checks for floor interaction with a 78 unit buffer.
         if (bufferY < height) continue;
@@ -397,7 +413,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
         surf = bottomSurfaceNode->surface;
         bottomSurfaceNode = bottomSurfaceNode->next;
 
-        if (surf->type != SURFACE_NEW_WATER_BOTTOM || !check_within_triangle_bounds(x, z, surf)) continue;
+        if (surf->type != SURFACE_NEW_WATER_BOTTOM || !check_within_floor_triangle_bounds(x, z, surf)) continue;
 
         curBottomHeight = get_surface_height_at_location(x, z, surf);
 
@@ -413,7 +429,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
         surf = topSurfaceNode->surface;
         topSurfaceNode = topSurfaceNode->next;
 
-        if ((surf->type == SURFACE_NEW_WATER_BOTTOM) || !check_within_triangle_bounds(x, z, surf)) continue;
+        if ((surf->type == SURFACE_NEW_WATER_BOTTOM) || !check_within_floor_triangle_bounds(x, z, surf)) continue;
 
         curHeight = get_surface_height_at_location(x, z, surf);
 
