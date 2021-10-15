@@ -94,22 +94,17 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     // If it's a cylinder, then it ignores that check, simply because an equal sided cylinder will have the
     // same result no matter the yaw. If neither is true, then it simply checks if it's 180 degrees, since
     // That will just be the same as 0.
-    if (light->pos[1][0] == light->pos[1][2]) {
-        if ((light->yaw % 0x4000) == 0 || light->flags & PUPPYLIGHT_SHAPE_CYLINDER) {
-            lightPos[0] = lightRelative[0];
-            lightPos[1] = lightRelative[2];
-            goto skippingTrig;
-        }
-    } else if ((light->yaw % 0x8000) == 0) {
+    if (((light->pos[1][0] == light->pos[1][2])
+     && ((light->yaw % 0x4000) == 0 || light->flags & PUPPYLIGHT_SHAPE_CYLINDER))
+     || ((light->yaw % 0x8000) == 0)) {
+        // Skip trig calculations.
         lightPos[0] = lightRelative[0];
         lightPos[1] = lightRelative[2];
-        goto skippingTrig;
+    } else {
+        // Get the position based off the rotation of the box.
+        lightPos[0] = (lightRelative[2] * sins(-light->yaw)) + (lightRelative[0] * coss(-light->yaw));
+        lightPos[1] = (lightRelative[2] * coss(-light->yaw)) - (lightRelative[0] * sins(-light->yaw));
     }
-
-    // Get the position based off the rotation of the box.
-    lightPos[0] = (lightRelative[2] * sins(-light->yaw)) + (lightRelative[0] * coss(-light->yaw));
-    lightPos[1] = (lightRelative[2] * coss(-light->yaw)) - (lightRelative[0] * sins(-light->yaw));
-    skippingTrig:
 
 #ifdef VISUAL_DEBUG
     vec3f_set(debugPos[0], light->pos[0][0], light->pos[0][1], light->pos[0][2]);
@@ -246,6 +241,18 @@ void puppylights_run(Lights1 *src, struct Object *obj, s32 flags, RGBA32 baseCol
     }
 }
 
+static void puppylights_deallocate_obj(struct Object *obj) {
+    if (obj->oLightID != 0xFFFF) {
+        gPuppyLights[obj->oLightID]->active = FALSE;
+        gPuppyLights[obj->oLightID]->flags = 0;
+    }
+    obj->oLightID = 0xFFFF;
+}
+
+static void puppylights_update_pos_obj(struct Object *obj) {
+    vec3_copy(gPuppyLights[obj->oLightID]->pos[0], &obj->oPosVec);
+}
+
 // Sets and updates dynamic lights from objects.
 // 0xFFFF is essentially the null ID. If the display flag is met, it will find and set an ID, otherwise it frees up the spot.
 void puppylights_object_emit(struct Object *obj) {
@@ -257,14 +264,16 @@ void puppylights_object_emit(struct Object *obj) {
         Vec3d d;
         vec3_diff(d, &obj->oPosVec, gMarioState->pos);
         if (vec3_sumsq(d) > vec3_sumsq(obj->puppylight.pos[1])) {
-            goto deallocate; // That's right. I used a goto. Eat your heart out xkcd.
+            puppylights_deallocate_obj(obj);
+            return;
         }
         if (obj->oLightID == 0xFFFF) {
             s32 fadingExists = FALSE;
             if (ABS(gNumLights - gDynLightStart) < MAX_LIGHTS_DYNAMIC) {
-                goto deallocate;
+                puppylights_deallocate_obj(obj);
+                return;
             }
-            for (i = gDynLightStart; i < MIN(gDynLightStart+MAX_LIGHTS_DYNAMIC, MAX_LIGHTS); i++) {
+            for (i = gDynLightStart; i < MIN((gDynLightStart + MAX_LIGHTS_DYNAMIC), MAX_LIGHTS); i++) {
                 if (gPuppyLights[i]->active == TRUE) {
                     if (gPuppyLights[i]->flags & PUPPYLIGHT_DELETE) {
                         fadingExists = TRUE;
@@ -276,11 +285,12 @@ void puppylights_object_emit(struct Object *obj) {
                 gPuppyLights[i]->area = gCurrAreaIndex;
                 gPuppyLights[i]->room = obj->oRoom;
                 obj->oLightID = i;
-                goto updatepos;
+                puppylights_update_pos_obj(obj);
+                return;
             }
             // Go through all the lights again, now this time, ignore the fading light flag and overwrite them.
             if (fadingExists) {
-                for (i = gDynLightStart; i < MIN(gDynLightStart+MAX_LIGHTS_DYNAMIC, MAX_LIGHTS); i++) {
+                for (i = gDynLightStart; i < MIN((gDynLightStart + MAX_LIGHTS_DYNAMIC), MAX_LIGHTS); i++) {
                     if (gPuppyLights[i]->active == TRUE && !(gPuppyLights[i]->flags & PUPPYLIGHT_DELETE)) {
                         continue;
                     }
@@ -290,20 +300,14 @@ void puppylights_object_emit(struct Object *obj) {
                     gPuppyLights[i]->room = obj->oRoom;
                     gPuppyLights[i]->flags &= ~PUPPYLIGHT_DELETE;
                     obj->oLightID = i;
-                    goto updatepos;
+                    puppylights_update_pos_obj(obj);
                 }
             }
         } else {
-            updatepos:
-            vec3_copy(gPuppyLights[obj->oLightID]->pos[0], &obj->oPosVec);
+            puppylights_update_pos_obj(obj);
         }
     } else {
-        deallocate:
-        if (obj->oLightID != 0xFFFF) {
-            gPuppyLights[obj->oLightID]->active = FALSE;
-            gPuppyLights[obj->oLightID]->flags = 0;
-        }
-        obj->oLightID = 0xFFFF;
+        puppylights_deallocate_obj(obj);
     }
 }
 

@@ -174,7 +174,7 @@ void reset_clipping(void) {
     if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
         make_viewport_clip_rect(&sEndCutsceneVp);
     } else {
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, SCREEN_HEIGHT - gBorderHeight);
+        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
     }
 }
 
@@ -282,7 +282,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #if SILHOUETTE
                 }
 #endif
-                gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform), G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+                gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform), (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
                 gSPDisplayList(gDisplayListHead++, currList->displayList);
                 currList = currList->next;
             }
@@ -413,7 +413,7 @@ void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node) {
 
         guOrtho(mtx, left, right, bottom, top, -2.0f, 2.0f, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
 
         geo_process_node_and_siblings(node->node.children);
     }
@@ -499,7 +499,7 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     }
     mtxf_rotate_xy(rollMtx, node->rollScreen);
 
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH));
 
     mtxf_lookat(cameraTransform, node->pos, node->focus, node->roll);
     mtxf_mul(gMatStack[gMatStackIndex + 1], cameraTransform, gMatStack[gMatStackIndex]);

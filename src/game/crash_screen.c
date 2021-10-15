@@ -368,7 +368,7 @@ void thread2_crash_screen(UNUSED void *arg) {
     OSThread *thread = NULL;
 
     osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg) 1);
-    osSetEventMesg(OS_EVENT_FAULT, &gCrashScreen.mesgQueue, (OSMesg) 2);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) 2);
     goto finished;
     reset:
     if ((u32) map_data_init != 0x80345678) {
