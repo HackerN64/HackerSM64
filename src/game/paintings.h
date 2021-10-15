@@ -13,12 +13,13 @@
 /// The default painting side length
 #define PAINTING_SIZE 614.0
 
-#define PAINTING_ID_DDD 7
+#define PAINTING_ID_DDD 0x7
 
 #define BOARD_BOWSERS_SUB 1
 
-#define BOWSERS_SUB_BEATEN 0x2
-#define DDD_BACK 0x1
+#define DDD_FLAGS_NONE              (0 << 0) // 0x0
+#define DDD_FLAG_BACK               (1 << 0) // 0x1
+#define DDD_FLAG_BOWSERS_SUB_BEATEN (1 << 1) // 0x2
 
 enum PaintingState
 {
@@ -27,13 +28,16 @@ enum PaintingState
     PAINTING_ENTERED
 };
 
-#define RIPPLE_TRIGGER_PROXIMITY 10
+#define RIPPLE_TRIGGER_PROXIMITY  10
 #define RIPPLE_TRIGGER_CONTINUOUS 20
 
-/// Painting that uses 1 or more images as a texture
-#define PAINTING_IMAGE 0
-/// Painting that has one texture used for an environment map effect
-#define PAINTING_ENV_MAP 1
+enum PaintingType
+{
+    /// Painting that uses 1 or more images as a texture
+    PAINTING_IMAGE,
+    /// Painting that has one texture used for an environment map effect
+    PAINTING_ENV_MAP
+};
 
 struct Painting
 {
@@ -127,9 +131,6 @@ struct PaintingMeshVertex {
     /*0x00*/ Vec3s pos;
     /*0x06*/ Vec3c norm;
 };
-
-extern s16 gPaintingMarioFloorType;
-extern Vec3f gPaintingMarioPos;
 
 extern struct PaintingMeshVertex *gPaintingMesh;
 extern Vec3f *gPaintingTriNorms;
