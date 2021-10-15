@@ -36,7 +36,7 @@ const LevelScript level_main_menu_entry_file_select[] = {
     LOAD_MODEL_FROM_GEO(MODEL_MAIN_MENU_GENERIC_BUTTON,         geo_menu_generic_button),
 
     AREA(/*index*/ 1, geo_menu_file_select_strings_and_menu_cursor),
-        OBJECT(/*model*/ MODEL_NONE,         /*pos*/ 0, 0, -19000, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvMenuButtonManager),
+        OBJECT(/*model*/ MODEL_NONE,                         /*pos*/ 0, 0, -19000, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvMenuButtonManager),
         OBJECT(/*model*/ MODEL_MAIN_MENU_YELLOW_FILE_BUTTON, /*pos*/ 0, 0, -19000, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvYellowBackgroundInMenu),
         TERRAIN(/*terrainData*/ main_menu_seg7_collision),
     END_AREA(),
@@ -45,7 +45,7 @@ const LevelScript level_main_menu_entry_file_select[] = {
     LOAD_AREA(/*area*/ 1),
     SET_MENU_MUSIC(/*seq*/ SEQ_MENU_FILE_SELECT),
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_FROM_COLOR, /*time*/ 16, /*color*/ 0xFF, 0xFF, 0xFF),
-    CALL(/*arg*/ 0, /*func*/ lvl_init_menu_values_and_cursor_pos),
+    CALL(     /*arg*/ 0, /*func*/ lvl_init_menu_values_and_cursor_pos),
     CALL_LOOP(/*arg*/ 0, /*func*/ lvl_update_obj_and_load_file_selected),
     GET_OR_SET(/*op*/ OP_SET, /*var*/ VAR_CURR_SAVE_FILE_NUM),
     STOP_MUSIC(/*fadeOutTime*/ 0x00BE),
@@ -53,13 +53,13 @@ const LevelScript level_main_menu_entry_file_select[] = {
     SLEEP(/*frames*/ 16),
     CLEAR_LEVEL(),
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
-    SET_REG(/*value*/ LEVEL_CASTLE_GROUNDS),
+    SET_REG(/*value*/ START_LEVEL),
     EXIT_AND_EXECUTE(/*seg*/ 0x15, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
 };
 
 const LevelScript level_main_menu_entry_act_select[] = {
     /*0*/ CALL(/*arg*/ 0, /*func*/ lvl_set_current_level),
-    /*2*/ JUMP_IF(/*op*/ OP_EQ, /*arg*/ 0, level_main_menu_entry_act_select + 42),
+    /*2*/ JUMP_IF(/*op*/ OP_EQ, /*arg*/ FALSE, (level_main_menu_entry_act_select + 42)),
     /*5*/ INIT_LEVEL(),
     /*6*/ FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
     /*10*/ LOAD_YAY0(/*seg*/ 0x07, _menu_segment_7SegmentRomStart, _menu_segment_7SegmentRomEnd),
@@ -82,7 +82,7 @@ const LevelScript level_main_menu_entry_act_select[] = {
     /*29*/ SLEEP(/*frames*/ 16),
     /*30*/ SET_MENU_MUSIC(/*seq*/ 0x000D),
 #ifndef NO_SEGMENTED_MEMORY
-    /*31*/ CALL(/*arg*/ 0, /*func*/ lvl_init_act_selector_values_and_stars),
+    /*31*/ CALL(     /*arg*/ 0, /*func*/ lvl_init_act_selector_values_and_stars),
 #endif
     /*33*/ CALL_LOOP(/*arg*/ 0, /*func*/ lvl_update_obj_and_load_act_button_actions),
     /*35*/ GET_OR_SET(/*op*/ OP_SET, /*var*/ VAR_CURR_ACT_NUM),

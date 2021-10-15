@@ -31,11 +31,11 @@ const LevelScript level_intro_splash_screen[] = {
     EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ 0x14, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),
 #endif
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
-    LOAD_RAW(/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
+    LOAD_RAW( /*seg*/ 0x13, _behaviorSegmentRomStart,        _behaviorSegmentRomEnd),
     LOAD_YAY0(/*seg*/ 0x07, _intro_segment_7SegmentRomStart, _intro_segment_7SegmentRomEnd),
 #if defined(HD_INTRO_TEXTURES) && defined(FLOOMBAS)
-    LOAD_YAY0(        /*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+    LOAD_YAY0(/*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
+    LOAD_RAW( /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
 
     // Load "Super Mario 64" logo
     ALLOC_LEVEL_POOL(),
@@ -83,7 +83,6 @@ const LevelScript level_intro_splash_screen[] = {
 };
 
 const LevelScript level_intro_mario_head_regular[] = {
-
     INIT_LEVEL(),
     BLACKOUT(/*active*/ TRUE),
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
@@ -168,7 +167,7 @@ const LevelScript script_intro_file_select[] = {
     SLEEP(/*frames*/ 16),
     CLEAR_LEVEL(),
     SLEEP(/*frames*/ 2),
-    SET_REG(/*value*/ 16),
+    SET_REG(/*value*/ START_LEVEL),
     EXIT_AND_EXECUTE(/*seg*/ 0x14, _menuSegmentRomStart, _menuSegmentRomEnd, level_main_menu_entry_file_select),
 };
 

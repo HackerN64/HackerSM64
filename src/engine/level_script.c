@@ -64,7 +64,7 @@ static s32 sRegister;
 static struct LevelCommand *sCurrentCmd;
 
 static s32 eval_script_op(s8 op, s32 arg) {
-    s32 result = 0;
+    s32 result = FALSE;
     switch (op) {
         case OP_AND:  result =  (sRegister &  arg); break;
         case OP_NAND: result = !(sRegister &  arg); break;
@@ -172,7 +172,7 @@ static void level_cmd_loop_begin(void) {
 }
 
 static void level_cmd_loop_until(void) {
-    if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4)) != 0) {
+    if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4))) {
         sCurrentCmd = CMD_NEXT;
         sStackTop -= 2;
     } else {
@@ -181,7 +181,7 @@ static void level_cmd_loop_until(void) {
 }
 
 static void level_cmd_jump_if(void) {
-    if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4)) != 0) {
+    if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4))) {
         sCurrentCmd = segmented_to_virtual(CMD_GET(void *, 8));
     } else {
         sCurrentCmd = CMD_NEXT;
@@ -189,7 +189,7 @@ static void level_cmd_jump_if(void) {
 }
 
 static void level_cmd_jump_and_link_if(void) {
-    if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4)) != 0) {
+    if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4))) {
         *sStackTop++ = (uintptr_t) NEXT_CMD;
         sCurrentCmd = segmented_to_virtual(CMD_GET(void *, 8));
     } else {
@@ -198,10 +198,10 @@ static void level_cmd_jump_and_link_if(void) {
 }
 
 static void level_cmd_skip_if(void) {
-    if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4)) == 0) {
+    if (!eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4))) {
         do {
             sCurrentCmd = CMD_NEXT;
-        } while (sCurrentCmd->type == 0x0F || sCurrentCmd->type == 0x10);
+        } while ((sCurrentCmd->type == 0x0F) || (sCurrentCmd->type == 0x10));
     }
 
     sCurrentCmd = CMD_NEXT;

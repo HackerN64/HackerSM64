@@ -33,33 +33,6 @@
 
 #include "config.h"
 
-enum PlayModes {
-    PLAY_MODE_NORMAL,
-    PLAY_MODE_UNUSED,
-    PLAY_MODE_PAUSED,
-    PLAY_MODE_CHANGE_AREA,
-    PLAY_MODE_CHANGE_LEVEL,
-    PLAY_MODE_FRAME_ADVANCE
-};
-
-enum WarpTypes {
-    WARP_TYPE_NOT_WARPING,
-    WARP_TYPE_CHANGE_LEVEL,
-    WARP_TYPE_CHANGE_AREA,
-    WARP_TYPE_SAME_AREA
-};
-
-#define WARP_NODE                0xF0
-#define WARP_NODE_F0            (0x00 | WARP_NODE)
-#define WARP_NODE_DEATH         (0x01 | WARP_NODE)
-#define WARP_NODE_LOOK_UP       (0x02 | WARP_NODE)
-#define WARP_NODE_WARP_FLOOR    (0x03 | WARP_NODE)
-#define WARP_NODE_CREDITS_START (0x08 | WARP_NODE)
-#define WARP_NODE_CREDITS_NEXT  (0x09 | WARP_NODE)
-#define WARP_NODE_CREDITS_END   (0x0A | WARP_NODE)
-
-#define WARP_NODE_CREDITS_MIN    0xF8
-
 // TODO: Make these ifdefs better
 const char *credits01[] = { "1GAME DIRECTOR", "SHIGERU MIYAMOTO" };
 const char *credits02[] = { "2ASSISTANT DIRECTORS", "YOSHIAKI KOIZUMI", "TAKASHI TEZUKA" };
@@ -694,7 +667,7 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
             case WARP_OP_DEMO_NEXT:
             case WARP_OP_DEMO_END:
                 sDelayedWarpTimer = 20;
-                sSourceWarpNodeId = WARP_NODE_F0;
+                sSourceWarpNodeId = WARP_NODE_DEFAULT;
                 gSavedCourseNum = COURSE_NONE;
                 fadeMusic = FALSE;
                 play_transition(WARP_TRANSITION_FADE_INTO_STAR, sDelayedWarpTimer, 0x00, 0x00, 0x00);
@@ -702,7 +675,7 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 
             case WARP_OP_CREDITS_END:
                 sDelayedWarpTimer = 60;
-                sSourceWarpNodeId = WARP_NODE_F0;
+                sSourceWarpNodeId = WARP_NODE_DEFAULT;
                 fadeMusic = FALSE;
                 gSavedCourseNum = COURSE_NONE;
                 play_transition(WARP_TRANSITION_FADE_INTO_COLOR, sDelayedWarpTimer, 0x00, 0x00, 0x00);
@@ -710,7 +683,7 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 
             case WARP_OP_STAR_EXIT:
                 sDelayedWarpTimer = 32;
-                sSourceWarpNodeId = WARP_NODE_F0;
+                sSourceWarpNodeId = WARP_NODE_DEFAULT;
                 gSavedCourseNum = COURSE_NONE;
                 play_transition(WARP_TRANSITION_FADE_INTO_MARIO, sDelayedWarpTimer, 0x00, 0x00, 0x00);
                 break;
@@ -743,7 +716,6 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                     sSourceWarpNodeId = WARP_NODE_DEATH;
 #endif
                 }
-
                 sDelayedWarpTimer = 20;
                 play_transition(WARP_TRANSITION_FADE_INTO_CIRCLE, sDelayedWarpTimer, 0x00, 0x00, 0x00);
                 break;
@@ -759,13 +731,13 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 
             case WARP_OP_SPIN_SHRINK: // bbh enter
                 sDelayedWarpTimer = 30;
-                sSourceWarpNodeId = ((m->usedObj->oBehParams & 0x00FF0000) >> 16);
+                sSourceWarpNodeId = ((m->usedObj->oBehParams & SOURCE_WARP_ID_MASK) >> 16);
                 play_transition(WARP_TRANSITION_FADE_INTO_COLOR, sDelayedWarpTimer, 0xFF, 0xFF, 0xFF);
                 break;
 
             case WARP_OP_TELEPORT:
                 sDelayedWarpTimer = 20;
-                sSourceWarpNodeId = ((m->usedObj->oBehParams & 0x00FF0000) >> 16);
+                sSourceWarpNodeId = ((m->usedObj->oBehParams & SOURCE_WARP_ID_MASK) >> 16);
                 fadeMusic = !music_unchanged_through_warp(sSourceWarpNodeId);
                 play_transition(WARP_TRANSITION_FADE_INTO_COLOR, sDelayedWarpTimer, 0xFF, 0xFF, 0xFF);
                 break;
@@ -773,7 +745,7 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
             case WARP_OP_WARP_DOOR:
                 sDelayedWarpTimer = 20;
                 sDelayedWarpArg = m->actionArg;
-                sSourceWarpNodeId = ((m->usedObj->oBehParams & 0x00FF0000) >> 16);
+                sSourceWarpNodeId = ((m->usedObj->oBehParams & SOURCE_WARP_ID_MASK) >> 16);
                 fadeMusic = !music_unchanged_through_warp(sSourceWarpNodeId);
                 play_transition(WARP_TRANSITION_FADE_INTO_CIRCLE, sDelayedWarpTimer, 0x00, 0x00, 0x00);
                 break;
@@ -791,11 +763,7 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 break;
 
             case WARP_OP_CREDITS_NEXT:
-                if (gCurrCreditsEntry == &sCreditsSequence[0]) {
-                    sDelayedWarpTimer = 60;
-                } else {
-                    sDelayedWarpTimer = 20;
-                }
+                sDelayedWarpTimer = ((gCurrCreditsEntry == &sCreditsSequence[0]) ? 60 : 20);
                 play_transition(WARP_TRANSITION_FADE_INTO_COLOR, sDelayedWarpTimer, 0x00, 0x00, 0x00);
                 fadeMusic = FALSE;
                 break;
@@ -816,7 +784,7 @@ void initiate_delayed_warp(void) {
     struct ObjectWarpNode *warpNode;
     s32 destWarpNode;
 
-    if (sDelayedWarpOp != WARP_OP_NONE && --sDelayedWarpTimer == 0) {
+    if ((sDelayedWarpOp != WARP_OP_NONE) && (--sDelayedWarpTimer == 0)) {
         reset_dialog_render_state();
 
         if (gDebugLevelSelect && (sDelayedWarpOp & WARP_OP_TRIGGERS_LEVEL_SELECT)) {
@@ -1283,21 +1251,23 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     s32 warpCheckpointActive = sWarpCheckpointActive;
 
     sWarpCheckpointActive = FALSE;
-    gCurrLevelNum = levelNum;
+    gCurrLevelNum  = levelNum;
     gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1];
 
     if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
         return FALSE;
     }
 
-    if (gCurrLevelNum != LEVEL_BOWSER_1 && gCurrLevelNum != LEVEL_BOWSER_2 && gCurrLevelNum != LEVEL_BOWSER_3) {
+    if ((gCurrLevelNum != LEVEL_BOWSER_1)
+     && (gCurrLevelNum != LEVEL_BOWSER_2)
+     && (gCurrLevelNum != LEVEL_BOWSER_3)) {
         gMarioState->numCoins = 0;
-        gHudDisplay.coins = 0;
+        gHudDisplay.coins     = 0;
         gCurrCourseStarFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
     }
 
     if (gSavedCourseNum != gCurrCourseNum) {
-        gSavedCourseNum = gCurrCourseNum;
+        gSavedCourseNum  = gCurrCourseNum;
         disable_warp_checkpoint();
     }
 
