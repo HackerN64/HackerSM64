@@ -67,6 +67,6 @@ STATIC_ASSERT(((EXTENDED_BOUNDS_MODE >= 0) && (EXTENDED_BOUNDS_MODE <= 3)), "You
 #define NOT_ENOUGH_ROOM_FOR_NODES    (1 << 1)
 
 // Use this to convert game units to cell coordinates
-#define GET_CELL_COORD(p)   ((((p) + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & (NUM_CELLS - 1));
+#define GET_CELL_COORD(p)   ((((s32)(p) + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & (NUM_CELLS - 1));
 
 #endif // __EXTENDED_BOUNDS_H__
