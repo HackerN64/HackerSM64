@@ -57,7 +57,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         // Exclude a large number of walls immediately to optimize.
         if (SURFACE_IS_NEW_WATER(type)) continue;
         // Determine if checking for the camera or not.
-        if (gCheckingSurfaceCollisionsForCamera) {
+        if (gCollisionFlags & COLLISION_FLAG_CAMERA) {
             if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
         } else {
             // Ignore camera only surfaces.
@@ -226,7 +226,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
         type = surf->type;
         // Determine if checking for the camera or not.
         if (SURFACE_IS_NEW_WATER(type)) continue;
-        if (gCheckingSurfaceCollisionsForCamera) {
+        if (gCollisionFlags & COLLISION_FLAG_CAMERA) {
             if (surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) continue;
         } else if (type == SURFACE_CAMERA_BOUNDARY) {
             // Ignore camera only surfaces.
@@ -355,9 +355,9 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         // To prevent the Merry-Go-Round room from loading when Mario passes above the hole that leads
         // there, SURFACE_INTANGIBLE is used. This prevent the wrong room from loading, but can also allow
         // Mario to pass through.
-        if (!gFindFloorIncludeSurfaceIntangible && (type == SURFACE_INTANGIBLE)) continue;
+        if (!(gCollisionFlags & COLLISION_FLAG_INCLUDE_INTANGIBLE) && (type == SURFACE_INTANGIBLE)) continue;
         // Determine if we are checking for the camera or not.
-        if (gCheckingSurfaceCollisionsForCamera) {
+        if (gCollisionFlags & COLLISION_FLAG_CAMERA) {
             if ((surf->flags & SURFACE_FLAG_NO_CAM_COLLISION) || SURFACE_IS_NEW_WATER(type)) continue;
         } else if (surf->type == SURFACE_CAMERA_BOUNDARY) {
             continue; // If we are not checking for the camera, ignore camera only floors.
@@ -489,7 +489,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     // Check for surfaces that are a part of level geometry.
     struct SurfaceNode *surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
     struct Surface *floor = find_floor_from_list(surfaceList, x, y, z, &height);
-    if (!gFindFloorExcludeDynamic) {
+    if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
         // In the next check, only check for floors higher than the previous check
         dynamicHeight = height;
         // Check for surfaces belonging to objects.
@@ -501,8 +501,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
         }
     }
     // To prevent accidentally leaving the floor tangible, stop checking for it.
-    gFindFloorIncludeSurfaceIntangible = FALSE;
-    gFindFloorExcludeDynamic           = FALSE;
+    gCollisionFlags &= ~(COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
     // If a floor was missed, increment the debug counter.
     if (floor == NULL) {
         gNumFindFloorMisses++;
@@ -517,8 +516,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
 }
 
 f32 find_room_floor(f32 x, f32 y, f32 z, struct Surface **pfloor) {
-    gFindFloorIncludeSurfaceIntangible = TRUE;
-    gFindFloorExcludeDynamic           = TRUE;
+    gCollisionFlags |= (COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
     return find_floor(x, y, z, pfloor);
 }
 
@@ -566,7 +564,7 @@ s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor) {
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-    s32 waterLevel = find_water_floor(x, (gCheckingSurfaceCollisionsForCamera ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
+    s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
     if (p != NULL && waterLevel == FLOOR_LOWER_LIMIT) {
         s32 numRegions = *p++;
@@ -609,7 +607,7 @@ s32 find_water_level(s32 x, s32 z) {
     OSTime first = osGetTime();
 #endif
 
-    s32 waterLevel = find_water_floor(x, (gCheckingSurfaceCollisionsForCamera ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
+    s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
     if (p != NULL && waterLevel == FLOOR_LOWER_LIMIT) {
         s32 numRegions = *p++;

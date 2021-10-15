@@ -2684,7 +2684,7 @@ void update_lakitu(struct Camera *c) {
         gLakituState.roll += gLakituState.keyDanceRoll;
 
         if (c->mode != CAMERA_MODE_C_UP && c->cutscene == 0) {
-            gCheckingSurfaceCollisionsForCamera = TRUE;
+            gCollisionFlags |= COLLISION_FLAG_CAMERA;
             f32 distToFloor = find_floor(gLakituState.pos[0],
                                          gLakituState.pos[1] + 20.0f,
                                          gLakituState.pos[2], &floor);
@@ -2692,7 +2692,7 @@ void update_lakitu(struct Camera *c) {
                 if (gLakituState.pos[1] < (distToFloor += 100.0f)) {
                     gLakituState.pos[1] = distToFloor;
                 } else {
-                    gCheckingSurfaceCollisionsForCamera = FALSE;
+                    gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
                 }
             }
         }
@@ -2752,13 +2752,13 @@ void update_camera(struct Camera *c) {
     sMarioGeometry.prevCeilType = sMarioGeometry.currCeilType;
 
     find_mario_floor_and_ceil(&sMarioGeometry);
-    gCheckingSurfaceCollisionsForCamera = TRUE;
+    gCollisionFlags |= COLLISION_FLAG_CAMERA;
     vec3f_copy(c->pos, gLakituState.goalPos);
     vec3f_copy(c->focus, gLakituState.goalFocus);
 
-    c->yaw = gLakituState.yaw;
+    c->yaw     = gLakituState.yaw;
     c->nextYaw = gLakituState.nextYaw;
-    c->mode = gLakituState.mode;
+    c->mode    = gLakituState.mode;
     c->defMode = gLakituState.defMode;
 #ifdef CAMERA_FIX
     if (gCurrDemoInput != NULL) camera_course_processing(c);
@@ -2816,7 +2816,7 @@ void update_camera(struct Camera *c) {
 #endif
     // Start any Mario-related cutscenes
     start_cutscene(c, get_cutscene_from_mario_status(c));
-    gCheckingSurfaceCollisionsForCamera = FALSE;
+    gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
 #ifdef PUPPYCAM
     if (!gPuppyCam.enabled || c->cutscene != 0 || gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
 #endif
@@ -6072,8 +6072,8 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
  */
 void find_mario_floor_and_ceil(struct PlayerGeometry *pg) {
     struct Surface *surf;
-    s16 tempCheckingSurfaceCollisionsForCamera = gCheckingSurfaceCollisionsForCamera;
-    gCheckingSurfaceCollisionsForCamera = TRUE;
+    s32 tempCollisionFlags = gCollisionFlags;
+    gCollisionFlags |= COLLISION_FLAG_CAMERA;
 
     if (find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 10.f,
                    sMarioCamState->pos[2], &surf) != FLOOR_LOWER_LIMIT) {
@@ -6089,7 +6089,7 @@ void find_mario_floor_and_ceil(struct PlayerGeometry *pg) {
         pg->currCeilType = 0;
     }
 
-    gCheckingSurfaceCollisionsForCamera = FALSE;
+    gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
     pg->currFloorHeight = find_floor(sMarioCamState->pos[0],
                                      sMarioCamState->pos[1] + 10.f,
                                      sMarioCamState->pos[2], &pg->currFloor);
@@ -6097,7 +6097,7 @@ void find_mario_floor_and_ceil(struct PlayerGeometry *pg) {
                                    sMarioCamState->pos[1] - 10.f,
                                    sMarioCamState->pos[2], &pg->currCeil);
     pg->waterHeight = find_water_level(sMarioCamState->pos[0], sMarioCamState->pos[2]);
-    gCheckingSurfaceCollisionsForCamera = tempCheckingSurfaceCollisionsForCamera;
+    gCollisionFlags = tempCollisionFlags;
 }
 
 /**
