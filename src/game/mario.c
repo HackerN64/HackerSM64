@@ -603,10 +603,10 @@ s32 mario_floor_is_steep(struct MarioState *m) {
 f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f32 distFromMario) {
     struct Surface *floor;
 
-    f32 y = sins(m->faceAngle[1] + angleFromMario) * distFromMario;
-    f32 x = coss(m->faceAngle[1] + angleFromMario) * distFromMario;
+    f32 y = (sins(m->faceAngle[1] + angleFromMario) * distFromMario);
+    f32 x = (coss(m->faceAngle[1] + angleFromMario) * distFromMario);
 
-    return find_floor(m->pos[0] + y, m->pos[1] + 100.0f, m->pos[2] + x, &floor);
+    return find_floor(m->pos[0] + y, (m->pos[1] + 100.0f), m->pos[2] + x, &floor);
 }
 
 /**

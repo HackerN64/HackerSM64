@@ -1286,7 +1286,6 @@ s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
 s32 update_fixed_camera(struct Camera *c, Vec3f focus, UNUSED Vec3f pos) {
     f32 focusFloorOff;
     f32 goalHeight;
-    f32 ceilHeight;
     f32 heightOffset;
     f32 distCamToFocus;
     f32 scaleToMario = 0.5f;
@@ -1336,10 +1335,10 @@ s32 update_fixed_camera(struct Camera *c, Vec3f focus, UNUSED Vec3f pos) {
     }
 
     if (300 > distCamToFocus) {
-        goalHeight += 300 - distCamToFocus;
+        goalHeight += (300 - distCamToFocus);
     }
 
-    ceilHeight = find_ceil(c->pos[0], goalHeight - 100.f, c->pos[2], &ceiling);
+    f32 ceilHeight = find_ceil(c->pos[0], (goalHeight - 100.f), c->pos[2], &ceiling);
     if (ceilHeight != CELL_HEIGHT_LIMIT) {
         if (goalHeight > (ceilHeight -= 125.f)) {
             goalHeight = ceilHeight;

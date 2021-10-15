@@ -852,7 +852,7 @@ static void puppycam_view_panning(void) {
         gPuppyCam.pan[0] = approach_f32_asymptotic(gPuppyCam.pan[0], expectedPanX, (0.02f * slideSpeed));
         gPuppyCam.pan[2] = approach_f32_asymptotic(gPuppyCam.pan[2], expectedPanZ, (0.02f * slideSpeed));
         if (gMarioState->vel[1] == 0.0f) {
-            f32 panFloor = CLAMP(find_floor_height((s16)(gPuppyCam.targetObj->oPosX+expectedPanX), (s16)(gPuppyCam.targetObj->oPosY + 200),
+            f32 panFloor = CLAMP(find_floor_height((s16)(gPuppyCam.targetObj->oPosX + expectedPanX), (s16)(gPuppyCam.targetObj->oPosY + 200),
             (s16)(gPuppyCam.targetObj->oPosZ+expectedPanZ)), (gPuppyCam.targetObj->oPosY - 50), (gPuppyCam.targetObj->oPosY + 50));
             // If the floor is lower than 150 units below Mario, then ignore the Y value and tilt the camera instead.
             if (panFloor <= gPuppyCam.targetObj->oPosY - 150) {
