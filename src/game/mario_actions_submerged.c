@@ -48,7 +48,7 @@ static s32 swimming_near_surface(struct MarioState *m) {
         return FALSE;
     }
 
-    return (m->waterLevel - 80) - m->pos[1] < 400.0f;
+    return (((m->waterLevel - 80) - m->pos[1]) < 400.0f);
 }
 
 static f32 get_buoyancy(struct MarioState *m) {
@@ -123,9 +123,11 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
 static void apply_water_current(struct MarioState *m, Vec3f step) {
     s32 i;
     f32 whirlpoolRadius = 2000.0f;
+    f32 distance, strength;
+    s16 pitchToWhirlpool, yawToWhirlpool;
 
     if (m->floor->type == SURFACE_FLOWING_WATER) {
-        s16 currentAngle = m->floor->force << 8;
+        s16 currentAngle = (m->floor->force << 8);
         f32 currentSpeed = sWaterCurrentSpeeds[m->floor->force >> 8];
 
         step[0] += currentSpeed * sins(currentAngle);
@@ -135,17 +137,9 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
     for (i = 0; i < 2; i++) {
         struct Whirlpool *whirlpool = gCurrentArea->whirlpools[i];
         if (whirlpool != NULL) {
-            f32 strength = 0.0f;
+            strength = 0.0f;
 
-            f32 dx = whirlpool->pos[0] - m->pos[0];
-            f32 dy = whirlpool->pos[1] - m->pos[1];
-            f32 dz = whirlpool->pos[2] - m->pos[2];
-
-            f32 lateralDist = sqrtf(sqr(dx) + sqr(dz));
-            f32 distance = sqrtf(sqr(lateralDist) + sqr(dy));
-
-            s16 pitchToWhirlpool = atan2s(lateralDist, dy);
-            s16 yawToWhirlpool = atan2s(dz, dx);
+            vec3f_to_vec3s_get_dist_and_angle(m->pos, whirlpool->pos, &distance, &pitchToWhirlpool, &yawToWhirlpool);
 
             yawToWhirlpool -= (s16)(0x2000 * 1000.0f / (distance + 1000.0f));
 
@@ -181,12 +175,11 @@ static u32 perform_water_step(struct MarioState *m) {
         apply_water_current(m, step);
     }
 
-    nextPos[0] = m->pos[0] + step[0];
-    nextPos[1] = m->pos[1] + step[1];
-    nextPos[2] = m->pos[2] + step[2];
+    vec3_sum(nextPos, m->pos, step);
 
-    if (nextPos[1] > m->waterLevel - 80) {
-        nextPos[1] = m->waterLevel - 80;
+    s16 waterSurf = (m->waterLevel - 80);
+    if (nextPos[1] > waterSurf) {
+        nextPos[1] = waterSurf;
         m->vel[1] = 0.0f;
     }
 
@@ -222,7 +215,7 @@ static void stationary_slow_down(struct MarioState *m) {
     m->angleVel[1] = 0;
 
     m->forwardVel = approach_f32(m->forwardVel, 0.0f, 1.0f, 1.0f);
-    m->vel[1] = approach_f32(m->vel[1], buoyancy, 2.0f, 1.0f);
+    m->vel[1]     = approach_f32(m->vel[1], buoyancy, 2.0f, 1.0f);
 
     m->faceAngle[0] = approach_s32(m->faceAngle[0], 0, 0x200, 0x200);
     m->faceAngle[2] = approach_s32(m->faceAngle[2], 0, 0x100, 0x100);

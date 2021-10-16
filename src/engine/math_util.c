@@ -713,7 +713,7 @@ void vec3f_get_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *lateralDist, An
 }
 
 /// Finds the distance and angles between two vectors.
-void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *yaw) {
+void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, Angle *pitch, Angle *yaw) {
     register Vec3f d;
     vec3_diff(d, to, from);
     register f32 xz = (sqr(d[0]) + sqr(d[2]));
@@ -723,6 +723,14 @@ void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, s16 *pitch, s16 *
 }
 void vec3s_get_dist_and_angle(Vec3s from, Vec3s to, s16 *dist, Angle *pitch, Angle *yaw) {
     register Vec3s d;
+    vec3_diff(d, to, from);
+    register f32 xz = (sqr(d[0]) + sqr(d[2]));
+    *dist           = sqrtf(xz + sqr(d[1]));
+    *pitch          = atan2s(sqrtf(xz), d[1]);
+    *yaw            = atan2s(d[2], d[0]);
+}
+void vec3f_to_vec3s_get_dist_and_angle(Vec3f from, Vec3s to, f32 *dist, Angle *pitch, Angle *yaw) {
+    register Vec3f d;
     vec3_diff(d, to, from);
     register f32 xz = (sqr(d[0]) + sqr(d[2]));
     *dist           = sqrtf(xz + sqr(d[1]));

@@ -516,6 +516,7 @@ void vec3f_get_lateral_dist_and_angle(         Vec3f from, Vec3f to,            
 void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, f32 *lateralDist, Angle  *pitch, Angle  *yaw);
 void vec3s_get_dist_and_angle(                 Vec3s from, Vec3s to, s16 *dist,                   Angle  *pitch, Angle  *yaw);
 void vec3f_get_dist_and_angle(                 Vec3f from, Vec3f to, f32 *dist,                   Angle  *pitch, Angle  *yaw);
+void vec3f_to_vec3s_get_dist_and_angle(        Vec3f from, Vec3s to, f32 *dist,                    Angle *pitch, Angle  *yaw);
 void vec3s_set_dist_and_angle(                 Vec3s from, Vec3s to, s16  dist,                   Angle32 pitch, Angle32 yaw);
 void vec3f_set_dist_and_angle(                 Vec3f from, Vec3f to, f32  dist,                   Angle32 pitch, Angle32 yaw);
 
