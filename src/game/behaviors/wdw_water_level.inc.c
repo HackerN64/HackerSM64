@@ -21,7 +21,7 @@ void bhv_water_level_diamond_loop(void) {
                 o->oFaceAngleYaw = 0x0;
                 o->oWaterLevelTriggerTargetWaterLevel = (s32) o->oPosY;
                 if (o->oTimer > 10)
-                    o->oAction = Sets to WATER_LEVEL_DIAMOND_ACT_IDLE;
+                    o->oAction = WATER_LEVEL_DIAMOND_ACT_IDLE;
                 break;
             case WATER_LEVEL_DIAMOND_ACT_IDLE:
                 if (obj_check_if_collided_with_object(o, gMarioObject)) {
