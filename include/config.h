@@ -15,7 +15,7 @@
 // -- ROM SETTINGS --
 // Internal ROM name. NEEDS TO BE **EXACTLY** 20 CHARACTERS. Can't be 19 characters, can't be 21 characters. You can fill it with spaces.
 // The end quote should be here:               "
-#define INTERNAL_ROM_NAME "SUPERMARIO64        "
+#define INTERNAL_ROM_NAME "SUPER MARIO 64      "
 // Support Rumble Pak
 // Currently not recommended, as it may cause random crashes.
 //#define ENABLE_RUMBLE (1 || VERSION_SH)
