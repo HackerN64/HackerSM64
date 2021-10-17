@@ -291,7 +291,18 @@ void draw_disasm(OSThread *thread) {
     osWritebackDCacheAll();
 }
 
+void draw_assert(OSThread *thread) {
+    crash_screen_draw_rect(25, 20, 270, 210);
 
+    crash_screen_print(30, 25, "ASSERT PAGE",);
+
+    crash_screen_print(30, 35, "FILE: %s", __n64Assert_Filename);
+    crash_screen_print(30, 35, "LINE: %d", __n64Assert_LineNum);
+    crash_screen_print(30, 35, "MESSAGE:");
+    crash_screen_print(30, 45, __n64Assert_Message);
+
+    osWritebackDCacheAll();
+}
 
 void draw_crash_screen(OSThread *thread) {
     s32 cause;
