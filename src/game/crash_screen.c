@@ -337,6 +337,7 @@ void draw_crash_screen(OSThread *thread) {
 #endif
             case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
             case PAGE_DISASM:     draw_disasm(thread); break;
+            case PAGE_ASSERTS:    draw_assert(thread); break;
         }
 
         osWritebackDCacheAll();
