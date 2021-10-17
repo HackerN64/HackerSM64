@@ -538,20 +538,20 @@ void clear_dynamic_surfaces(void) {
  * Applies an object's transformation to the object's vertices.
  */
 void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
-    Mat4 *objectTransform = &gCurrentObject->transform;
+    Mat4 *objectTransform = &o->transform;
 
     register s32 numVertices = *(*data);
     (*data)++;
 
     register TerrainData *vertices = *data;
 
-    if (gCurrentObject->header.gfx.throwMatrix == NULL) {
-        gCurrentObject->header.gfx.throwMatrix = objectTransform;
-        obj_build_transform_from_pos_and_angle(gCurrentObject, O_POS_INDEX, O_FACE_ANGLE_INDEX);
+    if (o->header.gfx.throwMatrix == NULL) {
+        o->header.gfx.throwMatrix = objectTransform;
+        obj_build_transform_from_pos_and_angle(o, O_POS_INDEX, O_FACE_ANGLE_INDEX);
     }
 
     Mat4 m;
-    obj_apply_scale_to_matrix(gCurrentObject, m, *objectTransform);
+    obj_apply_scale_to_matrix(o, m, *objectTransform);
 
     // Go through all vertices, rotating and translating them to transform the object.
     register Vec3f v;
@@ -572,7 +572,7 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
 }
 
 /**
- * Load in the surfaces for the gCurrentObject. This includes setting the flags, exertion, and room.
+ * Load in the surfaces for the o. This includes setting the flags, exertion, and room.
  */
 void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
     s32 i;
@@ -591,13 +591,13 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
 
     // The DDD warp is initially loaded at the origin and moved to the proper
     // position in paintings.c and doesn't update its room, so set it here.
-    RoomData room = ((gCurrentObject->behavior == segmented_to_virtual(bhvDddWarp)) ? 5 : 0);
+    RoomData room = ((o->behavior == segmented_to_virtual(bhvDddWarp)) ? 5 : 0);
 
     for (i = 0; i < numSurfaces; i++) {
         struct Surface *surface = read_surface_data(vertexData, data);
 
         if (surface != NULL) {
-            surface->object = gCurrentObject;
+            surface->object = o;
             surface->type = surfaceType;
 
 #ifdef ALL_SURFACES_HAVE_FORCE
@@ -623,7 +623,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
 static void get_optimal_coll_dist(struct Object *obj) {
     register f32 thisVertDist, maxDist = 0.0f;
     Vec3f v;
-    TerrainData *collisionData = gCurrentObject->collisionData;
+    TerrainData *collisionData = o->collisionData;
     obj->oFlags |= OBJ_FLAG_DONT_CALC_COLL_DIST;
     collisionData++;
     register u32 vertsLeft = *(collisionData);
@@ -649,30 +649,30 @@ void load_object_collision_model(void) {
     OSTime first = osGetTime();
 #endif
 
-    TerrainData *collisionData = gCurrentObject->collisionData;
-    f32 marioDist = gCurrentObject->oDistanceToMario;
+    TerrainData *collisionData = o->collisionData;
+    f32 marioDist = o->oDistanceToMario;
 
     // On an object's first frame, the distance is set to 19000.0f.
     // If the distance hasn't been updated, update it now.
-    if (gCurrentObject->oDistanceToMario == 19000.0f) {
-        marioDist = dist_between_objects(gCurrentObject, gMarioObject);
+    if (o->oDistanceToMario == 19000.0f) {
+        marioDist = dist_between_objects(o, gMarioObject);
     }
 
 #ifdef AUTO_COLLISION_DISTANCE
-    if (!(gCurrentObject->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
-        get_optimal_coll_dist(gCurrentObject);
+    if (!(o->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
+        get_optimal_coll_dist(o);
     }
 #endif
 
     // If the object collision is supposed to be loaded more than the
     // drawing distance, extend the drawing range.
-    if (gCurrentObject->oCollisionDistance > gCurrentObject->oDrawingDistance) {
-        gCurrentObject->oDrawingDistance = gCurrentObject->oCollisionDistance;
+    if (o->oCollisionDistance > o->oDrawingDistance) {
+        o->oDrawingDistance = o->oCollisionDistance;
     }
 
     // Update if no Time Stop, in range, and in the current room.
-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && (marioDist < gCurrentObject->oCollisionDistance)
-        && !(gCurrentObject->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+    if (!(gTimeStopState & TIME_STOP_ACTIVE) && (marioDist < o->oCollisionDistance)
+        && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         collisionData++;
         transform_object_vertices(&collisionData, vertexData);
 
@@ -681,7 +681,7 @@ void load_object_collision_model(void) {
             load_object_surfaces(&collisionData, vertexData);
         }
     }
-    COND_BIT((marioDist < gCurrentObject->oDrawingDistance), gCurrentObject->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
+    COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
 #if PUPPYPRINT_DEBUG
     collisionTime[perfIteration] += (osGetTime() - first);
 #endif

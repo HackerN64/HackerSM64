@@ -106,16 +106,16 @@ void obj_set_opacity_from_cam_dist(struct Object *obj) {
 
 // Push the address of a behavior command to the object's behavior stack.
 static void cur_obj_bhv_stack_push(uintptr_t bhvAddr) {
-    gCurrentObject->bhvStack[gCurrentObject->bhvStackIndex] = bhvAddr;
-    gCurrentObject->bhvStackIndex++;
+    o->bhvStack[o->bhvStackIndex] = bhvAddr;
+    o->bhvStackIndex++;
 }
 
 // Retrieve the last behavior command address from the object's behavior stack.
 static uintptr_t cur_obj_bhv_stack_pop(void) {
     uintptr_t bhvAddr;
 
-    gCurrentObject->bhvStackIndex--;
-    bhvAddr = gCurrentObject->bhvStack[gCurrentObject->bhvStackIndex];
+    o->bhvStackIndex--;
+    bhvAddr = o->bhvStack[o->bhvStackIndex];
 
     return bhvAddr;
 }

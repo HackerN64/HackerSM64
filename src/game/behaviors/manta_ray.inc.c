@@ -42,7 +42,7 @@ void bhv_manta_ray_init(void) {
 
 static void manta_ray_move(void) {
     s16 animFrame = o->header.gfx.animInfo.animFrame;
-    gCurrentObject->oPathedStartWaypoint = (struct Waypoint *) sMantaRayTraj;
+    o->oPathedStartWaypoint = (struct Waypoint *) sMantaRayTraj;
     cur_obj_follow_path();
     o->oMantaTargetYaw   = o->oPathedTargetYaw;
     o->oMantaTargetPitch = o->oPathedTargetPitch;

@@ -5,21 +5,22 @@ void bhv_end_birds_2_loop(void) {
     f32 dist;
     s16 pitch, yaw;
 
-    gCurrentObject->oForwardVel = (random_float() * 10.f) + 25.f;
+    o->oForwardVel = ((random_float() * 10.f) + 25.f);
 
-    switch (gCurrentObject->oAction) {
-        case 0:
+    switch (o->oAction) {
+        case END_BIRDS_ACT_INIT:
             cur_obj_scale(0.7f);
-            gCurrentObject->oAction += 1;
+            o->oAction = END_BIRDS_ACT_ACTIVE;
             break;
-        case 1:
+        case END_BIRDS_ACT_ACTIVE:
             vec3f_get_dist_and_angle(gCamera->pos, gCamera->focus, &dist, &pitch, &yaw);
             yaw += 0x1000;
             vec3f_set_dist_and_angle(gCamera->pos, pos, 14000.f, pitch, yaw);
-            obj_rotate_towards_point(gCurrentObject, pos, 0, 0, 8, 8);
+            obj_rotate_towards_point(o, pos, 0, 0, 8, 8);
 
-            if ((gCurrentObject->oEndBirdCutsceneVars9PointX == 0.f) && (gCurrentObject->oTimer == 0))
+            if ((o->oEndBirdCutsceneVars9PointX == 0.f) && (o->oTimer == 0)) {
                 cur_obj_play_sound_2(SOUND_GENERAL_BIRDS_FLY_AWAY);
+            }
             break;
     }
 

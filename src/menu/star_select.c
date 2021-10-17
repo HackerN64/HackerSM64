@@ -58,32 +58,32 @@ static s32 sActSelectorMenuTimer = 0;
  * Defines a select type for a star in the act selector.
  */
 void bhv_act_selector_star_type_loop(void) {
-    switch (gCurrentObject->oStarSelectorType) {
+    switch (o->oStarSelectorType) {
         // If a star is not selected, don't rotate or change size
         case STAR_SELECTOR_NOT_SELECTED:
-            gCurrentObject->oStarSelectorSize -= 0.1f;
-            if (gCurrentObject->oStarSelectorSize < 1.0f) {
-                gCurrentObject->oStarSelectorSize = 1.0f;
+            o->oStarSelectorSize -= 0.1f;
+            if (o->oStarSelectorSize < 1.0f) {
+                o->oStarSelectorSize = 1.0f;
             }
-            gCurrentObject->oFaceAngleYaw = 0;
+            o->oFaceAngleYaw = 0;
             break;
         // If a star is selected, rotate and slightly increase size
         case STAR_SELECTOR_SELECTED:
-            gCurrentObject->oStarSelectorSize += 0.1f;
-            if (gCurrentObject->oStarSelectorSize > 1.3f) {
-                gCurrentObject->oStarSelectorSize = 1.3f;
+            o->oStarSelectorSize += 0.1f;
+            if (o->oStarSelectorSize > 1.3f) {
+                o->oStarSelectorSize = 1.3f;
             }
-            gCurrentObject->oFaceAngleYaw += 0x800;
+            o->oFaceAngleYaw += 0x800;
             break;
         // If the 100 coin star is selected, rotate
         case STAR_SELECTOR_100_COINS:
-            gCurrentObject->oFaceAngleYaw += 0x800;
+            o->oFaceAngleYaw += 0x800;
             break;
     }
     // Scale act selector stars depending of the type selected
-    cur_obj_scale(gCurrentObject->oStarSelectorSize);
+    cur_obj_scale(o->oStarSelectorSize);
     // Unused timer, only referenced here. Probably replaced by sActSelectorMenuTimer
-    gCurrentObject->oStarSelectorTimer++;
+    o->oStarSelectorTimer++;
 }
 
 /**
@@ -94,14 +94,14 @@ void render_100_coin_star(u8 stars) {
         // If the 100 coin star has been collected, create a new star selector next to the coin score.
     #ifdef WIDE
         if (gConfig.widescreen) {
-            sStarSelectorModels[6] = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR,
+            sStarSelectorModels[6] = spawn_object_abs_with_rot(o, 0, MODEL_STAR,
                                                             bhvActSelectorStarType, ((370 * 4.0f) / 3), 24, -300, 0, 0, 0);
         } else {
-            sStarSelectorModels[6] = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR,
+            sStarSelectorModels[6] = spawn_object_abs_with_rot(o, 0, MODEL_STAR,
                                                             bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
         }
     #else
-        sStarSelectorModels[6] = spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_STAR,
+        sStarSelectorModels[6] = spawn_object_abs_with_rot(o, 0, MODEL_STAR,
                                                         bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
     #endif
 
@@ -162,14 +162,14 @@ void bhv_act_selector_init(void) {
     if (gConfig.widescreen) {
         for (i = 0; i < sVisibleStars; i++) {
             sStarSelectorModels[i] =
-                spawn_object_abs_with_rot(gCurrentObject, 0, selectorModelIDs[i], bhvActSelectorStarType,
+                spawn_object_abs_with_rot(o, 0, selectorModelIDs[i], bhvActSelectorStarType,
                                         (((75 + (sVisibleStars * -75) + (i * 152)) * 4.0f) / 3), 248, -300, 0, 0, 0);
             sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
         }
     } else {
         for (i = 0; i < sVisibleStars; i++) {
             sStarSelectorModels[i] =
-                spawn_object_abs_with_rot(gCurrentObject, 0, selectorModelIDs[i], bhvActSelectorStarType,
+                spawn_object_abs_with_rot(o, 0, selectorModelIDs[i], bhvActSelectorStarType,
                                         (75 + (sVisibleStars * -75) + (i * 152)), 248, -300, 0, 0, 0);
             sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
         }
@@ -177,7 +177,7 @@ void bhv_act_selector_init(void) {
     #else
     for (i = 0; i < sVisibleStars; i++) {
         sStarSelectorModels[i] =
-            spawn_object_abs_with_rot(gCurrentObject, 0, selectorModelIDs[i], bhvActSelectorStarType,
+            spawn_object_abs_with_rot(o, 0, selectorModelIDs[i], bhvActSelectorStarType,
                                     (75 + (sVisibleStars * -75) + (i * 152)), 248, -300, 0, 0, 0);
         sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
     }

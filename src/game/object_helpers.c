@@ -2328,7 +2328,7 @@ void cur_obj_spawn_loot_blue_coin(void) {
 
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY) {
     f32 objectPosY = o->oPosY;
-    o->oPosY += offsetY + gDebugInfo[5][0];
+    o->oPosY += (offsetY + gDebugInfo[5][0]);
     spawn_default_star(targetX, targetY, targetZ);
     o->oPosY = objectPosY;
 }
@@ -2344,8 +2344,7 @@ s32 obj_has_model(struct Object *obj, ModelID16 modelID) {
 
 u32 obj_get_model_id(struct Object *obj) {
     if (!obj->header.gfx.sharedChild) {
-        s32 i;
-        for (i = MODEL_NONE; i < MODEL_ID_COUNT; i++) {
+        for (s32 i = MODEL_NONE; i < MODEL_ID_COUNT; i++) {
             if (obj->header.gfx.sharedChild == gLoadedGraphNodes[i]) {
                 return i;
             }
