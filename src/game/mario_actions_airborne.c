@@ -36,15 +36,11 @@ void play_far_fall_sound(struct MarioState *m) {
 }
 
 void play_knockback_sound(struct MarioState *m) {
-#ifdef VERSION_JP
-    play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED);
-#else
     if (m->actionArg == 0 && (m->forwardVel <= -28.0f || m->forwardVel >= 28.0f)) {
         play_sound_if_no_flag(m, SOUND_MARIO_DOH, MARIO_MARIO_SOUND_PLAYED);
     } else {
         play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED);
     }
-#endif
 }
 
 s32 lava_boost_on_wall(struct MarioState *m) {
@@ -1761,10 +1757,8 @@ s32 act_flying(struct MarioState *m) {
 
     if (startPitch <= 0 && m->faceAngle[0] > 0 && m->forwardVel >= 48.0f) {
         play_sound(SOUND_ACTION_FLYING_FAST, m->marioObj->header.gfx.cameraToObject);
-#ifndef VERSION_JP
         play_sound(SOUND_MARIO_YAHOO_WAHA_YIPPEE + ((gAudioRandom % 5) << 16),
                    m->marioObj->header.gfx.cameraToObject);
-#endif
 #if ENABLE_RUMBLE
         queue_rumble_data(50, 40);
 #endif

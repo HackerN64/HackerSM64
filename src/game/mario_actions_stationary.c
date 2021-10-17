@@ -222,7 +222,6 @@ s32 act_start_sleeping(struct MarioState *m) {
         m->actionState++;
     }
 
-#ifndef VERSION_JP
     if (m->actionState == ACT_STATE_START_SLEEPING_YAWN && animFrame == -1) {
         play_sound(SOUND_MARIO_YAWNING, m->marioObj->header.gfx.cameraToObject);
     }
@@ -230,11 +229,6 @@ s32 act_start_sleeping(struct MarioState *m) {
     if (m->actionState == ACT_STATE_START_SLEEPING_SCRATCH && animFrame == -1) {
         play_sound(SOUND_MARIO_IMA_TIRED, m->marioObj->header.gfx.cameraToObject);
     }
-#else
-    if (m->actionState == ACT_STATE_START_SLEEPING_YAWN) {
-        play_sound_if_no_flag(m, SOUND_MARIO_YAWNING, MARIO_MARIO_SOUND_PLAYED);
-    }
-#endif
 
     stationary_ground_step(m);
     return FALSE;
@@ -294,17 +288,7 @@ s32 act_sleeping(struct MarioState *m) {
 
         case ACT_SLEEPING_STATE_LYING:
             animFrame = set_mario_animation(m, MARIO_ANIM_SLEEP_LYING);
-#ifndef VERSION_JP
             play_sound_if_no_flag(m, SOUND_MARIO_SNORING3, MARIO_ACTION_SOUND_PLAYED);
-#else
-            if (animFrame == 2) {
-                play_sound(SOUND_MARIO_SNORING2, m->marioObj->header.gfx.cameraToObject);
-            }
-
-            if (animFrame == 25) {
-                play_sound(SOUND_MARIO_SNORING1, m->marioObj->header.gfx.cameraToObject);
-            }
-#endif
             break;
     }
     return FALSE;
@@ -314,9 +298,7 @@ s32 act_waking_up(struct MarioState *m) {
     if (!m->actionTimer) {
         stop_sound(SOUND_MARIO_SNORING1, m->marioObj->header.gfx.cameraToObject);
         stop_sound(SOUND_MARIO_SNORING2, m->marioObj->header.gfx.cameraToObject);
-#ifndef VERSION_JP
         stop_sound(SOUND_MARIO_SNORING3, m->marioObj->header.gfx.cameraToObject);
-#endif
         raise_background_noise(2);
     }
 

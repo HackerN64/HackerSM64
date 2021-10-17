@@ -157,15 +157,13 @@ void bully_play_stomping_sound(void) {
 }
 
 void bully_step(void) {
-    s16 collisionFlags = 0;
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
     bully_backup_check(collisionFlags);
     bully_play_stomping_sound();
     obj_check_floor_death(collisionFlags, sObjFloor);
 
-    if (o->oBullySubtype & BULLY_STYPE_CHILL) {
-        if (o->oPosY < 1030.0f)
-            o->oAction = OBJ_ACT_LAVA_DEATH;
+    if ((o->oBullySubtype & BULLY_STYPE_CHILL) && (o->oPosY < 1030.0f)) {
+        o->oAction = OBJ_ACT_LAVA_DEATH;
     }
 }
 
@@ -180,7 +178,7 @@ void bully_spawn_coin(void) {
 #endif
     coin->oForwardVel = 10.0f;
     coin->oVelY = 100.0f;
-    coin->oPosY = o->oPosY + 310.0f;
+    coin->oPosY = (o->oPosY + 310.0f);
     coin->oMoveAngleYaw = (f32)(o->oBullyMarioCollisionAngle + 0x8000) + random_float() * 1024.0f;
 }
 

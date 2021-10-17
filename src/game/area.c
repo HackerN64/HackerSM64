@@ -84,7 +84,7 @@ Vp gViewport = { {
     { 640, 480, 511, 0 },
 } };
 
-#ifdef VERSION_EU
+#if MULTILANG
 const char *gNoControllerMsg[] = {
     "NO CONTROLLER",
     "MANETTE DEBRANCHEE",
@@ -110,12 +110,12 @@ void set_warp_transition_rgb(Color red, Color green, Color blue) {
 }
 
 void print_intro_text(void) {
-#ifdef VERSION_EU
+#if MULTILANG
     s32 language = eu_get_language();
 #endif
     if ((gGlobalTimer & 0x1F) < 20) {
         if (gControllerBits == 0) {
-#ifdef VERSION_EU
+#if MULTILANG
             print_text_centered((SCREEN_WIDTH / 2), 20, gNoControllerMsg[language]);
 #else
             print_text_centered((SCREEN_WIDTH / 2), 20, "NO CONTROLLER");

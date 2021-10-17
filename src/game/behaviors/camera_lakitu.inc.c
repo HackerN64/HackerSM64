@@ -76,7 +76,7 @@ static void camera_lakitu_intro_act_show_dialog(void) {
         }
 
         targetMovePitch = -0x3000;
-        targetMoveYaw = -0x6000;
+        targetMoveYaw   = -0x6000;
     } else {
         if (o->oCameraLakituSpeed != 0.0f) {
             if (o->oDistanceToMario > 5000.0f) {
@@ -107,8 +107,7 @@ static void camera_lakitu_intro_act_show_dialog(void) {
                     approach_f32_ptr(&o->oCameraLakituSpeed, 20.0f, 1.0f);
                     if (o->oDistanceToMario < 500.0f
                         && abs_angle_diff(gMarioObject->oFaceAngleYaw, o->oFaceAngleYaw) > 0x7000) {
-                        // Once within 500 units and facing toward mario, come
-                        // to a stop
+                        // Once within 500 units and facing toward mario, come to a stop
                         approach_f32_ptr(&o->oCameraLakituSpeed, 0.0f, 5.0f);
                     }
                 }

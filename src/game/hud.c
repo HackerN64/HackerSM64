@@ -436,7 +436,7 @@ void render_hud_timer(void) {
     Texture *(*hudLUT)[58];
     hudLUT = segmented_to_virtual(&main_hud_lut);
     u16 timerValFrames = gHudDisplay.timer;
-#ifdef VERSION_EU
+#if MULTILANG
     switch (eu_get_language()) {
         case LANGUAGE_ENGLISH: print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185,  "TIME"); break;
         case LANGUAGE_FRENCH:  print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(155), 185, "TEMPS"); break;
@@ -447,7 +447,7 @@ void render_hud_timer(void) {
     u16 timerSecs = ((timerValFrames - (timerMins * 1800)) / 30);
 
     u16 timerFracSecs = (((timerValFrames - (timerMins * 1800) - (timerSecs * 30)) & 0xFFFF) / 3);
-#ifndef VERSION_EU
+#if !MULTILANG
     print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185, "TIME");
 #endif
     print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(91), 185, "%0d", timerMins);

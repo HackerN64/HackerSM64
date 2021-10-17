@@ -343,14 +343,14 @@ void try_modify_debug_controls(void) {
         }
 
         if (sDebugInfoDPadMask & U_JPAD) {
-            sDebugSysCursor -= 1;
+            sDebugSysCursor--;
             if (sDebugSysCursor < 0) {
                 sDebugSysCursor = 0;
             }
         }
 
         if (sDebugInfoDPadMask & D_JPAD) {
-            sDebugSysCursor += 1;
+            sDebugSysCursor++;
             if (sDebugSysCursor >= 8) {
                 sDebugSysCursor = 7;
             }

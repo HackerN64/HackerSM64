@@ -42,7 +42,7 @@ struct CreditsEntry *sDispCreditsEntry = NULL;
 
 // related to peach gfx?
 static s8 sPeachManualBlinkTime = 0;
-static s8 sPeachIsBlinking = 0;
+static s8 sPeachIsBlinking = FALSE;
 static s8 sPeachBlinkTimes[7] = { 2, 3, 2, 1, 2, 3, 2 };
 
 static u8 sStarsNeededForDialog[] = { 1, 3, 8, 30, 50, 70 };
@@ -58,15 +58,15 @@ static u8 sStarsNeededForDialog[] = { 1, 3, 8, 30, 50, 70 };
  * that define the curve.
  */
 static Vec4s sJumboStarKeyframes[27] = {
-    { 20, 0, 678, -2916 },      { 30, 0, 680, -3500 },      { 40, 1000, 700, -4000 },
-    { 50, 2500, 750, -3500 },   { 50, 3500, 800, -2000 },   { 50, 4000, 850, 0 },
-    { 50, 3500, 900, 2000 },    { 50, 2000, 950, 3500 },    { 50, 0, 1000, 4000 },
-    { 50, -2000, 1050, 3500 },  { 50, -3500, 1100, 2000 },  { 50, -4000, 1150, 0 },
-    { 50, -3500, 1200, -2000 }, { 50, -2000, 1250, -3500 }, { 50, 0, 1300, -4000 },
-    { 50, 2000, 1350, -3500 },  { 50, 3500, 1400, -2000 },  { 50, 4000, 1450, 0 },
-    { 50, 3500, 1500, 2000 },   { 50, 2000, 1600, 3500 },   { 50, 0, 1700, 4000 },
-    { 50, -2000, 1800, 3500 },  { 50, -3500, 1900, 2000 },  { 30, -4000, 2000, 0 },
-    { 0, -3500, 2100, -2000 },  { 0, -2000, 2200, -3500 },  { 0, 0, 2300, -4000 },
+    { 20,     0,  678, -2916 }, { 30,     0,  680, -3500 }, { 40,  1000,  700, -4000 },
+    { 50,  2500,  750, -3500 }, { 50,  3500,  800, -2000 }, { 50,  4000,  850,     0 },
+    { 50,  3500,  900,  2000 }, { 50,  2000,  950,  3500 }, { 50,     0, 1000,  4000 },
+    { 50, -2000, 1050,  3500 }, { 50, -3500, 1100,  2000 }, { 50, -4000, 1150,     0 },
+    { 50, -3500, 1200, -2000 }, { 50, -2000, 1250, -3500 }, { 50,     0, 1300, -4000 },
+    { 50,  2000, 1350, -3500 }, { 50,  3500, 1400, -2000 }, { 50,  4000, 1450,     0 },
+    { 50,  3500, 1500,  2000 }, { 50,  2000, 1600,  3500 }, { 50,     0, 1700,  4000 },
+    { 50, -2000, 1800,  3500 }, { 50, -3500, 1900,  2000 }, { 30, -4000, 2000,     0 },
+    {  0, -3500, 2100, -2000 }, {  0, -2000, 2200, -3500 }, {  0,     0, 2300, -4000 },
 };
 
 /**
@@ -1666,25 +1666,15 @@ static void intro_cutscene_jump_out_of_pipe(struct MarioState *m) {
     if (m->actionTimer++ >= 118) {
         m->marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 
-#ifdef VERSION_EU
-        // For some reason these calls were swapped.
         play_sound_if_no_flag(m, SOUND_ACTION_HIT_3, MARIO_ACTION_SOUND_PLAYED);
         play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED);
-#else
-        play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED);
-    #ifndef VERSION_JP
-        play_sound_if_no_flag(m, SOUND_ACTION_HIT_3, MARIO_ACTION_SOUND_PLAYED);
-    #endif
-#endif
 
         set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP);
         mario_set_forward_vel(m, 10.0f);
         if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
             sound_banks_enable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE);
             play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
-#ifndef VERSION_JP
             play_sound(SOUND_MARIO_HAHA, m->marioObj->header.gfx.cameraToObject);
-#endif
             advance_cutscene_step(m);
         }
     }
@@ -2241,7 +2231,7 @@ static void end_peach_cutscene_dialog_2(struct MarioState *m) {
 #else
         case 45:
 #endif
-            sPeachIsBlinking = 1;
+            sPeachIsBlinking = TRUE;
             break;
 
 #ifdef VERSION_SH
@@ -2290,7 +2280,7 @@ static void end_peach_cutscene_kiss_from_peach(struct MarioState *m) {
 
     switch (m->actionTimer) {
         case 8:
-            sPeachIsBlinking = 0;
+            sPeachIsBlinking = FALSE;
             break;
 
         case 10:
@@ -2386,7 +2376,7 @@ static void end_peach_cutscene_dialog_3(struct MarioState *m) {
             sEndPeachAnimation = 0;
             sEndToadAnims[0] = 0;
             sEndToadAnims[1] = 2;
-            sPeachIsBlinking = 1;
+            sPeachIsBlinking = TRUE;
             set_cutscene_message(160, 227, 5, 30);
 #ifndef VERSION_JP
             play_sound(SOUND_PEACH_BAKE_A_CAKE, sEndPeachObj->header.gfx.cameraToObject);

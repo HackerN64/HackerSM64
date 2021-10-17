@@ -3019,7 +3019,6 @@ void init_camera(struct Camera *c) {
         // Note: This replaced an "old" way to call these cutscenes using
         // a camEvent value: CAM_EVENT_BOWSER_INIT
         case LEVEL_BOWSER_1:
-#ifndef VERSION_JP
             // Since Bowser 1 has a demo entry, check for it
             // If it is, then set CamAct to the end to directly activate Bowser
             // If it isn't, then start cutscene
@@ -3028,9 +3027,6 @@ void init_camera(struct Camera *c) {
             } else if (gSecondCameraFocus != NULL) {
                 gSecondCameraFocus->oBowserCamAct = BOWSER_CAM_ACT_END;
             }
-#else
-            start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA);
-#endif
             break;
         case LEVEL_BOWSER_2:
             start_cutscene(c, CUTSCENE_ENTER_BOWSER_ARENA);
@@ -4333,9 +4329,7 @@ void radial_camera_input(struct Camera *c) {
     if (gPlayer1Controller->buttonPressed & D_CBUTTONS) {
         if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
             gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
-#ifndef VERSION_JP
             play_camera_buzz_if_cdown();
-#endif
         } else {
             gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
             play_sound_cbutton_down();
@@ -4375,13 +4369,11 @@ void handle_c_button_movement(struct Camera *c) {
         if (gPlayer1Controller->buttonPressed & D_CBUTTONS) {
             if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
                 gCameraMovementFlags |= CAM_MOVE_ALREADY_ZOOMED_OUT;
-                sZoomAmount = gCameraZoomDist + 400.f;
-#ifndef VERSION_JP
+                sZoomAmount = (gCameraZoomDist + 400.f);
                 play_camera_buzz_if_cdown();
-#endif
             } else {
                 gCameraMovementFlags |= CAM_MOVE_ZOOMED_OUT;
-                sZoomAmount = gCameraZoomDist + 400.f;
+                sZoomAmount = (gCameraZoomDist + 400.f);
                 play_sound_cbutton_down();
             }
         }
@@ -4991,10 +4983,8 @@ void cam_hmc_enter_maze(struct Camera *c) {
         vec3f_get_dist_and_angle(c->focus, gLakituState.goalPos, &dist, &pitch, &yaw);
         vec3f_set_dist_and_angle(c->focus, gLakituState.goalPos, 300.f, pitch, yaw);
         gLakituState.goalPos[1] = -800.f;
-#ifndef VERSION_JP
         c->pos[1] = gLakituState.goalPos[1];
         gLakituState.curPos[1] = gLakituState.goalPos[1];
-#endif
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
     }
 }
@@ -6271,9 +6261,7 @@ void cutscene_intro_peach_start_letter_music(UNUSED struct Camera *c) {
  * Raise the volume (not in JP) and start the flying music.
  */
 void cutscene_intro_peach_start_flying_music(UNUSED struct Camera *c) {
-#ifndef VERSION_JP
     seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
-#endif
     cutscene_intro_peach_play_lakitu_flying_music();
 }
 
@@ -8681,11 +8669,9 @@ void intro_pipe_exit_text(UNUSED struct Camera *c) {
     create_dialog_box(DIALOG_033);
 }
 
-#ifndef VERSION_JP
 void play_sound_intro_turn_on_hud(UNUSED struct Camera *c) {
     play_sound_rbutton_changed();
 }
-#endif
 
 /**
  * Fly to the pipe. Near the end, the camera jumps to Lakitu's position and the hud turns on.

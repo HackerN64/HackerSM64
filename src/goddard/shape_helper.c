@@ -16,10 +16,6 @@
 #include "shape_helper.h"
 #include "skin.h"
 
-#ifndef VERSION_EU
-#include <prevent_bss_reordering.h>
-#endif
-
 // data
 struct ObjGroup *gMarioFaceGrp = NULL;     // @ 801A82E0; returned by load_dynlist
 struct ObjShape *gSpotShape = NULL;        // Shape used for drawing lights?

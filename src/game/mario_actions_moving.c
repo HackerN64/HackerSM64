@@ -1605,11 +1605,9 @@ s32 act_hard_backward_ground_kb(struct MarioState *m) {
         set_mario_action(m, ACT_DEATH_ON_BACK, 0);
     }
 
-#ifndef VERSION_JP
     if (animFrame == 54 && m->prevAction == ACT_SPECIAL_DEATH_EXIT) {
         play_sound(SOUND_MARIO_MAMA_MIA, m->marioObj->header.gfx.cameraToObject);
     }
-#endif
 
     if (animFrame == 69) {
         play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING);

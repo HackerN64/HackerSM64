@@ -51,12 +51,12 @@ s16 gLoadedLanguage = 0;
 
 void *languageTable[][3] =
 {
-    {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table}, //In EU, this is just mirroring English.
-    #if MULTILANG
+    {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table}, // In EU, this is just mirroring English.
+#if MULTILANG
     {&dialog_table_eu_en, &course_name_table_eu_en, &act_name_table_eu_en},
     {&dialog_table_eu_fr, &course_name_table_eu_fr, &act_name_table_eu_fr},
     {&dialog_table_eu_de, &course_name_table_eu_de, &act_name_table_eu_de},
-    #endif
+#endif
 };
 
 extern u8 gLastCompletedCourseNum;
@@ -149,8 +149,8 @@ void create_dl_identity_matrix(void) {
     guMtxIdent(matrix);
 #endif
 
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
+    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
 }
 
 void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
@@ -162,11 +162,12 @@ void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
 
     guTranslate(matrix, x, y, z);
 
-    if (pushOp == MENU_MTX_PUSH)
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-
-    if (pushOp == MENU_MTX_NOPUSH)
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+    if (pushOp == MENU_MTX_PUSH) {
+        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
+    }
+    if (pushOp == MENU_MTX_NOPUSH) {
+        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
+    }
 }
 
 void create_dl_rotation_matrix(s8 pushOp, f32 a, f32 x, f32 y, f32 z) {
@@ -178,11 +179,12 @@ void create_dl_rotation_matrix(s8 pushOp, f32 a, f32 x, f32 y, f32 z) {
 
     guRotate(matrix, a, x, y, z);
 
-    if (pushOp == MENU_MTX_PUSH)
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-
-    if (pushOp == MENU_MTX_NOPUSH)
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+    if (pushOp == MENU_MTX_PUSH) {
+        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH  ));
+    }
+    if (pushOp == MENU_MTX_NOPUSH) {
+        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
+    }
 }
 
 void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
@@ -233,9 +235,9 @@ Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     for (inPos = 0; inPos < (width * height) / 4; inPos++) {
         bitMask = 0x80;
         while (bitMask != 0) {
-            out[outPos] = (in[inPos] & bitMask) ? 0xF0 : 0x00;
+            out[outPos] = ((in[inPos] & bitMask) ? 0xF0 : 0x00);
             bitMask /= 2;
-            out[outPos] = (in[inPos] & bitMask) ? out[outPos] + 0x0F : out[outPos];
+            out[outPos] = ((in[inPos] & bitMask) ? (out[outPos] + 0x0F) : out[outPos]);
             bitMask /= 2;
             outPos++;
         }
@@ -247,7 +249,7 @@ Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
 void render_generic_char(u8 c) {
     void **fontLUT = segmented_to_virtual(main_font_lut);
     void *packedTexture = segmented_to_virtual(fontLUT[c]);
-#ifdef VERSION_EU
+#if MULTILANG
     void *unpackedTexture = alloc_ia4_tex_from_i1(packedTexture, 8, 8);
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));

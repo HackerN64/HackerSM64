@@ -85,28 +85,13 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
 
             objectGraphNode->oAnimState = 1;
 
-#ifdef VERSION_JP
-            if (currentGraphNode->parameter == 10) {
-                if (gDebugInfo[DEBUG_PAGE_ENEMYINFO][3]) {
-                    gDPSetAlphaCompare(dlHead++, G_AC_DITHER);
-                }
-            } else {
-                if (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA) {
-                    gDPSetAlphaCompare(dlHead++, G_AC_DITHER);
-                }
-            }
-#else // gDebugInfo accesses were removed in all non-JP versions.
             if (objectOpacity == 0 && segmented_to_virtual(bhvBowser) == objectGraphNode->behavior) {
                 objectGraphNode->oAnimState = 2;
             }
-            // the debug info check was removed in US. so we need to perform
-            // the only necessary check instead of the debuginfo one.
-            if (currentGraphNode->parameter != 10) {
-                if (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA) {
-                    gDPSetAlphaCompare(dlHead++, G_AC_DITHER);
-                }
+
+            if ((currentGraphNode->parameter != 10) && (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA)) {
+                gDPSetAlphaCompare(dlHead++, G_AC_DITHER);
             }
-#endif
         }
 
         gDPSetEnvColor(dlHead++, 255, 255, 255, objectOpacity);

@@ -707,13 +707,12 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
 #endif
     arg0->persistent.entries[arg0->persistent.numEntries].ptr = ret;
 
-    if (ret == NULL)
+    if (ret == NULL) {
 #else
     arg0->persistent.entries[arg0->persistent.numEntries].ptr = soundAlloc(&arg0->persistent.pool, arg1 * size);
 
-    if (arg0->persistent.entries[arg0->persistent.numEntries].ptr == NULL)
+    if (arg0->persistent.entries[arg0->persistent.numEntries].ptr == NULL) {
 #endif
-    {
         switch (arg3) {
             case 2:
 #if defined(VERSION_EU)
@@ -835,14 +834,7 @@ void *get_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 id) {
         }
 
         if (arg1 == 2) {
-#if defined(VERSION_EU) || defined(VERSION_SH)
             return get_bank_or_seq(arg0, 0, id);
-#else
-            // Prevent tail call optimization by using a temporary.
-            // Either copt or -Wo,-notail.
-            ret = get_bank_or_seq(arg0, 0, id);
-            return ret;
-#endif
         }
         return NULL;
     }
@@ -1002,10 +994,9 @@ void wait_for_audio_frames(s32 frames) {
 #endif
 
 u8 sAudioFirstBoot = 0;
-//Separate the reverb settings into their own func. Bit unstable currently, so still only runs at boot.
+// Separate the reverb settings into their own func. Bit unstable currently, so still only runs at boot.
 #if defined(VERSION_EU) || defined(VERSION_SH)
-void init_reverb_eu(void)
-{
+void init_reverb_eu(void) {
     s16 *mem;
     struct AudioSessionSettingsEU *preset = &gAudioSessionPresets[0];
     struct SynthesisReverb *reverb;
@@ -1013,8 +1004,7 @@ void init_reverb_eu(void)
     s32 i, j;
 
     // This is called 4 times for numReverbs to work at higher values. This does eat up some memory though.
-    for (j = 0; j < 4; j++)
-    {
+    for (j = 0; j < 4; j++) {
         gSynthesisReverbs[j].useReverb = 0;
 
         // Both left and right channels are allocated/cleared together, then separated based on the reverb window size
@@ -1022,27 +1012,25 @@ void init_reverb_eu(void)
             gSynthesisReverbs[j].ringBuffer.left = soundAlloc(&gNotesAndBuffersPool, REVERB_WINDOW_SIZE_MAX * 4);
     }
     gNumSynthesisReverbs = preset->numReverbs;
-    for (j = 0; j < gNumSynthesisReverbs; j++)
-    {
+    for (j = 0; j < gNumSynthesisReverbs; j++) {
         reverb = &gSynthesisReverbs[j];
         reverbSettings = &sReverbSettings[MIN(gAudioResetPresetIdToLoad+j, (sizeof(sReverbSettings) / sizeof(struct ReverbSettingsEU))-1)];
         reverb->windowSize = reverbSettings->windowSize * 0x40;
         reverb->downsampleRate = reverbSettings->downsampleRate;
         reverb->reverbGain = reverbSettings->gain;
         reverb->useReverb = 8;
-        if (reverb->windowSize > REVERB_WINDOW_SIZE_MAX)
+        if (reverb->windowSize > REVERB_WINDOW_SIZE_MAX) {
             reverb->windowSize = REVERB_WINDOW_SIZE_MAX;
-
+        }
         if (sAudioFirstBoot) {
             bzero(reverb->ringBuffer.left, REVERB_WINDOW_SIZE_MAX * 4);
         } else {
             reverb->resampleRate = 0x8000 / reverb->downsampleRate;
-            reverb->resampleStateLeft = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
+            reverb->resampleStateLeft  = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
             reverb->resampleStateRight = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
             reverb->unk24 = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
             reverb->unk28 = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
-            for (i = 0; i < gAudioBufferParameters.updatesPerFrame; i++)
-            {
+            for (i = 0; i < gAudioBufferParameters.updatesPerFrame; i++) {
                 mem = soundAlloc(&gNotesAndBuffersPool, DEFAULT_LEN_2CH);
                 reverb->items[0][i].toDownsampleLeft = mem;
                 reverb->items[0][i].toDownsampleRight = mem + DEFAULT_LEN_1CH / sizeof(s16);
@@ -1061,7 +1049,7 @@ void init_reverb_eu(void)
         if (reverb->downsampleRate != 1) {
             reverb->resampleRate = 0x8000 / reverb->downsampleRate;
             if (sAudioFirstBoot) {
-                bzero(reverb->resampleStateLeft, 16 * sizeof(s16));
+                bzero(reverb->resampleStateLeft,  16 * sizeof(s16));
                 bzero(reverb->resampleStateRight, 16 * sizeof(s16));
                 bzero(reverb->unk24, 16 * sizeof(s16));
                 bzero(reverb->unk28, 16 * sizeof(s16));
@@ -1117,7 +1105,7 @@ void init_reverb_us(s32 presetId) {
         if (!sAudioFirstBoot) {
             gSynthesisReverb.ringBuffer.left = soundAlloc(&gNotesAndBuffersPool, REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16));
 
-            gSynthesisReverb.resampleStateLeft = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
+            gSynthesisReverb.resampleStateLeft  = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
             gSynthesisReverb.resampleStateRight = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
             gSynthesisReverb.unk24 = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
             gSynthesisReverb.unk28 = soundAlloc(&gNotesAndBuffersPool, 16 * sizeof(s16));
@@ -1144,7 +1132,7 @@ void init_reverb_us(s32 presetId) {
             gSynthesisReverb.resampleFlags = A_INIT;
             gSynthesisReverb.resampleRate = 0x8000 / gReverbDownsampleRate;
             if (sAudioFirstBoot) {
-                bzero(gSynthesisReverb.resampleStateLeft, 16 * sizeof(s16));
+                bzero(gSynthesisReverb.resampleStateLeft,  16 * sizeof(s16));
                 bzero(gSynthesisReverb.resampleStateRight, 16 * sizeof(s16));
                 bzero(gSynthesisReverb.unk24, 16 * sizeof(s16));
                 bzero(gSynthesisReverb.unk28, 16 * sizeof(s16));

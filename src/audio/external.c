@@ -384,11 +384,7 @@ extern OSMesgQueue *D_SH_80350F88;
 extern OSMesgQueue *D_SH_80350FA8;
 #endif
 
-#ifdef VERSION_JP
-typedef u16 FadeT;
-#else
 typedef s32 FadeT;
-#endif
 
 // some sort of main thread -> sound thread dispatchers
 extern void func_802ad728(u32 bits, f32 arg);
@@ -401,81 +397,6 @@ static void fade_channel_volume_scale(u8 player, u8 channelId, u8 targetScale, u
 void process_level_music_dynamics(void);
 static u8 begin_background_music_fade(u16 fadeDuration);
 void func_80320ED8(void);
-
-#ifndef VERSION_JP
-void unused_8031E4F0(void) {
-    // This is a debug function which is almost entirely optimized away,
-    // except for loops, string literals, and a read of a volatile variable.
-    // The string literals have allowed it to be partially reconstructed.
-    s32 i;
-
-    stubbed_printf("AUTOSEQ ");
-    stubbed_printf("%2x %2x <%5x : %5x / %5x>\n", gSeqLoadedPool.temporary.entries[0].id,
-                   gSeqLoadedPool.temporary.entries[1].id, gSeqLoadedPool.temporary.entries[0].size,
-                   gSeqLoadedPool.temporary.entries[1].size, gSeqLoadedPool.temporary.pool.size);
-
-    stubbed_printf("AUTOBNK ");
-    stubbed_printf("%2x %3x <%5x : %5x / %5x>\n", gBankLoadedPool.temporary.entries[0].id,
-                   gBankLoadedPool.temporary.entries[1].id, gBankLoadedPool.temporary.entries[0].size,
-                   gBankLoadedPool.temporary.entries[1].size, gBankLoadedPool.temporary.pool.size);
-
-    stubbed_printf("STAYSEQ ");
-    stubbed_printf("[%2x] <%5x / %5x>\n", gSeqLoadedPool.persistent.numEntries,
-                   gSeqLoadedPool.persistent.pool.cur - gSeqLoadedPool.persistent.pool.start,
-                   gSeqLoadedPool.persistent.pool.size);
-    for (i = 0; (u32) i < gSeqLoadedPool.persistent.numEntries; i++) {
-        stubbed_printf("%2x ", gSeqLoadedPool.persistent.entries[i].id);
-    }
-    stubbed_printf("\n");
-
-    stubbed_printf("STAYBNK ");
-    stubbed_printf("[%2x] <%5x / %5x>\n", gBankLoadedPool.persistent.numEntries,
-                   gBankLoadedPool.persistent.pool.cur - gBankLoadedPool.persistent.pool.start,
-                   gBankLoadedPool.persistent.pool.size);
-    for (i = 0; (u32) i < gBankLoadedPool.persistent.numEntries; i++) {
-        stubbed_printf("%2x ", gBankLoadedPool.persistent.entries[i].id);
-    }
-    stubbed_printf("\n\n");
-
-    stubbed_printf("    0123456789ABCDEF0123456789ABCDEF01234567\n");
-    stubbed_printf("--------------------------------------------\n");
-
-    // gSeqLoadStatus/gBankLoadStatus, 4 entries at a time?
-    stubbed_printf("SEQ ");
-    for (i = 0; i < 40; i++) {
-        stubbed_printf("%1x", 0);
-    }
-    stubbed_printf("\n");
-
-    stubbed_printf("BNK ");
-    for (i = 0; i < 40; i += 4) {
-        stubbed_printf("%1x", 0);
-    }
-    stubbed_printf("\n");
-
-    stubbed_printf("FIXHEAP ");
-    stubbed_printf("%4x / %4x\n", 0, 0);
-    stubbed_printf("DRVHEAP ");
-    stubbed_printf("%5x / %5x\n", 0, 0);
-    stubbed_printf("DMACACHE  %4d Blocks\n", 0);
-    stubbed_printf("CHANNELS  %2d / MAX %3d \n", 0, 0);
-
-    stubbed_printf("TEMPOMAX  %d\n", gTempoInternalToExternal / TEMPO_SCALE);
-    stubbed_printf("TEMPO G0  %d\n", gSequencePlayers[SEQ_PLAYER_LEVEL].tempo / TEMPO_SCALE);
-    stubbed_printf("TEMPO G1  %d\n", gSequencePlayers[SEQ_PLAYER_ENV].tempo / TEMPO_SCALE);
-    stubbed_printf("TEMPO G2  %d\n", gSequencePlayers[SEQ_PLAYER_SFX].tempo / TEMPO_SCALE);
-    stubbed_printf("DEBUGFLAG  %8x\n", gAudioErrorFlags);
-}
-
-void unused_8031E568(void) {
-    stubbed_printf("COUNT %8d\n", gAudioFrameCount);
-}
-#endif
-
-#if defined(VERSION_EU) || defined(VERSION_SH)
-const char unusedErrorStr1[] = "Error : Queue is not empty ( %x ) \n";
-const char unusedErrorStr2[] = "specchg error\n";
-#endif
 
 /**
  * Fade out a sequence player
@@ -510,12 +431,10 @@ void audio_reset_session_eu(s32 presetId) {
 static void seq_player_fade_to_zero_volume(s32 player, FadeT fadeDuration) {
     struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
 
-#ifndef VERSION_JP
     // fadeDuration is never 0 in practice
     if (fadeDuration == 0) {
         fadeDuration++;
     }
-#endif
 
     seqPlayer->fadeVelocity = -(seqPlayer->fadeVolume / fadeDuration);
     seqPlayer->state = SEQUENCE_PLAYER_STATE_FADE_OUT;
@@ -547,7 +466,7 @@ static void seq_player_fade_to_percentage_of_volume(s32 player, FadeT fadeDurati
     f32 targetVolume;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    if (seqPlayer->state == 2) {
+    if (seqPlayer->state == SEQUENCE_PLAYER_STATE_2) {
         return;
     }
 #else
@@ -566,7 +485,7 @@ static void seq_player_fade_to_percentage_of_volume(s32 player, FadeT fadeDurati
     }
     seqPlayer->fadeVelocity = (targetVolume - seqPlayer->fadeVolume) / fadeDuration;
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    seqPlayer->state = 0;
+    seqPlayer->state = SEQUENCE_PLAYER_STATE_0;
 #else
     seqPlayer->state = SEQUENCE_PLAYER_STATE_4;
 #endif
@@ -581,7 +500,7 @@ static void seq_player_fade_to_normal_volume(s32 player, FadeT fadeDuration) {
     struct SequencePlayer *seqPlayer = &gSequencePlayers[player];
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    if (seqPlayer->state == 2) {
+    if (seqPlayer->state == SEQUENCE_PLAYER_STATE_2) {
         return;
     }
 #else
@@ -597,7 +516,7 @@ static void seq_player_fade_to_normal_volume(s32 player, FadeT fadeDuration) {
     }
     seqPlayer->fadeVelocity = (seqPlayer->volume - seqPlayer->fadeVolume) / fadeDuration;
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    seqPlayer->state = 0;
+    seqPlayer->state = SEQUENCE_PLAYER_STATE_0;
 #else
     seqPlayer->state = SEQUENCE_PLAYER_STATE_2;
 #endif
@@ -1144,7 +1063,7 @@ static f32 get_sound_pan(f32 x, f32 z) {
         // since x is not clamped. On JP, this can lead to an out-of-bounds
         // float read in note_set_vel_pan_reverb when x is highly negative,
         // causing console crashes when that float is a nan or denormal.
-        pan = 0.5 + x / (US_FLOAT(6.0) * absZ);
+        pan = 0.5f + x / (US_FLOAT(6.0) * absZ);
     }
 
     return pan;
@@ -1154,28 +1073,25 @@ static f32 get_sound_pan(f32 x, f32 z) {
  * Called from threads: thread4_sound, thread5_game_loop (EU only)
  */
 static f32 get_sound_volume(u8 bank, u8 soundIndex, f32 volumeRange) {
-    f32 maxSoundDistance;
     f32 intensity;
-#ifndef VERSION_JP
-    s32 div = bank < 3 ? 2 : 3;
-#endif
 
     if (!(sSoundBanks[bank][soundIndex].soundBits & SOUND_NO_VOLUME_LOSS)) {
 #ifdef VERSION_JP
         // Intensity linearly lowers from 1 at the camera to 0 at maxSoundDistance
-        maxSoundDistance = sLevelAcousticReaches[gCurrLevelNum];
+        f32 maxSoundDistance = sLevelAcousticReaches[gCurrLevelNum];
         if (maxSoundDistance < sSoundBanks[bank][soundIndex].distance) {
             intensity = 0.0f;
         } else {
             intensity = 1.0 - sSoundBanks[bank][soundIndex].distance / maxSoundDistance;
         }
 #else
+        s32 div = ((bank < 3) ? 2 : 3);
         // Intensity linearly lowers from 1 at the camera to 1 - volumeRange at maxSoundDistance,
         // then it goes from 1 - volumeRange at maxSoundDistance to 0 at AUDIO_MAX_DISTANCE
         if (sSoundBanks[bank][soundIndex].distance > AUDIO_MAX_DISTANCE) {
             intensity = 0.0f;
         } else {
-            maxSoundDistance = sLevelAcousticReaches[gCurrLevelNum] / div;
+            f32 maxSoundDistance = sLevelAcousticReaches[gCurrLevelNum] / div;
             if (maxSoundDistance < sSoundBanks[bank][soundIndex].distance) {
                 intensity = ((AUDIO_MAX_DISTANCE - sSoundBanks[bank][soundIndex].distance)
                              / (AUDIO_MAX_DISTANCE - maxSoundDistance))
@@ -1228,21 +1144,17 @@ static u8 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelIndex
     u8 level;
     u8 reverb;
 
-#ifndef VERSION_JP
     // Disable level reverb if NO_ECHO is set
     if (sSoundBanks[bank][soundIndex].soundBits & SOUND_NO_ECHO) {
         level = 0;
         area = 0;
     } else {
-#endif
         level = (gCurrLevelNum > LEVEL_MAX ? LEVEL_MAX : gCurrLevelNum);
         area = gCurrAreaIndex - 1;
         if (area > 2) {
             area = 2;
         }
-#ifndef VERSION_JP
     }
-#endif
 
     // reverb = reverb adjustment + level reverb + a volume-dependent value
     // The volume-dependent value is 0 when volume is at maximum, and raises to
@@ -2283,12 +2195,10 @@ void play_dialog_sound(u8 dialogID) {
         }
     }
 
-#ifndef VERSION_JP
     // "You've stepped on the (Wing|Metal|Vanish) Cap Switch"
     if (dialogID == DIALOG_010 || dialogID == DIALOG_011 || dialogID == DIALOG_012) {
         play_puzzle_jingle();
     }
-#endif
 }
 
 /**
@@ -2624,11 +2534,9 @@ void play_toads_jingle(void) {
  * Called from threads: thread5_game_loop
  */
 void sound_reset(u8 presetId) {
-#ifndef VERSION_JP
     if (presetId >= 8) {
         presetId = 0;
     }
-#endif
     sGameLoopTicked = 0;
     disable_all_sequence_players();
     sound_init();

@@ -139,11 +139,9 @@ void bhv_intro_lakitu_loop(void) {
                 obj_mark_for_deletion(o);
                 obj_mark_for_deletion(o->oIntroLakituCloud);
             }
-#ifndef VERSION_JP
             if (o->oTimer == 14) {
                 cur_obj_play_sound_2(SOUND_ACTION_INTRO_UNK45F);
             }
-#endif
             break;
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_1:
             cur_obj_enable_rendering();

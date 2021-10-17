@@ -1,20 +1,11 @@
 // Parameters: dialog enum ID, (unused), lines per box, left offset, width
 
-#ifdef VERSION_JP
-#define HOW_TO_READ_SIGNS_1 "\
-カンバンを　よむときも\n\
-たちどまって　Ｂボタン！\n\
-ＡかＢボタンですすめる！\n\
-まえにたつだけで　はなし\n\
-かける、どうぶつもいます。"
-#else
 #define HOW_TO_READ_SIGNS_1 "\
 カンバンは　まえにたって\n\
 ＡかＢボタンでよめます。\n\
 まえにたつだけで　はなし\n\
 かけてくれる　どうぶつも\n\
 います。"
-#endif
 
 DEFINE_DIALOG(DIALOG_000, 1, 5, 30, 200, _("\
 おおっと、ここはキケンな\n\
