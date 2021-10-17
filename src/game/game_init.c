@@ -26,7 +26,6 @@
 #include "sram.h"
 #endif
 #include "puppyprint.h"
-#include <prevent_bss_reordering.h>
 #include "puppycam2.h"
 #include "debug_box.h"
 #include "vc_check.h"

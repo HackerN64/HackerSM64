@@ -2,7 +2,6 @@
 
 #define INCLUDED_FROM_CAMERA_C
 
-#include "prevent_bss_reordering.h"
 #include "sm64.h"
 #include "camera.h"
 #include "seq_ids.h"

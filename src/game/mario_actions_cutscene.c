@@ -1,6 +1,5 @@
 #include <PR/ultratypes.h>
 
-// #include "prevent_bss_reordering.h"
 #include "sm64.h"
 #include "mario_actions_cutscene.h"
 #include "mario_actions_moving.h"

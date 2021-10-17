@@ -1,7 +1,5 @@
 #include <PR/ultratypes.h>
 
-#include "prevent_bss_reordering.h"
-
 #include "sm64.h"
 #include "game/ingame_menu.h"
 #include "graph_node.h"
