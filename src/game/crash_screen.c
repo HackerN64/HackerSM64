@@ -50,7 +50,7 @@ char *gCauseDesc[18] = {
     "Address error on store",
     "Bus error on inst.",
     "Bus error on data",
-    "System call exception",
+    "Failed Assert",
     "Breakpoint exception",
     "Reserved instruction",
     "Coprocessor unusable",
