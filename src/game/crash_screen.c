@@ -308,7 +308,7 @@ void draw_crash_screen(OSThread *thread) {
         crashPage++;
         updateBuffer = TRUE;
     }
-    if (gPlayer1Controller->buttonPressed & L_TRIG || gPlayer1Controller->buttonPressed & Z_TRIG) {
+    if (gPlayer1Controller->buttonPressed & (L_TRIG | Z_TRIG)) {
         crashPage--;
         updateBuffer = TRUE;
     }

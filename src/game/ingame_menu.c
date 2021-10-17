@@ -514,11 +514,11 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     u8 index = 0;
 
     if (scrollDirection == MENU_SCROLL_VERTICAL) {
-        if (gPlayer3Controller->rawStickY >  60) index++;
-        if (gPlayer3Controller->rawStickY < -60) index += 2;
+        if ((gPlayer3Controller->rawStickY >  60) || (gPlayer3Controller->buttonDown & (U_CBUTTONS | U_JPAD))) index++;
+        if ((gPlayer3Controller->rawStickY < -60) || (gPlayer3Controller->buttonDown & (D_CBUTTONS | D_JPAD))) index += 2;
     } else if (scrollDirection == MENU_SCROLL_HORIZONTAL) {
-        if (gPlayer3Controller->rawStickX >  60) index += 2;
-        if (gPlayer3Controller->rawStickX < -60) index++;
+        if ((gPlayer3Controller->rawStickX >  60) || (gPlayer3Controller->buttonDown & (R_CBUTTONS | R_JPAD))) index += 2;
+        if ((gPlayer3Controller->rawStickX < -60) || (gPlayer3Controller->buttonDown & (L_CBUTTONS | L_JPAD))) index++;
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 2) {
@@ -543,7 +543,7 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
         gMenuHoldKeyIndex = index;
     }
 
-    if ((index & 3) == 0) {
+    if ((index & 0x3) == 0) {
         gMenuHoldKeyTimer = 0;
     }
 }
@@ -1107,10 +1107,10 @@ void render_dialog_entries(void) {
 
             if (gDialogBoxType == DIALOG_TYPE_ROTATE) {
                 gDialogBoxOpenTimer -= 7.5f;
-                gDialogBoxScale -= 1.5f;
+                gDialogBoxScale     -= 1.5f;
             } else {
                 gDialogBoxOpenTimer -= 10.0f;
-                gDialogBoxScale -= 2.0f;
+                gDialogBoxScale     -= 2.0f;
             }
 
             if (gDialogBoxOpenTimer == 0.0f) {
@@ -1122,8 +1122,7 @@ void render_dialog_entries(void) {
         case DIALOG_STATE_VERTICAL:
             gDialogBoxOpenTimer = 0.0f;
 
-            if ((gPlayer3Controller->buttonPressed & A_BUTTON)
-                || (gPlayer3Controller->buttonPressed & B_BUTTON)) {
+            if (gPlayer3Controller->buttonPressed & (A_BUTTON | B_BUTTON | START_BUTTON | D_CBUTTONS | R_CBUTTONS | D_JPAD | R_JPAD)) {
                 if (gLastDialogPageStrPos == -1) {
                     handle_special_dialog_text(gDialogID);
                     gDialogBoxState = DIALOG_STATE_CLOSING;
@@ -1135,14 +1134,14 @@ void render_dialog_entries(void) {
             lowerBound = 1;
             break;
         case DIALOG_STATE_HORIZONTAL:
-            gDialogScrollOffsetY += dialog->linesPerBox * 2;
+            gDialogScrollOffsetY += (dialog->linesPerBox * 2);
 
-            if (gDialogScrollOffsetY >= dialog->linesPerBox * DIAG_VAL1) {
+            if (gDialogScrollOffsetY >= (dialog->linesPerBox * DIAG_VAL1)) {
                 gDialogTextPos = gLastDialogPageStrPos;
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 gDialogScrollOffsetY = 0;
             }
-            lowerBound = (gDialogScrollOffsetY / DIAG_VAL1) + 1;
+            lowerBound = ((gDialogScrollOffsetY / DIAG_VAL1) + 1);
             break;
         case DIALOG_STATE_CLOSING:
             if (gDialogBoxOpenTimer == 20.0f) {
@@ -1156,8 +1155,8 @@ void render_dialog_entries(void) {
                 gDialogResponse = gDialogLineNum;
             }
 
-            gDialogBoxOpenTimer = gDialogBoxOpenTimer + 10.0f;
-            gDialogBoxScale = gDialogBoxScale + 2.0f;
+            gDialogBoxOpenTimer = (gDialogBoxOpenTimer + 10.0f);
+            gDialogBoxScale     = (gDialogBoxScale + 2.0f);
 
             if (gDialogBoxOpenTimer == DEFAULT_DIALOG_BOX_ANGLE) {
                 gDialogBoxState = DIALOG_STATE_OPENING;
@@ -1192,7 +1191,7 @@ void render_dialog_entries(void) {
     if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {
         render_dialog_triangle_choice();
     }
-    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 2, 2, SCREEN_WIDTH - gBorderHeight/2, SCREEN_HEIGHT - gBorderHeight/2);
+    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 2, 2, (SCREEN_WIDTH - (gBorderHeight / 2)), (SCREEN_HEIGHT - (gBorderHeight / 2)));
     if (gLastDialogPageStrPos != -1 && gDialogBoxState == DIALOG_STATE_VERTICAL) {
         render_dialog_string_color(dialog->linesPerBox);
     }
@@ -1310,9 +1309,9 @@ void do_cutscene_handler(void) {
 
     // like the first check, it takes 5 frames to fade out, so
     // perform a + 10 to account for the earlier check (10-5=5).
-    if (gCutsceneMsgDuration + 10 < gCutsceneMsgTimer) {
+    if ((gCutsceneMsgDuration + 10) < gCutsceneMsgTimer) {
         gCutsceneMsgIndex = -1;
-        gCutsceneMsgFade = 0;
+        gCutsceneMsgFade  = 0;
         gCutsceneMsgTimer = 0;
         return;
     }
@@ -1479,10 +1478,10 @@ void render_widescreen_setting(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     if (!gConfig.widescreen) {
         print_generic_string(10, 20, textCurrRatio43);
-        print_generic_string(10, 7, textPressL);
+        print_generic_string(10,  7, textPressL);
     } else {
         print_generic_string(10, 20, textCurrRatio169);
-        print_generic_string(10, 7, textPressL);
+        print_generic_string(10,  7, textPressL);
     }
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     if (gPlayer1Controller->buttonPressed & L_TRIG){
@@ -1499,32 +1498,25 @@ void render_widescreen_setting(void) {
 #define MYSCORE_X  62
 
 void render_pause_my_score_coins(void) {
-    u8 textCourse[] = { TEXT_COURSE };
-    u8 textMyScore[] = { TEXT_MY_SCORE };
-    u8 textStar[] = { TEXT_STAR };
+    u8 textCourse[]       = { TEXT_COURSE        };
+    u8 textMyScore[]      = { TEXT_MY_SCORE      };
+    u8 textStar[]         = { TEXT_STAR          };
     u8 textUnfilledStar[] = { TEXT_UNFILLED_STAR };
 
     u8 strCourseNum[4];
-    void **courseNameTbl;
-    u8 *courseName;
-    void **actNameTbl;
-    u8 *actName;
-    u8 courseIndex;
-    u8 starFlags;
 
-    courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
-    actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
+    void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
+    void **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
 
-    courseIndex = gCurrCourseNum - 1;
-    starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
-
+    u8 courseIndex = gCurrCourseNum - 1;
+    u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     if (courseIndex < COURSE_STAGES_COUNT) {
         print_hud_my_score_coins(1, gCurrSaveFileNum - 1, courseIndex, 178, 103);
-        print_hud_my_score_stars(gCurrSaveFileNum - 1, courseIndex, 118, 103);
+        print_hud_my_score_stars(   gCurrSaveFileNum - 1, courseIndex, 118, 103);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1536,14 +1528,14 @@ void render_pause_my_score_coins(void) {
         print_generic_string(MYSCORE_X, 121, textMyScore);
     }
 
-    courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
+    u8 *courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
 
     if (courseIndex < COURSE_STAGES_COUNT) {
         print_generic_string(63, 157, textCourse);
         int_to_str(gCurrCourseNum, strCourseNum);
         print_generic_string(CRS_NUM_X1, 157, strCourseNum);
 
-        actName = segmented_to_virtual(actNameTbl[(gCurrCourseNum - 1) * 6 + gDialogCourseActNum - 1]);
+        u8 *actName = segmented_to_virtual(actNameTbl[((gCurrCourseNum - 1) * 6) + gDialogCourseActNum - 1]);
 
         if (starFlags & (1 << (gDialogCourseActNum - 1))) {
             print_generic_string(TXT_STAR_X, 140, textStar);
@@ -1563,23 +1555,23 @@ void render_pause_my_score_coins(void) {
 #define Y_VAL7 2
 
 void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
-    u8 textLakituMario[] = { TEXT_LAKITU_MARIO };
-    u8 textLakituStop[] = { TEXT_LAKITU_STOP };
+    u8 textLakituMario[]   = { TEXT_LAKITU_MARIO   };
+    u8 textLakituStop[]    = { TEXT_LAKITU_STOP    };
     u8 textNormalUpClose[] = { TEXT_NORMAL_UPCLOSE };
-    u8 textNormalFixed[] = { TEXT_NORMAL_FIXED };
+    u8 textNormalFixed[]   = { TEXT_NORMAL_FIXED   };
 
     handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, index, 1, 2);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(x + 14, y + 2, textLakituMario);
-    print_generic_string(x + TXT1_X, y - 13, textNormalUpClose);
-    print_generic_string(x + 124, y + 2, textLakituStop);
-    print_generic_string(x + TXT2_X, y - 13, textNormalFixed);
+    print_generic_string((x +  14   ), (y +  2), textLakituMario);
+    print_generic_string((x + TXT1_X), (y - 13), textNormalUpClose);
+    print_generic_string((x + 124   ), (y +  2), textLakituStop);
+    print_generic_string((x + TXT2_X), (y - 13), textNormalFixed);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    create_dl_translation_matrix(MENU_MTX_PUSH, ((*index - 1) * xIndex) + x, y + Y_VAL7, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, (((*index - 1) * xIndex) + x), (y + Y_VAL7), 0);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
@@ -1598,8 +1590,8 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
 #define Y_VAL8 2
 
 void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
-    u8 textContinue[] = { TEXT_CONTINUE };
-    u8 textExitCourse[] = { TEXT_EXIT_COURSE };
+    u8 textContinue[]     = { TEXT_CONTINUE       };
+    u8 textExitCourse[]   = { TEXT_EXIT_COURSE    };
     u8 textCameraAngleR[] = { TEXT_CAMERA_ANGLE_R };
 
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
@@ -1607,14 +1599,14 @@ void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(x + 10, y - 2, textContinue);
-    print_generic_string(x + 10, y - 17, textExitCourse);
+    print_generic_string((x + 10), (y -  2), textContinue);
+    print_generic_string((x + 10), (y - 17), textExitCourse);
 
     if (*index != MENU_OPT_CAMERA_ANGLE_R) {
-        print_generic_string(x + 10, y - 33, textCameraAngleR);
+        print_generic_string((x + 10), (y - 33), textCameraAngleR);
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
-        create_dl_translation_matrix(MENU_MTX_PUSH, x - X_VAL8, (y - ((*index - 1) * yIndex)) - Y_VAL8, 0);
+        create_dl_translation_matrix(MENU_MTX_PUSH, (x - X_VAL8), ((y - ((*index - 1) * yIndex)) - Y_VAL8), 0);
 
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
         gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
@@ -1622,24 +1614,24 @@ void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     }
 
     if (*index == MENU_OPT_CAMERA_ANGLE_R) {
-        render_pause_camera_options(x - 42, y - 42, &gDialogCameraAngleIndex, 110);
+        render_pause_camera_options((x - 42), (y - 42), &gDialogCameraAngleIndex, 110);
     }
 }
 
 void render_pause_castle_menu_box(s16 x, s16 y) {
-    create_dl_translation_matrix(MENU_MTX_PUSH, x - 78, y - 32, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, (x - 78), (y - 32), 0);
     create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.2f, 0.8f, 1.0f);
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 105);
     gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, x + 6, y - 28, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, (x +  6), (y - 28), 0);
     create_dl_rotation_matrix(MENU_MTX_NOPUSH, DEFAULT_DIALOG_BOX_ANGLE, 0, 0, 1.0f);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, x - 9, y - 101, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, (x - 9), (y - 101), 0);
     create_dl_rotation_matrix(MENU_MTX_NOPUSH, 270.0f, 0, 0, 1.0f);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
@@ -1651,7 +1643,7 @@ void highlight_last_course_complete_stars(void) {
     if (gLastCompletedCourseNum == COURSE_NONE) {
         courseDone = 0;
     } else {
-        courseDone = gLastCompletedCourseNum - 1;
+        courseDone = (gLastCompletedCourseNum - 1);
 
         if (courseDone >= COURSE_STAGES_COUNT) {
             courseDone = COURSE_STAGES_COUNT;
@@ -2004,8 +1996,8 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 }
 
 #define TXT_SAVEOPTIONS_X (x + 12)
-#define TXT_SAVECONT_Y 0
-#define TXT_SAVEQUIT_Y 20
+#define TXT_SAVECONT_Y    0
+#define TXT_SAVEQUIT_Y   20
 #define TXT_CONTNOSAVE_Y 40
 
 #define X_VAL9 x
@@ -2052,10 +2044,7 @@ s32 render_course_complete_screen(void) {
             render_course_complete_lvl_info_and_hud_str();
             render_save_confirmation(100, 86, &gDialogLineNum, 20);
 
-            if (gCourseDoneMenuTimer > 110
-                && (gPlayer3Controller->buttonPressed & A_BUTTON
-                 || gPlayer3Controller->buttonPressed & START_BUTTON
-                )) {
+            if (gCourseDoneMenuTimer > 110 && (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON))) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;

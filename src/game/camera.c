@@ -4201,8 +4201,7 @@ void play_camera_buzz_if_cbutton(void) {
 }
 
 void play_camera_buzz_if_c_sideways(void) {
-    if ((gPlayer1Controller->buttonPressed & L_CBUTTONS)
-        || (gPlayer1Controller->buttonPressed & R_CBUTTONS)) {
+    if (gPlayer1Controller->buttonPressed & (L_CBUTTONS | R_CBUTTONS)) {
         play_sound_button_change_blocked();
     }
 }

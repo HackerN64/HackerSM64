@@ -392,7 +392,7 @@ void puppycam_display_options() {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-//This has been separated for interesting reasons. Don't question it.
+// This has been separated for interesting reasons. Don't question it.
 void puppycam_render_option_text(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     puppycam_print_text(278, 212, (*gPCToggleStringsPtr)[gPCOptionOpen], 1);
@@ -430,12 +430,12 @@ void puppycam_check_pause_buttons(void) {
                     gPCOptionTimer +=  5;
                 }
                 play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
-                if ((gPlayer1Controller->rawStickY >= 60) || (gPlayer1Controller->buttonDown & U_JPAD)) {
+                if ((gPlayer1Controller->rawStickY >= 60) || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))) {
                     gPCOptionSelected--;
                     if (gPCOptionSelected < 0) {
                         gPCOptionSelected = (gPCOptionCap - 1);
                     }
-                } else if ((gPlayer1Controller->rawStickY <= -60) || (gPlayer1Controller->buttonDown & D_JPAD)) {
+                } else if ((gPlayer1Controller->rawStickY <= -60) || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))) {
                     gPCOptionSelected++;
                     if (gPCOptionSelected >= gPCOptionCap) {
                         gPCOptionSelected = 0;
@@ -540,7 +540,7 @@ void puppycam_input_pitch(void) {
 
 void puppycam_input_zoom(void) {
     // Handles R button zooming.
-    if (gPlayer1Controller->buttonPressed & R_TRIG && gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_ZOOM_CHANGE) {
+    if ((gPlayer1Controller->buttonPressed & R_TRIG) && (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_ZOOM_CHANGE)) {
         gPuppyCam.zoomSet++;
 
         if (gPuppyCam.zoomSet >= 3) {
@@ -689,7 +689,7 @@ static void puppycam_input_hold_preset3(void) {
         }
     }
     if ((gPlayer1Controller->buttonPressed & D_CBUTTONS && !gPuppyCam.options.analogue) || (gPuppyCam.stick2[1] < -DEADZONE && !gPuppyCam.stickN[1]) ||
-        gPlayer1Controller->buttonPressed & B_BUTTON || gPlayer1Controller->buttonPressed & A_BUTTON) {
+        gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON)) {
         if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ZOOMED_IN) {
             gPuppyCam.stickN[1]   = 1;
             gPuppyCam.mode3Flags |= PUPPYCAM_MODE3_ZOOMED_MED;

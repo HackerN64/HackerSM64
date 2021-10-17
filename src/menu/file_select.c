@@ -1396,16 +1396,17 @@ void bhv_menu_button_manager_loop(void) {
  */
 void handle_cursor_button_input(void) {
     // If scoring a file, pressing A just changes the coin score mode.
-    if (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_A || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_B
-        || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_C
-        || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_D) {
+    if ((sSelectedButtonID == MENU_BUTTON_SCORE_FILE_A)
+     || (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_B)
+     || (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_C)
+     || (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_D)) {
         if (gPlayer3Controller->buttonPressed
             & (B_BUTTON | START_BUTTON)) {
             sClickPos[0] = sCursorPos[0];
             sClickPos[1] = sCursorPos[1];
             sCursorClickingTimer = 1;
         } else if (gPlayer3Controller->buttonPressed & A_BUTTON) {
-            sScoreFileCoinScoreMode = 1 - sScoreFileCoinScoreMode;
+            sScoreFileCoinScoreMode = (1 - sScoreFileCoinScoreMode);
             play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
         }
     } else { // If cursor is clicked
