@@ -37,7 +37,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     register struct Surface *surf;
     register f32 offset;
     register f32 radius = data->radius;
-    register Vec3f pos = { data->x, data->y + data->offsetY, data->z };
+    register Vec3f pos = { data->x, (data->y + data->offsetY), data->z };
     register Vec3f v0, v1, v2;
     register f32 d00, d01, d11, d20, d21;
     register f32 invDenom;
@@ -84,11 +84,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         d20 = vec3_dot(v2, v0);
         d21 = vec3_dot(v2, v1);
         invDenom = ((d00 * d11) - (d01 * d01));
-        if (invDenom != 0.0f) {
-            invDenom = (1.0f / invDenom);
-        } else {
-            invDenom = F32_MAX;
-        }
+        if (invDenom != 0.0f) invDenom = (1.0f / invDenom);
         v = (((d11 * d20) - (d01 * d21)) * invDenom);
         if ((v < 0.0f) || (v > 1.0f)) goto edge_1_2;
         w = (((d00 * d21) - (d01 * d20)) * invDenom);
@@ -106,11 +102,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         vec3_diff(v2, pos, surf->vertex2);
         CALC_OFFSET(v1, continue);
     check_collision:
-        if (invDenom != 0.0f) {
-            invDenom = (offset / invDenom);
-        } else {
-            invDenom = F32_MAX;
-        }
+        if (invDenom != 0.0f) invDenom = (offset / invDenom);
         pos[0] += (d00 *= invDenom);
         pos[2] += (d01 *= invDenom);
         margin_radius += 0.01f;
