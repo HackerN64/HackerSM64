@@ -21,6 +21,7 @@ enum crashPages {
 #endif
     PAGE_STACKTRACE,
     PAGE_DISASM,
+    PAGE_ASSERTS,
     PAGE_COUNT
 };
 
@@ -50,7 +51,7 @@ char *gCauseDesc[18] = {
     "Address error on store",
     "Bus error on inst.",
     "Bus error on data",
-    "Failed Assert",
+    "Failed Assert: See Assert Page",
     "Breakpoint exception",
     "Reserved instruction",
     "Coprocessor unusable",
