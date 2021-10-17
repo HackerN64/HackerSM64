@@ -314,27 +314,24 @@ s32 mario_ready_to_speak(void) {
 // 1 = starting dialog
 // 2 = speaking
 s32 set_mario_npc_dialog(s32 actionArg) {
-    s32 dialogState = MARIO_DIALOG_STATUS_NONE;
-
     // in dialog
     if (gMarioState->action == ACT_READING_NPC_DIALOG) {
         if (gMarioState->actionState < 8) {
-            dialogState = MARIO_DIALOG_STATUS_START; // starting dialog
+            return MARIO_DIALOG_STATUS_START; // starting dialog
         }
         if (gMarioState->actionState == 8) {
             if (actionArg == MARIO_DIALOG_STOP) {
                 gMarioState->actionState++; // exit dialog
             } else {
-                dialogState = MARIO_DIALOG_STATUS_SPEAK;
+                return MARIO_DIALOG_STATUS_SPEAK;
             }
         }
     } else if (actionArg != MARIO_DIALOG_STOP && mario_ready_to_speak()) {
         gMarioState->usedObj = gCurrentObject;
         set_mario_action(gMarioState, ACT_READING_NPC_DIALOG, actionArg);
-        dialogState = MARIO_DIALOG_STATUS_START; // starting dialog
+        return MARIO_DIALOG_STATUS_START; // starting dialog
     }
-
-    return dialogState;
+    return MARIO_DIALOG_STATUS_NONE;
 }
 
 // actionargs:
@@ -481,7 +478,7 @@ s32 act_reading_sign(struct MarioState *m) {
             break;
         case ACT_STATE_READING_SIGN_IN_DIALOG:
             // dialog finished
-            if (gCamera->cutscene == 0) {
+            if (gCamera->cutscene == CUTSCENE_NONE) {
                 disable_time_stop();
                 set_mario_action(m, ACT_IDLE, 0);
             }
@@ -1705,7 +1702,7 @@ static void intro_cutscene_lower_pipe(struct MarioState *m) {
 }
 
 static void intro_cutscene_set_mario_to_idle(struct MarioState *m) {
-    if (gCamera->cutscene == 0) {
+    if (gCamera->cutscene == CUTSCENE_NONE) {
         gCameraMovementFlags &= ~CAM_MOVE_C_UP_MODE;
         set_mario_action(m, ACT_IDLE, 0);
     }
@@ -1902,26 +1899,23 @@ static s32 act_jumbo_star_cutscene(struct MarioState *m) {
     return FALSE;
 }
 
+s32 sSparkleGenTheta = 0x0;
+s32 sSparkleGenPhi   = 0x0;
+
 void generate_yellow_sparkles(s16 x, s16 y, s16 z, f32 radius) {
-    static s32 sSparkleGenTheta = 0;
-    static s32 sSparkleGenPhi = 0;
-
-    s16 offsetX = radius * coss(sSparkleGenTheta) * sins(sSparkleGenPhi);
-    s16 offsetY = radius * sins(sSparkleGenTheta);
-    s16 offsetZ = radius * coss(sSparkleGenTheta) * coss(sSparkleGenPhi);
-
-    spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn, x + offsetX, y + offsetY,
-                              z + offsetZ, 0, 0, 0);
-
-    offsetX = offsetX * 4 / 3;
-    offsetY = offsetY * 4 / 3;
-    offsetZ = offsetZ * 4 / 3;
-
-    spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn, x - offsetX, y - offsetY,
-                              z - offsetZ, 0, 0, 0);
-
-    sSparkleGenTheta += 0x3800;
-    sSparkleGenPhi += 0x6000;
+    Vec3s offset;
+    vec3s_set_dist_and_angle(gVec3sZero, offset, radius, sSparkleGenTheta, sSparkleGenPhi);
+    spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn, (x + offset[0]),
+                                                                              (y + offset[1]),
+                                                                              (z + offset[2]),
+                                                                              0, 0, 0);
+    vec3_mul_val(offset, (4.0f / 3.0f));
+    spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn, (x - offset[0]),
+                                                                              (y - offset[1]),
+                                                                              (z - offset[2]),
+                                                                              0, 0, 0);
+    sSparkleGenTheta += 0x3800; // 78.75 degrees
+    sSparkleGenPhi   += 0x6000; //   135 degrees
 }
 
 // not sure what this does, returns the height of the floor.
@@ -1929,15 +1923,10 @@ void generate_yellow_sparkles(s16 x, s16 y, s16 z, f32 radius) {
 static f32 end_obj_set_visual_pos(struct Object *obj) {
     struct Surface *surf;
     Vec3s translation;
-    f32 x, y, z;
 
     find_mario_anim_flags_and_translation(obj, obj->header.gfx.angle[1], translation);
 
-    x = obj->header.gfx.pos[0] + translation[0];
-    y = obj->header.gfx.pos[1] + 10.0f;
-    z = obj->header.gfx.pos[2] + translation[2];
-
-    return find_floor(x, y, z, &surf);
+    return find_floor((obj->header.gfx.pos[0] + translation[0]), (obj->header.gfx.pos[1] + 10.0f), (obj->header.gfx.pos[2] + translation[2]), &surf);
 }
 
 // make Mario fall and soften wing cap gravity
@@ -1976,8 +1965,8 @@ static void end_peach_cutscene_mario_landing(struct MarioState *m) {
 
 // raise hand animation, lower hand animation, do some special effects
 static void end_peach_cutscene_summon_jumbo_star(struct MarioState *m) {
-    set_mario_animation(m, m->actionState == 0 ? MARIO_ANIM_CREDITS_RAISE_HAND
-                                               : MARIO_ANIM_CREDITS_LOWER_HAND);
+    set_mario_animation(m, ((m->actionState == 0) ? MARIO_ANIM_CREDITS_RAISE_HAND
+                                                  : MARIO_ANIM_CREDITS_LOWER_HAND));
 
     if (m->actionState == ACT_STATE_END_PEACH_CUTSCENE_SUMMON_JUMBO_STAR_RAISE_HAND && is_anim_past_end(m)) {
         m->actionState  = ACT_STATE_END_PEACH_CUTSCENE_SUMMON_JUMBO_STAR_LOWER_HAND;
@@ -2031,7 +2020,7 @@ static void end_peach_cutscene_spawn_peach(struct MarioState *m) {
         sEndLeftToadObj->oOpacity  = 255;
 
         sPeachManualBlinkTime = 4;
-        sEndPeachAnimation = 4;
+        sEndPeachAnimation    = 4;
 
         sEndToadAnims[0] = 4;
         sEndToadAnims[1] = 5;

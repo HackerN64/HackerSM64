@@ -810,7 +810,6 @@ void render_multi_text_string_lines(s8 multiTextId, s8 lineNum, s16 *linePos, s8
     linePos += textLengths[multiTextId].length;
 }
 
-
 u32 ensure_nonnegative(s16 value) {
     return ((value < 0) ? 0 : value);
 }
@@ -819,7 +818,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     u8 strChar;
 
     s16 colorLoop;
-    u8 rgbaColors[4] = {0, 0, 0, 0};
+    ColorRGBA rgbaColors = {0, 0, 0, 0};
     u8 customColor = FALSE;
     u8 diffTmp = 0;
 
@@ -834,28 +833,27 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
 
     s8 linesPerBox = dialog->linesPerBox;
 
-    s16 strIdx;
     s16 linePos = 0;
 
     if (gDialogBoxState == DIALOG_STATE_HORIZONTAL) {
         // If scrolling, consider the number of lines for both
         // the current page and the page being scrolled to.
-        totalLines = linesPerBox * 2 + 1;
+        totalLines = ((linesPerBox * 2) + 1);
     } else {
-        totalLines = linesPerBox + 1;
+        totalLines = (linesPerBox + 1);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    strIdx = gDialogTextPos;
+    s16 strIdx = gDialogTextPos;
 
     if (gDialogBoxState == DIALOG_STATE_HORIZONTAL) {
         create_dl_translation_matrix(MENU_MTX_NOPUSH, 0, (f32) gDialogScrollOffsetY, 0);
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, 2 - lineNum * Y_VAL3, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, (2 - (lineNum * Y_VAL3)), 0);
 
     while (pageState == DIALOG_PAGE_STATE_NONE) {
-        if (customColor == TRUE) {
+        if (customColor) {
             gDPSetEnvColor(gDisplayListHead++, rgbaColors[0], rgbaColors[1], rgbaColors[2], rgbaColors[3]);
         } else {
             change_and_flash_dialog_text_color_lines(colorMode, lineNum, &customColor);
@@ -904,9 +902,8 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                 mark = DIALOG_MARK_HANDAKUTEN;
                 break;
             case DIALOG_CHAR_SPACE:
-                    xMatrix++;
+                xMatrix++;
                 linePos++;
-
                 break;
             case DIALOG_CHAR_SLASH:
                 xMatrix += 2;
@@ -963,12 +960,12 @@ void render_dialog_triangle_choice(void) {
         handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, &gDialogLineNum, 1, 2);
     }
 
-    create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogLineNum * X_VAL4_1) - X_VAL4_2, Y_VAL4_1 - (gLastDialogLineNum * Y_VAL4_2), 0);
+    create_dl_translation_matrix(MENU_MTX_NOPUSH, ((gDialogLineNum * X_VAL4_1) - X_VAL4_2), (Y_VAL4_1 - (gLastDialogLineNum * Y_VAL4_2)), 0);
 
     if (gDialogBoxType == DIALOG_TYPE_ROTATE) {
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
     } else {
-        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
+        gDPSetEnvColor(gDisplayListHead++,   0,   0,   0, 255);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
@@ -1044,14 +1041,14 @@ void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
 s16 gMenuMode = MENU_MODE_NONE;
 
 u8 gEndCutsceneStrEn0[] = { TEXT_FILE_MARIO_EXCLAMATION };
-u8 gEndCutsceneStrEn1[] = { TEXT_POWER_STARS_RESTORED };
-u8 gEndCutsceneStrEn2[] = { TEXT_THANKS_TO_YOU };
-u8 gEndCutsceneStrEn3[] = { TEXT_THANK_YOU_MARIO };
-u8 gEndCutsceneStrEn4[] = { TEXT_SOMETHING_SPECIAL };
-u8 gEndCutsceneStrEn5[] = { TEXT_LISTEN_EVERYBODY };
-u8 gEndCutsceneStrEn6[] = { TEXT_LETS_HAVE_CAKE };
-u8 gEndCutsceneStrEn7[] = { TEXT_FOR_MARIO };
-u8 gEndCutsceneStrEn8[] = { TEXT_FILE_MARIO_QUESTION };
+u8 gEndCutsceneStrEn1[] = { TEXT_POWER_STARS_RESTORED   };
+u8 gEndCutsceneStrEn2[] = { TEXT_THANKS_TO_YOU          };
+u8 gEndCutsceneStrEn3[] = { TEXT_THANK_YOU_MARIO        };
+u8 gEndCutsceneStrEn4[] = { TEXT_SOMETHING_SPECIAL      };
+u8 gEndCutsceneStrEn5[] = { TEXT_LISTEN_EVERYBODY       };
+u8 gEndCutsceneStrEn6[] = { TEXT_LETS_HAVE_CAKE         };
+u8 gEndCutsceneStrEn7[] = { TEXT_FOR_MARIO              };
+u8 gEndCutsceneStrEn8[] = { TEXT_FILE_MARIO_QUESTION    };
 
 u8 *gEndCutsceneStringsEn[] = {
     gEndCutsceneStrEn0,
@@ -1085,18 +1082,15 @@ s8 gDialogCourseActNum = 1;
 #define DIAG_VAL2 240 // JP & US
 
 void render_dialog_entries(void) {
-    void **dialogTable;
-    struct DialogEntry *dialog;
     s8 lowerBound = 0;
-    dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
-    dialog = segmented_to_virtual(dialogTable[gDialogID]);
+    void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
+    struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
 
     // if the dialog entry is invalid, set the ID to -1.
     if (segmented_to_virtual(NULL) == dialog) {
         gDialogID = DIALOG_NONE;
         return;
     }
-
 
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
@@ -1133,7 +1127,7 @@ void render_dialog_entries(void) {
             }
             lowerBound = 1;
             break;
-        case DIALOG_STATE_HORIZONTAL:
+        case DIALOG_STATE_HORIZONTAL: // scrolling
             gDialogScrollOffsetY += (dialog->linesPerBox * 2);
 
             if (gDialogScrollOffsetY >= (dialog->linesPerBox * DIAG_VAL1)) {
@@ -1156,7 +1150,7 @@ void render_dialog_entries(void) {
             }
 
             gDialogBoxOpenTimer = (gDialogBoxOpenTimer + 10.0f);
-            gDialogBoxScale     = (gDialogBoxScale + 2.0f);
+            gDialogBoxScale     = (gDialogBoxScale     +  2.0f);
 
             if (gDialogBoxOpenTimer == DEFAULT_DIALOG_BOX_ANGLE) {
                 gDialogBoxState = DIALOG_STATE_OPENING;

@@ -226,6 +226,7 @@ enum CameraShakePos
 
 enum Cutscenes
 {
+    CUTSCENE_NONE,
     CUTSCENE_DOOR_PULL = 130,
     CUTSCENE_DOOR_PUSH,
     CUTSCENE_UNUSED_132,
@@ -784,7 +785,7 @@ void trigger_cutscene_dialog(s32 trigger);
 void handle_c_button_movement(struct Camera *c);
 void start_cutscene(struct Camera *c, u8 cutscene);
 u32 get_cutscene_from_mario_status(struct Camera *c);
-void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ);
+void warp_camera(Vec3s disp);
 void approach_camera_height(struct Camera *c, f32 goal, f32 inc);
 void offset_rotated(Vec3f dst, Vec3f from, Vec3f to, Vec3s rotation);
 s32 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc, Vec3f oldPos, Vec3f oldFoc, s16 yaw);
@@ -793,7 +794,7 @@ s32 camera_course_processing(struct Camera *c);
 void resolve_geometry_collisions(Vec3f pos);
 s32 rotate_camera_around_walls(struct Camera *c, Vec3f cPos, s16 *avoidYaw, s16 yawRange);
 void find_mario_floor_and_ceil(struct PlayerGeometry *pg);
-u32 start_object_cutscene_without_focus(u8 cutscene);
+void start_object_cutscene_without_focus(u8 cutscene);
 s32 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID);
 s32 cutscene_object_without_dialog(u8 cutscene, struct Object *obj);
 s32 cutscene_object(u8 cutscene, struct Object *obj);

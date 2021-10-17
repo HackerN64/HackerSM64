@@ -219,8 +219,7 @@ static void puppycam_evaluate_spline(f32 progress, Vec3s cameraPos, Vec3f spline
 
 s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline splineFocus[], s32 mode, s32 index) {
     Vec3f tempPoints[4];
-    f32 tempProgress[2] = {0.0f, 0.0f};
-    f32 progChange = 0.0f;
+    f32 tempProgress[2] = { 0.0f, 0.0f };
     s32 i;
     Vec3f prevPos;
 
@@ -254,7 +253,7 @@ s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline sp
     if (splinePos[gPuppyCam.splineIndex + 2].speed != 0) {
         tempProgress[1] = (1.0f / splinePos[gPuppyCam.splineIndex + 2].speed);
     }
-    progChange = (tempProgress[1] - tempProgress[0]) * gPuppyCam.splineProgress + tempProgress[0];
+    f32 progChange = (tempProgress[1] - tempProgress[0]) * gPuppyCam.splineProgress + tempProgress[0];
 
     gPuppyCam.splineProgress += progChange;
 
@@ -274,7 +273,7 @@ s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline sp
 static void puppycam_process_cutscene(void) {
     if (gPuppyCam.cutscene) {
         if ((gPuppyCam.sceneFunc)() == 1) {
-            gPuppyCam.cutscene = 0;
+            gPuppyCam.cutscene = CUTSCENE_NONE;
             gPuppyCam.sceneInput = 0;
             gPuppyCam.flags = gPuppyCam.intendedFlags;
         }

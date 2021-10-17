@@ -463,7 +463,7 @@ void warp_credits(struct MarioState *m) {
     vec3s_set(gPlayerSpawnInfos[0].startPos, gCurrCreditsEntry->marioPos[0],
               gCurrCreditsEntry->marioPos[1], gCurrCreditsEntry->marioPos[2]);
 
-    vec3s_set(gPlayerSpawnInfos[0].startAngle, 0, 0x100 * gCurrCreditsEntry->marioAngle, 0);
+    vec3s_set(gPlayerSpawnInfos[0].startAngle, 0, (0x100 * gCurrCreditsEntry->marioAngle), 0);
 
     gPlayerSpawnInfos[0].areaIndex = sWarpDest.areaIdx;
 
@@ -506,7 +506,7 @@ void check_instant_warp(struct MarioState *m) {
                 change_area(warp->area);
                 m->area = gCurrentArea;
 
-                warp_camera(warp->displacement[0], warp->displacement[1], warp->displacement[2]);
+                warp_camera(warp->displacement);
 
                 m->area->camera->yaw = cameraAngle;
             }
@@ -1270,7 +1270,7 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
         disable_warp_checkpoint();
     }
 
-    if (gCurrCourseNum > COURSE_STAGES_MAX || warpCheckpointActive) {
+    if ((gCurrCourseNum > COURSE_STAGES_MAX) || warpCheckpointActive) {
         return FALSE;
     }
 
