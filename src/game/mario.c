@@ -1124,10 +1124,10 @@ s32 transition_submerged_to_airborne(struct MarioState *m) {
  * non-submerged action. This also applies the water surface camera preset.
  */
 s32 set_water_plunge_action(struct MarioState *m) {
-    m->forwardVel = m->forwardVel / 4.0f;
-    m->vel[1] = m->vel[1] / 2.0f;
+    m->forwardVel = (m->forwardVel / 4.0f);
+    m->vel[1]     = (m->vel[1]     / 2.0f);
 
-    // !BUG: Causes waterbox upwarp
+    // BUG: Causes waterbox upwarp
     // m->pos[1] = m->waterLevel - 100;
 
     m->faceAngle[2] = 0;

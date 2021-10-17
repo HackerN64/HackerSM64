@@ -24,13 +24,10 @@
 // Screen Size Defines
 #define SCREEN_WIDTH  320
 #define SCREEN_HEIGHT 240
-// Border Height Define for NTSC Versions
-#ifdef TARGET_N64 // safeguard
-// Size of the black border at the top and bottom of the screen. You can set it to different values for console and emulator.
+// Height of the black borders at the top and bottom of the screen for NTSC Versions. You can set it to different values for console and emulator.
 // There is generally no reason to have a value other than 0 for emulator. As for console, it provides a (small) performance boost.
 #define BORDER_HEIGHT_CONSOLE  0
 #define BORDER_HEIGHT_EMULATOR 0
-#endif // TARGET_N64
 
 // -- GAME SETTINGS --
 // Disables some mechanics that change behavior depending on hardcoded level numbers.
@@ -69,7 +66,7 @@
 // If this is disabled, backup assets will be used.
 //#define COMPLETE_EN_US_SEGMENT2
 /// Removes multi-language cake screen
-#define EU_CUSTOM_CAKE_FIX 1
+#define EU_CUSTOM_CAKE_FIX
 // Adds multiple languages to the game. Just a placeholder for the most part, because it only works with EU, and must be enabled with EU.
 #define MULTILANG (0 || VERSION_EU)
 // Prevents infinite death loops by always restoring Mario's health when he's warped to any kind of warp while dead.
@@ -80,7 +77,6 @@
 // -- EXIT COURSE SETTINGS --
 // Disable exit course
 //#define DISABLE_EXIT_COURSE
-#ifndef DISABLE_EXIT_COURSE // safeguard
 // Decides whether you can exit course while moving (has no effect if you disable exit course)
 #define EXIT_COURSE_WHILE_MOVING
 // Decides which level "exit course" takes you to (has no effect if you disable exit course)
@@ -89,7 +85,6 @@
 #define EXIT_COURSE_AREA 0x01
 // Decides the warp node "exit course" takes you to (has no effect if you disable exit course)
 #define EXIT_COURSE_NODE 0x1F
-#endif // DISABLE_EXIT_COURSE
 
 // -- MOVEMENT SETTINGS --
 // Fixes Mario's turn ground radius by making it dependent on the analog stick magnitude.
@@ -285,10 +280,20 @@
 // If you want to change the extended boundaries mode, go to engine/extended_bounds.h and change EXTENDED_BOUNDS_MODE
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
+#ifndef TARGET_N64
+#define BORDER_HEIGHT_CONSOLE  0
+#define BORDER_HEIGHT_EMULATOR 0
+#endif // !TARGET_N64
 #ifdef DISABLE_LIVES
 #undef SAVE_NUM_LIVES
-#endif
+#endif // DISABLE_LIVES
+#ifdef DISABLE_EXIT_COURSE
+#undef EXIT_COURSE_WHILE_MOVING
+#undef EXIT_COURSE_LEVEL
+#undef EXIT_COURSE_AREA
+#undef EXIT_COURSE_NODE
+#endif // DISABLE_EXIT_COURSE
 #ifndef KEEP_MARIO_HEAD
 #undef GODDARD_EASTER_EGG
 #define DISABLE_DEMO
-#endif
+#endif // !KEEP_MARIO_HEAD
