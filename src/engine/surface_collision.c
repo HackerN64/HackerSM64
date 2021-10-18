@@ -14,8 +14,10 @@
  *                      WALLS                     *
  **************************************************/
 
+#define NONZERO(x) (ABSF(x) > NEAR_ZERO)
+
 #define CALC_OFFSET(vert, next_step) {          \
-    if ((vert)[1] != 0.0f) {                    \
+    if (NONZERO((vert)[1])) {                   \
         v = (v2[1] / (vert)[1]);                \
         if ((v < 0.0f) || (v > 1.0f)) next_step;\
         d00 = (((vert)[0] * v) - v2[0]);        \
@@ -84,7 +86,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         d20 = vec3_dot(v2, v0);
         d21 = vec3_dot(v2, v1);
         invDenom = ((d00 * d11) - (d01 * d01));
-        if (invDenom != 0.0f) invDenom = (1.0f / invDenom);
+        if (NONZERO(invDenom)) invDenom = (1.0f / invDenom);
         v = (((d11 * d20) - (d01 * d21)) * invDenom);
         if ((v < 0.0f) || (v > 1.0f)) goto edge_1_2;
         w = (((d00 * d21) - (d01 * d20)) * invDenom);
@@ -102,7 +104,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         vec3_diff(v2, pos, surf->vertex2);
         CALC_OFFSET(v1, continue);
     check_collision:
-        if (invDenom != 0.0f) invDenom = (offset / invDenom);
+        if (NONZERO(invDenom)) invDenom = (offset / invDenom);
         pos[0] += (d00 *= invDenom);
         pos[2] += (d01 *= invDenom);
         margin_radius += 0.01f;
@@ -123,14 +125,13 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
  */
 s32 f32_find_wall_collision(f32 *xPtr, f32 *yPtr, f32 *zPtr, f32 offsetY, f32 radius) {
     struct WallCollisionData collision;
-    s32 numCollisions  = 0;
     collision.offsetY  = offsetY;
     collision.radius   = radius;
     collision.x        = *xPtr;
     collision.y        = *yPtr;
     collision.z        = *zPtr;
     collision.numWalls = 0;
-    numCollisions      = find_wall_collisions(&collision);
+    s32 numCollisions  = find_wall_collisions(&collision);
     *xPtr              = collision.x;
     *yPtr              = collision.y;
     *zPtr              = collision.z;
