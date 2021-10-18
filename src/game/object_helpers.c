@@ -1313,10 +1313,10 @@ s32 cur_obj_advance_looping_anim(void) {
 static s32 cur_obj_detect_steep_floor(s16 steepAngleDegrees) {
     struct Surface *intendedFloor;
     if (o->oForwardVel != 0.0f) {
-        f32 intendedX = o->oPosX + o->oVelX;
-        f32 intendedZ = o->oPosZ + o->oVelZ;
+        f32 intendedX = (o->oPosX + o->oVelX);
+        f32 intendedZ = (o->oPosZ + o->oVelZ);
         f32 intendedFloorHeight = find_floor(intendedX, o->oPosY, intendedZ, &intendedFloor);
-        f32 deltaFloorHeight = intendedFloorHeight - o->oFloorHeight;
+        f32 deltaFloorHeight = (intendedFloorHeight - o->oFloorHeight);
 
         if (intendedFloorHeight < FLOOR_LOWER_LIMIT_MISC) {
             o->oWallAngle = o->oMoveAngleYaw + 0x8000;

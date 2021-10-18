@@ -33,7 +33,7 @@ void bhv_fire_piranha_plant_init(void) {
         o->oFlags |= OBJ_FLAG_PERSISTENT_RESPAWN;
         o->oHealth = 1;
 
-        if (o->oBehParams & 0x0000FF00) {
+        if (o->oBehParams & BPARAM3) {
             o->oNumLootCoins = 0;
         } else {
             o->oNumLootCoins = 2;

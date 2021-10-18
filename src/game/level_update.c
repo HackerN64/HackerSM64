@@ -729,13 +729,13 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 
             case WARP_OP_SPIN_SHRINK: // bbh enter
                 sDelayedWarpTimer = 30;
-                sSourceWarpNodeId = ((m->usedObj->oBehParams & SOURCE_WARP_ID_MASK) >> 16);
+                sSourceWarpNodeId = ((m->usedObj->oBehParams & BPARAM2) >> 16);
                 play_transition(WARP_TRANSITION_FADE_INTO_COLOR, sDelayedWarpTimer, 0xFF, 0xFF, 0xFF);
                 break;
 
             case WARP_OP_TELEPORT:
                 sDelayedWarpTimer = 20;
-                sSourceWarpNodeId = ((m->usedObj->oBehParams & SOURCE_WARP_ID_MASK) >> 16);
+                sSourceWarpNodeId = ((m->usedObj->oBehParams & BPARAM2) >> 16);
                 fadeMusic = !music_unchanged_through_warp(sSourceWarpNodeId);
                 play_transition(WARP_TRANSITION_FADE_INTO_COLOR, sDelayedWarpTimer, 0xFF, 0xFF, 0xFF);
                 break;
@@ -743,14 +743,14 @@ s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
             case WARP_OP_WARP_DOOR:
                 sDelayedWarpTimer = 20;
                 sDelayedWarpArg = m->actionArg;
-                sSourceWarpNodeId = ((m->usedObj->oBehParams & SOURCE_WARP_ID_MASK) >> 16);
+                sSourceWarpNodeId = ((m->usedObj->oBehParams & BPARAM2) >> 16);
                 fadeMusic = !music_unchanged_through_warp(sSourceWarpNodeId);
                 play_transition(WARP_TRANSITION_FADE_INTO_CIRCLE, sDelayedWarpTimer, 0x00, 0x00, 0x00);
                 break;
 
             case WARP_OP_WARP_OBJECT:
                 sDelayedWarpTimer = 20;
-                sSourceWarpNodeId = ((m->usedObj->oBehParams & 0x00FF0000) >> 16);
+                sSourceWarpNodeId = ((m->usedObj->oBehParams & BPARAM2) >> 16);
                 fadeMusic = !music_unchanged_through_warp(sSourceWarpNodeId);
                 play_transition(WARP_TRANSITION_FADE_INTO_STAR, sDelayedWarpTimer, 0x00, 0x00, 0x00);
                 break;

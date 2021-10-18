@@ -168,8 +168,6 @@ enum WarpTypes {
 
 #define WARP_NODE_CREDITS_MIN    0xF8
 
-#define SOURCE_WARP_ID_MASK  0x00FF0000
-
 u32 level_control_timer(s32 timerOp);
 void fade_into_special_warp(u32 arg, u32 color);
 void load_level_init_text(u32 arg);

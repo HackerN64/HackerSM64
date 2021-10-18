@@ -281,7 +281,7 @@ static void floomba_act_startup(void) {
         o->oBehParams &= ~0x00008000;
     }
 
-    if ((o->oBehParams & 0xFF) > 0x00) { //! TODO: Mask name
+    if ((o->oBehParams & BPARAM4) > 0x00) {
         o->oBehParams--;
         return;
     }

@@ -126,6 +126,12 @@ enum DialogState {
 #define ACTIVE_PARTICLE_V_STAR                      (1 << 18) // 0x00040000
 #define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
 
+/* oBehParams */
+#define BPARAM1 (0xFF << (8 * 3)) // 0xFF000000
+#define BPARAM2 (0xFF << (8 * 2)) // 0x00FF0000
+#define BPARAM3 (0xFF << (8 * 1)) // 0x0000FF00
+#define BPARAM4 (0xFF << (8 * 0)) // 0x000000FF
+
 /* oBehParams2ndByte */
 enum ObjGeneralBehParams {
     OBJ_BP_NONE
@@ -1393,7 +1399,7 @@ enum CoinTypes { // coinType
 
 /* Wooden post */
     /* oBehParams */
-    #define WOODEN_POST_BP_NO_COINS_MASK                    0x0000FF00
+    #define WOODEN_POST_BP_NO_COINS_MASK                    BPARAM3
 
 /* Wiggler */
     /* oAction */
