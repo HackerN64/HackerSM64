@@ -392,17 +392,15 @@ void init_mario_after_warp(struct MarioState *m) {
             play_cap_music(SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP));
         }
 
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
         if (gCurrLevelNum == LEVEL_BOB
             && get_current_background_music() != SEQUENCE_ARGS(4, SEQ_LEVEL_SLIDE)
             && sTimerRunning) {
             play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(4, SEQ_LEVEL_SLIDE), 0);
         }
-#endif
 
         if (sWarpDest.levelNum == LEVEL_CASTLE && sWarpDest.areaIdx == 1 && (sWarpDest.nodeId == 31 || sWarpDest.nodeId == 32))
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
         if (sWarpDest.levelNum == LEVEL_CASTLE_GROUNDS && sWarpDest.areaIdx == 1
             && (sWarpDest.nodeId == 7 || sWarpDest.nodeId == 10 || sWarpDest.nodeId == 20
                 || sWarpDest.nodeId == 30)) {
@@ -521,7 +519,7 @@ s32 music_unchanged_through_warp(s16 arg) {
     s16 unchanged = TRUE;
     s16 currBgMusic;
 
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (levelNum == LEVEL_BOB && levelNum == gCurrLevelNum && destArea == gCurrAreaIndex) {
         currBgMusic = get_current_background_music();
         if (currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP | SEQ_VARIATION)
@@ -539,7 +537,7 @@ s32 music_unchanged_through_warp(s16 arg) {
         if (get_current_background_music() != destParam2) {
             unchanged = FALSE;
         }
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     }
 #endif
     return unchanged;
@@ -599,8 +597,7 @@ struct WarpNode *get_painting_warp_node(void) {
     s32 paintingIndex = gMarioState->floor->type - SURFACE_PAINTING_WARP_D3;
 
     if (paintingIndex >= PAINTING_WARP_INDEX_START && paintingIndex < PAINTING_WARP_INDEX_END) {
-        if (paintingIndex < PAINTING_WARP_INDEX_FA
-            || ((gMarioState->pos[1] - gMarioState->floorHeight) < 80.0f)) {
+        if (paintingIndex < PAINTING_WARP_INDEX_FA || ((gMarioState->pos[1] - gMarioState->floorHeight) < 80.0f)) {
             warpNode = &gCurrentArea->paintingWarpNodes[paintingIndex];
         }
     }

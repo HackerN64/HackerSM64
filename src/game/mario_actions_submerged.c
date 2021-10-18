@@ -144,7 +144,7 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
             yawToWhirlpool -= (s16)(0x2000 * 1000.0f / (distance + 1000.0f));
 
             if (whirlpool->strength >= 0) {
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
                 if (gCurrLevelNum == LEVEL_DDD && gCurrAreaIndex == 2) {
                     whirlpoolRadius = 4000.0f;
                 }

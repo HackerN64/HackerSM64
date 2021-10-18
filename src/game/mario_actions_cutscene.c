@@ -904,7 +904,7 @@ s32 act_warp_door_spawn(struct MarioState *m) {
             m->usedObj->oInteractStatus = INT_STATUS_WARP_DOOR_PUSHED;
         }
     } else if (m->usedObj->oAction == DOOR_ACT_CLOSED) {
-#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
         set_mario_action(m, ACT_IDLE, 0);
 #else
         if (gNeverEnteredCastle == TRUE && gCurrLevelNum == LEVEL_CASTLE) {
@@ -930,7 +930,7 @@ s32 act_emerge_from_pipe(struct MarioState *m) {
     marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 
     play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED);
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelNum == LEVEL_THI) {
         if (gCurrAreaIndex == 2) {
             play_sound_if_no_flag(m, SOUND_MENU_EXIT_PIPE, MARIO_ACTION_SOUND_PLAYED);

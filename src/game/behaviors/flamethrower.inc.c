@@ -39,7 +39,7 @@ void bhv_flamethrower_loop(void) {
     s32 flameTimeRemaining;
     s32 model;
     if (o->oAction == 0) {
-#ifndef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
         if (gCurrLevelNum != LEVEL_BBH || gMarioOnMerryGoRound == TRUE) {
             if (o->oDistanceToMario < 2000.0f) {
                 o->oAction++;

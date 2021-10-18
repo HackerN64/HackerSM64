@@ -47,7 +47,7 @@ void bhv_star_spawn_init(void) {
     o->oVelY       = ((o->oHomeY - o->oPosY)   / 30.0f);
     o->oForwardVel = (o->oStarSpawnDisFromHome / 30.0f);
     o->oStarSpawnVelY = o->oPosY;
-#ifdef DISABLE_LEVEL_SPECIFIC_CHECKS
+#ifdef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR) {
 #else
     if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR || gCurrCourseNum == COURSE_BBH) {
