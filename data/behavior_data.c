@@ -2936,13 +2936,13 @@ const BehaviorScript bhvCourtyardBooTriplet[] = {
 
 const BehaviorScript bhvBoo[] = {
     BEGIN(OBJ_LIST_GENACTOR),
-    SET_INT(oBehParams2ndByte, 1),
+    SET_INT(oBehParams2ndByte, BOO_BP_NORMAL),
     GOTO(bhvGhostHuntBoo + 1),
 };
 
 const BehaviorScript bhvMerryGoRoundBoo[] = {
     BEGIN(OBJ_LIST_GENACTOR),
-    SET_INT(oBehParams2ndByte, 2),
+    SET_INT(oBehParams2ndByte, BOO_BP_MERRY_GO_ROUND),
     GOTO(bhvGhostHuntBoo + 1),
 };
 

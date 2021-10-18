@@ -15,10 +15,10 @@ void bhv_purple_switch_loop(void) {
         case PURPLE_SWITCH_ACT_IDLE:
             cur_obj_set_model(MODEL_PURPLE_SWITCH);
             cur_obj_scale(1.5f);
-            if (gMarioObject->platform == o && !(gMarioStates[0].action & MARIO_NO_PURPLE_SWITCH)) {
-                if (lateral_dist_between_objects(o, gMarioObject) < 127.5f) {
-                    o->oAction = PURPLE_SWITCH_ACT_PRESSED;
-                }
+            if ((gMarioObject->platform == o)
+             && !(gMarioStates[0].action & MARIO_NO_PURPLE_SWITCH)
+             && (lateral_dist_between_objects(o, gMarioObject) < 127.5f)) {
+                o->oAction = PURPLE_SWITCH_ACT_PRESSED;
             }
             break;
         /**

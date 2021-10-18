@@ -246,11 +246,7 @@ void coin_inside_boo_act_dropped(void) {
 void coin_inside_boo_act_carried(void) {
     struct Object *parent = o->parentObj;
     cur_obj_become_intangible();
-#ifdef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
-    if (o->oTimer == 0) {
-#else
-    if ((o->oTimer == 0) && (gCurrLevelNum == LEVEL_BBH)) {
-#endif
+    if ((o->oTimer == 0) && GET_BPARAM1(parent->oBehParams) != COIN_INSIDE_BOO_BP_YELLOW_COIN) {
         cur_obj_set_model(MODEL_BLUE_COIN);
         cur_obj_scale(0.7f);
     }

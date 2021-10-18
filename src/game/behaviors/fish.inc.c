@@ -12,7 +12,7 @@ static void fish_spawner_act_spawn(void) {
     s32 schoolQuantity;
     s16 model;
     f32 minDistToMario;
-    const struct Animation * const *fishAnimation;
+    const struct Animation *const *fishAnimation;
     struct Object *fishObject;
 
     switch (o->oBehParams2ndByte) {

@@ -303,6 +303,10 @@ enum oActionsCoinFormation {
 };
 
 /* Coin Inside Boo */
+enum BehParam1CoinInsideBoo {
+    COIN_INSIDE_BOO_BP_BLUE_COIN,
+    COIN_INSIDE_BOO_BP_YELLOW_COIN,
+};
 enum oActionsCoinInsideBoo {
     COIN_INSIDE_BOO_ACT_CARRIED,
     COIN_INSIDE_BOO_ACT_DROPPED

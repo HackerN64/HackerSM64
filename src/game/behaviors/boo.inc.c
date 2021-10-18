@@ -70,7 +70,7 @@ void bhv_courtyard_boo_triplet_init(void) {
     {
         for (i = 0; i < 3; i++) {
             boo = spawn_object_relative(
-                0x01,
+                BOO_BP_NORMAL,
                 sCourtyardBooTripletPositions[i][0],
                 sCourtyardBooTripletPositions[i][1],
                 sCourtyardBooTripletPositions[i][2],
@@ -78,7 +78,7 @@ void bhv_courtyard_boo_triplet_init(void) {
                 MODEL_BOO,
                 bhvGhostHuntBoo
             );
-
+            OR_BPARAM1(boo->oBehParams, COIN_INSIDE_BOO_BP_YELLOW_COIN);
             boo->oMoveAngleYaw = random_u16();
         }
     }
@@ -717,9 +717,8 @@ static ObjActionFunc sBooWithCageActions[] = {
     boo_with_cage_act_3
 };
 
-void bhv_boo_with_cage_loop(void)
-{
-    //PARTIAL_UPDATE
+void bhv_boo_with_cage_loop(void) {
+    // PARTIAL_UPDATE
 
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sBooWithCageActions);
