@@ -141,7 +141,7 @@ void bhv_act_selector_init(void) {
     // If the stars have been collected in order so far, show the next star.
     if (sVisibleStars == sObtainedStars && sVisibleStars != 6) {
         selectorModelIDs[sVisibleStars] = MODEL_TRANSPARENT_STAR;
-        sInitSelectedActNum = sVisibleStars + 1;
+        sInitSelectedActNum = (sVisibleStars + 1);
         sSelectableStarIndex = sVisibleStars;
         sVisibleStars++;
     }
@@ -158,7 +158,7 @@ void bhv_act_selector_init(void) {
     }
 
     // Render star selector objects
-    #ifdef WIDE
+#ifdef WIDE
     if (gConfig.widescreen) {
         for (i = 0; i < sVisibleStars; i++) {
             sStarSelectorModels[i] =
@@ -174,14 +174,14 @@ void bhv_act_selector_init(void) {
             sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
         }
     }
-    #else
+#else
     for (i = 0; i < sVisibleStars; i++) {
         sStarSelectorModels[i] =
             spawn_object_abs_with_rot(o, 0, selectorModelIDs[i], bhvActSelectorStarType,
                                     (75 + (sVisibleStars * -75) + (i * 152)), 248, -300, 0, 0, 0);
         sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
     }
-    #endif
+#endif
 
     render_100_coin_star(stars);
 }
