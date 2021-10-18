@@ -799,7 +799,7 @@ const BehaviorScript bhvExitPodiumWarp[] = {
     SET_HITBOX(/*Radius*/ 50, /*Height*/ 50),
     BEGIN_LOOP(),
         CALL_NATIVE(load_object_collision_model),
-        SET_INT(oInteractStatus, 0),
+        SET_INT(oInteractStatus, INT_STATUS_NONE),
     END_LOOP(),
 };
 
@@ -1173,7 +1173,7 @@ const BehaviorScript bhvFlame[] = {
     SET_INT(oIntangibleTimer, 0),
     CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
-        SET_INT(oInteractStatus, 0),
+        SET_INT(oInteractStatus, INT_STATUS_NONE),
         ANIMATE_TEXTURE(oAnimState, 2),
     END_LOOP(),
 };
@@ -1846,7 +1846,7 @@ const BehaviorScript bhvIgloo[] = {
     SET_INT(oIntangibleTimer, 0),
     SET_HOME(),
     BEGIN_LOOP(),
-        SET_INT(oInteractStatus, 0),
+        SET_INT(oInteractStatus, INT_STATUS_NONE),
     END_LOOP(),
 };
 
@@ -3730,7 +3730,7 @@ const BehaviorScript bhvMessagePanel[] = {
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
         CALL_NATIVE(load_object_collision_model),
-        SET_INT(oInteractStatus, 0),
+        SET_INT(oInteractStatus, INT_STATUS_NONE),
     END_LOOP(),
 };
 
@@ -3743,7 +3743,7 @@ const BehaviorScript bhvSignOnWall[] = {
     SET_INT(oWoodenPostTotalMarioAngle, 0),
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
-        SET_INT(oInteractStatus, 0),
+        SET_INT(oInteractStatus, INT_STATUS_NONE),
     END_LOOP(),
 };
 
