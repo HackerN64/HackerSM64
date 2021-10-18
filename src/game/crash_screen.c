@@ -283,16 +283,16 @@ void draw_disasm(OSThread *thread) {
 
 
     for (int i = 0; i < 19; i++) {
-        u32 addr = sProgramPosition + (i * 4);
+        u32 addr = (sProgramPosition + (i * 4));
         u32 toDisasm = *(u32*)(addr);
 
-        crash_screen_print(30, 35 + (i * 10), "%s", insn_disasm(toDisasm, addr == tc->pc));
+        crash_screen_print(30, (35 + (i * 10)), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
     }
 
     osWritebackDCacheAll();
 }
 
-void draw_assert(OSThread *thread) {
+void draw_assert(UNUSED OSThread *thread) {
     crash_screen_draw_rect(25, 20, 270, 210);
 
     crash_screen_print(30, 25, "ASSERT PAGE");
@@ -304,8 +304,6 @@ void draw_assert(OSThread *thread) {
     } else {
         crash_screen_print(30, 35, "no failed assert to report.");
     }
-
-    
 
     osWritebackDCacheAll();
 }
