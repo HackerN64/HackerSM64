@@ -235,7 +235,7 @@ void update_debug_dpadmask(void) {
         } else {
             sDebugInfoDPadMask = 0;
         }
-        sDebugInfoDPadUpdID += 1;
+        sDebugInfoDPadUpdID++;
         if (sDebugInfoDPadUpdID >= 8) {
             sDebugInfoDPadUpdID = 6; // rapidly set to 6 from 8 as long as dPadMask is being set.
         }
