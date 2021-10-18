@@ -2489,7 +2489,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                                 seqPlayer->fadeRemainingFrames = u16v;
                                 seqPlayer->state = cmd;
                                 seqPlayer->fadeVelocity =
-                                    (0.0f - seqPlayer->fadeVolume) / (s32)(u16v & 0xFFFFu);
+                                    (-seqPlayer->fadeVolume) / (s32)(u16v & 0xFFFFu);
                                 break;
                         }
                         break;

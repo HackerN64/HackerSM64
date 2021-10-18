@@ -505,9 +505,8 @@ void obj_return_and_displace_home(struct Object *obj, f32 homeX, UNUSED f32 home
         obj->oHomeX = (f32)(baseDisp * 2) * random_float() - (f32) baseDisp + homeX;
         obj->oHomeZ = (f32)(baseDisp * 2) * random_float() - (f32) baseDisp + homeZ;
     }
-
-    f32 homeDistX = obj->oHomeX - obj->oPosX;
-    f32 homeDistZ = obj->oHomeZ - obj->oPosZ;
+    f32 homeDistX = (obj->oHomeX - obj->oPosX);
+    f32 homeDistZ = (obj->oHomeZ - obj->oPosZ);
     s16 angleToNewHome = atan2s(homeDistZ, homeDistX);
     obj->oMoveAngleYaw = approach_s16_symmetric(obj->oMoveAngleYaw, angleToNewHome, 320);
 }
@@ -517,14 +516,8 @@ void obj_return_and_displace_home(struct Object *obj, f32 homeX, UNUSED f32 home
  * of a given angle, within a certain range.
  */
 s32 obj_check_if_facing_toward_angle(u32 base, u32 goal, s16 range) {
-    s16 dAngle = (u16) goal - (u16) base;
-
-    if (((f32) sins(-range) < (f32) sins(dAngle)) && ((f32) sins(dAngle) < (f32) sins(range))
-        && (coss(dAngle) > 0)) {
-        return TRUE;
-    }
-
-    return FALSE;
+    s16 dAngle = ((u16) goal - (u16) base);
+    return (((f32) sins(-range) < (f32) sins(dAngle)) && ((f32) sins(dAngle) < (f32) sins(range)) && (coss(dAngle) > 0));
 }
 
 /**
@@ -539,9 +532,9 @@ s32 obj_find_wall_displacement(Vec3f dist, f32 x, f32 y, f32 z, f32 radius) {
     hitbox.radius = radius;
 
     if (find_wall_collisions(&hitbox) != 0) {
-        dist[0] = hitbox.x - x;
-        dist[1] = hitbox.y - y;
-        dist[2] = hitbox.z - z;
+        dist[0] = (hitbox.x - x);
+        dist[1] = (hitbox.y - y);
+        dist[2] = (hitbox.z - z);
         return TRUE;
     } else {
         return FALSE;

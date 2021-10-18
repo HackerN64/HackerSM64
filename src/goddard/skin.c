@@ -139,7 +139,7 @@ void func_80192528(struct ObjNet *net) {
     D_801B9E34 = 0.0f;
 
     if (net->flags & 0x1) {
-        net->velocity.y += -4.0f;
+        net->velocity.y -= 4.0f;
     }
 
     net->worldPos.x += net->velocity.x / 1.0f;
