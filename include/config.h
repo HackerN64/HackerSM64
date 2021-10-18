@@ -242,6 +242,10 @@
 // Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
 // NOTE: Stil breaks occasionally, and PUPPYLIGHT_NODE doesn't work in areas that aren't area 1.
 //#define PUPPYLIGHTS
+// Uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
+// It is sideways in vanilla, and since vanilla's environment map textures are sideways too, they will appear as sideways in-game if this is enabled.
+// Make sure your custom environment map textures are the correct orientation.
+//#define FIX_REFLECT_MTX
 
 // -- AUDIO SETTINGS --
 // Fixes the castle music sometimes triggering after getting a dialog

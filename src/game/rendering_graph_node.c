@@ -223,7 +223,11 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     // changes below.
 #ifdef F3DEX_GBI_2
     Mtx lMtx;
-    guLookAtReflect(&lMtx, &lookAt, 0, 0, 0, /* eye */ 0, 0, 1, /* at */ 1, 0, 0 /* up */);
+#ifdef FIX_REFLECT_MTX
+    guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 0.0f, 1.0f, 0.0f /* up */);
+#else
+    guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 1.0f, 0.0f, 0.0f /* up */);
+#endif
 #endif
     // if (gPlayer1Controller->buttonPressed & L_TRIG)
     //     ucodeTestSwitch ^= 1;
