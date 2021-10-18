@@ -149,30 +149,31 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->numCollidedObjs = 0;
 
 #if IS_64_BIT
-    for (i = 0; i < 0x50; i++) {
+    for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
         obj->rawData.asS32[i] = 0;
         obj->ptrData.asVoidPtr[i] = NULL;
     }
 #else
-    // -O2 needs everything until = on the same line
-    for (i = 0; i < 0x50; i++) obj->rawData.asS32[i] = 0;
+    for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
+        obj->rawData.asS32[i] = 0;
+    }
 #endif
 
     obj->unused1 = 0;
     obj->bhvStackIndex = 0;
     obj->bhvDelayTimer = 0;
 
-    obj->hitboxRadius = 50.0f;
-    obj->hitboxHeight = 100.0f;
-    obj->hurtboxRadius = 0.0f;
-    obj->hurtboxHeight = 0.0f;
-    obj->hitboxDownOffset = 0.0f;
+    obj->hitboxRadius     =  50.0f;
+    obj->hitboxHeight     = 100.0f;
+    obj->hurtboxRadius    =   0.0f;
+    obj->hurtboxHeight    =   0.0f;
+    obj->hitboxDownOffset =   0.0f;
     obj->unused2 = 0;
 
-    obj->platform = NULL;
+    obj->platform      = NULL;
     obj->collisionData = NULL;
-    obj->oIntangibleTimer = -1;
-    obj->oDamageOrCoinValue = 0;
+    obj->oIntangibleTimer   = -1;
+    obj->oDamageOrCoinValue =  0;
     obj->oHealth = 2048;
 
     obj->oCollisionDistance = 1000.0f;
