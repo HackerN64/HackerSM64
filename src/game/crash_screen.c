@@ -297,10 +297,10 @@ void draw_assert(OSThread *thread) {
 
     crash_screen_print(30, 25, "ASSERT PAGE");
 
-    crash_screen_print(30, 35, "FILE: %s", __n64Assert_Filename);
-    crash_screen_print(30, 35, "LINE: %d", __n64Assert_LineNum);
-    crash_screen_print(30, 35, "MESSAGE:");
-    crash_screen_print(30, 45, __n64Assert_Message);
+    crash_screen_print(30, 35, "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
+    
+    crash_screen_print(30, 55, "MESSAGE:");
+    crash_screen_print(30, 70, " %s", __n64Assert_Message);
 
     osWritebackDCacheAll();
 }
