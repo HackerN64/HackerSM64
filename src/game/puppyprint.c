@@ -43,6 +43,7 @@ a modern game engine's developer's console.
 #include "audio/heap.h"
 #include "hud.h"
 #include "debug_box.h"
+#include "color_presets.h"
 
 #ifdef PUPPYPRINT
 
@@ -424,12 +425,12 @@ struct CPUBar {
 extern void print_fps(s32 x, s32 y);
 
 struct CPUBar cpu_ordering_table[] = {
-    { collisionTime, { 255,   0,   0 }, { "Collision: <COL_99505099>" }},
-    {     graphTime, {   0,   0, 255 }, {     "Graph: <COL_50509999>" }},
-    { behaviourTime, {   0, 255,   0 }, { "Behaviour: <COL_50995099>" }},
-    {     audioTime, { 255, 255,   0 }, {     "Audio: <COL_99995099>" }},
-    {    cameraTime, {   0, 255, 255 }, {    "Camera: <COL_50999999>" }},
-    {       dmaTime, { 255,   0, 255 }, {       "DMA: <COL_99509999>" }},
+    { collisionTime, COLOR_RGB_RED,     { "Collision: <COL_99505099>" }},
+    {     graphTime, COLOR_RGB_BLUE,    {     "Graph: <COL_50509999>" }},
+    { behaviourTime, COLOR_RGB_GREEN,   { "Behaviour: <COL_50995099>" }},
+    {     audioTime, COLOR_RGB_YELLOW,  {     "Audio: <COL_99995099>" }},
+    {    cameraTime, COLOR_RGB_CYAN,    {    "Camera: <COL_50999999>" }},
+    {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_99509999>" }},
 };
 
 #define CPU_TABLE_MAX sizeof(cpu_ordering_table)/sizeof(struct CPUBar)
