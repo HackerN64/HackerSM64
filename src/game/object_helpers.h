@@ -222,7 +222,7 @@ s32 cur_obj_progress_direction_table(void);
 void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end);
 void cur_obj_set_pos_to_home_with_debug(void);
 s32 cur_obj_is_mario_on_platform(void);
-void cur_obj_call_action_function(void (*actionFunctions[])(void));
+void cur_obj_call_action_function(ObjActionFunc actionFunctions[]);
 void spawn_base_star_with_no_lvl_exit(void);
 s32 cur_obj_mario_far_away(void);
 s32 is_mario_moving_fast_or_in_air(s32 speedThreshold);

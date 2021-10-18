@@ -105,11 +105,11 @@ void tweester_act_chase(void) {
  * action if Mario is 2500 units away or 12 seconds passed.
  */
 void tweester_act_hide(void) {
-    f32 shrinkTimer = 60.0f - o->oTimer;
+    f32 shrinkTimer = (60.0f - o->oTimer);
 
-    if (shrinkTimer >= 0.0f)
+    if (shrinkTimer >= 0.0f) {
         tweester_scale_and_move(shrinkTimer / 60.0f);
-    else {
+    } else {
         cur_obj_become_intangible();
         if (cur_obj_lateral_dist_from_mario_to_home() > 2500.0f)
             o->oAction = TWEESTER_ACT_IDLE;
@@ -119,7 +119,11 @@ void tweester_act_hide(void) {
 }
 
 // Array of Tweester action functions.
-void (*sTweesterActions[])(void) = { tweester_act_idle, tweester_act_chase, tweester_act_hide };
+ObjActionFunc sTweesterActions[] = {
+    tweester_act_idle,
+    tweester_act_chase,
+    tweester_act_hide
+};
 
 /**
  * Loop behavior for Tweester.

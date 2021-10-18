@@ -264,7 +264,7 @@ void coin_inside_boo_act_carried(void) {
     }
 }
 
-void (*sCoinInsideBooActions[])(void) = {
+ObjActionFunc sCoinInsideBooActions[] = {
     coin_inside_boo_act_carried,
     coin_inside_boo_act_dropped
 };

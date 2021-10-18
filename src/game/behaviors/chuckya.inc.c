@@ -136,7 +136,12 @@ void chuckya_act_2(void) {
     }
 }
 
-void (*sChuckyaActions[])(void) = { chuckya_act_0, chuckya_act_1, chuckya_act_2, chuckya_act_3 };
+ObjActionFunc sChuckyaActions[] = {
+    chuckya_act_0,
+    chuckya_act_1,
+    chuckya_act_2,
+    chuckya_act_3
+};
 
 void chuckya_move(void) {
     cur_obj_update_floor_and_walls();

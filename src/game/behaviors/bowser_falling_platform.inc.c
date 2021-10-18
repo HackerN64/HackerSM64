@@ -78,7 +78,7 @@ void falling_bowser_plat_act_fall(void) {
     }
 }
 
-void (*sFallingBowserPlatformActions[])(void) = {
+ObjActionFunc sFallingBowserPlatformActions[] = {
     falling_bowser_plat_act_start,
     falling_bowser_plat_act_check,
     falling_bowser_plat_act_fall,

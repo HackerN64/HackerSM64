@@ -86,6 +86,8 @@ typedef u32 MarioInteraction;
 typedef u32 InteractType;
 typedef u32 MarioStep;
 
+typedef void (*ObjActionFunc)(void);
+
 typedef s8  ObjAction8;
 typedef s32 ObjAction32;
 typedef s16 ColFlags;

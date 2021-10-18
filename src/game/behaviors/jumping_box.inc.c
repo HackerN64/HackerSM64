@@ -33,7 +33,10 @@ void jumping_box_act_1(void) {
     }
 }
 
-void (*sJumpingBoxActions[])(void) = { jumping_box_act_0, jumping_box_act_1 };
+ObjActionFunc sJumpingBoxActions[] = {
+    jumping_box_act_0,
+    jumping_box_act_1
+};
 
 void jumping_box_free_update(void) {
     cur_obj_scale(0.5f);

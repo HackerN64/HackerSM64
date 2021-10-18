@@ -66,8 +66,16 @@ void tox_box_act_0(void) {
     o->oAction = cur_obj_set_direction_table(pattern);
 }
 
-void (*sToxBoxActions[])(void) = { tox_box_act_0, tox_box_act_1, tox_box_act_2, tox_box_act_3,
-                                   tox_box_act_4, tox_box_act_5, tox_box_act_6, tox_box_act_7 };
+ObjActionFunc sToxBoxActions[] = {
+    tox_box_act_0,
+    tox_box_act_1,
+    tox_box_act_2,
+    tox_box_act_3,
+    tox_box_act_4,
+    tox_box_act_5,
+    tox_box_act_6,
+    tox_box_act_7
+};
 
 void bhv_tox_box_loop(void) {
     cur_obj_call_action_function(sToxBoxActions);

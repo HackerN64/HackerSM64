@@ -61,8 +61,12 @@ void cap_switch_act_2(void) {
 void cap_switch_act_3(void) {
 } // dead function
 
-void (*sCapSwitchActions[])(void) = { cap_switch_act_0, cap_switch_act_1,
-                                      cap_switch_act_2, cap_switch_act_3 };
+ObjActionFunc sCapSwitchActions[] = {
+    cap_switch_act_0,
+    cap_switch_act_1,
+    cap_switch_act_2,
+    cap_switch_act_3
+};
 
 void bhv_cap_switch_loop(void) {
     cur_obj_call_action_function(sCapSwitchActions);

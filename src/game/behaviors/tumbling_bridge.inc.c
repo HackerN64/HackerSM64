@@ -109,8 +109,12 @@ void tumbling_bridge_act_0(void) {
         o->oAction = 1;
 }
 
-void (*sTumblingBridgeActions[])(void) = { tumbling_bridge_act_0, tumbling_bridge_act_1,
-                                           tumbling_bridge_act_2, tumbling_bridge_act_3 };
+ObjActionFunc sTumblingBridgeActions[] = {
+    tumbling_bridge_act_0,
+    tumbling_bridge_act_1,
+    tumbling_bridge_act_2,
+    tumbling_bridge_act_3
+};
 
 void bhv_tumbling_bridge_loop(void) {
     cur_obj_call_action_function(sTumblingBridgeActions);

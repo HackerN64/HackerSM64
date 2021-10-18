@@ -433,26 +433,26 @@ void ukiki_act_go_to_cage(void) {
  * SoundState number.
  */
 struct SoundState sUkikiSoundStates[] = {
-    {1, 1, 10, SOUND_OBJ_UKIKI_STEP_DEFAULT},
-    {0, 0, 0,  NO_SOUND},
-    {0, 0, 0,  NO_SOUND},
-    {0, 0, 0,  NO_SOUND},
-    {1, 0, -1, SOUND_OBJ_UKIKI_CHATTER_SHORT},
-    {1, 0, -1, SOUND_OBJ_UKIKI_CHATTER_LONG},
-    {0, 0, 0,  NO_SOUND},
-    {0, 0, 0,  NO_SOUND},
-    {1, 0, -1, SOUND_OBJ_UKIKI_CHATTER_LONG},
-    {1, 0, -1, SOUND_OBJ_UKIKI_STEP_LEAVES},
-    {1, 0, -1, SOUND_OBJ_UKIKI_CHATTER_IDLE},
-    {0, 0, 0,  NO_SOUND},
-    {0, 0, 0,  NO_SOUND},
+    { 1, 1, 10, SOUND_OBJ_UKIKI_STEP_DEFAULT  },
+    { 0, 0,  0, NO_SOUND                      },
+    { 0, 0,  0, NO_SOUND                      },
+    { 0, 0,  0, NO_SOUND                      },
+    { 1, 0, -1, SOUND_OBJ_UKIKI_CHATTER_SHORT },
+    { 1, 0, -1, SOUND_OBJ_UKIKI_CHATTER_LONG  },
+    { 0, 0,  0, NO_SOUND                      },
+    { 0, 0,  0, NO_SOUND                      },
+    { 1, 0, -1, SOUND_OBJ_UKIKI_CHATTER_LONG  },
+    { 1, 0, -1, SOUND_OBJ_UKIKI_STEP_LEAVES   },
+    { 1, 0, -1, SOUND_OBJ_UKIKI_CHATTER_IDLE  },
+    { 0, 0,  0, NO_SOUND                      },
+    { 0, 0,  0, NO_SOUND                      },
 };
 
 /**
  * An array of each of Ukiki's actions. A function is called
  * every frame.
  */
-void (*sUkikiActions[])(void) = {
+ObjActionFunc sUkikiActions[] = {
     ukiki_act_idle,
     ukiki_act_run,
     ukiki_act_turn_to_mario,

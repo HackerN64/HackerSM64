@@ -103,9 +103,11 @@ void tuxies_mother_act_idle(void) {
     }
 }
 
-void (*sTuxiesMotherActions[])(void) = { tuxies_mother_act_idle,
-                                         tuxies_mother_act_receiving_baby,
-                                         tuxies_mother_act_received_baby };
+ObjActionFunc sTuxiesMotherActions[] = {
+    tuxies_mother_act_idle,
+    tuxies_mother_act_receiving_baby,
+    tuxies_mother_act_received_baby
+};
 
 void bhv_tuxies_mother_loop(void) {
     o->activeFlags |= ACTIVE_FLAG_IGNORE_ENV_BOXES;
@@ -216,7 +218,7 @@ void small_penguin_act_near_mother(void) {
     small_penguin_dive_with_mario();
 }
 
-void (*sSmallPenguinActions[])(void) = {
+ObjActionFunc sSmallPenguinActions[] = {
     small_penguin_act_walking,
     small_penguin_act_walking_toward_mario,
     small_penguin_act_walking_away_from_mario,

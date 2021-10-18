@@ -1821,8 +1821,8 @@ s32 cur_obj_shake_y_until(s32 cycles, s32 amount) {
     return (o->oTimer == cycles * 2);
 }
 
-void cur_obj_call_action_function(void (*actionFunctions[])(void)) {
-    void (*actionFunction)(void) = actionFunctions[o->oAction];
+void cur_obj_call_action_function(ObjActionFunc actionFunctions[]) {
+    ObjActionFunc actionFunction = actionFunctions[o->oAction];
     actionFunction();
 }
 

@@ -36,7 +36,7 @@ void mr_i_piranha_particle_act_interacted(void) {
     }
 }
 
-void (*sMrIParticleActions[])(void) = {
+ObjActionFunc sMrIParticleActions[] = {
     mr_i_piranha_particle_act_move,
     mr_i_piranha_particle_act_interacted
 };
@@ -239,7 +239,7 @@ void mr_i_body_act_far_away(void) {
     }
 }
 
-void (*sMrIBodyActions[])(void) = {
+ObjActionFunc sMrIBodyActions[] = {
     mr_i_body_act_far_away,
     mr_i_body_act_idle,
     mr_i_body_act_looking_at_mario,

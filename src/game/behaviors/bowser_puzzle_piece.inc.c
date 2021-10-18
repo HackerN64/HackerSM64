@@ -241,10 +241,13 @@ void bhv_lll_bowser_puzzle_piece_move_down(void) {
     bhv_lll_bowser_puzzle_piece_move(0.0f, 120.0f, 4, 3);
 }
 
-void (*sBowserPuzzlePieceActions[])(void) = {
-    bhv_lll_bowser_puzzle_piece_action_0,   bhv_lll_bowser_puzzle_piece_action_1,
-    bhv_lll_bowser_puzzle_piece_idle,       bhv_lll_bowser_puzzle_piece_move_left,
-    bhv_lll_bowser_puzzle_piece_move_right, bhv_lll_bowser_puzzle_piece_move_up,
+ObjActionFunc sBowserPuzzlePieceActions[] = {
+    bhv_lll_bowser_puzzle_piece_action_0,
+    bhv_lll_bowser_puzzle_piece_action_1,
+    bhv_lll_bowser_puzzle_piece_idle,
+    bhv_lll_bowser_puzzle_piece_move_left,
+    bhv_lll_bowser_puzzle_piece_move_right,
+    bhv_lll_bowser_puzzle_piece_move_up,
     bhv_lll_bowser_puzzle_piece_move_down
 };
 
@@ -253,7 +256,5 @@ void bhv_lll_bowser_puzzle_piece_loop(void) {
 
     cur_obj_call_action_function(sBowserPuzzlePieceActions);
 
-    o->oPosX = o->oBowserPuzzlePieceOffsetX + o->oHomeX;
-    o->oPosY = o->oBowserPuzzlePieceOffsetY + o->oHomeY;
-    o->oPosZ = o->oBowserPuzzlePieceOffsetZ + o->oHomeZ;
+    vec3_sum(&o->oPosVec, &o->oBowserPuzzlePieceOffsetVec, &o->oHomeVec);
 }

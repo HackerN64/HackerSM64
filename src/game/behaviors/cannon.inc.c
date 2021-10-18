@@ -97,9 +97,15 @@ void opened_cannon_act_3(void) {
     }
 }
 
-void (*sOpenedCannonActions[])(void) = { opened_cannon_act_0, opened_cannon_act_1, opened_cannon_act_2,
-                                         opened_cannon_act_3, opened_cannon_act_4, opened_cannon_act_5,
-                                         opened_cannon_act_6 };
+ObjActionFunc sOpenedCannonActions[] = {
+    opened_cannon_act_0,
+    opened_cannon_act_1,
+    opened_cannon_act_2,
+    opened_cannon_act_3,
+    opened_cannon_act_4,
+    opened_cannon_act_5,
+    opened_cannon_act_6
+};
 
 void bhv_cannon_base_loop(void) {
     cur_obj_call_action_function(sOpenedCannonActions);

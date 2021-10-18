@@ -51,7 +51,7 @@ void bowser_tail_anchor_act_touched_mario(void) {
     cur_obj_become_intangible();
 }
 
-void (*sBowserTailAnchorActions[])(void) = {
+ObjActionFunc sBowserTailAnchorActions[] = {
     bowser_tail_anchor_act_default,
     bowser_tail_anchor_thrown,
     bowser_tail_anchor_act_touched_mario,
@@ -1413,7 +1413,7 @@ struct PlatformDisplacementInfo sBowserDisplacementInfo;
 /**
  * Set Bowser's actions
  */
-void (*sBowserActions[])(void) = {
+ObjActionFunc sBowserActions[] = {
     bowser_act_default,
     bowser_act_thrown,
     bowser_act_jump_onto_stage,

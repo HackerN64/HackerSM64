@@ -106,8 +106,13 @@ void bhv_elevator_init(void) {
     }
 }
 
-void (*sElevatorActions[])(void) = { elevator_act_0, elevator_act_1, elevator_act_2, elevator_act_3,
-                                     elevator_act_4 };
+ObjActionFunc sElevatorActions[] = {
+    elevator_act_0,
+    elevator_act_1,
+    elevator_act_2,
+    elevator_act_3,
+    elevator_act_4
+};
 
 void bhv_elevator_loop(void) {
     cur_obj_call_action_function(sElevatorActions);

@@ -51,10 +51,12 @@ void fire_bar_act_remove_flames(void) {
     o->oAction = LLL_FIRE_BAR_ACT_INACTIVE;
 }
 
-void (*sRotatingCwFireBarsActions[])(void) = { fire_bar_act_inactive,
-                                               fire_bar_act_spawn_flames,
-                                               fire_bar_act_active,
-                                               fire_bar_act_remove_flames };
+ObjActionFunc sRotatingCwFireBarsActions[] = {
+    fire_bar_act_inactive,
+    fire_bar_act_spawn_flames,
+    fire_bar_act_active,
+    fire_bar_act_remove_flames
+};
 
 void bhv_lll_rotating_block_fire_bars_loop(void) {
     cur_obj_call_action_function(sRotatingCwFireBarsActions);

@@ -454,7 +454,7 @@ static void boo_act_4(void) {
     }
 }
 
-static void (*sBooActions[])(void) = {
+static ObjActionFunc sBooActions[] = {
     boo_act_0,
     boo_act_1,
     boo_act_2,
@@ -629,7 +629,7 @@ static void big_boo_act_4(void) {
     }
 }
 
-static void (*sBooGivingStarActions[])(void) = {
+static ObjActionFunc sBooGivingStarActions[] = {
     big_boo_act_0,
     big_boo_act_1,
     big_boo_act_2,
@@ -710,7 +710,7 @@ void bhv_boo_with_cage_init(void) {
     }
 }
 
-static void (*sBooWithCageActions[])(void) = {
+static ObjActionFunc sBooWithCageActions[] = {
     boo_with_cage_act_0,
     boo_with_cage_act_1,
     boo_with_cage_act_2,

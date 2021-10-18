@@ -292,7 +292,7 @@ void piranha_plant_act_stopped_biting(void) {
 /**
  * Table of functions corresponding to the actions the Piranha Plant can take.
  */
-void (*TablePiranhaPlantActions[])(void) = {
+ObjActionFunc TablePiranhaPlantActions[] = {
     piranha_plant_act_idle,            // PIRANHA_PLANT_ACT_IDLE,
     piranha_plant_act_sleeping,        // PIRANHA_PLANT_ACT_SLEEPING,
     piranha_plant_act_biting,          // PIRANHA_PLANT_ACT_BITING,

@@ -150,7 +150,7 @@ void exclamation_box_act_wait_for_respawn(void) {
     }
 }
 
-void (*sExclamationBoxActions[])(void) = {
+ObjActionFunc sExclamationBoxActions[] = {
     exclamation_box_act_init,
     exclamation_box_act_outline,
     exclamation_box_act_active,

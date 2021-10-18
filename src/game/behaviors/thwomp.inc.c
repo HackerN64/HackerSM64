@@ -47,7 +47,7 @@ void grindel_thwomp_act_rising(void) {
     }
 }
 
-void (*sGrindelThwompActions[])(void) = {
+ObjActionFunc sGrindelThwompActions[] = {
     grindel_thwomp_act_rising,
     grindel_thwomp_act_floating,
     grindel_thwomp_act_falling,
