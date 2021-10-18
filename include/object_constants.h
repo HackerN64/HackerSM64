@@ -1399,7 +1399,6 @@ enum CoinTypes { // coinType
 
 /* Wooden post */
     /* oBehParams */
-    #define WOODEN_POST_BP_NO_COINS_MASK                    BPARAM3
 
 /* Wiggler */
     /* oAction */
