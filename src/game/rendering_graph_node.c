@@ -406,10 +406,11 @@ void geo_process_master_list(struct GraphNodeMasterList *node) {
 void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node) {
     if (node->node.children != NULL) {
         Mtx *mtx   = alloc_display_list(sizeof(*mtx));
-        f32 left   = (((gCurGraphNodeRoot->x - gCurGraphNodeRoot->width ) / 2.0f) * node->scale);
-        f32 right  = (((gCurGraphNodeRoot->x + gCurGraphNodeRoot->width ) / 2.0f) * node->scale);
-        f32 top    = (((gCurGraphNodeRoot->y - gCurGraphNodeRoot->height) / 2.0f) * node->scale);
-        f32 bottom = (((gCurGraphNodeRoot->y + gCurGraphNodeRoot->height) / 2.0f) * node->scale);
+        f32 scale = (node->scale / 2.0f);
+        f32 left   = ((gCurGraphNodeRoot->x - gCurGraphNodeRoot->width ) * scale);
+        f32 right  = ((gCurGraphNodeRoot->x + gCurGraphNodeRoot->width ) * scale);
+        f32 top    = ((gCurGraphNodeRoot->y - gCurGraphNodeRoot->height) * scale);
+        f32 bottom = ((gCurGraphNodeRoot->y + gCurGraphNodeRoot->height) * scale);
 
         guOrtho(mtx, left, right, bottom, top, -2.0f, 2.0f, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
@@ -649,7 +650,7 @@ void geo_process_background(struct GraphNodeBackground *node) {
         gDPSetCycleType(gfx++, G_CYC_FILL);
         gDPSetFillColor(gfx++, node->background);
         gDPFillRectangle(gfx++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
-        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - gBorderHeight - 1);
+                         (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), ((SCREEN_HEIGHT - gBorderHeight) - 1));
         gDPPipeSync(gfx++);
         gDPSetCycleType(gfx++, G_CYC_1CYCLE);
         gSPEndDisplayList(gfx++);

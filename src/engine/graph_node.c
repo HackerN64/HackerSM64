@@ -50,9 +50,7 @@ struct GraphNodeRoot *init_graph_node_root(struct AllocOnlyPool *pool, struct Gr
 /**
  * Allocates and returns a newly created otrhographic projection node
  */
-struct GraphNodeOrthoProjection *
-init_graph_node_ortho_projection(struct AllocOnlyPool *pool, struct GraphNodeOrthoProjection *graphNode,
-                                 f32 scale) {
+struct GraphNodeOrthoProjection * init_graph_node_ortho_projection(struct AllocOnlyPool *pool, struct GraphNodeOrthoProjection *graphNode, f32 scale) {
     if (pool != NULL) {
         graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeOrthoProjection));
     }

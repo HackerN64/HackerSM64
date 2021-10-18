@@ -310,43 +310,41 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
     gWarpTransition.pauseRendering = FALSE;
 
     // The lowest bit of transType determines if the transition is fading in or out.
-    if (transType & 1) {
+    if (transType & WARP_TRANSITION_FADE_INTO) {
         set_warp_transition_rgb(red, green, blue);
     } else {
         red = gWarpTransRed, green = gWarpTransGreen, blue = gWarpTransBlue;
     }
 
     if (transType < 8) { // if transition is RGB
-        gWarpTransition.data.red = red;
+        gWarpTransition.data.red   = red;
         gWarpTransition.data.green = green;
-        gWarpTransition.data.blue = blue;
+        gWarpTransition.data.blue  = blue;
     } else { // if transition is textured
-        gWarpTransition.data.red = red;
+        gWarpTransition.data.red   = red;
         gWarpTransition.data.green = green;
-        gWarpTransition.data.blue = blue;
+        gWarpTransition.data.blue  = blue;
 
         // Both the start and end textured transition are always located in the middle of the screen.
         // If you really wanted to, you could place the start at one corner and the end at
         // the opposite corner. This will make the transition image look like it is moving
         // across the screen.
-        gWarpTransition.data.startTexX = SCREEN_WIDTH / 2;
-        gWarpTransition.data.startTexY = SCREEN_HEIGHT / 2;
-        gWarpTransition.data.endTexX = SCREEN_WIDTH / 2;
-        gWarpTransition.data.endTexY = SCREEN_HEIGHT / 2;
+        gWarpTransition.data.startTexX = SCREEN_CENTER_X;
+        gWarpTransition.data.startTexY = SCREEN_CENTER_Y;
+        gWarpTransition.data.endTexX   = SCREEN_CENTER_X;
+        gWarpTransition.data.endTexY   = SCREEN_CENTER_Y;
 
         gWarpTransition.data.texTimer = 0;
 
-        if (transType & 1) // Is the image fading in?
-        {
+        if (transType & WARP_TRANSITION_FADE_INTO) { // Is the image fading in?
             gWarpTransition.data.startTexRadius = GFX_DIMENSIONS_FULL_RADIUS;
-            if (transType >= 0x0F) {
+            if (transType >= WARP_TRANSITION_FADES_INTO_LARGE) {
                 gWarpTransition.data.endTexRadius = 16;
             } else {
                 gWarpTransition.data.endTexRadius = 0;
             }
-        } else // The image is fading out. (Reverses start & end circles)
-        {
-            if (transType >= 0x0E) {
+        } else { // The image is fading out. (Reverses start & end circles)
+            if (transType >= WARP_TRANSITION_FADES_FROM_LARGE) {
                 gWarpTransition.data.startTexRadius = 16;
             } else {
                 gWarpTransition.data.startTexRadius = 0;
@@ -397,16 +395,15 @@ void render_game(void) {
 
         if (gViewportClip != NULL) {
             make_viewport_clip_rect(gViewportClip);
-        } else
+        } else {
             gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
-                          SCREEN_HEIGHT - gBorderHeight);
-
+                          (SCREEN_HEIGHT - gBorderHeight));
+        }
         if (gWarpTransition.isActive) {
             if (gWarpTransDelay == 0) {
-                gWarpTransition.isActive = !render_screen_transition(0, gWarpTransition.type, gWarpTransition.time,
-                                                                     &gWarpTransition.data);
+                gWarpTransition.isActive = !render_screen_transition(0, gWarpTransition.type, gWarpTransition.time, &gWarpTransition.data);
                 if (!gWarpTransition.isActive) {
-                    if (gWarpTransition.type & 1) {
+                    if (gWarpTransition.type & WARP_TRANSITION_FADE_INTO) {
                         gWarpTransition.pauseRendering = TRUE;
                     } else {
                         set_warp_transition_rgb(0, 0, 0);
@@ -426,7 +423,7 @@ void render_game(void) {
     }
 
     gViewportOverride = NULL;
-    gViewportClip = NULL;
+    gViewportClip     = NULL;
 #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);
     graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
