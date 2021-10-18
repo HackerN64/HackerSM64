@@ -55,8 +55,8 @@ void stub_mario_step_2(void) {
 }
 
 void transfer_bully_speed(struct BullyCollisionData *obj1, struct BullyCollisionData *obj2) {
-    f32 rx = obj2->posX - obj1->posX;
-    f32 rz = obj2->posZ - obj1->posZ;
+    f32 rx = (obj2->posX - obj1->posX);
+    f32 rz = (obj2->posZ - obj1->posZ);
 
     //! Bully NaN crash
     f32 rzx = (sqr(rx) + sqr(rz));

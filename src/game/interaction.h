@@ -84,8 +84,9 @@ enum AttackType
 
 #define INT_STATUS_ATTACK_MASK                       0x000000FF
 
-// Mario Interaction Status
 #define INT_STATUS_NONE                  (0 <<  0) /* 0x00000000 */
+
+// Mario Interaction Status
 #define INT_STATUS_MARIO_STUNNED         (1 <<  0) /* 0x00000001 */
 #define INT_STATUS_MARIO_KNOCKBACK_DMG   (1 <<  1) /* 0x00000002 */
 #define INT_STATUS_MARIO_THROWN_BY_OBJ   (1 <<  2) /* 0x00000004 */

@@ -6690,7 +6690,7 @@ void cutscene_grand_star_fly_start(struct Camera *c) {
     //! cvar6 is unused in grand star
     vec3f_set(sCutsceneVars[6].point, 0.01f, 0.01f, 0.01f);
     vec3f_set(sCutsceneVars[4].point, 0.f, 0.f, 0.f);
-    vec3f_set(sCutsceneVars[5].point, 0.f, c->focus[1] - sMarioCamState->pos[1], 0.f);
+    vec3f_set(sCutsceneVars[5].point, 0.f, (c->focus[1] - sMarioCamState->pos[1]), 0.f);
     sCutsceneVars[8].point[2] = 0.f;
     sCutsceneVars[8].point[0] = 0.f;
 }

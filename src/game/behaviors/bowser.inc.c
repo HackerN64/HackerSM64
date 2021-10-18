@@ -678,10 +678,8 @@ s32 bowser_land(void) {
  * Makes Bowser do a second hop speed only in BITS
  */
 void bowser_short_second_hop(void) {
-    if (o->oBehParams2ndByte == BOWSER_BP_BITS && o->oBowserStatus & BOWSER_STATUS_BIG_JUMP) {
-        if (o->oBowserDistToCentre > 1000.0f) {
-            o->oForwardVel = 60.0f;
-        }
+    if ((o->oBehParams2ndByte == BOWSER_BP_BITS) && (o->oBowserStatus & BOWSER_STATUS_BIG_JUMP) && (o->oBowserDistToCentre > 1000.0f)) {
+        o->oForwardVel = 60.0f;
     }
 }
 

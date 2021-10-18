@@ -30,7 +30,7 @@ void update_mario_platform(void) {
         gMarioPlatform = floorObj;
         gMarioObject->platform = floorObj;
     } else {
-        gMarioPlatform = NULL;
+        gMarioPlatform         = NULL;
         gMarioObject->platform = NULL;
     }
 }
@@ -147,9 +147,7 @@ static void apply_mario_inertia(void) {
  * Apply platform displacement or inertia if required.
  */
 void apply_mario_platform_displacement(void) {
-    struct Object *platform;
-
-    platform = gMarioPlatform;
+    struct Object *platform = gMarioPlatform;
     if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL) {
         if (platform != NULL) {
             apply_platform_displacement(&sMarioDisplacementInfo, gMarioState->pos, &gMarioState->faceAngle[1], platform);

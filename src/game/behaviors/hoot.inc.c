@@ -1,34 +1,32 @@
 // hoot.c.inc
 
 void bhv_hoot_init(void) {
-    cur_obj_init_animation(0);
-
-    o->oHomeX = (o->oPosX + 800.0f);
-    o->oHomeY = (o->oPosY - 150.0f);
-    o->oHomeZ = (o->oPosZ + 300.0f);
+    cur_obj_init_animation(HOOT_ANIM_DEFAULT);
+    Vec3f homeOffset = { 800.0f, -150.0f, 300.0f };
+    vec3_sum(&o->oHomeVec, &o->oPosVec, homeOffset);
     o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
 
     cur_obj_become_intangible();
 }
 
 f32 hoot_find_next_floor(f32 dist) {
-    f32 nextX = (dist * sins(o->oMoveAngleYaw)) + o->oPosX;
-    f32 nextZ = (dist * coss(o->oMoveAngleYaw)) + o->oPosZ;
+    f32 nextX = ((dist * sins(o->oMoveAngleYaw)) + o->oPosX);
+    f32 nextZ = ((dist * coss(o->oMoveAngleYaw)) + o->oPosZ);
     return find_floor_height(nextX, CELL_HEIGHT_LIMIT, nextZ);
 }
 
 void hoot_floor_bounce(void) {
     f32 floorY = hoot_find_next_floor(375.0f);
-    if (floorY + 75.0f > o->oPosY) {
+    if ((floorY + 75.0f) > o->oPosY) {
         o->oMoveAnglePitch -= DEGREES(20);
     }
     floorY = hoot_find_next_floor(200.0f);
-    if (floorY + 125.0f > o->oPosY) {
+    if ((floorY + 125.0f) > o->oPosY) {
         o->oMoveAnglePitch -= DEGREES(40);
     }
     floorY = hoot_find_next_floor(0.0f);
-    if (floorY + 125.0f > o->oPosY) {
-        o->oPosY = floorY + 125.0f;
+    if ((floorY + 125.0f) > o->oPosY) {
+        o->oPosY = (floorY + 125.0f);
     }
     if (o->oMoveAnglePitch < -DEGREES(120)) {
         o->oMoveAnglePitch = -DEGREES(120);
@@ -43,16 +41,16 @@ void hoot_free_step(s16 fastOscY, s32 speed) {
     f32 xPrev = o->oPosX;
     f32 zPrev = o->oPosZ;
 
-    o->oVelY   = sins(pitch) * speed;
-    f32 hSpeed = coss(pitch) * speed;
-    o->oVelX   = sins(yaw) * hSpeed;
-    o->oVelZ   = coss(yaw) * hSpeed;
+    o->oVelY   = (sins(pitch) * speed);
+    f32 hSpeed = (coss(pitch) * speed);
+    o->oVelX   = (sins(yaw) * hSpeed);
+    o->oVelZ   = (coss(yaw) * hSpeed);
 
     o->oPosX += o->oVelX;
     if (fastOscY == 0) {
-        o->oPosY -= o->oVelY + coss((s32)(animFrame * 3276.8f)) * 50.0f / 4;
+        o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 3276.8f)) * 12.5)); // 50.0f / 4;
     } else {
-        o->oPosY -= o->oVelY + coss((s32)(animFrame * 6553.6f)) * 50.0f / 4;
+        o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5)); // 50.0f / 4;
     }
     o->oPosZ += o->oVelZ;
 
@@ -62,8 +60,9 @@ void hoot_free_step(s16 fastOscY, s32 speed) {
         o->oPosZ = zPrev;
     }
 
-    if (animFrame == 0)
+    if (animFrame == 0) {
         cur_obj_play_sound_2(SOUND_GENERAL_WING_FLAP);
+    }
 }
 
 void hoot_player_set_yaw(void) {
@@ -83,15 +82,14 @@ void hoot_carry_step(s32 speed, UNUSED f32 xPrev, UNUSED f32 zPrev) {
     s16 yaw = o->oMoveAngleYaw;
     s16 pitch = o->oMoveAnglePitch;
     s16 animFrame = o->header.gfx.animInfo.animFrame;
-    f32 hSpeed;
 
-    o->oVelY = sins(pitch) * speed;
-    hSpeed = coss(pitch) * speed;
-    o->oVelX = sins(yaw) * hSpeed;
-    o->oVelZ = coss(yaw) * hSpeed;
+    o->oVelY   = (sins(pitch) * speed);
+    f32 hSpeed = (coss(pitch) * speed);
+    o->oVelX   = (sins(yaw) * hSpeed);
+    o->oVelZ   = (coss(yaw) * hSpeed);
 
     o->oPosX += o->oVelX;
-    o->oPosY -= o->oVelY + coss((s32)(animFrame * 6553.6f)) * 50.0f / 4;
+    o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5)); // 50.0f / 4;
     o->oPosZ += o->oVelZ;
 
     if (animFrame == 0)
@@ -122,12 +120,11 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
         return;
     }
 
-    if (ABSF(o->oPosX) > 8000.0f)
-        o->oPosX = xPrev;
-    if (ABSF(o->oPosZ) > 8000.0f)
-        o->oPosZ = zPrev;
-    if (floorY + 125.0f > o->oPosY)
-        o->oPosY = floorY + 125.0f;
+    if (ABSF(o->oPosX) > 8000.0f) o->oPosX = xPrev;
+    if (ABSF(o->oPosZ) > 8000.0f) o->oPosZ = zPrev;
+    if ((floorY + 125.0f) > o->oPosY) {
+        o->oPosY = (floorY + 125.0f);
+    }
 }
 
 void hoot_act_ascent(f32 xPrev, f32 zPrev) {
@@ -180,12 +177,13 @@ void hoot_action_loop(void) {
         case HOOT_ACT_TIRED:
             hoot_player_set_yaw();
 
-            o->oMoveAnglePitch = 0;
+            o->oMoveAnglePitch = 0x0;
 
             hoot_carry_step(20, xPrev, zPrev);
 
-            if (o->oTimer >= 61)
+            if (o->oTimer >= 61) {
                 gMarioObject->oInteractStatus |= INT_STATUS_MARIO_DROP_FROM_HOOT; /* bit 7 */
+            }
             break;
     }
 
@@ -202,16 +200,16 @@ void hoot_turn_to_home(void) {
 void hoot_awake_loop(void) {
     if (o->oInteractStatus == TRUE) { //! Note: Not a flag, treated as a TRUE/FALSE statement
         hoot_action_loop();
-        cur_obj_init_animation(1);
+        cur_obj_init_animation(HOOT_ANIM_HOLDING_MARIO);
     } else {
-        cur_obj_init_animation(0);
+        cur_obj_init_animation(HOOT_ANIM_DEFAULT);
 
         hoot_turn_to_home();
         hoot_floor_bounce();
         hoot_free_step(0, 10);
 
         o->oAction = 0;
-        o->oTimer = 0;
+        o->oTimer  = 0;
     }
 
     set_object_visibility(o, 2000);
