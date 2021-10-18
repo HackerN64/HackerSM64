@@ -12,8 +12,16 @@ struct ObjectHitbox sYellowCoinHitbox = {
     /* hurtboxHeight:     */   0,
 };
 
-s16 sCoinArrowPositions[][2] = { {   0, -150 }, {    0, -50 }, {  0,  50 }, {   0, 150 },
-                                 { -50,  100 }, { -100,  50 }, { 50, 100 }, { 100,  50 } };
+s16 sCoinArrowPositions[][2] = {
+    {     0, -150 },
+    {    0,   -50 },
+    {    0,    50 },
+    {    0,   150 },
+    {  -50,   100 },
+    { -100,    50 },
+    {   50,   100 },
+    {  100,    50 }
+};
 
 s32 bhv_coin_sparkles_init(void) {
     if (o->oInteractStatus & INT_STATUS_INTERACTED && !(o->oInteractStatus & INT_STATUS_TOUCHED_BOB_OMB)) {
@@ -159,7 +167,7 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
             break;
         case COIN_FORMATION_BP_SHAPE_VERTICAL_LINE:
             snapToGround = FALSE;
-            pos[1] = (160 * index * 0.8f); // 128 * index
+            pos[1] = (index << 7);
             if (index > 4) spawnCoin = FALSE;
             break;
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING:
@@ -168,8 +176,8 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
             break;
         case COIN_FORMATION_BP_SHAPE_VERTICAL_RING:
             snapToGround = FALSE;
-            pos[0] = (coss(index << 13) * 200.0f);
-            pos[1] = (sins(index << 13) * 200.0f) + 200.0f;
+            pos[0] =  (coss(index << 13) * 200.0f);
+            pos[1] = ((sins(index << 13) * 200.0f) + 200.0f);
             break;
         case COIN_FORMATION_BP_SHAPE_ARROW:
             pos[0] = sCoinArrowPositions[index][0];
@@ -184,7 +192,7 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
 }
 
 void bhv_coin_formation_init(void) {
-    o->oCoinRespawnBits = ((o->oBehParams >> 8) & RESPAWN_INFO_DONT_RESPAWN);
+    o->oCoinRespawnBits = GET_BPARAM3(o->oBehParams);
 }
 
 void bhv_coin_formation_loop(void) {
@@ -214,7 +222,7 @@ void bhv_coin_formation_loop(void) {
     set_object_respawn_info_bits(o, (o->oCoinRespawnBits & RESPAWN_INFO_DONT_RESPAWN));
 }
 
-void coin_inside_boo_act_1(void) {
+void coin_inside_boo_act_dropped(void) {
     cur_obj_update_floor_and_walls();
     cur_obj_if_hit_wall_bounce_away();
     if (o->oMoveFlags & OBJ_MOVE_BOUNCE) {
@@ -235,7 +243,7 @@ void coin_inside_boo_act_1(void) {
     }
 }
 
-void coin_inside_boo_act_0(void) {
+void coin_inside_boo_act_carried(void) {
     struct Object *parent = o->parentObj;
     cur_obj_become_intangible();
 #ifdef DISABLE_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
@@ -256,7 +264,10 @@ void coin_inside_boo_act_0(void) {
     }
 }
 
-void (*sCoinInsideBooActions[])(void) = { coin_inside_boo_act_0, coin_inside_boo_act_1 };
+void (*sCoinInsideBooActions[])(void) = {
+    coin_inside_boo_act_carried,
+    coin_inside_boo_act_dropped
+};
 
 void bhv_coin_inside_boo_loop(void) {
     cur_obj_call_action_function(sCoinInsideBooActions);

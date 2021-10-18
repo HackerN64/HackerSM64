@@ -418,8 +418,7 @@ struct Object *spawn_object_relative(s16 behaviorParam, s16 relativePosX, s16 re
     obj_build_relative_transform(obj);
 
     obj->oBehParams2ndByte = behaviorParam;
-    obj->oBehParams = (behaviorParam & 0xFF) << 16;
-
+    SET_BPARAM2(obj->oBehParams, behaviorParam);
     return obj;
 }
 

@@ -17,12 +17,12 @@ void bhv_snowmans_bottom_init(void) {
 
     vec3_copy(&o->oHomeVec, &o->oPosVec);
 
-    o->oGravity = 10.0f;
-    o->oFriction = 0.999f;
-    o->oBuoyancy = 2.0f;
+    o->oGravity  = 10.0f;
+    o->oFriction =  0.999f;
+    o->oBuoyancy =  2.0f;
 
-    o->oVelY = 0;
-    o->oForwardVel = 0;
+    o->oVelY       = 0.0f;
+    o->oForwardVel = 0.0f;
     o->oSnowmansBottomRollingFacePitch = 0.4f;
 
     headObj = cur_obj_nearest_object_with_behavior(bhvSnowmansHead);
@@ -150,15 +150,15 @@ void bhv_snowmans_bottom_loop(void) {
 
 void bhv_snowmans_head_init(void) {
     u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
-    s8 behParams = (o->oBehParams >> 24) & 0xFF;
+    s8 behParams = GET_BPARAM1(o->oBehParams);
 
     cur_obj_scale(0.7f);
 
-    o->oGravity = 5.0f;
+    o->oGravity  = 5.0f;
     o->oFriction = 0.999f;
     o->oBuoyancy = 2.0f;
 
-    if ((starFlags & (1 << behParams)) && gCurrActNum != behParams + 1) {
+    if ((starFlags & (1 << behParams)) && gCurrActNum != (behParams + 1)) {
         spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole, -4230, -1344, 1813, 0, 0, 0);
         vec3_set(&o->oPosVec, -4230.0f, -994.0f, 1813.0f);
         o->oAction = 1;

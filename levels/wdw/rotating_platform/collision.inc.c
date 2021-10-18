@@ -1,5 +1,5 @@
 // 0x070186B4 - 0x07018726
-const Collision wdw_seg7_collision_070186B4[] = {
+const Collision wdw_seg7_collision_rotating_platform[] = {
     COL_INIT(),
     COL_VERTEX_INIT(0x7),
     COL_VERTEX(0, 0, 0),

@@ -135,20 +135,34 @@ enum DialogState {
 #define BPARAM3_MASK (BPARAM_MASK << (BPARAM_SIZE * 1)) // 0x0000FF00
 #define BPARAM4_MASK (BPARAM_MASK << (BPARAM_SIZE * 0)) // 0x000000FF
 
-#define GET_BPARAM1(p) (((p) & BPARAM1_MASK) >> (BPARAM_SIZE * 3)) // (((p) >> (BPARAM_SIZE * 3)) & BPARAM_MASK)
-#define GET_BPARAM2(p) (((p) & BPARAM2_MASK) >> (BPARAM_SIZE * 2)) // (((p) >> (BPARAM_SIZE * 2)) & BPARAM_MASK)
-#define GET_BPARAM3(p) (((p) & BPARAM3_MASK) >> (BPARAM_SIZE * 1)) // (((p) >> (BPARAM_SIZE * 1)) & BPARAM_MASK)
-#define GET_BPARAM4(p) (((p) & BPARAM4_MASK) >> (BPARAM_SIZE * 0)) // (((p) >> (BPARAM_SIZE * 0)) & BPARAM_MASK)
+// Convert oBehParams to a bparam
+#define OBEHPARAMS_TO_BPARAM(p, shift) (((p) >> (BPARAM_SIZE * (shift))) & BPARAM_MASK)
 
-// Read two bparams as a single value:
+// Read a bparam from oBehParams
+#define GET_BPARAM1(p) OBEHPARAMS_TO_BPARAM((p), 3)
+#define GET_BPARAM2(p) OBEHPARAMS_TO_BPARAM((p), 2)
+#define GET_BPARAM3(p) OBEHPARAMS_TO_BPARAM((p), 1)
+#define GET_BPARAM4(p) OBEHPARAMS_TO_BPARAM((p), 0)
+
+// Read two bparams as a single value from oBehParams
 #define GET_BPARAM12(p) (((p) & (BPARAM1_MASK | BPARAM2_MASK)) >> (BPARAM_SIZE * 2))
 #define GET_BPARAM23(p) (((p) & (BPARAM2_MASK | BPARAM3_MASK)) >> (BPARAM_SIZE * 1))
 #define GET_BPARAM34(p) (((p) & (BPARAM3_MASK | BPARAM4_MASK)) >> (BPARAM_SIZE * 0))
 
-#define SET_BPARAM1(p, val) (p) |= (val << (BPARAM_SIZE * 3))
-#define SET_BPARAM2(p, val) (p) |= (val << (BPARAM_SIZE * 2))
-#define SET_BPARAM3(p, val) (p) |= (val << (BPARAM_SIZE * 1))
-#define SET_BPARAM4(p, val) (p) |= (val << (BPARAM_SIZE * 0))
+// Convert a u8 bparam to oBehParams
+#define BPARAM_TO_OBEHPARAMS(val, shift) (((val) & BPARAM_MASK) << (BPARAM_SIZE * (shift)))
+
+// Set oBehParams
+#define SET_BPARAM1(p, val) (p) = BPARAM_TO_OBEHPARAMS((val), 3)
+#define SET_BPARAM2(p, val) (p) = BPARAM_TO_OBEHPARAMS((val), 2)
+#define SET_BPARAM3(p, val) (p) = BPARAM_TO_OBEHPARAMS((val), 1)
+#define SET_BPARAM4(p, val) (p) = BPARAM_TO_OBEHPARAMS((val), 0)
+
+// OR oBehParams
+#define OR_BPARAM1(p, val) (p) |= BPARAM_TO_OBEHPARAMS((val), 3)
+#define OR_BPARAM2(p, val) (p) |= BPARAM_TO_OBEHPARAMS((val), 2)
+#define OR_BPARAM3(p, val) (p) |= BPARAM_TO_OBEHPARAMS((val), 1)
+#define OR_BPARAM4(p, val) (p) |= BPARAM_TO_OBEHPARAMS((val), 0)
 
 /* oBehParams2ndByte */
 enum ObjGeneralBehParams {

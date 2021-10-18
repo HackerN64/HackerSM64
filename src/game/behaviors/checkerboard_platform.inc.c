@@ -6,27 +6,27 @@ struct CheckerBoardPlatformInitPosition {
     f32 radius;
 };
 
-struct CheckerBoardPlatformInitPosition sCheckerBoardPlatformInitPositions[] = { { 145, { 0.7f, 1.5f, 0.7f }, 7.0f },
-                                                                                 { 235, { 1.2f, 2.0f, 1.2f }, 11.6f } };
+struct CheckerBoardPlatformInitPosition sCheckerBoardPlatformInitPositions[] = {
+    { 145, { 0.7f, 1.5f, 0.7f },  7.0f },
+    { 235, { 1.2f, 2.0f, 1.2f }, 11.6f }
+};
 
 void bhv_checkerboard_elevator_group_init(void) {
-    s32 relativePosY;
     s32 relativePosZ;
-    s32 type;
     s32 i;
     struct Object *platformObj;
-    if (o->oBehParams2ndByte == 0)
+    if (o->oBehParams2ndByte == 0) {
         o->oBehParams2ndByte = 65;
-    relativePosY = o->oBehParams2ndByte * 10;
-    type = (o->oBehParams >> 24) & 0XFF;
+    }
+    s32 relativePosY = (o->oBehParams2ndByte * 10);
+    s32 type = GET_BPARAM1(o->oBehParams);
     for (i = 0; i < 2; i++) {
-        if (i == 0)
+        if (i == 0) {
             relativePosZ = -sCheckerBoardPlatformInitPositions[type].relPosZ;
-        else
+        } else {
             relativePosZ = sCheckerBoardPlatformInitPositions[type].relPosZ;
-
-        platformObj = spawn_object_relative(i, 0, i * relativePosY, relativePosZ, o, MODEL_CHECKERBOARD_PLATFORM,
-                                     bhvCheckerboardPlatformSub);
+        }
+        platformObj = spawn_object_relative(i, 0, (i * relativePosY), relativePosZ, o, MODEL_CHECKERBOARD_PLATFORM, bhvCheckerboardPlatformSub);
         platformObj->oCheckerBoardPlatformRadius = sCheckerBoardPlatformInitPositions[type].radius;
         vec3f_copy(platformObj->header.gfx.scale, sCheckerBoardPlatformInitPositions[type].scale);
     }
