@@ -9,6 +9,7 @@
 #include "farcall.h"
 #include "game_init.h"
 #include "main.h"
+#include "debug.h"
 
 #include "sm64.h"
 
@@ -21,6 +22,7 @@ enum crashPages {
 #endif
     PAGE_STACKTRACE,
     PAGE_DISASM,
+    PAGE_ASSERTS,
     PAGE_COUNT
 };
 
@@ -50,7 +52,7 @@ char *gCauseDesc[18] = {
     "Address error on store",
     "Bus error on inst.",
     "Bus error on data",
-    "System call exception",
+    "Failed Assert: See Assert Page",
     "Breakpoint exception",
     "Reserved instruction",
     "Coprocessor unusable",
@@ -290,7 +292,18 @@ void draw_disasm(OSThread *thread) {
     osWritebackDCacheAll();
 }
 
+void draw_assert(OSThread *thread) {
+    crash_screen_draw_rect(25, 20, 270, 210);
 
+    crash_screen_print(30, 25, "ASSERT PAGE");
+
+    crash_screen_print(30, 35, "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
+    
+    crash_screen_print(30, 55, "MESSAGE:");
+    crash_screen_print(30, 70, " %s", __n64Assert_Message);
+
+    osWritebackDCacheAll();
+}
 
 void draw_crash_screen(OSThread *thread) {
     s32 cause;
@@ -336,6 +349,7 @@ void draw_crash_screen(OSThread *thread) {
 #endif
             case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;
             case PAGE_DISASM:     draw_disasm(thread); break;
+            case PAGE_ASSERTS:    draw_assert(thread); break;
         }
 
         osWritebackDCacheAll();
