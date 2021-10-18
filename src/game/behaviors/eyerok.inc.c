@@ -16,8 +16,8 @@ static s32 eyerok_check_mario_relative_z(s32 relZ) {
     return ((gMarioObject->oPosZ - o->oHomeZ) < relZ);
 }
 
-static void eyerok_spawn_hand(s16 side, s32 model, const BehaviorScript *behavior) {
-    struct Object *hand = spawn_object_relative_with_scale(side, -500 * side, 0, 300, 1.5f, o, model, behavior);
+static void eyerok_spawn_hand(s16 side, ModelID32 model, const BehaviorScript *behavior) {
+    struct Object *hand = spawn_object_relative_with_scale(side, (-500 * side), 0, 300, 1.5f, o, model, behavior);
     if (hand != NULL) {
         hand->oFaceAngleYaw -= 0x4000 * side;
     }

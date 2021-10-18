@@ -25,7 +25,7 @@ struct ChainSegment
 struct WaterDropletParams
 {
     s16 flags; // Droplet spawn flags, see defines above
-    s16 model;
+    ModelID16 model;
     const BehaviorScript *behavior;
     s16 moveAngleRange; // Only used for RAND_ANGLE_INCR flags
     s16 moveRange;      // Only used for RAND_OFFSET flags
@@ -73,22 +73,22 @@ s32 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleI
 void obj_set_parent_relative_pos(struct Object *obj, s16 relX, s16 relY, s16 relZ);
 void obj_set_pos(struct Object *obj, s16 x, s16 y, s16 z);
 void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll);
-struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, u32 model,
+struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, ModelID32 model,
                                          const BehaviorScript *behavior,
                                          s16 x, s16 y, s16 z, s16 rx, s16 ry, s16 rz);
-struct Object *spawn_object_rel_with_rot(struct Object *parent, u32 model, const BehaviorScript *behavior,
+struct Object *spawn_object_rel_with_rot(struct Object *parent, ModelID32 model, const BehaviorScript *behavior,
                                          s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, s16 rz);
-struct Object *spawn_obj_with_transform_flags(struct Object *sp20, s32 model, const BehaviorScript *behavior);
+struct Object *spawn_obj_with_transform_flags(struct Object *parent, ModelID32 model, const BehaviorScript *behavior);
 struct Object *spawn_water_droplet(struct Object *parent, struct WaterDropletParams *params);
-struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedArg, u32 model, const BehaviorScript *behavior);
-struct Object *spawn_object(struct Object *parent, s32 model, const BehaviorScript *behavior);
-struct Object *try_to_spawn_object(s16 offsetY, f32 scale, struct Object *parent, s32 model, const BehaviorScript *behavior);
-struct Object *spawn_object_with_scale(struct Object *parent, s32 model, const BehaviorScript *behavior, f32 scale);
+struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedArg, ModelID32 model, const BehaviorScript *behavior);
+struct Object *spawn_object(struct Object *parent, ModelID32 model, const BehaviorScript *behavior);
+struct Object *try_to_spawn_object(s16 offsetY, f32 scale, struct Object *parent, ModelID32 model, const BehaviorScript *behavior);
+struct Object *spawn_object_with_scale(struct Object *parent, ModelID32 model, const BehaviorScript *behavior, f32 scale);
 struct Object *spawn_object_relative(s16 behaviorParam, s16 relativePosX, s16 relativePosY, s16 relativePosZ,
-                                     struct Object *parent, s32 model, const BehaviorScript *behavior);
+                                     struct Object *parent, ModelID32 model, const BehaviorScript *behavior);
 struct Object *spawn_object_relative_with_scale(s16 behaviorParam, s16 relativePosX, s16 relativePosY,
                                                 s16 relativePosZ, f32 scale, struct Object *parent,
-                                                s32 model, const BehaviorScript *behavior);
+                                                ModelID32 model, const BehaviorScript *behavior);
 void cur_obj_move_using_vel(void);
 void obj_copy_graph_y_offset(struct Object *dst, struct Object *src);
 void obj_copy_pos_and_angle(struct Object *dst, struct Object *src);

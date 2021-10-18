@@ -445,7 +445,7 @@ static void level_cmd_init_mario(void) {
 
 static void level_cmd_place_object(void) {
     u8 val7 = (1 << (gCurrActNum - 1));
-    u16 model;
+    ModelID16 model;
     struct SpawnInfo *spawnInfo;
 
     if (sCurrAreaIndex != -1 && ((CMD_GET(u8, 2) & val7) || CMD_GET(u8, 2) == 0x1F)) {

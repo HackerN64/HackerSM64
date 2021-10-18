@@ -150,7 +150,7 @@ static s32 bhv_cmd_billboard(void) {
 // Command 0x1B: Sets the current model ID of the object.
 // Usage: SET_MODEL(modelID)
 static s32 bhv_cmd_set_model(void) {
-    s32 modelID = BHV_CMD_GET_2ND_S16(0);
+    ModelID32 modelID = BHV_CMD_GET_2ND_S16(0);
 
     gCurrentObject->header.gfx.sharedChild = gLoadedGraphNodes[modelID];
 
@@ -161,7 +161,7 @@ static s32 bhv_cmd_set_model(void) {
 // Command 0x1C: Spawns a child object with the specified model and behavior.
 // Usage: SPAWN_CHILD(modelID, behavior)
 static s32 bhv_cmd_spawn_child(void) {
-    u32 model = BHV_CMD_GET_U32(1);
+    ModelID32 model = BHV_CMD_GET_U32(1);
     const BehaviorScript *behavior = BHV_CMD_GET_VPTR(2);
 
     struct Object *child = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
@@ -174,7 +174,7 @@ static s32 bhv_cmd_spawn_child(void) {
 // Command 0x2C: Spawns a new object with the specified model and behavior.
 // Usage: SPAWN_OBJ(modelID, behavior)
 static s32 bhv_cmd_spawn_obj(void) {
-    u32 model = BHV_CMD_GET_U32(1);
+    ModelID32 model = BHV_CMD_GET_U32(1);
     const BehaviorScript *behavior = BHV_CMD_GET_VPTR(2);
 
     struct Object *object = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
@@ -190,7 +190,7 @@ static s32 bhv_cmd_spawn_obj(void) {
 // Usage: SPAWN_CHILD_WITH_PARAM(bhvParam, modelID, behavior)
 static s32 bhv_cmd_spawn_child_with_param(void) {
     u32 bhvParam = BHV_CMD_GET_2ND_S16(0);
-    u32 modelID = BHV_CMD_GET_U32(1);
+    ModelID32 modelID = BHV_CMD_GET_U32(1);
     const BehaviorScript *behavior = BHV_CMD_GET_VPTR(2);
 
     struct Object *child = spawn_object_at_origin(gCurrentObject, 0, modelID, behavior);

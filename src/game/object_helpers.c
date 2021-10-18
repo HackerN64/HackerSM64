@@ -292,7 +292,7 @@ void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll) {
 /*
  * Spawns an object at an absolute location with a specified angle.
  */
-struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, u32 model,
+struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, ModelID32 model,
                                          const BehaviorScript *behavior,
                                          s16 x, s16 y, s16 z, s16 rx, s16 ry, s16 rz) {
     // 'uselessArg' is unused in the function spawn_object_at_origin()
@@ -308,7 +308,7 @@ struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, 
  * The rz argument is never used, and the z offset is used for z-rotation instead. This is most likely
  * a copy-paste typo by one of the programmers.
  */
-struct Object *spawn_object_rel_with_rot(struct Object *parent, u32 model, const BehaviorScript *behavior,
+struct Object *spawn_object_rel_with_rot(struct Object *parent, ModelID32 model, const BehaviorScript *behavior,
                                          s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, s16 rz) {
     struct Object *newObj = spawn_object_at_origin(parent, 0, model, behavior);
     newObj->oFlags |= OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT;
@@ -318,7 +318,7 @@ struct Object *spawn_object_rel_with_rot(struct Object *parent, u32 model, const
     return newObj;
 }
 
-struct Object *spawn_obj_with_transform_flags(struct Object *parent, s32 model, const BehaviorScript *behavior) {
+struct Object *spawn_obj_with_transform_flags(struct Object *parent, ModelID32 model, const BehaviorScript *behavior) {
     struct Object *newObj = spawn_object(parent, model, behavior);
     newObj->oFlags |= (OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX | OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM);
     return newObj;
@@ -362,7 +362,7 @@ struct Object *spawn_water_droplet(struct Object *parent, struct WaterDropletPar
     return newObj;
 }
 
-struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedArg, u32 model,
+struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedArg, ModelID32 model,
                                       const BehaviorScript *behavior) {
     const BehaviorScript *behaviorAddr = segmented_to_virtual(behavior);
     struct Object *obj = create_object(behaviorAddr);
@@ -376,7 +376,7 @@ struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedAr
     return obj;
 }
 
-struct Object *spawn_object(struct Object *parent, s32 model, const BehaviorScript *behavior) {
+struct Object *spawn_object(struct Object *parent, ModelID32 model, const BehaviorScript *behavior) {
     struct Object *obj = spawn_object_at_origin(parent, 0, model, behavior);
 
     obj_copy_pos_and_angle(obj, parent);
@@ -384,7 +384,7 @@ struct Object *spawn_object(struct Object *parent, s32 model, const BehaviorScri
     return obj;
 }
 
-struct Object *try_to_spawn_object(s16 offsetY, f32 scale, struct Object *parent, s32 model,
+struct Object *try_to_spawn_object(s16 offsetY, f32 scale, struct Object *parent, ModelID32 model,
                                    const BehaviorScript *behavior) {
     if (gFreeObjectList.next != NULL) {
         struct Object *obj = spawn_object(parent, model, behavior);
@@ -396,7 +396,7 @@ struct Object *try_to_spawn_object(s16 offsetY, f32 scale, struct Object *parent
     }
 }
 
-struct Object *spawn_object_with_scale(struct Object *parent, s32 model, const BehaviorScript *behavior, f32 scale) {
+struct Object *spawn_object_with_scale(struct Object *parent, ModelID32 model, const BehaviorScript *behavior, f32 scale) {
     struct Object *obj = spawn_object_at_origin(parent, 0, model, behavior);
 
     obj_copy_pos_and_angle(obj, parent);
@@ -411,7 +411,7 @@ static void obj_build_relative_transform(struct Object *obj) {
 }
 
 struct Object *spawn_object_relative(s16 behaviorParam, s16 relativePosX, s16 relativePosY, s16 relativePosZ,
-                                     struct Object *parent, s32 model, const BehaviorScript *behavior) {
+                                     struct Object *parent, ModelID32 model, const BehaviorScript *behavior) {
     struct Object *obj = spawn_object_at_origin(parent, 0, model, behavior);
 
     obj_copy_pos_and_angle(obj, parent);
@@ -425,7 +425,7 @@ struct Object *spawn_object_relative(s16 behaviorParam, s16 relativePosX, s16 re
 
 struct Object *spawn_object_relative_with_scale(s16 behaviorParam, s16 relativePosX, s16 relativePosY,
                                                 s16 relativePosZ, f32 scale, struct Object *parent,
-                                                s32 model, const BehaviorScript *behavior) {
+                                                ModelID32 model, const BehaviorScript *behavior) {
     struct Object *obj = spawn_object_relative(behaviorParam, relativePosX, relativePosY, relativePosZ,
                                                parent, model, behavior);
     obj_scale(obj, scale);

@@ -228,7 +228,7 @@ void copy_mario_state_to_object(struct MarioState *m) {
 /**
  * Spawn a particle at gCurrentObject's location.
  */
-void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *behavior) {
+void spawn_particle(u32 activeParticleFlag, ModelID16 model, const BehaviorScript *behavior) {
     if (!(gCurrentObject->oActiveParticleFlags & activeParticleFlag)) {
         gCurrentObject->oActiveParticleFlags |= activeParticleFlag;
         struct Object *particle = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
