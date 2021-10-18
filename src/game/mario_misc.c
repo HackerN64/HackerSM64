@@ -135,15 +135,15 @@ static void toad_message_talking(void) {
         switch (o->oToadMessageDialogId) {
             case TOAD_STAR_1_DIALOG:
                 o->oToadMessageDialogId = TOAD_STAR_1_DIALOG_AFTER;
-                bhv_spawn_star_no_level_exit(0);
+                bhv_spawn_star_no_level_exit(STAR_BP_ACT_1);
                 break;
             case TOAD_STAR_2_DIALOG:
                 o->oToadMessageDialogId = TOAD_STAR_2_DIALOG_AFTER;
-                bhv_spawn_star_no_level_exit(1);
+                bhv_spawn_star_no_level_exit(STAR_BP_ACT_2);
                 break;
             case TOAD_STAR_3_DIALOG:
                 o->oToadMessageDialogId = TOAD_STAR_3_DIALOG_AFTER;
-                bhv_spawn_star_no_level_exit(2);
+                bhv_spawn_star_no_level_exit(STAR_BP_ACT_3);
                 break;
         }
     }
@@ -536,12 +536,12 @@ Gfx *geo_mario_rotate_wing_cap_wings(s32 callContext, struct GraphNode *node, UN
         if (!gBodyStates[asGenerated->parameter >> 1].wingFlutter) {
             rotX = (coss((gAreaUpdateCounter & 0xF) << 12) + 1.0f) * 4096.0f;
         } else {
-            rotX = (coss((gAreaUpdateCounter & 7) << 13) + 1.0f) * 6144.0f;
+            rotX = (coss((gAreaUpdateCounter & 0x7) << 13) + 1.0f) * 6144.0f;
         }
         if (!(asGenerated->parameter & 1)) {
             rotNode->rotation[0] = -rotX;
         } else {
-            rotNode->rotation[0] = rotX;
+            rotNode->rotation[0] =  rotX;
         }
     }
     return NULL;

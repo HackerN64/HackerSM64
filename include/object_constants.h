@@ -857,6 +857,17 @@ enum oActionsMarioCap {
     #define JS_RING_SPAWNER_ACT_ACTIVE                      0x0
     #define JS_RING_SPAWNER_ACT_INACTIVE                    0x1
 
+/* Star General */
+enum BehParam1StarAct { // BPARAM1
+    STAR_BP_ACT_1,
+    STAR_BP_ACT_2,
+    STAR_BP_ACT_3,
+    STAR_BP_ACT_4,
+    STAR_BP_ACT_5,
+    STAR_BP_ACT_6,
+    STAR_BP_ACT_100_COINS,
+};
+
 /* Hidden Star */
     /* oAction */
     #define HIDDEN_STAR_ACT_INACTIVE                        0x0

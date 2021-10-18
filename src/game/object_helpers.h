@@ -63,7 +63,9 @@ void obj_apply_scale_to_matrix(struct Object *obj, Mat4 dst, Mat4 src);
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);
 void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior);
 f32 lateral_dist_between_objects(struct Object *obj1, struct Object *obj2);
+f32 lateral_dist_between_objects_squared(struct Object *obj1, struct Object *obj2);
 f32 dist_between_objects(struct Object *obj1, struct Object *obj2);
+f32 dist_between_objects_squared(struct Object *obj1, struct Object *obj2);
 void cur_obj_forward_vel_approach_upward(f32 target, f32 increment);
 s32 cur_obj_rotate_yaw_toward(s16 target, s16 increment);
 s32 obj_angle_to_object(struct Object *obj1, struct Object *obj2);
@@ -108,7 +110,6 @@ void cur_obj_unhide(void);
 void cur_obj_hide(void);
 void cur_obj_set_pos_relative(struct Object *other, f32 dleft, f32 dy, f32 dforward);
 void cur_obj_set_pos_relative_to_parent(f32 dleft, f32 dy, f32 dforward);
-void cur_obj_enable_rendering_2(void);
 void obj_set_face_angle_to_move_angle(struct Object *obj);
 u32 get_object_list_from_behavior(const BehaviorScript *behavior);
 struct Object *cur_obj_nearest_object_with_behavior(const BehaviorScript *behavior);
@@ -133,7 +134,11 @@ void cur_obj_set_y_vel_and_animation(f32 yVel, s32 animIndex);
 void cur_obj_unrender_set_action_and_anim(s32 animIndex, s32 action);
 void cur_obj_get_thrown_or_placed(f32 forwardVel, f32 velY, s32 thrownAction);
 void cur_obj_get_dropped(void);
-void cur_obj_set_model(s32 modelID);
+void obj_set_model(struct Object *obj, ModelID16 modelID);
+void cur_obj_set_model(ModelID16 modelID);
+s32 obj_has_model(struct Object *obj, ModelID16 modelID);
+s32 cur_obj_has_model(ModelID16 modelID);
+ModelID32 obj_get_model_id(struct Object *obj);
 void mario_set_flag(s32 flag);
 s32 cur_obj_clear_interact_status_flag(s32 flag);
 void obj_mark_for_deletion(struct Object *obj);
@@ -200,15 +205,9 @@ s32 cur_obj_reflect_move_angle_off_wall(void);
 #define PATH_REACHED_END     -1
 #define PATH_REACHED_WAYPOINT 1
 
-struct GraphNode_802A45E4 {
-    /*0x00*/ s8 filler0[0x18 - 0x00];
-    /*0x18*/ s16 unk18;
-    /*0x1A*/ s16 unk1A;
-    /*0x1C*/ s16 unk1C;
-    /*0x1E*/ s16 unk1E;
-    /*0x20*/ s16 unk20;
-    /*0x22*/ s16 unk22;
-};
+#define SCALE_AXIS_X    (1 << 0) // 0x01
+#define SCALE_AXIS_Y    (1 << 1) // 0x02
+#define SCALE_AXIS_Z    (1 << 2) // 0x04
 
 void obj_set_hitbox(struct Object *obj, struct ObjectHitbox *hitbox);
 s32 cur_obj_wait_then_blink(s32 timeUntilBlinking, s32 numBlinks);
@@ -223,7 +222,6 @@ void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end);
 void cur_obj_set_pos_to_home_with_debug(void);
 s32 cur_obj_is_mario_on_platform(void);
 void cur_obj_call_action_function(ObjActionFunc actionFunctions[]);
-void spawn_base_star_with_no_lvl_exit(void);
 s32 cur_obj_mario_far_away(void);
 s32 is_mario_moving_fast_or_in_air(s32 speedThreshold);
 s32 is_item_in_array(s8 item, s8 *array);
@@ -234,7 +232,6 @@ void obj_set_collision_data(struct Object *obj, const void *segAddr);
 void cur_obj_if_hit_wall_bounce_away(void);
 s32 cur_obj_hide_if_mario_far_away_y(f32 distY);
 Gfx *geo_offset_klepto_held_object(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx);
-Gfx *geo_offset_klepto_debug(s32 callContext, struct GraphNode *node, UNUSED s32 context);
 s32 obj_is_hidden(struct Object *obj);
 void enable_time_stop(void);
 void disable_time_stop(void);
@@ -244,7 +241,6 @@ s32 cur_obj_can_mario_activate_textbox(f32 radius, f32 height, UNUSED s32 unused
 s32 cur_obj_can_mario_activate_textbox_2(f32 radius, f32 height);
 s32 cur_obj_update_dialog(s32 actionArg, s32 dialogFlags, s32 dialogID, UNUSED s32 unused);
 s32 cur_obj_update_dialog_with_cutscene(s32 actionArg, s32 dialogFlags, s32 cutsceneTable, s32 dialogID);
-s32 cur_obj_has_model(u16 modelID);
 void cur_obj_align_gfx_with_floor(void);
 s32 mario_is_within_rectangle(s16 minX, s16 maxX, s16 minZ, s16 maxZ);
 void cur_obj_shake_screen(s32 shake);
@@ -263,11 +259,5 @@ s32 cur_obj_check_interacted(void);
 void cur_obj_spawn_loot_blue_coin(void);
 
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY);
-
-// Extra functions for HackerSM64
-void obj_set_model(struct Object *obj, ModelID16 modelID);
-s32 obj_has_model(struct Object *obj, ModelID16 modelID);
-u32 obj_get_model_id(struct Object *obj);
-// End of HackerSM64 stuff
 
 #endif // OBJECT_HELPERS_H

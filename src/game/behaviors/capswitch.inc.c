@@ -38,7 +38,7 @@ void cap_switch_act_1(void) {
 
 void cap_switch_act_2(void) {
     if (o->oTimer < 5) {
-        cur_obj_scale_over_time(2, 4, 0.5f, 0.1f);
+        cur_obj_scale_over_time(SCALE_AXIS_Y, 4, 0.5f, 0.1f);
         if (o->oTimer == 4) {
             cur_obj_shake_screen(SHAKE_POS_SMALL);
             spawn_mist_particles();

@@ -243,7 +243,7 @@ void bhv_mips_dropped(void) {
  * Handles MIPS being thrown by Mario.
  */
 void bhv_mips_thrown(void) {
-    cur_obj_enable_rendering_2();
+    cur_obj_enable_rendering();
     o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
     o->oHeldState = HELD_FREE;
     o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;

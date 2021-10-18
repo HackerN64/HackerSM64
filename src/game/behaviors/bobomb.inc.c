@@ -192,7 +192,7 @@ void bobomb_dropped_loop(void) {
 }
 
 void bobomb_thrown_loop(void) {
-    cur_obj_enable_rendering_2();
+    cur_obj_enable_rendering();
 
     o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
     o->oHeldState  = 0;

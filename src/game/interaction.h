@@ -97,6 +97,7 @@ enum AttackType
 #define INT_STATUS_MARIO_DROP_FROM_HOOT  (1 <<  7) /* 0x00000080 */
 
 // Object Interaction Status
+#define INT_STATUS_TOUCHED_MARIO         (1 <<  0) /* 0x00000001 */
 #define INT_STATUS_GRABBED_MARIO         (1 << 11) /* 0x00000800 */
 #define INT_STATUS_ATTACKED_MARIO        (1 << 13) /* 0x00002000 */
 #define INT_STATUS_WAS_ATTACKED          (1 << 14) /* 0x00004000 */

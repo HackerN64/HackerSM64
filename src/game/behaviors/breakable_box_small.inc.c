@@ -96,7 +96,6 @@ void breakable_box_small_get_dropped(void) {
 
 void breakable_box_small_get_thrown(void) {
     cur_obj_become_tangible();
-    cur_obj_enable_rendering_2();
     cur_obj_enable_rendering();
     o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
     o->oHeldState = HELD_FREE;
