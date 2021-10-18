@@ -2430,7 +2430,6 @@ const BehaviorScript bhvLllBowserPuzzle[] = {
     BEGIN(OBJ_LIST_SPAWNER),
     DISABLE_RENDERING(),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    ADD_FLOAT(oPosZ, -50),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_lll_bowser_puzzle_loop),
     END_LOOP(),

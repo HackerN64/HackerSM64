@@ -12,34 +12,34 @@
  *
  * Note that pieces 11 and 14 do not move.
  */
-static s8 sPieceActions01[] = { 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, -1 };
-static s8 sPieceActions02[] = { 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, -1 };
-static s8 sPieceActions05[] = { 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 2, 2, 2, 2, 6, 2, 2, 2, -1 };
-static s8 sPieceActions06[] = { 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, -1 };
-static s8 sPieceActions10[] = { 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 2, 2, 6, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions09[] = { 2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions13[] = { 2, 2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 6, 2, 2, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions12[] = { 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2,
-                                2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions08[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 2, 2, 2, 2,
-                                2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions07[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2,
-                                2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions03[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 2, 2,
-                                5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions04[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4,
-                                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions11[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, -1 };
-static s8 sPieceActions14[] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-                                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, -1 };
+static ObjAction8 sPieceActions01[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_LEFT, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_RIGHT, BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions02[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_LEFT, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_RIGHT, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions05[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_UP  , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_DOWN , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions06[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_LEFT, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_RIGHT, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions10[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_UP  , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_DOWN , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions09[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_RIGHT, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_LEFT, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions13[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_UP   , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_DOWN, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions12[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_RIGHT, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_LEFT, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions08[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_DOWN , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_UP  , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions07[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_RIGHT, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_LEFT, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions03[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_DOWN, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_UP  , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions04[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_LEFT, BOWSER_PUZZLE_PIECE_ACT_RIGHT,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions11[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
+static ObjAction8 sPieceActions14[] = { BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE ,
+                                        BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE, BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE , BOWSER_PUZZLE_PIECE_ACT_IDLE, -1 };
 
 struct BowserPuzzlePiece {
     ModelID8 model;
@@ -89,7 +89,6 @@ void bhv_lll_bowser_puzzle_spawn_piece(ModelID16 model, const BehaviorScript *be
                                        ObjAction8 initialAction, ObjAction8 *actionList) {
     struct Object *puzzlePiece = spawn_object(o, model, behavior);
     puzzlePiece->oPosX += xOffset;
-    puzzlePiece->oPosY += 50.0f;
     puzzlePiece->oPosZ += zOffset;
     puzzlePiece->oAction = initialAction; // This action never gets executed.
     puzzlePiece->oBowserPuzzlePieceActionList = actionList;
@@ -111,7 +110,7 @@ void bhv_lll_bowser_puzzle_spawn_pieces(f32 pieceWidth) {
                                           sBowserPuzzlePieces[i].actionList);
 
     // The pieces should only be spawned once so go to the next action.
-    o->oAction++;
+    o->oAction = BOWSER_PUZZLE_ACT_WAIT_FOR_COMPLETE;
 }
 
 /*
@@ -119,23 +118,23 @@ void bhv_lll_bowser_puzzle_spawn_pieces(f32 pieceWidth) {
  */
 void bhv_lll_bowser_puzzle_loop(void) {
     s32 i;
-    UNUSED struct Object *coinObj;
     switch (o->oAction) {
         case BOWSER_PUZZLE_ACT_SPAWN_PIECES:
-            bhv_lll_bowser_puzzle_spawn_pieces(480.0f);
+            bhv_lll_bowser_puzzle_spawn_pieces(512.0f);
             break;
         case BOWSER_PUZZLE_ACT_WAIT_FOR_COMPLETE:
             // If both completion flags are set and Mario is within 1000 units...
-            if (o->oBowserPuzzleCompletionFlags == 3 && o->oDistanceToMario < 1000.0f) {
+            if ((o->oBowserPuzzleCompletionFlags == (BOWSER_PUZZLE_COMPLETION_FLAG_MARIO_ON_PLATFORM | BOWSER_PUZZLE_COMPLETION_FLAG_PUZZLE_COMPLETE)) && (o->oDistanceToMario < 1000.0f)) {
                 // Spawn 5 coins.
-                for (i = 0; i < 5; i++)
-                    coinObj = spawn_object(o, MODEL_YELLOW_COIN, bhvSingleCoinGetsSpawned);
+                for (i = 0; i < 5; i++) {
+                    spawn_object(o, MODEL_YELLOW_COIN, bhvSingleCoinGetsSpawned);
+                }
 
                 // Reset completion flags (even though they never get checked again).
-                o->oBowserPuzzleCompletionFlags = 0;
+                o->oBowserPuzzleCompletionFlags = BOWSER_PUZZLE_COMPLETION_FLAGS_NONE;
 
                 // Go to next action so we don't spawn 5 coins ever again.
-                o->oAction++;
+                o->oAction = BOWSER_PUZZLE_ACT_DONE;
             }
             break;
         case BOWSER_PUZZLE_ACT_DONE:
@@ -144,73 +143,55 @@ void bhv_lll_bowser_puzzle_loop(void) {
 }
 
 /*
- * Action 0 is never executed since it is not defined in any action lists.
- */
-void bhv_lll_bowser_puzzle_piece_action_0(void) {
-}
-
-/*
- * Action 1 is never executed since it is not defined in any action lists.
- */
-void bhv_lll_bowser_puzzle_piece_action_1(void) {
-    o->oPosY += 50.0f;
-    o->oAction = 3;
-}
-
-/*
  * Update the puzzle piece.
  */
 void bhv_lll_bowser_puzzle_piece_update(void) {
-    s8 *nextAction = o->oBowserPuzzlePieceNextAction;
+    ObjAction8 *nextAction = o->oBowserPuzzlePieceNextAction;
 
     // If Mario is standing on this puzzle piece, set a flag in the parent.
-    if (gMarioObject->platform == o)
-        o->parentObj->oBowserPuzzleCompletionFlags = 1;
-
+    if (gMarioObject->platform == o) {
+        o->parentObj->oBowserPuzzleCompletionFlags = BOWSER_PUZZLE_COMPLETION_FLAG_MARIO_ON_PLATFORM;
+    }
     // If we should advance to the next action...
-    if (o->oBowserPuzzlePieceContinuePerformingAction == 0) {
+    if (!o->oBowserPuzzlePieceContinuePerformingAction) {
         // Start doing the next action.
         cur_obj_change_action(*nextAction);
 
         // Advance the pointer to the next action.
-        nextAction++;
-        o->oBowserPuzzlePieceNextAction = nextAction;
+        o->oBowserPuzzlePieceNextAction = ++nextAction;
 
         // If we're at the end of the list...
         if (*nextAction == -1) {
             // Set the other completion flag in the parent.
-            o->parentObj->oBowserPuzzleCompletionFlags |= 2;
+            o->parentObj->oBowserPuzzleCompletionFlags |= BOWSER_PUZZLE_COMPLETION_FLAG_PUZZLE_COMPLETE;
 
             // The next action is the first action in the list again.
             o->oBowserPuzzlePieceNextAction = o->oBowserPuzzlePieceActionList;
         }
 
         // Keep doing this action until it's complete.
-        o->oBowserPuzzlePieceContinuePerformingAction = 1;
+        o->oBowserPuzzlePieceContinuePerformingAction = TRUE;
     }
 }
 
 void bhv_lll_bowser_puzzle_piece_move(f32 xOffset, f32 zOffset, s32 duration, UNUSED s32 a3) {
     // For the first 20 frames, shake the puzzle piece up and down.
     if (o->oTimer < 20) {
-        if (o->oTimer % 2)
-            o->oBowserPuzzlePieceOffsetY = 0.0f;
-        else
-            o->oBowserPuzzlePieceOffsetY = -6.0f;
+        o->oBowserPuzzlePieceOffsetY = ((o->oTimer & 0x1) ? 0.0f : -6.0f);
     } else {
         // On frame 20, play the shifting sound.
-        if (o->oTimer == 20)
+        if (o->oTimer == 20) {
             cur_obj_play_sound_2(SOUND_OBJ2_BOWSER_PUZZLE_PIECE_MOVE);
-
+        }
         // For the number of frames specified by duration, move the piece.
-        if (o->oTimer < duration + 20) {
+        if (o->oTimer < (duration + 20)) {
             o->oBowserPuzzlePieceOffsetX += xOffset;
             o->oBowserPuzzlePieceOffsetZ += zOffset;
         } else {
             // This doesn't actually accomplish anything since
             //   cur_obj_change_action is going to be called before the
             //   next action is performed anyway.
-            o->oAction = 2;
+            o->oAction = BOWSER_PUZZLE_PIECE_ACT_IDLE;
 
             // Advance to the next action.
             o->oBowserPuzzlePieceContinuePerformingAction = 0;
@@ -221,29 +202,17 @@ void bhv_lll_bowser_puzzle_piece_move(f32 xOffset, f32 zOffset, s32 duration, UN
 void bhv_lll_bowser_puzzle_piece_idle(void) {
     // For the first 24 frames, do nothing.
     // Then advance to the next action.
-    if (o->oTimer >= 24)
-        o->oBowserPuzzlePieceContinuePerformingAction = 0;
+    if (o->oTimer >= 24) {
+        o->oBowserPuzzlePieceContinuePerformingAction = FALSE;
+    }
 }
 
-void bhv_lll_bowser_puzzle_piece_move_left(void) {
-    bhv_lll_bowser_puzzle_piece_move(-120.0f, 0.0f, 4, 4);
-}
-
-void bhv_lll_bowser_puzzle_piece_move_right(void) {
-    bhv_lll_bowser_puzzle_piece_move(120.0f, 0.0f, 4, 5);
-}
-
-void bhv_lll_bowser_puzzle_piece_move_up(void) {
-    bhv_lll_bowser_puzzle_piece_move(0.0f, -120.0f, 4, 6);
-}
-
-void bhv_lll_bowser_puzzle_piece_move_down(void) {
-    bhv_lll_bowser_puzzle_piece_move(0.0f, 120.0f, 4, 3);
-}
+void bhv_lll_bowser_puzzle_piece_move_left(void)  { bhv_lll_bowser_puzzle_piece_move(-128.0f,    0.0f, 4, 4); }
+void bhv_lll_bowser_puzzle_piece_move_right(void) { bhv_lll_bowser_puzzle_piece_move( 128.0f,    0.0f, 4, 5); }
+void bhv_lll_bowser_puzzle_piece_move_up(void)    { bhv_lll_bowser_puzzle_piece_move(   0.0f, -128.0f, 4, 6); }
+void bhv_lll_bowser_puzzle_piece_move_down(void)  { bhv_lll_bowser_puzzle_piece_move(   0.0f,  128.0f, 4, 3); }
 
 ObjActionFunc sBowserPuzzlePieceActions[] = {
-    bhv_lll_bowser_puzzle_piece_action_0,
-    bhv_lll_bowser_puzzle_piece_action_1,
     bhv_lll_bowser_puzzle_piece_idle,
     bhv_lll_bowser_puzzle_piece_move_left,
     bhv_lll_bowser_puzzle_piece_move_right,
@@ -253,8 +222,6 @@ ObjActionFunc sBowserPuzzlePieceActions[] = {
 
 void bhv_lll_bowser_puzzle_piece_loop(void) {
     bhv_lll_bowser_puzzle_piece_update();
-
     cur_obj_call_action_function(sBowserPuzzlePieceActions);
-
     vec3_sum(&o->oPosVec, &o->oBowserPuzzlePieceOffsetVec, &o->oHomeVec);
 }
