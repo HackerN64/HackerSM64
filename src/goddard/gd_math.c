@@ -22,7 +22,9 @@ f32 gd_sqrt_f(f32 val) {
  * at the position 'to'.
  * An effective goddard copy of mtxf_lookat.
  */
-void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 yTo, f32 zTo,
+void gd_mat4f_lookat(Mat4f *mtx,
+                     f32 xFrom, f32 yFrom, f32 zFrom,
+                     f32 xTo,   f32 yTo,   f32 zTo,
                      f32 zColY, f32 yColY, f32 xColY) {
     f32 invLength;
 
@@ -33,9 +35,9 @@ void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 y
     // No reason to do this? mtx is set lower.
     gd_set_identity_mat4(mtx);
 
-    d.z = xTo - xFrom;
-    d.y = yTo - yFrom;
-    d.x = zTo - zFrom;
+    d.z = (xTo - xFrom);
+    d.y = (yTo - yFrom);
+    d.x = (zTo - zFrom);
 
     invLength = ABS(d.z) + ABS(d.y) + ABS(d.x);
 
@@ -136,11 +138,9 @@ void gd_rot_mat_about_vec(Mat4f *mtx, struct GdVec3f *vec) {
  * translation column of a mat4f matrix.
  */
 void gd_add_vec3f_to_mat4f_offset(Mat4f *mtx, struct GdVec3f *vec) {
-    f32 z, y, x;
-
-    x = vec->x;
-    y = vec->y;
-    z = vec->z;
+    f32 x = vec->x;
+    f32 y = vec->y;
+    f32 z = vec->z;
 
     (*mtx)[3][0] += x;
     (*mtx)[3][1] += y;
@@ -157,11 +157,6 @@ void gd_add_vec3f_to_mat4f_offset(Mat4f *mtx, struct GdVec3f *vec) {
  *                   |      0       0      0      1 |
  */
 void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec, f32 roll) {
-    f32 invertedHMag;
-    f32 hMag;
-    f32 c;
-    f32 s;
-    f32 radPerDeg = RAD_PER_DEG;
     struct GdVec3f unit;
 
     unit.x = vec->x;
@@ -169,17 +164,17 @@ void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec, f32 roll) {
     unit.z = vec->z;
 
     gd_normalize_vec3f(&unit);
-    hMag = gd_sqrt_f(SQ(unit.x) + SQ(unit.z));
+    f32 hMag = gd_sqrt_f(SQ(unit.x) + SQ(unit.z));
 
-    roll *= radPerDeg; // convert roll from degrees to radians
-    s = gd_sin_d(roll);
-    c = gd_cos_d(roll);
+    roll *= RAD_PER_DEG; // convert roll from degrees to radians
+    f32 s = gd_sin_d(roll);
+    f32 c = gd_cos_d(roll);
 
     gd_set_identity_mat4(mtx);
     if (hMag != 0.0f) {
-        invertedHMag = 1.0f / hMag;
+        f32 invertedHMag = (1.0f / hMag);
         (*mtx)[0][0] = ((-unit.z * c) - (s * unit.y * unit.x)) * invertedHMag;
-        (*mtx)[1][0] = ((unit.z * s) - (c * unit.y * unit.x)) * invertedHMag;
+        (*mtx)[1][0] = (( unit.z * s) - (c * unit.y * unit.x)) * invertedHMag;
         (*mtx)[2][0] = -unit.x;
         (*mtx)[3][0] = 0.0f;
 
@@ -188,7 +183,7 @@ void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec, f32 roll) {
         (*mtx)[2][1] = -unit.y;
         (*mtx)[3][1] = 0.0f;
 
-        (*mtx)[0][2] = ((c * unit.x) - (s * unit.y * unit.z)) * invertedHMag;
+        (*mtx)[0][2] = (( c * unit.x) - (s * unit.y * unit.z)) * invertedHMag;
         (*mtx)[1][2] = ((-s * unit.x) - (c * unit.y * unit.z)) * invertedHMag;
         (*mtx)[2][2] = -unit.z;
         (*mtx)[3][2] = 0.0f;

@@ -64,6 +64,8 @@ extern f32 gSineTable[];
 #define absi(x) ABSI((x))
 #define abs(x)  ABS((x))
 
+#define FLT_NONZERO(x) (ABSF(x) > NEAR_ZERO)
+
 #define signum_positive(x) ((x < 0) ? -1 : 1)
 
 #define min(a, b) MIN((a), (b)) // ((a) < (b) ? (a) : (b))

@@ -1199,7 +1199,7 @@ s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
         }
     }
 
-    // If zoom != 0.0, the camera will move zoom% closer to Mario
+    // If zoom != 0.0f, the camera will move zoom% closer to Mario
     marioOffset[0] = (-marioOffset[0] * zoom);
     marioOffset[1] = ( marioOffset[1] * zoom);
     marioOffset[2] = camOffset[2];
