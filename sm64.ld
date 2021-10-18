@@ -157,6 +157,7 @@ SECTIONS
    BEGIN_SEG(main, .) SUBALIGN(16)
    {
       KEEP(BUILD_DIR/asm/entry.o(.text));
+      KEEP(BUILD_DIR/asm/n64_assert.o(.text));
 
       BUILD_DIR/src/boot*.o(.text);
       BUILD_DIR/src/hvqm*.o(.text);
@@ -180,6 +181,7 @@ SECTIONS
       _mainSegmentTextEnd = .;
 
       /* data */
+      BUILD_DIR/asm/n64_assert.o(.data*);
       BUILD_DIR/src/boot*.o(.data*);
       BUILD_DIR/src/audio*.o(.data*);
 #ifdef S2DEX_TEXT_ENGINE
