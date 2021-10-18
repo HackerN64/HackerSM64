@@ -7,8 +7,8 @@ This file is for ports that want to enable widescreen.
 Change the definitions to the following:
 
 #include <math.h>
-#define GFX_DIMENSIONS_FROM_LEFT_EDGE(v) (SCREEN_WIDTH / 2 - SCREEN_HEIGHT / 2 * [current_aspect_ratio] + (v))
-#define GFX_DIMENSIONS_FROM_RIGHT_EDGE(v) (SCREEN_WIDTH / 2 + SCREEN_HEIGHT / 2 * [current_aspect_ratio] - (v))
+#define GFX_DIMENSIONS_FROM_LEFT_EDGE(v) v(SCREEN_CENTER_X - SCREEN_CENTER_Y * [current_aspect_ratio] + (v))
+#define GFX_DIMENSIONS_FROM_RIGHT_EDGE(v) (SCREEN_CENTER_X + SCREEN_CENTER_Y * [current_aspect_ratio] - (v))
 #define GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(v) ((int)floorf(GFX_DIMENSIONS_FROM_LEFT_EDGE(v)))
 #define GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(v) ((int)ceilf(GFX_DIMENSIONS_FROM_RIGHT_EDGE(v)))
 #define GFX_DIMENSIONS_ASPECT_RATIO [current_aspect_ratio]

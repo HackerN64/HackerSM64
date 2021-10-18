@@ -207,7 +207,7 @@ void print_ram_bar(void) {
     s32 i = 0;
     f32 perfPercentage;
     s32 graphPos = 0;
-    s32 prevGraph = (SCREEN_WIDTH / 2) - (BAR_LENGTH / 2);
+    s32 prevGraph = (SCREEN_CENTER_X - (BAR_LENGTH / 2));
     s32 ramsize = osGetMemSize();
 
     prepare_blank_box();
@@ -217,16 +217,16 @@ void print_ram_bar(void) {
             continue;
         }
         perfPercentage = (f32)ramsizeSegment[i]/ramsize;
-        graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_WIDTH / 2) + (BAR_LENGTH / 2));
-        render_blank_box(prevGraph, SCREEN_HEIGHT - 30, graphPos, SCREEN_HEIGHT - 22, colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
+        graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, SCREEN_CENTER_X + (BAR_LENGTH / 2));
+        render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22), colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
         prevGraph = graphPos;
     }
     perfPercentage = (f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize;
-    graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_WIDTH / 2) + (BAR_LENGTH / 2));
-    render_blank_box(prevGraph, SCREEN_HEIGHT - 30, graphPos, SCREEN_HEIGHT-22, 255, 255, 255, 255);
+    graphPos = (prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, SCREEN_CENTER_X + (BAR_LENGTH / 2)));
+    render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22), 255, 255, 255, 255);
     prevGraph = graphPos;
 
-    render_blank_box(prevGraph, SCREEN_HEIGHT - 30, (SCREEN_WIDTH / 2) + (BAR_LENGTH / 2), SCREEN_HEIGHT-22, 0, 0, 0, 255);
+    render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), SCREEN_CENTER_X + (BAR_LENGTH / 2), (SCREEN_HEIGHT - 22), 0, 0, 0, 255);
 
     finish_blank_box();
 }
@@ -266,7 +266,7 @@ void print_ram_overview(void) {
         if (i < 8) {
             sprintf(textBytes, "%s: %X", ramNames[i], ramsizeSegment[i]);
         } else {
-            sprintf(textBytes, "Segment %02X: %X", i - nameTable + 2, ramsizeSegment[i]);
+            sprintf(textBytes, "Segment %02X: %X", ((i - nameTable) + 2), ramsizeSegment[i]);
         }
         print_set_envcolour(colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
         print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
@@ -367,10 +367,10 @@ void print_which_benchmark(void) {
     char textBytes[40];
 
     prepare_blank_box();
-    render_blank_box(((SCREEN_WIDTH / 2) - 50), 115, (SCREEN_WIDTH / 2) + 50, 160, 0, 0, 0, 255);
+    render_blank_box((SCREEN_CENTER_X - 50), 115, (SCREEN_CENTER_X + 50), 160, 0, 0, 0, 255);
     finish_blank_box();
     sprintf(textBytes, "Select Option#%s#L: Confirm", benchNames[benchOption]);
-    print_small_text((SCREEN_WIDTH / 2), 120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    print_small_text(SCREEN_CENTER_X, 120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
 }
 
 char consoleLogTable[LOG_BUFFER_SIZE][255];
@@ -452,7 +452,7 @@ void puppyprint_render_profiler(void) {
     }
 
     sprintf(textBytes, "RAM: %06X/%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available() / (f32)mempool) * 100));
-    print_small_text((SCREEN_WIDTH / 2), (SCREEN_HEIGHT - 16), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+    print_small_text(SCREEN_CENTER_X, (SCREEN_HEIGHT - 16), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
 
     if (!ramViewer && !audioRamViewer && !benchViewer && !logViewer) {
         print_fps(16, 40);
@@ -476,10 +476,10 @@ void puppyprint_render_profiler(void) {
         if (benchmarkTimer > 0) {
             benchmarkTimer--;
             prepare_blank_box();
-            sprintf(textBytes, "Done in %0.000f seconds#Benchmark: %dus#High: %dus", (f32)(benchmarkProgramTimer) * 0.000001f, (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS]), (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS + 1]));
-            render_blank_box((SCREEN_WIDTH / 2) - (get_text_width(textBytes, FONT_OUTLINE) / 2) - 4, 158, (SCREEN_WIDTH / 2) + (get_text_width(textBytes, FONT_OUTLINE) / 2) + 4, 196, 0, 0, 0, 255);
+            sprintf(textBytes, "Done in %0.000f seconds#Benchmark: %dus#High: %dus", ((f32)(benchmarkProgramTimer) * 0.000001f), (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS]), (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS + 1]));
+            render_blank_box((SCREEN_CENTER_X - (get_text_width(textBytes, FONT_OUTLINE) / 2) - 4), 158, (SCREEN_CENTER_X + (get_text_width(textBytes, FONT_OUTLINE) / 2) + 4), 196, 0, 0, 0, 255);
             print_set_envcolour(255, 255, 255, 255);
-            print_small_text((SCREEN_WIDTH / 2), 160, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+            print_small_text(SCREEN_CENTER_X, 160, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
             finish_blank_box();
         }
 
@@ -1043,7 +1043,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             posH -= peakH;
         }
         gDPLoadSync(gDisplayListHead++);
-        gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, posW + imW - 1, posH + imH - 1, 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
+        gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
         gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW + imW - mOne) << 2, (y + posH + imH-mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
     }
     // If there's a remainder on the vertical side, then it will cycle through that too.
@@ -1053,7 +1053,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
         for (i = 0; i < (width / imW); i++) {
             posW = (i * imW);
             gDPLoadSync(gDisplayListHead++);
-            gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, posW + imW - 1, height-1, 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
+            gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
             gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW + imW - mOne) << 2, (y + posH + imH - mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
         }
     }
