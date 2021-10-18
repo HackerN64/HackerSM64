@@ -97,9 +97,9 @@ enum DialogState {
 #define OBJ_MOVE_UNUSED                             (1 << 15) // 0x8000
 
 #define OBJ_MOVE_MASK_ON_GROUND (OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND)
-#define OBJ_MOVE_MASK_IN_WATER (\
-    OBJ_MOVE_ENTERED_WATER |\
-    OBJ_MOVE_AT_WATER_SURFACE |\
+#define OBJ_MOVE_MASK_IN_WATER (    \
+    OBJ_MOVE_ENTERED_WATER         |\
+    OBJ_MOVE_AT_WATER_SURFACE      |\
     OBJ_MOVE_UNDERWATER_OFF_GROUND |\
     OBJ_MOVE_UNDERWATER_ON_GROUND)
 
@@ -127,10 +127,28 @@ enum DialogState {
 #define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
 
 /* oBehParams */
-#define BPARAM1 (0xFF << (8 * 3)) // 0xFF000000
-#define BPARAM2 (0xFF << (8 * 2)) // 0x00FF0000
-#define BPARAM3 (0xFF << (8 * 1)) // 0x0000FF00
-#define BPARAM4 (0xFF << (8 * 0)) // 0x000000FF
+#define BPARAM_SIZE 8
+#define BPARAM_MASK BITMASK(BPARAM_SIZE)
+
+#define BPARAM1_MASK (BPARAM_MASK << (BPARAM_SIZE * 3)) // 0xFF000000
+#define BPARAM2_MASK (BPARAM_MASK << (BPARAM_SIZE * 2)) // 0x00FF0000
+#define BPARAM3_MASK (BPARAM_MASK << (BPARAM_SIZE * 1)) // 0x0000FF00
+#define BPARAM4_MASK (BPARAM_MASK << (BPARAM_SIZE * 0)) // 0x000000FF
+
+#define GET_BPARAM1(p) (((p) & BPARAM1_MASK) >> (BPARAM_SIZE * 3)) // (((p) >> (BPARAM_SIZE * 3)) & BPARAM_MASK)
+#define GET_BPARAM2(p) (((p) & BPARAM2_MASK) >> (BPARAM_SIZE * 2)) // (((p) >> (BPARAM_SIZE * 2)) & BPARAM_MASK)
+#define GET_BPARAM3(p) (((p) & BPARAM3_MASK) >> (BPARAM_SIZE * 1)) // (((p) >> (BPARAM_SIZE * 1)) & BPARAM_MASK)
+#define GET_BPARAM4(p) (((p) & BPARAM4_MASK) >> (BPARAM_SIZE * 0)) // (((p) >> (BPARAM_SIZE * 0)) & BPARAM_MASK)
+
+// Read two bparams as a single value:
+#define GET_BPARAM12(p) (((p) & (BPARAM1_MASK | BPARAM2_MASK)) >> (BPARAM_SIZE * 2))
+#define GET_BPARAM23(p) (((p) & (BPARAM2_MASK | BPARAM3_MASK)) >> (BPARAM_SIZE * 1))
+#define GET_BPARAM34(p) (((p) & (BPARAM3_MASK | BPARAM4_MASK)) >> (BPARAM_SIZE * 0))
+
+#define SET_BPARAM1(p, val) (p) |= (val << (BPARAM_SIZE * 3))
+#define SET_BPARAM2(p, val) (p) |= (val << (BPARAM_SIZE * 2))
+#define SET_BPARAM3(p, val) (p) |= (val << (BPARAM_SIZE * 1))
+#define SET_BPARAM4(p, val) (p) |= (val << (BPARAM_SIZE * 0))
 
 /* oBehParams2ndByte */
 enum ObjGeneralBehParams {
@@ -213,69 +231,81 @@ enum CoinTypes { // coinType
 };
 
 /* Bouncing Coin */
-    /* oAction */
-    #define BOUNCING_COIN_ACT_FALLING                       0x0
-    #define BOUNCING_COIN_ACT_BOUNCING                      0x1
+enum oActionsBouncingCoin {
+    BOUNCING_COIN_ACT_FALLING,
+    BOUNCING_COIN_ACT_BOUNCING
+};
 
 /* Hidden Blue Coin */
-    /* oAction */
-    #define HIDDEN_BLUE_COIN_ACT_INACTIVE                   0x0
-    #define HIDDEN_BLUE_COIN_ACT_WAITING                    0x1
-    #define HIDDEN_BLUE_COIN_ACT_ACTIVE                     0x2
+enum oActionsHiddenBlueCoin {
+    HIDDEN_BLUE_COIN_ACT_INACTIVE,
+    HIDDEN_BLUE_COIN_ACT_WAITING,
+    HIDDEN_BLUE_COIN_ACT_ACTIVE
+};
 
 /* Blue Coin Switch */
-    /* oAction */
-    #define BLUE_COIN_SWITCH_ACT_IDLE                       0x0
-    #define BLUE_COIN_SWITCH_ACT_RECEDING                   0x1
-    #define BLUE_COIN_SWITCH_ACT_TICKING                    0x2
-    #define BLUE_COIN_SWITCH_ACT_EXTENDING                  0x3
+enum oActionsBlueCoinSwitch {
+    BLUE_COIN_SWITCH_ACT_IDLE,
+    BLUE_COIN_SWITCH_ACT_RECEDING,
+    BLUE_COIN_SWITCH_ACT_TICKING,
+    BLUE_COIN_SWITCH_ACT_EXTENDING
+};
 
 /* Moving Blue Coin */
-    /* oAction */
-    #define MOV_BCOIN_ACT_STILL                             0x0
-    #define MOV_BCOIN_ACT_MOVING                            0x1
-    #define MOV_BCOIN_ACT_SLOWING_DOWN                      0x2
-    #define MOV_BCOIN_ACT_STOPPED                           0x3
-    #define MOV_BCOIN_ACT_FLICKERING                        0x4
+enum oActionsMovingBlueCoin {
+    MOV_BCOIN_ACT_STILL,
+    MOV_BCOIN_ACT_MOVING,
+    MOV_BCOIN_ACT_SLOWING_DOWN,
+    MOV_BCOIN_ACT_STOPPED,
+    MOV_BCOIN_ACT_FLICKERING
+};
 
 /* Yellow Coin */
-    /* oBehParams2ndByte */
-    #define YELLOW_COIN_BP_ONE_COIN                         0x1
+enum oBehParams2ndByteYellowCoin {
+    YELLOW_COIN_BP_NO_COINS,
+    YELLOW_COIN_BP_ONE_COIN
+};
 
 /* Moving Yellow Coin */
-    /* oAction */
-    #define MOV_YCOIN_ACT_IDLE                              0x0
-    #define MOV_YCOIN_ACT_BLINKING                          0x1
+enum oActionsMovingYellowCoin {
+    MOV_YCOIN_ACT_IDLE,
+    MOV_YCOIN_ACT_BLINKING
+};
 
 /* Coin Formation */
-    /* oBehParams2ndByte */
-    #define COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE         0x00
-    #define COIN_FORMATION_BP_SHAPE_VERTICAL_LINE           0x01
-    #define COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING         0x02
-    #define COIN_FORMATION_BP_SHAPE_VERTICAL_RING           0x03
-    #define COIN_FORMATION_BP_SHAPE_ARROW                   0x04
-    #define COIN_FORMATION_BP_SHAPE_MASK                    0x07
-    #define COIN_FORMATION_BP_FLYING                        0x10
-    /* oAction */
-    #define COIN_FORMATION_ACT_INACTIVE                     0x00
-    #define COIN_FORMATION_ACT_ACTIVE                       0x01
-    #define COIN_FORMATION_ACT_DEACTIVATE                   0x02
+enum oBehParams2ndByteCoinFormation {
+    COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE,
+    COIN_FORMATION_BP_SHAPE_VERTICAL_LINE,
+    COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING,
+    COIN_FORMATION_BP_SHAPE_VERTICAL_RING,
+    COIN_FORMATION_BP_SHAPE_ARROW,
+    COIN_FORMATION_BP_SHAPE_MASK = 0x07,
+    COIN_FORMATION_BP_FLYING     = 0x10
+};
+enum oActionsCoinFormation {
+    COIN_FORMATION_ACT_INACTIVE,
+    COIN_FORMATION_ACT_ACTIVE,
+    COIN_FORMATION_ACT_DEACTIVATE
+};
 
 /* Coin Inside Boo */
-    /* oAction */
-    #define COIN_INSIDE_BOO_ACT_CARRIED                     0x0
-    #define COIN_INSIDE_BOO_ACT_DROPPED                     0x1
+enum oActionsCoinInsideBoo {
+    COIN_INSIDE_BOO_ACT_CARRIED,
+    COIN_INSIDE_BOO_ACT_DROPPED
+};
 
 /* 1-Up Mushroom */
-    /* oBehParams2ndByte */
-    #define MUSHROOM_BP_REQUIRES_NONE                       0x0
-    #define MUSHROOM_BP_REQUIRES_BOWSER_1                   0x1
-    #define MUSHROOM_BP_REQUIRES_BOWSER_2                   0x2
-    /* oAction */
-    #define MUSHROOM_ACT_INIT                               0x0
-    #define MUSHROOM_ACT_MOVING                             0x1
-    #define MUSHROOM_ACT_DISAPPEARING                       0x2
-    #define MUSHROOM_ACT_LOOP_IN_AIR                        0x3
+enum oBehParams2ndByte1UpMushroom {
+    MUSHROOM_BP_REQUIRES_NONE,
+    MUSHROOM_BP_REQUIRES_BOWSER_1,
+    MUSHROOM_BP_REQUIRES_BOWSER_2
+};
+enum oActions1UpMushroom {
+    MUSHROOM_ACT_INIT,
+    MUSHROOM_ACT_MOVING,
+    MUSHROOM_ACT_DISAPPEARING,
+    MUSHROOM_ACT_LOOP_IN_AIR
+};
 
 /* Bob-omb */
     /* oBehParams2ndByte */
@@ -286,9 +316,6 @@ enum CoinTypes { // coinType
     #define BOBOMB_ACT_LAUNCHED                             0x1
     #define BOBOMB_ACT_CHASE_MARIO                          0x2
     #define BOBOMB_ACT_EXPLODE                              0x3
-    /* oAnimState */
-    #define BOBOMB_ANIM_STATE_EYES_OPEN                     OBJ_BLINKING_ANIM_STATE_EYES_OPEN
-    #define BOBOMB_ANIM_STATE_EYES_CLOSED                   OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
     /* Animations */
     #define BOBOMB_ANIM_WALKING                             0x0
     #define BOBOMB_ANIM_HELD                                0x1
@@ -628,50 +655,55 @@ enum CoinTypes { // coinType
     #define JUMPING_BOX_SUB_ACT_IDLE_RESET_TIMER            0x1
 
 /* Exclamation Box */
-    /* oBehParams2ndByte, ExclamationBoxContents->id */
-    #define EXCLAMATION_BOX_BP_WING_CAP                     0x0
-    #define EXCLAMATION_BOX_BP_METAL_CAP                    0x1
-    #define EXCLAMATION_BOX_BP_VANISH_CAP                   0x2
-    #define EXCLAMATION_BOX_BP_KOOPA_SHELL                  0x3
-    #define EXCLAMATION_BOX_BP_COINS_1                      0x4
-    #define EXCLAMATION_BOX_BP_COINS_3                      0x5
-    #define EXCLAMATION_BOX_BP_COINS_10                     0x6
-    #define EXCLAMATION_BOX_BP_1UP_WALKING                  0x7
-    #define EXCLAMATION_BOX_BP_STAR_1                       0x8
-    #define EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY             0x9
-    #define EXCLAMATION_BOX_BP_STAR_2                       0xA
-    #define EXCLAMATION_BOX_BP_STAR_3                       0xB
-    #define EXCLAMATION_BOX_BP_STAR_4                       0xC
-    #define EXCLAMATION_BOX_BP_STAR_5                       0xD
-    #define EXCLAMATION_BOX_BP_STAR_6                       0xE
-    #define EXCLAMATION_BOX_BP_NULL                         0x63
-    /* oAction */
-    #define EXCLAMATION_BOX_ACT_INIT                        0x0
-    #define EXCLAMATION_BOX_ACT_OUTLINE                     0x1
-    #define EXCLAMATION_BOX_ACT_ACTIVE                      0x2
-    #define EXCLAMATION_BOX_ACT_SCALING                     0x3
-    #define EXCLAMATION_BOX_ACT_EXPLODE                     0x4
-    #define EXCLAMATION_BOX_ACT_WAIT_FOR_RESPAWN            0x5
-    /* oAnimState */
-    #define EXCLAMATION_BOX_ANIM_STATE_RED                  0x0
-    #define EXCLAMATION_BOX_ANIM_STATE_GREEN                0x1
-    #define EXCLAMATION_BOX_ANIM_STATE_BLUE                 0x2
-    #define EXCLAMATION_BOX_ANIM_STATE_YELLOW               0x3
+enum ExclamationBoxContentsList { // oBehParams2ndByte, ExclamationBoxContents->id
+    EXCLAMATION_BOX_BP_WING_CAP,
+    EXCLAMATION_BOX_BP_METAL_CAP,
+    EXCLAMATION_BOX_BP_VANISH_CAP,
+    EXCLAMATION_BOX_BP_KOOPA_SHELL,
+    EXCLAMATION_BOX_BP_COINS_1,
+    EXCLAMATION_BOX_BP_COINS_3,
+    EXCLAMATION_BOX_BP_COINS_10,
+    EXCLAMATION_BOX_BP_1UP_WALKING,
+    EXCLAMATION_BOX_BP_STAR_1,
+    EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY,
+    EXCLAMATION_BOX_BP_STAR_2,
+    EXCLAMATION_BOX_BP_STAR_3,
+    EXCLAMATION_BOX_BP_STAR_4,
+    EXCLAMATION_BOX_BP_STAR_5,
+    EXCLAMATION_BOX_BP_STAR_6,
+    EXCLAMATION_BOX_BP_NULL = 99
+};
+enum oActionsExclamationBox {
+    EXCLAMATION_BOX_ACT_INIT,
+    EXCLAMATION_BOX_ACT_OUTLINE,
+    EXCLAMATION_BOX_ACT_ACTIVE,
+    EXCLAMATION_BOX_ACT_SCALING,
+    EXCLAMATION_BOX_ACT_EXPLODE,
+    EXCLAMATION_BOX_ACT_WAIT_FOR_RESPAWN
+};
+enum oAnimStatesExcalamationBox {
+    EXCLAMATION_BOX_ANIM_STATE_RED,
+    EXCLAMATION_BOX_ANIM_STATE_GREEN,
+    EXCLAMATION_BOX_ANIM_STATE_BLUE,
+    EXCLAMATION_BOX_ANIM_STATE_YELLOW
+};
 
 /* Cap Switch */
-    /* oAction */
-    #define CAP_SWITCH_ACT_INIT                             0x0
-    #define CAP_SWITCH_ACT_IDLE                             0x1
-    #define CAP_SWITCH_ACT_BEING_PRESSED                    0x2
-    #define CAP_SWITCH_ACT_DONE                             0x3
+enum oActionsCapSwitch {
+    CAP_SWITCH_ACT_INIT,
+    CAP_SWITCH_ACT_IDLE,
+    CAP_SWITCH_ACT_BEING_PRESSED,
+    CAP_SWITCH_ACT_DONE
+};
 
 /* Mario Cap */
-    /* oAction */
-    #define CAP_ACT_MOVE                                    0x0
-    #define CAP_ACT_QUICKSAND                               0xA
-    #define CAP_ACT_MOVING_QUICKSAND                        0xB
-    #define CAP_ACT_INSTANT_QUICKSAND                       0xC
-    #define CAP_ACT_INSTANT_MOVING_QUICKSAND                0xD
+enum oActionsMarioCap {
+    CAP_ACT_MOVE,
+    CAP_ACT_QUICKSAND = 0xA,
+    CAP_ACT_MOVING_QUICKSAND,
+    CAP_ACT_INSTANT_QUICKSAND,
+    CAP_ACT_INSTANT_MOVING_QUICKSAND,
+};
 
 /* Koopa Shell */
     /* oAction */
@@ -1248,9 +1280,6 @@ enum CoinTypes { // coinType
     #define KOOPA_BP_KOOPA_THE_QUICK_BOB                    (KOOPA_BP_KOOPA_THE_QUICK_BASE + KOOPA_THE_QUICK_BOB_INDEX)
     #define KOOPA_BP_KOOPA_THE_QUICK_THI                    (KOOPA_BP_KOOPA_THE_QUICK_BASE + KOOPA_THE_QUICK_THI_INDEX)
     #define KOOPA_BP_TINY                                   0x4
-    /* oAnimState */
-    #define KOOPA_ANIM_STATE_EYES_OPEN                      OBJ_BLINKING_ANIM_STATE_EYES_OPEN
-    #define KOOPA_ANIM_STATE_EYES_CLOSED                    OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
     /* Animations */
     #define KOOPA_ANIM_SHELLED_UNUSED3                      0x0
     #define KOOPA_ANIM_SHELLED_RUN_AWAY                     0x1
@@ -1578,7 +1607,8 @@ enum CoinTypes { // coinType
     #define UKIKI_ANIM_STATE_EYE_CLOSED                     0x1
     #define UKIKI_ANIM_STATE_CAP_ON                         0x2
     /* oUkikiHasCap */
-    #define UKIKI_CAP_ON                                    0x1 //!
+    #define UKIKI_CAP_OFF                                   0x0
+    #define UKIKI_CAP_ON                                    0x1
 
 /* Ukiki Cage Star */
     /* oAction */
@@ -1728,35 +1758,41 @@ enum CoinTypes { // coinType
     #define PYRAMID_WALL_ACT_MOVING_UP                      0x1
 
 /* Tox Box */
-    /* oBehParams2ndByte */
-    #define TOX_BOX_BP_PATTERN_1                            0x0
-    #define TOX_BOX_BP_PATTERN_2                            0x1
-    #define TOX_BOX_BP_PATTERN_3                            0x2
-    /* oAction */
-    #define TOX_BOX_ACT_END                                -0x1
-    #define TOX_BOX_ACT_INIT                                0x0
-    #define TOX_BOX_ACT_STEP                                0x1
-    #define TOX_BOX_ACT_WAIT                                0x2
-    #define TOX_BOX_ACT_MOVE_FORWARD                        0x3
-    #define TOX_BOX_ACT_MOVE_BACKWARD                       0x4
-    #define TOX_BOX_ACT_MOVE_DOWN                           0x5
-    #define TOX_BOX_ACT_MOVE_UP                             0x6
+enum BehParamsToxBoxPatterns { // oBehParams2ndByte
+    TOX_BOX_BP_PATTERN_1,
+    TOX_BOX_BP_PATTERN_2,
+    TOX_BOX_BP_PATTERN_3
+};
+
+enum oActionsToxBox {
+    TOX_BOX_ACT_END = -1,
+    TOX_BOX_ACT_INIT,
+    TOX_BOX_ACT_STEP,
+    TOX_BOX_ACT_WAIT,
+    TOX_BOX_ACT_MOVE_FORWARD,
+    TOX_BOX_ACT_MOVE_BACKWARD,
+    TOX_BOX_ACT_MOVE_DOWN,
+    TOX_BOX_ACT_MOVE_UP
+};
 
 /* Penguins (general) */
-    /* Walking sounds */
-    #define PENGUIN_SOUND_WALK_BABY                         0x0
-    #define PENGUIN_SOUND_WALK_BIG                          0x1
-    /* geo_switch_tuxie_mother_eyes */
-    #define PENGUIN_ANIM_STATE_EYES_OPEN                    0x0
-    #define PENGUIN_ANIM_STATE_EYES_HALF_CLOSED             0x1
-    #define PENGUIN_ANIM_STATE_EYES_CLOSED                  0x2
-    #define PENGUIN_ANIM_STATE_EYES_ANGRY                   0x3
-    #define PENGUIN_ANIM_STATE_EYES_SAD                     0x4
-    /* Animations */
-    #define PENGUIN_ANIM_WALK                               0x0
-    #define PENGUIN_ANIM_DIVE_SLIDE                         0x1
-    #define PENGUIN_ANIM_STAND_UP                           0x2
-    #define PENGUIN_ANIM_IDLE                               0x3
+enum PenguinWalkingSounds {
+    PENGUIN_SOUND_WALK_BABY,
+    PENGUIN_SOUND_WALK_BIG
+};
+enum oAnimStatesPenguin { // geo_switch_tuxie_mother_eyes
+    PENGUIN_ANIM_STATE_EYES_OPEN,
+    PENGUIN_ANIM_STATE_EYES_HALF_CLOSED,
+    PENGUIN_ANIM_STATE_EYES_CLOSED,
+    PENGUIN_ANIM_STATE_EYES_ANGRY,
+    PENGUIN_ANIM_STATE_EYES_SAD
+};
+enum AnimIDsPenguin { // Animations
+    PENGUIN_ANIM_WALK,
+    PENGUIN_ANIM_DIVE_SLIDE,
+    PENGUIN_ANIM_STAND_UP,
+    PENGUIN_ANIM_IDLE
+};
 
 /* Racing Penguin */
     /* oBehParams2ndByte */
@@ -1946,8 +1982,6 @@ enum CoinTypes { // coinType
     /* oAction */
     #define HAUNTED_CHAIR_ACT_FALL_OR_SPIN                  0x0
     #define HAUNTED_CHAIR_ACT_FLY                           0x1
-    /* Animations */
-    #define HAUNTED_CHAIR_ANIM_DEFAULT                      0x0
 
 /* Fire piranha plant */
     /* oAction */
@@ -2442,34 +2476,38 @@ enum CoinTypes { // coinType
     #define WHITE_PUFF_EXPLODE_BP_SLOW_FADE                 0x3
 
 /* Dirt Particle */
-    /* oAnimState */
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_RED               0x0
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_GREEN             0x1
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_BLUE              0x2
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_DIRT              0x3
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW            0x4
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_BILLBOARD         0x5
+enum oAnimStatesTinyDirtParticle {
+    TINY_DIRT_PARTICLE_ANIM_STATE_RED,
+    TINY_DIRT_PARTICLE_ANIM_STATE_GREEN,
+    TINY_DIRT_PARTICLE_ANIM_STATE_BLUE,
+    TINY_DIRT_PARTICLE_ANIM_STATE_DIRT,
+    TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW,
+    TINY_DIRT_PARTICLE_ANIM_STATE_BILLBOARD
+};
 
 /* Cartoon Star Particle */
-    /* oAnimState */
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_RED            0x0
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_GREEN          0x1
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_BLUE           0x2
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_YELLOW         0x3
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_BILLBOARD      0x4
+enum oAnimStatesCartoonStarParticle {
+    CARTOON_STAR_PARTICLE_ANIM_STATE_RED,
+    CARTOON_STAR_PARTICLE_ANIM_STATE_GREEN,
+    CARTOON_STAR_PARTICLE_ANIM_STATE_BLUE,
+    CARTOON_STAR_PARTICLE_ANIM_STATE_YELLOW,
+    CARTOON_STAR_PARTICLE_ANIM_STATE_BILLBOARD
+};
 
 /* Music Touch */
-    /* oAction */
-    #define MUSIC_TOUCH_ACT_PLAY_SOUND                      0x0
-    #define MUSIC_TOUCH_ACT_DONE                            0x1
+enum oActionsMusicTouch {
+    MUSIC_TOUCH_ACT_PLAY_SOUND,
+    MUSIC_TOUCH_ACT_DONE
+};
 
 /* Intro Scene */
-    /* gCutsceneObjSpawn */
-    #define CUTSCENE_OBJ_NONE                               0x0
-    #define CUTSCENE_OBJ_BEGINNING_PEACH                    0x5
-    #define CUTSCENE_OBJ_BEGINNING_LAKITU                   0x6
-    #define CUTSCENE_OBJ_7_END_BIRDS_1                      0x7
-    #define CUTSCENE_OBJ_5_END_BIRDS_2                      0x8
-    #define CUTSCENE_OBJ_2_END_BIRDS_1                      0x9
+enum gCutsceneObjSpawns {
+    CUTSCENE_OBJ_NONE,
+    CUTSCENE_OBJ_BEGINNING_PEACH = 0x5,
+    CUTSCENE_OBJ_BEGINNING_LAKITU,
+    CUTSCENE_OBJ_7_END_BIRDS_1,
+    CUTSCENE_OBJ_5_END_BIRDS_2,
+    CUTSCENE_OBJ_2_END_BIRDS_1
+};
 
 #endif // OBJECT_CONSTANTS_H

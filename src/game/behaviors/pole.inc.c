@@ -19,7 +19,7 @@ void bhv_pole_init(void) {
      */
 
     // This treats bparam1 and bparam2 as a single value
-    o->hitboxHeight = (((o->oBehParams & (BPARAM1 | BPARAM2)) >> 16) * 10);
+    o->hitboxHeight = (GET_BPARAM12(o->oBehParams) * 10);
 }
 
 /**

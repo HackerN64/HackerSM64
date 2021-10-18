@@ -444,7 +444,7 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
             object->oBehParams = spawnInfo->behaviorArg;
             // The second byte of the behavior parameters is copied over to a special field
             // as it is the most frequently used by objects.
-            object->oBehParams2ndByte = (((spawnInfo->behaviorArg) >> 16) & 0xFF);
+            object->oBehParams2ndByte = GET_BPARAM2(spawnInfo->behaviorArg);
 
             object->behavior = script;
             object->unused1 = 0;
@@ -459,7 +459,7 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
             }
 
             geo_obj_init_spawninfo(&object->header.gfx, spawnInfo);
-            vec3_copy(&object->oPosVec, spawnInfo->startPos);
+            vec3_copy(&object->oPosVec,       spawnInfo->startPos);
             vec3_copy(&object->oFaceAngleVec, spawnInfo->startAngle);
             vec3_copy(&object->oMoveAngleVec, spawnInfo->startAngle);
             object->oFloorHeight = find_floor(object->oPosX, object->oPosY, object->oPosZ, &object->oFloor);

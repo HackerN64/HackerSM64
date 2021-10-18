@@ -415,7 +415,7 @@ static void koopa_unshelled_act_dive(void) {
 
     if (o->oForwardVel != 0.0f) {
         if (o->oAction == KOOPA_UNSHELLED_ACT_LYING) {
-            o->oAnimState = KOOPA_ANIM_STATE_EYES_CLOSED;
+            o->oAnimState = OBJ_BLINKING_ANIM_STATE_EYES_CLOSED;
             cur_obj_init_anim_extend(KOOPA_ANIM_UNSHELLED_LYING);
         } else {
             cur_obj_init_anim_extend(KOOPA_ANIM_SHELLED_LYING);

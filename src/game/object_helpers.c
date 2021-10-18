@@ -1494,9 +1494,9 @@ s32 cur_obj_angle_to_home(void) {
 void obj_set_gfx_pos_at_obj_pos(struct Object *obj1, struct Object *obj2) {
     vec3_copy_y_off(obj1->header.gfx.pos, &obj2->oPosVec, obj2->oGraphYOffset);
 
-    obj1->header.gfx.angle[0] = obj2->oMoveAnglePitch & 0xFFFF;
-    obj1->header.gfx.angle[1] = obj2->oMoveAngleYaw   & 0xFFFF;
-    obj1->header.gfx.angle[2] = obj2->oMoveAngleRoll  & 0xFFFF;
+    obj1->header.gfx.angle[0] = (obj2->oMoveAnglePitch & 0xFFFF);
+    obj1->header.gfx.angle[1] = (obj2->oMoveAngleYaw   & 0xFFFF);
+    obj1->header.gfx.angle[2] = (obj2->oMoveAngleRoll  & 0xFFFF);
 }
 
 /**
@@ -1508,9 +1508,9 @@ void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateInd
     f32 dy = obj->rawData.asF32[localTranslateIndex + 1];
     f32 dz = obj->rawData.asF32[localTranslateIndex + 2];
 
-    obj->rawData.asF32[posIndex + 0] += obj->transform[0][0] * dx + obj->transform[1][0] * dy + obj->transform[2][0] * dz;
-    obj->rawData.asF32[posIndex + 1] += obj->transform[0][1] * dx + obj->transform[1][1] * dy + obj->transform[2][1] * dz;
-    obj->rawData.asF32[posIndex + 2] += obj->transform[0][2] * dx + obj->transform[1][2] * dy + obj->transform[2][2] * dz;
+    obj->rawData.asF32[posIndex + 0] += (obj->transform[0][0] * dx) + (obj->transform[1][0] * dy) + (obj->transform[2][0] * dz);
+    obj->rawData.asF32[posIndex + 1] += (obj->transform[0][1] * dx) + (obj->transform[1][1] * dy) + (obj->transform[2][1] * dz);
+    obj->rawData.asF32[posIndex + 2] += (obj->transform[0][2] * dx) + (obj->transform[1][2] * dy) + (obj->transform[2][2] * dz);
 }
 
 void obj_build_transform_from_pos_and_angle(struct Object *obj, s16 posIndex, s16 angleIndex) {

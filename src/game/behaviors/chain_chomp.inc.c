@@ -449,7 +449,7 @@ void bhv_wooden_post_update(void) {
 
     if (o->oWoodenPostOffsetY != 0.0f) {
         o->oPosY = (o->oHomeY + o->oWoodenPostOffsetY);
-    } else if (!(o->oBehParams & BPARAM3)) { // Whether the post has coins or not
+    } else if (!GET_BPARAM3(o->oBehParams)) { // Whether the post has coins or not
         // Reset the timer once mario is far enough
         if (o->oDistanceToMario > 400.0f) {
             o->oTimer = o->oWoodenPostTotalMarioAngle = 0;

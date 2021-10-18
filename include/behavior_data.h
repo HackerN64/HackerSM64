@@ -5,7 +5,7 @@
 
 extern const BehaviorScript bhvStarDoor[];
 extern const BehaviorScript bhvMrI[];
-extern const BehaviorScript bhvMrIBody[];
+extern const BehaviorScript bhvMrIIris[];
 extern const BehaviorScript bhvMrIParticle[];
 extern const BehaviorScript bhvPurpleParticle[];
 extern const BehaviorScript bhvGiantPole[];

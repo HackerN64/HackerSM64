@@ -281,7 +281,7 @@ static void floomba_act_startup(void) {
         o->oBehParams &= ~0x00008000;
     }
 
-    if ((o->oBehParams & BPARAM4) > 0x00) {
+    if (GET_BPARAM4(o->oBehParams)) {
         o->oBehParams--;
         return;
     }
@@ -291,7 +291,7 @@ static void floomba_act_startup(void) {
     if (((o->oBehParams >> 8) & 0x7F) > o->oZoomCounter) {
         f32 frac = (f32) o->oZoomCounter / (f32) ((o->oBehParams >> 8) & 0x7F);
         o->oPosZ = (o->oZoomPosZ - (300.0f * (1.0f - frac)));
-        o->oGoombaScale = (sGoombaProperties[o->oGoombaSize].scale * frac * frac);
+        o->oGoombaScale = (sGoombaProperties[o->oGoombaSize].scale * sqr(frac));
         o->oZoomCounter++;
     } else {
         o->oPosZ = o->oZoomPosZ;
