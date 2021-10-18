@@ -20,7 +20,7 @@ void grindel_thwomp_act_falling(void) {
 }
 
 void grindel_thwomp_act_land(void) {
-    if (o->oTimer == 0) && (o->oDistanceToMario < 1500.0f) {
+    if ((o->oTimer == 0) && (o->oDistanceToMario < 1500.0f)) {
         cur_obj_shake_screen(SHAKE_POS_SMALL);
         cur_obj_play_sound_2(SOUND_OBJ_THWOMP);
     }
