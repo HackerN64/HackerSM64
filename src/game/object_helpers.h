@@ -196,8 +196,8 @@ s32 cur_obj_reflect_move_angle_off_wall(void);
 #define WAYPOINT_MASK_00FF 0x00FF
 #define WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE 3
 
-#define PATH_NONE 0
-#define PATH_REACHED_END -1
+#define PATH_NONE             0
+#define PATH_REACHED_END     -1
 #define PATH_REACHED_WAYPOINT 1
 
 struct GraphNode_802A45E4 {

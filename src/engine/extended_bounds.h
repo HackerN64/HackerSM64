@@ -57,8 +57,8 @@ STATIC_ASSERT(((EXTENDED_BOUNDS_MODE >= 0) && (EXTENDED_BOUNDS_MODE <= 3)), "You
 #define SURFACE_POOL_SIZE           (LEVEL_BOUNDARY_MAX / 2) // Vanilla: 2300
 // The maximum amount of SurfaceNodes (static and dynamic combined).
 // Each cell has a SurfaceNode for every surface which intersects it,
-// so each cell a surface intersects with gets its own SurfaceNode.
-// Larger surfaces means more SurfaceNodes.
+// so each cell a Surface intersects with gets its own SurfaceNode,
+// so larger surfaces means more SurfaceNodes.
 // Multiply SURFACE_POOL_SIZE by the average amount of cells the surfaces intersect.
 #define SURFACE_NODE_POOL_SIZE      (SURFACE_POOL_SIZE * 4) // Vanilla: 7000
 

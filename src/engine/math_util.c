@@ -973,11 +973,14 @@ Vec4s *gSplineKeyframe;
 float gSplineKeyframeFraction;
 int gSplineState;
 
-#define CURVE_BEGIN_1 0x1
-#define CURVE_BEGIN_2 0x2
-#define CURVE_MIDDLE  0x3
-#define CURVE_END_1   0x4
-#define CURVE_END_2   0x5
+enum gSplineStates {
+    CURVE_NONE,
+    CURVE_BEGIN_1,
+    CURVE_BEGIN_2,
+    CURVE_MIDDLE,
+    CURVE_END_1,
+    CURVE_END_2
+};
 
 /**
  * Set 'result' to a 4-vector with weights corresponding to interpolation
@@ -1004,11 +1007,11 @@ int gSplineState;
  * TODO: verify the classification of the spline / figure out how polynomials were computed
  */
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c) {
-    f32 tinv = 1 - t;
-    f32 tinv2 = tinv * tinv;
-    f32 tinv3 = tinv2 * tinv;
-    f32 t2 = t * t;
-    f32 t3 = t2 * t;
+    f32 tinv = (1 - t);
+    f32 tinv2 = (tinv  * tinv);
+    f32 tinv3 = (tinv2 * tinv);
+    f32 t2 = (t  * t);
+    f32 t3 = (t2 * t);
 
     switch (gSplineState) {
         case CURVE_BEGIN_1:
