@@ -1058,13 +1058,13 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
             switch (animFrame) {
                 case -1:
                     spawn_obj_at_mario_rel_yaw(m, MODEL_BOWSER_KEY_CUTSCENE, bhvBowserKeyCourseExit, -32768);
-                    //! fall through
+                    //! fallthrough
                 case 67:
                     play_sound(SOUND_ACTION_KEY_SWISH, m->marioObj->header.gfx.cameraToObject);
-                    //! fall through
+                    //! fallthrough
                 case 83:
                     play_sound(SOUND_ACTION_PAT_BACK, m->marioObj->header.gfx.cameraToObject);
-                    //! fall through
+                    //! fallthrough
                 case 111:
                     play_sound(SOUND_ACTION_KEY_UNKNOWN45C, m->marioObj->header.gfx.cameraToObject);
                     // no break
@@ -1089,7 +1089,7 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
                     cutscene_take_cap_off(m);
                     break;
                 case 37:
-                // fall through
+                // fallthrough
                 case 53:
                     play_sound(SOUND_ACTION_BRUSH_HAIR, m->marioObj->header.gfx.cameraToObject);
                     break;
@@ -1267,7 +1267,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
 
             m->actionState = ACT_STATE_BBH_ENTER_SPIN_SPINNING;
             m->actionTimer = 100;
-            // fall through
+            // fallthrough
 
         case ACT_STATE_BBH_ENTER_SPIN_SPINNING:
             m->faceAngle[1] = atan2s(cageDZ, cageDX);
@@ -1285,7 +1285,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
             break;
 
         case ACT_STATE_BBH_ENTER_SPIN_WAIT_FOR_ANIM:
-            // fall through
+            // fallthrough
         case ACT_STATE_BBH_ENTER_SPIN_DIVE:
             m->faceAngle[1] = atan2s(cageDZ, cageDX);
             mario_set_forward_vel(m, forwardVel);
@@ -1844,7 +1844,7 @@ static s32 jumbo_star_cutscene_flying(struct MarioState *m) {
             set_mario_animation(m, MARIO_ANIM_WING_CAP_FLY);
             anim_spline_init(sJumboStarKeyframes);
             m->actionState = ACT_STATE_JUMBO_STAR_CUTSCENE_FLYING_ANGLES;
-            // fall through
+            // fallthrough
         case ACT_STATE_JUMBO_STAR_CUTSCENE_FLYING_ANGLES:
             if (anim_spline_poll(targetPos)) {
                 // does this twice
@@ -1978,7 +1978,7 @@ static void end_peach_cutscene_summon_jumbo_star(struct MarioState *m) {
         advance_cutscene_step(m);
     }
 
-    sEndJumboStarObj->oFaceAngleYaw += 0x0400;
+    sEndJumboStarObj->oFaceAngleYaw += 0x400;
     generate_yellow_sparkles(0, 2528, -1800, 250.0f);
     play_sound(SOUND_AIR_PEACH_TWINKLE, sEndJumboStarObj->header.gfx.cameraToObject);
 }

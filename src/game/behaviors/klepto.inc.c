@@ -1,19 +1,21 @@
+// klepto.inc.c
+
 static struct ObjectHitbox sKleptoHitbox = {
     /* interactType:      */ INTERACT_HIT_FROM_BELOW,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 0,
-    /* health:            */ 1,
-    /* numLootCoins:      */ 0,
+    /* downOffset:        */   0,
+    /* damageOrCoinValue: */   0,
+    /* health:            */   1,
+    /* numLootCoins:      */   0,
     /* radius:            */ 160,
     /* height:            */ 250,
-    /* hurtboxRadius:     */ 80,
+    /* hurtboxRadius:     */  80,
     /* hurtboxHeight:     */ 200,
 };
 
 static Vec3f sKleptoTargetPositions[] = {
-    { 2200.0f, 1250.0f, -2820.0f },
+    {  2200.0f, 1250.0f, -2820.0f },
     { -6200.0f, 1250.0f, -2800.0f },
-    { -6200.0f, 1250.0f, 1150.0f },
+    { -6200.0f, 1250.0f,  1150.0f },
 };
 
 static u8 sKleptoAttackHandlers[] = { 2, 2, 5, 5, 2, 2 };
@@ -61,9 +63,9 @@ static void klepto_anim_dive(void) {
         }
     } else {
         obj_move_pitch_approach(o->oKleptoPitchToTarget, 600);
-        if (klepto_set_and_check_if_anim_at_end() != 0) {
+        if (klepto_set_and_check_if_anim_at_end()) {
             if (o->oKleptoDiveTimer != 0) {
-                o->oKleptoDiveTimer += 1;
+                o->oKleptoDiveTimer++;
             } else if (o->oKleptoPitchToTarget > -100) {
                 o->oKleptoDiveTimer = random_linear_offset(60, 60);
             }
@@ -92,13 +94,13 @@ void bhv_klepto_init(void) {
 
 static void klepto_change_target(void) {
     s32 newTarget = 0;
-    s32 i;
-    f32 dx, dz;
-    f32 targetDist;
-    f32 minTargetDist;
 
     if (o->oDistanceToMario > 2000.0f) {
-        minTargetDist = 99999.0f;
+        s32 i;
+        f32 dx;
+        f32 dz;
+        f32 targetDist;
+        f32 minTargetDist = 99999.0f;
 
         for (i = 0; i < 3; i++) {
             dx = gMarioObject->oPosX - sKleptoTargetPositions[i][0];
@@ -143,8 +145,7 @@ static void klepto_circle_target(f32 radius, f32 targetSpeed) {
 
         //! The multiplied value is sometimes out of range for an s16 during the s32 -> s16 cast,
         //  which might invert sign.
-        turnAmount =
-            (s16)(s32)(abs_angle_diff(o->oKleptoYawToTarget, o->oMoveAngleYaw) * (0.03f * o->oKleptoSpeed));
+        turnAmount = (s16)(s32)(abs_angle_diff(o->oKleptoYawToTarget, o->oMoveAngleYaw) * (0.03f * o->oKleptoSpeed));
         clamp_s16(&turnAmount, 400, 700);
         obj_rotate_yaw_and_bounce_off_walls(o->oKleptoYawToTarget, turnAmount);
 
@@ -187,8 +188,11 @@ static void klepto_act_wait_for_mario(void) {
 static void klepto_act_turn_toward_mario(void) {
     klepto_target_mario();
 
-    if (klepto_set_and_check_if_anim_at_end() && cur_obj_check_if_at_animation_end() && o->oKleptoDistanceToTarget > 800.0f
-        && abs_angle_diff(o->oAngleToMario, o->oFaceAngleYaw) < 0x800 && o->oKleptoPitchToTarget < 0x400) {
+    if (klepto_set_and_check_if_anim_at_end()
+     && cur_obj_check_if_at_animation_end()
+     && (o->oKleptoDistanceToTarget > 800.0f)
+     && (abs_angle_diff(o->oAngleToMario, o->oFaceAngleYaw) < 0x800)
+     && (o->oKleptoPitchToTarget < 0x400)) {
         cur_obj_play_sound_2(SOUND_OBJ_KLEPTO_TURN);
         o->oAction = KLEPTO_ACT_DIVE_AT_MARIO;
         o->oMoveAngleYaw = o->oFaceAngleYaw;
@@ -203,6 +207,7 @@ static void klepto_act_turn_toward_mario(void) {
 
 static void klepto_act_dive_at_mario(void) {
     approach_f32_ptr(&o->oKleptoSpeed, 60.0f, 10.0f);
+
     if (o->oSoundStateID == 2) {
         if (cur_obj_check_anim_frame(11)) {
             cur_obj_play_sound_2(SOUND_GENERAL_WING_FLAP);
@@ -217,7 +222,8 @@ static void klepto_act_dive_at_mario(void) {
             }
         }
     } else {
-        f32 dy = o->oPosY - gMarioObject->oPosY;
+        f32 dy = (o->oPosY - gMarioObject->oPosY);
+
         if (o->oSoundStateID == 3) {
             cur_obj_set_anim_if_at_end(4);
         } else if (o->oVelY > 0.0f && dy > 200.0f) {
@@ -231,16 +237,15 @@ static void klepto_act_dive_at_mario(void) {
                 o->oKleptoYawToTarget = o->oAngleToMario;
 
                 if (dy < 160.0f) {
-                    o->oSubAction += 1;
+                    o->oSubAction++;
                 }
             }
 
             if (gMarioStates[0].action != ACT_SLEEPING
                 && !(gMarioStates[0].action & (ACT_FLAG_SHORT_HITBOX | ACT_FLAG_BUTT_OR_STOMACH_SLIDE))
-                && o->oDistanceToMario < 200.0f && dy > 50.0f && dy < 90.0f) {
-                if (mario_lose_cap_to_enemy(1)) {
-                    o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_CAP;
-                }
+                && o->oDistanceToMario < 200.0f && dy > 50.0f && dy < 90.0f
+                && mario_lose_cap_to_enemy(1)) {
+                o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_CAP;
             }
         }
     }
@@ -277,14 +282,13 @@ static void klepto_act_retreat(void) {
     obj_face_pitch_approach(o->oMoveAnglePitch, 1000);
     obj_rotate_yaw_and_bounce_off_walls(o->oKleptoYawToTarget, 600);
 
-    if (obj_face_yaw_approach(o->oMoveAngleYaw, 1000)) {
-        if (abs_angle_diff(o->oFaceAnglePitch, o->oMoveAnglePitch) == 0) {
-            o->oAction = KLEPTO_ACT_RESET_POSITION;
-            o->oHomeY = 1500.0f;
-            o->oKleptoDiveTimer = -100;
-            o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
-            cur_obj_become_tangible();
-        }
+    if (obj_face_yaw_approach(o->oMoveAngleYaw, 1000)
+     && (abs_angle_diff(o->oFaceAnglePitch, o->oMoveAnglePitch) == 0x0)) {
+        o->oAction = KLEPTO_ACT_RESET_POSITION;
+        o->oHomeY = 1500.0f;
+        o->oKleptoDiveTimer = -100;
+        o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
+        cur_obj_become_tangible();
     }
 }
 
@@ -303,9 +307,7 @@ static void klepto_act_reset_position(void) {
         }
     } else {
         o->oAction = KLEPTO_ACT_WAIT_FOR_MARIO;
-        o->oHomeX = o->oKleptoStartPosX;
-        o->oHomeY = o->oKleptoStartPosY;
-        o->oHomeZ = o->oKleptoStartPosZ;
+        vec3_copy(&o->oHomeVec, &o->oKleptoStartPosVec);
     }
 }
 
@@ -367,8 +369,7 @@ void bhv_klepto_update(void) {
             o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
             cur_obj_become_intangible();
         } else if (gMarioStates[0].action == ACT_SLEEPING
-                   || (gMarioStates[0].action
-                       & (ACT_FLAG_SHORT_HITBOX | ACT_FLAG_BUTT_OR_STOMACH_SLIDE))) {
+                   || (gMarioStates[0].action & (ACT_FLAG_SHORT_HITBOX | ACT_FLAG_BUTT_OR_STOMACH_SLIDE))) {
             cur_obj_become_intangible();
         } else {
             cur_obj_become_tangible();

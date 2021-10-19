@@ -1,7 +1,7 @@
 // animated_floor_switch.inc.c
 
 struct FloorSwitchTriggeredAnimationFrame {
-    const void *collisionDataPtr;
+    const Collision *collision;
     ModelID16 model;
 };
 
@@ -63,7 +63,7 @@ void bhv_animates_on_floor_switch_press_loop(void) {
         }
 
         if (o->oFloorSwitchPressAnimationDoubleFrame < 9) {
-            o->oFloorSwitchPressAnimationDoubleFrame += 1;
+            o->oFloorSwitchPressAnimationDoubleFrame++;
         }
     } else if ((o->oFloorSwitchPressAnimationDoubleFrame -= 2) < 0) {
         o->oFloorSwitchPressAnimationDoubleFrame = 0;
@@ -71,7 +71,7 @@ void bhv_animates_on_floor_switch_press_loop(void) {
     }
 
     o->collisionData = segmented_to_virtual(
-        sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationDoubleFrame / 2].collisionDataPtr);
+        sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationDoubleFrame / 2].collision);
 
     cur_obj_set_model(sFloorSwitchTriggeredAnimationFrames[o->oBehParams2ndByte][o->oFloorSwitchPressAnimationDoubleFrame / 2].model);
 }

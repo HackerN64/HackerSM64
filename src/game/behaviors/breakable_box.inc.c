@@ -1,4 +1,4 @@
-// breakable_box.c.inc
+// breakable_box.inc.c
 
 struct ObjectHitbox sBreakableBoxHitbox = {
     /* interactType:      */ INTERACT_BREAKABLE,
@@ -37,12 +37,11 @@ void hidden_breakable_box_actions(void) {
             if (o->oHiddenObjectSwitchObj == NULL) {
                 o->oHiddenObjectSwitchObj = cur_obj_nearest_object_with_behavior(bhvFloorSwitchHiddenObjects);
             }
-            if ((switchObj = o->oHiddenObjectSwitchObj) != NULL) {
-                if (switchObj->oAction == PURPLE_SWITCH_ACT_TICKING) {
-                    o->oAction = BREAKABLE_BOX_ACT_ACTIVE;
-                    cur_obj_enable_rendering();
-                    cur_obj_unhide();
-                }
+            switchObj = o->oHiddenObjectSwitchObj;
+            if ((switchObj != NULL) && (switchObj->oAction == PURPLE_SWITCH_ACT_TICKING)) {
+                o->oAction = BREAKABLE_BOX_ACT_ACTIVE;
+                cur_obj_enable_rendering();
+                cur_obj_unhide();
             }
             break;
         case BREAKABLE_BOX_ACT_ACTIVE:

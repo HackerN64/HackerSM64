@@ -15,7 +15,7 @@
 
 #define PAINTING_ID_DDD 0x7
 
-#define BOARD_BOWSERS_SUB 1
+#define BOARD_BOWSERS_SUB (1 << 0)
 
 #define DDD_FLAGS_NONE              (0 << 0) // 0x0
 #define DDD_FLAG_BACK               (1 << 0) // 0x1
@@ -39,8 +39,7 @@ enum PaintingType
     PAINTING_ENV_MAP
 };
 
-struct Painting
-{
+struct Painting {
     s16 id;
     /// How many images should be drawn when the painting is rippling.
     s8 imageCount;

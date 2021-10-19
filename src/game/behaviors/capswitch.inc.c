@@ -1,11 +1,16 @@
-// capswitch.c.inc
+// capswitch.inc.c
 
-static s32 sCapSaveFlags[] = { SAVE_FLAG_HAVE_WING_CAP, SAVE_FLAG_HAVE_METAL_CAP, SAVE_FLAG_HAVE_VANISH_CAP };
+static s32 sCapSaveFlags[] = {
+    SAVE_FLAG_HAVE_WING_CAP,
+    SAVE_FLAG_HAVE_METAL_CAP,
+    SAVE_FLAG_HAVE_VANISH_CAP
+};
 
 void cap_switch_act_0(void) {
     o->oAnimState = o->oBehParams2ndByte;
     cur_obj_scale(0.5f);
     o->oPosY += 71.0f;
+
     spawn_object_relative_with_scale(0, 0, -71, 0, 0.5f, o, MODEL_CAP_SWITCH_BASE, bhvCapSwitchBase);
 #ifdef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte]) {
@@ -51,21 +56,23 @@ void cap_switch_act_2(void) {
         //! Neither of these flags are defined in this function so they do nothing.
         //  On an extra note, there's a specific check for this cutscene and
         //  there's no dialog defined since the cutscene itself calls the dialog.
-        s32 response = cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_FRONT,
+        s32 dialogResponse = cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_FRONT,
             (DIALOG_FLAG_TEXT_RESPONSE | DIALOG_FLAG_UNK_CAPSWITCH), CUTSCENE_CAP_SWITCH_PRESS, 0);
-        if (response)
+        if (dialogResponse) {
             o->oAction = 3;
+        }
     }
 }
 
+// dead function
 void cap_switch_act_3(void) {
-} // dead function
+}
 
 ObjActionFunc sCapSwitchActions[] = {
     cap_switch_act_0,
     cap_switch_act_1,
     cap_switch_act_2,
-    cap_switch_act_3
+    cap_switch_act_3,
 };
 
 void bhv_cap_switch_loop(void) {

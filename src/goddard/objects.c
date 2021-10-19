@@ -1278,20 +1278,17 @@ void move_animator(struct ObjAnimator *animObj) {
 void drag_picked_object(struct GdObj *inputObj) {
     struct GdVec3f displacement;
     struct GdVec3f spC4;
-    struct GdControl *ctrl;
     Mat4f sp80;
     Mat4f sp40;
     struct GdObj *obj;
-    f32 dispMag;
 
-    ctrl = &gGdCtrl;
+    struct GdControl *ctrl = &gGdCtrl;
 
     if (gViewUpdateCamera == NULL) {
         return;
     }
 
-    dispMag = gd_vec3f_magnitude(&gViewUpdateCamera->unk40);
-    dispMag /= 1000.0f;
+    f32 dispMag = (gd_vec3f_magnitude(&gViewUpdateCamera->unk40) / 1000.0f);
 
     displacement.x = ((f32)(ctrl->csrX - ctrl->dragStartX)) * dispMag;
     displacement.y = ((f32) - (ctrl->csrY - ctrl->dragStartY)) * dispMag;

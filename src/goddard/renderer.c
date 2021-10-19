@@ -62,7 +62,7 @@ struct GdDisplayList {
     /* GD DL Info */
     /*0x40*/ u32 id;     // user specified
     /*0x44*/ u32 number; // count
-    /*0x48*/ u8 pad48[4];
+    /*0x48*/ u8 filler[4];
     /*0x4C*/ struct GdDisplayList *parent; // not quite sure?
 };                                         /* sizeof = 0x50 */
 // accessor macros for gd dl
@@ -1408,7 +1408,7 @@ void gd_dl_set_fill(struct GdColour *colour) {
 }
 
 /* 24CDB4 -> 24CE10; orig name: func_8019E5E4 */
-void gd_dl_set_zbuffer_area(void) {
+void gd_dl_set_z_buffer_area(void) {
     gDPSetDepthImage(next_gfx(), GD_LOWER_24(sActiveView->parent->zbuf));
 }
 
@@ -2058,7 +2058,7 @@ void Unknown801A1E70(void) {
     gDPPipeSync(next_gfx());
     gDPSetCycleType(next_gfx(), G_CYC_FILL);
     gDPSetRenderMode(next_gfx(), G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gd_dl_set_zbuffer_area();
+    gd_dl_set_z_buffer_area();
     gDPSetColorImage(next_gfx(), G_IM_FMT_RGBA, G_IM_SIZ_16b, sActiveView->parent->lowerRight.x,
                      GD_LOWER_24(sActiveView->parent->zbuf));
     gDPSetFillColor(next_gfx(), GPACK_ZDZ(G_MAXFBZ, 0) << 16 | GPACK_ZDZ(G_MAXFBZ, 0));
@@ -2087,10 +2087,8 @@ void gddl_is_loading_shine_dl(s32 dlLoad) {
 
 /* 250C18 -> 251014; orig name: func_801A2448 */
 void start_view_dl(struct ObjView *view) {
-    f32 ulx;
-    f32 uly;
-    f32 lrx;
-    f32 lry;
+    f32 ulx, uly;
+    f32 lrx, lry;
 
     if (view->upperLeft.x < view->parent->upperLeft.x) {
         ulx = view->parent->upperLeft.x;
@@ -2651,13 +2649,13 @@ void Unknown801A4F58(void) {
             r = (s16)(colour >> 11 & 0x1F);
             g = (s16)(colour >> 6 & 0x1F);
             b = (s16)(colour >> 1 & 0x1F);
-            if ((r -= 1) < 0) {
+            if (--r < 0) {
                 r = 0;
             }
-            if ((g -= 1) < 0) {
+            if (--g < 0) {
                 g = 0;
             }
-            if ((b -= 1) < 0) {
+            if (--b < 0) {
                 b = 0;
             }
 
@@ -2872,7 +2870,7 @@ void Unknown801A5D90(struct ObjGroup *arg0) {
         sp23C = FALSE;
 
         for (;;) {
-            trackerNum += 1;
+            trackerNum++;
             mt = get_memtracker_by_index(trackerNum);
 
             if (mt->name != NULL) {
@@ -2922,7 +2920,7 @@ void Unknown801A5FF8(struct ObjGroup *arg0) {
 
     d_start_group("menug");
     sMenuGadgets[0] = d_makeobj(D_GADGET, "menu0");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(5.0f, 0.0f, 0.0f);
     d_set_scale(100.0f, 20.0f, 0.0f);
     d_set_type(6);
@@ -2933,7 +2931,7 @@ void Unknown801A5FF8(struct ObjGroup *arg0) {
     d_add_valptr("menu0", 0x40000, 0, (uintptr_t) NULL);
 
     sMenuGadgets[1] = d_makeobj(D_GADGET, "menu1");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(5.0f, 25.0f, 0.0f);
     d_set_scale(100.0f, 20.0f, 0.0f);
     d_set_type(6);
@@ -2944,7 +2942,7 @@ void Unknown801A5FF8(struct ObjGroup *arg0) {
     d_add_valptr("menu1", 0x40000, 0, (uintptr_t) NULL);
 
     sMenuGadgets[2] = d_makeobj(D_GADGET, "menu2");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(5.0f, 50.0f, 0.0f);
     d_set_scale(100.0f, 20.0f, 0.0f);
     d_set_type(6);
@@ -3049,7 +3047,7 @@ void make_timer_gadgets(void) {
 
     d_start_group("timerg");
     d_makeobj(D_GADGET, "bar1");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(20.0f, 5.0f, 0.0f);
     d_set_scale(50.0f, 5.0f, 0.0f);
     d_set_type(4);
@@ -3060,7 +3058,7 @@ void make_timer_gadgets(void) {
     bar1->colourNum = COLOUR_WHITE;
 
     d_makeobj(D_GADGET, "bar2");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(70.0f, 5.0f, 0.0f);
     d_set_scale(50.0f, 5.0f, 0.0f);
     d_set_type(4);
@@ -3071,7 +3069,7 @@ void make_timer_gadgets(void) {
     bar2->colourNum = COLOUR_PINK;
 
     d_makeobj(D_GADGET, "bar3");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(120.0f, 5.0f, 0.0f);
     d_set_scale(50.0f, 5.0f, 0.0f);
     d_set_type(4);
@@ -3082,7 +3080,7 @@ void make_timer_gadgets(void) {
     bar3->colourNum = COLOUR_WHITE;
 
     d_makeobj(D_GADGET, "bar4");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(170.0f, 5.0f, 0.0f);
     d_set_scale(50.0f, 5.0f, 0.0f);
     d_set_type(4);
@@ -3093,7 +3091,7 @@ void make_timer_gadgets(void) {
     bar4->colourNum = COLOUR_PINK;
 
     d_makeobj(D_GADGET, "bar5");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(220.0f, 5.0f, 0.0f);
     d_set_scale(50.0f, 5.0f, 0.0f);
     d_set_type(4);
@@ -3104,7 +3102,7 @@ void make_timer_gadgets(void) {
     bar5->colourNum = COLOUR_WHITE;
 
     d_makeobj(D_GADGET, "bar6");
-    d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+    d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
     d_set_world_pos(270.0f, 5.0f, 0.0f);
     d_set_scale(50.0f, 5.0f, 0.0f);
     d_set_type(4);
@@ -3120,7 +3118,7 @@ void make_timer_gadgets(void) {
         timer = get_timernum(i);
 
         d_makeobj(D_GADGET, timerNameBuf);
-        d_set_obj_draw_flag(OBJ_IS_GRABBALE);
+        d_set_obj_draw_flag(OBJ_IS_GRABBABLE);
         d_set_world_pos(20.0f, (f32)((i * 15) + 15), 0.0f);
         d_set_scale(50.0f, 14.0f, 0);
         d_set_type(4);

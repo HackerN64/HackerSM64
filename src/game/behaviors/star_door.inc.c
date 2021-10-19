@@ -1,4 +1,4 @@
-// star_door.c.inc
+// star_door.inc.c
 
 void star_door_update_pos(void) {
     o->oVelX = (o->oLeftVel *  coss(o->oMoveAngleYaw));
@@ -29,12 +29,12 @@ void bhv_star_door_loop(void) {
             cur_obj_become_intangible();
             o->oLeftVel = -8.0f;
             star_door_update_pos();
-            if (o->oTimer >= 16) {
+            if (o->oTimer > 15) {
                 o->oAction = STAR_DOOR_ACT_OPEN;
             }
             break;
         case STAR_DOOR_ACT_OPEN:
-            if (o->oTimer >= 31) {
+            if (o->oTimer > 30) {
                 o->oAction = STAR_DOOR_ACT_CLOSING;
             }
             break;
@@ -47,7 +47,7 @@ void bhv_star_door_loop(void) {
             }
             o->oLeftVel = 8.0f;
             star_door_update_pos();
-            if (o->oTimer >= 16) {
+            if (o->oTimer > 15) {
                 o->oAction = STAR_DOOR_ACT_RESET;
             }
             break;

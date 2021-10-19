@@ -2,14 +2,14 @@
 
 struct ObjectHitbox sClamShellHitbox = {
     /* interactType:      */ INTERACT_CLAM_OR_BUBBA,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 2,
-    /* health:            */ 99,
-    /* numLootCoins:      */ 0,
+    /* downOffset:        */   0,
+    /* damageOrCoinValue: */   2,
+    /* health:            */  99,
+    /* numLootCoins:      */   0,
     /* radius:            */ 150,
-    /* height:            */ 80,
+    /* height:            */  80,
     /* hurtboxRadius:     */ 150,
-    /* hurtboxHeight:     */ 80,
+    /* hurtboxHeight:     */  80,
 };
 
 void clam_act_0(void) {
@@ -24,7 +24,7 @@ void clam_act_0(void) {
         cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL_OPEN);
         o->oAction = 1;
     } else if (o->oClamShakeTimer != 0) {
-        o->oClamShakeTimer -= 1;
+        o->oClamShakeTimer--;
         cur_obj_shake_y(3.0f);
     }
 }

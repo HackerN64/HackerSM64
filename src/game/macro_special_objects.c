@@ -83,8 +83,7 @@ struct LoadedPreset {
     /*0x06*/ ModelID16 model;
 };
 
-enum MacroObjectIndex
-{
+enum MacroObjectIndex {
     MACRO_OBJ_Y_ROT,
     MACRO_OBJ_X,
     MACRO_OBJ_Y,
@@ -92,7 +91,7 @@ enum MacroObjectIndex
     MACRO_OBJ_PARAMS
 };
 
-void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
+void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
     s32 presetID;
     s16 macroObject[5]; // see the 5 #define statements above
     struct Object *newObj;
@@ -124,17 +123,18 @@ void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
         // If object has been killed, prevent it from respawning
         if (((macroObject[MACRO_OBJ_PARAMS] >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
             // Spawn the new macro object.
-            newObj = spawn_object_abs_with_rot(&gMacroObjectDefaultParent,                // Parent object
-                                          0,                                              // Unused
-                                          preset.model,                                   // Model ID
-                                          preset.behavior,                                // Behavior address
-                                          macroObject[MACRO_OBJ_X],                       // X-position
-                                          macroObject[MACRO_OBJ_Y],                       // Y-position
-                                          macroObject[MACRO_OBJ_Z],                       // Z-position
-                                          0,                                              // X-rotation
-                                          convert_rotation(macroObject[MACRO_OBJ_Y_ROT]), // Y-rotation
-                                          0                                               // Z-rotation
-                );
+            newObj = spawn_object_abs_with_rot(
+                         &gMacroObjectDefaultParent,                     // Parent object
+                         0,                                              // Unused
+                         preset.model,                                   // Model ID
+                         preset.behavior,                                // Behavior address
+                         macroObject[MACRO_OBJ_X],                       // X-position
+                         macroObject[MACRO_OBJ_Y],                       // Y-position
+                         macroObject[MACRO_OBJ_Z],                       // Z-position
+                         0,                                              // X-rotation
+                         convert_rotation(macroObject[MACRO_OBJ_Y_ROT]), // Y-rotation
+                         0                                               // Z-rotation
+                     );
 
             newObj->oUnusedCoinParams = macroObject[MACRO_OBJ_PARAMS];
             newObj->oBehParams = (((macroObject[MACRO_OBJ_PARAMS] & 0x00FF) << 16)
@@ -147,14 +147,14 @@ void spawn_macro_objects(s32 areaIndex, s16 *macroObjList) {
     }
 }
 
-void spawn_macro_objects_hardcoded(s32 areaIndex, s16 *macroObjList) {
+void spawn_macro_objects_hardcoded(s32 areaIndex, MacroObject *macroObjList) {
     // This version of macroObjList has the preset and Y-Rotation separated,
     // and lacks behavior params. Might be an early version of the macro object list?
     Vec3s pos;
     s16 macroObjPreset;
     s16 yaw;
 
-    gMacroObjectDefaultParent.header.gfx.areaIndex = areaIndex;
+    gMacroObjectDefaultParent.header.gfx.areaIndex       = areaIndex;
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
 
     while (TRUE) {
@@ -167,7 +167,7 @@ void spawn_macro_objects_hardcoded(s32 areaIndex, s16 *macroObjList) {
         pos[0] = *macroObjList++;
         pos[1] = *macroObjList++;
         pos[2] = *macroObjList++;
-        yaw = *macroObjList++;
+        yaw    = *macroObjList++;
 
         // Spawn objects based on hardcoded presets, and most seem to be for Big Boo's Haunt.
         // However, BBH doesn't use this function so this might just be an early test?

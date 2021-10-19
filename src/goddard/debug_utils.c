@@ -218,7 +218,7 @@ void remove_all_timers(void) {
     for (i = 0; i < ARRAY_COUNT(sTimers); i++) {
         sTimers[i].name = NULL;
         sTimers[i].total = 0;
-        sTimers[i].unused0C = 0.0f;
+        sTimers[i].unused = 0.0f;
         sTimers[i].scaledTotal = 0.0f;
         sTimers[i].prevScaledTotal = 0.0f;
         sTimers[i].gadgetColourNum = sTimerGadgetColours[(u32) i % 7];
@@ -662,12 +662,10 @@ static s32 int_sci_notation(s32 base, s32 significand) {
 char *sprint_val_withspecifiers(char *str, union PrintVal val, char *specifiers) {
     s32 fracPart; // sp3C
     s32 intPart;  // sp38
-    s32 intPrec;  // sp34
-    s32 fracPrec; // sp30
     char cur; // sp2B
 
-    fracPrec = 6;
-    intPrec = 6;
+    s32 fracPrec = 6;
+    s32 intPrec = 6;
 
     while ((cur = *specifiers++)) {
         if (cur == 'd') {
@@ -802,9 +800,8 @@ struct GdFile *gd_fopen(const char *filename, const char *mode) {
     struct UnkBufThing buf; // sp24
     u8 *bufbytes;           // sp20
     u8 *fileposptr;         // sp1C
-    s32 filecsr;            // sp18
 
-    filecsr = 0;
+    s32 filecsr = 0;
 
     while (TRUE) {
         bufbytes = (u8 *) &buf;

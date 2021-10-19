@@ -1,3 +1,4 @@
+
 /**
  * Behavior for MIPS (everyone's favorite yellow rabbit).
  */
@@ -8,15 +9,15 @@
  */
 void bhv_mips_init(void) {
     // Retrieve star flags for Castle Secret Stars on current save file.
-    u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, -1);
+    u8 starFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_NONE));
 
     // If the player has >= 15 stars and hasn't collected first MIPS star...
-    if (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 15
+    if (save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 15
         && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_1))) {
         o->oBehParams2ndByte = 0;
         o->oMipsForwardVelocity = 40.0f;
     // If the player has >= 50 stars and hasn't collected second MIPS star...
-    } else if (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 50
+    } else if (save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 50
              && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_2))) {
         o->oBehParams2ndByte = 1;
         o->oMipsForwardVelocity = 45.0f;
@@ -44,14 +45,11 @@ s32 bhv_mips_find_furthest_waypoint_to_mario(void) {
     s16 furthestWaypointIndex = -1;
     f32 furthestWaypointDistance = -10000.0f;
     f32 distanceToMario;
-    struct Waypoint **pathBase;
-    struct Waypoint *waypoint;
-
-    pathBase = segmented_to_virtual(&inside_castle_seg7_trajectory_mips);
+    struct Waypoint **pathBase = segmented_to_virtual(&inside_castle_seg7_trajectory_mips);
 
     // For each waypoint in MIPS path...
     for (i = 0; i < 10; i++) {
-        waypoint = segmented_to_virtual(pathBase[i]);
+        struct Waypoint *waypoint = segmented_to_virtual(pathBase[i]);
         x = waypoint->pos[0];
         y = waypoint->pos[1];
         z = waypoint->pos[2];
@@ -118,10 +116,10 @@ void bhv_mips_act_follow_path(void) {
     }
 
     // Play sounds during walk animation.
-    if (cur_obj_check_if_near_animation_end() == 1 && (collisionFlags & OBJ_COL_FLAG_UNDERWATER)) {
+    if (cur_obj_check_if_near_animation_end() && (collisionFlags & OBJ_COL_FLAG_UNDERWATER)) {
         cur_obj_play_sound_2(SOUND_OBJ_MIPS_RABBIT_WATER);
         spawn_object(o, MODEL_NONE, bhvShallowWaterSplash);
-    } else if (cur_obj_check_if_near_animation_end() == 1) {
+    } else if (cur_obj_check_if_near_animation_end()) {
         cur_obj_play_sound_2(SOUND_OBJ_MIPS_RABBIT);
     }
 }
@@ -130,7 +128,7 @@ void bhv_mips_act_follow_path(void) {
  * Seems to wait until the current animation is done, then go idle.
  */
 void bhv_mips_act_wait_for_animation_done(void) {
-    if (cur_obj_check_if_near_animation_end() == 1) {
+    if (cur_obj_check_if_near_animation_end()) {
         cur_obj_init_animation(0);
         o->oAction = MIPS_ACT_IDLE;
     }
@@ -149,8 +147,9 @@ void bhv_mips_act_fall_down(void) {
         o->oFlags |= OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
         o->oMoveAngleYaw = o->oFaceAngleYaw;
 
-        if (collisionFlags & OBJ_COL_FLAG_UNDERWATER)
+        if (collisionFlags & OBJ_COL_FLAG_UNDERWATER) {
             spawn_object(o, MODEL_NONE, bhvShallowWaterSplash);
+        }
     }
 }
 
@@ -158,7 +157,7 @@ void bhv_mips_act_fall_down(void) {
  * Idle loop, after you catch MIPS and put him down.
  */
 void bhv_mips_act_idle(void) {
-    o->oForwardVel = 0;
+    o->oForwardVel = 0.0f;
     object_step();
 
     // Spawn a star if he was just picked up for the first time.
@@ -209,10 +208,11 @@ void bhv_mips_held(void) {
     // If MIPS hasn't spawned his star yet...
     if (o->oMipsStarStatus == MIPS_STAR_STATUS_HAVENT_SPAWNED_STAR) {
         // Choose dialog based on which MIPS encounter this is.
-        if (o->oBehParams2ndByte == 0)
+        if (o->oBehParams2ndByte == 0) {
             dialogID = DIALOG_084;
-        else
+        } else {
             dialogID = DIALOG_162;
+        }
 
         if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_FRONT) == MARIO_DIALOG_STATUS_SPEAK) {
             o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;

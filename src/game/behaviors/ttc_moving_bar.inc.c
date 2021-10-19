@@ -43,7 +43,7 @@ static void ttc_moving_bar_act_wait(void) {
         // This is zero except on the first cycle, and is used to desync the
         // bars from each other at the very beginning
         if (o->oTTCMovingBarStoppedTimer != 0) {
-            o->oTTCMovingBarStoppedTimer -= 1;
+            o->oTTCMovingBarStoppedTimer--;
         } else {
             if (gTTCSpeedSetting == TTC_SPEED_RANDOM) {
                 // Set the delay for the next cycle
@@ -70,7 +70,7 @@ static void ttc_moving_bar_act_pull_back(void) {
     if ((o->oTTCMovingBarSpeed += 0.73f) > 0.0f) {
         // Possibly pause after pulling back
         if (o->oTTCMovingBarStoppedTimer != 0) {
-            o->oTTCMovingBarStoppedTimer -= 1;
+            o->oTTCMovingBarStoppedTimer--;
             o->oTTCMovingBarSpeed = 0.0f;
         } else {
             // Begin extending

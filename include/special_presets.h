@@ -13,8 +13,8 @@ enum SpecialPresetTypes {
     SPTYPE_UNKNOWN,           // object is 14-bytes long, has 3 extra shorts that get converted to floats.
     SPTYPE_DEF_PARAM_AND_YROT // object is 10-bytes long, has y-rotation and uses the default param
 };
-struct SpecialPreset
-{
+
+struct SpecialPreset {
     /*00*/ u8  preset_id;
     /*01*/ u8  type;      // Determines whether object is 8, 10, 12 or 14 bytes long.
     /*02*/ u8  defParam;  // Default parameter, only used when type is SPTYPE_DEF_PARAM_AND_YROT

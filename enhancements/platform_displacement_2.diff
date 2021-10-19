@@ -558,7 +558,7 @@ index 0000000..97cba2a
 +            } else // far away
 +            {
 +                o->oAction = 7;
-+                if (500.0f < o->oBowserDistToCentre && o->oBowserDistToCentre < 1500.0f
++                if (500.0f < o->oBowserDistToCenter && o->oBowserDistToCenter < 1500.0f
 +                    && rand < 0.5) // away from centre and good luck
 +                    o->oAction = 13;
 +            }
@@ -740,7 +740,7 @@ index 0000000..97cba2a
 +    if (o->oTimer == 0) {
 +        o->oForwardVel = -400.0f;
 +        o->oVelY = 100.0f;
-+        o->oMoveAngleYaw = o->oBowserAngleToCentre + 0x8000;
++        o->oMoveAngleYaw = o->oBowserAngleToCenter + 0x8000;
 +        o->oBowserEyesShut = 1;
 +    }
 +    if (o->oSubAction == 0) {
@@ -798,7 +798,7 @@ index 0000000..97cba2a
 +
 +void bowser_short_second_hop(void) {
 +    if (BITS && o->oBowserUnkF4 & 0x10000)
-+        if (o->oBowserDistToCentre > 1000.0f)
++        if (o->oBowserDistToCenter > 1000.0f)
 +            o->oForwardVel = 60.0f;
 +}
 +
@@ -1023,7 +1023,7 @@ index 0000000..97cba2a
 +        case 1:
 +            cur_obj_init_animation_with_sound(9);
 +            if (cur_obj_check_anim_frame(11)) {
-+                o->oMoveAngleYaw = o->oBowserAngleToCentre;
++                o->oMoveAngleYaw = o->oBowserAngleToCenter;
 +                o->oVelY = 150.0f;
 +                o->oBowserUnk1AC = 0xFF;
 +                o->oBowserUnkF8 = 0;
@@ -1034,7 +1034,7 @@ index 0000000..97cba2a
 +        case 2:
 +            if (o->oPosY > o->oHomeY) {
 +                o->oDragStrength = 0.0f;
-+                if (o->oBowserDistToCentre < 2500.0f) {
++                if (o->oBowserDistToCenter < 2500.0f) {
 +                    if (absf(o->oFloorHeight - o->oHomeY) < 100.0f)
 +                        approach_f32_signed(&o->oForwardVel, 0, -5.0f);
 +                    else
@@ -1097,7 +1097,7 @@ index 0000000..97cba2a
 +    else
 +        o->oForwardVel = -200.0f;
 +    o->oVelY = 100.0f;
-+    o->oMoveAngleYaw = o->oBowserAngleToCentre + 0x8000;
++    o->oMoveAngleYaw = o->oBowserAngleToCenter + 0x8000;
 +    o->oBowserUnkF8 = 0;
 +    o->oSubAction++;
 +}
@@ -1239,14 +1239,14 @@ index 0000000..97cba2a
 +
 +void bowser_tilt_platform(struct Object *platform, s16 a1) {
 +    s16 angle;
-+    angle = o->oBowserAngleToCentre + 0x8000;
++    angle = o->oBowserAngleToCenter + 0x8000;
 +    platform->oAngleVelPitch = coss(angle) * a1;
 +    platform->oAngleVelRoll = -sins(angle) * a1;
 +}
 +
 +void bowser_act_ride_tilting_platform(void) {
 +    struct Object *platform = cur_obj_nearest_object_with_behavior(bhvTiltingBowserLavaPlatform);
-+    UNUSED s16 sp2A = o->oBowserAngleToCentre + 0x8000;
++    UNUSED s16 sp2A = o->oBowserAngleToCenter + 0x8000;
 +    s16 sp28;
 +    UNUSED s32 unused;
 +    s32 i;
@@ -1420,16 +1420,16 @@ index 0000000..97cba2a
 +    s16 angleToMario;  // AngleToMario    from Bowser's perspective
 +    s16 angleToCentre; // AngleToCentre from Bowser's perspective
 +
-+    o->oBowserDistToCentre = sqrtf(o->oPosX * o->oPosX + o->oPosZ * o->oPosZ);
-+    o->oBowserAngleToCentre = atan2s(0.0f - o->oPosZ, 0.0f - o->oPosX);
++    o->oBowserDistToCenter = sqrtf(o->oPosX * o->oPosX + o->oPosZ * o->oPosZ);
++    o->oBowserAngleToCenter = atan2s(0.0f - o->oPosZ, 0.0f - o->oPosX);
 +    angleToMario = abs_angle_diff(o->oMoveAngleYaw, o->oAngleToMario);
-+    angleToCentre = abs_angle_diff(o->oMoveAngleYaw, o->oBowserAngleToCentre);
++    angleToCentre = abs_angle_diff(o->oMoveAngleYaw, o->oBowserAngleToCenter);
 +    o->oBowserUnkF4 &= ~0xFF;
 +    if (angleToMario < 0x2000)
 +        o->oBowserUnkF4 |= 2;
 +    if (angleToCentre < 0x3800)
 +        o->oBowserUnkF4 |= 4;
-+    if (o->oBowserDistToCentre < 1000.0f)
++    if (o->oBowserDistToCenter < 1000.0f)
 +        o->oBowserUnkF4 |= 0x10;
 +    if (o->oDistanceToMario < 850.0f)
 +        o->oBowserUnkF4 |= 8;

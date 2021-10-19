@@ -9,8 +9,8 @@
  * Properties for the ferris wheel axle and platforms.
  */
 struct FerrisWheelProperties {
-    void const *axleCollision;
-    void const *platformCollision;
+    Collision const *axleCollision;
+    Collision const *platformCollision;
     s16 platformModel;
 };
 

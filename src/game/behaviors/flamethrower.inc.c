@@ -1,31 +1,31 @@
-// flamethrower.c.inc
+// flamethrower.inc.c
 
 void bhv_flamethrower_flame_loop(void) {
-    f32 size;
+    f32 scale;
     s32 remainingTime;
     if (o->oTimer == 0) {
         o->oAnimState = (s32)(random_float() * 10.0f);
         obj_translate_xyz_random(o, 10.0f);
     }
     if (o->oBehParams2ndByte == FLAMETHROWER_BP_SLOW) {
-        size = (((o->oTimer * (o->oForwardVel -  6.0f)) / 100.0f) + 2.0f);
+        scale = (((o->oTimer * (o->oForwardVel -  6.0f)) / 100.0f) + 2.0f);
     } else {
-        size = (((o->oTimer * (o->oForwardVel - 20.0f)) / 100.0f) + 1.0f);
+        scale = (((o->oTimer * (o->oForwardVel - 20.0f)) / 100.0f) + 1.0f);
     }
     if (o->oBehParams2ndByte == FLAMETHROWER_BP_TALL_HITBOX) {
         o->hitboxHeight     = 200.0f;
         o->hitboxDownOffset = 150.0f;
         o->oVelY            = -28.0f;
         cur_obj_update_floor_height();
-        if ((o->oPosY - (25.0f * size)) < o->oFloorHeight) {
+        if ((o->oPosY - (25.0f * scale)) < o->oFloorHeight) {
             o->oVelY = 0;
-            o->oPosY = (o->oFloorHeight + (25.0f * size));
+            o->oPosY = (o->oFloorHeight + (25.0f * scale));
         }
         remainingTime = (o->parentObj->oFlameThowerTimeRemaining / 1.2f);
     } else {
         remainingTime = o->parentObj->oFlameThowerTimeRemaining;
     }
-    cur_obj_scale(size);
+    cur_obj_scale(scale);
     if (o->oBehParams2ndByte == FLAMETHROWER_BP_UPWARDS) {
         o->oPosY += o->oForwardVel; // weird?
     } else {
@@ -66,9 +66,11 @@ void bhv_flamethrower_loop(void) {
         o->oFlameThowerTimeRemaining = flameTimeRemaining;
         struct Object *flame = spawn_object_relative(o->oBehParams2ndByte, 0, 0, 0, o, model, bhvFlamethrowerFlame);
         flame->oForwardVel = flameVel;
+
         cur_obj_play_sound_1(SOUND_AIR_BLOW_FIRE);
-    } else if (o->oTimer > 60)
+    } else if (o->oTimer > 60) {
         o->oAction = FLAMETHROWER_ACT_IDLE;
+    }
 }
 
 void bhv_rr_rotating_bridge_platform_loop(void) {

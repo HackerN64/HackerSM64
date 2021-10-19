@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvFloorSwitchHardcodedModel, bhvFloorSwitchGrills, and
  * bhvFloorSwitchAnimatesObject.
@@ -21,6 +22,7 @@ void bhv_purple_switch_loop(void) {
                 o->oAction = PURPLE_SWITCH_ACT_PRESSED;
             }
             break;
+
         /**
          * Collapse the switch downward, play a sound, and shake the screen.
          * Immediately transition to the ticking state.
@@ -36,6 +38,7 @@ void bhv_purple_switch_loop(void) {
 #endif
             }
             break;
+
         /**
          * Play a continuous ticking sound that gets faster when time is almost
          * up. When time is up, move to a waiting-while-pressed state.
@@ -56,6 +59,7 @@ void bhv_purple_switch_loop(void) {
                 }
             }
             break;
+
         /**
          * Make the switch look unpressed again, and transition back to the
          * idle state.
@@ -66,6 +70,7 @@ void bhv_purple_switch_loop(void) {
                 o->oAction = PURPLE_SWITCH_ACT_IDLE;
             }
             break;
+
         /**
          * Mario is standing on the switch, but time has expired. Wait for
          * him to get off the switch, and when he does so, transition to the

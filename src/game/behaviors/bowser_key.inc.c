@@ -1,15 +1,15 @@
-// bowser_key.c.inc
+// bowser_key.inc.c
 
 struct ObjectHitbox sBowserKeyHitbox = {
-    /* interactType: */ INTERACT_STAR_OR_KEY,
-    /* downOffset: */ 0,
-    /* damageOrCoinValue: */ 0,
-    /* health: */ 0,
-    /* numLootCoins: */ 0,
-    /* radius: */ 160,
-    /* height: */ 100,
-    /* hurtboxRadius: */ 160,
-    /* hurtboxHeight: */ 100,
+    /* interactType:      */ INTERACT_STAR_OR_KEY,
+    /* downOffset:        */   0,
+    /* damageOrCoinValue: */   0,
+    /* health:            */   0,
+    /* numLootCoins:      */   0,
+    /* radius:            */ 160,
+    /* height:            */ 100,
+    /* hurtboxRadius:     */ 160,
+    /* hurtboxHeight:     */ 100,
 };
 
 void bhv_bowser_key_loop(void) {
@@ -20,6 +20,7 @@ void bhv_bowser_key_loop(void) {
     o->oFaceAngleYaw += o->oAngleVelYaw;
     o->oFaceAngleRoll = -0x4000;
     o->oGraphYOffset = 165.0f;
+
     if (o->oAction == 0) {
         if (o->oTimer == 0) {
             o->oVelY = 70.0f;
@@ -31,10 +32,11 @@ void bhv_bowser_key_loop(void) {
         if (o->oMoveFlags & OBJ_MOVE_ON_GROUND) {
             o->oAction = 1;
         } else if (o->oMoveFlags & OBJ_MOVE_LANDED) {
-            cur_obj_play_sound_2(SOUND_GENERAL_BOWSER_KEY_LAND_2);
+            cur_obj_play_sound_2(SOUND_GENERAL_BOWSER_KEY_LAND);
         }
     } else {
         obj_set_hitbox(o, &sBowserKeyHitbox);
+
         if (o->oInteractStatus & INT_STATUS_INTERACTED) {
             obj_mark_for_deletion(o);
             o->oInteractStatus = INT_STATUS_NONE;

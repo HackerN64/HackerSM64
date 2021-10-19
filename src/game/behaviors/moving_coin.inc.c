@@ -1,33 +1,34 @@
-// coin.c.inc
+// moving_coin.inc.c
 
 static struct ObjectHitbox sMovingYellowCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
+    /* downOffset:        */   0,
+    /* damageOrCoinValue: */   1,
+    /* health:            */   0,
+    /* numLootCoins:      */   0,
     /* radius:            */ 100,
-    /* height:            */ 64,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    /* height:            */  64,
+    /* hurtboxRadius:     */   0,
+    /* hurtboxHeight:     */   0,
 };
 
 static struct ObjectHitbox sMovingBlueCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 5,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
+    /* downOffset:        */   0,
+    /* damageOrCoinValue: */   5,
+    /* health:            */   0,
+    /* numLootCoins:      */   0,
     /* radius:            */ 100,
-    /* height:            */ 64,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    /* height:            */  64,
+    /* hurtboxRadius:     */   0,
+    /* hurtboxHeight:     */   0,
 };
 
 s32 coin_step(s16 *collisionFlagsPtr) {
     *collisionFlagsPtr = object_step();
     obj_check_floor_death(*collisionFlagsPtr, sObjFloor);
-    if ((*collisionFlagsPtr & OBJ_COL_FLAG_GROUNDED) && !(*collisionFlagsPtr & OBJ_COL_FLAG_NO_Y_VEL)) { /* bit 0, bit 3 */
+    if ((*collisionFlagsPtr & OBJ_COL_FLAG_GROUNDED)
+    && !(*collisionFlagsPtr & OBJ_COL_FLAG_NO_Y_VEL)) {
         cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP);
         return TRUE;
     }
@@ -55,6 +56,7 @@ void bhv_moving_yellow_coin_init(void) {
 
 void bhv_moving_yellow_coin_loop(void) {
     s16 collisionFlags;
+
     switch (o->oAction) {
         case MOV_YCOIN_ACT_IDLE:
             coin_step(&collisionFlags);
@@ -63,7 +65,8 @@ void bhv_moving_yellow_coin_loop(void) {
             } else {
                 cur_obj_become_tangible();
             }
-            if (o->oTimer >= 301) {
+
+            if (o->oTimer > 300) {
                 o->oAction = MOV_YCOIN_ACT_BLINKING;
             }
             break;
@@ -87,7 +90,7 @@ void bhv_moving_yellow_coin_loop(void) {
 #ifdef COIN_LAVA_FLICKER
     if (o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) moving_coin_flicker();
 #endif
-    if (o->oInteractStatus & INT_STATUS_INTERACTED) { /* bit 15 */
+    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         coin_collected();
         o->oInteractStatus = INT_STATUS_NONE;
     }
@@ -112,10 +115,10 @@ void bhv_moving_blue_coin_loop(void) {
 
         case MOV_BCOIN_ACT_MOVING:
             collisionFlags = object_step();
-            if (collisionFlags & OBJ_COL_FLAG_GROUNDED) { /* bit 0 */
+            if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
                 o->oForwardVel += 25.0f;
                 if (!(collisionFlags & OBJ_COL_FLAG_NO_Y_VEL)) {
-                    cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP); /* bit 3 */
+                    cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP);
                 }
             } else {
                 o->oForwardVel *= 0.98f;
@@ -127,7 +130,7 @@ void bhv_moving_blue_coin_loop(void) {
             break;
     }
 
-    if (o->oInteractStatus & INT_STATUS_INTERACTED) { /* bit 15 */
+    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         coin_collected();
         o->oInteractStatus = INT_STATUS_NONE;
     }
@@ -146,10 +149,11 @@ void blue_coin_sliding_away_from_mario(void) {
     o->oForwardVel = 15.0f;
     o->oMoveAngleYaw = o->oAngleToMario + 0x8000;
 
-    if (coin_step(&collisionFlags))
+    if (coin_step(&collisionFlags)) {
         o->oVelY += 18.0f;
+    }
     if (collisionFlags & OBJ_COL_FLAG_HIT_WALL) {
-        o->oAction = MOV_BCOIN_ACT_STOPPED; /* bit 1 */
+        o->oAction = MOV_BCOIN_ACT_STOPPED;
     }
     if (!is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 1000)) {
         o->oAction = MOV_BCOIN_ACT_SLOWING_DOWN;
@@ -164,7 +168,7 @@ void blue_coin_sliding_slow_down(void) {
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 500)) {
         o->oAction = MOV_BCOIN_ACT_MOVING;
     }
-    if (o->oTimer >= 151) {
+    if (o->oTimer > 150) {
         o->oAction = MOV_BCOIN_ACT_STOPPED;
     }
 }
@@ -191,8 +195,9 @@ void bhv_blue_coin_sliding_loop(void) {
 
         case MOV_BCOIN_ACT_STOPPED:
             coin_step(&collisionFlags);
-            if (o->oTimer >= 61)
+            if (o->oTimer > 60) {
                 o->oAction = MOV_BCOIN_ACT_FLICKERING;
+            }
             break;
 
         case MOV_BCOIN_ACT_FLICKERING:
@@ -212,7 +217,7 @@ void bhv_blue_coin_sliding_loop(void) {
             break;
     }
 
-    if (o->oInteractStatus & INT_STATUS_INTERACTED) { /* bit 15 */
+    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         coin_collected();
         o->oInteractStatus = INT_STATUS_NONE;
     }
@@ -247,7 +252,7 @@ void bhv_blue_coin_jumping_loop(void) {
 
         case MOV_BCOIN_ACT_STOPPED:
             coin_step(&collisionFlags);
-            if (o->oTimer >= 61) {
+            if (o->oTimer > 60) {
                 o->oAction = MOV_BCOIN_ACT_FLICKERING;
             }
             break;
@@ -257,7 +262,7 @@ void bhv_blue_coin_jumping_loop(void) {
             break;
     }
 
-    if (o->oInteractStatus & INT_STATUS_INTERACTED) { /* bit 15 */
+    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         coin_collected();
         o->oInteractStatus = INT_STATUS_NONE;
     }

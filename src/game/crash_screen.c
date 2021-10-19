@@ -35,6 +35,7 @@ u8 gCrashScreenCharToGlyph[128] = {
     23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
 };
 
+// A height of seven pixels for each Character * nine rows of characters + one row unused.
 u32 gCrashScreenFont[(7 * 9) + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
@@ -177,7 +178,6 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
-
     crash_screen_draw_rect(15, 20, 270, 210);
     crash_screen_print(30, 20, "THREAD:%d  (%s)", thread->id, gCauseDesc[cause]);
     crash_screen_print(30, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
@@ -407,7 +407,7 @@ void thread2_crash_screen(UNUSED void *arg) {
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
             thread = get_crashed_thread();
-            gCrashScreen.framebuffer = (u16 *) gFrameBuffers[sRenderedFramebuffer];
+            gCrashScreen.framebuffer = (u16 *) gFramebuffers[sRenderedFramebuffer];
             if (thread)
                 goto reset;
         } else {
@@ -427,7 +427,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 }
 
 void crash_screen_init(void) {
-    gCrashScreen.framebuffer = (u16 *) gFrameBuffers[sRenderedFramebuffer];
+    gCrashScreen.framebuffer = (u16 *) gFramebuffers[sRenderedFramebuffer];
     gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);

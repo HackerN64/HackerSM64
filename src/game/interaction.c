@@ -1754,7 +1754,7 @@ void mario_process_interactions(struct MarioState *m) {
     }
 
     if (m->invincTimer > 0 && !sDelayInvincTimer) {
-        m->invincTimer -= 1;
+        m->invincTimer--;
     }
 
     //! If the kick/punch flags are set and an object collision changes Mario's

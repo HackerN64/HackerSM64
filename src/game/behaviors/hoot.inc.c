@@ -1,4 +1,4 @@
-// hoot.c.inc
+// hoot.inc.c
 
 void bhv_hoot_init(void) {
     cur_obj_init_animation(HOOT_ANIM_DEFAULT);
@@ -48,9 +48,9 @@ void hoot_free_step(s16 fastOscY, s32 speed) {
 
     o->oPosX += o->oVelX;
     if (fastOscY == 0) {
-        o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 3276.8f)) * 12.5)); // 50.0f / 4;
+        o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 3276.8f)) * 12.5f)); // 50.0f / 4;
     } else {
-        o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5)); // 50.0f / 4;
+        o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5f)); // 50.0f / 4;
     }
     o->oPosZ += o->oVelZ;
 
@@ -89,11 +89,12 @@ void hoot_carry_step(s32 speed, UNUSED f32 xPrev, UNUSED f32 zPrev) {
     o->oVelZ   = (coss(yaw) * hSpeed);
 
     o->oPosX += o->oVelX;
-    o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5)); // 50.0f / 4;
+    o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5f)); // 50.0f / 4;
     o->oPosZ += o->oVelZ;
 
-    if (animFrame == 0)
+    if (animFrame == 0) {
         cur_obj_play_sound_2(SOUND_GENERAL_WING_FLAP);
+    }
 }
 
 void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
@@ -110,7 +111,7 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
         o->oPosX = hitbox.x;
         o->oPosY = hitbox.y;
         o->oPosZ = hitbox.z;
-        gMarioObject->oInteractStatus |= INT_STATUS_MARIO_DROP_FROM_HOOT; /* bit 7 */
+        gMarioObject->oInteractStatus |= INT_STATUS_MARIO_DROP_FROM_HOOT;
     }
 
     f32 floorY = find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
@@ -140,8 +141,9 @@ void hoot_act_ascent(f32 xPrev, f32 zPrev) {
         o->header.gfx.animInfo.animFrame = 1;
     }
 
-    if (o->oPosY > 6500.0f)
+    if (o->oPosY > 6500.0f) {
         o->oAction = HOOT_ACT_CARRY;
+    }
 
     hoot_carry_step(60, xPrev, zPrev);
 }
@@ -166,7 +168,6 @@ void hoot_action_loop(void) {
 
                 if (cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_045)) {
                     clear_time_stop_flags(TIME_STOP_ENABLED | TIME_STOP_MARIO_AND_DOORS);
-
                     o->oAction = HOOT_ACT_TIRED;
                 }
             }
@@ -181,8 +182,8 @@ void hoot_action_loop(void) {
 
             hoot_carry_step(20, xPrev, zPrev);
 
-            if (o->oTimer >= 61) {
-                gMarioObject->oInteractStatus |= INT_STATUS_MARIO_DROP_FROM_HOOT; /* bit 7 */
+            if (o->oTimer > 60) {
+                gMarioObject->oInteractStatus |= INT_STATUS_MARIO_DROP_FROM_HOOT;
             }
             break;
     }

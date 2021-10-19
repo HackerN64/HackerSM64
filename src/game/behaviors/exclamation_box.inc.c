@@ -1,4 +1,4 @@
-// exclamation_box.c.inc
+// exclamation_box.inc.c
 
 struct ExclamationBoxContents {
     u8 id;
@@ -156,7 +156,7 @@ ObjActionFunc sExclamationBoxActions[] = {
     exclamation_box_act_active,
     exclamation_box_act_scaling,
     exclamation_box_act_explode,
-    exclamation_box_act_wait_for_respawn
+    exclamation_box_act_wait_for_respawn,
 };
 
 void bhv_exclamation_box_loop(void) {

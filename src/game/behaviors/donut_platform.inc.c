@@ -1,3 +1,5 @@
+// donut_platform.inc.c
+
 static Vec3s sDonutPlatformPositions[] = {
     {  2892, -2089,  6564 }, { -2156,  2211,  -87 }, {  1692,  2520,   -32 },
     {  1487,  2520,   -32 }, {  1282,  2520,  -32 }, {  1356, -2089,  6564 },
@@ -18,7 +20,7 @@ void bhv_donut_platform_spawner_update(void) {
     Vec3f d;
     f32 marioSqDist;
 
-    for (i = 0, platformFlag = 1; i < 31; i++, platformFlag = platformFlag << 1) {
+    for (i = 0, platformFlag = 1; i < ARRAY_COUNT(sDonutPlatformPositions); i++, platformFlag = platformFlag << 1) {
         if (!(o->oDonutPlatformSpawnerSpawnedPlatforms & platformFlag)) {
             vec3_diff(d, &gMarioObject->oPosVec, sDonutPlatformPositions[i]);
             marioSqDist = vec3_sumsq(d);

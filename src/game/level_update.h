@@ -70,8 +70,7 @@ enum MarioSpawnType
     MARIO_SPAWN_FADE_FROM_BLACK
 };
 
-struct CreditsEntry
-{
+struct CreditsEntry {
     /*0x00*/ u8 levelNum;
     /*0x01*/ u8 areaIndex;
     /*0x02*/ u8 actNum;

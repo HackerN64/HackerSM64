@@ -412,8 +412,7 @@ static struct DynObjInfo *get_dynobj_info(DynObjName name) {
     gd_strcat(buf, sDynNameSuffix);
     foundDynobj = NULL;
     for (i = 0; i < sLoadedDynObjs; i++) {
-        if (gd_str_not_equal(sGdDynObjList[i].name, buf) == 0)
-        {
+        if (gd_str_not_equal(sGdDynObjList[i].name, buf) == 0) {
             foundDynobj = &sGdDynObjList[i];
             break;
         }
@@ -492,13 +491,12 @@ void d_attach_joint_to_net(UNUSED s32 arg0, DynObjName name) {
  */
 void d_make_netfromshapeid(DynObjName name) {
     struct DynObjInfo *dyninfo = get_dynobj_info(name);
-    struct ObjNet *net;
 
     if (dyninfo == NULL) {
         fatal_printf("dMakeNetFromShape(\"%s\"): Undefined object", DynNameAsStr(name));
     }
 
-    net = make_netfromshape((struct ObjShape *) dyninfo->obj);
+    struct ObjNet *net = make_netfromshape((struct ObjShape *) dyninfo->obj);
     add_to_dynobj_list(&net->header, NULL);
 }
 
@@ -949,9 +947,6 @@ void chk_shapegen(struct ObjShape *shape) {
     struct ObjFace *face;        // sp5C; made face
     struct ObjVertex *vtx;       // sp58; made gdvtx
     struct ObjVertex **vtxbuf;   // sp54; heap storage for made gd vtx
-    struct ObjGroup *shapeMtls;  // sp50
-    struct ObjGroup *shapeFaces; // sp4C
-    struct ObjGroup *shapeVtx;   // sp48
     struct ObjGroup *madeFaces;  // sp40
     struct ObjGroup *madeVtx;    // sp3C
     u32 i;                       // sp38
@@ -961,13 +956,12 @@ void chk_shapegen(struct ObjShape *shape) {
 
     start_memtracker("chk_shapegen");
     imin("chk_shapegen");
-    shapeMtls = shape->mtlGroup;
-    shapeFaces = shape->faceGroup;
-    shapeVtx = shape->vtxGroup;
+    struct ObjGroup *shapeMtls = shape->mtlGroup;
+    struct ObjGroup *shapeFaces = shape->faceGroup;
+    struct ObjGroup *shapeVtx = shape->vtxGroup;
 
     if (shapeVtx != NULL && shapeFaces != NULL) {
-        if ((shapeVtx->linkType & 1) && (shapeFaces->linkType & 1)) //? needs the double if
-        {
+        if ((shapeVtx->linkType & 0x1) && (shapeFaces->linkType & 0x1)) { //? needs the double if
             // These ListNodes point to special, compressed data structures
             vtxdata = (struct GdVtxData *) shapeVtx->firstMember->obj;
             facedata = (struct GdFaceData *) shapeFaces->firstMember->obj;

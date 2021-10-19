@@ -1,4 +1,4 @@
-// cap.c.inc
+// cap.inc.c
 
 static struct ObjectHitbox sCapHitbox = {
     /* interactType:      */ INTERACT_CAP,
@@ -14,6 +14,7 @@ static struct ObjectHitbox sCapHitbox = {
 
 s32 cap_set_hitbox(void) {
     obj_set_hitbox(o, &sCapHitbox);
+
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
         o->oInteractStatus = INT_STATUS_NONE;
@@ -83,14 +84,14 @@ void cap_sink_quicksand(void) {
 
         case CAP_ACT_INSTANT_QUICKSAND:
             o->oGraphYOffset -= 1.0f;
-            if (o->oTimer >= 21) {
+            if (o->oTimer > 20) {
                 o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
             }
             break;
 
         case CAP_ACT_INSTANT_MOVING_QUICKSAND:
             o->oGraphYOffset -= 6.0f;
-            if (o->oTimer >= 21) {
+            if (o->oTimer > 20) {
                 o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
             }
             o->oFaceAnglePitch = 0x2000;
@@ -127,7 +128,7 @@ void wing_vanish_cap_act_0(void) {
         }
     }
 
-    if (o->oCapDoScaleVertically == 1) {
+    if (o->oCapDoScaleVertically) {
         cap_scale_vertically();
     }
 }
@@ -161,8 +162,9 @@ void bhv_metal_cap_init(void) {
 void metal_cap_act_0(void) {
     o->oFaceAngleYaw += (o->oForwardVel * 128.0f);
     s16 collisionFlags = object_step();
-    if (collisionFlags & OBJ_COL_FLAG_GROUNDED)
+    if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         cap_check_quicksand();
+    }
 }
 
 void bhv_metal_cap_loop(void) {
@@ -229,7 +231,7 @@ void normal_cap_act_0(void) {
         }
     }
 
-    if (o->oCapDoScaleVertically == 1) {
+    if (o->oCapDoScaleVertically) {
         cap_scale_vertically();
     }
 }
@@ -252,7 +254,7 @@ void bhv_normal_cap_loop(void) {
     if (o->activeFlags == ACTIVE_FLAG_DEACTIVATED) {
         normal_cap_set_save_flags();
     }
-    if (cap_set_hitbox() == 1) {
+    if (cap_set_hitbox()) {
         save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
     }
 }

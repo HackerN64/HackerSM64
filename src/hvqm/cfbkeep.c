@@ -32,7 +32,7 @@ void init_cfb(void) {
   int i, j;
 
   for ( i = 0; i < NUM_CFBs; i++ ) {
-    for ( j = 0; j < SCREEN_WD*SCREEN_HT; j++ ) gFrameBuffers[i][j] = 0;
+    for ( j = 0; j < SCREEN_WD*SCREEN_HT; j++ ) gFramebuffers[i][j] = 0;
     cfb_status[i] = CFB_FREE;
   }
 }

@@ -1,3 +1,4 @@
+
 /**
  * Behavior file for bhvTweester and bhvTweesterSandParticle
  * Tweester swaps between twhree action- an idle action, a chasing
@@ -7,14 +8,14 @@
 
 struct ObjectHitbox sTweesterHitbox = {
     /* interactType:      */ INTERACT_TORNADO,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 0,
-    /* health:            */ 0,
-    /* numLootCoins:      */ 0,
+    /* downOffset:        */    0,
+    /* damageOrCoinValue: */    0,
+    /* health:            */    0,
+    /* numLootCoins:      */    0,
     /* radius:            */ 1500,
     /* height:            */ 4000,
-    /* hurtboxRadius:     */ 0,
-    /* hurtboxHeight:     */ 0,
+    /* hurtboxRadius:     */    0,
+    /* hurtboxHeight:     */    0,
 };
 
 /**
@@ -25,9 +26,9 @@ void tweester_scale_and_move(f32 preScale) {
     s16 dYaw  = 0x2C00;
     f32 scale = preScale * 0.4f;
 
-    o->header.gfx.scale[0] = (( coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.3f + 1.0f) * scale;
-    o->header.gfx.scale[1] = ((-coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.5f + 0.5f) * scale;
-    o->header.gfx.scale[2] = (( coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.3f + 1.0f) * scale;
+    o->header.gfx.scale[0] = (((( coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.3f) + 1.0f) * scale);
+    o->header.gfx.scale[1] = ((((-coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.5f) + 0.5f) * scale);
+    o->header.gfx.scale[2] = (((( coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.3f) + 1.0f) * scale);
 
     o->oTweesterScaleTimer += 0x200;
     o->oForwardVel = 14.0f;
@@ -43,21 +44,23 @@ void tweester_act_idle(void) {
     if (o->oSubAction == TWEESTER_SUB_ACT_WAIT) {
         cur_obj_become_tangible();
         cur_obj_set_pos_to_home();
-        cur_obj_scale(0);
+        cur_obj_scale(0.0f);
 
         // Hard to have any idea of this purpose, only set here.
         o->oTweesterUnused = 0;
 
         // If Mario is within range, change to the growth sub-action.
-        if (o->oDistanceToMario < 1500.0f)
+        if (o->oDistanceToMario < 1500.0f) {
             o->oSubAction++;
+        }
 
         o->oTimer = 0;
     } else {
         cur_obj_play_sound_1(SOUND_ENV_WIND1);
         tweester_scale_and_move(o->oTimer / 60.0f);
-        if (o->oTimer > 59)
+        if (o->oTimer >= 60) {
             o->oAction = TWEESTER_ACT_CHASE;
+        }
     }
 }
 
@@ -78,22 +81,26 @@ void tweester_act_chase(void) {
         cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x200);
         print_debug_top_down_objectinfo("off ", 0);
 
-        if (gMarioStates[0].action == ACT_TWIRLING)
+        if (gMarioStates[0].action == ACT_TWIRLING) {
             o->oSubAction++;
+        }
     } else {
         o->oForwardVel = 20.0f;
         cur_obj_rotate_yaw_toward(o->oAngleToHome, 0x200);
 
-        if (cur_obj_lateral_dist_to_home() < 200.0f)
+        if (cur_obj_lateral_dist_to_home() < 200.0f) {
             o->oAction = TWEESTER_ACT_HIDE;
+        }
     }
 
-    if (o->oDistanceToMario > 3000.0f)
+    if (o->oDistanceToMario > 3000.0f) {
         o->oAction = TWEESTER_ACT_HIDE;
+    }
 
     cur_obj_update_floor_and_walls();
-    if (o->oMoveFlags & OBJ_MOVE_HIT_WALL)
+    if (o->oMoveFlags & OBJ_MOVE_HIT_WALL) {
         o->oMoveAngleYaw = o->oWallAngle;
+    }
 
     cur_obj_move_standard(60);
     tweester_scale_and_move(1.0f);
@@ -111,10 +118,12 @@ void tweester_act_hide(void) {
         tweester_scale_and_move(shrinkTimer / 60.0f);
     } else {
         cur_obj_become_intangible();
-        if (cur_obj_lateral_dist_from_mario_to_home() > 2500.0f)
+        if (cur_obj_lateral_dist_from_mario_to_home() > 2500.0f) {
             o->oAction = TWEESTER_ACT_IDLE;
-        if (o->oTimer > 360)
+        }
+        if (o->oTimer > 360) {
             o->oAction = TWEESTER_ACT_IDLE;
+        }
     }
 }
 
@@ -122,7 +131,7 @@ void tweester_act_hide(void) {
 ObjActionFunc sTweesterActions[] = {
     tweester_act_idle,
     tweester_act_chase,
-    tweester_act_hide
+    tweester_act_hide,
 };
 
 /**
@@ -152,6 +161,7 @@ void bhv_tweester_sand_particle_loop(void) {
         o->oFaceAngleYaw = random_u16();
     }
 
-    if (o->oTimer > 15)
+    if (o->oTimer > 15) {
         obj_mark_for_deletion(o);
+    }
 }

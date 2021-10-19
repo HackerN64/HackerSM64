@@ -1,4 +1,4 @@
-// coin.c.inc
+// coin.inc.c
 
 struct ObjectHitbox sYellowCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,
@@ -13,7 +13,7 @@ struct ObjectHitbox sYellowCoinHitbox = {
 };
 
 s16 sCoinArrowPositions[][2] = {
-    {     0, -150 },
+    {    0,  -150 },
     {    0,   -50 },
     {    0,    50 },
     {    0,   150 },
@@ -73,6 +73,7 @@ void bhv_coin_init(void) {
     o->oVelY = ((random_float() * 10.0f) + 30 + o->oCoinBaseYVel);
     o->oForwardVel = (random_float() * 10.0f);
     o->oMoveAngleYaw = random_u16();
+
     cur_obj_set_behavior(bhvYellowCoin);
     obj_set_hitbox(o, &sYellowCoinHitbox);
     cur_obj_become_intangible();
@@ -95,14 +96,9 @@ void bhv_coin_loop(void) {
             }
         }
     }
-    if (o->oTimer == 0)
-#if defined(VERSION_US)
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_US);
-#elif defined(VERSION_EU) || defined(VERSION_SH)
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_EU_SH);
-#else
-        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT_JP);
-#endif
+    if (o->oTimer == 0) {
+        cur_obj_play_sound_2(SOUND_GENERAL_COIN_SPURT);
+    }
     if (o->oVelY < 0) {
         cur_obj_become_tangible();
     }
@@ -197,6 +193,7 @@ void bhv_coin_formation_init(void) {
 
 void bhv_coin_formation_loop(void) {
     s32 bitIndex;
+
     switch (o->oAction) {
         case COIN_FORMATION_ACT_INACTIVE:
             if (o->oDistanceToMario < o->oDrawingDistance) {
@@ -233,6 +230,7 @@ void coin_inside_boo_act_dropped(void) {
         cur_obj_become_tangible();
         cur_obj_set_behavior(bhvYellowCoin);
     }
+
     cur_obj_move_standard(-30);
     bhv_coin_sparkles_init();
     if (cur_obj_has_model(MODEL_BLUE_COIN)) {
@@ -245,12 +243,15 @@ void coin_inside_boo_act_dropped(void) {
 
 void coin_inside_boo_act_carried(void) {
     struct Object *parent = o->parentObj;
+
     cur_obj_become_intangible();
     if ((o->oTimer == 0) && GET_BPARAM1(parent->oBehParams) != COIN_INSIDE_BOO_BP_YELLOW_COIN) {
         cur_obj_set_model(MODEL_BLUE_COIN);
         cur_obj_scale(0.7f);
     }
+
     obj_copy_pos(o, parent);
+
     if (parent->oBooDeathStatus == BOO_DEATH_STATUS_DYING) {
         o->oAction = COIN_INSIDE_BOO_ACT_DROPPED;
         s16 marioMoveYaw = gMarioObject->oMoveAngleYaw;

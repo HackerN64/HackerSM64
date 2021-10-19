@@ -2,10 +2,10 @@
 
 struct ObjectHitbox sUnagiHitbox = {
     /* interactType:      */ INTERACT_CLAM_OR_BUBBA,
-    /* downOffset:        */ 50,
-    /* damageOrCoinValue: */ 3,
-    /* health:            */ 99,
-    /* numLootCoins:      */ 0,
+    /* downOffset:        */  50,
+    /* damageOrCoinValue: */   3,
+    /* health:            */  99,
+    /* numLootCoins:      */   0,
     /* radius:            */ 150,
     /* height:            */ 150,
     /* hurtboxRadius:     */ 150,
@@ -49,13 +49,11 @@ void unagi_act_1_4(s32 nextAction) {
         if (cur_obj_check_anim_frame(30)) {
             o->oForwardVel = 40.0f;
         }
-    } else {
-        if (cur_obj_check_if_at_animation_end()) {
-            if (o->oAction != nextAction && (o->oPathedPrevWaypointFlags & 0xFF) >= 7) {
-                cur_obj_init_animation_with_sound(UNAGI_ANIM_STATIC_STRAIGHT);
-            } else {
-                cur_obj_init_animation_with_sound(UNAGI_ANIM_SWIM);
-            }
+    } else if (cur_obj_check_if_at_animation_end()) {
+        if (o->oAction != nextAction && (o->oPathedPrevWaypointFlags & 0xFF) >= 7) {
+            cur_obj_init_animation_with_sound(UNAGI_ANIM_STATIC_STRAIGHT);
+        } else {
+            cur_obj_init_animation_with_sound(UNAGI_ANIM_SWIM);
         }
     }
 

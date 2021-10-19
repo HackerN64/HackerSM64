@@ -1,3 +1,4 @@
+
 /**
  * Behavior for the sliding Bowser puzzle in Lethal Lava Land.
  */
@@ -102,12 +103,13 @@ void bhv_lll_bowser_puzzle_spawn_pieces(f32 pieceWidth) {
     s32 i;
 
     // Spawn all 14 puzzle pieces.
-    for (i = 0; i < 14; i++)
+    for (i = 0; i < 14; i++) {
         bhv_lll_bowser_puzzle_spawn_piece(sBowserPuzzlePieces[i].model, bhvLllBowserPuzzlePiece,
                                           sBowserPuzzlePieces[i].xOffset * (pieceWidth / 10.0f),
                                           sBowserPuzzlePieces[i].zOffset * (pieceWidth / 10.0f),
                                           sBowserPuzzlePieces[i].initialAction,
                                           sBowserPuzzlePieces[i].actionList);
+    }
 
     // The pieces should only be spawned once so go to the next action.
     o->oAction = BOWSER_PUZZLE_ACT_WAIT_FOR_COMPLETE;
@@ -122,6 +124,7 @@ void bhv_lll_bowser_puzzle_loop(void) {
         case BOWSER_PUZZLE_ACT_SPAWN_PIECES:
             bhv_lll_bowser_puzzle_spawn_pieces(512.0f);
             break;
+
         case BOWSER_PUZZLE_ACT_WAIT_FOR_COMPLETE:
             // If both completion flags are set and Mario is within 1000 units...
             if ((o->oBowserPuzzleCompletionFlags == (BOWSER_PUZZLE_COMPLETION_FLAG_MARIO_ON_PLATFORM | BOWSER_PUZZLE_COMPLETION_FLAG_PUZZLE_COMPLETE)) && (o->oDistanceToMario < 1000.0f)) {
@@ -137,6 +140,7 @@ void bhv_lll_bowser_puzzle_loop(void) {
                 o->oAction = BOWSER_PUZZLE_ACT_DONE;
             }
             break;
+
         case BOWSER_PUZZLE_ACT_DONE:
             break;
     }
@@ -189,8 +193,8 @@ void bhv_lll_bowser_puzzle_piece_move(f32 xOffset, f32 zOffset, s32 duration, UN
             o->oBowserPuzzlePieceOffsetZ += zOffset;
         } else {
             // This doesn't actually accomplish anything since
-            //   cur_obj_change_action is going to be called before the
-            //   next action is performed anyway.
+            // cur_obj_change_action is going to be called before the
+            // next action is performed anyway.
             o->oAction = BOWSER_PUZZLE_PIECE_ACT_IDLE;
 
             // Advance to the next action.
@@ -217,7 +221,7 @@ ObjActionFunc sBowserPuzzlePieceActions[] = {
     bhv_lll_bowser_puzzle_piece_move_left,
     bhv_lll_bowser_puzzle_piece_move_right,
     bhv_lll_bowser_puzzle_piece_move_up,
-    bhv_lll_bowser_puzzle_piece_move_down
+    bhv_lll_bowser_puzzle_piece_move_down,
 };
 
 void bhv_lll_bowser_puzzle_piece_loop(void) {

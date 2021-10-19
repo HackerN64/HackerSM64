@@ -428,9 +428,9 @@ enum oActions1UpMushroom {
     #define BOWSER_CAM_ACT_END                              0x2
     /* oBowserStatus */
     #define BOWSER_STATUS_ANGLE_MARIO                       (1 <<  1) // 0x00000002
-    #define BOWSER_STATUS_ANGLE_CENTRE                      (1 <<  2) // 0x00000004
+    #define BOWSER_STATUS_ANGLE_CENTER                      (1 <<  2) // 0x00000004
     #define BOWSER_STATUS_DIST_MARIO                        (1 <<  3) // 0x00000008
-    #define BOWSER_STATUS_DIST_CENTRE                       (1 <<  4) // 0x00000010
+    #define BOWSER_STATUS_DIST_CENTER                       (1 <<  4) // 0x00000010
     #define BOWSER_STATUS_BIG_JUMP                          (1 << 16) // 0x00010000
     #define BOWSER_STATUS_FIRE_SKY                          (1 << 17) // 0x00020000
     /* oBowserGrabbedStatus */

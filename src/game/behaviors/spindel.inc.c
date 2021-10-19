@@ -1,4 +1,4 @@
-// spindel.c.inc
+// spindel.inc.c
 
 void bhv_spindel_init(void) {
     o->oHomeY = o->oPosY;
@@ -7,9 +7,6 @@ void bhv_spindel_init(void) {
 }
 
 void bhv_spindel_loop(void) {
-    f32 homeYOffset;
-    s32 shake;
-
     if (o->oSpindelMoveTimer == -1) {
         if (o->oTimer == 32) {
             o->oSpindelMoveTimer = 0;
@@ -21,16 +18,14 @@ void bhv_spindel_loop(void) {
         }
     }
 
-    shake = 10 - o->oSpindelMoveTimer;
+    s32 shake = (10 - o->oSpindelMoveTimer);
 
-    if (shake < 0) {
-        shake *= -1;
-    }
+    shake = ABS(shake);
     shake -= 6;
     if (shake < 0) {
         shake = 0;
     }
-    if (o->oTimer == shake + 8) {
+    if (o->oTimer == (shake + 8)) {
         o->oTimer = 0;
         o->oSpindelMoveTimer++;
         if (o->oSpindelMoveTimer == 20) {
@@ -51,13 +46,13 @@ void bhv_spindel_loop(void) {
     } else if (shake == 0) {
         shake = 1;
     }
-    if (o->oTimer < shake * 8) {
+    if (o->oTimer < (shake * 8)) {
         if (o->oSpindelMoveDirection == 0) {
-            o->oVelZ = 20 / shake;
-            o->oAngleVelPitch = 1024 / shake;
+            o->oVelZ = ( 20 / shake);
+            o->oAngleVelPitch = ( 1024 / shake);
         } else {
-            o->oVelZ = -20 / shake;
-            o->oAngleVelPitch = -1024 / shake;
+            o->oVelZ = (-20 / shake);
+            o->oAngleVelPitch = (-1024 / shake);
         }
 
         o->oPosZ += o->oVelZ;
@@ -67,13 +62,9 @@ void bhv_spindel_loop(void) {
             cur_obj_play_sound_2(SOUND_GENERAL2_SPINDEL_ROLL);
         }
 
-        homeYOffset = sins(o->oMoveAnglePitch * 4) * 23.0f;
-        if (homeYOffset < 0.0f) {
-            homeYOffset *= -1.0f;
-        }
-        o->oPosY = o->oHomeY + homeYOffset;
-
-        if (o->oTimer + 1 == shake * 8) {
+        f32 homeYOffset = (sins(o->oMoveAnglePitch * 4) * 23.0f);
+        o->oPosY = (o->oHomeY + ABSF(homeYOffset));
+        if ((o->oTimer + 1) == (shake * 8)) {
             set_camera_shake_from_point(SHAKE_POS_SMALL, o->oPosX, o->oPosY, o->oPosZ);
         }
     }

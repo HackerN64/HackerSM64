@@ -246,8 +246,7 @@ void init_sample_dma_buffers(UNUSED s32 arg0) {
     sSampleDmas = sound_alloc_uninitialized(&gNotesAndBuffersPool,
             gMaxSimultaneousNotes * 4 * sizeof(struct SharedDma) * gAudioBufferParameters.presetUnk4);
 
-    for (i = 0; i < gMaxSimultaneousNotes * 3 * gAudioBufferParameters.presetUnk4; i++)
-    {
+    for (i = 0; i < gMaxSimultaneousNotes * 3 * gAudioBufferParameters.presetUnk4; i++) {
         if ((sSampleDmas[gSampleDmaNumListItems].buffer = sound_alloc_uninitialized(&gNotesAndBuffersPool, sDmaBufSize)) == NULL) {
             break;
         }
@@ -603,8 +602,7 @@ void *func_sh_802f3764(s32 poolIdx, s32 idx, s32 *arg2) {
         devAddr = f->seqArray[idx].offset;
 
 
-        switch (sp18)
-        {
+        switch (sp18) {
             case 0:
                 vAddr = unk_pool1_alloc(poolIdx, idx, size);
                 if (vAddr == NULL) {
@@ -1003,7 +1001,8 @@ void audio_init() {
     port_eu_init();
 
 #ifdef TARGET_N64
-    eu_stubbed_printf_3("Clear Workarea %x -%x size %x \n",
+    eu_stubbed_printf_3(
+        "Clear Workarea %x -%x size %x \n",
         (uintptr_t) &gAudioGlobalsStartMarker,
         (uintptr_t) &gAudioGlobalsEndMarker,
         (uintptr_t) &gAudioGlobalsEndMarker - (uintptr_t) &gAudioGlobalsStartMarker

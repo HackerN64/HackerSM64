@@ -1,7 +1,6 @@
-// door.c.inc
+// door.inc.c
 
-struct DoorAction
-{
+struct DoorAction {
     u32 flag;
     s32 action;
 };
@@ -54,7 +53,7 @@ void play_warp_door_open_noise(void) {
 void bhv_door_loop(void) {
     s32 index = 0;
 
-    while (sDoorActions[index].flag != (u32)~0) {
+    while (sDoorActions[index].flag != 0xFFFFFFFF) {
         if (cur_obj_clear_interact_status_flag(sDoorActions[index].flag)) {
             set_door_camera_event();
             cur_obj_change_action(sDoorActions[index].action);

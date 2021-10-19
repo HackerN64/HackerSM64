@@ -1,4 +1,4 @@
-// grill_door.c.inc
+// grill_door.inc.c
 
 struct OpenableGrill {
     s16 halfWidth;
@@ -6,8 +6,10 @@ struct OpenableGrill {
     const Collision *collision;
 };
 
-struct OpenableGrill gOpenableGrills[] = { { 320, MODEL_BOB_BARS_GRILLS, bob_seg7_collision_gate },
-                                           { 410, MODEL_HMC_RED_GRILLS,  hmc_seg7_collision_grill_door } };
+struct OpenableGrill gOpenableGrills[] = {
+    { 320, MODEL_BOB_BARS_GRILLS, bob_seg7_collision_gate       },
+    { 410, MODEL_HMC_RED_GRILLS,  hmc_seg7_collision_grill_door }
+};
 
 void bhv_openable_cage_door_loop(void) {
     if (o->oAction == OPENABLE_GRILL_DOOR_ACT_CLOSED) {
@@ -26,6 +28,7 @@ void bhv_openable_cage_door_loop(void) {
 void bhv_openable_grill_loop(void) {
     struct Object *grillObj;
     s32 grillIdx;
+
     switch (o->oAction) {
         case OEPNABLE_GRILL_ACT_SPAWN:
             grillIdx = o->oBehParams2ndByte;

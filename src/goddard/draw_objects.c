@@ -39,7 +39,7 @@ enum SceneType {
  * texture S,T coordinates.
  */
 struct BetaVtx {
-    /* 0x00 */ u8 pad[0x44 - 0];
+    /* 0x00 */ u8 filler[68];
     /* 0x44 */ f32 s;
     /* 0x48 */ f32 t;
 };
@@ -80,12 +80,12 @@ static f32 sPickObjDistance;             ///< distance between object position a
 static struct GdObj *sPickedObject;      ///< object selected with cursor
 /// Various counters and pointers set in update_view() and used in various `draw_XXX` functions
 static struct {
-    u32 pad00;            // @ 801B9CE0
+    u8 filler1[4];        // @ 801B9CE0
     struct ObjView *view; // @ 801B9CE4
     s32 unreadCounter;    // @ 801B9CE8
     s32 mtlDlNum;         // @ 801B9CEC; name is a big guess
     s32 shapesDrawn;      // @ 801B9CF0
-    s32 unused18;         // @ 801B9CF4
+    s32 unused;           // @ 801B9CF4
 } sUpdateViewState;
 static struct ObjLight *sPhongLight;          // material light? phong light?
 static struct GdVec3f sPhongLightPosition;    //@ 801B9D00; guess; light source unit position for light
@@ -542,16 +542,15 @@ void world_pos_to_screen_coords(struct GdVec3f *pos, struct ObjCamera *cam, stru
  * @param input `GdObj` to check position of
  * @return void
  */
-void check_grabable_click(struct GdObj *input) {
+void check_grabbable_click(struct GdObj *input) {
     struct GdVec3f objPos;
-    struct GdObj *obj;
     Mat4f *mtx;
 
     if (gViewUpdateCamera == NULL) {
         return;
     }
-    obj = input;
-    if (!(obj->drawFlags & OBJ_IS_GRABBALE)) {
+    struct GdObj *obj = input;
+    if (!(obj->drawFlags & OBJ_IS_GRABBABLE)) {
         return;
     }
 
@@ -631,10 +630,9 @@ void drawscene(enum SceneType process, struct ObjGroup *interactables, struct Ob
     restart_timer("drawobj");
     imin("process_group");
     if (sSceneProcessType == FIND_PICKS) {
-        apply_to_obj_types_in_group(OBJ_TYPE_ALL, (applyproc_t) check_grabable_click, interactables);
+        apply_to_obj_types_in_group(OBJ_TYPE_ALL, (applyproc_t) check_grabbable_click, interactables);
     } else {
-        apply_to_obj_types_in_group(OBJ_TYPE_LIGHTS | OBJ_TYPE_GADGETS | OBJ_TYPE_NETS
-                                        | OBJ_TYPE_PARTICLES,
+        apply_to_obj_types_in_group(OBJ_TYPE_LIGHTS | OBJ_TYPE_GADGETS | OBJ_TYPE_NETS | OBJ_TYPE_PARTICLES,
                                     (applyproc_t) apply_obj_draw_fn, interactables);
     }
     imout();
@@ -1088,7 +1086,7 @@ void map_vertices(struct ObjGroup *facegrp, struct ObjGroup *vtxgrp) {
  * @note Not Called
  */
 void unpick_obj(struct GdObj *obj) {
-    if (obj->drawFlags & OBJ_IS_GRABBALE) {
+    if (obj->drawFlags & OBJ_IS_GRABBABLE) {
         obj->drawFlags &= ~(OBJ_PICKED | OBJ_HIGHLIGHTED);
     }
 }
@@ -1106,7 +1104,7 @@ void find_closest_pickable_obj(struct GdObj *input) {
     struct GdObj *obj = input;
     f32 distance;
 
-    if (obj->drawFlags & OBJ_IS_GRABBALE) {
+    if (obj->drawFlags & OBJ_IS_GRABBABLE) {
         if (obj->index == sPickDataTemp) {
             if (gViewUpdateCamera != NULL) {
                 distance = d_calc_world_dist_btwn(&gViewUpdateCamera->header, obj);
@@ -1158,7 +1156,7 @@ void update_view(struct ObjView *view) {
     char objTypeAbbr[0x100];
 
     sUpdateViewState.shapesDrawn = 0;
-    sUpdateViewState.unused18 = 0;
+    sUpdateViewState.unused = 0;
 
     if (!(view->flags & VIEW_UPDATE)) {
         view->flags &= ~VIEW_WAS_UPDATED;

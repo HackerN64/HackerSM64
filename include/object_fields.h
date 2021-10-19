@@ -330,14 +330,14 @@
 #define /*0x088*/ oBowserCamAct                                 OBJECT_FIELD_S32(0x00)
 #define /*0x0F4*/ oBowserStatus                                 OBJECT_FIELD_S32(0x1B)
 #define /*0x0F8*/ oBowserTimer                                  OBJECT_FIELD_S32(0x1C)
-#define /*0x0FC*/ oBowserDistToCentre                           OBJECT_FIELD_F32(0x1D)
+#define /*0x0FC*/ oBowserDistToCenter                           OBJECT_FIELD_F32(0x1D)
 #define /*0x106*/ oBowserBitsJustJump                           OBJECT_FIELD_S16(0x1F, 1)
 #define /*0x108*/ oBowserRandSplitFloor                         OBJECT_FIELD_S16(0x20, 0)
 #define /*0x10A*/ oBowserHeldAnglePitch                         OBJECT_FIELD_S16(0x20, 1)
 #define /*0x10D*/ oBowserHeldAngleVelYaw                        OBJECT_FIELD_S16(0x21, 0)
 #define /*0x10E*/ oBowserGrabbedStatus                          OBJECT_FIELD_S16(0x21, 1)
 #define /*0x110*/ oBowserIsReacting                             OBJECT_FIELD_S16(0x22, 0)
-#define /*0x112*/ oBowserAngleToCentre                          OBJECT_FIELD_S16(0x22, 1)
+#define /*0x112*/ oBowserAngleToCenter                          OBJECT_FIELD_S16(0x22, 1)
 #define /*0x1AC*/ oBowserTargetOpacity                          OBJECT_FIELD_S16(0x49, 0)
 #define /*0x1AE*/ oBowserEyesTimer                              OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oBowserEyesShut                               OBJECT_FIELD_S16(0x4A, 0)
@@ -373,10 +373,10 @@
 #define /*0x104*/ oBubbaNextTargetPitchTowardMario              OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oBubbaAirVelY                                 OBJECT_FIELD_F32(0x20)
 #define /*0x10C*/ oBubbaJumpHeight                              OBJECT_FIELD_F32(0x21)
-#define /*0x1AC*/ oBubbaTargetPitch                             OBJECT_FIELD_S16(0x49,   0)
-#define /*0x1AE*/ oBubbaTargetYaw                               OBJECT_FIELD_S16(0x49, + 1)
-#define /*0x1B0*/ oBubbaPitchVel                                OBJECT_FIELD_S16(0x4A,   0)
-#define /*0x1B2*/ oBubbaYawVel                                  OBJECT_FIELD_S16(0x4A, + 1)
+#define /*0x1AC*/ oBubbaTargetPitch                             OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oBubbaTargetYaw                               OBJECT_FIELD_S16(0x49, 1)
+#define /*0x1B0*/ oBubbaPitchVel                                OBJECT_FIELD_S16(0x4A, 0)
+#define /*0x1B2*/ oBubbaYawVel                                  OBJECT_FIELD_S16(0x4A, 1)
 
 /* Bullet Bill */
 #define /*0x0F8*/ oBulletBillInitialMoveYaw                     OBJECT_FIELD_S32(0x1C)
@@ -499,10 +499,10 @@
 #define /*0x100*/ oDorrieForwardDistToMario                     OBJECT_FIELD_F32(0x1E)
 #define /*0x104*/ oDorrieYawVel                                 OBJECT_FIELD_S32(0x1F)
 #define /*0x10C*/ oDorrieLiftingMario                           OBJECT_FIELD_S32(0x21)
-#define /*0x1AC*/ oDorrieGroundPounded                          OBJECT_FIELD_S16(0x49,   0)
-#define /*0x1AE*/ oDorrieAngleToHome                            OBJECT_FIELD_S16(0x49, + 1)
-#define /*0x1B0*/ oDorrieNeckAngle                              OBJECT_FIELD_S16(0x4A,   0)
-#define /*0x1B2*/ oDorrieHeadRaiseSpeed                         OBJECT_FIELD_S16(0x4A, + 1)
+#define /*0x1AC*/ oDorrieGroundPounded                          OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oDorrieAngleToHome                            OBJECT_FIELD_S16(0x49, 1)
+#define /*0x1B0*/ oDorrieNeckAngle                              OBJECT_FIELD_S16(0x4A, 0)
+#define /*0x1B2*/ oDorrieHeadRaiseSpeed                         OBJECT_FIELD_S16(0x4A, 1)
 
 /* Elevator */
 #define /*0x0F4*/ oElevatorMinY                                 OBJECT_FIELD_F32(0x1B)
@@ -671,10 +671,10 @@
 #define /*0x108*/ oKleptoStartPosY                              OBJECT_FIELD_F32(O_KLEPTO_START_POS_Y_INDEX)
 #define /*0x10C*/ oKleptoStartPosZ                              OBJECT_FIELD_F32(O_KLEPTO_START_POS_Z_INDEX)
 #define /*0x110*/ oKleptoTimeUntilTargetChange                  OBJECT_FIELD_S32(0x22)
-#define /*0x1AC*/ oKleptoTargetNumber                           OBJECT_FIELD_S16(0x49,   0)
-#define /*0x1AE*/ oKleptoDiveTimer                              OBJECT_FIELD_S16(0x49, + 1)
-#define /*0x1B0*/ oKleptoPitchToTarget                          OBJECT_FIELD_S16(0x4A,   0)
-#define /*0x1B2*/ oKleptoYawToTarget                            OBJECT_FIELD_S16(0x4A, + 1)
+#define /*0x1AC*/ oKleptoTargetNumber                           OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oKleptoDiveTimer                              OBJECT_FIELD_S16(0x49, 1)
+#define /*0x1B0*/ oKleptoPitchToTarget                          OBJECT_FIELD_S16(0x4A, 0)
+#define /*0x1B2*/ oKleptoYawToTarget                            OBJECT_FIELD_S16(0x4A, 1)
 
 /* Koopa */
 #define /*0x0F4*/ oKoopaAgility                                 OBJECT_FIELD_F32(0x1B)
@@ -707,8 +707,8 @@
 #define /*0x0FC*/ oCameraLakituCircleRadius                     OBJECT_FIELD_F32(0x1D)
 #define /*0x100*/ oCameraLakituFinishedDialog                   OBJECT_FIELD_S32(0x1E)
 #define /*0x104*/ oCameraLakituIntroMusicPlayed                 OBJECT_FIELD_S32(0x1F)
-#define /*0x1AC*/ oCameraLakituPitchVel                         OBJECT_FIELD_S16(0x49,   0)
-#define /*0x1AE*/ oCameraLakituYawVel                           OBJECT_FIELD_S16(0x49, + 1)
+#define /*0x1AC*/ oCameraLakituPitchVel                         OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oCameraLakituYawVel                           OBJECT_FIELD_S16(0x49, 1)
 
 /* Evil Lakitu */
 #define /*0x0F4*/ oEnemyLakituNumSpinies                        OBJECT_FIELD_S32(0x1B)
@@ -797,7 +797,7 @@
 #define /*0x100*/ oMrISpinDirection                             OBJECT_FIELD_S32(0x1E)
 #define /*0x104*/ oMrIParticleTimer                             OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oMrIParticleTimerTarget                       OBJECT_FIELD_S32(0x20)
-#define /*0x10C*/ oMrISize                                      OBJECT_FIELD_F32(0x21)
+#define /*0x10C*/ oMrIScale                                     OBJECT_FIELD_F32(0x21)
 #define /*0x110*/ oMrIBlinking                                  OBJECT_FIELD_S32(0x22)
 
 /* Object Respawner */
@@ -819,9 +819,9 @@
 // 0x1D-0x21 reserved for pathing
 #define /*0x110*/ oRacingPenguinWeightedNewTargetSpeed          OBJECT_FIELD_F32(0x22)
 #define /*0x1AC*/ oRacingPenguinFinalTextbox                    OBJECT_FIELD_S16(0x49, 0)
-#define /*0x1AE*/ oRacingPenguinMarioWon                        OBJECT_FIELD_S16(0x49, + 1)
+#define /*0x1AE*/ oRacingPenguinMarioWon                        OBJECT_FIELD_S16(0x49, 1)
 #define /*0x1B0*/ oRacingPenguinReachedBottom                   OBJECT_FIELD_S16(0x4A, 0)
-#define /*0x1B2*/ oRacingPenguinMarioCheated                    OBJECT_FIELD_S16(0x4A, + 1)
+#define /*0x1B2*/ oRacingPenguinMarioCheated                    OBJECT_FIELD_S16(0x4A, 1)
 
 /* Small Penguin */
 #define /*0x088*/ oSmallPenguinReturnedToMother                 OBJECT_FIELD_S32(0x00)
@@ -873,10 +873,10 @@
 #define /*0x108*/ oPlatformOnTrackPitch                         OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oPlatformOnTrackYaw                           OBJECT_FIELD_S32(0x21)
 #define /*0x110*/ oPlatformOnTrackOffsetY                       OBJECT_FIELD_F32(0x22)
-#define /*0x1AC*/ oPlatformOnTrackIsNotSkiLift                  OBJECT_FIELD_S16(0x49,   0)
-#define /*0x1AE*/ oPlatformOnTrackIsNotHMC                      OBJECT_FIELD_S16(0x49, + 1)
-#define /*0x1B0*/ oPlatformOnTrackType                          OBJECT_FIELD_S16(0x4A,   0)
-#define /*0x1B2*/ oPlatformOnTrackWasStoodOn                    OBJECT_FIELD_S16(0x4A, + 1)
+#define /*0x1AC*/ oPlatformOnTrackIsNotSkiLift                  OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oPlatformOnTrackIsNotHMC                      OBJECT_FIELD_S16(0x49, 1)
+#define /*0x1B0*/ oPlatformOnTrackType                          OBJECT_FIELD_S16(0x4A, 0)
+#define /*0x1B2*/ oPlatformOnTrackWasStoodOn                    OBJECT_FIELD_S16(0x4A, 1)
 
 /* Platform Spawner */
 #define /*0x0F4*/ oPlatformSpawnerWFTowerPlatformNum            OBJECT_FIELD_S32(0x1B)
@@ -962,7 +962,7 @@
 #define /*0x0F4*/ oSmokeTimer                                   OBJECT_FIELD_S32(0x1B)
 
 /* Snowman's Bottom */
-#define /*0x0F4*/ oSnowmansBottomRollingFacePitch               OBJECT_FIELD_F32(0x1B)
+#define /*0x0F4*/ oSnowmansBottomRollingFacePitch               OBJECT_FIELD_F32(0x1B) //! scale?
 #define /*0x0F8*/ oSnowmansBottomTargetYaw                      OBJECT_FIELD_S32(0x1C)
 #define /*0x1AC*/ oSnowmansBottomHitCheckpointNearMario         OBJECT_FIELD_S32(0x49)
 // 0x1D-0x21 reserved for pathing
@@ -981,11 +981,11 @@
 #define /*0x104*/ oSnufitBodyScalePeriod                        OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oSnufitBodyBaseScale                          OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oSnufitBullets                                OBJECT_FIELD_S32(0x21)
-#define /*0x1AC*/ oSnufitOffsetVec                              OBJECT_FIELD_S16(0x49,   0) // start pos of s16 vec
-#define /*0x1AC*/ oSnufitXOffset                                OBJECT_FIELD_S16(0x49,   0)
-#define /*0x1AE*/ oSnufitYOffset                                OBJECT_FIELD_S16(0x49, + 1)
-#define /*0x1B0*/ oSnufitZOffset                                OBJECT_FIELD_S16(0x4A,   0)
-#define /*0x1B2*/ oSnufitBodyScale                              OBJECT_FIELD_S16(0x4A, + 1)
+#define /*0x1AC*/ oSnufitOffsetVec                              OBJECT_FIELD_S16(0x49, 0) // start pos of s16 vec
+#define /*0x1AC*/ oSnufitXOffset                                OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oSnufitYOffset                                OBJECT_FIELD_S16(0x49, 1)
+#define /*0x1B0*/ oSnufitZOffset                                OBJECT_FIELD_S16(0x4A, 0)
+#define /*0x1B2*/ oSnufitBodyScale                              OBJECT_FIELD_S16(0x4A, 1)
 
 /* Spindel */
 #define /*0x0F4*/ oSpindelMoveTimer                             OBJECT_FIELD_S32(0x1B)
@@ -1160,8 +1160,8 @@
 // 0x1D-0x21 reserved for pathing
 #define /*0x110*/ oUnagiTargetNextForwardVel                    OBJECT_FIELD_F32(0x22)
 #define /*0x1AC*/ oUnagiDistanceToMario                         OBJECT_FIELD_F32(0x49)
-#define /*0x1B0*/ oUnagiInitMoveYaw                             OBJECT_FIELD_S16(0x4A,   0)
-#define /*0x1B2*/ oUnagiHasStar                                 OBJECT_FIELD_S16(0x4A, + 1)
+#define /*0x1B0*/ oUnagiInitMoveYaw                             OBJECT_FIELD_S16(0x4A, 0)
+#define /*0x1B2*/ oUnagiHasStar                                 OBJECT_FIELD_S16(0x4A, 1)
 
 /* Water Bomb */
 #define /*0x0F8*/ oWaterBombVerticalStretch                     OBJECT_FIELD_F32(0x1C)
@@ -1249,8 +1249,8 @@
 #define /*0x108*/ oWigglerTimeUntilRandomTurn                   OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oWigglerTargetYaw                             OBJECT_FIELD_S32(0x21)
 #define /*0x110*/ oWigglerWalkAwayFromWallTimer                 OBJECT_FIELD_S32(0x22)
-#define /*0x1AC*/ oWigglerUnused                                OBJECT_FIELD_S16(0x49,   0)
-#define /*0x1AE*/ oWigglerTextStatus                            OBJECT_FIELD_S16(0x49, + 1)
+#define /*0x1AC*/ oWigglerUnused                                OBJECT_FIELD_S16(0x49, 0)
+#define /*0x1AE*/ oWigglerTextStatus                            OBJECT_FIELD_S16(0x49, 1)
 
 /* Lll Wood Piece */
 #define /*0x0F4*/ oLllWoodPieceOscillationTimer                 OBJECT_FIELD_S32(0x1B)

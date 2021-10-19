@@ -188,12 +188,9 @@ void set_joint_vecs(struct ObjJoint *j, f32 x, f32 y, f32 z) {
 
 /* 23D818 -> 23DA18 */
 struct ObjJoint *make_joint(s32 flags, f32 x, f32 y, f32 z) {
-    struct ObjJoint *j; // sp24
-    struct ObjJoint *oldhead;
-
-    j = (struct ObjJoint *) make_object(OBJ_TYPE_JOINTS);
+    struct ObjJoint *j = (struct ObjJoint *) make_object(OBJ_TYPE_JOINTS);
     sJointCount++;
-    oldhead = gGdJointList;
+    struct ObjJoint *oldhead = gGdJointList;
     gGdJointList = j;
 
     if (oldhead != NULL) {
@@ -243,7 +240,7 @@ struct ObjJoint *make_grabber_joint(struct ObjShape *shape, s32 flags, f32 x, f3
     j->type = 5;
     j->flags |= flags;
     j->colourNum = COLOUR_PINK;
-    j->header.drawFlags |= OBJ_IS_GRABBALE;
+    j->header.drawFlags |= OBJ_IS_GRABBABLE;
     j->header.drawFlags |= OBJ_INVISIBLE;
     j->updateFunc = grabbable_joint_update_func;
     j->rootAnimator = NULL;
@@ -599,8 +596,7 @@ void func_801903E8(struct ObjJoint *j, struct GdVec3f *a1, f32 x, f32 y, f32 z) 
 }
 
 /* 23EBB8 -> 23F184 */
-void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 y, f32 z) // sp278
-{
+void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 y, f32 z) { // sp278
     struct ObjJoint *sp274; // = a2?
     struct ObjJoint *sp270; // mid-point of stack array?
     struct ObjJoint *sp26C; // jointstackarr[i]? curjoint?
