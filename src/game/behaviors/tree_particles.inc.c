@@ -1,7 +1,8 @@
-// tree_particles.c.inc
+// tree_particles.inc.c
 
 void bhv_tree_snow_or_leaf_loop(void) {
     cur_obj_update_floor_height();
+
     if (o->oTimer == 0) {
         o->oAngleVelPitch = ((random_float() - 0.5f) * 0x1000);
         o->oAngleVelRoll  = ((random_float() - 0.5f) * 0x1000);
@@ -21,7 +22,7 @@ void bhv_tree_snow_or_leaf_loop(void) {
         obj_mark_for_deletion(o);
     }
     o->oFaceAnglePitch += o->oAngleVelPitch;
-    o->oFaceAngleRoll += o->oAngleVelRoll;
+    o->oFaceAngleRoll  += o->oAngleVelRoll;
     o->oVelY -= 3.0f;
     if (o->oVelY < -8.0f)
         o->oVelY = -8.0f;

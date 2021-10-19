@@ -1,11 +1,12 @@
+// dorrie.inc.c
 
 void dorrie_raise_head(void) {
     s16 startAngle = o->oDorrieNeckAngle;
 
     o->oDorrieNeckAngle -= (s16) absf(370.0f * sins(o->oDorrieHeadRaiseSpeed));
 
-    f32 xzDisp = 440.0f * (coss(o->oDorrieNeckAngle) - coss(startAngle));
-    f32 yDisp = 440.0f * (sins(o->oDorrieNeckAngle) - sins(startAngle));
+    f32 xzDisp = ((440.0f * (coss(o->oDorrieNeckAngle)) - coss(startAngle)));
+    f32 yDisp  = ((440.0f * (sins(o->oDorrieNeckAngle)) - sins(startAngle)));
 
     vec3_set(gMarioStates[0].pos, (gMarioObject->oPosX + (xzDisp * sins(o->oMoveAngleYaw))),
                                   (gMarioObject->oPosY - yDisp),
@@ -13,12 +14,10 @@ void dorrie_raise_head(void) {
 }
 
 void dorrie_act_move(void) {
-    s16 startYaw;
+    s16 startYaw = o->oMoveAngleYaw;
     s16 targetYaw;
     s16 targetSpeed;
-    s16 circularTurn;
 
-    startYaw = o->oMoveAngleYaw;
     o->oDorrieNeckAngle = -0x26F4;
     cur_obj_init_animation_with_sound(1);
 
@@ -33,7 +32,7 @@ void dorrie_act_move(void) {
             targetYaw = gMarioObject->oFaceAngleYaw;
             targetSpeed = 10;
         } else {
-            circularTurn = 0x4000 - atan2s(2000.0f, o->oDorrieDistToHome - 2000.0f);
+            s16 circularTurn = 0x4000 - atan2s(2000.0f, o->oDorrieDistToHome - 2000.0f);
             if ((s16)(o->oMoveAngleYaw - o->oDorrieAngleToHome) < 0) {
                 circularTurn = -circularTurn;
             }
@@ -95,7 +94,6 @@ void dorrie_act_raise_head(void) {
 }
 
 void bhv_dorrie_update(void) {
-    f32 boundsShift;
     f32 maxOffsetY;
 
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
@@ -108,7 +106,7 @@ void bhv_dorrie_update(void) {
         o->oDorrieDistToHome = cur_obj_lateral_dist_to_home();
 
         // Shift dorrie's bounds to account for her neck
-        boundsShift = 440.0f * coss(o->oDorrieNeckAngle) * coss(o->oMoveAngleYaw - o->oDorrieAngleToHome);
+        f32 boundsShift = 440.0f * coss(o->oDorrieNeckAngle) * coss(o->oMoveAngleYaw - o->oDorrieAngleToHome);
 
         if (clamp_f32(&o->oDorrieDistToHome, 1650.0f + boundsShift, 2300.0f + boundsShift)) {
             o->oPosX = o->oHomeX - o->oDorrieDistToHome * sins(o->oDorrieAngleToHome);

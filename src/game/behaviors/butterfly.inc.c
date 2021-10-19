@@ -1,4 +1,4 @@
-// butterfly.c.inc
+// butterfly.inc.c
 
 void bhv_butterfly_init(void) {
     cur_obj_init_animation(BUTTERFLY_ANIM_RESTING);
@@ -30,7 +30,7 @@ void butterfly_step(s32 speed) {
         o->oPosY = floorY;
     }
     o->oButterflyYPhase++;
-    if (o->oButterflyYPhase >= 101) {
+    if (o->oButterflyYPhase > 100) {
         o->oButterflyYPhase = 0;
     }
 }
@@ -62,8 +62,9 @@ void butterfly_act_follow_mario(void) {
 
     butterfly_step(7);
 
-    if (!is_point_within_radius_of_mario(o->oHomeX, o->oHomeY, o->oHomeZ, 1200))
+    if (!is_point_within_radius_of_mario(o->oHomeX, o->oHomeY, o->oHomeZ, 1200)) {
         o->oAction = BUTTERFLY_ACT_RETURN_HOME;
+    }
 }
 
 void butterfly_act_return_home(void) {

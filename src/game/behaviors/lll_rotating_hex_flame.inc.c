@@ -1,4 +1,4 @@
-// lll_rotating_hex_flame.c.inc
+// lll_rotating_hex_flame.inc.c
 
 void bhv_lll_rotating_hex_flame_loop(void) {
     cur_obj_set_pos_relative(o->parentObj, o->oLllRotatingHexFlameRelativePosX, o->oLllRotatingHexFlameRelativePosY, o->oLllRotatingHexFlameRelativePosZ);
@@ -55,7 +55,7 @@ ObjActionFunc sRotatingCwFireBarsActions[] = {
     fire_bar_act_inactive,
     fire_bar_act_spawn_flames,
     fire_bar_act_active,
-    fire_bar_act_remove_flames
+    fire_bar_act_remove_flames,
 };
 
 void bhv_lll_rotating_block_fire_bars_loop(void) {

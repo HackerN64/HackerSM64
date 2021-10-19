@@ -19,14 +19,12 @@
 
 #define NUM_SAVE_FILES 4
 
-struct SaveBlockSignature
-{
+struct SaveBlockSignature {
     u16 magic;
     u16 chksum;
 };
 
-struct SaveFile
-{
+struct SaveFile {
     // Location of lost cap.
     // Note: the coordinates get set, but are never actually used, since the
     // cap can always be found in a fixed spot within the course
@@ -34,7 +32,7 @@ struct SaveFile
     u8 capArea;
 #ifdef SAVE_NUM_LIVES
     s8 numLives;
-    u8 pad[5];
+    u8 filler[5];
 #else
     // Note: the coordinates get set, but are never actually used, since the
     // cap can always be found in a fixed spot within the course
@@ -60,8 +58,7 @@ enum SaveFileIndex {
     SAVE_FILE_D
 };
 
-struct MainMenuSaveData
-{
+struct MainMenuSaveData {
     // Each save file has a 2 bit "age" for each course. The higher this value,
     // the older the high score is. This is used for tie-breaking when displaying
     // on the high score screen.
@@ -88,8 +85,7 @@ struct MainMenuSaveData
     struct SaveBlockSignature signature;
 };
 
-struct SaveBuffer
-{
+struct SaveBuffer {
     // Each of the four save files has two copies. If one is bad, the other is used as a backup.
     struct SaveFile files[NUM_SAVE_FILES][2];
     // The main menu data has two copies. If one is bad, the other is used as a backup.
@@ -111,6 +107,8 @@ extern u8 gGotFileCoinHiScore;
 extern u8 gCurrCourseStarFlags;
 extern u8 gSpecialTripleJump;
 extern s8 gLevelToCourseNumTable[];
+
+#define COURSE_FLAG_CANNON_UNLOCKED      /* 0x00000080 */ (1 <<  7)
 
 // game progress flags
 #define SAVE_FLAG_FILE_EXISTS            /* 0x00000001 */ (1 <<  0)
@@ -214,6 +212,8 @@ enum EuLanguages {
 
 void eu_set_language(u16 language);
 u32 eu_get_language(void);
+#else
+#define LANGUAGE_ENGLISH 0
 #endif
 
 #endif // SAVE_FILE_H

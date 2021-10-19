@@ -112,7 +112,7 @@ void print_intro_text(void) {
 #if MULTILANG
     s32 language = eu_get_language();
 #endif
-    if ((gGlobalTimer & 0x1F) < 20) {
+    if ((gGlobalTimer & 31) < 20) {
         if (gControllerBits == 0) {
 #if MULTILANG
             print_text_centered(SCREEN_CENTER_X, 20, gNoControllerMsg[language]);
@@ -195,7 +195,7 @@ void clear_areas(void) {
         gAreaData[i].instantWarps = NULL;
         gAreaData[i].objectSpawnInfos = NULL;
         gAreaData[i].camera = NULL;
-        gAreaData[i].unused28 = NULL;
+        gAreaData[i].unused = NULL;
         gAreaData[i].whirlpools[0] = NULL;
         gAreaData[i].whirlpools[1] = NULL;
         gAreaData[i].dialog[0] = DIALOG_NONE;
@@ -418,7 +418,7 @@ void render_game(void) {
         if (gViewportClip != NULL) {
             clear_viewport(gViewportClip, gWarpTransFBSetColor);
         } else {
-            clear_frame_buffer(gWarpTransFBSetColor);
+            clear_framebuffer(gWarpTransFBSetColor);
         }
     }
 

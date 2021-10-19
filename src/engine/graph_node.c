@@ -721,16 +721,14 @@ void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f po
  * Initialize and object node using the given SpawnInfo struct
  */
 void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo *spawn) {
-    vec3f_set(graphNode->scale, 1.0f, 1.0f, 1.0f);
+    vec3_same(graphNode->scale, 1.0f);
     vec3s_copy(graphNode->angle, spawn->startAngle);
-
-    graphNode->pos[0] = (f32) spawn->startPos[0];
-    graphNode->pos[1] = (f32) spawn->startPos[1];
-    graphNode->pos[2] = (f32) spawn->startPos[2];
+    
+    vec3_copy(graphNode->pos, spawn->startPos);
 
     graphNode->areaIndex = spawn->areaIndex;
     graphNode->activeAreaIndex = spawn->activeAreaIndex;
-    graphNode->sharedChild = spawn->modelNode;
+    graphNode->sharedChild = spawn->model;
     graphNode->spawnInfo = spawn;
     graphNode->throwMatrix = NULL;
     graphNode->animInfo.curAnim = 0;
@@ -813,7 +811,7 @@ s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
     }
 
     if (anim->flags & ANIM_FLAG_FORWARD) {
-        if (obj->animAccel) {
+        if (obj->animAccel != 0) {
             result = obj->animFrameAccelAssist - obj->animAccel;
         } else {
             result = (obj->animFrame - 1) << 16;

@@ -325,7 +325,7 @@ RGBA16 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampl
     ColorRGBf color;
     s32 iy, ix, sy, sx;
     s32 idy, idx, sdy;
-    RGBA16 *fb = gFrameBuffers[sRenderingFrameBuffer];
+    RGBA16 *fb = gFramebuffers[sRenderingFramebuffer];
     RGBA16 *image = alloc_display_list((imageW * imageH) * sizeof(RGBA16));
     if (image == NULL) return NULL;
     for ((iy = 0); (iy < imageH); (iy++)) {
@@ -420,4 +420,3 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
 }
 
 #endif
-

@@ -159,10 +159,8 @@ void wiggler_init_segments(void) {
     Vec3f d;
     s16 dpitch, dyaw;
     f32 dxz;
-    f32 segmentLength;
     s32 i;
-
-    segmentLength = (35.0f * o->header.gfx.scale[0]);
+    f32 segmentLength = (35.0f * o->header.gfx.scale[0]);
 
     for (i = 1; i < WIGGLER_NUM_SEGMENTS; i++) {
         prevBodyPart = &o->oWigglerSegments[i - 1];

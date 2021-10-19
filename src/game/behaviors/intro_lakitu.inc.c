@@ -1,9 +1,9 @@
+
 /**
  * @file intro_lakitu.inc.c
  * This file implements lakitu's behvaior during the intro cutscene.
  * It's also used during the ending cutscene.
  */
-
 
 /**
  * Add the camera's position to `offset`, rotate the point to be relative to the camera's focus, then
@@ -48,6 +48,14 @@ s32 intro_lakitu_set_pos_and_focus(struct Object *obj, struct CutsceneSplinePoin
     return splineFinished;
 }
 
+#ifdef VERSION_EU
+#define TIMER1 599
+#define TIMER2 74
+#else
+#define TIMER1 720
+#define TIMER2 98
+#endif
+
 void bhv_intro_lakitu_loop(void) {
     Vec3f offset, fromPoint, toPoint;
 	s16 yawToCam;
@@ -55,10 +63,10 @@ void bhv_intro_lakitu_loop(void) {
     switch (o->oAction) {
         case INTRO_LAKITU_ACT_INIT:
             cur_obj_disable_rendering();
-            o->oIntroLakituSplineSegment         = 0.f;
-            o->oIntroLakituSplineSegmentProgress = 0.f;
+            o->oIntroLakituSplineSegment         = 0.0f;
+            o->oIntroLakituSplineSegmentProgress = 0.0f;
             o->oIntroLakituCloud =
-                spawn_object_relative_with_scale(CLOUD_BP_LAKITU_CLOUD, 0, 0, 0, 2.f, o, MODEL_MIST, bhvCloud);
+                spawn_object_relative_with_scale(CLOUD_BP_LAKITU_CLOUD, 0, 0, 0, 2.0f, o, MODEL_MIST, bhvCloud);
             if (gCamera->cutscene == CUTSCENE_END_WAVING) {
                 o->oAction = INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_1;
             } else {
@@ -68,11 +76,14 @@ void bhv_intro_lakitu_loop(void) {
 
         case INTRO_LAKITU_ACT_CUTSCENE_INTRO_1:
             cur_obj_enable_rendering();
+
             if ((gCutsceneTimer > 350) && (gCutsceneTimer < 458)) {
                 vec3_copy_y_off(&o->oPosVec, gCamera->pos, 500.0f);
             }
-            if (gCutsceneTimer > 52)
+
+            if (gCutsceneTimer > 52) {
                 cur_obj_play_sound_1(SOUND_AIR_LAKITU_FLY_HIGHPRIO);
+            }
 
             if (intro_lakitu_set_pos_and_focus(o, gIntroLakituStartToPipeOffsetFromCamera, gIntroLakituStartToPipeFocus)) {
                 o->oAction = INTRO_LAKITU_ACT_CUTSCENE_INTRO_2;
@@ -93,11 +104,7 @@ void bhv_intro_lakitu_loop(void) {
 #endif
             break;
         case INTRO_LAKITU_ACT_CUTSCENE_INTRO_2:
-#ifdef VERSION_EU
-            if (gCutsceneTimer > 599) {
-#else
-            if (gCutsceneTimer > 720) {
-#endif
+            if (gCutsceneTimer > TIMER1) {
                 o->oAction = INTRO_LAKITU_ACT_CUTSCENE_INTRO_3;
                 o->oIntroLakituDistToBirdsX   =  1400.f;
                 o->oIntroLakituDistToBirdsZ   = -4096.f;
@@ -107,22 +114,23 @@ void bhv_intro_lakitu_loop(void) {
                 o->oFaceAngleYaw = (o->oMoveAngleYaw + 0x4000);
                 o->oMoveAnglePitch = 0x800;
             }
+
             cur_obj_play_sound_1(SOUND_AIR_LAKITU_FLY_HIGHPRIO);
             break;
 
         case INTRO_LAKITU_ACT_CUTSCENE_INTRO_3:
             cur_obj_play_sound_1(SOUND_AIR_LAKITU_FLY_HIGHPRIO);
-            vec3f_set(fromPoint, -1128.f, 560.f, 4664.f);
+            vec3f_set(fromPoint, -1128.0f, 560.0f, 4664.0f);
             o->oMoveAngleYaw += 0x200;
-            o->oIntroLakituDistToBirdsX = approach_f32_asymptotic(o->oIntroLakituDistToBirdsX, 100.f, 0.03f);
+            o->oIntroLakituDistToBirdsX = approach_f32_asymptotic(o->oIntroLakituDistToBirdsX, 100.0f, 0.03f);
             o->oFaceAnglePitch = atan2s(200.f, (o->oPosY - 400.f));
             o->oFaceAngleYaw = approach_s16_asymptotic(o->oFaceAngleYaw, (o->oMoveAngleYaw + 0x8000), 4);
             vec3f_set_dist_and_angle(fromPoint, toPoint, o->oIntroLakituDistToBirdsX, 0,  o->oMoveAngleYaw);
             toPoint[1] += (150.f * coss((s16) o->oIntroLakituDistToBirdsZ));
             o->oIntroLakituDistToBirdsZ += o->oIntroLakituEndBirds1DestZ;
-            o->oIntroLakituEndBirds1DestZ = approach_f32_asymptotic(o->oIntroLakituEndBirds1DestZ, 512.f, 0.05f);
+            o->oIntroLakituEndBirds1DestZ = approach_f32_asymptotic(o->oIntroLakituEndBirds1DestZ, 512.0f, 0.05f);
             toPoint[0] += o->oIntroLakituEndBirds1DestY;
-            o->oIntroLakituEndBirds1DestY = approach_f32_asymptotic(o->oIntroLakituEndBirds1DestY,   0.f, 0.05f);
+            o->oIntroLakituEndBirds1DestY = approach_f32_asymptotic(o->oIntroLakituEndBirds1DestY,   0.0f, 0.05f);
             vec3f_copy(&o->oPosVec, toPoint);
 
             if (o->oTimer == 31) {
@@ -131,11 +139,7 @@ void bhv_intro_lakitu_loop(void) {
                 spawn_mist_from_global();
                 o->oPosY += 158.f;
             }
-#ifdef VERSION_EU
-            if (o->oTimer == 74) {
-#else
-            if (o->oTimer == 98) {
-#endif
+            if (o->oTimer == TIMER2) {
                 obj_mark_for_deletion(o);
                 obj_mark_for_deletion(o->oIntroLakituCloud);
             }
@@ -145,7 +149,7 @@ void bhv_intro_lakitu_loop(void) {
             break;
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_1:
             cur_obj_enable_rendering();
-            vec3f_set(offset, -100.f, 100.f, 300.f);
+            vec3f_set(offset, -100.0f, 100.0f, 300.0f);
             offset_rotated(toPoint, gCamera->pos, offset, sMarioCamState->faceAngle);
             vec3f_copy(&o->oPosVec, toPoint);
             o->oMoveAnglePitch = 0x1000;
@@ -158,7 +162,7 @@ void bhv_intro_lakitu_loop(void) {
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2:
             vec3f_copy(toPoint, &o->oPosVec);
             if (o->oTimer > 60) {
-                o->oForwardVel = approach_f32_asymptotic(o->oForwardVel, -10.f, 0.05f);
+                o->oForwardVel = approach_f32_asymptotic(o->oForwardVel, -10.0f, 0.05f);
                 o->oMoveAngleYaw   += 0x78;
                 o->oMoveAnglePitch += 0x40;
                 o->oFaceAngleYaw = camera_approach_s16_symmetric(o->oFaceAngleYaw, (s16) calculate_yaw(toPoint, gCamera->pos), 0x200);
@@ -173,7 +177,7 @@ void bhv_intro_lakitu_loop(void) {
 
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_3:
             vec3f_copy(toPoint, &o->oPosVec);
-            o->oForwardVel = approach_f32_asymptotic(o->oForwardVel, 60.f, 0.05f);
+            o->oForwardVel = approach_f32_asymptotic(o->oForwardVel, 60.0f, 0.05f);
             vec3f_get_yaw(toPoint, gCamera->pos, &yawToCam);
             o->oFaceAngleYaw = camera_approach_s16_symmetric(o->oFaceAngleYaw, yawToCam, 0x200);
             if (o->oTimer < 62) {
@@ -185,3 +189,6 @@ void bhv_intro_lakitu_loop(void) {
             break;
     }
 }
+
+#undef TIMER1
+#undef TIMER2

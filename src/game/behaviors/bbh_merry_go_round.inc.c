@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvMerryGoRound.
  * This is the merry-go-round in BBH.
@@ -25,7 +26,7 @@ static void handle_merry_go_round_music(void) {
         u16 marioFloorType;
 
         if (marioFloor == NULL) {
-            marioFloorType = 0;
+            marioFloorType = SURFACE_DEFAULT;
         } else {
             marioFloorType = marioFloor->type;
         }

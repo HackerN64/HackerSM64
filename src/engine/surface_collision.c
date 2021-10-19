@@ -279,13 +279,12 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     f32 height        = CELL_HEIGHT_LIMIT;
     f32 dynamicHeight = CELL_HEIGHT_LIMIT;
-    s32 x, y, z;
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-    x = posX;
-    y = posY;
-    z = posZ;
+    s32 x = posX;
+    s32 y = posY;
+    s32 z = posZ;
     *pceil = NULL;
 
     if (is_outside_level_bounds(x, z)) {
@@ -490,8 +489,8 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     f32 dynamicHeight = FLOOR_LOWER_LIMIT;
 
     //! (Parallel Universes) Because position is casted to an s16, reaching higher
-    // float locations  can return floors despite them not existing there.
-    //(Dynamic floors will unload due to the range.)
+    //  float locations can return floors despite them not existing there.
+    //  (Dynamic floors will unload due to the range.)
     s32 x = xPos;
     s32 y = yPos;
     s32 z = zPos;
@@ -566,6 +565,9 @@ f32 find_water_floor(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor) {
     } else {
         *pfloor = floor;
     }
+
+    // Increment the debug tracker.
+    gNumCalls.floor++;
 
     return height;
 }

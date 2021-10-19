@@ -1,4 +1,4 @@
-// sparkle_spawn_star.c.inc
+// sparkle_spawn_star.inc.c
 
 struct ObjectHitbox sSparkleSpawnStarHitbox = {
     /* interactType:      */ INTERACT_STAR_OR_KEY,
@@ -17,7 +17,7 @@ void bhv_spawned_star_init(void) {
         o->oBehParams = o->parentObj->oBehParams;
     }
     s32 param = GET_BPARAM1(o->oBehParams);
-    if ((1 << param) & save_file_get_star_flags((gCurrSaveFileNum - 1), (gCurrCourseNum - 1))) {
+    if ((1 << param) & save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum))) {
         cur_obj_set_model(MODEL_TRANSPARENT_STAR);
     }
     cur_obj_play_sound_2(SOUND_GENERAL2_STAR_APPEARS);
@@ -32,8 +32,7 @@ void set_sparkle_spawn_star_hitbox(void) {
 }
 
 void set_home_to_mario(void) {
-    vec3_copy(&o->oHomeVec, &gMarioObject->oPosVec);
-    o->oHomeY += 250.0f;
+    vec3_copy_y_off(&o->oHomeVec, &gMarioObject->oPosVec, 250.0f);
     o->oPosY = o->oHomeY;
     f32 lateralDist;
     vec3f_get_lateral_dist(&o->oPosVec, &o->oHomeVec, &lateralDist);
@@ -92,6 +91,7 @@ void bhv_spawned_star_loop(void) {
             }
             break;
     }
+
     cur_obj_move_using_fvel_and_gravity();
     o->oFaceAngleYaw += o->oAngleVelYaw;
     o->oInteractStatus = INT_STATUS_NONE;

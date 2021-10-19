@@ -1,4 +1,4 @@
-// yoshi.c.inc
+// yoshi.inc.c
 
 // X/Z coordinates of Yoshi's homes that he switches between.
 // Note that this doesn't contain the Y coordinate since the castle roof is flat,
@@ -6,7 +6,7 @@
 static s16 sYoshiHomeLocations[] = { 0, -5625, -1364, -5912, -1403, -4609, -1004, -5308 };
 
 void bhv_yoshi_init(void) {
-    o->oGravity = 2.0f;
+    o->oGravity  = 2.0f;
     o->oFriction = 0.9f;
     o->oBuoyancy = 1.3f;
     o->oInteractionSubtype = INT_SUBTYPE_NPC;
@@ -23,15 +23,20 @@ void yoshi_walk_loop(void) {
     o->oForwardVel = 10.0f;
     object_step();
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oYoshiTargetYaw, 0x500);
-    if (is_point_close_to_object(o, o->oHomeX, 3174.0f, o->oHomeZ, 200))
+
+    if (is_point_close_to_object(o, o->oHomeX, 3174.0f, o->oHomeZ, 200)) {
         o->oAction = YOSHI_ACT_IDLE;
+    }
 
     cur_obj_init_animation(1);
-    if (animFrame == 0 || animFrame == 15)
-        cur_obj_play_sound_2(SOUND_GENERAL_YOSHI_WALK);
 
-    if (o->oInteractStatus == INT_STATUS_INTERACTED)
+    if (animFrame == 0 || animFrame == 15) {
+        cur_obj_play_sound_2(SOUND_GENERAL_YOSHI_WALK);
+    }
+
+    if (o->oInteractStatus == INT_STATUS_INTERACTED) {
         o->oAction = YOSHI_ACT_TALK;
+    }
 
     if (o->oPosY < 2100.0f) {
         create_respawner(MODEL_YOSHI, bhvYoshi, 3000);
@@ -40,10 +45,8 @@ void yoshi_walk_loop(void) {
 }
 
 void yoshi_idle_loop(void) {
-    s16 chosenHome;
-
     if (o->oTimer > 90) {
-        chosenHome = random_float() * 3.99f;
+        s16 chosenHome = (random_float() * 3.99f);
 
         if (o->oYoshiChosenHome == chosenHome) {
             return;
@@ -58,8 +61,10 @@ void yoshi_idle_loop(void) {
     }
 
     cur_obj_init_animation(0);
-    if (o->oInteractStatus == INT_STATUS_INTERACTED)
+
+    if (o->oInteractStatus == INT_STATUS_INTERACTED) {
         o->oAction = YOSHI_ACT_TALK;
+    }
 
     // Credits; Yoshi appears at this position overlooking the castle near the end of the credits
     if (gPlayerCameraState->cameraEvent == CAM_EVENT_START_ENDING ||
@@ -76,7 +81,7 @@ void yoshi_talk_loop(void) {
         cur_obj_init_animation(0);
         if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_FRONT) == MARIO_DIALOG_STATUS_SPEAK) {
             o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
-            if (cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_161)) {
+            if (cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_161) != 0) {
                 o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
                 o->oInteractStatus = INT_STATUS_NONE;
                 o->oHomeX = sYoshiHomeLocations[2];
@@ -98,10 +103,13 @@ void yoshi_walk_and_jump_off_roof_loop(void) {
     o->oForwardVel = 10.0f;
     object_step();
     cur_obj_init_animation(1);
-    if (o->oTimer == 0)
+
+    if (o->oTimer == 0) {
         cutscene_object(CUTSCENE_STAR_SPAWN, o);
+    }
 
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oYoshiTargetYaw, 0x500);
+
     if (is_point_close_to_object(o, o->oHomeX, 3174.0f, o->oHomeZ, 200)) {
         cur_obj_init_animation(2);
         cur_obj_play_sound_2(SOUND_GENERAL_ENEMY_ALERT1);
@@ -129,7 +137,7 @@ void yoshi_finish_jumping_and_despawn_loop(void) {
 }
 
 void yoshi_give_present_loop(void) {
-    s32 timer = gGlobalTimer;
+    s32 globalTimer = gGlobalTimer;
 
     if (gHudDisplay.lives == 100) {
 #ifdef SAVE_NUM_LIVES
@@ -141,7 +149,7 @@ void yoshi_give_present_loop(void) {
         return;
     }
 
-    if ((timer & 0x03) == 0) {
+    if (!(globalTimer & 0x3)) {
         play_sound(SOUND_MENU_YOSHI_GAIN_LIVES, gGlobalSoundSource);
         gMarioState->numLives++;
     }

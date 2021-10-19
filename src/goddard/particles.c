@@ -19,7 +19,7 @@ typedef union {
 
 struct Connection {
     struct GdObj header;  // this header is never used
-    u8 filler14[8];
+    u8 filler[8];
     VtxPtc node1;  // first connected vertex or particle
     VtxPtc node2;  // second connected vertex or particle
     f32 unk24;

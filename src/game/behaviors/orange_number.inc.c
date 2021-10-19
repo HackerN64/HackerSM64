@@ -1,4 +1,4 @@
-// orange_number.c.inc
+// orange_number.inc.c
 
 void bhv_orange_number_init(void) {
     o->oAnimState = o->oBehParams2ndByte;
@@ -17,7 +17,7 @@ void bhv_orange_number_loop(void) {
         if (o->oTimer == 35) {
             struct Object *sparkleObj = spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
             sparkleObj->oPosY -= 30.f;
-            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            obj_mark_for_deletion(o);
         }
 #ifdef DIALOG_INDICATOR
     } else if (o->oTimer >= 1 || gMarioState->action == ACT_READING_SIGN) {

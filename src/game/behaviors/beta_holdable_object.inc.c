@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvBetaHoldableObject.
  * This is a simple implementation of a holdable object, probably used
@@ -27,8 +28,8 @@ static void beta_holdable_object_drop(void) {
 
     o->oHeldState = HELD_FREE;
 
-    o->oForwardVel = 0;
-    o->oVelY = 0;
+    o->oForwardVel = 0.0f;
+    o->oVelY       = 0.0f;
 }
 
 /**

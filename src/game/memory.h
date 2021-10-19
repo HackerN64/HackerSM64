@@ -10,8 +10,7 @@
 
 #define NUM_TLB_SEGMENTS 32
 
-struct AllocOnlyPool
-{
+struct AllocOnlyPool {
     s32 totalSpace;
     s32 usedSpace;
     u8 *startPtr;
@@ -20,21 +19,18 @@ struct AllocOnlyPool
 
 struct MemoryPool;
 
-struct OffsetSizePair
-{
+struct OffsetSizePair {
     u32 offset;
     u32 size;
 };
 
-struct DmaTable
-{
+struct DmaTable {
     u32 count;
     u8 *srcAddr;
     struct OffsetSizePair anim[1]; // dynamic size
 };
 
-struct DmaHandlerList
-{
+struct DmaHandlerList {
     struct DmaTable *dmaTable;
     void *currentAddr;
     void *bufTarget;

@@ -329,7 +329,9 @@ void make_shadow_vertex_at_xyz(Vtx *vertices, s8 index, f32 relX, f32 relY, f32 
         vtxY += 5;
         vtxZ += 5;
     }
-    make_vertex(vertices, index, vtxX, vtxY, vtxZ, textureX << 5, textureY << 5, 255, 255, 255, alpha); // shadows are black
+    make_vertex( // shadows are black
+        vertices, index, vtxX, vtxY, vtxZ, textureX << 5, textureY << 5, 255, 255, 255, alpha
+    );
 }
 
 /**
@@ -689,7 +691,7 @@ Gfx *create_shadow_circle_4_verts(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
 Gfx *create_shadow_circle_assuming_flat_ground(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 solidity) {
     f32 distBelowFloor;
     f32 floorHeight;
-    f32 radius = shadowScale / 2;
+    f32 radius = (shadowScale / 2);
 
     if (gCurGraphNodeObjectNode->oFloor != NULL) {
         floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
@@ -700,7 +702,7 @@ Gfx *create_shadow_circle_assuming_flat_ground(f32 xPos, f32 yPos, f32 zPos, s16
     if (floorHeight < FLOOR_LOWER_LIMIT_SHADOW) {
         return NULL;
     } else {
-        distBelowFloor = floorHeight - yPos;
+        distBelowFloor = (floorHeight - yPos);
     }
 
     Vtx *verts = alloc_display_list(4 * sizeof(Vtx));

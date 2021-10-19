@@ -27,6 +27,11 @@
 #include "puppycam2.h"
 #include "main.h"
 
+#ifdef VERSION_EU
+#undef LANGUAGE_FUNCTION
+#define LANGUAGE_FUNCTION gInGameLanguage
+#endif
+
 u16 gDialogColorFadeTimer;
 s8 gLastDialogLineNum;
 s32 gDialogVariable;
@@ -46,8 +51,8 @@ u8 textPressL[] = { TEXT_HUD_PRESS_L };
 #define seg2_dialog_table dialog_table_eu_en
 #endif
 
-s16 gInGameLanguage = 0;
-s16 gLoadedLanguage = 0;
+s16 gInGameLanguage = LANGUAGE_ENGLISH;
+s16 gLoadedLanguage = LANGUAGE_ENGLISH;
 
 void *languageTable[][3] =
 {
@@ -79,8 +84,6 @@ enum DialogBoxType {
     DIALOG_TYPE_ROTATE, // used in NPCs and level messages
     DIALOG_TYPE_ZOOM    // used in signposts and wall signs and etc
 };
-
-enum DialogMark { DIALOG_MARK_NONE = 0, DIALOG_MARK_DAKUTEN = 1, DIALOG_MARK_HANDAKUTEN = 2 };
 
 #define DEFAULT_DIALOG_BOX_ANGLE 90.0f
 #define DEFAULT_DIALOG_BOX_SCALE 19.0f
@@ -180,7 +183,7 @@ void create_dl_rotation_matrix(s8 pushOp, f32 a, f32 x, f32 y, f32 z) {
     guRotate(matrix, a, x, y, z);
 
     if (pushOp == MENU_MTX_PUSH) {
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH  ));
+        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
     }
     if (pushOp == MENU_MTX_NOPUSH) {
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
@@ -196,11 +199,13 @@ void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
 
     guScale(matrix, x, y, z);
 
-    if (pushOp == MENU_MTX_PUSH)
+    if (pushOp == MENU_MTX_PUSH) {
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
+    }
 
-    if (pushOp == MENU_MTX_NOPUSH)
+    if (pushOp == MENU_MTX_NOPUSH) {
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+    }
 }
 
 void create_dl_ortho_matrix(void) {
@@ -291,6 +296,8 @@ void render_multi_text_string(s8 multiTextID) {
 }
 
 #define MAX_STRING_WIDTH 16
+#define CHAR_WIDTH_SPACE (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE])
+#define CHAR_WIDTH_DEFAULT (f32)(gDialogCharWidths[str[strPos]])
 
 /**
  * Prints a generic white string.
@@ -330,11 +337,13 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                         customColor = 2;
                         strPos = colorLoop - 8;
                         for (diffTmp = 0; diffTmp < 8; ++diffTmp) {
-                            if (str[strPos + diffTmp] != 0x9F)
+                            if (str[strPos + diffTmp] != 0x9F) {
                                 break;
+                            }
                         }
-                        if (diffTmp == 8)
+                        if (diffTmp == 8) {
                             strPos += diffTmp;
+                        }
                         break;
                     }
                     if ((8 - (colorLoop - strPos)) % 2 == 0) {
@@ -371,19 +380,20 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                 render_multi_text_string(STRING_YOU);
                 break;
             case DIALOG_CHAR_SPACE:
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE]), 0.0f, 0.0f);
-                break; // ? needed to match
+                // create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE]), 0.0f, 0.0f);
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, CHAR_WIDTH_SPACE, 0.0f, 0.0f);
+                break;
             default:
                 render_generic_char(str[strPos]);
                 if (mark != DIALOG_MARK_NONE) {
                     create_dl_translation_matrix(MENU_MTX_PUSH, 5.0f, 5.0f, 0.0f);
-                    render_generic_char(mark + 0xEF);
+                    render_generic_char(DIALOG_CHAR_MARK_START + mark);
                     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
                     mark = DIALOG_MARK_NONE;
                 }
 
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[str[strPos]]), 0.0f, 0.0f);
-                break; // what an odd difference. US added a useless break here.
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, CHAR_WIDTH_DEFAULT, 0.0f, 0.0f);
+                break;
         }
 
         strPos++;
@@ -464,7 +474,7 @@ void print_menu_generic_string(s16 x, s16 y, const u8 *str) {
                                     (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
                 if (mark != DIALOG_MARK_NONE) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[mark + 0xEF]);
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[DIALOG_CHAR_MARK_START + mark]);
                     gDPLoadSync(gDisplayListHead++);
                     gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
                     gSPTextureRectangle(gDisplayListHead++, (curX + 6) << 2, (curY - 7) << 2,
@@ -522,16 +532,21 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 2) {
-        if (currentIndex[0] != maxIndex) {
+        if (*currentIndex == maxIndex) {
+            //! Probably originally a >=, but later replaced with an == and an else statement.
+            *currentIndex = maxIndex;
+        } else {
             play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
-            currentIndex[0]++;
+            (*currentIndex)++;
         }
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 1) {
-        if (currentIndex[0] != minIndex) {
+        if (*currentIndex == minIndex) {
+            // Same applies to here as above
+        } else {
             play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
-            currentIndex[0]--;
+            (*currentIndex)--;
         }
     }
 
@@ -548,8 +563,6 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     }
 }
 
-// EU has both get_str_x_pos_from_center and get_str_x_pos_from_center_scale
-// US and JP only implement one or the other
 s32 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
     s16 strPos = 0;
     f32 spacesWidth = 0.0f;
@@ -578,14 +591,14 @@ s32 get_string_width(u8 *str) {
 u8 gHudSymCoin[] = { GLYPH_COIN, GLYPH_SPACE };
 u8 gHudSymX[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
 
-void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileNum, s8 courseNum, s16 x, s16 y) {
+void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
     u8 strNumCoins[4];
     s16 numCoins;
 
     if (!useCourseCoinScore) {
-        numCoins = (u16)(save_file_get_max_coin_score(courseNum) & 0xFFFF);
+        numCoins = (u16)(save_file_get_max_coin_score(courseIndex) & 0xFFFF);
     } else {
-        numCoins = save_file_get_course_coin_score(fileNum, courseNum);
+        numCoins = save_file_get_course_coin_score(fileIndex, courseIndex);
     }
 
     if (numCoins != 0) {
@@ -596,13 +609,12 @@ void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileNum, s8 courseNum, 
     }
 }
 
-void print_hud_my_score_stars(s8 fileNum, s8 courseNum, s16 x, s16 y) {
+void print_hud_my_score_stars(s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
     u8 strStarCount[4];
-    s16 starCount;
     u8 textSymStar[] = { GLYPH_STAR, GLYPH_SPACE };
     u8 textSymX[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
 
-    starCount = save_file_get_course_star_count(fileNum, courseNum);
+    s16 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
 
     if (starCount != 0) {
         print_hud_lut_string(HUD_LUT_GLOBAL, x, y, textSymStar);
@@ -755,40 +767,38 @@ void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
     if (lineNum == totalLines) {
-        pageState[0] = DIALOG_PAGE_STATE_SCROLL;
+        *pageState = DIALOG_PAGE_STATE_SCROLL;
         return;
     }
     create_dl_translation_matrix(MENU_MTX_PUSH, 0.0f, 2 - (lineNum * 16), 0);
 
-    linePos[0] = 0;
-    xMatrix[0] = 1;
+    *linePos = 0;
+    *xMatrix = 1;
 }
-
 
 void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos) {
     s8 tensDigit = gDialogVariable / 10;
     s8 onesDigit = gDialogVariable - (tensDigit * 10); // remainder
 
     if (tensDigit != 0) {
-        if (xMatrix[0] != 1) {
-            create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * xMatrix[0]), 0, 0);
+        if (*xMatrix != 1) {
+            create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * *xMatrix), 0, 0);
         }
 
         render_generic_char(tensDigit);
         create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32) gDialogCharWidths[tensDigit], 0, 0);
-        xMatrix[0] = 1;
-        linePos[0]++;
+        *xMatrix = 1;
+        (*linePos)++;
     }
 
-    if (xMatrix[0] != 1) {
-        create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * (xMatrix[0] - 1)), 0, 0);
+    if (*xMatrix != 1) {
+        create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * (*xMatrix - 1)), 0, 0);
     }
 
     render_generic_char(onesDigit);
     create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32) gDialogCharWidths[onesDigit], 0, 0);
-
-    linePos[0]++;
-    xMatrix[0] = 1;
+    (*linePos)++;
+    *xMatrix = 1;
 }
 
 void render_multi_text_string_lines(s8 multiTextId, s8 lineNum, s16 *linePos, s8 linesPerBox, s8 xMatrix, s8 lowerBound) {
@@ -799,7 +809,7 @@ void render_multi_text_string_lines(s8 multiTextId, s8 lineNum, s16 *linePos, s8
     };
 
     if (lineNum >= lowerBound && lineNum <= (lowerBound + linesPerBox)) {
-        if (linePos[0] != 0 || (xMatrix != 1)) {
+        if (*linePos != 0 || xMatrix != 1) {
             create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogCharWidths[DIALOG_CHAR_SPACE] * (xMatrix - 1)), 0, 0);
         }
         for (i = 0; i < textLengths[multiTextId].length; i++) {
@@ -816,23 +826,17 @@ u32 ensure_nonnegative(s16 value) {
 
 void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 lowerBound) {
     u8 strChar;
-
     s16 colorLoop;
-    ColorRGBA rgbaColors = {0, 0, 0, 0};
+    ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
     u8 customColor = FALSE;
     u8 diffTmp = 0;
-
     u8 *str = segmented_to_virtual(dialog->str);
     s8 lineNum = 1;
-
     s8 totalLines;
-
     s8 pageState = DIALOG_PAGE_STATE_NONE;
-    UNUSED s8 mark = DIALOG_MARK_NONE; // unused in US, EU
+    UNUSED s8 mark = DIALOG_MARK_NONE; // unused in US and EU
     s8 xMatrix = 1;
-
     s8 linesPerBox = dialog->linesPerBox;
-
     s16 linePos = 0;
 
     if (gDialogBoxState == DIALOG_STATE_HORIZONTAL) {
@@ -934,7 +938,6 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                 }
         }
 
-
         strIdx++;
     }
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -976,10 +979,10 @@ void render_dialog_triangle_choice(void) {
 #define Y_VAL5_2 5
 #define X_Y_VAL6 0.8f
 
-void render_dialog_string_color(s8 linesPerBox) {
-    s32 timer = gGlobalTimer;
+void render_dialog_triangle_next(s8 linesPerBox) {
+    s32 globalTimer = gGlobalTimer;
 
-    if (timer & 0x08) {
+    if (globalTimer & 0x8) {
         return;
     }
 
@@ -1000,7 +1003,7 @@ void render_dialog_string_color(s8 linesPerBox) {
 void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
     // King Bob-omb (Start), Whomp (Start), King Bob-omb (throw him out), Eyerock (Start), Wiggler (Start)
     s16 dialogBossStart[] = { DIALOG_017, DIALOG_114, DIALOG_128, DIALOG_117, DIALOG_150 };
-    // Koopa the Quick (BOB), Koopa the Quick (THI), Penguin Race, Fat Penguin Race (120 stars)
+    // Koopa the Quick (BoB), Koopa the Quick (THI), Penguin Race, Fat Penguin Race (120 stars)
     s16 dialogRaceSound[] = { DIALOG_005, DIALOG_009, DIALOG_055, DIALOG_164 };
     // Red Switch, Green Switch, Blue Switch, 100 coins star, Bowser Red Coin Star
     s16 dialogStarSound[] = { DIALOG_010, DIALOG_011, DIALOG_012, DIALOG_013, DIALOG_014 };
@@ -1086,7 +1089,7 @@ void render_dialog_entries(void) {
     void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
     struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
 
-    // if the dialog entry is invalid, set the ID to -1.
+    // if the dialog entry is invalid, set the ID to DIALOG_NONE.
     if (segmented_to_virtual(NULL) == dialog) {
         gDialogID = DIALOG_NONE;
         return;
@@ -1113,6 +1116,7 @@ void render_dialog_entries(void) {
             }
             lowerBound = 1;
             break;
+
         case DIALOG_STATE_VERTICAL:
             gDialogBoxOpenTimer = 0.0f;
 
@@ -1137,6 +1141,7 @@ void render_dialog_entries(void) {
             }
             lowerBound = ((gDialogScrollOffsetY / DIAG_VAL1) + 1);
             break;
+
         case DIALOG_STATE_CLOSING:
             if (gDialogBoxOpenTimer == 20.0f) {
                 level_set_transition(0, NULL);
@@ -1187,7 +1192,7 @@ void render_dialog_entries(void) {
     }
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 2, 2, (SCREEN_WIDTH - (gBorderHeight / 2)), (SCREEN_HEIGHT - (gBorderHeight / 2)));
     if (gLastDialogPageStrPos != -1 && gDialogBoxState == DIALOG_STATE_VERTICAL) {
-        render_dialog_string_color(dialog->linesPerBox);
+        render_dialog_triangle_next(dialog->linesPerBox);
     }
 }
 
@@ -1320,10 +1325,28 @@ void do_cutscene_handler(void) {
 
 // "Dear Mario" message handler
 void print_peach_letter_message(void) {
-    void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
-    struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
+    void **dialogTable;
+    struct DialogEntry *dialog;
+    u8 *str;
 
-    u8 *str = segmented_to_virtual(dialog->str);
+#ifdef VERSION_EU
+    gInGameLanguage = eu_get_language();
+    switch (gInGameLanguage) {
+        case LANGUAGE_ENGLISH:
+            dialogTable = segmented_to_virtual(dialog_table_eu_en);
+            break;
+        case LANGUAGE_FRENCH:
+            dialogTable = segmented_to_virtual(dialog_table_eu_fr);
+            break;
+        case LANGUAGE_GERMAN:
+            dialogTable = segmented_to_virtual(dialog_table_eu_de);
+            break;
+    }
+#else
+    dialogTable = segmented_to_virtual(seg2_dialog_table);
+#endif
+    dialog = segmented_to_virtual(dialogTable[gDialogID]);
+    str = segmented_to_virtual(dialog->str);
 
     create_dl_translation_matrix(MENU_MTX_PUSH, 97.0f, 118.0f, 0);
 
@@ -1414,11 +1437,11 @@ void shade_screen(void) {
 
     // This is a bit weird. It reuses the dialog text box (width 130, height -80),
     // so scale to at least fit the screen.
-#ifndef WIDESCREEN
-    create_dl_scale_matrix(MENU_MTX_NOPUSH, 2.6f, 3.4f, 1.0f);
-#else
+#ifdef WIDESCREEN
     create_dl_scale_matrix(MENU_MTX_NOPUSH,
                            GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_HEIGHT / 130.0f, 3.0f, 1.0f);
+#else
+    create_dl_scale_matrix(MENU_MTX_NOPUSH, 2.6f, 3.4f, 1.0f);
 #endif
 
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 110);
@@ -1427,14 +1450,14 @@ void shade_screen(void) {
 }
 
 void print_animated_red_coin(s16 x, s16 y) {
-    s32 timer = gGlobalTimer;
+    s32 globalTimer = gGlobalTimer;
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0);
     create_dl_scale_matrix(MENU_MTX_NOPUSH, 0.2f, 0.2f, 1.0f);
     gDPSetRenderMode(gDisplayListHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
 
 #ifdef IA8_30FPS_COINS
-    switch (timer & 0x7) {
+    switch (globalTimer & 0x7) {
         case 0: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_0     ); break;
         case 1: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_22_5  ); break;
         case 2: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_45    ); break;
@@ -1445,7 +1468,7 @@ void print_animated_red_coin(s16 x, s16 y) {
         case 7: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_22_5_r); break;
     }
 #else
-    switch (timer & 0x6) {
+    switch (globalTimer & 0x6) {
         case 0: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_front     ); break;
         case 2: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_tilt_right); break;
         case 4: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_side      ); break;
@@ -1464,7 +1487,7 @@ void render_pause_red_coins(void) {
         print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(30) - x * 20, 16);
     }
 }
-///By default, not needed as puppycamera has an option, but should you wish to revert that, you are legally allowed.
+/// By default, not needed as puppycamera has an option, but should you wish to revert that, you are legally allowed.
 
 #if defined(WIDE) && !defined(PUPPYCAM)
 void render_widescreen_setting(void) {
@@ -1485,11 +1508,29 @@ void render_widescreen_setting(void) {
 }
 #endif
 
-#define CRS_NUM_X1 100
-#define TXT_STAR_X 98
-#define ACT_NAME_X 116
-#define LVL_NAME_X 117
-#define MYSCORE_X  62
+#if defined(VERSION_JP) || defined(VERSION_SH)
+    #define CRS_NUM_X1 93
+#elif defined(VERSION_US)
+    #define CRS_NUM_X1 100
+#elif defined(VERSION_EU)
+    #define CRS_NUM_X1 get_string_width(LANGUAGE_ARRAY(textCourse)) + 51
+#endif
+
+#ifdef VERSION_EU
+    #define TXT_COURSE_X      48
+    #define TXT_STAR_X        89
+    #define ACT_NAME_X        107
+    #define LVL_NAME_X        108
+    #define SECRET_LVL_NAME_X get_str_x_pos_from_center(159, &courseName[3], 10.0f)
+    #define MYSCORE_X         48
+#else
+    #define TXT_COURSE_X      63
+    #define TXT_STAR_X        98
+    #define ACT_NAME_X        116
+    #define LVL_NAME_X        117
+    #define SECRET_LVL_NAME_X 94
+    #define MYSCORE_X         62
+#endif
 
 void render_pause_my_score_coins(void) {
     u8 textCourse[]       = { TEXT_COURSE        };
@@ -1502,15 +1543,15 @@ void render_pause_my_score_coins(void) {
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
     void **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
 
-    u8 courseIndex = gCurrCourseNum - 1;
-    u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
+    u8 courseIndex = COURSE_NUM_TO_INDEX(gCurrCourseNum);
+    u8 starFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    if (courseIndex < COURSE_STAGES_COUNT) {
-        print_hud_my_score_coins(1, gCurrSaveFileNum - 1, courseIndex, 178, 103);
-        print_hud_my_score_stars(   gCurrSaveFileNum - 1, courseIndex, 118, 103);
+    if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+        print_hud_my_score_coins(1, (gCurrSaveFileNum - 1), courseIndex, 178, 103);
+        print_hud_my_score_stars(   (gCurrSaveFileNum - 1), courseIndex, 118, 103);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1518,29 +1559,32 @@ void render_pause_my_score_coins(void) {
 
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    if (courseIndex < COURSE_STAGES_COUNT && save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0) {
-        print_generic_string(MYSCORE_X, 121, textMyScore);
+    if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)
+        && save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0) {
+        print_generic_string(MYSCORE_X, 121, LANGUAGE_ARRAY(textMyScore));
     }
 
     u8 *courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
 
-    if (courseIndex < COURSE_STAGES_COUNT) {
-        print_generic_string(63, 157, textCourse);
+    if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+        print_generic_string(TXT_COURSE_X, 157, LANGUAGE_ARRAY(textCourse));
         int_to_str(gCurrCourseNum, strCourseNum);
         print_generic_string(CRS_NUM_X1, 157, strCourseNum);
 
-        u8 *actName = segmented_to_virtual(actNameTbl[((gCurrCourseNum - 1) * 6) + gDialogCourseActNum - 1]);
+        u8 *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
 
         if (starFlags & (1 << (gDialogCourseActNum - 1))) {
             print_generic_string(TXT_STAR_X, 140, textStar);
         } else {
             print_generic_string(TXT_STAR_X, 140, textUnfilledStar);
         }
+
         print_generic_string(ACT_NAME_X, 140, actName);
         print_generic_string(LVL_NAME_X, 157, &courseName[3]);
     } else {
-        print_generic_string(94, 157, &courseName[3]);
+        print_generic_string(SECRET_LVL_NAME_X, 157, &courseName[3]);
     }
+
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
@@ -1559,10 +1603,10 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string((x +  14   ), (y +  2), textLakituMario);
-    print_generic_string((x + TXT1_X), (y - 13), textNormalUpClose);
-    print_generic_string((x + 124   ), (y +  2), textLakituStop);
-    print_generic_string((x + TXT2_X), (y - 13), textNormalFixed);
+    print_generic_string((x +     14), (y +  2), textLakituMario);
+    print_generic_string((x + TXT1_X), (y - 13), LANGUAGE_ARRAY(textNormalUpClose));
+    print_generic_string((x +    124), (y +  2), textLakituStop);
+    print_generic_string((x + TXT2_X), (y - 13), LANGUAGE_ARRAY(textNormalFixed));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     create_dl_translation_matrix(MENU_MTX_PUSH, (((*index - 1) * xIndex) + x), (y + Y_VAL7), 0);
@@ -1593,11 +1637,11 @@ void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string((x + 10), (y -  2), textContinue);
-    print_generic_string((x + 10), (y - 17), textExitCourse);
+    print_generic_string((x + 10), (y -  2), LANGUAGE_ARRAY(textContinue));
+    print_generic_string((x + 10), (y - 17), LANGUAGE_ARRAY(textExitCourse));
 
     if (*index != MENU_OPT_CAMERA_ANGLE_R) {
-        print_generic_string((x + 10), (y - 33), textCameraAngleR);
+        print_generic_string((x + 10), (y - 33), LANGUAGE_ARRAY(textCameraAngleR));
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
         create_dl_translation_matrix(MENU_MTX_PUSH, (x - X_VAL8), ((y - ((*index - 1) * yIndex)) - Y_VAL8), 0);
@@ -1632,19 +1676,19 @@ void render_pause_castle_menu_box(s16 x, s16 y) {
 }
 
 void highlight_last_course_complete_stars(void) {
-    u8 courseDone;
+    u8 doneCourseIndex;
 
     if (gLastCompletedCourseNum == COURSE_NONE) {
-        courseDone = 0;
+        doneCourseIndex = 0;
     } else {
-        courseDone = (gLastCompletedCourseNum - 1);
+        doneCourseIndex = COURSE_NUM_TO_INDEX(gLastCompletedCourseNum);
 
-        if (courseDone >= COURSE_STAGES_COUNT) {
-            courseDone = COURSE_STAGES_COUNT;
+        if (doneCourseIndex >= COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
+            doneCourseIndex  = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES);
         }
     }
 
-    gDialogLineNum = courseDone;
+    gDialogLineNum = doneCourseIndex;
 }
 
 void print_hud_pause_colorful_str(void) {
@@ -1658,15 +1702,15 @@ void print_hud_pause_colorful_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
-void render_pause_castle_course_stars(s16 x, s16 y, s16 fileNum, s16 courseNum) {
+void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseIndex) {
     s16 hasStar = 0;
 
     u8 str[COURSE_STAGES_COUNT * 2];
 
     u8 textStar[] = { TEXT_STAR };
 
-    u8 starFlags = save_file_get_star_flags(fileNum, courseNum);
-    u16 starCount = save_file_get_course_star_count(fileNum, courseNum);
+    u8 starFlags = save_file_get_star_flags(fileIndex, courseIndex);
+    u16 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
 
     u16 nextStar = 0;
 
@@ -1706,29 +1750,33 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     void *courseName;
 
     u8 strVal[8];
-    s16 starNum = gDialogLineNum;
+    s16 prevCourseIndex = gDialogLineNum;
 
 
-    handle_menu_scrolling(MENU_SCROLL_VERTICAL, &gDialogLineNum, -1, COURSE_STAGES_COUNT + 1);
+    handle_menu_scrolling(
+        MENU_SCROLL_VERTICAL, &gDialogLineNum,
+        COURSE_NUM_TO_INDEX(COURSE_MIN) - 1, COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1
+    );
 
-    if (gDialogLineNum == COURSE_STAGES_COUNT + 1) {
-        gDialogLineNum = 0;
+    if (gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1) {
+        gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_MIN); // Exceeded max, set to min
     }
 
-    if (gDialogLineNum == -1) {
-        gDialogLineNum = COURSE_STAGES_COUNT;
+    if (gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1) {
+        gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES); // Exceeded min, set to max
     }
 
-    if (gDialogLineNum != COURSE_STAGES_COUNT) {
+    if (gDialogLineNum != COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
         while (save_file_get_course_star_count(gCurrSaveFileNum - 1, gDialogLineNum) == 0) {
-            if (gDialogLineNum >= starNum) {
+            if (gDialogLineNum >= prevCourseIndex) {
                 gDialogLineNum++;
             } else {
                 gDialogLineNum--;
             }
 
-            if (gDialogLineNum == COURSE_STAGES_COUNT || gDialogLineNum == -1) {
-                gDialogLineNum = COURSE_STAGES_COUNT;
+            if (gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) + 1
+                || gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1) {
+                gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES);
                 break;
             }
         }
@@ -1736,13 +1784,14 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-    if (gDialogLineNum < COURSE_STAGES_COUNT) {
+
+    if (gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
         render_pause_castle_course_stars(x, y, gCurrSaveFileNum - 1, gDialogLineNum);
         print_generic_string(x + 34, y - 5, textCoin);
         int_to_str(save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum), strVal);
         print_generic_string(x + 54, y - 5, strVal);
-    } else {
+    } else { // Castle secret stars
         u8 textStarX[] = { TEXT_STAR_X };
         courseName = segmented_to_virtual(courseNameTbl[COURSE_MAX]);
         print_generic_string(x + 40, y + 13, textStarX);
@@ -1782,6 +1831,7 @@ s32 render_pause_courses_and_castle(void) {
                 gDialogBoxState = DIALOG_STATE_HORIZONTAL;
             }
             break;
+
         case DIALOG_STATE_VERTICAL:
             shade_screen();
             render_pause_my_score_coins();
@@ -1812,13 +1862,14 @@ s32 render_pause_courses_and_castle(void) {
                 return index;
             }
             break;
+
         case DIALOG_STATE_HORIZONTAL:
             shade_screen();
             print_hud_pause_colorful_str();
             render_pause_castle_menu_box(160, 143);
             render_pause_castle_main_strings(104, 60);
 
-            if (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON)) {
+            if (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON | Z_TRIG)) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gMenuMode = MENU_MODE_NONE;
@@ -1864,9 +1915,9 @@ void print_hud_course_complete_string(s8 str) {
     gDPSetEnvColor(gDisplayListHead++, colorFade, colorFade, colorFade, 255);
 
     if (str == HUD_PRINT_HISCORE) {
-        print_hud_lut_string(HUD_LUT_GLOBAL, TXT_HISCORE_X, TXT_HISCORE_Y, textHiScore);
+        print_hud_lut_string(HUD_LUT_GLOBAL, TXT_HISCORE_X, TXT_HISCORE_Y, LANGUAGE_ARRAY(textHiScore));
     } else { // HUD_PRINT_CONGRATULATIONS
-        print_hud_lut_string(HUD_LUT_GLOBAL, TXT_CONGRATS_X, 67, textCongratulations);
+        print_hud_lut_string(HUD_LUT_GLOBAL, TXT_CONGRATS_X, 67, LANGUAGE_ARRAY(textCongratulations));
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1920,11 +1971,11 @@ void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
 }
 
 #define TXT_NAME_X1 71
-#define TXT_NAME_X2 69
+#define TXT_NAME_X2 (TXT_NAME_X1 - 2)
 #define CRS_NUM_X2 104
-#define CRS_NUM_X3 102
+#define CRS_NUM_X3 (CRS_NUM_X2 - 2)
 #define TXT_CLEAR_X1 (get_string_width(name) + 81)
-#define TXT_CLEAR_X2 (get_string_width(name) + 79)
+#define TXT_CLEAR_X2 (TXT_CLEAR_X1 - 2)
 
 void render_course_complete_lvl_info_and_hud_str(void) {
     u8 textCourse[] = { TEXT_COURSE };
@@ -1938,28 +1989,36 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     void **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
-    if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) {
+    if (gLastCompletedCourseNum <= COURSE_STAGES_MAX) { // Main courses
         print_hud_course_complete_coins(118, 103);
         play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, (1 << (gLastCompletedStarNum - 1)));
 
         if (gLastCompletedStarNum == 7) {
             name = segmented_to_virtual(actNameTbl[(COURSE_STAGES_MAX * 6) + 1]);
         } else {
-            name = segmented_to_virtual(actNameTbl[(((gLastCompletedCourseNum - 1) * 6) + gLastCompletedStarNum) - 1]);
+            name = segmented_to_virtual(actNameTbl[((COURSE_NUM_TO_INDEX(gLastCompletedCourseNum) * 6) + gLastCompletedStarNum) - 1]);
         }
 
+        // Print course number
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+
         int_to_str(gLastCompletedCourseNum, strCourseNum);
+
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
-        print_generic_string(65, 165, textCourse);
+        print_generic_string(65, 165, LANGUAGE_ARRAY(textCourse));
         print_generic_string(CRS_NUM_X2, 165, strCourseNum);
+
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-        print_generic_string(63, 167, textCourse);
+        print_generic_string(63, 167, LANGUAGE_ARRAY(textCourse));
         print_generic_string(CRS_NUM_X3, 167, strCourseNum);
+
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    } else if (gLastCompletedCourseNum == COURSE_BITDW || gLastCompletedCourseNum == COURSE_BITFS) {
-        name = segmented_to_virtual(courseNameTbl[gLastCompletedCourseNum - 1]);
+    } else if (gLastCompletedCourseNum == COURSE_BITDW || gLastCompletedCourseNum == COURSE_BITFS) { // Bowser courses
+        name = segmented_to_virtual(courseNameTbl[COURSE_NUM_TO_INDEX(gLastCompletedCourseNum)]);
+
+        // Print course name and clear text
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
         print_generic_string(TXT_NAME_X1, 130, name);
         print_generic_string(TXT_CLEAR_X1, 130, textClear);
@@ -1967,37 +2026,47 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         print_generic_string(TXT_NAME_X2, 132, name);
         print_generic_string(TXT_CLEAR_X2, 132, textClear);
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
+
         print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
         print_hud_course_complete_coins(118, 111);
         play_star_fanfare_and_flash_hud(HUD_FLASH_KEYS, 0);
         return;
-    } else {
+    } else { // Castle secret stars
         name = segmented_to_virtual(actNameTbl[COURSE_STAGES_MAX * 6]);
+
         print_hud_course_complete_coins(118, 103);
         play_star_fanfare_and_flash_hud(HUD_FLASH_STARS, (1 << (gLastCompletedStarNum - 1)));
     }
 
+    // Print star glyph
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
+
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_hud_lut_string(HUD_LUT_GLOBAL, 55, 77, textSymStar);
+
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
+
+    // Print act name and catch text
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
     print_generic_string(76, 145, name);
+
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     print_generic_string(74, 147, name);
+
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
+#define X_VAL9 x
 #define TXT_SAVEOPTIONS_X (x + 12)
 #define TXT_SAVECONT_Y    0
 #define TXT_SAVEQUIT_Y   20
 #define TXT_CONTNOSAVE_Y 40
 
-#define X_VAL9 x
 void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
-    u8 textSaveAndContinue[] = { TEXT_SAVE_AND_CONTINUE };
-    u8 textSaveAndQuit[] = { TEXT_SAVE_AND_QUIT };
+    u8 textSaveAndContinue[]     = { TEXT_SAVE_AND_CONTINUE       };
+    u8 textSaveAndQuit[]         = { TEXT_SAVE_AND_QUIT           };
     u8 textContinueWithoutSave[] = { TEXT_CONTINUE_WITHOUT_SAVING };
 
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
@@ -2005,9 +2074,9 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(TXT_SAVEOPTIONS_X, (y + TXT_SAVECONT_Y  ), textSaveAndContinue);
-    print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_SAVEQUIT_Y  ), textSaveAndQuit);
-    print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_CONTNOSAVE_Y), textContinueWithoutSave);
+    print_generic_string(TXT_SAVEOPTIONS_X, (y + TXT_SAVECONT_Y  ), LANGUAGE_ARRAY(textSaveAndContinue));
+    print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_SAVEQUIT_Y  ), LANGUAGE_ARRAY(textSaveAndQuit));
+    print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_CONTNOSAVE_Y), LANGUAGE_ARRAY(textContinueWithoutSave));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
@@ -2033,6 +2102,7 @@ s32 render_course_complete_screen(void) {
                 gDialogLineNum = MENU_OPT_DEFAULT;
             }
             break;
+
         case DIALOG_STATE_VERTICAL:
             shade_screen();
             render_course_complete_lvl_info_and_hud_str();

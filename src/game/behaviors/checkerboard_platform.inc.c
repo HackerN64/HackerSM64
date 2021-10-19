@@ -1,4 +1,4 @@
-// checkerboard_platform.c.inc
+// checkerboard_platform.inc.c
 
 struct CheckerBoardPlatformInitPosition {
     s32 relPosZ;
@@ -24,7 +24,7 @@ void bhv_checkerboard_elevator_group_init(void) {
         if (i == 0) {
             relativePosZ = -sCheckerBoardPlatformInitPositions[type].relPosZ;
         } else {
-            relativePosZ = sCheckerBoardPlatformInitPositions[type].relPosZ;
+            relativePosZ =  sCheckerBoardPlatformInitPositions[type].relPosZ;
         }
         platformObj = spawn_object_relative(i, 0, (i * relativePosY), relativePosZ, o, MODEL_CHECKERBOARD_PLATFORM, bhvCheckerboardPlatformSub);
         platformObj->oCheckerBoardPlatformRadius = sCheckerBoardPlatformInitPositions[type].radius;
@@ -58,8 +58,10 @@ void bhv_checkerboard_platform_init(void) {
 void bhv_checkerboard_platform_loop(void) {
     f32 radius = o->oCheckerBoardPlatformRadius;
     o->oCheckerBoardPlatformRotateAction = 0;
-    if (o->oDistanceToMario < 1000.0f)
+    if (o->oDistanceToMario < 1000.0f) {
         cur_obj_play_sound_1(SOUND_ENV_ELEVATOR4);
+    }
+
     switch (o->oAction) {
         case 0:
             if (o->oBehParams2ndByte == 0) {
@@ -84,6 +86,7 @@ void bhv_checkerboard_platform_loop(void) {
     o->oMoveAnglePitch += ABSI(o->oAngleVelPitch);
     o->oFaceAnglePitch += ABSI(o->oAngleVelPitch);
     o->oFaceAngleYaw = o->oMoveAngleYaw;
+
     if (o->oMoveAnglePitch != 0) {
         f32 mul = ((o->oAngleVelPitch >= 0) ? 1.0f : -1.0f) * radius;
         o->oForwardVel = mul * sins(o->oMoveAnglePitch);
@@ -93,7 +96,9 @@ void bhv_checkerboard_platform_loop(void) {
         o->oAngleVelPitch = 0;
         o->oFaceAnglePitch &= ~0x7FFF;
         cur_obj_move_using_fvel_and_gravity();
-    } else
+    } else {
         cur_obj_move_using_fvel_and_gravity();
+    }
+
     load_object_collision_model();
 }

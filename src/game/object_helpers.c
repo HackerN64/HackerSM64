@@ -59,7 +59,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
         struct Object *objectGraphNode = (struct Object *) gCurGraphNodeObject; // TODO: change this to object pointer?
         struct GraphNodeGenerated *currentGraphNode = (struct GraphNodeGenerated *) node;
 
-        if (gCurGraphNodeHeldObject) {
+        if (gCurGraphNodeHeldObject != NULL) {
             objectGraphNode = gCurGraphNodeHeldObject->objNode;
         }
 
@@ -294,26 +294,24 @@ void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll) {
  */
 struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, ModelID32 model,
                                          const BehaviorScript *behavior,
-                                         s16 x, s16 y, s16 z, s16 rx, s16 ry, s16 rz) {
+                                         s16 x, s16 y, s16 z, s16 pitch, s16 yaw, s16 roll) {
     // 'uselessArg' is unused in the function spawn_object_at_origin()
     struct Object *newObj = spawn_object_at_origin(parent, uselessArg, model, behavior);
     obj_set_pos(newObj, x, y, z);
-    obj_set_angle(newObj, rx, ry, rz);
+    obj_set_angle(newObj, pitch, yaw, roll);
 
     return newObj;
 }
 
 /*
- * Spawns an object relative to the parent with a specified angle... is what it is supposed to do.
- * The rz argument is never used, and the z offset is used for z-rotation instead. This is most likely
- * a copy-paste typo by one of the programmers.
+ * Spawns an object relative to the parent with a specified angle.
  */
 struct Object *spawn_object_rel_with_rot(struct Object *parent, ModelID32 model, const BehaviorScript *behavior,
-                                         s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, s16 rz) {
+                                         s16 xOff, s16 yOff, s16 zOff, s16 pitch, s16 yaw, s16 roll) {
     struct Object *newObj = spawn_object_at_origin(parent, 0, model, behavior);
     newObj->oFlags |= OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT;
     obj_set_parent_relative_pos(newObj, xOff, yOff, zOff);
-    obj_set_angle(newObj, rx, ry, rz);
+    obj_set_angle(newObj, pitch, yaw, roll);
 
     return newObj;
 }
@@ -843,7 +841,7 @@ void mario_set_flag(s32 flag) {
 
 s32 cur_obj_clear_interact_status_flag(s32 flag) {
     if (o->oInteractStatus & flag) {
-        o->oInteractStatus &= flag ^ ~(0);
+        o->oInteractStatus &= flag ^ 0xFFFFFFFF;
         return TRUE;
     }
     return FALSE;
@@ -1769,8 +1767,8 @@ void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end) {
 }
 
 void cur_obj_set_pos_to_home_with_debug(void) {
-    vec3_sum(&o->oPosVec, &o->oHomeVec, gDebugInfo[5]);
-    cur_obj_scale((gDebugInfo[5][3] / 100.0f) + 1.0f);
+    vec3_sum(&o->oPosVec, &o->oHomeVec, gDebugInfo[DEBUG_PAGE_ENEMYINFO]);
+    cur_obj_scale((gDebugInfo[DEBUG_PAGE_ENEMYINFO][3] / 100.0f) + 1.0f);
 }
 
 s32 cur_obj_is_mario_on_platform(void) {
@@ -2135,19 +2133,16 @@ void cur_obj_shake_screen(s32 shake) {
 }
 
 s32 obj_attack_collided_from_other_object(struct Object *obj) {
-    s32 touchedOtherObject = FALSE;
-
-    s32 numCollidedObjs = obj->numCollidedObjs;
-    if (numCollidedObjs != 0) {
+    if (obj->numCollidedObjs != 0) {
         struct Object *other = obj->collidedObjs[0];
 
         if (other != gMarioObject) {
             other->oInteractStatus |= (INT_STATUS_TOUCHED_MARIO | INT_STATUS_WAS_ATTACKED | INT_STATUS_INTERACTED | INT_STATUS_TOUCHED_BOB_OMB);
-            touchedOtherObject = TRUE;
+            return TRUE;
         }
     }
 
-    return touchedOtherObject;
+    return FALSE;
 }
 
 s32 cur_obj_was_attacked_or_ground_pounded(void) {
@@ -2251,7 +2246,7 @@ void cur_obj_spawn_loot_blue_coin(void) {
 
 void cur_obj_spawn_star_at_y_offset(f32 targetX, f32 targetY, f32 targetZ, f32 offsetY) {
     f32 objectPosY = o->oPosY;
-    o->oPosY += (offsetY + gDebugInfo[5][0]);
+    o->oPosY += (offsetY + gDebugInfo[DEBUG_PAGE_ENEMYINFO][0]);
     spawn_default_star(targetX, targetY, targetZ);
     o->oPosY = objectPosY;
 }

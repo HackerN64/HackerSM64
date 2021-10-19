@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvBooCage.
  * This is the cage inside the big boo in the castle courtyard
@@ -10,15 +11,15 @@
  * Mario has to enter to enter BBH.
  */
 static struct ObjectHitbox sBooCageHitbox = {
-    /* interactType: */ INTERACT_BBH_ENTRANCE,
-    /* downOffset: */ 0,
-    /* damageOrCoinValue: */ 0,
-    /* health: */ 0,
-    /* numLootCoins: */ 0,
-    /* radius: */ 120,
-    /* height: */ 300,
-    /* hurtboxRadius: */ 0,
-    /* hurtboxHeight: */ 0,
+    /* interactType:      */ INTERACT_BBH_ENTRANCE,
+    /* downOffset:        */   0,
+    /* damageOrCoinValue: */   0,
+    /* health:            */   0,
+    /* numLootCoins:      */   0,
+    /* radius:            */ 120,
+    /* height:            */ 300,
+    /* hurtboxRadius:     */   0,
+    /* hurtboxHeight:     */   0,
 };
 
 /**
@@ -48,6 +49,7 @@ void bhv_boo_cage_loop(void) {
             }
 
             break;
+
         case BOO_CAGE_ACT_FALLING:
             // Reset pitch and roll. This is useless, since the cage never rotates.
             // Was it meant to rotate inside the boo, like the beta boo key?
@@ -76,6 +78,7 @@ void bhv_boo_cage_loop(void) {
             }
 
             break;
+
         case BOO_CAGE_ACT_ON_GROUND:
             // Allow Mario to enter the cage once it's still on the ground.
             cur_obj_become_tangible();
@@ -89,6 +92,7 @@ void bhv_boo_cage_loop(void) {
             }
 
             break;
+
         case BOO_CAGE_ACT_MARIO_JUMPING_IN:
             // All this action does is wait 100 frames after Mario starts
             // jumping into the cage to set the action to BOO_CAGE_ACT_USELESS,
@@ -99,6 +103,7 @@ void bhv_boo_cage_loop(void) {
             }
 
             break;
+
         case BOO_CAGE_ACT_USELESS:
             break;
     }

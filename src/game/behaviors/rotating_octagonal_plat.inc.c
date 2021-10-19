@@ -8,8 +8,8 @@ static const Collision *sOctagonalPlatformCollision[] = {
 static s16 sOctagonalPlatformAngularVelocities[] = { 300, -300, 600, -600 };
 
 void bhv_rotating_octagonal_plat_init(void) {
-    o->collisionData = segmented_to_virtual(sOctagonalPlatformCollision[(u8)(o->oBehParams >> 16)]);
-    o->oAngleVelYaw = sOctagonalPlatformAngularVelocities[(u8)(o->oBehParams >> 24)];
+    o->collisionData = segmented_to_virtual(sOctagonalPlatformCollision[GET_BPARAM2(o->oBehParams)]);
+    o->oAngleVelYaw = sOctagonalPlatformAngularVelocities[GET_BPARAM1(o->oBehParams)];
 }
 
 void bhv_rotating_octagonal_plat_loop(void) {

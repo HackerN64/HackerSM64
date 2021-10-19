@@ -8,7 +8,7 @@
 /**
  * Collision models for the different types of platforms.
  */
-static void const *sPlatformOnTrackCollisionModels[] = {
+static Collision const *sPlatformOnTrackCollisionModels[] = {
     /* PLATFORM_ON_TRACK_TYPE_CARPET    */ rr_seg7_collision_flying_carpet,
     /* PLATFORM_ON_TRACK_TYPE_SKI_LIFT  */ ccm_seg7_collision_ropeway_lift,
     /* PLATFORM_ON_TRACK_TYPE_CHECKERED */ checkerboard_platform_seg8_collision_platform,
@@ -18,10 +18,16 @@ static void const *sPlatformOnTrackCollisionModels[] = {
 /**
  * Paths for the different instances of these platforms.
  */
-static void const *sPlatformOnTrackPaths[] = {
-    rr_seg7_trajectory_0702EC3C,    rr_seg7_trajectory_0702ECC0,  ccm_seg7_trajectory_ropeway_lift,
-    bitfs_seg7_trajectory_070159AC, hmc_seg7_trajectory_checkerboard_platform, lll_seg7_trajectory_0702856C,
-    lll_seg7_trajectory_07028660,   rr_seg7_trajectory_0702ED9C,  rr_seg7_trajectory_0702EEE0,
+static Trajectory const *sPlatformOnTrackPaths[] = {
+    rr_seg7_trajectory_0702EC3C,
+    rr_seg7_trajectory_0702ECC0,
+    ccm_seg7_trajectory_ropeway_lift,
+    bitfs_seg7_trajectory_070159AC,
+    hmc_seg7_trajectory_checkerboard_platform,
+    lll_seg7_trajectory_0702856C,
+    lll_seg7_trajectory_07028660,
+    rr_seg7_trajectory_0702ED9C,
+    rr_seg7_trajectory_0702EEE0,
 };
 
 static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos) {

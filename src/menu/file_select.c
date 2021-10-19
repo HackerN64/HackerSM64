@@ -504,7 +504,7 @@ void render_score_menu_buttons(struct Object *scoreButton) {
     sMainMenuButtons[MENU_BUTTON_SCORE_ERASE_FILE]->oMenuButtonScale = 0.11111111f;
 }
 
-    #define SCORE_TIMER 31
+#define SCORE_TIMER 31
 /**
  * In the score menu, checks if a button was clicked to play a sound, button state and other functions.
  */
@@ -557,6 +557,7 @@ void check_score_menu_clicked_buttons(struct Object *scoreButton) {
         }
     }
 }
+
 #undef SCORE_TIMER
 
 /**
@@ -846,6 +847,7 @@ void erase_action_file_button(struct Object *eraseButton, s32 eraseFileButtonID)
             break;
     }
 }
+
 #undef BUZZ_TIMER
 
 /**
@@ -890,6 +892,7 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
         }
     }
 }
+
 #undef ACTION_TIMER
 #undef MAIN_RETURN_TIMER
 
@@ -939,6 +942,7 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
     sMainMenuButtons[MENU_BUTTON_OPTION_MIN + sSoundMode]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN;
 #endif
 }
+
 #undef SOUND_BUTTON_Y
 
 /**
@@ -1235,7 +1239,7 @@ void bhv_menu_button_manager_init(void) {
     sTextBaseAlpha = 0;
 }
 
-    #define SAVE_FILE_SOUND SOUND_MENU_STAR_SOUND_OKEY_DOKEY
+#define SAVE_FILE_SOUND SOUND_MENU_STAR_SOUND_OKEY_DOKEY
 
 /**
  * In the main menu, check if a button was clicked to play it's button growing state.
@@ -1326,6 +1330,7 @@ void check_main_menu_clicked_buttons(void) {
                 break;
         }
 }
+
 #undef SAVE_FILE_SOUND
 
 /**
@@ -1400,8 +1405,7 @@ void handle_cursor_button_input(void) {
      || (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_B)
      || (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_C)
      || (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_D)) {
-        if (gPlayer3Controller->buttonPressed
-            & (B_BUTTON | START_BUTTON)) {
+        if (gPlayer3Controller->buttonPressed & (B_BUTTON | START_BUTTON | Z_TRIG)) {
             sClickPos[0] = sCursorPos[0];
             sClickPos[1] = sCursorPos[1];
             sCursorClickingTimer = 1;
@@ -1610,11 +1614,11 @@ void score_menu_display_message(s8 messageID) {
     }
 }
 
-    #define RETURN_X     44
-    #define COPYFILE_X1  135
-    #define ERASEFILE_X1 231
+#define RETURN_X      44
+#define COPYFILE_X1  135
+#define ERASEFILE_X1 231
 
-    #define FADEOUT_TIMER 20
+#define FADEOUT_TIMER 20
 
 /**
  * Prints score menu strings that shows on the green background menu screen.
@@ -1662,12 +1666,12 @@ void print_score_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
-    #define NOFILE_COPY_X  119
-    #define COPY_FILE_X    104
-    #define COPYIT_WHERE_X 109
-    #define NOSAVE_DATA_X2 101
-    #define COPYCOMPLETE_X 110
-    #define SAVE_EXISTS_X1 110
+#define NOFILE_COPY_X  119
+#define COPY_FILE_X    104
+#define COPYIT_WHERE_X 109
+#define NOSAVE_DATA_X2 101
+#define COPYCOMPLETE_X 110
+#define SAVE_EXISTS_X1 110
 
 /**
  * Defines IDs for the top message of the copy menu and displays it if the ID is called in messageID.
@@ -1742,8 +1746,8 @@ void copy_menu_update_message(void) {
     }
 }
 
-    #define VIEWSCORE_X1 128
-    #define ERASEFILE_X2 230
+#define VIEWSCORE_X1 128
+#define ERASEFILE_X2 230
 
 /**
  * Prints copy menu strings that shows on the blue background menu screen.
@@ -1860,9 +1864,9 @@ void print_erase_menu_prompt(s16 x, s16 y) {
 //   US and EU   ---    JP
 // M a r i o   A --- マ リ オ Ａ
 // 0 1 2 3 4 5 6 --- 0 1 2 3
-    #define ERASE_FILE_X     98
+    #define ERASE_FILE_X      98
     #define NOSAVE_DATA_X3   100
-    #define MARIO_ERASED_VAR 6
+    #define MARIO_ERASED_VAR   6
     #define MARIO_ERASED_X   100
     #define SAVE_EXISTS_X2   100
 
@@ -1941,7 +1945,7 @@ void erase_menu_update_message(void) {
 }
 
 #define VIEWSCORE_X2 127
-#define COPYFILE_X2 233
+#define COPYFILE_X2  233
 
 /**
  * Prints erase menu strings that shows on the red background menu screen.
@@ -2058,9 +2062,9 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     print_menu_generic_string(x + 16, y, secretStarsText);
 }
 
-    #define HISCORE_COIN_ICON_X  18
-    #define HISCORE_COIN_TEXT_X  34
-    #define HISCORE_COIN_NAMES_X 60
+#define HISCORE_COIN_ICON_X  18
+#define HISCORE_COIN_TEXT_X  34
+#define HISCORE_COIN_NAMES_X 60
 
 /**
  * Prints course coins collected in a score menu save file.
@@ -2122,15 +2126,14 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     print_menu_generic_string(x, y, starScoreText);
 }
 
-    #define MARIO_X         25
-    #define FILE_LETTER_X   95
-    #define LEVEL_NUM_PAD    3
-    #define SECRET_STARS_PAD 6
-    #define LEVEL_NAME_X    23
-    #define STAR_SCORE_X   171
-    #define MYSCORE_X      238
-    #define HISCORE_X      231
-
+#define MARIO_X         25
+#define FILE_LETTER_X   95
+#define LEVEL_NUM_PAD    3
+#define SECRET_STARS_PAD 6
+#define LEVEL_NAME_X    23
+#define STAR_SCORE_X   171
+#define MYSCORE_X      238
+#define HISCORE_X      231
 
 /**
  * Prints save file score strings that shows when a save file is chosen inside the score menu.
@@ -2172,10 +2175,11 @@ void print_save_file_scores(s8 fileIndex) {
 
     // Print current coin score mode
     if (sScoreFileCoinScoreMode == 0) {
-        print_menu_generic_string(MYSCORE_X, 24, textMyScore);
+        print_menu_generic_string(MYSCORE_X, 24, LANGUAGE_ARRAY(textMyScore));
     } else {
-        print_menu_generic_string(HISCORE_X, 24, textHiScore);
+        print_menu_generic_string(HISCORE_X, 24, LANGUAGE_ARRAY(textHiScore));
     }
+
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -2208,7 +2212,7 @@ void print_file_select_strings(void) {
         sTextBaseAlpha += 10;
     }
     if (sMainMenuTimer < 1000) {
-        sMainMenuTimer += 1;
+        sMainMenuTimer++;
     }
 }
 

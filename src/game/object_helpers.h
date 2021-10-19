@@ -7,8 +7,7 @@
 #include "types.h"
 
 // used for chain chomp and wiggler
-struct ChainSegment
-{
+struct ChainSegment {
     Vec3f pos;
     Vec3s angle;
 };
@@ -22,8 +21,7 @@ struct ChainSegment
 #define WATER_DROPLET_FLAG_RAND_ANGLE_INCR_FORWARD  (1 << 7) // 0x80 // Unused
 
 // Call spawn_water_droplet with this struct to spawn an object.
-struct WaterDropletParams
-{
+struct WaterDropletParams {
     s16 flags; // Droplet spawn flags, see defines above
     ModelID16 model;
     const BehaviorScript *behavior;
@@ -37,9 +35,7 @@ struct WaterDropletParams
     f32 randSizeScale;
 };
 
-// TODO: Field names
-struct SpawnParticlesInfo
-{
+struct SpawnParticlesInfo {
     /*0x00*/ s8 behParam;
     /*0x01*/ s8 count;
     /*0x02*/ ModelID16 model;
@@ -75,9 +71,9 @@ void obj_set_pos(struct Object *obj, s16 x, s16 y, s16 z);
 void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll);
 struct Object *spawn_object_abs_with_rot(struct Object *parent, s16 uselessArg, ModelID32 model,
                                          const BehaviorScript *behavior,
-                                         s16 x, s16 y, s16 z, s16 rx, s16 ry, s16 rz);
+                                         s16 x, s16 y, s16 z, s16 pitch, s16 yaw, s16 roll);
 struct Object *spawn_object_rel_with_rot(struct Object *parent, ModelID32 model, const BehaviorScript *behavior,
-                                         s16 xOff, s16 yOff, s16 zOff, s16 rx, s16 ry, s16 rz);
+                                         s16 xOff, s16 yOff, s16 zOff, s16 pitch, s16 yaw, s16 roll);
 struct Object *spawn_obj_with_transform_flags(struct Object *parent, ModelID32 model, const BehaviorScript *behavior);
 struct Object *spawn_water_droplet(struct Object *parent, struct WaterDropletParams *params);
 struct Object *spawn_object_at_origin(struct Object *parent, UNUSED s32 unusedArg, ModelID32 model, const BehaviorScript *behavior);
@@ -97,7 +93,7 @@ void obj_copy_angle(struct Object *dst, struct Object *src);
 void obj_set_gfx_pos_from_pos(struct Object *obj);
 void obj_apply_scale_to_transform(struct Object *obj);
 void obj_copy_scale(struct Object *dst, struct Object *src);
-void obj_scale_xyz(struct Object* obj, f32 xScale, f32 yScale, f32 zScale);
+void obj_scale_xyz(struct Object *obj, f32 xScale, f32 yScale, f32 zScale);
 void obj_scale(struct Object *obj, f32 scale);
 void cur_obj_scale(f32 scale);
 void cur_obj_init_animation_with_sound(s32 animIndex);

@@ -69,7 +69,6 @@ static u8 sGoombaAttackHandlers[][6] = {
 void bhv_goomba_triplet_spawner_update(void) {
     s16 goombaFlag;
     s32 angle;
-    s32 dAngle;
     s16 dx, dz;
 
     // If mario is close enough and the goombas aren't currently loaded, then
@@ -78,16 +77,13 @@ void bhv_goomba_triplet_spawner_update(void) {
         if (o->oDistanceToMario < 3000.0f) {
             // The spawner is capable of spawning more than 3 goombas, but this
             // is not used in the game
-            dAngle =
-                0x10000
-                / (((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK) >> 2) + 3);
+            s32 dAngle = 0x10000 / (((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK) >> 2) + 3);
 
             for (angle = 0, goombaFlag = 1 << 8; angle < 0xFFFF; angle += dAngle, goombaFlag <<= 1) {
                 // Only spawn goombas which haven't been killed yet
                 if (!(o->oBehParams & goombaFlag)) {
-                    dx = 500.0f * coss(angle);
-                    dz = 500.0f * sins(angle);
-
+                    dx = (500.0f * coss(angle));
+                    dz = (500.0f * sins(angle));
 #ifdef FLOOMBAS
                     if (o->oIsFloomba) {
                         spawn_object_relative((o->oBehParams2ndByte & GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK) | (goombaFlag >> 6),
@@ -146,6 +142,7 @@ void bhv_goomba_init(void) {
  */
 static void goomba_begin_jump(void) {
     cur_obj_play_sound_2(SOUND_OBJ_GOOMBA_ALERT);
+
     o->oAction = GOOMBA_ACT_JUMP;
     o->oForwardVel = 0.0f;
     o->oVelY = ((50.0f / 3.0f) * o->oGoombaScale);
@@ -158,8 +155,8 @@ static void goomba_begin_jump(void) {
  */
 static void mark_goomba_as_dead(void) {
     if (o->parentObj != o) {
-        set_object_respawn_info_bits(o->parentObj,
-                                     (o->oBehParams2ndByte & GOOMBA_BP_TRIPLET_FLAG_MASK) >> 2);
+        set_object_respawn_info_bits(
+            o->parentObj, (o->oBehParams2ndByte & GOOMBA_BP_TRIPLET_FLAG_MASK) >> 2);
 
         o->parentObj->oBehParams =
             o->parentObj->oBehParams | (o->oBehParams2ndByte & GOOMBA_BP_TRIPLET_FLAG_MASK) << 6;
@@ -373,7 +370,7 @@ void bhv_goomba_update(void) {
 
         cur_obj_move_standard(-78);
     } else {
-        o->oAnimState = TRUE;
+        o->oAnimState = GOOMBA_ANIM_STATE_EYES_CLOSED;
 #ifdef FLOOMBAS
         if (o->oIsFloomba) {
             o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;

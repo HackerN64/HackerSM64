@@ -184,10 +184,7 @@ void add_3_vtx_to_face(struct ObjFace *face, struct ObjVertex *vtx1, struct ObjV
  * Creates an `ObjShape` object
  */
 struct ObjShape *make_shape(s32 flag, const char *name) {
-    struct ObjShape *newShape;
-    struct ObjShape *curShapeHead;
-
-    newShape = (struct ObjShape *) make_object(OBJ_TYPE_SHAPES);
+    struct ObjShape *newShape = (struct ObjShape *) make_object(OBJ_TYPE_SHAPES);
 
     if (name != NULL) {
         gd_strcpy(newShape->name, name);
@@ -197,7 +194,7 @@ struct ObjShape *make_shape(s32 flag, const char *name) {
 
     sGdShapeCount++;
 
-    curShapeHead = sGdShapeListHead;
+    struct ObjShape *curShapeHead = sGdShapeListHead;
     sGdShapeListHead = newShape;
 
     if (curShapeHead != NULL) {
@@ -733,7 +730,7 @@ void read_ARK_shape(struct ObjShape *shape, char *fileName) {
     union {
         s8 bytes[0x48];
         struct {
-            u8 pad[0x40];
+            u8 filler[0x40];
             s32 word40;
             s32 word44;
         } data;
@@ -1058,7 +1055,7 @@ void animate_mario_head_normal(struct ObjAnimator *self) {
 
             if (self->frame == 810.0f) {
                 self->frame = 750.0f;
-                self->nods -= 1;
+                self->nods--;
                 if (self->nods == 0) {
                     state = 3;
                 }
@@ -1236,7 +1233,7 @@ void load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
     grabberJoint->attachedObjsGrp = make_group(1, faceJoint);
     grabberJoint->updateFunc = eye_joint_update_func;
     grabberJoint->rootAnimator = animator;
-    grabberJoint->header.drawFlags &= ~OBJ_IS_GRABBALE;
+    grabberJoint->header.drawFlags &= ~OBJ_IS_GRABBABLE;
 
     // make the right eye follow cursor
     grabberJoint = make_grabber_joint(sGrabJointTestShape, 0, -100.0f, 200.0f, 400.0f);
@@ -1244,7 +1241,7 @@ void load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
     grabberJoint->attachedObjsGrp = make_group(1, faceJoint);
     grabberJoint->updateFunc = eye_joint_update_func;
     grabberJoint->rootAnimator = animator;
-    grabberJoint->header.drawFlags &= ~OBJ_IS_GRABBALE;
+    grabberJoint->header.drawFlags &= ~OBJ_IS_GRABBABLE;
 
     sp48 = make_group_of_type(OBJ_TYPE_JOINTS, sp38, NULL);
     sp54 = make_net(0, NULL, sp48, NULL, NULL);

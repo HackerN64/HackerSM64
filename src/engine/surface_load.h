@@ -8,14 +8,12 @@
 
 extern u8 gSurfacePoolError;
 
-struct SurfaceNode
-{
+struct SurfaceNode {
     struct SurfaceNode *next;
     struct Surface *surface;
 };
 
-enum SpatialPartitions
-{
+enum SpatialPartitions {
     SPATIAL_PARTITION_FLOORS,
     SPATIAL_PARTITION_CEILS,
     SPATIAL_PARTITION_WALLS,

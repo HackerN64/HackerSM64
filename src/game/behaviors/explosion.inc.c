@@ -1,4 +1,4 @@
-// explosion.c.inc
+// explosion.inc.c
 
 void bhv_explosion_init(void) {
     create_sound_spawner(SOUND_GENERAL2_BOBOMB_EXPLOSION);
@@ -12,10 +12,12 @@ void bhv_explosion_loop(void) {
 
     if (o->oTimer == 9) {
         if (find_water_level(o->oPosX, o->oPosZ) > o->oPosY) {
-            for (i = 0; i < 40; i++)
+            for (i = 0; i < 40; i++) {
                 spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvBobombExplosionBubble);
-        } else
+            }
+        } else {
             spawn_object(o, MODEL_SMOKE, bhvBobombBullyDeathSmoke);
+        }
 
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
@@ -54,9 +56,9 @@ void bhv_bobomb_explosion_bubble_loop(void) {
         spawn_object(o, MODEL_SMALL_WATER_SPLASH, bhvObjectWaterSplash);
     }
 
-    if (o->oTimer >= 61)
+    if (o->oTimer > 60) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-
+    }
     o->oPosY += o->oVelY;
     o->oTimer++;
 }

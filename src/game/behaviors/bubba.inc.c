@@ -2,10 +2,10 @@
 
 static struct ObjectHitbox sBubbaHitbox = {
     /* interactType:      */ INTERACT_CLAM_OR_BUBBA,
-    /* downOffset:        */ 0,
-    /* damageOrCoinValue: */ 1,
-    /* health:            */ 99,
-    /* numLootCoins:      */ 0,
+    /* downOffset:        */   0,
+    /* damageOrCoinValue: */   1,
+    /* health:            */  99,
+    /* numLootCoins:      */   0,
     /* radius:            */ 300,
     /* height:            */ 200,
     /* hurtboxRadius:     */ 300,
@@ -31,12 +31,12 @@ void bubba_act_0(void) {
             o->oBubbaRandomTimer = random_linear_offset(20, 30);
         }
 
-        if ((o->oBubbaHitWall = o->oMoveFlags & OBJ_MOVE_HIT_WALL) != 0) {
+        if ((o->oBubbaHitWall = o->oMoveFlags) & OBJ_MOVE_HIT_WALL) {
             o->oBubbaTargetYaw = cur_obj_reflect_move_angle_off_wall();
         } else if (o->oTimer > 30 && o->oDistanceToMario < 2000.0f) {
             o->oAction = 1;
         } else if (o->oBubbaRandomTimer != 0) {
-            o->oBubbaRandomTimer -= 1;
+            o->oBubbaRandomTimer--;
         } else {
             o->oBubbaTargetYaw = obj_random_fixed_turn(0x2000);
             o->oBubbaRandomTimer = random_linear_offset(100, 100);
@@ -46,6 +46,7 @@ void bubba_act_0(void) {
 
 void bubba_act_1(void) {
     treat_far_home_as_mario(2500.0f);
+
     if (o->oDistanceToMario > 2500.0f) {
         o->oAction = 0;
     } else if (o->oBubbaLungeTimer != 0) {

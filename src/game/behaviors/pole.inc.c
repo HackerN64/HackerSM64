@@ -1,4 +1,4 @@
-#include "config.h"
+
 /**
  * Behaviors for bhvPoleGrabbing and bhvGiantPole.
  *

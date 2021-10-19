@@ -1,4 +1,4 @@
-// respawner.c.inc
+// respawner.inc.c
 
 void bhv_respawner_loop(void) {
     struct Object *spawnedObject;

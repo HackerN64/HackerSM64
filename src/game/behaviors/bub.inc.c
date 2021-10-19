@@ -1,4 +1,4 @@
-// bub.c.inc
+// bub.inc.c
 
 // NOTE: These first set of functions spawn a school of bub depending on oCheepCheepSpawnerSpawnAmount's
 // value. The later action functions seem to check Y distance to Mario and proceed
@@ -33,7 +33,7 @@ ObjActionFunc sBirdChirpChirpActions[] = {
     bub_spawner_act_spawn_bubs,
     bub_spawner_act_idle,
     bub_spawner_act_remove_bubs,
-    bub_spawner_act_reset
+    bub_spawner_act_reset,
 };
 
 void bhv_bub_spawner_loop(void) {
@@ -123,13 +123,14 @@ void bub_act_swimming_away_from_mario(void) {
 ObjActionFunc sCheepCheepActions[] = {
     bub_act_init,
     bub_act_swimming_towards_mario,
-    bub_act_swimming_away_from_mario
+    bub_act_swimming_away_from_mario,
 };
 
 void bhv_bub_loop(void) {
     o->oCheepCheepWaterLevel = find_water_level(o->oPosX, o->oPosZ);
     o->oCheepCheepTargetY = (gMarioObject->oPosY + o->oCheepCheepTargetYOffset);
     o->oWallHitboxRadius = 30.0f;
+
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sCheepCheepActions);
     cur_obj_move_using_fvel_and_gravity();

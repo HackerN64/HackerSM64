@@ -1,4 +1,4 @@
-// warp.c.inc
+// warp.inc.c
 
 void bhv_warp_loop(void) {
     if (o->oTimer == 0) {

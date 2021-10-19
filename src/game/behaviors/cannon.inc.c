@@ -1,4 +1,4 @@
-// cannon.c.inc
+// cannon.inc.c
 
 void bhv_cannon_base_unused_loop(void) {
     o->oPosY += o->oVelY;
@@ -11,18 +11,18 @@ void opened_cannon_act_0(void) {
         o->oMoveAnglePitch = 0;
         o->oMoveAngleYaw = (s16)(o->oBehParams2ndByte << 8);
         o->oCannonAngle = 0;
-        o->oCannonIsActive = 0;
+        o->oCannonIsActive = FALSE;
         cur_obj_enable_rendering();
         cur_obj_become_tangible();
     }
+
     if (o->oDistanceToMario < 500.0f) {
         cur_obj_become_tangible();
         cur_obj_enable_rendering();
         if (o->oInteractStatus & INT_STATUS_INTERACTED
-            && (!(o->oInteractStatus
-                  & INT_STATUS_TOUCHED_BOB_OMB))) { // bob-omb explodes when it gets into a cannon
+         && (!(o->oInteractStatus & INT_STATUS_TOUCHED_BOB_OMB))) { // bob-omb explodes when it gets into a cannon
             o->oAction = 4;
-            o->oCannonIsActive = 1;
+            o->oCannonIsActive = TRUE;
             o->oCannonTimeSinceActivated = 1;
         } else {
             o->oInteractStatus = INT_STATUS_NONE;
@@ -30,13 +30,14 @@ void opened_cannon_act_0(void) {
     } else {
         cur_obj_become_intangible();
         cur_obj_disable_rendering();
-        o->oCannonIsActive = 0;
+        o->oCannonIsActive = FALSE;
     }
 }
 
 void opened_cannon_act_4(void) {
-    if (o->oTimer == 0)
+    if (o->oTimer == 0) {
         cur_obj_play_sound_2(SOUND_OBJ_CANNON_RISE);
+    }
     o->oPosY += 5.0f;
     o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5f) * 2;
     o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5f) * 2;
@@ -48,8 +49,9 @@ void opened_cannon_act_4(void) {
 }
 
 void opened_cannon_act_6(void) {
-    if (o->oTimer == 0)
+    if (o->oTimer == 0) {
         cur_obj_play_sound_2(SOUND_OBJ_CANNON_TURN);
+    }
     if (o->oTimer < 4) {
         o->oPosX += (f32)((o->oTimer / 2 & 1) - 0.5f) * 4.0f;
         o->oPosZ += (f32)((o->oTimer / 2 & 1) - 0.5f) * 4.0f;
@@ -68,8 +70,9 @@ void opened_cannon_act_6(void) {
 }
 
 void opened_cannon_act_5(void) {
-    if (o->oTimer == 0)
+    if (o->oTimer == 0) {
         cur_obj_play_sound_2(SOUND_OBJ_CANNON_BARREL_PITCH);
+    }
     if (o->oTimer >= 4) {
         if (o->oTimer < 20) {
             o->oCannonAngle += 0x400;
@@ -104,7 +107,7 @@ ObjActionFunc sOpenedCannonActions[] = {
     opened_cannon_act_3,
     opened_cannon_act_4,
     opened_cannon_act_5,
-    opened_cannon_act_6
+    opened_cannon_act_6,
 };
 
 void bhv_cannon_base_loop(void) {
@@ -117,6 +120,7 @@ void bhv_cannon_base_loop(void) {
 
 void bhv_cannon_barrel_loop(void) {
     struct Object *parent = o->parentObj;
+
     if (parent->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) {
         cur_obj_enable_rendering();
         obj_copy_pos(o, o->parentObj);

@@ -64,7 +64,7 @@ s32 random_flower_offset(void) {
  */
 void envfx_update_flower(Vec3s centerPos) {
     s32 i;
-    s32 timer = gGlobalTimer;
+    s32 globalTimer = gGlobalTimer;
 
     s16 centerX = centerPos[0];
     s16 centerZ = centerPos[2];
@@ -77,7 +77,7 @@ void envfx_update_flower(Vec3s centerPos) {
             (gEnvFxBuffer + i)->yPos = find_floor_height((gEnvFxBuffer + i)->xPos, 10000.0f, (gEnvFxBuffer + i)->zPos);
             (gEnvFxBuffer + i)->isAlive = TRUE;
             (gEnvFxBuffer + i)->animFrame = (random_float() * 5.0f);
-        } else if ((timer & 0x03) == 0) {
+        } else if (!(globalTimer & 3)) {
             (gEnvFxBuffer + i)->animFrame++;
             if ((gEnvFxBuffer + i)->animFrame > 5) {
                 (gEnvFxBuffer + i)->animFrame = 0;
@@ -97,7 +97,6 @@ void envfx_update_flower(Vec3s centerPos) {
  */
 void envfx_set_lava_bubble_position(s32 index, Vec3s centerPos) {
     struct Surface *surface;
-    s16 floorY;
 
     (gEnvFxBuffer + index)->xPos = (((random_float() * 6000.0f) - 3000.0f) + centerPos[0]);
     (gEnvFxBuffer + index)->zPos = (((random_float() * 6000.0f) - 3000.0f) + centerPos[2]);
@@ -116,8 +115,7 @@ void envfx_set_lava_bubble_position(s32 index, Vec3s centerPos) {
         (gEnvFxBuffer + index)->zPos = -16000 - (gEnvFxBuffer + index)->zPos;
     }
 
-    floorY =
-        find_floor((gEnvFxBuffer + index)->xPos, (centerPos[1] + 500), (gEnvFxBuffer + index)->zPos, &surface);
+    s16 floorY = find_floor((gEnvFxBuffer + index)->xPos, (centerPos[1] + 500), (gEnvFxBuffer + index)->zPos, &surface);
     if (surface == NULL) {
         (gEnvFxBuffer + index)->yPos = FLOOR_LOWER_LIMIT_MISC;
         return;
@@ -136,14 +134,14 @@ void envfx_set_lava_bubble_position(s32 index, Vec3s centerPos) {
  */
 void envfx_update_lava(Vec3s centerPos) {
     s32 i;
-    s32 timer = gGlobalTimer;
+    s32 globalTimer = gGlobalTimer;
     s8 chance;
 
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
         if ((gEnvFxBuffer + i)->isAlive == FALSE) {
             envfx_set_lava_bubble_position(i, centerPos);
             (gEnvFxBuffer + i)->isAlive = TRUE;
-        } else if ((timer & 0x01) == 0) {
+        } else if (!(globalTimer & 0x1)) {
             (gEnvFxBuffer + i)->animFrame++;
             if ((gEnvFxBuffer + i)->animFrame > 8) {
                 (gEnvFxBuffer + i)->isAlive = FALSE;
@@ -204,7 +202,7 @@ void envfx_update_whirlpool(void) {
 
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
         (gEnvFxBuffer + i)->isAlive = envfx_is_whirlpool_bubble_alive(i);
-        if ((gEnvFxBuffer + i)->isAlive == 0) {
+        if (!(gEnvFxBuffer + i)->isAlive) {
             (gEnvFxBuffer + i)->angleAndDist[1] = (random_float() *  1000.0f);
             (gEnvFxBuffer + i)->angleAndDist[0] = (random_float() * 65536.0f);
             (gEnvFxBuffer + i)->xPos =
@@ -217,7 +215,7 @@ void envfx_update_whirlpool(void) {
                 gEnvFxBubbleConfig[ENVFX_STATE_SRC_Y] + ((random_float() * 100.0f) - 50.0f);
             (gEnvFxBuffer + i)->yPos = (i + gEnvFxBuffer)->bubbleY;
             (gEnvFxBuffer + i)->unusedBubbleVar = 0;
-            (gEnvFxBuffer + i)->isAlive = 1;
+            (gEnvFxBuffer + i)->isAlive = TRUE;
 
             envfx_rotate_around_whirlpool(&(gEnvFxBuffer + i)->xPos,
                                           &(gEnvFxBuffer + i)->yPos,
@@ -261,7 +259,7 @@ void envfx_update_jetstream(void) {
 
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
         (gEnvFxBuffer + i)->isAlive = envfx_is_jestream_bubble_alive(i);
-        if ((gEnvFxBuffer + i)->isAlive == 0) {
+        if (!(gEnvFxBuffer + i)->isAlive) {
             (gEnvFxBuffer + i)->angleAndDist[1] = random_float() * 300.0f;
             (gEnvFxBuffer + i)->angleAndDist[0] = random_u16();
             (gEnvFxBuffer + i)->xPos = (gEnvFxBubbleConfig[ENVFX_STATE_SRC_X]
@@ -310,8 +308,8 @@ s32 envfx_init_bubble(s32 mode) {
             break;
     }
 
-    gEnvFxBuffer = mem_pool_alloc(gEffectsMemoryPool, sBubbleParticleCount * sizeof(struct EnvFxParticle));
-    if (!gEnvFxBuffer) {
+    gEnvFxBuffer = mem_pool_alloc(gEffectsMemoryPool, (sBubbleParticleCount * sizeof(struct EnvFxParticle)));
+    if (gEnvFxBuffer == NULL) {
         return FALSE;
     }
 
@@ -444,9 +442,7 @@ Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFro
     Vec3s vertex2;
     Vec3s vertex3;
 
-    Gfx *gfxStart;
-
-    gfxStart = alloc_display_list(((sBubbleParticleMaxCount / 5) * 10 + sBubbleParticleMaxCount + 3) * sizeof(Gfx));
+    Gfx *gfxStart = alloc_display_list(((sBubbleParticleMaxCount / 5) * 10 + sBubbleParticleMaxCount + 3) * sizeof(Gfx));
     if (gfxStart == NULL) {
         return NULL;
     }
@@ -499,7 +495,7 @@ void envfx_set_max_bubble_particles(s32 mode) {
 Gfx *envfx_update_bubbles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom) {
     Gfx *gfx;
 
-    if (gEnvFxMode == 0 && !envfx_init_bubble(mode)) {
+    if (gEnvFxMode == ENVFX_MODE_NONE && !envfx_init_bubble(mode)) {
         return NULL;
     }
 

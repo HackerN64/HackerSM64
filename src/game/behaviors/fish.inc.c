@@ -1,3 +1,4 @@
+
 /**
  * @file fish.inc.c
  * Implements behaviour and spawning for fish located in the Secret Aquarium and other levels.
@@ -13,7 +14,6 @@ static void fish_spawner_act_spawn(void) {
     ModelID16 model;
     f32 minDistToMario;
     const struct Animation *const *fishAnimation;
-    struct Object *fishObject;
 
     switch (o->oBehParams2ndByte) {
         case FISH_SPAWNER_BP_MANY_BLUE: model = MODEL_FISH;      schoolQuantity = 20; minDistToMario = 1500.0f; fishAnimation = blue_fish_seg3_anims_0301C2B0; break;
@@ -31,6 +31,7 @@ static void fish_spawner_act_spawn(void) {
 #else
     if ((o->oDistanceToMario < minDistToMario) || (gCurrLevelNum == LEVEL_SA)) {
 #endif
+        struct Object *fishObject;
         for (i = 0; i < schoolQuantity; i++) {
             fishObject = spawn_object(o, model, bhvFish);
             fishObject->oBehParams2ndByte = o->oBehParams2ndByte;
@@ -145,7 +146,7 @@ static void fish_act_roam(void) {
  * Interactively maneuver fish in relation to its distance from other fish and Mario.
  */
 static void fish_act_flee(void) {
-    f32 fishY = o->oPosY - gMarioObject->oPosY;
+    f32 fishY = (o->oPosY - gMarioObject->oPosY);
     o->oFishGoalY = gMarioObject->oPosY + o->oFishHeightOffset;
 
     // Initialize some variables when the flee action first starts.
@@ -178,6 +179,8 @@ static void fish_act_flee(void) {
         } else {
             fish_vertical_roam(4);
         }
+
+    // Don't let the fish leave the water vertically.
     } else {
         // Don't let the fish leave the water vertically.
         o->oPosY = (o->oFishWaterLevel - 50.0f);

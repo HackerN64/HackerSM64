@@ -1,4 +1,4 @@
-// koopa_shell.c.inc
+// koopa_shell.inc.c
 
 struct ObjectHitbox sKoopaShellHitbox = {
     /* interactType:      */ INTERACT_KOOPA_SHELL,
@@ -17,10 +17,10 @@ void shell_despawn(void) {
 }
 
 void koopa_shell_spawn_water_drop(void) {
-    struct Object *drop;
     spawn_object(o, MODEL_WAVE_TRAIL, bhvObjectWaveTrail);
+
     if (gMarioStates[0].forwardVel > 10.0f) {
-        drop = spawn_object_with_scale(o, MODEL_WHITE_PARTICLE_SMALL, bhvWaterDroplet, 1.5f);
+        struct Object *drop = spawn_object_with_scale(o, MODEL_WHITE_PARTICLE_SMALL, bhvWaterDroplet, 1.5f);
         drop->oVelY = (random_float() * 30.0f);
         obj_translate_xz_random(drop, 110.0f);
     }
@@ -35,10 +35,13 @@ void bhv_koopa_shell_flame_loop(void) {
         obj_translate_xz_random(o, 110.0f);
         o->oKoopaShellFlameScale = 4.0f;
     }
+
     cur_obj_update_floor_height();
     cur_obj_move_using_fvel_and_gravity();
-    if (o->oFloorHeight > o->oPosY || o->oTimer > 10)
+
+    if (o->oFloorHeight > o->oPosY || o->oTimer > 10) {
         obj_mark_for_deletion(o);
+    }
     o->oKoopaShellFlameScale -= 0.3f;
     cur_obj_scale(o->oKoopaShellFlameScale);
 }
@@ -59,6 +62,7 @@ void bhv_koopa_shell_loop(void) {
     struct Surface *floor;
     obj_set_hitbox(o, &sKoopaShellHitbox);
     cur_obj_scale(1.0f);
+
     switch (o->oAction) {
         case KOOPA_SHELL_ACT_MARIO_NOT_RIDING:
             cur_obj_update_floor_and_walls();
@@ -76,7 +80,7 @@ void bhv_koopa_shell_loop(void) {
             floor = cur_obj_update_floor_height_and_get_floor();
             if (absf(find_water_level(o->oPosX, o->oPosZ) - o->oPosY) < 10.0f) {
                 koopa_shell_spawn_water_drop();
-            } else if (5.0f > absf(o->oPosY - o->oFloorHeight)) {
+            } else if (absf(o->oPosY - o->oFloorHeight) < 5.0f) {
                 if (floor != NULL && floor->type == SURFACE_BURNING) {
                     bhv_koopa_shell_flame_spawn();
                 } else {
@@ -86,6 +90,7 @@ void bhv_koopa_shell_loop(void) {
                 koopa_shell_spawn_sparkles(10.0f);
             }
             o->oFaceAngleYaw = gMarioObject->oMoveAngleYaw;
+
             if (o->oInteractStatus & INT_STATUS_STOP_RIDING) {
                 obj_mark_for_deletion(o);
                 spawn_mist_particles();

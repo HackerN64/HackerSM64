@@ -96,7 +96,7 @@ void print_text_array_info(s16 *printState, const char *str, s32 number) {
             || (printState[DEBUG_PSTATE_MAX_X_CURSOR] < printState[DEBUG_PSTATE_Y_CURSOR])) {
             print_text(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                        "DPRINT OVER");
-            printState[DEBUG_PSTATE_DISABLED] += 1; // why not just = TRUE...
+            printState[DEBUG_PSTATE_DISABLED]++; // why not just = TRUE...
         } else {
             print_text_fmt_int(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                                str, number);
@@ -146,6 +146,7 @@ void print_debug_top_down_normal(const char *str, s32 number) {
 }
 
 void print_mapinfo(void) {
+    // EU mostly stubbed this function out.
     struct Surface *pfloor;
 
     s32 angY = gCurrentObject->oMoveAngleYaw / 182.044000;
@@ -163,7 +164,7 @@ void print_mapinfo(void) {
     print_debug_top_down_mapinfo("bgY  %d", bgY);
     print_debug_top_down_mapinfo("angY %d", angY);
 
-    if (pfloor) { // not null
+    if (pfloor != NULL) {
         print_debug_top_down_mapinfo("bgcode   %d", pfloor->type);
         print_debug_top_down_mapinfo("bgstatus %d", pfloor->flags);
         print_debug_top_down_mapinfo("bgarea   %d", pfloor->room);
@@ -196,7 +197,7 @@ void print_string_array_info(const char **strArr) {
     s32 i;
 
     if (!sDebugStringArrPrinted) {
-        sDebugStringArrPrinted += 1; // again, why not = TRUE...
+        sDebugStringArrPrinted++; // again, why not = TRUE...
         for (i = 0; i < 8; i++) {
             // sDebugPage is assumed to be 4 or 5 here.
             print_debug_top_down_mapinfo(strArr[i], gDebugInfo[sDebugPage][i]);
@@ -244,7 +245,7 @@ void update_debug_dpadmask(void) {
 
 void debug_unknown_level_select_check(void) {
     if (!sDebugLvSelectCheckFlag) {
-        sDebugLvSelectCheckFlag += 1; // again, just do = TRUE...
+        sDebugLvSelectCheckFlag++; // again, just do = TRUE...
 
         if (!gDebugLevelSelect) {
             gDebugInfoFlags = DEBUG_INFO_NOFLAGS;
@@ -283,7 +284,7 @@ UNUSED static void check_debug_button_seq(void) {
         s16 cButtonMask = (gPlayer1Controller->buttonPressed & C_BUTTONS);
         if (cButtonMask) {
             if (buttonArr[sDebugInfoButtonSeqID] == cButtonMask) {
-                sDebugInfoButtonSeqID += 1;
+                sDebugInfoButtonSeqID++;
                 if (buttonArr[sDebugInfoButtonSeqID] == -1) {
                     if (gDebugInfoFlags == DEBUG_INFO_FLAG_ALL) {
                         gDebugInfoFlags = DEBUG_INFO_FLAG_LSELECT;
@@ -402,11 +403,11 @@ void try_print_debug_mario_object_info(void) {
 
     print_debug_top_down_mapinfo("obj  %d", gObjectCounter);
 
-    if (gNumFindFloorMisses) {
+    if (gNumFindFloorMisses != 0) {
         print_debug_bottom_up("NULLBG %d", gNumFindFloorMisses);
     }
 
-    if (gUnknownWallCount) {
+    if (gUnknownWallCount != 0) {
         print_debug_bottom_up("WALL   %d", gUnknownWallCount);
     }
 }

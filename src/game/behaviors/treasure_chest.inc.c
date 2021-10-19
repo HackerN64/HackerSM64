@@ -1,4 +1,4 @@
-// treasure_chest.c.inc
+// treasure_chest.inc.c
 
 /**
  * Hitbox for treasure chest bottom.
@@ -69,8 +69,8 @@ void bhv_treasure_chest_bottom_loop(void) {
     switch (o->oAction) {
         case TREASURE_CHEST_BOTTOM_ACT_CLOSE:
             if ((!o->parentObj->oTreasureChestDoCloseChests)
-                && is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 150)
-                && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, (gMarioObject->header.gfx.angle[1] + 0x8000), 0x3000)) {
+             && is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 150)
+             && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, (gMarioObject->header.gfx.angle[1] + 0x8000), 0x3000)) {
                 if (o->parentObj->oTreasureChestNumOpenedChests == o->oBehParams2ndByte) {
                     play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource);
                     o->parentObj->oTreasureChestNumOpenedChests++;
@@ -103,8 +103,8 @@ void bhv_treasure_chest_bottom_loop(void) {
     o->oInteractStatus = INT_STATUS_NONE;
 }
 
-void spawn_treasure_chest(s8 param, s32 x, s32 y, s32 z, s16 ry) {
-    struct Object *chestBaseObj = spawn_object_abs_with_rot(o, 0, MODEL_TREASURE_CHEST_BASE, bhvTreasureChestBottom, x, y, z, 0, ry, 0);
+void spawn_treasure_chest(s8 param, s32 x, s32 y, s32 z, s16 yaw) {
+    struct Object *chestBaseObj = spawn_object_abs_with_rot(o, 0, MODEL_TREASURE_CHEST_BASE, bhvTreasureChestBottom, x, y, z, 0, yaw, 0);
     chestBaseObj->oBehParams2ndByte = param;
 }
 

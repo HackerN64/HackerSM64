@@ -5,6 +5,7 @@
 
 #include "types.h"
 
+#define INTERACT_NONE                   /* 0x00000000 */ (0 <<  0)
 #define INTERACT_HOOT                   /* 0x00000001 */ (1 <<  0)
 #define INTERACT_GRABBABLE              /* 0x00000002 */ (1 <<  1)
 #define INTERACT_DOOR                   /* 0x00000004 */ (1 <<  2)

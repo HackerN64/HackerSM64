@@ -1,3 +1,4 @@
+
 /**
  * This is the behavior file for the tilting inverted pyramids in BitFS/LLL.
  * The object essentially just tilts and moves Mario with it.
