@@ -690,8 +690,7 @@ s32 act_grabbed(struct MarioState *m) {
         queue_rumble_data(5, 60);
 #endif
 
-        return set_mario_action(m, (m->forwardVel >= 0.0f) ? ACT_THROWN_FORWARD : ACT_THROWN_BACKWARD,
-                                thrown);
+        return set_mario_action(m, ((m->forwardVel >= 0.0f) ? ACT_THROWN_FORWARD : ACT_THROWN_BACKWARD), thrown);
     }
 
     set_mario_animation(m, MARIO_ANIM_BEING_GRABBED);
@@ -735,19 +734,8 @@ s32 act_in_cannon(struct MarioState *m) {
             m->faceAngle[0] -= (s16)(m->controller->stickY * 10.0f);
             marioObj->oMarioCannonInputYaw -= (s16)(m->controller->stickX * 10.0f);
 
-            if (m->faceAngle[0] > 0x38E3) {
-                m->faceAngle[0] = 0x38E3;
-            }
-            if (m->faceAngle[0] < 0) {
-                m->faceAngle[0] = 0;
-            }
-
-            if (marioObj->oMarioCannonInputYaw > 0x4000) {
-                marioObj->oMarioCannonInputYaw = 0x4000;
-            }
-            if (marioObj->oMarioCannonInputYaw < -0x4000) {
-                marioObj->oMarioCannonInputYaw = -0x4000;
-            }
+            m->faceAngle[0] = CLAMP(m->faceAngle[0], 0, DEGREES(80));
+            marioObj->oMarioCannonInputYaw = CLAMP(marioObj->oMarioCannonInputYaw, -0x4000, 0x4000);
 
             m->faceAngle[1] = marioObj->oMarioCannonObjectYaw + marioObj->oMarioCannonInputYaw;
             if (m->input & INPUT_A_PRESSED) {
