@@ -30,6 +30,7 @@
 #include "puppycam2.h"
 #include "puppyprint.h"
 #include "puppylights.h"
+#include "level_commands.h"
 
 #include "config.h"
 
@@ -210,7 +211,7 @@ void load_level_init_text(u32 arg) {
 
         default:
             gotAchievement =
-                save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+                save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
             break;
     }
 
@@ -466,21 +467,26 @@ void warp_credits(struct MarioState *m) {
 
     play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 0x14, 0x00, 0x00, 0x00);
 
-    if (gCurrCreditsEntry == NULL || gCurrCreditsEntry == sCreditsSequence) {
+    if ((gCurrCreditsEntry == NULL) || (gCurrCreditsEntry == sCreditsSequence)) {
         set_background_music(gCurrentArea->musicParam, gCurrentArea->musicParam2, 0);
     }
 }
 
 void check_instant_warp(struct MarioState *m) {
-    if (gCurrLevelNum == LEVEL_CASTLE && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 70) {
+    // Infinite Stairs
+    if ((gCurrLevelNum == LEVEL_CASTLE)
+     && (save_file_get_total_star_count((gCurrSaveFileNum - 1),
+                                        COURSE_NUM_TO_INDEX(COURSE_MIN),
+                                        COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 70)) {
         return;
     }
 
     struct Surface *floor = m->floor;
     if (floor != NULL) {
         s32 index = (floor->type - SURFACE_INSTANT_WARP_1B);
-        if (index >= INSTANT_WARP_INDEX_START && index < INSTANT_WARP_INDEX_STOP
-            && gCurrentArea->instantWarps != NULL) {
+        if ((index >= INSTANT_WARP_INDEX_START)
+         && (index <  INSTANT_WARP_INDEX_STOP)
+         && (gCurrentArea->instantWarps != NULL)) {
             struct InstantWarp *warp = &gCurrentArea->instantWarps[index];
 
             if (warp->id != 0) {
@@ -520,8 +526,9 @@ s32 music_unchanged_through_warp(s16 arg) {
         u16 destParam1 = gAreas[destArea].musicParam;
         u16 destParam2 = gAreas[destArea].musicParam2;
 
-        unchanged = levelNum == gCurrLevelNum && destParam1 == gCurrentArea->musicParam
-               && destParam2 == gCurrentArea->musicParam2;
+        unchanged = (levelNum == gCurrLevelNum
+                     && destParam1 == gCurrentArea->musicParam
+                     && destParam2 == gCurrentArea->musicParam2);
 
         if (get_current_background_music() != destParam2) {
             unchanged = FALSE;
@@ -608,7 +615,7 @@ void initiate_painting_warp(void) {
             } else if (pWarpNode->id != 0) {
                 warpNode = *pWarpNode;
 
-                if (!(warpNode.destLevel & 0x80)) {
+                if (!(warpNode.destLevel & WARP_NO_CHECKPOINT)) {
                     sWarpCheckpointActive = check_warp_checkpoint(&warpNode);
                 }
 
@@ -1239,7 +1246,7 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     gCurrLevelNum  = levelNum;
     gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1];
 
-    if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
+    if ((gCurrDemoInput != NULL) || (gCurrCreditsEntry != NULL) || (gCurrCourseNum == COURSE_NONE)) {
         return FALSE;
     }
 
@@ -1248,7 +1255,7 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
      && (gCurrLevelNum != LEVEL_BOWSER_3)) {
         gMarioState->numCoins = 0;
         gHudDisplay.coins     = 0;
-        gCurrCourseStarFlags  = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+        gCurrCourseStarFlags  = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
     }
 
     if (gSavedCourseNum != gCurrCourseNum) {

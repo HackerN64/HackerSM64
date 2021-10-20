@@ -1769,9 +1769,6 @@ s32 execute_mario_action(struct MarioState *m) {
  **************************************************/
 
 void init_mario(struct MarioState *m) {
-    Vec3s capPos;
-    struct Object *capObject;
-
     m->actionTimer = 0;
     m->framesSinceA = 0xFF;
     m->framesSinceB = 0xFF;
@@ -1827,8 +1824,9 @@ void init_mario(struct MarioState *m) {
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
     vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
 
+    Vec3s capPos;
     if (save_file_get_cap_pos(capPos)) {
-        capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
+        struct Object *capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
         vec3_copy(&capObject->oPosVec, capPos);
         capObject->oForwardVel   = 0;
         capObject->oMoveAngleYaw = 0;
@@ -1846,7 +1844,9 @@ void init_mario_from_save_file(struct MarioState *m) {
     m->animList        = &gMarioAnimsBuf;
 
     m->numCoins = 0;
-    m->numStars = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
+    m->numStars = save_file_get_total_star_count((gCurrSaveFileNum - 1),
+                                                 COURSE_NUM_TO_INDEX(COURSE_MIN),
+                                                 COURSE_NUM_TO_INDEX(COURSE_MAX));
     m->numKeys  = 0;
 #ifdef SAVE_NUM_LIVES
     s8 savedLives = save_file_get_num_lives();
@@ -1860,7 +1860,7 @@ void init_mario_from_save_file(struct MarioState *m) {
     gHudDisplay.breath = 8;
 #endif
     m->prevNumStarsForDialog = m->numStars;
-    m->animYTrans = 0xBD;
+    m->animYTrans            = 0xBD;
 
     gHudDisplay.coins  = 0;
     gHudDisplay.wedges = 8;

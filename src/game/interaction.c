@@ -781,7 +781,9 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
 #endif
         save_file_collect_star_or_key(m->numCoins, starIndex);
 
-        m->numStars = save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
+        m->numStars = save_file_get_total_star_count((gCurrSaveFileNum - 1),
+                                                     COURSE_NUM_TO_INDEX(COURSE_MIN),
+                                                     COURSE_NUM_TO_INDEX(COURSE_MAX));
 
         if (!noExit) {
             drop_queued_background_music();
@@ -941,9 +943,11 @@ u32 get_door_save_file_flag(struct Object *door) {
 u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
     s16 requiredNumStars = GET_BPARAM1(obj->oBehParams);
 #ifndef UNLOCK_ALL
-    s16 numStars = save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
+    s16 numStars = save_file_get_total_star_count((gCurrSaveFileNum - 1),
+                                                  COURSE_NUM_TO_INDEX(COURSE_MIN),
+                                                  COURSE_NUM_TO_INDEX(COURSE_MAX));
 #endif
-    if (m->action == ACT_WALKING || m->action == ACT_DECELERATING) {
+    if ((m->action == ACT_WALKING) || (m->action == ACT_DECELERATING)) {
 #ifndef UNLOCK_ALL
         if (numStars >= requiredNumStars) {
 #endif

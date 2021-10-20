@@ -1017,7 +1017,7 @@ s32 act_ground_pound_land(struct MarioState *m) {
 }
 
 s32 act_first_person(struct MarioState *m) {
-    s32 exit = (m->input & (INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE | INPUT_STOMPED)) != 0;
+    s32 exit = ((m->input & (INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE | INPUT_STOMPED)) != 0);
 
     if (m->actionState == ACT_STATE_FIRST_PERSON_SET_MODE) {
         lower_background_noise(2);
@@ -1030,8 +1030,10 @@ s32 act_first_person(struct MarioState *m) {
         return set_mario_action(m, ACT_IDLE, 0);
     }
 
-    if (m->floor->type == SURFACE_LOOK_UP_WARP
-        && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 10) {
+    if ((m->floor->type == SURFACE_LOOK_UP_WARP)
+     && save_file_get_total_star_count((gCurrSaveFileNum - 1),
+                                       COURSE_NUM_TO_INDEX(COURSE_MIN),
+                                       COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 10) {
         s16 headRX = m->statusForCamera->headRotation[0];
         s16 totalRY = ((m->statusForCamera->headRotation[1] * 4) / 3) + m->faceAngle[1];
         if (headRX == -0x1800 && (totalRY < -0x6FFF || totalRY >= 0x7000)) {

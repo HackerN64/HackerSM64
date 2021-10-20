@@ -545,12 +545,10 @@ void painting_update_ripple_state(struct Painting *painting) {
             gRipplingPainting = NULL;
         }
     } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
-
         // if the painting is doing the entry ripple but the ripples are as small as those from the
         // passive ripple, make it do a passive ripple
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
         if (painting->state == PAINTING_ENTERED && painting->currRippleMag <= painting->passiveRippleMag) {
-
             painting->state = PAINTING_RIPPLE;
             painting->currRippleMag = painting->passiveRippleMag;
             painting->rippleDecay = painting->passiveRippleDecay;
@@ -819,13 +817,13 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
  * Orient the painting mesh for rendering.
  */
 Gfx *painting_model_view_transform(struct Painting *painting) {
-    f32 sizeRatio = painting->size / PAINTING_SIZE;
-    Mtx *rotX = alloc_display_list(sizeof(Mtx));
-    Mtx *rotY = alloc_display_list(sizeof(Mtx));
-    Mtx *translate = alloc_display_list(sizeof(Mtx));
-    Mtx *scale = alloc_display_list(sizeof(Mtx));
-    Gfx *dlist = alloc_display_list(5 * sizeof(Gfx));
-    Gfx *gfx = dlist;
+    f32 sizeRatio  = (painting->size / PAINTING_SIZE);
+    Mtx *rotX      = alloc_display_list(    sizeof(Mtx));
+    Mtx *rotY      = alloc_display_list(    sizeof(Mtx));
+    Mtx *translate = alloc_display_list(    sizeof(Mtx));
+    Mtx *scale     = alloc_display_list(    sizeof(Mtx));
+    Gfx *dlist     = alloc_display_list(5 * sizeof(Gfx));
+    Gfx *gfx       = dlist;
 
     guTranslate(translate, painting->pos[0], painting->pos[1], painting->pos[2]);
     guRotate(rotX, painting->pitch, 1.0f, 0.0f, 0.0f);
