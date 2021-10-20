@@ -45,18 +45,22 @@ struct LevelCommand {
     /*02*/ // variable sized argument data
 };
 
-enum ScriptStatus { SCRIPT_RUNNING = 1, SCRIPT_PAUSED = 0, SCRIPT_PAUSED2 = -1 };
+enum ScriptStatus {
+    SCRIPT_RUNNING =  1,
+    SCRIPT_PAUSED  =  0,
+    SCRIPT_PAUSED2 = -1
+};
 
 static uintptr_t sStack[NUM_TLB_SEGMENTS];
 
 static struct AllocOnlyPool *sLevelPool = NULL;
 
-static u16 sDelayFrames = 0;
+static u16 sDelayFrames  = 0;
 static u16 sDelayFrames2 = 0;
 
 static s16 sCurrAreaIndex = -1;
 
-static uintptr_t *sStackTop = sStack;
+static uintptr_t *sStackTop  = sStack;
 static uintptr_t *sStackBase = NULL;
 
 static s16 sScriptStatus;
@@ -84,7 +88,7 @@ static void level_cmd_load_and_execute(void) {
 
     *sStackTop++ = (uintptr_t) NEXT_CMD;
     *sStackTop++ = (uintptr_t) sStackBase;
-    sStackBase = sStackTop;
+    sStackBase   = sStackTop;
 
     sCurrentCmd = segmented_to_virtual(CMD_GET(void *, 12));
 }
@@ -201,7 +205,7 @@ static void level_cmd_skip_if(void) {
     if (!eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4))) {
         do {
             sCurrentCmd = CMD_NEXT;
-        } while ((sCurrentCmd->type == 0x0F) || (sCurrentCmd->type == 0x10));
+        } while ((sCurrentCmd->type == LEVEL_CMD_SKIP) || (sCurrentCmd->type == LEVEL_CMD_SKIPPABLE_NOP));
     }
 
     sCurrentCmd = CMD_NEXT;
@@ -210,7 +214,7 @@ static void level_cmd_skip_if(void) {
 static void level_cmd_skip(void) {
     do {
         sCurrentCmd = CMD_NEXT;
-    } while (sCurrentCmd->type == 0x10);
+    } while (sCurrentCmd->type == LEVEL_CMD_SKIPPABLE_NOP);
 
     sCurrentCmd = CMD_NEXT;
 }
@@ -277,7 +281,7 @@ static void level_cmd_load_mario_head(void) {
     if (addr != NULL) {
         gdm_init(addr, DOUBLE_SIZE_ON_64_BIT(0xE1000));
         gd_add_to_heap(gZBuffer, sizeof(gZBuffer)); // 0x25800
-        gd_add_to_heap(gFramebuffer0, 3 * sizeof(gFramebuffer0)); // 0x70800
+        gd_add_to_heap(gFramebuffer0, (3 * sizeof(gFramebuffer0))); // 0x70800
         gdm_setup();
         gdm_maketestdl(CMD_GET(s16, 2));
     }
@@ -535,7 +539,7 @@ static void level_cmd_create_painting_warp_node(void) {
     if (sCurrAreaIndex != -1) {
         if (gAreas[sCurrAreaIndex].paintingWarpNodes == NULL) {
             gAreas[sCurrAreaIndex].paintingWarpNodes =
-                alloc_only_pool_alloc(sLevelPool, NUM_PAINTINGS * sizeof(struct WarpNode));
+                alloc_only_pool_alloc(sLevelPool, (NUM_PAINTINGS * sizeof(struct WarpNode)));
 
             for (i = 0; i < NUM_PAINTINGS; i++) {
                 gAreas[sCurrAreaIndex].paintingWarpNodes[i].id = 0;
@@ -545,9 +549,9 @@ static void level_cmd_create_painting_warp_node(void) {
         node = &gAreas[sCurrAreaIndex].paintingWarpNodes[CMD_GET(u8, 2)];
 
         node->id = 1;
-        node->destLevel = CMD_GET(u8, 3) + CMD_GET(u8, 6);
-        node->destArea = CMD_GET(u8, 4);
-        node->destNode = CMD_GET(u8, 5);
+        node->destLevel = (CMD_GET(u8, 3) + CMD_GET(u8, 6));
+        node->destArea  =  CMD_GET(u8, 4);
+        node->destNode  =  CMD_GET(u8, 5);
     }
 
     sCurrentCmd = CMD_NEXT;
@@ -562,10 +566,10 @@ static void level_cmd_3A(void) {
                 alloc_only_pool_alloc(sLevelPool, sizeof(struct UnusedArea28));
         }
 
-        val4->unk00 = CMD_GET(s16, 2);
-        val4->unk02 = CMD_GET(s16, 4);
-        val4->unk04 = CMD_GET(s16, 6);
-        val4->unk06 = CMD_GET(s16, 8);
+        val4->unk00 = CMD_GET(s16,  2);
+        val4->unk02 = CMD_GET(s16,  4);
+        val4->unk04 = CMD_GET(s16,  6);
+        val4->unk06 = CMD_GET(s16,  8);
         val4->unk08 = CMD_GET(s16, 10);
     }
 
@@ -576,7 +580,7 @@ static void level_cmd_create_whirlpool(void) {
     struct Whirlpool *whirlpool;
     s32 index = CMD_GET(u8, 2);
     s32 beatBowser2 =
-        (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) != 0;
+        ((save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) != 0);
 
     if (CMD_GET(u8, 3) == WHIRLPOOL_COND_ALWAYS
     || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_NOT_BEATEN   && !beatBowser2)
@@ -669,7 +673,7 @@ static void level_cmd_set_mario_start_pos(void) {
 #else
     vec3s_copy(gMarioSpawnInfo->startPos, CMD_GET(Vec3s, 6));
 #endif
-    vec3s_set(gMarioSpawnInfo->startAngle, 0, CMD_GET(s16, 4) * 0x8000 / 180, 0);
+    vec3s_set(gMarioSpawnInfo->startAngle, 0, DEGREES(CMD_GET(s16, 4)), 0);
 
     sCurrentCmd = CMD_NEXT;
 }
