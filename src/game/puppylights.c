@@ -44,7 +44,7 @@ Lights1 gLevelLight; // Existing ambient light in the area. Will be set by the l
 u8 levelAmbient = FALSE;
 Lights1 *sLightBase; // The base value where lights are written to when worked with.
 Lights1 sDefaultLights = gdSPDefLights1(0x7F, 0x7F, 0x7F, 0xFE, 0xFE, 0xFE, 0x28, 0x28, 0x28); // Default lights default lights
-u16 gNumLights = 0; // How many lights are loaded.
+u16 gNumLights     = 0; // How many lights are loaded.
 u16 gDynLightStart = 0; // Where the dynamic lights will start.
 struct PuppyLight *gPuppyLights[MAX_LIGHTS]; // This contains all the loaded data.
 struct MemoryPool *gLightsPool; // The memory pool where the above is stored.
@@ -78,7 +78,7 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     Lights1 *tempLight;
     s32 lightPos[2];
     Vec3i lightRelative;
-    Vec3i lightDir = {0, 0, 0};
+    Vec3i lightDir = { 0, 0, 0 };
     s32 i;
     RGBA32 colour, ambient;
     f64 scaleOrig;
@@ -143,28 +143,27 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
         }
         scaleVal = (light->pos[1][2]*light->pos[1][2]);
         // If it's a cylinder, then bin anything outside it.
-        if (light->flags & PUPPYLIGHT_SHAPE_CYLINDER) {
-            if (scaleOrig > scaleVal) {
-                return;
-            }
+        if ((light->flags & PUPPYLIGHT_SHAPE_CYLINDER) && (scaleOrig > scaleVal)) {
+            return;
         }
     } else {
         return;
     }
     f32 epc = (f32)(light->epicentre / 100.0f);
     tempLight = segmented_to_virtual(src);
-    //Now we have a scale value and a scale factor, we can start lighting things up.
+    // Now we have a scale value and a scale factor, we can start lighting things up.
     // Convert to a percentage.
     scale = CLAMP(scaleOrig/scaleVal, 0.0f, 1.0f);
     // Reduce scale2 by the epicentre.
-    scale2 = CLAMP((scale - epc) * (1 + epc), 0.0f, 1.0f);
+    scale2 = ((scale - epc) * (1 + epc));
+    scale2 = CLAMP(scale2, 0.0f, 1.0f);
 
     // Get the direction numbers we want by applying some maths to the relative positions. We use 64 because light directions range from -64 to 63.
     // Note: can this be optimised further? Simply squaring lightRelative and then dividing it by preScale doesn't work.
     if (light->flags & PUPPYLIGHT_DIRECTIONAL) {
-        lightDir[0] = ((lightRelative[0]) * 64.0f) / light->pos[1][0];
-        lightDir[1] = ((lightRelative[1]) * 64.0f) / light->pos[1][1];
-        lightDir[2] = ((lightRelative[2]) * 64.0f) / light->pos[1][2];
+        lightDir[0] = (((lightRelative[0]) * 64.0f) / light->pos[1][0]);
+        lightDir[1] = (((lightRelative[1]) * 64.0f) / light->pos[1][1]);
+        lightDir[2] = (((lightRelative[2]) * 64.0f) / light->pos[1][2]);
     }
     //Get direction if applicable.
     for (i = 0; i < 3; i++) {
@@ -173,18 +172,18 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
         // If it's a directional light, then increase the current ambient by 50%, to give the effect better.
         // Otherwise, just normalise the brightness to keep it in line with the current ambient.
         // And now to apply the values.
-        tempLight->l[0].l.col[i] = colour;
+        tempLight->l[0].l.col[i]  = colour;
         tempLight->l[0].l.colc[i] = colour;
         // Ambient, too.
         if (!(light->flags & PUPPYLIGHT_DIRECTIONAL)) {
-            ambient = approach_f32_asymptotic(light->rgba[i]/2, tempLight->a.l.col[i], scale*((f32)light->rgba[3] / 255.0f));
-            tempLight->a.l.col[i] = ambient;
+            ambient = approach_f32_asymptotic(light->rgba[i] / 2, tempLight->a.l.col[i], scale * ((f32)light->rgba[3] / 255.0f));
+            tempLight->a.l.col[i]  = ambient;
             tempLight->a.l.colc[i] = ambient;
         }
         // A slightly hacky way to offset the ambient lighting in order to prevent directional lighting from having a noticeable change in ambient brightness.
         if (flags & LIGHTFLAG_DIRECTIONAL_OFFSET) {
-            ambient = approach_f32_asymptotic(MIN(tempLight->a.l.col[i] * 2, 0xFF), tempLight->a.l.col[i], scale2*((f32)light->rgba[3] / 255.0f));
-            tempLight->a.l.col[i] = ambient;
+            ambient = approach_f32_asymptotic(MIN(tempLight->a.l.col[i] * 2, 0xFF), tempLight->a.l.col[i], scale2 * ((f32)light->rgba[3] / 255.0f));
+            tempLight->a.l.col[i]  = ambient;
             tempLight->a.l.colc[i] = ambient;
         }
         // Apply direction. It takes the relative positions, and then multiplies them with the perspective matrix to get a correct direction.

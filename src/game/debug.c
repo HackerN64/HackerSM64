@@ -413,8 +413,7 @@ void try_print_debug_mario_object_info(void) {
 }
 
 /*
- * Similar to above, but with level information. (checkinfo, mapinfo,
- * stageinfo)
+ * Similar to above, but with level information. (checkinfo, mapinfo, stageinfo)
  */
 void try_print_debug_mario_level_info(void) {
     switch (sDebugPage) {

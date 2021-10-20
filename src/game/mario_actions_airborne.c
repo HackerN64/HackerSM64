@@ -39,7 +39,7 @@ void play_far_fall_sound(struct MarioState *m) {
 }
 
 void play_knockback_sound(struct MarioState *m) {
-    if (m->actionArg == 0 && (m->forwardVel <= -28.0f || m->forwardVel >= 28.0f)) {
+    if ((m->actionArg == 0) && ((m->forwardVel <= -28.0f) || (m->forwardVel >= 28.0f))) {
         play_sound_if_no_flag(m, SOUND_MARIO_DOH, MARIO_MARIO_SOUND_PLAYED);
     } else {
         play_sound_if_no_flag(m, SOUND_MARIO_UH, MARIO_MARIO_SOUND_PLAYED);
@@ -54,7 +54,7 @@ s32 lava_boost_on_wall(struct MarioState *m) {
     }
 
     if (!(m->flags & MARIO_METAL_CAP)) {
-        m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+        m->hurtCounter += ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
     }
 
     play_sound(SOUND_MARIO_ON_FIRE, m->marioObj->header.gfx.cameraToObject);
@@ -267,7 +267,7 @@ void update_flying_yaw(struct MarioState *m) {
     }
 
     m->faceAngle[1] += m->angleVel[1];
-    m->faceAngle[2] = 20 * -m->angleVel[1];
+    m->faceAngle[2] = (20 * -m->angleVel[1]);
 }
 
 void update_flying_pitch(struct MarioState *m) {
@@ -319,9 +319,9 @@ void update_flying(struct MarioState *m) {
 
     m->faceAngle[0] = CLAMP(m->faceAngle[0], -DEGREES(60), DEGREES(60));
 
-    m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
-    m->vel[1] = m->forwardVel * sins(m->faceAngle[0]);
-    m->vel[2] = m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]);
+    m->vel[0] = (m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]));
+    m->vel[1] = (m->forwardVel * sins(m->faceAngle[0])                        );
+    m->vel[2] = (m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]));
 
     m->slideVelX = m->vel[0];
     m->slideVelZ = m->vel[2];
@@ -408,7 +408,7 @@ s32 act_jump(struct MarioState *m) {
 
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0);
     common_air_action_step(m, ACT_JUMP_LAND, MARIO_ANIM_SINGLE_JUMP,
-                           AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG);
+                           (AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG));
     return FALSE;
 }
 
@@ -1466,8 +1466,9 @@ s32 act_lava_boost(struct MarioState *m) {
     }
 
     set_mario_animation(m, MARIO_ANIM_FIRE_LAVA_BURN);
-    if ((m->area->terrainType & TERRAIN_MASK) != TERRAIN_SNOW && !(m->flags & MARIO_METAL_CAP)
-        && m->vel[1] > 0.0f) {
+    if (((m->area->terrainType & TERRAIN_MASK) != TERRAIN_SNOW)
+     && !(m->flags & MARIO_METAL_CAP)
+     && (m->vel[1] > 0.0f)) {
         m->particleFlags |= PARTICLE_FIRE;
         if (m->actionState == ACT_STATE_LAVA_BOOST_HIT_LAVA) {
             play_sound(SOUND_MOVING_LAVA_BURN, m->marioObj->header.gfx.cameraToObject);

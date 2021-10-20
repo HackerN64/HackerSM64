@@ -461,7 +461,7 @@ s32 act_hanging(struct MarioState *m) {
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
 
-    if (m->actionArg & 1) {
+    if (m->actionArg & 0x1) {
         set_mario_animation(m, MARIO_ANIM_HANDSTAND_LEFT);
     } else {
         set_mario_animation(m, MARIO_ANIM_HANDSTAND_RIGHT);
@@ -488,9 +488,9 @@ s32 act_hang_moving(struct MarioState *m) {
     }
 
 #ifdef BETTER_HANGING
-    set_mario_anim_with_accel(m, ((m->actionArg & 1) ? MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT : MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT), ((m->forwardVel + 1.0f) * 0x2000));
+    set_mario_anim_with_accel(m, ((m->actionArg & 0x1) ? MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT : MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT), ((m->forwardVel + 1.0f) * 0x2000));
 #else
-    set_mario_animation(m, ((m->actionArg & 1) ? MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT : MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT));
+    set_mario_animation(m, ((m->actionArg & 0x1) ? MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT : MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT));
 #endif
 
     if (m->marioObj->header.gfx.animInfo.animFrame == 12) {
@@ -526,10 +526,10 @@ s32 act_hang_moving(struct MarioState *m) {
 s32 let_go_of_ledge(struct MarioState *m) {
     struct Surface *floor;
 
-    m->vel[1] = 0.0f;
+    m->vel[1]     =  0.0f;
     m->forwardVel = -8.0f;
-    m->pos[0] -= 60.0f * sins(m->faceAngle[1]);
-    m->pos[2] -= 60.0f * coss(m->faceAngle[1]);
+    m->pos[0] -= (60.0f * sins(m->faceAngle[1]));
+    m->pos[2] -= (60.0f * coss(m->faceAngle[1]));
 
     f32 floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
     if (floorHeight < (m->pos[1] - 100.0f)) {
@@ -543,22 +543,17 @@ s32 let_go_of_ledge(struct MarioState *m) {
 
 void climb_up_ledge(struct MarioState *m) {
     set_mario_animation(m, MARIO_ANIM_IDLE_HEAD_LEFT);
-    m->pos[0] += 14.0f * sins(m->faceAngle[1]);
-    m->pos[2] += 14.0f * coss(m->faceAngle[1]);
+    m->pos[0] += (14.0f * sins(m->faceAngle[1]));
+    m->pos[2] += (14.0f * coss(m->faceAngle[1]));
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
 }
 
 void update_ledge_climb_camera(struct MarioState *m) {
-    f32 dist;
+    f32 dist = MIN(m->actionTimer, 14.0f);
 
-    if (m->actionTimer < 14) {
-        dist = m->actionTimer;
-    } else {
-        dist = 14.0f;
-    }
-    m->statusForCamera->pos[0] = m->pos[0] + (dist * sins(m->faceAngle[1]));
-    m->statusForCamera->pos[2] = m->pos[2] + (dist * coss(m->faceAngle[1]));
-    m->statusForCamera->pos[1] = m->pos[1];
+    m->statusForCamera->pos[0] = (m->pos[0] + (dist * sins(m->faceAngle[1])));
+    m->statusForCamera->pos[2] = (m->pos[2] + (dist * coss(m->faceAngle[1])));
+    m->statusForCamera->pos[1] =  m->pos[1];
     m->actionTimer++;
     m->flags |= MARIO_LEDGE_CLIMB_CAMERA;
 }
@@ -595,7 +590,7 @@ s32 act_ledge_grab(struct MarioState *m) {
 
     if (m->input & INPUT_STOMPED) {
         if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_KNOCKBACK_DMG) {
-            m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+            m->hurtCounter += ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
         }
         return let_go_of_ledge(m);
     }
@@ -629,9 +624,8 @@ s32 act_ledge_climb_slow(struct MarioState *m) {
         return let_go_of_ledge(m);
     }
 
-    if (m->actionTimer >= 28
-        && (m->input
-            & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED | INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE))) {
+    if ((m->actionTimer >= 28)
+        && (m->input & (INPUT_NONZERO_ANALOG | INPUT_A_PRESSED | INPUT_OFF_FLOOR | INPUT_ABOVE_SLIDE))) {
         climb_up_ledge(m);
         return check_common_action_exits(m);
     }
@@ -682,7 +676,7 @@ s32 act_ledge_climb_fast(struct MarioState *m) {
 
 s32 act_grabbed(struct MarioState *m) {
     if (m->marioObj->oInteractStatus & INT_STATUS_MARIO_THROWN_BY_OBJ) {
-        s32 thrown = (m->marioObj->oInteractStatus & INT_STATUS_MARIO_DROPPED_BY_OBJ) == 0;
+        s32 thrown = ((m->marioObj->oInteractStatus & INT_STATUS_MARIO_DROPPED_BY_OBJ) == 0);
 
         m->faceAngle[1] = m->usedObj->oMoveAngleYaw;
         vec3f_copy(m->pos, m->marioObj->header.gfx.pos);
@@ -744,7 +738,7 @@ s32 act_in_cannon(struct MarioState *m) {
                 m->vel[1] = (100.0f * sins(m->faceAngle[0]));
 
                 m->pos[0] += (120.0f * coss(m->faceAngle[0]) * sins(m->faceAngle[1]));
-                m->pos[1] += (120.0f * sins(m->faceAngle[0]));
+                m->pos[1] += (120.0f * sins(m->faceAngle[0])                        );
                 m->pos[2] += (120.0f * coss(m->faceAngle[0]) * coss(m->faceAngle[1]));
 
                 play_sound(SOUND_ACTION_FLYING_FAST, m->marioObj->header.gfx.cameraToObject);

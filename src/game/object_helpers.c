@@ -963,8 +963,7 @@ static s32 cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlop
         // - We are above the target floor (most likely in the air)
         o->oPosX = intendedX;
         o->oPosZ = intendedZ;
-        //! Returning FALSE but moving anyway (not exploitable; return value is
-        //  never used)
+        //! Returning FALSE but moving anyway (not exploitable; return value is never used)
     }
 
     // We are likely trying to move onto a steep upward slope

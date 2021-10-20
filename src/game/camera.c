@@ -1155,9 +1155,9 @@ s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     vec3_copy_y_off(marioPos, sMarioCamState->pos, (150.f + marioFloorDist));
 
     // Calculate middle of the path (parScale is 0.5f)
-    parMidPoint[0] = path[0][0] + (path[1][0] - path[0][0]) * parScale;
-    parMidPoint[1] = path[0][1] + (path[1][1] - path[0][1]) * parScale;
-    parMidPoint[2] = path[0][2] + (path[1][2] - path[0][2]) * parScale;
+    parMidPoint[0] = (path[0][0] + ((path[1][0] - path[0][0]) * parScale));
+    parMidPoint[1] = (path[0][1] + ((path[1][1] - path[0][1]) * parScale));
+    parMidPoint[2] = (path[0][2] + ((path[1][2] - path[0][2]) * parScale));
 
     // Get direction of path
     vec3f_get_dist_and_angle(path[0], path[1], &pathLength, &pathPitch, &pathYaw);
@@ -1554,13 +1554,8 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     // Determine the yaw speed based on absPitch. A higher absPitch (further away from looking straight)
     // translates to a slower speed
     // Note: Pitch is always within +- 90 degrees or +-0x4000, and 0x4000 / 0x200 = 32
-    yawSpeed = 32 - absPitch / 0x200;
-    if (yawSpeed < 1) {
-        yawSpeed = 1;
-    }
-    if (yawSpeed > 32) {
-        yawSpeed = 32;
-    }
+    yawSpeed = (32 - (absPitch / 0x200));
+    yawSpeed = CLAMP(yawSpeed, 1, 32);
 
     if (sCSideButtonYaw != 0) {
         camera_approach_s16_symmetric_bool(&sCSideButtonYaw, 0, 1);
@@ -2088,7 +2083,7 @@ s32 update_default_camera(struct Camera *c) {
     }
     if (ceilHeight != CELL_HEIGHT_LIMIT) {
         if (c->pos[1] > (ceilHeight -= 150.f)
-            && (avoidStatus = is_range_behind_surface(c->pos, sMarioCamState->pos, ceil, 0, -1)) == 1) {
+            && (avoidStatus = is_range_behind_surface(c->pos, sMarioCamState->pos, ceil, 0, -1))) {
             c->pos[1] = ceilHeight;
         }
     }
@@ -5350,8 +5345,7 @@ void surface_type_modes_thi(struct Camera *c) {
 /**
  * Terminates a list of CameraTriggers.
  */
-#define NULL_TRIGGER                                                                                    \
-    { 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
+#define NULL_TRIGGER { 0, NULL, 0, 0, 0, 0, 0, 0, 0 }
 
 /**
  * The SL triggers operate camera behavior in front of the snowman who blows air.
@@ -5727,7 +5721,7 @@ s32 camera_course_processing(struct Camera *c) {
 
                 // Check if Mario is inside the bounds
                 if (is_pos_in_bounds(sMarioCamState->pos, center, bounds,
-                                                   sCameraTriggers[level][b].boundsYaw) == TRUE) {
+                                                   sCameraTriggers[level][b].boundsYaw)) {
                     //! This should be checked before calling is_pos_in_bounds. (It doesn't belong
                     //! outside the while loop because some events disable area processing)
                     if (!(sStatusFlags & CAM_FLAG_BLOCK_AREA_PROCESSING)) {
@@ -8189,8 +8183,10 @@ void cutscene_non_painting_set_cam_pos(struct Camera *c) {
  */
 void cutscene_non_painting_set_cam_focus(struct Camera *c) {
     offset_rotated(c->focus, sCutsceneVars[7].point, sCutsceneVars[6].point, sCutsceneVars[7].angle);
-    if ((gPrevLevel == LEVEL_COTMC) || (gPrevLevel == LEVEL_HMC) || (gPrevLevel == LEVEL_RR)
-        || (gPrevLevel == LEVEL_WMOTR)) {
+    if ((gPrevLevel == LEVEL_COTMC)
+     || (gPrevLevel == LEVEL_HMC  )
+     || (gPrevLevel == LEVEL_RR   )
+     || (gPrevLevel == LEVEL_WMOTR)) {
         c->focus[0] = c->pos[0] + ((sMarioCamState->pos[0] - c->pos[0]) * 0.7f);
         c->focus[1] = c->pos[1] + ((sMarioCamState->pos[1] - c->pos[1]) * 0.4f);
         c->focus[2] = c->pos[2] + ((sMarioCamState->pos[2] - c->pos[2]) * 0.7f);

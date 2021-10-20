@@ -2803,7 +2803,7 @@ void store_in_pickbuf(s16 data) {
 ** in the pick buf is a tupple of three halves: (datasize, objtype, objnumber)
 ** (datasize is always 2) */
 s32 get_cur_pickbuf_offset(UNUSED s16 *arg0) {
-    return sPickBufPosition / 3;
+    return (sPickBufPosition / 3);
 }
 
 /* 254328 -> 2543B8; orig name: func_801A5B58 */

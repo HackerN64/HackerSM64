@@ -1104,7 +1104,7 @@ u32 interact_flame(struct MarioState *m, UNUSED u32 interactType, struct Object 
         m->interactObj       = obj;
 
         if ((m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))
-            || m->waterLevel - m->pos[1] > 50.0f) {
+            || ((m->waterLevel - m->pos[1]) > 50.0f)) {
             play_sound(SOUND_GENERAL_FLAME_OUT, m->marioObj->header.gfx.cameraToObject);
         } else {
             m->marioObj->oMarioBurnTimer = 0;
@@ -1423,7 +1423,7 @@ u32 interact_koopa_shell(struct MarioState *m, UNUSED u32 interactType, struct O
 u32 check_object_grab_mario(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
     if ((!(m->action & (ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ATTACKING)) || !sInvulnerable)
         && (obj->oInteractionSubtype & INT_SUBTYPE_GRABS_MARIO)) {
-        if (object_facing_mario(m, obj, 0x2AAA)) {
+        if (object_facing_mario(m, obj, DEGREES(60))) {
             mario_stop_riding_and_holding(m);
             obj->oInteractStatus = INT_STATUS_INTERACTED | INT_STATUS_GRABBED_MARIO;
 
@@ -1453,7 +1453,7 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
 
             f32 velConv = m->forwardVel; // conserve the velocity.
             Angle dAngleToPole = (mario_obj_angle_to_object(m, obj) - m->faceAngle[1]);
-            if ((dAngleToPole < -0x2AAA) || (dAngleToPole > 0x2AAA)) return FALSE;
+            if ((dAngleToPole < -DEGREES(60)) || (dAngleToPole > DEGREES(60))) return FALSE;
 #elif defined(VERSION_SH) || defined(SHINDOU_POLES)
             f32 velConv = m->forwardVel; // conserve the velocity.
 #else
@@ -1478,7 +1478,7 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
             if (lowSpeed) return set_mario_action(m, ACT_GRAB_POLE_SLOW, 0);
 
 #if defined(VERSION_SH) || defined(SHINDOU_POLES)
-            m->angleVel[1] = (s32)(velConv * 0x100 + 0x1000);
+            m->angleVel[1] = (s32)((velConv * 0x100) + 0x1000);
 #else
             m->angleVel[1] = 0x1000;
 #endif

@@ -451,7 +451,7 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
     s32 starByte = COURSE_NUM_TO_INDEX(starIndex / 7);
     s32 starFlag = (1 << (starIndex % 7));
 #else
-    s32 starFlag = 1 << starIndex;
+    s32 starFlag = (1 << starIndex);
 #endif
 
     gLastCompletedCourseNum     = (courseIndex + 1);
@@ -460,7 +460,7 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
     gGotFileCoinHiScore         = FALSE;
 
     if (courseIndex >= COURSE_NUM_TO_INDEX(COURSE_MIN)
-        && courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
+     && courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
         //! Compares the coin score as a 16 bit value, but only writes the 8 bit
         // truncation. This can allow a high score to decrease.
 
