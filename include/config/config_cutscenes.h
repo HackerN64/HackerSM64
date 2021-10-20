@@ -1,4 +1,4 @@
-#pragma cutscene_conf
+#pragma once
 
 /*********************
  * CUTSCENE SETTINGS *

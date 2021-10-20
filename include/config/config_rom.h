@@ -1,4 +1,4 @@
-#pragma rom_config
+#pragma once
 
 /****************
  * ROM SETTINGS *

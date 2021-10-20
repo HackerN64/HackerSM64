@@ -1,4 +1,4 @@
-#pragma debug_conf
+#pragma once
 
 /******************
  * DEBUG SETTINGS *

@@ -1,4 +1,4 @@
-#pragma object_conf
+#pragma once
 
 /****************************
  * SPECIFIC OBJECT SETTINGS *

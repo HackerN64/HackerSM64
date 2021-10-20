@@ -1,5 +1,4 @@
-#pragma goddard_conf
-
+#pragma once
 
 /********************
  * GODDARD SETTINGS *

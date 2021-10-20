@@ -1,4 +1,4 @@
-#pragma menu_conf
+#pragma once
 
 /*****************
  * MENU SETTINGS *
