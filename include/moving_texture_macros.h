@@ -3,10 +3,6 @@
 
 #include "game/moving_texture.h"
 
-// Moving Texture rotations
-#define ROTATE_CLOCKWISE         0
-#define ROTATE_COUNTER_CLOCKWISE 1
-
 // Moving texture load quad tris start
 #define MOV_TEX_INIT_LOAD(amount) \
     amount, 0

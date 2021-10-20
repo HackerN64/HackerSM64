@@ -7,6 +7,16 @@
 #include "config.h"
 #include "game/puppylights.h"
 
+enum LevelActs {
+    ACT_1 = (1 << 0),
+    ACT_2 = (1 << 1),
+    ACT_3 = (1 << 2),
+    ACT_4 = (1 << 3),
+    ACT_5 = (1 << 4),
+    ACT_6 = (1 << 5),
+    ALL_ACTS = (ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6)
+};
+
 enum LevelCommandEvalOperation {
     OP_AND,
     OP_NAND,
@@ -31,8 +41,10 @@ enum LevelCommandVar {
     VAR_CURR_AREA_INDEX
 };
 
-#define WARP_CHECKPOINT    (1 << 7) // 0x80
-#define WARP_NO_CHECKPOINT (0 << 7) // 0x00
+enum WarpFlags {
+    WARP_NO_CHECKPOINT = (0 << 0), // 0x00
+    WARP_CHECKPOINT    = (1 << 7), // 0x80
+};
 
 enum LevelCommandCreateWhirlpoolCondition {
     WHIRLPOOL_COND_ALWAYS,
@@ -43,8 +55,8 @@ enum LevelCommandCreateWhirlpoolCondition {
 
 // Head defines
 enum GoddardScene {
-    REGULAR_FACE = 0x0002,
-    DIZZY_FACE   = 0x0003,
+    REGULAR_FACE = 0x2,
+    DIZZY_FACE   = 0x3,
 };
 
 #ifdef NO_SEGMENTED_MEMORY

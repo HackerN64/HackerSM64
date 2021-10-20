@@ -3,7 +3,7 @@
 
 // Sometimes a sequence id is represented as one of the below ids (the base id),
 // optionally OR'd with SEQ_VARIATION.
-#define SEQ_BASE_ID 0x7f
+#define SEQ_BASE_ID   0x7F
 #define SEQ_VARIATION 0x80
 
 #define SEQ_MENU_GAME_OVER (SEQ_MENU_TITLE_SCREEN | SEQ_VARIATION)

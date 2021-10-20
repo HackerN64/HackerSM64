@@ -5,6 +5,13 @@
 #include "behavior_data.h"
 #include "model_ids.h"
 
+enum CoinFormationFlags {
+    COIN_FORMATION_FLAG_VERTICAL = (1 << 0),
+    COIN_FORMATION_FLAG_RING     = (1 << 1),
+    COIN_FORMATION_FLAG_ARROW    = (1 << 2),
+    COIN_FORMATION_FLAG_FLYING   = (1 << 4),
+};
+
 struct MacroPreset {
     /*0x00*/ const BehaviorScript *behavior;
     /*0x04*/ ModelID16 model;

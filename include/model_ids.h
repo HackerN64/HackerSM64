@@ -1,26 +1,12 @@
 #ifndef MODEL_IDS_H
 #define MODEL_IDS_H
 
-#define ACT_1 (1 << 0)
-#define ACT_2 (1 << 1)
-#define ACT_3 (1 << 2)
-#define ACT_4 (1 << 3)
-#define ACT_5 (1 << 4)
-#define ACT_6 (1 << 5)
-
-#define ALL_ACTS (ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6)
-
-#define COIN_FORMATION_FLAG_VERTICAL  (1 << 0)
-#define COIN_FORMATION_FLAG_RING      (1 << 1)
-#define COIN_FORMATION_FLAG_ARROW     (1 << 2)
-#define COIN_FORMATION_FLAG_FLYING    (1 << 4)
-
-#define MODEL_NONE                        0x00
+#define MODEL_NONE                             0x00
 
 /* Global models that are loaded for every level */
 
-#define MODEL_MARIO                       0x01        // mario_geo
-#define MODEL_LUIGI                       0x02        // unused
+#define MODEL_MARIO                            0x01        // mario_geo
+#define MODEL_LUIGI                            0x02        // unused
 
 /* Various static level geometry, the geo layout differs but terrain object presets treat them the same.*/
 
