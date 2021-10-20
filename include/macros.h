@@ -71,6 +71,8 @@
 
 #define MODE_NTSC 0
 #define MODE_MPAL 1
-#define MODE_PAL 2
+#define MODE_PAL  2
+
+#define FORCE_CRASH { *(vs8*)0 = 0; }
 
 #endif // MACROS_H

@@ -127,42 +127,85 @@ enum DialogState {
 #define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
 
 /* oBehParams */
+
+/**
+ * behParams: oBehParams
+ * index: index of bparam in oBehParams
+ * val: bparam value
+ * num: number of bparams to read as one value
+ */
+// Number of bparams in oBehParams
+#define NUM_BPARAMS 4
+// Number of bits in one bparam
 #define BPARAM_SIZE 8
-#define BPARAM_MASK BITMASK(BPARAM_SIZE)
+// Number of bits in bparam bitmask
+#define BPARAM_MASK_SIZE(num) (BPARAM_SIZE * (num))
+// bparam bitmask ('num' 1 -> 0xFF, 'num' 2 -> 0xFFFF, etc.)
+#define BPARAM_MASK(num) BITMASK(BPARAM_MASK_SIZE(num))
+// Returns the amount of bits to shift a bparam value ('index' == bparam index)
+#define BPARAM_NSHIFT(index, num) (((NUM_BPARAMS - ((num) - 1)) - (index)) * BPARAM_SIZE)
+// Returns the bparam(s) value shifted to the index location in oBehParams
+#define SHIFTED_BPARAM(val, index, num) (((val) & BPARAM_MASK(num)) << BPARAM_NSHIFT((index), (num)))
+// Returns the bparam(s) value from the index location in oBehParams
+#define GET_BPARAMS(behParams, index, num) ((behParams >> BPARAM_NSHIFT((index), (num))) & BPARAM_MASK(num))
+// bparam mask shifted to the index location in oBehParams
+#define BPARAM_SHIFTED_MASK(index, num) (BPARAM_MASK(num) << BPARAM_NSHIFT((index), (num)))
+// oBehParams with the specified bparam(s) cleared
+#define CLEARED_BPARAM(behParams, index, num) ((behParams) & ~BPARAM_SHIFTED_MASK((index), (num)))
 
-#define BPARAM1_MASK (BPARAM_MASK << (BPARAM_SIZE * 3)) // 0xFF000000
-#define BPARAM2_MASK (BPARAM_MASK << (BPARAM_SIZE * 2)) // 0x00FF0000
-#define BPARAM3_MASK (BPARAM_MASK << (BPARAM_SIZE * 1)) // 0x0000FF00
-#define BPARAM4_MASK (BPARAM_MASK << (BPARAM_SIZE * 0)) // 0x000000FF
+// Get a u8 bparam from oBehParams
+#define GET_BPARAM1(behParams) GET_BPARAMS((behParams), 1, 1)
+#define GET_BPARAM2(behParams) GET_BPARAMS((behParams), 2, 1)
+#define GET_BPARAM3(behParams) GET_BPARAMS((behParams), 3, 1)
+#define GET_BPARAM4(behParams) GET_BPARAMS((behParams), 4, 1)
 
-// Convert oBehParams to a bparam
-#define OBEHPARAMS_TO_BPARAM(p, shift) (((p) >> (BPARAM_SIZE * (shift))) & BPARAM_MASK)
+// Read 2 bparams as a single value
+#define GET_BPARAM12(behParams) GET_BPARAMS((behParams), 1, 2)
+#define GET_BPARAM23(behParams) GET_BPARAMS((behParams), 2, 2)
+#define GET_BPARAM34(behParams) GET_BPARAMS((behParams), 3, 2)
 
-// Read a bparam from oBehParams
-#define GET_BPARAM1(p) OBEHPARAMS_TO_BPARAM((p), 3)
-#define GET_BPARAM2(p) OBEHPARAMS_TO_BPARAM((p), 2)
-#define GET_BPARAM3(p) OBEHPARAMS_TO_BPARAM((p), 1)
-#define GET_BPARAM4(p) OBEHPARAMS_TO_BPARAM((p), 0)
+// Read 3 bparams as a single value
+#define GET_BPARAM123(behParams) GET_BPARAMS((behParams), 1, 3)
+#define GET_BPARAM234(behParams) GET_BPARAMS((behParams), 2, 3)
 
-// Read two bparams as a single value from oBehParams
-#define GET_BPARAM12(p) (((p) & (BPARAM1_MASK | BPARAM2_MASK)) >> (BPARAM_SIZE * 2))
-#define GET_BPARAM23(p) (((p) & (BPARAM2_MASK | BPARAM3_MASK)) >> (BPARAM_SIZE * 1))
-#define GET_BPARAM34(p) (((p) & (BPARAM3_MASK | BPARAM4_MASK)) >> (BPARAM_SIZE * 0))
+// Read 4 bparams as a single value
+#define GET_BPARAM1234(behParams) (behParams)
 
-// Convert a u8 bparam to oBehParams
-#define BPARAM_TO_OBEHPARAMS(val, shift) (((val) & BPARAM_MASK) << (BPARAM_SIZE * (shift)))
+// Set a bparam in oBehParams without overwriting other bparams
+#define SET_BPARAM(behParams, val, index, num) (behParams) = (CLEARED_BPARAM((behParams), (index), (num)) | SHIFTED_BPARAM((val), (index), (num)))
+#define SET_BPARAM1(behParams, val) SET_BPARAM((behParams), (val), 1, 1)
+#define SET_BPARAM2(behParams, val) SET_BPARAM((behParams), (val), 2, 1)
+#define SET_BPARAM3(behParams, val) SET_BPARAM((behParams), (val), 3, 1)
+#define SET_BPARAM4(behParams, val) SET_BPARAM((behParams), (val), 4, 1)
 
-// Set oBehParams
-#define SET_BPARAM1(p, val) (p) = BPARAM_TO_OBEHPARAMS((val), 3)
-#define SET_BPARAM2(p, val) (p) = BPARAM_TO_OBEHPARAMS((val), 2)
-#define SET_BPARAM3(p, val) (p) = BPARAM_TO_OBEHPARAMS((val), 1)
-#define SET_BPARAM4(p, val) (p) = BPARAM_TO_OBEHPARAMS((val), 0)
+// Set a bparam in oBehParams, clearing other bparams
+#define SET_FULL_BPARAM(behParams, val, index, num) (behParams) = SHIFTED_BPARAM((val), (index), (num)))
+#define SET_FULL_BPARAM1(behParams, val) SET_FULL_BPARAM((behParams), (val), 1, 1)
+#define SET_FULL_BPARAM2(behParams, val) SET_FULL_BPARAM((behParams), (val), 2, 1)
+#define SET_FULL_BPARAM3(behParams, val) SET_FULL_BPARAM((behParams), (val), 3, 1)
+#define SET_FULL_BPARAM4(behParams, val) SET_FULL_BPARAM((behParams), (val), 4, 1)
 
-// OR oBehParams
-#define OR_BPARAM1(p, val) (p) |= BPARAM_TO_OBEHPARAMS((val), 3)
-#define OR_BPARAM2(p, val) (p) |= BPARAM_TO_OBEHPARAMS((val), 2)
-#define OR_BPARAM3(p, val) (p) |= BPARAM_TO_OBEHPARAMS((val), 1)
-#define OR_BPARAM4(p, val) (p) |= BPARAM_TO_OBEHPARAMS((val), 0)
+// OR a bparam into an index in oBehParams
+#define OR_BPARAM(behParams, val, index, num) (behParams) |= SHIFTED_BPARAM((val), (index), (num))
+#define OR_BPARAM1(behParams, val) OR_BPARAM((behParams), (val), 1, 1)
+#define OR_BPARAM2(behParams, val) OR_BPARAM((behParams), (val), 2, 1)
+#define OR_BPARAM3(behParams, val) OR_BPARAM((behParams), (val), 3, 1)
+#define OR_BPARAM4(behParams, val) OR_BPARAM((behParams), (val), 4, 1)
+
+// NAND a bparam into an index in oBehParams
+#define NAND_BPARAM(behParams, val, index, num) (behParams) &= ~SHIFTED_BPARAM((val), (index), (num))
+#define NAND_BPARAM1(behParams, val) NAND_BPARAM((behParams), (val), 1, 1)
+#define NAND_BPARAM2(behParams, val) NAND_BPARAM((behParams), (val), 2, 1)
+#define NAND_BPARAM3(behParams, val) NAND_BPARAM((behParams), (val), 3, 1)
+#define NAND_BPARAM4(behParams, val) NAND_BPARAM((behParams), (val), 4, 1)
+
+// Current object bparams
+#define BPARAM1 GET_BPARAM1(o->oBehParams)
+#define BPARAM2 GET_BPARAM2(o->oBehParams)
+#define BPARAM3 GET_BPARAM3(o->oBehParams)
+#define BPARAM4 GET_BPARAM4(o->oBehParams)
+
+
 
 /* oBehParams2ndByte */
 enum ObjGeneralBehParams {
@@ -1402,19 +1445,21 @@ enum BehParam1StarAct { // BPARAM1
 
 /* Goomba triplet spawner */
     /* oBehParams2ndByte */
-    #define GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK             0x00000003
-    #define GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK    0x000000FC
+    #define GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK             0x03
+    #define GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK    0xFC
     /* oAction */
     #define GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED             0x0
     #define GOOMBA_TRIPLET_SPAWNER_ACT_LOADED               0x1
 
 /* Goomba */
     /* oBehParams2ndByte */
-    #define GOOMBA_SIZE_REGULAR                             0x0
-    #define GOOMBA_SIZE_HUGE                                0x1
-    #define GOOMBA_SIZE_TINY                                0x2
-    #define GOOMBA_BP_SIZE_MASK                             0x3
-    #define GOOMBA_BP_TRIPLET_FLAG_MASK                     0x000000FC
+    #define GOOMBA_SIZE_REGULAR                             0x00
+    #define GOOMBA_SIZE_HUGE                                0x01
+    #define GOOMBA_SIZE_TINY                                0x02
+    #define GOOMBA_BP_SIZE_MASK                             0x03
+    #define GOOMBA_BP_TRIPLET_FLAG_MASK                     0xFC
+    /* BPARAM3 */
+    #define GOOMBA_BP3_IS_FLOOMBA                           (1 << 7)
     /* oAction */
     #define GOOMBA_ACT_WALK                                 0x0
     #define GOOMBA_ACT_ATTACKED_MARIO                       0x1
