@@ -1,4 +1,4 @@
-#pragma once
+#pragma collision_conf
 
 /**********************
  * COLLISION SETTINGS *
