@@ -1,4 +1,4 @@
-#pragma once
+#pragma graphics_conf
 
 /*********************
  * GRAPHICS SETTINGS *
