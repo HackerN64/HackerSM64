@@ -210,7 +210,7 @@ void load_level_init_text(u32 arg) {
 
         default:
             gotAchievement =
-                save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+                save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
             break;
     }
 
@@ -472,7 +472,8 @@ void warp_credits(struct MarioState *m) {
 }
 
 void check_instant_warp(struct MarioState *m) {
-    if (gCurrLevelNum == LEVEL_CASTLE && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 70) {
+    // Infinite Stairs
+    if ((gCurrLevelNum == LEVEL_CASTLE) && (save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 70)) {
         return;
     }
 
@@ -1248,7 +1249,7 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
      && (gCurrLevelNum != LEVEL_BOWSER_3)) {
         gMarioState->numCoins = 0;
         gHudDisplay.coins     = 0;
-        gCurrCourseStarFlags  = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+        gCurrCourseStarFlags  = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
     }
 
     if (gSavedCourseNum != gCurrCourseNum) {
