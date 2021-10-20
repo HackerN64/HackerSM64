@@ -3,8 +3,7 @@
 
 #include <PR/ultratypes.h>
 
-enum BhvProc
-{
+enum BhvProc {
     BHV_PROC_CONTINUE,
     BHV_PROC_BREAK
 };

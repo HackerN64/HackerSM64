@@ -15,8 +15,7 @@
 #define SOUND_MENU_FLAG_CAMERAZOOMOUT   (1 << 7) // 0x080
 #define SOUND_MENU_FLAG_EXTRA           (1 << 8) // 0x100
 
-enum SoundMenuMode
-{
+enum SoundMenuMode {
     SOUND_MENU_MODE_STEREO,
     SOUND_MENU_MODE_MONO,
     SOUND_MENU_MODE_HEADSET

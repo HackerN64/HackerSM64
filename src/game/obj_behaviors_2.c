@@ -49,8 +49,7 @@
 
 //! TODO: remove static
 
-enum ObjPositionOperation
-{
+enum ObjPositionOperation {
     POS_OP_SAVE_POSITION,
     POS_OP_COMPUTE_VELOCITY,
     POS_OP_RESTORE_POSITION

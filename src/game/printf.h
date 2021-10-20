@@ -2,8 +2,7 @@
 #define _PRINTF_H_
 #include <stdarg.h>
 
-typedef struct
-{
+typedef struct {
     union {
         /* 00 */ s64 s64;
         u64 u64;

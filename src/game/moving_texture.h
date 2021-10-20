@@ -6,8 +6,7 @@
 #include "macros.h"
 #include "types.h"
 
-enum MovtexRotations
-{
+enum MovtexRotations {
     ROTATE_CLOCKWISE,
     ROTATE_COUNTER_CLOCKWISE
 };

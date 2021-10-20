@@ -7,8 +7,7 @@
 #include "macros.h"
 #include "types.h"
 
-enum GeoCommandFlags
-{
+enum GeoCommandFlags {
     GEO_CMD_FLAGS_RESET,
     GEO_CMD_FLAGS_SET,
     GEO_CMD_FLAGS_CLEAR

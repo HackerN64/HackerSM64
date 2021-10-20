@@ -54,8 +54,7 @@ u8 textPressL[]       = { TEXT_HUD_PRESS_L           };
 s16 gInGameLanguage = LANGUAGE_ENGLISH;
 s16 gLoadedLanguage = LANGUAGE_ENGLISH;
 
-void *languageTable[][3] =
-{
+void *languageTable[][3] = {
     {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table}, // In EU, this is just mirroring English.
 #if MULTILANG
     {&dialog_table_eu_en, &course_name_table_eu_en, &act_name_table_eu_en},

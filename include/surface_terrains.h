@@ -238,8 +238,7 @@
 #define SURFACE_IS_WARP(cmd)                    (SURFACE_IS_PAINTING_WARP(cmd) || SURFACE_IS_INSTANT_WARP(cmd) || cmd == SURFACE_LOOK_UP_WARP || cmd == SURFACE_WOBBLING_WARP)
 #define SURFACE_IS_UNSAFE(cmd)                  (SURFACE_IS_QUICKSAND(cmd) || cmd == SURFACE_BURNING || SURFACE_IS_WARP(cmd))
 
-enum SurfaceClass
-{
+enum SurfaceClass {
     SURFACE_CLASS_DEFAULT,
     SURFACE_CLASS_VERY_SLIPPERY = 0x0013,
     SURFACE_CLASS_SLIPPERY,
@@ -252,8 +251,7 @@ enum SurfaceClass
 
 // These are effectively unique "surface" types like those defined higher
 // And they are used as collision commands to load certain functions
-enum TerrainLoadCmd
-{
+enum TerrainLoadCmd {
     TERRAIN_LOAD_VERTICES = 0x40, // Begins vertices list for collision triangles
     TERRAIN_LOAD_CONTINUE,        // Stop loading vertices but continues to load other collision commands
     TERRAIN_LOAD_END,             // End the collision list
@@ -265,8 +263,7 @@ enum TerrainLoadCmd
 #define TERRAIN_LOAD_IS_SURFACE_TYPE_HIGH(cmd) (cmd >= 0x65)
 
 // Terrain types defined by the level script command terrain_type (cmd_31)
-enum TerrainType
-{
+enum TerrainType {
     TERRAIN_GRASS,
     TERRAIN_STONE,
     TERRAIN_SNOW,

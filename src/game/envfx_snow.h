@@ -4,8 +4,7 @@
 #include <PR/ultratypes.h>
 #include "types.h"
 
-enum EnvFxMode
-{
+enum EnvFxMode {
     ENVFX_MODE_NONE,         // no effects
     ENVFX_SNOW_NORMAL,       // CCM, SL
     ENVFX_SNOW_WATER,        // Secret Aquarium, Sunken Ship

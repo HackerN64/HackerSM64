@@ -7,8 +7,7 @@
 #include "macros.h"
 
 // TODO: make this an enum without causing bss reordering
-enum GdColours
-{
+enum GdColours {
     COLOUR_BLACK,
     COLOUR_WHITE,
     COLOUR_RED,

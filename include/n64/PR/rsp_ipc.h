@@ -20,8 +20,7 @@
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
 
-typedef enum
-{
+typedef enum {
     CMD_NULL,
     CMD_CMD,
     CMD_QUIT,
@@ -32,8 +31,7 @@ typedef enum
     CMD_LAST
 } rsp_shm_cmd_t;
 
-typedef struct
-{
+typedef struct {
     unsigned long int	dram[(2048 * 1024)>>2];	/* share DRAM */
     /*
      * howardc - Keep buff right after the dram to keep it 64b aligned. This

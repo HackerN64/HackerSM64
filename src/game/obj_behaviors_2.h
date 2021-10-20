@@ -5,8 +5,7 @@
 
 #include "types.h"
 
-enum AttackHandler
-{
+enum AttackHandler {
     ATTACK_HANDLER_NOP,
     ATTACK_HANDLER_DIE_IF_HEALTH_NON_POSITIVE,
     ATTACK_HANDLER_KNOCKBACK,

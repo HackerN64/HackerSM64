@@ -17,8 +17,7 @@
 #define SCREEN_CENTER_X (SCREEN_WIDTH  / 2)
 #define SCREEN_CENTER_Y (SCREEN_HEIGHT / 2)
 
-struct Config
-{
+struct Config {
     f32 audioFrequency;
 #ifdef WIDE
     s16 widescreen;

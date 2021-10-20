@@ -62,8 +62,7 @@
 
 // Passed as first argument to a GraphNodeFunc to give information about in
 // which context it was called and what it is expected to do.
-enum GeoContext
-{
+enum GeoContext {
     GEO_CONTEXT_CREATE,      // called when node is created from a geo command
     GEO_CONTEXT_RENDER,      // called from rendering_graph_node.c
     GEO_CONTEXT_AREA_UNLOAD, // called when unloading an area
@@ -243,8 +242,7 @@ struct GraphNodeAnimatedPart {
     /*0x18*/ Vec3s translation;
 };
 
-struct GraphNodeBone
-{
+struct GraphNodeBone {
     struct GraphNode node;
     void *displayList;
     Vec3s translation;

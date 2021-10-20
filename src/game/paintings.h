@@ -21,8 +21,7 @@
 #define DDD_FLAG_BACK               (1 << 0) // 0x1
 #define DDD_FLAG_BOWSERS_SUB_BEATEN (1 << 1) // 0x2
 
-enum PaintingState
-{
+enum PaintingState {
     PAINTING_IDLE,
     PAINTING_RIPPLE,
     PAINTING_ENTERED
@@ -31,8 +30,7 @@ enum PaintingState
 #define RIPPLE_TRIGGER_PROXIMITY  10
 #define RIPPLE_TRIGGER_CONTINUOUS 20
 
-enum PaintingType
-{
+enum PaintingType {
     /// Painting that uses 1 or more images as a texture
     PAINTING_IMAGE,
     /// Painting that has one texture used for an environment map effect

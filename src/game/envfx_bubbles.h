@@ -4,8 +4,7 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
 
-enum EnvfxBubblesState
-{
+enum EnvfxBubblesState {
     ENVFX_STATE_UNUSED,
     // whirlpool / jetsream bubble source position
     ENVFX_STATE_SRC_X,

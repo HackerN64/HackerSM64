@@ -87,20 +87,17 @@
 #define CAM_MODE_LAKITU_WAS_ZOOMED_OUT  (1 << 1) // 0x02
 #define CAM_MODE_MARIO_SELECTED         (1 << 2) // 0x04
 
-enum CameraSelection
-{
+enum CameraSelection {
     CAM_SELECTION_MARIO = 1,
     CAM_SELECTION_FIXED = 2
 };
 
-enum CameraAngle
-{
+enum CameraAngle {
     CAM_ANGLE_MARIO  = 1,
     CAM_ANGLE_LAKITU = 2
 };
 
-enum CameraMode
-{
+enum CameraMode {
     CAMERA_MODE_NONE,
     CAMERA_MODE_RADIAL,
     CAMERA_MODE_OUTWARD_RADIAL,
@@ -176,8 +173,7 @@ enum CameraMode
 #define CAM_STATUS_MODE_GROUP   (CAM_STATUS_MARIO | CAM_STATUS_LAKITU | CAM_STATUS_FIXED)
 #define CAM_STATUS_C_MODE_GROUP (CAM_STATUS_C_DOWN | CAM_STATUS_C_UP)
 
-enum CameraShake
-{
+enum CameraShake {
     SHAKE_NONE,
     SHAKE_ATTACK,
     SHAKE_GROUND_POUND,
@@ -191,8 +187,7 @@ enum CameraShake
     SHAKE_SHOCK
 };
 
-enum CameraShakeEnv
-{
+enum CameraShakeEnv {
     SHAKE_ENV_NONE,
     SHAKE_ENV_EXPLOSION,
     SHAKE_ENV_BOWSER_THROW_BOUNCE,
@@ -206,8 +201,7 @@ enum CameraShakeEnv
     SHAKE_ENV_FALLING_BITS_PLAT
 };
 
-enum CameraShakeFov
-{
+enum CameraShakeFov {
     SHAKE_FOV_NONE,
     SHAKE_FOV_SMALL,
     SHAKE_FOV_UNUSED,
@@ -215,8 +209,7 @@ enum CameraShakeFov
     SHAKE_FOV_LARGE
 };
 
-enum CameraShakePos
-{
+enum CameraShakePos {
     SHAKE_POS_NONE,
     SHAKE_POS_SMALL,
     SHAKE_POS_MEDIUM,
@@ -224,8 +217,7 @@ enum CameraShakePos
     SHAKE_POS_BOWLING_BALL
 };
 
-enum Cutscenes
-{
+enum Cutscenes {
     CUTSCENE_NONE,
     CUTSCENE_DOOR_PULL = 130,
     CUTSCENE_DOOR_PUSH,

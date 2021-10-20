@@ -7,8 +7,7 @@
 #include "config.h"
 #include "game/puppylights.h"
 
-enum LevelCommandEvalOperation
-{
+enum LevelCommandEvalOperation {
     OP_AND,
     OP_NAND,
     OP_EQ,
@@ -19,14 +18,12 @@ enum LevelCommandEvalOperation
     OP_GEQ
 };
 
-enum LevelCommandGetOrSet
-{
+enum LevelCommandGetOrSet {
     OP_SET,
     OP_GET
 };
 
-enum LevelCommandVar
-{
+enum LevelCommandVar {
     VAR_CURR_SAVE_FILE_NUM,
     VAR_CURR_COURSE_NUM,
     VAR_CURR_ACT_NUM,
@@ -37,8 +34,7 @@ enum LevelCommandVar
 #define WARP_CHECKPOINT    (1 << 7) // 0x80
 #define WARP_NO_CHECKPOINT (0 << 7) // 0x00
 
-enum LevelCommandCreateWhirlpoolCondition
-{
+enum LevelCommandCreateWhirlpoolCondition {
     WHIRLPOOL_COND_ALWAYS,
     WHIRLPOOL_COND_BOWSER2_NOT_BEATEN,
     WHIRLPOOL_COND_BOWSER2_BEATEN,
@@ -46,8 +42,7 @@ enum LevelCommandCreateWhirlpoolCondition
 };
 
 // Head defines
-enum GoddardScene
-{
+enum GoddardScene {
     REGULAR_FACE = 0x0002,
     DIZZY_FACE   = 0x0003,
 };
