@@ -168,9 +168,6 @@ enum DialogState {
 #define GET_BPARAM123(behParams) GET_BPARAMS((behParams), 1, 3)
 #define GET_BPARAM234(behParams) GET_BPARAMS((behParams), 2, 3)
 
-// Read 4 bparams as a single value
-#define GET_BPARAM1234(behParams) (behParams)
-
 // Set a bparam in oBehParams without overwriting other bparams
 #define SET_BPARAM(behParams, val, index, num) (behParams) = (CLEARED_BPARAM((behParams), (index), (num)) | SHIFTED_BPARAM((val), (index), (num)))
 #define SET_BPARAM1(behParams, val) SET_BPARAM((behParams), (val), 1, 1)
