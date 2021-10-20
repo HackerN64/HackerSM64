@@ -1,4 +1,4 @@
-#pragma game_conf
+#pragma once
 
 /*****************
  * GAME SETTINGS *
