@@ -1716,7 +1716,7 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
 
     if (starFlags & STAR_FLAG_ACT_100_COINS) {
         starCount--;
-        print_generic_string(x + 89, y - 5, textStar);
+        print_generic_string((x + 89), (y - 5), textStar);
     }
 
     while (hasStar != starCount) {
@@ -1739,7 +1739,7 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
 
     str[nextStar * 2] = DIALOG_CHAR_TERMINATOR;
 
-    print_generic_string(x + 14, y + 13, str);
+    print_generic_string((x + 14), (y + 13), str);
 }
 
 void render_pause_castle_main_strings(s16 x, s16 y) {
@@ -1755,28 +1755,28 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
     handle_menu_scrolling(
         MENU_SCROLL_VERTICAL, &gDialogLineNum,
-        COURSE_NUM_TO_INDEX(COURSE_MIN) - 1, COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1
+        (COURSE_NUM_TO_INDEX(COURSE_MIN) - 1), (COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1)
     );
 
     if (gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1) {
-        gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_MIN); // Exceeded max, set to min
+        gDialogLineNum  = COURSE_NUM_TO_INDEX(COURSE_MIN); // Exceeded max, set to min
     }
 
     if (gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1) {
-        gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES); // Exceeded min, set to max
+        gDialogLineNum  = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES); // Exceeded min, set to max
     }
 
     if (gDialogLineNum != COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
-        while (save_file_get_course_star_count(gCurrSaveFileNum - 1, gDialogLineNum) == 0) {
+        while (save_file_get_course_star_count((gCurrSaveFileNum - 1), gDialogLineNum) == 0) {
             if (gDialogLineNum >= prevCourseIndex) {
                 gDialogLineNum++;
             } else {
                 gDialogLineNum--;
             }
 
-            if (gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) + 1
-                || gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1) {
-                gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES);
+            if (gDialogLineNum == (COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) + 1)
+             || gDialogLineNum == COURSE_NUM_TO_INDEX(COURSE_MIN) - 1) {
+                gDialogLineNum  = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES);
                 break;
             }
         }
@@ -1787,19 +1787,19 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
     if (gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
-        render_pause_castle_course_stars(x, y, gCurrSaveFileNum - 1, gDialogLineNum);
-        print_generic_string(x + 34, y - 5, textCoin);
-        int_to_str(save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum), strVal);
-        print_generic_string(x + 54, y - 5, strVal);
+        render_pause_castle_course_stars(x, y, (gCurrSaveFileNum - 1), gDialogLineNum);
+        print_generic_string((x + 34), (y - 5), textCoin);
+        int_to_str(save_file_get_course_coin_score((gCurrSaveFileNum - 1), gDialogLineNum), strVal);
+        print_generic_string((x + 54), (y - 5), strVal);
     } else { // Castle secret stars
         u8 textStarX[] = { TEXT_STAR_X };
         courseName = segmented_to_virtual(courseNameTbl[COURSE_MAX]);
-        print_generic_string(x + 40, y + 13, textStarX);
-        int_to_str(save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_BONUS_STAGES - 1, COURSE_MAX - 1), strVal);
-        print_generic_string(x + 60, y + 13, strVal);
+        print_generic_string((x + 40), (y + 13), textStarX);
+        int_to_str(save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES), COURSE_NUM_TO_INDEX(COURSE_MAX)), strVal);
+        print_generic_string((x + 60), (y + 13), strVal);
     }
 
-    print_generic_string(x - 9, y + 30, courseName);
+    print_generic_string((x - 9), (y + 30), courseName);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
