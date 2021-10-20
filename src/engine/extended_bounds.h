@@ -29,9 +29,9 @@
 
 // For the static assert macro
 #include "macros.h"
+#include "config.h"
 
-// Set this to the extended bounds mode you want, then do "make clean".
-#define EXTENDED_BOUNDS_MODE 1
+// Set EXTENDED_BOUNDS_MODE in /include/config/config_collision.h, then do "make clean".
 
 // Don't touch the stuff past this point unless you know what you're doing!
 
