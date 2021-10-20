@@ -30,6 +30,7 @@
 #include "puppycam2.h"
 #include "puppyprint.h"
 #include "puppylights.h"
+#include "level_commands.h"
 
 #include "config.h"
 
@@ -209,8 +210,7 @@ void load_level_init_text(u32 arg) {
             break;
 
         default:
-            gotAchievement =
-                save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+            gotAchievement = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
             break;
     }
 
@@ -520,8 +520,8 @@ s32 music_unchanged_through_warp(s16 arg) {
         u16 destParam1 = gAreas[destArea].musicParam;
         u16 destParam2 = gAreas[destArea].musicParam2;
 
-        unchanged = levelNum == gCurrLevelNum && destParam1 == gCurrentArea->musicParam
-               && destParam2 == gCurrentArea->musicParam2;
+        unchanged = (levelNum == gCurrLevelNum && destParam1 == gCurrentArea->musicParam
+                     && destParam2 == gCurrentArea->musicParam2);
 
         if (get_current_background_music() != destParam2) {
             unchanged = FALSE;
@@ -608,7 +608,7 @@ void initiate_painting_warp(void) {
             } else if (pWarpNode->id != 0) {
                 warpNode = *pWarpNode;
 
-                if (!(warpNode.destLevel & 0x80)) {
+                if (!(warpNode.destLevel & WARP_NO_CHECKPOINT)) {
                     sWarpCheckpointActive = check_warp_checkpoint(&warpNode);
                 }
 

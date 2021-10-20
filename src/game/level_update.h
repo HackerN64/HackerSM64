@@ -5,16 +5,14 @@
 
 #include "types.h"
 
-enum TimerControl
-{
+enum TimerControl {
     TIMER_CONTROL_SHOW,
     TIMER_CONTROL_START,
     TIMER_CONTROL_STOP,
     TIMER_CONTROL_HIDE
 };
 
-enum WarpOperation
-{
+enum WarpOperation {
     WARP_OP_NONE,
     WARP_OP_LOOK_UP,
     WARP_OP_SPIN_SHRINK,
@@ -45,8 +43,7 @@ enum WarpOperation
 #define WARP_FLAG_DOOR_FLIP_MARIO         (1 << 1) // 0x02
 #define WARP_FLAG_DOOR_IS_WARP            (1 << 2) // 0x04
 
-enum MarioSpawnType
-{
+enum MarioSpawnType {
     MARIO_SPAWN_NONE,
     MARIO_SPAWN_DOOR_WARP,
     MARIO_SPAWN_IDLE,
@@ -137,7 +134,7 @@ enum HUDDisplayFlag
     HUD_DISPLAY_FLAG_EMPHASIZE_POWER  = (1 << 15), // 0x8000
 
     HUD_DISPLAY_NONE                  = (0 <<  0), // 0x0000
-    HUD_DISPLAY_DEFAULT = HUD_DISPLAY_FLAG_LIVES | HUD_DISPLAY_FLAG_COIN_COUNT | HUD_DISPLAY_FLAG_STAR_COUNT | HUD_DISPLAY_FLAG_CAMERA_AND_POWER | HUD_DISPLAY_FLAG_KEYS | HUD_DISPLAY_FLAG_UNKNOWN_0020
+    HUD_DISPLAY_DEFAULT = (HUD_DISPLAY_FLAG_LIVES | HUD_DISPLAY_FLAG_COIN_COUNT | HUD_DISPLAY_FLAG_STAR_COUNT | HUD_DISPLAY_FLAG_CAMERA_AND_POWER | HUD_DISPLAY_FLAG_KEYS | HUD_DISPLAY_FLAG_UNKNOWN_0020)
 };
 
 enum PlayModes {
@@ -156,16 +153,17 @@ enum WarpTypes {
     WARP_TYPE_SAME_AREA
 };
 
-#define WARP_NODE_F0             0xF0
-#define WARP_NODE_DEFAULT       (0x00 | WARP_NODE_F0)
-#define WARP_NODE_DEATH         (0x01 | WARP_NODE_F0)
-#define WARP_NODE_LOOK_UP       (0x02 | WARP_NODE_F0)
-#define WARP_NODE_WARP_FLOOR    (0x03 | WARP_NODE_F0)
-#define WARP_NODE_CREDITS_START (0x08 | WARP_NODE_F0)
-#define WARP_NODE_CREDITS_NEXT  (0x09 | WARP_NODE_F0)
-#define WARP_NODE_CREDITS_END   (0x0A | WARP_NODE_F0)
+enum WarpNodes {
+    WARP_NODE_DEFAULT = 0xF0,
+    WARP_NODE_DEATH,
+    WARP_NODE_LOOK_UP,
+    WARP_NODE_WARP_FLOOR,
+    WARP_NODE_CREDITS_MIN = 0xF8,
+    WARP_NODE_CREDITS_START = 0xF8,
+    WARP_NODE_CREDITS_NEXT,
+    WARP_NODE_CREDITS_END
+};
 
-#define WARP_NODE_CREDITS_MIN    0xF8
 
 u32 level_control_timer(s32 timerOp);
 void fade_into_special_warp(u32 arg, u32 color);

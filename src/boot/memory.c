@@ -284,7 +284,6 @@ void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
  * Return the destination address.
  */
 void *dynamic_dma_read(u8 *srcStart, u8 *srcEnd, u32 side, u32 alignment, u32 bssLength) {
-    void *dest;
     u32 size = ALIGN16(srcEnd - srcStart);
     u32 offset = 0;
 
@@ -292,7 +291,7 @@ void *dynamic_dma_read(u8 *srcStart, u8 *srcEnd, u32 side, u32 alignment, u32 bs
         offset = ALIGN((uintptr_t)sPoolListHeadL + 16, alignment) - ((uintptr_t)sPoolListHeadL + 16);
     }
 
-    dest = main_pool_alloc(offset + size + bssLength, side);
+    void *dest = main_pool_alloc(offset + size + bssLength, side);
     if (dest != NULL) {
         dma_read((u8 *)dest + offset, srcStart, srcEnd);
         if (bssLength) {
@@ -309,7 +308,7 @@ u8 gTlbSegments[NUM_TLB_SEGMENTS] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 void mapTLBPages(uintptr_t virtualAddress, uintptr_t physicalAddress, s32 length, s32 segment) {
     while (length > 0) {
         if (length > TLB_PAGE_SIZE) {
-            osMapTLB(gTlbEntries++, OS_PM_4K, (void *)virtualAddress, physicalAddress, physicalAddress + TLB_PAGE_SIZE, -1);
+            osMapTLB(gTlbEntries++, OS_PM_4K, (void *)virtualAddress, physicalAddress, (physicalAddress + TLB_PAGE_SIZE), -1);
             virtualAddress  += TLB_PAGE_SIZE;
             physicalAddress += TLB_PAGE_SIZE;
             length -= TLB_PAGE_SIZE;
