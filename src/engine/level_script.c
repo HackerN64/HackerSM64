@@ -318,7 +318,7 @@ extern u8 gTlbSegments[NUM_TLB_SEGMENTS];
 void unmap_tlbs(void) {
     s32 i;
     for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
-        if (gTlbSegments[i] && i != 0x17 && i != 0x16 && i != 0x13) {
+        if (gTlbSegments[i]/* && i != 0x17 && i != 0x16 && i != 0x13*/) {
             while (gTlbSegments[i] > 0) {
                 osUnmapTLB(gTlbEntries);
                 gTlbSegments[i]--;
