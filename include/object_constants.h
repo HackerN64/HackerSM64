@@ -203,7 +203,6 @@ enum DialogState {
 #define BPARAM4 GET_BPARAM4(o->oBehParams)
 
 
-
 /* oBehParams2ndByte */
 enum ObjGeneralBehParams {
     OBJ_BP_NONE
