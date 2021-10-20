@@ -727,14 +727,14 @@ void geo_process_bone(struct GraphNodeBone *node) {
             translation[2] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurAnimTranslationMultiplier;
             gCurAnimType = ANIM_TYPE_ROTATION;
         } else {
-            if (gCurAnimType == ANIM_TYPE_VERTICAL_TRANSLATION) {
+            if (gCurrAnimType == ANIM_TYPE_VERTICAL_TRANSLATION) {
                 gCurrAnimAttribute += 2;
                 translation[1] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurAnimTranslationMultiplier;
                 gCurrAnimAttribute += 2;
-                gCurAnimType = ANIM_TYPE_ROTATION;
-            } else if (gCurAnimType == ANIM_TYPE_NO_TRANSLATION) {
+                gCurrAnimType = ANIM_TYPE_ROTATION;
+            } else if (gCurrAnimType == ANIM_TYPE_NO_TRANSLATION) {
                 gCurrAnimAttribute += 6;
-                gCurAnimType = ANIM_TYPE_ROTATION;
+                gCurrAnimType = ANIM_TYPE_ROTATION;
             }
         }
     }
@@ -742,9 +742,10 @@ void geo_process_bone(struct GraphNodeBone *node) {
         rotation[0] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
         rotation[1] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
         rotation[2] += gCurAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
-    }
-    mtxf_rot_trans_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
-    inc_mat_stack();
+
+
+    if (gCurrAnimType == ANIM_TYPE_ROTATION) {
+        rotation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
     append_dl_and_return(((struct GraphNodeDisplayList *)node));
 }
 
