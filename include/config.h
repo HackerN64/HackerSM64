@@ -23,3 +23,4 @@
 #include "config/config_graphics.h"
 #include "config/config_audio.h"
 #include "config/config_debug.h"
+#include "config/config_goddard.h"
