@@ -499,6 +499,8 @@ static s32 obj_die_if_above_lava_and_health_non_positive(void) {
 }
 
 static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioAction, u8 *attackHandlers) {
+    s32 attackType;
+
     obj_set_hitbox(o, hitbox);
 
     //! Dies immediately if above lava
@@ -511,7 +513,7 @@ static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActi
                 o->oTimer = 0;
             }
         } else {
-            s32 attackType = (o->oInteractStatus & INT_STATUS_ATTACK_MASK);
+            attackType = o->oInteractStatus & INT_STATUS_ATTACK_MASK;
 
             switch (attackHandlers[attackType - 1]) {
                 case ATTACK_HANDLER_NOP:
