@@ -672,9 +672,8 @@ void geo_process_background(struct GraphNodeBackground *node) {
  */
 void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
     Vec3s rotation = { 0, 0, 0 };
-    Vec3f translation = {node->translation[0], node->translation[1], node->translation[2]};
+    Vec3f translation = { node->translation[0], node->translation[1], node->translation[2] };
 
-    vec3f_set(translation, node->translation[0], node->translation[1], node->translation[2]);
     if (gCurrAnimType == ANIM_TYPE_TRANSLATION) {
         translation[0] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
         translation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
@@ -712,8 +711,8 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
  * Render an animated part that has an initial rotation value
  */
 void geo_process_bone(struct GraphNodeBone *node) {
-    Vec3s rotation =    {node->rotation[0],    node->rotation[1],    node->rotation[2] };
-    Vec3f translation = {node->translation[0], node->translation[1], node->translation[2]};
+    Vec3s rotation    = { node->rotation[0],    node->rotation[1],    node->rotation[2]    };
+    Vec3f translation = { node->translation[0], node->translation[1], node->translation[2] };
 
     if (gCurrAnimType == ANIM_TYPE_TRANSLATION) {
         translation[0] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;

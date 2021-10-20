@@ -11,7 +11,7 @@
 #define PAINTING_ID(id, grp) id | (grp << 8)
 
 /// The default painting side length
-#define PAINTING_SIZE 614.0
+#define PAINTING_SIZE 614.0f
 
 #define PAINTING_ID_DDD 0x7
 
