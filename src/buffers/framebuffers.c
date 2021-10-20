@@ -3,4 +3,4 @@
 #include "config.h"
 
 // 0x70800 bytes
-u16 gFrameBuffers[3][SCREEN_WIDTH * SCREEN_HEIGHT];
+u16 gFramebuffers[3][SCREEN_WIDTH * SCREEN_HEIGHT];

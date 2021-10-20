@@ -166,7 +166,7 @@ void select_framebuffer(void) {
 
     gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
     gDPSetColorImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WIDTH,
-                     gPhysicalFrameBuffers[sRenderingFrameBuffer]);
+                     gPhysicalFramebuffers[sRenderingFramebuffer]);
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
                   SCREEN_HEIGHT - gBorderHeight);
 }
@@ -379,7 +379,7 @@ void render_init(void) {
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     if ((*(volatile u32 *)0xA4100010) != 0) { // Read RDP Clock Register, has a value of zero on emulators
-        sRenderingFrameBuffer++;
+        sRenderingFramebuffer++;
     }
     gGlobalTimer++;
 }
@@ -420,8 +420,8 @@ void display_and_vsync(void) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }
-        if (++sRenderingFrameBuffer == 3) {
-            sRenderingFrameBuffer = 0;
+        if (++sRenderingFramebuffer == 3) {
+            sRenderingFramebuffer = 0;
         }
     }
     gGlobalTimer++;
