@@ -264,7 +264,7 @@ void ukiki_act_run(void) {
 
     if (fleeMario && o->oDistanceToMario < 200.0f) {
         if ((o->oMoveFlags & OBJ_MOVE_HIT_WALL)
-            && is_mario_moving_fast_or_in_air(10)) {
+         && is_mario_moving_fast_or_in_air(10)) {
             o->oAction = UKIKI_ACT_JUMP;
             o->oMoveAngleYaw = o->oWallAngle;
         } else if ((o->oMoveFlags & OBJ_MOVE_HIT_EDGE) && is_mario_moving_fast_or_in_air(10)) {

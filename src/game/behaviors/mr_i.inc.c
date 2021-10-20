@@ -171,8 +171,9 @@ void mr_i_body_act_looking_at_mario(void) {
         o->oMrISpinAmount = 0;
     }
     if (o->oMrISpinAmount < 5000) {
-        if (o->oMrIParticleTimer == o->oMrIParticleTimerTarget)
+        if (o->oMrIParticleTimer == o->oMrIParticleTimerTarget) {
             o->oMrIBlinking = TRUE;
+        }
         if (o->oMrIParticleTimer == (o->oMrIParticleTimerTarget + 20)) {
             spawn_mr_i_particle();
             o->oMrIParticleTimer = 0;

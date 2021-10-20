@@ -130,15 +130,15 @@ static void beta_boo_key_drop(void) {
         velocityDirection = gMarioObject->oMoveAngleYaw;
         velocityMagnitude = 3.0f;
 
-        o->oVelX = sins(velocityDirection) * velocityMagnitude;
-        o->oVelZ = coss(velocityDirection) * velocityMagnitude;
+        o->oVelX = (sins(velocityDirection) * velocityMagnitude);
+        o->oVelZ = (coss(velocityDirection) * velocityMagnitude);
 
         // Give it an initial Y velocity of 40 units/frame
         o->oVelY = 40.0f;
     }
 
     // Rotate the key
-    o->oFaceAngleYaw += 0x200;
+    o->oFaceAngleYaw  += 0x200;
     o->oFaceAngleRoll += 0x200;
 }
 

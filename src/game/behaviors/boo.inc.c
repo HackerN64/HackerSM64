@@ -289,7 +289,7 @@ static s32 boo_get_attack_status(void) {
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         if ((o->oInteractStatus & INT_STATUS_WAS_ATTACKED)
-            && !obj_has_attack_type(ATTACK_FROM_ABOVE)) {
+         && !obj_has_attack_type(ATTACK_FROM_ABOVE)) {
             cur_obj_become_intangible();
 
             o->oInteractStatus = INT_STATUS_NONE;
@@ -459,7 +459,7 @@ static ObjActionFunc sBooActions[] = {
 };
 
 void bhv_boo_loop(void) {
-    //PARTIAL_UPDATE
+    // PARTIAL_UPDATE
 
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sBooActions);
@@ -467,7 +467,7 @@ void bhv_boo_loop(void) {
     boo_approach_target_opacity_and_update_scale();
 
     if (obj_has_behavior(o->parentObj, bhvMerryGoRoundBooManager)
-        && o->activeFlags == ACTIVE_FLAG_DEACTIVATED) {
+     && o->activeFlags == ACTIVE_FLAG_DEACTIVATED) {
         o->parentObj->oMerryGoRoundBooManagerNumBoosKilled++;
     }
 

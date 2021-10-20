@@ -134,7 +134,7 @@ static void klepto_circle_target(f32 radius, f32 targetSpeed) {
         o->oKleptoTimeUntilTargetChange = random_linear_offset(300, 300);
         o->oAction = KLEPTO_ACT_APPROACH_TARGET_HOLDING;
     } else {
-        s16 turnAmount = 0x4000 - atan2s(radius, o->oKleptoDistanceToTarget - radius);
+        s16 turnAmount = (0x4000 - atan2s(radius, o->oKleptoDistanceToTarget - radius));
         f32 accel = 0.05f;
         if ((s16)(o->oMoveAngleYaw - o->oKleptoYawToTarget) < 0) {
             turnAmount = -turnAmount;
@@ -242,9 +242,11 @@ static void klepto_act_dive_at_mario(void) {
             }
 
             if (gMarioStates[0].action != ACT_SLEEPING
-                && !(gMarioStates[0].action & (ACT_FLAG_SHORT_HITBOX | ACT_FLAG_BUTT_OR_STOMACH_SLIDE))
-                && o->oDistanceToMario < 200.0f && dy > 50.0f && dy < 90.0f
-                && mario_lose_cap_to_enemy(1)) {
+             && !(gMarioStates[0].action & (ACT_FLAG_SHORT_HITBOX | ACT_FLAG_BUTT_OR_STOMACH_SLIDE))
+             && (o->oDistanceToMario < 200.0f)
+             && (dy > 50.0f)
+             && (dy < 90.0f)
+             && mario_lose_cap_to_enemy(1)) {
                 o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_CAP;
             }
         }

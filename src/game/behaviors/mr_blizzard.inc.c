@@ -366,8 +366,8 @@ void bhv_mr_blizzard_update(void) {
     // slowly fall over.
     o->oFaceAngleRoll = o->oMrBlizzardDizziness;
     // Mr. Blizzard's graphical position changes by changing the Y offset.
-    o->oGraphYOffset = o->oMrBlizzardGraphYOffset + absf(20.0f * sins(o->oFaceAngleRoll))
-                       - 40.0f * (1.0f - o->oMrBlizzardScale);
+    o->oGraphYOffset = (o->oMrBlizzardGraphYOffset + absf(20.0f * sins(o->oFaceAngleRoll))
+                       - (40.0f * (1.0f - o->oMrBlizzardScale)));
 
     cur_obj_scale(o->oMrBlizzardScale);
     cur_obj_move_standard(78);

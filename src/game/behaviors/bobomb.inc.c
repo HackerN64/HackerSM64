@@ -93,8 +93,9 @@ void bobomb_act_chase_mario(void) {
 
 void bobomb_act_launched(void) {
     s16 collisionFlags = object_step();
-    if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED)
+    if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) {
         o->oAction = BOBOMB_ACT_EXPLODE;
+    }
 }
 
 void generic_bobomb_free_loop(void) {

@@ -402,8 +402,9 @@ static void koopa_unshelled_act_dive(void) {
         //  units behind mario.
         //  Using this, we can get the koopa to pick up and despawn its shell
         //  while mario is riding it.
-        if ((shell != NULL) && (dist_between_objects(shell, gMarioObject) > 200.0f)
-            && (distToShell < 50.0f)) {
+        if ((shell != NULL)
+         && (dist_between_objects(shell, gMarioObject) > 200.0f)
+         && (distToShell < 50.0f)) {
             o->oKoopaMovementType = KOOPA_BP_NORMAL;
             o->oAction = KOOPA_SHELLED_ACT_LYING;
             o->oForwardVel *= 0.5f;

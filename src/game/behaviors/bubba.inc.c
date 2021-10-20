@@ -71,7 +71,7 @@ void bubba_act_1(void) {
         }
     } else {
         if (abs_angle_diff(gMarioObject->oFaceAngleYaw, o->oAngleToMario) < 0x3000) {
-            s16 targetDYaw = 0x4000 - atan2s(800.0f, o->oDistanceToMario - 800.0f);
+            s16 targetDYaw = (0x4000 - atan2s(800.0f, (o->oDistanceToMario - 800.0f)));
             if ((s16)(o->oMoveAngleYaw - o->oAngleToMario) < 0) {
                 targetDYaw = -targetDYaw;
             }
@@ -84,7 +84,7 @@ void bubba_act_1(void) {
         o->oBubbaTargetPitch = o->oBubbaNextTargetPitchTowardMario;
 
         if (obj_is_near_to_and_facing_mario(500.0f, 3000)
-            && abs_angle_diff(o->oBubbaTargetPitch, o->oMoveAnglePitch) < 3000) {
+         && abs_angle_diff(o->oBubbaTargetPitch, o->oMoveAnglePitch) < 3000) {
             o->oBubbaLungeTimer = 30;
             o->oBubbaMovePitch = 0;
             o->oAnimState = 1;

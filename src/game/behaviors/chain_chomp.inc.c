@@ -62,9 +62,8 @@ static void chain_chomp_act_uninitialized(void) {
             cur_obj_set_pos_to_home();
 
             // Spawn the pivot and set to parent
-            if ((o->parentObj =
-                     spawn_object(o, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, bhvChainChompChainPart))
-                != NULL) {
+            o->parentObj = spawn_object(o, CHAIN_CHOMP_CHAIN_PART_BP_PIVOT, bhvChainChompChainPart);
+            if (o->parentObj != NULL) {
                 // Spawn the non-pivot chain parts, starting from the chain
                 // chomp and moving toward the pivot
                 for (i = 1; i < CHAIN_CHOMP_NUM_SEGMENTS; i++) {

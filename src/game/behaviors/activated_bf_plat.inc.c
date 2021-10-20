@@ -84,9 +84,8 @@ void bhv_activated_back_and_forth_platform_update(void) {
             // or Mario is over 3000 units away, the platform will reset the wait timer and flip around.
             if (clamp_f32(&o->oActivatedBackAndForthPlatformOffset, 0.0f,
                           o->oActivatedBackAndForthPlatformMaxOffset)
-                ||
                 // The platform will not reset if Mario goes far away and it's travelling backwards
-                (o->oActivatedBackAndForthPlatformVel > 0.0f && o->oDistanceToMario > 3000.0f)) {
+                || (o->oActivatedBackAndForthPlatformVel > 0.0f && o->oDistanceToMario > 3000.0f)) {
                 // Reset the wait timer
                 o->oActivatedBackAndForthPlatformCountdown = 20;
 

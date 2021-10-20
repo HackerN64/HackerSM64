@@ -197,8 +197,8 @@ void manta_water_ring_act_not_collected(void) {
         o->oOpacity -= 2;
         if (o->oOpacity < 3) {
             if ((o->oWaterRingIndex == (ringManager->oWaterRingMgrLastRingCollected + 1))
-            && (ringSpawner->oWaterRingSpawnerRingsCollected < 5)
-            && (ringManager->oWaterRingSpawnerRingsCollected < 5)) {
+             && (ringSpawner->oWaterRingSpawnerRingsCollected < 5)
+             && (ringManager->oWaterRingSpawnerRingsCollected < 5)) {
                 ringSpawner->oWaterRingSpawnerRingsCollected = 0;
                 ringManager->oWaterRingSpawnerRingsCollected = 0;
             }

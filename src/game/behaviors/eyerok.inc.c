@@ -366,9 +366,11 @@ static void eyerok_hand_act_retreat(void) {
 }
 
 static void eyerok_hand_act_target_mario(void) {
-    if (eyerok_check_mario_relative_z(400) || ((o->oPosZ - gMarioObject->oPosZ) > 0.0f)
-        || o->oPosZ - o->parentObj->oPosZ > 1700.0f || absf(o->oPosX - o->parentObj->oPosX) > 900.0f
-        || (o->oMoveFlags & OBJ_MOVE_HIT_WALL)) {
+    if (eyerok_check_mario_relative_z(400)
+     || ((o->oPosZ - gMarioObject->oPosZ) > 0.0f)
+     || ((o->oPosZ - o->parentObj->oPosZ) > 1700.0f)
+     || (absf(o->oPosX - o->parentObj->oPosX) > 900.0f)
+     || (o->oMoveFlags & OBJ_MOVE_HIT_WALL)) {
         o->oForwardVel = 0.0f;
         if (approach_f32_ptr(&o->oPosY, o->oHomeY + 300.0f, 20.0f)) {
             o->oAction = EYEROK_HAND_ACT_SMASH;

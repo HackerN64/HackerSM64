@@ -69,8 +69,9 @@ void bhv_spawned_star_loop(void) {
             }
             break;
         case SPAWN_STAR_POS_CUTSCENE_ACT_BOUNCE:
-            if (o->oVelY < -4.0f)
+            if (o->oVelY < -4.0f) {
                 o->oVelY = -4.0f;
+            }
             if ((o->oVelY < 0) && (o->oPosY < o->oHomeY)) {
                 gObjCutsceneDone = TRUE;
                 o->oVelY    = 0.0f;

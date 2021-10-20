@@ -207,8 +207,9 @@ void king_bobomb_act_been_thrown(void) { // act 4
                 o->oForwardVel = 0.0f;
                 o->oVelY       = 0.0f;
                 o->oSubAction  = KING_BOBOMB_SUB_ACT_THROWN_STAND_UP;
-            } else if (o->oMoveFlags & OBJ_MOVE_LANDED)
+            } else if (o->oMoveFlags & OBJ_MOVE_LANDED) {
                 cur_obj_play_sound_2(SOUND_OBJ_KING_BOBOMB);
+            }
         } else {
             if (cur_obj_init_animation_and_check_if_near_end(10)) {
                 o->oAction = KING_BOBOMB_ACT_RETURN_HOME; // Go back to top of hill
@@ -249,8 +250,9 @@ void king_bobomb_act_return_home(void) { // act 5
             }
             break;
         case KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING_END:
-            if (cur_obj_init_animation_and_check_if_near_end(KING_BOBOMB_ANIM_T_POSE))
+            if (cur_obj_init_animation_and_check_if_near_end(KING_BOBOMB_ANIM_T_POSE)) {
                 o->oSubAction = KING_BOBOMB_SUB_ACT_RETURN_HOME_WAIT_FOR_DIALOG;
+            }
             break;
         case KING_BOBOMB_SUB_ACT_RETURN_HOME_WAIT_FOR_DIALOG:
             if (mario_is_far_below_object(1200.0f)) {

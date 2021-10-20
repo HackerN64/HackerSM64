@@ -9,24 +9,19 @@ void bhv_tree_snow_or_leaf_loop(void) {
         o->oTreeSnowOrLeafSidewardVel = 4;
         o->oTreeSnowOrLeafSidewardAngleVel = ((random_float() * 0x400) + 0x600);
     }
-    if (o->oPosY < o->oFloorHeight) {
-        obj_mark_for_deletion(o);
-    }
-    if (o->oFloorHeight < FLOOR_LOWER_LIMIT) {
-        obj_mark_for_deletion(o);
-    }
-    if (o->oTimer > 100) {
-        obj_mark_for_deletion(o);
-    }
-    if (gPrevFrameObjectCount > (OBJECT_POOL_CAPACITY - 28)) {
+    if ((o->oPosY < o->oFloorHeight)
+     || (o->oFloorHeight < FLOOR_LOWER_LIMIT)
+     || (o->oTimer > 100)
+     || (gPrevFrameObjectCount > (OBJECT_POOL_CAPACITY - 28))) {
         obj_mark_for_deletion(o);
     }
     o->oFaceAnglePitch += o->oAngleVelPitch;
     o->oFaceAngleRoll  += o->oAngleVelRoll;
     o->oVelY -= 3.0f;
-    if (o->oVelY < -8.0f)
+    if (o->oVelY < -8.0f) {
         o->oVelY = -8.0f;
-    if (o->oForwardVel > 0) {
+    }
+    if (o->oForwardVel > 0.0f) {
         o->oForwardVel -= 0.3f;
     } else {
         o->oForwardVel = 0.0f;

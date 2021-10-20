@@ -114,8 +114,9 @@ void bhv_goomba_init(void) {
     o->oGravity = ((-8.0f / 3.0f) * o->oGoombaScale);
 
 #ifdef FLOOMBAS
-    if (o->oIsFloomba)
+    if (o->oIsFloomba) {
         o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
+    }
 #ifdef HD_INTRO_TEXTURES
     if (o->oAction == FLOOMBA_ACT_STARTUP) {
         o->oZoomPosZ = o->oPosZ;
