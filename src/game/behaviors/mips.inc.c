@@ -12,13 +12,17 @@ void bhv_mips_init(void) {
     u8 starFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_NONE));
 
     // If the player has >= 15 stars and hasn't collected first MIPS star...
-    if (save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 15
+    if ((save_file_get_total_star_count((gCurrSaveFileNum - 1),
+                                        COURSE_NUM_TO_INDEX(COURSE_MIN),
+                                        COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 15)
         && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_1))) {
         o->oBehParams2ndByte = 0;
         o->oMipsForwardVelocity = 40.0f;
     // If the player has >= 50 stars and hasn't collected second MIPS star...
-    } else if (save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 50
-             && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_2))) {
+    } else if ((save_file_get_total_star_count((gCurrSaveFileNum - 1),
+                                               COURSE_NUM_TO_INDEX(COURSE_MIN),
+                                               COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 50)
+        && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_2))) {
         o->oBehParams2ndByte = 1;
         o->oMipsForwardVelocity = 45.0f;
     } else {
@@ -28,9 +32,9 @@ void bhv_mips_init(void) {
 
     o->oInteractionSubtype = INT_SUBTYPE_HOLDABLE_NPC;
 
-    o->oGravity = 15.0f;
-    o->oFriction = 0.89f;
-    o->oBuoyancy = 1.2f;
+    o->oGravity  = 15.0f;
+    o->oFriction =  0.89f;
+    o->oBuoyancy =  1.2f;
 
     cur_obj_init_animation(0);
 }
@@ -41,24 +45,22 @@ void bhv_mips_init(void) {
  */
 s32 bhv_mips_find_furthest_waypoint_to_mario(void) {
     s8 i;
-    s16 x, y, z;
+    Vec3s pos;
     s16 furthestWaypointIndex = -1;
     f32 furthestWaypointDistance = -10000.0f;
     f32 distanceToMario;
     struct Waypoint **pathBase = segmented_to_virtual(&inside_castle_seg7_trajectory_mips);
-
+    f32 dx, dz;
     // For each waypoint in MIPS path...
     for (i = 0; i < 10; i++) {
         struct Waypoint *waypoint = segmented_to_virtual(pathBase[i]);
-        x = waypoint->pos[0];
-        y = waypoint->pos[1];
-        z = waypoint->pos[2];
-
+        vec3s_copy(pos, waypoint->pos);
         // Is the waypoint within 800 units of MIPS?
-        if (is_point_close_to_object(o, x, y, z, 800)) {
+        if (is_point_close_to_object(o, pos[0], pos[1], pos[2], 800)) {
             // Is this further from Mario than the last waypoint?
-            distanceToMario =
-                sqr(x - gMarioObject->header.gfx.pos[0]) + sqr(z - gMarioObject->header.gfx.pos[2]);
+            dx = (pos[0] - gMarioObject->header.gfx.pos[0]);
+            dz = (pos[2] - gMarioObject->header.gfx.pos[2]);
+            distanceToMario = (sqr(dx) + sqr(dz));
             if (furthestWaypointDistance < distanceToMario) {
                 furthestWaypointIndex = i;
                 furthestWaypointDistance = distanceToMario;

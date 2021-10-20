@@ -3,7 +3,12 @@
 // X/Z coordinates of Yoshi's homes that he switches between.
 // Note that this doesn't contain the Y coordinate since the castle roof is flat,
 // so o->oHomeY is never updated.
-static s16 sYoshiHomeLocations[] = { 0, -5625, -1364, -5912, -1403, -4609, -1004, -5308 };
+static s16 sYoshiHomeLocations[] = {
+        0, -5625,
+    -1364, -5912,
+    -1403, -4609,
+    -1004, -5308
+};
 
 void bhv_yoshi_init(void) {
     o->oGravity  = 2.0f;
@@ -11,8 +16,10 @@ void bhv_yoshi_init(void) {
     o->oBuoyancy = 1.3f;
     o->oInteractionSubtype = INT_SUBTYPE_NPC;
 
-    if (save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) < 120
-        || sYoshiDead == TRUE) {
+    if ((save_file_get_total_star_count((gCurrSaveFileNum - 1),
+                                        COURSE_NUM_TO_INDEX(COURSE_MIN),
+                                        COURSE_NUM_TO_INDEX(COURSE_MAX)) < 120)
+                                        || sYoshiDead) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 }
