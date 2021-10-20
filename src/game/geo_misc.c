@@ -70,6 +70,7 @@ s32 round_float(f32 num) {
 }
 
 #define NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT 10
+
 /**
  * Create a display list for the light in the castle lobby that shows the
  * player where to look to enter Tower of the Wing Cap.
