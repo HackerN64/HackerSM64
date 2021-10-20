@@ -27,7 +27,7 @@ void rolling_log_roll_log(void) {
         } else {
             o->oAngleVelPitch -= 0x10;
         }
-        o->oAngleVelPitch = CLAMP(o->oAngleVelPitch = -0x200, 0x200);
+        o->oAngleVelPitch = CLAMP(o->oAngleVelPitch, -0x200, 0x200);
     } else {
         if (is_point_close_to_object(o, o->oHomeX, o->oHomeY, o->oHomeZ, 100)) {
             if (o->oAngleVelPitch != 0) {
