@@ -1402,19 +1402,23 @@ enum BehParam1StarAct { // BPARAM1
 
 /* Goomba triplet spawner */
     /* oBehParams2ndByte */
-    #define GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK             0x00000003
-    #define GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK    0x000000FC
+    #define GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK             0x03
+    #define GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK    0xFC
     /* oAction */
     #define GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED             0x0
     #define GOOMBA_TRIPLET_SPAWNER_ACT_LOADED               0x1
 
 /* Goomba */
     /* oBehParams2ndByte */
-    #define GOOMBA_SIZE_REGULAR                             0x0
-    #define GOOMBA_SIZE_HUGE                                0x1
-    #define GOOMBA_SIZE_TINY                                0x2
-    #define GOOMBA_BP_SIZE_MASK                             0x3
-    #define GOOMBA_BP_TRIPLET_FLAG_MASK                     0x000000FC
+    #define GOOMBA_SIZE_REGULAR                             0x00
+    #define GOOMBA_SIZE_HUGE                                0x01
+    #define GOOMBA_SIZE_TINY                                0x02
+    #define GOOMBA_BP_SIZE_MASK                             0x03
+    #define GOOMBA_BP_TRIPLET_FLAG_MASK                     0xFC
+#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+    /* BPARAM3 */
+    #define GOOMBA_BP3_FLOOMBA_MIRRORED_STARTUP_ANIM        (1 << 7)
+#endif
     /* oAction */
     #define GOOMBA_ACT_WALK                                 0x0
     #define GOOMBA_ACT_ATTACKED_MARIO                       0x1

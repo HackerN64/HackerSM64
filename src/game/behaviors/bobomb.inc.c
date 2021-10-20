@@ -20,7 +20,7 @@ void bhv_bobomb_init(void) {
 }
 
 void bobomb_spawn_coin(void) {
-    if (!((o->oBehParams >> 8) & 0x01)) { //! param name
+    if (!(GET_BPARAM3(o->oBehParams) & 0x01)) { //! param name
         obj_spawn_yellow_coins(o, 1);
         o->oBehParams = 0x100;
         set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_NORMAL);
@@ -29,7 +29,7 @@ void bobomb_spawn_coin(void) {
 
 void bobomb_act_explode(void) {
     if (o->oTimer < 5) {
-        cur_obj_scale(1.0f + (f32) o->oTimer / 5.0f);
+        cur_obj_scale(1.0f + ((f32) o->oTimer / 5.0f));
     } else {
         struct Object *explosion = spawn_object(o, MODEL_EXPLOSION, bhvExplosion);
         explosion->oGraphYOffset += 100.0f;
