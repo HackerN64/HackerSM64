@@ -1,4 +1,4 @@
-#pragma once
+#pragma movement_conf
 
 /*********************
  * MOVEMENT SETTINGS *
