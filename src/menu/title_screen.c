@@ -138,7 +138,7 @@ s32 intro_level_select(void) {
     print_text_centered(160, 80, "SELECT STAGE");
     print_text_centered(160, 30, "PRESS START BUTTON");
     print_text_fmt_int(40, 60, "%2d", gCurrLevelNum);
-    print_text(80, 60, sLevelSelectStageNames[gCurrLevelNum - 1]); // print stage name
+    print_text(80, 60, sLevelSelectStageNames[COURSE_NUM_TO_INDEX(gCurrLevelNum)]); // print stage name
     // start being pressed signals the stage to be started. that is, unless...
     if (gPlayer1Controller->buttonPressed & (START_BUTTON | A_BUTTON)) {
         // ... the level select quit combo is being pressed, which uses START. If this
