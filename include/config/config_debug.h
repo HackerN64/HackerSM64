@@ -3,7 +3,7 @@
 /******************
  * DEBUG SETTINGS *
  ******************/
-
+#ifdef DEBUG
 // Enables most debug options
 //#define DEBUG_ALL
 
