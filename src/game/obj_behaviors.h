@@ -138,7 +138,7 @@ void bhv_wf_sliding_platform_init(void);
 void bhv_wf_sliding_platform_loop(void);
 void bhv_moneybag_init(void);
 void moneybag_check_mario_collision(void);
-void moneybag_jump(s8 collisionFlags);
+void moneybag_jump(s16 collisionFlags);
 void moneybag_act_move_around(void);
 void moneybag_act_return_home(void);
 void moneybag_act_disappear(void);

@@ -188,8 +188,10 @@ u32 mario_update_moving_sand(struct MarioState *m) {
     struct Surface *floor = m->floor;
     s32 floorType = floor->type;
 
-    if (floorType == SURFACE_DEEP_MOVING_QUICKSAND || floorType == SURFACE_SHALLOW_MOVING_QUICKSAND
-        || floorType == SURFACE_MOVING_QUICKSAND || floorType == SURFACE_INSTANT_MOVING_QUICKSAND) {
+    if ((floorType == SURFACE_DEEP_MOVING_QUICKSAND)
+     || (floorType == SURFACE_SHALLOW_MOVING_QUICKSAND)
+     || (floorType == SURFACE_MOVING_QUICKSAND)
+     || (floorType == SURFACE_INSTANT_MOVING_QUICKSAND)) {
         s16 pushAngle = (floor->force << 8);
         f32 pushSpeed = sMovingSandSpeeds[floor->force >> 8];
 
@@ -210,7 +212,7 @@ u32 mario_update_windy_ground(struct MarioState *m) {
         s16 pushAngle = (floor->force << 8);
 
         if (m->action & ACT_FLAG_MOVING) {
-            s16 pushDYaw = m->faceAngle[1] - pushAngle;
+            s16 pushDYaw = (m->faceAngle[1] - pushAngle);
 
             pushSpeed = ((m->forwardVel > 0.0f) ? (-m->forwardVel * 0.5f) : -8.0f);
 
@@ -281,7 +283,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     resolve_and_return_wall_collisions(nextPos, 60.0f, 50.0f, &upperWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
+    f32 ceilHeight = find_ceil(nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
 
     f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
 
@@ -295,8 +297,8 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
         floor->originOffset = -floorHeight;
     }
 
-    if (nextPos[1] > floorHeight + 100.0f) {
-        if (nextPos[1] + 160.0f >= ceilHeight) {
+    if (nextPos[1] > (floorHeight + 100.0f)) {
+        if ((nextPos[1] + 160.0f) >= ceilHeight) {
             return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
         }
 
@@ -325,7 +327,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
             set_mario_wall(m, upperWall.walls[i]);
         }
 
-        if (wallDYaw >= 0x2AAA && wallDYaw <= 0x5555) {
+        if (wallDYaw >= DEGREES(60) && wallDYaw <= DEGREES(120)) {
             continue;
         }
 

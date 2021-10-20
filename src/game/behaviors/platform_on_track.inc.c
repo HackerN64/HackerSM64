@@ -43,7 +43,7 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos)
             amountToMove = (300.0f * ballIndex);
         } else {
             obj_perform_position_op(POS_OP_SAVE_POSITION);
-            o->oPlatformOnTrackPrevWaypointFlags = 0;
+            o->oPlatformOnTrackPrevWaypointFlags = WAYPOINT_FLAGS_NONE;
             amountToMove = o->oForwardVel;
         }
 
@@ -91,7 +91,7 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos)
             if (trackBall != NULL) vec3_copy(&trackBall->oPosVec, pos);
         } else {
             if (prevWaypoint != initialPrevWaypoint) {
-                if (o->oPlatformOnTrackPrevWaypointFlags == 0) {
+                if (o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_NONE) {
                     o->oPlatformOnTrackPrevWaypointFlags = initialPrevWaypoint->flags;
                 }
                 o->oPlatformOnTrackPrevWaypoint = prevWaypoint;
@@ -161,7 +161,7 @@ static void platform_on_track_act_init(void) {
     s32 i;
 
     o->oPlatformOnTrackPrevWaypoint = o->oPlatformOnTrackStartWaypoint;
-    o->oPlatformOnTrackPrevWaypointFlags = 0;
+    o->oPlatformOnTrackPrevWaypointFlags = WAYPOINT_FLAGS_NONE;
     o->oPlatformOnTrackBaseBallIndex = 0;
 
     vec3_copy(&o->oHomeVec, o->oPlatformOnTrackStartWaypoint->pos);
@@ -221,7 +221,7 @@ static void platform_on_track_act_move_along_track(void) {
         o->oAction = PLATFORM_ON_TRACK_ACT_FALL;
     } else {
         // The ski lift should pause or stop after reaching a special waypoint
-        if (o->oPlatformOnTrackPrevWaypointFlags != 0 && !o->oPlatformOnTrackIsNotSkiLift) {
+        if (o->oPlatformOnTrackPrevWaypointFlags != WAYPOINT_FLAGS_NONE && !o->oPlatformOnTrackIsNotSkiLift) {
             if (o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_END
                 || o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE) {
                 cur_obj_play_sound_2(SOUND_GENERAL_ELEVATOR_WOBBLE_LOWPRIO);

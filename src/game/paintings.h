@@ -17,9 +17,11 @@
 
 #define BOARD_BOWSERS_SUB (1 << 0)
 
-#define DDD_FLAGS_NONE              (0 << 0) // 0x0
-#define DDD_FLAG_BACK               (1 << 0) // 0x1
-#define DDD_FLAG_BOWSERS_SUB_BEATEN (1 << 1) // 0x2
+enum DDDPaintingFlags {
+    DDD_FLAGS_NONE              = (0 << 0), // 0x0
+    DDD_FLAG_BACK               = (1 << 0), // 0x1
+    DDD_FLAG_BOWSERS_SUB_BEATEN = (1 << 1), // 0x2
+};
 
 enum PaintingState {
     PAINTING_IDLE,

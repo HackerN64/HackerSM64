@@ -5,8 +5,10 @@
 
 #include "types.h"
 
-#define MEMORY_POOL_LEFT  0
-#define MEMORY_POOL_RIGHT 1
+enum MemoryPoolSide {
+    MEMORY_POOL_LEFT,
+    MEMORY_POOL_RIGHT
+};
 
 #define NUM_TLB_SEGMENTS 32
 

@@ -1568,7 +1568,7 @@ s32 cur_obj_follow_path(void) {
     } else {
         targetWaypoint = startWaypoint;
     }
-    o->oPathedPrevWaypointFlags = lastWaypoint->flags | WAYPOINT_FLAGS_INITIALIZED;
+    o->oPathedPrevWaypointFlags = (lastWaypoint->flags | WAYPOINT_FLAGS_INITIALIZED);
 
     vec3_diff(prevToNext, targetWaypoint->pos, lastWaypoint->pos);
     vec3_diff(objToNext, targetWaypoint->pos, &o->oPosVec);

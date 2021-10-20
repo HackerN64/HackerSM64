@@ -118,60 +118,68 @@ enum CameraMode {
     CAMERA_MODE_SPIRAL_STAIRS
 };
 
-#define CAM_MOVE_RETURN_TO_MIDDLE       (1 <<  0) // 0x0001
-#define CAM_MOVE_ZOOMED_OUT             (1 <<  1) // 0x0002
-#define CAM_MOVE_ROTATE_RIGHT           (1 <<  2) // 0x0004
-#define CAM_MOVE_ROTATE_LEFT            (1 <<  3) // 0x0008
-#define CAM_MOVE_ENTERED_ROTATE_SURFACE (1 <<  4) // 0x0010
-#define CAM_MOVE_METAL_BELOW_WATER      (1 <<  5) // 0x0020
-#define CAM_MOVE_FIX_IN_PLACE           (1 <<  6) // 0x0040
-#define CAM_MOVE_UNKNOWN_8              (1 <<  7) // 0x0080
-#define CAM_MOVING_INTO_MODE            (1 <<  8) // 0x0100
-#define CAM_MOVE_STARTED_EXITING_C_UP   (1 <<  9) // 0x0200
-#define CAM_MOVE_UNKNOWN_11             (1 << 10) // 0x0400
-#define CAM_MOVE_INIT_CAMERA            (1 << 11) // 0x0800
-#define CAM_MOVE_ALREADY_ZOOMED_OUT     (1 << 12) // 0x1000
-#define CAM_MOVE_C_UP_MODE              (1 << 13) // 0x2000
-#define CAM_MOVE_SUBMERGED              (1 << 14) // 0x4000
-#define CAM_MOVE_PAUSE_SCREEN           (1 << 15) // 0x8000
+enum CameraMovementFlags {
+    CAM_MOVE_RETURN_TO_MIDDLE       = (1 <<  0), // 0x0001
+    CAM_MOVE_ZOOMED_OUT             = (1 <<  1), // 0x0002
+    CAM_MOVE_ROTATE_RIGHT           = (1 <<  2), // 0x0004
+    CAM_MOVE_ROTATE_LEFT            = (1 <<  3), // 0x0008
+    CAM_MOVE_ENTERED_ROTATE_SURFACE = (1 <<  4), // 0x0010
+    CAM_MOVE_METAL_BELOW_WATER      = (1 <<  5), // 0x0020
+    CAM_MOVE_FIX_IN_PLACE           = (1 <<  6), // 0x0040
+    CAM_MOVE_UNKNOWN_8              = (1 <<  7), // 0x0080
+    CAM_MOVING_INTO_MODE            = (1 <<  8), // 0x0100
+    CAM_MOVE_STARTED_EXITING_C_UP   = (1 <<  9), // 0x0200
+    CAM_MOVE_UNKNOWN_11             = (1 << 10), // 0x0400
+    CAM_MOVE_INIT_CAMERA            = (1 << 11), // 0x0800
+    CAM_MOVE_ALREADY_ZOOMED_OUT     = (1 << 12), // 0x1000
+    CAM_MOVE_C_UP_MODE              = (1 << 13), // 0x2000
+    CAM_MOVE_SUBMERGED              = (1 << 14), // 0x4000
+    CAM_MOVE_PAUSE_SCREEN           = (1 << 15), // 0x8000
 
-#define CAM_MOVE_ROTATE /**/ (CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ROTATE_LEFT | CAM_MOVE_RETURN_TO_MIDDLE)
-/// These flags force the camera to move a certain way
-#define CAM_MOVE_RESTRICT /**/ (CAM_MOVE_ENTERED_ROTATE_SURFACE | CAM_MOVE_METAL_BELOW_WATER | CAM_MOVE_FIX_IN_PLACE | CAM_MOVE_UNKNOWN_8)
+    CAM_MOVE_ROTATE   = (CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ROTATE_LEFT | CAM_MOVE_RETURN_TO_MIDDLE),
+    /// These flags force the camera to move a certain way
+    CAM_MOVE_RESTRICT = (CAM_MOVE_ENTERED_ROTATE_SURFACE | CAM_MOVE_METAL_BELOW_WATER | CAM_MOVE_FIX_IN_PLACE | CAM_MOVE_UNKNOWN_8),
+};
 
-#define CAM_SOUND_C_UP_PLAYED            (1 <<  0) // 0x01
-#define CAM_SOUND_MARIO_ACTIVE           (1 <<  1) // 0x02
-#define CAM_SOUND_NORMAL_ACTIVE          (1 <<  2) // 0x04
-#define CAM_SOUND_UNUSED_SELECT_MARIO    (1 <<  3) // 0x08
-#define CAM_SOUND_UNUSED_SELECT_FIXED    (1 <<  4) // 0x10
-#define CAM_SOUND_FIXED_ACTIVE           (1 <<  5) // 0x20
+enum CameraSounds {
+    CAM_SOUND_C_UP_PLAYED           = (1 <<  0), // 0x01
+    CAM_SOUND_MARIO_ACTIVE          = (1 <<  1), // 0x02
+    CAM_SOUND_NORMAL_ACTIVE         = (1 <<  2), // 0x04
+    CAM_SOUND_UNUSED_SELECT_MARIO   = (1 <<  3), // 0x08
+    CAM_SOUND_UNUSED_SELECT_FIXED   = (1 <<  4), // 0x10
+    CAM_SOUND_FIXED_ACTIVE          = (1 <<  5), // 0x20
+};
 
-#define CAM_FLAG_SMOOTH_MOVEMENT         (1 <<  0) // 0x0001
-#define CAM_FLAG_BLOCK_SMOOTH_MOVEMENT   (1 <<  1) // 0x0002
-#define CAM_FLAG_FRAME_AFTER_CAM_INIT    (1 <<  2) // 0x0004
-#define CAM_FLAG_CHANGED_PARTRACK_INDEX  (1 <<  3) // 0x0008
-#define CAM_FLAG_CCM_SLIDE_SHORTCUT      (1 <<  4) // 0x0010
-#define CAM_FLAG_CAM_NEAR_WALL           (1 <<  5) // 0x0020
-#define CAM_FLAG_SLEEPING                (1 <<  6) // 0x0040
-#define CAM_FLAG_UNUSED_7                (1 <<  7) // 0x0080
-#define CAM_FLAG_UNUSED_8                (1 <<  8) // 0x0100
-#define CAM_FLAG_COLLIDED_WITH_WALL      (1 <<  9) // 0x0200
-#define CAM_FLAG_START_TRANSITION        (1 << 10) // 0x0400
-#define CAM_FLAG_TRANSITION_OUT_OF_C_UP  (1 << 11) // 0x0800
-#define CAM_FLAG_BLOCK_AREA_PROCESSING   (1 << 12) // 0x1000
-#define CAM_FLAG_UNUSED_13               (1 << 13) // 0x2000
-#define CAM_FLAG_UNUSED_CUTSCENE_ACTIVE  (1 << 14) // 0x4000
-#define CAM_FLAG_BEHIND_MARIO_POST_DOOR  (1 << 15) // 0x8000
+enum CameraFlags {
+    CAM_FLAG_SMOOTH_MOVEMENT        = (1 <<  0), // 0x0001
+    CAM_FLAG_BLOCK_SMOOTH_MOVEMENT  = (1 <<  1), // 0x0002
+    CAM_FLAG_FRAME_AFTER_CAM_INIT   = (1 <<  2), // 0x0004
+    CAM_FLAG_CHANGED_PARTRACK_INDEX = (1 <<  3), // 0x0008
+    CAM_FLAG_CCM_SLIDE_SHORTCUT     = (1 <<  4), // 0x0010
+    CAM_FLAG_CAM_NEAR_WALL          = (1 <<  5), // 0x0020
+    CAM_FLAG_SLEEPING               = (1 <<  6), // 0x0040
+    CAM_FLAG_UNUSED_7               = (1 <<  7), // 0x0080
+    CAM_FLAG_UNUSED_8               = (1 <<  8), // 0x0100
+    CAM_FLAG_COLLIDED_WITH_WALL     = (1 <<  9), // 0x0200
+    CAM_FLAG_START_TRANSITION       = (1 << 10), // 0x0400
+    CAM_FLAG_TRANSITION_OUT_OF_C_UP = (1 << 11), // 0x0800
+    CAM_FLAG_BLOCK_AREA_PROCESSING  = (1 << 12), // 0x1000
+    CAM_FLAG_UNUSED_13              = (1 << 13), // 0x2000
+    CAM_FLAG_UNUSED_CUTSCENE_ACTIVE = (1 << 14), // 0x4000
+    CAM_FLAG_BEHIND_MARIO_POST_DOOR = (1 << 15), // 0x8000
+};
 
-#define CAM_STATUS_NONE                  (0 <<  0) // 0x00
-#define CAM_STATUS_MARIO                 (1 <<  0) // 0x01
-#define CAM_STATUS_LAKITU                (1 <<  1) // 0x02
-#define CAM_STATUS_FIXED                 (1 <<  2) // 0x04
-#define CAM_STATUS_C_DOWN                (1 <<  3) // 0x08
-#define CAM_STATUS_C_UP                  (1 <<  4) // 0x10
+enum CameraStatus {
+    CAM_STATUS_NONE                 = (0 <<  0), // 0x00
+    CAM_STATUS_MARIO                = (1 <<  0), // 0x01
+    CAM_STATUS_LAKITU               = (1 <<  1), // 0x02
+    CAM_STATUS_FIXED                = (1 <<  2), // 0x04
+    CAM_STATUS_C_DOWN               = (1 <<  3), // 0x08
+    CAM_STATUS_C_UP                 = (1 <<  4), // 0x10
 
-#define CAM_STATUS_MODE_GROUP   (CAM_STATUS_MARIO | CAM_STATUS_LAKITU | CAM_STATUS_FIXED)
-#define CAM_STATUS_C_MODE_GROUP (CAM_STATUS_C_DOWN | CAM_STATUS_C_UP)
+    CAM_STATUS_MODE_GROUP   = (CAM_STATUS_MARIO | CAM_STATUS_LAKITU | CAM_STATUS_FIXED),
+    CAM_STATUS_C_MODE_GROUP = (CAM_STATUS_C_DOWN | CAM_STATUS_C_UP),
+};
 
 enum CameraShake {
     SHAKE_NONE,

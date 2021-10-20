@@ -8,17 +8,25 @@
      ((asc) >= 'A' && (asc) <= 'Z') ? ((asc) - 'A' + 0x0A) :       \
      ((asc) >= 'a' && (asc) <= 'z') ? ((asc) - 'a' + 0x24) : 0x00)
 
+enum MenuMtxPushOp {
+    MENU_MTX_NONE,
+    MENU_MTX_PUSH,
+    MENU_MTX_NOPUSH,
+};
 
-#define MENU_MTX_PUSH   1
-#define MENU_MTX_NOPUSH 2
-
-#define MENU_SCROLL_VERTICAL   1
-#define MENU_SCROLL_HORIZONTAL 2
+enum MenuScrollAxis {
+    MENU_SCROLL_NONE,
+    MENU_SCROLL_VERTICAL,
+    MENU_SCROLL_HORIZONTAL,
+};
 
 // Japanese File Select uses an unique table
 // to print specific Japanese HUD chars
-#define HUD_LUT_JPMENU 1
-#define HUD_LUT_GLOBAL 2
+enum HUDLUTs {
+    HUD_LUT_NONE,
+    HUD_LUT_JPMENU,
+    HUD_LUT_GLOBAL,
+};
 
 // For file select JP HUD difference
 #if defined(VERSION_JP) || defined(VERSION_SH)
@@ -135,12 +143,12 @@ enum DialogResponseDefines {
 
 extern s32 gDialogResponse;
 extern u16 gDialogColorFadeTimer;
-extern s8 gLastDialogLineNum;
+extern s8  gLastDialogLineNum;
 extern s32 gDialogVariable;
 extern u16 gDialogTextAlpha;
 extern s16 gCutsceneMsgXOffset;
 extern s16 gCutsceneMsgYOffset;
-extern s8 gRedCoinsCollected;
+extern s8  gRedCoinsCollected;
 
 void create_dl_identity_matrix(void);
 void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z);

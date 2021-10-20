@@ -12,13 +12,15 @@ struct ChainSegment {
     Vec3s angle;
 };
 
-#define WATER_DROPLET_FLAG_RAND_ANGLE               (1 << 1) // 0x02
-#define WATER_DROPLET_FLAG_RAND_OFFSET_XZ           (1 << 2) // 0x04 // Unused
-#define WATER_DROPLET_FLAG_RAND_OFFSET_XYZ          (1 << 3) // 0x08 // Unused
-#define WATER_DROPLET_FLAG_UNUSED                   (1 << 4) // 0x10 // Unused
-#define WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL     (1 << 5) // 0x20
-#define WATER_DROPLET_FLAG_RAND_ANGLE_INCR_BACKWARD (1 << 6) // 0x40
-#define WATER_DROPLET_FLAG_RAND_ANGLE_INCR_FORWARD  (1 << 7) // 0x80 // Unused
+enum WaterDropletFlags {
+    WATER_DROPLET_FLAG_RAND_ANGLE               = (1 << 1), // 0x02
+    WATER_DROPLET_FLAG_RAND_OFFSET_XZ           = (1 << 2), // 0x04 // Unused
+    WATER_DROPLET_FLAG_RAND_OFFSET_XYZ          = (1 << 3), // 0x08 // Unused
+    WATER_DROPLET_FLAG_UNUSED                   = (1 << 4), // 0x10 // Unused
+    WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL     = (1 << 5), // 0x20
+    WATER_DROPLET_FLAG_RAND_ANGLE_INCR_BACKWARD = (1 << 6), // 0x40
+    WATER_DROPLET_FLAG_RAND_ANGLE_INCR_FORWARD  = (1 << 7), // 0x80 // Unused
+};
 
 // Call spawn_water_droplet with this struct to spawn an object.
 struct WaterDropletParams {
@@ -193,17 +195,22 @@ void cur_obj_spawn_particles(struct SpawnParticlesInfo *info);
 s32 cur_obj_reflect_move_angle_off_wall(void);
 
 #define WAYPOINT_FLAGS_END -1
+#define WAYPOINT_FLAGS_NONE 0
 #define WAYPOINT_FLAGS_INITIALIZED 0x8000
-#define WAYPOINT_MASK_00FF 0x00FF
 #define WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE 3
+#define WAYPOINT_MASK_00FF 0x00FF
 
-#define PATH_NONE             0
-#define PATH_REACHED_END     -1
-#define PATH_REACHED_WAYPOINT 1
+enum PathStatus {
+    PATH_REACHED_END = -1,
+    PATH_NONE,
+    PATH_REACHED_WAYPOINT,
+};
 
-#define SCALE_AXIS_X    (1 << 0) // 0x01
-#define SCALE_AXIS_Y    (1 << 1) // 0x02
-#define SCALE_AXIS_Z    (1 << 2) // 0x04
+enum ObjScaleAxis {
+    SCALE_AXIS_X = (1 << 0), // 0x01
+    SCALE_AXIS_Y = (1 << 1), // 0x02
+    SCALE_AXIS_Z = (1 << 2), // 0x04
+};
 
 void obj_set_hitbox(struct Object *obj, struct ObjectHitbox *hitbox);
 s32 cur_obj_wait_then_blink(s32 timeUntilBlinking, s32 numBlinks);

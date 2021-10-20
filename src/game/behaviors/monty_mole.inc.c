@@ -29,11 +29,10 @@ Vec3f sMontyMoleLastKilledPos;
  */
 static struct Object *link_objects_with_behavior(const BehaviorScript *behavior) {
     const BehaviorScript *behaviorAddr = segmented_to_virtual(behavior);
-    struct Object *obj;
     struct Object *lastObject = NULL;
     struct ObjectNode *listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
 
-    obj = (struct Object *) listHead->next;
+    struct Object *obj = (struct Object *) listHead->next;
     while (obj != (struct Object *) listHead) {
         if (obj->behavior == behaviorAddr && obj->activeFlags != ACTIVE_FLAG_DEACTIVATED) {
             obj->parentObj = lastObject;
@@ -98,29 +97,29 @@ void bhv_monty_mole_hole_update(void) {
     }
 }
 
+static struct SpawnParticlesInfo sMontyMoleRiseFromGroundParticles = {
+    /* behParam:        */  0,
+    /* count:           */  3,
+    /* model:           */ MODEL_SAND_DUST,
+    /* offsetY:         */  0,
+    /* forwardVelBase:  */  4,
+    /* forwardVelRange: */  4,
+    /* velYBase:        */ 10,
+    /* velYRange:       */ 15,
+    /* gravity:         */ -4,
+    /* dragStrength:    */  0,
+    /* sizeBase:        */ 10.0f,
+    /* sizeRange:       */  7.0f,
+};
+
 /**
  * Spawn dirt particles when rising out of the ground.
  */
 void monty_mole_spawn_dirt_particles(s8 offsetY, s8 velYBase) {
-    static struct SpawnParticlesInfo montyMoleRiseFromGroundParticles = {
-        /* behParam:        */  0,
-        /* count:           */  3,
-        /* model:           */ MODEL_SAND_DUST,
-        /* offsetY:         */  0,
-        /* forwardVelBase:  */  4,
-        /* forwardVelRange: */  4,
-        /* velYBase:        */ 10,
-        /* velYRange:       */ 15,
-        /* gravity:         */ -4,
-        /* dragStrength:    */  0,
-        /* sizeBase:        */ 10.0f,
-        /* sizeRange:       */  7.0f,
-    };
+    sMontyMoleRiseFromGroundParticles.offsetY  = offsetY;
+    sMontyMoleRiseFromGroundParticles.velYBase = velYBase;
 
-    montyMoleRiseFromGroundParticles.offsetY  = offsetY;
-    montyMoleRiseFromGroundParticles.velYBase = velYBase;
-
-    cur_obj_spawn_particles(&montyMoleRiseFromGroundParticles);
+    cur_obj_spawn_particles(&sMontyMoleRiseFromGroundParticles);
 }
 
 /**

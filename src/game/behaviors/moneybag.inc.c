@@ -37,7 +37,7 @@ void moneybag_check_mario_collision(void) {
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         if (o->oInteractStatus & INT_STATUS_ATTACKED_MARIO) {
-            o->oMoveAngleYaw = o->oAngleToMario + 0x8000;
+            o->oMoveAngleYaw = (o->oAngleToMario + 0x8000);
             o->oVelY = 30.0f;
         }
 
@@ -49,7 +49,7 @@ void moneybag_check_mario_collision(void) {
     }
 }
 
-void moneybag_jump(s8 collisionFlags) {
+void moneybag_jump(s16 collisionFlags) {
     s16 animFrame = o->header.gfx.animInfo.animFrame;
 
     switch (o->oMoneybagJumpState) {
@@ -57,7 +57,7 @@ void moneybag_jump(s8 collisionFlags) {
             cur_obj_init_animation(1);
             if (animFrame == 5) {
                 o->oForwardVel = 20.0f;
-                o->oVelY = 40.0f;
+                o->oVelY       = 40.0f;
             }
 
             if (cur_obj_check_if_near_animation_end()) {
@@ -90,7 +90,7 @@ void moneybag_jump(s8 collisionFlags) {
 
             if (o->oTimer > 60) {
                 o->oMoneybagJumpState = MONEYBAG_JUMP_LANDING;
-                o->oForwardVel = 0;
+                o->oForwardVel = 0.0f;
                 o->header.gfx.animInfo.animFrame = 0;
             }
             break;
@@ -103,11 +103,9 @@ void moneybag_jump(s8 collisionFlags) {
 }
 
 void moneybag_act_move_around(void) {
-    s16 collisionFlags;
-
     obj_return_and_displace_home(o, o->oHomeX, o->oHomeY, o->oHomeZ, 200);
 
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
 
     if (((collisionFlags & OBJ_COL_FLAGS_LANDED) == OBJ_COL_FLAGS_LANDED)
         && (o->oMoneybagJumpState == MONEYBAG_JUMP_LANDING)) {
