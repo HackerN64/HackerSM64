@@ -1,4 +1,4 @@
-#pragma once
+#pragma audio_conf
 
 /*******************
  * CAMERA SETTINGS *
