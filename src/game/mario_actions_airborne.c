@@ -19,19 +19,22 @@
 
 void play_flip_sounds(struct MarioState *m, s16 frame1, s16 frame2, s16 frame3) {
     s32 animFrame = m->marioObj->header.gfx.animInfo.animFrame;
-    if (animFrame == frame1 || animFrame == frame2 || animFrame == frame3) {
+    if ((animFrame == frame1)
+     || (animFrame == frame2)
+     || (animFrame == frame3)) {
         play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
     }
 }
 
 void play_far_fall_sound(struct MarioState *m) {
     u32 action = m->action;
-    if (!(action & ACT_FLAG_INVULNERABLE) && action != ACT_TWIRLING && action != ACT_FLYING
-        && !(m->flags & MARIO_FALL_SOUND_PLAYED)) {
-        if (m->peakHeight - m->pos[1] > FALL_DAMAGE_HEIGHT_SMALL) {
-            play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
-            m->flags |= MARIO_FALL_SOUND_PLAYED;
-        }
+    if (!(action & ACT_FLAG_INVULNERABLE)
+     && (action != ACT_TWIRLING)
+     && (action != ACT_FLYING)
+     && !(m->flags & MARIO_FALL_SOUND_PLAYED)
+     && ((m->peakHeight - m->pos[1]) > FALL_DAMAGE_HEIGHT_SMALL)) {
+        play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
+        m->flags |= MARIO_FALL_SOUND_PLAYED;
     }
 }
 
@@ -89,28 +92,25 @@ s32 check_fall_damage(struct MarioState *m, u32 hardFallAction) {
 
 s32 check_kick_or_dive_in_air(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
-        return set_mario_action(m, m->forwardVel > 28.0f ? ACT_DIVE : ACT_JUMP_KICK, 0);
+        return set_mario_action(m, ((m->forwardVel > 28.0f) ? ACT_DIVE : ACT_JUMP_KICK), 0);
     }
     return FALSE;
 }
 
 s32 should_get_stuck_in_ground(struct MarioState *m) {
-    u32 terrainType = m->area->terrainType & TERRAIN_MASK;
-    struct Surface *floor = m->floor;
-    s32 flags = floor->flags;
-    s32 type = floor->type;
-
 #ifdef NO_GETTING_BURIED
     return FALSE;
 #else
-    if (floor != NULL && (terrainType == TERRAIN_SNOW || terrainType == TERRAIN_SAND)
-        && type != SURFACE_BURNING && SURFACE_IS_NOT_HARD(type)) {
-        if (!(flags & SURFACE_FLAG_DYNAMIC) && m->peakHeight - m->pos[1] > 1000.0f && floor->normal.y >= COS30) {
-            return TRUE;
-        }
-    }
-
-    return FALSE;
+    u32 terrainType = (m->area->terrainType & TERRAIN_MASK);
+    struct Surface *floor = m->floor;
+    s32 type = floor->type;
+    return ((floor != NULL)
+         && ((terrainType == TERRAIN_SNOW) || (terrainType == TERRAIN_SAND))
+         && (type != SURFACE_BURNING)
+         && SURFACE_IS_NOT_HARD(type)
+         && !(floor->flags & SURFACE_FLAG_DYNAMIC)
+         && ((m->peakHeight - m->pos[1]) > 1000.0f)
+         && (floor->normal.y >= COS30));
 #endif
 }
 
@@ -132,17 +132,17 @@ s32 check_horizontal_wind(struct MarioState *m) {
     struct Surface *floor = m->floor;
 
     if (floor->type == SURFACE_HORIZONTAL_WIND) {
-        s16 pushAngle = floor->force << 8;
+        s16 pushAngle = (floor->force << 8);
 
-        m->slideVelX += 1.2f * sins(pushAngle);
-        m->slideVelZ += 1.2f * coss(pushAngle);
+        m->slideVelX += (1.2f * sins(pushAngle));
+        m->slideVelZ += (1.2f * coss(pushAngle));
 
         f32 speed = (sqr(m->slideVelX) + sqr(m->slideVelZ));
 
         if (speed > sqr(48.0f)) {
-            speed = sqrtf(speed);
-            m->slideVelX = m->slideVelX * 48.0f / speed;
-            m->slideVelZ = m->slideVelZ * 48.0f / speed;
+            speed = (48.0f / sqrtf(speed));
+            m->slideVelX = (m->slideVelX * speed);
+            m->slideVelZ = (m->slideVelZ * speed);
             speed = 48.0f;
         } else if (speed > 32.0f) {
             speed = 32.0f;
@@ -158,20 +158,16 @@ s32 check_horizontal_wind(struct MarioState *m) {
 }
 
 void update_air_with_turn(struct MarioState *m) {
-    f32 dragThreshold;
-    s16 intendedDYaw;
-    f32 intendedMag;
-
     if (!check_horizontal_wind(m)) {
-        dragThreshold = m->action == ACT_LONG_JUMP ? 48.0f : 32.0f;
+        f32 dragThreshold = ((m->action == ACT_LONG_JUMP) ? 48.0f : 32.0f);
         m->forwardVel = approach_f32(m->forwardVel, 0.0f, 0.35f, 0.35f);
 
         if (m->input & INPUT_NONZERO_ANALOG) {
-            intendedDYaw = m->intendedYaw - m->faceAngle[1];
-            intendedMag = m->intendedMag / 32.0f;
+            s16 intendedDYaw = (m->intendedYaw - m->faceAngle[1]);
+            f32 intendedMag = (m->intendedMag / 32.0f);
 
-            m->forwardVel += 1.5f * coss(intendedDYaw) * intendedMag;
-            m->faceAngle[1] += 512.0f * sins(intendedDYaw) * intendedMag;
+            m->forwardVel   += (1.5f * coss(intendedDYaw) * intendedMag);
+            m->faceAngle[1] += (512.0f * sins(intendedDYaw) * intendedMag);
         }
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -182,27 +178,26 @@ void update_air_with_turn(struct MarioState *m) {
             m->forwardVel += 2.0f;
         }
 
-        m->vel[0] = m->slideVelX = m->forwardVel * sins(m->faceAngle[1]);
-        m->vel[2] = m->slideVelZ = m->forwardVel * coss(m->faceAngle[1]);
+        m->vel[0] = m->slideVelX = (m->forwardVel * sins(m->faceAngle[1]));
+        m->vel[2] = m->slideVelZ = (m->forwardVel * coss(m->faceAngle[1]));
     }
 }
 
 void update_air_without_turn(struct MarioState *m) {
     f32 sidewaysSpeed = 0.0f;
-    f32 dragThreshold;
     s16 intendedDYaw;
     f32 intendedMag;
 
     if (!check_horizontal_wind(m)) {
-        dragThreshold = ((m->action == ACT_LONG_JUMP) ? 48.0f : 32.0f);
+        f32 dragThreshold = ((m->action == ACT_LONG_JUMP) ? 48.0f : 32.0f);
         m->forwardVel = approach_f32(m->forwardVel, 0.0f, 0.35f, 0.35f);
 
         if (m->input & INPUT_NONZERO_ANALOG) {
             intendedDYaw = m->intendedYaw - m->faceAngle[1];
             intendedMag = (m->intendedMag / 32.0f);
 
-            m->forwardVel += intendedMag * coss(intendedDYaw) *  1.5f;
-            sidewaysSpeed  = intendedMag * sins(intendedDYaw) * 10.0f;
+            m->forwardVel += (intendedMag * coss(intendedDYaw) *  1.5f);
+            sidewaysSpeed  = (intendedMag * sins(intendedDYaw) * 10.0f);
         }
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -225,15 +220,12 @@ void update_air_without_turn(struct MarioState *m) {
 }
 
 void update_lava_boost_or_twirling(struct MarioState *m) {
-    s16 intendedDYaw;
-    f32 intendedMag;
-
     if (m->input & INPUT_NONZERO_ANALOG) {
-        intendedDYaw = m->intendedYaw - m->faceAngle[1];
-        intendedMag = m->intendedMag / 32.0f;
+        s16 intendedDYaw = (m->intendedYaw - m->faceAngle[1]);
+        f32 intendedMag = (m->intendedMag / 32.0f);
 
-        m->forwardVel += coss(intendedDYaw) * intendedMag;
-        m->faceAngle[1] += sins(intendedDYaw) * intendedMag * 1024.0f;
+        m->forwardVel   += (coss(intendedDYaw) * intendedMag);
+        m->faceAngle[1] += (sins(intendedDYaw) * intendedMag * 1024.0f);
 
         if (m->forwardVel < 0.0f) {
             m->faceAngle[1] += 0x8000;
@@ -308,29 +300,24 @@ void update_flying(struct MarioState *m) {
     update_flying_pitch(m);
     update_flying_yaw(m);
 
-    m->forwardVel -= 2.0f * ((f32) m->faceAngle[0] / 0x4000) + 0.1f;
-    m->forwardVel -= 0.5f * (1.0f - coss(m->angleVel[1]));
+    m->forwardVel -= ((2.0f * ((f32) m->faceAngle[0] / 0x4000)) + 0.1f);
+    m->forwardVel -= (0.5f * (1.0f - coss(m->angleVel[1])));
 
     if (m->forwardVel < 0.0f) {
         m->forwardVel = 0.0f;
     }
 
     if (m->forwardVel > 16.0f) {
-        m->faceAngle[0] += (m->forwardVel - 32.0f) * 6.0f;
+        m->faceAngle[0] += ((m->forwardVel - 32.0f) *  6.0f);
     } else if (m->forwardVel > 4.0f) {
-        m->faceAngle[0] += (m->forwardVel - 32.0f) * 10.0f;
+        m->faceAngle[0] += ((m->forwardVel - 32.0f) * 10.0f);
     } else {
         m->faceAngle[0] -= 0x400;
     }
 
     m->faceAngle[0] += m->angleVel[0];
 
-    if (m->faceAngle[0] > 0x2AAA) {
-        m->faceAngle[0] = 0x2AAA;
-    }
-    if (m->faceAngle[0] < -0x2AAA) {
-        m->faceAngle[0] = -0x2AAA;
-    }
+    m->faceAngle[0] = CLAMP(m->faceAngle[0], -DEGREES(60), DEGREES(60));
 
     m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
     m->vel[1] = m->forwardVel * sins(m->faceAngle[0]);
@@ -426,9 +413,9 @@ s32 act_jump(struct MarioState *m) {
 }
 
 s32 act_double_jump(struct MarioState *m) {
-    s32 animation = (m->vel[1] >= 0.0f)
-        ? MARIO_ANIM_DOUBLE_JUMP_RISE
-        : MARIO_ANIM_DOUBLE_JUMP_FALL;
+    s32 animation = ((m->vel[1] >= 0.0f)
+                     ? MARIO_ANIM_DOUBLE_JUMP_RISE
+                     : MARIO_ANIM_DOUBLE_JUMP_FALL);
 
     if (check_kick_or_dive_in_air(m)) {
         return TRUE;
@@ -704,17 +691,17 @@ s32 act_dive(struct MarioState *m) {
 
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_NONE:
-            if (m->vel[1] < 0.0f && m->faceAngle[0] > -0x2AAA) {
+            if ((m->vel[1] < 0.0f) && m->faceAngle[0] > -DEGREES(60)) {
                 m->faceAngle[0] -= 0x200;
-                if (m->faceAngle[0] < -0x2AAA) {
-                    m->faceAngle[0] = -0x2AAA;
+                if (m->faceAngle[0] < -DEGREES(60)) {
+                    m->faceAngle[0] = -DEGREES(60);
                 }
             }
             m->marioObj->header.gfx.angle[0] = -m->faceAngle[0];
             break;
 
         case AIR_STEP_LANDED:
-            if (should_get_stuck_in_ground(m) && m->faceAngle[0] == -0x2AAA) {
+            if (should_get_stuck_in_ground(m) && m->faceAngle[0] == -DEGREES(60)) {
 #if ENABLE_RUMBLE
                 queue_rumble_data(5, 80);
 #endif
@@ -1051,13 +1038,10 @@ s32 act_crazy_box_bounce(struct MarioState *m) {
     return FALSE;
 }
 
-u32 common_air_knockback_step(struct MarioState *m, u32 landAction, u32 hardFallAction, s32 animation,
-                              f32 speed) {
-    u32 stepResult;
-
+u32 common_air_knockback_step(struct MarioState *m, u32 landAction, u32 hardFallAction, s32 animation, f32 speed) {
     mario_set_forward_vel(m, speed);
 
-    stepResult = perform_air_step(m, 0);
+    u32 stepResult = perform_air_step(m, 0);
     switch (stepResult) {
         case AIR_STEP_NONE:
             set_mario_animation(m, animation);
@@ -1694,7 +1678,7 @@ s32 act_flying(struct MarioState *m) {
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_NONE:
             m->marioObj->header.gfx.angle[0] = -m->faceAngle[0];
-            m->marioObj->header.gfx.angle[2] = m->faceAngle[2];
+            m->marioObj->header.gfx.angle[2] =  m->faceAngle[2];
             m->actionTimer = 0;
             break;
 
@@ -1720,8 +1704,8 @@ s32 act_flying(struct MarioState *m) {
                     m->vel[1] = 0.0f;
                 }
 
-                play_sound((m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK
-                                                        : SOUND_ACTION_BONK,
+                play_sound(((m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK
+                                                         : SOUND_ACTION_BONK),
                            m->marioObj->header.gfx.cameraToObject);
 
                 m->particleFlags |= PARTICLE_VERTICAL_STAR;
@@ -1737,12 +1721,12 @@ s32 act_flying(struct MarioState *m) {
                 }
 
                 m->faceAngle[0] -= 0x200;
-                if (m->faceAngle[0] < -0x2AAA) {
-                    m->faceAngle[0] = -0x2AAA;
+                if (m->faceAngle[0] < -DEGREES(60)) {
+                    m->faceAngle[0] = -DEGREES(60);
                 }
 
                 m->marioObj->header.gfx.angle[0] = -m->faceAngle[0];
-                m->marioObj->header.gfx.angle[2] = m->faceAngle[2];
+                m->marioObj->header.gfx.angle[2] =  m->faceAngle[2];
             }
             break;
 
