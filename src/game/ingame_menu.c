@@ -40,9 +40,9 @@ s16 gCutsceneMsgXOffset;
 s16 gCutsceneMsgYOffset;
 s8 gRedCoinsCollected;
 #if defined(WIDE) && !defined(PUPPYCAM)
-u8 textCurrRatio43[] = { TEXT_HUD_CURRENT_RATIO_43 };
+u8 textCurrRatio43[]  = { TEXT_HUD_CURRENT_RATIO_43  };
 u8 textCurrRatio169[] = { TEXT_HUD_CURRENT_RATIO_169 };
-u8 textPressL[] = { TEXT_HUD_PRESS_L };
+u8 textPressL[]       = { TEXT_HUD_PRESS_L           };
 #endif
 
 #if MULTILANG
@@ -879,15 +879,17 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                         customColor = 2;
                         strIdx = colorLoop - 8;
                         for (diffTmp = 0; diffTmp < 8; ++diffTmp) {
-                            if (str[strIdx + diffTmp] != 0x9F)
+                            if (str[strIdx + diffTmp] != 0x9F) {
                                 break;
+                            }
                         }
-                        if (diffTmp == 8)
+                        if (diffTmp == 8) {
                             strIdx += diffTmp;
+                        }
                         break;
                     }
                     if (((8 - (colorLoop - strIdx)) % 2) == 0) {
-                        rgbaColors[(8 - (colorLoop - strIdx)) / 2] = ((str[strIdx] - diffTmp) & 0x0F) << 4;
+                        rgbaColors[(8 - (colorLoop - strIdx)) / 2] = (((str[strIdx] - diffTmp) & 0x0F) << 4);
                     } else {
                         rgbaColors[(8 - (colorLoop - strIdx)) / 2] += ((str[strIdx] - diffTmp) & 0x0F);
                     }
@@ -1484,6 +1486,7 @@ void render_pause_red_coins(void) {
         print_animated_red_coin(GFX_DIMENSIONS_FROM_RIGHT_EDGE(30) - x * 20, 16);
     }
 }
+
 /// By default, not needed as puppycamera has an option, but should you wish to revert that, you are legally allowed.
 
 #if defined(WIDE) && !defined(PUPPYCAM)
@@ -1557,7 +1560,7 @@ void render_pause_my_score_coins(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)
-        && save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0) {
+        && (save_file_get_course_star_count((gCurrSaveFileNum - 1), courseIndex) != 0)) {
         print_generic_string(MYSCORE_X, 121, LANGUAGE_ARRAY(textMyScore));
     }
 
@@ -1568,7 +1571,7 @@ void render_pause_my_score_coins(void) {
         int_to_str(gCurrCourseNum, strCourseNum);
         print_generic_string(  CRS_NUM_X1, 157, strCourseNum);
 
-        u8 *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
+        u8 *actName = segmented_to_virtual(actNameTbl[(COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6) + gDialogCourseActNum - 1]);
 
         if (starFlags & (1 << (gDialogCourseActNum - 1))) {
             print_generic_string(TXT_STAR_X, 140, textStar);

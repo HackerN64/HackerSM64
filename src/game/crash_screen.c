@@ -337,11 +337,12 @@ void draw_crash_screen(OSThread *thread) {
         updateBuffer = TRUE;
     }
 
-    if (crashPage >= PAGE_COUNT && crashPage != 255)
+    if (crashPage >= PAGE_COUNT && crashPage != 255) {
         crashPage = 0;
-    if (crashPage == 255)
-        crashPage = PAGE_COUNT-1;
-
+    }
+    if (crashPage == 255) {
+        crashPage = (PAGE_COUNT - 1);
+    }
     if (updateBuffer) {
         crash_screen_draw_rect(25, 8, 270, 12);
         crash_screen_print(30, 10, "Page:%02d                L/Z: Left   R: Right", crashPage);
@@ -408,8 +409,9 @@ void thread2_crash_screen(UNUSED void *arg) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
             thread = get_crashed_thread();
             gCrashScreen.framebuffer = (u16 *) gFramebuffers[sRenderedFramebuffer];
-            if (thread)
+            if (thread) {
                 goto reset;
+            }
         } else {
             if (gControllerBits) {
 #if ENABLE_RUMBLE

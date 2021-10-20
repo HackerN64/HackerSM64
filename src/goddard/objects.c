@@ -767,8 +767,9 @@ s32 group_contains_obj(struct ObjGroup *group, struct GdObj *obj) {
     struct ListNode *node = group->firstMember;
 
     while (node != NULL) {
-        if (node->obj->index == obj->index)
+        if (node->obj->index == obj->index) {
             return TRUE;
+        }
         node = node->next;
     }
 

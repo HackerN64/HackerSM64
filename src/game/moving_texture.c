@@ -620,8 +620,9 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
             waterId = gEnvironmentRegions[(i * 6) + 1];
             waterY  = gEnvironmentRegions[(i * 6) + 6];
             subList = movtex_gen_quads_id(waterId, waterY, quadCollection);
-            if (subList != NULL)
+            if (subList != NULL) {
                 gSPDisplayList(gfx++, VIRTUAL_TO_PHYSICAL(subList));
+            }
         }
         gSPDisplayList(gfx++, dl_waterbox_end);
         gSPEndDisplayList(gfx);

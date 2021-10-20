@@ -14,8 +14,7 @@ extern struct GraphNodeHeldObject *gCurGraphNodeHeldObject;
 #define gCurGraphNodeObjectNode ((struct Object *)gCurGraphNodeObject)
 extern u16 gAreaUpdateCounter;
 
-enum AnimType
-{
+enum AnimType {
     // after processing an object, the type is reset to this
     ANIM_TYPE_NONE,
     // Not all parts have full animation: to save space, some animations only
@@ -29,8 +28,7 @@ enum AnimType
     ANIM_TYPE_ROTATION
 };
 
-enum HeadsList
-{
+enum HeadsList {
     LIST_HEADS_ZEX,
     LIST_HEADS_REJ,
 };
@@ -40,8 +38,7 @@ enum HeadsList
 
 #if SILHOUETTE
 #define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))
-enum RenderPhase
-{
+enum RenderPhase {
     RENDER_PHASE_ZEX_BG,
     RENDER_PHASE_REJ_ZB,
     RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
@@ -53,8 +50,7 @@ enum RenderPhase
     RENDER_PHASE_END,
 };
 #else
-enum RenderPhase
-{
+enum RenderPhase {
     RENDER_PHASE_ZEX_BG,
     RENDER_PHASE_REJ_ZB,
     RENDER_PHASE_ZEX_ALL,

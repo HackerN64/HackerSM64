@@ -556,9 +556,9 @@ s32 gd_atoi(const char *str) {
         cur = *str++;
 
         // Each character must be either a digit or a minus sign
-        if ((cur < '0' || cur > '9') && (cur != '-'))
+        if ((cur < '0' || cur > '9') && (cur != '-')) {
             fatal_printf("gd_atoi() bad number '%s'", origstr);
-
+        }
         if (cur == '-') {
             isNegative = TRUE;
         } else {

@@ -46,8 +46,7 @@ enum PuppyVolumeShapes {
     CMD_W(removeflags), \
     CMD_BBH(flagpersistance, shape, room)
 
-struct gPuppyOptions
-{
+struct gPuppyOptions {
     s16 analogue;
     s16 sensitivityX;
     s16 sensitivityY;
@@ -57,8 +56,7 @@ struct gPuppyOptions
     s16 inputType;
 };
 
-struct gPuppyStruct
-{
+struct gPuppyStruct {
     s16 yaw;                    // Horizontal Direction the game reads as the active value.
     s16 yawTarget;              // Horizontal Direction that yaw tries to be.
     f32 yawAcceleration;        // Horizontal Direction that sets yawTarget.
@@ -113,8 +111,7 @@ struct gPuppyStruct
 };
 
 // A second container for bounds that have 2 pairs of coordinates. Optional.
-struct sPuppyAngles
-{
+struct sPuppyAngles {
     Vec3s pos;
     Vec3s focus;
     s16 yaw;
@@ -123,16 +120,14 @@ struct sPuppyAngles
 };
 
 // Structurally, it's exactly the same as CutsceneSplinePoint
-struct sPuppySpline
-{
+struct sPuppySpline {
     s8 index;  // The index of the spline. Ends with -1
     u8 speed;  // The amount of frames it takes to get through this index.
     Vec3s pos; // The vector pos of the spline index itself.
 };
 
 // A bounding volume for activating puppycamera scripts and angles.
-struct sPuppyVolume
-{
+struct sPuppyVolume {
     Vec3s pos;                   // The set position of the volume
     Vec3s radius;                // Where it extends.
     s16 rot;                     // The rotational angle of the volume.
@@ -146,8 +141,7 @@ struct sPuppyVolume
     u8 area;
 };
 
-enum gPuppyCamBeh
-{
+enum gPuppyCamBeh {
     PUPPYCAM_BEHAVIOUR_X_MOVEMENT       = (1 <<  0), // 0x0001
     PUPPYCAM_BEHAVIOUR_Y_MOVEMENT       = (1 <<  1), // 0x0002
     PUPPYCAM_BEHAVIOUR_Z_MOVEMENT       = (1 <<  2), // 0x0004

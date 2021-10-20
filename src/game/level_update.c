@@ -389,8 +389,9 @@ void init_mario_after_warp(struct MarioState *m) {
             play_music(SEQ_PLAYER_LEVEL, SEQUENCE_ARGS(4, SEQ_LEVEL_SLIDE), 0);
         }
 
-        if (sWarpDest.levelNum == LEVEL_CASTLE && sWarpDest.areaIdx == 1 && (sWarpDest.nodeId == 31 || sWarpDest.nodeId == 32))
+        if (sWarpDest.levelNum == LEVEL_CASTLE && sWarpDest.areaIdx == 1 && (sWarpDest.nodeId == 31 || sWarpDest.nodeId == 32)) {
             play_sound(SOUND_MENU_MARIO_CASTLE_WARP, gGlobalSoundSource);
+        }
         if (sWarpDest.levelNum == LEVEL_CASTLE_GROUNDS && sWarpDest.areaIdx == 1
             && (sWarpDest.nodeId == 7 || sWarpDest.nodeId == 10 || sWarpDest.nodeId == 20
                 || sWarpDest.nodeId == 30)) {

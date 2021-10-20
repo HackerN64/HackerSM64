@@ -302,11 +302,11 @@ void print_audio_ram_overview(void) {
 
     y += 24;
     for (i = 0; i < NUM_AUDIO_POOLS; i++) {
-        if (audioPoolSizes[i][0] == 0)
+        if (audioPoolSizes[i][0] == 0) {
             percentage = 1000;
-        else
+        } else {
             percentage = ((s64) audioPoolSizes[i][1] * 1000) / audioPoolSizes[i][0];
-
+        }
         sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
             audioPoolSizes[i][1], audioPoolSizes[i][0], percentage / 10, percentage % 10);
         
@@ -319,11 +319,11 @@ void print_audio_ram_overview(void) {
         totalMemory[1] += audioPoolSizes[i][1];
     }
     
-    if (totalMemory[0] == 0)
+    if (totalMemory[0] == 0) {
         percentage = 0;
-    else
+    } else {
         percentage = ((s64) totalMemory[1] * 1000) / totalMemory[0];
-
+    }
     if (totalMemory[0] == gAudioHeapSize) {
         sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d_)",
             totalMemory[1], totalMemory[0], percentage / 10, percentage % 10);
@@ -864,8 +864,7 @@ s32 get_text_height(const char *str) {
     return textPos;
 }
 
-void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 font)
-{
+void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 font) {
     s32 textX = 0;
     s32 textY = 0;
     s32 offsetY = 0;
@@ -878,7 +877,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     s32 wavePos;
     s32 lines = 0;
     s32 xlu = currEnv[3];
-    s32 prevxlu = 256; //Set out of bounds, so it will *always* be different at first.
+    s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
     Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
 
     shakeToggle = 0;

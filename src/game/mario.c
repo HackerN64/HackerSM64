@@ -571,8 +571,9 @@ s32 mario_floor_is_steep(struct MarioState *m) {
     s32 result = FALSE;
 
 #ifdef JUMP_KICK_FIX
-    if (m->floor->type == SURFACE_NOT_SLIPPERY)
+    if (m->floor->type == SURFACE_NOT_SLIPPERY) {
         return FALSE;
+    }
 #endif
 
     // Interestingly, this function does not check for the
@@ -1269,7 +1270,6 @@ void update_mario_joystick_inputs(struct MarioState *m) {
  * Resolves wall collisions, and updates a variety of inputs.
  */
 void update_mario_geometry_inputs(struct MarioState *m) {
-    f32 gasLevel;
     f32 ceilToFloorDist;
 
     f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f);
@@ -1286,28 +1286,28 @@ void update_mario_geometry_inputs(struct MarioState *m) {
         m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
     }
 
-    m->ceilHeight = find_ceil(m->pos[0], m->pos[1] + 3.0f, m->pos[2], &m->ceil);
-    gasLevel = find_poison_gas_level(m->pos[0], m->pos[2]);
+    m->ceilHeight = find_ceil(m->pos[0], (m->pos[1] + 3.0f), m->pos[2], &m->ceil);
+    f32 gasLevel = find_poison_gas_level(m->pos[0], m->pos[2]);
     m->waterLevel = find_water_level(m->pos[0], m->pos[2]);
 
     if (m->floor != NULL) {
         m->floorYaw = atan2s(m->floor->normal.z, m->floor->normal.x);
         m->terrainSoundAddend = mario_get_terrain_sound_addend(m);
 
-        if ((m->pos[1] > m->waterLevel - 40) && mario_floor_is_slippery(m)) {
+        if ((m->pos[1] > (m->waterLevel - 40)) && mario_floor_is_slippery(m)) {
             m->input |= INPUT_ABOVE_SLIDE;
         }
 
         if ((m->floor->flags & SURFACE_FLAG_DYNAMIC)
-            || (m->ceil && m->ceil->flags & SURFACE_FLAG_DYNAMIC)) {
-            ceilToFloorDist = m->ceilHeight - m->floorHeight;
+         || (m->ceil && m->ceil->flags & SURFACE_FLAG_DYNAMIC)) {
+            ceilToFloorDist = (m->ceilHeight - m->floorHeight);
 
             if ((0.0f <= ceilToFloorDist) && (ceilToFloorDist <= 150.0f)) {
                 m->input |= INPUT_SQUISHED;
             }
         }
 
-        if (m->pos[1] > m->floorHeight + 100.0f) {
+        if (m->pos[1] > (m->floorHeight + 100.0f)) {
             m->input |= INPUT_OFF_FLOOR;
         }
 
@@ -1660,8 +1660,9 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
     // This checks for Z_TRIG instead of Z_DOWN flag
     // (which is also what other debug functions do),
     // so likely debug behavior rather than unused behavior.
-    if ((gPlayer1Controller->buttonDown & Z_TRIG) && (gPlayer1Controller->buttonPressed & button)
-        && !(gMarioState->flags & flags)) {
+    if ((gPlayer1Controller->buttonDown & Z_TRIG)
+     && (gPlayer1Controller->buttonPressed & button)
+     && !(gMarioState->flags & flags)) {
         gMarioState->flags |= (flags + MARIO_CAP_ON_HEAD);
 
         if (capTimer > gMarioState->capTimer) {
@@ -1706,9 +1707,12 @@ s32 execute_mario_action(struct MarioState *m) {
         mario_reset_bodystate(m);
         update_mario_inputs(m);
 #ifdef PUPPYCAM
-        if (!(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_FREE))
+        if (!(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_FREE)) {
 #endif
-        mario_handle_special_floors(m);
+            mario_handle_special_floors(m);  
+#ifdef PUPPYCAM
+        }
+#endif
         mario_process_interactions(m);
 
         // If Mario is OOB, stop executing actions.
