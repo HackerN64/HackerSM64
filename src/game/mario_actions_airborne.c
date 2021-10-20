@@ -886,7 +886,7 @@ s32 act_ground_pound(struct MarioState *m) {
         }
 
         m->actionTimer++;
-        if (m->actionTimer >= m->marioObj->header.gfx.animInfo.curAnim->loopEnd + 4) {
+        if (m->actionTimer >= (m->marioObj->header.gfx.animInfo.currAnim->loopEnd + 4)) {
 #ifdef GROUND_POUND_WALL_FIX
             m->vel[1] = -50.0f;
 #endif

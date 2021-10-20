@@ -80,35 +80,33 @@ void bhv_bowser_tail_anchor_loop(void) {
  */
 void bhv_bowser_flame_spawn_loop(void) {
     struct Object *bowser = o->parentObj;
-    s32 animFrame;
-    f32 posX;
-    f32 posZ;
-    f32 cossYaw = coss(bowser->oMoveAngleYaw);
-    f32 sinsYaw = sins(bowser->oMoveAngleYaw);
-    s16 *data = segmented_to_virtual(dBowserFlamesOrientationValues);
 
     // Check for Bowser breathing animation
     if (bowser->oSoundStateID == BOWSER_ANIM_BREATH) {
 
         // Start counting anim frames then reset it when it ends
-        animFrame = bowser->header.gfx.animInfo.animFrame + 1.0f;
-        if (bowser->header.gfx.animInfo.curAnim->loopEnd == animFrame) {
+        s32 animFrame = (bowser->header.gfx.animInfo.animFrame + 1.0f);
+        if (bowser->header.gfx.animInfo.currAnim->loopEnd == animFrame) {
             animFrame = 0;
         }
 
         // Bowser is breathing, play sound and adjust flame position
         // each animFrame based off the orientantion data
-        if (animFrame > 45 && animFrame < 85) {
+        if ((animFrame > 45) && (animFrame < 85)) {
             cur_obj_play_sound_1(SOUND_AIR_BOWSER_SPIT_FIRE);
-            posX = data[5 * animFrame];
-            posZ = data[5 * animFrame + 2];
-            o->oPosX = bowser->oPosX + (posZ * sinsYaw + posX * cossYaw);
-            o->oPosY = bowser->oPosY + data[5 * animFrame + 1];
-            o->oPosZ = bowser->oPosZ + (posZ * cossYaw - posX * sinsYaw);
-            o->oMoveAnglePitch = data[5 * animFrame + 4] + 0xC00;
-            o->oMoveAngleYaw = data[5 * animFrame + 3] + (s16) bowser->oMoveAngleYaw;
+            s16 *data = segmented_to_virtual(dBowserFlamesOrientationValues);
+            s32 animFrame5 = (5 * animFrame);
+            f32 posX = data[animFrame5];
+            f32 posZ = data[animFrame5 + 2];
+            f32 cossYaw = coss(bowser->oMoveAngleYaw);
+            f32 sinsYaw = sins(bowser->oMoveAngleYaw);
+            o->oPosX = (bowser->oPosX + ((posZ * sinsYaw) + (posX * cossYaw)));
+            o->oPosY = (bowser->oPosY + data[animFrame5 + 1]);
+            o->oPosZ = (bowser->oPosZ + ((posZ * cossYaw) - (posX * sinsYaw)));
+            o->oMoveAnglePitch = (data[animFrame5 + 4] + 0xC00);
+            o->oMoveAngleYaw = (data[animFrame5 + 3] + (s16) bowser->oMoveAngleYaw);
             // Spawns the flames on a non-odd animFrame value
-            if (!(animFrame & 1)) {
+            if (!(animFrame & 0x1)) {
                 spawn_object(o, MODEL_RED_FLAME, bhvFlameMovingForwardGrowing);
             }
         }

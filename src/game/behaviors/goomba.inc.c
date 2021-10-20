@@ -249,8 +249,8 @@ static void goomba_act_jump(void) {
 #if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
 static void floomba_act_startup(void) {
     if (GET_BPARAM3(o->oBehParams) & GOOMBA_BP3_FLOOMBA_MIRRORED_STARTUP_ANIM) {
-        struct Animation *curAnim = o->header.gfx.animInfo.curAnim;
-        s16 frameDiff = ((curAnim->loopEnd - curAnim->loopStart) / 2);
+        struct Animation *currAnim = o->header.gfx.animInfo.currAnim;
+        s16 frameDiff = ((currAnim->loopEnd - currAnim->loopStart) / 2);
 
         o->header.gfx.animInfo.animFrameAccelAssist += (frameDiff << 16);
         o->header.gfx.animInfo.animFrame += frameDiff;

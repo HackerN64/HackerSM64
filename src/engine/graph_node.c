@@ -304,7 +304,7 @@ struct GraphNodeObject *init_graph_node_object(struct AllocOnlyPool *pool,
         graphNode->sharedChild = sharedChild;
         graphNode->throwMatrix = NULL;
         graphNode->animInfo.animID = 0;
-        graphNode->animInfo.curAnim = NULL;
+        graphNode->animInfo.currAnim = NULL;
         graphNode->animInfo.animFrame = 0;
         graphNode->animInfo.animFrameAccelAssist = 0;
         graphNode->animInfo.animAccel = 0x10000;
@@ -709,7 +709,7 @@ void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f po
     graphNode->sharedChild = sharedChild;
     graphNode->spawnInfo = 0;
     graphNode->throwMatrix = NULL;
-    graphNode->animInfo.curAnim = NULL;
+    graphNode->animInfo.currAnim = NULL;
 
     graphNode->node.flags |=  GRAPH_RENDER_ACTIVE;
     graphNode->node.flags &= ~GRAPH_RENDER_INVISIBLE;
@@ -731,7 +731,7 @@ void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo 
     graphNode->sharedChild = spawn->model;
     graphNode->spawnInfo = spawn;
     graphNode->throwMatrix = NULL;
-    graphNode->animInfo.curAnim = 0;
+    graphNode->animInfo.currAnim = 0;
 
     graphNode->node.flags |= GRAPH_RENDER_ACTIVE;
     graphNode->node.flags &= ~GRAPH_RENDER_INVISIBLE;
@@ -746,8 +746,8 @@ void geo_obj_init_animation(struct GraphNodeObject *graphNode, struct Animation 
     struct Animation **animSegmented = segmented_to_virtual(animPtrAddr);
     struct Animation *anim = segmented_to_virtual(*animSegmented);
 
-    if (graphNode->animInfo.curAnim != anim) {
-        graphNode->animInfo.curAnim = anim;
+    if (graphNode->animInfo.currAnim != anim) {
+        graphNode->animInfo.currAnim = anim;
         graphNode->animInfo.animFrame = anim->startFrame + ((anim->flags & ANIM_FLAG_FORWARD) ? 1 : -1);
         graphNode->animInfo.animAccel = 0;
         graphNode->animInfo.animYTrans = 0;
@@ -761,8 +761,8 @@ void geo_obj_init_animation_accel(struct GraphNodeObject *graphNode, struct Anim
     struct Animation **animSegmented = segmented_to_virtual(animPtrAddr);
     struct Animation *anim = segmented_to_virtual(*animSegmented);
 
-    if (graphNode->animInfo.curAnim != anim) {
-        graphNode->animInfo.curAnim = anim;
+    if (graphNode->animInfo.currAnim != anim) {
+        graphNode->animInfo.currAnim = anim;
         graphNode->animInfo.animYTrans = 0;
         graphNode->animInfo.animFrameAccelAssist =
             (anim->startFrame << 16) + ((anim->flags & ANIM_FLAG_FORWARD) ? animAccel : -animAccel);
@@ -800,7 +800,7 @@ s32 retrieve_animation_index(s32 frame, u16 **attributes) {
  */
 s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
     s32 result;
-    struct Animation *anim = obj->curAnim;
+    struct Animation *anim = obj->currAnim;
 
     if (obj->animTimer == gAreaUpdateCounter || anim->flags & ANIM_FLAG_NO_ACCEL) {
         if (accelAssist != NULL) {
@@ -856,7 +856,7 @@ s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
  * animations without lateral translation.
  */
 void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f position) {
-    struct Animation *animation = obj->animInfo.curAnim;
+    struct Animation *animation = obj->animInfo.currAnim;
 
     if (animation != NULL) {
         u16 *attribute = segmented_to_virtual((void *) animation->index);

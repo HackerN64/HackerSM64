@@ -753,7 +753,7 @@ void geo_process_bone(struct GraphNodeBone *node) {
  * object's animation.
  */
 void geo_set_animation_globals(struct AnimInfo *node, s32 hasAnimation) {
-    struct Animation *anim = node->curAnim;
+    struct Animation *anim = node->currAnim;
 
     if (hasAnimation) {
         node->animFrame = geo_update_animation_frame(node, &node->animFrameAccelAssist);
@@ -966,7 +966,7 @@ void geo_process_object(struct Object *node) {
         vec3_copy(node->header.gfx.cameraToObject, gMatStack[gMatStackIndex][3]);
 
         // FIXME: correct types
-        if (node->header.gfx.animInfo.curAnim != NULL) {
+        if (node->header.gfx.animInfo.currAnim != NULL) {
             geo_set_animation_globals(&node->header.gfx.animInfo, hasAnimation);
         }
         if (obj_is_in_view(&node->header.gfx, gMatStack[gMatStackIndex])) {
@@ -1047,7 +1047,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
         gGeoTempState.data                  = gCurrAnimData;
         gCurrAnimType                        = 0;
         gCurGraphNodeHeldObject             = (void *) node;
-        if (node->objNode->header.gfx.animInfo.curAnim != NULL) {
+        if (node->objNode->header.gfx.animInfo.currAnim != NULL) {
             geo_set_animation_globals(&node->objNode->header.gfx.animInfo, hasAnimation);
         }
 

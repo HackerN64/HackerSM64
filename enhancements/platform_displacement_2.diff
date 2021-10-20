@@ -380,7 +380,7 @@ index 0000000..97cba2a
 +    s16 *sp1C = segmented_to_virtual(bowser_seg6_unkmoveshorts_060576FC);
 +    if (bowser->oSoundStateID == 6) {
 +        sp30 = bowser->header.gfx.animInfo.animFrame + 1.0f;
-+        if (bowser->header.gfx.animInfo.curAnim->loopEnd == sp30)
++        if (bowser->header.gfx.animInfo.currAnim->loopEnd == sp30)
 +            sp30 = 0;
 +        if (sp30 > 45 && sp30 < 85) {
 +            cur_obj_play_sound_1(SOUND_AIR_BOWSER_SPIT_FIRE);

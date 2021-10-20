@@ -562,7 +562,7 @@ static s32 obj_handle_attacks(struct ObjectHitbox *hitbox, s32 attackedMarioActi
 static void obj_act_knockback(UNUSED f32 baseScale) {
     cur_obj_update_floor_and_walls();
 
-    if (o->header.gfx.animInfo.curAnim != NULL) {
+    if (o->header.gfx.animInfo.currAnim != NULL) {
         cur_obj_extend_animation_if_at_end();
     }
 
@@ -577,11 +577,11 @@ static void obj_act_knockback(UNUSED f32 baseScale) {
 }
 
 static void obj_act_squished(f32 baseScale) {
-    f32 targetScaleY = baseScale * 0.3f;
+    f32 targetScaleY = (baseScale * 0.3f);
 
     cur_obj_update_floor_and_walls();
 
-    if (o->header.gfx.animInfo.curAnim != NULL) {
+    if (o->header.gfx.animInfo.currAnim != NULL) {
         cur_obj_extend_animation_if_at_end();
     }
 

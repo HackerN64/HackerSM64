@@ -44,7 +44,7 @@
 s32 is_anim_at_end(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
 
-    return (marioObj->header.gfx.animInfo.animFrame + 1) == marioObj->header.gfx.animInfo.curAnim->loopEnd;
+    return ((marioObj->header.gfx.animInfo.animFrame + 1) == marioObj->header.gfx.animInfo.currAnim->loopEnd);
 }
 
 /**
@@ -52,7 +52,7 @@ s32 is_anim_at_end(struct MarioState *m) {
  */
 s32 is_anim_past_end(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
-    return marioObj->header.gfx.animInfo.animFrame >= (marioObj->header.gfx.animInfo.curAnim->loopEnd - 2);
+    return (marioObj->header.gfx.animInfo.animFrame >= (marioObj->header.gfx.animInfo.currAnim->loopEnd - 2));
 }
 
 /**
@@ -69,7 +69,7 @@ s32 set_mario_animation(struct MarioState *m, s32 targetAnimID) {
 
     if (marioObj->header.gfx.animInfo.animID != targetAnimID) {
         marioObj->header.gfx.animInfo.animID = targetAnimID;
-        marioObj->header.gfx.animInfo.curAnim = targetAnim;
+        marioObj->header.gfx.animInfo.currAnim = targetAnim;
         marioObj->header.gfx.animInfo.animAccel = 0;
         marioObj->header.gfx.animInfo.animYTrans = m->animYTrans;
 
@@ -102,7 +102,7 @@ s32 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel)
 
     if (marioObj->header.gfx.animInfo.animID != targetAnimID) {
         marioObj->header.gfx.animInfo.animID = targetAnimID;
-        marioObj->header.gfx.animInfo.curAnim = targetAnim;
+        marioObj->header.gfx.animInfo.currAnim = targetAnim;
         marioObj->header.gfx.animInfo.animYTrans = m->animYTrans;
 
         if (targetAnim->flags & ANIM_FLAG_NO_ACCEL) {
@@ -128,31 +128,31 @@ s32 set_mario_anim_with_accel(struct MarioState *m, s32 targetAnimID, s32 accel)
  */
 void set_anim_to_frame(struct MarioState *m, s16 animFrame) {
     struct AnimInfo *animInfo = &m->marioObj->header.gfx.animInfo;
-    struct Animation *curAnim = animInfo->curAnim;
+    struct Animation *currAnim = animInfo->currAnim;
 
     if (animInfo->animAccel != 0) {
-        if (curAnim->flags & ANIM_FLAG_FORWARD) {
-            animInfo->animFrameAccelAssist = (animFrame << 0x10) + animInfo->animAccel;
+        if (currAnim->flags & ANIM_FLAG_FORWARD) {
+            animInfo->animFrameAccelAssist = ((animFrame << 0x10) + animInfo->animAccel);
         } else {
-            animInfo->animFrameAccelAssist = (animFrame << 0x10) - animInfo->animAccel;
+            animInfo->animFrameAccelAssist = ((animFrame << 0x10) - animInfo->animAccel);
         }
     } else {
-        if (curAnim->flags & ANIM_FLAG_FORWARD) {
-            animInfo->animFrame = animFrame + 1;
+        if (currAnim->flags & ANIM_FLAG_FORWARD) {
+            animInfo->animFrame = (animFrame + 1);
         } else {
-            animInfo->animFrame = animFrame - 1;
+            animInfo->animFrame = (animFrame - 1);
         }
     }
 }
 
 s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
     s32 isPastFrame;
-    s32 acceleratedFrame = animFrame << 0x10;
+    s32 acceleratedFrame = (animFrame << 0x10);
     struct AnimInfo *animInfo = &m->marioObj->header.gfx.animInfo;
-    struct Animation *curAnim = animInfo->curAnim;
+    struct Animation *currAnim = animInfo->currAnim;
 
     if (animInfo->animAccel != 0) {
-        if (curAnim->flags & ANIM_FLAG_FORWARD) {
+        if (currAnim->flags & ANIM_FLAG_FORWARD) {
             isPastFrame =
                 (animInfo->animFrameAccelAssist > acceleratedFrame)
                 && (acceleratedFrame >= (animInfo->animFrameAccelAssist - animInfo->animAccel));
@@ -162,7 +162,7 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
                 && (acceleratedFrame <= (animInfo->animFrameAccelAssist + animInfo->animAccel));
         }
     } else {
-        if (curAnim->flags & ANIM_FLAG_FORWARD) {
+        if (currAnim->flags & ANIM_FLAG_FORWARD) {
             isPastFrame = (animInfo->animFrame == (animFrame + 1));
         } else {
             isPastFrame = ((animInfo->animFrame + 1) == animFrame);
@@ -177,24 +177,22 @@ s32 is_anim_past_frame(struct MarioState *m, s16 animFrame) {
  * and returns the animation's flags.
  */
 s32 find_mario_anim_flags_and_translation(struct Object *obj, s32 yaw, Vec3s translation) {
-    f32 dx, dz;
-
-    struct Animation *curAnim = (void *) obj->header.gfx.animInfo.curAnim;
+    struct Animation *currAnim = (void *) obj->header.gfx.animInfo.currAnim;
     s16 animFrame = geo_update_animation_frame(&obj->header.gfx.animInfo, NULL);
-    u16 *animIndex = segmented_to_virtual((void *) curAnim->index);
-    s16 *animValues = segmented_to_virtual((void *) curAnim->values);
+    u16 *animIndex = segmented_to_virtual((void *) currAnim->index);
+    s16 *animValues = segmented_to_virtual((void *) currAnim->values);
 
     f32 s = (f32) sins(yaw);
     f32 c = (f32) coss(yaw);
 
-    dx = *(animValues + (retrieve_animation_index(animFrame, &animIndex))) / 4.0f;
+    f32 dx         = *(animValues + (retrieve_animation_index(animFrame, &animIndex))) / 4.0f;
     translation[1] = *(animValues + (retrieve_animation_index(animFrame, &animIndex))) / 4.0f;
-    dz = *(animValues + (retrieve_animation_index(animFrame, &animIndex))) / 4.0f;
+    f32 dz         = *(animValues + (retrieve_animation_index(animFrame, &animIndex))) / 4.0f;
 
-    translation[0] = ( dx * c) + (dz * s);
-    translation[2] = (-dx * s) + (dz * c);
+    translation[0] = (( dx * c) + (dz * s));
+    translation[2] = ((-dx * s) + (dz * c));
 
-    return curAnim->flags;
+    return currAnim->flags;
 }
 
 /**

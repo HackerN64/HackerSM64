@@ -183,7 +183,9 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
     pos[0] += platform->oVelX;
     pos[2] += platform->oVelZ;
 
-    if (rotation[0] != 0 || rotation[1] != 0 || rotation[2] != 0) {
+    if ((rotation[0] != 0x0)
+     || (rotation[1] != 0x0)
+     || (rotation[2] != 0x0)) {
         if (isMario) gMarioStates[0].faceAngle[1] += rotation[1];
         vec3f_copy(platformPos, &platform->oPosVec);
         vec3f_diff(currentObjectOffset, pos, platformPos);
@@ -211,7 +213,7 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
 */
 void apply_mario_platform_displacement(void) {
     struct Object *platform = gMarioPlatform;
-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL && platform != NULL) {
+    if (!(gTimeStopState & TIME_STOP_ACTIVE) && (gMarioObject != NULL) && (platform != NULL)) {
         apply_platform_displacement(TRUE, platform);
     }
 }

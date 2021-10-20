@@ -699,14 +699,14 @@ void cur_obj_reverse_animation(void) {
 
 void cur_obj_extend_animation_if_at_end(void) {
     s32 animFrame = o->header.gfx.animInfo.animFrame;
-    s32 nearLoopEnd = o->header.gfx.animInfo.curAnim->loopEnd - 2;
+    s32 nearLoopEnd = (o->header.gfx.animInfo.currAnim->loopEnd - 2);
     if (animFrame == nearLoopEnd) o->header.gfx.animInfo.animFrame--;
 }
 
 s32 cur_obj_check_if_near_animation_end(void) {
-    u32 animFlags = (s32) o->header.gfx.animInfo.curAnim->flags;
+    u32 animFlags = (s32) o->header.gfx.animInfo.currAnim->flags;
     s32 animFrame = o->header.gfx.animInfo.animFrame;
-    s32 nearLoopEnd = o->header.gfx.animInfo.curAnim->loopEnd - 2;
+    s32 nearLoopEnd = (o->header.gfx.animInfo.currAnim->loopEnd - 2);
     if ((animFlags & ANIM_FLAG_NOLOOP) && ((nearLoopEnd + 1) == animFrame)) {
         return TRUE;
     }
@@ -714,7 +714,7 @@ s32 cur_obj_check_if_near_animation_end(void) {
 }
 
 s32 cur_obj_check_if_at_animation_end(void) {
-    return (o->header.gfx.animInfo.animFrame == (o->header.gfx.animInfo.curAnim->loopEnd - 1));
+    return (o->header.gfx.animInfo.animFrame == (o->header.gfx.animInfo.currAnim->loopEnd - 1));
 }
 
 s32 cur_obj_check_anim_frame(s32 frame) {
@@ -1284,7 +1284,7 @@ f32 cur_obj_abs_y_dist_to_home(void) {
 
 s32 cur_obj_advance_looping_anim(void) {
     s32 animFrame = o->header.gfx.animInfo.animFrame;
-    s32 loopEnd = o->header.gfx.animInfo.curAnim->loopEnd;
+    s32 loopEnd = o->header.gfx.animInfo.currAnim->loopEnd;
 
     if (animFrame < 0) {
         animFrame = 0;
