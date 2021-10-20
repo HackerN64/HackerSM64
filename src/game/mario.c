@@ -1825,7 +1825,7 @@ void init_mario(struct MarioState *m) {
     vec3_copy(&m->marioObj->oMoveAngleVec, m->faceAngle);
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_copy(m->marioObj->header.gfx.angle, m->faceAngle);
 
     if (save_file_get_cap_pos(capPos)) {
         capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
