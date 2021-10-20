@@ -127,6 +127,16 @@ enum DialogState {
 #define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
 
 /* oBehParams */
+
+/**
+ * behParams: oBehParams
+ * index: index of bparam in oBehParams
+ * val: bparam value
+ * num: number of bparams to read as one value
+ */
+// Number of bparams in oBehParams
+#define NUM_BPARAMS 4
+// Number of bits in one bparam
 #define BPARAM_SIZE 8
 // Number of bits in bparam bitmask
 #define BPARAM_MASK_SIZE(num) (BPARAM_SIZE * (num))
@@ -191,7 +201,6 @@ enum DialogState {
 #define BPARAM2 GET_BPARAM2(o->oBehParams)
 #define BPARAM3 GET_BPARAM3(o->oBehParams)
 #define BPARAM4 GET_BPARAM4(o->oBehParams)
-
 
 
 /* oBehParams2ndByte */
