@@ -637,9 +637,9 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     set_mario_wall(m, NULL);
 
     for (i = 0; i < 4; i++) {
-        intendedPos[0] = m->pos[0] + m->vel[0] / numSteps;
-        intendedPos[1] = m->pos[1] + m->vel[1] / numSteps;
-        intendedPos[2] = m->pos[2] + m->vel[2] / numSteps;
+        intendedPos[0] = (m->pos[0] + (m->vel[0] / numSteps));
+        intendedPos[1] = (m->pos[1] + (m->vel[1] / numSteps));
+        intendedPos[2] = (m->pos[2] + (m->vel[2] / numSteps));
 
         quarterStepResult = perform_air_quarter_step(m, intendedPos, stepArg);
 
@@ -647,9 +647,10 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
             stepResult = quarterStepResult;
         }
 
-        if (quarterStepResult == AIR_STEP_LANDED || quarterStepResult == AIR_STEP_GRABBED_LEDGE
-            || quarterStepResult == AIR_STEP_GRABBED_CEILING
-            || quarterStepResult == AIR_STEP_HIT_LAVA_WALL) {
+        if (quarterStepResult == AIR_STEP_LANDED
+         || quarterStepResult == AIR_STEP_GRABBED_LEDGE
+         || quarterStepResult == AIR_STEP_GRABBED_CEILING
+         || quarterStepResult == AIR_STEP_HIT_LAVA_WALL) {
             break;
         }
     }
