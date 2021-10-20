@@ -2242,11 +2242,6 @@ const BehaviorScript bhvLllSinkingRockBlock[] = {
     END_LOOP(),
 };
 
-const BehaviorScript bhvStub1D70[] = {
-    BEGIN(OBJ_LIST_DEFAULT),
-    BREAK(),
-};
-
 const BehaviorScript bhvLllMovingOctagonalMeshPlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),

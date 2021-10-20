@@ -178,7 +178,6 @@ extern const BehaviorScript bhvClockHourHand[];
 extern const BehaviorScript bhvMacroUkiki[];
 extern const BehaviorScript bhvLllRotatingHexagonalPlatform[];
 extern const BehaviorScript bhvLllSinkingRockBlock[];
-extern const BehaviorScript bhvStub1D70[];
 extern const BehaviorScript bhvLllMovingOctagonalMeshPlatform[];
 extern const BehaviorScript bhvSnowBall[];
 extern const BehaviorScript bhvLllRotatingBlockWithFireBars[];
