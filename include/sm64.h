@@ -98,23 +98,24 @@ enum RenderLayers {
 #define LAYER_NON_ZB_FIRST                  (LAYER_ZB_LAST + 1)
 #define LAYER_NON_ZB_LAST                   LAYER_LAST
 
-#define INPUT_NONZERO_ANALOG                /* 0x0001 */ (1 <<  0)
-#define INPUT_A_PRESSED                     /* 0x0002 */ (1 <<  1)
-#define INPUT_OFF_FLOOR                     /* 0x0004 */ (1 <<  2)
-#define INPUT_ABOVE_SLIDE                   /* 0x0008 */ (1 <<  3)
-#define INPUT_FIRST_PERSON                  /* 0x0010 */ (1 <<  4)
-#define INPUT_IDLE                          /* 0x0020 */ (1 <<  5)
-#define INPUT_SQUISHED                      /* 0x0040 */ (1 <<  6)
-#define INPUT_A_DOWN                        /* 0x0080 */ (1 <<  7)
-#define INPUT_IN_POISON_GAS                 /* 0x0100 */ (1 <<  8)
-#define INPUT_IN_WATER                      /* 0x0200 */ (1 <<  9)
-#define INPUT_STOMPED                       /* 0x0400 */ (1 << 10)
-#define INPUT_INTERACT_OBJ_GRABBABLE        /* 0x0800 */ (1 << 11)
-#define INPUT_B_DOWN                        /* 0x1000 */ (1 << 12)
-#define INPUT_B_PRESSED                     /* 0x2000 */ (1 << 13)
-#define INPUT_Z_DOWN                        /* 0x4000 */ (1 << 14)
-#define INPUT_Z_PRESSED                     /* 0x8000 */ (1 << 15)
-
+enum MarioInput {
+    INPUT_NONZERO_ANALOG         = /* 0x0001 */ (1 <<  0),
+    INPUT_A_PRESSED              = /* 0x0002 */ (1 <<  1),
+    INPUT_OFF_FLOOR              = /* 0x0004 */ (1 <<  2),
+    INPUT_ABOVE_SLIDE            = /* 0x0008 */ (1 <<  3),
+    INPUT_FIRST_PERSON           = /* 0x0010 */ (1 <<  4),
+    INPUT_IDLE                   = /* 0x0020 */ (1 <<  5),
+    INPUT_SQUISHED               = /* 0x0040 */ (1 <<  6),
+    INPUT_A_DOWN                 = /* 0x0080 */ (1 <<  7),
+    INPUT_IN_POISON_GAS          = /* 0x0100 */ (1 <<  8),
+    INPUT_IN_WATER               = /* 0x0200 */ (1 <<  9),
+    INPUT_STOMPED                = /* 0x0400 */ (1 << 10),
+    INPUT_INTERACT_OBJ_GRABBABLE = /* 0x0800 */ (1 << 11),
+    INPUT_B_DOWN                 = /* 0x1000 */ (1 << 12),
+    INPUT_B_PRESSED              = /* 0x2000 */ (1 << 13),
+    INPUT_Z_DOWN                 = /* 0x4000 */ (1 << 14),
+    INPUT_Z_PRESSED              = /* 0x8000 */ (1 << 15),
+};
 enum GroundStep {
     GROUND_STEP_LEFT_GROUND,
     GROUND_STEP_NONE,
@@ -148,106 +149,115 @@ enum WaterStep {
     WATER_STEP_HIT_WALL
 };
 
-#define PARTICLE_NONE                       /* 0x00000000 */ (0 <<  0)
-#define PARTICLE_DUST                       /* 0x00000001 */ (1 <<  0)
-#define PARTICLE_VERTICAL_STAR              /* 0x00000002 */ (1 <<  1)
-#define PARTICLE_2                          /* 0x00000004 */ (1 <<  2)
-#define PARTICLE_SPARKLES                   /* 0x00000008 */ (1 <<  3)
-#define PARTICLE_HORIZONTAL_STAR            /* 0x00000010 */ (1 <<  4)
-#define PARTICLE_BUBBLE                     /* 0x00000020 */ (1 <<  5)
-#define PARTICLE_WATER_SPLASH               /* 0x00000040 */ (1 <<  6)
-#define PARTICLE_IDLE_WATER_WAVE            /* 0x00000080 */ (1 <<  7)
-#define PARTICLE_SHALLOW_WATER_WAVE         /* 0x00000100 */ (1 <<  8)
-#define PARTICLE_PLUNGE_BUBBLE              /* 0x00000200 */ (1 <<  9)
-#define PARTICLE_WAVE_TRAIL                 /* 0x00000400 */ (1 << 10)
-#define PARTICLE_FIRE                       /* 0x00000800 */ (1 << 11)
-#define PARTICLE_SHALLOW_WATER_SPLASH       /* 0x00001000 */ (1 << 12)
-#define PARTICLE_LEAF                       /* 0x00002000 */ (1 << 13)
-#define PARTICLE_SNOW                       /* 0x00004000 */ (1 << 14)
-#define PARTICLE_DIRT                       /* 0x00008000 */ (1 << 15)
-#define PARTICLE_MIST_CIRCLE                /* 0x00010000 */ (1 << 16)
-#define PARTICLE_BREATH                     /* 0x00020000 */ (1 << 17)
-#define PARTICLE_TRIANGLE                   /* 0x00040000 */ (1 << 18)
-#define PARTICLE_19                         /* 0x00080000 */ (1 << 19)
+enum MarioParticleFlags {
+    PARTICLE_NONE                 = /* 0x00000000 */ (0 <<  0),
+    PARTICLE_DUST                 = /* 0x00000001 */ (1 <<  0),
+    PARTICLE_VERTICAL_STAR        = /* 0x00000002 */ (1 <<  1),
+    PARTICLE_2                    = /* 0x00000004 */ (1 <<  2),
+    PARTICLE_SPARKLES             = /* 0x00000008 */ (1 <<  3),
+    PARTICLE_HORIZONTAL_STAR      = /* 0x00000010 */ (1 <<  4),
+    PARTICLE_BUBBLE               = /* 0x00000020 */ (1 <<  5),
+    PARTICLE_WATER_SPLASH         = /* 0x00000040 */ (1 <<  6),
+    PARTICLE_IDLE_WATER_WAVE      = /* 0x00000080 */ (1 <<  7),
+    PARTICLE_SHALLOW_WATER_WAVE   = /* 0x00000100 */ (1 <<  8),
+    PARTICLE_PLUNGE_BUBBLE        = /* 0x00000200 */ (1 <<  9),
+    PARTICLE_WAVE_TRAIL           = /* 0x00000400 */ (1 << 10),
+    PARTICLE_FIRE                 = /* 0x00000800 */ (1 << 11),
+    PARTICLE_SHALLOW_WATER_SPLASH = /* 0x00001000 */ (1 << 12),
+    PARTICLE_LEAF                 = /* 0x00002000 */ (1 << 13),
+    PARTICLE_SNOW                 = /* 0x00004000 */ (1 << 14),
+    PARTICLE_DIRT                 = /* 0x00008000 */ (1 << 15),
+    PARTICLE_MIST_CIRCLE          = /* 0x00010000 */ (1 << 16),
+    PARTICLE_BREATH               = /* 0x00020000 */ (1 << 17),
+    PARTICLE_TRIANGLE             = /* 0x00040000 */ (1 << 18),
+    PARTICLE_19                   = /* 0x00080000 */ (1 << 19),
+};
 
-#define MODEL_STATE_ALPHA                    (1 << 8)                      //  0x100
-#define MODEL_STATE_NOISE_ALPHA             ((1 << 7) | MODEL_STATE_ALPHA) // (0x080 | MODEL_STATE_ALPHA)
-#define MODEL_STATE_METAL                    (1 << 9)                      //  0x200
+enum ModelStates {
+    MODEL_STATE_ALPHA       =  (1 << 8),                      //  0x100
+    MODEL_STATE_NOISE_ALPHA = ((1 << 7) | MODEL_STATE_ALPHA), // (0x080 | MODEL_STATE_ALPHA)
+    MODEL_STATE_METAL       =  (1 << 9),                      //  0x200
+    MODEL_STATE_MASK        =  0xFF
+};
 
-#define MODEL_STATE_MASK                    0xFF
-
-#define MARIO_NONE                          /* 0x00000000 */ (0 <<  0)
-#define MARIO_NORMAL_CAP                    /* 0x00000001 */ (1 <<  0)
-#define MARIO_VANISH_CAP                    /* 0x00000002 */ (1 <<  1)
-#define MARIO_METAL_CAP                     /* 0x00000004 */ (1 <<  2)
-#define MARIO_WING_CAP                      /* 0x00000008 */ (1 <<  3)
-#define MARIO_CAP_ON_HEAD                   /* 0x00000010 */ (1 <<  4)
-#define MARIO_CAP_IN_HAND                   /* 0x00000020 */ (1 <<  5)
-#define MARIO_METAL_SHOCK                   /* 0x00000040 */ (1 <<  6)
-#define MARIO_TELEPORTING                   /* 0x00000080 */ (1 <<  7)
-#define MARIO_JUMPING                       /* 0x00000100 */ (1 <<  8)
-#define MARIO_UNUSED_9                      /* 0x00000200 */ (1 <<  9)
-#define MARIO_UNUSED_10                     /* 0x00000400 */ (1 << 10)
-#define MARIO_UNUSED_11                     /* 0x00000800 */ (1 << 11)
-#define MARIO_UNUSED_12                     /* 0x00001000 */ (1 << 12)
-#define MARIO_NO_PURPLE_SWITCH              /* 0x00002000 */ (1 << 13)
-#define MARIO_UNUSED_14                     /* 0x00004000 */ (1 << 14)
-#define MARIO_UNUSED_15                     /* 0x00008000 */ (1 << 15)
-#define MARIO_ACTION_SOUND_PLAYED           /* 0x00010000 */ (1 << 16)
-#define MARIO_MARIO_SOUND_PLAYED            /* 0x00020000 */ (1 << 17)
-#define MARIO_FALL_SOUND_PLAYED             /* 0x00040000 */ (1 << 18)
-#define MARIO_UNUSED_19                     /* 0x00080000 */ (1 << 19)
-#define MARIO_PUNCHING                      /* 0x00100000 */ (1 << 20)
-#define MARIO_KICKING                       /* 0x00200000 */ (1 << 21)
-#define MARIO_TRIPPING                      /* 0x00400000 */ (1 << 22)
-#define MARIO_UNUSED_23                     /* 0x00800000 */ (1 << 23)
-#define MARIO_UNUSED_24                     /* 0x01000000 */ (1 << 24)
-#define MARIO_LEDGE_CLIMB_CAMERA            /* 0x02000000 */ (1 << 25)
-#define MARIO_UNUSED_26                     /* 0x04000000 */ (1 << 26)
-#define MARIO_UNUSED_27                     /* 0x08000000 */ (1 << 27)
-#define MARIO_UNUSED_28                     /* 0x10000000 */ (1 << 28)
-#define MARIO_UNUSED_29                     /* 0x20000000 */ (1 << 29)
-#define MARIO_AIR_HIT_WALL                  /* 0x40000000 */ (1 << 30)
-#define MARIO_PUSHING                       /* 0x80000000 */ (1 << 31)
+enum MarioFlags {
+    MARIO_NONE                = /* 0x00000000 */ (0 <<  0),
+    MARIO_NORMAL_CAP          = /* 0x00000001 */ (1 <<  0),
+    MARIO_VANISH_CAP          = /* 0x00000002 */ (1 <<  1),
+    MARIO_METAL_CAP           = /* 0x00000004 */ (1 <<  2),
+    MARIO_WING_CAP            = /* 0x00000008 */ (1 <<  3),
+    MARIO_CAP_ON_HEAD         = /* 0x00000010 */ (1 <<  4),
+    MARIO_CAP_IN_HAND         = /* 0x00000020 */ (1 <<  5),
+    MARIO_METAL_SHOCK         = /* 0x00000040 */ (1 <<  6),
+    MARIO_TELEPORTING         = /* 0x00000080 */ (1 <<  7),
+    MARIO_JUMPING             = /* 0x00000100 */ (1 <<  8),
+    MARIO_UNUSED_9            = /* 0x00000200 */ (1 <<  9),
+    MARIO_UNUSED_10           = /* 0x00000400 */ (1 << 10),
+    MARIO_UNUSED_11           = /* 0x00000800 */ (1 << 11),
+    MARIO_UNUSED_12           = /* 0x00001000 */ (1 << 12),
+    MARIO_NO_PURPLE_SWITCH    = /* 0x00002000 */ (1 << 13),
+    MARIO_UNUSED_14           = /* 0x00004000 */ (1 << 14),
+    MARIO_UNUSED_15           = /* 0x00008000 */ (1 << 15),
+    MARIO_ACTION_SOUND_PLAYED = /* 0x00010000 */ (1 << 16),
+    MARIO_MARIO_SOUND_PLAYED  = /* 0x00020000 */ (1 << 17),
+    MARIO_FALL_SOUND_PLAYED   = /* 0x00040000 */ (1 << 18),
+    MARIO_UNUSED_19           = /* 0x00080000 */ (1 << 19),
+    MARIO_PUNCHING            = /* 0x00100000 */ (1 << 20),
+    MARIO_KICKING             = /* 0x00200000 */ (1 << 21),
+    MARIO_TRIPPING            = /* 0x00400000 */ (1 << 22),
+    MARIO_UNUSED_23           = /* 0x00800000 */ (1 << 23),
+    MARIO_UNUSED_24           = /* 0x01000000 */ (1 << 24),
+    MARIO_LEDGE_CLIMB_CAMERA  = /* 0x02000000 */ (1 << 25),
+    MARIO_UNUSED_26           = /* 0x04000000 */ (1 << 26),
+    MARIO_UNUSED_27           = /* 0x08000000 */ (1 << 27),
+    MARIO_UNUSED_28           = /* 0x10000000 */ (1 << 28),
+    MARIO_UNUSED_29           = /* 0x20000000 */ (1 << 29),
+    MARIO_AIR_HIT_WALL        = /* 0x40000000 */ (1 << 30),
+    MARIO_PUSHING             = /* 0x80000000 */ (1 << 31),
+};
 
 #define MARIO_SPECIAL_CAPS (MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP)
-#define MARIO_CAPS (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS)
+#define MARIO_CAPS         (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS)
 
 #define ACT_ID_MASK                         0x000001FF
 
-#define ACT_GROUP_MASK                      0x000001C0
-#define ACT_GROUP_STATIONARY                /* 0x00000000 */ (0 << 6)
-#define ACT_GROUP_MOVING                    /* 0x00000040 */ (1 << 6)
-#define ACT_GROUP_AIRBORNE                  /* 0x00000080 */ (2 << 6)
-#define ACT_GROUP_SUBMERGED                 /* 0x000000C0 */ (3 << 6)
-#define ACT_GROUP_CUTSCENE                  /* 0x00000100 */ (4 << 6)
-#define ACT_GROUP_AUTOMATIC                 /* 0x00000140 */ (5 << 6)
-#define ACT_GROUP_OBJECT                    /* 0x00000180 */ (6 << 6)
-#define ACT_GROUP_CUSTOM                    /* 0x000001C0 */ (7 << 6)
+enum MarioActionGroups {
+    ACT_GROUP_STATIONARY = /* 0x00000000 */ (0 << 6),
+    ACT_GROUP_MOVING     = /* 0x00000040 */ (1 << 6),
+    ACT_GROUP_AIRBORNE   = /* 0x00000080 */ (2 << 6),
+    ACT_GROUP_SUBMERGED  = /* 0x000000C0 */ (3 << 6),
+    ACT_GROUP_CUTSCENE   = /* 0x00000100 */ (4 << 6),
+    ACT_GROUP_AUTOMATIC  = /* 0x00000140 */ (5 << 6),
+    ACT_GROUP_OBJECT     = /* 0x00000180 */ (6 << 6),
+    ACT_GROUP_CUSTOM     = /* 0x000001C0 */ (7 << 6),
+    ACT_GROUP_MASK       = 0x000001C0
+};
 
-#define ACT_FLAG_STATIONARY                 /* 0x00000200 */ (1 <<  9)
-#define ACT_FLAG_MOVING                     /* 0x00000400 */ (1 << 10)
-#define ACT_FLAG_AIR                        /* 0x00000800 */ (1 << 11)
-#define ACT_FLAG_INTANGIBLE                 /* 0x00001000 */ (1 << 12)
-#define ACT_FLAG_SWIMMING                   /* 0x00002000 */ (1 << 13)
-#define ACT_FLAG_METAL_WATER                /* 0x00004000 */ (1 << 14)
-#define ACT_FLAG_SHORT_HITBOX               /* 0x00008000 */ (1 << 15)
-#define ACT_FLAG_RIDING_SHELL               /* 0x00010000 */ (1 << 16)
-#define ACT_FLAG_INVULNERABLE               /* 0x00020000 */ (1 << 17)
-#define ACT_FLAG_BUTT_OR_STOMACH_SLIDE      /* 0x00040000 */ (1 << 18)
-#define ACT_FLAG_DIVING                     /* 0x00080000 */ (1 << 19)
-#define ACT_FLAG_ON_POLE                    /* 0x00100000 */ (1 << 20)
-#define ACT_FLAG_HANGING                    /* 0x00200000 */ (1 << 21)
-#define ACT_FLAG_IDLE                       /* 0x00400000 */ (1 << 22)
-#define ACT_FLAG_ATTACKING                  /* 0x00800000 */ (1 << 23)
-#define ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION /* 0x01000000 */ (1 << 24)
-#define ACT_FLAG_CONTROL_JUMP_HEIGHT        /* 0x02000000 */ (1 << 25)
-#define ACT_FLAG_ALLOW_FIRST_PERSON         /* 0x04000000 */ (1 << 26)
-#define ACT_FLAG_PAUSE_EXIT                 /* 0x08000000 */ (1 << 27)
-#define ACT_FLAG_SWIMMING_OR_FLYING         /* 0x10000000 */ (1 << 28)
-#define ACT_FLAG_WATER_OR_TEXT              /* 0x20000000 */ (1 << 29)
-#define ACT_FLAG_UNUSED                     /* 0x40000000 */ (1 << 30)
-#define ACT_FLAG_THROWING                   /* 0x80000000 */ (1 << 31)
+enum MarioActionFlags {
+    ACT_FLAG_STATIONARY                 = /* 0x00000200 */ (1 <<  9),
+    ACT_FLAG_MOVING                     = /* 0x00000400 */ (1 << 10),
+    ACT_FLAG_AIR                        = /* 0x00000800 */ (1 << 11),
+    ACT_FLAG_INTANGIBLE                 = /* 0x00001000 */ (1 << 12),
+    ACT_FLAG_SWIMMING                   = /* 0x00002000 */ (1 << 13),
+    ACT_FLAG_METAL_WATER                = /* 0x00004000 */ (1 << 14),
+    ACT_FLAG_SHORT_HITBOX               = /* 0x00008000 */ (1 << 15),
+    ACT_FLAG_RIDING_SHELL               = /* 0x00010000 */ (1 << 16),
+    ACT_FLAG_INVULNERABLE               = /* 0x00020000 */ (1 << 17),
+    ACT_FLAG_BUTT_OR_STOMACH_SLIDE      = /* 0x00040000 */ (1 << 18),
+    ACT_FLAG_DIVING                     = /* 0x00080000 */ (1 << 19),
+    ACT_FLAG_ON_POLE                    = /* 0x00100000 */ (1 << 20),
+    ACT_FLAG_HANGING                    = /* 0x00200000 */ (1 << 21),
+    ACT_FLAG_IDLE                       = /* 0x00400000 */ (1 << 22),
+    ACT_FLAG_ATTACKING                  = /* 0x00800000 */ (1 << 23),
+    ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION = /* 0x01000000 */ (1 << 24),
+    ACT_FLAG_CONTROL_JUMP_HEIGHT        = /* 0x02000000 */ (1 << 25),
+    ACT_FLAG_ALLOW_FIRST_PERSON         = /* 0x04000000 */ (1 << 26),
+    ACT_FLAG_PAUSE_EXIT                 = /* 0x08000000 */ (1 << 27),
+    ACT_FLAG_SWIMMING_OR_FLYING         = /* 0x10000000 */ (1 << 28),
+    ACT_FLAG_WATER_OR_TEXT              = /* 0x20000000 */ (1 << 29),
+    ACT_FLAG_UNUSED                     = /* 0x40000000 */ (1 << 30),
+    ACT_FLAG_THROWING                   = /* 0x80000000 */ (1 << 31),
+};
 
 #define ACT_UNINITIALIZED              0x00000000 // (0x000)
 

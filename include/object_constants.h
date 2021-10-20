@@ -5,18 +5,20 @@
 // field-specific and object-specific constants, e.g. actions.
 
 /* activeFlags */
-#define ACTIVE_FLAG_DEACTIVATED                     (0 <<  0) // 0x0000
-#define ACTIVE_FLAG_ACTIVE                          (1 <<  0) // 0x0001
-#define ACTIVE_FLAG_FAR_AWAY                        (1 <<  1) // 0x0002
-#define ACTIVE_FLAG_UNUSED                          (1 <<  2) // 0x0004
-#define ACTIVE_FLAG_IN_DIFFERENT_ROOM               (1 <<  3) // 0x0008
-#define ACTIVE_FLAG_UNIMPORTANT                     (1 <<  4) // 0x0010
-#define ACTIVE_FLAG_INITIATED_TIME_STOP             (1 <<  5) // 0x0020
-#define ACTIVE_FLAG_MOVE_THROUGH_GRATE              (1 <<  6) // 0x0040
-#define ACTIVE_FLAG_DITHERED_ALPHA                  (1 <<  7) // 0x0080
-#define ACTIVE_FLAG_ALLOCATED                       (1 <<  8) // 0x0100
-#define ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY    (1 <<  9) // 0x0200
-#define ACTIVE_FLAG_IGNORE_ENV_BOXES                (1 << 10) // 0x0400
+enum ObjActiveFlags {
+    ACTIVE_FLAG_DEACTIVATED                    = (0 <<  0), // 0x0000
+    ACTIVE_FLAG_ACTIVE                         = (1 <<  0), // 0x0001
+    ACTIVE_FLAG_FAR_AWAY                       = (1 <<  1), // 0x0002
+    ACTIVE_FLAG_UNUSED                         = (1 <<  2), // 0x0004
+    ACTIVE_FLAG_IN_DIFFERENT_ROOM              = (1 <<  3), // 0x0008
+    ACTIVE_FLAG_UNIMPORTANT                    = (1 <<  4), // 0x0010
+    ACTIVE_FLAG_INITIATED_TIME_STOP            = (1 <<  5), // 0x0020
+    ACTIVE_FLAG_MOVE_THROUGH_GRATE             = (1 <<  6), // 0x0040
+    ACTIVE_FLAG_DITHERED_ALPHA                 = (1 <<  7), // 0x0080
+    ACTIVE_FLAG_ALLOCATED                      = (1 <<  8), // 0x0100
+    ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY   = (1 <<  9), // 0x0200
+    ACTIVE_FLAG_IGNORE_ENV_BOXES               = (1 << 10), // 0x0400
+};
 
 /* respawnInfoType */
 enum RespawnInfoType {
@@ -29,30 +31,32 @@ enum RespawnInfoType {
 #define RESPAWN_INFO_DONT_RESPAWN                   0xFF
 
 /* oFlags */
-#define OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE           (1 <<  0) // 0x00000001
-#define OBJ_FLAG_MOVE_XZ_USING_FVEL                 (1 <<  1) // 0x00000002
-#define OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL           (1 <<  2) // 0x00000004
-#define OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW           (1 <<  3) // 0x00000008
-#define OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE       (1 <<  4) // 0x00000010
-#define OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX  (1 <<  5) // 0x00000020
-#define OBJ_FLAG_COMPUTE_DIST_TO_MARIO              (1 <<  6) // 0x00000040
-#define OBJ_FLAG_ACTIVE_FROM_AFAR                   (1 <<  7) // 0x00000080
-#define OBJ_FLAG_PLAYER                             (1 <<  8) // 0x00000100
-#define OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT       (1 <<  9) // 0x00000200
-#define OBJ_FLAG_HOLDABLE                           (1 << 10) // 0x00000400
-#define OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM    (1 << 11) // 0x00000800
-#define OBJ_FLAG_1000                               (1 << 12) // 0x00001000
-#define OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO             (1 << 13) // 0x00002000
-#define OBJ_FLAG_PERSISTENT_RESPAWN                 (1 << 14) // 0x00004000
-#define OBJ_FLAG_VELOCITY_PLATFORM                  (1 << 15) // 0x00008000
-#define OBJ_FLAG_DONT_CALC_COLL_DIST                (1 << 16) // 0x00010000
-#define OBJ_FLAG_UCODE_SMALL                        (1 << 17) // 0x00020000
-#define OBJ_FLAG_UCODE_LARGE                        (1 << 18) // 0x00040000
-#define OBJ_FLAG_SILHOUETTE                         (1 << 19) // 0x00080000
-#define OBJ_FLAG_OCCLUDE_SILHOUETTE                 (1 << 20) // 0x00100000
-#define OBJ_FLAG_OPACITY_FROM_CAMERA_DIST           (1 << 21) // 0x00200000
-#define OBJ_FLAG_EMIT_LIGHT                         (1 << 22) // 0x00400000
-#define OBJ_FLAG_HITBOX_WAS_SET                     (1 << 30) // 0x40000000
+enum ObjFlags {
+    OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE          = (1 <<  0), // 0x00000001
+    OBJ_FLAG_MOVE_XZ_USING_FVEL                = (1 <<  1), // 0x00000002
+    OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL          = (1 <<  2), // 0x00000004
+    OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW          = (1 <<  3), // 0x00000008
+    OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE      = (1 <<  4), // 0x00000010
+    OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX = (1 <<  5), // 0x00000020
+    OBJ_FLAG_COMPUTE_DIST_TO_MARIO             = (1 <<  6), // 0x00000040
+    OBJ_FLAG_ACTIVE_FROM_AFAR                  = (1 <<  7), // 0x00000080
+    OBJ_FLAG_PLAYER                            = (1 <<  8), // 0x00000100
+    OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT      = (1 <<  9), // 0x00000200
+    OBJ_FLAG_HOLDABLE                          = (1 << 10), // 0x00000400
+    OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM   = (1 << 11), // 0x00000800
+    OBJ_FLAG_1000                              = (1 << 12), // 0x00001000
+    OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO            = (1 << 13), // 0x00002000
+    OBJ_FLAG_PERSISTENT_RESPAWN                = (1 << 14), // 0x00004000
+    OBJ_FLAG_VELOCITY_PLATFORM                 = (1 << 15), // 0x00008000
+    OBJ_FLAG_DONT_CALC_COLL_DIST               = (1 << 16), // 0x00010000
+    OBJ_FLAG_UCODE_SMALL                       = (1 << 17), // 0x00020000
+    OBJ_FLAG_UCODE_LARGE                       = (1 << 18), // 0x00040000
+    OBJ_FLAG_SILHOUETTE                        = (1 << 19), // 0x00080000
+    OBJ_FLAG_OCCLUDE_SILHOUETTE                = (1 << 20), // 0x00100000
+    OBJ_FLAG_OPACITY_FROM_CAMERA_DIST          = (1 << 21), // 0x00200000
+    OBJ_FLAG_EMIT_LIGHT                        = (1 << 22), // 0x00400000
+    OBJ_FLAG_HITBOX_WAS_SET                    = (1 << 30), // 0x40000000
+};
 
 /* oHeldState */
 enum HeldState {
@@ -71,30 +75,34 @@ enum DialogState {
     DIALOG_STATUS_DISABLE_TIME_STOP
 };
 
-#define DIALOG_FLAG_NONE                            (0 <<  0) // 0x00
-#define DIALOG_FLAG_TURN_TO_MARIO                   (1 <<  0) // 0x01 // cutscene only
-#define DIALOG_FLAG_TEXT_DEFAULT                    (1 <<  1) // 0x02
-#define DIALOG_FLAG_TEXT_RESPONSE                   (1 <<  2) // 0x04 // non-cutscene only
-#define DIALOG_FLAG_UNK_CAPSWITCH                   (1 <<  3) // 0x08 // not defined
-#define DIALOG_FLAG_TIME_STOP_ENABLED               (1 <<  4) // 0x10
+enum DialogFlags {
+    DIALOG_FLAG_NONE                           = (0 <<  0), // 0x00
+    DIALOG_FLAG_TURN_TO_MARIO                  = (1 <<  0), // 0x01 // cutscene only
+    DIALOG_FLAG_TEXT_DEFAULT                   = (1 <<  1), // 0x02
+    DIALOG_FLAG_TEXT_RESPONSE                  = (1 <<  2), // 0x04 // non-cutscene only
+    DIALOG_FLAG_UNK_CAPSWITCH                  = (1 <<  3), // 0x08 // not defined
+    DIALOG_FLAG_TIME_STOP_ENABLED              = (1 <<  4), // 0x10
+};
 
 /* oMoveFlags */
-#define OBJ_MOVE_LANDED                             (1 <<  0) // 0x0001
-#define OBJ_MOVE_ON_GROUND                          (1 <<  1) // 0x0002 // mutually exclusive to OBJ_MOVE_LANDED
-#define OBJ_MOVE_LEFT_GROUND                        (1 <<  2) // 0x0004
-#define OBJ_MOVE_ENTERED_WATER                      (1 <<  3) // 0x0008
-#define OBJ_MOVE_AT_WATER_SURFACE                   (1 <<  4) // 0x0010
-#define OBJ_MOVE_UNDERWATER_OFF_GROUND              (1 <<  5) // 0x0020
-#define OBJ_MOVE_UNDERWATER_ON_GROUND               (1 <<  6) // 0x0040
-#define OBJ_MOVE_IN_AIR                             (1 <<  7) // 0x0080
-#define OBJ_MOVE_OUT_SCOPE                          (1 <<  8) // 0x0100
-#define OBJ_MOVE_HIT_WALL                           (1 <<  9) // 0x0200
-#define OBJ_MOVE_HIT_EDGE                           (1 << 10) // 0x0400
-#define OBJ_MOVE_ABOVE_LAVA                         (1 << 11) // 0x0800
-#define OBJ_MOVE_LEAVING_WATER                      (1 << 12) // 0x1000
-#define OBJ_MOVE_BOUNCE                             (1 << 13) // 0x2000
-#define OBJ_MOVE_ABOVE_DEATH_BARRIER                (1 << 14) // 0x4000
-#define OBJ_MOVE_UNUSED                             (1 << 15) // 0x8000
+enum ObjMoveFlags {
+    OBJ_MOVE_LANDED                            = (1 <<  0), // 0x0001
+    OBJ_MOVE_ON_GROUND                         = (1 <<  1), // 0x0002 // mutually exclusive to OBJ_MOVE_LANDED
+    OBJ_MOVE_LEFT_GROUND                       = (1 <<  2), // 0x0004
+    OBJ_MOVE_ENTERED_WATER                     = (1 <<  3), // 0x0008
+    OBJ_MOVE_AT_WATER_SURFACE                  = (1 <<  4), // 0x0010
+    OBJ_MOVE_UNDERWATER_OFF_GROUND             = (1 <<  5), // 0x0020
+    OBJ_MOVE_UNDERWATER_ON_GROUND              = (1 <<  6), // 0x0040
+    OBJ_MOVE_IN_AIR                            = (1 <<  7), // 0x0080
+    OBJ_MOVE_OUT_SCOPE                         = (1 <<  8), // 0x0100
+    OBJ_MOVE_HIT_WALL                          = (1 <<  9), // 0x0200
+    OBJ_MOVE_HIT_EDGE                          = (1 << 10), // 0x0400
+    OBJ_MOVE_ABOVE_LAVA                        = (1 << 11), // 0x0800
+    OBJ_MOVE_LEAVING_WATER                     = (1 << 12), // 0x1000
+    OBJ_MOVE_BOUNCE                            = (1 << 13), // 0x2000
+    OBJ_MOVE_ABOVE_DEATH_BARRIER               = (1 << 14), // 0x4000
+    OBJ_MOVE_UNUSED                            = (1 << 15), // 0x8000
+};
 
 #define OBJ_MOVE_MASK_ON_GROUND (OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND)
 #define OBJ_MOVE_MASK_IN_WATER (    \
@@ -104,27 +112,29 @@ enum DialogState {
     OBJ_MOVE_UNDERWATER_ON_GROUND)
 
 /* oActiveParticleFlags */
-#define ACTIVE_PARTICLE_NONE                        (0 <<  0) // 0x00000000
-#define ACTIVE_PARTICLE_DUST                        (1 <<  0) // 0x00000001
-#define ACTIVE_PARTICLE_UNUSED_1                    (1 <<  1) // 0x00000002
-#define ACTIVE_PARTICLE_UNUSED_2                    (1 <<  2) // 0x00000004
-#define ACTIVE_PARTICLE_SPARKLES                    (1 <<  3) // 0x00000008
-#define ACTIVE_PARTICLE_H_STAR                      (1 <<  4) // 0x00000010
-#define ACTIVE_PARTICLE_BUBBLE                      (1 <<  5) // 0x00000020
-#define ACTIVE_PARTICLE_WATER_SPLASH                (1 <<  6) // 0x00000040
-#define ACTIVE_PARTICLE_IDLE_WATER_WAVE             (1 <<  7) // 0x00000080
-#define ACTIVE_PARTICLE_SHALLOW_WATER_WAVE          (1 <<  8) // 0x00000100
-#define ACTIVE_PARTICLE_PLUNGE_BUBBLE               (1 <<  9) // 0x00000200
-#define ACTIVE_PARTICLE_WAVE_TRAIL                  (1 << 10) // 0x00000400
-#define ACTIVE_PARTICLE_FIRE                        (1 << 11) // 0x00000800
-#define ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH        (1 << 12) // 0x00001000
-#define ACTIVE_PARTICLE_LEAF                        (1 << 13) // 0x00002000
-#define ACTIVE_PARTICLE_DIRT                        (1 << 14) // 0x00004000
-#define ACTIVE_PARTICLE_MIST_CIRCLE                 (1 << 15) // 0x00008000
-#define ACTIVE_PARTICLE_SNOW                        (1 << 16) // 0x00010000
-#define ACTIVE_PARTICLE_BREATH                      (1 << 17) // 0x00020000
-#define ACTIVE_PARTICLE_V_STAR                      (1 << 18) // 0x00040000
-#define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
+enum ActiveParticleFlags {
+    ACTIVE_PARTICLE_NONE                       = (0 <<  0), // 0x00000000
+    ACTIVE_PARTICLE_DUST                       = (1 <<  0), // 0x00000001
+    ACTIVE_PARTICLE_UNUSED_1                   = (1 <<  1), // 0x00000002
+    ACTIVE_PARTICLE_UNUSED_2                   = (1 <<  2), // 0x00000004
+    ACTIVE_PARTICLE_SPARKLES                   = (1 <<  3), // 0x00000008
+    ACTIVE_PARTICLE_H_STAR                     = (1 <<  4), // 0x00000010
+    ACTIVE_PARTICLE_BUBBLE                     = (1 <<  5), // 0x00000020
+    ACTIVE_PARTICLE_WATER_SPLASH               = (1 <<  6), // 0x00000040
+    ACTIVE_PARTICLE_IDLE_WATER_WAVE            = (1 <<  7), // 0x00000080
+    ACTIVE_PARTICLE_SHALLOW_WATER_WAVE         = (1 <<  8), // 0x00000100
+    ACTIVE_PARTICLE_PLUNGE_BUBBLE              = (1 <<  9), // 0x00000200
+    ACTIVE_PARTICLE_WAVE_TRAIL                 = (1 << 10), // 0x00000400
+    ACTIVE_PARTICLE_FIRE                       = (1 << 11), // 0x00000800
+    ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH       = (1 << 12), // 0x00001000
+    ACTIVE_PARTICLE_LEAF                       = (1 << 13), // 0x00002000
+    ACTIVE_PARTICLE_DIRT                       = (1 << 14), // 0x00004000
+    ACTIVE_PARTICLE_MIST_CIRCLE                = (1 << 15), // 0x00008000
+    ACTIVE_PARTICLE_SNOW                       = (1 << 16), // 0x00010000
+    ACTIVE_PARTICLE_BREATH                     = (1 << 17), // 0x00020000
+    ACTIVE_PARTICLE_V_STAR                     = (1 << 18), // 0x00040000
+    ACTIVE_PARTICLE_TRIANGLE                   = (1 << 19), // 0x00080000
+};
 
 /* oBehParams */
 

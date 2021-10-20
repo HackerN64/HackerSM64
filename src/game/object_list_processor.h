@@ -11,14 +11,15 @@
  * Flags for gTimeStopState. These control which objects are processed each frame
  * and also track some miscellaneous info.
  */
-#define TIME_STOP_UNKNOWN_0         (1 << 0)
-#define TIME_STOP_ENABLED           (1 << 1)
-#define TIME_STOP_DIALOG            (1 << 2)
-#define TIME_STOP_MARIO_AND_DOORS   (1 << 3)
-#define TIME_STOP_ALL_OBJECTS       (1 << 4)
-#define TIME_STOP_MARIO_OPENED_DOOR (1 << 5)
-#define TIME_STOP_ACTIVE            (1 << 6)
-
+enum gTimeStopStateFlags {
+    TIME_STOP_UNKNOWN_0         = (1 << 0),
+    TIME_STOP_ENABLED           = (1 << 1),
+    TIME_STOP_DIALOG            = (1 << 2),
+    TIME_STOP_MARIO_AND_DOORS   = (1 << 3),
+    TIME_STOP_ALL_OBJECTS       = (1 << 4),
+    TIME_STOP_MARIO_OPENED_DOOR = (1 << 5),
+    TIME_STOP_ACTIVE            = (1 << 6),
+};
 
 /**
  * The maximum number of objects that can be loaded at once.
@@ -97,10 +98,12 @@ extern s32 gNumStaticSurfaces;
 
 extern struct MemoryPool *gObjectMemoryPool;
 
-#define COLLISION_FLAGS_NONE                (0 << 0)
-#define COLLISION_FLAG_CAMERA               (1 << 1)
-#define COLLISION_FLAG_INCLUDE_INTANGIBLE   (1 << 2)
-#define COLLISION_FLAG_EXCLUDE_DYNAMIC      (1 << 3)
+enum CollisionFlags {
+    COLLISION_FLAGS_NONE              = (0 << 0),
+    COLLISION_FLAG_CAMERA             = (1 << 1),
+    COLLISION_FLAG_INCLUDE_INTANGIBLE = (1 << 2),
+    COLLISION_FLAG_EXCLUDE_DYNAMIC    = (1 << 3),
+};
 
 extern s16 gCollisionFlags;
 extern TerrainData *gEnvironmentRegions;
