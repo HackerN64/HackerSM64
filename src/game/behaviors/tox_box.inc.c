@@ -6,7 +6,11 @@ s8 sToxBoxDirectionPattern2[] = { 4, 1, 4, 1, 7, 1, 7, 1, 7, 1, 2, 6, 1, 6, 1, 6
                                   1, 5, 1, 6, 1, 5, 1, 5, 1, 2, 4, 1, 4, 1, 7, 1, -1 };
 s8 sToxBoxDirectionPattern3[] = { 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 2, 5, 1, 5, 1, 5, 1, 5,
                                   1, 5, 1, 7, 1, 2, 6, 1, 6, 1, 5, 1, 2, 4, 1, 7, 1, -1 };
-s8 *sToxBoxDirectionPatterns[] = { sToxBoxDirectionPattern1, sToxBoxDirectionPattern2, sToxBoxDirectionPattern3 };
+s8 *sToxBoxDirectionPatterns[] = {
+    sToxBoxDirectionPattern1,
+    sToxBoxDirectionPattern2,
+    sToxBoxDirectionPattern3
+};
 
 void tox_box_shake_screen(void) {
     if (o->oDistanceToMario < 3000.0f) {

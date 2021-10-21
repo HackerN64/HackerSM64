@@ -491,8 +491,6 @@ struct AdsrEnvelope gDefaultEnvelope[] = {
     { BSWAP16(ADSR_HANG), 0 }          // then continue staying there
 };
 
-u8 unk_sh_data2[4] = { 0, 0, 0, 0 };
-
 struct NoteSubEu gZeroNoteSub = { 0 };
 struct NoteSubEu gDefaultNoteSub = {
     1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, { NULL },

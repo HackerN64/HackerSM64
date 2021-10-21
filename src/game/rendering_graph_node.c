@@ -46,10 +46,10 @@
  *
  */
 
-s16 gMatStackIndex;
+s16  gMatStackIndex;
 Mat4 gMatStack[32];
 Mtx *gMatStackFixed[32];
-f32 sAspectRatio;
+f32  sAspectRatio;
 
 /**
  * Animation nodes have state in global variables, so this struct captures
@@ -69,10 +69,10 @@ struct GeoAnimState {
 // of separate global variables. It won't match EU otherwise.
 struct GeoAnimState gGeoTempState;
 
-u8 gCurrAnimType;
-u8 gCurrAnimEnabled;
-s16 gCurrAnimFrame;
-f32 gCurrAnimTranslationMultiplier;
+u8   gCurrAnimType;
+u8   gCurrAnimEnabled;
+s16  gCurrAnimFrame;
+f32  gCurrAnimTranslationMultiplier;
 u16 *gCurrAnimAttribute;
 s16 *gCurrAnimData;
 
@@ -215,7 +215,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     s32 endLayer      = LAYER_LAST;
     s32 headsIndex    = LIST_HEADS_ZEX;
     s32 renderPhase   = RENDER_PHASE_ZEX_BG;
-    s32 enableZBuffer = (node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0;
+    s32 enableZBuffer = ((node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0);
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
     // @bug This is where the LookAt values should be calculated but aren't.
@@ -369,14 +369,14 @@ void geo_append_display_list(void *displayList, s32 layer) {
     }
 }
 
-void inc_mat_stack() {
+inline void inc_mat_stack() {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
     gMatStackIndex++;
     mtxf_to_mtx(mtx, gMatStack[gMatStackIndex]);
     gMatStackFixed[gMatStackIndex] = mtx;
 }
 
-void append_dl_and_return(struct GraphNodeDisplayList *node) {
+inline void append_dl_and_return(struct GraphNodeDisplayList *node) {
     if (node->displayList != NULL) {
         geo_append_display_list(node->displayList, GET_GRAPH_NODE_LAYER(node->node.flags));
     }

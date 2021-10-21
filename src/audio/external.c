@@ -2127,7 +2127,7 @@ void sound_banks_disable(UNUSED u8 player, u16 bankMask) {
         if (bankMask & 1) {
             sSoundBankDisabled[i] = TRUE;
         }
-        bankMask = bankMask >> 1;
+        bankMask = (bankMask >> 1);
     }
 }
 
@@ -2156,13 +2156,12 @@ void sound_banks_enable(UNUSED u8 player, u16 bankMask) {
     }
 }
 
-u8 unused_803209D8(u8 player, u8 channelIndex, u8 arg2) {
-    u8 ret = 0;
+UNUSED u8 unused_803209D8(u8 player, u8 channelIndex, u8 arg2) {
     if (gSequencePlayers[player].channels[channelIndex] != &gSequenceChannelNone) {
         gSequencePlayers[player].channels[channelIndex]->stopSomething2 = arg2;
-        ret = arg2;
+        return arg2;
     }
-    return ret;
+    return 0;
 }
 
 /**
@@ -2206,8 +2205,8 @@ void play_dialog_sound(u8 dialogID) {
  * Called from threads: thread5_game_loop
  */
 void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
-    u8 seqId = seqArgs & 0xff;
-    u8 priority = seqArgs >> 8;
+    u8 seqId    = (seqArgs & 0xff);
+    u8 priority = (seqArgs >> 8);
     u8 i;
     u8 foundIndex = 0;
 
@@ -2259,29 +2258,26 @@ void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
     // the new sequence first.
     for (i = sBackgroundMusicQueueSize - 1; i > foundIndex; i--) {
         sBackgroundMusicQueue[i].priority = sBackgroundMusicQueue[i - 1].priority;
-        sBackgroundMusicQueue[i].seqId = sBackgroundMusicQueue[i - 1].seqId;
+        sBackgroundMusicQueue[i].seqId    = sBackgroundMusicQueue[i - 1].seqId;
     }
 
     // Insert item into queue.
     sBackgroundMusicQueue[foundIndex].priority = priority;
-    sBackgroundMusicQueue[foundIndex].seqId = seqId;
+    sBackgroundMusicQueue[foundIndex].seqId    = seqId;
 }
 
 /**
  * Called from threads: thread5_game_loop
  */
 void stop_background_music(u16 seqId) {
-    u8 foundIndex;
-    u8 i;
-
     if (sBackgroundMusicQueueSize == 0) {
         return;
     }
 
     // If sequence is not found, remove an empty queue item (the next empty
     // queue slot).
-    foundIndex = sBackgroundMusicQueueSize;
-
+    u8 foundIndex = sBackgroundMusicQueueSize;
+    u8 i;
     // Search for the sequence.
     for (i = 0; i < sBackgroundMusicQueueSize; i++) {
         if (sBackgroundMusicQueue[i].seqId == (u8)(seqId & 0xff)) {

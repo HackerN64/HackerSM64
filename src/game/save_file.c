@@ -349,7 +349,7 @@ void save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
 
 void save_file_load_all(void) {
     gMainMenuDataModified = FALSE;
-    gSaveFileModified = FALSE;
+    gSaveFileModified     = FALSE;
 
     bzero(&gSaveBuffer, sizeof(gSaveBuffer));
     read_eeprom_data(&gSaveBuffer, sizeof(gSaveBuffer));
@@ -540,7 +540,7 @@ u32 save_file_get_max_coin_score(s32 courseIndex) {
 s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
     s32 i;
     s32 count = 0;
-    u8 flag = 1;
+    u8 flag   = 0x1;
     u8 starFlags = save_file_get_star_flags(fileIndex, courseIndex);
 
     for (i = 0; i < 7; i++, flag <<= 1) {

@@ -110,7 +110,7 @@ struct MovtexObject {
 };
 
 /// Counters to make textures move iff the game is not paused.
-s16 gMovtexCounter = 1;
+s16 gMovtexCounter     = 1;
 s16 gMovtexCounterPrev = 0;
 
 // Vertex colors for rectangles. Used to give mist a tint

@@ -113,17 +113,15 @@ static void klepto_change_target(void) {
             }
         }
     } else {
-        newTarget = random_u16() % 3;
+        newTarget = (random_u16() % 0x3);
     }
 
-    o->oKleptoHomeYOffset  = 400 * ABSI(newTarget - o->oKleptoTargetNumber);
+    o->oKleptoHomeYOffset  = (400 * ABSI(newTarget - o->oKleptoTargetNumber));
     o->oKleptoTargetNumber = newTarget;
 
-    o->oHomeX = sKleptoTargetPositions[o->oKleptoTargetNumber][0];
-    o->oHomeY = sKleptoTargetPositions[o->oKleptoTargetNumber][1] + o->oKleptoHomeYOffset;
-    o->oHomeZ = sKleptoTargetPositions[o->oKleptoTargetNumber][2];
+    vec3_copy_y_off(&o->oHomeVec, sKleptoTargetPositions[o->oKleptoTargetNumber], o->oKleptoHomeYOffset);
 
-    o->oKleptoHalfLateralDistToHome = cur_obj_lateral_dist_to_home() / 2;
+    o->oKleptoHalfLateralDistToHome = (cur_obj_lateral_dist_to_home() / 2);
 }
 
 static void klepto_circle_target(f32 radius, f32 targetSpeed) {

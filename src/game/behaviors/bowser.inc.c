@@ -723,23 +723,14 @@ void bowser_act_big_jump(void) {
 }
 
 /**
- * Fixed values for the quick jump action
- */
-s16 sBowserVelYAir[] = { 60 };
-s16 sBowserFVelAir[] = { 50 };
-
-/**
  * Makes Bowser do a "quick" jump in BitDW
  */
 void bowser_act_quick_jump(void) {
-    f32 velY = sBowserVelYAir[0];
-    f32 fVel = sBowserFVelAir[0];
-
     if (o->oSubAction == 0) {
         // Set fixed val positions while jumping
         if (bowser_set_anim_jump()) {
-            o->oVelY = velY;
-            o->oForwardVel = fVel;
+            o->oVelY        = 60.0f;
+            o->oForwardVel  = 50.0f;
             o->oBowserTimer = 0;
             o->oSubAction++;
         }

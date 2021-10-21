@@ -1479,7 +1479,9 @@ void update_mario_breath(struct MarioState *m) {
 #if ENABLE_RUMBLE
                 if (gRumblePakTimer == 0) {
                     gRumblePakTimer = 36;
-                    if (is_rumble_finished_and_queue_empty()) queue_rumble_data(3, 30);
+                    if (is_rumble_finished_and_queue_empty()) {
+                        queue_rumble_data(3, 30);
+                    }
                 }
             } else {
                 gRumblePakTimer = 0;

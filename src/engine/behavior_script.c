@@ -39,7 +39,7 @@ UNUSED static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
 }
 
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
-u16 random_u16(void) {
+u32 random_u16(void) {
     u16 temp1, temp2;
 
     if (gRandomSeed16 == 22026) {

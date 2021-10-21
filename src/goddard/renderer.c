@@ -2237,18 +2237,8 @@ void parse_p1_controller(void) {
     }
 
     // clamp cursor position within screen view bounds
-    if (gdctrl->csrX < sScreenView->parent->upperLeft.x + 16.0f) {
-        gdctrl->csrX = sScreenView->parent->upperLeft.x + 16.0f;
-    }
-    if (gdctrl->csrX > sScreenView->parent->upperLeft.x + sScreenView->parent->lowerRight.x - 48.0f) {
-        gdctrl->csrX = sScreenView->parent->upperLeft.x + sScreenView->parent->lowerRight.x - 48.0f;
-    }
-    if (gdctrl->csrY < sScreenView->parent->upperLeft.y + 16.0f) {
-        gdctrl->csrY = sScreenView->parent->upperLeft.y + 16.0f;
-    }
-    if (gdctrl->csrY > sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f) {
-        gdctrl->csrY = sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f;
-    }
+    gdctrl->csrX = CLAMP(gdctrl->csrX, (sScreenView->parent->upperLeft.x + 16.0f), (sScreenView->parent->upperLeft.x + sScreenView->parent->lowerRight.x - 48.0f));
+    gdctrl->csrY = CLAMP(gdctrl->csrY, (sScreenView->parent->upperLeft.y + 16.0f), (sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f));
 
     for (i = 0; i < sizeof(OSContPad); i++) {
         ((u8 *) prevInputs)[i] = ((u8 *) currInputs)[i];

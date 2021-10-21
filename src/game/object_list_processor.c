@@ -91,13 +91,6 @@ struct ObjectNode gFreeObjectList;
 struct Object *gMarioObject;
 
 /**
- * An object variable that may have been used to represent the planned
- * second player. This is speculation, based on its position and its usage in
- * shadow.c.
- */
-struct Object *gLuigiObject;
-
-/**
  * The object whose behavior script is currently being updated.
  * This object is used frequently in object behavior code, and so is often
  * aliased as "o".

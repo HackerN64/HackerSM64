@@ -42,11 +42,11 @@ static void fly_guy_act_idle(void) {
         } else {
             // Randomly enter the approach mario action - but this doesn't
             // really do anything since we come right back to idle
-            if (o->oFlyGuyIdleTimer >= 3 || o->oFlyGuyIdleTimer == (random_u16() & 1) + 2) {
+            if ((o->oFlyGuyIdleTimer >= 3) || (o->oFlyGuyIdleTimer == (s32)((random_u16() & 0x1) + 2))) {
                 o->oFlyGuyIdleTimer = 0;
                 o->oAction = FLY_GUY_ACT_APPROACH_MARIO;
             } else {
-                o->oFlyGuyUnusedJitter = o->oMoveAngleYaw + sFlyGuyJitterAmounts[o->oFlyGuyIdleTimer];
+                o->oFlyGuyUnusedJitter = (o->oMoveAngleYaw + sFlyGuyJitterAmounts[o->oFlyGuyIdleTimer]);
                 o->oFlyGuyIdleTimer++;
             }
         }
@@ -59,7 +59,7 @@ static void fly_guy_act_idle(void) {
  */
 static void fly_guy_act_approach_mario(void) {
     // If we are >2000 units from home or Mario is <2000 units from us
-    if (o->oDistanceToMario >= 25000.0f || o->oDistanceToMario < 2000.0f) {
+    if ((o->oDistanceToMario >= 25000.0f) || (o->oDistanceToMario < 2000.0f)) {
         obj_forward_vel_approach(10.0f, 0.5f);
 
         // Turn toward home or Mario

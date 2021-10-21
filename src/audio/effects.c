@@ -169,22 +169,20 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
 }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-s16 get_vibrato_pitch_change(struct VibratoState *vib) {
-    s32 index;
+s32 get_vibrato_pitch_change(struct VibratoState *vib) {
     vib->time += (s32) vib->rate;
-    index = (vib->time >> 10) & 0x3F;
-    return vib->curve[index] >> 8;
+    s32 index = ((vib->time >> 10) & 0x3F);
+    return (vib->curve[index] >> 8);
 }
 #else
-s8 get_vibrato_pitch_change(struct VibratoState *vib) {
-    s32 index;
+s32 get_vibrato_pitch_change(struct VibratoState *vib) {
     vib->time += vib->rate;
 
-    index = (vib->time >> 10) & 0x3F;
+    s32 index = ((vib->time >> 10) & 0x3F);
 
     switch (index & 0x30) {
         case 0x10:
-            index = 31 - index;
+            index = (31 - index);
             // fall through
 
         case 0x00:
@@ -195,7 +193,7 @@ s8 get_vibrato_pitch_change(struct VibratoState *vib) {
             break;
 
         case 0x30:
-            index = 63 - index;
+            index = (63 - index);
             break;
     }
 
@@ -204,10 +202,6 @@ s8 get_vibrato_pitch_change(struct VibratoState *vib) {
 #endif
 
 f32 get_vibrato_freq_scale(struct VibratoState *vib) {
-    s32 pitchChange;
-    f32 extent;
-    f32 result;
-
     if (vib->delay != 0) {
         vib->delay--;
         return 1;
@@ -246,13 +240,13 @@ f32 get_vibrato_freq_scale(struct VibratoState *vib) {
         return 1.0f;
     }
 
-    pitchChange = get_vibrato_pitch_change(vib);
-    extent = (f32) vib->extent / US_FLOAT(4096.0);
+    s32 pitchChange = get_vibrato_pitch_change(vib);
+    f32 extent = ((f32) vib->extent / 4096.0f);
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    result = US_FLOAT(1.0) + extent * (gPitchBendFrequencyScale[pitchChange + 128] - US_FLOAT(1.0));
+    f32 result = (1.0f + (extent * (gPitchBendFrequencyScale[pitchChange + 128] - 1.0f)));
 #else
-    result = US_FLOAT(1.0) + extent * (gPitchBendFrequencyScale[pitchChange + 127] - US_FLOAT(1.0));
+    f32 result = (1.0f + (extent * (gPitchBendFrequencyScale[pitchChange + 127] - 1.0f)));
 #endif
     return result;
 }
@@ -282,7 +276,7 @@ void note_vibrato_init(struct Note *note) {
     struct NotePlaybackState *seqPlayerState = (struct NotePlaybackState *) &note->priority;
 #endif
 
-    note->vibratoFreqScale = 1.0f;
+    note->vibratoFreqScale    = 1.0f;
     note->portamentoFreqScale = 1.0f;
 
     vib = &note->vibratoState;
