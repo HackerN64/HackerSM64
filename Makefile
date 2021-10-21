@@ -106,7 +106,7 @@ endif
 
 DEBUG_MAP_STACKTRACE_FLAG := -D DEBUG_MAP_STACKTRACE
 
-TARGET := sm64.$(VERSION)
+TARGET := sm64
 
 
 # GRUCODE - selects which RSP microcode to use.
@@ -171,21 +171,10 @@ endif
 
 ifeq ($(NON_MATCHING),1)
   DEFINES += NON_MATCHING=1 AVOID_UB=1
-  COMPARE := 0
 endif
 
 
-# COMPARE - whether to verify the SHA-1 hash of the ROM after building
-#   1 - verifies the SHA-1 hash of the selected version of the game
-#   0 - does not verify the hash
-COMPARE ?= 0
-$(eval $(call validate-option,COMPARE,0 1))
-
-TARGET_STRING := sm64.$(VERSION).$(CONSOLE).$(GRUCODE)
-# If non-default settings were chosen, disable COMPARE
-ifeq ($(filter $(TARGET_STRING), sm64.jp.f3d_old sm64.us.f3d_old sm64.eu.f3d_new sm64.sh.f3d_new),)
-  COMPARE := 0
-endif
+TARGET_STRING := sm64
 
 # UNF - whether to use UNFLoader flashcart library
 #   1 - includes code in ROM
@@ -245,27 +234,6 @@ endif
 # Whether to colorize build messages
 COLOR ?= 1
 
-# display selected options unless 'make clean' or 'make distclean' is run
-ifeq ($(filter clean distclean,$(MAKECMDGOALS)),)
-  $(info ==== Build Options ====)
-  $(info Version:        $(VERSION))
-  $(info Microcode:      $(GRUCODE))
-  $(info Console:        $(CONSOLE))
-  $(info Target:         $(TARGET))
-  ifeq ($(COMPARE),1)
-    $(info Compare ROM:    yes)
-  else
-    $(info Compare ROM:    no)
-  endif
-  ifeq ($(NON_MATCHING),1)
-    $(info Build Matching: no)
-  else
-    $(info Build Matching: yes)
-  endif
-  $(info =======================)
-endif
-
-
 #==============================================================================#
 # Universal Dependencies                                                       #
 #==============================================================================#
@@ -311,7 +279,7 @@ endif
 
 BUILD_DIR_BASE := build
 # BUILD_DIR is the location where all build artifacts are placed
-BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)
+BUILD_DIR      := $(BUILD_DIR_BASE)/$(VERSION)_$(CONSOLE)
 ROM            := $(BUILD_DIR)/$(TARGET_STRING).z64
 ELF            := $(BUILD_DIR)/$(TARGET_STRING).elf
 LIBZ           := $(BUILD_DIR)/libz.a
@@ -485,7 +453,7 @@ RED     := \033[0;31m
 GREEN   := \033[0;32m
 BLUE    := \033[0;34m
 YELLOW  := \033[0;33m
-BLINK   := \033[33;5m
+BLINK   := \033[32;5m
 endif
 
 # For non-IDO, use objcopy instead of extract_data_for_mio
@@ -503,13 +471,12 @@ endef
 #==============================================================================#
 
 all: $(ROM)
-ifeq ($(COMPARE),1)
-	@$(PRINT) "$(GREEN)Checking if ROM matches.. $(NO_COL)\n"
-	@$(SHA1SUM) --quiet -c $(TARGET).sha1 && $(PRINT) "$(TARGET): $(GREEN)OK$(NO_COL)\n" || ($(PRINT) "$(YELLOW)Building the ROM file has succeeded, but does not match the original ROM.\nThis is expected, and not an error, if you are making modifications.\nTo silence this message, use 'make COMPARE=0.' $(NO_COL)\n" && false)
-else
 	@$(SHA1SUM) $(ROM)
-	@$(PRINT) "${GREEN}Build succeeded.$(NO_COL)\n"
-endif
+	@$(PRINT) "${BLINK}Build succeeded.\n$(NO_COL)"
+	@$(PRINT) "==== Build Options ====$(NO_COL)\n"
+	@$(PRINT) "${GREEN}Version:        $(BLUE)$(VERSION)$(NO_COL)\n"
+	@$(PRINT) "${GREEN}Microcode:      $(BLUE)$(GRUCODE)$(NO_COL)\n"
+	@$(PRINT) "${GREEN}Console:        $(BLUE)$(CONSOLE)$(NO_COL)\n"
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
@@ -814,7 +781,7 @@ ifeq      ($(CONSOLE),n64)
 	$(V)$(OBJCOPY) --pad-to=0x101000 --gap-fill=0xFF $< $@ -O binary
 else ifeq ($(CONSOLE),bb)
 	$(V)$(OBJCOPY) --gap-fill=0x00 $< $@ -O binary
-	$(V)dd if=$@ of=tmp bs=16K conv=sync
+	$(V)dd if=$@ of=tmp bs=16K conv=sync status=none
 	$(V)mv tmp $@
 endif
 	$(V)$(N64CKSUM) $@
