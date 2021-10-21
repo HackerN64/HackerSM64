@@ -1,4 +1,4 @@
-///Puppylights 2.0 by Fazana. What happened to 1.0? Tragic accident.
+/// Puppylights 2.0 by Fazana. What happened to 1.0? Tragic accident.
 /**
 Intended for use with manipulating existing Lights1 structs for objects in real time.
 Can support static lights that are loaded with the level, or lights created by objects.
@@ -165,9 +165,9 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
         lightDir[1] = (((lightRelative[1]) * 64.0f) / light->pos[1][1]);
         lightDir[2] = (((lightRelative[2]) * 64.0f) / light->pos[1][2]);
     }
-    //Get direction if applicable.
+    // Get direction if applicable.
     for (i = 0; i < 3; i++) {
-        //So it works by starting from the final colour, and then lerping to the original colour, by a factor of the epicentre corrected scale. Light opacity affects this further.
+        // So it works by starting from the final colour, and then lerping to the original colour, by a factor of the epicentre corrected scale. Light opacity affects this further.
         colour = approach_f32_asymptotic(light->rgba[i], tempLight->l[0].l.col[i], scale2 * ((f32)light->rgba[3]/255.0f));
         // If it's a directional light, then increase the current ambient by 50%, to give the effect better.
         // Otherwise, just normalise the brightness to keep it in line with the current ambient.

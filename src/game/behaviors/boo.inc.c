@@ -628,11 +628,11 @@ static ObjActionFunc sBooGivingStarActions[] = {
 };
 
 void bhv_big_boo_loop(void) {
-    //PARTIAL_UPDATE
+    // PARTIAL_UPDATE
 
     obj_set_hitbox(o, &sBooGivingStarHitbox);
 
-    o->oGraphYOffset = o->oBooBaseScale * 60.0f;
+    o->oGraphYOffset = (o->oBooBaseScale * 60.0f);
 
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sBooGivingStarActions);

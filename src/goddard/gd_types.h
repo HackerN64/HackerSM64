@@ -203,7 +203,7 @@ struct ObjJoint {
     /* 0x0CC */ struct GdVec3f unkCC;
     /* 0x0D8 */ u8  filler2[4];
     /* 0x0DC */ struct GdVec3f friction;
-    /* 0x0E8 */ Mat4f matE8;     //matrix4x4
+    /* 0x0E8 */ Mat4f matE8;     // matrix4x4
     /* 0x128 */ Mat4f mat128;    // "rot matrix"
     /* 0x168 */ Mat4f mat168;    // "id matrix"
     /* 0x1A8 */ struct GdVec3f unk1A8;
@@ -216,7 +216,7 @@ struct ObjJoint {
     /* 0x1CC */ s32 type;     // 0 = normal joint, 5 = grabbable joint. seems to be set, but never used
     /* 0x1D0 */ struct ObjAnimator *rootAnimator;  // root animator? used by eye_joint_update_func
     /* 0x1D4 */ u8  filler4[32];
-    /* 0x1F4 */ struct ObjGroup *weightGrp;    //Group of ObjWeights, only? skin weights?
+    /* 0x1F4 */ struct ObjGroup *weightGrp;    // Group of ObjWeights, only? skin weights?
     /* 0x1F8 */ struct ObjGroup *attachedObjsGrp;    //attach object group
     /* 0x1FC */ s32 attachFlags;                 //d_attach_to arg 0; "AttFlag"
     /* 0x200 */ struct GdVec3f attachOffset;
@@ -238,15 +238,15 @@ struct ObjParticle {
     /* 0x30 */ f32 unk30;
     /* 0x34 */ u8 filler3[4];
     /* 0x38 */ struct GdVec3f unk38;
-    /* 0x44 */ f32 unk44; //not vec?
-    /* 0x48 */ f32 unk48; //not vec?
+    /* 0x44 */ f32 unk44; // not vec?
+    /* 0x48 */ f32 unk48; // not vec?
     /* 0x4C */ u8 filler4[4];
     /* 0x50 */ s32 id;
     /* 0x54 */ u32 flags;   // "dflags"?
     /* 0x58 */ s32 colourNum;
     /* 0x5C */ s32 timeout;  // when this reaches zero, the particle disappears
-    /* 0x60 */ s32 unk60;   //type?
-    /* 0x64 */ s32 unk64;   //type? (1 = has 50 sub-particles, 2,3 = has 30 sub-particles
+    /* 0x60 */ s32 unk60;   // type?
+    /* 0x64 */ s32 unk64;   // type? (1 = has 50 sub-particles, 2,3 = has 30 sub-particles
     /* 0x68 */ u8 filler5[4];
     /* 0x6C */ struct ObjGroup *subParticlesGrp;   // group of other Particles ?
     /* 0x70 */ u8 filler6[4];
@@ -314,7 +314,7 @@ struct ObjNet {
     /* 0x044 */ struct GdVec3f unusedForce;   // "force" (unused)
     /* 0x050 */ struct GdVec3f velocity;
     /* 0x05C */ struct GdVec3f rotation;
-    /* 0x068 */ struct GdVec3f unk68;   //initial rotation?
+    /* 0x068 */ struct GdVec3f unk68;   // initial rotation?
     /* 0x074 */ struct GdVec3f collDisp;   // what is this?
     /* 0x080 */ struct GdVec3f collTorque;   // what is this?
     /* 0x08C */ struct GdVec3f unusedCollTorqueL;   // unused
@@ -354,7 +354,7 @@ struct ObjNet {
 struct ObjPlane {
     /* 0x00 */ struct GdObj header;
     /* 0x14 */ u32 id;
-    /* 0x18 */ s32 unk18; //bool;  contained within zone? (from its parent Net?)
+    /* 0x18 */ s32 unk18; // bool;  contained within zone? (from its parent Net?)
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ s32 unk20;
     /* 0x24 */ s32 unk24;
@@ -403,11 +403,11 @@ struct ObjCamera {
     /* 0x058 */ f32 unk58;      // GdVec3f ?
     /* 0x05C */ u8  filler[4];
     /* 0x060 */ f32 unk60;
-    /* 0x064 */ Mat4f unk64;    //matrix4x4
+    /* 0x064 */ Mat4f unk64;    // matrix4x4
     /* 0x0A4 */ f32 unkA4;
-    /* 0x0A8 */ Mat4f unkA8;    //matrix4x4
+    /* 0x0A8 */ Mat4f unkA8;    // matrix4x4
     /* 0x0E8 */ Mat4f unkE8;
-    /* 0x128 */ struct GdVec3f unk128;  //possibly
+    /* 0x128 */ struct GdVec3f unk128;  // possibly
     /* 0x134 */ struct GdVec3f unk134;
     /* 0x140 */ struct GdVec3f zoomPositions[4]; // zoom positions (*1, *1.5, *2, empty fourth)
     /* 0x170 */ s32 maxZoomLevel; // max number of zoom positions
@@ -474,7 +474,7 @@ struct ObjGadget {
     /* 0x40 */ struct GdVec3f size;   // size (x = width, y = height)
     /* 0x4C */ struct ObjGroup *valueGrp;  // group containing `ObjValPtr`s controlled by this gadget
     /* 0x50 */ struct ObjShape *shapePtr;
-    /* 0x54 */ struct ObjGroup *unk54;  //node group?
+    /* 0x54 */ struct ObjGroup *unk54;  // node group?
     /* 0x58 */ u8 filler2[4];
     /* 0x5C */ s32 colourNum;
 }; /* sizeof = 0x60 */
@@ -648,8 +648,8 @@ struct ObjZone {
 struct ObjUnk200000 {
     /* 0x00 */ struct GdObj header;
     /* 0x14 */ u8  filler[28];
-    /* 0x30 */ struct ObjVertex *unk30; //not sure; guessing for Unknown801781DC; 30 and 34 could switch with ObjZone
-    /* 0x34 */ struct ObjFace *unk34;   //not sure; guessing for Unknown801781DC
+    /* 0x30 */ struct ObjVertex *unk30; // not sure; guessing for Unknown801781DC; 30 and 34 could switch with ObjZone
+    /* 0x34 */ struct ObjFace *unk34;   // not sure; guessing for Unknown801781DC
 }; /* sizeof = 0x38*/
 
 #endif // GD_TYPES_H

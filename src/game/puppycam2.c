@@ -67,7 +67,7 @@ static unsigned char  gPCFlagStringsEN  [][64] = {{OPTION_DISABLED_EN}, {OPTION_
 static unsigned char  gPCToggleStringsEN[][64] = {{NC_BUTTON_EN}, {NC_BUTTON2_EN}, {NC_OPTION_EN}, {NC_HIGHLIGHT_L}, {NC_HIGHLIGHT_R},};
 
 
-#define OPT 32 //Just a temp thing
+#define OPT 32 // Just a temp thing
 
 static unsigned char  (*gPCOptionStringsPtr)[OPT][64] = (unsigned char (*)[OPT][64])&gPCOptionStringsEN;
 static unsigned char  (*gPCFlagStringsPtr  )[OPT][64] = (unsigned char (*)[OPT][64])&gPCFlagStringsEN;
@@ -300,7 +300,7 @@ static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 
     gSPDisplayList(   gDisplayListHead++, dl_hud_img_end);
 }
 
-//I actually took the time to redo this, properly. Lmao. Please don't bully me over this anymore :(
+// I actually took the time to redo this, properly. Lmao. Please don't bully me over this anymore :(
 void puppycam_change_setting(s8 toggle) {
     if (gPlayer1Controller->buttonDown & A_BUTTON) toggle *=  5;
     if (gPlayer1Controller->buttonDown & B_BUTTON) toggle *= 10;
@@ -620,7 +620,7 @@ static void puppycam_input_hold_preset3(void) {
     // Just in case it happens to be nonzero.
     gPuppyCam.yawAcceleration = 0;
 
-    //In theory this shouldn't be necessary, but it's nice to cover all bases.
+    // In theory this shouldn't be necessary, but it's nice to cover all bases.
     if (!(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_YAW_ROTATION)) {
         return;
     }
@@ -715,7 +715,7 @@ static void puppycam_input_hold(void) {
         stickMag[1] = (gPuppyCam.stick2[1] * 1.25f);
     }
 
-    //In theory this shouldn't be necessary, but it's nice to cover all bases.
+    // In theory this shouldn't be necessary, but it's nice to cover all bases.
     if (!(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_YAW_ROTATION)) {
         return;
     }

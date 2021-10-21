@@ -18,8 +18,8 @@ struct ReverbSettingsEU sReverbSettings[8] = {
     { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF },
     { /*Downsample Rate*/ 1,/*Window Size*/ 60,/*Gain*/ 0x3FFF },
     { /*Downsample Rate*/ 1,/*Window Size*/ 48,/*Gain*/ 0x4FFF },
-    { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF }, //Duplicate of the first index
-    { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x47FF }, //Duplicate of the second index
+    { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF }, // Duplicate of the first index
+    { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x47FF }, // Duplicate of the second index
     { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x37FF },
 };
 /**

@@ -64,20 +64,20 @@ struct GraphNode *gCurRootGraphNode;
  * might be for Mario and Luigi, and the other 10 could be different cameras for
  * different rooms / boss fights. An area might be structured like this:
  *
- * geo_camera mode_player //Mario cam
+ * geo_camera mode_player // Mario cam
  * geo_open_node
  *   geo_render_obj
  *   geo_assign_as_view 1   // currently unused geo command
  * geo_close_node
  *
- * geo_camera mode_player //Luigi cam
+ * geo_camera mode_player // Luigi cam
  * geo_open_node
  *   geo_render_obj
  *   geo_copy_view 1        // currently unused geo command
  *   geo_assign_as_view 2
  * geo_close_node
  *
- * geo_camera mode_boss //boss fight cam
+ * geo_camera mode_boss // boss fight cam
  * geo_assign_as_view 3
  * ...
  *

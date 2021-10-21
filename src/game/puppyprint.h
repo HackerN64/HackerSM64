@@ -41,7 +41,7 @@ extern s8 nameTable;
 extern s32 mempool;
 extern u8 benchOption;
 
-//General
+// General
 extern u32 cpuTime;
 extern u32 rspTime;
 extern u32 rdpTime;
