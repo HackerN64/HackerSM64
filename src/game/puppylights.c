@@ -227,7 +227,7 @@ void puppylights_run(Lights1 *src, struct Object *obj, s32 flags, RGBA32 baseCol
     memcpy(segmented_to_virtual(src), &sLightBase[0], sizeof(Lights1));
 
     for (i = 0; i < gNumLights; i++) {
-        if (gPuppyLights[i]->rgba[3] > 0 && gPuppyLights[i]->active == TRUE && gPuppyLights[i]->area == gCurrAreaIndex && (gPuppyLights[i]->room == -1 || gPuppyLights[i]->room == gMarioCurrentRoom)) {
+        if (gPuppyLights[i]->rgba[3] > 0 && gPuppyLights[i]->active && gPuppyLights[i]->area == gCurrAreaIndex && (gPuppyLights[i]->room == -1 || gPuppyLights[i]->room == gMarioCurrentRoom)) {
             if (gPuppyLights[i]->flags & PUPPYLIGHT_DIRECTIONAL && !offsetPlaced) {
                 lightFlags |= LIGHTFLAG_DIRECTIONAL_OFFSET;
                 offsetPlaced = TRUE;

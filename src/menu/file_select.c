@@ -422,8 +422,6 @@ void bhv_menu_button_loop(void) {
     cur_obj_scale(o->oMenuButtonScale);
 }
 
-#define MENU_BUTTON_SCALE 0.11111111f
-
 /**
  * Handles how to exit the score file menu using button states.
  */
@@ -461,6 +459,8 @@ static const Vec3s sSaveFileButtonPositions[] = {
     sSaveFileButtonPositions[saveFile][1],                                                              \
     sSaveFileButtonPositions[saveFile][2],                                                              \
     0x0, -0x8000, 0x0)
+
+#define MENU_BUTTON_SCALE 0.11111111f
 
 /**
  * Render buttons for the score menu.
@@ -1662,14 +1662,14 @@ void print_erase_menu_prompt(s16 x, s16 y) {
     s16 cursorX = (sCursorPos[0] + CURSOR_X);
     s16 cursorY = (sCursorPos[1] + 120.0f);
 
-    if (cursorX < MENU_ERASE_YES_MAX_X && cursorX >= MENU_ERASE_YES_MIN_X &&
-        cursorY < MENU_ERASE_YES_NO_MAX_Y && cursorY >= MENU_ERASE_YES_NO_MIN_Y) {
+    if ((cursorX < MENU_ERASE_YES_MAX_X   ) && (cursorX >= MENU_ERASE_YES_MIN_X   )
+     && (cursorY < MENU_ERASE_YES_NO_MAX_Y) && (cursorY >= MENU_ERASE_YES_NO_MIN_Y)) {
         // Fade "YES" string color but keep "NO" gray
         sYesNoColor[0] = ((sins(colorFade) * 50.0f) + 205.0f);
         sYesNoColor[1] = 150;
         sEraseYesNoHoverState = MENU_ERASE_HOVER_YES;
-    } else if (cursorX < MENU_ERASE_NO_MAX_X     && cursorX >= MENU_ERASE_NO_MIN_X
-            && cursorY < MENU_ERASE_YES_NO_MAX_Y && cursorY >= MENU_ERASE_YES_NO_MIN_Y) {
+    } else if ((cursorX < MENU_ERASE_NO_MAX_X    ) && (cursorX >= MENU_ERASE_NO_MIN_X    )
+            && (cursorY < MENU_ERASE_YES_NO_MAX_Y) && (cursorY >= MENU_ERASE_YES_NO_MIN_Y)) {
         // Fade "NO" string color but keep "YES" gray
         sYesNoColor[0] = 150;
         sYesNoColor[1] = ((sins(colorFade) * 50.0f) + 205.0f);
@@ -1963,7 +1963,7 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
         // Print "[coin] x"
         print_menu_generic_string((x + HISCORE_COIN_ICON_X), y, textCoinX);
         // Print coin highscore
-        int_to_str((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF, coinScoreText);
+        int_to_str(((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF), coinScoreText);
         print_menu_generic_string((x + HISCORE_COIN_TEXT_X), y, coinScoreText);
         // Print coin highscore file
         print_menu_generic_string((x + HISCORE_COIN_NAMES_X), y,

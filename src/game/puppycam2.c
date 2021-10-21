@@ -366,7 +366,7 @@ void puppycam_display_options() {
         if (scroll <= 140 && scroll > 32) {
             puppycam_print_text(160, scroll, (*gPCOptionStringsPtr)[gPCOptions[i].gPCOptionName], (gPCOptionSelected - i));
             if (gPCOptions[i].gPCOptionStart != 255) {
-                var = *gPCOptions[i].gPCOptionVar+gPCOptions[i].gPCOptionStart;
+                var = (*gPCOptions[i].gPCOptionVar + gPCOptions[i].gPCOptionStart);
                 if (var < sizeof(gPCFlagStringsEN)) { // Failsafe for if it somehow indexes an out of bounds array.
                     puppycam_print_text(160, (scroll - 12), (*gPCFlagStringsPtr)[var], gPCOptionSelected - i);
                 }
@@ -374,7 +374,7 @@ void puppycam_display_options() {
                 int_to_str(*gPCOptions[i].gPCOptionVar, newstring);
                 puppycam_print_text(160, (scroll - 12), newstring, (gPCOptionSelected - i));
                 puppycam_display_box(96, (111 + (32 * i) - (gPCOptionScroll * 32)), 224, (117 + (32 * i) - (gPCOptionScroll * 32)), 0x80, 0x80, 0x80, 0xFF);
-                maxvar = gPCOptions[i].gPCOptionMax - gPCOptions[i].gPCOptionMin;
+                maxvar =  gPCOptions[i].gPCOptionMax - gPCOptions[i].gPCOptionMin;
                 minvar = *gPCOptions[i].gPCOptionVar - gPCOptions[i].gPCOptionMin;
                 puppycam_display_box(96, (111 + (32 * i) - (gPCOptionScroll * 32)), (96 + (((f32)minvar / maxvar) * 128)), (117 + (32 * i) - (gPCOptionScroll * 32)), 0xFF, 0xFF, 0xFF, 0xFF);
                 puppycam_display_box((94 + (((f32)minvar / maxvar) * 128)), (109 + (32 * i) - (gPCOptionScroll * 32)), (98 + (((f32)minvar / maxvar) * 128)), (119 + (32 * i) - (gPCOptionScroll * 32)), 0xFF, 0x00, 0x00, 0xFF);
@@ -851,7 +851,7 @@ static void puppycam_view_panning(void) {
         gPuppyCam.pan[2] = approach_f32_asymptotic(gPuppyCam.pan[2], expectedPanZ, (0.02f * slideSpeed));
         if (gMarioState->vel[1] == 0.0f) {
             f32 panFloor = CLAMP(find_floor_height((s16)(gPuppyCam.targetObj->oPosX + expectedPanX), (s16)(gPuppyCam.targetObj->oPosY + 200),
-            (s16)(gPuppyCam.targetObj->oPosZ+expectedPanZ)), (gPuppyCam.targetObj->oPosY - 50), (gPuppyCam.targetObj->oPosY + 50));
+            (s16)(gPuppyCam.targetObj->oPosZ + expectedPanZ)), (gPuppyCam.targetObj->oPosY - 50), (gPuppyCam.targetObj->oPosY + 50));
             // If the floor is lower than 150 units below Mario, then ignore the Y value and tilt the camera instead.
             if (panFloor <= gPuppyCam.targetObj->oPosY - 150) {
                 panFloor = gPuppyCam.targetObj->oPosY;
@@ -1148,7 +1148,7 @@ static void puppycam_projection(void) {
             gPuppyCam.targetDist[0] = approach_f32_asymptotic(gPuppyCam.targetDist[0], 0, 0.2f);
         }
 
-        gPuppyCam.targetDist[1] = gPuppyCam.targetDist[0] + gPuppyCam.zoom+gPuppyCam.moveZoom;
+        gPuppyCam.targetDist[1] = (gPuppyCam.targetDist[0] + gPuppyCam.zoom + gPuppyCam.moveZoom);
 
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_X_MOVEMENT) gPuppyCam.focus[0] = targetPos3[0] + gPuppyCam.shake[0] + (gPuppyCam.pan[0] * gPuppyCam.targetDist[1] / gPuppyCam.zoomPoints[2]) * panD;
         if (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_Y_MOVEMENT) gPuppyCam.focus[1] = targetPos3[1] + gPuppyCam.shake[1] + (gPuppyCam.pan[1] * gPuppyCam.targetDist[1] / gPuppyCam.zoomPoints[2]) + gPuppyCam.povHeight - gPuppyCam.floorY[0] + (gPuppyCam.swimPitch / 10);

@@ -90,7 +90,7 @@ void bhv_act_selector_star_type_loop(void) {
  * Renders the 100 coin star with an special star selector type.
  */
 void render_100_coin_star(u8 stars) {
-    if (stars & (1 << 6)) {
+    if (stars & STAR_FLAG_ACT_100_COINS) {
         // If the 100 coin star has been collected, create a new star selector next to the coin score.
     #ifdef WIDE
         if (gConfig.widescreen) {
@@ -314,15 +314,15 @@ void print_act_selector_strings(void) {
 #if MULTILANG
     switch (language) {
         case LANGUAGE_ENGLISH:
-            actNameTbl = segmented_to_virtual(act_name_table_eu_en);
+            actNameTbl   = segmented_to_virtual(act_name_table_eu_en);
             levelNameTbl = segmented_to_virtual(course_name_table_eu_en);
             break;
         case LANGUAGE_FRENCH:
-            actNameTbl = segmented_to_virtual(act_name_table_eu_fr);
+            actNameTbl   = segmented_to_virtual(act_name_table_eu_fr);
             levelNameTbl = segmented_to_virtual(course_name_table_eu_fr);
             break;
         case LANGUAGE_GERMAN:
-            actNameTbl = segmented_to_virtual(act_name_table_eu_de);
+            actNameTbl   = segmented_to_virtual(act_name_table_eu_de);
             levelNameTbl = segmented_to_virtual(course_name_table_eu_de);
             break;
     }
