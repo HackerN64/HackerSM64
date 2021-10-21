@@ -376,173 +376,204 @@ enum oActions1UpMushroom {
 };
 
 /* Bob-omb */
-    /* oBehParams2ndByte */
-    #define BOBOMB_BP_STYPE_GENERIC                         0x0
-    #define BOBOMB_BP_STYPE_STATIONARY                      0x1
-    /* oAction */
-    #define BOBOMB_ACT_PATROL                               0x0
-    #define BOBOMB_ACT_LAUNCHED                             0x1
-    #define BOBOMB_ACT_CHASE_MARIO                          0x2
-    #define BOBOMB_ACT_EXPLODE                              0x3
-    /* Animations */
-    #define BOBOMB_ANIM_WALKING                             0x0
-    #define BOBOMB_ANIM_HELD                                0x1
+enum oBehParams2ndByteBobOmb {
+    BOBOMB_BP_STYPE_GENERIC,
+    BOBOMB_BP_STYPE_STATIONARY
+};
+enum oActionsBobOmb {
+    BOBOMB_ACT_PATROL,
+    BOBOMB_ACT_LAUNCHED,
+    BOBOMB_ACT_CHASE_MARIO,
+    BOBOMB_ACT_EXPLODE
+};
+enum AnimIDsBobOmb {
+    BOBOMB_ANIM_WALKING,
+    BOBOMB_ANIM_HELD
+};
 
 /* Bob-omb Buddy */
-    /* oBehParams2ndByte */
-    #define BOBOMB_BUDDY_BP_STYPE_GENERIC                   0x0
-    #define BOBOMB_BUDDY_BP_STYPE_BOB_GRASS_KBB             0x1
-    #define BOBOMB_BUDDY_BP_STYPE_BOB_CANNON_KBB            0x2
-    #define BOBOMB_BUDDY_BP_STYPE_BOB_GRASS                 0x3
-    /* oAction */
-    #define BOBOMB_BUDDY_ACT_IDLE                           0x0
-    #define BOBOMB_BUDDY_ACT_TURN_TO_TALK                   0x2
-    #define BOBOMB_BUDDY_ACT_TALK                           0x3
-    /* oBobombBuddyRole */
-    #define BOBOMB_BUDDY_ROLE_ADVICE                        0x0
-    #define BOBOMB_BUDDY_ROLE_CANNON                        0x1
-    /* oBobombBuddyCannonStatus */
-    #define BOBOMB_BUDDY_CANNON_UNOPENED                    0x0
-    #define BOBOMB_BUDDY_CANNON_OPENING                     0x1
-    #define BOBOMB_BUDDY_CANNON_OPENED                      0x2
-    #define BOBOMB_BUDDY_CANNON_STOP_TALKING                0x3
-    /* oBobombBuddyHasTalkedToMario */
-    #define BOBOMB_BUDDY_HAS_NOT_TALKED                     0x0
-    #define BOBOMB_BUDDY_HAS_TALKED                         0x2
+enum oBehParams2ndByteBobOmbBuddy {
+    BOBOMB_BUDDY_BP_STYPE_GENERIC,
+    BOBOMB_BUDDY_BP_STYPE_BOB_GRASS_KBB,
+    BOBOMB_BUDDY_BP_STYPE_BOB_CANNON_KBB,
+    BOBOMB_BUDDY_BP_STYPE_BOB_GRASS
+};
+enum oActionsBobOmbBuddy {
+    BOBOMB_BUDDY_ACT_IDLE,
+    BOBOMB_BUDDY_ACT_1,
+    BOBOMB_BUDDY_ACT_TURN_TO_TALK,
+    BOBOMB_BUDDY_ACT_TALK
+};
+enum oBobombBuddyRoles {
+    BOBOMB_BUDDY_ROLE_ADVICE,
+    BOBOMB_BUDDY_ROLE_CANNON
+};
+enum oBobombBuddyCannonStatuses {
+    BOBOMB_BUDDY_CANNON_UNOPENED,
+    BOBOMB_BUDDY_CANNON_OPENING,
+    BOBOMB_BUDDY_CANNON_OPENED,
+    BOBOMB_BUDDY_CANNON_STOP_TALKING
+};
+enum oBobombBuddyHasTalkedToMarioStates {
+    BOBOMB_BUDDY_HAS_NOT_TALKED,
+    BOBOMB_BUDDY_TALKED_STATE_UNUSED,
+    BOBOMB_BUDDY_HAS_TALKED
+};
 
 /* Bowser */
-    /* oBehParams2ndByte */
-    #define BOWSER_BP_BITDW                                 0x0
-    #define BOWSER_BP_BITFS                                 0x1
-    #define BOWSER_BP_BITS                                  0x2
-    /* Tail oAction */
-    #define BOWSER_ACT_TAIL_DEFAULT                         0x00
-    #define BOWSER_ACT_TAIL_THROWN                          0x01
-    #define BOWSER_ACT_TAIL_TOUCHED_MARIO                   0x02
-    /* oAction */
-    #define BOWSER_ACT_DEFAULT                              0x00
-    #define BOWSER_ACT_THROWN                               0x01
-    #define BOWSER_ACT_JUMP_ONTO_STAGE                      0x02
-    #define BOWSER_ACT_DANCE                                0x03
-    #define BOWSER_ACT_DEAD                                 0x04
-    #define BOWSER_ACT_WAIT                                 0x05
-    #define BOWSER_ACT_INTRO_WALK                           0x06
-    #define BOWSER_ACT_CHARGE_MARIO                         0x07
-    #define BOWSER_ACT_SPIT_FIRE_INTO_SKY                   0x08
-    #define BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR                 0x09
-    #define BOWSER_ACT_HIT_EDGE                             0x0A
-    #define BOWSER_ACT_TURN_FROM_EDGE                       0x0B
-    #define BOWSER_ACT_HIT_MINE                             0x0C
-    #define BOWSER_ACT_BIG_JUMP                             0x0D
-    #define BOWSER_ACT_WALK_TO_MARIO                        0x0E
-    #define BOWSER_ACT_BREATH_FIRE                          0x0F
-    #define BOWSER_ACT_TELEPORT                             0x10
-    #define BOWSER_ACT_QUICK_JUMP                           0x11
-    #define BOWSER_ACT_UNUSED_SLOW_WALK                     0x12
-    #define BOWSER_ACT_TILT_LAVA_PLATFORM                   0x13
-    /* oAnimState */
-    #define BOWSER_ANIM_STATE_OPAQUE                        TRANSPARENCY_ANIM_STATE_OPAQUE
-    #define BOWSER_ANIM_STATE_TRANSPARENT                   TRANSPARENCY_ANIM_STATE_TRANSPARENT
-    #define BOWSER_ANIM_STATE_INVISIBLE                     0x02
-    /* Animations */
-    #define BOWSER_ANIM_STAND_UP                            0x00
-    #define BOWSER_ANIM_STAND_UP_UNUSED                     0x01 // slightly different
-    #define BOWSER_ANIM_SHAKING                             0x02
-    #define BOWSER_ANIM_GRABBED                             0x03
-    #define BOWSER_ANIM_BROKEN                              0x04 // broken animation
-    #define BOWSER_ANIM_FALL_DOWN                           0x05 // unused
-    #define BOWSER_ANIM_BREATH                              0x06
-    #define BOWSER_ANIM_JUMP                                0x07 // unused, short jump, replaced by start/stop
-    #define BOWSER_ANIM_JUMP_STOP                           0x08
-    #define BOWSER_ANIM_JUMP_START                          0x09
-    #define BOWSER_ANIM_DANCE                               0x0A
-    #define BOWSER_ANIM_BREATH_UP                           0x0B
-    #define BOWSER_ANIM_IDLE                                0x0C
-    #define BOWSER_ANIM_SLOW_GAIT                           0x0D
-    #define BOWSER_ANIM_LOOK_DOWN_STOP_WALK                 0x0E
-    #define BOWSER_ANIM_LOOK_UP_START_WALK                  0x0F
-    #define BOWSER_ANIM_FLIP_DOWN                           0x10
-    #define BOWSER_ANIM_LAY_DOWN                            0x11
-    #define BOWSER_ANIM_RUN_START                           0x12
-    #define BOWSER_ANIM_RUN                                 0x13
-    #define BOWSER_ANIM_RUN_STOP                            0x14
-    #define BOWSER_ANIM_RUN_SLIP                            0x15
-    #define BOWSER_ANIM_BREATH_QUICK                        0x16
-    #define BOWSER_ANIM_EDGE_MOVE                           0x17
-    #define BOWSER_ANIM_EDGE_STOP                           0x18
-    #define BOWSER_ANIM_FLIP                                0x19
-    #define BOWSER_ANIM_STAND_UP_FROM_FLIP                  0x1A
-    /* oBowserCamAct */
-    #define BOWSER_CAM_ACT_IDLE                             0x0
-    #define BOWSER_CAM_ACT_WALK                             0x1
-    #define BOWSER_CAM_ACT_END                              0x2
-    /* oBowserStatus */
-    #define BOWSER_STATUS_ANGLE_MARIO                       (1 <<  1) // 0x00000002
-    #define BOWSER_STATUS_ANGLE_CENTER                      (1 <<  2) // 0x00000004
-    #define BOWSER_STATUS_DIST_MARIO                        (1 <<  3) // 0x00000008
-    #define BOWSER_STATUS_DIST_CENTER                       (1 <<  4) // 0x00000010
-    #define BOWSER_STATUS_BIG_JUMP                          (1 << 16) // 0x00010000
-    #define BOWSER_STATUS_FIRE_SKY                          (1 << 17) // 0x00020000
-    /* oBowserGrabbedStatus */
-    #define BOWSER_GRAB_STATUS_NONE                         0x0
-    #define BOWSER_GRAB_STATUS_GRABBED                      0x1
-    #define BOWSER_GRAB_STATUS_HOLDING                      0x2
+enum oBehParams2ndByteBowser {
+    BOWSER_BP_BITDW,
+    BOWSER_BP_BITFS,
+    BOWSER_BP_BITS
+};
+enum oActionsBowserTail {
+    BOWSER_ACT_TAIL_DEFAULT,
+    BOWSER_ACT_TAIL_THROWN,
+    BOWSER_ACT_TAIL_TOUCHED_MARIO
+};
+enum oActionsBowser {
+    BOWSER_ACT_DEFAULT,
+    BOWSER_ACT_THROWN,
+    BOWSER_ACT_JUMP_ONTO_STAGE,
+    BOWSER_ACT_DANCE,
+    BOWSER_ACT_DEAD,
+    BOWSER_ACT_WAIT,
+    BOWSER_ACT_INTRO_WALK,
+    BOWSER_ACT_CHARGE_MARIO,
+    BOWSER_ACT_SPIT_FIRE_INTO_SKY,
+    BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR,
+    BOWSER_ACT_HIT_EDGE,
+    BOWSER_ACT_TURN_FROM_EDGE,
+    BOWSER_ACT_HIT_MINE,
+    BOWSER_ACT_BIG_JUMP,
+    BOWSER_ACT_WALK_TO_MARIO,
+    BOWSER_ACT_BREATH_FIRE,
+    BOWSER_ACT_TELEPORT,
+    BOWSER_ACT_QUICK_JUMP,
+    BOWSER_ACT_UNUSED_SLOW_WALK,
+    BOWSER_ACT_TILT_LAVA_PLATFORM,
+};
+enum oAnimStatesBowser {
+    BOWSER_ANIM_STATE_OPAQUE      = TRANSPARENCY_ANIM_STATE_OPAQUE,
+    BOWSER_ANIM_STATE_TRANSPARENT = TRANSPARENCY_ANIM_STATE_TRANSPARENT,
+    BOWSER_ANIM_STATE_INVISIBLE   = 0x02,
+};
+enum animIDsBowser {
+    BOWSER_ANIM_STAND_UP,
+    BOWSER_ANIM_STAND_UP_UNUSED, // slightly different
+    BOWSER_ANIM_SHAKING,
+    BOWSER_ANIM_GRABBED,
+    BOWSER_ANIM_BROKEN,          // broken animation
+    BOWSER_ANIM_FALL_DOWN,       // unused
+    BOWSER_ANIM_BREATH,
+    BOWSER_ANIM_JUMP,            // unused, short jump, replaced by start/stop
+    BOWSER_ANIM_JUMP_STOP,
+    BOWSER_ANIM_JUMP_START,
+    BOWSER_ANIM_DANCE,
+    BOWSER_ANIM_BREATH_UP,
+    BOWSER_ANIM_IDLE,
+    BOWSER_ANIM_SLOW_GAIT,
+    BOWSER_ANIM_LOOK_DOWN_STOP_WALK,
+    BOWSER_ANIM_LOOK_UP_START_WALK,
+    BOWSER_ANIM_FLIP_DOWN,
+    BOWSER_ANIM_LAY_DOWN,
+    BOWSER_ANIM_RUN_START,
+    BOWSER_ANIM_RUN,
+    BOWSER_ANIM_RUN_STOP,
+    BOWSER_ANIM_RUN_SLIP,
+    BOWSER_ANIM_BREATH_QUICK,
+    BOWSER_ANIM_EDGE_MOVE,
+    BOWSER_ANIM_EDGE_STOP,
+    BOWSER_ANIM_FLIP,
+    BOWSER_ANIM_STAND_UP_FROM_FLIP,
+};
+enum oBowserCamActions {
+    BOWSER_CAM_ACT_IDLE,
+    BOWSER_CAM_ACT_WALK,
+    BOWSER_CAM_ACT_END
+};
+enum oBowserStatuses {
+    BOWSER_STATUS_ANGLE_MARIO  = (1 <<  1), // 0x00000002
+    BOWSER_STATUS_ANGLE_CENTER = (1 <<  2), // 0x00000004
+    BOWSER_STATUS_DIST_MARIO   = (1 <<  3), // 0x00000008
+    BOWSER_STATUS_DIST_CENTER  = (1 <<  4), // 0x00000010
+    BOWSER_STATUS_BIG_JUMP     = (1 << 16), // 0x00010000
+    BOWSER_STATUS_FIRE_SKY     = (1 << 17), // 0x00020000
+};
+enum oBowserGrabbedStatuses {
+    BOWSER_GRAB_STATUS_NONE,
+    BOWSER_GRAB_STATUS_GRABBED,
+    BOWSER_GRAB_STATUS_HOLDING
+};
     /* oSubAction */
-        /* BOWSER_ACT_THROWN */
-    #define BOWSER_SUB_ACT_THROWN_BOUNCE                    0x0
-    #define BOWSER_SUB_ACT_THROWN_STOP                      0x1
-        /* BOWSER_ACT_DEAD */
-    #define BOWSER_SUB_ACT_DEAD_FLY_BACK                    0x0
-    #define BOWSER_SUB_ACT_DEAD_BOUNCE                      0x1
-    #define BOWSER_SUB_ACT_DEAD_WAIT                        0x2
-    #define BOWSER_SUB_ACT_DEAD_DEFAULT_END                 0x3
-    #define BOWSER_SUB_ACT_DEAD_DEFAULT_END_OVER            0x4
-    #define BOWSER_SUB_ACT_DEAD_FINAL_END                   0xA
-    #define BOWSER_SUB_ACT_DEAD_FINAL_END_OVER              0xB
-        /* BOWSER_ACT_INTRO_WALK */
-    #define BOWSER_SUB_ACT_INTRO_WALK_LOOK_UP               0x0
-    #define BOWSER_SUB_ACT_INTRO_WALK_SLOWLY                0x1
-    #define BOWSER_SUB_ACT_INTRO_WALK_STOP                  0x2
-        /* BOWSER_ACT_CHARGE_MARIO */
-    #define BOWSER_SUB_ACT_CHARGE_START                     0x0
-    #define BOWSER_SUB_ACT_CHARGE_RUN                       0x1
-    #define BOWSER_SUB_ACT_CHARGE_END                       0x2
-    #define BOWSER_SUB_ACT_CHARGE_SLIP                      0x3
-        /* BOWSER_ACT_TELEPORT */
-    #define BOWSER_SUB_ACT_TELEPORT_START                   0x0
-    #define BOWSER_SUB_ACT_TELEPORT_MOVE                    0x1
-    #define BOWSER_SUB_ACT_TELEPORT_STOP                    0x2
-        /* BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR */
-    #define BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_START            0x0
-    #define BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_STOP             0x1
-        /* BOWSER_ACT_HIT_EDGE */
-    #define BOWSER_SUB_ACT_HIT_EDGE_START                   0x0
-    #define BOWSER_SUB_ACT_HIT_EDGE_STOP                    0x1
-        /* BOWSER_ACT_TURN_FROM_EDGE */
-    #define BOWSER_SUB_ACT_TURN_FROM_EDGE_START             0x0
-    #define BOWSER_SUB_ACT_TURN_FROM_EDGE_STOP              0x1
-    #define BOWSER_SUB_ACT_TURN_FROM_EDGE_END               0x2
-        /* BOWSER_ACT_HIT_MINE */
-    #define BOWSER_SUB_ACT_HIT_MINE_START                   0x0
-    #define BOWSER_SUB_ACT_HIT_MINE_FALL                    0x1
-    #define BOWSER_SUB_ACT_HIT_MINE_STOP                    0x2
-        /* BOWSER_ACT_JUMP_ONTO_STAGE */
-    #define BOWSER_SUB_ACT_JUMP_ON_STAGE_IDLE               0x0
-    #define BOWSER_SUB_ACT_JUMP_ON_STAGE_START              0x1
-    #define BOWSER_SUB_ACT_JUMP_ON_STAGE_LAND               0x2
-    #define BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP               0x3
-        /* BOWSER_ACT_BIG_JUMP */
-    #define BOWSER_SUB_ACT_BIG_JUMP_START                   0x0
-    #define BOWSER_SUB_ACT_BIG_JUMP_LAND                    0x1
-    #define BOWSER_SUB_ACT_BIG_JUMP_STOP                    0x2
-        /* BOWSER_ACT_WALK_TO_MARIO */
-    #define BOWSER_SUB_ACT_WALK_TO_MARIO_START              0x0
-    #define BOWSER_SUB_ACT_WALK_TO_MARIO_WALKING            0x1
-    #define BOWSER_SUB_ACT_WALK_TO_MARIO_STOP               0x2
-        /* BOWSER_ACT_QUICK_JUMP */
-    #define BOWSER_SUB_ACT_QUICK_JUMP_START                 0x0
-    #define BOWSER_SUB_ACT_QUICK_JUMP_LAND                  0x1
-    #define BOWSER_SUB_ACT_QUICK_JUMP_STOP                  0x2
+enum oSubActionBowserActThrown { // BOWSER_ACT_THROWN
+    BOWSER_SUB_ACT_THROWN_BOUNCE,
+    BOWSER_SUB_ACT_THROWN_STOP
+};
+enum oSubActionBowserActDead { // BOWSER_ACT_DEAD
+    BOWSER_SUB_ACT_DEAD_FLY_BACK,
+    BOWSER_SUB_ACT_DEAD_BOUNCE,
+    BOWSER_SUB_ACT_DEAD_WAIT,
+    BOWSER_SUB_ACT_DEAD_DEFAULT_END,
+    BOWSER_SUB_ACT_DEAD_DEFAULT_END_OVER,
+    BOWSER_SUB_ACT_DEAD_FINAL_END = 0xA,
+    BOWSER_SUB_ACT_DEAD_FINAL_END_OVER
+};
+enum oSubActionBowserActIntroWalk { // BOWSER_ACT_INTRO_WALK
+    BOWSER_SUB_ACT_INTRO_WALK_LOOK_UP,
+    BOWSER_SUB_ACT_INTRO_WALK_SLOWLY,
+    BOWSER_SUB_ACT_INTRO_WALK_STOP
+};
+enum oSubActionBowserActChargeMario { // BOWSER_ACT_CHARGE_MARIO
+    BOWSER_SUB_ACT_CHARGE_START,
+    BOWSER_SUB_ACT_CHARGE_RUN,
+    BOWSER_SUB_ACT_CHARGE_END,
+    BOWSER_SUB_ACT_CHARGE_SLIP
+};
+enum oSubActionBowserActTeleport { // BOWSER_ACT_TELEPORT
+    BOWSER_SUB_ACT_TELEPORT_START,
+    BOWSER_SUB_ACT_TELEPORT_MOVE,
+    BOWSER_SUB_ACT_TELEPORT_STOP
+};
+enum oSubActionBowserActSpitFireOntoFloor { // BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR
+    BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_START,
+    BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_STOP
+};
+enum oSubActionBowserActHitEdge { // BOWSER_ACT_HIT_EDGE
+    BOWSER_SUB_ACT_HIT_EDGE_START,
+    BOWSER_SUB_ACT_HIT_EDGE_STOP
+};
+enum oSubActionBowserActTurnFromEdge { // BOWSER_ACT_TURN_FROM_EDGE
+    BOWSER_SUB_ACT_TURN_FROM_EDGE_START,
+    BOWSER_SUB_ACT_TURN_FROM_EDGE_STOP,
+    BOWSER_SUB_ACT_TURN_FROM_EDGE_END
+};
+enum oSubActionBowserActHitMine { // BOWSER_ACT_HIT_MINE
+    BOWSER_SUB_ACT_HIT_MINE_START,
+    BOWSER_SUB_ACT_HIT_MINE_FALL,
+    BOWSER_SUB_ACT_HIT_MINE_STOP
+};
+enum oSubActionBowserActJumpOntoStage { // BOWSER_ACT_JUMP_ONTO_STAGE
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_IDLE,
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_START,
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_LAND,
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP
+};
+enum oSubActionBowserActBigJump { // BOWSER_ACT_BIG_JUMP
+    BOWSER_SUB_ACT_BIG_JUMP_START,
+    BOWSER_SUB_ACT_BIG_JUMP_LAND,
+    BOWSER_SUB_ACT_BIG_JUMP_STOP
+};
+enum oSubActionBowserActWalkToMario { // BOWSER_ACT_WALK_TO_MARIO
+    BOWSER_SUB_ACT_WALK_TO_MARIO_START,
+    BOWSER_SUB_ACT_WALK_TO_MARIO_WALKING,
+    BOWSER_SUB_ACT_WALK_TO_MARIO_STOP
+};
+enum oSubActionBowserActQuickJump { // BOWSER_ACT_QUICK_JUMP
+    BOWSER_SUB_ACT_QUICK_JUMP_START,
+    BOWSER_SUB_ACT_QUICK_JUMP_LAND,
+    BOWSER_SUB_ACT_QUICK_JUMP_STOP
+};
 
 /* Bowser BITS Platform */
     /* oAction */
