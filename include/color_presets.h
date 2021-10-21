@@ -49,52 +49,54 @@
 // -- Presets --
 
 
-// I4 (I[0..15])
-#define COLOR_I4_BLACK                             0x0 // 0000 |  0
-#define COLOR_I4_GRAY                              0x7 // 0111 |  7
-#define COLOR_I4_WHITE                             0xF // 1111 | 15
+// I4 (I[0..15])                                     IIII
+#define COLOR_I4_BLACK                             0b0000 // 0000 | 0x0 |  0
+#define COLOR_I4_GRAY                              0b0111 // 0111 | 0x7 |  7
+#define COLOR_I4_WHITE                             0b1111 // 1111 | 0xF | 15
 
 
-// I8 (I[0..255])
-#define COLOR_I8_BLACK                            0x00 // 0000 0000 |   0
-#define COLOR_I8_GRAY                             0x7F // 0111 1111 | 127
-#define COLOR_I8_WHITE                            0xFF // 1111 1111 | 255
+// I8 (I[0..255])                                    IIIIIIII
+#define COLOR_I8_BLACK                             0b00000000 // 0x00 // 0000 0000 |   0
+#define COLOR_I8_GRAY                              0b01111111 // 0x7F // 0111 1111 | 127
+#define COLOR_I8_WHITE                             0b11111111 // 0xFF // 1111 1111 | 255
 
 
-// IA4 (I[0..7], A[0..1])
-#define COLOR_IA4_NONE                             0x0 // 0000 | 000 0 | 0 0
-#define COLOR_IA4_BLACK                            0x1 // 0001 | 000 1 | 0 1
-#define COLOR_IA4_GRAY                             0x7 // 0111 | 011 1 | 3 1
-#define COLOR_IA4_WHITE                            0xF // 1111 | 111 1 | 7 1
+// IA4 (I[0..7], A[0..1])                            IIIA
+#define COLOR_IA4_NONE                             0b0000 // | 000 0 | 0x00 | 0 0
+#define COLOR_IA4_BLACK                            0b0000 // | 000 1 | 0x0F | 0 1
+#define COLOR_IA4_GRAY                             0b0000 // | 011 1 | 0x7F | 3 1
+#define COLOR_IA4_WHITE                            0b0000 // | 111 1 | 0xFF | 7 1
 
 
-// IA8 (I[0..15], A[0..15])
-#define COLOR_IA8_NONE                            0x00 // 0000 0000 |  0  0
-#define COLOR_IA8_BLACK                           0x0F // 0000 1111 |  0 15
-#define COLOR_IA8_GRAY                            0x7F // 0111 1111 |  7 15
-#define COLOR_IA8_WHITE                           0xFF // 1111 1111 | 15 15
+// IA8 (I[0..15], A[0..15])                         IIIIAAAA
+#define COLOR_IA8_NONE                            0b00000000 // 0000 0000 | 0x00 |  0  0
+#define COLOR_IA8_BLACK                           0b00001111 // 0000 1111 | 0x0F |  0 15
+#define COLOR_IA8_GRAY                            0b01111111 // 0111 1111 | 0x7F |  7 15
+#define COLOR_IA8_WHITE                           0b11111111 // 1111 1111 | 0xFF | 15 15
 
 
-// IA16 (I[0..255], A[0..255])
-#define COLOR_IA16_NONE                         0x0000 // 0000 0000 0000 0000 |   0   0
-#define COLOR_IA16_BLACK                        0x00FF // 0000 0000 1111 1111 |   0 255
-#define COLOR_IA16_GRAY                         0x7FFF // 0111 1111 1111 1111 | 127 255
-#define COLOR_IA16_WHITE                        0xFFFF // 1111 1111 1111 1111 | 255 255
+// IA16 (I[0..255], A[0..255])                    IIIIIIIIAAAAAAAA
+#define COLOR_IA16_NONE                         0b0000000000000000 // 0000 0000 0000 0000 | 0x0000 |   0   0
+#define COLOR_IA16_BLACK                        0b0000000011111111 // 0000 0000 1111 1111 | 0x00FF |   0 255
+#define COLOR_IA16_GRAY                         0b0111111111111111 // 0111 1111 1111 1111 | 0x7FFF | 127 255
+#define COLOR_IA16_WHITE                        0b1111111111111111 // 1111 1111 1111 1111 | 0xFFFF | 255 255
 
 
 // RGBA16 (RGB[0..31], A[0..1])
 
-// Grayscale
-#define COLOR_RGBA16_NONE                       0x0000 // 0000 0000 0000 0000 | 00000 00000 00000 0 |  0  0  0  0
-#define COLOR_RGBA16_BLACK                      0x0001 // 0000 0000 0000 0001 | 00000 00000 00000 1 |  0  0  0  1
-#define COLOR_RGBA16_DARK_GRAY                  0x39CF // 0011 1001 1100 1111 | 00111 00111 00111 1 |  7  7  7  1
-#define COLOR_RGBA16_GRAY                       0x7BDF // 0111 1011 1101 1111 | 01111 01111 01111 1 | 15 15 15  1
-#define COLOR_RGBA16_LIGHT_GRAY                 0xBDEF // 1011 1101 1110 1111 | 10111 10111 10111 1 | 23 23 23  1
-#define COLOR_RGBA16_WHITE                      0xFFFF // 1111 1111 1111 1111 | 11111 11111 11111 1 | 31 31 31  1
+// Grayscale Colors
+//                                                                                     RRRRRGGGGGBBBBBA | RRRR RGGG GGBB BBBA | RRRRR GGGGG BBBBB A | 0x0000 |  R  G  B  A
+#define COLOR_RGBA16_NONE                       RGBA16_COMPOSITE_GRAYSCALE( 0, 0) // 0b0000000000000000 | 0000 0000 0000 0000 | 00000 00000 00000 0 | 0x0000 |  0  0  0  0
+#define COLOR_RGBA16_BLACK                      RGBA16_COMPOSITE_GRAYSCALE( 0, 1) // 0b0000000000000001 | 0000 0000 0000 0001 | 00000 00000 00000 1 | 0x0001 |  0  0  0  1
+#define COLOR_RGBA16_DARK_GRAY                  RGBA16_COMPOSITE_GRAYSCALE( 7, 1) // 0b0011100111001111 | 0011 1001 1100 1111 | 00111 00111 00111 1 | 0x39CF |  7  7  7  1
+#define COLOR_RGBA16_GRAY                       RGBA16_COMPOSITE_GRAYSCALE(15, 1) // 0b0111101111011111 | 0111 1011 1101 1111 | 01111 01111 01111 1 | 0x7BDF | 15 15 15  1
+#define COLOR_RGBA16_LIGHT_GRAY                 RGBA16_COMPOSITE_GRAYSCALE(23, 1) // 0b1011110111101111 | 1011 1101 1110 1111 | 10111 10111 10111 1 | 0xBDEF | 23 23 23  1
+#define COLOR_RGBA16_WHITE                      RGBA16_COMPOSITE_GRAYSCALE(31, 1) // 0b1111111111111111 | 1111 1111 1111 1111 | 11111 11111 11111 1 | 0xFFFF | 31 31 31  1
 
 // Crash screen
-#define COLOR_RGBA16_CRASH_ERROR                0x6253 // 0110 0010 0101 0011 | 01100 01001 01001 1 | 12  9  9  1
-#define COLOR_RGBA16_CRASH_ASSERT               0x5263 // 0101 0010 0110 0011 | 01010 01001 10001 1 | 10  9 21  1
+//                                                                                   RRRRRGGGGGBBBBBA | RRRR RGGG GGBB BBBA | RRRRR GGGGG BBBBB A | 0x0000 |  R  G  B  A
+#define COLOR_RGBA16_CRASH_ERROR                RGBA16_COMPOSITE(12,  9,  9, 1) // 0b0110001001010011 | 0110 0010 0101 0011 | 01100 01001 01001 1 | 0x6253 | 12  9  9  1
+#define COLOR_RGBA16_CRASH_ASSERT               RGBA16_COMPOSITE(10,  9, 21, 1) // 0b0101001001100011 | 0101 0010 0110 0011 | 01010 01001 10001 1 | 0x5263 | 10  9 21  1
 #define COLOR_RGBA16_CRASH_BLACK                COLOR_RGBA16_BLACK
 #define COLOR_RGBA16_CRASH_WHITE                COLOR_RGBA16_WHITE
 
