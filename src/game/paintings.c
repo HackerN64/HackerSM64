@@ -170,7 +170,7 @@ struct Painting **sPaintingGroups[] = {
     sTtmPaintings,
 };
 
-s16 gPaintingUpdateCounter = 1;
+s16 gPaintingUpdateCounter     = 1;
 s16 gLastPaintingUpdateCounter = 0;
 
 /**
