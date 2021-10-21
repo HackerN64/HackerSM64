@@ -9,16 +9,18 @@
 #include "geo_commands.h"
 #include "game/memory.h"
 
-#define GRAPH_RENDER_ACTIVE             (1 << 0) // 0x0001
-#define GRAPH_RENDER_CHILDREN_FIRST     (1 << 1) // 0x0002
-#define GRAPH_RENDER_BILLBOARD          (1 << 2) // 0x0004
-#define GRAPH_RENDER_Z_BUFFER           (1 << 3) // 0x0008
-#define GRAPH_RENDER_INVISIBLE          (1 << 4) // 0x0010
-#define GRAPH_RENDER_HAS_ANIMATION      (1 << 5) // 0x0020
-#define GRAPH_RENDER_SILHOUETTE         (1 << 6) // 0x0040
-#define GRAPH_RENDER_OCCLUDE_SILHOUETTE (1 << 7) // 0x0080
-#define GRAPH_RENDER_UCODE_REJ          (1 << 8) // 0x0100
-#define GRAPH_RENDER_UCODE_ZEX          (1 << 9) // 0x0200
+enum GraphRenderFlags {
+    GRAPH_RENDER_ACTIVE             = (1 << 0), // 0x0001
+    GRAPH_RENDER_CHILDREN_FIRST     = (1 << 1), // 0x0002
+    GRAPH_RENDER_BILLBOARD          = (1 << 2), // 0x0004
+    GRAPH_RENDER_Z_BUFFER           = (1 << 3), // 0x0008
+    GRAPH_RENDER_INVISIBLE          = (1 << 4), // 0x0010
+    GRAPH_RENDER_HAS_ANIMATION      = (1 << 5), // 0x0020
+    GRAPH_RENDER_SILHOUETTE         = (1 << 6), // 0x0040
+    GRAPH_RENDER_OCCLUDE_SILHOUETTE = (1 << 7), // 0x0080
+    GRAPH_RENDER_UCODE_REJ          = (1 << 8), // 0x0100
+    GRAPH_RENDER_UCODE_ZEX          = (1 << 9), // 0x0200
+};
 
 // The amount of bits to use for the above flags out of a s16 variable.
 // The remaining bits to the left are used for the render layers.
@@ -34,31 +36,33 @@
 #define GRAPH_NODE_TYPE_FUNCTIONAL            0x100
 
 // The discriminant for different types of geo nodes
-#define GRAPH_NODE_TYPE_ROOT                  0x001
-#define GRAPH_NODE_TYPE_ORTHO_PROJECTION      0x002
-#define GRAPH_NODE_TYPE_PERSPECTIVE          (0x003 | GRAPH_NODE_TYPE_FUNCTIONAL)
-#define GRAPH_NODE_TYPE_MASTER_LIST           0x004
-#define GRAPH_NODE_TYPE_START                 0x00A
-#define GRAPH_NODE_TYPE_LEVEL_OF_DETAIL       0x00B
-#define GRAPH_NODE_TYPE_SWITCH_CASE          (0x00C | GRAPH_NODE_TYPE_FUNCTIONAL)
-#define GRAPH_NODE_TYPE_CAMERA               (0x014 | GRAPH_NODE_TYPE_FUNCTIONAL)
-#define GRAPH_NODE_TYPE_TRANSLATION_ROTATION  0x015
-#define GRAPH_NODE_TYPE_TRANSLATION           0x016
-#define GRAPH_NODE_TYPE_ROTATION              0x017
-#define GRAPH_NODE_TYPE_OBJECT                0x018
-#define GRAPH_NODE_TYPE_ANIMATED_PART         0x019
-#define GRAPH_NODE_TYPE_BONE                  GEO_BONE_ID
-#define GRAPH_NODE_TYPE_BILLBOARD             0x01A
-#define GRAPH_NODE_TYPE_DISPLAY_LIST          0x01B
-#define GRAPH_NODE_TYPE_SCALE                 0x01C
-#define GRAPH_NODE_TYPE_SHADOW                0x028
-#define GRAPH_NODE_TYPE_OBJECT_PARENT         0x029
-#define GRAPH_NODE_TYPE_GENERATED_LIST       (0x02A | GRAPH_NODE_TYPE_FUNCTIONAL)
-#define GRAPH_NODE_TYPE_BACKGROUND           (0x02C | GRAPH_NODE_TYPE_FUNCTIONAL)
-#define GRAPH_NODE_TYPE_HELD_OBJ             (0x02E | GRAPH_NODE_TYPE_FUNCTIONAL)
-#define GRAPH_NODE_TYPE_CULLING_RADIUS        0x02F
+enum GraphNodeTypes {
+    GRAPH_NODE_TYPE_ROOT                 =  0x001,
+    GRAPH_NODE_TYPE_ORTHO_PROJECTION     =  0x002,
+    GRAPH_NODE_TYPE_PERSPECTIVE          = (0x003 | GRAPH_NODE_TYPE_FUNCTIONAL),
+    GRAPH_NODE_TYPE_MASTER_LIST          =  0x004,
+    GRAPH_NODE_TYPE_START                =  0x00A,
+    GRAPH_NODE_TYPE_LEVEL_OF_DETAIL      =  0x00B,
+    GRAPH_NODE_TYPE_SWITCH_CASE          = (0x00C | GRAPH_NODE_TYPE_FUNCTIONAL),
+    GRAPH_NODE_TYPE_CAMERA               = (0x014 | GRAPH_NODE_TYPE_FUNCTIONAL),
+    GRAPH_NODE_TYPE_TRANSLATION_ROTATION =  0x015,
+    GRAPH_NODE_TYPE_TRANSLATION          =  0x016,
+    GRAPH_NODE_TYPE_ROTATION             =  0x017,
+    GRAPH_NODE_TYPE_OBJECT               =  0x018,
+    GRAPH_NODE_TYPE_ANIMATED_PART        =  0x019,
+    GRAPH_NODE_TYPE_BONE                 =  GEO_BONE_ID,
+    GRAPH_NODE_TYPE_BILLBOARD            =  0x01A,
+    GRAPH_NODE_TYPE_DISPLAY_LIST         =  0x01B,
+    GRAPH_NODE_TYPE_SCALE                =  0x01C,
+    GRAPH_NODE_TYPE_SHADOW               =  0x028,
+    GRAPH_NODE_TYPE_OBJECT_PARENT        =  0x029,
+    GRAPH_NODE_TYPE_GENERATED_LIST       = (0x02A | GRAPH_NODE_TYPE_FUNCTIONAL),
+    GRAPH_NODE_TYPE_BACKGROUND           = (0x02C | GRAPH_NODE_TYPE_FUNCTIONAL),
+    GRAPH_NODE_TYPE_HELD_OBJ             = (0x02E | GRAPH_NODE_TYPE_FUNCTIONAL),
+    GRAPH_NODE_TYPE_CULLING_RADIUS       =  0x02F,
 
-#define GRAPH_NODE_TYPES_MASK                 0x0FF
+    GRAPH_NODE_TYPES_MASK                =  0x0FF,
+};
 
 // Passed as first argument to a GraphNodeFunc to give information about in
 // which context it was called and what it is expected to do.
