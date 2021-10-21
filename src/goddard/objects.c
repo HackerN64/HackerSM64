@@ -884,18 +884,18 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     }
 
     gd_cross_vec3f(&sp70, a1, &sp94);
-    sp2C = (f32) gd_sqrt_d(SQ(sp94.x) + SQ(sp94.z));
+    sp2C = (f32) gd_sqrt_d(sqr(sp94.x) + sqr(sp94.z));
 
     if (sp2C > 1000.0f) {
         sp2C = 1000.0f;
     }
 
     sp2C /= 1000.0f;
-    sp2C = 1.0f - sp2C;
+    sp2C = (1.0f - sp2C);
 
-    sp88.x = a2->x * sp2C;
-    sp88.y = a2->y * sp2C;
-    sp88.z = a2->z * sp2C;
+    sp88.x = (a2->x * sp2C);
+    sp88.y = (a2->y * sp2C);
+    sp88.z = (a2->z * sp2C);
 
     a0->collDisp.x += sp88.x;
     a0->collDisp.y += sp88.y;

@@ -571,7 +571,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                     layer->pan = temp_a0_5;
 #else
-                    layer->pan = (f32) temp_a0_5 / US_FLOAT(128.0);
+                    layer->pan = ((f32) temp_a0_5 / 128.0f);
 #endif
                 }
                 break;
@@ -791,7 +791,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                         layer->pan = drum->pan;
                     }
 #else
-                    layer->pan = FLOAT_CAST(drum->pan) / US_FLOAT(128.0);
+                    layer->pan = (FLOAT_CAST(drum->pan) / 128.0f);
 #endif
                     layer->sound = &drum->sound;
                     layer->freqScale = layer->sound->tuning;
@@ -801,7 +801,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 #endif
             } else { // instrument
                 // cmd is reused for the instrument semitone
-                cmd += seqPlayer->transposition + seqChannel->transposition + layer->transposition;
+                cmd += (seqPlayer->transposition + seqChannel->transposition + layer->transposition);
 
                 if (cmd >= 0x80) {
                     layer->stopSomething = TRUE;
@@ -869,17 +869,17 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                         }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-                        portamento->extent = temp_f2 / freqScale - 1.0f;
+                        portamento->extent = ((temp_f2 / freqScale) - 1.0f);
 #else
-                        portamento->extent = sp24 / freqScale - US_FLOAT(1.0);
+                        portamento->extent = ((sp24 / freqScale) - 1.0f);
 #endif
 
                         if (PORTAMENTO_IS_SPECIAL(layer->portamento)) {
-                            portamento->speed = US_FLOAT(32512.0) * FLOAT_CAST(seqPlayer->tempo)
+                            portamento->speed = 32512.0f * FLOAT_CAST(seqPlayer->tempo)
                                                 / ((f32) layer->delay * (f32) gTempoInternalToExternal
                                                    * FLOAT_CAST(layer->portamentoTime));
                         } else {
-                            portamento->speed = US_FLOAT(127.0) / FLOAT_CAST(layer->portamentoTime);
+                            portamento->speed = (127.0f / FLOAT_CAST(layer->portamentoTime));
                         }
                         portamento->cur = 0.0f;
                         layer->freqScale = freqScale;
@@ -1272,11 +1272,11 @@ s32 seq_channel_layer_process_script_part4(struct SequenceChannelLayer *layer, s
                 portamento->extent = sp24 / freqScale - 1.0f;
 
                 if (PORTAMENTO_IS_SPECIAL(layer->portamento)) {
-                    portamento->speed = US_FLOAT(32512.0) * FLOAT_CAST(seqPlayer->tempo)
+                    portamento->speed = 32512.0f * FLOAT_CAST(seqPlayer->tempo)
                                         / ((f32) layer->delay * (f32) gTempoInternalToExternal
                                             * FLOAT_CAST(layer->portamentoTime));
                 } else {
-                    portamento->speed = US_FLOAT(127.0) / FLOAT_CAST(layer->portamentoTime);
+                    portamento->speed = (127.0f / FLOAT_CAST(layer->portamentoTime));
                 }
                 portamento->cur = 0.0f;
                 layer->freqScale = freqScale;
@@ -1453,7 +1453,7 @@ void set_instrument(struct SequenceChannel *seqChannel, u8 instId) {
 }
 
 void sequence_channel_set_volume(struct SequenceChannel *seqChannel, u8 volume) {
-    seqChannel->volume = FLOAT_CAST(volume) / US_FLOAT(127.0);
+    seqChannel->volume = (FLOAT_CAST(volume) / 127.0f);
 }
 
 void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
@@ -1689,7 +1689,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         break;
 
                     case 0xe0: // chan_setvolscale
-                        seqChannel->volumeScale = FLOAT_CAST(m64_read_u8(state)) / US_FLOAT(128.0);
+                        seqChannel->volumeScale = (FLOAT_CAST(m64_read_u8(state)) / 128.0f);
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqChannel->changes.as_bitfields.volume = TRUE;
 #endif
@@ -1697,7 +1697,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
 
                     case 0xde: // chan_freqscale; pitch bend using raw frequency multiplier N/2^15 (N is u16)
                         sp5A = m64_read_s16(state);
-                        seqChannel->freqScale = FLOAT_CAST(sp5A) / US_FLOAT(32768.0);
+                        seqChannel->freqScale = (FLOAT_CAST(sp5A) / 32768.0f);
 #if defined(VERSION_EU) || defined(VERSION_SH)
                         seqChannel->changes.as_bitfields.freqScale = TRUE;
 #endif
@@ -1706,9 +1706,9 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                     case 0xd3: // chan_pitchbend; pitch bend by <= 1 octave in either direction (-127..127)
                         // (m64_read_u8(state) is really s8 here)
 #ifdef VERSION_SH
-                        cmd = m64_read_u8(state) + 128;
+                        cmd = (m64_read_u8(state) + 128);
 #else
-                        cmd = m64_read_u8(state) + 127;
+                        cmd = (m64_read_u8(state) + 127);
 #endif
                         seqChannel->freqScale = gPitchBendFrequencyScale[cmd];
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -1718,7 +1718,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
 
 #ifdef VERSION_SH
                     case 0xee:
-                        cmd = m64_read_u8(state) + 0x80;
+                        cmd = (m64_read_u8(state) + 0x80);
                         seqChannel->freqScale = unk_sh_data_1[cmd];
                         seqChannel->changes.as_bitfields.freqScale = TRUE;
                         break;
@@ -1729,7 +1729,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         seqChannel->newPan = m64_read_u8(state);
                         seqChannel->changes.as_bitfields.pan = TRUE;
 #else
-                        seqChannel->pan = FLOAT_CAST(m64_read_u8(state)) / US_FLOAT(128.0);
+                        seqChannel->pan = (FLOAT_CAST(m64_read_u8(state)) / 128.0f);
 #endif
                         break;
 
@@ -1738,7 +1738,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         seqChannel->panChannelWeight = m64_read_u8(state);
                         seqChannel->changes.as_bitfields.pan = TRUE;
 #else
-                        seqChannel->panChannelWeight = FLOAT_CAST(m64_read_u8(state)) / US_FLOAT(128.0);
+                        seqChannel->panChannelWeight = (FLOAT_CAST(m64_read_u8(state)) / 128.0f);
 #endif
                         break;
 
@@ -2509,18 +2509,18 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                         switch (seqPlayer->state) {
                             case SEQUENCE_PLAYER_STATE_2:
                                 if (seqPlayer->fadeRemainingFrames != 0) {
-                                    f32 targetVolume = FLOAT_CAST(cmd) / US_FLOAT(127.0);
+                                    f32 targetVolume = (FLOAT_CAST(cmd) / 127.0f);
                                     seqPlayer->fadeVelocity = (targetVolume - seqPlayer->fadeVolume)
                                                               / FLOAT_CAST(seqPlayer->fadeRemainingFrames);
                                     break;
                                 }
                                 // fallthrough
                             case SEQUENCE_PLAYER_STATE_0:
-                                seqPlayer->fadeVolume = FLOAT_CAST(cmd) / US_FLOAT(127.0);
+                                seqPlayer->fadeVolume = (FLOAT_CAST(cmd) / 127.0f);
                                 break;
                             case SEQUENCE_PLAYER_STATE_FADE_OUT:
                             case SEQUENCE_PLAYER_STATE_4:
-                                seqPlayer->volume = FLOAT_CAST(cmd) / US_FLOAT(127.0);
+                                seqPlayer->volume = (FLOAT_CAST(cmd) / 127.0f);
                                 break;
                         }
                         break;
@@ -2528,14 +2528,14 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
                     case 0xda: // seq_changevol
                         temp = m64_read_u8(state);
                         seqPlayer->fadeVolume =
-                            seqPlayer->fadeVolume + (f32)(s8) temp / US_FLOAT(127.0);
+                            seqPlayer->fadeVolume + ((f32)(s8) temp / 127.0f);
                         break;
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
                     case 0xd9:
                         temp = m64_read_u8(state);
-                        seqPlayer->fadeVolumeScale = (s8) temp / 127.0f;
+                        seqPlayer->fadeVolumeScale = ((s8) temp / 127.0f);
                         break;
 #endif
 
@@ -2551,7 +2551,7 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 
                     case 0xd5: // seq_setmutescale
                         temp = m64_read_u8(state);
-                        seqPlayer->muteVolumeScale = (f32)(s8) temp / US_FLOAT(127.0);
+                        seqPlayer->muteVolumeScale = ((f32)(s8) temp / 127.0f);
                         break;
 
                     case 0xd4: // seq_mute

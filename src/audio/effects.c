@@ -52,18 +52,15 @@ void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 reca
 }
 #else
 static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
-    f32 channelVolume;
-    f32 panLayerWeight;
-    f32 panFromChannel;
     s32 i;
 
-    channelVolume = seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume;
+    f32 channelVolume = (seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume);
     if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
         channelVolume *= seqChannel->seqPlayer->muteVolumeScale;
     }
 
-    panFromChannel = seqChannel->pan * seqChannel->panChannelWeight;
-    panLayerWeight = US_FLOAT(1.0) - seqChannel->panChannelWeight;
+    f32 panFromChannel = (seqChannel->pan * seqChannel->panChannelWeight);
+    f32 panLayerWeight = (1.0f - seqChannel->panChannelWeight);
 
     for (i = 0; i < 4; i++) {
         struct SequenceChannelLayer *layer = seqChannel->layers[i];
@@ -140,8 +137,6 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
 }
 
 f32 get_portamento_freq_scale(struct Portamento *p) {
-    u32 v0;
-    f32 result;
 #if defined(VERSION_JP) || defined(VERSION_US)
     if (p->mode == 0) {
         return 1.0f;
@@ -149,23 +144,21 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
 #endif
 
     p->cur += p->speed;
-    v0 = (u32) p->cur;
+    u32 v0 = (u32) p->cur;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    if (v0 > 127)
+    if (v0 > 127) {
 #else
-    if (v0 >= 127)
+    if (v0 >= 127) {
 #endif
-    {
         v0 = 127;
     }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    result = US_FLOAT(1.0) + p->extent * (gPitchBendFrequencyScale[v0 + 128] - US_FLOAT(1.0));
+    return (1.0f + (p->extent * (gPitchBendFrequencyScale[v0 + 128] - 1.0f)));
 #else
-    result = US_FLOAT(1.0) + p->extent * (gPitchBendFrequencyScale[v0 + 127] - US_FLOAT(1.0));
+    return (1.0f + (p->extent * (gPitchBendFrequencyScale[v0 + 127] - 1.0f)));
 #endif
-    return result;
 }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)

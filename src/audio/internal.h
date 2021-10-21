@@ -54,9 +54,6 @@ enum Codecs {
 
 #define TEMPO_SCALE TATUMS_PER_BEAT
 
-// TODO: US_FLOAT should probably be renamed to JP_DOUBLE since eu seems to use floats too
-#define US_FLOAT(x) x ## f
-
 // Convert u8 or u16 to f32. On JP, this uses a u32->f32 conversion,
 // resulting in more bloated codegen, while on US it goes through s32.
 // Since u8 and u16 fit losslessly in both, behavior is the same.

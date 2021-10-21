@@ -583,21 +583,21 @@ void process_notes(void) {
             attributes = &note->attributes;
             if (note->priority == NOTE_PRIORITY_STOPPING) {
                 frequency = attributes->freqScale;
-                velocity = attributes->velocity;
-                pan = attributes->pan;
+                velocity  = attributes->velocity;
+                pan       = attributes->pan;
                 reverbVol = attributes->reverbVol;
             } else {
                 frequency = note->parentLayer->noteFreqScale;
-                velocity = note->parentLayer->noteVelocity;
-                pan = note->parentLayer->notePan;
+                velocity  = note->parentLayer->noteVelocity;
+                pan       = note->parentLayer->notePan;
                 reverbVol = note->parentLayer->seqChannel->reverbVol;
             }
 
             scale = note->adsrVolScale;
-            frequency *= note->vibratoFreqScale * note->portamentoFreqScale;
+            frequency *= (note->vibratoFreqScale * note->portamentoFreqScale);
             cap = 3.99992f;
             if (gAiFrequency != 32006) {
-                frequency *= US_FLOAT(32000.0) / (f32) gAiFrequency;
+                frequency *= (32000.0f / (f32) gAiFrequency);
             }
             frequency = (frequency < cap ? frequency : cap);
             scale *= 4.3498e-5f; // ~1 / 23000
@@ -843,21 +843,21 @@ void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLay
     u8 lim;
     u8 origSampleCount = note->sampleCount;
 
-    if (seqLayer->freqScale < US_FLOAT(1.0)) {
+    if (seqLayer->freqScale < 1.0f) {
         note->sampleCount = 64;
-        seqLayer->freqScale *= US_FLOAT(1.0465);
+        seqLayer->freqScale *= 1.0465f;
         stepSize = 1;
-    } else if (seqLayer->freqScale < US_FLOAT(2.0)) {
+    } else if (seqLayer->freqScale < 2.0f) {
         note->sampleCount = 32;
-        seqLayer->freqScale *= US_FLOAT(0.52325);
+        seqLayer->freqScale *= 0.52325f;
         stepSize = 2;
-    } else if (seqLayer->freqScale < US_FLOAT(4.0)) {
+    } else if (seqLayer->freqScale < 4.0f) {
         note->sampleCount = 16;
-        seqLayer->freqScale *= US_FLOAT(0.26263);
+        seqLayer->freqScale *= 0.26263f;
         stepSize = 4;
     } else {
         note->sampleCount = 8;
-        seqLayer->freqScale *= US_FLOAT(0.13081);
+        seqLayer->freqScale *= 0.13081f;
         stepSize = 8;
     }
 

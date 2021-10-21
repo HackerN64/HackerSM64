@@ -77,7 +77,7 @@ struct Instrument **instOut = _instOut;\
     } \
     inst = gCtlEntries[(*seqChannel).bankId].instruments[_instId]; \
     if (inst == NULL) { \
-        while (_instId != 0xff) { \
+        while (_instId != 0xFF) { \
             inst = gCtlEntries[(*seqChannel).bankId].instruments[_instId]; \
             if (inst != NULL) { \
                 goto gi ## l; \
@@ -167,12 +167,12 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
             cmd = *_ptr_pc;
         }
 
-        if (cmd <= 0xc0) {
+        if (cmd <= 0xC0) {
             break;
         }
 
         switch (cmd) {
-            case 0xff: // layer_end; function return or end of script
+            case 0xFF: // layer_end; function return or end of script
                 if (state->depth == 0) {
                     // N.B. this function call is *not* inlined even though it's
                     // within the same file, unlike in the rest of this function.
@@ -212,7 +212,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 if (cmd == 0xc1) {
                     layer->velocitySquare = (f32)(temp_a0_5 * temp_a0_5);
                 } else {
-                    layer->pan = (f32) temp_a0_5 / US_FLOAT(128.0);
+                    layer->pan = ((f32) temp_a0_5 / 128.0f);
                 }
                 break;
 
@@ -361,9 +361,9 @@ l1138:
                 if (drum == NULL) {
                     layer->stopSomething = TRUE;
                 } else {
-                    layer->adsr.envelope = drum->envelope;
+                    layer->adsr.envelope    = drum->envelope;
                     layer->adsr.releaseRate = drum->releaseRate;
-                    layer->pan = FLOAT_CAST(drum->pan) / US_FLOAT(128.0);
+                    layer->pan = (FLOAT_CAST(drum->pan) / 128.0f);
                     layer->sound = &drum->sound;
                     layer->freqScale = layer->sound->tuning;
                 }
@@ -414,13 +414,13 @@ l1138:
                                 goto l13cc;
                         }
 l13cc:
-                        portamento->extent = sp24 / freqScale - US_FLOAT(1.0);
+                        portamento->extent = ((sp24 / freqScale) - 1.0f);
                         if (PORTAMENTO_IS_SPECIAL((*layer).portamento)) {
-                            portamento->speed = US_FLOAT(32512.0) * FLOAT_CAST((*seqPlayer).tempo)
+                            portamento->speed = 32512.0f * FLOAT_CAST((*seqPlayer).tempo)
                                                 / ((f32)(*layer).delay * (f32) gTempoInternalToExternal
                                                    * FLOAT_CAST((*layer).portamentoTime));
                         } else {
-                            portamento->speed = US_FLOAT(127.0) / FLOAT_CAST((*layer).portamentoTime);
+                            portamento->speed = (127.0f / FLOAT_CAST((*layer).portamentoTime));
                         }
                         portamento->cur = 0.0f;
                         layer->freqScale = freqScale;

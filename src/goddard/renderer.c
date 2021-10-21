@@ -1852,7 +1852,7 @@ void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
     sp40.z = cam->unkE8[0][2] + arg4->x;
     sp40.y = cam->unkE8[1][2] + arg4->y;
     sp40.x = cam->unkE8[2][2] + arg4->z;
-    sp3C = sqrtf(SQ(sp40.z) + SQ(sp40.y) + SQ(sp40.x));
+    sp3C = sqrtf(sqr(sp40.z) + sqr(sp40.y) + sqr(sp40.x));
     if (sp3C > 0.1f) {
         sp3C = 1.0f / sp3C;
         sp40.z *= sp3C;

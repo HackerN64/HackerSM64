@@ -90,28 +90,27 @@ void unk_pools_init(u32 size1, u32 size2);
  * Computes a newton's method step for f(x) = x^k - d
  */
 f64 root_newton_step(f64 x, s32 k, f64 d) {
-    f64 deg2 = x * x;
-    f64 deg4 = deg2 * deg2;
-    f64 deg8 = deg4 * deg4;
-    s32 degree = k - 9;
-    f64 fx;
+    f64 deg2 = (x * x);
+    f64 deg4 = (deg2 * deg2);
+    f64 deg8 = (deg4 * deg4);
+    s32 degree = (k - 9);
 
     f64 deriv = deg8;
-    if (degree & 1) {
+    if (degree & 0x1) {
         deriv *= x;
     }
-    if (degree & 2) {
+    if (degree & 0x2) {
         deriv *= deg2;
     }
-    if (degree & 4) {
+    if (degree & 0x4) {
         deriv *= deg4;
     }
-    if (degree & 8) {
+    if (degree & 0x8) {
         deriv *= deg8;
     }
-    fx = deriv * x - d;
-    deriv = k * deriv;
-    return x - fx / deriv;
+    f64 fx = ((deriv * x) - d);
+    deriv *= k;
+    return (x - (fx / deriv));
 }
 
 /**
@@ -152,7 +151,7 @@ void build_vol_rampings_table(s32 UNUSED unused, s32 len) {
     s32 i;
     s32 step;
     s32 d;
-    s32 k = len / 8;
+    s32 k = (len / 8);
 
     for (step = 0, i = 0; i < 0x400; step += 32, i++) {
         d = step;
@@ -173,11 +172,11 @@ void build_vol_rampings_table(s32 UNUSED unused, s32 len) {
 void reset_bank_and_seq_load_status(void) {
 #ifdef VERSION_SH
     bzero(&gBankLoadStatus, sizeof(gBankLoadStatus));
-    bzero(&gUnkLoadStatus, sizeof(gUnkLoadStatus));
-    bzero(&gSeqLoadStatus, sizeof(gBankLoadStatus));
+    bzero(&gUnkLoadStatus,  sizeof(gUnkLoadStatus));
+    bzero(&gSeqLoadStatus,  sizeof(gBankLoadStatus));
 #else
-    bzero(&gBankLoadStatus, sizeof(gBankLoadStatus)); //Setting this array to zero is equivilent to SOUND_LOAD_STATUS_NOT_LOADED
-    bzero(&gSeqLoadStatus, sizeof(gSeqLoadStatus)); //Same dealio
+    bzero(&gBankLoadStatus, sizeof(gBankLoadStatus)); // Setting this array to zero is equivilent to SOUND_LOAD_STATUS_NOT_LOADED
+    bzero(&gSeqLoadStatus,  sizeof(gSeqLoadStatus));  // Same dealio
 #endif
 }
 
@@ -234,7 +233,7 @@ void *soundAlloc(struct SoundAllocPool *pool, u32 size) {
     u32 alignedSize = ALIGN16(size);
 
     start = pool->cur;
-    if (start + alignedSize <= pool->start + pool->size) {
+    if ((start + alignedSize) <= (pool->start + pool->size)) {
         bzero(start, alignedSize);
         pool->cur += alignedSize;
     } else {
@@ -248,7 +247,7 @@ void *soundAlloc(struct SoundAllocPool *pool, u32 size) {
     u32 alignedSize = ALIGN16(size);
 
     start = pool->cur;
-    if ((start + alignedSize <= pool->size + pool->start)) {
+    if (((start + alignedSize) <= (pool->size + pool->start))) {
         bzero(start, alignedSize);
         pool->cur += alignedSize;
     } else {

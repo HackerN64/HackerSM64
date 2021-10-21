@@ -57,7 +57,7 @@ void gd_mat4f_lookat(Mat4f *mtx,
         d.x = norm.z;
     }
 
-    invLength = -1.0f / gd_sqrt_f(SQ(d.z) + SQ(d.y) + SQ(d.x));
+    invLength = -1.0f / gd_sqrt_f(sqr(d.z) + sqr(d.y) + sqr(d.x));
     d.z *= invLength;
     d.y *= invLength;
     d.x *= invLength;
@@ -66,7 +66,7 @@ void gd_mat4f_lookat(Mat4f *mtx,
     colX.y = xColY * d.z - zColY * d.x;
     colX.x = zColY * d.y - yColY * d.z;
 
-    invLength = 1.0f / gd_sqrt_f(SQ(colX.z) + SQ(colX.y) + SQ(colX.x));
+    invLength = 1.0f / gd_sqrt_f(sqr(colX.z) + sqr(colX.y) + sqr(colX.x));
 
     colX.z *= invLength;
     colX.y *= invLength;
@@ -76,7 +76,7 @@ void gd_mat4f_lookat(Mat4f *mtx,
     yColY = d.x * colX.z - d.z * colX.x;
     xColY = d.z * colX.y - d.y * colX.z;
 
-    invLength = 1.0f / gd_sqrt_f(SQ(zColY) + SQ(yColY) + SQ(xColY));
+    invLength = 1.0f / gd_sqrt_f(sqr(zColY) + sqr(yColY) + sqr(xColY));
 
     zColY *= invLength;
     yColY *= invLength;
@@ -164,7 +164,7 @@ void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec, f32 roll) {
     unit.z = vec->z;
 
     gd_normalize_vec3f(&unit);
-    f32 hMag = gd_sqrt_f(SQ(unit.x) + SQ(unit.z));
+    f32 hMag = gd_sqrt_f(sqr(unit.x) + sqr(unit.z));
 
     roll *= RAD_PER_DEG; // convert roll from degrees to radians
     f32 s = gd_sin_d(roll);
@@ -310,7 +310,7 @@ void gd_absrot_mat4(Mat4f *mtx, s32 axisnum, f32 ang) {
 
 
 f32 gd_vec3f_magnitude(struct GdVec3f *vec) {
-    return gd_sqrt_f(SQ(vec->x) + SQ(vec->y) + SQ(vec->z));
+    return gd_sqrt_f(sqr(vec->x) + sqr(vec->y) + sqr(vec->z));
 }
 
 /**
@@ -318,7 +318,7 @@ f32 gd_vec3f_magnitude(struct GdVec3f *vec) {
  */
 s32 gd_normalize_vec3f(struct GdVec3f *vec) {
     f32 mag;
-    if ((mag = SQ(vec->x) + SQ(vec->y) + SQ(vec->z)) == 0.0f) {
+    if ((mag = sqr(vec->x) + sqr(vec->y) + sqr(vec->z)) == 0.0f) {
         return FALSE;
     }
 
@@ -606,7 +606,7 @@ void UNUSED gd_create_quat_rot_mat(f32 quat[4], UNUSED s32 unused, Mat4f *mtx) {
     s32 i, j, k;
 
     for (i = 0; i < 4; i++) {
-        sqQuat[i] = SQ(quat[i]);
+        sqQuat[i] = sqr(quat[i]);
     }
 
     for (i = 1; i < 4; i++) {
@@ -768,7 +768,7 @@ void gd_mat4f_mult_vec3f(struct GdVec3f *vec, const Mat4f *mtx) {
     vec->z = out.z;
 }
 
-#define MAT4_DOT_PROD(A, B, R, row, col)                                                               \
+#define GD_MAT4_DOT_PROD(A, B, R, row, col)                                                            \
     {                                                                                                  \
         (R)[(row)][(col)] = (A)[(row)][0] * (B)[0][(col)];                                             \
         (R)[(row)][(col)] += (A)[(row)][1] * (B)[1][(col)];                                            \
@@ -776,24 +776,24 @@ void gd_mat4f_mult_vec3f(struct GdVec3f *vec, const Mat4f *mtx) {
         (R)[(row)][(col)] += (A)[(row)][3] * (B)[3][(col)];                                            \
     }
 
-#define MAT4_MULTIPLY(A, B, R)                                                                         \
+#define GD_MAT4_MULTIPLY(A, B, R)                                                                      \
     {                                                                                                  \
-        MAT4_DOT_PROD((A), (B), (R), 0, 0);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 0, 1);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 0, 2);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 0, 3);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 1, 0);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 1, 1);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 1, 2);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 1, 3);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 2, 0);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 2, 1);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 2, 2);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 2, 3);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 3, 0);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 3, 1);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 3, 2);                                                            \
-        MAT4_DOT_PROD((A), (B), (R), 3, 3);                                                            \
+        GD_MAT4_DOT_PROD((A), (B), (R), 0, 0);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 0, 1);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 0, 2);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 0, 3);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 1, 0);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 1, 1);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 1, 2);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 1, 3);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 2, 0);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 2, 1);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 2, 2);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 2, 3);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 3, 0);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 3, 1);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 3, 2);                                                         \
+        GD_MAT4_DOT_PROD((A), (B), (R), 3, 3);                                                         \
     }
 
 /**
@@ -802,12 +802,12 @@ void gd_mat4f_mult_vec3f(struct GdVec3f *vec, const Mat4f *mtx) {
 void gd_mult_mat4f(const Mat4f *mA, const Mat4f *mB, Mat4f *dst) {
     Mat4f res;
 
-    MAT4_MULTIPLY((*mA), (*mB), res);
+    GD_MAT4_MULTIPLY((*mA), (*mB), res);
     gd_copy_mat4f(&res, dst);
 }
 
-#undef MAT4_MULTIPLY
-#undef MAT4_DOT_PROD
+#undef GD_MAT4_MULTIPLY
+#undef GD_MAT4_DOT_PROD
 
 /**
  * Prints a vec3f vector.
@@ -870,7 +870,7 @@ void UNUSED gd_rot_mat_offset(Mat4f *dst, f32 x, f32 y, f32 z, s32 copy) {
     Mat4f rot;
     struct GdVec3f vec;
 
-    f32 opp = gd_sqrt_f(SQ(x) + SQ(y) + SQ(z));
+    f32 opp = gd_sqrt_f(sqr(x) + sqr(y) + sqr(z));
 
     if (opp == 0.0f) {
         if (copy) {
@@ -879,7 +879,7 @@ void UNUSED gd_rot_mat_offset(Mat4f *dst, f32 x, f32 y, f32 z, s32 copy) {
         return;
     }
 
-    f32 mag = gd_sqrt_f(SQ(adj) + SQ(opp));
+    f32 mag = gd_sqrt_f(sqr(adj) + sqr(opp));
     f32 c = adj / mag;
     f32 s = opp / mag;
 

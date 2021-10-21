@@ -5,6 +5,7 @@
 
 #include "gd_types.h"
 #include "macros.h"
+#include "engine/math_util.h"
 
 struct Row4 {
     f32 c0, c1, c2, c3;

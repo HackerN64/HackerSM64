@@ -955,29 +955,29 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
             }
 
 #ifndef VERSION_EU
-            if (note->frequency < US_FLOAT(2.0)) {
+            if (note->frequency < 2.0f) {
                 nParts = 1;
-                if (note->frequency > US_FLOAT(1.99996)) {
-                    note->frequency = US_FLOAT(1.99996);
+                if (note->frequency > 1.99996f) {
+                    note->frequency = 1.99996f;
                 }
                 resamplingRate = note->frequency;
             } else {
                 // If frequency is > 2.0, the processing must be split into two parts
                 nParts = 2;
-                if (note->frequency >= US_FLOAT(3.99993)) {
-                    note->frequency = US_FLOAT(3.99993);
+                if (note->frequency >= 3.99993f) {
+                    note->frequency = 3.99993f;
                 }
-                resamplingRate = note->frequency * US_FLOAT(.5);
+                resamplingRate = (note->frequency * 0.5f);
             }
 
             resamplingRateFixedPoint = (u16)(s32)(resamplingRate * 32768.0f);
-            samplesLenFixedPoint = note->samplePosFrac + (resamplingRateFixedPoint * bufLen) * 2;
+            samplesLenFixedPoint = (note->samplePosFrac + ((resamplingRateFixedPoint * bufLen) * 2));
             note->samplePosFrac = samplesLenFixedPoint & 0xFFFF; // 16-bit store, can't reuse
 #else
             resamplingRateFixedPoint = noteSubEu->resamplingRateFixedPoint;
-            nParts = noteSubEu->hasTwoAdpcmParts + 1;
-            samplesLenFixedPoint = (resamplingRateFixedPoint * tempBufLen * 2) + synthesisState->samplePosFrac;
-            synthesisState->samplePosFrac = samplesLenFixedPoint & 0xFFFF;
+            nParts = (noteSubEu->hasTwoAdpcmParts + 1);
+            samplesLenFixedPoint = ((resamplingRateFixedPoint * tempBufLen * 2) + synthesisState->samplePosFrac);
+            synthesisState->samplePosFrac = (samplesLenFixedPoint & 0xFFFF);
 #endif
 
 #ifdef VERSION_EU
