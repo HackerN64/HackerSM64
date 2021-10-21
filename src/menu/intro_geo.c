@@ -19,8 +19,10 @@
 #define INTRO_STEPS_ZOOM_OUT 91
 
 // background types
-#define INTRO_BACKGROUND_SUPER_MARIO 0
-#define INTRO_BACKGROUND_GAME_OVER   1
+enum IntroBackgroundTypes {
+    INTRO_BACKGROUND_SUPER_MARIO,
+    INTRO_BACKGROUND_GAME_OVER
+};
 
 struct GraphNodeMore {
     /*0x00*/ struct GraphNode node;

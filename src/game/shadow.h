@@ -23,20 +23,16 @@ enum ShadowType {
     SHADOW_CIRCLE_PLAYER              = 99
 };
 
-#define SHADOW_FLAGS_NONE         (0 << 0)
-/**
- * Flag for if the current shadow is above water or lava.
- */
-#define SHADOW_FLAG_WATER_BOX     (1 << 0)
-#define SHADOW_FLAG_WATER_SURFACE (1 << 1)
-/**
- * Flag for if Mario is on ice or a flying carpet.
- */
-#define SHADOW_FLAG_ICE_CARPET    (1 << 2)
-/**
- * Flag for if Mario is on a flying carpet.
- */
-#define SHADOW_FLAG_RAISED        (1 << 3)
+enum ShadowFlags {
+    SHADOW_FLAGS_NONE         = (0 << 0),
+    // Flag for if the current shadow is above water or lava.
+    SHADOW_FLAG_WATER_BOX     = (1 << 0),
+    SHADOW_FLAG_WATER_SURFACE = (1 << 1),
+    // Flag for if Mario is on ice or a flying carpet.
+    SHADOW_FLAG_ICE_CARPET    = (1 << 2),
+    // Flag for if Mario is on a flying carpet.
+    SHADOW_FLAG_RAISED        = (1 << 3),
+};
 
 extern s8 gShadowFlags;
 

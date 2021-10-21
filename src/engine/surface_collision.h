@@ -20,11 +20,13 @@
 
 #define SURFACE_YAW(s) (atan2s(((s)->normal.z), ((s)->normal.x)))
 
-#define RAYCAST_FIND_FLOOR  (1 << 0)
-#define RAYCAST_FIND_WALL   (1 << 1)
-#define RAYCAST_FIND_CEIL   (1 << 2)
-#define RAYCAST_FIND_WATER  (1 << 3)
-#define RAYCAST_FIND_ALL    (0xFFFFFFFF)
+enum RaycastFlags {
+    RAYCAST_FIND_FLOOR = (1 << 0),
+    RAYCAST_FIND_WALL  = (1 << 1),
+    RAYCAST_FIND_CEIL  = (1 << 2),
+    RAYCAST_FIND_WATER = (1 << 3),
+    RAYCAST_FIND_ALL   = (0xFFFFFFFF)
+};
 
 struct WallCollisionData {
     /*0x00*/ f32 x, y, z;

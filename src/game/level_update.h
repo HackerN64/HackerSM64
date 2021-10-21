@@ -31,17 +31,21 @@ enum WarpOperation {
     WARP_OP_DEMO_END
 };
 
-#define WARP_SPECIAL_LEVEL_SELECT           -9
-#define WARP_SPECIAL_INTRO_SPLASH_SCREEN    -8
-#define WARP_SPECIAL_MARIO_HEAD_DIZZY       -3
-#define WARP_SPECIAL_MARIO_HEAD_REGULAR     -2
-#define WARP_SPECIAL_ENDING                 -1
-#define WARP_SPECIAL_NONE                    0
+enum SpecialWarpDestinations {
+    WARP_SPECIAL_LEVEL_SELECT        = -9,
+    WARP_SPECIAL_INTRO_SPLASH_SCREEN = -8,
+    WARP_SPECIAL_MARIO_HEAD_DIZZY    = -3,
+    WARP_SPECIAL_MARIO_HEAD_REGULAR  = -2,
+    WARP_SPECIAL_ENDING              = -1,
+    WARP_SPECIAL_NONE                =  0,
+};
 
-#define WARP_FLAGS_NONE                   (0 << 0) // 0x00
-#define WARP_FLAG_DOOR_PULLED             (1 << 0) // 0x01
-#define WARP_FLAG_DOOR_FLIP_MARIO         (1 << 1) // 0x02
-#define WARP_FLAG_DOOR_IS_WARP            (1 << 2) // 0x04
+enum WarpDoorFlags {
+    WARP_FLAGS_NONE           = (0 << 0), // 0x00
+    WARP_FLAG_DOOR_PULLED     = (1 << 0), // 0x01
+    WARP_FLAG_DOOR_FLIP_MARIO = (1 << 1), // 0x02
+    WARP_FLAG_DOOR_IS_WARP    = (1 << 2), // 0x04
+};
 
 enum MarioSpawnType {
     MARIO_SPAWN_NONE,

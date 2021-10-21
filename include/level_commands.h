@@ -41,7 +41,7 @@ enum LevelCommandVar {
     VAR_CURR_AREA_INDEX
 };
 
-enum WarpFlags {
+enum WarpCheckpointFlags {
     WARP_NO_CHECKPOINT = (0 << 0), // 0x00
     WARP_CHECKPOINT    = (1 << 7), // 0x80
 };

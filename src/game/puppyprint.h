@@ -14,10 +14,12 @@ enum Benchmark {
     BENCHMARK_GRAPHICS
 };
 
-#define PRINT_TEXT_ALIGN_LEFT   0
-#define PRINT_TEXT_ALIGN_CENTRE 1
-#define PRINT_TEXT_ALIGN_RIGHT  2
-#define PRINT_ALL              -1
+enum PuppyprintTextAlign {
+    PRINT_TEXT_ALIGN_LEFT   =  0,
+    PRINT_TEXT_ALIGN_CENTRE =  1,
+    PRINT_TEXT_ALIGN_RIGHT  =  2,
+    PRINT_ALL               = -1,
+};
 
 #if PUPPYPRINT_DEBUG
 #define NUM_AUDIO_POOLS 6
@@ -33,7 +35,7 @@ extern u8 gPuppyFont;
 extern s8 perfIteration;
 extern s16 benchmarkLoop;
 extern s32 benchmarkTimer;
-extern u8 currEnv[4];
+extern ColorRGBA currEnv;
 extern s32 ramsizeSegment[33];
 extern s8 nameTable;
 extern s32 mempool;

@@ -62,19 +62,21 @@
  *          enough.
  */
 
-#define RIPPLE_FLAGS_NONE           (0 << 0) // 0x00
-// Triggers an entry ripple on the right side of the painting.
-#define RIPPLE_FLAG_ENTER_RIGHT     (1 << 0) // 0x01
-// Triggers an entry ripple in the middle of the painting.
-#define RIPPLE_FLAG_ENTER_MIDDLE    (1 << 1) // 0x02
-// Triggers an entry ripple on the left side of the painting.
-#define RIPPLE_FLAG_ENTER_LEFT      (1 << 2) // 0x04
-// Triggers a passive ripple on the right side of the painting.
-#define RIPPLE_FLAG_RIPPLE_RIGHT    (1 << 3) // 0x08
-// Triggers a passive ripple in the middle the painting.
-#define RIPPLE_FLAG_RIPPLE_MIDDLE   (1 << 4) // 0x10
-// Triggers a passive ripple on the left side of the painting.
-#define RIPPLE_FLAG_RIPPLE_LEFT     (1 << 5) // 0x20
+enum PaintingRippleFlags {
+    RIPPLE_FLAGS_NONE         = (0 << 0), // 0x00
+    // Triggers an entry ripple on the right side of the painting.
+    RIPPLE_FLAG_ENTER_RIGHT   = (1 << 0), // 0x01
+    // Triggers an entry ripple in the middle of the painting.
+    RIPPLE_FLAG_ENTER_MIDDLE  = (1 << 1), // 0x02
+    // Triggers an entry ripple on the left side of the painting.
+    RIPPLE_FLAG_ENTER_LEFT    = (1 << 2), // 0x04
+    // Triggers a passive ripple on the right side of the painting.
+    RIPPLE_FLAG_RIPPLE_RIGHT  = (1 << 3), // 0x08
+    // Triggers a passive ripple in the middle the painting.
+    RIPPLE_FLAG_RIPPLE_MIDDLE = (1 << 4), // 0x10
+    // Triggers a passive ripple on the left side of the painting.
+    RIPPLE_FLAG_RIPPLE_LEFT   = (1 << 5), // 0x20
+};
 
 /**
  * Use the 1/4th part of the painting that is nearest to Mario's current floor.

@@ -6,8 +6,10 @@
 // How many times to store the terrain pitch. This stores it over 10 frames to help smooth over changes in curvature.
 #define NUM_PITCH_ITERATIONS 10
 
-#define PUPPYCAM_FLAGS_CUTSCENE (1 << 0) // 0x0001
-#define PUPPYCAM_FLAGS_SMOOTH   (1 << 1) // 0x0002
+enum PuppyCamFlags {
+    PUPPYCAM_FLAGS_CUTSCENE = (1 << 0), // 0x0001
+    PUPPYCAM_FLAGS_SMOOTH   = (1 << 1), // 0x0002
+};
 
 #define PUPPY_ERROR_POOL_FULL 0x1
 
@@ -24,16 +26,22 @@ enum PuppyVolumeShapes {
     PUPPYVOLUME_SHAPE_CYLINDER
 };
 
-#define PUPPYCAM_MODE3_ZOOMED_IN            (1 << 0) // 0x1
-#define PUPPYCAM_MODE3_ZOOMED_MED           (1 << 1) // 0x2
-#define PUPPYCAM_MODE3_ZOOMED_OUT           (1 << 2) // 0x4
-#define PUPPYCAM_MODE3_ENTER_FIRST_PERSON   (1 << 3) // 0x8
+enum PuppycamMode3ZoomFlags {
+    PUPPYCAM_MODE3_ZOOMED_IN          = (1 << 0), // 0x1
+    PUPPYCAM_MODE3_ZOOMED_MED         = (1 << 1), // 0x2
+    PUPPYCAM_MODE3_ZOOMED_OUT         = (1 << 2), // 0x4
+    PUPPYCAM_MODE3_ENTER_FIRST_PERSON = (1 << 3), // 0x8
+};
 
-#define PUPPYSPLINE_NONE                    (1 << 0) // 0x1 // Will not write to focus at all.
-#define PUPPYSPLINE_FOLLOW                  (1 << 1) // 0x2 // Focus will follow a separate spline, but will mirror the speed and progress of the pos.
+enum PuppySplineFlags {
+    PUPPYSPLINE_NONE                  = (1 << 0), // 0x1 // Will not write to focus at all.
+    PUPPYSPLINE_FOLLOW                = (1 << 1), // 0x2 // Focus will follow a separate spline, but will mirror the speed and progress of the pos.    
+};
 
-#define PUPPYDEBUG_LOCK_CONTROLS            (1 << 0) // 0x1
-#define PUPPYDEBUG_TRACK_MARIO              (1 << 1) // 0x2
+enum PuppyDebugFlags {
+    PUPPYDEBUG_LOCK_CONTROLS          = (1 << 0), // 0x1
+    PUPPYDEBUG_TRACK_MARIO            = (1 << 1), // 0x2
+};
 
 #include "include/command_macros_base.h"
 

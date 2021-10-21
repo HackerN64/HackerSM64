@@ -11,14 +11,16 @@
 #define MAX_LIGHTS_DYNAMIC 8
 
 // Two shapes. Choose your destiny.
-#define PUPPYLIGHT_SHAPE_CUBE     (1 << 0) // 0x01
-#define PUPPYLIGHT_SHAPE_CYLINDER (1 << 1) // 0x02
-#define PUPPYLIGHT_DYNAMIC        (1 << 2) // 0x04
-#define PUPPYLIGHT_DIRECTIONAL    (1 << 3) // 0x08
-#define PUPPYLIGHT_SHADOW         (1 << 4) // 0x10
-#define PUPPYLIGHT_WET            (1 << 5) // 0x20
-#define PUPPYLIGHT_DELETE         (1 << 6) // 0x40
-#define PUPPYLIGHT_IGNORE_Y       (1 << 7) // 0x80
+enum PuppylightShapes {
+    PUPPYLIGHT_SHAPE_CUBE     = (1 << 0), // 0x01
+    PUPPYLIGHT_SHAPE_CYLINDER = (1 << 1), // 0x02
+    PUPPYLIGHT_DYNAMIC        = (1 << 2), // 0x04
+    PUPPYLIGHT_DIRECTIONAL    = (1 << 3), // 0x08
+    PUPPYLIGHT_SHADOW         = (1 << 4), // 0x10
+    PUPPYLIGHT_WET            = (1 << 5), // 0x20
+    PUPPYLIGHT_DELETE         = (1 << 6), // 0x40
+    PUPPYLIGHT_IGNORE_Y       = (1 << 7), // 0x80
+};
 
 #define LIGHTFLAG_DIRECTIONAL_OFFSET    0x1
 

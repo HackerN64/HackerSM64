@@ -24,11 +24,14 @@ typedef struct {
     /* 34 */ u8 length;
 } printf_struct;
 
-#define FLAGS_SPACE (1 << 0) //  1
-#define FLAGS_PLUS  (1 << 1) //  2
-#define FLAGS_MINUS (1 << 2) //  4
-#define FLAGS_HASH  (1 << 3) //  8
-#define FLAGS_ZERO  (1 << 4) // 16
+enum PrintfFlags {
+    FLAGS_SPACE = (1 << 0), //  1
+    FLAGS_PLUS  = (1 << 1), //  2
+    FLAGS_MINUS = (1 << 2), //  4
+    FLAGS_HASH  = (1 << 3), //  8
+    FLAGS_ZERO  = (1 << 4), // 16
+};
+
 s32 _Printf(char *(*prout)(char *, const char *, size_t), char *dst, const char *fmt, va_list args);
 void _Litob(printf_struct *args, u8 type);
 void _Ldtob(printf_struct *args, u8 type);
