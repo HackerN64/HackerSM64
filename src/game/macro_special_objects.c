@@ -100,15 +100,15 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
     while (TRUE) {
         if (*macroObjList == -1) break; // An encountered value of -1 means the list has ended.
-        presetID = ((*macroObjList & 0x1FF) - 31); // Preset identifier for MacroObjectPresets array
+        presetID = (*macroObjList & 0x1FF) - 31; // Preset identifier for MacroObjectPresets array
         if (presetID < 0) break;
 
         // Set macro object properties from the list
-        macroObject[MACRO_OBJ_Y_ROT ] = (((*macroObjList++ >> 9) & 0x7F) << 1); // Y-Rotation
-        macroObject[MACRO_OBJ_X     ] = *macroObjList++;                        // X position
-        macroObject[MACRO_OBJ_Y     ] = *macroObjList++;                        // Y position
-        macroObject[MACRO_OBJ_Z     ] = *macroObjList++;                        // Z position
-        macroObject[MACRO_OBJ_PARAMS] = *macroObjList++;                        // Behavior params
+        macroObject[MACRO_OBJ_Y_ROT ] = ((*macroObjList++ >> 9) & 0x7F) << 1; // Y-Rotation
+        macroObject[MACRO_OBJ_X     ] = *macroObjList++;                      // X position
+        macroObject[MACRO_OBJ_Y     ] = *macroObjList++;                      // Y position
+        macroObject[MACRO_OBJ_Z     ] = *macroObjList++;                      // Z position
+        macroObject[MACRO_OBJ_PARAMS] = *macroObjList++;                      // Behavior params
 
         // Get the preset values from the MacroObjectPresets list.
         preset.model = MacroObjectPresets[presetID].model;
@@ -117,7 +117,7 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
 
         if (preset.param != 0) {
             macroObject[MACRO_OBJ_PARAMS] =
-                (macroObject[MACRO_OBJ_PARAMS] & 0xFF00) | (preset.param & 0x00FF);
+                (macroObject[MACRO_OBJ_PARAMS] & 0xFF00) + (preset.param & 0x00FF);
         }
 
         // If object has been killed, prevent it from respawning
@@ -137,12 +137,12 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
                      );
 
             newObj->oUnusedCoinParams = macroObject[MACRO_OBJ_PARAMS];
-            newObj->oBehParams      = (((macroObject[MACRO_OBJ_PARAMS] & 0x00FF) << 16)
-                                      | (macroObject[MACRO_OBJ_PARAMS] & 0xFF00));
+            newObj->oBehParams = (((macroObject[MACRO_OBJ_PARAMS] & 0x00FF) << 16)
+                                 + (macroObject[MACRO_OBJ_PARAMS] & 0xFF00));
             newObj->oBehParams2ndByte = (macroObject[MACRO_OBJ_PARAMS] & 0x00FF);
             newObj->respawnInfoType = RESPAWN_INFO_TYPE_MACRO_OBJECT;
             newObj->respawnInfo = (macroObjList - 1);
-            newObj->parentObj   = newObj;
+            newObj->parentObj = newObj;
         }
     }
 }

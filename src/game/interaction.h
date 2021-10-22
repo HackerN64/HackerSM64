@@ -72,7 +72,8 @@
 // INTERACT_CLAM_OR_BUBBA
 #define INT_SUBTYPE_EATS_MARIO          /* 0x00002000 */ (1 << 13)
 
-enum AttackType {
+enum AttackType
+{
     ATTACK_NONE,
     ATTACK_PUNCH,
     ATTACK_KICK_OR_TRIP,

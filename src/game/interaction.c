@@ -777,11 +777,12 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
 #ifdef GLOBAL_STAR_IDS
         u32 starIndex = GET_BPARAM1(obj->oBehParams);
 #else
-        u32 starIndex = (GET_BPARAM1(obj->oBehParams) & 0x1F);
+        u32 starIndex = ((obj->oBehParams >> 24) & 0x1F);
 #endif
         save_file_collect_star_or_key(m->numCoins, starIndex);
 
-        m->numStars = save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
+        m->numStars =
+            save_file_get_total_star_count((gCurrSaveFileNum - 1), (COURSE_MIN - 1), (COURSE_MAX - 1));
 
         if (!noExit) {
             drop_queued_background_music();
@@ -868,7 +869,7 @@ u32 interact_warp_door(struct MarioState *m, UNUSED u32 interactType, struct Obj
     u32 doorAction = ACT_UNINITIALIZED;
 #ifndef UNLOCK_ALL
     u32 saveFlags = save_file_get_flags();
-    s16 warpDoorId = GET_BPARAM1(obj->oBehParams);
+    s16 warpDoorId = (obj->oBehParams >> 24);
 #endif
 
     if (m->action == ACT_WALKING || m->action == ACT_DECELERATING) {
@@ -925,7 +926,7 @@ u32 interact_warp_door(struct MarioState *m, UNUSED u32 interactType, struct Obj
 
 u32 get_door_save_file_flag(struct Object *door) {
     u32 saveFileFlag = 0;
-    s16 requiredNumStars = GET_BPARAM1(door->oBehParams);
+    s16 requiredNumStars = (door->oBehParams >> 24);
 
     switch (requiredNumStars) {
         case  1: saveFileFlag = ((door->oPosY > 500.0f) ? SAVE_FLAG_UNLOCKED_PSS_DOOR : SAVE_FLAG_UNLOCKED_WF_DOOR ); break;
@@ -939,9 +940,9 @@ u32 get_door_save_file_flag(struct Object *door) {
 }
 
 u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    s16 requiredNumStars = GET_BPARAM1(obj->oBehParams);
+    s16 requiredNumStars = (obj->oBehParams >> 24);
 #ifndef UNLOCK_ALL
-    s16 numStars = save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
+    s16 numStars = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
 #endif
     if (m->action == ACT_WALKING || m->action == ACT_DECELERATING) {
 #ifndef UNLOCK_ALL

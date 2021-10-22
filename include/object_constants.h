@@ -1441,8 +1441,8 @@ enum BehParam1StarAct { // BPARAM1
 
 /* Goomba triplet spawner */
     /* oBehParams2ndByte */
-    #define GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK             0x03
-    #define GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK    0xFC
+    #define GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK             0x00000003
+    #define GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK    0x000000FC
     /* oAction */
     #define GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED             0x0
     #define GOOMBA_TRIPLET_SPAWNER_ACT_LOADED               0x1
