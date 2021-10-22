@@ -3774,8 +3774,6 @@ s32 is_behind_surface(Vec3f pos, struct Surface *surf) {
  */
 s32 is_range_behind_surface(Vec3f from, Vec3f to, struct Surface *surf, s16 range, s16 surfType) {
     s32 behindSurface = TRUE;
-    s32 leftBehind = 0;
-    s32 rightBehind = 0;
     f32 checkDist;
     s16 checkPitch, checkYaw;
     Vec3f checkPos;
@@ -3786,11 +3784,11 @@ s32 is_range_behind_surface(Vec3f from, Vec3f to, struct Surface *surf, s16 rang
                 behindSurface = is_behind_surface(to, surf);
             } else {
                 vec3f_get_dist_and_angle(from, to, &checkDist, &checkPitch, &checkYaw);
-                vec3f_set_dist_and_angle(from, checkPos, checkDist, checkPitch, checkYaw + range);
-                leftBehind = is_behind_surface(checkPos, surf);
-                vec3f_set_dist_and_angle(from, checkPos, checkDist, checkPitch, checkYaw - range);
-                rightBehind = is_behind_surface(checkPos, surf);
-                behindSurface = leftBehind * rightBehind;
+                vec3f_set_dist_and_angle(from, checkPos, checkDist, checkPitch, (checkYaw + range));
+                s32 leftBehind = is_behind_surface(checkPos, surf);
+                vec3f_set_dist_and_angle(from, checkPos, checkDist, checkPitch, (checkYaw - range));
+                s32 rightBehind = is_behind_surface(checkPos, surf);
+                behindSurface = (leftBehind * rightBehind);
             }
         }
     }
@@ -3802,9 +3800,9 @@ s32 is_range_behind_surface(Vec3f from, Vec3f to, struct Surface *surf, s16 rang
  * scaled along a line between them. Typically, somewhere in the middle.
  */
 void scale_along_line(Vec3f dst, Vec3f from, Vec3f to, f32 scale) {
-    dst[0] = ((((to[0] - from[0]) * scale) + from[0]);
-    dst[1] = ((((to[1] - from[1]) * scale) + from[1]);
-    dst[2] = ((((to[2] - from[2]) * scale) + from[2]);
+    dst[0] = (((to[0] - from[0]) * scale) + from[0]);
+    dst[1] = (((to[1] - from[1]) * scale) + from[1]);
+    dst[2] = (((to[2] - from[2]) * scale) + from[2]);
 }
 /**
  * Effectively created a rectangular prism defined by a vector starting at the center
@@ -6853,7 +6851,7 @@ void cutscene_dance_closeup_start(struct Camera *c) {
 void cutscene_dance_closeup_focus_mario(struct Camera *c) {
     Vec3f marioPos;
 
-    vec3f_set(marioPos, sMarioCamState->pos[0], (sMarioCamState->pos[1] + 125.0f,) sMarioCamState->pos[2]);
+    vec3f_set(marioPos, sMarioCamState->pos[0], (sMarioCamState->pos[1] + 125.0f), sMarioCamState->pos[2]);
     approach_vec3f_asymptotic(sCutsceneVars[9].point, marioPos, 0.2f, 0.2f, 0.2f);
     vec3f_copy(c->focus, sCutsceneVars[9].point);
 }
