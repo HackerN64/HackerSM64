@@ -390,7 +390,7 @@ s32 update_hang_moving(struct MarioState *m) {
     s32 stepResult = perform_hanging_step(m, nextPos);
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
+    vec3s_set( m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
     return stepResult;
 }
 
@@ -694,7 +694,7 @@ s32 act_grabbed(struct MarioState *m) {
 s32 act_in_cannon(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
     s16 startFacePitch = m->faceAngle[0];
-    s16 startFaceYaw = m->faceAngle[1];
+    s16 startFaceYaw   = m->faceAngle[1];
 
     switch (m->actionState) {
         case ACT_STATE_IN_CANNON_INIT:
@@ -702,7 +702,7 @@ s32 act_in_cannon(struct MarioState *m) {
             m->usedObj->oInteractStatus = INT_STATUS_INTERACTED;
 
             m->statusForCamera->cameraEvent = CAM_EVENT_CANNON;
-            m->statusForCamera->usedObj = m->usedObj;
+            m->statusForCamera->usedObj     = m->usedObj;
 
             vec3_zero(m->vel);
             vec3_copy_y_off(m->pos, &m->usedObj->oPosVec, 350.0f);
@@ -713,12 +713,12 @@ s32 act_in_cannon(struct MarioState *m) {
             break;
 
         case ACT_STATE_IN_CANNON_WAIT_FOR_CANNON:
-            if (m->usedObj->oAction == 1) {
+            if (m->usedObj->oAction == OPENED_CANNON_ACT_READY) {
                 m->faceAngle[0] = m->usedObj->oMoveAnglePitch;
                 m->faceAngle[1] = m->usedObj->oMoveAngleYaw;
 
                 marioObj->oMarioCannonObjectYaw = m->usedObj->oMoveAngleYaw;
-                marioObj->oMarioCannonInputYaw = 0;
+                marioObj->oMarioCannonInputYaw  = 0x0;
 
                 m->actionState = ACT_STATE_IN_CANNON_READY;
             }
