@@ -3801,23 +3801,12 @@ s32 is_surf_within_bounding_box(struct Surface *surf, f32 xMax, f32 yMax, f32 zM
  * Because the function only uses `surf`s first vertex, some surfaces can shadow others.
  */
 s32 is_behind_surface(Vec3f pos, struct Surface *surf) {
-    s32 behindSurface = 0;
-    // Surface normal
-    f32 normX = (surf->vertex2[1] - surf->vertex1[1]) * (surf->vertex3[2] - surf->vertex2[2]) -
-                (surf->vertex3[1] - surf->vertex2[1]) * (surf->vertex2[2] - surf->vertex1[2]);
-    f32 normY = (surf->vertex2[2] - surf->vertex1[2]) * (surf->vertex3[0] - surf->vertex2[0]) -
-                (surf->vertex3[2] - surf->vertex2[2]) * (surf->vertex2[0] - surf->vertex1[0]);
-    f32 normZ = (surf->vertex2[0] - surf->vertex1[0]) * (surf->vertex3[1] - surf->vertex2[1]) -
-                (surf->vertex3[0] - surf->vertex2[0]) * (surf->vertex2[1] - surf->vertex1[1]);
-    f32 dirX = surf->vertex1[0] - pos[0];
-    f32 dirY = surf->vertex1[1] - pos[1];
-    f32 dirZ = surf->vertex1[2] - pos[2];
-
-    if ((dirX * normX) + (dirY * normY) + (dirZ * normZ) < 0) {
-        behindSurface = 1;
-    }
-    return behindSurface;
+    Vec3f norm = { surf->normal.x, surf->normal.y, surf->normal.x };
+    Vec3f dir;
+    vec3_diff(dir, surf->vertex1, pos);
+    return (vec3_dot(dir, norm) < 0);
 }
+
 
 /**
  * Checks if the whole circular sector is behind the surface.
