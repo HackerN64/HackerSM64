@@ -343,7 +343,7 @@ s32 func_sh_802f2f38(struct AudioBankSample *sample, s32 bankId) {
     u8 *sp24;
 
     if (sample->isPatched == TRUE && sample->medium != 0) {
-        sp24 = func_sh_802f1d90(sample->size, bankId, sample->sampleAddr, sample->medium);
+        sp24 = (u8 *)func_sh_802f1d90(sample->size, bankId, sample->sampleAddr, sample->medium);
         if (sp24 == NULL) {
             return -1;
         }
@@ -1091,7 +1091,7 @@ s32 func_sh_802f47c8(s32 bankId, u8 idx, s8 *io) {
     }
     temp->sample = *sample;
     temp->io = io;
-    temp->vAddr = func_sh_802f1d40(sample->size, bankId, sample->sampleAddr, sample->medium);
+    temp->vAddr = (u8 *)func_sh_802f1d40(sample->size, bankId, sample->sampleAddr, sample->medium);
     if (temp->vAddr == NULL) {
         if (sample->medium == 1 || sample->codec == CODEC_SKIP) {
             *io = 0;
@@ -1420,11 +1420,11 @@ void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
                 case 0:
                     temp = temp_s0->medium = patchInfo->medium1;
                     if (temp != 0) {
-                        addr = func_sh_802f1d90(temp_s0->size, patchInfo->bankId1, temp_s0->sampleAddr, temp_s0->medium);
+                        addr = (u8 *)func_sh_802f1d90(temp_s0->size, patchInfo->bankId1, temp_s0->sampleAddr, temp_s0->medium);
                     } else {
                         temp = temp_s0->medium = patchInfo->medium2;
                         if (temp != 0) {
-                            addr = func_sh_802f1d90(temp_s0->size, patchInfo->bankId2, temp_s0->sampleAddr, temp_s0->medium);
+                            addr = (u8 *)func_sh_802f1d90(temp_s0->size, patchInfo->bankId2, temp_s0->sampleAddr, temp_s0->medium);
                         }
                     }
                     break;
@@ -1432,11 +1432,11 @@ void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
                 case 1:
                     temp = temp_s0->medium = patchInfo->medium1;
                     if (temp != 0) {
-                        addr = func_sh_802f1d40(temp_s0->size, patchInfo->bankId1, temp_s0->sampleAddr, temp_s0->medium);
+                        addr = (u8 *)func_sh_802f1d40(temp_s0->size, patchInfo->bankId1, temp_s0->sampleAddr, temp_s0->medium);
                     } else {
                         temp = temp_s0->medium = patchInfo->medium2;
                         if (temp != 0) {
-                            addr = func_sh_802f1d40(temp_s0->size, patchInfo->bankId2, temp_s0->sampleAddr, temp_s0->medium);
+                            addr = (u8 *)func_sh_802f1d40(temp_s0->size, patchInfo->bankId2, temp_s0->sampleAddr, temp_s0->medium);
                         }
                     }
                     break;

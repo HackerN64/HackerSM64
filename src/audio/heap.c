@@ -1469,7 +1469,7 @@ u32 *func_sh_802f1d40(u32 size, s32 bank, u8 *arg2, s8 medium) {
         ret->bankId = bank;
         ret->dstAddr = arg2;
         ret->medium = medium;
-        return ret->srcAddr;
+        return (u32 *)ret->srcAddr;
     }
     return NULL;
 }
@@ -1482,7 +1482,7 @@ u32 *func_sh_802f1d90(u32 size, s32 bank, u8 *arg2, s8 medium) {
         ret->bankId = bank;
         ret->dstAddr = arg2;
         ret->medium = medium;
-        return ret->srcAddr;
+        return (u32 *)ret->srcAddr;
     }
     return NULL;
 }
