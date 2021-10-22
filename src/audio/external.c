@@ -1139,7 +1139,7 @@ static f32 get_sound_freq_scale(u8 bank, u8 item) {
 /**
  * Called from threads: thread4_sound, thread5_game_loop (EU only)
  */
-static u8 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelIndex) {
+static u32 get_sound_reverb(UNUSED u8 bank, UNUSED u8 soundIndex, u8 channelIndex) {
     u8 area;
     u8 level;
     u8 reverb;
@@ -2156,13 +2156,12 @@ void sound_banks_enable(UNUSED u8 player, u16 bankMask) {
     }
 }
 
-u8 unused_803209D8(u8 player, u8 channelIndex, u8 arg2) {
-    u8 ret = 0;
+UNUSED u32 unused_803209D8(u8 player, u8 channelIndex, u8 arg2) {
     if (gSequencePlayers[player].channels[channelIndex] != &gSequenceChannelNone) {
         gSequencePlayers[player].channels[channelIndex]->stopSomething2 = arg2;
-        ret = arg2;
+        return arg2;
     }
-    return ret;
+    return 0;
 }
 
 /**

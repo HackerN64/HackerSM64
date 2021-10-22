@@ -1464,7 +1464,7 @@ void *unk_pool1_alloc(s32 poolIndex, s32 arg1, u32 size) {
     return ret;
 }
 
-u8 *func_sh_802f1d40(u32 size, s32 bank, u8 *arg2, s8 medium) {
+u32 *func_sh_802f1d40(u32 size, s32 bank, u8 *arg2, s8 medium) {
     struct UnkEntry *ret;
 
     ret = func_sh_802f1ec4(size);
@@ -1476,7 +1476,8 @@ u8 *func_sh_802f1d40(u32 size, s32 bank, u8 *arg2, s8 medium) {
     }
     return NULL;
 }
-u8 *func_sh_802f1d90(u32 size, s32 bank, u8 *arg2, s8 medium) {
+
+u32 *func_sh_802f1d90(u32 size, s32 bank, u8 *arg2, s8 medium) {
     struct UnkEntry *ret;
 
     ret = unk_pool2_alloc(size);
@@ -1488,18 +1489,7 @@ u8 *func_sh_802f1d90(u32 size, s32 bank, u8 *arg2, s8 medium) {
     }
     return NULL;
 }
-u8 *func_sh_802f1de0(u32 size, s32 bank, u8 *arg2, s8 medium) { // duplicated function?
-    struct UnkEntry *ret;
 
-    ret = unk_pool2_alloc(size);
-    if (ret != NULL) {
-        ret->bankId = bank;
-        ret->dstAddr = arg2;
-        ret->medium = medium;
-        return ret->srcAddr;
-    }
-    return NULL;
-}
 void unk_pools_init(u32 size1, u32 size2) {
     void *mem;
 

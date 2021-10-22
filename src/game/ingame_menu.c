@@ -225,7 +225,7 @@ void create_dl_ortho_matrix(void) {
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH)
 }
 
-Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
+Texture32 *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     u32 size = ((u32) width * (u32) height);
     s32 inPos;
     s16 outPos = 0;
@@ -248,7 +248,7 @@ Texture *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
         }
     }
 
-    return out;
+    return (Texture32 *)out;
 }
 
 void render_generic_char(u8 c) {

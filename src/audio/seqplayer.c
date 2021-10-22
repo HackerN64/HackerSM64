@@ -16,8 +16,8 @@ s32 seq_channel_layer_process_script_part5(struct SequenceChannelLayer *layer, s
 #endif
 void seq_channel_layer_process_script(struct SequenceChannelLayer *layer);
 void sequence_channel_process_script(struct SequenceChannel *seqChannel);
-u8 get_instrument(struct SequenceChannel *seqChannel, u8 instId, struct Instrument **instOut,
-                  struct AdsrSettings *adsr);
+u32 get_instrument(struct SequenceChannel *seqChannel, u8 instId, struct Instrument **instOut,
+                   struct AdsrSettings *adsr);
 
 void sequence_channel_init(struct SequenceChannel *seqChannel) {
     s32 i;
@@ -389,7 +389,7 @@ void init_layer_freelist(void) {
     }
 }
 
-u8 m64_read_u8(struct M64ScriptState *state) {
+u32 m64_read_u8(struct M64ScriptState *state) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
     return *(state->pc++);
 #else
@@ -398,13 +398,13 @@ u8 m64_read_u8(struct M64ScriptState *state) {
 #endif
 }
 
-s16 m64_read_s16(struct M64ScriptState *state) {
+s32 m64_read_s16(struct M64ScriptState *state) {
     s16 ret = *(state->pc++) << 8;
     ret = *(state->pc++) | ret;
     return ret;
 }
 
-u16 m64_read_compressed_u16(struct M64ScriptState *state) {
+u32 m64_read_compressed_u16(struct M64ScriptState *state) {
     u16 ret = *(state->pc++);
     if (ret & 0x80) {
         ret = (ret << 8) & 0x7f00;
@@ -1375,7 +1375,7 @@ s32 seq_channel_layer_process_script_part3(struct SequenceChannelLayer *layer, s
 }
 #endif
 
-u8 get_instrument(struct SequenceChannel *seqChannel, u8 instId, struct Instrument **instOut, struct AdsrSettings *adsr) {
+u32 get_instrument(struct SequenceChannel *seqChannel, u8 instId, struct Instrument **instOut, struct AdsrSettings *adsr) {
     struct Instrument *inst;
 #if defined(VERSION_EU) || defined(VERSION_SH)
     inst = get_instrument_inner(seqChannel->bankId, instId);

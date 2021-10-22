@@ -403,7 +403,7 @@ void func_sh_802f3158(s32 seqId, s32 numChunks, s32 arg2, OSMesgQueue *retQueue)
     }
 }
 
-u8 *func_sh_802f3220(u32 seqId, u32 *a1) {
+u32 *func_sh_802f3220(u32 seqId, u32 *a1) {
     s32 val;
 
     val = ((u16 *) gAlBankSets)[canonicalize_index(0, seqId)];
@@ -411,7 +411,7 @@ u8 *func_sh_802f3220(u32 seqId, u32 *a1) {
     if (*a1 == 0) {
         return NULL;
     }
-    return &gAlBankSets[val];
+    return (u32 *)(&gAlBankSets[val]);
 }
 
 void func_sh_802f3288(s32 idx) {

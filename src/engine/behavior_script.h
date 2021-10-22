@@ -22,7 +22,7 @@ enum BhvProc
 
 #define obj_and_int(object, offset, value) object->OBJECT_FIELD_S32(offset) &= (s32)(value)
 
-u16   random_u16(void);
+u32   random_u16(void);
 float random_float(void);
 s32   random_sign(void);
 

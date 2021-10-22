@@ -42,7 +42,7 @@ static void fly_guy_act_idle(void) {
         } else {
             // Randomly enter the approach mario action - but this doesn't
             // really do anything since we come right back to idle
-            if (o->oFlyGuyIdleTimer >= 3 || o->oFlyGuyIdleTimer == (random_u16() & 1) + 2) {
+            if (o->oFlyGuyIdleTimer >= 3 || o->oFlyGuyIdleTimer == (s32)(random_u16() & 0x1) + 2) {
                 o->oFlyGuyIdleTimer = 0;
                 o->oAction = FLY_GUY_ACT_APPROACH_MARIO;
             } else {

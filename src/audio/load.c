@@ -694,7 +694,7 @@ void *sequence_dma_async(s32 seqId, s32 arg1, struct SequencePlayer *seqPlayer) 
     return ptr;
 }
 
-u8 get_missing_bank(u32 seqId, s32 *nonNullCount, s32 *nullCount) {
+u32 get_missing_bank(u32 seqId, s32 *nonNullCount, s32 *nullCount) {
     void *temp;
     u32 bankId;
     u16 offset;

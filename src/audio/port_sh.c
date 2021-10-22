@@ -426,7 +426,7 @@ u32 func_sh_802f6878(s32 *arg0) {
     return sp1C >> 0x18;
 }
 
-u8 *func_sh_802f68e0(u32 index, u32 *a1) {
+UNUSED u32 *func_sh_802f68e0(u32 index, u32 *a1) {
     return func_sh_802f3220(index, a1);
 }
 
@@ -464,7 +464,7 @@ void func_sh_802f69cc(void) {
     gAudioResetStatus = 0;
 }
 
-s32 func_sh_802f6a08(s32 playerIndex, s32 channelIndex, s32 soundScriptIOIndex) {
+UNUSED s32 func_sh_802f6a08(s32 playerIndex, s32 channelIndex, s32 soundScriptIOIndex) {
     struct SequenceChannel *seqChannel;
     struct SequencePlayer *player;
 
@@ -478,7 +478,7 @@ s32 func_sh_802f6a08(s32 playerIndex, s32 channelIndex, s32 soundScriptIOIndex) 
     return -1;
 }
 
-s8 func_sh_802f6a6c(s32 playerIndex, s32 index) {
+UNUSED s32 func_sh_802f6a6c(s32 playerIndex, s32 index) {
     return gSequencePlayers[playerIndex].seqVariationEu[index];
 }
 
