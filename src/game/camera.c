@@ -3768,7 +3768,6 @@ s32 is_behind_surface(Vec3f pos, struct Surface *surf) {
     return (vec3_dot(dir, norm) < 0);
 }
 
-
 /**
  * Checks if the whole circular sector is behind the surface.
  */
