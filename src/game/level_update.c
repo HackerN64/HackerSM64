@@ -127,8 +127,8 @@ s16 sDelayedWarpOp;
 s16 sDelayedWarpTimer;
 s16 sSourceWarpNodeId;
 s32 sDelayedWarpArg;
-s8 sTimerRunning;
-s8 gNeverEnteredCastle;
+s8  sTimerRunning;
+s8  gNeverEnteredCastle;
 
 struct MarioState *gMarioState = &gMarioStates[0];
 s8 sWarpCheckpointActive = FALSE;

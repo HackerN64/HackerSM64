@@ -1034,9 +1034,9 @@ s32 act_first_person(struct MarioState *m) {
      && save_file_get_total_star_count((gCurrSaveFileNum - 1),
                                        COURSE_NUM_TO_INDEX(COURSE_MIN),
                                        COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 10) {
-        s16 headRX = m->statusForCamera->headRotation[0];
-        s16 totalRY = ((m->statusForCamera->headRotation[1] * 4) / 3) + m->faceAngle[1];
-        if (headRX == -0x1800 && (totalRY < -0x6FFF || totalRY >= 0x7000)) {
+        s16 headRX  =    m->statusForCamera->headRotation[0];
+        s16 totalRY = (((m->statusForCamera->headRotation[1] * 4) / 3) + m->faceAngle[1]);
+        if ((headRX == -0x1800) && ((totalRY < -0x6FFF) || (totalRY >= 0x7000))) {
             level_trigger_warp(m, WARP_OP_LOOK_UP);
         }
     }

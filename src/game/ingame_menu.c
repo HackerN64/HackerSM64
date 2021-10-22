@@ -1758,11 +1758,11 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     );
 
     if (gDialogLineNum == (COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES) + 1)) {
-        gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_MIN); // Exceeded max, set to min
+        gDialogLineNum  =  COURSE_NUM_TO_INDEX(COURSE_MIN); // Exceeded max, set to min
     }
 
     if (gDialogLineNum == (COURSE_NUM_TO_INDEX(COURSE_MIN) - 1)) {
-        gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES); // Exceeded min, set to max
+        gDialogLineNum  =  COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES); // Exceeded min, set to max
     }
 
     if (gDialogLineNum != COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES)) {
@@ -1775,7 +1775,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
             if (gDialogLineNum == (COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX) + 1)
              || gDialogLineNum == (COURSE_NUM_TO_INDEX(COURSE_MIN) - 1)) {
-                gDialogLineNum = COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES);
+                gDialogLineNum  =  COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES);
                 break;
             }
         }

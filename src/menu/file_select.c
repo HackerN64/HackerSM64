@@ -645,8 +645,7 @@ void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
 #if ENABLE_RUMBLE
                     queue_rumble_data(5, 80);
 #endif
-                    sMainMenuButtons[MENU_BUTTON_COPY_FILE_A + sSelectedFileIndex]->oMenuButtonState =
-                        MENU_BUTTON_STATE_ZOOM_OUT;
+                    sMainMenuButtons[MENU_BUTTON_COPY_FILE_A + sSelectedFileIndex]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_OUT;
                     copyButton->oMenuButtonActionPhase = COPY_PHASE_MAIN;
                     sFadeOutText = TRUE;
                     return;
@@ -1753,7 +1752,7 @@ void erase_menu_display_message(s8 messageID) {
             print_generic_string_fade(NOSAVE_DATA_X3, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
             break;
         case ERASE_MSG_MARIO_ERASED:
-            LANGUAGE_ARRAY(textMarioAJustErased)[MARIO_ERASED_VAR] = sSelectedFileIndex + 10;
+            LANGUAGE_ARRAY(textMarioAJustErased)[MARIO_ERASED_VAR] = (sSelectedFileIndex + 10);
             print_generic_string_fade(MARIO_ERASED_X, 190, LANGUAGE_ARRAY(textMarioAJustErased));
             break;
         case ERASE_MSG_SAVE_EXISTS: // unused
@@ -1839,7 +1838,7 @@ void print_erase_menu_strings(void) {
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string (89,  62, textMarioA);
+    print_menu_generic_string( 89,  62, textMarioA);
     print_menu_generic_string(211,  62, textMarioB);
     print_menu_generic_string( 89, 105, textMarioC);
     print_menu_generic_string(211, 105, textMarioD);
@@ -2017,7 +2016,7 @@ void print_save_file_scores(s8 fileIndex) {
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_hud_lut_string(HUD_LUT_DIFF, MARIO_X, 15, textMario);
+    print_hud_lut_string(HUD_LUT_DIFF,         MARIO_X, 15, textMario);
     print_hud_lut_string(HUD_LUT_GLOBAL, FILE_LETTER_X, 15, textFileLetter);
 
     // Print save file star count at top
