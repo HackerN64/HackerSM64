@@ -321,7 +321,7 @@ Gfx *intro_draw_face(u16 *image, s32 imageW, s32 imageH) {
     return dl;
 }
 
-RGBA16 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH, s32 xOffset, s32 yOffset) {
+RGBA16Return32 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH, s32 xOffset, s32 yOffset) {
     s32 pixel;
     f32 size = (1.0f / (sampleW * sampleH));
     ColorRGBf color;
@@ -351,7 +351,7 @@ RGBA16 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampl
         }
     }
 
-    return image;
+    return (RGBA16Return32 *)image;
 }
 
 Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED void *context) {
@@ -378,7 +378,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
         }
         // Draw while the first or last face is visible.
         if (sFaceVisible[0] == 1 || sFaceVisible[17] == 1) {
-            RGBA16 *image = intro_sample_frame_buffer(40, 40, 2, 2, 120, 80);
+            RGBA16 *image = (RGBA16 *)intro_sample_frame_buffer(40, 40, 2, 2, 120, 80);
             if (image != NULL) {
                 SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
                 dl = intro_draw_face(image, 40, 40);

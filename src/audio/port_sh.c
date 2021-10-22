@@ -426,7 +426,7 @@ u32 func_sh_802f6878(s32 *arg0) {
     return sp1C >> 0x18;
 }
 
-u8 *func_sh_802f68e0(u32 index, u32 *a1) {
+UNUSED u32 *func_sh_802f68e0(u32 index, u32 *a1) {
     return func_sh_802f3220(index, a1);
 }
 

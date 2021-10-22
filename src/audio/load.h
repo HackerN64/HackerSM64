@@ -99,7 +99,7 @@ void load_sequence(u32 player, u32 seqId, s32 loadAsync);
 
 #ifdef VERSION_SH
 void func_sh_802f3158(s32 seqId, s32 arg1, s32 arg2, OSMesgQueue *retQueue);
-u8 *func_sh_802f3220(u32 seqId, u32 *a1);
+u32 *func_sh_802f3220(u32 seqId, u32 *a1);
 struct AudioBankSample *func_sh_802f4978(s32 bankId, s32 idx);
 s32 func_sh_802f47c8(s32 bankId, u8 idx, s8 *io);
 void *func_sh_802f3f08(s32 poolIdx, s32 arg1, s32 arg2, s32 arg3, OSMesgQueue *retQueue);

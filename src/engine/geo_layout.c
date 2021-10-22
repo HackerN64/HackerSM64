@@ -348,8 +348,8 @@ void geo_layout_cmd_node_camera(void) {
 
     Vec3f pos, focus;
 
-    cmdPos = read_vec3s_to_vec3f(pos, cmdPos);
-    cmdPos = read_vec3s_to_vec3f(focus, cmdPos);
+    cmdPos = (s16 *)read_vec3s_to_vec3f(pos, cmdPos);
+    cmdPos = (s16 *)read_vec3s_to_vec3f(focus, cmdPos);
 
     graphNode = init_graph_node_camera(gGraphNodePool, NULL, pos, focus,
                                        (GraphNodeFunc) cur_geo_cmd_ptr(0x10), cur_geo_cmd_s16(0x02));
@@ -408,15 +408,15 @@ void geo_layout_cmd_node_translation_rotation(void) {
 
     switch ((params & 0x70) >> 4) {
         case 0:
-            cmdPos = read_vec3s(translation, &cmdPos[2]);
-            cmdPos = read_vec3s_angle(rotation, cmdPos);
+            cmdPos = (s16 *)read_vec3s(translation, &cmdPos[2]);
+            cmdPos = (s16 *)read_vec3s_angle(rotation, cmdPos);
             break;
         case 1:
-            cmdPos = read_vec3s(translation, &cmdPos[1]);
+            cmdPos = (s16 *)read_vec3s(translation, &cmdPos[1]);
             vec3s_copy(rotation, gVec3sZero);
             break;
         case 2:
-            cmdPos = read_vec3s_angle(rotation, &cmdPos[1]);
+            cmdPos = (s16 *)read_vec3s_angle(rotation, &cmdPos[1]);
             vec3s_copy(translation, gVec3sZero);
             break;
         case 3:
@@ -459,7 +459,7 @@ void geo_layout_cmd_node_translation(void) {
     s16 *cmdPos = (s16 *) gGeoLayoutCommand;
     void *displayList = NULL;
 
-    cmdPos = read_vec3s(translation, &cmdPos[1]);
+    cmdPos = (s16 *)read_vec3s(translation, &cmdPos[1]);
 
     if (params & 0x80) {
         displayList = *(void **) &cmdPos[0];
@@ -495,7 +495,7 @@ void geo_layout_cmd_node_rotation(void) {
     s16 *cmdPos = (s16 *) gGeoLayoutCommand;
     void *displayList = NULL;
 
-    cmdPos = read_vec3s_angle(angle, &cmdPos[1]);
+    cmdPos = (s16 *)read_vec3s_angle(angle, &cmdPos[1]);
 
     if (params & 0x80) {
         displayList = *(void **) &cmdPos[0];
@@ -587,7 +587,7 @@ void geo_layout_cmd_node_billboard(void) {
     s16 *cmdPos = (s16 *) gGeoLayoutCommand;
     void *displayList = NULL;
 
-    cmdPos = read_vec3s(translation, &cmdPos[1]);
+    cmdPos = (s16 *)read_vec3s(translation, &cmdPos[1]);
 
     if (params & 0x80) {
         displayList = *(void **) &cmdPos[0];
@@ -762,8 +762,8 @@ void geo_layout_cmd_bone(void) {
     void *displayList;
     s16 *cmdPos = (s16 *) gGeoLayoutCommand;
 
-    cmdPos = read_vec3s(translation, &cmdPos[2]);
-    cmdPos = read_vec3s(rotation, &cmdPos[0]);
+    cmdPos = (s16 *)read_vec3s(translation, &cmdPos[2]);
+    cmdPos = (s16 *)read_vec3s(rotation, &cmdPos[0]);
     displayList = *(void **) &cmdPos[0];
     cmdPos += (2 << CMD_SIZE_SHIFT);
 

@@ -29,14 +29,14 @@ void rgba32_to_colorRGBA(ColorRGBA dst, RGBA32 src) {
     dst[3] = COMPOSITE_TO_COLOR(src, MSK_RGBA32_A, IDX_RGBA32_A);
 }
 
-RGBA16 colorRGB_to_rgba16(ColorRGB src) {
+RGBA16Return32 colorRGB_to_rgba16(ColorRGB src) {
     return (COLOR_TO_COMPOSITE(src[0], MSK_RGBA16_C, IDX_RGBA16_R)
           | COLOR_TO_COMPOSITE(src[1], MSK_RGBA16_C, IDX_RGBA16_G)
           | COLOR_TO_COMPOSITE(src[2], MSK_RGBA16_C, IDX_RGBA16_B)
           | MSK_RGBA16_A);
 }
 
-RGBA16 colorRGBA_to_rgba16(ColorRGBA src) {
+RGBA16Return32 colorRGBA_to_rgba16(ColorRGBA src) {
     return (COLOR_TO_COMPOSITE(src[0], MSK_RGBA16_C, IDX_RGBA16_R)
           | COLOR_TO_COMPOSITE(src[1], MSK_RGBA16_C, IDX_RGBA16_G)
           | COLOR_TO_COMPOSITE(src[2], MSK_RGBA16_C, IDX_RGBA16_B)
@@ -81,14 +81,14 @@ void rgba32_to_colorRGBAf(ColorRGBAf dst, RGBA32 src) {
     dst[3] = COMPOSITE_TO_COLORF(src, MSK_RGBA32_A, IDX_RGBA32_A);
 }
 
-RGBA16 colorRGBf_to_rgba16(ColorRGBf src) {
+RGBA16Return32 colorRGBf_to_rgba16(ColorRGBf src) {
     return (COLORF_TO_COMPOSITE(src[0], MSK_RGBA16_C, IDX_RGBA16_R)
           | COLORF_TO_COMPOSITE(src[1], MSK_RGBA16_C, IDX_RGBA16_G)
           | COLORF_TO_COMPOSITE(src[2], MSK_RGBA16_C, IDX_RGBA16_B)
           | MSK_RGBA16_A);
 }
 
-RGBA16 colorRGBAf_to_rgba16(ColorRGBAf src) {
+RGBA16Return32 colorRGBAf_to_rgba16(ColorRGBAf src) {
     return (COLORF_TO_COMPOSITE(src[0], MSK_RGBA16_C, IDX_RGBA16_R)
           | COLORF_TO_COMPOSITE(src[1], MSK_RGBA16_C, IDX_RGBA16_G)
           | COLORF_TO_COMPOSITE(src[2], MSK_RGBA16_C, IDX_RGBA16_B)
@@ -142,15 +142,7 @@ Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA 
     return FALSE;
 }
 
-// 0-31
-UNUSED RGBA16Component rgba16_get_average_component(RGBA16 rgba) {
-    ColorRGBf color;
-    rgba16_to_colorRGBf(color, rgba);
-    ColorF avg = vec3_average(color);
-    return COLORF_TO_COMPOSITE(avg, MSK_RGBA16_C, 0);
-}
-
-RGBA16 rgba16_make_grayscale(RGBA16 rgba) {
+RGBA16Return32 rgba16_make_grayscale(RGBA16 rgba) {
     ColorRGBf color;
     rgba16_to_colorRGBf(color, rgba);
     ColorF avg = vec3_average(color);
