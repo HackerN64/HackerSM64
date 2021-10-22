@@ -1461,9 +1461,9 @@ void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *pat
                     case 1:
                         D_SH_8034EC88[D_SH_8034F68C].sample = temp_s0;
                         D_SH_8034EC88[D_SH_8034F68C].ramAddr = addr;
-                        D_SH_8034EC88[D_SH_8034F68C].encodedInfo = (D_SH_8034F68C << 24) | 0xffffff;
+                        D_SH_8034EC88[D_SH_8034F68C].encodedInfo = ((D_SH_8034F68C << 24) | 0xffffff);
                         D_SH_8034EC88[D_SH_8034F68C].isFree = FALSE;
-                        D_SH_8034EC88[D_SH_8034F68C].endAndMediumIdentification = temp_s0->sampleAddr + temp_s0->size + temp_s0->medium;
+                        D_SH_8034EC88[D_SH_8034F68C].endAndMediumIdentification = (temp_s0->sampleAddr + temp_s0->size + temp_s0->medium);
                         D_SH_8034F68C++;
                         break;
                 }
@@ -1527,7 +1527,7 @@ next:
             sample = D_SH_8034EC88[D_SH_8034F68C - 1].sample;
             sampleAddr = sample->sampleAddr;
             size = sample->size;
-            unk = size >> 0xC;
+            unk = (size >> 0xC);
             unk += 1;
             added = ((sampleAddr + size) + sample->medium);
             if (added != D_SH_8034EC88[D_SH_8034F68C - 1].endAndMediumIdentification) {

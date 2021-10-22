@@ -263,7 +263,7 @@ s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline sp
             gPuppyCam.splineProgress = 0;
             return TRUE;
         }
-        gPuppyCam.splineProgress -= 1;
+        gPuppyCam.splineProgress--;
     }
 
     return FALSE;
