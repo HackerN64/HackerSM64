@@ -36,7 +36,12 @@ static struct Object *sEndJumboStarObj;
 static s16 sEndPeachAnimation;
 static s16 sEndToadAnims[2];
 
-Vp sEndCutsceneVp = { { { 640, 480, 511, 0 }, { 640, 480, 511, 0 } } };
+Vp sEndCutsceneVp = {
+    {
+        { 640, 480, 511, 0 },
+        { 640, 480, 511, 0 }
+    }
+};
 struct CreditsEntry *sDispCreditsEntry = NULL;
 
 // related to peach gfx?
@@ -118,29 +123,29 @@ void print_displaying_credits_entry(void) {
 
         switch (numLines) {
             case 4:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 24, *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 24), *currStrPtr++);
                 numLines = 2;
                 lineHeight = 24;
                 break;
             case 5:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 16), *currStrPtr++);
                 numLines = 3;
                 break;
 #ifdef VERSION_EU
             case 6:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 32), *currStrPtr++);
                 numLines = 3;
                 break;
             case 7:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 16), *currStrPtr++);
+                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, (strY + 32), *currStrPtr++);
                 numLines = 3;
                 break;
 #endif
         }
 
         while (numLines-- > 0) {
-            print_credits_str_ascii(CREDIT_TEXT_X_RIGHT - get_credits_str_width(*currStrPtr), strY, *currStrPtr);
+            print_credits_str_ascii((CREDIT_TEXT_X_RIGHT - get_credits_str_width(*currStrPtr)), strY, *currStrPtr);
 
             strY += lineHeight;
 
@@ -269,7 +274,7 @@ struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, ModelID32 model,
  */
 void cutscene_take_cap_off(struct MarioState *m) {
     m->flags &= ~MARIO_CAP_ON_HEAD;
-    m->flags |= MARIO_CAP_IN_HAND;
+    m->flags |=  MARIO_CAP_IN_HAND;
     play_sound(SOUND_ACTION_TAKE_OFF_CAP, m->marioObj->header.gfx.cameraToObject);
 }
 
@@ -413,8 +418,8 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
         enable_time_stop();
     }
     if (m->actionState < 9) {
-        set_mario_animation(m, m->prevAction == ACT_STAR_DANCE_WATER ? MARIO_ANIM_WATER_IDLE
-                                                                     : MARIO_ANIM_FIRST_PERSON);
+        set_mario_animation(m, ((m->prevAction == ACT_STAR_DANCE_WATER) ? MARIO_ANIM_WATER_IDLE
+                                                                        : MARIO_ANIM_FIRST_PERSON));
         // always look up for automatic dialogs
         m->actionTimer -= 1024;
     } else {
@@ -448,7 +453,7 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
         }
     }
     // apply head turn
-    vec3s_set(m->marioBodyState->headAngle, m->actionTimer, 0, 0);
+    vec3s_set(m->marioBodyState->headAngle, m->actionTimer, 0x0, 0x0);
     return FALSE;
 }
 

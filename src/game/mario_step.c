@@ -104,7 +104,7 @@ void init_bully_collision_data(struct BullyCollisionData *data, f32 posX, f32 po
 void mario_bonk_reflection(struct MarioState *m, u32 negateSpeed) {
     if (m->wall != NULL) {
         s16 wallAngle = m->wallYaw;
-        m->faceAngle[1] = wallAngle - (s16)(m->faceAngle[1] - wallAngle);
+        m->faceAngle[1] = (wallAngle - (s16)(m->faceAngle[1] - wallAngle));
 
         play_sound((m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK : SOUND_ACTION_BONK,
                    m->marioObj->header.gfx.cameraToObject);
@@ -175,8 +175,8 @@ u32 mario_push_off_steep_floor(struct MarioState *m, u32 action, u32 actionArg) 
 
     if (floorDYaw > -0x4000
      && floorDYaw <  0x4000) {
-        m->forwardVel = 16.0f;
-        m->faceAngle[1] = m->floorYaw;
+        m->forwardVel =  16.0f;
+        m->faceAngle[1] =  m->floorYaw;
     } else {
         m->forwardVel = -16.0f;
         m->faceAngle[1] = (m->floorYaw + 0x8000);
@@ -327,7 +327,8 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
             set_mario_wall(m, upperWall.walls[i]);
         }
 
-        if (wallDYaw >= DEGREES(60) && wallDYaw <= DEGREES(120)) {
+        if (wallDYaw >= DEGREES( 60)
+         && wallDYaw <= DEGREES(120)) {
             continue;
         }
 
@@ -437,9 +438,9 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     resolve_and_return_wall_collisions(nextPos,  30.0f, 50.0f, &lowerWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
+    f32 ceilHeight  = find_ceil(nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
 
-    f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
+    f32 waterLevel  = find_water_level(nextPos[0], nextPos[2]);
 
     // set_mario_wall(m, NULL);
 

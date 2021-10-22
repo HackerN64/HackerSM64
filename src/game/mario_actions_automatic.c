@@ -54,14 +54,12 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
         marioObj->oMarioPolePos = poleTop;
     }
 
-    m->pos[0] = m->usedObj->oPosX;
-    m->pos[2] = m->usedObj->oPosZ;
-    m->pos[1] = (m->usedObj->oPosY + marioObj->oMarioPolePos + offsetY);
+    vec3_copy_y_off(m->pos, &m->usedObj->oPosVec, (marioObj->oMarioPolePos + offsetY));
 
     s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f);
     collided |= f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
 
-    f32 ceilHeight = find_ceil(m->pos[0], m->pos[1] + 3.0f, m->pos[2], &ceil);
+    f32 ceilHeight = find_ceil(m->pos[0], (m->pos[1] + 3.0f), m->pos[2], &ceil);
     if (m->pos[1] > (ceilHeight - 160.0f)) {
         m->pos[1] = (ceilHeight - 160.0f);
         marioObj->oMarioPolePos = (m->pos[1] - m->usedObj->oPosY);
@@ -123,7 +121,7 @@ s32 act_holding_pole(struct MarioState *m) {
     }
 
     if (m->controller->stickY > 16.0f) {
-        f32 poleTop = m->usedObj->hitboxHeight - 100.0f;
+        f32 poleTop = (m->usedObj->hitboxHeight - 100.0f);
         const BehaviorScript *poleBehavior = virtual_to_segmented(0x13, m->usedObj->behavior);
 
         if (marioObj->oMarioPolePos < poleTop - 0.4f) {
@@ -136,7 +134,7 @@ s32 act_holding_pole(struct MarioState *m) {
     }
 
     if (m->controller->stickY < -16.0f) {
-        m->angleVel[1] -= m->controller->stickY * 2;
+        m->angleVel[1] -= (m->controller->stickY * 2);
         if (m->angleVel[1] > 0x1000) {
             m->angleVel[1] = 0x1000;
         }
@@ -163,7 +161,6 @@ s32 act_holding_pole(struct MarioState *m) {
 }
 
 s32 act_climbing_pole(struct MarioState *m) {
-    s32 animSpeed;
     struct Object *marioObj = m->marioObj;
     s16 cameraAngle = m->area->camera->yaw;
 
@@ -183,12 +180,12 @@ s32 act_climbing_pole(struct MarioState *m) {
         return set_mario_action(m, ACT_HOLDING_POLE, 0);
     }
 
-    marioObj->oMarioPolePos += m->controller->stickY / 8.0f;
+    marioObj->oMarioPolePos += (m->controller->stickY / 8.0f);
     m->angleVel[1] = 0x0;
     m->faceAngle[1] = approach_angle(m->faceAngle[1], cameraAngle, 0x400);
 
     if (set_pole_position(m, 0.0f) == POLE_NONE) {
-        animSpeed = ((m->controller->stickY / 4.0f) * 0x10000);
+        s32 animSpeed = ((m->controller->stickY / 4.0f) * 0x10000);
         set_mario_anim_with_accel(m, MARIO_ANIM_CLIMB_UP_POLE, animSpeed);
         add_tree_leaf_particles(m);
         play_climbing_sounds(m, 1);
@@ -289,7 +286,6 @@ s32 act_top_of_pole_transition(struct MarioState *m) {
 }
 
 s32 act_top_of_pole(struct MarioState *m) {
-
     if (m->input & INPUT_A_PRESSED) {
         return set_mario_action(m, ACT_TOP_OF_POLE_JUMP, 0);
     }
@@ -332,11 +328,11 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     if (ceilOffset < -30.0f) {
         return HANG_HIT_CEIL_OR_OOB;
     }
-    if (ceilOffset > 30.0f) {
+    if (ceilOffset >  30.0f) {
         return HANG_LEFT_CEIL;
     }
 
-    nextPos[1] = m->ceilHeight - 144.0f;
+    nextPos[1] = (m->ceilHeight - 144.0f);
     vec3f_copy(m->pos, nextPos);
 
     set_mario_floor(m, floor, floorHeight);
@@ -725,7 +721,7 @@ s32 act_in_cannon(struct MarioState *m) {
             break;
 
         case ACT_STATE_IN_CANNON_READY:
-            m->faceAngle[0] -= (s16)(m->controller->stickY * 10.0f);
+            m->faceAngle[0]                -= (s16)(m->controller->stickY * 10.0f);
             marioObj->oMarioCannonInputYaw -= (s16)(m->controller->stickX * 10.0f);
 
             m->faceAngle[0] = CLAMP(m->faceAngle[0], 0, DEGREES(80));
