@@ -658,10 +658,8 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
             case 1:
 #if defined(VERSION_SH)
                 tp->entries[1].ptr = (u8 *) ((uintptr_t) (pool->start + pool->size - size) & ~0x0f);
-#elif defined(VERSION_EU)
-                tp->entries[1].ptr = pool->start + pool->size - size - 0x10;
 #else
-                tp->entries[1].ptr = pool->size + pool->start - size - 0x10;
+                tp->entries[1].ptr = (pool->start + pool->size - size - 0x10);
 #endif
                 tp->entries[1].id = id;
                 tp->entries[1].size = size;

@@ -383,27 +383,27 @@ s32 update_hang_moving(struct MarioState *m) {
     m->vel[1] = 0.0f;
     m->vel[2] = m->slideVelZ;
 
-    nextPos[0] = m->pos[0] - (m->ceil->normal.y * m->vel[0]);
-    nextPos[2] = m->pos[2] - (m->ceil->normal.y * m->vel[2]);
-    nextPos[1] = m->pos[1];
+    nextPos[0] = (m->pos[0] - (m->ceil->normal.y * m->vel[0]));
+    nextPos[2] = (m->pos[2] - (m->ceil->normal.y * m->vel[2]));
+    nextPos[1] =  m->pos[1];
 
     s32 stepResult = perform_hanging_step(m, nextPos);
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
     return stepResult;
 }
 
 void update_hang_stationary(struct MarioState *m) {
     m->forwardVel = 0.0f;
-    m->slideVelX = 0.0f;
-    m->slideVelZ = 0.0f;
+    m->slideVelX  = 0.0f;
+    m->slideVelZ  = 0.0f;
 
     m->pos[1] = (m->ceilHeight - 144.0f);
     vec3f_copy(m->vel, gVec3fZero);
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
 #ifdef BETTER_HANGING
-    vec3_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
 #endif
 }
 
@@ -761,7 +761,7 @@ s32 act_in_cannon(struct MarioState *m) {
     }
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
     set_mario_animation(m, MARIO_ANIM_DIVE);
 
     return FALSE;
@@ -771,8 +771,8 @@ s32 act_tornado_twirling(struct MarioState *m) {
     struct Surface *floor;
     Vec3f nextPos;
     struct Object *marioObj = m->marioObj;
-    struct Object *usedObj = m->usedObj;
-    s16 prevTwirlYaw = m->twirlYaw;
+    struct Object *usedObj  = m->usedObj;
+    s16 prevTwirlYaw        = m->twirlYaw;
 
     f32 dx = ((m->pos[0] - usedObj->oPosX) * 0.95f);
     f32 dz = ((m->pos[2] - usedObj->oPosZ) * 0.95f);
@@ -824,7 +824,7 @@ s32 act_tornado_twirling(struct MarioState *m) {
 
     m->actionTimer++;
 
-    set_mario_animation(m, (m->actionArg == 0) ? MARIO_ANIM_START_TWIRL : MARIO_ANIM_TWIRL);
+    set_mario_animation(m, ((m->actionArg == 0) ? MARIO_ANIM_START_TWIRL : MARIO_ANIM_TWIRL));
 
     if (is_anim_past_end(m)) {
         m->actionArg = 1;
@@ -836,7 +836,7 @@ s32 act_tornado_twirling(struct MarioState *m) {
     }
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1] + m->twirlYaw, 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, (m->faceAngle[1] + m->twirlYaw), 0x0);
 #if ENABLE_RUMBLE
     reset_rumble_timers_slip();
 #endif

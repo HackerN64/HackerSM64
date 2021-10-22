@@ -1356,7 +1356,7 @@ void move_camera(struct ObjCamera *cam) {
     struct GdControl *ctrl;
 
     ctrl = &gGdCtrl;
-    if (!(cam->flags & 0x10)) {
+    if (!(cam->flags & (1 << 4))) {
         return;
     }
 

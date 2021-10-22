@@ -1779,7 +1779,7 @@ s32 act_riding_hoot(struct MarioState *m) {
 
     vec3_zero(m->vel);
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, (0x4000 - m->faceAngle[1]), 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, (0x4000 - m->faceAngle[1]), 0x0);
     return FALSE;
 }
 

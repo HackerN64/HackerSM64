@@ -775,7 +775,7 @@ s32 act_shockwave_bounce(struct MarioState *m) {
         return set_mario_action(m, ACT_IDLE, 0);
     }
 
-    s16 bounceTimer = (m->actionTimer % 16) << 12;
+    s16 bounceTimer = ((m->actionTimer % 16) << 12);
     f32 bounceAmt = (f32)(((f32)(6 - m->actionTimer / 8) * 8.0f) + 4.0f);
     mario_set_forward_vel(m, 0);
     vec3_zero(m->vel);
@@ -786,7 +786,7 @@ s32 act_shockwave_bounce(struct MarioState *m) {
     }
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     return FALSE;
 }

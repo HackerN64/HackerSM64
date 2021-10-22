@@ -47,22 +47,22 @@ void grabbable_joint_update_func(struct ObjJoint *self) {
     // The joint acts somewhat like a spring in that the further it is moved
     // from its original position, the more resistance it has to moving further
 
-    offset.x = self->mat128[3][0] - self->initPos.x;
-    offset.y = self->mat128[3][1] - self->initPos.y;
-    offset.z = self->mat128[3][2] - self->initPos.z;
+    offset.x = (self->mat128[3][0] - self->initPos.x);
+    offset.y = (self->mat128[3][1] - self->initPos.y);
+    offset.z = (self->mat128[3][2] - self->initPos.z);
 
     if (self->header.drawFlags & OBJ_PICKED) {
         self->velocity.x = offset.x * -0.25f;
         self->velocity.y = offset.y * -0.25f;
         self->velocity.z = offset.z * -0.25f;
 
-        self->flags |= 0x2000;
+        self->flags |= (1 << 13);
     } else {
         if (!gGdCtrl.trgR) { // R trigger is released
             // Set velocity so that the joint approaches its initial position
-            self->velocity.x -= offset.x * 0.5f;
-            self->velocity.y -= offset.y * 0.5f;
-            self->velocity.z -= offset.z * 0.5f;
+            self->velocity.x -= (offset.x * 0.5f);
+            self->velocity.y -= (offset.y * 0.5f);
+            self->velocity.z -= (offset.z * 0.5f);
 
             // Decay the velocity
             self->velocity.x *= 0.8f;
@@ -80,11 +80,11 @@ void grabbable_joint_update_func(struct ObjJoint *self) {
                 }
             }
 
-            if (self->flags & 0x2000) {
+            if (self->flags & (1 << 13)) {
                 gd_play_sfx(GD_SFX_LET_GO_FACE);
             }
 
-            self->flags &= ~0x2000;
+            self->flags &= ~(1 << 13);
             ; // necessary?
         } else {
             // freeze position of joint
@@ -204,11 +204,11 @@ struct ObjJoint *make_joint(s32 flags, f32 x, f32 y, f32 z) {
     j->id = sJointCount;
     j->flags = flags;
 
-    if (!(j->flags & 0x1)) {
+    if (!(j->flags & (1 << 0))) {
         sJointNotF1Count++;
     }
 
-    if (j->flags & 0x1) {
+    if (j->flags & (1 << 0)) {
         j->colourNum = COLOUR_RED;
     } else {
         j->colourNum = COLOUR_PINK;
@@ -262,13 +262,13 @@ void func_8018F328(struct ObjBone *b) {
     joint2 = (struct ObjJoint *) link->obj;
 
     // bone position is average of two connecting joints
-    b->worldPos.x = (joint1->worldPos.x + joint2->worldPos.x) / 2.0f;
-    b->worldPos.y = (joint1->worldPos.y + joint2->worldPos.y) / 2.0f;
-    b->worldPos.z = (joint1->worldPos.z + joint2->worldPos.z) / 2.0f;
+    b->worldPos.x = ((joint1->worldPos.x + joint2->worldPos.x) / 2.0f);
+    b->worldPos.y = ((joint1->worldPos.y + joint2->worldPos.y) / 2.0f);
+    b->worldPos.z = ((joint1->worldPos.z + joint2->worldPos.z) / 2.0f);
 
-    b->unk58.x = joint2->worldPos.x - joint1->worldPos.x;
-    b->unk58.y = joint2->worldPos.y - joint1->worldPos.y;
-    b->unk58.z = joint2->worldPos.z - joint1->worldPos.z;
+    b->unk58.x = (joint2->worldPos.x - joint1->worldPos.x);
+    b->unk58.y = (joint2->worldPos.y - joint1->worldPos.y);
+    b->unk58.z = (joint2->worldPos.z - joint1->worldPos.z);
 
     gd_normalize_vec3f(&b->unk58);
     gd_create_origin_lookat(&b->matB0, &b->unk58, 0); //? 0.0f
@@ -276,7 +276,7 @@ void func_8018F328(struct ObjBone *b) {
 
 /* 23DC9C -> 23DCF0 */
 void func_8018F4CC(struct ObjJoint *j) {
-    if (j->flags & 0x1000) {
+    if (j->flags & (1 << 12)) {
         j->unkB4.x = D_801BA968.x;
         j->unkB4.y = D_801BA968.y;
         j->unkB4.z = D_801BA968.z;
@@ -574,24 +574,24 @@ void func_801903E8(struct ObjJoint *j, struct GdVec3f *a1, f32 x, f32 y, f32 z) 
     f32 sp14;
     struct GdVec3f sp8;
 
-    if (j->flags & 0x1 || (j->flags & 0x1000) == 0) {
+    if (j->flags & (1 << 0) || (j->flags & (1 << 12)) == 0) {
         j->unk3C.x += x;
         j->unk3C.y += y;
         j->unk3C.z += z;
         a1->x = a1->y = a1->z = 0.0f;
     } else {
-        sp14 = (j->unkB4.x * x) + (j->unkB4.y * y) + (j->unkB4.z * z);
-        sp8.x = j->unkB4.x * sp14;
-        sp8.y = j->unkB4.y * sp14;
-        sp8.z = j->unkB4.z * sp14;
+        sp14 = ((j->unkB4.x * x) + (j->unkB4.y * y) + (j->unkB4.z * z));
+        sp8.x = (j->unkB4.x * sp14);
+        sp8.y = (j->unkB4.y * sp14);
+        sp8.z = (j->unkB4.z * sp14);
 
         j->unk3C.x += sp8.x;
         j->unk3C.y += sp8.y;
         j->unk3C.z += sp8.z;
 
-        a1->x = x - sp8.x;
-        a1->y = y - sp8.y;
-        a1->z = z - sp8.z;
+        a1->x = (x - sp8.x);
+        a1->y = (y - sp8.y);
+        a1->z = (z - sp8.z);
     }
 }
 
@@ -605,13 +605,12 @@ void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 
     s32 sp234; // i?
     s32 sp230;
     s32 sp22C = 1;
-    s32 sp224;
     s32 sp220;
     struct ObjJoint *sp120[0x40];
     struct ObjBone *sp20[0x40];
 
     for (sp230 = 1; sp230 < a0; sp230 *= 2) {
-        sp22C = sp22C * 2 + 1;
+        sp22C = ((sp22C * 2) + 1);
     }
 
     if (a0 & 0x8000) {
@@ -622,7 +621,7 @@ void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 
     printf("NIDmask: %d /  ", a0);
 
     a2->unk1C0 |= a0;
-    sp224 = func_8018FFE8(sp20, sp120, a1, a2);
+    s32 sp224 = func_8018FFE8(sp20, sp120, a1, a2);
     func_801903E8(a2, &sp240, x, y, z);
     for (sp234 = 0; sp234 < sp224; sp234++) {
         if (a1 != NULL) {
@@ -642,7 +641,7 @@ void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 
             }
 
             if (sp220 < 2) {
-                if (sp26C->flags & 0x1) {
+                if (sp26C->flags & (1 << 0)) {
                     sJointArrLen++;
                     sJointArr[sJointArrLen] = sp274;
                     sJointArrVecs[sJointArrLen].x = -sp24C.x;

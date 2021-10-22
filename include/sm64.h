@@ -99,6 +99,7 @@ enum RenderLayers {
 #define LAYER_NON_ZB_LAST                   LAYER_LAST
 
 enum MarioInput {
+    INPUT_NONE                   = /* 0x0000 */ (0 <<  0),
     INPUT_NONZERO_ANALOG         = /* 0x0001 */ (1 <<  0),
     INPUT_A_PRESSED              = /* 0x0002 */ (1 <<  1),
     INPUT_OFF_FLOOR              = /* 0x0004 */ (1 <<  2),

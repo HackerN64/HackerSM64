@@ -171,14 +171,15 @@ u32 mario_update_quicksand(struct MarioState *m, f32 sinkingSpeed) {
 }
 
 u32 mario_push_off_steep_floor(struct MarioState *m, u32 action, u32 actionArg) {
-    s16 floorDYaw = m->floorYaw - m->faceAngle[1];
+    s16 floorDYaw = (m->floorYaw - m->faceAngle[1]);
 
-    if (floorDYaw > -0x4000 && floorDYaw < 0x4000) {
+    if (floorDYaw > -0x4000
+     && floorDYaw <  0x4000) {
         m->forwardVel = 16.0f;
         m->faceAngle[1] = m->floorYaw;
     } else {
         m->forwardVel = -16.0f;
-        m->faceAngle[1] = m->floorYaw + 0x8000;
+        m->faceAngle[1] = (m->floorYaw + 0x8000);
     }
 
     return set_mario_action(m, action, actionArg);
@@ -216,7 +217,8 @@ u32 mario_update_windy_ground(struct MarioState *m) {
 
             pushSpeed = ((m->forwardVel > 0.0f) ? (-m->forwardVel * 0.5f) : -8.0f);
 
-            if (pushDYaw > -0x4000 && pushDYaw < 0x4000) {
+            if ((pushDYaw > -0x4000)
+             && (pushDYaw <  0x4000)) {
                 pushSpeed *= -1.0f;
             }
 
@@ -245,18 +247,16 @@ void stop_and_set_height_to_floor(struct MarioState *m) {
     }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
-    vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_set(marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
 }
 
 s32 stationary_ground_step(struct MarioState *m) {
-    u32 takeStep;
     struct Object *marioObj = m->marioObj;
     u32 stepResult = GROUND_STEP_NONE;
 
     mario_set_forward_vel(m, 0.0f);
 
-    takeStep = mario_update_moving_sand(m);
-    takeStep |= mario_update_windy_ground(m);
+    u32 takeStep = (mario_update_moving_sand(m) | mario_update_windy_ground(m));
     if (takeStep) {
         stepResult = perform_ground_step(m);
     } else {
@@ -265,7 +265,7 @@ s32 stationary_ground_step(struct MarioState *m) {
         }
 
         vec3f_copy(marioObj->header.gfx.pos, m->pos);
-        vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+        vec3s_set(marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
     }
 
     return stepResult;
@@ -345,9 +345,9 @@ s32 perform_ground_step(struct MarioState *m) {
     set_mario_wall(m, NULL);
 
     for (i = 0; i < 4; i++) {
-        intendedPos[0] = m->pos[0] + m->floor->normal.y * (m->vel[0] / 4.0f);
-        intendedPos[2] = m->pos[2] + m->floor->normal.y * (m->vel[2] / 4.0f);
-        intendedPos[1] = m->pos[1];
+        intendedPos[0] = (m->pos[0] + (m->floor->normal.y * (m->vel[0] / 4.0f)));
+        intendedPos[2] = (m->pos[2] + (m->floor->normal.y * (m->vel[2] / 4.0f)));
+        intendedPos[1] =  m->pos[1];
 
         stepResult = perform_ground_quarter_step(m, intendedPos);
         if (stepResult == GROUND_STEP_LEFT_GROUND || stepResult == GROUND_STEP_HIT_WALL_STOP_QSTEPS) {
@@ -357,7 +357,7 @@ s32 perform_ground_step(struct MarioState *m) {
 
     m->terrainSoundAddend = mario_get_terrain_sound_addend(m);
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
 
     if (stepResult == GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS) {
         stepResult = GROUND_STEP_HIT_WALL;
@@ -504,18 +504,23 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     //! When the wall is not completely vertical or there is a slight wall
     // misalignment, you can activate these conditions in unexpected situations
 
-    if ((stepArg & AIR_STEP_CHECK_LEDGE_GRAB) && upperWall.numWalls == 0 && lowerWall.numWalls != 0) {
+    if ((stepArg & AIR_STEP_CHECK_LEDGE_GRAB)
+     && (upperWall.numWalls == 0)
+     && (lowerWall.numWalls != 0)) {
         for (i = 0; i < lowerWall.numWalls; i++) {
             grabbedWall = check_ledge_grab(m, grabbedWall, lowerWall.walls[i], intendedPos, nextPos, ledgePos, &ledgeFloor);
             if (grabbedWall != NULL) {
                 stepResult = AIR_STEP_GRABBED_LEDGE;
             }
         }
-        if (stepResult == AIR_STEP_GRABBED_LEDGE && grabbedWall != NULL && ledgeFloor != NULL && ledgePos != NULL) {
+        if ((stepResult == AIR_STEP_GRABBED_LEDGE)
+         && (grabbedWall != NULL)
+         && (ledgeFloor  != NULL)
+         && (ledgePos    != NULL)) {
             vec3f_copy(m->pos, ledgePos);
             set_mario_floor(m, floor, ledgePos[1]);
             m->faceAngle[0] = 0x0;
-            m->faceAngle[1] = SURFACE_YAW(grabbedWall) + 0x8000;
+            m->faceAngle[1] = (SURFACE_YAW(grabbedWall) + 0x8000);
         } else {
             vec3f_copy(m->pos, nextPos);
             set_mario_floor(m, floor, floorHeight);
@@ -561,7 +566,7 @@ u32 should_strengthen_gravity_for_jump_ascent(struct MarioState *m) {
     }
 
     if (!(m->input & INPUT_A_DOWN) && m->vel[1] > 20.0f) {
-        return (m->action & ACT_FLAG_CONTROL_JUMP_HEIGHT) != 0;
+        return ((m->action & ACT_FLAG_CONTROL_JUMP_HEIGHT) != 0);
     }
 
     return FALSE;
@@ -617,14 +622,15 @@ void apply_gravity(struct MarioState *m) {
 
 void apply_vertical_wind(struct MarioState *m) {
     f32 maxVelY;
-    f32 offsetY;
 
     if (m->action != ACT_GROUND_POUND) {
-        offsetY = m->pos[1] - -1500.0f;
+        f32 offsetY = (m->pos[1] - -1500.0f);
 
-        if (m->floor->type == SURFACE_VERTICAL_WIND && -3000.0f < offsetY && offsetY < 2000.0f) {
+        if ((m->floor->type == SURFACE_VERTICAL_WIND)
+         && (-3000.0f < offsetY)
+         && (offsetY <  2000.0f)) {
             if (offsetY >= 0.0f) {
-                maxVelY = 10000.0f / (offsetY + 200.0f);
+                maxVelY = (10000.0f / (offsetY + 200.0f));
             } else {
                 maxVelY = 50.0f;
             }
@@ -679,7 +685,7 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     apply_vertical_wind(m);
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
 
     return stepResult;
 }
@@ -687,13 +693,13 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
 // They had these functions the whole time and never used them? Lol
 
 void set_vel_from_pitch_and_yaw(struct MarioState *m) {
-    m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
-    m->vel[1] = m->forwardVel * sins(m->faceAngle[0]);
-    m->vel[2] = m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]);
+    m->vel[0] = (m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]));
+    m->vel[1] = (m->forwardVel * sins(m->faceAngle[0])                        );
+    m->vel[2] = (m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]));
 }
 
 void set_vel_from_yaw(struct MarioState *m) {
-    m->vel[0] = m->slideVelX = m->forwardVel * sins(m->faceAngle[1]);
+    m->vel[0] = m->slideVelX = (m->forwardVel * sins(m->faceAngle[1]));
     m->vel[1] = 0.0f;
-    m->vel[2] = m->slideVelZ = m->forwardVel * coss(m->faceAngle[1]);
+    m->vel[2] = m->slideVelZ = (m->forwardVel * coss(m->faceAngle[1]));
 }

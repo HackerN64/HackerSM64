@@ -16,7 +16,7 @@ static struct SpawnParticlesInfo sThiTopPuffs = {
 };
 
 void bhv_thi_huge_island_top_loop(void) {
-    if (gTHIWaterDrained & 1) {
+    if (gTHIWaterDrained & 0x1) {
         if (o->oTimer == 0) {
             gEnvironmentRegions[18] = 3000;
         }
@@ -27,7 +27,7 @@ void bhv_thi_huge_island_top_loop(void) {
 }
 
 void bhv_thi_tiny_island_top_loop(void) {
-    if (!(gTHIWaterDrained & 1)) {
+    if (!(gTHIWaterDrained & 0x1)) {
         if (o->oAction == 0) {
             if ((o->oDistanceToMario < 500.0f) && (gMarioStates[0].action == ACT_GROUND_POUND_LAND)) {
                 o->oAction = 1;

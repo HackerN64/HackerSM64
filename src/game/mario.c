@@ -1325,8 +1325,8 @@ void update_mario_geometry_inputs(struct MarioState *m) {
  * Handles Mario's input flags as well as a couple timers.
  */
 void update_mario_inputs(struct MarioState *m) {
-    m->particleFlags = 0;
-    m->input = 0;
+    m->particleFlags = PARTICLE_NONE;
+    m->input         = INPUT_NONE;
     m->collidedObjInteractTypes = m->marioObj->collidedObjInteractTypes;
     m->flags &= 0xFFFFFF;
 
@@ -1524,10 +1524,10 @@ void update_mario_info_for_cam(struct MarioState *m) {
 void mario_reset_bodystate(struct MarioState *m) {
     struct MarioBodyState *bodyState = m->marioBodyState;
 
-    bodyState->capState = MARIO_HAS_DEFAULT_CAP_OFF;
-    bodyState->eyeState = MARIO_EYES_BLINK;
-    bodyState->handState = MARIO_HAND_FISTS;
-    bodyState->modelState = 0;
+    bodyState->capState    = MARIO_HAS_DEFAULT_CAP_OFF;
+    bodyState->eyeState    = MARIO_EYES_BLINK;
+    bodyState->handState   = MARIO_HAND_FISTS;
+    bodyState->modelState  = 0;
     bodyState->wingFlutter = FALSE;
 
     m->flags &= ~MARIO_METAL_SHOCK;
@@ -1618,7 +1618,7 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
     //! (Pause buffered hitstun) Since the global timer increments while paused,
     //  this can be paused through to give continual invisibility. This leads to
     //  no interaction with objects.
-    if ((m->invincTimer >= 3) && (gGlobalTimer & 1)) {
+    if ((m->invincTimer >= 3) && (gGlobalTimer & 0x1)) {
         m->marioObj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
     }
 
@@ -1772,7 +1772,7 @@ s32 execute_mario_action(struct MarioState *m) {
  **************************************************/
 
 void init_mario(struct MarioState *m) {
-    m->actionTimer = 0;
+    m->actionTimer  = 0;
     m->framesSinceA = 0xFF;
     m->framesSinceB = 0xFF;
 
@@ -1784,7 +1784,7 @@ void init_mario(struct MarioState *m) {
         m->flags = (MARIO_NORMAL_CAP | MARIO_CAP_ON_HEAD);
     }
 
-    m->forwardVel = 0.0f;
+    m->forwardVel  = 0.0f;
     m->squishTimer = 0;
 
     m->hurtCounter = 0;
@@ -1825,7 +1825,7 @@ void init_mario(struct MarioState *m) {
     vec3_copy(&m->marioObj->oMoveAngleVec, m->faceAngle);
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
 
     Vec3s capPos;
     if (save_file_get_cap_pos(capPos)) {

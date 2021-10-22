@@ -121,7 +121,7 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
     }
 
     sp1C.x = sp1C.y = sp1C.z = 0.0f;
-    if (flag & 2) {
+    if (flag & (1 << 1)) {
         gd_dl_load_trans_matrix(f, g, h);
         sp1C.x += f;
         sp1C.y += g;
@@ -171,11 +171,11 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
         update_shaders(shape, &sp1C);
     }
 
-    if (flag & 4) {
+    if (flag & (1 << 2)) {
         gd_dl_mul_trans_matrix(i, j, k);
     }
 
-    if (flag & 1) {
+    if (flag & (1 << 0)) {
         gd_dl_scale(c, d, e);
     }
 
@@ -196,7 +196,7 @@ void draw_shape_2d(struct ObjShape *shape, s32 flag, UNUSED f32 c, UNUSED f32 d,
         return;
     }
 
-    if (flag & 2) {
+    if (flag & (1 << 1)) {
         sp1C.x = f;
         sp1C.y = g;
         sp1C.z = h;

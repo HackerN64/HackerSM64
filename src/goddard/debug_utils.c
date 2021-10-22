@@ -525,7 +525,7 @@ f32 gd_rand_float(void) {
 
     for (i = 0; i < 4; i++) {
         if (sPrimarySeed & 0x80000000) {
-            sPrimarySeed = sPrimarySeed << 1 | 1;
+            sPrimarySeed = ((sPrimarySeed << 1) | 1);
         } else {
             sPrimarySeed <<= 1;
         }
@@ -533,7 +533,7 @@ f32 gd_rand_float(void) {
     sPrimarySeed += 4;
 
     /* Seed Switch */
-    if ((sPrimarySeed ^= gd_get_ostime()) & 1) {
+    if ((sPrimarySeed ^= gd_get_ostime()) & 0x1) {
         u32 temp = sPrimarySeed;
         sPrimarySeed = sSecondarySeed;
         sSecondarySeed = temp;
@@ -718,9 +718,7 @@ void ascii_to_uppercase(char *str) {
 
 /* 23C52C -> 23C5A8; orig name: func_8018DD5C */
 char *gd_strdup(const char *src) {
-    char *dst; // sp24
-
-    dst = gd_malloc_perm((gd_strlen(src) + 1) * sizeof(char));
+    char *dst = gd_malloc_perm((gd_strlen(src) + 1) * sizeof(char));
 
     if (dst == NULL) {
         fatal_printf("gd_strdup(): out of memory");
@@ -766,7 +764,7 @@ s32 gd_str_not_equal(const char *str1, const char *str2) {
         }
     }
 
-    return *str1 != '\0' || *str2 != '\0';
+    return ((*str1 != '\0') || (*str2 != '\0'));
 }
 
 /* 23C728 -> 23C7B8; orig name; func_8018DF58 */
@@ -784,12 +782,12 @@ s32 gd_str_contains(const char *str1, const char *str2) {
 
 /* 23C7B8 -> 23C7DC; orig name: func_8018DFE8 */
 s32 gd_feof(struct GdFile *f) {
-    return f->flags & 0x4;
+    return (f->flags & (1 << 2));
 }
 
 /* 23C7DC -> 23C7FC; orig name: func_8018E00C */
 void gd_set_feof(struct GdFile *f) {
-    f->flags |= 0x4;
+    f->flags |= (1 << 2);
 }
 
 /* 23C7FC -> 23CA0C */
@@ -836,10 +834,10 @@ struct GdFile *gd_fopen(const char *filename, const char *mode) {
     f->size = buf.size;
     f->pos = f->flags = 0;
     if (gd_str_contains(mode, "w")) {
-        f->flags |= 0x1;
+        f->flags |= (1 << 0);
     }
     if (gd_str_contains(mode, "b")) {
-        f->flags |= 0x2;
+        f->flags |= (1 << 1);
     }
 
     return f;

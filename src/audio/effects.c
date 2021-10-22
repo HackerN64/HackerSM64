@@ -501,15 +501,15 @@ s32 adsr_update(struct AdsrState *adsr) {
 
     if ((action & ADSR_ACTION_DECAY)) {
         adsr->state = ADSR_STATE_DECAY;
-        adsr->action = action & ~ADSR_ACTION_DECAY;
+        adsr->action = (action & ~ADSR_ACTION_DECAY);
     }
 
     if ((action & ADSR_ACTION_RELEASE)) {
         adsr->state = ADSR_STATE_RELEASE;
 #if defined(VERSION_EU) || defined(VERSION_SH)
-        adsr->action = action & ~ADSR_ACTION_RELEASE;
+        adsr->action = (action & ~ADSR_ACTION_RELEASE);
 #else
-        adsr->action = action & ~(ADSR_ACTION_RELEASE | ADSR_ACTION_DECAY);
+        adsr->action = (action & ~(ADSR_ACTION_RELEASE | ADSR_ACTION_DECAY));
 #endif
     }
 

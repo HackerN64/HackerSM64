@@ -1513,13 +1513,13 @@ u32 interact_hoot(struct MarioState *m, UNUSED u32 interactType, struct Object *
 u32 interact_cap(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
     u32 capFlag = get_mario_cap_flag(obj);
     u16 capMusic = 0;
-    u16 capTime = 0;
+    u16 capTime  = 0;
 
-    if (m->action != ACT_GETTING_BLOWN && capFlag != 0) {
+    if ((m->action != ACT_GETTING_BLOWN) && (capFlag != 0)) {
         m->interactObj = obj;
         obj->oInteractStatus = INT_STATUS_INTERACTED;
 
-        m->flags &= ~MARIO_CAP_ON_HEAD & ~MARIO_CAP_IN_HAND;
+        m->flags &= ~(MARIO_CAP_ON_HEAD | MARIO_CAP_IN_HAND);
         m->flags |= capFlag;
 
         switch (capFlag) {

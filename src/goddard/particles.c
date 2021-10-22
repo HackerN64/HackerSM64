@@ -103,7 +103,7 @@ void func_80181EB0(struct Connection *cxn) {
     struct ObjParticle *sp0 = cxn->node2.ptc;
 
     sp34.x = 0.0f;
-    sp34.y = sp4->pos.y - sp0->pos.y;
+    sp34.y = (sp4->pos.y - sp0->pos.y);
     sp34.z = 0.0f;
     sp34.y *= 0.01f;
     sp4->unk38.x -= sp34.x;
@@ -112,12 +112,12 @@ void func_80181EB0(struct Connection *cxn) {
     sp0->unk38.x += sp34.x;
     sp0->unk38.y += sp34.y;
     sp0->unk38.z += sp34.z;
-    if (!(sp4->flags & 2)) {
+    if (!(sp4->flags & (1 << 1))) {
         sp4->pos.x -= sp34.x;
         sp4->pos.y -= sp34.y;
         sp4->pos.z -= sp34.z;
     }
-    if (!(sp0->flags & 2)) {
+    if (!(sp0->flags & (1 << 1))) {
         sp0->pos.x += sp34.x;
         sp0->pos.y += sp34.y;
         sp0->pos.z += sp34.z;
@@ -155,12 +155,12 @@ void func_80182088(struct Connection *cxn) {
     sp18->unk38.x += vec.x;
     sp18->unk38.y += vec.y;
     sp18->unk38.z += vec.z;
-    if (!(sp1C->flags & 2)) {
+    if (!(sp1C->flags & (1 << 1))) {
         sp1C->pos.x -= vec.x;
         sp1C->pos.y -= vec.y;
         sp1C->pos.z -= vec.z;
     }
-    if (!(sp18->flags & 2)) {
+    if (!(sp18->flags & (1 << 1))) {
         sp18->pos.x += vec.x;
         sp18->pos.y += vec.y;
         sp18->pos.z += vec.z;
@@ -315,19 +315,19 @@ void move_particle(struct ObjParticle *ptc) {
     struct GdVec3f sp40;
     struct GdVec3f sp34;
 
-    if (ptc->flags & 2) {
+    if (ptc->flags & (1 << 1)) {
         return;
     }
-    if (!(ptc->flags & 8)) {
+    if (!(ptc->flags & (1 << 3))) {
         return;
     }
     if (ptc->unk60 == 3) {
-        sp40.x = -gViewUpdateCamera->unkE8[2][0] * 50.0f;
-        sp40.y = -gViewUpdateCamera->unkE8[2][1] * 50.0f;
-        sp40.z = gViewUpdateCamera->unkE8[2][2] * 50.0f;
-        sp34.x = gViewUpdateCamera->unkE8[2][0] * -20.0f;
-        sp34.y = gViewUpdateCamera->unkE8[2][1] * -20.0f;
-        sp34.z = gViewUpdateCamera->unkE8[2][2] * -20.0f;
+        sp40.x = (-gViewUpdateCamera->unkE8[2][0] *  50.0f);
+        sp40.y = (-gViewUpdateCamera->unkE8[2][1] *  50.0f);
+        sp40.z = ( gViewUpdateCamera->unkE8[2][2] *  50.0f);
+        sp34.x = ( gViewUpdateCamera->unkE8[2][0] * -20.0f);
+        sp34.y = ( gViewUpdateCamera->unkE8[2][1] * -20.0f);
+        sp34.z = ( gViewUpdateCamera->unkE8[2][2] * -20.0f);
     }
     if (ptc->attachedToObj != NULL) {
         set_cur_dynobj(ptc->attachedToObj);
@@ -337,10 +337,10 @@ void move_particle(struct ObjParticle *ptc) {
                 // Camera->unk18C = ObjView here
                 if (sp4C->unk18C->pickedObj != NULL) {
                     set_cur_dynobj(sp4C->unk18C->pickedObj);
-                    ptc->flags |= 0x20;
+                    ptc->flags |= (1 << 5);
                 } else {
-                    ptc->flags &= ~0x10;
-                    ptc->flags &= ~0x20;
+                    ptc->flags &= ~(1 << 4);
+                    ptc->flags &= ~(1 << 5);
                 }
             }
         }
@@ -353,7 +353,7 @@ void move_particle(struct ObjParticle *ptc) {
     ptc->pos.x += ptc->unk38.x;
     ptc->pos.y += ptc->unk38.y;
     ptc->pos.z += ptc->unk38.z;
-    if (ptc->flags & 1) {
+    if (ptc->flags & (1 << 0)) {
         ptc->unk38.y += sp7C;
     }
     switch (ptc->unkB0) {
@@ -410,9 +410,9 @@ void move_particle(struct ObjParticle *ptc) {
                         sp2C->pos.z = ptc->pos.z;
                         sp2C->timeout = 20;
                         do {
-                            sp2C->unk38.x = gd_rand_float() * 64.0f - 32.0f;
-                            sp2C->unk38.y = gd_rand_float() * 64.0f - 32.0f;
-                            sp2C->unk38.z = gd_rand_float() * 64.0f - 32.0f;
+                            sp2C->unk38.x = ((gd_rand_float() * 64.0f) - 32.0f);
+                            sp2C->unk38.y = ((gd_rand_float() * 64.0f) - 32.0f);
+                            sp2C->unk38.z = ((gd_rand_float() * 64.0f) - 32.0f);
                         } while (gd_vec3f_magnitude(&sp2C->unk38) > 32.0f);
                         sp2C->unk30 = gd_rand_float() * 180.0f;
                         sp2C->header.drawFlags &= ~OBJ_INVISIBLE;
@@ -422,9 +422,9 @@ void move_particle(struct ObjParticle *ptc) {
                 }
                 break;
             case 3:
-                if ((ptc->flags & 0x20) && !(ptc->flags & 0x10)) {
+                if ((ptc->flags & (1 << 5)) && !(ptc->flags & (1 << 4))) {
                     func_80182A08(ptc, &sp40);
-                    ptc->flags |= 0x10;
+                    ptc->flags |= (1 << 4);
                 }
                 break;
             case 2:

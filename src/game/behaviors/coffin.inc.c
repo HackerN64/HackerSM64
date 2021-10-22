@@ -37,7 +37,7 @@ void bhv_coffin_spawner_loop(void) {
                 relativeZ = coffinRelativePos[i].z;
 
                 // Behavior param of 0 for all even i, 1 for all odd
-                coffin = spawn_object_relative(i & 1, coffinRelativePos[i].x, 0, relativeZ, o,
+                coffin = spawn_object_relative(i & 0x1, coffinRelativePos[i].x, 0, relativeZ, o,
                                                MODEL_BBH_WOODEN_TOMB, bhvCoffin);
 
                 // Never true, game would enter a while(1) before it could.

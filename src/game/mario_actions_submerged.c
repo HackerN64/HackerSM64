@@ -31,7 +31,7 @@ static s16 sBobIncrement;
 static f32 sBobHeight;
 
 static void set_swimming_at_surface_particles(struct MarioState *m, u32 particleFlag) {
-    s16 atSurface = m->pos[1] >= m->waterLevel - 130;
+    s16 atSurface = (m->pos[1] >= (m->waterLevel - 130));
 
     if (atSurface) {
         m->particleFlags |= particleFlag;
@@ -130,8 +130,8 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
         s16 currentAngle = (m->floor->force << 8);
         f32 currentSpeed = sWaterCurrentSpeeds[m->floor->force >> 8];
 
-        step[0] += currentSpeed * sins(currentAngle);
-        step[2] += currentSpeed * coss(currentAngle);
+        step[0] += (currentSpeed * sins(currentAngle));
+        step[2] += (currentSpeed * coss(currentAngle));
     }
 
     for (i = 0; i < 2; i++) {
@@ -149,16 +149,16 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
                     whirlpoolRadius = 4000.0f;
                 }
 #endif
-                if (distance >= 26.0f && distance < whirlpoolRadius) {
-                    strength = whirlpool->strength * (1.0f - distance / whirlpoolRadius);
+                if ((distance >= 26.0f) && (distance < whirlpoolRadius) && (whirlpoolRadius > 0.0f)) {
+                    strength = whirlpool->strength * (1.0f - (distance / whirlpoolRadius));
                 }
             } else if (distance < 2000.0f) {
-                strength = whirlpool->strength * (1.0f - distance / 2000.0f);
+                strength = whirlpool->strength * (1.0f - (distance / 2000.0f));
             }
 
-            step[0] += strength * coss(pitchToWhirlpool) * sins(yawToWhirlpool);
-            step[1] += strength * sins(pitchToWhirlpool);
-            step[2] += strength * coss(pitchToWhirlpool) * coss(yawToWhirlpool);
+            step[0] += (strength * coss(pitchToWhirlpool) * sins(yawToWhirlpool));
+            step[1] += (strength * sins(pitchToWhirlpool)                       );
+            step[2] += (strength * coss(pitchToWhirlpool) * coss(yawToWhirlpool));
         }
     }
 }
@@ -200,11 +200,11 @@ static void update_water_pitch(struct MarioState *m) {
     }
 
     if (marioObj->header.gfx.angle[0] < 0) {
-        marioObj->header.gfx.angle[0] = marioObj->header.gfx.angle[0] * 6 / 10;
+        marioObj->header.gfx.angle[0] = (marioObj->header.gfx.angle[0] * 6 / 10);
     }
 
     if (marioObj->header.gfx.angle[0] > 0) {
-        marioObj->header.gfx.angle[0] = marioObj->header.gfx.angle[0] * 10 / 8;
+        marioObj->header.gfx.angle[0] = (marioObj->header.gfx.angle[0] * 10 / 8);
     }
 }
 
@@ -220,8 +220,10 @@ static void stationary_slow_down(struct MarioState *m) {
     m->faceAngle[0] = approach_s32(m->faceAngle[0], 0, 0x200, 0x200);
     m->faceAngle[2] = approach_s32(m->faceAngle[2], 0, 0x100, 0x100);
 
-    m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
-    m->vel[2] = m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]);
+    f32 velPitch = m->forwardVel * coss(m->faceAngle[0]);
+
+    m->vel[0] = (velPitch * sins(m->faceAngle[1]));
+    m->vel[2] = (velPitch * coss(m->faceAngle[1]));
 }
 
 static void update_swimming_speed(struct MarioState *m, f32 decelThreshold) {
@@ -244,9 +246,9 @@ static void update_swimming_speed(struct MarioState *m, f32 decelThreshold) {
         m->forwardVel -= 0.5f;
     }
 
-    m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
-    m->vel[1] = m->forwardVel * sins(m->faceAngle[0]) + buoyancy;
-    m->vel[2] = m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]);
+    m->vel[0] = (m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]));
+    m->vel[1] = (m->forwardVel * sins(m->faceAngle[0]) + buoyancy);
+    m->vel[2] = (m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]));
 }
 
 static void update_swimming_yaw(struct MarioState *m) {
@@ -275,7 +277,7 @@ static void update_swimming_yaw(struct MarioState *m) {
     }
 
     m->faceAngle[1] += m->angleVel[1];
-    m->faceAngle[2] = -m->angleVel[1] * 8;
+    m->faceAngle[2] = (-m->angleVel[1] * 8);
 }
 
 static void update_swimming_pitch(struct MarioState *m) {
@@ -309,7 +311,7 @@ static void common_idle_step(struct MarioState *m, s32 animation, s32 arg) {
     update_water_pitch(m);
 
     if (m->faceAngle[0] > 0) {
-        *val = approach_s32(*val, m->faceAngle[0] / 2, 0x80, 0x200);
+        *val = approach_s32(*val, (m->faceAngle[0] / 2), 0x80, 0x200);
     } else {
         *val = approach_s32(*val, 0, 0x200, 0x200);
     }
@@ -423,9 +425,10 @@ static void reset_bob_variables(struct MarioState *m) {
  * Controls the bobbing that happens when you swim near the surface.
  */
 static void surface_swim_bob(struct MarioState *m) {
-    if (sBobIncrement != 0 && m->pos[1] > m->waterLevel - 85 && m->faceAngle[0] >= 0) {
-        if ((sBobTimer += sBobIncrement) >= 0) {
-            m->marioObj->header.gfx.pos[1] += sBobHeight * sins(sBobTimer);
+    if ((sBobIncrement != 0) && (m->pos[1] > (m->waterLevel - 85)) && (m->faceAngle[0] >= 0)) {
+        sBobTimer += sBobIncrement;
+        if (sBobTimer >= 0) {
+            m->marioObj->header.gfx.pos[1] += (sBobHeight * sins(sBobTimer));
             return;
         }
     }
@@ -437,7 +440,7 @@ static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
     s16 floorPitch;
     update_swimming_yaw(m);
     update_swimming_pitch(m);
-    update_swimming_speed(m, swimStrength / 10.0f);
+    update_swimming_speed(m, (swimStrength / 10.0f));
 
     switch (perform_water_step(m)) {
         case WATER_STEP_HIT_FLOOR:
@@ -472,7 +475,7 @@ static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
     }
 
     update_water_pitch(m);
-    m->marioBodyState->headAngle[0] = approach_s32(m->marioBodyState->headAngle[0], 0, 0x200, 0x200);
+    m->marioBodyState->headAngle[0] = approach_s32(m->marioBodyState->headAngle[0], 0x0, 0x200, 0x200);
 
     surface_swim_bob(m);
     set_swimming_at_surface_particles(m, PARTICLE_WAVE_TRAIL);
@@ -486,10 +489,8 @@ static void play_swimming_noise(struct MarioState *m) {
 }
 
 static s32 check_water_jump(struct MarioState *m) {
-    s32 probe = (s32)(m->pos[1] + 1.5f);
-
     if (m->input & INPUT_A_PRESSED) {
-        if (probe >= m->waterLevel - 80 && m->faceAngle[0] >= 0 && m->controller->stickY < -60.0f) {
+        if (((s32)(m->pos[1] + 1.5f) >= (m->waterLevel - 80)) && (m->faceAngle[0] >= 0x0) && (m->controller->stickY < -60.0f)) {
             vec3_zero(m->angleVel);
 
             m->vel[1] = 62.0f;
@@ -661,11 +662,11 @@ static s32 act_hold_breaststroke(struct MarioState *m) {
     }
 
     if (m->actionTimer >= 2) {
-        if (m->actionTimer < 6 && (m->input & INPUT_A_PRESSED)) {
+        if ((m->actionTimer < 6) && (m->input & INPUT_A_PRESSED)) {
             m->actionState = ACT_STATE_BREASTSTROKE_CONTINUE;
         }
 
-        if (m->actionTimer == 9 && m->actionState == ACT_STATE_BREASTSTROKE_CONTINUE) {
+        if ((m->actionTimer == 9) && (m->actionState == ACT_STATE_BREASTSTROKE_CONTINUE)) {
             set_anim_to_frame(m, 0);
             m->actionState = ACT_STATE_BREASTSTROKE_START;
             m->actionTimer = 1;
@@ -703,7 +704,7 @@ static s32 act_hold_swimming_end(struct MarioState *m) {
         return TRUE;
     }
 
-    if ((m->input & INPUT_A_DOWN) && m->actionTimer >= 7) {
+    if ((m->input & INPUT_A_DOWN) && (m->actionTimer >= 7)) {
         return set_mario_action(m, ACT_HOLD_BREASTSTROKE, 0);
     }
 
@@ -772,11 +773,11 @@ static s32 check_water_grab(struct MarioState *m) {
     // you can use water grab to pick up heave ho.
     if (m->marioObj->collidedObjInteractTypes & INTERACT_GRABBABLE) {
         struct Object *object = mario_get_collided_object(m, INTERACT_GRABBABLE);
-        f32 dx = object->oPosX - m->pos[0];
-        f32 dz = object->oPosZ - m->pos[2];
-        s16 dAngleToObject = atan2s(dz, dx) - m->faceAngle[1];
+        f32 dx = (object->oPosX - m->pos[0]);
+        f32 dz = (object->oPosZ - m->pos[2]);
+        s16 dAngleToObject = abs_angle_diff(atan2s(dz, dx), m->faceAngle[1]);
 
-        if (dAngleToObject >= -0x2AAA && dAngleToObject <= 0x2AAA) {
+        if (dAngleToObject <= 0x2AAA) {
             m->usedObj = object;
             mario_grab_used_object(m);
             m->marioBodyState->grabPos = GRAB_POS_LIGHT_OBJ;
@@ -859,7 +860,7 @@ static s32 act_water_punch(struct MarioState *m) {
     return FALSE;
 }
 
-static void common_water_knockback_step(struct MarioState *m, s32 animation, u32 endAction, s32 arg3) {
+static void common_water_knockback_step(struct MarioState *m, s32 animation, u32 endAction, s32 actionArg) {
     stationary_slow_down(m);
     perform_water_step(m);
     set_mario_animation(m, animation);
@@ -867,11 +868,11 @@ static void common_water_knockback_step(struct MarioState *m, s32 animation, u32
     m->marioBodyState->headAngle[0] = 0;
 
     if (is_anim_at_end(m)) {
-        if (arg3 > 0) {
+        if (actionArg > 0) {
             m->invincTimer = 30;
         }
 
-        set_mario_action(m, m->health >= 0x100 ? endAction : ACT_WATER_DEATH, 0);
+        set_mario_action(m, ((m->health >= 0x100) ? endAction : ACT_WATER_DEATH), 0);
     }
 }
 
@@ -897,7 +898,7 @@ static s32 act_water_shocked(struct MarioState *m) {
 
     if (m->actionTimer >= 6) {
         m->invincTimer = 30;
-        set_mario_action(m, m->health < 0x100 ? ACT_WATER_DEATH : ACT_WATER_IDLE, 0);
+        set_mario_action(m, ((m->health < 0x100) ? ACT_WATER_DEATH : ACT_WATER_IDLE), 0);
     }
 
     stationary_slow_down(m);
@@ -947,7 +948,6 @@ static s32 act_water_death(struct MarioState *m) {
 }
 
 static s32 act_water_plunge(struct MarioState *m) {
-    u32 stepResult;
     s32 stateFlags = (m->heldObj != NULL);
 
     f32 endVSpeed;
@@ -967,7 +967,7 @@ static s32 act_water_plunge(struct MarioState *m) {
 
     stationary_slow_down(m);
 
-    stepResult = perform_water_step(m);
+    u32 stepResult = perform_water_step(m);
 
     if (m->actionState == ACT_STATE_WATER_PLUNGE_FALL) {
         play_sound(SOUND_ACTION_WATER_PLUNGE, m->marioObj->header.gfx.cameraToObject);
@@ -1037,11 +1037,11 @@ static s32 act_caught_in_whirlpool(struct MarioState *m) {
     f32 newDistance;
     s16 angleChange;
 
-    struct Object *marioObj = m->marioObj;
+    struct Object *marioObj  = m->marioObj;
     struct Object *whirlpool = m->usedObj;
 
-    f32 dx = m->pos[0] - whirlpool->oPosX;
-    f32 dz = m->pos[2] - whirlpool->oPosZ;
+    f32 dx = (m->pos[0] - whirlpool->oPosX);
+    f32 dz = (m->pos[2] - whirlpool->oPosZ);
     f32 distance = sqrtf(sqr(dx) + sqr(dz));
 
     if ((marioObj->oMarioWhirlpoolPosY += m->vel[1]) < 0.0f) {
@@ -1055,35 +1055,35 @@ static s32 act_caught_in_whirlpool(struct MarioState *m) {
         newDistance = 16.0f;
         angleChange = 0x1800;
     } else if (distance < 256.0f) {
-        newDistance = distance - (12.0f - distance / 32.0f);
-        angleChange = (s16)(0x1C00 - distance * 20.0f);
+        newDistance = (distance - (12.0f - distance / 32.0f));
+        angleChange = (s16)(0x1C00 - (distance * 20.0f));
     } else {
-        newDistance = distance - 4.0f;
+        newDistance = (distance - 4.0f);
         angleChange = 0x800;
     }
 
-    m->vel[1] = -640.0f / (newDistance + 16.0f);
+    m->vel[1] = (-640.0f / (newDistance + 16.0f));
 
     f32 sinAngleChange = sins(angleChange);
     f32 cosAngleChange = coss(angleChange);
 
     if (distance < 1.0f) {
-        dx = newDistance * sins(m->faceAngle[1]);
-        dz = newDistance * coss(m->faceAngle[1]);
+        dx = (newDistance * sins(m->faceAngle[1]));
+        dz = (newDistance * coss(m->faceAngle[1]));
     } else {
-        dx *= newDistance / distance;
-        dz *= newDistance / distance;
+        dx *= (newDistance / distance);
+        dz *= (newDistance / distance);
     }
 
-    m->pos[0] = whirlpool->oPosX + dx * cosAngleChange + dz * sinAngleChange;
-    m->pos[2] = whirlpool->oPosZ - dx * sinAngleChange + dz * cosAngleChange;
-    m->pos[1] = whirlpool->oPosY + marioObj->oMarioWhirlpoolPosY;
+    m->pos[0] = (whirlpool->oPosX + (dx * cosAngleChange) + (dz * sinAngleChange));
+    m->pos[2] = (whirlpool->oPosZ - (dx * sinAngleChange) + (dz * cosAngleChange));
+    m->pos[1] = (whirlpool->oPosY + marioObj->oMarioWhirlpoolPosY);
 
-    m->faceAngle[1] = atan2s(dz, dx) + 0x8000;
+    m->faceAngle[1] = (atan2s(dz, dx) + 0x8000);
 
     set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
 #if ENABLE_RUMBLE
     reset_rumble_timers_slip();
 #endif
@@ -1096,7 +1096,7 @@ static void play_metal_water_jumping_sound(struct MarioState *m, u32 landing) {
         m->particleFlags |= PARTICLE_MIST_CIRCLE;
     }
 
-    play_sound_if_no_flag(m, landing ? SOUND_ACTION_METAL_LAND_WATER : SOUND_ACTION_METAL_JUMP_WATER,
+    play_sound_if_no_flag(m, (landing ? SOUND_ACTION_METAL_LAND_WATER : SOUND_ACTION_METAL_JUMP_WATER),
                           MARIO_ACTION_SOUND_PLAYED);
 }
 

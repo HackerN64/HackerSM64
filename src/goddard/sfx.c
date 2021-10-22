@@ -18,7 +18,7 @@ void gd_reset_sfx(void) {
  * This is used by geo_draw_mario_head_goddard to start new sounds.
  */
 u32 gd_new_sfx_to_play(void) {
-    return ~sPrevSfx & sCurrSfx;
+    return (~sPrevSfx & sCurrSfx);
 }
 
 /**

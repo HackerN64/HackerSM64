@@ -138,13 +138,13 @@ void func_80192528(struct ObjNet *net) {
     D_801B9E28.z = 0.0f;
     D_801B9E34 = 0.0f;
 
-    if (net->flags & 0x1) {
+    if (net->flags & (1 << 0)) {
         net->velocity.y -= 4.0f;
     }
 
-    net->worldPos.x += net->velocity.x / 1.0f;
-    net->worldPos.y += net->velocity.y / 1.0f;
-    net->worldPos.z += net->velocity.z / 1.0f;
+    net->worldPos.x += (net->velocity.x / 1.0f);
+    net->worldPos.y += (net->velocity.y / 1.0f);
+    net->worldPos.z += (net->velocity.z / 1.0f);
 }
 
 /* 240E74 -> 2412A0 */
@@ -155,13 +155,14 @@ void collision_something_801926A4(struct ObjNet *net) {
             D_801B9E28.y /= D_801B9E34;
             D_801B9E28.z /= D_801B9E34;
         }
+        f32 invctrl = (1.0f / gGdCounter.ctr1);
 
-        D_801B9E28.x *= 1.0f / gGdCounter.ctr1;
-        D_801B9E28.y *= 1.0f / gGdCounter.ctr1;
-        D_801B9E28.z *= 1.0f / gGdCounter.ctr1;
-        D_801B9E18.x *= 1.0f / gGdCounter.ctr1;
-        D_801B9E18.y *= 1.0f / gGdCounter.ctr1;
-        D_801B9E18.z *= 1.0f / gGdCounter.ctr1;
+        D_801B9E28.x *= invctrl;
+        D_801B9E28.y *= invctrl;
+        D_801B9E28.z *= invctrl;
+        D_801B9E18.x *= invctrl;
+        D_801B9E18.y *= invctrl;
+        D_801B9E18.z *= invctrl;
 
         func_8017E584(gGdSkinNet, &D_801B9E28, &D_801B9E18);
         func_8017E838(gGdSkinNet, &D_801B9E28, &D_801B9E18);
@@ -170,9 +171,9 @@ void collision_something_801926A4(struct ObjNet *net) {
     net->torque.x += net->collTorque.x;
     net->torque.y += net->collTorque.y;
     net->torque.z += net->collTorque.z;
-    net->collDisp.x *= 1.0f;
-    net->collDisp.y *= 1.0f;
-    net->collDisp.z *= 1.0f;
+    // net->collDisp.x *= 1.0f;
+    // net->collDisp.y *= 1.0f;
+    // net->collDisp.z *= 1.0f;
     net->velocity.x += net->collDisp.x;
     net->velocity.y += net->collDisp.y;
     net->velocity.z += net->collDisp.z;
