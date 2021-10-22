@@ -3,6 +3,7 @@
 #include "sm64.h"
 #include "mario_actions_moving.h"
 #include "mario_actions_object.h"
+#include "mario_actions_airborne.h"
 #include "mario.h"
 #include "audio/external.h"
 #include "engine/math_util.h"
@@ -1431,7 +1432,7 @@ s32 act_slide_kick_slide(struct MarioState *m) {
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
-        return set_jumping_action(m, ACT_FORWARD_ROLLOUT, 0);
+        return set_jumping_action(m, ACT_ROLLOUT, ACT_ARG_ROLLOUT_FORWARD);
     }
 
     set_mario_animation(m, MARIO_ANIM_SLIDE_KICK);
@@ -1463,8 +1464,7 @@ s32 stomach_slide_action(struct MarioState *m, u32 stopAction, u32 airAction, s3
 #if ENABLE_RUMBLE
             queue_rumble_data(5, 80);
 #endif
-            return drop_and_set_mario_action(
-                m, m->forwardVel >= 0.0f ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT, 0);
+            return drop_and_set_mario_action(m, ACT_ROLLOUT, (m->forwardVel >= 0.0f));
         }
     } else {
         m->actionTimer++;
@@ -1495,7 +1495,7 @@ s32 act_dive_slide(struct MarioState *m) {
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
-        return set_mario_action(m, m->forwardVel > 0.0f ? ACT_FORWARD_ROLLOUT : ACT_BACKWARD_ROLLOUT, 0);
+        return set_mario_action(m, ACT_ROLLOUT, (m->forwardVel > 0.0f));
     }
 
     play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_BODY_HIT_GROUND);
