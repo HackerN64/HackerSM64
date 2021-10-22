@@ -25,7 +25,12 @@ enum ActionStatesGettingBlown { // act_getting_blown
     ACT_STATE_GETTING_BLOWN_SLOW_DOWN
 };
 
-enum ActionStatesRollout { // act_forward_rollout, act_backward_rollout
+enum ActionArgsRollout { // act_rollout
+    ACT_ARG_ROLLOUT_BACKWARD,
+    ACT_ARG_ROLLOUT_FORWARD
+};
+
+enum ActionStatesRollout { // act_rollout
     ACT_STATE_ROLLOUT_START_HOP,
     ACT_STATE_ROLLOUT_SPIN,
     ACT_STATE_ROLLOUT_SPIN_END

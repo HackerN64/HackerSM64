@@ -1274,7 +1274,8 @@ s32 act_air_hit_wall(struct MarioState *m) {
     return FALSE;
 }
 
-s32 act_forward_rollout(struct MarioState *m) {
+s32 act_rollout(struct MarioState *m) {
+    u32 actionArg = m->actionArg;
     if (m->actionState == ACT_STATE_ROLLOUT_START_HOP) {
         m->vel[1] = 30.0f;
         m->actionState = ACT_STATE_ROLLOUT_SPIN;
@@ -1287,7 +1288,7 @@ s32 act_forward_rollout(struct MarioState *m) {
     switch (perform_air_step(m, 0)) {
         case AIR_STEP_NONE:
             if (m->actionState == ACT_STATE_ROLLOUT_SPIN) {
-                if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 4) {
+                if (set_mario_animation(m, ((actionArg == ACT_ARG_ROLLOUT_FORWARD) ? MARIO_ANIM_FORWARD_SPINNING : MARIO_ANIM_BACKWARD_SPINNING)) == 4) {
                     play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
                 }
             } else {
@@ -1308,51 +1309,13 @@ s32 act_forward_rollout(struct MarioState *m) {
             lava_boost_on_wall(m);
             break;
     }
-
-    if (m->actionState == ACT_STATE_ROLLOUT_SPIN && is_anim_past_end(m)) {
-        m->actionState = ACT_STATE_ROLLOUT_SPIN_END;
-    }
-    return FALSE;
-}
-
-s32 act_backward_rollout(struct MarioState *m) {
-    if (m->actionState == ACT_STATE_ROLLOUT_START_HOP) {
-        m->vel[1] = 30.0f;
-        m->actionState = ACT_STATE_ROLLOUT_SPIN;
+    if (m->actionState == ACT_STATE_ROLLOUT_SPIN) {
+        if ((actionArg == ACT_ARG_ROLLOUT_BACKWARD && m->marioObj->header.gfx.animInfo.animFrame == 2)
+         || (actionArg == ACT_ARG_ROLLOUT_FORWARD && is_anim_past_end(m))) {
+            m->actionState = ACT_STATE_ROLLOUT_SPIN_END;
+        }
     }
 
-    play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, 0);
-
-    update_air_without_turn(m);
-
-    switch (perform_air_step(m, 0)) {
-        case AIR_STEP_NONE:
-            if (m->actionState == ACT_STATE_ROLLOUT_SPIN) {
-                if (set_mario_animation(m, MARIO_ANIM_BACKWARD_SPINNING) == 4) {
-                    play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
-                }
-            } else {
-                set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
-            }
-            break;
-
-        case AIR_STEP_LANDED:
-            set_mario_action(m, ACT_FREEFALL_LAND_STOP, 0);
-            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
-            break;
-
-        case AIR_STEP_HIT_WALL:
-            mario_set_forward_vel(m, 0.0f);
-            break;
-
-        case AIR_STEP_HIT_LAVA_WALL:
-            lava_boost_on_wall(m);
-            break;
-    }
-
-    if (m->actionState == ACT_STATE_ROLLOUT_SPIN && m->marioObj->header.gfx.animInfo.animFrame == 2) {
-        m->actionState = ACT_STATE_ROLLOUT_SPIN_END;
-    }
     return FALSE;
 }
 
@@ -2007,13 +1970,12 @@ s32 mario_execute_airborne_action(struct MarioState *m) {
         case ACT_HARD_BACKWARD_AIR_KB: cancel = act_hard_backward_air_kb(m); break;
         case ACT_SOFT_BONK:            cancel = act_soft_bonk(m);            break;
         case ACT_AIR_HIT_WALL:         cancel = act_air_hit_wall(m);         break;
-        case ACT_FORWARD_ROLLOUT:      cancel = act_forward_rollout(m);      break;
+        case ACT_ROLLOUT:              cancel = act_rollout(m);              break;
         case ACT_SHOT_FROM_CANNON:     cancel = act_shot_from_cannon(m);     break;
         case ACT_BUTT_SLIDE_AIR:       cancel = act_butt_slide_air(m);       break;
         case ACT_HOLD_BUTT_SLIDE_AIR:  cancel = act_hold_butt_slide_air(m);  break;
         case ACT_LAVA_BOOST:           cancel = act_lava_boost(m);           break;
         case ACT_GETTING_BLOWN:        cancel = act_getting_blown(m);        break;
-        case ACT_BACKWARD_ROLLOUT:     cancel = act_backward_rollout(m);     break;
         case ACT_CRAZY_BOX_BOUNCE:     cancel = act_crazy_box_bounce(m);     break;
         case ACT_SPECIAL_TRIPLE_JUMP:  cancel = act_special_triple_jump(m);  break;
         case ACT_GROUND_POUND:         cancel = act_ground_pound(m);         break;
