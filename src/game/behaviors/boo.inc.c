@@ -329,7 +329,7 @@ static void boo_chase_mario(f32 minDY, s16 yawIncrement, f32 mul) {
         if (!mario_is_in_air_action()) {
             dy = (o->oPosY - gMarioObject->oPosY);
             if (minDY < dy && dy < 500.0f) {
-                o->oVelY = increment_velocity_toward_range(o->oPosY, (gMarioObject->oPosY + 50.0f), 10.f, 2.0f);
+                o->oVelY = increment_velocity_toward_range(o->oPosY, (gMarioObject->oPosY + 50.0f), 10.0f, 2.0f);
             }
         }
 

@@ -16,7 +16,7 @@ void bhv_orange_number_loop(void) {
         }
         if (o->oTimer == 35) {
             struct Object *sparkleObj = spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
-            sparkleObj->oPosY -= 30.f;
+            sparkleObj->oPosY -= 30.0f;
             obj_mark_for_deletion(o);
         }
 #ifdef DIALOG_INDICATOR

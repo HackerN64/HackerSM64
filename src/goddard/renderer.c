@@ -2321,9 +2321,9 @@ void gd_setproperty(enum GdProperty prop, f32 f1, f32 f2, f32 f3) {
             sAmbScaleColour.b = f3;
             break;
         case GD_PROP_LIGHT_DIR:
-            sLightDirections[sLightId].x = (s32)(f1 * 120.f);
-            sLightDirections[sLightId].y = (s32)(f2 * 120.f);
-            sLightDirections[sLightId].z = (s32)(f3 * 120.f);
+            sLightDirections[sLightId].x = (s32)(f1 * 120.0f);
+            sLightDirections[sLightId].y = (s32)(f2 * 120.0f);
+            sLightDirections[sLightId].z = (s32)(f3 * 120.0f);
             break;
         case GD_PROP_DIFUSE_COLOUR:
             sLightScaleColours[sLightId].r = f1;

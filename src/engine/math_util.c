@@ -868,7 +868,7 @@ s32 approach_f32_signed(f32 *current, f32 target, f32 inc) {
  * Edits the current value directly, returns TRUE if the target has been reached, FALSE otherwise.
  */
 s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier) {
-    if (multiplier > 1.f) multiplier = 1.f;
+    if (multiplier > 1.0f) multiplier = 1.0f;
     *current = (*current + ((target - *current) * multiplier));
     return (*current != target);
 }

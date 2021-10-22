@@ -50,7 +50,7 @@ static void eyerok_boss_act_wake_up(void) {
                     o->oTimer = 0;
                 }
             } else if (o->oTimer > 90) {
-                approach_f32_ptr(&o->oEyerokBossOffsetFromHome, 300.f, 10.0f);
+                approach_f32_ptr(&o->oEyerokBossOffsetFromHome, 300.0f, 10.0f);
             }
         }
     } else {

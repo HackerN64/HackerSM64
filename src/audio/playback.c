@@ -132,19 +132,19 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         stubbed_printf("Audio: setvol: volume minus %f\n", velocity);
         velocity = 0.0f;
     }
-    if (velocity > 32767.f) {
+    if (velocity > 32767.0f) {
         stubbed_printf("Audio: setvol: volume overflow %f\n", velocity);
-        velocity = 32767.f;
+        velocity = 32767.0f;
     }
 
-    sub->targetVolLeft =  ((s32) (velocity * volLeft) & 0xffff) >> 5;
-    sub->targetVolRight = ((s32) (velocity * volRight) & 0xffff) >> 5;
+    sub->targetVolLeft  = (((s32) (velocity * volLeft ) & 0xffff) >> 5);
+    sub->targetVolRight = (((s32) (velocity * volRight) & 0xffff) >> 5);
 #endif
 
     //! @bug for the change to UQ0.7, the if statement should also have been changed accordingly
     if (sub->reverbVol != reverbVol) {
 #ifdef VERSION_SH
-        sub->reverbVol = reverbVol >> 1;
+        sub->reverbVol = (reverbVol >> 1);
 #else
         sub->reverbVol = reverbVol;
 #endif

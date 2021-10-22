@@ -106,10 +106,10 @@ void bhv_intro_lakitu_loop(void) {
         case INTRO_LAKITU_ACT_CUTSCENE_INTRO_2:
             if (gCutsceneTimer > TIMER1) {
                 o->oAction = INTRO_LAKITU_ACT_CUTSCENE_INTRO_3;
-                o->oIntroLakituDistToBirdsX   =  1400.f;
-                o->oIntroLakituDistToBirdsZ   = -4096.f;
-                o->oIntroLakituEndBirds1DestZ =  2048.f;
-                o->oIntroLakituEndBirds1DestY =  -200.f;
+                o->oIntroLakituDistToBirdsX   =  1400.0f;
+                o->oIntroLakituDistToBirdsZ   = -4096.0f;
+                o->oIntroLakituEndBirds1DestZ =  2048.0f;
+                o->oIntroLakituEndBirds1DestY =  -200.0f;
                 o->oMoveAngleYaw = 0x8000;
                 o->oFaceAngleYaw = (o->oMoveAngleYaw + 0x4000);
                 o->oMoveAnglePitch = 0x800;
@@ -123,10 +123,10 @@ void bhv_intro_lakitu_loop(void) {
             vec3f_set(fromPoint, -1128.0f, 560.0f, 4664.0f);
             o->oMoveAngleYaw += 0x200;
             o->oIntroLakituDistToBirdsX = approach_f32_asymptotic(o->oIntroLakituDistToBirdsX, 100.0f, 0.03f);
-            o->oFaceAnglePitch = atan2s(200.f, (o->oPosY - 400.f));
-            o->oFaceAngleYaw = approach_s16_asymptotic(o->oFaceAngleYaw, (o->oMoveAngleYaw + 0x8000), 4);
+            o->oFaceAnglePitch = atan2s(200.0f, (o->oPosY - 400.0f));
+            o->oFaceAngleYaw = approach_s16_asymptotic(o->oFaceAngleYaw, (o->oMoveAngleYaw + 0x8000), 0x4);
             vec3f_set_dist_and_angle(fromPoint, toPoint, o->oIntroLakituDistToBirdsX, 0,  o->oMoveAngleYaw);
-            toPoint[1] += (150.f * coss((s16) o->oIntroLakituDistToBirdsZ));
+            toPoint[1] += (150.0f * coss((s16) o->oIntroLakituDistToBirdsZ));
             o->oIntroLakituDistToBirdsZ += o->oIntroLakituEndBirds1DestZ;
             o->oIntroLakituEndBirds1DestZ = approach_f32_asymptotic(o->oIntroLakituEndBirds1DestZ, 512.0f, 0.05f);
             toPoint[0] += o->oIntroLakituEndBirds1DestY;
@@ -134,10 +134,10 @@ void bhv_intro_lakitu_loop(void) {
             vec3f_copy(&o->oPosVec, toPoint);
 
             if (o->oTimer == 31) {
-                o->oPosY -= 158.f;
+                o->oPosY -= 158.0f;
                 // Spawn white ground particles
                 spawn_mist_from_global();
-                o->oPosY += 158.f;
+                o->oPosY += 158.0f;
             }
             if (o->oTimer == TIMER2) {
                 obj_mark_for_deletion(o);
