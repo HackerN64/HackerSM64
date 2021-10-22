@@ -248,7 +248,7 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
 
         case SURFACE_CLASS_NOT_SLIPPERY:
             accel = 5.0f;
-            lossFactor = m(((->intendedMag / 32.0f) * forward * 0.02f) + 0.92f);
+            lossFactor = (((m->intendedMag / 32.0f) * forward * 0.02f) + 0.92f);
             break;
     }
 
