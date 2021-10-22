@@ -295,7 +295,7 @@ f32 *gCurrentLeftVolRamping; // Points to any of the three left buffers above
 f32 *gCurrentRightVolRamping; // Points to any of the three right buffers above
 
 u8 audioString1[] = "pitch %x: delaybytes %d : olddelay %d\n";
-u8 audioString2[] = "cont %x: delaybytes %d : olddelay %d\n";
+u8 audioString2[] =  "cont %x: delaybytes %d : olddelay %d\n";
 #endif
 
 #ifdef VERSION_EU

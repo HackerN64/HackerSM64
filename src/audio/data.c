@@ -888,8 +888,8 @@ u16 unk_sh_data_4[] = {
 #endif
 
 #ifndef VERSION_SH
-s16 gTatumsPerBeat = TATUMS_PER_BEAT;
-s32 gAudioHeapSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE);
+s16 gTatumsPerBeat     = TATUMS_PER_BEAT;
+s32 gAudioHeapSize     = DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE);
 s32 gAudioInitPoolSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_INIT_POOL_SIZE);
 volatile s32 gAudioLoadLock = AUDIO_LOCK_UNINITIALIZED;
 #endif
@@ -942,19 +942,19 @@ u8 D_SH_80350F18;
 u8 D_SH_80350F19;
 
 OSMesg D_SH_80350F1C[1];
-OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
+OSMesgQueue  D_SH_80350F20; // address written to D_SH_80350F38
 OSMesgQueue *D_SH_80350F38;
 
 OSMesg D_SH_80350F40[4];
-OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
+OSMesgQueue  D_SH_80350F50; // address written to D_SH_80350F68
 OSMesgQueue *D_SH_80350F68;
 
 OSMesg D_SH_80350F6C[1];
-OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
+OSMesgQueue  D_SH_80350F70; // address written to D_SH_80350F88
 OSMesgQueue *D_SH_80350F88;
 
 OSMesg D_SH_80350F8C[1];
-OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
+OSMesgQueue  D_SH_80350F90; // address written to D_SH_80350F90
 OSMesgQueue *D_SH_80350FA8;
 #endif
 

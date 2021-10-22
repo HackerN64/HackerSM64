@@ -430,20 +430,15 @@ UNUSED u32 *func_sh_802f68e0(u32 index, u32 *a1) {
     return func_sh_802f3220(index, a1);
 }
 
-s32 func_sh_802f6900(void) {
-    s32 ret;
+UNUSED s32 func_sh_802f6900(void) {
     s32 sp18;
 
-    ret = osRecvMesg(D_SH_80350FA8, (OSMesg *) &sp18, 0);
+    s32 ret = osRecvMesg(D_SH_80350FA8, (OSMesg *) &sp18, 0);
 
     if (ret == -1) {
-        return 0;
+        return FALSE;
     }
-    if (sp18 != gAudioResetPresetIdToLoad) {
-        return 0;
-    } else {
-        return 1;
-    }
+    return (sp18 == gAudioResetPresetIdToLoad);
 }
 
 // TODO: (Scrub C)

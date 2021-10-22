@@ -6,11 +6,11 @@
 #include "types.h"
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#define SEQUENCE_PLAYERS 4
+#define SEQUENCE_PLAYERS   4
 #define SEQUENCE_CHANNELS 48
-#define SEQUENCE_LAYERS 64
+#define SEQUENCE_LAYERS   64
 #else
-#define SEQUENCE_PLAYERS 3
+#define SEQUENCE_PLAYERS   3
 #define SEQUENCE_CHANNELS 32
 #ifdef VERSION_JP
 #define SEQUENCE_LAYERS 48
@@ -19,14 +19,16 @@
 #endif
 #endif
 
-#define LAYERS_MAX       4
+#define LAYERS_MAX        4
 #define CHANNELS_MAX     16
 
 #define NO_LAYER ((struct SequenceChannelLayer *)(-1))
 
-#define MUTE_BEHAVIOR_STOP_SCRIPT (1 << 7) // 0x80 // stop processing sequence/channel scripts
-#define MUTE_BEHAVIOR_STOP_NOTES  (1 << 6) // 0x40 // prevent further notes from playing
-#define MUTE_BEHAVIOR_SOFTEN      (1 << 5) // 0x20 // lower volume, by default to half
+enum MuteBehaviors {
+    MUTE_BEHAVIOR_STOP_SCRIPT = (1 << 7), // 0x80 // stop processing sequence/channel scripts
+    MUTE_BEHAVIOR_STOP_NOTES  = (1 << 6), // 0x40 // prevent further notes from playing
+    MUTE_BEHAVIOR_SOFTEN      = (1 << 5), // 0x20 // lower volume, by default to half
+};
 
 enum SequencePlayerStates {
     SEQUENCE_PLAYER_STATE_0,

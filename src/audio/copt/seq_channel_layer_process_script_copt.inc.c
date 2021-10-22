@@ -249,7 +249,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 M64_READ_U8(state, (*layer).portamento.mode);
                 M64_READ_U8(state, cmdSemitone);
 
-                cmdSemitone = cmdSemitone + (*seqChannel).transposition;
+                cmdSemitone = (cmdSemitone + (*seqChannel).transposition);
                 cmdSemitone += (*layer).transposition;
                 cmdSemitone += (*seqPlayer).transposition;
 
@@ -314,8 +314,8 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                     goto l1090;
             }
 l1090:
-            cmdSemitone = cmd - (cmd & 0xc0);
-            layer->velocitySquare = vel * vel;
+            cmdSemitone = (cmd - (cmd & 0xc0));
+            layer->velocitySquare = (vel * vel);
         } else {
             switch (cmd & 0xc0) {
                 case 0x00: // play note, type 0 (play percentage)
@@ -337,7 +337,7 @@ l1138:
         }
 
         layer->delay = sp3A;
-        layer->duration = layer->noteDuration * sp3A / 256;
+        layer->duration = (layer->noteDuration * sp3A / 256);
         if ((seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_STOP_NOTES) != 0)
             || seqChannel->stopSomething2
             || !seqChannel->hasInstrument
@@ -347,7 +347,7 @@ l1138:
             if (seqChannel->instOrWave == 0) { // drum
                 cmdSemitone += (*seqChannel).transposition + (*layer).transposition;
                 if (cmdSemitone >= gCtlEntries[seqChannel->bankId].numDrums) {
-                    cmdSemitone = gCtlEntries[seqChannel->bankId].numDrums;
+                    cmdSemitone  = gCtlEntries[seqChannel->bankId].numDrums;
                     if (cmdSemitone == 0) {
                         // this goto looks a bit like a function return...
                         layer->stopSomething = TRUE;
@@ -370,7 +370,7 @@ l1138:
 
             skip:;
             } else { // instrument
-                cmdSemitone += (*seqPlayer).transposition + (*seqChannel).transposition + (*layer).transposition;
+                cmdSemitone += ((*seqPlayer).transposition + (*seqChannel).transposition + (*layer).transposition);
                 if (cmdSemitone >= 0x80) {
                     layer->stopSomething = TRUE;
                 } else {
@@ -383,7 +383,7 @@ l1138:
                         usedSemitone = (layer->portamentoTargetNote < cmdSemitone) ? cmdSemitone : layer->portamentoTargetNote;
 
                         if (instrument != NULL) {
-                            sound = (u8) usedSemitone < instrument->normalRangeLo ? &instrument->lowNotesSound
+                            sound = (u8) usedSemitone <  instrument->normalRangeLo ? &instrument->lowNotesSound
                                   : (u8) usedSemitone <= instrument->normalRangeHi ?
                                         &instrument->normalNotesSound : &instrument->highNotesSound;
 
@@ -395,8 +395,8 @@ l1138:
                             tuning = 1.0f;
                         }
 
-                        temp_f2 = gNoteFrequencies[cmdSemitone] * tuning;
-                        temp_f12 = gNoteFrequencies[layer->portamentoTargetNote] * tuning;
+                        temp_f2  = (gNoteFrequencies[cmdSemitone] * tuning);
+                        temp_f12 = (gNoteFrequencies[layer->portamentoTargetNote] * tuning);
 
                         portamento = &layer->portamento;
                         switch (PORTAMENTO_MODE(layer->portamento)) {
@@ -434,7 +434,7 @@ l13cc:
 
                         sameSound = (sound == (*layer).sound);
                         layer->sound = sound;
-                        layer->freqScale = gNoteFrequencies[cmdSemitone] * (*sound).tuning;
+                        layer->freqScale = (gNoteFrequencies[cmdSemitone] * (*sound).tuning);
                     } else {
                         layer->sound = NULL;
                         layer->freqScale = gNoteFrequencies[cmdSemitone];

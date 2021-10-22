@@ -822,7 +822,7 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
                 break;
         }
     } else {
-        aEnvSetup1(cmd++, (sourceReverbVol & 0x7f) * 2, rampReverb, rampLeft, rampRight);
+        aEnvSetup1(cmd++, ((sourceReverbVol & 0x7f) * 2), rampReverb, rampLeft, rampRight);
         aEnvSetup2(cmd++, sourceLeft, sourceRight);
         aEnvMixer(cmd++,
                 inBuf, nSamples,

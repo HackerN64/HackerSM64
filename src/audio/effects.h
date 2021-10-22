@@ -18,14 +18,18 @@ enum ADSRStates {
     ADSR_STATE_SUSTAIN
 };
 
-#define ADSR_ACTION_RELEASE (1 << 4) // 0x10
-#define ADSR_ACTION_DECAY   (1 << 5) // 0x20
-#define ADSR_ACTION_HANG    (1 << 6) // 0x40
+enum ADSRActions {
+    ADSR_ACTION_RELEASE = (1 << 4), // 0x10
+    ADSR_ACTION_DECAY   = (1 << 5), // 0x20
+    ADSR_ACTION_HANG    = (1 << 6), // 0x40
+};
 
-#define ADSR_DISABLE  0
-#define ADSR_HANG    -1
-#define ADSR_GOTO    -2
-#define ADSR_RESTART -3
+enum ADSRDelays {
+    ADSR_DISABLE =  0,
+    ADSR_HANG    = -1,
+    ADSR_GOTO    = -2,
+    ADSR_RESTART = -3,
+};
 
 // Envelopes are always stored as big endian, to match sequence files which are
 // byte blobs and can embed envelopes. Hence this byteswapping macro.

@@ -84,13 +84,13 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         }
 
         sub->stereoStrongRight = strongRight;
-        sub->stereoStrongLeft = strongLeft;
+        sub->stereoStrongLeft  = strongLeft;
 
 #ifdef VERSION_SH
         switch (reverbBits.stereoHeadsetEffects) {
             case 0:
                 sub->stereoStrongRight = reverbBits.strongRight;
-                sub->stereoStrongLeft = reverbBits.strongLeft;
+                sub->stereoStrongLeft  = reverbBits.strongLeft;
                 break;
 
             case 1:
@@ -98,12 +98,12 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
 
             case 2:
                 sub->stereoStrongRight = reverbBits.strongRight | strongRight;
-                sub->stereoStrongLeft = reverbBits.strongLeft | strongLeft;
+                sub->stereoStrongLeft  = reverbBits.strongLeft  | strongLeft;
                 break;
 
             case 3:
                 sub->stereoStrongRight = reverbBits.strongRight ^ strongRight;
-                sub->stereoStrongLeft = reverbBits.strongLeft ^ strongLeft;
+                sub->stereoStrongLeft  = reverbBits.strongLeft  ^ strongLeft;
                 break;
         }
 #endif
@@ -123,7 +123,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         velocity = 1.0f;
     }
 
-    sub->targetVolLeft =  ((s32) (velocity * volLeft * 4095.999f));
+    sub->targetVolLeft =  ((s32) (velocity * volLeft  * 4095.999f));
     sub->targetVolRight = ((s32) (velocity * volRight * 4095.999f));
     sub->synthesisVolume = reverbInfo->synthesisVolume;
     sub->filter = reverbInfo->filter;
