@@ -302,28 +302,18 @@ s32 act_holding_bowser(struct MarioState *m) {
             m->twirlYaw = m->intendedYaw;
         } else {
             // spin = acceleration
-            spin = (s16)(m->intendedYaw - m->twirlYaw) / 0x80;
+            spin = ((s16)(m->intendedYaw - m->twirlYaw) / 0x80);
 
-            if (spin < -0x80) {
-                spin = -0x80;
-            }
-            if (spin > 0x80) {
-                spin = 0x80;
-            }
+            spin = CLAMP(spin, -0x80, 0x80);
 
             m->twirlYaw = m->intendedYaw;
             m->angleVel[1] += spin;
 
-            if (m->angleVel[1] > 0x1000) {
-                m->angleVel[1] = 0x1000;
-            }
-            if (m->angleVel[1] < -0x1000) {
-                m->angleVel[1] = -0x1000;
-            }
+            m->angleVel[1] = CLAMP(m->angleVel[1], -0x1000, 0x1000);
         }
     } else {
         m->actionArg = 0;
-        m->angleVel[1] = approach_s32(m->angleVel[1], 0, 64, 64);
+        m->angleVel[1] = approach_s32_symmetric(m->angleVel[1], 0x0, 0x40);
     }
 
     // spin = starting yaw

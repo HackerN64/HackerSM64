@@ -234,9 +234,9 @@ void bhv_unlock_door_star_init(void) {
     o->oUnlockDoorStarState = UNLOCK_DOOR_STAR_RISING;
     o->oUnlockDoorStarTimer = 0;
     o->oUnlockDoorStarYawVel = 0x1000;
-    o->oPosX += 30.0f * sins(gMarioState->faceAngle[1] - 0x4000);
+    o->oPosX += (30.0f * sins(gMarioState->faceAngle[1] - 0x4000));
     o->oPosY += 160.0f;
-    o->oPosZ += 30.0f * coss(gMarioState->faceAngle[1] - 0x4000);
+    o->oPosZ += (30.0f * coss(gMarioState->faceAngle[1] - 0x4000));
     o->oMoveAngleYaw = 0x7800;
     obj_scale(o, 0.5f);
 }
@@ -265,14 +265,14 @@ void bhv_unlock_door_star_loop(void) {
             if (++o->oUnlockDoorStarTimer == 30) {
                 play_sound(SOUND_MENU_STAR_SOUND,
                            o->header.gfx.cameraToObject); // Play final sound
-                cur_obj_hide();                                            // Hide the object
+                cur_obj_hide(); // Hide the object
                 o->oUnlockDoorStarTimer = 0;
                 o->oUnlockDoorStarState++; // Sets state to UNLOCK_DOOR_STAR_SPAWNING_PARTICLES
             }
             break;
         case UNLOCK_DOOR_STAR_SPAWNING_PARTICLES:
             // Spawn two particles, opposite sides of the star.
-            star_door_unlock_spawn_particles(0);
+            star_door_unlock_spawn_particles(0x0);
             star_door_unlock_spawn_particles(0x8000);
             if (o->oUnlockDoorStarTimer++ == 20) {
                 o->oUnlockDoorStarTimer = 0;
@@ -367,14 +367,14 @@ Gfx *geo_switch_mario_eyes(s32 callContext, struct GraphNode *node, UNUSED Mat4 
 
     if (callContext == GEO_CONTEXT_RENDER) {
         if (bodyState->eyeState == 0) {
-            s16 blinkFrame = (((switchCase->numCases * 32 + gAreaUpdateCounter) >> 1) & 0x1F);
+            s16 blinkFrame = ((((switchCase->numCases * 32) + gAreaUpdateCounter) >> 1) & 0x1F);
             if (blinkFrame < 7) {
                 switchCase->selectedCase = gMarioBlinkAnimation[blinkFrame];
             } else {
                 switchCase->selectedCase = 0;
             }
         } else {
-            switchCase->selectedCase = bodyState->eyeState - 1;
+            switchCase->selectedCase = (bodyState->eyeState - 1);
         }
     }
     return NULL;
@@ -533,11 +533,7 @@ Gfx *geo_mario_rotate_wing_cap_wings(s32 callContext, struct GraphNode *node, UN
         } else {
             rotX = ((coss((gAreaUpdateCounter & 0x7) << 13) + 1.0f) * 6144.0f);
         }
-        if (!(asGenerated->parameter & 0x1)) {
-            rotNode->rotation[0] = -rotX;
-        } else {
-            rotNode->rotation[0] =  rotX;
-        }
+        rotNode->rotation[0] = ((asGenerated->parameter & 0x1) ? rotX : -rotX);
     }
     return NULL;
 }
@@ -600,8 +596,8 @@ Gfx *geo_render_mirror_mario(s32 callContext, struct GraphNode *node, UNUSED Mat
         case GEO_CONTEXT_RENDER:
             if (mario->header.gfx.pos[0] > 1700.0f) {
                 // TODO: Is this a geo layout copy or a graph node copy?
-                gMirrorMario.sharedChild =     mario->header.gfx.sharedChild;
-                gMirrorMario.areaIndex   =     mario->header.gfx.areaIndex;
+                gMirrorMario.sharedChild     = mario->header.gfx.sharedChild;
+                gMirrorMario.areaIndex       = mario->header.gfx.areaIndex;
                 vec3s_copy(gMirrorMario.angle, mario->header.gfx.angle);
                 vec3f_copy(gMirrorMario.pos,   mario->header.gfx.pos);
                 vec3f_copy(gMirrorMario.scale, mario->header.gfx.scale);

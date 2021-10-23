@@ -342,16 +342,18 @@ s32 perform_ground_step(struct MarioState *m) {
     s32 i;
     u32 stepResult;
     Vec3f intendedPos;
+    const f32 numSteps = 4.0f;
 
     set_mario_wall(m, NULL);
 
     for (i = 0; i < 4; i++) {
-        intendedPos[0] = (m->pos[0] + (m->floor->normal.y * (m->vel[0] / 4.0f)));
-        intendedPos[2] = (m->pos[2] + (m->floor->normal.y * (m->vel[2] / 4.0f)));
+        intendedPos[0] = (m->pos[0] + (m->floor->normal.y * (m->vel[0] / numSteps)));
+        intendedPos[2] = (m->pos[2] + (m->floor->normal.y * (m->vel[2] / numSteps)));
         intendedPos[1] =  m->pos[1];
 
         stepResult = perform_ground_quarter_step(m, intendedPos);
-        if (stepResult == GROUND_STEP_LEFT_GROUND || stepResult == GROUND_STEP_HIT_WALL_STOP_QSTEPS) {
+        if ((stepResult == GROUND_STEP_LEFT_GROUND)
+         || (stepResult == GROUND_STEP_HIT_WALL_STOP_QSTEPS)) {
             break;
         }
     }
@@ -604,7 +606,7 @@ void apply_gravity(struct MarioState *m) {
         if (m->vel[1] < -16.0f) {
             m->vel[1] = -16.0f;
         }
-    } else if ((m->flags & MARIO_WING_CAP) && m->vel[1] < 0.0f && (m->input & INPUT_A_DOWN)) {
+    } else if ((m->flags & MARIO_WING_CAP) && (m->vel[1] < 0.0f) && (m->input & INPUT_A_DOWN)) {
         m->marioBodyState->wingFlutter = TRUE;
 
         m->vel[1] -= 2.0f;

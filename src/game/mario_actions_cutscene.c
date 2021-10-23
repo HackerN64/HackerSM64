@@ -261,7 +261,6 @@ void handle_save_menu(struct MarioState *m) {
  */
 struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, ModelID32 model, const BehaviorScript *behavior, s16 relYaw) {
     struct Object *obj = spawn_object(m->marioObj, model, behavior);
-
     obj->oFaceAngleYaw = (m->faceAngle[1] + relYaw);
     vec3_copy(&obj->oPosVec, m->pos);
     return obj;
@@ -302,10 +301,11 @@ s32 mario_ready_to_speak(void) {
     u32 actionGroup = gMarioState->action & ACT_GROUP_MASK;
     s32 isReadyToSpeak = FALSE;
 
-    if ((gMarioState->action == ACT_WAITING_FOR_DIALOG || actionGroup == ACT_GROUP_STATIONARY
-         || actionGroup == ACT_GROUP_MOVING)
-        && (!(gMarioState->action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
-            && gMarioState->action != ACT_FIRST_PERSON)) {
+    if ((gMarioState->action == ACT_WAITING_FOR_DIALOG
+        || actionGroup == ACT_GROUP_STATIONARY
+        || actionGroup == ACT_GROUP_MOVING)
+     && (!(gMarioState->action & (ACT_FLAG_RIDING_SHELL | ACT_FLAG_INVULNERABLE))
+      && gMarioState->action != ACT_FIRST_PERSON)) {
         isReadyToSpeak = TRUE;
     }
 
@@ -447,8 +447,7 @@ s32 act_reading_automatic_dialog(struct MarioState *m) {
                 set_mario_action(m, ACT_WATER_IDLE, 0); // 100c star?
             } else {
                 // make Mario walk into door after star dialog
-                set_mario_action(m, m->prevAction == ACT_UNLOCKING_STAR_DOOR ? ACT_WALKING : ACT_IDLE,
-                                 0);
+                set_mario_action(m, m->prevAction == ACT_UNLOCKING_STAR_DOOR ? ACT_WALKING : ACT_IDLE, 0);
             }
         }
     }

@@ -780,9 +780,9 @@ s32 act_shockwave_bounce(struct MarioState *m) {
     mario_set_forward_vel(m, 0);
     vec3_zero(m->vel);
     if (sins(bounceTimer) >= 0.0f) {
-        m->pos[1] = sins(bounceTimer) * bounceAmt + m->floorHeight;
+        m->pos[1] = ((sins(bounceTimer) * bounceAmt) + m->floorHeight);
     } else {
-        m->pos[1] = m->floorHeight - sins(bounceTimer) * bounceAmt;
+        m->pos[1] = (m->floorHeight - (sins(bounceTimer) * bounceAmt));
     }
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
@@ -904,8 +904,8 @@ s32 act_long_jump_land_stop(struct MarioState *m) {
         return TRUE;
     }
 
-    landing_step(m, !m->marioObj->oMarioLongJumpIsSlow ? MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP
-                                                       : MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP,
+    landing_step(m, (!m->marioObj->oMarioLongJumpIsSlow ? MARIO_ANIM_CROUCH_FROM_FAST_LONGJUMP
+                                                        : MARIO_ANIM_CROUCH_FROM_SLOW_LONGJUMP),
                  ACT_CROUCHING);
     return FALSE;
 }

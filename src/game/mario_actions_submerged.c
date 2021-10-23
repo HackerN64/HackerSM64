@@ -56,7 +56,7 @@ static f32 get_buoyancy(struct MarioState *m) {
 
     if (m->flags & MARIO_METAL_CAP) {
         if (m->action & ACT_FLAG_INVULNERABLE) {
-            buoyancy = -2.0f;
+            buoyancy =  -2.0f;
         } else {
             buoyancy = -18.0f;
         }
@@ -71,14 +71,12 @@ static f32 get_buoyancy(struct MarioState *m) {
 
 static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     struct WallCollisionData wallData;
-    struct Surface *wall;
-    struct Surface *ceil;
-    struct Surface *floor;
+    struct Surface *ceil, *floor;
 
     resolve_and_return_wall_collisions(nextPos, 10.0f, 110.0f, &wallData);
-    wall = wallData.numWalls == 0 ? NULL : wallData.walls[0];
+    struct Surface *wall = ((wallData.numWalls == 0) ? NULL : wallData.walls[0]);
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
+    f32 ceilHeight  = find_ceil( nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
 
     if (floor == NULL) {
         return WATER_STEP_CANCELLED;
@@ -164,7 +162,6 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
 }
 
 static u32 perform_water_step(struct MarioState *m) {
-    u32 stepResult;
     Vec3f nextPos;
     Vec3f step;
     struct Object *marioObj = m->marioObj;
@@ -183,7 +180,7 @@ static u32 perform_water_step(struct MarioState *m) {
         m->vel[1] = 0.0f;
     }
 
-    stepResult = perform_water_full_step(m, nextPos);
+    u32 stepResult = perform_water_full_step(m, nextPos);
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, -m->faceAngle[0], m->faceAngle[1], m->faceAngle[2]);
@@ -211,8 +208,8 @@ static void update_water_pitch(struct MarioState *m) {
 static void stationary_slow_down(struct MarioState *m) {
     f32 buoyancy = get_buoyancy(m);
 
-    m->angleVel[0] = 0;
-    m->angleVel[1] = 0;
+    m->angleVel[0] = 0x0;
+    m->angleVel[1] = 0x0;
 
     m->forwardVel = approach_f32(m->forwardVel, 0.0f, 1.0f, 1.0f);
     m->vel[1]     = approach_f32(m->vel[1], buoyancy, 2.0f, 1.0f);
@@ -228,19 +225,12 @@ static void stationary_slow_down(struct MarioState *m) {
 
 static void update_swimming_speed(struct MarioState *m, f32 decelThreshold) {
     f32 buoyancy = get_buoyancy(m);
-    f32 maxSpeed = 28.0f;
 
     if (m->action & ACT_FLAG_STATIONARY) {
         m->forwardVel -= 2.0f;
     }
 
-    if (m->forwardVel < 0.0f) {
-        m->forwardVel = 0.0f;
-    }
-
-    if (m->forwardVel > maxSpeed) {
-        m->forwardVel = maxSpeed;
-    }
+    m->forwardVel = CLAMP(m->forwardVel, 0.0f, 28.0f);
 
     if (m->forwardVel > decelThreshold) {
         m->forwardVel -= 0.5f;
@@ -283,12 +273,7 @@ static void update_swimming_yaw(struct MarioState *m) {
 static void update_swimming_pitch(struct MarioState *m) {
     s16 targetPitch = -(s16)(252.0f * m->controller->stickY);
 
-    s16 pitchVel;
-    if (m->faceAngle[0] < 0) {
-        pitchVel = 0x100;
-    } else {
-        pitchVel = 0x200;
-    }
+    s16 pitchVel = ((m->faceAngle[0] < 0x0) ? 0x100 : 0x200);
 
     if (m->faceAngle[0] < targetPitch) {
         if ((m->faceAngle[0] += pitchVel) > targetPitch) {
@@ -418,14 +403,14 @@ static s32 act_hold_water_action_end(struct MarioState *m) {
 static void reset_bob_variables(struct MarioState *m) {
     sBobTimer = 0;
     sBobIncrement = 0x800;
-    sBobHeight = m->faceAngle[0] / 256.0f + 20.0f;
+    sBobHeight = ((m->faceAngle[0] / 256.0f) + 20.0f);
 }
 
 /**
  * Controls the bobbing that happens when you swim near the surface.
  */
 static void surface_swim_bob(struct MarioState *m) {
-    if ((sBobIncrement != 0) && (m->pos[1] > (m->waterLevel - 85)) && (m->faceAngle[0] >= 0)) {
+    if ((sBobIncrement != 0) && (m->pos[1] > (m->waterLevel - 85)) && (m->faceAngle[0] >= 0x0)) {
         sBobTimer += sBobIncrement;
         if (sBobTimer >= 0) {
             m->marioObj->header.gfx.pos[1] += (sBobHeight * sins(sBobTimer));
@@ -461,8 +446,8 @@ static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
             if (m->controller->stickY == 0.0f) {
                 if (m->faceAngle[0] > 0.0f) {
                     m->faceAngle[0] += 0x200;
-                    if (m->faceAngle[0] > 0x3F00) {
-                        m->faceAngle[0] = 0x3F00;
+                    if (m->faceAngle[0] >  0x3F00) {
+                        m->faceAngle[0] =  0x3F00;
                     }
                 } else {
                     m->faceAngle[0] -= 0x200;
@@ -475,7 +460,7 @@ static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
     }
 
     update_water_pitch(m);
-    m->marioBodyState->headAngle[0] = approach_s32(m->marioBodyState->headAngle[0], 0x0, 0x200, 0x200);
+    m->marioBodyState->headAngle[0] = approach_s32_symmetric(m->marioBodyState->headAngle[0], 0x0, 0x200);
 
     surface_swim_bob(m);
     set_swimming_at_surface_particles(m, PARTICLE_WAVE_TRAIL);
@@ -775,9 +760,7 @@ static s32 check_water_grab(struct MarioState *m) {
         struct Object *object = mario_get_collided_object(m, INTERACT_GRABBABLE);
         f32 dx = (object->oPosX - m->pos[0]);
         f32 dz = (object->oPosZ - m->pos[2]);
-        s16 dAngleToObject = abs_angle_diff(atan2s(dz, dx), m->faceAngle[1]);
-
-        if (dAngleToObject <= 0x2AAA) {
+        if (abs_angle_diff(atan2s(dz, dx), m->faceAngle[1]) <= 0x2AAA) {
             m->usedObj = object;
             mario_grab_used_object(m);
             m->marioBodyState->grabPos = GRAB_POS_LIGHT_OBJ;
@@ -950,12 +933,7 @@ static s32 act_water_death(struct MarioState *m) {
 static s32 act_water_plunge(struct MarioState *m) {
     s32 stateFlags = (m->heldObj != NULL);
 
-    f32 endVSpeed;
-    if (swimming_near_surface(m)) {
-        endVSpeed =  0.0f;
-    } else {
-        endVSpeed = -5.0f;
-    }
+    f32 endVSpeed = (swimming_near_surface(m) ? 0.0f : -5.0f);
 
     if (m->flags & MARIO_METAL_CAP) {
         stateFlags |= PLUNGE_FLAG_METAL_CAP;
@@ -1529,8 +1507,8 @@ s32 mario_execute_submerged_action(struct MarioState *m) {
 
     m->quicksandDepth = 0.0f;
 
-    m->marioBodyState->headAngle[1] = 0;
-    m->marioBodyState->headAngle[2] = 0;
+    m->marioBodyState->headAngle[1] = 0x0;
+    m->marioBodyState->headAngle[2] = 0x0;
 
     /* clang-format off */
     switch (m->action) {

@@ -56,8 +56,8 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
 
     vec3_copy_y_off(m->pos, &m->usedObj->oPosVec, (marioObj->oMarioPolePos + offsetY));
 
-    s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f);
-    collided |= f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
+    s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f)
+                 | f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
 
     f32 ceilHeight = find_ceil(m->pos[0], (m->pos[1] + 3.0f), m->pos[2], &ceil);
     if (m->pos[1] > (ceilHeight - 160.0f)) {
@@ -95,7 +95,7 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
 s32 act_holding_pole(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
 #ifdef POLE_SWING
-    if ((m->input & (INPUT_Z_PRESSED | INPUT_B_PRESSED)) || m->health < 0x100) {
+    if ((m->input & (INPUT_Z_PRESSED | INPUT_B_PRESSED)) || (m->health < 0x100)) {
         add_tree_leaf_particles(m);
         m->forwardVel = -8.0f;
 #else
@@ -124,7 +124,7 @@ s32 act_holding_pole(struct MarioState *m) {
         f32 poleTop = (m->usedObj->hitboxHeight - 100.0f);
         const BehaviorScript *poleBehavior = virtual_to_segmented(0x13, m->usedObj->behavior);
 
-        if (marioObj->oMarioPolePos < poleTop - 0.4f) {
+        if (marioObj->oMarioPolePos < (poleTop - 0.4f)) {
             return set_mario_action(m, ACT_CLIMBING_POLE, 0);
         }
 
@@ -181,7 +181,7 @@ s32 act_climbing_pole(struct MarioState *m) {
     }
 
     marioObj->oMarioPolePos += (m->controller->stickY / 8.0f);
-    m->angleVel[1] = 0x0;
+    m->angleVel[1]  = 0x0;
     m->faceAngle[1] = approach_angle(m->faceAngle[1], cameraAngle, 0x400);
 
     if (set_pole_position(m, 0.0f) == POLE_NONE) {
@@ -257,7 +257,7 @@ s32 act_grab_pole_fast(struct MarioState *m) {
             set_mario_animation(m, MARIO_ANIM_GRAB_POLE_SWING_PART1);
         } else {
             set_mario_animation(m, MARIO_ANIM_GRAB_POLE_SWING_PART2);
-            if (is_anim_at_end(m) || (m->angleVel[1] == 0)) {
+            if (is_anim_at_end(m) || (m->angleVel[1] == 0x0)) {
                 set_mario_action(m, ACT_HOLDING_POLE, 0);
             }
         }
@@ -301,8 +301,7 @@ s32 act_top_of_pole(struct MarioState *m) {
 }
 
 s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
-    struct Surface *ceil;
-    struct Surface *floor;
+    struct Surface *ceil, *floor;
     struct WallCollisionData wallCollisionData;
 
     resolve_and_return_wall_collisions(nextPos, 50.0f, 50.0f, &wallCollisionData);
@@ -317,7 +316,7 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     if (ceil == NULL) {
         return HANG_LEFT_CEIL;
     }
-    if (ceilHeight - floorHeight <= 144.0f) {
+    if ((ceilHeight - floorHeight) <= 144.0f) {
         return HANG_HIT_CEIL_OR_OOB;
     }
     if (ceil->type != SURFACE_HANGABLE) {
@@ -571,11 +570,7 @@ s32 act_ledge_grab(struct MarioState *m) {
         m->actionTimer++;
     }
 
-    if (m->floor->normal.y < COS25) {
-        return let_go_of_ledge(m);
-    }
-
-    if (m->input & (INPUT_Z_PRESSED | INPUT_OFF_FLOOR)) {
+    if ((m->floor->normal.y < COS25) || (m->input & (INPUT_Z_PRESSED | INPUT_OFF_FLOOR))) {
         return let_go_of_ledge(m);
     }
 
