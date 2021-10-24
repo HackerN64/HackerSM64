@@ -204,7 +204,9 @@ u8 sAudioSynthesisPad[0x20];
 
 #if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
 static inline s32 clamp16(s32 x) {
-    return CLAMP(x, -0x8000, 0x7FFF);
+    if (x >=  0x7FFF) return  0x7FFF;
+    if (x <= -0x8000) return -0x8000;
+    return (s16) x;
 }
 
 static inline void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 inSampleR) {
