@@ -522,31 +522,29 @@ void patch_audio_bank(struct AudioBank *mem, u8 *offset, u32 numInstruments, u32
 
 #if defined(VERSION_JP) || defined(VERSION_US)
     if (numInstruments >= 1) {
+#else
+    if (numInstruments > 0) {
 #endif
-        if (numInstruments > 0) {
-            itInstrs = mem->instruments;
-            end = (numInstruments + itInstrs);
+        itInstrs = mem->instruments;
+        end = (numInstruments + itInstrs);
 
-            do {
-                if (*itInstrs != NULL) {
-                    *itInstrs = BASE_OFFSET(*itInstrs, mem);
-                    instrument = *itInstrs;
+        do {
+            if (*itInstrs != NULL) {
+                *itInstrs = BASE_OFFSET(*itInstrs, mem);
+                instrument = *itInstrs;
 
-                    if (!instrument->loaded) {
-                        PATCH_SOUND(&instrument->lowNotesSound,    (u8 *) mem, offset);
-                        PATCH_SOUND(&instrument->normalNotesSound, (u8 *) mem, offset);
-                        PATCH_SOUND(&instrument->highNotesSound,   (u8 *) mem, offset);
-                        patched = instrument->envelope;
-                        instrument->envelope = BASE_OFFSET(mem, patched);
-                        instrument->loaded   = TRUE;
-                    }
+                if (!instrument->loaded) {
+                    PATCH_SOUND(&instrument->lowNotesSound,    (u8 *) mem, offset);
+                    PATCH_SOUND(&instrument->normalNotesSound, (u8 *) mem, offset);
+                    PATCH_SOUND(&instrument->highNotesSound,   (u8 *) mem, offset);
+                    patched = instrument->envelope;
+                    instrument->envelope = BASE_OFFSET(mem, patched);
+                    instrument->loaded   = TRUE;
                 }
-                itInstrs++;
-            } while (end != itInstrs);
-        }
-#if defined(VERSION_JP) || defined(VERSION_US)
+            }
+            itInstrs++;
+        } while (end != itInstrs);
     }
-#endif
 #undef PATCH_MEM
 #undef PATCH
 #undef BASE_OFFSET_REAL

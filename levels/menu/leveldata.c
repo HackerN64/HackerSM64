@@ -598,13 +598,13 @@ ALIGNED8 static const Texture texture_menu_hud_char_kana_dakuten_do[] = {
 // Menu HUD print table, only used in JP
 // 0x0700ABD0
 const Texture *const menu_hud_lut[] = {
-    texture_menu_hud_char_katakana_hu, texture_menu_hud_char_katakana_small_a,         texture_menu_hud_char_katakana_i, texture_menu_hud_char_katakana_ru,
-    texture_menu_hud_char_katakana_se,      texture_menu_hud_char_katakana_re,        texture_menu_hud_char_katakana_ku, texture_menu_hud_char_katakana_to,
-    texture_menu_hud_char_hiragana_wo,      texture_menu_hud_char_katakana_ko, texture_menu_hud_char_kana_handakuten_pi, texture_menu_hud_char_choonpu,
-    texture_menu_hud_char_hiragana_su,      texture_menu_hud_char_hiragana_ru,        texture_menu_hud_char_hiragana_ke, texture_menu_hud_char_katakana_ma,
-    texture_menu_hud_char_katakana_ri,       texture_menu_hud_char_katakana_o,        texture_menu_hud_char_katakana_su, texture_menu_hud_char_katakana_a,
-    texture_menu_hud_char_hiragana_mi,  texture_menu_hud_char_hira_dakuten_do,        texture_menu_hud_char_hiragana_no, texture_menu_hud_char_question,
-    texture_menu_hud_char_katakana_sa,       texture_menu_hud_char_katakana_u,         texture_menu_hud_char_katakana_n, texture_menu_hud_char_kana_dakuten_do,
+    texture_menu_hud_char_katakana_hu, texture_menu_hud_char_katakana_small_a, texture_menu_hud_char_katakana_i,         texture_menu_hud_char_katakana_ru,
+    texture_menu_hud_char_katakana_se, texture_menu_hud_char_katakana_re,      texture_menu_hud_char_katakana_ku,        texture_menu_hud_char_katakana_to,
+    texture_menu_hud_char_hiragana_wo, texture_menu_hud_char_katakana_ko,      texture_menu_hud_char_kana_handakuten_pi, texture_menu_hud_char_choonpu,
+    texture_menu_hud_char_hiragana_su, texture_menu_hud_char_hiragana_ru,      texture_menu_hud_char_hiragana_ke,        texture_menu_hud_char_katakana_ma,
+    texture_menu_hud_char_katakana_ri, texture_menu_hud_char_katakana_o,       texture_menu_hud_char_katakana_su,        texture_menu_hud_char_katakana_a,
+    texture_menu_hud_char_hiragana_mi, texture_menu_hud_char_hira_dakuten_do,  texture_menu_hud_char_hiragana_no,        texture_menu_hud_char_question,
+    texture_menu_hud_char_katakana_sa, texture_menu_hud_char_katakana_u,       texture_menu_hud_char_katakana_n,         texture_menu_hud_char_kana_dakuten_do,
 };
 
 #if defined(VERSION_JP) || defined(VERSION_SH)

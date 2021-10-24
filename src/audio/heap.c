@@ -1327,9 +1327,9 @@ void audio_reset_session(void) {
     // external beats/minute (JP) or tatums/minute (US). In practice this is
     // 300 on JP and 14360 on US.
 #ifdef VERSION_JP
-    gTempoInternalToExternal = updatesPerFrame * 3600 / gTatumsPerBeat;
+    gTempoInternalToExternal = ((updatesPerFrame * 3600) / gTatumsPerBeat);
 #else
-    gTempoInternalToExternal = (u32)(updatesPerFrame * 2880000.0f / gTatumsPerBeat / 16.713f);
+    gTempoInternalToExternal = (u32)(((updatesPerFrame * 2880000.0f) / gTatumsPerBeat) / 16.713f);
 #endif
     gMaxAudioCmds = ((gMaxSimultaneousNotes * 20 * updatesPerFrame) + 320);
 #endif
@@ -1345,7 +1345,7 @@ void audio_reset_session(void) {
     temporaryMem  = DOUBLE_SIZE_ON_64_BIT(preset->temporaryBankMem  + preset->temporarySeqMem);
 #endif
     totalMem = (persistentMem + temporaryMem);
-    wantMisc = (gAudioSessionPool.size - totalMem - BETTER_REVERB_SIZE);
+    wantMisc = ((gAudioSessionPool.size - totalMem) - BETTER_REVERB_SIZE);
     sSessionPoolSplit.wantSeq    = wantMisc;
     sSessionPoolSplit.wantCustom = totalMem;
     session_pools_init(&sSessionPoolSplit);
@@ -1539,7 +1539,7 @@ struct UnkEntry *func_sh_802f1ec4(u32 size) {
             continue;
         }
         itemStart = pool->entries[i].srcAddr;
-        itemEnd = itemStart + pool->entries[i].size - 1;
+        itemEnd = ((itemStart + pool->entries[i].size) - 1);
 
         if (itemEnd < phi_s3 && itemStart < phi_s3) {
             continue;
@@ -1606,7 +1606,7 @@ void func_sh_802f2158(struct UnkEntry *entry) {
 void func_sh_802F2320(struct UnkEntry *entry, struct AudioBankSample *sample) {
     if (sample != NULL && sample->sampleAddr == entry->srcAddr) {
         sample->sampleAddr = entry->dstAddr;
-        sample->medium = entry->medium;
+        sample->medium     = entry->medium;
     }
 }
 

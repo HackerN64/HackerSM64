@@ -12,38 +12,38 @@ void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 reca
     s32 i;
 
     if (seqChannel->changes.as_bitfields.volume || recalculateVolume) {
-        channelVolume = seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->appliedFadeVolume;
-        if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
-            channelVolume = seqChannel->seqPlayer->muteVolumeScale * channelVolume;
+        channelVolume = (seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->appliedFadeVolume);
+        if (seqChannel->seqPlayer->muted && ((seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0)) {
+            channelVolume = (seqChannel->seqPlayer->muteVolumeScale * channelVolume);
         }
 #ifdef VERSION_SH
-        seqChannel->appliedVolume = channelVolume * channelVolume;
+        seqChannel->appliedVolume = (channelVolume * channelVolume);
 #else
         seqChannel->appliedVolume = channelVolume;
 #endif
     }
 
     if (seqChannel->changes.as_bitfields.pan) {
-        seqChannel->pan = seqChannel->newPan * seqChannel->panChannelWeight;
+        seqChannel->pan = (seqChannel->newPan * seqChannel->panChannelWeight);
     }
 
     for (i = 0; i < 4; ++i) {
         struct SequenceChannelLayer *layer = seqChannel->layers[i];
         if (layer != NULL && layer->enabled && layer->note != NULL) {
             if (layer->notePropertiesNeedInit) {
-                layer->noteFreqScale = layer->freqScale * seqChannel->freqScale;
-                layer->noteVelocity = layer->velocitySquare * seqChannel->appliedVolume;
-                layer->notePan = (seqChannel->pan + layer->pan * (0x80 - seqChannel->panChannelWeight)) >> 7;
+                layer->noteFreqScale = (layer->freqScale * seqChannel->freqScale);
+                layer->noteVelocity  = (layer->velocitySquare * seqChannel->appliedVolume);
+                layer->notePan       = ((seqChannel->pan + (layer->pan * (0x80 - seqChannel->panChannelWeight))) >> 7);
                 layer->notePropertiesNeedInit = FALSE;
             } else {
                 if (seqChannel->changes.as_bitfields.freqScale) {
-                    layer->noteFreqScale = layer->freqScale * seqChannel->freqScale;
+                    layer->noteFreqScale = (layer->freqScale * seqChannel->freqScale);
                 }
                 if (seqChannel->changes.as_bitfields.volume || recalculateVolume) {
-                    layer->noteVelocity = layer->velocitySquare * seqChannel->appliedVolume;
+                    layer->noteVelocity = (layer->velocitySquare * seqChannel->appliedVolume);
                 }
                 if (seqChannel->changes.as_bitfields.pan) {
-                    layer->notePan = (seqChannel->pan + layer->pan * (0x80 - seqChannel->panChannelWeight)) >> 7;
+                    layer->notePan = ((seqChannel->pan + (layer->pan * (0x80 - seqChannel->panChannelWeight))) >> 7);
                 }
             }
         }
@@ -55,7 +55,7 @@ static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
     s32 i;
 
     f32 channelVolume = (seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume);
-    if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
+    if (seqChannel->seqPlayer->muted && ((seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0)) {
         channelVolume *= seqChannel->seqPlayer->muteVolumeScale;
     }
 
@@ -65,9 +65,9 @@ static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
     for (i = 0; i < 4; i++) {
         struct SequenceChannelLayer *layer = seqChannel->layers[i];
         if (layer != NULL && layer->enabled && layer->note != NULL) {
-            layer->noteFreqScale = layer->freqScale * seqChannel->freqScale * gConfig.audioFrequency;
-            layer->noteVelocity = layer->velocitySquare * channelVolume;
-            layer->notePan = (layer->pan * panLayerWeight) + panFromChannel;
+            layer->noteFreqScale = (layer->freqScale * seqChannel->freqScale * gConfig.audioFrequency);
+            layer->noteVelocity  = (layer->velocitySquare * channelVolume);
+            layer->notePan       = ((layer->pan * panLayerWeight) + panFromChannel);
         }
     }
 }
@@ -262,8 +262,6 @@ void note_vibrato_update(struct Note *note) {
 }
 
 void note_vibrato_init(struct Note *note) {
-    struct VibratoState *vib;
-    UNUSED struct SequenceChannel *seqChannel;
 #if defined(VERSION_EU) || defined(VERSION_SH)
     struct NotePlaybackState *seqPlayerState = (struct NotePlaybackState *) &note->priority;
 #endif
@@ -271,7 +269,7 @@ void note_vibrato_init(struct Note *note) {
     note->vibratoFreqScale    = 1.0f;
     note->portamentoFreqScale = 1.0f;
 
-    vib = &note->vibratoState;
+    struct VibratoState *vib = &note->vibratoState;
 
 /* This code was probably removed from EU and SH for a reason; probably because it's dumb and makes vibrato harder to use well.
 #if defined(VERSION_JP) || defined(VERSION_US)
@@ -307,7 +305,7 @@ void note_vibrato_init(struct Note *note) {
 #else
     vib->curve = gVibratoCurve;
     vib->seqChannel = note->parentLayer->seqChannel;
-    seqChannel = vib->seqChannel;
+    struct SequenceChannel *seqChannel = vib->seqChannel;
 
     if ((vib->extentChangeTimer = seqChannel->vibratoExtentChangeDelay) == 0) {
         vib->extent = seqChannel->vibratoExtentTarget;
@@ -327,21 +325,21 @@ void note_vibrato_init(struct Note *note) {
 }
 
 void adsr_init(struct AdsrState *adsr, struct AdsrEnvelope *envelope, UNUSED s16 *volOut) {
-    adsr->action = 0;
-    adsr->state = ADSR_STATE_DISABLED;
+    adsr->action   = 0;
+    adsr->state    = ADSR_STATE_DISABLED;
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    adsr->delay = 0;
+    adsr->delay    = 0;
     adsr->envelope = envelope;
 #ifdef VERSION_SH
     adsr->sustain = 0.0f;
 #endif
     adsr->current = 0.0f;
 #else
-    adsr->initial = 0;
-    adsr->delay = 0;
+    adsr->initial  = 0;
+    adsr->delay    = 0;
     adsr->velocity = 0;
     adsr->envelope = envelope;
-    adsr->volOut = volOut;
+    adsr->volOut   = volOut;
 #endif
 }
 
@@ -363,7 +361,7 @@ s32 adsr_update(struct AdsrState *adsr) {
         case ADSR_STATE_INITIAL: {
 #if defined(VERSION_JP) || defined(VERSION_US)
             adsr->current = adsr->initial;
-            adsr->target = adsr->initial;
+            adsr->target  = adsr->initial;
 #endif
             if (action & ADSR_ACTION_HANG) {
                 adsr->state = ADSR_STATE_HANG;
@@ -375,7 +373,7 @@ s32 adsr_update(struct AdsrState *adsr) {
         case ADSR_STATE_START_LOOP:
             adsr->envIndex = 0;
 #if defined(VERSION_JP) || defined(VERSION_US)
-            adsr->currentHiRes = adsr->current << 0x10;
+            adsr->currentHiRes = (adsr->current << 0x10);
 #endif
             adsr->state = ADSR_STATE_LOOP;
 
@@ -407,7 +405,7 @@ s32 adsr_update(struct AdsrState *adsr) {
                 default:
 #if defined(VERSION_EU) || defined(VERSION_SH)
                     if (adsr->delay >= 4) {
-                        adsr->delay = adsr->delay * gAudioBufferParameters.updatesPerFrame
+                        adsr->delay = (adsr->delay * gAudioBufferParameters.updatesPerFrame)
 #ifdef VERSION_SH
                         / gAudioBufferParameters.presetUnk4
 #endif
@@ -441,7 +439,7 @@ s32 adsr_update(struct AdsrState *adsr) {
             adsr->current += adsr->velocity;
 #else
             adsr->currentHiRes += adsr->velocity;
-            adsr->current = adsr->currentHiRes >> 0x10;
+            adsr->current = (adsr->currentHiRes >> 0x10);
 #endif
             if (--adsr->delay <= 0) {
                 adsr->state = ADSR_STATE_LOOP;
@@ -464,7 +462,7 @@ s32 adsr_update(struct AdsrState *adsr) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                     adsr->delay = 128;
 #else
-                    adsr->delay = adsr->sustain / 16;
+                    adsr->delay = (adsr->sustain / 16);
 #endif
                     adsr->state = ADSR_STATE_SUSTAIN;
                 }
@@ -491,7 +489,7 @@ s32 adsr_update(struct AdsrState *adsr) {
         }
 
         case ADSR_STATE_SUSTAIN:
-            adsr->delay -= 1;
+            adsr->delay--;
             if (adsr->delay == 0) {
                 adsr->state = ADSR_STATE_RELEASE;
             }
