@@ -41,6 +41,9 @@
 // Sets Mario in the proper action when interacting with a shell in midair.
 //#define SHELL_CANCEL_FIX
 
+// Prevents hands-free holding.
+#define HANDS_FREE_HOLDING_FIX
+
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!
 #define PLATFORM_DISPLACEMENT_2
 
