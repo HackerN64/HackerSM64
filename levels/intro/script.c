@@ -28,14 +28,14 @@
 const LevelScript level_intro_splash_screen[] = {
     INIT_LEVEL(),
 #ifdef SKIP_TITLE_SCREEN
-    EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ 0x14, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),
+    EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),
 #endif
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
-    LOAD_RAW( /*seg*/ 0x13, _behaviorSegmentRomStart,        _behaviorSegmentRomEnd),
-    LOAD_YAY0(/*seg*/ 0x07, _intro_segment_7SegmentRomStart, _intro_segment_7SegmentRomEnd),
+    LOAD_RAW( /*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
+    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _intro_segment_7SegmentRomStart, _intro_segment_7SegmentRomEnd),
 #if defined(HD_INTRO_TEXTURES) && defined(FLOOMBAS)
-    LOAD_YAY0(/*seg*/ 0x08, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW( /*seg*/ 0x0F, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+    LOAD_YAY0(/*seg*/ SEGMENT_COMMON0_YAY0, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
+    LOAD_RAW( /*seg*/ SEGMENT_COMMON0_GEO, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
 
     // Load "Super Mario 64" logo
     ALLOC_LEVEL_POOL(),
@@ -79,7 +79,7 @@ const LevelScript level_intro_splash_screen[] = {
     CMD2A(/*unk2*/ 1),
     CLEAR_LEVEL(),
     SLEEP(/*frames*/ 2),
-    EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ 0x14, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),
+    EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),
 };
 
 const LevelScript level_intro_mario_head_regular[] = {
@@ -88,8 +88,8 @@ const LevelScript level_intro_mario_head_regular[] = {
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
 #ifdef KEEP_MARIO_HEAD
     LOAD_MARIO_HEAD(/*loadHeadID*/ REGULAR_FACE),
-    LOAD_RAW(/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ 0x0A, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
+    LOAD_RAW(/*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
+    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
 
     ALLOC_LEVEL_POOL(),
     AREA(/*index*/ 1, intro_geo_mario_head_regular),
@@ -118,8 +118,8 @@ const LevelScript level_intro_mario_head_dizzy[] = {
 #ifdef KEEP_MARIO_HEAD
     LOAD_MARIO_HEAD(/*loadHeadID*/ DIZZY_FACE),
 #endif
-    LOAD_RAW(/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ 0x0A, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
+    LOAD_RAW(/*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
+    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
     ALLOC_LEVEL_POOL(),
 
     AREA(/*index*/ 1, intro_geo_mario_head_dizzy),
@@ -140,9 +140,9 @@ const LevelScript level_intro_mario_head_dizzy[] = {
 
 const LevelScript level_intro_entry_level_select[] = {
     INIT_LEVEL(),
-    LOAD_RAW(/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ 0x0A, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
-    LOAD_YAY0(/*seg*/ 0x07, _debug_level_select_yay0SegmentRomStart, _debug_level_select_yay0SegmentRomEnd),
+    LOAD_RAW(/*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
+    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
+    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _debug_level_select_yay0SegmentRomStart, _debug_level_select_yay0SegmentRomEnd),
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
     ALLOC_LEVEL_POOL(),
 
@@ -168,7 +168,7 @@ const LevelScript script_intro_file_select[] = {
     CLEAR_LEVEL(),
     SLEEP(/*frames*/ 2),
     SET_REG(/*value*/ START_LEVEL),
-    EXIT_AND_EXECUTE(/*seg*/ 0x14, _menuSegmentRomStart, _menuSegmentRomEnd, level_main_menu_entry_file_select),
+    EXIT_AND_EXECUTE(/*seg*/ SEGMENT_MENU_INTRO, _menuSegmentRomStart, _menuSegmentRomEnd, level_main_menu_entry_file_select),
 };
 
 const LevelScript script_intro_level_select[] = {
@@ -176,7 +176,7 @@ const LevelScript script_intro_level_select[] = {
     SLEEP(/*frames*/ 16),
     CLEAR_LEVEL(),
     SLEEP(/*frames*/ 2),
-    EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ 0x14, _introSegmentRomStart, _introSegmentRomEnd, level_intro_entry_level_select, _introSegmentBssStart, _introSegmentBssEnd),
+    EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_entry_level_select, _introSegmentBssStart, _introSegmentBssEnd),
 };
 
 const LevelScript script_intro_main_level_entry_stop_music[] = {
@@ -189,7 +189,7 @@ const LevelScript script_intro_main_level_entry[] = {
     SLEEP(/*frames*/ 16),
     CLEAR_LEVEL(),
     SLEEP(/*frames*/ 2),
-    EXIT_AND_EXECUTE(/*seg*/ 0x15, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
+    EXIT_AND_EXECUTE(/*seg*/ SEGMENT_GLOBAL_LEVEL_SCRIPT, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
 };
 
 const LevelScript script_intro_splash_screen[] = {
@@ -198,5 +198,5 @@ const LevelScript script_intro_splash_screen[] = {
     SLEEP(/*frames*/ 16),
     CLEAR_LEVEL(),
     SLEEP(/*frames*/ 2),
-    EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ 0x14, _introSegmentRomStart, _introSegmentRomEnd, level_intro_splash_screen, _introSegmentBssStart, _introSegmentBssEnd),
+    EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_splash_screen, _introSegmentBssStart, _introSegmentBssEnd),
 };

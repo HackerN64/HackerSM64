@@ -183,7 +183,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print(30, 30, "PC:%08XH   SR:%08XH   VA:%08XH", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
     crash_screen_draw_rect(15, 45, 270, 185);
-    if ((u32)parse_map != 0x80345678) {
+    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
         crash_screen_print(30, 40, "CRASH AT: %s", fname == NULL ? "UNKNOWN" : fname);
     }
@@ -241,7 +241,7 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
 
     crash_screen_draw_rect(25, 20, 270, 210);
     crash_screen_print(30, 25, "STACK TRACE FROM %08X:", temp_sp);
-    if ((u32) parse_map == 0x80345678) {
+    if ((u32) parse_map == MAP_PARSER_ADDRESS) {
         crash_screen_print(30, 35, "CURRFUNC: NONE");
     } else {
         crash_screen_print(30, 35, "CURRFUNC: %s", parse_map(tc->pc));
@@ -250,11 +250,11 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     osWritebackDCacheAll();
 
     for (int i = 0; i < 18; i++) {
-        if ((u32) find_function_in_stack == 0x80345678) {
+        if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
             crash_screen_print(30, (45 + (i * 10)), "STACK TRACE DISABLED");
             break;
         } else {
-            if ((u32) find_function_in_stack == 0x80345678) {
+            if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
                 return;
             }
 
@@ -388,7 +388,7 @@ void thread2_crash_screen(UNUSED void *arg) {
     osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) 2);
     goto finished;
     reset:
-    if ((u32) map_data_init != 0x80345678) {
+    if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
         map_data_init();
     }
     gCrashScreen.thread.priority = 15;
