@@ -57,6 +57,8 @@ extern f32 gSineTable[];
 
 #define asm_abs_s(dst, src) __asm__("abs.s %0,%1" : "=f" (dst) : "f" (src))
 #define asm_abs_d(dst, src) __asm__("abs.d %0,%1" : "=f" (dst) : "f" (src))
+#define asm_abs_s_self(dst) __asm__("abs.s %0,%1" : "=f" (dst) : "f" (dst))
+#define asm_abs_d_self(dst) __asm__("abs.d %0,%1" : "=f" (dst) : "f" (dst))
 #define ABSF(x) ((x) > 0.0f ? (x) : -(x))
 #define ABSI(x) ((x) > 0    ? (x) : -(x))
 #define ABS(x)  ABSF((x))

@@ -9,7 +9,7 @@
 #include "internal.h"
 #include "external.h"
 #include "game/game_init.h"
-
+#include "engine/math_util.h"
 
 #define DMEM_ADDR_TEMP                   0x000
 #define DMEM_ADDR_RESAMPLED              0x020
@@ -203,12 +203,6 @@ u8 sAudioSynthesisPad[0x20];
 #endif
 
 #if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
-static inline s32 clamp16(s32 x) {
-    if (x >=  0x7FFF) return  0x7FFF;
-    if (x <= -0x8000) return -0x8000;
-    return x;
-}
-
 static inline void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 inSampleR) {
     s32 i = 0;
     s32 j = 0;
@@ -242,9 +236,10 @@ static inline void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSample
         if (++allpassIdxL[i] == delaysL[i]) allpassIdxL[i] = 0;
         if (++allpassIdxR[i] == delaysR[i]) allpassIdxR[i] = 0;
     }
-
-    *outSampleL = clamp16((outTmpL * REVERB_WET_SIGNAL/* + inSampleL * REVERB_DRY_SIGNAL*/) / 256);
-    *outSampleR = clamp16((outTmpR * REVERB_WET_SIGNAL/* + inSampleR * REVERB_DRY_SIGNAL*/) / 256);
+    s32 outUnclamped = ((outTmpL * REVERB_WET_SIGNAL/* + inSampleL * REVERB_DRY_SIGNAL*/) / 256);
+    *outSampleL = CLAMP_S16(outUnclamped);
+    outUnclamped = ((outTmpR * REVERB_WET_SIGNAL/* + inSampleL * REVERB_DRY_SIGNAL*/) / 256);
+    *outSampleR = CLAMP_S16(outUnclamped);
 }
 
 static inline void reverb_mono_sample(s16 *outSample, s32 inSample) {
@@ -271,8 +266,8 @@ static inline void reverb_mono_sample(s16 *outSample, s32 inSample) {
         if (++allpassIdxL[i] == delaysL[i])
             allpassIdxL[i] = 0;
     }
-
-    *outSample = clamp16((outTmp * REVERB_WET_SIGNAL/* + inSample * REVERB_DRY_SIGNAL*/) / 256);
+    s32 outUnclamped = ((outTmp * REVERB_WET_SIGNAL/* + inSample * REVERB_DRY_SIGNAL*/) / 256);
+    *outSample = CLAMP_S16(outUnclamped);
 }
 #endif
 
