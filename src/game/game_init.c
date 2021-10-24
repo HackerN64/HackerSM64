@@ -273,17 +273,16 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.ucode      = gspFast3D_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspFast3D_fifoDataStart;
 #endif
-    gGfxSPTask->task.t.ucode_size = SP_UCODE_SIZE; // (this size is ignored)
-    gGfxSPTask->task.t.ucode_data_size = SP_UCODE_DATA_SIZE;
-    gGfxSPTask->task.t.dram_stack = (u64 *) gGfxSPTaskStack;
-    gGfxSPTask->task.t.dram_stack_size = SP_DRAM_STACK_SIZE8;
-    gGfxSPTask->task.t.output_buff = gGfxSPTaskOutputBuffer;
-    gGfxSPTask->task.t.output_buff_size =
-        (u64 *)((u8 *) gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
-    gGfxSPTask->task.t.data_ptr = (u64 *) &gGfxPool->buffer;
-    gGfxSPTask->task.t.data_size = entries * sizeof(Gfx);
-    gGfxSPTask->task.t.yield_data_ptr = (u64 *) gGfxSPTaskYieldBuffer;
-    gGfxSPTask->task.t.yield_data_size = OS_YIELD_DATA_SIZE;
+    gGfxSPTask->task.t.ucode_size       = SP_UCODE_SIZE; // (this size is ignored)
+    gGfxSPTask->task.t.ucode_data_size  = SP_UCODE_DATA_SIZE;
+    gGfxSPTask->task.t.dram_stack       = (u64 *) gGfxSPTaskStack;
+    gGfxSPTask->task.t.dram_stack_size  = SP_DRAM_STACK_SIZE8;
+    gGfxSPTask->task.t.output_buff      = gGfxSPTaskOutputBuffer;
+    gGfxSPTask->task.t.output_buff_size = (u64 *)((u8 *) gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
+    gGfxSPTask->task.t.data_ptr         = (u64 *) &gGfxPool->buffer;
+    gGfxSPTask->task.t.data_size        = entries * sizeof(Gfx);
+    gGfxSPTask->task.t.yield_data_ptr   = (u64 *) gGfxSPTaskYieldBuffer;
+    gGfxSPTask->task.t.yield_data_size  = OS_YIELD_DATA_SIZE;
 }
 
 /**
@@ -356,9 +355,9 @@ void render_init(void) {
     }
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
-    gGfxSPTask = &gGfxPool->spTask;
-    gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxSPTask       = &gGfxPool->spTask;
+    gDisplayListHead =  gGfxPool->buffer;
+    gGfxPoolEnd      = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
     init_rcp(CLEAR_ZBUFFER);
     clear_framebuffer(0);
     end_master_display_list();
@@ -379,8 +378,8 @@ void select_gfx_pool(void) {
     gGfxPool = &gGfxPools[gGlobalTimer % ARRAY_COUNT(gGfxPools)];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask       = &gGfxPool->spTask;
-    gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd      = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
+    gDisplayListHead =  gGfxPool->buffer;
+    gGfxPoolEnd      = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
 }
 
 /**
@@ -640,7 +639,7 @@ void init_controllers(void) {
  */
 void setup_game_memory(void) {
     // Setup general Segment 0
-    set_segment_base_addr(SEGMENT_MAIN, (void *) 0x80000000);
+    set_segment_base_addr(SEGMENT_MAIN, (void *)RAM_START);
     // Create Mesg Queues
     osCreateMesgQueue( &gGfxVblankQueue,  gGfxMesgBuf, ARRAY_COUNT( gGfxMesgBuf));
     osCreateMesgQueue(&gGameVblankQueue, gGameMesgBuf, ARRAY_COUNT(gGameMesgBuf));
@@ -651,11 +650,11 @@ void setup_game_memory(void) {
     gPhysicalFramebuffers[2] = VIRTUAL_TO_PHYSICAL(gFramebuffer2);
     // Setup Mario Animations
     gMarioAnimsMemAlloc = main_pool_alloc(0x4000, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
+    set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *)gMarioAnimsMemAlloc);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
     // Setup Demo Inputs List
     gDemoInputsMemAlloc = main_pool_alloc(0x800, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
+    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *)gDemoInputsMemAlloc);
     setup_dma_table_list(&gDemoInputsBuf, gDemoInputs, gDemoInputsMemAlloc);
     // Setup Level Script Entry
     load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
@@ -670,7 +669,6 @@ void thread5_game_loop(UNUSED void *arg) {
 #if PUPPYPRINT_DEBUG
     OSTime lastTime = 0;
 #endif
-
     setup_game_memory();
 #if ENABLE_RUMBLE
     init_rumble_pak_scheduler_queue();
@@ -751,7 +749,7 @@ void thread5_game_loop(UNUSED void *arg) {
         if (gShowDebugText) {
             // subtract the end of the gfx pool with the display list to obtain the
             // amount of free space remaining.
-            print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
+            print_text_fmt_int(180, 20, "BUF %d", (gGfxPoolEnd - (u8 *)gDisplayListHead));
         }
 #if 0
         if (gPlayer1Controller->buttonPressed & L_TRIG) {

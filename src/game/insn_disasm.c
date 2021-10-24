@@ -107,7 +107,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         }
     }
 
-    for (int i = 0;  i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
+    for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
 
     for (int i = 0; i < ARRAY_COUNT(insn_db); i++) {
         if (insn.i.opcode != 0 && insn.i.opcode == insn_db[i].opcode) {
@@ -166,6 +166,3 @@ char *insn_disasm(InsnData insn, u32 isPC) {
 
     return insn_as_string;
 }
-
-
-

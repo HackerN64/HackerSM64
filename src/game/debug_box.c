@@ -138,12 +138,12 @@ extern Mat4 gMatStack[32]; // XXX: Hack
 /**
  * The color that new boxes will be drawn with.
  */
-u32 sCurBoxColor = DBG_BOX_ALPHA << 24 | DBG_BOX_DEF_COLOR;
+u32 sCurBoxColor = ((DBG_BOX_ALPHA << 24) | DBG_BOX_DEF_COLOR);
 
 /**
  * The allocated size of a rotated box's dl
  */
-#define DBG_BOX_DLSIZE ((s32)(6 * sizeof(Gfx) + 8 * sizeof(Vtx)))
+#define DBG_BOX_DLSIZE ((s32)((6 * sizeof(Gfx)) + (8 * sizeof(Vtx))))
 
 /**
  * Sets up the RCP for drawing the boxes
@@ -197,8 +197,8 @@ void debug_box_input(void) {
         if (viewCycle > 3) {
             viewCycle = 0;
         }
-        hitboxView  = (viewCycle == 1 || viewCycle == 3);
-        surfaceView = (viewCycle == 2 || viewCycle == 3);
+        hitboxView  = ((viewCycle == 1) || (viewCycle == 3));
+        surfaceView = ((viewCycle == 2) || (viewCycle == 3));
     }
 }
 
@@ -211,7 +211,7 @@ void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
     struct SurfaceNode *node;
     struct Surface *surf;
     s32 i = 0;
-    ColorRGB col = {0xFF, 0x00, 0x00};
+    ColorRGB col = COLOR_RGB_RED;
 
     if (is_outside_level_bounds(x, z)) return;
 
@@ -289,19 +289,26 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
             ntx = MIN(VERTCOUNT, vts);
             gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts + ((gVisualSurfaceCount)-vts)), ntx, 0);
             count = 0;
-            vtl = VERTCOUNT;
+            vtl   = VERTCOUNT;
         }
 
         if (vtl >= 6) {
-            gSP2Triangles(gDisplayListHead++, count + 0, count + 1, count + 2, 0, count + 3, count + 4, count + 5, 0);
-            vts -= 6;
-            vtl -= 6;
-            count+= 6;
+            gSP2Triangles(gDisplayListHead++, (count + 0),
+                                              (count + 1),
+                                              (count + 2), 0x0,
+                                              (count + 3),
+                                              (count + 4),
+                                              (count + 5), 0x0);
+            vts   -= 6;
+            vtl   -= 6;
+            count += 6;
         } else if (vtl >= 3) {
-            gSP1Triangle(gDisplayListHead++, count + 0, count + 1, count + 2, 0);
-            vts -= 3;
-            vtl -= 6;
-            count+= 3;
+            gSP1Triangle(gDisplayListHead++, (count + 0),
+                                             (count + 1),
+                                             (count + 2), 0x0);
+            vts   -= 3;
+            vtl   -= 6;
+            count += 3;
         }
     }
 }
@@ -348,7 +355,7 @@ void visual_surface_loop(void) {
         return;
     }
     Mtx *mtx   = alloc_display_list(sizeof(Mtx));
-    Vtx *verts = alloc_display_list((iterate_surface_count(gMarioState->pos[0], gMarioState->pos[2])*3) * sizeof(Vtx));
+    Vtx *verts = alloc_display_list((iterate_surface_count(gMarioState->pos[0], gMarioState->pos[2]) * 3) * sizeof(Vtx));
 
     gVisualSurfaceCount = 0;
     gVisualOffset       = 0;
@@ -360,7 +367,7 @@ void visual_surface_loop(void) {
 
     gSPDisplayList(gDisplayListHead++, dl_visual_surface);
 
-    gSPMatrix(gDisplayListHead++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+    gSPMatrix(gDisplayListHead++, mtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
 
     iterate_surfaces_visual(gMarioState->pos[0], gMarioState->pos[2], verts);
 
@@ -388,10 +395,10 @@ static void append_debug_box(Vec3f center, Vec3f bounds, s16 yaw, s32 type) {
         vec3f_to_vec3s(sBoxes[sNumBoxes].center, center);
         vec3f_to_vec3s(sBoxes[sNumBoxes].bounds, bounds);
 
-        sBoxes[sNumBoxes].yaw = yaw;
+        sBoxes[sNumBoxes].yaw   = yaw;
         sBoxes[sNumBoxes].color = sCurBoxColor;
-        sBoxes[sNumBoxes].type = type;
-        if (!(sBoxes[sNumBoxes].type & DEBUG_UCODE_REJ) && !(sBoxes[sNumBoxes].type & DEBUG_UCODE_DEFAULT)) {
+        sBoxes[sNumBoxes].type  = type;
+        if (!(sBoxes[sNumBoxes].type & (DEBUG_UCODE_REJ | DEBUG_UCODE_DEFAULT))) {
             sBoxes[sNumBoxes].type |= DEBUG_UCODE_DEFAULT;
         }
         ++sNumBoxes;
@@ -433,7 +440,7 @@ void debug_box_rot(Vec3f center, Vec3f bounds, s16 yaw, s32 type) {
  * @see debug_box_pos_rot()
  */
 void debug_box_pos(Vec3f pMin, Vec3f pMax, s32 type) {
-    debug_box_pos_rot(pMin, pMax, 0, type);
+    debug_box_pos_rot(pMin, pMax, 0x0, type);
 }
 
 /**
@@ -461,19 +468,25 @@ static void render_box(int index) {
     Mtx *rotate    = alloc_display_list(sizeof(Mtx));
     Mtx *scale     = alloc_display_list(sizeof(Mtx));
 
-    if (mtx == NULL || translate == NULL || rotate == NULL || scale == NULL) return;
+    if ((mtx       == NULL)
+     || (translate == NULL)
+     || (rotate    == NULL)
+     || (scale     == NULL)) return;
 
     mtxf_to_mtx(mtx, gMatStack[1]);
     guTranslate(translate, box->center[0],  box->center[1],  box->center[2]);
-    guRotate(rotate, ((box->yaw / (float)0x10000) * 360.0f), 0, 1.0f, 0);
+    guRotate(rotate, ((box->yaw / (f32)0x10000) * 360.0f), 0, 1.0f, 0);
     guScale(scale, ((f32) box->bounds[0] * 0.01f), ((f32) box->bounds[1] * 0.01f), ((f32) box->bounds[2] * 0.01f));
 
-    gSPMatrix(gDisplayListHead++, mtx,       G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-    gSPMatrix(gDisplayListHead++, translate, G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH);
-    gSPMatrix(gDisplayListHead++, rotate,    G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH);
-    gSPMatrix(gDisplayListHead++, scale,     G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH);
+    gSPMatrix(gDisplayListHead++, mtx,       (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
+    gSPMatrix(gDisplayListHead++, translate, (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
+    gSPMatrix(gDisplayListHead++, rotate,    (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
+    gSPMatrix(gDisplayListHead++, scale,     (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
 
-    gDPSetEnvColor(gDisplayListHead++, (color >> 16) & 0xFF, (color >> 8) & 0xFF, (color) & 0xFF, (color >> 24) & 0xFF);
+    gDPSetEnvColor(gDisplayListHead++, ((color >> 16) & 0xFF),
+                                       ((color >>  8) & 0xFF),
+                                       ((color      ) & 0xFF),
+                                       ((color >> 24) & 0xFF));
 
     if (box->type & DEBUG_SHAPE_BOX) {
         gSPDisplayList(gDisplayListHead++, dl_debug_box_verts);

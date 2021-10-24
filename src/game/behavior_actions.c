@@ -82,9 +82,9 @@ static struct SpawnParticlesInfo sMistParticles = {
 
 // generate_wind_puffs/dust (something like that)
 void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
-    sMistParticles.sizeBase = size;
+    sMistParticles.sizeBase  = size;
     sMistParticles.sizeRange = (size / 20.0f);
-    sMistParticles.offsetY = offsetY;
+    sMistParticles.offsetY   = offsetY;
 
     if (count == 0) {
         sMistParticles.count = 20;
@@ -156,14 +156,14 @@ static s16 sSpawnSparkleParticleAngle = 0x0;
 // n is the number of objects to spawn, r if the rate of change of phase (frequency?)
 void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
     s32 i;
-    s16 separation = 0x10000 / n; // Evenly spread around a circle
+    s16 separation = (0x10000 / n); // Evenly spread around a circle
 
     for (i = 0; i < n; i++) {
-        spawn_object_relative(0, sins(sSpawnSparkleParticleAngle + i * separation) * radius, (i + 1) * height,
-                              coss(sSpawnSparkleParticleAngle + i * separation) * radius, o, MODEL_NONE, bhvSparkleSpawn);
+        spawn_object_relative(OBJ_BP_NONE, (sins(sSpawnSparkleParticleAngle + (i * separation)) * radius), ((i + 1) * height),
+                                           (coss(sSpawnSparkleParticleAngle + (i * separation)) * radius), o, MODEL_NONE, bhvSparkleSpawn);
     }
 
-    sSpawnSparkleParticleAngle += r * 0x100;
+    sSpawnSparkleParticleAngle += (r * 0x100);
 }
 
 #include "behaviors/beta_boo_key.inc.c"
@@ -195,11 +195,12 @@ void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
 #include "behaviors/bowser_puzzle_piece.inc.c"
 
 s32 set_obj_anim_with_accel_and_sound(s16 frame1, s16 frame2, s32 sound) {
-    f32 range;
-    if ((range = o->header.gfx.animInfo.animAccel / (f32) 0x10000) == 0) {
+    f32 range = (o->header.gfx.animInfo.animAccel / (f32) 0x10000);
+    if (range == 0.0f) {
         range = 1.0f;
     }
-    if (cur_obj_check_anim_frame_in_range(frame1, range) || cur_obj_check_anim_frame_in_range(frame2, range)) {
+    if (cur_obj_check_anim_frame_in_range(frame1, range)
+     || cur_obj_check_anim_frame_in_range(frame2, range)) {
         cur_obj_play_sound_2(sound);
         return TRUE;
     }

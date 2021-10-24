@@ -26,6 +26,7 @@
 #include "config.h"
 
 enum Interactions {
+    INT_NONE                       = (0 << 0), // 0x00
     INT_GROUND_POUND_OR_TWIRL      = (1 << 0), // 0x01
     INT_PUNCH                      = (1 << 1), // 0x02
     INT_KICK                       = (1 << 2), // 0x04
@@ -77,49 +78,49 @@ struct InteractionHandler {
 };
 
 static struct InteractionHandler sInteractionHandlers[] = {
-    { INTERACT_COIN,           interact_coin },
-    { INTERACT_WATER_RING,     interact_water_ring },
-    { INTERACT_STAR_OR_KEY,    interact_star_or_key },
-    { INTERACT_BBH_ENTRANCE,   interact_bbh_entrance },
-    { INTERACT_WARP,           interact_warp },
-    { INTERACT_WARP_DOOR,      interact_warp_door },
-    { INTERACT_DOOR,           interact_door },
-    { INTERACT_CANNON_BASE,    interact_cannon_base },
-    { INTERACT_IGLOO_BARRIER,  interact_igloo_barrier },
-    { INTERACT_TORNADO,        interact_tornado },
-    { INTERACT_WHIRLPOOL,      interact_whirlpool },
-    { INTERACT_STRONG_WIND,    interact_strong_wind },
-    { INTERACT_FLAME,          interact_flame },
-    { INTERACT_SNUFIT_BULLET,  interact_snufit_bullet },
-    { INTERACT_CLAM_OR_BUBBA,  interact_clam_or_bubba },
-    { INTERACT_BULLY,          interact_bully },
-    { INTERACT_SHOCK,          interact_shock },
-    { INTERACT_BOUNCE_TOP2,    interact_bounce_top },
-    { INTERACT_MR_BLIZZARD,    interact_mr_blizzard },
+    { INTERACT_COIN,           interact_coin           },
+    { INTERACT_WATER_RING,     interact_water_ring     },
+    { INTERACT_STAR_OR_KEY,    interact_star_or_key    },
+    { INTERACT_BBH_ENTRANCE,   interact_bbh_entrance   },
+    { INTERACT_WARP,           interact_warp           },
+    { INTERACT_WARP_DOOR,      interact_warp_door      },
+    { INTERACT_DOOR,           interact_door           },
+    { INTERACT_CANNON_BASE,    interact_cannon_base    },
+    { INTERACT_IGLOO_BARRIER,  interact_igloo_barrier  },
+    { INTERACT_TORNADO,        interact_tornado        },
+    { INTERACT_WHIRLPOOL,      interact_whirlpool      },
+    { INTERACT_STRONG_WIND,    interact_strong_wind    },
+    { INTERACT_FLAME,          interact_flame          },
+    { INTERACT_SNUFIT_BULLET,  interact_snufit_bullet  },
+    { INTERACT_CLAM_OR_BUBBA,  interact_clam_or_bubba  },
+    { INTERACT_BULLY,          interact_bully          },
+    { INTERACT_SHOCK,          interact_shock          },
+    { INTERACT_BOUNCE_TOP2,    interact_bounce_top     },
+    { INTERACT_MR_BLIZZARD,    interact_mr_blizzard    },
     { INTERACT_HIT_FROM_BELOW, interact_hit_from_below },
-    { INTERACT_BOUNCE_TOP,     interact_bounce_top },
-    { INTERACT_DAMAGE,         interact_damage },
-    { INTERACT_POLE,           interact_pole },
-    { INTERACT_HOOT,           interact_hoot },
-    { INTERACT_BREAKABLE,      interact_breakable },
-    { INTERACT_KOOPA,          interact_bounce_top },
-    { INTERACT_KOOPA_SHELL,    interact_koopa_shell },
-    { INTERACT_SPINY_WALKING,     interact_spiny_walking },
-    { INTERACT_CAP,            interact_cap },
-    { INTERACT_GRABBABLE,      interact_grabbable },
-    { INTERACT_TEXT,           interact_text },
+    { INTERACT_BOUNCE_TOP,     interact_bounce_top     },
+    { INTERACT_DAMAGE,         interact_damage         },
+    { INTERACT_POLE,           interact_pole           },
+    { INTERACT_HOOT,           interact_hoot           },
+    { INTERACT_BREAKABLE,      interact_breakable      },
+    { INTERACT_KOOPA,          interact_bounce_top     },
+    { INTERACT_KOOPA_SHELL,    interact_koopa_shell    },
+    { INTERACT_SPINY_WALKING,  interact_spiny_walking  },
+    { INTERACT_CAP,            interact_cap            },
+    { INTERACT_GRABBABLE,      interact_grabbable      },
+    { INTERACT_TEXT,           interact_text           },
 };
 
 static u32 sForwardKnockbackActions[][3] = {
     { ACT_SOFT_FORWARD_GROUND_KB, ACT_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB },
-    { ACT_FORWARD_AIR_KB,         ACT_FORWARD_AIR_KB,    ACT_HARD_FORWARD_AIR_KB },
-    { ACT_FORWARD_WATER_KB,       ACT_FORWARD_WATER_KB,  ACT_FORWARD_WATER_KB },
+    { ACT_FORWARD_AIR_KB,         ACT_FORWARD_AIR_KB,    ACT_HARD_FORWARD_AIR_KB    },
+    { ACT_FORWARD_WATER_KB,       ACT_FORWARD_WATER_KB,  ACT_FORWARD_WATER_KB       },
 };
 
 static u32 sBackwardKnockbackActions[][3] = {
     { ACT_SOFT_BACKWARD_GROUND_KB, ACT_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB },
-    { ACT_BACKWARD_AIR_KB,         ACT_BACKWARD_AIR_KB,    ACT_HARD_BACKWARD_AIR_KB },
-    { ACT_BACKWARD_WATER_KB,       ACT_BACKWARD_WATER_KB,  ACT_BACKWARD_WATER_KB },
+    { ACT_BACKWARD_AIR_KB,         ACT_BACKWARD_AIR_KB,    ACT_HARD_BACKWARD_AIR_KB    },
+    { ACT_BACKWARD_WATER_KB,       ACT_BACKWARD_WATER_KB,  ACT_BACKWARD_WATER_KB       },
 };
 
 static u8 sDisplayingDoorText = FALSE;
@@ -150,9 +151,8 @@ u32 get_mario_cap_flag(struct Object *capObject) {
  * in the angular range given towards Mario.
  */
 u32 object_facing_mario(struct MarioState *m, struct Object *obj, s16 angleRange) {
-    f32 dx = m->pos[0] - obj->oPosX;
-    f32 dz = m->pos[2] - obj->oPosZ;
-
+    f32 dx = (m->pos[0] - obj->oPosX);
+    f32 dz = (m->pos[2] - obj->oPosZ);
     s16 angleToMario = atan2s(dz, dx);
     s16 dAngle = abs_angle_diff(angleToMario, obj->oMoveAngleYaw);
 
@@ -174,7 +174,9 @@ u32 determine_interaction(struct MarioState *m, struct Object *obj) {
     u32 action = m->action;
 
     if (action & ACT_FLAG_ATTACKING) {
-        if (action == ACT_PUNCHING || action == ACT_MOVE_PUNCHING || action == ACT_JUMP_KICK) {
+        if ((action == ACT_PUNCHING)
+         || (action == ACT_MOVE_PUNCHING)
+         || (action == ACT_JUMP_KICK)) {
             s16 dYawToObject = abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]);
 
             if (m->flags & MARIO_PUNCHING) {
@@ -195,23 +197,23 @@ u32 determine_interaction(struct MarioState *m, struct Object *obj) {
                     interaction = INT_TRIP;
                 }
             }
-        } else if (action == ACT_GROUND_POUND || action == ACT_TWIRLING) {
+        } else if ((action == ACT_GROUND_POUND) || (action == ACT_TWIRLING)) {
             if (m->vel[1] < 0.0f) {
                 interaction = INT_GROUND_POUND_OR_TWIRL;
             }
-        } else if (action == ACT_GROUND_POUND_LAND || action == ACT_TWIRL_LAND) {
+        } else if ((action == ACT_GROUND_POUND_LAND) || (action == ACT_TWIRL_LAND)) {
             // Neither ground pounding nor twirling change Mario's vertical speed on landing.,
             // so the speed check is nearly always true (perhaps not if you land while going upwards?)
             // Additionally, actionState it set on each first thing in their action, so this is
             // only true prior to the very first frame (i.e. active 1 frame prior to it run).
-            if (m->vel[1] < 0.0f && m->actionState == 0) {
+            if ((m->vel[1] < 0.0f) && (m->actionState == 0)) { //! TODO: actionState name
                 interaction = INT_GROUND_POUND_OR_TWIRL;
             }
-        } else if (action == ACT_SLIDE_KICK || action == ACT_SLIDE_KICK_SLIDE) {
+        } else if ((action == ACT_SLIDE_KICK) || (action == ACT_SLIDE_KICK_SLIDE)) {
             interaction = INT_SLIDE_KICK;
         } else if (action & ACT_FLAG_RIDING_SHELL) {
             interaction = INT_FAST_ATTACK_OR_SHELL;
-        } else if (m->forwardVel <= -26.0f || 26.0f <= m->forwardVel) {
+        } else if ((m->forwardVel <= -26.0f) || m->forwardVel >= 26.0f) {
             interaction = INT_FAST_ATTACK_OR_SHELL;
         }
     }
@@ -219,7 +221,7 @@ u32 determine_interaction(struct MarioState *m, struct Object *obj) {
     // Prior to this, the interaction type could be overwritten. This requires, however,
     // that the interaction not be set prior. This specifically overrides turning a ground
     // pound into just a bounce.
-    if (interaction == 0 && (action & ACT_FLAG_AIR)) {
+    if ((interaction == INT_NONE) && (action & ACT_FLAG_AIR)) {
         if (m->vel[1] < 0.0f) {
             if (m->pos[1] > obj->oPosY) {
                 interaction = INT_HIT_FROM_ABOVE;
@@ -263,7 +265,7 @@ u32 attack_object(struct Object *obj, s32 interaction) {
             break;
     }
 
-    obj->oInteractStatus = attackType + (INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED);
+    obj->oInteractStatus = (attackType + (INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED));
     return attackType;
 }
 
@@ -320,7 +322,7 @@ void mario_stop_riding_and_holding(struct MarioState *m) {
     mario_stop_riding_object(m);
 
     if (m->action == ACT_RIDING_HOOT) {
-        m->usedObj->oInteractStatus = FALSE;
+        m->usedObj->oInteractStatus       = FALSE;
         m->usedObj->oHootMarioReleaseTime = gGlobalTimer;
     }
 }

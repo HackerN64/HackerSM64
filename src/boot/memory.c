@@ -82,7 +82,7 @@ uintptr_t set_segment_base_addr(s32 segment, void *addr) {
     return sSegmentTable[segment];
 }
 
-void *get_segment_base_addr(s32 segment) {
+UNUSED void *get_segment_base_addr(s32 segment) {
     return (void *) (sSegmentTable[segment] | 0x80000000);
 }
 
@@ -95,7 +95,7 @@ void *segmented_to_virtual(const void *addr) {
 }
 
 void *virtual_to_segmented(u32 segment, const void *addr) {
-    size_t offset = ((uintptr_t) addr & 0x1FFFFFFF) - sSegmentTable[segment];
+    size_t offset = (((uintptr_t) addr & 0x1FFFFFFF) - sSegmentTable[segment]);
     return (void *) ((segment << 24) + offset);
 }
 
@@ -125,7 +125,7 @@ void move_segment_table_to_dmem(void) {
  * freeing the object that was most recently allocated from a side.
  */
 void main_pool_init(void *start, void *end) {
-    sPoolStart = ((u8 *) ALIGN16((uintptr_t) start) + 16);
+    sPoolStart = ((u8 *) ALIGN16((uintptr_t) start   ) + 16);
     sPoolEnd   = ((u8 *) ALIGN16((uintptr_t) end - 15) - 16);
     sPoolFreeSpace = (sPoolEnd - sPoolStart);
 
@@ -229,7 +229,7 @@ u32 main_pool_available(void) {
  */
 u32 main_pool_push_state(void) {
     struct MainPoolState *prevState = gMainPoolState;
-    u32 freeSpace = sPoolFreeSpace;
+    u32 freeSpace               = sPoolFreeSpace;
     struct MainPoolBlock *lhead = sPoolListHeadL;
     struct MainPoolBlock *rhead = sPoolListHeadR;
 
@@ -237,7 +237,7 @@ u32 main_pool_push_state(void) {
     gMainPoolState->freeSpace = freeSpace;
     gMainPoolState->listHeadL = lhead;
     gMainPoolState->listHeadR = rhead;
-    gMainPoolState->prev = prevState;
+    gMainPoolState->prev      = prevState;
     return sPoolFreeSpace;
 }
 
@@ -392,7 +392,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     u32 *size = (u32 *) (compressed + compSize);
 #else
     // Decompressed size from header (This works for non-mio0 because they also have the size in same place)
-    u32 *size = (u32 *) (compressed + 4);
+    u32 *size = (u32 *)(compressed + 4);
 #endif
     if (compressed != NULL) {
 #ifdef UNCOMPRESSED
@@ -463,7 +463,7 @@ void *load_segment_decompress_heap(u32 segment, u8 *srcStart, u8 *srcEnd) {
 
 void load_engine_code_segment(void) {
     void *startAddr = (void *) _engineSegmentStart;
-    u32 totalSize = _engineSegmentEnd - _engineSegmentStart;
+    u32 totalSize   = (_engineSegmentEnd - _engineSegmentStart);
     // UNUSED u32 alignedSize = ALIGN16(_engineSegmentRomEnd - _engineSegmentRomStart);
 
     bzero(startAddr, totalSize);
@@ -482,7 +482,7 @@ void load_engine_code_segment(void) {
 struct AllocOnlyPool *alloc_only_pool_init(u32 size, u32 side) {
     struct AllocOnlyPool *subPool = NULL;
     size = ALIGN4(size);
-    void *addr = main_pool_alloc(size + sizeof(struct AllocOnlyPool), side);
+    void *addr = main_pool_alloc((size + sizeof(struct AllocOnlyPool)), side);
     if (addr != NULL) {
         subPool = (struct AllocOnlyPool *) addr;
         subPool->totalSpace = size;
@@ -562,10 +562,10 @@ void *mem_pool_alloc(struct MemoryPool *pool, u32 size) {
                 freeBlock->next = freeBlock->next->next;
             } else {
                 struct MemoryBlock *newBlock = (struct MemoryBlock *) ((u8 *) freeBlock->next + size);
-                newBlock->size = (freeBlock->next->size - size);
-                newBlock->next = freeBlock->next->next;
+                newBlock->size        = (freeBlock->next->size - size);
+                newBlock->next        =  freeBlock->next->next;
                 freeBlock->next->size = size;
-                freeBlock->next = newBlock;
+                freeBlock->next       = newBlock;
             }
             break;
         }
@@ -588,7 +588,7 @@ void mem_pool_free(struct MemoryPool *pool, void *addr) {
         if (block < pool->freeList.next) {
             if ((u8 *) pool->freeList.next == ((u8 *) block + block->size)) {
                 block->size += freeList->size;
-                block->next = freeList->next;
+                block->next  = freeList->next;
                 pool->freeList.next = block;
             } else {
                 block->next = pool->freeList.next;
@@ -609,7 +609,7 @@ void mem_pool_free(struct MemoryPool *pool, void *addr) {
                 freeList->next = block;
             }
             if ((block->next != NULL) && ((u8 *) block->next == ((u8 *) block + block->size))) {
-                block->size = block->size + block->next->size;
+                block->size += block->next->size);
                 block->next = block->next->next;
             }
         }
@@ -628,12 +628,12 @@ void *alloc_display_list(u32 size) {
 }
 
 static struct DmaTable *load_dma_table_address(u8 *srcAddr) {
-    struct DmaTable *table = dynamic_dma_read(srcAddr, srcAddr + sizeof(u32), MEMORY_POOL_LEFT, 0, 0);
-    u32 size = table->count * sizeof(struct OffsetSizePair) +
-        sizeof(struct DmaTable) - sizeof(struct OffsetSizePair);
+    struct DmaTable *table = dynamic_dma_read(srcAddr, (srcAddr + sizeof(u32)), MEMORY_POOL_LEFT, 0, 0);
+    u32 size = ((table->count * sizeof(struct OffsetSizePair)) +
+        sizeof(struct DmaTable) - sizeof(struct OffsetSizePair));
     main_pool_free(table);
 
-    table = dynamic_dma_read(srcAddr, srcAddr + size, MEMORY_POOL_LEFT, 0, 0);
+    table = dynamic_dma_read(srcAddr, (srcAddr + size), MEMORY_POOL_LEFT, 0, 0);
     table->srcAddr = srcAddr;
     return table;
 }

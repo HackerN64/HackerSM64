@@ -144,7 +144,7 @@ void envfx_update_lava(Vec3s centerPos) {
         } else if (!(globalTimer & 0x1)) {
             (gEnvFxBuffer + i)->animFrame++;
             if ((gEnvFxBuffer + i)->animFrame > 8) {
-                (gEnvFxBuffer + i)->isAlive = FALSE;
+                (gEnvFxBuffer + i)->isAlive   = FALSE;
                 (gEnvFxBuffer + i)->animFrame = 0;
             }
         }
@@ -160,17 +160,17 @@ void envfx_update_lava(Vec3s centerPos) {
  * according to the pitch and yaw of the whirlpool.
  */
 void envfx_rotate_around_whirlpool(s32 *x, s32 *y, s32 *z) {
-    s32 vecX = *x - gEnvFxBubbleConfig[ENVFX_STATE_DEST_X];
-    s32 vecY = *y - gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y];
-    s32 vecZ = *z - gEnvFxBubbleConfig[ENVFX_STATE_DEST_Z];
+    s32 vecX     = (*x - gEnvFxBubbleConfig[ENVFX_STATE_DEST_X]);
+    s32 vecY     = (*y - gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y]);
+    s32 vecZ     = (*z - gEnvFxBubbleConfig[ENVFX_STATE_DEST_Z]);
     f32 cosPitch = coss( gEnvFxBubbleConfig[ENVFX_STATE_PITCH]);
     f32 sinPitch = sins( gEnvFxBubbleConfig[ENVFX_STATE_PITCH]);
     f32 cosMYaw  = coss(-gEnvFxBubbleConfig[ENVFX_STATE_YAW]);
     f32 sinMYaw  = sins(-gEnvFxBubbleConfig[ENVFX_STATE_YAW]);
 
-    f32 rotatedX = (vecX * cosMYaw ) - (sinMYaw * cosPitch * vecY) - (sinPitch * sinMYaw * vecZ);
-    f32 rotatedY = (vecX * sinMYaw ) + (cosPitch * cosMYaw * vecY) - (sinPitch * cosMYaw * vecZ);
-    f32 rotatedZ = (vecY * sinPitch) + (cosPitch * vecZ);
+    f32 rotatedX = ((vecX * cosMYaw ) - (sinMYaw * cosPitch * vecY) - (sinPitch * sinMYaw * vecZ));
+    f32 rotatedY = ((vecX * sinMYaw ) + (cosPitch * cosMYaw * vecY) - (sinPitch * cosMYaw * vecZ));
+    f32 rotatedZ = ((vecY * sinPitch) + (cosPitch * vecZ));
 
     *x = gEnvFxBubbleConfig[ENVFX_STATE_DEST_X] + (s32) rotatedX;
     *y = gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y] + (s32) rotatedY;
@@ -182,7 +182,7 @@ void envfx_rotate_around_whirlpool(s32 *x, s32 *y, s32 *z) {
  * low or close to the center.
  */
 s32 envfx_is_whirlpool_bubble_alive(s32 index) {
-    if ((gEnvFxBuffer + index)->bubbleY < gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y] - 100) {
+    if ((gEnvFxBuffer + index)->bubbleY < (gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y] - 100)) {
         return FALSE;
     }
 
@@ -223,13 +223,13 @@ void envfx_update_whirlpool(void) {
         } else {
             (gEnvFxBuffer + i)->angleAndDist[1] -= 40;
             (gEnvFxBuffer + i)->angleAndDist[0] +=
-                (s16)(3000 - (gEnvFxBuffer + i)->angleAndDist[1] * 2) + 0x400;
+                ((s16)(3000 - (gEnvFxBuffer + i)->angleAndDist[1] * 2) + 0x400);
             (gEnvFxBuffer + i)->xPos =
-                gEnvFxBubbleConfig[ENVFX_STATE_SRC_X]
-                + sins((gEnvFxBuffer + i)->angleAndDist[0]) * (gEnvFxBuffer + i)->angleAndDist[1];
+                (gEnvFxBubbleConfig[ENVFX_STATE_SRC_X]
+                + (sins((gEnvFxBuffer + i)->angleAndDist[0]) * (gEnvFxBuffer + i)->angleAndDist[1]));
             (gEnvFxBuffer + i)->zPos =
-                gEnvFxBubbleConfig[ENVFX_STATE_SRC_Z]
-                + coss((gEnvFxBuffer + i)->angleAndDist[0]) * (gEnvFxBuffer + i)->angleAndDist[1];
+                (gEnvFxBubbleConfig[ENVFX_STATE_SRC_Z]
+                + (coss((gEnvFxBuffer + i)->angleAndDist[0]) * (gEnvFxBuffer + i)->angleAndDist[1]));
             (gEnvFxBuffer + i)->bubbleY -= (40 - ((s16)(gEnvFxBuffer + i)->angleAndDist[1] / 100));
             (gEnvFxBuffer + i)->yPos = (i + gEnvFxBuffer)->bubbleY;
 
@@ -290,12 +290,12 @@ s32 envfx_init_bubble(s32 mode) {
             return FALSE;
 
         case ENVFX_FLOWERS:
-            sBubbleParticleCount = 30;
+            sBubbleParticleCount    = 30;
             sBubbleParticleMaxCount = 30;
             break;
 
         case ENVFX_LAVA_BUBBLES:
-            sBubbleParticleCount = 15;
+            sBubbleParticleCount    = 15;
             sBubbleParticleMaxCount = 15;
             break;
 
@@ -368,8 +368,7 @@ void envfx_bubbles_update_switch(s32 mode, Vec3s camTo, Vec3s vertex1, Vec3s ver
  * 'index'. The 3 input vertices represent the rotated triangle around (0,0,0)
  * that will be translated to bubble positions to draw the bubble image
  */
-void append_bubble_vertex_buffer(Gfx *gfx, s32 index, Vec3s vertex1, Vec3s vertex2, Vec3s vertex3,
-                                 Vtx *template) {
+void append_bubble_vertex_buffer(Gfx *gfx, s32 index, Vec3s vertex1, Vec3s vertex2, Vec3s vertex3, Vtx *template) {
     s32 i = 0;
     Vtx *vertBuf = alloc_display_list(15 * sizeof(Vtx));
 
@@ -378,10 +377,10 @@ void append_bubble_vertex_buffer(Gfx *gfx, s32 index, Vec3s vertex1, Vec3s verte
     }
 
     for (i = 0; i < 15; i += 3) {
-        vertBuf[i] = template[0];
-        (vertBuf + i)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex1[0];
-        (vertBuf + i)->v.ob[1] = (gEnvFxBuffer + (index + i / 3))->yPos + vertex1[1];
-        (vertBuf + i)->v.ob[2] = (gEnvFxBuffer + (index + i / 3))->zPos + vertex1[2];
+        vertBuf[i + 0] = template[0];
+        (vertBuf + i + 0)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex1[0];
+        (vertBuf + i + 0)->v.ob[1] = (gEnvFxBuffer + (index + i / 3))->yPos + vertex1[1];
+        (vertBuf + i + 0)->v.ob[2] = (gEnvFxBuffer + (index + i / 3))->zPos + vertex1[2];
 
         vertBuf[i + 1] = template[1];
         (vertBuf + i + 1)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex2[0];
@@ -437,12 +436,9 @@ void envfx_set_bubble_texture(s32 mode, s16 index) {
 Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFrom, Vec3s camTo) {
     s32 i;
     s16 radius, pitch, yaw;
+    Vec3s vertex1, vertex2, vertex3;
+    Gfx *gfxStart = alloc_display_list((((sBubbleParticleMaxCount / 5) * 10) + sBubbleParticleMaxCount + 3) * sizeof(Gfx));
 
-    Vec3s vertex1;
-    Vec3s vertex2;
-    Vec3s vertex3;
-
-    Gfx *gfxStart = alloc_display_list(((sBubbleParticleMaxCount / 5) * 10 + sBubbleParticleMaxCount + 3) * sizeof(Gfx));
     if (gfxStart == NULL) {
         return NULL;
     }
@@ -478,12 +474,8 @@ Gfx *envfx_update_bubble_particles(s32 mode, UNUSED Vec3s marioPos, Vec3s camFro
  */
 void envfx_set_max_bubble_particles(s32 mode) {
     switch (mode) {
-        case ENVFX_WHIRLPOOL_BUBBLES:
-            sBubbleParticleMaxCount = gEnvFxBubbleConfig[ENVFX_STATE_PARTICLECOUNT];
-            break;
-        case ENVFX_JETSTREAM_BUBBLES:
-            sBubbleParticleMaxCount = gEnvFxBubbleConfig[ENVFX_STATE_PARTICLECOUNT];
-            break;
+        case ENVFX_WHIRLPOOL_BUBBLES: sBubbleParticleMaxCount = gEnvFxBubbleConfig[ENVFX_STATE_PARTICLECOUNT]; break;
+        case ENVFX_JETSTREAM_BUBBLES: sBubbleParticleMaxCount = gEnvFxBubbleConfig[ENVFX_STATE_PARTICLECOUNT]; break;
     }
 }
 
@@ -495,7 +487,7 @@ void envfx_set_max_bubble_particles(s32 mode) {
 Gfx *envfx_update_bubbles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom) {
     Gfx *gfx;
 
-    if (gEnvFxMode == ENVFX_MODE_NONE && !envfx_init_bubble(mode)) {
+    if ((gEnvFxMode == ENVFX_MODE_NONE) && !envfx_init_bubble(mode)) {
         return NULL;
     }
 

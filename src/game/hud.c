@@ -133,17 +133,17 @@ void render_hud_tex_lut(s32 x, s32 y, Texture *texture) {
  */
 void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
     gDPSetTile(         gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
-                        G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
+                        (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD, (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD);
     gDPTileSync(        gDisplayListHead++);
     gDPSetTile(         gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
                         G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
-    gDPSetTileSize(     gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
+    gDPSetTileSize(     gDisplayListHead++, G_TX_RENDERTILE, 0, 0, ((8 - 1) << G_TEXTURE_IMAGE_FRAC), ((8 - 1) << G_TEXTURE_IMAGE_FRAC));
     gDPPipeSync(        gDisplayListHead++);
     gDPSetTextureImage( gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
     gDPLoadSync(        gDisplayListHead++);
-    gDPLoadBlock(       gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
-    gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 7) << 2, (y + 7) << 2, G_TX_RENDERTILE,
-                        0, 0, 4 << 10, 1 << 10);
+    gDPLoadBlock(       gDisplayListHead++, G_TX_LOADTILE, 0, 0, ((8 * 8) - 1), CALC_DXT(8, G_IM_SIZ_16b_BYTES));
+    gSPTextureRectangle(gDisplayListHead++, (x << 2), (y << 2), ((x + 7) << 2), ((y + 7) << 2), G_TX_RENDERTILE,
+                        0, 0, (4 << 10), (1 << 10));
 }
 
 /**
@@ -154,7 +154,7 @@ void render_power_meter_health_segment(s16 numHealthWedges) {
     gDPPipeSync(       gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, (*healthLUT)[numHealthWedges - 1]);
     gDPLoadSync(       gDisplayListHead++);
-    gDPLoadBlock(      gDisplayListHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
+    gDPLoadBlock(      gDisplayListHead++, G_TX_LOADTILE, 0, 0, ((32 * 32) - 1), CALC_DXT(32, G_IM_SIZ_16b_BYTES));
     gSP1Triangle(      gDisplayListHead++, 0, 1, 2, 0);
     gSP1Triangle(      gDisplayListHead++, 0, 2, 3, 0);
 }
@@ -351,7 +351,7 @@ void handle_breath_meter_actions(s16 numBreathWedges) {
     // If Mario is swimming, keep breath meter visible
     if (gPlayerCameraState->action & ACT_FLAG_SWIMMING) {
         if (sBreathMeterHUD.animation == BREATH_METER_HIDDEN) {
-            sBreathMeterHUD.animation = BREATH_METER_SHOWING;
+            sBreathMeterHUD.animation  = BREATH_METER_SHOWING;
         }
         sBreathMeterVisibleTimer = 0;
     }
@@ -385,9 +385,9 @@ void render_hud_mario_lives(void) {
 #ifdef CUSTOM_DEBUG
 void render_debug_mode(void) {
     print_text(180, 40, "DEBUG MODE");
-    print_text_fmt_int(5, 20, "Z %d", gMarioState->pos[2]);
-    print_text_fmt_int(5, 40, "Y %d", gMarioState->pos[1]);
-    print_text_fmt_int(5, 60, "X %d", gMarioState->pos[0]);
+    print_text_fmt_int( 5,  20, "Z %d", gMarioState->pos[2]);
+    print_text_fmt_int( 5,  40, "Y %d", gMarioState->pos[1]);
+    print_text_fmt_int( 5,  60, "X %d", gMarioState->pos[0]);
     print_text_fmt_int(10, 100, "SPD %d", (s32) gMarioState->forwardVel);
     print_text_fmt_int(10, 120, "ANG 0*%04x", (u16) gMarioState->faceAngle[1]);
     print_fps(10,80);
@@ -450,9 +450,9 @@ void render_hud_timer(void) {
     print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(150), 185, "TIME");
 #endif
 
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(91), 185, "%0d", timerMins);
+    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(91), 185, "%0d",  timerMins);
     print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(71), 185, "%02d", timerSecs);
-    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(37), 185, "%d", timerFracSecs);
+    print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(37), 185, "%d",   timerFracSecs);
 
     gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
     render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(81), 32, (*hudLUT)[GLYPH_APOSTROPHE]);
@@ -486,22 +486,22 @@ void render_hud_camera_status(void) {
 
     switch (sCameraHUD.status & CAM_STATUS_MODE_GROUP) {
         case CAM_STATUS_MARIO:
-            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_MARIO_HEAD]);
+            render_hud_tex_lut((x + 16), y, (*cameraLUT)[GLYPH_CAM_MARIO_HEAD]);
             break;
         case CAM_STATUS_LAKITU:
-            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_LAKITU_HEAD]);
+            render_hud_tex_lut((x + 16), y, (*cameraLUT)[GLYPH_CAM_LAKITU_HEAD]);
             break;
         case CAM_STATUS_FIXED:
-            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_FIXED]);
+            render_hud_tex_lut((x + 16), y, (*cameraLUT)[GLYPH_CAM_FIXED]);
             break;
     }
 
     switch (sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) {
         case CAM_STATUS_C_DOWN:
-            render_hud_small_tex_lut(x + 4, y + 16, (*cameraLUT)[GLYPH_CAM_ARROW_DOWN]);
+            render_hud_small_tex_lut((x + 4), (y + 16), (*cameraLUT)[GLYPH_CAM_ARROW_DOWN]);
             break;
         case CAM_STATUS_C_UP:
-            render_hud_small_tex_lut(x + 4, y -  8, (*cameraLUT)[GLYPH_CAM_ARROW_UP]);
+            render_hud_small_tex_lut((x + 4), (y -  8), (*cameraLUT)[GLYPH_CAM_ARROW_UP]);
             break;
     }
 
@@ -533,7 +533,7 @@ void render_hud(void) {
         guOrtho(mtx, -16.0f, (SCREEN_WIDTH + 16), 0, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx),
-                  G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+                  (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH));
 #else
         create_dl_ortho_matrix();
 #endif

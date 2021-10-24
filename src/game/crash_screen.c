@@ -94,10 +94,10 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
             // 0xe738 = 0b1110011100111000
-            *ptr = ((*ptr & 0xE738) >> 2) | 1;
+            *ptr = (((*ptr & 0xE738) >> 2) | 1);
             ptr++;
         }
-        ptr += gCrashScreen.width - w;
+        ptr += (gCrashScreen.width - w);
     }
 }
 
@@ -117,7 +117,7 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
             *ptr++ = ((bit & rowMask) ? 0xFFFF : 1);
             bit >>= 1;
         }
-        ptr += gCrashScreen.width - 6;
+        ptr += (gCrashScreen.width - 6);
     }
 }
 
@@ -126,7 +126,6 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
 }
 
 void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
-    char *ptr;
     u32 glyph;
     char buf[0x108];
     bzero(&buf ,sizeof(buf));
@@ -134,7 +133,7 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     va_start(args, fmt);
     s32 size = _Printf(write_to_buf, buf, fmt, args);
     if (size > 0) {
-        ptr = buf;
+        char *ptr = buf;
         while (*ptr) {
             glyph = gCrashScreenCharToGlyph[*ptr & 0x7f];
             if (glyph != 0xff) {
@@ -156,8 +155,8 @@ void crash_screen_sleep(s32 ms) {
 void crash_screen_print_float_reg(s32 x, s32 y, s32 regNum, void *addr) {
     u32 bits = *(u32 *) addr;
     s32 exponent = (((bits & 0x7f800000U) >> 0x17) - 0x7F);
-    if ((exponent >= -0x7E && exponent <= 0x7F) || bits == 0) {
-        crash_screen_print(x, y, "F%02d:%.3e", regNum, *(f32 *) addr);
+    if (((exponent >= -0x7E) && (exponent <= 0x7F)) || (bits == 0x0)) {
+        crash_screen_print(x, y, "F%02d:%.3e",  regNum, *(f32 *) addr);
     } else {
         crash_screen_print(x, y, "F%02d:%08XD", regNum, *(u32 *) addr);
     }
@@ -165,7 +164,7 @@ void crash_screen_print_float_reg(s32 x, s32 y, s32 regNum, void *addr) {
 
 void crash_screen_print_fpcsr(u32 fpcsr) {
     s32 i;
-    u32 bit = (1 << 17);
+    u32 bit = BIT(17);
     crash_screen_print(30, 155, "FPCSR:%08XH", fpcsr);
     for (i = 0; i < 6; i++) {
         if (fpcsr & bit) {
@@ -226,7 +225,7 @@ void draw_crash_log(void) {
     osWritebackDCacheAll();
 #define LINE_HEIGHT (25 + ((LOG_BUFFER_SIZE - 1) * 10))
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
-        crash_screen_print(30, (LINE_HEIGHT) - (i * 10), consoleLogTable[i]);
+        crash_screen_print(30, (LINE_HEIGHT - (i * 10)), consoleLogTable[i]);
     }
 #undef LINE_HEIGHT
 }
@@ -309,10 +308,9 @@ void draw_assert(UNUSED OSThread *thread) {
 }
 
 void draw_crash_screen(OSThread *thread) {
-    s32 cause;
     __OSThreadContext *tc = &thread->context;
 
-    cause = (tc->cause >> 2) & 0x1F;
+    s32 cause = ((tc->cause >> 2) & 0x1F);
     if (cause == 23) { // EXC_WATCH
         cause = 16;
     }
@@ -367,7 +365,7 @@ OSThread *get_crashed_thread(void) {
     OSThread *thread = __osGetCurrFaultedThread();
     while (thread->priority != -1) {
         if (thread->priority > OS_PRIORITY_IDLE && thread->priority < OS_PRIORITY_APPMAX
-            && (thread->flags & 3) != 0) {
+            && ((thread->flags & (BIT(0) | BIT(1))) != 0)) {
             return thread;
         }
         thread = thread->tlnext;

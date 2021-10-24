@@ -30,8 +30,8 @@
 #define NUM_FLYING_CARPET_VERTICES 21
 extern const s16 flying_carpet_static_vertex_data[NUM_FLYING_CARPET_VERTICES];
 
-static s16 sCurAreaTimer = 1;
-static s16 sPrevAreaTimer = 0;
+static s16 sCurAreaTimer            = 1;
+static s16 sPrevAreaTimer           = 0;
 static s16 sFlyingCarpetRippleTimer = 0;
 
 s8 gFlyingCarpetState;
@@ -51,7 +51,7 @@ void make_vertex(Vtx *vtx, s32 n, f32 x, f32 y, f32 z, s16 tx, s16 ty, u8 r, u8 
     vtx[n].v.ob[1] = y;
     vtx[n].v.ob[2] = z;
 
-    vtx[n].v.flag = 0;
+    vtx[n].v.flag = 0x0;
 
     vtx[n].v.tc[0] = tx;
     vtx[n].v.tc[1] = ty;
@@ -109,12 +109,12 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
 Gfx *geo_exec_flying_carpet_timer_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     if (callContext != GEO_CONTEXT_RENDER) {
         sFlyingCarpetRippleTimer = 0;
-        sPrevAreaTimer = gAreaUpdateCounter - 1;
-        sCurAreaTimer = gAreaUpdateCounter;
+        sPrevAreaTimer = (gAreaUpdateCounter - 1);
+        sCurAreaTimer  =  gAreaUpdateCounter;
         gFlyingCarpetState = FLYING_CARPET_IDLE;
     } else {
         sPrevAreaTimer = sCurAreaTimer;
-        sCurAreaTimer = gAreaUpdateCounter;
+        sCurAreaTimer  = gAreaUpdateCounter;
         if (sPrevAreaTimer != sCurAreaTimer) {
             sFlyingCarpetRippleTimer += 0x400;
         }
@@ -141,14 +141,14 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
         displayList = alloc_display_list(7 * sizeof(*displayList));
         displayListHead = displayList;
 
-        if (verts == NULL || displayList == NULL) {
+        if ((verts == NULL) || (displayList == NULL)) {
             return NULL;
         }
         SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_OPAQUE);
 
         for (n = 0; n <= 20; n++) {
-            row = n / 3;
-            col = n % 3;
+            row = (n / 3);
+            col = (n % 3);
 
             x  = vertexData[(n * 4) + 0];
             y  = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0f);
@@ -166,7 +166,7 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
         gSPDisplayList(displayListHead++, dl_flying_carpet_model_half);
 
         // The back half.
-        gSPVertex(displayListHead++, verts + 9, 12, 0);
+        gSPVertex(displayListHead++, (verts + 9), 12, 0);
         gSPDisplayList(displayListHead++, dl_flying_carpet_model_half);
 
         gSPDisplayList(displayListHead++, dl_flying_carpet_end);

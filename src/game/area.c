@@ -92,20 +92,20 @@ const char *gNoControllerMsg[] = {
 #endif
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
-    RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
+    RGBA16 color = (((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A);
 
-    gFBSetColor = (color << 16) | color;
+    gFBSetColor       = (color << 16) | color;
     gViewportOverride = vpOverride;
-    gViewportClip = vpClip;
+    gViewportClip     = vpClip;
 }
 
 void set_warp_transition_rgb(Color red, Color green, Color blue) {
-    RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
+    RGBA16 color = (((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A);
 
-    gWarpTransFBSetColor = (color << 16) | color;
-    gWarpTransRed = red;
-    gWarpTransGreen = green;
-    gWarpTransBlue = blue;
+    gWarpTransFBSetColor = ((color << 16) | color);
+    gWarpTransRed        = red;
+    gWarpTransGreen      = green;
+    gWarpTransBlue       = blue;
 }
 
 void print_intro_text(void) {
@@ -177,31 +177,31 @@ void load_obj_warp_nodes(void) {
 void clear_areas(void) {
     s32 i;
 
-    gCurrentArea = NULL;
-    gWarpTransition.isActive = FALSE;
+    gCurrentArea                   = NULL;
+    gWarpTransition.isActive       = FALSE;
     gWarpTransition.pauseRendering = FALSE;
-    gMarioSpawnInfo->areaIndex = -1;
+    gMarioSpawnInfo->areaIndex     = -1;
 
     for (i = 0; i < 8; i++) {
-        gAreaData[i].index = i;
-        gAreaData[i].flags = 0;
-        gAreaData[i].terrainType = 0;
-        gAreaData[i].graphNode = NULL;
-        gAreaData[i].terrainData = NULL;
-        gAreaData[i].surfaceRooms = NULL;
-        gAreaData[i].macroObjects = NULL;
-        gAreaData[i].warpNodes = NULL;
+        gAreaData[i].index             = i;
+        gAreaData[i].flags             = 0x0;
+        gAreaData[i].terrainType       = TERRAIN_GRASS;
+        gAreaData[i].graphNode         = NULL;
+        gAreaData[i].terrainData       = NULL;
+        gAreaData[i].surfaceRooms      = NULL;
+        gAreaData[i].macroObjects      = NULL;
+        gAreaData[i].warpNodes         = NULL;
         gAreaData[i].paintingWarpNodes = NULL;
-        gAreaData[i].instantWarps = NULL;
-        gAreaData[i].objectSpawnInfos = NULL;
-        gAreaData[i].camera = NULL;
-        gAreaData[i].unused = NULL;
-        gAreaData[i].whirlpools[0] = NULL;
-        gAreaData[i].whirlpools[1] = NULL;
-        gAreaData[i].dialog[0] = DIALOG_NONE;
-        gAreaData[i].dialog[1] = DIALOG_NONE;
-        gAreaData[i].musicParam = 0;
-        gAreaData[i].musicParam2 = 0;
+        gAreaData[i].instantWarps      = NULL;
+        gAreaData[i].objectSpawnInfos  = NULL;
+        gAreaData[i].camera            = NULL;
+        gAreaData[i].unused            = NULL;
+        gAreaData[i].whirlpools[0]     = NULL;
+        gAreaData[i].whirlpools[1]     = NULL;
+        gAreaData[i].dialog[0]         = DIALOG_NONE;
+        gAreaData[i].dialog[1]         = DIALOG_NONE;
+        gAreaData[i].musicParam        = 0;
+        gAreaData[i].musicParam2       = 0;
     }
 }
 
@@ -304,16 +304,18 @@ void area_update_objects(void) {
 void play_transition(UNUSED s16 transType, UNUSED s16 time, UNUSED Color red, UNUSED Color green, UNUSED Color blue) {
 #else
 void play_transition(s16 transType, s16 time, Color red, Color green, Color blue) {
-    gWarpTransition.isActive = TRUE;
-    gWarpTransition.type = transType;
-    gWarpTransition.time = time;
+    gWarpTransition.isActive       = TRUE;
+    gWarpTransition.type           = transType;
+    gWarpTransition.time           = time;
     gWarpTransition.pauseRendering = FALSE;
 
     // The lowest bit of transType determines if the transition is fading in or out.
     if (transType & WARP_TRANSITION_FADE_INTO) {
         set_warp_transition_rgb(red, green, blue);
     } else {
-        red = gWarpTransRed, green = gWarpTransGreen, blue = gWarpTransBlue;
+        red   = gWarpTransRed;
+        green = gWarpTransGreen;
+        blue  = gWarpTransBlue;
     }
 
     if (transType < 8) { // if transition is RGB
