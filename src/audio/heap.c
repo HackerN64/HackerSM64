@@ -1578,7 +1578,7 @@ void func_sh_802f2158(struct UnkEntry *entry) {
         bankId2 = gCtlEntries[idx].bankId2;
         if ((bankId1 != 0xff && entry->bankId == bankId1) || (bankId2 != 0xff && entry->bankId == bankId2) || entry->bankId == 0) {
             if (get_bank_or_seq(1, 2, idx) != NULL) {
-                if (IS_BANK_LOAD_COMPLETE(idx) != FALSE) {
+                if (IS_BANK_LOAD_COMPLETE(idx)) {
                     for (instId = 0; instId < gCtlEntries[idx].numInstruments; instId++) {
                         inst = get_instrument_inner(idx, instId);
                         if (inst != NULL) {
@@ -1640,7 +1640,7 @@ void func_sh_802f23ec(void) {
         bankId2 = gCtlEntries[idx].bankId2;
         if ((bankId1 != 0xffu && entry->bankId == bankId1) || (bankId2 != 0xff && entry->bankId == bankId2) || entry->bankId == 0) {
             if (get_bank_or_seq(1, 3, idx) != NULL) {
-                if (IS_BANK_LOAD_COMPLETE(idx) != FALSE) {
+                if (IS_BANK_LOAD_COMPLETE(idx)) {
                     for (i = 0; i < gUnkPool2.numEntries; i++) {
                         entry = &gUnkPool2.entries[i];
                         for (instId = 0; instId < gCtlEntries[idx].numInstruments; instId++) {

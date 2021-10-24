@@ -2251,12 +2251,12 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 #endif
 
     // If discarded, bail out.
-    if (IS_SEQ_LOAD_COMPLETE(seqPlayer->seqId) == FALSE
+    if (!IS_SEQ_LOAD_COMPLETE(seqPlayer->seqId)
         || (
 #ifdef VERSION_SH
         seqPlayer->defaultBank[0] != 0xff &&
 #endif
-        IS_BANK_LOAD_COMPLETE(seqPlayer->defaultBank[0]) == FALSE)) {
+        !IS_BANK_LOAD_COMPLETE(seqPlayer->defaultBank[0]))) {
         eu_stubbed_printf_1("Disappear Sequence or Bank %d\n", seqPlayer->seqId);
         sequence_player_disable(seqPlayer);
         return;

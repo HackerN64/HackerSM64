@@ -689,13 +689,13 @@ u32 get_missing_bank(u32 seqId, s32 *nonNullCount, s32 *nullCount) {
     for (i = gAlBankSets[offset++], ret = 0; i != 0; i--) {
         bankId = gAlBankSets[offset++];
 #else
-    u16 offset = ((u16 *) gAlBankSets)[seqId] + 1;
+    u16 offset = (((u16 *) gAlBankSets)[seqId] + 1);
     for (i = gAlBankSets[offset - 1], ret = 0; i != 0; i--) {
         offset++;
         bankId = gAlBankSets[offset - 1];
 #endif
 
-        if (IS_BANK_LOAD_COMPLETE(bankId) == TRUE) {
+        if (IS_BANK_LOAD_COMPLETE(bankId)) {
 #if defined(VERSION_EU)
             temp = get_bank_or_seq(&gBankLoadedPool, 2, bankId);
 #else
@@ -732,7 +732,7 @@ struct AudioBank *load_banks_immediate(s32 seqId, u8 *outDefaultBank) {
         bankId = gAlBankSets[offset - 1];
 #endif
 
-        if (IS_BANK_LOAD_COMPLETE(bankId) == TRUE) {
+        if (IS_BANK_LOAD_COMPLETE(bankId)) {
 #ifdef VERSION_EU
             ret = get_bank_or_seq(&gBankLoadedPool, 2, bankId);
 #else
@@ -764,8 +764,7 @@ void preload_sequence(u32 seqId, u8 preloadMask) {
     }
 
     if (preloadMask & PRELOAD_SEQUENCE) {
-        // @bug should be IS_SEQ_LOAD_COMPLETE
-        if (IS_SEQ_LOAD_COMPLETE(seqId) == TRUE) {
+        if (IS_SEQ_LOAD_COMPLETE(seqId)) {
             eu_stubbed_printf_1("SEQ  %d ALREADY CACHED\n", seqId);
             sequenceData = get_bank_or_seq(&gSeqLoadedPool, 2, seqId);
         } else {

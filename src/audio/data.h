@@ -7,9 +7,9 @@
 #include "types.h"
 #include "synthesis.h"
 
-#define AUDIO_LOCK_UNINITIALIZED 0
-#define AUDIO_LOCK_NOT_LOADING 0x76557364
-#define AUDIO_LOCK_LOADING     0x19710515
+#define AUDIO_LOCK_UNINITIALIZED 0x00000000
+#define AUDIO_LOCK_NOT_LOADING   0x76557364
+#define AUDIO_LOCK_LOADING       0x19710515
 
 #define NUMAIBUFFERS 3
 
@@ -56,7 +56,7 @@ extern struct NoteSubEu gDefaultNoteSub;
 extern u16 gHeadsetPanQuantization[10];
 #endif
 extern f32 gHeadsetPanVolume[128];
-extern f32 gStereoPanVolume[128];
+extern f32  gStereoPanVolume[128];
 extern f32 gDefaultPanVolume[128];
 
 extern f32 gVolRampingLhs136[128];
@@ -110,15 +110,15 @@ extern u32 gAudioRandom;
 
 #ifdef EXPAND_AUDIO_HEAP
 #if defined(VERSION_US) || defined(VERSION_JP) || defined(VERSION_EU)
-#define EXT_AUDIO_HEAP_SIZE 0x27400
-#define EXT_AUDIO_INIT_POOL_SIZE 0x2000
+#define EXT_AUDIO_HEAP_SIZE      0x27400
+#define EXT_AUDIO_INIT_POOL_SIZE 0x02000
 #else
 // SH not yet supported for expanded audio heap
-#define EXT_AUDIO_HEAP_SIZE 0x0
+#define EXT_AUDIO_HEAP_SIZE      0x0
 #define EXT_AUDIO_INIT_POOL_SIZE 0x0
 #endif
 #else
-#define EXT_AUDIO_HEAP_SIZE 0x0
+#define EXT_AUDIO_HEAP_SIZE      0x0
 #define EXT_AUDIO_INIT_POOL_SIZE 0x0
 #endif
 
@@ -131,19 +131,19 @@ extern u8 D_SH_80350F18;
 extern u8 D_SH_80350F19;
 
 extern OSMesg D_SH_80350F1C[1];
-extern OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
+extern OSMesgQueue  D_SH_80350F20; // address written to D_SH_80350F38
 extern OSMesgQueue *D_SH_80350F38;
 
 extern OSMesg D_SH_80350F40[4];
-extern OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
+extern OSMesgQueue  D_SH_80350F50; // address written to D_SH_80350F68
 extern OSMesgQueue *D_SH_80350F68;
 
 extern OSMesg D_SH_80350F6C[1];
-extern OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
+extern OSMesgQueue  D_SH_80350F70; // address written to D_SH_80350F88
 extern OSMesgQueue *D_SH_80350F88;
 
 extern OSMesg D_SH_80350F8C[1];
-extern OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
+extern OSMesgQueue  D_SH_80350F90; // address written to D_SH_80350F90
 extern OSMesgQueue *D_SH_80350FA8;
 #endif
 

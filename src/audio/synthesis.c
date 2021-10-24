@@ -25,18 +25,18 @@
 #define DMEM_ADDR_WET_RIGHT_CH           0x880
 
 #define aSetLoadBufferPair(pkt, c, off)                                                                \
-    aSetBuffer(pkt, 0, c + DMEM_ADDR_WET_LEFT_CH, 0, DEFAULT_LEN_1CH - c);                             \
-    aLoadBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left + (off)));                  \
-    aSetBuffer(pkt, 0, c + DMEM_ADDR_WET_RIGHT_CH, 0, DEFAULT_LEN_1CH - c);                            \
-    aLoadBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)))
+    aSetBuffer( (pkt), 0, ((c) + DMEM_ADDR_WET_LEFT_CH ), 0, (DEFAULT_LEN_1CH - (c)));                 \
+    aLoadBuffer((pkt), VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left  + (off)));               \
+    aSetBuffer( (pkt), 0, ((c) + DMEM_ADDR_WET_RIGHT_CH), 0, (DEFAULT_LEN_1CH - (c)));                 \
+    aLoadBuffer((pkt), VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
 
 #define aSetSaveBufferPair(pkt, c, d, off)                                                             \
-    aSetBuffer(pkt, 0, 0, c + DMEM_ADDR_WET_LEFT_CH, d);                                               \
-    aSaveBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left +  (off)));                 \
-    aSetBuffer(pkt, 0, 0, c + DMEM_ADDR_WET_RIGHT_CH, d);                                              \
-    aSaveBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
+    aSetBuffer( (pkt), 0, 0, ((c) + DMEM_ADDR_WET_LEFT_CH ), (d));                                     \
+    aSaveBuffer((pkt), VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left  + (off)));               \
+    aSetBuffer( (pkt), 0, 0, ((c) + DMEM_ADDR_WET_RIGHT_CH), (d));                                     \
+    aSaveBuffer((pkt), VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
 
-#define AUDIO_ALIGN(val, amnt) (((val) + (1 << amnt) - 1) & ~((1 << amnt) - 1))
+#define AUDIO_ALIGN(val, amnt) (((val) + (1 << (amnt)) - 1) & ~((1 << (amnt)) - 1))
 
 #if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
 /* ----------------------------------------------------------------------BEGIN REVERB PARAMETERS---------------------------------------------------------------------- */
@@ -77,7 +77,7 @@ s8 betterReverbDownsampleEmulator = 2;
 // Filter count should always be a multiple of 3. Never ever set this value to be greater than NUM_ALLPASS.
 // Setting it to anything less than 3 will disable reverb outright.
 // This can be changed at any time, but is best set when calling audio_reset_session.
-u32 reverbFilterCountConsole = NUM_ALLPASS - 6;
+u32 reverbFilterCountConsole = (NUM_ALLPASS - 6);
 
 // This value represents the number of filters to use with the reverb. This can be decreased to improve performance, but at the cost of a lesser presence of reverb in the final audio.
 // Filter count should always be a multiple of 3. Never ever set this value to be greater than NUM_ALLPASS.
@@ -156,14 +156,14 @@ s32 reverbMultsR[NUM_ALLPASS / 3] = {0xCF, 0x73, 0x38, 0x1F};
 /* -----------------------------------------------------------------------END REVERB PARAMETERS----------------------------------------------------------------------- */
 
 // Do not touch these values manually, unless you want potential for problems.
-s32 reverbFilterCount = NUM_ALLPASS;
-s32 reverbFilterCountm1 = NUM_ALLPASS - 1;
+s32 reverbFilterCount   =  NUM_ALLPASS;
+s32 reverbFilterCountm1 = (NUM_ALLPASS - 1);
 u8 monoReverb = FALSE;
 u8 toggleBetterReverb = TRUE;
-s32 allpassIdxL[NUM_ALLPASS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-s32 allpassIdxR[NUM_ALLPASS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-s32 tmpBufL[NUM_ALLPASS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-s32 tmpBufR[NUM_ALLPASS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+s32 allpassIdxL[NUM_ALLPASS] = {0 , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+s32 allpassIdxR[NUM_ALLPASS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+s32     tmpBufL[NUM_ALLPASS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+s32     tmpBufR[NUM_ALLPASS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 s32 **delayBufsL;
 s32 **delayBufsR;
 #endif
@@ -357,13 +357,11 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
 
             for (srcPos = 0, dstPos = 0; dstPos < (item->lengthA / 2);
                  srcPos += gReverbDownsampleRate, dstPos++) {
-                gSynthesisReverb.ringBuffer.left[dstPos + item->startPos] =
-                    item->toDownsampleLeft[srcPos];
-                gSynthesisReverb.ringBuffer.right[dstPos + item->startPos] =
-                    item->toDownsampleRight[srcPos];
+                gSynthesisReverb.ringBuffer.left [dstPos + item->startPos] = item->toDownsampleLeft [srcPos];
+                gSynthesisReverb.ringBuffer.right[dstPos + item->startPos] = item->toDownsampleRight[srcPos];
             }
-            for (dstPos = 0; dstPos < item->lengthB / 2; srcPos += gReverbDownsampleRate, dstPos++) {
-                gSynthesisReverb.ringBuffer.left[ dstPos] = item->toDownsampleLeft[ srcPos];
+            for (dstPos = 0; dstPos < (item->lengthB / 2); srcPos += gReverbDownsampleRate, dstPos++) {
+                gSynthesisReverb.ringBuffer.left [dstPos] = item->toDownsampleLeft [srcPos];
                 gSynthesisReverb.ringBuffer.right[dstPos] = item->toDownsampleRight[srcPos];
             }
         }
@@ -514,7 +512,7 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
             leftVolRamp = gLeftVolRampings[nextVolRampTable];
             rightVolRamp = gRightVolRampings[nextVolRampTable & 0xFFFFFFFF];
         } else {
-            if (bufLen / i >= gAudioBufferParameters.samplesPerUpdateMax) {
+            if ((bufLen / i) >= gAudioBufferParameters.samplesPerUpdateMax) {
                 chunkLen = gAudioBufferParameters.samplesPerUpdateMax; nextVolRampTable = 2; leftVolRamp = gLeftVolRampings[2]; rightVolRamp = gRightVolRampings[2];
             } else if (bufLen / i <= gAudioBufferParameters.samplesPerUpdateMin) {
                 chunkLen = gAudioBufferParameters.samplesPerUpdateMin; nextVolRampTable = 0; leftVolRamp = gLeftVolRampings[0]; rightVolRamp = gRightVolRampings[0];
@@ -526,10 +524,10 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
         gCurrentRightVolRamping = rightVolRamp;
         for (j = 0; j < gNumSynthesisReverbs; j++) {
             if (gSynthesisReverbs[j].useReverb != 0) {
-                prepare_reverb_ring_buffer(chunkLen, gAudioBufferParameters.updatesPerFrame - i, j);
+                prepare_reverb_ring_buffer(chunkLen, (gAudioBufferParameters.updatesPerFrame - i), j);
             }
         }
-        cmd = synthesis_do_one_audio_update((s16 *) aiBufPtr, chunkLen, cmd, gAudioBufferParameters.updatesPerFrame - i);
+        cmd = synthesis_do_one_audio_update((s16 *) aiBufPtr, chunkLen, cmd, (gAudioBufferParameters.updatesPerFrame - i));
         bufLen   -= chunkLen;
         aiBufPtr += chunkLen;
     }
@@ -549,7 +547,7 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
     s32 chunkLen;
     s32 i;
     u32 *aiBufPtr = (u32 *) aiBuf;
-    u64 *cmd = cmdBuf + 1;
+    u64 *cmd = (cmdBuf + 1);
     s32 v0;
 
     aSegment(cmdBuf, 0, 0);
@@ -604,11 +602,10 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
 
 #ifdef VERSION_EU
 u64 *synthesis_resample_and_mix_reverb(u64 *cmd, s32 bufLen, s16 reverbIndex, s16 updateIndex) {
-    struct ReverbRingBufferItem *item;
     s16 startPad;
     s16 paddedLengthA;
 
-    item = &gSynthesisReverbs[reverbIndex].items[gSynthesisReverbs[reverbIndex].curFrame][updateIndex];
+    struct ReverbRingBufferItem *item = &gSynthesisReverbs[reverbIndex].items[gSynthesisReverbs[reverbIndex].curFrame][updateIndex];
 
     aClearBuffer(cmd++, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
     if (gSynthesisReverbs[reverbIndex].downsampleRate == 1) {
@@ -618,7 +615,7 @@ u64 *synthesis_resample_and_mix_reverb(u64 *cmd, s32 bufLen, s16 reverbIndex, s1
         }
         aSetBuffer(cmd++, 0, 0, 0, DEFAULT_LEN_2CH);
         aMix(cmd++, 0, 0x7fff, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_LEFT_CH);
-        aMix(cmd++, 0, 0x8000 + gSynthesisReverbs[reverbIndex].reverbGain, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_WET_LEFT_CH);
+        aMix(cmd++, 0, (0x8000 + gSynthesisReverbs[reverbIndex].reverbGain), DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_WET_LEFT_CH);
     } else {
         startPad = ((item->startPos & 0x7) * 2);
         paddedLengthA = AUDIO_ALIGN(startPad + item->lengthA, 4);
@@ -726,7 +723,7 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
     }
     for (; i < notePos; i++) {
         temp = updateIndex * gMaxSimultaneousNotes;
-        if (IS_BANK_LOAD_COMPLETE(gNoteSubsEu[temp + noteIndices[i]].bankId) == TRUE) {
+        if (IS_BANK_LOAD_COMPLETE(gNoteSubsEu[temp + noteIndices[i]].bankId)) {
             cmd = synthesis_process_note(&gNotes[noteIndices[i]],
                                          &gNoteSubsEu[temp + noteIndices[i]],
                                          &gNotes[noteIndices[i]].synthesisState,
@@ -890,9 +887,9 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
 #ifdef VERSION_US
         //! This function requires note->enabled to be volatile, but it breaks other functions like note_enable.
         //! Casting to a struct with just the volatile bitfield works, but there may be a better way to match.
-        if (((struct vNote *)note)->enabled && IS_BANK_LOAD_COMPLETE(note->bankId) == FALSE) {
+        if (((struct vNote *)note)->enabled && !IS_BANK_LOAD_COMPLETE(note->bankId)) {
 #else
-        if (IS_BANK_LOAD_COMPLETE(note->bankId) == FALSE) {
+        if (!IS_BANK_LOAD_COMPLETE(note->bankId)) {
 #endif
             gAudioErrorFlags = ((note->bankId << 8) + noteIndex + 0x1000000);
         } else if (((struct vNote *)note)->enabled) {
@@ -1063,7 +1060,7 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
 
                         if (t0 != 0) {
 #ifdef VERSION_EU
-                            temp = ((synthesisState->samplePosInt - s2 + 0x10) / 16);
+                            temp = (((synthesisState->samplePosInt - s2) + 0x10) / 16);
                             if (audioBookSample->loaded == 0x81) {
                                 v0_2 = (sampleAddr + (temp * 9));
                             } else {
@@ -1291,10 +1288,10 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
     }
 
     t9 = (bufLen * 2);
-    aSetBuffer(cmd++, 0, 0, DMEM_ADDR_TEMP, t9);
+    aSetBuffer( cmd++, 0, 0, DMEM_ADDR_TEMP, t9);
     aInterleave(cmd++, DMEM_ADDR_LEFT_CH, DMEM_ADDR_RIGHT_CH);
     t9 *= 2;
-    aSetBuffer(cmd++, 0, 0, DMEM_ADDR_TEMP, t9);
+    aSetBuffer( cmd++, 0, 0, DMEM_ADDR_TEMP, t9);
     aSaveBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(aiBuf));
 #endif
 
@@ -1303,19 +1300,17 @@ u64 *synthesis_process_notes(s16 *aiBuf, s32 bufLen, u64 *cmd) {
 
 #ifdef VERSION_EU
 u64 *load_wave_samples(u64 *cmd, struct NoteSubEu *noteSubEu, struct NoteSynthesisState *synthesisState, s32 nSamplesToLoad) {
-    s32 a3;
-    s32 repeats;
-    s32 i;
     aSetBuffer(cmd++, /*flags*/ 0, /*dmemin*/ DMEM_ADDR_UNCOMPRESSED_NOTE, /*dmemout*/ 0, /*count*/ 128);
     aLoadBuffer(cmd++, VIRTUAL_TO_PHYSICAL2(noteSubEu->sound.samples));
 
     synthesisState->samplePosInt &= 0x3f;
-    a3 = (64 - synthesisState->samplePosInt);
+    s32 a3 = (64 - synthesisState->samplePosInt);
     if (a3 < nSamplesToLoad) {
-        repeats = ((nSamplesToLoad - a3 + 63) / 64);
+        s32 repeats = (((nSamplesToLoad - a3) + 63) / 64);
+        s32 i;
         for (i = 0; i < repeats; i++) {
             aDMEMMove(cmd++,
-                      /*dmemin*/ DMEM_ADDR_UNCOMPRESSED_NOTE,
+                      /*dmemin*/   DMEM_ADDR_UNCOMPRESSED_NOTE,
                       /*dmemout*/ (DMEM_ADDR_UNCOMPRESSED_NOTE + ((1 + i) * 128)),
                       /*count*/ 128);
         }
@@ -1332,7 +1327,7 @@ u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad) {
     note->samplePosInt &= (note->sampleCount - 1);
     a3 = (64 - note->samplePosInt);
     if (a3 < nSamplesToLoad) {
-        for (i = 0; i <= (((nSamplesToLoad - a3 + 63) / 64) - 1); i++) {
+        for (i = 0; i <= ((((nSamplesToLoad - a3) + 63) / 64) - 1); i++) {
             aDMEMMove(cmd++, /*dmemin*/ DMEM_ADDR_UNCOMPRESSED_NOTE, /*dmemout*/ (DMEM_ADDR_UNCOMPRESSED_NOTE + ((1 + i) * sizeof(note->synthesisBuffers->samples))), /*count*/ sizeof(note->synthesisBuffers->samples));
         }
     }
@@ -1343,13 +1338,13 @@ u64 *load_wave_samples(u64 *cmd, struct Note *note, s32 nSamplesToLoad) {
 #ifdef VERSION_EU
 u64 *final_resample(u64 *cmd, struct NoteSynthesisState *synthesisState, s32 count, u16 pitch, u16 dmemIn, u32 flags) {
     aSetBuffer(cmd++, /*flags*/ 0, dmemIn, /*dmemout*/ DMEM_ADDR_TEMP, count);
-    aResample(cmd++, flags, pitch, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->finalResampleState));
+    aResample( cmd++, flags, pitch, VIRTUAL_TO_PHYSICAL2(synthesisState->synthesisBuffers->finalResampleState));
     return cmd;
 }
 #else
 u64 *final_resample(u64 *cmd, struct Note *note, s32 count, u16 pitch, u16 dmemIn, u32 flags) {
     aSetBuffer(cmd++, /*flags*/ 0, dmemIn, /*dmemout*/ DMEM_ADDR_TEMP, count);
-    aResample(cmd++, flags, pitch, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->finalResampleState));
+    aResample( cmd++, flags, pitch, VIRTUAL_TO_PHYSICAL2(note->synthesisBuffers->finalResampleState));
     return cmd;
 }
 #endif
@@ -1484,16 +1479,12 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
         if (note->stereoStrongRight) {
             aSetBuffer(cmd++, 0, 0, 0, (nSamples * 2));
             // 0x8000 is -100%, so subtract sound instead of adding...
-            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY,
-                 /*out*/ DMEM_ADDR_LEFT_CH);
-            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_WET,
-                 /*out*/ DMEM_ADDR_WET_LEFT_CH);
+            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY, /*out*/ DMEM_ADDR_LEFT_CH);
+            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_WET, /*out*/ DMEM_ADDR_WET_LEFT_CH);
         } else if (note->stereoStrongLeft) {
             aSetBuffer(cmd++, 0, 0, 0, (nSamples * 2));
-            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY,
-                 /*out*/ DMEM_ADDR_RIGHT_CH);
-            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_WET,
-                 /*out*/ DMEM_ADDR_WET_RIGHT_CH);
+            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY, /*out*/ DMEM_ADDR_RIGHT_CH);
+            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_WET, /*out*/ DMEM_ADDR_WET_RIGHT_CH);
         }
     } else {
 #ifdef VERSION_EU
@@ -1503,12 +1494,10 @@ u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisStat
 #endif
         if (note->stereoStrongRight) {
             aSetBuffer(cmd++, 0, 0, 0, (nSamples * 2));
-            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY,
-                 /*out*/ DMEM_ADDR_LEFT_CH);
+            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY, /*out*/ DMEM_ADDR_LEFT_CH);
         } else if (note->stereoStrongLeft) {
             aSetBuffer(cmd++, 0, 0, 0, (nSamples * 2));
-            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY,
-                 /*out*/ DMEM_ADDR_RIGHT_CH);
+            aMix(cmd++, 0, /*gain*/ 0x8000, /*in*/ DMEM_ADDR_STEREO_STRONG_TEMP_DRY, /*out*/ DMEM_ADDR_RIGHT_CH);
         }
     }
     return cmd;
@@ -1627,11 +1616,6 @@ void note_init_volume(struct Note *note) {
 
 void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverbVol) {
     f32 volLeft, volRight;
-    // Anding with 127 avoids out-of-bounds reads when pan is outside of [0, 1].
-    // This can occur during PU movement -- see the bug comment in get_sound_pan
-    // in external.c. An out-of-bounds read by itself doesn't crash, but if the
-    // resulting value is a nan or denormal, performing arithmetic on it crashes
-    // on console.
     s32 panIndex = ((s32)(pan * 127.5f) & 127);
     if (note->stereoHeadsetEffects && gSoundMode == SOUND_MODE_HEADSET) {
         s8 smallPanIndex;
@@ -1646,7 +1630,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
         note->stereoStrongRight     = FALSE;
         note->stereoStrongLeft      = FALSE;
         note->usesHeadsetPanEffects = TRUE;
-        volLeft = gHeadsetPanVolume[panIndex];
+        volLeft  = gHeadsetPanVolume[      panIndex];
         volRight = gHeadsetPanVolume[127 - panIndex];
     } else if (note->stereoHeadsetEffects && gSoundMode == SOUND_MODE_STEREO) {
         u8 strongLeft  = FALSE;
@@ -1654,7 +1638,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
         note->headsetPanLeft  = 0;
         note->headsetPanRight = 0;
         note->usesHeadsetPanEffects = FALSE;
-        volLeft = gStereoPanVolume[panIndex];
+        volLeft  = gStereoPanVolume[      panIndex];
         volRight = gStereoPanVolume[127 - panIndex];
         if (panIndex < 0x20) {
             strongLeft = TRUE;
@@ -1662,12 +1646,12 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
             strongRight = TRUE;
         }
         note->stereoStrongRight = strongRight;
-        note->stereoStrongLeft = strongLeft;
+        note->stereoStrongLeft  = strongLeft;
     } else if (gSoundMode == SOUND_MODE_MONO) {
         volLeft  = 0.707f;
         volRight = 0.707f;
     } else {
-        volLeft = gDefaultPanVolume[panIndex];
+        volLeft  = gDefaultPanVolume[      panIndex];
         volRight = gDefaultPanVolume[127 - panIndex];
     }
 
@@ -1683,8 +1667,8 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, f32 pan, u8 reverb
         note->targetVolRight++;
     }
     if (note->reverbVol != reverbVol) {
-        note->reverbVol = reverbVol;
-        note->reverbVolShifted = (reverbVol << 8);
+        note->reverbVol         =  reverbVol;
+        note->reverbVolShifted  = (reverbVol << 8);
         note->envMixerNeedsInit = TRUE;
         return;
     }
@@ -1714,7 +1698,7 @@ void note_disable(struct Note *note) {
     if (note->needsInit) {
         note->needsInit = FALSE;
     } else {
-        note_set_vel_pan_reverb(note, 0, 0.5, 0);
+        note_set_vel_pan_reverb(note, 0, 0.5f, 0);
     }
     note->priority        = NOTE_PRIORITY_DISABLED;
     note->enabled         = FALSE;

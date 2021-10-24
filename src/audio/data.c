@@ -13,14 +13,14 @@ extern struct OSMesgQueue OSMesgQueue3;
 // To increase reverb window sizes beyond 64, please increase the REVERB_WINDOW_SIZE_MAX in heap.c by a factor of 0x40 and update AUDIO_HEAP_SIZE by 4x the same amount.
 #ifdef VERSION_EU
 struct ReverbSettingsEU sReverbSettings[8] = {
-    { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF },
-    { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x47FF },
-    { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF },
-    { /*Downsample Rate*/ 1,/*Window Size*/ 60,/*Gain*/ 0x3FFF },
-    { /*Downsample Rate*/ 1,/*Window Size*/ 48,/*Gain*/ 0x4FFF },
-    { /*Downsample Rate*/ 1,/*Window Size*/ 64,/*Gain*/ 0x2FFF }, // Duplicate of the first index
-    { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x47FF }, // Duplicate of the second index
-    { /*Downsample Rate*/ 1,/*Window Size*/ 40,/*Gain*/ 0x37FF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 64, /*Gain*/ 0x2FFF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 40, /*Gain*/ 0x47FF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 64, /*Gain*/ 0x2FFF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 60, /*Gain*/ 0x3FFF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 48, /*Gain*/ 0x4FFF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 64, /*Gain*/ 0x2FFF }, // Duplicate of the first index
+    { /*Downsample Rate*/ 1, /*Window Size*/ 40, /*Gain*/ 0x47FF }, // Duplicate of the second index
+    { /*Downsample Rate*/ 1, /*Window Size*/ 40, /*Gain*/ 0x37FF },
 };
 /**
 1: Frequency
@@ -38,9 +38,9 @@ struct ReverbSettingsEU sReverbSettings[8] = {
 
 struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 #ifdef EXPAND_AUDIO_HEAP
-    {/*1*/ 32000,/*2*/ 1,/*3*/ 40,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ 0x8200,/*9*/ 0xDC00,/*10*/ 0xE800,/*11*/ 0x5500 },
+    { /*1*/ 32000,/*2*/ 1,/*3*/ 40,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ 0x8200,/*9*/ 0xDC00,/*10*/ 0xE800,/*11*/ 0x5500 },
 #else
-    {/*1*/ 32000,/*2*/ 1,/*3*/ 20,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ 0x4100,/*9*/ 0x6E00,/*10*/ 0x7400,/*11*/ 0x2A80 },
+    { /*1*/ 32000,/*2*/ 1,/*3*/ 20,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ 0x4100,/*9*/ 0x6E00,/*10*/ 0x7400,/*11*/ 0x2A80 },
 #endif
 };
 #endif
@@ -60,24 +60,24 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 // To increase reverb window sizes beyond 0x1000, please increase the REVERB_WINDOW_SIZE_MAX in heap.c and update AUDIO_HEAP_SIZE by the same amount.
 #if defined(VERSION_JP) || defined(VERSION_US)
 struct ReverbSettingsUS gReverbSettings[18] = {
-    {1, 0x0C00, 0x2FFF},
-    {1, 0x0A00, 0x47FF},
-    {1, 0x1000, 0x2FFF},
-    {1, 0x0E00, 0x3FFF},
-    {1, 0x0C00, 0x4FFF},
-    {1, 0x0C00, 0x2FFF},
-    {1, 0x0A00, 0x47FF},
-    {1, 0x0800, 0x37FF},
-    {1, 0x0800, 0x2FFF},
-    {1, 0x0800, 0x3FFF},
-    {1, 0x1000, 0x3FFF},
-    {1, 0x1000, 0x2FFF},
-    {1, 0x0C00, 0x3FFF},
-    {1, 0x0800, 0x4FFF},
-    {1, 0x0800, 0x2FFF},
-    {1, 0x0800, 0x2FFF},
-    {1, 0x0800, 0x2FFF},
-    {1, 0x0800, 0x2FFF},
+    { 1, 0x0C00, 0x2FFF },
+    { 1, 0x0A00, 0x47FF },
+    { 1, 0x1000, 0x2FFF },
+    { 1, 0x0E00, 0x3FFF },
+    { 1, 0x0C00, 0x4FFF },
+    { 1, 0x0C00, 0x2FFF },
+    { 1, 0x0A00, 0x47FF },
+    { 1, 0x0800, 0x37FF },
+    { 1, 0x0800, 0x2FFF },
+    { 1, 0x0800, 0x3FFF },
+    { 1, 0x1000, 0x3FFF },
+    { 1, 0x1000, 0x2FFF },
+    { 1, 0x0C00, 0x3FFF },
+    { 1, 0x0800, 0x4FFF },
+    { 1, 0x0800, 0x2FFF },
+    { 1, 0x0800, 0x2FFF },
+    { 1, 0x0800, 0x2FFF },
+    { 1, 0x0800, 0x2FFF },
 };
 
 // TODO: Does using 40/20 instead of 32/16 for gMaxSimultaneousNotes cause memory problems at high capacities or is it good as is?
@@ -101,15 +101,15 @@ u16 gAudioCosineTable[128] = {
     26220,  25975, 25726, 25473, 25216, 24956, 24691, 24423, 24151, 23875, 23596, 23313, 23026,
     22736,  22442, 22145, 21845, 21541, 21234, 20924, 20610, 20294, 19974, 19651, 19325, 18997,
     18665,  18331, 17993, 17653, 17310, 16965, 16617, 16266, 15913, 15558, 15200, 14840, 14477,
-    14113,  13746, 13377, 13006, 12633, 12258, 11881, 11503, 11122, 10740, 10357, 9971,  9584,
-    9196,   8806,  8415,  8023,  7630,  7235,  6839,  6442,  6044,  5646,  5246,  4845,  4444,
-    4042,   3640,  3237,  2833,  2429,  2025,  1620,  1216,  810,   405,   0,
+    14113,  13746, 13377, 13006, 12633, 12258, 11881, 11503, 11122, 10740, 10357,  9971,  9584,
+     9196,   8806,  8415,  8023,  7630,  7235,  6839,  6442,  6044,  5646,  5246,  4845,  4444,
+     4042,   3640,  3237,  2833,  2429,  2025,  1620,  1216,   810,   405,     0,
 };
 #endif
 
 // Transforms a pitch scale factor in -127..127 into a frequency scale factor
 // between -1 and +1 octave.
-// gPitchBendFrequencyScale[k] = 0.5 * 2^(k/127)
+// gPitchBendFrequencyScale[k] = (0.5 * 2^(k/127))
 #ifndef VERSION_SH
 #if defined(VERSION_EU)
 f32 gPitchBendFrequencyScale[256] = {
@@ -117,7 +117,7 @@ f32 gPitchBendFrequencyScale[256] = {
 #else
 f32 gPitchBendFrequencyScale[255] = {
 #endif
-    0.5f,      0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f, 0.522315f,
+    0.500000f, 0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f, 0.522315f,
     0.525174f, 0.528048f, 0.530938f, 0.533843f, 0.536765f, 0.539702f, 0.542656f, 0.545626f, 0.548612f,
     0.551614f, 0.554633f, 0.557669f, 0.560721f, 0.563789f, 0.566875f, 0.569977f, 0.573097f, 0.576233f,
     0.579387f, 0.582558f, 0.585746f, 0.588951f, 0.592175f, 0.595415f, 0.598674f, 0.601950f, 0.605245f,
@@ -131,7 +131,7 @@ f32 gPitchBendFrequencyScale[255] = {
     0.858284f, 0.862982f, 0.867704f, 0.872453f, 0.877228f, 0.882029f, 0.886856f, 0.891709f, 0.896590f,
     0.901496f, 0.906430f, 0.911391f, 0.916379f, 0.921394f, 0.926436f, 0.931507f, 0.936604f, 0.941730f,
     0.946884f, 0.952066f, 0.957277f, 0.962516f, 0.967783f, 0.973080f, 0.978405f, 0.983760f, 0.989144f,
-    0.994557f, 1.0f,      1.005473f, 1.010975f, 1.016508f, 1.022071f, 1.027665f, 1.033289f, 1.038944f,
+    0.994557f, 1.000000f, 1.005473f, 1.010975f, 1.016508f, 1.022071f, 1.027665f, 1.033289f, 1.038944f,
     1.044630f, 1.050347f, 1.056095f, 1.061875f, 1.067687f, 1.073530f, 1.079405f, 1.085312f, 1.091252f,
     1.097224f, 1.103229f, 1.109267f, 1.115337f, 1.121441f, 1.127579f, 1.133750f, 1.139955f, 1.146193f,
     1.152466f, 1.158773f, 1.165115f, 1.171491f, 1.177903f, 1.184349f, 1.190831f, 1.197348f, 1.203901f,
@@ -145,7 +145,7 @@ f32 gPitchBendFrequencyScale[255] = {
     1.707225f, 1.716569f, 1.725963f, 1.735409f, 1.744906f, 1.754456f, 1.764058f, 1.773712f, 1.783419f,
     1.793179f, 1.802993f, 1.812860f, 1.822782f, 1.832757f, 1.842788f, 1.852873f, 1.863013f, 1.873209f,
     1.883461f, 1.893768f, 1.904132f, 1.914553f, 1.925031f, 1.935567f, 1.946159f, 1.956810f, 1.967520f,
-    1.978287f, 1.989114f, 2.0f
+    1.978287f, 1.989114f, 2.000000f
 };
 
 // Frequencies for notes using the standard twelve-tone equal temperament scale.
@@ -155,13 +155,13 @@ f32 gPitchBendFrequencyScale[255] = {
 // the reference frequency, which is assigned value 1.
 // clang-format off
 f32 gNoteFrequencies[128] = {
-    0.105112f,  0.111362f,  0.117984f,  0.125f, 0.132433f, 0.140308f,  0.148651f,  0.15749f,  0.166855f, 0.176777f, 0.187288f,  0.198425f,
-    0.210224f,  0.222725f,  0.235969f,  0.25f,  0.264866f, 0.280616f,  0.297302f,  0.31498f,  0.33371f,  0.353553f, 0.374577f,  0.39685f,
-    0.420448f,  0.445449f,  0.471937f,  0.5f,   0.529732f, 0.561231f,  0.594604f,  0.629961f, 0.66742f,  0.707107f, 0.749154f,  0.793701f,
-    0.840897f,  0.890899f,  0.943875f,  1.0f,   1.059463f, 1.122462f,  1.189207f,  1.259921f, 1.33484f,  1.414214f, 1.498307f,  1.587401f,
-    1.681793f,  1.781798f,  1.887749f,  2.0f,   2.118926f, 2.244924f,  2.378414f,  2.519842f, 2.66968f,  2.828428f, 2.996615f,  3.174803f,
-    3.363586f,  3.563596f,  3.775498f,  4.0f,   4.237853f, 4.489849f,  4.756829f,  5.039685f, 5.33936f,  5.656855f, 5.993229f,  6.349606f,
-    6.727173f,  7.127192f,  7.550996f,  8.0f,   8.475705f, 8.979697f,  9.513658f,  10.07937f, 10.67872f, 11.31371f, 11.986459f, 12.699211f,
+     0.105112f,  0.111362f,  0.117984f,  0.125f, 0.132433f, 0.140308f,  0.148651f,  0.15749f,  0.166855f, 0.176777f, 0.187288f,  0.198425f,
+     0.210224f,  0.222725f,  0.235969f,  0.25f,  0.264866f, 0.280616f,  0.297302f,  0.31498f,  0.33371f,  0.353553f, 0.374577f,  0.39685f,
+     0.420448f,  0.445449f,  0.471937f,  0.5f,   0.529732f, 0.561231f,  0.594604f,  0.629961f, 0.66742f,  0.707107f, 0.749154f,  0.793701f,
+     0.840897f,  0.890899f,  0.943875f,  1.0f,   1.059463f, 1.122462f,  1.189207f,  1.259921f, 1.33484f,  1.414214f, 1.498307f,  1.587401f,
+     1.681793f,  1.781798f,  1.887749f,  2.0f,   2.118926f, 2.244924f,  2.378414f,  2.519842f, 2.66968f,  2.828428f, 2.996615f,  3.174803f,
+     3.363586f,  3.563596f,  3.775498f,  4.0f,   4.237853f, 4.489849f,  4.756829f,  5.039685f, 5.33936f,  5.656855f, 5.993229f,  6.349606f,
+     6.727173f,  7.127192f,  7.550996f,  8.0f,   8.475705f, 8.979697f,  9.513658f, 10.07937f, 10.67872f, 11.31371f, 11.986459f, 12.699211f,
     13.454346f, 14.254383f, 15.101993f, 16.0f,  16.95141f, 17.959394f, 19.027315f, 20.15874f, 21.35744f, 22.62742f, 23.972918f, 25.398422f,
     26.908691f, 28.508766f, 30.203985f, 32.0f,  33.90282f, 35.91879f,  38.05463f,  40.31748f, 42.71488f, 45.25484f, 47.945835f, 50.796844f,
     53.817383f, 57.017532f, 60.40797f,  64.0f,  67.80564f, 71.83758f,  76.10926f,  80.63496f, 85.42976f, 45.25484f, 47.945835f, 50.796844f,
@@ -185,7 +185,7 @@ s8 gVibratoCurve[16] = { 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 
 #endif
 
 struct AdsrEnvelope gDefaultEnvelope[] = {
-    { BSWAP16(4), BSWAP16(32000) },    // go from 0 to 32000 over the course of 16ms
+    { BSWAP16(   4), BSWAP16(32000) }, // go from 0 to 32000 over the course of 16ms
     { BSWAP16(1000), BSWAP16(32000) }, // stay there for 4.16 seconds
     { BSWAP16(ADSR_HANG), 0 }          // then continue staying there
 };
@@ -362,20 +362,20 @@ s16 sSineWave[0x40] = {
 };
 
 s16 sSquareWave[0x40] = {
-    0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,
-    0,       0,       0,       0,       0,       0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,
-    0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0,
-    0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,
-    0,       0,       0,       0,       -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF,
+     0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,
+     0,       0,       0,       0,       0,       0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,
+     0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0x7FFF,  0,
+     0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,
+     0,       0,       0,       0,      -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF,
     -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF, -0x7FFF,
 };
 s16 sTriangleWave[0x40] = {
-    0,       0x7FF,   0xFFF,   0x17FF,  0x1FFF,  0x27FF,  0x2FFF,  0x37FF,  0x3FFF,  0x47FF,  0x4FFF,
-    0x57FF,  0x5FFF,  0x67FF,  0x6FFF,  0x77FF,  0x7FFF,  0x77FF,  0x6FFF,  0x67FF,  0x5FFF,  0x57FF,
-    0x4FFF,  0x47FF,  0x3FFF,  0x37FF,  0x2FFF,  0x27FF,  0x1FFF,  0x17FF,  0xFFF,   0x7FF,   0,
-    -0x7FF,  -0xFFF,  -0x17FF, -0x1FFF, -10239,  -0x2FFF, -0x37FF, -0x3FFF, -0x47FF, -0x4FFF, -22527,
-    -24575,  -26623,  -28671,  -30719,  -0x7FFF, -30719,  -28671,  -26623,  -24575,  -22527,  -0x4FFF,
-    -0x47FF, -0x3FFF, -0x37FF, -0x2FFF, -0x27FF, -0x1FFF, -0x17FF, -0xFFF,  -0x7FF,
+     0x0000,   0x07FF,   0x0FFF,  0x17FF,  0x1FFF,  0x27FF,  0x2FFF,  0x37FF,  0x3FFF,  0x47FF,  0x4FFF,
+     0x57FF,   0x5FFF,   0x67FF,  0x6FFF,  0x77FF,  0x7FFF,  0x77FF,  0x6FFF,  0x67FF,  0x5FFF,  0x57FF,
+     0x4FFF,   0x47FF,   0x3FFF,  0x37FF,  0x2FFF,  0x27FF,  0x1FFF,  0x17FF,  0x0FFF,  0x07FF,  0x0000,
+    -0x07FF,  -0x0FFF,  -0x17FF, -0x1FFF,  -10239, -0x2FFF, -0x37FF, -0x3FFF, -0x47FF, -0x4FFF,  -22527,
+     -24575,   -26623,   -28671,  -30719, -0x7FFF,  -30719,  -28671,  -26623,  -24575,  -22527, -0x4FFF,
+    -0x47FF,  -0x3FFF,  -0x37FF, -0x2FFF, -0x27FF, -0x1FFF, -0x17FF, -0x0FFF, -0x07FF,
 };
 
 s16 sSawtoothWave[0x40] = {
@@ -386,13 +386,17 @@ s16 sSawtoothWave[0x40] = {
     -0x4FFF, -19455, -0x47FF, -17407, -0x3FFF, -15359, -0x37FF, -13311, -0x2FFF, -11263, -10239,
     -9215,   -8191,  -7167,   -6143,  -5119,   -4095,  -3071,   -2047,  -1023,
 };
-s16 *gWaveSamples[4] = { sSawtoothWave, sTriangleWave, sSineWave, sSquareWave };
+s16 *gWaveSamples[4] = {
+    sSawtoothWave,
+    sTriangleWave,
+    sSineWave,
+    sSquareWave
+};
 #endif
 
 #ifdef VERSION_SH
-s32 unk_sh_data_0[2] = {0, 0};
 f32 gPitchBendFrequencyScale[256] = {
-    0.5f,      0.5f,      0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f,
+    0.500000f, 0.500000f, 0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f,
     0.522315f, 0.525174f, 0.528048f, 0.530938f, 0.533843f, 0.536765f, 0.539702f, 0.542656f, 0.545626f,
     0.548612f, 0.551614f, 0.554633f, 0.557669f, 0.560721f, 0.563789f, 0.566875f, 0.569977f, 0.573097f,
     0.576233f, 0.579387f, 0.582558f, 0.585746f, 0.588951f, 0.592175f, 0.595415f, 0.598674f, 0.601950f,
@@ -406,7 +410,7 @@ f32 gPitchBendFrequencyScale[256] = {
     0.853613f, 0.858284f, 0.862982f, 0.867704f, 0.872453f, 0.877228f, 0.882029f, 0.886856f, 0.891709f,
     0.896590f, 0.901496f, 0.906430f, 0.911391f, 0.916379f, 0.921394f, 0.926436f, 0.931507f, 0.936604f,
     0.941730f, 0.946884f, 0.952066f, 0.957277f, 0.962516f, 0.967783f, 0.973080f, 0.978405f, 0.983760f,
-    0.989144f, 0.994557f, 1.0f,      1.005473f, 1.010975f, 1.016508f, 1.022071f, 1.027665f, 1.033289f,
+    0.989144f, 0.994557f, 1.000000f, 1.005473f, 1.010975f, 1.016508f, 1.022071f, 1.027665f, 1.033289f,
     1.038944f, 1.044630f, 1.050347f, 1.056095f, 1.061875f, 1.067687f, 1.073530f, 1.079405f, 1.085312f,
     1.091252f, 1.097224f, 1.103229f, 1.109267f, 1.115337f, 1.121441f, 1.127579f, 1.133750f, 1.139955f,
     1.146193f, 1.152466f, 1.158773f, 1.165115f, 1.171491f, 1.177903f, 1.184349f, 1.190831f, 1.197348f,
@@ -420,7 +424,7 @@ f32 gPitchBendFrequencyScale[256] = {
     1.697933f, 1.707225f, 1.716569f, 1.725963f, 1.735409f, 1.744906f, 1.754456f, 1.764058f, 1.773712f,
     1.783419f, 1.793179f, 1.802993f, 1.812860f, 1.822782f, 1.832757f, 1.842788f, 1.852873f, 1.863013f,
     1.873209f, 1.883461f, 1.893768f, 1.904132f, 1.914553f, 1.925031f, 1.935567f, 1.946159f, 1.956810f,
-    1.967520f, 1.978287f, 1.989114f, 2.0f
+    1.967520f, 1.978287f, 1.989114f, 2.000000f
 };
 #endif
 
@@ -899,7 +903,12 @@ u8 bufferDelete2[12] = { 0 };
 u8 D_EU_80302010 = 0;
 u8 D_EU_80302014 = 0;
 
-struct OSMesgQueue *OSMesgQueues[4] = { &OSMesgQueue0, &OSMesgQueue1, &OSMesgQueue2, &OSMesgQueue3 };
+struct OSMesgQueue *OSMesgQueues[4] = {
+    &OSMesgQueue0,
+    &OSMesgQueue1,
+    &OSMesgQueue2,
+    &OSMesgQueue3
+};
 #endif
 
 // .bss

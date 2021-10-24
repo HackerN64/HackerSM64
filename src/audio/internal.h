@@ -860,7 +860,6 @@ struct UnkStruct80343D00 {
 };
 
 // in external.c
-extern s32 D_SH_80343CF0;
 extern struct UnkStruct80343D00 D_SH_80343D00;
 #endif
 

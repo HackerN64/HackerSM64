@@ -5,6 +5,7 @@
 #include "data.h"
 #include "seqplayer.h"
 #include "game/main.h"
+#include "engine/math_util.h"
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 recalculateVolume) {
@@ -81,13 +82,7 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
         seqPlayer->recalculateVolume = TRUE;
 #endif
-
-        if (seqPlayer->fadeVolume > 1) {
-            seqPlayer->fadeVolume = 1;
-        }
-        if (seqPlayer->fadeVolume < 0) {
-            seqPlayer->fadeVolume = 0;
-        }
+        seqPlayer->fadeVolume = CLAMP(seqPlayer->fadeVolume, 0, 1);
 
         if (--seqPlayer->fadeRemainingFrames == 0) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -236,11 +231,10 @@ f32 get_vibrato_freq_scale(struct VibratoState *vib) {
     f32 extent = ((f32) vib->extent / 4096.0f);
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    f32 result = (1.0f + (extent * (gPitchBendFrequencyScale[pitchChange + 128] - 1.0f)));
+    return (1.0f + (extent * (gPitchBendFrequencyScale[pitchChange + 128] - 1.0f)));
 #else
-    f32 result = (1.0f + (extent * (gPitchBendFrequencyScale[pitchChange + 127] - 1.0f)));
+    return (1.0f + (extent * (gPitchBendFrequencyScale[pitchChange + 127] - 1.0f)));
 #endif
-    return result;
 }
 
 void note_vibrato_update(struct Note *note) {

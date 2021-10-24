@@ -22,18 +22,18 @@
 #define DMEM_ADDR_WET_RIGHT_CH          0xE10
 
 #define aSetLoadBufferPair(pkt, c, off)                                                                \
-    aSetBuffer( pkt, 0, (c + DMEM_ADDR_WET_LEFT_CH), 0, (DEFAULT_LEN_1CH - c));                        \
-    aLoadBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left + (off)));                  \
-    aSetBuffer( pkt, 0, (c + DMEM_ADDR_WET_RIGHT_CH), 0, (DEFAULT_LEN_1CH - c));                       \
-    aLoadBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)))
+    aSetBuffer( (pkt), 0, ((c) + DMEM_ADDR_WET_LEFT_CH ), 0, (DEFAULT_LEN_1CH - (c)));                 \
+    aLoadBuffer((pkt), VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left  + (off)));               \
+    aSetBuffer( (pkt), 0, ((c) + DMEM_ADDR_WET_RIGHT_CH), 0, (DEFAULT_LEN_1CH - (c)));                 \
+    aLoadBuffer((pkt), VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
 
 #define aSetSaveBufferPair(pkt, c, d, off)                                                             \
-    aSetBuffer( pkt, 0, 0, (c + DMEM_ADDR_WET_LEFT_CH), d);                                            \
-    aSaveBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left  + (off)));                 \
-    aSetBuffer( pkt, 0, 0, (c + DMEM_ADDR_WET_RIGHT_CH), d);                                           \
-    aSaveBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
+    aSetBuffer( (pkt), 0, 0, ((c) + DMEM_ADDR_WET_LEFT_CH ), (d));                                     \
+    aSaveBuffer((pkt), VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left  + (off)));               \
+    aSetBuffer( (pkt), 0, 0, ((c) + DMEM_ADDR_WET_RIGHT_CH), (d));                                     \
+    aSaveBuffer((pkt), VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
 
-#define ALIGN(val, amnt) (((val) + (1 << amnt) - 1) & ~((1 << amnt) - 1))
+#define ALIGN(val, amnt) (((val) + (1 << (amnt)) - 1) & ~((1 << (amnt)) - 1))
 
 struct VolumeChange {
     u16 sourceLeft;

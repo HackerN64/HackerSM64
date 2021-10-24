@@ -205,9 +205,7 @@ struct AudioBankSound *instrument_get_audio_bank_sound(struct Instrument *instru
 }
 
 struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
-    struct Instrument *inst;
-
-    if (IS_BANK_LOAD_COMPLETE(bankId) == FALSE) {
+    if (!IS_BANK_LOAD_COMPLETE(bankId)) {
         stubbed_printf("Audio: voiceman: No bank error %d\n", bankId);
         gAudioErrorFlags = bankId + 0x10000000;
         return NULL;
@@ -220,7 +218,7 @@ struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
         return NULL;
     }
 
-    inst = gCtlEntries[bankId].instruments[instId];
+    struct Instrument *inst = gCtlEntries[bankId].instruments[instId];
     if (inst == NULL) {
         stubbed_printf("Audio: voiceman: progNo. undefined %d,%d\n", bankId, instId);
         gAudioErrorFlags = ((bankId << 8) + instId) + 0x1000000;
@@ -238,7 +236,7 @@ struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
     }
 
     stubbed_printf("Audio: voiceman: BAD Voicepointer %x,%d,%d\n", inst, bankId, instId);
-    gAudioErrorFlags = ((bankId << 8) + instId) + 0x2000000;
+    gAudioErrorFlags = (((bankId << 8) + instId) + 0x2000000);
     return NULL;
 #else
     return inst;
@@ -249,9 +247,9 @@ struct Drum *get_drum(s32 bankId, s32 drumId) {
     struct Drum *drum;
 
 #ifdef VERSION_SH
-    if (IS_BANK_LOAD_COMPLETE(bankId) == FALSE) {
+    if (!IS_BANK_LOAD_COMPLETE(bankId)) {
         stubbed_printf("Audio: voiceman: No bank error %d\n", bankId);
-        gAudioErrorFlags = bankId + 0x10000000;
+        gAudioErrorFlags = (bankId + 0x10000000);
         return NULL;
     }
 #endif
@@ -259,7 +257,7 @@ struct Drum *get_drum(s32 bankId, s32 drumId) {
     if (drumId >= gCtlEntries[bankId].numDrums) {
         stubbed_printf("Audio: voiceman: Percussion Overflow %d,%d\n",
                 drumId, gCtlEntries[bankId].numDrums);
-        gAudioErrorFlags = ((bankId << 8) + drumId) + 0x4000000;
+        gAudioErrorFlags = (((bankId << 8) + drumId) + 0x4000000);
         return NULL;
     }
 
@@ -319,12 +317,12 @@ void note_disable(struct Note *note) {
 #ifdef VERSION_SH
     note->unkSH34 = 0;
 #endif
-    note->parentLayer = NO_LAYER;
-    note->prevParentLayer = NO_LAYER;
-    note->noteSubEu.enabled = FALSE;
+    note->parentLayer        = NO_LAYER;
+    note->prevParentLayer    = NO_LAYER;
+    note->noteSubEu.enabled  = FALSE;
     note->noteSubEu.finished = FALSE;
 #ifdef VERSION_SH
-    note->adsr.state = ADSR_STATE_DISABLED;
+    note->adsr.state   = ADSR_STATE_DISABLED;
     note->adsr.current = 0;
 #endif
 }
@@ -628,19 +626,19 @@ struct AudioBankSound *instrument_get_audio_bank_sound(struct Instrument *instru
 struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
     struct Instrument *inst;
 
-    if (IS_BANK_LOAD_COMPLETE(bankId) == FALSE) {
-        gAudioErrorFlags = bankId + 0x10000000;
+    if (!IS_BANK_LOAD_COMPLETE(bankId)) {
+        gAudioErrorFlags = (bankId + 0x10000000);
         return NULL;
     }
 
     if (instId >= gCtlEntries[bankId].numInstruments) {
-        gAudioErrorFlags = ((bankId << 8) + instId) + 0x3000000;
+        gAudioErrorFlags = (((bankId << 8) + instId) + 0x3000000);
         return NULL;
     }
 
     inst = gCtlEntries[bankId].instruments[instId];
     if (inst == NULL) {
-        gAudioErrorFlags = ((bankId << 8) + instId) + 0x1000000;
+        gAudioErrorFlags = (((bankId << 8) + instId) + 0x1000000);
         return inst;
     }
 
@@ -650,13 +648,13 @@ struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
 struct Drum *get_drum(s32 bankId, s32 drumId) {
     struct Drum *drum;
 
-    if (IS_BANK_LOAD_COMPLETE(bankId) == FALSE) {
-        gAudioErrorFlags = bankId + 0x10000000;
+    if (!IS_BANK_LOAD_COMPLETE(bankId)) {
+        gAudioErrorFlags = (bankId + 0x10000000);
         return NULL;
     }
 
     if (drumId >= gCtlEntries[bankId].numDrums) {
-        gAudioErrorFlags = ((bankId << 8) + drumId) + 0x4000000;
+        gAudioErrorFlags = (((bankId << 8) + drumId) + 0x4000000);
         return NULL;
     }
 
@@ -668,7 +666,7 @@ struct Drum *get_drum(s32 bankId, s32 drumId) {
 
     drum = gCtlEntries[bankId].drums[drumId];
     if (drum == NULL) {
-        gAudioErrorFlags = ((bankId << 8) + drumId) + 0x5000000;
+        gAudioErrorFlags = (((bankId << 8) + drumId) + 0x5000000);
     }
     return drum;
 }
@@ -892,24 +890,22 @@ void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLay
 
 void init_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLayer) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    s32 sampleCountIndex;
-    s32 waveSampleCountIndex;
     s32 waveId = seqLayer->instOrWave;
     if (waveId == 0xff) {
         waveId = seqLayer->seqChannel->instOrWave;
     }
-    sampleCountIndex = note->sampleCountIndex;
-    waveSampleCountIndex = build_synthetic_wave(note, seqLayer, waveId);
+    s32 sampleCountIndex = note->sampleCountIndex;
+    s32 waveSampleCountIndex = build_synthetic_wave(note, seqLayer, waveId);
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    note->synthesisState.samplePosInt = note->synthesisState.samplePosInt * euUnknownData_8030194c[waveSampleCountIndex] / euUnknownData_8030194c[sampleCountIndex];
+    note->synthesisState.samplePosInt = (note->synthesisState.samplePosInt * euUnknownData_8030194c[waveSampleCountIndex] / euUnknownData_8030194c[sampleCountIndex]);
 #else // Not a real change. Just temporary so I can remove this variable.
-    note->synthesisState.samplePosInt = note->synthesisState.samplePosInt * gDefaultShortNoteVelocityTable[waveSampleCountIndex] / gDefaultShortNoteVelocityTable[sampleCountIndex];
+    note->synthesisState.samplePosInt = (note->synthesisState.samplePosInt * gDefaultShortNoteVelocityTable[waveSampleCountIndex] / gDefaultShortNoteVelocityTable[sampleCountIndex]);
 #endif
 #else
     s32 sampleCount = note->sampleCount;
     build_synthetic_wave(note, seqLayer);
     if (sampleCount != 0) {
-        note->samplePosInt *= note->sampleCount / sampleCount;
+        note->samplePosInt *= (note->sampleCount / sampleCount);
     } else {
         note->samplePosInt = 0;
     }
@@ -927,10 +923,10 @@ void init_note_lists(struct NotePool *pool) {
     init_note_list(&pool->decaying);
     init_note_list(&pool->releasing);
     init_note_list(&pool->active);
-    pool->disabled.pool = pool;
-    pool->decaying.pool = pool;
+    pool->disabled.pool  = pool;
+    pool->decaying.pool  = pool;
     pool->releasing.pool = pool;
-    pool->active.pool = pool;
+    pool->active.pool    = pool;
 }
 
 void init_note_free_list(void) {
@@ -1003,8 +999,7 @@ void note_pool_clear(struct NotePool *pool) {
 }
 
 void note_pool_fill(struct NotePool *pool, s32 count) {
-    s32 i;
-    s32 j;
+    s32 i, j;
     struct Note *note;
     struct AudioListItem *source;
     struct AudioListItem *dest;
@@ -1020,12 +1015,12 @@ void note_pool_fill(struct NotePool *pool, s32 count) {
         switch (i) {
             case 0:
                 source = &gNoteFreeLists.disabled;
-                dest = &pool->disabled;
+                dest   = &pool->disabled;
                 break;
 
             case 1:
                 source = &gNoteFreeLists.decaying;
-                dest = &pool->decaying;
+                dest   = &pool->decaying;
                 break;
 
             case 2:
@@ -1035,7 +1030,7 @@ void note_pool_fill(struct NotePool *pool, s32 count) {
 
             case 3:
                 source = &gNoteFreeLists.active;
-                dest = &pool->active;
+                dest   = &pool->active;
                 break;
         }
 
@@ -1058,7 +1053,7 @@ void audio_list_push_front(struct AudioListItem *list, struct AudioListItem *ite
         item->prev = list;
         item->next = list->next;
         list->next->prev = item;
-        list->next = item;
+        list->next       = item;
         list->u.count++;
         item->pool = list->pool;
     }
@@ -1115,12 +1110,12 @@ void note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLaye
     struct NoteSubEu *sub = &note->noteSubEu;
 
     note->prevParentLayer = NO_LAYER;
-    note->parentLayer = seqLayer;
-    note->priority = seqLayer->seqChannel->notePriority;
+    note->parentLayer     = seqLayer;
+    note->priority        = seqLayer->seqChannel->notePriority;
     seqLayer->notePropertiesNeedInit = TRUE;
     seqLayer->status = SOUND_LOAD_STATUS_DISCARDABLE; // "loaded"
-    seqLayer->note = note;
-    seqLayer->seqChannel->noteUnused = note;
+    seqLayer->note   = note;
+    seqLayer->seqChannel->noteUnused  = note;
     seqLayer->seqChannel->layerUnused = seqLayer;
     seqLayer->noteVelocity = 0.0f;
     note_init(note);
@@ -1145,14 +1140,14 @@ void note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLaye
     sub->bankId = seqLayer->seqChannel->bankId;
 #endif
     sub->stereoHeadsetEffects = seqLayer->seqChannel->stereoHeadsetEffects;
-    sub->reverbIndex = seqLayer->seqChannel->reverbIndex & 3;
+    sub->reverbIndex = (seqLayer->seqChannel->reverbIndex & 0x3);
 }
 #else
 s32 note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLayer) {
     note->prevParentLayer = NO_LAYER;
     note->parentLayer = seqLayer;
     note->priority = seqLayer->seqChannel->notePriority;
-    if (IS_BANK_LOAD_COMPLETE(seqLayer->seqChannel->bankId) == FALSE) {
+    if (!IS_BANK_LOAD_COMPLETE(seqLayer->seqChannel->bankId)) {
         return TRUE;
     }
 
