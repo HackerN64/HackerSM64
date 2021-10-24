@@ -206,7 +206,7 @@ u8 sAudioSynthesisPad[0x20];
 static inline s32 clamp16(s32 x) {
     if (x >=  0x7FFF) return  0x7FFF;
     if (x <= -0x8000) return -0x8000;
-    return (s16) x;
+    return x;
 }
 
 static inline void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 inSampleR) {
@@ -284,9 +284,9 @@ struct NoteSubEu *gNoteSubsEu;
 #endif
 
 #ifdef VERSION_EU
-f32 gLeftVolRampings[3][1024];
+f32 gLeftVolRampings [3][1024];
 f32 gRightVolRampings[3][1024];
-f32 *gCurrentLeftVolRamping; // Points to any of the three left buffers above
+f32 *gCurrentLeftVolRamping;  // Points to any of the three left buffers above
 f32 *gCurrentRightVolRamping; // Points to any of the three right buffers above
 
 u8 audioString1[] = "pitch %x: delaybytes %d : olddelay %d\n";
