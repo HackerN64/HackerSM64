@@ -253,7 +253,7 @@ void bhv_unlock_door_star_loop(void) {
             o->oPosY += 3.4f; // Raise the star up in the air
             o->oMoveAngleYaw +=
                 o->oUnlockDoorStarYawVel; // Apply yaw velocity
-            obj_scale(o, ((o->oUnlockDoorStarTimer / 50.0f) + 0.5f)); // Scale the star to be bigger
+            cur_obj_scale((o->oUnlockDoorStarTimer / 50.0f) + 0.5f); // Scale the star to be bigger
             if (++o->oUnlockDoorStarTimer == 30) {
                 o->oUnlockDoorStarTimer = 0;
                 o->oUnlockDoorStarState++; // Sets state to UNLOCK_DOOR_STAR_WAITING
@@ -263,8 +263,7 @@ void bhv_unlock_door_star_loop(void) {
             o->oMoveAngleYaw +=
                 o->oUnlockDoorStarYawVel; // Apply yaw velocity
             if (++o->oUnlockDoorStarTimer == 30) {
-                play_sound(SOUND_MENU_STAR_SOUND,
-                           o->header.gfx.cameraToObject); // Play final sound
+                play_sound(SOUND_MENU_STAR_SOUND, o->header.gfx.cameraToObject); // Play final sound
                 cur_obj_hide(); // Hide the object
                 o->oUnlockDoorStarTimer = 0;
                 o->oUnlockDoorStarState++; // Sets state to UNLOCK_DOOR_STAR_SPAWNING_PARTICLES
@@ -289,9 +288,7 @@ void bhv_unlock_door_star_loop(void) {
     // Checks if the angle has cycled back to 0.
     // This means that the code will execute when the star completes a full revolution.
     if (prevYaw > (s16) o->oMoveAngleYaw) {
-        play_sound(
-            SOUND_GENERAL_SHORT_STAR,
-            o->header.gfx.cameraToObject); // Play a sound every time the star spins once
+        play_sound(SOUND_GENERAL_SHORT_STAR, o->header.gfx.cameraToObject); // Play a sound every time the star spins once
     }
 }
 
@@ -324,7 +321,7 @@ static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
 /**
  * Sets the correct blend mode and color for mirror Mario.
  */
-Gfx *geo_mirror_mario_set_alpha(s32 callContext, struct GraphNode *node, UNUSED Mat4 *c) {
+Gfx *geo_mirror_mario_set_alpha(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
     Gfx *gfx = NULL;
     struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
     struct MarioBodyState *bodyState = &gBodyStates[asGenerated->parameter];

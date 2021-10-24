@@ -389,7 +389,7 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     u8 *compressed = main_pool_alloc(compSize, MEMORY_POOL_RIGHT);
 #ifdef GZIP
     // Decompressed size from end of gzip
-    u32 *size = (u32 *) (compressed + compSize);
+    u32 *size = (u32 *)(compressed + compSize);
 #else
     // Decompressed size from header (This works for non-mio0 because they also have the size in same place)
     u32 *size = (u32 *)(compressed + 4);
@@ -609,8 +609,8 @@ void mem_pool_free(struct MemoryPool *pool, void *addr) {
                 freeList->next = block;
             }
             if ((block->next != NULL) && ((u8 *) block->next == ((u8 *) block + block->size))) {
-                block->size += block->next->size);
-                block->next = block->next->next;
+                block->size += block->next->size;
+                block->next  = block->next->next;
             }
         }
     }
