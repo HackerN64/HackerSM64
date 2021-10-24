@@ -119,13 +119,13 @@ struct SPTask *create_next_audio_frame_task(void) {
     task->ucode = aspMainTextStart;
     task->ucode_data = aspMainDataStart;
     task->ucode_size = 0x800; // (this size is ignored)
-    task->ucode_data_size = (aspMainDataEnd - aspMainDataStart) * sizeof(u64);
+    task->ucode_data_size = ((aspMainDataEnd - aspMainDataStart) * sizeof(u64));
     task->dram_stack = NULL;
     task->dram_stack_size = 0;
     task->output_buff = NULL;
     task->output_buff_size = NULL;
     task->data_ptr = gAudioCmdBuffers[index];
-    task->data_size = writtenCmds * sizeof(u64);
+    task->data_size = (writtenCmds * sizeof(u64));
     task->yield_data_ptr = NULL;
     task->yield_data_size = 0;
     return gAudioTask;
@@ -198,9 +198,9 @@ void seq_player_fade_to_zero_volume(s32 player, FadeT fadeOutTime) {
 void func_8031D690(s32 player, FadeT fadeInTime) {
     if (fadeInTime != 0) {
         gSequencePlayers[player].state = 1;
-        gSequencePlayers[player].fadeTimerUnkEu = fadeInTime;
+        gSequencePlayers[player].fadeTimerUnkEu      = fadeInTime;
         gSequencePlayers[player].fadeRemainingFrames = fadeInTime;
-        gSequencePlayers[player].fadeVolume = 0.0f;
+        gSequencePlayers[player].fadeVolume   = 0.0f;
         gSequencePlayers[player].fadeVelocity = 0.0f;
     }
 }
@@ -216,7 +216,7 @@ void port_eu_init_queues(void) {
 
 void func_802ad6f0(s32 arg0, s32 *arg1) {
     struct EuAudioCmd *cmd = &sAudioCmd[D_EU_80302010 & 0xff];
-    cmd->u.first = arg0;
+    cmd->u.first   =  arg0;
     cmd->u2.as_u32 = *arg1;
     D_EU_80302010++;
 }
@@ -245,8 +245,8 @@ void func_802ad7ec(u32 arg0) {
     struct EuAudioCmd *cmd;
     struct SequencePlayer *seqPlayer;
     struct SequenceChannel *chan;
-    u8 end = arg0 & 0xff;
-    u8 i = (arg0 >> 8) & 0xff;
+    u8 end = (arg0 & 0xff);
+    u8 i = ((arg0 >> 8) & 0xff);
 
     for (;;) {
         if (i == end) break;
@@ -264,7 +264,7 @@ void func_802ad7ec(u32 arg0) {
                         break;
 
                     case 0x47:
-                        seqPlayer->tempo = cmd->u2.as_s32 * TATUMS_PER_BEAT;
+                        seqPlayer->tempo = (cmd->u2.as_s32 * TATUMS_PER_BEAT);
                         break;
 
                     case 0x48:

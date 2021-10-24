@@ -172,7 +172,7 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput) {
     }
 #endif
     if (resamplingRateInput < 2.0f) {
-        tempSub->hasTwoAdpcmParts = 0;
+        tempSub->hasTwoAdpcmParts = FALSE;
 
         if (MIN_RESAMPLING_RATE < resamplingRateInput) {
             resamplingRate = MIN_RESAMPLING_RATE;
@@ -181,11 +181,11 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput) {
         }
 
     } else {
-        tempSub->hasTwoAdpcmParts = 1;
+        tempSub->hasTwoAdpcmParts = TRUE;
         if (2 * MIN_RESAMPLING_RATE < resamplingRateInput) {
             resamplingRate = MIN_RESAMPLING_RATE;
         } else {
-            resamplingRate = resamplingRateInput * 0.5f;
+            resamplingRate = (resamplingRateInput * 0.5f);
         }
     }
     note->noteSubEu.resamplingRateFixedPoint = (s32) (resamplingRate * 32768.0f);

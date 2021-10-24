@@ -24,20 +24,14 @@ void seq_player_fade_to_zero_volume(s32 arg0, s32 numFrames);
 void func_802ad7ec(u32 arg0);
 
 struct SPTask *create_next_audio_frame_task(void) {
-    u32 samplesRemainingInAI;
     s32 writtenCmds;
-    s32 index;
-    OSTask_t *task;
-    s32 flags;
-    s16 *currAiBuffer;
-    s32 oldDmaCount;
     s32 sp38;
     s32 sp34;
     s32 writtenCmdsCopy;
 
     gAudioFrameCount++;
     if (gAudioFrameCount % gAudioBufferParameters.presetUnk4 != 0) {
-        if ((gAudioFrameCount % gAudioBufferParameters.presetUnk4) + 1 == gAudioBufferParameters.presetUnk4) {
+        if (((gAudioFrameCount % gAudioBufferParameters.presetUnk4) + 1) == gAudioBufferParameters.presetUnk4) {
             return D_SH_80314FCC;
         }
         return NULL;
@@ -47,16 +41,16 @@ struct SPTask *create_next_audio_frame_task(void) {
     gAudioTaskIndex ^= 1;
     gCurrAiBufferIndex++;
     gCurrAiBufferIndex %= NUMAIBUFFERS;
-    index = (gCurrAiBufferIndex - 2 + NUMAIBUFFERS) % NUMAIBUFFERS;
-    samplesRemainingInAI = osAiGetLength() / 4;
+    s32 index = ((gCurrAiBufferIndex - 2 + NUMAIBUFFERS) % NUMAIBUFFERS);
+    u32 samplesRemainingInAI = (osAiGetLength() / 4);
 
     if (gAudioLoadLockSH < 0x10U) {
         if (gAiBufferLengths[index] != 0) {
-            osAiSetNextBuffer(gAiBuffers[index], gAiBufferLengths[index] * 4);
+            osAiSetNextBuffer(gAiBuffers[index], (gAiBufferLengths[index] * 4));
         }
     }
 
-    oldDmaCount = gCurrAudioFrameDmaCount;
+    s32 oldDmaCount = gCurrAudioFrameDmaCount;
     if (oldDmaCount > AUDIO_FRAME_DMA_QUEUE_SIZE) {
     }
     gCurrAudioFrameDmaCount = 0;
@@ -89,7 +83,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     gAudioTask = &gAudioTasks[gAudioTaskIndex];
     gAudioCmd = (u64 *) gAudioCmdBuffers[gAudioTaskIndex];
     index = gCurrAiBufferIndex;
-    currAiBuffer = gAiBuffers[index];
+    s16 *currAiBuffer = gAiBuffers[index];
 
     gAiBufferLengths[index] = (s16) ((((gAudioBufferParameters.samplesPerFrameTarget - samplesRemainingInAI) +
          EXTRA_BUFFERED_AI_SAMPLES_TARGET) & ~0xf) + SAMPLES_TO_OVERPRODUCE);
@@ -106,7 +100,7 @@ struct SPTask *create_next_audio_frame_task(void) {
         } while (osRecvMesg(D_SH_80350F68, (OSMesg *) &sp34, 0) != -1);
     }
 
-    flags = 0;
+    s32 flags = 0;
     gAudioCmd = synthesis_execute(gAudioCmd, &writtenCmds, currAiBuffer, gAiBufferLengths[index]);
     gAudioRandom = (u32) (osGetCount() * (gAudioRandom + gAudioFrameCount));
     gAudioRandom = (u32) (gAiBuffers[index][gAudioFrameCount & 0xFF] + gAudioRandom);
@@ -115,7 +109,7 @@ struct SPTask *create_next_audio_frame_task(void) {
     gAudioTask->msgqueue = NULL;
     gAudioTask->msg = NULL;
 
-    task = &gAudioTask->task.t;
+    OSTask_t *task = &gAudioTask->task.t;
     task->type = M_AUDTASK;
     task->flags = flags;
     task->ucode_boot = rspbootTextStart;
@@ -240,9 +234,9 @@ void func_8031D690(s32 playerIndex, s32 fadeInTime) {
     if (fadeInTime != 0) {
         player = &gSequencePlayers[playerIndex];
         player->state = 1;
-        player->fadeTimerUnkEu = fadeInTime;
+        player->fadeTimerUnkEu      = fadeInTime;
         player->fadeRemainingFrames = fadeInTime;
-        player->fadeVolume = 0.0f;
+        player->fadeVolume   = 0.0f;
         player->fadeVelocity = 0.0f;
     }
 }
@@ -263,7 +257,7 @@ void port_eu_init_queues(void) {
 extern struct EuAudioCmd sAudioCmd[0x100];
 void func_802ad6f0(s32 arg0, s32 *arg1) {
     struct EuAudioCmd *cmd = &sAudioCmd[D_SH_80350F18 & 0xff];
-    cmd->u.first = arg0;
+    cmd->u.first   =  arg0;
     cmd->u2.as_u32 = *arg1;
     D_SH_80350F18++;
     if (D_SH_80350F18 == D_SH_80350F19) {
@@ -280,7 +274,7 @@ void func_802ad74c(u32 arg0, u32 arg1) {
 }
 
 void func_802ad770(u32 arg0, s8 arg1) {
-    s32 sp1C = arg1 << 24;
+    s32 sp1C = (arg1 << 24);
     func_802ad6f0(arg0, &sp1C);
 }
 
@@ -291,9 +285,9 @@ void func_sh_802F64C8(void) {
     s32 mesg;
 
     if (((D_SH_80350F18 - D_SH_80350F19 + 0x100) & 0xff) > D_SH_8031503C) {
-        D_SH_8031503C = (D_SH_80350F18 - D_SH_80350F19 + 0x100) & 0xff;
+        D_SH_8031503C = ((D_SH_80350F18 - D_SH_80350F19 + 0x100) & 0xff);
     }
-    mesg = ((D_SH_80350F19 & 0xff) << 8) | (D_SH_80350F18 & 0xff);
+    mesg = (((D_SH_80350F19 & 0xff) << 8) | (D_SH_80350F18 & 0xff));
     osSendMesg(D_SH_80350F68, (OSMesg)mesg, OS_MESG_NOBLOCK);
     D_SH_80350F19 = D_SH_80350F18;
 }
@@ -306,7 +300,6 @@ void func_802ad7ec(u32 arg0) {
     struct EuAudioCmd *cmd;
     struct SequencePlayer *seqPlayer;
     struct SequenceChannel *chan;
-    u8 end;
 
     UNUSED static char shindouDebugPrint134[] = "Continue Port\n";
     UNUSED static char shindouDebugPrint135[] = "%d -> %d\n";
@@ -317,10 +310,10 @@ void func_802ad7ec(u32 arg0) {
     static u8 D_SH_8031509C = 0;
 
     if (D_SH_8031509C == 0) {
-        D_SH_80315098 = (arg0 >> 8) & 0xff;
+        D_SH_80315098 = ((arg0 >> 8) & 0xff);
     }
 
-    end = arg0 & 0xff;
+    u8 end = (arg0 & 0xff);
 
     for (;;) {
         if (D_SH_80315098 == end) {
@@ -423,7 +416,7 @@ u32 func_sh_802f6878(s32 *arg0) {
         return 0U;
     }
     *arg0 = (s32) (sp1C & 0xFFFFFF);
-    return sp1C >> 0x18;
+    return (sp1C >> 0x18);
 }
 
 UNUSED u32 *func_sh_802f68e0(u32 index, u32 *a1) {
