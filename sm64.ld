@@ -31,7 +31,7 @@ OUTPUT_ARCH (mips)
    } \
    END_SEG(name##_yay0) \
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
-   _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
+   _##name##_mio0SegmentRomEnd   = _##name##_yay0SegmentRomEnd;
 
 #define YAY0_EU_SEG(name, segAddr) \
    BEGIN_SEG(name##_yay0, segAddr) \
@@ -41,16 +41,16 @@ OUTPUT_ARCH (mips)
    } \
    END_SEG(name##_yay0) \
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
-   _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
+   _##name##_mio0SegmentRomEnd   = _##name##_yay0SegmentRomEnd;
 
 #define STANDARD_LEVEL(name) \
-   BEGIN_SEG(name##_segment_7, 0x07000000) \
+   BEGIN_SEG(name##_segment_7, SEG_ADDRESS(SEGMENT_LEVEL_DATA)) \
    { \
       KEEP(BUILD_DIR/levels/name/leveldata.szp.o(.data)); \
       . = ALIGN(0x10); \
    } \
    END_SEG(name##_segment_7) \
-   BEGIN_SEG(name, 0x0E000000) \
+   BEGIN_SEG(name, SEG_ADDRESS(SEGMENT_ENDING_SCRIPT)) \
    { \
       KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
       KEEP(BUILD_DIR/levels/name/script.o(.text)); \
@@ -93,14 +93,14 @@ SECTIONS
 {
    __romPos = 0;
 
-   BEGIN_SEG(boot, 0x04000000)
+   BEGIN_SEG(boot, SEG_ADDRESS(SEGMENT_GROUP0_YAY0))
    {
       KEEP(BUILD_DIR/asm/rom_header.o(.text));
       KEEP(BUILD_DIR/asm/boot.o(.text));
    }
    END_SEG(boot)
 
-   . = 0x80000400;
+   . = (RAM_START + 0x400);
    BEGIN_NOLOAD(zbuffer)
    {
       BUILD_DIR/src/buffers/zbuffer.o(.bss*);
@@ -146,12 +146,12 @@ SECTIONS
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
 #ifndef DEBUG_MAP_STACKTRACE
-      parse_map = 0x80345678;
-      find_function_in_stack = 0x80345678;
+      parse_map               = MAP_PARSER_ADDRESS;
+      find_function_in_stack  = MAP_PARSER_ADDRESS;
       _mapDataSegmentRomStart = 0;
-      gMapEntries = 0;
+      gMapEntries   = 0;
       gMapEntrySize = 0;
-      gMapStrings = 0;
+      gMapStrings   = 0;
 #endif
 
    BEGIN_SEG(main, .) SUBALIGN(16)
@@ -278,57 +278,57 @@ SECTIONS
    END_NOLOAD(framebuffers)
 
    __mainPoolStart = .;
-   __mainPoolSize = RAM_END - .;
+   __mainPoolSize  = (RAM_END - .);
 
-   __expansionRamStart = 0x80400000;
-   #ifndef USE_EXT_RAM
-      #ifndef PRELIMINARY
+   __expansionRamStart = (RAM_START + (RAM_1MB * 4));
+#ifndef USE_EXT_RAM
+   #ifndef PRELIMINARY
          ASSERT((. <= __expansionRamStart), "Error: RDRAM expanded into Expansion RAM, despite Expansion RAM not being defined.")
-      #endif
    #endif
+#endif
 
-   BEGIN_SEG(entry, 0x10000000)
+   BEGIN_SEG(entry, SEG_ADDRESS(SEGMENT_LEVEL_ENTRY))
    {
       BUILD_DIR/levels/entry.o(.data);
    }
    END_SEG(entry)
 
    /* load YAY0 and level data */
-   YAY0_SEG(segment2, 0x02000000)
+   YAY0_SEG(segment2, SEG_ADDRESS(SEGMENT_SEGMENT2))
 #ifdef VERSION_EU
-   YAY0_EU_SEG(translation_en, 0x19000000)
-   YAY0_EU_SEG(translation_fr, 0x19000000)
-   YAY0_EU_SEG(translation_de, 0x19000000)
+   YAY0_EU_SEG(translation_en, SEG_ADDRESS(SEGMENT_EU_TRANSLATION))
+   YAY0_EU_SEG(translation_fr, SEG_ADDRESS(SEGMENT_EU_TRANSLATION))
+   YAY0_EU_SEG(translation_de, SEG_ADDRESS(SEGMENT_EU_TRANSLATION))
 #endif
 
    /* mario actor group */
-   STANDARD_OBJECTS(group0,  0x04000000, 0x17000000)
+   STANDARD_OBJECTS(group0,  SEG_ADDRESS(SEGMENT_GROUP0_YAY0), SEG_ADDRESS(SEGMENT_GROUP0_GEO))
 
    /* load the other actor groups */
-   STANDARD_OBJECTS(group1,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group2,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group3,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group4,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group5,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group6,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group7,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group8,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group9,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group10, 0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group11, 0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group12, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group13, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group14, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group15, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group16, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group17, 0x06000000, 0x0D000000)
+   STANDARD_OBJECTS(group1,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group2,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group3,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group4,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group5,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group6,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group7,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group8,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group9,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group10, SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group11, SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group12, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group13, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group14, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group15, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group16, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group17, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
 
    /* load the common actor groups */
-   STANDARD_OBJECTS(common0, 0x08000000, 0x0F000000)
-   STANDARD_OBJECTS(common1, 0x03000000, 0x16000000)
+   STANDARD_OBJECTS(common0, SEG_ADDRESS(SEGMENT_COMMON0_YAY0), SEG_ADDRESS(SEGMENT_COMMON0_GEO))
+   STANDARD_OBJECTS(common1, SEG_ADDRESS(SEGMENT_COMMON1_YAY0), SEG_ADDRESS(SEGMENT_COMMON1_GEO))
 
    /* use segmented addressing for behaviors */
-   BEGIN_SEG(behavior, 0x13000000)
+   BEGIN_SEG(behavior, SEG_ADDRESS(SEGMENT_BEHAVIOR_DATA))
    {
       KEEP(BUILD_DIR/data/behavior_data.o(.data*));
       KEEP(BUILD_DIR/data/behavior_data.o(.rodata*));
@@ -343,13 +343,13 @@ SECTIONS
 
 
    /* 0x8016F000 21D7D0-255EC0 [386F0] */
-   BEGIN_SEG(goddard, RAM_END - GODDARD_SIZE)
+   BEGIN_SEG(goddard, (RAM_END - GODDARD_SIZE))
    {
       KEEP(BUILD_DIR/src/menu*.o(.text));
       _goddardSegmentTextEnd = .;
       KEEP(BUILD_DIR/src/menu*.o(.data*));
       KEEP(BUILD_DIR/src/menu*.o(.rodata*));
-   #ifdef KEEP_MARIO_HEAD
+#ifdef KEEP_MARIO_HEAD
       KEEP(BUILD_DIR/libgoddard.a:*.o(.text));
       KEEP(BUILD_DIR/libgoddard.a:gd_main.o(.data*));
       KEEP(BUILD_DIR/libgoddard.a:draw_objects.o(.data*));
@@ -374,29 +374,28 @@ SECTIONS
       KEEP(BUILD_DIR/libgoddard.a:gd_math.o(.rodata*));
       KEEP(BUILD_DIR/libgoddard.a:shape_helper.o(.rodata*));
       KEEP(BUILD_DIR/libgoddard.a:renderer.o(.rodata*));
-   #endif
+#endif
       . = ALIGN(16);
    }
    END_SEG(goddard)
    BEGIN_NOLOAD(goddard)
    {
       KEEP(BUILD_DIR/src/menu*.o(.bss*));
-   #ifdef KEEP_MARIO_HEAD
+#ifdef KEEP_MARIO_HEAD
       KEEP(BUILD_DIR/libgoddard.a:*.o(.bss*));
-   #endif
+#endif
       . = ALIGN(16);
    }
    END_NOLOAD(goddard)
 
-   #ifndef PRELIMINARY
-      ASSERT((. <= (SEG_POOL_START + POOL_SIZE)), "Error: extended past pool end.")
-   #endif
-   #ifdef PRELIMINARY
+#ifdef PRELIMINARY
       GODDARD_SIZE = SIZEOF(.goddard) + SIZEOF(.goddard.noload);
-   #endif
+#else
+      ASSERT((. <= (SEG_POOL_START + POOL_SIZE)), "Error: extended past pool end.")
+#endif
 
    /* 0x268020 0x268020-0 [0] */
-   BEGIN_SEG(intro, 0x14000000)
+   BEGIN_SEG(intro, SEG_ADDRESS(SEGMENT_MENU_INTRO))
    {
       KEEP(BUILD_DIR/levels/intro/script.o(.*data));
       KEEP(BUILD_DIR/levels/intro/script.o(.rodata*));
@@ -409,18 +408,18 @@ SECTIONS
       KEEP(BUILD_DIR/levels/intro/script.o(.bss*));
    }
    END_NOLOAD(intro)
-   BEGIN_SEG(intro_segment_7, 0x07000000)
+   BEGIN_SEG(intro_segment_7, SEG_ADDRESS(SEGMENT_LEVEL_DATA))
    {
       KEEP(BUILD_DIR/levels/intro/leveldata.szp.o(.data));
       . = ALIGN(0x10);
    }
    END_SEG(intro_segment_7)
 
-   YAY0_SEG(debug_level_select, 0x07000000)
-   YAY0_SEG(title_screen_bg, 0x0A000000)
+   YAY0_SEG(debug_level_select, SEG_ADDRESS(SEGMENT_LEVEL_DATA))
+   YAY0_SEG(title_screen_bg,    SEG_ADDRESS(SEGMENT_SKYBOX))
 
 #ifdef KEEP_MARIO_HEAD
-   BEGIN_SEG(gd_dynlists, 0x04000000)
+   BEGIN_SEG(gd_dynlists, SEG_ADDRESS(SEGMENT_GROUP0_YAY0))
    {
       BUILD_DIR/libgoddard.a:dynlist_test_cube.o(.data);
       BUILD_DIR/libgoddard.a:dynlist_unused.o(.data);
@@ -445,50 +444,50 @@ SECTIONS
 
    gMainLevels = __romPos;
 
-   BEGIN_SEG(menu, 0x14000000)
+   BEGIN_SEG(menu, SEG_ADDRESS(SEGMENT_MENU_INTRO))
    {
       KEEP(BUILD_DIR/levels/menu/script.o(.data));
       KEEP(BUILD_DIR/levels/menu/geo.o(.data));
    }
    END_SEG(menu)
-   BEGIN_SEG(menu_segment_7, 0x07000000)
+   BEGIN_SEG(menu_segment_7, SEG_ADDRESS(SEGMENT_LEVEL_DATA))
    {
       KEEP(BUILD_DIR/levels/menu/leveldata.szp.o(.data));
       . = ALIGN(0x10);
    }
    END_SEG(menu_segment_7)
 
-   BEGIN_SEG(scripts, 0x15000000)
+   BEGIN_SEG(scripts, SEG_ADDRESS(SEGMENT_GLOBAL_LEVEL_SCRIPT))
    {
       BUILD_DIR/levels/scripts.o(.data);
    }
    END_SEG(scripts)
 
-   YAY0_SEG(water_skybox, 0x0A000000)
-   YAY0_SEG(ccm_skybox, 0x0A000000)
-   YAY0_SEG(clouds_skybox, 0x0A000000)
-   YAY0_SEG(bitfs_skybox, 0x0A000000)
-   YAY0_SEG(wdw_skybox, 0x0A000000)
-   YAY0_SEG(cloud_floor_skybox, 0x0A000000)
-   YAY0_SEG(ssl_skybox, 0x0A000000)
-   YAY0_SEG(bbh_skybox, 0x0A000000)
-   YAY0_SEG(bidw_skybox, 0x0A000000)
-   YAY0_SEG(bits_skybox, 0x0A000000)
+   YAY0_SEG(water_skybox,       SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(ccm_skybox,         SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(clouds_skybox,      SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(bitfs_skybox,       SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(wdw_skybox,         SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(cloud_floor_skybox, SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(ssl_skybox,         SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(bbh_skybox,         SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(bidw_skybox,        SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(bits_skybox,        SEG_ADDRESS(SEGMENT_SKYBOX))
 
    // Texture bins
-   YAY0_SEG(fire, 0x09000000)
-   YAY0_SEG(spooky, 0x09000000)
-   YAY0_SEG(generic, 0x09000000)
-   YAY0_SEG(water, 0x09000000)
-   YAY0_SEG(sky, 0x09000000)
-   YAY0_SEG(snow, 0x09000000)
-   YAY0_SEG(cave, 0x09000000)
-   YAY0_SEG(machine, 0x09000000)
-   YAY0_SEG(mountain, 0x09000000)
-   YAY0_SEG(grass, 0x09000000)
-   YAY0_SEG(outside, 0x09000000)
-   YAY0_SEG(inside, 0x09000000)
-   YAY0_SEG(effect, 0x0B000000)
+   YAY0_SEG(fire,     SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(spooky,   SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(generic,  SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(water,    SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(sky,      SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(snow,     SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(cave,     SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(machine,  SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(mountain, SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(grass,    SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(outside,  SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(inside,   SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(effect,   SEG_ADDRESS(SEGMENT_EFFECT_YAY0))
 
 #define STUB_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8)
 #define DEFINE_LEVEL(_0, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) STANDARD_LEVEL(folder)
@@ -516,7 +515,7 @@ SECTIONS
 #endif
 
 #ifdef DEBUG_MAP_STACKTRACE
-   BEGIN_SEG(mapData, 0x80700000) {
+   BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
       KEEP(BUILD_DIR/asm/debug/map.o(.data*));
    }
    END_SEG(mapData)

@@ -122,7 +122,7 @@ s32 act_holding_pole(struct MarioState *m) {
 
     if (m->controller->stickY > 16.0f) {
         f32 poleTop = (m->usedObj->hitboxHeight - 100.0f);
-        const BehaviorScript *poleBehavior = virtual_to_segmented(0x13, m->usedObj->behavior);
+        const BehaviorScript *poleBehavior = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, m->usedObj->behavior);
 
         if (marioObj->oMarioPolePos < (poleTop - 0.4f)) {
             return set_mario_action(m, ACT_CLIMBING_POLE, 0);

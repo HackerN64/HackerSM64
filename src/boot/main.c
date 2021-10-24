@@ -97,20 +97,20 @@ void setup_mesg_queues(void) {
     osCreateMesgQueue(&gIntrMesgQueue, gIntrMesgBuf, ARRAY_COUNT(gIntrMesgBuf));
     osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
 
-    osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
-    osSetEventMesg(OS_EVENT_DP, &gIntrMesgQueue, (OSMesg) MESG_DP_COMPLETE);
+    osSetEventMesg(OS_EVENT_SP,     &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
+    osSetEventMesg(OS_EVENT_DP,     &gIntrMesgQueue, (OSMesg) MESG_DP_COMPLETE);
     osSetEventMesg(OS_EVENT_PRENMI, &gIntrMesgQueue, (OSMesg) MESG_NMI_REQUEST);
 }
 
 void alloc_pool(void) {
-    void *start = (void *) SEG_POOL_START;
-    void *end = (void *) (SEG_POOL_START + POOL_SIZE);
+    void *start = (void *)  SEG_POOL_START;
+    void *end   = (void *) (SEG_POOL_START + POOL_SIZE);
 
     main_pool_init(start, end);
     gEffectsMemoryPool = mem_pool_init(0x4000, MEMORY_POOL_LEFT);
-    #ifdef PUPPYLIGHTS
+#ifdef PUPPYLIGHTS
     gLightsPool = mem_pool_init(PUPPYLIGHTS_POOL, MEMORY_POOL_LEFT);
-    #endif
+#endif
 }
 
 void create_thread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri) {

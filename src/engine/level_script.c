@@ -316,18 +316,25 @@ static void level_cmd_init_level(void) {
 }
 
 extern s32 gTlbEntries;
-extern u8 gTlbSegments[NUM_TLB_SEGMENTS];
+extern u8  gTlbSegments[NUM_TLB_SEGMENTS];
 
 // This clears all the temporary bank TLB maps. group0, common1 and behavourdata are always loaded,
 // and they're also loaded first, so that means we just leave the first 3 indexes mapped.
 void unmap_tlbs(void) {
     s32 i;
     for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
-        if (gTlbSegments[i]/* && i != 0x17 && i != 0x16 && i != 0x13*/) {
-            while (gTlbSegments[i] > 0) {
-                osUnmapTLB(gTlbEntries);
-                gTlbSegments[i]--;
-                gTlbEntries--;
+        if (gTlbSegments[i]) {
+            if ((i != SEGMENT_GROUP0_GEO)
+             && (i != SEGMENT_COMMON1_GEO)
+             && (i != SEGMENT_BEHAVIOR_DATA)) {
+                while (gTlbSegments[i] > 0) {
+                    osUnmapTLB(gTlbEntries);
+                    gTlbSegments[i]--;
+                    gTlbEntries--;
+                }
+            } else {
+                gTlbEntries -= gTlbSegments[i];
+                gTlbSegments[i] = 0;
             }
         }
     }

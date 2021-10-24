@@ -17,7 +17,6 @@ extern struct MapEntry gMapEntries[];
 extern u32 gMapEntrySize;
 extern u8 _mapDataSegmentRomStart[];
 
-
 // code provided by Wiseguy
 static void headless_dma(u32 devAddr, void *dramAddr, u32 size) {
     register u32 stat = IO_READ(PI_STATUS_REG);
@@ -34,9 +33,8 @@ static u32 headless_pi_status(void) {
 }
 // end of code provided by Wiseguy
 
-
 void map_data_init(void) {
-	headless_dma((u32)_mapDataSegmentRomStart, (u32*)0x80700000, 0x100000);
+	headless_dma((u32)_mapDataSegmentRomStart, (u32*)(RAM_END - 0x100000), 0x100000);
 	while (headless_pi_status() & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
 }
 

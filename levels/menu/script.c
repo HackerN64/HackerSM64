@@ -21,8 +21,8 @@
 const LevelScript level_main_menu_entry_file_select[] = {
     INIT_LEVEL(),
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
-    LOAD_YAY0(/*seg*/ 0x07, _menu_segment_7SegmentRomStart, _menu_segment_7SegmentRomEnd),
-    LOAD_RAW(/*seg*/ 0x13, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
+    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _menu_segment_7SegmentRomStart, _menu_segment_7SegmentRomEnd),
+    LOAD_RAW(/*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
     ALLOC_LEVEL_POOL(),
     LOAD_MODEL_FROM_GEO(MODEL_MAIN_MENU_MARIO_SAVE_BUTTON,      geo_menu_mario_save_button),
     LOAD_MODEL_FROM_GEO(MODEL_MAIN_MENU_RED_ERASE_BUTTON,       geo_menu_erase_button),
@@ -54,7 +54,7 @@ const LevelScript level_main_menu_entry_file_select[] = {
     CLEAR_LEVEL(),
     SLEEP_BEFORE_EXIT(/*frames*/ 1),
     SET_REG(/*value*/ START_LEVEL),
-    EXIT_AND_EXECUTE(/*seg*/ 0x15, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
+    EXIT_AND_EXECUTE(/*seg*/ SEGMENT_GLOBAL_LEVEL_SCRIPT, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
 };
 
 const LevelScript level_main_menu_entry_act_select[] = {
@@ -62,7 +62,7 @@ const LevelScript level_main_menu_entry_act_select[] = {
     /*2*/ JUMP_IF(/*op*/ OP_EQ, /*arg*/ FALSE, (level_main_menu_entry_act_select + 42)), // goto L1 (exit)
     /*5*/ INIT_LEVEL(),
     /*6*/ FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
-    /*10*/ LOAD_YAY0(/*seg*/ 0x07, _menu_segment_7SegmentRomStart, _menu_segment_7SegmentRomEnd),
+    /*10*/ LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _menu_segment_7SegmentRomStart, _menu_segment_7SegmentRomEnd),
     /*13*/ ALLOC_LEVEL_POOL(),
 
     /*14*/ AREA(/*index*/ 2, geo_menu_act_selector_strings),

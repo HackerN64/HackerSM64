@@ -1,5 +1,7 @@
 #include <PR/ultratypes.h>
 #include <stdio.h>
+
+#include "sm64.h"
 #include "macros.h"
 #include "farcall.h"
 
@@ -124,7 +126,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     break;
                 case PARAM_JAL:
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
-                    if ((u32)parse_map != 0x80345678) {
+                    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
                         strp += sprintf(strp, "%-8s %s", insn_db[i].name,
                                                          parse_map(target)
                         );

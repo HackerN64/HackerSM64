@@ -355,7 +355,7 @@ void render_init(void) {
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
     gGfxPool = &gGfxPools[0];
-    set_segment_base_addr(1, gGfxPool->buffer);
+    set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
     gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
@@ -377,7 +377,7 @@ void render_init(void) {
  */
 void select_gfx_pool(void) {
     gGfxPool = &gGfxPools[gGlobalTimer % ARRAY_COUNT(gGfxPools)];
-    set_segment_base_addr(1, gGfxPool->buffer);
+    set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask       = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
     gGfxPoolEnd      = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
@@ -640,7 +640,7 @@ void init_controllers(void) {
  */
 void setup_game_memory(void) {
     // Setup general Segment 0
-    set_segment_base_addr(0, (void *) 0x80000000);
+    set_segment_base_addr(SEGMENT_MAIN, (void *) 0x80000000);
     // Create Mesg Queues
     osCreateMesgQueue( &gGfxVblankQueue,  gGfxMesgBuf, ARRAY_COUNT( gGfxMesgBuf));
     osCreateMesgQueue(&gGameVblankQueue, gGameMesgBuf, ARRAY_COUNT(gGameMesgBuf));
@@ -651,16 +651,16 @@ void setup_game_memory(void) {
     gPhysicalFramebuffers[2] = VIRTUAL_TO_PHYSICAL(gFramebuffer2);
     // Setup Mario Animations
     gMarioAnimsMemAlloc = main_pool_alloc(0x4000, MEMORY_POOL_LEFT);
-    set_segment_base_addr(17, (void *) gMarioAnimsMemAlloc);
+    set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
     // Setup Demo Inputs List
     gDemoInputsMemAlloc = main_pool_alloc(0x800, MEMORY_POOL_LEFT);
-    set_segment_base_addr(24, (void *) gDemoInputsMemAlloc);
+    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
     setup_dma_table_list(&gDemoInputsBuf, gDemoInputs, gDemoInputsMemAlloc);
     // Setup Level Script Entry
-    load_segment(0x10, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
+    load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
     // Setup Segment 2 (Fonts, Text, etc)
-    load_segment_decompress(2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
+    load_segment_decompress(SEGMENT_SEGMENT2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
 }
 
 /**
