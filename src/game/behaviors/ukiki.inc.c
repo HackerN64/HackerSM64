@@ -207,8 +207,6 @@ void ukiki_act_unused_turn(void) {
  * Turns ukiki to face towards Mario while moving with slow forward velocity.
  */
 void ukiki_act_turn_to_mario(void) {
-    s32 facingMario;
-
     // Initialize the action with a random fVel from 2-5.
     if (o->oTimer == 0) {
         o->oForwardVel = ((random_float() * 3.0f) + 2.0f);
@@ -216,7 +214,7 @@ void ukiki_act_turn_to_mario(void) {
 
     cur_obj_init_animation_with_sound(UKIKI_ANIM_TURN);
 
-    facingMario = cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x800);
+    s32 facingMario = cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x800);
 
     if (facingMario) {
         o->oAction = UKIKI_ACT_IDLE;
@@ -244,7 +242,7 @@ void ukiki_act_run(void) {
     }
 
     if (o->oTimer == 0) {
-        o->oUkikiChaseFleeRange = random_float() * 100.0f + 350.0f;
+        o->oUkikiChaseFleeRange = ((random_float() * 100.0f) + 350.0f);
     }
 
     cur_obj_init_animation_with_sound(UKIKI_ANIM_RUN);

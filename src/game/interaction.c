@@ -315,6 +315,14 @@ u32 does_mario_have_normal_cap_on_head(struct MarioState *m) {
     return ((m->flags & (MARIO_CAPS | MARIO_CAP_ON_HEAD)) == (MARIO_NORMAL_CAP | MARIO_CAP_ON_HEAD));
 }
 
+#ifdef PREVENT_CAP_LOSS
+UNUSED void mario_blow_off_cap(UNUSED struct MarioState *m, UNUSED f32 capSpeed) {
+}
+
+Bool32 mario_lose_cap_to_enemy(UNUSED u32 enemyType) {
+    return FALSE;
+}
+#else
 void mario_blow_off_cap(struct MarioState *m, f32 capSpeed) {
     struct Object *capObject;
 
@@ -325,7 +333,7 @@ void mario_blow_off_cap(struct MarioState *m, f32 capSpeed) {
 
         capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
 
-        capObject->oPosY += (m->action & ACT_FLAG_SHORT_HITBOX) ? 120.0f : 180.0f;
+        capObject->oPosY += ((m->action & ACT_FLAG_SHORT_HITBOX) ? 120.0f : 180.0f);
         capObject->oForwardVel = capSpeed;
         capObject->oMoveAngleYaw = (s16)(m->faceAngle[1] + 0x400);
 
@@ -335,7 +343,7 @@ void mario_blow_off_cap(struct MarioState *m, f32 capSpeed) {
     }
 }
 
-u32 mario_lose_cap_to_enemy(u32 enemyType) {
+Bool32 mario_lose_cap_to_enemy(u32 enemyType) {
     if (does_mario_have_normal_cap_on_head(gMarioState)) {
         save_file_set_flags((enemyType == 1) ? SAVE_FLAG_CAP_ON_KLEPTO : SAVE_FLAG_CAP_ON_UKIKI);
         gMarioState->flags &= ~(MARIO_NORMAL_CAP | MARIO_CAP_ON_HEAD);
@@ -343,6 +351,7 @@ u32 mario_lose_cap_to_enemy(u32 enemyType) {
     }
     return FALSE;
 }
+#endif
 
 void mario_retrieve_cap(void) {
     mario_drop_held_object(gMarioState);

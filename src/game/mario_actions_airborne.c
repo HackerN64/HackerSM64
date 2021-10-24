@@ -1185,11 +1185,11 @@ s32 act_getting_blown(struct MarioState *m) { // :flushed:
             m->windGravity += 0.05f;
         }
     }
-
+#ifndef PREVENT_CAP_LOSS
     if (++(m->actionTimer) == 20) {
         mario_blow_off_cap(m, 50.0f);
     }
-
+#endif
     mario_set_forward_vel(m, m->forwardVel);
     set_mario_animation(m, MARIO_ANIM_BACKWARD_AIR_KB);
 
