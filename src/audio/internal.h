@@ -582,18 +582,18 @@ struct NotePlaybackState {
     /*0x84, 0x5C,     */ struct VibratoState vibratoState;
 };
 struct NoteSubEu {
-    /*0x00*/ volatile u8 enabled      : TRUE;
-    /*0x00*/ u8 needsInit             : TRUE;
-    /*0x00*/ u8 finished              : TRUE;
-    /*0x00*/ u8 envMixerNeedsInit     : TRUE;
-    /*0x00*/ u8 stereoStrongRight     : TRUE;
-    /*0x00*/ u8 stereoStrongLeft      : TRUE;
-    /*0x00*/ u8 stereoHeadsetEffects  : TRUE;
-    /*0x00*/ u8 usesHeadsetPanEffects : TRUE;
+    /*0x00*/ volatile u8 enabled      : 1;
+    /*0x00*/ u8 needsInit             : 1;
+    /*0x00*/ u8 finished              : 1;
+    /*0x00*/ u8 envMixerNeedsInit     : 1;
+    /*0x00*/ u8 stereoStrongRight     : 1;
+    /*0x00*/ u8 stereoStrongLeft      : 1;
+    /*0x00*/ u8 stereoHeadsetEffects  : 1;
+    /*0x00*/ u8 usesHeadsetPanEffects : 1;
     /*0x01*/ u8 reverbIndex           : 3;
     /*0x01*/ u8 bookOffset            : 3;
-    /*0x01*/ u8 isSyntheticWave       : TRUE;
-    /*0x01*/ u8 hasTwoAdpcmParts      : TRUE;
+    /*0x01*/ u8 isSyntheticWave       : 1;
+    /*0x01*/ u8 hasTwoAdpcmParts      : 1;
 #ifdef VERSION_EU
     /*0x02*/ u8 bankId;
 #else
@@ -650,19 +650,19 @@ struct Note {
 // volatile Note, needed in synthesis_process_notes
 struct vNote {
     /* U/J, EU  */
-    /*0x00*/ volatile u8 enabled : TRUE;
+    /*0x00*/ volatile u8 enabled : 1;
     long long int force_structure_alignment;
 }; // size = 0xC0
 struct Note {
     /* U/J, EU  */
-    /*0x00*/ u8 enabled              : TRUE;
-    /*0x00*/ u8 needsInit            : TRUE;
-    /*0x00*/ u8 restart              : TRUE;
-    /*0x00*/ u8 finished             : TRUE;
-    /*0x00*/ u8 envMixerNeedsInit    : TRUE;
-    /*0x00*/ u8 stereoStrongRight    : TRUE;
-    /*0x00*/ u8 stereoStrongLeft     : TRUE;
-    /*0x00*/ u8 stereoHeadsetEffects : TRUE;
+    /*0x00*/ u8 enabled              : 1;
+    /*0x00*/ u8 needsInit            : 1;
+    /*0x00*/ u8 restart              : 1;
+    /*0x00*/ u8 finished             : 1;
+    /*0x00*/ u8 envMixerNeedsInit    : 1;
+    /*0x00*/ u8 stereoStrongRight    : 1;
+    /*0x00*/ u8 stereoStrongLeft     : 1;
+    /*0x00*/ u8 stereoHeadsetEffects : 1;
     /*0x01*/ u8 usesHeadsetPanEffects;
     /*0x02*/ u8 unk2;
     /*0x03*/ u8 sampleDmaIndex;

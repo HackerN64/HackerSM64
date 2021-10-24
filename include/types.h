@@ -261,14 +261,14 @@ struct ObjectNode {
 
 #ifdef PUPPYLIGHTS
 struct PuppyLight {
-    Vec3t pos[2];    // The location of the light. First index is the absolute position, second index are offsets.
-    s16 yaw;         // Used by cubes. Allows epic rotating of the volume.
-    RoomData room;   // Which room to use. -1 is visible from all rooms.
-    s8 epicentre;    // What percentage inside the volume you'll be before maximum light strength is applied. (E.g: 100 will be full strength always, and 0 will be full strength at the centre.)
-    u8 flags;        // Some stuff to define how the volume is used. Mostly just shape stuff, but can potentially have other uses.
-    ColorRGBA rgba;  // Colour. Go on, take even the tiniest guess as to what this entails.
-    u8 area;         // Which section of the level this light is stored in.
-    u8 active: TRUE; // Whether the light will actually work. Mostly intended to be used for objects.
+    Vec3t pos[2];   // The location of the light. First index is the absolute position, second index are offsets.
+    s16 yaw;        // Used by cubes. Allows epic rotating of the volume.
+    RoomData room;  // Which room to use. -1 is visible from all rooms.
+    s8 epicentre;   // What percentage inside the volume you'll be before maximum light strength is applied. (E.g: 100 will be full strength always, and 0 will be full strength at the centre.)
+    u8 flags;       // Some stuff to define how the volume is used. Mostly just shape stuff, but can potentially have other uses.
+    ColorRGBA rgba; // Colour. Go on, take even the tiniest guess as to what this entails.
+    u8 area;        // Which section of the level this light is stored in.
+    u8 active: 1;   // Whether the light will actually work. Mostly intended to be used for objects.
 };
 #endif
 
@@ -468,7 +468,7 @@ struct MarioState {
              u8  breathCounter;
 #endif
 #ifdef PREVENT_DEATH_LOOP
-             u8  isDead: TRUE;
+             u8  isDead: 1;
 #endif
            Vec3f lastSafePos;
            Vec3f prevPos;
