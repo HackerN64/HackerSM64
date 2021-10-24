@@ -38,7 +38,7 @@
 // Detect Mario's collision with lava regardless of action
 //#define LAVA_INTERACTION_FIX
 
-// Fixes shell cancel
+// Sets Mario in the proper action when interacting with a shell in midair.
 //#define SHELL_CANCEL_FIX
 
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!

@@ -1401,7 +1401,7 @@ u32 interact_koopa_shell(struct MarioState *m, UNUSED u32 interactType, struct O
             play_shell_music();
             mario_drop_held_object(m);
 #ifdef SHELL_CANCEL_FIX
-            return set_mario_action(m, ((m->pos[0] > m->floorHeight) ? ACT_RIDING_SHELL_FALL : ACT_RIDING_SHELL_GROUND), 0);
+            return set_mario_action(m, ((m->action & ACT_FLAG_AIR) ? ACT_RIDING_SHELL_FALL : ACT_RIDING_SHELL_GROUND), 0);
 #else
             // Puts Mario in ground action even when in air, making it easy to
             // escape air actions into crouch slide (shell cancel)
