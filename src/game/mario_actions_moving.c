@@ -328,7 +328,7 @@ s32 apply_landing_accel(struct MarioState *m, f32 frictionFactor) {
 
     if (!mario_floor_is_slope(m)) {
         m->forwardVel *= frictionFactor;
-        if (m->forwardVel * m->forwardVel < 1.0f) {
+        if (sqr(m->forwardVel) < 1.0f) {
             mario_set_forward_vel(m, 0.0f);
             stopped = TRUE;
         }
@@ -407,7 +407,8 @@ s32 apply_slope_decel(struct MarioState *m, f32 decelCoef) {
 s32 update_decelerating_speed(struct MarioState *m) {
     s32 stopped = FALSE;
 
-    if ((m->forwardVel = approach_f32(m->forwardVel, 0.0f, 1.0f, 1.0f)) == 0.0f) {
+    m->forwardVel = approach_f32(m->forwardVel, 0.0f, 1.0f, 1.0f);
+    if (m->forwardVel == 0.0f) {
         stopped = TRUE;
     }
 
@@ -419,7 +420,7 @@ s32 update_decelerating_speed(struct MarioState *m) {
 }
 
 void update_walking_speed(struct MarioState *m) {
-    f32 maxTargetSpeed = ((m->floor != NULL && m->floor->type == SURFACE_SLOW) ? 24.0f : 32.0f);
+    f32 maxTargetSpeed = (((m->floor != NULL) && (m->floor->type == SURFACE_SLOW)) ? 24.0f : 32.0f);
 
     f32 targetSpeed = MIN(m->intendedMag, maxTargetSpeed);
 
@@ -761,8 +762,11 @@ s32 act_walking(struct MarioState *m) {
     if (m->input & INPUT_IDLE) {
         return begin_braking_action(m);
     }
-
+#ifdef GROUND_TURNING_AROUND_FIX
+    if (analog_stick_held_back(m)) {
+#else
     if (analog_stick_held_back(m) && m->forwardVel >= 16.0f) {
+#endif
         return set_mario_action(m, ACT_TURNING_AROUND, 0);
     }
 
@@ -942,7 +946,7 @@ s32 act_turning_around(struct MarioState *m) {
         return begin_walking_action(m, 8.0f, ACT_FINISH_TURNING_AROUND, 0);
     }
 
-    play_sound(SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend, m->marioObj->header.gfx.cameraToObject);
+    play_sound((SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend), m->marioObj->header.gfx.cameraToObject);
 
     adjust_sound_for_speed(m);
 
@@ -980,6 +984,12 @@ s32 act_finish_turning_around(struct MarioState *m) {
     if (m->input & INPUT_A_PRESSED) {
         return set_jumping_action(m, ACT_SIDE_FLIP, 0);
     }
+
+#ifdef GROUND_TURNING_AROUND_FIX
+    if (analog_stick_held_back(m)) {
+        return set_mario_action(m, ACT_TURNING_AROUND, 0);
+    }
+#endif
 
     update_walking_speed(m);
     set_mario_animation(m, MARIO_ANIM_TURNING_PART2);
@@ -1024,7 +1034,7 @@ s32 act_braking(struct MarioState *m) {
             break;
     }
 
-    play_sound(SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend, m->marioObj->header.gfx.cameraToObject);
+    play_sound((SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend), m->marioObj->header.gfx.cameraToObject);
     adjust_sound_for_speed(m);
     set_mario_animation(m, MARIO_ANIM_SKID_ON_GROUND);
     return FALSE;
@@ -1076,12 +1086,13 @@ s32 act_decelerating(struct MarioState *m) {
 
     if (slopeClass == SURFACE_CLASS_VERY_SLIPPERY) {
         set_mario_animation(m, MARIO_ANIM_IDLE_HEAD_LEFT);
-        play_sound(SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend, m->marioObj->header.gfx.cameraToObject);
+        play_sound((SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend), m->marioObj->header.gfx.cameraToObject);
         adjust_sound_for_speed(m);
         m->particleFlags |= PARTICLE_DUST;
     } else {
         // (Speed Crash) Crashes if speed exceeds 2^17.
-        if ((animSpeed = (s32)(m->forwardVel / 4.0f * 0x10000)) < 0x1000) {
+        animSpeed = (s32)(m->forwardVel / 4.0f * 0x10000);
+        if (animSpeed < 0x1000) {
             animSpeed = 0x1000;
         }
 
@@ -1147,7 +1158,8 @@ s32 act_hold_decelerating(struct MarioState *m) {
         m->particleFlags |= PARTICLE_DUST;
     } else {
         //! (Speed Crash) This crashes if Mario has more speed than 2^15 speed.
-        if ((animSpeed = (s32)(m->forwardVel * 0x10000)) < 0x1000) {
+        animSpeed = (s32)(m->forwardVel * 0x10000);
+        if (animSpeed < 0x1000) {
             animSpeed = 0x1000;
         }
 
@@ -1194,7 +1206,7 @@ s32 act_riding_shell_ground(struct MarioState *m) {
     if (m->floor->type == SURFACE_BURNING) {
         play_sound(SOUND_MOVING_RIDING_SHELL_LAVA, m->marioObj->header.gfx.cameraToObject);
     } else {
-        play_sound(SOUND_MOVING_TERRAIN_RIDING_SHELL + m->terrainSoundAddend,
+        play_sound((SOUND_MOVING_TERRAIN_RIDING_SHELL + m->terrainSoundAddend),
                    m->marioObj->header.gfx.cameraToObject);
     }
 
@@ -1267,7 +1279,7 @@ s32 act_burning_ground(struct MarioState *m) {
         return set_mario_action(m, ACT_WALKING, 0);
     }
 
-    if (m->waterLevel - m->floorHeight > 50.0f) {
+    if ((m->waterLevel - m->floorHeight) > 50.0f) {
         play_sound(SOUND_GENERAL_FLAME_OUT, m->marioObj->header.gfx.cameraToObject);
         return set_mario_action(m, ACT_WALKING, 0);
     }
@@ -1324,7 +1336,7 @@ void common_slide_action(struct MarioState *m, u32 endAction, u32 airAction, s32
     switch (perform_ground_step(m)) {
         case GROUND_STEP_LEFT_GROUND:
             set_mario_action(m, airAction, 0);
-            if (m->forwardVel < -50.0f || 50.0f < m->forwardVel) {
+            if ((m->forwardVel < -50.0f) || (50.0f < m->forwardVel)) {
                 play_sound(SOUND_MARIO_HOOHOO, m->marioObj->header.gfx.cameraToObject);
             }
             break;

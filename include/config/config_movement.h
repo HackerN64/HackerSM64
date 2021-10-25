@@ -5,7 +5,11 @@
  *********************/
 
 // Fixes Mario's turn ground radius by making it dependent on the analog stick magnitude.
-#define GROUND_TURN_FIX
+//#define GROUND_TURN_FIX
+
+// Fixes Mario's turn ground radius by allowing Mario to turn around at any speed.
+// Basically a simpler version of GROUND_TURN_FIX but smoother & closer to vanilla.
+#define GROUND_TURNING_AROUND_FIX
 
 // Flips Mario around when running backwards really fast.
 // This can happen when sliding backwards off a slope onto a floor.
@@ -82,3 +86,10 @@
 
 // Disable BLJs and crush SimpleFlips's dreams
 //#define DISABLE_BLJ
+
+
+// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
+
+#ifdef GROUND_TURNING_AROUND_FIX
+#undef GROUND_TURN_FIX
+#endif // GROUND_TURNING_AROUND_FIX
