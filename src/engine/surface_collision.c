@@ -204,30 +204,30 @@ void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struc
  **************************************************/
 
 void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
-    register f32 diff_x, diff_z, invDenom;
-    diff_x = ((target1[0] - *x) + (target2[0] - *x));
-    diff_z = ((target1[2] - *z) + (target2[2] - *z));
-    invDenom = (margin / sqrtf(sqr(diff_x) + sqr(diff_z)));
+    register f32 diff_x = ((target1[0] - *x) + (target2[0] - *x));
+    register f32 diff_z = ((target1[2] - *z) + (target2[2] - *z));
+    register f32 invDenom = (margin / sqrtf(sqr(diff_x) + sqr(diff_z)));
     *x += (diff_x * invDenom);
     *z += (diff_z * invDenom);
 }
 
 static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf, const f32 margin) {
+    s32 addMargin = (surf->type != SURFACE_HANGABLE);
     Vec3i vx, vz;
     vx[0] = surf->vertex1[0];
     vz[0] = surf->vertex1[2];
-    if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[0], &vz[0], surf->vertex2, surf->vertex3, margin);
+    if (addMargin) add_ceil_margin(&vx[0], &vz[0], surf->vertex2, surf->vertex3, margin);
     vx[1] = surf->vertex2[0];
     vz[1] = surf->vertex2[2];
-    if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[1], &vz[1], surf->vertex3, surf->vertex1, margin);
+    if (addMargin) add_ceil_margin(&vx[1], &vz[1], surf->vertex3, surf->vertex1, margin);
     // Checking if point is in bounds of the triangle laterally.
-    if ((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0]) > 0) return FALSE;
+    if (((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0])) > 0) return FALSE;
     // Slight optimization by checking these later.
     vx[2] = surf->vertex3[0];
     vz[2] = surf->vertex3[2];
-    if (surf->type != SURFACE_HANGABLE) add_ceil_margin(&vx[2], &vz[2], surf->vertex1, surf->vertex2, margin);
-    if ((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1]) > 0) return FALSE;
-    if ((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2]) > 0) return FALSE;
+    if (addMargin) add_ceil_margin(&vx[2], &vz[2], surf->vertex1, surf->vertex2, margin);
+    if (((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1])) > 0) return FALSE;
+    if (((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2])) > 0) return FALSE;
     return TRUE;
 }
 
@@ -342,11 +342,11 @@ static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf
     vz[0] = surf->vertex1[2];
     vx[1] = surf->vertex2[0];
     vz[1] = surf->vertex2[2];
-    if ((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0]) < 0) return FALSE;
+    if (((vz[0] - z) * (vx[1] - vx[0]) - (vx[0] - x) * (vz[1] - vz[0])) < 0) return FALSE;
     vx[2] = surf->vertex3[0];
     vz[2] = surf->vertex3[2];
-    if ((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1]) < 0) return FALSE;
-    if ((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2]) < 0) return FALSE;
+    if (((vz[1] - z) * (vx[2] - vx[1]) - (vx[1] - x) * (vz[2] - vz[1])) < 0) return FALSE;
+    if (((vz[2] - z) * (vx[0] - vx[2]) - (vx[2] - x) * (vz[0] - vz[2])) < 0) return FALSE;
     return TRUE;
 }
 
@@ -418,7 +418,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
 
         curBottomHeight = get_surface_height_at_location(x, z, surf);
 
-        if (curBottomHeight <  (y - 78.0f)) {
+        if (curBottomHeight < (y - 78.0f)) {
             continue;
         } else {
             bottomHeight = curBottomHeight;
@@ -427,19 +427,19 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
 
     // Iterate through the list of water tops until there are no more water tops.
     while (topSurfaceNode != NULL) {
-        surf = topSurfaceNode->surface;
+        surf           = topSurfaceNode->surface;
         topSurfaceNode = topSurfaceNode->next;
 
         if ((surf->type == SURFACE_NEW_WATER_BOTTOM) || !check_within_floor_triangle_bounds(x, z, surf)) continue;
 
         curHeight = get_surface_height_at_location(x, z, surf);
 
-        if (bottomHeight != FLOOR_LOWER_LIMIT && curHeight > bottomHeight) continue;
+        if ((bottomHeight != FLOOR_LOWER_LIMIT) && (curHeight > bottomHeight)) continue;
 
         if (curHeight > height) {
-            height = curHeight;
+            height   = curHeight;
             *pheight = curHeight;
-            floor = surf;
+            floor    = surf;
         }
     }
 
@@ -589,7 +589,7 @@ s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor) {
 #endif
     s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
-    if (p != NULL && waterLevel == FLOOR_LOWER_LIMIT) {
+    if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
         s32 numRegions = *p++;
 
         for (s32 i = 0; i < numRegions; i++) {

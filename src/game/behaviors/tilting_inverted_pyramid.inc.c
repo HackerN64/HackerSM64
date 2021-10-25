@@ -9,7 +9,7 @@
  */
 void bhv_platform_normals_init(void) {
     Mat4 *transform = &o->transform;
-    vec3_set(&o->oTiltingPyramidNormalVec, 0.0f, 1.0f, 0.0f);
+    vec3f_set(&o->oTiltingPyramidNormalVec, 0.0f, 1.0f, 0.0f);
     mtxf_align_terrain_normal(*transform, &o->oTiltingPyramidNormalVec, &o->oPosVec, 0);
 }
 
@@ -35,7 +35,7 @@ void bhv_tilting_inverted_pyramid_loop(void) {
         vec3f_normalize(targetNormal);
         o->oTiltingPyramidMarioOnPlatform = TRUE;
     } else {
-        vec3_set(targetNormal, 0.0f, 1.0f, 0.0f);
+        vec3f_set(targetNormal, 0.0f, 1.0f, 0.0f);
         o->oTiltingPyramidMarioOnPlatform = FALSE;
     }
     // Approach the normals by 0.01f towards the new goal, then create a transform matrix and orient the object.
@@ -48,10 +48,10 @@ void bhv_tilting_inverted_pyramid_loop(void) {
     // If Mario is on the platform, adjust his position for the platform tilt.
     if (o->oTiltingPyramidMarioOnPlatform) {
         linear_mtxf_mul_vec3f(*transform, posAfterRotation, dist);
-        m[0] += posAfterRotation[0] - posBeforeRotation[0];
-        m[1] += posAfterRotation[1] - posBeforeRotation[1];
-        m[2] += posAfterRotation[2] - posBeforeRotation[2];
-        vec3_set(gMarioStates[0].pos, m);
+        m[0] += (posAfterRotation[0] - posBeforeRotation[0]);
+        m[1] += (posAfterRotation[1] - posBeforeRotation[1]);
+        m[2] += (posAfterRotation[2] - posBeforeRotation[2]);
+        vec3_copy(gMarioStates[0].pos, m);
     }
 #endif
     o->header.gfx.throwMatrix = transform;

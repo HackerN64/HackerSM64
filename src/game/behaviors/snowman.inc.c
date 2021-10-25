@@ -161,7 +161,7 @@ void bhv_snowmans_head_init(void) {
 
     if ((starFlags & (1 << behParams)) && (gCurrActNum != (behParams + 1))) {
         spawn_object_abs_with_rot(o, 0, MODEL_CCM_SNOWMAN_BASE, bhvBigSnowmanWhole, -4230, -1344, 1813, 0, 0, 0);
-        vec3_set(&o->oPosVec, -4230.0f, -994.0f, 1813.0f);
+        vec3f_set(&o->oPosVec, -4230.0f, -994.0f, 1813.0f);
         o->oAction = 1;
     }
 }

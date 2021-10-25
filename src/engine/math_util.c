@@ -77,11 +77,11 @@ f32 max_3f(f32 a0, f32 a1, f32 a2) { if (a1 > a0) a0 = a1; if (a2 > a0) a0 = a2;
 
 /// A combination of the above.
 void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max) {
-    *min = a;
-    *max = a;
     if (b < a) {
+        *max = a;
         *min = b;
     } else {
+        *min = a;
         *max = b;
     }
     if (c < *min) *min = c;
@@ -271,7 +271,7 @@ void mtxf_identity(register Mat4 mtx) {
 void mtxf_translate(Mat4 dest, Vec3f b) {
     register s32 i;
     register f32 *pen;
-    for (pen = (f32 *) dest + 1, i = 0; i < 12; pen++, i++) {
+    for (pen = ((f32 *) dest + 1), i = 0; i < 12; pen++, i++) {
         *pen = 0;
     }
     for (pen = (f32 *) dest, i = 0; i < 4; pen += 5, i++) {
@@ -291,7 +291,7 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
 void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
     s32 i;
     for (i = 0; i < 3; i++) {
-        dst[i] = (m[0][i] * v[0]) + (m[1][i] * v[1]) + (m[2][i] * v[2]);
+        dst[i] = ((m[0][i] * v[0]) + (m[1][i] * v[1]) + (m[2][i] * v[2]));
     }
 }
 
@@ -440,8 +440,7 @@ void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f b, Vec3s c) {
  */
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
     register s32 i;
-    register f32 *temp, *temp2;
-    temp = (f32 *)dest;
+    register f32 *temp2, *temp = (f32 *)dest;
     for (i = 0; i < 16; i++) {
         *temp = 0;
         temp++;
@@ -464,7 +463,7 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
     temp  = (f32 *)dest;
     temp2 = (f32 *)mtx;
     for (i = 0; i < 3; i++) {
-        temp[12] = (temp2[0] * position[0]) + (temp2[4] * position[1]) + (temp2[8] * position[2]) + temp2[12];
+        temp[12] = ((temp2[0] * position[0]) + (temp2[4] * position[1]) + (temp2[8] * position[2]) + temp2[12]);
         temp++;
         temp2++;
     }
@@ -508,6 +507,7 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     Vec3f forward;
     Vec3f xColumn, yColumn, zColumn;
     f32 minY = (-radius * 3);
+    f32 height = (pos[1] + 150);
 
     point0[0] = (pos[0] + (radius * sins(yaw + 0x2AAA)));
     point0[2] = (pos[2] + (radius * coss(yaw + 0x2AAA)));
@@ -516,13 +516,13 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     point2[0] = (pos[0] + (radius * sins(yaw + 0xD555)));
     point2[2] = (pos[2] + (radius * coss(yaw + 0xD555)));
 
-    point0[1] = find_floor(point0[0], (pos[1] + 150), point0[2], &floor);
-    point1[1] = find_floor(point1[0], (pos[1] + 150), point1[2], &floor);
-    point2[1] = find_floor(point2[0], (pos[1] + 150), point2[2], &floor);
+    point0[1] = find_floor(point0[0], height, point0[2], &floor);
+    point1[1] = find_floor(point1[0], height, point1[2], &floor);
+    point2[1] = find_floor(point2[0], height, point2[2], &floor);
 
-    if (point0[1] - pos[1] < minY) point0[1] = pos[1];
-    if (point1[1] - pos[1] < minY) point1[1] = pos[1];
-    if (point2[1] - pos[1] < minY) point2[1] = pos[1];
+    if ((point0[1] - pos[1]) < minY) point0[1] = pos[1];
+    if ((point1[1] - pos[1]) < minY) point1[1] = pos[1];
+    if ((point2[1] - pos[1]) < minY) point2[1] = pos[1];
 
     f32 avgY = average_3(point0[1], point1[1], point2[1]);
 
@@ -562,7 +562,7 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
         vec3_copy(entry, temp);
         temp3 = (f32 *)b;
         for (; (i & 3) !=3; i++) {
-            *temp2 = (entry[0] * temp3[0]) + (entry[1] * temp3[4]) + (entry[2] * temp3[8]);
+            *temp2 = ((entry[0] * temp3[0]) + (entry[1] * temp3[4]) + (entry[2] * temp3[8]));
             temp2++;
             temp3++;
         }
@@ -605,7 +605,7 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
     register s32 i;
     register s16 *c = b;
     for (i = 0; i < 3; i++) {
-        c[0] = (x * temp2[0]) + (y * temp2[4]) + (z * temp2[8]) + temp2[12];
+        c[0] = ((x * temp2[0]) + (y * temp2[4]) + (z * temp2[8]) + temp2[12]);
         c++;
         temp2++;
     }
@@ -951,7 +951,7 @@ s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
 }
 
 s32 abs_angle_diff(s16 a0, s16 a1) {
-    s16 diff = (a1 - a0);
+    register s16 diff = (a1 - a0);
     if (diff == -0x8000) return 0x7FFF;
     return ABSI(diff);
 }
@@ -1035,13 +1035,13 @@ enum gSplineStates {
  * gSplineState ensures that the curve is clamped: the first two points
  * and last two points have different weight formulas. These are the weights
  * just before gSplineState transitions:
- * 1: [1, 0, 0, 0]
- * 1->2: [0, 3/12, 7/12, 2/12]
- * 2->3: [0, 1/6, 4/6, 1/6]
- * 3->3: [0, 1/6, 4/6, 1/6] (repeats)
- * 3->4: [0, 1/6, 4/6, 1/6]
- * 4->5: [0, 2/12, 7/12, 3/12]
- * 5: [0, 0, 0, 1]
+ * 1:    [1,      0,      0,      0]
+ * 1->2: [0, (3/12), (7/12), (2/12)]
+ * 2->3: [0, (1/ 6), (4/ 6), (1/ 6)]
+ * 3->3: [0, (1/ 6), (4/ 6), (1/ 6)] (repeats)
+ * 3->4: [0, (1/ 6), (4/ 6), (1/ 6)]
+ * 4->5: [0, (2/12), (7/12), (3/12)]
+ * 5:    [0,      0,      0,      1]
  *
  * I suspect that the weight formulas will give a 3rd degree B-spline with the
  * common uniform clamped knot vector, e.g. for n points:
@@ -1049,41 +1049,41 @@ enum gSplineStates {
  * TODO: verify the classification of the spline / figure out how polynomials were computed
  */
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c) {
-    f32 tinv = (1 - t);
+    f32 tinv  = (1 - t);
     f32 tinv2 = (tinv  * tinv);
     f32 tinv3 = (tinv2 * tinv);
-    f32 t2 = (t  * t);
-    f32 t3 = (t2 * t);
+    f32 t2    = (t     * t   );
+    f32 t3    = (t2    * t   );
 
     switch (gSplineState) {
         case CURVE_BEGIN_1:
             result[0] = tinv3;
-            result[1] = t3 * 1.75f - t2 * 4.5f + t * 3.0f;
-            result[2] = -t3 * (11 / 12.0f) + t2 * 1.5f;
-            result[3] = t3 * (1 / 6.0f);
+            result[1] = ((t3 * 1.75f) - (t2 * 4.5f) + (t * 3.0f));
+            result[2] = ((-t3 * (11 / 12.0f)) + (t2 * 1.5f));
+            result[3] = (t3 * (1 / 6.0f));
             break;
         case CURVE_BEGIN_2:
-            result[0] = tinv3 * 0.25f;
-            result[1] = t3 * (7 / 12.0f) - t2 * 1.25f + t * 0.25f + (7 / 12.0f);
-            result[2] = -t3 * 0.5f + t2 * 0.5f + t * 0.5f + (1 / 6.0f);
-            result[3] = t3 * (1 / 6.0f);
+            result[0] = (tinv3 * 0.25f);
+            result[1] = ((t3 * (7 / 12.0f)) - (t2 * 1.25f) + (t * 0.25f) + (7 / 12.0f));
+            result[2] = ((-t3 * 0.5f) + (t2 * 0.5f) + (t * 0.5f) + (1 / 6.0f));
+            result[3] = (t3 * (1 / 6.0f));
             break;
         case CURVE_MIDDLE:
-            result[0] = tinv3 * (1 / 6.0f);
-            result[1] = t3 * 0.5f - t2 + (4 / 6.0f);
-            result[2] = -t3 * 0.5f + t2 * 0.5f + t * 0.5f + (1 / 6.0f);
-            result[3] = t3 * (1 / 6.0f);
+            result[0] = (tinv3 * (1 / 6.0f));
+            result[1] = ((t3 * 0.5f) - t2 + (4 / 6.0f));
+            result[2] = ((-t3 * 0.5f) + (t2 * 0.5f) + (t * 0.5f) + (1 / 6.0f));
+            result[3] = (t3 * (1 / 6.0f));
             break;
         case CURVE_END_1:
-            result[0] = tinv3 * (1 / 6.0f);
-            result[1] = -tinv3 * 0.5f + tinv2 * 0.5f + tinv * 0.5f + (1 / 6.0f);
-            result[2] = tinv3 * (7 / 12.0f) - tinv2 * 1.25f + tinv * 0.25f + (7 / 12.0f);
-            result[3] = t3 * 0.25f;
+            result[0] = (tinv3 * (1 / 6.0f));
+            result[1] = ((-tinv3 * 0.5f) + (tinv2 * 0.5f) + (tinv * 0.5f) + (1 / 6.0f));
+            result[2] = ((tinv3 * (7 / 12.0f)) - (tinv2 * 1.25f) + (tinv * 0.25f) + (7 / 12.0f));
+            result[3] = (t3 * 0.25f);
             break;
         case CURVE_END_2:
-            result[0] = tinv3 * (1 / 6.0f);
-            result[1] = -tinv3 * (11 / 12.0f) + tinv2 * 1.5f;
-            result[2] = tinv3 * 1.75f - tinv2 * 4.5f + tinv * 3.0f;
+            result[0] = (tinv3 * (1 / 6.0f));
+            result[1] = ((-tinv3 * (11 / 12.0f)) + (tinv2 * 1.5f));
+            result[2] = ((tinv3 * 1.75f) - (tinv2 * 4.5f) + (tinv * 3.0f));
             result[3] = t3;
             break;
     }
@@ -1119,7 +1119,8 @@ s32 anim_spline_poll(Vec3f result) {
         vec3_sum_val(result, gSplineKeyframe[i], weights[i]);
     }
 
-    if ((gSplineKeyframeFraction += gSplineKeyframe[0][0] / 1000.0f) >= 1) {
+    gSplineKeyframeFraction += (gSplineKeyframe[0][0] / 1000.0f);
+    if (gSplineKeyframeFraction >= 1) {
         gSplineKeyframe++;
         gSplineKeyframeFraction--;
         switch (gSplineState) {
@@ -1144,18 +1145,17 @@ s32 anim_spline_poll(Vec3f result) {
  *                    RAYCASTING                  *
  **************************************************/
 
-#define RAY_OFFSET 30.0f /*How many units to extrapolate surfaces when testing for a raycast*/
-#define RAY_STEPS 4 /*How many steps to do when casting rays, default to quartersteps.*/
+#define RAY_OFFSET 30.0f /* How many units to extrapolate surfaces when testing for a raycast */
+#define RAY_STEPS      4 /* How many steps to do when casting rays, default to quartersteps.  */
 
 s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface *surface, Vec3f hit_pos, f32 *length) {
     Vec3f v0, v1, v2, e1, e2, h, s, q;
-    f32 a, f, u, v;
     Vec3f add_dir;
     Vec3f norm;
     // Ignore certain surface types.
     if ((surface->type == SURFACE_INTANGIBLE) || (surface->flags & SURFACE_FLAG_NO_CAM_COLLISION)) return FALSE;
     // Get surface normal and some other stuff
-    vec3f_set(norm, 0.0f, surface->normal.y, 0.0f);
+    vec3f_set(norm, surface->normal.x, surface->normal.y, surface->normal.z);
     vec3_mul_val(norm, RAY_OFFSET);
     vec3s_to_vec3f(v0, surface->vertex1);
     vec3s_to_vec3f(v1, surface->vertex2);
@@ -1167,15 +1167,15 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     vec3f_diff(e2, v2, v0);
     vec3f_cross(h, dir, e2);
     // Check if we're perpendicular from the surface
-    a = vec3f_dot(e1, h);
+    f32 a = vec3f_dot(e1, h); // Angle difference between ray and surface normals
     if ((a > -NEAR_ZERO) && (a < NEAR_ZERO)) return FALSE;
     // Check if we're making contact with the surface
-    f = (1.0f / a);
+    f32 f = (1.0f / a);
     vec3f_diff(s, orig, v0);
-    u = (f * vec3f_dot(s, h));
+    f32 u = (f * vec3f_dot(s, h));
     if ((u < 0.0f) || (u > 1.0f)) return FALSE;
     vec3f_cross(q, s, e1);
-    v = (f * vec3f_dot(dir, q));
+    f32 v = (f * vec3f_dot(dir, q));
     if ((v < 0.0f) || ((u + v) > 1.0f)) return FALSE;
     // Get the length between our origin and the surface contact point
     *length = (f * vec3f_dot(e2, q));
@@ -1195,7 +1195,6 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-
     // Get upper and lower bounds of ray
     if (dir[1] >= 0.0f) {
         top    = (orig[1] + (dir[1] * dir_length));
@@ -1223,7 +1222,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
 
 void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
     // Skip if OOB
-    if (cellX >= 0 && cellX <= (NUM_CELLS - 1) && cellZ >= 0 && cellZ <= (NUM_CELLS - 1)) {
+    if ((cellX >= 0) && (cellX <= (NUM_CELLS - 1)) && (cellZ >= 0) && (cellZ <= (NUM_CELLS - 1))) {
         // Iterate through each surface in this partition
         if ((normalized_dir[1] > -NEAR_ONE) && (flags & RAYCAST_FIND_CEIL)) {
             find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
@@ -1245,8 +1244,6 @@ void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized
 }
 
 void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags) {
-    s32 cellZ, cellX, cellPrevX, cellPrevZ;
-    f32 fCellZ, fCellX;
     Vec3f normalized_dir;
     f32 step;
     s32 i;
@@ -1263,12 +1260,12 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     vec3f_normalize(normalized_dir);
 
     // Get our cell coordinate
-    fCellX = ((orig[0] + LEVEL_BOUNDARY_MAX) * invcell);
-    fCellZ = ((orig[2] + LEVEL_BOUNDARY_MAX) * invcell);
-    cellX = fCellX;
-    cellZ = fCellZ;
-    cellPrevX = cellX;
-    cellPrevZ = cellZ;
+    f32 fCellX    = ((orig[0] + LEVEL_BOUNDARY_MAX) * invcell);
+    f32 fCellZ    = ((orig[2] + LEVEL_BOUNDARY_MAX) * invcell);
+    s32 cellX     = fCellX;
+    s32 cellZ     = fCellZ;
+    s32 cellPrevX = cellX;
+    s32 cellPrevZ = cellZ;
 
     // Don't do DDA if straight down
     if ((normalized_dir[1] >= NEAR_ONE) || (normalized_dir[1] <= -NEAR_ONE)) {
@@ -1282,6 +1279,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     } else {
         step = ((RAY_STEPS * ABS(dir[2])) * invcell);
     }
+
     f32 dx = ((dir[0] / step) * invcell);
     f32 dz = ((dir[2] / step) * invcell);
 
@@ -1289,12 +1287,12 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
         find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
 
         // Move cell coordinate
-        fCellX += dx;
-        fCellZ += dz;
+        fCellX   += dx;
+        fCellZ   += dz;
         cellPrevX = cellX;
         cellPrevZ = cellZ;
-        cellX = fCellX;
-        cellZ = fCellZ;
+        cellX     = fCellX;
+        cellZ     = fCellZ;
 
         if ((cellPrevX != cellX) && (cellPrevZ != cellZ)) {
             find_surface_on_ray_cell(cellX, cellPrevZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);

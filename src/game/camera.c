@@ -3645,7 +3645,7 @@ s32 reduce_by_dist_from_camera(s16 value, f32 maxDist, f32 posX, f32 posY, f32 p
     f32 goalDY = (gLakituState.goalPos[1] - posY);
     f32 goalDZ = (gLakituState.goalPos[2] - posZ);
     if (sqr(maxDist) > (sqr(goalDX) + sqr(goalDY) + sqr(goalDZ))) {
-        vec3_set(pos, posX, posY, posZ);
+        vec3f_set(pos, posX, posY, posZ);
         vec3f_get_dist_and_angle(gLakituState.goalPos, pos, &dist, &pitch, &yaw);
         if (dist < maxDist) {
             calculate_angles(gLakituState.goalPos, gLakituState.goalFocus, &goalPitch, &goalYaw);
@@ -7312,7 +7312,7 @@ void cutscene_star_spawn_end(struct Camera *c) {
 
 void cutscene_exit_waterfall_warp(struct Camera *c) {
     //! hardcoded position
-    vec3_set(c->pos, -3899.0f, 39.0f, -5671.0f);
+    vec3f_set(c->pos, -3899.0f, 39.0f, -5671.0f);
 }
 
 /**

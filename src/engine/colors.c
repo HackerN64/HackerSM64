@@ -146,7 +146,7 @@ RGBA16Return32 rgba16_make_grayscale(RGBA16 rgba) {
     ColorRGBf color;
     rgba16_to_colorRGBf(color, rgba);
     ColorF avg = vec3_average(color);
-    vec3_set(color, avg, avg, avg);
+    vec3f_set(color, avg, avg, avg);
     return colorRGBf_to_rgba16(color);
 }
 

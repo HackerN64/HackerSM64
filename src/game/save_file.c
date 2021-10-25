@@ -642,7 +642,7 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
     saveFile->capLevel = gCurrLevelNum;
     saveFile->capArea  = gCurrAreaIndex;
 #ifndef SAVE_NUM_LIVES
-    vec3_set(saveFile->capPos, x, y, z);
+    vec3s_set(saveFile->capPos, x, y, z);
 #endif
     save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
 }

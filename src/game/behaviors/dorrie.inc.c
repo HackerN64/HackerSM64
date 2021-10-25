@@ -8,9 +8,9 @@ void dorrie_raise_head(void) {
     f32 xzDisp = ((440.0f * (coss(o->oDorrieNeckAngle)) - coss(startAngle)));
     f32 yDisp  = ((440.0f * (sins(o->oDorrieNeckAngle)) - sins(startAngle)));
 
-    vec3_set(gMarioStates[0].pos, (gMarioObject->oPosX + (xzDisp * sins(o->oMoveAngleYaw))),
-                                  (gMarioObject->oPosY - yDisp),
-                                  (gMarioObject->oPosZ + (xzDisp * coss(o->oMoveAngleYaw))));
+    vec3f_set(gMarioStates[0].pos, (gMarioObject->oPosX + (xzDisp * sins(o->oMoveAngleYaw))),
+                                   (gMarioObject->oPosY - yDisp),
+                                   (gMarioObject->oPosZ + (xzDisp * coss(o->oMoveAngleYaw))));
 }
 
 void dorrie_act_move(void) {

@@ -135,13 +135,13 @@ void puppyprint_calculate_ram_usage(void) {
         }
         temp[0] = ramP[i][0];
         temp[1] = ramP[i][1];
-        ramsizeSegment[i] = temp[1] - temp[0];
+        ramsizeSegment[i] = (temp[1] - temp[0]);
     }
 
     // These are a bit hacky, but what can ye do eh?
     // gEffectsMemoryPool is 0x4000, gObjectsMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
     ramsizeSegment[5] = (0x4000 + 0x800 + 0x4000 + 0x800);
-    ramsizeSegment[6] = (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + (SURFACE_POOL_SIZE * sizeof(struct Surface));
+    ramsizeSegment[6] = ((SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + (SURFACE_POOL_SIZE * sizeof(struct Surface)));
     ramsizeSegment[7] = gAudioHeapSize;
 }
 
@@ -153,11 +153,11 @@ void puppyprint_calculate_ram_usage(void) {
 
 void puppyprint_profiler_finished(void) {
     s32 i = 0;
-    benchMark[NUM_BENCH_ITERATIONS] = 0;
+    benchMark[NUM_BENCH_ITERATIONS    ] = 0;
     benchMark[NUM_BENCH_ITERATIONS + 1] = 0;
     benchmarkTimer = 300;
     benchViewer = FALSE;
-    for (i = 0; i < NUM_BENCH_ITERATIONS - 2; i++) {
+    for (i = 0; i < (NUM_BENCH_ITERATIONS - 2); i++) {
         benchMark[NUM_BENCH_ITERATIONS] += benchMark[i];
         if (benchMark[i] > benchMark[NUM_BENCH_ITERATIONS + 1]) {
             benchMark[NUM_BENCH_ITERATIONS + 1] = benchMark[i];
@@ -218,16 +218,16 @@ void print_ram_bar(void) {
             continue;
         }
         perfPercentage = (f32)ramsizeSegment[i]/ramsize;
-        graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, SCREEN_CENTER_X + (BAR_LENGTH / 2));
+        graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_CENTER_X + (BAR_LENGTH / 2)));
         render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22), colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
         prevGraph = graphPos;
     }
     perfPercentage = (f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize;
-    graphPos = (prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, SCREEN_CENTER_X + (BAR_LENGTH / 2)));
+    graphPos = (prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_CENTER_X + (BAR_LENGTH / 2))));
     render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22), 255, 255, 255, 255);
     prevGraph = graphPos;
 
-    render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), SCREEN_CENTER_X + (BAR_LENGTH / 2), (SCREEN_HEIGHT - 22), 0, 0, 0, 255);
+    render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), (SCREEN_CENTER_X + (BAR_LENGTH / 2)), (SCREEN_HEIGHT - 22), 0, 0, 0, 255);
 
     finish_blank_box();
 }
@@ -305,10 +305,10 @@ void print_audio_ram_overview(void) {
         if (audioPoolSizes[i][0] == 0) {
             percentage = 1000;
         } else {
-            percentage = ((s64) audioPoolSizes[i][1] * 1000) / audioPoolSizes[i][0];
+            percentage = (((s64) audioPoolSizes[i][1] * 1000) / audioPoolSizes[i][0]);
         }
         sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
-            audioPoolSizes[i][1], audioPoolSizes[i][0], percentage / 10, percentage % 10);
+            audioPoolSizes[i][1], audioPoolSizes[i][0], (percentage / 10), (percentage % 10));
         
         print_set_envcolour(colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
         print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
@@ -322,11 +322,11 @@ void print_audio_ram_overview(void) {
     if (totalMemory[0] == 0) {
         percentage = 0;
     } else {
-        percentage = ((s64) totalMemory[1] * 1000) / totalMemory[0];
+        percentage = (((s64) totalMemory[1] * 1000) / totalMemory[0]);
     }
     if (totalMemory[0] == gAudioHeapSize) {
         sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d_)",
-            totalMemory[1], totalMemory[0], percentage / 10, percentage % 10);
+            totalMemory[1], totalMemory[0], (percentage / 10), (percentage % 10));
     } else {
         sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (Incorrect!)",
             totalMemory[1], totalMemory[0]);
@@ -337,7 +337,7 @@ void print_audio_ram_overview(void) {
 }
 
 void benchmark_custom(void) {
-    if (benchmarkLoop == 0 || benchOption != 2) {
+    if ((benchmarkLoop == 0) || (benchOption != 2)) {
         return;
     }
     OSTime lastTime;
@@ -345,7 +345,7 @@ void benchmark_custom(void) {
         lastTime = osGetTime();
         // Insert your function here!
 
-        if (benchmarkLoop > 0 && benchOption == 2) {
+        if ((benchmarkLoop > 0) && (benchOption == 2)) {
             benchmarkLoop--;
             benchMark[benchmarkLoop] = (osGetTime() - lastTime);
             if (benchmarkLoop == 0) {
@@ -377,7 +377,7 @@ void print_which_benchmark(void) {
 char consoleLogTable[LOG_BUFFER_SIZE][255];
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
-    return (char *) memcpy(buffer, data, size) + size;
+    return ((char *) memcpy(buffer, data, size) + size);
 }
 
 void append_puppyprint_log(const char *str, ...) {
@@ -442,8 +442,12 @@ void puppyprint_render_profiler(void) {
     s32 prevGraph;
     u32 i;
     s32 viewedNums;
-    OSTime cpuCount = CYCLE_CONV(cpuTime + audioTime[NUM_PERF_ITERATIONS] + dmaAudioTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS]
-                                         +  taskTime[NUM_PERF_ITERATIONS] - profilerTime[NUM_PERF_ITERATIONS] - profilerTime2[NUM_PERF_ITERATIONS]);
+    OSTime cpuCount = CYCLE_CONV(cpuTime +     audioTime[NUM_PERF_ITERATIONS]
+                                         +  dmaAudioTime[NUM_PERF_ITERATIONS]
+                                         +     faultTime[NUM_PERF_ITERATIONS]
+                                         +      taskTime[NUM_PERF_ITERATIONS]
+                                         -  profilerTime[NUM_PERF_ITERATIONS]
+                                         - profilerTime2[NUM_PERF_ITERATIONS]);
     OSTime first = osGetTime();
     char textBytes[80];
 
@@ -547,36 +551,37 @@ void get_average_perf_time(u32 *time) {
     for (i = 0; i < (NUM_PERF_ITERATIONS - 1); i++) {
         total += time[i];
     }
-    time[NUM_PERF_ITERATIONS] = MAX(total / NUM_PERF_ITERATIONS, 0);
+    total /= NUM_PERF_ITERATIONS;
+    time[NUM_PERF_ITERATIONS] = MAX(total, 0);
 }
 
 void puppyprint_profiler_process(void) {
     bufferTime[perfIteration] = (IO_READ(DPC_BUFBUSY_REG));
-    tmemTime[perfIteration] = (IO_READ(DPC_TMEM_REG));
-    busTime[perfIteration] = (IO_READ(DPC_PIPEBUSY_REG));
+      tmemTime[perfIteration] = (IO_READ(DPC_TMEM_REG));
+       busTime[perfIteration] = (IO_READ(DPC_PIPEBUSY_REG));
     OSTime newTime = osGetTime();
 
     if ((gGlobalTimer % 15) == 0) {
-        get_average_perf_time(scriptTime);
+        get_average_perf_time(   scriptTime);
         get_average_perf_time(behaviourTime);
         get_average_perf_time(collisionTime);
-        get_average_perf_time(graphTime);
-        get_average_perf_time(audioTime);
-        get_average_perf_time(dmaTime);
-        get_average_perf_time(dmaAudioTime);
-        get_average_perf_time(faultTime);
-        get_average_perf_time(taskTime);
-        get_average_perf_time(profilerTime);
-        get_average_perf_time(profilerTime2);
-        get_average_perf_time(cameraTime);
+        get_average_perf_time(    graphTime);
+        get_average_perf_time(    audioTime);
+        get_average_perf_time(      dmaTime);
+        get_average_perf_time( dmaAudioTime);
+        get_average_perf_time(    faultTime);
+        get_average_perf_time(     taskTime);
+        get_average_perf_time( profilerTime);
+        get_average_perf_time( profilerTime2);
+        get_average_perf_time(   cameraTime);
 
         dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
 
         get_average_perf_time(rspGenTime);
 
         get_average_perf_time(bufferTime);
-        get_average_perf_time(tmemTime);
-        get_average_perf_time(busTime);
+        get_average_perf_time(  tmemTime);
+        get_average_perf_time(   busTime);
 
         rdpTime = bufferTime[NUM_PERF_ITERATIONS];
         rdpTime = MAX(rdpTime, tmemTime[NUM_PERF_ITERATIONS]);
@@ -591,7 +596,7 @@ void puppyprint_profiler_process(void) {
 
     gLastOSTime = newTime;
     if (gGlobalTimer > 5) {
-        IO_WRITE(DPC_STATUS_REG, DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR);
+        IO_WRITE(DPC_STATUS_REG, (DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR));
     }
     if (fDebug/* && (gMarioState->action != ACT_DEBUG_FREE_MOVE)*/) {
         if (gPlayer1Controller->buttonPressed & D_JPAD) {
@@ -658,7 +663,10 @@ void puppyprint_profiler_process(void) {
 #endif
 
 void print_set_envcolour(s32 r, s32 g, s32 b, s32 a) {
-    if (r != currEnv[0] || g != currEnv[1] || b != currEnv[2] || a != currEnv[3]) {
+    if ((r != currEnv[0])
+     || (g != currEnv[1])
+     || (b != currEnv[2])
+     || (a != currEnv[3])) {
         gDPSetEnvColor(gDisplayListHead++, (u8)r, (u8)g, (u8)b, (u8)a);
         vec4_set(currEnv, r, g, b, a);
     }
@@ -766,7 +774,7 @@ s8  waveToggle = 0;
 
 s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     s32 len = 0;
-    while (str[i + len] != '>' && (i + len) < (signed)strlen(str)) len++;
+    while ((str[i + len] != '>') && ((i + len) < (signed)strlen(str))) len++;
     len++;
 
     if (runCMD) {
@@ -815,11 +823,15 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
             b4 = ((b - b2) * 1.2875f);
             a4 = ((a - a2) * 1.2875f);
             // Now start from the median, and wave from end to end with the difference, to create the fading effect.
-            print_set_envcolour(r3 + ((sins(gGlobalTimer * spd * 50)) * r4), g3 + ((sins(gGlobalTimer * spd * 50)) * g4), b3 + ((sins(gGlobalTimer * spd * 50)) * b4), a3 + ((sins(gGlobalTimer * spd * 50)) * a4));
+            f32 sTimer = (sins(gGlobalTimer * spd * 50));
+            print_set_envcolour((r3 + (sTimer * r4)),
+                                (g3 + (sTimer * g4)),
+                                (b3 + (sTimer * b4)),
+                                (a3 + (sTimer * a4)));
         } else if (strncmp((str + i), "<RAINBOW>", 8) == 0) { // Toggles the happy colours :o) Do it again to disable it.
-            s32 r = (coss( gGlobalTimer * 600) + 1) * 127;
-            s32 g = (coss((gGlobalTimer * 600) + 21845) + 1) * 127;
-            s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
+            s32 r = ((coss( gGlobalTimer * 600         ) + 1) * 127);
+            s32 g = ((coss((gGlobalTimer * 600) + 21845) + 1) * 127);
+            s32 b = ((coss((gGlobalTimer * 600) - 21845) + 1) * 127);
             print_set_envcolour(r, g, b, 255);
         } else if (strncmp((str + i), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
             shakeToggle ^= 1;
@@ -831,9 +843,9 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
 }
 
 s32 get_text_width(const char *str, s32 font) {
-    s32 i = 0;
+    s32 i       = 0;
     s32 textPos = 0;
-    s32 wideX = 0;
+    s32 wideX   = 0;
     s32 textX, textY, offsetY, spaceX;
 
     for (i = 0; i < (signed)strlen(str); i++) {
@@ -845,7 +857,7 @@ s32 get_text_width(const char *str, s32 font) {
             i += text_iterate_command(str, i, FALSE);
         }
         get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
-        textPos += spaceX + 1;
+        textPos += (spaceX + 1);
         wideX = MAX(textPos, wideX);
     }
     return wideX;
@@ -881,14 +893,14 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
 
     shakeToggle = 0;
-    waveToggle = 0;
+    waveToggle  = 0;
 
     if (amount == PRINT_ALL) {
         tx = (signed)strlen(str);
     }
-    gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
-    gDPSetTexturePersp(gDisplayListHead++, G_TP_NONE);
-    gDPSetCombineMode(gDisplayListHead++, G_CC_FADEA, G_CC_FADEA);
+    gDPSetCycleType(    gDisplayListHead++, G_CYC_1CYCLE);
+    gDPSetTexturePersp( gDisplayListHead++, G_TP_NONE);
+    gDPSetCombineMode(  gDisplayListHead++, G_CC_FADEA, G_CC_FADEA);
     gDPSetTextureFilter(gDisplayListHead++, G_TF_POINT);
     if (align == PRINT_TEXT_ALIGN_CENTRE) {
         for (i = 0; i < (signed)strlen(str); i++) {
@@ -924,7 +936,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
         textPos[0] = -wideX[0];
     }
     lines = 0;
-    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     for (i = 0; i < tx; i++) {
         if (str[i] == '#') {
             i++;
@@ -940,14 +952,14 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
             i += text_iterate_command(str, i, TRUE);
         }
         if (shakeToggle) {
-            shakePos[0] = (-1 + (random_u16() % 2));
-            shakePos[1] = (-1 + (random_u16() % 2));
+            shakePos[0] = (-1 + (random_u16() & 0x1));
+            shakePos[1] = (-1 + (random_u16() & 0x1));
         } else {
             shakePos[0] = 0;
             shakePos[1] = 0;
         }
         if (waveToggle) {
-            wavePos = (sins((gGlobalTimer * 3000) + (i * 10000))) * 2;
+            wavePos = ((sins((gGlobalTimer * 3000) + (i * 10000))) * 2);
         } else {
             wavePos = 0;
         }
@@ -960,7 +972,11 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
                 gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF);
             }
         }
-        gSPScisTextureRectangle(gDisplayListHead++, (x + shakePos[0] + textPos[0]) << 2, (y + shakePos[1] + offsetY + textPos[1] + wavePos) << 2, (x + textPos[0] + shakePos[0] + 8) << 2, (y + wavePos + offsetY + shakePos[1] + 12 + textPos[1]) << 2, G_TX_RENDERTILE, (textX << 6), (textY << 6), (1 << 10), (1 << 10));
+        gSPScisTextureRectangle(gDisplayListHead++, ((x + shakePos[0] + textPos[0]     ) << 2),
+                                                    ((y + shakePos[1] + offsetY + textPos[1] + wavePos) << 2),
+                                                    ((x +  textPos[0] + shakePos[0] + 8) << 2),
+                                                    ((y + wavePos + offsetY + shakePos[1] + 12 + textPos[1]) << 2),
+                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), (1 << 10), (1 << 10));
         textPos[0] += (spaceX + 1);
     }
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -988,7 +1004,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
 
     // Find how best to seperate the horizontal. Keep going until it finds a whole value.
     while (TRUE) {
-        f32 val =  (f32)width / (f32)num;
+        f32 val = ((f32)width / (f32)num);
 
         if ((s32)val == val && (s32) val >= 1) {
             imW = num;
@@ -1043,8 +1059,8 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             posH -= peakH;
         }
         gDPLoadSync(gDisplayListHead++);
-        gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
-        gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW + imW - mOne) << 2, (y + posH + imH-mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
+        gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+        gSPScisTextureRectangle(gDisplayListHead++, ((x + posW) << 2), ((y + posH) << 2), ((x + posW + imW - mOne) << 2), ((y + posH + imH-mOne) << 2), G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
     }
     // If there's a remainder on the vertical side, then it will cycle through that too.
     if (height-peakH != 0) {
@@ -1053,8 +1069,8 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
         for (i = 0; i < (width / imW); i++) {
             posW = (i * imW);
             gDPLoadSync(gDisplayListHead++);
-            gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
-            gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW + imW - mOne) << 2, (y + posH + imH - mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
+            gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+            gSPScisTextureRectangle(gDisplayListHead++, ((x + posW) << 2), ((y + posH) << 2), ((x + posW + imW - mOne) << 2), ((y + posH + imH - mOne) << 2), G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
         }
     }
 }

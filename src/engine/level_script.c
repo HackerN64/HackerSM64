@@ -521,9 +521,9 @@ static void level_cmd_create_instant_warp(void) {
         warp[0].id   = 1;
         warp[0].area = CMD_GET(u8, 3);
 
-        vec3_set(warp[0].displacement, CMD_GET(s16, 4),
-                                       CMD_GET(s16, 6),
-                                       CMD_GET(s16, 8));
+        vec3s_set(warp[0].displacement, CMD_GET(s16, 4),
+                                        CMD_GET(s16, 6),
+                                        CMD_GET(s16, 8));
     }
 
     sCurrentCmd = CMD_NEXT;
@@ -817,17 +817,16 @@ static void level_cmd_puppylight_node(void) {
                                              CMD_GET(u8,   4),
                                              CMD_GET(u8,   5));
 
-    vec3s_set(gPuppyLights[gNumLights]->pos, CMD_GET(s16,  6),
-                                             CMD_GET(s16,  8),
-                                             CMD_GET(s16, 10));
+    vec3s_set(gPuppyLights[gNumLights]->pos[0], CMD_GET(s16,  6),
+                                                CMD_GET(s16,  8),
+                                                CMD_GET(s16, 10));
 
-    vec3_set( gPuppyLights[gNumLights]->pos, CMD_GET(s16, 12),
-                                             CMD_GET(s16, 14),
-                                             CMD_GET(s16, 16));
-    gPuppyLights[gNumLights]->yaw = CMD_GET(s16, 18);
-
-    gPuppyLights[gNumLights]->epicentre = CMD_GET(u8, 20);
-    gPuppyLights[gNumLights]->flags     = CMD_GET(u8, 21);
+    vec3s_set(gPuppyLights[gNumLights]->pos[1], CMD_GET(s16, 12),
+                                                CMD_GET(s16, 14),
+                                                CMD_GET(s16, 16));
+    gPuppyLights[gNumLights]->yaw       = CMD_GET(s16, 18);
+    gPuppyLights[gNumLights]->epicentre = CMD_GET(u8,  20);
+    gPuppyLights[gNumLights]->flags     = CMD_GET(u8,  21);
     gPuppyLights[gNumLights]->active    = TRUE;
     gPuppyLights[gNumLights]->area      = sCurrAreaIndex;
     gPuppyLights[gNumLights]->room      = CMD_GET(s16, 22);

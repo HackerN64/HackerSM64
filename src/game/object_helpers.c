@@ -473,7 +473,7 @@ void obj_copy_scale(struct Object *dst, struct Object *src) {
 }
 
 void obj_scale_xyz(struct Object *obj, f32 xScale, f32 yScale, f32 zScale) {
-    vec3_set(obj->header.gfx.scale, xScale, yScale, zScale);
+    vec3f_set(obj->header.gfx.scale, xScale, yScale, zScale);
 }
 
 void obj_scale(struct Object *obj, f32 scale) {
@@ -1907,7 +1907,7 @@ s32 cur_obj_hide_if_mario_far_away_y(f32 distY) {
 
 Gfx *geo_offset_klepto_held_object(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx) {
     if (callContext == GEO_CONTEXT_RENDER) {
-        vec3_set(((struct GraphNodeTranslationRotation *) node->next)->translation, 300, 300, 0);
+        vec3s_set(((struct GraphNodeTranslationRotation *) node->next)->translation, 300, 300, 0);
     }
 
     return NULL;

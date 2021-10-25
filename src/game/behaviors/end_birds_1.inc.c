@@ -6,7 +6,7 @@ void bhv_end_birds_1_loop(void) {
     switch (o->oAction) {
         case END_BIRDS_ACT_INIT:
             cur_obj_scale(0.7f);
-            vec3_set(&o->oIntroLakituEndBirds1DestVec, -554.0f, 3044.0f, -1314.0f);
+            vec3f_set(&o->oIntroLakituEndBirds1DestVec, -554.0f, 3044.0f, -1314.0f);
             o->oAction = END_BIRDS_ACT_ACTIVE;
             break;
         case END_BIRDS_ACT_ACTIVE:

@@ -45,7 +45,7 @@ static void camera_lakitu_intro_act_spawn_cloud(void) {
     if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_SPEAK) {
         o->oAction = CAMERA_LAKITU_INTRO_ACT_SHOW_DIALOG;
 
-        vec3_set(&o->oPosVec, 1800.0f, 2400.0f, -2400.0f);
+        vec3f_set(&o->oPosVec, 1800.0f, 2400.0f, -2400.0f);
 
         o->oMoveAnglePitch = 0x4000;
         o->oCameraLakituSpeed = 60.0f;
