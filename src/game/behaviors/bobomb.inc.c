@@ -20,7 +20,7 @@ void bhv_bobomb_init(void) {
 }
 
 void bobomb_spawn_coin(void) {
-    if (!(GET_BPARAM3(o->oBehParams) & 0x01)) { //! param name
+    if (!(GET_BPARAM3(o->oBehParams) & RESPAWN_INFO_TYPE_NORMAL)) {
         obj_spawn_yellow_coins(o, 1);
         o->oBehParams = 0x100;
         set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_NORMAL);

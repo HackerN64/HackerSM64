@@ -348,10 +348,10 @@ struct GraphNodeCullingRadius {
     u8 filler[2];
 };
 
-extern struct GraphNodeMasterList *gCurGraphNodeMasterList;
+extern struct GraphNodeMasterList  *gCurGraphNodeMasterList;
 extern struct GraphNodePerspective *gCurGraphNodeCamFrustum;
-extern struct GraphNodeCamera *gCurGraphNodeCamera;
-extern struct GraphNodeHeldObject *gCurGraphNodeHeldObject;
+extern struct GraphNodeCamera      *gCurGraphNodeCamera;
+extern struct GraphNodeHeldObject  *gCurGraphNodeHeldObject;
 extern u16 gAreaUpdateCounter;
 
 extern struct GraphNode *gCurRootGraphNode;
@@ -425,9 +425,9 @@ void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f posit
 struct GraphNodeRoot *geo_find_root(struct GraphNode *graphNode);
 
 // graph_node_manager
-s32 *read_vec3s_to_vec3f(Vec3f, s16 *src);
-s32 *read_vec3s(Vec3s dst, s16 *src);
-s32 *read_vec3s_angle(Vec3s dst, s16 *src);
+s32 *read_vec3s_to_vec3f(Vec3f dst, s16 *src);
+s32 *read_vec3s(         Vec3s dst, s16 *src);
+s32 *read_vec3s_angle(   Vec3s dst, s16 *src);
 void register_scene_graph_node(struct GraphNode *graphNode);
 
 #endif // GRAPH_NODE_H

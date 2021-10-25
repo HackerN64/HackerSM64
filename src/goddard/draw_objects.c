@@ -135,7 +135,7 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
         sp1C.z += (*rotMtx)[3][2];
     }
 
-    if (flag & 8) {
+    if (flag & (1 << 3)) {
         if (m != 0.0f) {
             func_8019F2C4(m, 121);
         }

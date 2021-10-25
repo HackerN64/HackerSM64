@@ -1591,16 +1591,16 @@ void bowser_thrown_dropped_update(void) {
         swingSpd *= 2.5f;
     }
     // Set distance speed when throwing
-    o->oForwardVel =  coss(o->oBowserHeldAnglePitch) * swingSpd;
-    o->oVelY       = -sins(o->oBowserHeldAnglePitch) * swingSpd;
+    o->oForwardVel = ( coss(o->oBowserHeldAnglePitch) * swingSpd);
+    o->oVelY       = (-sins(o->oBowserHeldAnglePitch) * swingSpd);
     cur_obj_become_intangible();
 
     // Reset timer and subactions
-    o->prevObj->oAction = BOWSER_ACT_TAIL_THROWN; // prevObj is Bowser's Tail
-    o->prevObj->oTimer = 0;
+    o->prevObj->oAction    = BOWSER_ACT_TAIL_THROWN; // prevObj is Bowser's Tail
+    o->prevObj->oTimer     = 0;
     o->prevObj->oSubAction = 0; //! Tail doesn't have sub actions
 
-    o->oTimer = 0;
+    o->oTimer     = 0;
     o->oSubAction = 0;
 }
 
@@ -1609,7 +1609,7 @@ void bowser_thrown_dropped_update(void) {
  */
 void bhv_bowser_loop(void) {
     // Set distance/angle values
-    o->oBowserDistToCenter = sqrtf(sqr(o->oPosX) + sqr(o->oPosZ));
+    o->oBowserDistToCenter  = sqrtf(sqr(o->oPosX) + sqr(o->oPosZ));
     o->oBowserAngleToCenter = atan2s(-o->oPosZ, -o->oPosX);
     s16 angleToMario  = abs_angle_diff(o->oMoveAngleYaw, o->oAngleToMario       ); // AngleToMario from Bowser's perspective
     s16 angleToCenter = abs_angle_diff(o->oMoveAngleYaw, o->oBowserAngleToCenter); // AngleToCenter from Bowser's perspective
