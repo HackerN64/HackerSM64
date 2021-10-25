@@ -1254,7 +1254,7 @@ static void puppycam_collision(void) {
     camdir[0][1] = LENCOS(gPuppyCam.zoomTarget, pitchTotal) + gPuppyCam.shake[1];
     camdir[0][2] = LENCOS(LENSIN(gPuppyCam.zoomTarget, pitchTotal), gPuppyCam.yaw) + gPuppyCam.shake[2];
 
-    vec3_copy(camdir[1], camdir[0]);
+    vec3f_copy(camdir[1], camdir[0]);
 
     find_surface_on_ray(target[0], camdir[0], &surf[0], hitpos[0], RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);
     find_surface_on_ray(target[1], camdir[1], &surf[1], hitpos[1], RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL);

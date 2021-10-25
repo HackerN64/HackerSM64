@@ -39,7 +39,7 @@ void bhv_scuttlebug_loop(void) {
                 cur_obj_play_sound_2(SOUND_OBJ_GOOMBA_ALERT);
             }
             if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
-                vec3_copy(&o->oHomeVec, &o->oPosVec);
+                vec3f_copy(&o->oHomeVec, &o->oPosVec);
                 o->oSubAction++;
             }
             break;

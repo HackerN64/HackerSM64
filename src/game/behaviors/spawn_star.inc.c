@@ -80,7 +80,7 @@ void bhv_star_spawn_loop(void) {
                 o->oAction = SPAWN_STAR_ARC_CUTSCENE_ACT_BOUNCE;
                 o->oForwardVel = 0;
                 // Set to exact home coordinates
-                vec3_copy(&o->oPosVec, &o->oHomeVec);
+                vec3f_copy(&o->oPosVec, &o->oHomeVec);
                 play_power_star_jingle();
             }
             break;

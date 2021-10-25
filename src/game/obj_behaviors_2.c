@@ -98,9 +98,9 @@ static s32 obj_is_near_to_and_facing_mario(f32 maxDist, s16 maxAngleDiff) {
 
 static void obj_perform_position_op(s32 op) {
     switch (op) {
-        case POS_OP_SAVE_POSITION:    vec3_copy(sObjSavedPos, &o->oPosVec); break;
-        case POS_OP_COMPUTE_VELOCITY: vec3_diff(&o->oVelVec, &o->oPosVec, sObjSavedPos); break;
-        case POS_OP_RESTORE_POSITION: vec3_copy(&o->oPosVec, sObjSavedPos); break;
+        case POS_OP_SAVE_POSITION:    vec3f_copy(sObjSavedPos, &o->oPosVec); break;
+        case POS_OP_COMPUTE_VELOCITY: vec3f_diff(&o->oVelVec, &o->oPosVec, sObjSavedPos); break;
+        case POS_OP_RESTORE_POSITION: vec3f_copy(&o->oPosVec, sObjSavedPos); break;
     }
 }
 

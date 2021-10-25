@@ -50,7 +50,7 @@ void bhv_jrb_sliding_box_loop(void) {
     } else {
         shipObj = o->oJrbSlidingBoxShipObj;
         vec3_copy(shipRotation, &shipObj->oFaceAngleVec);
-        vec3_copy(shipToBoxPos1, &o->oParentRelativePosVec);
+        vec3f_copy(shipToBoxPos1, &o->oParentRelativePosVec);
         mtxf_rotate_zxy_and_translate(mtx, shipToBoxPos1, shipRotation);
         linear_mtxf_mul_vec3f(mtx, shipToBoxPos2, shipToBoxPos1);
         vec3_sum(&o->oPosVec, &shipObj->oPosVec, shipToBoxPos2);

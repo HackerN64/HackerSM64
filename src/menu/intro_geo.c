@@ -56,22 +56,22 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
         Vec3f scale;
 
         // determine scale based on the frame counter
-        if (sIntroFrameCounter >= 0 && sIntroFrameCounter < INTRO_STEPS_ZOOM_IN) {
+        if ((sIntroFrameCounter >= 0) && (sIntroFrameCounter < INTRO_STEPS_ZOOM_IN)) {
             // zooming in
-            vec3_copy(scale, &scaleTable1[sIntroFrameCounter * 3]);
+            vec3f_copy(scale, &scaleTable1[sIntroFrameCounter * 3]);
         } else if (sIntroFrameCounter >= INTRO_STEPS_ZOOM_IN && sIntroFrameCounter < INTRO_STEPS_HOLD_1) {
             // holding
             vec3_same(scale, 1.0f);
         } else if (sIntroFrameCounter >= INTRO_STEPS_HOLD_1 && sIntroFrameCounter < INTRO_STEPS_ZOOM_OUT) {
             // zooming out
-            vec3_copy(scale, &scaleTable2[(sIntroFrameCounter - INTRO_STEPS_HOLD_1) * 3]);
+            vec3f_copy(scale, &scaleTable2[(sIntroFrameCounter - INTRO_STEPS_HOLD_1) * 3]);
         } else {
             // disappeared
             vec3_zero(scale);
         }
         guScale(scaleMat, scale[0], scale[1], scale[2]);
 
-        gSPMatrix(dlIter++, scaleMat, G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
+        gSPMatrix(dlIter++, scaleMat, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
         gSPDisplayList(dlIter++, &intro_seg7_dl_main_logo);  // draw model
         gSPPopMatrix(dlIter++, G_MTX_MODELVIEW);
         gSPEndDisplayList(dlIter);

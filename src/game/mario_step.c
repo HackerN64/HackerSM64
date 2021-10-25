@@ -312,7 +312,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     }
 
     vec3f_set(m->pos, nextPos[0], floorHeight, nextPos[2]);
-    if (!SURFACE_IS_UNSAFE(floor->type)) vec3_copy(m->lastSafePos, m->pos);
+    if (!SURFACE_IS_UNSAFE(floor->type)) vec3f_copy(m->lastSafePos, m->pos);
     set_mario_floor(m, floor, floorHeight);
 
     if (m->wall != NULL) {
@@ -530,7 +530,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         }
         return stepResult;
     }
-    vec3_copy(m->pos, nextPos);
+    vec3f_copy(m->pos, nextPos);
     set_mario_floor(m, floor, floorHeight);
     if (upperWall.numWalls > 0) {
         stepResult  = bonk_or_hit_lava_wall(m, &upperWall);

@@ -13,7 +13,7 @@ static struct ObjectHitbox sRollingSphereHitbox = {
 };
 
 void bhv_snowmans_bottom_init(void) {
-    vec3_copy(&o->oHomeVec, &o->oPosVec);
+    vec3f_copy(&o->oHomeVec, &o->oPosVec);
 
     o->oGravity  = 10.0f;
     o->oFriction =  0.999f;

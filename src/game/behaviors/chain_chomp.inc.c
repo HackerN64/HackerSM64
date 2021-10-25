@@ -106,7 +106,7 @@ static void chain_chomp_update_chain_segments(void) {
         f32 maxTotalDist = o->oChainChompMaxDistFromPivotPerChainPart * (CHAIN_CHOMP_NUM_SEGMENTS - i);
         vec3_normalize_max(offset, maxTotalDist);
 
-        vec3_copy(segment->pos, offset);
+        vec3f_copy(segment->pos, offset);
     }
 }
 

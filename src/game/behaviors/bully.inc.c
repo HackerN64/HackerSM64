@@ -26,7 +26,7 @@ static struct ObjectHitbox sBigBullyHitbox = {
 
 void bhv_small_bully_init(void) {
     cur_obj_init_animation(0);
-    vec3_copy(&o->oHomeVec, &o->oPosVec);
+    vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oBehParams2ndByte = BULLY_BP_SIZE_SMALL;
     o->oGravity  = 4.0f;
     o->oFriction = 0.91f;
@@ -37,7 +37,7 @@ void bhv_small_bully_init(void) {
 
 void bhv_big_bully_init(void) {
     cur_obj_init_animation(0);
-    vec3_copy(&o->oHomeVec, &o->oPosVec);
+    vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oBehParams2ndByte = BULLY_BP_SIZE_BIG;
     o->oGravity  = 5.0f;
     o->oFriction = 0.93f;
@@ -204,7 +204,7 @@ void bully_act_level_death(void) {
 }
 
 void bhv_bully_loop(void) {
-    vec3_copy(&o->oBullyPrevVec, &o->oPosVec);
+    vec3f_copy(&o->oBullyPrevVec, &o->oPosVec);
 
     //! Because this function runs no matter what, Mario is able to interrupt the bully's
     //  death action by colliding with it. Since the bully hitbox is tall enough to collide
@@ -279,7 +279,7 @@ void big_bully_spawn_star(void) {
 
 void bhv_big_bully_with_minions_loop(void) {
     s16 collisionFlags = 0;
-    vec3_copy(&o->oBullyPrevVec, &o->oPosVec);
+    vec3f_copy(&o->oBullyPrevVec, &o->oPosVec);
 
     bully_check_mario_collision();
 

@@ -656,7 +656,7 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
 #ifdef SAVE_NUM_LIVES
         vec3_zero(capPos);
 #else
-        vec3_copy(capPos, saveFile->capPos);
+        vec3s_copy(capPos, saveFile->capPos);
 #endif
         return TRUE;
     }

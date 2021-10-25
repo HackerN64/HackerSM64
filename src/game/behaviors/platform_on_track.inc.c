@@ -88,7 +88,7 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos)
         if (ballIndex != 0) {
             struct Object *trackBall = spawn_object_relative((o->oPlatformOnTrackBaseBallIndex + ballIndex), 0, 0, 0, o,
                                               MODEL_TRAJECTORY_MARKER_BALL, bhvTrackBall);
-            if (trackBall != NULL) vec3_copy(&trackBall->oPosVec, pos);
+            if (trackBall != NULL) vec3f_copy(&trackBall->oPosVec, pos);
         } else {
             if (prevWaypoint != initialPrevWaypoint) {
                 if (o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_NONE) {
@@ -96,7 +96,7 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos)
                 }
                 o->oPlatformOnTrackPrevWaypoint = prevWaypoint;
             }
-            vec3_copy(&o->oPosVec, pos);
+            vec3f_copy(&o->oPosVec, pos);
             obj_perform_position_op(POS_OP_COMPUTE_VELOCITY);
 
             o->oPlatformOnTrackPitch = atan2s(sqrtf(sqr(o->oVelX) + sqr(o->oVelZ)), -o->oVelY);
@@ -165,7 +165,7 @@ static void platform_on_track_act_init(void) {
     o->oPlatformOnTrackBaseBallIndex = 0;
 
     vec3_copy(&o->oHomeVec, o->oPlatformOnTrackStartWaypoint->pos);
-    vec3_copy(&o->oPosVec, &o->oHomeVec);
+    vec3f_copy(&o->oPosVec, &o->oHomeVec);
 
     o->oFaceAngleYaw = o->oBehParams2ndByte;
     o->oForwardVel = o->oVelX = o->oVelY = o->oVelZ = o->oPlatformOnTrackDistMovedSinceLastBall = 0.0f;
@@ -255,7 +255,7 @@ static void platform_on_track_act_move_along_track(void) {
             if (approach_f32_ptr(&o->oPlatformOnTrackDistMovedSinceLastBall, 300.0f, o->oForwardVel)) {
                 o->oPlatformOnTrackDistMovedSinceLastBall -= 300.0f;
 
-                vec3_copy(&o->oHomeVec, &o->oPosVec);
+                vec3f_copy(&o->oHomeVec, &o->oPosVec);
                 o->oPlatformOnTrackBaseBallIndex = (u16)(o->oPlatformOnTrackBaseBallIndex + 1);
 
                 platform_on_track_update_pos_or_spawn_ball(5, &o->oHomeVec);

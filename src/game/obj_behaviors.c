@@ -372,7 +372,7 @@ void obj_splash(s32 waterY, s32 objY) {
  */
 s32 object_step(void) {
     Vec3f pos;
-    vec3_copy(pos, &o->oPosVec);
+    vec3f_copy(pos, &o->oPosVec);
 
     f32 waterY = FLOOR_LOWER_LIMIT_MISC;
 

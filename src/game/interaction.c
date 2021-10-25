@@ -274,7 +274,7 @@ void mario_drop_held_object(struct MarioState *m) {
         }
 
         obj_set_held_state(m->heldObj, bhvCarrySomethingDropped);
-        vec3_copy(&m->heldObj->oPosVec, m->marioBodyState->heldObjLastPosition);
+        vec3f_copy(&m->heldObj->oPosVec, m->marioBodyState->heldObjLastPosition);
 
         m->heldObj->oMoveAngleYaw = m->faceAngle[1];
 

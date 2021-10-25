@@ -8,6 +8,9 @@
 #define NEAR_ZERO   __FLT_EPSILON__
 #define NEAR_ONE    (1.0f - __FLT_EPSILON__)
 
+#define FLOAT_ONE   0x3F800000
+
+extern Mat4  identityMat4;
 extern Vec3f gVec3fX;
 extern Vec3f gVec3fY;
 extern Vec3f gVec3fZ;
@@ -436,7 +439,7 @@ extern f32 gSineTable[];
 
 #define MTXF_END(mtx) {                         \
     (mtx)[0][3] = (mtx)[1][3] = (mtx)[2][3] = 0;\
-    ((u32 *)(mtx))[15] = 0x3F800000;            \
+    ((u32 *)(mtx))[15] = FLOAT_ONE;            \
 }
 
 #define NAME_INVMAG(v) v##_invmag

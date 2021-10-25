@@ -9052,7 +9052,7 @@ void cutscene_enter_cannon_raise(struct Camera *c) {
     if ((obj = sMarioCamState->usedObj) != NULL) {
         sCutsceneVars[0].point[1] = obj->oPosY;
         vec3_copy(cannonAngle, &obj->oMoveAngleVec);
-        vec3_copy(c->focus, &obj->oPosVec);
+        vec3f_copy(c->focus, &obj->oPosVec);
         vec3_set(cannonFocus, 0.0f, 100.0f, 0.0f);
         offset_rotated(c->focus, c->focus, cannonFocus, cannonAngle);
     }
@@ -9075,7 +9075,7 @@ void cutscene_enter_cannon_start(struct Camera *c) {
 
     // Store the cannon's position and angle in cvar0
     if ((obj = sMarioCamState->usedObj) != NULL) {
-        vec3_copy(sCutsceneVars[0].point, &obj->oPosVec);
+        vec3f_copy(sCutsceneVars[0].point, &obj->oPosVec);
         vec3_copy(sCutsceneVars[0].angle, &obj->oMoveAngleVec);
     }
 

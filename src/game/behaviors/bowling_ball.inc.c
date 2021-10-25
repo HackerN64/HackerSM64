@@ -235,7 +235,7 @@ void bhv_free_bowling_ball_init(void) {
     o->oGravity  = 5.5f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 2.0f;
-    vec3_copy(&o->oHomeVec, &o->oPosVec);
+    vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oForwardVel   = 0x0;
     o->oMoveAngleYaw = 0x0;
 }
@@ -257,7 +257,7 @@ void bhv_free_bowling_ball_roll_loop(void) {
     if (!is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 6000)) {
         o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
         cur_obj_become_intangible();
-        vec3_copy(&o->oPosVec, &o->oHomeVec);
+        vec3f_copy(&o->oPosVec, &o->oHomeVec);
         bhv_free_bowling_ball_init();
         o->oAction = FREE_BBALL_ACT_RESET;
     }

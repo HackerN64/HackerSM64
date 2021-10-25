@@ -83,7 +83,7 @@ void bhv_klepto_init(void) {
             o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_STAR;
         }
     } else {
-        vec3_copy(&o->oKleptoStartPosVec, &o->oPosVec);
+        vec3f_copy(&o->oKleptoStartPosVec, &o->oPosVec);
         if (save_file_get_flags() & SAVE_FLAG_CAP_ON_KLEPTO) {
             o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_CAP;
         } else {
@@ -97,8 +97,7 @@ static void klepto_change_target(void) {
 
     if (o->oDistanceToMario > 2000.0f) {
         s32 i;
-        f32 dx;
-        f32 dz;
+        f32 dx, dz;
         f32 targetDist;
         f32 minTargetDist = 99999.0f;
 
@@ -307,7 +306,7 @@ static void klepto_act_reset_position(void) {
         }
     } else {
         o->oAction = KLEPTO_ACT_WAIT_FOR_MARIO;
-        vec3_copy(&o->oHomeVec, &o->oKleptoStartPosVec);
+        vec3f_copy(&o->oHomeVec, &o->oKleptoStartPosVec);
     }
 }
 

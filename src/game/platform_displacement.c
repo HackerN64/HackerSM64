@@ -26,7 +26,9 @@ void update_mario_platform(void) {
     //  of displacement since he is considered to be far from the platform's
     //  axis of rotation.
     struct Object *floorObj = gMarioState->floor->object;
-    if ((gMarioState->floor != NULL) && (floorObj != NULL) && (absf(gMarioObject->oPosY - gMarioState->floorHeight) < 4.0f)) {
+    if ((gMarioState->floor != NULL)
+     && (floorObj != NULL)
+     && (absf(gMarioObject->oPosY - gMarioState->floorHeight) < 4.0f)) {
         gMarioPlatform = floorObj;
         gMarioObject->platform = floorObj;
     } else {
@@ -51,7 +53,7 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
     Vec3f yawVec;
     Vec3f scaledPos;
     // Determine how much Mario turned on his own since last frame
-    s16 yawDifference = *yaw - displaceInfo->prevYaw;
+    s16 yawDifference = (*yaw - displaceInfo->prevYaw);
 
     // Avoid a crash if the platform unloaded its collision while stood on
     if (platform->header.gfx.throwMatrix == NULL) return;
@@ -175,9 +177,9 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
     vec3s_copy(rotation, &platform->oAngleVelVec);
 
     if (isMario) {
-        vec3_copy(pos, gMarioStates[0].pos);
+        vec3f_copy(pos, gMarioStates[0].pos);
     } else {
-        vec3_copy(pos, &gCurrentObject->oPosVec);
+        vec3f_copy(pos, &gCurrentObject->oPosVec);
     }
 
     pos[0] += platform->oVelX;
@@ -201,9 +203,9 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
         vec3_sum(pos, platformPos, newObjectOffset);
     }
     if (isMario) {
-        vec3_copy(gMarioStates[0].pos, pos);
+        vec3f_copy(gMarioStates[0].pos, pos);
     } else {
-        vec3_copy(&gCurrentObject->oPosVec, pos);
+        vec3f_copy(&gCurrentObject->oPosVec, pos);
     }
 }
 

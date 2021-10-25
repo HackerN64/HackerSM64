@@ -153,7 +153,7 @@ void bhv_camera_lakitu_update(void) {
                 cur_obj_hide();
             } else {
                 cur_obj_unhide();
-                vec3_copy(&o->oPosVec, gLakituState.curPos);
+                vec3f_copy(&o->oPosVec, gLakituState.curPos);
 
                 o->oHomeX = gLakituState.curFocus[0];
                 o->oHomeZ = gLakituState.curFocus[2];

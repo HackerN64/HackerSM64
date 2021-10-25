@@ -22,7 +22,7 @@ static struct ObjectHitbox sAmpHitbox = {
  * Homing amp initialization function.
  */
 void bhv_homing_amp_init(void) {
-    vec3_copy(&o->oHomeVec, &o->oPosVec);
+    vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oGravity  = 0.0f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 1.0f;
@@ -153,7 +153,7 @@ static void homing_amp_give_up_loop(void) {
 
     if (o->oTimer > 150) {
         // Hide the amp and reset it back to its inactive state
-        vec3_copy(&o->oPosVec, &o->oHomeVec);
+        vec3f_copy(&o->oPosVec, &o->oHomeVec);
         o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
         o->oAction = HOMING_AMP_ACT_INACTIVE;
         o->oAnimState = 0;
@@ -224,7 +224,7 @@ void bhv_homing_amp_loop(void) {
  * Circling amp initialization function.
  */
 void bhv_circling_amp_init(void) {
-    vec3_copy(&o->oHomeVec, &o->oPosVec);
+    vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oAnimState = 1;
 
     // Determine the radius of the circling amp's circle

@@ -1175,7 +1175,7 @@ Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED 
         gPaintingUpdateCounter     = gAreaUpdateCounter;
 
         // Store Mario's position
-        vec3_copy(gPaintingMarioPos, &gMarioObject->oPosVec);
+        vec3f_copy(gPaintingMarioPos, &gMarioObject->oPosVec);
     }
     return NULL;
 }

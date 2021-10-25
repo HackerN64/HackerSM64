@@ -262,7 +262,7 @@ void handle_save_menu(struct MarioState *m) {
 struct Object *spawn_obj_at_mario_rel_yaw(struct MarioState *m, ModelID32 model, const BehaviorScript *behavior, s16 relYaw) {
     struct Object *obj = spawn_object(m->marioObj, model, behavior);
     obj->oFaceAngleYaw = (m->faceAngle[1] + relYaw);
-    vec3_copy(&obj->oPosVec, m->pos);
+    vec3f_copy(&obj->oPosVec, m->pos);
     return obj;
 }
 
@@ -534,7 +534,7 @@ s32 act_debug_free_move(struct MarioState *m) {
     if ((ceilHeight - floorHeight) >= 160.0f) {
         if ((floor != NULL) && ( pos[1] < floorHeight)) pos[1] = floorHeight;
         if (( ceil != NULL) && ((pos[1] + 160.0f) > ceilHeight)) pos[1] = (ceilHeight - 160.0f);
-        vec3_copy(m->pos, pos);
+        vec3f_copy(m->pos, pos);
     }
     m->faceAngle[1] = m->intendedYaw;
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);

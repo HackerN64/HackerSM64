@@ -17,13 +17,19 @@ s16 identityMtx[4][4] = {
     { 1, 0, 0, 0 },
     { 0, 1, 0, 0 }, 
     { 0, 0, 1, 0 },
-    { 0, 0, 0, 1 }
+    { 0, 0, 0, 1 },
 };
 s16 zeroMtx[4][4] = {
     { 0, 0, 0, 0 },
     { 0, 0, 0, 0 },
     { 0, 0, 0, 0 },
-    { 0, 0, 0, 0 }
+    { 0, 0, 0, 0 },
+};
+Mat4 identityMat4 = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f }, 
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
 };
 
 Vec3f gVec3fX    = {  1.0f,  0.0f,  0.0f };
@@ -210,13 +216,13 @@ void vec3f_normalize_negative(Vec3f dest) {
     }
 }
 
-struct CopyMe {
+struct CopyMat4 {
     f32 a[0x10];
 };
 
 /// Copy matrix 'src' to 'dest'
 void mtxf_copy(register Mat4 dest, register Mat4 src) {
-    *((struct CopyMe *) dest) = *((struct CopyMe *) src);
+    *((struct CopyMat4 *) dest) = *((struct CopyMat4 *) src);
 }
 
 /**
@@ -225,11 +231,11 @@ void mtxf_copy(register Mat4 dest, register Mat4 src) {
 void mtxf_identity(register Mat4 mtx) {
     s32 i;
     f32 *dest;
-    for (dest = (f32 *) mtx + 1, i = 0; i < 14; dest++, i++) {
+    for (dest = ((f32 *) mtx + 1), i = 0; i < 14; dest++, i++) {
         *dest = 0;
     }
     for (dest = (f32 *) mtx, i = 0; i < 4; dest += 5, i++) {
-        *((u32 *) dest) = 0x3F800000;
+        *((u32 *) dest) = FLOAT_ONE;
     }
 }
 
@@ -243,7 +249,7 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
         *pen = 0;
     }
     for (pen = (f32 *) dest, i = 0; i < 4; pen += 5, i++) {
-        *((u32 *) pen) = 0x3F800000;
+        *((u32 *) pen) = FLOAT_ONE;
     }
     vec3f_copy(&dest[3][0], &b[0]);
 }
@@ -291,13 +297,13 @@ void mtxf_rot_trans_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
     entry[2] = -sy;
     linear_mtxf_mul_vec3(src, dest[0], entry);
     entry[1] = (sx * sy);
-    entry[0] = (entry[1] * cz) - (cx * sz);
-    entry[1] = (entry[1] * sz) + (cx * cz);
+    entry[0] = ((entry[1] * cz) - (cx * sz));
+    entry[1] = ((entry[1] * sz) + (cx * cz));
     entry[2] = (sx * cy);
     linear_mtxf_mul_vec3(src, dest[1], entry);
     entry[1] = (cx * sy);
-    entry[0] = (entry[1] * cz) + (sx * sz);
-    entry[1] = (entry[1] * sz) - (sx * cz);
+    entry[0] = ((entry[1] * cz) + (sx * sz));
+    entry[1] = ((entry[1] * sz) - (sx * cz));
     entry[2] = (cx * cy);
     linear_mtxf_mul_vec3(src, dest[2], entry);
     linear_mtxf_mul_vec3(src, dest[3], trans);
@@ -368,7 +374,7 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f translate, Vec3s rotate) {
     dest[0][2] = ((sx * cysz) - sycz);
     dest[1][2] = ((sx * cycz) + sysz);
     dest[2][2] = (cx * cy);
-    vec3_copy(dest[3], translate);
+    vec3f_copy(dest[3], translate);
     MTXF_END(dest);
 }
 
@@ -396,7 +402,7 @@ void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f b, Vec3s c) {
     dest[2][0] = ((cxcz * sy) + sxsz);
     dest[2][1] = ((cxsz * sy) - sxcz);
     dest[2][2] = (cx * cy);
-    vec3_copy(dest[3], b);
+    vec3f_copy(dest[3], b);
     MTXF_END(dest);
 }
 
@@ -415,19 +421,19 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
         temp++;
     }
     if (angle == 0x0) {
-        ((u32 *) dest)[0] = 0x3F800000;
+        ((u32 *) dest)[0] = FLOAT_ONE;
         dest[0][1] = 0;
         dest[1][0] = 0;
-        ((u32 *) dest)[5] = 0x3F800000;
+        ((u32 *) dest)[5] = FLOAT_ONE;
     } else {
         dest[0][0] = coss(angle);
         dest[0][1] = sins(angle);
         dest[1][0] = -dest[0][1];
         dest[1][1] =  dest[0][0];
     }
-    ((u32 *) dest)[10] = 0x3F800000;
+    ((u32 *) dest)[10] = FLOAT_ONE;
     dest[2][3] = 0;
-    ((u32 *) dest)[15] = 0x3F800000;
+    ((u32 *) dest)[15] = FLOAT_ONE;
 
     temp  = (f32 *)dest;
     temp2 = (f32 *)mtx;
@@ -449,7 +455,7 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
-    vec3_set(lateralDir, sins(yaw), 0, coss(yaw));
+    vec3_set(lateralDir, sins(yaw), 0x0, coss(yaw));
     vec3f_normalize(upDir);
     vec3_cross(leftDir, upDir, lateralDir);
     vec3f_normalize(leftDir);
@@ -484,17 +490,17 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     point2[0] = (pos[0] + (radius * sins(yaw + 0xD555)));
     point2[2] = (pos[2] + (radius * coss(yaw + 0xD555)));
 
-    point0[1] = find_floor(point0[0], pos[1] + 150, point0[2], &floor);
-    point1[1] = find_floor(point1[0], pos[1] + 150, point1[2], &floor);
-    point2[1] = find_floor(point2[0], pos[1] + 150, point2[2], &floor);
+    point0[1] = find_floor(point0[0], (pos[1] + 150), point0[2], &floor);
+    point1[1] = find_floor(point1[0], (pos[1] + 150), point1[2], &floor);
+    point2[1] = find_floor(point2[0], (pos[1] + 150), point2[2], &floor);
 
     if (point0[1] - pos[1] < minY) point0[1] = pos[1];
     if (point1[1] - pos[1] < minY) point1[1] = pos[1];
     if (point2[1] - pos[1] < minY) point2[1] = pos[1];
 
-    f32 avgY = ((point0[1] + point1[1] + point2[1]) / 3);
+    f32 avgY = average_3(point0[1], point1[1], point2[1]);
 
-    vec3_set(forward, sins(yaw), 0, coss(yaw));
+    vec3_set(forward, sins(yaw), 0x0, coss(yaw));
     find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
     vec3f_normalize(yColumn);
     vec3_cross(xColumn, yColumn, forward);
@@ -539,14 +545,14 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
         temp2++;
     }
     vec3_add(&dest[3][0], &b[3][0]);
-    ((u32 *) dest)[15] = 0x3F800000;
+    ((u32 *) dest)[15] = FLOAT_ONE;
 }
 
 /**
  * Set matrix 'dest' to 'mtx' scaled by vector s
  */
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
-    register f32 *temp = (f32 *)dest;
+    register f32 *temp  = (f32 *)dest;
     register f32 *temp2 = (f32 *)mtx;
     register s32 i;
 

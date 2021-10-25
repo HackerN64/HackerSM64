@@ -7,7 +7,7 @@ void bhv_cannon_base_unused_loop(void) {
 void opened_cannon_act_0(void) {
     if (o->oTimer == 0) {
         o->oInteractStatus = INT_STATUS_NONE;
-        vec3_copy(&o->oPosVec, &o->oHomeVec);
+        vec3f_copy(&o->oPosVec, &o->oHomeVec);
         o->oMoveAnglePitch = 0;
         o->oMoveAngleYaw = (s16)(o->oBehParams2ndByte << 8);
         o->oCannonAngle = 0;

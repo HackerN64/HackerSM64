@@ -818,8 +818,8 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                 f32 sinAng = sins(gCurGraphNodeObject->angle[1]);
                 f32 cosAng = coss(gCurGraphNodeObject->angle[1]);
 
-                shadowPos[0] += ( animOffset[0] * cosAng) + (animOffset[2] * sinAng);
-                shadowPos[2] += (-animOffset[0] * sinAng) + (animOffset[2] * cosAng);
+                shadowPos[0] += (( animOffset[0] * cosAng) + (animOffset[2] * sinAng));
+                shadowPos[2] += ((-animOffset[0] * sinAng) + (animOffset[2] * cosAng));
             }
         }
         Gfx *shadowList = create_shadow_below_xyz(shadowPos[0], shadowPos[1], shadowPos[2], shadowScale, node->shadowSolidity, node->shadowType);
@@ -962,7 +962,7 @@ void geo_process_object(struct Object *node) {
 
         mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
         node->header.gfx.throwMatrix = &gMatStack[++gMatStackIndex];
-        vec3_copy(node->header.gfx.cameraToObject, gMatStack[gMatStackIndex][3]);
+        vec3f_copy(node->header.gfx.cameraToObject, gMatStack[gMatStackIndex][3]);
 
         // FIXME: correct types
         if (node->header.gfx.animInfo.currAnim != NULL) {
@@ -1030,7 +1030,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
 
         mtxf_translate(mat, translation);
         mtxf_copy(gMatStack[gMatStackIndex + 1], *gCurGraphNodeObject->throwMatrix);
-        vec3_copy(gMatStack[gMatStackIndex + 1][3], gMatStack[gMatStackIndex][3]);
+        vec3f_copy(gMatStack[gMatStackIndex + 1][3], gMatStack[gMatStackIndex][3]);
         mtxf_copy(tempMtx, gMatStack[gMatStackIndex + 1]);
         mtxf_mul(gMatStack[gMatStackIndex + 1], mat, tempMtx);
         mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->objNode->header.gfx.scale);

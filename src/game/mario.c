@@ -1687,7 +1687,7 @@ s32 execute_mario_action(struct MarioState *m) {
     s32 inLoop = TRUE;
     // Updates once per frame:
     vec3f_get_dist_and_lateral_dist_and_angle(m->prevPos, m->pos, &m->moveSpeed, &m->lateralSpeed, &m->movePitch, &m->moveYaw);
-    vec3_copy(m->prevPos, m->pos);
+    vec3f_copy(m->prevPos, m->pos);
     if (m->action) {
 #ifdef ENABLE_DEBUG_FREE_MOVE
         if (gPlayer1Controller->buttonDown & U_JPAD) {
@@ -1798,7 +1798,7 @@ void init_mario(struct MarioState *m) {
     vec3_copy(m->faceAngle, gMarioSpawnInfo->startAngle);
     vec3_zero(m->angleVel);
     vec3_copy(m->pos, gMarioSpawnInfo->startPos);
-    vec3_copy(m->prevPos, m->pos);
+    vec3f_copy(m->prevPos, m->pos);
     vec3_zero(m->vel);
     m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
 
@@ -1814,7 +1814,7 @@ void init_mario(struct MarioState *m) {
     update_mario_info_for_cam(m);
     m->marioBodyState->punchState = 0x0;
 
-    vec3_copy(&m->marioObj->oPosVec, m->pos);
+    vec3f_copy(&m->marioObj->oPosVec, m->pos);
     vec3_copy(&m->marioObj->oMoveAngleVec, m->faceAngle);
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);

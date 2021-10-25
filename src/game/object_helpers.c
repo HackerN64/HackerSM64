@@ -166,7 +166,7 @@ void obj_apply_scale_to_matrix(struct Object *obj, Mat4 dst, Mat4 src) {
     vec3_prod_val(dst[0], src[0], obj->header.gfx.scale[0]);
     vec3_prod_val(dst[1], src[1], obj->header.gfx.scale[1]);
     vec3_prod_val(dst[2], src[2], obj->header.gfx.scale[2]);
-    vec3_copy(dst[3], src[3]);
+    vec3f_copy(dst[3], src[3]);
     dst[0][3] = src[0][3];
     dst[1][3] = src[1][3];
     dst[2][3] = src[2][3];
@@ -462,14 +462,14 @@ void obj_init_animation(struct Object *obj, s32 animIndex) {
 
 void obj_apply_scale_to_transform(struct Object *obj) {
     Vec3f scale;
-    vec3_copy(scale, obj->header.gfx.scale);
+    vec3f_copy(scale, obj->header.gfx.scale);
     vec3_mul_val(obj->transform[0], scale[0]);
     vec3_mul_val(obj->transform[1], scale[1]);
     vec3_mul_val(obj->transform[2], scale[2]);
 }
 
 void obj_copy_scale(struct Object *dst, struct Object *src) {
-    vec3_copy(dst->header.gfx.scale, src->header.gfx.scale);
+    vec3f_copy(dst->header.gfx.scale, src->header.gfx.scale);
 }
 
 void obj_scale_xyz(struct Object *obj, f32 xScale, f32 yScale, f32 zScale) {
@@ -1190,7 +1190,7 @@ s32 cur_obj_outside_home_rectangle(f32 minX, f32 maxX, f32 minZ, f32 maxZ) {
 }
 
 void cur_obj_set_pos_to_home(void) {
-    vec3_copy(&o->oPosVec, &o->oHomeVec);
+    vec3f_copy(&o->oPosVec, &o->oHomeVec);
 }
 
 void cur_obj_set_pos_to_home_and_stop(void) {
@@ -1202,7 +1202,7 @@ void cur_obj_set_pos_to_home_and_stop(void) {
 
 void cur_obj_shake_y(f32 amount) {
     //! Technically could cause a bit of drift, but not much
-    if (o->oTimer % 2 == 0) {
+    if ((o->oTimer & 0x1) == 0) {
         o->oPosY += amount;
     } else {
         o->oPosY -= amount;
@@ -1491,7 +1491,7 @@ void obj_set_gfx_pos_at_obj_pos(struct Object *obj1, struct Object *obj2) {
  */
 void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateIndex) {
     Vec3f d;
-    vec3_copy(d, &obj->rawData.asF32[localTranslateIndex]);
+    vec3f_copy(d, &obj->rawData.asF32[localTranslateIndex]);
 
     obj->rawData.asF32[posIndex + 0] += ((obj->transform[0][0] * d[0]) + (obj->transform[1][0] * d[1]) + (obj->transform[2][0] * d[2]));
     obj->rawData.asF32[posIndex + 1] += ((obj->transform[0][1] * d[0]) + (obj->transform[1][1] * d[1]) + (obj->transform[2][1] * d[2]));
@@ -1500,7 +1500,7 @@ void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateInd
 
 void obj_build_transform_from_pos_and_angle(struct Object *obj, s16 posIndex, s16 angleIndex) {
     Vec3f translate;
-    vec3_copy(translate, &obj->rawData.asF32[posIndex]);
+    vec3f_copy(translate, &obj->rawData.asF32[posIndex]);
     Vec3s rotation;
     vec3_copy(rotation,  &obj->rawData.asS32[angleIndex]);
     mtxf_rotate_zxy_and_translate(obj->transform, translate, rotation);
@@ -1526,7 +1526,7 @@ void obj_build_transform_relative_to_parent(struct Object *obj) {
     obj_apply_scale_to_transform(obj);
     mtxf_mul(obj->transform, obj->transform, parent->transform);
 
-    vec3_copy(&obj->oPosVec, obj->transform[3]);
+    vec3f_copy(&obj->oPosVec, obj->transform[3]);
 
     obj->header.gfx.throwMatrix = &obj->transform;
 
@@ -1536,7 +1536,7 @@ void obj_build_transform_relative_to_parent(struct Object *obj) {
 void obj_create_transform_from_self(struct Object *obj) {
     obj->oFlags &= ~OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT;
     obj->oFlags |= OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM;
-    vec3_copy(obj->transform[3], &obj->oPosVec);
+    vec3f_copy(obj->transform[3], &obj->oPosVec);
 }
 
 void cur_obj_rotate_move_angle_using_vel(void) {
@@ -2106,7 +2106,7 @@ void cur_obj_align_gfx_with_floor(void) {
     struct Surface *floor;
     Vec3f floorNormal;
     Vec3f position;
-    vec3_copy(position, &o->oPosVec);
+    vec3f_copy(position, &o->oPosVec);
 
     find_floor(position[0], position[1], position[2], &floor);
     if (floor != NULL) {
@@ -2120,8 +2120,8 @@ void cur_obj_align_gfx_with_floor(void) {
 }
 
 s32 mario_is_within_rectangle(s16 minX, s16 maxX, s16 minZ, s16 maxZ) {
-    if (gMarioObject->oPosX < minX || maxX < gMarioObject->oPosX) return FALSE;
-    if (gMarioObject->oPosZ < minZ || maxZ < gMarioObject->oPosZ) return FALSE;
+    if ((gMarioObject->oPosX < minX) || (maxX < gMarioObject->oPosX)) return FALSE;
+    if ((gMarioObject->oPosZ < minZ) || (maxZ < gMarioObject->oPosZ)) return FALSE;
     return TRUE;
 }
 
