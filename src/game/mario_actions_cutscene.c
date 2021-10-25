@@ -624,7 +624,7 @@ s32 act_fall_after_star_grab(struct MarioState *m) {
         m->particleFlags |= PARTICLE_WATER_SPLASH;
         return set_mario_action(m, ACT_STAR_DANCE_WATER, m->actionArg);
     }
-    if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
+    if (perform_air_step(m, AIR_STEP_CHECK_LEDGE_GRAB) == AIR_STEP_LANDED) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
         set_mario_action(m, ((m->actionArg & 0x1) ? ACT_STAR_DANCE_NO_EXIT : ACT_STAR_DANCE_EXIT), m->actionArg);
     }
@@ -726,7 +726,7 @@ s32 launch_mario_until_land(struct MarioState *m, s32 endAction, s32 animation, 
     s32 airStepLanded;
     mario_set_forward_vel(m, forwardVel);
     set_mario_animation(m, animation);
-    airStepLanded = (perform_air_step(m, 0) == AIR_STEP_LANDED);
+    airStepLanded = (perform_air_step(m, AIR_STEP_CHECK_NONE) == AIR_STEP_LANDED);
     if (airStepLanded) {
         set_mario_action(m, endAction, 0);
     }
@@ -963,7 +963,7 @@ s32 act_spawn_spin_airborne(struct MarioState *m) {
     mario_set_forward_vel(m, m->forwardVel);
 
     // landed on floor, play spawn land animation
-    if (perform_air_step(m, 0.0f) == AIR_STEP_LANDED) {
+    if (perform_air_step(m, AIR_STEP_CHECK_NONE) == AIR_STEP_LANDED) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
         set_mario_action(m, ACT_SPAWN_SPIN_LANDING, 0);
     }
@@ -1111,6 +1111,8 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
 }
 
 s32 act_death_exit(struct MarioState *m) {
+    // one unit of health
+    m->health = 0x0100;
 #ifdef BREATH_METER
     m->breath = 0x880;
 #endif
@@ -1126,12 +1128,12 @@ s32 act_death_exit(struct MarioState *m) {
         // restore 7.75 units of health
         m->healCounter = 31;
     }
-    // one unit of health
-    m->health = 0x0100;
     return FALSE;
 }
 
 s32 act_unused_death_exit(struct MarioState *m) {
+    // one unit of health
+    m->health = 0x0100;
 #ifdef BREATH_METER
     m->breath = 0x880;
 #endif
@@ -1144,12 +1146,12 @@ s32 act_unused_death_exit(struct MarioState *m) {
         // restore 7.75 units of health
         m->healCounter = 31;
     }
-    // one unit of health
-    m->health = 0x0100;
     return FALSE;
 }
 
 s32 act_falling_death_exit(struct MarioState *m) {
+    // one unit of health
+    m->health = 0x0100;
 #ifdef BREATH_METER
     m->breath = 0x880;
 #endif
@@ -1165,8 +1167,6 @@ s32 act_falling_death_exit(struct MarioState *m) {
         // restore 7.75 units of health
         m->healCounter = 31;
     }
-    // one unit of health
-    m->health = 0x0100;
     return FALSE;
 }
 
@@ -1200,6 +1200,8 @@ s32 act_special_exit_airborne(struct MarioState *m) {
 }
 
 s32 act_special_death_exit(struct MarioState *m) {
+    // one unit of health
+    m->health = 0x0100;
 #ifdef BREATH_METER
     m->breath = 0x880;
 #endif
@@ -1222,8 +1224,6 @@ s32 act_special_death_exit(struct MarioState *m) {
     }
     // show Mario
     marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
-    // one unit of health
-    m->health = 0x0100;
 
     return FALSE;
 }
@@ -1283,7 +1283,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
             }
 
             m->flags &= ~MARIO_JUMPING;
-            perform_air_step(m, 0);
+            perform_air_step(m, AIR_STEP_CHECK_NONE);
             if (m->vel[1] <= 0) {
                 m->actionState = ACT_STATE_BBH_ENTER_SPIN_WAIT_FOR_ANIM;
             }
@@ -1295,7 +1295,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
             m->faceAngle[1] = atan2s(cageDZ, cageDX);
             mario_set_forward_vel(m, forwardVel);
             m->flags &= ~MARIO_JUMPING;
-            if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
+            if (perform_air_step(m, AIR_STEP_CHECK_NONE) == AIR_STEP_LANDED) {
                 level_trigger_warp(m, WARP_OP_SPIN_SHRINK);
 #if ENABLE_RUMBLE
                 queue_rumble_data(15, 80);
@@ -1346,7 +1346,7 @@ s32 act_bbh_enter_jump(struct MarioState *m) {
     }
 
     set_mario_animation(m, MARIO_ANIM_DOUBLE_JUMP_RISE);
-    perform_air_step(m, 0);
+    perform_air_step(m, AIR_STEP_CHECK_NONE);
 
     if (m->vel[1] <= 0.0f) {
         set_mario_action(m, ACT_BBH_ENTER_SPIN, 0);
@@ -1429,7 +1429,7 @@ s32 act_shocked(struct MarioState *m) {
 
     if (m->actionArg == 0) {
         mario_set_forward_vel(m, 0.0f);
-        if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
+        if (perform_air_step(m, AIR_STEP_CHECK_LEDGE_GRAB) == AIR_STEP_LANDED) {
             play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
             m->actionArg = 1;
         }
@@ -1669,7 +1669,7 @@ static void intro_cutscene_jump_out_of_pipe(struct MarioState *m) {
 
         set_mario_animation(m, MARIO_ANIM_SINGLE_JUMP);
         mario_set_forward_vel(m, 10.0f);
-        if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
+        if (perform_air_step(m, AIR_STEP_CHECK_NONE) == AIR_STEP_LANDED) {
             sound_banks_enable(SEQ_PLAYER_SFX, SOUND_BANKS_DISABLED_DURING_INTRO_CUTSCENE);
             play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
             play_sound(SOUND_MARIO_HAHA, m->marioObj->header.gfx.cameraToObject);
@@ -1768,7 +1768,7 @@ static void jumbo_star_cutscene_falling(struct MarioState *m) {
         mario_set_forward_vel(m, 0.0f);
         set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
 
-        if (perform_air_step(m, 1) == AIR_STEP_LANDED) {
+        if (perform_air_step(m, AIR_STEP_CHECK_LEDGE_GRAB) == AIR_STEP_LANDED) {
             play_cutscene_music(SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_VICTORY));
             play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
             m->actionState = ACT_STATE_JUMBO_STAR_CUTSCENE_FALLING_LAND;
@@ -1945,7 +1945,7 @@ static void end_peach_cutscene_mario_falling(struct MarioState *m) {
     set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
     mario_set_forward_vel(m, 0.0f);
 
-    if (perform_air_step(m, 0) == AIR_STEP_LANDED) {
+    if (perform_air_step(m, AIR_STEP_CHECK_NONE) == AIR_STEP_LANDED) {
         play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
         advance_cutscene_step(m);
     }

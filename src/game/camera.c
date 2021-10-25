@@ -4409,7 +4409,7 @@ u32 get_cutscene_from_mario_status(struct Camera *c) {
             case ACT_EXIT_AIRBORNE:         cutscene = CUTSCENE_EXIT_PAINTING_SUCC; break;
             case ACT_SPECIAL_EXIT_AIRBORNE: cutscene = ((gPrevLevel == LEVEL_BOWSER_1 || gPrevLevel == LEVEL_BOWSER_2 || gPrevLevel == LEVEL_BOWSER_3) ? CUTSCENE_EXIT_BOWSER_SUCC  : CUTSCENE_EXIT_SPECIAL_SUCC); break;
             case ACT_SPECIAL_DEATH_EXIT:    cutscene = ((gPrevLevel == LEVEL_BOWSER_1 || gPrevLevel == LEVEL_BOWSER_2 || gPrevLevel == LEVEL_BOWSER_3) ? CUTSCENE_EXIT_BOWSER_DEATH : CUTSCENE_NONPAINTING_DEATH); break;
-            case ACT_ENTERING_STAR_DOOR:    cutscene = (c->doorStatus == DOOR_DEFAULT) ? CUTSCENE_SLIDING_DOORS_OPEN : CUTSCENE_DOOR_PULL_MODE; break;
+            case ACT_ENTERING_STAR_DOOR:    cutscene = ((c->doorStatus == DOOR_DEFAULT) ? CUTSCENE_SLIDING_DOORS_OPEN : CUTSCENE_DOOR_PULL_MODE); break;
             case ACT_UNLOCKING_KEY_DOOR:    cutscene = CUTSCENE_UNLOCK_KEY_DOOR;    break;
             case ACT_WATER_DEATH:           cutscene = CUTSCENE_WATER_DEATH;        break;
             case ACT_DEATH_ON_BACK:         cutscene = CUTSCENE_DEATH_ON_BACK;      break;
@@ -4952,7 +4952,7 @@ void cam_bob_default_free_roam(struct Camera *c) {
  */
 void cam_castle_hmc_start_pool_cutscene(struct Camera *c) {
     if ((sMarioCamState->action != ACT_SPECIAL_DEATH_EXIT)
-        && (sMarioCamState->action != ACT_SPECIAL_EXIT_AIRBORNE)) {
+     && (sMarioCamState->action != ACT_SPECIAL_EXIT_AIRBORNE)) {
         start_cutscene(c, CUTSCENE_ENTER_POOL);
     }
 }

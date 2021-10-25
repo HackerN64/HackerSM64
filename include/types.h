@@ -401,32 +401,32 @@ struct MarioBodyState {
 };
 
 struct MarioState {
-    /*0x00*/ u16 playerID;
-    /*0x02*/ u16 input;
-    /*0x04*/ u32 flags;
-    /*0x08*/ u32 particleFlags;
-    /*0x0C*/ u32 action;
-    /*0x10*/ u32 prevAction;
-    /*0x14*/ u32 terrainSoundAddend;
-    /*0x18*/ u16 actionState;
-    /*0x1A*/ u16 actionTimer;
-    /*0x1C*/ u32 actionArg;
-    /*0x20*/ f32 intendedMag;
-    /*0x24*/ s16 intendedYaw;
-    /*0x26*/ s16 invincTimer;
-    /*0x28*/ u8 framesSinceA;
-    /*0x29*/ u8 framesSinceB;
-    /*0x2A*/ u8 wallKickTimer;
-    /*0x2B*/ u8 doubleJumpTimer;
+    /*0x00*/ u16   playerID;
+    /*0x02*/ u16   input;
+    /*0x04*/ u32   flags;
+    /*0x08*/ u32   particleFlags;
+    /*0x0C*/ u32   action;
+    /*0x10*/ u32   prevAction;
+    /*0x14*/ u32   terrainSoundAddend;
+    /*0x18*/ u16   actionState;
+    /*0x1A*/ u16   actionTimer;
+    /*0x1C*/ u32   actionArg;
+    /*0x20*/ f32   intendedMag;
+    /*0x24*/ s16   intendedYaw;
+    /*0x26*/ s16   invincTimer;
+    /*0x28*/ u8    framesSinceA;
+    /*0x29*/ u8    framesSinceB;
+    /*0x2A*/ u8    wallKickTimer;
+    /*0x2B*/ u8    doubleJumpTimer;
     /*0x2C*/ Vec3s faceAngle;
     /*0x32*/ Vec3s angleVel;
-    /*0x38*/ s16 slideYaw;
-    /*0x3A*/ s16 twirlYaw;
+    /*0x38*/ s16   slideYaw;
+    /*0x3A*/ s16   twirlYaw;
     /*0x3C*/ Vec3f pos;
     /*0x48*/ Vec3f vel;
-    /*0x54*/ f32 forwardVel;
-    /*0x58*/ f32 slideVelX;
-    /*0x5C*/ f32 slideVelZ;
+    /*0x54*/ f32   forwardVel;
+    /*0x58*/ f32   slideVelX;
+    /*0x5C*/ f32   slideVelZ;
     /*0x60*/ struct Surface *wall;
     /*0x64*/ struct Surface *ceil;
     /*0x68*/ struct Surface *floor;
@@ -435,17 +435,17 @@ struct MarioState {
     /*0x74*/ s16 floorYaw;
     #define floorAngle floorYaw
     /*0x76*/ s16 waterLevel;
-    /*0x78*/ struct Object *interactObj;
-    /*0x7C*/ struct Object *heldObj;
-    /*0x80*/ struct Object *usedObj;
-    /*0x84*/ struct Object *riddenObj;
-    /*0x88*/ struct Object *marioObj;
-    /*0x8C*/ struct SpawnInfo *spawnInfo;
-    /*0x90*/ struct Area *area;
+    /*0x78*/ struct Object            *interactObj;
+    /*0x7C*/ struct Object            *heldObj;
+    /*0x80*/ struct Object            *usedObj;
+    /*0x84*/ struct Object            *riddenObj;
+    /*0x88*/ struct Object            *marioObj;
+    /*0x8C*/ struct SpawnInfo         *spawnInfo;
+    /*0x90*/ struct Area              *area;
     /*0x94*/ struct PlayerCameraState *statusForCamera;
-    /*0x98*/ struct MarioBodyState *marioBodyState;
-    /*0x9C*/ struct Controller *controller;
-    /*0xA0*/ struct DmaHandlerList *animList;
+    /*0x98*/ struct MarioBodyState    *marioBodyState;
+    /*0x9C*/ struct Controller        *controller;
+    /*0xA0*/ struct DmaHandlerList    *animList;
     /*0xA4*/ u32 collidedObjInteractTypes;
     /*0xA8*/ s16 numCoins;
     /*0xAA*/ s16 numStars;
@@ -468,7 +468,7 @@ struct MarioState {
              u8  breathCounter;
 #endif
 #ifdef PREVENT_DEATH_LOOP
-             u8  isDead: 1;
+             u8  isDead : 1;
 #endif
            Vec3f lastSafePos;
            Vec3f prevPos;

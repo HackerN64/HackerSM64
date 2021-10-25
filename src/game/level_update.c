@@ -516,7 +516,7 @@ s32 music_unchanged_through_warp(s16 arg) {
     s16 currBgMusic;
 
 #ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    if (levelNum == LEVEL_BOB && levelNum == gCurrLevelNum && destArea == gCurrAreaIndex) {
+    if ((levelNum == LEVEL_BOB) && (levelNum == gCurrLevelNum) && (destArea == gCurrAreaIndex)) {
         currBgMusic = get_current_background_music();
         if (currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP | SEQ_VARIATION)
          || currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP)) {
@@ -555,9 +555,9 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
     }
 
     sWarpDest.levelNum = destLevel;
-    sWarpDest.areaIdx = destArea;
-    sWarpDest.nodeId = destWarpNode;
-    sWarpDest.arg = warpFlags;
+    sWarpDest.areaIdx  = destArea;
+    sWarpDest.nodeId   = destWarpNode;
+    sWarpDest.arg      = warpFlags;
 #if defined(PUPPYCAM) || defined(PUPPYLIGHTS)
     s32 i = 0;
 #endif
@@ -593,8 +593,8 @@ struct WarpNode *get_painting_warp_node(void) {
     struct WarpNode *warpNode = NULL;
     s32 paintingIndex = gMarioState->floor->type - SURFACE_PAINTING_WARP_D3;
 
-    if (paintingIndex >= PAINTING_WARP_INDEX_START && paintingIndex < PAINTING_WARP_INDEX_END) {
-        if (paintingIndex < PAINTING_WARP_INDEX_FA || ((gMarioState->pos[1] - gMarioState->floorHeight) < 80.0f)) {
+    if ((paintingIndex >= PAINTING_WARP_INDEX_START) && (paintingIndex < PAINTING_WARP_INDEX_END)) {
+        if ((paintingIndex < PAINTING_WARP_INDEX_FA) || ((gMarioState->pos[1] - gMarioState->floorHeight) < 80.0f)) {
             warpNode = &gCurrentArea->paintingWarpNodes[paintingIndex];
         }
     }
@@ -606,7 +606,7 @@ struct WarpNode *get_painting_warp_node(void) {
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
 void initiate_painting_warp(void) {
-    if (gCurrentArea->paintingWarpNodes != NULL && gMarioState->floor != NULL) {
+    if ((gCurrentArea->paintingWarpNodes != NULL) && (gMarioState->floor != NULL)) {
         struct WarpNode warpNode;
         struct WarpNode *pWarpNode = get_painting_warp_node();
 
@@ -827,7 +827,7 @@ void initiate_delayed_warp(void) {
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
 
                     initiate_warp((warpNode->node.destLevel & 0x7F), warpNode->node.destArea,
-                                  warpNode->node.destNode, sDelayedWarpArg);
+                                   warpNode->node.destNode, sDelayedWarpArg);
 
                     check_if_should_set_warp_checkpoint(&warpNode->node);
                     if (sWarpDest.type != WARP_TYPE_CHANGE_LEVEL) {
@@ -873,7 +873,7 @@ void update_hud_values(void) {
 
         gHudDisplay.stars = gMarioState->numStars;
         gHudDisplay.lives = gMarioState->numLives;
-        gHudDisplay.keys = gMarioState->numKeys;
+        gHudDisplay.keys  = gMarioState->numKeys;
 
         if (numHealthWedges > gHudDisplay.wedges) {
             play_sound(SOUND_MENU_POWER_METER, gGlobalSoundSource);

@@ -97,15 +97,17 @@ static struct InteractionHandler sInteractionHandlers[] = {
 };
 
 static u32 sForwardKnockbackActions[][3] = {
-    { ACT_SOFT_FORWARD_GROUND_KB, ACT_FORWARD_GROUND_KB, ACT_HARD_FORWARD_GROUND_KB },
-    { ACT_FORWARD_AIR_KB,         ACT_FORWARD_AIR_KB,    ACT_HARD_FORWARD_AIR_KB    },
-    { ACT_FORWARD_WATER_KB,       ACT_FORWARD_WATER_KB,  ACT_FORWARD_WATER_KB       },
+//    Soft                         Normal                  Hard
+    { ACT_SOFT_FORWARD_GROUND_KB,  ACT_FORWARD_GROUND_KB,  ACT_HARD_FORWARD_GROUND_KB  }, // Ground
+    { ACT_FORWARD_AIR_KB,          ACT_FORWARD_AIR_KB,     ACT_HARD_FORWARD_AIR_KB     }, // Air
+    { ACT_FORWARD_WATER_KB,        ACT_FORWARD_WATER_KB,   ACT_FORWARD_WATER_KB        }, // Water
 };
 
 static u32 sBackwardKnockbackActions[][3] = {
-    { ACT_SOFT_BACKWARD_GROUND_KB, ACT_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB },
-    { ACT_BACKWARD_AIR_KB,         ACT_BACKWARD_AIR_KB,    ACT_HARD_BACKWARD_AIR_KB    },
-    { ACT_BACKWARD_WATER_KB,       ACT_BACKWARD_WATER_KB,  ACT_BACKWARD_WATER_KB       },
+//    Soft                         Normal                  Hard
+    { ACT_SOFT_BACKWARD_GROUND_KB, ACT_BACKWARD_GROUND_KB, ACT_HARD_BACKWARD_GROUND_KB }, // Ground
+    { ACT_BACKWARD_AIR_KB,         ACT_BACKWARD_AIR_KB,    ACT_HARD_BACKWARD_AIR_KB    }, // Air
+    { ACT_BACKWARD_WATER_KB,       ACT_BACKWARD_WATER_KB,  ACT_BACKWARD_WATER_KB       }, // Water
 };
 
 static u8 sDisplayingDoorText = FALSE;
@@ -117,7 +119,6 @@ static u8 sPssSlideStarted    = FALSE;
  */
 u32 get_mario_cap_flag(struct Object *capObject) {
     const BehaviorScript *script = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, capObject->behavior);
-
     if (script == bhvNormalCap) {
         return MARIO_NORMAL_CAP;
     } else if (script == bhvMetalCap) {
@@ -127,7 +128,6 @@ u32 get_mario_cap_flag(struct Object *capObject) {
     } else if (script == bhvVanishCap) {
         return MARIO_VANISH_CAP;
     }
-
     return MARIO_NONE;
 }
 
@@ -136,16 +136,15 @@ u32 get_mario_cap_flag(struct Object *capObject) {
  * in the angular range given towards Mario.
  */
 u32 object_facing_mario(struct MarioState *m, struct Object *obj, s16 angleRange) {
-    f32 dx = (m->pos[0] - obj->oPosX);
-    f32 dz = (m->pos[2] - obj->oPosZ);
-    s16 angleToMario = atan2s(dz, dx);
-    s16 dAngle = abs_angle_diff(angleToMario, obj->oMoveAngleYaw);
-    return (dAngle <= angleRange);
+    register f32 dx = (m->pos[0] - obj->oPosX);
+    register f32 dz = (m->pos[2] - obj->oPosZ);
+    register s16 angleToMario = atan2s(dz, dx);
+    return (abs_angle_diff(angleToMario, obj->oMoveAngleYaw) <= angleRange);
 }
 
 s32 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj) {
-    f32 dx = (obj->oPosX - m->pos[0]);
-    f32 dz = (obj->oPosZ - m->pos[2]);
+    register f32 dx = (obj->oPosX - m->pos[0]);
+    register f32 dz = (obj->oPosZ - m->pos[2]);
     return atan2s(dz, dx);
 }
 
@@ -154,8 +153,8 @@ s32 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj) {
  * action, speed, and position.
  */
 u32 determine_interaction(struct MarioState *m, struct Object *obj) {
-    u32 interaction = 0;
-    u32 action = m->action;
+    u32 interaction = INT_NONE;
+    u32 action      = m->action;
 
     if (action & ACT_FLAG_ATTACKING) {
         if ((action == ACT_PUNCHING)
@@ -1772,7 +1771,7 @@ void mario_process_interactions(struct MarioState *m) {
 
 void check_death_barrier(struct MarioState *m) {
     if (m->pos[1] < (m->floorHeight + 2048.0f)) {
-        if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m->flags & MARIO_FALL_SOUND_PLAYED)) {
+        if ((level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20) && !(m->flags & MARIO_FALL_SOUND_PLAYED)) {
             play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
         }
     }

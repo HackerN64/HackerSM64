@@ -10,6 +10,7 @@
 #include "sound_init.h"
 #include "level_table.h"
 #include "course_table.h"
+#include "level_commands.h"
 #include "rumble_init.h"
 #include "config.h"
 #ifdef SRAM
@@ -734,7 +735,7 @@ void disable_warp_checkpoint(void) {
  * game should set a warp checkpoint.
  */
 void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
-    if (warpNode->destLevel & 0x80) {
+    if (warpNode->destLevel & WARP_CHECKPOINT) {
         // Overwrite the warp checkpoint variables.
         gWarpCheckpoint.actNum    = gCurrActNum;
         gWarpCheckpoint.courseNum = gCurrCourseNum;
@@ -754,11 +755,12 @@ s32 check_warp_checkpoint(struct WarpNode *warpNode) {
     s16 currCourseNum = gLevelToCourseNumTable[(warpNode->destLevel & 0x7F) - 1];
 
     // gSavedCourseNum is only used in this function.
-    if (gWarpCheckpoint.courseNum != COURSE_NONE && gSavedCourseNum == currCourseNum
-        && gWarpCheckpoint.actNum == gCurrActNum) {
-        warpNode->destLevel = gWarpCheckpoint.levelID;
-        warpNode->destArea = gWarpCheckpoint.areaNum;
-        warpNode->destNode = gWarpCheckpoint.warpNode;
+    if ((gWarpCheckpoint.courseNum != COURSE_NONE)
+     && (gSavedCourseNum == currCourseNum)
+     && (gWarpCheckpoint.actNum == gCurrActNum)) {
+        warpNode->destLevel  = gWarpCheckpoint.levelID;
+        warpNode->destArea   = gWarpCheckpoint.areaNum;
+        warpNode->destNode   = gWarpCheckpoint.warpNode;
         warpCheckpointActive = TRUE;
     } else {
         // Disable the warp checkpoint just in case the other 2 conditions failed?

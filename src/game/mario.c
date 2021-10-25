@@ -1445,8 +1445,8 @@ void update_mario_health(struct MarioState *m) {
             m->hurtCounter--;
         }
 
-        if (m->health > 0x880) m->health = 0x880;
-        if (m->health < 0x100) m->health = 0xFF;
+        m->health = CLAMP(m->health, 0xFF, 0x880);
+
 #ifndef BREATH_METER
         // Play a noise to alert the player when Mario is close to drowning.
         if (((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) && (m->health < 0x300)) {
@@ -1772,7 +1772,7 @@ void init_mario(struct MarioState *m) {
     m->invincTimer = 0;
 
     if (save_file_get_flags() & (SAVE_FLAG_CAP_ON_GROUND | SAVE_FLAG_CAP_ON_KLEPTO | SAVE_FLAG_CAP_ON_UKIKI | SAVE_FLAG_CAP_ON_MR_BLIZZARD)) {
-        m->flags = 0;
+        m->flags = MARIO_NONE;
     } else {
         m->flags = (MARIO_NORMAL_CAP | MARIO_CAP_ON_HEAD);
     }
@@ -1830,9 +1830,9 @@ void init_mario(struct MarioState *m) {
 }
 
 void init_mario_from_save_file(struct MarioState *m) {
-    m->playerID = 0;
-    m->flags    = 0;
-    m->action   = 0;
+    m->playerID        = 0;
+    m->flags           = MARIO_NONE;
+    m->action          = ACT_UNINITIALIZED;
     m->spawnInfo       = &gPlayerSpawnInfos[0];
     m->statusForCamera = &gPlayerCameraState[0];
     m->marioBodyState  = &gBodyStates[0];
