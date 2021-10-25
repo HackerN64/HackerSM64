@@ -28,7 +28,7 @@ void bhv_tilting_inverted_pyramid_loop(void) {
     if (gMarioObject->platform == o) {
         vec3_diff(targetNormal, &gMarioObject->oPosVec, &o->oPosVec);
 #ifndef PLATFORM_DISPLACEMENT_2
-        vec3_copy(m, gMarioStates[0].pos);
+        vec3f_copy(m, gMarioStates[0].pos);
         linear_mtxf_mul_vec3f(*transform, posBeforeRotation, targetNormal);
 #endif
         targetNormal[1] = 500.0f;

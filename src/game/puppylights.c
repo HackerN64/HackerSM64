@@ -253,7 +253,7 @@ static void puppylights_deallocate_obj(struct Object *obj) {
 }
 
 static void puppylights_update_pos_obj(struct Object *obj) {
-    vec3_copy(gPuppyLights[obj->oLightID]->pos[0], &obj->oPosVec);
+    vec3f_to_vec3s(gPuppyLights[obj->oLightID]->pos[0], &obj->oPosVec);
 }
 
 // Sets and updates dynamic lights from objects.

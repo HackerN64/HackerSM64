@@ -1795,9 +1795,9 @@ void init_mario(struct MarioState *m) {
     m->area = gCurrentArea;
     m->marioObj = gMarioObject;
     m->marioObj->header.gfx.animInfo.animID = -1;
-    vec3_copy(m->faceAngle, gMarioSpawnInfo->startAngle);
+    vec3s_copy(m->faceAngle, gMarioSpawnInfo->startAngle);
     vec3_zero(m->angleVel);
-    vec3_copy(m->pos, gMarioSpawnInfo->startPos);
+    vec3s_to_vec3f(m->pos, gMarioSpawnInfo->startPos);
     vec3f_copy(m->prevPos, m->pos);
     vec3_zero(m->vel);
     m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
@@ -1815,7 +1815,7 @@ void init_mario(struct MarioState *m) {
     m->marioBodyState->punchState = 0x0;
 
     vec3f_copy(&m->marioObj->oPosVec, m->pos);
-    vec3_copy(&m->marioObj->oMoveAngleVec, m->faceAngle);
+    vec3s_to_vec3i(&m->marioObj->oMoveAngleVec, m->faceAngle);
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
     vec3s_set( m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
@@ -1823,7 +1823,7 @@ void init_mario(struct MarioState *m) {
     Vec3s capPos;
     if (save_file_get_cap_pos(capPos)) {
         struct Object *capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
-        vec3_copy(&capObject->oPosVec, capPos);
+        vec3s_to_vec3f(&capObject->oPosVec, capPos);
         capObject->oForwardVel   = 0;
         capObject->oMoveAngleYaw = 0;
     }

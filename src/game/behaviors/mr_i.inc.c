@@ -16,7 +16,7 @@ void mr_i_piranha_particle_act_move(void) {
     o->oVelX = (o->oForwardVel *  coss(o->oMoveAnglePitch) * sins(o->oMoveAngleYaw));
     o->oVelY = (o->oForwardVel * -sins(o->oMoveAnglePitch)                         );
     o->oVelZ = (o->oForwardVel *  coss(o->oMoveAnglePitch) * coss(o->oMoveAngleYaw));
-    vec3_add(&o->oPosVec, &o->oVelVec);
+    vec3f_add(&o->oPosVec, &o->oVelVec);
     cur_obj_scale(3.0f);
     o->oForwardVel = 20.0f;
     cur_obj_update_floor_and_walls();

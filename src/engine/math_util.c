@@ -175,14 +175,40 @@ f32 vec3f_dot(Vec3f a, Vec3f b) {
     return vec3_dot(a, b);
 }
 
+void vec3i_copy(Vec3i dest, Vec3i src) {
+    register s32 x = ((u32 *) src)[0];
+    register s32 y = ((u32 *) src)[1];
+    register s32 z = ((u32 *) src)[2];
+    ((s32 *) dest)[0] = x;
+    ((s32 *) dest)[1] = y;
+    ((s32 *) dest)[2] = z;
+}
+
+void vec3s_to_vec3i(Vec3i dest, Vec3s src) { vec3_copy(dest, src); } // 16 -> 32
+void vec3s_to_vec3f(Vec3f dest, Vec3s src) { vec3_copy(dest, src); } // 16 -> 32
+void vec3i_to_vec3s(Vec3s dest, Vec3i src) { vec3_copy(dest, src); } // 32 -> 16
+void vec3i_to_vec3f(Vec3f dest, Vec3i src) {
+    register u32 x = ((u32 *) src)[0];
+    register u32 y = ((u32 *) src)[1];
+    register u32 z = ((u32 *) src)[2];
+    ((u32 *) dest)[0] = x;
+    ((u32 *) dest)[1] = y;
+    ((u32 *) dest)[2] = z;
+} // 32 -> 32
+
 /**
  * Convert float vector a to a short vector 'dest' by rounding the components
  * to the nearest integer.
  */
-void vec3f_to_vec3s(Vec3s dest, Vec3f a) {
-    dest[0] = asm_roundf(a[0]);
-    dest[1] = asm_roundf(a[1]);
-    dest[2] = asm_roundf(a[2]);
+void vec3f_to_vec3s(Vec3s dest, Vec3f src) {
+    dest[0] = asm_roundf(src[0]);
+    dest[1] = asm_roundf(src[1]);
+    dest[2] = asm_roundf(src[2]);
+}
+void vec3f_to_vec3i(Vec3i dest, Vec3f src) {
+    dest[0] = asm_roundf(src[0]);
+    dest[1] = asm_roundf(src[1]);
+    dest[2] = asm_roundf(src[2]);
 }
 
 /// Make vector 'dest' the cross product of vectors a and b.
@@ -1129,11 +1155,11 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     // Ignore certain surface types.
     if ((surface->type == SURFACE_INTANGIBLE) || (surface->flags & SURFACE_FLAG_NO_CAM_COLLISION)) return FALSE;
     // Get surface normal and some other stuff
-    vec3_set(norm, 0, surface->normal.y, 0);
+    vec3f_set(norm, 0.0f, surface->normal.y, 0.0f);
     vec3_mul_val(norm, RAY_OFFSET);
-    vec3_copy(v0, surface->vertex1);
-    vec3_copy(v1, surface->vertex2);
-    vec3_copy(v2, surface->vertex3);
+    vec3s_to_vec3f(v0, surface->vertex1);
+    vec3s_to_vec3f(v1, surface->vertex2);
+    vec3s_to_vec3f(v2, surface->vertex3);
     vec3f_add( v0, norm);
     vec3f_add( v1, norm);
     vec3f_add( v2, norm);

@@ -665,10 +665,10 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
     gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
     for (i = 0; i < numTris; i++) {
         PaintingData tri = ((numVtx * 3) + (i * 3) + 2); // Add 2 because of the 2 length entries preceding the list
-        vec3_copy(v, &mesh[tri]);
-        vec3_copy(vp0, gPaintingMesh[v[0]].pos);
-        vec3_copy(vp1, gPaintingMesh[v[1]].pos);
-        vec3_copy(vp2, gPaintingMesh[v[2]].pos);
+        vec3s_copy(v, &mesh[tri]);
+        vec3s_to_vec3f(vp0, gPaintingMesh[v[0]].pos);
+        vec3s_to_vec3f(vp1, gPaintingMesh[v[1]].pos);
+        vec3s_to_vec3f(vp2, gPaintingMesh[v[2]].pos);
         // Cross product to find each triangle's normal vector
         find_vector_perpendicular_to_plane(gPaintingTriNorms[i], vp0, vp1, vp2);
     }
@@ -717,7 +717,7 @@ void painting_average_vertex_normals(PaintingData *neighborTris, PaintingData nu
         neighbors = neighborTris[entry];
         for (j = 0; j < neighbors; j++) {
             tri = neighborTris[(entry + j) + 1];
-            vec3_add(n, gPaintingTriNorms[tri]);
+            vec3f_add(n, gPaintingTriNorms[tri]);
         }
         // Move to the next vertex's entry
         entry += (neighbors + 1);

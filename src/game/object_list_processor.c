@@ -213,9 +213,9 @@ struct ParticleProperties sParticleTypes[] = {
 void copy_mario_state_to_object(struct MarioState *m) {
     vec3f_copy(&o->oVelVec, m->vel);
     vec3f_copy(&o->oPosVec, m->pos);
-    vec3_copy(&o->oMoveAngleVec, o->header.gfx.angle);
-    vec3_copy(&o->oFaceAngleVec, o->header.gfx.angle);
-    vec3_copy(&o->oAngleVelVec, m->angleVel);
+    vec3s_to_vec3i(&o->oMoveAngleVec, o->header.gfx.angle);
+    vec3s_to_vec3i(&o->oFaceAngleVec, o->header.gfx.angle);
+    vec3s_to_vec3i(&o->oAngleVelVec,  m->angleVel);
 }
 
 /**
@@ -453,9 +453,9 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
             }
 
             geo_obj_init_spawninfo(&object->header.gfx, spawnInfo);
-            vec3_copy(&object->oPosVec,       spawnInfo->startPos);
-            vec3_copy(&object->oFaceAngleVec, spawnInfo->startAngle);
-            vec3_copy(&object->oMoveAngleVec, spawnInfo->startAngle);
+            vec3s_to_vec3f(&object->oPosVec,       spawnInfo->startPos);
+            vec3s_to_vec3i(&object->oFaceAngleVec, spawnInfo->startAngle);
+            vec3s_to_vec3i(&object->oMoveAngleVec, spawnInfo->startAngle);
             object->oFloorHeight = find_floor(object->oPosX, object->oPosY, object->oPosZ, &object->oFloor);
         }
 

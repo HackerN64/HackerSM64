@@ -162,8 +162,7 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
 }
 
 static u32 perform_water_step(struct MarioState *m) {
-    Vec3f nextPos;
-    Vec3f step;
+    Vec3f nextPos, step;
     struct Object *marioObj = m->marioObj;
 
     vec3f_copy(step, m->vel);
@@ -172,7 +171,7 @@ static u32 perform_water_step(struct MarioState *m) {
         apply_water_current(m, step);
     }
 
-    vec3_sum(nextPos, m->pos, step);
+    vec3f_sum(nextPos, m->pos, step);
 
     s16 waterSurf = (m->waterLevel - 80);
     if (nextPos[1] > waterSurf) {

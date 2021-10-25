@@ -31,7 +31,7 @@ struct EnvFxParticle {
 extern s8 gEnvFxMode;
 
 extern struct EnvFxParticle *gEnvFxBuffer;
-extern Vec3i gSnowCylinderLastPos;
+extern Vec3s gSnowCylinderLastPos;
 extern s16 gSnowParticleCount;
 
 Gfx *envfx_update_particles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom);

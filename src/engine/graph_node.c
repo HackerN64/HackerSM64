@@ -712,7 +712,7 @@ void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo 
     vec3_same(graphNode->scale, 1.0f);
     vec3s_copy(graphNode->angle, spawn->startAngle);
     
-    vec3_copy(graphNode->pos, spawn->startPos);
+    vec3s_to_vec3f(graphNode->pos, spawn->startPos);
 
     graphNode->areaIndex         = spawn->areaIndex;
     graphNode->activeAreaIndex   = spawn->activeAreaIndex;

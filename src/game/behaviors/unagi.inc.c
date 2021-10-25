@@ -38,7 +38,7 @@ void bhv_unagi_init(void) {
 void unagi_act_0(void) {
     if (o->oDistanceToMario > 4500.0f && o->oSubAction != UNAGI_SUB_ACT_SHIP_RESET_PATH_WAIT_FOR_MARIO) {
         o->oAction = UNAGI_ACT_SHIP_PATH;
-        vec3_copy(&o->oPosVec, o->oPathedStartWaypoint->pos);
+        vec3s_to_vec3f(&o->oPosVec, o->oPathedStartWaypoint->pos);
     } else if (o->oUnagiDistanceToMario < 700.0f) {
         o->oSubAction = UNAGI_SUB_ACT_SHIP_RESET_PATH_DO_RESET;
     }

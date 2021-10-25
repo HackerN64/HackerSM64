@@ -434,7 +434,7 @@ s32 object_step_without_floor_orient(void) {
 void obj_move_xyz_using_fvel_and_yaw(struct Object *obj) {
     obj->oVelX = obj->oForwardVel * sins(obj->oMoveAngleYaw);
     obj->oVelZ = obj->oForwardVel * coss(obj->oMoveAngleYaw);
-    vec3_add(&obj->oPosVec, &obj->oVelVec);
+    vec3f_add(&obj->oPosVec, &obj->oVelVec);
 }
 
 /**

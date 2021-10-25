@@ -70,7 +70,7 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos)
             // Move directly to the next waypoint, even if it's farther away
             // than amountToMove
             amountToMove -= distToNextWaypoint;
-            vec3_add(pos, d);
+            vec3f_add(pos, d);
         } while (amountToMove > 0.0f);
 
         // If we moved farther than amountToMove, move in the opposite direction
@@ -164,7 +164,7 @@ static void platform_on_track_act_init(void) {
     o->oPlatformOnTrackPrevWaypointFlags = WAYPOINT_FLAGS_NONE;
     o->oPlatformOnTrackBaseBallIndex = 0;
 
-    vec3_copy(&o->oHomeVec, o->oPlatformOnTrackStartWaypoint->pos);
+    vec3s_to_vec3f(&o->oHomeVec, o->oPlatformOnTrackStartWaypoint->pos);
     vec3f_copy(&o->oPosVec, &o->oHomeVec);
 
     o->oFaceAngleYaw = o->oBehParams2ndByte;

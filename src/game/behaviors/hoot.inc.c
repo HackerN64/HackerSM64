@@ -3,7 +3,7 @@
 void bhv_hoot_init(void) {
     cur_obj_init_animation(HOOT_ANIM_DEFAULT);
     Vec3f homeOffset = { 800.0f, -150.0f, 300.0f };
-    vec3_sum(&o->oHomeVec, &o->oPosVec, homeOffset);
+    vec3f_sum(&o->oHomeVec, &o->oPosVec, homeOffset);
     o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
 
     cur_obj_become_intangible();

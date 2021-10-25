@@ -26,7 +26,7 @@
  */
 
 struct EnvFxParticle *gEnvFxBuffer;
-Vec3i gSnowCylinderLastPos;
+Vec3s gSnowCylinderLastPos;
 s16 gSnowParticleCount;
 s16 gSnowParticleMaxCount;
 
@@ -203,7 +203,7 @@ void envfx_update_snow_normal(Vec3s snowCylinderPos) {
             (gEnvFxBuffer + i)->zPos += (((random_float() * 2) - 1.0f) + (s16)(delta[2] / 1.2f));
         }
     }
-    vec3_copy(gSnowCylinderLastPos, snowCylinderPos);
+    vec3s_copy(gSnowCylinderLastPos, snowCylinderPos);
 }
 
 /**
@@ -231,7 +231,7 @@ void envfx_update_snow_blizzard(Vec3s snowCylinderPos) {
             (gEnvFxBuffer + i)->zPos +=  (((random_float() * 2) - 1.0f) + (s16)(delta[2] / 1.2f));
         }
     }
-    vec3_copy(gSnowCylinderLastPos, snowCylinderPos);
+    vec3s_copy(gSnowCylinderLastPos, snowCylinderPos);
 }
 
 /**
@@ -264,9 +264,9 @@ void rotate_triangle_vertices(Vec3s vertex1, Vec3s vertex2, Vec3s vertex3, s16 p
     f32 sinMYaw  = sins(-yaw);
 
     Vec3f v1, v2, v3;
-    vec3_copy(v1, vertex1);
-    vec3_copy(v2, vertex2);
-    vec3_copy(v3, vertex3);
+    vec3s_to_vec3f(v1, vertex1);
+    vec3s_to_vec3f(v2, vertex2);
+    vec3s_to_vec3f(v3, vertex3);
 
     f32 spsy = ( sinPitch * sinMYaw );
     f32 spcy = (-sinPitch * cosMYaw );

@@ -33,7 +33,7 @@ void bhv_chain_chomp_chain_part_update(void) {
     } else if (o->oBehParams2ndByte != CHAIN_CHOMP_CHAIN_PART_BP_PIVOT) {
         struct ChainSegment *segment = &o->parentObj->oChainChompSegments[o->oBehParams2ndByte];
         // Set position relative to the pivot
-        vec3_sum(&o->oPosVec, &o->parentObj->parentObj->oPosVec, segment->pos);
+        vec3f_sum(&o->oPosVec, &o->parentObj->parentObj->oPosVec, segment->pos);
     } else if (o->parentObj->oChainChompReleaseStatus != CHAIN_CHOMP_NOT_RELEASED) {
         cur_obj_update_floor_and_walls();
         cur_obj_move_standard(78);
@@ -102,7 +102,7 @@ static void chain_chomp_update_chain_segments(void) {
         vec3_normalize_max(offset, o->oChainChompMaxDistBetweenChainParts);
 
         // Cap distance to pivot (so that it stretches when the chomp moves far from the wooden post)
-        vec3_add(offset, prevSegment->pos);
+        vec3f_add(offset, prevSegment->pos);
         f32 maxTotalDist = o->oChainChompMaxDistFromPivotPerChainPart * (CHAIN_CHOMP_NUM_SEGMENTS - i);
         vec3_normalize_max(offset, maxTotalDist);
 
@@ -364,7 +364,7 @@ static void chain_chomp_act_move(void) {
 
             if (o->oChainChompReleaseStatus == CHAIN_CHOMP_NOT_RELEASED) {
                 // Restrict chain chomp position
-                vec3_sum(&o->oPosVec, &o->parentObj->oPosVec, o->oChainChompSegments[0].pos);
+                vec3f_sum(&o->oPosVec, &o->parentObj->oPosVec, o->oChainChompSegments[0].pos);
                 o->oChainChompRestrictedByChain = TRUE;
             } else {
                 // Move pivot like the chain chomp is pulling it along

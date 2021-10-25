@@ -660,7 +660,7 @@ void update_moving_texture_offset(s16 *movtexVerts, s32 attr) {
  */
 void movtex_write_vertex_first(Vtx *vtx, s16 *movtexVerts, struct MovtexObject *c, s8 attrLayout) {
     Vec3s pos;
-    vec3_copy(pos, &movtexVerts[MOVTEX_ATTR_POS_INDEX]);
+    vec3s_copy(pos, &movtexVerts[MOVTEX_ATTR_POS_INDEX]);
     u8 alpha = c->a;
     ColorRGB color;
     s16 s, t;
@@ -697,7 +697,7 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, s16 *movtexVerts, struct M
     switch (attrLayout) {
         case MOVTEX_LAYOUT_NOCOLOR:
             entryStart = (index * 5);
-            vec3_copy(pos, &movtexVerts[entryStart + MOVTEX_ATTR_POS_INDEX]);
+            vec3s_copy(pos, &movtexVerts[entryStart + MOVTEX_ATTR_POS_INDEX]);
             baseS = movtexVerts[MOVTEX_ATTR_NOCOLOR_S];
             baseT = movtexVerts[MOVTEX_ATTR_NOCOLOR_T];
             offS = movtexVerts[entryStart + MOVTEX_ATTR_NOCOLOR_S];
@@ -708,7 +708,7 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, s16 *movtexVerts, struct M
             break;
         case MOVTEX_LAYOUT_COLORED:
             entryStart = (index * 8);
-            vec3_copy(pos, &movtexVerts[entryStart + MOVTEX_ATTR_POS_INDEX]);
+            vec3s_copy(pos, &movtexVerts[entryStart + MOVTEX_ATTR_POS_INDEX]);
             baseS = movtexVerts[MOVTEX_ATTR_COLORED_S];
             baseT = movtexVerts[MOVTEX_ATTR_COLORED_T];
             offS = movtexVerts[entryStart + MOVTEX_ATTR_COLORED_S];

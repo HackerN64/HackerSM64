@@ -196,7 +196,7 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
         mtxf_rotate_zxy_and_translate(displaceMatrix, currentObjectOffset, rotation);
         linear_mtxf_transpose_mul_vec3f(displaceMatrix, relativeOffset, currentObjectOffset);
 
-        vec3_copy(rotation, &platform->oFaceAngleVec);
+        vec3i_to_vec3s(rotation, &platform->oFaceAngleVec);
 
         mtxf_rotate_zxy_and_translate(displaceMatrix, currentObjectOffset, rotation);
         linear_mtxf_mul_vec3f(displaceMatrix, newObjectOffset, relativeOffset);

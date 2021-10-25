@@ -528,7 +528,7 @@ void geo_process_translation_rotation(struct GraphNodeTranslationRotation *node)
     Mat4 mtxf;
     Vec3f translation;
 
-    vec3_copy(translation, node->translation);
+    vec3s_to_vec3f(translation, node->translation);
     mtxf_rotate_zxy_and_translate(mtxf, translation, node->rotation);
     mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, gMatStack[gMatStackIndex]);
     inc_mat_stack();
@@ -544,7 +544,7 @@ void geo_process_translation(struct GraphNodeTranslation *node) {
     Mat4 mtxf;
     Vec3f translation;
 
-    vec3_copy(translation, node->translation);
+    vec3s_to_vec3f(translation, node->translation);
     mtxf_rotate_zxy_and_translate(mtxf, translation, gVec3sZero);
     mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, gMatStack[gMatStackIndex]);
     inc_mat_stack();
@@ -588,7 +588,7 @@ void geo_process_scale(struct GraphNodeScale *node) {
 void geo_process_billboard(struct GraphNodeBillboard *node) {
     Vec3f translation;
 
-    vec3_copy(translation, node->translation);
+    vec3s_to_vec3f(translation, node->translation);
     mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], translation, gCurGraphNodeCamera->roll);
 
     if (gCurGraphNodeHeldObject != NULL) {

@@ -447,8 +447,8 @@ void obj_copy_pos(struct Object *dst, struct Object *src) {
 }
 
 void obj_copy_angle(struct Object *dst, struct Object *src) {
-    vec3_copy(&dst->oMoveAngleVec, &src->oMoveAngleVec);
-    vec3_copy(&dst->oFaceAngleVec, &src->oFaceAngleVec);
+    vec3i_copy(&dst->oMoveAngleVec, &src->oMoveAngleVec);
+    vec3i_copy(&dst->oFaceAngleVec, &src->oFaceAngleVec);
 }
 
 void obj_set_gfx_pos_from_pos(struct Object *obj) {
@@ -564,7 +564,7 @@ void cur_obj_unused_init_on_floor(void) {
 }
 
 void obj_set_face_angle_to_move_angle(struct Object *obj) {
-    vec3_copy(&obj->oFaceAngleVec, &obj->oMoveAngleVec);
+    vec3i_copy(&obj->oFaceAngleVec, &obj->oMoveAngleVec);
 }
 
 u32 get_object_list_from_behavior(const BehaviorScript *behavior) {
@@ -1449,7 +1449,7 @@ UNUSED static s32 cur_obj_within_bounds(f32 bounds) {
 
 void cur_obj_move_using_vel_and_gravity(void) {
     o->oVelY += o->oGravity; //! No terminal velocity
-    vec3_add(&o->oPosVec, &o->oVelVec);
+    vec3f_add(&o->oPosVec, &o->oVelVec);
 }
 
 void cur_obj_move_using_fvel_and_gravity(void) {
@@ -1502,7 +1502,7 @@ void obj_build_transform_from_pos_and_angle(struct Object *obj, s16 posIndex, s1
     Vec3f translate;
     vec3f_copy(translate, &obj->rawData.asF32[posIndex]);
     Vec3s rotation;
-    vec3_copy(rotation,  &obj->rawData.asS32[angleIndex]);
+    vec3i_to_vec3s(rotation,  &obj->rawData.asS32[angleIndex]);
     mtxf_rotate_zxy_and_translate(obj->transform, translate, rotation);
 }
 
@@ -1548,7 +1548,7 @@ void cur_obj_rotate_face_angle_using_vel(void) {
 }
 
 void cur_obj_set_face_angle_to_move_angle(void) {
-    vec3_copy(&o->oFaceAngleVec, &o->oMoveAngleVec);
+    vec3i_copy(&o->oFaceAngleVec, &o->oMoveAngleVec);
 }
 
 s32 cur_obj_follow_path(void) {
@@ -1619,7 +1619,7 @@ static void obj_build_vel_from_transform(struct Object *obj) {
 void cur_obj_set_pos_via_transform(void) {
     obj_build_transform_from_pos_and_angle(o, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX);
     obj_build_vel_from_transform(o);
-    vec3_add(&o->oPosVec, &o->oVelVec);
+    vec3f_add(&o->oPosVec, &o->oVelVec);
 }
 
 s32 cur_obj_reflect_move_angle_off_wall(void) {
@@ -1727,7 +1727,7 @@ void cur_obj_push_mario_away_from_cylinder(f32 radius, f32 extentY) {
 }
 
 void bhv_dust_smoke_loop(void) {
-    vec3_add(&o->oPosVec, &o->oVelVec);
+    vec3f_add(&o->oPosVec, &o->oVelVec);
     if (o->oSmokeTimer == 10) {
         obj_mark_for_deletion(o);
     }

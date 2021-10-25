@@ -807,7 +807,7 @@ void puppycam_debug_view(void) {
         gPuppyCam.focus[2] = gPuppyCam.pos[2] + (100 * sins(gPuppyCam.yawTarget));
     } else {
         if (gPuppyCam.debugFlags & PUPPYDEBUG_TRACK_MARIO) {
-            vec3_copy(gPuppyCam.focus, &gPuppyCam.targetObj->oPosVec);
+            vec3f_to_vec3s(gPuppyCam.focus, &gPuppyCam.targetObj->oPosVec);
         }
 
         gPuppyCam.yawTarget   = atan2s(gPuppyCam.pos[2] - gPuppyCam.focus[2], gPuppyCam.pos[0] - gPuppyCam.focus[0]);
@@ -1271,7 +1271,7 @@ static void puppycam_collision(void) {
             gPuppyCam.zoom = MIN(gPuppyCam.collisionDistance, gPuppyCam.zoomTarget);
             if (gPuppyCam.zoom - gPuppyCam.zoomTarget < 5) {
                 if (dist[0] >= dist[1]) {
-                    vec3_copy(gPuppyCam.pos, hitpos[0]);
+                    vec3s_to_vec3f(gPuppyCam.pos, hitpos[0]);
                 } else {
                     vec3_copy_y_off(gPuppyCam.pos, hitpos[1], (gPuppyCam.povHeight * 0.6f));
                 }

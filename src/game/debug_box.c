@@ -453,7 +453,7 @@ void debug_box_pos_rot(Vec3f pMin, Vec3f pMax, s16 yaw, s32 type) {
     bounds[1] = ((pMax[1] - pMin[1]) / 2.0f);
     bounds[2] = ((pMax[2] - pMin[2]) / 2.0f);
 
-    vec3_sum(center, pMin, bounds);
+    vec3f_sum(center, pMin, bounds);
 
     append_debug_box(center, bounds, yaw, type);
 }

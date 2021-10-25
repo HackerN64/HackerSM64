@@ -3377,7 +3377,7 @@ void shake_camera_handheld(Vec3f pos, Vec3f focus) {
         vec3_zero(shakeOffset);
     } else {
         for (i = 0; i < 4; i++) {
-            vec3_copy(shakeSpline[i], sHandheldShakeSpline[i].point);
+            vec3s_to_vec3f(shakeSpline[i], sHandheldShakeSpline[i].point);
         }
         evaluate_cubic_spline(sHandheldShakeTimer, shakeOffset, shakeSpline[0],
                               shakeSpline[1], shakeSpline[2], shakeSpline[3]);
@@ -4446,7 +4446,7 @@ void warp_camera(Vec3s disp) {
 
     gCurrLevelArea = ((gCurrLevelNum * 16) + gCurrentArea->index);
     Vec3f displacement;
-    vec3_copy(displacement, disp);
+    vec3s_to_vec3f(displacement, disp);
     vec3f_add(gLakituState.curPos,    displacement);
     vec3f_add(gLakituState.curFocus,  displacement);
     vec3f_add(gLakituState.goalPos,   displacement);
@@ -4664,7 +4664,7 @@ s32 set_camera_mode_fixed(struct Camera *c, s16 x, s16 y, s16 z) {
         basePosSet = TRUE;
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
     }
-    vec3_copy(sFixedModeBasePosition, pos);
+    vec3f_copy(sFixedModeBasePosition, pos);
     if (c->mode != CAMERA_MODE_FIXED) {
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
         c->mode = CAMERA_MODE_FIXED;
@@ -8907,8 +8907,8 @@ void cutscene_exit_painting_start(struct Camera *c) {
         sCutsceneVars[1].point[1] = 0.0f;
         sCutsceneVars[1].point[2] = 0.0f;
     }
-    vec3_copy(sCutsceneVars[0].point, sMarioCamState->pos);
-    vec3_set( sCutsceneVars[0].angle, 0x0, sMarioCamState->faceAngle[1], 0x0);
+    vec3f_copy(sCutsceneVars[0].point, sMarioCamState->pos);
+    vec3s_set( sCutsceneVars[0].angle, 0x0, sMarioCamState->faceAngle[1], 0x0);
     offset_rotated(c->focus, sCutsceneVars[0].point, sCutsceneVars[1].point, sCutsceneVars[0].angle);
     offset_rotated(c->pos,   sCutsceneVars[0].point, sCutsceneVars[2].point, sCutsceneVars[0].angle);
     f32 floorHeight = find_floor(c->pos[0], (c->pos[1] + 10.0f), c->pos[2], &floor);
@@ -9051,13 +9051,13 @@ void cutscene_enter_cannon_raise(struct Camera *c) {
 
     if ((obj = sMarioCamState->usedObj) != NULL) {
         sCutsceneVars[0].point[1] = obj->oPosY;
-        vec3_copy(cannonAngle, &obj->oMoveAngleVec);
+        vec3i_to_vec3s(cannonAngle, &obj->oMoveAngleVec);
         vec3f_copy(c->focus, &obj->oPosVec);
-        vec3_set(cannonFocus, 0.0f, 100.0f, 0.0f);
+        vec3f_set(cannonFocus, 0.0f, 100.0f, 0.0f);
         offset_rotated(c->focus, c->focus, cannonFocus, cannonAngle);
     }
 
-    f32 floorHeight = find_floor(c->pos[0], c->pos[1] + 500.0f, c->pos[2], &floor) + 100.0f;
+    f32 floorHeight = (find_floor(c->pos[0], (c->pos[1] + 500.0f), c->pos[2], &floor) + 100.0f);
 
     if (c->pos[1] < floorHeight) {
         c->pos[1] = floorHeight;
@@ -9076,7 +9076,7 @@ void cutscene_enter_cannon_start(struct Camera *c) {
     // Store the cannon's position and angle in cvar0
     if ((obj = sMarioCamState->usedObj) != NULL) {
         vec3f_copy(sCutsceneVars[0].point, &obj->oPosVec);
-        vec3_copy(sCutsceneVars[0].angle, &obj->oMoveAngleVec);
+        vec3i_to_vec3s(sCutsceneVars[0].angle, &obj->oMoveAngleVec);
     }
 
     // Store the camera's polar offset from the cannon in cvar1

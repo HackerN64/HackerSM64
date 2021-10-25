@@ -322,7 +322,7 @@ void init_mario_after_warp(struct MarioState *m) {
     u32 marioSpawnType = get_mario_spawn_type(spawnNode->object);
 
     if (m->action != ACT_UNINITIALIZED) {
-        vec3_copy(gPlayerSpawnInfos[0].startPos, &spawnNode->object->oPosVec);
+        vec3f_to_vec3s(gPlayerSpawnInfos[0].startPos, &spawnNode->object->oPosVec);
 
         gPlayerSpawnInfos[0].startAngle[0] = 0;
         gPlayerSpawnInfos[0].startAngle[1] = spawnNode->object->oMoveAngleYaw;

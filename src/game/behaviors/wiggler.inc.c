@@ -81,7 +81,7 @@ void bhv_wiggler_body_part_update(void) {
     f32 dxz  =  (posOffset * sins(o->oFaceAnglePitch));
     d[0] = dxz * sins(o->oFaceAngleYaw);
     d[2] = dxz * coss(o->oFaceAngleYaw);
-    vec3_sum(&o->oPosVec, segment->pos, d);
+    vec3f_sum(&o->oPosVec, segment->pos, d);
 
     if (o->oPosY < o->parentObj->oWigglerFallThroughFloorsHeight) {
         //! Since position is recomputed each frame, tilting the wiggler up while
@@ -122,7 +122,7 @@ void wiggler_init_segments(void) {
         o->oWigglerSegments = segments;
         for (i = 0; i < WIGGLER_NUM_SEGMENTS; i++) {
             chain_segment_init(segments + i);
-            vec3_copy((segments + i)->pos, &o->oPosVec);
+            vec3f_copy((segments + i)->pos, &o->oPosVec);
             (segments + i)->angle[0] = o->oFaceAnglePitch;
             (segments + i)->angle[1] = o->oFaceAngleYaw;
         }
@@ -418,7 +418,7 @@ void bhv_wiggler_update(void) {
         }
 
         // Update segment 0 with data from the wiggler object
-        vec3_copy(o->oWigglerSegments[0].pos, &o->oPosVec);
+        vec3f_copy(o->oWigglerSegments[0].pos, &o->oPosVec);
         o->oWigglerSegments[0].angle[0] = o->oFaceAnglePitch;
         o->oWigglerSegments[0].angle[1] = o->oFaceAngleYaw;
 

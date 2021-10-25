@@ -558,14 +558,14 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
     obj_apply_scale_to_matrix(o, m, *objectTransform);
 
     // Go through all vertices, rotating and translating them to transform the object.
-    register Vec3f v;
+    Vec3f v;
     while (numVertices--) {
-        vec3_copy(v, vertices);
+        vec3s_to_vec3f(v, vertices);
         vertices += 3;
 
         //! No bounds check on vertex data
         if ((v[0] == 0) && (v[1] == 0) && (v[2] == 0)) {
-            vec3_copy(vertexData, m[3]);
+            vec3f_to_vec3s(vertexData, m[3]);
         } else {
             linear_mtxf_mul_vec3_and_translate(m, vertexData, v);
         }
