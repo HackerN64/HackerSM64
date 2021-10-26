@@ -157,20 +157,20 @@ enum WarpTypes {
 };
 
 enum WarpNodes {
-    WARP_NODE_DEFAULT = 0xF0,
-    WARP_NODE_DEATH,
-    WARP_NODE_LOOK_UP,
-    WARP_NODE_WARP_FLOOR,
+    WARP_NODE_DEFAULT       = 0xF0,
+    WARP_NODE_DEATH         = 0xF1,
+    WARP_NODE_LOOK_UP       = 0xF2,
+    WARP_NODE_WARP_FLOOR    = 0xF3,
     WARP_NODE_CREDITS_MIN   = 0xF8,
     WARP_NODE_CREDITS_START = 0xF8,
-    WARP_NODE_CREDITS_NEXT,
-    WARP_NODE_CREDITS_END
+    WARP_NODE_CREDITS_NEXT  = 0xF9,
+    WARP_NODE_CREDITS_END   = 0xFA
 };
 
-u32 level_control_timer(s32 timerOp);
+u32  level_control_timer(s32 timerOp);
 void fade_into_special_warp(u32 arg, u32 color);
 void load_level_init_text(u32 arg);
-s32 level_trigger_warp(struct MarioState *m, s32 warpOp);
+s32  level_trigger_warp(struct MarioState *m, s32 warpOp);
 void level_set_transition(s16 length, void (*updateFunction)());
 
 s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 levelNum);
