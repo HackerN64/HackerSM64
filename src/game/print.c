@@ -33,7 +33,7 @@ s32 int_pow(s32 n, s32 exponent) {
     s32 i;
 
     for (i = 0; i < exponent; i++) {
-        result = n * result;
+        result *= n;
     }
 
     return result;
@@ -50,13 +50,7 @@ void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 
     s32 len = 0;
     s8 digit;
     s8 negative = FALSE;
-    char pad;
-
-    if (zeroPad) {
-        pad = '0';
-    } else {
-        pad = -1;
-    }
+    char pad = (zeroPad ? '0' : -1);
 
     if (n != 0) {
         // Formats a negative number for negative prefix.
@@ -93,15 +87,15 @@ void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 
         }
 
         // Transfer the digits into the proper base.
-        for (i = numDigits - 1; i >= 0; i--) {
+        for (i = (numDigits - 1); i >= 0; i--) {
             powBase = int_pow(base, i);
-            digit = n / powBase;
+            digit = (n / powBase);
 
             // FIXME: Why doesn't [] match?
             if (digit < 10) {
-                *(dest + len + numDigits - 1 - i) = digit + '0';
+                *(((dest + len + numDigits) - 1) - i) = (digit + '0');
             } else {
-                *(dest + len + numDigits - 1 - i) = digit + '7';
+                *(((dest + len + numDigits) - 1) - i) = (digit + '7');
             }
 
             n -= digit * powBase;
@@ -154,11 +148,11 @@ void parse_width_field(const char *str, s32 *srcIndex, u8 *width, s8 *zeroPad) {
     }
 
     // Sum the digits to calculate the total width.
-    for (i = 0; i < digitsLen - 1; i++) {
-        *width = *width + digits[i] * ((digitsLen - i - 1) * 10);
+    for (i = 0; i < (digitsLen - 1); i++) {
+        *width += (digits[i] * (((digitsLen - i) - 1) * 10));
     }
 
-    *width = *width + digits[digitsLen - 1];
+    *width += digits[digitsLen - 1];
 }
 
 /**
@@ -205,7 +199,7 @@ void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
 
             srcIndex++;
 
-            format_integer(n, base, sTextLabels[sTextLabelsCount]->buffer + len, &len, width, zeroPad);
+            format_integer(n, base, (sTextLabels[sTextLabelsCount]->buffer + len), &len, width, zeroPad);
         } else { // straight copy
             sTextLabels[sTextLabelsCount]->buffer[len] = c;
             len++;
@@ -254,7 +248,7 @@ void print_text(s32 x, s32 y, const char *str) {
  */
 void print_text_centered(s32 x, s32 y, const char *str) {
     char c = 0;
-    s32 length = 0;
+    s32 length   = 0;
     s32 srcIndex = 0;
 
     // Don't continue if there is no memory to do so.
@@ -274,7 +268,7 @@ void print_text_centered(s32 x, s32 y, const char *str) {
     }
 
     sTextLabels[sTextLabelsCount]->length = length;
-    sTextLabels[sTextLabelsCount]->x = x - length * 12 / 2;
+    sTextLabels[sTextLabelsCount]->x = (x - (length * 6)); // * 12 / 2));
     sTextLabels[sTextLabelsCount]->y = y;
     sTextLabelsCount++;
 }
@@ -283,9 +277,9 @@ void print_text_centered(s32 x, s32 y, const char *str) {
  * Converts a char into the proper colorful glyph for the char.
  */
 s32 char_to_glyph_index(char c) {
-    if (c >= 'A' && c <= 'Z') return c - 55;
-    if (c >= 'a' && c <= 'z') return c - 87;
-    if (c >= '0' && c <= '9') return c - 48;
+    if (c >= 'A' && c <= 'Z') return (c - 55);
+    if (c >= 'a' && c <= 'z') return (c - 87);
+    if (c >= '0' && c <= '9') return (c - 48);
     if (c == ' ') return GLYPH_SPACE;
     if (c == '!') return GLYPH_EXCLAMATION_PNT; // !, JP only
     if (c == '#') return GLYPH_TWO_EXCLAMATION; // !!, JP only
@@ -331,8 +325,8 @@ void clip_to_bounds(s32 *x, s32 *y) {
  * Renders the glyph that's set at the given position.
  */
 void render_textrect(s32 x, s32 y, s32 pos) {
-    s32 rectBaseX = x + pos * 12;
-    s32 rectBaseY = 224 - y;
+    s32 rectBaseX = (x + (pos * 12));
+    s32 rectBaseY = (224 - y);
     s32 rectX, rectY;
 
 #ifndef WIDESCREEN
@@ -341,8 +335,8 @@ void render_textrect(s32 x, s32 y, s32 pos) {
 #endif
     rectX = rectBaseX;
     rectY = rectBaseY;
-    gSPTextureRectangle(gDisplayListHead++, rectX << 2, rectY << 2, (rectX + 15) << 2,
-                        (rectY + 15) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
+    gSPTextureRectangle(gDisplayListHead++, (rectX << 2), (rectY << 2), ((rectX + 15) << 2),
+                        ((rectY + 15) << 2), G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10));
 }
 
 /**
@@ -352,13 +346,12 @@ void render_textrect(s32 x, s32 y, s32 pos) {
 void render_text_labels(void) {
     s32 i, j;
     s8 glyphIndex;
-    Mtx *mtx;
 
     if (sTextLabelsCount == 0) {
         return;
     }
 
-    mtx = alloc_display_list(sizeof(*mtx));
+    Mtx *mtx = alloc_display_list(sizeof(*mtx));
 
     if (mtx == NULL) {
         sTextLabelsCount = 0;
@@ -367,7 +360,7 @@ void render_text_labels(void) {
 
     guOrtho(mtx, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
     gSPPerspNormalize((Gfx *) (gDisplayListHead++), 0xFFFF);
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
     gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
 
     for (i = 0; i < sTextLabelsCount; i++) {
@@ -383,7 +376,7 @@ void render_text_labels(void) {
                     render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);
 
                     add_glyph_texture(GLYPH_UMLAUT);
-                    render_textrect(sTextLabels[i]->x, sTextLabels[i]->y + 3, j);
+                    render_textrect(sTextLabels[i]->x, (sTextLabels[i]->y + 3), j);
                 } else {
                     add_glyph_texture(glyphIndex);
                     render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);

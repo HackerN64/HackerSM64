@@ -597,14 +597,14 @@ void drawscene(enum SceneType process, struct ObjGroup *interactables, struct Ob
                       sUpdateViewState.view->clipping.x, sUpdateViewState.view->clipping.y);
     } else {
         gd_create_ortho_matrix(
-            -sUpdateViewState.view->lowerRight.x / 2.0f, sUpdateViewState.view->lowerRight.x / 2.0f,
-            -sUpdateViewState.view->lowerRight.y / 2.0f, sUpdateViewState.view->lowerRight.y / 2.0f,
+            (-sUpdateViewState.view->lowerRight.x / 2.0f), (sUpdateViewState.view->lowerRight.x / 2.0f),
+            (-sUpdateViewState.view->lowerRight.y / 2.0f), (sUpdateViewState.view->lowerRight.y / 2.0f),
             sUpdateViewState.view->clipping.x, sUpdateViewState.view->clipping.y);
     }
 
     if (lightgrp != NULL) {
         set_gd_mtx_parameters(G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH);
-        apply_to_obj_types_in_group(OBJ_TYPE_LIGHTS | OBJ_TYPE_PARTICLES,
+        apply_to_obj_types_in_group((OBJ_TYPE_LIGHTS | OBJ_TYPE_PARTICLES),
                                     (applyproc_t) apply_obj_draw_fn, lightgrp);
         set_gd_mtx_parameters(G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH);
     }

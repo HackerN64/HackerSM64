@@ -135,6 +135,6 @@ extern struct Painting *gRipplingPainting;
 extern s8 gDddPaintingStatus;
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
-Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 c);
+Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx);
 
 #endif // PAINTINGS_H

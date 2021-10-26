@@ -141,7 +141,6 @@ TerrainData *gEnvironmentRegions;
 s32 gEnvironmentLevels[20];
 RoomData gDoorAdjacentRooms[60][2];
 s16 gMarioCurrentRoom;
-s16 gDoorRenderingTimer;
 s16 gTHIWaterDrained;
 s16 gTTCSpeedSetting;
 s16 gMarioShotFromCannon;
@@ -554,7 +553,7 @@ void update_objects(void) {
 
     gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
 
-    gNumRoomedObjectsInMarioRoom = 0;
+    gNumRoomedObjectsInMarioRoom    = 0;
     gNumRoomedObjectsNotInMarioRoom = 0;
     gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
 
