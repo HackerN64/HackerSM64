@@ -450,22 +450,27 @@ void update_walking_speed(struct MarioState *m) {
     }
 #endif
 
+#ifdef BACKWARDS_CONTROLS_FIX
+    s16 targetYaw = ((m->forwardVel < 0.0f) ? (m->intendedYaw + 0x8000) : m->intendedYaw);
+#else
+    s16 targetYaw = m->intendedYaw;
+#endif
 #ifdef GROUND_TURN_FIX
     if ((m->heldObj == NULL) && !(m->action & ACT_FLAG_SHORT_HITBOX)) {
         if (m->forwardVel >= 16.0f) {
-            s16 turnRange = abs_angle_diff(m->faceAngle[1], m->intendedYaw);
+            s16 turnRange = abs_angle_diff(m->faceAngle[1], targetYaw);
             f32 fac = (m->forwardVel + m->intendedMag);
             turnRange *= (1.0f - (CLAMP(fac, 0.0f, 32.0f) / 32.0f));
             turnRange = MAX(turnRange, 0x800);
-            approach_angle_bool(&m->faceAngle[1], m->intendedYaw, turnRange);
+            approach_angle_bool(&m->faceAngle[1], targetYaw, turnRange);
         } else {
-            m->faceAngle[1] = m->intendedYaw;
+            m->faceAngle[1] = targetYaw;
         }
     } else {
-        approach_angle_bool(&m->faceAngle[1], m->intendedYaw, 0x800);
+        approach_angle_bool(&m->faceAngle[1], targetYaw, 0x800);
     }
 #else
-    approach_angle_bool(&m->faceAngle[1], m->intendedYaw, 0x800);
+    approach_angle_bool(&m->faceAngle[1], targetYaw, 0x800);
 #endif
     apply_slope_accel(m);
 }
@@ -763,9 +768,9 @@ s32 act_walking(struct MarioState *m) {
         return begin_braking_action(m);
     }
 #ifdef GROUND_TURNING_AROUND_FIX
-    if (analog_stick_held_back(m)) {
+    if (analog_stick_held_back(m) && (m->forwardVel >=  0.0f)) {
 #else
-    if (analog_stick_held_back(m) && m->forwardVel >= 16.0f) {
+    if (analog_stick_held_back(m) && (m->forwardVel >= 16.0f)) {
 #endif
         return set_mario_action(m, ACT_TURNING_AROUND, 0);
     }

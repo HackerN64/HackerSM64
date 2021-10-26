@@ -15,6 +15,9 @@
 // This can happen when sliding backwards off a slope onto a floor.
 //#define GROUND_SPEED_FLIP
 
+// Flips analog stick direction when moving backwards
+#define BACKWARDS_CONTROLS_FIX
+
 // Improved hanging:
 // - Doesn't require holding down the A button
 // - Percise turning control
@@ -90,6 +93,6 @@
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
 
-#ifdef GROUND_TURNING_AROUND_FIX
-#undef GROUND_TURN_FIX
-#endif // GROUND_TURNING_AROUND_FIX
+// #ifdef GROUND_TURNING_AROUND_FIX
+// #undef GROUND_TURN_FIX
+// #endif // GROUND_TURNING_AROUND_FIX
