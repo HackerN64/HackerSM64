@@ -16,34 +16,32 @@
 #include "levels/sa/header.h"
 
 static const LevelScript script_func_local_1[] = {
-    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFishSpawner),
-    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00020000, /*beh*/ bhvFishSpawner),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x00, 0x00, 0x00, 0x00), /*beh*/ bhvFishSpawner),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x00, 0x02, 0x00, 0x00), /*beh*/ bhvFishSpawner),
     RETURN(),
 };
 
 static const LevelScript script_func_local_2[] = {
-    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -4250, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvHiddenRedCoinStar),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -4250, 0, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x00, 0x00, 0x00, 0x00), /*beh*/ bhvHiddenRedCoinStar),
     RETURN(),
 };
 
 const LevelScript level_sa_entry[] = {
     INIT_LEVEL(),
-    LOAD_YAY0(        /*seg*/ SEGMENT_LEVEL_DATA, _sa_segment_7SegmentRomStart, _sa_segment_7SegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_TEXTURE, _inside_yay0SegmentRomStart, _inside_yay0SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ SEGMENT_SKYBOX, _cloud_floor_skybox_yay0SegmentRomStart, _cloud_floor_skybox_yay0SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ SEGMENT_EFFECT_YAY0, _effect_yay0SegmentRomStart, _effect_yay0SegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ SEGMENT_GROUPA_YAY0, _group4_yay0SegmentRomStart, _group4_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ SEGMENT_GROUPA_GEO, _group4_geoSegmentRomStart,  _group4_geoSegmentRomEnd),
-    LOAD_YAY0(        /*seg*/ SEGMENT_GROUPB_YAY0, _group13_yay0SegmentRomStart, _group13_yay0SegmentRomEnd),
-    LOAD_RAW(         /*seg*/ SEGMENT_GROUPB_GEO, _group13_geoSegmentRomStart,  _group13_geoSegmentRomEnd),
+    LOAD_LEVEL_DATA(sa),
+    LOAD_TEXTURE_BIN(inside),
+    LOAD_SKYBOX(cloud_floor),
+    LOAD_EFFECTS(),
+    LOAD_GROUPA(group4),
+    LOAD_GROUPB(group13),
     ALLOC_LEVEL_POOL(),
-    MARIO(/*model*/ MODEL_MARIO, /*behParam*/ 0x00000001, /*beh*/ bhvMario),
-    JUMP_LINK(script_func_global_5),
-    JUMP_LINK(script_func_global_14),
+    MARIO(/*model*/ MODEL_MARIO, /*behParam*/ BP(0x00, 0x00, 0x00, 0x01), /*beh*/ bhvMario),
+    LOAD_ACTOR_MODELS(group4),
+    LOAD_ACTOR_MODELS(group13),
 
     AREA(/*index*/ 1, sa_geo_000170),
-        OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1535, 0, /*angle*/ 0, 90, 0, /*behParam*/ 0x000A0000, /*beh*/ bhvSwimmingWarp),
-        WARP_NODE(/*id*/ 0x0A, /*destLevel*/ LEVEL_SA, /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
+        OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1535, 0, /*angle*/ 0, 90, 0, /*behParam*/ BP(0x00, 0x0A, 0x00, 0x00), /*beh*/ bhvSwimmingWarp),
+        WARP_NODE(/*id*/ 0x0A, /*destLevel*/ LEVEL_SA,     /*destArea*/ 0x01, /*destNode*/ 0x0A, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF0, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x27, /*flags*/ WARP_NO_CHECKPOINT),
         WARP_NODE(/*id*/ 0xF1, /*destLevel*/ LEVEL_CASTLE, /*destArea*/ 0x01, /*destNode*/ 0x28, /*flags*/ WARP_NO_CHECKPOINT),
         JUMP_LINK(script_func_local_1),
@@ -56,7 +54,7 @@ const LevelScript level_sa_entry[] = {
 
     FREE_LEVEL_POOL(),
     MARIO_POS(/*area*/ 1, /*yaw*/ 90, /*pos*/ 0, -1535, 0),
-    CALL(/*arg*/ 0, /*func*/ lvl_init_or_update),
+    CALL(     /*arg*/ 0, /*func*/ lvl_init_or_update),
     CALL_LOOP(/*arg*/ 1, /*func*/ lvl_init_or_update),
     CLEAR_LEVEL(),
     SLEEP_BEFORE_EXIT(/*frames*/ 1),

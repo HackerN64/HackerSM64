@@ -20,9 +20,9 @@
 
 const LevelScript level_main_menu_entry_file_select[] = {
     INIT_LEVEL(),
-    FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
-    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _menu_segment_7SegmentRomStart, _menu_segment_7SegmentRomEnd),
-    LOAD_RAW(/*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
+    LOAD_GODDARD(),
+    LOAD_LEVEL_DATA(menu),
+    LOAD_BEHAVIOR_DATA(),
     ALLOC_LEVEL_POOL(),
     LOAD_MODEL_FROM_GEO(MODEL_MAIN_MENU_MARIO_SAVE_BUTTON,      geo_menu_mario_save_button),
     LOAD_MODEL_FROM_GEO(MODEL_MAIN_MENU_RED_ERASE_BUTTON,       geo_menu_erase_button),
@@ -36,8 +36,8 @@ const LevelScript level_main_menu_entry_file_select[] = {
     LOAD_MODEL_FROM_GEO(MODEL_MAIN_MENU_GENERIC_BUTTON,         geo_menu_generic_button),
 
     AREA(/*index*/ 1, geo_menu_file_select_strings_and_menu_cursor),
-        OBJECT(/*model*/ MODEL_NONE,                         /*pos*/ 0, 0, -19000, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvMenuButtonManager),
-        OBJECT(/*model*/ MODEL_MAIN_MENU_YELLOW_FILE_BUTTON, /*pos*/ 0, 0, -19000, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvYellowBackgroundInMenu),
+        OBJECT(/*model*/ MODEL_NONE,                         /*pos*/ 0, 0, -19000, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x04, 0x00, 0x00, 0x00), /*beh*/ bhvMenuButtonManager),
+        OBJECT(/*model*/ MODEL_MAIN_MENU_YELLOW_FILE_BUTTON, /*pos*/ 0, 0, -19000, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x04, 0x00, 0x00, 0x00), /*beh*/ bhvYellowBackgroundInMenu),
         TERRAIN(/*terrainData*/ main_menu_seg7_collision),
     END_AREA(),
 
@@ -58,15 +58,15 @@ const LevelScript level_main_menu_entry_file_select[] = {
 };
 
 const LevelScript level_main_menu_entry_act_select[] = {
-    /*0*/ CALL(/*arg*/ 0, /*func*/ lvl_set_current_level),
-    /*2*/ JUMP_IF(/*op*/ OP_EQ, /*arg*/ FALSE, (level_main_menu_entry_act_select + 42)), // goto L1 (exit)
-    /*5*/ INIT_LEVEL(),
-    /*6*/ FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
-    /*10*/ LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _menu_segment_7SegmentRomStart, _menu_segment_7SegmentRomEnd),
+    /* 0*/ CALL(/*arg*/ 0, /*func*/ lvl_set_current_level),
+    /* 2*/ JUMP_IF(/*op*/ OP_EQ, /*arg*/ FALSE, (level_main_menu_entry_act_select + 42)), // goto L1 (exit)
+    /* 5*/ INIT_LEVEL(),
+    /* 6*/ LOAD_GODDARD(),
+    /*10*/ LOAD_LEVEL_DATA(menu),
     /*13*/ ALLOC_LEVEL_POOL(),
 
     /*14*/ AREA(/*index*/ 2, geo_menu_act_selector_strings),
-        /*16*/ OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -100, 0, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvActSelector),
+        /*16*/ OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -100, 0, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x04, 0x00, 0x00, 0x00), /*beh*/ bhvActSelector),
         /*22*/ TERRAIN(/*terrainData*/ main_menu_seg7_collision),
     /*24*/ END_AREA(),
 

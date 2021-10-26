@@ -30,19 +30,18 @@ const LevelScript level_intro_splash_screen[] = {
 #ifdef SKIP_TITLE_SCREEN
     EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),
 #endif
-    FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
-    LOAD_RAW( /*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
-    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _intro_segment_7SegmentRomStart, _intro_segment_7SegmentRomEnd),
+    LOAD_GODDARD(),
+    LOAD_BEHAVIOR_DATA(),
+    LOAD_LEVEL_DATA(intro),
 #if defined(HD_INTRO_TEXTURES) && defined(FLOOMBAS)
-    LOAD_YAY0(/*seg*/ SEGMENT_COMMON0_YAY0, _common0_yay0SegmentRomStart, _common0_yay0SegmentRomEnd),
-    LOAD_RAW( /*seg*/ SEGMENT_COMMON0_GEO, _common0_geoSegmentRomStart,  _common0_geoSegmentRomEnd),
+    LOAD_COMMON0(),
 
     // Load "Super Mario 64" logo
     ALLOC_LEVEL_POOL(),
     LOAD_MODEL_FROM_GEO(MODEL_GOOMBA, goomba_geo),
     AREA(/*index*/ 1, intro_geo_splash_screen),
-        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/ -570, -480, 1500, /*angle*/ 0,  50, 0, /*behParam*/ 0x1800100B, /*beh*/ bhvFloombaStartup),
-        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/  570, -480, 1500, /*angle*/ 0, -50, 0, /*behParam*/ 0x1800900B, /*beh*/ bhvFloombaStartup),
+        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/ -570, -480, 1500, /*angle*/ 0,  50, 0, /*behParam*/ BP(0x18, 0x00, 0x10, 0x0B), /*beh*/ bhvFloombaStartup),
+        OBJECT(/*model*/ MODEL_GOOMBA, /*pos*/  570, -480, 1500, /*angle*/ 0, -50, 0, /*behParam*/ BP(0x18, 0x00, 0x90, 0x0B), /*beh*/ bhvFloombaStartup),
     END_AREA(),
     FREE_LEVEL_POOL(),
 
@@ -85,11 +84,11 @@ const LevelScript level_intro_splash_screen[] = {
 const LevelScript level_intro_mario_head_regular[] = {
     INIT_LEVEL(),
     BLACKOUT(/*active*/ TRUE),
-    FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
+    LOAD_GODDARD(),
 #ifdef KEEP_MARIO_HEAD
     LOAD_MARIO_HEAD(/*loadHeadID*/ REGULAR_FACE),
-    LOAD_RAW(/*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
+    LOAD_BEHAVIOR_DATA(),
+    LOAD_TITLE_SCREEN_BG(),
 
     ALLOC_LEVEL_POOL(),
     AREA(/*index*/ 1, intro_geo_mario_head_regular),
@@ -114,12 +113,12 @@ const LevelScript level_intro_mario_head_regular[] = {
 const LevelScript level_intro_mario_head_dizzy[] = {
     INIT_LEVEL(),
     BLACKOUT(/*active*/ TRUE),
-    FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
+    LOAD_GODDARD(),
 #ifdef KEEP_MARIO_HEAD
     LOAD_MARIO_HEAD(/*loadHeadID*/ DIZZY_FACE),
 #endif
-    LOAD_RAW(/*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
+    LOAD_BEHAVIOR_DATA(),
+    LOAD_TITLE_SCREEN_BG(),
     ALLOC_LEVEL_POOL(),
 
     AREA(/*index*/ 1, intro_geo_mario_head_dizzy),
@@ -140,8 +139,8 @@ const LevelScript level_intro_mario_head_dizzy[] = {
 
 const LevelScript level_intro_entry_level_select[] = {
     INIT_LEVEL(),
-    LOAD_RAW(/*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd),
-    LOAD_YAY0_TEXTURE(/*seg*/ SEGMENT_SKYBOX, _title_screen_bg_yay0SegmentRomStart, _title_screen_bg_yay0SegmentRomEnd),
+    LOAD_BEHAVIOR_DATA(),
+    LOAD_TITLE_SCREEN_BG(),
     LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _debug_level_select_yay0SegmentRomStart, _debug_level_select_yay0SegmentRomEnd),
     FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
     ALLOC_LEVEL_POOL(),

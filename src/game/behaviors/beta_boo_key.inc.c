@@ -3,7 +3,7 @@
  * Behavior for bhvAlphaBooKey and bhvBetaBooKey.
  * They were apparently intended to be a key that would be contained in boos
  * and would fall out, like coins do. There is a model, MODEL_BETA_BOO_KEY, that
- * is loaded in script_func_global_10, which contains boo-themed models used in
+ * is loaded in script_func_global_group9, which contains boo-themed models used in
  * BBH and the castle courtyard. It is used in a macro preset with bhvAlphaBooKey,
  * which is also grouped near other boo/BBH-related macros. This is evidence that
  * bhvAlphaBooKey was supposed to be a key. bhvBetaBooKey has code similar to
