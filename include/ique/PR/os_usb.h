@@ -156,11 +156,11 @@ typedef void *OSBbUsbHandle;
 extern s32	osBbUsbInit(void);
 extern s32	osBbUsbSetCtlrModes(s32, u32);
 extern u32	osBbUsbGetResetCount(s32);
-extern s32	osBbUsbDevQuery(s32, OSBbUsbInfo *, s32);
+extern s32	osBbUsbDevQuery(    s32, OSBbUsbInfo *, s32);
 extern s32	osBbUsbDevGetHandle(s32, OSBbUsbInfo *, OSBbUsbHandle *);
 extern s32	osBbUsbDevFreeHandle(OSBbUsbHandle);
-extern s32	osBbUsbDevRead(OSBbUsbHandle, u8 *, s32, u64);
-extern s32	osBbUsbDevWrite(OSBbUsbHandle, u8 *, s32, u64);
+extern s32	osBbUsbDevRead(      OSBbUsbHandle, u8 *, s32, u64);
+extern s32	osBbUsbDevWrite(     OSBbUsbHandle, u8 *, s32, u64);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

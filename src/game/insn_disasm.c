@@ -19,7 +19,7 @@ enum ParamTypes {
     PARAM_LUI,
 };
 
-extern far char *parse_map(u32);
+extern far char *parse_map(u32 pc);
 static char insn_as_string[100];
 
 typedef struct __attribute__((packed)) {

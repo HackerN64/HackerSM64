@@ -145,9 +145,9 @@ typedef struct OSMesgQueue_s {
 /* Message operations */
 
 extern void		osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 count);
-extern s32		osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern s32		osJamMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern s32		osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
+extern s32		osSendMesg(       OSMesgQueue *mq, OSMesg  msg, s32 flag);
+extern s32		osJamMesg(        OSMesgQueue *mq, OSMesg  msg, s32 flag);
+extern s32		osRecvMesg(       OSMesgQueue *mq, OSMesg *msg, s32 flag);
 
 /* Event operations */
 

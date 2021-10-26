@@ -293,7 +293,7 @@ extern void gtStateSetOthermode(Gfx *om, gtStateOthermode_t mode, int data);
  */
 #define GT_DUMPTURBO_HANGAFTER           64
 #define GT_DUMPTURBO_NOTEXTURES          128
-extern void gtDumpTurbo(OSTask *tp,u8 flags);
+extern void gtDumpTurbo(OSTask *tp, u8 flags);
 
 /*
  * Special macros to init othermode words to all 0's, a good default

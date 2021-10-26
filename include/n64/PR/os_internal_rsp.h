@@ -32,11 +32,11 @@ extern "C" {
 /* Signal processor interface (Sp) */
 
 extern u32 		__osSpGetStatus(void);
-extern void		__osSpSetStatus(u32);
-extern s32		__osSpSetPc(u32);
-extern s32		__osSpRawWriteIo(u32, u32);
-extern s32		__osSpRawReadIo(u32, u32 *);
-extern s32		__osSpRawStartDma(s32, u32, void *, u32);
+extern void		__osSpSetStatus(               u32  data);
+extern s32		__osSpSetPc(                   u32  data);
+extern s32		__osSpRawWriteIo( u32 devAddr, u32  data);
+extern s32		__osSpRawReadIo(  u32 devAddr, u32 *data);
+extern s32		__osSpRawStartDma(s32 direction, u32 devAddr, void *dramAddr, u32 size);
 
 
 #endif /* _LANGUAGE_C */

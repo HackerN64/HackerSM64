@@ -148,14 +148,14 @@ typedef struct OSMesgQueue_s {
 
 /* Message operations */
 
-extern void		osCreateMesgQueue(OSMesgQueue *, OSMesg *, s32);
-extern s32		osSendMesg(OSMesgQueue *, OSMesg, s32);
-extern s32		osJamMesg(OSMesgQueue *, OSMesg, s32);
-extern s32		osRecvMesg(OSMesgQueue *, OSMesg *, s32);
+extern void		osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 count);
+extern s32		osSendMesg(       OSMesgQueue *mq, OSMesg  msg, s32 flag);
+extern s32		osJamMesg(        OSMesgQueue *mq, OSMesg  msg, s32 flag);
+extern s32		osRecvMesg(       OSMesgQueue *mq, OSMesg *msg, s32 flag);
 
 /* Event operations */
 
-extern void		osSetEventMesg(OSEvent, OSMesgQueue *, OSMesg);
+extern void		osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg m);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

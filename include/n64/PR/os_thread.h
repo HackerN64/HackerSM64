@@ -134,15 +134,15 @@ typedef struct OSThread_s {
 
 /* Thread operations */
 
-extern void		osCreateThread(OSThread *t, OSId id, void (*entry)(void *),
+extern void		osCreateThread( OSThread *t, OSId id, void (*entry)(void *),
 				       void *arg, void *sp, OSPri pri);
 extern void		osDestroyThread(OSThread *t);
 extern void		osYieldThread(void);
-extern void		osStartThread(OSThread *t);
-extern void		osStopThread(OSThread *t);
-extern OSId		osGetThreadId(OSThread *t);
-extern void		osSetThreadPri(OSThread *t, OSPri pri);
-extern OSPri	osGetThreadPri(OSThread *t);
+extern void		osStartThread(  OSThread *t);
+extern void		osStopThread(   OSThread *t);
+extern OSId		osGetThreadId(  OSThread *t);
+extern void		osSetThreadPri( OSThread *t, OSPri pri);
+extern OSPri	osGetThreadPri( OSThread *t);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

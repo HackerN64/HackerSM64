@@ -73,9 +73,9 @@ char *gFpcsrDesc[6] = {
 
 
 extern u64 osClockRate;
-extern far char *parse_map(u32);
+extern far char *parse_map(u32 pc);
 extern far void map_data_init(void);
-extern far char *find_function_in_stack(u32 *);
+extern far char *find_function_in_stack(u32 *sp);
 
 struct {
     OSThread thread;
@@ -128,7 +128,7 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
 void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     u32 glyph;
     char buf[0x108];
-    bzero(&buf ,sizeof(buf));
+    bzero(&buf, sizeof(buf));
     va_list args;
     va_start(args, fmt);
     s32 size = _Printf(write_to_buf, buf, fmt, args);

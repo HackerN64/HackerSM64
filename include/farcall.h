@@ -22,7 +22,7 @@ Simply place any code you want in any groupX_geo.c or any level's script.c (see 
 To call segment code from normal code or vice versa (or segment code from other segmented code)
  - Add `#include "farcall.h"` to the given file
  - Declare any functions that are not in that file like so (with far)
-    `far void print_text(s32, s32, const char*);`
+    `far void print_text(s32 x, s32 y, const char *str);`
  - Call any functions that are not in the file like so:
     `farcall(print_text)(10, 10 "test");`
 

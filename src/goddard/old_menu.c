@@ -24,7 +24,7 @@
 static struct ObjGadget *sCurGadgetPtr;
 
 // forward declarations
-static void reset_gadget_default(struct ObjGadget *);
+static void reset_gadget_default(struct ObjGadget *gdgt);
 
 /* 239EC0 -> 239F78 */
 void get_objvalue(union ObjVarVal *dst, enum ValPtrType type, void *base, size_t offset) {

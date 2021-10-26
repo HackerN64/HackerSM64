@@ -57,15 +57,15 @@ typedef struct{
  * 		externs
  *-----------------------------------------------------------------------*/
 
-extern s32 osRTCInit(OSMesgQueue *);
-extern s32 osRTCReadData(OSMesgQueue *, u8 *);
-extern s32 osRTCWriteData(OSMesgQueue *, u8 *);
-extern s32 osRTCGetTime(OSMesgQueue *, OSRTCTime *);
-extern s32 osRTCSetTime(OSMesgQueue *, OSRTCTime *);
+extern s32 osRTCInit(        OSMesgQueue *mq);
+extern s32 osRTCReadData(    OSMesgQueue *mq, u8 *);
+extern s32 osRTCWriteData(   OSMesgQueue *mq, u8 *);
+extern s32 osRTCGetTime(     OSMesgQueue *mq, OSRTCTime *);
+extern s32 osRTCSetTime(     OSMesgQueue *mq, OSRTCTime *);
 extern u32 osRTCGetIntervalTime(OSRTCTime *, OSRTCTime *);
-extern s32 osRTCGetLaterTime(OSMesgQueue *, u32, OSRTCTime *);
-extern s32 osRTCSetAlarm(OSMesgQueue *, u8, u8);
-extern s32 osRTCGetAlarmStat(OSMesgQueue *, u8 *, u8 *, int *);
-extern s32 osRTCProbe(OSMesgQueue *mq);
+extern s32 osRTCGetLaterTime(OSMesgQueue *mq, u32, OSRTCTime *);
+extern s32 osRTCSetAlarm(    OSMesgQueue *mq, u8, u8);
+extern s32 osRTCGetAlarmStat(OSMesgQueue *mq, u8 *, u8 *, int *);
+extern s32 osRTCProbe(       OSMesgQueue *mq);
 
 #endif /* _rtc_h_ */

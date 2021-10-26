@@ -20,7 +20,7 @@
  * Each mesh using this system has the animated vertices stored as an array of shorts.
  * The first entry is the texture movement speed. After that the vertices are stored
  * in one of two layouts: one without per-vertex color attributes and one with.
- * [speed, v0(x,y,z, s,t)      , v1(x,y,z, s,t)      , ...]
+ * [speed, v0(x,y,z,       s,t), v1(x,y,z,       s,t), ...]
  * [speed, v0(x,y,z, r,g,b s,t), v1(x,y,z, r,g,b s,t), ...]
  * x, y, z = vertex position as integers
  * s, t = texture coordinates as 6.10 fixed point number. That means coordinates in

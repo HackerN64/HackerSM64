@@ -91,11 +91,11 @@ typedef u32 OSPageMask;
 
 /* TLB management routines */
 
-extern void		osMapTLB(s32, OSPageMask, void *, u32, u32, s32);
+extern void		osMapTLB(s32 index, OSPageMask pm, void *vaddr, u32 evenpaddr, u32 oddpaddr, s32 asid);
 extern void		osMapTLBRdb(void);
-extern void		osUnmapTLB(s32);
+extern void		osUnmapTLB(s32 index);
 extern void		osUnmapTLBAll(void);
-extern void		osSetTLBASID(s32);
+extern void		osSetTLBASID(s32 asid);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

@@ -261,9 +261,9 @@ void (*funcPointer_read)();
 // USB globals
 static s8 usb_cart = CART_NONE;
 static u8 __attribute__((aligned(16))) usb_buffer[BUFFER_SIZE];
-int usb_datatype = 0;
-int usb_datasize = 0;
-int usb_dataleft = 0;
+int usb_datatype  =  0;
+int usb_datasize  =  0;
+int usb_dataleft  =  0;
 int usb_readblock = -1;
 
 #ifndef LIBDRAGON
@@ -276,13 +276,13 @@ int usb_readblock = -1;
 
     // osPiRaw
     #if USE_OSRAW
-        extern s32 __osPiRawWriteIo(u32, u32);
-        extern s32 __osPiRawReadIo(u32, u32 *);
-        extern s32 __osPiRawStartDma(s32, u32, void *, u32);
+        extern s32 __osPiRawWriteIo(u32 devAddr, u32  data);
+        extern s32 __osPiRawReadIo( u32 devAddr, u32 *data);
+        extern s32 __osPiRawStartDma(s32 direction, u32 devAddr, void *dramAddr, u32 size);
 
-        #define osPiRawWriteIo(a, b) __osPiRawWriteIo(a, b)
-        #define osPiRawReadIo(a, b) __osPiRawReadIo(a, b)
-        #define osPiRawStartDma(a, b, c, d) __osPiRawStartDma(a, b, c, d)
+        #define osPiRawWriteIo(devAddr, data)                       __osPiRawWriteIo(devAddr, data)
+        #define osPiRawReadIo( devAddr, data)                       __osPiRawReadIo( devAddr, data)
+        #define osPiRawStartDma(direction, devAddr, dramAddr, size) __osPiRawStartDma(direction, devAddr, dramAddr, size)
     #endif
 #endif
 

@@ -522,7 +522,7 @@ struct Painting cotmc_painting = {
     /* id */ 0x000E,
     /* Image Count */ 0x01,
     /* Texture Type */ PAINTING_ENV_MAP,
-    /* Floor Status */ 0x00, 0x00 , 0x00 /* which of the painting's nearby special floors Mario's on */,
+    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
     /* Ripple Status */ 0x00,
     /* Rotation */ 270.0f,  0.0f,
     /* Position */ 2989.055908f, -4485.120117f, 5135.359863f,

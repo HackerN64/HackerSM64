@@ -33,7 +33,7 @@ void func_8031D690(s32 player, FadeT fadeInTime);
 void seq_player_fade_to_zero_volume(s32 player, FadeT fadeOutTime);
 void decrease_sample_dma_ttls(void);
 s32 audio_shut_down_and_reset_step(void);
-void func_802ad7ec(u32);
+void func_802ad7ec(u32 arg0);
 
 struct SPTask *create_next_audio_frame_task(void) {
     s32 writtenCmds;
