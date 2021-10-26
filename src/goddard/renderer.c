@@ -76,7 +76,10 @@ struct LightDirVec {
     s32 x, y, z;
 };
 
-enum DynListBankFlag { TABLE_END = -1, STD_LIST_BANK = 3 };
+enum DynListBankFlag {
+    TABLE_END     = -1,
+    STD_LIST_BANK =  3
+};
 
 struct DynListBankInfo {
     /* 0x00 */ enum DynListBankFlag flag;
@@ -90,7 +93,6 @@ static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
 static OSMesg sGdDMACompleteMsg; // msg buf for D_801BE8B0 queue
 static OSIoMesg sGdDMAReqMesg;
-static struct ObjView *D_801BE994; // store if View flag 0x40 set
 static OSContStatus D_801BAE60[4];
 static OSContPad sGdContPads[4];    // @ 801BAE70
 static OSContPad sPrevFrameCont[4]; // @ 801BAE88
@@ -138,8 +140,8 @@ static struct GdDisplayList *sGdDlStash;    // @ 801BD7B8
 static struct GdDisplayList *sMHeadMainDls[2]; // @ 801BD7C0; two DLs, double buffered one per frame - seem to be basic dls that branch to actual lists?
 static struct GdDisplayList *sViewDls[3][2];       // I guess? 801BD7C8 -> 801BD7E0?
 static struct GdDisplayList *sGdDLArray[MAX_GD_DLS]; // @ 801BD7E0; indexed by dl number (gddl+0x44)
-static s32 sPickBufLen;                              // @ 801BE780
-static s32 sPickBufPosition;                         // @ 801BE784
+static s32  sPickBufLen;                             // @ 801BE780
+static s32  sPickBufPosition;                        // @ 801BE784
 static s16 *sPickBuf;                                // @ 801BE788
 static LookAt D_801BE790[2];
 static LookAt D_801BE7D0[3];
@@ -152,27 +154,27 @@ static f32 sTracked1FrameTime = 0.0f; // @ 801A8684
 static f32 sDynamicsTime = 0.0f;      // @ 801A8688
 static f32 sDLGenTime = 0.0f;         // @ 801A868C
 static f32 sRCPTime = 0.0f;           // @ 801A8690
-static f32 sTimeScaleFactor = 1.0f;   // @ D_801A8694
+static f32 sTimeScaleFactor = 1.0f;   // @ 801A8694
 static u32 sMemBlockPoolSize = 1;     // @ 801A8698
 static s32 sMemBlockPoolUsed = 0;     // @ 801A869C
 static s32 sTextureCount = 0;  // maybe?
 static struct GdTimer *D_801A86A4 = NULL; // timer for dlgen, dynamics, or rcp
 static struct GdTimer *D_801A86A8 = NULL; // timer for dlgen, dynamics, or rcp
 static struct GdTimer *D_801A86AC = NULL; // timer for dlgen, dynamics, or rcp
-s32 gGdFrameBufNum = 0;                      // @ 801A86B0
+s32 gGdFrameBufNum = 0;                    // @ 801A86B0
 static struct ObjShape *sHandShape = NULL; // @ 801A86B8
 static s32 D_801A86BC = 1;
 static s32 D_801A86C0 = 0; // gd_dl id for something?
 static s32 sMtxParamType = G_MTX_PROJECTION;
 UNUSED static struct GdVec3f D_801A86CC = { 1.0f, 1.0f, 1.0f };
-static struct ObjView *sActiveView = NULL;  // @ 801A86D8 current view? used when drawing dl
+static struct ObjView *sActiveView = NULL; // @ 801A86D8 current view? used when drawing dl
 static struct ObjView *sScreenView = NULL; // @ 801A86DC
-static struct ObjView *D_801A86E0 = NULL;
-static struct ObjView *sHandView = NULL; // @ 801A86E4
-static struct ObjView *sMenuView = NULL; // @ 801A86E8
-static u32 sItemsInMenu = 0;             // @ 801A86EC
+static struct ObjView *D_801A86E0  = NULL;
+static struct ObjView *sHandView   = NULL; // @ 801A86E4
+static struct ObjView *sMenuView   = NULL; // @ 801A86E8
+static u32 sItemsInMenu = 0;               // @ 801A86EC
 static s32 sDebugViewsCount = 0;               // number of elements in the sDebugViews array
-static s32 sCurrDebugViewIndex = 0;             // @ 801A86F4; timing activate cool down counter?
+static s32 sCurrDebugViewIndex = 0;               // @ 801A86F4; timing activate cool down counter?
 static struct GdDisplayList *sCurrentGdDl = NULL; // @ 801A86FC
 static u32 sGdDlCount = 0;                        // @ 801A8700
 static struct DynListBankInfo sDynLists[] = {     // @ 801A8704
@@ -264,10 +266,10 @@ ALIGNED8 static Texture gd_texture_white_star_7[] = {
 };
 
 static Vtx_t gd_vertex_star[] = {
-    {{-64,   0, 0}, 0, {  0, 992}, {0x00, 0x00, 0x7F}},
-    {{ 64,   0, 0}, 0, {992, 992}, {0x00, 0x00, 0x7F}},
-    {{ 64, 128, 0}, 0, {992,   0}, {0x00, 0x00, 0x7F}},
-    {{-64, 128, 0}, 0, {  0,   0}, {0x00, 0x00, 0x7F}},
+    {{   -64,      0,      0}, 0, {      0,  31<<5}, {0x00, 0x00, 0x7F, 0x00}},
+    {{    64,      0,      0}, 0, {  31<<5,  31<<5}, {0x00, 0x00, 0x7F, 0x00}},
+    {{    64,    128,      0}, 0, {  31<<5,      0}, {0x00, 0x00, 0x7F, 0x00}},
+    {{   -64,    128,      0}, 0, {      0,      0}, {0x00, 0x00, 0x7F, 0x00}},
 };
 
 static Gfx gd_dl_star_common[] = {
@@ -277,9 +279,9 @@ static Gfx gd_dl_star_common[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
     gsDPLoadSync(),
-    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, ((32 * 32) - 1), CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
-    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsDPSetTileSize(0, 0, 0, ((32 - 1) << G_TEXTURE_IMAGE_FRAC), ((32 - 1) << G_TEXTURE_IMAGE_FRAC)),
     gsSPVertex(gd_vertex_star, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
@@ -449,10 +451,10 @@ UNUSED ALIGNED8 static Texture gd_texture_sparkle_5[] = {
 };
 
 static Vtx_t gd_vertex_sparkle[] = {
-    {{   -32,      0,      0}, 0, {      0,   1984}, {  0x00, 0x00, 0x7F, 0x00}},
-    {{    32,      0,      0}, 0, {   1984,   1984}, {  0x00, 0x00, 0x7F, 0x00}},
-    {{    32,     64,      0}, 0, {   1984,      0}, {  0x00, 0x00, 0x7F, 0x00}},
-    {{   -32,     64,      0}, 0, {      0,      0}, {  0x00, 0x00, 0x7F, 0x00}},
+    {{   -32,      0,      0}, 0, {      0,  62<<5}, {0x00, 0x00, 0x7F, 0x00}},
+    {{    32,      0,      0}, 0, {  62<<5,  62<<5}, {0x00, 0x00, 0x7F, 0x00}},
+    {{    32,     64,      0}, 0, {  62<<5,      0}, {0x00, 0x00, 0x7F, 0x00}},
+    {{   -32,     64,      0}, 0, {      0,      0}, {0x00, 0x00, 0x7F, 0x00}},
 };
 
 static Gfx gd_dl_sparkle[] = {
@@ -460,13 +462,13 @@ static Gfx gd_dl_sparkle[] = {
     gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
     gsDPSetRenderMode(G_RM_AA_ZB_TEX_EDGE, G_RM_NOOP2),
     gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD,
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPLoadSync(),
-    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD,
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, ((32 * 32) - 1), CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
-    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsDPSetTileSize(0, 0, 0, ((32 - 1) << G_TEXTURE_IMAGE_FRAC), ((32 - 1) << G_TEXTURE_IMAGE_FRAC)),
     gsSPVertex(gd_vertex_sparkle, 4, 0),
     gsSP2Triangles(0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPTexture(0x0001, 0x0001, 0, G_TX_RENDERTILE, G_OFF),
@@ -1623,7 +1625,7 @@ void gd_dl_lookat(struct ObjCamera *cam, f32 fromX, f32 fromY, f32 fromZ, f32 to
 
     mat4_to_mtx(&cam->unkE8, &DL_CURRENT_MTX(sCurrentGdDl));
     gSPMatrix(next_gfx(), osVirtualToPhysical(&DL_CURRENT_MTX(sCurrentGdDl)),
-            G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+            (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH));
 
     /*  col           colc          dir
         0  1  2   3   4  5  6   7   8  9  10  11
@@ -1994,10 +1996,10 @@ void set_Vtx_norm_buf_2(struct GdVec3f *norm) {
 /* 24FF80 -> 24FFDC; orig name: func_801A17B0 */
 void set_gd_mtx_parameters(s32 params) {
     switch (params) {
-        case G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH:
+        case (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH):
             sMtxParamType = G_MTX_PROJECTION;
             break;
-        case G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH:
+        case (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH):
             sMtxParamType = G_MTX_MODELVIEW;
             break;
     }
@@ -2382,20 +2384,17 @@ void gd_setproperty(enum GdProperty prop, f32 f1, f32 f2, f32 f3) {
 
 /* 2522C0 -> 25245C */
 void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
-    uintptr_t orthoMtx;
-    uintptr_t rotMtx;
-
     // Should produce G_RDPHALF_1 in Fast3D
     gSPPerspNormalize(next_gfx(), 0xFFFF);
 
     guOrtho(&DL_CURRENT_MTX(sCurrentGdDl), l, r, b, t, n, f, 1.0f);
-    orthoMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
-    gSPMatrix(next_gfx(), orthoMtx, G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    uintptr_t orthoMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
+    gSPMatrix(next_gfx(), orthoMtx, (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
 
     next_mtx();
     guRotate(&DL_CURRENT_MTX(sCurrentGdDl), 0.0f, 0.0f, 0.0f, 1.0f);
-    rotMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
-    gSPMatrix(next_gfx(), rotMtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+    uintptr_t rotMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
+    gSPMatrix(next_gfx(), rotMtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
 
     func_801A3324(0.0f, 0.0f, 0.0f);
     next_mtx();
@@ -2404,21 +2403,19 @@ void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
 /* 25245C -> 25262C */
 void gd_create_perspective_matrix(f32 fovy, f32 aspect, f32 near, f32 far) {
     u16 perspNorm;
-    uintptr_t perspecMtx;
-    uintptr_t rotMtx;
 
     sGdPerspTimer += 0.1f;
     guPerspective(&DL_CURRENT_MTX(sCurrentGdDl), &perspNorm, fovy, aspect, near, far, 1.0f);
 
     gSPPerspNormalize(next_gfx(), perspNorm);
 
-    perspecMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
-    gSPMatrix(next_gfx(), perspecMtx, G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    uintptr_t perspecMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
+    gSPMatrix(next_gfx(), perspecMtx, (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));
     next_mtx();
 
     guRotate(&DL_CURRENT_MTX(sCurrentGdDl), 0.0f, 0.0f, 0.0f, 1.0f);
-    rotMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
-    gSPMatrix(next_gfx(), rotMtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+    uintptr_t rotMtx = GD_LOWER_29(&DL_CURRENT_MTX(sCurrentGdDl));
+    gSPMatrix(next_gfx(), rotMtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
     func_801A3324(0.0f, 0.0f, 0.0f);
     next_mtx();
 }
@@ -2428,16 +2425,16 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
                        UNUSED s32 lrx, UNUSED s32 lry) {
     char memtrackerName[0x100];
 
-    if (view->flags & (VIEW_Z_BUF | VIEW_COLOUR_BUF) && !(view->flags & VIEW_UNK_1000)) {
+    if ((view->flags & (VIEW_Z_BUF | VIEW_COLOUR_BUF)) && !(view->flags & VIEW_UNK_1000)) {
         if (view->flags & VIEW_COLOUR_BUF) {
             sprintf(memtrackerName, "%s CBuf", name);
             start_memtracker(memtrackerName);
             view->colourBufs[0] =
-                gd_malloc((u32)(2.0f * view->lowerRight.x * view->lowerRight.y + 64.0f), 0x20);
+                gd_malloc((u32)((2.0f * view->lowerRight.x * view->lowerRight.y) + 64.0f), 0x20);
 
             if (view->flags & VIEW_2_COL_BUF) {
                 view->colourBufs[1] =
-                    gd_malloc((u32)(2.0f * view->lowerRight.x * view->lowerRight.y + 64.0f), 0x20);
+                    gd_malloc((u32)((2.0f * view->lowerRight.x * view->lowerRight.y) + 64.0f), 0x20);
             } else {
                 view->colourBufs[1] = view->colourBufs[0];
             }
@@ -2459,7 +2456,7 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
             start_memtracker(memtrackerName);
             if (view->flags & VIEW_ALLOC_ZBUF) {
                 view->zbuf =
-                    gd_malloc((u32)(2.0f * view->lowerRight.x * view->lowerRight.y + 64.0f), 0x40);
+                    gd_malloc((u32)((2.0f * view->lowerRight.x * view->lowerRight.y) + 64.0f), 0x40);
                 if (view->zbuf == NULL) {
                     fatal_printf("Not enough DRAM for Z buffer\n");
                 }
@@ -2500,8 +2497,8 @@ void gd_init_controllers(void) {
 
 /* 252C08 -> 252C70 */
 void func_801A4438(f32 x, f32 y, f32 z) {
-    sTextDrawPos.x = x - (sActiveView->lowerRight.x / 2.0f);
-    sTextDrawPos.y = (sActiveView->lowerRight.y / 2.0f) - y;
+    sTextDrawPos.x = (x - (sActiveView->lowerRight.x / 2.0f));
+    sTextDrawPos.y = ((sActiveView->lowerRight.y / 2.0f) - y);
     sTextDrawPos.z = z;
 }
 
@@ -2536,13 +2533,6 @@ s32 gd_gentexture(void *texture, s32 fmt, s32 size, UNUSED u32 arg3, UNUSED u32 
     sTextureDisplayLists[sTextureCount] = dl;
 
     return dl;
-}
-
-/* 252F88 -> 252FAC */
-void Unknown801A47B8(struct ObjView *v) {
-    if (v->flags & VIEW_SAVE_TO_GLOBAL) {
-        D_801BE994 = v;
-    }
 }
 
 /* 253018 -> 253084 */

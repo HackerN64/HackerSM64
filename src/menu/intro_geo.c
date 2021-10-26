@@ -152,7 +152,7 @@ static Gfx *intro_backdrop_one_image(s32 index, s8 *backgroundTable) {
     s32 i;
 
     guTranslate(mtx, xCoords[index], yCoords[index], 0.0f);
-    gSPMatrix(displayListIter++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH);
+    gSPMatrix(displayListIter++, mtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH));
     gSPDisplayList(displayListIter++, &title_screen_bg_dl_0A000118);
     for (i = 0; i < 4; ++i) {
         gDPLoadTextureBlock(displayListIter++, vIntroBgTable[i], G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 20, 0,

@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "engine/behavior_script.h"
 #include "engine/surface_collision.h"
+#include "engine/math_util.h"
 #include "game_init.h"
 #include "main.h"
 #include "object_constants.h"
@@ -35,29 +36,49 @@ enum DebugPrintStateInfo {
 
 // DEBUG_SYS_EFFECTINFO
 const char *sDebugEffectStringInfo[] = {
-    "  a0 %d", "  a1 %d", "  a2 %d", "  a3 %d", "  a4 %d", "  a5 %d", "  a6 %d", "  a7 %d",
+    "  a0 %d",
+    "  a1 %d",
+    "  a2 %d",
+    "  a3 %d",
+    "  a4 %d",
+    "  a5 %d",
+    "  a6 %d",
+    "  a7 %d",
     "A" // cursor
 };
 
 // DEBUG_SYS_ENEMYINFO
 const char *sDebugEnemyStringInfo[] = {
-    "  b0 %d", "  b1 %d", "  b2 %d", "  b3 %d", "  b4 %d", "  b5 %d", "  b6 %d", "  b7 %d",
+    "  b0 %d",
+    "  b1 %d",
+    "  b2 %d",
+    "  b3 %d",
+    "  b4 %d",
+    "  b5 %d",
+    "  b6 %d",
+    "  b7 %d",
     "B" // cursor
 };
 
-s32 sDebugInfoDPadMask = 0;
-s32 sDebugInfoDPadUpdID = 0;
-s8 sDebugLvSelectCheckFlag = FALSE;
+s32 sDebugInfoDPadMask      = 0;
+s32 sDebugInfoDPadUpdID     = 0;
+s8  sDebugLvSelectCheckFlag = FALSE;
 
 #define DEBUG_PAGE_MIN DEBUG_PAGE_OBJECTINFO
 #define DEBUG_PAGE_MAX DEBUG_PAGE_ENEMYINFO
 
-s8 sDebugPage = DEBUG_PAGE_MIN;
-s8 sNoExtraDebug = FALSE;
-s8 sDebugStringArrPrinted = FALSE;
-s8 sDebugSysCursor = 0;
-s8 sDebugInfoButtonSeqID = 0;
-s16 sDebugInfoButtonSeq[] = { U_CBUTTONS, L_CBUTTONS, D_CBUTTONS, R_CBUTTONS, -1 };
+s8  sDebugPage             = DEBUG_PAGE_MIN;
+s8  sNoExtraDebug          = FALSE;
+s8  sDebugStringArrPrinted = FALSE;
+s8  sDebugSysCursor        = 0;
+s8  sDebugInfoButtonSeqID  = 0;
+s16 sDebugInfoButtonSeq[]  = {
+    U_CBUTTONS,
+    L_CBUTTONS,
+    D_CBUTTONS,
+    R_CBUTTONS,
+    -1
+};
 
 /*
  * These 2 functions are called from the object list processor in regards to cycle
@@ -77,13 +98,12 @@ s64 get_clock_difference(UNUSED s64 cycles) {
  * information. Note the reset of the printing boolean. For all intenses and
  * purposes this creates/formats a new print state.
  */
-void set_print_state_info(s16 *printState, s16 xCursor, s16 yCursor, s16 minYCursor, s16 maxXCursor,
-                          s16 lineYOffset) {
-    printState[DEBUG_PSTATE_DISABLED] = FALSE;
-    printState[DEBUG_PSTATE_X_CURSOR] = xCursor;
-    printState[DEBUG_PSTATE_Y_CURSOR] = yCursor;
-    printState[DEBUG_PSTATE_MIN_Y_CURSOR] = minYCursor;
-    printState[DEBUG_PSTATE_MAX_X_CURSOR] = maxXCursor;
+void set_print_state_info(s16 *printState, s16 xCursor, s16 yCursor, s16 minYCursor, s16 maxXCursor, s16 lineYOffset) {
+    printState[DEBUG_PSTATE_DISABLED     ] = FALSE;
+    printState[DEBUG_PSTATE_X_CURSOR     ] = xCursor;
+    printState[DEBUG_PSTATE_Y_CURSOR     ] = yCursor;
+    printState[DEBUG_PSTATE_MIN_Y_CURSOR ] = minYCursor;
+    printState[DEBUG_PSTATE_MAX_X_CURSOR ] = maxXCursor;
     printState[DEBUG_PSTATE_LINE_Y_OFFSET] = lineYOffset;
 }
 
@@ -94,14 +114,14 @@ void set_print_state_info(s16 *printState, s16 xCursor, s16 yCursor, s16 minYCur
  */
 void print_text_array_info(s16 *printState, const char *str, s32 number) {
     if (!printState[DEBUG_PSTATE_DISABLED]) {
-        if ((printState[DEBUG_PSTATE_Y_CURSOR] < printState[DEBUG_PSTATE_MIN_Y_CURSOR])
-            || (printState[DEBUG_PSTATE_MAX_X_CURSOR] < printState[DEBUG_PSTATE_Y_CURSOR])) {
+        if ((printState[DEBUG_PSTATE_Y_CURSOR    ] < printState[DEBUG_PSTATE_MIN_Y_CURSOR])
+         || (printState[DEBUG_PSTATE_MAX_X_CURSOR] < printState[DEBUG_PSTATE_Y_CURSOR    ])) {
             print_text(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                        "DPRINT OVER");
-            printState[DEBUG_PSTATE_DISABLED]++; // why not just = TRUE...
+            printState[DEBUG_PSTATE_DISABLED] = TRUE;
         } else {
-            print_text_fmt_int(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
-                               str, number);
+            print_text_fmt_int(printState[DEBUG_PSTATE_X_CURSOR],
+                               printState[DEBUG_PSTATE_Y_CURSOR], str, number);
             printState[DEBUG_PSTATE_Y_CURSOR] += printState[DEBUG_PSTATE_LINE_Y_OFFSET];
         }
     }
@@ -109,10 +129,8 @@ void print_text_array_info(s16 *printState, const char *str, s32 number) {
 
 void set_text_array_x_y(s32 xOffset, s32 yOffset) {
     s16 *printState = gDebugPrintState1;
-
     printState[DEBUG_PSTATE_X_CURSOR] += xOffset;
-    printState[DEBUG_PSTATE_Y_CURSOR] =
-        yOffset * printState[DEBUG_PSTATE_LINE_Y_OFFSET] + printState[DEBUG_PSTATE_Y_CURSOR];
+    printState[DEBUG_PSTATE_Y_CURSOR] = ((yOffset * printState[DEBUG_PSTATE_LINE_Y_OFFSET]) + printState[DEBUG_PSTATE_Y_CURSOR]);
 }
 
 /*
@@ -151,9 +169,9 @@ void print_mapinfo(void) {
     // EU mostly stubbed this function out.
     struct Surface *pfloor;
 
-    s32 angY = gCurrentObject->oMoveAngleYaw / 182.044000;
-    s32 area = ((s32) gCurrentObject->oPosX + 0x2000) / 1024
-             + ((s32) gCurrentObject->oPosZ + 0x2000) / 1024 * 16;
+    s32 angY = (gCurrentObject->oMoveAngleYaw / DEGREES(1.0f));
+    s32 area = ( (((s32) gCurrentObject->oPosX + 0x2000) / 1024)
+             +  ((((s32) gCurrentObject->oPosZ + 0x2000) / 1024) * 16));
 
     f32 bgY   = find_floor(gCurrentObject->oPosX, gCurrentObject->oPosY, gCurrentObject->oPosZ, &pfloor);
     f32 water = find_water_level(gCurrentObject->oPosX, gCurrentObject->oPosZ);
@@ -199,7 +217,7 @@ void print_string_array_info(const char **strArr) {
     s32 i;
 
     if (!sDebugStringArrPrinted) {
-        sDebugStringArrPrinted++; // again, why not = TRUE...
+        sDebugStringArrPrinted = TRUE;
         for (i = 0; i < 8; i++) {
             // sDebugPage is assumed to be 4 or 5 here.
             print_debug_top_down_mapinfo(strArr[i], gDebugInfo[sDebugPage][i]);
@@ -266,11 +284,11 @@ void reset_debug_objectinfo(void) {
     gUnknownWallCount      = 0;
     gObjectCounter         = 0;
     sDebugStringArrPrinted = FALSE;
-    gDoorRenderingTimer    = 0;
-
+#ifdef CUSTOM_DEBUG
     set_print_state_info(gDebugPrintState1,  20, 185, 40, 200, -15);
     set_print_state_info(gDebugPrintState2, 180,  30,  0, 150,  15);
     update_debug_dpadmask();
+#endif
 }
 
 /*

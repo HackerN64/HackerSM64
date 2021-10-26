@@ -2,7 +2,7 @@
 
 struct DoorAction {
     u32 flag;
-    s32 action;
+    ObjAction32 action;
 };
 
 static struct DoorAction sDoorActions[] = {
@@ -13,7 +13,7 @@ static struct DoorAction sDoorActions[] = {
     { -1,                          DOOR_ACT_CLOSED      },
 };
 
-static s32 sDoorOpenSounds[]  = { SOUND_GENERAL_OPEN_WOOD_DOOR,  SOUND_GENERAL_OPEN_IRON_DOOR };
+static s32 sDoorOpenSounds[]  = { SOUND_GENERAL_OPEN_WOOD_DOOR,  SOUND_GENERAL_OPEN_IRON_DOOR  };
 static s32 sDoorCloseSounds[] = { SOUND_GENERAL_CLOSE_WOOD_DOOR, SOUND_GENERAL_CLOSE_IRON_DOOR };
 
 void door_animation_and_reset(s32 animIndex) {
@@ -24,7 +24,7 @@ void door_animation_and_reset(s32 animIndex) {
 }
 
 void set_door_camera_event(void) {
-    if (segmented_to_virtual(bhvDoor) == o->behavior) {
+    if (o->behavior == segmented_to_virtual(bhvDoor)) {
         gPlayerCameraState->cameraEvent = CAM_EVENT_DOOR;
     } else {
         gPlayerCameraState->cameraEvent = CAM_EVENT_DOOR_WARP;
@@ -90,19 +90,20 @@ void bhv_door_loop(void) {
 
 void bhv_door_init(void) {
     f32 x = o->oPosX;
+    f32 y = o->oPosY;
     f32 z = o->oPosZ;
     struct Surface *floor;
-    find_room_floor(x, o->oPosY, z, &floor);
-    if (floor != NULL) o->oDoorSelfRoom = floor->room;
-    x = o->oPosX + sins(o->oMoveAngleYaw) * 200.0f;
-    z = o->oPosZ + coss(o->oMoveAngleYaw) * 200.0f;
-    find_room_floor(x, o->oPosY, z, &floor);
-    if (floor != NULL) o->oDoorForwardRoom = floor->room;
-    x = o->oPosX + sins(o->oMoveAngleYaw) * -200.0f;
-    z = o->oPosZ + coss(o->oMoveAngleYaw) * -200.0f;
-    find_room_floor(x, o->oPosY, z, &floor);
+    find_room_floor(x, y, z, &floor);
+    if (floor != NULL) o->oDoorSelfRoom     = floor->room;
+    x = (o->oPosX + (sins(o->oMoveAngleYaw) *  200.0f));
+    z = (o->oPosZ + (coss(o->oMoveAngleYaw) *  200.0f));
+    find_room_floor(x, y, z, &floor);
+    if (floor != NULL) o->oDoorForwardRoom  = floor->room;
+    x = (o->oPosX + (sins(o->oMoveAngleYaw) * -200.0f));
+    z = (o->oPosZ + (coss(o->oMoveAngleYaw) * -200.0f));
+    find_room_floor(x, y, z, &floor);
     if (floor != NULL) o->oDoorBackwardRoom = floor->room;
-    if (o->oDoorSelfRoom > 0 && o->oDoorSelfRoom < 60) {
+    if ((o->oDoorSelfRoom > 0) && (o->oDoorSelfRoom < 60)) {
         gDoorAdjacentRooms[o->oDoorSelfRoom][0] = o->oDoorForwardRoom;
         gDoorAdjacentRooms[o->oDoorSelfRoom][1] = o->oDoorBackwardRoom;
     }
@@ -110,17 +111,12 @@ void bhv_door_init(void) {
 
 void bhv_door_rendering_loop(void) {
     o->oDoorIsRendering = ((gMarioCurrentRoom == 0)
-     || (o->oDoorSelfRoom == gMarioCurrentRoom)
-     || (gMarioCurrentRoom == o->oDoorForwardRoom)
+     || (gMarioCurrentRoom == o->oDoorSelfRoom    )
+     || (gMarioCurrentRoom == o->oDoorForwardRoom )
      || (gMarioCurrentRoom == o->oDoorBackwardRoom)
-     || (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorForwardRoom)
+     || (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorForwardRoom )
      || (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oDoorBackwardRoom)
-     || (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorForwardRoom)
+     || (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorForwardRoom )
      || (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oDoorBackwardRoom));
-    if (o->oDoorIsRendering) {
-        o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
-        gDoorRenderingTimer++;
-    } else {
-        o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
-    }
+    COND_BIT(o->oDoorIsRendering, o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
 }

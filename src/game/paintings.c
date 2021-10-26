@@ -1140,7 +1140,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     } else if (callContext == GEO_CONTEXT_RENDER) {
 
         // Update the ddd painting before drawing
-        if (group == 1 && id == PAINTING_ID_DDD) {
+        if ((group == 1) && (id == PAINTING_ID_DDD)) {
             move_ddd_painting(painting, 3456.0f, 5529.6f, 20.0f);
         }
 
@@ -1165,11 +1165,11 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 /**
  * Update the painting system's local copy of Mario's current floor and position.
  */
-Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 c) {
+Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     // Reset the update counter
     if (callContext != GEO_CONTEXT_RENDER) {
         gLastPaintingUpdateCounter = (gAreaUpdateCounter - 1);
-        gPaintingUpdateCounter     = gAreaUpdateCounter;
+        gPaintingUpdateCounter     =  gAreaUpdateCounter;
     } else {
         gLastPaintingUpdateCounter = gPaintingUpdateCounter;
         gPaintingUpdateCounter     = gAreaUpdateCounter;
