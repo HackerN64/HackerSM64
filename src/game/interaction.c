@@ -940,7 +940,8 @@ u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *
                                                   COURSE_NUM_TO_INDEX(COURSE_MIN),
                                                   COURSE_NUM_TO_INDEX(COURSE_MAX));
 #endif
-    if ((m->action == ACT_WALKING) || (m->action == ACT_DECELERATING)) {
+    if ((m->action == ACT_WALKING)
+     || (m->action == ACT_DECELERATING)) {
 #ifndef UNLOCK_ALL
         if (numStars >= requiredNumStars) {
 #endif

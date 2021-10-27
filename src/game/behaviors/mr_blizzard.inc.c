@@ -158,7 +158,7 @@ static void mr_blizzard_act_rotate(void) {
             // Slowly move Dizziness back to 0 by making ChangeInDizziness positive if Dizziness
             // is negative, and making ChangeInDizziness negative if Dizziness is positive.
             if (o->oMrBlizzardDizziness < 0.0f) {
-                approach_f32_ptr(&o->oMrBlizzardChangeInDizziness, 1000.0f, 80.0f);
+                approach_f32_ptr(&o->oMrBlizzardChangeInDizziness,  1000.0f, 80.0f);
             } else {
                 approach_f32_ptr(&o->oMrBlizzardChangeInDizziness, -1000.0f, 80.0f);
             }
@@ -166,7 +166,7 @@ static void mr_blizzard_act_rotate(void) {
             o->oMrBlizzardDizziness += o->oMrBlizzardChangeInDizziness;
             // If prevDizziness has a different sign than Dizziness,
             // set Dizziness and ChangeInDizziness to 0.
-            if (prevDizziness * o->oMrBlizzardDizziness < 0.0f) {
+            if ((prevDizziness * o->oMrBlizzardDizziness) < 0.0f) {
                 o->oMrBlizzardDizziness = o->oMrBlizzardChangeInDizziness = 0.0f;
             }
         }
@@ -184,7 +184,7 @@ static void mr_blizzard_act_rotate(void) {
             o->oMrBlizzardChangeInDizziness = 300.0f;
             o->prevObj = o->oMrBlizzardHeldObj = NULL;
             // After 60 frames, if Mario is within 11.25 degrees of Mr. Blizzard, throw snowball action.
-        } else if (o->oTimer > 60 && abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw) < 0x800) {
+        } else if ((o->oTimer > 60) && (abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw) < 0x800)) {
             o->oAction = MR_BLIZZARD_ACT_THROW_SNOWBALL;
         }
     }
@@ -200,12 +200,11 @@ static void mr_blizzard_act_death(void) {
             // If Mr. Blizzard is wearing Mario's cap, clear
             // the save flag and spawn Mario's cap.
             if (o->oAnimState != 0) {
-                struct Object *cap;
                 save_file_clear_flags(SAVE_FLAG_CAP_ON_MR_BLIZZARD);
 
-                cap = spawn_object_relative(0, 5, 105, 0, o, MODEL_MARIOS_CAP, bhvNormalCap);
+                struct Object *cap = spawn_object_relative(0, 5, 105, 0, o, MODEL_MARIOS_CAP, bhvNormalCap);
                 if (cap != NULL) {
-                    cap->oMoveAngleYaw = o->oFaceAngleYaw + (o->oFaceAngleRoll < 0 ? 0x4000 : -0x4000);
+                    cap->oMoveAngleYaw = (o->oFaceAngleYaw + ((o->oFaceAngleRoll < 0x0) ? 0x4000 : -0x4000));
                     cap->oForwardVel = 10.0f;
                 }
 

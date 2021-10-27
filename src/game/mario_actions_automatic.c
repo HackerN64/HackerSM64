@@ -23,7 +23,7 @@ void add_tree_leaf_particles(struct MarioState *m) {
     if (m->usedObj->behavior == segmented_to_virtual(bhvTree)) {
         // make leaf effect spawn higher on the Shifting Sand Land palm tree
         f32 leafHeight = (obj_has_model(m->usedObj, MODEL_SSL_PALM_TREE) ? 250.0f : 100.0f);
-        if (m->pos[1] - m->floorHeight > leafHeight) {
+        if ((m->pos[1] - m->floorHeight) > leafHeight) {
             m->particleFlags |= PARTICLE_LEAF;
         }
     }
@@ -689,7 +689,7 @@ s32 act_in_cannon(struct MarioState *m) {
 
     switch (m->actionState) {
         case ACT_STATE_IN_CANNON_INIT:
-            m->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
+            marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
             m->usedObj->oInteractStatus = INT_STATUS_INTERACTED;
 
             m->statusForCamera->cameraEvent = CAM_EVENT_CANNON;
@@ -722,20 +722,24 @@ s32 act_in_cannon(struct MarioState *m) {
             m->faceAngle[0] = CLAMP(m->faceAngle[0], 0, DEGREES(80));
             marioObj->oMarioCannonInputYaw = CLAMP(marioObj->oMarioCannonInputYaw, -0x4000, 0x4000);
 
-            m->faceAngle[1] = marioObj->oMarioCannonObjectYaw + marioObj->oMarioCannonInputYaw;
+            m->faceAngle[1] = (marioObj->oMarioCannonObjectYaw + marioObj->oMarioCannonInputYaw);
             if (m->input & INPUT_A_PRESSED) {
-                m->forwardVel = (100.0f * coss(m->faceAngle[0]));
+                f32 cosPitch = coss(m->faceAngle[0]);
+                m->forwardVel = (100.0f * cosPitch);
 
-                m->vel[1] = (100.0f * sins(m->faceAngle[0]));
+                f32 sinPitch = sins(m->faceAngle[0]);
+                m->vel[1] = (100.0f * sinPitch);
 
-                m->pos[0] += (120.0f * coss(m->faceAngle[0]) * sins(m->faceAngle[1]));
-                m->pos[1] += (120.0f * sins(m->faceAngle[0])                        );
-                m->pos[2] += (120.0f * coss(m->faceAngle[0]) * coss(m->faceAngle[1]));
+                cosPitch *= 120.0f;
 
-                play_sound(SOUND_ACTION_FLYING_FAST, m->marioObj->header.gfx.cameraToObject);
-                play_sound(SOUND_OBJ_POUNDING_CANNON, m->marioObj->header.gfx.cameraToObject);
+                m->pos[0] += (cosPitch * sins(m->faceAngle[1]));
+                m->pos[1] += (120.0f   * sinPitch);
+                m->pos[2] += (cosPitch * coss(m->faceAngle[1]));
 
-                m->marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
+                play_sound(SOUND_ACTION_FLYING_FAST,  marioObj->header.gfx.cameraToObject);
+                play_sound(SOUND_OBJ_POUNDING_CANNON, marioObj->header.gfx.cameraToObject);
+
+                marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 
                 set_mario_action(m, ACT_SHOT_FROM_CANNON, 0);
 #if ENABLE_RUMBLE
@@ -743,16 +747,16 @@ s32 act_in_cannon(struct MarioState *m) {
 #endif
                 m->usedObj->oAction = OPENED_CANNON_ACT_SHOOT;
                 return FALSE;
-            } else if (m->faceAngle[0] != startFacePitch || m->faceAngle[1] != startFaceYaw) {
-                play_sound(SOUND_MOVING_AIM_CANNON, m->marioObj->header.gfx.cameraToObject);
+            } else if ((m->faceAngle[0] != startFacePitch) || (m->faceAngle[1] != startFaceYaw)) {
+                play_sound(SOUND_MOVING_AIM_CANNON, marioObj->header.gfx.cameraToObject);
 #if ENABLE_RUMBLE
                 reset_rumble_timers_vibrate(0);
 #endif
             }
     }
 
-    vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
+    vec3f_copy(marioObj->header.gfx.pos, m->pos);
+    vec3s_set( marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
     set_mario_animation(m, MARIO_ANIM_DIVE);
 
     return FALSE;
@@ -772,7 +776,8 @@ s32 act_tornado_twirling(struct MarioState *m) {
         m->vel[1] += 1.0f;
     }
 
-    if ((marioObj->oMarioTornadoPosY += m->vel[1]) < 0.0f) {
+    marioObj->oMarioTornadoPosY += m->vel[1];
+    if (marioObj->oMarioTornadoPosY < 0.0f) {
         marioObj->oMarioTornadoPosY = 0.0f;
     }
     if (marioObj->oMarioTornadoPosY > usedObj->hitboxHeight) {
@@ -823,11 +828,11 @@ s32 act_tornado_twirling(struct MarioState *m) {
 
     // Play sound on angle overflow
     if (prevTwirlYaw > m->twirlYaw) {
-        play_sound(SOUND_ACTION_TWIRL, m->marioObj->header.gfx.cameraToObject);
+        play_sound(SOUND_ACTION_TWIRL, marioObj->header.gfx.cameraToObject);
     }
 
-    vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, 0x0, (m->faceAngle[1] + m->twirlYaw), 0x0);
+    vec3f_copy(marioObj->header.gfx.pos, m->pos);
+    vec3s_set( marioObj->header.gfx.angle, 0x0, (m->faceAngle[1] + m->twirlYaw), 0x0);
 #if ENABLE_RUMBLE
     reset_rumble_timers_slip();
 #endif
