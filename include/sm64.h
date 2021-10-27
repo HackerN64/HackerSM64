@@ -25,8 +25,8 @@
 // Pointer casting is technically UB, and avoiding it gets rid of endian issues as well as a nice side effect.
 #define GET_HIGH_U16_OF_32(var) ((u16)((var) >> 16))
 #define GET_HIGH_S16_OF_32(var) ((s16)((var) >> 16))
-#define GET_LOW_U16_OF_32(var) ((u16)((var) & 0xFFFF))
-#define GET_LOW_S16_OF_32(var) ((s16)((var) & 0xFFFF))
+#define GET_LOW_U16_OF_32(var)  ((u16)((var) & 0xFFFF))
+#define GET_LOW_S16_OF_32(var)  ((s16)((var) & 0xFFFF))
 #define SET_HIGH_U16_OF_32(var, x) ((var) = ((var) & 0xFFFF) | ((x) << 16))
 #define SET_HIGH_S16_OF_32(var, x) ((var) = ((var) & 0xFFFF) | ((x) << 16))
 
@@ -216,10 +216,9 @@ enum MarioFlags {
     MARIO_UNUSED_29           = /* 0x20000000 */ (1 << 29),
     MARIO_AIR_HIT_WALL        = /* 0x40000000 */ (1 << 30),
     MARIO_PUSHING             = /* 0x80000000 */ (1 << 31),
+    MARIO_SPECIAL_CAPS        = (MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP),
+    MARIO_CAPS                = (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS),
 };
-
-#define MARIO_SPECIAL_CAPS (MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP)
-#define MARIO_CAPS         (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS)
 
 #define ACT_ID_MASK                         0x000001FF
 

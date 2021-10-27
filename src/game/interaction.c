@@ -394,10 +394,9 @@ struct Object *mario_get_collided_object(struct MarioState *m, u32 interactType)
 
 u32 mario_check_object_grab(struct MarioState *m) {
     u32 result = FALSE;
-    const BehaviorScript *script;
 
     if (m->input & INPUT_INTERACT_OBJ_GRABBABLE) {
-        script = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, m->interactObj->behavior);
+        const BehaviorScript *script = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, m->interactObj->behavior);
 
         if (script == bhvBowser) {
             s16 facingDYaw = abs_angle_diff(m->faceAngle[1], m->interactObj->oMoveAngleYaw);
@@ -697,8 +696,9 @@ u32 interact_coin(struct MarioState *m, UNUSED u32 interactType, struct Object *
 #endif
     obj->oInteractStatus = INT_STATUS_INTERACTED;
 #ifdef X_COIN_STAR
-    if (COURSE_IS_MAIN_COURSE(gCurrCourseNum) && m->numCoins - obj->oDamageOrCoinValue < X_COIN_STAR
-        && m->numCoins >= X_COIN_STAR) {
+    if (COURSE_IS_MAIN_COURSE(gCurrCourseNum)
+     && ((m->numCoins - obj->oDamageOrCoinValue) < X_COIN_STAR)
+     && (m->numCoins >= X_COIN_STAR)) {
         bhv_spawn_star_no_level_exit(STAR_BP_ACT_100_COINS);
     }
 #endif
@@ -1715,7 +1715,7 @@ void check_kick_or_punch_wall(struct MarioState *m) {
         detector.z = (m->pos[2] + (50.0f * coss(m->faceAngle[1])));
         detector.offsetY = 80.0f;
         detector.radius  =  5.0f;
-        if (find_wall_collisions(&detector) > 0) {
+        if (find_wall_collisions(&detector)) {
             if ((m->action != ACT_MOVE_PUNCHING) || (m->forwardVel >= 0.0f)) {
                 if (m->action == ACT_PUNCHING) m->action = ACT_MOVE_PUNCHING;
                 mario_set_forward_vel(m, -48.0f);

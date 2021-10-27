@@ -107,7 +107,7 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
     hitbox.offsetY = 10.0f;
     hitbox.radius  = 50.0f;
 
-    if (find_wall_collisions(&hitbox) != 0) {
+    if (find_wall_collisions(&hitbox)) {
         o->oPosX = hitbox.x;
         o->oPosY = hitbox.y;
         o->oPosZ = hitbox.z;

@@ -34,11 +34,11 @@ void play_climbing_sounds(struct MarioState *m, s32 b) {
 
     if (b == 1) {
         if (is_anim_past_frame(m, 1)) {
-            play_sound(isOnTree ? SOUND_ACTION_CLIMB_UP_TREE : SOUND_ACTION_CLIMB_UP_POLE,
+            play_sound((isOnTree ? SOUND_ACTION_CLIMB_UP_TREE : SOUND_ACTION_CLIMB_UP_POLE),
                        m->marioObj->header.gfx.cameraToObject);
         }
     } else {
-        play_sound(isOnTree ? SOUND_MOVING_SLIDE_DOWN_TREE : SOUND_MOVING_SLIDE_DOWN_POLE,
+        play_sound((isOnTree ? SOUND_MOVING_SLIDE_DOWN_TREE : SOUND_MOVING_SLIDE_DOWN_POLE),
                    m->marioObj->header.gfx.cameraToObject);
     }
 }
@@ -57,7 +57,7 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
     vec3_copy_y_off(m->pos, &m->usedObj->oPosVec, (marioObj->oMarioPolePos + offsetY));
 
     s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f)
-                 | f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
+                 + f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
 
     f32 ceilHeight = find_ceil(m->pos[0], (m->pos[1] + 3.0f), m->pos[2], &ceil);
     if (m->pos[1] > (ceilHeight - 160.0f)) {
@@ -85,8 +85,8 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
         }
     }
 
-    vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
-    vec3s_set(m->marioObj->header.gfx.angle, m->usedObj->oMoveAnglePitch, m->faceAngle[1],
+    vec3f_copy(marioObj->header.gfx.pos, m->pos);
+    vec3s_set( marioObj->header.gfx.angle, m->usedObj->oMoveAnglePitch, m->faceAngle[1],
               m->usedObj->oMoveAngleRoll);
 
     return result;
@@ -335,7 +335,7 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     vec3f_copy(m->pos, nextPos);
 
     set_mario_floor(m, floor, floorHeight);
-    set_mario_ceil(m, ceil, ceilHeight);
+    set_mario_ceil( m,  ceil,  ceilHeight);
 
     return HANG_NONE;
 }
@@ -574,7 +574,7 @@ s32 act_ledge_grab(struct MarioState *m) {
         return let_go_of_ledge(m);
     }
 
-    s32 hasSpaceForMario = (m->ceilHeight - m->floorHeight >= 160.0f);
+    s32 hasSpaceForMario = ((m->ceilHeight - m->floorHeight) >= 160.0f);
     if ((m->input & INPUT_A_PRESSED) && hasSpaceForMario) {
         return set_mario_action(m, ACT_LEDGE_CLIMB_FAST, 0);
     }
@@ -585,7 +585,7 @@ s32 act_ledge_grab(struct MarioState *m) {
         }
         return let_go_of_ledge(m);
     }
-    if (m->actionTimer == 10 && (m->input & INPUT_NONZERO_ANALOG)) {
+    if ((m->actionTimer == 10) && (m->input & INPUT_NONZERO_ANALOG)) {
         if (abs_angle_diff(m->intendedYaw, m->faceAngle[1]) <= 0x4000) {
             if (hasSpaceForMario) {
                 return set_mario_action(m, ACT_LEDGE_CLIMB_SLOW_1, 0);
@@ -595,8 +595,8 @@ s32 act_ledge_grab(struct MarioState *m) {
         }
     }
 
-    f32 heightAboveFloor = m->pos[1] - find_floor_height_relative_polar(m, -0x8000, 30.0f);
-    if (hasSpaceForMario && heightAboveFloor < 100.0f) {
+    f32 heightAboveFloor = (m->pos[1] - find_floor_height_relative_polar(m, -0x8000, 30.0f));
+    if (hasSpaceForMario && (heightAboveFloor < 100.0f)) {
         return set_mario_action(m, ACT_LEDGE_CLIMB_FAST, 0);
     }
 

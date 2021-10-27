@@ -139,7 +139,7 @@ s32 obj_find_wall(f32 objNewX, f32 objY, f32 objNewZ, f32 objVelX, f32 objVelZ) 
     hitbox.offsetY = (o->hitboxHeight / 2);
     hitbox.radius = o->hitboxRadius;
 
-    if (find_wall_collisions(&hitbox) != 0) {
+    if (find_wall_collisions(&hitbox)) {
         o->oPosX = hitbox.x;
         o->oPosY = hitbox.y;
         o->oPosZ = hitbox.z;
@@ -515,7 +515,7 @@ s32 obj_find_wall_displacement(Vec3f dist, f32 x, f32 y, f32 z, f32 radius) {
     hitbox.offsetY = 10.0f;
     hitbox.radius = radius;
 
-    if (find_wall_collisions(&hitbox) != 0) {
+    if (find_wall_collisions(&hitbox)) {
         dist[0] = (hitbox.x - x);
         dist[1] = (hitbox.y - y);
         dist[2] = (hitbox.z - z);
@@ -535,8 +535,8 @@ void obj_spawn_yellow_coins(struct Object *obj, s8 nCoins) {
 
     for (count = 0; count < nCoins; count++) {
         coin = spawn_object(obj, MODEL_YELLOW_COIN, bhvMovingYellowCoin);
-        coin->oForwardVel = (random_float() * 20);
-        coin->oVelY = ((random_float() * 40) + 20);
+        coin->oForwardVel   =  (random_float() * 20);
+        coin->oVelY         = ((random_float() * 40) + 20);
         coin->oMoveAngleYaw = random_u16();
     }
 }
@@ -549,7 +549,7 @@ s32 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan) {
         return FALSE;
     }
 
-    if (obj->oTimer < lifeSpan + 40) {
+    if (obj->oTimer < (lifeSpan + 40)) {
         COND_BIT((obj->oTimer & 0x1), obj->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE);
     } else {
         obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
@@ -685,7 +685,7 @@ UNUSED s32 debug_sequence_tracker(s16 debugInputSequence[]) {
         sDebugSequenceTracker++;
         sDebugTimer = 0;
     // If wrong input or timer reaches 10, reset sequence progress.
-    } else if (sDebugTimer == 10 || gPlayer3Controller->buttonPressed != 0) {
+    } else if ((sDebugTimer == 10) || (gPlayer3Controller->buttonPressed != 0)) {
         sDebugSequenceTracker = 0;
         sDebugTimer = 0;
         return FALSE;

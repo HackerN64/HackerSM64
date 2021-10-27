@@ -506,7 +506,7 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     Vec3f point0, point1, point2;
     Vec3f forward;
     Vec3f xColumn, yColumn, zColumn;
-    f32 minY = (-radius * 3);
+    f32 minY   = (-radius * 3);
     f32 height = (pos[1] + 150);
 
     point0[0] = (pos[0] + (radius * sins(yaw + 0x2AAA)));

@@ -120,7 +120,7 @@ void check_ledge_climb_down(struct MarioState *m) {
         wallCols.z = m->pos[2];
         wallCols.radius  =  10.0f;
         wallCols.offsetY = -10.0f;
-        if (find_wall_collisions(&wallCols) != 0) {
+        if (find_wall_collisions(&wallCols)) {
             f32 floorHeight = find_floor(wallCols.x, wallCols.y, wallCols.z, &floor);
             if ((floor != NULL) && ((wallCols.y - floorHeight) > 160.0f)) {
                 wall = wallCols.walls[wallCols.numWalls - 1];
@@ -443,10 +443,10 @@ void update_walking_speed(struct MarioState *m) {
     }
 
 #ifdef GROUND_SPEED_FLIP
-    if (m->forwardVel < -10.0f && analog_stick_held_back(m)) {
+    if ((m->forwardVel < -10.0f) && analog_stick_held_back(m)) {
         // Flip Mario if he is moving backwards
         m->faceAngle[1] += 0x8000;
-        m->forwardVel *= -1.0f;
+        m->forwardVel   *= -1.0f;
     }
 #endif
 
@@ -463,6 +463,10 @@ void update_walking_speed(struct MarioState *m) {
             turnRange *= (1.0f - (CLAMP(fac, 0.0f, 32.0f) / 32.0f));
             turnRange = MAX(turnRange, 0x800);
             approach_angle_bool(&m->faceAngle[1], targetYaw, turnRange);
+            // f32 fac = (m->intendedMag + m->forwardVel);
+            // fac = (1.0f - (CLAMP(fac, 0.0f, 32.0f) / 32.0f));
+            // s16 turnRange = (0x800 + ((0x7FFF - 0x800) * fac));
+            // approach_angle_bool(&m->faceAngle[1], targetYaw, turnRange);
         } else {
             m->faceAngle[1] = targetYaw;
         }

@@ -1148,8 +1148,10 @@ s32 set_water_plunge_action(struct MarioState *m) {
  * These are the scaling values for the x and z axis for Mario
  * when he is close to unsquishing.
  */
-u8 sSquishScaleOverTime[16] = { 0x46, 0x32, 0x32, 0x3C, 0x46, 0x50, 0x50, 0x3C,
-                                0x28, 0x14, 0x14, 0x1E, 0x32, 0x3C, 0x3C, 0x28 };
+u8 sSquishScaleOverTime[16] = {
+    0x46, 0x32, 0x32, 0x3C, 0x46, 0x50, 0x50, 0x3C,
+    0x28, 0x14, 0x14, 0x1E, 0x32, 0x3C, 0x3C, 0x28
+};
 
 /**
  * Applies the squish to Mario's model via scaling.
@@ -1562,8 +1564,10 @@ u32 update_and_return_cap_flags(struct MarioState *m) {
         u32 action = m->action;
 
         if ((m->capTimer <= 60)
-            || ((action != ACT_READING_AUTOMATIC_DIALOG) && (action != ACT_READING_NPC_DIALOG)
-                && (action != ACT_READING_SIGN) && (action != ACT_IN_CANNON))) {
+            || ((action != ACT_READING_AUTOMATIC_DIALOG)
+             && (action != ACT_READING_NPC_DIALOG)
+             && (action != ACT_READING_SIGN)
+             && (action != ACT_IN_CANNON))) {
             m->capTimer--;
         }
 
@@ -1792,7 +1796,7 @@ void init_mario(struct MarioState *m) {
 
     m->waterLevel = find_water_level(gMarioSpawnInfo->startPos[0], gMarioSpawnInfo->startPos[2]);
 
-    m->area = gCurrentArea;
+    m->area     = gCurrentArea;
     m->marioObj = gMarioObject;
     m->marioObj->header.gfx.animInfo.animID = -1;
     vec3s_copy(m->faceAngle, gMarioSpawnInfo->startAngle);
