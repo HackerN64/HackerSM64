@@ -464,11 +464,6 @@ void puppyprint_render_collision(void)
 #endif
 }
 
-puppyprint_render_graph(void)
-{
-
-}
-
 struct CPUBar {
     u32 *time;
     ColorRGB colour;
@@ -488,42 +483,6 @@ struct CPUBar cpu_ordering_table[] = {
 
 #define CPU_TABLE_MAX sizeof(cpu_ordering_table)/sizeof(struct CPUBar)
 #define ADDTIMES MAX((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX])/80, 1)
-
-#define MENU_BOX_WIDTH 128
-#define MAX_DEBUG_OPTIONS (sizeof(ppPages) / sizeof(struct PuppyPrintPage))
-
-struct PuppyPrintPage ppPages[] = {
-    {&puppyprint_render_standard, "Standard"},
-    {&puppyprint_render_minimal, "Minimal"},
-    {&print_audio_ram_overview, "Audio"},
-    {&print_ram_overview, "Segments"},
-    {&puppyprint_render_collision, "Collision"},
-    {&print_console_log, "Log"},
-};
-
-void render_page_menu(void)
-{
-    s32 i;
-    s32 posY;
-    s32 scrollY = 36/(MAX_DEBUG_OPTIONS-1);
-    prepare_blank_box();
-    render_blank_box(32,32,32+MENU_BOX_WIDTH,32+72, 0x00, 0x00, 0x00, 0xC0);
-    render_blank_box(32+MENU_BOX_WIDTH-8, 32+(scrollY*sDebugOption), 32+MENU_BOX_WIDTH, 32+(scrollY*sDebugOption)+36, 0xFF, 0xFF, 0xFF, 0xFF);
-    finish_blank_box();
-    for (i = 0; i < MAX_DEBUG_OPTIONS; i++)
-    {
-        s32 yOffset = sDebugOption > 5 ? sDebugOption-5 : 0;
-        posY = 38 + ((i-yOffset) * 10);
-        if (posY > 32 && posY < 90)
-        {
-            if (sDebugOption == i)
-                print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
-            else
-                print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
-            print_small_text(28+(MENU_BOX_WIDTH/2), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
-        }
-    }
-}
 
 void print_basic_profiling(void)
 {
@@ -601,8 +560,43 @@ void puppyprint_render_standard(void)
 
 void puppyprint_render_minimal(void)
 {
-    char textBytes[90];
     print_basic_profiling();
+}
+
+struct PuppyPrintPage ppPages[] = {
+    {&puppyprint_render_standard, "Standard"},
+    {&puppyprint_render_minimal, "Minimal"},
+    {&print_audio_ram_overview, "Audio"},
+    {&print_ram_overview, "Segments"},
+    {&puppyprint_render_collision, "Collision"},
+    {&print_console_log, "Log"},
+};
+
+#define MENU_BOX_WIDTH 128
+#define MAX_DEBUG_OPTIONS (sizeof(ppPages) / sizeof(struct PuppyPrintPage))
+
+void render_page_menu(void)
+{
+    s32 i;
+    s32 posY;
+    s32 scrollY = 36/(MAX_DEBUG_OPTIONS-1);
+    prepare_blank_box();
+    render_blank_box(32,32,32+MENU_BOX_WIDTH,32+72, 0x00, 0x00, 0x00, 0xC0);
+    render_blank_box(32+MENU_BOX_WIDTH-8, 32+(scrollY*sDebugOption), 32+MENU_BOX_WIDTH, 32+(scrollY*sDebugOption)+36, 0xFF, 0xFF, 0xFF, 0xFF);
+    finish_blank_box();
+    for (i = 0; i < (s32)MAX_DEBUG_OPTIONS; i++)
+    {
+        s32 yOffset = sDebugOption > 5 ? sDebugOption-5 : 0;
+        posY = 38 + ((i-yOffset) * 10);
+        if (posY > 32 && posY < 90)
+        {
+            if (sDebugOption == i)
+                print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
+            else
+                print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
+            print_small_text(28+(MENU_BOX_WIDTH/2), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
+        }
+    }
 }
 
 void puppyprint_render_profiler(void) {
@@ -683,6 +677,7 @@ void puppyprint_profiler_process(void) {
 
         //Performed twice a frame without fail, so doubled to have a more representative value.
         audioTime[NUM_PERF_ITERATIONS] *= 2;
+        dmaAudioTime[NUM_PERF_ITERATIONS] *= 2;
         dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
 
         get_average_perf_time(rspGenTime);
