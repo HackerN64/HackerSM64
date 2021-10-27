@@ -332,12 +332,7 @@ void update_shell_speed(struct MarioState *m) {
     }
 
     f32 targetSpeed = (m->intendedMag * 2.0f);
-    if (targetSpeed > maxTargetSpeed) {
-        targetSpeed = maxTargetSpeed;
-    }
-    if (targetSpeed < 24.0f) {
-        targetSpeed = 24.0f;
-    }
+    targetSpeed = CLAMP(targetSpeed, 24.0f, maxTargetSpeed);
 
     if (m->forwardVel <= 0.0f) {
         m->forwardVel += 1.1f;
@@ -352,7 +347,7 @@ void update_shell_speed(struct MarioState *m) {
         m->forwardVel = 64.0f;
     }
 
-    m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x800);
+    approach_angle_bool(&m->faceAngle[1], m->intendedYaw, 0x800);
 
     apply_slope_accel(m);
 }
@@ -993,7 +988,16 @@ s32 act_finish_turning_around(struct MarioState *m) {
         set_mario_action(m, ACT_WALKING, 0);
     }
 
+#ifdef GROUND_TURNING_AROUND_FIX
+    if (m->input & INPUT_NONZERO_ANALOG) {
+        m->marioObj->header.gfx.angle[1] += 0x8000;
+    } else {
+        m->faceAngle[1] = m->intendedYaw;
+        m->marioObj->header.gfx.angle[1] = (m->faceAngle[1] + 0x8000);
+    }
+#else
     m->marioObj->header.gfx.angle[1] += 0x8000;
+#endif
     return FALSE;
 }
 
@@ -1276,7 +1280,7 @@ s32 act_burning_ground(struct MarioState *m) {
     m->forwardVel = approach_f32(CLAMP(m->forwardVel, 8.0f, 48.0f), 32.0f, 4.0f, 1.0f);
 
     if (m->input & INPUT_NONZERO_ANALOG) {
-        m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, 0x600);
+        approach_angle_bool(&m->faceAngle[1], m->intendedYaw, 0x600);
     }
 
     apply_slope_accel(m);

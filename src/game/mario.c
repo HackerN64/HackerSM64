@@ -507,14 +507,12 @@ u32 mario_get_terrain_sound_addend(struct MarioState *m) {
  */
 s32 mario_facing_downhill(struct MarioState *m, s32 turnYaw) {
     s16 faceAngleYaw = m->faceAngle[1];
-
     // This is never used in practice, as turnYaw is
     // always passed as zero.
-    if (turnYaw && m->forwardVel < 0.0f) {
+    if (turnYaw && (m->forwardVel < 0.0f)) {
         faceAngleYaw += 0x8000;
     }
-    faceAngleYaw = m->floorYaw - faceAngleYaw;
-    return (-0x4000 < faceAngleYaw) && (faceAngleYaw < 0x4000);
+    return (abs_angle_diff(m->floorYaw, faceAngleYaw) < 0x4000);
 }
 
 /**
@@ -594,10 +592,8 @@ s32 mario_floor_is_steep(struct MarioState *m) {
  */
 f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f32 distFromMario) {
     struct Surface *floor;
-
     f32 y = (sins(m->faceAngle[1] + angleFromMario) * distFromMario);
     f32 x = (coss(m->faceAngle[1] + angleFromMario) * distFromMario);
-
     return find_floor((m->pos[0] + y), (m->pos[1] + 100.0f), (m->pos[2] + x), &floor);
 }
 
@@ -1282,7 +1278,7 @@ void update_mario_geometry_inputs(struct MarioState *m) {
     }
 
     m->ceilHeight = find_ceil(m->pos[0], (m->pos[1] + 3.0f), m->pos[2], &m->ceil);
-    f32 gasLevel = find_poison_gas_level(m->pos[0], m->pos[2]);
+    f32 gasLevel  = find_poison_gas_level(m->pos[0], m->pos[2]);
     m->waterLevel = find_water_level(m->pos[0], m->pos[2]);
 
     if (m->floor != NULL) {
