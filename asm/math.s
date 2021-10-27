@@ -8,14 +8,11 @@
 
 .balign 32
 glabel mtxf_to_mtx_asm
-    li.s $f6, 1.0
     li $v0, 1
     li.s $f4, 65536.0
 1:
     lwc1 $f0, ($a1)
     lwc1 $f2, 0x04($a1)
-    mul.s $f0, $f6
-    mul.s $f2, $f6
 
     andi $t0, $v0, (1 << 1)
     mul.s $f0, $f4
