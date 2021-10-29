@@ -5,12 +5,12 @@
 
 #include "engine/graph_node.h"
 
-extern struct GraphNodeRoot *gCurGraphNodeRoot;
-extern struct GraphNodeMasterList *gCurGraphNodeMasterList;
+extern struct GraphNodeRoot        *gCurGraphNodeRoot;
+extern struct GraphNodeMasterList  *gCurGraphNodeMasterList;
 extern struct GraphNodePerspective *gCurGraphNodeCamFrustum;
-extern struct GraphNodeCamera *gCurGraphNodeCamera;
-extern struct GraphNodeObject *gCurGraphNodeObject;
-extern struct GraphNodeHeldObject *gCurGraphNodeHeldObject;
+extern struct GraphNodeCamera      *gCurGraphNodeCamera;
+extern struct GraphNodeObject      *gCurGraphNodeObject;
+extern struct GraphNodeHeldObject  *gCurGraphNodeHeldObject;
 #define gCurGraphNodeObjectNode ((struct Object *)gCurGraphNodeObject)
 extern u16 gAreaUpdateCounter;
 

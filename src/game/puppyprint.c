@@ -289,7 +289,7 @@ void print_audio_ram_overview(void) {
     char textBytes[128];
     const s32 x = 16;
     s32 y = 16;
-    s32 i = 0;
+    s32 i =  0;
     s32 percentage = 0;
     s32 tmpY = y;
     s32 totalMemory[2] = {0, 0};
@@ -434,7 +434,7 @@ struct CPUBar cpu_ordering_table[] = {
 };
 
 #define CPU_TABLE_MAX sizeof(cpu_ordering_table)/sizeof(struct CPUBar)
-#define ADDTIMES MAX((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX])/80, 1)
+#define ADDTIMES MAX(((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX]) / 80), 1)
 
 void puppyprint_render_profiler(void) {
     s32 perfPercentage[CPU_TABLE_MAX];
@@ -461,7 +461,7 @@ void puppyprint_render_profiler(void) {
 
     if (!ramViewer && !audioRamViewer && !benchViewer && !logViewer) {
         print_fps(16, 40);
-        sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)(cpuCount / 333), (s32)CYCLE_CONV(rspTime), (s32)CYCLE_CONV(rspTime) / 333, (s32)CYCLE_CONV(rdpTime), (s32)CYCLE_CONV(rdpTime) / 333);
+        sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)(cpuCount / 333), (s32)CYCLE_CONV(rspTime), ((s32)CYCLE_CONV(rspTime) / 333), (s32)CYCLE_CONV(rdpTime), ((s32)CYCLE_CONV(rdpTime) / 333));
         print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
         sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
@@ -469,12 +469,21 @@ void puppyprint_render_profiler(void) {
 
         // Very little point printing useless info if Mayro doesn't even exist.
         if (gMarioState->marioObj) {
-            sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x", (s32)(gMarioState->pos[0]), (s32)(gMarioState->pos[1]), (s32)(gMarioState->pos[2]), (u16)(gMarioState->faceAngle[1]), (u32)(gMarioState->action & ACT_ID_MASK));
+            sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
+                    (s32)(gMarioState->pos[0]),
+                    (s32)(gMarioState->pos[1]),
+                    (s32)(gMarioState->pos[2]),
+                    (u16)(gMarioState->faceAngle[1]),
+                    (u32)(gMarioState->action & ACT_ID_MASK));
             print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
         }
         // Same for the camera, especially so because this will crash otherwise.
         if (gCamera) {
-            sprintf(textBytes, "Camera Pos#X: %d#Y: %d#Z: %d#D: %X", (s32)(gCamera->pos[0]), (s32)(gCamera->pos[1]), (s32)(gCamera->pos[2]), (u16)(gCamera->yaw));
+            sprintf(textBytes, "Camera Pos#X: %d#Y: %d#Z: %d#D: %X",
+                    (s32)(gCamera->pos[0]),
+                    (s32)(gCamera->pos[1]),
+                    (s32)(gCamera->pos[2]),
+                    (u16)(gCamera->yaw));
             print_small_text((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
         }
 
@@ -490,8 +499,10 @@ void puppyprint_render_profiler(void) {
 
         // Just to keep screen estate a little friendlier.
 #define MX NUM_PERF_ITERATIONS
+        s32 unclampedPerfPErcentage;
         for (i = 0; i < CPU_TABLE_MAX; i++) {
-            perfPercentage[i] = MAX((cpu_ordering_table[i].time[MX] / ADDTIMES), 0);
+            unclampedPerfPErcentage = (cpu_ordering_table[i].time[MX] / ADDTIMES);
+            perfPercentage[i] = MAX(unclampedPerfPErcentage, 0);
         }
 #undef ADDTIMES
 #undef MX
@@ -600,35 +611,35 @@ void puppyprint_profiler_process(void) {
     }
     if (fDebug/* && (gMarioState->action != ACT_DEBUG_FREE_MOVE)*/) {
         if (gPlayer1Controller->buttonPressed & D_JPAD) {
-            benchViewer ^= TRUE;
-            ramViewer = FALSE;
+            benchViewer   ^= TRUE;
+            ramViewer      = FALSE;
             audioRamViewer = FALSE;
-            logViewer = FALSE;
+            logViewer      = FALSE;
         } else if (gPlayer1Controller->buttonPressed & U_JPAD) {
             if (audioRamViewer) {
-                ramViewer = FALSE;
+                ramViewer  = FALSE;
             } else {
                 ramViewer ^= TRUE;
             }
             audioRamViewer = FALSE;
-            benchViewer = FALSE;
-            logViewer   = FALSE;
+            benchViewer    = FALSE;
+            logViewer      = FALSE;
         } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
             if (audioRamViewer) {
-                ramViewer = TRUE;
-                logViewer = FALSE;
+                ramViewer  = TRUE;
+                logViewer  = FALSE;
             } else {
                 logViewer ^= TRUE;
                 ramViewer  = FALSE;
             }
             audioRamViewer = FALSE;
-            benchViewer = FALSE;
+            benchViewer    = FALSE;
         } else if (gPlayer1Controller->buttonPressed & R_JPAD) {
             if (ramViewer) {
                 audioRamViewer ^= TRUE;
-                logViewer = FALSE;
-                ramViewer = FALSE;
-                benchViewer = FALSE;
+                logViewer       = FALSE;
+                ramViewer       = FALSE;
+                benchViewer     = FALSE;
             }
         }
 #ifdef VISUAL_DEBUG
@@ -667,7 +678,7 @@ void print_set_envcolour(s32 r, s32 g, s32 b, s32 a) {
      || (g != currEnv[1])
      || (b != currEnv[2])
      || (a != currEnv[3])) {
-        gDPSetEnvColor(gDisplayListHead++, (u8)r, (u8)g, (u8)b, (u8)a);
+        gDPSetEnvColor(gDisplayListHead++, (Color)r, (Color)g, (Color)b, (Color)a);
         vec4_set(currEnv, r, g, b, a);
     }
 }
@@ -983,11 +994,11 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
 }
 
 void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNUSED s32 scaleX, UNUSED s32 scaleY, s32 mode) {
-    s32 posW, posH, imW, imH, peakH, maskW, maskH, cycles, num, i, modeSC, mOne;
-    i = 0;
-    num = 256;
-    maskW = 1;
-    maskH = 1;
+    s32 posW, posH, imW, imH, modeSC, mOne;
+    s32 i     = 0;
+    s32 num   = 256;
+    s32 maskW = 1;
+    s32 maskH = 1;
 
     if (mode == G_CYC_COPY) {
         gDPSetCycleType(gDisplayListHead++, mode);
@@ -1047,8 +1058,8 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     }
     num = height;
     // Find the height remainder
-    peakH = (height - (height % imH));
-    cycles = ((width * peakH) / (imW * imH));
+    s32 peakH  = (height - (height % imH));
+    s32 cycles = ((width * peakH) / (imW * imH));
 
     // Pass 1
     for (i = 0; i < cycles; i++) {
@@ -1060,7 +1071,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
         }
         gDPLoadSync(gDisplayListHead++);
         gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
-        gSPScisTextureRectangle(gDisplayListHead++, ((x + posW) << 2), ((y + posH) << 2), ((x + posW + imW - mOne) << 2), ((y + posH + imH-mOne) << 2), G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
+        gSPScisTextureRectangle(gDisplayListHead++, ((x + posW) << 2), ((y + posH) << 2), (((x + posW + imW)- mOne) << 2), (((y + posH + imH) - mOne) << 2), G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
     }
     // If there's a remainder on the vertical side, then it will cycle through that too.
     if (height-peakH != 0) {
@@ -1070,7 +1081,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             posW = (i * imW);
             gDPLoadSync(gDisplayListHead++);
             gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
-            gSPScisTextureRectangle(gDisplayListHead++, ((x + posW) << 2), ((y + posH) << 2), ((x + posW + imW - mOne) << 2), ((y + posH + imH - mOne) << 2), G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
+            gSPScisTextureRectangle(gDisplayListHead++, ((x + posW) << 2), ((y + posH) << 2), (((x + posW + imW) - mOne) << 2), (((y + posH + imH) - mOne) << 2), G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
         }
     }
 }

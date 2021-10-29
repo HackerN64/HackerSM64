@@ -217,7 +217,7 @@ void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
  */
 void print_text(s32 x, s32 y, const char *str) {
     char c = 0;
-    s32 length = 0;
+    s32 length   = 0;
     s32 srcIndex = 0;
 
     // Don't continue if there is no memory to do so.
@@ -252,8 +252,7 @@ void print_text_centered(s32 x, s32 y, const char *str) {
     s32 srcIndex = 0;
 
     // Don't continue if there is no memory to do so.
-    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
-                                                        sizeof(struct TextLabel))) == NULL) {
+    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool, sizeof(struct TextLabel))) == NULL) {
         return;
     }
 
@@ -277,9 +276,9 @@ void print_text_centered(s32 x, s32 y, const char *str) {
  * Converts a char into the proper colorful glyph for the char.
  */
 s32 char_to_glyph_index(char c) {
-    if (c >= 'A' && c <= 'Z') return (c - 55);
-    if (c >= 'a' && c <= 'z') return (c - 87);
-    if (c >= '0' && c <= '9') return (c - 48);
+    if ((c >= 'A') && (c <= 'Z')) return (c - 55);
+    if ((c >= 'a') && (c <= 'z')) return (c - 87);
+    if ((c >= '0') && (c <= '9')) return (c - 48);
     if (c == ' ') return GLYPH_SPACE;
     if (c == '!') return GLYPH_EXCLAMATION_PNT; // !, JP only
     if (c == '#') return GLYPH_TWO_EXCLAMATION; // !!, JP only

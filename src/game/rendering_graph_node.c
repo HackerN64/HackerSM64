@@ -392,7 +392,7 @@ inline void append_dl_and_return(struct GraphNodeDisplayList *node) {
 void geo_process_master_list(struct GraphNodeMasterList *node) {
     s32 i;
 
-    if (gCurGraphNodeMasterList == NULL && node->node.children != NULL) {
+    if ((gCurGraphNodeMasterList == NULL) && (node->node.children != NULL)) {
         gCurGraphNodeMasterList = node;
         for (i = 0; i < LAYER_COUNT; i++) {
             node->listHeads[LIST_HEADS_ZEX][i] = NULL;
@@ -464,7 +464,7 @@ void geo_process_level_of_detail(struct GraphNodeLevelOfDetail *node) {
 #else
     f32 distanceFromCam = -gMatStack[gMatStackIndex][3][2];
 #endif
-    if ((f32)node->minDistance <= distanceFromCam && distanceFromCam < (f32)node->maxDistance) {
+    if (((f32)node->minDistance <= distanceFromCam) && (distanceFromCam < (f32)node->maxDistance)) {
         if (node->node.children != 0) {
             geo_process_node_and_siblings(node->node.children);
         }
@@ -483,7 +483,7 @@ void geo_process_switch(struct GraphNodeSwitchCase *node) {
     if (node->fnNode.func != NULL) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);
     }
-    for (i = 0; selectedChild != NULL && node->selectedCase > i; i++) {
+    for (i = 0; ((selectedChild != NULL) && (node->selectedCase > i)); i++) {
         selectedChild = selectedChild->next;
     }
     if (selectedChild != NULL) {
@@ -792,7 +792,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
     f32 shadowScale;
     struct GraphNode *geo;
 
-    if (gCurGraphNodeCamera != NULL && gCurGraphNodeObject != NULL) {
+    if ((gCurGraphNodeCamera != NULL) && (gCurGraphNodeObject != NULL)) {
         if (gCurGraphNodeHeldObject != NULL) {
             get_pos_from_transform_mtx(shadowPos, gMatStack[gMatStackIndex], *gCurGraphNodeCamera->matrixPtr);
             shadowScale = (node->shadowScale * gCurGraphNodeHeldObject->objNode->header.gfx.scale[0]);
@@ -803,9 +803,9 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
 
         f32 objScale = 1.0f;
         if (gCurrAnimEnabled) {
-            if (gCurrAnimType == ANIM_TYPE_TRANSLATION || gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION) {
+            if ((gCurrAnimType == ANIM_TYPE_TRANSLATION) || (gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION)) {
                 geo = node->node.children;
-                if (geo != NULL && geo->type == GRAPH_NODE_TYPE_SCALE) {
+                if ((geo != NULL) && (geo->type == GRAPH_NODE_TYPE_SCALE)) {
                     objScale = ((struct GraphNodeScale *) geo)->scale;
                 }
                 animOffset[0] = gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier * objScale;
@@ -930,7 +930,7 @@ void visualise_object_hitbox(struct Object *node) {
             debug_box_color(COLOR_RGBA32_DEBUG_HITBOX);
         }
         debug_box(bnds1, bnds2, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_REJ);
-        vec3f_set(bnds1, node->oPosX, node->oPosY - node->hitboxDownOffset, node->oPosZ);
+        vec3f_set(bnds1, node->oPosX, (node->oPosY - node->hitboxDownOffset), node->oPosZ);
         vec3f_set(bnds2, node->hurtboxRadius, node->hurtboxHeight, node->hurtboxRadius);
         debug_box_color(COLOR_RGBA32_DEBUG_HURTBOX);
         debug_box(bnds1, bnds2, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_REJ);
@@ -1024,7 +1024,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
     if (node->fnNode.func != NULL) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);
     }
-    if (node->objNode != NULL && node->objNode->header.gfx.sharedChild != NULL) {
+    if ((node->objNode != NULL) && (node->objNode->header.gfx.sharedChild != NULL)) {
         s32 hasAnimation = (node->objNode->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0;
         vec3_quot_val(translation, node->translation, 4.0f);
 
@@ -1157,15 +1157,15 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         mtxf_to_mtx(initialMatrix, gMatStack[gMatStackIndex]);
         gMatStackFixed[gMatStackIndex] = initialMatrix;
         gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewport));
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(gMatStackFixed[gMatStackIndex]),
-                  (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
+        gSPMatrix(  gDisplayListHead++, VIRTUAL_TO_PHYSICAL(gMatStackFixed[gMatStackIndex]),
+                    (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
         gCurGraphNodeRoot = node;
         if (node->node.children != NULL) {
             geo_process_node_and_siblings(node->node.children);
         }
         gCurGraphNodeRoot = NULL;
         if (gShowDebugText) {
-            print_text_fmt_int(180, 36, "MEM %d", gDisplayListHeap->totalSpace - gDisplayListHeap->usedSpace);
+            print_text_fmt_int(180, 36, "MEM %d", (gDisplayListHeap->totalSpace - gDisplayListHeap->usedSpace));
         }
         main_pool_free(gDisplayListHeap);
     }

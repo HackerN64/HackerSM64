@@ -32,15 +32,14 @@ void falling_bowser_plat_act_start(void) {
 void falling_bowser_plat_act_check(void) {
     struct Object *bowser = o->oBitsPlatformBowser;
 
-    if (bowser->platform == o) {
-        if (bowser->oAction == BOWSER_ACT_BIG_JUMP
-            && bowser->oBowserStatus & BOWSER_STATUS_BIG_JUMP) {
-            o->oAction = BOWSER_BITS_PLAT_ACT_FALL;
-        }
+    if ((bowser->platform == o)
+     && (bowser->oAction == BOWSER_ACT_BIG_JUMP)
+     && (bowser->oBowserStatus & BOWSER_STATUS_BIG_JUMP)) {
+        o->oAction = BOWSER_BITS_PLAT_ACT_FALL;
     }
 
-    if (bowser->oHealth == 1
-        && (bowser->oAction == BOWSER_ACT_DANCE || bowser->oHeldState != HELD_FREE)) {
+    if ((bowser->oHealth == 1)
+        && ((bowser->oAction == BOWSER_ACT_DANCE) || (bowser->oHeldState != HELD_FREE))) {
         o->oSubAction = 1;
     }
 
@@ -56,7 +55,7 @@ void falling_bowser_plat_act_check(void) {
 }
 
 void falling_bowser_plat_act_fall(void) {
-    if (o->oTimer == 0 || o->oTimer == 22) {
+    if ((o->oTimer == 0) || (o->oTimer == 22)) {
         cur_obj_play_sound_2(SOUND_GENERAL_BOWSER_PLATFORM_FALL);
     }
 

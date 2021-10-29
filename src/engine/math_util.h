@@ -467,7 +467,7 @@ extern f32 gSineTable[];
     }                                   \
 }
 
-f32 roundf(f32 x);
+s32 roundf(f32 x);
 f32 absf(f32 x);
 s32 min_3i(s32 a0, s32 a1, s32 a2);
 f32 min_3f(f32 a0, f32 a1, f32 a2);
@@ -557,7 +557,7 @@ s32 atan2s(f32 y, f32 x);
 f32 atan2f(f32 a, f32 b);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
-s32 anim_spline_poll(Vec3f result);
+s32  anim_spline_poll(Vec3f result);
 void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void mtxf_rot_trans_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);

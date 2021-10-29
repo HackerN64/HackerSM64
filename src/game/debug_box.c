@@ -287,7 +287,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
     while (vts > 0) {
         if (count == VERTCOUNT) {
             ntx = MIN(VERTCOUNT, vts);
-            gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts + ((gVisualSurfaceCount)-vts)), ntx, 0);
+            gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
             count = 0;
             vtl   = VERTCOUNT;
         }
@@ -351,7 +351,9 @@ s32 iterate_surface_count(s32 x, s32 z) {
 }
 
 void visual_surface_loop(void) {
-    if (!gSurfaceNodesAllocated || !gSurfacesAllocated || !gMarioState->marioObj) {
+    if (!gSurfaceNodesAllocated
+     || !gSurfacesAllocated
+     || !gMarioState->marioObj) {
         return;
     }
     Mtx *mtx   = alloc_display_list(sizeof(Mtx));
@@ -360,7 +362,7 @@ void visual_surface_loop(void) {
     gVisualSurfaceCount = 0;
     gVisualOffset       = 0;
 
-    if (mtx == NULL || verts == NULL) {
+    if ((mtx == NULL) || (verts == NULL)) {
         return;
     }
     mtxf_to_mtx(mtx, gMatStack[1]);
@@ -476,7 +478,9 @@ static void render_box(int index) {
     mtxf_to_mtx(mtx, gMatStack[1]);
     guTranslate(translate, box->center[0],  box->center[1],  box->center[2]);
     guRotate(rotate, ((box->yaw / (f32)0x10000) * 360.0f), 0, 1.0f, 0);
-    guScale(scale, ((f32) box->bounds[0] * 0.01f), ((f32) box->bounds[1] * 0.01f), ((f32) box->bounds[2] * 0.01f));
+    guScale(scale, ((f32) box->bounds[0] * 0.01f),
+                   ((f32) box->bounds[1] * 0.01f),
+                   ((f32) box->bounds[2] * 0.01f));
 
     gSPMatrix(gDisplayListHead++, mtx,       (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
     gSPMatrix(gDisplayListHead++, translate, (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));

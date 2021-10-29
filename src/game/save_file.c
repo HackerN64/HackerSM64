@@ -63,7 +63,7 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
 
     if (gEepromProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer) / 8;
+        u32 offset = ((u32)((u8 *) buffer - (u8 *) &gSaveBuffer) / 8);
 
         do {
 #if ENABLE_RUMBLE
@@ -74,7 +74,7 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
-        } while (triesLeft > 0 && status != 0);
+        } while ((triesLeft > 0) && (status != 0));
     }
 
     return status;
@@ -91,7 +91,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
 
     if (gEepromProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer) >> 3;
+        u32 offset = ((u32)((u8 *) buffer - (u8 *) &gSaveBuffer) >> 3);
 
         do {
 #if ENABLE_RUMBLE
@@ -102,7 +102,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
-        } while (triesLeft > 0 && status != 0);
+        } while ((triesLeft > 0) && (status != 0));
     }
 
     return status;
@@ -131,7 +131,7 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
-        } while (triesLeft > 0 && status != 0);
+        } while ((triesLeft > 0) && (status != 0));
     }
 
     return status;
@@ -159,7 +159,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
-        } while (triesLeft > 0 && status != 0);
+        } while ((triesLeft > 0) && (status != 0));
     }
 
     return status;
@@ -356,8 +356,8 @@ void save_file_load_all(void) {
     read_eeprom_data(&gSaveBuffer, sizeof(gSaveBuffer));
 
     // Verify the main menu data and create a backup copy if only one of the slots is valid.
-    s32 validSlots = verify_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
-    // validSlots |= verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1;
+    s32 validSlots  =  verify_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
+    // validSlots |= (verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1);
     switch (validSlots) {
         case 0: // Neither copy is correct
             wipe_main_menu_data();
@@ -373,8 +373,8 @@ void save_file_load_all(void) {
     s32 file;
     for (file = 0; file < NUM_SAVE_FILES; file++) {
         // Verify the save file and create a backup copy if only one of the slots is valid.
-        validSlots = verify_save_block_signature(&gSaveBuffer.files[file][0], sizeof(gSaveBuffer.files[file][0]), SAVE_FILE_MAGIC);
-        validSlots |= verify_save_block_signature(&gSaveBuffer.files[file][1], sizeof(gSaveBuffer.files[file][1]), SAVE_FILE_MAGIC) << 1;
+        validSlots  =  verify_save_block_signature(&gSaveBuffer.files[file][0], sizeof(gSaveBuffer.files[file][0]), SAVE_FILE_MAGIC);
+        validSlots |= (verify_save_block_signature(&gSaveBuffer.files[file][1], sizeof(gSaveBuffer.files[file][1]), SAVE_FILE_MAGIC) << 1);
         switch (validSlots) {
             case 0: // Neither copy is correct
                 save_file_erase(file);
@@ -391,7 +391,9 @@ void save_file_load_all(void) {
 
 #ifdef PUPPYCAM
 void puppycam_check_save(void) {
-    if (gSaveBuffer.menuData[0].firstBoot != 4 || gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5 || gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5) {
+    if ((gSaveBuffer.menuData[0].firstBoot != 4)
+     || (gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5)
+     || (gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5)) {
         wipe_main_menu_data();
         gSaveBuffer.menuData[0].firstBoot = 4;
         puppycam_default_config();
@@ -438,7 +440,7 @@ void save_file_reload(void) {
     bcopy(&gSaveBuffer.menuData[1], &gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]));
 
     gMainMenuDataModified = FALSE;
-    gSaveFileModified = FALSE;
+    gSaveFileModified     = FALSE;
 }
 
 /**
@@ -561,7 +563,7 @@ s32 save_file_get_total_star_count(s32 fileIndex, s32 minCourse, s32 maxCourse) 
     }
 
     // Add castle secret star count.
-    return save_file_get_course_star_count(fileIndex, COURSE_NUM_TO_INDEX(COURSE_NONE)) + count;
+    return (save_file_get_course_star_count(fileIndex, COURSE_NUM_TO_INDEX(COURSE_NONE)) + count);
 }
 
 void save_file_set_flags(u32 flags) {
@@ -576,7 +578,7 @@ void save_file_clear_flags(u32 flags) {
 }
 
 u32 save_file_get_flags(void) {
-    if (gCurrCreditsEntry != NULL || gCurrDemoInput != NULL) {
+    if ((gCurrCreditsEntry != NULL) || (gCurrDemoInput != NULL)) {
         return 0;
     }
     return gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags;
@@ -592,7 +594,7 @@ u32 save_file_get_star_flags(s32 fileIndex, s32 courseIndex) {
     if (courseIndex == COURSE_NUM_TO_INDEX(COURSE_NONE)) {
         starFlags = SAVE_FLAG_TO_STAR_FLAG(gSaveBuffer.files[fileIndex][0].flags);
     } else {
-        starFlags = gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & 0x7F;
+        starFlags = (gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & 0x7F);
     }
 
     return starFlags;
@@ -621,7 +623,7 @@ s32 save_file_get_course_coin_score(s32 fileIndex, s32 courseIndex) {
  * Return TRUE if the cannon is unlocked in the current course.
  */
 s32 save_file_is_cannon_unlocked(void) {
-    return (gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] & COURSE_FLAG_CANNON_UNLOCKED) != 0;
+    return ((gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] & COURSE_FLAG_CANNON_UNLOCKED) != 0);
 }
 
 /**
@@ -651,8 +653,9 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
     s32 flags = save_file_get_flags();
 
-    if (saveFile->capLevel == gCurrLevelNum && saveFile->capArea == gCurrAreaIndex
-        && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
+    if ((saveFile->capLevel == gCurrLevelNum)
+     && (saveFile->capArea == gCurrAreaIndex)
+     && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
 #ifdef SAVE_NUM_LIVES
         vec3_zero(capPos);
 #else

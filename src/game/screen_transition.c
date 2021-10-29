@@ -74,20 +74,17 @@ s32 dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *t
 
 s32 render_fade_transition_from_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *transData) {
     u8 alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_FROM_COLOR, fadeTimer, transTime);
-
     return dl_transition_color(fadeTimer, transTime, transData, alpha);
 }
 
 s32 render_fade_transition_into_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *transData) {
     u8 alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_INTO_COLOR, fadeTimer, transTime);
-
     return dl_transition_color(fadeTimer, transTime, transData, alpha);
 }
 
 s32 calc_tex_transition_radius(s8 fadeTimer, s8 transTime, struct WarpTransitionData *transData) {
     f32 texRadius  = (transData->endTexRadius - transData->startTexRadius);
     f32 radiusTime = ((sTransitionColorFadeCount[fadeTimer] * texRadius) / (f32)(transTime - 1));
-
     return (s16)((transData->startTexRadius + radiusTime) + 0.5f);
 }
 

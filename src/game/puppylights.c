@@ -102,8 +102,8 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
         lightPos[1] = lightRelative[2];
     } else {
         // Get the position based off the rotation of the box.
-        lightPos[0] = (lightRelative[2] * sins(-light->yaw)) + (lightRelative[0] * coss(-light->yaw));
-        lightPos[1] = (lightRelative[2] * coss(-light->yaw)) - (lightRelative[0] * sins(-light->yaw));
+        lightPos[0] = ((lightRelative[2] * sins(-light->yaw)) + (lightRelative[0] * coss(-light->yaw)));
+        lightPos[1] = ((lightRelative[2] * coss(-light->yaw)) - (lightRelative[0] * sins(-light->yaw)));
     }
 
 #ifdef VISUAL_DEBUG
@@ -117,9 +117,9 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     }
 #endif
     // Check if the object is inside the box, after correcting it for rotation.
-    if (-light->pos[1][0] <      lightPos[0] &&      lightPos[0] < light->pos[1][0] &&
-        -light->pos[1][1] < lightRelative[1] && lightRelative[1] < light->pos[1][1] &&
-        -light->pos[1][2] <      lightPos[1] &&      lightPos[1] < light->pos[1][2]) {
+    if ((-light->pos[1][0] <      lightPos[0]) && (     lightPos[0] < light->pos[1][0])
+     && (-light->pos[1][1] < lightRelative[1]) && (lightRelative[1] < light->pos[1][1])
+     && (-light->pos[1][2] <      lightPos[1]) && (     lightPos[1] < light->pos[1][2])) {
         // If so, then start making preparations to see how alongside they're in.
         // This takes the largest side of the box and multiplies the other axis to match the numbers.
         // This way, the colour value will scale correctly, no matter which side is entered.
@@ -327,7 +327,7 @@ void set_light_properties(struct PuppyLight *light, s32 x, s32 y, s32 z, s32 off
     vec3s_set(light->pos[0], x, y, z);
     vec3s_set(light->pos[1], MAX(offsetX, 10), MAX(offsetY, 10), MAX(offsetZ, 10));
     RGBA32_TO_COLORRGBA(light->rgba, colour);
-    light->yaw = yaw;
+    light->yaw  = yaw;
     light->area = gCurrAreaIndex;
     light->room = room;
     light->epicentre = epicentre;

@@ -155,8 +155,6 @@ f32 disable_shadow_with_distance(f32 shadowScale, f32 distFromFloor) {
  * Dim a shadow when its parent object is further from the ground.
  */
 s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
-    f32 ret;
-
     if (solidity < 121) {
         return solidity;
     } else if (distFromFloor <= 0.0f) {
@@ -164,8 +162,7 @@ s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
     } else if (distFromFloor >= 600.0f) {
         return 120;
     } else {
-        ret = ((120 - solidity) * distFromFloor) / 600.0f + (f32) solidity;
-        return ret;
+        return ((((120 - solidity) * distFromFloor) / 600.0f) + (f32) solidity);
     }
 }
 
@@ -177,7 +174,7 @@ f32 get_water_level_below_shadow(struct Shadow *s, struct Surface **waterFloor) 
     f32 waterLevel = find_water_level_and_floor(s->parentPos[0], s->parentPos[2], waterFloor);
     if (waterLevel < FLOOR_LOWER_LIMIT_SHADOW) {
         return 0;
-    } else if (s->parentPos[1] >= waterLevel && s->floorHeight <= waterLevel) {
+    } else if ((s->parentPos[1] >= waterLevel) && (s->floorHeight <= waterLevel)) {
         gShadowFlags |= SHADOW_FLAG_WATER_BOX;
         return waterLevel;
     }
@@ -418,7 +415,9 @@ s32 floor_local_tilt(struct Shadow s, f32 vtxX, f32 vtxY, f32 vtxZ) {
     f32 relY = (vtxY - s.floorHeight);
     f32 relZ = (vtxZ - s.parentPos[2]);
 
-    return (s16)((relX * s.floorNormal[0]) + (relY * s.floorNormal[1]) + (relZ * s.floorNormal[2]));
+    return (s16)((relX * s.floorNormal[0])
+               + (relY * s.floorNormal[1])
+               + (relZ * s.floorNormal[2]));
 }
 
 /**
@@ -520,36 +519,34 @@ void linearly_interpolate_solidity_negative(struct Shadow *s, u8 initialSolidity
  */
 s32 correct_shadow_solidity_for_animations(UNUSED s32 isLuigi, u8 initialSolidity, struct Shadow *shadow) {
     struct Object *player = gMarioObject;
-    s8 ret;
     s16 animFrame = player->header.gfx.animInfo.animFrame;
     switch (player->header.gfx.animInfo.animID) {
         case MARIO_ANIM_IDLE_ON_LEDGE:
-            ret = SHADOW_SOLIDITY_NO_SHADOW;
+            return SHADOW_SOLIDITY_NO_SHADOW;
             break;
         case MARIO_ANIM_FAST_LEDGE_GRAB:
             linearly_interpolate_solidity_positive(shadow, initialSolidity, animFrame,  5, 14);
-            ret = SHADOW_SOILDITY_ALREADY_SET;
+            return SHADOW_SOILDITY_ALREADY_SET;
             break;
         case MARIO_ANIM_SLOW_LEDGE_GRAB:
             linearly_interpolate_solidity_positive(shadow, initialSolidity, animFrame, 21, 33);
-            ret = SHADOW_SOILDITY_ALREADY_SET;
+            return SHADOW_SOILDITY_ALREADY_SET;
             break;
         case MARIO_ANIM_CLIMB_DOWN_LEDGE:
             linearly_interpolate_solidity_negative(shadow, initialSolidity, animFrame,  0,  5);
-            ret = SHADOW_SOILDITY_ALREADY_SET;
+            return SHADOW_SOILDITY_ALREADY_SET;
             break;
         default:
-            ret = SHADOW_SOLIDITY_NOT_YET_SET;
+            return SHADOW_SOLIDITY_NOT_YET_SET;
             break;
     }
-    return ret;
 }
 
 /**
  * Slightly change the height of a shadow in levels with lava.
  */
 void correct_lava_shadow_height(struct Shadow *s) {
-    if (gCurrLevelNum == LEVEL_BITFS && sSurfaceTypeBelowShadow == SURFACE_BURNING) {
+    if ((gCurrLevelNum == LEVEL_BITFS) && (sSurfaceTypeBelowShadow == SURFACE_BURNING)) {
         if (s->floorHeight < -3000.0f) {
             s->floorHeight = -3062.0f;
             gShadowFlags |= SHADOW_FLAG_WATER_BOX;

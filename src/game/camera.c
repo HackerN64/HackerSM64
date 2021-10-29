@@ -3161,19 +3161,19 @@ Gfx *geo_camera_main(s32 callContext, struct GraphNode *g, void *context) {
  *
  * The spline is described at www2.cs.uregina.ca/~anima/408/Notes/Interpolation/UniformBSpline.htm
  */
-void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f a0, Vec3f a1, Vec3f a2, Vec3f a3) {
+void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f spline1, Vec3f spline2, Vec3f spline3, Vec3f spline4) {
     f32 B[4];
     if (u > 1.0f) u = 1.0f;
     register f32 nu = (1.0f - u);
     register f32 su = sqr(u);
-    register f32 hcu = (cube(u) / 2.0f);
+    register f32 hcu = ((su * u) / 2.0f);
     B[0] = (cube(nu) / 6.0f);
     B[1] = (( hcu ) -  su                      + (2.0f / 3.0f));
     B[2] = ((-hcu ) + (su / 2.0f) + (u / 2.0f) + (5.0f / 3.0f));
     B[3] =  ( hcu / 3.0f);
-    Q[0] = ((B[0] * a0[0]) + (B[1] * a1[0]) + (B[2] * a2[0]) + (B[3] * a3[0]));
-    Q[1] = ((B[0] * a0[1]) + (B[1] * a1[1]) + (B[2] * a2[1]) + (B[3] * a3[1]));
-    Q[2] = ((B[0] * a0[2]) + (B[1] * a1[2]) + (B[2] * a2[2]) + (B[3] * a3[2]));
+    Q[0] = ((B[0] * spline1[0]) + (B[1] * spline2[0]) + (B[2] * spline3[0]) + (B[3] * spline4[0]));
+    Q[1] = ((B[0] * spline1[1]) + (B[1] * spline2[1]) + (B[2] * spline3[1]) + (B[3] * spline4[1]));
+    Q[2] = ((B[0] * spline1[2]) + (B[1] * spline2[2]) + (B[2] * spline3[2]) + (B[3] * spline4[2]));
 }
 
 /**
