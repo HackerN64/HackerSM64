@@ -7,16 +7,18 @@
 
 #include "engine/extended_bounds.h"
 
-#define CELL_HEIGHT_LIMIT           20000
+#define CELL_HEIGHT_LIMIT            20000
 #define FLOOR_LOWER_LIMIT           -11000
 #define FLOOR_LOWER_LIMIT_MISC      (FLOOR_LOWER_LIMIT + 1000)
-// same as FLOOR_LOWER_LIMIT_MISC, explicitly for shadow.c
-#define FLOOR_LOWER_LIMIT_SHADOW    (FLOOR_LOWER_LIMIT + 1000)
 
-#define is_outside_level_bounds(xPos, zPos) (((xPos) <= -LEVEL_BOUNDARY_MAX) || ((xPos) >=  LEVEL_BOUNDARY_MAX) || ((zPos) <= -LEVEL_BOUNDARY_MAX) || ((zPos) >=  LEVEL_BOUNDARY_MAX))
+#define is_outside_level_bounds(xPos, zPos) \
+    (((xPos) <= -LEVEL_BOUNDARY_MAX) ||     \
+     ((xPos) >=  LEVEL_BOUNDARY_MAX) ||     \
+     ((zPos) <= -LEVEL_BOUNDARY_MAX) ||     \
+     ((zPos) >=  LEVEL_BOUNDARY_MAX))
 
-#define get_surface_height_at_location(xPos, zPos, surf) (-(((xPos) * (surf)->normal.x) + ((surf)->normal.z * (zPos)) + (surf)->originOffset) / (surf)->normal.y)
-#define get_surface_height_at_location_ny(xPos, zPos, surf, ny) (-(((xPos) * (surf)->normal.x) + ((surf)->normal.z * (zPos)) + (surf)->originOffset) / ny)
+#define get_surface_height_at_location(   xPos, zPos, surf)     (-(((xPos) * (surf)->normal.x) + ((surf)->normal.z * (zPos)) + (surf)->originOffset) / (surf)->normal.y)
+#define get_surface_height_at_location_ny(xPos, zPos, surf, ny) (-(((xPos) * (surf)->normal.x) + ((surf)->normal.z * (zPos)) + (surf)->originOffset) / (ny))
 
 #define SURFACE_YAW(s) (atan2s(((s)->normal.z), ((s)->normal.x)))
 
@@ -32,7 +34,7 @@ struct WallCollisionData {
     /*0x00*/ f32 x, y, z;
     /*0x0C*/ f32 offsetY;
     /*0x10*/ f32 radius;
-    /*0x14*/ u8 filler[2];
+    /*0x14*/ u8  filler[2];
     /*0x16*/ s16 numWalls;
     /*0x18*/ struct Surface *walls[MAX_REFEREMCED_WALLS];
 };

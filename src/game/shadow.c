@@ -97,7 +97,7 @@ shadowRectangle rectangles[2] = {
 };
 
 // See shadow.h for documentation.
-s8 gShadowFlags;
+s8  gShadowFlags;
 s16 sSurfaceTypeBelowShadow;
 
 /**
@@ -144,11 +144,7 @@ f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
  * Disable a shadow when its parent object is more than 600 units from the ground.
  */
 f32 disable_shadow_with_distance(f32 shadowScale, f32 distFromFloor) {
-    if (distFromFloor >= 600.0f) {
-        return 0.0f;
-    } else {
-        return shadowScale;
-    }
+    return ((distFromFloor >= 600.0f) ? 0.0f : shadowScale);
 }
 
 /**
@@ -172,7 +168,7 @@ s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
  */
 f32 get_water_level_below_shadow(struct Shadow *s, struct Surface **waterFloor) {
     f32 waterLevel = find_water_level_and_floor(s->parentPos[0], s->parentPos[2], waterFloor);
-    if (waterLevel < FLOOR_LOWER_LIMIT_SHADOW) {
+    if (waterLevel < FLOOR_LOWER_LIMIT_MISC) {
         return 0;
     } else if ((s->parentPos[1] >= waterLevel) && (s->floorHeight <= waterLevel)) {
         gShadowFlags |= SHADOW_FLAG_WATER_BOX;
@@ -197,7 +193,12 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
     s->parentPos[1] = yPos;
     s->parentPos[2] = zPos;
 
-    s->floorHeight = find_floor(s->parentPos[0], s->parentPos[1], s->parentPos[2], &floor);
+    if ((gCurGraphNodeObjectNode != gMarioObject) && (gCurGraphNodeObjectNode->oFloor != NULL)) {
+        floor          = gCurGraphNodeObjectNode->oFloor;
+        s->floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
+    } else {
+        s->floorHeight = find_floor(xPos, yPos, zPos, &floor);
+    }
 
     f32 waterLevel = get_water_level_below_shadow(s, &waterFloor);
 
@@ -226,7 +227,7 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
     } else {
         // Don't draw a shadow if the floor is lower than expected possible,
         // or if the y-normal is negative (an unexpected result).
-        if ((s->floorHeight < FLOOR_LOWER_LIMIT_SHADOW) || (floor->normal.y <= 0.0f)) {
+        if ((s->floorHeight < FLOOR_LOWER_LIMIT_MISC) || (floor->normal.y <= 0.0f)) {
             return TRUE;
         }
 
@@ -330,7 +331,7 @@ void make_shadow_vertex_at_xyz(Vtx *vertices, s8 index, f32 relX, f32 relY, f32 
  * according to the floor's normal vector.
  */
 f32 extrapolate_vertex_y_position(struct Shadow s, f32 vtxX, f32 vtxZ) {
-    return -((s.floorNormal[0] * vtxX) + (s.floorNormal[2] * vtxZ) + s.floorOriginOffset) / s.floorNormal[1];
+    return (-((s.floorNormal[0] * vtxX) + (s.floorNormal[2] * vtxZ) + s.floorOriginOffset) / s.floorNormal[1]);
 }
 
 /**
@@ -373,8 +374,8 @@ void calculate_vertex_xyz(s8 index, struct Shadow s, f32 *xPosVtx, f32 *yPosVtx,
     f32 halfScale       = ((xCoordUnit * s.shadowScale) / 2.0f);
     f32 halfTiltedScale = ((zCoordUnit *   tiltedScale) / 2.0f);
 
-    *xPosVtx = (halfTiltedScale * sinf(downwardAngle)) + (halfScale * cosf(downwardAngle)) + s.parentPos[0];
-    *zPosVtx = (halfTiltedScale * cosf(downwardAngle)) - (halfScale * sinf(downwardAngle)) + s.parentPos[2];
+    *xPosVtx = ((halfTiltedScale * sinf(downwardAngle)) + (halfScale * cosf(downwardAngle)) + s.parentPos[0]);
+    *zPosVtx = ((halfTiltedScale * cosf(downwardAngle)) - (halfScale * sinf(downwardAngle)) + s.parentPos[2]);
 
     if (gShadowFlags & SHADOW_FLAG_WATER_BOX) {
         *yPosVtx = s.floorHeight;
@@ -596,7 +597,7 @@ Gfx *create_shadow_player(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 soli
 
     Vtx *verts       = alloc_display_list(9 * sizeof(Vtx));
     Gfx *displayList = alloc_display_list(5 * sizeof(Gfx));
-    if (verts == NULL || displayList == NULL) {
+    if ((verts == NULL) || (displayList == NULL)) {
         return NULL;
     }
 
@@ -673,7 +674,7 @@ Gfx *create_shadow_circle_assuming_flat_ground(f32 xPos, f32 yPos, f32 zPos, s16
         floorHeight = find_floor_height(xPos, yPos, zPos);
     }
 
-    if (floorHeight < FLOOR_LOWER_LIMIT_SHADOW) {
+    if (floorHeight < FLOOR_LOWER_LIMIT_MISC) {
         return NULL;
     } else {
         distBelowFloor = (floorHeight - yPos);
@@ -734,11 +735,11 @@ s32 get_shadow_height_solidity(f32 xPos, f32 yPos, f32 zPos, f32 *shadowHeight, 
         *shadowHeight = find_floor_height(xPos, yPos, zPos);
     }
 
-    if (*shadowHeight < FLOOR_LOWER_LIMIT_SHADOW) {
+    if (*shadowHeight < FLOOR_LOWER_LIMIT_MISC) {
         return TRUE;
     } else {
         f32 waterLevel = find_water_level(xPos, zPos);
-        if (waterLevel < FLOOR_LOWER_LIMIT_SHADOW) {
+        if (waterLevel < FLOOR_LOWER_LIMIT_MISC) {
             // Dead if-statement. There may have been an assert here.
         } else if ((yPos >= waterLevel) && (waterLevel >= *shadowHeight)) {
             gShadowFlags |= SHADOW_FLAG_WATER_BOX;
@@ -808,7 +809,11 @@ Gfx *create_shadow_hardcoded_rectangle(f32 xPos, f32 yPos, f32 zPos, UNUSED s16 
 Gfx *create_shadow_below_xyz(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 shadowSolidity, s8 shadowType) {
     Gfx *displayList = NULL;
     struct Surface *pfloor;
-    find_floor(xPos, yPos, zPos, &pfloor);
+    if (gCurGraphNodeObjectNode->oFloor != NULL) {
+        pfloor = gCurGraphNodeObjectNode->oFloor;
+    } else {
+        find_floor(xPos, yPos, zPos, &pfloor);
+    }
     gShadowFlags = SHADOW_FLAGS_NONE;
     if (pfloor != NULL) {
         if (pfloor->type == SURFACE_ICE) {

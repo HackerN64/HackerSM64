@@ -66,7 +66,8 @@ void make_vertex(Vtx *vtx, s32 n, f32 x, f32 y, f32 z, s16 tx, s16 ty, u8 r, u8 
  * Round `num` to the nearest `s32`.
  */
 s32 round_float(f32 num) {
-    return ((num >= 0.0f) ? (num + 0.5f) : (num - 0.5f));
+    return roundf(num);
+    // return ((num >= 0.0f) ? (num + 0.5f) : (num - 0.5f));
 }
 
 #define NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT 10
@@ -75,13 +76,11 @@ s32 round_float(f32 num) {
  * player where to look to enter Tower of the Wing Cap.
  */
 Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx) {
-    s32 flags;
-    struct GraphNodeGenerated *generatedNode;
     Gfx *displayListHead = NULL;
-    Gfx *displayList = NULL;
+    Gfx *displayList     = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        flags = save_file_get_flags();
+        s32 flags = save_file_get_flags();
         if (gHudDisplay.stars >= NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT && !(flags & SAVE_FLAG_HAVE_WING_CAP)) {
             displayList = alloc_display_list(2 * sizeof(*displayList));
 
@@ -91,7 +90,7 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
                 displayListHead = displayList;
             }
 
-            generatedNode = (struct GraphNodeGenerated *) node;
+            struct GraphNodeGenerated *generatedNode = (struct GraphNodeGenerated *) node;
             SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_TRANSPARENT);
 
             gSPDisplayList(displayListHead++, dl_castle_lobby_wing_cap_light);

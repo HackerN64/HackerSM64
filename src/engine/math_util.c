@@ -795,7 +795,7 @@ void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, 
  * Construct the 'to' point which is distance 'dist' away from the 'from' position,
  * and has the angles pitch and yaw.
  */
-void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, s32 pitch, s32 yaw) {
+void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, Angle32 pitch, Angle32 yaw) {
     register f32 dcos = (dist * coss(pitch));
     to[0] = (from[0] + (dcos * sins(yaw  )));
     to[1] = (from[1] + (dist * sins(pitch)));

@@ -21,10 +21,6 @@ struct Object *gMarioPlatform = NULL;
  */
 void update_mario_platform(void) {
     if ((gMarioObject == NULL) || (gMarioState->floor == NULL)) return;
-    //! If Mario moves onto a rotating platform in a PU, the find_floor call
-    //  will detect the platform and he will end up receiving a large amount
-    //  of displacement since he is considered to be far from the platform's
-    //  axis of rotation.
     struct Object *floorObj = gMarioState->floor->object;
     if ((gMarioState->floor != NULL)
      && (floorObj != NULL)

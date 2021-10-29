@@ -63,11 +63,11 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             // Ignore camera only surfaces.
             if (type == SURFACE_CAMERA_BOUNDARY) continue;
             // If an object can pass through a vanish cap wall, pass through.
-            if (type == SURFACE_VANISH_CAP_WALLS && o != NULL) {
+            if ((type == SURFACE_VANISH_CAP_WALLS) && (o != NULL)) {
                 // If an object can pass through a vanish cap wall, pass through.
                 if (o->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE) continue;
                 // If Mario has a vanish cap, pass through the vanish cap wall.
-                if (o == gMarioObject && (gMarioState->flags & MARIO_VANISH_CAP)) continue;
+                if ((o == gMarioObject) && (gMarioState->flags & MARIO_VANISH_CAP)) continue;
             }
         }
         if ((pos[1] < surf->lowerY) || (pos[1] > surf->upperY)) continue;
@@ -117,6 +117,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     data->z = pos[2];
     return numCols;
 }
+#undef CALC_OFFSET
 
 /**
  * Formats the position and wall search for find_wall_collisions.

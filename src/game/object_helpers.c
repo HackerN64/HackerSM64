@@ -760,7 +760,7 @@ void cur_obj_unrender_set_action_and_anim(s32 animIndex, s32 action) {
 
 static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
     o->oMoveFlags = 0;
-    o->oFloorHeight = find_floor_height(o->oPosX, o->oPosY + 160.0f, o->oPosZ);
+    o->oFloorHeight = find_floor_height(o->oPosX, (o->oPosY + 160.0f), o->oPosZ);
 
     if (o->oFloorHeight > o->oPosY) {
         o->oPosY = o->oFloorHeight;
@@ -789,7 +789,7 @@ void cur_obj_get_thrown_or_placed(f32 forwardVel, f32 velY, s32 thrownAction) {
 
     o->oHeldState = HELD_FREE;
 
-    if ((o->oInteractionSubtype & INT_SUBTYPE_HOLDABLE_NPC) || forwardVel == 0.0f) {
+    if ((o->oInteractionSubtype & INT_SUBTYPE_HOLDABLE_NPC) || (forwardVel == 0.0f)) {
         cur_obj_move_after_thrown_or_dropped(0.0f, 0.0f);
     } else {
         o->oAction = thrownAction;

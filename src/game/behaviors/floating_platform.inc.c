@@ -9,18 +9,18 @@ f32 floating_platform_find_home_y(void) {
         return (waterLevel + o->oFloatingPlatformHeightOffset);
     } else {
         o->oFloatingPlatformIsOnFloor = TRUE;
-        return floorHeight + o->oFloatingPlatformHeightOffset;
+        return (floorHeight + o->oFloatingPlatformHeightOffset);
     }
 }
 
 void floating_platform_act_0(void) {
     if (gMarioObject->platform == o) {
-        f32 dx = gMarioObject->header.gfx.pos[0] - o->oPosX;
-        f32 dz = gMarioObject->header.gfx.pos[2] - o->oPosZ;
+        f32 dx = (gMarioObject->header.gfx.pos[0] - o->oPosX);
+        f32 dz = (gMarioObject->header.gfx.pos[2] - o->oPosZ);
         f32 cy = coss(-o->oMoveAngleYaw);
         f32 sy = sins(-o->oMoveAngleYaw);
-        o->oFaceAnglePitch = ( (dz * cy + dx * sy) * 2);
-        o->oFaceAngleRoll  = (-(dx * cy + dz * sy) * 2);
+        o->oFaceAnglePitch = ( ((dz * cy) + (dx * sy)) * 2);
+        o->oFaceAngleRoll  = (-((dx * cy) + (dz * sy)) * 2);
         o->oVelY -= 1.0f;
         if (o->oVelY < 0.0f) {
             o->oVelY = 0.0f;
@@ -40,7 +40,7 @@ void floating_platform_act_0(void) {
         }
     }
 
-    o->oPosY = (o->oHomeY - 64.0f - o->oFloatingPlatformMarioWeightWobbleOffset + (sins(o->oFloatingPlatformWaterSurfaceWobbleOffset * 0x800) * 10.0f));
+    o->oPosY = ((o->oHomeY - 64.0f) - o->oFloatingPlatformMarioWeightWobbleOffset + (sins(o->oFloatingPlatformWaterSurfaceWobbleOffset * 0x800) * 10.0f));
     o->oFloatingPlatformWaterSurfaceWobbleOffset++;
     if (o->oFloatingPlatformWaterSurfaceWobbleOffset == 32) {
         o->oFloatingPlatformWaterSurfaceWobbleOffset = 0;
