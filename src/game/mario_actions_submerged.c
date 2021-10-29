@@ -1549,6 +1549,7 @@ s32 mario_execute_submerged_action(struct MarioState *m) {
         case ACT_HOLD_METAL_WATER_FALL_LAND: cancel = act_hold_metal_water_fall_land(m); break;
         case ACT_HOLD_METAL_WATER_JUMP:      cancel = act_hold_metal_water_jump(m);      break;
         case ACT_HOLD_METAL_WATER_JUMP_LAND: cancel = act_hold_metal_water_jump_land(m); break;
+        default:                             cancel = TRUE;                              break;
     }
     /* clang-format on */
 

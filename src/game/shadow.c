@@ -330,7 +330,7 @@ void make_shadow_vertex_at_xyz(Vtx *vertices, s8 index, f32 relX, f32 relY, f32 
  * according to the floor's normal vector.
  */
 f32 extrapolate_vertex_y_position(struct Shadow s, f32 vtxX, f32 vtxZ) {
-    return -(s.floorNormal[0] * vtxX + s.floorNormal[2] * vtxZ + s.floorOriginOffset) / s.floorNormal[1];
+    return -((s.floorNormal[0] * vtxX) + (s.floorNormal[2] * vtxZ) + s.floorOriginOffset) / s.floorNormal[1];
 }
 
 /**
@@ -453,7 +453,7 @@ void make_shadow_vertex(Vtx *vertices, s8 index, struct Shadow s, s8 shadowVerte
         posVtx[1] = extrapolate_vertex_y_position(s, posVtx[0], posVtx[2]);
         solidity = 0;
     }
-    vec3_diff(rel, posVtx, s.parentPos);
+    vec3f_diff(rel, posVtx, s.parentPos);
 
     make_shadow_vertex_at_xyz(vertices, index, rel[0], rel[1], rel[2], solidity, shadowVertexType);
 }

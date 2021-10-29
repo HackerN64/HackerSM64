@@ -1951,6 +1951,7 @@ s32 mario_execute_moving_action(struct MarioState *m) {
         case ACT_QUICKSAND_JUMP_LAND:      cancel = act_quicksand_jump_land(m);      break;
         case ACT_HOLD_QUICKSAND_JUMP_LAND: cancel = act_hold_quicksand_jump_land(m); break;
         case ACT_LONG_JUMP_LAND:           cancel = act_long_jump_land(m);           break;
+        default:                           cancel = TRUE;                            break;
     }
     /* clang-format on */
 

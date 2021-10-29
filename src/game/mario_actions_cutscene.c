@@ -2631,6 +2631,7 @@ s32 mario_execute_cutscene_action(struct MarioState *m) {
         case ACT_BUTT_STUCK_IN_GROUND:       cancel = act_butt_stuck_in_ground(m);       break;
         case ACT_FEET_STUCK_IN_GROUND:       cancel = act_feet_stuck_in_ground(m);       break;
         case ACT_PUTTING_ON_CAP:             cancel = act_putting_on_cap(m);             break;
+        default:                             cancel = TRUE;                              break;
     }
     /* clang-format on */
 

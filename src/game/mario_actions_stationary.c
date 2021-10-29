@@ -1123,6 +1123,7 @@ s32 mario_execute_stationary_action(struct MarioState *m) {
         case ACT_BRAKING_STOP:            cancel = act_braking_stop(m);                     break;
         case ACT_BUTT_SLIDE_STOP:         cancel = act_butt_slide_stop(m);                  break;
         case ACT_HOLD_BUTT_SLIDE_STOP:    cancel = act_hold_butt_slide_stop(m);             break;
+        default:                          cancel = TRUE;                                    break;
     }
     /* clang-format on */
 

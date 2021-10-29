@@ -3119,7 +3119,7 @@ void make_timer_gadgets(void) {
     timerg = (struct ObjGroup *) d_use_obj("timerg");
     timersview = make_view(
         "timersview", (VIEW_2_COL_BUF | VIEW_ALLOC_ZBUF | VIEW_1_CYCLE | VIEW_MOVEMENT | VIEW_DRAW), 2,
-        0, 10, SCREEN_WIDTH, SCREEN_HEIGHT+30, timerg);
+        0, 10, SCREEN_WIDTH, (SCREEN_HEIGHT + 30), timerg);
     timersview->colour.r = 0.0f;
     timersview->colour.g = 0.0f;
     timersview->colour.b = 0.0f;

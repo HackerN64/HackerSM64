@@ -876,6 +876,7 @@ s32 mario_execute_automatic_action(struct MarioState *m) {
         case ACT_GRABBED:                cancel = act_grabbed(m);                break;
         case ACT_IN_CANNON:              cancel = act_in_cannon(m);              break;
         case ACT_TORNADO_TWIRLING:       cancel = act_tornado_twirling(m);       break;
+        default:                         cancel = TRUE;                          break;
     }
     /* clang-format on */
 

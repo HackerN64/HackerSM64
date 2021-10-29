@@ -1968,6 +1968,7 @@ s32 mario_execute_airborne_action(struct MarioState *m) {
         case ACT_RIDING_HOOT:          cancel = act_riding_hoot(m);          break;
         case ACT_TOP_OF_POLE_JUMP:     cancel = act_top_of_pole_jump(m);     break;
         case ACT_VERTICAL_WIND:        cancel = act_vertical_wind(m);        break;
+        default:                       cancel = TRUE;                        break;
     }
     /* clang-format on */
 

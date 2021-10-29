@@ -414,6 +414,7 @@ s32 mario_execute_object_action(struct MarioState *m) {
         case ACT_PICKING_UP_BOWSER:  cancel = act_picking_up_bowser(m);  break;
         case ACT_HOLDING_BOWSER:     cancel = act_holding_bowser(m);     break;
         case ACT_RELEASING_BOWSER:   cancel = act_releasing_bowser(m);   break;
+        default:                     cancel = TRUE;                      break;
     }
     /* clang-format on */
 

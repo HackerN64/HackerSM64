@@ -6,9 +6,9 @@ include util.mk
 default: all
 
 # Preprocessor definitions
-DEFINES :=
+DEFINES   :=
 
-SRC_DIRS :=
+SRC_DIRS  :=
 USE_DEBUG := 0
 
 #==============================================================================#
@@ -22,7 +22,7 @@ USE_DEBUG := 0
 TARGET_N64 ?= 1
 
 # CONSOLE - selects the console to target
-#   bb - Targets the iQue Player (codenamed BB)
+#   bb  - Targets the iQue Player (codenamed BB)
 #   n64 - Targets the N64
 CONSOLE ?= n64
 $(eval $(call validate-option,CONSOLE,n64 bb))
@@ -37,24 +37,24 @@ else ifeq ($(CONSOLE),bb)
 endif
 
 # COMPILER - selects the C compiler to use
-#   gcc - uses the GNU C Compiler
+#   gcc   - uses the GNU C Compiler
 #   clang - uses clang C/C++ frontend for LLVM
 COMPILER ?= gcc
 $(eval $(call validate-option,COMPILER,gcc clang))
 
 
-# LIBGCCDIR - selects the libgcc configuration for checking for dividing by zero
-#   trap - GCC default behavior, uses teq instructions which some emulators don't like
+# LIBGCCDIR  - selects the libgcc configuration for checking for dividing by zero
+#   trap     - GCC default behavior, uses teq instructions which some emulators don't like
 #   divbreak - this is similar to IDO behavior, and is default.
-#   nocheck - never checks for dividing by 0. Technically fastest, but also UB so not recommended
+#   nocheck  - never checks for dividing by 0. Technically fastest, but also UB so not recommended
 LIBGCCDIR ?= divbreak
 $(eval $(call validate-option,LIBGCCDIR,trap divbreak nocheck))
 
 
 # SAVETYPE - selects the save type
-#   eep4k - uses EEPROM 4kbit
+#   eep4k  - uses EEPROM 4kbit
 #   eep16k - uses EEPROM 16kbit (There aren't any differences in syntax, but this is provided just in case)
-#   sram - uses SRAM 256Kbit
+#   sram   - uses SRAM 256Kbit
 SAVETYPE ?= eep4k
 $(eval $(call validate-option,SAVETYPE,eep4k eep16k sram))
 ifeq ($(SAVETYPE),eep4k)
@@ -139,7 +139,7 @@ LIBRARIES := nustd hvqm2 z goddard
 #   s2dex_text_engine - Text Engine by someone2639
 TEXT_ENGINE := none
 ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
+  DEFINES   += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
   LIBRARIES += s2d_engine
   DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/
 endif
@@ -182,7 +182,7 @@ TARGET_STRING := sm64
 UNF ?= 0
 $(eval $(call validate-option,UNF,0 1))
 ifeq ($(UNF),1)
-  DEFINES += UNF=1
+  DEFINES  += UNF=1
   SRC_DIRS += src/usb
   USE_DEBUG := 1
 endif
@@ -212,7 +212,7 @@ endif
 HVQM ?= 0
 $(eval $(call validate-option,HVQM,0 1))
 ifeq ($(HVQM),1)
-  DEFINES += HVQM=1
+  DEFINES  += HVQM=1
   SRC_DIRS += src/hvqm
 endif
 
@@ -302,7 +302,7 @@ include Makefile.split
 # Source code files
 LEVEL_C_FILES     := $(wildcard levels/*/leveldata.c) $(wildcard levels/*/script.c) $(wildcard levels/*/geo.c)
 C_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(LEVEL_C_FILES)
-LIBZ_C_FILES     := $(foreach dir,$(LIBZ_SRC_DIRS),$(wildcard $(dir)/*.c))
+LIBZ_C_FILES      := $(foreach dir,$(LIBZ_SRC_DIRS),$(wildcard $(dir)/*.c))
 GODDARD_C_FILES   := $(foreach dir,$(GODDARD_SRC_DIRS),$(wildcard $(dir)/*.c))
 S_FILES           := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
 GENERATED_C_FILES := $(BUILD_DIR)/assets/mario_anim_data.c $(BUILD_DIR)/assets/demo_data.c
@@ -327,7 +327,7 @@ O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
            $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o)) \
            lib/PR/hvqm/hvqm2sp1.o lib/PR/hvqm/hvqm2sp2.o
 
-LIBZ_O_FILES := $(foreach file,$(LIBZ_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
+LIBZ_O_FILES    := $(foreach file,$(LIBZ_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
 # Automatic dependency files
@@ -440,12 +440,12 @@ else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
-EMULATOR = ~/Downloads/mupen64plus/mupen64plus-gui
-EMU_FLAGS =
-LOADER = loader64
+EMULATOR     = ~/Downloads/mupen64plus/mupen64plus-gui
+EMU_FLAGS    =
+LOADER       = loader64
 LOADER_FLAGS = -vwf
-SHA1SUM = sha1sum
-PRINT = printf
+SHA1SUM      = sha1sum
+PRINT        = printf
 
 ifeq ($(COLOR),1)
 NO_COL  := \033[0m
@@ -539,12 +539,12 @@ else
   endif
 endif
 
-$(BUILD_DIR)/src/usb/usb.o: OPT_FLAGS := -O0
-$(BUILD_DIR)/src/usb/usb.o: CFLAGS += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
-$(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := -O0
-$(BUILD_DIR)/src/usb/debug.o: CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
-$(BUILD_DIR)/src/audio/*.o: OPT_FLAGS := -Os -fno-jump-tables
-$(BUILD_DIR)/src/engine/math_util.o: OPT_FLAGS := -Ofast -fno-unroll-loops -fno-peel-loops --param case-values-threshold=20
+$(BUILD_DIR)/src/usb/usb.o:                   OPT_FLAGS := -O0
+$(BUILD_DIR)/src/usb/usb.o:                   CFLAGS += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
+$(BUILD_DIR)/src/usb/debug.o:                 OPT_FLAGS := -O0
+$(BUILD_DIR)/src/usb/debug.o:                 CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
+$(BUILD_DIR)/src/audio/*.o:                   OPT_FLAGS := -Os -fno-jump-tables
+$(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := -Ofast -fno-unroll-loops -fno-peel-loops --param case-values-threshold=20
 $(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := -Ofast --param case-values-threshold=20
 
 ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) asm/debug $(GODDARD_SRC_DIRS) $(LIBZ_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) rsp include) $(YAY0_DIR) $(addprefix $(YAY0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION)
@@ -556,7 +556,7 @@ $(BUILD_DIR)/include/text_strings.h: $(BUILD_DIR)/include/text_menu_strings.h
 $(BUILD_DIR)/src/menu/file_select.o: $(BUILD_DIR)/include/text_strings.h
 $(BUILD_DIR)/src/menu/star_select.o: $(BUILD_DIR)/include/text_strings.h
 $(BUILD_DIR)/src/game/ingame_menu.o: $(BUILD_DIR)/include/text_strings.h
-$(BUILD_DIR)/src/game/puppycam2.o: $(BUILD_DIR)/include/text_strings.h
+$(BUILD_DIR)/src/game/puppycam2.o:   $(BUILD_DIR)/include/text_strings.h
 
 
 
