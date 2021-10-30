@@ -20,8 +20,9 @@ void bhv_racing_penguin_init(void) {
 }
 
 static void racing_penguin_act_wait_for_mario(void) {
-    if (o->oTimer > o->oRacingPenguinInitTextCooldown && o->oPosY - gMarioObject->oPosY <= 0.0f
-        && cur_obj_can_mario_activate_textbox_2(400.0f, 400.0f)) {
+    if ((o->oTimer > o->oRacingPenguinInitTextCooldown)
+     && ((o->oPosY - gMarioObject->oPosY) <= 0.0f)
+     && cur_obj_can_mario_activate_textbox_2(400.0f, 400.0f)) {
         o->oAction = RACING_PENGUIN_ACT_SHOW_INIT_TEXT;
     }
 }
@@ -69,17 +70,17 @@ static void racing_penguin_act_race(void) {
 
         cur_obj_play_sound_1(SOUND_AIR_ROUGH_SLIDE);
 
-        if (targetSpeed < 100.0f || (o->oPathedPrevWaypointFlags & WAYPOINT_MASK_00FF) >= 35) {
+        if ((targetSpeed < 100.0f) || ((o->oPathedPrevWaypointFlags & WAYPOINT_MASK_00FF) >= 35)) {
             if ((o->oPathedPrevWaypointFlags & WAYPOINT_MASK_00FF) >= 35) {
                 minSpeed = 60.0f;
             }
 
             approach_f32_ptr(&o->oRacingPenguinWeightedNewTargetSpeed, -500.0f, 100.0f);
         } else {
-            approach_f32_ptr(&o->oRacingPenguinWeightedNewTargetSpeed, 1000.0f, 30.0f);
+            approach_f32_ptr(&o->oRacingPenguinWeightedNewTargetSpeed, 1000.0f,  30.0f);
         }
 
-        targetSpeed = 0.1f * (o->oRacingPenguinWeightedNewTargetSpeed + targetSpeed);
+        targetSpeed = (0.1f * (o->oRacingPenguinWeightedNewTargetSpeed + targetSpeed));
         clamp_f32(&targetSpeed, minSpeed, 150.0f);
         obj_forward_vel_approach(targetSpeed, 0.4f);
 
