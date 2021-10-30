@@ -100,47 +100,48 @@ struct DemoInput gRecordedDemoInput = { 0 };
 /**
  * Sets the initial RDP (Reality Display Processor) rendering settings.
  */
-void init_rdp(void) {
-    gDPPipeSync(         gDisplayListHead++);
-    gDPPipelineMode(     gDisplayListHead++, G_PM_1PRIMITIVE);
+const Gfx init_rdp[] = {
+    gsDPPipeSync(),
+    gsDPPipelineMode(     G_PM_1PRIMITIVE),
 
-    gDPSetScissor(       gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    gDPSetCombineMode(   gDisplayListHead++, G_CC_SHADE, G_CC_SHADE);
+    gsDPSetScissor(       G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT),
+    gsDPSetCombineMode(   G_CC_SHADE, G_CC_SHADE),
 
-    gDPSetTextureLOD(    gDisplayListHead++, G_TL_TILE);
-    gDPSetTextureLUT(    gDisplayListHead++, G_TT_NONE);
-    gDPSetTextureDetail( gDisplayListHead++, G_TD_CLAMP);
-    gDPSetTexturePersp(  gDisplayListHead++, G_TP_PERSP);
-    gDPSetTextureFilter( gDisplayListHead++, G_TF_BILERP);
-    gDPSetTextureConvert(gDisplayListHead++, G_TC_FILT);
+    gsDPSetTextureLOD(    G_TL_TILE),
+    gsDPSetTextureLUT(    G_TT_NONE),
+    gsDPSetTextureDetail( G_TD_CLAMP),
+    gsDPSetTexturePersp(  G_TP_PERSP),
+    gsDPSetTextureFilter( G_TF_BILERP),
+    gsDPSetTextureConvert(G_TC_FILT),
 
-    gDPSetCombineKey(    gDisplayListHead++, G_CK_NONE);
-    gDPSetAlphaCompare(  gDisplayListHead++, G_AC_NONE);
-    gDPSetRenderMode(    gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gDPSetColorDither (  gDisplayListHead++, G_CD_MAGICSQ);
-    gDPSetCycleType(     gDisplayListHead++, G_CYC_FILL);
+    gsDPSetCombineKey(    G_CK_NONE),
+    gsDPSetAlphaCompare(  G_AC_NONE),
+    gsDPSetRenderMode(    G_RM_OPA_SURF, G_RM_OPA_SURF2),
+    gsDPSetColorDither(   G_CD_MAGICSQ),
+    gsDPSetCycleType(     G_CYC_FILL),
 
-    gDPSetAlphaDither(   gDisplayListHead++, G_AD_PATTERN);
-    gDPPipeSync(         gDisplayListHead++);
-}
+    gsDPSetAlphaDither(   G_AD_PATTERN),
+    // gsDPPipeSync(),
+    gsSPEndDisplayList(),
+};
 
 /**
  * Sets the initial RSP (Reality Signal Processor) settings.
  */
-void init_rsp(void) {
-    // G_ZBUFFER | G_CLIPPING
-    // gSPClearGeometryMode(gDisplayListHead++, (G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD));
-    // gSPSetGeometryMode(  gDisplayListHead++, (G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING));
-    gSPClearGeometryMode(gDisplayListHead++, (G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD));
-    gSPSetGeometryMode(  gDisplayListHead++, (G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING));
-    gSPNumLights(        gDisplayListHead++, NUMLIGHTS_1);
-    gSPTexture(          gDisplayListHead++, 0, 0, 0, G_TX_RENDERTILE, G_OFF);
+const Gfx init_rsp[] = {
+    // gsSPClearGeometryMode((G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD));
+    // gsSPSetGeometryMode(  (G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING));
+    gsSPClearGeometryMode((G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD)),
+    gsSPSetGeometryMode(  (G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING)),
+    gsSPNumLights(        NUMLIGHTS_1),
+    gsSPTexture(          0, 0, 0, G_TX_RENDERTILE, G_OFF),
     // @bug Failing to set the clip ratio will result in warped triangles in F3DEX2
     // without this change: https://jrra.zone/n64/doc/n64man/gsp/gSPClipRatio.htm
 #ifdef F3DEX_GBI_2
-    gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
+    gsSPClipRatio(        FRUSTRATIO_1),
 #endif
-}
+    gsSPEndDisplayList(),
+};
 
 /**
  * Initialize the z buffer for the current frame.
@@ -243,14 +244,14 @@ void make_viewport_clip_rect(Vp *viewport) {
  * If you plan on using gSPLoadUcode, make sure to add OS_TASK_LOADABLE to the flags member.
  */
 void create_gfx_task_structure(void) {
-    s32 entries = gDisplayListHead - gGfxPool->buffer;
+    s32 entries = (gDisplayListHead - gGfxPool->buffer);
 
     gGfxSPTask->msgqueue = &gGfxVblankQueue;
     gGfxSPTask->msg = (OSMesg) 2;
     gGfxSPTask->task.t.type = M_GFXTASK;
     gGfxSPTask->task.t.ucode_boot = rspbootTextStart;
     gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
-    gGfxSPTask->task.t.flags = OS_TASK_LOADABLE | OS_TASK_DP_WAIT;
+    gGfxSPTask->task.t.flags = (OS_TASK_LOADABLE | OS_TASK_DP_WAIT);
 #ifdef  L3DEX2_ALONE
     gGfxSPTask->task.t.ucode      = gspL3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspL3DEX2_fifoDataStart;
@@ -290,8 +291,8 @@ void create_gfx_task_structure(void) {
  */
 void init_rcp(s32 resetZB) {
     move_segment_table_to_dmem();
-    init_rdp();
-    init_rsp();
+    gSPDisplayList(gDisplayListHead++, init_rdp);
+    gSPDisplayList(gDisplayListHead++, init_rsp);
     init_z_buffer(resetZB);
     select_framebuffer();
 }
