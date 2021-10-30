@@ -51,15 +51,18 @@ ColorRGBA currEnv;
 u8 fDebug = FALSE;
 
 #if PUPPYPRINT_DEBUG
-s8 benchViewer = FALSE;
-u8 benchOption = 0;
-s8 logViewer = FALSE;
+s8 benchViewer  = FALSE;
+u8 benchOption  = 0;
+s8 logViewer    = FALSE;
+u8 sPPDebugPage = 0;
+u8 sDebugMenu   = FALSE;
+u8 sDebugOption = 0;
 // Profiler values
-s8  perfIteration = 0;
-s16 benchmarkLoop = 0;
+s8  perfIteration  = 0;
+s16 benchmarkLoop  = 0;
 s32 benchmarkTimer = 0;
 s32 benchmarkProgramTimer = 0;
-s8  benchmarkType = 0;
+s8  benchmarkType  = 0;
 // General
 u32     cpuTime = 0;
 u32     rspTime = 0;
@@ -67,7 +70,7 @@ u32     rdpTime = 0;
 u32     ramTime = 0;
 u32    loadTime = 0;
 u32 gLastOSTime = 0;
-u32 rspDelta = 0;
+u32    rspDelta = 0;
 s32       benchMark[NUM_BENCH_ITERATIONS + 2];
 // CPU
 u32 collisionTime[NUM_PERF_ITERATIONS + 1];
@@ -274,6 +277,10 @@ void print_ram_overview(void) {
         y += 12;
         drawn++;
     }
+    sprintf(textBytes, "RAM: %06X/%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available() / (f32)mempool) * 100));
+    print_small_text(SCREEN_CENTER_X, (SCREEN_HEIGHT - 16), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+
+    print_ram_bar();
 }
 
 const char *audioPoolNames[NUM_AUDIO_POOLS] = {
@@ -309,7 +316,7 @@ void print_audio_ram_overview(void) {
         }
         sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
             audioPoolSizes[i][1], audioPoolSizes[i][0], (percentage / 10), (percentage % 10));
-        
+
         print_set_envcolour(colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
         print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
@@ -318,7 +325,7 @@ void print_audio_ram_overview(void) {
         totalMemory[0] += audioPoolSizes[i][0];
         totalMemory[1] += audioPoolSizes[i][1];
     }
-    
+
     if (totalMemory[0] == 0) {
         percentage = 0;
     } else {
@@ -331,7 +338,7 @@ void print_audio_ram_overview(void) {
         sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (Incorrect!)",
             totalMemory[1], totalMemory[0]);
     }
-    
+
     print_set_envcolour(colourChart[30][0], colourChart[30][1], colourChart[30][2], 255);
     print_small_text(x, tmpY, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
@@ -416,6 +423,44 @@ void print_console_log(void) {
 }
 #undef LINE_HEIGHT
 
+extern u8 viewCycle;
+extern s16 gVisualSurfaceCount;
+#ifndef VISUAL_DEBUG
+    #define gVisualSurfaceCount 0
+#endif
+
+void puppyprint_render_collision(void) {
+    char textBytes[200];
+
+    sprintf(textBytes, "Collision:<COL_99505099> %dus", collisionTime[NUM_PERF_ITERATIONS]);
+    print_small_text(304, 48, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
+
+    sprintf(textBytes, "Pool Size: %X#Node Size: %X#Surfaces Allocated: %d#Nodes Allocated: %d#Current Cell: %d", (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)), (SURFACE_POOL_SIZE * sizeof(struct Surface)),
+            gSurfacesAllocated, gSurfaceNodesAllocated, gVisualSurfaceCount);
+    print_small_text(304, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
+
+
+#ifdef VISUAL_DEBUG
+    print_small_text(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
+    switch (viewCycle) {
+        case 0: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 1: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 2: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 3: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+    }
+    if (gPlayer1Controller->buttonPressed & R_JPAD) viewCycle++;
+    if (gPlayer1Controller->buttonPressed & L_JPAD) viewCycle--;
+    if (viewCycle == 4) {
+        viewCycle = 0;
+    }
+    if (viewCycle == 255) {
+        viewCycle = 3;
+    }
+    hitboxView  = ((viewCycle == 1) || (viewCycle == 3));
+    surfaceView = ((viewCycle == 2) || (viewCycle == 3));
+#endif
+}
+
 struct CPUBar {
     u32 *time;
     ColorRGB colour;
@@ -433,121 +478,141 @@ struct CPUBar cpu_ordering_table[] = {
     {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_99509999>" }},
 };
 
-#define CPU_TABLE_MAX sizeof(cpu_ordering_table)/sizeof(struct CPUBar)
+#define CPU_TABLE_MAX (sizeof(cpu_ordering_table) / sizeof(struct CPUBar))
 #define ADDTIMES MAX(((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX]) / 80), 1)
 
-void puppyprint_render_profiler(void) {
+void print_basic_profiling(void) {
+    char textBytes[90];
+    print_fps(16, 40);
+    sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", cpuTime, cpuTime / 333, rspTime, rspTime / 333, rdpTime, rdpTime / 333);
+    print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+}
+
+void puppyprint_render_standard(void) {
     s32 perfPercentage[CPU_TABLE_MAX];
     s32 graphPos;
     s32 prevGraph;
     u32 i;
     s32 viewedNums;
-    OSTime cpuCount = CYCLE_CONV(cpuTime +     audioTime[NUM_PERF_ITERATIONS]
-                                         +  dmaAudioTime[NUM_PERF_ITERATIONS]
-                                         +     faultTime[NUM_PERF_ITERATIONS]
-                                         +      taskTime[NUM_PERF_ITERATIONS]
-                                         -  profilerTime[NUM_PERF_ITERATIONS]
-                                         - profilerTime2[NUM_PERF_ITERATIONS]);
-    OSTime first = osGetTime();
     char textBytes[80];
+
+    print_basic_profiling();
+
+    sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
+    print_small_text(16, 124, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+
+    // Very little point printing useless info if Mario doesn't even exist.
+    if (gMarioState->marioObj) {
+        sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
+            (s32)(gMarioState->pos[0]),
+            (s32)(gMarioState->pos[1]),
+            (s32)(gMarioState->pos[2]),
+            (u16)(gMarioState->faceAngle[1]),
+            (u32)(gMarioState->action & ACT_ID_MASK));
+        print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    }
+    // Same for the camera, especially so because this will crash otherwise.
+    if (gCamera) {
+        sprintf(textBytes, "Camera Pos#X: %d#Y: %d#Z: %d#D: %X",
+            (s32)(gCamera->pos[0]),
+            (s32)(gCamera->pos[1]),
+            (s32)(gCamera->pos[2]),
+            (u16)(gCamera->yaw));
+        print_small_text((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+    }
+
+    // Just to keep screen estate a little friendlier.
+#define MX NUM_PERF_ITERATIONS
+    for (i = 0; i < CPU_TABLE_MAX; i++) {
+        perfPercentage[i] = MAX((cpu_ordering_table[i].time[MX] / ADDTIMES), 0);
+    }
+#undef ADDTIMES
+#undef MX
+
+    viewedNums = 0;
+    for (i = 0; i < CPU_TABLE_MAX; i++) {
+        s32 num = cpu_ordering_table[i].time[NUM_PERF_ITERATIONS];
+        if (num != 0) {
+            sprintf(textBytes, "%s%dus", cpu_ordering_table[i].str, num);
+            print_small_text((SCREEN_WIDTH - 16), (40 + (viewedNums * 12)), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+            viewedNums++;
+        }
+    }
+    s32 barY = ((28 + (viewedNums * 12)) + 16);
+    prepare_blank_box();
+    viewedNums = 0;
+    // Render CPU breakdown bar.
+    for (i = 0; i < CPU_TABLE_MAX; i++) {
+        if ((perfPercentage[i] == 0) && (i != (CPU_TABLE_MAX - 1))) {
+            continue;
+        }
+        if (viewedNums == 0) {
+            graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
+            render_blank_box((SCREEN_WIDTH - 96), barY, graphPos, (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+        } else if (i == (CPU_TABLE_MAX - 1)) {
+            graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
+            render_blank_box(prevGraph, barY, (SCREEN_WIDTH - 16), (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+        } else {
+            graphPos += perfPercentage[i];
+            render_blank_box(prevGraph, barY, graphPos, (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+        }
+        viewedNums++;
+        prevGraph = graphPos;
+    }
+    finish_blank_box();
+}
+
+void puppyprint_render_minimal(void) {
+    print_basic_profiling();
+}
+
+struct PuppyPrintPage ppPages[] = {
+    {&puppyprint_render_standard,  "Standard" },
+    {&puppyprint_render_minimal,   "Minimal"  },
+    {&print_audio_ram_overview,    "Audio"    },
+    {&print_ram_overview,          "Segments" },
+    {&puppyprint_render_collision, "Collision"},
+    {&print_console_log,           "Log"      },
+};
+
+#define MENU_BOX_WIDTH 128
+#define MAX_DEBUG_OPTIONS (sizeof(ppPages) / sizeof(struct PuppyPrintPage))
+
+void render_page_menu(void) {
+    s32 i;
+    s32 posY;
+    s32 scrollY = (36 / (MAX_DEBUG_OPTIONS - 1));
+    prepare_blank_box();
+    render_blank_box(32, 32, (32 + MENU_BOX_WIDTH), (32 + 72), 0x00, 0x00, 0x00, 0xC0);
+    render_blank_box((32 + MENU_BOX_WIDTH - 8), (32 + (scrollY * sDebugOption)), (32 + MENU_BOX_WIDTH), (32 + (scrollY * sDebugOption) + 36), 0xFF, 0xFF, 0xFF, 0xFF);
+    finish_blank_box();
+    for (i = 0; i < (s32)MAX_DEBUG_OPTIONS; i++) {
+        s32 yOffset = ((sDebugOption > 5) ? (sDebugOption - 5) : 0);
+        posY = (38 + ((i-yOffset) * 10));
+        if ((posY > 32) && (posY < 90)) {
+            if (sDebugOption == i) {
+                print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
+            } else {
+                print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
+            }
+            print_small_text(28+(MENU_BOX_WIDTH / 2), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
+        }
+    }
+}
+
+void puppyprint_render_profiler(void) {
+    OSTime first = osGetTime();
 
     if (!fDebug) {
         profiler_update(profilerTime, first);
         return;
     }
 
-    sprintf(textBytes, "RAM: %06X/%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available() / (f32)mempool) * 100));
-    print_small_text(SCREEN_CENTER_X, (SCREEN_HEIGHT - 16), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+    (ppPages[sPPDebugPage].func)();
 
-    if (!ramViewer && !audioRamViewer && !benchViewer && !logViewer) {
-        print_fps(16, 40);
-        sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)(cpuCount / 333), (s32)CYCLE_CONV(rspTime), ((s32)CYCLE_CONV(rspTime) / 333), (s32)CYCLE_CONV(rdpTime), ((s32)CYCLE_CONV(rdpTime) / 333));
-        print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    if (sDebugMenu)
+        render_page_menu();
 
-        sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
-        print_small_text(16, 124, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
-
-        // Very little point printing useless info if Mayro doesn't even exist.
-        if (gMarioState->marioObj) {
-            sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
-                    (s32)(gMarioState->pos[0]),
-                    (s32)(gMarioState->pos[1]),
-                    (s32)(gMarioState->pos[2]),
-                    (u16)(gMarioState->faceAngle[1]),
-                    (u32)(gMarioState->action & ACT_ID_MASK));
-            print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
-        }
-        // Same for the camera, especially so because this will crash otherwise.
-        if (gCamera) {
-            sprintf(textBytes, "Camera Pos#X: %d#Y: %d#Z: %d#D: %X",
-                    (s32)(gCamera->pos[0]),
-                    (s32)(gCamera->pos[1]),
-                    (s32)(gCamera->pos[2]),
-                    (u16)(gCamera->yaw));
-            print_small_text((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-        }
-
-        if (benchmarkTimer > 0) {
-            benchmarkTimer--;
-            prepare_blank_box();
-            sprintf(textBytes, "Done in %0.000f seconds#Benchmark: %dus#High: %dus", ((f32)(benchmarkProgramTimer) * 0.000001f), (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS]), (s32)CYCLE_CONV(benchMark[NUM_BENCH_ITERATIONS + 1]));
-            render_blank_box((SCREEN_CENTER_X - (get_text_width(textBytes, FONT_OUTLINE) / 2) - 4), 158, (SCREEN_CENTER_X + (get_text_width(textBytes, FONT_OUTLINE) / 2) + 4), 196, 0, 0, 0, 255);
-            print_set_envcolour(255, 255, 255, 255);
-            print_small_text(SCREEN_CENTER_X, 160, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
-            finish_blank_box();
-        }
-
-        // Just to keep screen estate a little friendlier.
-#define MX NUM_PERF_ITERATIONS
-        s32 unclampedPerfPErcentage;
-        for (i = 0; i < CPU_TABLE_MAX; i++) {
-            unclampedPerfPErcentage = (cpu_ordering_table[i].time[MX] / ADDTIMES);
-            perfPercentage[i] = MAX(unclampedPerfPErcentage, 0);
-        }
-#undef ADDTIMES
-#undef MX
-
-        viewedNums = 0;
-        for (i = 0; i < CPU_TABLE_MAX; i++) {
-            s32 num = CYCLE_CONV(cpu_ordering_table[i].time[NUM_PERF_ITERATIONS]);
-            if (num != 0) {
-                sprintf(textBytes, "%s%dus", cpu_ordering_table[i].str, num);
-                print_small_text((SCREEN_WIDTH - 16), (40 + (viewedNums * 12)), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-                viewedNums++;
-            }
-        }
-        s32 barY = ((28 + (viewedNums * 12)) + 16);
-        prepare_blank_box();
-        viewedNums = 0;
-        // Render CPU breakdown bar.
-        for (i = 0; i < CPU_TABLE_MAX; i++) {
-            if ((perfPercentage[i] == 0) && (i != (CPU_TABLE_MAX - 1))) {
-                continue;
-            }
-            if (viewedNums == 0) {
-                graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
-                render_blank_box((SCREEN_WIDTH - 96), barY, graphPos, (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
-            } else if (i == (CPU_TABLE_MAX - 1)) {
-                graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
-                render_blank_box(prevGraph, barY, (SCREEN_WIDTH - 16), (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
-            } else {
-                graphPos += perfPercentage[i];
-                render_blank_box(prevGraph, barY, graphPos, (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
-            }
-            viewedNums++;
-            prevGraph = graphPos;
-        }
-        finish_blank_box();
-    } else if (ramViewer) {
-        print_ram_overview();
-    } else if (audioRamViewer) {
-        print_audio_ram_overview();
-    } else if (logViewer) {
-        print_console_log();
-    } else if (benchViewer) {
-        print_which_benchmark();
-    }
-    print_ram_bar();
     profiler_update(profilerTime, first);
 }
 
@@ -563,7 +628,7 @@ void get_average_perf_time(u32 *time) {
         total += time[i];
     }
     total /= NUM_PERF_ITERATIONS;
-    time[NUM_PERF_ITERATIONS] = MAX(total, 0);
+    time[NUM_PERF_ITERATIONS] = CYCLE_CONV(MAX(total, 0));
 }
 
 void puppyprint_profiler_process(void) {
@@ -572,7 +637,30 @@ void puppyprint_profiler_process(void) {
        busTime[perfIteration] = (IO_READ(DPC_PIPEBUSY_REG));
     OSTime newTime = osGetTime();
 
-    if ((gGlobalTimer % 15) == 0) {
+    if (fDebug && gPlayer1Controller->buttonPressed & L_TRIG) {
+        sDebugMenu ^= TRUE;
+        if (sDebugMenu == FALSE) {
+            sPPDebugPage = sDebugOption;
+        }
+    }
+
+    if ((gPlayer1Controller->buttonDown & U_JPAD) && (gPlayer1Controller->buttonPressed & L_TRIG)) {
+        fDebug ^= TRUE;
+        sDebugMenu = FALSE;
+    }
+
+    if (sDebugMenu) {
+        if (gPlayer1Controller->buttonPressed & U_JPAD) sDebugOption--;
+        if (gPlayer1Controller->buttonPressed & D_JPAD) sDebugOption++;
+        if (sDebugOption == 255) {
+            sDebugOption = ((sizeof(ppPages) / sizeof(struct PuppyPrintPage)) - 1);
+        }
+        if (sDebugOption >= (sizeof(ppPages) / sizeof(struct PuppyPrintPage))) {
+            sDebugOption = 0;
+        }
+    }
+
+    if ((gGlobalTimer % 16) == 0) {
         get_average_perf_time(   scriptTime);
         get_average_perf_time(behaviourTime);
         get_average_perf_time(collisionTime);
@@ -586,6 +674,9 @@ void puppyprint_profiler_process(void) {
         get_average_perf_time( profilerTime2);
         get_average_perf_time(   cameraTime);
 
+        // Performed twice a frame without fail, so doubled to have a more representative value.
+        audioTime[NUM_PERF_ITERATIONS] *= 2;
+        dmaAudioTime[NUM_PERF_ITERATIONS] *= 2;
         dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
 
         get_average_perf_time(rspGenTime);
@@ -600,7 +691,7 @@ void puppyprint_profiler_process(void) {
 #if BBPLAYER == 1 // iQue RDP registers need to be halved to be correct.
         rdpTime /= 2;
 #endif
-        cpuTime = scriptTime[NUM_PERF_ITERATIONS];
+        cpuTime = scriptTime[NUM_PERF_ITERATIONS] + taskTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS] + audioTime[NUM_PERF_ITERATIONS];
         rspTime = rspGenTime[NUM_PERF_ITERATIONS];
         puppyprint_calculate_ram_usage();
     }
@@ -608,63 +699,6 @@ void puppyprint_profiler_process(void) {
     gLastOSTime = newTime;
     if (gGlobalTimer > 5) {
         IO_WRITE(DPC_STATUS_REG, (DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR));
-    }
-    if (fDebug/* && (gMarioState->action != ACT_DEBUG_FREE_MOVE)*/) {
-        if (gPlayer1Controller->buttonPressed & D_JPAD) {
-            benchViewer   ^= TRUE;
-            ramViewer      = FALSE;
-            audioRamViewer = FALSE;
-            logViewer      = FALSE;
-        } else if (gPlayer1Controller->buttonPressed & U_JPAD) {
-            if (audioRamViewer) {
-                ramViewer  = FALSE;
-            } else {
-                ramViewer ^= TRUE;
-            }
-            audioRamViewer = FALSE;
-            benchViewer    = FALSE;
-            logViewer      = FALSE;
-        } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
-            if (audioRamViewer) {
-                ramViewer  = TRUE;
-                logViewer  = FALSE;
-            } else {
-                logViewer ^= TRUE;
-                ramViewer  = FALSE;
-            }
-            audioRamViewer = FALSE;
-            benchViewer    = FALSE;
-        } else if (gPlayer1Controller->buttonPressed & R_JPAD) {
-            if (ramViewer) {
-                audioRamViewer ^= TRUE;
-                logViewer       = FALSE;
-                ramViewer       = FALSE;
-                benchViewer     = FALSE;
-            }
-        }
-#ifdef VISUAL_DEBUG
-        else if (!benchViewer && !ramViewer && !audioRamViewer && !logViewer) {
-            debug_box_input();
-        }
-#endif
-        if (benchViewer) {
-            if (gPlayer1Controller->buttonPressed & R_JPAD) benchOption++;
-            if (gPlayer1Controller->buttonPressed & L_JPAD) benchOption--;
-            if (benchOption == 255) benchOption = 2;
-            if (benchOption >    2) benchOption = 0;
-            if (gPlayer1Controller->buttonPressed & L_TRIG) {
-                benchmarkLoop = NUM_BENCH_ITERATIONS;
-                benchmarkProgramTimer = osGetTime();
-            }
-        }
-        benchmark_custom();
-    }
-    if ((gPlayer1Controller->buttonDown & U_JPAD) && (gPlayer1Controller->buttonPressed & L_TRIG)) {
-        ramViewer      = FALSE;
-        audioRamViewer = FALSE;
-        benchViewer    = FALSE;
-        logViewer      = FALSE;
-        fDebug        ^= TRUE;
     }
     if (perfIteration++ == (NUM_PERF_ITERATIONS - 1)) {
         perfIteration = 0;

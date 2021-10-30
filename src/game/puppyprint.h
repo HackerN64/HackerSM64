@@ -7,9 +7,14 @@
 #define NUM_BENCH_ITERATIONS 150
 #define LOG_BUFFER_SIZE       16
 
+struct PuppyPrintPage{
+    void (*func)();
+    char name[32];
+};
+
 enum Benchmark {
     BENCHMARK_NONE,
-    BENCHMARK_GAME,  
+    BENCHMARK_GAME,
     BENCHMARK_AUDIO,
     BENCHMARK_GRAPHICS
 };
@@ -31,6 +36,7 @@ enum PuppyFont {
     FONT_NUM,
 };
 
+extern u8 sPPDebugPage;
 extern u8 gPuppyFont;
 extern s8 perfIteration;
 extern s16 benchmarkLoop;
@@ -61,6 +67,8 @@ extern u32  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
 extern u32     faultTime[NUM_PERF_ITERATIONS + 1];
 extern u32      taskTime[NUM_PERF_ITERATIONS + 1];
 extern u32    cameraTime[NUM_PERF_ITERATIONS + 1];
+extern u32  profilerTime[NUM_PERF_ITERATIONS + 1];
+extern u32 profilerTime2[NUM_PERF_ITERATIONS + 1];
 // RSP
 extern u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
 // RDP
