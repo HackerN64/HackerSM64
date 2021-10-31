@@ -428,9 +428,9 @@ struct GraphNodeShadow *init_graph_node_shadow(struct AllocOnlyPool *pool,
 
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_SHADOW);
-        graphNode->shadowScale = shadowScale;
+        graphNode->shadowScale    = shadowScale;
         graphNode->shadowSolidity = shadowSolidity;
-        graphNode->shadowType = shadowType;
+        graphNode->shadowType     = shadowType;
     }
 
     return graphNode;
@@ -491,7 +491,7 @@ struct GraphNodeBackground *init_graph_node_background(struct AllocOnlyPool *poo
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->fnNode.node, GRAPH_NODE_TYPE_BACKGROUND);
 
-        graphNode->background = (background << 16) | background;
+        graphNode->background = ((background << 16) | background);
         graphNode->fnNode.func = backgroundFunc;
         graphNode->unused = zero; // always 0, unused
 

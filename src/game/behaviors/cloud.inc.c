@@ -1,8 +1,7 @@
 
 /**
  * Behavior for bhvCloud and bhvCloudPart.
- * bhvCloud includes both fwoosh and the cloud that lakitu rides (both nice and
- * evil).
+ * bhvCloud includes both fwoosh and the cloud that lakitu rides (both nice and evil).
  * bhvCloudPart is spawned by bhvCloud and is either a "chunk" of cloud, or fwoosh's
  * face. It is purely visual.
  * If spawned by a lakitu, its parent will be the lakitu.
@@ -12,7 +11,9 @@
 /**
  * The relative heights of each cloud part.
  */
-static s8 sCloudPartHeights[] = { 11, 8, 12, 8, 9, 9 };
+static s8 sCloudPartHeights[] = {
+    11, 8, 12, 8, 9, 9
+};
 
 /**
  * Spawn the visual parts of the cloud, including fwoosh's face.
@@ -89,8 +90,8 @@ static void cloud_fwoosh_update(void) {
                 o->oTimer = 0;
             }
 
-            o->oCloudCenterX = o->oHomeX + 100.0f * coss(o->oCloudFwooshMovementRadius);
-            o->oPosZ = o->oHomeZ + 100.0f * sins(o->oCloudFwooshMovementRadius);
+            o->oCloudCenterX = (o->oHomeX + (100.0f * coss(o->oCloudFwooshMovementRadius)));
+            o->oPosZ         = (o->oHomeZ + (100.0f * sins(o->oCloudFwooshMovementRadius)));
             o->oCloudCenterY = o->oHomeY;
         }
 
@@ -103,9 +104,6 @@ static void cloud_fwoosh_update(void) {
  * unloads, and when fwoosh blows wind.
  */
 static void cloud_act_main(void) {
-    s16 localOffsetPhase = (0x800 * gGlobalTimer);
-    f32 localOffset;
-
     if (o->parentObj != o) {
         // Despawn if the parent lakitu does
         if (o->parentObj->activeFlags == ACTIVE_FLAG_DEACTIVATED) {
@@ -113,7 +111,7 @@ static void cloud_act_main(void) {
         } else {
             o->oCloudCenterX = o->parentObj->oPosX;
             o->oCloudCenterY = o->parentObj->oPosY;
-            o->oPosZ = o->parentObj->oPosZ;
+            o->oPosZ         = o->parentObj->oPosZ;
 
             o->oMoveAngleYaw = o->parentObj->oFaceAngleYaw;
         }
@@ -127,10 +125,10 @@ static void cloud_act_main(void) {
         cloud_fwoosh_update();
     }
 
-    localOffset = 2 * coss(localOffsetPhase) * o->header.gfx.scale[0];
+    f32 localOffset = (2 * coss(0x800 * gGlobalTimer) * o->header.gfx.scale[0]);
 
-    o->oPosX = o->oCloudCenterX + localOffset;
-    o->oPosY = o->oCloudCenterY + localOffset + 12.0f * o->header.gfx.scale[0];
+    o->oPosX = (o->oCloudCenterX + localOffset);
+    o->oPosY = (o->oCloudCenterY + localOffset + (12.0f * o->header.gfx.scale[0]));
 }
 
 /**
@@ -186,7 +184,7 @@ void bhv_cloud_part_update(void) {
         cur_obj_scale(scale);
 
         // Cap fwoosh's face size
-        if (o->oBehParams2ndByte == 5 && scale > 2.0f) {
+        if ((o->oBehParams2ndByte == 5) && (scale > 2.0f)) {
             scale = o->header.gfx.scale[1] = 2.0f;
         }
 

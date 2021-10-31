@@ -726,12 +726,12 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, s16 *movtexVerts, struct M
  * 'attrLayout' is one of MOVTEX_LAYOUT_NOCOLOR and MOVTEX_LAYOUT_COLORED.
  */
 Gfx *movtex_gen_list(s16 *movtexVerts, struct MovtexObject *movtexList, s8 attrLayout) {
-    Vtx *verts = alloc_display_list(movtexList->vtx_count * sizeof(*verts));
+    Vtx *verts   = alloc_display_list(movtexList->vtx_count * sizeof(*verts));
     Gfx *gfxHead = alloc_display_list(11 * sizeof(*gfxHead));
     Gfx *gfx = gfxHead;
     s32 i;
 
-    if (verts == NULL || gfxHead == NULL) {
+    if ((verts == NULL) || (gfxHead == NULL)) {
         return NULL;
     }
 

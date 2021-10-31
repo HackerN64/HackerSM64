@@ -51,7 +51,7 @@ void bhv_tilting_inverted_pyramid_loop(void) {
         m[0] += (posAfterRotation[0] - posBeforeRotation[0]);
         m[1] += (posAfterRotation[1] - posBeforeRotation[1]);
         m[2] += (posAfterRotation[2] - posBeforeRotation[2]);
-        vec3_copy(gMarioStates[0].pos, m);
+        vec3f_copy(gMarioStates[0].pos, m);
     }
 #endif
     o->header.gfx.throwMatrix = transform;

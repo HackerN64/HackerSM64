@@ -462,13 +462,12 @@ static void level_cmd_place_object(void) {
         ModelID16 model = CMD_GET(u32, 0x18);
         struct SpawnInfo *spawnInfo = alloc_only_pool_alloc(sLevelPool, sizeof(struct SpawnInfo));
 
-        spawnInfo->startPos[0] = CMD_GET(s16, 4);
-        spawnInfo->startPos[1] = CMD_GET(s16, 6);
-        spawnInfo->startPos[2] = CMD_GET(s16, 8);
-
-        spawnInfo->startAngle[0] = DEGREES(CMD_GET(s16, 10));
-        spawnInfo->startAngle[1] = DEGREES(CMD_GET(s16, 12));
-        spawnInfo->startAngle[2] = DEGREES(CMD_GET(s16, 14));
+        vec3s_set(spawnInfo->startPos, CMD_GET(s16, 4),
+                                       CMD_GET(s16, 6),
+                                       CMD_GET(s16, 8));
+        vec3s_set(spawnInfo->startAngle, DEGREES(CMD_GET(s16, 10)),
+                                         DEGREES(CMD_GET(s16, 12)),
+                                         DEGREES(CMD_GET(s16, 14)));
 
         spawnInfo->areaIndex = sCurrAreaIndex;
         spawnInfo->activeAreaIndex = sCurrAreaIndex;

@@ -6,12 +6,11 @@
 
 #if IS_64_BIT
 static s16 next_s16_in_geo_script(s16 **src) {
-    s16 ret;
-    if (((uintptr_t)(*src) & 7) == 4) {
+    if (((uintptr_t)(*src) & 0x7) == 4) {
          *src += 2; // skip 32 bits
     }
-    ret = *(*src)++;
-    if (((uintptr_t)(*src) & 7) == 4) {
+    s16 ret = *(*src)++;
+    if (((uintptr_t)(*src) & 0x7) == 4) {
          *src += 2; // skip 32 bits
     }
     return ret;
@@ -44,9 +43,8 @@ s32 *read_vec3s(Vec3s dst, s16 *src) {
 }
 
 /**
- * Takes a pointer to three angles in degrees (supplied by a geo layout script)
- * and converts it to a vector of three in-game angle units in [-32768, 32767]
- * range.
+ * Takes a pointer to three angles in degrees (supplied by a geo layout script) and
+ * converts it to a vector of three in-game angle units in [-32768, 32767] range.
  */
 s32 *read_vec3s_angle(Vec3s dst, s16 *src) {
     dst[0] = ((next_s16_in_geo_script(&src) << 15) / 180);

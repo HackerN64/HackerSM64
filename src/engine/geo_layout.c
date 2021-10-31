@@ -44,9 +44,9 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     geo_layout_cmd_node_culling_radius,
 };
 
-struct GraphNode gObjParentGraphNode;
+struct GraphNode      gObjParentGraphNode;
 struct AllocOnlyPool *gGraphNodePool;
-struct GraphNode *gCurRootGraphNode;
+struct GraphNode     *gCurRootGraphNode;
 
 /* The gGeoViews array is a mysterious one. Some background:
  *
@@ -112,8 +112,8 @@ void geo_layout_cmd_branch_and_link(void) {
 void geo_layout_cmd_end(void) {
     gGeoLayoutStackIndex = gGeoLayoutReturnIndex;
     gGeoLayoutReturnIndex = (gGeoLayoutStack[--gGeoLayoutStackIndex] & 0xFFFF);
-    gCurGraphNodeIndex = gGeoLayoutStack[gGeoLayoutStackIndex] >> 16;
-    gGeoLayoutCommand = (u8 *) gGeoLayoutStack[--gGeoLayoutStackIndex];
+    gCurGraphNodeIndex = (gGeoLayoutStack[gGeoLayoutStackIndex] >> 16);
+    gGeoLayoutCommand  = (u8 *) gGeoLayoutStack[--gGeoLayoutStackIndex];
 }
 
 /*
@@ -192,20 +192,20 @@ void geo_layout_cmd_node_root(void) {
     s32 i;
     struct GraphNodeRoot *graphNode;
 
-    s16 x = cur_geo_cmd_s16(0x04);
-    s16 y = cur_geo_cmd_s16(0x06);
-    s16 width = cur_geo_cmd_s16(0x08);
+    s16 x      = cur_geo_cmd_s16(0x04);
+    s16 y      = cur_geo_cmd_s16(0x06);
+    s16 width  = cur_geo_cmd_s16(0x08);
     s16 height = cur_geo_cmd_s16(0x0A);
 
     // number of entries to allocate for gGeoViews array
     // at least 2 are allocated by default
     // cmd+0x02 = 0x00: Mario face, 0x0A: all other levels
-    gGeoNumViews = cur_geo_cmd_s16(0x02) + 2;
+    gGeoNumViews = (cur_geo_cmd_s16(0x02) + 2);
 
     graphNode = init_graph_node_root(gGraphNodePool, NULL, 0, x, y, width, height);
 
     // TODO: check type
-    gGeoViews = alloc_only_pool_alloc(gGraphNodePool, gGeoNumViews * sizeof(struct GraphNode *));
+    gGeoViews = alloc_only_pool_alloc(gGraphNodePool, (gGeoNumViews * sizeof(struct GraphNode *)));
 
     graphNode->views = gGeoViews;
     graphNode->numViews = gGeoNumViews;
@@ -244,9 +244,9 @@ void geo_layout_cmd_node_ortho_projection(void) {
 */
 void geo_layout_cmd_node_perspective(void) {
     GraphNodeFunc frustumFunc = NULL;
-    s16 fov = cur_geo_cmd_s16(0x02);
+    s16 fov  = cur_geo_cmd_s16(0x02);
     u16 near = cur_geo_cmd_u16(0x04);
-    u16 far = cur_geo_cmd_u16(0x06);
+    u16 far  = cur_geo_cmd_u16(0x06);
 
     if (cur_geo_cmd_u8(0x01) != 0) {
         // optional asm function
@@ -421,14 +421,14 @@ void geo_layout_cmd_node_translation_rotation(void) {
             break;
         case 3:
             vec3s_copy(translation, gVec3sZero);
-            vec3s_set(rotation, 0, ((cmdPos[1] << 15) / 180), 0);
-            cmdPos += 2 << CMD_SIZE_SHIFT;
+            vec3s_set(rotation, 0, ((cmdPos[1] << 15) / 180), 0); // degrees
+            cmdPos += (2 << CMD_SIZE_SHIFT);
             break;
     }
 
     if (params & 0x80) {
         displayList = *(void **) &cmdPos[0];
-        drawingLayer = params & 0x0F;
+        drawingLayer = (params & 0x0F);
         cmdPos += (2 << CMD_SIZE_SHIFT);
     }
 
@@ -783,9 +783,9 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     gGeoNumViews = 0; // number of entries in gGeoViews
 
     gCurGraphNodeList[0] = 0;
-    gCurGraphNodeIndex = 0; // incremented by cmd_open_node, decremented by cmd_close_node
+    gCurGraphNodeIndex   = 0; // incremented by cmd_open_node, decremented by cmd_close_node
 
-    gGeoLayoutStackIndex = 2;
+    gGeoLayoutStackIndex  = 2;
     gGeoLayoutReturnIndex = 2; // stack index is often copied here?
 
     gGeoLayoutCommand = segmented_to_virtual(segptr);
