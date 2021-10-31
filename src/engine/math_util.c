@@ -229,19 +229,6 @@ void vec3f_normalize(Vec3f dest) {
     }
 }
 
-/// Scale vector 'dest' so it has length -1
-void vec3f_normalize_negative(Vec3f dest) {
-    f32 mag = sqrtf(sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
-    if (mag > NEAR_ZERO) {
-        register f32 invsqrt = (-1.0f / mag);
-        vec3_mul_val(dest, invsqrt);
-    } else {
-        dest[0] = 0;
-        dest[1] = 1;
-        dest[2] = 0;
-    }
-}
-
 struct CopyMat4 {
     f32 a[0x10];
 };
@@ -355,8 +342,8 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
     colY[1] = coss(roll);
     colY[0] = ( sr * dz);
     colY[2] = (-sr * dx);
-    vec3_diff(colZ, to, from);
-    vec3f_normalize_negative(colZ);
+    vec3f_diff(colZ, from, to); // to & from are swapped
+    vec3f_normalize(colZ);
     vec3f_cross(colX, colY, colZ);
     vec3f_normalize(colX);
     vec3f_cross(colY, colZ, colX);
@@ -482,9 +469,9 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
     Vec3f forwardDir;
     vec3_set(lateralDir, sins(yaw), 0x0, coss(yaw));
     vec3f_normalize(upDir);
-    vec3_cross(leftDir, upDir, lateralDir);
+    vec3f_cross(leftDir, upDir, lateralDir);
     vec3f_normalize(leftDir);
-    vec3_cross(forwardDir, leftDir, upDir);
+    vec3f_cross(forwardDir, leftDir, upDir);
     vec3f_normalize(forwardDir);
     vec3f_copy(dest[0], leftDir);
     vec3f_copy(dest[1], upDir);
@@ -509,12 +496,12 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     f32 minY   = (-radius * 3);
     f32 height = (pos[1] + 150);
 
-    point0[0] = (pos[0] + (radius * sins(yaw + 0x2AAA)));
-    point0[2] = (pos[2] + (radius * coss(yaw + 0x2AAA)));
-    point1[0] = (pos[0] + (radius * sins(yaw + 0x8000)));
-    point1[2] = (pos[2] + (radius * coss(yaw + 0x8000)));
-    point2[0] = (pos[0] + (radius * sins(yaw + 0xD555)));
-    point2[2] = (pos[2] + (radius * coss(yaw + 0xD555)));
+    point0[0] = (pos[0] + (radius * sins(yaw + DEGREES( 60))));
+    point0[2] = (pos[2] + (radius * coss(yaw + DEGREES( 60))));
+    point1[0] = (pos[0] + (radius * sins(yaw + DEGREES(180))));
+    point1[2] = (pos[2] + (radius * coss(yaw + DEGREES(180))));
+    point2[0] = (pos[0] + (radius * sins(yaw + DEGREES(-60))));
+    point2[2] = (pos[2] + (radius * coss(yaw + DEGREES(-60))));
 
     point0[1] = find_floor(point0[0], height, point0[2], &floor);
     point1[1] = find_floor(point1[0], height, point1[2], &floor);
@@ -529,9 +516,9 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     vec3_set(forward, sins(yaw), 0x0, coss(yaw));
     find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
     vec3f_normalize(yColumn);
-    vec3_cross(xColumn, yColumn, forward);
+    vec3f_cross(xColumn, yColumn, forward);
     vec3f_normalize(xColumn);
-    vec3_cross(zColumn, xColumn, yColumn);
+    vec3f_cross(zColumn, xColumn, yColumn);
     vec3f_normalize(zColumn);
     vec3f_copy(mtx[0], xColumn);
     vec3f_copy(mtx[1], yColumn);
@@ -795,17 +782,17 @@ void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, 
  * Construct the 'to' point which is distance 'dist' away from the 'from' position,
  * and has the angles pitch and yaw.
  */
+#define vec3_set_dist_and_angle(from, to, dist, pitch, yaw) { \
+    register f32 dcos = (dist * coss(pitch)); \
+    to[0] = (from[0] + (dcos * sins(yaw  ))); \
+    to[1] = (from[1] + (dist * sins(pitch))); \
+    to[2] = (from[2] + (dcos * coss(yaw  ))); \
+}
 void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, Angle32 pitch, Angle32 yaw) {
-    register f32 dcos = (dist * coss(pitch));
-    to[0] = (from[0] + (dcos * sins(yaw  )));
-    to[1] = (from[1] + (dist * sins(pitch)));
-    to[2] = (from[2] + (dcos * coss(yaw  )));
+    vec3_set_dist_and_angle(from, to, dist, pitch, yaw);
 }
 void vec3s_set_dist_and_angle(Vec3s from, Vec3s to, s16 dist, Angle32 pitch, Angle32 yaw) {
-    register f32 dcos = (dist * coss(pitch));
-    to[0] = (from[0] + (dcos * sins(yaw  )));
-    to[1] = (from[1] + (dist * sins(pitch)));
-    to[2] = (from[2] + (dcos * coss(yaw  )));
+    vec3_set_dist_and_angle(from, to, dist, pitch, yaw);
 }
 
 /**
@@ -920,7 +907,6 @@ f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier) {
  */
 s32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor) {
     s16 temp = *current;
-
     if (divisor == 0) {
         *current = target;
     } else {
@@ -938,7 +924,6 @@ s32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor) {
  */
 s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
     s16 temp = current;
-
     if (divisor == 0) {
         current = target;
     } else {
@@ -961,6 +946,9 @@ s32 abs_angle_diff(s16 a0, s16 a1) {
  * the resulting angle is in range [0, 0x2000] (1/8 of a circle).
  */
 #define atan2_lookup(y, x) ((x == 0) ? 0x0 : atans((y) / (x)))
+// static inline u32 atan2_lookup(f32 y, f32 x) {
+//     return ((x == 0) ? 0x0 : atans(y / x));
+// }
 
 /**
  * Compute the angle from (0, 0) to (x, y) as a s16. Given that terrain is in

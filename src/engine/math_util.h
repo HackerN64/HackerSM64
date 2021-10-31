@@ -27,7 +27,9 @@ extern Vec3s gVec3sOne;
  * Converts an angle in degrees to sm64's s16 angle units. For example, DEGREES(90) == 0x4000
  * This should be used mainly to make camera code clearer at first glance.
  */
-#define DEGREES(x) ((x) * 0x10000 / 360)
+// #define DEGREES(x) ((x) * 0x10000 / 360)
+#define DEGREES(x) ((x) * 0x2000 / 45)
+// #define DEGREES(x) (((x) << 13) / 45)
 
 /*
  * The sine and cosine tables overlap, but "#define gCosineTable (gSineTable +
