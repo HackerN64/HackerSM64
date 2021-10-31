@@ -57,10 +57,8 @@ s32 random_linear_offset(s16 base, s16 range);
 s32 random_mod_offset(s16 base, s16 step, s16 mod);
 s32 obj_random_fixed_turn(s16 delta);
 s32 obj_grow_then_shrink(f32 *scaleVel, f32 shootFireScale, f32 endScale);
-s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero, f32 accel,
-                            f32 slowdown);
-void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange,
-                                s16 blinkLength);
+s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero, f32 accel, f32 slowdown);
+void obj_update_blinking(s32 *blinkTimer, s16 baseCycleLength, s16 cycleLengthRange, s16 blinkLength);
 s32 obj_resolve_object_collisions(s32 *targetYaw);
 s32 obj_bounce_off_walls_edges_objects(s32 *targetYaw);
 s32 obj_resolve_collisions_and_turn(s16 targetYaw, s16 turnSpeed);

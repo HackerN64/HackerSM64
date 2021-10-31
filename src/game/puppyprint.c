@@ -645,7 +645,7 @@ void puppyprint_profiler_process(void) {
     }
 
     if ((gPlayer1Controller->buttonDown & U_JPAD) && (gPlayer1Controller->buttonPressed & L_TRIG)) {
-        fDebug ^= TRUE;
+        fDebug    ^= TRUE;
         sDebugMenu = FALSE;
     }
 
@@ -675,9 +675,9 @@ void puppyprint_profiler_process(void) {
         get_average_perf_time(   cameraTime);
 
         // Performed twice a frame without fail, so doubled to have a more representative value.
-        audioTime[NUM_PERF_ITERATIONS] *= 2;
+           audioTime[NUM_PERF_ITERATIONS] *= 2;
         dmaAudioTime[NUM_PERF_ITERATIONS] *= 2;
-        dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
+             dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
 
         get_average_perf_time(rspGenTime);
 
@@ -691,8 +691,8 @@ void puppyprint_profiler_process(void) {
 #if BBPLAYER == 1 // iQue RDP registers need to be halved to be correct.
         rdpTime /= 2;
 #endif
-        cpuTime = scriptTime[NUM_PERF_ITERATIONS] + taskTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS] + audioTime[NUM_PERF_ITERATIONS];
-        rspTime = rspGenTime[NUM_PERF_ITERATIONS];
+        cpuTime = (scriptTime[NUM_PERF_ITERATIONS] + taskTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS] + audioTime[NUM_PERF_ITERATIONS]);
+        rspTime =  rspGenTime[NUM_PERF_ITERATIONS];
         puppyprint_calculate_ram_usage();
     }
 
@@ -824,49 +824,46 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
 
     if (runCMD) {
         if (strncmp((str + i), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
-            s32 r, g, b, a;
             // Each value is taken from the strong. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
-            r  = ((str[i +  5] - '0') * 10);
-            r +=  (str[i +  6] - '0');
-            g  = ((str[i +  7] - '0') * 10);
-            g +=  (str[i +  8] - '0');
-            b  = ((str[i +  9] - '0') * 10);
-            b +=  (str[i + 10] - '0');
-            a  = ((str[i + 11] - '0') * 10);
-            a +=  (str[i + 12] - '0');
+            s32 r = (((str[i +  5] - '0') * 10)
+                  +   (str[i +  6] - '0'));
+            s32 g = (((str[i +  7] - '0') * 10)
+                  +   (str[i +  8] - '0'));
+            s32 b = (((str[i +  9] - '0') * 10)
+                  +   (str[i + 10] - '0'));
+            s32 a = (((str[i + 11] - '0') * 10)
+                  +   (str[i + 12] - '0'));
             // Multiply each value afterwards by 2.575f to make 255.
             print_set_envcolour((r * 2.575f), (g * 2.575f), (b * 2.575f), (a * 2.575f));
         } else if (strncmp((str + i), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
-            s32 r, g, b, a, r2, g2, b2, a2, spd, r3, g3, b3, a3, r4, g4, b4, a4;
-            r    = ((str[i +  6] - '0') * 10);
-            r   +=  (str[i +  7] - '0');
-            g    = ((str[i +  8] - '0') * 10);
-            g   +=  (str[i +  9] - '0');
-            b    = ((str[i + 10] - '0') * 10);
-            b   +=  (str[i + 11] - '0');
-            a    = ((str[i + 12] - '0') * 10);
-            a   +=  (str[i + 13] - '0');
-            r2   = ((str[i + 15] - '0') * 10);
-            r2  +=  (str[i + 16] - '0');
-            g2   = ((str[i + 17] - '0') * 10);
-            g2  +=  (str[i + 18] - '0');
-            b2   = ((str[i + 19] - '0') * 10);
-            b2  +=  (str[i + 20] - '0');
-            a2   = ((str[i + 21] - '0') * 10);
-            a2  +=  (str[i + 22] - '0');
-            spd  = ((str[i + 24] - '0') * 10);
-            spd +=  (str[i + 25] - '0');
-
+            s32 r   = (((str[i +  6] - '0') * 10)
+                    +   (str[i +  7] - '0'));
+            s32 g   = (((str[i +  8] - '0') * 10)
+                    +   (str[i +  9] - '0'));
+            s32 b   = (((str[i + 10] - '0') * 10)
+                    +   (str[i + 11] - '0'));
+            s32 a   = (((str[i + 12] - '0') * 10)
+                    +   (str[i + 13] - '0'));
+            s32 r2  = (((str[i + 15] - '0') * 10)
+                    +   (str[i + 16] - '0'));
+            s32 g2  = (((str[i + 17] - '0') * 10)
+                    +   (str[i + 18] - '0'));
+            s32 b2  = (((str[i + 19] - '0') * 10)
+                    +   (str[i + 20] - '0'));
+            s32 a2  = (((str[i + 21] - '0') * 10)
+                    +   (str[i + 22] - '0'));
+            s32 spd = (((str[i + 24] - '0') * 10)
+                    +   (str[i + 25] - '0'));
             // Find the median.
-            r3 = ((r + r2) * 1.2875f);
-            g3 = ((g + g2) * 1.2875f);
-            b3 = ((b + b2) * 1.2875f);
-            a3 = ((a + a2) * 1.2875f);
+            s32 r3 = ((r + r2) * 1.2875f);
+            s32 g3 = ((g + g2) * 1.2875f);
+            s32 b3 = ((b + b2) * 1.2875f);
+            s32 a3 = ((a + a2) * 1.2875f);
             // Find the difference.
-            r4 = ((r - r2) * 1.2875f);
-            g4 = ((g - g2) * 1.2875f);
-            b4 = ((b - b2) * 1.2875f);
-            a4 = ((a - a2) * 1.2875f);
+            s32 r4 = ((r - r2) * 1.2875f);
+            s32 g4 = ((g - g2) * 1.2875f);
+            s32 b4 = ((b - b2) * 1.2875f);
+            s32 a4 = ((a - a2) * 1.2875f);
             // Now start from the median, and wave from end to end with the difference, to create the fading effect.
             f32 sTimer = (sins(gGlobalTimer * spd * 50));
             print_set_envcolour((r3 + (sTimer * r4)),
@@ -881,7 +878,7 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
         } else if (strncmp((str + i), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
             shakeToggle ^= 1;
         } else if (strncmp((str + i), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
-            waveToggle ^= 1;
+            waveToggle  ^= 1;
         }
     }
     return len;

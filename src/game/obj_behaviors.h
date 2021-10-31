@@ -9,7 +9,7 @@
 
 //! Lots of these are duplicates
 void set_yoshi_as_not_dead(void);
-s32 coin_step(s16 *collisionFlagsPtr);
+s32  coin_step(s16 *collisionFlagsPtr);
 void moving_coin_flicker(void);
 void coin_collected(void);
 void bhv_moving_yellow_coin_init(void);
@@ -18,9 +18,9 @@ void bhv_moving_blue_coin_init(void);
 void bhv_moving_blue_coin_loop(void);
 void bhv_blue_coin_sliding_jumping_init(void);
 void blue_coin_sliding_away_from_mario(void); /* likely unused */
-void blue_coin_sliding_slow_down(void); /* likely unused */
-void bhv_blue_coin_sliding_loop(void); /* likely unused */
-void bhv_blue_coin_jumping_loop(void); /* likely unused */
+void blue_coin_sliding_slow_down(void);       /* likely unused */
+void bhv_blue_coin_sliding_loop(void);        /* likely unused */
+void bhv_blue_coin_jumping_loop(void);        /* likely unused */
 void bhv_seaweed_init(void);
 void bhv_seaweed_bundle_init(void);
 void bhv_bobomb_init(void);
@@ -156,9 +156,9 @@ void bhv_generic_bowling_ball_spawner_loop(void);
 void bhv_thi_bowling_ball_spawner_loop(void);
 void bhv_bob_pit_bowling_ball_init(void);
 void bhv_bob_pit_bowling_ball_loop(void);
-void bhv_free_bowling_ball_init(void); /* likely unused */
+void bhv_free_bowling_ball_init(void);      /* likely unused */
 void bhv_free_bowling_ball_roll_loop(void); /* likely unused */
-void bhv_free_bowling_ball_loop(void); /* likely unused */
+void bhv_free_bowling_ball_loop(void);      /* likely unused */
 void bhv_rr_cruiser_wing_init(void);
 void bhv_rr_cruiser_wing_loop(void);
 void spawn_default_star(f32 x, f32 y, f32 z);

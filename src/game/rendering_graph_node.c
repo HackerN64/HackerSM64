@@ -168,7 +168,7 @@ struct GraphNodeObject      *gCurGraphNodeObject     = NULL;
 struct GraphNodeHeldObject  *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
 
-u8 ucodeTestSwitch = 1;
+// u8 ucodeTestSwitch = 1;
 
 void reset_clipping(void) {
     if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
@@ -185,14 +185,16 @@ LookAt lookAt;
 #if SILHOUETTE
 #define SIL_CVG_THRESHOLD    0x3F // 32..255, 63 seems to give best results
 #define SCHWA (AA_EN | IM_RD | CLR_ON_CVG | CVG_DST_WRAP | CVG_X_ALPHA | FORCE_BL)
-#define SET_SILHOUETTE_F3D(gfx) {                                                                    \
-    gDPSetRenderMode(  (gfx)++, (SCHWA | GBL_c1(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA)),  \
-                                (SCHWA | GBL_c2(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA))); \
-    gSPSetGeometryMode((gfx)++, G_FOG);                      /* Enable fog                  */       \
-    gSPFogPosition(    (gfx)++, 0, 1 );                      /* Fox position                */       \
-    gDPSetFogColor(    (gfx)++, 0, 0, 0, SILHOUETTE       ); /* silhouette color & alpha    */       \
-    gDPSetEnvColor(    (gfx)++, 0, 0, 0, SIL_CVG_THRESHOLD); /* silhouette env transparency */       \
-}
+const Gfx dl_silhouette_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetRenderMode(  (SCHWA | GBL_c1(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA)),
+                        (SCHWA | GBL_c2(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA))),
+    gsSPSetGeometryMode(G_FOG),                      /* Enable fog                  */
+    gsSPFogPosition(    0, 1 ),                      /* Fox position                */
+    gsDPSetFogColor(    0, 0, 0, SILHOUETTE       ), /* silhouette color & alpha    */
+    gsDPSetEnvColor(    0, 0, 0, SIL_CVG_THRESHOLD), /* silhouette env transparency */
+    gsSPEndDisplayList(),
+};
 #define CLEAR_SILHOUETTE_F3D(gfx, i) {                                                                 \
     gSPClearGeometryMode((gfx)++, G_FOG             );               /* Disable fog                 */ \
     gDPSetEnvColor(      (gfx)++, 255, 255, 255, 255);               /* Reset env color & alpha     */ \
@@ -277,7 +279,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             while (currList != NULL) {
 #if SILHOUETTE
                 if (renderPhase == RENDER_PHASE_REJ_SILHOUETTE) {
-                    SET_SILHOUETTE_F3D(gDisplayListHead);
+                    gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
                 } else if (renderPhase == RENDER_PHASE_REJ_NON_SILHOUETTE) {
                     CLEAR_SILHOUETTE_F3D(gDisplayListHead, currLayer);
                 } else {
@@ -331,7 +333,7 @@ void geo_append_display_list(void *displayList, s32 layer) {
 #if defined(F3DZEX_GBI_2) || (SILHOUETTE > 0)
     if (gCurGraphNodeObject != NULL) {
 #ifdef F3DZEX_GBI_2
-        if (/* gIsConsole && */ (gCurGraphNodeObject->node.flags & GRAPH_RENDER_UCODE_REJ) && ucodeTestSwitch) {
+        if (/* gIsConsole && */ (gCurGraphNodeObject->node.flags & GRAPH_RENDER_UCODE_REJ)/* && ucodeTestSwitch*/) {
             index = LIST_HEADS_REJ;
         }
 #endif

@@ -127,17 +127,13 @@ f32 atan2_deg(f32 a, f32 b) {
  * initial size of the shadow and the current distance.
  */
 f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
-    f32 newScale;
-
     if (distFromFloor <= 0.0f) {
-        newScale = initial;
+        return initial;
     } else if (distFromFloor >= 600.0f) {
-        newScale = initial * 0.5f;
+        return (initial * 0.5f);
     } else {
-        newScale = initial * (1.0f - (0.5f * distFromFloor / 600.0f));
+        return (initial * (1.0f - (0.5f * distFromFloor / 600.0f)));
     }
-
-    return newScale;
 }
 
 /**
@@ -172,7 +168,6 @@ f32 get_water_level_below_shadow(struct Shadow *s, struct Surface **waterFloor) 
         return 0;
     } else if ((s->parentPos[1] >= waterLevel) && (s->floorHeight <= waterLevel)) {
         gShadowFlags |= SHADOW_FLAG_WATER_BOX;
-        return waterLevel;
     }
     return waterLevel;
 }
@@ -210,9 +205,9 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
         s->floorHeight = waterLevel;
 
         if (waterFloor != NULL) {
-            s->floorNormal[0] = waterFloor->normal.x;
-            s->floorNormal[1] = waterFloor->normal.y;
-            s->floorNormal[2] = waterFloor->normal.z;
+            s->floorNormal[0]    = waterFloor->normal.x;
+            s->floorNormal[1]    = waterFloor->normal.y;
+            s->floorNormal[2]    = waterFloor->normal.z;
             s->floorOriginOffset = waterFloor->originOffset;
             gShadowFlags &= ~SHADOW_FLAG_WATER_BOX;
             gShadowFlags |= SHADOW_FLAG_WATER_SURFACE;
@@ -555,7 +550,9 @@ void correct_lava_shadow_height(struct Shadow *s) {
             s->floorHeight = 3492.0f;
             gShadowFlags |= SHADOW_FLAG_WATER_BOX;
         }
-    } else if ((gCurrLevelNum == LEVEL_LLL) && (gCurrAreaIndex == 1) && (sSurfaceTypeBelowShadow == SURFACE_BURNING)) {
+    } else if ((gCurrLevelNum == LEVEL_LLL)
+            && (gCurrAreaIndex == 1)
+            && (sSurfaceTypeBelowShadow == SURFACE_BURNING)) {
         s->floorHeight = 5.0f;
         gShadowFlags |= SHADOW_FLAG_WATER_BOX;
     }
@@ -624,7 +621,7 @@ Gfx *create_shadow_circle_9_verts(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
     Vtx *verts       = alloc_display_list(9 * sizeof(Vtx));
     Gfx *displayList = alloc_display_list(5 * sizeof(Gfx));
 
-    if (verts == NULL || displayList == NULL) {
+    if ((verts == NULL) || (displayList == NULL)) {
         return NULL;
     }
     for (i = 0; i < 9; i++) {

@@ -121,7 +121,6 @@ const Gfx init_rdp[] = {
     gsDPSetCycleType(     G_CYC_FILL),
 
     gsDPSetAlphaDither(   G_AD_PATTERN),
-    // gsDPPipeSync(),
     gsSPEndDisplayList(),
 };
 
@@ -129,8 +128,7 @@ const Gfx init_rdp[] = {
  * Sets the initial RSP (Reality Signal Processor) settings.
  */
 const Gfx init_rsp[] = {
-    // gsSPClearGeometryMode((G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD));
-    // gsSPSetGeometryMode(  (G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING));
+    gsDPPipeSync(),
     gsSPClearGeometryMode((G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD)),
     gsSPSetGeometryMode(  (G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING)),
     gsSPNumLights(        NUMLIGHTS_1),

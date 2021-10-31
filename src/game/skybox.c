@@ -9,8 +9,8 @@
 #include "save_file.h"
 #include "segment2.h"
 #include "sm64.h"
+#include "geo_commands.h"
 #include "color_presets.h"
-
 
 /**
  * @file skybox.c
@@ -75,16 +75,16 @@ extern SkyboxTexture water_skybox_ptrlist;
 extern SkyboxTexture wdw_skybox_ptrlist;
 
 SkyboxTexture *sSkyboxTextures[10] = {
-    &water_skybox_ptrlist,
-    &bitfs_skybox_ptrlist,
-    &wdw_skybox_ptrlist,
+          &water_skybox_ptrlist,
+          &bitfs_skybox_ptrlist,
+            &wdw_skybox_ptrlist,
     &cloud_floor_skybox_ptrlist,
-    &ccm_skybox_ptrlist,
-    &ssl_skybox_ptrlist,
-    &bbh_skybox_ptrlist,
-    &bidw_skybox_ptrlist,
-    &clouds_skybox_ptrlist,
-    &bits_skybox_ptrlist,
+            &ccm_skybox_ptrlist,
+            &ssl_skybox_ptrlist,
+            &bbh_skybox_ptrlist,
+           &bidw_skybox_ptrlist,
+         &clouds_skybox_ptrlist,
+           &bits_skybox_ptrlist,
 };
 
 /**
@@ -286,8 +286,8 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, V
     s8 colorIndex = 1;
 
     // If the "Plunder in the Sunken Ship" star in JRB is collected, make the sky darker and slightly green
-    if ((background == 8)
-        && !(save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
+    if ((background == BACKGROUND_ABOVE_CLOUDS)
+     && !(save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
         colorIndex = 0;
     }
 

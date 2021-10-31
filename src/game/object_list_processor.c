@@ -412,11 +412,11 @@ void unload_objects_from_area(s32 areaIndex) {
  * Spawn objects given a list of SpawnInfos. Called when loading an area.
  */
 void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
-    gObjectLists = gObjectListArray;
+    gObjectLists   = gObjectListArray;
     gTimeStopState = 0;
 
     gWDWWaterLevelChanging = FALSE;
-    gMarioOnMerryGoRound = FALSE;
+    gMarioOnMerryGoRound   = FALSE;
 
     clear_mario_platform();
 

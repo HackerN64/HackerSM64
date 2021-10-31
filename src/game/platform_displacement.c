@@ -150,7 +150,7 @@ void apply_mario_platform_displacement(void) {
         if (platform != NULL) {
             apply_platform_displacement(&sMarioDisplacementInfo, gMarioState->pos, &gMarioState->faceAngle[1], platform);
             sShouldApplyInertia = TRUE;
-            sInertiaFirstFrame = TRUE;
+            sInertiaFirstFrame  = TRUE;
         } else if (sShouldApplyInertia && gDoInertia) {
             apply_mario_inertia();
             sInertiaFirstFrame = FALSE;
@@ -199,7 +199,7 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
         vec3_sum(pos, platformPos, newObjectOffset);
     }
     if (isMario) {
-        vec3f_copy(gMarioStates[0].pos, pos);
+        vec3f_copy(gMarioStates[0].pos,      pos);
     } else {
         vec3f_copy(&gCurrentObject->oPosVec, pos);
     }

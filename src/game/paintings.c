@@ -196,7 +196,6 @@ void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
 f32 painting_mario_y(struct Painting *painting) {
     // Add 50 to make the ripple closer to Mario's center of mass.
     f32 relY = ((gPaintingMarioPos[1] - painting->pos[1]) + 50.0f);
-
     if (relY < 0.0f) {
         relY = 0.0f;
     } else if (relY > painting->size) {
@@ -537,7 +536,9 @@ void painting_update_floors(struct Painting *painting) {
 void painting_update_ripple_state(struct Painting *painting) {
     if (gPaintingUpdateCounter != gLastPaintingUpdateCounter) {
         painting->currRippleMag *= painting->rippleDecay;
-        if (painting->rippleTimer >= ((1 << 24) - 1.0f)) painting->rippleTimer = 0.0f;
+        if (painting->rippleTimer >= ((1 << 24) - 1.0f)) {
+            painting->rippleTimer = 0.0f;
+        }
         painting->rippleTimer += 1.0f;
     }
     if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
@@ -550,11 +551,11 @@ void painting_update_ripple_state(struct Painting *painting) {
         // if the painting is doing the entry ripple but the ripples are as small as those from the
         // passive ripple, make it do a passive ripple
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
-        if (painting->state == PAINTING_ENTERED && painting->currRippleMag <= painting->passiveRippleMag) {
+        if ((painting->state == PAINTING_ENTERED) && (painting->currRippleMag <= painting->passiveRippleMag)) {
             painting->state = PAINTING_RIPPLE;
-            painting->currRippleMag = painting->passiveRippleMag;
-            painting->rippleDecay = painting->passiveRippleDecay;
-            painting->currRippleRate = painting->passiveRippleRate;
+            painting->currRippleMag    = painting->passiveRippleMag;
+            painting->rippleDecay      = painting->passiveRippleDecay;
+            painting->currRippleRate   = painting->passiveRippleRate;
             painting->dispersionFactor = painting->passiveDispersionFactor;
         }
     }
@@ -583,7 +584,7 @@ s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
     f32 dy = (posY - rippleY);
     f32 distanceToOrigin = sqrtf(sqr(dx) + sqr(dy));
     // A larger dispersionFactor makes the ripple spread slower
-    f32 rippleDistance = distanceToOrigin / dispersionFactor;
+    f32 rippleDistance = (distanceToOrigin / dispersionFactor);
     if (rippleTimer < rippleDistance) {
         // if the ripple hasn't reached the point yet, make the point magnitude 0
         return 0;
@@ -782,9 +783,14 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
             ty = textureMap[mapping3 + 3];
 
             // Map the texture and place it in the verts array
-            make_vertex(verts, ((group * 15) + map), gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
-                        gPaintingMesh[meshVtx].pos[2], tx, ty, gPaintingMesh[meshVtx].norm[0],
-                        gPaintingMesh[meshVtx].norm[1], gPaintingMesh[meshVtx].norm[2], alpha);
+            make_vertex(verts, ((group * 15) + map), gPaintingMesh[meshVtx].pos[0],
+                                                     gPaintingMesh[meshVtx].pos[1],
+                                                     gPaintingMesh[meshVtx].pos[2],
+                                                     tx, ty,
+                                                     gPaintingMesh[meshVtx].norm[0],
+                                                     gPaintingMesh[meshVtx].norm[1],
+                                                     gPaintingMesh[meshVtx].norm[2],
+                                                     alpha);
         }
 
         // Load the vertices and draw the 5 triangles
@@ -800,9 +806,14 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
         meshVtx  = textureMap[mapping3 + 1];
         tx       = textureMap[mapping3 + 2];
         ty       = textureMap[mapping3 + 3];
-        make_vertex(verts, ((triGroups * 15) + map), gPaintingMesh[meshVtx].pos[0], gPaintingMesh[meshVtx].pos[1],
-                    gPaintingMesh[meshVtx].pos[2], tx, ty, gPaintingMesh[meshVtx].norm[0],
-                    gPaintingMesh[meshVtx].norm[1], gPaintingMesh[meshVtx].norm[2], alpha);
+        make_vertex(verts, ((triGroups * 15) + map), gPaintingMesh[meshVtx].pos[0],
+                                                     gPaintingMesh[meshVtx].pos[1],
+                                                     gPaintingMesh[meshVtx].pos[2],
+                                                     tx, ty,
+                                                     gPaintingMesh[meshVtx].norm[0],
+                                                     gPaintingMesh[meshVtx].norm[1],
+                                                     gPaintingMesh[meshVtx].norm[2],
+                                                     alpha);
     }
 
     // Draw the triangles individually
@@ -868,8 +879,8 @@ Gfx *painting_ripple_image(struct Painting *painting) {
     // Map each image to the mesh's vertices
     for (i = 0; i < imageCount; i++) {
         textureMap = segmented_to_virtual(textureMaps[i]);
-        meshVerts = textureMap[0];
-        meshTris = textureMap[(meshVerts * 3) + 1];
+        meshVerts  = textureMap[0];
+        meshTris   = textureMap[(meshVerts * 3) + 1];
         gSPDisplayList(gfx++, render_painting(textures[i], tWidth, tHeight, textureMap, meshVerts, meshTris, painting->alpha));
     }
 
@@ -886,7 +897,7 @@ Gfx *painting_ripple_image(struct Painting *painting) {
  * Ripple a painting that has 1 "environment map" texture.
  */
 Gfx *painting_ripple_env_mapped(struct Painting *painting) {
-    PaintingData tWidth = painting->textureWidth;
+    PaintingData tWidth  = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
     PaintingData **textureMaps = segmented_to_virtual(painting->textureMaps);
     Texture **tArray = segmented_to_virtual(painting->textureArray);
@@ -903,8 +914,8 @@ Gfx *painting_ripple_env_mapped(struct Painting *painting) {
 
     // Map the image to the mesh's vertices
     PaintingData *textureMap = segmented_to_virtual(textureMaps[0]);
-    PaintingData meshVerts = textureMap[0];
-    PaintingData meshTris = textureMap[(meshVerts * 3) + 1];
+    PaintingData meshVerts   = textureMap[0];
+    PaintingData meshTris    = textureMap[(meshVerts * 3) + 1];
     gSPDisplayList(gfx++, render_painting(tArray[0], tWidth, tHeight, textureMap, meshVerts, meshTris, painting->alpha));
 
     // Update the ripple, may automatically reset the painting's state.
@@ -921,9 +932,9 @@ Gfx *painting_ripple_env_mapped(struct Painting *painting) {
  * The mesh and vertex normals are regenerated and freed every frame.
  */
 Gfx *display_painting_rippling(struct Painting *painting) {
-    PaintingData *mesh = segmented_to_virtual(seg2_painting_triangle_mesh);
+    PaintingData *mesh         = segmented_to_virtual(seg2_painting_triangle_mesh);
     PaintingData *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris);
-    PaintingData numVtx = mesh[0];
+    PaintingData numVtx  = mesh[0];
     PaintingData numTris = mesh[(numVtx * 3) + 1];
     Gfx *dlist = NULL;
 
@@ -982,14 +993,14 @@ void reset_painting(struct Painting *painting) {
     // Make sure all variables are reset correctly.
     // With segmented memory the segments that contain the relevant
     // Painting structs are reloaded from ROM upon level load.
-    painting->state = PAINTING_IDLE;
-    painting->currRippleMag = 0.0f;
-    painting->rippleDecay = 1.0f;
-    painting->currRippleRate = 0.0f;
+    painting->state            = PAINTING_IDLE;
+    painting->currRippleMag    = 0.0f;
+    painting->rippleDecay      = 1.0f;
+    painting->currRippleRate   = 0.0f;
     painting->dispersionFactor = 0.0f;
-    painting->rippleTimer = 0.0f;
-    painting->rippleX = 0.0f;
-    painting->rippleY = 0.0f;
+    painting->rippleTimer      = 0.0f;
+    painting->rippleX          = 0.0f;
+    painting->rippleY          = 0.0f;
     if (painting == &ddd_painting) {
         // Move DDD painting to initial position, in case the animation
         // that moves the painting stops during level unload.
@@ -1019,9 +1030,9 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
     // Get the other save file flags
     u32 saveFileFlags = save_file_get_flags();
     // Find out whether Board Bowser's Sub was collected
-    u32 bowsersSubBeaten = dddFlags & BOARD_BOWSERS_SUB;
+    u32 bowsersSubBeaten = (dddFlags & BOARD_BOWSERS_SUB);
     // Check whether DDD has already moved back
-    u32 dddBack = saveFileFlags & SAVE_FLAG_DDD_MOVED_BACK;
+    u32 dddBack = (saveFileFlags & SAVE_FLAG_DDD_MOVED_BACK);
 
     if (!bowsersSubBeaten && !dddBack) {
         // If we haven't collected the star or moved the painting, put the painting at the front

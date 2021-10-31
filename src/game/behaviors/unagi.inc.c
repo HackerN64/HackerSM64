@@ -36,7 +36,7 @@ void bhv_unagi_init(void) {
 }
 
 void unagi_act_0(void) {
-    if (o->oDistanceToMario > 4500.0f && o->oSubAction != UNAGI_SUB_ACT_SHIP_RESET_PATH_WAIT_FOR_MARIO) {
+    if ((o->oDistanceToMario > 4500.0f) && (o->oSubAction != UNAGI_SUB_ACT_SHIP_RESET_PATH_WAIT_FOR_MARIO)) {
         o->oAction = UNAGI_ACT_SHIP_PATH;
         vec3s_to_vec3f(&o->oPosVec, o->oPathedStartWaypoint->pos);
     } else if (o->oUnagiDistanceToMario < 700.0f) {
@@ -45,12 +45,12 @@ void unagi_act_0(void) {
 }
 
 void unagi_act_1_4(s32 nextAction) {
-    if (o->oSoundStateID == 3) {
+    if (o->oSoundStateID == UNAGI_ANIM_STATIC_STRAIGHT) {
         if (cur_obj_check_anim_frame(30)) {
             o->oForwardVel = 40.0f;
         }
     } else if (cur_obj_check_if_at_animation_end()) {
-        if (o->oAction != nextAction && (o->oPathedPrevWaypointFlags & 0xFF) >= 7) {
+        if ((o->oAction != nextAction) && (o->oPathedPrevWaypointFlags & 0xFF) >= 7) {
             cur_obj_init_animation_with_sound(UNAGI_ANIM_STATIC_STRAIGHT);
         } else {
             cur_obj_init_animation_with_sound(UNAGI_ANIM_SWIM);

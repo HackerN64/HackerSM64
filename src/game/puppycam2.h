@@ -46,12 +46,12 @@ enum PuppyDebugFlags {
 #include "include/command_macros_base.h"
 
 #define PUPPYVOLUME(x, y, z, length, height, width, yaw, functionptr, anglesptr, addflags, removeflags, flagpersistance, room, shape) \
-    CMD_BBH(0x3D, 0x24, x), \
+    CMD_BBH(0x3D, 0x24, x),                       \
     CMD_HHHHHH(y, z, length, height, width, yaw), \
-    CMD_PTR(functionptr), \
-    CMD_PTR(anglesptr), \
-    CMD_W(addflags), \
-    CMD_W(removeflags), \
+    CMD_PTR(functionptr),                         \
+    CMD_PTR(anglesptr),                           \
+    CMD_W(addflags),                              \
+    CMD_W(removeflags),                           \
     CMD_BBH(flagpersistance, shape, room)
 
 struct gPuppyOptions {
@@ -178,7 +178,7 @@ enum gPuppyCamBeh {
 };
 
 extern const struct sPuppyAngles puppyAnglesNull;
-extern u8 gPCOptionOpen;
+extern u8  gPCOptionOpen;
 extern s32 gPuppyError;
 extern struct gPuppyStruct gPuppyCam;
 extern struct sPuppyVolume *sPuppyVolumeStack[MAX_PUPPYCAM_VOLUMES];
@@ -188,17 +188,17 @@ extern void puppycam_boot(void);
 extern void puppycam_init(void);
 extern void puppycam_loop(void);
 extern void puppycam_shake(s16 x, s16 y, s16 z);
-extern f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
+extern f32  approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
 extern void puppycam_default_config(void);
-extern s32 LENCOS(s16 length, s16 direction);
-extern s32 LENSIN(s16 length, s16 direction);
+extern s32  LENCOS(s16 length, s16 direction);
+extern s32  LENSIN(s16 length, s16 direction);
 extern void puppycam_display_options(void);
 extern void puppycam_set_save(void);
 extern void puppycam_check_pause_buttons(void);
 extern void puppycam_activate_cutscene(s32 (*scene)(), s32 lockinput);
 extern void puppycam_render_option_text();
 extern void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacementZ);
-extern s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline splineFocus[], s32 mode, s32 index);
+extern s32  puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline splineFocus[], s32 mode, s32 index);
 
 #endif
 
