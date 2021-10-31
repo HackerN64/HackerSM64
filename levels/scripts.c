@@ -73,11 +73,11 @@ static const LevelScript goto_debug_level_select[] = {
 #undef STUB_LEVEL
 
 const LevelScript level_main_scripts_entry[] = {
-    LOAD_YAY0(          /*seg*/ SEGMENT_GROUP0_YAY0, _group0_yay0SegmentRomStart, _group0_yay0SegmentRomEnd),
+    LOAD_YAY0(          /*seg*/ SEGMENT_GROUP0_YAY0,   _group0_yay0SegmentRomStart,  _group0_yay0SegmentRomEnd),
     LOAD_YAY0(          /*seg*/ SEGMENT_COMMON1_YAY0, _common1_yay0SegmentRomStart, _common1_yay0SegmentRomEnd),
-    LOAD_RAW_WITH_CODE( /*seg*/ SEGMENT_GROUP0_GEO, _group0_geoSegmentRomStart, _group0_geoSegmentRomEnd, _group0_geoSegmentBssStart, _group0_geoSegmentBssEnd),
-    LOAD_RAW_WITH_CODE( /*seg*/ SEGMENT_COMMON1_GEO, _common1_geoSegmentRomStart, _common1_geoSegmentRomEnd, _common1_geoSegmentBssStart, _common1_geoSegmentBssEnd),
-    LOAD_RAW_WITH_CODE( /*seg*/ SEGMENT_BEHAVIOR_DATA, _behaviorSegmentRomStart, _behaviorSegmentRomEnd, _behaviorSegmentBssStart, _behaviorSegmentBssEnd),
+    LOAD_RAW_WITH_CODE( /*seg*/ SEGMENT_GROUP0_GEO,     _group0_geoSegmentRomStart,   _group0_geoSegmentRomEnd,  _group0_geoSegmentBssStart,  _group0_geoSegmentBssEnd),
+    LOAD_RAW_WITH_CODE( /*seg*/ SEGMENT_COMMON1_GEO,   _common1_geoSegmentRomStart,  _common1_geoSegmentRomEnd, _common1_geoSegmentBssStart, _common1_geoSegmentBssEnd),
+    LOAD_RAW_WITH_CODE( /*seg*/ SEGMENT_BEHAVIOR_DATA,    _behaviorSegmentRomStart,     _behaviorSegmentRomEnd,   _behaviorSegmentBssStart,     _behaviorSegmentBssEnd),
     ALLOC_LEVEL_POOL(),
     LOAD_MODEL_FROM_GEO(MODEL_MARIO,                   mario_geo),
     LOAD_MODEL_FROM_GEO(MODEL_SMOKE,                   smoke_geo),
@@ -166,7 +166,7 @@ static const LevelScript script_exec_ ## folder [] = { \
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
 
-const LevelScript script_func_global_1[] = {
+const LevelScript script_func_global_common0[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BLUE_COIN_SWITCH,        blue_coin_switch_geo),
     LOAD_MODEL_FROM_GEO(MODEL_AMP,                     dAmpGeo),
     LOAD_MODEL_FROM_GEO(MODEL_PURPLE_SWITCH,           purple_switch_geo),
@@ -193,7 +193,7 @@ const LevelScript script_func_global_1[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_2[] = {
+const LevelScript script_func_global_group1[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BULLET_BILL,             bullet_bill_geo),
     LOAD_MODEL_FROM_GEO(MODEL_YELLOW_SPHERE,           yellow_sphere_geo),
     LOAD_MODEL_FROM_GEO(MODEL_HOOT,                    hoot_geo),
@@ -203,21 +203,21 @@ const LevelScript script_func_global_2[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_3[] = {
+const LevelScript script_func_global_group2[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BLARGG,                  blargg_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BULLY,                   bully_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BULLY_BOSS,              bully_boss_geo),
     RETURN(),
 };
 
-const LevelScript script_func_global_4[] = {
+const LevelScript script_func_global_group3[] = {
     LOAD_MODEL_FROM_GEO(MODEL_WATER_BOMB,              water_bomb_geo),
     LOAD_MODEL_FROM_GEO(MODEL_WATER_BOMB_SHADOW,       water_bomb_shadow_geo),
     LOAD_MODEL_FROM_GEO(MODEL_KING_BOBOMB,             king_bobomb_geo),
     RETURN(),
 };
 
-const LevelScript script_func_global_5[] = {
+const LevelScript script_func_global_group4[] = {
     LOAD_MODEL_FROM_GEO(MODEL_MANTA_RAY,               manta_seg5_geo_05008D14),
     LOAD_MODEL_FROM_GEO(MODEL_UNAGI,                   unagi_geo),
     LOAD_MODEL_FROM_GEO(MODEL_SUSHI,                   sushi_geo),
@@ -226,7 +226,7 @@ const LevelScript script_func_global_5[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_6[] = {
+const LevelScript script_func_global_group5[] = {
     LOAD_MODEL_FROM_GEO(MODEL_POKEY_HEAD,              pokey_head_geo),
     LOAD_MODEL_FROM_GEO(MODEL_POKEY_BODY_PART,         pokey_body_part_geo),
     LOAD_MODEL_FROM_GEO(MODEL_TWEESTER,                tweester_geo),
@@ -236,7 +236,7 @@ const LevelScript script_func_global_6[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_7[] = {
+const LevelScript script_func_global_group6[] = {
     LOAD_MODEL_FROM_DL( MODEL_DL_MONTY_MOLE_HOLE,      monty_mole_hole_seg5_dl_05000840, LAYER_TRANSPARENT_DECAL),
     LOAD_MODEL_FROM_GEO(MODEL_MONTY_MOLE,              monty_mole_geo),
     LOAD_MODEL_FROM_GEO(MODEL_UKIKI,                   ukiki_geo),
@@ -244,7 +244,7 @@ const LevelScript script_func_global_7[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_8[] = {
+const LevelScript script_func_global_group7[] = {
     LOAD_MODEL_FROM_GEO(MODEL_SPINDRIFT,               spindrift_geo),
     LOAD_MODEL_FROM_GEO(MODEL_MR_BLIZZARD_HIDDEN,      mr_blizzard_hidden_geo),
     LOAD_MODEL_FROM_GEO(MODEL_MR_BLIZZARD,             mr_blizzard_geo),
@@ -252,14 +252,14 @@ const LevelScript script_func_global_8[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_9[] = {
+const LevelScript script_func_global_group8[] = {
     LOAD_MODEL_FROM_DL( MODEL_CAP_SWITCH_EXCLAMATION,  cap_switch_exclamation_seg5_dl_05002E00, LAYER_ALPHA),
     LOAD_MODEL_FROM_GEO(MODEL_CAP_SWITCH,              cap_switch_geo),
     LOAD_MODEL_FROM_DL( MODEL_CAP_SWITCH_BASE,         cap_switch_base_seg5_dl_05003120,        LAYER_OPAQUE),
     RETURN(),
 };
 
-const LevelScript script_func_global_10[] = {
+const LevelScript script_func_global_group9[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BOO,                     boo_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BETA_BOO_KEY,            small_key_geo),
     LOAD_MODEL_FROM_GEO(MODEL_HAUNTED_CHAIR,           haunted_chair_geo),
@@ -270,14 +270,14 @@ const LevelScript script_func_global_10[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_11[] = {
+const LevelScript script_func_global_group10[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BIRDS,                   birds_geo),
     LOAD_MODEL_FROM_GEO(MODEL_PEACH,                   peach_geo),
     LOAD_MODEL_FROM_GEO(MODEL_YOSHI,                   yoshi_geo),
     RETURN(),
 };
 
-const LevelScript script_func_global_12[] = {
+const LevelScript script_func_global_group11[] = {
     LOAD_MODEL_FROM_GEO(MODEL_ENEMY_LAKITU,            enemy_lakitu_geo),
     LOAD_MODEL_FROM_GEO(MODEL_SPINY_BALL,              spiny_ball_geo),
     LOAD_MODEL_FROM_GEO(MODEL_SPINY,                   spiny_geo),
@@ -287,7 +287,7 @@ const LevelScript script_func_global_12[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_13[] = {
+const LevelScript script_func_global_group12[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BOWSER,                  bowser_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BOWSER_BOMB_CHILD_OBJ,   bowser_bomb_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BOWSER_BOMB,             bowser_bomb_geo),
@@ -298,7 +298,7 @@ const LevelScript script_func_global_13[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_14[] = {
+const LevelScript script_func_global_group13[] = {
     LOAD_MODEL_FROM_GEO(MODEL_BUB,                     bub_geo),
     LOAD_MODEL_FROM_GEO(MODEL_TREASURE_CHEST_BASE,     treasure_chest_base_geo),
     LOAD_MODEL_FROM_GEO(MODEL_TREASURE_CHEST_LID,      treasure_chest_lid_geo),
@@ -310,7 +310,7 @@ const LevelScript script_func_global_14[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_15[] = {
+const LevelScript script_func_global_group14[] = {
     LOAD_MODEL_FROM_GEO(MODEL_PIRANHA_PLANT,           piranha_plant_geo),
     LOAD_MODEL_FROM_GEO(MODEL_WHOMP,                   whomp_geo),
     LOAD_MODEL_FROM_GEO(MODEL_KOOPA_WITH_SHELL,        koopa_with_shell_geo),
@@ -322,7 +322,7 @@ const LevelScript script_func_global_15[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_16[] = {
+const LevelScript script_func_global_group15[] = {
     LOAD_MODEL_FROM_GEO(MODEL_MIPS,                    mips_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BOO_CASTLE,              boo_castle_geo),
     LOAD_MODEL_FROM_GEO(MODEL_LAKITU,                  lakitu_geo),
@@ -330,14 +330,14 @@ const LevelScript script_func_global_16[] = {
     RETURN(),
 };
 
-const LevelScript script_func_global_17[] = {
+const LevelScript script_func_global_group16[] = {
     LOAD_MODEL_FROM_GEO(MODEL_CHILL_BULLY,             chilly_chief_geo),
     LOAD_MODEL_FROM_GEO(MODEL_BIG_CHILL_BULLY,         chilly_chief_big_geo),
     LOAD_MODEL_FROM_GEO(MODEL_MONEYBAG,                moneybag_geo),
     RETURN(),
 };
 
-const LevelScript script_func_global_18[] = {
+const LevelScript script_func_global_group17[] = {
     LOAD_MODEL_FROM_GEO(MODEL_SWOOP,                   swoop_geo),
     LOAD_MODEL_FROM_GEO(MODEL_SCUTTLEBUG,              scuttlebug_geo),
     LOAD_MODEL_FROM_GEO(MODEL_MR_I_IRIS,               mr_i_iris_geo),
