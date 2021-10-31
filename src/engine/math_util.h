@@ -446,18 +446,11 @@ extern f32 gSineTable[];
 
 #define NAME_INVMAG(v) v##_invmag
 
-/// Scale vector 'v' so it has length  1
+/// Scale vector 'v' so it has length 1
 #define vec3_normalize(v) {                                     \
     register f32 NAME_INVMAG(v) = vec3_mag((v));                \
     NAME_INVMAG(v) = (1.0f / MAX(NAME_INVMAG(v), NEAR_ZERO));   \
     vec3_mul_val((v), NAME_INVMAG(v));                          \
-}
-
-/// Scale vector 'v' so it has length -1
-#define vec3_normalize_negative(v) {                    \
-    register f32 v##_invmag = vec3_mag((v));            \
-    v##_invmag = -(1.0f / MAX(v##_invmag, NEAR_ZERO));  \
-    vec3_mul_val((v), v##_invmag);                      \
 }
 
 #define vec3_normalize_max(v, max) {    \
@@ -476,24 +469,26 @@ f32 min_3f(f32 a0, f32 a1, f32 a2);
 s32 max_3i(s32 a0, s32 a1, s32 a2);
 f32 max_3f(f32 a0, f32 a1, f32 a2);
 void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max);
-void vec3f_copy(Vec3f dest, Vec3f src);
-void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
-void vec3f_add(Vec3f dest, Vec3f a);
-void vec3f_sum(Vec3f dest, Vec3f a, Vec3f b);
-void vec3s_copy(Vec3s dest, Vec3s src);
-void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z);
-void vec3s_add(Vec3s dest, Vec3s a);
-void vec3s_sum(Vec3s dest, Vec3s a, Vec3s b);
-void vec3s_sub(Vec3s dest, Vec3s a);
-void vec3f_sub(Vec3f dest, Vec3f src);
-void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b);
-void vec3i_copy(Vec3i dest, Vec3i src);
+
+void vec3f_copy    (Vec3f dest, Vec3f src);
+void vec3i_copy    (Vec3i dest, Vec3i src);
+void vec3s_copy    (Vec3s dest, Vec3s src);
 void vec3s_to_vec3i(Vec3i dest, Vec3s src);
 void vec3s_to_vec3f(Vec3f dest, Vec3s src);
 void vec3i_to_vec3s(Vec3s dest, Vec3i src);
 void vec3i_to_vec3f(Vec3f dest, Vec3i src);
 void vec3f_to_vec3s(Vec3s dest, Vec3f src);
 void vec3f_to_vec3i(Vec3i dest, Vec3f src);
+
+void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
+void vec3f_add(Vec3f dest, Vec3f a);
+void vec3f_sum(Vec3f dest, Vec3f a, Vec3f b);
+void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z);
+void vec3s_add(Vec3s dest, Vec3s a);
+void vec3s_sum(Vec3s dest, Vec3s a, Vec3s b);
+void vec3s_sub(Vec3s dest, Vec3s a);
+void vec3f_sub(Vec3f dest, Vec3f src);
+void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b);
 f32  vec3f_dot(Vec3f a, Vec3f b);
 void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_normalize(Vec3f dest);

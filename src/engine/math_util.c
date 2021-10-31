@@ -45,11 +45,16 @@ Vec3i gVec3iZero = {     0,     0,     0 };
 Vec3s gVec3sOne  = {     1,     1,     1 };
 
 /// From Wiseguy
+// static inline s32 asm_roundf(f32 in) {
+//     f32 tmp;
+//     s32 out;
+//     __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in));
+//     __asm__("mfc1 %0,%1" : "=r" (out) : "f" (tmp));
+//     return out;
+// }
 static inline s32 asm_roundf(f32 in) {
-    f32 tmp;
     s32 out;
-    __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in));
-    __asm__("mfc1 %0,%1" : "=r" (out) : "f" (tmp));
+    __asm__("round.w.s %0,%1" : "=f" (out) : "f" (in));
     return out;
 }
 
@@ -89,14 +94,36 @@ void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max) {
 }
 
 /// Copy vector 'src' to 'dest'
-void vec3f_copy(Vec3f dest, Vec3f src) {
-    register u32 x = ((u32 *) src)[0];
-    register u32 y = ((u32 *) src)[1];
-    register u32 z = ((u32 *) src)[2];
-    ((u32 *) dest)[0] = x;
-    ((u32 *) dest)[1] = y;
-    ((u32 *) dest)[2] = z;
+#define vec3_copy_bits(destFmt, dest, srcFmt, src) { \
+    register destFmt x = ((srcFmt *) src)[0];        \
+    register destFmt y = ((srcFmt *) src)[1];        \
+    register destFmt z = ((srcFmt *) src)[2];        \
+    ((destFmt *) dest)[0] = x;                       \
+    ((destFmt *) dest)[1] = y;                       \
+    ((destFmt *) dest)[2] = z;                       \
 }
+void vec3f_copy    (Vec3f dest, Vec3f src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
+void vec3i_copy    (Vec3i dest, Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
+void vec3s_copy    (Vec3s dest, Vec3s src) { vec3_copy_bits(s16, dest, s16, src); } // 16 -> 16
+void vec3s_to_vec3i(Vec3i dest, Vec3s src) { vec3_copy_bits(s32, dest, s16, src); } // 16 -> 32
+void vec3s_to_vec3f(Vec3f dest, Vec3s src) { vec3_copy_bits(f32, dest, s16, src); } // 16 -> 32
+void vec3i_to_vec3s(Vec3s dest, Vec3i src) { vec3_copy_bits(s16, dest, s32, src); } // 32 -> 16
+void vec3i_to_vec3f(Vec3f dest, Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
+
+/**
+ * Convert float vector a to a short vector 'dest' by rounding the components
+ * to the nearest integer.
+ */
+#define vec3_copy_bits_roundf(destFmt, dest, src) { \
+    register destFmt x = asm_roundf(src[0]);        \
+    register destFmt y = asm_roundf(src[1]);        \
+    register destFmt z = asm_roundf(src[2]);        \
+    ((destFmt *) dest)[0] = x;                      \
+    ((destFmt *) dest)[1] = y;                      \
+    ((destFmt *) dest)[2] = z;                      \
+}
+void vec3f_to_vec3s(Vec3s dest, Vec3f src) { vec3_copy_bits_roundf(s16, dest, src); } // 32 -> 16
+void vec3f_to_vec3i(Vec3i dest, Vec3f src) { vec3_copy_bits_roundf(s32, dest, src); } // 32 -> 32
 
 /// Set vector 'dest' to (x, y, z)
 inline void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z) {
@@ -137,16 +164,6 @@ void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b) {
     vec3_diff(dest, a, b);
 }
 
-/// Copy vector src to dest
-void vec3s_copy(Vec3s dest, Vec3s src) {
-    register s16 x = src[0];
-    register s16 y = src[1];
-    register s16 z = src[2];
-    dest[0] = x;
-    dest[1] = y;
-    dest[2] = z;
-}
-
 /// Set vector 'dest' to (x, y, z)
 inline void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z) {
     vec3_set(dest, x, y, z);
@@ -175,42 +192,6 @@ f32 vec3f_dot(Vec3f a, Vec3f b) {
     return vec3_dot(a, b);
 }
 
-void vec3i_copy(Vec3i dest, Vec3i src) {
-    register s32 x = ((u32 *) src)[0];
-    register s32 y = ((u32 *) src)[1];
-    register s32 z = ((u32 *) src)[2];
-    ((s32 *) dest)[0] = x;
-    ((s32 *) dest)[1] = y;
-    ((s32 *) dest)[2] = z;
-}
-
-void vec3s_to_vec3i(Vec3i dest, Vec3s src) { vec3_copy(dest, src); } // 16 -> 32
-void vec3s_to_vec3f(Vec3f dest, Vec3s src) { vec3_copy(dest, src); } // 16 -> 32
-void vec3i_to_vec3s(Vec3s dest, Vec3i src) { vec3_copy(dest, src); } // 32 -> 16
-void vec3i_to_vec3f(Vec3f dest, Vec3i src) {
-    register u32 x = ((u32 *) src)[0];
-    register u32 y = ((u32 *) src)[1];
-    register u32 z = ((u32 *) src)[2];
-    ((u32 *) dest)[0] = x;
-    ((u32 *) dest)[1] = y;
-    ((u32 *) dest)[2] = z;
-} // 32 -> 32
-
-/**
- * Convert float vector a to a short vector 'dest' by rounding the components
- * to the nearest integer.
- */
-void vec3f_to_vec3s(Vec3s dest, Vec3f src) {
-    dest[0] = asm_roundf(src[0]);
-    dest[1] = asm_roundf(src[1]);
-    dest[2] = asm_roundf(src[2]);
-}
-void vec3f_to_vec3i(Vec3i dest, Vec3f src) {
-    dest[0] = asm_roundf(src[0]);
-    dest[1] = asm_roundf(src[1]);
-    dest[2] = asm_roundf(src[2]);
-}
-
 /// Make vector 'dest' the cross product of vectors a and b.
 void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b) {
     vec3_cross(dest, a, b);
@@ -220,7 +201,7 @@ void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b) {
 void vec3f_normalize(Vec3f dest) {
     f32 mag = sqrtf(sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
     if (mag > NEAR_ZERO) {
-        register f32 invsqrt = ( 1.0f / mag);
+        register f32 invsqrt = (1.0f / mag);
         vec3_mul_val(dest, invsqrt);
     } else {
         dest[0] = 0;
@@ -278,7 +259,9 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
 void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
     s32 i;
     for (i = 0; i < 3; i++) {
-        dst[i] = ((m[0][i] * v[0]) + (m[1][i] * v[1]) + (m[2][i] * v[2]));
+        dst[i] = ((m[0][i] * v[0])
+               +  (m[1][i] * v[1])
+               +  (m[2][i] * v[2]));
     }
 }
 
@@ -541,7 +524,7 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
  */
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
     register Vec3f entry;
-    register f32 *temp = (f32 *)a;
+    register f32 *temp  = (f32 *)a;
     register f32 *temp2 = (f32 *)dest;
     register f32 *temp3;
     register s32 i;
@@ -549,7 +532,9 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
         vec3_copy(entry, temp);
         temp3 = (f32 *)b;
         for (; (i & 3) !=3; i++) {
-            *temp2 = ((entry[0] * temp3[0]) + (entry[1] * temp3[4]) + (entry[2] * temp3[8]));
+            *temp2 = ((entry[0] * temp3[0])
+                   +  (entry[1] * temp3[4])
+                   +  (entry[2] * temp3[8]));
             temp2++;
             temp3++;
         }
@@ -592,7 +577,9 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
     register s32 i;
     register s16 *c = b;
     for (i = 0; i < 3; i++) {
-        c[0] = ((x * temp2[0]) + (y * temp2[4]) + (z * temp2[8]) + temp2[12]);
+        c[0] = ((x * temp2[0])
+             +  (y * temp2[4])
+             +  (z * temp2[8]) + temp2[12]);
         c++;
         temp2++;
     }
@@ -645,7 +632,9 @@ void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
     }
     temp2 -= 3;
     for (i = 0; i < 3; i++) {
-        *temp1 = (x[-3] * temp2[0]) + (x[-2] * temp2[1]) + (x[-1] * temp2[2]);
+        *temp1 = ((x[-3] * temp2[0])
+               +  (x[-2] * temp2[1])
+               +  (x[-1] * temp2[2]));
         temp1++;
         temp2 += 4;
     }
@@ -865,20 +854,19 @@ Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec) {
 }
 
 s32 approach_f32_signed(f32 *current, f32 target, f32 inc) {
-    s32 reachedTarget = FALSE;
     *current += inc;
     if (inc >= 0.0f) {
         if (*current > target) {
             *current = target;
-            reachedTarget = TRUE;
+            return TRUE;
         }
     } else {
         if (*current < target) {
             *current = target;
-            reachedTarget = TRUE;
+            return TRUE;
         }
     }
-    return reachedTarget;
+    return FALSE;
 }
 
 /**
@@ -1046,32 +1034,32 @@ void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c) {
     switch (gSplineState) {
         case CURVE_BEGIN_1:
             result[0] = tinv3;
-            result[1] = ((t3 * 1.75f) - (t2 * 4.5f) + (t * 3.0f));
-            result[2] = ((-t3 * (11 / 12.0f)) + (t2 * 1.5f));
+            result[1] = (( t3 *        1.75f) - (t2 * 4.5f) + (t * 3.0f));
+            result[2] = ((-t3 * (11 / 12.0f)) + (t2 * 1.5f)             );
             result[3] = (t3 * (1 / 6.0f));
             break;
         case CURVE_BEGIN_2:
-            result[0] = (tinv3 * 0.25f);
-            result[1] = ((t3 * (7 / 12.0f)) - (t2 * 1.25f) + (t * 0.25f) + (7 / 12.0f));
-            result[2] = ((-t3 * 0.5f) + (t2 * 0.5f) + (t * 0.5f) + (1 / 6.0f));
-            result[3] = (t3 * (1 / 6.0f));
+            result[0] =  (tinv3 * 0.25f);
+            result[1] = ((   t3 * (7 / 12.0f)) - (t2 * 1.25f) + (t * 0.25f) + (7 / 12.0f));
+            result[2] = ((  -t3 * 0.5f) + (t2 * 0.5f) + (t * 0.5f) + (1 / 6.0f));
+            result[3] =  (   t3 * (1 / 6.0f));
             break;
         case CURVE_MIDDLE:
-            result[0] = (tinv3 * (1 / 6.0f));
-            result[1] = ((t3 * 0.5f) - t2 + (4 / 6.0f));
-            result[2] = ((-t3 * 0.5f) + (t2 * 0.5f) + (t * 0.5f) + (1 / 6.0f));
-            result[3] = (t3 * (1 / 6.0f));
+            result[0] =  (tinv3 * (1.0f / 6.0f));
+            result[1] = ((   t3 *          0.5f) - t2 + (4.0f / 6.0f));
+            result[2] = ((  -t3 *          0.5f) + (t2 * 0.5f) + (t * 0.5f) + (1.0f / 6.0f));
+            result[3] =  (   t3 * (1.0f / 6.0f));
             break;
         case CURVE_END_1:
-            result[0] = (tinv3 * (1 / 6.0f));
-            result[1] = ((-tinv3 * 0.5f) + (tinv2 * 0.5f) + (tinv * 0.5f) + (1 / 6.0f));
-            result[2] = ((tinv3 * (7 / 12.0f)) - (tinv2 * 1.25f) + (tinv * 0.25f) + (7 / 12.0f));
-            result[3] = (t3 * 0.25f);
+            result[0] =  ( tinv3 * (1.0f /  6.0f));
+            result[1] = ((-tinv3 *          0.5f ) + (tinv2 * 0.5f ) + (tinv * 0.5f ) + (1.0f /  6.0f));
+            result[2] = (( tinv3 * (7.0f / 12.0f)) - (tinv2 * 1.25f) + (tinv * 0.25f) + (7.0f / 12.0f));
+            result[3] =  (    t3 *          0.25f);
             break;
         case CURVE_END_2:
-            result[0] = (tinv3 * (1 / 6.0f));
-            result[1] = ((-tinv3 * (11 / 12.0f)) + (tinv2 * 1.5f));
-            result[2] = ((tinv3 * 1.75f) - (tinv2 * 4.5f) + (tinv * 3.0f));
+            result[0] = (tinv3 * (1.0f / 6.0f));
+            result[1] = ((-tinv3 * (11.0f / 12.0f)) + (tinv2 * 1.5f)                );
+            result[2] = (( tinv3 *           1.75f) - (tinv2 * 4.5f) + (tinv * 3.0f));
             result[3] = t3;
             break;
     }
