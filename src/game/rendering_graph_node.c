@@ -673,7 +673,7 @@ void geo_process_background(struct GraphNodeBackground *node) {
  * but set in global variables. If an animated part is skipped, everything afterwards desyncs.
  */
 void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
-    Vec3s rotation = { 0, 0, 0 };
+    Vec3s rotation    = { 0x0, 0x0, 0x0 };
     Vec3f translation = { node->translation[0], node->translation[1], node->translation[2] };
 
     if (gCurrAnimType == ANIM_TYPE_TRANSLATION) {
@@ -683,14 +683,14 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
         gCurrAnimType = ANIM_TYPE_ROTATION;
     } else {
         if (gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION) {
-            translation[0] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
+            translation[0]     += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
             gCurrAnimAttribute += 2;
-            translation[2] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
+            translation[2]     += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
             gCurrAnimType = ANIM_TYPE_ROTATION;
         } else {
             if (gCurrAnimType == ANIM_TYPE_VERTICAL_TRANSLATION) {
                 gCurrAnimAttribute += 2;
-                translation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
+                translation[1]     += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
                 gCurrAnimAttribute += 2;
                 gCurrAnimType = ANIM_TYPE_ROTATION;
             } else if (gCurrAnimType == ANIM_TYPE_NO_TRANSLATION) {
@@ -713,7 +713,7 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
  * Render an animated part that has an initial rotation value
  */
 void geo_process_bone(struct GraphNodeBone *node) {
-    Vec3s rotation    = { node->rotation[0],    node->rotation[1],    node->rotation[2]    };
+    Vec3s rotation    = { 0x0, 0x0, 0x0 };
     Vec3f translation = { node->translation[0], node->translation[1], node->translation[2] };
 
     if (gCurrAnimType == ANIM_TYPE_TRANSLATION) {
@@ -723,14 +723,14 @@ void geo_process_bone(struct GraphNodeBone *node) {
         gCurrAnimType = ANIM_TYPE_ROTATION;
     } else {
         if (gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION) {
-            translation[0] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
+            translation[0]     += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
             gCurrAnimAttribute += 2;
-            translation[2] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
+            translation[2]     += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
             gCurrAnimType = ANIM_TYPE_ROTATION;
         } else {
             if (gCurrAnimType == ANIM_TYPE_VERTICAL_TRANSLATION) {
                 gCurrAnimAttribute += 2;
-                translation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
+                translation[1]     += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier;
                 gCurrAnimAttribute += 2;
                 gCurrAnimType = ANIM_TYPE_ROTATION;
             } else if (gCurrAnimType == ANIM_TYPE_NO_TRANSLATION) {
@@ -740,9 +740,9 @@ void geo_process_bone(struct GraphNodeBone *node) {
         }
     }
     if (gCurrAnimType == ANIM_TYPE_ROTATION) {
-        rotation[0] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
-        rotation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
-        rotation[2] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+        rotation[0] = (node->rotation[0] + gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]);
+        rotation[1] = (node->rotation[1] + gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]);
+        rotation[2] = (node->rotation[2] + gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]);
     }
     mtxf_rot_trans_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
