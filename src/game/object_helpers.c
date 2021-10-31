@@ -159,7 +159,7 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
 }
 
 void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
-    linear_mtxf_mul_vec3_and_translate(mtx, &obj->oPosVec,  &obj->oParentRelativePosVec);
+    linear_mtxf_mul_vec3f_and_translate(mtx, &obj->oPosVec,  &obj->oParentRelativePosVec);
 }
 
 void obj_apply_scale_to_matrix(struct Object *obj, Mat4 dst, Mat4 src) {
@@ -1614,7 +1614,7 @@ void obj_translate_xz_random(struct Object *obj, f32 rangeLength) {
 
 static void obj_build_vel_from_transform(struct Object *obj) {
     Vec3f vel = { obj->oLeftVel, obj->oUpVel, obj->oForwardVel };
-    linear_mtxf_mul_vec3(obj->transform, &obj->oVelVec, vel);
+    linear_mtxf_mul_vec3f(obj->transform, &obj->oVelVec, vel);
 }
 
 void cur_obj_set_pos_via_transform(void) {

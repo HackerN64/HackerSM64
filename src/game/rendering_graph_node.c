@@ -527,12 +527,10 @@ void geo_process_camera(struct GraphNodeCamera *node) {
  * For the rest it acts as a normal display list node.
  */
 void geo_process_translation_rotation(struct GraphNodeTranslationRotation *node) {
-    Mat4 mtxf;
     Vec3f translation;
 
     vec3s_to_vec3f(translation, node->translation);
-    mtxf_rotate_zxy_and_translate(mtxf, translation, node->rotation);
-    mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, gMatStack[gMatStackIndex]);
+    mtxf_rotate_zxy_and_translate_and_mul(node->rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
     append_dl_and_return(((struct GraphNodeDisplayList *)node));
 }
@@ -543,12 +541,10 @@ void geo_process_translation_rotation(struct GraphNodeTranslationRotation *node)
  * For the rest it acts as a normal display list node.
  */
 void geo_process_translation(struct GraphNodeTranslation *node) {
-    Mat4 mtxf;
     Vec3f translation;
 
     vec3s_to_vec3f(translation, node->translation);
-    mtxf_rotate_zxy_and_translate(mtxf, translation, gVec3sZero);
-    mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, gMatStack[gMatStackIndex]);
+    mtxf_rotate_zxy_and_translate_and_mul(gVec3sZero, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
     append_dl_and_return(((struct GraphNodeDisplayList *)node));
 }
@@ -559,10 +555,7 @@ void geo_process_translation(struct GraphNodeTranslation *node) {
  * For the rest it acts as a normal display list node.
  */
 void geo_process_rotation(struct GraphNodeRotation *node) {
-    Mat4 mtxf;
-
-    mtxf_rotate_zxy_and_translate(mtxf, gVec3fZero, node->rotation);
-    mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, gMatStack[gMatStackIndex]);
+    mtxf_rotate_zxy_and_translate_and_mul(node->rotation, gVec3fZero, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
     append_dl_and_return(((struct GraphNodeDisplayList *)node));
 }
@@ -704,7 +697,7 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
         rotation[1] = gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
         rotation[2] = gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
     }
-    mtxf_rot_trans_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
+    mtxf_rotate_xyz_and_translate_and_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
     append_dl_and_return(((struct GraphNodeDisplayList *)node));
 }
@@ -744,7 +737,7 @@ void geo_process_bone(struct GraphNodeBone *node) {
         rotation[1] = (node->rotation[1] + gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]);
         rotation[2] = (node->rotation[2] + gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]);
     }
-    mtxf_rot_trans_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
+    mtxf_rotate_xyz_and_translate_and_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
     append_dl_and_return(((struct GraphNodeDisplayList *)node));
 }
@@ -949,7 +942,7 @@ void visualise_object_hitbox(struct Object *node) {
  * Process an object node.
  */
 void geo_process_object(struct Object *node) {
-    Mat4 mtxf;
+    // Mat4 mtxf;
     s32 hasAnimation = (node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0;
 
     if (node->header.gfx.areaIndex == gCurGraphNodeRoot->areaIndex) {
@@ -958,8 +951,7 @@ void geo_process_object(struct Object *node) {
         } else if (node->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
             mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], node->header.gfx.pos, gCurGraphNodeCamera->roll);
         } else {
-            mtxf_rotate_zxy_and_translate(mtxf, node->header.gfx.pos, node->header.gfx.angle);
-            mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, gMatStack[gMatStackIndex]);
+            mtxf_rotate_zxy_and_translate_and_mul(node->header.gfx.angle, node->header.gfx.pos, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
         }
 
         mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);

@@ -181,7 +181,7 @@ extern f32 gSineTable[];
 }
 
 #define linear_mtxf_mul_vec3_and_translate(mtx, dstV, srcV) {   \
-    linear_mtxf_mul_vec3((mtx), (dstV), (srcV));               \
+    linear_mtxf_mul_vec3((mtx), (dstV), (srcV));                \
     vec3_add((dstV), (mtx)[3]);                                 \
 }
 
@@ -464,10 +464,12 @@ extern f32 gSineTable[];
 
 s32 roundf(f32 x);
 f32 absf(f32 x);
-s32 min_3i(s32 a0, s32 a1, s32 a2);
 f32 min_3f(f32 a0, f32 a1, f32 a2);
-s32 max_3i(s32 a0, s32 a1, s32 a2);
+s32 min_3i(s32 a0, s32 a1, s32 a2);
+s32 min_3s(s16 a0, s16 a1, s16 a2);
 f32 max_3f(f32 a0, f32 a1, f32 a2);
+s32 max_3i(s32 a0, s32 a1, s32 a2);
+s32 max_3s(s16 a0, s16 a1, s16 a2);
 void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max);
 
 void vec3f_copy    (Vec3f dest, Vec3f src);
@@ -481,14 +483,22 @@ void vec3f_to_vec3s(Vec3s dest, Vec3f src);
 void vec3f_to_vec3i(Vec3i dest, Vec3f src);
 
 void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
-void vec3f_add(Vec3f dest, Vec3f a);
-void vec3f_sum(Vec3f dest, Vec3f a, Vec3f b);
+void vec3i_set(Vec3i dest, s32 x, s32 y, s32 z);
 void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z);
-void vec3s_add(Vec3s dest, Vec3s a);
-void vec3s_sum(Vec3s dest, Vec3s a, Vec3s b);
-void vec3s_sub(Vec3s dest, Vec3s a);
-void vec3f_sub(Vec3f dest, Vec3f src);
+
+void vec3f_add (Vec3f dest, Vec3f a         );
+void vec3i_add (Vec3i dest, Vec3i a         );
+void vec3s_add (Vec3s dest, Vec3s a         );
+void vec3f_sum (Vec3f dest, Vec3f a, Vec3f b);
+void vec3i_sum (Vec3i dest, Vec3i a, Vec3i b);
+void vec3s_sum (Vec3s dest, Vec3s a, Vec3s b);
+void vec3f_sub (Vec3f dest, Vec3f a         );
+void vec3i_sub (Vec3i dest, Vec3i a         );
+void vec3s_sub (Vec3s dest, Vec3s a         );
 void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b);
+void vec3i_diff(Vec3i dest, Vec3i a, Vec3i b);
+void vec3s_diff(Vec3s dest, Vec3s a, Vec3s b);
+
 f32  vec3f_dot(Vec3f a, Vec3f b);
 void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b);
 void vec3f_normalize(Vec3f dest);
@@ -496,8 +506,10 @@ void mtxf_copy(Mat4 dest, Mat4 src);
 void mtxf_identity(Mat4 mtx);
 void mtxf_translate(Mat4 dest, Vec3f b);
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll);
-void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f translate, Vec3s rotate);
-void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f b, Vec3s c);
+void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
+void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
+void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
+void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle);
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw);
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius);
@@ -556,8 +568,8 @@ void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32  anim_spline_poll(Vec3f result);
 void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
+void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v);
 void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
-void mtxf_rot_trans_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
 
 #endif // MATH_UTIL_H

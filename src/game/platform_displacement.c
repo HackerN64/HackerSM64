@@ -196,7 +196,7 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
 
         mtxf_rotate_zxy_and_translate(displaceMatrix, currentObjectOffset, rotation);
         linear_mtxf_mul_vec3f(displaceMatrix, newObjectOffset, relativeOffset);
-        vec3_sum(pos, platformPos, newObjectOffset);
+        vec3f_sum(pos, platformPos, newObjectOffset);
     }
     if (isMario) {
         vec3f_copy(gMarioStates[0].pos,      pos);
