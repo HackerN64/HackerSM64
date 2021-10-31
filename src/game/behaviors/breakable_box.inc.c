@@ -59,7 +59,8 @@ void hidden_breakable_box_actions(void) {
             cur_obj_become_intangible();
             cur_obj_disable_rendering();
             o->oInteractStatus = INT_STATUS_NONE;
-            if (((switchObj = o->oHiddenObjectSwitchObj) != NULL) && (switchObj->oAction == PURPLE_SWITCH_ACT_IDLE)) {
+            switchObj = o->oHiddenObjectSwitchObj;
+            if ((switchObj != NULL) && (switchObj->oAction == PURPLE_SWITCH_ACT_IDLE)) {
                 o->oAction = BREAKABLE_BOX_ACT_HIDDEN;
             }
             break;
@@ -76,7 +77,8 @@ void hidden_unbreakable_box_actions(void) {
             if (o->oHiddenObjectSwitchObj == NULL) {
                 o->oHiddenObjectSwitchObj = cur_obj_nearest_object_with_behavior(bhvFloorSwitchHiddenObjects);
             }
-            if (((switchObj = o->oHiddenObjectSwitchObj) != NULL) && (switchObj->oAction == PURPLE_SWITCH_ACT_TICKING)) {
+            switchObj = o->oHiddenObjectSwitchObj;
+            if ((switchObj != NULL) && (switchObj->oAction == PURPLE_SWITCH_ACT_TICKING)) {
                 o->oAction = BREAKABLE_BOX_ACT_ACTIVE;
                 cur_obj_enable_rendering();
                 cur_obj_unhide();

@@ -149,7 +149,7 @@ f32 disable_shadow_with_distance(f32 shadowScale, f32 distFromFloor) {
 s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
     if (solidity < 121) {
         return solidity;
-    } else if (distFromFloor <= 0.0f) {
+    } else if (distFromFloor <=   0.0f) {
         return solidity;
     } else if (distFromFloor >= 600.0f) {
         return 120;
@@ -184,9 +184,7 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
     struct Surface *floor;
     struct Surface *waterFloor = NULL;
 
-    s->parentPos[0] = xPos;
-    s->parentPos[1] = yPos;
-    s->parentPos[2] = zPos;
+    vec3f_set(s->parentPos, xPos, yPos, zPos);
 
     if ((gCurGraphNodeObjectNode != gMarioObject) && (gCurGraphNodeObjectNode->oFloor != NULL)) {
         floor          = gCurGraphNodeObjectNode->oFloor;
@@ -205,9 +203,9 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
         s->floorHeight = waterLevel;
 
         if (waterFloor != NULL) {
-            s->floorNormal[0]    = waterFloor->normal.x;
-            s->floorNormal[1]    = waterFloor->normal.y;
-            s->floorNormal[2]    = waterFloor->normal.z;
+            vec3f_set(s->floorNormal, waterFloor->normal.x,
+                                      waterFloor->normal.y,
+                                      waterFloor->normal.z);
             s->floorOriginOffset = waterFloor->originOffset;
             gShadowFlags &= ~SHADOW_FLAG_WATER_BOX;
             gShadowFlags |= SHADOW_FLAG_WATER_SURFACE;
@@ -215,7 +213,9 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
         } else {
             gShadowFlags &= ~SHADOW_FLAG_WATER_SURFACE;
             // Assume that the water is flat.
-            vec3f_copy(s->floorNormal, gVec3fY);
+            s->floorNormal[0] = 0.0f;
+            ((u32 *) s->floorNormal)[1] = FLOAT_ONE;
+            s->floorNormal[2] = 0.0f;
             s->floorOriginOffset = -waterLevel;
         }
 
@@ -226,9 +226,9 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
             return TRUE;
         }
 
-        s->floorNormal[0] = floor->normal.x;
-        s->floorNormal[1] = floor->normal.y;
-        s->floorNormal[2] = floor->normal.z;
+        vec3f_set(s->floorNormal, floor->normal.x,
+                                  floor->normal.y,
+                                  floor->normal.z);
         s->floorOriginOffset = floor->originOffset;
     }
 
@@ -278,10 +278,10 @@ void get_texture_coords_9_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
 void get_texture_coords_4_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
 #ifdef HD_SHADOWS
     *textureX = (((vertexNum & 0x1) * 2 * 63) - 63);
-    *textureY = (((vertexNum /   2) * 2 * 63) - 63);
+    *textureY = (((vertexNum >>  1) * 2 * 63) - 63);
 #else
     *textureX = (((vertexNum & 0x1) * 2 * 15) - 15);
-    *textureY = (((vertexNum /   2) * 2 * 15) - 15);
+    *textureY = (((vertexNum >>  1) * 2 * 15) - 15);
 #endif
 }
 
@@ -760,9 +760,9 @@ Gfx *create_shadow_square(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 soli
 
     f32 distFromShadow = (yPos - shadowHeight);
     switch (shadowType) {
-        case SHADOW_SQUARE_PERMANENT: shadowRadius = (shadowScale / 2); break;
-        case SHADOW_SQUARE_SCALABLE:  shadowRadius = (  scale_shadow_with_distance(shadowScale, distFromShadow) / 2.0f); break;
-        case SHADOW_SQUARE_TOGGLABLE: shadowRadius = (disable_shadow_with_distance(shadowScale, distFromShadow) / 2.0f); break;
+        case SHADOW_SQUARE_PERMANENT: shadowRadius = (shadowScale >> 1); break;
+        case SHADOW_SQUARE_SCALABLE:  shadowRadius = (  scale_shadow_with_distance(shadowScale, distFromShadow) * 0.5f); break;
+        case SHADOW_SQUARE_TOGGLABLE: shadowRadius = (disable_shadow_with_distance(shadowScale, distFromShadow) * 0.5f); break;
         default: return NULL;
     }
 

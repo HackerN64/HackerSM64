@@ -10,7 +10,6 @@
 
 #define FLOAT_ONE   0x3F800000
 
-extern Mat4  identityMat4;
 extern Vec3f gVec3fX;
 extern Vec3f gVec3fY;
 extern Vec3f gVec3fZ;
