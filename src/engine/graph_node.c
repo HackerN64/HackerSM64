@@ -690,7 +690,7 @@ void geo_reset_object_node(struct GraphNodeObject *graphNode) {
  * Initialize an object node using the given parameters
  */
 void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f pos, Vec3s angle) {
-    vec3f_set(graphNode->scale, 1.0f, 1.0f, 1.0f);
+    vec3_same(graphNode->scale, 1.0f);
     vec3f_copy(graphNode->pos, pos);
     vec3s_copy(graphNode->angle, angle);
 
