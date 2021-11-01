@@ -146,7 +146,7 @@ RGBA16Return32 rgba16_make_grayscale(RGBA16 rgba) {
     ColorRGBf color;
     rgba16_to_colorRGBf(color, rgba);
     ColorF avg = vec3_average(color);
-    vec3f_set(color, avg, avg, avg);
+    vec3_same(color, avg);
     return colorRGBf_to_rgba16(color);
 }
 
@@ -163,10 +163,10 @@ void colorRGB_add_hue(ColorRGB color, Color hueAdd, Color s) {
     }
     if (hue < 0.0f) hue += 6.0f;
     // this is the algorithm to convert from RGB to HSV:
-    Color h  = (((u8)((hue * (128.0f/3.0f)) + hueAdd) >> 2) * 3); // needs to u8 cycle before multiplying. 0..191
-    Color i  =  (h >> 5);                                         // 0..5
-    Color f  = ((h & 0x1F) << 3);                                 // 'fractional' part of 'i' 0..248 in jumps
-    Color pv = (0xFF -   s                    );                  // pv will be in range 0..255
+    Color h  = (((u8)((hue * (128.0f / 3.0f)) + hueAdd) >> 2) * 3); // needs to u8 cycle before multiplying. 0..191
+    Color i  =  (h >> 5);                                           // 0..5
+    Color f  = ((h & 0x1F) << 3);                                   // 'fractional' part of 'i' 0..248 in jumps
+    Color pv = (0xFF -   s                    );                    // pv will be in range 0..255
     Color qv = (0xFF - ((s *         f ) >> 8));
     Color tv = (0xFF - ((s * (0xFF - f)) >> 8));
     switch (i) {

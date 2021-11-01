@@ -406,7 +406,7 @@ void thread2_crash_screen(UNUSED void *arg) {
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, 1);
             thread = get_crashed_thread();
-            gCrashScreen.framebuffer = (u16 *) gFramebuffers[sRenderedFramebuffer];
+            gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
             if (thread) {
                 goto reset;
             }

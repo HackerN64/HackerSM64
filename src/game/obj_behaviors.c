@@ -40,15 +40,6 @@
  * specific behaviors. Few functions besides the bhv_ functions are used elsewhere in the repo.
  */
 
-enum ObjCollisionFlags {
-    OBJ_COL_FLAGS_NONE      = (0 << 0),
-    OBJ_COL_FLAG_GROUNDED   = (1 << 0),
-    OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
-    OBJ_COL_FLAG_UNDERWATER = (1 << 2),
-    OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
-    OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
-};
-
 /**
  * Current object floor as defined in object_step.
  */
@@ -93,7 +84,7 @@ Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *no
 
     if (callContext == GEO_CONTEXT_RENDER) {
         struct Object *heldObject = (struct Object *) gCurGraphNodeObject;
-        struct Object *obj = (struct Object *) node;
+        struct Object *obj        = (struct Object *) node;
 
 
         if (gCurGraphNodeHeldObject != NULL) {
@@ -263,9 +254,9 @@ void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 obj
 
         // Adds horizontal component of gravity for horizontal speed.
         f32 nxz = (sqr(floor_nX) + sqr(floor_nZ));
-        f32 nxyz = (nxz + sqr(floor_nY));
-        objVelX += (floor_nX * (nxz) / (nxyz) * o->oGravity * 2);
-        objVelZ += (floor_nZ * (nxz) / (nxyz) * o->oGravity * 2);
+        f32 vel = (((nxz) / (nxz + sqr(floor_nY))) * o->oGravity * 2);
+        objVelX += (floor_nX * vel);
+        objVelZ += (floor_nZ * vel);
 
         if ((objVelX < NEAR_ZERO) && (objVelX > -NEAR_ZERO)) objVelX = 0;
         if ((objVelZ < NEAR_ZERO) && (objVelZ > -NEAR_ZERO)) objVelZ = 0;
@@ -319,14 +310,14 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
         objVelZ += (floor_nZ * velm);
     }
 
-    if (objVelX < NEAR_ZERO && objVelX > -NEAR_ZERO) objVelX = 0;
-    if (objVelZ < NEAR_ZERO && objVelZ > -NEAR_ZERO) objVelZ = 0;
+    if ((objVelX < NEAR_ZERO) && (objVelX > -NEAR_ZERO)) objVelX = 0;
+    if ((objVelZ < NEAR_ZERO) && (objVelZ > -NEAR_ZERO)) objVelZ = 0;
 
-    if (o->oVelY < NEAR_ZERO && o->oVelY > -NEAR_ZERO) {
+    if ((o->oVelY < NEAR_ZERO) && (o->oVelY > -NEAR_ZERO)) {
         o->oVelY = 0;
     }
 
-    if (objVelX != 0 || objVelZ != 0) {
+    if ((objVelX != 0) || (objVelZ != 0)) {
         o->oMoveAngleYaw = atan2s(objVelZ, objVelX);
     }
 
@@ -432,8 +423,8 @@ s32 object_step_without_floor_orient(void) {
  * This does accept an object as an argument, though it is always called with `o`.
  */
 void obj_move_xyz_using_fvel_and_yaw(struct Object *obj) {
-    obj->oVelX = obj->oForwardVel * sins(obj->oMoveAngleYaw);
-    obj->oVelZ = obj->oForwardVel * coss(obj->oMoveAngleYaw);
+    obj->oVelX = (obj->oForwardVel * sins(obj->oMoveAngleYaw));
+    obj->oVelZ = (obj->oForwardVel * coss(obj->oMoveAngleYaw));
     vec3f_add(&obj->oPosVec, &obj->oVelVec);
 }
 
@@ -486,8 +477,8 @@ s32 obj_return_home_if_safe(struct Object *obj, f32 homeX, f32 y, f32 homeZ, s32
  */
 void obj_return_and_displace_home(struct Object *obj, f32 homeX, UNUSED f32 homeY, f32 homeZ, s32 baseDisp) {
     if ((s32)(random_float() * 50.0f) == 0) {
-        obj->oHomeX = (f32)(baseDisp * 2) * random_float() - (f32) baseDisp + homeX;
-        obj->oHomeZ = (f32)(baseDisp * 2) * random_float() - (f32) baseDisp + homeZ;
+        obj->oHomeX = ((((f32)(baseDisp * 2) * random_float()) - (f32) baseDisp) + homeX);
+        obj->oHomeZ = ((((f32)(baseDisp * 2) * random_float()) - (f32) baseDisp) + homeZ);
     }
     f32 homeDistX = (obj->oHomeX - obj->oPosX);
     f32 homeDistZ = (obj->oHomeZ - obj->oPosZ);
@@ -501,7 +492,9 @@ void obj_return_and_displace_home(struct Object *obj, f32 homeX, UNUSED f32 home
  */
 s32 obj_check_if_facing_toward_angle(u32 base, u32 goal, s16 range) {
     s16 dAngle = ((u16) goal - (u16) base);
-    return (((f32) sins(-range) < (f32) sins(dAngle)) && ((f32) sins(dAngle) < (f32) sins(range)) && (coss(dAngle) > 0));
+    return (((f32) sins(-range) < (f32) sins(dAngle))
+         && ((f32) sins(dAngle) < (f32) sins(range))
+         && (coss(dAngle) > 0x0));
 }
 
 /**
@@ -594,11 +587,11 @@ s32 trigger_obj_dialog_when_facing(s32 *inDialog, s16 dialogID, f32 dist, s32 ac
                 *inDialog = FALSE;
                 return dialogResponse;
             }
-            return 0;
+            return DIALOG_RESPONSE_NONE;
         }
     }
 
-    return 0;
+    return DIALOG_RESPONSE_NONE;
 }
 
 /**

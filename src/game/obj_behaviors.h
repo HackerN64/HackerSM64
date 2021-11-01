@@ -7,6 +7,15 @@
 #include "macros.h"
 #include "types.h"
 
+enum ObjCollisionFlags {
+    OBJ_COL_FLAGS_NONE      = (0 << 0),
+    OBJ_COL_FLAG_GROUNDED   = (1 << 0),
+    OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
+    OBJ_COL_FLAG_UNDERWATER = (1 << 2),
+    OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
+    OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
+};
+
 //! Lots of these are duplicates
 void set_yoshi_as_not_dead(void);
 s32  coin_step(s16 *collisionFlagsPtr);

@@ -77,10 +77,10 @@ void bhv_wiggler_body_part_update(void) {
 
     // TODO: What is this for?
     f32 posOffset = (-37.5f * o->header.gfx.scale[0]);
-    d[1] = ((posOffset * coss(o->oFaceAnglePitch)) - posOffset);
-    f32 dxz  =  (posOffset * sins(o->oFaceAnglePitch));
-    d[0] = dxz * sins(o->oFaceAngleYaw);
-    d[2] = dxz * coss(o->oFaceAngleYaw);
+    d[1]    = ((posOffset * coss(o->oFaceAnglePitch)) - posOffset);
+    f32 dxz =  (posOffset * sins(o->oFaceAnglePitch));
+    d[0] = (dxz * sins(o->oFaceAngleYaw));
+    d[2] = (dxz * coss(o->oFaceAngleYaw));
     vec3f_sum(&o->oPosVec, segment->pos, d);
 
     if (o->oPosY < o->parentObj->oWigglerFallThroughFloorsHeight) {

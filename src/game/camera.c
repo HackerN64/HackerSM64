@@ -6122,7 +6122,7 @@ void cutscene_reset_spline(void) {
 
 void stop_cutscene_and_retrieve_stored_info(struct Camera *c) {
     gCutsceneTimer = CUTSCENE_STOP;
-    c->cutscene = CUTSCENE_NONE;
+    c->cutscene    = CUTSCENE_NONE;
     vec3f_copy(c->focus, sCameraStoreCutscene.focus);
     vec3f_copy(c->pos, sCameraStoreCutscene.pos);
 }
