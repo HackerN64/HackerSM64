@@ -707,7 +707,7 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
  * Render an animated part that has an initial rotation value
  */
 void geo_process_bone(struct GraphNodeBone *node) {
-    Vec3s rotation    = { 0x0, 0x0, 0x0 };
+    Vec3s rotation    = { node->rotation[0],    node->rotation[1],    node->rotation[2]    };
     Vec3f translation = { node->translation[0], node->translation[1], node->translation[2] };
 
     if (gCurrAnimType == ANIM_TYPE_TRANSLATION) {
@@ -734,9 +734,9 @@ void geo_process_bone(struct GraphNodeBone *node) {
         }
     }
     if (gCurrAnimType == ANIM_TYPE_ROTATION) {
-        rotation[0] = (node->rotation[0] + gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]);
-        rotation[1] = (node->rotation[1] + gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]);
-        rotation[2] = (node->rotation[2] + gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)]);
+        rotation[0] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+        rotation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
+        rotation[2] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
     }
     mtxf_rotate_xyz_and_translate_and_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
@@ -960,8 +960,8 @@ void geo_process_object(struct Object *node) {
         if (node->header.gfx.animInfo.currAnim != NULL) {
             geo_set_animation_globals(&node->header.gfx.animInfo, ((node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0));
         }
-        if (obj_is_in_view(&node->header.gfx, gMatStack[gMatStackIndex])) {
 
+        if (obj_is_in_view(&node->header.gfx, gMatStack[gMatStackIndex])) {
             gMatStackIndex--;
             inc_mat_stack();
             if (node->header.gfx.sharedChild != NULL) {
