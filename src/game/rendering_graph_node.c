@@ -772,7 +772,7 @@ void geo_set_animation_globals(struct AnimInfo *node, s32 hasAnimation) {
     if (anim->animYTransDivisor == 0) {
         gCurrAnimTranslationMultiplier = 1.0f;
     } else {
-        gCurrAnimTranslationMultiplier = (f32) node->animYTrans / (f32) anim->animYTransDivisor;
+        gCurrAnimTranslationMultiplier = ((f32) node->animYTrans / (f32) anim->animYTransDivisor);
     }
 }
 
