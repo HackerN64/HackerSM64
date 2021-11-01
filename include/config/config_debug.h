@@ -40,6 +40,9 @@
 // Open all courses and doors. Used for debugging purposes to unlock all content.
 //#define UNLOCK_ALL
 
+// Removes the limit on FPS
+//#define UNLOCK_FPS
+
 // Forces a crash when the game starts. Useful for debugging the crash screen.
 //#define DEBUG_FORCE_CRASH_ON_BOOT
 

@@ -214,7 +214,7 @@ void draw_screen_borders(void) {
     gDPSetScissor(   gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
     gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
-    gDPSetFillColor( gDisplayListHead++, (GPACK_RGBA5551(0, 0, 0, 0) << 16) | GPACK_RGBA5551(0, 0, 0, 0));
+    gDPSetFillColor( gDisplayListHead++, ((GPACK_RGBA5551(0, 0, 0, 0) << 16) | GPACK_RGBA5551(0, 0, 0, 0)));
     if (gBorderHeight) {
         gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0,
                         (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (gBorderHeight - 1));
@@ -315,11 +315,11 @@ void draw_reset_bars(void) {
     s32 fbNum;
     u64 *fbPtr;
 
-    if (gResetTimer != 0 && gNmiResetBarsTimer < 15) {
+    if ((gResetTimer != 0) && (gNmiResetBarsTimer < 15)) {
         if (sRenderedFramebuffer == 0) {
             fbNum = 2;
         } else {
-            fbNum = sRenderedFramebuffer - 1;
+            fbNum = (sRenderedFramebuffer - 1);
         }
 
         fbPtr = (u64 *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[fbNum]);
@@ -390,20 +390,26 @@ void select_gfx_pool(void) {
  */
 void display_and_vsync(void) {
     gIsVC = IS_VC();
-    if (IO_READ(DPC_PIPEBUSY_REG) && gIsConsole != 1) {
+    if (IO_READ(DPC_PIPEBUSY_REG) && !gIsConsole) {
         gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
     // gIsConsole = (IO_READ(DPC_PIPEBUSY_REG));
+#ifndef UNLOCK_FPS
     osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+#endif
     if (gGoddardVblankCallback != NULL) {
         gGoddardVblankCallback();
         gGoddardVblankCallback = NULL;
     }
     exec_display_list(&gGfxPool->spTask);
+#ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+#endif
     osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
+#ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+#endif
     // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
     if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
         if (++sRenderedFramebuffer == 3) {
@@ -429,22 +435,19 @@ UNUSED static void record_demo(void) {
 
     // If the stick is in deadzone, set its value to 0 to
     // nullify the effects. We do not record deadzone inputs.
-    if (rawStickX > -8 && rawStickX < 8) {
-        rawStickX = 0;
-    }
-
-    if (rawStickY > -8 && rawStickY < 8) {
-        rawStickY = 0;
-    }
+    if ((rawStickX > -8) && (rawStickX < 8)) rawStickX = 0;
+    if ((rawStickY > -8) && (rawStickY < 8)) rawStickY = 0;
 
     // Rrecord the distinct input and timer so long as they are unique.
     // If the timer hits 0xFF, reset the timer for the next demo input.
-    if (gRecordedDemoInput.timer == 0xFF || buttonMask != gRecordedDemoInput.buttonMask
-        || rawStickX != gRecordedDemoInput.rawStickX || rawStickY != gRecordedDemoInput.rawStickY) {
-        gRecordedDemoInput.timer = 0;
+    if ((gRecordedDemoInput.timer == 0xFF)
+     || (buttonMask != gRecordedDemoInput.buttonMask)
+     || (rawStickX  != gRecordedDemoInput.rawStickX)
+     || (rawStickY  != gRecordedDemoInput.rawStickY)) {
+        gRecordedDemoInput.timer      = 0;
         gRecordedDemoInput.buttonMask = buttonMask;
-        gRecordedDemoInput.rawStickX = rawStickX;
-        gRecordedDemoInput.rawStickY = rawStickY;
+        gRecordedDemoInput.rawStickX  = rawStickX;
+        gRecordedDemoInput.rawStickY  = rawStickY;
     }
     gRecordedDemoInput.timer++;
 }
@@ -467,7 +470,7 @@ void run_demo_inputs(void) {
         if (gControllers[1].controllerData != NULL) {
             gControllers[1].controllerData->stick_x = 0;
             gControllers[1].controllerData->stick_y = 0;
-            gControllers[1].controllerData->button = 0;
+            gControllers[1].controllerData->button  = 0;
         }
 
         // The timer variable being 0 at the current input means the demo is over.
@@ -475,7 +478,7 @@ void run_demo_inputs(void) {
         if (gCurrDemoInput->timer == 0) {
             gControllers[0].controllerData->stick_x = 0;
             gControllers[0].controllerData->stick_y = 0;
-            gControllers[0].controllerData->button = END_DEMO;
+            gControllers[0].controllerData->button  = END_DEMO;
         } else {
             // Backup the start button if it is pressed, since we don't want the
             // demo input to override the mask where start may have been pressed.
