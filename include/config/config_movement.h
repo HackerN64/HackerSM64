@@ -27,6 +27,9 @@
 // Change the movement speed when hanging from a ceiling (the vanilla value is 4.0f, has no effect if BETTER_HANGING is enabled)
 #define HANGING_SPEED 12.0f
 
+// Prevents Mario from falling asleep while idle
+#define NO_SLEEP
+
 // Disables fall damage
 #define NO_FALL_DAMAGE
 
