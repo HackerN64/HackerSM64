@@ -384,8 +384,8 @@ Gfx *envfx_update_snow(s32 snowMode, Vec3s marioPos, Vec3s camFrom, Vec3s camTo)
 
     rotate_triangle_vertices((s16 *)&vertex1, (s16 *)&vertex2, (s16 *)&vertex3, pitch, yaw);
 
-    if (snowMode == ENVFX_SNOW_NORMAL
-     || snowMode == ENVFX_SNOW_BLIZZARD) {
+    if ((snowMode == ENVFX_SNOW_NORMAL)
+     || (snowMode == ENVFX_SNOW_BLIZZARD)) {
         gSPDisplayList(gfx++, &tiny_bubble_dl_0B006A50); // snowflake with gray edge
     } else if (snowMode == ENVFX_SNOW_WATER) {
         gSPDisplayList(gfx++, &tiny_bubble_dl_0B006CD8); // snowflake with blue edge
@@ -415,7 +415,7 @@ Gfx *envfx_update_particles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom
         return NULL;
     }
 
-    if (gEnvFxMode != ENVFX_MODE_NONE && gEnvFxMode != mode) {
+    if ((gEnvFxMode != ENVFX_MODE_NONE) && (gEnvFxMode != mode)) {
         mode = ENVFX_MODE_NONE;
     }
 
@@ -423,7 +423,7 @@ Gfx *envfx_update_particles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom
         return envfx_update_bubbles(mode, marioPos, camTo, camFrom);
     }
 
-    if (gEnvFxMode == ENVFX_MODE_NONE && !envfx_init_snow(mode)) {
+    if ((gEnvFxMode == ENVFX_MODE_NONE) && !envfx_init_snow(mode)) {
         return NULL;
     }
 

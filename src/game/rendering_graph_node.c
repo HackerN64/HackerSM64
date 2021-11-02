@@ -187,20 +187,20 @@ LookAt lookAt;
 #define SCHWA (AA_EN | IM_RD | CLR_ON_CVG | CVG_DST_WRAP | CVG_X_ALPHA | FORCE_BL)
 const Gfx dl_silhouette_begin[] = {
     gsDPPipeSync(),
-    gsDPSetRenderMode(  (SCHWA | GBL_c1(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA)),
-                        (SCHWA | GBL_c2(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA))),
-    gsSPSetGeometryMode(G_FOG),                      /* Enable fog                  */
-    gsSPFogPosition(    0, 1 ),                      /* Fox position                */
-    gsDPSetFogColor(    0, 0, 0, SILHOUETTE       ), /* silhouette color & alpha    */
-    gsDPSetEnvColor(    0, 0, 0, SIL_CVG_THRESHOLD), /* silhouette env transparency */
+    gsDPSetRenderMode((SCHWA | GBL_c1(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA)),
+                      (SCHWA | GBL_c2(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA))),
+    gsSPSetGeometryMode(G_FOG),                  /* Enable fog                  */
+    gsSPFogPosition(0, 1),                       /* Fox position                */
+    gsDPSetFogColor(0, 0, 0, SILHOUETTE       ), /* silhouette color & alpha    */
+    gsDPSetEnvColor(0, 0, 0, SIL_CVG_THRESHOLD), /* silhouette env transparency */
     gsSPEndDisplayList(),
 };
-#define CLEAR_SILHOUETTE_F3D(gfx, i) {                                                                 \
-    gSPClearGeometryMode((gfx)++, G_FOG             );               /* Disable fog                 */ \
-    gDPSetEnvColor(      (gfx)++, 255, 255, 255, 255);               /* Reset env color & alpha     */ \
-    gDPSetRenderMode(    (gfx)++, (mode1List->modes[(i)] & ~IM_RD),                                    \
-                                  (mode2List->modes[(i)] & ~IM_RD)); /* Use normal mode list, no AA */ \
-}
+const Gfx dl_silhouette_end[] = {
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_FOG),                /* Disable fog                 */
+    gsDPSetEnvColor(255, 255, 255, 255),         /* Reset env color & alpha     */
+    gsSPEndDisplayList(),
+};
 #endif
 
 /**
@@ -282,7 +282,10 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
                 if (renderPhase == RENDER_PHASE_REJ_SILHOUETTE) {
                     gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
                 } else if (renderPhase == RENDER_PHASE_REJ_NON_SILHOUETTE) {
-                    CLEAR_SILHOUETTE_F3D(gDisplayListHead, currLayer);
+                    gSPDisplayList(gDisplayListHead++, dl_silhouette_end);
+                    // Use normal mode list, no AA
+                    gDPSetRenderMode(gDisplayListHead++, (mode1List->modes[currLayer] & ~IM_RD),
+                                                         (mode2List->modes[currLayer] & ~IM_RD));
                 } else {
 #endif
                     gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer], mode2List->modes[currLayer]);
@@ -1117,7 +1120,7 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                 ((struct GraphNodeObject *) curGraphNode)->throwMatrix = NULL;
             }
         }
-    } while (iterateChildren && (curGraphNode = curGraphNode->next) != firstNode);
+    } while (iterateChildren && ((curGraphNode = curGraphNode->next) != firstNode));
 }
 
 /**

@@ -377,19 +377,19 @@ void append_bubble_vertex_buffer(Gfx *gfx, s32 index, Vec3s vertex1, Vec3s verte
 
     for (i = 0; i < 15; i += 3) {
         vertBuf[i + 0] = template[0];
-        (vertBuf + i + 0)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex1[0];
-        (vertBuf + i + 0)->v.ob[1] = (gEnvFxBuffer + (index + i / 3))->yPos + vertex1[1];
-        (vertBuf + i + 0)->v.ob[2] = (gEnvFxBuffer + (index + i / 3))->zPos + vertex1[2];
+        ((vertBuf + i) + 0)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex1[0];
+        ((vertBuf + i) + 0)->v.ob[1] = (gEnvFxBuffer + (index + i / 3))->yPos + vertex1[1];
+        ((vertBuf + i) + 0)->v.ob[2] = (gEnvFxBuffer + (index + i / 3))->zPos + vertex1[2];
 
         vertBuf[i + 1] = template[1];
-        (vertBuf + i + 1)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex2[0];
-        (vertBuf + i + 1)->v.ob[1] = (gEnvFxBuffer + (index + i / 3))->yPos + vertex2[1];
-        (vertBuf + i + 1)->v.ob[2] = (gEnvFxBuffer + (index + i / 3))->zPos + vertex2[2];
+        ((vertBuf + i) + 1)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex2[0];
+        ((vertBuf + i) + 1)->v.ob[1] = (gEnvFxBuffer + (index + i / 3))->yPos + vertex2[1];
+        ((vertBuf + i) + 1)->v.ob[2] = (gEnvFxBuffer + (index + i / 3))->zPos + vertex2[2];
 
         vertBuf[i + 2] = template[2];
-        (vertBuf + i + 2)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex3[0];
-        (vertBuf + i + 2)->v.ob[1] = (gEnvFxBuffer + (index + i / 3))->yPos + vertex3[1];
-        (vertBuf + i + 2)->v.ob[2] = (gEnvFxBuffer + (index + i / 3))->zPos + vertex3[2];
+        ((vertBuf + i) + 2)->v.ob[0] = (gEnvFxBuffer + (index + i / 3))->xPos + vertex3[0];
+        ((vertBuf + i) + 2)->v.ob[1] = (gEnvFxBuffer + (index + i / 3))->yPos + vertex3[1];
+        ((vertBuf + i) + 2)->v.ob[2] = (gEnvFxBuffer + (index + i / 3))->zPos + vertex3[2];
     }
 
     gSPVertex(gfx, VIRTUAL_TO_PHYSICAL(vertBuf), 15, 0);
@@ -484,8 +484,6 @@ void envfx_set_max_bubble_particles(s32 mode) {
  * Returns a display list drawing the particles.
  */
 Gfx *envfx_update_bubbles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom) {
-    Gfx *gfx;
-
     if ((gEnvFxMode == ENVFX_MODE_NONE) && !envfx_init_bubble(mode)) {
         return NULL;
     }
@@ -498,24 +496,22 @@ Gfx *envfx_update_bubbles(s32 mode, Vec3s marioPos, Vec3s camTo, Vec3s camFrom) 
 
     switch (mode) {
         case ENVFX_FLOWERS:
-            gfx = envfx_update_bubble_particles(ENVFX_FLOWERS, marioPos, camFrom, camTo);
+            return envfx_update_bubble_particles(ENVFX_FLOWERS, marioPos, camFrom, camTo);
             break;
 
         case ENVFX_LAVA_BUBBLES:
-            gfx = envfx_update_bubble_particles(ENVFX_LAVA_BUBBLES, marioPos, camFrom, camTo);
+            return envfx_update_bubble_particles(ENVFX_LAVA_BUBBLES, marioPos, camFrom, camTo);
             break;
 
         case ENVFX_WHIRLPOOL_BUBBLES:
-            gfx = envfx_update_bubble_particles(ENVFX_WHIRLPOOL_BUBBLES, marioPos, camFrom, camTo);
+            return envfx_update_bubble_particles(ENVFX_WHIRLPOOL_BUBBLES, marioPos, camFrom, camTo);
             break;
 
         case ENVFX_JETSTREAM_BUBBLES:
-            gfx = envfx_update_bubble_particles(ENVFX_JETSTREAM_BUBBLES, marioPos, camFrom, camTo);
+            return envfx_update_bubble_particles(ENVFX_JETSTREAM_BUBBLES, marioPos, camFrom, camTo);
             break;
 
         default:
             return NULL;
     }
-
-    return gfx;
 }
