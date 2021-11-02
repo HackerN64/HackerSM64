@@ -114,7 +114,7 @@ void alloc_pool(void) {
 }
 
 void create_thread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri) {
-    thread->next = NULL;
+    thread->next  = NULL;
     thread->queue = NULL;
     osCreateThread(thread, id, entry, arg, sp, pri);
 }
@@ -310,10 +310,10 @@ void thread3_main(UNUSED void *arg) {
     osSyncPrintf("Linker  : %s\n", __linker__);
 #endif
 
-    create_thread(&gSoundThread, 4, thread4_sound, NULL, (gThread4Stack + 0x2000), 20);
+    create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, (gThread4Stack + 0x2000), 20);
     osStartThread(&gSoundThread);
 
-    create_thread(&gGameLoopThread, 5, thread5_game_loop, NULL, (gThread5Stack + 0x2000), 10);
+    create_thread(&gGameLoopThread, THREAD_5_GAME_LOOP, thread5_game_loop, NULL, (gThread5Stack + 0x2000), 10);
     osStartThread(&gGameLoopThread);
 
     while (TRUE) {
@@ -447,7 +447,7 @@ void thread1_idle(UNUSED void *arg) {
     osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
     osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
-    create_thread(&gMainThread, 3, thread3_main, NULL, (gThread3Stack + 0x2000), 100);
+    create_thread(&gMainThread, THREAD_3_MAIN, thread3_main, NULL, (gThread3Stack + 0x2000), 100);
     osStartThread(&gMainThread);
 
     osSetThreadPri(NULL, 0);
@@ -458,7 +458,7 @@ void thread1_idle(UNUSED void *arg) {
 
 #if CLEARRAM
 void ClearRAM(void) {
-    bzero(_mainSegmentEnd, (size_t)osMemSize - (size_t)OS_K0_TO_PHYSICAL(_mainSegmentEnd));
+    bzero(_mainSegmentEnd, ((size_t)osMemSize - (size_t)OS_K0_TO_PHYSICAL(_mainSegmentEnd)));
 }
 #endif
 
@@ -486,6 +486,6 @@ void main_func(void) {
 #ifdef ISVPRINT
     osInitialize_fakeisv();
 #endif
-    create_thread(&gIdleThread, 1, thread1_idle, NULL, (gIdleThreadStack + 0x800), 100);
+    create_thread(&gIdleThread, THREAD_1_IDLE, thread1_idle, NULL, (gIdleThreadStack + 0x800), 100);
     osStartThread(&gIdleThread);
 }

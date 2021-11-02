@@ -261,17 +261,20 @@ void cancel_rumble(void) {
 
 void create_thread_6(void) {
     osCreateMesgQueue(&gRumbleThreadVIMesgQueue, gRumbleThreadVIMesgBuf, 1);
-    osCreateThread(&gRumblePakThread, 6, thread6_rumble_loop, NULL, (gThread6Stack + 0x2000), 30);
+    osCreateThread(&gRumblePakThread, THREAD_6_RUMBLE, thread6_rumble_loop, NULL, (gThread6Stack + 0x2000), 30);
     osStartThread(&gRumblePakThread);
 }
+
+#define VRTC 0x56525443
 
 void rumble_thread_update_vi(void) {
     if (!sRumblePakThreadActive) {
         return;
     }
 
-    // 0x56525443 = 'VRTC'
-    osSendMesg(&gRumbleThreadVIMesgQueue, (OSMesg) 0x56525443, OS_MESG_NOBLOCK);
+    osSendMesg(&gRumbleThreadVIMesgQueue, (OSMesg) VRTC, OS_MESG_NOBLOCK);
 }
+
+#undef VRTC
 
 #endif
