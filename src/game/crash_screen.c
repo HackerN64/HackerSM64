@@ -335,7 +335,7 @@ void draw_crash_screen(OSThread *thread) {
         updateBuffer = TRUE;
     }
 
-    if (crashPage >= PAGE_COUNT && crashPage != 255) {
+    if ((crashPage >= PAGE_COUNT) && (crashPage != 255)) {
         crashPage = 0;
     }
     if (crashPage == 255) {
@@ -385,20 +385,6 @@ void thread2_crash_screen(UNUSED void *arg) {
 
     osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg) 1);
     osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg) 2);
-    goto finished;
-    reset:
-    if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
-        map_data_init();
-    }
-    gCrashScreen.thread.priority = 15;
-    stop_sounds_in_continuous_banks();
-    stop_background_music(sBackgroundMusicQueue[0].seqId);
-    audio_signal_game_loop_tick();
-    crash_screen_sleep(200);
-    play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
-    audio_signal_game_loop_tick();
-    crash_screen_sleep(200);
-    finished:
     while (TRUE) {
 #if PUPPYPRINT_DEBUG
         OSTime first = osGetTime();
@@ -408,7 +394,18 @@ void thread2_crash_screen(UNUSED void *arg) {
             thread = get_crashed_thread();
             gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
             if (thread) {
-                goto reset;
+                if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
+                    map_data_init();
+                }
+                gCrashScreen.thread.priority = 15;
+                stop_sounds_in_continuous_banks();
+                stop_background_music(sBackgroundMusicQueue[0].seqId);
+                audio_signal_game_loop_tick();
+                crash_screen_sleep(200);
+                play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
+                audio_signal_game_loop_tick();
+                crash_screen_sleep(200);
+                continue;
             }
         } else {
             if (gControllerBits) {
@@ -431,7 +428,7 @@ void crash_screen_init(void) {
     gCrashScreen.width  = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
-    osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL, (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack), OS_PRIORITY_APPMAX);
+    osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL, ((u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack)), OS_PRIORITY_APPMAX);
     osStartThread( &gCrashScreen.thread);
 }
 
