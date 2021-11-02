@@ -15,7 +15,7 @@ void hexagonal_ring_spawn_flames(void) {
 
 void bhv_lll_rotating_hexagonal_ring_loop(void) {
     o->oCollisionDistance = 4000.0f;
-    o->oDrawingDistance = 8000.0f;
+    o->oDrawingDistance   = 8000.0f;
 
     switch (o->oAction) {
         case 0:
@@ -27,7 +27,7 @@ void bhv_lll_rotating_hexagonal_ring_loop(void) {
             break;
 
         case 1:
-            o->oAngleVelYaw = 256.0f - sins(o->oTimer * 128) * 256.0f;
+            o->oAngleVelYaw = (256.0f - (sins(o->oTimer * 128) * 256.0f));
 
             if (o->oTimer > 128) {
                 o->oAction = 2;
@@ -36,7 +36,7 @@ void bhv_lll_rotating_hexagonal_ring_loop(void) {
 
         case 2:
             if (gMarioObject->platform != o) {
-                o->oAction++;
+                o->oAction = 3;
             }
 
             if (o->oTimer > 128) {
@@ -48,7 +48,7 @@ void bhv_lll_rotating_hexagonal_ring_loop(void) {
             break;
 
         case 3:
-            o->oAngleVelYaw = sins(o->oTimer * 128) * 256.0f;
+            o->oAngleVelYaw = (sins(o->oTimer * 128) * 256.0f);
 
             if (o->oTimer > 128) {
                 o->oAction = 0;

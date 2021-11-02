@@ -147,9 +147,9 @@ void puppyprint_calculate_ram_usage(void) {
     // These are a bit hacky, but what can ye do eh?
     // gEffectsMemoryPool is 0x4000, gObjectMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
     ramsizeSegment[5] = (EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL
-                      +  EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL);
+                       + EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL);
     ramsizeSegment[6] = ((SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode))
-                      +  (     SURFACE_POOL_SIZE * sizeof(struct Surface    )));
+                       + (     SURFACE_POOL_SIZE * sizeof(struct Surface    )));
     ramsizeSegment[7] = gAudioHeapSize;
 }
 
@@ -721,9 +721,9 @@ void puppyprint_profiler_process(void) {
         rdpTime /= 2;
 #endif
         cpuTime = (scriptTime[NUM_PERF_ITERATIONS]
-                +    taskTime[NUM_PERF_ITERATIONS]
-                +   faultTime[NUM_PERF_ITERATIONS]
-                +   audioTime[NUM_PERF_ITERATIONS]);
+                 +   taskTime[NUM_PERF_ITERATIONS]
+                 +  faultTime[NUM_PERF_ITERATIONS]
+                 +  audioTime[NUM_PERF_ITERATIONS]);
         rspTime =  rspGenTime[NUM_PERF_ITERATIONS];
         puppyprint_calculate_ram_usage();
     }

@@ -72,7 +72,9 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         }
         if ((pos[1] < surf->lowerY) || (pos[1] > surf->upperY)) continue;
         // Dot of normal and pos, + origin offset
-        offset = ((surf->normal.x * pos[0]) + (surf->normal.y * pos[1]) + (surf->normal.z * pos[2]) + surf->originOffset);
+        offset = ((surf->normal.x * pos[0])
+                + (surf->normal.y * pos[1])
+                + (surf->normal.z * pos[2]) + surf->originOffset);
         if ((offset < -radius) || (offset > radius)) continue;
         vec3_diff(v0, surf->vertex2, surf->vertex1);
         vec3_diff(v1, surf->vertex3, surf->vertex1);

@@ -223,8 +223,8 @@ void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
     s32 i;
     for (i = 0; i < 3; i++) {
         dst[i] = ((m[0][i] * v[0])
-               +  (m[1][i] * v[1])
-               +  (m[2][i] * v[2]));
+                + (m[1][i] * v[1])
+                + (m[2][i] * v[2]));
     }
 }
 
@@ -433,9 +433,9 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
     temp2 = (f32 *)mtx;
     for (i = 0; i < 3; i++) {
         temp[12] = ((temp2[ 0] * position[0])
-                 +  (temp2[ 4] * position[1])
-                 +  (temp2[ 8] * position[2])
-                 +   temp2[12]);
+                  + (temp2[ 4] * position[1])
+                  + (temp2[ 8] * position[2])
+                  +  temp2[12]);
         temp++;
         temp2++;
     }
@@ -534,8 +534,8 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
         temp3 = (f32 *)b;
         for (; (i & 3) !=3; i++) {
             *temp2 = ((entry[0] * temp3[0])
-                   +  (entry[1] * temp3[4])
-                   +  (entry[2] * temp3[8]));
+                    + (entry[1] * temp3[4])
+                    + (entry[2] * temp3[8]));
             temp2++;
             temp3++;
         }
@@ -579,9 +579,9 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
     register s16 *c = b;
     for (i = 0; i < 3; i++) {
         c[0] = ((x * temp2[ 0])
-             +  (y * temp2[ 4])
-             +  (z * temp2[ 8])
-             +       temp2[12]);
+              + (y * temp2[ 4])
+              + (z * temp2[ 8])
+              +      temp2[12]);
         c++;
         temp2++;
     }
@@ -635,8 +635,8 @@ void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
     temp2 -= 3;
     for (i = 0; i < 3; i++) {
         *temp1 = ((x[-3] * temp2[0])
-               +  (x[-2] * temp2[1])
-               +  (x[-1] * temp2[2]));
+                + (x[-2] * temp2[1])
+                + (x[-1] * temp2[2]));
         temp1++;
         temp2 += 4;
     }
