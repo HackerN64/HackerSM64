@@ -12,15 +12,24 @@ static struct ObjectHitbox sYellowCoinHitbox = {
     /* hurtboxHeight:     */   0,
 };
 
+/**
+ *     3
+ *   4   6
+ * 5   2   7
+ * 
+ *     1
+ * 
+ *     0
+ **/
 static const s16 sCoinArrowPositions[][2] = {
-    {    0,  -150 },
-    {    0,   -50 },
-    {    0,    50 },
-    {    0,   150 },
-    {  -50,   100 },
-    { -100,    50 },
-    {   50,   100 },
-    {  100,    50 }
+    {    0, -150 }, // 0
+    {    0,  -50 }, // 1
+    {    0,   50 }, // 2
+    {    0,  150 }, // 3
+    {  -50,  100 }, // 4
+    { -100,   50 }, // 5
+    {   50,  100 }, // 6
+    {  100,   50 }  // 7
 };
 
 s32 bhv_coin_sparkles_init(void) {
@@ -85,8 +94,9 @@ void bhv_coin_loop(void) {
     cur_obj_if_hit_wall_bounce_away();
     cur_obj_move_standard(-62);
     struct Surface *floor = o->oFloor;
+    u32 moveFlags = o->oMoveFlags;
     if (floor != NULL) {
-        if (o->oMoveFlags & OBJ_MOVE_ON_GROUND) {
+        if (moveFlags & OBJ_MOVE_ON_GROUND) {
             o->oAction = BOUNCING_COIN_ACT_BOUNCING;
         }
         if (o->oAction == BOUNCING_COIN_ACT_BOUNCING) {
@@ -103,19 +113,19 @@ void bhv_coin_loop(void) {
     if (o->oVelY < 0) {
         cur_obj_become_tangible();
     }
-    if (o->oMoveFlags & OBJ_MOVE_LANDED) {
+    if (moveFlags & OBJ_MOVE_LANDED) {
 #ifdef COIN_LAVA_FLICKER
-        if ((o->oMoveFlags & OBJ_MOVE_ABOVE_DEATH_BARRIER)
-        || ((o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) && cur_obj_wait_then_blink(0, 20))) {
+        if ((moveFlags & OBJ_MOVE_ABOVE_DEATH_BARRIER)
+        || ((moveFlags & OBJ_MOVE_ABOVE_LAVA) && cur_obj_wait_then_blink(0, 20))) {
             obj_mark_for_deletion(o);
         }
 #else
-        if (o->oMoveFlags & (OBJ_MOVE_ABOVE_DEATH_BARRIER | OBJ_MOVE_ABOVE_LAVA)) {
+        if (moveFlags & (OBJ_MOVE_ABOVE_DEATH_BARRIER | OBJ_MOVE_ABOVE_LAVA)) {
             obj_mark_for_deletion(o);
         }
 #endif
     }
-    if (o->oMoveFlags & OBJ_MOVE_BOUNCE) {
+    if (moveFlags & OBJ_MOVE_BOUNCE) {
         if (o->oCoinBounceTimer < 5) {
             cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP);
         }
@@ -190,7 +200,9 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
         snapToGround = FALSE;
     }
     if (spawnCoin) {
-        struct Object *newCoin = spawn_object_relative(index, pos[0], pos[1], pos[2], o, MODEL_YELLOW_COIN, bhvCoinFormationSpawnedCoin);
+        struct Object *newCoin =
+            spawn_object_relative(index, pos[0], pos[1], pos[2], o,
+                                  MODEL_YELLOW_COIN, bhvCoinFormationSpawnedCoin);
         newCoin->oCoinSnapToGround = snapToGround;
     }
 }
