@@ -2313,7 +2313,7 @@ void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer) 
  */
 void func_80321080(u16 fadeTimer) {
     if (sBackgroundMusicTargetVolume != TARGET_VOLUME_UNSET) {
-        sBackgroundMusicTargetVolume = TARGET_VOLUME_UNSET;
+        sBackgroundMusicTargetVolume  = TARGET_VOLUME_UNSET;
         D_80332120 = 0;
         D_80332124 = 0;
         begin_background_music_fade(fadeTimer);

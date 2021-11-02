@@ -705,10 +705,9 @@ void cur_obj_extend_animation_if_at_end(void) {
 }
 
 s32 cur_obj_check_if_near_animation_end(void) {
-    u32 animFlags = (s32) o->header.gfx.animInfo.currAnim->flags;
     s32 animFrame = o->header.gfx.animInfo.animFrame;
     s32 nearLoopEnd = (o->header.gfx.animInfo.currAnim->loopEnd - 2);
-    if ((animFlags & ANIM_FLAG_NOLOOP) && ((nearLoopEnd + 1) == animFrame)) {
+    if ((o->header.gfx.animInfo.currAnim->flags & ANIM_FLAG_NOLOOP) && ((nearLoopEnd + 1) == animFrame)) {
         return TRUE;
     }
     return (animFrame == nearLoopEnd);

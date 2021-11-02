@@ -12,7 +12,7 @@
  */
 void piranha_plant_act_idle(void) {
     cur_obj_become_intangible();
-    cur_obj_init_animation_with_sound(8);
+    cur_obj_init_animation_with_sound(PIRANHA_PLANT_ANIM_SLEEPING);
 
     /**
      * This call is necessary because a Piranha Plant may enter this state
@@ -69,9 +69,9 @@ void piranha_plant_act_sleeping(void) {
     cur_obj_become_tangible();
     o->oInteractType = INTERACT_BOUNCE_TOP;
 
-    cur_obj_init_animation_with_sound(8);
+    cur_obj_init_animation_with_sound(PIRANHA_PLANT_ANIM_SLEEPING);
 
-    cur_obj_set_hitbox_radius_and_height(250.0f, 200.0f);
+    cur_obj_set_hitbox_radius_and_height( 250.0f, 200.0f);
     cur_obj_set_hurtbox_radius_and_height(150.0f, 100.0f);
 
     /**
@@ -106,7 +106,7 @@ void piranha_plant_act_woken_up(void) {
         func_80321080(50);
     }
 
-    if (!piranha_plant_check_interactions() && o->oTimer > 10) {
+    if (!piranha_plant_check_interactions() && (o->oTimer > 10)) {
         o->oAction = PIRANHA_PLANT_ACT_BITING;
     }
 }
@@ -138,7 +138,7 @@ void piranha_plant_reset_when_far(void) {
  */
 void piranha_plant_attacked(void) {
     cur_obj_become_intangible();
-    cur_obj_init_animation_with_sound(2);
+    cur_obj_init_animation_with_sound(PIRANHA_PLANT_ANIM_FALLING_OVER);
     o->oInteractStatus = INT_STATUS_NONE;
     if (cur_obj_check_if_near_animation_end()) {
         o->oAction = PIRANHA_PLANT_ACT_SHRINK_AND_DIE;
@@ -164,7 +164,7 @@ void piranha_plant_act_shrink_and_die(void) {
      */
     if (o->oPiranhaPlantScale > 0.0f) {
         // Shrink by 0.04f per frame.
-        o->oPiranhaPlantScale = o->oPiranhaPlantScale - 0.04f;
+        o->oPiranhaPlantScale = (o->oPiranhaPlantScale - 0.04f);
     } else {
         o->oPiranhaPlantScale = 0.0f;
         cur_obj_spawn_loot_blue_coin();
@@ -190,7 +190,7 @@ void piranha_plant_act_wait_to_respawn(void) {
  * grown, set it to the idle state.
  */
 void piranha_plant_act_respawn(void) {
-    cur_obj_init_animation_with_sound(8);
+    cur_obj_init_animation_with_sound(PIRANHA_PLANT_ANIM_SLEEPING);
     if (o->oTimer == 0) {
         o->oPiranhaPlantScale = 0.3f;
     }
@@ -215,7 +215,9 @@ void piranha_plant_act_respawn(void) {
  * The frames of the Piranha Plant's biting animation on which to play a bite
  * sound.
  */
-static s8 sPiranhaPlantBiteSoundFrames[] = { 12, 28, 50, 64, -1 };
+static s8 sPiranhaPlantBiteSoundFrames[] = {
+    12, 28, 50, 64, -1
+};
 
 /**
  * Make the Piranha Plant bite in the direction of the player. If the player
@@ -230,9 +232,9 @@ void piranha_plant_act_biting(void) {
 
     o->oInteractType = INTERACT_DAMAGE;
 
-    cur_obj_init_animation_with_sound(0);
+    cur_obj_init_animation_with_sound(PIRANHA_PLANT_ANIM_BITE);
 
-    cur_obj_set_hitbox_radius_and_height(150.0f, 100.0f);
+    cur_obj_set_hitbox_radius_and_height( 150.0f, 100.0f);
     cur_obj_set_hurtbox_radius_and_height(150.0f, 100.0f);
 
     // Play a bite sound effect on certain frames.
@@ -261,9 +263,8 @@ void piranha_plant_act_biting(void) {
  * This is called from both the "stopped biting" state and the "sleeping" state.
  */
 s32 mario_moving_fast_enough_to_make_piranha_plant_bite(void) {
-    if (gMarioStates[0].vel[1]     > 10.0f) return TRUE;
-    if (gMarioStates[0].forwardVel > 10.0f) return TRUE;
-    return FALSE;
+    return ((gMarioStates[0].vel[1]     > 10.0f)
+         || (gMarioStates[0].forwardVel > 10.0f));
 }
 
 /**
@@ -273,7 +274,7 @@ s32 mario_moving_fast_enough_to_make_piranha_plant_bite(void) {
  */
 void piranha_plant_act_stopped_biting(void) {
     cur_obj_become_intangible();
-    cur_obj_init_animation_with_sound(6);
+    cur_obj_init_animation_with_sound(PIRANHA_PLANT_ANIM_STOP_BITING);
 
     if (cur_obj_check_if_near_animation_end()) {
         o->oAction = PIRANHA_PLANT_ACT_SLEEPING;
@@ -286,7 +287,7 @@ void piranha_plant_act_stopped_biting(void) {
      * of the Piranha Plant during the short time the Piranha Plant's nod
      * animation plays.
      */
-    if (o->oDistanceToMario < 400.0f && mario_moving_fast_enough_to_make_piranha_plant_bite()) {
+    if ((o->oDistanceToMario < 400.0f) && mario_moving_fast_enough_to_make_piranha_plant_bite()) {
         o->oAction = PIRANHA_PLANT_ACT_BITING;
     }
 }
