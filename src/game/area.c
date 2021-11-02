@@ -429,7 +429,7 @@ void render_game(void) {
 #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);
     graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
-    // graphTime[perfIteration] -=   profilerTime[perfIteration];
+    graphTime[perfIteration] -=   profilerTime[perfIteration]; //! Graph time is inaccurate and wrongly reaches 0 sometimes
 #endif
 #if PUPPYPRINT_DEBUG
     puppyprint_render_profiler();
