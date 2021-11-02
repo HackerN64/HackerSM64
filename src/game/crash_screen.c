@@ -417,7 +417,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 #endif
                 osContStartReadData(&gSIEventMesgQueue);
             }
-            read_controller_inputs(2);
+            read_controller_inputs(THREAD_2_CRASH_SCREEN);
             draw_crash_screen(thread);
         }
 #if PUPPYPRINT_DEBUG
@@ -432,6 +432,6 @@ void crash_screen_init(void) {
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
     osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL, (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack), OS_PRIORITY_APPMAX);
-    osStartThread(&gCrashScreen.thread);
+    osStartThread( &gCrashScreen.thread);
 }
 

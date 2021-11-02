@@ -265,8 +265,8 @@ static void level_cmd_load_to_fixed_address(void) {
 }
 
 static void level_cmd_load_raw(void) {
-    load_segment(CMD_GET(s16, 2), CMD_GET(void *, 4), CMD_GET(void *, 8),
-            MEMORY_POOL_LEFT, CMD_GET(void *, 12), CMD_GET(void *, 16));
+    load_segment(CMD_GET(s16, 2), CMD_GET(void *,  4), CMD_GET(void *,  8),
+                MEMORY_POOL_LEFT, CMD_GET(void *, 12), CMD_GET(void *, 16));
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -456,9 +456,7 @@ static void level_cmd_init_mario(void) {
 }
 
 static void level_cmd_place_object(void) {
-    u8 val7 = (1 << (gCurrActNum - 1));
-
-    if ((sCurrAreaIndex != -1) && ((CMD_GET(u8, 2) & val7) || (CMD_GET(u8, 2) == 0x1F))) {
+    if ((sCurrAreaIndex != -1) && ((CMD_GET(u8, 2) & (1 << (gCurrActNum - 1))) || (CMD_GET(u8, 2) == 0x1F))) {
         ModelID16 model = CMD_GET(u32, 0x18);
         struct SpawnInfo *spawnInfo = alloc_only_pool_alloc(sLevelPool, sizeof(struct SpawnInfo));
 
@@ -515,7 +513,7 @@ static void level_cmd_create_instant_warp(void) {
             }
         }
 
-        struct InstantWarp *warp = gAreas[sCurrAreaIndex].instantWarps + CMD_GET(u8, 2);
+        struct InstantWarp *warp = (gAreas[sCurrAreaIndex].instantWarps + CMD_GET(u8, 2));
 
         warp[0].id   = 1;
         warp[0].area = CMD_GET(u8, 3);
