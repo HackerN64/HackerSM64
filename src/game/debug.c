@@ -85,11 +85,11 @@ s16 sDebugInfoButtonSeq[]  = {
  * counts. They likely have stubbed out code that calculated the clock count and
  * its difference for consecutive calls.
  */
-s64 get_current_clock(void) {
+UNUSED s64 get_current_clock(void) {
     return 0;
 }
 
-s64 get_clock_difference(UNUSED s64 cycles) {
+UNUSED s64 get_clock_difference(UNUSED s64 cycles) {
     return 0;
 }
 
