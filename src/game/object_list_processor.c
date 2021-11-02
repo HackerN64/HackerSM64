@@ -545,7 +545,7 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
 void update_objects(void) {
     //s64 cycleCounts[30];
 #if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
+    OSTime first   = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
 #endif
 
