@@ -1603,7 +1603,7 @@ enum BehParam1StarAct { // BPARAM1
     #define INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2         0x65
     #define INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_3         0x66
     /* Animations */
-    #define INTRO_LAKITU_ACT_DEFAULT                        0x0
+    #define INTRO_LAKITU_ANIM_DEFAULT                       0x0
 
 /* Camera Lakitu */
     /* oBehParams2ndByte */
@@ -2096,6 +2096,8 @@ enum AnimIDsPenguin { // Animations
     /* oAction */
     #define HAUNTED_CHAIR_ACT_FALL_OR_SPIN                  0x0
     #define HAUNTED_CHAIR_ACT_FLY                           0x1
+    /* Animations */
+    #define HAUNTED_CHAIR_ANIM_DEFAULT                      0x0
 
 /* Fire piranha plant */
     /* oAction */

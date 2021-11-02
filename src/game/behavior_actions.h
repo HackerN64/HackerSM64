@@ -68,7 +68,7 @@ void bhv_coin_init(void);
 void bhv_coin_loop(void);
 void bhv_coin_inside_boo_loop(void);
 void bhv_coin_formation_init(void);
-void bhv_coin_formation_spawn_loop(void);
+void bhv_coin_formation_spawned_coin_loop(void);
 void bhv_coin_formation_loop(void);
 void bhv_temp_coin_loop(void);
 void bhv_coin_sparkles_loop(void);

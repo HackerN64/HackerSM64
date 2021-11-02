@@ -223,7 +223,7 @@ void clear_area_graph_nodes(void) {
 }
 
 void load_area(s32 index) {
-    if (gCurrentArea == NULL && gAreaData[index].graphNode != NULL) {
+    if ((gCurrentArea == NULL) && (gAreaData[index].graphNode != NULL)) {
         gCurrentArea = &gAreaData[index];
         gCurrAreaIndex = gCurrentArea->index;
 

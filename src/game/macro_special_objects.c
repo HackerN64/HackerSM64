@@ -111,9 +111,9 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
         macroObject[MACRO_OBJ_PARAMS] = *macroObjList++;                        // Behavior params
 
         // Get the preset values from the MacroObjectPresets list.
-        preset.model = MacroObjectPresets[presetID].model;
+        preset.model    = MacroObjectPresets[presetID].model;
         preset.behavior = MacroObjectPresets[presetID].behavior;
-        preset.param = MacroObjectPresets[presetID].param;
+        preset.param    = MacroObjectPresets[presetID].param;
 
         if (preset.param != 0) {
             macroObject[MACRO_OBJ_PARAMS] =

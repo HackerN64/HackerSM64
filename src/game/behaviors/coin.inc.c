@@ -127,7 +127,7 @@ void bhv_coin_loop(void) {
     bhv_coin_sparkles_init();
 }
 
-void bhv_coin_formation_spawn_loop(void) {
+void bhv_coin_formation_spawned_coin_loop(void) {
     if (o->oTimer == 0) {
         cur_obj_set_behavior(bhvYellowCoin);
         obj_set_hitbox(o, &sYellowCoinHitbox);
@@ -190,7 +190,7 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
         snapToGround = FALSE;
     }
     if (spawnCoin) {
-        struct Object *newCoin = spawn_object_relative(index, pos[0], pos[1], pos[2], o, MODEL_YELLOW_COIN, bhvCoinFormationSpawn);
+        struct Object *newCoin = spawn_object_relative(index, pos[0], pos[1], pos[2], o, MODEL_YELLOW_COIN, bhvCoinFormationSpawnedCoin);
         newCoin->oCoinSnapToGround = snapToGround;
     }
 }

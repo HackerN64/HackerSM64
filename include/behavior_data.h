@@ -52,7 +52,7 @@ extern const BehaviorScript bhvSpawnedStar[];
 extern const BehaviorScript bhvSpawnedStarNoLevelExit[];
 extern const BehaviorScript bhvMrIBlueCoin[];
 extern const BehaviorScript bhvCoinInsideBoo[];
-extern const BehaviorScript bhvCoinFormationSpawn[];
+extern const BehaviorScript bhvCoinFormationSpawnedCoin[];
 extern const BehaviorScript bhvCoinFormation[];
 extern const BehaviorScript bhvOneCoin[];
 extern const BehaviorScript bhvYellowCoin[];

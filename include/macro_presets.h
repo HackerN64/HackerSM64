@@ -28,9 +28,9 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvCoinFormation,                  MODEL_NONE, (                       0                                                            )}, // macro_coin_line_horizontal
     {bhvCoinFormation,                  MODEL_NONE, (                             COIN_FORMATION_FLAG_RING                               )}, // macro_coin_ring_horizontal
     {bhvCoinFormation,                  MODEL_NONE, (                             COIN_FORMATION_FLAG_ARROW                              )}, // macro_coin_arrow
-    {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAG_FLYING                                                          )}, // macro_coin_line_horizontal_flyin
+    {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAG_FLYING                                                          )}, // macro_coin_line_horizontal_flying
     {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAG_FLYING |                            COIN_FORMATION_FLAG_VERTICAL)}, // macro_coin_line_vertical
-    {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_RING                               )}, // macro_coin_ring_horizontal_flyin
+    {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_RING                               )}, // macro_coin_ring_horizontal_flying
     {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL)}, // macro_coin_ring_vertical
     {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAG_FLYING | COIN_FORMATION_FLAG_ARROW                              )}, // macro_coin_arrow_flying - unused
     {bhvHiddenStarTrigger,              MODEL_NONE,                         0}, // macro_hidden_star_trigger
