@@ -426,6 +426,7 @@ void render_game(void) {
 
     gViewportOverride = NULL;
     gViewportClip     = NULL;
+
 #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);
     graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);

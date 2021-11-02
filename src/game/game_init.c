@@ -279,7 +279,7 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.output_buff      = gGfxSPTaskOutputBuffer;
     gGfxSPTask->task.t.output_buff_size = (u64 *)((u8 *) gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
     gGfxSPTask->task.t.data_ptr         = (u64 *) &gGfxPool->buffer;
-    gGfxSPTask->task.t.data_size        = entries * sizeof(Gfx);
+    gGfxSPTask->task.t.data_size        = (entries * sizeof(Gfx));
     gGfxSPTask->task.t.yield_data_ptr   = (u64 *) gGfxSPTaskYieldBuffer;
     gGfxSPTask->task.t.yield_data_size  = OS_YIELD_DATA_SIZE;
 }

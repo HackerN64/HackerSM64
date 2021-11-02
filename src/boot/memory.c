@@ -641,14 +641,14 @@ void setup_dma_table_list(struct DmaHandlerList *list, void *srcAddr, void *buff
         list->dmaTable = load_dma_table_address(srcAddr);
     }
     list->currentAddr = NULL;
-    list->bufTarget = buffer;
+    list->bufTarget   = buffer;
 }
 
 s32 load_patchable_table(struct DmaHandlerList *list, s32 index) {
     struct DmaTable *table = list->dmaTable;
 
     if ((u32)index < table->count) {
-        u8 *addr = table->srcAddr + table->anim[index].offset;
+        u8 *addr = (table->srcAddr + table->anim[index].offset);
         s32 size = table->anim[index].size;
 
         if (list->currentAddr != addr) {

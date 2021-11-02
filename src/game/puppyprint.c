@@ -638,9 +638,9 @@ void puppyprint_render_profiler(void) {
 
     (ppPages[sPPDebugPage].func)();
 
-    if (sDebugMenu)
+    if (sDebugMenu) {
         render_page_menu();
-
+    }
     profiler_update(profilerTime, first);
 }
 

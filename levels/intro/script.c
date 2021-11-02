@@ -52,12 +52,12 @@ const LevelScript level_intro_splash_screen[] = {
     CALL(/*arg*/ 0, /*func*/ load_mario_area),
     
     JUMP_LINK_PUSH_ARG(75),
-        CALL(/*arg*/ 0, /*func*/ area_update_objects),
+        CALL(/*arg*/ 0, /*func*/ area_update_objects), //! UB
         SLEEP(/*frames*/ 1),
     JUMP_N_TIMES(),
     TRANSITION(/*transType*/ WARP_TRANSITION_FADE_INTO_COLOR, /*time*/ 16, /*color*/ 0x00, 0x00, 0x00),
     JUMP_LINK_PUSH_ARG(16),
-        CALL(/*arg*/ 0, /*func*/ area_update_objects),
+        CALL(/*arg*/ 0, /*func*/ area_update_objects), //! UB
         SLEEP(/*frames*/ 1),
     JUMP_N_TIMES(),
 #else

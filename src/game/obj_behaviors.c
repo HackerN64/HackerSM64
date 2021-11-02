@@ -275,7 +275,7 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
     f32 floor_nY = objFloor->normal.y;
     f32 floor_nZ = objFloor->normal.z;
 
-    f32 netYAccel = ((1.0f - o->oBuoyancy) * (-1.0f * o->oGravity));
+    f32 netYAccel = ((1.0f - o->oBuoyancy) * -o->oGravity);
     o->oVelY -= netYAccel;
 
     // Caps vertical speed with a "terminal velocity".
@@ -296,11 +296,14 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
     }
 
     // If moving fast near the surface of the water, flip vertical speed? To emulate skipping?
-    if ((o->oForwardVel > 12.5f) && ((waterY + 30.0f) > o->oPosY) && ((waterY - 30.0f) < o->oPosY)) {
+    if ((o->oForwardVel > 12.5f)
+     && ((waterY + 30.0f) > o->oPosY)
+     && ((waterY - 30.0f) < o->oPosY)) {
         o->oVelY = -o->oVelY;
     }
 
-    if (((s32) o->oPosY >= (s32) floorY) && ((s32) o->oPosY < ((s32) floorY + 37))) {
+    if (((s32) o->oPosY >= (s32) floorY)
+     && ((s32) o->oPosY < ((s32) floorY + 37))) {
         obj_orient_graph(o, floor_nX, floor_nY, floor_nZ);
 
         // Adds horizontal component of gravity for horizontal speed.
@@ -343,7 +346,8 @@ void obj_splash(s32 waterY, s32 objY) {
     u32 globalTimer = gGlobalTimer;
 
     // Spawns waves if near surface of water and plays a noise if entering.
-    if (((f32)(waterY + 30) > o->oPosY) && (o->oPosY > (f32)(waterY - 30))) {
+    if (((f32)(waterY + 30) > o->oPosY)
+     && (o->oPosY > (f32)(waterY - 30))) {
         spawn_object(o, MODEL_IDLE_WATER_WAVE, bhvObjectWaterWave);
 
         if (o->oVelY < -20.0f) {
@@ -413,7 +417,7 @@ s32 object_step(void) {
  */
 s32 object_step_without_floor_orient(void) {
     sOrientObjWithFloor = FALSE;
-    s16 collisionFlags = object_step();
+    s16 collisionFlags  = object_step();
     sOrientObjWithFloor = TRUE;
     return collisionFlags;
 }
