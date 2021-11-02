@@ -733,9 +733,9 @@ void thread5_game_loop(UNUSED void *arg) {
         profiler_update(scriptTime, lastTime);
         scriptTime[perfIteration] -= profilerTime[perfIteration];
         scriptTime[perfIteration] -= profilerTime2[perfIteration];
-            if (benchmarkLoop > 0 && benchOption == 0) {
+            if ((benchmarkLoop > 0) && (benchOption == 0)) {
                 benchmarkLoop--;
-                benchMark[benchmarkLoop] = osGetTime() - lastTime;
+                benchMark[benchmarkLoop] = (osGetTime() - lastTime);
                 if (benchmarkLoop == 0) {
                     puppyprint_profiler_finished();
                     break;

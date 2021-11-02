@@ -94,17 +94,19 @@ u32      tmemTime[NUM_PERF_ITERATIONS + 1];
 u32       busTime[NUM_PERF_ITERATIONS + 1];
 // RAM
 s8  ramViewer = FALSE;
-s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = { 0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0,
-                                             0, 0, 0 };
+s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0
+};
 s8  audioRamViewer = FALSE;
 s32 mempool;
 
@@ -133,7 +135,8 @@ void puppyprint_calculate_ram_usage(void) {
     s32 i = 0;
 
     for (i = 0; i < 5; i++) {
-        if (!ramP[i][0] || !ramP[i][1]) {
+        if (!ramP[i][0]
+         || !ramP[i][1]) {
             continue;
         }
         temp[0] = ramP[i][0];
@@ -202,7 +205,8 @@ ColorRGB colourChart[NUM_TLB_SEGMENTS + 1] = {
     { 216, 191, 216 },
     { 244, 164,  96 },
     { 176, 196, 222 },
-    { 255, 255, 255 }};
+    { 255, 255, 255 }
+};
 
 // Change this to alter the width of the bar at the bottom.
 #define BAR_LENGTH 200
@@ -220,12 +224,15 @@ void print_ram_bar(void) {
         if (ramsizeSegment[i] == 0) {
             continue;
         }
-        perfPercentage = (f32)ramsizeSegment[i]/ramsize;
+        perfPercentage = ((f32)ramsizeSegment[i] / ramsize);
         graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_CENTER_X + (BAR_LENGTH / 2)));
-        render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22), colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
+        render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22),
+            colourChart[i][0],
+            colourChart[i][1],
+            colourChart[i][2], 255);
         prevGraph = graphPos;
     }
-    perfPercentage = (f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize;
+    perfPercentage = ((f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize);
     graphPos = (prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_CENTER_X + (BAR_LENGTH / 2))));
     render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22), 255, 255, 255, 255);
     prevGraph = graphPos;
@@ -250,7 +257,7 @@ const char ramNames[8][32] = {
 s8 nameTable = (sizeof(ramNames) / NUM_TLB_SEGMENTS);
 
 void print_ram_overview(void) {
-    s32 i = 0;
+    s32 i =  0;
     char textBytes[32];
     s32 x = 80;
     s32 y = 16;
@@ -317,7 +324,9 @@ void print_audio_ram_overview(void) {
         sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
             audioPoolSizes[i][1], audioPoolSizes[i][0], (percentage / 10), (percentage % 10));
 
-        print_set_envcolour(colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
+        print_set_envcolour(colourChart[i][0],
+                            colourChart[i][1],
+                            colourChart[i][2], 255);
         print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
         y += 12;
@@ -339,12 +348,15 @@ void print_audio_ram_overview(void) {
             totalMemory[1], totalMemory[0]);
     }
 
-    print_set_envcolour(colourChart[30][0], colourChart[30][1], colourChart[30][2], 255);
+    print_set_envcolour(colourChart[30][0],
+                        colourChart[30][1],
+                        colourChart[30][2], 255);
     print_small_text(x, tmpY, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
 void benchmark_custom(void) {
-    if ((benchmarkLoop == 0) || (benchOption != 2)) {
+    if ((benchmarkLoop == 0)
+     || (benchOption != 2)) {
         return;
     }
     OSTime lastTime;
@@ -352,7 +364,8 @@ void benchmark_custom(void) {
         lastTime = osGetTime();
         // Insert your function here!
 
-        if ((benchmarkLoop > 0) && (benchOption == 2)) {
+        if ((benchmarkLoop > 0)
+         && (benchOption == 2)) {
             benchmarkLoop--;
             benchMark[benchmarkLoop] = (osGetTime() - lastTime);
             if (benchmarkLoop == 0) {
@@ -484,7 +497,10 @@ struct CPUBar cpu_ordering_table[] = {
 void print_basic_profiling(void) {
     char textBytes[90];
     print_fps(16, 40);
-    sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", cpuTime, cpuTime / 333, rspTime, rspTime / 333, rdpTime, rdpTime / 333);
+    sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)",
+        cpuTime, (cpuTime / 333),
+        rspTime, (rspTime / 333),
+        rdpTime, (rdpTime / 333));
     print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
@@ -543,18 +559,28 @@ void puppyprint_render_standard(void) {
     viewedNums = 0;
     // Render CPU breakdown bar.
     for (i = 0; i < CPU_TABLE_MAX; i++) {
-        if ((perfPercentage[i] == 0) && (i != (CPU_TABLE_MAX - 1))) {
+        if ((perfPercentage[i] == 0)
+         && (i != (CPU_TABLE_MAX - 1))) {
             continue;
         }
         if (viewedNums == 0) {
             graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
-            render_blank_box((SCREEN_WIDTH - 96), barY, graphPos, (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+            render_blank_box((SCREEN_WIDTH - 96), barY, graphPos, (barY + 8),
+                cpu_ordering_table[i].colour[0],
+                cpu_ordering_table[i].colour[1],
+                cpu_ordering_table[i].colour[2], 255);
         } else if (i == (CPU_TABLE_MAX - 1)) {
             graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
-            render_blank_box(prevGraph, barY, (SCREEN_WIDTH - 16), (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+            render_blank_box(prevGraph, barY, (SCREEN_WIDTH - 16), (barY + 8),
+                cpu_ordering_table[i].colour[0],
+                cpu_ordering_table[i].colour[1],
+                cpu_ordering_table[i].colour[2], 255);
         } else {
             graphPos += perfPercentage[i];
-            render_blank_box(prevGraph, barY, graphPos, (barY + 8), cpu_ordering_table[i].colour[0], cpu_ordering_table[i].colour[1], cpu_ordering_table[i].colour[2], 255);
+            render_blank_box(prevGraph, barY, graphPos, (barY + 8),
+                cpu_ordering_table[i].colour[0],
+                cpu_ordering_table[i].colour[1],
+                cpu_ordering_table[i].colour[2], 255);
         }
         viewedNums++;
         prevGraph = graphPos;
@@ -584,18 +610,18 @@ void render_page_menu(void) {
     s32 scrollY = (36 / (MAX_DEBUG_OPTIONS - 1));
     prepare_blank_box();
     render_blank_box(32, 32, (32 + MENU_BOX_WIDTH), (32 + 72), 0x00, 0x00, 0x00, 0xC0);
-    render_blank_box((32 + MENU_BOX_WIDTH - 8), (32 + (scrollY * sDebugOption)), (32 + MENU_BOX_WIDTH), (32 + (scrollY * sDebugOption) + 36), 0xFF, 0xFF, 0xFF, 0xFF);
+    render_blank_box(((32 + MENU_BOX_WIDTH) - 8), (32 + (scrollY * sDebugOption)), (32 + MENU_BOX_WIDTH), (32 + (scrollY * sDebugOption) + 36), 0xFF, 0xFF, 0xFF, 0xFF);
     finish_blank_box();
     for (i = 0; i < (s32)MAX_DEBUG_OPTIONS; i++) {
         s32 yOffset = ((sDebugOption > 5) ? (sDebugOption - 5) : 0);
-        posY = (38 + ((i-yOffset) * 10));
+        posY = (38 + ((i - yOffset) * 10));
         if ((posY > 32) && (posY < 90)) {
             if (sDebugOption == i) {
                 print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
             } else {
                 print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
             }
-            print_small_text(28+(MENU_BOX_WIDTH / 2), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
+            print_small_text((28 + (MENU_BOX_WIDTH / 2)), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
         }
     }
 }
@@ -644,7 +670,8 @@ void puppyprint_profiler_process(void) {
         }
     }
 
-    if ((gPlayer1Controller->buttonDown & U_JPAD) && (gPlayer1Controller->buttonPressed & L_TRIG)) {
+    if ((gPlayer1Controller->buttonDown    & U_JPAD)
+     && (gPlayer1Controller->buttonPressed & L_TRIG)) {
         fDebug    ^= TRUE;
         sDebugMenu = FALSE;
     }
@@ -660,7 +687,7 @@ void puppyprint_profiler_process(void) {
         }
     }
 
-    if ((gGlobalTimer % 16) == 0) {
+    if (!(gGlobalTimer & 15)) {
         get_average_perf_time(   scriptTime);
         get_average_perf_time(behaviourTime);
         get_average_perf_time(collisionTime);
@@ -691,7 +718,10 @@ void puppyprint_profiler_process(void) {
 #if BBPLAYER == 1 // iQue RDP registers need to be halved to be correct.
         rdpTime /= 2;
 #endif
-        cpuTime = (scriptTime[NUM_PERF_ITERATIONS] + taskTime[NUM_PERF_ITERATIONS] + faultTime[NUM_PERF_ITERATIONS] + audioTime[NUM_PERF_ITERATIONS]);
+        cpuTime = (scriptTime[NUM_PERF_ITERATIONS]
+                +    taskTime[NUM_PERF_ITERATIONS]
+                +   faultTime[NUM_PERF_ITERATIONS]
+                +   audioTime[NUM_PERF_ITERATIONS]);
         rspTime =  rspGenTime[NUM_PERF_ITERATIONS];
         puppyprint_calculate_ram_usage();
     }
@@ -725,7 +755,7 @@ void prepare_blank_box(void) {
 
 void finish_blank_box(void) {
     print_set_envcolour(255, 255, 255, 255);
-    gSPDisplayList(gDisplayListHead++,dl_hud_img_end);
+    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
 }
 
 // This does some epic shenanigans to figure out the optimal way to draw this.
@@ -834,7 +864,10 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
             s32 a = (((str[i + 11] - '0') * 10)
                   +   (str[i + 12] - '0'));
             // Multiply each value afterwards by 2.575f to make 255.
-            print_set_envcolour((r * 2.575f), (g * 2.575f), (b * 2.575f), (a * 2.575f));
+            print_set_envcolour((r * 2.575f),
+                                (g * 2.575f),
+                                (b * 2.575f),
+                                (a * 2.575f));
         } else if (strncmp((str + i), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
             s32 r   = (((str[i +  6] - '0') * 10)
                     +   (str[i +  7] - '0'));
@@ -1032,12 +1065,12 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     s32 maskH = 1;
 
     if (mode == G_CYC_COPY) {
-        gDPSetCycleType(gDisplayListHead++, mode);
+        gDPSetCycleType( gDisplayListHead++, mode);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP2);
         modeSC = 4;
         mOne   = 1;
     } else {
-        gDPSetCycleType(gDisplayListHead++, mode);
+        gDPSetCycleType( gDisplayListHead++, mode);
         gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         modeSC = 1;
         mOne   = 0;
@@ -1101,8 +1134,14 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             posH -= peakH;
         }
         gDPLoadSync(gDisplayListHead++);
-        gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
-        gSPScisTextureRectangle(gDisplayListHead++, ((x + posW) << 2), ((y + posH) << 2), (((x + posW + imW)- mOne) << 2), (((y + posH + imH) - mOne) << 2), G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
+        gDPLoadTextureTile(gDisplayListHead++,
+            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+        gSPScisTextureRectangle(gDisplayListHead++,
+            ((x + posW) << 2),
+            ((y + posH) << 2),
+            (((x + posW + imW) - mOne) << 2),
+            (((y + posH + imH) - mOne) << 2),
+            G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
     }
     // If there's a remainder on the vertical side, then it will cycle through that too.
     if (height-peakH != 0) {
@@ -1111,8 +1150,14 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
         for (i = 0; i < (width / imW); i++) {
             posW = (i * imW);
             gDPLoadSync(gDisplayListHead++);
-            gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
-            gSPScisTextureRectangle(gDisplayListHead++, ((x + posW) << 2), ((y + posH) << 2), (((x + posW + imW) - mOne) << 2), (((y + posH + imH) - mOne) << 2), G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
+            gDPLoadTextureTile(gDisplayListHead++,
+                image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+            gSPScisTextureRectangle(gDisplayListHead++,
+                ((x + posW) << 2),
+                ((y + posH) << 2),
+                (((x + posW + imW) - mOne) << 2),
+                (((y + posH + imH) - mOne) << 2),
+                G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
         }
     }
 }
