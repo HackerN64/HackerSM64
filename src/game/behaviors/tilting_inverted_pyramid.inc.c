@@ -47,7 +47,7 @@ void bhv_tilting_inverted_pyramid_loop(void) {
 #ifndef PLATFORM_DISPLACEMENT_2
     // If Mario is on the platform, adjust his position for the platform tilt.
     if (o->oTiltingPyramidMarioOnPlatform) {
-        linear_mtxf_mul_vec3f(*transform, posAfterRotation, dist);
+        linear_mtxf_mul_vec3f(*transform, posAfterRotation, targetNormal);
         m[0] += (posAfterRotation[0] - posBeforeRotation[0]);
         m[1] += (posAfterRotation[1] - posBeforeRotation[1]);
         m[2] += (posAfterRotation[2] - posBeforeRotation[2]);
