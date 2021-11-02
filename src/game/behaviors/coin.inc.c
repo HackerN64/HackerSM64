@@ -1,6 +1,6 @@
 // coin.inc.c
 
-struct ObjectHitbox sYellowCoinHitbox = {
+static struct ObjectHitbox sYellowCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,
     /* downOffset:        */   0,
     /* damageOrCoinValue: */   1,
@@ -12,7 +12,7 @@ struct ObjectHitbox sYellowCoinHitbox = {
     /* hurtboxHeight:     */   0,
 };
 
-s16 sCoinArrowPositions[][2] = {
+static const s16 sCoinArrowPositions[][2] = {
     {    0,  -150 },
     {    0,   -50 },
     {    0,    50 },
@@ -24,7 +24,8 @@ s16 sCoinArrowPositions[][2] = {
 };
 
 s32 bhv_coin_sparkles_init(void) {
-    if (o->oInteractStatus & INT_STATUS_INTERACTED && !(o->oInteractStatus & INT_STATUS_TOUCHED_BOB_OMB)) {
+    if ((o->oInteractStatus & INT_STATUS_INTERACTED)
+    && !(o->oInteractStatus & INT_STATUS_TOUCHED_BOB_OMB)) {
         spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
         obj_mark_for_deletion(o);
         return TRUE;
@@ -70,9 +71,9 @@ void bhv_temp_coin_loop(void) {
 }
 
 void bhv_coin_init(void) {
-    o->oVelY = ((random_float() * 10.0f) + 30 + o->oCoinBaseYVel);
-    o->oForwardVel = (random_float() * 10.0f);
-    o->oMoveAngleYaw = random_u16();
+    o->oVelY         = (((random_float() * 10.0f) + 30) + o->oCoinBaseYVel);
+    o->oForwardVel   =   (random_float() * 10.0f);
+    o->oMoveAngleYaw =    random_u16();
 
     cur_obj_set_behavior(bhvYellowCoin);
     obj_set_hitbox(o, &sYellowCoinHitbox);
@@ -104,10 +105,14 @@ void bhv_coin_loop(void) {
     }
     if (o->oMoveFlags & OBJ_MOVE_LANDED) {
 #ifdef COIN_LAVA_FLICKER
-        if (o->oMoveFlags & OBJ_MOVE_ABOVE_DEATH_BARRIER) obj_mark_for_deletion(o);
-        if ((o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) && cur_obj_wait_then_blink(0, 20)) obj_mark_for_deletion(o);
+        if ((o->oMoveFlags & OBJ_MOVE_ABOVE_DEATH_BARRIER)
+        || ((o->oMoveFlags & OBJ_MOVE_ABOVE_LAVA) && cur_obj_wait_then_blink(0, 20))) {
+            obj_mark_for_deletion(o);
+        }
 #else
-        if (o->oMoveFlags & (OBJ_MOVE_ABOVE_DEATH_BARRIER | OBJ_MOVE_ABOVE_LAVA)) obj_mark_for_deletion(o);
+        if (o->oMoveFlags & (OBJ_MOVE_ABOVE_DEATH_BARRIER | OBJ_MOVE_ABOVE_LAVA)) {
+            obj_mark_for_deletion(o);
+        }
 #endif
     }
     if (o->oMoveFlags & OBJ_MOVE_BOUNCE) {
@@ -130,7 +135,8 @@ void bhv_coin_formation_spawn_loop(void) {
         if (o->oCoinSnapToGround) {
             o->oPosY += 300.0f;
             cur_obj_update_floor_height();
-            if (o->oPosY < o->oFloorHeight || o->oFloorHeight < FLOOR_LOWER_LIMIT_MISC) {
+            if ((o->oPosY < o->oFloorHeight)
+             || (o->oFloorHeight < FLOOR_LOWER_LIMIT_MISC)) {
                 obj_mark_for_deletion(o);
             } else {
                 o->oPosY = o->oFloorHeight;
@@ -180,7 +186,9 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
             pos[2] = sCoinArrowPositions[index][1];
             break;
     }
-    if (shape & COIN_FORMATION_BP_FLYING) snapToGround = FALSE;
+    if (shape & COIN_FORMATION_BP_FLYING) {
+        snapToGround = FALSE;
+    }
     if (spawnCoin) {
         struct Object *newCoin = spawn_object_relative(index, pos[0], pos[1], pos[2], o, MODEL_YELLOW_COIN, bhvCoinFormationSpawn);
         newCoin->oCoinSnapToGround = snapToGround;

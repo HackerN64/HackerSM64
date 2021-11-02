@@ -177,7 +177,7 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     obj->oHealth = 2048;
 
     obj->oCollisionDistance = 1000.0f;
-    obj->oDrawingDistance = 4500.0f;
+    obj->oDrawingDistance   = 4500.0f;
 
     mtxf_identity(obj->transform);
 
