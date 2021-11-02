@@ -20,7 +20,7 @@
 //#define DEBUG_LEVEL_SELECT
 
 // Enable debug free move (DPad up to enter, A to exit)
-//#define ENABLE_DEBUG_FREE_MOVE
+#define ENABLE_DEBUG_FREE_MOVE
 
 // Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
 //#define CUSTOM_DEBUG
@@ -38,7 +38,7 @@
 //#define VISUAL_DEBUG
 
 // Open all courses and doors. Used for debugging purposes to unlock all content.
-//#define UNLOCK_ALL
+#define UNLOCK_ALL
 
 // Removes the limit on FPS
 //#define UNLOCK_FPS
