@@ -594,7 +594,7 @@ s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
         f32 rippleZ = (rippleMag * cosf(rippleRate * (2 * M_PI) * (rippleTimer - rippleDistance)));
 
         // round it to an int and return it
-        return round_float(rippleZ);
+        return roundf(rippleZ);
     }
 }
 

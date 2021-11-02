@@ -295,9 +295,9 @@ void get_texture_coords_4_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
  * @param shadowVertexType One of SHADOW_WITH_9_VERTS or SHADOW_WITH_4_VERTS
  */
 void make_shadow_vertex_at_xyz(Vtx *vertices, s8 index, f32 relX, f32 relY, f32 relZ, u8 alpha, s8 shadowVertexType) {
-    s16 vtxX = round_float(relX);
-    s16 vtxY = round_float(relY);
-    s16 vtxZ = round_float(relZ);
+    s16 vtxX = roundf(relX);
+    s16 vtxY = roundf(relY);
+    s16 vtxZ = roundf(relZ);
     s16 textureX = 0;
     s16 textureY = 0;
 

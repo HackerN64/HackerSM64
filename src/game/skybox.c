@@ -161,7 +161,7 @@ s32 calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
 
     // Scale by 360 / fov
     f32 degreesToScale = ((360.0f * pitchInDegrees) / 90.0f);
-    s32 roundedY = round_float(degreesToScale);
+    s32 roundedY = roundf(degreesToScale);
 
     // Since pitch can be negative, and the tile grid starts 1 octant above the camera's focus, add
     // 5 octants to the y position

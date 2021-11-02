@@ -62,14 +62,6 @@ void make_vertex(Vtx *vtx, s32 n, f32 x, f32 y, f32 z, s16 tx, s16 ty, u8 r, u8 
     vtx[n].v.cn[3] = a;
 }
 
-/**
- * Round `num` to the nearest `s32`.
- */
-s32 round_float(f32 num) {
-    return roundf(num);
-    // return ((num >= 0.0f) ? (num + 0.5f) : (num - 0.5f));
-}
-
 #define NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT 10
 /**
  * Create a display list for the light in the castle lobby that shows the
@@ -150,7 +142,7 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
             col = (n % 3);
 
             x  = vertexData[(n * 4) + 0];
-            y  = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0f);
+            y  = roundf(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0f);
             z  = vertexData[(n * 4) + 1];
             tx = vertexData[(n * 4) + 2];
             ty = vertexData[(n * 4) + 3];
