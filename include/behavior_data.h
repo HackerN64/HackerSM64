@@ -217,7 +217,6 @@ extern const BehaviorScript bhvRockSolid[];
 extern const BehaviorScript bhvBowserSubDoor[];
 extern const BehaviorScript bhvBowsersSub[];
 extern const BehaviorScript bhvSushiShark[];
-extern const BehaviorScript bhvSushiSharkCollisionChild[];
 extern const BehaviorScript bhvJrbSlidingBox[];
 extern const BehaviorScript bhvShipPart3[];
 extern const BehaviorScript bhvInSunkenShip3[];
