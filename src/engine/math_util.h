@@ -59,19 +59,6 @@ extern f32 gSineTable[];
 #define degrees_to_radians(x) (f32)(   (f32)(x) * RAD_PER_DEG       )
 #define radians_to_degrees(x) (f32)(   (f32)(x) * DEG_PER_RAD       )
 
-#define asm_abs_s(dst, src) __asm__("abs.s %0,%1" : "=f" (dst) : "f" (src))
-#define asm_abs_d(dst, src) __asm__("abs.d %0,%1" : "=f" (dst) : "f" (src))
-#define asm_abs_s_self(dst) __asm__("abs.s %0,%1" : "=f" (dst) : "f" (dst))
-#define asm_abs_d_self(dst) __asm__("abs.d %0,%1" : "=f" (dst) : "f" (dst))
-#define ABSF(x) ((x) > 0.0f ? (x) : -(x))
-#define ABSI(x) ((x) > 0    ? (x) : -(x))
-#define ABS(x)  ABSF((x))
-// #define absf(x) ABSF((x))
-#define absi(x) ABSI((x))
-#define abs(x)  ABS((x))
-
-#define FLT_NONZERO(x) (ABSF(x) > NEAR_ZERO)
-
 #define signum_positive(x) ((x < 0) ? -1 : 1)
 
 #define min(a, b) MIN((a), (b)) // ((a) < (b) ? (a) : (b))
@@ -461,8 +448,35 @@ extern f32 gSineTable[];
     }                                   \
 }
 
-s32 roundf(f32 x);
-f32 absf(f32 x);
+inline s32 roundf(f32 in) {
+    f32 tmp;
+    s32 out;
+    __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in ));
+    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
+    return out;
+}
+inline f32 absf(f32 in) {
+    f32 out;
+    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
+    return out;
+}
+inline s32 absi(s32 in) {
+    // s32 out;
+    // __asm__("abs %0,%1" : "=r" (out) : "r" (in));
+    // return out;
+    return ((in > 0) ? in : -in);
+}
+#define abss absi
+// inline s32 abss(s16 in) {
+//     s32 out;
+//     __asm__("abs %0,%1" : "=r" (out) : "r" (in));
+//     return out;
+// }
+
+#define ABS(x)  (((x) > 0) ? (x) : -(x))
+
+#define FLT_NONZERO(x) (absf(x) > NEAR_ZERO)
+
 f32 min_3f(f32 a0, f32 a1, f32 a2);
 s32 min_3i(s32 a0, s32 a1, s32 a2);
 s32 min_3s(s16 a0, s16 a1, s16 a2);

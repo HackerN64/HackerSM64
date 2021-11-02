@@ -2231,10 +2231,10 @@ void parse_p1_controller(void) {
     }
 
     // deadzone checks
-    if (ABS(gdctrl->stickX) >= 6) {
+    if (absi(gdctrl->stickX) >= 6) {
         gdctrl->csrX += gdctrl->stickX * 0.1f;
     }
-    if (ABS(gdctrl->stickY) >= 6) {
+    if (absi(gdctrl->stickY) >= 6) {
         gdctrl->csrY -= gdctrl->stickY * 0.1f;
     }
 

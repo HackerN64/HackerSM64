@@ -173,7 +173,7 @@ static void mr_blizzard_act_rotate(void) {
         // If Dizziness is not 0 and Mr. Blizzard's FaceRollAngle has a magnitude greater than
         // 67.5 degrees move to death action, delete the snowball, and make Mr. Blizzard intangible.
         if (o->oMrBlizzardDizziness != 0.0f) {
-            if (ABSI(o->oFaceAngleRoll) > 0x3000) {
+            if (absi(o->oFaceAngleRoll) > 0x3000) {
                 o->oAction = MR_BLIZZARD_ACT_DEATH;
                 o->prevObj = o->oMrBlizzardHeldObj = NULL;
                 cur_obj_become_intangible();

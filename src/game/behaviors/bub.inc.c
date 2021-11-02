@@ -60,8 +60,8 @@ void bub_act_swimming_towards_mario(void) {
         o->oCheepCheepRandomSwimAway = random_float();
     }
     f32 dy = (o->oPosY - gMarioObject->oPosY);
-    if (o->oPosY < o->oCheepCheepWaterLevel - 50.0f) {
-        if (ABSF(dy) < 500.0f) {
+    if (o->oPosY < (o->oCheepCheepWaterLevel - 50.0f)) {
+        if (absf(dy) < 500.0f) {
             bub_move_vertically(1);
         } else {
             bub_move_vertically(4);
@@ -100,7 +100,7 @@ void bub_act_swimming_away_from_mario(void) {
     }
     f32 dy = (o->oPosY - gMarioObject->oPosY);
     if (o->oPosY < (o->oCheepCheepWaterLevel - 50.0f)) {
-        if (ABSF(dy) < 500.0f) {
+        if (absf(dy) < 500.0f) {
             bub_move_vertically(2);
         } else {
             bub_move_vertically(4);

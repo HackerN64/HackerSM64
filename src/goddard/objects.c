@@ -1302,7 +1302,7 @@ void drag_picked_object(struct GdObj *inputObj) {
     if ((inputObj->drawFlags & OBJ_PICKED) && gGdCtrl.dragging) {
         gd_play_sfx(GD_SFX_PINCH_FACE);
         // Note: this second sfx won't play, as it is "overwritten" by the first
-        if (ABS(ctrl->stickDeltaX) + ABS(ctrl->stickDeltaY) >= 11) {
+        if ((absi(ctrl->stickDeltaX) + absi(ctrl->stickDeltaY)) >= 11) {
             gd_play_sfx(GD_SFX_PINCH_FACE_2);
         }
 

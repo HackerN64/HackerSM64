@@ -115,7 +115,7 @@ static void klepto_change_target(void) {
         newTarget = (random_u16() % 0x3);
     }
 
-    o->oKleptoHomeYOffset  = (400 * ABSI(newTarget - o->oKleptoTargetNumber));
+    o->oKleptoHomeYOffset  = (400 * absi(newTarget - o->oKleptoTargetNumber));
     o->oKleptoTargetNumber = newTarget;
 
     vec3_copy_y_off(&o->oHomeVec, sKleptoTargetPositions[o->oKleptoTargetNumber], o->oKleptoHomeYOffset);

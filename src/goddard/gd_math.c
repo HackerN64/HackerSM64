@@ -39,7 +39,7 @@ void gd_mat4f_lookat(Mat4f *mtx,
     d.y = (yTo - yFrom);
     d.x = (zTo - zFrom);
 
-    invLength = ABS(d.z) + ABS(d.y) + ABS(d.x);
+    invLength = (absf(d.z) + absf(d.y) + absf(d.x));
 
     // Scales 'd' if smaller than 10 or larger than 10,000 to be
     // of a magnitude of 10,000.
@@ -385,7 +385,7 @@ void gd_inverse_mat4f(Mat4f *src, Mat4f *dst) {
     gd_adjunct_mat4f(src, dst);
     determinant = gd_mat4f_det(dst);
 
-    if (ABS(determinant) < 1e-5) { //? 1e-5f
+    if (absf(determinant) < 1e-5) { //? 1e-5f
         fatal_print("Non-singular matrix, no inverse!\n");
     }
 

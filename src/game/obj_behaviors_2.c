@@ -282,7 +282,7 @@ static s32 obj_smooth_turn(s16 *angleVel, s32 *angle, s16 targetAngle, f32 targe
 
     *angleVel = approach_s16_symmetric(*angleVel, ((targetAngle - currentAngle) * targetSpeedProportion), accel);
 
-    s16 currentSpeed = ABSI(*angleVel);
+    s16 currentSpeed = abss(*angleVel);
     clamp_s16(&currentSpeed, minSpeed, maxSpeed);
 
     *angle = approach_angle(*angle, targetAngle, currentSpeed);

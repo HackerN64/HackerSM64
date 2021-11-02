@@ -1277,8 +1277,7 @@ void cur_obj_spawn_loot_coin_at_mario_pos(void) {
 }
 
 f32 cur_obj_abs_y_dist_to_home(void) {
-    f32 dist = (o->oHomeY - o->oPosY);
-    return ABSF(dist);
+    return absf(o->oHomeY - o->oPosY);
 }
 
 s32 cur_obj_advance_looping_anim(void) {
@@ -1721,8 +1720,7 @@ void cur_obj_push_mario_away(f32 radius) {
 }
 
 void cur_obj_push_mario_away_from_cylinder(f32 radius, f32 extentY) {
-    f32 marioRelY = (gMarioObject->oPosY - o->oPosY);
-    if (ABSF(marioRelY) < extentY) {
+    if (absf(gMarioObject->oPosY - o->oPosY) < extentY) {
         cur_obj_push_mario_away(radius);
     }
 }

@@ -228,7 +228,7 @@ s32 act_grab_pole_fast(struct MarioState *m) {
     play_sound_if_no_flag(m, SOUND_MARIO_WHOA, MARIO_MARIO_SOUND_PLAYED);
 #ifdef POLE_SWING
     m->faceAngle[1] += m->angleVel[1];
-    if (ABSI(m->angleVel[1]) > 0x1) {
+    if (abss(m->angleVel[1]) > 0x1) {
         m->angleVel[1] *= 0.8f;
     } else {
         m->angleVel[1] = 0x0;
@@ -253,7 +253,7 @@ s32 act_grab_pole_fast(struct MarioState *m) {
 #endif
 
     if (set_pole_position(m, 0.0f) == POLE_NONE) {
-        if (ABSI(m->angleVel[1]) > 0x800) {
+        if (abss(m->angleVel[1]) > 0x800) {
             set_mario_animation(m, MARIO_ANIM_GRAB_POLE_SWING_PART1);
         } else {
             set_mario_animation(m, MARIO_ANIM_GRAB_POLE_SWING_PART2);
@@ -363,7 +363,7 @@ s32 update_hang_moving(struct MarioState *m) {
         // Reduce Mario's forward speed by the turn amount, so Mario won't move off sideward from the intended angle when turning around.
         m->forwardVel *= ((coss(dYaw) + 1.0f) / 2.0f); // 1.0f is turning forwards, 0.0f is turning backwards
         // Increase turn speed if forwardVel is lower and intendedMag is higher
-        turnRange     *= (2.0f - (ABSF(m->forwardVel) / MAX(m->intendedMag, NEAR_ZERO))); // 1.0f front, 2.0f back
+        turnRange     *= (2.0f - (absf(m->forwardVel) / MAX(m->intendedMag, NEAR_ZERO))); // 1.0f front, 2.0f back
     }
     m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, turnRange);
 #else

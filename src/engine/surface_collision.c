@@ -802,8 +802,7 @@ s32 unused_resolve_floor_or_ceil_collisions(s32 checkCeil, f32 *px, f32 *py, f32
     f32 nz = (*psurface)->normal.z;
     f32 oo = (*psurface)->originOffset;
 
-    f32 offset = ((nx * x) + (ny * y) + (nz * z) + oo);
-    asm_abs_s(offset, offset);
+    f32 offset = absf((nx * x) + (ny * y) + (nz * z) + oo);
 
     // Interesting surface interaction that should be surf type independent.
     if (offset < radius) {

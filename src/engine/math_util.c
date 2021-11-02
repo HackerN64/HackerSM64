@@ -33,31 +33,6 @@ Vec3s gVec3sOne  = {     1,     1,     1 };
 //     __asm__("mfc1 %0,%1" : "=r" (out) : "f" (tmp));
 //     return out;
 // }
-static inline s32 asm_roundf(f32 in) {
-    s32 out;
-    __asm__("round.w.s %0,%1" : "=f" (out) : "f" (in));
-    return out;
-}
-
-inline s32 roundf(f32 x) {
-    return asm_roundf(x);
-}
-
-static inline f32 asm_absf(f32 in) {
-    f32 out;
-    __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
-    return out;
-}
-
-inline f32 absf(f32 x) {
-    return asm_absf(x);
-}
-
-// static inline f32 sqrtf(f32 in) {
-//     f32 out;
-//     __asm__("sqrt.s $f0, $f12" : "=f" (out) : "f" (in));
-//     return out;
-// }
 
 /// Returns the lowest of three values.
 #define min_3_func(a0, a1, a2) {\
@@ -114,9 +89,9 @@ void vec3i_to_vec3f(Vec3f dest, Vec3i src) { vec3_copy_bits(s32, dest, s32, src)
  * to the nearest integer.
  */
 #define vec3_copy_bits_roundf(destFmt, dest, src) { \
-    register destFmt x = asm_roundf(src[0]);        \
-    register destFmt y = asm_roundf(src[1]);        \
-    register destFmt z = asm_roundf(src[2]);        \
+    register destFmt x = roundf(src[0]);            \
+    register destFmt y = roundf(src[1]);            \
+    register destFmt z = roundf(src[2]);            \
     ((destFmt *) dest)[0] = x;                      \
     ((destFmt *) dest)[1] = y;                      \
     ((destFmt *) dest)[2] = z;                      \
@@ -953,7 +928,7 @@ s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
 s32 abs_angle_diff(s16 a0, s16 a1) {
     register s16 diff = (a1 - a0);
     if (diff == -0x8000) return 0x7FFF;
-    return ABSI(diff);
+    return abss(diff);
 }
 
 /**
@@ -1277,10 +1252,12 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     }
 
     // Get cells we cross using DDA
-    if (ABS(dir[0]) >= ABS(dir[2])) {
-        step = ((RAY_STEPS * ABS(dir[0])) * invcell);
+    f32 absDir0 = absf(dir[0]);
+    f32 absDir2 = absf(dir[2]);
+    if (absDir0 >= absDir2) {
+        step = ((RAY_STEPS * absDir0) * invcell);
     } else {
-        step = ((RAY_STEPS * ABS(dir[2])) * invcell);
+        step = ((RAY_STEPS * absDir2) * invcell);
     }
 
     f32 dx = ((dir[0] / step) * invcell);

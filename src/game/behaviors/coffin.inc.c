@@ -98,7 +98,7 @@ void coffin_act_idle(void) {
             if ((o->oTimer > 60)
              && ((o->oDistanceToMario > 100.0f) || (gMarioState->action == ACT_SQUISHED))
              && ((gMarioObject->oPosY - o->oPosY) < 200.0f)
-             && (ABSF(distForwards) < 140.0f)
+             && (absf(distForwards) < 140.0f)
              && (distSideways <  150.0f)
              && (distSideways > -450.0f)) {
                 cur_obj_play_sound_2(SOUND_GENERAL_BUTTON_PRESS_2_LOWPRIO);

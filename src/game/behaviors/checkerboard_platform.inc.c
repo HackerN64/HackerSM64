@@ -45,7 +45,7 @@ void checkerboard_plat_act_move_y(f32 vel, s32 time) {
 void checkerboard_plat_act_rotate(s32 nextAction, s16 pitch) {
     o->oVelY = 0.0f;
     o->oAngleVelPitch = pitch;
-    if (o->oTimer + 1 == 0x8000 / ABSI(pitch)) {
+    if ((o->oTimer + 1) == (0x8000 / abss(pitch))) {
         o->oAction = nextAction;
     }
     o->oCheckerBoardPlatformRotateAction = nextAction;
@@ -83,14 +83,14 @@ void bhv_checkerboard_platform_loop(void) {
             checkerboard_plat_act_rotate(1, -512);
             break;
     }
-    o->oMoveAnglePitch += ABSI(o->oAngleVelPitch);
-    o->oFaceAnglePitch += ABSI(o->oAngleVelPitch);
+    o->oMoveAnglePitch += absi(o->oAngleVelPitch);
+    o->oFaceAnglePitch += absi(o->oAngleVelPitch);
     o->oFaceAngleYaw = o->oMoveAngleYaw;
 
     if (o->oMoveAnglePitch != 0) {
-        f32 mul = ((o->oAngleVelPitch >= 0) ? 1.0f : -1.0f) * radius;
-        o->oForwardVel = mul * sins(o->oMoveAnglePitch);
-        o->oVelY       = mul * coss(o->oMoveAnglePitch);
+        f32 mul = (((o->oAngleVelPitch >= 0) ? 1.0f : -1.0f) * radius);
+        o->oForwardVel = (mul * sins(o->oMoveAnglePitch));
+        o->oVelY       = (mul * coss(o->oMoveAnglePitch));
     }
     if (o->oCheckerBoardPlatformRotateAction == 1) {
         o->oAngleVelPitch = 0;

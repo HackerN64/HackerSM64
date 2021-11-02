@@ -278,7 +278,7 @@ void puppylights_object_emit(struct Object *obj) {
         }
         if (obj->oLightID == 0xFFFF) {
             s32 fadingExists = FALSE;
-            if (ABS(gNumLights - gDynLightStart) < MAX_LIGHTS_DYNAMIC) {
+            if (absi(gNumLights - gDynLightStart) < MAX_LIGHTS_DYNAMIC) {
                 puppylights_deallocate_obj(obj);
                 return;
             }

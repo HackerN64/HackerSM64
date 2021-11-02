@@ -511,7 +511,7 @@ void draw_camera(struct ObjCamera *cam) {
         sp44.z = cam->lookAt.z;
     }
 
-    if (ABS(cam->worldPos.x - sp44.x) + ABS(cam->worldPos.z - sp44.z) == 0.0f) {
+    if ((absf(cam->worldPos.x - sp44.x) + absf(cam->worldPos.z - sp44.z)) == 0.0f) {
         gd_printf("Draw_Camera(): Zero view distance\n");
         return;
     }
@@ -560,15 +560,14 @@ void check_grabbable_click(struct GdObj *input) {
     objPos.y = (*mtx)[3][1];
     objPos.z = (*mtx)[3][2];
     world_pos_to_screen_coords(&objPos, gViewUpdateCamera, sUpdateViewState.view);
-    if (ABS(gGdCtrl.csrX - objPos.x) < 20.0f) {
-        if (ABS(gGdCtrl.csrY - objPos.y) < 20.0f) {
-            // store (size, Obj Type, Obj Index) in s16 pick buffer array
-            store_in_pickbuf(2);
-            store_in_pickbuf(obj->type);
-            store_in_pickbuf(obj->index);
-            sGrabCords.x = objPos.x;
-            sGrabCords.y = objPos.y;
-        }
+    if ((absi(gGdCtrl.csrX - objPos.x) < 20.0f)
+     && (absi(gGdCtrl.csrY - objPos.y) < 20.0f)) {
+        // store (size, Obj Type, Obj Index) in s16 pick buffer array
+        store_in_pickbuf(2);
+        store_in_pickbuf(obj->type);
+        store_in_pickbuf(obj->index);
+        sGrabCords.x = objPos.x;
+        sGrabCords.y = objPos.y;
     }
 }
 

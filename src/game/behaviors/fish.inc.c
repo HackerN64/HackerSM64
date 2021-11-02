@@ -122,7 +122,7 @@ static void fish_act_roam(void) {
     cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x400);
 
     if (o->oPosY < (o->oFishWaterLevel - 50.0f)) {
-        if (ABSF(fishY) < 500.0f) {
+        if (absf(fishY) < 500.0f) {
             fish_vertical_roam(2);
         } else {
             fish_vertical_roam(4);
@@ -174,7 +174,7 @@ static void fish_act_flee(void) {
     cur_obj_rotate_yaw_toward((o->oAngleToMario + 0x8000), o->oFishYawVel);
 
     if (o->oPosY < (o->oFishWaterLevel - 50.0f)) {
-        if (ABSF(fishY) < 500.0f) {
+        if (absf(fishY) < 500.0f) {
             fish_vertical_roam(2);
         } else {
             fish_vertical_roam(4);

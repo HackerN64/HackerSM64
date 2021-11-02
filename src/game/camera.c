@@ -1870,7 +1870,7 @@ s32 update_default_camera(struct Camera *c) {
         if (xzDist >= 250) {
             sStatusFlags &= ~CAM_FLAG_BEHIND_MARIO_POST_DOOR;
         }
-        if (ABS((sMarioCamState->faceAngle[1] - yaw) / 2) < 0x1800) {
+        if (abss((sMarioCamState->faceAngle[1] - yaw) / 2) < 0x1800) {
             sStatusFlags &= ~CAM_FLAG_BEHIND_MARIO_POST_DOOR;
             yaw = sCameraYawAfterDoorCutscene + DEGREES(180);
             dist = 800.0f;
@@ -3496,7 +3496,7 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
             norm[2] = wall->normal.z;
             originOffset = wall->originOffset;
             offset = (vec3_dot(norm, newPos[i]) + originOffset);
-            if (ABSF(offset) < radius) {
+            if (absf(offset) < radius) {
                 newPos[i][0] += (norm[0] * (radius - offset));
                 newPos[i][2] += (norm[2] * (radius - offset));
                 vec3f_copy(pos, newPos[i]);
@@ -3568,11 +3568,11 @@ void approach_vec3s_asymptotic(Vec3s current, Vec3s target, s16 xMul, s16 yMul, 
 
 //! move these to math_util
 s32 camera_approach_s16_symmetric_bool(s16 *current, s16 target, s16 inc) {
-    return approach_s16_symmetric_bool(current, target, ABSI(inc));
+    return approach_s16_symmetric_bool(current, target, abss(inc));
 }
 
 s32 camera_approach_s16_symmetric(s16 current, s16 target, s16 inc) {
-    return approach_s16_symmetric(current, target, ABSI(inc));
+    return approach_s16_symmetric(current, target, abss(inc));
 }
 
 s32 set_or_approach_s16_symmetric(s16 *current, s16 target, s16 increment) {
@@ -3590,14 +3590,14 @@ s32 set_or_approach_s16_symmetric(s16 *current, s16 target, s16 increment) {
  * It could possibly be an older version of the function
  */
 s32 camera_approach_f32_symmetric_bool(f32 *current, f32 target, f32 inc) {
-    return approach_f32_symmetric_bool(current, target, ABSF(inc));
+    return approach_f32_symmetric_bool(current, target, absf(inc));
 }
 
 /**
  * Nearly the same as the above function, this one returns the new value in place of a bool.
  */
 f32 camera_approach_f32_symmetric(f32 current, f32 target, f32 inc) {
-    return approach_f32_symmetric(current, target, ABSF(inc));
+    return approach_f32_symmetric(current, target, absf(inc));
 }
 
 /**
@@ -3715,15 +3715,15 @@ s32 is_surf_within_bounding_box(struct Surface *surf, f32 xMax, f32 yMax, f32 zM
         if (j >= 3) {
             j = 0;
         }
-        dx = ABS(sx[i] - sx[j]);
+        dx = abss(sx[i] - sx[j]);
         if (dx > dxMax) {
             dxMax = dx;
         }
-        dy = ABS(sy[i] - sy[j]);
+        dy = abss(sy[i] - sy[j]);
         if (dy > dyMax) {
             dyMax = dy;
         }
-        dz = ABS(sz[i] - sz[j]);
+        dz = abss(sz[i] - sz[j]);
         if (dz > dzMax) {
             dzMax = dz;
         }
@@ -3892,7 +3892,7 @@ void set_camera_pitch_shake(s16 mag, s16 decay, s16 inc) {
  * Start shaking the camera's yaw (side to side)
  */
 void set_camera_yaw_shake(s16 mag, s16 decay, s16 inc) {
-    if (ABS(mag) > ABS(gLakituState.shakeMagnitude[1])) {
+    if (abss(mag) > abss(gLakituState.shakeMagnitude[1])) {
         gLakituState.shakeMagnitude[1] = mag;
         gLakituState.shakeYawDecay = decay;
         gLakituState.shakeYawVel = inc;
@@ -4583,9 +4583,9 @@ s32 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
     // Transition from the last mode to the current one
     if (sModeTransition.framesLeft > 0) {
         vec3f_get_dist_and_angle(curFoc, curPos, &goalDist, &goalPitch, &goalYaw);
-        distVelocity  = (ABS(goalDist  - sModeTransition.posDist ) /  distTimer);
-        pitchVelocity = (ABS(goalPitch - sModeTransition.posPitch) / angleTimer);
-        yawVelocity   = (ABS(goalYaw   - sModeTransition.posYaw  ) / angleTimer);
+        distVelocity  = (absf(goalDist  - sModeTransition.posDist ) /  distTimer);
+        pitchVelocity = (abss(goalPitch - sModeTransition.posPitch) / angleTimer);
+        yawVelocity   = (abss(goalYaw   - sModeTransition.posYaw  ) / angleTimer);
 
         camera_approach_f32_symmetric_bool(&sModeTransition.posDist, goalDist, distVelocity);
         camera_approach_s16_symmetric_bool(&sModeTransition.posYaw, goalYaw, yawVelocity);
@@ -6368,7 +6368,7 @@ void cutscene_ending_mario_fall_focus_mario(struct Camera *c) {
     Vec3f offset;
     offset[0] =  0.0f;
     offset[1] = 80.0f;
-    offset[2] = (ABS(sMarioCamState->pos[1] - c->pos[1]) * -0.1f);
+    offset[2] = (absf(sMarioCamState->pos[1] - c->pos[1]) * -0.1f);
     if (offset[2] > -100.0f) {
         offset[2] = -100.0f;
     }
@@ -7471,7 +7471,7 @@ void cutscene_red_coin_star_warp(struct Camera *c) {
     posYaw = calculate_yaw(sCutsceneVars[1].point, c->pos);
     yaw    = calculate_yaw(sCutsceneVars[1].point, sMarioCamState->pos);
 
-    if (ABS((yaw - posYaw) + DEGREES(90)) < ABS((yaw - posYaw) - DEGREES(90))) {
+    if (abss((yaw - posYaw) + DEGREES(90)) < abss((yaw - posYaw) - DEGREES(90))) {
         yaw += DEGREES(90);
     } else {
         yaw -= DEGREES(90);
@@ -7597,7 +7597,7 @@ void cutscene_prepare_cannon_fly_to_cannon(struct Camera *c) {
  * Used in the cannon opening cutscene to fly back to the camera's last position and focus
  */
 void cannon_approach_prev(f32 *value, f32 target) {
-    f32 inc = (ABS(target - *value) / sCutsceneVars[2].point[0]);
+    f32 inc = (absf(target - *value) / sCutsceneVars[2].point[0]);
     camera_approach_f32_symmetric_bool(value, target, inc);
 }
 

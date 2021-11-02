@@ -21,7 +21,7 @@ void bhv_beta_trampoline_spring_loop(void) {
     f32 yDisplacement;
 
     // Update to be 75 units under the trampoline top
-    obj_copy_pos_and_angle(o, o->parentObj);
+    obj_copy_pos_and_angle( o, o->parentObj);
     obj_copy_graph_y_offset(o, o->parentObj);
     o->oPosY -= 75.0f;
 
@@ -29,8 +29,8 @@ void bhv_beta_trampoline_spring_loop(void) {
     // scale the spring by (the displacement)/10 + 1.
     // For this to work correctly, the arbitrary value of 10
     // must be replaced with 150 (the height of the trampoline).
-    if ((yDisplacement = o->oPosY - o->oHomeY) >= 0) {
-        yScale = yDisplacement / 150.0f + 1.0f;
+    if ((yDisplacement = (o->oPosY - o->oHomeY)) >= 0) {
+        yScale = ((yDisplacement / 150.0f) + 1.0f);
     } else {
         // Otherwise (if the trampoline is compressed),
         // scale by 1 - (the displacement)/500.
@@ -38,7 +38,7 @@ void bhv_beta_trampoline_spring_loop(void) {
         // must be replaced with 150 (the height of the trampoline),
         // as with the above code.
         yDisplacement = -yDisplacement;
-        yScale = 1.0f - yDisplacement / 150.0f;
+        yScale = (1.0f - (yDisplacement / 150.0f));
     }
 
     // Scale the spring
