@@ -107,7 +107,7 @@ void alloc_pool(void) {
     void *end   = (void *) (SEG_POOL_START + POOL_SIZE);
 
     main_pool_init(start, end);
-    gEffectsMemoryPool = mem_pool_init(0x4000, MEMORY_POOL_LEFT);
+    gEffectsMemoryPool = mem_pool_init(EFFECTS_MEMORY_POOL, MEMORY_POOL_LEFT);
 #ifdef PUPPYLIGHTS
     gLightsPool = mem_pool_init(PUPPYLIGHTS_POOL, MEMORY_POOL_LEFT);
 #endif

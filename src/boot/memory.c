@@ -2,8 +2,6 @@
 
 #include "sm64.h"
 
-#define INCLUDED_FROM_MEMORY_C
-
 #include "buffers/buffers.h"
 #include "slidec.h"
 #include "game/game_init.h"

@@ -145,9 +145,11 @@ void puppyprint_calculate_ram_usage(void) {
     }
 
     // These are a bit hacky, but what can ye do eh?
-    // gEffectsMemoryPool is 0x4000, gObjectsMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
-    ramsizeSegment[5] = (0x4000 + 0x800 + 0x4000 + 0x800);
-    ramsizeSegment[6] = ((SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + (SURFACE_POOL_SIZE * sizeof(struct Surface)));
+    // gEffectsMemoryPool is 0x4000, gObjectMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
+    ramsizeSegment[5] = (EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL
+                      +  EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL);
+    ramsizeSegment[6] = ((SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode))
+                      +  (     SURFACE_POOL_SIZE * sizeof(struct Surface    )));
     ramsizeSegment[7] = gAudioHeapSize;
 }
 
@@ -225,7 +227,7 @@ void print_ram_bar(void) {
             continue;
         }
         perfPercentage = ((f32)ramsizeSegment[i] / ramsize);
-        graphPos = prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_CENTER_X + (BAR_LENGTH / 2)));
+        graphPos = (prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_CENTER_X + (BAR_LENGTH / 2))));
         render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22),
             colourChart[i][0],
             colourChart[i][1],

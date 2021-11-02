@@ -468,9 +468,9 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
 void clear_objects(void) {
     s32 i;
 
-    gTHIWaterDrained = 0;
-    gTimeStopState = 0;
-    gMarioObject = NULL;
+    gTHIWaterDrained  = 0;
+    gTimeStopState    = 0;
+    gMarioObject      = NULL;
     gMarioCurrentRoom = 0;
 
     for (i = 0; i < 60; i++) {
@@ -488,8 +488,8 @@ void clear_objects(void) {
         geo_reset_object_node(&gObjectPool[i].header.gfx);
     }
 
-    gObjectMemoryPool = mem_pool_init(0x800, MEMORY_POOL_LEFT);
-    gObjectLists = gObjectListArray;
+    gObjectMemoryPool = mem_pool_init(OBJECT_MEMORY_POOL, MEMORY_POOL_LEFT);
+    gObjectLists      = gObjectListArray;
 
     clear_dynamic_surfaces();
 }
