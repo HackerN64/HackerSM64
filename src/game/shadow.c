@@ -348,7 +348,6 @@ void add_shadow_to_display_list(Gfx *displayListHead, Vtx *verts, s8 shadowShape
             gSPDisplayList(displayListHead++, dl_shadow_square) break;
     }
     gSPVertex(displayListHead++, verts, 4, 0);
-    gSPDisplayList(displayListHead++, dl_shadow_4_verts);
     gSPDisplayList(displayListHead++, dl_shadow_end);
     gSPEndDisplayList(displayListHead);
 }
@@ -643,6 +642,7 @@ Gfx *create_shadow_hardcoded_rectangle(struct Shadow *s, f32 xPos, f32 yPos, f32
     return create_shadow_rectangle(halfWidth, halfLength, -distFromShadow, solidity);
 }
 
+extern struct MarioState *gMarioState;
 /**
  * Create a shadow at the absolute position given, with the given parameters.
  * Return a pointer to the display list representing the shadow.
@@ -650,9 +650,12 @@ Gfx *create_shadow_hardcoded_rectangle(struct Shadow *s, f32 xPos, f32 yPos, f32
 Gfx *create_shadow_below_xyz(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 shadowSolidity, s8 shadowType) {
     struct Shadow s;
 
-    if ((gCurGraphNodeObjectNode !=  gMarioObject)
-     && (gCurGraphNodeObject     != &gMirrorMario)
-     && (gCurGraphNodeObjectNode->oFloor != NULL)) {
+    // Attempt to use existing floors before finding a new one.
+    if (gCurGraphNodeObjectNode == gMarioObject) {
+        s.floor       = gMarioState->floor;
+        s.floorHeight = gMarioState->floorHeight;
+    } else if ((gCurGraphNodeObject != &gMirrorMario)
+            && (gCurGraphNodeObjectNode->oFloor != NULL)) {
         s.floor       = gCurGraphNodeObjectNode->oFloor;
         s.floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
     } else {

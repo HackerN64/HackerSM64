@@ -430,6 +430,10 @@ void try_print_debug_mario_object_info(void) {
     if (gUnknownWallCount != 0) {
         print_debug_bottom_up("WALL   %d", gUnknownWallCount);
     }
+
+    // gNumCalls.floor = 0;
+    // gNumCalls.ceil  = 0;
+    // gNumCalls.wall  = 0;
 }
 
 /*
