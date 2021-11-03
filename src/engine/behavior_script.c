@@ -40,19 +40,16 @@ UNUSED static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
 
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
 u32 random_u16(void) {
-    u16 temp1, temp2;
-
     if (gRandomSeed16 == 22026) {
         gRandomSeed16 = 0;
     }
 
-    temp1 = ((gRandomSeed16 & 0x00FF) << 8);
-    temp1 = (temp1 ^ gRandomSeed16);
+    u16 temp1 = (((gRandomSeed16 & 0x00FF) << 8) ^ gRandomSeed16);
 
     gRandomSeed16 = ((temp1 & 0x00FF) << 8) + ((temp1 & 0xFF00) >> 8);
 
     temp1 = (((temp1 & 0x00FF) << 1) ^ gRandomSeed16);
-    temp2 = ((temp1 >> 1) ^ 0xFF80);
+    u16 temp2 = ((temp1 >> 1) ^ 0xFF80);
 
     if ((temp1 & 0x1) == 0) {
         if (temp2 == 43605) {
@@ -431,7 +428,7 @@ static s32 bhv_cmd_set_int_rand_rshift(void) {
     s32 min    = BHV_CMD_GET_2ND_S16(0);
     s32 rshift = BHV_CMD_GET_1ST_S16(1);
 
-    cur_obj_set_int(field, (random_u16() >> rshift) + min);
+    cur_obj_set_int(field, ((random_u16() >> rshift) + min));
 
     gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
@@ -444,7 +441,7 @@ static s32 bhv_cmd_add_random_float(void) {
     f32 min   = BHV_CMD_GET_2ND_S16(0);
     f32 range = BHV_CMD_GET_1ST_S16(1);
 
-    cur_obj_set_float(field, cur_obj_get_float(field) + min + (range * random_float()));
+    cur_obj_set_float(field, (cur_obj_get_float(field) + min + (range * random_float())));
 
     gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
@@ -675,30 +672,10 @@ static s32 bhv_cmd_begin(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// An unused, incomplete behavior command that does not have an entry in the lookup table, and so no command number.
-// It cannot be simply re-added to the table, as unlike all other bhv commands it takes a parameter.
-// Theoretically this command would have been of variable size.
-// Included below is a modified/repaired version of this function that would work properly.
-UNUSED static void bhv_cmd_set_int_random_from_table(s32 tableSize) {
-    u8 field = BHV_CMD_GET_2ND_U8(0);
-    s32 table[16];
-    s32 i;
-    // This for loop would not work as intended at all...
-    for (i = 0; i <= tableSize / 2; i += 2) {
-        table[i + 0] = BHV_CMD_GET_1ST_S16(i + 1);
-        table[i + 1] = BHV_CMD_GET_2ND_S16(i + 1);
-    }
-
-    cur_obj_set_int(field, table[(s32)(tableSize * random_float())]);
-
-    // Does not increment gCurBhvCommand or return a bhv status
-}
-
-/**
 // Command 0x??: Sets the specified field to a random entry in the given table, up to size 16.
 // Bytes: ?? FF SS SS V1 V1 V2 V2 V3 V3 V4 V4... ...V15 V15 V16 V16 (no macro exists)
 // F -> field, S -> table size, V1, V2, etc. -> table entries (up to 16)
-static s32 bhv_cmd_set_int_random_from_table(void) {
+UNUSED static s32 bhv_cmd_set_int_random_from_table(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
     // Retrieve tableSize from the bhv command instead of as a parameter.
     s16 tableSize = BHV_CMD_GET_2ND_S16(0); // tableSize should not be greater than 16
@@ -707,17 +684,16 @@ static s32 bhv_cmd_set_int_random_from_table(void) {
 
     // Construct the table from the behavior command.
     for (i = 0; i <= tableSize; i += 2) {
-        table[i] = BHV_CMD_GET_1ST_S16((i / 2) + 1);
+        table[i + 0] = BHV_CMD_GET_1ST_S16((i / 2) + 1);
         table[i + 1] = BHV_CMD_GET_2ND_S16((i / 2) + 1);
     }
 
     // Set the field to a random entry of the table.
     cur_obj_set_int(field, table[(s32)(tableSize * random_float())]);
 
-    gCurBhvCommand += (tableSize / 2) + 1;
+    gCurBhvCommand += ((tableSize / 2) + 1);
     return BHV_PROC_CONTINUE;
 }
-**/
 
 // Command 0x2A: Loads collision data for the object.
 // Usage: LOAD_COLLISION_DATA(collisionData)
