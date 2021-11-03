@@ -606,7 +606,8 @@ struct WarpNode *get_painting_warp_node(void) {
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
 void initiate_painting_warp(void) {
-    if ((gCurrentArea->paintingWarpNodes != NULL) && (gMarioState->floor != NULL)) {
+    if ((gCurrentArea->paintingWarpNodes != NULL)
+     && (gMarioState->floor              != NULL)) {
         struct WarpNode warpNode;
         struct WarpNode *pWarpNode = get_painting_warp_node();
 
@@ -620,7 +621,7 @@ void initiate_painting_warp(void) {
                     sWarpCheckpointActive = check_warp_checkpoint(&warpNode);
                 }
 
-                initiate_warp(warpNode.destLevel & 0x7F, warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
+                initiate_warp((warpNode.destLevel & 0x7F), warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
                 check_if_should_set_warp_checkpoint(&warpNode);
 
                 play_transition_after_delay(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255, 45);
@@ -910,8 +911,8 @@ s32 play_mode_normal(void) {
     if (gCurrDemoInput != NULL) {
         print_intro_text();
         if (gPlayer1Controller->buttonPressed & END_DEMO) {
-            level_trigger_warp(gMarioState, gCurrLevelNum == LEVEL_PSS ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT);
-        } else if (!gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
+            level_trigger_warp(gMarioState, ((gCurrLevelNum == LEVEL_PSS) ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT));
+        } else if (!gWarpTransition.isActive && (sDelayedWarpOp == WARP_OP_NONE)
                    && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
             level_trigger_warp(gMarioState, WARP_OP_DEMO_NEXT);
         }
@@ -921,7 +922,7 @@ s32 play_mode_normal(void) {
     warp_area(gMarioState);
     check_instant_warp(gMarioState);
 
-    if (sTimerRunning && gHudDisplay.timer < 17999) {
+    if (sTimerRunning && (gHudDisplay.timer < 17999)) {
         gHudDisplay.timer++;
     }
 

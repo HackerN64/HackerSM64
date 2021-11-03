@@ -711,7 +711,7 @@ void thread5_game_loop(UNUSED void *arg) {
             lastTime = osGetTime();
             collisionTime[perfIteration] = 0;
             behaviourTime[perfIteration] = 0;
-            dmaTime[perfIteration] = 0;
+                  dmaTime[perfIteration] = 0;
 #endif
 
         // If any controllers are plugged in, start read the data for when

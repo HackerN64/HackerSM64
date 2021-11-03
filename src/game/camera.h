@@ -88,13 +88,15 @@
 #define CAM_MODE_MARIO_SELECTED         (1 << 2) // 0x04
 
 enum CameraSelection {
-    CAM_SELECTION_MARIO = 1,
-    CAM_SELECTION_FIXED = 2
+    CAM_SELECTION_NONE,
+    CAM_SELECTION_MARIO,
+    CAM_SELECTION_FIXED,
 };
 
 enum CameraAngle {
-    CAM_ANGLE_MARIO  = 1,
-    CAM_ANGLE_LAKITU = 2
+    CAM_ANGLE_NONE,
+    CAM_ANGLE_MARIO,
+    CAM_ANGLE_LAKITU,
 };
 
 enum CameraMode {
