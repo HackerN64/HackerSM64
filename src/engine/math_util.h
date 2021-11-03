@@ -465,19 +465,11 @@ inline f32 absf(f32 in) {
     return out;
 }
 inline s32 absi(s32 in) {
-    // s32 out;
-    // __asm__("abs %0,%1" : "=r" (out) : "r" (in));
-    // return out;
     return ABS(in);
 }
 #define abss absi
-// inline s32 abss(s16 in) {
-//     s32 out;
-//     __asm__("abs %0,%1" : "=r" (out) : "r" (in));
-//     return out;
-// }
 
-#define FLT_NONZERO(x) (absf(x) > NEAR_ZERO)
+#define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
 
 f32 min_3f(f32 a0, f32 a1, f32 a2);
 s32 min_3i(s32 a0, s32 a1, s32 a2);
