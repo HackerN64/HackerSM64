@@ -114,6 +114,9 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             data->walls[data->numWalls++] = surf;
         }
         numCols++;
+        if (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST) {
+            break;
+        }
     }
     data->x = pos[0];
     data->z = pos[2];
@@ -271,7 +274,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
         if (y >= surf->upperY) continue;
         *pheight = height;
         ceil = surf;
-        if (height == y) break;
+        if ((height == y) || (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST)) break;
     }
     return ceil;
 }
@@ -394,7 +397,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         *pheight = height;
         floor = surf;
         // Exit the loop if it's not possible for another floor to be closer to the original point
-        if (height == bufferY) break;
+        if ((height == bufferY) || (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST)) break;
     }
     return floor;
 }
