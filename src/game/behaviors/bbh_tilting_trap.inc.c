@@ -37,15 +37,15 @@ void bhv_bbh_tilting_trap_platform_loop(void) {
 
         if ((s16) o->oFaceAnglePitch > 0) {
             if (o->oFaceAnglePitch < 200) {
-                o->oFaceAnglePitch = 0;
+                o->oFaceAnglePitch =    0;
             } else {
-                o->oAngleVelPitch = -200;
+                o->oAngleVelPitch  = -200;
             }
         } else {
             if (o->oFaceAnglePitch > -200) {
-                o->oFaceAnglePitch = 0;
+                o->oFaceAnglePitch =   0;
             } else {
-                o->oAngleVelPitch = 200;
+                o->oAngleVelPitch  = 200;
             }
         }
     }

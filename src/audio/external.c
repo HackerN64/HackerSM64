@@ -1006,12 +1006,12 @@ static void select_current_sounds(u8 bank) {
 static f32 get_sound_pan(f32 x, f32 z) {
     f32 pan;
 
-    f32 absX = (x < 0 ? -x : x);
+    f32 absX = absf(x);
     if (absX > AUDIO_MAX_DISTANCE) {
         absX = AUDIO_MAX_DISTANCE;
     }
 
-    f32 absZ = (z < 0 ? -z : z);
+    f32 absZ = absf(z);
     if (absZ > AUDIO_MAX_DISTANCE) {
         absZ = AUDIO_MAX_DISTANCE;
     }

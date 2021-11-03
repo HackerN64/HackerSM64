@@ -926,10 +926,9 @@ s32 abs_angle_diff(s16 a0, s16 a1) {
  * Helper function for atan2s. Does a look up of the arctangent of y/x assuming
  * the resulting angle is in range [0, 0x2000] (1/8 of a circle).
  */
-#define atan2_lookup(y, x) ((x == 0) ? 0x0 : atans((y) / (x)))
-// static inline u32 atan2_lookup(f32 y, f32 x) {
-//     return ((x == 0) ? 0x0 : atans(y / x));
-// }
+static inline u32 atan2_lookup(f32 y, f32 x) {
+    return ((x == 0) ? 0x0 : atans(y / x));
+}
 
 /**
  * Compute the angle from (0, 0) to (x, y) as a s16. Given that terrain is in

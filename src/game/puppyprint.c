@@ -766,7 +766,7 @@ void finish_blank_box(void) {
 void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a) {
     s32 cycleadd = 0;
     if (((absi(x1 - x2) % 4) == 0) && (a == 255)) {
-        gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
+        gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP);
         cycleadd = 1;
     } else {

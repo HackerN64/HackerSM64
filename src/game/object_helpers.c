@@ -1275,13 +1275,13 @@ void cur_obj_spawn_loot_coin_at_mario_pos(void) {
     obj_copy_pos(coin, gMarioObject);
 }
 
-f32 cur_obj_abs_y_dist_to_home(void) {
+UNUSED f32 cur_obj_abs_y_dist_to_home(void) {
     return absf(o->oHomeY - o->oPosY);
 }
 
 s32 cur_obj_advance_looping_anim(void) {
     s32 animFrame = o->header.gfx.animInfo.animFrame;
-    s32 loopEnd = o->header.gfx.animInfo.currAnim->loopEnd;
+    s32 loopEnd   = o->header.gfx.animInfo.currAnim->loopEnd;
 
     if (animFrame < 0) {
         animFrame = 0;
@@ -1323,7 +1323,7 @@ s32 cur_obj_resolve_wall_collisions(void) {
     if (radius > 0.1f) {
         struct WallCollisionData collisionData;
         collisionData.offsetY = 10.0f;
-        collisionData.radius = radius;
+        collisionData.radius  = radius;
         collisionData.x = (s16) o->oPosX;
         collisionData.y = (s16) o->oPosY;
         collisionData.z = (s16) o->oPosZ;
@@ -1349,7 +1349,8 @@ static void cur_obj_update_floor(void) {
     if (floor != NULL) {
         if (floor->type == SURFACE_BURNING) {
             o->oMoveFlags |= OBJ_MOVE_ABOVE_LAVA;
-        } else if ((floor->type == SURFACE_DEATH_PLANE) || (floor->type == SURFACE_VERTICAL_WIND)) {
+        } else if ((floor->type == SURFACE_DEATH_PLANE)
+                || (floor->type == SURFACE_VERTICAL_WIND)) {
             //! This maybe misses SURFACE_WARP
             o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
         }
@@ -1534,7 +1535,7 @@ void obj_build_transform_relative_to_parent(struct Object *obj) {
 
 void obj_create_transform_from_self(struct Object *obj) {
     obj->oFlags &= ~OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT;
-    obj->oFlags |= OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM;
+    obj->oFlags |=  OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM;
     vec3f_copy(obj->transform[3], &obj->oPosVec);
 }
 
@@ -1823,12 +1824,10 @@ void bhv_init_room(void) {
 }
 
 void cur_obj_enable_rendering_if_mario_in_room(void) {
-    register s32 marioInRoom;
-
     if ((o->oRoom != -1) && (gMarioCurrentRoom != 0)) {
-        marioInRoom = ((gMarioCurrentRoom == o->oRoom)
-                    || (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oRoom)
-                    || (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oRoom));
+        register s32 marioInRoom = ((gMarioCurrentRoom == o->oRoom)
+          || (gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oRoom)
+          || (gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oRoom));
 
         if (marioInRoom) {
             cur_obj_enable_rendering();

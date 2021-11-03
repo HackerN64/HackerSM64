@@ -334,40 +334,35 @@ struct ObjValPtr *make_valptr(struct GdObj *obj, s32 flag, enum ValPtrType type,
 /* @ 22B1DC for 0x430 */
 void reset_plane(struct ObjPlane *plane) {
     struct ObjFace *face;
-    f32 sp48;
-    f32 sp44;
+    f32 norm;
     s32 i;
-    s32 sp30;
-    register f32 sp28;
+    s32 maxNormID;
+    f32 maxNorm = 0.0f;
 
     imin("reset_plane");
 
     face = plane->unk40;
     calc_face_normal(face);
     plane->unk1C = gd_dot_vec3f(&face->vertices[0]->pos, &face->normal);
-    sp48 = 0.0f;
 
-    sp28 = face->normal.x < 0.0f ? -face->normal.x : face->normal.x;
-    sp44 = sp28;
-    if (sp44 > sp48) {
-        sp30 = 0;
-        sp48 = sp44;
+    norm = absf(face->normal.x);
+    if (norm > maxNorm) {
+        maxNormID = 0;
+        maxNorm = norm;
     }
 
-    sp28 = face->normal.y < 0.0f ? -face->normal.y : face->normal.y;
-    sp44 = sp28;
-    if (sp44 > sp48) {
-        sp30 = 1;
-        sp48 = sp44;
+    norm = absf(face->normal.y);
+    if (norm > maxNorm) {
+        maxNormID = 1;
+        maxNorm = norm;
     }
 
-    sp28 = face->normal.z < 0.0f ? -face->normal.z : face->normal.z;
-    sp44 = sp28;
-    if (sp44 > sp48) {
-        sp30 = 2;
+    norm = absf(face->normal.z);
+    if (norm > maxNorm) {
+        maxNormID = 2;
     }
 
-    switch (sp30) {
+    switch (maxNormID) {
         case 0:
             plane->unk20 = 1;
             plane->unk24 = 2;
@@ -395,7 +390,7 @@ void reset_plane(struct ObjPlane *plane) {
     plane->boundingBox.maxY = gSomeBoundingBox.maxY;
     plane->boundingBox.maxZ = gSomeBoundingBox.maxZ;
 
-    if (plane->boundingBox.maxX - plane->boundingBox.minX < 100.0f) {
+    if ((plane->boundingBox.maxX - plane->boundingBox.minX) < 100.0f) {
         plane->boundingBox.maxX += 50.0f;
         plane->boundingBox.minX -= 50.0f;
     }
@@ -403,7 +398,7 @@ void reset_plane(struct ObjPlane *plane) {
     plane->boundingBox.maxY += 200.0f;
     plane->boundingBox.minY -= 200.0f;
 
-    if (plane->boundingBox.maxZ - plane->boundingBox.minZ < 100.0f) {
+    if ((plane->boundingBox.maxZ - plane->boundingBox.minZ) < 100.0f) {
         plane->boundingBox.maxZ += 50.0f;
         plane->boundingBox.minZ -= 50.0f;
     }
