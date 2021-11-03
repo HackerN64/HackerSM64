@@ -30,14 +30,12 @@ struct Shadow {
     f32 shadowScale;
     /* The floor underneath the object. */
     struct Surface *floor;
-    // s16 floorPitch;
-    // s16 floorYaw;
-    /* Angle describing "which way a marble would roll," in degrees. */
-    f32 floorDownwardAngle;
     /* Angle describing "how tilted the ground is" in degrees (-90 to 90). */
-    f32 floorTilt;
+    Angle floorPitch;
+    /* Angle describing "which way a marble would roll," in degrees. */
+    Angle floorYaw;
     /* Initial solidity of the shadow, from 0 to 255 (just an alpha value). */
-    u8 solidity;
+    Alpha solidity;
 };
 
 enum ShadowSolidity {
@@ -162,15 +160,6 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
 
     vec3f_set(s->parentPos, xPos, yPos, zPos);
 
-    // if ((gCurGraphNodeObjectNode !=  gMarioObject)
-    //  && (gCurGraphNodeObject     != &gMirrorMario)
-    //  && (gCurGraphNodeObjectNode->oFloor != NULL)) {
-    //     s->floor       = gCurGraphNodeObjectNode->oFloor;
-    //     s->floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
-    // } else {
-    //     s->floorHeight = find_floor(xPos, yPos, zPos, &s->floor);
-    // }
-
     f32 waterLevel = get_water_level_below_shadow(s, &waterFloor);
 
     // if (gEnvironmentRegions != 0) {
@@ -208,19 +197,16 @@ s32 init_shadow(struct Shadow *s, f32 xPos, f32 yPos, f32 zPos, s16 shadowScale,
 
     s->shadowScale = scale_shadow_with_distance(shadowScale, (yPos - s->floorHeight));
 
-    // s->floorYaw = atan2s(s->floor->normal.z, s->floor->normal.x);
-    s->floorDownwardAngle = angle_to_degrees(atan2s(s->floor->normal.z, s->floor->normal.x));
+    s->floorYaw = atan2s(s->floor->normal.z, s->floor->normal.x);
 
     f32 floorSteepness = (sqr(s->floor->normal.x) + sqr(s->floor->normal.z));
 
     // This if-statement avoids dividing by 0.
     if (floorSteepness == 0.0f) {
-        // s->floorPitch = 0x0;
-        s->floorTilt = 0;
+        s->floorPitch = 0x0;
     } else {
         floorSteepness = sqrtf(floorSteepness);
-        // s->floorPitch = (0x4000 - atan2s(floorSteepness, s->floor->normal.y));
-        s->floorTilt = (90.0f - angle_to_degrees(atan2s(floorSteepness, s->floor->normal.y)));
+        s->floorPitch = (0x4000 - atan2s(floorSteepness, s->floor->normal.y));
     }
     return FALSE;
 }
@@ -312,8 +298,8 @@ void get_vertex_coords(s8 index, s8 *xCoord, s8 *zCoord) {
  * behavior is overwritten.
  */
 void calculate_vertex_xyz(s8 index, struct Shadow *s, f32 *xPosVtx, f32 *yPosVtx, f32 *zPosVtx) {
-    f32 tiltedScale = (cosf(degrees_to_radians(s->floorTilt)) * s->shadowScale);
-    f32 downwardAngle = degrees_to_radians(s->floorDownwardAngle);
+    f32 tiltedScale = (coss(s->floorPitch) * s->shadowScale);
+    Angle downwardAngle = s->floorYaw;
     s8 xCoordUnit, zCoordUnit;
 
     // This makes xCoordUnit and yCoordUnit each one of -1, 0, or 1.
@@ -322,8 +308,8 @@ void calculate_vertex_xyz(s8 index, struct Shadow *s, f32 *xPosVtx, f32 *yPosVtx
     f32 halfScale       = ((xCoordUnit * s->shadowScale) / 2.0f);
     f32 halfTiltedScale = ((zCoordUnit *    tiltedScale) / 2.0f);
 
-    *xPosVtx = ((halfTiltedScale * sinf(downwardAngle)) + (halfScale * cosf(downwardAngle)) + s->parentPos[0]);
-    *zPosVtx = ((halfTiltedScale * cosf(downwardAngle)) - (halfScale * sinf(downwardAngle)) + s->parentPos[2]);
+    *xPosVtx = ((halfTiltedScale * sins(downwardAngle)) + (halfScale * coss(downwardAngle)) + s->parentPos[0]);
+    *zPosVtx = ((halfTiltedScale * coss(downwardAngle)) - (halfScale * sins(downwardAngle)) + s->parentPos[2]);
 
     if (gShadowFlags & SHADOW_FLAG_WATER_BOX) {
         *yPosVtx = s->floorHeight;
@@ -692,6 +678,5 @@ Gfx *create_shadow_below_xyz(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 s
         case SHADOW_CIRCLE_PLAYER:              return create_shadow_player                     (&s, xPos, yPos, zPos, shadowScale, shadowSolidity            ); break; // init
         default:                                return create_shadow_hardcoded_rectangle        (&s, xPos, yPos, zPos, shadowScale, shadowSolidity, shadowType); break; // no init
     }
-    // return create_shadow_circle_4_verts             (&s, xPos, yPos, zPos, shadowScale, shadowSolidity            );
     return NULL;
 }
