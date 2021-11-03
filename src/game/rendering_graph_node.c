@@ -800,18 +800,19 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             shadowScale = (node->shadowScale * gCurGraphNodeObject->scale[0]);
         }
 
-        f32 objScale = 1.0f;
         if (gCurrAnimEnabled) {
             if ((gCurrAnimType == ANIM_TYPE_TRANSLATION)
              || (gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION)) {
                 struct GraphNode *geo = node->node.children;
+                f32 objScale = 1.0f;
                 if ((geo != NULL) && (geo->type == GRAPH_NODE_TYPE_SCALE)) {
                     objScale = ((struct GraphNodeScale *) geo)->scale;
                 }
-                animOffset[0] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier * objScale);
+                f32 animScale = (gCurrAnimTranslationMultiplier * objScale);
+                animOffset[0] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * animScale);
                 animOffset[1] = 0.0f;
                 gCurrAnimAttribute += 2;
-                animOffset[2] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * gCurrAnimTranslationMultiplier * objScale);
+                animOffset[2] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * animScale);
                 gCurrAnimAttribute -= 6;
 
                 // simple matrix rotation so the shadow offset rotates along with the object
@@ -822,7 +823,10 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                 shadowPos[2] += ((-animOffset[0] * sinAng) + (animOffset[2] * cosAng));
             }
         }
-        Gfx *shadowList = create_shadow_below_xyz(shadowPos[0], shadowPos[1], shadowPos[2], shadowScale, node->shadowSolidity, node->shadowType);
+        Gfx *shadowList =
+            create_shadow_below_xyz(shadowPos[0],
+                                    shadowPos[1],
+                                    shadowPos[2], shadowScale, node->shadowSolidity, node->shadowType);
         if (shadowList != NULL) {
             mtxf_translate(mtxf, shadowPos);
             mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, *gCurGraphNodeCamera->matrixPtr);

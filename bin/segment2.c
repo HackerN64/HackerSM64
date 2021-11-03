@@ -2667,15 +2667,6 @@ const Gfx dl_shadow_square[] = {
 };
 #endif
 
-// 0x020145D8 - 0x02014620
-const Gfx dl_shadow_9_verts[] = {
-    gsSP2Triangles( 0,  3,  4, 0x0,  0,  4,  1, 0x0),
-    gsSP2Triangles( 1,  4,  2, 0x0,  2,  4,  5, 0x0),
-    gsSP2Triangles( 3,  6,  4, 0x0,  4,  6,  7, 0x0),
-    gsSP2Triangles( 4,  7,  8, 0x0,  4,  8,  5, 0x0),
-    gsSPEndDisplayList(),
-};
-
 // 0x02014620 - 0x02014638
 const Gfx dl_shadow_4_verts[] = {
     gsSP2Triangles( 0,  2,  1, 0x0,  1,  2,  3, 0x0),

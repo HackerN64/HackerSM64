@@ -37,11 +37,6 @@ enum ShadowFlags {
 extern s8 gShadowFlags;
 
 /**
- * The surface type below the current shadow.
- */
-extern s16 sSurfaceTypeBelowShadow;
-
-/**
  * Given the (x, y, z) location of an object, create a shadow below that object
  * with the given initial solidity and "shadowType" (described above).
  */
