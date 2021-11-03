@@ -427,7 +427,7 @@ extern f32 gSineTable[];
 
 #define MTXF_END(mtx) {                         \
     (mtx)[0][3] = (mtx)[1][3] = (mtx)[2][3] = 0;\
-    ((u32 *)(mtx))[15] = FLOAT_ONE;            \
+    ((u32 *)(mtx))[15] = FLOAT_ONE;             \
 }
 
 #define NAME_INVMAG(v) v##_invmag
@@ -448,6 +448,9 @@ extern f32 gSineTable[];
     }                                   \
 }
 
+#define ABS(x)  (((x) > 0) ? (x) : -(x))
+
+/// From Wiseguy
 inline s32 roundf(f32 in) {
     f32 tmp;
     s32 out;
@@ -455,6 +458,7 @@ inline s32 roundf(f32 in) {
     __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
     return out;
 }
+/// Absolute value
 inline f32 absf(f32 in) {
     f32 out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
@@ -464,7 +468,7 @@ inline s32 absi(s32 in) {
     // s32 out;
     // __asm__("abs %0,%1" : "=r" (out) : "r" (in));
     // return out;
-    return ((in > 0) ? in : -in);
+    return ABS(in);
 }
 #define abss absi
 // inline s32 abss(s16 in) {
@@ -472,8 +476,6 @@ inline s32 absi(s32 in) {
 //     __asm__("abs %0,%1" : "=r" (out) : "r" (in));
 //     return out;
 // }
-
-#define ABS(x)  (((x) > 0) ? (x) : -(x))
 
 #define FLT_NONZERO(x) (absf(x) > NEAR_ZERO)
 

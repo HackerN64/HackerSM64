@@ -375,14 +375,14 @@ void geo_append_display_list(void *displayList, s32 layer) {
     }
 }
 
-inline void inc_mat_stack() {
+static inline void inc_mat_stack() {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
     gMatStackIndex++;
     mtxf_to_mtx(mtx, gMatStack[gMatStackIndex]);
     gMatStackFixed[gMatStackIndex] = mtx;
 }
 
-inline void append_dl_and_return(struct GraphNodeDisplayList *node) {
+static inline void append_dl_and_return(struct GraphNodeDisplayList *node) {
     if (node->displayList != NULL) {
         geo_append_display_list(node->displayList, GET_GRAPH_NODE_LAYER(node->node.flags));
     }
@@ -1021,14 +1021,14 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
     }
     if ((node->objNode != NULL) && (node->objNode->header.gfx.sharedChild != NULL)) {
         s32 hasAnimation = (node->objNode->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0;
-        vec3_quot_val(translation, node->translation, 4.0f);
+        vec3_prod_val(translation, node->translation, 0.25f);
 
         mtxf_translate(mat, translation);
-        mtxf_copy(gMatStack[gMatStackIndex + 1], *gCurGraphNodeObject->throwMatrix);
-        vec3f_copy(gMatStack[gMatStackIndex + 1][3], gMatStack[gMatStackIndex][3]);
+        mtxf_copy(         gMatStack[gMatStackIndex + 1], *gCurGraphNodeObject->throwMatrix);
+        vec3f_copy(        gMatStack[gMatStackIndex + 1][3], gMatStack[gMatStackIndex][3]);
         mtxf_copy(tempMtx, gMatStack[gMatStackIndex + 1]);
-        mtxf_mul(gMatStack[gMatStackIndex + 1], mat, tempMtx);
-        mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->objNode->header.gfx.scale);
+        mtxf_mul(          gMatStack[gMatStackIndex + 1], mat, tempMtx);
+        mtxf_scale_vec3f(  gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->objNode->header.gfx.scale);
         if (node->fnNode.func != NULL) {
             node->fnNode.func(GEO_CONTEXT_HELD_OBJ, &node->fnNode.node, (struct AllocOnlyPool *) gMatStack[gMatStackIndex + 1]);
         }
@@ -1134,7 +1134,7 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         Vp *viewport = alloc_display_list(sizeof(*viewport));
 
         gDisplayListHeap = alloc_only_pool_init((main_pool_available() - sizeof(struct AllocOnlyPool)), MEMORY_POOL_LEFT);
-        initialMatrix = alloc_display_list(sizeof(*initialMatrix));
+        initialMatrix    = alloc_display_list(sizeof(*initialMatrix));
         gMatStackIndex = 0;
         gCurrAnimType  = ANIM_TYPE_NONE;
         vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), 511);

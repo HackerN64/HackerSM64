@@ -25,15 +25,6 @@ Vec3s gVec3sZero = {     0,     0,     0 };
 Vec3i gVec3iZero = {     0,     0,     0 };
 Vec3s gVec3sOne  = {     1,     1,     1 };
 
-/// From Wiseguy
-// static inline s32 asm_roundf(f32 in) {
-//     f32 tmp;
-//     s32 out;
-//     __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in));
-//     __asm__("mfc1 %0,%1" : "=r" (out) : "f" (tmp));
-//     return out;
-// }
-
 /// Returns the lowest of three values.
 #define min_3_func(a0, a1, a2) {\
     if (a1 < a0) a0 = a1;       \
