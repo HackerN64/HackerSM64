@@ -167,13 +167,13 @@ struct ObjBone {
     /* 0x070 */ Mat4f mat70;
     /* 0x0B0 */ Mat4f matB0;
     /* 0x0F0 */ struct ObjShape *shapePtr; // from dead code in draw_bone
-    /* 0x0F4 */ f32 unkF4;              // also length?
-    /* 0x0F8 */ f32 unkF8;              // length?
-    /* 0x0FC */ f32 unkFC;              // also length?
+    /* 0x0F4 */ f32 unkF4;                 // also length?
+    /* 0x0F8 */ f32 unkF8;                 // length?
+    /* 0x0FC */ f32 unkFC;                 // also length?
     /* 0x100 */ s32 colourNum;             // "colour"
-    /* 0x104 */ s32 unk104;             // "flags"
+    /* 0x104 */ s32 unk104;                // "flags"
     /* 0x108 */ s32 id;
-    /* 0x10C */ struct ObjGroup *unk10C; // group of joints?
+    /* 0x10C */ struct ObjGroup *unk10C;   // group of joints?
     /* 0x110 */ f32 spring;
     /* 0x114 */ f32 unk114;
     /* 0x118 */ f32 unk118;

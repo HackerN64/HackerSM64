@@ -40,9 +40,6 @@ extern s32 gGdFrameBufNum;
 u32 get_alloc_mem_amt(void);
 s32 gd_get_ostime(void);
 f32 get_time_scale(void);
-f64 gd_sin_d(f64 x);
-f64 gd_cos_d(f64 x);
-f64 gd_sqrt_d(f64 x);
 
 #if defined(ISVPRINT) || defined(UNF)
 #define gd_printf osSyncPrintf
@@ -113,7 +110,6 @@ void gd_init(void);
 void init_pick_buf(s16 *buf, s32 len);
 void store_in_pickbuf(s16 data);
 s32  get_cur_pickbuf_offset(UNUSED s16 *arg0);
-void set_vtx_tc_buf(f32 tcS, f32 tcT);
 struct GdObj *load_dynlist(struct DynList *dynlist);
 
 #endif // GD_RENDERER_H

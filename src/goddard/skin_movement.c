@@ -10,54 +10,25 @@
 #include "skin_movement.h"
 
 /* bss */
+s32 sResetWeightVtxNum;
 struct ObjWeight *sResetCurWeight;
-static Mat4f D_801B9EA8; // TODO: rename to sHead2Mtx?
-static struct ObjJoint *D_801B9EE8;  // set but not used
-
-/* @ 22FDB0 for 0x180 */
-void func_801815E0(Mat4f *mtx) {
-    struct GdVec3f scratchVec;
-
-    scratchVec.x = (*mtx)[0][0];
-    scratchVec.y = (*mtx)[0][1];
-    scratchVec.z = (*mtx)[0][2];
-    gd_normalize_vec3f(&scratchVec);
-    (*mtx)[0][0] = scratchVec.x;
-    (*mtx)[0][1] = scratchVec.y;
-    (*mtx)[0][2] = scratchVec.z;
-
-    scratchVec.x = (*mtx)[1][0];
-    scratchVec.y = (*mtx)[1][1];
-    scratchVec.z = (*mtx)[1][2];
-    gd_normalize_vec3f(&scratchVec);
-    (*mtx)[1][0] = scratchVec.x;
-    (*mtx)[1][1] = scratchVec.y;
-    (*mtx)[1][2] = scratchVec.z;
-
-    scratchVec.x = (*mtx)[2][0];
-    scratchVec.y = (*mtx)[2][1];
-    scratchVec.z = (*mtx)[2][2];
-    gd_normalize_vec3f(&scratchVec);
-    (*mtx)[2][0] = scratchVec.x;
-    (*mtx)[2][1] = scratchVec.y;
-    (*mtx)[2][2] = scratchVec.z;
-}
+static Mat4f sHead2Mtx;
 
 /* @ 22FF30 for 0xDC */
 /* called with ObjNext->unk1A8 (variable obj ptr?) ->unk20 or ->unk24 ptr*/
 // TODO: figure out the proper object type for a0
-void scale_verts(struct ObjGroup *a0) {
-    register f32 sp1C;
+void scale_verts(struct ObjGroup *group) {
+    register f32 scale;
     register struct ListNode *link;
     struct ObjVertex *vtx;
 
-    for (link = a0->firstMember; link != NULL; link = link->next) {
-        vtx = (struct ObjVertex *) link->obj;
-
-        if ((sp1C = vtx->scaleFactor) != 0.0f) {
-            vtx->pos.x = vtx->initPos.x * sp1C;
-            vtx->pos.y = vtx->initPos.y * sp1C;
-            vtx->pos.z = vtx->initPos.z * sp1C;
+    for (link = group->firstMember; link != NULL; link = link->next) {
+        vtx   = (struct ObjVertex *) link->obj;
+        scale = vtx->scaleFactor;
+        if (scale != 0.0f) {
+            vtx->pos.x = (vtx->initPos.x * scale);
+            vtx->pos.y = (vtx->initPos.y * scale);
+            vtx->pos.z = (vtx->initPos.z * scale);
         } else {
             vtx->pos.x = vtx->pos.y = vtx->pos.z = 0.0f;
         }
@@ -73,7 +44,7 @@ void move_skin(struct ObjNet *net) {
 
 /* @ 230064 for 0x13C*/
 void func_80181894(struct ObjJoint *joint) {
-    register struct ObjGroup *weightGroup; // baseGroup? weights Only?
+    register struct ObjGroup *weightGroup = joint->weightGrp; // baseGroup? weights Only?
     struct GdVec3f stackVec;
     register struct ObjWeight *curWeight;
     register struct ObjVertex *connectedVtx;
@@ -81,7 +52,6 @@ void func_80181894(struct ObjJoint *joint) {
     register f32 scaleFactor;
     struct GdObj *linkedObj;
 
-    weightGroup = joint->weightGrp;
     if (weightGroup != NULL) {
         for (link = weightGroup->firstMember; link != NULL; link = link->next) {
             linkedObj = link->obj;
@@ -96,9 +66,9 @@ void func_80181894(struct ObjJoint *joint) {
                 connectedVtx = curWeight->vtx;
                 scaleFactor = curWeight->weightVal;
 
-                connectedVtx->pos.x += stackVec.x * scaleFactor;
-                connectedVtx->pos.y += stackVec.y * scaleFactor;
-                connectedVtx->pos.z += stackVec.z * scaleFactor;
+                connectedVtx->pos.x += (stackVec.x * scaleFactor);
+                connectedVtx->pos.y += (stackVec.y * scaleFactor);
+                connectedVtx->pos.z += (stackVec.z * scaleFactor);
             }
         }
     }
@@ -114,7 +84,7 @@ void reset_weight_vtx(struct ObjVertex *vtx) {
         localVec.y = vtx->pos.y;
         localVec.z = vtx->pos.z;
 
-        gd_rotate_and_translate_vec3f(&localVec, &D_801B9EA8);
+        gd_rotate_and_translate_vec3f(&localVec, &sHead2Mtx);
         sResetCurWeight->vec20.x = localVec.x;
         sResetCurWeight->vec20.y = localVec.y;
         sResetCurWeight->vec20.z = localVec.z;
@@ -141,11 +111,9 @@ void reset_weight(struct ObjWeight *weight) {
 }
 
 void reset_joint_weights(struct ObjJoint *joint) {
-    struct ObjGroup *group;
-
-    gd_inverse_mat4f(&joint->matE8, &D_801B9EA8);
-    D_801B9EE8 = joint;
-    if ((group = joint->weightGrp) != NULL) {
+    gd_inverse_mat4f(&joint->matE8, &sHead2Mtx);
+    struct ObjGroup *group = joint->weightGrp;
+    if (group != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_WEIGHTS, (applyproc_t) reset_weight, group);
     }
 }

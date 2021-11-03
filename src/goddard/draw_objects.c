@@ -13,6 +13,7 @@
 #include "renderer.h"
 #include "shape_helper.h"
 #include "draw_objects.h"
+#include "color_presets.h"
 
 /**
  * @file draw_objects.c
@@ -34,31 +35,21 @@ enum SceneType {
     FIND_PICKS   = 27  ///< only check position of primitives relative to cursor click
 };
 
-/**
- * A possible remnant of an early `ObjVertex` structure that contained
- * texture S,T coordinates.
- */
-struct BetaVtx {
-    /* 0x00 */ u8 filler[68];
-    /* 0x44 */ f32 s;
-    /* 0x48 */ f32 t;
-};
-
 // data
-static struct GdColour sClrWhite        = { 1.0f, 1.0f, 1.0f };
-static struct GdColour sClrRed          = { 1.0f, 0.0f, 0.0f };
-static struct GdColour sClrGreen        = { 0.0f, 1.0f, 0.0f };
-static struct GdColour sClrBlue         = { 0.0f, 0.0f, 1.0f };
-static struct GdColour sClrErrDarkBlue  = { 0.0f, 0.0f, 6.0f };
-static struct GdColour sClrPink         = { 1.0f, 0.0f, 1.0f };
-static struct GdColour sClrBlack        = { 0.0f, 0.0f, 0.0f };
-static struct GdColour sClrGrey         = { 0.6f, 0.6f, 0.6f };
-static struct GdColour sClrDarkGrey     = { 0.4f, 0.4f, 0.4f };
-static struct GdColour sClrYellow       = { 1.0f, 1.0f, 0.0f };
-static struct GdColour sLightColours    = { 1.0f, 1.0f, 0.0f };
+static struct GdColour sClrWhite        = COLOR_RGBF_WHITE;
+static struct GdColour sClrRed          = COLOR_RGBF_RED;
+static struct GdColour sClrGreen        = COLOR_RGBF_GREEN;
+static struct GdColour sClrBlue         = COLOR_RGBF_BLUE;
+static struct GdColour sClrErrDarkBlue  = COLOR_RGBF_ERR_DARK_BLUE;
+static struct GdColour sClrPink         = COLOR_RGBF_PINK;
+static struct GdColour sClrBlack        = COLOR_RGBF_BLACK;
+static struct GdColour sClrGrey         = COLOR_RGBF_GREY;
+static struct GdColour sClrDarkGrey     = COLOR_RGBF_DARK_GREY;
+static struct GdColour sClrYellow       = COLOR_RGBF_YELLOW;
+static struct GdColour sLightColours    = COLOR_RGBF_YELLOW;
 static struct GdColour *sSelectedColour = &sClrRed;
 struct ObjCamera *gViewUpdateCamera = NULL; 
-static s32 sUnreadShapeFlag = 0;
+static s32 sUnreadShapeFlag = FALSE;
 struct GdColour *sColourPalette[5] = {
     &sClrWhite, &sClrYellow, &sClrRed, &sClrBlack, &sClrBlack
 };
@@ -101,7 +92,7 @@ static struct GdVec3f sGrabCords;             ///< x, y grabbable point near cur
 void setup_lights(void) {
     set_light_num(NUMLIGHTS_2);
     gd_setproperty(GD_PROP_AMB_COLOUR, 0.5f, 0.5f, 0.5f);
-    gd_setproperty(GD_PROP_CULLING, 1.0f, 0.0f, 0.0f); // set G_CULL_BACK
+    gd_setproperty(GD_PROP_CULLING,    1.0f, 0.0f, 0.0f); // set G_CULL_BACK
     return;
 }
 
@@ -111,7 +102,7 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
                 f32 i, f32 j, f32 k, // translate shape
                 f32 l, f32 m, f32 n, // rotate x, y, z
                 s32 colorIdx, Mat4f *rotMtx) {
-    struct GdVec3f sp1C;
+    struct GdVec3f offset;
 
     restart_timer("drawshape");
     sUpdateViewState.shapesDrawn++;
@@ -120,19 +111,19 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
         return;
     }
 
-    sp1C.x = sp1C.y = sp1C.z = 0.0f;
+    offset.x = offset.y = offset.z = 0.0f;
     if (flag & (1 << 1)) {
         gd_dl_load_trans_matrix(f, g, h);
-        sp1C.x += f;
-        sp1C.y += g;
-        sp1C.z += h;
+        offset.x += f;
+        offset.y += g;
+        offset.z += h;
     }
 
     if ((flag & 0x10) && rotMtx != NULL) {
         gd_dl_load_matrix(rotMtx);
-        sp1C.x += (*rotMtx)[3][0];
-        sp1C.y += (*rotMtx)[3][1];
-        sp1C.z += (*rotMtx)[3][2];
+        offset.x += (*rotMtx)[3][0];
+        offset.y += (*rotMtx)[3][1];
+        offset.z += (*rotMtx)[3][2];
     }
 
     if (flag & (1 << 3)) {
@@ -162,13 +153,13 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
 
     if (sNumActiveLights != 0 && shape->mtlGroup != NULL) {
         if (rotMtx != NULL) {
-            sp1C.x = (*rotMtx)[3][0];
-            sp1C.y = (*rotMtx)[3][1];
-            sp1C.z = (*rotMtx)[3][2];
+            offset.x = (*rotMtx)[3][0];
+            offset.y = (*rotMtx)[3][1];
+            offset.z = (*rotMtx)[3][2];
         } else {
-            sp1C.x = sp1C.y = sp1C.z = 0.0f;
+            offset.x = offset.y = offset.z = 0.0f;
         }
-        update_shaders(shape, &sp1C);
+        update_shaders(shape, &offset);
     }
 
     if (flag & (1 << 2)) {
@@ -187,7 +178,7 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
 void draw_shape_2d(struct ObjShape *shape, s32 flag, UNUSED f32 c, UNUSED f32 d, UNUSED f32 e, f32 f,
                    f32 g, f32 h, UNUSED f32 i, UNUSED f32 j, UNUSED f32 k, UNUSED f32 l, UNUSED f32 m,
                    UNUSED f32 n, UNUSED s32 color, UNUSED s32 p) {
-    struct GdVec3f sp1C;
+    struct GdVec3f vec;
 
     restart_timer("drawshape2d");
     sUpdateViewState.shapesDrawn++;
@@ -197,13 +188,13 @@ void draw_shape_2d(struct ObjShape *shape, s32 flag, UNUSED f32 c, UNUSED f32 d,
     }
 
     if (flag & (1 << 1)) {
-        sp1C.x = f;
-        sp1C.y = g;
-        sp1C.z = h;
+        vec.x = f;
+        vec.y = g;
+        vec.z = h;
         if (gViewUpdateCamera != NULL) {
-            gd_rotate_and_translate_vec3f(&sp1C, &gViewUpdateCamera->unkE8);
+            gd_rotate_and_translate_vec3f(&vec, &gViewUpdateCamera->unkE8);
         }
-        gd_dl_load_trans_matrix(sp1C.x, sp1C.y, sp1C.z);
+        gd_dl_load_trans_matrix(vec.x, vec.y, vec.z);
     }
     draw_shape_faces(shape);
     split_timer("drawshape2d");
@@ -312,11 +303,8 @@ void draw_face(struct ObjFace *face) {
     struct ObjVertex *vtx; // 3c
     f32 x, y, z;           // 30, 34, 38
     s32 i;             // 20; also used to store mtl's gddl number
-    s32 hasTextCoords; // 1c
-    Vtx *gbiVtx;       // 18
 
     imin("draw_face");
-    hasTextCoords = FALSE;
     if (sUseSelectedColor == FALSE && face->mtlId >= 0) { // -1 == colored face
         if (face->mtl != NULL) {
             if ((i = face->mtl->gddlNumber) != 0) {
@@ -343,14 +331,8 @@ void draw_face(struct ObjFace *face) {
         if (gGdUseVtxNormal) {
             set_Vtx_norm_buf_2(&vtx->normal);
         }
-        //! @bug This function seems to have some parts based on older versions of ObjVertex
-        //!      as the struct requests fields passed the end of an ObjVertex.
-        //!      The bad code is statically unreachable, so...
-        if (hasTextCoords) {
-            set_vtx_tc_buf(((struct BetaVtx *) vtx)->s, ((struct BetaVtx *) vtx)->t);
-        }
 
-        gbiVtx = gd_dl_make_vertex(x, y, z, vtx->alpha);
+        Vtx *gbiVtx = gd_dl_make_vertex(x, y, z, vtx->alpha);
 
         if (gbiVtx != NULL) {
             vtx->gbiVerts = make_vtx_link(vtx->gbiVerts, gbiVtx);
@@ -479,15 +461,15 @@ void draw_gadget(struct ObjGadget *gdgt) {
     draw_rect_fill(colour,
         gdgt->worldPos.x,
         gdgt->worldPos.y,
-        gdgt->worldPos.x + gdgt->sliderPos * gdgt->size.x,
-        gdgt->worldPos.y + gdgt->size.y);
+        (gdgt->worldPos.x + (gdgt->sliderPos * gdgt->size.x)),
+        (gdgt->worldPos.y + gdgt->size.y));
 
     if (gdgt->header.drawFlags & OBJ_HIGHLIGHTED) {
         draw_rect_stroke(COLOUR_YELLOW,
             gdgt->worldPos.x,
             gdgt->worldPos.y,
-            gdgt->worldPos.x + gdgt->sliderPos * gdgt->size.x,
-            gdgt->worldPos.y + gdgt->size.y);
+            (gdgt->worldPos.x + (gdgt->sliderPos * gdgt->size.x)),
+            (gdgt->worldPos.y + gdgt->size.y));
     }
     gdgt->header.drawFlags &= ~OBJ_HIGHLIGHTED;
 }
@@ -525,10 +507,10 @@ void world_pos_to_screen_coords(struct GdVec3f *pos, struct ObjCamera *cam, stru
         return;
     }
 
-    pos->x *= 256.0f / -pos->z;
-    pos->y *= 256.0f /  pos->z;
-    pos->x += view->lowerRight.x / 2.0f;
-    pos->y += view->lowerRight.y / 2.0f;
+    pos->x *= (256.0f / -pos->z);
+    pos->y *= (256.0f /  pos->z);
+    pos->x += (view->lowerRight.x / 2.0f);
+    pos->y += (view->lowerRight.y / 2.0f);
 }
 
 /**
@@ -586,7 +568,7 @@ void check_grabbable_click(struct GdObj *input) {
 void drawscene(enum SceneType process, struct ObjGroup *interactables, struct ObjGroup *lightgrp) {
     restart_timer("drawscene");
     imin("draw_scene()");
-    sUnreadShapeFlag = 0;
+    sUnreadShapeFlag = FALSE;
     sUpdateViewState.unreadCounter = 0;
     restart_timer("draw1");
     set_gd_mtx_parameters(G_MTX_PROJECTION | G_MTX_MUL | G_MTX_PUSH);
@@ -683,10 +665,10 @@ void draw_particle(struct GdObj *obj) {
     if (ptc->timeout > 0) {
         white = sColourPalette[0];
         black = sWhiteBlack[1];
-        brightness = ptc->timeout / 10.0f;
-        sLightColours.r = (white->r - black->r) * brightness + black->r;
-        sLightColours.g = (white->g - black->g) * brightness + black->g;
-        sLightColours.b = (white->b - black->b) * brightness + black->b;
+        brightness = (ptc->timeout / 10.0f);
+        sLightColours.r = (((white->r - black->r) * brightness) + black->r);
+        sLightColours.g = (((white->g - black->g) * brightness) + black->g);
+        sLightColours.b = (((white->b - black->b) * brightness) + black->b);
     } else {
         sLightColours.r = 0.0f;
         sLightColours.g = 0.0f;
@@ -795,17 +777,13 @@ void register_light(struct ObjLight *light) {
 }
 
 /* 229180 -> 229564 */
-void Proc8017A980(struct ObjLight *light) {
-    f32 sp24; // diffuse factor?
-    f32 sp20;
-    f32 sp1C;
-
-    light->colour.r = light->diffuse.r * light->unk30;
-    light->colour.g = light->diffuse.g * light->unk30;
-    light->colour.b = light->diffuse.b * light->unk30;
-    sLightPositionCache[light->id].x = light->position.x - sLightPositionOffset.x;
-    sLightPositionCache[light->id].y = light->position.y - sLightPositionOffset.y;
-    sLightPositionCache[light->id].z = light->position.z - sLightPositionOffset.z;
+void update_lighting(struct ObjLight *light) {
+    light->colour.r = (light->diffuse.r * light->unk30);
+    light->colour.g = (light->diffuse.g * light->unk30);
+    light->colour.b = (light->diffuse.b * light->unk30);
+    sLightPositionCache[light->id].x = (light->position.x - sLightPositionOffset.x);
+    sLightPositionCache[light->id].y = (light->position.y - sLightPositionOffset.y);
+    sLightPositionCache[light->id].z = (light->position.z - sLightPositionOffset.z);
     gd_normalize_vec3f(&sLightPositionCache[light->id]);
     if (light->flags & LIGHT_UNK20) {
         sPhongLightPosition.x = sLightPositionCache[light->id].x;
@@ -813,25 +791,22 @@ void Proc8017A980(struct ObjLight *light) {
         sPhongLightPosition.z = sLightPositionCache[light->id].z;
         sPhongLight = light;
     }
-    sp24 = light->unk30;
+    f32 diffuseFac = light->unk30; // diffuse factor?
     if (light->flags & LIGHT_UNK02) {
-        sp20 = -gd_dot_vec3f(&sLightPositionCache[light->id], &light->unk80);
-        sp1C = 1.0f - light->unk38 / 90.0f;
-        if (sp20 > sp1C) {
-            sp20 = (sp20 - sp1C) * (1.0f / (1.0f - sp1C));
-            if (sp20 > 1.0f) {
-                sp20 = 1.0f;
-            } else if (sp20 < 0.0f) {
-                sp20 = 0.0f;
-            }
+        f32 facMul = -gd_dot_vec3f(&sLightPositionCache[light->id], &light->unk80);
+        f32 diffuseThreshold = (1.0f - (light->unk38 / 90.0f));
+        if (diffuseThreshold < 0.0f) {
+            facMul = (-diffuseThreshold * (1.0f / (1.0f - diffuseThreshold)));
+            facMul = CLAMP(facMul, 0.0f, 1.0f);
         } else {
-            sp20 = 0.0f;
+            facMul = 0.0f;
         }
-        sp24 *= sp20;
+        diffuseFac *= facMul;
     }
     set_light_id(light->id);
-    gd_setproperty(GD_PROP_DIFUSE_COLOUR, light->diffuse.r * sp24, light->diffuse.g * sp24,
-                   light->diffuse.b * sp24);
+    gd_setproperty(GD_PROP_DIFUSE_COLOUR, (light->diffuse.r * diffuseFac),
+                                          (light->diffuse.g * diffuseFac),
+                                          (light->diffuse.b * diffuseFac));
     gd_setproperty(GD_PROP_LIGHT_DIR, sLightPositionCache[light->id].x,
                    sLightPositionCache[light->id].y, sLightPositionCache[light->id].z);
     gd_setproperty(GD_PROP_LIGHTING, 2.0f, 0.0f, 0.0f);
@@ -846,7 +821,7 @@ void update_shaders(struct ObjShape *shape, struct GdVec3f *offset) {
     sLightPositionOffset.z = offset->z;
     sPhongLight = NULL;
     if (gGdLightGroup != NULL) {
-        apply_to_obj_types_in_group(OBJ_TYPE_LIGHTS, (applyproc_t) Proc8017A980, gGdLightGroup);
+        apply_to_obj_types_in_group(OBJ_TYPE_LIGHTS, (applyproc_t) update_lighting, gGdLightGroup);
     }
     if (shape->mtlGroup != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_MATERIALS, (applyproc_t) apply_obj_draw_fn,
@@ -881,12 +856,10 @@ void create_shape_mtl_gddls(struct ObjShape *shape) {
  * @note Contains string literals that suggest a removed `printf` call
  */
 void create_shape_gddl(struct ObjShape *s) {
-    struct ObjShape *shape = s; // 24
-    s32 shapedl;                // 20
-    UNUSED s32 enddl;           // 1C
+    struct ObjShape *shape = s;
 
     create_shape_mtl_gddls(shape);
-    shapedl = gd_startdisplist(7);
+    s32 shapedl = gd_startdisplist(7);
     if (shapedl == 0) {
         return;
     }
@@ -896,7 +869,7 @@ void create_shape_gddl(struct ObjShape *s) {
     if (shape->unk3C == 0) {
         draw_shape_faces(shape);
     }
-    enddl = gd_enddlsplist_parent();
+    UNUSED s32 enddl = gd_enddlsplist_parent();
     shape->dlNums[0] = shapedl;
     shape->dlNums[1] = shapedl;
 
@@ -931,12 +904,11 @@ void create_gddl_for_shapes(struct ObjGroup *grp) {
  */
 void map_face_materials(struct ObjGroup *faces, struct ObjGroup *mtls) {
     struct ObjFace *face;
-    register struct ListNode *linkFaces;
+    register struct ListNode *linkFaces = faces->firstMember;
     struct GdObj *temp;
     register struct ListNode *linkMtls;
     struct ObjMaterial *mtl;
 
-    linkFaces = faces->firstMember;
     while (linkFaces != NULL) {
         temp = linkFaces->obj;
         face = (struct ObjFace *) temp;
@@ -970,14 +942,12 @@ void map_face_materials(struct ObjGroup *faces, struct ObjGroup *mtls) {
  */
 static void calc_vtx_normal(struct ObjVertex *vtx, struct ObjGroup *facegrp) {
     s32 i;
-    s32 faceCount;
-    register struct ListNode *node;
     struct ObjFace *curFace;
 
     vtx->normal.x = vtx->normal.y = vtx->normal.z = 0.0f;
 
-    faceCount = 0;
-    node = facegrp->firstMember;
+    s32 faceCount = 0;
+    register struct ListNode *node = facegrp->firstMember;
     while (node != NULL) {
         curFace = (struct ObjFace *) node->obj;
         for (i = 0; i < curFace->vtxCount; i++) {
@@ -1051,15 +1021,11 @@ static void find_thisface_verts(struct ObjFace *face, struct ObjGroup *vertexGrp
  *       a very similar task...
  */
 void map_vertices(struct ObjGroup *facegrp, struct ObjGroup *vtxgrp) {
-    register struct ListNode *faceNode;
-    struct ObjFace *curFace;
-    register struct ListNode *vtxNode;
-    struct ObjVertex *vtx;
-
     imin("map_vertices");
 
     // resolve vertex indices to actual vertices
-    faceNode = facegrp->firstMember;
+    register struct ListNode *faceNode = facegrp->firstMember;
+    struct ObjFace *curFace;
     while (faceNode != NULL) {
         curFace = (struct ObjFace *) faceNode->obj;
         find_thisface_verts(curFace, vtxgrp);
@@ -1067,7 +1033,8 @@ void map_vertices(struct ObjGroup *facegrp, struct ObjGroup *vtxgrp) {
     }
 
     // compute normals of vertices in vtxgrp
-    vtxNode = vtxgrp->firstMember;
+    register struct ListNode *vtxNode = vtxgrp->firstMember;
+    struct ObjVertex *vtx;
     while (vtxNode != NULL) {
         vtx = (struct ObjVertex *) vtxNode->obj;
         calc_vtx_normal(vtx, facegrp);
@@ -1103,18 +1070,17 @@ void find_closest_pickable_obj(struct GdObj *input) {
     struct GdObj *obj = input;
     f32 distance;
 
-    if (obj->drawFlags & OBJ_IS_GRABBABLE) {
-        if (obj->index == sPickDataTemp) {
-            if (gViewUpdateCamera != NULL) {
-                distance = d_calc_world_dist_btwn(&gViewUpdateCamera->header, obj);
-            } else {
-                distance = 0.0f;
-            }
+    if ((obj->drawFlags & OBJ_IS_GRABBABLE)
+     && (obj->index == sPickDataTemp)) {
+        if (gViewUpdateCamera != NULL) {
+            distance = d_calc_world_dist_btwn(&gViewUpdateCamera->header, obj);
+        } else {
+            distance = 0.0f;
+        }
 
-            if (distance < sPickObjDistance) {
-                sPickObjDistance = distance;
-                sPickedObject = obj;
-            }
+        if (distance < sPickObjDistance) {
+            sPickObjDistance = distance;
+            sPickedObject = obj;
         }
     }
 }
@@ -1208,7 +1174,7 @@ void update_view(struct ObjView *view) {
 
     if (view->components != NULL) {
         if (gGdCtrl.dragging) {
-            if (gd_getproperty(3, 0) != FALSE && gGdCtrl.startedDragging != FALSE) {
+            if ((gd_getproperty(3, 0)) && (gGdCtrl.startedDragging)) {
                 init_pick_buf(sPickBuffer, ARRAY_COUNT(sPickBuffer));
                 drawscene(FIND_PICKS, sUpdateViewState.view->components, NULL);
                 pickOffset = get_cur_pickbuf_offset(sPickBuffer);

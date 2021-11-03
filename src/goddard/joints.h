@@ -5,9 +5,6 @@
 
 #include "gd_types.h"
 
-// bss
-extern s32 sResetWeightVtxNum;
-
 // functions
 void eye_joint_update_func(struct ObjJoint *self);
 struct ObjJoint *make_joint(s32 flags, f32 x, f32 y, f32 z);

@@ -310,7 +310,7 @@ struct GdObj *proc_dynlist(struct DynList *dylist) {
             case 38:
                 d_map_vertices(Dyn1AsName(dylist));
                 break;
-            case 53:
+            case 53: //! does nothing
                 d_set_texture_st(DynVecX(dylist), DynVecY(dylist));
                 break;
             case 52:

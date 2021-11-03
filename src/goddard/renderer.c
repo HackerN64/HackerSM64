@@ -733,25 +733,6 @@ static Vp *next_vp(void) {
     return &sCurrentGdDl->vp[sCurrentGdDl->curVpIdx++];
 }
 
-/* 249AAC -> 249AEC */
-f64 gd_sin_d(f64 x) {
-    return sinf(x);
-}
-
-/* 249AEC -> 249B2C */
-f64 gd_cos_d(f64 x) {
-    return cosf(x);
-}
-
-/* 249B2C -> 249BA4 */
-f64 gd_sqrt_d(f64 x) {
-    if (x < 1.0e-7) {
-        return 0.0;
-    }
-    return sqrtf(x);
-}
-
-
 #if defined(ISVPRINT) || defined(UNF)
 #define stubbed_printf osSyncPrintf
 #else
@@ -1621,7 +1602,7 @@ void gd_dl_lookat(struct ObjCamera *cam, f32 fromX, f32 fromY, f32 fromZ, f32 to
 
     colXY *= RAD_PER_DEG;
 
-    gd_mat4f_lookat(&cam->unkE8, fromX, fromY, fromZ, toX, toY, toZ, gd_sin_d(colXY), gd_cos_d(colXY), 0.0f);
+    gd_mat4f_lookat(&cam->unkE8, fromX, fromY, fromZ, toX, toY, toZ, sinf(colXY), cosf(colXY), 0.0f);
 
     mat4_to_mtx(&cam->unkE8, &DL_CURRENT_MTX(sCurrentGdDl));
     gSPMatrix(next_gfx(), osVirtualToPhysical(&DL_CURRENT_MTX(sCurrentGdDl)),
@@ -2784,12 +2765,6 @@ void store_in_pickbuf(s16 data) {
 ** (datasize is always 2) */
 s32 get_cur_pickbuf_offset(UNUSED s16 *arg0) {
     return (sPickBufPosition / 3);
-}
-
-/* 254328 -> 2543B8; orig name: func_801A5B58 */
-void set_vtx_tc_buf(f32 tcS, f32 tcT) {
-    sVtxCvrtTCBuf[0] = (s16)(tcS * 512.0f);
-    sVtxCvrtTCBuf[1] = (s16)(tcT * 512.0f);
 }
 
 /* 2543B8 -> 2543F4 */

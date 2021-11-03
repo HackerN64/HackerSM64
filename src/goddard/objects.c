@@ -40,8 +40,8 @@ s32 gGdPlaneCount;
 s32 gGdCameraCount;
 s32 sGdViewCount;
 struct ObjJoint *gGdJointList;
-struct ObjBone *gGdBoneList;
-struct GdObj *gGdObjectList;    // head of linked list containing every single GdObj that was created
+struct ObjBone  *gGdBoneList;
+struct GdObj    *gGdObjectList;    // head of linked list containing every single GdObj that was created
 struct ObjGroup *gGdViewsGroup;
 
 /* @ 22A480 for 0x70 */
@@ -239,8 +239,8 @@ struct GdObj *make_object(enum ObjTypeFlag objType) {
     }
 
     // Fill in required fields
-    newObj->index = gGdObjCount;
-    newObj->type = objType;
+    newObj->index     = gGdObjCount;
+    newObj->type      = objType;
     newObj->objDrawFn = objDrawFn;
     newObj->drawFlags = 0;
 
@@ -321,14 +321,14 @@ struct VtxLink *make_vtx_link(struct VtxLink *prevNode, Vtx *data) {
 
 /* @ 22B154 for 0x88; orig name: func8017C984 */
 struct ObjValPtr *make_valptr(struct GdObj *obj, s32 flag, enum ValPtrType type, size_t offset) {
-    struct ObjValPtr *sp1C = (struct ObjValPtr *) make_object(OBJ_TYPE_VALPTRS);
+    struct ObjValPtr *valPtr = (struct ObjValPtr *) make_object(OBJ_TYPE_VALPTRS);
 
-    sp1C->obj = obj;
-    sp1C->flag = flag;
-    sp1C->offset = offset;
-    sp1C->datatype = type;
+    valPtr->obj      = obj;
+    valPtr->flag     = flag;
+    valPtr->offset   = offset;
+    valPtr->datatype = type;
 
-    return sp1C;
+    return valPtr;
 }
 
 /* @ 22B1DC for 0x430 */
@@ -849,7 +849,6 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     struct GdVec3f sp88;
     struct GdVec3f sp7C;
     struct GdVec3f sp70;
-    f32 sp2C;
     struct GdVec3f sp1C;
 
     sp70.x = a2->x;
@@ -879,7 +878,7 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     }
 
     gd_cross_vec3f(&sp70, a1, &sp94);
-    sp2C = (f32) gd_sqrt_d(sqr(sp94.x) + sqr(sp94.z));
+    f32 sp2C = sqrtf(sqr(sp94.x) + sqr(sp94.z));
 
     if (sp2C > 1000.0f) {
         sp2C = 1000.0f;
@@ -1422,7 +1421,7 @@ void move_camera(struct ObjCamera *cam) {
             cam->unk128.x -= cam->unk134.x;
         }
 
-        cam->unk128.x = gd_clamp_f32(cam->unk128.x, 80.0f);
+        cam->unk128.x = CLAMP(cam->unk128.x, -80.0f, 80.0f);
 
         cam->unk4C.x = cam->zoomPositions[cam->zoomLevel].x;
         cam->unk4C.y = cam->zoomPositions[cam->zoomLevel].y;
