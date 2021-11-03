@@ -279,7 +279,7 @@ enum GoddardScene {
 
 // unk8 is float, but doesn't really matter since CMD23 is unused
 #define CMD23(model, unk4, unk8) \
-    CMD_BBH(0x22, 0x08, 0), \
+    CMD_BBH(0x23, 0x08, 0), \
     CMD_PTR(unk4), \
     CMD_W(unk8)
 
@@ -314,8 +314,8 @@ enum GoddardScene {
 #define LOAD_AREA(area) \
     CMD_BBBB(0x29, 0x04, area, 0x00)
 
-#define CMD2A(unk2) \
-    CMD_BBBB(0x2A, 0x04, unk2, 0x00)
+#define UNLOAD_AREA(area) \
+    CMD_BBBB(0x2A, 0x04, area, 0x00)
 
 #define MARIO_POS(area, yaw, posX, posY, posZ) \
     CMD_BBBB(0x2B, 0x0C, area, 0x00), \
@@ -323,11 +323,11 @@ enum GoddardScene {
     CMD_HH(posY, posZ)
 
 // unused
-#define CMD2C() \
+#define UNLOAD_MARIO_AREA() \
     CMD_BBH(0x2C, 0x04, 0x0000)
 
 // unused
-#define CMD2D() \
+#define UPDATE_OBJECTS() \
     CMD_BBH(0x2D, 0x04, 0x0000)
 
 #define TERRAIN(terrainData) \
