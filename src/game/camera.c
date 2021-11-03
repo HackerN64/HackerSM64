@@ -2630,7 +2630,7 @@ void update_lakitu(struct Camera *c) {
         gLakituState.roll += sHandheldShakeRoll;
         gLakituState.roll += gLakituState.keyDanceRoll;
 
-        if (c->mode != CAMERA_MODE_C_UP && c->cutscene == CUTSCENE_NONE) {
+        if ((c->mode != CAMERA_MODE_C_UP) && (c->cutscene == CUTSCENE_NONE)) {
             gCollisionFlags |= COLLISION_FLAG_CAMERA;
             f32 distToFloor = find_floor(gLakituState.pos[0],
                                         (gLakituState.pos[1] + 20.0f),

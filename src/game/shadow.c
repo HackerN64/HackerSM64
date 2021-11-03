@@ -60,8 +60,8 @@ enum ShadowSolidity {
  * Constant to indicate any sort of circular or rectangular shadow.
  */
 enum ShadowShapes {
-    SHADOW_SHAPE_CIRCLE = 10,
-    SHADOW_SHAPE_SQUARE = 20,
+    SHADOW_SHAPE_CIRCLE,
+    SHADOW_SHAPE_SQUARE,
 };
 
 /**
@@ -73,7 +73,7 @@ typedef struct {
     /* Half the length of the rectangle. */
     f32 halfLength;
     /* Flag for if this shadow be smaller when its object is further away. */
-    s8 scaleWithDistance;
+    u8 scaleWithDistance : 1;
 } shadowRectangle;
 
 /**
@@ -87,7 +87,7 @@ shadowRectangle rectangles[2] = {
 };
 
 // See shadow.h for documentation.
-s8  gShadowFlags;
+s8 gShadowFlags;
 
 /**
  * Let (oldZ, oldX) be the relative coordinates of a point on a rectangle,
@@ -658,7 +658,6 @@ Gfx *create_shadow_below_xyz(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 s
     } else {
         gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
         s.floorHeight = find_floor(xPos, yPos, zPos, &s.floor);
-        gCollisionFlags &= ~COLLISION_FLAG_RETURN_FIRST;
     }
 
     if (s.floor == NULL) return NULL;
