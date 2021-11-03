@@ -29,8 +29,10 @@ enum PaintingState {
     PAINTING_ENTERED
 };
 
-#define RIPPLE_TRIGGER_PROXIMITY  10
-#define RIPPLE_TRIGGER_CONTINUOUS 20
+enum RippleTriggers {
+    RIPPLE_TRIGGER_PROXIMITY  = 10,
+    RIPPLE_TRIGGER_CONTINUOUS = 20,
+};
 
 enum PaintingType {
     /// Painting that uses 1 or more images as a texture
@@ -107,14 +109,14 @@ struct Painting {
     s8 rippleTrigger;
 
     /// The painting's transparency. Determines what layer the painting is in.
-    u8 alpha;
+    Alpha alpha;
 
     /// True if Mario was under the painting's y coordinate last frame
-    s8 marioWasUnder;
+    u8 marioWasUnder : 1;
     /// True if Mario is currently under the painting's y coordinate
-    s8 marioIsUnder;
+    u8 marioIsUnder : 1;
     /// True if Mario just went under the painting's y coordinate on this frame
-    s8 marioWentUnder;
+    u8 marioWentUnder : 1;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0 x 614.0

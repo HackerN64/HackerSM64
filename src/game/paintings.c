@@ -1024,6 +1024,12 @@ void reset_painting(struct Painting *painting) {
  *  2 (0b10): set x coordinate to backPos
  *  3 (0b11): same as 2. Bit 0 is ignored
  */
+#ifdef UNLOCK_ALL
+void move_ddd_painting(struct Painting *painting, UNUSED f32 frontPos, f32 backPos, UNUSED f32 speed) {
+    painting->pos[0] = backPos;
+    gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
+}
+#else
 void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32 speed) {
     // Obtain the DDD star flags
     u32 dddFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD));
@@ -1044,7 +1050,7 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
         painting->pos[0] += speed;
         gDddPaintingStatus = DDD_FLAG_BOWSERS_SUB_BEATEN;
         if (painting->pos[0] >= backPos) {
-            painting->pos[0] = backPos;
+            painting->pos[0]  = backPos;
             // Tell the save file that we've moved DDD back.
             save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
         }
@@ -1054,6 +1060,7 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
         gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
     }
 }
+#endif
 
 /**
  * Set the painting's node's layer based on its alpha
