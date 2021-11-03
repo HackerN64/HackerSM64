@@ -850,7 +850,7 @@ static u32 set_mario_action_moving(struct MarioState *m, u32 action, UNUSED u32 
     switch (action) {
         case ACT_WALKING:
             if (floorClass != SURFACE_CLASS_VERY_SLIPPERY) {
-                mag = min(m->intendedMag, 8.0f);
+                mag = MIN(m->intendedMag, 8.0f);
                 if (0.0f <= forwardVel && forwardVel < mag) {
                     m->forwardVel = mag;
                 }
@@ -860,7 +860,7 @@ static u32 set_mario_action_moving(struct MarioState *m, u32 action, UNUSED u32 
             break;
 
         case ACT_HOLD_WALKING:
-            mag = (min(m->intendedMag, 8.0f) / 2.0f);
+            mag = (MIN(m->intendedMag, 8.0f) / 2.0f);
             if ((forwardVel >= 0.0f) && (forwardVel < mag)) {
                 m->forwardVel = mag;
             }

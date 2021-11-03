@@ -61,8 +61,8 @@ extern f32 gSineTable[];
 
 #define signum_positive(x) ((x < 0) ? -1 : 1)
 
-#define min(a, b) MIN((a), (b)) // ((a) < (b) ? (a) : (b))
-#define max(a, b) MAX((a), (b)) // ((a) > (b) ? (a) : (b))
+// #define min(a, b) MIN((a), (b)) // ((a) < (b) ? (a) : (b))
+// #define max(a, b) MAX((a), (b)) // ((a) > (b) ? (a) : (b))
 #define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 // from limits.h
