@@ -3399,7 +3399,7 @@ void shake_camera_handheld(Vec3f pos, Vec3f focus) {
         vec3f_get_dist_and_angle(pos, focus, &dist, &pitch, &yaw);
         pitch += sHandheldShakePitch;
         yaw += sHandheldShakeYaw;
-        vec3f_set_dist_and_angle(pos, focus, dist, pitch, yaw);
+        vec3f_set_dist_and_angle(pos, focus,  dist,  pitch,  yaw);
     }
 
     // Unless called every frame, the effect will stop after the first time.
@@ -3523,7 +3523,7 @@ void clamp_pitch(Vec3f from, Vec3f to, s16 maxPitch, s16 minPitch) {
     f32 dist;
     vec3f_get_dist_and_angle(from, to, &dist, &pitch, &yaw);
     pitch = CLAMP(pitch, minPitch, maxPitch);
-    vec3f_set_dist_and_angle(from, to, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(from, to,  dist,  pitch,  yaw);
 }
 
 s32 is_within_100_units_of_mario(f32 posX, f32 posY, f32 posZ) {
@@ -3877,9 +3877,9 @@ void rotate_in_xz(Vec3f dst, Vec3f src, s16 yaw) {
  * space. If possible, use vec3f_set_dist_and_angle()
  */
 void rotate_in_yz(Vec3f dst, Vec3f src, s16 pitch) {
-    dst[2] = -((src[2] * coss(pitch)) - src[1] * sins(pitch)));
-    dst[1] =  ((src[2] * sins(pitch)) + src[1] * coss(pitch)));
-    dst[0] =   src[0];
+    dst[2] = -((src[2] * coss(pitch)) - (src[1] * sins(pitch)));
+    dst[1] =  ((src[2] * sins(pitch)) + (src[1] * coss(pitch)));
+    dst[0] =    src[0];
 }
 
 /**
@@ -3955,7 +3955,7 @@ void shake_camera_pitch(Vec3f pos, Vec3f focus) {
     if (gLakituState.shakeMagnitude[0] | gLakituState.shakeMagnitude[1]) {
         vec3f_get_dist_and_angle(pos, focus, &dist, &pitch, &yaw);
         pitch += (gLakituState.shakeMagnitude[0] * sins(gLakituState.shakePitchPhase));
-        vec3f_set_dist_and_angle(pos, focus, dist, pitch, yaw);
+        vec3f_set_dist_and_angle(pos, focus,  dist,  pitch,  yaw);
         increment_shake_offset(&gLakituState.shakePitchPhase, gLakituState.shakePitchVel);
         if (camera_approach_s16_symmetric_bool(&gLakituState.shakeMagnitude[0], 0,
                                                gLakituState.shakePitchDecay) == 0) {
@@ -3973,7 +3973,7 @@ void shake_camera_yaw(Vec3f pos, Vec3f focus) {
     if (gLakituState.shakeMagnitude[1] != 0) {
         vec3f_get_dist_and_angle(pos, focus, &dist, &pitch, &yaw);
         yaw += (gLakituState.shakeMagnitude[1] * sins(gLakituState.shakeYawPhase));
-        vec3f_set_dist_and_angle(pos, focus, dist, pitch, yaw);
+        vec3f_set_dist_and_angle(pos, focus,  dist,  pitch,  yaw);
         increment_shake_offset(&gLakituState.shakeYawPhase, gLakituState.shakeYawVel);
         if (camera_approach_s16_symmetric_bool(&gLakituState.shakeMagnitude[1], 0,
                                                gLakituState.shakeYawDecay) == 0) {
@@ -6332,7 +6332,7 @@ void rotate_and_move_vec3f(Vec3f to, Vec3f from, f32 incDist, s16 incPitch, s16 
     pitch += incPitch;
     yaw   += incYaw;
     dist  += incDist;
-    vec3f_set_dist_and_angle(from, to, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(from, to,  dist,  pitch,  yaw);
 }
 
 void set_flag_post_door(struct Camera *c) {
@@ -6632,7 +6632,7 @@ void cutscene_grand_star_front_of_mario(struct Camera *c) {
     approach_f32_asymptotic_bool(&dist, goalDist, 0.1f);
     approach_s16_asymptotic_bool(&pitch, goalPitch, 32);
     approach_s16_asymptotic_bool(&yaw, (goalYaw + 0x1200), 20);
-    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos,  dist,  pitch,  yaw);
 }
 
 /**
@@ -6802,7 +6802,7 @@ void cutscene_dance_move_to_mario(struct Camera *c) {
     vec3f_get_dist_and_angle(sMarioCamState->pos, c->pos, &dist, &pitch, &yaw);
     approach_f32_asymptotic_bool(&dist,  600.0f, 0.3f);
     approach_s16_asymptotic_bool(&pitch, 0x1000, 0x10);
-    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos,  dist,  pitch,  yaw);
 }
 
 void cutscene_dance_rotate(struct Camera *c) {
@@ -6943,7 +6943,7 @@ void cutscene_dance_closeup_fly_above(struct Camera *c) {
     approach_f32_asymptotic_bool(&dist, 800.0f, 0.05f);
     approach_s16_asymptotic_bool(&pitch, goalPitch, 16);
     approach_s16_asymptotic_bool(&yaw, c->yaw, 8);
-    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos,  dist,  pitch,  yaw);
 }
 
 /**
@@ -6957,7 +6957,7 @@ void cutscene_dance_closeup_fly_closer(struct Camera *c) {
     approach_f32_asymptotic_bool(&dist, 240.0f, 0.4f);
     approach_s16_asymptotic_bool(&yaw, c->yaw, 8);
     approach_s16_asymptotic_bool(&pitch, 0x1000, 5);
-    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos,  dist,  pitch,  yaw);
 }
 
 /**
@@ -7030,7 +7030,7 @@ void cutscene_dance_fly_away_approach_mario(struct Camera *c) {
     approach_f32_asymptotic_bool(&dist,  600.0f, 0.3f);
     approach_s16_asymptotic_bool(&pitch, 0x1000, 16);
     approach_s16_asymptotic_bool(&yaw, c->yaw, 8);
-    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos,  dist,  pitch,  yaw);
 }
 
 void cutscene_dance_fly_away_focus_mario(struct Camera *c) {
@@ -7657,7 +7657,7 @@ void water_death_move_to_mario_side(struct Camera *c) {
 
     vec3f_get_dist_and_angle(sMarioCamState->pos, c->pos, &dist, &pitch, &yaw);
     approach_s16_asymptotic_bool(&yaw, (sMarioCamState->faceAngle[1] - 0x3000), 8);
-    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos,  dist,  pitch,  yaw);
 }
 
 void cutscene_death_standing_start(struct Camera *c) {
@@ -8364,7 +8364,7 @@ void cutscene_cap_switch_press_rotate_around_mario(struct Camera *c) {
     }
 
     yaw = (sMarioCamState->faceAngle[1] + sCutsceneVars[3].angle[1] + sCutsceneVars[1].angle[1]);
-    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos,  dist,  pitch,  yaw);
 }
 
 /**
@@ -8384,7 +8384,7 @@ void cutscene_cap_switch_press_approach_mario(struct Camera *c) {
     vec3f_get_dist_and_angle(sMarioCamState->pos, c->pos, &dist, &pitch, &yaw);
     approach_f32_asymptotic_bool(&dist, 195.0f, 0.2f);
     approach_s16_asymptotic_bool(&pitch,   0x0, 0x10);
-    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos, dist, pitch, yaw);
+    vec3f_set_dist_and_angle(sMarioCamState->pos, c->pos,  dist,  pitch,  yaw);
 
     approach_f32_asymptotic_bool(&c->focus[0],  sMarioCamState->pos[0],           0.1f);
     approach_f32_asymptotic_bool(&c->focus[1], (sMarioCamState->pos[1] + 110.0f), 0.1f);

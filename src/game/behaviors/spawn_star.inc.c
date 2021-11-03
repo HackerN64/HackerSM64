@@ -48,7 +48,7 @@ void bhv_star_spawn_init(void) {
 #ifdef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR) {
 #else
-    if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR || gCurrCourseNum == COURSE_BBH) {
+    if ((o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR) || (gCurrCourseNum == COURSE_BBH)) {
 #endif
         cutscene_object(CUTSCENE_STAR_SPAWN, o);
     } else {
