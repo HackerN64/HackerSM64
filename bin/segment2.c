@@ -2667,14 +2667,9 @@ const Gfx dl_shadow_square[] = {
 };
 #endif
 
-// 0x02014620 - 0x02014638
-const Gfx dl_shadow_4_verts[] = {
-    gsSP2Triangles( 0,  2,  1, 0x0,  1,  2,  3, 0x0),
-    gsSPEndDisplayList(),
-};
-
 // 0x02014638 - 0x02014660
 const Gfx dl_shadow_end[] = {
+    gsSP2Triangles( 0,  2,  1, 0x0,  1,  2,  3, 0x0),
     gsDPPipeSync(),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK),
