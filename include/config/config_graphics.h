@@ -55,3 +55,6 @@
 // It is sideways in vanilla, and since vanilla's environment map textures are sideways too, they will appear as sideways in-game if this is enabled.
 // Make sure your custom environment map textures are the correct orientation.
 //#define FIX_REFLECT_MTX
+
+// Disables object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
+//#define DISABLE_SHADOWS

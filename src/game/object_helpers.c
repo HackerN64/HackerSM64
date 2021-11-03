@@ -99,7 +99,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
 
 Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     if (callContext == GEO_CONTEXT_RENDER) {
-        struct Object *obj = (struct Object *) gCurGraphNodeObject; // TODO: change global type to Object pointer
+        struct Object *obj = gCurGraphNodeObjectNode;
 
         // move to a local var because GraphNodes are passed in all geo functions.
         // cast the pointer.
