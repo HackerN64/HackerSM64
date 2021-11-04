@@ -5680,16 +5680,6 @@ const BehaviorScript bhvMovingFlame[] = {
     END_LOOP(),
 };
 
-const BehaviorScript bhvFireSpitter[] = {
-    BEGIN(OBJ_LIST_GENACTOR),
-    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
-    BILLBOARD(),
-    SCALE(/*Unused*/ 0, /*Field*/ 40),
-    BEGIN_LOOP(),
-        CALL_NATIVE(bhv_fire_spitter_update),
-    END_LOOP(),
-};
-
 const BehaviorScript bhvMovingFlameEmber[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
@@ -5698,6 +5688,16 @@ const BehaviorScript bhvMovingFlameEmber[] = {
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_moving_flame_particle_loop),
         ADD_INT(oAnimState, 1),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvFireSpitter[] = {
+    BEGIN(OBJ_LIST_GENACTOR),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    BILLBOARD(),
+    SCALE(/*Unused*/ 0, /*Field*/ 40),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_fire_spitter_update),
     END_LOOP(),
 };
 
