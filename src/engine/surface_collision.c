@@ -564,7 +564,7 @@ f32 find_water_floor(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor) {
 
     // Check for surfaces that are a part of level geometry.
     struct SurfaceNode *surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER].next;
-    struct Surface *floor = find_water_floor_from_list(surfaceList, x, y, z, &height);
+    struct Surface     *floor       = find_water_floor_from_list(surfaceList, x, y, z, &height);
 
     if (floor == NULL) {
         height = FLOOR_LOWER_LIMIT;
@@ -631,14 +631,13 @@ s32 find_water_level(s32 x, s32 z) {
     s32 val;
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
-    struct Surface *floor;
+    struct Surface *floor = NULL;
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-
     s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
-    if (p != NULL && waterLevel == FLOOR_LOWER_LIMIT) {
+    if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
         s32 numRegions = *p++;
 
         for (s32 i = 0; i < numRegions; i++) {
