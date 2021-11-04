@@ -92,7 +92,6 @@ s8 gShadowFlags;
 
 struct Shadow gCurrShadow;
 #define s gCurrShadow
-struct Surface gShadowFloor;
 
 /**
  * Let (oldZ, oldX) be the relative coordinates of a point on a rectangle,
@@ -171,6 +170,9 @@ s32 init_shadow(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 overwriteSolid
     //     waterLevel = get_water_level_below_shadow(s);
     // }
 
+    Vec3f n = { s.floor->normal.x, s.floor->normal.y, s.floor->normal.z };
+    // register f32 oo  = s.floor->originOffset;
+
     if (gShadowFlags & SHADOW_FLAG_WATER_BOX) {
         s.floorHeight = waterLevel;
 
@@ -178,20 +180,20 @@ s32 init_shadow(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 overwriteSolid
             s.floor = waterFloor;
             gShadowFlags &= ~SHADOW_FLAG_WATER_BOX;
             gShadowFlags |=  SHADOW_FLAG_WATER_SURFACE;
-            s.solidity   = 200;
+            s.solidity    = 200;
         } else {
             gShadowFlags &= ~SHADOW_FLAG_WATER_SURFACE;
             // Assume that the water is flat.
-            s.floor->normal.x = 0.0f;
-            s.floor->normal.y = 1.0f;
-            s.floor->normal.z = 0.0f;
-            s.floor->originOffset = -waterLevel;
+            n[0] = 0.0f;
+            ((u32 *) n)[1] = FLOAT_ONE;
+            n[2] = 0.0f;
+            // oo = -waterLevel;
         }
 
     } else {
         // Don't draw a shadow if the floor is lower than expected possible,
         // or if the y-normal is negative (an unexpected result).
-        if ((s.floorHeight < FLOOR_LOWER_LIMIT_MISC) || (s.floor->normal.y <= 0.0f)) {
+        if ((s.floorHeight < FLOOR_LOWER_LIMIT_MISC) || (n[1] <= 0.0f)) {
             return TRUE;
         }
     }
@@ -202,35 +204,16 @@ s32 init_shadow(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 overwriteSolid
 
     s.shadowScale = scale_shadow_with_distance(shadowScale, (yPos - s.floorHeight));
 
-    s.floorYaw = atan2s(s.floor->normal.z, s.floor->normal.x);
-
-    f32 floorSteepness = (sqr(s.floor->normal.x) + sqr(s.floor->normal.z));
-
+    f32 floorSteepness = (sqr(n[0]) + sqr(n[2]));
     // This if-statement avoids dividing by 0.
-    if (floorSteepness == 0.0f) {
-        s.floorPitch = 0x0;
+    if (FLT_IS_NONZERO(floorSteepness)) {
+        s.floorPitch = (0x4000 - atan2s(sqrtf(floorSteepness), n[1]));
+        s.floorYaw   = atan2s(n[2], n[0]);
     } else {
-        floorSteepness = sqrtf(floorSteepness);
-        s.floorPitch = (0x4000 - atan2s(floorSteepness, s.floor->normal.y));
+        s.floorPitch = 0x0;
+        s.floorYaw   = 0x0;
     }
     return FALSE;
-}
-
-/**
- * Given a `vertexNum` from a shadow with nine vertices, update the
- * texture coordinates corresponding to that vertex. That is:
- *      0 = (-15, -15)         1 = (0, -15)         2 = (15, -15)
- *      3 = (-15,   0)         4 = (0,   0)         5 = (15,   0)
- *      6 = (-15,  15)         7 = (0,  15)         8 = (15,  15)
- */
-void get_texture_coords_9_vertices(s8 vertexNum, s16 *textureX, s16 *textureY) {
-#ifdef HD_SHADOWS
-    *textureX = (((vertexNum % 3) * 63) - 63);
-    *textureY = (((vertexNum / 3) * 63) - 63);
-#else
-    *textureX = (((vertexNum % 3) * 15) - 15);
-    *textureY = (((vertexNum / 3) * 15) - 15);
-#endif
 }
 
 /**
@@ -280,9 +263,8 @@ void make_shadow_vertex_at_xyz(Vtx *vertices, s8 index, f32 relX, f32 relY, f32 
 /**
  * Given a shadow vertex with the given `index`, return the corresponding texture
  * coordinates ranging in the square with corners at (-1, -1), (1, -1), (-1, 1),
- * and (1, 1) in the x-z plane. See `get_texture_coords_9_vertices()` and
- * `get_texture_coords_4_vertices()`, which have similar functionality, but
- * return 15 times these values.
+ * and (1, 1) in the x-z plane. See `get_texture_coords_4_vertices()`, which has
+ * similar functionality, but return 15 times these values.
  */
 void get_vertex_coords(s8 index, s8 *xCoord, s8 *zCoord) {
     *xCoord = ((index & 0x1) - 1);
@@ -311,7 +293,7 @@ void calculate_vertex_xyz(s8 index, f32 *xPosVtx, f32 *yPosVtx, f32 *zPosVtx) {
     get_vertex_coords(index, &xCoordUnit, &zCoordUnit);
 
     f32 halfScale       = ((xCoordUnit * s.shadowScale) / 2.0f);
-    f32 halfTiltedScale = ((zCoordUnit *    tiltedScale) / 2.0f);
+    f32 halfTiltedScale = ((zCoordUnit *   tiltedScale) / 2.0f);
 
     *xPosVtx = ((halfTiltedScale * sins(downwardAngle)) + (halfScale * coss(downwardAngle)) + s.parentPos[0]);
     *zPosVtx = ((halfTiltedScale * coss(downwardAngle)) - (halfScale * sins(downwardAngle)) + s.parentPos[2]);
@@ -392,9 +374,8 @@ void linearly_interpolate_solidity_negative(u8 initialSolidity, s16 curr, s16 st
  * Change a shadow's solidity based on the player's current animation frame.
  */
 s32 correct_shadow_solidity_for_animations(u8 initialSolidity) {
-    struct Object *player = gMarioObject;
-    s16 animFrame = player->header.gfx.animInfo.animFrame;
-    switch (player->header.gfx.animInfo.animID) {
+    s16 animFrame = gMarioObject->header.gfx.animInfo.animFrame;
+    switch (gMarioObject->header.gfx.animInfo.animID) {
         case MARIO_ANIM_IDLE_ON_LEDGE:
             return SHADOW_SOLIDITY_NO_SHADOW;
             break;
@@ -425,12 +406,12 @@ void correct_lava_shadow_height(void) {
             s.floorHeight = -3062.0f;
             gShadowFlags |= SHADOW_FLAG_WATER_BOX;
         } else if (s.floorHeight > 3400.0f) {
-            s.floorHeight = 3492.0f;
+            s.floorHeight =  3492.0f;
             gShadowFlags |= SHADOW_FLAG_WATER_BOX;
         }
-    } else if ((gCurrLevelNum == LEVEL_LLL)
+    } else if ((gCurrLevelNum  == LEVEL_LLL)
             && (gCurrAreaIndex == 1)
-            && (s.floor->type == SURFACE_BURNING)) {
+            && (s.floor->type  == SURFACE_BURNING)) {
         s.floorHeight = 5.0f;
         gShadowFlags |= SHADOW_FLAG_WATER_BOX;
     }
@@ -653,16 +634,14 @@ Gfx *create_shadow_hardcoded_rectangle(f32 xPos, f32 yPos, f32 zPos, UNUSED s16 
  * Return a pointer to the display list representing the shadow.
  */
 Gfx *create_shadow_below_xyz(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 shadowSolidity, s8 shadowType) {
-    s.floor = &gShadowFloor;
-
     // Attempt to use existing floors before finding a new one.
     if (gCurGraphNodeObjectNode == gMarioObject) {
-        gShadowFloor  = *gMarioState->floor;
-        s.floorHeight =  gMarioState->floorHeight;
+        s.floor       = gMarioState->floor;
+        s.floorHeight = gMarioState->floorHeight;
     } else if ((gCurGraphNodeObject != &gMirrorMario)
             && (gCurGraphNodeObjectNode->oFloor != NULL)) {
-        gShadowFloor  = *gCurGraphNodeObjectNode->oFloor;
-        s.floorHeight =  gCurGraphNodeObjectNode->oFloorHeight;
+        s.floor       = gCurGraphNodeObjectNode->oFloor;
+        s.floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
     } else {
         gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
         s.floorHeight = find_floor(xPos, yPos, zPos, &s.floor);
