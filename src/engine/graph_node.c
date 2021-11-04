@@ -491,9 +491,9 @@ struct GraphNodeBackground *init_graph_node_background(struct AllocOnlyPool *poo
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->fnNode.node, GRAPH_NODE_TYPE_BACKGROUND);
 
-        graphNode->background = ((background << 16) | background);
+        graphNode->background  = ((background << 16) | background);
         graphNode->fnNode.func = backgroundFunc;
-        graphNode->unused = zero; // always 0, unused
+        graphNode->unused      = zero; // always 0, unused
 
         if (backgroundFunc != NULL) {
             backgroundFunc(GEO_CONTEXT_CREATE, &graphNode->fnNode.node, pool);
@@ -518,7 +518,7 @@ struct GraphNodeHeldObject *init_graph_node_held_object(struct AllocOnlyPool *po
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->fnNode.node, GRAPH_NODE_TYPE_HELD_OBJ);
         vec3s_copy(graphNode->translation, translation);
-        graphNode->objNode = objNode;
+        graphNode->objNode     = objNode;
         graphNode->fnNode.func = nodeFunc;
         graphNode->playerIndex = playerIndex;
 
@@ -599,7 +599,7 @@ struct GraphNode *geo_make_first_child(struct GraphNode *newFirstChild) {
             newFirstChild->prev = lastSibling;
             newFirstChild->next = *firstChild;
             (*firstChild)->prev = newFirstChild;
-            lastSibling->next = newFirstChild;
+            lastSibling->next   = newFirstChild;
         }
         *firstChild = newFirstChild;
     }
@@ -619,10 +619,8 @@ void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 call
     do {
         asFnNode = (struct FnGraphNode *) curNode;
 
-        if (curNode->type & GRAPH_NODE_TYPE_FUNCTIONAL) {
-            if (asFnNode->func != NULL) {
-                asFnNode->func(callContext, curNode, NULL);
-            }
+        if ((curNode->type & GRAPH_NODE_TYPE_FUNCTIONAL) && (asFnNode->func != NULL)) {
+            asFnNode->func(callContext, curNode, NULL);
         }
 
         if (curNode->children != NULL) {
@@ -691,12 +689,12 @@ void geo_reset_object_node(struct GraphNodeObject *graphNode) {
  */
 void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f pos, Vec3s angle) {
     vec3_same(graphNode->scale, 1.0f);
-    vec3f_copy(graphNode->pos, pos);
+    vec3f_copy(graphNode->pos,   pos);
     vec3s_copy(graphNode->angle, angle);
 
-    graphNode->sharedChild = sharedChild;
-    graphNode->spawnInfo = 0;
-    graphNode->throwMatrix = NULL;
+    graphNode->sharedChild      = sharedChild;
+    graphNode->spawnInfo        = 0;
+    graphNode->throwMatrix      = NULL;
     graphNode->animInfo.currAnim = NULL;
 
     graphNode->node.flags |=  GRAPH_RENDER_ACTIVE;
@@ -732,7 +730,7 @@ void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo 
  */
 void geo_obj_init_animation(struct GraphNodeObject *graphNode, struct Animation **animPtrAddr) {
     struct Animation **animSegmented = segmented_to_virtual(animPtrAddr);
-    struct Animation *anim = segmented_to_virtual(*animSegmented);
+    struct Animation  *anim          = segmented_to_virtual(*animSegmented);
 
     if (graphNode->animInfo.currAnim != anim) {
         graphNode->animInfo.currAnim   = anim;
