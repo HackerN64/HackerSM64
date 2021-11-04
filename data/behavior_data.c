@@ -5669,13 +5669,13 @@ const BehaviorScript bhvFirePiranhaPlant[] = {
     END_LOOP(),
 };
 
-const BehaviorScript bhvSmallPiranhaFlame[] = {
+const BehaviorScript bhvMovingFlame[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BILLBOARD(),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 30, /*Gravity*/ 0, /*Bounciness*/ -50, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_small_piranha_flame_loop),
+        CALL_NATIVE(bhv_moving_flame_loop),
         ADD_INT(oAnimState, 1),
     END_LOOP(),
 };
@@ -5690,13 +5690,13 @@ const BehaviorScript bhvFireSpitter[] = {
     END_LOOP(),
 };
 
-const BehaviorScript bhvFlyguyFlame[] = {
+const BehaviorScript bhvMovingFlameEmber[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     BILLBOARD(),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ 200, /*Bounciness*/ 0, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_fly_guy_flame_loop),
+        CALL_NATIVE(bhv_moving_flame_particle_loop),
         ADD_INT(oAnimState, 1),
     END_LOOP(),
 };

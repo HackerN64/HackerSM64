@@ -41,8 +41,8 @@ void bhv_boo_cage_loop(void) {
             // give the cage an initial Y velocity of 60 units/frame, and play the puzzle jingle.
             // Otherwise, stay inside the boo.
             if (o->parentObj->oBooDeathStatus != BOO_DEATH_STATUS_ALIVE) {
-                o->oAction++;
-                o->oVelY = 60.0f;
+                o->oAction = BOO_CAGE_ACT_FALLING;
+                o->oVelY   = 60.0f;
                 play_puzzle_jingle();
             } else {
                 obj_copy_pos_and_angle(o, o->parentObj);
@@ -54,7 +54,7 @@ void bhv_boo_cage_loop(void) {
             // Reset pitch and roll. This is useless, since the cage never rotates.
             // Was it meant to rotate inside the boo, like the beta boo key?
             o->oFaceAnglePitch = 0;
-            o->oFaceAngleRoll = 0;
+            o->oFaceAngleRoll  = 0;
 
             // Apply standard physics to the cage.
             cur_obj_update_floor_and_walls();
@@ -72,9 +72,8 @@ void bhv_boo_cage_loop(void) {
             // set the action to BOO_CAGE_ACT_ON_GROUND.
             // This is the only use of the OBJ_MOVE_AT_WATER_SURFACE flag in the game.
             // It seems to serve no purpose here.
-            if (o->oMoveFlags
-                & (OBJ_MOVE_UNDERWATER_ON_GROUND | OBJ_MOVE_AT_WATER_SURFACE | OBJ_MOVE_ON_GROUND)) {
-                o->oAction++;
+            if (o->oMoveFlags & (OBJ_MOVE_UNDERWATER_ON_GROUND | OBJ_MOVE_AT_WATER_SURFACE | OBJ_MOVE_ON_GROUND)) {
+                o->oAction = BOO_CAGE_ACT_ON_GROUND;
             }
 
             break;
@@ -88,7 +87,7 @@ void bhv_boo_cage_loop(void) {
 
             // Set the action to BOO_CAGE_ACT_MARIO_JUMPING_IN when Mario jumps in.
             if (obj_check_if_collided_with_object(o, gMarioObject)) {
-                o->oAction++;
+                o->oAction = BOO_CAGE_ACT_MARIO_JUMPING_IN;
             }
 
             break;
@@ -99,7 +98,7 @@ void bhv_boo_cage_loop(void) {
             // which does nothing. By extension, this action is also useless.
 
             if (o->oTimer > 100) {
-                o->oAction++;
+                o->oAction = BOO_CAGE_ACT_USELESS;
             }
 
             break;

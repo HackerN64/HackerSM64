@@ -42,8 +42,8 @@ void bhv_bub_spawner_loop(void) {
 
 void bub_move_vertically(s32 ySpeed) {
     f32 parentY = o->parentObj->oPosY;
-    if (((parentY - 100.0f - o->oCheepCheepMaxYOffset) < o->oPosY)
-     && (o->oPosY < (parentY + 1000.0f + o->oCheepCheepMaxYOffset))) {
+    if ((((parentY - 100.0f) - o->oCheepCheepMaxYOffset) < o->oPosY)
+     && (o->oPosY < ((parentY + 1000.0f) + o->oCheepCheepMaxYOffset))) {
         o->oPosY = approach_f32_symmetric(o->oPosY, o->oCheepCheepTargetY, ySpeed);
     }
 }
@@ -115,7 +115,7 @@ void bub_act_swimming_away_from_mario(void) {
         o->oAngleToMario = cur_obj_angle_to_home();
     }
     cur_obj_rotate_yaw_toward((o->oAngleToMario + 0x8000), 0x400);
-    if (o->oTimer > 200 && o->oDistanceToMario > 600.0f) {
+    if ((o->oTimer > 200) && (o->oDistanceToMario > 600.0f)) {
         o->oAction = BUB_ACT_SWIMMING_TOWARDS_MARIO;
     }
 }
@@ -128,8 +128,8 @@ ObjActionFunc sCheepCheepActions[] = {
 
 void bhv_bub_loop(void) {
     o->oCheepCheepWaterLevel = find_water_level(o->oPosX, o->oPosZ);
-    o->oCheepCheepTargetY = (gMarioObject->oPosY + o->oCheepCheepTargetYOffset);
-    o->oWallHitboxRadius = 30.0f;
+    o->oCheepCheepTargetY    = (gMarioObject->oPosY + o->oCheepCheepTargetYOffset);
+    o->oWallHitboxRadius     = 30.0f;
 
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sCheepCheepActions);

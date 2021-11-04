@@ -35,23 +35,19 @@ void hoot_floor_bounce(void) {
 
 void hoot_free_step(s16 fastOscY, s32 speed) {
     struct Surface *floor;
-    s16 yaw = o->oMoveAngleYaw;
-    s16 pitch = o->oMoveAnglePitch;
+    s16 yaw       = o->oMoveAngleYaw;
+    s16 pitch     = o->oMoveAnglePitch;
     s16 animFrame = o->header.gfx.animInfo.animFrame;
-    f32 xPrev = o->oPosX;
-    f32 zPrev = o->oPosZ;
+    f32 xPrev     = o->oPosX;
+    f32 zPrev     = o->oPosZ;
 
-    o->oVelY   = (sins(pitch) * speed);
-    f32 hSpeed = (coss(pitch) * speed);
-    o->oVelX   = (sins(yaw) * hSpeed);
-    o->oVelZ   = (coss(yaw) * hSpeed);
+    o->oVelY   = (sins(pitch) *  speed);
+    f32 hSpeed = (coss(pitch) *  speed);
+    o->oVelX   = (sins(  yaw) * hSpeed);
+    o->oVelZ   = (coss(  yaw) * hSpeed);
 
     o->oPosX += o->oVelX;
-    if (fastOscY == 0) {
-        o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 3276.8f)) * 12.5f)); // 50.0f / 4;
-    } else {
-        o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5f)); // 50.0f / 4;
-    }
+    o->oPosY -= (o->oVelY + (coss((s32)(animFrame * ((fastOscY == 0) ? 3276.8f : 6553.6f))) * 12.5f)); // 50.0f / 4;
     o->oPosZ += o->oVelZ;
 
     find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
@@ -79,14 +75,14 @@ void hoot_player_set_yaw(void) {
 }
 
 void hoot_carry_step(s32 speed, UNUSED f32 xPrev, UNUSED f32 zPrev) {
-    s16 yaw = o->oMoveAngleYaw;
-    s16 pitch = o->oMoveAnglePitch;
+    s16 yaw       = o->oMoveAngleYaw;
+    s16 pitch     = o->oMoveAnglePitch;
     s16 animFrame = o->header.gfx.animInfo.animFrame;
 
-    o->oVelY   = (sins(pitch) * speed);
-    f32 hSpeed = (coss(pitch) * speed);
-    o->oVelX   = (sins(yaw) * hSpeed);
-    o->oVelZ   = (coss(yaw) * hSpeed);
+    o->oVelY   = (sins(pitch) *  speed);
+    f32 hSpeed = (coss(pitch) *  speed);
+    o->oVelX   = (sins(  yaw) * hSpeed);
+    o->oVelZ   = (coss(  yaw) * hSpeed);
 
     o->oPosX += o->oVelX;
     o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5f)); // 50.0f / 4;
@@ -108,9 +104,7 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
     hitbox.radius  = 50.0f;
 
     if (find_wall_collisions(&hitbox)) {
-        o->oPosX = hitbox.x;
-        o->oPosY = hitbox.y;
-        o->oPosZ = hitbox.z;
+        vec3f_set(&o->oPosVec, hitbox.x, hitbox.y, hitbox.z);
         gMarioObject->oInteractStatus |= INT_STATUS_MARIO_DROP_FROM_HOOT;
     }
 
@@ -241,8 +235,8 @@ void bhv_hoot_loop(void) {
         case HOOT_AVAIL_WANTS_TO_TALK:
             hoot_awake_loop();
 
-            if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_SPEAK
-                && cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_044)) {
+            if ((set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_SPEAK)
+             && cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_044)) {
                 set_mario_npc_dialog(MARIO_DIALOG_STOP);
 
                 cur_obj_become_tangible();

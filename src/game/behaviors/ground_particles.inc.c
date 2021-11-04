@@ -44,7 +44,12 @@ void bhv_ground_sand_init(void) {
     cur_obj_spawn_particles(&sSandParticles);
 }
 
-static s16 sSmokeMovementParams[] = { 2, -8, 1, 4 };
+static s16 sSmokeMovementParams[] = {
+    /* forwardVel  */  2,
+    /* velY        */ -8,
+    /* gravity     */  1,
+    /* rangeLength */  4
+};
 
 void spawn_smoke_with_velocity(void) {
     struct Object *smoke = spawn_object_with_scale(o, MODEL_SMOKE, bhvWhitePuffSmoke2, 1.0f);

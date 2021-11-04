@@ -82,7 +82,7 @@ void bobomb_act_chase_mario(void) {
     o->oForwardVel = 20.0f;
     s16 collisionFlags = object_step();
 
-    if (animFrame == 5 || animFrame == 16) {
+    if ((animFrame == 5) || (animFrame == 16)) {
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK);
     }
 
@@ -193,7 +193,7 @@ void bobomb_dropped_loop(void) {
     cur_obj_init_animation(BOBOMB_ANIM_WALKING);
 
     o->oHeldState = HELD_FREE;
-    o->oAction = BOBOMB_ACT_PATROL;
+    o->oAction    = BOBOMB_ACT_PATROL;
 }
 
 void bobomb_thrown_loop(void) {
@@ -211,7 +211,7 @@ void cur_obj_random_blink(s32 *blinkTimer) {
     if (*blinkTimer == 0) {
         if ((s16)(random_float() * 100.0f) == 0) {
             o->oAnimState = 1;
-            *blinkTimer = 1;
+            *blinkTimer   = 1;
         }
     } else {
         (*blinkTimer)++;
@@ -226,7 +226,7 @@ void cur_obj_random_blink(s32 *blinkTimer) {
 
         if (*blinkTimer > 15) {
             o->oAnimState = 0;
-            *blinkTimer = 0;
+            *blinkTimer   = 0;
         }
     }
 }
@@ -275,9 +275,9 @@ void bhv_bobomb_loop(void) {
 }
 
 void bhv_bobomb_fuse_smoke_init(void) {
-    o->oPosX += (s32)(random_float() * 80.0f) - 40;
-    o->oPosY += (s32)(random_float() * 80.0f) + 60;
-    o->oPosZ += (s32)(random_float() * 80.0f) - 40;
+    o->oPosX += ((s32)(random_float() * 80.0f) - 40);
+    o->oPosY += ((s32)(random_float() * 80.0f) + 60);
+    o->oPosZ += ((s32)(random_float() * 80.0f) - 40);
     cur_obj_scale(1.2f);
 }
 
@@ -291,9 +291,7 @@ void bhv_bobomb_buddy_init(void) {
 void bobomb_buddy_act_idle(void) {
     s16 animFrame = o->header.gfx.animInfo.animFrame;
 
-    o->oBobombBuddyPosXCopy = o->oPosX;
-    o->oBobombBuddyPosYCopy = o->oPosY;
-    o->oBobombBuddyPosZCopy = o->oPosZ;
+    // vec3f_copy(&o->oBobombBuddyPosCopyVec, &o->oPosVec);
 
     object_step();
 
@@ -356,9 +354,9 @@ void bobomb_buddy_cannon_dialog(s16 dialogFirstText, s16 dialogSecondText) {
 
             o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
             o->oBobombBuddyHasTalkedToMario = BOBOMB_BUDDY_HAS_TALKED;
-            o->oInteractStatus = INT_STATUS_NONE;
-            o->oAction = BOBOMB_BUDDY_ACT_IDLE;
-            o->oBobombBuddyCannonStatus = BOBOMB_BUDDY_CANNON_OPENED;
+            o->oInteractStatus              = INT_STATUS_NONE;
+            o->oAction                      = BOBOMB_BUDDY_ACT_IDLE;
+            o->oBobombBuddyCannonStatus     = BOBOMB_BUDDY_CANNON_OPENED;
             break;
     }
 }
@@ -375,8 +373,8 @@ void bobomb_buddy_act_talk(void) {
 
                     o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
                     o->oBobombBuddyHasTalkedToMario = BOBOMB_BUDDY_HAS_TALKED;
-                    o->oInteractStatus = INT_STATUS_NONE;
-                    o->oAction = BOBOMB_BUDDY_ACT_IDLE;
+                    o->oInteractStatus              = INT_STATUS_NONE;
+                    o->oAction                      = BOBOMB_BUDDY_ACT_IDLE;
                 }
                 break;
 
