@@ -78,7 +78,6 @@ void bobomb_act_patrol(void) {
 
 void bobomb_act_chase_mario(void) {
     s16 animFrame = ++o->header.gfx.animInfo.animFrame;
-    o->oForwardVel = 20.0f;
 
     o->oForwardVel = 20.0f;
     s16 collisionFlags = object_step();
