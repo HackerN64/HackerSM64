@@ -12,7 +12,14 @@
 #define BITMASK(size) ((BIT(size)) - 1)
 #define SHIFTED_BITMASK(size, shift) (BITMASK(size) << shift)
 
-#define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
+// #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
+#define COND_BIT(cond, dst, flag) { \
+    if ((cond)) {                   \
+        (dst) |=  (flag);           \
+    } else {                        \
+        (dst) &= ~(flag);           \
+    }                               \
+}
 
 #define SCREEN_CENTER_X (SCREEN_WIDTH  / 2)
 #define SCREEN_CENTER_Y (SCREEN_HEIGHT / 2)
@@ -28,9 +35,9 @@ struct Config {
 struct Controller {
   /*0x00*/ s16 rawStickX;       //
   /*0x02*/ s16 rawStickY;       //
-  /*0x04*/ float stickX;        // [-64, 64] positive is right
-  /*0x08*/ float stickY;        // [-64, 64] positive is up
-  /*0x0C*/ float stickMag;      // distance from center [0, 64]
+  /*0x04*/ f32 stickX;          // [-64, 64] positive is right
+  /*0x08*/ f32 stickY;          // [-64, 64] positive is up
+  /*0x0C*/ f32 stickMag;        // distance from center [0, 64]
   /*0x10*/ u16 buttonDown;
   /*0x12*/ u16 buttonPressed;
   /*0x14*/ OSContStatus *statusData;
@@ -196,14 +203,14 @@ struct VblankHandler {
 };
 
 enum AnimFlags {
-    ANIM_FLAG_NOLOOP     = (1 << 0), // 0x01
-    ANIM_FLAG_FORWARD    = (1 << 1), // 0x02
-    ANIM_FLAG_NO_ACCEL   = (1 << 2), // 0x04
-    ANIM_FLAG_HOR_TRANS  = (1 << 3), // 0x08
-    ANIM_FLAG_VERT_TRANS = (1 << 4), // 0x10
-    ANIM_FLAG_DISABLED   = (1 << 5), // 0x20
-    ANIM_FLAG_NO_TRANS   = (1 << 6), // 0x40
-    ANIM_FLAG_UNUSED     = (1 << 7), // 0x80
+    ANIM_FLAG_NOLOOP     = BIT(0), // 0x01
+    ANIM_FLAG_FORWARD    = BIT(1), // 0x02
+    ANIM_FLAG_NO_ACCEL   = BIT(2), // 0x04
+    ANIM_FLAG_HOR_TRANS  = BIT(3), // 0x08
+    ANIM_FLAG_VERT_TRANS = BIT(4), // 0x10
+    ANIM_FLAG_DISABLED   = BIT(5), // 0x20
+    ANIM_FLAG_NO_TRANS   = BIT(6), // 0x40
+    ANIM_FLAG_UNUSED     = BIT(7), // 0x80
 };
 
 struct Animation {

@@ -214,9 +214,9 @@ static s32 cur_obj_set_anim_if_at_end(s32 animIndex) {
 }
 
 static s32 cur_obj_play_sound_at_anim_range(s8 startFrame1, s8 startFrame2, u32 sound) {
-    s32 rangeLength;
+    s32 rangeLength = (o->header.gfx.animInfo.animAccel / 0x10000);
 
-    if ((rangeLength = o->header.gfx.animInfo.animAccel / 0x10000) <= 0) {
+    if (rangeLength <= 0) {
         rangeLength = 1;
     }
 
