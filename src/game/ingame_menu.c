@@ -1113,7 +1113,7 @@ void render_dialog_entries(void) {
 
             if (gDialogBoxOpenTimer == 0.0f) {
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
-                gDialogLineNum = 1;
+                gDialogLineNum  = 1;
             }
             lowerBound = 1;
             break;
@@ -1188,11 +1188,11 @@ void render_dialog_entries(void) {
                   ensure_nonnegative(240 + ((dialog->linesPerBox * 80) / DIAG_VAL4) - dialog->width));
     handle_dialog_text_and_pages(0, dialog, lowerBound);
 
-    if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {
+    if ((gLastDialogPageStrPos == -1) && (gLastDialogResponse == 1)) {
         render_dialog_triangle_choice();
     }
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 2, 2, (SCREEN_WIDTH - (gBorderHeight / 2)), (SCREEN_HEIGHT - (gBorderHeight / 2)));
-    if (gLastDialogPageStrPos != -1 && gDialogBoxState == DIALOG_STATE_VERTICAL) {
+    if ((gLastDialogPageStrPos != -1) && (gDialogBoxState == DIALOG_STATE_VERTICAL)) {
         render_dialog_triangle_next(dialog->linesPerBox);
     }
 }
@@ -1269,12 +1269,12 @@ void do_cutscene_handler(void) {
      || (action == ACT_END_PEACH_CUTSCENE)
      || (action == ACT_END_WAVING_CUTSCENE)) {
         gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
-        gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
+        gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
 
-        gDPSetFillColor(gDisplayListHead++, ((GPACK_RGBA5551(0, 0, 0, 0) << 16) | GPACK_RGBA5551(0, 0, 0, 0)));
-        gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0, (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (32 - 1));
+        gDPSetFillColor( gDisplayListHead++, ((GPACK_RGBA5551(0, 0, 0, 0) << 16) | GPACK_RGBA5551(0, 0, 0, 0)));
+        gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0),                    0, (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (           32 - 1));
         gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), (SCREEN_HEIGHT - 32), (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (SCREEN_HEIGHT - 1));
-        gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
+        gDPSetCycleType( gDisplayListHead++, G_CYC_1CYCLE);
     }
 
     // is a cutscene playing? do not perform this handler's actions if so.
@@ -1508,7 +1508,7 @@ void render_widescreen_setting(void) {
 #endif
 
 #if defined(VERSION_JP) || defined(VERSION_SH)
-    #define CRS_NUM_X1 93
+    #define CRS_NUM_X1  93
 #elif defined(VERSION_US)
     #define CRS_NUM_X1 100
 #elif defined(VERSION_EU)
@@ -1516,19 +1516,19 @@ void render_widescreen_setting(void) {
 #endif
 
 #ifdef VERSION_EU
-    #define TXT_COURSE_X      48
-    #define TXT_STAR_X        89
+    #define TXT_COURSE_X       48
+    #define TXT_STAR_X         89
     #define ACT_NAME_X        107
     #define LVL_NAME_X        108
     #define SECRET_LVL_NAME_X get_str_x_pos_from_center(159, &courseName[3], 10.0f)
-    #define MYSCORE_X         48
+    #define MYSCORE_X          48
 #else
-    #define TXT_COURSE_X      63
-    #define TXT_STAR_X        98
+    #define TXT_COURSE_X       63
+    #define TXT_STAR_X         98
     #define ACT_NAME_X        116
     #define LVL_NAME_X        117
-    #define SECRET_LVL_NAME_X 94
-    #define MYSCORE_X         62
+    #define SECRET_LVL_NAME_X  94
+    #define MYSCORE_X          62
 #endif
 
 void render_pause_my_score_coins(void) {
@@ -1540,7 +1540,7 @@ void render_pause_my_score_coins(void) {
     u8 strCourseNum[4];
 
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
-    void **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
+    void    **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
 
     u8 courseIndex = COURSE_NUM_TO_INDEX(gCurrCourseNum);
     u8 starFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
@@ -1678,7 +1678,7 @@ void highlight_last_course_complete_stars(void) {
     u8 doneCourseIndex;
 
     if (gLastCompletedCourseNum == COURSE_NONE) {
-        doneCourseIndex = 0;
+        doneCourseIndex = COURSE_NUM_TO_INDEX(COURSE_MIN);
     } else {
         doneCourseIndex = COURSE_NUM_TO_INDEX(gLastCompletedCourseNum);
 
