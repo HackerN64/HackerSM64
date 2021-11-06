@@ -247,7 +247,7 @@ void update_debug_dpadmask(void) {
 
     if (!dPadMask) {
         sDebugInfoDPadUpdID = 0;
-        sDebugInfoDPadMask = 0;
+        sDebugInfoDPadMask  = 0;
     } else {
         // to prevent stuttering of mask updates, the first time is updated 6
         // frames from start, and then every 2 frames when held down.

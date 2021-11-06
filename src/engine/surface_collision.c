@@ -179,10 +179,10 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
         numCollisions += find_wall_collisions_from_list(node, colData);
     }
     gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
-
+#ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.wall++;
-
+#endif
 #if PUPPYPRINT_DEBUG
     collisionTime[perfIteration] += (osGetTime() - first);
 #endif
@@ -323,10 +323,10 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 
     *pceil = ceil;
-
+#ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.ceil++;
-
+#endif
 #if PUPPYPRINT_DEBUG
     collisionTime[perfIteration] += (osGetTime() - first);
 #endif
@@ -538,8 +538,10 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
         gNumFindFloorMisses++;
     }
     *pfloor = floor;
+#ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.floor++;
+#endif
 #if PUPPYPRINT_DEBUG
     collisionTime[perfIteration] += (osGetTime() - first);
 #endif
@@ -576,10 +578,10 @@ f32 find_water_floor(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor) {
     } else {
         *pfloor = floor;
     }
-
+#ifdef VANILLA_DEBUG
     // Increment the debug tracker.
     gNumCalls.floor++;
-
+#endif
     return height;
 }
 
@@ -718,6 +720,7 @@ s32 find_poison_gas_level(s32 x, s32 z) {
  *                      DEBUG                     *
  **************************************************/
 
+#ifdef VANILLA_DEBUG
 /**
  * Finds the length of a surface list for debug purposes.
  */
@@ -785,6 +788,7 @@ void debug_surface_list_info(f32 xPos, f32 zPos) {
     gNumCalls.ceil  = 0;
     gNumCalls.wall  = 0;
 }
+#endif
 
 /**
  * An unused function that finds and interacts with any type of surface.
