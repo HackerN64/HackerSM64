@@ -668,7 +668,7 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
 
         approach_camera_height(c, goalHeight, 5.0f);
     } else {
-        camFloorHeight   = find_floor(c->pos[0], (c->pos[1] + 100.0f), c->pos[2], &surface) + baseOff;
+        camFloorHeight   = (find_floor(c->pos[0], (c->pos[1] + 100.0f), c->pos[2], &surface) + baseOff);
         marioFloorHeight = (baseOff + sMarioGeometry.currFloorHeight);
 
         if (camFloorHeight < marioFloorHeight) {
@@ -704,7 +704,7 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
 s32 look_down_slopes(s16 camYaw) {
     struct Surface *floor;
     // Default pitch
-    s16 pitch = 0x05B0;
+    s16 pitch = DEGREES(8);
     // x and z offsets towards the camera
     f32 xOff = (sMarioCamState->pos[0] + (sins(camYaw) * 40.0f));
     f32 zOff = (sMarioCamState->pos[2] + (coss(camYaw) * 40.0f));
@@ -712,8 +712,8 @@ s32 look_down_slopes(s16 camYaw) {
     f32 floorDY = (find_floor(xOff, sMarioCamState->pos[1], zOff, &floor) - sMarioCamState->pos[1]);
 
     if ((floor != NULL) && (floor->type != SURFACE_WALL_MISC) && (floorDY > 0)) {
-        if (floor->normal.z == 0.0f && floorDY < 100.0f) {
-            pitch = 0x05B0;
+        if ((floor->normal.z == 0.0f) && (floorDY < 100.0f)) {
+            pitch = DEGREES(8);
         } else {
             // Add the slope's angle of declination to the pitch
             pitch += atan2s(40.0f, floorDY);
