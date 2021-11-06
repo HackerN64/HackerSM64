@@ -761,7 +761,7 @@ void debug_surface_list_info(f32 xPos, f32 zPos) {
     list = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next;
     numCeils += surface_list_length(list);
 
-    print_debug_top_down_mapinfo("area   %x", cellZ * NUM_CELLS + cellX);
+    print_debug_top_down_mapinfo("area   %x", ((cellZ * NUM_CELLS) + cellX));
 
     // Names represent ground, walls, and roofs as found in SMS.
     print_debug_top_down_mapinfo("dg %d", numFloors);

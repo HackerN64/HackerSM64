@@ -15,6 +15,8 @@
 #include "sm64.h"
 #include "types.h"
 
+#ifdef VANILLA_DEBUG
+
 enum DebugInfoFlags {
     DEBUG_INFO_NOFLAGS      = (0 << 0),
     DEBUG_INFO_FLAG_DPRINT  = (1 << 0),
@@ -265,7 +267,7 @@ void update_debug_dpadmask(void) {
 
 void debug_unknown_level_select_check(void) {
     if (!sDebugLvSelectCheckFlag) {
-        sDebugLvSelectCheckFlag++; // again, just do = TRUE...
+        sDebugLvSelectCheckFlag = TRUE;
 
         if (!gDebugLevelSelect) {
             gDebugInfoFlags = DEBUG_INFO_NOFLAGS;
@@ -284,11 +286,9 @@ void reset_debug_objectinfo(void) {
     gUnknownWallCount      = 0;
     gObjectCounter         = 0;
     sDebugStringArrPrinted = FALSE;
-#ifdef CUSTOM_DEBUG
     set_print_state_info(gDebugPrintState1,  20, 185, 40, 200, -15);
     set_print_state_info(gDebugPrintState2, 180,  30,  0, 150,  15);
     update_debug_dpadmask();
-#endif
 }
 
 /*
@@ -520,3 +520,5 @@ void debug_enemy_unknown(s16 *enemyArr) {
     enemyArr[6] = gDebugInfo[DEBUG_PAGE_ENEMYINFO][3];
     enemyArr[7] = gDebugInfo[DEBUG_PAGE_ENEMYINFO][4];
 }
+
+#endif

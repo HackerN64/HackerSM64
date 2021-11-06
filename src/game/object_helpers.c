@@ -1279,7 +1279,7 @@ UNUSED f32 cur_obj_abs_y_dist_to_home(void) {
     return absf(o->oHomeY - o->oPosY);
 }
 
-s32 cur_obj_advance_looping_anim(void) {
+UNUSED s32 cur_obj_advance_looping_anim(void) {
     s32 animFrame = o->header.gfx.animInfo.animFrame;
     s32 loopEnd   = o->header.gfx.animInfo.currAnim->loopEnd;
 
@@ -1347,18 +1347,18 @@ static void cur_obj_update_floor(void) {
     o->oFloor = floor;
 
     if (floor != NULL) {
-        if (floor->type == SURFACE_BURNING) {
+        SurfaceType floorType = floor->type;
+        if (floorType == SURFACE_BURNING) {
             o->oMoveFlags |= OBJ_MOVE_ABOVE_LAVA;
-        } else if ((floor->type == SURFACE_DEATH_PLANE)
-                || (floor->type == SURFACE_VERTICAL_WIND)) {
+        } else if ((floorType == SURFACE_DEATH_PLANE)
+                || (floorType == SURFACE_VERTICAL_WIND)) {
             //! This maybe misses SURFACE_WARP
             o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
         }
-
-        o->oFloorType = floor->type;
+        o->oFloorType = floorType;
         o->oFloorRoom = floor->room;
     } else {
-        o->oFloorType = 0;
+        o->oFloorType = SURFACE_DEFAULT;
         o->oFloorRoom = 0;
     }
 }

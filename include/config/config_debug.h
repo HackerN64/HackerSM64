@@ -16,11 +16,14 @@
 // If you want the game to boot normally, just comment out the define again.
 //#define TEST_LEVEL LEVEL_BOB
 
-// Enable debug level select
+// Enable debug level select.
 //#define DEBUG_LEVEL_SELECT
 
-// Enable debug free move (DPad up to enter, A to exit)
+// Enable debug free move (DPad up to enter, A to exit).
 #define ENABLE_DEBUG_FREE_MOVE
+
+// Include vanilla debug functionality.
+//#define VANILLA_DEBUG
 
 // Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
 //#define CUSTOM_DEBUG
@@ -30,7 +33,7 @@
 // Include a custom, enhanced performance profiler (Requires PUPPYPRINT).
 #define PUPPYPRINT_DEBUG 1
 
-// Use cycles instead of microseconds in Puppyprint debug output
+// Use cycles instead of microseconds in Puppyprint debug output.
 //#define PUPPYPRINT_DEBUG_CYCLES
 
 // Visual debug enables some collision visuals. Tapping Right on the dpad will cycle between visual hitboxes, visual surfaces, both, and neither.
@@ -62,6 +65,7 @@
 #undef TEST_LEVEL
 #undef DEBUG_LEVEL_SELECT
 #undef ENABLE_DEBUG_FREE_MOVE
+#undef VANILLA_DEBUG
 #undef CUSTOM_DEBUG
 #undef PUPPYPRINT_DEBUG
 #undef PUPPYPRINT_DEBUG_CYCLES

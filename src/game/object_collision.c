@@ -8,7 +8,7 @@
 #include "spawn_object.h"
 #include "engine/math_util.h"
 
-struct Object *debug_print_obj_collision(struct Object *a) {
+UNUSED struct Object *debug_print_obj_collision(struct Object *a) {
     struct Object *currCollidedObj;
     s32 i;
 
