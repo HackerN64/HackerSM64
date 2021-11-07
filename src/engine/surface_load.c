@@ -116,10 +116,10 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
     s32 listIndex;
     s32 isWater = SURFACE_IS_NEW_WATER(surface->type);
 
-    if (surface->normal.y > 0.01) {
-        listIndex = isWater ? SPATIAL_PARTITION_WATER : SPATIAL_PARTITION_FLOORS;
+    if (surface->normal.y > 0.01f) {
+        listIndex = (isWater ? SPATIAL_PARTITION_WATER : SPATIAL_PARTITION_FLOORS);
         sortDir = 1; // highest to lowest, then insertion order
-    } else if (surface->normal.y < -0.01) {
+    } else if (surface->normal.y < -0.01f) {
         listIndex = SPATIAL_PARTITION_CEILS;
         sortDir = -1; // lowest to highest, then insertion order
     } else {
@@ -134,7 +134,7 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
     if (dynamic) {
         list = &gDynamicSurfacePartition[cellZ][cellX][listIndex];
     } else {
-        list = &gStaticSurfacePartition[cellZ][cellX][listIndex];
+        list =  &gStaticSurfacePartition[cellZ][cellX][listIndex];
     }
 
     // Loop until we find the appropriate place for the surface in the list.
@@ -156,8 +156,6 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
  * @param coord The coordinate to test
  */
 static s32 lower_cell_index(s32 coord) {
-    s32 index;
-
     // Move from range [-LEVEL_BOUNDARY_MAX, LEVEL_BOUNDARY_MAX) to [0, 2 * LEVEL_BOUNDARY_MAX)
     coord += LEVEL_BOUNDARY_MAX;
     if (coord < 0) {
@@ -165,7 +163,7 @@ static s32 lower_cell_index(s32 coord) {
     }
 
     // [0, NUM_CELLS)
-    index = (coord / CELL_SIZE);
+    s32 index = (coord / CELL_SIZE);
 
     // Include extra cell if close to boundary
     //! Some wall checks are larger than the buffer, meaning wall checks can
@@ -186,8 +184,6 @@ static s32 lower_cell_index(s32 coord) {
  * @param coord The coordinate to test
  */
 static s32 upper_cell_index(s32 coord) {
-    s32 index;
-
     // Move from range [-LEVEL_BOUNDARY_MAX, LEVEL_BOUNDARY_MAX) to [0, 2 * LEVEL_BOUNDARY_MAX)
     coord += LEVEL_BOUNDARY_MAX;
     if (coord < 0) {
@@ -195,7 +191,7 @@ static s32 upper_cell_index(s32 coord) {
     }
 
     // [0, NUM_CELLS)
-    index = (coord / CELL_SIZE);
+    s32 index = (coord / CELL_SIZE);
 
     // Include extra cell if close to boundary
     //! Some wall checks are larger than the buffer, meaning wall checks can
@@ -348,8 +344,8 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
 
         surface = read_surface_data(vertexData, data);
         if (surface != NULL) {
-            surface->room = room;
-            surface->type = surfaceType;
+            surface->room  = room;
+            surface->type  = surfaceType;
             surface->flags = flags;
 
 #ifdef ALL_SURFACES_HAVE_FORCE
@@ -401,8 +397,6 @@ static void load_environmental_regions(TerrainData **data) {
  * Allocate some of the main pool for surfaces (2300 surf) and for surface nodes (7000 nodes).
  */
 void alloc_surface_pools(void) {
-    // sSurfaceNodePoolSize = SURFACE_NODE_POOL_SIZE;
-    // sSurfacePoolSize     = SURFACE_POOL_SIZE;
     sSurfaceNodePool     = main_pool_alloc(sSurfaceNodePoolSize * sizeof(struct SurfaceNode), MEMORY_POOL_LEFT);
     sSurfacePool         = main_pool_alloc(sSurfacePoolSize     * sizeof(struct Surface    ), MEMORY_POOL_LEFT);
     gCCMEnteredSlide     = FALSE;
@@ -531,7 +525,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
  */
 void clear_dynamic_surfaces(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
-        gSurfacesAllocated = gNumStaticSurfaces;
+        gSurfacesAllocated     = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
 
         clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
@@ -564,7 +558,9 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
         vertices += 3;
 
         //! No bounds check on vertex data
-        if ((v[0] == 0) && (v[1] == 0) && (v[2] == 0)) {
+        if ((v[0] == 0)
+         && (v[1] == 0)
+         && (v[2] == 0)) {
             vec3f_to_vec3s(vertexData, m[3]);
         } else {
             linear_mtxf_mul_vec3_and_translate(m, vertexData, v);
@@ -602,7 +598,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
 
         if (surface != NULL) {
             surface->object = o;
-            surface->type = surfaceType;
+            surface->type   = surfaceType;
 
 #ifdef ALL_SURFACES_HAVE_FORCE
             surface->force = *(*data + 3);
@@ -610,7 +606,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
             surface->force = (hasForce ? *(*data + 3) : 0);
 #endif
             surface->flags |= flags;
-            surface->room = room;
+            surface->room   = room;
             add_surface(surface, TRUE);
         }
 
@@ -675,8 +671,9 @@ void load_object_collision_model(void) {
     }
 
     // Update if no Time Stop, in range, and in the current room.
-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && (marioDist < o->oCollisionDistance)
-        && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+    if (!(gTimeStopState & TIME_STOP_ACTIVE)
+     && (marioDist < o->oCollisionDistance)
+     && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         collisionData++;
         transform_object_vertices(&collisionData, vertexData);
 
