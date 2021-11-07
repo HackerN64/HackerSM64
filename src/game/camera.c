@@ -3227,12 +3227,9 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
     }
     evaluate_cubic_spline(u, p, controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
 
-    if (spline[*splineSegment + 1].speed != 0) {
-        firstSpeed = (1.0f / spline[*splineSegment + 1].speed);
-    }
-    if (spline[*splineSegment + 2].speed != 0) {
-        secondSpeed = (1.0f / spline[*splineSegment + 2].speed);
-    }
+    if (spline[*splineSegment + 1].speed != 0) firstSpeed  = (1.0f / spline[*splineSegment + 1].speed);
+    if (spline[*splineSegment + 2].speed != 0) secondSpeed = (1.0f / spline[*splineSegment + 2].speed);
+
     progressChange = (((secondSpeed - firstSpeed) * *progress) + firstSpeed);
 
     if (1 <= (*progress += progressChange)) {

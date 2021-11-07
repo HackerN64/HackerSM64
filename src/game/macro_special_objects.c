@@ -35,7 +35,7 @@ void spawn_macro_abs_yrot_2params(ModelID32 model, const BehaviorScript *behavio
     if (behavior != NULL) {
         struct Object *newObj =
             spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, convert_rotation(ry), 0);
-        newObj->oBehParams = ((u32) params) << 16;
+        newObj->oBehParams = (((u32) params) << 16);
     }
 }
 
@@ -48,7 +48,7 @@ void spawn_macro_abs_yrot_param1(ModelID32 model, const BehaviorScript *behavior
     if (behavior != NULL) {
         struct Object *newObj =
             spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, convert_rotation(ry), 0);
-        newObj->oBehParams = ((u32) param) << 24;
+        newObj->oBehParams = (((u32) param) << 24);
     }
 }
 
@@ -195,21 +195,16 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
     u8 defaultParam;
     const BehaviorScript *behavior;
 
-    s32 numOfSpecialObjects = **specialObjList;
-    (*specialObjList)++;
+    s32 numOfSpecialObjects = *(*specialObjList)++;
 
-    gMacroObjectDefaultParent.header.gfx.areaIndex = areaIndex;
+    gMacroObjectDefaultParent.header.gfx.areaIndex       = areaIndex;
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
 
     for (i = 0; i < numOfSpecialObjects; i++) {
-        presetID = (u8) **specialObjList;
-        (*specialObjList)++;
-        pos[0] = **specialObjList;
-        (*specialObjList)++;
-        pos[1] = **specialObjList;
-        (*specialObjList)++;
-        pos[2] = **specialObjList;
-        (*specialObjList)++;
+        presetID = (u8) *(*specialObjList)++;
+        pos[0] = *(*specialObjList)++;
+        pos[1] = *(*specialObjList)++;
+        pos[2] = *(*specialObjList)++;
 
         offset = 0;
         while (TRUE) {
@@ -219,9 +214,9 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
             offset++;
         }
 
-        model = SpecialObjectPresets[offset].model;
-        behavior = SpecialObjectPresets[offset].behavior;
-        type = SpecialObjectPresets[offset].type;
+        model        = SpecialObjectPresets[offset].model;
+        behavior     = SpecialObjectPresets[offset].behavior;
+        type         = SpecialObjectPresets[offset].type;
         defaultParam = SpecialObjectPresets[offset].defParam;
 
         switch (type) {
@@ -229,29 +224,22 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
                 spawn_macro_abs_yrot_2params(model, behavior, pos[0], pos[1], pos[2], 0, 0);
                 break;
             case SPTYPE_YROT_NO_PARAMS:
-                extraParams[0] = **specialObjList; // Y-rotation
-                (*specialObjList)++;
+                extraParams[0] = *(*specialObjList)++; // Y-rotation
                 spawn_macro_abs_yrot_2params(model, behavior, pos[0], pos[1], pos[2], extraParams[0], 0);
                 break;
             case SPTYPE_PARAMS_AND_YROT:
-                extraParams[0] = **specialObjList; // Y-rotation
-                (*specialObjList)++;
-                extraParams[1] = **specialObjList; // Params
-                (*specialObjList)++;
+                extraParams[0] = *(*specialObjList)++; // Y-rotation
+                extraParams[1] = *(*specialObjList)++; // Params
                 spawn_macro_abs_yrot_2params(model, behavior, pos[0], pos[1], pos[2], extraParams[0], extraParams[1]);
                 break;
             case SPTYPE_UNKNOWN:
-                extraParams[0] = **specialObjList; // Unknown, gets put into obj->oMacroUnk108 as a float
-                (*specialObjList)++;
-                extraParams[1] = **specialObjList; // Unknown, gets put into obj->oMacroUnk10C as a float
-                (*specialObjList)++;
-                extraParams[2] = **specialObjList; // Unknown, gets put into obj->oMacroUnk110 as a float
-                (*specialObjList)++;
+                extraParams[0] = *(*specialObjList)++; // Unknown, gets put into obj->oMacroUnk108 as a float
+                extraParams[1] = *(*specialObjList)++; // Unknown, gets put into obj->oMacroUnk10C as a float
+                extraParams[2] = *(*specialObjList)++; // Unknown, gets put into obj->oMacroUnk110 as a float
                 spawn_macro_abs_special(model, behavior, pos[0], pos[1], pos[2], extraParams[0], extraParams[1], extraParams[2]);
                 break;
             case SPTYPE_DEF_PARAM_AND_YROT:
-                extraParams[0] = **specialObjList; // Y-rotation
-                (*specialObjList)++;
+                extraParams[0] = *(*specialObjList)++; // Y-rotation
                 spawn_macro_abs_yrot_param1(model, behavior, pos[0], pos[1], pos[2], extraParams[0], defaultParam);
                 break;
             default:
@@ -271,7 +259,7 @@ u32 get_special_objects_size(s16 *data) {
 
     for (i = 0; i < numOfSpecialObjects; i++) {
         presetID = (u8) *data++;
-        data += 3;
+        data  += 3;
         offset = 0;
 
         while (TRUE) {
