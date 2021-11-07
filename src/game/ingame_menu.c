@@ -856,7 +856,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, (2 - (lineNum * Y_VAL3)), 0);
 
     while (pageState == DIALOG_PAGE_STATE_NONE) {
-        if (customColor) {
+        if (customColor == 1) {
             gDPSetEnvColor(gDisplayListHead++, rgbaColors[0], rgbaColors[1], rgbaColors[2], rgbaColors[3]);
         } else {
             change_and_flash_dialog_text_color_lines(colorMode, lineNum, &customColor);
