@@ -210,7 +210,7 @@ static void puppycam_evaluate_spline(f32 progress, Vec3s cameraPos, Vec3f spline
 
     tempP[0] = (cube(invp) / 6.0f);
     tempP[1] = ( progress3) -  progress2                             + (2.0f / 3.0f);
-    tempP[2] = (-progress3) + (progress2 / 2.0f) + (progress / 2.0f) + (5.0f / 3.0f);
+    tempP[2] = (-progress3) + (progress2 / 2.0f) + (progress / 2.0f) + (1.0f / 6.0f);
     tempP[3] = ( progress3 / 3.0f);
 
     cameraPos[0] = ((tempP[0] * spline1[0]) + (tempP[1] * spline2[0]) + (tempP[2] * spline3[0]) + (tempP[3] * spline4[0]));
