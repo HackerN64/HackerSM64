@@ -4204,13 +4204,6 @@ void radial_camera_input(struct Camera *c) {
 }
 
 /**
- * Starts a cutscene dialog. Only has an effect when `trigger` is 1
- */
-void trigger_cutscene_dialog(s32 trigger) {
-    if (trigger == 1) start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE);
-}
-
-/**
  * Updates the camera based on which C buttons are pressed this frame
  */
 void handle_c_button_movement(struct Camera *c) {
@@ -6047,18 +6040,20 @@ void start_object_cutscene(u8 cutscene, struct Object *obj) {
  * This will play if nothing else happened in the same frame, like exiting or warping.
  */
 void start_object_cutscene_without_focus(u8 cutscene) {
-    sObjectCutscene = cutscene;
+    sObjectCutscene         = cutscene;
     sCutsceneDialogResponse = DIALOG_RESPONSE_NONE;
 }
 
-s32 unused_dialog_cutscene_response(u8 cutscene) {
+UNUSED s32 unused_dialog_cutscene_response(u8 cutscene) {
     // if not in a cutscene, start this one
-    if ((gCamera->cutscene == CUTSCENE_NONE) && (sObjectCutscene == CUTSCENE_NONE)) {
+    if ((gCamera->cutscene == CUTSCENE_NONE)
+     && (sObjectCutscene   == CUTSCENE_NONE)) {
         sObjectCutscene = cutscene;
     }
 
     // if playing this cutscene and Mario responded, return the response
-    if ((gCamera->cutscene == cutscene) && (sCutsceneDialogResponse)) {
+    if ((gCamera->cutscene == cutscene)
+     && (sCutsceneDialogResponse)) {
         return sCutsceneDialogResponse;
     } else {
         return DIALOG_RESPONSE_NONE;
@@ -6068,7 +6063,8 @@ s32 unused_dialog_cutscene_response(u8 cutscene) {
 s32 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID) {
     s16 response = DIALOG_RESPONSE_NONE;
 
-    if ((gCamera->cutscene == CUTSCENE_NONE) && (sObjectCutscene == CUTSCENE_NONE)) {
+    if ((gCamera->cutscene == CUTSCENE_NONE)
+     && (sObjectCutscene   == CUTSCENE_NONE)) {
         if (gRecentCutscene != cutscene) {
             start_object_cutscene(cutscene, obj);
             if (dialogID != DIALOG_NONE) {

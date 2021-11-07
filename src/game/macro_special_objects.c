@@ -107,9 +107,10 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
         // Get the preset values from the MacroObjectPresets list.
         preset = MacroObjectPresets[presetID];
 
+        // If the preset has a defined param, replace the lower bits with the preset param.
         if (preset.param != 0) {
             macroObject[MACRO_OBJ_PARAMS] =
-                (macroObject[MACRO_OBJ_PARAMS] & 0xFF00) | (preset.param & 0x00FF);
+                ((macroObject[MACRO_OBJ_PARAMS] & 0xFF00) | (preset.param & 0x00FF));
         }
 
         // If object has been killed, prevent it from respawning
@@ -128,13 +129,13 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
                          0                                               // Z-rotation
                      );
 
-            newObj->oUnusedCoinParams = macroObject[MACRO_OBJ_PARAMS];
-            newObj->oBehParams      = (((macroObject[MACRO_OBJ_PARAMS] & 0x00FF) << 16)
-                                      | (macroObject[MACRO_OBJ_PARAMS] & 0xFF00));
-            newObj->oBehParams2ndByte = (macroObject[MACRO_OBJ_PARAMS] & 0x00FF);
-            newObj->respawnInfoType = RESPAWN_INFO_TYPE_MACRO_OBJECT;
-            newObj->respawnInfo = (macroObjList - 1);
-            newObj->parentObj   = newObj;
+            newObj->oUnusedCoinParams =    macroObject[MACRO_OBJ_PARAMS];
+            newObj->oBehParams        = (((macroObject[MACRO_OBJ_PARAMS] & 0x00FF) << 16) // Shift preset param to set 2nd byte
+                                        | (macroObject[MACRO_OBJ_PARAMS] & 0xFF00));      // Set 3rd byte from upper bits (macro param)
+            newObj->oBehParams2ndByte = (  macroObject[MACRO_OBJ_PARAMS] & 0x00FF );      // Set 2nd byte from preset param
+            newObj->respawnInfoType   = RESPAWN_INFO_TYPE_MACRO_OBJECT;
+            newObj->respawnInfo       = (macroObjList - 1);
+            newObj->parentObj         = newObj;
         }
     }
 }

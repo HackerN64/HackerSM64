@@ -46,7 +46,6 @@ s32 bhv_coin_sparkles_init(void) {
 void bhv_yellow_coin_init(void) {
     cur_obj_set_behavior(bhvYellowCoin);
     obj_set_hitbox(o, &sYellowCoinHitbox);
-    bhv_init_room();
     cur_obj_update_floor_height();
     if (500.0f < absf(o->oPosY - o->oFloorHeight)) {
         if (cur_obj_has_model(MODEL_YELLOW_COIN)) {
