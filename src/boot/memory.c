@@ -128,7 +128,7 @@ void main_pool_init(void *start, void *end) {
     sPoolFreeSpace = (sPoolEnd - sPoolStart);
 
     sPoolListHeadL = (struct MainPoolBlock *) (sPoolStart - 16);
-    sPoolListHeadR = (struct MainPoolBlock *) sPoolEnd;
+    sPoolListHeadR = (struct MainPoolBlock *)  sPoolEnd;
     sPoolListHeadL->prev = NULL;
     sPoolListHeadL->next = NULL;
     sPoolListHeadR->prev = NULL;
@@ -355,8 +355,8 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart
  * of the pool is already allocated, return NULL.
  */
 void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
-    void *dest = NULL;
-    u32 srcSize = ALIGN16(srcEnd - srcStart);
+    void *dest   = NULL;
+    u32 srcSize  = ALIGN16(srcEnd - srcStart);
     u32 destSize = ALIGN16((u8 *) sPoolListHeadR - destAddr);
 
     if (srcSize <= destSize) {
@@ -627,8 +627,7 @@ void *alloc_display_list(u32 size) {
 
 static struct DmaTable *load_dma_table_address(u8 *srcAddr) {
     struct DmaTable *table = dynamic_dma_read(srcAddr, (srcAddr + sizeof(u32)), MEMORY_POOL_LEFT, 0, 0);
-    u32 size = ((table->count * sizeof(struct OffsetSizePair)) +
-        sizeof(struct DmaTable) - sizeof(struct OffsetSizePair));
+    u32 size = (((table->count * sizeof(struct OffsetSizePair)) + sizeof(struct DmaTable)) - sizeof(struct OffsetSizePair));
     main_pool_free(table);
 
     table = dynamic_dma_read(srcAddr, (srcAddr + size), MEMORY_POOL_LEFT, 0, 0);

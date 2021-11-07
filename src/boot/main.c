@@ -21,13 +21,15 @@
 #include "game/puppylights.h"
 
 // Message IDs
-#define MESG_SP_COMPLETE 100
-#define MESG_DP_COMPLETE 101
-#define MESG_VI_VBLANK 102
-#define MESG_START_GFX_SPTASK 103
-#define MESG_NMI_REQUEST 104
+enum MessageIDs {
+    MESG_SP_COMPLETE = 100,
+    MESG_DP_COMPLETE,
+    MESG_VI_VBLANK,
+    MESG_START_GFX_SPTASK,
+    MESG_NMI_REQUEST,
+};
 
-OSThread gUnkThread; // unused?
+// OSThread gUnkThread; // unused?
 OSThread gIdleThread;
 OSThread gMainThread;
 OSThread gGameLoopThread;
@@ -52,14 +54,14 @@ OSViMode VI;
 
 struct Config gConfig;
 
-struct VblankHandler *gVblankHandler1 = NULL;
-struct VblankHandler *gVblankHandler2 = NULL;
-struct VblankHandler *gVblankHandler3 = NULL;
-struct SPTask *gActiveSPTask = NULL;
-struct SPTask *sCurrentAudioSPTask = NULL;
-struct SPTask *sCurrentDisplaySPTask = NULL;
-struct SPTask *sNextAudioSPTask = NULL;
-struct SPTask *sNextDisplaySPTask = NULL;
+struct VblankHandler *gVblankHandler1       = NULL;
+struct VblankHandler *gVblankHandler2       = NULL;
+struct VblankHandler *gVblankHandler3       = NULL;
+struct SPTask        *gActiveSPTask         = NULL;
+struct SPTask        *sCurrentAudioSPTask   = NULL;
+struct SPTask        *sCurrentDisplaySPTask = NULL;
+struct SPTask        *sNextAudioSPTask      = NULL;
+struct SPTask        *sNextDisplaySPTask    = NULL;
 s8 sAudioEnabled = TRUE;
 u32 gNumVblanks = 0;
 s8 gResetTimer = 0;
@@ -72,11 +74,13 @@ s8 gDebugLevelSelect = FALSE;
 
 s8 gShowDebugText = FALSE;
 
+#ifdef VANILLA_DEBUG
 // unused
-void handle_debug_key_sequences(void) {
-    static u16 sDebugTextKeySequence[] = { D_JPAD, D_JPAD, U_JPAD, U_JPAD,
-                                           L_JPAD, R_JPAD, L_JPAD, R_JPAD };
-    static s16 sDebugTextKey = 0;
+static u16 sDebugTextKeySequence[] = {
+    D_JPAD, D_JPAD, U_JPAD, U_JPAD, L_JPAD, R_JPAD, L_JPAD, R_JPAD
+};
+static s16 sDebugTextKey = 0;
+UNUSED void handle_debug_key_sequences(void) {
     if (gPlayer3Controller->buttonPressed != 0) {
         if (sDebugTextKeySequence[sDebugTextKey++] == gPlayer3Controller->buttonPressed) {
             if (sDebugTextKey == ARRAY_COUNT(sDebugTextKeySequence)) {
@@ -87,14 +91,15 @@ void handle_debug_key_sequences(void) {
         }
     }
 }
+#endif
 
 void setup_mesg_queues(void) {
-    osCreateMesgQueue(&gDmaMesgQueue, gDmaMesgBuf, ARRAY_COUNT(gDmaMesgBuf));
+    osCreateMesgQueue(    &gDmaMesgQueue,     gDmaMesgBuf, ARRAY_COUNT(    gDmaMesgBuf));
     osCreateMesgQueue(&gSIEventMesgQueue, gSIEventMesgBuf, ARRAY_COUNT(gSIEventMesgBuf));
     osSetEventMesg(OS_EVENT_SI, &gSIEventMesgQueue, NULL);
 
     osCreateMesgQueue(&gSPTaskMesgQueue, gUnknownMesgBuf, ARRAY_COUNT(gUnknownMesgBuf));
-    osCreateMesgQueue(&gIntrMesgQueue, gIntrMesgBuf, ARRAY_COUNT(gIntrMesgBuf));
+    osCreateMesgQueue(  &gIntrMesgQueue,    gIntrMesgBuf, ARRAY_COUNT(   gIntrMesgBuf));
     osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
 
     osSetEventMesg(OS_EVENT_SP,     &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
@@ -145,14 +150,16 @@ void receive_new_tasks(void) {
         }
     }
 
-    if (sCurrentAudioSPTask == NULL && sNextAudioSPTask != NULL) {
+    if ((sCurrentAudioSPTask == NULL)
+     && (sNextAudioSPTask    != NULL)) {
         sCurrentAudioSPTask = sNextAudioSPTask;
-        sNextAudioSPTask = NULL;
+        sNextAudioSPTask    = NULL;
     }
 
-    if (sCurrentDisplaySPTask == NULL && sNextDisplaySPTask != NULL) {
+    if ((sCurrentDisplaySPTask == NULL)
+    && (sNextDisplaySPTask     != NULL)) {
         sCurrentDisplaySPTask = sNextDisplaySPTask;
-        sNextDisplaySPTask = NULL;
+        sNextDisplaySPTask    = NULL;
     }
 }
 
@@ -176,8 +183,9 @@ void interrupt_gfx_sptask(void) {
 }
 
 void start_gfx_sptask(void) {
-    if (gActiveSPTask == NULL && sCurrentDisplaySPTask != NULL
-        && sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED) {
+    if ((gActiveSPTask == NULL)
+     && (sCurrentDisplaySPTask != NULL)
+     && (sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED)) {
 #if PUPPYPRINT_DEBUG
         rspDelta = osGetTime();
 #endif
@@ -193,7 +201,7 @@ void pretend_audio_sptask_done(void) {
 
 void handle_vblank(void) {
     gNumVblanks++;
-    if (gResetTimer > 0 && gResetTimer < 100) {
+    if ((gResetTimer > 0) && (gResetTimer < 100)) {
         gResetTimer++;
     }
 
@@ -215,8 +223,9 @@ void handle_vblank(void) {
             }
         }
     } else {
-        if (gActiveSPTask == NULL && sCurrentDisplaySPTask != NULL
-            && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
+        if ((gActiveSPTask == NULL)
+         && (sCurrentDisplaySPTask != NULL)
+         && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
 #if PUPPYPRINT_DEBUG
             rspDelta = osGetTime();
 #endif
@@ -239,9 +248,8 @@ void handle_sp_complete(void) {
     gActiveSPTask = NULL;
 
     if (curSPTask->state == SPTASK_STATE_INTERRUPTED) {
-        // handle_vblank tried to start an audio task while there was already a
-        // gfx task running, so it had to interrupt the gfx task. That interruption
-        // just finished.
+        // handle_vblank tried to start an audio task while there was already a gfx task
+        // running, so it had to interrupt the gfx task. That interruption just finished.
         if (osSpTaskYielded(&curSPTask->task) == 0) {
             // The gfx task completed before we had time to interrupt it.
             // Mark it finished, just like below.
@@ -261,8 +269,8 @@ void handle_sp_complete(void) {
         curSPTask->state = SPTASK_STATE_FINISHED;
         if (curSPTask->task.t.type == M_AUDTASK) {
             // After audio tasks come gfx tasks.
-            if (sCurrentDisplaySPTask != NULL
-                && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
+            if ((sCurrentDisplaySPTask != NULL)
+             && (sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED)) {
                 start_sptask(M_GFXTASK);
             }
             sCurrentAudioSPTask = NULL;
@@ -337,7 +345,7 @@ void thread3_main(UNUSED void *arg) {
 
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg) {
     handler->queue = queue;
-    handler->msg = msg;
+    handler->msg   = msg;
 
     switch (index) {
         case 1: gVblankHandler1 = handler; break;
@@ -352,7 +360,7 @@ void send_sp_task_message(OSMesg *msg) {
 }
 
 void dispatch_audio_sptask(struct SPTask *spTask) {
-    if (sAudioEnabled && spTask != NULL) {
+    if (sAudioEnabled && (spTask != NULL)) {
         osWritebackDCacheAll();
         osSendMesg(&gSPTaskMesgQueue, spTask, OS_MESG_NOBLOCK);
     }
@@ -364,7 +372,7 @@ void exec_display_list(struct SPTask *spTask) {
         spTask->state = SPTASK_STATE_NOT_STARTED;
         if (sCurrentDisplaySPTask == NULL) {
             sCurrentDisplaySPTask = spTask;
-            sNextDisplaySPTask = NULL;
+            sNextDisplaySPTask    = NULL;
             osSendMesg(&gIntrMesgQueue, (OSMesg) MESG_START_GFX_SPTASK, OS_MESG_NOBLOCK);
         } else {
             sNextDisplaySPTask = spTask;

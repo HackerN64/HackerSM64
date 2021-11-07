@@ -407,7 +407,7 @@ struct MarioBodyState {
     /*0x0C*/ Vec3s torsoAngle;
     /*0x12*/ Vec3s headAngle;
     /*0x18*/ Vec3f heldObjLastPosition; /// also known as HOLP
-    u8 filler[4];
+    // u8 filler[4];
 };
 
 struct MarioState {

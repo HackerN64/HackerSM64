@@ -103,7 +103,7 @@ void envfx_update_snowflake_count(s32 mode, Vec3s marioPos) {
             waterLevel = find_water_level(marioPos[0], marioPos[2]);
 
             gSnowParticleCount =
-                ((((s32)((waterLevel - 400.0f - (f32) marioPos[1]) * 0.001f) << 0x10) >> 0x10) * 5);
+                ((((s32)(((waterLevel - 400.0f) - (f32) marioPos[1]) * 0.001f) << 0x10) >> 0x10) * 5);
 
             if (gSnowParticleCount < 0) {
                 gSnowParticleCount = 0;
@@ -303,19 +303,19 @@ void append_snowflake_vertex_buffer(Gfx *gfx, s32 index, Vec3s vertex1, Vec3s ve
 
     for (i = 0; i < 15; i += 3) {
         vertBuf[i + 0] = gSnowTempVtx[0];
-        (vertBuf + i + 0)->v.ob[0] = ((gEnvFxBuffer + (index + i / 3))->xPos + vertex1[0]);
-        (vertBuf + i + 0)->v.ob[1] = ((gEnvFxBuffer + (index + i / 3))->yPos + vertex1[1]);
-        (vertBuf + i + 0)->v.ob[2] = ((gEnvFxBuffer + (index + i / 3))->zPos + vertex1[2]);
+        ((vertBuf + i) + 0)->v.ob[0] = ((gEnvFxBuffer + (index + i / 3))->xPos + vertex1[0]);
+        ((vertBuf + i) + 0)->v.ob[1] = ((gEnvFxBuffer + (index + i / 3))->yPos + vertex1[1]);
+        ((vertBuf + i) + 0)->v.ob[2] = ((gEnvFxBuffer + (index + i / 3))->zPos + vertex1[2]);
 
         vertBuf[i + 1] = gSnowTempVtx[1];
-        (vertBuf + i + 1)->v.ob[0] = ((gEnvFxBuffer + (index + i / 3))->xPos + vertex2[0]);
-        (vertBuf + i + 1)->v.ob[1] = ((gEnvFxBuffer + (index + i / 3))->yPos + vertex2[1]);
-        (vertBuf + i + 1)->v.ob[2] = ((gEnvFxBuffer + (index + i / 3))->zPos + vertex2[2]);
+        ((vertBuf + i) + 1)->v.ob[0] = ((gEnvFxBuffer + (index + i / 3))->xPos + vertex2[0]);
+        ((vertBuf + i) + 1)->v.ob[1] = ((gEnvFxBuffer + (index + i / 3))->yPos + vertex2[1]);
+        ((vertBuf + i) + 1)->v.ob[2] = ((gEnvFxBuffer + (index + i / 3))->zPos + vertex2[2]);
 
         vertBuf[i + 2] = gSnowTempVtx[2];
-        (vertBuf + i + 2)->v.ob[0] = ((gEnvFxBuffer + (index + i / 3))->xPos + vertex3[0]);
-        (vertBuf + i + 2)->v.ob[1] = ((gEnvFxBuffer + (index + i / 3))->yPos + vertex3[1]);
-        (vertBuf + i + 2)->v.ob[2] = ((gEnvFxBuffer + (index + i / 3))->zPos + vertex3[2]);
+        ((vertBuf + i) + 2)->v.ob[0] = ((gEnvFxBuffer + (index + i / 3))->xPos + vertex3[0]);
+        ((vertBuf + i) + 2)->v.ob[1] = ((gEnvFxBuffer + (index + i / 3))->yPos + vertex3[1]);
+        ((vertBuf + i) + 2)->v.ob[2] = ((gEnvFxBuffer + (index + i / 3))->zPos + vertex3[2]);
     }
 
     gSPVertex(gfx, VIRTUAL_TO_PHYSICAL(vertBuf), 15, 0);

@@ -424,7 +424,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 }
 
 void crash_screen_init(void) {
-    gCrashScreen.framebuffer = (u16 *) gFramebuffers[sRenderedFramebuffer];
+    gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
     gCrashScreen.width  = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);

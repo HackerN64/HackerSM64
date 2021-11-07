@@ -36,7 +36,7 @@ struct RumbleSettings {
 
 extern struct Config gConfig;
 
-extern OSThread gUnkThread;
+// extern OSThread gUnkThread;
 extern OSThread gIdleThread;
 extern OSThread gMainThread;
 extern OSThread gGameLoopThread;

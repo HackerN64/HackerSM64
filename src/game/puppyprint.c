@@ -650,7 +650,7 @@ void profiler_update(u32 *time, OSTime time2) {
 
 void get_average_perf_time(u32 *time) {
     // This takes all but the last index of the timer array, and creates an average value, which is written to the last index.
-    s32 i = 0;
+    s32 i     = 0;
     s32 total = 0;
     for (i = 0; i < (NUM_PERF_ITERATIONS - 1); i++) {
         total += time[i];
@@ -665,7 +665,7 @@ void puppyprint_profiler_process(void) {
        busTime[perfIteration] = (IO_READ(DPC_PIPEBUSY_REG));
     OSTime newTime = osGetTime();
 
-    if (fDebug && gPlayer1Controller->buttonPressed & L_TRIG) {
+    if (fDebug && (gPlayer1Controller->buttonPressed & L_TRIG)) {
         sDebugMenu ^= TRUE;
         if (sDebugMenu == FALSE) {
             sPPDebugPage = sDebugOption;
