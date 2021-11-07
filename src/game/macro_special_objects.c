@@ -77,17 +77,15 @@ UNUSED static void spawn_macro_coin_unknown(const BehaviorScript *behavior, s16 
     obj->oBehParams = ((a1[4] & 0xFF) >> 16);
 }
 
-enum MacroObjectIndex {
-    MACRO_OBJ_Y_ROT,
-    MACRO_OBJ_X,
-    MACRO_OBJ_Y,
-    MACRO_OBJ_Z,
-    MACRO_OBJ_PARAMS
+struct LoadedMacroObject {
+    /*0x00*/ Angle yaw;
+    /*0x02*/ Vec3s pos;
+    /*0x08*/ s16 params;
 };
 
 void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
     s32 presetID;
-    s16 macroObject[5]; // see the 5 #define statements above
+    struct LoadedMacroObject macroObject;
     struct Object *newObj;
     struct MacroPreset preset;
     gMacroObjectDefaultParent.header.gfx.areaIndex       = areaIndex;
@@ -98,41 +96,40 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
         if (presetID < 0) break;
 
         // Set macro object properties from the list
-        macroObject[MACRO_OBJ_Y_ROT ] = (((*macroObjList++ >> 9) & 0x7F) << 1); // Y-Rotation
-        macroObject[MACRO_OBJ_X     ] = *macroObjList++;                        // X position
-        macroObject[MACRO_OBJ_Y     ] = *macroObjList++;                        // Y position
-        macroObject[MACRO_OBJ_Z     ] = *macroObjList++;                        // Z position
-        macroObject[MACRO_OBJ_PARAMS] = *macroObjList++;                        // Behavior params
+        macroObject.yaw    = (((*macroObjList++ >> 9) & 0x7F) << 1); // Y-Rotation
+        macroObject.pos[0] =    *macroObjList++;                     // X position
+        macroObject.pos[1] =    *macroObjList++;                     // Y position
+        macroObject.pos[2] =    *macroObjList++;                     // Z position
+        macroObject.params =    *macroObjList++;                     // Behavior params
 
         // Get the preset values from the MacroObjectPresets list.
         preset = MacroObjectPresets[presetID];
 
         // If the preset has a defined param, replace the lower bits with the preset param.
         if (preset.param != 0) {
-            macroObject[MACRO_OBJ_PARAMS] =
-                ((macroObject[MACRO_OBJ_PARAMS] & 0xFF00) | (preset.param & 0x00FF));
+            macroObject.params = ((macroObject.params & 0xFF00) | (preset.param & 0x00FF));
         }
 
-        // If object has been killed, prevent it from respawning
-        if (((macroObject[MACRO_OBJ_PARAMS] >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
+        // If object has been killed (bparam3 check), prevent it from respawning
+        if (((macroObject.params >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
             // Spawn the new macro object.
             newObj = spawn_object_abs_with_rot(
-                         &gMacroObjectDefaultParent,                     // Parent object
-                         0,                                              // Unused
-                         preset.model,                                   // Model ID
-                         preset.behavior,                                // Behavior address
-                         macroObject[MACRO_OBJ_X],                       // X-position
-                         macroObject[MACRO_OBJ_Y],                       // Y-position
-                         macroObject[MACRO_OBJ_Z],                       // Z-position
-                         0,                                              // X-rotation
-                         convert_rotation(macroObject[MACRO_OBJ_Y_ROT]), // Y-rotation
-                         0                                               // Z-rotation
+                         &gMacroObjectDefaultParent,        // Parent object
+                         0,                                 // Unused
+                         preset.model,                      // Model ID
+                         preset.behavior,                   // Behavior address
+                         macroObject.pos[0],                // X-position
+                         macroObject.pos[1],                // Y-position
+                         macroObject.pos[2],                // Z-position
+                         0,                                 // X-rotation
+                         convert_rotation(macroObject.yaw), // Y-rotation
+                         0                                  // Z-rotation
                      );
 
-            newObj->oUnusedCoinParams =    macroObject[MACRO_OBJ_PARAMS];
-            newObj->oBehParams        = (((macroObject[MACRO_OBJ_PARAMS] & 0x00FF) << 16) // Shift preset param to set 2nd byte
-                                        | (macroObject[MACRO_OBJ_PARAMS] & 0xFF00));      // Set 3rd byte from upper bits (macro param)
-            newObj->oBehParams2ndByte = (  macroObject[MACRO_OBJ_PARAMS] & 0x00FF );      // Set 2nd byte from preset param
+            newObj->oUnusedCoinParams =    macroObject.params;
+            newObj->oBehParams        = (((macroObject.params & 0x00FF) << 16) // Shift preset param to set 2nd byte
+                                        | (macroObject.params & 0xFF00));      // Set 3rd byte from upper bits (macro param)
+            newObj->oBehParams2ndByte =   (macroObject.params & 0x00FF);       // Set 2nd byte from preset param
             newObj->respawnInfoType   = RESPAWN_INFO_TYPE_MACRO_OBJECT;
             newObj->respawnInfo       = (macroObjList - 1);
             newObj->parentObj         = newObj;
