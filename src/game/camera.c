@@ -3122,17 +3122,17 @@ void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
     c->mode    = CAMERA_MODE_8_DIRECTIONS;
     c->defMode = CAMERA_MODE_8_DIRECTIONS;
 #else
-    s16 mode = gc->config.mode;
+    s16 mode   = gc->config.mode;
     c->mode    = mode;
     c->defMode = mode;
 #endif
-    c->cutscene = CUTSCENE_NONE;
+    c->cutscene   = CUTSCENE_NONE;
     c->doorStatus = DOOR_DEFAULT;
-    c->areaCenX = gc->focus[0];
-    c->areaCenY = gc->focus[1];
-    c->areaCenZ = gc->focus[2];
-    c->yaw = 0;
-    vec3f_copy(c->pos, gc->pos);
+    c->areaCenX   = gc->focus[0];
+    c->areaCenY   = gc->focus[1];
+    c->areaCenZ   = gc->focus[2];
+    c->yaw        = 0x0;
+    vec3f_copy(c->pos,   gc->pos);
     vec3f_copy(c->focus, gc->focus);
 }
 
@@ -3141,7 +3141,7 @@ void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
  */
 void update_graph_node_camera(struct GraphNodeCamera *gc) {
     gc->rollScreen = gLakituState.roll;
-    vec3f_copy(gc->pos, gLakituState.pos);
+    vec3f_copy(gc->pos,   gLakituState.pos);
     vec3f_copy(gc->focus, gLakituState.focus);
     zoom_out_if_paused_and_outside(gc);
 }

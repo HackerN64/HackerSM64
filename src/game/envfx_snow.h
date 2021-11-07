@@ -4,18 +4,6 @@
 #include <PR/ultratypes.h>
 #include "types.h"
 
-enum EnvFxMode {
-    ENVFX_MODE_NONE,         // no effects
-    ENVFX_SNOW_NORMAL,       // CCM, SL
-    ENVFX_SNOW_WATER,        // Secret Aquarium, Sunken Ship
-    ENVFX_SNOW_BLIZZARD,     // unused
-    ENVFX_BUBBLE_START = 10, // Separates snow effects and flower/bubble effects
-    ENVFX_FLOWERS,           // unused
-    ENVFX_LAVA_BUBBLES,      // LLL, BitFS, Bowser 2
-    ENVFX_WHIRLPOOL_BUBBLES, // DDD
-    ENVFX_JETSTREAM_BUBBLES  // JRB, DDD (submarine area)
-};
-
 struct EnvFxParticle {
     s8  isAlive : 1;
     s16 animFrame; // lava bubbles and flowers have frame animations

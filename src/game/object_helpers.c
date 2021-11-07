@@ -67,7 +67,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
         Gfx *dlHead = dlStart;
 
         if (objectOpacity == 0xFF) {
-            if (currentGraphNode->parameter == 20) {
+            if (currentGraphNode->parameter == GEO_TRANSPARENCY_MODE_DECAL) {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT_DECAL);
             } else {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_OPAQUE);
@@ -75,7 +75,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
 
             objectGraphNode->oAnimState = TRANSPARENCY_ANIM_STATE_OPAQUE;
         } else {
-            if (currentGraphNode->parameter == 20) {
+            if (currentGraphNode->parameter == GEO_TRANSPARENCY_MODE_DECAL) {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT_DECAL);
             } else {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT);
@@ -87,7 +87,8 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
                 objectGraphNode->oAnimState = BOWSER_ANIM_STATE_INVISIBLE;
             }
 
-            if ((currentGraphNode->parameter != 10) && (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA)) {
+            if ((currentGraphNode->parameter != GEO_TRANSPARENCY_MODE_NO_DITHER)
+             && (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA)) {
                 gDPSetAlphaCompare(dlHead++, G_AC_DITHER);
             }
         }

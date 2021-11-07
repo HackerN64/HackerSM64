@@ -66,7 +66,7 @@ index 30a87806..6bf7b79a 100644
  #include "levels/intro/header.h"
 
 +const GeoLayout intro_geo_error_screen[] = {
-+    GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
++    GEO_NODE_SCREEN_AREA(0, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
 +    GEO_OPEN_NODE(),
 +        GEO_ZBUFFER(0),
 +        GEO_OPEN_NODE(),
@@ -85,7 +85,7 @@ index 30a87806..6bf7b79a 100644
 +
  // 0x0E0002D0
  const GeoLayout intro_geo_splash_screen[] = {
-    GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+    GEO_NODE_SCREEN_AREA(0, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
 diff --git a/levels/intro/header.h b/levels/intro/header.h
 index 99277e86..04797cd7 100644
 --- a/levels/intro/header.h

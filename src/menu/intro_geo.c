@@ -402,9 +402,9 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
     } else if (callContext == GEO_CONTEXT_RENDER) {
         SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
         s32 introContext = (genNode->parameter & 0xFF);
-        if (introContext == 0) {
+        if (introContext == INTRO_CONTEXT_NORMAL) {
             backgroundTileSix = introBackgroundIndexTable[6];
-        } else if (introContext == 1) {
+        } else if (introContext == INTRO_CONTEXT_GAME_OVER) {
             backgroundTileSix = gameOverBackgroundTable[6];
         }
         if (backgroundTileSix == INTRO_BACKGROUND_SUPER_MARIO) {

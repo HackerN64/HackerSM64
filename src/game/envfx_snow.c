@@ -12,6 +12,7 @@
 #include "engine/behavior_script.h"
 #include "audio/external.h"
 #include "obj_behaviors.h"
+#include "level_geo.h"
 
 /**
  * This file contains the function that handles 'environment effects',
