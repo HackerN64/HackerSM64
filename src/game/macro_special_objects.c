@@ -77,12 +77,6 @@ UNUSED static void spawn_macro_coin_unknown(const BehaviorScript *behavior, s16 
     obj->oBehParams = ((a1[4] & 0xFF) >> 16);
 }
 
-struct LoadedPreset {
-    /*0x00*/ const BehaviorScript *behavior;
-    /*0x04*/ s16 param; // huh? why does the below function swap these.. just use the struct..
-    /*0x06*/ ModelID16 model;
-};
-
 enum MacroObjectIndex {
     MACRO_OBJ_Y_ROT,
     MACRO_OBJ_X,
@@ -95,7 +89,7 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
     s32 presetID;
     s16 macroObject[5]; // see the 5 #define statements above
     struct Object *newObj;
-    struct LoadedPreset preset;
+    struct MacroPreset preset;
     gMacroObjectDefaultParent.header.gfx.areaIndex       = areaIndex;
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
     while (TRUE) {
@@ -111,9 +105,7 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
         macroObject[MACRO_OBJ_PARAMS] = *macroObjList++;                        // Behavior params
 
         // Get the preset values from the MacroObjectPresets list.
-        preset.model    = MacroObjectPresets[presetID].model;
-        preset.behavior = MacroObjectPresets[presetID].behavior;
-        preset.param    = MacroObjectPresets[presetID].param;
+        preset = MacroObjectPresets[presetID];
 
         if (preset.param != 0) {
             macroObject[MACRO_OBJ_PARAMS] =
