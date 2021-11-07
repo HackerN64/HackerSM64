@@ -3325,7 +3325,7 @@ void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f a0, Vec3f a1, Vec3f a2, Vec3f a
     register f32 hcu = (cube(u) / 2.0f);
     B[0] = (cube(nu) / 6.0f);
     B[1] = (( hcu ) -  su                      + (2.0f / 3.0f));
-    B[2] = ((-hcu ) + (su / 2.0f) + (u / 2.0f) + (5.0f / 3.0f));
+    B[2] = ((-hcu ) + (su / 2.0f) + (u / 2.0f) + (1.0f / 6.0f));
     B[3] =  ( hcu / 3.0f);
     Q[0] = ((B[0] * a0[0]) + (B[1] * a1[0]) + (B[2] * a2[0]) + (B[3] * a3[0]));
     Q[1] = ((B[0] * a0[1]) + (B[1] * a1[1]) + (B[2] * a2[1]) + (B[3] * a3[1]));
