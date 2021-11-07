@@ -309,24 +309,24 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
 
     s16 colorLoop;
     ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
-    u8 customColor = FALSE;
+    u8 customColor = 0;
     u8 diffTmp = 0;
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
     while (str[strPos] != DIALOG_CHAR_TERMINATOR) {
-        if (customColor == TRUE) {
+        if (customColor == 1) {
             gDPSetEnvColor(gDisplayListHead++, rgbaColors[0], rgbaColors[1], rgbaColors[2], rgbaColors[3]);
         } else {
             if (customColor == 2) {
                 gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
-                customColor = FALSE;
+                customColor = 0;
             }
         }
 
         switch (str[strPos]) {
             case DIALOG_CHAR_COLOR:
-                customColor = TRUE;
+                customColor = 1;
                 strPos++;
                 for (colorLoop = (strPos + 8); strPos < colorLoop; ++strPos) {
                     diffTmp = 0;
@@ -749,7 +749,7 @@ void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum, u8 *cust
             case DIALOG_TYPE_ROTATE:
                 if (*customColor == 2) {
                     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-                    *customColor = FALSE;
+                    *customColor = 0;
                 }
                 break;
             case DIALOG_TYPE_ZOOM:
@@ -827,7 +827,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     u8 strChar;
     s16 colorLoop;
     ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
-    u8 customColor = FALSE;
+    u8 customColor = 0;
     u8 diffTmp = 0;
     u8 *str = segmented_to_virtual(dialog->str);
     s8 lineNum = 1;
@@ -869,7 +869,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
                 break;
             case DIALOG_CHAR_COLOR:
-                customColor = TRUE;
+                customColor = 1;
                 strIdx++;
                 for (colorLoop = (strIdx + 8); strIdx < colorLoop; ++strIdx) {
                     diffTmp = 0;
