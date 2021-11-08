@@ -315,15 +315,6 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
     while (str[strPos] != DIALOG_CHAR_TERMINATOR) {
-        if (customColor == 1) {
-            gDPSetEnvColor(gDisplayListHead++, rgbaColors[0], rgbaColors[1], rgbaColors[2], rgbaColors[3]);
-        } else {
-            if (customColor == 2) {
-                gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
-                customColor = 0;
-            }
-        }
-
         switch (str[strPos]) {
             case DIALOG_CHAR_COLOR:
                 customColor = 1;
@@ -352,6 +343,12 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                     }
                 }
                 strPos--;
+                if (customColor == 1) {
+                    gDPSetEnvColor(gDisplayListHead++, rgbaColors[0], rgbaColors[1], rgbaColors[2], rgbaColors[3]);
+                } else if (customColor == 2) {
+                    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
+                    customColor = 0;
+                }
                 break;
             case DIALOG_CHAR_DAKUTEN:
                 mark = DIALOG_MARK_DAKUTEN;
