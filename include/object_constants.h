@@ -1783,25 +1783,31 @@ enum oBehParams1stByteSlidingPlatform { // collisionDataIndex
     #define CHECKERBOARD_PLATFORM_ACT_ROTATE_DOWN           0x4
 
 /* Platform on track */
-    /* oAction */
-    #define PLATFORM_ON_TRACK_ACT_INIT                      0x0
-    #define PLATFORM_ON_TRACK_ACT_WAIT_FOR_MARIO            0x1
-    #define PLATFORM_ON_TRACK_ACT_MOVE_ALONG_TRACK          0x2
-    #define PLATFORM_ON_TRACK_ACT_PAUSE_BRIEFLY             0x3
-    #define PLATFORM_ON_TRACK_ACT_FALL                      0x4
-    /* oBehParams2ndByte */
-    #define PLATFORM_ON_TRACK_BP_MASK_PATH                  0xF
-    #define PLATFORM_ON_TRACK_BP_MASK_TYPE                  (0x7 << 4)
-    #define PLATFORM_ON_TRACK_BP_SPAWN_BALLS                (1 <<  7)
-    #define PLATFORM_ON_TRACK_BP_RETURN_TO_START            (1 <<  8)
-    #define PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR             (1 <<  9)
-    #define PLATFORM_ON_TRACK_BP_DONT_TURN_YAW              (1 << 10)
-    #define PLATFORM_ON_TRACK_BP_DONT_TURN_ROLL             (1 << 11)
-    /* oPlatformOnTrackType */
-    #define PLATFORM_ON_TRACK_TYPE_CARPET                   0x0
-    #define PLATFORM_ON_TRACK_TYPE_SKI_LIFT                 0x1
-    #define PLATFORM_ON_TRACK_TYPE_CHECKERED                0x2
-    #define PLATFORM_ON_TRACK_TYPE_GRATE                    0x3
+enum oActionsPlatformOnTrack {
+    PLATFORM_ON_TRACK_ACT_INIT,
+    PLATFORM_ON_TRACK_ACT_WAIT_FOR_MARIO,
+    PLATFORM_ON_TRACK_ACT_MOVE_ALONG_TRACK,
+    PLATFORM_ON_TRACK_ACT_PAUSE_BRIEFLY,
+    PLATFORM_ON_TRACK_ACT_FALL,
+};
+enum oBehParams2ndBytePlatformOnTrack {
+    PLATFORM_ON_TRACK_BP_SPAWN_BALLS     = (1 << 7), // 0x80
+
+    PLATFORM_ON_TRACK_BP_MASK_TYPE       = 0x70,
+    PLATFORM_ON_TRACK_BP_MASK_PATH       = 0x0F,
+};
+enum oBehParams1stBytePlatformOnTrack {
+    PLATFORM_ON_TRACK_BP_RETURN_TO_START = (1 << 0), // 0x1
+    PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR  = (1 << 1), // 0x2
+    PLATFORM_ON_TRACK_BP_DONT_TURN_YAW   = (1 << 2), // 0x4
+    PLATFORM_ON_TRACK_BP_DONT_TURN_ROLL  = (1 << 4), // 0x8
+};
+enum oPlatformOnTrackTypes {
+    PLATFORM_ON_TRACK_TYPE_CARPET,
+    PLATFORM_ON_TRACK_TYPE_SKI_LIFT,
+    PLATFORM_ON_TRACK_TYPE_CHECKERED,
+    PLATFORM_ON_TRACK_TYPE_GRATE,
+};
 
 /* HMC Controllable Platform */
     /* oBehParams2ndByte / sControllablePlatformDirectionState */

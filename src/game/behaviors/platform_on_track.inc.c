@@ -56,7 +56,7 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos)
                     o->oPlatformOnTrackPrevWaypointFlags = WAYPOINT_FLAGS_END;
                 }
 
-                if ((GET_BPARAM2(o->oBehParams) & PLATFORM_ON_TRACK_BP_RETURN_TO_START)) {
+                if ((GET_BPARAM1(o->oBehParams) & PLATFORM_ON_TRACK_BP_RETURN_TO_START)) {
                     nextWaypoint = o->oPlatformOnTrackStartWaypoint;
                 } else {
                     return;
@@ -88,7 +88,9 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos)
         if (ballIndex != 0) {
             struct Object *trackBall = spawn_object_relative((o->oPlatformOnTrackBaseBallIndex + ballIndex), 0, 0, 0, o,
                                               MODEL_TRAJECTORY_MARKER_BALL, bhvTrackBall);
-            if (trackBall != NULL) vec3f_copy(&trackBall->oPosVec, pos);
+            if (trackBall != NULL) {
+                vec3f_copy(&trackBall->oPosVec, pos);
+            }
         } else {
             if (prevWaypoint != initialPrevWaypoint) {
                 if (o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_NONE) {
@@ -96,7 +98,9 @@ static void platform_on_track_update_pos_or_spawn_ball(s32 ballIndex, Vec3f pos)
                 }
                 o->oPlatformOnTrackPrevWaypoint = prevWaypoint;
             }
+
             vec3f_copy(&o->oPosVec, pos);
+
             obj_perform_position_op(POS_OP_COMPUTE_VELOCITY);
 
             o->oPlatformOnTrackPitch = atan2s(sqrtf(sqr(o->oVelX) + sqr(o->oVelZ)), -o->oVelY);
@@ -119,7 +123,7 @@ static void platform_on_track_reset(void) {
  * begin blinking, and finally reset.
  */
 static void platform_on_track_mario_not_on_platform(void) {
-    if (!(GET_BPARAM2(o->oBehParams) & PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR)) {
+    if (!(GET_BPARAM1(o->oBehParams) & PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR)) {
         // Once oTimer reaches 150, blink 40 times
         if (cur_obj_wait_then_blink(150, 40)) {
             platform_on_track_reset();
@@ -136,10 +140,9 @@ void bhv_platform_on_track_init(void) {
         s16 pathIndex           =  (GET_BPARAM2(o->oBehParams) & PLATFORM_ON_TRACK_BP_MASK_PATH);
         o->oPlatformOnTrackType = ((GET_BPARAM2(o->oBehParams) & PLATFORM_ON_TRACK_BP_MASK_TYPE) >> 4);
 
-        o->oPlatformOnTrackIsNotSkiLift = o->oPlatformOnTrackType - PLATFORM_ON_TRACK_TYPE_SKI_LIFT;
+        o->oPlatformOnTrackIsNotSkiLift = (o->oPlatformOnTrackType - PLATFORM_ON_TRACK_TYPE_SKI_LIFT);
 
-        o->collisionData =
-            segmented_to_virtual(sPlatformOnTrackCollisionModels[o->oPlatformOnTrackType]);
+        o->collisionData = segmented_to_virtual(sPlatformOnTrackCollisionModels[o->oPlatformOnTrackType]);
 
         o->oPlatformOnTrackStartWaypoint = segmented_to_virtual(sPlatformOnTrackPaths[pathIndex]);
 
@@ -160,9 +163,9 @@ void bhv_platform_on_track_init(void) {
 static void platform_on_track_act_init(void) {
     s32 i;
 
-    o->oPlatformOnTrackPrevWaypoint = o->oPlatformOnTrackStartWaypoint;
+    o->oPlatformOnTrackPrevWaypoint      = o->oPlatformOnTrackStartWaypoint;
     o->oPlatformOnTrackPrevWaypointFlags = WAYPOINT_FLAGS_NONE;
-    o->oPlatformOnTrackBaseBallIndex = 0;
+    o->oPlatformOnTrackBaseBallIndex     = 0;
 
     vec3s_to_vec3f(&o->oHomeVec, o->oPlatformOnTrackStartWaypoint->pos);
     vec3f_copy(&o->oPosVec, &o->oHomeVec);
@@ -217,7 +220,7 @@ static void platform_on_track_act_move_along_track(void) {
 
     // Fall after reaching the last waypoint if desired
     if ((o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_END)
-     && !(GET_BPARAM2(o->oBehParams) & PLATFORM_ON_TRACK_BP_RETURN_TO_START)) {
+     && !(GET_BPARAM1(o->oBehParams) & PLATFORM_ON_TRACK_BP_RETURN_TO_START)) {
         o->oAction = PLATFORM_ON_TRACK_ACT_FALL;
     } else {
         // The ski lift should pause or stop after reaching a special waypoint
@@ -272,7 +275,7 @@ static void platform_on_track_act_move_along_track(void) {
         //  after reappearing
 
         // Turn face yaw and compute yaw vel
-        if (!(GET_BPARAM2(o->oBehParams) & PLATFORM_ON_TRACK_BP_DONT_TURN_YAW)) {
+        if (!(GET_BPARAM1(o->oBehParams) & PLATFORM_ON_TRACK_BP_DONT_TURN_YAW)) {
             s16 targetFaceYaw = (o->oMoveAngleYaw + 0x4000);
             s16 yawSpeed = (abs_angle_diff(targetFaceYaw, o->oFaceAngleYaw) / 20);
 
@@ -283,7 +286,7 @@ static void platform_on_track_act_move_along_track(void) {
         }
 
         // Turn face roll and compute roll vel
-        if ((GET_BPARAM2(o->oBehParams) & PLATFORM_ON_TRACK_BP_DONT_TURN_ROLL)) {
+        if ((GET_BPARAM1(o->oBehParams) & PLATFORM_ON_TRACK_BP_DONT_TURN_ROLL)) {
             s16 rollSpeed = (abs_angle_diff(o->oMoveAnglePitch, o->oFaceAngleRoll) / 20);
 
             initialAngle = o->oFaceAngleRoll;
@@ -391,9 +394,10 @@ void bhv_platform_on_track_update(void) {
 
 #else
         if (!o->oPlatformOnTrackWasStoodOn && (gMarioObject->platform == o)) {
-            o->oPlatformOnTrackOffsetY = -8.0f;
+            o->oPlatformOnTrackOffsetY    = -8.0f;
             o->oPlatformOnTrackWasStoodOn = TRUE;
         }
+
         approach_f32_ptr(&o->oPlatformOnTrackOffsetY, 0.0f, 0.5f);
         o->oPosY += o->oPlatformOnTrackOffsetY;
 #endif
