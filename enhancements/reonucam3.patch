@@ -224,7 +224,7 @@ index 25b27983..2ff11930 100644
 +
      gCamera = c;
      update_camera_hud_status(c);
-     if (c->cutscene == 0 &&
+     if (c->cutscene == CUTSCENE_NONE &&
 @@ -3046,14 +3109,13 @@ void update_camera(struct Camera *c) {
          // Only process R_TRIG if 'fixed' is not selected in the menu
          if (cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {

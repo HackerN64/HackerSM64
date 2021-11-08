@@ -2825,7 +2825,7 @@ void update_camera(struct Camera *c) {
 #ifdef PUPPYCAM
     }
     // Just a cute little bit that syncs puppycamera up to vanilla when playing a vanilla cutscene :3
-    if (c->cutscene != 0) {
+    if (c->cutscene != CUTSCENE_NONE) {
         gPuppyCam.yawTarget = gCamera->yaw;
         gPuppyCam.yaw       = gCamera->yaw;
         if (gMarioState->action == ACT_ENTERING_STAR_DOOR) { // god this is stupid and the fact I have to continue doing this is testament to the idiocy of the star door cutscene >:(
@@ -2837,7 +2837,7 @@ void update_camera(struct Camera *c) {
      && gPuppyCam.enabled
      && !(gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON)) {
         // Clear the recent cutscene after 8 frames
-        if ((gRecentCutscene != 0) && (sFramesSinceCutsceneEnded < 8)) {
+        if ((gRecentCutscene != CUTSCENE_NONE) && (sFramesSinceCutsceneEnded < 8)) {
             sFramesSinceCutsceneEnded++;
             if (sFramesSinceCutsceneEnded >= 8) {
                 gRecentCutscene = CUTSCENE_NONE;
