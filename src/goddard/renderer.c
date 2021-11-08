@@ -1600,9 +1600,9 @@ void func_8019F2C4(f32 arg0, s8 arg1) {
 void gd_dl_lookat(struct ObjCamera *cam, f32 fromX, f32 fromY, f32 fromZ, f32 toX, f32 toY, f32 toZ, f32 colXY) {
     LookAt *lookat;
 
-    colXY *= RAD_PER_DEG;
+    Angle roll = degrees_to_angle(colXY);
 
-    gd_mat4f_lookat(&cam->unkE8, fromX, fromY, fromZ, toX, toY, toZ, sinf(colXY), cosf(colXY), 0.0f);
+    gd_mat4f_lookat(&cam->unkE8, fromX, fromY, fromZ, toX, toY, toZ, sins(roll), coss(roll), 0.0f);
 
     mat4_to_mtx(&cam->unkE8, &DL_CURRENT_MTX(sCurrentGdDl));
     gSPMatrix(next_gfx(), osVirtualToPhysical(&DL_CURRENT_MTX(sCurrentGdDl)),
@@ -1624,22 +1624,22 @@ void gd_dl_lookat(struct ObjCamera *cam, f32 fromX, f32 fromY, f32 fromZ, f32 to
     lookat->l[1].l.dir[1] = LOOKAT_PACK(cam->unkE8[1][1]);
     lookat->l[1].l.dir[2] = LOOKAT_PACK(cam->unkE8[2][1]);
 
-    lookat->l[0].l.col[0] = 0;
-    lookat->l[0].l.col[1] = 0;
-    lookat->l[0].l.col[2] = 0;
-    lookat->l[0].l.pad1 = 0;
+    lookat->l[0].l.col[0]  = 0;
+    lookat->l[0].l.col[1]  = 0;
+    lookat->l[0].l.col[2]  = 0;
+    lookat->l[0].l.pad1    = 0;
     lookat->l[0].l.colc[0] = 0;
     lookat->l[0].l.colc[1] = 0;
     lookat->l[0].l.colc[2] = 0;
-    lookat->l[0].l.pad2 = 0;
-    lookat->l[1].l.col[0] = 0;
-    lookat->l[1].l.col[1] = 0x80;
-    lookat->l[1].l.col[2] = 0;
-    lookat->l[1].l.pad1 = 0;
+    lookat->l[0].l.pad2    = 0;
+    lookat->l[1].l.col[0]  = 0;
+    lookat->l[1].l.col[1]  = 0x80;
+    lookat->l[1].l.col[2]  = 0;
+    lookat->l[1].l.pad1    = 0;
     lookat->l[1].l.colc[0] = 0;
     lookat->l[1].l.colc[1] = 0x80;
     lookat->l[1].l.colc[2] = 0;
-    lookat->l[1].l.pad2 = 0;
+    lookat->l[1].l.pad2    = 0;
 
     lookat = &D_801BE790[0];
     lookat->l[0].l.dir[0] = 1;

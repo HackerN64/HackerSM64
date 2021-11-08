@@ -218,7 +218,7 @@ void draw_light(struct ObjLight *light) {
         sp94.x = -light->unk80.x;
         sp94.y = -light->unk80.y;
         sp94.z = -light->unk80.z;
-        gd_create_origin_lookat(&sp54, &sp94, 0.0f);
+        gd_create_origin_lookat(&sp54, &sp94);
         shape = gSpotShape;
     } else {
         shape = light->unk9C;
@@ -497,7 +497,7 @@ void draw_camera(struct ObjCamera *cam) {
         gd_printf("Draw_Camera(): Zero view distance\n");
         return;
     }
-    gd_dl_lookat(cam, cam->worldPos.x, cam->worldPos.y, cam->worldPos.z, sp44.x, sp44.y, sp44.z, cam->unkA4);
+    gd_dl_lookat(cam, cam->worldPos.x, cam->worldPos.y, cam->worldPos.z, sp44.x, sp44.y, sp44.z, cam->roll);
 }
 
 /* 22836C -> 228498 */

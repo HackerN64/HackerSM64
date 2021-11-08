@@ -404,7 +404,7 @@ struct ObjCamera {
     /* 0x05C */ u8  filler[4];
     /* 0x060 */ f32 unk60;
     /* 0x064 */ Mat4f unk64;    // matrix4x4
-    /* 0x0A4 */ f32 unkA4;
+    /* 0x0A4 */ f32 roll;
     /* 0x0A8 */ Mat4f unkA8;    // matrix4x4
     /* 0x0E8 */ Mat4f unkE8;
     /* 0x128 */ struct GdVec3f unk128;  // possibly
