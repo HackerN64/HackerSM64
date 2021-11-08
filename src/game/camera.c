@@ -2927,47 +2927,47 @@ void init_camera(struct Camera *c) {
     Vec3f marioOffset = { 0.0f, 125.0f, 400.0f };
     s32 i;
 
-    sCreditsPlayer2Pitch = 0;
-    sCreditsPlayer2Yaw = 0;
-    gPrevLevel = (gCurrLevelArea / 16);
-    gCurrLevelArea = ((gCurrLevelNum * 16) + gCurrentArea->index);
-    sSelectionFlags &= CAM_MODE_MARIO_SELECTED;
-    sFramesPaused = 0;
-    gLakituState.mode = c->mode;
-    gLakituState.defMode = c->defMode;
-    gLakituState.posHSpeed = 0.3f;
-    gLakituState.posVSpeed = 0.3f;
-    gLakituState.focHSpeed = 0.8f;
-    gLakituState.focVSpeed = 0.3f;
-    gLakituState.roll         = 0;
-    gLakituState.keyDanceRoll = 0;
-    gLakituState.unused       = 0;
-    sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
+    sCreditsPlayer2Pitch           = 0x0;
+    sCreditsPlayer2Yaw             = 0x0;
+    gPrevLevel                     = (gCurrLevelArea / 16);
+    gCurrLevelArea                 = ((gCurrLevelNum * 16) + gCurrentArea->index);
+    sSelectionFlags               &= CAM_MODE_MARIO_SELECTED;
+    sFramesPaused                  = 0;
+    gLakituState.mode              = c->mode;
+    gLakituState.defMode           = c->defMode;
+    gLakituState.posHSpeed         = 0.3f;
+    gLakituState.posVSpeed         = 0.3f;
+    gLakituState.focHSpeed         = 0.8f;
+    gLakituState.focVSpeed         = 0.3f;
+    gLakituState.roll              = 0;
+    gLakituState.keyDanceRoll      = 0;
+    gLakituState.unused            = 0;
+    sStatusFlags                  &= ~CAM_FLAG_SMOOTH_MOVEMENT;
     vec3_zero(sCastleEntranceOffset);
     vec3_zero(sPlayer2FocusOffset);
     find_mario_floor_and_ceil(&sMarioGeometry);
     sMarioGeometry.prevFloorHeight = sMarioGeometry.currFloorHeight;
-    sMarioGeometry.prevCeilHeight = sMarioGeometry.currCeilHeight;
-    sMarioGeometry.prevFloor = sMarioGeometry.currFloor;
-    sMarioGeometry.prevCeil = sMarioGeometry.currCeil;
-    sMarioGeometry.prevFloorType = sMarioGeometry.currFloorType;
-    sMarioGeometry.prevCeilType = sMarioGeometry.currCeilType;
+    sMarioGeometry.prevCeilHeight  = sMarioGeometry.currCeilHeight;
+    sMarioGeometry.prevFloor       = sMarioGeometry.currFloor;
+    sMarioGeometry.prevCeil        = sMarioGeometry.currCeil;
+    sMarioGeometry.prevFloorType   = sMarioGeometry.currFloorType;
+    sMarioGeometry.prevCeilType    = sMarioGeometry.currCeilType;
     for (i = 0; i < 32; i++) {
         sCurCreditsSplinePos[i].index   = -1;
         sCurCreditsSplineFocus[i].index = -1;
     }
-    sCutsceneSplineSegment = 0;
+    sCutsceneSplineSegment         = 0;
     sCutsceneSplineSegmentProgress = 0.0f;
-    sHandheldShakeInc = 0.0f;
-    sHandheldShakeTimer = 0.0f;
-    sHandheldShakeMag = 0;
+    sHandheldShakeInc              = 0.0f;
+    sHandheldShakeTimer            = 0.0f;
+    sHandheldShakeMag              = 0;
     for (i = 0; i < 4; i++) {
         sHandheldShakeSpline[i].index = -1;
     }
-    sHandheldShakePitch = 0x0;
-    sHandheldShakeYaw   = 0x0;
-    sHandheldShakeRoll  = 0x0;
-    c->cutscene = CUTSCENE_NONE;
+    sHandheldShakePitch            = 0x0;
+    sHandheldShakeYaw              = 0x0;
+    sHandheldShakeRoll             = 0x0;
+    c->cutscene                    = CUTSCENE_NONE;
 
     // Set the camera's starting position or start a cutscene for certain levels
     switch (gCurrLevelNum) {
@@ -2993,14 +2993,14 @@ void init_camera(struct Camera *c) {
 
         //! Hardcoded position checks determine which cutscene to play when Mario enters castle grounds.
         case LEVEL_CASTLE_GROUNDS:
-            if (!is_within_100_units_of_mario(-1328.0f, 260.0f, 4664.0f)) {
+            if (!is_within_100_units_of_mario(-1328.0f,  260.0f,  4664.0f)) {
                 marioOffset[0] = -400.0f;
                 marioOffset[2] = -800.0f;
             }
-            if (is_within_100_units_of_mario(-6901.0f, 2376.0f, -6509.0f)) {
+            if (is_within_100_units_of_mario(-6901.0f,  2376.0f, -6509.0f)) {
                 start_cutscene(c, CUTSCENE_EXIT_WATERFALL);
             }
-            if (is_within_100_units_of_mario(5408.0f, 4500.0f, 3637.0f)) {
+            if (is_within_100_units_of_mario( 5408.0f,  4500.0f,  3637.0f)) {
                 start_cutscene(c, CUTSCENE_EXIT_FALL_WMOTR);
             }
             gLakituState.mode = CAMERA_MODE_FREE_ROAM;
@@ -3131,23 +3131,23 @@ void select_mario_cam_mode(void) {
  * Allocate the GraphNodeCamera's config.camera, and copy `c`'s focus to the Camera's area center point.
  */
 void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
-    struct Camera *c = alloc_only_pool_alloc(pool, sizeof(struct Camera));
+    struct Camera *c   = alloc_only_pool_alloc(pool, sizeof(struct Camera));
 
-    gc->config.camera = c;
+    gc->config.camera  = c;
 #ifdef CAMERA_FIX
-    c->mode    = CAMERA_MODE_8_DIRECTIONS;
-    c->defMode = CAMERA_MODE_8_DIRECTIONS;
+    c->mode            = CAMERA_MODE_8_DIRECTIONS;
+    c->defMode         = CAMERA_MODE_8_DIRECTIONS;
 #else
-    s16 mode   = gc->config.mode;
-    c->mode    = mode;
-    c->defMode = mode;
+    s16 mode           = gc->config.mode;
+    c->mode            = mode;
+    c->defMode         = mode;
 #endif
-    c->cutscene   = CUTSCENE_NONE;
-    c->doorStatus = DOOR_DEFAULT;
-    c->areaCenX   = gc->focus[0];
-    c->areaCenY   = gc->focus[1];
-    c->areaCenZ   = gc->focus[2];
-    c->yaw        = 0x0;
+    c->cutscene        = CUTSCENE_NONE;
+    c->doorStatus      = DOOR_DEFAULT;
+    c->areaCenX        = gc->focus[0];
+    c->areaCenY        = gc->focus[1];
+    c->areaCenZ        = gc->focus[2];
+    c->yaw             = 0x0;
     vec3f_copy(c->pos,   gc->pos);
     vec3f_copy(c->focus, gc->focus);
 }
@@ -3156,7 +3156,7 @@ void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
  * Copy Lakitu's pos and foc into `gc`
  */
 void update_graph_node_camera(struct GraphNodeCamera *gc) {
-    gc->rollScreen = gLakituState.roll;
+    gc->rollScreen      = gLakituState.roll;
     vec3f_copy(gc->pos,   gLakituState.pos);
     vec3f_copy(gc->focus, gLakituState.focus);
     zoom_out_if_paused_and_outside(gc);
@@ -3277,7 +3277,8 @@ s32 cam_select_alt_mode(s32 selection) {
     }
 
     // The alternate mode is up-close, but the player just selected fixed in the pause menu
-    if ((selection == CAM_SELECTION_FIXED) && (sSelectionFlags & CAM_MODE_MARIO_SELECTED)) {
+    if ((selection == CAM_SELECTION_FIXED)
+     && (sSelectionFlags & CAM_MODE_MARIO_SELECTED)) {
         // So change to normal mode in case the user paused in up-close mode
         set_cam_angle(CAM_ANGLE_LAKITU);
         sSelectionFlags &= ~CAM_MODE_MARIO_SELECTED;
@@ -3301,7 +3302,8 @@ s32 set_cam_angle(s32 mode) {
     s32 curMode = CAM_ANGLE_LAKITU;
 
     // Switch to Mario mode
-    if (mode == CAM_ANGLE_MARIO && !(sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
+    if ((mode == CAM_ANGLE_MARIO)
+     && !(sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
         sSelectionFlags |= CAM_MODE_MARIO_ACTIVE;
         if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
             sSelectionFlags |= CAM_MODE_LAKITU_WAS_ZOOMED_OUT;
@@ -3311,7 +3313,8 @@ s32 set_cam_angle(s32 mode) {
     }
 
     // Switch back to normal mode
-    if (mode == CAM_ANGLE_LAKITU && (sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
+    if ((mode == CAM_ANGLE_LAKITU)
+     && (sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
         sSelectionFlags &= ~CAM_MODE_MARIO_ACTIVE;
         if (sSelectionFlags & CAM_MODE_LAKITU_WAS_ZOOMED_OUT) {
             sSelectionFlags &= ~CAM_MODE_LAKITU_WAS_ZOOMED_OUT;
@@ -3336,11 +3339,11 @@ void set_handheld_shake(u8 mode) {
     switch (mode) {
         // They're not in numerical order because that would be too simple...
         case HAND_CAM_SHAKE_CUTSCENE: // Lowest increment
-            sHandheldShakeMag = 0x600;
+            sHandheldShakeMag = 0x0600;
             sHandheldShakeInc = 0.04f;
             break;
         case HAND_CAM_SHAKE_LOW: // Lowest magnitude
-            sHandheldShakeMag = 0x300;
+            sHandheldShakeMag = 0x0300;
             sHandheldShakeInc = 0.06f;
             break;
         case HAND_CAM_SHAKE_HIGH: // Highest mag and inc
@@ -3348,19 +3351,19 @@ void set_handheld_shake(u8 mode) {
             sHandheldShakeInc = 0.1f;
             break;
         case HAND_CAM_SHAKE_UNUSED: // Never used
-            sHandheldShakeMag = 0x600;
+            sHandheldShakeMag = 0x0600;
             sHandheldShakeInc = 0.07f;
             break;
         case HAND_CAM_SHAKE_HANG_OWL: // exactly the same as UNUSED...
-            sHandheldShakeMag = 0x600;
+            sHandheldShakeMag = 0x0600;
             sHandheldShakeInc = 0.07f;
             break;
         case HAND_CAM_SHAKE_STAR_DANCE: // Slightly steadier than HANG_OWL and UNUSED
-            sHandheldShakeMag = 0x400;
+            sHandheldShakeMag = 0x0400;
             sHandheldShakeInc = 0.07f;
             break;
         default:
-            sHandheldShakeMag = 0x0;
+            sHandheldShakeMag = 0x0000;
             sHandheldShakeInc = 0.0f;
     }
 }
@@ -3468,8 +3471,9 @@ s32 find_c_buttons_pressed(u16 currentState, u16 buttonsPressed, u16 buttonsDown
 s32 update_camera_hud_status(struct Camera *c) {
     s16 status = CAM_STATUS_NONE;
 
-    if (c->cutscene != 0
-        || ((gPlayer1Controller->buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED)) {
+    if ((c->cutscene != CUTSCENE_NONE)
+     || ((gPlayer1Controller->buttonDown & R_TRIG)
+      && (cam_select_alt_mode(0) == CAM_SELECTION_FIXED))) {
         status |= CAM_STATUS_FIXED;
     } else if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
         status |= CAM_STATUS_MARIO;
@@ -3528,7 +3532,9 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
  * Compare a vector to a position, return TRUE if they match.
  */
 s32 vec3f_compare(Vec3f pos, f32 posX, f32 posY, f32 posZ) {
-    return (pos[0] == posX && pos[1] == posY && pos[2] == posZ);
+    return ((pos[0] == posX)
+         && (pos[1] == posY)
+         && (pos[2] == posZ));
 }
 
 void clamp_pitch(Vec3f from, Vec3f to, s16 maxPitch, s16 minPitch) {
