@@ -1738,9 +1738,9 @@ void check_kick_or_punch_wall(struct MarioState *m) {
 
 void mario_process_interactions(struct MarioState *m) {
     sDelayInvincTimer = FALSE;
-    sInvulnerable = (m->action & ACT_FLAG_INVULNERABLE) || m->invincTimer != 0;
+    sInvulnerable = ((m->action & ACT_FLAG_INVULNERABLE) || (m->invincTimer != 0));
 
-    if (!(m->action & ACT_FLAG_INTANGIBLE) && m->collidedObjInteractTypes != 0) {
+    if (!(m->action & ACT_FLAG_INTANGIBLE) && (m->collidedObjInteractTypes != 0)) {
         s32 i;
         for (i = 0; i < ARRAY_COUNT(sInteractionHandlers); i++) {
             u32 interactType = sInteractionHandlers[i].interactType;
@@ -1758,7 +1758,7 @@ void mario_process_interactions(struct MarioState *m) {
         }
     }
 
-    if (m->invincTimer > 0 && !sDelayInvincTimer) {
+    if ((m->invincTimer > 0) && !sDelayInvincTimer) {
         m->invincTimer--;
     }
 
@@ -1785,10 +1785,14 @@ void check_death_barrier(struct MarioState *m) {
 
 void check_lava_boost(struct MarioState *m) {
 #ifdef LAVA_INTERACTION_FIX
-    if ((m->floor->type == SURFACE_BURNING) && !(m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_RIDING_SHELL)) && (m->pos[1] < (m->floorHeight + 10.0f))) {
+    if ((m->floor->type == SURFACE_BURNING)
+     && !(m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_RIDING_SHELL))
+     && (m->pos[1] < (m->floorHeight + 10.0f))) {
         if (!(m->flags & MARIO_METAL_CAP)) m->hurtCounter = ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
 #else
-    if ((m->floor->type == SURFACE_BURNING) && !(m->action & (ACT_FLAG_AIR | ACT_FLAG_SWIMMING | ACT_FLAG_RIDING_SHELL)) && (m->pos[1] < (m->floorHeight + 10.0f))) {
+    if ((m->floor->type == SURFACE_BURNING)
+     && !(m->action & (ACT_FLAG_AIR | ACT_FLAG_SWIMMING | ACT_FLAG_RIDING_SHELL))
+     && (m->pos[1] < (m->floorHeight + 10.0f))) {
         if (!(m->flags & MARIO_METAL_CAP)) m->hurtCounter += ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
 #endif
         update_mario_sound_and_camera(m);
@@ -1810,9 +1814,7 @@ void pss_end_slide(struct MarioState *m) {
         u16 slideTime = level_control_timer(TIMER_CONTROL_STOP);
         if (slideTime < 630) {
             m->marioObj->oBehParams = (1 << 24); //! TODO: Flag name
-            spawn_default_star(-6358.0f,
-                               -4300.0f,
-                                4700.0f);
+            spawn_default_star(-6358.0f, -4300.0f, 4700.0f);
         }
         sPssSlideStarted = FALSE;
     }

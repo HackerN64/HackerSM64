@@ -11,23 +11,24 @@ static Collision const *sSlidingPlatform2CollisionData[] = {
     bitdw_seg7_collision_0700F688,
 };
 
+//! TODO: Flag names
 void bhv_sliding_plat_2_init(void) {
-    s32 collisionDataIndex = (((u16)(o->oBehParams >> 16) & 0x0380) >> 7);
+    s32 collisionDataIndex = ((GET_BPARAM2(o->oBehParams) & 0x0380) >> 7);
 
     o->collisionData = segmented_to_virtual(sSlidingPlatform2CollisionData[collisionDataIndex]);
-    o->oBackAndForthPlatformPathLength = 50.0f * ((u16)(o->oBehParams >> 16) & 0x003F);
+    o->oBackAndForthPlatformPathLength = (50.0f * (GET_BPARAM2(o->oBehParams) & 0x003F));
 
-    if (collisionDataIndex < 5 || collisionDataIndex > 6) {
+    if ((collisionDataIndex < 5) || (collisionDataIndex > 6)) {
         o->oBackAndForthPlatformVel = 15.0f;
-        if ((u16)(o->oBehParams >> 16) & 0x0040) {
+        if (GET_BPARAM2(o->oBehParams) & (1 << 6)) {
             o->oMoveAngleYaw += 0x8000;
         }
     } else {
         o->oBackAndForthPlatformVel = 10.0f;
-        if ((u16)(o->oBehParams >> 16) & 0x0040) {
+        if (GET_BPARAM2(o->oBehParams) & (1 << 6)) {
             o->oBackAndForthPlatformDirection = -1.0f;
         } else {
-            o->oBackAndForthPlatformDirection = 1.0f;
+            o->oBackAndForthPlatformDirection =  1.0f;
         }
     }
 }
@@ -44,7 +45,7 @@ void bhv_sliding_plat_2_loop(void) {
     obj_perform_position_op(POS_OP_SAVE_POSITION);
 
     if (o->oBackAndForthPlatformDirection != 0.0f) {
-        o->oPosY = o->oHomeY + o->oBackAndForthPlatformDistance * o->oBackAndForthPlatformDirection;
+        o->oPosY = (o->oHomeY + (o->oBackAndForthPlatformDistance * o->oBackAndForthPlatformDirection));
     } else {
         obj_set_dist_from_home(o->oBackAndForthPlatformDistance);
     }

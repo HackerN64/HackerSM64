@@ -265,8 +265,8 @@ static void floomba_act_startup(void) {
     
     cur_obj_unhide();
 
-    if (((o->oBehParams >> 8) & 0x7F) > o->oZoomCounter) {
-        f32 frac = (f32) o->oZoomCounter / (f32) ((o->oBehParams >> 8) & 0x7F);
+    if ((GET_BPARAM3(o->oBehParams) & 0x7F) > o->oZoomCounter) {
+        f32 frac = (f32) o->oZoomCounter / (f32) (GET_BPARAM3(o->oBehParams) & 0x7F);
         o->oPosZ = (o->oZoomPosZ - (300.0f * (1.0f - frac)));
         o->oGoombaScale = (sGoombaProperties[o->oGoombaSize].scale * sqr(frac));
         o->oZoomCounter++;

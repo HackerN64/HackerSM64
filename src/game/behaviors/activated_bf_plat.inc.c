@@ -26,14 +26,15 @@ static Collision const *sActivatedBackAndForthPlatformCollisionModels[] = {
 /**
  * Activated back-and-forth platform initialization function.
  */
+//! TODO: Param names
 void bhv_activated_back_and_forth_platform_init(void) {
     // Equivalent to the first behavior param byte & 3 (last 2 bits of the byte).
-    s32 platformType = (((u16)(o->oBehParams >> 16) & 0x0300) >> 8);
+    s32 platformType = (GET_BPARAM1(o->oBehParams) & ACTIVATED_BF_PLAT_TYPES_MASK);
 
     // The BitS arrow platform should flip 180º (0x8000 angle units), but
     // there is no reason for the other platforms to flip.
     if (platformType != ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT) {
-        o->oActivatedBackAndForthPlatformFlipRotation = 0;
+        o->oActivatedBackAndForthPlatformFlipRotation = 0x0000;
     } else {
         o->oActivatedBackAndForthPlatformFlipRotation = 0x8000;
     }
@@ -45,7 +46,7 @@ void bhv_activated_back_and_forth_platform_init(void) {
     // Equivalent to 50 * (oBehParams2ndByte & 0x7F), i.e. 50 * (oBehParams2ndByte % 128).
     // The maximum possible value of this is 50 * 127 = 6350.
     // It's 50 * 97 = 4850 in BitS and 50 * 31 = 1550 in BitFS.
-    o->oActivatedBackAndForthPlatformMaxOffset = 50.0f * ((u16)(o->oBehParams >> 16) & 0x007F);
+    o->oActivatedBackAndForthPlatformMaxOffset = (50.0f * (GET_BPARAM2(o->oBehParams) & 0x007F));
 
     if (platformType == ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR) {
         o->oActivatedBackAndForthPlatformMaxOffset -= 12.0f;
@@ -53,7 +54,7 @@ void bhv_activated_back_and_forth_platform_init(void) {
 
     // Truthy/falsy value that determines the direction of movement.
     // Equivalent to oBehParams2ndByte & 0x80, i.e. the most significant bit of oBehParams2ndByte.
-    o->oActivatedBackAndForthPlatformVertical = (u16)(o->oBehParams >> 16) & 0x0080;
+    o->oActivatedBackAndForthPlatformVertical = (GET_BPARAM2(o->oBehParams) & 0x0080);
 
     o->oActivatedBackAndForthPlatformStartYaw = o->oFaceAngleYaw;
 }
@@ -85,7 +86,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
             if (clamp_f32(&o->oActivatedBackAndForthPlatformOffset, 0.0f,
                           o->oActivatedBackAndForthPlatformMaxOffset)
                 // The platform will not reset if Mario goes far away and it's travelling backwards
-                || (o->oActivatedBackAndForthPlatformVel > 0.0f && o->oDistanceToMario > 3000.0f)) {
+                || ((o->oActivatedBackAndForthPlatformVel > 0.0f) && (o->oDistanceToMario > 3000.0f))) {
                 // Reset the wait timer
                 o->oActivatedBackAndForthPlatformCountdown = 20;
 
@@ -94,7 +95,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
                 // the platform will reverse directions. Otherwise, it will stop.
                 // This means that if Mario touches the platform initially, then gets off,
                 // it will do a full round trip then stop (assuming Mario stays within 3000 units).
-                if (o->oVelY < 0.0f || o->oActivatedBackAndForthPlatformVel > 0.0f) {
+                if ((o->oVelY < 0.0f) || (o->oActivatedBackAndForthPlatformVel > 0.0f)) {
                     o->oActivatedBackAndForthPlatformVel = -o->oActivatedBackAndForthPlatformVel;
                 } else {
                     o->oActivatedBackAndForthPlatformVel = 0.0f;

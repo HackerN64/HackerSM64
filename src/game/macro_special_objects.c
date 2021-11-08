@@ -106,12 +106,13 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
         preset = MacroObjectPresets[presetID];
 
         // If the preset has a defined param, replace the lower bits with the preset param.
+        // The lower bits are later used for bparam2.
         if (preset.param != 0) {
             macroObject.params = ((macroObject.params & 0xFF00) | (preset.param & 0x00FF));
         }
 
         // If object has been killed (bparam3 check), prevent it from respawning
-        if (((macroObject.params >> 8) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
+        if ((GET_BPARAM3(macroObject.params) & RESPAWN_INFO_DONT_RESPAWN) != RESPAWN_INFO_DONT_RESPAWN) {
             // Spawn the new macro object.
             newObj = spawn_object_abs_with_rot(
                          &gMacroObjectDefaultParent,        // Parent object
@@ -121,15 +122,15 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
                          macroObject.pos[0],                // X-position
                          macroObject.pos[1],                // Y-position
                          macroObject.pos[2],                // Z-position
-                         0,                                 // X-rotation
+                         0x0,                               // X-rotation
                          convert_rotation(macroObject.yaw), // Y-rotation
-                         0                                  // Z-rotation
+                         0x0                                // Z-rotation
                      );
 
             newObj->oUnusedCoinParams =    macroObject.params;
-            newObj->oBehParams        = (((macroObject.params & 0x00FF) << 16) // Shift preset param to set 2nd byte
-                                        | (macroObject.params & 0xFF00));      // Set 3rd byte from upper bits (macro param)
-            newObj->oBehParams2ndByte =   (macroObject.params & 0x00FF);       // Set 2nd byte from preset param
+            newObj->oBehParams        = (((macroObject.params & 0x00FF) << 16) // Set 2nd byte from lower bits (shifted).
+                                        | (macroObject.params & 0xFF00));      // Set 3rd byte from upper bits.
+            newObj->oBehParams2ndByte =   (macroObject.params & 0x00FF);       // Set 2nd byte from lower bits.
             newObj->respawnInfoType   = RESPAWN_INFO_TYPE_MACRO_OBJECT;
             newObj->respawnInfo       = (macroObjList - 1);
             newObj->parentObj         = newObj;
@@ -191,10 +192,10 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
 
     for (i = 0; i < numOfSpecialObjects; i++) {
-        presetID = (u8) *(*specialObjList)++;
-        pos[0] = *(*specialObjList)++;
-        pos[1] = *(*specialObjList)++;
-        pos[2] = *(*specialObjList)++;
+        presetID = *(*specialObjList)++;
+        pos[0]   = *(*specialObjList)++;
+        pos[1]   = *(*specialObjList)++;
+        pos[2]   = *(*specialObjList)++;
 
         offset = 0;
         while (TRUE) {
@@ -252,10 +253,7 @@ u32 get_special_objects_size(s16 *data) {
         data  += 3;
         offset = 0;
 
-        while (TRUE) {
-            if (SpecialObjectPresets[offset].preset_id == presetID) {
-                break;
-            }
+        while (SpecialObjectPresets[offset].preset_id != presetID) {
             offset++;
         }
 

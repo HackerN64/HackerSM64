@@ -1787,9 +1787,10 @@ enum BehParam1StarAct { // BPARAM1
     #define PLATFORM_ON_TRACK_ACT_MOVE_ALONG_TRACK          0x2
     #define PLATFORM_ON_TRACK_ACT_PAUSE_BRIEFLY             0x3
     #define PLATFORM_ON_TRACK_ACT_FALL                      0x4
-    /* oBehParams >> 16 */
+    /* oBehParams2ndByte */
     #define PLATFORM_ON_TRACK_BP_MASK_PATH                  0xF
     #define PLATFORM_ON_TRACK_BP_MASK_TYPE                  (0x7 << 4)
+    #define PLATFORM_ON_TRACK_BP_SPAWN_BALLS                (1 <<  7)
     #define PLATFORM_ON_TRACK_BP_RETURN_TO_START            (1 <<  8)
     #define PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR             (1 <<  9)
     #define PLATFORM_ON_TRACK_BP_DONT_TURN_YAW              (1 << 10)
@@ -2039,6 +2040,7 @@ enum AnimIDsPenguin { // Animations
     #define ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT          0x0
     #define ACTIVATED_BF_PLAT_TYPE_BITFS_MESH_PLAT          0x1
     #define ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR           0x2
+    #define ACTIVATED_BF_PLAT_TYPES_MASK                    0x3
 
 /* Unagi */
     /* oBehParams2ndByte */
