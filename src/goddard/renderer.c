@@ -1597,12 +1597,10 @@ void func_8019F2C4(f32 arg0, s8 arg1) {
 }
 
 /* 24DAE8 -> 24E1A8 */
-void gd_dl_lookat(struct ObjCamera *cam, f32 fromX, f32 fromY, f32 fromZ, f32 toX, f32 toY, f32 toZ, f32 colXY) {
+void gd_dl_lookat(struct ObjCamera *cam, f32 fromX, f32 fromY, f32 fromZ, f32 toX, f32 toY, f32 toZ) {
     LookAt *lookat;
 
-    Angle roll = degrees_to_angle(colXY);
-
-    gd_mat4f_lookat(&cam->unkE8, fromX, fromY, fromZ, toX, toY, toZ, sins(roll), coss(roll), 0.0f);
+    gd_mat4f_lookat(&cam->unkE8, fromX, fromY, fromZ, toX, toY, toZ, 0.0f, 1.0f, 0.0f);
 
     mat4_to_mtx(&cam->unkE8, &DL_CURRENT_MTX(sCurrentGdDl));
     gSPMatrix(next_gfx(), osVirtualToPhysical(&DL_CURRENT_MTX(sCurrentGdDl)),

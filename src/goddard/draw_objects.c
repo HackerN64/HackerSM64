@@ -497,7 +497,7 @@ void draw_camera(struct ObjCamera *cam) {
         gd_printf("Draw_Camera(): Zero view distance\n");
         return;
     }
-    gd_dl_lookat(cam, cam->worldPos.x, cam->worldPos.y, cam->worldPos.z, sp44.x, sp44.y, sp44.z, cam->roll);
+    gd_dl_lookat(cam, cam->worldPos.x, cam->worldPos.y, cam->worldPos.z, sp44.x, sp44.y, sp44.z);
 }
 
 /* 22836C -> 228498 */
