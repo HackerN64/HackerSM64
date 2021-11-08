@@ -2906,20 +2906,20 @@ void reset_camera(struct Camera *c) {
     sMarioCamState->headRotation[1] = 0;
     // sLuigiCamState->headRotation[0] = 0;
     // sLuigiCamState->headRotation[1] = 0;
-    sMarioCamState->cameraEvent = CAM_EVENT_NONE;
-    sMarioCamState->usedObj     = NULL;
+    sMarioCamState->cameraEvent     = CAM_EVENT_NONE;
+    sMarioCamState->usedObj         = NULL;
     vec3_zero(gLakituState.shakeMagnitude);
     vec3_zero(gLakituState.unusedVec2);
     vec3_zero(gLakituState.unusedVec1);
-    gLakituState.lastFrameAction = 0;
+    gLakituState.lastFrameAction    =  0;
     set_fov_function(CAM_FOV_DEFAULT);
-    sFOVState.fov              = 45.0f;
-    sFOVState.fovOffset        =  0.0f;
-    sFOVState.unusedIsSleeping =  0;
-    sFOVState.shakeAmplitude   =  0.0f;
-    sFOVState.shakePhase       =  0;
-    sObjectCutscene = CUTSCENE_NONE;
-    gRecentCutscene = CUTSCENE_NONE;
+    sFOVState.fov                   = 45.0f;
+    sFOVState.fovOffset             =  0.0f;
+    sFOVState.unusedIsSleeping      =  0;
+    sFOVState.shakeAmplitude        =  0.0f;
+    sFOVState.shakePhase            =  0;
+    sObjectCutscene                 = CUTSCENE_NONE;
+    gRecentCutscene                 = CUTSCENE_NONE;
 }
 
 void init_camera(struct Camera *c) {
