@@ -322,9 +322,9 @@ void painting_state(s8 state, struct Painting *painting, struct Painting *painti
             painting->dispersionFactor = painting->entryDispersionFactor;
             break;
     }
-    painting->state = state;
-    painting->rippleX = painting_ripple_x(painting, xSource);
-    painting->rippleY = painting_ripple_y(painting, ySource);
+    painting->state      = state;
+    painting->rippleX    = painting_ripple_x(painting, xSource);
+    painting->rippleY    = painting_ripple_y(painting, ySource);
     gPaintingMarioYEntry = gPaintingMarioPos[1];
 
     // Because true or false would be too simple...
@@ -492,8 +492,8 @@ void floor_painting_continuous_rippling(struct Painting *painting, struct Painti
  * Check for Mario entering one of the special floors associated with the painting.
  */
 void painting_update_floors(struct Painting *painting) {
-    s32 paintingId3 = (painting->id * 3);
-    s8  rippleFlags = RIPPLE_FLAGS_NONE;
+    s32 paintingId3    = (painting->id * 3);
+    s8  rippleFlags    = RIPPLE_FLAGS_NONE;
     s16 marioFloorType = SURFACE_DEFAULT;
     
     if (gMarioState->floor != NULL) marioFloorType = gMarioState->floor->type;
@@ -591,10 +591,8 @@ s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
     } else {
         // use a cosine wave to make the ripple go up and down,
         // scaled by the painting's ripple magnitude
-        f32 rippleZ = (rippleMag * cosf(rippleRate * (2 * M_PI) * (rippleTimer - rippleDistance)));
-
         // round it to an int and return it
-        return roundf(rippleZ);
+        return roundf(rippleMag * coss((s16)((rippleRate * (rippleTimer - rippleDistance)) * 0x10000)));
     }
 }
 

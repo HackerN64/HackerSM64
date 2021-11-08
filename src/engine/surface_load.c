@@ -46,8 +46,7 @@ u8 gSurfacePoolError = 0;
  * Allocate the part of the surface node pool to contain a surface node.
  */
 static struct SurfaceNode *alloc_surface_node(void) {
-    struct SurfaceNode *node = &sSurfaceNodePool[gSurfaceNodesAllocated];
-    gSurfaceNodesAllocated++;
+    struct SurfaceNode *node = &sSurfaceNodePool[gSurfaceNodesAllocated++];
 
     node->next = NULL;
 
@@ -64,8 +63,7 @@ static struct SurfaceNode *alloc_surface_node(void) {
  */
 static struct Surface *alloc_surface(void) {
 
-    struct Surface *surface = &sSurfacePool[gSurfacesAllocated];
-    gSurfacesAllocated++;
+    struct Surface *surface = &sSurfacePool[gSurfacesAllocated++];
 
     if (gSurfacesAllocated >= sSurfacePoolSize) {
         gSurfacePoolError |= NOT_ENOUGH_ROOM_FOR_SURFACES;
@@ -109,45 +107,37 @@ static void clear_static_surfaces(void) {
  * @param surface The surface to add
  */
 static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surface *surface) {
-    struct SurfaceNode *newNode = alloc_surface_node();
-    struct SurfaceNode *list;
     s32 priority;
     s32 sortDir;
     s32 listIndex;
-    s32 isWater = SURFACE_IS_NEW_WATER(surface->type);
 
-    if (surface->normal.y > 0.01) {
-        listIndex = isWater ? SPATIAL_PARTITION_WATER : SPATIAL_PARTITION_FLOORS;
-        sortDir = 1; // highest to lowest, then insertion order
-    } else if (surface->normal.y < -0.01) {
+    if (surface->normal.y > 0.01f) {
+        listIndex = (SURFACE_IS_NEW_WATER(surface->type) ? SPATIAL_PARTITION_WATER : SPATIAL_PARTITION_FLOORS);
+        sortDir =  1; // highest to lowest, then insertion order
+    } else if (surface->normal.y < -0.01f) {
         listIndex = SPATIAL_PARTITION_CEILS;
         sortDir = -1; // lowest to highest, then insertion order
     } else {
         listIndex = SPATIAL_PARTITION_WALLS;
-        sortDir = 0; // insertion order
+        sortDir =  0; // insertion order
     }
 
     s32 surfacePriority = (surface->upperY * sortDir);
 
+    struct SurfaceNode *newNode = alloc_surface_node();
     newNode->surface = surface;
 
-    if (dynamic) {
-        list = &gDynamicSurfacePartition[cellZ][cellX][listIndex];
-    } else {
-        list = &gStaticSurfacePartition[cellZ][cellX][listIndex];
-    }
+    struct SurfaceNode *list = &(dynamic ? gDynamicSurfacePartition : gStaticSurfacePartition)[cellZ][cellX][listIndex];
 
     // Loop until we find the appropriate place for the surface in the list.
     while (list->next != NULL) {
         priority = (list->next->surface->upperY * sortDir);
-
         if (surfacePriority > priority) break;
-
         list = list->next;
     }
 
     newNode->next = list->next;
-    list->next = newNode;
+    list->next    = newNode;
 }
 
 /**
@@ -156,8 +146,6 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
  * @param coord The coordinate to test
  */
 static s32 lower_cell_index(s32 coord) {
-    s32 index;
-
     // Move from range [-LEVEL_BOUNDARY_MAX, LEVEL_BOUNDARY_MAX) to [0, 2 * LEVEL_BOUNDARY_MAX)
     coord += LEVEL_BOUNDARY_MAX;
     if (coord < 0) {
@@ -165,7 +153,7 @@ static s32 lower_cell_index(s32 coord) {
     }
 
     // [0, NUM_CELLS)
-    index = (coord / CELL_SIZE);
+    s32 index = (coord / CELL_SIZE);
 
     // Include extra cell if close to boundary
     //! Some wall checks are larger than the buffer, meaning wall checks can
@@ -186,8 +174,6 @@ static s32 lower_cell_index(s32 coord) {
  * @param coord The coordinate to test
  */
 static s32 upper_cell_index(s32 coord) {
-    s32 index;
-
     // Move from range [-LEVEL_BOUNDARY_MAX, LEVEL_BOUNDARY_MAX) to [0, 2 * LEVEL_BOUNDARY_MAX)
     coord += LEVEL_BOUNDARY_MAX;
     if (coord < 0) {
@@ -195,7 +181,7 @@ static s32 upper_cell_index(s32 coord) {
     }
 
     // [0, NUM_CELLS)
-    index = (coord / CELL_SIZE);
+    s32 index = (coord / CELL_SIZE);
 
     // Include extra cell if close to boundary
     //! Some wall checks are larger than the buffer, meaning wall checks can
@@ -270,8 +256,8 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
     surface->originOffset = -vec3_dot(n, v1);
     
     min_max_3(v1[1], v2[1], v3[1], &min, &max);
-    surface->lowerY = (min - 5);
-    surface->upperY = (max + 5);
+    surface->lowerY = (min - SURFACE_VERTICAL_BUFFER);
+    surface->upperY = (max + SURFACE_VERTICAL_BUFFER);
 
     return surface;
 }
@@ -337,19 +323,17 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
 #endif
     s32 flags = surf_has_no_cam_collision(surfaceType);
 
-    s32 numSurfaces = *(*data);
-    (*data)++;
+    s32 numSurfaces = *(*data)++;
 
     for (i = 0; i < numSurfaces; i++) {
         if (*surfaceRooms != NULL) {
-            room = *(*surfaceRooms);
-            (*surfaceRooms)++;
+            room = *(*surfaceRooms)++;
         }
 
         surface = read_surface_data(vertexData, data);
         if (surface != NULL) {
-            surface->room = room;
-            surface->type = surfaceType;
+            surface->room  = room;
+            surface->type  = surfaceType;
             surface->flags = flags;
 
 #ifdef ALL_SURFACES_HAVE_FORCE
@@ -373,8 +357,7 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
  * Read the data for vertices for reference by triangles.
  */
 static TerrainData *read_vertex_data(TerrainData **data) {
-    s32 numVertices = *(*data);
-    (*data)++;
+    s32 numVertices = *(*data)++;
 
     TerrainData *vertexData = *data;
     *data += (3 * numVertices);
@@ -401,8 +384,6 @@ static void load_environmental_regions(TerrainData **data) {
  * Allocate some of the main pool for surfaces (2300 surf) and for surface nodes (7000 nodes).
  */
 void alloc_surface_pools(void) {
-    // sSurfaceNodePoolSize = SURFACE_NODE_POOL_SIZE;
-    // sSurfacePoolSize     = SURFACE_POOL_SIZE;
     sSurfaceNodePool     = main_pool_alloc(sSurfaceNodePoolSize * sizeof(struct SurfaceNode), MEMORY_POOL_LEFT);
     sSurfacePool         = main_pool_alloc(sSurfacePoolSize     * sizeof(struct Surface    ), MEMORY_POOL_LEFT);
     gCCMEnteredSlide     = FALSE;
@@ -487,8 +468,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     // A while loop iterating through each section of the level data. Sections of data are
     // prefixed by a terrain "type." This type is reused for surfaces as the surface type.
     while (TRUE) {
-        terrainLoadType = *data;
-        data++;
+        terrainLoadType = *data++;
 
         if (TERRAIN_LOAD_IS_SURFACE_TYPE_LOW(terrainLoadType)) {
             load_static_surfaces(&data, vertexData, terrainLoadType, &surfaceRooms);
@@ -531,7 +511,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
  */
 void clear_dynamic_surfaces(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
-        gSurfacesAllocated = gNumStaticSurfaces;
+        gSurfacesAllocated     = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
 
         clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
@@ -544,8 +524,7 @@ void clear_dynamic_surfaces(void) {
 void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
     Mat4 *objectTransform = &o->transform;
 
-    register s32 numVertices = *(*data);
-    (*data)++;
+    register s32 numVertices = *(*data)++;
 
     register TerrainData *vertices = *data;
 
@@ -564,7 +543,9 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
         vertices += 3;
 
         //! No bounds check on vertex data
-        if ((v[0] == 0) && (v[1] == 0) && (v[2] == 0)) {
+        if ((v[0] == 0)
+         && (v[1] == 0)
+         && (v[2] == 0)) {
             vec3f_to_vec3s(vertexData, m[3]);
         } else {
             linear_mtxf_mul_vec3_and_translate(m, vertexData, v);
@@ -581,11 +562,8 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
 void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
     s32 i;
 
-    s32 surfaceType = *(*data);
-    (*data)++;
-
-    s32 numSurfaces = *(*data);
-    (*data)++;
+    s32 surfaceType = *(*data)++;
+    s32 numSurfaces = *(*data)++;
 
 #ifndef ALL_SURFACES_HAVE_FORCE
     TerrainData hasForce = surface_has_force(surfaceType);
@@ -602,7 +580,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
 
         if (surface != NULL) {
             surface->object = o;
-            surface->type = surfaceType;
+            surface->type   = surfaceType;
 
 #ifdef ALL_SURFACES_HAVE_FORCE
             surface->force = *(*data + 3);
@@ -610,7 +588,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
             surface->force = (hasForce ? *(*data + 3) : 0);
 #endif
             surface->flags |= flags;
-            surface->room = room;
+            surface->room   = room;
             add_surface(surface, TRUE);
         }
 
@@ -630,9 +608,7 @@ static void get_optimal_coll_dist(struct Object *obj) {
     TerrainData *collisionData = o->collisionData;
     obj->oFlags |= OBJ_FLAG_DONT_CALC_COLL_DIST;
     collisionData++;
-    register u32 vertsLeft = *(collisionData);
-    collisionData++;
-    // vertices = *data;
+    register u32 vertsLeft = *(collisionData)++;
     while (vertsLeft) {
         vec3_prod(v, collisionData, obj->header.gfx.scale);
         thisVertDist = vec3_sumsq(v);
@@ -675,8 +651,9 @@ void load_object_collision_model(void) {
     }
 
     // Update if no Time Stop, in range, and in the current room.
-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && (marioDist < o->oCollisionDistance)
-        && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+    if (!(gTimeStopState & TIME_STOP_ACTIVE)
+     && (marioDist < o->oCollisionDistance)
+     && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         collisionData++;
         transform_object_vertices(&collisionData, vertexData);
 

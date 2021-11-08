@@ -6,6 +6,8 @@
 #include "surface_collision.h"
 #include "types.h"
 
+#define SURFACE_VERTICAL_BUFFER 5
+
 extern u8 gSurfacePoolError;
 
 struct SurfaceNode {

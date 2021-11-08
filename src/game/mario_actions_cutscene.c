@@ -464,7 +464,7 @@ s32 act_reading_sign(struct MarioState *m) {
 
     switch (m->actionState) {
         case ACT_STATE_READING_SIGN_START_DIALOG:
-            trigger_cutscene_dialog(1);
+            start_object_cutscene_without_focus(CUTSCENE_READ_MESSAGE);
             enable_time_stop();
             // reading sign
             set_mario_animation(m, MARIO_ANIM_FIRST_PERSON);

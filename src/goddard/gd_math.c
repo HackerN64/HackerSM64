@@ -18,35 +18,22 @@ void gd_mat4f_lookat(Mat4f *mtx,
                      f32 xFrom, f32 yFrom, f32 zFrom,
                      f32 xTo,   f32 yTo,   f32 zTo,
                      f32 zColY, f32 yColY, f32 xColY) {
-    f32 invLength;
-
     struct GdVec3f d;
     struct GdVec3f colX;
-    struct GdVec3f norm;
-
-    // No reason to do this? mtx is set lower.
-    gd_set_identity_mat4(mtx);
 
     d.z = (xTo - xFrom);
     d.y = (yTo - yFrom);
     d.x = (zTo - zFrom);
 
-    invLength = (absf(d.z) + absf(d.y) + absf(d.x));
+    f32 invLength = (absf(d.z) + absf(d.y) + absf(d.x));
 
     // Scales 'd' if smaller than 10 or larger than 10,000 to be
     // of a magnitude of 10,000.
     if ((invLength > 10000.0f) || (invLength < 10.0f)) {
-        norm.x = d.z;
-        norm.y = d.y;
-        norm.z = d.x;
-        gd_normalize_vec3f(&norm);
-        norm.x *= 10000.0f;
-        norm.y *= 10000.0f;
-        norm.z *= 10000.0f;
-
-        d.z = norm.x;
-        d.y = norm.y;
-        d.x = norm.z;
+        gd_normalize_vec3f(&d);
+        d.x *= 10000.0f;
+        d.y *= 10000.0f;
+        d.z *= 10000.0f;
     }
 
     invLength = -(1.0f / sqrtf(sqr(d.z) + sqr(d.y) + sqr(d.x)));
@@ -114,15 +101,9 @@ void gd_scale_mat4f_by_vec3f(Mat4f *mtx, struct GdVec3f *vec) {
  * Rotates the matrix 'mtx' about the vector given.
  */
 void gd_rot_mat_about_vec(Mat4f *mtx, struct GdVec3f *vec) {
-    if (vec->x != 0.0f) {
-        gd_absrot_mat4(mtx, GD_X_AXIS, vec->x);
-    }
-    if (vec->y != 0.0f) {
-        gd_absrot_mat4(mtx, GD_Y_AXIS, vec->y);
-    }
-    if (vec->z != 0.0f) {
-        gd_absrot_mat4(mtx, GD_Z_AXIS, vec->z);
-    }
+    if (vec->x != 0.0f) gd_absrot_mat4(mtx, GD_X_AXIS, vec->x);
+    if (vec->y != 0.0f) gd_absrot_mat4(mtx, GD_Y_AXIS, vec->y);
+    if (vec->z != 0.0f) gd_absrot_mat4(mtx, GD_Z_AXIS, vec->z);
 }
 
 /**
@@ -148,7 +129,7 @@ void gd_add_vec3f_to_mat4f_offset(Mat4f *mtx, struct GdVec3f *vec) {
  *                   |     -x      -y     -z      0 |
  *                   |      0       0      0      1 |
  */
-void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec, f32 roll) {
+void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec) {
     struct GdVec3f unit;
 
     unit.x = vec->x;
@@ -158,27 +139,23 @@ void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec, f32 roll) {
     gd_normalize_vec3f(&unit);
     f32 hMag = sqrtf(sqr(unit.x) + sqr(unit.z));
 
-    roll *= RAD_PER_DEG; // convert roll from degrees to radians
-    f32 s = sinf(roll);
-    f32 c = cosf(roll);
-
     gd_set_identity_mat4(mtx);
     if (hMag != 0.0f) {
         f32 invertedHMag = (1.0f / hMag);
         f32 units = (unit.y * unit.x);
-        (*mtx)[0][0] = (((-unit.z * c) - (s * units)) * invertedHMag);
-        (*mtx)[1][0] = ((( unit.z * s) - (c * units)) * invertedHMag);
+        (*mtx)[0][0] = (-unit.z * invertedHMag);
+        (*mtx)[1][0] = (-units  * invertedHMag);
         (*mtx)[2][0] = -unit.x;
         (*mtx)[3][0] = 0.0f;
 
-        (*mtx)[0][1] = s * hMag;
-        (*mtx)[1][1] = c * hMag;
+        (*mtx)[0][1] = 0.0f;
+        (*mtx)[1][1] = hMag;
         (*mtx)[2][1] = -unit.y;
         (*mtx)[3][1] = 0.0f;
 
         units = (unit.y * unit.z);
-        (*mtx)[0][2] = ((( c * unit.x) - (s * units)) * invertedHMag);
-        (*mtx)[1][2] = (((-s * unit.x) - (c * units)) * invertedHMag);
+        (*mtx)[0][2] = ( unit.x * invertedHMag);
+        (*mtx)[1][2] = (-units  * invertedHMag);
         (*mtx)[2][2] = -unit.z;
         (*mtx)[3][2] = 0.0f;
 
@@ -222,9 +199,9 @@ void gd_clamp_vec3f(struct GdVec3f *vec, f32 limit) {
  * Rotates a 2D vector by some angle in degrees.
  */
 void gd_rot_2d_vec(f32 deg, f32 *x, f32 *y) {
-    f32 rad = (deg / DEG_PER_RAD);
-    f32 xP  = ((*x * cosf(rad)) - (*y * sinf(rad)));
-    f32 yP =  ((*x * sinf(rad)) + (*y * cosf(rad)));
+    s16 angle = degrees_to_angle(deg);
+    f32 xP  = ((*x * coss(angle)) - (*y * sins(angle)));
+    f32 yP =  ((*x * sins(angle)) + (*y * coss(angle)));
     *x = xP;
     *y = yP;
 }
@@ -603,7 +580,6 @@ void gd_create_rot_matrix(Mat4f *mtx, struct GdVec3f *vec, f32 s, f32 c) {
     register f32 omcZX = (oneMinusCos * rev.z * rev.x);
     register f32 omcZY = (oneMinusCos * rev.z * rev.y);
 
-
     (*mtx)[0][0] = ((oneMinusCos * sqr(rev.z)) + c);
     (*mtx)[1][1] = ((oneMinusCos * sqr(rev.y)) + c);
     (*mtx)[2][2] = ((oneMinusCos * sqr(rev.x)) + c);
@@ -629,12 +605,11 @@ void gd_create_rot_matrix(Mat4f *mtx, struct GdVec3f *vec, f32 s, f32 c) {
 }
 
 /**
- * Creates a rotation matrix about vector 'vec' with ang in degrees.
+ * Creates a rotation matrix about vector 'vec' with deg in degrees.
  */
-void gd_create_rot_mat_angular(Mat4f *mtx, struct GdVec3f *vec, f32 ang) {
-    f32 s = sinf(ang / (DEG_PER_RAD / 2.0f));
-    f32 c = cosf(ang / (DEG_PER_RAD / 2.0f));
-    gd_create_rot_matrix(mtx, vec, s, c);
+void gd_create_rot_mat_angular(Mat4f *mtx, struct GdVec3f *vec, f32 deg) {
+    f32 ang = degrees_to_angle(deg * 2.0f);
+    gd_create_rot_matrix(mtx, vec, sins(ang), coss(ang));
 }
 
 /**

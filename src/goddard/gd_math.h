@@ -34,7 +34,7 @@ void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 y
 void gd_scale_mat4f_by_vec3f(Mat4f *mtx, struct GdVec3f *vec);
 void gd_rot_mat_about_vec(Mat4f *mtx, struct GdVec3f *vec);
 void gd_add_vec3f_to_mat4f_offset(Mat4f *mtx, struct GdVec3f *vec);
-void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec, f32 roll);
+void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec);
 void gd_clamp_vec3f(struct GdVec3f *vec, f32 limit);
 void gd_rot_2d_vec(f32 deg, f32 *x, f32 *y);
 void gd_absrot_mat4(Mat4f *mtx, s32 axisnum, f32 ang);

@@ -343,6 +343,13 @@ enum CameraEvent {
     CAM_EVENT_START_CREDITS
 };
 
+enum AvoidStatus {
+    AVOID_STATUS_NONE,
+    AVOID_STATUS_WALL_NEAR_CAMERA,
+    AVOID_STATUS_2,
+    AVOID_STATUS_WALL_COVERING_MARIO,
+};
+
 /**
  * A copy of player information that is relevant to the camera.
  */
@@ -691,8 +698,6 @@ struct LakituState {
     /*0xBC*/ s16 unused;
 };
 
-// bss order hack to not affect BSS order. if possible, remove me, but it will be hard to match otherwise
-#ifndef INCLUDED_FROM_CAMERA_C
 // BSS
 extern s16 sSelectionFlags;
 extern s16 sCameraSoundFlags;
@@ -702,8 +707,6 @@ extern struct LakituState gLakituState;
 extern s16 gCameraMovementFlags;
 extern s32 gObjCutsceneDone;
 extern struct Camera *gCamera;
-#endif
-
 extern struct Object *gCutsceneFocus;
 extern struct Object *gSecondCameraFocus;
 extern u8 gRecentCutscene;
@@ -768,7 +771,6 @@ void play_sound_button_change_blocked(void);
 void play_sound_rbutton_changed(void);
 void play_sound_if_cam_switched_to_lakitu_or_mario(void);
 void radial_camera_input(struct Camera *c);
-void trigger_cutscene_dialog(s32 trigger);
 void handle_c_button_movement(struct Camera *c);
 void start_cutscene(struct Camera *c, u8 cutscene);
 u32 get_cutscene_from_mario_status(struct Camera *c);

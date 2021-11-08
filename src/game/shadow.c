@@ -1,6 +1,5 @@
 #include <PR/ultratypes.h>
 #include <PR/gbi.h>
-#include <math.h>
 
 #include "engine/math_util.h"
 #include "engine/surface_collision.h"

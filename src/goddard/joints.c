@@ -260,7 +260,7 @@ void func_8018F328(struct ObjBone *b) {
     b->unk58.z = (joint2->worldPos.z - joint1->worldPos.z);
 
     gd_normalize_vec3f(&b->unk58);
-    gd_create_origin_lookat(&b->matB0, &b->unk58, 0); //? 0.0f
+    gd_create_origin_lookat(&b->matB0, &b->unk58);
 }
 
 /* 23DC9C -> 23DCF0 */

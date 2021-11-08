@@ -455,7 +455,7 @@ struct ObjCamera *make_camera(s32 flags, struct GdObj *a1) {
     newCam->zoomLevel = 0;
     newCam->maxZoomLevel = -1;
 
-    newCam->unkA4 = 0.0f;
+    newCam->roll = 0.0f;
 
     newCam->lookAt.x = newCam->lookAt.y = newCam->lookAt.z = 0.0f;
     newCam->worldPos.x = newCam->worldPos.y = newCam->worldPos.z = 0.0f;

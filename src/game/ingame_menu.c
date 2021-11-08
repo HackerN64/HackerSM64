@@ -251,7 +251,7 @@ Texture32 *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
 }
 
 void render_generic_char(u8 c) {
-    void **fontLUT = segmented_to_virtual(main_font_lut);
+    void **fontLUT      = segmented_to_virtual(main_font_lut);
     void *packedTexture = segmented_to_virtual(fontLUT[c]);
 #if MULTILANG
     void *unpackedTexture = alloc_ia4_tex_from_i1(packedTexture, 8, 8);
@@ -294,8 +294,8 @@ void render_multi_text_string(s8 multiTextID) {
     }
 }
 
-#define MAX_STRING_WIDTH 16
-#define CHAR_WIDTH_SPACE (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE])
+#define MAX_STRING_WIDTH   16
+#define CHAR_WIDTH_SPACE   (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE])
 #define CHAR_WIDTH_DEFAULT (f32)(gDialogCharWidths[str[strPos]])
 
 /**
@@ -310,7 +310,7 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
     s16 colorLoop;
     ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
     u8 customColor = 0;
-    u8 diffTmp = 0;
+    u8 diffTmp     = 0;
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
@@ -321,7 +321,8 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                 strPos++;
                 for (colorLoop = (strPos + 8); strPos < colorLoop; ++strPos) {
                     diffTmp = 0;
-                    if ((str[strPos] >= 0x24) && (str[strPos] <= 0x29)) {
+                    if ((str[strPos] >= 0x24)
+                     && (str[strPos] <= 0x29)) {
                         diffTmp = 0x1A;
                     } else if (str[strPos] >= 0x10) {
                         customColor = 2;
@@ -344,7 +345,10 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                 }
                 strPos--;
                 if (customColor == 1) {
-                    gDPSetEnvColor(gDisplayListHead++, rgbaColors[0], rgbaColors[1], rgbaColors[2], rgbaColors[3]);
+                    gDPSetEnvColor(gDisplayListHead++, rgbaColors[0],
+                                                    rgbaColors[1],
+                                                    rgbaColors[2],
+                                                    rgbaColors[3]);
                 } else if (customColor == 2) {
                     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
                     customColor = 0;
@@ -613,8 +617,8 @@ void print_hud_my_score_stars(s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
     s16 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
 
     if (starCount != 0) {
-        print_hud_lut_string(HUD_LUT_GLOBAL, (x +  0), y, textSymStar);
-        print_hud_lut_string(HUD_LUT_GLOBAL, (x + 16), y, textSymX);
+        print_hud_lut_string(HUD_LUT_GLOBAL, (x +  0), y, textSymStar );
+        print_hud_lut_string(HUD_LUT_GLOBAL, (x + 16), y, textSymX    );
         int_to_str(starCount, strStarCount);
         print_hud_lut_string(HUD_LUT_GLOBAL, (x + 32), y, strStarCount);
     }
@@ -639,12 +643,13 @@ void int_to_str(s32 num, u8 *dst) {
         dst[pos++] = digit[1];
     }
 
-    if ((digit[2] != 0) || (digit[1] != 0)) {
+    if ((digit[2] != 0)
+     || (digit[1] != 0)) {
         dst[pos++] = digit[2];
     }
 
     dst[pos++] = digit[3];
-    dst[pos]   = DIALOG_CHAR_TERMINATOR;
+    dst[pos  ] = DIALOG_CHAR_TERMINATOR;
 }
 
 s32 get_dialog_id(void) {
@@ -683,10 +688,6 @@ void create_dialog_box_with_response(s16 dialog) {
 
 void reset_dialog_render_state(void) {
     level_set_transition(0, NULL);
-
-    if (gDialogBoxType == DIALOG_TYPE_ZOOM) {
-        trigger_cutscene_dialog(2);
-    }
 
     gDialogBoxScale       = 19.0f;
     gDialogBoxOpenTimer   = 90.0f;
@@ -853,7 +854,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, (2 - (lineNum * Y_VAL3)), 0);
 
     while (pageState == DIALOG_PAGE_STATE_NONE) {
-        if (customColor) {
+        if (customColor == 1) {
             gDPSetEnvColor(gDisplayListHead++, rgbaColors[0], rgbaColors[1], rgbaColors[2], rgbaColors[3]);
         } else {
             change_and_flash_dialog_text_color_lines(colorMode, lineNum, &customColor);
@@ -923,7 +924,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                 render_star_count_dialog_text(&xMatrix, &linePos);
                 break;
             default: // any other character
-                if (lineNum >= lowerBound && lineNum <= lowerBound + linesPerBox) {
+                if ((lineNum >= lowerBound) && (lineNum <= (lowerBound + linesPerBox))) {
                     if (linePos || xMatrix != 1) {
                         create_dl_translation_matrix(
                             MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * (xMatrix - 1)), 0, 0);
@@ -1002,11 +1003,11 @@ void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
     // King Bob-omb (Start), Whomp (Start), King Bob-omb (throw him out), Eyerock (Start), Wiggler (Start)
     s16 dialogBossStart[] = { DIALOG_017, DIALOG_114, DIALOG_128, DIALOG_117, DIALOG_150 };
     // Koopa the Quick (BoB), Koopa the Quick (THI), Penguin Race, Fat Penguin Race (120 stars)
-    s16 dialogRaceSound[] = { DIALOG_005, DIALOG_009, DIALOG_055, DIALOG_164 };
+    s16 dialogRaceSound[] = { DIALOG_005, DIALOG_009, DIALOG_055, DIALOG_164             };
     // Red Switch, Green Switch, Blue Switch, 100 coins star, Bowser Red Coin Star
     s16 dialogStarSound[] = { DIALOG_010, DIALOG_011, DIALOG_012, DIALOG_013, DIALOG_014 };
     // King Bob-omb (Start), Whomp (Defeated), King Bob-omb (Defeated, missing in JP), Eyerock (Defeated), Wiggler (Defeated)
-    s16 dialogBossStop[] = { DIALOG_017, DIALOG_115, DIALOG_116, DIALOG_118, DIALOG_152 };
+    s16 dialogBossStop[]  = { DIALOG_017, DIALOG_115, DIALOG_116, DIALOG_118, DIALOG_152 };
     s16 i;
 
     for (i = 0; i < (s16) ARRAY_COUNT(dialogBossStart); i++) {
@@ -1018,14 +1019,14 @@ void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
     }
 
     for (i = 0; i < (s16) ARRAY_COUNT(dialogRaceSound); i++) {
-        if (dialogRaceSound[i] == dialogID && gDialogLineNum == 1) {
+        if ((dialogRaceSound[i] == dialogID) && (gDialogLineNum == 1)) {
             play_race_fanfare();
             return;
         }
     }
 
     for (i = 0; i < (s16) ARRAY_COUNT(dialogStarSound); i++) {
-        if (dialogStarSound[i] == dialogID && gDialogLineNum == 1) {
+        if ((dialogStarSound[i] == dialogID) && (gDialogLineNum == 1)) {
             play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
             return;
         }
@@ -1101,11 +1102,11 @@ void render_dialog_entries(void) {
             }
 
             if (gDialogBoxType == DIALOG_TYPE_ROTATE) {
-                gDialogBoxOpenTimer -= 7.5f;
-                gDialogBoxScale     -= 1.5f;
+                gDialogBoxOpenTimer -=  7.5f;
+                gDialogBoxScale     -=  1.5f;
             } else {
                 gDialogBoxOpenTimer -= 10.0f;
-                gDialogBoxScale     -= 2.0f;
+                gDialogBoxScale     -=  2.0f;
             }
 
             if (gDialogBoxOpenTimer == 0.0f) {
@@ -1144,10 +1145,6 @@ void render_dialog_entries(void) {
             if (gDialogBoxOpenTimer == 20.0f) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_MESSAGE_DISAPPEAR, gGlobalSoundSource);
-
-                if (gDialogBoxType == DIALOG_TYPE_ZOOM) {
-                    trigger_cutscene_dialog(2);
-                }
 
                 gDialogResponse = gDialogLineNum;
             }
@@ -1327,15 +1324,9 @@ void print_peach_letter_message(void) {
     void **dialogTable;
     gInGameLanguage = eu_get_language();
     switch (gInGameLanguage) {
-        case LANGUAGE_ENGLISH:
-            dialogTable = segmented_to_virtual(dialog_table_eu_en);
-            break;
-        case LANGUAGE_FRENCH:
-            dialogTable = segmented_to_virtual(dialog_table_eu_fr);
-            break;
-        case LANGUAGE_GERMAN:
-            dialogTable = segmented_to_virtual(dialog_table_eu_de);
-            break;
+        case LANGUAGE_ENGLISH: dialogTable = segmented_to_virtual(dialog_table_eu_en); break;
+        case LANGUAGE_FRENCH:  dialogTable = segmented_to_virtual(dialog_table_eu_fr); break;
+        case LANGUAGE_GERMAN:  dialogTable = segmented_to_virtual(dialog_table_eu_de); break;
     }
 #else
     void **dialogTable = segmented_to_virtual(seg2_dialog_table);
@@ -1412,7 +1403,7 @@ void render_hud_cannon_reticle(void) {
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    // gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
 void reset_red_coins_collected(void) {
@@ -1723,7 +1714,7 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
             str[nextStar * 2] = DIALOG_CHAR_STAR_OPEN;
         }
 
-        str[nextStar * 2 + 1] = DIALOG_CHAR_SPACE;
+        str[(nextStar * 2) + 1] = DIALOG_CHAR_SPACE;
         nextStar++;
     }
 
@@ -1803,10 +1794,10 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-s8 gCourseCompleteCoinsEqual = FALSE;
+s8  gCourseCompleteCoinsEqual = FALSE;
 s32 gCourseDoneMenuTimer = 0;
 s32 gCourseCompleteCoins = 0;
-s8 gHudFlash = HUD_FLASH_NONE;
+s8  gHudFlash = HUD_FLASH_NONE;
 
 s32 render_pause_courses_and_castle(void) {
     s16 index;
@@ -1967,7 +1958,9 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
 }
 
 void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
-    if ((gHudDisplay.coins == gCourseCompleteCoins) && ((gCurrCourseStarFlags & starNum) == 0) && (gHudFlash == HUD_FLASH_NONE)) {
+    if ((gHudDisplay.coins == gCourseCompleteCoins)
+     && ((gCurrCourseStarFlags & starNum) == 0)
+     && (gHudFlash == HUD_FLASH_NONE)) {
         play_star_fanfare();
         gHudFlash = arg;
     }
@@ -2077,8 +2070,8 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(TXT_SAVEOPTIONS_X, (y + TXT_SAVECONT_Y  ), LANGUAGE_ARRAY(textSaveAndContinue));
-    print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_SAVEQUIT_Y  ), LANGUAGE_ARRAY(textSaveAndQuit));
+    print_generic_string(TXT_SAVEOPTIONS_X, (y + TXT_SAVECONT_Y  ), LANGUAGE_ARRAY(textSaveAndContinue    ));
+    print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_SAVEQUIT_Y  ), LANGUAGE_ARRAY(textSaveAndQuit        ));
     print_generic_string(TXT_SAVEOPTIONS_X, (y - TXT_CONTNOSAVE_Y), LANGUAGE_ARRAY(textContinueWithoutSave));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -2088,14 +2081,14 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
 
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    gSPPopMatrix(  gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
 s32 render_course_complete_screen(void) {
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             render_course_complete_lvl_info_and_hud_str();
-            if (gCourseDoneMenuTimer > 100 && gCourseCompleteCoinsEqual) {
+            if ((gCourseDoneMenuTimer > 100) && gCourseCompleteCoinsEqual) {
 #ifdef SAVE_NUM_LIVES
                 save_file_set_num_lives(gMarioState->numLives);
 #endif
@@ -2111,7 +2104,7 @@ s32 render_course_complete_screen(void) {
             render_course_complete_lvl_info_and_hud_str();
             render_save_confirmation(100, 86, &gDialogLineNum, 20);
 
-            if (gCourseDoneMenuTimer > 110 && (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON))) {
+            if ((gCourseDoneMenuTimer > 110) && (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON))) {
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;
