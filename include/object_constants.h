@@ -1094,18 +1094,20 @@ enum BehParam1StarAct { // BPARAM1
     #define WF_SLID_BRICK_PTFM_ACT_RETRACT                  0x2
 
 /* Sliding Platform */
-    #define SLIDING_PLATFORM_TYPE_MASK                      0x0380
-    #define SLIDING_PLATFORM_LENGTH_MASK                    0x003F
-    #define SLIDING_PLATFORM_DIRECTION_MASK                 0x0040
-    /* collisionDataIndex */
-    #define SLIDING_PLATFORM_BP_BITS_SLIDING_PLATFORM       0x0
-    #define SLIDING_PLATFORM_BP_BITS_TWIN_SLIDING_PLATFORMS 0x1
-    #define SLIDING_PLATFORM_BP_BITFS_MOVING_SQUARE         0x2
-    #define SLIDING_PLATFORM_BP_BITFS_SLIDING_PLATFORM      0x3
-    #define SLIDING_PLATFORM_BP_RR_SLIDING_PLATFORM         0x4
-    #define SLIDING_PLATFORM_BP_RR_PYRAMID                  0x5
-    #define SLIDING_PLATFORM_BP_NULL                        0x6
-    #define SLIDING_PLATFORM_BP_BITDW_SLIDING_PLATFORM      0x7
+enum oBehParams1stByteSlidingPlatform { // collisionDataIndex
+    /*0x00*/ SLIDING_PLATFORM_BP1_BITS_SLIDING_PLATFORM,
+    /*0x01*/ SLIDING_PLATFORM_BP1_BITS_TWIN_SLIDING_PLATFORMS,
+    /*0x02*/ SLIDING_PLATFORM_BP1_BITFS_MOVING_SQUARE,
+    /*0x03*/ SLIDING_PLATFORM_BP1_BITFS_SLIDING_PLATFORM,
+    /*0x04*/ SLIDING_PLATFORM_BP1_RR_SLIDING_PLATFORM,
+    /*0x05*/ SLIDING_PLATFORM_BP1_RR_PYRAMID,
+    /*0x06*/ SLIDING_PLATFORM_BP1_NULL,
+    /*0x07*/ SLIDING_PLATFORM_BP1_BITDW_SLIDING_PLATFORM,
+    /*0x07*/ SLIDING_PLATFORM_BP1_TYPES_MASK = 0x07,
+};
+    /* bparam2 */
+    #define SLIDING_PLATFORM_BP2_LENGTH_MASK                 0x3F
+    #define SLIDING_PLATFORM_BP2_FLAG_INVERTED               (1 << 6)
 
 /* BITDW Pyramid Platforms */
     /* oAction */
@@ -2036,7 +2038,7 @@ enum AnimIDsPenguin { // Animations
     #define TREADMILL_BP_SIZE_MASK                          0x1
 
 /* Activated Back-and-Forth Platform */
-    /* ((u16)(o->oBehParams >> 16) &         0x0300) >> 8 aka platform type */
+    /* (bparam1 & 0x03) aka platform type */
     #define ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT          0x0
     #define ACTIVATED_BF_PLAT_TYPE_BITFS_MESH_PLAT          0x1
     #define ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR           0x2

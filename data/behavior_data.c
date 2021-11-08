@@ -5486,9 +5486,9 @@ const BehaviorScript bhvSlidingPlatform2[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_UCODE_LARGE)),
     SET_HOME(),
-    CALL_NATIVE(bhv_sliding_plat_2_init),
+    CALL_NATIVE(bhv_sliding_platform_init),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_sliding_plat_2_loop),
+        CALL_NATIVE(bhv_sliding_platform_loop),
         CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
 };
