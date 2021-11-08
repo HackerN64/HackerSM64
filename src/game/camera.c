@@ -1956,11 +1956,11 @@ s32 update_default_camera(struct Camera *c) {
 
     f32 marioFloorHeight = (125.0f + sMarioGeometry.currFloorHeight);
     struct Surface *marioFloor = sMarioGeometry.currFloor;
-    f32 camFloorHeight = find_floor(cPos[0], (cPos[1] + 50.0f), cPos[2], &cFloor) + 125.0f;
+    f32 camFloorHeight = (find_floor(cPos[0], (cPos[1] + 50.0f), cPos[2], &cFloor) + 125.0f);
     for (scale = 0.1f; scale < 1.0f; scale += 0.2f) {
         scale_along_line(tempPos, cPos, sMarioCamState->pos, scale);
-        f32 tempFloorHeight = find_floor(tempPos[0], tempPos[1], tempPos[2], &tempFloor) + 125.0f;
-        if (tempFloor != NULL && tempFloorHeight > marioFloorHeight) {
+        f32 tempFloorHeight = (find_floor(tempPos[0], tempPos[1], tempPos[2], &tempFloor) + 125.0f);
+        if ((tempFloor != NULL) && (tempFloorHeight > marioFloorHeight)) {
             marioFloorHeight = tempFloorHeight;
             marioFloor       = tempFloor;
         }
@@ -2016,7 +2016,8 @@ s32 update_default_camera(struct Camera *c) {
             posHeight = 100.0f;
         }
     }
-    if ((gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) && (sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
+    if ((gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT)
+     && (sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {
         posHeight = 610.0f;
 #ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
         if ((gCurrLevelArea == AREA_SSL_PYRAMID) || (gCurrLevelNum == LEVEL_CASTLE)) {
@@ -2244,7 +2245,8 @@ void exit_c_up(struct Camera *c) {
     s16 curPitch, curYaw;
     s16 checkYaw = 0;
 
-    if ((gCameraMovementFlags & CAM_MOVE_C_UP_MODE) && !(gCameraMovementFlags & CAM_MOVE_STARTED_EXITING_C_UP)) {
+    if ((gCameraMovementFlags & CAM_MOVE_C_UP_MODE)
+    && !(gCameraMovementFlags & CAM_MOVE_STARTED_EXITING_C_UP)) {
         vec3f_copy(checkFoc, c->focus);
         checkFoc[0] = sMarioCamState->pos[0];
         checkFoc[2] = sMarioCamState->pos[2];
@@ -2328,7 +2330,6 @@ void exit_c_up(struct Camera *c) {
 s32 update_c_up(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 pitch = sCUpCameraPitch;
     s16 yaw = (sMarioCamState->faceAngle[1] + sModeOffsetYaw + DEGREES(180));
-
     focus_on_mario(focus, pos, 125.0f, 125.0f, 250.0f, pitch, yaw);
     return sMarioCamState->faceAngle[1];
 }
@@ -2356,14 +2357,14 @@ void move_into_c_up(struct Camera *c) {
     struct LinearTransitionPoint *start = &sModeInfo.transitionStart;
     struct LinearTransitionPoint *end   = &sModeInfo.transitionEnd;
 
-    f32 dist  = (end->dist  - start->dist );
-    s16 pitch = (end->pitch - start->pitch);
-    s16 yaw   = (end->yaw   - start->yaw  );
+    f32 dist  = start->dist;
+    s16 pitch = start->pitch;
+    s16 yaw   = start->yaw;
 
     // Linearly interpolate from start to end position's polar coordinates
-    dist  = (start->dist  + (dist  * sModeInfo.frame / sModeInfo.max));
-    pitch = (start->pitch + (pitch * sModeInfo.frame / sModeInfo.max));
-    yaw   = (start->yaw   + (yaw   * sModeInfo.frame / sModeInfo.max));
+    dist  += ((end->dist  - dist ) * sModeInfo.frame / sModeInfo.max);
+    pitch += ((end->pitch - pitch) * sModeInfo.frame / sModeInfo.max);
+    yaw   += ((end->yaw   - yaw  ) * sModeInfo.frame / sModeInfo.max);
 
     // Linearly interpolate the focus from start to end
     c->focus[0] = (start->focus[0] + ((end->focus[0] - start->focus[0]) * sModeInfo.frame / sModeInfo.max));
@@ -2477,9 +2478,9 @@ void transition_next_state(UNUSED struct Camera *c, s16 frames) {
  */
 void transition_to_camera_mode(struct Camera *c, s16 newMode, s16 numFrames) {
     if (c->mode != newMode) {
-        sModeInfo.newMode = ((newMode != -1) ? newMode : sModeInfo.lastMode);
+        sModeInfo.newMode  = ((newMode != -1) ? newMode : sModeInfo.lastMode);
         sModeInfo.lastMode = c->mode;
-        c->mode = sModeInfo.newMode;
+        c->mode            = sModeInfo.newMode;
 
         // Clear movement flags that would affect the transition
         gCameraMovementFlags &= (u16)~(CAM_MOVE_RESTRICT | CAM_MOVE_ROTATE);
@@ -2511,7 +2512,8 @@ void set_camera_mode(struct Camera *c, s16 mode, s16 frames) {
     struct LinearTransitionPoint *start = &sModeInfo.transitionStart;
     struct LinearTransitionPoint *end   = &sModeInfo.transitionEnd;
 
-    if (!(mode == CAMERA_MODE_WATER_SURFACE) || !(gCurrLevelArea == AREA_TTM_OUTSIDE)) {
+    if (!(mode == CAMERA_MODE_WATER_SURFACE)
+     || !(gCurrLevelArea == AREA_TTM_OUTSIDE)) {
         // Clear movement flags that would affect the transition
         gCameraMovementFlags &= (u16)~(CAM_MOVE_RESTRICT | CAM_MOVE_ROTATE);
         gCameraMovementFlags |= CAM_MOVING_INTO_MODE;
@@ -2572,15 +2574,15 @@ void update_lakitu(struct Camera *c) {
 
         // Update old state
         vec3f_copy(sOldPosition, newPos);
-        vec3f_copy(sOldFocus, newFoc);
+        vec3f_copy(sOldFocus,    newFoc);
 
-        gLakituState.yaw = c->yaw;
+        gLakituState.yaw     = c->yaw;
         gLakituState.nextYaw = c->nextYaw;
-        vec3f_copy(gLakituState.goalPos, c->pos);
+        vec3f_copy(gLakituState.goalPos,   c->pos);
         vec3f_copy(gLakituState.goalFocus, c->focus);
 
         // Simulate Lakitu flying to the new position and turning towards the new focus
-        set_or_approach_vec3f_asymptotic(gLakituState.curPos, newPos,
+        set_or_approach_vec3f_asymptotic(gLakituState.curPos,   newPos,
                                          gLakituState.posHSpeed,
                                          gLakituState.posVSpeed,
                                          gLakituState.posHSpeed);
@@ -2623,14 +2625,16 @@ void update_lakitu(struct Camera *c) {
         shake_camera_roll(   &gLakituState.roll);
         shake_camera_handheld(gLakituState.pos, gLakituState.focus);
 
-        if ((sMarioCamState->action == ACT_DIVE) && (gLakituState.lastFrameAction != ACT_DIVE)) {
+        if ((sMarioCamState->action == ACT_DIVE)
+         && (gLakituState.lastFrameAction != ACT_DIVE)) {
             set_camera_shake_from_hit(SHAKE_HIT_FROM_BELOW);
         }
 
         gLakituState.roll += sHandheldShakeRoll;
         gLakituState.roll += gLakituState.keyDanceRoll;
 
-        if ((c->mode != CAMERA_MODE_C_UP) && (c->cutscene == CUTSCENE_NONE)) {
+        if ((c->mode != CAMERA_MODE_C_UP)
+         && (c->cutscene == CUTSCENE_NONE)) {
             gCollisionFlags |= COLLISION_FLAG_CAMERA;
             f32 distToFloor = find_floor(gLakituState.pos[0],
                                         (gLakituState.pos[1] + 20.0f),
@@ -2659,18 +2663,19 @@ void update_lakitu(struct Camera *c) {
  */
 void update_camera(struct Camera *c) {
 #if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
+    OSTime first   = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
 #endif
     gCamera = c;
     update_camera_hud_status(c);
-    if ((c->cutscene == CUTSCENE_NONE) &&
+    if ((c->cutscene == CUTSCENE_NONE)
 #ifdef PUPPYCAM
-        !gPuppyCam.enabled &&
+     && !gPuppyCam.enabled
 #endif
-        !(gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON)) {
+     && !(gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON)) {
         // Only process R_TRIG if 'fixed' is not selected in the menu
-        if ((cam_select_alt_mode(CAM_SELECTION_NONE) == CAM_SELECTION_MARIO) && (gPlayer1Controller->buttonPressed & R_TRIG)) {
+        if ((cam_select_alt_mode(CAM_SELECTION_NONE) == CAM_SELECTION_MARIO)
+         && (gPlayer1Controller->buttonPressed & R_TRIG)) {
             if (set_cam_angle(CAM_ANGLE_NONE) == CAM_ANGLE_LAKITU) {
                 set_cam_angle(CAM_ANGLE_MARIO);
             } else {
@@ -3395,7 +3400,7 @@ void shake_camera_handheld(Vec3f pos, Vec3f focus) {
     if (sHandheldShakePitch | sHandheldShakeYaw) {
         vec3f_get_dist_and_angle(pos, focus, &dist, &pitch, &yaw);
         pitch += sHandheldShakePitch;
-        yaw += sHandheldShakeYaw;
+        yaw   += sHandheldShakeYaw;
         vec3f_set_dist_and_angle(pos, focus,  dist,  pitch,  yaw);
     }
 
@@ -3570,11 +3575,13 @@ void approach_vec3s_asymptotic(Vec3s current, Vec3s target, s16 xMul, s16 yMul, 
 
 //! move these to math_util
 s32 camera_approach_s16_symmetric_bool(s16 *current, s16 target, s16 inc) {
-    return approach_s16_symmetric_bool(current, target, abss(inc));
+    inc = abss(inc);
+    return approach_s16_symmetric_bool(current, target, inc);
 }
 
 s32 camera_approach_s16_symmetric(s16 current, s16 target, s16 inc) {
-    return approach_s16_symmetric(current, target, abss(inc));
+    inc = abss(inc);
+    return approach_s16_symmetric(current, target, inc);
 }
 
 s32 set_or_approach_s16_symmetric(s16 *current, s16 target, s16 increment) {
@@ -3592,14 +3599,16 @@ s32 set_or_approach_s16_symmetric(s16 *current, s16 target, s16 increment) {
  * It could possibly be an older version of the function
  */
 s32 camera_approach_f32_symmetric_bool(f32 *current, f32 target, f32 inc) {
-    return approach_f32_symmetric_bool(current, target, absf(inc));
+    inc = absf(inc);
+    return approach_f32_symmetric_bool(current, target, inc);
 }
 
 /**
  * Nearly the same as the above function, this one returns the new value in place of a bool.
  */
 f32 camera_approach_f32_symmetric(f32 current, f32 target, f32 inc) {
-    return approach_f32_symmetric(current, target, absf(inc));
+    inc = absf(inc);
+    return approach_f32_symmetric(current, target, inc);
 }
 
 /**
@@ -3607,15 +3616,12 @@ f32 camera_approach_f32_symmetric(f32 current, f32 target, f32 inc) {
  * three ranges determine how wide the range about zero.
  */
 void random_vec3s(Vec3s dst, s16 xRange, s16 yRange, s16 zRange) {
-    f32 randomFloat = random_float();
     f32 tempXRange = xRange;
-    dst[0] = ((randomFloat * tempXRange) - (tempXRange / 2));
-    randomFloat = random_float();
+    dst[0] = ((random_float() * tempXRange) - (tempXRange / 2));
     f32 tempYRange = yRange;
-    dst[1] = ((randomFloat * tempYRange) - (tempYRange / 2));
-    randomFloat = random_float();
+    dst[1] = ((random_float() * tempYRange) - (tempYRange / 2));
     f32 tempZRange = zRange;
-    dst[2] = ((randomFloat * tempZRange) - (tempZRange / 2));
+    dst[2] = ((random_float() * tempZRange) - (tempZRange / 2));
 }
 
 /**
@@ -5950,7 +5956,7 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
             if (step >= 5) {
                 sStatusFlags |= CAM_FLAG_CAM_NEAR_WALL;
                 if (status <= 0) {
-                    status = 1;
+                    status  = 1;
                     wall = colData.walls[colData.numWalls - 1];
                     // wallYaw is parallel to the wall, not perpendicular
                     wallYaw = SURFACE_YAW(wall);
