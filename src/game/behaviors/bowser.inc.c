@@ -1062,7 +1062,9 @@ void bowser_act_jump_onto_stage(void) {
 /**
  * The frames of the Bowser's timer on which to play a "stomp" sound
  */
-s8 sBowserDanceStepNoises[] = { 24, 42, 60, -1 };
+s8 sBowserDanceStepNoises[] = {
+    24, 42, 60, -1
+};
 
 /**
  * Makes Bowser's dance as a "taunt"
@@ -1104,7 +1106,7 @@ void bowser_fly_back_dead(void) {
         o->oForwardVel = -200.0f;
     }
     o->oVelY = 100.0f;
-    o->oMoveAngleYaw = o->oBowserAngleToCenter + 0x8000;
+    o->oMoveAngleYaw = (o->oBowserAngleToCenter + 0x8000);
     o->oBowserTimer = 0;
     o->oSubAction++; // BOWSER_SUB_ACT_DEAD_BOUNCE
 }
@@ -1131,8 +1133,9 @@ void bowser_dead_bounce(void) {
 s32 bowser_dead_wait_for_mario(void) {
     s32 ret = FALSE;
     cur_obj_become_intangible();
-    if (cur_obj_init_animation_and_check_if_near_end(BOWSER_ANIM_LAY_DOWN) && o->oDistanceToMario < 700.0f
-        && abs_angle_diff(gMarioObject->oMoveAngleYaw, o->oAngleToMario) > 0x6000) {
+    if (cur_obj_init_animation_and_check_if_near_end(BOWSER_ANIM_LAY_DOWN)
+     && (o->oDistanceToMario < 700.0f)
+     && (abs_angle_diff(gMarioObject->oMoveAngleYaw, o->oAngleToMario) > 0x6000)) {
         ret = TRUE;
     }
     cur_obj_extend_animation_if_at_end();
@@ -1153,13 +1156,13 @@ s32 bowser_dead_twirl_up(void) {
     }
     // Slowly scale down his X and Z value
     if (o->header.gfx.scale[0] > 0.2f) {
-        o->header.gfx.scale[0] = o->header.gfx.scale[0] - 0.02f;
-        o->header.gfx.scale[2] = o->header.gfx.scale[2] - 0.02f;
+        o->header.gfx.scale[0] = (o->header.gfx.scale[0] - 0.02f);
+        o->header.gfx.scale[2] = (o->header.gfx.scale[2] - 0.02f);
     } else {
         // Now scale down his Y value (and send Bowser up)
-        o->header.gfx.scale[1] = o->header.gfx.scale[1] - 0.01f;
-        o->oVelY = 20.0f;
-        o->oGravity = 0.0f;
+        o->header.gfx.scale[1] = (o->header.gfx.scale[1] - 0.01f);
+        o->oVelY    = 20.0f;
+        o->oGravity =  0.0f;
     }
     // At half Y scale value, he is high enough, so we are done
     if (o->header.gfx.scale[1] < 0.5f) {
@@ -1181,8 +1184,8 @@ s32 bowser_dead_twirl_up(void) {
 void bowser_dead_hide(void) {
     cur_obj_scale(0);
     o->oForwardVel = 0;
-    o->oVelY = 0;
-    o->oGravity = 0;
+    o->oVelY       = 0;
+    o->oGravity    = 0;
 }
 
 /**
@@ -1411,13 +1414,13 @@ void bowser_act_tilt_lava_platform(void) {
  * Check if Bowser is offstage from a large distance or landed on a lethal floor
  */
 s32 bowser_check_fallen_off_stage(void) {
-    if (o->oAction != BOWSER_ACT_JUMP_ONTO_STAGE && o->oAction != BOWSER_ACT_TILT_LAVA_PLATFORM) {
+    if ((o->oAction != BOWSER_ACT_JUMP_ONTO_STAGE) && (o->oAction != BOWSER_ACT_TILT_LAVA_PLATFORM)) {
         if (o->oPosY < (o->oHomeY - 1000.0f)) {
             return TRUE;
         }
         if (o->oMoveFlags & OBJ_MOVE_LANDED) {
             // Check for Fire Sea & Dark World - Sky
-            if (o->oFloorType == SURFACE_BURNING || o->oFloorType == SURFACE_DEATH_PLANE) {
+            if ((o->oFloorType == SURFACE_BURNING) || (o->oFloorType == SURFACE_DEATH_PLANE)) {
                 return TRUE;
             }
         }
@@ -1567,7 +1570,7 @@ void bowser_held_update(void) {
     }
 
     // Reset move flags
-    o->oMoveFlags = 0;
+    o->oMoveFlags = OBJ_MOVE_NONE;
     // Copy angle values from Mario
     o->oBowserHeldAnglePitch = gMarioObject->oMoveAnglePitch;
     o->oBowserHeldAngleVelYaw = gMarioObject->oAngleVelYaw;

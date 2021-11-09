@@ -103,7 +103,7 @@ static void racing_penguin_act_race(void) {
 
 static void racing_penguin_act_finish_race(void) {
     if (o->oForwardVel != 0.0f) {
-        if (o->oTimer > 5 && (o->oMoveFlags & OBJ_MOVE_HIT_WALL)) {
+        if ((o->oTimer > 5) && (o->oMoveFlags & OBJ_MOVE_HIT_WALL)) {
             cur_obj_play_sound_2(SOUND_OBJ_POUNDING_LOUD);
             set_camera_shake_from_point(SHAKE_POS_SMALL, o->oPosX, o->oPosY, o->oPosZ);
             o->oForwardVel = 0.0f;

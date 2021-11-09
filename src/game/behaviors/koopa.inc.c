@@ -619,9 +619,9 @@ static void koopa_the_quick_act_race(void) {
                             o->oVelY = 40.0f;
                         }
 
-                        o->oGravity = -6.0f;
+                        o->oGravity   = -6.0f;
                         o->oSubAction = 2;
-                        o->oMoveFlags = 0;
+                        o->oMoveFlags = OBJ_MOVE_NONE;
 
                         cur_obj_init_animation_with_sound(12);
                     }

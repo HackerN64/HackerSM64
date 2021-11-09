@@ -568,8 +568,7 @@ static void obj_act_knockback(UNUSED f32 baseScale) {
     }
 
     //! Dies immediately if above lava
-    if ((o->oMoveFlags
-         & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_MASK_IN_WATER | OBJ_MOVE_HIT_WALL | OBJ_MOVE_ABOVE_LAVA))
+    if ((o->oMoveFlags & (OBJ_MOVE_MASK_ON_GROUND | OBJ_MOVE_MASK_IN_WATER | OBJ_MOVE_HIT_WALL | OBJ_MOVE_ABOVE_LAVA))
         || ((o->oAction == OBJ_ACT_VERTICAL_KNOCKBACK) && (o->oTimer >= 9))) {
         obj_die_if_health_non_positive();
     }

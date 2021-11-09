@@ -338,14 +338,6 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
  *                     FLOORS                     *
  **************************************************/
 
-/**
- * Find the height of the highest floor below an object.
- */
-f32 unused_obj_find_floor_height(struct Object *obj) {
-    struct Surface *floor;
-    return find_floor(obj->oPosX, obj->oPosY, obj->oPosZ, &floor);
-}
-
 static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
     register Vec3i vx, vz;
     vx[0] = surf->vertex1[0];

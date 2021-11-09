@@ -1,7 +1,7 @@
 // bullet_bill.inc.c
 
 void bhv_white_puff_smoke_init(void) {
-    cur_obj_scale(random_float() * 2.0f + 2.0f);
+    cur_obj_scale((random_float() * 2.0f) + 2.0f);
 }
 
 void bhv_bullet_bill_init(void) {
@@ -10,18 +10,19 @@ void bhv_bullet_bill_init(void) {
 
 void bullet_bill_act_0(void) {
     cur_obj_become_tangible();
-    o->oForwardVel = 0.0f;
-    o->oMoveAngleYaw = o->oBulletBillInitialMoveYaw;
-    o->oFaceAnglePitch = 0;
-    o->oFaceAngleRoll = 0;
-    o->oMoveFlags = 0;
+    o->oForwardVel     = 0.0f;
+    o->oMoveAngleYaw   = o->oBulletBillInitialMoveYaw;
+    o->oFaceAnglePitch = 0x0;
+    o->oFaceAngleRoll  = 0x0;
+    o->oMoveFlags      = OBJ_MOVE_NONE;
     cur_obj_set_pos_to_home();
     o->oAction = 1;
 }
 
 void bullet_bill_act_1(void) {
-    s16 dYaw = abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw);
-    if (dYaw < 0x2000 && 400.0f < o->oDistanceToMario && o->oDistanceToMario < 1500.0f) {
+    if ((400.0f < o->oDistanceToMario)
+     && (o->oDistanceToMario < 1500.0f)
+     && (abs_angle_diff(o->oAngleToMario, o->oMoveAngleYaw) < 0x2000)) {
         o->oAction = 2;
     }
 }
@@ -31,7 +32,7 @@ void bullet_bill_act_2(void) {
         o->oForwardVel = 3.0f;
     } else if (o->oTimer < 50) {
         if (o->oTimer % 2) {
-            o->oForwardVel = 3.0f;
+            o->oForwardVel =  3.0f;
         } else {
             o->oForwardVel = -3.0f;
         }

@@ -394,9 +394,9 @@ void bhv_monty_mole_update(void) {
  */
 static void monty_mole_rock_act_held(void) {
     // The position is offset since the monty mole is throwing it with its hand
-    o->oParentRelativePosX = 80.0f;
+    o->oParentRelativePosX =  80.0f;
     o->oParentRelativePosY = -50.0f;
-    o->oParentRelativePosZ = 0.0f;
+    o->oParentRelativePosZ =   0.0f;
 
     if (o->parentObj->prevObj == NULL) {
         f32 distToMario = o->oDistanceToMario;
@@ -407,12 +407,12 @@ static void monty_mole_rock_act_held(void) {
         o->oAction = MONTY_MOLE_ROCK_ACT_MOVE;
 
         // The angle is adjusted to compensate for the start position offset
-        o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 500 - distToMario * 0.1f);
+        o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 500 - (distToMario * 0.1f));
 
         o->oForwardVel = 40.0f;
-        o->oVelY = distToMario * 0.08f + 8.0f;
+        o->oVelY = ((distToMario * 0.08f) + 8.0f);
 
-        o->oMoveFlags = 0;
+        o->oMoveFlags = OBJ_MOVE_NONE;
     }
 }
 

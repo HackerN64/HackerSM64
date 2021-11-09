@@ -37,7 +37,7 @@ void bhv_kickable_board_loop(void) {
             o->oFaceAnglePitch = 0x0;
             load_object_collision_model();
             o->oFaceAnglePitch = (-sins(o->oKickableBoardRockingAngleAmount) * o->oKickableBoardRockingTimer);
-            if (o->oTimer > 30 && (attackValue = check_mario_attacking())) {
+            if ((o->oTimer > 30) && (attackValue = check_mario_attacking())) {
                 if ((gMarioObject->oPosY > (o->oPosY + 160.0f)) && attackValue == WF_ATTACK_AIR) {
                     o->oAction = KICKABLE_BOARD_ACT_FALLING;
                     cur_obj_play_sound_2(SOUND_GENERAL_BUTTON_PRESS_2);

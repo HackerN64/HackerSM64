@@ -755,14 +755,14 @@ void cur_obj_unrender_set_action_and_anim(s32 animIndex, s32 action) {
 
 static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
     o->oMoveFlags = 0;
-    o->oFloorHeight = find_floor_height(o->oPosX, (o->oPosY + 160.0f), o->oPosZ);
+    o->oFloorHeight = find_floor(o->oPosX, (o->oPosY + 160.0f), o->oPosZ, &o->oFloor);
 
     if (o->oFloorHeight > o->oPosY) {
         o->oPosY = o->oFloorHeight;
     } else if (o->oFloorHeight < FLOOR_LOWER_LIMIT_MISC) {
         //! OoB failsafe
         obj_copy_pos(o, gMarioObject);
-        o->oFloorHeight = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
+        o->oFloorHeight = find_floor(o->oPosX, o->oPosY, o->oPosZ, &o->oFloor);
     }
 
     o->oForwardVel = forwardVel;
@@ -915,7 +915,7 @@ static s32 cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlop
     f32 intendedZ = (o->oPosZ + o->oVelZ);
 
     f32 intendedFloorHeight = find_floor(intendedX, o->oPosY, intendedZ, &intendedFloor);
-    f32 deltaFloorHeight = (intendedFloorHeight - o->oFloorHeight);
+    f32    deltaFloorHeight = (intendedFloorHeight - o->oFloorHeight);
 
     o->oMoveFlags &= ~OBJ_MOVE_HIT_EDGE;
 

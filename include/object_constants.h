@@ -86,6 +86,7 @@ enum DialogFlags {
 
 /* oMoveFlags */
 enum ObjMoveFlags {
+    OBJ_MOVE_NONE                              = (0 <<  0), // 0x0000
     OBJ_MOVE_LANDED                            = (1 <<  0), // 0x0001
     OBJ_MOVE_ON_GROUND                         = (1 <<  1), // 0x0002 // mutually exclusive to OBJ_MOVE_LANDED
     OBJ_MOVE_LEFT_GROUND                       = (1 <<  2), // 0x0004

@@ -306,8 +306,8 @@ static void mr_blizzard_act_jump(void) {
                 // Jump forward.
             } else {
                 o->oForwardVel = 10.0f;
-                o->oVelY = 50.0f;
-                o->oMoveFlags = 0;
+                o->oVelY       = 50.0f;
+                o->oMoveFlags  = OBJ_MOVE_NONE;
             }
         }
     } else if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
@@ -322,7 +322,7 @@ static void mr_blizzard_act_jump(void) {
             o->oMrBlizzardDistFromHome = 700;
         }
 
-        o->oForwardVel = 0.0f;
+        o->oForwardVel      = 0.0f;
         o->oMrBlizzardTimer = 15;
     }
 }
@@ -397,13 +397,13 @@ static void mr_blizzard_snowball_act_1(void) {
             }
 
             // Launch the snowball relative to Mario's distance from the snowball.
-            o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 4000 - marioDist * 4.0f);
+            o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 4000 - (marioDist * 4.0f));
             o->oForwardVel = 40.0f;
-            o->oVelY = -20.0f + marioDist * 0.075f;
+            o->oVelY = (-20.0f + (marioDist * 0.075f));
         }
 
-        o->oAction = 2;
-        o->oMoveFlags = 0;
+        o->oAction    = 2;
+        o->oMoveFlags = OBJ_MOVE_NONE;
     }
 }
 

@@ -79,9 +79,9 @@ static struct SpawnParticlesInfo sWaterBombExplodeParticles = {
  * Spawn particles when the water bomb explodes.
  */
 void water_bomb_spawn_explode_particles(s8 offsetY, s8 forwardVelRange, s8 velYBase) {
-    sWaterBombExplodeParticles.offsetY = offsetY;
+    sWaterBombExplodeParticles.offsetY         = offsetY;
     sWaterBombExplodeParticles.forwardVelRange = forwardVelRange;
-    sWaterBombExplodeParticles.velYBase = velYBase;
+    sWaterBombExplodeParticles.velYBase        = velYBase;
     cur_obj_spawn_particles(&sWaterBombExplodeParticles);
 }
 
@@ -91,9 +91,9 @@ void water_bomb_spawn_explode_particles(s8 offsetY, s8 forwardVelRange, s8 velYB
 static void water_bomb_act_init(void) {
     cur_obj_play_sound_2(SOUND_OBJ_SOMETHING_LANDING);
 
-    o->oAction = WATER_BOMB_ACT_DROP;
-    o->oMoveFlags = 0;
-    o->oVelY = -40.0f;
+    o->oAction    = WATER_BOMB_ACT_DROP;
+    o->oMoveFlags = OBJ_MOVE_NONE;
+    o->oVelY      = -40.0f;
 }
 
 /**
