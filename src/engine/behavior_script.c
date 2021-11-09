@@ -87,9 +87,11 @@ void obj_update_gfx_pos_and_angle(struct Object *obj) {
 #define OBJ_OPACITY_LENGTH 512.0f
 void obj_set_opacity_from_cam_dist(struct Object *obj) {
     s32 opacityDist = ((-obj->header.gfx.cameraToObject[2] - OBJ_OPACITY_NEAR) * (256.0f / OBJ_OPACITY_LENGTH));
+#ifdef OBJECTS_REJ
     if (opacityDist > 0) {
         obj->header.gfx.node.flags &= ~GRAPH_RENDER_UCODE_REJ;
     }
+#endif
     obj->oOpacity = CLAMP(opacityDist, 0x00, 0xFF);
 }
 #undef OBJ_OPACITY_NEAR
@@ -855,7 +857,6 @@ void cur_obj_update(void) {
     f32 distanceFromMario;
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
-    s32 objListIndex = OBJ_LIST_PLAYER;
 
     // Calculate the distance from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
@@ -930,9 +931,13 @@ void cur_obj_update(void) {
         obj_update_gfx_pos_and_angle(o);
     }
 
-    COND_BIT((!(objFlags & OBJ_FLAG_UCODE_LARGE       )), o->header.gfx.node.flags, GRAPH_RENDER_UCODE_REJ         );
+#if SILHOUETTE
     COND_BIT((  objFlags & OBJ_FLAG_SILHOUETTE         ), o->header.gfx.node.flags, GRAPH_RENDER_SILHOUETTE        );
     COND_BIT((  objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE ), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
+#endif
+#ifdef OBJECTS_REJ
+    s32 objListIndex = OBJ_LIST_PLAYER;
+    COND_BIT((!(objFlags & OBJ_FLAG_UCODE_LARGE       )), o->header.gfx.node.flags, GRAPH_RENDER_UCODE_REJ         );
     BehaviorScript *bhvScript = segmented_to_virtual(o->behavior);
     if ((bhvScript[0] >> 24) == 0) {
         objListIndex = ((bhvScript[0] >> 16) & 0xFFFF);
@@ -942,7 +947,7 @@ void cur_obj_update(void) {
         o->header.gfx.node.flags &= ~GRAPH_RENDER_UCODE_REJ;
         o->header.gfx.node.flags |=  GRAPH_RENDER_UCODE_ZEX;
     }
-
+#endif
 #ifdef OBJ_OPACITY_BY_CAM_DIST
     if (objFlags & OBJ_FLAG_OPACITY_FROM_CAMERA_DIST) {
         obj_set_opacity_from_cam_dist(o);
@@ -957,18 +962,18 @@ void cur_obj_update(void) {
     if (o->oRoom != -1) {
         // If the object is in a room, only show it when Mario is in the room.
         cur_obj_enable_rendering_if_mario_in_room();
-    } else if ((objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) && (o->collisionData == NULL)) {
-        if (!(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)) {
-            // If the object has a render distance, check if it should be shown.
-            if (distanceFromMario > o->oDrawingDistance) {
-                // Out of render distance, hide the object.
-                o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
-                o->activeFlags |= ACTIVE_FLAG_FAR_AWAY;
-            } else if (o->oHeldState == HELD_FREE) {
-                // In render distance (and not being held), show the object.
-                o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
-                o->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
-            }
+    } else if ((o->collisionData == NULL)
+            &&  (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO)
+            && !(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)) {
+        // If the object has a render distance, check if it should be shown.
+        if (distanceFromMario > o->oDrawingDistance) {
+            // Out of render distance, hide the object.
+            o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
+            o->activeFlags           |=  ACTIVE_FLAG_FAR_AWAY;
+        } else if (o->oHeldState == HELD_FREE) {
+            // In render distance (and not being held), show the object.
+            o->header.gfx.node.flags |=  GRAPH_RENDER_ACTIVE;
+            o->activeFlags           &= ~ACTIVE_FLAG_FAR_AWAY;
         }
     }
 }

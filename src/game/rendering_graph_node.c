@@ -215,8 +215,10 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     s32 currLayer     = LAYER_FIRST;
     s32 startLayer    = LAYER_FIRST;
     s32 endLayer      = LAYER_LAST;
+#ifdef OBJECTS_REJ
     s32 headsIndex    = LIST_HEADS_ZEX;
-    s32 renderPhase   = RENDER_PHASE_ZEX_BG;
+#endif
+    s32 renderPhase   = RENDER_PHASE_FIRST;
     s32 enableZBuffer = ((node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0);
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
@@ -238,6 +240,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     for (renderPhase = 0; renderPhase < RENDER_PHASE_END; renderPhase++) {
         switch (renderPhase) {
 #if SILHOUETTE
+#ifdef OBJECTS_REJ
             case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
             case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
             case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
@@ -247,13 +250,24 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_LAST;                    break;
             case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
 #else
+            case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
+            case RENDER_PHASE_ZEX_SILHOUETTE:         startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
+            case RENDER_PHASE_ZEX_NON_SILHOUETTE:     startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
+            case RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE: startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_OCCLUDE_SILHOUETTE_LAST; break;
+            case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_LAST;                    break;
+#endif
+#else
+#ifdef OBJECTS_REJ
             case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
             case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_ZB_LAST;                 break;
             case RENDER_PHASE_ZEX_ALL:                headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST;                    break;
             case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
+#else
+            case RENDER_PHASE_ZEX_ALL:                startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST;                    break;
+#endif
 #endif
         }
-#ifdef F3DZEX_GBI_2
+#if defined(OBJECTS_REJ) && defined(F3DZEX_GBI_2)
         // Load rejection on pass 2. ZEX is loaded afterwards.
         if (headsIndex == LIST_HEADS_REJ) {
             if (gIsConsole) {
@@ -276,12 +290,22 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             gSPSetGeometryMode(gDisplayListHead++, G_ZBUFFER);
         }
         for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
+#ifdef OBJECTS_REJ
             currList = node->listHeads[headsIndex][currLayer];
+#else
+            currList = node->listHeads[currLayer];
+#endif
             while (currList != NULL) {
 #if SILHOUETTE
+#ifdef OBJECTS_REJ
                 if (renderPhase == RENDER_PHASE_REJ_SILHOUETTE) {
                     gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
                 } else if (renderPhase == RENDER_PHASE_REJ_NON_SILHOUETTE) {
+#else
+                if (renderPhase == RENDER_PHASE_ZEX_SILHOUETTE) {
+                    gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
+                } else if (renderPhase == RENDER_PHASE_ZEX_NON_SILHOUETTE) {
+#endif
                     gSPDisplayList(gDisplayListHead++, dl_silhouette_end);
                     // Use normal mode list, no AA
                     gDPSetRenderMode(gDisplayListHead++, (mode1List->modes[currLayer] & ~IM_RD),
@@ -330,20 +354,22 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
  * render modes of layers.
  */
 void geo_append_display_list(void *displayList, s32 layer) {
+#ifdef OBJECTS_REJ
     s32 index = LIST_HEADS_ZEX;
+#endif
 #ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);
 #endif
 #if defined(F3DZEX_GBI_2) || (SILHOUETTE > 0)
     if (gCurGraphNodeObject != NULL) {
-#ifdef F3DZEX_GBI_2
+#if defined(OBJECTS_REJ) && defined(F3DZEX_GBI_2)
         if (/* gIsConsole && */ (gCurGraphNodeObject->node.flags & GRAPH_RENDER_UCODE_REJ)/* && ucodeTestSwitch*/) {
             index = LIST_HEADS_REJ;
         }
 #endif
 #if SILHOUETTE
         if (gCurGraphNodeObject->node.flags & GRAPH_RENDER_SILHOUETTE) {
-#ifndef F3DZEX_GBI_2
+#if defined(OBJECTS_REJ) && defined(F3DZEX_GBI_2)
             index = LIST_HEADS_REJ;
 #endif
             switch (layer) {
@@ -363,15 +389,24 @@ void geo_append_display_list(void *displayList, s32 layer) {
     if (gCurGraphNodeMasterList != 0) {
         struct DisplayListNode *listNode = alloc_only_pool_alloc(gDisplayListHeap, sizeof(struct DisplayListNode));
 
-        listNode->transform = gMatStackFixed[gMatStackIndex];
+        listNode->transform   = gMatStackFixed[gMatStackIndex];
         listNode->displayList = displayList;
-        listNode->next = 0;
+        listNode->next        = 0;
+#ifdef OBJECTS_REJ
         if (gCurGraphNodeMasterList->listHeads[index][layer] == 0) {
             gCurGraphNodeMasterList->listHeads[index][layer] = listNode;
         } else {
             gCurGraphNodeMasterList->listTails[index][layer]->next = listNode;
         }
         gCurGraphNodeMasterList->listTails[index][layer] = listNode;
+#else
+        if (gCurGraphNodeMasterList->listHeads[layer] == 0) {
+            gCurGraphNodeMasterList->listHeads[layer] = listNode;
+        } else {
+            gCurGraphNodeMasterList->listTails[layer]->next = listNode;
+        }
+        gCurGraphNodeMasterList->listTails[layer] = listNode;
+#endif
     }
 }
 
@@ -398,11 +433,16 @@ static inline void append_dl_and_return(struct GraphNodeDisplayList *node) {
 void geo_process_master_list(struct GraphNodeMasterList *node) {
     s32 i;
 
-    if ((gCurGraphNodeMasterList == NULL) && (node->node.children != NULL)) {
+    if ((gCurGraphNodeMasterList == NULL)
+     && (node->node.children     != NULL)) {
         gCurGraphNodeMasterList = node;
         for (i = 0; i < LAYER_COUNT; i++) {
+#ifdef OBJECTS_REJ
             node->listHeads[LIST_HEADS_ZEX][i] = NULL;
             node->listHeads[LIST_HEADS_REJ][i] = NULL;
+#else
+            node->listHeads[i] = NULL;
+#endif
         }
         geo_process_node_and_siblings(node->node.children);
         geo_process_master_list_sub(gCurGraphNodeMasterList);
