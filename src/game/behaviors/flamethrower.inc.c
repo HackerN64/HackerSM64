@@ -23,7 +23,7 @@ void bhv_flamethrower_flame_loop(void) {
         }
         remainingTime = (o->parentObj->oFlameThowerTimeRemaining / 1.2f);
     } else {
-        remainingTime = o->parentObj->oFlameThowerTimeRemaining;
+        remainingTime =  o->parentObj->oFlameThowerTimeRemaining;
     }
     cur_obj_scale(scale);
     if (o->oBehParams2ndByte == FLAMETHROWER_BP_UPWARDS) {
@@ -40,7 +40,7 @@ void bhv_flamethrower_flame_loop(void) {
 void bhv_flamethrower_loop(void) {
     if (o->oAction == FLAMETHROWER_ACT_IDLE) {
 #ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-        if (gCurrLevelNum != LEVEL_BBH || gMarioOnMerryGoRound == TRUE) {
+        if ((gCurrLevelNum != LEVEL_BBH) || (gMarioOnMerryGoRound)) {
             if (o->oDistanceToMario < 2000.0f) {
                 o->oAction = FLAMETHROWER_ACT_BLOW_FIRE;
             }
@@ -55,7 +55,7 @@ void bhv_flamethrower_loop(void) {
         if (o->oBehParams2ndByte == FLAMETHROWER_BP_SLOW) {
             flameVel = 50.0f;
         }
-        f32 flameTimeRemaining = 1;
+        f32 flameTimeRemaining =  1;
         if (o->oTimer < 60) {
             flameTimeRemaining = 15;
         } else if (o->oTimer < 74) {
