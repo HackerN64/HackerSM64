@@ -38,8 +38,8 @@ enum GraphRenderFlags {
 #define SET_GRAPH_NODE_LAYER(flags, layer)  ((flags) = ((flags) & GRAPH_RENDER_FLAGS_MASK) | (((layer) << GRAPH_RENDER_FLAGS_SIZE) & GRAPH_RENDER_LAYERS_MASK))
 #define GET_GRAPH_NODE_LAYER(flags       )  ((flags & GRAPH_RENDER_LAYERS_MASK) >> GRAPH_RENDER_FLAGS_SIZE)
 
-// // Whether the node type has a function pointer of type GraphNodeFunc
-// #define GRAPH_NODE_TYPE_FUNCTIONAL          (1 << 8)
+// Whether the node type has a function pointer of type GraphNodeFunc
+#define GRAPH_NODE_TYPE_FUNCTIONAL          (1 << 8)
 
 // // The discriminant for different types of geo nodes
 // enum GraphNodeTypes {
