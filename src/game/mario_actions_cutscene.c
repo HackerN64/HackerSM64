@@ -469,7 +469,7 @@ s32 act_reading_sign(struct MarioState *m) {
             // reading sign
             set_mario_animation(m, MARIO_ANIM_FIRST_PERSON);
             m->actionState = ACT_STATE_READING_SIGN_TURN_TOWARD_SIGN;
-            // intentional fall through
+            // intentional fallthrough
         case ACT_STATE_READING_SIGN_TURN_TOWARD_SIGN:
             m->faceAngle[1] += (marioObj->oMarioReadingSignDYaw  / 11   );
             m->pos[0]       += (marioObj->oMarioReadingSignDPosX / 11.0f);

@@ -3836,7 +3836,7 @@ void calculate_angles(Vec3f from, Vec3f to, s16 *pitch, s16 *yaw) {
     f32 dy = (to[1] - from[1]);
     f32 dz = (to[2] - from[2]);
     *pitch = atan2s(sqrtf(sqr(dx) + sqr(dz)), dy);
-    *yaw = atan2s(dz, dx);
+    *yaw   = atan2s(dz, dx);
 }
 
 /**

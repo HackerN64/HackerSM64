@@ -246,7 +246,7 @@ s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
         case LVL_INTRO_REGULAR:             retVar = intro_regular();             break;
         case LVL_INTRO_GAME_OVER:           retVar = intro_game_over();           break;
 #else
-        case LVL_INTRO_REGULAR:             // fall through
+        case LVL_INTRO_REGULAR:             // fallthrough
         case LVL_INTRO_GAME_OVER:           retVar = (LEVEL_FILE_SELECT + gDebugLevelSelect);   break;
 #endif
         case LVL_INTRO_LEVEL_SELECT:        retVar = intro_level_select();        break; //! this runs on save and quit for some reason?
