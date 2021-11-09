@@ -28,7 +28,7 @@
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
-struct Area gAreaData[8];
+struct Area gAreaData[AREA_COUNT];
 
 struct WarpTransition gWarpTransition;
 
@@ -39,21 +39,22 @@ s16 gSavedCourseNum;
 s16 gMenuOptSelectIndex;
 s16 gSaveOptSelectIndex;
 
-struct SpawnInfo *gMarioSpawnInfo = &gPlayerSpawnInfos[0];
-struct GraphNode **gLoadedGraphNodes = gGraphNodePointers;
-struct Area *gAreas = gAreaData;
-struct Area *gCurrentArea = NULL;
+struct SpawnInfo    *gMarioSpawnInfo   = &gPlayerSpawnInfos[0];
+struct GraphNode   **gLoadedGraphNodes =  gGraphNodePointers;
+struct Area         *gAreas            =  gAreaData;
+struct Area         *gCurrentArea      = NULL;
 struct CreditsEntry *gCurrCreditsEntry = NULL;
-Vp *gViewportOverride = NULL;
-Vp *gViewportClip = NULL;
-s16 gWarpTransDelay = 0;
+
+Vp        *gViewportOverride    = NULL;
+Vp        *gViewportClip        = NULL;
+s16        gWarpTransDelay      = 0;
 RGBA16FILL gFBSetColor          = 0;
 RGBA16FILL gWarpTransFBSetColor = 0;
-Color gWarpTransRed   = 0;
-Color gWarpTransGreen = 0;
-Color gWarpTransBlue  = 0;
-s16 gCurrSaveFileNum  = 1;
-s16 gCurrLevelNum     = LEVEL_MIN;
+Color      gWarpTransRed        = 0;
+Color      gWarpTransGreen      = 0;
+Color      gWarpTransBlue       = 0;
+s16        gCurrSaveFileNum     = 1;
+s16        gCurrLevelNum        = LEVEL_MIN;
 
 /*
  * The following two tables are used in get_mario_spawn_type() to determine spawn type
@@ -182,7 +183,7 @@ void clear_areas(void) {
     gWarpTransition.pauseRendering = FALSE;
     gMarioSpawnInfo->areaIndex     = -1;
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < AREA_COUNT; i++) {
         gAreaData[i].index             = i;
         gAreaData[i].flags             = 0x0;
         gAreaData[i].terrainType       = TERRAIN_GRASS;
@@ -214,7 +215,7 @@ void clear_area_graph_nodes(void) {
         gWarpTransition.isActive = FALSE;
     }
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < AREA_COUNT; i++) {
         if (gAreaData[i].graphNode != NULL) {
             // geo_call_global_function_nodes(&gAreaData[i].graphNode->node, GEO_CONTEXT_AREA_INIT);
             gAreaData[i].graphNode = NULL;
@@ -224,12 +225,13 @@ void clear_area_graph_nodes(void) {
 
 void load_area(s32 index) {
     if ((gCurrentArea == NULL) && (gAreaData[index].graphNode != NULL)) {
-        gCurrentArea = &gAreaData[index];
+        gCurrentArea   = &gAreaData[index];
         gCurrAreaIndex = gCurrentArea->index;
 
         if (gCurrentArea->terrainData != NULL) {
-            load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
-                              gCurrentArea->macroObjects);
+            load_area_terrain(index, gCurrentArea->terrainData,
+                                     gCurrentArea->surfaceRooms,
+                                     gCurrentArea->macroObjects);
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {
@@ -261,12 +263,13 @@ void load_mario_area(void) {
         spawn_objects_from_info(gMarioSpawnInfo);
     }
     if (gAreaSkyboxStart[gCurrAreaIndex - 1]) {
-        load_segment_decompress(SEGMENT_SKYBOX, gAreaSkyboxStart[gCurrAreaIndex - 1], gAreaSkyboxEnd[gCurrAreaIndex - 1]);
+        load_segment_decompress(SEGMENT_SKYBOX, gAreaSkyboxStart[gCurrAreaIndex - 1],
+                                                  gAreaSkyboxEnd[gCurrAreaIndex - 1]);
     }
 }
 
 void unload_mario_area(void) {
-    if (gCurrentArea != NULL && (gCurrentArea->flags & AREA_FLAG_LOAD)) {
+    if ((gCurrentArea != NULL) && (gCurrentArea->flags & AREA_FLAG_LOAD)) {
         unload_objects_from_area(gMarioSpawnInfo->activeAreaIndex);
         gCurrentArea->flags &= ~AREA_FLAG_LOAD;
         if (gCurrentArea->flags == AREA_FLAG_UNLOAD) {
@@ -283,7 +286,7 @@ void change_area(s32 index) {
         load_area(index);
 
         gCurrentArea->flags = areaFlags;
-        gMarioObject->oActiveParticleFlags = 0;
+        gMarioObject->oActiveParticleFlags = ACTIVE_PARTICLE_NONE;
     }
 
     if (areaFlags & AREA_FLAG_LOAD) {
@@ -318,7 +321,7 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
         blue  = gWarpTransBlue;
     }
 
-    if (transType < 8) { // if transition is RGB
+    if (transType < WARP_TRANSITION_TYPE_STAR) { // if transition is WARP_TRANSITION_TYPE_COLOR
         gWarpTransition.data.red   = red;
         gWarpTransition.data.green = green;
         gWarpTransition.data.blue  = blue;

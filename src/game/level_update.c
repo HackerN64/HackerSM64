@@ -516,7 +516,9 @@ s32 music_unchanged_through_warp(s16 arg) {
     s16 currBgMusic;
 
 #ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    if ((levelNum == LEVEL_BOB) && (levelNum == gCurrLevelNum) && (destArea == gCurrAreaIndex)) {
+    if ((levelNum == LEVEL_BOB)
+     && (levelNum == gCurrLevelNum)
+     && (destArea == gCurrAreaIndex)) {
         currBgMusic = get_current_background_music();
         if (currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP | SEQ_VARIATION)
          || currBgMusic == SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP)) {
