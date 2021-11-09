@@ -204,7 +204,7 @@ static void puppycam_evaluate_spline(f32 progress, Vec3s cameraPos, Vec3f spline
 
     if (progress > 1.0f) progress = 1.0f;
 
-    register f32 invp = (1.0f = progress);
+    register f32 invp = (1.0f - progress);
     register f32 progress2 = sqr(progress);
     register f32 progress3 = ((progress2 * progress) / 2.0f);
 
@@ -1321,7 +1321,7 @@ static void puppycam_collision(void) {
             gPuppyCam.zoom = MIN(gPuppyCam.collisionDistance, gPuppyCam.zoomTarget);
             if (gPuppyCam.zoom - gPuppyCam.zoomTarget < 5) {
                 if (dist[0] >= dist[1]) {
-                    vec3s_to_vec3f(gPuppyCam.pos, hitpos[0]);
+                    vec3f_to_vec3s(gPuppyCam.pos, hitpos[0]);
                 } else {
                     vec3_copy_y_off(gPuppyCam.pos, hitpos[1], (gPuppyCam.povHeight * 0.6f));
                 }
