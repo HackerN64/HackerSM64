@@ -25,12 +25,12 @@ enum PuppylightShapes {
 #define LIGHTFLAG_DIRECTIONAL_OFFSET    0x1
 
 #define PUPPYLIGHT_ENVIRONMENT(ambientR, ambientG, ambientB, diffuseR, diffuseG, diffuseB, diffuseX, diffuseY, diffuseZ) \
-    CMD_BBBB(0x3F, 0x0C, ambientR, ambientG), \
+    CMD_BBBB(LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT, 0x0C, ambientR, ambientG), \
     CMD_BBBB(ambientB, diffuseR, diffuseG, diffuseB), \
     CMD_BBBB(diffuseX, diffuseY, diffuseZ, 0x0)
 
 #define PUPPYLIGHT_NODE(r, g, b, a, x, y, z, offsetX, offsetY, offsetZ, yaw, epicentre, flags, room) \
-    CMD_BBBB(0x40, 0x18, r, g), \
+    CMD_BBBB(LEVEL_CMD_PUPPYLIGHT_NODE, 0x18, r, g), \
     CMD_BBH(b, a, x), \
     CMD_HH(y, z), \
     CMD_HH(offsetX, offsetY), \

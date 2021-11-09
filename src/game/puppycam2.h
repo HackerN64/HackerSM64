@@ -46,7 +46,7 @@ enum PuppyDebugFlags {
 #include "include/command_macros_base.h"
 
 #define PUPPYVOLUME(x, y, z, length, height, width, yaw, functionptr, anglesptr, addflags, removeflags, flagpersistance, room, shape) \
-    CMD_BBH(0x3D, 0x24, x),                       \
+    CMD_BBH(LEVEL_CMD_PUPPYVOLUME, 0x24, x),      \
     CMD_HHHHHH(y, z, length, height, width, yaw), \
     CMD_PTR(functionptr),                         \
     CMD_PTR(anglesptr),                           \
