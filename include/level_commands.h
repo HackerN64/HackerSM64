@@ -326,7 +326,6 @@ enum GoddardScene {
 #define UNLOAD_MARIO_AREA() \
     CMD_BBH(0x2C, 0x04, 0x0000)
 
-// unused
 #define UPDATE_OBJECTS() \
     CMD_BBH(0x2D, 0x04, 0x0000)
 
