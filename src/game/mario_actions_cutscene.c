@@ -820,9 +820,9 @@ s32 act_entering_star_door(struct MarioState *m) {
         m->interactObj->oInteractStatus = INT_STATUS_DOOR_PULLED;
 
         // ~30 degrees / 1/12 rot
-        s16 targetAngle = (m->usedObj->oMoveAngleYaw + 0x1555);
+        s16 targetAngle = (m->usedObj->oMoveAngleYaw + DEGREES(30));
         if (m->actionArg & WARP_FLAG_DOOR_FLIP_MARIO) {
-            targetAngle += 0x5556; // ~120 degrees / 1/3 rot (total 150d / 5/12)
+            targetAngle += DEGREES(120); // ~120 degrees / 1/3 rot (total 150d / 5/12)
         }
 
         // targetDX and targetDZ are the offsets to add to Mario's position to

@@ -47,7 +47,7 @@ static void triplet_butterfly_act_init(void) {
         o->oAction = TRIPLET_BUTTERFLY_ACT_WANDER;
 
         o->oTripletButterflyBaseYaw = o->oBehParams2ndByte * (0x10000 / 3);
-        o->oMoveAngleYaw = (s32)(o->oTripletButterflyBaseYaw + random_linear_offset(0, 0x5555));
+        o->oMoveAngleYaw = (s32)(o->oTripletButterflyBaseYaw + random_linear_offset(0, DEGREES(120)));
         o->oTripletButterflySpeed = random_linear_offset(15, 15);
 
         cur_obj_unhide();
