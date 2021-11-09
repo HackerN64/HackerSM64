@@ -84,7 +84,7 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     RGBA32 colour, ambient;
     f64 scaleOrig;
     f64 scaleVal = 1.0f;
-    Vec3f debugPos[2];
+    // Vec3f debugPos[2];
 
     // Relative positions of the object vs. the centre of the node.
     vec3_diff(lightRelative, light->pos[0], &obj->oPosVec);
@@ -154,7 +154,7 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     // Now we have a scale value and a scale factor, we can start lighting things up.
     // Convert to a percentage.
     f32 scale = (scaleOrig / scaleVal);
-    f32 scale = CLAMP(scale, 0.0f, 1.0f);
+    scale = CLAMP(scale, 0.0f, 1.0f);
     // Reduce scale2 by the epicentre.
     f32 scale2 = ((scale - epc) * (1 + epc));
     scale2 = CLAMP(scale2, 0.0f, 1.0f);
