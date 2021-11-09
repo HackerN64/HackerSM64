@@ -1121,10 +1121,8 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                     default:                                   geo_try_process_children        ((struct GraphNode                    *) curGraphNode); break;
                 }
             }
-        } else {
-            if (curGraphNode->type == GRAPH_NODE_TYPE_OBJECT) {
-                ((struct GraphNodeObject *) curGraphNode)->throwMatrix = NULL;
-            }
+        } else if (curGraphNode->type == GRAPH_NODE_TYPE_OBJECT) {
+            ((struct GraphNodeObject *) curGraphNode)->throwMatrix = NULL;
         }
     } while (iterateChildren && ((curGraphNode = curGraphNode->next) != firstNode));
 }

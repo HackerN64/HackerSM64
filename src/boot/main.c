@@ -84,7 +84,8 @@ UNUSED void handle_debug_key_sequences(void) {
     if (gPlayer3Controller->buttonPressed != 0) {
         if (sDebugTextKeySequence[sDebugTextKey++] == gPlayer3Controller->buttonPressed) {
             if (sDebugTextKey == ARRAY_COUNT(sDebugTextKeySequence)) {
-                sDebugTextKey = 0, gShowDebugText ^= 1;
+                sDebugTextKey   = 0;
+                gShowDebugText ^= 1;
             }
         } else {
             sDebugTextKey = 0;
