@@ -228,34 +228,34 @@ static void add_surface(struct Surface *surface, s32 dynamic) {
  * @param vertexIndices Helper which tells positions in vertexData to start reading vertices
  */
 static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **vertexIndices) {
-    Vec3t v1, v2, v3;
+    Vec3t v[3];
     Vec3f n;
     Vec3t offset;
     s32 min, max;
 
     vec3_prod_val(offset, (*vertexIndices), 3);
 
-    vec3s_copy(v1, (vertexData + offset[0]));
-    vec3s_copy(v2, (vertexData + offset[1]));
-    vec3s_copy(v3, (vertexData + offset[2]));
+    vec3s_copy(v[0], (vertexData + offset[0]));
+    vec3s_copy(v[1], (vertexData + offset[1]));
+    vec3s_copy(v[2], (vertexData + offset[2]));
 
-    find_vector_perpendicular_to_plane(n, v1, v2, v3);
+    find_vector_perpendicular_to_plane(n, v[0], v[1], v[2]);
 
     vec3f_normalize(n);
 
     struct Surface *surface = alloc_surface();
 
-    vec3s_copy(surface->vertex1, v1);
-    vec3s_copy(surface->vertex2, v2);
-    vec3s_copy(surface->vertex3, v3);
+    vec3s_copy(surface->vertex1, v[0]);
+    vec3s_copy(surface->vertex2, v[1]);
+    vec3s_copy(surface->vertex3, v[2]);
 
     surface->normal.x = n[0];
     surface->normal.y = n[1];
     surface->normal.z = n[2];
 
-    surface->originOffset = -vec3_dot(n, v1);
+    surface->originOffset = -vec3_dot(n, v[0]);
     
-    min_max_3(v1[1], v2[1], v3[1], &min, &max);
+    min_max_3(v[0][1], v[1][1], v[2][1], &min, &max);
     surface->lowerY = (min - SURFACE_VERTICAL_BUFFER);
     surface->upperY = (max + SURFACE_VERTICAL_BUFFER);
 

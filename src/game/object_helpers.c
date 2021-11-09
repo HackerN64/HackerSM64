@@ -2069,14 +2069,14 @@ s32 cur_obj_update_dialog_with_cutscene(s32 actionArg, s32 dialogFlags, s32 cuts
             // If flag defined, keep time stop enabled until the object
             // decided to disable it independently
             if (dialogFlags & DIALOG_FLAG_TIME_STOP_ENABLED) {
-                dialogResponse = o->oDialogResponse;
+                dialogResponse  = o->oDialogResponse;
                 o->oDialogState = DIALOG_STATUS_ENABLE_TIME_STOP;
             } else if (gMarioState->action != ACT_READING_NPC_DIALOG) {
                 // Disable time stop, then enable time stop for a frame
                 // until the set_mario_npc_dialog function disables it
                 gTimeStopState &= ~TIME_STOP_ENABLED;
                 o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
-                dialogResponse = o->oDialogResponse;
+                dialogResponse  = o->oDialogResponse;
                 o->oDialogState = DIALOG_STATUS_ENABLE_TIME_STOP;
             } else {
                 // And finally stop Mario dialog status
@@ -2096,10 +2096,7 @@ void cur_obj_align_gfx_with_floor(void) {
 
     find_floor(position[0], position[1], position[2], &floor);
     if (floor != NULL) {
-        floorNormal[0] = floor->normal.x;
-        floorNormal[1] = floor->normal.y;
-        floorNormal[2] = floor->normal.z;
-
+        vec3f_set(floorNormal, floor->normal.x, floor->normal.y, floor->normal.z);
         mtxf_align_terrain_normal(o->transform, floorNormal, position, o->oFaceAngleYaw);
         o->header.gfx.throwMatrix = &o->transform;
     }
