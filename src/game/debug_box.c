@@ -102,7 +102,7 @@ Gfx dl_debug_cylinder_verts[] = {
 	gsSPEndDisplayList(),
 };
 
-u8 hitboxView = FALSE;
+u8 hitboxView  = FALSE;
 u8 surfaceView = FALSE;
 
 /**

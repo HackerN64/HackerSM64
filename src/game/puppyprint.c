@@ -122,16 +122,16 @@ extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentEnd[];
 
 // Here is stored the rom addresses of the global code segments. If you get rid of any, it's best to just write them as NULL.
-s32 ramP[5][2] = {
-    {(u32)&_buffersSegmentBssStart,      (u32)&_buffersSegmentBssEnd},
-    {(u32)&_mainSegmentStart,            (u32)&_mainSegmentEnd},
-    {(u32)&_engineSegmentStart,          (u32)&_engineSegmentEnd},
-    {(u32)&_framebuffersSegmentBssStart, (u32)&_framebuffersSegmentBssEnd},
-    {(u32)&_goddardSegmentStart,         (u32)&_goddardSegmentEnd},
+u32 ramP[5][2] = {
+    {(u32)_buffersSegmentBssStart,      (u32)_buffersSegmentBssEnd},
+    {(u32)_mainSegmentStart,            (u32)_mainSegmentEnd},
+    {(u32)_engineSegmentStart,          (u32)_engineSegmentEnd},
+    {(u32)_framebuffersSegmentBssStart, (u32)_framebuffersSegmentBssEnd},
+    {(u32)_goddardSegmentStart,         (u32)_goddardSegmentEnd},
 };
 
 void puppyprint_calculate_ram_usage(void) {
-    s32 temp[2];
+    u32 temp[2];
     s32 i = 0;
 
     for (i = 0; i < 5; i++) {
@@ -164,7 +164,7 @@ void puppyprint_profiler_finished(void) {
     benchMark[NUM_BENCH_ITERATIONS    ] = 0;
     benchMark[NUM_BENCH_ITERATIONS + 1] = 0;
     benchmarkTimer = 300;
-    benchViewer = FALSE;
+    benchViewer    = FALSE;
     for (i = 0; i < (NUM_BENCH_ITERATIONS - 2); i++) {
         benchMark[NUM_BENCH_ITERATIONS] += benchMark[i];
         if (benchMark[i] > benchMark[NUM_BENCH_ITERATIONS + 1]) {
@@ -211,14 +211,18 @@ ColorRGB colourChart[NUM_TLB_SEGMENTS + 1] = {
 };
 
 // Change this to alter the width of the bar at the bottom.
-#define BAR_LENGTH 200
+#define RAM_BAR_LENGTH 200
+#define RAM_BAR_MIN    (SCREEN_CENTER_X - (RAM_BAR_LENGTH / 2))
+#define RAM_BAR_MAX    (SCREEN_CENTER_X + (RAM_BAR_LENGTH / 2))
+#define RAM_BAR_TOP    (SCREEN_HEIGHT - 30)
+#define RAM_BAR_BOTTOM (SCREEN_HEIGHT - 22)
 
 void print_ram_bar(void) {
     s32 i = 0;
     f32 perfPercentage;
-    s32 graphPos = 0;
-    s32 prevGraph = (SCREEN_CENTER_X - (BAR_LENGTH / 2));
-    s32 ramsize = osGetMemSize();
+    s32 graphPos  = 0;
+    s32 prevGraph = RAM_BAR_MIN;
+    s32 ramsize   = osGetMemSize();
 
     prepare_blank_box();
 
@@ -226,20 +230,20 @@ void print_ram_bar(void) {
         if (ramsizeSegment[i] == 0) {
             continue;
         }
-        perfPercentage = ((f32)ramsizeSegment[i] / ramsize);
-        graphPos = (prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_CENTER_X + (BAR_LENGTH / 2))));
-        render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22),
+        perfPercentage = (RAM_BAR_LENGTH * ((f32)ramsizeSegment[i] / ramsize));
+        graphPos = (prevGraph + CLAMP(perfPercentage, 1, RAM_BAR_MAX));
+        render_blank_box(prevGraph, RAM_BAR_TOP, graphPos, RAM_BAR_BOTTOM,
             colourChart[i][0],
             colourChart[i][1],
             colourChart[i][2], 255);
         prevGraph = graphPos;
     }
-    perfPercentage = ((f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize);
-    graphPos = (prevGraph + CLAMP((BAR_LENGTH * perfPercentage), 1, (SCREEN_CENTER_X + (BAR_LENGTH / 2))));
-    render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), graphPos, (SCREEN_HEIGHT - 22), 255, 255, 255, 255);
+    perfPercentage = (RAM_BAR_LENGTH * ((f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize));
+    graphPos = (prevGraph + CLAMP(perfPercentage, 1, RAM_BAR_MAX));
+    render_blank_box(prevGraph, RAM_BAR_TOP, graphPos, RAM_BAR_BOTTOM, 255, 255, 255, 255);
     prevGraph = graphPos;
 
-    render_blank_box(prevGraph, (SCREEN_HEIGHT - 30), (SCREEN_CENTER_X + (BAR_LENGTH / 2)), (SCREEN_HEIGHT - 22), 0, 0, 0, 255);
+    render_blank_box(prevGraph, RAM_BAR_TOP, RAM_BAR_MAX, RAM_BAR_BOTTOM, 0, 0, 0, 255);
 
     finish_blank_box();
 }
@@ -308,7 +312,7 @@ void print_audio_ram_overview(void) {
     s32 i =  0;
     s32 percentage = 0;
     s32 tmpY = y;
-    s32 totalMemory[2] = {0, 0};
+    s32 totalMemory[2] = { 0, 0 };
     s32 audioPoolSizes[NUM_AUDIO_POOLS][2];
     prepare_blank_box();
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
@@ -324,7 +328,10 @@ void print_audio_ram_overview(void) {
             percentage = (((s64) audioPoolSizes[i][1] * 1000) / audioPoolSizes[i][0]);
         }
         sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
-            audioPoolSizes[i][1], audioPoolSizes[i][0], (percentage / 10), (percentage % 10));
+                audioPoolSizes[i][1],
+                audioPoolSizes[i][0],
+                (percentage / 10),
+                (percentage % 10));
 
         print_set_envcolour(colourChart[i][0],
                             colourChart[i][1],
@@ -344,10 +351,14 @@ void print_audio_ram_overview(void) {
     }
     if (totalMemory[0] == gAudioHeapSize) {
         sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d_)",
-            totalMemory[1], totalMemory[0], (percentage / 10), (percentage % 10));
+                totalMemory[1],
+                totalMemory[0],
+                (percentage / 10),
+                (percentage % 10));
     } else {
         sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (Incorrect!)",
-            totalMemory[1], totalMemory[0]);
+                totalMemory[1],
+                totalMemory[0]);
     }
 
     print_set_envcolour(colourChart[30][0],
@@ -446,8 +457,11 @@ extern s16 gVisualSurfaceCount;
 
 void puppyprint_render_collision(void) {
     char textBytes[200];
-
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+    sprintf(textBytes, "Collision:<COL_99505099> %dc", collisionTime[NUM_PERF_ITERATIONS]);
+#else
     sprintf(textBytes, "Collision:<COL_99505099> %dus", collisionTime[NUM_PERF_ITERATIONS]);
+#endif
     print_small_text(304, 48, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
     sprintf(textBytes, "Pool Size: %X#Node Size: %X#Surfaces Allocated: %d#Nodes Allocated: %d#Current Cell: %d", (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)), (SURFACE_POOL_SIZE * sizeof(struct Surface)),
@@ -499,10 +513,17 @@ struct CPUBar cpu_ordering_table[] = {
 void print_basic_profiling(void) {
     char textBytes[90];
     print_fps(16, 40);
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+    sprintf(textBytes, "CPU: %dc (%d_)#RSP: %dc (%d_)#RDP: %dc (%d_)",
+            cpuTime, (cpuTime / 15625),
+            rspTime, (rspTime / 15625),
+            rdpTime, (rdpTime / 15625));
+#else
     sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)",
-        cpuTime, (cpuTime / 333),
-        rspTime, (rspTime / 333),
-        rdpTime, (rdpTime / 333));
+            cpuTime, (cpuTime / 333),
+            rspTime, (rspTime / 333),
+            rdpTime, (rdpTime / 333));
+#endif
     print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
@@ -551,7 +572,11 @@ void puppyprint_render_standard(void) {
     for (i = 0; i < CPU_TABLE_MAX; i++) {
         s32 num = cpu_ordering_table[i].time[NUM_PERF_ITERATIONS];
         if (num != 0) {
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+            sprintf(textBytes, "%s%dc", cpu_ordering_table[i].str, num);
+#else
             sprintf(textBytes, "%s%dus", cpu_ordering_table[i].str, num);
+#endif
             print_small_text((SCREEN_WIDTH - 16), (40 + (viewedNums * 12)), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
             viewedNums++;
         }
@@ -689,7 +714,7 @@ void puppyprint_profiler_process(void) {
         }
     }
 
-    if (!(gGlobalTimer & 15)) {
+    if (!(gGlobalTimer & NUM_PERF_ITERATIONS)) {
         get_average_perf_time(   scriptTime);
         get_average_perf_time(behaviourTime);
         get_average_perf_time(collisionTime);
@@ -953,6 +978,15 @@ s32 get_text_height(const char *str) {
     return textPos;
 }
 
+const Gfx dl_small_text_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(    G_CYC_1CYCLE),
+    gsDPSetTexturePersp( G_TP_NONE),
+    gsDPSetCombineMode(  G_CC_FADEA, G_CC_FADEA),
+    gsDPSetTextureFilter(G_TF_POINT),
+    gsSPEndDisplayList(),
+};
+
 void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 font) {
     s32 textX = 0;
     s32 textY = 0;
@@ -975,10 +1009,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     if (amount == PRINT_ALL) {
         tx = (signed)strlen(str);
     }
-    gDPSetCycleType(    gDisplayListHead++, G_CYC_1CYCLE);
-    gDPSetTexturePersp( gDisplayListHead++, G_TP_NONE);
-    gDPSetCombineMode(  gDisplayListHead++, G_CC_FADEA, G_CC_FADEA);
-    gDPSetTextureFilter(gDisplayListHead++, G_TF_POINT);
+    gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
     if (align == PRINT_TEXT_ALIGN_CENTRE) {
         for (i = 0; i < (signed)strlen(str); i++) {
             if (str[i] == '#') {
