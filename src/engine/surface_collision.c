@@ -46,8 +46,8 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     register TerrainData type = SURFACE_DEFAULT;
     s32 numCols = 0;
     // Max collision radius = 200
-    if (radius > 200.0f) {
-        radius = 200.0f;
+    if (radius > 200) {
+        radius = 200;
     }
     // Stay in this loop until out of walls.
     while (surfaceNode != NULL) {
@@ -367,22 +367,22 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
     register struct Surface *surf, *floor = NULL;
     register SurfaceType type = SURFACE_DEFAULT;
     register f32 height;
-    register f32 bufferY = (y + 78.0f);
+    register s32 bufferY = (y + FIND_FLOOR_BUFFER);
     // Iterate through the list of floors until there are no more floors.
     while (surfaceNode != NULL) {
         surf        = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
         type        = surf->type;
         // Exclude all floors above the point.
-        if (y < (surf->lowerY - 30)) continue;
+        if (bufferY < surf->lowerY) continue;
         // Check that the point is within the triangle bounds.
         if (!check_within_floor_triangle_bounds(x, z, surf)) continue;
         // Get the height of the floor under the current location.
         height = get_surface_height_at_location(x, z, surf);
         // Exclude floors lower than the previous highest floor.
         if (height  < *pheight) continue;
-        // Checks for floor interaction with a 78 unit buffer.
-        if (bufferY < height) continue;
+        // Checks for floor interaction with a FIND_FLOOR_BUFFER unit buffer.
+        if (bufferY <   height) continue;
         // To prevent the Merry-Go-Round room from loading when Mario passes above the hole that leads
         // there, SURFACE_INTANGIBLE is used. This prevent the wrong room from loading, but can also allow
         // Mario to pass through.
@@ -429,7 +429,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
 
         curBottomHeight = get_surface_height_at_location(x, z, surf);
 
-        if (curBottomHeight < (y - 78.0f)) {
+        if (curBottomHeight < (y - FIND_FLOOR_BUFFER)) {
             continue;
         } else {
             bottomHeight = curBottomHeight;
