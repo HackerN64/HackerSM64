@@ -38,37 +38,65 @@ enum GraphRenderFlags {
 #define SET_GRAPH_NODE_LAYER(flags, layer)  ((flags) = ((flags) & GRAPH_RENDER_FLAGS_MASK) | (((layer) << GRAPH_RENDER_FLAGS_SIZE) & GRAPH_RENDER_LAYERS_MASK))
 #define GET_GRAPH_NODE_LAYER(flags       )  ((flags & GRAPH_RENDER_LAYERS_MASK) >> GRAPH_RENDER_FLAGS_SIZE)
 
-// Whether the node type has a function pointer of type GraphNodeFunc
-#define GRAPH_NODE_TYPE_FUNCTIONAL          (1 << 8)
+// // Whether the node type has a function pointer of type GraphNodeFunc
+// #define GRAPH_NODE_TYPE_FUNCTIONAL          (1 << 8)
+
+// // The discriminant for different types of geo nodes
+// enum GraphNodeTypes {
+//     GRAPH_NODE_TYPE_ROOT                 =  0x01,
+//     GRAPH_NODE_TYPE_ORTHO_PROJECTION     =  0x02,
+//     GRAPH_NODE_TYPE_PERSPECTIVE          = (0x03 | GRAPH_NODE_TYPE_FUNCTIONAL),
+//     GRAPH_NODE_TYPE_MASTER_LIST          =  0x04,
+//     GRAPH_NODE_TYPE_START                =  0x0A,
+//     GRAPH_NODE_TYPE_LEVEL_OF_DETAIL      =  0x0B,
+//     GRAPH_NODE_TYPE_SWITCH_CASE          = (0x0C | GRAPH_NODE_TYPE_FUNCTIONAL),
+//     GRAPH_NODE_TYPE_CAMERA               = (0x14 | GRAPH_NODE_TYPE_FUNCTIONAL),
+//     GRAPH_NODE_TYPE_TRANSLATION_ROTATION =  0x15,
+//     GRAPH_NODE_TYPE_TRANSLATION          =  0x16,
+//     GRAPH_NODE_TYPE_ROTATION             =  0x17,
+//     GRAPH_NODE_TYPE_OBJECT               =  0x18,
+//     GRAPH_NODE_TYPE_ANIMATED_PART        =  0x19,
+//     GRAPH_NODE_TYPE_BONE                 =  0x1A,
+//     GRAPH_NODE_TYPE_BILLBOARD            =  0x1B,
+//     GRAPH_NODE_TYPE_DISPLAY_LIST         =  0x1C,
+//     GRAPH_NODE_TYPE_SCALE                =  0x1D,
+//     GRAPH_NODE_TYPE_SHADOW               =  0x28,
+//     GRAPH_NODE_TYPE_OBJECT_PARENT        =  0x29,
+//     GRAPH_NODE_TYPE_GENERATED_LIST       = (0x2A | GRAPH_NODE_TYPE_FUNCTIONAL),
+//     GRAPH_NODE_TYPE_BACKGROUND           = (0x2C | GRAPH_NODE_TYPE_FUNCTIONAL),
+//     GRAPH_NODE_TYPE_HELD_OBJ             = (0x2E | GRAPH_NODE_TYPE_FUNCTIONAL),
+//     GRAPH_NODE_TYPE_CULLING_RADIUS       =  0x2F,
+
+//     GRAPH_NODE_TYPES_MASK                =  0xFF,
+// };
 
 // The discriminant for different types of geo nodes
 enum GraphNodeTypes {
-    GRAPH_NODE_TYPE_ROOT                 =  0x01,
-    GRAPH_NODE_TYPE_ORTHO_PROJECTION     =  0x02,
-    GRAPH_NODE_TYPE_PERSPECTIVE          = (0x03 | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_MASTER_LIST          =  0x04,
-    GRAPH_NODE_TYPE_START                =  0x0A,
-    GRAPH_NODE_TYPE_LEVEL_OF_DETAIL      =  0x0B,
-    GRAPH_NODE_TYPE_SWITCH_CASE          = (0x0C | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_CAMERA               = (0x14 | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_TRANSLATION_ROTATION =  0x15,
-    GRAPH_NODE_TYPE_TRANSLATION          =  0x16,
-    GRAPH_NODE_TYPE_ROTATION             =  0x17,
-    GRAPH_NODE_TYPE_OBJECT               =  0x18,
-    GRAPH_NODE_TYPE_ANIMATED_PART        =  0x19,
-    GRAPH_NODE_TYPE_BONE                 =  0x1A,
-    GRAPH_NODE_TYPE_BILLBOARD            =  0x1B,
-    GRAPH_NODE_TYPE_DISPLAY_LIST         =  0x1C,
-    GRAPH_NODE_TYPE_SCALE                =  0x1D,
-    GRAPH_NODE_TYPE_SHADOW               =  0x28,
-    GRAPH_NODE_TYPE_OBJECT_PARENT        =  0x29,
-    GRAPH_NODE_TYPE_GENERATED_LIST       = (0x2A | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_BACKGROUND           = (0x2C | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_HELD_OBJ             = (0x2E | GRAPH_NODE_TYPE_FUNCTIONAL),
-    GRAPH_NODE_TYPE_CULLING_RADIUS       =  0x2F,
-
-    GRAPH_NODE_TYPES_MASK                =  0xFF,
+    GRAPH_NODE_TYPE_ROOT,
+    GRAPH_NODE_TYPE_ORTHO_PROJECTION,
+    GRAPH_NODE_TYPE_PERSPECTIVE,
+    GRAPH_NODE_TYPE_MASTER_LIST,
+    GRAPH_NODE_TYPE_START,
+    GRAPH_NODE_TYPE_LEVEL_OF_DETAIL,
+    GRAPH_NODE_TYPE_SWITCH_CASE,
+    GRAPH_NODE_TYPE_CAMERA,
+    GRAPH_NODE_TYPE_TRANSLATION_ROTATION,
+    GRAPH_NODE_TYPE_TRANSLATION,
+    GRAPH_NODE_TYPE_ROTATION,
+    GRAPH_NODE_TYPE_OBJECT,
+    GRAPH_NODE_TYPE_ANIMATED_PART,
+    GRAPH_NODE_TYPE_BONE,
+    GRAPH_NODE_TYPE_BILLBOARD,
+    GRAPH_NODE_TYPE_DISPLAY_LIST,
+    GRAPH_NODE_TYPE_SCALE,
+    GRAPH_NODE_TYPE_SHADOW,
+    GRAPH_NODE_TYPE_OBJECT_PARENT,
+    GRAPH_NODE_TYPE_GENERATED_LIST,
+    GRAPH_NODE_TYPE_BACKGROUND,
+    GRAPH_NODE_TYPE_HELD_OBJ,
+    GRAPH_NODE_TYPE_CULLING_RADIUS,
 };
+
 
 // Passed as first argument to a GraphNodeFunc to give information about in
 // which context it was called and what it is expected to do.
