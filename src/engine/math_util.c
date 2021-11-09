@@ -25,6 +25,44 @@ Vec3s gVec3sZero = {     0,     0,     0 };
 Vec3i gVec3iZero = {     0,     0,     0 };
 Vec3s gVec3sOne  = {     1,     1,     1 };
 
+static u16 gRandomSeed16;
+
+// Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
+u32 random_u16(void) {
+    if (gRandomSeed16 == 22026) {
+        gRandomSeed16 = 0;
+    }
+
+    u16 temp1 = (((gRandomSeed16 & 0x00FF) << 8) ^ gRandomSeed16);
+
+    gRandomSeed16 = ((temp1 & 0x00FF) << 8) + ((temp1 & 0xFF00) >> 8);
+
+    temp1 = (((temp1 & 0x00FF) << 1) ^ gRandomSeed16);
+    u16 temp2 = ((temp1 >> 1) ^ 0xFF80);
+
+    if ((temp1 & 0x1) == 0) {
+        if (temp2 == 43605) {
+            gRandomSeed16 = 0;
+        } else {
+            gRandomSeed16 = (temp2 ^ 0x1FF4);
+        }
+    } else {
+        gRandomSeed16 = (temp2 ^ 0x8180);
+    }
+
+    return gRandomSeed16;
+}
+
+// Generate a pseudorandom float in the range [0, 1).
+f32 random_float(void) {
+    return ((f32) random_u16() / (f32) 0x10000);
+}
+
+// Return either -1 or 1 with a 50:50 chance.
+s32 random_sign(void) {
+    return ((random_u16() >= 0x7FFF) ? 1 : -1);
+}
+
 /// Returns the lowest of three values.
 #define min_3_func(a0, a1, a2) {\
     if (a1 < a0) a0 = a1;       \
