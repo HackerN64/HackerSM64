@@ -1788,12 +1788,16 @@ void check_lava_boost(struct MarioState *m) {
     if ((m->floor->type == SURFACE_BURNING)
      && !(m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_RIDING_SHELL))
      && (m->pos[1] < (m->floorHeight + 10.0f))) {
-        if (!(m->flags & MARIO_METAL_CAP)) m->hurtCounter = ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
+        if (!(m->flags & MARIO_METAL_CAP)) {
+            m->hurtCounter = ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
+        }
 #else
     if ((m->floor->type == SURFACE_BURNING)
      && !(m->action & (ACT_FLAG_AIR | ACT_FLAG_SWIMMING | ACT_FLAG_RIDING_SHELL))
      && (m->pos[1] < (m->floorHeight + 10.0f))) {
-        if (!(m->flags & MARIO_METAL_CAP)) m->hurtCounter += ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
+        if (!(m->flags & MARIO_METAL_CAP)) {
+            m->hurtCounter += ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
+        }
 #endif
         update_mario_sound_and_camera(m);
         drop_and_set_mario_action(m, ACT_LAVA_BOOST, 0);
@@ -1813,7 +1817,7 @@ void pss_end_slide(struct MarioState *m) {
     if (sPssSlideStarted) {
         u16 slideTime = level_control_timer(TIMER_CONTROL_STOP);
         if (slideTime < 630) {
-            m->marioObj->oBehParams = (1 << 24); //! TODO: Flag name
+            SET_FULL_BPARAM1(m->marioObj->oBehParams, 0x01); //! TODO: Flag name
             spawn_default_star(-6358.0f, -4300.0f, 4700.0f);
         }
         sPssSlideStarted = FALSE;

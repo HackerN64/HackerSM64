@@ -187,7 +187,7 @@ enum ActiveParticleFlags {
 #define SET_BPARAM4(behParams, val) SET_BPARAM((behParams), (val), 4, 1)
 
 // Set a bparam in oBehParams, clearing other bparams
-#define SET_FULL_BPARAM(behParams, val, index, num) (behParams) = SHIFTED_BPARAM((val), (index), (num)))
+#define SET_FULL_BPARAM(behParams, val, index, num) (behParams) = SHIFTED_BPARAM((val), (index), (num))
 #define SET_FULL_BPARAM1(behParams, val) SET_FULL_BPARAM((behParams), (val), 1, 1)
 #define SET_FULL_BPARAM2(behParams, val) SET_FULL_BPARAM((behParams), (val), 2, 1)
 #define SET_FULL_BPARAM3(behParams, val) SET_FULL_BPARAM((behParams), (val), 3, 1)
@@ -354,7 +354,7 @@ enum oActionsCoinFormation {
 };
 
 /* Coin Inside Boo */
-enum BehParam1CoinInsideBoo {
+enum oBehParam1stByteCoinInsideBoo {
     COIN_INSIDE_BOO_BP_BLUE_COIN,
     COIN_INSIDE_BOO_BP_YELLOW_COIN,
 };
@@ -773,6 +773,10 @@ enum ExclamationBoxContentsList { // oBehParams2ndByte, ExclamationBoxContents->
     EXCLAMATION_BOX_BP_STAR_6,
     EXCLAMATION_BOX_BP_NULL = 99
 };
+enum oBehParam1stByteExclamationBox {
+    EXCLAMATION_BOX_BP1_NEEDS_SWITCH,
+    EXCLAMATION_BOX_BP1_ALWAYS_ACTIVE,
+};
 enum oActionsExclamationBox {
     EXCLAMATION_BOX_ACT_INIT,
     EXCLAMATION_BOX_ACT_OUTLINE,
@@ -832,27 +836,33 @@ enum oActionsMarioCap {
     #define OPENED_CANNON_ACT_TURNING_YAW                   0x6
 
 /* Door */
-    /* oAction */
-    #define DOOR_ACT_CLOSED                                 0x0
-    #define DOOR_ACT_PULLED                                 0x1
-    #define DOOR_ACT_PUSHED                                 0x2
-    #define DOOR_ACT_WARP_PULLED                            0x3
-    #define DOOR_ACT_WARP_PUSHED                            0x4
-    /* Animations */
-    #define DOOR_ANIM_CLOSED                                0x0
-    #define DOOR_ANIM_PULLED                                0x1
-    #define DOOR_ANIM_PUSHED                                0x2
-    #define DOOR_ANIM_WARP_PULLED                           0x3
-    #define DOOR_ANIM_WARP_PUSHED                           0x4
+enum oBehParams1stByteKeyDoor {
+    KEY_DOOR_BP1_BASEMENT,
+    KEY_DOOR_BP1_UPSTAIRS,
+};
+enum oActionsDoor {
+    DOOR_ACT_CLOSED,
+    DOOR_ACT_PULLED,
+    DOOR_ACT_PUSHED,
+    DOOR_ACT_WARP_PULLED,
+    DOOR_ACT_WARP_PUSHED,
+};
+enum animIDsDoor {
+    DOOR_ANIM_CLOSED,
+    DOOR_ANIM_PULLED,
+    DOOR_ANIM_PUSHED,
+    DOOR_ANIM_WARP_PULLED,
+    DOOR_ANIM_WARP_PUSHED,
+};
 
 /* Star Door */
-    /* oAction */
-    #define STAR_DOOR_ACT_CLOSED                            0x0
-    #define STAR_DOOR_ACT_OPENING                           0x1
-    #define STAR_DOOR_ACT_OPEN                              0x2
-    #define STAR_DOOR_ACT_CLOSING                           0x3
-    #define STAR_DOOR_ACT_RESET                             0x4
-
+enum oActionsStarDoor {
+    STAR_DOOR_ACT_CLOSED,
+    STAR_DOOR_ACT_OPENING,
+    STAR_DOOR_ACT_OPEN,
+    STAR_DOOR_ACT_CLOSING,
+    STAR_DOOR_ACT_RESET,
+};
 /* Castle Trap Door */
     /* oAction */
     #define CASTLE_FLOOR_TRAP_ACT_OPEN_DETECT               0x0
@@ -944,7 +954,7 @@ enum oActionsMarioCap {
     #define JS_RING_SPAWNER_ACT_INACTIVE                    0x1
 
 /* Star General */
-enum BehParam1StarAct { // BPARAM1
+enum oBehParam1stByteStarAct { // BPARAM1
     STAR_BP_ACT_1,
     STAR_BP_ACT_2,
     STAR_BP_ACT_3,

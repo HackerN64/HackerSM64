@@ -748,7 +748,7 @@ s32 act_unlocking_key_door(struct MarioState *m) {
     }
 
     switch (m->marioObj->header.gfx.animInfo.animFrame) {
-        case 79:
+        case  79:
             play_sound(SOUND_GENERAL_DOOR_INSERT_KEY, m->marioObj->header.gfx.cameraToObject);
             break;
         case 111:
@@ -760,7 +760,7 @@ s32 act_unlocking_key_door(struct MarioState *m) {
     stop_and_set_height_to_floor(m);
 
     if (is_anim_at_end(m)) {
-        if (GET_BPARAM1(m->usedObj->oBehParams) == 0x1) {
+        if (GET_BPARAM1(m->usedObj->oBehParams) == KEY_DOOR_BP1_UPSTAIRS) {
             save_file_set_flags(SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR);
             save_file_clear_flags(SAVE_FLAG_HAVE_KEY_2);
         } else {
