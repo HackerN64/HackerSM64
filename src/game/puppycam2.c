@@ -951,6 +951,9 @@ const struct sPuppyAngles puppyAnglesNull = {
 static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) {
     Vec3i rel;
     s32 pos[2];
+#ifdef VISUAL_DEBUG
+    Vec3f debugPos[2];
+#endif
 
     if ((sPuppyVolumeStack[index]->room != gMarioCurrentRoom) && (sPuppyVolumeStack[index]->room != -1)) {
         return FALSE;
@@ -964,7 +967,6 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         pos[0] = ((rel[2] * sinrot) + (rel[0] * cosrot));
         pos[1] = ((rel[2] * cosrot) - (rel[0] * sinrot));
 #ifdef VISUAL_DEBUG
-        Vec3f debugPos[2];
         vec3f_set(debugPos[0], sPuppyVolumeStack[index]->pos[0],    sPuppyVolumeStack[index]->pos[1],    sPuppyVolumeStack[index]->pos[2]);
         vec3f_set(debugPos[1], sPuppyVolumeStack[index]->radius[0], sPuppyVolumeStack[index]->radius[1], sPuppyVolumeStack[index]->radius[2]);
         debug_box_color(COLOR_RGBA32_DEBUG_PUPPYVOLUME);
@@ -982,7 +984,6 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         vec3_diff(rel, sPuppyVolumeStack[index]->pos, &gPuppyCam.targetObj->oPosVec);
         f32 dist = (sqr(rel[0]) + sqr(rel[2]));
 #ifdef VISUAL_DEBUG
-        Vec3f debugPos[2];
         vec3s_to_vec3f(debugPos[0], sPuppyVolumeStack[index]->pos   );
         vec3s_to_vec3f(debugPos[1], sPuppyVolumeStack[index]->radius);
         debug_box_color(COLOR_RGBA32_DEBUG_PUPPYVOLUME);
