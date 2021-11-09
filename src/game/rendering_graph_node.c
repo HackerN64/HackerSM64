@@ -1066,7 +1066,6 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);
     }
     if ((node->objNode != NULL) && (node->objNode->header.gfx.sharedChild != NULL)) {
-        s32 hasAnimation = (node->objNode->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0;
         vec3_prod_val(translation, node->translation, 0.25f);
 
         mtxf_translate(mat, translation);
@@ -1088,7 +1087,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
         gCurrAnimType                       = ANIM_TYPE_NONE;
         gCurGraphNodeHeldObject             = (void *) node;
         if (node->objNode->header.gfx.animInfo.currAnim != NULL) {
-            geo_set_animation_globals(&node->objNode->header.gfx.animInfo, hasAnimation);
+            geo_set_animation_globals(&node->objNode->header.gfx.animInfo, ((node->objNode->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0));
         }
 
         geo_process_node_and_siblings(node->objNode->header.gfx.sharedChild);

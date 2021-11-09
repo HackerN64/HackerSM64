@@ -42,6 +42,7 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_ID_NOP_1E                     */ geo_layout_cmd_nop2,
     /*GEO_ID_NOP_1F                     */ geo_layout_cmd_nop3,
     /*GEO_ID_NODE_CULLING_RADIUS        */ geo_layout_cmd_node_culling_radius,
+    /*GEO_ID_NODE_BONE                  */ geo_layout_cmd_bone,
 };
 
 struct GraphNode      gObjParentGraphNode;
@@ -777,14 +778,7 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     gGeoLayoutStack[1] = 0;
 
     while (gGeoLayoutCommand != NULL) {
-        // Custom geo commands can be a part of the switch-case, otherwise use GeoLayoutJumpTable
-        switch (gGeoLayoutCommand[0x00]) {
-            case GEO_ID_BONE:
-                geo_layout_cmd_bone();
-                break;
-            default:
-                GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
-        }
+        GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
     }
 
     return gCurRootGraphNode;

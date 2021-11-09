@@ -534,7 +534,7 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
         temp += 4;
         temp2++;
     }
-    vec3_add(&dest[3][0], &b[3][0]);
+    vec3f_add(&dest[3][0], &b[3][0]);
     ((u32 *) dest)[15] = FLOAT_ONE;
 }
 
