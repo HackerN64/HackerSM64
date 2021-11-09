@@ -226,20 +226,20 @@ enum SurfaceTypes {
     SURFACE_TRAPDOOR,                   // 0x00FF // Bowser Left trapdoor, has no action defined
 };
 
-#define SURFACE_IS_NEW_WATER(cmd)               (cmd == SURFACE_NEW_WATER || cmd == SURFACE_NEW_WATER_BOTTOM)
-#define SURFACE_IS_QUICKSAND(cmd)               ((cmd >= SURFACE_SHALLOW_QUICKSAND && cmd <= SURFACE_MOVING_QUICKSAND) || cmd == SURFACE_INSTANT_MOVING_QUICKSAND)
-#define SURFACE_IS_NOT_HARD(cmd)                (cmd != SURFACE_HARD && !(cmd >= SURFACE_HARD_SLIPPERY && cmd <= SURFACE_HARD_NOT_SLIPPERY))
-#define SURFACE_IS_PAINTING_WOBBLE(cmd)         (cmd >= SURFACE_PAINTING_WOBBLE_A6 && cmd <= SURFACE_PAINTING_WOBBLE_D2)
-#define SURFACE_IS_PAINTING_WOBBLE_LEFT(cmd)    (((cmd - SURFACE_PAINTING_WOBBLE_A6) % 3) == 0)
-#define SURFACE_IS_PAINTING_WOBBLE_MIDDLE(cmd)  (((cmd - SURFACE_PAINTING_WOBBLE_A7) % 3) == 0)
-#define SURFACE_IS_PAINTING_WOBBLE_RIGHT(cmd)   (((cmd - SURFACE_PAINTING_WOBBLE_A8) % 3) == 0)
-#define SURFACE_IS_PAINTING_WARP(cmd)           (cmd >= SURFACE_PAINTING_WARP_D3 && cmd < SURFACE_WOBBLING_WARP) // skips SURFACE_WOBBLING_WARP
-#define SURFACE_IS_PAINTING_WARP_LEFT(cmd)      (((cmd - SURFACE_PAINTING_WARP_D3  ) % 3) == 0)
-#define SURFACE_IS_PAINTING_WARP_MIDDLE(cmd)    (((cmd - SURFACE_PAINTING_WARP_D4  ) % 3) == 0)
-#define SURFACE_IS_PAINTING_WARP_RIGHT(cmd)     (((cmd - SURFACE_PAINTING_WARP_D5  ) % 3) == 0)
-#define SURFACE_IS_INSTANT_WARP(cmd)            (cmd >= SURFACE_INSTANT_WARP_1B && cmd <= SURFACE_INSTANT_WARP_1E)
-#define SURFACE_IS_WARP(cmd)                    (SURFACE_IS_PAINTING_WARP(cmd) || SURFACE_IS_INSTANT_WARP(cmd) || cmd == SURFACE_LOOK_UP_WARP || cmd == SURFACE_WOBBLING_WARP)
-#define SURFACE_IS_UNSAFE(cmd)                  (SURFACE_IS_QUICKSAND(cmd) || cmd == SURFACE_BURNING || SURFACE_IS_WARP(cmd))
+#define SURFACE_IS_NEW_WATER(cmd)               (((cmd) == SURFACE_NEW_WATER) || ((cmd) == SURFACE_NEW_WATER_BOTTOM))
+#define SURFACE_IS_QUICKSAND(cmd)               ((((cmd) >= SURFACE_SHALLOW_QUICKSAND) && ((cmd) <= SURFACE_MOVING_QUICKSAND)) || ((cmd) == SURFACE_INSTANT_MOVING_QUICKSAND))
+#define SURFACE_IS_NOT_HARD(cmd)                (((cmd) != SURFACE_HARD) && !((cmd) >= SURFACE_HARD_SLIPPERY && ((cmd) <= SURFACE_HARD_NOT_SLIPPERY)))
+#define SURFACE_IS_PAINTING_WOBBLE(cmd)         (((cmd) >= SURFACE_PAINTING_WOBBLE_A6) && ((cmd) <= SURFACE_PAINTING_WOBBLE_D2))
+#define SURFACE_IS_PAINTING_WOBBLE_LEFT(cmd)    ((((cmd) - SURFACE_PAINTING_WOBBLE_A6) % 3) == 0)
+#define SURFACE_IS_PAINTING_WOBBLE_MIDDLE(cmd)  ((((cmd) - SURFACE_PAINTING_WOBBLE_A7) % 3) == 0)
+#define SURFACE_IS_PAINTING_WOBBLE_RIGHT(cmd)   ((((cmd) - SURFACE_PAINTING_WOBBLE_A8) % 3) == 0)
+#define SURFACE_IS_PAINTING_WARP(cmd)           (((cmd) >= SURFACE_PAINTING_WARP_D3) && ((cmd) < SURFACE_WOBBLING_WARP)) // skips SURFACE_WOBBLING_WARP
+#define SURFACE_IS_PAINTING_WARP_LEFT(cmd)      ((((cmd) - SURFACE_PAINTING_WARP_D3  ) % 3) == 0)
+#define SURFACE_IS_PAINTING_WARP_MIDDLE(cmd)    ((((cmd) - SURFACE_PAINTING_WARP_D4  ) % 3) == 0)
+#define SURFACE_IS_PAINTING_WARP_RIGHT(cmd)     ((((cmd) - SURFACE_PAINTING_WARP_D5  ) % 3) == 0)
+#define SURFACE_IS_INSTANT_WARP(cmd)            (((cmd) >= SURFACE_INSTANT_WARP_1B) && ((cmd) <= SURFACE_INSTANT_WARP_1E))
+#define SURFACE_IS_WARP(cmd)                    (((cmd) == SURFACE_LOOK_UP_WARP) || ((cmd) == SURFACE_WOBBLING_WARP) || SURFACE_IS_PAINTING_WARP(cmd) || SURFACE_IS_INSTANT_WARP(cmd))
+#define SURFACE_IS_UNSAFE(cmd)                  (((cmd) == SURFACE_BURNING) || SURFACE_IS_QUICKSAND(cmd) || SURFACE_IS_WARP(cmd))
 
 enum SurfaceClass {
     SURFACE_CLASS_DEFAULT,
@@ -248,9 +248,11 @@ enum SurfaceClass {
     SURFACE_CLASS_NOT_SLIPPERY
 };
 
-#define SURFACE_FLAGS_NONE            (0 << 0) // 0x0000
-#define SURFACE_FLAG_DYNAMIC          (1 << 0) // 0x0001
-#define SURFACE_FLAG_NO_CAM_COLLISION (1 << 1) // 0x0002
+enum SurfaceFlags {
+    SURFACE_FLAGS_NONE            = (0 << 0), // 0x0000
+    SURFACE_FLAG_DYNAMIC          = (1 << 0), // 0x0001
+    SURFACE_FLAG_NO_CAM_COLLISION = (1 << 1), // 0x0002
+};
 
 // These are effectively unique "surface" types like those defined higher
 // And they are used as collision commands to load certain functions

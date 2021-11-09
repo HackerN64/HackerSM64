@@ -40,7 +40,7 @@ s32 sSurfaceNodePoolSize = SURFACE_NODE_POOL_SIZE;
  */
 s32 sSurfacePoolSize = SURFACE_POOL_SIZE;
 
-u8 gSurfacePoolError = 0;
+u8 gSurfacePoolError = 0x0;
 
 /**
  * Allocate the part of the surface node pool to contain a surface node.
@@ -71,7 +71,7 @@ static struct Surface *alloc_surface(void) {
 
     surface->type   = SURFACE_DEFAULT;
     surface->force  = 0;
-    surface->flags  = 0;
+    surface->flags  = SURFACE_FLAGS_NONE;
     surface->room   = 0;
     surface->object = NULL;
 

@@ -371,16 +371,27 @@ s32 perform_ground_step(struct MarioState *m) {
     return stepResult;
 }
 
+// Horizontal dot product of surface normal
+#define hdot_surf(surf, vec) (((surf)->normal.x * (vec)[0]) + ((surf)->normal.z * (vec)[2]))
+
 struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *prevWall, struct Surface *wall, Vec3f intendedPos, Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
     struct Surface *returnedWall = wall;
-    if ((m->vel[1] > 0.0f) || (wall == NULL)) return NULL;
-    if (prevWall == NULL) prevWall = wall;
-    // Return the already grabbed wall if Mario is moving into it more than the newly tested wall
-    if (((prevWall->normal.x * m->vel[0]) + (prevWall->normal.z * m->vel[2])) < ((wall->normal.x * m->vel[0]) + (wall->normal.z * m->vel[2]))) returnedWall = prevWall;
-    f32 displacementX = (nextPos[0] - intendedPos[0]);
-    f32 displacementZ = (nextPos[2] - intendedPos[2]);
+    if ((m->vel[1] > 0.0f) || (wall == NULL)) {
+        return NULL;
+    }
+    if (prevWall == NULL) {
+        prevWall = wall;
+    }
+    // Return the already grabbed wall if Mario is moving into it more than the newly tested wall.
+    if (hdot_surf(prevWall, m->vel) < hdot_surf(wall, m->vel)) {
+        returnedWall = prevWall;
+    }
     // Only ledge grab if the wall displaced Mario in the opposite direction of his velocity.
-    if (((displacementX * m->vel[0]) + (displacementZ * m->vel[2])) > 0.0f) returnedWall = prevWall;
+    // hdot(displacement, vel).
+    if ((((nextPos[0] - intendedPos[0]) * m->vel[0])
+       + ((nextPos[2] - intendedPos[2]) * m->vel[2])) > 0.0f) {
+        returnedWall = prevWall;
+    }
     ledgePos[0] = (nextPos[0] - (wall->normal.x * 60.0f));
     ledgePos[2] = (nextPos[2] - (wall->normal.z * 60.0f));
     ledgePos[1] = find_floor(ledgePos[0], (nextPos[1] + 160.0f), ledgePos[2], ledgeFloor);
@@ -393,6 +404,8 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *prevWall,
     }
     return returnedWall;
 }
+
+#undef hdot_surf
 
 s32 bonk_or_hit_lava_wall(struct MarioState *m, struct WallCollisionData *wallData) {
     s16 i;
