@@ -607,6 +607,7 @@ struct GraphNode *geo_make_first_child(struct GraphNode *newFirstChild) {
     return parent;
 }
 
+#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 /**
  * Helper function for geo_call_global_function_nodes that recursively
  * traverses the scene graph and calls the functions of global nodes.
@@ -673,6 +674,7 @@ void geo_call_global_function_nodes(struct GraphNode *graphNode, s32 callContext
         gCurGraphNodeRoot = 0;
     }
 }
+#endif
 
 /**
  * When objects are cleared, this is called on all object nodes (loaded or unloaded).
