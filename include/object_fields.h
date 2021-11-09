@@ -962,7 +962,7 @@
 #define /*0x0F4*/ oSmokeTimer                                   OBJECT_FIELD_S32(0x1B)
 
 /* Snowman's Bottom */
-#define /*0x0F4*/ oSnowmansBottomRollingFacePitch               OBJECT_FIELD_F32(0x1B) //! scale?
+#define /*0x0F4*/ oSnowmansBottomScale                          OBJECT_FIELD_F32(0x1B)
 #define /*0x0F8*/ oSnowmansBottomTargetYaw                      OBJECT_FIELD_S32(0x1C)
 #define /*0x1AC*/ oSnowmansBottomHitCheckpointNearMario         OBJECT_FIELD_S32(0x49)
 // 0x1D-0x21 reserved for pathing

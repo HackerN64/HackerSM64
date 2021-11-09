@@ -1974,21 +1974,23 @@ enum AnimIDsPenguin { // Animations
     #define SNOW_MOUND_ACT_MOVE                             0x0
     #define SNOW_MOUND_ACT_SINK                             0x1
 
-/* Snowman Head */
-    /* oAction */
-    #define SNOWMANS_HEAD_ACT_ASK                           0x0
-    #define SNOWMANS_HEAD_ACT_NONE                          0x1
-    #define SNOWMANS_HEAD_ACT_JUMPING                       0x2
-    #define SNOWMANS_HEAD_ACT_LAND                          0x3
-    #define SNOWMANS_HEAD_ACT_THANK                         0x4
+/* Snowman's Head */
+enum oActionsSnowmansHead {
+    SNOWMANS_HEAD_ACT_ASK,
+    SNOWMANS_HEAD_ACT_NONE,
+    SNOWMANS_HEAD_ACT_JUMPING,
+    SNOWMANS_HEAD_ACT_LAND,
+    SNOWMANS_HEAD_ACT_THANK,
+};
 
-/* Snowman Bottom */
-    /* oAction */
-    #define SNOWMANS_BOTTOM_ACT_WAITING                     0x0
-    #define SNOWMANS_BOTTOM_ACT_FOLLOW_PATH                 0x1
-    #define SNOWMANS_BOTTOM_ACT_FINAL_STRETCH               0x2
-    #define SNOWMANS_BOTTOM_ACT_REACH_END                   0x3
-    #define SNOWMANS_BOTTOM_ACT_COLLISION                   0x4
+/* Snowman's Bottom */
+enum oActionsSnowmansBottom {
+    SNOWMANS_BOTTOM_ACT_WAITING,
+    SNOWMANS_BOTTOM_ACT_FOLLOW_PATH,
+    SNOWMANS_BOTTOM_ACT_FINAL_STRETCH,
+    SNOWMANS_BOTTOM_ACT_REACH_END,
+    SNOWMANS_BOTTOM_ACT_COLLISION,
+};
 
 /* Water Bomb Cannon */
     /* oBehParams2ndByte */
