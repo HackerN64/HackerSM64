@@ -122,6 +122,11 @@ enum DialogStates { // set_mario_npc_dialog
     MARIO_DIALOG_STATUS_SPEAK
 };
 
+enum EndToadAnimIndex {
+    END_TOAD_INDEX_WEST,
+    END_TOAD_INDEX_EAST,
+};
+
 void print_displaying_credits_entry(void);
 void bhv_end_peach_loop(void);
 void bhv_end_toad_loop(void);

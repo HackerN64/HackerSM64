@@ -1355,20 +1355,38 @@ enum oBehParams1stByteSlidingPlatform { // collisionDataIndex
     #define ARROW_LIFT_ACT_MOVING_BACK                      0x2
 
 /* Toad */
-    /* Animations */
-    #define TOAD_ANIM_0                                     0x0 //! anim name
-    #define TOAD_ANIM_6                                     0x6 //! anim name
+enum animIDsToad {
+    TOAD_ANIM_WEST_WAVE_THEN_TURN, // 1 frame
+    TOAD_ANIM_WEST_WALKING,
+    TOAD_ANIM_EAST_NOD_THEN_TURN,  // 1 frame
+    TOAD_ANIM_EAST_WALKING,
+    TOAD_ANIM_WEST_STANDING,
+    TOAD_ANIM_EAST_STANDING,
+    TOAD_ANIM_WEST_WAVING_BOTH_ARMS,
+    TOAD_ANIM_EAST_WAVING_ONE_ARM,
+};
 
 /* Intro Peach */
-    /* oAction */
-    #define PEACH_ACT_INIT                                  0x0
-    #define PEACH_ACT_FADE_1                                0x1
-    #define PEACH_ACT_UNFADE                                0x2
-    #define PEACH_ACT_FADE_2                                0x3
-    /* Animations */
-    #define PEACH_ANIM_0                                    0x0 //! anim name
-
-/* Yoshi */
+enum oActionsIntroPeach {
+    PEACH_ACT_INIT,
+    PEACH_ACT_FADE_1,
+    PEACH_ACT_UNFADE,
+    PEACH_ACT_FADE_2,
+};
+enum animIDsPeach { //! TODO: anim names 0-3 & 6-8
+    PEACH_ANIM_0,
+    PEACH_ANIM_1,
+    PEACH_ANIM_2,
+    PEACH_ANIM_3,
+    PEACH_ANIM_DESCEND_FROM_WINDOW,
+    PEACH_ANIM_LOOK_UP_AND_OPEN_EYES,
+    PEACH_ANIM_DIALOG_1_PART_1,
+    PEACH_ANIM_DIALOG_1_PART_2,
+    PEACH_ANIM_DIALOG_1_PART_3,
+    PEACH_ANIM_THANKS_TO_YOU,
+    PEACH_ANIM_KISS,
+    PEACH_ANIM_WAVING,
+};
 
 /* Yoshi */
     /* oAction */
