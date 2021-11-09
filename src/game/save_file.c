@@ -540,6 +540,10 @@ u32 save_file_get_max_coin_score(s32 courseIndex) {
     return ((maxScoreFileNum << 16) + MAX(maxCoinScore, 0));
 }
 
+#ifdef COMPLETE_SAVE_FILE
+s32 save_file_get_course_star_count(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
+    return 7;
+#else
 s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
     s32 i;
     s32 count = 0;
@@ -552,6 +556,7 @@ s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
         }
     }
     return count;
+#endif
 }
 
 s32 save_file_get_total_star_count(s32 fileIndex, s32 minCourse, s32 maxCourse) {
@@ -578,26 +583,49 @@ void save_file_clear_flags(u32 flags) {
 }
 
 u32 save_file_get_flags(void) {
+#ifdef COMPLETE_SAVE_FILE
+    return (SAVE_FLAG_FILE_EXISTS            |
+            SAVE_FLAG_HAVE_WING_CAP          |
+            SAVE_FLAG_HAVE_METAL_CAP         |
+            SAVE_FLAG_HAVE_VANISH_CAP        |
+            SAVE_FLAG_UNLOCKED_BASEMENT_DOOR |
+            SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR |
+            SAVE_FLAG_DDD_MOVED_BACK         |
+            SAVE_FLAG_MOAT_DRAINED           |
+            SAVE_FLAG_UNLOCKED_PSS_DOOR      |
+            SAVE_FLAG_UNLOCKED_WF_DOOR       |
+            SAVE_FLAG_UNLOCKED_CCM_DOOR      |
+            SAVE_FLAG_UNLOCKED_JRB_DOOR      |
+            SAVE_FLAG_UNLOCKED_BITDW_DOOR    |
+            SAVE_FLAG_UNLOCKED_BITFS_DOOR    |
+            SAVE_FLAG_UNLOCKED_50_STAR_DOOR  |
+            SAVE_FLAG_COLLECTED_TOAD_STAR_1  |
+            SAVE_FLAG_COLLECTED_TOAD_STAR_2  |
+            SAVE_FLAG_COLLECTED_TOAD_STAR_3  |
+            SAVE_FLAG_COLLECTED_MIPS_STAR_1  |
+            SAVE_FLAG_COLLECTED_MIPS_STAR_2);
+#else
     if ((gCurrCreditsEntry != NULL) || (gCurrDemoInput != NULL)) {
         return 0;
     }
     return gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags;
+#endif
 }
 
 /**
  * Return the bitset of obtained stars in the specified course.
  * If course is COURSE_NONE, return the bitset of obtained castle secret stars.
  */
+#ifdef COMPLETE_SAVE_FILE
+u32 save_file_get_star_flags(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
+    return 0x7F;
+#else
 u32 save_file_get_star_flags(s32 fileIndex, s32 courseIndex) {
-    u32 starFlags;
-
     if (courseIndex == COURSE_NUM_TO_INDEX(COURSE_NONE)) {
-        starFlags = SAVE_FLAG_TO_STAR_FLAG(gSaveBuffer.files[fileIndex][0].flags);
-    } else {
-        starFlags = (gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & 0x7F);
+        return SAVE_FLAG_TO_STAR_FLAG(gSaveBuffer.files[fileIndex][0].flags);
     }
-
-    return starFlags;
+    return (gSaveBuffer.files[fileIndex][0].courseStars[courseIndex] & 0x7F);
+#endif
 }
 
 /**
@@ -615,15 +643,24 @@ void save_file_set_star_flags(s32 fileIndex, s32 courseIndex, u32 starFlags) {
     gSaveFileModified = TRUE;
 }
 
+#ifdef COMPLETE_SAVE_FILE
+s32 save_file_get_course_coin_score(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
+    return MAX_NUM_COINS;
+#else
 s32 save_file_get_course_coin_score(s32 fileIndex, s32 courseIndex) {
     return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
+#endif
 }
 
 /**
  * Return TRUE if the cannon is unlocked in the current course.
  */
 s32 save_file_is_cannon_unlocked(void) {
+#ifdef UNLOCK_ALL
+    return TRUE;
+#else
     return ((gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] & COURSE_FLAG_CANNON_UNLOCKED) != 0);
+#endif
 }
 
 /**
@@ -631,7 +668,7 @@ s32 save_file_is_cannon_unlocked(void) {
  */
 void save_file_set_cannon_unlocked(void) {
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] |= COURSE_FLAG_CANNON_UNLOCKED;
-    gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
+    gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags                       |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
 }
 
@@ -669,9 +706,9 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
 #ifdef SAVE_NUM_LIVES
 void save_file_set_num_lives(s8 numLives) {
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
-    saveFile->numLives = numLives;
-    saveFile->flags |= SAVE_FLAG_FILE_EXISTS;
-    gSaveFileModified = TRUE;
+    saveFile->numLives        = numLives;
+    saveFile->flags          |= SAVE_FLAG_FILE_EXISTS;
+    gSaveFileModified         = TRUE;
 }
 
 s32 save_file_get_num_lives(void) {

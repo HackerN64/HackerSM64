@@ -73,13 +73,12 @@ static void spiny_act_walk(void) {
                 o->oSpinyTurningAwayFromWall =
                     obj_resolve_collisions_and_turn(o->oSpinyTargetYaw, 0x80);
             } else {
-                if (!(o->oSpinyTurningAwayFromWall =
-                          obj_bounce_off_walls_edges_objects(&o->oSpinyTargetYaw))) {
+                if (!(o->oSpinyTurningAwayFromWall = obj_bounce_off_walls_edges_objects(&o->oSpinyTargetYaw))) {
                     // Walk and occasionally randomly change direction
                     if (o->oSpinyTimeUntilTurn != 0) {
                         o->oSpinyTimeUntilTurn--;
                     } else {
-                        o->oSpinyTargetYaw = o->oMoveAngleYaw + (s16) random_sign() * 0x2000;
+                        o->oSpinyTargetYaw = (o->oMoveAngleYaw + ((s16) random_sign() * 0x2000));
                         o->oSpinyTimeUntilTurn = random_linear_offset(100, 100);
                     }
                 }
@@ -98,7 +97,7 @@ static void spiny_act_walk(void) {
             // When attacked by mario, lessen the knockback
             o->oAction = SPINY_ACT_WALK;
             o->oForwardVel *= 0.1f;
-            o->oVelY *= 0.7f;
+            o->oVelY       *= 0.7f;
 
             o->oMoveFlags = 0; // weird flex but okay
 
@@ -118,8 +117,8 @@ static void spiny_act_held_by_lakitu(void) {
     o->oGraphYOffset = 15.0f;
     cur_obj_init_animation_with_sound(0);
 
-    o->oParentRelativePosX = -50.0f;
-    o->oParentRelativePosY = 35.0f;
+    o->oParentRelativePosX =  -50.0f;
+    o->oParentRelativePosY =   35.0f;
     o->oParentRelativePosZ = -100.0f;
 
     if (o->parentObj->prevObj == NULL) {
@@ -127,8 +126,7 @@ static void spiny_act_held_by_lakitu(void) {
         o->oMoveAngleYaw = o->parentObj->oFaceAngleYaw;
 
         // Move more quickly if the lakitu is moving forward
-        o->oForwardVel =
-            o->parentObj->oForwardVel * coss(o->oMoveAngleYaw - o->parentObj->oMoveAngleYaw) + 10.0f;
+        o->oForwardVel = ((o->parentObj->oForwardVel * coss(o->oMoveAngleYaw - o->parentObj->oMoveAngleYaw)) + 10.0f);
         o->oVelY = 30.0f;
 
         o->oMoveFlags = 0; // you do you, spiny
@@ -161,7 +159,7 @@ static void spiny_act_thrown_by_lakitu(void) {
 
         cur_obj_move_standard(-78);
 
-        if (obj_check_attacks(&sSpinyHitbox, o->oAction) != 0 && o->parentObj != o) {
+        if ((obj_check_attacks(&sSpinyHitbox, o->oAction) != 0) && (o->parentObj != o)) {
             o->parentObj->oEnemyLakituNumSpinies--;
         }
     }

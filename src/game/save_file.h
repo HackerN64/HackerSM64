@@ -108,7 +108,9 @@ extern u8 gCurrCourseStarFlags;
 extern u8 gSpecialTripleJump;
 extern s8 gLevelToCourseNumTable[];
 
-#define COURSE_FLAG_CANNON_UNLOCKED      /* 0x00000080 */ (1 <<  7)
+enum CourseFlags {
+    COURSE_FLAG_CANNON_UNLOCKED      = (1 <<  7), /* 0x00000080 */
+};
 
 // game progress flags
 enum SaveProgressFlags {

@@ -43,6 +43,10 @@
 // Open all courses and doors. Used for debugging purposes to unlock all content.
 #define UNLOCK_ALL
 
+// Same as above, but also reads all save file flags as complete.
+// This will not overwrite existing save file data unless you save over it.
+//#define COMPLETE_SAVE_FILE
+
 // Removes the limit on FPS
 //#define UNLOCK_FPS
 
@@ -51,6 +55,10 @@
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
 
+#ifdef COMPLETE_SAVE_FILE
+#define UNLOCK_ALL
+#endif // COMPLETE_SAVE_FILE
+
 #ifdef DEBUG_ALL
 #define DEBUG_LEVEL_SELECT
 #define ENABLE_DEBUG_FREE_MOVE
@@ -58,6 +66,7 @@
 #define PUPPYPRINT_DEBUG 1
 #define VISUAL_DEBUG
 #define UNLOCK_ALL
+#define COMPLETE_SAVE_FILE
 #endif // DEBUG_ALL
 
 #ifdef DISABLE_ALL
@@ -71,5 +80,6 @@
 #undef PUPPYPRINT_DEBUG_CYCLES
 #undef VISUAL_DEBUG
 #undef UNLOCK_ALL
+#undef COMPLETE_SAVE_FILE
 #undef DEBUG_FORCE_CRASH_ON_BOOT
 #endif // DISABLE_ALL

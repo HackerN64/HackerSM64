@@ -46,7 +46,7 @@ void bhv_rotating_exclamation_mark_loop(void) {
 }
 
 void exclamation_box_act_init(void) {
-    if (o->oBehParams2ndByte < 3) {
+    if (o->oBehParams2ndByte < EXCLAMATION_BOX_BP_KOOPA_SHELL) {
         o->oAnimState = o->oBehParams2ndByte;
         if ((save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte]) || GET_BPARAM1(o->oBehParams) != 0x00) {
             o->oAction = EXCLAMATION_BOX_ACT_ACTIVE;

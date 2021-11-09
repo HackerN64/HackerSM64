@@ -140,7 +140,6 @@ void bhv_coin_formation_spawned_coin_loop(void) {
     if (o->oTimer == 0) {
         cur_obj_set_behavior(bhvYellowCoin);
         obj_set_hitbox(o, &sYellowCoinHitbox);
-        bhv_init_room();
         if (o->oCoinSnapToGround) {
             o->oPosY += 300.0f;
             cur_obj_update_floor_height();

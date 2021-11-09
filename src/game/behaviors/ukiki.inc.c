@@ -464,7 +464,8 @@ void ukiki_free_loop(void) {
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sUkikiActions);
 
-    if (o->oAction == UKIKI_ACT_GO_TO_CAGE || o->oAction == UKIKI_ACT_RETURN_HOME) {
+    if ((o->oAction == UKIKI_ACT_GO_TO_CAGE)
+     || (o->oAction == UKIKI_ACT_RETURN_HOME)) {
         steepSlopeAngleDegrees = -88;
     } else {
         steepSlopeAngleDegrees = -20;
