@@ -471,43 +471,43 @@ inline s32 absi(s32 in) {
 
 #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
 
-f32 min_3f(f32 a0, f32 a1, f32 a2);
-s32 min_3i(s32 a0, s32 a1, s32 a2);
-s32 min_3s(s16 a0, s16 a1, s16 a2);
-f32 max_3f(f32 a0, f32 a1, f32 a2);
-s32 max_3i(s32 a0, s32 a1, s32 a2);
-s32 max_3s(s16 a0, s16 a1, s16 a2);
+f32  min_3f(   f32 a, f32 b, f32 c);
+s32  min_3i(   s32 a, s32 b, s32 c);
+s32  min_3s(   s16 a, s16 b, s16 c);
+f32  max_3f(   f32 a, f32 b, f32 c);
+s32  max_3i(   s32 a, s32 b, s32 c);
+s32  max_3s(   s16 a, s16 b, s16 c);
 void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max);
 
-void vec3f_copy    (Vec3f dest, Vec3f src);
-void vec3i_copy    (Vec3i dest, Vec3i src);
-void vec3s_copy    (Vec3s dest, Vec3s src);
-void vec3s_to_vec3i(Vec3i dest, Vec3s src);
-void vec3s_to_vec3f(Vec3f dest, Vec3s src);
-void vec3i_to_vec3s(Vec3s dest, Vec3i src);
-void vec3i_to_vec3f(Vec3f dest, Vec3i src);
-void vec3f_to_vec3s(Vec3s dest, Vec3f src);
-void vec3f_to_vec3i(Vec3i dest, Vec3f src);
+void vec3f_copy    (Vec3f dest, const Vec3f src);
+void vec3i_copy    (Vec3i dest, const Vec3i src);
+void vec3s_copy    (Vec3s dest, const Vec3s src);
+void vec3s_to_vec3i(Vec3i dest, const Vec3s src);
+void vec3s_to_vec3f(Vec3f dest, const Vec3s src);
+void vec3i_to_vec3s(Vec3s dest, const Vec3i src);
+void vec3i_to_vec3f(Vec3f dest, const Vec3i src);
+void vec3f_to_vec3s(Vec3s dest, const Vec3f src);
+void vec3f_to_vec3i(Vec3i dest, const Vec3f src);
 
-void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z);
-void vec3i_set(Vec3i dest, s32 x, s32 y, s32 z);
-void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z);
+void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z);
+void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z);
+void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z);
 
-void vec3f_add (Vec3f dest, Vec3f a         );
-void vec3i_add (Vec3i dest, Vec3i a         );
-void vec3s_add (Vec3s dest, Vec3s a         );
-void vec3f_sum (Vec3f dest, Vec3f a, Vec3f b);
-void vec3i_sum (Vec3i dest, Vec3i a, Vec3i b);
-void vec3s_sum (Vec3s dest, Vec3s a, Vec3s b);
-void vec3f_sub (Vec3f dest, Vec3f a         );
-void vec3i_sub (Vec3i dest, Vec3i a         );
-void vec3s_sub (Vec3s dest, Vec3s a         );
-void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b);
-void vec3i_diff(Vec3i dest, Vec3i a, Vec3i b);
-void vec3s_diff(Vec3s dest, Vec3s a, Vec3s b);
+void vec3f_add (Vec3f dest, const Vec3f a               );
+void vec3i_add (Vec3i dest, const Vec3i a               );
+void vec3s_add (Vec3s dest, const Vec3s a               );
+void vec3f_sum (Vec3f dest, const Vec3f a, const Vec3f b);
+void vec3i_sum (Vec3i dest, const Vec3i a, const Vec3i b);
+void vec3s_sum (Vec3s dest, const Vec3s a, const Vec3s b);
+void vec3f_sub (Vec3f dest, const Vec3f a               );
+void vec3i_sub (Vec3i dest, const Vec3i a               );
+void vec3s_sub (Vec3s dest, const Vec3s a               );
+void vec3f_diff(Vec3f dest, const Vec3f a, const Vec3f b);
+void vec3i_diff(Vec3i dest, const Vec3i a, const Vec3i b);
+void vec3s_diff(Vec3s dest, const Vec3s a, const Vec3s b);
 
-f32  vec3f_dot(Vec3f a, Vec3f b);
-void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b);
+f32  vec3f_dot(              const Vec3f a, const Vec3f b);
+void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b);
 void vec3f_normalize(Vec3f dest);
 void mtxf_copy(Mat4 dest, Mat4 src);
 void mtxf_identity(Mat4 mtx);

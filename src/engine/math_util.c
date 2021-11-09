@@ -31,9 +31,9 @@ Vec3s gVec3sOne  = {     1,     1,     1 };
     if (a2 < a0) a0 = a2;       \
     return a0;                  \
 }
-f32 min_3f(f32 a0, f32 a1, f32 a2) { min_3_func(a0, a1, a2) }
-s32 min_3i(s32 a0, s32 a1, s32 a2) { min_3_func(a0, a1, a2) }
-s32 min_3s(s16 a0, s16 a1, s16 a2) { min_3_func(a0, a1, a2) }
+f32 min_3f(f32 a, f32 b, f32 c) { min_3_func(a, b, c) }
+s32 min_3i(s32 a, s32 b, s32 c) { min_3_func(a, b, c) }
+s32 min_3s(s16 a, s16 b, s16 c) { min_3_func(a, b, c) }
 
 /// Returns the highest of three values.
 #define max_3_func(a0, a1, a2) {\
@@ -41,9 +41,9 @@ s32 min_3s(s16 a0, s16 a1, s16 a2) { min_3_func(a0, a1, a2) }
     if (a2 > a0) a0 = a2;       \
     return a0;                  \
 }
-f32 max_3f(f32 a0, f32 a1, f32 a2) { max_3_func(a0, a1, a2) }
-s32 max_3i(s32 a0, s32 a1, s32 a2) { max_3_func(a0, a1, a2) }
-s32 max_3s(s16 a0, s16 a1, s16 a2) { max_3_func(a0, a1, a2) }
+f32 max_3f(f32 a, f32 b, f32 c) { max_3_func(a, b, c) }
+s32 max_3i(s32 a, s32 b, s32 c) { max_3_func(a, b, c) }
+s32 max_3s(s16 a, s16 b, s16 c) { max_3_func(a, b, c) }
 
 /// A combination of the above.
 void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max) {
@@ -67,13 +67,13 @@ void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max) {
     ((destFmt *) dest)[1] = y;                       \
     ((destFmt *) dest)[2] = z;                       \
 }
-void vec3f_copy    (Vec3f dest, Vec3f src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
-void vec3i_copy    (Vec3i dest, Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
-void vec3s_copy    (Vec3s dest, Vec3s src) { vec3_copy_bits(s16, dest, s16, src); } // 16 -> 16
-void vec3s_to_vec3i(Vec3i dest, Vec3s src) { vec3_copy_bits(s32, dest, s16, src); } // 16 -> 32
-void vec3s_to_vec3f(Vec3f dest, Vec3s src) { vec3_copy_bits(f32, dest, s16, src); } // 16 -> 32
-void vec3i_to_vec3s(Vec3s dest, Vec3i src) { vec3_copy_bits(s16, dest, s32, src); } // 32 -> 16
-void vec3i_to_vec3f(Vec3f dest, Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
+void vec3f_copy    (Vec3f dest, const Vec3f src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
+void vec3i_copy    (Vec3i dest, const Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
+void vec3s_copy    (Vec3s dest, const Vec3s src) { vec3_copy_bits(s16, dest, s16, src); } // 16 -> 16
+void vec3s_to_vec3i(Vec3i dest, const Vec3s src) { vec3_copy_bits(s32, dest, s16, src); } // 16 -> 32
+void vec3s_to_vec3f(Vec3f dest, const Vec3s src) { vec3_copy_bits(f32, dest, s16, src); } // 16 -> 32
+void vec3i_to_vec3s(Vec3s dest, const Vec3i src) { vec3_copy_bits(s16, dest, s32, src); } // 32 -> 16
+void vec3i_to_vec3f(Vec3f dest, const Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
 
 /**
  * Convert float vector a to a short vector 'dest' by rounding the components
@@ -87,13 +87,13 @@ void vec3i_to_vec3f(Vec3f dest, Vec3i src) { vec3_copy_bits(s32, dest, s32, src)
     ((destFmt *) dest)[1] = y;                      \
     ((destFmt *) dest)[2] = z;                      \
 }
-void vec3f_to_vec3s(Vec3s dest, Vec3f src) { vec3_copy_bits_roundf(s16, dest, src); } // 32 -> 16
-void vec3f_to_vec3i(Vec3i dest, Vec3f src) { vec3_copy_bits_roundf(s32, dest, src); } // 32 -> 32
+void vec3f_to_vec3s(Vec3s dest, const Vec3f src) { vec3_copy_bits_roundf(s16, dest, src); } // 32 -> 16
+void vec3f_to_vec3i(Vec3i dest, const Vec3f src) { vec3_copy_bits_roundf(s32, dest, src); } // 32 -> 32
 
 /// Set vector 'dest' to (x, y, z)
-inline void vec3f_set(Vec3f dest, f32 x, f32 y, f32 z) { vec3_set(dest, x, y, z); }
-inline void vec3i_set(Vec3i dest, s32 x, s32 y, s32 z) { vec3_set(dest, x, y, z); }
-inline void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z) { vec3_set(dest, x, y, z); }
+inline void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z) { vec3_set(dest, x, y, z); }
+inline void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z) { vec3_set(dest, x, y, z); }
+inline void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z) { vec3_set(dest, x, y, z); }
 
 /// Add vector 'a' to 'dest'
 #define vec3_add_func(fmt, dest, a) {   \
@@ -108,9 +108,9 @@ inline void vec3s_set(Vec3s dest, s16 x, s16 y, s16 z) { vec3_set(dest, x, y, z)
         temp[-1] = (sum + sum2);        \
     }                                   \
 }
-void vec3f_add(Vec3f dest, Vec3f a) { vec3_add_func(f32, dest, a); }
-void vec3i_add(Vec3i dest, Vec3i a) { vec3_add_func(s32, dest, a); }
-void vec3s_add(Vec3s dest, Vec3s a) { vec3_add_func(s16, dest, a); }
+void vec3f_add(Vec3f dest, const Vec3f a) { vec3_add_func(f32, dest, a); }
+void vec3i_add(Vec3i dest, const Vec3i a) { vec3_add_func(s32, dest, a); }
+void vec3s_add(Vec3s dest, const Vec3s a) { vec3_add_func(s16, dest, a); }
 
 /// Make 'dest' the sum of vectors a and b.
 #define vec3_sum_func(fmt, dest, a, b) {\
@@ -126,28 +126,28 @@ void vec3s_add(Vec3s dest, Vec3s a) { vec3_add_func(s16, dest, a); }
         temp++;                         \
     }                                   \
 }
-void vec3f_sum(Vec3f dest, Vec3f a, Vec3f b) { vec3_sum_func(f32, dest, a, b); }
-void vec3i_sum(Vec3i dest, Vec3i a, Vec3i b) { vec3_sum_func(s32, dest, a, b); }
-void vec3s_sum(Vec3s dest, Vec3s a, Vec3s b) { vec3_sum_func(s16, dest, a, b); }
+void vec3f_sum(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_sum_func(f32, dest, a, b); }
+void vec3i_sum(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_sum_func(s32, dest, a, b); }
+void vec3s_sum(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_sum_func(s16, dest, a, b); }
 
 
 /// Make 'dest' the difference of vectors a and b.
-void vec3f_diff(Vec3f dest, Vec3f a, Vec3f b) { vec3_diff(dest, a, b); }
-void vec3i_diff(Vec3i dest, Vec3i a, Vec3i b) { vec3_diff(dest, a, b); }
-void vec3s_diff(Vec3s dest, Vec3s a, Vec3s b) { vec3_diff(dest, a, b); }
+void vec3f_diff(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_diff(dest, a, b); }
+void vec3i_diff(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_diff(dest, a, b); }
+void vec3s_diff(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_diff(dest, a, b); }
 
 /// Subtract vector a from 'dest'
-void vec3f_sub(Vec3f dest, Vec3f a) { vec3_sub(dest, a); }
-void vec3i_sub(Vec3i dest, Vec3i a) { vec3_sub(dest, a); }
-void vec3s_sub(Vec3s dest, Vec3s a) { vec3_sub(dest, a); }
+void vec3f_sub(Vec3f dest, const Vec3f a) { vec3_sub(dest, a); }
+void vec3i_sub(Vec3i dest, const Vec3i a) { vec3_sub(dest, a); }
+void vec3s_sub(Vec3s dest, const Vec3s a) { vec3_sub(dest, a); }
 
 
-f32 vec3f_dot(Vec3f a, Vec3f b) {
+f32 vec3f_dot(const Vec3f a, const Vec3f b) {
     return vec3_dot(a, b);
 }
 
 /// Make vector 'dest' the cross product of vectors a and b.
-void vec3f_cross(Vec3f dest, Vec3f a, Vec3f b) {
+void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b) {
     vec3_cross(dest, a, b);
 }
 
