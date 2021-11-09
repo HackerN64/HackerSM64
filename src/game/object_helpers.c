@@ -550,22 +550,14 @@ void cur_obj_set_pos_relative(struct Object *other, f32 dleft, f32 dy, f32 dforw
     o->oPosZ = (other->oPosZ + dz);
 }
 
-void cur_obj_set_pos_relative_to_parent(f32 dleft, f32 dy, f32 dforward) {
-    cur_obj_set_pos_relative(o->parentObj, dleft, dy, dforward);
-}
-
-void cur_obj_unused_init_on_floor(void) {
+UNUSED void cur_obj_unused_init_on_floor(void) {
     cur_obj_enable_rendering();
 
     o->oPosY = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
     if (o->oPosY < FLOOR_LOWER_LIMIT_MISC) {
-        cur_obj_set_pos_relative_to_parent(0.0f, 0.0f, -70.0f);
+        cur_obj_set_pos_relative(o->parentObj, 0.0f, 0.0f, -70.0f);
         o->oPosY = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
     }
-}
-
-void obj_set_face_angle_to_move_angle(struct Object *obj) {
-    vec3i_copy(&obj->oFaceAngleVec, &obj->oMoveAngleVec);
 }
 
 u32 get_object_list_from_behavior(const BehaviorScript *behavior) {
@@ -784,7 +776,7 @@ static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
 void cur_obj_get_thrown_or_placed(f32 forwardVel, f32 velY, s32 thrownAction) {
     if (o->behavior == segmented_to_virtual(bhvBowser)) {
         // Interestingly, when bowser is thrown, he is offset slightly to Mario's right
-        cur_obj_set_pos_relative_to_parent(-41.684f, 85.859f, 321.577f);
+        cur_obj_set_pos_relative(o->parentObj, -41.684f, 85.859f, 321.577f);
     }
 
     cur_obj_become_tangible();

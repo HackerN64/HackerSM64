@@ -218,11 +218,9 @@ void bhv_bob_pit_bowling_ball_init(void) {
 }
 
 void bhv_bob_pit_bowling_ball_loop(void) {
-    struct Surface *floor;
     object_step();
 
-    find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
-    if ((floor != NULL) && (floor->normal.x == 0) && (floor->normal.z == 0)) {
+    if ((o->oFloor != NULL) && (o->oFloor->normal.x == 0) && (o->oFloor->normal.z == 0)) {
         o->oForwardVel = 28.0f;
     }
     bowling_ball_set_hitbox();

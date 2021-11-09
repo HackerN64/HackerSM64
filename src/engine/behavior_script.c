@@ -38,6 +38,7 @@ UNUSED static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
     gCurrentObject->bhvStackIndex = 0;
 }
 
+//! TODO: Move these three functions to math_util.c
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
 u32 random_u16(void) {
     if (gRandomSeed16 == 22026) {
@@ -895,8 +896,8 @@ void cur_obj_update(void) {
 
     // If the object's action has changed, reset the action timer.
     if (o->oAction != o->oPrevAction) {
-        o->oTimer = 0;
-        o->oSubAction = 0;
+        o->oTimer      = 0;
+        o->oSubAction  = 0;
         o->oPrevAction = o->oAction;
     }
 
@@ -904,7 +905,7 @@ void cur_obj_update(void) {
     objFlags = o->oFlags;
 
     if (objFlags & OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE) {
-        obj_set_face_angle_to_move_angle(o);
+        vec3i_copy(&o->oFaceAngleVec, &o->oMoveAngleVec);
     }
 
     if (objFlags & OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW) {

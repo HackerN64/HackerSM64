@@ -113,8 +113,6 @@ void cur_obj_disable_rendering(void);
 void cur_obj_unhide(void);
 void cur_obj_hide(void);
 void cur_obj_set_pos_relative(struct Object *other, f32 dleft, f32 dy, f32 dforward);
-void cur_obj_set_pos_relative_to_parent(f32 dleft, f32 dy, f32 dforward);
-void obj_set_face_angle_to_move_angle(struct Object *obj);
 u32 get_object_list_from_behavior(const BehaviorScript *behavior);
 struct Object *cur_obj_nearest_object_with_behavior(const BehaviorScript *behavior);
 f32 cur_obj_dist_to_nearest_object_with_behavior(const BehaviorScript* behavior);

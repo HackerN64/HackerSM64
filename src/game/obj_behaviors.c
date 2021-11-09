@@ -164,9 +164,7 @@ s32 turn_obj_away_from_steep_floor(struct Surface *objFloor, f32 floorY, f32 obj
         return FALSE;
     }
 
-    floor_n[0] = objFloor->normal.x;
-    floor_n[1] = objFloor->normal.y;
-    floor_n[2] = objFloor->normal.z;
+    vec3f_set(floor_n, objFloor->normal.x, objFloor->normal.y, objFloor->normal.z);
 
     // If the floor is steep and we are below it (i.e. walking into it), turn away from the floor.
     if ((floor_n[1] < 0.5f) && (floorY > o->oPosY)) {
@@ -384,6 +382,8 @@ s32 object_step(void) {
     }
 
     f32 floorY = find_floor(nextX, pos[1], nextZ, &sObjFloor);
+    o->oFloor       = sObjFloor;
+    o->oFloorHeight = floorY;
     if (turn_obj_away_from_steep_floor(sObjFloor, floorY, objVelX, objVelZ)) {
         waterY = find_water_level(nextX, nextZ);
         if (waterY > pos[1]) {

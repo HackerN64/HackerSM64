@@ -1491,28 +1491,31 @@ struct SoundState sBowserSoundStates[] = {
 /**
  * Set whenever Bowser should have rainbow light or not on each stage
  */
-s8 sBowserRainbowLight[] = { FALSE, FALSE, TRUE };
+s8 sBowserRainbowLight[] = {
+    FALSE, FALSE, TRUE
+};
 
 /**
  * Set how much health Bowser has on each stage
  */
-s8 sBowserHealth[] = { 1, 1, 3 };
+s8 sBowserHealth[] = {
+    1, 1, 3
+};
 
 /**
  * Update Bowser's actions when he's hands free
  */
 void bowser_free_update(void) {
-    struct Surface *floor;
-    struct Object *platform;
+    struct Object *platform = o->platform;
 #ifdef PLATFORM_DISPLACEMENT_2
     s16 tmpOFaceAngleYaw = (s16) o->oFaceAngleYaw;
-    if ((platform = o->platform) != NULL) {
+    if (platform != NULL) {
         // NOTE: This function was at one point using '&o->oFaceAngleYaw', which is a s32 address. Should tmpOFaceAngleYaw be using the first 16 bits instead, or was that a bug?
         apply_platform_displacement(&sBowserDisplacementInfo, &o->oPosVec, &tmpOFaceAngleYaw, platform);
         o->oFaceAngleYaw = tmpOFaceAngleYaw;
     }
 #else
-    if ((platform = o->platform) != NULL) {
+    if (platform != NULL) {
         apply_platform_displacement(FALSE, platform);
     }
 #endif
@@ -1527,9 +1530,8 @@ void bowser_free_update(void) {
         o->oAction = BOWSER_ACT_JUMP_ONTO_STAGE;
     }
     // Check floor height and platform
-    find_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
-    if ((floor != NULL) && (floor->object != NULL)) {
-        o->platform = floor->object;
+    if ((o->oFloor != NULL) && (o->oFloor->object != NULL)) {
+        o->platform = o->oFloor->object;
     } else {
         o->platform = NULL;
     }
