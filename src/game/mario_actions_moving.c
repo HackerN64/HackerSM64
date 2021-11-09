@@ -505,34 +505,36 @@ void anim_and_audio_for_walk(struct MarioState *m) {
         animSpeed = (s32)((intendedSpeed / 4.0f) * 0x10000);
         set_mario_anim_with_accel(m, MARIO_ANIM_MOVE_IN_QUICKSAND, animSpeed);
         play_step_sound(m, 19, 93);
-        m->actionTimer = 0;
+        m->actionTimer = WALK_SPEED_START_TIPTOE;
     } else {
         while (inLoop) {
             switch (m->actionTimer) {
-                case 0:
+                case WALK_SPEED_START_TIPTOE:
                     if (intendedSpeed > 8.0f) {
-                        m->actionTimer = 2;
+                        m->actionTimer = WALK_SPEED_WALKING;
                     } else {
                         //! (Speed Crash) If Mario's speed is more than 2^17.
-                        if ((animSpeed = (s32)((intendedSpeed / 4.0f) * 0x10000)) < 0x1000) {
+                        animSpeed = (s32)((intendedSpeed / 4.0f) * 0x10000);
+                        if (animSpeed < 0x1000) {
                             animSpeed = 0x1000;
                         }
                         set_mario_anim_with_accel(m, MARIO_ANIM_START_TIPTOE, animSpeed);
                         play_step_sound(m, 7, 22);
                         if (is_anim_past_frame(m, 23)) {
-                            m->actionTimer = 2;
+                            m->actionTimer = WALK_SPEED_WALKING;
                         }
 
                         inLoop = FALSE;
                     }
                     break;
 
-                case 1:
+                case WALK_SPEED_TIPTOE:
                     if (intendedSpeed > 8.0f) {
-                        m->actionTimer = 2;
+                        m->actionTimer = WALK_SPEED_WALKING;
                     } else {
                         //! (Speed Crash) If Mario's speed is more than 2^17.
-                        if ((animSpeed = (s32)(intendedSpeed * 0x10000)) < 0x1000) {
+                        animSpeed = (s32)(intendedSpeed * 0x10000);
+                        if (animSpeed < 0x1000) {
                             animSpeed = 0x1000;
                         }
                         set_mario_anim_with_accel(m, MARIO_ANIM_TIPTOE, animSpeed);
@@ -542,11 +544,11 @@ void anim_and_audio_for_walk(struct MarioState *m) {
                     }
                     break;
 
-                case 2:
+                case WALK_SPEED_WALKING:
                     if (intendedSpeed < 5.0f) {
-                        m->actionTimer = 1;
+                        m->actionTimer = WALK_SPEED_TIPTOE;
                     } else if (intendedSpeed > 22.0f) {
-                        m->actionTimer = 3;
+                        m->actionTimer = WALK_SPEED_RUNNING;
                     } else {
                         //! (Speed Crash) If Mario's speed is more than 2^17.
                         animSpeed = (s32)((intendedSpeed / 4.0f) * 0x10000);
@@ -557,9 +559,9 @@ void anim_and_audio_for_walk(struct MarioState *m) {
                     }
                     break;
 
-                case 3:
+                case WALK_SPEED_RUNNING:
                     if (intendedSpeed < 18.0f) {
-                        m->actionTimer = 2;
+                        m->actionTimer = WALK_SPEED_WALKING;
                     } else {
                         //! (Speed Crash) If Mario's speed is more than 2^17.
                         animSpeed = (s32)((intendedSpeed / 4.0f) * 0x10000);
@@ -574,8 +576,7 @@ void anim_and_audio_for_walk(struct MarioState *m) {
         }
     }
 
-    marioObj->oMarioWalkingPitch =
-        (s16) approach_s32_symmetric(marioObj->oMarioWalkingPitch, targetPitch, 0x800);
+    marioObj->oMarioWalkingPitch = approach_s32_symmetric(marioObj->oMarioWalkingPitch, targetPitch, 0x800);
     marioObj->header.gfx.angle[0] = marioObj->oMarioWalkingPitch;
 }
 
@@ -590,9 +591,9 @@ void anim_and_audio_for_hold_walk(struct MarioState *m) {
 
     while (inLoop) {
         switch (m->actionTimer) {
-            case 0:
+            case HOLD_WALK_SPEED_SLOW:
                 if (intendedSpeed > 6.0f) {
-                    m->actionTimer = 1;
+                    m->actionTimer = HOLD_WALK_SPEED_WALKING;
                 } else {
                     //! (Speed Crash) Crashes if Mario's speed exceeds or equals 2^15.
                     animSpeed = (s32)(intendedSpeed * 0x10000);
@@ -603,11 +604,11 @@ void anim_and_audio_for_hold_walk(struct MarioState *m) {
                 }
                 break;
 
-            case 1:
+            case HOLD_WALK_SPEED_WALKING:
                 if (intendedSpeed < 3.0f) {
-                    m->actionTimer = 0;
+                    m->actionTimer = HOLD_WALK_SPEED_SLOW;
                 } else if (intendedSpeed > 11.0f) {
-                    m->actionTimer = 2;
+                    m->actionTimer = HOLD_WALK_SPEED_RUN;
                 } else {
                     //! (Speed Crash) Crashes if Mario's speed exceeds or equals 2^15.
                     animSpeed = (s32)(intendedSpeed * 0x10000);
@@ -618,9 +619,9 @@ void anim_and_audio_for_hold_walk(struct MarioState *m) {
                 }
                 break;
 
-            case 2:
+            case HOLD_WALK_SPEED_RUN:
                 if (intendedSpeed < 8.0f) {
-                    m->actionTimer = 1;
+                    m->actionTimer = HOLD_WALK_SPEED_WALKING;
                 } else {
                     //! (Speed Crash) Crashes if Mario's speed exceeds or equals 2^16.
                     animSpeed = (s32)((intendedSpeed / 2.0f) * 0x10000);
@@ -689,8 +690,7 @@ void tilt_body_walking(struct MarioState *m, s16 startYaw) {
     if ((animID == MARIO_ANIM_WALKING)
      || (animID == MARIO_ANIM_RUNNING)) {
         s16 dYaw = (m->faceAngle[1] - startYaw);
-        //! (Speed Crash) These casts can cause a crash if (dYaw * forwardVel / 12) or
-        //! (forwardVel * 170) exceed or equal 2^31.
+        //! (Speed Crash) These casts can cause a crash if (dYaw * forwardVel / 12) or (forwardVel * 170) exceed or equal 2^31.
         s16 nextBodyRoll = -(s16)(dYaw * m->forwardVel / 12.0f);
         s16 nextBodyPitch = (s16)(m->forwardVel * 170.0f);
         nextBodyRoll  = CLAMP(nextBodyRoll, -DEGREES(30), DEGREES(30));
@@ -707,9 +707,8 @@ void tilt_body_ground_shell(struct MarioState *m, s16 startYaw) {
     struct MarioBodyState *marioBodyState = m->marioBodyState;
     struct Object *marioObj = m->marioObj;
     s16 dYaw = m->faceAngle[1] - startYaw;
-    //! (Speed Crash) These casts can cause a crash if (dYaw * forwardVel / 12) or
-    //! (forwardVel * 170) exceed or equal 2^31. Harder (if not impossible to do)
-    //! while on a Koopa Shell making this less of an issue.
+    //! (Speed Crash) These casts can cause a crash if (dYaw * forwardVel / 12) or (forwardVel * 170) exceed or equal 2^31.
+    //! Harder (if not impossible to do) while on a Koopa Shell making this less of an issue.
     s16 nextBodyRoll = -(s16)(dYaw * m->forwardVel / 12.0f);
     s16 nextBodyPitch = (s16)(m->forwardVel * 170.0f);
     nextBodyRoll  = CLAMP(nextBodyRoll, -0x1800, 0x1800);

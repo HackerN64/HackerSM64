@@ -802,7 +802,7 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
             break;
 
         case ACT_DIVE:
-            forwardVel = (m->forwardVel + 15.0f);
+            forwardVel += 15.0f;
             if (forwardVel > 48.0f) {
                 forwardVel = 48.0f;
             }
@@ -816,7 +816,8 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
 
             //! (BLJ's) This properly handles long jumps from getting forward speed with
             //  too much velocity, but misses backwards longs allowing high negative speeds.
-            if ((m->forwardVel *= 1.5f) > 48.0f) {
+            m->forwardVel *= 1.5f;
+            if (m->forwardVel > 48.0f) {
                 m->forwardVel = 48.0f;
             }
             break;
@@ -851,12 +852,12 @@ static u32 set_mario_action_moving(struct MarioState *m, u32 action, UNUSED u32 
         case ACT_WALKING:
             if (floorClass != SURFACE_CLASS_VERY_SLIPPERY) {
                 mag = MIN(m->intendedMag, 8.0f);
-                if (0.0f <= forwardVel && forwardVel < mag) {
+                if ((0.0f <= forwardVel) && (forwardVel < mag)) {
                     m->forwardVel = mag;
                 }
             }
 
-            m->marioObj->oMarioWalkingPitch = 0;
+            m->marioObj->oMarioWalkingPitch = 0x0;
             break;
 
         case ACT_HOLD_WALKING:
@@ -1053,19 +1054,10 @@ s32 hurt_and_set_mario_action(struct MarioState *m, u32 action, u32 actionArg, s
  * actions. A common variant of the below function.
  */
 s32 check_common_action_exits(struct MarioState *m) {
-    if (m->input & INPUT_A_PRESSED) {
-        return set_mario_action(m, ACT_JUMP, 0);
-    }
-    if (m->input & INPUT_OFF_FLOOR) {
-        return set_mario_action(m, ACT_FREEFALL, 0);
-    }
-    if (m->input & INPUT_NONZERO_ANALOG) {
-        return set_mario_action(m, ACT_WALKING, 0);
-    }
-    if (m->input & INPUT_ABOVE_SLIDE) {
-        return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
-    }
-
+    if (m->input & INPUT_A_PRESSED     ) return set_mario_action(m, ACT_JUMP,          0);
+    if (m->input & INPUT_OFF_FLOOR     ) return set_mario_action(m, ACT_FREEFALL,      0);
+    if (m->input & INPUT_NONZERO_ANALOG) return set_mario_action(m, ACT_WALKING,       0);
+    if (m->input & INPUT_ABOVE_SLIDE   ) return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
     return FALSE;
 }
 
@@ -1089,11 +1081,7 @@ s32 transition_submerged_to_walking(struct MarioState *m) {
 
     vec3_zero(m->angleVel);
 
-    if (m->heldObj == NULL) {
-        return set_mario_action(m, ACT_WALKING, 0);
-    } else {
-        return set_mario_action(m, ACT_HOLD_WALKING, 0);
-    }
+    return set_mario_action(m, (m->heldObj ? ACT_HOLD_WALKING : ACT_WALKING), 0);
 }
 
 /**
@@ -1105,12 +1093,10 @@ s32 transition_submerged_to_airborne(struct MarioState *m) {
 
     vec3_zero(m->angleVel);
 
-    if (m->heldObj == NULL) {
-        if (m->input & INPUT_A_DOWN) return set_mario_action(m, ACT_DIVE, 0);
-        else return set_mario_action(m, ACT_FREEFALL, 0);
+    if (m->input & INPUT_A_DOWN) {
+        return set_mario_action(m, (m->heldObj ? ACT_HOLD_JUMP     : ACT_DIVE    ), 0);
     } else {
-        if (m->input & INPUT_A_DOWN) return set_mario_action(m, ACT_HOLD_JUMP, 0);
-        else return set_mario_action(m, ACT_HOLD_FREEFALL, 0);
+        return set_mario_action(m, (m->heldObj ? ACT_HOLD_FREEFALL : ACT_FREEFALL), 0);
     }
 }
 
@@ -1119,18 +1105,18 @@ s32 transition_submerged_to_airborne(struct MarioState *m) {
  * non-submerged action. This also applies the water surface camera preset.
  */
 s32 set_water_plunge_action(struct MarioState *m) {
-    m->forwardVel = (m->forwardVel / 4.0f);
-    m->vel[1]     = (m->vel[1]     / 2.0f);
+    m->forwardVel /= 4.0f;
+    m->vel[1]     /= 2.0f;
 
     // BUG: Causes waterbox upwarp
-    // m->pos[1] = m->waterLevel - 100;
+    // m->pos[1] = (m->waterLevel - 100);
 
-    m->faceAngle[2] = 0;
+    m->faceAngle[2] = 0x0;
 
     vec3_zero(m->angleVel);
 
     if (!(m->action & ACT_FLAG_DIVING)) {
-        m->faceAngle[0] = 0;
+        m->faceAngle[0] = 0x0;
     }
 
     if (m->area->camera->mode != CAMERA_MODE_WATER_SURFACE) {
@@ -1325,7 +1311,8 @@ void update_mario_inputs(struct MarioState *m) {
     m->flags &= 0xFFFFFF;
 
 #ifdef PUPPYCAM
-    if (gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ENTER_FIRST_PERSON || (gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_FREE && gPuppyCam.debugFlags & PUPPYDEBUG_LOCK_CONTROLS)) {
+    if ((gPuppyCam.mode3Flags & PUPPYCAM_MODE3_ENTER_FIRST_PERSON)
+     || ((gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_FREE) && (gPuppyCam.debugFlags & PUPPYDEBUG_LOCK_CONTROLS))) {
         m->input = INPUT_FIRST_PERSON;
         return;
     }

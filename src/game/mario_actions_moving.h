@@ -5,6 +5,19 @@
 
 #include "types.h"
 
+enum WalkSpeeds {
+	WALK_SPEED_START_TIPTOE,
+	WALK_SPEED_TIPTOE,
+	WALK_SPEED_WALKING,
+	WALK_SPEED_RUNNING,
+};
+
+enum HoldWalkSpeeds {
+	HOLD_WALK_SPEED_SLOW,
+	HOLD_WALK_SPEED_WALKING,
+	HOLD_WALK_SPEED_RUN,
+};
+
 enum ActionStatesWalking { // act_walking
     ACT_STATE_WALKING_NO_WALL,
     ACT_STATE_WALKING_REACH_WALL
