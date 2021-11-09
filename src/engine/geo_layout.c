@@ -9,39 +9,39 @@
 typedef void (*GeoLayoutCommandProc)(void);
 
 GeoLayoutCommandProc GeoLayoutJumpTable[] = {
-    geo_layout_cmd_branch_and_link,
-    geo_layout_cmd_end,
-    geo_layout_cmd_branch,
-    geo_layout_cmd_return,
-    geo_layout_cmd_open_node,
-    geo_layout_cmd_close_node,
-    geo_layout_cmd_assign_as_view,
-    geo_layout_cmd_update_node_flags,
-    geo_layout_cmd_node_root,
-    geo_layout_cmd_node_ortho_projection,
-    geo_layout_cmd_node_perspective,
-    geo_layout_cmd_node_start,
-    geo_layout_cmd_node_master_list,
-    geo_layout_cmd_node_level_of_detail,
-    geo_layout_cmd_node_switch_case,
-    geo_layout_cmd_node_camera,
-    geo_layout_cmd_node_translation_rotation,
-    geo_layout_cmd_node_translation,
-    geo_layout_cmd_node_rotation,
-    geo_layout_cmd_node_animated_part,
-    geo_layout_cmd_node_billboard,
-    geo_layout_cmd_node_display_list,
-    geo_layout_cmd_node_shadow,
-    geo_layout_cmd_node_object_parent,
-    geo_layout_cmd_node_generated,
-    geo_layout_cmd_node_background,
-    geo_layout_cmd_nop,
-    geo_layout_cmd_copy_view,
-    geo_layout_cmd_node_held_obj,
-    geo_layout_cmd_node_scale,
-    geo_layout_cmd_nop2,
-    geo_layout_cmd_nop3,
-    geo_layout_cmd_node_culling_radius,
+    /*GEO_ID_BRANCH_AND_LINK            */ geo_layout_cmd_branch_and_link,
+    /*GEO_ID_END                        */ geo_layout_cmd_end,
+    /*GEO_ID_BRANCH                     */ geo_layout_cmd_branch,
+    /*GEO_ID_RETURN                     */ geo_layout_cmd_return,
+    /*GEO_ID_OPEN_NODE                  */ geo_layout_cmd_open_node,
+    /*GEO_ID_CLOSE_NODE                 */ geo_layout_cmd_close_node,
+    /*GEO_ID_ASSIGN_AS_VIEW             */ geo_layout_cmd_assign_as_view,
+    /*GEO_ID_UPDATE_NODE_FLAGS          */ geo_layout_cmd_update_node_flags,
+    /*GEO_ID_NODE_ROOT                  */ geo_layout_cmd_node_root,
+    /*GEO_ID_NODE_ORTHO_PROJECTION      */ geo_layout_cmd_node_ortho_projection,
+    /*GEO_ID_NODE_PERSPECTIVE           */ geo_layout_cmd_node_perspective,
+    /*GEO_ID_NODE_START                 */ geo_layout_cmd_node_start,
+    /*GEO_ID_NODE_MASTER_LIST           */ geo_layout_cmd_node_master_list,
+    /*GEO_ID_NODE_LEVEL_OF_DETAIL       */ geo_layout_cmd_node_level_of_detail,
+    /*GEO_ID_NODE_SWITCH_CASE           */ geo_layout_cmd_node_switch_case,
+    /*GEO_ID_NODE_CAMERA                */ geo_layout_cmd_node_camera,
+    /*GEO_ID_NODE_TRANSLATION_ROTATION  */ geo_layout_cmd_node_translation_rotation,
+    /*GEO_ID_NODE_TRANSLATION           */ geo_layout_cmd_node_translation,
+    /*GEO_ID_NODE_ROTATION              */ geo_layout_cmd_node_rotation,
+    /*GEO_ID_NODE_ANIMATED_PART         */ geo_layout_cmd_node_animated_part,
+    /*GEO_ID_NODE_BILLBOARD             */ geo_layout_cmd_node_billboard,
+    /*GEO_ID_NODE_DISPLAY_LIST          */ geo_layout_cmd_node_display_list,
+    /*GEO_ID_NODE_SHADOW                */ geo_layout_cmd_node_shadow,
+    /*GEO_ID_NODE_OBJECT_PARENT         */ geo_layout_cmd_node_object_parent,
+    /*GEO_ID_NODE_GENERATED             */ geo_layout_cmd_node_generated,
+    /*GEO_ID_NODE_BACKGROUND            */ geo_layout_cmd_node_background,
+    /*GEO_ID_NOP_1A                     */ geo_layout_cmd_nop,
+    /*GEO_ID_COPY_VIEW                  */ geo_layout_cmd_copy_view,
+    /*GEO_ID_NODE_HELD_OBJ              */ geo_layout_cmd_node_held_obj,
+    /*GEO_ID_NODE_SCALE                 */ geo_layout_cmd_node_scale,
+    /*GEO_ID_NOP_1E                     */ geo_layout_cmd_nop2,
+    /*GEO_ID_NOP_1F                     */ geo_layout_cmd_nop3,
+    /*GEO_ID_NODE_CULLING_RADIUS        */ geo_layout_cmd_node_culling_radius,
 };
 
 struct GraphNode      gObjParentGraphNode;
@@ -779,7 +779,7 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     while (gGeoLayoutCommand != NULL) {
         // Custom geo commands can be a part of the switch-case, otherwise use GeoLayoutJumpTable
         switch (gGeoLayoutCommand[0x00]) {
-            case GEO_BONE_ID:
+            case GEO_ID_BONE:
                 geo_layout_cmd_bone();
                 break;
             default:
