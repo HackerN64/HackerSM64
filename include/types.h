@@ -367,6 +367,12 @@ struct Waypoint {
     Vec3s pos;
 };
 
+struct Normal {
+    /*0x00*/ f32 x;
+    /*0x04*/ f32 y;
+    /*0x08*/ f32 z;
+};
+
 struct Surface {
     /*0x00*/ TerrainData type;
     /*0x02*/ TerrainData force;
@@ -377,11 +383,7 @@ struct Surface {
     /*0x0A*/ Vec3t vertex1;
     /*0x10*/ Vec3t vertex2;
     /*0x16*/ Vec3t vertex3;
-    /*0x1C*/ struct {
-        f32 x;
-        f32 y;
-        f32 z;
-    } normal;
+    /*0x1C*/ struct Normal normal;
     /*0x28*/ f32 originOffset;
     /*0x2C*/ struct Object *object;
 };
