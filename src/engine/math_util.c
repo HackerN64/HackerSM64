@@ -915,8 +915,7 @@ s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier) {
  * Nearly the same as the above function, returns new value instead.
  */
 f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier) {
-    current = (current + ((target - current) * multiplier));
-    return current;
+    return (current + ((target - current) * multiplier));
 }
 
 /**
