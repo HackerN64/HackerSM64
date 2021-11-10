@@ -527,9 +527,10 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius);
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b);
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s);
 void mtxf_mul_vec3s(Mat4 mtx, Vec3s b);
-extern void mtxf_to_mtx_asm(register void *dest, register void *src);
+// extern void mtxf_to_mtx_asm(register void *dest, register void *src);
 inline void mtxf_to_mtx(register void *dest, register void *src) {
-    mtxf_to_mtx_asm(dest, src);
+    // mtxf_to_mtx_asm(dest, src);
+    guMtxF2L(src, dest);
 }
 void mtxf_rotate_xy(Mtx *mtx, s32 angle);
 void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx);
