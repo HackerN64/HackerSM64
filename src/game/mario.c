@@ -1162,6 +1162,7 @@ void squish_mario_model(struct MarioState *m) {
     }
 }
 
+#ifdef VANILLA_DEBUG
 /**
  * Debug function that prints floor normal, velocity, and action information.
  */
@@ -1178,6 +1179,7 @@ void debug_print_speed_action_normal(struct MarioState *m) {
         print_text_fmt_int(210, 56, "STA %x", (m->action & ACT_ID_MASK));
     }
 }
+#endif
 
 /**
  * Update the button inputs for Mario.

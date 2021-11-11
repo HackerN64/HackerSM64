@@ -72,9 +72,9 @@ s8 gDebugLevelSelect = TRUE;
 s8 gDebugLevelSelect = FALSE;
 #endif
 
+#ifdef VANILLA_DEBUG
 s8 gShowDebugText = FALSE;
 
-#ifdef VANILLA_DEBUG
 // unused
 static u16 sDebugTextKeySequence[] = {
     D_JPAD, D_JPAD, U_JPAD, U_JPAD, L_JPAD, R_JPAD, L_JPAD, R_JPAD

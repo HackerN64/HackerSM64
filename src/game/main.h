@@ -79,7 +79,9 @@ extern u32 gNumVblanks;
 extern s8 gResetTimer;
 extern s8 gNmiResetBarsTimer;
 extern s8 gDebugLevelSelect;
+#ifdef VANILLA_DEBUG
 extern s8 gShowDebugText;
+#endif
 
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg);
 void dispatch_audio_sptask(struct SPTask *spTask);

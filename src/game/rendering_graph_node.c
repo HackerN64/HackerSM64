@@ -236,7 +236,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     // if (gPlayer1Controller->buttonPressed & L_TRIG) {
     //     ucodeTestSwitch ^= 1;
     // }
-    // print_text_fmt_int(32,32,"%d",ucodeTestSwitch);
+    // print_text_fmt_int(32, 32, "%d", ucodeTestSwitch);
     for (renderPhase = 0; renderPhase < RENDER_PHASE_END; renderPhase++) {
         switch (renderPhase) {
 #if SILHOUETTE
@@ -1202,9 +1202,11 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
             geo_process_node_and_siblings(node->node.children);
         }
         gCurGraphNodeRoot = NULL;
+#ifdef VANILLA_DEBUG
         if (gShowDebugText) {
             print_text_fmt_int(180, 36, "MEM %d", (gDisplayListHeap->totalSpace - gDisplayListHeap->usedSpace));
         }
+#endif
         main_pool_free(gDisplayListHeap);
     }
 }
