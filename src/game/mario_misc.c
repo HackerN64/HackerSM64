@@ -455,6 +455,8 @@ Gfx *geo_switch_mario_hand(s32 callContext, struct GraphNode *node, UNUSED Mat4 
     return NULL;
 }
 
+static s16 sMarioAttackAnimCounter = 0;
+
 /**
  * Increase Mario's hand / foot size when he punches / kicks.
  * Since animation geo nodes only support rotation, this scaling animation
@@ -464,7 +466,6 @@ Gfx *geo_switch_mario_hand(s32 callContext, struct GraphNode *node, UNUSED Mat4 
  * (such as in the mirror room) results in a faster and desynced punch / kick animation.
  */
 Gfx *geo_mario_hand_foot_scaler(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
-    static s16 sMarioAttackAnimCounter = 0;
     struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
     struct GraphNodeScale     *scaleNode   = (struct GraphNodeScale     *) node->next;
     struct MarioBodyState     *bodyState   = &gBodyStates[0];

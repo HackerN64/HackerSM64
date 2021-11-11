@@ -117,6 +117,34 @@ Gfx *geo_intro_tm_copyright(s32 callContext, struct GraphNode *node, UNUSED void
     return dl;
 }
 
+// intro screen background display lists for each of four 80x20 textures
+static const Gfx *introBackgroundDlRows[] = {
+    title_screen_bg_dl_0A000130,
+    title_screen_bg_dl_0A000148,
+    title_screen_bg_dl_0A000160,
+    title_screen_bg_dl_0A000178
+};
+
+// intro screen background texture X offsets
+static float xCoords[] = {
+    0, 80, 160, 240,
+    0, 80, 160, 240,
+    0, 80, 160, 240,
+};
+
+// intro screen background texture Y offsets
+static float yCoords[] = {
+    160, 160, 160, 160,
+     80,  80,  80,  80,
+      0,   0,   0,   0,
+};
+
+// table that points to either the "Super Mario 64" or "Game Over" tables
+static const Texture *const *textureTables[] = {
+    mario_title_texture_table,
+    game_over_texture_table
+};
+
 /**
  * Generates a display list for a single background tile
  *
@@ -124,27 +152,6 @@ Gfx *geo_intro_tm_copyright(s32 callContext, struct GraphNode *node, UNUSED void
  * @param backgroundTable  array describing which image to use for each tile (0 denotes a "Super Mario 64" image, and 1 denotes a "Game Over" image)
  */
 static Gfx *intro_backdrop_one_image(s32 index, s8 *backgroundTable) {
-    // intro screen background display lists for each of four 80x20 textures
-    static const Gfx *introBackgroundDlRows[] = { title_screen_bg_dl_0A000130, title_screen_bg_dl_0A000148,
-                                                  title_screen_bg_dl_0A000160, title_screen_bg_dl_0A000178 };
-
-    // intro screen background texture X offsets
-    static float xCoords[] = {
-        0, 80, 160, 240,
-        0, 80, 160, 240,
-        0, 80, 160, 240,
-    };
-
-    // intro screen background texture Y offsets
-    static float yCoords[] = {
-        160, 160, 160, 160,
-         80,  80,  80,  80,
-          0,   0,   0,   0,
-    };
-
-    // table that points to either the "Super Mario 64" or "Game Over" tables
-    static const Texture *const *textureTables[] = { mario_title_texture_table, game_over_texture_table };
-
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
     Gfx *displayList = alloc_display_list(36 * sizeof(*displayList));
     Gfx *displayListIter = displayList;
@@ -207,6 +214,11 @@ static s8 gameOverBackgroundTable[] = {
     INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER, INTRO_BACKGROUND_GAME_OVER,
 };
 
+// order of tiles that are flipped from "Game Over" to "Super Mario 64"
+static s8 flipOrder[] = {
+    0, 1, 2, 3, 7, 11, 10, 9, 8, 4, 5, 6
+};
+
 /**
  * Geo callback to render the Game Over background tiles
  */
@@ -217,8 +229,8 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     s32 i, j;
 
     if (callContext != GEO_CONTEXT_RENDER) {  // reset
-        sGameOverFrameCounter = 0;
-        sGameOverTableIndex = -2;
+        sGameOverFrameCounter =  0;
+        sGameOverTableIndex   = -2;
         for (i = 0; i < ARRAY_COUNT(gameOverBackgroundTable); ++i) {
             gameOverBackgroundTable[i] = INTRO_BACKGROUND_GAME_OVER;
         }
@@ -232,10 +244,7 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
             }
         } else {
             // transition tile from "Game Over" to "Super Mario 64"
-            if (sGameOverTableIndex != 11 && !(sGameOverFrameCounter & 0x1)) {
-                // order of tiles that are flipped from "Game Over" to "Super Mario 64"
-                static s8 flipOrder[] = { 0, 1, 2, 3, 7, 11, 10, 9, 8, 4, 5, 6 };
-
+            if ((sGameOverTableIndex != 11) && !(sGameOverFrameCounter & 0x1)) {
                 sGameOverTableIndex++;
                 gameOverBackgroundTable[flipOrder[sGameOverTableIndex]] = INTRO_BACKGROUND_SUPER_MARIO;
             }
