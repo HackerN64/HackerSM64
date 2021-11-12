@@ -843,7 +843,7 @@ s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
  * currently happens in-line in geo_process_shadow where it also accounts for
  * animations without lateral translation.
  */
-void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f position) {
+UNUSED void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f position) {
     struct Animation *animation = obj->animInfo.currAnim;
 
     if (animation != NULL) {
@@ -868,7 +868,7 @@ void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f posit
  * Unused function to find the root of the geo node tree, which should be a
  * GraphNodeRoot. If it is not for some reason, null is returned.
  */
-struct GraphNodeRoot *geo_find_root(struct GraphNode *graphNode) {
+UNUSED struct GraphNodeRoot *geo_find_root(struct GraphNode *graphNode) {
     struct GraphNodeRoot *resGraphNode = NULL;
 
     while (graphNode->parent != NULL) {

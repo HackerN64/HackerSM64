@@ -710,6 +710,7 @@ void thread5_game_loop(UNUSED void *arg) {
         while (TRUE) {
             lastTime = osGetTime();
             collisionTime[perfIteration] = 0;
+                // graphTime[perfIteration] = 0;
             behaviourTime[perfIteration] = 0;
                   dmaTime[perfIteration] = 0;
 #endif

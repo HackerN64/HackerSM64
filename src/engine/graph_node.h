@@ -41,11 +41,9 @@ enum GraphRenderFlags {
 #ifdef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 // The discriminant for different types of geo nodes
 enum GraphNodeTypes {
-    GRAPH_NODE_TYPE_ROOT,
     GRAPH_NODE_TYPE_ORTHO_PROJECTION,
     GRAPH_NODE_TYPE_PERSPECTIVE,
     GRAPH_NODE_TYPE_MASTER_LIST,
-    GRAPH_NODE_TYPE_START,
     GRAPH_NODE_TYPE_LEVEL_OF_DETAIL,
     GRAPH_NODE_TYPE_SWITCH_CASE,
     GRAPH_NODE_TYPE_CAMERA,
@@ -64,6 +62,8 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_BACKGROUND,
     GRAPH_NODE_TYPE_HELD_OBJ,
     GRAPH_NODE_TYPE_CULLING_RADIUS,
+    GRAPH_NODE_TYPE_ROOT,
+    GRAPH_NODE_TYPE_START,
 };
 #else
 // Whether the node type has a function pointer of type GraphNodeFunc

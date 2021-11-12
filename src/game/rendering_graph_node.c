@@ -21,6 +21,18 @@
 
 #include "config.h"
 
+
+#if PUPPYPRINT_DEBUG
+#include "puppyprint.h"
+#define GRAPH_START \
+    OSTime first   = osGetTime(); \
+    OSTime colTime = collisionTime[perfIteration];
+
+#define GRAPH_END \
+    graphTime[perfIteration] += (osGetTime() - first); \
+    graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
+#endif
+
 /**
  * This file contains the code that processes the scene graph for rendering.
  * The scene graph is responsible for drawing everything except the HUD / text boxes.
@@ -922,7 +934,7 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     // half of the fov in in-game angle units instead of degrees
     s16 halfFov = ((((((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f) + 1.0f) * 32768.0f) / 180.0f) + 0.5f);
 
-    f32 hScreenEdge = (-matrix[3][2] * sins(halfFov) / coss(halfFov));
+    f32 hScreenEdge = (-matrix[3][2] * tans(halfFov));
     // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get
     // the amount of units between the center of the screen and the horizontal edge
     // given the distance from the object to the camera.
@@ -1109,7 +1121,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
 /**
  * Processes the children of the given GraphNode if it has any
  */
-void geo_try_process_children(struct GraphNode *node) {
+static void geo_try_process_children(struct GraphNode *node) {
     if (node->children != NULL) {
         geo_process_node_and_siblings(node->children);
     }
@@ -1148,6 +1160,7 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                     case GRAPH_NODE_TYPE_ROTATION:             geo_process_rotation            ((struct GraphNodeRotation            *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_OBJECT:               geo_process_object              ((struct Object                       *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_ANIMATED_PART:        geo_process_animated_part       ((struct GraphNodeAnimatedPart        *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_BONE:                 geo_process_bone                ((struct GraphNodeBone                *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_BILLBOARD:            geo_process_billboard           ((struct GraphNodeBillboard           *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_DISPLAY_LIST:         geo_process_display_list        ((struct GraphNodeDisplayList         *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_SCALE:                geo_process_scale               ((struct GraphNodeScale               *) curGraphNode); break;
@@ -1156,7 +1169,6 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                     case GRAPH_NODE_TYPE_GENERATED_LIST:       geo_process_generated_list      ((struct GraphNodeGenerated           *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_BACKGROUND:           geo_process_background          ((struct GraphNodeBackground          *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_HELD_OBJ:             geo_process_held_object         ((struct GraphNodeHeldObject          *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_BONE:                 geo_process_bone                ((struct GraphNodeBone                *) curGraphNode); break;
                     default:                                   geo_try_process_children        ((struct GraphNode                    *) curGraphNode); break;
                 }
             }
@@ -1178,8 +1190,8 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
 
         gDisplayListHeap = alloc_only_pool_init((main_pool_available() - sizeof(struct AllocOnlyPool)), MEMORY_POOL_LEFT);
         initialMatrix    = alloc_display_list(sizeof(*initialMatrix));
-        gMatStackIndex = 0;
-        gCurrAnimType  = ANIM_TYPE_NONE;
+        gMatStackIndex   = 0;
+        gCurrAnimType    = ANIM_TYPE_NONE;
         vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), 511);
         vec3s_set(viewport->vp.vscale, (node->width * 4), (node->height * 4), 511);
         if (b != NULL) {

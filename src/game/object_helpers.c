@@ -110,8 +110,7 @@ Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void 
             obj = gCurGraphNodeHeldObject->objNode;
         }
 
-        // if the case is greater than the number of cases, set to 0 to avoid overflowing
-        // the switch.
+        // if the case is greater than the number of cases, set to 0 to avoid overflowing the switch.
         if (obj->oAnimState >= switchCase->numCases) {
             obj->oAnimState = 0;
         }
