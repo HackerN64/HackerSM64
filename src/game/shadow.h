@@ -9,18 +9,20 @@
  * can be composed of either 4 or 9 vertices.
  */
 enum ShadowType {
-    SHADOW_CIRCLE_9_VERTS             =  0,
-    SHADOW_CIRCLE_4_VERTS             =  1,
-    SHADOW_CIRCLE_4_VERTS_FLAT_UNUSED =  2,
-    SHADOW_SQUARE_PERMANENT           = 10,
-    SHADOW_SQUARE_SCALABLE            = 11,
-    SHADOW_SQUARE_TOGGLABLE           = 12,
+    SHADOW_CIRCLE_PLAYER    = 0,
+    SHADOW_CIRCLE           = 1,
+    SHADOW_CIRCLE_4_VERTS   = SHADOW_CIRCLE,
+    SHADOW_CIRCLE_9_VERTS   = SHADOW_CIRCLE,
+    SHADOW_SQUARE_PERMANENT = 2,
+    SHADOW_SQUARE_SCALABLE  = 3,
+    SHADOW_SQUARE_TOGGLABLE = 4,
     /**
      * This defines an offset after which rectangular shadows with custom
      * widths and heights can be defined.
      */
-    SHADOW_RECTANGLE_HARDCODED_OFFSET = 50,
-    SHADOW_CIRCLE_PLAYER              = 99
+    SHADOW_RECTANGLE_HARDCODED_OFFSET = 5,
+    SHADOW_RECTANGLE_SPINDEL          = (0 + SHADOW_RECTANGLE_HARDCODED_OFFSET),
+    SHADOW_RECTANGLE_WHOMP            = (1 + SHADOW_RECTANGLE_HARDCODED_OFFSET),
 };
 
 enum ShadowFlags {
