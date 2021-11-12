@@ -11,12 +11,6 @@
 #include "game/vc_check.h"
 #include "string.h"
 
-#ifdef VERSION_EU
-#define REVERB_WINDOW_SIZE_MAX 0x1000
-#else
-#define REVERB_WINDOW_SIZE_MAX 0x1000
-#endif
-
 #define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
 struct PoolSplit {
@@ -40,6 +34,9 @@ struct SoundAllocPool gAudioSessionPool;
 struct SoundAllocPool gAudioInitPool;
 struct SoundAllocPool gNotesAndBuffersPool;
 u8 sAudioHeapPad[0x20]; // probably two unused pools
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+struct SoundAllocPool gBetterReverbPool;
+#endif
 struct SoundAllocPool gSeqAndBankPool;
 struct SoundAllocPool gPersistentCommonPool;
 struct SoundAllocPool gTemporaryCommonPool;
@@ -319,7 +316,10 @@ void puppyprint_get_allocated_pools(s32 *audioPoolList) {
         &gSeqLoadedPool.persistent.pool,
         &gSeqLoadedPool.temporary.pool,
         &gBankLoadedPool.persistent.pool,
-        &gBankLoadedPool.temporary.pool
+        &gBankLoadedPool.temporary.pool,
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+        &gBetterReverbPool,
+#endif
     };
 
     for (i = 0, j = 0; j < NUM_AUDIO_POOLS; i += 2, j++) {
@@ -339,6 +339,9 @@ void session_pools_init(struct PoolSplit *a) {
     gAudioSessionPool.cur = gAudioSessionPool.start;
     sound_alloc_pool_init(&gNotesAndBuffersPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantSeq), a->wantSeq);
     sound_alloc_pool_init(&gSeqAndBankPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantCustom), a->wantCustom);
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+    sound_alloc_pool_init(&gBetterReverbPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, BETTER_REVERB_SIZE), BETTER_REVERB_SIZE);
+#endif
 }
 
 void seq_and_bank_pool_init(struct PoolSplit2 *a) {
@@ -1117,6 +1120,11 @@ void init_reverb_us(s32 presetId) {
                 gSynthesisReverb.items[1][i].toDownsampleLeft = mem;
                 gSynthesisReverb.items[1][i].toDownsampleRight = mem + DEFAULT_LEN_1CH / sizeof(s16);
             }
+#ifdef BETTER_REVERB
+            delayBufsL = (s32**) soundAlloc(&gBetterReverbPool, BETTER_REVERB_PTR_SIZE);
+            delayBufsR = &delayBufsL[NUM_ALLPASS];
+            delayBufsL[0] = (s32*) soundAlloc(&gBetterReverbPool, BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE);
+#endif
         } else {
             bzero(gSynthesisReverb.ringBuffer.left, REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16));
         }
@@ -1146,13 +1154,9 @@ void init_reverb_us(s32 presetId) {
         // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
 #ifdef BETTER_REVERB
         if (toggleBetterReverb) {
-            if (!sAudioFirstBoot) {
-                delayBufsL = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
-                delayBufsR = (s32**) soundAlloc(&gAudioSessionPool, NUM_ALLPASS * sizeof(s32*));
-                delayBufsL[0] = (s32*) soundAlloc(&gAudioSessionPool, ALIGN16(BETTER_REVERB_SIZE - 0x80));
-            } else {
-                bzero(delayBufsL[0], ALIGN16(BETTER_REVERB_SIZE - 0x80)); // Can maybe be simplified to clear only the previous allocation size
-            }
+            if (sAudioFirstBoot) {
+                bzero(delayBufsL[0], BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE);
+            }            
 
             for (i = 0; i < NUM_ALLPASS; ++i) {
                 delaysL[i] = delaysBaselineL[i] / gReverbDownsampleRate;

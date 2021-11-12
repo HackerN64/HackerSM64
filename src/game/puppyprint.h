@@ -20,7 +20,11 @@ enum Benchmark {
 #define PRINT_ALL              -1
 
 #if PUPPYPRINT_DEBUG
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+#define NUM_AUDIO_POOLS 7
+#else
 #define NUM_AUDIO_POOLS 6
+#endif
 #endif
 
 enum PuppyFont {

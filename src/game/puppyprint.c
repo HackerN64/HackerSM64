@@ -282,7 +282,10 @@ const char *audioPoolNames[NUM_AUDIO_POOLS] = {
     "gSeqLoadedPool.persistent.pool",
     "gSeqLoadedPool.temporary.pool",
     "gBankLoadedPool.persistent.pool",
-    "gBankLoadedPool.temporary.pool"
+    "gBankLoadedPool.temporary.pool",
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+    "gBetterReverbPool",
+#endif
 };
 
 void print_audio_ram_overview(void) {
