@@ -284,17 +284,17 @@ void get_vertex_coords(s8 index, s8 *xCoord, s8 *zCoord) {
  */
 void calculate_vertex_xyz(s8 index, f32 *xPosVtx, f32 *yPosVtx, f32 *zPosVtx) {
     f32 tiltedScale = (coss(s.floorPitch) * s.shadowScale);
-    Angle downwardAngle = s.floorYaw;
     s8 xCoordUnit, zCoordUnit;
 
     // This makes xCoordUnit and yCoordUnit each one of -1, 0, or 1.
     get_vertex_coords(index, &xCoordUnit, &zCoordUnit);
 
-    f32 halfScale       = ((xCoordUnit * s.shadowScale) / 2.0f);
-    f32 halfTiltedScale = ((zCoordUnit *   tiltedScale) / 2.0f);
+    f32 halfScale       = ((xCoordUnit * s.shadowScale) * 0.5f);
+    f32 halfTiltedScale = ((zCoordUnit *   tiltedScale) * 0.5f);
 
-    f32 sinYaw = sins(downwardAngle);
-    f32 cosYaw = coss(downwardAngle);
+    Angle yaw = s.floorYaw;
+    f32 sinYaw = sins(yaw);
+    f32 cosYaw = coss(yaw);
 
     *xPosVtx = ((halfTiltedScale * sinYaw) + (halfScale * cosYaw) + s.parentPos[0]);
     *zPosVtx = ((halfTiltedScale * cosYaw) - (halfScale * sinYaw) + s.parentPos[2]);

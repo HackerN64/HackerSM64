@@ -1411,7 +1411,7 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     // Find the floor of the arena
     pos[1] = find_floor(c->areaCenX, CELL_HEIGHT_LIMIT, c->areaCenZ, &floor);
     if (floor != NULL) {
-        pos[1] = 300.0f + get_surface_height_at_location(pos[0], pos[2], floor);
+        pos[1] = (300.0f + get_surface_height_at_location(pos[0], pos[2], floor));
 #ifndef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
         switch (gCurrLevelArea) {
             case AREA_BOB: pos[1] += 125.0f; break;
@@ -3499,7 +3499,6 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
     struct WallCollisionData collisionData;
     struct Surface *wall = NULL;
     Vec3f norm;
-    f32 originOffset;
     f32 offset;
     Vec3f newPos[MAX_REFEREMCED_WALLS];
     s32 i;
@@ -3516,8 +3515,7 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
             norm[0] = wall->normal.x;
             norm[1] = wall->normal.y;
             norm[2] = wall->normal.z;
-            originOffset = wall->originOffset;
-            offset = (vec3_dot(norm, newPos[i]) + originOffset);
+            offset = (vec3_dot(norm, newPos[i]) + wall->originOffset);
             if (absf(offset) < radius) {
                 newPos[i][0] += (norm[0] * (radius - offset));
                 newPos[i][2] += (norm[2] * (radius - offset));
