@@ -11,8 +11,6 @@
 #include "game/vc_check.h"
 #include "string.h"
 
-#define ALIGN16(val) (((val) + 0xF) & ~0xF)
-
 struct PoolSplit {
     u32 wantSeq;
     u32 wantBank;

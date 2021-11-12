@@ -17,14 +17,16 @@
 #define MAX_UPDATES_PER_FRAME 4
 #endif
 
+#define ALIGN16(val) (((val) + 0xF) & ~0xF)
+
 #if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
 
 #define NUM_ALLPASS 12 // Number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
-#define BETTER_REVERB_PTR_SIZE (NUM_ALLPASS * sizeof(s32*) * 2) // Allocation space consumed by dynamically allocated pointers
+#define BETTER_REVERB_PTR_SIZE ALIGN16(NUM_ALLPASS * sizeof(s32*) * 2) // Allocation space consumed by dynamically allocated pointers
 
  // Size determined by (all delaysBaselineL/R values * 8) / (2 ^ Minimum Downsample Factor).
  // The default value can be increased or decreased in conjunction with the values in delaysBaselineL/R
-#define BETTER_REVERB_SIZE (0xF200 + BETTER_REVERB_PTR_SIZE)
+#define BETTER_REVERB_SIZE ALIGN16(0xF200 + BETTER_REVERB_PTR_SIZE)
 
 // #define BETTER_REVERB_SIZE (0x7A00 + BETTER_REVERB_PTR_SIZE) // Default for use only with a downsampling value of 3 (i.e. double the emulator default)
 // #define BETTER_REVERB_SIZE (0x1E200 + BETTER_REVERB_PTR_SIZE) // Default for use with a downsampling value of 1 (i.e. no downsampling at all)
