@@ -353,13 +353,13 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
             if (transType >= WARP_TRANSITION_FADES_INTO_LARGE) {
                 gWarpTransition.data.endTexRadius = 16;
             } else {
-                gWarpTransition.data.endTexRadius = 0;
+                gWarpTransition.data.endTexRadius =  0;
             }
         } else { // The image is fading out. (Reverses start & end circles)
             if (transType >= WARP_TRANSITION_FADES_FROM_LARGE) {
                 gWarpTransition.data.startTexRadius = 16;
             } else {
-                gWarpTransition.data.startTexRadius = 0;
+                gWarpTransition.data.startTexRadius =  0;
             }
             gWarpTransition.data.endTexRadius = GFX_DIMENSIONS_FULL_RADIUS;
         }

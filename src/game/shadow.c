@@ -644,7 +644,6 @@ Gfx *create_shadow_below_xyz(f32 xPos, f32 yPos, f32 zPos, s16 shadowScale, u8 s
         gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
         s.floorHeight = find_floor(xPos, yPos, zPos, &s.floor);
         if (s.floor == NULL) return NULL;
-
     }
 
     gShadowFlags = SHADOW_FLAGS_NONE;

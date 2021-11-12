@@ -21,18 +21,6 @@
 
 #include "config.h"
 
-
-#if PUPPYPRINT_DEBUG
-#include "puppyprint.h"
-#define GRAPH_START \
-    OSTime first   = osGetTime(); \
-    OSTime colTime = collisionTime[perfIteration];
-
-#define GRAPH_END \
-    graphTime[perfIteration] += (osGetTime() - first); \
-    graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
-#endif
-
 /**
  * This file contains the code that processes the scene graph for rendering.
  * The scene graph is responsible for drawing everything except the HUD / text boxes.
