@@ -173,7 +173,11 @@ s32 intro_regular(void) {
         sPlayMarioGreeting = FALSE;
     }
     print_intro_text();
-
+#ifdef DEBUG_LEVEL_SELECT
+    if (gPlayer3Controller->buttonDown & L_TRIG) {
+        gDebugLevelSelect = TRUE;
+    }
+#endif
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
@@ -239,17 +243,22 @@ s32 intro_play_its_a_me_mario(void) {
  * Returns a level ID after their criteria is met.
  */
 s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
-    s32 retVar = LEVEL_NONE;
     switch (arg) {
-        case LVL_INTRO_PLAY_ITS_A_ME_MARIO: retVar = intro_play_its_a_me_mario(); break;
+        case LVL_INTRO_PLAY_ITS_A_ME_MARIO: return intro_play_its_a_me_mario();
 #ifdef KEEP_MARIO_HEAD
-        case LVL_INTRO_REGULAR:             retVar = intro_regular();             break;
-        case LVL_INTRO_GAME_OVER:           retVar = intro_game_over();           break;
+        case LVL_INTRO_REGULAR:             return intro_regular();
+        case LVL_INTRO_GAME_OVER:           return intro_game_over();
 #else
-        case LVL_INTRO_REGULAR:             // fallthrough
-        case LVL_INTRO_GAME_OVER:           retVar = (LEVEL_FILE_SELECT + gDebugLevelSelect);   break;
+        case LVL_INTRO_REGULAR:
+#ifdef DEBUG_LEVEL_SELECT
+            if (gPlayer3Controller->buttonDown & L_TRIG) {
+                gDebugLevelSelect = TRUE;
+            }
 #endif
-        case LVL_INTRO_LEVEL_SELECT:        retVar = intro_level_select();        break; //! this runs on save and quit for some reason?
+            // fallthrough
+        case LVL_INTRO_GAME_OVER:           return (LEVEL_FILE_SELECT + gDebugLevelSelect);
+#endif
+        case LVL_INTRO_LEVEL_SELECT:        return intro_level_select();
+        default: return LEVEL_NONE;
     }
-    return retVar;
 }

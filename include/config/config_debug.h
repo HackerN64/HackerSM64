@@ -16,8 +16,8 @@
 // If you want the game to boot normally, just comment out the define again.
 //#define TEST_LEVEL LEVEL_BOB
 
-// Enable debug level select.
-//#define DEBUG_LEVEL_SELECT
+// Enable debug level select. Hold L while the game boots to turn it on.
+#define DEBUG_LEVEL_SELECT
 
 // Enable debug free move (DPad up to enter, A to exit).
 #define ENABLE_DEBUG_FREE_MOVE
