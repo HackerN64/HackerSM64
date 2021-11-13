@@ -201,7 +201,6 @@ void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
     if (pushOp == MENU_MTX_PUSH) {
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
     }
-
     if (pushOp == MENU_MTX_NOPUSH) {
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
     }

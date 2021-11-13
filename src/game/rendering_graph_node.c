@@ -863,15 +863,16 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                 shadowPos[2] += ((-animOffset[0] * sinAng) + (animOffset[2] * cosAng));
             }
         }
-        Gfx *shadowList =
-            create_shadow_below_xyz(shadowPos[0],
-                                    shadowPos[1],
-                                    shadowPos[2], shadowScale, node->shadowSolidity, node->shadowType);
+        Gfx *shadowList = create_shadow_below_xyz(shadowPos, shadowScale, node->shadowSolidity, node->shadowType);
+
         if (shadowList != NULL) {
-            mtxf_translate(mtxf, shadowPos);
+            mtxf_align_terrain_normal(mtxf, gCurrShadow.floorNormal, shadowPos, gCurGraphNodeObject->angle[1]);
+            mtxf_scale_vec3f(mtxf, mtxf, gCurrShadow.scale);
+
             mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, *gCurGraphNodeCamera->matrixPtr);
             inc_mat_stack();
-            geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList), ((gShadowFlags & (SHADOW_FLAG_WATER_BOX | SHADOW_FLAG_WATER_SURFACE | SHADOW_FLAG_ICE_CARPET)) ? LAYER_TRANSPARENT : LAYER_TRANSPARENT_DECAL));
+            geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList),
+                                    ((gCurrShadow.flags & (SHADOW_FLAG_WATER_BOX | SHADOW_FLAG_WATER_SURFACE | SHADOW_FLAG_ICE | SHADOW_FLAG_CARPET)) ? LAYER_TRANSPARENT : LAYER_TRANSPARENT_DECAL));
             gMatStackIndex--;
         }
     }
