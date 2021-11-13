@@ -27,10 +27,10 @@ struct Object *try_allocate_object(struct ObjectNode *destList, struct ObjectNod
         freeList->next = nextObj->next;
 
         // Insert at end of destination list
-        nextObj->prev = destList->prev;
-        nextObj->next = destList;
+        nextObj->prev        = destList->prev;
+        nextObj->next        = destList;
         destList->prev->next = nextObj;
-        destList->prev = nextObj;
+        destList->prev       = nextObj;
     } else {
         return NULL;
     }
@@ -93,7 +93,7 @@ void clear_object_lists(struct ObjectNode *objLists) {
  */
 void unload_object(struct Object *obj) {
     obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-    obj->prevObj = NULL;
+    obj->prevObj     = NULL;
 
     obj->header.gfx.throwMatrix = NULL;
     stop_sounds_from_source(obj->header.gfx.cameraToObject);
@@ -141,12 +141,11 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     }
 
     // Initialize object fields
-
-    obj->activeFlags = (ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_ALLOCATED);
-    obj->parentObj = obj;
-    obj->prevObj = NULL;
+    obj->activeFlags              = (ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_ALLOCATED);
+    obj->parentObj                = obj;
+    obj->prevObj                  = NULL;
     obj->collidedObjInteractTypes = 0;
-    obj->numCollidedObjs = 0;
+    obj->numCollidedObjs          = 0;
 
 #if IS_64_BIT
     for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
@@ -159,22 +158,22 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     }
 #endif
 
-    obj->unused1 = 0;
-    obj->bhvStackIndex = 0;
-    obj->bhvDelayTimer = 0;
+    obj->unused1            = 0;
+    obj->bhvStackIndex      = 0;
+    obj->bhvDelayTimer      = 0;
 
-    obj->hitboxRadius     =  50.0f;
-    obj->hitboxHeight     = 100.0f;
-    obj->hurtboxRadius    =   0.0f;
-    obj->hurtboxHeight    =   0.0f;
-    obj->hitboxDownOffset =   0.0f;
-    obj->unused2 = 0;
+    obj->hitboxRadius       =  50.0f;
+    obj->hitboxHeight       = 100.0f;
+    obj->hurtboxRadius      =   0.0f;
+    obj->hurtboxHeight      =   0.0f;
+    obj->hitboxDownOffset   =   0.0f;
+    obj->unused2            =   0;
 
-    obj->platform      = NULL;
-    obj->collisionData = NULL;
-    obj->oIntangibleTimer   = -1;
-    obj->oDamageOrCoinValue =  0;
-    obj->oHealth = 2048;
+    obj->platform           = NULL;
+    obj->collisionData      = NULL;
+    obj->oIntangibleTimer   =   -1;
+    obj->oDamageOrCoinValue =    0;
+    obj->oHealth            = 2048;
 
     obj->oCollisionDistance = 1000.0f;
     obj->oDrawingDistance   = 4500.0f;
@@ -182,10 +181,10 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     mtxf_identity(obj->transform);
 
     obj->respawnInfoType = RESPAWN_INFO_TYPE_NULL;
-    obj->respawnInfo = NULL;
+    obj->respawnInfo     = NULL;
 
     obj->oDistanceToMario = 19000.0f;
-    obj->oRoom = -1;
+    obj->oRoom            = -1;
 
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
 #ifdef OBJECTS_REJ
@@ -201,27 +200,12 @@ struct Object *allocate_object(struct ObjectNode *objList) {
 }
 
 /**
- * If the object is close to being on the floor, move it to be exactly on the floor.
- */
-static void snap_object_to_floor(struct Object *obj) {
-    struct Surface *surface;
-
-    obj->oFloorHeight = find_floor(obj->oPosX, obj->oPosY, obj->oPosZ, &surface);
-
-    if (((obj->oFloorHeight + 2.0f) > obj->oPosY) && (obj->oPosY > (obj->oFloorHeight - 10.0f))) {
-        obj->oPosY = obj->oFloorHeight;
-        obj->oMoveFlags |= OBJ_MOVE_ON_GROUND;
-    }
-}
-
-/**
  * Spawn an object at the origin with the behavior script at virtual address bhvScript.
  */
 struct Object *create_object(const BehaviorScript *bhvScript) {
     s32 objListIndex;
     struct Object *obj;
     struct ObjectNode *objList;
-    const BehaviorScript *behavior = bhvScript;
 
     // If the first behavior script command is "begin <object list>", then
     // extract the object list from it
@@ -232,28 +216,13 @@ struct Object *create_object(const BehaviorScript *bhvScript) {
     }
 
     objList = &gObjectLists[objListIndex];
-    obj = allocate_object(objList);
+    obj     = allocate_object(objList);
 
     obj->curBhvCommand = bhvScript;
-    obj->behavior = behavior;
+    obj->behavior      = bhvScript;
 
     if (objListIndex == OBJ_LIST_UNIMPORTANT) {
         obj->activeFlags |= ACTIVE_FLAG_UNIMPORTANT;
-    }
-
-    //! They intended to snap certain objects to the floor when they spawn.
-    //  However, at this point the object's position is the origin. So this will
-    //  place the object at the floor beneath the origin. Typically this
-    //  doesn't matter since the caller of this function sets oPosX/Y/Z
-    //  themselves.
-    switch (objListIndex) {
-        case OBJ_LIST_GENACTOR:
-        case OBJ_LIST_PUSHABLE:
-        case OBJ_LIST_POLELIKE:
-            snap_object_to_floor(obj);
-            break;
-        default:
-            break;
     }
 
     return obj;
