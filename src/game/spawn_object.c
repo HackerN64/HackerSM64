@@ -51,7 +51,7 @@ static void deallocate_object(struct ObjectNode *freeList, struct ObjectNode *ob
     obj->prev->next = obj->next;
 
     // Insert at beginning of free list
-    obj->next = freeList->next;
+    obj->next      = freeList->next;
     freeList->next = obj;
 }
 
@@ -100,8 +100,7 @@ void unload_object(struct Object *obj) {
     geo_remove_child(&obj->header.gfx.node);
     geo_add_child(&gObjParentGraphNode, &obj->header.gfx.node);
 
-    obj->header.gfx.node.flags &= ~GRAPH_RENDER_BILLBOARD;
-    obj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
+    obj->header.gfx.node.flags &= ~(GRAPH_RENDER_BILLBOARD | GRAPH_RENDER_ACTIVE);
 
     deallocate_object(&gFreeObjectList, &obj->header);
 }
@@ -132,10 +131,9 @@ struct Object *allocate_object(struct ObjectNode *objList) {
             unload_object(unimportantObj);
             obj = try_allocate_object(objList, &gFreeObjectList);
             if (gCurrentObject == obj) {
-                //! Uh oh, the unimportant object was in the middle of
-                //  updating! This could cause some interesting logic errors,
-                //  but I don't know of any unimportant objects that spawn
-                //  other objects.
+                //! Uh oh, the unimportant object was in the middle of updating!
+                //  This could cause some interesting logic errors, but I don't
+                //  know of any unimportant objects that spawn other objects.
             }
         }
     }

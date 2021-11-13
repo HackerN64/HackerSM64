@@ -18,29 +18,25 @@
 void exec_anim_sound_state(struct SoundState *soundStates) {
     s32 stateIdx = gCurrentObject->oSoundStateID;
 
-    switch (soundStates[stateIdx].playSound) {
-        // since we have an array of sound states corresponding to
-        // various behaviors, not all entries intend to play sounds. the
-        // boolean being 0 for unused entries skips these states.
-        case FALSE:
-            break;
-        case TRUE: {
-            s32 animFrame;
+    // since we have an array of sound states corresponding to
+    // various behaviors, not all entries intend to play sounds. the
+    // boolean being 0 for unused entries skips these states.
+    if (soundStates[stateIdx].playSound) {
+        s32 animFrame;
 
-            // in the sound state information, -1 (0xFF) is for empty
-            // animFrame entries. These checks skips them.
-            if ((animFrame = soundStates[stateIdx].animFrame1) >= 0) {
-                if (cur_obj_check_anim_frame(animFrame)) {
-                    cur_obj_play_sound_2(soundStates[stateIdx].soundMagic);
-                }
+        // in the sound state information, -1 (0xFF) is for empty
+        // animFrame entries. These checks skips them.
+        if ((animFrame = soundStates[stateIdx].animFrame1) >= 0) {
+            if (cur_obj_check_anim_frame(animFrame)) {
+                cur_obj_play_sound_2(soundStates[stateIdx].soundMagic);
             }
+        }
 
-            if ((animFrame = soundStates[stateIdx].animFrame2) >= 0) {
-                if (cur_obj_check_anim_frame(animFrame)) {
-                    cur_obj_play_sound_2(soundStates[stateIdx].soundMagic);
-                }
+        if ((animFrame = soundStates[stateIdx].animFrame2) >= 0) {
+            if (cur_obj_check_anim_frame(animFrame)) {
+                cur_obj_play_sound_2(soundStates[stateIdx].soundMagic);
             }
-        } break;
+        }
     }
 }
 
@@ -101,7 +97,7 @@ s32 calc_dist_to_volume_range_1(f32 distance) { // range from 60-124
     } else if (1500.0f < distance) {
         volume = 0;
     } else {
-        volume = (((distance - 500.0f) / 1000.0f) * 64.0f) + 60.0f;
+        volume = ((((distance - 500.0f) / 1000.0f) * 64.0f) + 60.0f);
     }
 
     return volume;
@@ -115,7 +111,7 @@ s32 calc_dist_to_volume_range_2(f32 distance) { // range from 79.2-143.2
     } else if (2300.0f < distance) {
         volume = 0;
     } else {
-        volume = (((distance - 1000.0f) / 1000.0f) * 64.0f) + 60.0f;
+        volume = ((((distance - 1000.0f) / 1000.0f) * 64.0f) + 60.0f);
     }
 
     return volume;

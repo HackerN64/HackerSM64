@@ -25,12 +25,14 @@ static struct VblankHandler sSoundVblankHandler;
 // Only written to, never read.
 static u8 sMusicVolume = 0;
 
-static u8 sBgMusicDisabled = FALSE;
-static u16 sCurrentMusic = MUSIC_NONE;
-static u16 sCurrentShellMusic = MUSIC_NONE;
-static u16 sCurrentCapMusic = MUSIC_NONE;
-static u8 sPlayingInfiniteStairs = FALSE;
-static s16 sSoundMenuModeToSoundMode[] = { SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET };
+static u8  sBgMusicDisabled       = FALSE;
+static u16 sCurrentMusic          = MUSIC_NONE;
+static u16 sCurrentShellMusic     = MUSIC_NONE;
+static u16 sCurrentCapMusic       = MUSIC_NONE;
+static u8  sPlayingInfiniteStairs = FALSE;
+static s16 sSoundMenuModeToSoundMode[] = {
+    SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET
+};
 // Only the 20th array element is used.
 static u32 sMenuSoundsExtra[] = {
     SOUND_MOVING_TERRAIN_SLIDE + (0 << 16),
@@ -198,16 +200,12 @@ void play_painting_eject_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void play_infinite_stairs_music(void) {
-    u8 shouldPlay = FALSE;
-
-    /* Infinite stairs? */
-    if (gCurrLevelNum == LEVEL_CASTLE && gCurrAreaIndex == 2 && gMarioState->numStars < 70) {
-        if (gMarioState->floor != NULL && gMarioState->floor->room == 6) {
-            if (gMarioState->pos[2] < 2540.0f) {
-                shouldPlay = TRUE;
-            }
-        }
-    }
+    u8 shouldPlay = ((gCurrLevelNum == LEVEL_CASTLE)
+                  && (gCurrAreaIndex == 2)
+                  && (gMarioState->numStars < 70)
+                  && (gMarioState->floor != NULL)
+                  && (gMarioState->floor->room == 6)
+                  && (gMarioState->pos[2] < 2540.0f));
 
     if (sPlayingInfiniteStairs ^ shouldPlay) {
         sPlayingInfiniteStairs = shouldPlay;
@@ -288,7 +286,7 @@ void stop_shell_music(void) {
  */
 void play_cap_music(u16 seqArgs) {
     play_music(SEQ_PLAYER_LEVEL, seqArgs, 0);
-    if (sCurrentCapMusic != MUSIC_NONE && sCurrentCapMusic != seqArgs) {
+    if ((sCurrentCapMusic != MUSIC_NONE) && (sCurrentCapMusic != seqArgs)) {
         stop_background_music(sCurrentCapMusic);
     }
     sCurrentCapMusic = seqArgs;
@@ -358,9 +356,9 @@ void thread4_sound(UNUSED void *arg) {
 #if PUPPYPRINT_DEBUG
                 profiler_update(audioTime, lastTime);
                 audioTime[perfIteration] -= dmaAudioTime[perfIteration];
-                if (benchmarkLoop > 0 && benchOption == 1) {
+                if ((benchmarkLoop > 0) && (benchOption == 1)) {
                     benchmarkLoop--;
-                    benchMark[benchmarkLoop] = osGetTime() - lastTime;
+                    benchMark[benchmarkLoop] = (osGetTime() - lastTime);
                     if (benchmarkLoop == 0) {
                         puppyprint_profiler_finished();
                         break;

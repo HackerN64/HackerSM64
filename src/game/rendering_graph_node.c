@@ -828,7 +828,6 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
 #ifndef DISABLE_SHADOWS
     Mat4 mtxf;
     Vec3f shadowPos;
-    Vec3f animOffset;
     f32 shadowScale;
 
     if ((gCurGraphNodeCamera != NULL) && (gCurGraphNodeObject != NULL)) {
@@ -849,6 +848,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                     objScale = ((struct GraphNodeScale *) geo)->scale;
                 }
                 f32 animScale = (gCurrAnimTranslationMultiplier * objScale);
+                Vec3f animOffset;
                 animOffset[0] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * animScale);
                 animOffset[1] = 0.0f;
                 gCurrAnimAttribute += 2;

@@ -295,7 +295,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     s.scale[0] = (s.scale[1] * scaleXMod);
     s.scale[2] = (s.scale[1] * scaleZMod);
 
-    pos[1] = gCurrShadow.floorHeight;
+    pos[1] = s.floorHeight;
 
     return displayList;
 }
