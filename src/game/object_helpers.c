@@ -1446,7 +1446,7 @@ void cur_obj_move_using_vel_and_gravity(void) {
 
 void cur_obj_move_using_fvel_and_gravity(void) {
     cur_obj_compute_vel_xz();
-    cur_obj_move_using_vel_and_gravity(); //! No terminal velocity
+    cur_obj_move_using_vel_and_gravity();
 }
 
 void obj_set_pos_relative(struct Object *obj, struct Object *other, f32 dleft, f32 dy, f32 dforward) {
@@ -1506,9 +1506,7 @@ void obj_set_throw_matrix_from_transform(struct Object *obj) {
 
     obj->header.gfx.throwMatrix = &obj->transform;
 
-    //! Sets scale of gCurrentObject instead of obj. Not exploitable since this
-    //  function is only called with obj = gCurrentObject
-    cur_obj_scale(1.0f);
+    obj_scale(obj, 1.0f);
 }
 
 void obj_build_transform_relative_to_parent(struct Object *obj) {
