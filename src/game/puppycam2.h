@@ -11,7 +11,9 @@ enum PuppyCamFlags {
     PUPPYCAM_FLAGS_SMOOTH   = (1 << 1), // 0x0002
 };
 
-#define PUPPY_ERROR_POOL_FULL 0x1
+enum PuppyErrors {
+    PUPPY_ERROR_POOL_FULL = (1 << 0), // 0x1
+};
 
 #define PUPPY_NULL 15151
 #define MAX_PUPPYCAM_VOLUMES 128
@@ -41,6 +43,12 @@ enum PuppySplineFlags {
 enum PuppyDebugFlags {
     PUPPYDEBUG_LOCK_CONTROLS          = (1 << 0), // 0x1
     PUPPYDEBUG_TRACK_MARIO            = (1 << 1), // 0x2
+};
+
+enum PuppyCamInputTypes {
+    PUPPYCAMP_INPUT_TYPE_DOUBLE_TAP,
+    PUPPYCAMP_INPUT_TYPE_SINGLE_PRESS,
+    PUPPYCAM_INPUT_TYPE_CLASSIC,
 };
 
 #include "include/command_macros_base.h"
