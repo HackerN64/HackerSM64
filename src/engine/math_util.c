@@ -474,6 +474,36 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
 }
 
 /**
+ * Mostly the same as 'mtxf_align_terrain_normal', but also applies a scale and multiplication.
+ * 'src' is the matrix to multiply from
+ * 'upDir' is the terrain normal
+ * 'pos' is the object's position in the world
+ * 'scale' is the scale of the shadow
+ * 'yaw' is the angle which it should face
+ */
+void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
+    Vec3f lateralDir;
+    Vec3f leftDir;
+    Vec3f forwardDir;
+    vec3f_set(lateralDir, sins(yaw), 0.0f, coss(yaw));
+    vec3f_normalize(upDir);
+    vec3f_cross(leftDir, upDir, lateralDir);
+    vec3f_normalize(leftDir);
+    vec3f_cross(forwardDir, leftDir, upDir);
+    vec3f_normalize(forwardDir);
+    Vec3f entry;
+    vec3_prod(entry, leftDir, scale);
+    linear_mtxf_mul_vec3f(src, dest[0], entry);
+    vec3_prod(entry, upDir, scale);
+    linear_mtxf_mul_vec3f(src, dest[1], entry);
+    vec3_prod(entry, forwardDir, scale);
+    linear_mtxf_mul_vec3f(src, dest[2], entry);
+    linear_mtxf_mul_vec3f(src, dest[3], pos);
+    vec3f_add(dest[3], src[3]);
+    MTXF_END(dest);
+}
+
+/**
  * Set 'dest' to a transformation matrix that aligns an object with the terrain
  * based on the normal. Used for enemies.
  * 'upDir' is the terrain normal

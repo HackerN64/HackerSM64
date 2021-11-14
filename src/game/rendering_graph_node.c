@@ -826,11 +826,9 @@ void geo_set_animation_globals(struct AnimInfo *node, s32 hasAnimation) {
  */
 void geo_process_shadow(struct GraphNodeShadow *node) {
 #ifndef DISABLE_SHADOWS
-    Mat4 mtxf;
-    Vec3f shadowPos;
-    f32 shadowScale;
-
     if ((gCurGraphNodeCamera != NULL) && (gCurGraphNodeObject != NULL)) {
+        Vec3f shadowPos;
+        f32 shadowScale;
         if (gCurGraphNodeHeldObject != NULL) {
             get_pos_from_transform_mtx(shadowPos, gMatStack[gMatStackIndex], *gCurGraphNodeCamera->matrixPtr);
             shadowScale = (node->shadowScale * gCurGraphNodeHeldObject->objNode->header.gfx.scale[0]);
@@ -866,10 +864,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
         Gfx *shadowList = create_shadow_below_xyz(shadowPos, shadowScale, node->shadowSolidity, node->shadowType);
 
         if (shadowList != NULL) {
-            mtxf_align_terrain_normal(mtxf, gCurrShadow.floorNormal, shadowPos, gCurGraphNodeObject->angle[1]);
-            mtxf_scale_vec3f(mtxf, mtxf, gCurrShadow.scale);
-
-            mtxf_mul(gMatStack[gMatStackIndex + 1], mtxf, *gCurGraphNodeCamera->matrixPtr);
+            mtxf_shadow(gMatStack[gMatStackIndex + 1], *gCurGraphNodeCamera->matrixPtr, gCurrShadow.floorNormal, shadowPos, gCurrShadow.scale, gCurGraphNodeObject->angle[1]);
             inc_mat_stack();
             geo_append_display_list((void *) VIRTUAL_TO_PHYSICAL(shadowList),
                                     ((gCurrShadow.flags & (SHADOW_FLAG_WATER_BOX | SHADOW_FLAG_WATER_SURFACE | SHADOW_FLAG_ICE | SHADOW_FLAG_CARPET)) ? LAYER_TRANSPARENT : LAYER_TRANSPARENT_DECAL));

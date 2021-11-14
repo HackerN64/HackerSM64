@@ -327,7 +327,7 @@ struct GraphNodeScale {
 };
 
 /** GraphNode that draws a shadow under an object.
- *  Every object starts with a shadow node.
+ *  Almost every object starts with a shadow node.
  *  The shadow type determines the shape (round or rectangular), vertices (4 or 9)
  *  and other features.
  */
