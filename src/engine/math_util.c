@@ -294,24 +294,24 @@ void vec3f_normalize(Vec3f dest) {
         register f32 invsqrt = (1.0f / sqrtf(mag));
         vec3_mul_val(dest, invsqrt);
     } else {
+        // Default to up vector.
         dest[0] = 0;
         ((u32 *) dest)[1] = FLOAT_ONE;
         dest[2] = 0;
     }
 }
 
+/// Struct the same data size as a Mat4
 struct CopyMat4 {
     f32 a[0x10];
 };
 
-/// Copy matrix 'src' to 'dest'
+/// Copy matrix 'src' to 'dest' by casting to a struct CopyMat4 pointer.
 void mtxf_copy(register Mat4 dest, register Mat4 src) {
     *((struct CopyMat4 *) dest) = *((struct CopyMat4 *) src);
 }
 
-/**
- * Set mtx to the identity matrix
- */
+/// Set mtx to the identity matrix.
 void mtxf_identity(register Mat4 mtx) {
     s32 i;
     f32 *dest;
@@ -323,9 +323,7 @@ void mtxf_identity(register Mat4 mtx) {
     }
 }
 
-/**
- * Set dest to a translation matrix of vector b
- */
+/// Set dest to a translation matrix of vector b.
 void mtxf_translate(Mat4 dest, Vec3f b) {
     register s32 i;
     register f32 *pen;
@@ -375,10 +373,7 @@ void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
     }
 }
 
-/**
- * Build a matrix that rotates around the z axis, then the x axis, then the y
- * axis, and then translates.
- */
+/// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates.
 void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
     register f32 sx   = sins(rot[0]);
     register f32 cx   = coss(rot[0]);
@@ -403,10 +398,7 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
     MTXF_END(dest);
 }
 
-/**
- * Build a matrix that rotates around the x axis, then the y axis, then the z
- * axis, and then translates.
- */
+/// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates.
 void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
     register f32 sx   = sins(rot[0]);
     register f32 cx   = coss(rot[0]);
@@ -431,6 +423,7 @@ void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
     MTXF_END(dest);
 }
 
+/// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates and multiplies.
 void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
     register f32 sx = sins(rot[0]);
     register f32 cx = coss(rot[0]);
@@ -460,6 +453,7 @@ void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
     MTXF_END(dest);
 }
 
+/// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates and multiplies.
 void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
     register f32 sx = sins(rot[0]);
     register f32 cx = coss(rot[0]);
@@ -1287,35 +1281,52 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     Vec3f norm;
     // Ignore certain surface types.
     if ((surface->type == SURFACE_INTANGIBLE) || (surface->flags & SURFACE_FLAG_NO_CAM_COLLISION)) return FALSE;
-    // Get surface normal and some other stuff
-    vec3f_set(norm, surface->normal.x, surface->normal.y, surface->normal.z);
-    vec3_mul_val(norm, RAY_OFFSET);
+    // Convert the vertices to Vec3f.
     vec3s_to_vec3f(v0, surface->vertex1);
     vec3s_to_vec3f(v1, surface->vertex2);
     vec3s_to_vec3f(v2, surface->vertex3);
+    // Get surface normal and extend it by RAY_OFFSET.
+    vec3f_set(norm, surface->normal.x, surface->normal.y, surface->normal.z);
+    vec3_mul_val(norm, RAY_OFFSET);
+    // Move the face forward by RAY_OFFSET.
     vec3f_add( v0, norm);
     vec3f_add( v1, norm);
     vec3f_add( v2, norm);
+    // Make 'e1' the vector from vertex 0 to vertex 1 (edge 1).
     vec3f_diff(e1, v1, v0);
+    // Make 'e2' the vector from vertex 0 to vertex 2 (edge 2).
     vec3f_diff(e2, v2, v0);
+    // Make 'h' the vector perpendicular to edge 1 and 2.
+    //! This recalculates the normal vector. Just using 'norm' here seems to break wall collisions though.
     vec3f_cross(h, dir, e2);
-    // Check if we're perpendicular from the surface
-    f32 a = vec3f_dot(e1, h); // Angle difference between ray and surface normals
+    // Determine the angle difference between ray and surface normals.
+    f32 a = vec3f_dot(e1, h);
+    // Check if we're perpendicular from the surface.
     if ((a > -NEAR_ZERO) && (a < NEAR_ZERO)) return FALSE;
-    // Check if we're making contact with the surface
+    // Check if we're making contact with the surface.
+    // Make f the inverse of the angle between ray and surface normals.
     f32 f = (1.0f / a);
+    // Make 's' the vector from vertex 0 to 'orig'.
     vec3f_diff(s, orig, v0);
+    // Make 'u' the angle between vectors 's' and normals, scaled by 'f'.
     f32 u = (f * vec3f_dot(s, h));
+    // Check if 'u' is within bounds.
     if ((u < 0.0f) || (u > 1.0f)) return FALSE;
+    // Make 'q' the vector perpendicular to 's' and edge 1.
     vec3f_cross(q, s, e1);
+    // Make 'v' the angle between the ray and 'q', scaled by 'f'.
     f32 v = (f * vec3f_dot(dir, q));
+    // Check if 'v' is within bounds.
     if ((v < 0.0f) || ((u + v) > 1.0f)) return FALSE;
-    // Get the length between our origin and the surface contact point
+    // Get the length between our origin and the surface contact point.
+    // Make '*length' the angle betqwwn edge 2 and 'q', scaled by 'f'.
     *length = (f * vec3f_dot(e2, q));
+    // Check if '*length' is within bounds.
     if ((*length <= NEAR_ZERO) || (*length > dir_length)) return FALSE;
-    // Successful contact
-    vec3f_copy(add_dir, dir);
-    vec3_mul_val(add_dir, *length);
+    // Successful contact.
+    // Make 'add_dir' into 'dir' scaled by 'length'.
+    vec3_prod_val(add_dir, dir, *length);
+    // Make 'hit_pos' into the sum of 'orig' and 'add_dir'.
     vec3f_sum(hit_pos, orig, add_dir);
     return TRUE;
 }
@@ -1330,9 +1341,11 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
 #endif
     // Get upper and lower bounds of ray
     if (dir[1] >= 0.0f) {
+        // Ray is upwards.
         top    = (orig[1] + (dir[1] * dir_length));
         bottom = orig[1];
     } else {
+        // Ray is downwards.
         top    = orig[1];
         bottom = (orig[1] + (dir[1] * dir_length));
     }
