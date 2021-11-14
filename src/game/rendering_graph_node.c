@@ -837,29 +837,28 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             shadowScale = (node->shadowScale * gCurGraphNodeObject->scale[0]);
         }
 
-        if (gCurrAnimEnabled) {
-            if ((gCurrAnimType == ANIM_TYPE_TRANSLATION)
-             || (gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION)) {
-                struct GraphNode *geo = node->node.children;
-                f32 objScale = 1.0f;
-                if ((geo != NULL) && (geo->type == GRAPH_NODE_TYPE_SCALE)) {
-                    objScale = ((struct GraphNodeScale *) geo)->scale;
-                }
-                f32 animScale = (gCurrAnimTranslationMultiplier * objScale);
-                Vec3f animOffset;
-                animOffset[0] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * animScale);
-                animOffset[1] = 0.0f;
-                gCurrAnimAttribute += 2;
-                animOffset[2] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * animScale);
-                gCurrAnimAttribute -= 6;
-
-                // simple matrix rotation so the shadow offset rotates along with the object
-                f32 sinAng = sins(gCurGraphNodeObject->angle[1]);
-                f32 cosAng = coss(gCurGraphNodeObject->angle[1]);
-
-                shadowPos[0] += (( animOffset[0] * cosAng) + (animOffset[2] * sinAng));
-                shadowPos[2] += ((-animOffset[0] * sinAng) + (animOffset[2] * cosAng));
+        if (gCurrAnimEnabled
+         && ((gCurrAnimType == ANIM_TYPE_TRANSLATION)
+          || (gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION))) {
+            struct GraphNode *geo = node->node.children;
+            f32 objScale = 1.0f;
+            if ((geo != NULL) && (geo->type == GRAPH_NODE_TYPE_SCALE)) {
+                objScale = ((struct GraphNodeScale *) geo)->scale;
             }
+            f32 animScale = (gCurrAnimTranslationMultiplier * objScale);
+            Vec3f animOffset;
+            animOffset[0] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * animScale);
+            animOffset[1] = 0.0f;
+            gCurrAnimAttribute += 2;
+            animOffset[2] = (gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)] * animScale);
+            gCurrAnimAttribute -= 6;
+
+            // simple matrix rotation so the shadow offset rotates along with the object
+            f32 sinAng = sins(gCurGraphNodeObject->angle[1]);
+            f32 cosAng = coss(gCurGraphNodeObject->angle[1]);
+
+            shadowPos[0] += (( animOffset[0] * cosAng) + (animOffset[2] * sinAng));
+            shadowPos[2] += ((-animOffset[0] * sinAng) + (animOffset[2] * cosAng));
         }
         Gfx *shadowList = create_shadow_below_xyz(shadowPos, shadowScale, node->shadowSolidity, node->shadowType);
 

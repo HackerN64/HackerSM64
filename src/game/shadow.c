@@ -28,7 +28,7 @@ static ShadowRectangle shadowRectangles[2] = {
 };
 
 struct Shadow gCurrShadow;
-#define s gCurrShadow
+struct Shadow *s = &gCurrShadow;
 
 /**
  * Shrink a shadow when its parent object is further from the floor, given the
@@ -68,8 +68,8 @@ f32 get_water_level_below_shadow(Vec3f pos, struct Surface **waterFloor) {
     if (waterLevel < FLOOR_LOWER_LIMIT_MISC) {
         return FLOOR_LOWER_LIMIT_MISC;
     } else if ((pos[1] >= waterLevel)
-            && (s.floorHeight  <= waterLevel)) {
-        s.flags |= SHADOW_FLAG_WATER_BOX;
+            && (s->floorHeight  <= waterLevel)) {
+        s->flags |= SHADOW_FLAG_WATER_BOX;
     }
     return waterLevel;
 }
@@ -91,39 +91,39 @@ s32 init_shadow(Vec3f pos, s16 shadowScale, u8 overwriteSolidity) {
     //     waterLevel = get_water_level_below_shadow(s);
     // }
 
-    if (s.flags & SHADOW_FLAG_WATER_BOX) {
-        s.floorHeight = waterLevel;
+    if (s->flags & SHADOW_FLAG_WATER_BOX) {
+        s->floorHeight = waterLevel;
 
         if (waterFloor != NULL) {
-            s.floor    = waterFloor;
-            s.flags   &= ~SHADOW_FLAG_WATER_BOX;
-            s.flags   |=  SHADOW_FLAG_WATER_SURFACE;
-            s.solidity = 200;
+            s->floor    = waterFloor;
+            s->flags   &= ~SHADOW_FLAG_WATER_BOX;
+            s->flags   |=  SHADOW_FLAG_WATER_SURFACE;
+            s->solidity = 200;
         } else {
-            s.flags &= ~SHADOW_FLAG_WATER_SURFACE;
+            s->flags &= ~SHADOW_FLAG_WATER_SURFACE;
             // Assume that the water is flat.
-            s.floorNormal[0] = 0.0f;
-            ((u32 *) s.floorNormal)[1] = FLOAT_ONE;
-            s.floorNormal[2] = 0.0f;
+            s->floorNormal[0] = 0.0f;
+            ((u32 *) s->floorNormal)[1] = FLOAT_ONE;
+            s->floorNormal[2] = 0.0f;
         }
 
     } else {
         // Don't draw a shadow if the floor is lower than expected possible,
         // or if the y-normal is negative (an unexpected result).
-        if ((s.floorNormal[1] <= 0.0f) || (s.floorHeight < FLOOR_LOWER_LIMIT_MISC)) {
+        if ((s->floorNormal[1] <= 0.0f) || (s->floorHeight < FLOOR_LOWER_LIMIT_MISC)) {
             return TRUE;
         }
     }
 
-    f32 dy = (pos[1] - s.floorHeight);
+    f32 dy = (pos[1] - s->floorHeight);
 
     if (overwriteSolidity) {
-        s.solidity = dim_shadow_with_distance(overwriteSolidity, dy);
+        s->solidity = dim_shadow_with_distance(overwriteSolidity, dy);
     }
 
-    s.scale[1] = scale_shadow_with_distance(shadowScale, dy);
+    s->scale[1] = scale_shadow_with_distance(shadowScale, dy);
 
-    return !(s.solidity);
+    return !(s->solidity);
 }
 
 /**
@@ -132,11 +132,11 @@ s32 init_shadow(Vec3f pos, s16 shadowScale, u8 overwriteSolidity) {
  */
 void linearly_interpolate_solidity_positive(u8 finalSolidity, s16 curr, s16 start, s16 end) {
     if ((curr >= 0) && (curr < start)) {
-        s.solidity = 0;
+        s->solidity = 0;
     } else if (end < curr) {
-        s.solidity = finalSolidity;
+        s->solidity = finalSolidity;
     } else {
-        s.solidity = ((f32) finalSolidity * (curr - start) / (end - start));
+        s->solidity = ((f32) finalSolidity * (curr - start) / (end - start));
     }
 }
 
@@ -151,9 +151,9 @@ void linearly_interpolate_solidity_negative(u8 initialSolidity, s16 curr, s16 st
     // This is not necessarily a bug, since this function is only used once,
     // with start == 0.
     if ((curr >= start) && (end >= curr)) {
-        s.solidity = ((f32) initialSolidity * (1.0f - (f32)(curr - start) / (end - start)));
+        s->solidity = ((f32) initialSolidity * (1.0f - (f32)(curr - start) / (end - start)));
     } else {
-        s.solidity = 0;
+        s->solidity = 0;
     }
 }
 
@@ -183,20 +183,20 @@ s32 correct_shadow_solidity_for_animations(u8 initialSolidity) {
  * Slightly change the height of a shadow in levels with lava.
  */
 void correct_lava_shadow_height(void) {
-    SurfaceType type = s.floor->type;
+    SurfaceType type = s->floor->type;
     if ((gCurrLevelNum == LEVEL_BITFS) && (type == SURFACE_BURNING)) {
-        if (s.floorHeight < -3000.0f) {
-            s.floorHeight = -3062.0f;
-            s.flags |= SHADOW_FLAG_WATER_BOX;
-        } else if (s.floorHeight > 3400.0f) {
-            s.floorHeight =  3492.0f;
-            s.flags |= SHADOW_FLAG_WATER_BOX;
+        if (s->floorHeight < -3000.0f) {
+            s->floorHeight = -3062.0f;
+            s->flags |= SHADOW_FLAG_WATER_BOX;
+        } else if (s->floorHeight > 3400.0f) {
+            s->floorHeight =  3492.0f;
+            s->flags |= SHADOW_FLAG_WATER_BOX;
         }
     } else if ((gCurrLevelNum  == LEVEL_LLL)
             && (gCurrAreaIndex == 1)
             && (type  == SURFACE_BURNING)) {
-        s.floorHeight = 5.0f;
-        s.flags |= SHADOW_FLAG_WATER_BOX;
+        s->floorHeight = 5.0f;
+        s->flags |= SHADOW_FLAG_WATER_BOX;
     }
 }
 
@@ -205,7 +205,7 @@ void correct_lava_shadow_height(void) {
  */
 void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
     gSPDisplayList(displayListHead++, (shadowType ? dl_shadow_square : dl_shadow_circle));
-    gDPSetEnvColor(displayListHead++, 255, 255, 255, s.solidity);
+    gDPSetEnvColor(displayListHead++, 255, 255, 255, s->solidity);
     gSPDisplayList(displayListHead++, dl_shadow_end);
     gSPEndDisplayList(displayListHead);
 }
@@ -220,40 +220,40 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     if ((gCurGraphNodeObjectNode == gMarioObject)
      && (gMarioState->floor != NULL)
      && (gCurGraphNodeHeldObject == NULL)) {
-        s.floor       = gMarioState->floor;
-        s.floorHeight = gMarioState->floorHeight;
+        s->floor       = gMarioState->floor;
+        s->floorHeight = gMarioState->floorHeight;
         isPlayer = TRUE;
     } else if ((gCurGraphNodeObject != &gMirrorMario)
             && (gCurGraphNodeObjectNode->oFloor != NULL)
             && (gCurGraphNodeHeldObject == NULL)) {
-        s.floor       = gCurGraphNodeObjectNode->oFloor;
-        s.floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
+        s->floor       = gCurGraphNodeObjectNode->oFloor;
+        s->floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
     } else {
         gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
-        s.floorHeight = find_floor(pos[0], pos[1], pos[2], &s.floor);
-        if (s.floor == NULL) return NULL;
+        s->floorHeight = find_floor(pos[0], pos[1], pos[2], &s->floor);
+        if (s->floor == NULL) return NULL;
     }
 
-    if ((pos[1] - s.floorHeight) > 1024.0f) {
+    if ((pos[1] - s->floorHeight) > 1024.0f) {
         return NULL;
     }
 
-    s.flags = SHADOW_FLAGS_NONE;
-    if (s.floor->type == SURFACE_ICE) {
-        s.flags |= SHADOW_FLAG_ICE;
+    s->flags = SHADOW_FLAGS_NONE;
+    if (s->floor->type == SURFACE_ICE) {
+        s->flags |= SHADOW_FLAG_ICE;
     }
 
-    vec3f_set(s.floorNormal, s.floor->normal.x, s.floor->normal.y, s.floor->normal.z);
+    vec3f_set(s->floorNormal, s->floor->normal.x, s->floor->normal.y, s->floor->normal.z);
 
     f32 scaleXMod = 1.0f;
     f32 scaleZMod = 1.0f;
 
     if (isPlayer) {
-        // Update s.flags if Mario is on a flying carpet.
+        // Update s->flags if Mario is on a flying carpet.
         if ((gCurrLevelNum == LEVEL_RR)
-         && (s.floor->object != NULL)
-         && (s.floor->object->behavior == segmented_to_virtual(bhvPlatformOnTrack))) {
-            s.flags |= SHADOW_FLAG_CARPET;
+         && (s->floor->object != NULL)
+         && (s->floor->object->behavior == segmented_to_virtual(bhvPlatformOnTrack))) {
+            s->flags |= SHADOW_FLAG_CARPET;
         }
         switch (correct_shadow_solidity_for_animations(shadowSolidity)) {
             case SHADOW_SOLIDITY_NO_SHADOW:
@@ -289,17 +289,16 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
 
     add_shadow_to_display_list(displayList, shadowType);
 
-    if (s.flags & SHADOW_FLAG_CARPET) {
-        s.floorHeight += 5;
+    if (s->flags & SHADOW_FLAG_CARPET) {
+        s->floorHeight += 5;
     }
 
-    s.scale[1] *= 0.5f;
-    s.scale[0] = (s.scale[1] * scaleXMod);
-    s.scale[2] = (s.scale[1] * scaleZMod);
+    f32 baseScale = (s->scale[1] * 0.5f);
+    s->scale[0] = (baseScale * scaleXMod);
+    s->scale[1] = baseScale;
+    s->scale[2] = (baseScale * scaleZMod);
 
-    pos[1] = s.floorHeight;
+    pos[1] = s->floorHeight;
 
     return displayList;
 }
-
-#undef s
