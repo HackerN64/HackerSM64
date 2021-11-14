@@ -116,6 +116,15 @@ void vec3s_to_vec3f(Vec3f dest, const Vec3s src) { vec3_copy_bits(f32, dest, s16
 void vec3i_to_vec3s(Vec3s dest, const Vec3i src) { vec3_copy_bits(s16, dest, s32, src); } // 32 -> 16
 void vec3i_to_vec3f(Vec3f dest, const Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
 
+void surface_normal_to_vec3f(Vec3f dest, struct Surface *surf) {
+    register f32 x = surf->normal.x;
+    register f32 y = surf->normal.y;
+    register f32 z = surf->normal.z;
+    ((f32 *) dest)[0] = x;
+    ((f32 *) dest)[1] = y;
+    ((f32 *) dest)[2] = z;
+}
+
 /**
  * Convert float vector a to a short vector 'dest' by rounding the components
  * to the nearest integer.
@@ -1277,7 +1286,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     vec3s_to_vec3f(v1, surface->vertex2);
     vec3s_to_vec3f(v2, surface->vertex3);
     // Get surface normal and extend it by RAY_OFFSET.
-    vec3f_set(norm, surface->normal.x, surface->normal.y, surface->normal.z);
+    surface_normal_to_vec3f(norm, surface);
     vec3_mul_val(norm, RAY_OFFSET);
     // Move the face forward by RAY_OFFSET.
     vec3f_add( v0, norm);

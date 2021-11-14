@@ -164,7 +164,7 @@ s32 turn_obj_away_from_steep_floor(struct Surface *objFloor, f32 floorY, f32 obj
         return FALSE;
     }
 
-    vec3f_set(floor_n, objFloor->normal.x, objFloor->normal.y, objFloor->normal.z);
+    surface_normal_to_vec3f(floor_n, objFloor);
 
     // If the floor is steep and we are below it (i.e. walking into it), turn away from the floor.
     if ((floor_n[1] < 0.5f) && (floorY > o->oPosY)) {

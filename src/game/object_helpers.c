@@ -2087,13 +2087,13 @@ s32 cur_obj_update_dialog_with_cutscene(s32 actionArg, s32 dialogFlags, s32 cuts
 
 void cur_obj_align_gfx_with_floor(void) {
     struct Surface *floor;
-    Vec3f floorNormal;
     Vec3f position;
     vec3f_copy(position, &o->oPosVec);
 
     find_floor(position[0], position[1], position[2], &floor);
     if (floor != NULL) {
-        vec3f_set(floorNormal, floor->normal.x, floor->normal.y, floor->normal.z);
+        Vec3f floorNormal;
+        surface_normal_to_vec3f(floorNormal, floor);
         mtxf_align_terrain_normal(o->transform, floorNormal, position, o->oFaceAngleYaw);
         o->header.gfx.throwMatrix = &o->transform;
     }

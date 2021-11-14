@@ -3758,7 +3758,8 @@ s32 is_surf_within_bounding_box(struct Surface *surf, f32 xMax, f32 yMax, f32 zM
  * Because the function only uses `surf`s first vertex, some surfaces can shadow others.
  */
 s32 is_behind_surface(Vec3f pos, struct Surface *surf) {
-    Vec3f norm = { surf->normal.x, surf->normal.y, surf->normal.x };
+    Vec3f norm;
+    surface_normal_to_vec3f(norm, surf);
     Vec3f dir;
     vec3_diff(dir, surf->vertex1, pos);
     return (vec3_dot(dir, norm) < 0);

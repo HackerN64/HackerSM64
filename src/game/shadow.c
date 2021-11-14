@@ -243,7 +243,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         s->flags |= SHADOW_FLAG_ICE;
     }
 
-    vec3f_set(s->floorNormal, s->floor->normal.x, s->floor->normal.y, s->floor->normal.z);
+    surface_normal_to_vec3f(s->floorNormal, s->floor);
 
     f32 scaleXMod = 1.0f;
     f32 scaleZMod = 1.0f;
