@@ -218,12 +218,14 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     s8 isPlayer = FALSE;
     // Attempt to use existing floors before finding a new one.
     if ((gCurGraphNodeObjectNode == gMarioObject)
-     && (gMarioState->floor != NULL)) {
+     && (gMarioState->floor != NULL)
+     && (gCurGraphNodeHeldObject == NULL)) {
         s.floor       = gMarioState->floor;
         s.floorHeight = gMarioState->floorHeight;
         isPlayer = TRUE;
     } else if ((gCurGraphNodeObject != &gMirrorMario)
-            && (gCurGraphNodeObjectNode->oFloor != NULL)) {
+            && (gCurGraphNodeObjectNode->oFloor != NULL)
+            && (gCurGraphNodeHeldObject == NULL)) {
         s.floor       = gCurGraphNodeObjectNode->oFloor;
         s.floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
     } else {
