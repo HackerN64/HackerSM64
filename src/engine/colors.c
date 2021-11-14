@@ -81,6 +81,9 @@ void rgba32_to_colorRGBAf(ColorRGBAf dst, RGBA32 src) {
     dst[3] = COMPOSITE_TO_COLORF(src, MSK_RGBA32_A, IDX_RGBA32_A);
 }
 
+void colorRGB_to_colorRGBf(ColorRGBf dst, ColorRGB src) { vec3_quot_val(dst, src, 255.0f); }
+void colorRGBf_to_colorRGB(ColorRGB dst, ColorRGBf src) { vec3_prod_val(dst, src, 255.0f); }
+
 RGBA16Return32 colorRGBf_to_rgba16(ColorRGBf src) {
     return (COLORF_TO_COMPOSITE(src[0], MSK_RGBA16_C, IDX_RGBA16_R)
           | COLORF_TO_COMPOSITE(src[1], MSK_RGBA16_C, IDX_RGBA16_G)
@@ -109,24 +112,12 @@ RGBA32 colorRGBAf_to_rgba32(ColorRGBAf src) {
           | COLORF_TO_COMPOSITE(src[2], MSK_RGBA32_A, IDX_RGBA32_A));
 }
 
-//! TODO:
-// void colorRGB_to_colorHSV(ColorHSV dst, ColorRGB src) {
-// }
-
-// void colorHSV_to_colorRGB(ColorRGB dst, ColorHSV src) {
-// }
-
-// void colorRGBf_to_colorHSVf(ColorHSVf dst, ColorRGBf src) {
-// }
-
-// void colorHSVf_to_colorRGBf(ColorRGBf dst, ColorHSVf src) {
-// }
-
 Bool32 colorRGBA_average_2(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2) {
     if ((dst[3] = (c1[3] + c2[3])) > 0) {
-        dst[0] = (((c1[0] * c1[3]) + (c2[0] * c2[3])) / dst[3]);
-        dst[1] = (((c1[1] * c1[3]) + (c2[1] * c2[3])) / dst[3]);
-        dst[2] = (((c1[2] * c1[3]) + (c2[2] * c2[3])) / dst[3]);
+        s32 i;
+        for (i = 0; i < 3; i++) {
+            dst[i] = (((c1[i] * c1[3]) + (c2[i] * c2[3])) / dst[3]);
+        }
         return TRUE;
     }
     return FALSE;
@@ -134,9 +125,10 @@ Bool32 colorRGBA_average_2(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2) {
 
 Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA c3) {
     if ((dst[3] = (c1[3] + c2[3] + c3[3])) > 0) {
-        dst[0] = (((c1[0] * c1[3]) + (c2[0] * c2[3]) + (c3[0] * c3[3])) / dst[3]);
-        dst[1] = (((c1[1] * c1[3]) + (c2[1] * c2[3]) + (c3[1] * c3[3])) / dst[3]);
-        dst[2] = (((c1[2] * c1[3]) + (c2[2] * c2[3]) + (c3[2] * c3[3])) / dst[3]);
+        s32 i;
+        for (i = 0; i < 3; i++) {
+            dst[i] = (((c1[i] * c1[3]) + (c2[i] * c2[3]) + (c3[i] * c3[3])) / dst[3]);
+        }
         return TRUE;
     }
     return FALSE;

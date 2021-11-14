@@ -69,9 +69,9 @@ s32 random_sign(void) {
     if (a2 < a0) a0 = a2;       \
     return a0;                  \
 }
-f32 min_3f(f32 a, f32 b, f32 c) { min_3_func(a, b, c) }
-s32 min_3i(s32 a, s32 b, s32 c) { min_3_func(a, b, c) }
-s32 min_3s(s16 a, s16 b, s16 c) { min_3_func(a, b, c) }
+f32 min_3f(f32 a, f32 b, f32 c) { min_3_func(a, b, c); }
+s32 min_3i(s32 a, s32 b, s32 c) { min_3_func(a, b, c); }
+s32 min_3s(s16 a, s16 b, s16 c) { min_3_func(a, b, c); }
 
 /// Returns the highest of three values.
 #define max_3_func(a0, a1, a2) {\
@@ -79,22 +79,25 @@ s32 min_3s(s16 a, s16 b, s16 c) { min_3_func(a, b, c) }
     if (a2 > a0) a0 = a2;       \
     return a0;                  \
 }
-f32 max_3f(f32 a, f32 b, f32 c) { max_3_func(a, b, c) }
-s32 max_3i(s32 a, s32 b, s32 c) { max_3_func(a, b, c) }
-s32 max_3s(s16 a, s16 b, s16 c) { max_3_func(a, b, c) }
+f32 max_3f(f32 a, f32 b, f32 c) { max_3_func(a, b, c); }
+s32 max_3i(s32 a, s32 b, s32 c) { max_3_func(a, b, c); }
+s32 max_3s(s16 a, s16 b, s16 c) { max_3_func(a, b, c); }
 
 /// A combination of the above.
-void min_max_3(s32 a, s32 b, s32 c, s32 *min, s32 *max) {
-    if (b < a) {
-        *max = a;
-        *min = b;
-    } else {
-        *min = a;
-        *max = b;
-    }
-    if (c < *min) *min = c;
-    if (c > *max) *max = c;
+#define min_max_3_func(a, b, c, min, max) { \
+    if (b < a) {                            \
+        *max = a;                           \
+        *min = b;                           \
+    } else {                                \
+        *min = a;                           \
+        *max = b;                           \
+    }                                       \
+    if (c < *min) *min = c;                 \
+    if (c > *max) *max = c;                 \
 }
+void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max) { min_max_3_func(a, b, c, min, max); }
+void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max) { min_max_3_func(a, b, c, min, max); }
+void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, c, min, max); }
 
 /// Copy vector 'src' to 'dest'
 #define vec3_copy_bits(destFmt, dest, srcFmt, src) { \
