@@ -171,18 +171,113 @@ void vec3f_sum(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_sum_func(f32, de
 void vec3i_sum(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_sum_func(s32, dest, a, b); }
 void vec3s_sum(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_sum_func(s16, dest, a, b); }
 
+/// Subtract vector a from 'dest'
+#define vec3_sub_func(fmt, dest, a) {       \
+    register fmt *temp = (fmt *)(dest);     \
+    register fmt dif, dif2;                 \
+    register s32 i;                         \
+    for (i = 0; i < 3; i++) {               \
+        dif = *(a);                         \
+        (a)++;                              \
+        dif2 = *temp;                       \
+        temp++;                             \
+        temp[-1] = (dif - dif2);            \
+    }                                       \
+}
+void vec3f_sub(Vec3f dest, const Vec3f a) { vec3_sub_func(f32, dest, a); }
+void vec3i_sub(Vec3i dest, const Vec3i a) { vec3_sub_func(s32, dest, a); }
+void vec3s_sub(Vec3s dest, const Vec3s a) { vec3_sub_func(s16, dest, a); }
 
 /// Make 'dest' the difference of vectors a and b.
-void vec3f_diff(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_diff(dest, a, b); }
-void vec3i_diff(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_diff(dest, a, b); }
-void vec3s_diff(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_diff(dest, a, b); }
+#define vec3_diff_func(fmt, dest, a, b) {   \
+    register fmt *temp = (fmt *)(dest);     \
+    register fmt dif, dif2;                 \
+    register s32 i;                         \
+    for (i = 0; i < 3; i++) {               \
+        dif = *(a);                         \
+        (a)++;                              \
+        dif2 = *(b);                        \
+        (b)++;                              \
+        *temp = (dif - dif2);               \
+        temp++;                             \
+    }                                       \
+}
+void vec3f_diff(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_diff_func(f32, dest, a, b); }
+void vec3i_diff(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_diff_func(s32, dest, a, b); }
+void vec3s_diff(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_diff_func(s16, dest, a, b); }
 
-/// Subtract vector a from 'dest'
-void vec3f_sub(Vec3f dest, const Vec3f a) { vec3_sub(dest, a); }
-void vec3i_sub(Vec3i dest, const Vec3i a) { vec3_sub(dest, a); }
-void vec3s_sub(Vec3s dest, const Vec3s a) { vec3_sub(dest, a); }
+/// Multiply vector 'a' into 'dest'
+#define vec3_mul_func(fmt, dest, a) {       \
+    register fmt *temp = (fmt *)(dest);     \
+    register fmt sum, sum2;                 \
+    register s32 i;                         \
+    for (i = 0; i < 3; i++) {               \
+        sum = *(a);                         \
+        (a)++;                              \
+        sum2 = *temp;                       \
+        temp++;                             \
+        temp[-1] = (sum * sum2);            \
+    }                                       \
+}
+void vec3f_mul(Vec3f dest, const Vec3f a) { vec3_mul_func(f32, dest, a); }
+void vec3i_mul(Vec3i dest, const Vec3i a) { vec3_mul_func(s32, dest, a); }
+void vec3s_mul(Vec3s dest, const Vec3s a) { vec3_mul_func(s16, dest, a); }
+
+/// Make 'dest' the product of vectors a and b.
+#define vec3_prod_func(fmt, dest, a, b) {   \
+    register fmt *temp = (fmt *)(dest);     \
+    register fmt sum, sum2;                 \
+    register s32 i;                         \
+    for (i = 0; i < 3; i++) {               \
+        sum = *(a);                         \
+        (a)++;                              \
+        sum2 = *(b);                        \
+        (b)++;                              \
+        *temp = (sum * sum2);               \
+        temp++;                             \
+    }                                       \
+}
+void vec3f_prod(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_prod_func(f32, dest, a, b); }
+void vec3i_prod(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_prod_func(s32, dest, a, b); }
+void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_prod_func(s16, dest, a, b); }
 
 
+/// Add vector 'a' to 'dest'
+#define vec3_div_func(fmt, dest, a) {       \
+    register fmt *temp = (fmt *)(dest);     \
+    register fmt div, div2;                 \
+    register s32 i;                         \
+    for (i = 0; i < 3; i++) {               \
+        div = *(a);                         \
+        (a)++;                              \
+        div2 = *temp;                       \
+        temp++;                             \
+        temp[-1] = (div / div2);            \
+    }                                       \
+}
+void vec3f_div(Vec3f dest, const Vec3f a) { vec3_div_func(f32, dest, a); }
+void vec3i_div(Vec3i dest, const Vec3i a) { vec3_div_func(s32, dest, a); }
+void vec3s_div(Vec3s dest, const Vec3s a) { vec3_div_func(s16, dest, a); }
+
+/// Make 'dest' the sum of vectors a and b.
+#define vec3_quot_func(fmt, dest, a, b) {   \
+    register fmt *temp = (fmt *)(dest);     \
+    register fmt div, div2;                 \
+    register s32 i;                         \
+    for (i = 0; i < 3; i++) {               \
+        div = *(a);                         \
+        (a)++;                              \
+        div2 = *(b);                        \
+        (b)++;                              \
+        *temp = (div / div2);               \
+        temp++;                             \
+    }                                       \
+}
+void vec3f_quot(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_quot_func(f32, dest, a, b); }
+void vec3i_quot(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_quot_func(s32, dest, a, b); }
+void vec3s_quot(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_quot_func(s16, dest, a, b); }
+
+/// Return the dot product of vectors a and b.
 f32 vec3f_dot(const Vec3f a, const Vec3f b) {
     return vec3_dot(a, b);
 }
@@ -492,11 +587,11 @@ void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 y
     vec3f_cross(forwardDir, leftDir, upDir);
     vec3f_normalize(forwardDir);
     Vec3f entry;
-    vec3_prod(entry, leftDir, scale);
+    vec3f_prod(entry, leftDir, scale);
     linear_mtxf_mul_vec3f(src, dest[0], entry);
-    vec3_prod(entry, upDir, scale);
+    vec3f_prod(entry, upDir, scale);
     linear_mtxf_mul_vec3f(src, dest[1], entry);
-    vec3_prod(entry, forwardDir, scale);
+    vec3f_prod(entry, forwardDir, scale);
     linear_mtxf_mul_vec3f(src, dest[2], entry);
     linear_mtxf_mul_vec3f(src, dest[3], pos);
     vec3f_add(dest[3], src[3]);

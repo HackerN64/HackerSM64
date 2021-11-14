@@ -677,7 +677,7 @@ static s32 obj_move_for_one_second(s32 endAction) {
  */
 static void treat_far_home_as_mario(f32 threshold) {
     Vec3f d;
-    vec3_diff(d, &o->oHomeVec, &o->oPosVec);
+    vec3f_diff(d, &o->oHomeVec, &o->oPosVec);
     if (vec3_sumsq(d) > sqr(threshold)) {
         o->oAngleToMario = atan2s(d[2], d[0]);
         o->oDistanceToMario = 25000.0f;
@@ -686,7 +686,7 @@ static void treat_far_home_as_mario(f32 threshold) {
             o->oDistanceToMario = 20000.0f;
             return;
         }
-        vec3_diff(d, &o->oHomeVec, &gMarioObject->oPosVec);
+        vec3f_diff(d, &o->oHomeVec, &gMarioObject->oPosVec);
         if (vec3_sumsq(d) > sqr(threshold)) {
             o->oDistanceToMario = 20000.0f;
         }

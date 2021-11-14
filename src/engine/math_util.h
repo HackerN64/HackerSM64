@@ -513,6 +513,18 @@ void vec3s_sub (Vec3s dest, const Vec3s a               );
 void vec3f_diff(Vec3f dest, const Vec3f a, const Vec3f b);
 void vec3i_diff(Vec3i dest, const Vec3i a, const Vec3i b);
 void vec3s_diff(Vec3s dest, const Vec3s a, const Vec3s b);
+void vec3f_mul (Vec3f dest, const Vec3f a               );
+void vec3i_mul (Vec3i dest, const Vec3i a               );
+void vec3s_mul (Vec3s dest, const Vec3s a               );
+void vec3f_prod(Vec3f dest, const Vec3f a, const Vec3f b);
+void vec3i_prod(Vec3i dest, const Vec3i a, const Vec3i b);
+void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b);
+void vec3f_div (Vec3f dest, const Vec3f a               );
+void vec3i_div (Vec3i dest, const Vec3i a               );
+void vec3s_div (Vec3s dest, const Vec3s a               );
+void vec3f_quot(Vec3f dest, const Vec3f a, const Vec3f b);
+void vec3i_quot(Vec3i dest, const Vec3i a, const Vec3i b);
+void vec3s_quot(Vec3s dest, const Vec3s a, const Vec3s b);
 
 f32  vec3f_dot(              const Vec3f a, const Vec3f b);
 void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b);
