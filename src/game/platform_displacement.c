@@ -60,7 +60,7 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
     vec3f_copy(posDifference, pos);
     vec3f_sub(posDifference, displaceInfo->prevPos);
 
-    if ((platform == displaceInfo->prevPlatform) && (gGlobalTimer == displaceInfo->prevTimer + 1)) {
+    if ((platform == displaceInfo->prevPlatform) && (gGlobalTimer == (displaceInfo->prevTimer + 1))) {
         // Transform from relative positions to world positions
         vec3_prod(scaledPos, displaceInfo->prevTransformedPos, platform->header.gfx.scale);
         linear_mtxf_mul_vec3f(*platform->header.gfx.throwMatrix, pos, scaledPos);
@@ -70,7 +70,7 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
 
         // Calculate new yaw
         linear_mtxf_mul_vec3f(*platform->header.gfx.throwMatrix, yawVec, displaceInfo->prevTransformedYawVec);
-        *yaw = atan2s(yawVec[2], yawVec[0]) + yawDifference;
+        *yaw = (atan2s(yawVec[2], yawVec[0]) + yawDifference);
     } else {
         // First frame of standing on the platform, don't calculate a new position
         vec3f_sub(pos, platformPos);
@@ -93,7 +93,7 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
         vec3f_sub(sMarioAmountDisplaced, posDifference);
 
         // Make sure inertia isn't set on the first frame otherwise the previous value isn't cleared
-        if ((platform != displaceInfo->prevPlatform) || (gGlobalTimer != displaceInfo->prevTimer + 1)) {
+        if ((platform != displaceInfo->prevPlatform) || (gGlobalTimer != (displaceInfo->prevTimer + 1))) {
             vec3_zero(sMarioAmountDisplaced);
         }
     }
@@ -103,20 +103,20 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
     vec3f_copy(displaceInfo->prevPos, pos);
 
     // Set yaw info
-    vec3f_set(yawVec, sins(*yaw), 0, coss(*yaw));
+    vec3f_set(yawVec, sins(*yaw), 0.0f, coss(*yaw));
     linear_mtxf_transpose_mul_vec3f(*platform->header.gfx.throwMatrix, displaceInfo->prevTransformedYawVec, yawVec);
     displaceInfo->prevYaw = *yaw;
 
     // Update platform and timer
     displaceInfo->prevPlatform = platform;
-    displaceInfo->prevTimer = gGlobalTimer;
+    displaceInfo->prevTimer    = gGlobalTimer;
 }
 
 // Doesn't change in the code, set this to FALSE if you don't want inertia
 u8 gDoInertia = TRUE;
 
 static u8 sShouldApplyInertia = FALSE;
-static u8 sInertiaFirstFrame = FALSE;
+static u8 sInertiaFirstFrame  = FALSE;
 
 /**
  * Apply inertia based on Mario's last platform.

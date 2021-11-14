@@ -130,6 +130,7 @@ void vec3i_to_vec3f(Vec3f dest, const Vec3i src) { vec3_copy_bits(s32, dest, s32
 }
 void vec3f_to_vec3s(Vec3s dest, const Vec3f src) { vec3_copy_bits_roundf(s16, dest, src); } // 32 -> 16
 void vec3f_to_vec3i(Vec3i dest, const Vec3f src) { vec3_copy_bits_roundf(s32, dest, src); } // 32 -> 32
+#undef vec3_copy_bits_roundf
 
 /// Set vector 'dest' to (x, y, z)
 inline void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z) { vec3_set(dest, x, y, z); }
@@ -145,13 +146,14 @@ inline void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z) { vec3_
         sum = *(a);                     \
         (a)++;                          \
         sum2 = *temp;                   \
+        *temp = (sum + sum2);           \
         temp++;                         \
-        temp[-1] = (sum + sum2);        \
     }                                   \
 }
 void vec3f_add(Vec3f dest, const Vec3f a) { vec3_add_func(f32, dest, a); }
 void vec3i_add(Vec3i dest, const Vec3i a) { vec3_add_func(s32, dest, a); }
 void vec3s_add(Vec3s dest, const Vec3s a) { vec3_add_func(s16, dest, a); }
+#undef vec3_add_func
 
 /// Make 'dest' the sum of vectors a and b.
 #define vec3_sum_func(fmt, dest, a, b) {\
@@ -170,112 +172,101 @@ void vec3s_add(Vec3s dest, const Vec3s a) { vec3_add_func(s16, dest, a); }
 void vec3f_sum(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_sum_func(f32, dest, a, b); }
 void vec3i_sum(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_sum_func(s32, dest, a, b); }
 void vec3s_sum(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_sum_func(s16, dest, a, b); }
+#undef vec3_sum_func
 
 /// Subtract vector a from 'dest'
-#define vec3_sub_func(fmt, dest, a) {       \
-    register fmt *temp = (fmt *)(dest);     \
-    register fmt dif, dif2;                 \
-    register s32 i;                         \
-    for (i = 0; i < 3; i++) {               \
-        dif = *(a);                         \
-        (a)++;                              \
-        dif2 = *temp;                       \
-        temp++;                             \
-        temp[-1] = (dif - dif2);            \
-    }                                       \
+#define vec3_sub_func(fmt, dest, a) {   \
+    register fmt x = ((fmt *) a)[0];    \
+    register fmt y = ((fmt *) a)[1];    \
+    register fmt z = ((fmt *) a)[2];    \
+    ((fmt *) dest)[0] -= x;             \
+    ((fmt *) dest)[1] -= y;             \
+    ((fmt *) dest)[2] -= z;             \
 }
 void vec3f_sub(Vec3f dest, const Vec3f a) { vec3_sub_func(f32, dest, a); }
 void vec3i_sub(Vec3i dest, const Vec3i a) { vec3_sub_func(s32, dest, a); }
 void vec3s_sub(Vec3s dest, const Vec3s a) { vec3_sub_func(s16, dest, a); }
+#undef vec3_sub_func
 
 /// Make 'dest' the difference of vectors a and b.
 #define vec3_diff_func(fmt, dest, a, b) {   \
-    register fmt *temp = (fmt *)(dest);     \
-    register fmt dif, dif2;                 \
-    register s32 i;                         \
-    for (i = 0; i < 3; i++) {               \
-        dif = *(a);                         \
-        (a)++;                              \
-        dif2 = *(b);                        \
-        (b)++;                              \
-        *temp = (dif - dif2);               \
-        temp++;                             \
-    }                                       \
+    register fmt x1 = ((fmt *) a)[0];       \
+    register fmt y1 = ((fmt *) a)[1];       \
+    register fmt z1 = ((fmt *) a)[2];       \
+    register fmt x2 = ((fmt *) b)[0];       \
+    register fmt y2 = ((fmt *) b)[1];       \
+    register fmt z2 = ((fmt *) b)[2];       \
+    ((fmt *) dest)[0] = (x1 - x2);          \
+    ((fmt *) dest)[1] = (y1 - y2);          \
+    ((fmt *) dest)[2] = (z1 - z2);          \
 }
 void vec3f_diff(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_diff_func(f32, dest, a, b); }
 void vec3i_diff(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_diff_func(s32, dest, a, b); }
 void vec3s_diff(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_diff_func(s16, dest, a, b); }
+#undef vec3_diff_func
 
 /// Multiply vector 'a' into 'dest'
-#define vec3_mul_func(fmt, dest, a) {       \
-    register fmt *temp = (fmt *)(dest);     \
-    register fmt sum, sum2;                 \
-    register s32 i;                         \
-    for (i = 0; i < 3; i++) {               \
-        sum = *(a);                         \
-        (a)++;                              \
-        sum2 = *temp;                       \
-        temp++;                             \
-        temp[-1] = (sum * sum2);            \
-    }                                       \
+#define vec3_mul_func(fmt, dest, a) {   \
+    register fmt x = ((fmt *) a)[0];    \
+    register fmt y = ((fmt *) a)[1];    \
+    register fmt z = ((fmt *) a)[2];    \
+    ((fmt *) dest)[0] *= x;             \
+    ((fmt *) dest)[1] *= y;             \
+    ((fmt *) dest)[2] *= z;             \
 }
 void vec3f_mul(Vec3f dest, const Vec3f a) { vec3_mul_func(f32, dest, a); }
 void vec3i_mul(Vec3i dest, const Vec3i a) { vec3_mul_func(s32, dest, a); }
 void vec3s_mul(Vec3s dest, const Vec3s a) { vec3_mul_func(s16, dest, a); }
+#undef vec3_mul_func
 
 /// Make 'dest' the product of vectors a and b.
 #define vec3_prod_func(fmt, dest, a, b) {   \
-    register fmt *temp = (fmt *)(dest);     \
-    register fmt sum, sum2;                 \
-    register s32 i;                         \
-    for (i = 0; i < 3; i++) {               \
-        sum = *(a);                         \
-        (a)++;                              \
-        sum2 = *(b);                        \
-        (b)++;                              \
-        *temp = (sum * sum2);               \
-        temp++;                             \
-    }                                       \
+    register fmt x1 = ((fmt *) a)[0];       \
+    register fmt y1 = ((fmt *) a)[1];       \
+    register fmt z1 = ((fmt *) a)[2];       \
+    register fmt x2 = ((fmt *) b)[0];       \
+    register fmt y2 = ((fmt *) b)[1];       \
+    register fmt z2 = ((fmt *) b)[2];       \
+    ((fmt *) dest)[0] = (x1 * x2);          \
+    ((fmt *) dest)[1] = (y1 * y2);          \
+    ((fmt *) dest)[2] = (z1 * z2);          \
 }
 void vec3f_prod(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_prod_func(f32, dest, a, b); }
 void vec3i_prod(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_prod_func(s32, dest, a, b); }
 void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_prod_func(s16, dest, a, b); }
+#undef vec3_prod_func
 
 
 /// Add vector 'a' to 'dest'
-#define vec3_div_func(fmt, dest, a) {       \
-    register fmt *temp = (fmt *)(dest);     \
-    register fmt div, div2;                 \
-    register s32 i;                         \
-    for (i = 0; i < 3; i++) {               \
-        div = *(a);                         \
-        (a)++;                              \
-        div2 = *temp;                       \
-        temp++;                             \
-        temp[-1] = (div / div2);            \
-    }                                       \
+#define vec3_div_func(fmt, dest, a) {   \
+    register fmt x = ((fmt *) a)[0];    \
+    register fmt y = ((fmt *) a)[1];    \
+    register fmt z = ((fmt *) a)[2];    \
+    ((fmt *) dest)[0] /= x;             \
+    ((fmt *) dest)[1] /= y;             \
+    ((fmt *) dest)[2] /= z;             \
 }
 void vec3f_div(Vec3f dest, const Vec3f a) { vec3_div_func(f32, dest, a); }
 void vec3i_div(Vec3i dest, const Vec3i a) { vec3_div_func(s32, dest, a); }
 void vec3s_div(Vec3s dest, const Vec3s a) { vec3_div_func(s16, dest, a); }
+#undef vec3_div_func
 
 /// Make 'dest' the sum of vectors a and b.
 #define vec3_quot_func(fmt, dest, a, b) {   \
-    register fmt *temp = (fmt *)(dest);     \
-    register fmt div, div2;                 \
-    register s32 i;                         \
-    for (i = 0; i < 3; i++) {               \
-        div = *(a);                         \
-        (a)++;                              \
-        div2 = *(b);                        \
-        (b)++;                              \
-        *temp = (div / div2);               \
-        temp++;                             \
-    }                                       \
+    register fmt x1 = ((fmt *) a)[0];       \
+    register fmt y1 = ((fmt *) a)[1];       \
+    register fmt z1 = ((fmt *) a)[2];       \
+    register fmt x2 = ((fmt *) b)[0];       \
+    register fmt y2 = ((fmt *) b)[1];       \
+    register fmt z2 = ((fmt *) b)[2];       \
+    ((fmt *) dest)[0] = (x1 / x2);          \
+    ((fmt *) dest)[1] = (y1 / y2);          \
+    ((fmt *) dest)[2] = (z1 / z2);          \
 }
 void vec3f_quot(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_quot_func(f32, dest, a, b); }
 void vec3i_quot(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_quot_func(s32, dest, a, b); }
 void vec3s_quot(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_quot_func(s16, dest, a, b); }
+#undef vec3_quot_func
 
 /// Return the dot product of vectors a and b.
 f32 vec3f_dot(const Vec3f a, const Vec3f b) {
