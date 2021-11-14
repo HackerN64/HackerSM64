@@ -1413,6 +1413,13 @@ enum animIDsPeach { //! TODO: anim names 0-3 & 6-8
     #define YOSHI_ANIM_WALK                                 0x1
     #define YOSHI_ANIM_JUMP                                 0x2
 
+/* Koopa Race end waypoint */
+enum oKoopaRaceEndpointRaceStatuses {
+    KOOPA_RACE_ENDPOINT_STATUS_MARIO_CHEATED = -1,
+    KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON     =  0,
+    KOOPA_RACE_ENDPOINT_STATUS_MARIO_WON     =  1,
+};
+
 /* Koopa (General) */
     /* oBehParams2ndByte */
     #define KOOPA_BP_UNSHELLED                              0x0

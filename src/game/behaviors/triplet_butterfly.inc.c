@@ -27,13 +27,13 @@ static void triplet_butterfly_act_init(void) {
     s32 butterflyNum = (o->oBehParams2ndByte & TRIPLET_BUTTERFLY_BP_BUTTERFLY_NUM);
     s32 i;
 
-    if (butterflyNum != 0 || o->oDistanceToMario < 200.0f) {
+    if ((butterflyNum != 0) || (o->oDistanceToMario < 200.0f)) {
         if (butterflyNum == 0) {
-            for (i = 1; i <= 2; i++) {
+            for (i = 1; i < 3; i++) {
                 spawn_object_relative(i, 0, 0, 0, o, MODEL_BUTTERFLY, bhvTripletButterfly);
             }
 
-            o->oTripletButterflySelectedButterfly = random_u16() % 3;
+            o->oTripletButterflySelectedButterfly = (random_u16() % 3);
         }
 
         //! TODO: Describe this glitch
@@ -46,7 +46,7 @@ static void triplet_butterfly_act_init(void) {
 
         o->oAction = TRIPLET_BUTTERFLY_ACT_WANDER;
 
-        o->oTripletButterflyBaseYaw = o->oBehParams2ndByte * (0x10000 / 3);
+        o->oTripletButterflyBaseYaw = (o->oBehParams2ndByte * (0x10000 / 3));
         o->oMoveAngleYaw = (s32)(o->oTripletButterflyBaseYaw + random_linear_offset(0, DEGREES(120)));
         o->oTripletButterflySpeed = random_linear_offset(15, 15);
 

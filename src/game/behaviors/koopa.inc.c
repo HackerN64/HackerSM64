@@ -113,7 +113,7 @@ static s32 koopa_check_run_from_mario(void) {
  */
 static void koopa_shelled_act_stopped(void) {
     o->oForwardVel = 0.0f;
-    if (cur_obj_init_anim_and_check_if_end(7)) {
+    if (cur_obj_init_anim_and_check_if_end(KOOPA_ANIM_STOPPED)) {
         o->oAction = KOOPA_SHELLED_ACT_WALK;
         o->oKoopaTargetYaw = (o->oMoveAngleYaw + (0x2000 * (s16)random_sign()));
     }
@@ -125,7 +125,7 @@ static void koopa_shelled_act_stopped(void) {
 static void koopa_walk_start(void) {
     obj_forward_vel_approach((3.0f * o->oKoopaAgility), (0.3f * o->oKoopaAgility));
 
-    if (cur_obj_init_anim_and_check_if_end(11)) {
+    if (cur_obj_init_anim_and_check_if_end(KOOPA_ANIM_WALK_START)) {
         o->oSubAction++;
         o->oKoopaCountdown = random_linear_offset(30, 100);
     }
@@ -135,7 +135,7 @@ static void koopa_walk_start(void) {
  * Walk until oKoopaCountdown hits zero, then increment sub-action.
  */
 static void koopa_walk(void) {
-    cur_obj_init_animation_with_sound(9);
+    cur_obj_init_animation_with_sound(KOOPA_ANIM_WALK);
     koopa_play_footstep_sound(2, 17);
 
     if (o->oKoopaCountdown != 0) {
@@ -149,8 +149,8 @@ static void koopa_walk(void) {
  * Stop walking, then enter action KOOPA_SHELLED_ACT_STOPPED.
  */
 static void koopa_walk_stop(void) {
-    obj_forward_vel_approach(0.0f, 1.0f * o->oKoopaAgility);
-    if (cur_obj_init_anim_and_check_if_end(10)) {
+    obj_forward_vel_approach(0.0f, (1.0f * o->oKoopaAgility));
+    if (cur_obj_init_anim_and_check_if_end(KOOPA_ANIM_SHELLED_WALK_STOP)) {
         o->oAction = KOOPA_SHELLED_ACT_STOPPED;
     }
 }
@@ -192,7 +192,7 @@ static void koopa_shelled_act_walk(void) {
  * away.
  */
 static void koopa_shelled_act_run_from_mario(void) {
-    cur_obj_init_animation_with_sound(1);
+    cur_obj_init_animation_with_sound(KOOPA_ANIM_SHELLED_RUN_AWAY);
     koopa_play_footstep_sound(0, 11);
 
     // If far from home, run toward it
@@ -239,7 +239,7 @@ static void koopa_shelled_act_lying(void) {
     } else if (o->oKoopaCountdown != 0) {
         o->oKoopaCountdown--;
         cur_obj_extend_animation_if_at_end();
-    } else if (cur_obj_init_anim_and_check_if_end(6)) {
+    } else if (cur_obj_init_anim_and_check_if_end(KOOPA_ANIM_STAND_UP)) {
         o->oAction = KOOPA_SHELLED_ACT_STOPPED;
     }
 }
@@ -417,7 +417,7 @@ static void koopa_unshelled_act_dive(void) {
     } else if (o->oKoopaCountdown != 0) {
         o->oKoopaCountdown--;
         cur_obj_extend_animation_if_at_end();
-    } else if (cur_obj_init_anim_and_check_if_end(6)) {
+    } else if (cur_obj_init_anim_and_check_if_end(KOOPA_ANIM_STAND_UP)) {
         o->oAction = KOOPA_UNSHELLED_ACT_RUN;
     }
 }
@@ -483,7 +483,7 @@ static void koopa_the_quick_act_wait_before_race(void) {
         //  cur_obj_update_dialog_with_cutscene for that glitch)
         o->oAction = KOOPA_THE_QUICK_ACT_SHOW_INIT_TEXT;
         o->oForwardVel = 0.0f;
-        cur_obj_init_animation_with_sound(7);
+        cur_obj_init_animation_with_sound(KOOPA_ANIM_STOPPED);
     }
 }
 
@@ -583,7 +583,7 @@ static void koopa_the_quick_act_race(void) {
                 case KOOPA_THE_QUICK_SUB_ACT_RUN:
                     koopa_the_quick_animate_footsteps();
 
-                    if ((o->parentObj->oKoopaRaceEndpointRaceStatus != 0)
+                    if ((o->parentObj->oKoopaRaceEndpointRaceStatus != KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON)
                      && (o->oDistanceToMario > 1500.0f)
                      && ((o->oPathedPrevWaypointFlags & WAYPOINT_MASK_00FF) < 28)) {
                         // Move faster if mario has already finished the race or
@@ -620,18 +620,18 @@ static void koopa_the_quick_act_race(void) {
                         }
 
                         o->oGravity   = -6.0f;
-                        o->oSubAction = 2;
+                        o->oSubAction = KOOPA_THE_QUICK_SUB_ACT_JUMP;
                         o->oMoveFlags = OBJ_MOVE_NONE;
 
-                        cur_obj_init_animation_with_sound(12);
+                        cur_obj_init_animation_with_sound(KOOPA_ANIM_THE_QUICK_JUMP);
                     }
                     break;
 
                 case KOOPA_THE_QUICK_SUB_ACT_JUMP:
                     // We could perform a goomba double jump if we could deactivate ktq
                     if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
-                        if (cur_obj_init_anim_and_check_if_end(13)) {
-                            o->oSubAction--;
+                        if (cur_obj_init_anim_and_check_if_end(KOOPA_ANIM_THE_QUICK_LAND)) {
+                            o->oSubAction = KOOPA_THE_QUICK_SUB_ACT_RUN;
                         }
 
                         koopa_the_quick_detect_bowling_ball();
@@ -673,18 +673,17 @@ static void koopa_the_quick_act_stop(void) {
  * the star.
  */
 static void koopa_the_quick_act_after_race(void) {
-    cur_obj_init_animation_with_sound(7);
+    cur_obj_init_animation_with_sound(KOOPA_ANIM_STOPPED);
 
     if (o->parentObj->oKoopaRaceEndpointDialog == 0) {
         if (cur_obj_can_mario_activate_textbox_2(400.0f, 400.0f)) {
             stop_background_music(SEQUENCE_ARGS(4, SEQ_LEVEL_SLIDE));
 
             // Determine which text to display
-
-            if (o->parentObj->oKoopaRaceEndpointRaceStatus != 0) {
-                if (o->parentObj->oKoopaRaceEndpointRaceStatus < 0) {
+            if (o->parentObj->oKoopaRaceEndpointRaceStatus != KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON) {
+                if (o->parentObj->oKoopaRaceEndpointRaceStatus == KOOPA_RACE_ENDPOINT_STATUS_MARIO_CHEATED) {
                     // Mario cheated
-                    o->parentObj->oKoopaRaceEndpointRaceStatus = 0;
+                    o->parentObj->oKoopaRaceEndpointRaceStatus = KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON;
                     o->parentObj->oKoopaRaceEndpointDialog = DIALOG_006;
                 } else {
                     // Mario won
@@ -701,16 +700,16 @@ static void koopa_the_quick_act_after_race(void) {
     } else if (o->parentObj->oKoopaRaceEndpointDialog > 0) {
         s32 dialogResponse = cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
             DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, o->parentObj->oKoopaRaceEndpointDialog);
-        if (dialogResponse != 0) {
+        if (dialogResponse != DIALOG_RESPONSE_NONE) {
             o->parentObj->oKoopaRaceEndpointDialog = DIALOG_NONE;
             o->oTimer = 0;
         }
-    } else if (o->parentObj->oKoopaRaceEndpointRaceStatus != 0) {
+    } else if (o->parentObj->oKoopaRaceEndpointRaceStatus != KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON) {
         spawn_default_star(sKoopaTheQuickProperties[o->oKoopaTheQuickRaceIndex].starPos[0],
                            sKoopaTheQuickProperties[o->oKoopaTheQuickRaceIndex].starPos[1],
                            sKoopaTheQuickProperties[o->oKoopaTheQuickRaceIndex].starPos[2]);
 
-        o->parentObj->oKoopaRaceEndpointRaceStatus = 0;
+        o->parentObj->oKoopaRaceEndpointRaceStatus = KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON;
     }
 }
 
@@ -799,7 +798,7 @@ void bhv_koopa_race_endpoint_update(void) {
 
         if (!o->oKoopaRaceEndpointKoopaFinished) {
             play_race_fanfare();
-            o->oKoopaRaceEndpointRaceStatus = (gMarioShotFromCannon ? -1 : 1);
+            o->oKoopaRaceEndpointRaceStatus = (gMarioShotFromCannon ? KOOPA_RACE_ENDPOINT_STATUS_MARIO_CHEATED : KOOPA_RACE_ENDPOINT_STATUS_MARIO_WON);
         }
     }
 }

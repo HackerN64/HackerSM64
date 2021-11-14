@@ -10,10 +10,10 @@ f32 water_ring_calc_mario_dist(void) {
 #endif
 
 void water_ring_init(void) {
-    cur_obj_init_animation(0);
-    o->oWaterRingScalePhaseX = (s32)(random_float() * 4096.0f) + 0x1000;
-    o->oWaterRingScalePhaseY = (s32)(random_float() * 4096.0f) + 0x1000;
-    o->oWaterRingScalePhaseZ = (s32)(random_float() * 4096.0f) + 0x1000;
+    cur_obj_init_animation(WATER_RING_ANIM_WOBBLE);
+    o->oWaterRingScalePhaseX = ((s32)(random_float() * 4096.0f) + 0x1000);
+    o->oWaterRingScalePhaseY = ((s32)(random_float() * 4096.0f) + 0x1000);
+    o->oWaterRingScalePhaseZ = ((s32)(random_float() * 4096.0f) + 0x1000);
 #ifndef FIX_WATER_RINGS
     //! This normal calculation assumes a facing yaw of 0, which is not the case
     //  for the manta ray rings. It also errs by multiplying the normal X by -1.
@@ -47,7 +47,7 @@ void water_ring_check_collection(UNUSED f32 avgScale, struct Object *ringManager
 #else
     f32 marioDistInFront = water_ring_calc_mario_dist();
     if (!is_point_close_to_object(o, gMarioObject->header.gfx.pos[0],
-                                     gMarioObject->header.gfx.pos[1] + 80.0f,
+                                    (gMarioObject->header.gfx.pos[1] + 80.0f),
                                      gMarioObject->header.gfx.pos[2],
                                     (avgScale + 0.2f) * 120.0f)) {
         o->oWaterRingMarioDistInFront = marioDistInFront;
@@ -67,7 +67,7 @@ void water_ring_check_collection(UNUSED f32 avgScale, struct Object *ringManager
                                 + (((u8) ringSpawner->oWaterRingSpawnerRingsCollected - 1) << 16),
                                 gGlobalSoundSource);
                 }
-                ringManager->oWaterRingMgrLastRingCollected = o->oWaterRingIndex;
+                ringManager->oWaterRingMgrLastRingCollected  = o->oWaterRingIndex;
             } else {
                 ringSpawner->oWaterRingSpawnerRingsCollected = 0;
             }
@@ -81,14 +81,14 @@ void water_ring_check_collection(UNUSED f32 avgScale, struct Object *ringManager
 }
 
 void water_ring_set_scale(f32 avgScale) {
-    o->header.gfx.scale[0] = (sins(o->oWaterRingScalePhaseX) * 0.1f) + avgScale;
-    o->header.gfx.scale[1] = (sins(o->oWaterRingScalePhaseY) * 0.5f) + avgScale;
-    o->header.gfx.scale[2] = (sins(o->oWaterRingScalePhaseZ) * 0.1f) + avgScale;
+    o->header.gfx.scale[0] = ((sins(o->oWaterRingScalePhaseX) * 0.1f) + avgScale);
+    o->header.gfx.scale[1] = ((sins(o->oWaterRingScalePhaseY) * 0.5f) + avgScale);
+    o->header.gfx.scale[2] = ((sins(o->oWaterRingScalePhaseZ) * 0.1f) + avgScale);
     vec3_add_val(&o->oWaterRingScalePhaseVec, 0x1700);
 }
 
 void water_ring_act_collected(void) {
-    f32 avgScale = ((f32) o->oTimer * 0.2f) + o->oWaterRingAvgScale;
+    f32 avgScale = (((f32) o->oTimer * 0.2f) + o->oWaterRingAvgScale);
 
     if (o->oTimer > 20) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
@@ -101,7 +101,7 @@ void water_ring_act_collected(void) {
 }
 
 void water_ring_act_not_collected(void) {
-    f32 avgScale = (((f32) o->oTimer / 225.0f) * 3.0f) + 0.5f;
+    f32 avgScale = ((((f32) o->oTimer / 225.0f) * 3.0f) + 0.5f);
 
     //! In this case ringSpawner and ringManager are the same object,
     //  because the Jet Stream Ring Spawner is its own parent object.
@@ -121,9 +121,9 @@ void water_ring_act_not_collected(void) {
     o->oFaceAngleYaw += 0x100;
     set_object_visibility(o, 5000);
 
-    if (ringSpawner->oWaterRingSpawnerRingsCollected == 4
-        && o->oWaterRingIndex == ringSpawner->oWaterRingMgrLastRingCollected + 1) {
-        o->oOpacity = sins(o->oTimer * 0x1000) * 200.0f + 50.0f;
+    if ((ringSpawner->oWaterRingSpawnerRingsCollected == 4)
+     && (o->oWaterRingIndex == ringSpawner->oWaterRingMgrLastRingCollected + 1)) {
+        o->oOpacity = ((sins(o->oTimer * 0x1000) * 200.0f) + 50.0f);
     }
 
     o->oWaterRingAvgScale = avgScale;
@@ -153,7 +153,11 @@ void water_ring_spawner_act_inactive(void) {
     if (o->oTimer == 300) {
         o->oTimer = 0;
     }
-    if ((o->oTimer == 0) || (o->oTimer == 50) || (o->oTimer == 150) || (o->oTimer == 200) || (o->oTimer == 250)) {
+    if ((o->oTimer ==   0)
+     || (o->oTimer ==  50)
+     || (o->oTimer == 150)
+     || (o->oTimer == 200)
+     || (o->oTimer == 250)) {
         struct Object *waterRing = spawn_object(o, MODEL_WATER_RING, bhvJetStreamWaterRing);
         waterRing->oWaterRingIndex = o->oWaterRingMgrNextRingIndex;
         o->oWaterRingMgrNextRingIndex++;
@@ -186,7 +190,7 @@ void bhv_manta_ray_water_ring_init(void) {
 }
 
 void manta_water_ring_act_not_collected(void) {
-    f32 avgScale = (((f32) o->oTimer / 50.0f) * 1.3f) + 0.1f;
+    f32 avgScale = ((((f32) o->oTimer / 50.0f) * 1.3f) + 0.1f);
     struct Object *ringSpawner = o->parentObj;
     struct Object *ringManager = ringSpawner->parentObj;
 
@@ -210,8 +214,8 @@ void manta_water_ring_act_not_collected(void) {
     water_ring_set_scale(avgScale);
     set_object_visibility(o, 5000);
 
-    if (ringSpawner->oWaterRingSpawnerRingsCollected == 4
-        && o->oWaterRingIndex == ringManager->oWaterRingMgrLastRingCollected + 1) {
+    if ((ringSpawner->oWaterRingSpawnerRingsCollected == 4)
+     && (o->oWaterRingIndex == ringManager->oWaterRingMgrLastRingCollected + 1)) {
         o->oOpacity = ((sins(o->oTimer * 0x1000) * 200.0f) + 50.0f);
     }
 

@@ -304,11 +304,11 @@ static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
     if (alpha == 255) {
         SET_GRAPH_NODE_LAYER(node->fnNode.node.flags, LAYER_OPAQUE);
         gfxHead = alloc_display_list(2 * sizeof(*gfxHead));
-        gfx = gfxHead;
+        gfx     = gfxHead;
     } else {
         SET_GRAPH_NODE_LAYER(node->fnNode.node.flags, LAYER_TRANSPARENT);
         gfxHead = alloc_display_list(3 * sizeof(*gfxHead));
-        gfx = gfxHead;
+        gfx     = gfxHead;
         if (gMarioState->flags & MARIO_VANISH_CAP) {
             gDPSetAlphaCompare(gfx++, G_AC_DITHER);
         } else {
@@ -603,10 +603,10 @@ Gfx *geo_render_mirror_mario(s32 callContext, struct GraphNode *node, UNUSED Mat
                 vec3f_copy(gMirrorMario.pos,   mario->header.gfx.pos);
                 vec3f_copy(gMirrorMario.scale, mario->header.gfx.scale);
 
-                gMirrorMario.animInfo = mario->header.gfx.animInfo;
-                mirroredX = (CASTLE_MIRROR_X - gMirrorMario.pos[0]);
-                gMirrorMario.pos[0] = (mirroredX + CASTLE_MIRROR_X);
-                gMirrorMario.angle[1] = -gMirrorMario.angle[1];
+                gMirrorMario.animInfo  = mario->header.gfx.animInfo;
+                mirroredX              = (CASTLE_MIRROR_X - gMirrorMario.pos[0]);
+                gMirrorMario.pos[0]    = (mirroredX + CASTLE_MIRROR_X);
+                gMirrorMario.angle[1]  = -gMirrorMario.angle[1];
                 gMirrorMario.scale[0] *= -1.0f;
                 ((struct GraphNode *) &gMirrorMario)->flags |=  GRAPH_RENDER_ACTIVE;
             } else {

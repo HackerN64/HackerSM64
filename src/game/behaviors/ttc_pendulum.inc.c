@@ -45,10 +45,10 @@ void bhv_ttc_pendulum_update(void) {
             o->oTTCPendulumDelay--;
         } else {
             // Accelerate in the direction that moves angle to zero
-            if (o->oTTCPendulumAngle * o->oTTCPendulumAccelDir > 0.0f) {
+            if ((o->oTTCPendulumAngle * o->oTTCPendulumAccelDir) > 0.0f) {
                 o->oTTCPendulumAccelDir = -o->oTTCPendulumAccelDir;
             }
-            o->oTTCPendulumAngleVel += o->oTTCPendulumAngleAccel * o->oTTCPendulumAccelDir;
+            o->oTTCPendulumAngleVel += (o->oTTCPendulumAngleAccel * o->oTTCPendulumAccelDir);
 
             // Ignoring floating point imprecision, angle vel should always be
             // a multiple of angle accel, and so it will eventually reach zero
@@ -60,20 +60,20 @@ void bhv_ttc_pendulum_update(void) {
                     // Select a new acceleration
                     //! By manipulating this, we can cause the pendulum to reach
                     //  extreme angles and speeds
-                    if (random_u16() % 3 != 0) {
+                    if ((random_u16() % 3) != 0) {
                         o->oTTCPendulumAngleAccel = 13.0f;
                     } else {
                         o->oTTCPendulumAngleAccel = 42.0f;
                     }
 
                     // Pick a random delay
-                    if (random_u16() % 2 == 0) {
+                    if ((random_u16() % 2) == 0) {
                         o->oTTCPendulumDelay = random_linear_offset(5, 30);
                     }
                 }
 
                 // Play the sound 15 frames after beginning to move
-                o->oTTCPendulumSoundTimer = o->oTTCPendulumDelay + 15;
+                o->oTTCPendulumSoundTimer = (o->oTTCPendulumDelay + 15);
             }
 
             o->oTTCPendulumAngle += o->oTTCPendulumAngleVel;

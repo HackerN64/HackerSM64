@@ -208,8 +208,8 @@ static void chain_chomp_sub_act_lunge(void) {
  * Fall to the ground and interrupt mario into a cutscene action.
  */
 static void chain_chomp_released_trigger_cutscene(void) {
-    o->oForwardVel = 0.0f;
-    o->oGravity = -4.0f;
+    o->oForwardVel =  0.0f;
+    o->oGravity    = -4.0f;
 
     //! Can delay this if we get into a cutscene-unfriendly action after the
     //  last post ground pound and before this
@@ -250,7 +250,7 @@ static void chain_chomp_released_lunge_around(void) {
             } else {
                 o->oChainChompReleaseStatus = CHAIN_CHOMP_RELEASED_BREAK_GATE;
                 o->oHomeX = 1450.0f;
-                o->oHomeZ = 562.0f;
+                o->oHomeZ =  562.0f;
                 o->oMoveAngleYaw = cur_obj_angle_to_home();
                 o->oForwardVel = (cur_obj_lateral_dist_to_home() / 8);
                 o->oVelY = 50.0f;
@@ -268,20 +268,19 @@ static void chain_chomp_released_break_gate(void) {
     if (!o->oChainChompHitGate) {
         // If hit wall, assume it's the gate and bounce off of it
         //! The wall may not be the gate
-        //! If the chain chomp gets stuck, it may never hit a wall, resulting
-        //  in a softlock
+        //! If the chain chomp gets stuck, it may never hit a wall, resulting in a softlock
         if (o->oMoveFlags & OBJ_MOVE_HIT_WALL) {
             o->oChainChompHitGate = TRUE;
-            o->oMoveAngleYaw = cur_obj_reflect_move_angle_off_wall();
-            o->oForwardVel *= 0.4f;
+            o->oMoveAngleYaw      = cur_obj_reflect_move_angle_off_wall();
+            o->oForwardVel       *= 0.4f;
         }
     } else if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
         o->oChainChompReleaseStatus = CHAIN_CHOMP_RELEASED_JUMP_AWAY;
-        o->oHomeX = 3288.0f;
-        o->oHomeZ = -1770.0f;
+        o->oHomeX        =  3288.0f;
+        o->oHomeZ        = -1770.0f;
         o->oMoveAngleYaw = cur_obj_angle_to_home();
-        o->oForwardVel = (cur_obj_lateral_dist_to_home() / 50.0f);
-        o->oVelY = 120.0f;
+        o->oForwardVel   = (cur_obj_lateral_dist_to_home() / 50.0f);
+        o->oVelY         = 120.0f;
     }
 }
 
