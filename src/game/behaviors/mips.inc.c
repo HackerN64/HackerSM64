@@ -8,6 +8,7 @@
  * hiding him if necessary.
  */
 void bhv_mips_init(void) {
+#ifndef UNLOCK_ALL
     // Retrieve star flags for Castle Secret Stars on current save file.
     u8 starFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_NONE));
 
@@ -16,20 +17,22 @@ void bhv_mips_init(void) {
                                         COURSE_NUM_TO_INDEX(COURSE_MIN),
                                         COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 15)
         && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_1))) {
-        o->oBehParams2ndByte = 0;
+        o->oBehParams2ndByte    = MIPS_BP_STAR_1;
         o->oMipsForwardVelocity = 40.0f;
     // If the player has >= 50 stars and hasn't collected second MIPS star...
     } else if ((save_file_get_total_star_count((gCurrSaveFileNum - 1),
                                                COURSE_NUM_TO_INDEX(COURSE_MIN),
                                                COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 50)
         && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_2))) {
-        o->oBehParams2ndByte = 1;
+#endif
+        o->oBehParams2ndByte    = MIPS_BP_STAR_2;
         o->oMipsForwardVelocity = 45.0f;
+#ifndef UNLOCK_ALL
     } else {
         // No MIPS stars are available, hide MIPS.
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
-
+#endif
     o->oInteractionSubtype = INT_SUBTYPE_HOLDABLE_NPC;
 
     o->oGravity  = 15.0f;
@@ -210,7 +213,7 @@ void bhv_mips_held(void) {
     // If MIPS hasn't spawned his star yet...
     if (o->oMipsStarStatus == MIPS_STAR_STATUS_HAVENT_SPAWNED_STAR) {
         // Choose dialog based on which MIPS encounter this is.
-        if (o->oBehParams2ndByte == 0) {
+        if (o->oBehParams2ndByte == MIPS_BP_STAR_1) {
             dialogID = DIALOG_084;
         } else {
             dialogID = DIALOG_162;

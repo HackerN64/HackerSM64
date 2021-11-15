@@ -497,7 +497,7 @@ UNUSED static void ukiki_blink_timer(void) {
  * Called by the main behavior function for the cage ukiki whenever it is held.
  */
 void cage_ukiki_held_loop(void) {
-    if (o->oPosY - o->oHomeY > -100.0f) {
+    if ((o->oPosY - o->oHomeY) > -100.0f) {
         switch (o->oUkikiTextState) {
             case UKIKI_TEXT_DEFAULT:
                 if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_SPEAK) {

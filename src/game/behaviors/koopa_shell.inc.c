@@ -39,7 +39,7 @@ void bhv_koopa_shell_flame_loop(void) {
     cur_obj_update_floor_height();
     cur_obj_move_using_fvel_and_gravity();
 
-    if (o->oFloorHeight > o->oPosY || o->oTimer > 10) {
+    if ((o->oFloorHeight > o->oPosY) || (o->oTimer > 10)) {
         obj_mark_for_deletion(o);
     }
     o->oKoopaShellFlameScale -= 0.3f;
@@ -81,7 +81,7 @@ void bhv_koopa_shell_loop(void) {
             if (absf(find_water_level(o->oPosX, o->oPosZ) - o->oPosY) < 10.0f) {
                 koopa_shell_spawn_water_drop();
             } else if (absf(o->oPosY - o->oFloorHeight) < 5.0f) {
-                if (floor != NULL && floor->type == SURFACE_BURNING) {
+                if ((floor != NULL) && (floor->type == SURFACE_BURNING)) {
                     bhv_koopa_shell_flame_spawn();
                 } else {
                     koopa_shell_spawn_sparkles(10.0f);

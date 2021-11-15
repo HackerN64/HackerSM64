@@ -112,7 +112,7 @@ void bhv_shallow_water_splash_init(void) {
 }
 
 void bhv_wave_trail_shrink(void) {
-    // Destroy every other water wave to space them out (this is a terrible way of doing it)
+    //! Destroy every other water wave to space them out (this is a terrible way of doing it)
     if ((o->oTimer == 0) && (gGlobalTimer & 0x1)) {
         obj_mark_for_deletion(o);
         return;
