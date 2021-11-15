@@ -1,5 +1,5 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
+
 
 /**
  * @file config.h
@@ -33,28 +33,4 @@
 /// Removes multi-language cake screen
 #define EU_CUSTOM_CAKE_FIX 1
 
-// Support Rumble Pak
-#define ENABLE_RUMBLE (1 || VERSION_SH)
-
-// Clear RAM on boot
-#define CLEARRAM 1
-
-// Screen Size Defines
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
-
-// Border Height Define for NTSC Versions
-#ifdef TARGET_N64
-#ifndef VERSION_EU
-#define BORDER_HEIGHT_CONSOLE 8
-#define BORDER_HEIGHT_EMULATOR 0
-#else
-#define BORDER_HEIGHT_CONSOLE 1
-#define BORDER_HEIGHT_EMULATOR 0
-#endif
-#else
-#define BORDER_HEIGHT_CONSOLE 0
-#define BORDER_HEIGHT_EMULATOR 0
-#endif
-
-#endif // CONFIG_H
+#include "config/config__rom.h"

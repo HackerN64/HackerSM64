@@ -2,6 +2,7 @@ OUTPUT_ARCH (mips)
 
 #define LINKER /* Removes externs from preprocessed script */
 #include "segments.h"
+#include "config.h"
 #undef LINKER
 
 #define BEGIN_SEG(name, addr) \
@@ -30,7 +31,7 @@ OUTPUT_ARCH (mips)
    } \
    END_SEG(name##_yay0) \
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
-   _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
+   _##name##_mio0SegmentRomEnd   = _##name##_yay0SegmentRomEnd;
 
 #define YAY0_EU_SEG(name, segAddr) \
    BEGIN_SEG(name##_yay0, segAddr) \
@@ -40,21 +41,31 @@ OUTPUT_ARCH (mips)
    } \
    END_SEG(name##_yay0) \
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
-   _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
+   _##name##_mio0SegmentRomEnd   = _##name##_yay0SegmentRomEnd;
 
 #define STANDARD_LEVEL(name) \
-   BEGIN_SEG(name##_segment_7, 0x07000000) \
+   BEGIN_SEG(name##_segment_7, SEG_ADDRESS(SEGMENT_LEVEL_DATA)) \
    { \
       KEEP(BUILD_DIR/levels/name/leveldata.szp.o(.data)); \
       . = ALIGN(0x10); \
    } \
    END_SEG(name##_segment_7) \
-   BEGIN_SEG(name, 0x0E000000) \
+   BEGIN_SEG(name, SEG_ADDRESS(SEGMENT_ENDING_SCRIPT)) \
    { \
-      KEEP(BUILD_DIR/levels/name/script.o(.data)); \
-      KEEP(BUILD_DIR/levels/name/geo.o(.data)); \
+      KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
+      KEEP(BUILD_DIR/levels/name/script.o(.text)); \
+      KEEP(BUILD_DIR/levels/name/script.o(.rodata*)); \
+      KEEP(BUILD_DIR/levels/name/geo.o(.*data*)); \
+      KEEP(BUILD_DIR/levels/name/geo.o(.text)); \
+      KEEP(BUILD_DIR/levels/name/geo.o(.rodata*)); \
    } \
-   END_SEG(name)
+   END_SEG(name) \
+   BEGIN_NOLOAD(name) \
+   { \
+      KEEP(BUILD_DIR/levels/name/script.o(.bss*)); \
+      KEEP(BUILD_DIR/levels/name/geo.o(.bss*)); \
+   } \
+   END_NOLOAD(name)
 
 #define STANDARD_OBJECTS(name, segAddr, geoAddr) \
    BEGIN_SEG(name##_yay0, segAddr) \
@@ -65,9 +76,16 @@ OUTPUT_ARCH (mips)
    END_SEG(name##_yay0) \
    BEGIN_SEG(name##_geo, geoAddr) \
    { \
-      KEEP(BUILD_DIR/actors/name##_geo.o(.data)); \
+      KEEP(BUILD_DIR/actors/name##_geo.o(.*data*)); \
+      KEEP(BUILD_DIR/actors/name##_geo.o(.rodata*)); \
+      KEEP(BUILD_DIR/actors/name##_geo.o(.text)); \
    } \
    END_SEG(name##_geo) \
+   BEGIN_NOLOAD(name##_geo) \
+   { \
+      KEEP(BUILD_DIR/actors/name##_geo.o(.bss*)); \
+   } \
+   END_NOLOAD(name##_geo) \
    _##name##_mio0SegmentRomStart = _##name##_yay0SegmentRomStart; \
    _##name##_mio0SegmentRomEnd = _##name##_yay0SegmentRomEnd;
 
@@ -75,14 +93,14 @@ SECTIONS
 {
    __romPos = 0;
 
-   BEGIN_SEG(boot, 0x04000000)
+   BEGIN_SEG(boot, SEG_ADDRESS(SEGMENT_GROUP0_YAY0))
    {
       KEEP(BUILD_DIR/asm/rom_header.o(.text));
       KEEP(BUILD_DIR/asm/boot.o(.text));
    }
    END_SEG(boot)
 
-   . = 0x80000400;
+   . = (RAM_START + 0x400);
    BEGIN_NOLOAD(zbuffer)
    {
       BUILD_DIR/src/buffers/zbuffer.o(.bss*);
@@ -126,13 +144,28 @@ SECTIONS
    . = _hvqbufSegmentBssEnd;
 #endif
 
+/* hardcoded symbols to satisfy preliminary link for map parser */
+#ifndef DEBUG_MAP_STACKTRACE
+      parse_map               = MAP_PARSER_ADDRESS;
+      find_function_in_stack  = MAP_PARSER_ADDRESS;
+      _mapDataSegmentRomStart = 0;
+      gMapEntries   = 0;
+      gMapEntrySize = 0;
+      gMapStrings   = 0;
+#endif
+
    BEGIN_SEG(main, .) SUBALIGN(16)
    {
       KEEP(BUILD_DIR/asm/entry.o(.text));
+      KEEP(BUILD_DIR/asm/n64_assert.o(.text));
 
       BUILD_DIR/src/boot*.o(.text);
       BUILD_DIR/src/hvqm*.o(.text);
+      BUILD_DIR/src/usb*.o(.text);
       BUILD_DIR/src/audio*.o(.text);
+#ifdef S2DEX_TEXT_ENGINE
+      lib/libs2d_engine.a:*(.text);
+#endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(.text);
 #else
@@ -143,12 +176,17 @@ SECTIONS
       */librtc.a:*.o(.text);
       */libz.a:*.o(.text);
       */libhvqm2.a:*.o(.text);
-      BUILD_DIR/lib/rsp.o(.text);   
+      BUILD_DIR/lib/rsp.o(.text);
       lib/PR/hvqm/hvqm2sp1.o(.text);
+      _mainSegmentTextEnd = .;
 
       /* data */
+      BUILD_DIR/asm/n64_assert.o(.data*);
       BUILD_DIR/src/boot*.o(.data*);
       BUILD_DIR/src/audio*.o(.data*);
+#ifdef S2DEX_TEXT_ENGINE
+      lib/libs2d_engine.a:*(.data*);
+#endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(.data*);
 #else
@@ -163,7 +201,11 @@ SECTIONS
 
       /* rodata */
       BUILD_DIR/src/boot*.o(.rodata*);
+      BUILD_DIR/src/usb*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
+#ifdef S2DEX_TEXT_ENGINE
+      lib/libs2d_engine.a:*(.rodata*);
+#endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(.rodata*);
 #else
@@ -181,7 +223,11 @@ SECTIONS
    {
       BUILD_DIR/src/boot*.o(.*bss*);
       BUILD_DIR/src/hvqm*.o(.*bss*);
+      BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);
+#ifdef S2DEX_TEXT_ENGINE
+      lib/libs2d_engine.a:*(.*bss*);
+#endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(COMMON);
       */libultra_d.a:*.o(.scommon);
@@ -198,15 +244,14 @@ SECTIONS
    }
    END_NOLOAD(main)
 
-   /*ASSERT((. <= SEG_ENGINE), "Error: main segment extended into engine.")*/
-
    . = _mainSegmentBssEnd;
 
    BEGIN_SEG(engine, .)
    {
       BUILD_DIR/src/game*.o(.text);
       BUILD_DIR/src/engine*.o(.text);
-      BUILD_DIR/src/usb*.o(.text);
+      /* BUILD_DIR/asm/math.o(.text); */
+      _engineSegmentTextEnd = .;
       /* data */
       BUILD_DIR/src/game*.o(.data*);
       BUILD_DIR/src/engine*.o(.data*);
@@ -215,19 +260,15 @@ SECTIONS
       /* rodata */
       BUILD_DIR/src/game*.o(.rodata*);
       BUILD_DIR/src/engine*.o(.rodata*);
-      BUILD_DIR/src/usb*.o(.rodata*);
    }
    END_SEG(engine)
    BEGIN_NOLOAD(engine)
    {
       BUILD_DIR/src/game*.o(.*bss*);
       BUILD_DIR/src/engine*.o(.bss*);
-      BUILD_DIR/src/usb*.o(.*bss*);
       . = ALIGN(0x40);
    }
    END_NOLOAD(engine)
-
-   /*ASSERT((. <= SEG_FRAMEBUFFERS), "Error: engine segment extended into framebuffers.")*/
 
    . = _engineSegmentBssEnd;
    BEGIN_NOLOAD(framebuffers)
@@ -237,124 +278,148 @@ SECTIONS
    END_NOLOAD(framebuffers)
 
    __mainPoolStart = .;
-   __mainPoolSize = RAM_END - .;
+   __mainPoolSize  = (RAM_END - .);
 
-   __expansionRamStart = 0x80400000;
-   ASSERT((. <= __expansionRamStart), "Error: RDRAM expanded into Expansion RAM, despite Expansion RAM not being defined.")
+   __expansionRamStart = (RAM_START + (RAM_1MB * 4));
+#ifndef USE_EXT_RAM
+   #ifndef PRELIMINARY
+         ASSERT((. <= __expansionRamStart), "Error: RDRAM expanded into Expansion RAM, despite Expansion RAM not being defined.")
+   #endif
+#endif
 
-   BEGIN_SEG(entry, 0x10000000)
+   BEGIN_SEG(entry, SEG_ADDRESS(SEGMENT_LEVEL_ENTRY))
    {
       BUILD_DIR/levels/entry.o(.data);
    }
    END_SEG(entry)
 
    /* load YAY0 and level data */
-   YAY0_SEG(segment2, 0x02000000)
+   YAY0_SEG(segment2, SEG_ADDRESS(SEGMENT_SEGMENT2))
 #ifdef VERSION_EU
-   YAY0_EU_SEG(translation_en, 0x19000000)
-   YAY0_EU_SEG(translation_fr, 0x19000000)
-   YAY0_EU_SEG(translation_de, 0x19000000)
+   YAY0_EU_SEG(translation_en, SEG_ADDRESS(SEGMENT_EU_TRANSLATION))
+   YAY0_EU_SEG(translation_fr, SEG_ADDRESS(SEGMENT_EU_TRANSLATION))
+   YAY0_EU_SEG(translation_de, SEG_ADDRESS(SEGMENT_EU_TRANSLATION))
 #endif
 
    /* mario actor group */
-   STANDARD_OBJECTS(group0,  0x04000000, 0x17000000)
+   STANDARD_OBJECTS(group0,  SEG_ADDRESS(SEGMENT_GROUP0_YAY0), SEG_ADDRESS(SEGMENT_GROUP0_GEO))
 
    /* load the other actor groups */
-   STANDARD_OBJECTS(group1,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group2,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group3,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group4,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group5,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group6,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group7,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group8,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group9,  0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group10, 0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group11, 0x05000000, 0x0C000000)
-   STANDARD_OBJECTS(group12, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group13, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group14, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group15, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group16, 0x06000000, 0x0D000000)
-   STANDARD_OBJECTS(group17, 0x06000000, 0x0D000000)
+   STANDARD_OBJECTS(group1,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group2,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group3,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group4,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group5,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group6,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group7,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group8,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group9,  SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group10, SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group11, SEG_ADDRESS(SEGMENT_GROUPA_YAY0), SEG_ADDRESS(SEGMENT_GROUPA_GEO))
+   STANDARD_OBJECTS(group12, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group13, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group14, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group15, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group16, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
+   STANDARD_OBJECTS(group17, SEG_ADDRESS(SEGMENT_GROUPB_YAY0), SEG_ADDRESS(SEGMENT_GROUPB_GEO))
 
    /* load the common actor groups */
-   STANDARD_OBJECTS(common0, 0x08000000, 0x0F000000)
-   STANDARD_OBJECTS(common1, 0x03000000, 0x16000000)
+   STANDARD_OBJECTS(common0, SEG_ADDRESS(SEGMENT_COMMON0_YAY0), SEG_ADDRESS(SEGMENT_COMMON0_GEO))
+   STANDARD_OBJECTS(common1, SEG_ADDRESS(SEGMENT_COMMON1_YAY0), SEG_ADDRESS(SEGMENT_COMMON1_GEO))
 
    /* use segmented addressing for behaviors */
-   BEGIN_SEG(behavior, 0x13000000)
+   BEGIN_SEG(behavior, SEG_ADDRESS(SEGMENT_BEHAVIOR_DATA))
    {
-      KEEP(BUILD_DIR/data/behavior_data.o(.data));
+      KEEP(BUILD_DIR/data/behavior_data.o(.data*));
+      KEEP(BUILD_DIR/data/behavior_data.o(.rodata*));
+      KEEP(BUILD_DIR/data/behavior_data.o(.text));
    }
    END_SEG(behavior)
+   BEGIN_NOLOAD(behavior)
+   {
+      KEEP(BUILD_DIR/data/behavior_data.o(.bss*));
+   }
+   END_NOLOAD(behavior)
+
 
    /* 0x8016F000 21D7D0-255EC0 [386F0] */
-   BEGIN_SEG(goddard, SEG_GODDARD)
+   BEGIN_SEG(goddard, (RAM_END - GODDARD_SIZE))
    {
-      BUILD_DIR/src/menu*.o(.text);
-      BUILD_DIR/src/menu*.o(.data*);
-      BUILD_DIR/src/menu*.o(.rodata*);
-#ifdef GODDARD
-      BUILD_DIR/libgoddard.a:*.o(.text);
-      /* goddard subsystem data */
-      BUILD_DIR/libgoddard.a:gd_main.o(.data*);
-      BUILD_DIR/libgoddard.a:draw_objects.o(.data*);
-      BUILD_DIR/libgoddard.a:objects.o(.data*);
-      BUILD_DIR/libgoddard.a:particles.o(.data*);
-      BUILD_DIR/libgoddard.a:dynlist_proc.o(.data*);
-      BUILD_DIR/libgoddard.a:debug_utils.o(.data*);
-      BUILD_DIR/libgoddard.a:joints.o(.data*);
-      BUILD_DIR/libgoddard.a:shape_helper.o(.data*);
-      BUILD_DIR/libgoddard.a:renderer.o(.data*);
-      /* goddard subsystem rodata */
-      BUILD_DIR/libgoddard.a:gd_main.o(.rodata*);
-      BUILD_DIR/libgoddard.a:gd_memory.o(.rodata*);
-      BUILD_DIR/libgoddard.a:draw_objects.o(.rodata*);
-      BUILD_DIR/libgoddard.a:objects.o(.rodata*);
-      BUILD_DIR/libgoddard.a:skin_movement.o(.rodata*);
-      BUILD_DIR/libgoddard.a:particles.o(.rodata*);
-      BUILD_DIR/libgoddard.a:dynlist_proc.o(.rodata*);
-      BUILD_DIR/libgoddard.a:old_menu.o(.rodata*);
-      BUILD_DIR/libgoddard.a:debug_utils.o(.rodata*);
-      BUILD_DIR/libgoddard.a:joints.o(.rodata*);
-      BUILD_DIR/libgoddard.a:skin.o(.rodata*);
-      BUILD_DIR/libgoddard.a:gd_math.o(.rodata*);
-      BUILD_DIR/libgoddard.a:shape_helper.o(.rodata*);
-      BUILD_DIR/libgoddard.a:renderer.o(.rodata*);
+      KEEP(BUILD_DIR/src/menu*.o(.text));
+      _goddardSegmentTextEnd = .;
+      KEEP(BUILD_DIR/src/menu*.o(.data*));
+      KEEP(BUILD_DIR/src/menu*.o(.rodata*));
+#ifdef KEEP_MARIO_HEAD
+      KEEP(BUILD_DIR/libgoddard.a:*.o(.text));
+      KEEP(BUILD_DIR/libgoddard.a:gd_main.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:draw_objects.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:objects.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:particles.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:dynlist_proc.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:debug_utils.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:joints.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:shape_helper.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:renderer.o(.data*));
+      KEEP(BUILD_DIR/libgoddard.a:gd_main.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:gd_memory.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:draw_objects.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:objects.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:skin_movement.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:particles.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:dynlist_proc.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:old_menu.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:debug_utils.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:joints.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:skin.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:gd_math.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:shape_helper.o(.rodata*));
+      KEEP(BUILD_DIR/libgoddard.a:renderer.o(.rodata*));
 #endif
+      . = ALIGN(16);
    }
    END_SEG(goddard)
    BEGIN_NOLOAD(goddard)
    {
-      BUILD_DIR/src/menu*.o(.bss*);
-#ifdef GODDARD
-      BUILD_DIR/libgoddard.a:*.o(.bss*);
+      KEEP(BUILD_DIR/src/menu*.o(.bss*));
+#ifdef KEEP_MARIO_HEAD
+      KEEP(BUILD_DIR/libgoddard.a:*.o(.bss*));
 #endif
+      . = ALIGN(16);
    }
    END_NOLOAD(goddard)
 
-   ASSERT((. <= (SEG_POOL_START + POOL_SIZE)), "Error: extended past pool end.")
+#ifdef PRELIMINARY
+      GODDARD_SIZE = SIZEOF(.goddard) + SIZEOF(.goddard.noload);
+#else
+      ASSERT((. <= (SEG_POOL_START + POOL_SIZE)), "Error: extended past pool end.")
+#endif
 
    /* 0x268020 0x268020-0 [0] */
-   BEGIN_SEG(intro, 0x14000000)
+   BEGIN_SEG(intro, SEG_ADDRESS(SEGMENT_MENU_INTRO))
    {
-      KEEP(BUILD_DIR/levels/intro/script.o(.data));
+      KEEP(BUILD_DIR/levels/intro/script.o(.*data));
+      KEEP(BUILD_DIR/levels/intro/script.o(.rodata*));
+      KEEP(BUILD_DIR/levels/intro/script.o(.text));
       KEEP(BUILD_DIR/levels/intro/geo.o(.data));
    }
    END_SEG(intro)
-   BEGIN_SEG(intro_segment_7, 0x07000000)
+   BEGIN_NOLOAD(intro)
+   {
+      KEEP(BUILD_DIR/levels/intro/script.o(.bss*));
+   }
+   END_NOLOAD(intro)
+   BEGIN_SEG(intro_segment_7, SEG_ADDRESS(SEGMENT_LEVEL_DATA))
    {
       KEEP(BUILD_DIR/levels/intro/leveldata.szp.o(.data));
       . = ALIGN(0x10);
    }
    END_SEG(intro_segment_7)
 
-   YAY0_SEG(debug_level_select, 0x07000000)
-   YAY0_SEG(title_screen_bg, 0x0A000000)
+   YAY0_SEG(debug_level_select, SEG_ADDRESS(SEGMENT_LEVEL_DATA))
+   YAY0_SEG(title_screen_bg,    SEG_ADDRESS(SEGMENT_SKYBOX))
 
-#ifdef GODDARD
-   BEGIN_SEG(gd_dynlists, 0x04000000)
+#ifdef KEEP_MARIO_HEAD
+   BEGIN_SEG(gd_dynlists, SEG_ADDRESS(SEGMENT_GROUP0_YAY0))
    {
       BUILD_DIR/libgoddard.a:dynlist_test_cube.o(.data);
       BUILD_DIR/libgoddard.a:dynlist_unused.o(.data);
@@ -379,50 +444,50 @@ SECTIONS
 
    gMainLevels = __romPos;
 
-   BEGIN_SEG(menu, 0x14000000)
+   BEGIN_SEG(menu, SEG_ADDRESS(SEGMENT_MENU_INTRO))
    {
       KEEP(BUILD_DIR/levels/menu/script.o(.data));
       KEEP(BUILD_DIR/levels/menu/geo.o(.data));
    }
    END_SEG(menu)
-   BEGIN_SEG(menu_segment_7, 0x07000000)
+   BEGIN_SEG(menu_segment_7, SEG_ADDRESS(SEGMENT_LEVEL_DATA))
    {
       KEEP(BUILD_DIR/levels/menu/leveldata.szp.o(.data));
       . = ALIGN(0x10);
    }
    END_SEG(menu_segment_7)
 
-   BEGIN_SEG(scripts, 0x15000000)
+   BEGIN_SEG(scripts, SEG_ADDRESS(SEGMENT_GLOBAL_LEVEL_SCRIPT))
    {
       BUILD_DIR/levels/scripts.o(.data);
    }
    END_SEG(scripts)
 
-   YAY0_SEG(water_skybox, 0x0A000000)
-   YAY0_SEG(ccm_skybox, 0x0A000000)
-   YAY0_SEG(clouds_skybox, 0x0A000000)
-   YAY0_SEG(bitfs_skybox, 0x0A000000)
-   YAY0_SEG(wdw_skybox, 0x0A000000)
-   YAY0_SEG(cloud_floor_skybox, 0x0A000000)
-   YAY0_SEG(ssl_skybox, 0x0A000000)
-   YAY0_SEG(bbh_skybox, 0x0A000000)
-   YAY0_SEG(bidw_skybox, 0x0A000000)
-   YAY0_SEG(bits_skybox, 0x0A000000)
+   YAY0_SEG(water_skybox,       SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(ccm_skybox,         SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(clouds_skybox,      SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(bitfs_skybox,       SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(wdw_skybox,         SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(cloud_floor_skybox, SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(ssl_skybox,         SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(bbh_skybox,         SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(bidw_skybox,        SEG_ADDRESS(SEGMENT_SKYBOX))
+   YAY0_SEG(bits_skybox,        SEG_ADDRESS(SEGMENT_SKYBOX))
 
    // Texture bins
-   YAY0_SEG(fire, 0x09000000)
-   YAY0_SEG(spooky, 0x09000000)
-   YAY0_SEG(generic, 0x09000000)
-   YAY0_SEG(water, 0x09000000)
-   YAY0_SEG(sky, 0x09000000)
-   YAY0_SEG(snow, 0x09000000)
-   YAY0_SEG(cave, 0x09000000)
-   YAY0_SEG(machine, 0x09000000)
-   YAY0_SEG(mountain, 0x09000000)
-   YAY0_SEG(grass, 0x09000000)
-   YAY0_SEG(outside, 0x09000000)
-   YAY0_SEG(inside, 0x09000000)
-   YAY0_SEG(effect, 0x0B000000)
+   YAY0_SEG(fire,     SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(spooky,   SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(generic,  SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(water,    SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(sky,      SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(snow,     SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(cave,     SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(machine,  SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(mountain, SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(grass,    SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(outside,  SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(inside,   SEG_ADDRESS(SEGMENT_TEXTURE))
+   YAY0_SEG(effect,   SEG_ADDRESS(SEGMENT_EFFECT_YAY0))
 
 #define STUB_LEVEL(_0, _1, _2, _3, _4, _5, _6, _7, _8)
 #define DEFINE_LEVEL(_0, _1, _2, folder, _4, _5, _6, _7, _8, _9, _10) STANDARD_LEVEL(folder)
@@ -441,12 +506,19 @@ SECTIONS
       KEEP(BUILD_DIR/sound/sound_data.o(.data));
    }
    END_SEG(assets)
-#ifdef HVQM 
+#ifdef HVQM
    BEGIN_SEG(capcom, __romPos) SUBALIGN(2)
    {
       KEEP(BUILD_DIR/data/capcom.o(.data));
    }
 	END_SEG(capcom)
+#endif
+
+#ifdef DEBUG_MAP_STACKTRACE
+   BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
+      KEEP(BUILD_DIR/asm/debug/map.o(.data*));
+   }
+   END_SEG(mapData)
 #endif
    /* DWARF debug sections.
       Symbols in the DWARF debugging sections are relative to the beginning
