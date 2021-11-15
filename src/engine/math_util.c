@@ -761,6 +761,22 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
     ((s16 *) mtx)[15] = 1;
 }
 
+void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
+    dst[0][0] =  vec3_dot(a1[0], a2[0]);
+    dst[0][1] =  vec3_dot(a1[0], a2[1]);
+    dst[0][2] =  vec3_dot(a1[0], a2[2]);
+    dst[1][0] =  vec3_dot(a1[1], a2[0]);
+    dst[1][1] =  vec3_dot(a1[1], a2[1]);
+    dst[1][2] =  vec3_dot(a1[1], a2[2]);
+    dst[2][0] =  vec3_dot(a1[2], a2[0]);
+    dst[2][1] =  vec3_dot(a1[2], a2[1]);
+    dst[2][2] =  vec3_dot(a1[2], a2[2]);
+    dst[3][0] = (vec3_dot(a1[3], a2[0]) - vec3_dot(a2[3], a2[0]));
+    dst[3][1] = (vec3_dot(a1[3], a2[1]) - vec3_dot(a2[3], a2[1]));
+    dst[3][2] = (vec3_dot(a1[3], a2[2]) - vec3_dot(a2[3], a2[2]));
+    MTXF_END(dst);
+}
+
 /**
  * Extract a position given an object's transformation matrix and a camera matrix.
  * This is used for determining the world position of the held object: since objMtx

@@ -162,33 +162,6 @@ void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
     linear_mtxf_mul_vec3f_and_translate(mtx, &obj->oPosVec,  &obj->oParentRelativePosVec);
 }
 
-void obj_apply_scale_to_matrix(struct Object *obj, Mat4 dst, Mat4 src) {
-    vec3_prod_val(dst[0], src[0], obj->header.gfx.scale[0]);
-    vec3_prod_val(dst[1], src[1], obj->header.gfx.scale[1]);
-    vec3_prod_val(dst[2], src[2], obj->header.gfx.scale[2]);
-    vec3f_copy(dst[3], src[3]);
-    dst[0][3] = src[0][3];
-    dst[1][3] = src[1][3];
-    dst[2][3] = src[2][3];
-    dst[3][3] = src[3][3];
-}
-
-void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
-    dst[0][0] =  vec3_dot(a1[0], a2[0]);
-    dst[0][1] =  vec3_dot(a1[0], a2[1]);
-    dst[0][2] =  vec3_dot(a1[0], a2[2]);
-    dst[1][0] =  vec3_dot(a1[1], a2[0]);
-    dst[1][1] =  vec3_dot(a1[1], a2[1]);
-    dst[1][2] =  vec3_dot(a1[1], a2[2]);
-    dst[2][0] =  vec3_dot(a1[2], a2[0]);
-    dst[2][1] =  vec3_dot(a1[2], a2[1]);
-    dst[2][2] =  vec3_dot(a1[2], a2[2]);
-    dst[3][0] = (vec3_dot(a1[3], a2[0]) - vec3_dot(a2[3], a2[0]));
-    dst[3][1] = (vec3_dot(a1[3], a2[1]) - vec3_dot(a2[3], a2[1]));
-    dst[3][2] = (vec3_dot(a1[3], a2[2]) - vec3_dot(a2[3], a2[2]));
-    MTXF_END(dst);
-}
-
 void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior) {
     obj->parentObj = o;
 

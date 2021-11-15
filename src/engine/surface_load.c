@@ -534,7 +534,7 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
     }
 
     Mat4 m;
-    obj_apply_scale_to_matrix(o, m, *objectTransform);
+    mtxf_scale_vec3f(m, *objectTransform, o->header.gfx.scale);
 
     // Go through all vertices, rotating and translating them to transform the object.
     Vec3f v;
