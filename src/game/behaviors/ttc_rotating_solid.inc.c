@@ -28,7 +28,7 @@ static u8 sTTCRotatingSolidInitialDelays[] = {
 void bhv_ttc_rotating_solid_init(void) {
     o->collisionData = segmented_to_virtual(sTTCRotatingSolidCollisionModels[o->oBehParams2ndByte]);
 
-    o->oTTCRotatingSolidNumSides = o->oBehParams2ndByte == TTC_ROTATING_SOLID_BP_CUBE ? 4 : 3;
+    o->oTTCRotatingSolidNumSides = ((o->oBehParams2ndByte == TTC_ROTATING_SOLID_BP_CUBE) ? 4 : 3);
 
     o->oTTCRotatingSolidRotationDelay = sTTCRotatingSolidInitialDelays[gTTCSpeedSetting];
 }

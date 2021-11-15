@@ -66,7 +66,7 @@ static void swoop_act_move(void) {
             // If we're not done swooping, turn toward mario. When between
             // 0 and 200 units above mario, increase speed and stop swooping
             o->oSwoopTargetYaw = o->oAngleToMario;
-            if (o->oPosY < gMarioObject->oPosY + 200.0f) {
+            if (o->oPosY < (gMarioObject->oPosY + 200.0f)) {
                 if (obj_y_vel_approach(0.0f, 0.5f)) {
                     o->oForwardVel *= 2.0f;
                 }
@@ -80,13 +80,13 @@ static void swoop_act_move(void) {
         }
 
         // Tilt upward when approaching mario
-        if ((o->oSwoopTargetPitch = obj_get_pitch_from_vel()) == 0) {
-            o->oSwoopTargetPitch += o->oForwardVel * 500;
+        if ((o->oSwoopTargetPitch = obj_get_pitch_from_vel()) == 0x0) {
+            o->oSwoopTargetPitch += (o->oForwardVel * 500);
         }
         obj_move_pitch_approach(o->oSwoopTargetPitch, 140);
 
         // Jitter yaw a bit
-        cur_obj_rotate_yaw_toward(o->oSwoopTargetYaw + (s32)(3000 * coss(4000 * gGlobalTimer)), 1200);
+        cur_obj_rotate_yaw_toward((o->oSwoopTargetYaw + (s32)(3000 * coss(4000 * gGlobalTimer))), 1200);
         obj_roll_to_match_yaw_turn(o->oSwoopTargetYaw, 0x3000, 500);
 
         // Jitter roll a bit

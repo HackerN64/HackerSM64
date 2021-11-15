@@ -11,7 +11,7 @@
  * or makes him wait to respawn if in water.
  */
 void handle_cap_ukiki_reset(void) {
-    if (o->oBehParams2ndByte == UKIKI_CAP) {
+    if (o->oBehParams2ndByte == UKIKI_BP_CAP) {
         if (cur_obj_mario_far_away()) {
             cur_obj_set_pos_to_home_and_stop();
             o->oAction = UKIKI_ACT_IDLE;
@@ -26,7 +26,7 @@ void handle_cap_ukiki_reset(void) {
  * the cap ukiki.
  */
 s32 is_cap_ukiki_and_mario_has_normal_cap_on_head(void) {
-    return ((o->oBehParams2ndByte == UKIKI_CAP) && does_mario_have_normal_cap_on_head(gMarioState));
+    return ((o->oBehParams2ndByte == UKIKI_BP_CAP) && does_mario_have_normal_cap_on_head(gMarioState));
 }
 
 /**
@@ -154,7 +154,7 @@ void ukiki_act_idle(void) {
         o->oUkikiTextState = UKIKI_TEXT_HAS_CAP;
     }
 
-    if (o->oBehParams2ndByte == UKIKI_CAP) {
+    if (o->oBehParams2ndByte == UKIKI_BP_CAP) {
         if (o->oPosY < -1550.0f) {
             o->oAction = UKIKI_ACT_RETURN_HOME;
         }
@@ -486,7 +486,7 @@ void ukiki_free_loop(void) {
  * Possibly unused so AnimState could be used for wearing a cap?
  */
 UNUSED static void ukiki_blink_timer(void) {
-    if (gGlobalTimer % 50 < 7) {
+    if ((gGlobalTimer % 50) < 7) {
         o->oAnimState = UKIKI_ANIM_STATE_EYE_CLOSED;
     } else {
         o->oAnimState = UKIKI_ANIM_STATE_DEFAULT;
@@ -581,7 +581,7 @@ void cap_ukiki_held_loop(void) {
  * Initializatation for ukiki, determines if it has Mario's cap.
  */
 void bhv_ukiki_init(void) {
-    if ((o->oBehParams2ndByte == UKIKI_CAP)
+    if ((o->oBehParams2ndByte == UKIKI_BP_CAP)
      && (save_file_get_flags() & SAVE_FLAG_CAP_ON_UKIKI)) {
         o->oUkikiTextState = UKIKI_TEXT_HAS_CAP;
         o->oUkikiHasCap |= UKIKI_CAP_ON;
@@ -604,7 +604,7 @@ void bhv_ukiki_loop(void) {
             cur_obj_unrender_set_action_and_anim(UKIKI_ANIM_HELD, 0);
             obj_copy_pos(o, gMarioObject);
 
-            if (o->oBehParams2ndByte == UKIKI_CAP) {
+            if (o->oBehParams2ndByte == UKIKI_BP_CAP) {
                 cap_ukiki_held_loop();
             } else {
                 cage_ukiki_held_loop();

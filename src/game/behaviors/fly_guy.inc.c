@@ -21,7 +21,9 @@ static struct ObjectHitbox sFlyGuyHitbox = {
 /**
  * Unused jitter amounts.
  */
-static s16 sFlyGuyJitterAmounts[] = { 0x1000, -0x2000, 0x2000 };
+static s16 sFlyGuyJitterAmounts[] = {
+    0x1000, -0x2000, 0x2000
+};
 
 /**
  * Return to regular size. When mario is close enough or home is far enough,
@@ -71,7 +73,7 @@ static void fly_guy_act_approach_mario(void) {
         if (abs_angle_diff(o->oAngleToMario, o->oFaceAngleYaw) < 0x2000
          && (((o->oPosY - gMarioObject->oPosY) > 400.0f) || (o->oDistanceToMario < 400.0f))) {
             // Either shoot fire or lunge
-            if (o->oBehParams2ndByte != 0 && (random_u16() % 0x1)) {
+            if (o->oBehParams2ndByte != FLY_GUY_BP_LUNGES && (random_u16() % 0x1)) {
                 o->oAction = FLY_GUY_ACT_SHOOT_FIRE;
                 o->oFlyGuyScaleVel = 0.06f;
             } else {
@@ -192,7 +194,7 @@ void bhv_fly_guy_update(void) {
 
         // Oscillate up and down
         o->oFlyGuyOscTimer++;
-        o->oPosY += coss(0x400 * o->oFlyGuyOscTimer) * 1.5f;
+        o->oPosY += (coss(0x400 * o->oFlyGuyOscTimer) * 1.5f);
 
         switch (o->oAction) {
             case FLY_GUY_ACT_IDLE:

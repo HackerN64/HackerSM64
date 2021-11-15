@@ -338,12 +338,19 @@ enum oActionsMovingYellowCoin {
 };
 
 /* Coin Formation */
+enum CoinFormationFlags {
+    COIN_FORMATION_FLAG_NONE     = (0 << 0),
+    COIN_FORMATION_FLAG_VERTICAL = (1 << 0),
+    COIN_FORMATION_FLAG_RING     = (1 << 1),
+    COIN_FORMATION_FLAG_ARROW    = (1 << 2),
+    COIN_FORMATION_FLAG_FLYING   = (1 << 4),
+};
 enum oBehParams2ndByteCoinFormation {
-    COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE,
-    COIN_FORMATION_BP_SHAPE_VERTICAL_LINE,
-    COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING,
-    COIN_FORMATION_BP_SHAPE_VERTICAL_RING,
-    COIN_FORMATION_BP_SHAPE_ARROW,
+    COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE = (COIN_FORMATION_FLAG_NONE),
+    COIN_FORMATION_BP_SHAPE_VERTICAL_LINE   = (COIN_FORMATION_FLAG_VERTICAL),
+    COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING = (COIN_FORMATION_FLAG_RING),
+    COIN_FORMATION_BP_SHAPE_VERTICAL_RING   = (COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL),
+    COIN_FORMATION_BP_SHAPE_ARROW           = (COIN_FORMATION_FLAG_ARROW),
     COIN_FORMATION_BP_SHAPE_MASK = 0x07,
     COIN_FORMATION_BP_FLYING     = 0x10
 };
@@ -793,11 +800,17 @@ enum oAnimStatesExcalamationBox {
 };
 
 /* Cap Switch */
+enum oBehParams2ndByteCapSwitch {
+    CAP_SWITCH_BP_WING_CAP,
+    CAP_SWITCH_BP_METAL_CAP,
+    CAP_SWITCH_BP_VANISH_CAP,
+    CAP_SWITCH_BP_YELLOW_CAP,
+};
 enum oActionsCapSwitch {
     CAP_SWITCH_ACT_INIT,
-    CAP_SWITCH_ACT_IDLE,
+    CAP_SWITCH_ACT_IDLE_UNPRESSED,
     CAP_SWITCH_ACT_BEING_PRESSED,
-    CAP_SWITCH_ACT_DONE
+    CAP_SWITCH_ACT_IDLE_PRESSED
 };
 
 /* Mario Cap */
@@ -1500,12 +1513,18 @@ enum oKoopaRaceEndpointRaceStatuses {
     #define POKEY_PART_BP_LOWEST                            (POKEY_NUM_SEGMENTS - 0x1)
 
 /* Swoop */
-    /* oAction */
-    #define SWOOP_ACT_IDLE                                  0x0
-    #define SWOOP_ACT_MOVE                                  0x1
-    /* Animations */
-    #define SWOOP_ANIM_FLY                                  0x0
-    #define SWOOP_ANIM_IDLE                                 0x1
+enum oBehParams2ndByteSwoop {
+    SWOOP_BP_0,
+    SWOOP_BP_1,
+};
+enum oActionsSwoop {
+    SWOOP_ACT_IDLE,
+    SWOOP_ACT_MOVE,
+};
+enum animIDsSwoop {
+    SWOOP_ANIM_FLY,
+    SWOOP_ANIM_IDLE,
+};
 
 /* Fly guy */
     /* oBehParams2ndByte */
@@ -1673,6 +1692,7 @@ enum oKoopaRaceEndpointRaceStatuses {
 /* Monty mole */
     /* oBehParams2ndByte */
     #define MONTY_MOLE_BP_NO_ROCK                           0x0
+    #define MONTY_MOLE_BP_ROCK                              0x1
     /* oAction */
     #define MONTY_MOLE_ACT_SELECT_HOLE                      0x0
     #define MONTY_MOLE_ACT_RISE_FROM_HOLE                   0x1
@@ -1701,8 +1721,8 @@ enum oKoopaRaceEndpointRaceStatuses {
 
 /* Ukiki */
     /* oBehParams2ndByte */
-    #define UKIKI_CAGE                                      0x0
-    #define UKIKI_CAP                                       0x1
+    #define UKIKI_BP_CAGE                                   0x0
+    #define UKIKI_BP_CAP                                    0x1
     /* oAction */
     #define UKIKI_ACT_IDLE                                  0x0
     #define UKIKI_ACT_RUN                                   0x1
@@ -2063,12 +2083,18 @@ enum oActionsSnowmansBottom {
 
 /* TTC cog */
     /* oBehParams2ndByte */
-    #define TTC_COG_BP_SHAPE_MASK                           0x00000002
+    #define TTC_COG_BP_SHAPE_MASK                           0x02
     #define TTC_COG_BP_SHAPE_HEXAGON                        (0 << 1)
     #define TTC_COG_BP_SHAPE_TRIANGLE                       (1 << 1)
-    #define TTC_COG_BP_DIR_MASK                             0x00000001
+    #define TTC_COG_BP_DIR_MASK                             0x01
     #define TTC_COG_BP_DIR_CCW                              (0 << 0) // TODO: Check these
     #define TTC_COG_BP_DIR_CW                               (1 << 0)
+
+/* TTC Pit Block */
+enum oBehParams2ndByteTTCPitBlock {
+    TTC_PIT_BLOCK_BP_0,
+    TTC_PIT_BLOCK_BP_1,
+};
 
 /* TTC 2D Rotator */
     /* oBehParams2ndByte */
@@ -2080,6 +2106,7 @@ enum oActionsSnowmansBottom {
     #define TREADMILL_BP_LARGE                              0x0
     #define TREADMILL_BP_SMALL                              0x1
     #define TREADMILL_BP_SIZE_MASK                          0x1
+    #define TREADMILL_BP_UNKNOWN                            0x2
 
 /* Activated Back-and-Forth Platform */
     /* (bparam1 & 0x03) aka platform type */
@@ -2147,18 +2174,24 @@ enum oActionsSnowmansBottom {
     /* Animations */
     #define HAUNTED_CHAIR_ANIM_DEFAULT                      0x0
 
-/* Fire piranha plant */
-    /* oAction */
-    #define FIRE_PIRANHA_PLANT_ACT_HIDE                     0x0
-    #define FIRE_PIRANHA_PLANT_ACT_GROW                     0x1
-    /* Animations */
-    #define FIRE_PIRANHA_PLANT_ANIM_SHRINK                  0x0
-    #define FIRE_PIRANHA_PLANT_ANIM_UNUSED_1                0x1
-    #define FIRE_PIRANHA_PLANT_ANIM_ATTACKED                0x2
-    #define FIRE_PIRANHA_PLANT_ANIM_UNUSED_3                0x3
-    #define FIRE_PIRANHA_PLANT_ANIM_GROW                    0x4
+/* Fire Piranha Plant */
+enum oBehParam2ndByteFirePiranhaPlant {
+    FIRE_PIRANHA_PLANT_BP_NORMAL,
+    FIRE_PIRANHA_PLANT_BP_THI,
+};
+enum oActionsFirePiranhaPlant {
+    FIRE_PIRANHA_PLANT_ACT_HIDE,
+    FIRE_PIRANHA_PLANT_ACT_GROW,
+};
+enum animIDsFirePiranhaPlant {
+    FIRE_PIRANHA_PLANT_ANIM_SHRINK,
+    FIRE_PIRANHA_PLANT_ANIM_UNUSED_1,
+    FIRE_PIRANHA_PLANT_ANIM_ATTACKED,
+    FIRE_PIRANHA_PLANT_ANIM_UNUSED_3,
+    FIRE_PIRANHA_PLANT_ANIM_GROW,
+};
 
-/* Fire spitter */
+/* Fire Spitter */
     /* oAction */
     #define FIRE_SPITTER_ACT_IDLE                           0x0
     #define FIRE_SPITTER_ACT_SPIT_FIRE                      0x1
@@ -2444,6 +2477,7 @@ enum oActionsSnowmansBottom {
 
 /* Triplet butterfly */
     /* oBehParams2ndByte */
+    #define TRIPLET_BUTTERFLY_BP_0                          0x0
     #define TRIPLET_BUTTERFLY_BP_BUTTERFLY_NUM              0x3
     #define TRIPLET_BUTTERFLY_BP_NO_BOMBS                   0x4
     /* oAction */

@@ -2112,7 +2112,7 @@ s32 cur_obj_was_attacked_or_ground_pounded(void) {
 }
 
 void obj_copy_behavior_params(struct Object *dst, struct Object *src) {
-    dst->oBehParams = src->oBehParams;
+    dst->oBehParams        = src->oBehParams;
     dst->oBehParams2ndByte = src->oBehParams2ndByte;
 }
 

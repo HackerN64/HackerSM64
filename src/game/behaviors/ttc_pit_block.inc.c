@@ -39,7 +39,7 @@ static struct TTCPitBlockProperties sTTCPitBlockProperties[][2] = {
 void bhv_ttc_pit_block_init(void) {
     o->collisionData = segmented_to_virtual(sTTCPitBlockCollisionModels[o->oBehParams2ndByte]);
 
-    o->oTTCPitBlockPeakY = o->oPosY + 330.0f;
+    o->oTTCPitBlockPeakY = (o->oPosY + 330.0f);
 
     if (gTTCSpeedSetting == TTC_SPEED_STOPPED) {
         o->oPosY += 330.0f;

@@ -46,7 +46,7 @@ void bhv_activated_back_and_forth_platform_init(void) {
     // Equivalent to 50 * (oBehParams2ndByte & 0x7F), i.e. 50 * (oBehParams2ndByte % 128).
     // The maximum possible value of this is 50 * 127 = 6350.
     // It's 50 * 97 = 4850 in BitS and 50 * 31 = 1550 in BitFS.
-    o->oActivatedBackAndForthPlatformMaxOffset = (50.0f * (GET_BPARAM2(o->oBehParams) & 0x007F));
+    o->oActivatedBackAndForthPlatformMaxOffset = (50.0f * (GET_BPARAM2(o->oBehParams) & 0x7F));
 
     if (platformType == ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR) {
         o->oActivatedBackAndForthPlatformMaxOffset -= 12.0f;
@@ -54,7 +54,7 @@ void bhv_activated_back_and_forth_platform_init(void) {
 
     // Truthy/falsy value that determines the direction of movement.
     // Equivalent to oBehParams2ndByte & 0x80, i.e. the most significant bit of oBehParams2ndByte.
-    o->oActivatedBackAndForthPlatformVertical = (GET_BPARAM2(o->oBehParams) & 0x0080);
+    o->oActivatedBackAndForthPlatformVertical = (GET_BPARAM2(o->oBehParams) & 0x80);
 
     o->oActivatedBackAndForthPlatformStartYaw = o->oFaceAngleYaw;
 }
@@ -125,8 +125,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
         // ...set its position to its original position + the offset.
         o->oPosY = o->oHomeY + o->oActivatedBackAndForthPlatformOffset;
     } else {
-        // Otherwise, dip down 20 units if Mario gets on the horizontal platform, and undo if he gets
-        // off.
+        // Otherwise, dip down 20 units if Mario gets on the horizontal platform, and undo if he gets off.
         o->oPosY += o->oVelY;
         clamp_f32(&o->oPosY, (o->oHomeY - 20.0f), o->oHomeY);
 
