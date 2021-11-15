@@ -1309,6 +1309,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     Vec3f e2;
     vec3f_diff(e2, v2, v0);
     // Make 'h' the cross product of 'dir' and edge 2.
+    Vec3f h;
     vec3f_cross(h, dir, e2);
     // Determine the cos(angle) difference between ray and surface normals.
     f32 det = vec3f_dot(e1, h);
