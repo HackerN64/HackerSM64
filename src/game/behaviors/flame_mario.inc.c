@@ -26,6 +26,13 @@ void bhv_black_smoke_mario_loop(void) {
 
     o->oMoveAngleYaw += o->oAngleVelYaw;
     o->oPosY += o->oVelY;
+#ifdef BURN_SMOKE_FIX
+    cur_obj_scale(1.0f + (o->oTimer / 8.0f));
+    o->oOpacity -= 8;
+    if (o->oOpacity < 10) {
+        obj_mark_for_deletion(o);
+    }
+#endif
 }
 
 void bhv_flame_mario_loop(void) {
