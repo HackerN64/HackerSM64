@@ -116,7 +116,7 @@ const Gfx tree_seg3_sub_dl_spiky[] = {
 
 const Gfx tree_seg3_dl_spiky[] = {
     gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPBranchList(tree_seg3_sub_dl_spiky),
 };
 //! These shouldn't need to be separate. However, silhouette moment.
@@ -155,7 +155,7 @@ const Gfx tree_seg3_sub_dl_snowy_pine[] = {
 
 const Gfx tree_seg3_dl_snowy_pine[] = {
     gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPBranchList(tree_seg3_sub_dl_snowy_pine),
 };
 //! These shouldn't need to be separate. However, silhouette moment.
@@ -202,7 +202,7 @@ const Gfx tree_seg3_sub_dl_palm[] = {
 
 const Gfx tree_seg3_dl_palm[] = {
     gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPBranchList(tree_seg3_sub_dl_palm),
 };
 //! These shouldn't need to be separate. However, silhouette moment.
