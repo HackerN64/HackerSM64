@@ -1275,56 +1275,70 @@ s32 anim_spline_poll(Vec3f result) {
 #define RAY_OFFSET 30.0f /* How many units to extrapolate surfaces when testing for a raycast */
 #define RAY_STEPS      4 /* How many steps to do when casting rays, default to quartersteps.  */
 
+/**
+ * @brief Checks if a ray intersects a surface using Möller–Trumbore intersection algorithm.
+ * 
+ * @param orig is the starting point of the ray.
+ * @param dir is the normalized ray direction.
+ * @param dir_length is the length of the ray.
+ * @param surface is the surface to check.
+ * @param hit_pos returns the position on the surface where the ray intersects it.
+ * @param length returns the distance from the starting point to the hit position.
+ * @return s32 TRUE if the ray intersects a surface.
+ */
 s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface *surface, Vec3f hit_pos, f32 *length) {
-    Vec3f v0, v1, v2, e1, e2, h, s, q;
-    Vec3f add_dir;
-    Vec3f norm;
     // Ignore certain surface types.
     if ((surface->type == SURFACE_INTANGIBLE) || (surface->flags & SURFACE_FLAG_NO_CAM_COLLISION)) return FALSE;
     // Convert the vertices to Vec3f.
+    Vec3f v0, v1, v2;
     vec3s_to_vec3f(v0, surface->vertex1);
     vec3s_to_vec3f(v1, surface->vertex2);
     vec3s_to_vec3f(v2, surface->vertex3);
     // Get surface normal and extend it by RAY_OFFSET.
+    Vec3f norm;
     surface_normal_to_vec3f(norm, surface);
     vec3_mul_val(norm, RAY_OFFSET);
     // Move the face forward by RAY_OFFSET.
-    vec3f_add( v0, norm);
-    vec3f_add( v1, norm);
-    vec3f_add( v2, norm);
-    // Make 'e1' the vector from vertex 0 to vertex 1 (edge 1).
+    vec3f_add(v0, norm);
+    vec3f_add(v1, norm);
+    vec3f_add(v2, norm);
+    // Make 'e1' (edge 1) the vector from vertex 0 to vertex 1.
+    Vec3f e1;
     vec3f_diff(e1, v1, v0);
-    // Make 'e2' the vector from vertex 0 to vertex 2 (edge 2).
+    // Make 'e2' (edge 2) the vector from vertex 0 to vertex 2.
+    Vec3f e2;
     vec3f_diff(e2, v2, v0);
-    // Make 'h' the vector perpendicular to edge 1 and 2.
-    //! This recalculates the normal vector. Just using 'norm' here seems to break wall collisions though.
+    // Make 'h' the cross product of 'dir' and edge 2.
     vec3f_cross(h, dir, e2);
-    // Determine the angle difference between ray and surface normals.
-    f32 a = vec3f_dot(e1, h);
+    // Determine the cos(angle) difference between ray and surface normals.
+    f32 det = vec3f_dot(e1, h);
     // Check if we're perpendicular from the surface.
-    if ((a > -NEAR_ZERO) && (a < NEAR_ZERO)) return FALSE;
+    if ((det > -NEAR_ZERO) && (det < NEAR_ZERO)) return FALSE;
     // Check if we're making contact with the surface.
-    // Make f the inverse of the angle between ray and surface normals.
-    f32 f = (1.0f / a);
+    // Make f the inverse of the cos(angle) between ray and surface normals.
+    f32 f = (1.0f / det); // invDet
     // Make 's' the vector from vertex 0 to 'orig'.
+    Vec3f s; //! t?
     vec3f_diff(s, orig, v0);
-    // Make 'u' the angle between vectors 's' and normals, scaled by 'f'.
+    // Make 'u' the cos(angle) between vectors 's' and normals, divided by 'det'.
     f32 u = (f * vec3f_dot(s, h));
     // Check if 'u' is within bounds.
     if ((u < 0.0f) || (u > 1.0f)) return FALSE;
-    // Make 'q' the vector perpendicular to 's' and edge 1.
+    // Make 'q' the cross product of 's' and edge 1. 
+    Vec3f q;
     vec3f_cross(q, s, e1);
-    // Make 'v' the angle between the ray and 'q', scaled by 'f'.
+    // Make 'v' the cos(angle) between the ray and 'q', divided by 'det'.
     f32 v = (f * vec3f_dot(dir, q));
     // Check if 'v' is within bounds.
     if ((v < 0.0f) || ((u + v) > 1.0f)) return FALSE;
     // Get the length between our origin and the surface contact point.
-    // Make '*length' the angle betqwwn edge 2 and 'q', scaled by 'f'.
+    // Make '*length' the cos(angle) betqwwn edge 2 and 'q', divided by 'det'.
     *length = (f * vec3f_dot(e2, q));
-    // Check if '*length' is within bounds.
+    // Check if the length to the hit point is shorter than the ray length.
     if ((*length <= NEAR_ZERO) || (*length > dir_length)) return FALSE;
     // Successful contact.
     // Make 'add_dir' into 'dir' scaled by 'length'.
+    Vec3f add_dir;
     vec3_prod_val(add_dir, dir, *length);
     // Make 'hit_pos' into the sum of 'orig' and 'add_dir'.
     vec3f_sum(hit_pos, orig, add_dir);
@@ -1355,7 +1369,8 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
         // Reject surface if out of vertical bounds
         if ((list->surface->lowerY > top) || (list->surface->upperY < bottom)) continue;
         // Check intersection between the ray and this surface
-        if ((hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length)) && (length <= *max_length)) {
+        hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length);
+        if (hit && (length <= *max_length)) {
             *hit_surface = list->surface;
             vec3f_copy(hit_pos, chk_hit_pos);
             *max_length = length;
@@ -1371,20 +1386,20 @@ void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized
     if ((cellX >= 0) && (cellX <= (NUM_CELLS - 1)) && (cellZ >= 0) && (cellZ <= (NUM_CELLS - 1))) {
         // Iterate through each surface in this partition
         if ((normalized_dir[1] > -NEAR_ONE) && (flags & RAYCAST_FIND_CEIL)) {
-            find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
         }
         if ((normalized_dir[1] <  NEAR_ONE) && (flags & RAYCAST_FIND_FLOOR)) {
-            find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
             find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
         }
         if (flags & RAYCAST_FIND_WALL) {
-            find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
         }
         if (flags & RAYCAST_FIND_WATER) {
-            find_surface_on_ray_list(gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
         }
     }
 }
