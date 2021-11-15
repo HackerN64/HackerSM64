@@ -533,22 +533,22 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
         obj_build_transform_from_pos_and_angle(o, O_POS_INDEX, O_FACE_ANGLE_INDEX);
     }
 
-    Mat4 m;
-    mtxf_scale_vec3f(m, *objectTransform, o->header.gfx.scale);
+    Mat4 transform;
+    mtxf_scale_vec3f(transform, *objectTransform, o->header.gfx.scale);
 
     // Go through all vertices, rotating and translating them to transform the object.
-    Vec3f v;
+    Vec3f pos;
     while (numVertices--) {
-        vec3s_to_vec3f(v, vertices);
+        vec3s_to_vec3f(pos, vertices);
         vertices += 3;
 
         //! No bounds check on vertex data
-        if ((v[0] == 0)
-         && (v[1] == 0)
-         && (v[2] == 0)) {
-            vec3f_to_vec3s(vertexData, m[3]);
+        if ((pos[0] == 0)
+         && (pos[1] == 0)
+         && (pos[2] == 0)) {
+            vec3f_to_vec3s(vertexData, transform[3]);
         } else {
-            linear_mtxf_mul_vec3_and_translate(m, vertexData, v);
+            linear_mtxf_mul_vec3_and_translate(transform, vertexData, pos);
         }
         vertexData += 3;
     }

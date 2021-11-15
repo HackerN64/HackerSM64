@@ -50,7 +50,7 @@ struct GraphNodeRoot *init_graph_node_root(struct AllocOnlyPool *pool, struct Gr
 /**
  * Allocates and returns a newly created otrhographic projection node
  */
-struct GraphNodeOrthoProjection * init_graph_node_ortho_projection(struct AllocOnlyPool *pool, struct GraphNodeOrthoProjection *graphNode, f32 scale) {
+struct GraphNodeOrthoProjection *init_graph_node_ortho_projection(struct AllocOnlyPool *pool, struct GraphNodeOrthoProjection *graphNode, f32 scale) {
     if (pool != NULL) {
         graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeOrthoProjection));
     }
@@ -694,9 +694,9 @@ void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f po
     vec3f_copy(graphNode->pos,   pos);
     vec3s_copy(graphNode->angle, angle);
 
-    graphNode->sharedChild      = sharedChild;
-    graphNode->spawnInfo        = 0;
-    graphNode->throwMatrix      = NULL;
+    graphNode->sharedChild       = sharedChild;
+    graphNode->spawnInfo         = 0;
+    graphNode->throwMatrix       = NULL;
     graphNode->animInfo.currAnim = NULL;
 
     graphNode->node.flags |=  GRAPH_RENDER_ACTIVE;
@@ -768,16 +768,8 @@ void geo_obj_init_animation_accel(struct GraphNodeObject *graphNode, struct Anim
  * with actual animation values.
  */
 s32 retrieve_animation_index(s32 frame, u16 **attributes) {
-    s32 result;
-
-    if (frame < (*attributes)[0]) {
-        result = ((*attributes)[1] + frame);
-    } else {
-        result = ((*attributes)[1] + (*attributes)[0] - 1);
-    }
-
+    s32 result = ((*attributes)[1] + ((frame < (*attributes)[0]) ? frame : ((*attributes)[0] - 1)));
     *attributes += 2;
-
     return result;
 }
 

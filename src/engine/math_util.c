@@ -1335,7 +1335,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     // Make f the inverse of the cos(angle) between ray and surface normals.
     f32 f = (1.0f / det); // invDet
     // Make 's' the vector from vertex 0 to 'orig'.
-    Vec3f s; //! t?
+    Vec3f s;
     vec3f_diff(s, orig, v0);
     // Make 'u' the cos(angle) between vectors 's' and normals, divided by 'det'.
     f32 u = (f * vec3f_dot(s, h));

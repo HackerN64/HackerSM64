@@ -109,7 +109,7 @@ void mario_bonk_reflection(struct MarioState *m, u32 negateSpeed) {
         s16 wallAngle = m->wallYaw;
         m->faceAngle[1] = (wallAngle - (s16)(m->faceAngle[1] - wallAngle));
 
-        play_sound((m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK : SOUND_ACTION_BONK,
+        play_sound(((m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_BONK : SOUND_ACTION_BONK),
                    m->marioObj->header.gfx.cameraToObject);
     } else {
         play_sound(SOUND_ACTION_HIT, m->marioObj->header.gfx.cameraToObject);
@@ -132,27 +132,31 @@ u32 mario_update_quicksand(struct MarioState *m, f32 sinkingSpeed) {
 
         switch (m->floor->type) {
             case SURFACE_SHALLOW_QUICKSAND:
-                if ((m->quicksandDepth += sinkingSpeed) >= 10.0f) {
+                m->quicksandDepth += sinkingSpeed;
+                if (m->quicksandDepth >= 10.0f) {
                     m->quicksandDepth = 10.0f;
                 }
                 break;
 
             case SURFACE_SHALLOW_MOVING_QUICKSAND:
-                if ((m->quicksandDepth += sinkingSpeed) >= 25.0f) {
+                m->quicksandDepth += sinkingSpeed;
+                if (m->quicksandDepth >= 25.0f) {
                     m->quicksandDepth = 25.0f;
                 }
                 break;
 
             case SURFACE_QUICKSAND:
             case SURFACE_MOVING_QUICKSAND:
-                if ((m->quicksandDepth += sinkingSpeed) >= 60.0f) {
+                m->quicksandDepth += sinkingSpeed;
+                if (m->quicksandDepth >= 60.0f) {
                     m->quicksandDepth = 60.0f;
                 }
                 break;
 
             case SURFACE_DEEP_QUICKSAND:
             case SURFACE_DEEP_MOVING_QUICKSAND:
-                if ((m->quicksandDepth += sinkingSpeed) >= 160.0f) {
+                m->quicksandDepth += sinkingSpeed;
+                if (m->quicksandDepth >= 160.0f) {
                     update_mario_sound_and_camera(m);
                     return drop_and_set_mario_action(m, ACT_QUICKSAND_DEATH, 0);
                 }
@@ -286,15 +290,15 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     resolve_and_return_wall_collisions(nextPos, 60.0f, 50.0f, &upperWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
+    f32 ceilHeight  = find_ceil(nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
 
-    f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
+    f32 waterLevel  = find_water_level(nextPos[0], nextPos[2]);
 
     if (floor == NULL) {
         return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
     }
 
-    if ((m->action & ACT_FLAG_RIDING_SHELL) && floorHeight < waterLevel) {
+    if ((m->action & ACT_FLAG_RIDING_SHELL) && (floorHeight < waterLevel)) {
         floorHeight = waterLevel;
         floor = &gWaterSurfacePseudoFloor;
         floor->originOffset = -floorHeight;
@@ -475,7 +479,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         return AIR_STEP_HIT_WALL;
     }
 
-    if ((m->action & ACT_FLAG_RIDING_SHELL) && floorHeight < waterLevel) {
+    if ((m->action & ACT_FLAG_RIDING_SHELL) && (floorHeight < waterLevel)) {
         floorHeight = waterLevel;
         floor = &gWaterSurfacePseudoFloor;
         floor->originOffset = -floorHeight;
@@ -584,7 +588,7 @@ u32 should_strengthen_gravity_for_jump_ascent(struct MarioState *m) {
         return FALSE;
     }
 
-    if (!(m->input & INPUT_A_DOWN) && m->vel[1] > 20.0f) {
+    if (!(m->input & INPUT_A_DOWN) && (m->vel[1] > 20.0f)) {
         return ((m->action & ACT_FLAG_CONTROL_JUMP_HEIGHT) != 0);
     }
 
@@ -592,20 +596,22 @@ u32 should_strengthen_gravity_for_jump_ascent(struct MarioState *m) {
 }
 
 void apply_gravity(struct MarioState *m) {
-    if (m->action == ACT_TWIRLING && m->vel[1] < 0.0f) {
+    if ((m->action == ACT_TWIRLING) && (m->vel[1] < 0.0f)) {
         apply_twirl_gravity(m);
     } else if (m->action == ACT_SHOT_FROM_CANNON) {
         m->vel[1] -= 1.0f;
         if (m->vel[1] < -75.0f) {
             m->vel[1] = -75.0f;
         }
-    } else if (m->action == ACT_LONG_JUMP || m->action == ACT_SLIDE_KICK
-        || m->action == ACT_BBH_ENTER_SPIN) {
+    } else if ((m->action == ACT_LONG_JUMP)
+            || (m->action == ACT_SLIDE_KICK)
+            || (m->action == ACT_BBH_ENTER_SPIN)) {
         m->vel[1] -= 2.0f;
         if (m->vel[1] < -75.0f) {
             m->vel[1] = -75.0f;
         }
-    } else if (m->action == ACT_LAVA_BOOST || m->action == ACT_FALL_AFTER_STAR_GRAB) {
+    } else if ((m->action == ACT_LAVA_BOOST)
+            || (m->action == ACT_FALL_AFTER_STAR_GRAB)) {
         m->vel[1] -= 3.2f;
         if (m->vel[1] < -65.0f) {
             m->vel[1] = -65.0f;
@@ -627,7 +633,8 @@ void apply_gravity(struct MarioState *m) {
 
         m->vel[1] -= 2.0f;
         if (m->vel[1] < -37.5f) {
-            if ((m->vel[1] += 4.0f) > -37.5f) {
+            m->vel[1] += 4.0f;
+            if (m->vel[1] > -37.5f) {
                 m->vel[1] = -37.5f;
             }
         }
@@ -655,7 +662,8 @@ void apply_vertical_wind(struct MarioState *m) {
             }
 
             if (m->vel[1] < maxVelY) {
-                if ((m->vel[1] += maxVelY / 8.0f) > maxVelY) {
+                m->vel[1] += (maxVelY / 8.0f);
+                if (m->vel[1] > maxVelY) {
                     m->vel[1] = maxVelY;
                 }
             }

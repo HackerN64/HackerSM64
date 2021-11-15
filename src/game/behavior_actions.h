@@ -16,10 +16,10 @@ void play_penguin_walking_sound(s32 walk);
 s32 update_angle_from_move_flags(s32 *angle);
 void cur_obj_spawn_strong_wind_particles(s32 windSpread, f32 scale, f32 relPosX, f32 relPosY, f32 relPosZ);
 
+//! Lots of these are duplicates
 void bhv_cap_switch_loop(void);
 void bhv_tiny_star_particles_init(void);
 void bhv_grindel_thwomp_loop(void);
-void bhv_koopa_shell_underwater_loop(void);
 void bhv_door_init(void);
 void bhv_door_loop(void);
 void bhv_star_door_loop(void);

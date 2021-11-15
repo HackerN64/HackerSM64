@@ -531,19 +531,14 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 2) {
-        if (*currentIndex == maxIndex) {
-            //! Probably originally a >=, but later replaced with an == and an else statement.
-            *currentIndex = maxIndex;
-        } else {
+        if (*currentIndex != maxIndex) {
             play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
             (*currentIndex)++;
         }
     }
 
     if (((index ^ gMenuHoldKeyIndex) & index) == 1) {
-        if (*currentIndex == minIndex) {
-            // Same applies to here as above
-        } else {
+        if (*currentIndex != minIndex) {
             play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
             (*currentIndex)--;
         }

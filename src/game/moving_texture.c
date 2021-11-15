@@ -265,8 +265,9 @@ Gfx *geo_wdw_set_initial_water_level(s32 callContext, UNUSED struct GraphNode *n
     // Why was this global variable needed when they could just check for GEO_CONTEXT_AREA_LOAD?
     if (callContext != GEO_CONTEXT_RENDER) {
         gWdwWaterLevelSet = FALSE;
-    } else if (callContext == GEO_CONTEXT_RENDER && gEnvironmentRegions != NULL
-               && !gWdwWaterLevelSet) {
+    } else if ((callContext == GEO_CONTEXT_RENDER)
+            && (gEnvironmentRegions != NULL)
+            && !gWdwWaterLevelSet) {
         if (gPaintingMarioYEntry <= 1382.4f) {
             wdwWaterHeight = 31;
         } else if (gPaintingMarioYEntry >= 1600.0f) {
@@ -289,11 +290,11 @@ Gfx *geo_wdw_set_initial_water_level(s32 callContext, UNUSED struct GraphNode *n
  */
 Gfx *geo_movtex_pause_control(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     if (callContext != GEO_CONTEXT_RENDER) {
-        gMovtexCounterPrev = gAreaUpdateCounter - 1;
-        gMovtexCounter = gAreaUpdateCounter;
+        gMovtexCounterPrev = (gAreaUpdateCounter - 1);
+        gMovtexCounter     =  gAreaUpdateCounter;
     } else {
-        gMovtexCounterPrev = gMovtexCounter;
-        gMovtexCounter = gAreaUpdateCounter;
+        gMovtexCounterPrev =  gMovtexCounter;
+        gMovtexCounter     =  gAreaUpdateCounter;
     }
     return NULL;
 }
@@ -378,7 +379,7 @@ Gfx *movtex_gen_from_quad(s16 y, struct MovtexQuad *quad) {
         gfxHead = alloc_display_list(8 * sizeof(*gfxHead));
     }
 
-    if (gfxHead == NULL || verts == NULL) {
+    if ((gfxHead == NULL) || (verts == NULL)) {
         return NULL;
     }
     gfx = gfxHead;
@@ -700,10 +701,10 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, s16 *movtexVerts, struct M
             vec3s_copy(pos, &movtexVerts[entryStart + MOVTEX_ATTR_POS_INDEX]);
             baseS = movtexVerts[MOVTEX_ATTR_NOCOLOR_S];
             baseT = movtexVerts[MOVTEX_ATTR_NOCOLOR_T];
-            offS = movtexVerts[entryStart + MOVTEX_ATTR_NOCOLOR_S];
-            offT = movtexVerts[entryStart + MOVTEX_ATTR_NOCOLOR_T];
-            s = (baseS + ((offS * 32) * 32U));
-            t = (baseT + ((offT * 32) * 32U));
+            offS  = movtexVerts[entryStart + MOVTEX_ATTR_NOCOLOR_S];
+            offT  = movtexVerts[entryStart + MOVTEX_ATTR_NOCOLOR_T];
+            s     = (baseS + ((offS * 32) * 32U));
+            t     = (baseT + ((offT * 32) * 32U));
             make_vertex(verts, index, pos[0], pos[1], pos[2], s, t, d->r, d->g, d->b, alpha);
             break;
         case MOVTEX_LAYOUT_COLORED:
@@ -711,10 +712,10 @@ void movtex_write_vertex_index(Vtx *verts, s32 index, s16 *movtexVerts, struct M
             vec3s_copy(pos, &movtexVerts[entryStart + MOVTEX_ATTR_POS_INDEX]);
             baseS = movtexVerts[MOVTEX_ATTR_COLORED_S];
             baseT = movtexVerts[MOVTEX_ATTR_COLORED_T];
-            offS = movtexVerts[entryStart + MOVTEX_ATTR_COLORED_S];
-            offT = movtexVerts[entryStart + MOVTEX_ATTR_COLORED_T];
-            s = (baseS + ((offS * 32) * 32U));
-            t = (baseT + ((offT * 32) * 32U));
+            offS  = movtexVerts[entryStart + MOVTEX_ATTR_COLORED_S];
+            offT  = movtexVerts[entryStart + MOVTEX_ATTR_COLORED_T];
+            s     = (baseS + ((offS * 32) * 32U));
+            t     = (baseT + ((offT * 32) * 32U));
             vec3_copy(color, &movtexVerts[entryStart + MOVTEX_ATTR_RGB_INDEX]);
             make_vertex(verts, index, pos[0], pos[1], pos[2], s, t, color[0], color[1], color[2], alpha);
             break;
@@ -753,14 +754,12 @@ Gfx *movtex_gen_list(s16 *movtexVerts, struct MovtexObject *movtexList, s8 attrL
  * Function for a geo node that draws a MovtexObject in the gMovtexNonColored list.
  */
 Gfx *geo_movtex_draw_nocolor(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx) {
-    s32 i;
-    s16 *movtexVerts;
-    struct GraphNodeGenerated *asGenerated;
     Gfx *gfx = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        i = 0;
-        asGenerated = (struct GraphNodeGenerated *) node;
+        s32 i = 0;
+        struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
+        s16 *movtexVerts;
         while (gMovtexNonColored[i].movtexVerts != 0) {
             if (gMovtexNonColored[i].geoId == asGenerated->parameter) {
                 SET_GRAPH_NODE_LAYER(asGenerated->fnNode.node.flags, gMovtexNonColored[i].layer);
@@ -779,14 +778,12 @@ Gfx *geo_movtex_draw_nocolor(s32 callContext, struct GraphNode *node, UNUSED Mat
  * Function for a geo node that draws a MovtexObject in the gMovtexColored list.
  */
 Gfx *geo_movtex_draw_colored(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx) {
-    s32 i;
-    s16 *movtexVerts;
-    struct GraphNodeGenerated *asGenerated;
     Gfx *gfx = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        i = 0;
-        asGenerated = (struct GraphNodeGenerated *) node;
+        s32 i = 0;
+        struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
+        s16 *movtexVerts;
         while (gMovtexColored[i].movtexVerts != 0) {
             if (gMovtexColored[i].geoId == asGenerated->parameter) {
                 SET_GRAPH_NODE_LAYER(asGenerated->fnNode.node.flags, gMovtexColored[i].layer);
@@ -809,14 +806,12 @@ Gfx *geo_movtex_draw_colored(s32 callContext, struct GraphNode *node, UNUSED Mat
  * increase the more instances there are.
  */
 Gfx *geo_movtex_draw_colored_no_update(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx) {
-    s32 i;
-    s16 *movtexVerts;
-    struct GraphNodeGenerated *asGenerated;
     Gfx *gfx = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        i = 0;
-        asGenerated = (struct GraphNodeGenerated *) node;
+        s32 i = 0;
+        struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
+        s16 *movtexVerts;
         while (gMovtexColored[i].movtexVerts != 0) {
             if (gMovtexColored[i].geoId == asGenerated->parameter) {
                 SET_GRAPH_NODE_LAYER(asGenerated->fnNode.node.flags, gMovtexColored[i].layer);
@@ -835,14 +830,12 @@ Gfx *geo_movtex_draw_colored_no_update(s32 callContext, struct GraphNode *node, 
  * Used for the sand pits in SSL, both outside and inside the pyramid.
  */
 Gfx *geo_movtex_draw_colored_2_no_update(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx) {
-    s32 i;
-    s16 *movtexVerts;
-    struct GraphNodeGenerated *asGenerated;
     Gfx *gfx = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        i = 0;
-        asGenerated = (struct GraphNodeGenerated *) node;
+        s32 i = 0;
+        struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
+        s16 *movtexVerts;
         while (gMovtexColored2[i].movtexVerts != 0) {
             if (gMovtexColored2[i].geoId == asGenerated->parameter) {
                 SET_GRAPH_NODE_LAYER(asGenerated->fnNode.node.flags, gMovtexColored2[i].layer);

@@ -154,7 +154,7 @@ void receive_new_tasks(void) {
     }
 
     if ((sCurrentDisplaySPTask == NULL)
-    && (sNextDisplaySPTask     != NULL)) {
+     && (sNextDisplaySPTask     != NULL)) {
         sCurrentDisplaySPTask = sNextDisplaySPTask;
         sNextDisplaySPTask    = NULL;
     }

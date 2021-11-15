@@ -668,7 +668,7 @@ static s32 act_hold_breaststroke(struct MarioState *m) {
     }
 
     set_mario_animation(m, MARIO_ANIM_SWIM_WITH_OBJ_PART1);
-    common_swimming_step(m, 0x00A0);
+    common_swimming_step(m, 160);
     return FALSE;
 }
 
@@ -701,7 +701,7 @@ static s32 act_hold_swimming_end(struct MarioState *m) {
 
     m->forwardVel -= 0.25f;
     set_mario_animation(m, MARIO_ANIM_SWIM_WITH_OBJ_PART2);
-    common_swimming_step(m, 0x00A0);
+    common_swimming_step(m, 160);
     return FALSE;
 }
 
@@ -727,7 +727,7 @@ static s32 act_hold_flutter_kick(struct MarioState *m) {
         play_swimming_noise(m);
         set_mario_animation(m, MARIO_ANIM_FLUTTERKICK_WITH_OBJ);
     }
-    common_swimming_step(m, 0x00A0);
+    common_swimming_step(m, 160);
     return FALSE;
 }
 
@@ -751,7 +751,7 @@ static s32 act_water_shell_swimming(struct MarioState *m) {
 
     play_swimming_noise(m);
     set_mario_animation(m, MARIO_ANIM_FLUTTERKICK_WITH_OBJ);
-    common_swimming_step(m, 0x012C);
+    common_swimming_step(m, 300);
 
     return FALSE;
 }

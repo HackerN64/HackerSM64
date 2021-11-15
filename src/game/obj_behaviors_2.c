@@ -115,31 +115,31 @@ static void cur_obj_spin_all_dimensions(f32 pitchSpeed, f32 rollSpeed) {
         if (o->oMoveFlags & OBJ_MOVE_IN_AIR) {
             yaw = 50.0f;
         } else {
-            if (o->oFaceAnglePitch < 0) {
+            if (o->oFaceAnglePitch < 0x0) {
                 pitch = -pitchSpeed;
-            } else if (o->oFaceAnglePitch > 0) {
+            } else if (o->oFaceAnglePitch > 0x0) {
                 pitch =  pitchSpeed;
             }
 
-            if (o->oFaceAngleRoll < 0) {
+            if (o->oFaceAngleRoll < 0x0) {
                 roll = -rollSpeed;
-            } else if (o->oFaceAngleRoll > 0) {
+            } else if (o->oFaceAngleRoll > 0x0) {
                 roll =  rollSpeed;
             }
         }
 
-        c = coss(o->oFaceAnglePitch);
-        s = sins(o->oFaceAnglePitch);
+        c  = coss(o->oFaceAnglePitch);
+        s  = sins(o->oFaceAnglePitch);
         nz = ((pitch * c) + (yaw   * s));
         ny = ((yaw   * c) - (pitch * s));
 
-        c = coss(o->oFaceAngleRoll);
-        s = sins(o->oFaceAngleRoll);
+        c  = coss(o->oFaceAngleRoll);
+        s  = sins(o->oFaceAngleRoll);
         nx = ((roll * c) + (ny   * s));
         ny = ((ny   * c) - (roll * s));
 
-        c = coss(o->oFaceAngleYaw);
-        s = sins(o->oFaceAngleYaw);
+        c  = coss(o->oFaceAngleYaw);
+        s  = sins(o->oFaceAngleYaw);
         px = ((nx * c) - (nz * s));
         nz = ((nz * c) + (nx * s));
 
@@ -342,7 +342,7 @@ static s32 oscillate_toward(s32 *value, f32 *vel, s32 target, f32 velCloseToZero
        && (*vel > -velCloseToZero)
        && (*vel <  velCloseToZero))) {
         *value = target;
-        *vel = 0.0f;
+        *vel   = 0.0f;
         return TRUE;
     } else {
         if (*value >= target) {

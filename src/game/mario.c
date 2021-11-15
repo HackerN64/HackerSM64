@@ -679,7 +679,8 @@ void update_mario_sound_and_camera(struct MarioState *m) {
         raise_background_noise(2);
     }
 
-    if (!(action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) && (camPreset == CAMERA_MODE_BEHIND_MARIO || camPreset == CAMERA_MODE_WATER_SURFACE)) {
+    if (!(action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))
+     && ((camPreset == CAMERA_MODE_BEHIND_MARIO) || (camPreset == CAMERA_MODE_WATER_SURFACE))) {
         set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
     }
 }
@@ -1149,10 +1150,8 @@ void squish_mario_model(struct MarioState *m) {
         else if (m->squishTimer <= 16) {
             m->squishTimer--;
 
-            m->marioObj->header.gfx.scale[1] =
-                (1.0f - ((sSquishScaleOverTime[15 - m->squishTimer] * 0.6f) / 100.0f));
-            m->marioObj->header.gfx.scale[0] =
-                (((sSquishScaleOverTime[15 - m->squishTimer] * 0.4f) / 100.0f) + 1.0f);
+            m->marioObj->header.gfx.scale[1] = (1.0f - ((sSquishScaleOverTime[15 - m->squishTimer] * 0.6f) / 100.0f));
+            m->marioObj->header.gfx.scale[0] = (1.0f + ((sSquishScaleOverTime[15 - m->squishTimer] * 0.4f) / 100.0f));
 
             m->marioObj->header.gfx.scale[2] = m->marioObj->header.gfx.scale[0];
         } else {
@@ -1456,8 +1455,10 @@ void update_mario_health(struct MarioState *m) {
 
 #ifdef BREATH_METER
 void update_mario_breath(struct MarioState *m) {
-    if (m->breath >= 0x100 && m->health >= 0x100) {
-        if (m->pos[1] < (m->waterLevel - 140) && !(m->flags & MARIO_METAL_CAP) && !(m->action & ACT_FLAG_INTANGIBLE)) {
+    if ((m->breath >= 0x100) && (m->health >= 0x100)) {
+        if (m->pos[1] < (m->waterLevel - 140)
+         && !(m->flags & MARIO_METAL_CAP)
+         && !(m->action & ACT_FLAG_INTANGIBLE)) {
             m->breath--;
             if (m->breath < 0x300) {
                 // Play a noise to alert the player when Mario is close to drowning.
