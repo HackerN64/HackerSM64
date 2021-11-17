@@ -125,21 +125,29 @@ void surface_normal_to_vec3f(Vec3f dest, struct Surface *surf) {
     ((f32 *) dest)[2] = z;
 }
 
-/**
- * Convert float vector a to a short vector 'dest' by rounding the components
- * to the nearest integer.
- */
-#define vec3_copy_bits_roundf(destFmt, dest, src) { \
-    register destFmt x = roundf(src[0]);            \
-    register destFmt y = roundf(src[1]);            \
-    register destFmt z = roundf(src[2]);            \
-    ((destFmt *) dest)[0] = x;                      \
-    ((destFmt *) dest)[1] = y;                      \
-    ((destFmt *) dest)[2] = z;                      \
+/// Convert float vector a to a short vector 'dest' by rounding the components to the nearest integer.
+#define vec3_copy_bits_roundf(fmt, dest, src) { \
+    register fmt x = roundf(src[0]);            \
+    register fmt y = roundf(src[1]);            \
+    register fmt z = roundf(src[2]);            \
+    ((fmt *) dest)[0] = x;                      \
+    ((fmt *) dest)[1] = y;                      \
+    ((fmt *) dest)[2] = z;                      \
 }
 void vec3f_to_vec3s(Vec3s dest, const Vec3f src) { vec3_copy_bits_roundf(s16, dest, src); } // 32 -> 16
 void vec3f_to_vec3i(Vec3i dest, const Vec3f src) { vec3_copy_bits_roundf(s32, dest, src); } // 32 -> 32
 #undef vec3_copy_bits_roundf
+
+#define vec3_copy_y_off_func(destFmt, dest, srcFmt, src, yOff) {\
+    register destFmt x = ((srcFmt *) src)[0];                   \
+    register destFmt y = ((srcFmt *) src)[1] + yOff;            \
+    register destFmt z = ((srcFmt *) src)[2];                   \
+    ((destFmt *) dest)[0] = x;                                  \
+    ((destFmt *) dest)[1] = y;                                  \
+    ((destFmt *) dest)[2] = z;                                  \
+}
+void vec3f_copy_y_off(Vec3f dest, Vec3f src, f32 yOff) { vec3_copy_y_off_func(f32, dest, f32, src, yOff); }
+#undef vec3_copy_y_off_func
 
 /// Set vector 'dest' to (x, y, z)
 inline void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z) { vec3_set(dest, x, y, z); }
@@ -354,8 +362,13 @@ void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
 }
 
 void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v) {
-    linear_mtxf_mul_vec3f(m, dst, v);
-    vec3f_add(dst, m[3]);
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        dst[i] = ((m[0][i] * v[0])
+                + (m[1][i] * v[1])
+                + (m[2][i] * v[2])
+                +  m[3][i]);
+    }
 }
 
 /**
@@ -399,7 +412,7 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
 }
 
 /// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates.
-void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
+UNUSED void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
     register f32 sx   = sins(rot[0]);
     register f32 cx   = coss(rot[0]);
     register f32 sy   = sins(rot[1]);
@@ -524,31 +537,39 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
 
 /**
  * Set 'dest' to a transformation matrix that turns an object to face the camera.
- * 'mtx' is the look-at matrix from the camera
- * 'position' is the position of the object in the world
+ * 'mtx' is the look-at matrix from the camera.
+ * 'position' is the position of the object in the world.
+ * 'scale' is the scale of the object.
  * 'angle' rotates the object while still facing the camera.
  */
-void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle) {
+void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle) {
     register s32 i;
+    register f32 sx = scale[0];
+    register f32 sy = scale[1];
+    register f32 sz = ((f32 *) scale)[2];
     register f32 *temp2, *temp = (f32 *)dest;
     for (i = 0; i < 16; i++) {
         *temp = 0;
         temp++;
     }
     if (angle == 0x0) {
-        ((u32 *) dest)[0] = FLOAT_ONE;
+        // ((u32 *) dest)[0] = FLOAT_ONE;
+        dest[0][0] = sx; // [0][0]
         dest[0][1] = 0;
         dest[1][0] = 0;
-        ((u32 *) dest)[5] = FLOAT_ONE;
+        // ((u32 *) dest)[5] = FLOAT_ONE;
+        dest[1][1] = sy; // [1][1]
     } else {
-        dest[0][0] = coss(angle);
-        dest[0][1] = sins(angle);
-        dest[1][0] = -dest[0][1];
-        dest[1][1] =  dest[0][0];
+        dest[0][0] = (coss(angle) * sx);
+        dest[0][1] = (sins(angle) * sx);
+        dest[1][0] = (-dest[0][1] * sy);
+        dest[1][1] = ( dest[0][0] * sy);
     }
-    ((u32 *) dest)[10] = FLOAT_ONE;
+    // ((u32 *) dest)[10] = FLOAT_ONE;
+    // dest[2][2] = sz; // [2][2]
+    ((f32 *) dest)[10] = sz; // [2][2]
     dest[2][3] = 0;
-    ((u32 *) dest)[15] = FLOAT_ONE;
+    ((u32 *) dest)[15] = FLOAT_ONE; // [3][3]
 
     temp  = (f32 *)dest;
     temp2 = (f32 *)mtx;
@@ -721,7 +742,7 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
  * to the point. Note that the bottom row is assumed to be [0, 0, 0, 1], which is
  * true for transformation matrices if the translation has a w component of 1.
  */
-void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
+UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
     register f32 x = b[0];
     register f32 y = b[1];
     register f32 z = b[2];

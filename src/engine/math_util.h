@@ -145,8 +145,7 @@ extern f32 gSineTable[];
 
 /**
  * Set 'dest' the normal vector of a triangle with vertices a, b and c.
- * It is similar to vec3f_cross, but it calculates the vectors (c-b) and (b-a)
- * at the same time.
+ * Equivalent to cross((c-b), (c-a)).
  */
 #define find_vector_perpendicular_to_plane(dest, a, b, c) {                                     \
     (dest)[0] = ((b)[1] - (a)[1]) * ((c)[2] - (b)[2]) - ((c)[1] - (b)[1]) * ((b)[2] - (a)[2]);  \
@@ -497,6 +496,8 @@ void vec3i_to_vec3f(Vec3f dest, const Vec3i src);
 void vec3f_to_vec3s(Vec3s dest, const Vec3f src);
 void vec3f_to_vec3i(Vec3i dest, const Vec3f src);
 
+void vec3f_copy_y_off(Vec3f dest, Vec3f src, f32 yOff);
+
 void surface_normal_to_vec3f(Vec3f dest, struct Surface *surf);
 
 void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z);
@@ -539,7 +540,7 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
 void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
 void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
-void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, s32 angle);
+void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle);
 void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw);
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw);
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius);
@@ -552,6 +553,9 @@ inline void mtxf_to_mtx(register void *dest, register void *src) {
     guMtxF2L(src, dest);
 }
 void mtxf_rotate_xy(Mtx *mtx, s32 angle);
+void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
+void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v);
+void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);
 void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx);
 
@@ -599,9 +603,6 @@ f32 atan2f(f32 a, f32 b);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32  anim_spline_poll(Vec3f result);
-void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
-void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v);
-void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
 void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
 
 #endif // MATH_UTIL_H
