@@ -703,8 +703,7 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
     register s32 i;
     for (i = 0; i < 16; i++) {
         vec3_copy(entry, temp);
-        temp3 = (f32 *)b;
-        for (; (i & 3) !=3; i++) {
+        for (temp3 = (f32 *)b; (i & 3) != 3; i++) {
             *temp2 = ((entry[0] * temp3[0])
                     + (entry[1] * temp3[4])
                     + (entry[2] * temp3[8]));
@@ -783,18 +782,15 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
 }
 
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
-    dst[0][0] =  vec3_dot(a1[0], a2[0]);
-    dst[0][1] =  vec3_dot(a1[0], a2[1]);
-    dst[0][2] =  vec3_dot(a1[0], a2[2]);
-    dst[1][0] =  vec3_dot(a1[1], a2[0]);
-    dst[1][1] =  vec3_dot(a1[1], a2[1]);
-    dst[1][2] =  vec3_dot(a1[1], a2[2]);
-    dst[2][0] =  vec3_dot(a1[2], a2[0]);
-    dst[2][1] =  vec3_dot(a1[2], a2[1]);
-    dst[2][2] =  vec3_dot(a1[2], a2[2]);
-    dst[3][0] = (vec3_dot(a1[3], a2[0]) - vec3_dot(a2[3], a2[0]));
-    dst[3][1] = (vec3_dot(a1[3], a2[1]) - vec3_dot(a2[3], a2[1]));
-    dst[3][2] = (vec3_dot(a1[3], a2[2]) - vec3_dot(a2[3], a2[2]));
+    s32 i, j;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            dst[i][j] = vec3f_dot(a1[i], a1[j]);
+        }
+    }
+    for (i = 0; i < 3; i++) {
+        dst[3][i] = (vec3f_dot(a1[3], a2[i]) - vec3f_dot(a2[3], a2[i]));
+    }
     MTXF_END(dst);
 }
 

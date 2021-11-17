@@ -231,7 +231,9 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     } else {
         gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
         s->floorHeight = find_floor(pos[0], pos[1], pos[2], &s->floor);
-        if (s->floor == NULL) return NULL;
+        if (s->floor == NULL) {
+            return NULL;
+        }
     }
 
     if ((pos[1] - s->floorHeight) > 1024.0f) {
