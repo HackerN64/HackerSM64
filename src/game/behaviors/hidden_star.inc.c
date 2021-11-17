@@ -8,7 +8,7 @@ void bhv_hidden_star_init(void) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
 
-    o->oHiddenStarTriggerCounter = (5 - remainingTriggers);
+    o->oHiddenStarTriggerCounter = 5 - remainingTriggers;
 }
 
 void bhv_hidden_star_loop(void) {

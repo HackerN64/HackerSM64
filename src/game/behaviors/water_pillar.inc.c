@@ -78,5 +78,5 @@ void bhv_water_level_pillar_loop(void) {
         water_level_pillar_undrained();
     }
     gEnvironmentRegions[18] = gEnvironmentLevels[2];
-    gEnvironmentRegions[ 6] = gEnvironmentLevels[0];
+    gEnvironmentRegions[6] = gEnvironmentLevels[0];
 }

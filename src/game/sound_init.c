@@ -25,11 +25,11 @@ static struct VblankHandler sSoundVblankHandler;
 // Only written to, never read.
 static u8 sMusicVolume = 0;
 
-static u8  sBgMusicDisabled       = FALSE;
-static u16 sCurrentMusic          = MUSIC_NONE;
-static u16 sCurrentShellMusic     = MUSIC_NONE;
-static u16 sCurrentCapMusic       = MUSIC_NONE;
-static u8  sPlayingInfiniteStairs = FALSE;
+static u8 sBgMusicDisabled = FALSE;
+static u16 sCurrentMusic = MUSIC_NONE;
+static u16 sCurrentShellMusic = MUSIC_NONE;
+static u16 sCurrentCapMusic = MUSIC_NONE;
+static u8 sPlayingInfiniteStairs = FALSE;
 static s16 sSoundMenuModeToSoundMode[] = {
     SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET
 };
@@ -221,14 +221,14 @@ void play_infinite_stairs_music(void) {
  * Called from threads: thread5_game_loop
  */
 void set_background_music(u16 a, u16 seqArgs, s16 fadeTimer) {
-    if ((gResetTimer == 0) && (seqArgs != sCurrentMusic)) {
+    if (gResetTimer == 0 && seqArgs != sCurrentMusic) {
         if (gCurrCreditsEntry != NULL) {
             sound_reset(7);
         } else {
             sound_reset(a);
         }
 
-        if (!gNeverEnteredCastle || (seqArgs != SEQ_LEVEL_INSIDE_CASTLE)) {
+        if (!gNeverEnteredCastle || seqArgs != SEQ_LEVEL_INSIDE_CASTLE) {
             play_music(SEQ_PLAYER_LEVEL, seqArgs, fadeTimer);
             sCurrentMusic = seqArgs;
         }
@@ -240,9 +240,9 @@ void set_background_music(u16 a, u16 seqArgs, s16 fadeTimer) {
  */
 void fadeout_music(s16 fadeOutTime) {
     func_803210D4(fadeOutTime);
-    sCurrentMusic      = MUSIC_NONE;
+    sCurrentMusic = MUSIC_NONE;
     sCurrentShellMusic = MUSIC_NONE;
-    sCurrentCapMusic   = MUSIC_NONE;
+    sCurrentCapMusic = MUSIC_NONE;
 }
 
 /**
@@ -250,9 +250,9 @@ void fadeout_music(s16 fadeOutTime) {
  */
 void fadeout_level_music(s16 fadeTimer) {
     seq_player_fade_out(SEQ_PLAYER_LEVEL, fadeTimer);
-    sCurrentMusic      = MUSIC_NONE;
+    sCurrentMusic = MUSIC_NONE;
     sCurrentShellMusic = MUSIC_NONE;
-    sCurrentCapMusic   = MUSIC_NONE;
+    sCurrentCapMusic = MUSIC_NONE;
 }
 
 /**
@@ -286,7 +286,7 @@ void stop_shell_music(void) {
  */
 void play_cap_music(u16 seqArgs) {
     play_music(SEQ_PLAYER_LEVEL, seqArgs, 0);
-    if ((sCurrentCapMusic != MUSIC_NONE) && (sCurrentCapMusic != seqArgs)) {
+    if (sCurrentCapMusic != MUSIC_NONE && sCurrentCapMusic != seqArgs) {
         stop_background_music(sCurrentCapMusic);
     }
     sCurrentCapMusic = seqArgs;

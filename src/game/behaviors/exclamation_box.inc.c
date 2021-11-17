@@ -10,10 +10,10 @@ struct ExclamationBoxContents {
 
 struct ObjectHitbox sExclamationBoxHitbox = {
     /* interactType:      */ INTERACT_BREAKABLE,
-    /* downOffset:        */  5,
-    /* damageOrCoinValue: */  0,
-    /* health:            */  1,
-    /* numLootCoins:      */  0,
+    /* downOffset:        */ 5,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 1,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 40,
     /* height:            */ 30,
     /* hurtboxRadius:     */ 40,
@@ -56,7 +56,7 @@ void exclamation_box_act_init(void) {
         }
     } else {
         o->oAnimState = EXCLAMATION_BOX_ANIM_STATE_YELLOW;
-        o->oAction    = EXCLAMATION_BOX_ACT_ACTIVE;
+        o->oAction = EXCLAMATION_BOX_ACT_ACTIVE;
     }
 }
 
@@ -85,7 +85,7 @@ void exclamation_box_act_active(void) {
     if (cur_obj_was_attacked_or_ground_pounded()) {
         cur_obj_become_intangible();
         o->oExclamationBoxScaleAngle = 0x4000;
-        o->oVelY    = 30.0f;
+        o->oVelY = 30.0f;
         o->oGravity = -8.0f;
         o->oFloorHeight = o->oPosY;
         o->oAction = EXCLAMATION_BOX_ACT_SCALING;
@@ -102,13 +102,13 @@ void exclamation_box_act_scaling(void) {
         o->oVelY = 0.0f;
         o->oGravity = 0.0f;
     }
-    o->oExclamationBoxVerticalScale   = ((( sins(o->oExclamationBoxScaleAngle) + 1.0f) *  0.3f) + 0.0f);
-    o->oExclamationBoxHorizontalScale = (((-sins(o->oExclamationBoxScaleAngle) + 1.0f) *  0.5f) + 1.0f);
-    o->oGraphYOffset                  =  ((-sins(o->oExclamationBoxScaleAngle) + 1.0f) * 26.0f);
+    o->oExclamationBoxVerticalScale = (sins(o->oExclamationBoxScaleAngle) + 1.0f) * 0.3f + 0.0f;
+    o->oExclamationBoxHorizontalScale = (-sins(o->oExclamationBoxScaleAngle) + 1.0f) * 0.5f + 1.0f;
+    o->oGraphYOffset = (-sins(o->oExclamationBoxScaleAngle) + 1.0f) * 26.0f;
     o->oExclamationBoxScaleAngle += 0x1000;
-    o->header.gfx.scale[0] = (o->oExclamationBoxHorizontalScale * 2.0f);
-    o->header.gfx.scale[1] = (o->oExclamationBoxVerticalScale   * 2.0f);
-    o->header.gfx.scale[2] = (o->oExclamationBoxHorizontalScale * 2.0f);
+    o->header.gfx.scale[0] = o->oExclamationBoxHorizontalScale * 2.0f;
+    o->header.gfx.scale[1] = o->oExclamationBoxVerticalScale   * 2.0f;
+    o->header.gfx.scale[2] = o->oExclamationBoxHorizontalScale * 2.0f;
     if (o->oTimer == 7) {
         o->oAction = EXCLAMATION_BOX_ACT_EXPLODE;
     }
@@ -120,8 +120,8 @@ void exclamation_box_spawn_contents(struct ExclamationBoxContents *contentsList,
     while (contentsList->id != EXCLAMATION_BOX_BP_NULL) {
         if (boxType == contentsList->id) {
             contentsObj = spawn_object(o, contentsList->model, contentsList->behavior);
-            contentsObj->oVelY       = 20.0f;
-            contentsObj->oForwardVel =  3.0f;
+            contentsObj->oVelY = 20.0f;
+            contentsObj->oForwardVel = 3.0f;
             contentsObj->oMoveAngleYaw = gMarioObject->oMoveAngleYaw;
             OR_BPARAM1(o->oBehParams, contentsList->behParams);
             if (contentsList->model == MODEL_STAR) {

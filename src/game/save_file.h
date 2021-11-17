@@ -36,7 +36,7 @@ struct SaveFile {
 #else
     // Note: the coordinates get set, but are never actually used, since the
     // cap can always be found in a fixed spot within the course
-    Vec3s capPos;
+    Vec3s capPos; // 48 bits
 #endif
 
     u32 flags;
@@ -44,11 +44,11 @@ struct SaveFile {
     // Star flags for each course.
     // The most significant bit of the byte *following* each course is set if the
     // cannon is open.
-    u8 courseStars[COURSE_COUNT];
+    u8 courseStars[COURSE_COUNT]; // 200 bits
 
-    u8 courseCoinScores[COURSE_STAGES_COUNT];
+    u8 courseCoinScores[COURSE_STAGES_COUNT]; // 120 bits
 
-    struct SaveBlockSignature signature;
+    struct SaveBlockSignature signature; // 32 bits
 };
 
 enum SaveFileIndex {

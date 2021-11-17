@@ -6,11 +6,11 @@
 #include "types.h"
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#define SEQUENCE_PLAYERS   4
+#define SEQUENCE_PLAYERS 4
 #define SEQUENCE_CHANNELS 48
-#define SEQUENCE_LAYERS   64
+#define SEQUENCE_LAYERS 64
 #else
-#define SEQUENCE_PLAYERS   3
+#define SEQUENCE_PLAYERS 3
 #define SEQUENCE_CHANNELS 32
 #ifdef VERSION_JP
 #define SEQUENCE_LAYERS 48
@@ -19,7 +19,7 @@
 #endif
 #endif
 
-#define LAYERS_MAX        4
+#define LAYERS_MAX       4
 #define CHANNELS_MAX     16
 
 #define NO_LAYER ((struct SequenceChannelLayer *)(-1))
@@ -363,9 +363,9 @@ struct ReverbBitsData {
     /* 0x00 */ u8 bit1 : 1;
     /* 0x00 */ u8 bit2 : 1;
     /* 0x00 */ u8 usesHeadsetPanEffects : 1;
-    /* 0x00 */ u8 stereoHeadsetEffects  : 2;
+    /* 0x00 */ u8 stereoHeadsetEffects : 2;
     /* 0x00 */ u8 strongRight : 1;
-    /* 0x00 */ u8 strongLeft  : 1;
+    /* 0x00 */ u8 strongLeft : 1;
 };
 
 union ReverbBits {

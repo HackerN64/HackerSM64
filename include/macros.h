@@ -69,9 +69,11 @@
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
 #endif
 
-#define MODE_NTSC 0
-#define MODE_MPAL 1
-#define MODE_PAL  2
+enum VIModes {
+    MODE_NTSC,
+    MODE_MPAL,
+    MODE_PAL,
+};
 
 #define FORCE_CRASH { *(vs8*)0 = 0; }
 

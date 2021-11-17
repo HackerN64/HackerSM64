@@ -27,9 +27,9 @@ void bhv_horizontal_grindel_update(void) {
                     cur_obj_play_sound_2(SOUND_OBJ_KING_BOBOMB_JUMP);
 
                     o->oForwardVel = 11.0f;
-                    o->oVelY       = 70.0f;
-                    o->oGravity    = -4.0f;
-                    o->oMoveFlags  = OBJ_MOVE_NONE;
+                    o->oVelY = 70.0f;
+                    o->oGravity = -4.0f;
+                    o->oMoveFlags = OBJ_MOVE_NONE;
                 }
             }
         } else {

@@ -32,6 +32,7 @@ void bhv_openable_grill_loop(void) {
     switch (o->oAction) {
         case OEPNABLE_GRILL_ACT_SPAWN:
             grillIdx = o->oBehParams2ndByte;
+
             grillObj = spawn_object_relative(-1, gOpenableGrills[grillIdx].halfWidth, 0, 0, o, gOpenableGrills[grillIdx].modelID, bhvOpenableCageDoor);
             grillObj->oMoveAngleYaw += 0x8000;
             obj_set_collision_data(grillObj, gOpenableGrills[grillIdx].collision);
@@ -39,22 +40,28 @@ void bhv_openable_grill_loop(void) {
             obj_set_collision_data(grillObj, gOpenableGrills[grillIdx].collision);
             o->oAction = OEPNABLE_GRILL_IDLE_CLOSED;
             break;
+
         case OEPNABLE_GRILL_IDLE_CLOSED:
             if ((o->oOpenableGrillFloorSwitchObj = cur_obj_nearest_object_with_behavior(bhvFloorSwitchGrills)) != NULL) {
                 o->oAction = OEPNABLE_GRILL_OPENING;
             }
             break;
+
         case OEPNABLE_GRILL_OPENING:
             grillObj = o->oOpenableGrillFloorSwitchObj;
+
             if (grillObj->oAction == OPENABLE_GRILL_DOOR_ACT_OPEN) {
                 o->oOpenableGrillIsOpen = TRUE;
                 cur_obj_play_sound_2(SOUND_GENERAL_CAGE_OPEN);
                 o->oAction = OEPNABLE_GRILL_IDLE_OPEN;
+
+                // Only play the jingle once
                 if (o->oBehParams2ndByte != 0) {
                     play_puzzle_jingle();
                 }
             }
             break;
+
         case OEPNABLE_GRILL_IDLE_OPEN:
             break;
     }

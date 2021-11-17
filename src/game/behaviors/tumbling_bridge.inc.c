@@ -47,7 +47,7 @@ void bhv_tumbling_bridge_platform_loop(void) {
             o->oGravity = -3.0f;
             cur_obj_rotate_face_angle_using_vel();
             cur_obj_move_using_fvel_and_gravity();
-            if (o->oPosY < (o->oFloorHeight - 300.0f)) {
+            if (o->oPosY < o->oFloorHeight - 300.0f) {
                 o->oAction = 3;
             }
             break;

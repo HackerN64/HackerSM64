@@ -27,10 +27,10 @@ struct Object *try_allocate_object(struct ObjectNode *destList, struct ObjectNod
         freeList->next = nextObj->next;
 
         // Insert at end of destination list
-        nextObj->prev        = destList->prev;
-        nextObj->next        = destList;
+        nextObj->prev = destList->prev;
+        nextObj->next = destList;
         destList->prev->next = nextObj;
-        destList->prev       = nextObj;
+        destList->prev = nextObj;
     } else {
         return NULL;
     }
@@ -51,7 +51,7 @@ static void deallocate_object(struct ObjectNode *freeList, struct ObjectNode *ob
     obj->prev->next = obj->next;
 
     // Insert at beginning of free list
-    obj->next      = freeList->next;
+    obj->next = freeList->next;
     freeList->next = obj;
 }
 
@@ -67,7 +67,7 @@ void init_free_object_list(void) {
     gFreeObjectList.next = (struct ObjectNode *) obj;
 
     // Link each object in the pool to the following object
-    for (i = 0; i < (poolLength - 1); i++) {
+    for (i = 0; i < poolLength - 1; i++) {
         obj->header.next = &(obj + 1)->header;
         obj++;
     }
@@ -93,7 +93,7 @@ void clear_object_lists(struct ObjectNode *objLists) {
  */
 void unload_object(struct Object *obj) {
     obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
-    obj->prevObj     = NULL;
+    obj->prevObj = NULL;
 
     obj->header.gfx.throwMatrix = NULL;
     stop_sounds_from_source(obj->header.gfx.cameraToObject);
@@ -139,11 +139,11 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     }
 
     // Initialize object fields
-    obj->activeFlags              = (ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_ALLOCATED);
-    obj->parentObj                = obj;
-    obj->prevObj                  = NULL;
+    obj->activeFlags = (ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_ALLOCATED);
+    obj->parentObj = obj;
+    obj->prevObj = NULL;
     obj->collidedObjInteractTypes = 0;
-    obj->numCollidedObjs          = 0;
+    obj->numCollidedObjs = 0;
 
 #if IS_64_BIT
     for (i = 0; i < MAX_OBJECT_FIELDS; i++) {
@@ -156,33 +156,33 @@ struct Object *allocate_object(struct ObjectNode *objList) {
     }
 #endif
 
-    obj->unused1            = 0;
-    obj->bhvStackIndex      = 0;
-    obj->bhvDelayTimer      = 0;
+    obj->unused1 = 0;
+    obj->bhvStackIndex = 0;
+    obj->bhvDelayTimer = 0;
 
-    obj->hitboxRadius       =  50.0f;
-    obj->hitboxHeight       = 100.0f;
-    obj->hurtboxRadius      =   0.0f;
-    obj->hurtboxHeight      =   0.0f;
-    obj->hitboxDownOffset   =   0.0f;
-    obj->unused2            =   0;
+    obj->hitboxRadius = 50.0f;
+    obj->hitboxHeight = 100.0f;
+    obj->hurtboxRadius = 0.0f;
+    obj->hurtboxHeight = 0.0f;
+    obj->hitboxDownOffset = 0.0f;
+    obj->unused2 = 0;
 
-    obj->platform           = NULL;
-    obj->collisionData      = NULL;
-    obj->oIntangibleTimer   =   -1;
-    obj->oDamageOrCoinValue =    0;
-    obj->oHealth            = 2048;
+    obj->platform = NULL;
+    obj->collisionData = NULL;
+    obj->oIntangibleTimer = -1;
+    obj->oDamageOrCoinValue = 0;
+    obj->oHealth = 2048;
 
     obj->oCollisionDistance = 1000.0f;
-    obj->oDrawingDistance   = 4000.0f;
+    obj->oDrawingDistance = 4000.0f;
 
     mtxf_identity(obj->transform);
 
     obj->respawnInfoType = RESPAWN_INFO_TYPE_NULL;
-    obj->respawnInfo     = NULL;
+    obj->respawnInfo = NULL;
 
     obj->oDistanceToMario = 19000.0f;
-    obj->oRoom            = -1;
+    obj->oRoom = -1;
 
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
 #ifdef OBJECTS_REJ
@@ -208,16 +208,16 @@ struct Object *create_object(const BehaviorScript *bhvScript) {
     // If the first behavior script command is "begin <object list>", then
     // extract the object list from it
     if ((bhvScript[0] >> 24) == 0) {
-        objListIndex = ((bhvScript[0] >> 16) & 0xFFFF);
+        objListIndex = (bhvScript[0] >> 16) & 0xFFFF;
     } else {
         objListIndex = OBJ_LIST_DEFAULT;
     }
 
     objList = &gObjectLists[objListIndex];
-    obj     = allocate_object(objList);
+    obj = allocate_object(objList);
 
     obj->curBhvCommand = bhvScript;
-    obj->behavior      = bhvScript;
+    obj->behavior = bhvScript;
 
     if (objListIndex == OBJ_LIST_UNIMPORTANT) {
         obj->activeFlags |= ACTIVE_FLAG_UNIMPORTANT;

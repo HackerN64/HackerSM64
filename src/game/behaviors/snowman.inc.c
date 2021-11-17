@@ -2,14 +2,14 @@
 
 static struct ObjectHitbox sRollingSphereHitbox = {
     /* interactType:      */ INTERACT_DAMAGE,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   3,
-    /* health:            */   0,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 3,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 210,
     /* height:            */ 350,
-    /* hurtboxRadius:     */   0,
-    /* hurtboxHeight:     */   0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 static const Vec3f sSnowmanHeadPos = { -4230.0f, -1344.0f, 1813.0f };
@@ -17,12 +17,12 @@ static const Vec3f sSnowmanHeadPos = { -4230.0f, -1344.0f, 1813.0f };
 void bhv_snowmans_bottom_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
 
-    o->oGravity  = 10.0f;
-    o->oFriction =  0.999f;
-    o->oBuoyancy =  2.0f;
+    o->oGravity = 10.0f;
+    o->oFriction = 0.999f;
+    o->oBuoyancy = 2.0f;
 
-    o->oVelY       = 0.0f;
-    o->oForwardVel = 0.0f;
+    o->oVelY = 0;
+    o->oForwardVel = 0;
     o->oSnowmansBottomScale = 0.4f;
 
     struct Object *snowmansHead = cur_obj_nearest_object_with_behavior(bhvSnowmansHead);
@@ -80,12 +80,12 @@ void snowmans_bottom_act_final_stretch(void) { // act 2
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oSnowmansBottomTargetYaw, 0x400);
     if (is_point_close_to_object(o, sSnowmanHeadPos[0], sSnowmanHeadPos[1], sSnowmanHeadPos[2], 300)) {
         spawn_mist_particles_variable(0, 0, 70.0f);
-        o->oMoveAngleYaw      = atan2s((sSnowmanHeadPos[2] - o->oPosZ), (sSnowmanHeadPos[0] - o->oPosX));
-        o->oVelY              = 80.0f;
-        o->oForwardVel        = 15.0f;
-        o->oAction            = SNOWMANS_BOTTOM_ACT_REACH_END;
+        o->oMoveAngleYaw = atan2s((sSnowmanHeadPos[2] - o->oPosZ), (sSnowmanHeadPos[0] - o->oPosX));
+        o->oVelY = 80.0f;
+        o->oForwardVel = 15.0f;
+        o->oAction = SNOWMANS_BOTTOM_ACT_REACH_END;
         o->parentObj->oAction = SNOWMANS_HEAD_ACT_JUMPING;
-        o->parentObj->oVelY   = 100.0f;
+        o->parentObj->oVelY = 100.0f;
         cur_obj_play_sound_2(SOUND_OBJ_SNOWMAN_BOUNCE);
     }
 
@@ -147,16 +147,16 @@ void bhv_snowmans_bottom_loop(void) {
     set_rolling_sphere_hitbox();
     set_object_visibility(o, 8000);
     cur_obj_scale(o->oSnowmansBottomScale);
-    o->oGraphYOffset = (o->oSnowmansBottomScale * 180.0f);
+    o->oGraphYOffset = o->oSnowmansBottomScale * 180.0f;
 }
 
 void bhv_snowmans_head_init(void) {
-    u8 starFlags = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
+    u8 starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
     s8 behParams = GET_BPARAM1(o->oBehParams);
 
     cur_obj_scale(0.7f);
 
-    o->oGravity  = 5.0f;
+    o->oGravity = 5.0f;
     o->oFriction = 0.999f;
     o->oBuoyancy = 2.0f;
 

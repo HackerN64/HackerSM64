@@ -39,8 +39,8 @@ Vtx_t gBubbleTempVtx[3] = {
  * kill flower and bubble particles.
  */
 s32 particle_is_laterally_close(s32 index, s32 x, s32 z, s32 distance) {
-    s32 dx = ((gEnvFxBuffer + index)->xPos - x);
-    s32 dz = ((gEnvFxBuffer + index)->zPos - z);
+    s32 dx = (gEnvFxBuffer + index)->xPos - x;
+    s32 dz = (gEnvFxBuffer + index)->zPos - z;
     return (sqr(dx) + sqr(dz) <= sqr(distance));
 }
 
@@ -49,7 +49,7 @@ s32 particle_is_laterally_close(s32 index, s32 x, s32 z, s32 distance) {
  * Used to position flower particles
  */
 s32 random_flower_offset(void) {
-    s32 result = ((random_float() * 2000.0f) - 1000.0f);
+    s32 result = random_float() * 2000.0f - 1000.0f;
     if (result < 0) {
         result -= 1000;
     } else {
@@ -141,7 +141,7 @@ void envfx_update_lava(Vec3s centerPos) {
         if ((gEnvFxBuffer + i)->isAlive == FALSE) {
             envfx_set_lava_bubble_position(i, centerPos);
             (gEnvFxBuffer + i)->isAlive = TRUE;
-        } else if (!(globalTimer & 0x1)) {
+        } else if (!(globalTimer & 1)) {
             (gEnvFxBuffer + i)->animFrame++;
             if ((gEnvFxBuffer + i)->animFrame > 8) {
                 (gEnvFxBuffer + i)->isAlive   = FALSE;
@@ -160,13 +160,13 @@ void envfx_update_lava(Vec3s centerPos) {
  * according to the pitch and yaw of the whirlpool.
  */
 void envfx_rotate_around_whirlpool(s32 *x, s32 *y, s32 *z) {
-    s32 vecX     = (*x - gEnvFxBubbleConfig[ENVFX_STATE_DEST_X]);
-    s32 vecY     = (*y - gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y]);
-    s32 vecZ     = (*z - gEnvFxBubbleConfig[ENVFX_STATE_DEST_Z]);
-    f32 cosPitch = coss( gEnvFxBubbleConfig[ENVFX_STATE_PITCH]);
-    f32 sinPitch = sins( gEnvFxBubbleConfig[ENVFX_STATE_PITCH]);
-    f32 cosMYaw  = coss(-gEnvFxBubbleConfig[ENVFX_STATE_YAW]);
-    f32 sinMYaw  = sins(-gEnvFxBubbleConfig[ENVFX_STATE_YAW]);
+    s32 vecX = *x - gEnvFxBubbleConfig[ENVFX_STATE_DEST_X];
+    s32 vecY = *y - gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y];
+    s32 vecZ = *z - gEnvFxBubbleConfig[ENVFX_STATE_DEST_Z];
+    f32 cosPitch = coss(gEnvFxBubbleConfig[ENVFX_STATE_PITCH]);
+    f32 sinPitch = sins(gEnvFxBubbleConfig[ENVFX_STATE_PITCH]);
+    f32 cosMYaw = coss(-gEnvFxBubbleConfig[ENVFX_STATE_YAW]);
+    f32 sinMYaw = sins(-gEnvFxBubbleConfig[ENVFX_STATE_YAW]);
 
     f32 rotatedX = ((vecX * cosMYaw ) - (sinMYaw  * cosPitch * vecY) - (sinPitch * sinMYaw * vecZ));
     f32 rotatedY = ((vecX * sinMYaw ) + (cosPitch * cosMYaw  * vecY) - (sinPitch * cosMYaw * vecZ));
@@ -182,7 +182,7 @@ void envfx_rotate_around_whirlpool(s32 *x, s32 *y, s32 *z) {
  * low or close to the center.
  */
 s32 envfx_is_whirlpool_bubble_alive(s32 index) {
-    if ((gEnvFxBuffer + index)->bubbleY < (gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y] - 100)) {
+    if ((gEnvFxBuffer + index)->bubbleY < gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y] - 100) {
         return FALSE;
     }
 
@@ -290,12 +290,12 @@ s32 envfx_init_bubble(s32 mode) {
             return FALSE;
 
         case ENVFX_FLOWERS:
-            sBubbleParticleCount    = 30;
+            sBubbleParticleCount = 30;
             sBubbleParticleMaxCount = 30;
             break;
 
         case ENVFX_LAVA_BUBBLES:
-            sBubbleParticleCount    = 15;
+            sBubbleParticleCount = 15;
             sBubbleParticleMaxCount = 15;
             break;
 
@@ -308,7 +308,7 @@ s32 envfx_init_bubble(s32 mode) {
             break;
     }
 
-    gEnvFxBuffer = mem_pool_alloc(gEffectsMemoryPool, (sBubbleParticleCount * sizeof(struct EnvFxParticle)));
+    gEnvFxBuffer = mem_pool_alloc(gEffectsMemoryPool, sBubbleParticleCount * sizeof(struct EnvFxParticle));
     if (gEnvFxBuffer == NULL) {
         return FALSE;
     }
@@ -318,7 +318,7 @@ s32 envfx_init_bubble(s32 mode) {
 
     if (mode == ENVFX_LAVA_BUBBLES) {
         for (i = 0; i < sBubbleParticleCount; i++) {
-            (gEnvFxBuffer + i)->animFrame = (random_float() * 7.0f);
+            (gEnvFxBuffer + i)->animFrame = random_float() * 7.0f;
         }
     }
 
@@ -408,18 +408,18 @@ void envfx_set_bubble_texture(s32 mode, s16 index) {
     switch (mode) {
         case ENVFX_FLOWERS:
             imageArr = segmented_to_virtual(&flower_bubbles_textures_ptr_0B002008);
-            frame    = (gEnvFxBuffer + index)->animFrame;
+            frame = (gEnvFxBuffer + index)->animFrame;
             break;
 
         case ENVFX_LAVA_BUBBLES:
             imageArr = segmented_to_virtual(&lava_bubble_ptr_0B006020);
-            frame    = (gEnvFxBuffer + index)->animFrame;
+            frame = (gEnvFxBuffer + index)->animFrame;
             break;
 
         case ENVFX_WHIRLPOOL_BUBBLES:
         case ENVFX_JETSTREAM_BUBBLES:
             imageArr = segmented_to_virtual(&bubble_ptr_0B006848);
-            frame    = 0;
+            frame = 0;
             break;
         default:
             return;

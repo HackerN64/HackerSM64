@@ -2,13 +2,13 @@
 
 static struct ObjectHitbox sKleptoHitbox = {
     /* interactType:      */ INTERACT_HIT_FROM_BELOW,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   0,
-    /* health:            */   1,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 1,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 160,
     /* height:            */ 250,
-    /* hurtboxRadius:     */  80,
+    /* hurtboxRadius:     */ 80,
     /* hurtboxHeight:     */ 200,
 };
 
@@ -77,7 +77,7 @@ static void klepto_anim_dive(void) {
 
 void bhv_klepto_init(void) {
     if (o->oBehParams2ndByte != KLEPTO_BP_NO_STAR) {
-        if (save_file_get_star_flags((gCurrSaveFileNum - 1), (COURSE_SSL - 1)) & STAR_FLAG_ACT_1) {
+        if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_SSL)) & STAR_FLAG_ACT_1) {
             o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_TRANSPARENT_STAR;
         } else {
             o->oAnimState = KLEPTO_ANIM_STATE_HOLDING_STAR;
@@ -112,13 +112,13 @@ static void klepto_change_target(void) {
             }
         }
     } else {
-        newTarget = (random_u16() % 0x3);
+        newTarget = random_u16() % 3;
     }
 
-    o->oKleptoHomeYOffset  = (400 * absi(newTarget - o->oKleptoTargetNumber));
+    o->oKleptoHomeYOffset  = 400 * absi(newTarget - o->oKleptoTargetNumber);
     o->oKleptoTargetNumber = newTarget;
 
-    vec3_copy_y_off(&o->oHomeVec, sKleptoTargetPositions[o->oKleptoTargetNumber], o->oKleptoHomeYOffset);
+    vec3f_copy_y_off(&o->oHomeVec, sKleptoTargetPositions[o->oKleptoTargetNumber], o->oKleptoHomeYOffset);
 
     o->oKleptoHalfLateralDistToHome = (cur_obj_lateral_dist_to_home() / 2);
 }
@@ -131,7 +131,7 @@ static void klepto_circle_target(f32 radius, f32 targetSpeed) {
         o->oKleptoTimeUntilTargetChange = random_linear_offset(300, 300);
         o->oAction = KLEPTO_ACT_APPROACH_TARGET_HOLDING;
     } else {
-        s16 turnAmount = (0x4000 - atan2s(radius, o->oKleptoDistanceToTarget - radius));
+        s16 turnAmount = 0x4000 - atan2s(radius, o->oKleptoDistanceToTarget - radius);
         f32 accel = 0.05f;
         if ((s16)(o->oMoveAngleYaw - o->oKleptoYawToTarget) < 0) {
             turnAmount = -turnAmount;
@@ -159,7 +159,8 @@ static void klepto_approach_target(f32 targetSpeed) {
         o->oAction = KLEPTO_ACT_CIRCLE_TARGET_HOLDING;
     } else {
         if (o->oKleptoHalfLateralDistToHome > 0.0f) {
-            if ((o->oKleptoHalfLateralDistToHome -= o->oForwardVel) <= 0.0f) {
+            o->oKleptoHalfLateralDistToHome -= o->oForwardVel;
+            if (o->oKleptoHalfLateralDistToHome <= 0.0f) {
                 o->oHomeY -= o->oKleptoHomeYOffset;
             }
         }
@@ -219,7 +220,7 @@ static void klepto_act_dive_at_mario(void) {
             }
         }
     } else {
-        f32 dy = (o->oPosY - gMarioObject->oPosY);
+        f32 dy = o->oPosY - gMarioObject->oPosY;
 
         if (o->oSoundStateID == KLEPTO_ANIM_DIVE_AT_MARIO_3) {
             cur_obj_set_anim_if_at_end(KLEPTO_ANIM_DIVE_AT_MARIO_4);
@@ -228,6 +229,7 @@ static void klepto_act_dive_at_mario(void) {
         }
 
         o->oKleptoPitchToTarget = -0x3000;
+
         if (o->oAnimState == KLEPTO_ANIM_STATE_HOLDING_NOTHING) {
             if (o->oSubAction == 0) {
                 o->oKleptoPitchToTarget = obj_turn_pitch_toward_mario(0.0f, 0);
@@ -267,8 +269,8 @@ static void klepto_act_struck_by_mario(void) {
 
         o->oMoveAnglePitch = -obj_get_pitch_from_vel();
         o->oKleptoSpeed = sqrtf(sqr(o->oForwardVel) + sqr(o->oVelY));
-        
-        vec3_copy_y_off(&o->oHomeVec, &o->oPosVec, 500.0f);
+
+        vec3f_copy_y_off(&o->oHomeVec, &o->oPosVec, 500.0f);
     }
 }
 

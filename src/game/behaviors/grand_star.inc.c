@@ -1,20 +1,24 @@
 // grand_star.inc.c
 
 s32 arc_to_goal_pos(Vec3f a0, Vec3f a1, f32 yVel, f32 gravity) {
-    f32 dx = (a0[0] - a1[0]);
-    f32 dz = (a0[2] - a1[2]);
+    f32 dx = a0[0] - a1[0];
+    f32 dz = a0[2] - a1[2];
     f32 planarDist = sqrtf(sqr(dx) + sqr(dz));
+
     o->oMoveAngleYaw = atan2s(dz, dx);
     o->oVelY = yVel;
     o->oGravity = gravity;
-    s32 time = ((-2.0f / o->oGravity * yVel) - 1.0f);
-    o->oForwardVel = (planarDist / time);
+
+    s32 time = -2.0f / o->oGravity * yVel - 1.0f;
+
+    o->oForwardVel = planarDist / time;
+
     return time;
 }
 
 void grand_star_zero_velocity(void) {
-    o->oGravity    = 0.0f;
-    o->oVelY       = 0.0f;
+    o->oGravity = 0.0f;
+    o->oVelY = 0.0f;
     o->oForwardVel = 0.0f;
 }
 
@@ -51,7 +55,7 @@ void bhv_grand_star_loop(void) {
 
                 cur_obj_play_sound_2(SOUND_GENERAL_GRAND_STAR_JUMP);
             }
-        } else if ((o->oVelY < 0.0f) && (o->oPosY < (o->oHomeY + 200.0f))) {
+        } else if (o->oVelY < 0.0f && o->oPosY < o->oHomeY + 200.0f) {
             o->oPosY = (o->oHomeY + 200.0f);
             grand_star_zero_velocity();
             gObjCutsceneDone = TRUE;

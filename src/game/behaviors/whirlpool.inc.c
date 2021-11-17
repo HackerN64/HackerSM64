@@ -2,21 +2,21 @@
 
 static struct ObjectHitbox sWhirlpoolHitbox = {
     /* interactType:      */ INTERACT_WHIRLPOOL,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   0,
-    /* health:            */   0,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 200,
     /* height:            */ 500,
-    /* hurtboxRadius:     */   0,
-    /* hurtboxHeight:     */   0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 void bhv_whirlpool_init(void) {
     o->oWhirlpoolInitFacePitch = o->oFaceAnglePitch;
     o->oWhirlpoolInitFaceRoll = o->oFaceAngleRoll;
-    o->oFaceAnglePitch = 0x0;
-    o->oFaceAngleRoll  = 0x0;
+    o->oFaceAnglePitch = 0;
+    o->oFaceAngleRoll = 0;
 }
 
 void whirlpool_set_hitbox(void) {

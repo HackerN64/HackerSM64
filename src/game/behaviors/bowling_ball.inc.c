@@ -2,14 +2,14 @@
 
 static struct ObjectHitbox sBowlingBallHitbox = {
     /* interactType:      */ INTERACT_DAMAGE,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   2,
-    /* health:            */   0,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 2,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 100,
     /* height:            */ 150,
-    /* hurtboxRadius:     */   0,
-    /* hurtboxHeight:     */   0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 static Trajectory sThiHugeMetalBallTraj[] = {
@@ -40,7 +40,7 @@ static Trajectory sThiTinyMetalBallTraj[] = {
 };
 
 void bhv_bowling_ball_init(void) {
-    o->oGravity  = 5.5f;
+    o->oGravity = 5.5f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 2.0f;
 }
@@ -212,9 +212,9 @@ void bhv_thi_bowling_ball_spawner_loop(void) {
 }
 
 void bhv_bob_pit_bowling_ball_init(void) {
-    o->oGravity  = 12.0f;
-    o->oFriction =  1.0f;
-    o->oBuoyancy =  2.0f;
+    o->oGravity = 12.0f;
+    o->oFriction = 1.0f;
+    o->oBuoyancy = 2.0f;
 }
 
 void bhv_bob_pit_bowling_ball_loop(void) {
@@ -230,12 +230,12 @@ void bhv_bob_pit_bowling_ball_loop(void) {
 }
 
 void bhv_free_bowling_ball_init(void) {
-    o->oGravity  = 5.5f;
+    o->oGravity = 5.5f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 2.0f;
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
-    o->oForwardVel   = 0x0;
-    o->oMoveAngleYaw = 0x0;
+    o->oForwardVel = 0;
+    o->oMoveAngleYaw = 0;
 }
 
 void bhv_free_bowling_ball_roll_loop(void) {

@@ -97,7 +97,7 @@ static void chain_chomp_update_chain_segments(void) {
 
         // Cap distance to previous chain part (so that the tail follows the chomp)
         Vec3f offset;
-        vec3_diff(offset, segment->pos, prevSegment->pos);
+        vec3f_diff(offset, segment->pos, prevSegment->pos);
         vec3_normalize_max(offset, o->oChainChompMaxDistBetweenChainParts);
 
         // Cap distance to pivot (so that it stretches when the chomp moves far from the wooden post)

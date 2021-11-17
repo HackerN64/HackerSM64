@@ -55,10 +55,10 @@ void bhv_pokey_body_part_update(void) {
             //  index by killing two body parts on the frame before a new part
             //  spawns, but one of the body parts shifts upward immediately,
             //  so not very interesting
-            if ((o->oBehParams2ndByte > 1)
+            if (o->oBehParams2ndByte > 1
                 && !(o->parentObj->oPokeyAliveBodyPartFlags & (1 << (o->oBehParams2ndByte - 1)))) {
                 o->parentObj->oPokeyAliveBodyPartFlags =
-                    o->parentObj->oPokeyAliveBodyPartFlags | (1 << (o->oBehParams2ndByte - 1));
+                    o->parentObj->oPokeyAliveBodyPartFlags | 1 << (o->oBehParams2ndByte - 1);
 
                 o->parentObj->oPokeyAliveBodyPartFlags =
                     o->parentObj->oPokeyAliveBodyPartFlags & ((1 << o->oBehParams2ndByte) ^ ~0);
@@ -70,20 +70,20 @@ void bhv_pokey_body_part_update(void) {
             //! If you kill a body part as it's expanding, the body part that
             //  was above it will instantly shrink and begin expanding in its
             //  place.
-            } else if ((o->parentObj->oPokeyBottomBodyPartSize < 1.0f)
-                     && ((o->oBehParams2ndByte + 1) == o->parentObj->oPokeyNumAliveBodyParts)) {
+            } else if (o->parentObj->oPokeyBottomBodyPartSize < 1.0f
+                     && o->oBehParams2ndByte + 1 == o->parentObj->oPokeyNumAliveBodyParts) {
                 approach_f32_ptr(&o->parentObj->oPokeyBottomBodyPartSize, 1.0f, 0.1f);
                 cur_obj_scale(o->parentObj->oPokeyBottomBodyPartSize * 3.0f);
             }
 
-            s16 offsetAngle = ((o->oBehParams2ndByte * 0x4000) + (o->oTimer * 0x800));
-            o->oPosX = (o->parentObj->oPosX + (coss(offsetAngle) * 6.0f));
-            o->oPosZ = (o->parentObj->oPosZ + (sins(offsetAngle) * 6.0f));
+            s16 offsetAngle = o->oBehParams2ndByte * 0x4000 + o->oTimer * 0x800;
+            o->oPosX = o->parentObj->oPosX + coss(offsetAngle) * 6.0f;
+            o->oPosZ = o->parentObj->oPosZ + sins(offsetAngle) * 6.0f;
 
             // This is the height of the tower beneath the body part
             f32 baseHeight = o->parentObj->oPosY
-                         + ((120 * (o->parentObj->oPokeyNumAliveBodyParts - o->oBehParams2ndByte)) - 240)
-                         + (120.0f * o->parentObj->oPokeyBottomBodyPartSize);
+                         + (120 * (o->parentObj->oPokeyNumAliveBodyParts - o->oBehParams2ndByte) - 240)
+                         + 120.0f * o->parentObj->oPokeyBottomBodyPartSize;
 
             // We treat the base height as a minimum height, allowing the body
             // part to briefly stay in the air after a part below it dies
@@ -120,7 +120,7 @@ void bhv_pokey_body_part_update(void) {
                 // Die in order from top to bottom
                 // If a new body part spawns after the head has been killed, its
                 // death delay will be 0
-                o->oPokeyBodyPartDeathDelayAfterHeadKilled = ((o->oBehParams2ndByte << 2) + 20);
+                o->oPokeyBodyPartDeathDelayAfterHeadKilled = (o->oBehParams2ndByte << 2) + 20;
             }
 
             cur_obj_move_standard(-78);
@@ -129,7 +129,7 @@ void bhv_pokey_body_part_update(void) {
         o->oAnimState = 1;
     }
 
-    o->oGraphYOffset = (o->header.gfx.scale[1] * 22.0f);
+    o->oGraphYOffset = o->header.gfx.scale[1] * 22.0f;
 }
 
 /**
@@ -154,7 +154,7 @@ static void pokey_act_uninitialized(void) {
         }
 
         o->oPokeyAliveBodyPartFlags = BITMASK(POKEY_NUM_SEGMENTS);
-        o->oPokeyNumAliveBodyParts  = POKEY_NUM_SEGMENTS;
+        o->oPokeyNumAliveBodyParts = POKEY_NUM_SEGMENTS;
         o->oPokeyBottomBodyPartSize = 1.0f;
         o->oAction = POKEY_ACT_WANDER;
     }
@@ -171,7 +171,7 @@ static void pokey_act_wander(void) {
 
     if (o->oPokeyNumAliveBodyParts == POKEY_PART_BP_HEAD) {
         obj_mark_for_deletion(o);
-    } else if (o->oDistanceToMario > (o->oDrawingDistance + 500.0f)) {
+    } else if (o->oDistanceToMario > o->oDrawingDistance + 500.0f) {
         o->oAction = POKEY_ACT_UNLOAD_PARTS;
         o->oForwardVel = 0.0f;
     } else {

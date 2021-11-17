@@ -15,7 +15,7 @@
 #include <hvqm/hvqm.h>
 
 /*
- *  Buffer for video records (HVQM2 compressed data) read from
+ * Buffer for video records (HVQM2 compressed data) read from
  * the HVQM2 data.
  * (Note) Please locate at a 16byte aligned address with the spec file.
  */

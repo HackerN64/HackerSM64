@@ -131,7 +131,7 @@ void bhv_act_selector_init(void) {
             // If this is the first star that has not been collected, set
             // the default selection to this star.
             if (sInitSelectedActNum == 0) {
-                sInitSelectedActNum  = (sVisibleStars + 1);
+                sInitSelectedActNum = sVisibleStars + 1;
                 sSelectableStarIndex = sVisibleStars;
             }
         }
@@ -139,9 +139,9 @@ void bhv_act_selector_init(void) {
     }
 
     // If the stars have been collected in order so far, show the next star.
-    if ((sVisibleStars == sObtainedStars) && (sVisibleStars != 6)) {
+    if (sVisibleStars == sObtainedStars && sVisibleStars != 6) {
         selectorModelIDs[sVisibleStars] = MODEL_TRANSPARENT_STAR;
-        sInitSelectedActNum  = (sVisibleStars + 1);
+        sInitSelectedActNum = sVisibleStars + 1;
         sSelectableStarIndex = sVisibleStars;
         sVisibleStars++;
     }
@@ -196,7 +196,7 @@ void bhv_act_selector_init(void) {
 void bhv_act_selector_loop(void) {
     s8 i;
     u8 starIndexCounter;
-    u8 stars = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
+    u8 stars = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
 
     if (sObtainedStars != 6) {
         // Sometimes, stars are not selectable even if they appear on the screen.
@@ -206,7 +206,7 @@ void bhv_act_selector_loop(void) {
         starIndexCounter = sSelectableStarIndex;
         for (i = 0; i < sVisibleStars; i++) {
             // Can the star be selected (is it either already completed or the first non-completed mission)
-            if ((stars & (1 << i)) || (i + 1) == sInitSelectedActNum) {
+            if ((stars & (1 << i)) || i + 1 == sInitSelectedActNum) {
                 if (starIndexCounter == 0) { // We have reached the sSelectableStarIndex-th selectable star.
                     sSelectedActIndex = i;
                     break;
@@ -349,8 +349,8 @@ void print_act_selector_strings(void) {
 #if MULTILANG
     print_generic_string(get_str_x_pos_from_center(160, (currLevelName + 3), 10.0f), 33, currLevelName + 3);
 #else
-    lvlNameX = get_str_x_pos_from_center(160, (currLevelName + 3), 10.0f);
-    print_generic_string(lvlNameX, 33, (currLevelName + 3));
+    lvlNameX = get_str_x_pos_from_center(160, currLevelName + 3, 10.0f);
+    print_generic_string(lvlNameX, 33, currLevelName + 3);
 #endif
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -379,9 +379,9 @@ void print_act_selector_strings(void) {
     for (i = 1; i <= sVisibleStars; i++) {
         starNumbers[0] = i;
 #if MULTILANG
-        print_menu_generic_string((143 - (sVisibleStars * 15) + (i * 30)), 38, starNumbers);
+        print_menu_generic_string(143 - sVisibleStars * 15 + i * 30, 38, starNumbers);
 #else
-        print_menu_generic_string((139 - (sVisibleStars * 17) + (i * 34)), 38, starNumbers);
+        print_menu_generic_string(139 - sVisibleStars * 17 + i * 34, 38, starNumbers);
 #endif
     }
 
@@ -403,14 +403,14 @@ Gfx *geo_act_selector_strings(s16 callContext, UNUSED struct GraphNode *node, UN
  * Also load how much stars a course has, without counting the 100 coin star.
  */
 s32 lvl_init_act_selector_values_and_stars(UNUSED s32 arg, UNUSED s32 unused) {
-    u8 stars = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
+    u8 stars = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
 
     sLoadedActNum = 0;
     sInitSelectedActNum = 0;
     sVisibleStars = 0;
     sActSelectorMenuTimer = 0;
     sObtainedStars =
-        save_file_get_course_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
+        save_file_get_course_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
 
     // Don't count 100 coin star
     if (stars & STAR_FLAG_ACT_100_COINS) {
@@ -434,11 +434,11 @@ s32 lvl_update_obj_and_load_act_button_actions(UNUSED s32 arg, UNUSED s32 unused
             queue_rumble_decay(1);
 #endif
             if (sInitSelectedActNum >= sSelectedActIndex + 1) {
-                sLoadedActNum = (sSelectedActIndex + 1);
+                sLoadedActNum = sSelectedActIndex + 1;
             } else {
                 sLoadedActNum = sInitSelectedActNum;
             }
-            gDialogCourseActNum = (sSelectedActIndex + 1);
+            gDialogCourseActNum = sSelectedActIndex + 1;
         }
     }
 

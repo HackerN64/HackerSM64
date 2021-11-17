@@ -2,14 +2,14 @@
 
 struct ObjectHitbox sSparkleSpawnStarHitbox = {
     /* interactType:      */ INTERACT_STAR_OR_KEY,
-    /* downOffset:        */  0,
-    /* damageOrCoinValue: */  0,
-    /* health:            */  0,
-    /* numLootCoins:      */  0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 80,
     /* height:            */ 50,
-    /* hurtboxRadius:     */  0,
-    /* hurtboxHeight:     */  0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 void bhv_spawned_star_init(void) {
@@ -32,7 +32,7 @@ void set_sparkle_spawn_star_hitbox(void) {
 }
 
 void set_home_to_mario(void) {
-    vec3_copy_y_off(&o->oHomeVec, &gMarioObject->oPosVec, 250.0f);
+    vec3f_copy_y_off(&o->oHomeVec, &gMarioObject->oPosVec, 250.0f);
     o->oPosY = o->oHomeY;
     f32 lateralDist;
     vec3f_get_lateral_dist(&o->oPosVec, &o->oHomeVec, &lateralDist);
@@ -74,9 +74,9 @@ void bhv_spawned_star_loop(void) {
             }
             if ((o->oVelY < 0) && (o->oPosY < o->oHomeY)) {
                 gObjCutsceneDone = TRUE;
-                o->oVelY    = 0.0f;
-                o->oGravity = 0.0f;
-                o->oAction  = SPAWN_STAR_POS_CUTSCENE_ACT_END;
+                o->oVelY = 0;
+                o->oGravity = 0;
+                o->oAction = SPAWN_STAR_POS_CUTSCENE_ACT_END;
             }
             spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
             break;

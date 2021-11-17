@@ -222,8 +222,9 @@ void copy_mario_state_to_object(struct MarioState *m) {
  */
 void spawn_particle(u32 activeParticleFlag, ModelID16 model, const BehaviorScript *behavior) {
     if (!(gCurrentObject->oActiveParticleFlags & activeParticleFlag)) {
+        struct Object *particle;
         gCurrentObject->oActiveParticleFlags |= activeParticleFlag;
-        struct Object *particle = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
+        particle = spawn_object_at_origin(gCurrentObject, 0, model, behavior);
         obj_copy_pos_and_angle(particle, gCurrentObject);
     }
 }
@@ -232,14 +233,16 @@ void spawn_particle(u32 activeParticleFlag, ModelID16 model, const BehaviorScrip
  * Mario's primary behavior update function.
  */
 void bhv_mario_update(void) {
+    s32 i;
     u32 particleFlags = execute_mario_action(gMarioState);
+
     gCurrentObject->oMarioParticleFlags = particleFlags;
 
     // Mario code updates MarioState's versions of position etc, so we need
     // to sync it with the Mario object
     copy_mario_state_to_object(gMarioState);
 
-    for (s32 i = 0; (sParticleTypes[i].particleFlag != 0); i++) {
+    for (i = 0; (sParticleTypes[i].particleFlag != 0); i++) {
         if (particleFlags & sParticleTypes[i].particleFlag) {
             spawn_particle(sParticleTypes[i].activeParticleFlag,
                            sParticleTypes[i].model,
@@ -371,14 +374,16 @@ void unload_deactivated_objects_in_list(struct ObjectNode *objList) {
 void set_object_respawn_info_bits(struct Object *obj, u8 bits) {
     u32 *info32;
     u16 *info16;
+
     switch (obj->respawnInfoType) {
         case RESPAWN_INFO_TYPE_NORMAL:
             info32 = (u32 *) obj->respawnInfo;
-            *info32 |= (bits << 8);
+            *info32 |= bits << 8;
             break;
+
         case RESPAWN_INFO_TYPE_MACRO_OBJECT:
             info16 = (u16 *) obj->respawnInfo;
-            *info16 |= (bits << 8);
+            *info16 |= bits << 8;
             break;
     }
 }
@@ -394,7 +399,7 @@ void unload_objects_from_area(s32 areaIndex) {
     gObjectLists = gObjectListArray;
 
     for (i = 0; i < NUM_OBJ_LISTS; i++) {
-        list = (gObjectLists + i);
+        list = gObjectLists + i;
         node = list->next;
 
         while (node != list) {
@@ -412,11 +417,11 @@ void unload_objects_from_area(s32 areaIndex) {
  * Spawn objects given a list of SpawnInfos. Called when loading an area.
  */
 void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
-    gObjectLists   = gObjectListArray;
+    gObjectLists = gObjectListArray;
     gTimeStopState = 0;
 
     gWDWWaterLevelChanging = FALSE;
-    gMarioOnMerryGoRound   = FALSE;
+    gMarioOnMerryGoRound = FALSE;
 
     clear_mario_platform();
 
@@ -468,9 +473,9 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
 void clear_objects(void) {
     s32 i;
 
-    gTHIWaterDrained  = 0;
-    gTimeStopState    = 0;
-    gMarioObject      = NULL;
+    gTHIWaterDrained = 0;
+    gTimeStopState = 0;
+    gMarioObject = NULL;
     gMarioCurrentRoom = 0;
 
     for (i = 0; i < 60; i++) {
@@ -489,7 +494,7 @@ void clear_objects(void) {
     }
 
     gObjectMemoryPool = mem_pool_init(OBJECT_MEMORY_POOL, MEMORY_POOL_LEFT);
-    gObjectLists      = gObjectListArray;
+    gObjectLists = gObjectListArray;
 
     clear_dynamic_surfaces();
 }
@@ -498,7 +503,7 @@ void clear_objects(void) {
  * Update spawner and surface objects.
  */
 void update_terrain_objects(void) {
-    gObjectCounter  = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
+    gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
     gObjectCounter += update_objects_in_list(&gObjectLists[OBJ_LIST_SURFACE]);
 }
 
@@ -508,7 +513,9 @@ void update_terrain_objects(void) {
  */
 void update_non_terrain_objects(void) {
     s32 listIndex;
-    for (s32 i = 2; ((listIndex = sObjectListUpdateOrder[i]) != -1); i++) {
+    s32 i;
+
+    for (i = 2; ((listIndex = sObjectListUpdateOrder[i]) != -1); i++) {
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
     }
 }
@@ -518,7 +525,9 @@ void update_non_terrain_objects(void) {
  */
 void unload_deactivated_objects(void) {
     s32 listIndex;
-    for (s32 i = 0; ((listIndex = sObjectListUpdateOrder[i]) != -1); i++) {
+    s32 i;
+
+    for (i = 0; ((listIndex = sObjectListUpdateOrder[i]) != -1); i++) {
         unload_deactivated_objects_in_list(&gObjectLists[listIndex]);
     }
 
@@ -531,7 +540,7 @@ void unload_deactivated_objects(void) {
  * Unused profiling function.
  */
 UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
-    f64 cycles = (cycleCounts[index] - cycleCounts[index - 1]);
+    f64 cycles = cycleCounts[index] - cycleCounts[index - 1];
     if (cycles < 0) cycles = 0;
     u16 time = (u16)(((u64) cycles * 1000000 / osClockRate) / 16667.0 * 1000.0);
     if (time > 999) time = 999;
@@ -553,7 +562,7 @@ void update_objects(void) {
 
     gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
 
-    gNumRoomedObjectsInMarioRoom    = 0;
+    gNumRoomedObjectsInMarioRoom = 0;
     gNumRoomedObjectsNotInMarioRoom = 0;
     gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
 

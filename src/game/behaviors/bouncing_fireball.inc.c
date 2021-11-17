@@ -7,7 +7,7 @@ void bhv_bouncing_fireball_flame_loop(void) {
     switch (o->oAction) {
         case 0:
             if (o->oTimer == 0) {
-                o->oAnimState = (random_float() * 10.0f);
+                o->oAnimState = random_float() * 10.0f;
                 o->oVelY = 30.0f;
             }
 
@@ -49,7 +49,7 @@ void bhv_bouncing_fireball_spawner_loop(void) {
 
         case 1:
             flameObj = spawn_object(o, MODEL_RED_FLAME, bhvBouncingFireballFlame);
-            scale = ((10 - o->oTimer) * 0.5f);
+            scale = (10 - o->oTimer) * 0.5f;
             obj_scale(flameObj, scale);
             if (o->oTimer == 0) {
                 obj_become_tangible(flameObj);
@@ -61,9 +61,9 @@ void bhv_bouncing_fireball_spawner_loop(void) {
 
         case 2:
             if (o->oTimer == 0) {
-                o->oBouncingFireBallSpawnerRandomCooldown = (random_float() * 100.0f);
+                o->oBouncingFireBallSpawnerRandomCooldown = random_float() * 100.0f;
             }
-            if ((o->oBouncingFireBallSpawnerRandomCooldown + 100) < o->oTimer) {
+            if (o->oBouncingFireBallSpawnerRandomCooldown + 100 < o->oTimer) {
                 o->oAction = 0;
             }
             break;

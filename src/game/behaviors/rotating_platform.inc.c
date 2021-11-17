@@ -17,7 +17,7 @@ struct WFRotatingPlatformData sWFRotatingPlatformData[] = {
 
 void bhv_wf_rotating_wooden_platform_loop(void) {
     if (o->oAction == 0) {
-        o->oAngleVelYaw = 0x0;
+        o->oAngleVelYaw = 0;
         if (o->oTimer > 60) {
             o->oAction = ROTATING_PLATFORM_ACT_MOVING;
         }
@@ -38,6 +38,6 @@ void bhv_rotating_platform_loop(void) {
         o->oCollisionDistance = sWFRotatingPlatformData[o->oBehParams2ndByte].collisionDistance;
         cur_obj_scale(sWFRotatingPlatformData[o->oBehParams2ndByte].scale * 0.01f);
     }
-    o->oAngleVelYaw = (speed << 4);
+    o->oAngleVelYaw = speed << 4;
     o->oFaceAngleYaw += o->oAngleVelYaw;
 }

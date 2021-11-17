@@ -35,16 +35,16 @@ void hoot_floor_bounce(void) {
 
 void hoot_free_step(s16 fastOscY, s32 speed) {
     struct Surface *floor;
-    s16 yaw       = o->oMoveAngleYaw;
-    s16 pitch     = o->oMoveAnglePitch;
+    s16 yaw = o->oMoveAngleYaw;
+    s16 pitch = o->oMoveAnglePitch;
     s16 animFrame = o->header.gfx.animInfo.animFrame;
-    f32 xPrev     = o->oPosX;
-    f32 zPrev     = o->oPosZ;
+    f32 xPrev = o->oPosX;
+    f32 zPrev = o->oPosZ;
 
-    o->oVelY   = (sins(pitch) *  speed);
-    f32 hSpeed = (coss(pitch) *  speed);
-    o->oVelX   = (sins(  yaw) * hSpeed);
-    o->oVelZ   = (coss(  yaw) * hSpeed);
+    o->oVelY = sins(pitch) * speed;
+    f32 hSpeed = coss(pitch) * speed;
+    o->oVelX = sins(yaw) * hSpeed;
+    o->oVelZ = coss(yaw) * hSpeed;
 
     o->oPosX += o->oVelX;
     o->oPosY -= (o->oVelY + (coss((s32)(animFrame * ((fastOscY == 0) ? 3276.8f : 6553.6f))) * 12.5f)); // 50.0f / 4;
@@ -68,21 +68,21 @@ void hoot_player_set_yaw(void) {
 #else
     s16 stickX = gPlayer3Controller->rawStickX;
     s16 stickY = gPlayer3Controller->rawStickY;
-    if ((stickX < 10) && (stickX > -10)) stickX = 0;
-    if ((stickY < 10) && (stickY > -10)) stickY = 0;
-    o->oMoveAngleYaw -= (5 * stickX);
+    if (stickX < 10 && stickX > -10) stickX = 0;
+    if (stickY < 10 && stickY > -10) stickY = 0;
+    o->oMoveAngleYaw -= 5 * stickX;
 #endif
 }
 
 void hoot_carry_step(s32 speed, UNUSED f32 xPrev, UNUSED f32 zPrev) {
-    s16 yaw       = o->oMoveAngleYaw;
-    s16 pitch     = o->oMoveAnglePitch;
+    s16 yaw = o->oMoveAngleYaw;
+    s16 pitch = o->oMoveAnglePitch;
     s16 animFrame = o->header.gfx.animInfo.animFrame;
 
-    o->oVelY   = (sins(pitch) *  speed);
-    f32 hSpeed = (coss(pitch) *  speed);
-    o->oVelX   = (sins(  yaw) * hSpeed);
-    o->oVelZ   = (coss(  yaw) * hSpeed);
+    o->oVelY = sins(pitch) * speed;
+    f32 hSpeed = coss(pitch) * speed;
+    o->oVelX = sins(yaw) * hSpeed;
+    o->oVelZ = coss(yaw) * hSpeed;
 
     o->oPosX += o->oVelX;
     o->oPosY -= (o->oVelY + (coss((s32)(animFrame * 6553.6f)) * 12.5f)); // 50.0f / 4;
@@ -117,8 +117,9 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
 
     if (absf(o->oPosX) > 8000.0f) o->oPosX = xPrev;
     if (absf(o->oPosZ) > 8000.0f) o->oPosZ = zPrev;
-    if ((floorY + 125.0f) > o->oPosY) {
-        o->oPosY = (floorY + 125.0f);
+
+    if (floorY + 125.0f > o->oPosY) {
+        o->oPosY = floorY + 125.0f;
     }
 }
 
@@ -128,7 +129,7 @@ void hoot_act_ascent(f32 xPrev, f32 zPrev) {
     s16 angleToOrigin = atan2s(negZ, negX);
 
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, angleToOrigin, 0x500);
-    o->oMoveAnglePitch = 0xCE38;
+    o->oMoveAnglePitch = DEGREES(290);
 
     if (o->oTimer >= 29) {
         cur_obj_play_sound_1(SOUND_ENV_WIND2);
@@ -172,7 +173,7 @@ void hoot_action_loop(void) {
         case HOOT_ACT_TIRED:
             hoot_player_set_yaw();
 
-            o->oMoveAnglePitch = 0x0;
+            o->oMoveAnglePitch = 0;
 
             hoot_carry_step(20, xPrev, zPrev);
 
@@ -188,7 +189,7 @@ void hoot_action_loop(void) {
 void hoot_turn_to_home(void) {
     Angle pitchToHome, yawToHome;
     vec3f_get_angle(&o->oPosVec, &o->oHomeVec, &pitchToHome, &yawToHome);
-    o->oMoveAngleYaw   = approach_s16_symmetric(o->oMoveAngleYaw,    yawToHome,   0x140);
+    o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, yawToHome, 0x140);
     o->oMoveAnglePitch = approach_s16_symmetric(o->oMoveAnglePitch, -pitchToHome, 0x140);
 }
 
@@ -204,7 +205,7 @@ void hoot_awake_loop(void) {
         hoot_free_step(0, 10);
 
         o->oAction = 0;
-        o->oTimer  = 0;
+        o->oTimer = 0;
     }
 
     set_object_visibility(o, 2000);

@@ -2,10 +2,10 @@
 
 struct ObjectHitbox sUnagiHitbox = {
     /* interactType:      */ INTERACT_CLAM_OR_BUBBA,
-    /* downOffset:        */  50,
-    /* damageOrCoinValue: */   3,
-    /* health:            */  99,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 50,
+    /* damageOrCoinValue: */ 3,
+    /* health:            */ 99,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 150,
     /* height:            */ 150,
     /* hurtboxRadius:     */ 150,
@@ -23,7 +23,7 @@ void bhv_unagi_init(void) {
     } else {
         o->oPathedStartWaypoint = segmented_to_virtual(jrb_seg7_trajectory_unagi_2);
         o->oAction = UNAGI_ACT_IN_CAVE;
-        if (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_JRB) & STAR_FLAG_ACT_2) {
+        if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_JRB) & STAR_FLAG_ACT_2) {
             o->oAnimState = UNAGI_ANIM_STATE_HAS_TRANSPARENT_STAR;
         } else {
             o->oAnimState = UNAGI_ANIM_STATE_HAS_STAR;
@@ -36,7 +36,7 @@ void bhv_unagi_init(void) {
 }
 
 void unagi_act_0(void) {
-    if ((o->oDistanceToMario > 4500.0f) && (o->oSubAction != UNAGI_SUB_ACT_SHIP_RESET_PATH_WAIT_FOR_MARIO)) {
+    if (o->oDistanceToMario > 4500.0f && o->oSubAction != UNAGI_SUB_ACT_SHIP_RESET_PATH_WAIT_FOR_MARIO) {
         o->oAction = UNAGI_ACT_SHIP_PATH;
         vec3s_to_vec3f(&o->oPosVec, o->oPathedStartWaypoint->pos);
     } else if (o->oUnagiDistanceToMario < 700.0f) {
@@ -177,14 +177,14 @@ void bhv_unagi_subobject_loop(void) {
     if (!o->parentObj->oUnagiHasStar) {
         obj_mark_for_deletion(o);
     } else {
-        f32 offset = (300.0f * o->oBehParams2ndByte);
+        f32 offset = 300.0f * o->oBehParams2ndByte;
 
-        o->oPosY = (o->parentObj->oPosY - (offset * sins(o->parentObj->oFaceAnglePitch) * 1.13f));
+        o->oPosY = o->parentObj->oPosY - offset * sins(o->parentObj->oFaceAnglePitch) * 1.13f;
 
-        offset = (coss(o->parentObj->oFaceAnglePitch / 2) * offset);
+        offset = coss(o->parentObj->oFaceAnglePitch / 2) * offset;
 
-        o->oPosX = (o->parentObj->oPosX + (offset * sins(o->parentObj->oFaceAngleYaw)));
-        o->oPosZ = (o->parentObj->oPosZ + (offset * coss(o->parentObj->oFaceAngleYaw)));
+        o->oPosX = o->parentObj->oPosX + offset * sins(o->parentObj->oFaceAngleYaw);
+        o->oPosZ = o->parentObj->oPosZ + offset * coss(o->parentObj->oFaceAngleYaw);
 
         if (o->oBehParams2ndByte == UNAGI_PART_BP_BACK) {
             if (o->parentObj->oAnimState != UNAGI_ANIM_STATE_NO_STAR && o->oDistanceToMario < 150.0f) {

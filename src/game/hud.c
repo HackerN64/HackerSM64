@@ -124,26 +124,26 @@ void render_hud_tex_lut(s32 x, s32 y, Texture *texture) {
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
     gSPDisplayList(gDisplayListHead++, &dl_hud_img_load_tex_block);
-    gSPTextureRectangle(gDisplayListHead++, (x << 2), (y << 2), ((x + 15) << 2), ((y + 15) << 2),
-                        G_TX_RENDERTILE, 0, 0, (4 << 10), (1 << 10));
+    gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 15) << 2, (y + 15) << 2,
+                        G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
 }
 
 /**
  * Renders a rgba16 8x8 glyph texture from a table list.
  */
 void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
-    gDPSetTile(         gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
-                        (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD, (G_TX_WRAP | G_TX_NOMIRROR), G_TX_NOMASK, G_TX_NOLOD);
-    gDPTileSync(        gDisplayListHead++);
-    gDPSetTile(         gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
-                        G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
-    gDPSetTileSize(     gDisplayListHead++, G_TX_RENDERTILE, 0, 0, ((8 - 1) << G_TEXTURE_IMAGE_FRAC), ((8 - 1) << G_TEXTURE_IMAGE_FRAC));
-    gDPPipeSync(        gDisplayListHead++);
-    gDPSetTextureImage( gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
-    gDPLoadSync(        gDisplayListHead++);
-    gDPLoadBlock(       gDisplayListHead++, G_TX_LOADTILE, 0, 0, ((8 * 8) - 1), CALC_DXT(8, G_IM_SIZ_16b_BYTES));
-    gSPTextureRectangle(gDisplayListHead++, (x << 2), (y << 2), ((x + 7) << 2), ((y + 7) << 2), G_TX_RENDERTILE,
-                        0, 0, (4 << 10), (1 << 10));
+    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
+                G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
+    gDPTileSync(gDisplayListHead++);
+    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
+                G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
+    gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
+    gDPPipeSync(gDisplayListHead++);
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
+    gDPLoadSync(gDisplayListHead++);
+    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
+    gSPTextureRectangle(gDisplayListHead++, x << 2, y << 2, (x + 7) << 2, (y + 7) << 2, G_TX_RENDERTILE,
+                        0, 0, 4 << 10, 1 << 10);
 }
 
 /**
@@ -151,12 +151,14 @@ void render_hud_small_tex_lut(s32 x, s32 y, Texture *texture) {
  */
 void render_power_meter_health_segment(s16 numHealthWedges) {
     Texture *(*healthLUT)[] = segmented_to_virtual(&power_meter_health_segments_lut);
-    gDPPipeSync(       gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, (*healthLUT)[numHealthWedges - 1]);
-    gDPLoadSync(       gDisplayListHead++);
-    gDPLoadBlock(      gDisplayListHead++, G_TX_LOADTILE, 0, 0, ((32 * 32) - 1), CALC_DXT(32, G_IM_SIZ_16b_BYTES));
-    gSP1Triangle(      gDisplayListHead++, 0, 1, 2, 0);
-    gSP1Triangle(      gDisplayListHead++, 0, 2, 3, 0);
+
+    gDPPipeSync(gDisplayListHead++);
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1,
+                       (*healthLUT)[numHealthWedges - 1]);
+    gDPLoadSync(gDisplayListHead++);
+    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
+    gSP1Triangle(gDisplayListHead++, 0, 1, 2, 0);
+    gSP1Triangle(gDisplayListHead++, 0, 2, 3, 0);
 }
 
 /**
@@ -165,7 +167,11 @@ void render_power_meter_health_segment(s16 numHealthWedges) {
  */
 void render_dl_power_meter(s16 numHealthWedges) {
     Mtx *mtx = alloc_display_list(sizeof(Mtx));
-    if (mtx == NULL) return;
+
+    if (mtx == NULL) {
+        return;
+    }
+
     guTranslate(mtx, (f32) sPowerMeterHUD.x, (f32) sPowerMeterHUD.y, 0);
 
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx++),
@@ -207,6 +213,7 @@ static void animate_power_meter_deemphasizing(void) {
     if (sPowerMeterHUD.y > (HUD_POWER_METER_Y - 10)) speed = 2;
     if (sPowerMeterHUD.y > (HUD_POWER_METER_Y -  5)) speed = 1;
     sPowerMeterHUD.y += speed;
+
     if (sPowerMeterHUD.y > HUD_POWER_METER_Y) {
         sPowerMeterHUD.y = HUD_POWER_METER_Y;
         sPowerMeterHUD.animation = POWER_METER_VISIBLE;
@@ -235,14 +242,17 @@ void handle_power_meter_actions(s16 numHealthWedges) {
         sPowerMeterHUD.animation = POWER_METER_EMPHASIZED;
         sPowerMeterHUD.y = HUD_POWER_METER_EMPHASIZED_Y;
     }
+
     // Show power meter if health is full, has 8
     if (numHealthWedges == 8 && sPowerMeterStoredHealth == 7) {
         sPowerMeterVisibleTimer = 0;
     }
+
     // After health is full, hide power meter
     if (numHealthWedges == 8 && sPowerMeterVisibleTimer > 45.0f) {
         sPowerMeterHUD.animation = POWER_METER_HIDING;
     }
+
     // Update to match health value
     sPowerMeterStoredHealth = numHealthWedges;
 #ifndef BREATH_METER
@@ -284,12 +294,12 @@ void render_hud_power_meter(void) {
 void render_breath_meter_segment(s16 numBreathWedges) {
     Texture *(*breathLUT)[];
     breathLUT = segmented_to_virtual(&breath_meter_segments_lut);
-    gDPPipeSync(       gDisplayListHead++);
+    gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, (*breathLUT)[numBreathWedges - 1]);
-    gDPLoadSync(       gDisplayListHead++);
-    gDPLoadBlock(      gDisplayListHead++, G_TX_LOADTILE, 0, 0, ((32 * 32) - 1), CALC_DXT(32, G_IM_SIZ_16b_BYTES));
-    gSP1Triangle(      gDisplayListHead++, 0, 1, 2, 0);
-    gSP1Triangle(      gDisplayListHead++, 0, 2, 3, 0);
+    gDPLoadSync(gDisplayListHead++);
+    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES));
+    gSP1Triangle(gDisplayListHead++, 0, 1, 2, 0);
+    gSP1Triangle(gDisplayListHead++, 0, 2, 3, 0);
 }
 
 /**
@@ -298,10 +308,14 @@ void render_breath_meter_segment(s16 numBreathWedges) {
  */
 void render_dl_breath_meter(s16 numBreathWedges) {
     Mtx *mtx = alloc_display_list(sizeof(Mtx));
-    if (mtx == NULL) return;
-    guTranslate(mtx, ((f32) sBreathMeterHUD.x), ((f32) sBreathMeterHUD.y), 0);
+
+    if (mtx == NULL) {
+        return;
+    }
+
+    guTranslate(mtx, (f32) sBreathMeterHUD.x, (f32) sBreathMeterHUD.y, 0);
     gSPMatrix(      gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx++),
-                    (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
+                    G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
     gSPDisplayList( gDisplayListHead++, &dl_breath_meter_base);
     if (numBreathWedges != 0) {
         gSPDisplayList(gDisplayListHead++, &dl_breath_meter_health_segments_begin);
@@ -410,7 +424,7 @@ void render_hud_coins(void) {
  * Disables "X" glyph when Mario has 100 stars or more.
  */
 void render_hud_stars(void) {
-    if ((gHudFlash == HUD_FLASH_STARS) && (gGlobalTimer & 0x8)) return;
+    if (gHudFlash == HUD_FLASH_STARS && gGlobalTimer & 0x8) return;
     s8 showX = (gHudDisplay.stars < 100);
     print_text(GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X), HUD_TOP_Y, "^"); // 'Star' glyph
     if (showX) print_text((GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_STARS_X) + 16), HUD_TOP_Y, "*"); // 'X' glyph
@@ -425,7 +439,7 @@ void render_hud_stars(void) {
 void render_hud_keys(void) {
     s16 i;
     for (i = 0; i < gHudDisplay.keys; i++) {
-        print_text(((i * 16) + 220), 142, "|"); // unused glyph - beta key
+        print_text((i * 16) + 220, 142, "|"); // unused glyph - beta key
     }
 }
 
@@ -486,22 +500,22 @@ void render_hud_camera_status(void) {
 
     switch (sCameraHUD.status & CAM_STATUS_MODE_GROUP) {
         case CAM_STATUS_MARIO:
-            render_hud_tex_lut((x + 16), y, (*cameraLUT)[GLYPH_CAM_MARIO_HEAD]);
+            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_MARIO_HEAD]);
             break;
         case CAM_STATUS_LAKITU:
-            render_hud_tex_lut((x + 16), y, (*cameraLUT)[GLYPH_CAM_LAKITU_HEAD]);
+            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_LAKITU_HEAD]);
             break;
         case CAM_STATUS_FIXED:
-            render_hud_tex_lut((x + 16), y, (*cameraLUT)[GLYPH_CAM_FIXED]);
+            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_FIXED]);
             break;
     }
 
     switch (sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) {
         case CAM_STATUS_C_DOWN:
-            render_hud_small_tex_lut((x + 4), (y + 16), (*cameraLUT)[GLYPH_CAM_ARROW_DOWN]);
+            render_hud_small_tex_lut(x + 4, y + 16, (*cameraLUT)[GLYPH_CAM_ARROW_DOWN]);
             break;
         case CAM_STATUS_C_UP:
-            render_hud_small_tex_lut((x + 4), (y -  8), (*cameraLUT)[GLYPH_CAM_ARROW_UP]);
+            render_hud_small_tex_lut(x + 4, y - 8, (*cameraLUT)[GLYPH_CAM_ARROW_UP]);
             break;
     }
 
@@ -520,23 +534,28 @@ void render_hud(void) {
         sPowerMeterStoredHealth = 8;
         sPowerMeterVisibleTimer = 0;
 #ifdef BREATH_METER
-        sBreathMeterHUD.animation   = BREATH_METER_HIDDEN;
-        sBreathMeterStoredValue     = 8;
-        sBreathMeterVisibleTimer    = 0;
+        sBreathMeterHUD.animation = BREATH_METER_HIDDEN;
+        sBreathMeterStoredValue = 8;
+        sBreathMeterVisibleTimer = 0;
 #endif
     } else {
 #ifdef VERSION_EU
         // basically create_dl_ortho_matrix but guOrtho screen width is different
         Mtx *mtx = alloc_display_list(sizeof(*mtx));
-        if (mtx == NULL) return;
+
+        if (mtx == NULL) {
+            return;
+        }
+
         create_dl_identity_matrix();
-        guOrtho(mtx, -16.0f, (SCREEN_WIDTH + 16), 0, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
+        guOrtho(mtx, -16.0f, SCREEN_WIDTH + 16, 0, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx),
-                  (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH));
+                  G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
 #else
         create_dl_ortho_matrix();
 #endif
+
         if (gCurrentArea != NULL && gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
             render_hud_cannon_reticle();
         }
@@ -572,7 +591,7 @@ void render_hud(void) {
         }
 #endif
 #ifdef PUPPYPRINT
-    print_set_envcolour(255, 255, 255, 255);
+        print_set_envcolour(255, 255, 255, 255);
 #endif
     }
 }

@@ -10,6 +10,9 @@ static u8 D_80334974[] = "0123456789ABCDEF";
 void _Litob(printf_struct *args, u8 type) {
     u8 buff[BUFF_LEN];
     const u8 *num_map;
+    s32 base;
+    s32 buff_ind;
+    u64 num;
     lldiv_t quotrem;
 
     if (type == 'X') {
@@ -18,9 +21,9 @@ void _Litob(printf_struct *args, u8 type) {
         num_map = D_80334960;
     }
 
-    s32 base = (type == 'o') ? 8 : ((type != 'x' && type != 'X') ? 10 : 16);
-    s32 buff_ind = BUFF_LEN;
-    u64 num = args->value.s64;
+    base = (type == 'o') ? 8 : ((type != 'x' && type != 'X') ? 10 : 16);
+    buff_ind = BUFF_LEN;
+    num = args->value.s64;
 
     if ((type == 'd' || type == 'i') && args->value.s64 < 0) {
         num = -num;

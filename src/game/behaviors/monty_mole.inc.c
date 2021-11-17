@@ -29,10 +29,11 @@ Vec3f sMontyMoleLastKilledPos;
  */
 static struct Object *link_objects_with_behavior(const BehaviorScript *behavior) {
     const BehaviorScript *behaviorAddr = segmented_to_virtual(behavior);
+    struct Object *obj;
     struct Object *lastObject = NULL;
     struct ObjectNode *listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
 
-    struct Object *obj = (struct Object *) listHead->next;
+    obj = (struct Object *) listHead->next;
     while (obj != (struct Object *) listHead) {
         if (obj->behavior == behaviorAddr && obj->activeFlags != ACTIVE_FLAG_DEACTIVATED) {
             obj->parentObj = lastObject;
@@ -75,12 +76,15 @@ static struct Object *monty_mole_select_available_hole(f32 minDistToMario) {
                     if (numAvailableHoles == selectedHole) {
                         return hole;
                     }
+
                     numAvailableHoles++;
                 }
             }
+
             hole = hole->parentObj;
         }
     }
+
     return NULL;
 }
 
@@ -98,25 +102,25 @@ void bhv_monty_mole_hole_update(void) {
 }
 
 static struct SpawnParticlesInfo sMontyMoleRiseFromGroundParticles = {
-    /* behParam:        */  0,
-    /* count:           */  3,
+    /* behParam:        */ 0,
+    /* count:           */ 3,
     /* model:           */ MODEL_SAND_DUST,
-    /* offsetY:         */  0,
-    /* forwardVelBase:  */  4,
-    /* forwardVelRange: */  4,
+    /* offsetY:         */ 0,
+    /* forwardVelBase:  */ 4,
+    /* forwardVelRange: */ 4,
     /* velYBase:        */ 10,
     /* velYRange:       */ 15,
     /* gravity:         */ -4,
-    /* dragStrength:    */  0,
+    /* dragStrength:    */ 0,
     /* sizeBase:        */ 10.0f,
-    /* sizeRange:       */  7.0f,
+    /* sizeRange:       */ 7.0f,
 };
 
 /**
  * Spawn dirt particles when rising out of the ground.
  */
 void monty_mole_spawn_dirt_particles(s8 offsetY, s8 velYBase) {
-    sMontyMoleRiseFromGroundParticles.offsetY  = offsetY;
+    sMontyMoleRiseFromGroundParticles.offsetY = offsetY;
     sMontyMoleRiseFromGroundParticles.velYBase = velYBase;
 
     cur_obj_spawn_particles(&sMontyMoleRiseFromGroundParticles);
@@ -138,7 +142,7 @@ static void monty_mole_act_select_hole(void) {
 
     if (o->oBehParams2ndByte != MONTY_MOLE_BP_NO_ROCK) {
         minDistToMario = 200.0f;
-    } else if (gMarioStates[0].forwardVel < 8.0f) {
+    } else if (gMarioState->forwardVel < 8.0f) {
         minDistToMario = 100.0f;
     } else {
         minDistToMario = 500.0f;
@@ -161,12 +165,12 @@ static void monty_mole_act_select_hole(void) {
 
         if (o->oDistanceToMario > 500.0f || minDistToMario > 100.0f || random_sign() < 0) {
             o->oAction = MONTY_MOLE_ACT_RISE_FROM_HOLE;
-            o->oVelY    = 3.0f;
+            o->oVelY = 3.0f;
             o->oGravity = 0.0f;
             monty_mole_spawn_dirt_particles(0, 10);
         } else {
             o->oAction = MONTY_MOLE_ACT_JUMP_OUT_OF_HOLE;
-            o->oVelY    = 50.0f;
+            o->oVelY = 50.0f;
             o->oGravity = -4.0f;
             monty_mole_spawn_dirt_particles(0, 20);
         }
@@ -394,9 +398,9 @@ void bhv_monty_mole_update(void) {
  */
 static void monty_mole_rock_act_held(void) {
     // The position is offset since the monty mole is throwing it with its hand
-    o->oParentRelativePosX =  80.0f;
+    o->oParentRelativePosX = 80.0f;
     o->oParentRelativePosY = -50.0f;
-    o->oParentRelativePosZ =   0.0f;
+    o->oParentRelativePosZ = 0.0f;
 
     if (o->parentObj->prevObj == NULL) {
         f32 distToMario = o->oDistanceToMario;
@@ -407,10 +411,10 @@ static void monty_mole_rock_act_held(void) {
         o->oAction = MONTY_MOLE_ROCK_ACT_MOVE;
 
         // The angle is adjusted to compensate for the start position offset
-        o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 500 - (distToMario * 0.1f));
+        o->oMoveAngleYaw = (s32)(o->parentObj->oMoveAngleYaw + 500 - distToMario * 0.1f);
 
         o->oForwardVel = 40.0f;
-        o->oVelY = ((distToMario * 0.08f) + 8.0f);
+        o->oVelY = distToMario * 0.08f + 8.0f;
 
         o->oMoveFlags = OBJ_MOVE_NONE;
     }
@@ -422,9 +426,9 @@ static void monty_mole_rock_act_held(void) {
 static struct ObjectHitbox sMontyMoleRockHitbox = {
     /* interactType:      */ INTERACT_MR_BLIZZARD,
     /* downOffset:        */ 15,
-    /* damageOrCoinValue: */  1,
+    /* damageOrCoinValue: */ 1,
     /* health:            */ 99,
-    /* numLootCoins:      */  0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 30,
     /* height:            */ 15,
     /* hurtboxRadius:     */ 30,
@@ -435,16 +439,16 @@ static struct ObjectHitbox sMontyMoleRockHitbox = {
  * The particles that spawn when a monty mole rock breaks.
  */
 static struct SpawnParticlesInfo sMontyMoleRockBreakParticles = {
-    /* behParam:        */  0,
-    /* count:           */  2,
+    /* behParam:        */ 0,
+    /* count:           */ 2,
     /* model:           */ MODEL_PEBBLE,
     /* offsetY:         */ 10,
-    /* forwardVelBase:  */  4,
-    /* forwardVelRange: */  4,
+    /* forwardVelBase:  */ 4,
+    /* forwardVelRange: */ 4,
     /* velYBase:        */ 10,
     /* velYRange:       */ 15,
     /* gravity:         */ -4,
-    /* dragStrength:    */  0,
+    /* dragStrength:    */ 0,
     /* sizeBase:        */ 8.0f,
     /* sizeRange:       */ 4.0f,
 };

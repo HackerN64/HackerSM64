@@ -18,7 +18,7 @@ void bhv_spindel_loop(void) {
         }
     }
 
-    s32 shake = (absi(10 - o->oSpindelMoveTimer) - 6);
+    s32 shake = absi(10 - o->oSpindelMoveTimer) - 6;
 
     if (shake < 0) {
         shake = 0;
@@ -44,13 +44,13 @@ void bhv_spindel_loop(void) {
     } else if (shake == 0) {
         shake = 1;
     }
-    if (o->oTimer < (shake * 8)) {
+    if (o->oTimer < shake * 8) {
         if (o->oSpindelMoveDirection == 0) {
-            o->oVelZ = ( 20 / shake);
-            o->oAngleVelPitch = ( 1024 / shake);
+            o->oVelZ = 20 / shake;
+            o->oAngleVelPitch = 1024 / shake;
         } else {
-            o->oVelZ = (-20 / shake);
-            o->oAngleVelPitch = (-1024 / shake);
+            o->oVelZ = -20 / shake;
+            o->oAngleVelPitch = -1024 / shake;
         }
 
         o->oPosZ += o->oVelZ;
@@ -60,8 +60,8 @@ void bhv_spindel_loop(void) {
             cur_obj_play_sound_2(SOUND_GENERAL2_SPINDEL_ROLL);
         }
 
-        o->oPosY = (o->oHomeY + absf(sins(o->oMoveAnglePitch * 4) * 23.0f));
-        if ((o->oTimer + 1) == (shake * 8)) {
+        o->oPosY = o->oHomeY + absf(sins(o->oMoveAnglePitch * 4) * 23.0f);
+        if (o->oTimer + 1 == shake * 8) {
             set_camera_shake_from_point(SHAKE_POS_SMALL, o->oPosX, o->oPosY, o->oPosZ);
         }
     }

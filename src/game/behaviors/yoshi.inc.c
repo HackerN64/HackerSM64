@@ -11,7 +11,7 @@ static s16 sYoshiHomeLocations[] = {
 };
 
 void bhv_yoshi_init(void) {
-    o->oGravity  = 2.0f;
+    o->oGravity = 2.0f;
     o->oFriction = 0.9f;
     o->oBuoyancy = 1.3f;
     o->oInteractionSubtype = INT_SUBTYPE_NPC;
@@ -53,7 +53,7 @@ void yoshi_walk_loop(void) {
 
 void yoshi_idle_loop(void) {
     if (o->oTimer > 90) {
-        s16 chosenHome = (random_float() * 3.99f);
+        s16 chosenHome = random_float() * 3.99f;
 
         if (o->oYoshiChosenHome == chosenHome) {
             return;
@@ -156,7 +156,7 @@ void yoshi_give_present_loop(void) {
         return;
     }
 
-    if (!(globalTimer & 0x3)) {
+    if (!(globalTimer & 3)) {
         play_sound(SOUND_MENU_YOSHI_GAIN_LIVES, gGlobalSoundSource);
         gMarioState->numLives++;
     }

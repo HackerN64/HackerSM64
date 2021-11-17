@@ -12,7 +12,7 @@
  * Just sets various physics constants for the object.
  */
 void bhv_beta_holdable_object_init(void) {
-    o->oGravity  = 2.5f;
+    o->oGravity = 2.5f;
     o->oFriction = 0.8f;
     o->oBuoyancy = 1.3f;
 }
@@ -29,7 +29,7 @@ static void beta_holdable_object_drop(void) {
     o->oHeldState = HELD_FREE;
 
     o->oForwardVel = 0.0f;
-    o->oVelY       = 0.0f;
+    o->oVelY = 0.0f;
 }
 
 /**
@@ -45,7 +45,7 @@ static void beta_holdable_object_throw(void) {
 
     // Set initial velocity
     o->oForwardVel = 40.0f;
-    o->oVelY       = 20.0f;
+    o->oVelY = 20.0f;
 }
 
 /**

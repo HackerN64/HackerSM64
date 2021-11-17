@@ -50,7 +50,7 @@ OUTPUT_ARCH (mips)
       . = ALIGN(0x10); \
    } \
    END_SEG(name##_segment_7) \
-   BEGIN_SEG(name, SEG_ADDRESS(SEGMENT_ENDING_SCRIPT)) \
+   BEGIN_SEG(name, SEG_ADDRESS(SEGMENT_LEVEL_SCRIPT)) \
    { \
       KEEP(BUILD_DIR/levels/name/script.o(.*data*)); \
       KEEP(BUILD_DIR/levels/name/script.o(.text)); \

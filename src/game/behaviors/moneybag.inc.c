@@ -2,26 +2,26 @@
 
 static struct ObjectHitbox sMoneybagHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   2,
-    /* health:            */   1,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 2,
+    /* health:            */ 1,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 120,
-    /* height:            */  60,
+    /* height:            */ 60,
     /* hurtboxRadius:     */ 100,
-    /* hurtboxHeight:     */  50,
+    /* hurtboxHeight:     */ 50,
 };
 
 static struct ObjectHitbox sMoneybagHiddenHitbox = {
     /* interactType:      */ INTERACT_DAMAGE,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   2,
-    /* health:            */   1,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 2,
+    /* health:            */ 1,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 120,
-    /* height:            */  60,
+    /* height:            */ 60,
     /* hurtboxRadius:     */ 100,
-    /* hurtboxHeight:     */  50,
+    /* hurtboxHeight:     */ 50,
 };
 
 void bhv_moneybag_init(void) {
@@ -37,7 +37,7 @@ void moneybag_check_mario_collision(void) {
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         if (o->oInteractStatus & INT_STATUS_ATTACKED_MARIO) {
-            o->oMoveAngleYaw = (o->oAngleToMario + 0x8000);
+            o->oMoveAngleYaw = o->oAngleToMario + 0x8000;
             o->oVelY = 30.0f;
         }
 
@@ -57,7 +57,7 @@ void moneybag_jump(s16 collisionFlags) {
             cur_obj_init_animation(1);
             if (animFrame == 5) {
                 o->oForwardVel = 20.0f;
-                o->oVelY       = 40.0f;
+                o->oVelY = 40.0f;
             }
 
             if (cur_obj_check_if_near_animation_end()) {
@@ -90,7 +90,7 @@ void moneybag_jump(s16 collisionFlags) {
 
             if (o->oTimer > 60) {
                 o->oMoneybagJumpState = MONEYBAG_JUMP_LANDING;
-                o->oForwardVel = 0.0f;
+                o->oForwardVel = 0;
                 o->header.gfx.animInfo.animFrame = 0;
             }
             break;
@@ -103,9 +103,11 @@ void moneybag_jump(s16 collisionFlags) {
 }
 
 void moneybag_act_move_around(void) {
+    s16 collisionFlags;
+
     obj_return_and_displace_home(o, o->oHomeX, o->oHomeY, o->oHomeZ, 200);
 
-    s16 collisionFlags = object_step();
+    collisionFlags = object_step();
 
     if (((collisionFlags & OBJ_COL_FLAGS_LANDED) == OBJ_COL_FLAGS_LANDED)
         && (o->oMoneybagJumpState == MONEYBAG_JUMP_LANDING)) {
@@ -127,8 +129,8 @@ void moneybag_act_move_around(void) {
 }
 
 void moneybag_act_return_home(void) {
-    f32 dx = (o->oHomeX - o->oPosX);
-    f32 dz = (o->oHomeZ - o->oPosZ);
+    f32 dx = o->oHomeX - o->oPosX;
+    f32 dz = o->oHomeZ - o->oPosZ;
     s16 yawToHome = atan2s(dz, dx);
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, yawToHome, 0x800);
 

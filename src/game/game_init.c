@@ -160,12 +160,13 @@ void init_z_buffer(s32 resetZB) {
  * Tells the RDP which of the three framebuffers it shall draw to.
  */
 void select_framebuffer(void) {
-    gDPPipeSync(     gDisplayListHead++);
-    gDPSetCycleType( gDisplayListHead++, G_CYC_1CYCLE);
+    gDPPipeSync(gDisplayListHead++);
+
+    gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
     gDPSetColorImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WIDTH,
                      gPhysicalFramebuffers[sRenderingFramebuffer]);
-    gDPSetScissor(   gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
-                     (SCREEN_HEIGHT - gBorderHeight));
+    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+                  SCREEN_HEIGHT - gBorderHeight);
 }
 
 /**
@@ -173,54 +174,66 @@ void select_framebuffer(void) {
  * Information about the color argument: https://jrra.zone/n64/doc/n64man/gdp/gDPSetFillColor.htm
  */
 void clear_framebuffer(s32 color) {
-    gDPPipeSync(     gDisplayListHead++);
+    gDPPipeSync(gDisplayListHead++);
 
     gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
-    gDPSetFillColor( gDisplayListHead++, color);
+    gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
+
+    gDPSetFillColor(gDisplayListHead++, color);
     gDPFillRectangle(gDisplayListHead++,
                      GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
-                     (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), ((SCREEN_HEIGHT - gBorderHeight) - 1));
-    gDPPipeSync(     gDisplayListHead++);
-    gDPSetCycleType( gDisplayListHead++, G_CYC_1CYCLE);
+                     GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - gBorderHeight - 1);
+
+    gDPPipeSync(gDisplayListHead++);
+
+    gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
 }
 
 /**
  * Resets the viewport, readying it for the final image.
  */
 void clear_viewport(Vp *viewport, s32 color) {
-    s16 vpUlx = (((viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4) + 1);
-    s16 vpUly = (((viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4) + 1);
-    s16 vpLrx = (((viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4) - 2);
-    s16 vpLry = (((viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4) - 2);
+    s16 vpUlx = (viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4 + 1;
+    s16 vpUly = (viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4 + 1;
+    s16 vpLrx = (viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4 - 2;
+    s16 vpLry = (viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4 - 2;
+
 #ifdef WIDESCREEN
     vpUlx = GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(vpUlx);
     vpLrx = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(SCREEN_WIDTH - vpLrx);
 #endif
-    gDPPipeSync(     gDisplayListHead++);
+
+    gDPPipeSync(gDisplayListHead++);
+
     gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
-    gDPSetFillColor( gDisplayListHead++, color);
+    gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
+
+    gDPSetFillColor(gDisplayListHead++, color);
     gDPFillRectangle(gDisplayListHead++, vpUlx, vpUly, vpLrx, vpLry);
-    gDPPipeSync(     gDisplayListHead++);
-    gDPSetCycleType( gDisplayListHead++, G_CYC_1CYCLE);
+
+    gDPPipeSync(gDisplayListHead++);
+
+    gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
 }
 
 /**
  * Draw the horizontal screen borders.
  */
 void draw_screen_borders(void) {
-    gDPPipeSync(     gDisplayListHead++);
-    gDPSetScissor(   gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    gDPPipeSync(gDisplayListHead++);
+
+    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
-    gDPSetFillColor( gDisplayListHead++, ((GPACK_RGBA5551(0, 0, 0, 0) << 16) | GPACK_RGBA5551(0, 0, 0, 0)));
+    gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
+
+    gDPSetFillColor(gDisplayListHead++, GPACK_RGBA5551(0, 0, 0, 0) << 16 | GPACK_RGBA5551(0, 0, 0, 0));
+
     if (gBorderHeight) {
         gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0,
-                        (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (gBorderHeight - 1));
+                        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, gBorderHeight - 1);
         gDPFillRectangle(gDisplayListHead++,
                         GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), SCREEN_HEIGHT - gBorderHeight,
-                        (GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1), (SCREEN_HEIGHT - 1));
+                        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - 1);
     }
 }
 
@@ -229,10 +242,10 @@ void draw_screen_borders(void) {
  * Scissoring: https://jrra.zone/n64/doc/pro-man/pro12/12-03.htm#01
  */
 void make_viewport_clip_rect(Vp *viewport) {
-    s16 vpUlx = (((viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4) + 1);
-    s16 vpPly = (((viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4) + 1);
-    s16 vpLrx = (((viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4) - 1);
-    s16 vpLry = (((viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4) - 1);
+    s16 vpUlx = (viewport->vp.vtrans[0] - viewport->vp.vscale[0]) / 4 + 1;
+    s16 vpPly = (viewport->vp.vtrans[1] - viewport->vp.vscale[1]) / 4 + 1;
+    s16 vpLrx = (viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4 - 1;
+    s16 vpLry = (viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4 - 1;
 
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, vpUlx, vpPly, vpLrx, vpLry);
 }
@@ -242,7 +255,7 @@ void make_viewport_clip_rect(Vp *viewport) {
  * If you plan on using gSPLoadUcode, make sure to add OS_TASK_LOADABLE to the flags member.
  */
 void create_gfx_task_structure(void) {
-    s32 entries = (gDisplayListHead - gGfxPool->buffer);
+    s32 entries = gDisplayListHead - gGfxPool->buffer;
 
     gGfxSPTask->msgqueue = &gGfxVblankQueue;
     gGfxSPTask->msg = (OSMesg) 2;
@@ -251,37 +264,38 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
     gGfxSPTask->task.t.flags = (OS_TASK_LOADABLE | OS_TASK_DP_WAIT);
 #ifdef  L3DEX2_ALONE
-    gGfxSPTask->task.t.ucode      = gspL3DEX2_fifoTextStart;
+    gGfxSPTask->task.t.ucode = gspL3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspL3DEX2_fifoDataStart;
 #elif  F3DZEX_GBI_2
-    gGfxSPTask->task.t.ucode      = gspF3DZEX2_PosLight_fifoTextStart;
+    gGfxSPTask->task.t.ucode = gspF3DZEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DZEX2_PosLight_fifoDataStart;
 #elif   F3DEX2PL_GBI
-    gGfxSPTask->task.t.ucode      = gspF3DEX2_PosLight_fifoTextStart;
+    gGfxSPTask->task.t.ucode = gspF3DEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_PosLight_fifoDataStart;
 #elif   F3DEX_GBI_2
-    gGfxSPTask->task.t.ucode      = gspF3DEX2_fifoTextStart;
+    gGfxSPTask->task.t.ucode = gspF3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_fifoDataStart;
 #elif   F3DEX_GBI
-    gGfxSPTask->task.t.ucode      = gspF3DEX_fifoTextStart;
+    gGfxSPTask->task.t.ucode = gspF3DEX_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX_fifoDataStart;
 #elif   SUPER3D_GBI
-    gGfxSPTask->task.t.ucode      = gspSuper3D_fifoTextStart;
+    gGfxSPTask->task.t.ucode = gspSuper3D_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspSuper3D_fifoDataStart;
 #else
-    gGfxSPTask->task.t.ucode      = gspFast3D_fifoTextStart;
+    gGfxSPTask->task.t.ucode = gspFast3D_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspFast3D_fifoDataStart;
 #endif
-    gGfxSPTask->task.t.ucode_size       = SP_UCODE_SIZE; // (this size is ignored)
-    gGfxSPTask->task.t.ucode_data_size  = SP_UCODE_DATA_SIZE;
-    gGfxSPTask->task.t.dram_stack       = (u64 *) gGfxSPTaskStack;
-    gGfxSPTask->task.t.dram_stack_size  = SP_DRAM_STACK_SIZE8;
-    gGfxSPTask->task.t.output_buff      = gGfxSPTaskOutputBuffer;
-    gGfxSPTask->task.t.output_buff_size = (u64 *)((u8 *) gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
-    gGfxSPTask->task.t.data_ptr         = (u64 *) &gGfxPool->buffer;
-    gGfxSPTask->task.t.data_size        = (entries * sizeof(Gfx));
-    gGfxSPTask->task.t.yield_data_ptr   = (u64 *) gGfxSPTaskYieldBuffer;
-    gGfxSPTask->task.t.yield_data_size  = OS_YIELD_DATA_SIZE;
+    gGfxSPTask->task.t.ucode_size = SP_UCODE_SIZE; // (this size is ignored)
+    gGfxSPTask->task.t.ucode_data_size = SP_UCODE_DATA_SIZE;
+    gGfxSPTask->task.t.dram_stack = (u64 *) gGfxSPTaskStack;
+    gGfxSPTask->task.t.dram_stack_size = SP_DRAM_STACK_SIZE8;
+    gGfxSPTask->task.t.output_buff = gGfxSPTaskOutputBuffer;
+    gGfxSPTask->task.t.output_buff_size =
+        (u64 *)((u8 *) gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
+    gGfxSPTask->task.t.data_ptr = (u64 *) &gGfxPool->buffer;
+    gGfxSPTask->task.t.data_size = entries * sizeof(Gfx);
+    gGfxSPTask->task.t.yield_data_ptr = (u64 *) gGfxSPTaskYieldBuffer;
+    gGfxSPTask->task.t.yield_data_size = OS_YIELD_DATA_SIZE;
 }
 
 /**
@@ -315,11 +329,11 @@ void draw_reset_bars(void) {
     s32 fbNum;
     u64 *fbPtr;
 
-    if ((gResetTimer != 0) && (gNmiResetBarsTimer < 15)) {
+    if (gResetTimer != 0 && gNmiResetBarsTimer < 15) {
         if (sRenderedFramebuffer == 0) {
             fbNum = 2;
         } else {
-            fbNum = (sRenderedFramebuffer - 1);
+            fbNum = sRenderedFramebuffer - 1;
         }
 
         fbPtr = (u64 *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[fbNum]);
@@ -354,9 +368,9 @@ void render_init(void) {
     }
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
-    gGfxSPTask       = &gGfxPool->spTask;
-    gDisplayListHead =  gGfxPool->buffer;
-    gGfxPoolEnd      = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxSPTask = &gGfxPool->spTask;
+    gDisplayListHead = gGfxPool->buffer;
+    gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
     init_rcp(CLEAR_ZBUFFER);
     clear_framebuffer(0);
     end_master_display_list();
@@ -376,9 +390,9 @@ void render_init(void) {
 void select_gfx_pool(void) {
     gGfxPool = &gGfxPools[gGlobalTimer % ARRAY_COUNT(gGfxPools)];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
-    gGfxSPTask       = &gGfxPool->spTask;
-    gDisplayListHead =  gGfxPool->buffer;
-    gGfxPoolEnd      = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxSPTask = &gGfxPool->spTask;
+    gDisplayListHead = gGfxPool->buffer;
+    gGfxPoolEnd = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
 }
 
 /**
@@ -435,8 +449,8 @@ UNUSED static void record_demo(void) {
 
     // If the stick is in deadzone, set its value to 0 to
     // nullify the effects. We do not record deadzone inputs.
-    if ((rawStickX > -8) && (rawStickX < 8)) rawStickX = 0;
-    if ((rawStickY > -8) && (rawStickY < 8)) rawStickY = 0;
+    if (rawStickX > -8 && rawStickX < 8) rawStickX = 0;
+    if (rawStickY > -8 && rawStickY < 8) rawStickY = 0;
 
     // Rrecord the distinct input and timer so long as they are unique.
     // If the timer hits 0xFF, reset the timer for the next demo input.
@@ -444,10 +458,10 @@ UNUSED static void record_demo(void) {
      || (buttonMask != gRecordedDemoInput.buttonMask)
      || (rawStickX  != gRecordedDemoInput.rawStickX)
      || (rawStickY  != gRecordedDemoInput.rawStickY)) {
-        gRecordedDemoInput.timer      = 0;
+        gRecordedDemoInput.timer = 0;
         gRecordedDemoInput.buttonMask = buttonMask;
-        gRecordedDemoInput.rawStickX  = rawStickX;
-        gRecordedDemoInput.rawStickY  = rawStickY;
+        gRecordedDemoInput.rawStickX = rawStickX;
+        gRecordedDemoInput.rawStickY = rawStickY;
     }
     gRecordedDemoInput.timer++;
 }
@@ -470,7 +484,7 @@ void run_demo_inputs(void) {
         if (gControllers[1].controllerData != NULL) {
             gControllers[1].controllerData->stick_x = 0;
             gControllers[1].controllerData->stick_y = 0;
-            gControllers[1].controllerData->button  = 0;
+            gControllers[1].controllerData->button = 0;
         }
 
         // The timer variable being 0 at the current input means the demo is over.
@@ -478,11 +492,11 @@ void run_demo_inputs(void) {
         if (gCurrDemoInput->timer == 0) {
             gControllers[0].controllerData->stick_x = 0;
             gControllers[0].controllerData->stick_y = 0;
-            gControllers[0].controllerData->button  = END_DEMO;
+            gControllers[0].controllerData->button = END_DEMO;
         } else {
             // Backup the start button if it is pressed, since we don't want the
             // demo input to override the mask where start may have been pressed.
-            u16 startPushed = (gControllers[0].controllerData->button & START_BUTTON);
+            u16 startPushed = gControllers[0].controllerData->button & START_BUTTON;
 
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
             gControllers[0].controllerData->stick_x = gCurrDemoInput->rawStickX;
@@ -564,32 +578,32 @@ void read_controller_inputs(s32 threadID) {
         if (controller->controllerData != NULL) {
             controller->rawStickX = controller->controllerData->stick_x;
             controller->rawStickY = controller->controllerData->stick_y;
-            controller->buttonPressed = (controller->controllerData->button
-                                        & (controller->controllerData->button ^ controller->buttonDown));
+            controller->buttonPressed = controller->controllerData->button
+                                        & (controller->controllerData->button ^ controller->buttonDown);
             // 0.5x A presses are a good meme
             controller->buttonDown = controller->controllerData->button;
             adjust_analog_stick(controller);
         } else { // otherwise, if the controllerData is NULL, 0 out all of the inputs.
-            controller->rawStickX     = 0;
-            controller->rawStickY     = 0;
+            controller->rawStickX = 0;
+            controller->rawStickY = 0;
             controller->buttonPressed = 0;
-            controller->buttonDown    = 0;
-            controller->stickX        = 0;
-            controller->stickY        = 0;
-            controller->stickMag      = 0;
+            controller->buttonDown = 0;
+            controller->stickX = 0;
+            controller->stickY = 0;
+            controller->stickMag = 0;
         }
     }
 
     // For some reason, player 1's inputs are copied to player 3's port.
     // This potentially may have been a way the developers "recorded"
     // the inputs for demos, despite record_demo existing.
-    gPlayer3Controller->rawStickX     = gPlayer1Controller->rawStickX;
-    gPlayer3Controller->rawStickY     = gPlayer1Controller->rawStickY;
-    gPlayer3Controller->stickX        = gPlayer1Controller->stickX;
-    gPlayer3Controller->stickY        = gPlayer1Controller->stickY;
-    gPlayer3Controller->stickMag      = gPlayer1Controller->stickMag;
+    gPlayer3Controller->rawStickX = gPlayer1Controller->rawStickX;
+    gPlayer3Controller->rawStickY = gPlayer1Controller->rawStickY;
+    gPlayer3Controller->stickX = gPlayer1Controller->stickX;
+    gPlayer3Controller->stickY = gPlayer1Controller->stickY;
+    gPlayer3Controller->stickMag = gPlayer1Controller->stickMag;
     gPlayer3Controller->buttonPressed = gPlayer1Controller->buttonPressed;
-    gPlayer3Controller->buttonDown    = gPlayer1Controller->buttonDown;
+    gPlayer3Controller->buttonDown = gPlayer1Controller->buttonDown;
 }
 
 /**
@@ -644,7 +658,7 @@ void setup_game_memory(void) {
     // Setup general Segment 0
     set_segment_base_addr(SEGMENT_MAIN, (void *)RAM_START);
     // Create Mesg Queues
-    osCreateMesgQueue( &gGfxVblankQueue,  gGfxMesgBuf, ARRAY_COUNT( gGfxMesgBuf));
+    osCreateMesgQueue(&gGfxVblankQueue, gGfxMesgBuf, ARRAY_COUNT(gGfxMesgBuf));
     osCreateMesgQueue(&gGameVblankQueue, gGameMesgBuf, ARRAY_COUNT(gGameMesgBuf));
     // Setup z buffer and framebuffer
     gPhysicalZBuffer = VIRTUAL_TO_PHYSICAL(gZBuffer);
@@ -652,12 +666,12 @@ void setup_game_memory(void) {
     gPhysicalFramebuffers[1] = VIRTUAL_TO_PHYSICAL(gFramebuffer1);
     gPhysicalFramebuffers[2] = VIRTUAL_TO_PHYSICAL(gFramebuffer2);
     // Setup Mario Animations
-    gMarioAnimsMemAlloc = main_pool_alloc(0x4000, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *)gMarioAnimsMemAlloc);
+    gMarioAnimsMemAlloc = main_pool_alloc(MARIO_ANIMS_POOL_SIZE, MEMORY_POOL_LEFT);
+    set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
     // Setup Demo Inputs List
-    gDemoInputsMemAlloc = main_pool_alloc(0x800, MEMORY_POOL_LEFT);
-    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *)gDemoInputsMemAlloc);
+    gDemoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
+    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
     setup_dma_table_list(&gDemoInputsBuf, gDemoInputs, gDemoInputsMemAlloc);
     // Setup Level Script Entry
     load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
@@ -735,7 +749,7 @@ void thread5_game_loop(UNUSED void *arg) {
         profiler_update(scriptTime, lastTime);
         scriptTime[perfIteration] -= profilerTime[perfIteration];
         scriptTime[perfIteration] -= profilerTime2[perfIteration];
-            if ((benchmarkLoop > 0) && (benchOption == 0)) {
+            if (benchmarkLoop > 0 && benchOption == 0) {
                 benchmarkLoop--;
                 benchMark[benchmarkLoop] = (osGetTime() - lastTime);
                 if (benchmarkLoop == 0) {
@@ -755,7 +769,7 @@ void thread5_game_loop(UNUSED void *arg) {
         if (gShowDebugText) {
             // subtract the end of the gfx pool with the display list to obtain the
             // amount of free space remaining.
-            print_text_fmt_int(180, 20, "BUF %d", (gGfxPoolEnd - (u8 *)gDisplayListHead));
+            print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
         }
 #endif
 #if 0

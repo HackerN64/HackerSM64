@@ -101,7 +101,7 @@ void elevator_act_3(void) {
 }
 
 void bhv_elevator_init(void) {
-    s32 index = sElevatorHeights[(o->oBehParams2ndByte * 3) + 2];
+    s32 index = sElevatorHeights[o->oBehParams2ndByte * 3 + 2];
     if (index == 0) {
         o->oElevatorMinY = sElevatorHeights[o->oBehParams2ndByte * 3];
         o->oElevatorMaxY = o->oHomeY;

@@ -8,14 +8,14 @@
 
 struct ObjectHitbox sTweesterHitbox = {
     /* interactType:      */ INTERACT_TORNADO,
-    /* downOffset:        */    0,
-    /* damageOrCoinValue: */    0,
-    /* health:            */    0,
-    /* numLootCoins:      */    0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 1500,
     /* height:            */ 4000,
-    /* hurtboxRadius:     */    0,
-    /* hurtboxHeight:     */    0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 /**
@@ -26,9 +26,9 @@ void tweester_scale_and_move(f32 preScale) {
     s16 dYaw  = 0x2C00;
     f32 scale = preScale * 0.4f;
 
-    o->header.gfx.scale[0] = (((( coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.3f) + 1.0f) * scale);
-    o->header.gfx.scale[1] = ((((-coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.5f) + 0.5f) * scale);
-    o->header.gfx.scale[2] = (((( coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.3f) + 1.0f) * scale);
+    o->header.gfx.scale[0] = (( coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.3f + 1.0f) * scale;
+    o->header.gfx.scale[1] = ((-coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.5f + 0.5f) * scale;
+    o->header.gfx.scale[2] = (( coss(o->oTweesterScaleTimer) + 1.0f) * 0.5f * 0.3f + 1.0f) * scale;
 
     o->oTweesterScaleTimer += 0x200;
     o->oForwardVel = 14.0f;
@@ -112,7 +112,7 @@ void tweester_act_chase(void) {
  * action if Mario is 2500 units away or 12 seconds passed.
  */
 void tweester_act_hide(void) {
-    f32 shrinkTimer = (60.0f - o->oTimer);
+    f32 shrinkTimer = 60.0f - o->oTimer;
 
     if (shrinkTimer >= 0.0f) {
         tweester_scale_and_move(shrinkTimer / 60.0f);

@@ -10,10 +10,10 @@
  */
 static struct ObjectHitbox sGoombaHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */  0,
-    /* damageOrCoinValue: */  1,
-    /* health:            */  0,
-    /* numLootCoins:      */  1,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 1,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 1,
     /* radius:            */ 72,
     /* height:            */ 50,
     /* hurtboxRadius:     */ 42,
@@ -27,7 +27,7 @@ struct GoombaProperties {
     f32 scale;
     u32 deathSound;
     s16 drawDistance;
-    s8  damage;
+    s8 damage;
 };
 
 /**
@@ -101,17 +101,17 @@ void bhv_goomba_triplet_spawner_update(void) {
  * Initialization function for goomba.
  */
 void bhv_goomba_init(void) {
-    o->oGoombaSize = (o->oBehParams2ndByte & GOOMBA_BP_SIZE_MASK);
+    o->oGoombaSize = o->oBehParams2ndByte & GOOMBA_BP_SIZE_MASK;
 
     o->oGoombaScale = sGoombaProperties[o->oGoombaSize].scale;
-    o->oDeathSound  = sGoombaProperties[o->oGoombaSize].deathSound;
+    o->oDeathSound = sGoombaProperties[o->oGoombaSize].deathSound;
 
     obj_set_hitbox(o, &sGoombaHitbox);
 
-    o->oDrawingDistance   = sGoombaProperties[o->oGoombaSize].drawDistance;
+    o->oDrawingDistance = sGoombaProperties[o->oGoombaSize].drawDistance;
     o->oDamageOrCoinValue = sGoombaProperties[o->oGoombaSize].damage;
 
-    o->oGravity = ((-8.0f / 3.0f) * o->oGoombaScale);
+    o->oGravity = -8.0f / 3.0f * o->oGoombaScale;
 
 #ifdef FLOOMBAS
     if (o->oIsFloomba) {
@@ -135,7 +135,7 @@ static void goomba_begin_jump(void) {
 
     o->oAction = GOOMBA_ACT_JUMP;
     o->oForwardVel = 0.0f;
-    o->oVelY = ((50.0f / 3.0f) * o->oGoombaScale);
+    o->oVelY = 50.0f / 3.0f * o->oGoombaScale;
 }
 
 /**
@@ -160,7 +160,7 @@ static void goomba_act_walk(void) {
     obj_forward_vel_approach(o->oGoombaRelativeSpeed * o->oGoombaScale, 0.4f);
 
     // If walking fast enough, play footstep sounds
-    if (o->oGoombaRelativeSpeed > (4.0f / 3.0f)) {
+    if (o->oGoombaRelativeSpeed > 4.0f / 3.0f) {
         cur_obj_play_sound_at_anim_range(2, 17, SOUND_OBJ_GOOMBA_WALK);
     }
 
@@ -192,7 +192,8 @@ static void goomba_act_walk(void) {
                 // If mario is far away, walk at a normal pace, turning randomly
                 // and occasionally jumping
 
-                o->oGoombaRelativeSpeed = (4.0f / 3.0f);
+                o->oGoombaRelativeSpeed = 4.0f / 3.0f;
+
                 if (o->oGoombaWalkTimer != 0) {
                     o->oGoombaWalkTimer--;
                 } else {
@@ -206,6 +207,7 @@ static void goomba_act_walk(void) {
                 }
             }
         }
+
         cur_obj_rotate_yaw_toward(o->oGoombaTargetYaw, 0x200);
     }
 }
@@ -222,7 +224,9 @@ static void goomba_act_attacked_mario(void) {
 #endif
         obj_die_if_health_non_positive();
     } else {
-        if (o->oPosY <= o->oFloorHeight) goomba_begin_jump();
+        if (o->oPosY <= o->oFloorHeight) {
+            goomba_begin_jump();
+        }
         o->oGoombaTargetYaw = o->oAngleToMario;
         o->oGoombaTurningAwayFromWall = FALSE;
     }

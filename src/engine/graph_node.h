@@ -33,10 +33,16 @@ enum GraphRenderFlags {
 #define GRAPH_RENDER_FLAGS_SIZE              8
 #endif
 
-#define GRAPH_RENDER_LAYERS_MASK            (BITMASK(16 - GRAPH_RENDER_FLAGS_SIZE) << GRAPH_RENDER_FLAGS_SIZE) // 8:0xFF00 12:0xF000
+#define GRAPH_RENDER_VAR_SIZE               sizeof(s16) * 8
+#define GRAPH_RENDER_LAYERS_MASK            (BITMASK(GRAPH_RENDER_VAR_SIZE - GRAPH_RENDER_FLAGS_SIZE) << GRAPH_RENDER_FLAGS_SIZE) // 8:0xFF00 12:0xF000
 #define GRAPH_RENDER_FLAGS_MASK             BITMASK(GRAPH_RENDER_FLAGS_SIZE) // 8:0x00FF 12:0x0FFF
+#if GRAPH_RENDER_FLAGS_SIZE == 8
+#define SET_GRAPH_NODE_LAYER(flags, layer)  ((flags) = ((flags) & GRAPH_RENDER_FLAGS_MASK) | ((layer) << GRAPH_RENDER_FLAGS_SIZE))
+#define GET_GRAPH_NODE_LAYER(flags)         (flags >> GRAPH_RENDER_FLAGS_SIZE)
+#else
 #define SET_GRAPH_NODE_LAYER(flags, layer)  ((flags) = ((flags) & GRAPH_RENDER_FLAGS_MASK) | (((layer) << GRAPH_RENDER_FLAGS_SIZE) & GRAPH_RENDER_LAYERS_MASK))
-#define GET_GRAPH_NODE_LAYER(flags       )  ((flags & GRAPH_RENDER_LAYERS_MASK) >> GRAPH_RENDER_FLAGS_SIZE)
+#define GET_GRAPH_NODE_LAYER(flags)         ((flags & GRAPH_RENDER_LAYERS_MASK) >> GRAPH_RENDER_FLAGS_SIZE)
+#endif
 
 #ifdef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 // The discriminant for different types of geo nodes
@@ -446,9 +452,9 @@ void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f posit
 struct GraphNodeRoot *geo_find_root(struct GraphNode *graphNode);
 
 // graph_node_manager
-s32 *read_vec3s_to_vec3f(Vec3f dst, s16 *src);
-s32 *read_vec3s(         Vec3s dst, s16 *src);
-s32 *read_vec3s_angle(   Vec3s dst, s16 *src);
+s16 *read_vec3s_to_vec3f(Vec3f dst, s16 *src);
+s16 *read_vec3s(         Vec3s dst, s16 *src);
+s16 *read_vec3s_angle(   Vec3s dst, s16 *src);
 void register_scene_graph_node(struct GraphNode *graphNode);
 
 #endif // GRAPH_NODE_H

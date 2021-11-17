@@ -22,7 +22,7 @@ void bhv_1up_interact(void) {
 
 void bhv_1up_common_init(void) {
     o->oMoveAnglePitch = -0x4000;
-    o->oGravity  = 3.0f;
+    o->oGravity = 3.0f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 1.0f;
 }
@@ -46,15 +46,15 @@ void one_up_loop_in_air(void) {
     } else {
         o->oAngleVelPitch = -0x1000;
         o->oMoveAnglePitch += o->oAngleVelPitch;
-        o->oVelY = ((coss(o->oMoveAnglePitch) * 30.0f) + 2.0f);
-        o->oForwardVel = (-sins(o->oMoveAnglePitch) * 30.0f);
+        o->oVelY = coss(o->oMoveAnglePitch) * 30.0f + 2.0f;
+        o->oForwardVel = -sins(o->oMoveAnglePitch) * 30.0f;
     }
 }
 
 void pole_1up_move_towards_mario(void) {
-    f32 dx = (gMarioObject->header.gfx.pos[0] - o->oPosX);
-    f32 dy = (gMarioObject->header.gfx.pos[1] - o->oPosY) + 120.0f;
-    f32 dz = (gMarioObject->header.gfx.pos[2] - o->oPosZ);
+    f32 dx = gMarioObject->header.gfx.pos[0] - o->oPosX;
+    f32 dy = gMarioObject->header.gfx.pos[1] - o->oPosY + 120.0f;
+    f32 dz = gMarioObject->header.gfx.pos[2] - o->oPosZ;
     s16 targetPitch = atan2s(sqrtf(sqr(dx) + sqr(dz)), dy);
 
     obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 0x1000);
@@ -70,9 +70,11 @@ void one_up_move_away_from_mario(s16 collisionFlags) {
     o->oMoveAngleYaw = o->oAngleToMario + 0x8000;
 
     bhv_1up_interact();
+
     if (collisionFlags & OBJ_COL_FLAG_HIT_WALL) {
         o->oAction = MUSHROOM_ACT_DISAPPEARING;
     }
+
     if (!is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 3000)) {
         o->oAction = MUSHROOM_ACT_DISAPPEARING;
     }
@@ -118,6 +120,7 @@ void bhv_1up_walking_loop(void) {
 
 void bhv_1up_running_away_loop(void) {
     s16 collisionFlags = object_step();
+
     switch (o->oAction) {
         case MUSHROOM_ACT_INIT:
             if (o->oTimer > 17) {
@@ -153,6 +156,7 @@ void bhv_1up_running_away_loop(void) {
 
 void sliding_1up_move(void) {
     s16 collisionFlags = object_step();
+
     if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         o->oForwardVel += 25.0f;
         o->oVelY = 0.0f;
@@ -226,6 +230,7 @@ void bhv_1up_jump_on_approach_loop(void) {
 
 void bhv_1up_hidden_loop(void) {
     s16 collisionFlags;
+
     switch (o->oAction) {
         case MUSHROOM_ACT_INIT:
             o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;

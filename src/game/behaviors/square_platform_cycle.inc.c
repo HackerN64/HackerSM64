@@ -10,7 +10,7 @@ void bhv_squarish_path_moving_loop(void) {
 
     switch (o->oAction) {
         case 0:
-            o->oAction = ((o->oBehParams2ndByte & 3) + 1);
+            o->oAction = (o->oBehParams2ndByte & 3) + 1;
             break;
         case 1:
             if (square_plat_set_yaw_until_timer(0x0000, 60)) {

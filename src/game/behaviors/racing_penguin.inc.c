@@ -183,7 +183,7 @@ void bhv_racing_penguin_update(void) {
 
 void bhv_penguin_race_finish_line_update(void) {
     if ((o->parentObj->oRacingPenguinReachedBottom
-         || ((o->oDistanceToMario < 1000.0f) && ((gMarioObject->oPosZ - o->oPosZ) < 0.0f)))
+         || (o->oDistanceToMario < 1000.0f && gMarioObject->oPosZ - o->oPosZ < 0.0f))
         && !o->parentObj->oRacingPenguinReachedBottom) {
         o->parentObj->oRacingPenguinMarioWon = TRUE;
     }

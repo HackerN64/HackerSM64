@@ -32,9 +32,10 @@ static void camera_lakitu_intro_act_trigger_cutscene(void) {
      && (gMarioObject->oPosX <   545.0f)
      && (gMarioObject->oPosY >   800.0f)
      && (gMarioObject->oPosZ > -2000.0f)
-     && (gMarioObject->oPosZ <  -177.0f)
-     && (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_START)) {
-        o->oAction = CAMERA_LAKITU_INTRO_ACT_SPAWN_CLOUD;
+     && (gMarioObject->oPosZ <  -177.0f)) {
+         if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_START) {
+            o->oAction = CAMERA_LAKITU_INTRO_ACT_SPAWN_CLOUD;
+         }
     }
 }
 
@@ -76,7 +77,7 @@ static void camera_lakitu_intro_act_show_dialog(void) {
         }
 
         targetMovePitch = -0x3000;
-        targetMoveYaw   = -0x6000;
+        targetMoveYaw = -0x6000;
     } else {
         if (o->oCameraLakituSpeed != 0.0f) {
             if (o->oDistanceToMario > 5000.0f) {

@@ -46,7 +46,8 @@ void bhv_sl_walking_penguin_loop(void) {
                 o->oSLWalkingPenguinCurStepTimer = 0;
             }
 
-            if (o->oSLWalkingPenguinCurStepTimer < sSLWalkingPenguinErraticSteps[o->oSLWalkingPenguinCurStep].stepLength) {
+            if (o->oSLWalkingPenguinCurStepTimer <
+                sSLWalkingPenguinErraticSteps[o->oSLWalkingPenguinCurStep].stepLength) {
                 o->oSLWalkingPenguinCurStepTimer++;
             } else {
                 // Move to next step

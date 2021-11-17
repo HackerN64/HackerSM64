@@ -8,10 +8,10 @@
  */
 static struct ObjectHitbox sFlyGuyHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */  0,
-    /* damageOrCoinValue: */  2,
-    /* health:            */  0,
-    /* numLootCoins:      */  2,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 2,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 2,
     /* radius:            */ 70,
     /* height:            */ 60,
     /* hurtboxRadius:     */ 40,
@@ -21,9 +21,7 @@ static struct ObjectHitbox sFlyGuyHitbox = {
 /**
  * Unused jitter amounts.
  */
-static s16 sFlyGuyJitterAmounts[] = {
-    0x1000, -0x2000, 0x2000
-};
+static s16 sFlyGuyJitterAmounts[] = { 0x1000, -0x2000, 0x2000 };
 
 /**
  * Return to regular size. When mario is close enough or home is far enough,
@@ -44,11 +42,11 @@ static void fly_guy_act_idle(void) {
         } else {
             // Randomly enter the approach mario action - but this doesn't
             // really do anything since we come right back to idle
-            if ((o->oFlyGuyIdleTimer >= 3) || (o->oFlyGuyIdleTimer == (s32)((random_u16() & 0x1) + 2))) {
+            if (o->oFlyGuyIdleTimer >= 3 || o->oFlyGuyIdleTimer == ((u16)random_u16() & 1) + 2) {
                 o->oFlyGuyIdleTimer = 0;
                 o->oAction = FLY_GUY_ACT_APPROACH_MARIO;
             } else {
-                o->oFlyGuyUnusedJitter = (o->oMoveAngleYaw + sFlyGuyJitterAmounts[o->oFlyGuyIdleTimer]);
+                o->oFlyGuyUnusedJitter = o->oMoveAngleYaw + sFlyGuyJitterAmounts[o->oFlyGuyIdleTimer];
                 o->oFlyGuyIdleTimer++;
             }
         }
@@ -61,7 +59,7 @@ static void fly_guy_act_idle(void) {
  */
 static void fly_guy_act_approach_mario(void) {
     // If we are >2000 units from home or Mario is <2000 units from us
-    if ((o->oDistanceToMario >= 25000.0f) || (o->oDistanceToMario < 2000.0f)) {
+    if (o->oDistanceToMario >= 25000.0f || o->oDistanceToMario < 2000.0f) {
         obj_forward_vel_approach(10.0f, 0.5f);
 
         // Turn toward home or Mario
@@ -71,18 +69,18 @@ static void fly_guy_act_approach_mario(void) {
         // If facing toward mario and we are either near mario laterally or
         // far above him
         if (abs_angle_diff(o->oAngleToMario, o->oFaceAngleYaw) < 0x2000
-         && (((o->oPosY - gMarioObject->oPosY) > 400.0f) || (o->oDistanceToMario < 400.0f))) {
+            && (o->oPosY - gMarioObject->oPosY > 400.0f || o->oDistanceToMario < 400.0f)) {
             // Either shoot fire or lunge
-            if (o->oBehParams2ndByte != FLY_GUY_BP_LUNGES && (random_u16() % 0x1)) {
+            if (o->oBehParams2ndByte != FLY_GUY_BP_LUNGES && random_u16() % 0x1) {
                 o->oAction = FLY_GUY_ACT_SHOOT_FIRE;
                 o->oFlyGuyScaleVel = 0.06f;
             } else {
                 o->oAction = FLY_GUY_ACT_LUNGE;
                 o->oFlyGuyLungeTargetPitch = obj_turn_pitch_toward_mario(-200.0f, 0);
 
-                o->oForwardVel = (25.0f *  coss(o->oFlyGuyLungeTargetPitch));
-                o->oVelY       = (25.0f * -sins(o->oFlyGuyLungeTargetPitch));
-                o->oFlyGuyLungeYDecel = (-o->oVelY / 30.0f);
+                o->oForwardVel = 25.0f * coss(o->oFlyGuyLungeTargetPitch);
+                o->oVelY = 25.0f * -sins(o->oFlyGuyLungeTargetPitch);
+                o->oFlyGuyLungeYDecel = -o->oVelY / 30.0f;
             }
         }
     } else if (obj_forward_vel_approach(0.0f, 0.2f)) {
@@ -137,12 +135,14 @@ static void fly_guy_act_shoot_fire(void) {
     o->oForwardVel = 0.0f;
 
     if (obj_face_yaw_approach(o->oAngleToMario, 0x800)) {
+        s32 scaleStatus;
+
         o->oMoveAngleYaw = o->oFaceAngleYaw;
 
         // Increase scale by 0.06, 0.05, ..., -0.03. Then wait ~8 frames, then
         // starting moving scale by 0.05 each frame toward 1.1. The first time
         // it becomes below 1.2 during this latter portion, shoot fire.
-        s32 scaleStatus = obj_grow_then_shrink(&o->oFlyGuyScaleVel, 1.2f, 1.1f);
+        scaleStatus = obj_grow_then_shrink(&o->oFlyGuyScaleVel, 1.2f, 1.1f);
 
         if (scaleStatus != 0) {
             if (scaleStatus < 0) {
@@ -194,7 +194,7 @@ void bhv_fly_guy_update(void) {
 
         // Oscillate up and down
         o->oFlyGuyOscTimer++;
-        o->oPosY += (coss(0x400 * o->oFlyGuyOscTimer) * 1.5f);
+        o->oPosY += coss(0x400 * o->oFlyGuyOscTimer) * 1.5f;
 
         switch (o->oAction) {
             case FLY_GUY_ACT_IDLE:

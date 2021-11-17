@@ -6,11 +6,12 @@
 
 #if IS_64_BIT
 static s16 next_s16_in_geo_script(s16 **src) {
-    if (((uintptr_t)(*src) & 0x7) == 4) {
+    s16 ret;
+    if (((uintptr_t)(*src) & 7) == 4) {
          *src += 2; // skip 32 bits
     }
-    s16 ret = *(*src)++;
-    if (((uintptr_t)(*src) & 0x7) == 4) {
+    ret = *(*src)++;
+    if (((uintptr_t)(*src) & 7) == 4) {
          *src += 2; // skip 32 bits
     }
     return ret;
@@ -23,11 +24,11 @@ static s16 next_s16_in_geo_script(s16 **src) {
  * Takes a pointer to three shorts (supplied by a geo layout script) and
  * copies it to the destination float vector.
  */
-s32 *read_vec3s_to_vec3f(Vec3f dst, s16 *src) {
+s16 *read_vec3s_to_vec3f(Vec3f dst, s16 *src) {
     dst[0] = next_s16_in_geo_script(&src);
     dst[1] = next_s16_in_geo_script(&src);
     dst[2] = next_s16_in_geo_script(&src);
-    return (s32 *)src;
+    return src;
 }
 
 /**
@@ -35,22 +36,22 @@ s32 *read_vec3s_to_vec3f(Vec3f dst, s16 *src) {
  * copies it to the destination vector. It's essentially a memcpy but consistent
  * with the other two 'geo-script vector to internal vector' functions.
  */
-s32 *read_vec3s(Vec3s dst, s16 *src) {
+s16 *read_vec3s(Vec3s dst, s16 *src) {
     dst[0] = next_s16_in_geo_script(&src);
     dst[1] = next_s16_in_geo_script(&src);
     dst[2] = next_s16_in_geo_script(&src);
-    return (s32 *)src;
+    return src;
 }
 
 /**
  * Takes a pointer to three angles in degrees (supplied by a geo layout script) and
  * converts it to a vector of three in-game angle units in [-32768, 32767] range.
  */
-s32 *read_vec3s_angle(Vec3s dst, s16 *src) {
-    dst[0] = ((next_s16_in_geo_script(&src) << 15) / 180);
-    dst[1] = ((next_s16_in_geo_script(&src) << 15) / 180);
-    dst[2] = ((next_s16_in_geo_script(&src) << 15) / 180);
-    return (s32 *)src;
+s16 *read_vec3s_angle(Vec3s dst, s16 *src) {
+    dst[0] = (next_s16_in_geo_script(&src) << 15) / 180;
+    dst[1] = (next_s16_in_geo_script(&src) << 15) / 180;
+    dst[2] = (next_s16_in_geo_script(&src) << 15) / 180;
+    return src;
 }
 
 /**

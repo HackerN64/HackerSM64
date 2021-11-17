@@ -76,9 +76,9 @@ void spawn_and_init_wf_platforms(s16 a, const BehaviorScript *bhv) {
     struct Object *platform = spawn_object(o, a, bhv);
     s16 yaw = ((o->oPlatformSpawnerWFTowerPlatformNum * o->oPlatformSpawnerWFTowerDYaw) + o->oPlatformSpawnerWFTowerYawOffset);
     platform->oMoveAngleYaw = yaw;
-    platform->oPosX += (o->oPlatformSpawnerWFTowerRadius * sins(yaw));
-    platform->oPosY += (100 * o->oPlatformSpawnerWFTowerPlatformNum);
-    platform->oPosZ += (o->oPlatformSpawnerWFTowerRadius * coss(yaw));
+    platform->oPosX += o->oPlatformSpawnerWFTowerRadius * sins(yaw);
+    platform->oPosY += 100 * o->oPlatformSpawnerWFTowerPlatformNum;
+    platform->oPosZ += o->oPlatformSpawnerWFTowerRadius * coss(yaw);
     platform->oPlatformWFTowerMoveDistance = o->oPlatformSpawnerWFTowerMoveDistance;
     platform->oPlatformWFTowerForwardVel = o->oPlatformSpawnerWFTowerForwardVel;
     o->oPlatformSpawnerWFTowerPlatformNum++;
@@ -108,7 +108,7 @@ void bhv_tower_platform_group_loop(void) {
 
     switch (o->oAction) {
         case 0:
-            if (marioY > (o->oHomeY - 1000.0f)) {
+            if (marioY > o->oHomeY - 1000.0f) {
                 o->oAction++;
             }
             break;
@@ -119,7 +119,7 @@ void bhv_tower_platform_group_loop(void) {
             break;
 
         case 2:
-            if (marioY < (o->oHomeY - 1000.0f)) {
+            if (marioY < o->oHomeY - 1000.0f) {
                 o->oAction++;
             }
             break;

@@ -12,18 +12,18 @@ OSThread gRumblePakThread;
 
 OSPfs gRumblePakPfs;
 
-OSMesg      gRumblePakSchedulerMesgBuf[1];
+OSMesg gRumblePakSchedulerMesgBuf[1];
 OSMesgQueue gRumblePakSchedulerMesgQueue;
-OSMesg      gRumbleThreadVIMesgBuf[1];
+OSMesg gRumbleThreadVIMesgBuf[1];
 OSMesgQueue gRumbleThreadVIMesgQueue;
 
-struct RumbleData     gRumbleDataQueue[3];
+struct RumbleData gRumbleDataQueue[3];
 struct RumbleSettings gCurrRumbleSettings;
 
 s32 sRumblePakThreadActive = FALSE;
-s32 sRumblePakActive       = FALSE;
-s32 sRumblePakErrorCount   = 0;
-s32 gRumblePakTimer        = 0;
+s32 sRumblePakActive = FALSE;
+s32 sRumblePakErrorCount = 0;
+s32 gRumblePakTimer = 0;
 
 void init_rumble_pak_scheduler_queue(void) {
     osCreateMesgQueue(&gRumblePakSchedulerMesgQueue, gRumblePakSchedulerMesgBuf, 1);
@@ -153,7 +153,7 @@ void queue_rumble_decay(s16 decay) {
 }
 
 u32 is_rumble_finished_and_queue_empty(void) {
-    if ((gCurrRumbleSettings.start + gCurrRumbleSettings.timer) >= 4) {
+    if (gCurrRumbleSettings.start + gCurrRumbleSettings.timer >= 4) {
         return FALSE;
     }
 
@@ -231,8 +231,8 @@ static void thread6_rumble_loop(UNUSED void *arg) {
             if (sRumblePakErrorCount >= 30) {
                 sRumblePakActive = FALSE;
             }
-        } else if ((gNumVblanks % 60) == 0) {
-            sRumblePakActive = (osMotorInit(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) < 1);
+        } else if (gNumVblanks % 60 == 0) {
+            sRumblePakActive = osMotorInit(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) < 1;
             sRumblePakErrorCount = 0;
         }
 

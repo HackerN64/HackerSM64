@@ -1306,9 +1306,9 @@ static void puppycam_collision(void) {
 
     // The ray, starting from the top
     s32 dy = (gPuppyCam.targetObj->oPosY - gPuppyCam.targetFloorHeight);
-    vec3_copy_y_off(target[0], &gPuppyCam.targetObj->oPosVec, (gPuppyCam.povHeight - CLAMP(dy, 0, 300)));
+    vec3f_copy_y_off(target[0], &gPuppyCam.targetObj->oPosVec, (gPuppyCam.povHeight - CLAMP(dy, 0, 300)));
     // The ray, starting from the bottom
-    vec3_copy_y_off(target[1], &gPuppyCam.targetObj->oPosVec, (gPuppyCam.povHeight * 0.4f));
+    vec3f_copy_y_off(target[1], &gPuppyCam.targetObj->oPosVec, (gPuppyCam.povHeight * 0.4f));
 
     camdir[0][0] = (LENSIN(LENSIN(gPuppyCam.zoomTarget, pitchTotal), gPuppyCam.yaw) + gPuppyCam.shake[0]);
     camdir[0][1] = (LENCOS(       gPuppyCam.zoomTarget, pitchTotal)                 + gPuppyCam.shake[1]);

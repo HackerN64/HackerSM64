@@ -2,26 +2,26 @@
 
 struct ObjectHitbox sFirePiranhaPlantHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   2,
-    /* health:            */   0,
-    /* numLootCoins:      */   1,
-    /* radius:            */  80,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 2,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 1,
+    /* radius:            */ 80,
     /* height:            */ 160,
-    /* hurtboxRadius:     */  50,
+    /* hurtboxRadius:     */ 50,
     /* hurtboxHeight:     */ 150,
 };
 
 struct ObjectHitbox sPiranhaPlantFireHitbox = {
     /* interactType:      */ INTERACT_FLAME,
-    /* downOffset:        */  10,
-    /* damageOrCoinValue: */   0,
-    /* health:            */   0,
-    /* numLootCoins:      */   0,
-    /* radius:            */  10,
-    /* height:            */  20,
-    /* hurtboxRadius:     */  10,
-    /* hurtboxHeight:     */  20,
+    /* downOffset:        */ 10,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
+    /* radius:            */ 10,
+    /* height:            */ 20,
+    /* hurtboxRadius:     */ 10,
+    /* hurtboxHeight:     */ 20,
 };
 
 s32 sNumActiveFirePiranhaPlants;
@@ -71,8 +71,8 @@ static void fire_piranha_plant_act_hide(void) {
                 obj_die_if_health_non_positive();
                 set_object_respawn_info_bits(o, RESPAWN_INFO_TYPE_NORMAL);
             }
-        } else if ((sNumActiveFirePiranhaPlants < 2) && (o->oTimer > 100)
-                   && (o->oDistanceToMario > 100.0f) && (o->oDistanceToMario < 800.0f)) {
+        } else if (sNumActiveFirePiranhaPlants < 2 && o->oTimer > 100
+                   && o->oDistanceToMario > 100.0f && o->oDistanceToMario < 800.0f) {
             cur_obj_play_sound_2(SOUND_OBJ_PIRANHA_PLANT_APPEAR);
 
             o->oFirePiranhaPlantActive = TRUE;
@@ -93,7 +93,7 @@ static void fire_piranha_plant_act_grow(void) {
     cur_obj_init_anim_extend(FIRE_PIRANHA_PLANT_ANIM_GROW);
 
     if (approach_f32_ptr(&o->oFirePiranhaPlantScale, o->oFirePiranhaPlantNeutralScale,
-                         (0.04f * o->oFirePiranhaPlantNeutralScale))) {
+                         0.04f * o->oFirePiranhaPlantNeutralScale)) {
         if (o->oTimer > 80) {
             cur_obj_play_sound_2(SOUND_OBJ_PIRANHA_PLANT_SHRINK);
             o->oAction = FIRE_PIRANHA_PLANT_ACT_HIDE;

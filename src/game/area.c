@@ -45,16 +45,16 @@ struct Area         *gAreas            =  gAreaData;
 struct Area         *gCurrentArea      = NULL;
 struct CreditsEntry *gCurrCreditsEntry = NULL;
 
-Vp        *gViewportOverride    = NULL;
-Vp        *gViewportClip        = NULL;
-s16        gWarpTransDelay      = 0;
-RGBA16FILL gFBSetColor          = 0;
+Vp *gViewportOverride = NULL;
+Vp *gViewportClip = NULL;
+s16 gWarpTransDelay = 0;
+RGBA16FILL gFBSetColor = 0;
 RGBA16FILL gWarpTransFBSetColor = 0;
-Color      gWarpTransRed        = 0;
-Color      gWarpTransGreen      = 0;
-Color      gWarpTransBlue       = 0;
-s16        gCurrSaveFileNum     = 1;
-s16        gCurrLevelNum        = LEVEL_MIN;
+Color gWarpTransRed= 0;
+Color gWarpTransGreen = 0;
+Color gWarpTransBlue = 0;
+s16 gCurrSaveFileNum = 1;
+s16 gCurrLevelNum = LEVEL_MIN;
 
 /*
  * The following two tables are used in get_mario_spawn_type() to determine spawn type
@@ -178,31 +178,31 @@ void load_obj_warp_nodes(void) {
 void clear_areas(void) {
     s32 i;
 
-    gCurrentArea                   = NULL;
-    gWarpTransition.isActive       = FALSE;
+    gCurrentArea = NULL;
+    gWarpTransition.isActive = FALSE;
     gWarpTransition.pauseRendering = FALSE;
-    gMarioSpawnInfo->areaIndex     = -1;
+    gMarioSpawnInfo->areaIndex = -1;
 
     for (i = 0; i < AREA_COUNT; i++) {
-        gAreaData[i].index             = i;
-        gAreaData[i].flags             = 0x0;
-        gAreaData[i].terrainType       = TERRAIN_GRASS;
-        gAreaData[i].graphNode         = NULL;
-        gAreaData[i].terrainData       = NULL;
-        gAreaData[i].surfaceRooms      = NULL;
-        gAreaData[i].macroObjects      = NULL;
-        gAreaData[i].warpNodes         = NULL;
+        gAreaData[i].index = i;
+        gAreaData[i].flags = AREA_FLAG_UNLOAD;
+        gAreaData[i].terrainType = TERRAIN_GRASS;
+        gAreaData[i].graphNode = NULL;
+        gAreaData[i].terrainData = NULL;
+        gAreaData[i].surfaceRooms = NULL;
+        gAreaData[i].macroObjects = NULL;
+        gAreaData[i].warpNodes = NULL;
         gAreaData[i].paintingWarpNodes = NULL;
-        gAreaData[i].instantWarps      = NULL;
-        gAreaData[i].objectSpawnInfos  = NULL;
-        gAreaData[i].camera            = NULL;
-        gAreaData[i].unused            = NULL;
-        gAreaData[i].whirlpools[0]     = NULL;
-        gAreaData[i].whirlpools[1]     = NULL;
-        gAreaData[i].dialog[0]         = DIALOG_NONE;
-        gAreaData[i].dialog[1]         = DIALOG_NONE;
-        gAreaData[i].musicParam        = 0;
-        gAreaData[i].musicParam2       = 0;
+        gAreaData[i].instantWarps = NULL;
+        gAreaData[i].objectSpawnInfos = NULL;
+        gAreaData[i].camera = NULL;
+        gAreaData[i].unused = NULL;
+        gAreaData[i].whirlpools[0] = NULL;
+        gAreaData[i].whirlpools[1] = NULL;
+        gAreaData[i].dialog[0] = DIALOG_NONE;
+        gAreaData[i].dialog[1] = DIALOG_NONE;
+        gAreaData[i].musicParam = 0;
+        gAreaData[i].musicParam2 = 0;
     }
 }
 
@@ -314,28 +314,28 @@ void area_update_objects(void) {
 void play_transition(UNUSED s16 transType, UNUSED s16 time, UNUSED Color red, UNUSED Color green, UNUSED Color blue) {
 #else
 void play_transition(s16 transType, s16 time, Color red, Color green, Color blue) {
-    gWarpTransition.isActive       = TRUE;
-    gWarpTransition.type           = transType;
-    gWarpTransition.time           = time;
+    gWarpTransition.isActive = TRUE;
+    gWarpTransition.type = transType;
+    gWarpTransition.time = time;
     gWarpTransition.pauseRendering = FALSE;
 
     // The lowest bit of transType determines if the transition is fading in or out.
     if (transType & WARP_TRANSITION_FADE_INTO) {
         set_warp_transition_rgb(red, green, blue);
     } else {
-        red   = gWarpTransRed;
+        red = gWarpTransRed;
         green = gWarpTransGreen;
-        blue  = gWarpTransBlue;
+        blue = gWarpTransBlue;
     }
 
     if (transType < WARP_TRANSITION_TYPE_STAR) { // if transition is WARP_TRANSITION_TYPE_COLOR
-        gWarpTransition.data.red   = red;
+        gWarpTransition.data.red = red;
         gWarpTransition.data.green = green;
-        gWarpTransition.data.blue  = blue;
+        gWarpTransition.data.blue = blue;
     } else { // if transition is textured
-        gWarpTransition.data.red   = red;
+        gWarpTransition.data.red = red;
         gWarpTransition.data.green = green;
-        gWarpTransition.data.blue  = blue;
+        gWarpTransition.data.blue = blue;
 
         // Both the start and end textured transition are always located in the middle of the screen.
         // If you really wanted to, you could place the start at one corner and the end at
@@ -343,8 +343,8 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
         // across the screen.
         gWarpTransition.data.startTexX = SCREEN_CENTER_X;
         gWarpTransition.data.startTexY = SCREEN_CENTER_Y;
-        gWarpTransition.data.endTexX   = SCREEN_CENTER_X;
-        gWarpTransition.data.endTexY   = SCREEN_CENTER_Y;
+        gWarpTransition.data.endTexX = SCREEN_CENTER_X;
+        gWarpTransition.data.endTexY = SCREEN_CENTER_Y;
 
         gWarpTransition.data.texTimer = 0;
 

@@ -25,7 +25,7 @@ void bhv_mips_init(void) {
                                                COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 50)
         && !(starFlags & SAVE_FLAG_TO_STAR_FLAG(SAVE_FLAG_COLLECTED_MIPS_STAR_2))) {
 #endif
-        o->oBehParams2ndByte    = MIPS_BP_STAR_2;
+        o->oBehParams2ndByte = MIPS_BP_STAR_2;
         o->oMipsForwardVelocity = 45.0f;
 #ifndef UNLOCK_ALL
     } else {
@@ -35,9 +35,9 @@ void bhv_mips_init(void) {
 #endif
     o->oInteractionSubtype = INT_SUBTYPE_HOLDABLE_NPC;
 
-    o->oGravity  = 15.0f;
-    o->oFriction =  0.89f;
-    o->oBuoyancy =  1.2f;
+    o->oGravity = 15.0f;
+    o->oFriction = 0.89f;
+    o->oBuoyancy = 1.2f;
 
     cur_obj_init_animation(0);
 }

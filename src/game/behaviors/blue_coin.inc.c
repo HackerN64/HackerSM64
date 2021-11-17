@@ -21,7 +21,7 @@ void bhv_hidden_blue_coin_loop(void) {
             o->oHiddenBlueCoinSwitch = cur_obj_nearest_object_with_behavior(bhvBlueCoinSwitch);
 
             if (o->oHiddenBlueCoinSwitch != NULL) {
-                o->oAction++;
+                o->oAction = HIDDEN_BLUE_COIN_ACT_WAITING;
             }
 
             break;
@@ -31,7 +31,7 @@ void bhv_hidden_blue_coin_loop(void) {
             blueCoinSwitch = o->oHiddenBlueCoinSwitch;
 
             if (blueCoinSwitch->oAction == BLUE_COIN_SWITCH_ACT_TICKING) {
-                o->oAction++; // Set to HIDDEN_BLUE_COIN_ACT_ACTIVE
+                o->oAction = HIDDEN_BLUE_COIN_ACT_ACTIVE;
             }
 
             break;
@@ -83,10 +83,10 @@ void bhv_blue_coin_switch_loop(void) {
                     o->oAction = BLUE_COIN_SWITCH_ACT_RECEDING;
 #ifdef BLUE_COIN_SWITCH_RETRY
                     // Recede at a rate of 16 units/frame.
-                    o->oVelY    = -16.0f;
+                    o->oVelY = -16.0f;
 #else
                     // Recede at a rate of 20 units/frame.
-                    o->oVelY    = -20.0f;
+                    o->oVelY = -20.0f;
 #endif
                     // Set gravity to 0 so it doesn't accelerate when receding.
                     o->oGravity = 0.0f;
@@ -117,7 +117,7 @@ void bhv_blue_coin_switch_loop(void) {
                 o->oVelY    = 0.0f;
                 o->oGravity = 0.0f;
 #else
-                o->oPosY = (gMarioObject->oPosY - 40.0f);
+                o->oPosY = gMarioObject->oPosY - 40.0f;
 #endif
 
                 // Spawn particles. There's a function that calls this same function

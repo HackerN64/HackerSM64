@@ -6,6 +6,11 @@
 
 // -- COIN --
 
+// The distance from Mario which coin formations spawn coins at.
+// Vanilla is 2000.0f. 
+// Set this to o->oDrawingDistance for a more reasonable range at the cost of performance.
+#define COIN_FORMATION_DISTANCE 2000.0f
+
 // Moving Coins flicker and disappear when they hit lava instead of being instantly deleted.
 #define COIN_LAVA_FLICKER
 

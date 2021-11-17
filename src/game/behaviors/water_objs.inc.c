@@ -9,8 +9,8 @@ void bhv_water_air_bubble_init(void) {
 
 void bhv_water_air_bubble_loop(void) {
     s32 i;
-    o->header.gfx.scale[0] = (( sins(o->oWaterObjScaleXAngle) * 0.5f) + 4.0f);
-    o->header.gfx.scale[1] = ((-sins(o->oWaterObjScaleXAngle) * 0.5f) + 4.0f);
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.5f + 4.0f;
+    o->header.gfx.scale[1] = -sins(o->oWaterObjScaleXAngle) * 0.5f + 4.0f;
     o->oWaterObjScaleXAngle += 0x400;
     if (o->oTimer < 30) {
         cur_obj_become_intangible();
@@ -22,8 +22,8 @@ void bhv_water_air_bubble_loop(void) {
         cur_obj_move_using_fvel_and_gravity();
     }
 
-    o->oPosX += ((random_float() * 4.0f) - 2.0f);
-    o->oPosZ += ((random_float() * 4.0f) - 2.0f);
+    o->oPosX += random_float() * 4.0f - 2.0f;
+    o->oPosZ += random_float() * 4.0f - 2.0f;
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED || o->oTimer > 200) {
         cur_obj_play_sound_2(SOUND_GENERAL_QUIET_BUBBLE);
@@ -40,8 +40,8 @@ void bhv_water_air_bubble_loop(void) {
 }
 
 void bhv_bubble_wave_init(void) {
-    o->oWaterObjScaleXAngleVel = (0x800 + (s32)(random_float() * 2048.0f));
-    o->oWaterObjScaleYAngleVel = (0x800 + (s32)(random_float() * 2048.0f));
+    o->oWaterObjScaleXAngleVel = 0x800 + (s32)(random_float() * 2048.0f);
+    o->oWaterObjScaleYAngleVel = 0x800 + (s32)(random_float() * 2048.0f);
     cur_obj_play_sound_2(SOUND_GENERAL_QUIET_BUBBLE);
 }
 
@@ -50,19 +50,20 @@ void scale_bubble_random(void) {
 }
 
 void bhv_bubble_maybe_loop(void) {
-    o->oPosY += ((random_float() *  3.0f) + 6.0f);
-    o->oPosX += ((random_float() * 10.0f) - 5.0f);
-    o->oPosZ += ((random_float() * 10.0f) - 5.0f);
-    o->header.gfx.scale[0] = ((sins(o->oWaterObjScaleXAngle) * 0.2f) + 1.0f);
+    o->oPosY += random_float() * 3.0f + 6.0f;
+    o->oPosX += random_float() * 10.0f - 5.0f;
+    o->oPosZ += random_float() * 10.0f - 5.0f;
+
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
-    o->header.gfx.scale[1] = ((sins(o->oWaterObjScaleYAngle) * 0.2f) + 1.0f);
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
 }
 
 void bhv_small_water_wave_loop(void) {
-    o->header.gfx.scale[0] = ((sins(o->oWaterObjScaleXAngle) * 0.2f) + 1.0f);
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
-    o->header.gfx.scale[1] = ((sins(o->oWaterObjScaleYAngle) * 0.2f) + 1.0f);
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
     if (o->oPosY > find_water_level(o->oPosX, o->oPosZ)) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
@@ -78,16 +79,16 @@ void bhv_small_water_wave_loop(void) {
 }
 
 void scale_bubble_sin(void) {
-    o->header.gfx.scale[0] = ((sins(o->oWaterObjScaleXAngle) * 0.5f) + 2.0f);
+    o->header.gfx.scale[0] = sins(o->oWaterObjScaleXAngle) * 0.5f + 2.0f;
     o->oWaterObjScaleXAngle += o->oWaterObjScaleXAngleVel;
-    o->header.gfx.scale[1] = ((sins(o->oWaterObjScaleYAngle) * 0.5f) + 2.0f);
+    o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.5f + 2.0f;
     o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
 }
 
 void bhv_particle_init(void) {
     obj_scale_xyz(o, 2.0f, 2.0f, 1.0f);
-    o->oWaterObjScaleXAngleVel = (0x800 + (s32)(random_float() * 2048.0f));
-    o->oWaterObjScaleYAngleVel = (0x800 + (s32)(random_float() * 2048.0f));
+    o->oWaterObjScaleXAngleVel = 0x800 + (s32)(random_float() * 2048.0f);
+    o->oWaterObjScaleYAngleVel = 0x800 + (s32)(random_float() * 2048.0f);
     obj_translate_xyz_random(o, 100.0f);
 }
 
@@ -108,7 +109,7 @@ void bhv_small_bubbles_loop(void) {
 }
 
 void bhv_fish_group_loop(void) {
-    if ((gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) && (gGlobalTimer & 0x1)) {
+    if ((gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) && (gGlobalTimer & 1)) {
         spawn_object(o, MODEL_WHITE_PARTICLE_SMALL, bhvSmallParticleBubbles);
     }
 }

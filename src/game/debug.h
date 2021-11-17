@@ -13,12 +13,12 @@ enum DebugPage {
 };
 
 #ifdef VANILLA_DEBUG
-s64  get_current_clock(void);
-s64  get_clock_difference(UNUSED s64 cycles);
+s64 get_current_clock(void);
+s64 get_clock_difference(UNUSED s64 cycles);
 void set_text_array_x_y(s32 xOffset, s32 yOffset);
 void print_debug_top_down_objectinfo(const char *str, s32 number);
-void print_debug_top_down_mapinfo(   const char *str, s32 number);
-void print_debug_bottom_up(          const char *str, s32 number);
+void print_debug_top_down_mapinfo(const char *str, s32 number);
+void print_debug_bottom_up(const char *str, s32 number);
 void debug_unknown_level_select_check(void);
 void reset_debug_objectinfo(void);
 void stub_debug_control(void);
@@ -30,8 +30,8 @@ void try_print_debug_mario_level_info(void);
 #define get_clock_difference(cycles)
 #define set_text_array_x_y(xOffset, yOffset)
 #define print_debug_top_down_objectinfo(str, number)
-#define print_debug_top_down_mapinfo(   str, number)
-#define print_debug_bottom_up(          str, number)
+#define print_debug_top_down_mapinfo(str, number)
+#define print_debug_bottom_up(str, number)
 #define debug_unknown_level_select_check()
 #define reset_debug_objectinfo()
 #define stub_debug_control()

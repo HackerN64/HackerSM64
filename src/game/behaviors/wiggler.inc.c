@@ -12,10 +12,10 @@
  */
 static struct ObjectHitbox sWigglerBodyPartHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */  0,
-    /* damageOrCoinValue: */  3,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 3,
     /* health:            */ 99, // never decreases
-    /* numLootCoins:      */  0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 20,
     /* height:            */ 20,
     /* hurtboxRadius:     */ 20,
@@ -27,10 +27,10 @@ static struct ObjectHitbox sWigglerBodyPartHitbox = {
  */
 static struct ObjectHitbox sWigglerHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */  0,
-    /* damageOrCoinValue: */  3,
-    /* health:            */  4,
-    /* numLootCoins:      */  0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 3,
+    /* health:            */ 4,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 60,
     /* height:            */ 50,
     /* hurtboxRadius:     */ 30,
@@ -73,7 +73,7 @@ void bhv_wiggler_body_part_update(void) {
     cur_obj_scale(o->parentObj->header.gfx.scale[0]);
 
     o->oFaceAnglePitch = segment->angle[0];
-    o->oFaceAngleYaw   = segment->angle[1];
+    o->oFaceAngleYaw = segment->angle[1];
 
     // TODO: What is this for?
     f32 posOffset = (-37.5f * o->header.gfx.scale[0]);
@@ -196,7 +196,7 @@ void wiggler_init_segments(void) {
  * If attacked by mario, enter either the jumped on or knockback action.
  */
 static void wiggler_act_walk(void) {
-    o->oWigglerWalkAnimSpeed = (0.06f * o->oForwardVel);
+    o->oWigglerWalkAnimSpeed = 0.06f * o->oForwardVel;
 
     // Update text if necessary
     if (o->oWigglerTextStatus < WIGGLER_TEXT_STATUS_COMPLETED_DIALOG) {
@@ -207,7 +207,7 @@ static void wiggler_act_walk(void) {
 
         // If Mario is positioned below the wiggler, assume he entered through the
         // lower cave entrance, so don't display text.
-        if ((gMarioObject->oPosY < o->oPosY) || cur_obj_update_dialog_with_cutscene(
+        if (gMarioObject->oPosY < o->oPosY || cur_obj_update_dialog_with_cutscene(
             MARIO_DIALOG_LOOK_UP, DIALOG_FLAG_NONE, CUTSCENE_DIALOG, DIALOG_150)) {
             o->oWigglerTextStatus = WIGGLER_TEXT_STATUS_COMPLETED_DIALOG;
         }
@@ -233,7 +233,7 @@ static void wiggler_act_walk(void) {
                 } else if (o->oWigglerTimeUntilRandomTurn != 0) {
                     o->oWigglerTimeUntilRandomTurn--;
                 } else {
-                    o->oWigglerTargetYaw = (o->oMoveAngleYaw + (0x4000 * (s16) random_sign()));
+                    o->oWigglerTargetYaw = o->oMoveAngleYaw + 0x4000 * (s16) random_sign();
                     o->oWigglerTimeUntilRandomTurn = random_linear_offset(30, 50);
                 }
             }
@@ -243,7 +243,7 @@ static void wiggler_act_walk(void) {
         // in practice
         s16 yawTurnSpeed = (s16)(30.0f * o->oForwardVel);
         cur_obj_rotate_yaw_toward(o->oWigglerTargetYaw, yawTurnSpeed);
-        obj_face_yaw_approach(o->oMoveAngleYaw, (2 * yawTurnSpeed));
+        obj_face_yaw_approach(o->oMoveAngleYaw, 2 * yawTurnSpeed);
 
         obj_face_pitch_approach(0, 0x320);
 
@@ -311,12 +311,12 @@ static void wiggler_act_jumped_on(void) {
  */
 static void wiggler_act_knockback(void) {
     if (o->oVelY > 0.0f) {
-        o->oFaceAnglePitch -= (o->oVelY * 30.0f);
+        o->oFaceAnglePitch -= o->oVelY * 30.0f;
     } else {
         obj_face_pitch_approach(0, 0x190);
     }
 
-    if (obj_forward_vel_approach(0.0f, 1.0f) && o->oFaceAnglePitch == 0x0) {
+    if (obj_forward_vel_approach(0.0f, 1.0f) && o->oFaceAnglePitch == 0) {
         o->oAction = WIGGLER_ACT_WALK;
         o->oMoveAngleYaw = o->oFaceAngleYaw;
     }
@@ -390,7 +390,7 @@ void bhv_wiggler_update(void) {
             cur_obj_init_animation_with_accel_and_sound(0, o->oWigglerWalkAnimSpeed);
             if (o->oWigglerWalkAnimSpeed != 0.0f) {
                 cur_obj_play_sound_at_anim_range(0, 13,
-                              ((o->oHealth >= 4) ? SOUND_OBJ_WIGGLER_LOW_PITCH : SOUND_OBJ_WIGGLER_HIGH_PITCH));
+                              o->oHealth >= 4 ? SOUND_OBJ_WIGGLER_LOW_PITCH : SOUND_OBJ_WIGGLER_HIGH_PITCH);
             } else {
                 cur_obj_reverse_animation();
             }

@@ -79,9 +79,9 @@ void bhv_temp_coin_loop(void) {
 }
 
 void bhv_coin_init(void) {
-    o->oVelY         = (((random_float() * 10.0f) + 30) + o->oCoinBaseYVel);
-    o->oForwardVel   =   (random_float() * 10.0f);
-    o->oMoveAngleYaw =    random_u16();
+    o->oVelY = random_float() * 10.0f + 30 + o->oCoinBaseYVel;
+    o->oForwardVel = random_float() * 10.0f;
+    o->oMoveAngleYaw = random_u16();
 
     cur_obj_set_behavior(bhvYellowCoin);
     obj_set_hitbox(o, &sYellowCoinHitbox);
@@ -141,16 +141,18 @@ void bhv_coin_formation_spawned_coin_loop(void) {
         cur_obj_set_behavior(bhvYellowCoin);
         obj_set_hitbox(o, &sYellowCoinHitbox);
         if (o->oCoinSnapToGround) {
+
             o->oPosY += 300.0f;
             cur_obj_update_floor_height();
-            if ((o->oPosY < o->oFloorHeight)
-             || (o->oFloorHeight < FLOOR_LOWER_LIMIT_MISC)) {
+            if (o->oPosY < o->oFloorHeight
+             || o->oFloorHeight < FLOOR_LOWER_LIMIT_MISC) {
                 obj_mark_for_deletion(o);
             } else {
                 o->oPosY = o->oFloorHeight;
             }
         } else {
             cur_obj_update_floor_height();
+
             if (absf(o->oPosY - o->oFloorHeight) > 250.0f) {
                 cur_obj_set_model(MODEL_YELLOW_COIN_NO_SHADOW);
             }
@@ -181,13 +183,13 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
             if (index > 4) spawnCoin = FALSE;
             break;
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING:
-            pos[0] = (sins(index << 13) * 300.0f);
-            pos[2] = (coss(index << 13) * 300.0f);
+            pos[0] = sins(index << 13) * 300.0f;
+            pos[2] = coss(index << 13) * 300.0f;
             break;
         case COIN_FORMATION_BP_SHAPE_VERTICAL_RING:
             snapToGround = FALSE;
-            pos[0] =  (coss(index << 13) * 200.0f);
-            pos[1] = ((sins(index << 13) * 200.0f) + 200.0f);
+            pos[0] = coss(index << 13) * 200.0f;
+            pos[1] = sins(index << 13) * 200.0f + 200.0f;
             break;
         case COIN_FORMATION_BP_SHAPE_ARROW:
             pos[0] = sCoinArrowPositions[index][0];
@@ -214,7 +216,7 @@ void bhv_coin_formation_loop(void) {
 
     switch (o->oAction) {
         case COIN_FORMATION_ACT_INACTIVE:
-            if (o->oDistanceToMario < o->oDrawingDistance) {
+            if (o->oDistanceToMario < COIN_FORMATION_DISTANCE) {
                 for (bitIndex = 0; bitIndex < 8; bitIndex++) {
                     if (!(o->oCoinRespawnBits & (1 << bitIndex))) {
                         spawn_coin_in_formation(bitIndex, o->oBehParams2ndByte);
@@ -224,7 +226,7 @@ void bhv_coin_formation_loop(void) {
             }
             break;
         case COIN_FORMATION_ACT_ACTIVE:
-            if (o->oDistanceToMario > (o->oDrawingDistance + 100.0f)) {
+            if (o->oDistanceToMario > (COIN_FORMATION_DISTANCE + 100.0f)) {
                 o->oAction = COIN_FORMATION_ACT_DEACTIVATE;
             }
             break;

@@ -207,14 +207,16 @@ void ukiki_act_unused_turn(void) {
  * Turns ukiki to face towards Mario while moving with slow forward velocity.
  */
 void ukiki_act_turn_to_mario(void) {
+    s32 facingMario;
+
     // Initialize the action with a random fVel from 2-5.
     if (o->oTimer == 0) {
-        o->oForwardVel = ((random_float() * 3.0f) + 2.0f);
+        o->oForwardVel = random_float() * 3.0f + 2.0f;
     }
 
     cur_obj_init_animation_with_sound(UKIKI_ANIM_TURN);
 
-    s32 facingMario = cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x800);
+    facingMario = cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x800);
 
     if (facingMario) {
         o->oAction = UKIKI_ACT_IDLE;
@@ -234,7 +236,7 @@ void ukiki_act_turn_to_mario(void) {
  */
 void ukiki_act_run(void) {
     s32 fleeMario = TRUE;
-    s16 goalYaw = (o->oAngleToMario + 0x8000);
+    s16 goalYaw = o->oAngleToMario + 0x8000;
 
     if (is_cap_ukiki_and_mario_has_normal_cap_on_head()) {
         fleeMario = FALSE;
@@ -242,7 +244,7 @@ void ukiki_act_run(void) {
     }
 
     if (o->oTimer == 0) {
-        o->oUkikiChaseFleeRange = ((random_float() * 100.0f) + 350.0f);
+        o->oUkikiChaseFleeRange = random_float() * 100.0f + 350.0f;
     }
 
     cur_obj_init_animation_with_sound(UKIKI_ANIM_RUN);
@@ -464,8 +466,7 @@ void ukiki_free_loop(void) {
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sUkikiActions);
 
-    if ((o->oAction == UKIKI_ACT_GO_TO_CAGE)
-     || (o->oAction == UKIKI_ACT_RETURN_HOME)) {
+    if (o->oAction == UKIKI_ACT_GO_TO_CAGE || o->oAction == UKIKI_ACT_RETURN_HOME) {
         steepSlopeAngleDegrees = -88;
     } else {
         steepSlopeAngleDegrees = -20;
@@ -497,7 +498,7 @@ UNUSED static void ukiki_blink_timer(void) {
  * Called by the main behavior function for the cage ukiki whenever it is held.
  */
 void cage_ukiki_held_loop(void) {
-    if ((o->oPosY - o->oHomeY) > -100.0f) {
+    if (o->oPosY - o->oHomeY > -100.0f) {
         switch (o->oUkikiTextState) {
             case UKIKI_TEXT_DEFAULT:
                 if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_UP) == MARIO_DIALOG_STATUS_SPEAK) {
@@ -624,6 +625,7 @@ void bhv_ukiki_loop(void) {
     }
 
     o->oInteractStatus = INT_STATUS_NONE;
+
     print_debug_bottom_up("mode   %d\n", o->oAction);
     print_debug_bottom_up("action %d\n", o->oHeldState);
 }

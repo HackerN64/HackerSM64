@@ -4,10 +4,10 @@ void bhv_tree_snow_or_leaf_loop(void) {
     cur_obj_update_floor_height();
 
     if (o->oTimer == 0) {
-        o->oAngleVelPitch = ((random_float() - 0.5f) * 0x1000);
-        o->oAngleVelRoll  = ((random_float() - 0.5f) * 0x1000);
+        o->oAngleVelPitch = (random_float() - 0.5f) * 0x1000;
+        o->oAngleVelRoll = (random_float() - 0.5f) * 0x1000;
         o->oTreeSnowOrLeafSidewardVel = 4;
-        o->oTreeSnowOrLeafSidewardAngleVel = ((random_float() * 0x400) + 0x600);
+        o->oTreeSnowOrLeafSidewardAngleVel = random_float() * 0x400 + 0x600;
     }
     if ((o->oPosY < o->oFloorHeight)
      || (o->oFloorHeight < FLOOR_LOWER_LIMIT)
@@ -26,8 +26,8 @@ void bhv_tree_snow_or_leaf_loop(void) {
     } else {
         o->oForwardVel = 0.0f;
     }
-    o->oPosX += (sins(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafSidewardAngle) * o->oTreeSnowOrLeafSidewardVel);
-    o->oPosZ += (coss(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafSidewardAngle) * o->oTreeSnowOrLeafSidewardVel);
+    o->oPosX += sins(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafSidewardAngle) * o->oTreeSnowOrLeafSidewardVel;
+    o->oPosZ += coss(o->oMoveAngleYaw) * sins(o->oTreeSnowOrLeafSidewardAngle) * o->oTreeSnowOrLeafSidewardVel;
     o->oTreeSnowOrLeafSidewardAngle += o->oTreeSnowOrLeafSidewardAngleVel;
     o->oPosY += o->oVelY;
 }
@@ -45,20 +45,20 @@ void bhv_snow_leaf_particle_spawn_init(void) {
             scale = random_float();
             obj_scale(obj, scale);
             obj->oMoveAngleYaw = random_u16();
-            obj->oForwardVel = (random_float() *  5.0f);
-            obj->oVelY       = (random_float() * 15.0f);
+            obj->oForwardVel = random_float() * 5.0f;
+            obj->oVelY = random_float() * 15.0f;
         }
     } else {
         if (random_float() < 0.3f) {
             obj = spawn_object(o, MODEL_LEAVES, bhvTreeLeaf);
-            scale = (random_float() * 3.0f);
+            scale = random_float() * 3.0f;
             obj_scale(obj, scale);
             obj->oMoveAngleYaw = random_u16();
-            obj->oForwardVel   = ((random_float() *  5.0f) + 5.0f);
-            obj->oVelY         = (random_float() * 15.0f);
+            obj->oForwardVel = random_float() * 5.0f + 5.0f;
+            obj->oVelY = random_float() * 15.0f;
             obj->oFaceAnglePitch = random_u16();
-            obj->oFaceAngleRoll  = random_u16();
-            obj->oFaceAngleYaw   = random_u16();
+            obj->oFaceAngleRoll = random_u16();
+            obj->oFaceAngleYaw = random_u16();
         }
     }
 }

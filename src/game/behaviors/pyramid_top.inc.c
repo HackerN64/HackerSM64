@@ -27,11 +27,11 @@ void bhv_pyramid_top_init(void) {
  */
 void bhv_pyramid_top_spinning(void) {
     // (TODO: What is this doing)
-    o->oPosX = (o->oHomeX + (sins(o->oTimer * 0x4000) * 40.0f));
+    o->oPosX = o->oHomeX + sins(o->oTimer * 0x4000) * 40.0f;
 
     // At first, move upward smoothly without rotating.
     if (o->oTimer < 60) {
-        o->oPosY = (o->oHomeY + absf(sins(o->oTimer * 0x2000) * 10.0f));
+        o->oPosY = o->oHomeY + absf(sins(o->oTimer * 0x2000) * 10.0f);
     } else {
         // Then, rotate at an accelerating rate, and move upward at a constant rate.
         o->oAngleVelYaw += 0x100;

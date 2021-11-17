@@ -134,7 +134,8 @@ s32 intro_level_select(void) {
     if (gCurrLevelNum < LEVEL_MIN) gCurrLevelNum = LEVEL_MAX; // exceeded min. set to max.
     // Use file 4 and last act as a test
     gCurrSaveFileNum = 4;
-    gCurrActNum      = 6;
+    gCurrActNum = 6;
+
     print_text_centered(160, 80, "SELECT STAGE");
     print_text_centered(160, 30, "PRESS START BUTTON");
     print_text_fmt_int(40, 60, "%2d", gCurrLevelNum);
@@ -217,7 +218,7 @@ s32 intro_game_over(void) {
         queue_rumble_decay(1);
 #endif
         // same criteria as intro_regular
-        level = (LEVEL_FILE_SELECT + gDebugLevelSelect);
+        level = LEVEL_FILE_SELECT + gDebugLevelSelect;
         sPlayMarioGameOver = TRUE;
     }
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)

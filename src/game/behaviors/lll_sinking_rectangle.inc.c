@@ -17,10 +17,10 @@ void sinking_rectangular_plat_actions(f32 a0, s32 a1) {
 }
 
 void bhv_lll_sinking_rectangular_platform_loop(void) {
-    if (o->oMoveAngleYaw != 0x0) {
+    if (o->oMoveAngleYaw != 0) {
         sinking_rectangular_plat_actions(0.4f, 0x100);
     } else {
-        o->oFaceAnglePitch = (sins(o->oLllWoodPieceOscillationTimer) * 0x200);
+        o->oFaceAnglePitch = sins(o->oLllWoodPieceOscillationTimer) * 0x200;
         o->oLllWoodPieceOscillationTimer += 0x100;
     }
 }

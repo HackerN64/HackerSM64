@@ -440,12 +440,12 @@ else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
-EMULATOR     = ~/Downloads/mupen64plus/mupen64plus-gui
-EMU_FLAGS    =
-LOADER       = loader64
+EMULATOR = ~/Downloads/mupen64plus/mupen64plus-gui
+EMU_FLAGS =
+LOADER = loader64
 LOADER_FLAGS = -vwf
-SHA1SUM      = sha1sum
-PRINT        = printf
+SHA1SUM = sha1sum
+PRINT = printf
 
 ifeq ($(COLOR),1)
 NO_COL  := \033[0m
@@ -557,7 +557,6 @@ $(BUILD_DIR)/src/menu/file_select.o: $(BUILD_DIR)/include/text_strings.h
 $(BUILD_DIR)/src/menu/star_select.o: $(BUILD_DIR)/include/text_strings.h
 $(BUILD_DIR)/src/game/ingame_menu.o: $(BUILD_DIR)/include/text_strings.h
 $(BUILD_DIR)/src/game/puppycam2.o:   $(BUILD_DIR)/include/text_strings.h
-
 
 
 #==============================================================================#

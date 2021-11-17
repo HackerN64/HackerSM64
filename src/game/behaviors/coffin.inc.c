@@ -37,7 +37,7 @@ void bhv_coffin_spawner_loop(void) {
                 relativeZ = coffinRelativePos[i].z;
 
                 // Behavior param of 0 for all even i, 1 for all odd
-                coffin = spawn_object_relative(i & 0x1, coffinRelativePos[i].x, 0, relativeZ, o,
+                coffin = spawn_object_relative(i & 1, coffinRelativePos[i].x, 0, relativeZ, o,
                                                MODEL_BBH_WOODEN_TOMB, bhvCoffin);
 
                 // Never true, game would enter a while(1) before it could.
@@ -87,19 +87,19 @@ void coffin_act_idle(void) {
             f32 yawCos = coss(o->oFaceAngleYaw);
             // f32 yawSin = sins(o->oFaceAngleYaw);
 
-            f32 dx = (gMarioObject->oPosX - o->oPosX);
-            f32 dz = (gMarioObject->oPosZ - o->oPosZ);
+            f32 dx = gMarioObject->oPosX - o->oPosX;
+            f32 dz = gMarioObject->oPosZ - o->oPosZ;
 
-            f32 distForwards = (dx * yawCos); // + dz * yawSin;
-            f32 distSideways = (dz * yawCos); // - dx * yawSin;
+            f32 distForwards = dx * yawCos; // + dz * yawSin;
+            f32 distSideways = dz * yawCos; // - dx * yawSin;
 
             // This checks a box around the coffin and if it has been a bit since it stood up.
             // It also checks in the case Mario is squished, so he doesn't get permanently squished.
             if ((o->oTimer > 60)
-             && ((o->oDistanceToMario > 100.0f) || (gMarioState->action == ACT_SQUISHED))
-             && ((gMarioObject->oPosY - o->oPosY) < 200.0f)
+             && (o->oDistanceToMario > 100.0f || gMarioState->action == ACT_SQUISHED)
+             && (gMarioObject->oPosY - o->oPosY < 200.0f)
              && (absf(distForwards) < 140.0f)
-             && (distSideways <  150.0f)
+             && (distSideways < 150.0f)
              && (distSideways > -450.0f)) {
                 cur_obj_play_sound_2(SOUND_GENERAL_BUTTON_PRESS_2_LOWPRIO);
                 o->oAction = COFFIN_ACT_STAND_UP;
@@ -131,7 +131,7 @@ void coffin_act_stand_up(void) {
             o->oFaceAngleRoll = ((400 * (gGlobalTimer & 0x1)) - 200);
         }
 
-        o->oAngleVelPitch = 0x0;
+        o->oAngleVelPitch = 0;
     }
 }
 

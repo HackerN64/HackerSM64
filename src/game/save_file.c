@@ -63,7 +63,7 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
 
     if (gEepromProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = ((u32)((u8 *) buffer - (u8 *) &gSaveBuffer) / 8);
+        u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer) / 8;
 
         do {
 #if ENABLE_RUMBLE
@@ -74,7 +74,7 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
-        } while ((triesLeft > 0) && (status != 0));
+        } while (triesLeft > 0 && status != 0);
     }
 
     return status;
@@ -91,7 +91,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
 
     if (gEepromProbe != 0) {
         s32 triesLeft = 4;
-        u32 offset = ((u32)((u8 *) buffer - (u8 *) &gSaveBuffer) >> 3);
+        u32 offset = (u32)((u8 *) buffer - (u8 *) &gSaveBuffer) >> 3;
 
         do {
 #if ENABLE_RUMBLE
@@ -102,7 +102,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
-        } while ((triesLeft > 0) && (status != 0));
+        } while (triesLeft > 0 && status != 0);
     }
 
     return status;
@@ -131,7 +131,7 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
-        } while ((triesLeft > 0) && (status != 0));
+        } while (triesLeft > 0 && status != 0);
     }
 
     return status;
@@ -159,7 +159,7 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
-        } while ((triesLeft > 0) && (status != 0));
+        } while (triesLeft > 0 && status != 0);
     }
 
     return status;
@@ -209,7 +209,7 @@ static void add_save_block_signature(void *buffer, s32 size, u16 magic) {
  * Copy main menu data from one backup slot to the other slot.
  */
 static void restore_main_menu_data(s32 srcSlot) {
-    s32 destSlot = (srcSlot ^ 1);
+    s32 destSlot = srcSlot ^ 1;
 
     // Compute checksum on source data
     add_save_block_signature(&gSaveBuffer.menuData[srcSlot], sizeof(gSaveBuffer.menuData[srcSlot]), MENU_DATA_MAGIC);
@@ -249,14 +249,14 @@ static void wipe_main_menu_data(void) {
 }
 
 static s32 get_coin_score_age(s32 fileIndex, s32 courseIndex) {
-    return ((gSaveBuffer.menuData[0].coinScoreAges[fileIndex] >> (2 * courseIndex)) & 0x3);
+    return (gSaveBuffer.menuData[0].coinScoreAges[fileIndex] >> (2 * courseIndex)) & 0x3;
 }
 
 static void set_coin_score_age(s32 fileIndex, s32 courseIndex, s32 age) {
-    s32 mask = (0x3 << (2 * courseIndex));
+    s32 mask = 0x3 << (2 * courseIndex);
 
     gSaveBuffer.menuData[0].coinScoreAges[fileIndex] &= ~mask;
-    gSaveBuffer.menuData[0].coinScoreAges[fileIndex] |= (age << (2 * courseIndex));
+    gSaveBuffer.menuData[0].coinScoreAges[fileIndex] |= age << (2 * courseIndex);
 }
 
 /**
@@ -271,7 +271,7 @@ static void touch_coin_score_age(s32 fileIndex, s32 courseIndex) {
         for (i = 0; i < NUM_SAVE_FILES; i++) {
             age = get_coin_score_age(i, courseIndex);
             if (age < currentAge) {
-                set_coin_score_age(i, courseIndex, (age + 1));
+                set_coin_score_age(i, courseIndex, age + 1);
             }
         }
 
@@ -349,14 +349,17 @@ void save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
 }
 
 void save_file_load_all(void) {
+    s32 file;
+    s32 validSlots;
+
     gMainMenuDataModified = FALSE;
-    gSaveFileModified     = FALSE;
+    gSaveFileModified = FALSE;
 
     bzero(&gSaveBuffer, sizeof(gSaveBuffer));
     read_eeprom_data(&gSaveBuffer, sizeof(gSaveBuffer));
 
     // Verify the main menu data and create a backup copy if only one of the slots is valid.
-    s32 validSlots  =  verify_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
+    validSlots = verify_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
     // validSlots |= (verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1);
     switch (validSlots) {
         case 0: // Neither copy is correct
@@ -370,11 +373,10 @@ void save_file_load_all(void) {
             break;
     }
 
-    s32 file;
     for (file = 0; file < NUM_SAVE_FILES; file++) {
         // Verify the save file and create a backup copy if only one of the slots is valid.
-        validSlots  =  verify_save_block_signature(&gSaveBuffer.files[file][0], sizeof(gSaveBuffer.files[file][0]), SAVE_FILE_MAGIC);
-        validSlots |= (verify_save_block_signature(&gSaveBuffer.files[file][1], sizeof(gSaveBuffer.files[file][1]), SAVE_FILE_MAGIC) << 1);
+        validSlots = verify_save_block_signature(&gSaveBuffer.files[file][0], sizeof(gSaveBuffer.files[file][0]), SAVE_FILE_MAGIC);
+        validSlots |= verify_save_block_signature(&gSaveBuffer.files[file][1], sizeof(gSaveBuffer.files[file][1]), SAVE_FILE_MAGIC) << 1;
         switch (validSlots) {
             case 0: // Neither copy is correct
                 save_file_erase(file);
@@ -440,7 +442,7 @@ void save_file_reload(void) {
     bcopy(&gSaveBuffer.menuData[1], &gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]));
 
     gMainMenuDataModified = FALSE;
-    gSaveFileModified     = FALSE;
+    gSaveFileModified = FALSE;
 }
 
 /**
@@ -448,19 +450,19 @@ void save_file_reload(void) {
  * If coin score is greater than the current high score, update it.
  */
 void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
-    s32 fileIndex = (gCurrSaveFileNum - 1);
+    s32 fileIndex = gCurrSaveFileNum - 1;
     s32 courseIndex = COURSE_NUM_TO_INDEX(gCurrCourseNum);
 #ifdef GLOBAL_STAR_IDS
     s32 starByte = COURSE_NUM_TO_INDEX(starIndex / 7);
-    s32 starFlag = (1 << (starIndex % 7));
+    s32 starFlag = 1 << (starIndex % 7);
 #else
-    s32 starFlag = (1 << starIndex);
+    s32 starFlag = 1 << starIndex;
 #endif
 
-    gLastCompletedCourseNum     = (courseIndex + 1);
-    gLastCompletedStarNum       = (  starIndex + 1);
+    gLastCompletedCourseNum = courseIndex + 1;
+    gLastCompletedStarNum = starIndex + 1;
     sUnusedGotGlobalCoinHiScore = FALSE;
-    gGotFileCoinHiScore         = FALSE;
+    gGotFileCoinHiScore = FALSE;
 
     if (courseIndex >= COURSE_NUM_TO_INDEX(COURSE_MIN)
      && courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
@@ -476,7 +478,7 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
             touch_coin_score_age(fileIndex, courseIndex);
 
             gGotFileCoinHiScore = TRUE;
-            gSaveFileModified   = TRUE;
+            gSaveFileModified = TRUE;
         }
     }
 
@@ -511,7 +513,7 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
 }
 
 s32 save_file_exists(s32 fileIndex) {
-    return ((gSaveBuffer.files[fileIndex][0].flags & SAVE_FLAG_FILE_EXISTS) != 0);
+    return (gSaveBuffer.files[fileIndex][0].flags & SAVE_FLAG_FILE_EXISTS) != 0;
 }
 
 /**
@@ -521,23 +523,23 @@ s32 save_file_exists(s32 fileIndex) {
  */
 u32 save_file_get_max_coin_score(s32 courseIndex) {
     s32 fileIndex;
-    s32 maxCoinScore    = -1;
-    s32 maxScoreAge     = -1;
-    s32 maxScoreFileNum =  0;
+    s32 maxCoinScore = -1;
+    s32 maxScoreAge = -1;
+    s32 maxScoreFileNum = 0;
 
     for (fileIndex = 0; fileIndex < NUM_SAVE_FILES; fileIndex++) {
         if (save_file_get_star_flags(fileIndex, courseIndex) != 0) {
             s32 coinScore = save_file_get_course_coin_score(fileIndex, courseIndex);
-            s32 scoreAge  = get_coin_score_age(fileIndex, courseIndex);
+            s32 scoreAge = get_coin_score_age(fileIndex, courseIndex);
 
-            if ((coinScore > maxCoinScore) || ((coinScore == maxCoinScore) && (scoreAge > maxScoreAge))) {
-                maxCoinScore    = coinScore;
-                maxScoreAge     = scoreAge;
-                maxScoreFileNum = (fileIndex + 1);
+            if (coinScore > maxCoinScore || (coinScore == maxCoinScore && scoreAge > maxScoreAge)) {
+                maxCoinScore = coinScore;
+                maxScoreAge = scoreAge;
+                maxScoreFileNum = fileIndex + 1;
             }
         }
     }
-    return ((maxScoreFileNum << 16) + MAX(maxCoinScore, 0));
+    return (maxScoreFileNum << 16) + MAX(maxCoinScore, 0);
 }
 
 #ifdef COMPLETE_SAVE_FILE
@@ -547,7 +549,7 @@ s32 save_file_get_course_star_count(UNUSED s32 fileIndex, UNUSED s32 courseIndex
 s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
     s32 i;
     s32 count = 0;
-    u8 flag   = 0x1;
+    u8 flag = 1;
     u8 starFlags = save_file_get_star_flags(fileIndex, courseIndex);
 
     for (i = 0; i < 7; i++, flag <<= 1) {
@@ -568,7 +570,7 @@ s32 save_file_get_total_star_count(s32 fileIndex, s32 minCourse, s32 maxCourse) 
     }
 
     // Add castle secret star count.
-    return (save_file_get_course_star_count(fileIndex, COURSE_NUM_TO_INDEX(COURSE_NONE)) + count);
+    return save_file_get_course_star_count(fileIndex, COURSE_NUM_TO_INDEX(COURSE_NONE)) + count;
 }
 
 void save_file_set_flags(u32 flags) {
@@ -605,7 +607,7 @@ u32 save_file_get_flags(void) {
             SAVE_FLAG_COLLECTED_MIPS_STAR_1  |
             SAVE_FLAG_COLLECTED_MIPS_STAR_2);
 #else
-    if ((gCurrCreditsEntry != NULL) || (gCurrDemoInput != NULL)) {
+    if (gCurrCreditsEntry != NULL || gCurrDemoInput != NULL) {
         return 0;
     }
     return gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags;
@@ -668,7 +670,7 @@ s32 save_file_is_cannon_unlocked(void) {
  */
 void save_file_set_cannon_unlocked(void) {
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] |= COURSE_FLAG_CANNON_UNLOCKED;
-    gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags                       |= SAVE_FLAG_FILE_EXISTS;
+    gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
 }
 
@@ -679,7 +681,7 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
 #endif
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
     saveFile->capLevel = gCurrLevelNum;
-    saveFile->capArea  = gCurrAreaIndex;
+    saveFile->capArea = gCurrAreaIndex;
 #ifndef SAVE_NUM_LIVES
     vec3s_set(saveFile->capPos, x, y, z);
 #endif
@@ -690,8 +692,8 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
     s32 flags = save_file_get_flags();
 
-    if ((saveFile->capLevel == gCurrLevelNum)
-     && (saveFile->capArea == gCurrAreaIndex)
+    if (saveFile->capLevel == gCurrLevelNum
+     && saveFile->capArea == gCurrAreaIndex
      && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
 #ifdef SAVE_NUM_LIVES
         vec3_zero(capPos);
@@ -706,9 +708,9 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
 #ifdef SAVE_NUM_LIVES
 void save_file_set_num_lives(s8 numLives) {
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
-    saveFile->numLives        = numLives;
-    saveFile->flags          |= SAVE_FLAG_FILE_EXISTS;
-    gSaveFileModified         = TRUE;
+    saveFile->numLives = numLives;
+    saveFile->flags |= SAVE_FLAG_FILE_EXISTS;
+    gSaveFileModified = TRUE;
 }
 
 s32 save_file_get_num_lives(void) {
@@ -777,11 +779,11 @@ void disable_warp_checkpoint(void) {
 void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
     if (warpNode->destLevel & WARP_CHECKPOINT) {
         // Overwrite the warp checkpoint variables.
-        gWarpCheckpoint.actNum    = gCurrActNum;
+        gWarpCheckpoint.actNum = gCurrActNum;
         gWarpCheckpoint.courseNum = gCurrCourseNum;
-        gWarpCheckpoint.levelID   = (warpNode->destLevel & 0x7F);
-        gWarpCheckpoint.areaNum   = warpNode->destArea;
-        gWarpCheckpoint.warpNode  = warpNode->destNode;
+        gWarpCheckpoint.levelID = warpNode->destLevel & 0x7F;
+        gWarpCheckpoint.areaNum = warpNode->destArea;
+        gWarpCheckpoint.warpNode = warpNode->destNode;
     }
 }
 
@@ -795,12 +797,12 @@ s32 check_warp_checkpoint(struct WarpNode *warpNode) {
     s16 currCourseNum = gLevelToCourseNumTable[(warpNode->destLevel & 0x7F) - 1];
 
     // gSavedCourseNum is only used in this function.
-    if ((gWarpCheckpoint.courseNum != COURSE_NONE)
-     && (gSavedCourseNum == currCourseNum)
-     && (gWarpCheckpoint.actNum == gCurrActNum)) {
-        warpNode->destLevel  = gWarpCheckpoint.levelID;
-        warpNode->destArea   = gWarpCheckpoint.areaNum;
-        warpNode->destNode   = gWarpCheckpoint.warpNode;
+    if (gWarpCheckpoint.courseNum != COURSE_NONE
+     && gSavedCourseNum == currCourseNum
+     && gWarpCheckpoint.actNum == gCurrActNum) {
+        warpNode->destLevel = gWarpCheckpoint.levelID;
+        warpNode->destArea = gWarpCheckpoint.areaNum;
+        warpNode->destNode = gWarpCheckpoint.warpNode;
         warpCheckpointActive = TRUE;
     } else {
         // Disable the warp checkpoint just in case the other 2 conditions failed?

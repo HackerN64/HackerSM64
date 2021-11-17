@@ -21,13 +21,12 @@ void bhv_wind_loop(void) {
             o->oForwardVel = random_float() * 70.0f + 50.0f;
         } else {
             obj_translate_xz_random(o, 600.0f);
-            o->oPosY -= 500 - 200; // 300
+            o->oPosY -= 300;
             o->oVelY = random_float() * 30.0f + 50.0f;
             o->oMoveAngleYaw = random_u16();
             o->oForwardVel = 10.0f;
         }
         obj_set_billboard(o);
-        cur_obj_scale(1.0f); //?
     }
 
     if (o->oTimer > 8) {

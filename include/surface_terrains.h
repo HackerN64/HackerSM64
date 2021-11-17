@@ -5,6 +5,7 @@
 
 // Surface Types
 enum SurfaceTypes {
+    SURFACE_NULL = -1,
     SURFACE_DEFAULT,                    // 0x0000 // Environment default
     SURFACE_BURNING,                    // 0x0001 // Lava / Frostbite (in SL), but is used mostly for Lava
     SURFACE_NEW_WATER,                  // 0x0002 // Custom water surface

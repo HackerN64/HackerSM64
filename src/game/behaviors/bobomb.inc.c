@@ -46,9 +46,9 @@ void bobomb_check_interactions(void) {
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         if (o->oInteractStatus & INT_STATUS_MARIO_KNOCKBACK_DMG) {
             o->oMoveAngleYaw = gMarioObject->header.gfx.angle[1];
-            o->oForwardVel   = 25.0f;
-            o->oVelY         = 30.0f;
-            o->oAction       = BOBOMB_ACT_LAUNCHED;
+            o->oForwardVel = 25.0f;
+            o->oVelY = 30.0f;
+            o->oAction = BOBOMB_ACT_LAUNCHED;
         }
 
         if (o->oInteractStatus & INT_STATUS_TOUCHED_BOB_OMB) {
@@ -82,7 +82,7 @@ void bobomb_act_chase_mario(void) {
     o->oForwardVel = 20.0f;
     s16 collisionFlags = object_step();
 
-    if ((animFrame == 5) || (animFrame == 16)) {
+    if (animFrame == 5 || animFrame == 16) {
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK);
     }
 
@@ -193,25 +193,25 @@ void bobomb_dropped_loop(void) {
     cur_obj_init_animation(BOBOMB_ANIM_WALKING);
 
     o->oHeldState = HELD_FREE;
-    o->oAction    = BOBOMB_ACT_PATROL;
+    o->oAction = BOBOMB_ACT_PATROL;
 }
 
 void bobomb_thrown_loop(void) {
     cur_obj_enable_rendering();
 
     o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-    o->oHeldState  = HELD_FREE;
-    o->oFlags     &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
+    o->oHeldState = HELD_FREE;
+    o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
     o->oForwardVel = 25.0f;
-    o->oVelY       = 20.0f;
-    o->oAction     = BOBOMB_ACT_LAUNCHED;
+    o->oVelY = 20.0f;
+    o->oAction = BOBOMB_ACT_LAUNCHED;
 }
 
 void cur_obj_random_blink(s32 *blinkTimer) {
     if (*blinkTimer == 0) {
         if ((s16)(random_float() * 100.0f) == 0) {
             o->oAnimState = 1;
-            *blinkTimer   = 1;
+            *blinkTimer = 1;
         }
     } else {
         (*blinkTimer)++;
@@ -226,7 +226,7 @@ void cur_obj_random_blink(s32 *blinkTimer) {
 
         if (*blinkTimer > 15) {
             o->oAnimState = 0;
-            *blinkTimer   = 0;
+            *blinkTimer = 0;
         }
     }
 }
@@ -275,14 +275,14 @@ void bhv_bobomb_loop(void) {
 }
 
 void bhv_bobomb_fuse_smoke_init(void) {
-    o->oPosX += ((s32)(random_float() * 80.0f) - 40);
-    o->oPosY += ((s32)(random_float() * 80.0f) + 60);
-    o->oPosZ += ((s32)(random_float() * 80.0f) - 40);
+    o->oPosX += (s32)(random_float() * 80.0f) - 40;
+    o->oPosY += (s32)(random_float() * 80.0f) + 60;
+    o->oPosZ += (s32)(random_float() * 80.0f) - 40;
     cur_obj_scale(1.2f);
 }
 
 void bhv_bobomb_buddy_init(void) {
-    o->oGravity  = 2.5f;
+    o->oGravity = 2.5f;
     o->oFriction = 0.8f;
     o->oBuoyancy = 1.3f;
     o->oInteractionSubtype = INT_SUBTYPE_NPC;
@@ -295,7 +295,7 @@ void bobomb_buddy_act_idle(void) {
 
     object_step();
 
-    if ((animFrame == 5) || (animFrame == 16)) {
+    if (animFrame == 5 || animFrame == 16) {
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK);
     }
 
@@ -354,9 +354,9 @@ void bobomb_buddy_cannon_dialog(s16 dialogFirstText, s16 dialogSecondText) {
 
             o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
             o->oBobombBuddyHasTalkedToMario = BOBOMB_BUDDY_HAS_TALKED;
-            o->oInteractStatus              = INT_STATUS_NONE;
-            o->oAction                      = BOBOMB_BUDDY_ACT_IDLE;
-            o->oBobombBuddyCannonStatus     = BOBOMB_BUDDY_CANNON_OPENED;
+            o->oInteractStatus = INT_STATUS_NONE;
+            o->oAction = BOBOMB_BUDDY_ACT_IDLE;
+            o->oBobombBuddyCannonStatus = BOBOMB_BUDDY_CANNON_OPENED;
             break;
     }
 }
@@ -373,8 +373,8 @@ void bobomb_buddy_act_talk(void) {
 
                     o->activeFlags &= ~ACTIVE_FLAG_INITIATED_TIME_STOP;
                     o->oBobombBuddyHasTalkedToMario = BOBOMB_BUDDY_HAS_TALKED;
-                    o->oInteractStatus              = INT_STATUS_NONE;
-                    o->oAction                      = BOBOMB_BUDDY_ACT_IDLE;
+                    o->oInteractStatus = INT_STATUS_NONE;
+                    o->oAction = BOBOMB_BUDDY_ACT_IDLE;
                 }
                 break;
 
@@ -391,7 +391,8 @@ void bobomb_buddy_act_talk(void) {
 
 void bobomb_buddy_act_turn_to_talk(void) {
     s16 animFrame = o->header.gfx.animInfo.animFrame;
-    if ((animFrame == 5) || (animFrame == 16)) {
+
+    if (animFrame == 5 || animFrame == 16) {
         cur_obj_play_sound_2(SOUND_OBJ_BOBOMB_WALK);
     }
 

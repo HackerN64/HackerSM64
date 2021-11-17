@@ -71,7 +71,7 @@ void piranha_plant_act_sleeping(void) {
 
     cur_obj_init_animation_with_sound(PIRANHA_PLANT_ANIM_SLEEPING);
 
-    cur_obj_set_hitbox_radius_and_height( 250.0f, 200.0f);
+    cur_obj_set_hitbox_radius_and_height(250.0f, 200.0f);
     cur_obj_set_hurtbox_radius_and_height(150.0f, 100.0f);
 
     /**
@@ -215,9 +215,7 @@ void piranha_plant_act_respawn(void) {
  * The frames of the Piranha Plant's biting animation on which to play a bite
  * sound.
  */
-static s8 sPiranhaPlantBiteSoundFrames[] = {
-    12, 28, 50, 64, -1
-};
+static s8 sPiranhaPlantBiteSoundFrames[] = { 12, 28, 50, 64, -1 };
 
 /**
  * Make the Piranha Plant bite in the direction of the player. If the player
@@ -234,7 +232,7 @@ void piranha_plant_act_biting(void) {
 
     cur_obj_init_animation_with_sound(PIRANHA_PLANT_ANIM_BITE);
 
-    cur_obj_set_hitbox_radius_and_height( 150.0f, 100.0f);
+    cur_obj_set_hitbox_radius_and_height(150.0f, 100.0f);
     cur_obj_set_hurtbox_radius_and_height(150.0f, 100.0f);
 
     // Play a bite sound effect on certain frames.
@@ -263,8 +261,8 @@ void piranha_plant_act_biting(void) {
  * This is called from both the "stopped biting" state and the "sleeping" state.
  */
 s32 mario_moving_fast_enough_to_make_piranha_plant_bite(void) {
-    return ((gMarioStates[0].vel[1]     > 10.0f)
-         || (gMarioStates[0].forwardVel > 10.0f));
+    return ((gMarioState->vel[1]     > 10.0f)
+         || (gMarioState->forwardVel > 10.0f));
 }
 
 /**
@@ -287,7 +285,7 @@ void piranha_plant_act_stopped_biting(void) {
      * of the Piranha Plant during the short time the Piranha Plant's nod
      * animation plays.
      */
-    if ((o->oDistanceToMario < 400.0f) && mario_moving_fast_enough_to_make_piranha_plant_bite()) {
+    if (o->oDistanceToMario < 400.0f && mario_moving_fast_enough_to_make_piranha_plant_bite()) {
         o->oAction = PIRANHA_PLANT_ACT_BITING;
     }
 }

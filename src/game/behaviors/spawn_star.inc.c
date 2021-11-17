@@ -2,14 +2,14 @@
 
 static struct ObjectHitbox sCollectStarHitbox = {
     /* interactType:      */ INTERACT_STAR_OR_KEY,
-    /* downOffset:        */  0,
-    /* damageOrCoinValue: */  0,
-    /* health:            */  0,
-    /* numLootCoins:      */  0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 80,
     /* height:            */ 50,
-    /* hurtboxRadius:     */  0,
-    /* hurtboxHeight:     */  0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 void bhv_collect_star_init(void) {
@@ -42,8 +42,8 @@ void bhv_star_spawn_init(void) {
     Angle yaw;
     vec3f_get_lateral_dist_and_yaw(&o->oPosVec, &o->oHomeVec, &o->oStarSpawnDisFromHome, &yaw);
     o->oMoveAngleYaw = yaw;
-    o->oVelY       = ((o->oHomeY - o->oPosY)   / 30.0f);
-    o->oForwardVel = (o->oStarSpawnDisFromHome / 30.0f);
+    o->oVelY = (o->oHomeY - o->oPosY) / 30.0f;
+    o->oForwardVel = o->oStarSpawnDisFromHome / 30.0f;
     o->oStarSpawnVelY = o->oPosY;
 #ifdef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (o->oBehParams2ndByte == SPAWN_STAR_ARC_CUTSCENE_BP_DEFAULT_STAR) {
@@ -72,7 +72,7 @@ void bhv_star_spawn_loop(void) {
         case SPAWN_STAR_ARC_CUTSCENE_ACT_GO_TO_HOME:
             obj_move_xyz_using_fvel_and_yaw(o);
             o->oStarSpawnVelY += o->oVelY;
-            o->oPosY = (o->oStarSpawnVelY + (sins((o->oTimer * 0x8000) / 30) * 400.0f));
+            o->oPosY = o->oStarSpawnVelY + sins((o->oTimer * 0x8000) / 30) * 400.0f;
             o->oFaceAngleYaw += 0x1000;
             spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
             cur_obj_play_sound_1(SOUND_ENV_STAR);
@@ -93,7 +93,7 @@ void bhv_star_spawn_loop(void) {
             }
             spawn_object(o, MODEL_NONE, bhvSparkleSpawn);
             obj_move_xyz_using_fvel_and_yaw(o);
-            o->oFaceAngleYaw = ((o->oFaceAngleYaw - (o->oTimer * 0x10)) + 0x1000);
+            o->oFaceAngleYaw = o->oFaceAngleYaw - o->oTimer * 0x10 + 0x1000;
             cur_obj_play_sound_1(SOUND_ENV_STAR);
 
             if (o->oPosY < o->oHomeY) {
@@ -124,8 +124,8 @@ struct Object *spawn_star(struct Object *starObj, f32 x, f32 y, f32 z) {
     starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStarSpawnCoordinates, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
     starObj->oBehParams = o->oBehParams;
     vec3f_set(&starObj->oHomeVec, x, y, z);
-    starObj->oFaceAnglePitch = 0x0;
-    starObj->oFaceAngleRoll  = 0x0;
+    starObj->oFaceAnglePitch = 0;
+    starObj->oFaceAngleRoll = 0;
     return starObj;
 }
 
@@ -159,7 +159,7 @@ void bhv_hidden_red_coin_star_init(void) {
         starObj->oBehParams = o->oBehParams;
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     }
-    o->oHiddenStarTriggerCounter = (8 - numRedCoinsRemaining);
+    o->oHiddenStarTriggerCounter = 8 - numRedCoinsRemaining;
 }
 
 void bhv_hidden_red_coin_star_loop(void) {

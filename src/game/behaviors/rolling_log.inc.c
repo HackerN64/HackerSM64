@@ -7,8 +7,8 @@
 // a rolling log of another variation.
 
 void bhv_ttm_rolling_log_init(void) {
-    o->oRollingLogX       =   3970.0f;
-    o->oRollingLogZ       =   3654.0f;
+    o->oRollingLogX = 3970.0f;
+    o->oRollingLogZ = 3654.0f;
     o->oRollingLogMaxDist = 271037.0f;
     o->oMoveAngleYaw = 8810;
     o->oForwardVel = 0.0f;
@@ -27,6 +27,7 @@ void rolling_log_roll_log(void) {
         } else {
             o->oAngleVelPitch -= 0x10;
         }
+
         o->oAngleVelPitch = CLAMP(o->oAngleVelPitch, -0x200, 0x200);
     } else {
         if (is_point_close_to_object(o, o->oHomeX, o->oHomeY, o->oHomeZ, 100)) {
@@ -63,9 +64,9 @@ void bhv_rolling_log_loop(void) {
 
     rolling_log_roll_log();
 
-    o->oForwardVel = (o->oAngleVelPitch / 0x40);
-    o->oVelX = (o->oForwardVel * sins(o->oMoveAngleYaw));
-    o->oVelZ = (o->oForwardVel * coss(o->oMoveAngleYaw));
+    o->oForwardVel = o->oAngleVelPitch / 0x40;
+    o->oVelX = o->oForwardVel * sins(o->oMoveAngleYaw);
+    o->oVelZ = o->oForwardVel * coss(o->oMoveAngleYaw);
 
     o->oPosX += o->oVelX;
     o->oPosZ += o->oVelZ;
@@ -79,7 +80,7 @@ void bhv_rolling_log_loop(void) {
     }
 
     o->oFaceAnglePitch += o->oAngleVelPitch;
-    if ((absf(o->oFaceAnglePitch & 0x1FFF) < 528.0f) && (o->oAngleVelPitch != 0)) {
+    if (absf(o->oFaceAnglePitch & 0x1FFF) < 528.0f && o->oAngleVelPitch != 0) {
         cur_obj_play_sound_2(SOUND_GENERAL_ROLLING_LOG);
     }
 }

@@ -31,7 +31,8 @@ void bhv_ferris_wheel_axle_init(void) {
     struct Object *platform;
     s32 i;
 
-    o->collisionData = segmented_to_virtual(sFerrisWheelProperties[o->oBehParams2ndByte].axleCollision);
+    o->collisionData =
+        segmented_to_virtual(sFerrisWheelProperties[o->oBehParams2ndByte].axleCollision);
 
     for (i = 0; i < 4; i++) {
         platform = spawn_object_relative(i, 0, 0, 0, o,

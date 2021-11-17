@@ -8,8 +8,8 @@
 #include "synthesis.h"
 
 #define AUDIO_LOCK_UNINITIALIZED 0x00000000
-#define AUDIO_LOCK_NOT_LOADING   0x76557364
-#define AUDIO_LOCK_LOADING       0x19710515
+#define AUDIO_LOCK_NOT_LOADING 0x76557364
+#define AUDIO_LOCK_LOADING 0x19710515
 
 #define NUMAIBUFFERS 3
 
@@ -56,7 +56,7 @@ extern struct NoteSubEu gDefaultNoteSub;
 extern u16 gHeadsetPanQuantization[10];
 #endif
 extern f32 gHeadsetPanVolume[128];
-extern f32  gStereoPanVolume[128];
+extern f32 gStereoPanVolume[128];
 extern f32 gDefaultPanVolume[128];
 
 extern f32 gVolRampingLhs136[128];
@@ -131,19 +131,19 @@ extern u8 D_SH_80350F18;
 extern u8 D_SH_80350F19;
 
 extern OSMesg D_SH_80350F1C[1];
-extern OSMesgQueue  D_SH_80350F20; // address written to D_SH_80350F38
+extern OSMesgQueue D_SH_80350F20; // address written to D_SH_80350F38
 extern OSMesgQueue *D_SH_80350F38;
 
 extern OSMesg D_SH_80350F40[4];
-extern OSMesgQueue  D_SH_80350F50; // address written to D_SH_80350F68
+extern OSMesgQueue D_SH_80350F50; // address written to D_SH_80350F68
 extern OSMesgQueue *D_SH_80350F68;
 
 extern OSMesg D_SH_80350F6C[1];
-extern OSMesgQueue  D_SH_80350F70; // address written to D_SH_80350F88
+extern OSMesgQueue D_SH_80350F70; // address written to D_SH_80350F88
 extern OSMesgQueue *D_SH_80350F88;
 
 extern OSMesg D_SH_80350F8C[1];
-extern OSMesgQueue  D_SH_80350F90; // address written to D_SH_80350F90
+extern OSMesgQueue D_SH_80350F90; // address written to D_SH_80350F90
 extern OSMesgQueue *D_SH_80350FA8;
 #endif
 

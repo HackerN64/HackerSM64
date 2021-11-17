@@ -12,11 +12,11 @@ void bhv_sliding_snow_mound_loop(void) {
             break;
 
         case 1:
-            o->oVelX =  -5.0f;
+            o->oVelX = -5.0f;
             o->oPosX += o->oVelX;
             o->oVelY = -10.0f;
             o->oPosY += o->oVelY;
-            o->oPosZ = (o->oHomeZ - 2.0f);
+            o->oPosZ = o->oHomeZ - 2.0f;
             if (o->oTimer > 50) {
                 o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
             }

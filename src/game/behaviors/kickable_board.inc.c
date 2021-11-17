@@ -22,9 +22,11 @@ void init_kickable_board_rock(void) {
 
 void bhv_kickable_board_loop(void) {
     s32 attackValue;
+
     switch (o->oAction) {
         case KICKABLE_BOARD_ACT_IDLE_VERTICAL:
-            o->oFaceAnglePitch = 0x0;
+            o->oFaceAnglePitch = 0;
+
             if (check_mario_attacking()) {
                 init_kickable_board_rock();
                 o->oAction = KICKABLE_BOARD_ACT_ROCKING;
@@ -34,15 +36,19 @@ void bhv_kickable_board_loop(void) {
             break;
 
         case KICKABLE_BOARD_ACT_ROCKING:
-            o->oFaceAnglePitch = 0x0;
+            o->oFaceAnglePitch = 0;
             load_object_collision_model();
-            o->oFaceAnglePitch = (-sins(o->oKickableBoardRockingAngleAmount) * o->oKickableBoardRockingTimer);
-            if ((o->oTimer > 30) && (attackValue = check_mario_attacking())) {
-                if ((gMarioObject->oPosY > (o->oPosY + 160.0f)) && attackValue == WF_ATTACK_AIR) {
-                    o->oAction = KICKABLE_BOARD_ACT_FALLING;
-                    cur_obj_play_sound_2(SOUND_GENERAL_BUTTON_PRESS_2);
-                } else {
-                    o->oTimer = 0;
+            o->oFaceAnglePitch = -sins(o->oKickableBoardRockingAngleAmount) * o->oKickableBoardRockingTimer;
+
+            if (o->oTimer > 30) {
+                attackValue = check_mario_attacking();
+                if (attackValue) {
+                    if (gMarioObject->oPosY > o->oPosY + 160.0f && attackValue == WF_ATTACK_AIR) {
+                        o->oAction = KICKABLE_BOARD_ACT_FALLING;
+                        cur_obj_play_sound_2(SOUND_GENERAL_BUTTON_PRESS_2);
+                    } else {
+                        o->oTimer = 0;
+                    }
                 }
             }
 
@@ -54,9 +60,11 @@ void bhv_kickable_board_loop(void) {
             } else {
                 init_kickable_board_rock();
             }
+
             if (!(o->oKickableBoardRockingAngleAmount & 0x7FFF)) {
                 cur_obj_play_sound_2(SOUND_GENERAL_BUTTON_PRESS_2);
             }
+
             o->oKickableBoardRockingAngleAmount += 0x400;
             break;
 
@@ -69,7 +77,7 @@ void bhv_kickable_board_loop(void) {
 
             if (o->oFaceAnglePitch < -0x4000) {
                 o->oFaceAnglePitch = -0x4000;
-                o->oAngleVelPitch = 0x0;
+                o->oAngleVelPitch = 0;
                 o->oAction = KICKABLE_BOARD_ACT_IDLE_HORIZONTAL;
 
                 cur_obj_shake_screen(SHAKE_POS_SMALL);

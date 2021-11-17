@@ -12,14 +12,14 @@
  */
 static struct ObjectHitbox sBooCageHitbox = {
     /* interactType:      */ INTERACT_BBH_ENTRANCE,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   0,
-    /* health:            */   0,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 120,
     /* height:            */ 300,
-    /* hurtboxRadius:     */   0,
-    /* hurtboxHeight:     */   0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 /**
@@ -42,7 +42,7 @@ void bhv_boo_cage_loop(void) {
             // Otherwise, stay inside the boo.
             if (o->parentObj->oBooDeathStatus != BOO_DEATH_STATUS_ALIVE) {
                 o->oAction = BOO_CAGE_ACT_FALLING;
-                o->oVelY   = 60.0f;
+                o->oVelY = 60.0f;
                 play_puzzle_jingle();
             } else {
                 obj_copy_pos_and_angle(o, o->parentObj);
@@ -54,7 +54,7 @@ void bhv_boo_cage_loop(void) {
             // Reset pitch and roll. This is useless, since the cage never rotates.
             // Was it meant to rotate inside the boo, like the beta boo key?
             o->oFaceAnglePitch = 0;
-            o->oFaceAngleRoll  = 0;
+            o->oFaceAngleRoll = 0;
 
             // Apply standard physics to the cage.
             cur_obj_update_floor_and_walls();

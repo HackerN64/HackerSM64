@@ -26,7 +26,7 @@
 #define SEGMENT_EFFECT_YAY0          0x0B // | Segment 11 | effect_yay0
 #define SEGMENT_GROUPA_GEO           0x0C // | Segment 12 | Actor group A geo (group1  - group11)
 #define SEGMENT_GROUPB_GEO           0x0D // | Segment 13 | Actor group B geo (group12 - group17)
-#define SEGMENT_ENDING_SCRIPT        0x0E // | Segment 14 | level_ending_entry (/levels/ending/)
+#define SEGMENT_LEVEL_SCRIPT         0x0E // | Segment 14 | level_ending_entry (/levels/ending/), DEFINE_LEVEL
 #define SEGMENT_COMMON0_GEO          0x0F // | Segment 15 | /actors/common0_geo
 #define SEGMENT_LEVEL_ENTRY          0x10 // | Segment 16 | Level Script Entry
 #define SEGMENT_MARIO_ANIMS          0x11 // | Segment 17 | Mario Animations

@@ -2,10 +2,10 @@
 
 static struct ObjectHitbox sMadPianoHitbox = {
     /* interactType:      */ INTERACT_MR_BLIZZARD,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   3,
-    /* health:            */  99,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 3,
+    /* health:            */ 99,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 200,
     /* height:            */ 150,
     /* hurtboxRadius:     */ 200,
@@ -16,7 +16,7 @@ static void mad_piano_act_wait(void) {
     cur_obj_init_animation_with_sound(0);
 
     if (o->oDistanceToMario < 500.0f) {
-        if ((o->oTimer > 20) && (gMarioStates[0].forwardVel > 10.0f)) {
+        if (o->oTimer > 20 && gMarioStates[0].forwardVel > 10.0f) {
             o->oAction = MAD_PIANO_ACT_ATTACK;
             cur_obj_become_tangible();
         }

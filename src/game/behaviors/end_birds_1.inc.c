@@ -22,5 +22,6 @@ void bhv_end_birds_1_loop(void) {
             }
             break;
     }
+
     cur_obj_set_pos_via_transform();
 }

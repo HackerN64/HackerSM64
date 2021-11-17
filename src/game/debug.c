@@ -101,11 +101,11 @@ UNUSED s64 get_clock_difference(UNUSED s64 cycles) {
  * purposes this creates/formats a new print state.
  */
 void set_print_state_info(s16 *printState, s16 xCursor, s16 yCursor, s16 minYCursor, s16 maxXCursor, s16 lineYOffset) {
-    printState[DEBUG_PSTATE_DISABLED     ] = FALSE;
-    printState[DEBUG_PSTATE_X_CURSOR     ] = xCursor;
-    printState[DEBUG_PSTATE_Y_CURSOR     ] = yCursor;
-    printState[DEBUG_PSTATE_MIN_Y_CURSOR ] = minYCursor;
-    printState[DEBUG_PSTATE_MAX_X_CURSOR ] = maxXCursor;
+    printState[DEBUG_PSTATE_DISABLED] = FALSE;
+    printState[DEBUG_PSTATE_X_CURSOR] = xCursor;
+    printState[DEBUG_PSTATE_Y_CURSOR] = yCursor;
+    printState[DEBUG_PSTATE_MIN_Y_CURSOR] = minYCursor;
+    printState[DEBUG_PSTATE_MAX_X_CURSOR] = maxXCursor;
     printState[DEBUG_PSTATE_LINE_Y_OFFSET] = lineYOffset;
 }
 
@@ -247,7 +247,7 @@ void update_debug_dpadmask(void) {
 
     if (!dPadMask) {
         sDebugInfoDPadUpdID = 0;
-        sDebugInfoDPadMask  = 0;
+        sDebugInfoDPadMask = 0;
     } else {
         // to prevent stuttering of mask updates, the first time is updated 6
         // frames from start, and then every 2 frames when held down.
@@ -276,18 +276,18 @@ void debug_unknown_level_select_check(void) {
         }
 
         gNumCalls.floor = 0;
-        gNumCalls.ceil  = 0;
-        gNumCalls.wall  = 0;
+        gNumCalls.ceil = 0;
+        gNumCalls.wall = 0;
     }
 }
 
 void reset_debug_objectinfo(void) {
-    gNumFindFloorMisses    = 0;
-    gUnknownWallCount      = 0;
-    gObjectCounter         = 0;
+    gNumFindFloorMisses = 0;
+    gUnknownWallCount = 0;
+    gObjectCounter = 0;
     sDebugStringArrPrinted = FALSE;
-    set_print_state_info(gDebugPrintState1,  20, 185, 40, 200, -15);
-    set_print_state_info(gDebugPrintState2, 180,  30,  0, 150,  15);
+    set_print_state_info(gDebugPrintState1, 20, 185, 40, 200, -15);
+    set_print_state_info(gDebugPrintState2, 180, 30, 0, 150, 15);
     update_debug_dpadmask();
 }
 
@@ -298,6 +298,7 @@ void reset_debug_objectinfo(void) {
  */
 UNUSED static void check_debug_button_seq(void) {
     s16 *buttonArr = sDebugInfoButtonSeq;
+
     if (!(gPlayer1Controller->buttonDown & L_TRIG)) {
         sDebugInfoButtonSeqID = 0;
     } else {

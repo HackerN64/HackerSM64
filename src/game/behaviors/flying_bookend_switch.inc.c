@@ -40,8 +40,10 @@ void flying_bookend_act_0(void) {
         cur_obj_play_sound_2(SOUND_OBJ_DEFAULT_DEATH);
 
         o->oAction = 1;
-        o->oBookendTargetPitch = (o->oFaceAnglePitch + 0x7FFF);
-        o->oBookendTargetRoll  = (o->oFaceAngleRoll  - 0x7FFF);
+
+        o->oBookendTargetPitch = o->oFaceAnglePitch + 0x7FFF;
+        o->oBookendTargetRoll  = o->oFaceAngleRoll - 0x7FFF;
+
         cur_obj_set_model(MODEL_BOOKEND_PART);
     }
 }
@@ -134,6 +136,7 @@ void bhv_bookend_spawn_loop(void) {
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         if (o->oTimer > 40 && obj_is_near_to_and_facing_mario(600.0f, 0x2000)) {
             struct Object *bookendObj = spawn_object(o, MODEL_BOOKEND, bhvFlyingBookend);
+
             if (bookendObj != NULL) {
                 bookendObj->oAction = 3;
                 cur_obj_play_sound_2(SOUND_OBJ_DEFAULT_DEATH);
@@ -247,6 +250,7 @@ void bhv_book_switch_loop(void) {
             }
 
             o->oAction = 1;
+
             if (o->oBookSwitchDistFromHome == 0.0f) {
                 cur_obj_play_sound_2(SOUND_OBJ_DEFAULT_DEATH);
             }
@@ -261,6 +265,7 @@ void bhv_book_switch_loop(void) {
             }
         } else {
             cur_obj_become_intangible();
+
             if (approach_f32_ptr(&o->oBookSwitchDistFromHome, 0.0f, 20.0f) && (o->oAction != 0)) {
                 if (o->parentObj->oBookSwitchManagerNumCorrectChoices == o->oBehParams2ndByte) {
                     play_sound(SOUND_GENERAL2_RIGHT_ANSWER, gGlobalSoundSource);
@@ -270,11 +275,12 @@ void bhv_book_switch_loop(void) {
                     s16 z = gMarioObject->oPosZ + (1.5f * gMarioStates[0].vel[2]);
 
                     play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource);
+
                     if (z > 0) z = 0;
 
                     struct Object *bookendObj = spawn_object_abs_with_rot(o, 0, MODEL_BOOKEND, bhvFlyingBookend,
-                                                        0x1FC * rand01 - 0x8CA, 890, z, 0,
-                                                        0x8000 * rand01 + 0x4000, 0);
+                                                     0x1FC * rand01 - 0x8CA, 890, z, 0,
+                                                     0x8000 * rand01 + 0x4000, 0);
 
                     if (bookendObj != NULL) {
                         bookendObj->oAction = 3;

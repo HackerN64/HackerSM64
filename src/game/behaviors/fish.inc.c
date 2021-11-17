@@ -29,7 +29,7 @@ static void fish_spawner_act_spawn(void) {
 #ifdef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
     if (o->oDistanceToMario < minDistToMario) {
 #else
-    if ((o->oDistanceToMario < minDistToMario) || (gCurrLevelNum == LEVEL_SA)) {
+    if (o->oDistanceToMario < minDistToMario || gCurrLevelNum == LEVEL_SA) {
 #endif
         struct Object *fishObject;
         for (i = 0; i < schoolQuantity; i++) {
@@ -96,7 +96,7 @@ static void fish_vertical_roam(s32 speed) {
  * Fish action that randomly roams within a set range.
  */
 static void fish_act_roam(void) {
-    f32 fishY = (o->oPosY - gMarioObject->oPosY);
+    f32 fishY = o->oPosY - gMarioObject->oPosY;
 
     // Alters speed of animation for natural movement.
     if (o->oTimer < 10) {
@@ -107,21 +107,21 @@ static void fish_act_roam(void) {
 
     // Initializes some variables when the fish first begins roaming.
     if (o->oTimer == 0) {
-        o->oForwardVel = ((random_float() * 2) + 3.0f);
+        o->oForwardVel = random_float() * 2 + 3.0f;
 #ifdef DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
-        o->oFishHeightOffset = (random_float() * 100.0f);
+        o->oFishHeightOffset = random_float() * 100.0f;
 #else
-        o->oFishHeightOffset = (random_float() * ((gCurrLevelNum == LEVEL_SA) ? 700.0f : 100.0f));
+        o->oFishHeightOffset = random_float() * ((gCurrLevelNum == LEVEL_SA) ? 700.0f : 100.0f);
 #endif
-        o->oFishRoamDistance = ((random_float() * 500) + 200.0f);
+        o->oFishRoamDistance = random_float() * 500 + 200.0f;
     }
 
-    o->oFishGoalY = (gMarioObject->oPosY + o->oFishHeightOffset);
+    o->oFishGoalY = gMarioObject->oPosY + o->oFishHeightOffset;
 
     // Rotate the fish towards Mario.
     cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x400);
 
-    if (o->oPosY < (o->oFishWaterLevel - 50.0f)) {
+    if (o->oPosY < o->oFishWaterLevel - 50.0f) {
         if (absf(fishY) < 500.0f) {
             fish_vertical_roam(2);
         } else {
@@ -130,14 +130,14 @@ static void fish_act_roam(void) {
 
     // Don't let the fish leave the water vertically.
     } else {
-        o->oPosY = (o->oFishWaterLevel - 50.0f);
+        o->oPosY = o->oFishWaterLevel - 50.0f;
         if (fishY > 300.0f) {
             o->oPosY = o->oPosY - 1.0f;
         }
     }
 
     // Flee from Mario if the fish gets too close.
-    if (o->oDistanceToMario < (o->oFishRoamDistance + 150.0f)) {
+    if (o->oDistanceToMario < o->oFishRoamDistance + 150.0f) {
         o->oAction = FISH_ACT_FLEE;
     }
 }
@@ -146,14 +146,16 @@ static void fish_act_roam(void) {
  * Interactively maneuver fish in relation to its distance from other fish and Mario.
  */
 static void fish_act_flee(void) {
-    f32 fishY = (o->oPosY - gMarioObject->oPosY);
+    f32 fishY = o->oPosY - gMarioObject->oPosY;
+
     o->oFishGoalY = gMarioObject->oPosY + o->oFishHeightOffset;
 
     // Initialize some variables when the flee action first starts.
     if (o->oTimer == 0) {
-        o->oFishActiveDistance = (random_float() * 300.0f);
-        o->oFishYawVel  = ((random_float() * 1024.0f) + 1024.0f);
-        o->oFishGoalVel = ((random_float() * 4.0f) + 8.0f + 5.0f);
+        o->oFishActiveDistance = random_float() * 300.0f;
+        o->oFishYawVel = random_float() * 1024.0f + 1024.0f;
+        o->oFishGoalVel = random_float() * 4.0f + 8.0f + 5.0f;
+
         cur_obj_play_sound_2(SOUND_GENERAL_MOVING_WATER);
     }
 
@@ -183,14 +185,14 @@ static void fish_act_flee(void) {
     // Don't let the fish leave the water vertically.
     } else {
         // Don't let the fish leave the water vertically.
-        o->oPosY = (o->oFishWaterLevel - 50.0f);
+        o->oPosY = o->oFishWaterLevel - 50.0f;
         if (fishY > 300.0f) {
             o->oPosY -= 1.0f;
         }
     }
 
     // If distance to Mario is too great, then set fish to active.
-    if (o->oDistanceToMario > (o->oFishActiveDistance + 500.0f)) {
+    if (o->oDistanceToMario > o->oFishActiveDistance + 500.0f) {
         o->oAction = FISH_ACT_ROAM;
     }
 }
@@ -201,8 +203,8 @@ static void fish_act_flee(void) {
 static void fish_act_init(void) {
     cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
     o->header.gfx.animInfo.animFrame = (s16)(random_float() * 28.0f);
-    o->oFishDepthDistance = (random_float() * 300.0f);
-    cur_obj_scale((random_float() * 0.4f) + 0.8f);
+    o->oFishDepthDistance = random_float() * 300.0f;
+    cur_obj_scale(random_float() * 0.4f + 0.8f);
     o->oAction = FISH_ACT_ROAM;
 }
 

@@ -9,9 +9,9 @@
 static struct ObjectHitbox sAmpHitbox = {
     /* interactType:      */ INTERACT_SHOCK,
     /* downOffset:        */ 40,
-    /* damageOrCoinValue: */  1,
-    /* health:            */  0,
-    /* numLootCoins:      */  0,
+    /* damageOrCoinValue: */ 1,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 40,
     /* height:            */ 50,
     /* hurtboxRadius:     */ 50,
@@ -23,7 +23,7 @@ static struct ObjectHitbox sAmpHitbox = {
  */
 void bhv_homing_amp_init(void) {
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
-    o->oGravity  = 0.0f;
+    o->oGravity = 0.0f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 1.0f;
     o->oHomingAmpAvgY = o->oHomeY;
@@ -93,8 +93,8 @@ static void homing_amp_appear_loop(void) {
  */
 static void homing_amp_chase_loop(void) {
     // Lock on to Mario if he ever goes within 11.25 degrees of the amp's line of sight
-    if (((o->oAngleToMario - 0x400) < o->oMoveAngleYaw)
-     && (o->oMoveAngleYaw < (o->oAngleToMario + 0x400))) {
+    if ((o->oAngleToMario - 0x400 < o->oMoveAngleYaw)
+        && (o->oMoveAngleYaw < o->oAngleToMario + 0x400)) {
         o->oHomingAmpLockedOn = TRUE;
         o->oTimer = 0;
     }
@@ -108,10 +108,10 @@ static void homing_amp_chase_loop(void) {
         // Mario's head. Mario's graphics' Y + 150 is around the top of his head.
         // Note that the average Y will slowly go down to approach his head if the amp
         // is above his head, but if the amp is below it will instantly snap up.
-        if (o->oHomingAmpAvgY > (gMarioObject->header.gfx.pos[1] + 150.0f)) {
+        if (o->oHomingAmpAvgY > gMarioObject->header.gfx.pos[1] + 150.0f) {
             o->oHomingAmpAvgY -= 10.0f;
         } else {
-            o->oHomingAmpAvgY = (gMarioObject->header.gfx.pos[1] + 150.0f);
+            o->oHomingAmpAvgY = gMarioObject->header.gfx.pos[1] + 150.0f;
         }
 
         if (o->oTimer > 30) {
@@ -127,13 +127,13 @@ static void homing_amp_chase_loop(void) {
         // The amp's average Y will approach Mario's graphical Y position + 250
         // at a rate of 10 units per frame. Interestingly, this is different from
         // the + 150 used while chasing him. Could this be a typo?
-        if (o->oHomingAmpAvgY < (gMarioObject->header.gfx.pos[1] + 250.0f)) {
+        if (o->oHomingAmpAvgY < gMarioObject->header.gfx.pos[1] + 250.0f) {
             o->oHomingAmpAvgY += 10.0f;
         }
     }
 
     // The amp's position will sinusoidally oscillate 40 units around its average Y.
-    o->oPosY = (o->oHomingAmpAvgY + (sins(o->oAmpYPhase * 0x400) * 20.0f));
+    o->oPosY = o->oHomingAmpAvgY + sins(o->oAmpYPhase * 0x400) * 20.0f;
 
     // Handle attacks
     check_amp_attack();

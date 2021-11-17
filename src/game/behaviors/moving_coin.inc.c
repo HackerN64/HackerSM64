@@ -2,41 +2,45 @@
 
 static struct ObjectHitbox sMovingYellowCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   1,
-    /* health:            */   0,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 1,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 100,
-    /* height:            */  64,
-    /* hurtboxRadius:     */   0,
-    /* hurtboxHeight:     */   0,
+    /* height:            */ 64,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 static struct ObjectHitbox sMovingBlueCoinHitbox = {
     /* interactType:      */ INTERACT_COIN,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   5,
-    /* health:            */   0,
-    /* numLootCoins:      */   0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 5,
+    /* health:            */ 0,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 100,
-    /* height:            */  64,
-    /* hurtboxRadius:     */   0,
-    /* hurtboxHeight:     */   0,
+    /* height:            */ 64,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 s32 coin_step(s16 *collisionFlagsPtr) {
     *collisionFlagsPtr = object_step();
+
     obj_check_floor_death(*collisionFlagsPtr, sObjFloor);
+
     if ((*collisionFlagsPtr & OBJ_COL_FLAG_GROUNDED)
     && !(*collisionFlagsPtr & OBJ_COL_FLAG_NO_Y_VEL)) {
         cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP);
         return TRUE;
     }
+
     return FALSE;
 }
 
 void moving_coin_flicker(void) {
     s16 collisionFlags;
+
     coin_step(&collisionFlags);
     obj_flicker_and_disappear(o, 0);
 }
@@ -47,7 +51,7 @@ void coin_collected(void) {
 }
 
 void bhv_moving_yellow_coin_init(void) {
-    o->oGravity  = 3.0f;
+    o->oGravity = 3.0f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 1.5f;
 
@@ -60,6 +64,7 @@ void bhv_moving_yellow_coin_loop(void) {
     switch (o->oAction) {
         case MOV_YCOIN_ACT_IDLE:
             coin_step(&collisionFlags);
+
             if (o->oTimer < 10) {
                 cur_obj_become_intangible();
             } else {
@@ -97,9 +102,10 @@ void bhv_moving_yellow_coin_loop(void) {
 }
 
 void bhv_moving_blue_coin_init(void) {
-    o->oGravity  = 5.0f;
+    o->oGravity = 5.0f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 1.5f;
+
     obj_set_hitbox(o, &sMovingBlueCoinHitbox);
 }
 
@@ -115,6 +121,7 @@ void bhv_moving_blue_coin_loop(void) {
 
         case MOV_BCOIN_ACT_MOVING:
             collisionFlags = object_step();
+
             if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
                 o->oForwardVel += 25.0f;
                 if (!(collisionFlags & OBJ_COL_FLAG_NO_Y_VEL)) {
@@ -123,9 +130,11 @@ void bhv_moving_blue_coin_loop(void) {
             } else {
                 o->oForwardVel *= 0.98f;
             }
+
             if (o->oForwardVel > 75.0f) {
                 o->oForwardVel = 75.0f;
             }
+
             obj_flicker_and_disappear(o, 600);
             break;
     }
@@ -137,7 +146,7 @@ void bhv_moving_blue_coin_loop(void) {
 }
 
 void bhv_blue_coin_sliding_jumping_init(void) {
-    o->oGravity  = 3.0f;
+    o->oGravity = 3.0f;
     o->oFriction = 0.98f;
     o->oBuoyancy = 1.5f;
     obj_set_hitbox(o, &sMovingBlueCoinHitbox);
@@ -152,9 +161,11 @@ void blue_coin_sliding_away_from_mario(void) {
     if (coin_step(&collisionFlags)) {
         o->oVelY += 18.0f;
     }
+
     if (collisionFlags & OBJ_COL_FLAG_HIT_WALL) {
         o->oAction = MOV_BCOIN_ACT_STOPPED;
     }
+
     if (!is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 1000)) {
         o->oAction = MOV_BCOIN_ACT_SLOWING_DOWN;
     }
@@ -168,6 +179,7 @@ void blue_coin_sliding_slow_down(void) {
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 500)) {
         o->oAction = MOV_BCOIN_ACT_MOVING;
     }
+
     if (o->oTimer > 150) {
         o->oAction = MOV_BCOIN_ACT_STOPPED;
     }
@@ -181,6 +193,7 @@ void bhv_blue_coin_sliding_loop(void) {
             if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 500)) {
                 o->oAction = MOV_BCOIN_ACT_MOVING;
             }
+
             set_object_visibility(o, 3000);
             break;
 

@@ -210,10 +210,10 @@ static s32 bhv_cmd_delay(void) {
 // Command 0x25: Delays the behavior script for the number of frames given by the value of the specified field.
 // Usage: DELAY_VAR(field)
 static s32 bhv_cmd_delay_var(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
-    s32 num   = cur_obj_get_int(field);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    s32 num = cur_obj_get_int(field);
 
-    if (gCurrentObject->bhvDelayTimer < (num - 1)) {
+    if (gCurrentObject->bhvDelayTimer < num - 1) {
         gCurrentObject->bhvDelayTimer++; // Increment timer
     } else {
         gCurrentObject->bhvDelayTimer = 0;
@@ -259,7 +259,7 @@ static s32 bhv_cmd_begin_repeat(void) {
 // Command 0x06: Marks the end of a repeating loop.
 // Usage: END_REPEAT()
 static s32 bhv_cmd_end_repeat(void) {
-    u32 count = (cur_obj_bhv_stack_pop() - 1); // Retrieve loop count from the stack.
+    u32 count = cur_obj_bhv_stack_pop() - 1; // Retrieve loop count from the stack.
 
     if (count != 0) {
         gCurBhvCommand = (const BehaviorScript *) cur_obj_bhv_stack_pop(); // Jump back to the first command in the loop
@@ -278,7 +278,7 @@ static s32 bhv_cmd_end_repeat(void) {
 // Command 0x07: Also marks the end of a repeating loop, but continues executing commands following the loop on the same frame.
 // Usage: END_REPEAT_CONTINUE()
 static s32 bhv_cmd_end_repeat_continue(void) {
-    u32 count = (cur_obj_bhv_stack_pop() - 1);
+    u32 count = cur_obj_bhv_stack_pop() - 1;
 
     if (count != 0) {
         gCurBhvCommand = (const BehaviorScript *) cur_obj_bhv_stack_pop(); // Jump back to the first command in the loop
@@ -327,7 +327,7 @@ static s32 bhv_cmd_call_native(void) {
 // Command 0x0E: Sets the specified field to a float.
 // Usage: SET_FLOAT(field, value)
 static s32 bhv_cmd_set_float(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
     f32 value = BHV_CMD_GET_2ND_S16(0);
 
     cur_obj_set_float(field, value);
@@ -339,7 +339,7 @@ static s32 bhv_cmd_set_float(void) {
 // Command 0x10: Sets the specified field to an integer.
 // Usage: SET_INT(field, value)
 static s32 bhv_cmd_set_int(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
     s16 value = BHV_CMD_GET_2ND_S16(0);
 
     cur_obj_set_int(field, value);
@@ -350,7 +350,7 @@ static s32 bhv_cmd_set_int(void) {
 
 // Command 0x36: Unused. Sets the specified field to an integer. Wastes 4 bytes of space for no reason at all.
 static s32 bhv_cmd_set_int_unused(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
     s32 value = BHV_CMD_GET_2ND_S16(1); // Taken from 2nd word instead of 1st
 
     cur_obj_set_int(field, value);
@@ -362,8 +362,8 @@ static s32 bhv_cmd_set_int_unused(void) {
 // Command 0x14: Sets the specified field to a random float in the given range.
 // Usage: SET_RANDOM_FLOAT(field, min, range)
 static s32 bhv_cmd_set_random_float(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
-    f32 min   = BHV_CMD_GET_2ND_S16(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    f32 min = BHV_CMD_GET_2ND_S16(0);
     f32 range = BHV_CMD_GET_1ST_S16(1);
 
     cur_obj_set_float(field, (range * random_float()) + min);
@@ -375,8 +375,8 @@ static s32 bhv_cmd_set_random_float(void) {
 // Command 0x15: Sets the specified field to a random integer in the given range.
 // Usage: SET_RANDOM_INT(field, min, range)
 static s32 bhv_cmd_set_random_int(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
-    s32 min   = BHV_CMD_GET_2ND_S16(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    s32 min = BHV_CMD_GET_2ND_S16(0);
     s32 range = BHV_CMD_GET_1ST_S16(1);
 
     cur_obj_set_int(field, (s32)(range * random_float()) + min);
@@ -388,11 +388,11 @@ static s32 bhv_cmd_set_random_int(void) {
 // Command 0x13: Gets a random short, right shifts it the specified amount and adds min to it, then sets the specified field to that value.
 // Usage: SET_INT_RAND_RSHIFT(field, min, rshift)
 static s32 bhv_cmd_set_int_rand_rshift(void) {
-    u8  field  = BHV_CMD_GET_2ND_U8(0);
-    s32 min    = BHV_CMD_GET_2ND_S16(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    s32 min = BHV_CMD_GET_2ND_S16(0);
     s32 rshift = BHV_CMD_GET_1ST_S16(1);
 
-    cur_obj_set_int(field, ((random_u16() >> rshift) + min));
+    cur_obj_set_int(field, (random_u16() >> rshift) + min);
 
     gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
@@ -401,8 +401,8 @@ static s32 bhv_cmd_set_int_rand_rshift(void) {
 // Command 0x16: Adds a random float in the given range to the specified field.
 // Usage: ADD_RANDOM_FLOAT(field, min, range)
 static s32 bhv_cmd_add_random_float(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
-    f32 min   = BHV_CMD_GET_2ND_S16(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    f32 min = BHV_CMD_GET_2ND_S16(0);
     f32 range = BHV_CMD_GET_1ST_S16(1);
 
     cur_obj_set_float(field, (cur_obj_get_float(field) + min + (range * random_float())));
@@ -414,10 +414,10 @@ static s32 bhv_cmd_add_random_float(void) {
 // Command 0x17: Gets a random short, right shifts it the specified amount and adds min to it, then adds the value to the specified field. Unused.
 // Usage: ADD_INT_RAND_RSHIFT(field, min, rshift)
 static s32 bhv_cmd_add_int_rand_rshift(void) {
-    u8  field  = BHV_CMD_GET_2ND_U8(0);
-    s32 min    = BHV_CMD_GET_2ND_S16(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    s32 min = BHV_CMD_GET_2ND_S16(0);
     s32 rshift = BHV_CMD_GET_1ST_S16(1);
-    s32 rnd    = random_u16();
+    s32 rnd = random_u16();
 
     cur_obj_set_int(field, (cur_obj_get_int(field) + min) + (rnd >> rshift));
 
@@ -428,7 +428,7 @@ static s32 bhv_cmd_add_int_rand_rshift(void) {
 // Command 0x0D: Adds a float to the specified field.
 // Usage: ADD_FLOAT(field, value)
 static s32 bhv_cmd_add_float(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
     f32 value = BHV_CMD_GET_2ND_S16(0);
 
     cur_obj_add_float(field, value);
@@ -440,7 +440,7 @@ static s32 bhv_cmd_add_float(void) {
 // Command 0x0F: Adds an integer to the specified field.
 // Usage: ADD_INT(field, value)
 static s32 bhv_cmd_add_int(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
     s16 value = BHV_CMD_GET_2ND_S16(0);
 
     cur_obj_add_int(field, value);
@@ -453,8 +453,8 @@ static s32 bhv_cmd_add_int(void) {
 // Usually used to set an object's flags.
 // Usage: OR_INT(field, value)
 static s32 bhv_cmd_or_int(void) {
-    u8  objectOffset = BHV_CMD_GET_2ND_U8(0);
-    s32 value        = BHV_CMD_GET_2ND_S16(0);
+    u8 objectOffset = BHV_CMD_GET_2ND_U8(0);
+    s32 value = BHV_CMD_GET_2ND_S16(0);
 
     value &= 0xFFFF;
     cur_obj_or_int(objectOffset, value);
@@ -466,7 +466,7 @@ static s32 bhv_cmd_or_int(void) {
 // Command 0x12: Performs a bit clear with the specified short. Unused.
 // Usage: BIT_CLEAR(field, value)
 static s32 bhv_cmd_bit_clear(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
     s32 value = BHV_CMD_GET_2ND_S16(0);
 
     value = (value & 0xFFFF) ^ 0xFFFF;
@@ -540,7 +540,7 @@ static s32 bhv_cmd_nop_2(void) {
 // Command 0x1F: Sets the destination float field to the sum of the values of the given float fields.
 // Usage: SUM_FLOAT(fieldDst, fieldSrc1, fieldSrc2)
 static s32 bhv_cmd_sum_float(void) {
-    u32 fieldDst  = BHV_CMD_GET_2ND_U8(0);
+    u32 fieldDst = BHV_CMD_GET_2ND_U8(0);
     u32 fieldSrc1 = BHV_CMD_GET_3RD_U8(0);
     u32 fieldSrc2 = BHV_CMD_GET_4TH_U8(0);
 
@@ -553,7 +553,7 @@ static s32 bhv_cmd_sum_float(void) {
 // Command 0x20: Sets the destination integer field to the sum of the values of the given integer fields. Unused.
 // Usage: SUM_INT(fieldDst, fieldSrc1, fieldSrc2)
 static s32 bhv_cmd_sum_int(void) {
-    u32 fieldDst  = BHV_CMD_GET_2ND_U8(0);
+    u32 fieldDst = BHV_CMD_GET_2ND_U8(0);
     u32 fieldSrc1 = BHV_CMD_GET_3RD_U8(0);
     u32 fieldSrc2 = BHV_CMD_GET_4TH_U8(0);
 
@@ -592,12 +592,12 @@ static s32 bhv_cmd_set_hurtbox(void) {
 // Command 0x2B: Sets the size of the object's cylindrical hitbox, and applies a downwards offset.
 // Usage: SET_HITBOX_WITH_OFFSET(radius, height, downOffset)
 static s32 bhv_cmd_set_hitbox_with_offset(void) {
-    s16 radius     = BHV_CMD_GET_1ST_S16(1);
-    s16 height     = BHV_CMD_GET_2ND_S16(1);
+    s16 radius = BHV_CMD_GET_1ST_S16(1);
+    s16 height = BHV_CMD_GET_2ND_S16(1);
     s16 downOffset = BHV_CMD_GET_1ST_S16(2);
 
-    gCurrentObject->hitboxRadius     = radius;
-    gCurrentObject->hitboxHeight     = height;
+    gCurrentObject->hitboxRadius = radius;
+    gCurrentObject->hitboxHeight = height;
     gCurrentObject->hitboxDownOffset = downOffset;
 
     gCurBhvCommand += 3;
@@ -641,7 +641,7 @@ UNUSED static s32 bhv_cmd_set_int_random_from_table(void) {
     // Set the field to a random entry of the table.
     cur_obj_set_int(field, table[(s32)(tableSize * random_float())]);
 
-    gCurBhvCommand += ((tableSize / 2) + 1);
+    gCurBhvCommand += (tableSize / 2) + 1;
     return BHV_PROC_CONTINUE;
 }
 
@@ -699,15 +699,15 @@ static s32 bhv_cmd_scale(void) {
 // Command 0x30: Sets various parameters that the object uses for calculating physics.
 // Usage: SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy, unused1, unused2)
 static s32 bhv_cmd_set_obj_physics(void) {
-    gCurrentObject->oWallHitboxRadius =  BHV_CMD_GET_1ST_S16(1);
-    gCurrentObject->oGravity          = (BHV_CMD_GET_2ND_S16(1) / 100.0f);
-    gCurrentObject->oBounciness       = (BHV_CMD_GET_1ST_S16(2) / 100.0f);
-    gCurrentObject->oDragStrength     = (BHV_CMD_GET_2ND_S16(2) / 100.0f);
-    gCurrentObject->oFriction         = (BHV_CMD_GET_1ST_S16(3) / 100.0f);
-    gCurrentObject->oBuoyancy         = (BHV_CMD_GET_2ND_S16(3) / 100.0f);
+    gCurrentObject->oWallHitboxRadius = BHV_CMD_GET_1ST_S16(1);
+    gCurrentObject->oGravity = BHV_CMD_GET_2ND_S16(1) / 100.0f;
+    gCurrentObject->oBounciness = BHV_CMD_GET_1ST_S16(2) / 100.0f;
+    gCurrentObject->oDragStrength = BHV_CMD_GET_2ND_S16(2) / 100.0f;
+    gCurrentObject->oFriction = BHV_CMD_GET_1ST_S16(3) / 100.0f;
+    gCurrentObject->oBuoyancy = BHV_CMD_GET_2ND_S16(3) / 100.0f;
 
-    UNUSED f32 unused1 = (BHV_CMD_GET_1ST_S16(4) / 100.0f);
-    UNUSED f32 unused2 = (BHV_CMD_GET_2ND_S16(4) / 100.0f);
+    UNUSED f32 unused1 = BHV_CMD_GET_1ST_S16(4) / 100.0f;
+    UNUSED f32 unused2 = BHV_CMD_GET_2ND_S16(4) / 100.0f;
 
     gCurBhvCommand += 5;
     return BHV_PROC_CONTINUE;
@@ -717,7 +717,7 @@ static s32 bhv_cmd_set_obj_physics(void) {
 // Used for clearing active particle flags fron Mario's object.
 // Usage: PARENT_BIT_CLEAR(field, value)
 static s32 bhv_cmd_parent_bit_clear(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
     s32 value = BHV_CMD_GET_U32(1);
 
     value ^= 0xFFFFFFFF;
@@ -741,8 +741,8 @@ static s32 bhv_cmd_spawn_water_droplet(void) {
 // Command 0x34: Animates an object using texture animation. <field> is always set to oAnimState.
 // Usage: ANIMATE_TEXTURE(field, rate)
 static s32 bhv_cmd_animate_texture(void) {
-    u8  field = BHV_CMD_GET_2ND_U8(0);
-    s16 rate  = BHV_CMD_GET_2ND_S16(0);
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    s16 rate = BHV_CMD_GET_2ND_S16(0);
 
     // Increase the field (oAnimState) by 1 every <rate> frames.
     if ((gGlobalTimer % rate) == 0) {
@@ -835,8 +835,8 @@ void cur_obj_update(void) {
 
     // If the object's action has changed, reset the action timer.
     if (o->oAction != o->oPrevAction) {
-        o->oTimer      = 0;
-        o->oSubAction  = 0;
+        o->oTimer = 0;
+        o->oSubAction = 0;
         o->oPrevAction = o->oAction;
     }
 
@@ -844,7 +844,7 @@ void cur_obj_update(void) {
     gCurBhvCommand = o->curBhvCommand;
 
     do {
-        bhvCmdProc    = BehaviorCmdTable[*gCurBhvCommand >> 24];
+        bhvCmdProc = BehaviorCmdTable[*gCurBhvCommand >> 24];
         bhvProcResult = bhvCmdProc();
     } while (bhvProcResult == BHV_PROC_CONTINUE);
 
@@ -857,8 +857,8 @@ void cur_obj_update(void) {
 
     // If the object's action has changed, reset the action timer.
     if (o->oAction != o->oPrevAction) {
-        o->oTimer      = 0;
-        o->oSubAction  = 0;
+        o->oTimer = 0;
+        o->oSubAction = 0;
         o->oPrevAction = o->oAction;
     }
 
@@ -931,11 +931,11 @@ void cur_obj_update(void) {
         if (distanceFromMario > o->oDrawingDistance) {
             // Out of render distance, hide the object.
             o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
-            o->activeFlags           |=  ACTIVE_FLAG_FAR_AWAY;
+            o->activeFlags |= ACTIVE_FLAG_FAR_AWAY;
         } else if (o->oHeldState == HELD_FREE) {
             // In render distance (and not being held), show the object.
-            o->header.gfx.node.flags |=  GRAPH_RENDER_ACTIVE;
-            o->activeFlags           &= ~ACTIVE_FLAG_FAR_AWAY;
+            o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
+            o->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
         }
     }
 }

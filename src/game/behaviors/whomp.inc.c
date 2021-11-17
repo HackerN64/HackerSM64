@@ -3,10 +3,10 @@
 void whomp_play_sfx_from_pound_animation(void) {
     s32 playSound = FALSE;
     if (o->oForwardVel < 5.0f) {
-        playSound  = cur_obj_check_anim_frame( 0);
+        playSound = cur_obj_check_anim_frame(0);
         playSound |= cur_obj_check_anim_frame(23);
     } else {
-        playSound  = cur_obj_check_anim_frame_in_range( 0, 3);
+        playSound = cur_obj_check_anim_frame_in_range(0, 3);
         playSound |= cur_obj_check_anim_frame_in_range(23, 3);
     }
 

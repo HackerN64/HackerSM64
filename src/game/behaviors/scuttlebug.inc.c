@@ -2,14 +2,14 @@
 
 struct ObjectHitbox sScuttlebugHitbox = {
     /* interactType:      */ INTERACT_BOUNCE_TOP,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   1,
-    /* health:            */   1,
-    /* numLootCoins:      */   3,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 1,
+    /* health:            */ 1,
+    /* numLootCoins:      */ 3,
     /* radius:            */ 130,
-    /* height:            */  70,
-    /* hurtboxRadius:     */  90,
-    /* hurtboxHeight:     */  60,
+    /* height:            */ 70,
+    /* hurtboxRadius:     */ 90,
+    /* hurtboxHeight:     */ 60,
 };
 
 s32 update_angle_from_move_flags(s32 *angle) {
@@ -76,7 +76,7 @@ void bhv_scuttlebug_loop(void) {
             if ((s16) o->oMoveAngleYaw == (s16) o->oAngleToMario) {
                 o->oSubAction = 1;
             }
-            if ((o->oPosY - o->oHomeY) < -200.0f) {
+            if (o->oPosY - o->oHomeY < -200.0f) {
                 obj_mark_for_deletion(o);
             }
             cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x400);

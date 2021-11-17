@@ -10,8 +10,8 @@ void intro_peach_set_pos_and_opacity(struct Object *obj, f32 targetOpacity, f32 
 
     vec3f_get_angle(gLakituState.pos, gLakituState.focus, &focusPitch, &focusYaw);
     vec3f_set_dist_and_angle(gLakituState.pos, newPos, obj->oIntroPeachDistToCamera,
-                             (obj->oIntroPeachPitchFromFocus + focusPitch),
-                             (obj->oIntroPeachYawFromFocus   + focusYaw));
+                             obj->oIntroPeachPitchFromFocus + focusPitch,
+                             obj->oIntroPeachYawFromFocus + focusYaw);
     vec3f_copy(&obj->oPosVec, newPos);
     f32 newOpacity = obj->oOpacity;
     camera_approach_f32_symmetric_bool(&newOpacity, targetOpacity, increment);
@@ -23,26 +23,32 @@ void bhv_intro_peach_loop(void) {
         case PEACH_ACT_INIT:
             o->oAction = PEACH_ACT_FADE_1;
             vec3_set(&o->oFaceAngleVec, 0x400, 0x7500, -0x3700);
-            o->oIntroPeachDistToCamera   =   186.0f;
+            o->oIntroPeachDistToCamera = 186.0f;
             o->oIntroPeachPitchFromFocus = -9984.0f;
-            o->oIntroPeachYawFromFocus   =  -768.0f;
+            o->oIntroPeachYawFromFocus = -768.0f;
             o->oOpacity = 255;
             o->header.gfx.animInfo.animFrame = 100;
             break;
+
         case PEACH_ACT_FADE_1:
             intro_peach_set_pos_and_opacity(o, 0.0f, 0.0f);
+
             if (o->oTimer > 20) {
                 o->oAction = PEACH_ACT_UNFADE;
             }
             break;
+
         case PEACH_ACT_UNFADE:
             intro_peach_set_pos_and_opacity(o, 255.0f, 3.0f);
+
             if ((o->oTimer > 100) && (get_dialog_id() == DIALOG_NONE)) {
                 o->oAction = PEACH_ACT_FADE_2;
             }
             break;
+
         case PEACH_ACT_FADE_2:
             intro_peach_set_pos_and_opacity(o, 0.0f, 8.0f);
+
             if (o->oTimer > 60) {
                 obj_mark_for_deletion(o);
             }

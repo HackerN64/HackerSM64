@@ -19,7 +19,7 @@
 #endif
 #endif
 
-#define SAMPLES_TO_OVERPRODUCE           0x10
+#define SAMPLES_TO_OVERPRODUCE 0x10
 #define EXTRA_BUFFERED_AI_SAMPLES_TARGET 0x40
 
 typedef s32 FadeT;
@@ -36,7 +36,13 @@ s32 audio_shut_down_and_reset_step(void);
 void func_802ad7ec(u32 arg0);
 
 struct SPTask *create_next_audio_frame_task(void) {
+    u32 samplesRemainingInAI;
     s32 writtenCmds;
+    s32 index;
+    OSTask_t *task;
+    s32 flags;
+    s16 *currAiBuffer;
+    s32 oldDmaCount;
     OSMesg sp30;
     OSMesg sp2C;
 
@@ -51,14 +57,14 @@ struct SPTask *create_next_audio_frame_task(void) {
     gAudioTaskIndex ^= 1;
     gCurrAiBufferIndex++;
     gCurrAiBufferIndex %= NUMAIBUFFERS;
-    s32 index = (((gCurrAiBufferIndex - 2) + NUMAIBUFFERS) % NUMAIBUFFERS);
-    u32 samplesRemainingInAI = (osAiGetLength() / 4);
+    index = (gCurrAiBufferIndex - 2 + NUMAIBUFFERS) % NUMAIBUFFERS;
+    samplesRemainingInAI = osAiGetLength() / 4;
 
     if (gAiBufferLengths[index] != 0) {
         osAiSetNextBuffer(gAiBuffers[index], gAiBufferLengths[index] * 4);
     }
 
-    s32 oldDmaCount = gCurrAudioFrameDmaCount;
+    oldDmaCount = gCurrAudioFrameDmaCount;
     if (oldDmaCount > AUDIO_FRAME_DMA_QUEUE_SIZE) {
         stubbed_printf("DMA: Request queue over.( %d )\n", oldDmaCount);
     }
@@ -82,10 +88,10 @@ struct SPTask *create_next_audio_frame_task(void) {
     gAudioTask = &gAudioTasks[gAudioTaskIndex];
     gAudioCmd = gAudioCmdBuffers[gAudioTaskIndex];
     index = gCurrAiBufferIndex;
-    s16 *currAiBuffer = gAiBuffers[index];
+    currAiBuffer = gAiBuffers[index];
 
-    gAiBufferLengths[index] = ((((gAudioBufferParameters.samplesPerFrameTarget - samplesRemainingInAI) +
-         EXTRA_BUFFERED_AI_SAMPLES_TARGET) & ~0xf) + SAMPLES_TO_OVERPRODUCE);
+    gAiBufferLengths[index] = ((gAudioBufferParameters.samplesPerFrameTarget - samplesRemainingInAI +
+         EXTRA_BUFFERED_AI_SAMPLES_TARGET) & ~0xf) + SAMPLES_TO_OVERPRODUCE;
     gAiBufferLengths[index] = CLAMP(gAiBufferLengths[index], gAudioBufferParameters.minAiBufferLength,
                                                              gAudioBufferParameters.maxAiBufferLength);
 
@@ -93,32 +99,32 @@ struct SPTask *create_next_audio_frame_task(void) {
         func_802ad7ec((u32) sp2C);
     }
 
-    s32 flags = 0;
+    flags = 0;
     gAudioCmd = synthesis_execute(gAudioCmd, &writtenCmds, currAiBuffer, gAiBufferLengths[index]);
     gAudioRandom = ((gAudioRandom + gAudioFrameCount) * gAudioFrameCount);
-    gAudioRandom = (gAudioRandom + (writtenCmds / 8));
+    gAudioRandom = gAudioRandom + writtenCmds / 8;
 
     index = gAudioTaskIndex;
     gAudioTask->msgqueue = NULL;
-    gAudioTask->msg      = NULL;
+    gAudioTask->msg = NULL;
 
-    OSTask_t *task         = &gAudioTask->task.t;
-    task->type             = M_AUDTASK;
-    task->flags            = flags;
-    task->ucode_boot       = rspbootTextStart;
-    task->ucode_boot_size  = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
-    task->ucode            = aspMainTextStart;
-    task->ucode_data       = aspMainDataStart;
-    task->ucode_size       = 0x800; // (this size is ignored)
-    task->ucode_data_size  = ((aspMainDataEnd - aspMainDataStart) * sizeof(u64));
-    task->dram_stack       = NULL;
-    task->dram_stack_size  = 0;
-    task->output_buff      = NULL;
+    task = &gAudioTask->task.t;
+    task->type = M_AUDTASK;
+    task->flags = flags;
+    task->ucode_boot = rspbootTextStart;
+    task->ucode_boot_size = (u8 *) rspbootTextEnd - (u8 *) rspbootTextStart;
+    task->ucode = aspMainTextStart;
+    task->ucode_data = aspMainDataStart;
+    task->ucode_size = 0x800; // (this size is ignored)
+    task->ucode_data_size = (aspMainDataEnd - aspMainDataStart) * sizeof(u64);
+    task->dram_stack = NULL;
+    task->dram_stack_size = 0;
+    task->output_buff = NULL;
     task->output_buff_size = NULL;
-    task->data_ptr         = gAudioCmdBuffers[index];
-    task->data_size        = (writtenCmds * sizeof(u64));
-    task->yield_data_ptr   = NULL;
-    task->yield_data_size  = 0;
+    task->data_ptr = gAudioCmdBuffers[index];
+    task->data_size = writtenCmds * sizeof(u64);
+    task->yield_data_ptr = NULL;
+    task->yield_data_size = 0;
     return gAudioTask;
 }
 
@@ -187,9 +193,9 @@ void seq_player_fade_to_zero_volume(s32 player, FadeT fadeOutTime) {
 void func_8031D690(s32 player, FadeT fadeInTime) {
     if (fadeInTime != 0) {
         gSequencePlayers[player].state = 1;
-        gSequencePlayers[player].fadeTimerUnkEu      = fadeInTime;
+        gSequencePlayers[player].fadeTimerUnkEu = fadeInTime;
         gSequencePlayers[player].fadeRemainingFrames = fadeInTime;
-        gSequencePlayers[player].fadeVolume   = 0.0f;
+        gSequencePlayers[player].fadeVolume = 0.0f;
         gSequencePlayers[player].fadeVelocity = 0.0f;
     }
 }
@@ -205,7 +211,7 @@ void port_eu_init_queues(void) {
 
 void func_802ad6f0(s32 arg0, s32 *arg1) {
     struct EuAudioCmd *cmd = &sAudioCmd[D_EU_80302010 & 0xff];
-    cmd->u.first   =  arg0;
+    cmd->u.first = arg0;
     cmd->u2.as_u32 = *arg1;
     D_EU_80302010++;
 }
@@ -219,13 +225,13 @@ void func_802ad74c(u32 arg0, u32 arg1) {
 }
 
 void func_802ad770(u32 arg0, s8 arg1) {
-    s32 sp1C = (arg1 << 24);
+    s32 sp1C = arg1 << 24;
     func_802ad6f0(arg0, &sp1C);
 }
 
 void func_802ad7a0(void) {
     osSendMesg(OSMesgQueues[1],
-            (OSMesg)(u32)(((D_EU_80302014 & 0xff) << 8) | (D_EU_80302010 & 0xff)),
+            (OSMesg)(u32)((D_EU_80302014 & 0xff) << 8 | (D_EU_80302010 & 0xff)),
             OS_MESG_NOBLOCK);
     D_EU_80302014 = D_EU_80302010;
 }
@@ -234,8 +240,8 @@ void func_802ad7ec(u32 arg0) {
     struct EuAudioCmd *cmd;
     struct SequencePlayer *seqPlayer;
     struct SequenceChannel *chan;
-    u8 end = (arg0 & 0xff);
-    u8 i = ((arg0 >> 8) & 0xff);
+    u8 end = arg0 & 0xff;
+    u8 i = (arg0 >> 8) & 0xff;
 
     for (;;) {
         if (i == end) break;
@@ -253,7 +259,7 @@ void func_802ad7ec(u32 arg0) {
                         break;
 
                     case 0x47:
-                        seqPlayer->tempo = (cmd->u2.as_s32 * TATUMS_PER_BEAT);
+                        seqPlayer->tempo = cmd->u2.as_s32 * TATUMS_PER_BEAT;
                         break;
 
                     case 0x48:
@@ -264,7 +270,7 @@ void func_802ad7ec(u32 arg0) {
                         seqPlayer->seqVariationEu[cmd->u.s.arg3] = cmd->u2.as_s8;
                         break;
                 }
-            } else if ((seqPlayer->enabled != FALSE) && (cmd->u.s.arg2 < 0x10)) {
+            } else if (seqPlayer->enabled != FALSE && cmd->u.s.arg2 < 0x10) {
                 chan = seqPlayer->channels[cmd->u.s.arg2];
                 if (IS_SEQUENCE_CHANNEL_VALID(chan)) {
                     switch (cmd->u.s.op) {

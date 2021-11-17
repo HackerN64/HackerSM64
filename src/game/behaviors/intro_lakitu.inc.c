@@ -26,10 +26,12 @@ void intro_lakitu_set_offset_from_camera(struct Object *obj, Vec3f offset) {
 void intro_lakitu_set_focus(struct Object *obj, Vec3f newFocus) {
     f32 dist;
     s16 pitch, yaw;
+
     // newFocus is an offset from lakitu's origin, not a point in the world.
     vec3f_get_dist_and_angle(gVec3fZero, newFocus, &dist, &pitch, &yaw);
+
     obj->oFaceAnglePitch = pitch;
-    obj->oFaceAngleYaw   = yaw;
+    obj->oFaceAngleYaw = yaw;
 }
 
 /**
@@ -42,9 +44,12 @@ s32 intro_lakitu_set_pos_and_focus(struct Object *obj, struct CutsceneSplinePoin
     s16 splineSegment = obj->oIntroLakituSplineSegment;
     s32 splineFinished = ((move_point_along_spline(newFocus, offset, &splineSegment, &(o->oIntroLakituSplineSegmentProgress)))
                        || (move_point_along_spline(newOffset, focus, &splineSegment, &(o->oIntroLakituSplineSegmentProgress))));
+
     obj->oIntroLakituSplineSegment = splineSegment;
+
     intro_lakitu_set_offset_from_camera(obj, newOffset);
     intro_lakitu_set_focus(obj, newFocus);
+
     return splineFinished;
 }
 
@@ -63,10 +68,12 @@ void bhv_intro_lakitu_loop(void) {
     switch (o->oAction) {
         case INTRO_LAKITU_ACT_INIT:
             cur_obj_disable_rendering();
-            o->oIntroLakituSplineSegment         = 0.0f;
+
+            o->oIntroLakituSplineSegment = 0.0f;
             o->oIntroLakituSplineSegmentProgress = 0.0f;
             o->oIntroLakituCloud =
                 spawn_object_relative_with_scale(CLOUD_BP_LAKITU_CLOUD, 0, 0, 0, 2.0f, o, MODEL_MIST, bhvCloud);
+
             if (gCamera->cutscene == CUTSCENE_END_WAVING) {
                 o->oAction = INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_1;
             } else {
@@ -78,7 +85,7 @@ void bhv_intro_lakitu_loop(void) {
             cur_obj_enable_rendering();
 
             if ((gCutsceneTimer > 350) && (gCutsceneTimer < 458)) {
-                vec3_copy_y_off(&o->oPosVec, gCamera->pos, 500.0f);
+                vec3f_copy_y_off(&o->oPosVec, gCamera->pos, 500.0f);
             }
 
             if (gCutsceneTimer > 52) {
@@ -88,6 +95,7 @@ void bhv_intro_lakitu_loop(void) {
             if (intro_lakitu_set_pos_and_focus(o, gIntroLakituStartToPipeOffsetFromCamera, gIntroLakituStartToPipeFocus)) {
                 o->oAction = INTRO_LAKITU_ACT_CUTSCENE_INTRO_2;
             }
+
             switch (o->oTimer) {
 #if defined(VERSION_US) || defined(VERSION_SH)
                 case 534: cur_obj_play_sound_2(SOUND_ACTION_FLYING_FAST) ; break;
@@ -103,15 +111,16 @@ void bhv_intro_lakitu_loop(void) {
             if (o->oTimer == 485) cur_obj_play_sound_2(SOUND_ACTION_INTRO_UNK45E);
 #endif
             break;
+
         case INTRO_LAKITU_ACT_CUTSCENE_INTRO_2:
             if (gCutsceneTimer > TIMER1) {
                 o->oAction = INTRO_LAKITU_ACT_CUTSCENE_INTRO_3;
-                o->oIntroLakituDistToBirdsX   =  1400.0f;
+                o->oIntroLakituDistToBirdsX   = 1400.0f;
                 o->oIntroLakituDistToBirdsZ   = -4096.0f;
-                o->oIntroLakituEndBirds1DestZ =  2048.0f;
-                o->oIntroLakituEndBirds1DestY =  -200.0f;
+                o->oIntroLakituEndBirds1DestZ = 2048.0f;
+                o->oIntroLakituEndBirds1DestY = -200.0f;
                 o->oMoveAngleYaw = 0x8000;
-                o->oFaceAngleYaw = (o->oMoveAngleYaw + 0x4000);
+                o->oFaceAngleYaw = o->oMoveAngleYaw + 0x4000;
                 o->oMoveAnglePitch = 0x800;
             }
 
@@ -139,10 +148,12 @@ void bhv_intro_lakitu_loop(void) {
                 spawn_mist_from_global();
                 o->oPosY += 158.0f;
             }
+
             if (o->oTimer == TIMER2) {
                 obj_mark_for_deletion(o);
                 obj_mark_for_deletion(o->oIntroLakituCloud);
             }
+
             if (o->oTimer == 14) {
                 cur_obj_play_sound_2(SOUND_ACTION_INTRO_UNK45F);
             }
@@ -152,39 +163,49 @@ void bhv_intro_lakitu_loop(void) {
             vec3f_set(offset, -100.0f, 100.0f, 300.0f);
             offset_rotated(toPoint, gCamera->pos, offset, sMarioCamState->faceAngle);
             vec3f_copy(&o->oPosVec, toPoint);
+
             o->oMoveAnglePitch = 0x1000;
-            o->oMoveAngleYaw   = 0x9000;
-            o->oFaceAnglePitch = (o->oMoveAnglePitch / 2);
-            o->oFaceAngleYaw   = o->oMoveAngleYaw;
-            o->oAction         = INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2;
+            o->oMoveAngleYaw = 0x9000;
+            o->oFaceAnglePitch = o->oMoveAnglePitch / 2;
+            o->oFaceAngleYaw = o->oMoveAngleYaw;
+
+            o->oAction = INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2;
             break;
 
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2:
             vec3f_copy(toPoint, &o->oPosVec);
+
             if (o->oTimer > 60) {
                 o->oForwardVel = approach_f32_asymptotic(o->oForwardVel, -10.0f, 0.05f);
                 o->oMoveAngleYaw   += 0x78;
                 o->oMoveAnglePitch += 0x40;
                 o->oFaceAngleYaw = camera_approach_s16_symmetric(o->oFaceAngleYaw, (s16) calculate_yaw(toPoint, gCamera->pos), 0x200);
             }
+
             if (o->oTimer > 105) {
                 o->oAction = INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_3;
                 o->oMoveAnglePitch = 0xE00;
             }
-            o->oFaceAnglePitch = 0x0;
+
+            o->oFaceAnglePitch = 0;
+
             cur_obj_set_pos_via_transform();
             break;
 
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_3:
             vec3f_copy(toPoint, &o->oPosVec);
+
             o->oForwardVel = approach_f32_asymptotic(o->oForwardVel, 60.0f, 0.05f);
             vec3f_get_yaw(toPoint, gCamera->pos, &yawToCam);
             o->oFaceAngleYaw = camera_approach_s16_symmetric(o->oFaceAngleYaw, yawToCam, 0x200);
+
             if (o->oTimer < 62) {
                 o->oMoveAngleYaw = approach_s16_asymptotic(o->oMoveAngleYaw, 0x1800, 0x1E);
             }
+
             o->oMoveAnglePitch = camera_approach_s16_symmetric(o->oMoveAnglePitch, -0x2000, 0x5A);
-            o->oFaceAnglePitch = 0x0;
+            o->oFaceAnglePitch = 0;
+
             cur_obj_set_pos_via_transform();
             break;
     }

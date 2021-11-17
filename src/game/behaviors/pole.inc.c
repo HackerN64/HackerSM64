@@ -17,9 +17,8 @@ void bhv_pole_init(void) {
      * This is equivalent to using `o->oBehParams2ndByte` according to
      * `spawn_objects_from_info`.
      */
-
     // This treats bparam1 and bparam2 as a single value
-    o->hitboxHeight = (GET_BPARAM12(o->oBehParams) * 10);
+    o->hitboxHeight = GET_BPARAM12(o->oBehParams) * 10;
 }
 
 /**
@@ -30,7 +29,7 @@ void bhv_pole_init(void) {
 void bhv_giant_pole_loop(void) {
     if (o->oTimer == 0) {
         struct Object *topBall = spawn_object(o, MODEL_YELLOW_SPHERE, bhvYellowBall);
-        topBall->oPosY += (o->hitboxHeight + 50.0f);
+        topBall->oPosY += o->hitboxHeight + 50.0f;
     }
     bhv_pole_base_loop();
 }

@@ -116,7 +116,7 @@ void chuckya_act_1(void) {
             } else {
                 cur_obj_init_animation_with_sound(1);
                 o->oMoveAngleYaw += INT_STATUS_GRABBED_MARIO;
-                if ((o->oChuckyaSubActionTimer-- < 0)
+                if (o->oChuckyaSubActionTimer-- < 0
                  && (check_if_moving_over_floor(50.0f, 150.0f) || o->oChuckyaSubActionTimer < -16)) {
                     o->oSubAction++;
                 }
@@ -135,7 +135,7 @@ void chuckya_act_1(void) {
 
 void chuckya_act_3(void) {
     o->oForwardVel = 0.0f;
-    o->oVelY       = 0.0f;
+    o->oVelY = 0.0f;
     cur_obj_init_animation_with_sound(4);
     if (o->oTimer > 100) {
         o->oAction = 0;

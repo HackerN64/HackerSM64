@@ -46,7 +46,7 @@ void bhv_activated_back_and_forth_platform_init(void) {
     // Equivalent to 50 * (oBehParams2ndByte & 0x7F), i.e. 50 * (oBehParams2ndByte % 128).
     // The maximum possible value of this is 50 * 127 = 6350.
     // It's 50 * 97 = 4850 in BitS and 50 * 31 = 1550 in BitFS.
-    o->oActivatedBackAndForthPlatformMaxOffset = (50.0f * (GET_BPARAM2(o->oBehParams) & 0x7F));
+    o->oActivatedBackAndForthPlatformMaxOffset = 50.0f * (GET_BPARAM2(o->oBehParams) & 0x7F);
 
     if (platformType == ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR) {
         o->oActivatedBackAndForthPlatformMaxOffset -= 12.0f;
@@ -54,7 +54,7 @@ void bhv_activated_back_and_forth_platform_init(void) {
 
     // Truthy/falsy value that determines the direction of movement.
     // Equivalent to oBehParams2ndByte & 0x80, i.e. the most significant bit of oBehParams2ndByte.
-    o->oActivatedBackAndForthPlatformVertical = (GET_BPARAM2(o->oBehParams) & 0x80);
+    o->oActivatedBackAndForthPlatformVertical = GET_BPARAM2(o->oBehParams) & 0x80;
 
     o->oActivatedBackAndForthPlatformStartYaw = o->oFaceAngleYaw;
 }
@@ -95,7 +95,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
                 // the platform will reverse directions. Otherwise, it will stop.
                 // This means that if Mario touches the platform initially, then gets off,
                 // it will do a full round trip then stop (assuming Mario stays within 3000 units).
-                if ((o->oVelY < 0.0f) || (o->oActivatedBackAndForthPlatformVel > 0.0f)) {
+                if (o->oVelY < 0.0f || o->oActivatedBackAndForthPlatformVel > 0.0f) {
                     o->oActivatedBackAndForthPlatformVel = -o->oActivatedBackAndForthPlatformVel;
                 } else {
                     o->oActivatedBackAndForthPlatformVel = 0.0f;
@@ -127,7 +127,7 @@ void bhv_activated_back_and_forth_platform_update(void) {
     } else {
         // Otherwise, dip down 20 units if Mario gets on the horizontal platform, and undo if he gets off.
         o->oPosY += o->oVelY;
-        clamp_f32(&o->oPosY, (o->oHomeY - 20.0f), o->oHomeY);
+        clamp_f32(&o->oPosY, o->oHomeY - 20.0f, o->oHomeY);
 
         // Update the position using the object's home (original position), facing angle, and offset.
         // This has to be done manually when the platform is vertical because only the yaw is used

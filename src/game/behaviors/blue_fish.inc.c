@@ -55,6 +55,7 @@ void bhv_blue_fish_movement_loop(void) {
                 o->oAction++;
             }
             break;
+
         // Animates and adjusts pitch to an upward direction.
         case BLUE_FISH_ACT_ASCEND:
             cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
@@ -71,6 +72,7 @@ void bhv_blue_fish_movement_loop(void) {
                 o->oFaceAnglePitch += o->oAngleVelPitch;
             }
             break;
+
         // Animates and turns fish around
         case BLUE_FISH_ACT_TURN_BACK:
             cur_obj_init_animation_with_accel_and_sound(0, 2.0f);

@@ -1,8 +1,8 @@
 // star_door.inc.c
 
 void star_door_update_pos(void) {
-    o->oVelX = (o->oLeftVel *  coss(o->oMoveAngleYaw));
-    o->oVelZ = (o->oLeftVel * -sins(o->oMoveAngleYaw));
+    o->oVelX = o->oLeftVel * coss(o->oMoveAngleYaw);
+    o->oVelZ = o->oLeftVel * -sins(o->oMoveAngleYaw);
     o->oPosX += o->oVelX;
     o->oPosZ += o->oVelZ;
 }
@@ -20,7 +20,7 @@ void bhv_star_door_loop(void) {
             }
             break;
         case STAR_DOOR_ACT_OPENING:
-            if (o->oTimer == 0 && (s16)(o->oMoveAngleYaw) >= 0) {
+            if (o->oTimer == 0 && (s16) o->oMoveAngleYaw >= 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_OPEN);
 #if ENABLE_RUMBLE
                 queue_rumble_data(35, 30);
@@ -39,7 +39,7 @@ void bhv_star_door_loop(void) {
             }
             break;
         case STAR_DOOR_ACT_CLOSING:
-            if (o->oTimer == 0 && (s16)(o->oMoveAngleYaw) >= 0) {
+            if (o->oTimer == 0 && (s16) o->oMoveAngleYaw >= 0) {
                 cur_obj_play_sound_2(SOUND_GENERAL_STAR_DOOR_CLOSE);
 #if ENABLE_RUMBLE
                 queue_rumble_data(35, 30);

@@ -4,8 +4,8 @@
 // plant code later on reuses this function.
 void bhv_piranha_particle_loop(void) {
     if (o->oTimer == 0) {
-        o->oVelY       =   (20.0f + (20.0f * random_float()));
-        o->oForwardVel   = (20.0f + (20.0f * random_float()));
+        o->oVelY = 20.0f + 20.0f * random_float();
+        o->oForwardVel = 20.0f + 20.0f * random_float();
         o->oMoveAngleYaw = random_u16();
     }
     cur_obj_move_using_fvel_and_gravity();
@@ -64,7 +64,7 @@ void bhv_mr_i_iris_loop(void) {
         obj_build_transform_from_pos_and_angle(o, O_PARENT_RELATIVE_POS_INDEX, O_MOVE_ANGLE_INDEX);
         obj_translate_local(o, O_POS_INDEX, O_PARENT_RELATIVE_POS_INDEX);
         o->oFaceAnglePitch = o->oMoveAnglePitch;
-        o->oGraphYOffset = (o->header.gfx.scale[1] * 100.0f);
+        o->oGraphYOffset = o->header.gfx.scale[1] * 100.0f;
     }
     if (!o->parentObj->oMrIBlinking) {
         o->oAnimState = OBJ_ANIM_STATE_INIT_ANIM;
@@ -82,11 +82,12 @@ void bhv_mr_i_iris_loop(void) {
 void mr_i_body_act_spin_death(void) {
     s16 direction = ((o->oMrISpinDirection < 0) ? 0x1000 : -0x1000);
     f32 scaleModifier = ((o->oBehParams2ndByte) ? 2.0f : 1.0f);
-    f32 spinAmount = ((o->oTimer + 1) / 96.0f);
+    f32 spinAmount = (o->oTimer + 1) / 96.0f;
+
     if (o->oTimer < 64) {
         s16 startYaw = o->oMoveAngleYaw;
-        o->oMoveAngleYaw += (direction * coss(0x4000 * spinAmount));
-        if (startYaw < 0x0 && o->oMoveAngleYaw >= 0x0) {
+        o->oMoveAngleYaw += direction * coss(0x4000 * spinAmount);
+        if (startYaw < 0 && o->oMoveAngleYaw >= 0) {
             cur_obj_play_sound_2(SOUND_OBJ2_MRI_SPINNING);
         }
         o->oMoveAnglePitch = (1.0f - coss(0x4000 * spinAmount)) * -0x4000;
@@ -95,11 +96,11 @@ void mr_i_body_act_spin_death(void) {
         if (o->oTimer == 64) {
             cur_obj_play_sound_2(SOUND_OBJ_MRI_DEATH);
         }
-        f32 shakeY = ((f32)(o->oTimer - 63) / 32);
+        f32 shakeY = (f32)(o->oTimer - 63) / 32;
         o->oMoveAngleYaw += direction * coss(0x4000 * spinAmount);
         o->oMoveAnglePitch = (1.0f - coss(0x4000 * spinAmount)) * -0x4000;
         cur_obj_shake_y((s32)((1.0f - shakeY) * 4)); // trucating the f32?
-        f32 baseScale = ((coss(0x4000 * shakeY) * 0.4f) + 0.6f);
+        f32 baseScale = coss(0x4000 * shakeY) * 0.4f + 0.6f;
         cur_obj_scale(baseScale * scaleModifier);
     } else if (o->oTimer < 104) {
         // do nothing
@@ -107,7 +108,7 @@ void mr_i_body_act_spin_death(void) {
         if (o->oTimer == 104) {
             cur_obj_become_intangible();
             spawn_mist_particles();
-            o->oMrIScale = (scaleModifier * 0.6f);
+            o->oMrIScale = scaleModifier * 0.6f;
             if (o->oBehParams2ndByte != 0) {
                 o->oPosY += 100.0f;
                 spawn_default_star(1370, 2000.0f, -320.0f);
@@ -116,7 +117,7 @@ void mr_i_body_act_spin_death(void) {
                 cur_obj_spawn_loot_blue_coin();
             }
         }
-        o->oMrIScale -= (0.2f * scaleModifier);
+        o->oMrIScale -= 0.2f * scaleModifier;
         if (o->oMrIScale < 0) {
             o->oMrIScale = 0;
         }
@@ -177,12 +178,12 @@ void mr_i_body_act_looking_at_mario(void) {
         if (o->oMrIParticleTimer == (o->oMrIParticleTimerTarget + 20)) {
             spawn_mr_i_particle();
             o->oMrIParticleTimer = 0;
-            o->oMrIParticleTimerTarget = (s32)((random_float() * 50.0f) + 50.0f);
+            o->oMrIParticleTimerTarget = (s32)(random_float() * 50.0f + 50.0f);
         }
         o->oMrIParticleTimer++;
     } else {
         o->oMrIParticleTimer = 0;
-        o->oMrIParticleTimerTarget = (s32)((random_float() * 50.0f) + 50.0f);
+        o->oMrIParticleTimerTarget = (s32)(random_float() * 50.0f + 50.0f);
     }
     if (o->oDistanceToMario > 800.0f) {
         o->oAction = MR_I_BODY_ACT_IDLE;
@@ -195,10 +196,10 @@ void mr_i_body_act_idle(void) {
     s16 angleDiffMoveYawToMarioFaceYaw = abs_angle_diff(o->oMoveAngleYaw, gMarioObject->oFaceAngleYaw);
     if (o->oTimer == 0) {
         cur_obj_become_tangible();
-        o->oMoveAnglePitch   = 0x0;
+        o->oMoveAnglePitch = 0;
         o->oMrIParticleTimer = 30;
-        o->oMrIParticleTimerTarget = (random_float() * 20.0f);
-        o->oAngleVelYaw            = ((o->oMrIParticleTimerTarget & 0x1) ? -256 : 256);
+        o->oMrIParticleTimerTarget = random_float() * 20.0f;
+        o->oAngleVelYaw = ((o->oMrIParticleTimerTarget & 0x1) ? -256 : 256);
     }
     if (angleDiffMoveYawToMario < 1024 && angleDiffMoveYawToMarioFaceYaw > 0x4000) {
         if (o->oDistanceToMario < 700.0f) {
@@ -210,10 +211,10 @@ void mr_i_body_act_idle(void) {
         o->oMoveAngleYaw += o->oAngleVelYaw;
         o->oMrIParticleTimer = 30;
     }
-    if (o->oMrIParticleTimer == (o->oMrIParticleTimerTarget + 60)) {
+    if (o->oMrIParticleTimer == o->oMrIParticleTimerTarget + 60) {
         o->oMrIBlinking = TRUE;
     }
-    if (o->oMrIParticleTimer > (o->oMrIParticleTimerTarget + 80)) {
+    if (o->oMrIParticleTimer > o->oMrIParticleTimerTarget + 80) {
         o->oMrIParticleTimer = 0;
         o->oMrIParticleTimerTarget = (random_float() * 80.0f);
         spawn_mr_i_particle();
@@ -227,6 +228,7 @@ void mr_i_body_act_far_away(void) {
     if (o->oTimer == 0) {
         cur_obj_set_pos_to_home();
     }
+
     if (o->oDistanceToMario < 1500.0f) {
         o->oAction = MR_I_BODY_ACT_IDLE;
     }
@@ -241,21 +243,23 @@ ObjActionFunc sMrIBodyActions[] = {
 
 struct ObjectHitbox sMrIHitbox = {
     /* interactType:      */ INTERACT_DAMAGE,
-    /* downOffset:        */   0,
-    /* damageOrCoinValue: */   2,
-    /* health:            */   2,
-    /* numLootCoins:      */   5,
-    /* radius:            */  80,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 2,
+    /* health:            */ 2,
+    /* numLootCoins:      */ 5,
+    /* radius:            */ 80,
     /* height:            */ 150,
-    /* hurtboxRadius:     */   0,
-    /* hurtboxHeight:     */   0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 void bhv_mr_i_body_loop(void) {
     obj_set_hitbox(o, &sMrIHitbox);
     cur_obj_call_action_function(sMrIBodyActions);
+
     if ((o->oAction != MR_I_BODY_ACT_SPIN_DEATH) && (o->oDistanceToMario > 3000.0f || o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         o->oAction = MR_I_BODY_ACT_FAR_AWAY;
     }
+
     o->oInteractStatus = INT_STATUS_NONE;
 }

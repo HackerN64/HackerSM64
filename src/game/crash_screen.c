@@ -36,7 +36,7 @@ u8 gCrashScreenCharToGlyph[128] = {
 };
 
 // A height of seven pixels for each Character * nine rows of characters + one row unused.
-u32 gCrashScreenFont[(7 * 9) + 1] = {
+u32 gCrashScreenFont[7 * 9 + 1] = {
     #include "textures/crash_custom/crash_screen_font.ia1.inc.c"
 };
 
@@ -88,36 +88,39 @@ struct {
 } gCrashScreen;
 
 void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h) {
+    u16 *ptr;
     s32 i, j;
 
-    u16 *ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
+    ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j++) {
             // 0xe738 = 0b1110011100111000
-            *ptr = (((*ptr & 0xE738) >> 2) | 1);
+            *ptr = ((*ptr & 0xE738) >> 2) | 1;
             ptr++;
         }
-        ptr += (gCrashScreen.width - w);
+        ptr += gCrashScreen.width - w;
     }
 }
 
 void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph) {
+    const u32 *data;
+    u16 *ptr;
     u32 bit;
     u32 rowMask;
     s32 i, j;
 
-    const u32 *data = &gCrashScreenFont[(glyph / 5) * 7];
-    u16 *ptr = (gCrashScreen.framebuffer + (gCrashScreen.width * y) + x);
+    data = &gCrashScreenFont[glyph / 5 * 7];
+    ptr = gCrashScreen.framebuffer + gCrashScreen.width * y + x;
 
     for (i = 0; i < 7; i++) {
-        bit = (0x80000000U >> ((glyph % 5) * 6));
+        bit = 0x80000000U >> ((glyph % 5) * 6);
         rowMask = *data++;
 
         for (j = 0; j < 6; j++) {
-            *ptr++ = ((bit & rowMask) ? 0xFFFF : 1);
+            *ptr++ = (bit & rowMask) ? 0xFFFF : 1;
             bit >>= 1;
         }
-        ptr += (gCrashScreen.width - 6);
+        ptr += gCrashScreen.width - 6;
     }
 }
 
@@ -126,23 +129,31 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
 }
 
 void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
+    char *ptr;
     u32 glyph;
+    s32 size;
     char buf[0x108];
     bzero(&buf, sizeof(buf));
     va_list args;
     va_start(args, fmt);
-    s32 size = _Printf(write_to_buf, buf, fmt, args);
+
+    size = _Printf(write_to_buf, buf, fmt, args);
+
     if (size > 0) {
-        char *ptr = buf;
+        ptr = buf;
+
         while (*ptr) {
             glyph = gCrashScreenCharToGlyph[*ptr & 0x7f];
+
             if (glyph != 0xff) {
                 crash_screen_draw_glyph(x, y, glyph);
             }
+
             ptr++;
             x += 6;
         }
     }
+
     va_end(args);
 }
 
@@ -425,10 +436,10 @@ void thread2_crash_screen(UNUSED void *arg) {
 
 void crash_screen_init(void) {
     gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[sRenderedFramebuffer];
-    gCrashScreen.width  = SCREEN_WIDTH;
+    gCrashScreen.width = SCREEN_WIDTH;
     gCrashScreen.height = SCREEN_HEIGHT;
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
-    osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL, ((u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack)), OS_PRIORITY_APPMAX);
-    osStartThread( &gCrashScreen.thread);
+    osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL, (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack), OS_PRIORITY_APPMAX);
+    osStartThread(&gCrashScreen.thread);
 }
 

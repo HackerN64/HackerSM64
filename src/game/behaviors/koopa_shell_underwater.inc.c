@@ -2,14 +2,14 @@
 
 struct ObjectHitbox sKoopaShellUnderwaterHitbox = {
     /* interactType:      */ INTERACT_GRABBABLE,
-    /* downOffset:        */  0,
-    /* damageOrCoinValue: */  0,
-    /* health:            */  1,
-    /* numLootCoins:      */  0,
+    /* downOffset:        */ 0,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 1,
+    /* numLootCoins:      */ 0,
     /* radius:            */ 80,
     /* height:            */ 50,
-    /* hurtboxRadius:     */  0,
-    /* hurtboxHeight:     */  0,
+    /* hurtboxRadius:     */ 0,
+    /* hurtboxHeight:     */ 0,
 };
 
 void set_koopa_shell_underwater_hitbox(void) {
@@ -35,5 +35,6 @@ void bhv_koopa_shell_underwater_loop(void) {
         spawn_mist_particles();
         obj_mark_for_deletion(o);
     }
+
     o->oInteractStatus = INT_STATUS_NONE;
 }

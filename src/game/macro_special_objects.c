@@ -35,7 +35,7 @@ void spawn_macro_abs_yrot_2params(ModelID32 model, const BehaviorScript *behavio
     if (behavior != NULL) {
         struct Object *newObj =
             spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, convert_rotation(ry), 0);
-        newObj->oBehParams = (((u32) params) << 16);
+        newObj->oBehParams = ((u32) params) << 16;
     }
 }
 
@@ -48,7 +48,7 @@ void spawn_macro_abs_yrot_param1(ModelID32 model, const BehaviorScript *behavior
     if (behavior != NULL) {
         struct Object *newObj =
             spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior, x, y, z, 0, convert_rotation(ry), 0);
-        newObj->oBehParams = (((u32) param) << 24);
+        newObj->oBehParams = ((u32) param) << 24;
     }
 }
 
@@ -74,7 +74,7 @@ UNUSED static void spawn_macro_coin_unknown(const BehaviorScript *behavior, s16 
                                     a1[1], a1[2], a1[3], 0, convert_rotation(a1[0]), 0);
 
     obj->oUnusedCoinParams = a1[4];
-    obj->oBehParams = ((a1[4] & 0xFF) >> 16);
+    obj->oBehParams = (a1[4] & 0xFF) >> 16;
 }
 
 struct LoadedMacroObject {
@@ -88,19 +88,27 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
     struct LoadedMacroObject macroObject;
     struct Object *newObj;
     struct MacroPreset preset;
-    gMacroObjectDefaultParent.header.gfx.areaIndex       = areaIndex;
+
+    gMacroObjectDefaultParent.header.gfx.areaIndex = areaIndex;
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
+
     while (TRUE) {
-        if (*macroObjList == -1) break; // An encountered value of -1 means the list has ended.
-        presetID = ((*macroObjList & 0x1FF) - 31); // Preset identifier for MacroObjectPresets array
-        if (presetID < 0) break;
+        if (*macroObjList == -1) { // An encountered value of -1 means the list has ended.
+            break;
+        }
+
+        presetID = (*macroObjList & 0x1FF) - 31; // Preset identifier for MacroObjectPresets array
+
+        if (presetID < 0) {
+            break;
+        }
 
         // Set macro object properties from the list
-        macroObject.yaw    = (((*macroObjList++ >> 9) & 0x7F) << 1); // Y-Rotation
-        macroObject.pos[0] =    *macroObjList++;                     // X position
-        macroObject.pos[1] =    *macroObjList++;                     // Y position
-        macroObject.pos[2] =    *macroObjList++;                     // Z position
-        macroObject.params =    *macroObjList++;                     // Behavior params
+        macroObject.yaw    = ((*macroObjList++ >> 9) & 0x7F) << 1; // Y-Rotation
+        macroObject.pos[0] = *macroObjList++;                      // X position
+        macroObject.pos[1] = *macroObjList++;                      // Y position
+        macroObject.pos[2] = *macroObjList++;                      // Z position
+        macroObject.params = *macroObjList++;                      // Behavior params
 
         // Get the preset values from the MacroObjectPresets list.
         preset = MacroObjectPresets[presetID];
@@ -131,9 +139,9 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
             newObj->oBehParams        = (((macroObject.params & 0x00FF) << 16) // Set 2nd byte from lower bits (shifted).
                                         | (macroObject.params & 0xFF00));      // Set 3rd byte from upper bits.
             newObj->oBehParams2ndByte =   (macroObject.params & 0x00FF);       // Set 2nd byte from lower bits.
-            newObj->respawnInfoType   = RESPAWN_INFO_TYPE_MACRO_OBJECT;
-            newObj->respawnInfo       = (macroObjList - 1);
-            newObj->parentObj         = newObj;
+            newObj->respawnInfoType = RESPAWN_INFO_TYPE_MACRO_OBJECT;
+            newObj->respawnInfo = macroObjList - 1;
+            newObj->parentObj = newObj;
         }
     }
 }
@@ -145,7 +153,7 @@ void spawn_macro_objects_hardcoded(s32 areaIndex, MacroObject *macroObjList) {
     s16 macroObjPreset;
     s16 yaw;
 
-    gMacroObjectDefaultParent.header.gfx.areaIndex       = areaIndex;
+    gMacroObjectDefaultParent.header.gfx.areaIndex = areaIndex;
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
 
     while (TRUE) {
@@ -188,7 +196,7 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
 
     s32 numOfSpecialObjects = *(*specialObjList)++;
 
-    gMacroObjectDefaultParent.header.gfx.areaIndex       = areaIndex;
+    gMacroObjectDefaultParent.header.gfx.areaIndex = areaIndex;
     gMacroObjectDefaultParent.header.gfx.activeAreaIndex = areaIndex;
 
     for (i = 0; i < numOfSpecialObjects; i++) {
@@ -205,9 +213,9 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
             offset++;
         }
 
-        model        = SpecialObjectPresets[offset].model;
-        behavior     = SpecialObjectPresets[offset].behavior;
-        type         = SpecialObjectPresets[offset].type;
+        model = SpecialObjectPresets[offset].model;
+        behavior = SpecialObjectPresets[offset].behavior;
+        type = SpecialObjectPresets[offset].type;
         defaultParam = SpecialObjectPresets[offset].defParam;
 
         switch (type) {
@@ -250,7 +258,7 @@ u32 get_special_objects_size(s16 *data) {
 
     for (i = 0; i < numOfSpecialObjects; i++) {
         presetID = (u8) *data++;
-        data  += 3;
+        data += 3;
         offset = 0;
 
         while (SpecialObjectPresets[offset].preset_id != presetID) {

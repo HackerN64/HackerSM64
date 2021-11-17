@@ -75,16 +75,16 @@ extern SkyboxTexture water_skybox_ptrlist;
 extern SkyboxTexture wdw_skybox_ptrlist;
 
 SkyboxTexture *sSkyboxTextures[10] = {
-          &water_skybox_ptrlist,
-          &bitfs_skybox_ptrlist,
-            &wdw_skybox_ptrlist,
+    &water_skybox_ptrlist,
+    &bitfs_skybox_ptrlist,
+    &wdw_skybox_ptrlist,
     &cloud_floor_skybox_ptrlist,
-            &ccm_skybox_ptrlist,
-            &ssl_skybox_ptrlist,
-            &bbh_skybox_ptrlist,
-           &bidw_skybox_ptrlist,
-         &clouds_skybox_ptrlist,
-           &bits_skybox_ptrlist,
+    &ccm_skybox_ptrlist,
+    &ssl_skybox_ptrlist,
+    &bbh_skybox_ptrlist,
+    &bidw_skybox_ptrlist,
+    &clouds_skybox_ptrlist,
+    &bits_skybox_ptrlist,
 };
 
 /**
@@ -139,14 +139,14 @@ ColorRGB sSkyboxColors[] = {
 s32 calculate_skybox_scaled_x(s8 player, f32 fov) {
     f32 yaw = sSkyBoxInfo[player].yaw;
 
-    f32 yawScaled = ((SCREEN_WIDTH * 360.0f * yaw) / (fov * 65536.0f));
+    f32 yawScaled = SCREEN_WIDTH * 360.0f * yaw / (fov * 65536.0f);
     // Round the scaled yaw. Since yaw is a u16, it doesn't need to check for < 0
-    s32 scaledX = (yawScaled + 0.5f);
+    s32 scaledX = yawScaled + 0.5f;
 
     if (scaledX > SKYBOX_WIDTH) {
-        scaledX -= ((scaledX / SKYBOX_WIDTH) * SKYBOX_WIDTH);
+        scaledX -= scaledX / SKYBOX_WIDTH * SKYBOX_WIDTH;
     }
-    return (SKYBOX_WIDTH - scaledX);
+    return SKYBOX_WIDTH - scaledX;
 }
 
 /**
@@ -157,15 +157,15 @@ s32 calculate_skybox_scaled_x(s8 player, f32 fov) {
  */
 s32 calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
     // Convert pitch to degrees. Pitch is bounded between -90 (looking down) and 90 (looking up).
-    f32 pitchInDegrees = (((f32) sSkyBoxInfo[player].pitch * 360.0f) / 65535.0f);
+    f32 pitchInDegrees = (f32) sSkyBoxInfo[player].pitch * 360.0f / 65535.0f;
 
     // Scale by 360 / fov
-    f32 degreesToScale = ((360.0f * pitchInDegrees) / 90.0f);
+    f32 degreesToScale = 360.0f * pitchInDegrees / 90.0f;
     s32 roundedY = roundf(degreesToScale);
 
     // Since pitch can be negative, and the tile grid starts 1 octant above the camera's focus, add
     // 5 octants to the y position
-    s32 scaledY = (roundedY + ((5 * SKYBOX_SIZE) * SKYBOX_TILE_HEIGHT));
+    s32 scaledY = roundedY + (5 * SKYBOX_SIZE) * SKYBOX_TILE_HEIGHT;
 
     return CLAMP(scaledY, SCREEN_HEIGHT, SKYBOX_HEIGHT);
 }
@@ -174,10 +174,10 @@ s32 calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
  * Converts the upper left xPos and yPos to the index of the upper left tile in the skybox.
  */
 static s32 get_top_left_tile_idx(s8 player) {
-    s32 tileCol = (sSkyBoxInfo[player].scaledX / SKYBOX_TILE_WIDTH);
-    s32 tileRow = ((SKYBOX_HEIGHT - sSkyBoxInfo[player].scaledY) / SKYBOX_TILE_HEIGHT);
+    s32 tileCol = sSkyBoxInfo[player].scaledX / SKYBOX_TILE_WIDTH;
+    s32 tileRow = (SKYBOX_HEIGHT - sSkyBoxInfo[player].scaledY) / SKYBOX_TILE_HEIGHT;
 
-    return ((tileRow * SKYBOX_COLS) + tileCol);
+    return tileRow * SKYBOX_COLS + tileCol;
 }
 
 /**
@@ -189,8 +189,8 @@ static s32 get_top_left_tile_idx(s8 player) {
  */
 Vtx *make_skybox_rect(s32 tileIndex, s8 colorIndex) {
     Vtx *verts = alloc_display_list(4 * sizeof(*verts));
-    s16 x = (tileIndex % SKYBOX_COLS * SKYBOX_TILE_WIDTH);
-    s16 y = (SKYBOX_HEIGHT - (tileIndex / SKYBOX_COLS * SKYBOX_TILE_HEIGHT));
+    s16 x = tileIndex % SKYBOX_COLS * SKYBOX_TILE_WIDTH;
+    s16 y = SKYBOX_HEIGHT - tileIndex / SKYBOX_COLS * SKYBOX_TILE_HEIGHT;
 
     if (verts != NULL) {
         make_vertex(verts, 0,  x,                       y,                       -1,         0,         0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
@@ -225,10 +225,10 @@ void draw_skybox_tile_grid(Gfx **dlist, s8 background, s8 player, s8 colorIndex)
 }
 
 void *create_skybox_ortho_matrix(s8 player) {
-    f32 left   =  sSkyBoxInfo[player].scaledX;
-    f32 right  = (sSkyBoxInfo[player].scaledX + SCREEN_WIDTH );
-    f32 bottom = (sSkyBoxInfo[player].scaledY - SCREEN_HEIGHT);
-    f32 top    =  sSkyBoxInfo[player].scaledY;
+    f32 left = sSkyBoxInfo[player].scaledX;
+    f32 right = sSkyBoxInfo[player].scaledX + SCREEN_WIDTH;
+    f32 bottom = sSkyBoxInfo[player].scaledY - SCREEN_HEIGHT;
+    f32 top = sSkyBoxInfo[player].scaledY;
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
 
 #ifdef WIDESCREEN
@@ -252,7 +252,7 @@ void *create_skybox_ortho_matrix(s8 player) {
  * Creates the skybox's display list, then draws the 3x3 grid of tiles.
  */
 Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
-    s32 dlCommandCount = (5 + ((3 * 3) * 7)); // 5 for the start and end, plus 9 skybox tiles
+    s32 dlCommandCount = 5 + (3 * 3) * 7; // 5 for the start and end, plus 9 skybox tiles
     void *skybox = alloc_display_list(dlCommandCount * sizeof(Gfx) * sqr(SKYBOX_SIZE));
     Gfx *dlist = skybox;
 
@@ -261,11 +261,11 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
     } else {
         Mtx *ortho = create_skybox_ortho_matrix(player);
 
-        gSPDisplayList(   dlist++, dl_skybox_begin);
-        gSPMatrix(        dlist++, VIRTUAL_TO_PHYSICAL(ortho), (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH));
-        gSPDisplayList(   dlist++, dl_skybox_tile_tex_settings);
+        gSPDisplayList(dlist++, dl_skybox_begin);
+        gSPMatrix(dlist++, VIRTUAL_TO_PHYSICAL(ortho), (G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH));
+        gSPDisplayList(dlist++, dl_skybox_tile_tex_settings);
         draw_skybox_tile_grid(&dlist, background, player, colorIndex);
-        gSPDisplayList(   dlist++, dl_skybox_end);
+        gSPDisplayList(dlist++, dl_skybox_end);
         gSPEndDisplayList(dlist);
     }
     return skybox;
@@ -287,7 +287,7 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, V
 
     // If the "Plunder in the Sunken Ship" star in JRB is collected, make the sky darker and slightly green
     if ((background == BACKGROUND_ABOVE_CLOUDS)
-     && !(save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
+     && !(save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
         colorIndex = 0;
     }
 

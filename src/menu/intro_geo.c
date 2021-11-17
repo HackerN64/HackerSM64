@@ -14,8 +14,8 @@
 #include "audio/external.h"
 
 // frame counts for the zoom in, hold, and zoom out of title model
-#define INTRO_STEPS_ZOOM_IN  20
-#define INTRO_STEPS_HOLD_1   75
+#define INTRO_STEPS_ZOOM_IN 20
+#define INTRO_STEPS_HOLD_1 75
 #define INTRO_STEPS_ZOOM_OUT 91
 
 // background types
@@ -56,7 +56,7 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
         Vec3f scale;
 
         // determine scale based on the frame counter
-        if ((sIntroFrameCounter >= 0) && (sIntroFrameCounter < INTRO_STEPS_ZOOM_IN)) {
+        if (sIntroFrameCounter >= 0 && sIntroFrameCounter < INTRO_STEPS_ZOOM_IN) {
             // zooming in
             vec3f_copy(scale, &scaleTable1[sIntroFrameCounter * 3]);
         } else if (sIntroFrameCounter >= INTRO_STEPS_ZOOM_IN && sIntroFrameCounter < INTRO_STEPS_HOLD_1) {
@@ -159,7 +159,7 @@ static Gfx *intro_backdrop_one_image(s32 index, s8 *backgroundTable) {
     s32 i;
 
     guTranslate(mtx, xCoords[index], yCoords[index], 0.0f);
-    gSPMatrix(displayListIter++, mtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH));
+    gSPMatrix(displayListIter++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_PUSH);
     gSPDisplayList(displayListIter++, &title_screen_bg_dl_0A000118);
     for (i = 0; i < 4; ++i) {
         gDPLoadTextureBlock(displayListIter++, vIntroBgTable[i], G_IM_FMT_RGBA, G_IM_SIZ_16b, 80, 20, 0,
@@ -186,9 +186,9 @@ static s8 *introBackgroundTables[] = { introBackgroundIndexTable };
  */
 Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeMore *graphNode = (struct GraphNodeMore *) node;
-    s32 index = (graphNode->bgTableID & 0xff); // TODO: word at offset 0x18 of struct GraphNode (always ends up being 0)
+    s32 index = graphNode->bgTableID & 0xff; // TODO: word at offset 0x18 of struct GraphNode (always ends up being 0)
     s8 *backgroundTable = introBackgroundTables[index];
-    Gfx *dl     = NULL;
+    Gfx *dl = NULL;
     Gfx *dlIter = NULL;
     s32 i;
 
@@ -229,8 +229,8 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     s32 i, j;
 
     if (callContext != GEO_CONTEXT_RENDER) {  // reset
-        sGameOverFrameCounter =  0;
-        sGameOverTableIndex   = -2;
+        sGameOverFrameCounter = 0;
+        sGameOverTableIndex = -2;
         for (i = 0; i < ARRAY_COUNT(gameOverBackgroundTable); ++i) {
             gameOverBackgroundTable[i] = INTRO_BACKGROUND_GAME_OVER;
         }
@@ -244,7 +244,7 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
             }
         } else {
             // transition tile from "Game Over" to "Super Mario 64"
-            if ((sGameOverTableIndex != 11) && !(sGameOverFrameCounter & 0x1)) {
+            if (sGameOverTableIndex != 11 && !(sGameOverFrameCounter & 0x1)) {
                 sGameOverTableIndex++;
                 gameOverBackgroundTable[flipOrder[sGameOverTableIndex]] = INTRO_BACKGROUND_SUPER_MARIO;
             }
@@ -298,9 +298,9 @@ void intro_gen_face_texrect(Gfx **dlIter) {
 
     for (y = 0; y < 6; y++) {
         for (x = 0; x < 8; x++) {
-            if (sFaceVisible[(y * 8) + x] != 0) {
-                gSPTextureRectangle((*dlIter)++, ((x * 40) << 2), ((y * 40) << 2), (((x * 40) + 39) << 2), (((y * 40) + 39) << 2), 0,
-                                    0, 0, (4 << 10), (1 << 10));
+            if (sFaceVisible[y * 8 + x] != 0) {
+                gSPTextureRectangle((*dlIter)++, (x * 40) << 2, (y * 40) << 2, (x * 40 + 39) << 2, (y * 40 + 39) << 2, 0,
+                                    0, 0, 4 << 10, 1 << 10);
             }
         }
     }
@@ -354,9 +354,9 @@ RGBA16Return32 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s
                     color[2] += RGBA16_B(pixel);
                 }
             }
-            image[(imageH * iy) + ix] = ((R_RGBA16((RGBA16)((color[0] * size) + 0.5f)) & 0xFFFF) |
-                                         (G_RGBA16((RGBA16)((color[1] * size) + 0.5f)) & 0xFFFF) |
-                                         (B_RGBA16((RGBA16)((color[2] * size) + 0.5f)) & 0xFFFF) | MSK_RGBA16_A);
+            image[imageH * iy + ix] = ((R_RGBA16((RGBA16)((color[0] * size) + 0.5f)) & 0xFFFF) |
+                                       (G_RGBA16((RGBA16)((color[1] * size) + 0.5f)) & 0xFFFF) |
+                                       (B_RGBA16((RGBA16)((color[2] * size) + 0.5f)) & 0xFFFF) | MSK_RGBA16_A);
         }
     }
 
@@ -372,6 +372,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
         for (i = 0; i < 48; i++) {
             sFaceVisible[i] = 0;
         }
+
     } else if (callContext == GEO_CONTEXT_RENDER) {
         if (sFaceCounter == 0) {
             if (gPlayer1Controller->buttonPressed & Z_TRIG) {
@@ -385,6 +386,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
                 sFaceCounter = 0;
             }
         }
+
         // Draw while the first or last face is visible.
         if (sFaceVisible[0] == 1 || sFaceVisible[17] == 1) {
             RGBA16 *image = (RGBA16 *)intro_sample_frame_buffer(40, 40, 2, 2, 120, 80);
@@ -410,7 +412,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
         dl = NULL;
     } else if (callContext == GEO_CONTEXT_RENDER) {
         SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
-        s32 introContext = (genNode->parameter & 0xFF);
+        s32 introContext = genNode->parameter & 0xFF;
         if (introContext == INTRO_CONTEXT_NORMAL) {
             backgroundTileSix = introBackgroundIndexTable[6];
         } else if (introContext == INTRO_CONTEXT_GAME_OVER) {

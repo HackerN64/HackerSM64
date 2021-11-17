@@ -2,10 +2,10 @@
 
 struct ObjectHitbox sJumpingBoxHitbox = {
     /* interactType:      */ INTERACT_GRABBABLE,
-    /* downOffset:        */  20,
-    /* damageOrCoinValue: */   0,
-    /* health:            */   1,
-    /* numLootCoins:      */   5,
+    /* downOffset:        */ 20,
+    /* damageOrCoinValue: */ 0,
+    /* health:            */ 1,
+    /* numLootCoins:      */ 5,
     /* radius:            */ 150,
     /* height:            */ 250,
     /* hurtboxRadius:     */ 150,
@@ -72,5 +72,6 @@ void bhv_jumping_box_loop(void) {
         create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
         obj_explode_and_spawn_coins(46.0f, COIN_TYPE_YELLOW);
     }
+
     o->oInteractStatus = INT_STATUS_NONE;
 }
