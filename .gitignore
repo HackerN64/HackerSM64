@@ -98,7 +98,8 @@ build/*
 !/textures/segment2/shadow_quarter_circle_64.ia8.png
 !/textures/segment2/shadow_quarter_square_64.ia8.png
 
-
+# diff files
+*.diff
 
 # libultra
 
