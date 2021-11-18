@@ -362,13 +362,11 @@ void mario_retrieve_cap(void) {
 u32 able_to_grab_object(struct MarioState *m, UNUSED struct Object *obj) {
     u32 action = m->action;
 
-    if ((action == ACT_DIVE_SLIDE)
-     || (action == ACT_DIVE)) {
+    if (action == ACT_DIVE_SLIDE || action == ACT_DIVE) {
         if (!(obj->oInteractionSubtype & INT_SUBTYPE_GRABS_MARIO)) {
             return TRUE;
         }
-    } else if ((action == ACT_PUNCHING)
-            || (action == ACT_MOVE_PUNCHING)) {
+    } else if (action == ACT_PUNCHING || action == ACT_MOVE_PUNCHING) {
         if (m->actionArg < 2) {
             return TRUE;
         }
@@ -412,7 +410,7 @@ u32 mario_check_object_grab(struct MarioState *m) {
                 m->usedObj = m->interactObj;
 
                 if (!(m->action & ACT_FLAG_AIR)) {
-                    set_mario_action(m, ((m->action & ACT_FLAG_DIVING) ? ACT_DIVE_PICKING_UP : ACT_PICKING_UP), 0);
+                    set_mario_action(m, (m->action & ACT_FLAG_DIVING) ? ACT_DIVE_PICKING_UP : ACT_PICKING_UP, 0);
                 }
 
                 result = TRUE;
@@ -586,14 +584,14 @@ u32 determine_knockback_action(struct MarioState *m, UNUSED s32 arg) {
 
 void push_mario_out_of_object(struct MarioState *m, struct Object *obj, f32 padding) {
     f32 minDistance = (obj->hitboxRadius + m->marioObj->hitboxRadius + padding);
-    f32 offsetX = (m->pos[0] - obj->oPosX);
-    f32 offsetZ = (m->pos[2] - obj->oPosZ);
-    f32 distanceSquared = (sqr(offsetX) + sqr(offsetZ));
+    f32 offsetX = m->pos[0] - obj->oPosX;
+    f32 offsetZ = m->pos[2] - obj->oPosZ;
+    f32 distanceSquared = sqr(offsetX) + sqr(offsetZ);
     if (distanceSquared < sqr(minDistance)) {
         struct Surface *floor;
         s16 pushAngle = ((distanceSquared == 0.0f) ? m->faceAngle[1] : atan2s(offsetZ, offsetX));
-        f32 newMarioX = (obj->oPosX + (minDistance * sins(pushAngle)));
-        f32 newMarioZ = (obj->oPosZ + (minDistance * coss(pushAngle)));
+        f32 newMarioX = obj->oPosX + minDistance * sins(pushAngle);
+        f32 newMarioZ = obj->oPosZ + minDistance * coss(pushAngle);
         f32_find_wall_collision(&newMarioX, &m->pos[1], &newMarioZ, 60.0f, 50.0f);
         f32 floorHeight = find_floor(newMarioX, m->pos[1], newMarioZ, &floor);
         if (floor != NULL) {
@@ -681,17 +679,17 @@ u32 take_damage_and_knock_back(struct MarioState *m, struct Object *obj) {
 }
 
 void reset_mario_pitch(struct MarioState *m) {
-    if ((m->action == ACT_WATER_JUMP)
-     || (m->action == ACT_SHOT_FROM_CANNON)
-     || (m->action == ACT_FLYING)) {
+    if (m->action == ACT_WATER_JUMP
+     || m->action == ACT_SHOT_FROM_CANNON
+     || m->action == ACT_FLYING) {
         set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
         m->faceAngle[0] = 0;
     }
 }
 
 u32 interact_coin(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    m->numCoins      += obj->oDamageOrCoinValue;
-    m->healCounter   += 4 * obj->oDamageOrCoinValue;
+    m->numCoins += obj->oDamageOrCoinValue;
+    m->healCounter += 4 * obj->oDamageOrCoinValue;
 #ifdef BREATH_METER
     m->breathCounter += 4 * obj->oDamageOrCoinValue;
 #endif
@@ -715,7 +713,7 @@ u32 interact_water_ring(struct MarioState *m, UNUSED u32 interactType, struct Ob
 #ifdef BREATH_METER
     m->breathCounter += 4 * obj->oDamageOrCoinValue;
 #else
-    m->healCounter   += 4 * obj->oDamageOrCoinValue;
+    m->healCounter += 4 * obj->oDamageOrCoinValue;
 #endif
     obj->oInteractStatus = INT_STATUS_INTERACTED;
     return FALSE;
@@ -726,7 +724,7 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
 #ifdef NON_STOP_STARS
     u32 noExit = TRUE;
 #else
-    u32 noExit    = (obj->oInteractionSubtype & INT_SUBTYPE_NO_EXIT   ) != 0;
+    u32 noExit = (obj->oInteractionSubtype & INT_SUBTYPE_NO_EXIT) != 0;
 #endif
     u32 grandStar = (obj->oInteractionSubtype & INT_SUBTYPE_GRAND_STAR) != 0;
 
@@ -754,9 +752,13 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         } else { 
             starGrabAction = ACT_STAR_DANCE_NO_EXIT;
         }
-        if (m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) starGrabAction = ACT_STAR_DANCE_WATER;
+
+        if (m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
+            starGrabAction = ACT_STAR_DANCE_WATER;
+        }
+
         if (m->action & ACT_FLAG_AIR) {
-            starGrabAction = ((m->pos[1] < (m->floorHeight + 1024.0f)) ? ACT_FALL_AFTER_STAR_GRAB : ACT_STAR_DANCE_WATER);
+            starGrabAction = ((m->pos[1] < m->floorHeight + 1024.0f) ? ACT_FALL_AFTER_STAR_GRAB : ACT_STAR_DANCE_WATER);
         }
 
         spawn_object(obj, MODEL_NONE, bhvStarKeyCollectionPuffSpawner);
@@ -767,7 +769,7 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
 #ifdef GLOBAL_STAR_IDS
         u32 starIndex = GET_BPARAM1(obj->oBehParams);
 #else
-        u32 starIndex = (GET_BPARAM1(obj->oBehParams) & 0x1F);
+        u32 starIndex = GET_BPARAM1(obj->oBehParams) & 0x1F;
 #endif
         save_file_collect_star_or_key(m->numCoins, starIndex);
 
@@ -898,8 +900,7 @@ u32 interact_warp_door(struct MarioState *m, UNUSED u32 interactType, struct Obj
         }
 #endif
 
-        if ((m->action == ACT_WALKING)
-         || (m->action == ACT_DECELERATING)) {
+        if (m->action == ACT_WALKING || m->action == ACT_DECELERATING) {
             u32 actionArg = (should_push_or_pull_door(m, obj) + WARP_FLAG_DOOR_IS_WARP);
 
             if (doorAction == 0) {

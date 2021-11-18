@@ -67,7 +67,6 @@ enum InteractSubtypes {
     INT_SUBTYPE_NPC                 = /* 0x00004000 */ (1 << 14),
     // INTERACT_CLAM_OR_BUBBA
     INT_SUBTYPE_EATS_MARIO          = /* 0x00002000 */ (1 << 13),
-    
 };
 
 enum AttackType {
@@ -124,19 +123,19 @@ enum Interactions {
     INT_ATTACK_NOT_WEAK_FROM_ABOVE = (INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP |                                                                  INT_HIT_FROM_BELOW),
 };
 
-s32  mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
+s32 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
 void mario_stop_riding_object(struct MarioState *m);
 void mario_grab_used_object(struct MarioState *m);
 void mario_drop_held_object(struct MarioState *m);
 void mario_throw_held_object(struct MarioState *m);
 void mario_stop_riding_and_holding(struct MarioState *m);
-u32  does_mario_have_normal_cap_on_head(struct MarioState *m);
+u32 does_mario_have_normal_cap_on_head(struct MarioState *m);
 void mario_blow_off_cap(struct MarioState *m, f32 capSpeed);
-u32  mario_lose_cap_to_enemy(u32 enemyType);
+u32 mario_lose_cap_to_enemy(u32 enemyType);
 void mario_retrieve_cap(void);
 struct Object *mario_get_collided_object(struct MarioState *m, u32 interactType);
-u32  mario_check_object_grab(struct MarioState *m);
-u32  get_door_save_file_flag(struct Object *door);
+u32 mario_check_object_grab(struct MarioState *m);
+u32 get_door_save_file_flag(struct Object *door);
 void mario_process_interactions(struct MarioState *m);
 void mario_handle_special_floors(struct MarioState *m);
 
