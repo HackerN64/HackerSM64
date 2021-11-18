@@ -17,8 +17,6 @@
 #define MAX_UPDATES_PER_FRAME 4
 #endif
 
-#define ALIGN16(val) (((val) + 0xF) & ~0xF)
-
 #if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
 
 #define NUM_ALLPASS 12 // Number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.

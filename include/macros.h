@@ -53,6 +53,17 @@
 #define ALIGNED16
 #endif
 
+// round up to the next multiple.
+#define ALIGN4(val)  (((val) + 0x3) & ~0x3)
+#define ALIGN8(val)  (((val) + 0x7) & ~0x7)
+#define ALIGN16(val) (((val) + 0xF) & ~0xF)
+#define ALIGN32(val) (((val) + 0x1F) & ~0x1F)
+#define ALIGN64(val) (((val) + 0x3F) & ~0x3F)
+
+#ifndef ALIGN
+#define ALIGN(VAL_, ALIGNMENT_) (((VAL_) + ((ALIGNMENT_) - 1)) & ~((ALIGNMENT_) - 1))
+#endif
+
 #ifndef NO_SEGMENTED_MEMORY
 // convert a virtual address to physical.
 #define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
