@@ -393,6 +393,7 @@ u32 mario_check_object_grab(struct MarioState *m) {
     if (m->input & INPUT_INTERACT_OBJ_GRABBABLE) {
         struct Object *obj = m->interactObj;
         if (obj->behavior == segmented_to_virtual(bhvBowser)) {
+#ifdef BOWSER_TAIL_GRAB_FIX
             f32 dist;
             s16 yaw;
             vec3f_get_dist_and_yaw(m->pos, &obj->prevObj->oPosVec, &dist, &yaw); // dist and yaw from Mario to tail object
@@ -403,6 +404,13 @@ u32 mario_check_object_grab(struct MarioState *m) {
                     return set_mario_action(m, ACT_PICKING_UP_BOWSER, 0);
                 }
             }
+#else
+            if (abs_angle_diff(m->faceAngle[1], m->interactObj->oMoveAngleYaw) <= DEGREES(120)) {
+                m->faceAngle[1] = m->interactObj->oMoveAngleYaw;
+                m->usedObj = m->interactObj;
+                return set_mario_action(m, ACT_PICKING_UP_BOWSER, 0);
+            }
+#endif
         } else {
             if (abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]) <= DEGREES(60)) {
                 m->usedObj = obj;

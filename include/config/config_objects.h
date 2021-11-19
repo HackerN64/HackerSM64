@@ -54,6 +54,11 @@
 // The speed of a platform on a track can be controlled by standing near the front or back of it
 //#define CONTROLLABLE_PLATFORM_SPEED
 
+// -- BOWSER --
+
+// Fixes being able to pick up Bowser from anywhere within in his hitbox after having passed through the tail hitbox once.
+#define BOWSER_TAIL_GRAB_FIX
+
 // -- CHAIN CHOMP --
 
 // The number of chain balls the Chain Chomp has.  Vanilla is 5.
