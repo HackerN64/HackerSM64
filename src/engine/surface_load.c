@@ -615,7 +615,9 @@ void load_object_collision_model(void) {
 
 #ifdef AUTO_COLLISION_DISTANCE
     // Originally from Kaze Emanuar
-    if (collisionData != NULL && !(o->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
+    if (collisionData == NULL) {
+        o->oCollisionDistance = 0.0f;
+    } else if (!(o->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
         o->oFlags |= OBJ_FLAG_DONT_CALC_COLL_DIST;
         register f32 thisVertDist, maxDist = 0.0f;
         register Vec3f v, scale;
