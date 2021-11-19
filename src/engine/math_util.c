@@ -352,22 +352,36 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
  * | 0 0 0 1 |
  * i.e. a matrix representing a linear transformation over 3 space.
  */
-void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
+void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
+    register f32 x = src[0];
+    register f32 y = src[1];
+    register f32 z = src[2];
+    register f32 *temp  = (f32 *)dst;
+    register f32 *temp2 = (f32 *)mtx;
     s32 i;
     for (i = 0; i < 3; i++) {
-        dst[i] = ((m[0][i] * v[0])
-                + (m[1][i] * v[1])
-                + (m[2][i] * v[2]));
+        *temp = ((temp2[0] * x)
+               + (temp2[4] * y)
+               + (temp2[8] * z));
+        temp++;
+        temp2++;
     }
 }
 
-void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v) {
+void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src) {
+    register f32 x = src[0];
+    register f32 y = src[1];
+    register f32 z = src[2];
+    register f32 *temp  = (f32 *)dst;
+    register f32 *temp2 = (f32 *)mtx;
     s32 i;
     for (i = 0; i < 3; i++) {
-        dst[i] = ((m[0][i] * v[0])
-                + (m[1][i] * v[1])
-                + (m[2][i] * v[2])
-                +  m[3][i]);
+        *temp = ((temp2[ 0] * x)
+               + (temp2[ 4] * y)
+               + (temp2[ 8] * z)
+               +  temp2[12]);
+        temp++;
+        temp2++;
     }
 }
 
@@ -379,10 +393,10 @@ void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v) {
  * | 0 0 0 1 |
  * i.e. a matrix representing a linear transformation over 3 space.
  */
-void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
+void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
     s32 i;
     for (i = 0; i < 3; i++) {
-        dst[i] = vec3_dot(m[i], v);
+        dst[i] = vec3_dot(mtx[i], src);
     }
 }
 
@@ -722,14 +736,17 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
  * Set matrix 'dest' to 'mtx' scaled by vector s
  */
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
+    register f32 x = s[0];
+    register f32 y = s[1];
+    register f32 z = s[2];
     register f32 *temp  = (f32 *)dest;
     register f32 *temp2 = (f32 *)mtx;
     register s32 i;
 
     for (i = 0; i < 4; i++) {
-        temp[ 0] = (temp2[ 0] * s[0]);
-        temp[ 4] = (temp2[ 4] * s[1]);
-        temp[ 8] = (temp2[ 8] * s[2]);
+        temp[ 0] = (temp2[ 0] * x);
+        temp[ 4] = (temp2[ 4] * y);
+        temp[ 8] = (temp2[ 8] * z);
         temp[12] =  temp2[12];
         temp++;
         temp2++;

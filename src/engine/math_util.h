@@ -553,9 +553,9 @@ inline void mtxf_to_mtx(register void *dest, register void *src) {
     guMtxF2L(src, dest);
 }
 void mtxf_rotate_xy(Mtx *mtx, s32 angle);
-void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
-void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v);
-void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v);
+void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
+void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src);
+void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);
 void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx);
 
