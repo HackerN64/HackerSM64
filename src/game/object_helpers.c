@@ -159,7 +159,7 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
 }
 
 void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
-    linear_mtxf_mul_vec3f_and_translate(mtx, &obj->oPosVec,  &obj->oParentRelativePosVec);
+    linear_mtxf_mul_vec3f_and_translate(mtx, &obj->oPosVec, &obj->oParentRelativePosVec);
 }
 
 void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior) {
@@ -484,16 +484,16 @@ void obj_init_animation_with_sound(struct Object *obj, const struct Animation * 
 
 void cur_obj_enable_rendering_and_become_tangible(struct Object *obj) {
     obj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
-    obj->oIntangibleTimer = 0;
-}
-
-void cur_obj_enable_rendering(void) {
-    o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
+    obj_become_tangible(obj);
 }
 
 void cur_obj_disable_rendering_and_become_intangible(struct Object *obj) {
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
-    obj->oIntangibleTimer = -1;
+    obj_become_intangible(obj);
+}
+
+void cur_obj_enable_rendering(void) {
+    o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 }
 
 void cur_obj_disable_rendering(void) {
@@ -754,8 +754,9 @@ static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
 
 void cur_obj_get_thrown_or_placed(f32 forwardVel, f32 velY, s32 thrownAction) {
     if (o->behavior == segmented_to_virtual(bhvBowser)) {
-        // Interestingly, when bowser is thrown, he is offset slightly to Mario's right
-        cur_obj_set_pos_relative(o->parentObj, -41.684f, 85.859f, 321.577f);
+        // // Interestingly, when bowser is thrown, he is offset slightly to Mario's right
+        // cur_obj_set_pos_relative(o->parentObj, -41.684f, 85.859f, 321.577f);
+        cur_obj_set_pos_relative(o->parentObj, 0.0f, 90.0f, 320.0f);
     }
 
     cur_obj_become_tangible();
@@ -837,9 +838,13 @@ void cur_obj_disable(void) {
 }
 
 void cur_obj_become_intangible(void) {
-    // When the timer is negative, the object is intangible and the timer
-    // doesn't count down
+    // When the timer is negative, the object is intangible and the timer doesn't count down
     o->oIntangibleTimer = -1;
+}
+
+void obj_become_intangible(struct Object *obj) {
+    // When the timer is negative, the object is intangible and the timer doesn't count down
+    obj->oIntangibleTimer = -1;
 }
 
 void cur_obj_become_tangible(void) {
@@ -2066,7 +2071,11 @@ void cur_obj_align_gfx_with_floor(void) {
     Vec3f position;
     vec3f_copy(position, &o->oPosVec);
 
-    find_floor(position[0], position[1], position[2], &floor);
+    if (o->oFloor) {
+        floor = o->oFloor;
+    } else {
+        find_floor(position[0], position[1], position[2], &floor);
+    }
     if (floor != NULL) {
         Vec3f floorNormal;
         surface_normal_to_vec3f(floorNormal, floor);

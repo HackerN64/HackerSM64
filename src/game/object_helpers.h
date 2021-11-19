@@ -144,6 +144,7 @@ s32 cur_obj_clear_interact_status_flag(s32 flag);
 void obj_mark_for_deletion(struct Object *obj);
 void cur_obj_disable(void);
 void cur_obj_become_intangible(void);
+void obj_become_intangible(struct Object *obj);
 void cur_obj_become_tangible(void);
 void obj_become_tangible(struct Object *obj);
 void cur_obj_update_floor_height(void);
