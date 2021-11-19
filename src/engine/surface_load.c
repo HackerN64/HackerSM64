@@ -595,26 +595,6 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
     }
 }
 
-#ifdef AUTO_COLLISION_DISTANCE
-// From Kaze
-static void get_optimal_coll_dist(struct Object *obj) {
-    register f32 thisVertDist, maxDist = 0.0f;
-    Vec3f v;
-    TerrainData *collisionData = o->collisionData;
-    obj->oFlags |= OBJ_FLAG_DONT_CALC_COLL_DIST;
-    collisionData++;
-    register u32 vertsLeft = *(collisionData)++;
-    while (vertsLeft) {
-        vec3_prod(v, collisionData, obj->header.gfx.scale);
-        thisVertDist = vec3_sumsq(v);
-        if (thisVertDist > maxDist) maxDist = thisVertDist;
-        collisionData += 3;
-        vertsLeft--;
-    }
-    obj->oCollisionDistance = (sqrtf(maxDist) + 100.0f);
-}
-#endif
-
 /**
  * Transform an object's vertices, reload them, and render the object.
  */
@@ -629,13 +609,29 @@ void load_object_collision_model(void) {
 
     // On an object's first frame, the distance is set to 19000.0f.
     // If the distance hasn't been updated, update it now.
-    if (o->oDistanceToMario == 19000.0f) {
+    if (marioDist == 19000.0f) {
         marioDist = dist_between_objects(o, gMarioObject);
     }
 
 #ifdef AUTO_COLLISION_DISTANCE
-    if (!(o->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
-        get_optimal_coll_dist(o);
+    // Originally from Kaze Emanuar
+    if (collisionData != NULL && !(o->oFlags & OBJ_FLAG_DONT_CALC_COLL_DIST)) {
+        o->oFlags |= OBJ_FLAG_DONT_CALC_COLL_DIST;
+        register f32 thisVertDist, maxDist = 0.0f;
+        register Vec3f v, scale;
+        collisionData++;
+        register u32 vertsLeft = *(collisionData)++;
+        vec3_copy(scale, o->header.gfx.scale);
+        while (vertsLeft) {
+            vec3_prod(v, collisionData, scale);
+            thisVertDist = vec3_sumsq(v);
+            if (thisVertDist > maxDist) {
+                maxDist = thisVertDist;
+            }
+            collisionData += 3;
+            vertsLeft--;
+        }
+        o->oCollisionDistance = (sqrtf(maxDist) + 200.0f);
     }
 #endif
 
@@ -649,6 +645,9 @@ void load_object_collision_model(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE)
      && (marioDist < o->oCollisionDistance)
      && !(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
+#ifdef AUTO_COLLISION_DISTANCE
+        collisionData = o->collisionData;
+#endif
         collisionData++;
         transform_object_vertices(&collisionData, vertexData);
 
