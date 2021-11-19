@@ -780,31 +780,39 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
     ((s16 *) mtx)[a     ] = (((s32) b) >> 16);  \
     ((s16 *) mtx)[a + 16] = (((s32) b) & 0xFFFF);
 void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
-    register s32 i = (coss(angle) * 0x10000);
-    register s32 j = (sins(angle) * 0x10000);
+    register s32 c = (coss(angle) * 0x10000);
+    register s32 s = (sins(angle) * 0x10000);
     register f32 *temp = (f32 *)mtx;
-    register s32 k;
-    for (k = 0; k < 16; k++) {
+    register s32 i;
+    for (i = 0; i < 16; i++) {
         *temp = 0;
         temp++;
     }
-    MATENTRY(0,  i)
-    MATENTRY(1,  j)
-    MATENTRY(4, -j)
-    MATENTRY(5,  i)
+    MATENTRY(0,  c)
+    MATENTRY(1,  s)
+    MATENTRY(4, -s)
+    MATENTRY(5,  c)
     ((s16 *) mtx)[10] = 1;
     ((s16 *) mtx)[15] = 1;
 }
 
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
-    s32 i, j;
+    register f32 *temp = (f32 *)dst;
+    register f32 tx = a2[3][0];
+    register f32 ty = a2[3][1];
+    register f32 tz = a2[3][2];
+    register f32 rx, ry, rz;
+    s32 i;
     for (i = 0; i < 3; i++) {
-        for (j = 0; j < 3; j++) {
-            dst[i][j] = vec3f_dot(a1[i], a2[j]);
-        }
-    }
-    for (i = 0; i < 3; i++) {
-        dst[3][i] = vec3f_dot(a1[3], a2[i]) - vec3f_dot(a2[3], a2[i]);
+        rx = a2[i][0];
+        ry = a2[i][1];
+        rz = a2[i][2];
+        temp[ 0] = (a1[0][0] * rx + a1[0][1] * ry + a1[0][2] * rz); //   vec3f_dot(a1[0], a2[i])
+        temp[ 4] = (a1[1][0] * rx + a1[1][1] * ry + a1[1][2] * rz); //   vec3f_dot(a1[1], a2[i])
+        temp[ 8] = (a1[2][0] * rx + a1[2][1] * ry + a1[2][2] * rz); //   vec3f_dot(a1[2], a2[i])
+        temp[12] = (a1[3][0] * rx + a1[3][1] * ry + a1[3][2] * rz)  //   vec3f_dot(a1[3], a2[i])
+                 - (      tx * rx +       ty * ry +       tz * rz); // - vec3f_dot(a2[3], a2[i])
+        temp++;
     }
     MTXF_END(dst);
 }
