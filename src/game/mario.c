@@ -257,7 +257,7 @@ void play_mario_jump_sound(struct MarioState *m) {
  * Adjusts the volume/pitch of sounds from Mario's speed.
  */
 void adjust_sound_for_speed(struct MarioState *m) {
-    s32 absForwardVel = (m->forwardVel > 0.0f) ? m->forwardVel : -m->forwardVel;
+    s32 absForwardVel = absf(m->forwardVel);
     set_sound_moving_speed(SOUND_BANK_MOVING, MIN(absForwardVel, 100));
 }
 
@@ -817,7 +817,7 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
             break;
 
         case ACT_DIVE:
-            forwardVel += 15.0f;
+            forwardVel = m->forwardVel + 15.0f;
             if (forwardVel > 48.0f) {
                 forwardVel = 48.0f;
             }
@@ -1109,7 +1109,7 @@ s32 transition_submerged_to_airborne(struct MarioState *m) {
     vec3_zero(m->angleVel);
 
     if (m->input & INPUT_A_DOWN) {
-        return set_mario_action(m, (m->heldObj ? ACT_HOLD_JUMP     : ACT_DIVE    ), 0);
+        return set_mario_action(m, (m->heldObj ? ACT_HOLD_JUMP : ACT_DIVE), 0);
     } else {
         return set_mario_action(m, (m->heldObj ? ACT_HOLD_FREEFALL : ACT_FREEFALL), 0);
     }
