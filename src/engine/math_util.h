@@ -10,12 +10,7 @@
 
 #define FLOAT_ONE   0x3F800000
 
-extern Vec3f gVec3fX;
-extern Vec3f gVec3fY;
-extern Vec3f gVec3fZ;
-extern Vec3f gVec3fNX;
-extern Vec3f gVec3fNY;
-extern Vec3f gVec3fNZ;
+extern Mat4 identityMtx;
 extern Vec3f gVec3fZero;
 extern Vec3s gVec3sZero;
 extern Vec3i gVec3iZero;
@@ -471,11 +466,11 @@ inline s32 absi(s32 in) {
 #define abss absi
 
 #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
-
+// RNG
 u32 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
-
+// Min/Max
 f32  min_3f(   f32 a, f32 b, f32 c);
 s32  min_3i(   s32 a, s32 b, s32 c);
 s32  min_3s(   s16 a, s16 b, s16 c);
@@ -485,7 +480,7 @@ s32  max_3s(   s16 a, s16 b, s16 c);
 void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max);
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max);
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max);
-
+// Vector copy
 void vec3f_copy    (Vec3f dest, const Vec3f src);
 void vec3i_copy    (Vec3i dest, const Vec3i src);
 void vec3s_copy    (Vec3s dest, const Vec3s src);
@@ -495,15 +490,14 @@ void vec3i_to_vec3s(Vec3s dest, const Vec3i src);
 void vec3i_to_vec3f(Vec3f dest, const Vec3i src);
 void vec3f_to_vec3s(Vec3s dest, const Vec3f src);
 void vec3f_to_vec3i(Vec3i dest, const Vec3f src);
-
+// Special vector copy
 void vec3f_copy_y_off(Vec3f dest, Vec3f src, f32 yOff);
-
 void surface_normal_to_vec3f(Vec3f dest, struct Surface *surf);
-
+// Vector set
 void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z);
 void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z);
 void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z);
-
+// Vector arithmetic
 void vec3f_add (Vec3f dest, const Vec3f a               );
 void vec3i_add (Vec3i dest, const Vec3i a               );
 void vec3s_add (Vec3s dest, const Vec3s a               );
@@ -528,37 +522,41 @@ void vec3s_div (Vec3s dest, const Vec3s a               );
 void vec3f_quot(Vec3f dest, const Vec3f a, const Vec3f b);
 void vec3i_quot(Vec3i dest, const Vec3i a, const Vec3i b);
 void vec3s_quot(Vec3s dest, const Vec3s a, const Vec3s b);
-
+// Vector operations
 f32  vec3f_dot(              const Vec3f a, const Vec3f b);
 void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b);
 void vec3f_normalize(Vec3f dest);
+// Mtxf operations
 void mtxf_copy(Mat4 dest, Mat4 src);
+// Create specific matrices
 void mtxf_identity(Mat4 mtx);
-void mtxf_translate(Mat4 dest, Vec3f b);
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll);
-void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
-void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
-void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
-void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle);
 void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw);
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw);
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius);
+void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);
+// Translation & rotation
+void mtxf_translate(Mat4 dest, Vec3f b);
+void mtxf_rotate_xy(Mtx *mtx, s32 angle);
+void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
+void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
+void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
+void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
+void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx);
+// Matrix multiplication
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b);
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s);
 void mtxf_mul_vec3s(Mat4 mtx, Vec3s b);
+void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
+void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src);
+void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
 // extern void mtxf_to_mtx_asm(register void *dest, register void *src);
 inline void mtxf_to_mtx(register void *dest, register void *src) {
     // mtxf_to_mtx_asm(dest, src);
     guMtxF2L(src, dest);
 }
-void mtxf_rotate_xy(Mtx *mtx, s32 angle);
-void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
-void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src);
-void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
-void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);
-void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx);
-
+// Vector get/set functions
 void vec2f_get_lateral_dist(                   Vec2f from, Vec2f to,            f32 *lateralDist                            );
 void vec3f_get_lateral_dist(                   Vec3f from, Vec3f to,            f32 *lateralDist                            );
 void vec3f_get_lateral_dist_squared(           Vec3f from, Vec3f to,            f32 *lateralDist                            );
@@ -577,7 +575,7 @@ void vec3f_get_dist_and_angle(                 Vec3f from, Vec3f to, f32 *dist, 
 void vec3f_to_vec3s_get_dist_and_angle(        Vec3f from, Vec3s to, f32 *dist,                    Angle *pitch, Angle  *yaw);
 void vec3s_set_dist_and_angle(                 Vec3s from, Vec3s to, s16  dist,                   Angle32 pitch, Angle32 yaw);
 void vec3f_set_dist_and_angle(                 Vec3f from, Vec3f to, f32  dist,                   Angle32 pitch, Angle32 yaw);
-
+// Approach value functions
 s32 approach_angle(s32 current, s32 target, s32 inc);
 s32 approach_s16(s32 current, s32 target, s32 inc, s32 dec);
 s32 approach_s32(s32 current, s32 target, s32 inc, s32 dec);
@@ -597,12 +595,15 @@ s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier);
 f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
 s32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor);
 s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor);
+// Angles
 s32 abs_angle_diff(s16 a0, s16 a1);
 s32 atan2s(f32 y, f32 x);
 f32 atan2f(f32 a, f32 b);
+// Splines
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32  anim_spline_poll(Vec3f result);
+// Raycasting
 void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags);
 
 #endif // MATH_UTIL_H

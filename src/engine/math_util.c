@@ -12,13 +12,12 @@
 
 #include "config.h"
 
-
-Vec3f gVec3fX    = {  1.0f,  0.0f,  0.0f };
-Vec3f gVec3fY    = {  0.0f,  1.0f,  0.0f };
-Vec3f gVec3fZ    = {  0.0f,  0.0f,  1.0f };
-Vec3f gVec3fNX   = { -1.0f,  0.0f,  0.0f };
-Vec3f gVec3fNY   = {  0.0f, -1.0f,  0.0f };
-Vec3f gVec3fNZ   = {  0.0f,  0.0f, -1.0f };
+Mat4 identityMtx = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
 Vec3f gVec3fZero = {  0.0f,  0.0f,  0.0f };
 Vec3f gVec3fOne  = {  1.0f,  1.0f,  1.0f };
 Vec3s gVec3sZero = {     0,     0,     0 };
@@ -342,6 +341,48 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
         *((u32 *) pen) = FLOAT_ONE;
     }
     vec3f_copy(&dest[3][0], &b[0]);
+}
+
+/**
+ * Set matrix 'dest' to 'mtx' scaled by vector s
+ */
+void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
+    register f32 x = s[0];
+    register f32 y = s[1];
+    register f32 z = s[2];
+    register f32 *temp  = (f32 *)dest;
+    register f32 *temp2 = (f32 *)mtx;
+    register s32 i;
+    for (i = 0; i < 4; i++) {
+        temp[ 0] = (temp2[ 0] * x);
+        temp[ 4] = (temp2[ 4] * y);
+        temp[ 8] = (temp2[ 8] * z);
+        temp[12] =  temp2[12];
+        temp++;
+        temp2++;
+    }
+}
+
+/**
+ * Multiply a vector with a transformation matrix, which applies the transformation
+ * to the point. Note that the bottom row is assumed to be [0, 0, 0, 1], which is
+ * true for transformation matrices if the translation has a w component of 1.
+ */
+UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
+    register f32 x = b[0];
+    register f32 y = b[1];
+    register f32 z = b[2];
+    register f32 *temp2 = (f32 *)mtx;
+    register s32 i;
+    register s16 *c = b;
+    for (i = 0; i < 3; i++) {
+        c[0] = ((temp2[ 0] * x)
+              + (temp2[ 4] * y)
+              + (temp2[ 8] * z)
+              +  temp2[12]);
+        c++;
+        temp2++;
+    }
 }
 
 /**
@@ -730,49 +771,6 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
     }
     vec3f_add(&dest[3][0], &b[3][0]);
     ((u32 *) dest)[15] = FLOAT_ONE;
-}
-
-/**
- * Set matrix 'dest' to 'mtx' scaled by vector s
- */
-void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
-    register f32 x = s[0];
-    register f32 y = s[1];
-    register f32 z = s[2];
-    register f32 *temp  = (f32 *)dest;
-    register f32 *temp2 = (f32 *)mtx;
-    register s32 i;
-
-    for (i = 0; i < 4; i++) {
-        temp[ 0] = (temp2[ 0] * x);
-        temp[ 4] = (temp2[ 4] * y);
-        temp[ 8] = (temp2[ 8] * z);
-        temp[12] =  temp2[12];
-        temp++;
-        temp2++;
-    }
-}
-
-/**
- * Multiply a vector with a transformation matrix, which applies the transformation
- * to the point. Note that the bottom row is assumed to be [0, 0, 0, 1], which is
- * true for transformation matrices if the translation has a w component of 1.
- */
-UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
-    register f32 x = b[0];
-    register f32 y = b[1];
-    register f32 z = b[2];
-    register f32 *temp2 = (f32 *)mtx;
-    register s32 i;
-    register s16 *c = b;
-    for (i = 0; i < 3; i++) {
-        c[0] = ((x * temp2[ 0])
-              + (y * temp2[ 4])
-              + (z * temp2[ 8])
-              +      temp2[12]);
-        c++;
-        temp2++;
-    }
 }
 
 /**
