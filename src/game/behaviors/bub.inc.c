@@ -16,7 +16,7 @@ void bub_spawner_act_spawn_bubs(void) {
 }
 
 void bub_spawner_act_idle(void) {
-    if ((gMarioObject->oPosY - o->oPosY) > 2000.0f) {
+    if (gMarioObject->oPosY - o->oPosY > 2000.0f) {
         o->oAction = BUB_SPAWNER_ACT_REMOVE_BUBS;
     }
 }
@@ -42,25 +42,25 @@ void bhv_bub_spawner_loop(void) {
 
 void bub_move_vertically(s32 ySpeed) {
     f32 parentY = o->parentObj->oPosY;
-    if ((((parentY - 100.0f) - o->oCheepCheepMaxYOffset) < o->oPosY)
-     && (o->oPosY < ((parentY + 1000.0f) + o->oCheepCheepMaxYOffset))) {
+    if ((parentY - 100.0f - o->oCheepCheepMaxYOffset < o->oPosY)
+     && (o->oPosY < parentY + 1000.0f + o->oCheepCheepMaxYOffset)) {
         o->oPosY = approach_f32_symmetric(o->oPosY, o->oCheepCheepTargetY, ySpeed);
     }
 }
 
 void bub_act_init(void) {
-    o->oCheepCheepTargetYOffset = (random_float() * 100.0f);
-    o->oCheepCheepMaxYOffset    = (random_float() * 300.0f);
+    o->oCheepCheepTargetYOffset = random_float() * 100.0f;
+    o->oCheepCheepMaxYOffset = random_float() * 300.0f;
     o->oAction = BUB_ACT_SWIMMING_TOWARDS_MARIO;
 }
 
 void bub_act_swimming_towards_mario(void) {
     if (o->oTimer == 0) {
-        o->oForwardVel = ((random_float() * 2) + 2);
+        o->oForwardVel = random_float() * 2 + 2;
         o->oCheepCheepRandomSwimAway = random_float();
     }
-    f32 dy = (o->oPosY - gMarioObject->oPosY);
-    if (o->oPosY < (o->oCheepCheepWaterLevel - 50.0f)) {
+    f32 dy = o->oPosY - gMarioObject->oPosY;
+    if (o->oPosY < o->oCheepCheepWaterLevel - 50.0f) {
         if (absf(dy) < 500.0f) {
             bub_move_vertically(1);
         } else {
@@ -76,7 +76,7 @@ void bub_act_swimming_towards_mario(void) {
         o->oAngleToMario = cur_obj_angle_to_home();
     }
     cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x100);
-    if ((o->oDistanceToMario < 200.0f) && (o->oCheepCheepRandomSwimAway < 0.5f)) {
+    if (o->oDistanceToMario < 200.0f && o->oCheepCheepRandomSwimAway < 0.5f) {
         o->oAction = BUB_ACT_SWIMMING_AWAY_FROM_MARIO;
     }
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
@@ -99,14 +99,14 @@ void bub_act_swimming_away_from_mario(void) {
         o->oForwardVel = 6.0f;
     }
     f32 dy = (o->oPosY - gMarioObject->oPosY);
-    if (o->oPosY < (o->oCheepCheepWaterLevel - 50.0f)) {
+    if (o->oPosY < o->oCheepCheepWaterLevel - 50.0f) {
         if (absf(dy) < 500.0f) {
             bub_move_vertically(2);
         } else {
             bub_move_vertically(4);
         }
     } else {
-        o->oPosY = (o->oCheepCheepWaterLevel - 50.0f);
+        o->oPosY = o->oCheepCheepWaterLevel - 50.0f;
         if (dy > 300.0f) {
             o->oPosY -= 1.0f;
         }
@@ -114,8 +114,8 @@ void bub_act_swimming_away_from_mario(void) {
     if (cur_obj_lateral_dist_from_mario_to_home() > 800.0f) {
         o->oAngleToMario = cur_obj_angle_to_home();
     }
-    cur_obj_rotate_yaw_toward((o->oAngleToMario + 0x8000), 0x400);
-    if ((o->oTimer > 200) && (o->oDistanceToMario > 600.0f)) {
+    cur_obj_rotate_yaw_toward(o->oAngleToMario + 0x8000, 0x400);
+    if (o->oTimer > 200 && o->oDistanceToMario > 600.0f) {
         o->oAction = BUB_ACT_SWIMMING_TOWARDS_MARIO;
     }
 }
@@ -128,8 +128,8 @@ ObjActionFunc sCheepCheepActions[] = {
 
 void bhv_bub_loop(void) {
     o->oCheepCheepWaterLevel = find_water_level(o->oPosX, o->oPosZ);
-    o->oCheepCheepTargetY    = (gMarioObject->oPosY + o->oCheepCheepTargetYOffset);
-    o->oWallHitboxRadius     = 30.0f;
+    o->oCheepCheepTargetY = gMarioObject->oPosY + o->oCheepCheepTargetYOffset;
+    o->oWallHitboxRadius = 30.0f;
 
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sCheepCheepActions);
