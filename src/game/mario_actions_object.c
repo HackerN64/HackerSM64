@@ -24,7 +24,7 @@ void animated_stationary_ground_step(struct MarioState *m, s32 animation, u32 en
     }
 }
 
-s32 mario_update_punch_sequence(struct MarioState *m) {
+void mario_update_punch_sequence(struct MarioState *m) {
     u32 endAction, crouchEndAction;
     s32 animFrame;
 
@@ -46,13 +46,13 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
 
             if (m->marioObj->header.gfx.animInfo.animFrame >= 2) {
                 if (mario_check_object_grab(m)) {
-                    return TRUE;
+                    return;
                 }
 
                 m->flags |= MARIO_PUNCHING;
             }
             if (m->actionArg == ACT_ARG_PUNCH_SEQUENCE_FIRST_PUNCH_FAST) {
-                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_FIRST_PUNCH | 0x4);
+                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_FIRST_PUNCH | 4);
             }
             break;
 
@@ -84,7 +84,7 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
             }
 
             if (m->actionArg == ACT_ARG_PUNCH_SEQUENCE_SECOND_PUNCH_FAST) {
-                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_SECOND_PUNCH | 0x4);
+                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_SECOND_PUNCH | 4);
             }
             break;
 
@@ -107,7 +107,7 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
             play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1);
             animFrame = set_mario_animation(m, MARIO_ANIM_GROUND_KICK);
             if (animFrame == 0) {
-                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_KICK | 0x6);
+                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_KICK | 6);
             }
 
             if (animFrame >= 0 && animFrame < 8) {
@@ -133,8 +133,6 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
             }
             break;
     }
-
-    return FALSE;
 }
 
 s32 act_punching(struct MarioState *m) {
@@ -467,7 +465,7 @@ s32 mario_execute_object_action(struct MarioState *m) {
         case ACT_PICKING_UP_BOWSER:  cancel = act_picking_up_bowser(m);  break;
         case ACT_HOLDING_BOWSER:     cancel = act_holding_bowser(m);     break;
         case ACT_RELEASING_BOWSER:   cancel = act_releasing_bowser(m);   break;
-        default:                     cancel = TRUE;                      break;
+        default:                     cancel = FALSE;                     break;
     }
     /* clang-format on */
 

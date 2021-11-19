@@ -388,13 +388,16 @@ struct Surface {
     /*0x2C*/ struct Object *object;
 };
 
-#define PUNCH_STATE_TIMER_MASK          0b00111111
-#define PUNCH_STATE_TYPES_MASK          0b11000000
+#define PUNCH_STATE_TIMER_SIZE 6
+
+#define PUNCH_STATE_TIMER_MASK BITMASK(PUNCH_STATE_TIMER_SIZE)
+#define PUNCH_STATE_TYPES_MASK ~PUNCH_STATE_TIMER_MASK
 
 enum PunchStateTypes {
-    PUNCH_STATE_TYPE_FIRST_PUNCH  = (0 << 6),
-    PUNCH_STATE_TYPE_SECOND_PUNCH = (1 << 6),
-    PUNCH_STATE_TYPE_KICK         = (2 << 6),
+    PUNCH_STATE_TYPE_NONE         = (0 << 0),
+    PUNCH_STATE_TYPE_FIRST_PUNCH  = (0 << PUNCH_STATE_TIMER_SIZE),
+    PUNCH_STATE_TYPE_SECOND_PUNCH = (1 << PUNCH_STATE_TIMER_SIZE),
+    PUNCH_STATE_TYPE_KICK         = (2 << PUNCH_STATE_TIMER_SIZE),
 };
 
 struct MarioBodyState {
@@ -405,11 +408,11 @@ struct MarioBodyState {
     /*0x07*/ s8 wingFlutter; /// whether Mario's wing cap wings are fluttering
     /*0x08*/ s16 modelState;
     /*0x0A*/ s8 grabPos;
-    /*0x0B*/ u8 punchState; /// 2 bits for type of punch, 6 bits for punch animation timer
+    /*0x0B*/ u8 punchState; /// 2 bits for type of punch, 6 bits for punch animation timer. Configure this using PUNCH_STATE_TIMER_SIZE above.
     /*0x0C*/ Vec3s torsoAngle;
     /*0x12*/ Vec3s headAngle;
     /*0x18*/ Vec3f heldObjLastPosition; /// also known as HOLP
-    // u8 filler[4];
+    u8 filler[4];
 };
 
 struct MarioState {

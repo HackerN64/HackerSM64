@@ -511,11 +511,13 @@ u32 mario_get_terrain_sound_addend(struct MarioState *m) {
  */
 s32 mario_facing_downhill(struct MarioState *m, s32 turnYaw) {
     s16 faceAngleYaw = m->faceAngle[1];
+
     // This is never used in practice, as turnYaw is
     // always passed as zero.
     if (turnYaw && m->forwardVel < 0.0f) {
         faceAngleYaw += 0x8000;
     }
+
     return (abs_angle_diff(m->floorYaw, faceAngleYaw) < 0x4000);
 }
 
@@ -1821,7 +1823,7 @@ void init_mario(struct MarioState *m) {
 
     mario_reset_bodystate(m);
     update_mario_info_for_cam(m);
-    m->marioBodyState->punchState = 0x0;
+    m->marioBodyState->punchState = PUNCH_STATE_TYPE_NONE;
 
     vec3f_copy(&m->marioObj->oPosVec, m->pos);
     vec3s_to_vec3i(&m->marioObj->oMoveAngleVec, m->faceAngle);
