@@ -237,9 +237,9 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
 
     f32 oldSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
-    f32 sideward          = ((m->intendedMag / 32.0f) * sins(intendedDYaw) * 0.05f);
-    f32 slideVelXModifier = (m->slideVelZ * sideward);
-    f32 slideVelZModifier = (m->slideVelX * sideward);
+    f32 sideward          = (m->intendedMag / 32.0f) * sins(intendedDYaw) * 0.05f;
+    f32 slideVelXModifier = m->slideVelZ * sideward;
+    f32 slideVelZModifier = m->slideVelX * sideward;
 
     m->slideVelX += slideVelXModifier;
     m->slideVelZ -= slideVelZModifier;
@@ -371,7 +371,8 @@ s32 apply_slope_decel(struct MarioState *m, f32 decelCoef) {
             break;
     }
 
-    if ((m->forwardVel = approach_f32(m->forwardVel, 0.0f, decel, decel)) == 0.0f) {
+    m->forwardVel = approach_f32(m->forwardVel, 0.0f, decel, decel);
+    if (m->forwardVel == 0.0f) {
         stopped = TRUE;
     }
 

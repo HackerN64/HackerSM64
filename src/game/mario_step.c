@@ -461,9 +461,9 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     resolve_and_return_wall_collisions(nextPos,  30.0f, 50.0f, &lowerWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight  = find_ceil(nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
+    f32 ceilHeight = find_ceil(nextPos[0], (nextPos[1] + 3.0f), nextPos[2], &ceil);
 
-    f32 waterLevel  = find_water_level(nextPos[0], nextPos[2]);
+    f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
 
     // set_mario_wall(m, NULL);
 
@@ -501,7 +501,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         return AIR_STEP_LANDED;
     }
 
-    if ((nextPos[1] + 160.0f) > ceilHeight) {
+    if (nextPos[1] + 160.0f > ceilHeight) {
         if (m->vel[1] >= 0.0f) {
             m->vel[1] = 0.0f;
 
@@ -544,7 +544,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             vec3f_copy(m->pos, ledgePos);
             set_mario_floor(m, floor, ledgePos[1]);
             m->faceAngle[0] = 0x0;
-            m->faceAngle[1] = (SURFACE_YAW(grabbedWall) + 0x8000);
+            m->faceAngle[1] = SURFACE_YAW(grabbedWall) + 0x8000;
         } else {
             vec3f_copy(m->pos, nextPos);
             set_mario_floor(m, floor, floorHeight);
