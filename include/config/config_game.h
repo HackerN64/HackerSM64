@@ -5,7 +5,6 @@
  *****************/
 
 // Disables some mechanics that change behavior depending on hardcoded level numbers.
-// You may also need to change sLevelsWithRooms in object_helpers.c
 // TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic
 //#define DISABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
