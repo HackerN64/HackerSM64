@@ -800,11 +800,11 @@ void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
     s32 i, j;
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
-            dst[i][j] = vec3f_dot(a1[i], a1[j]);
+            dst[i][j] = vec3f_dot(a1[i], a2[j]);
         }
     }
     for (i = 0; i < 3; i++) {
-        dst[3][i] = (vec3f_dot(a1[3], a2[i]) - vec3f_dot(a2[3], a2[i]));
+        dst[3][i] = vec3f_dot(a1[3], a2[i]) - vec3f_dot(a2[3], a2[i]);
     }
     MTXF_END(dst);
 }

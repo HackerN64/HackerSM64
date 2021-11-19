@@ -60,13 +60,10 @@ ObjActionFunc sBowserTailAnchorActions[] = {
  * Bowser's tail main loop
  */
 void bhv_bowser_tail_anchor_loop(void) {
-    const f32 offset = -90.0f;
-    s16 bowserYaw = o->parentObj->oMoveAngleYaw;
     // Call its actions
     cur_obj_call_action_function(sBowserTailAnchorActions);
     // Position the tail
-    o->oParentRelativePosX = offset * sins(bowserYaw);
-    o->oParentRelativePosZ = offset * coss(bowserYaw);
+    o->oParentRelativePosX = 90.0f;
 
     // Make it intangible while Bowser is dead
     if (o->parentObj->oAction == BOWSER_ACT_DEAD) {
