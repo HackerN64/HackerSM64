@@ -145,6 +145,7 @@ u32 object_facing_mario(struct MarioState *m, struct Object *obj, s16 angleRange
 s32 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj) {
     register f32 dx = obj->oPosX - m->pos[0];
     register f32 dz = obj->oPosZ - m->pos[2];
+
     return atan2s(dz, dx);
 }
 
@@ -157,9 +158,7 @@ u32 determine_interaction(struct MarioState *m, struct Object *obj) {
     u32 action      = m->action;
 
     if (action & ACT_FLAG_ATTACKING) {
-        if ((action == ACT_PUNCHING)
-         || (action == ACT_MOVE_PUNCHING)
-         || (action == ACT_JUMP_KICK)) {
+        if (action == ACT_PUNCHING || action == ACT_MOVE_PUNCHING || action == ACT_JUMP_KICK) {
             s16 dYawToObject = abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]);
 
             if (m->flags & MARIO_PUNCHING) {
@@ -391,34 +390,33 @@ struct Object *mario_get_collided_object(struct MarioState *m, u32 interactType)
 }
 
 u32 mario_check_object_grab(struct MarioState *m) {
-    u32 result = FALSE;
-    const BehaviorScript *script;
-
     if (m->input & INPUT_INTERACT_OBJ_GRABBABLE) {
-        script = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, m->interactObj->behavior);
-
-        if (script == bhvBowser) {
-            s16 facingDYaw = abs_angle_diff(m->faceAngle[1], m->interactObj->oMoveAngleYaw);
-            if (facingDYaw <= DEGREES(120)) {
-                m->faceAngle[1] = m->interactObj->oMoveAngleYaw;
-                m->usedObj = m->interactObj;
-                result = set_mario_action(m, ACT_PICKING_UP_BOWSER, 0);
+        struct Object *obj = m->interactObj;
+        if (obj->behavior == segmented_to_virtual(bhvBowser)) {
+            f32 dist;
+            s16 yaw;
+            vec3f_get_dist_and_yaw(m->pos, &obj->prevObj->oPosVec, &dist, &yaw); // dist and yaw from Mario to tail object
+            if (dist < 200.0f) {
+                if (abs_angle_diff(yaw, m->faceAngle[1]) <= DEGREES(120)) {
+                    m->faceAngle[1] = obj->oMoveAngleYaw;
+                    m->usedObj = obj;
+                    return set_mario_action(m, ACT_PICKING_UP_BOWSER, 0);
+                }
             }
         } else {
-            s16 facingDYaw = abs_angle_diff(mario_obj_angle_to_object(m, m->interactObj), m->faceAngle[1]);
-            if (facingDYaw <= DEGREES(60)) {
-                m->usedObj = m->interactObj;
+            if (abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]) <= DEGREES(60)) {
+                m->usedObj = obj;
 
                 if (!(m->action & ACT_FLAG_AIR)) {
                     set_mario_action(m, (m->action & ACT_FLAG_DIVING) ? ACT_DIVE_PICKING_UP : ACT_PICKING_UP, 0);
                 }
 
-                result = TRUE;
+                return TRUE;
             }
         }
     }
 
-    return result;
+    return FALSE;
 }
 
 u32 bully_knock_back_mario(struct MarioState *mario) {
@@ -583,17 +581,24 @@ u32 determine_knockback_action(struct MarioState *m, UNUSED s32 arg) {
 }
 
 void push_mario_out_of_object(struct MarioState *m, struct Object *obj, f32 padding) {
-    f32 minDistance = (obj->hitboxRadius + m->marioObj->hitboxRadius + padding);
+    f32 minDistance = obj->hitboxRadius + m->marioObj->hitboxRadius + padding;
+
     f32 offsetX = m->pos[0] - obj->oPosX;
     f32 offsetZ = m->pos[2] - obj->oPosZ;
     f32 distanceSquared = sqr(offsetX) + sqr(offsetZ);
+
     if (distanceSquared < sqr(minDistance)) {
         struct Surface *floor;
+
         s16 pushAngle = ((distanceSquared == 0.0f) ? m->faceAngle[1] : atan2s(offsetZ, offsetX));
+
         f32 newMarioX = obj->oPosX + minDistance * sins(pushAngle);
         f32 newMarioZ = obj->oPosZ + minDistance * coss(pushAngle);
+
         f32_find_wall_collision(&newMarioX, &m->pos[1], &newMarioZ, 60.0f, 50.0f);
+
         f32 floorHeight = find_floor(newMarioX, m->pos[1], newMarioZ, &floor);
+
         if (floor != NULL) {
             m->pos[0] = newMarioX;
             m->pos[2] = newMarioZ;
@@ -679,9 +684,7 @@ u32 take_damage_and_knock_back(struct MarioState *m, struct Object *obj) {
 }
 
 void reset_mario_pitch(struct MarioState *m) {
-    if (m->action == ACT_WATER_JUMP
-     || m->action == ACT_SHOT_FROM_CANNON
-     || m->action == ACT_FLYING) {
+    if (m->action == ACT_WATER_JUMP || m->action == ACT_SHOT_FROM_CANNON || m->action == ACT_FLYING) {
         set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
         m->faceAngle[0] = 0;
     }
