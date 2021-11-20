@@ -215,19 +215,20 @@ void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
  * Return a pointer to the display list representing the shadow.
  */
 Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 shadowType) {
+    struct Object *obj = gCurGraphNodeObjectNode;
     s8 isPlayer = FALSE;
+    s8 notHeldObj = (gCurGraphNodeHeldObject == NULL);
+    if (obj == NULL) {
+        return NULL;
+    }
     // Attempt to use existing floors before finding a new one.
-    if ((gCurGraphNodeObjectNode == gMarioObject)
-     && (gMarioState->floor != NULL)
-     && (gCurGraphNodeHeldObject == NULL)) {
+    if (notHeldObj && (obj == gMarioObject) && gMarioState->floor) {
         s->floor       = gMarioState->floor;
         s->floorHeight = gMarioState->floorHeight;
         isPlayer = TRUE;
-    } else if ((gCurGraphNodeObject != &gMirrorMario)
-            && (gCurGraphNodeObjectNode->oFloor != NULL)
-            && (gCurGraphNodeHeldObject == NULL)) {
-        s->floor       = gCurGraphNodeObjectNode->oFloor;
-        s->floorHeight = gCurGraphNodeObjectNode->oFloorHeight;
+    } else if (notHeldObj && obj->oFloor && (gCurGraphNodeObject != &gMirrorMario)) {
+        s->floor       = obj->oFloor;
+        s->floorHeight = obj->oFloorHeight;
     } else {
         gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
         s->floorHeight = find_floor(pos[0], pos[1], pos[2], &s->floor);
@@ -236,7 +237,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         }
     }
 
-    if ((pos[1] - s->floorHeight) > 1024.0f) {
+    if (pos[1] - s->floorHeight > 1024.0f) {
         return NULL;
     }
 
@@ -279,15 +280,17 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             return NULL;
         }
         if (shadowType >= SHADOW_RECTANGLE_HARDCODED_OFFSET) {
-            s8 idx = (shadowType - SHADOW_RECTANGLE_HARDCODED_OFFSET);
-            scaleXMod = (shadowRectangles[idx].halfWidth );
-            scaleZMod = (shadowRectangles[idx].halfLength);
+            s8 idx = shadowType - SHADOW_RECTANGLE_HARDCODED_OFFSET;
+            scaleXMod = shadowRectangles[idx].halfWidth;
+            scaleZMod = shadowRectangles[idx].halfLength;
         }
     }
 
     Gfx *displayList = alloc_display_list(6 * sizeof(Gfx));
 
-    if (displayList == NULL) return NULL;
+    if (displayList == NULL) {
+        return NULL;
+    }
 
     add_shadow_to_display_list(displayList, shadowType);
 
