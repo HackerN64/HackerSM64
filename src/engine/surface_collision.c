@@ -598,6 +598,7 @@ s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor) {
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
+    //! Always uses Mario or camera height, even when being called for objects.
     s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
     if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
@@ -640,6 +641,7 @@ s32 find_water_level(s32 x, s32 z) {
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
+    //! Always uses Mario or camera height, even when being called for objects.
     s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
 
     if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
