@@ -32,6 +32,9 @@
 // Use .rej microcode for certain objects (experimental).
 //#define OBJECTS_REJ
 
+// Culls objects which are out of view vertically (the game already does this horizontally).
+#define VERTICAL_CULLING
+
 // Mario's silhouette when behind solid objects/surfaces
 // Also enables new render layers, such as LAYER_ALPHA_DECAL.
 // The number is the intensity of the silhouette, from 0-255.
