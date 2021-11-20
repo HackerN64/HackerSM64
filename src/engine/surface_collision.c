@@ -497,7 +497,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     f32 height        = FLOOR_LOWER_LIMIT;
     f32 dynamicHeight = FLOOR_LOWER_LIMIT;
 
-    //! (Parallel Universes) Because position is casted to an s16, reaching higher
+    //! (Parallel Universes) Because position is casted to an s32, reaching higher
     //  float locations can return floors despite them not existing there.
     //  (Dynamic floors will unload due to the range.)
     s32 x = xPos;
@@ -590,7 +590,7 @@ f32 find_water_floor(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor) {
 /**
  * Finds the height of water at a given location.
  */
-s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor) {
+s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
     s32 val;
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
@@ -598,8 +598,7 @@ s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor) {
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-    //! Always uses Mario or camera height, even when being called for objects.
-    s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
+    s32 waterLevel = find_water_floor(x, y, z, &floor);
 
     if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
         s32 numRegions = *p++;

@@ -64,7 +64,7 @@ s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
  * -10,000.
  */
 f32 get_water_level_below_shadow(Vec3f pos, struct Surface **waterFloor) {
-    f32 waterLevel = find_water_level_and_floor(pos[0], pos[2], waterFloor);
+    f32 waterLevel = find_water_level_and_floor(pos[0], pos[1], pos[2], waterFloor);
     if (waterLevel < FLOOR_LOWER_LIMIT_MISC) {
         return FLOOR_LOWER_LIMIT_MISC;
     } else if ((pos[1] >= waterLevel)

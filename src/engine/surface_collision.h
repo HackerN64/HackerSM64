@@ -47,7 +47,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil);
 f32 find_floor_height(f32 x, f32 y, f32 z);
 f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor);
 f32 find_room_floor(f32 x, f32 y, f32 z, struct Surface **pfloor);
-s32 find_water_level_and_floor(s32 x, s32 z, struct Surface **pfloor);
+s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor);
 s32 find_water_level(s32 x, s32 z);
 s32 find_poison_gas_level(s32 x, s32 z);
 #ifdef VANILLA_DEBUG
