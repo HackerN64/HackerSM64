@@ -53,6 +53,13 @@
 #define ALIGNED16
 #endif
 
+// Force a function to be inlined
+#ifdef __GNUC__
+#define FORCE_INLINE inline __attribute__((always_inline))
+#else
+#define FORCE_INLINE inline
+#endif
+
 // round up to the next multiple.
 #ifndef ALIGN
 #define ALIGN(VAL_, ALIGNMENT_) (((VAL_) + ((ALIGNMENT_) - 1)) & ~((ALIGNMENT_) - 1))

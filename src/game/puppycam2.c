@@ -29,12 +29,12 @@
 
 #ifdef PUPPYCAM
 
-static inline float smooth(float x) {
+static FORCE_INLINE float smooth(float x) {
     x = CLAMP(x, 0, 1);
     return (sqr(x) * (3.0f - (2.0f * x)));
 }
 
-static inline float softClamp(float x, float a, float b) {
+static FORCE_INLINE float softClamp(float x, float a, float b) {
     return ((smooth((2.0f / 3.0f) * (x - a) / (b - a) + (1.0f / 6.0f)) * (b - a)) + a);
 }
 
@@ -100,10 +100,10 @@ static const struct gPCOptionStruct gPCOptions[] = { // If the min and max are 0
 
 u8 gPCOptionCap = (sizeof(gPCOptions) / sizeof(struct gPCOptionStruct)); // How many options there are in newcam_uptions.
 
-inline s32 LENSIN(s16 length, s16 direction) {
+FORCE_INLINE s32 LENSIN(s16 length, s16 direction) {
     return (s16)(length * sins(direction));
 }
-inline s32 LENCOS(s16 length, s16 direction) {
+FORCE_INLINE s32 LENCOS(s16 length, s16 direction) {
     return (s16)(length * coss(direction));
 }
 

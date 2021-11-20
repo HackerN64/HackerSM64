@@ -447,7 +447,7 @@ extern f32 gSineTable[];
 #define ABS(x)  (((x) > 0) ? (x) : -(x))
 
 /// From Wiseguy
-inline s32 roundf(f32 in) {
+FORCE_INLINE s32 roundf(f32 in) {
     f32 tmp;
     s32 out;
     __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in ));
@@ -455,12 +455,12 @@ inline s32 roundf(f32 in) {
     return out;
 }
 /// Absolute value
-inline f32 absf(f32 in) {
+FORCE_INLINE f32 absf(f32 in) {
     f32 out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
     return out;
 }
-inline s32 absi(s32 in) {
+FORCE_INLINE s32 absi(s32 in) {
     return ABS(in);
 }
 #define abss absi
@@ -553,7 +553,7 @@ void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
 void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src);
 void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
 // extern void mtxf_to_mtx_asm(register void *dest, register void *src);
-inline void mtxf_to_mtx(register void *dest, register void *src) {
+FORCE_INLINE void mtxf_to_mtx(register void *dest, register void *src) {
     // mtxf_to_mtx_asm(dest, src);
     guMtxF2L(src, dest);
 }

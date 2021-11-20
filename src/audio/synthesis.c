@@ -58,7 +58,7 @@
  * Depending on the violating parameters chosen, you probably won't ever experience s32 overflow, but s16 overflow still isn't a pleasant experience.
  * Checks to prevent this have not been implemented to maximize performance potential, so choose your parameters wisely. The current defaults are unlikely to have this problem.
  * Generally speaking, a sound that doesn't seem to be fading at a natural rate is a parameter red flag (also known as feedback).
- * 
+ *
  * This is also known to cause severe lag on emulators that have counter factor set to 2 or greater.
  * Be sure either you alert the user in advance, or check for and set betterReverbDownsampleEmulator to -1 if it's detected the user isn't using good settings.
  */
@@ -207,7 +207,7 @@ u8 sAudioSynthesisPad[0x20];
 #endif
 
 #if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
-static inline void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 inSampleR) {
+static FORCE_INLINE void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 inSampleR) {
     s32 i = 0;
     s32 j = 0;
     s32 k = 0;
@@ -246,7 +246,7 @@ static inline void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSample
     *outSampleR = CLAMP_S16(outUnclamped);
 }
 
-static inline void reverb_mono_sample(s16 *outSample, s32 inSample) {
+static FORCE_INLINE void reverb_mono_sample(s16 *outSample, s32 inSample) {
     s32 i = 0;
     s32 j = 0;
     s32 k = 0;

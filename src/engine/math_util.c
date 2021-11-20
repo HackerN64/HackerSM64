@@ -149,9 +149,9 @@ void vec3f_copy_y_off(Vec3f dest, Vec3f src, f32 yOff) { vec3_copy_y_off_func(f3
 #undef vec3_copy_y_off_func
 
 /// Set vector 'dest' to (x, y, z)
-inline void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z) { vec3_set(dest, x, y, z); }
-inline void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z) { vec3_set(dest, x, y, z); }
-inline void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z) { vec3_set(dest, x, y, z); }
+FORCE_INLINE void vec3f_set(Vec3f dest, const f32 x, const f32 y, const f32 z) { vec3_set(dest, x, y, z); }
+FORCE_INLINE void vec3i_set(Vec3i dest, const s32 x, const s32 y, const s32 z) { vec3_set(dest, x, y, z); }
+FORCE_INLINE void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z) { vec3_set(dest, x, y, z); }
 
 /// Add vector 'a' to 'dest'
 #define vec3_add_func(fmt, dest, a) {   \
@@ -1170,7 +1170,7 @@ s32 abs_angle_diff(s16 a0, s16 a1) {
  * Helper function for atan2s. Does a look up of the arctangent of y/x assuming
  * the resulting angle is in range [0, 0x2000] (1/8 of a circle).
  */
-static inline u32 atan2_lookup(f32 y, f32 x) {
+FORCE_INLINE u32 atan2_lookup(f32 y, f32 x) {
     return ((x == 0) ? 0x0 : atans(y / x));
 }
 

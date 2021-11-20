@@ -416,14 +416,14 @@ void geo_append_display_list(void *displayList, s32 layer) {
     }
 }
 
-static inline void inc_mat_stack() {
+static void inc_mat_stack() {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
     gMatStackIndex++;
     mtxf_to_mtx(mtx, gMatStack[gMatStackIndex]);
     gMatStackFixed[gMatStackIndex] = mtx;
 }
 
-static inline void append_dl_and_return(struct GraphNodeDisplayList *node) {
+static void append_dl_and_return(struct GraphNodeDisplayList *node) {
     if (node->displayList != NULL) {
         geo_append_display_list(node->displayList, GET_GRAPH_NODE_LAYER(node->node.flags));
     }

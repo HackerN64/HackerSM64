@@ -150,7 +150,12 @@ LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 ifeq ($(COMPILER),gcc)
   NON_MATCHING := 1
   MIPSISET     := -mips3
-  OPT_FLAGS    := -Ofast
+  OPT_FLAGS    := \
+    -Ofast \
+    --param case-values-threshold=20 \
+    --param max-completely-peeled-insns=10 \
+    --param max-unrolled-insns=10 \
+    -finline-limit=1
 else ifeq ($(COMPILER),clang)
   NON_MATCHING := 1
   # clang doesn't support ABI 'o32' for 'mips3'
@@ -544,8 +549,28 @@ $(BUILD_DIR)/src/usb/usb.o:                   CFLAGS += -Wno-unused-variable -Wn
 $(BUILD_DIR)/src/usb/debug.o:                 OPT_FLAGS := -O0
 $(BUILD_DIR)/src/usb/debug.o:                 CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
 $(BUILD_DIR)/src/audio/*.o:                   OPT_FLAGS := -Os -fno-jump-tables
-$(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := -Ofast -fno-unroll-loops -fno-peel-loops --param case-values-threshold=20
-$(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := -Ofast --param case-values-threshold=20
+# Surface Collision
+$(BUILD_DIR)/src/engine/surface_collision.o:  OPT_FLAGS := \
+  -Ofast \
+  --param case-values-threshold=20 \
+  --param max-completely-peeled-insns=100 \
+  --param max-unrolled-insns=100 \
+  -finline-limit=0
+
+# Math Util
+$(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := \
+  -Ofast \
+  -fno-unroll-loops \
+  -fno-peel-loops \
+  --param case-values-threshold=20
+#   - setting any sort of -finline-limit has shown to worsen performance, lower values were the worst, the higher you go - the closer performance gets to not setting it at all
+
+$(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := \
+  -Ofast \
+  --param case-values-threshold=20 \
+  --param max-completely-peeled-insns=100 \
+  --param max-unrolled-insns=100 \
+  -finline-limit=0
 
 ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) asm/debug $(GODDARD_SRC_DIRS) $(LIBZ_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) rsp include) $(YAY0_DIR) $(addprefix $(YAY0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION)
 
