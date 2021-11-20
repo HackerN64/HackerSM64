@@ -613,7 +613,10 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 angle)
     register s32 i;
     register f32 sx = scale[0];
     register f32 sy = scale[1];
-    register f32 sz = ((f32 *) scale)[2];
+    register f32 sz = scale[2];
+    register f32 tx = position[0];
+    register f32 ty = position[1];
+    register f32 tz = position[2];
     register f32 *srcp, *dstp = (f32 *)dest;
     for (i = 0; i < 16; i++) {
         *dstp = 0;
@@ -633,17 +636,16 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 angle)
         dest[1][1] = ( dest[0][0] * sy);
     }
     // ((u32 *) dest)[10] = FLOAT_ONE;
-    // dest[2][2] = sz; // [2][2]
-    ((f32 *) dest)[10] = sz; // [2][2]
+    dest[2][2] = sz; // [2][2]
     dest[2][3] = 0;
     ((u32 *) dest)[15] = FLOAT_ONE; // [3][3]
 
     dstp = (f32 *)dest;
     srcp = (f32 *)src;
     for (i = 0; i < 3; i++) {
-        dstp[12] = ((srcp[ 0] * position[0])
-                  + (srcp[ 4] * position[1])
-                  + (srcp[ 8] * position[2])
+        dstp[12] = ((srcp[ 0] * tx)
+                  + (srcp[ 4] * ty)
+                  + (srcp[ 8] * tz)
                   +  srcp[12]);
         dstp++;
         srcp++;
