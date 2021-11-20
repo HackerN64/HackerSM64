@@ -82,7 +82,7 @@ f32 get_water_level_below_shadow(Vec3f pos, struct Surface **waterFloor) {
  * @param overwriteSolidity Flag for whether the existing shadow solidity should
  *                          be dimmed based on its distance to the floor
  */
-s32 init_shadow(Vec3f pos, s16 shadowScale, u8 overwriteSolidity) {
+s32 init_shadow(Vec3f pos, s16 shadowScale, s8 shadowType, u8 overwriteSolidity) {
     struct Surface *waterFloor = NULL;
     // Check for water under the shadow.
     f32 waterLevel = get_water_level_below_shadow(pos, &waterFloor);
@@ -117,14 +117,19 @@ s32 init_shadow(Vec3f pos, s16 shadowScale, u8 overwriteSolidity) {
             return TRUE;
         }
     }
-    // Set solidity and scale based on distance.
-    f32 dy = (pos[1] - s->floorHeight);
+    if (shadowType != SHADOW_SQUARE_PERMANENT) {
+        // Set solidity and scale based on distance.
+        f32 dy = (pos[1] - s->floorHeight);
 
-    if (overwriteSolidity) {
-        s->solidity = dim_shadow_with_distance(overwriteSolidity, dy);
+        if (overwriteSolidity) {
+            s->solidity = dim_shadow_with_distance(overwriteSolidity, dy);
+        }
+
+        s->scale[1] = scale_shadow_with_distance(shadowScale, dy);
+    } else {
+        s->solidity = overwriteSolidity;
+        s->scale[1] = shadowScale;
     }
-
-    s->scale[1] = scale_shadow_with_distance(shadowScale, dy);
 
     return !(s->solidity);
 }
@@ -274,12 +279,12 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             case SHADOW_SOLIDITY_NO_SHADOW:
                 return NULL;
             case SHADOW_SOILDITY_ALREADY_SET:
-                if (init_shadow(pos, shadowScale, /* overwriteSolidity */ 0)) {
+                if (init_shadow(pos, shadowScale, shadowType, /* overwriteSolidity */ 0)) {
                     return NULL;
                 }
                 break;
             case SHADOW_SOLIDITY_NOT_YET_SET:
-                if (init_shadow(pos, shadowScale, shadowSolidity)) {
+                if (init_shadow(pos, shadowScale, shadowType, shadowSolidity)) {
                     return NULL;
                 }
                 break;
@@ -288,7 +293,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         }
         correct_lava_shadow_height();
     } else {
-        if (init_shadow(pos, shadowScale, shadowSolidity)) {
+        if (init_shadow(pos, shadowScale, shadowType, shadowSolidity)) {
             return NULL;
         }
         // Get the scaling modifiers for rectangular shadows (Whomp and Spindel).
