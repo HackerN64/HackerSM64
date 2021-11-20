@@ -531,6 +531,7 @@ void mtxf_copy(Mat4 dest, Mat4 src);
 // Create specific matrices
 void mtxf_identity(Mat4 mtx);
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll);
+void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, Vec3f scale);
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle);
 void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw);
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw);

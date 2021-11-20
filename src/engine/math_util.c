@@ -155,15 +155,15 @@ inline void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z) { vec3_
 
 /// Add vector 'a' to 'dest'
 #define vec3_add_func(fmt, dest, a) {   \
-    register fmt *temp = (fmt *)(dest); \
+    register fmt *dstp = (fmt *)(dest); \
     register fmt sum, sum2;             \
     register s32 i;                     \
     for (i = 0; i < 3; i++) {           \
         sum = *(a);                     \
         (a)++;                          \
-        sum2 = *temp;                   \
-        *temp = (sum + sum2);           \
-        temp++;                         \
+        sum2 = *dstp;                   \
+        *dstp = (sum + sum2);           \
+        dstp++;                         \
     }                                   \
 }
 void vec3f_add(Vec3f dest, const Vec3f a) { vec3_add_func(f32, dest, a); }
@@ -173,7 +173,7 @@ void vec3s_add(Vec3s dest, const Vec3s a) { vec3_add_func(s16, dest, a); }
 
 /// Make 'dest' the sum of vectors a and b.
 #define vec3_sum_func(fmt, dest, a, b) {\
-    register fmt *temp = (fmt *)(dest); \
+    register fmt *dstp = (fmt *)(dest); \
     register fmt sum, sum2;             \
     register s32 i;                     \
     for (i = 0; i < 3; i++) {           \
@@ -181,8 +181,8 @@ void vec3s_add(Vec3s dest, const Vec3s a) { vec3_add_func(s16, dest, a); }
         (a)++;                          \
         sum2 = *(b);                    \
         (b)++;                          \
-        *temp = (sum + sum2);           \
-        temp++;                         \
+        *dstp = (sum + sum2);           \
+        dstp++;                         \
     }                                   \
 }
 void vec3f_sum(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_sum_func(f32, dest, a, b); }
@@ -291,7 +291,15 @@ f32 vec3f_dot(const Vec3f a, const Vec3f b) {
 
 /// Make vector 'dest' the cross product of vectors a and b.
 void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b) {
-    vec3_cross(dest, a, b);
+    register f32 x1 = a[0];
+    register f32 y1 = a[1];
+    register f32 z1 = a[2];
+    register f32 x2 = b[0];
+    register f32 y2 = b[1];
+    register f32 z2 = b[2];
+    dest[0] = ((y1 * z2) - (z1 * y2));
+    dest[1] = ((z1 * x2) - (x1 * z2));
+    dest[2] = ((x1 * y2) - (y1 * x2));
 }
 
 /// Scale vector 'dest' so it has length 1
@@ -308,14 +316,18 @@ void vec3f_normalize(Vec3f dest) {
     }
 }
 
-/// Struct the same data size as a Mat4
-struct CopyMat4 {
-    f32 a[0x10];
-};
-
-/// Copy matrix 'src' to 'dest' by casting to a struct CopyMat4 pointer.
-void mtxf_copy(register Mat4 dest, register Mat4 src) {
-    *((struct CopyMat4 *) dest) = *((struct CopyMat4 *) src);
+/// Copy matrix 'src' to 'dest'.
+UNUSED void mtxf_copy(register Mat4 dest, register Mat4 src) {
+    f32 m[8];
+    s32 i, j;
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 8; j++) {
+            m[j] = src[i][j];
+        }
+        for (j = 0; j < 8; j++) {
+            dest[i][j] = m[j];
+        }
+    }
 }
 
 /// Set mtx to the identity matrix.
@@ -331,7 +343,7 @@ void mtxf_identity(register Mat4 mtx) {
 }
 
 /// Set dest to a translation matrix of vector b.
-void mtxf_translate(Mat4 dest, Vec3f b) {
+UNUSED void mtxf_translate(Mat4 dest, Vec3f b) {
     register s32 i;
     register f32 *pen;
     for (pen = ((f32 *) dest + 1), i = 0; i < 12; pen++, i++) {
@@ -340,26 +352,26 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
     for (pen = (f32 *) dest, i = 0; i < 4; pen += 5, i++) {
         *((u32 *) pen) = FLOAT_ONE;
     }
-    vec3f_copy(&dest[3][0], &b[0]);
+    vec3f_copy(dest[3], b);
 }
 
 /**
  * Set matrix 'dest' to 'mtx' scaled by vector s
  */
-void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
+void mtxf_scale_vec3f(Mat4 dest, Mat4 src, register Vec3f s) {
     register f32 x = s[0];
     register f32 y = s[1];
     register f32 z = s[2];
-    register f32 *temp  = (f32 *)dest;
-    register f32 *temp2 = (f32 *)mtx;
+    register f32 *destp = (f32 *)dest;
+    register f32 *srcp = (f32 *)src;
     register s32 i;
     for (i = 0; i < 4; i++) {
-        temp[ 0] = (temp2[ 0] * x);
-        temp[ 4] = (temp2[ 4] * y);
-        temp[ 8] = (temp2[ 8] * z);
-        temp[12] =  temp2[12];
-        temp++;
-        temp2++;
+        destp[ 0] = (srcp[ 0] * x);
+        destp[ 4] = (srcp[ 4] * y);
+        destp[ 8] = (srcp[ 8] * z);
+        destp[12] =  srcp[12];
+        destp++;
+        srcp++;
     }
 }
 
@@ -368,20 +380,20 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
  * to the point. Note that the bottom row is assumed to be [0, 0, 0, 1], which is
  * true for transformation matrices if the translation has a w component of 1.
  */
-UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
+UNUSED void mtxf_mul_vec3s(Mat4 dst, Vec3s b) {
     register f32 x = b[0];
     register f32 y = b[1];
     register f32 z = b[2];
-    register f32 *temp2 = (f32 *)mtx;
+    register f32 *dstp = (f32 *)dst;
     register s32 i;
     register s16 *c = b;
     for (i = 0; i < 3; i++) {
-        c[0] = ((temp2[ 0] * x)
-              + (temp2[ 4] * y)
-              + (temp2[ 8] * z)
-              +  temp2[12]);
+        c[0] = ((dstp[ 0] * x)
+              + (dstp[ 4] * y)
+              + (dstp[ 8] * z)
+              +  dstp[12]);
         c++;
-        temp2++;
+        dstp++;
     }
 }
 
@@ -397,15 +409,15 @@ void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
     register f32 x = src[0];
     register f32 y = src[1];
     register f32 z = src[2];
-    register f32 *temp  = (f32 *)dst;
-    register f32 *temp2 = (f32 *)mtx;
+    register f32 *dstp = (f32 *)dst;
+    register f32 *mtxp = (f32 *)mtx;
     s32 i;
     for (i = 0; i < 3; i++) {
-        *temp = ((temp2[0] * x)
-               + (temp2[4] * y)
-               + (temp2[8] * z));
-        temp++;
-        temp2++;
+        *dstp = ((mtxp[0] * x)
+               + (mtxp[4] * y)
+               + (mtxp[8] * z));
+        dstp++;
+        mtxp++;
     }
 }
 
@@ -413,16 +425,16 @@ void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src) {
     register f32 x = src[0];
     register f32 y = src[1];
     register f32 z = src[2];
-    register f32 *temp  = (f32 *)dst;
-    register f32 *temp2 = (f32 *)mtx;
+    register f32 *dstp = (f32 *)dst;
+    register f32 *mtxp = (f32 *)mtx;
     s32 i;
     for (i = 0; i < 3; i++) {
-        *temp = ((temp2[ 0] * x)
-               + (temp2[ 4] * y)
-               + (temp2[ 8] * z)
-               +  temp2[12]);
-        temp++;
-        temp2++;
+        *dstp = ((mtxp[ 0] * x)
+               + (mtxp[ 4] * y)
+               + (mtxp[ 8] * z)
+               +  mtxp[12]);
+        dstp++;
+        mtxp++;
     }
 }
 
@@ -597,15 +609,15 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
  * 'scale' is the scale of the object.
  * 'angle' rotates the object while still facing the camera.
  */
-void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle) {
+void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 angle) {
     register s32 i;
     register f32 sx = scale[0];
     register f32 sy = scale[1];
     register f32 sz = ((f32 *) scale)[2];
-    register f32 *temp2, *temp = (f32 *)dest;
+    register f32 *srcp, *dstp = (f32 *)dest;
     for (i = 0; i < 16; i++) {
-        *temp = 0;
-        temp++;
+        *dstp = 0;
+        dstp++;
     }
     if (angle == 0x0) {
         // ((u32 *) dest)[0] = FLOAT_ONE;
@@ -626,16 +638,31 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle)
     dest[2][3] = 0;
     ((u32 *) dest)[15] = FLOAT_ONE; // [3][3]
 
-    temp  = (f32 *)dest;
-    temp2 = (f32 *)mtx;
+    dstp = (f32 *)dest;
+    srcp = (f32 *)src;
     for (i = 0; i < 3; i++) {
-        temp[12] = ((temp2[ 0] * position[0])
-                  + (temp2[ 4] * position[1])
-                  + (temp2[ 8] * position[2])
-                  +  temp2[12]);
-        temp++;
-        temp2++;
+        dstp[12] = ((srcp[ 0] * position[0])
+                  + (srcp[ 4] * position[1])
+                  + (srcp[ 8] * position[2])
+                  +  srcp[12]);
+        dstp++;
+        srcp++;
     }
+}
+
+void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, Vec3f scale) {
+    register f32 x = translation[0];
+    register f32 y = translation[1];
+    register f32 z = translation[2];
+    mtxf_scale_vec3f(dest, throwMatrix, scale);
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        dest[3][i] = (throwMatrix[0][i] * x)
+                   + (throwMatrix[1][i] * y)
+                   + (throwMatrix[2][i] * z)
+                   + src[3][i];
+    }
+    ((u32 *) dest)[15] = FLOAT_ONE;
 }
 
 /**
@@ -718,9 +745,9 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     point2[2] = (pos[2] + (radius * coss(yaw + DEGREES(-60))));
     point2[1] = find_floor(point2[0], height, point2[2], &floor);
 
-    if ((point0[1] - pos[1]) < minY) point0[1] = pos[1];
-    if ((point1[1] - pos[1]) < minY) point1[1] = pos[1];
-    if ((point2[1] - pos[1]) < minY) point2[1] = pos[1];
+    if (point0[1] - pos[1] < minY) point0[1] = pos[1];
+    if (point1[1] - pos[1] < minY) point1[1] = pos[1];
+    if (point2[1] - pos[1] < minY) point2[1] = pos[1];
 
     f32 avgY = average_3(point0[1], point1[1], point2[1]);
 
@@ -752,24 +779,24 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
  */
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
     register Vec3f entry;
-    register f32 *temp  = (f32 *)a;
-    register f32 *temp2 = (f32 *)dest;
-    register f32 *temp3;
+    register f32 *ap = (f32 *)a;
+    register f32 *destp = (f32 *)dest;
+    register f32 *bp;
     register s32 i;
     for (i = 0; i < 16; i++) {
-        vec3_copy(entry, temp);
-        for (temp3 = (f32 *)b; (i & 3) != 3; i++) {
-            *temp2 = ((entry[0] * temp3[0])
-                    + (entry[1] * temp3[4])
-                    + (entry[2] * temp3[8]));
-            temp2++;
-            temp3++;
+        vec3_copy(entry, ap);
+        for (bp = (f32 *)b; (i & 3) != 3; i++) {
+            *destp = ((entry[0] * bp[0])
+                    + (entry[1] * bp[4])
+                    + (entry[2] * bp[8]));
+            destp++;
+            bp++;
         }
-        *temp2 = 0;
-        temp += 4;
-        temp2++;
+        *destp = 0;
+        ap += 4;
+        destp++;
     }
-    vec3f_add(&dest[3][0], &b[3][0]);
+    vec3f_add(dest[3], b[3]);
     ((u32 *) dest)[15] = FLOAT_ONE;
 }
 
@@ -782,11 +809,11 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
 void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
     register s32 c = (coss(angle) * 0x10000);
     register s32 s = (sins(angle) * 0x10000);
-    register f32 *temp = (f32 *)mtx;
+    register f32 *mtxp = (f32 *)mtx;
     register s32 i;
     for (i = 0; i < 16; i++) {
-        *temp = 0;
-        temp++;
+        *mtxp = 0;
+        mtxp++;
     }
     MATENTRY(0,  c)
     MATENTRY(1,  s)
@@ -797,7 +824,7 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
 }
 
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
-    register f32 *temp = (f32 *)dst;
+    register f32 *dstp = (f32 *)dst;
     register f32 tx = a2[3][0];
     register f32 ty = a2[3][1];
     register f32 tz = a2[3][2];
@@ -807,12 +834,12 @@ void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
         rx = a2[i][0];
         ry = a2[i][1];
         rz = a2[i][2];
-        temp[ 0] = (a1[0][0] * rx + a1[0][1] * ry + a1[0][2] * rz); //   vec3f_dot(a1[0], a2[i])
-        temp[ 4] = (a1[1][0] * rx + a1[1][1] * ry + a1[1][2] * rz); //   vec3f_dot(a1[1], a2[i])
-        temp[ 8] = (a1[2][0] * rx + a1[2][1] * ry + a1[2][2] * rz); //   vec3f_dot(a1[2], a2[i])
-        temp[12] = (a1[3][0] * rx + a1[3][1] * ry + a1[3][2] * rz)  //   vec3f_dot(a1[3], a2[i])
+        dstp[ 0] = (a1[0][0] * rx + a1[0][1] * ry + a1[0][2] * rz); //   vec3f_dot(a1[0], a2[i])
+        dstp[ 4] = (a1[1][0] * rx + a1[1][1] * ry + a1[1][2] * rz); //   vec3f_dot(a1[1], a2[i])
+        dstp[ 8] = (a1[2][0] * rx + a1[2][1] * ry + a1[2][2] * rz); //   vec3f_dot(a1[2], a2[i])
+        dstp[12] = (a1[3][0] * rx + a1[3][1] * ry + a1[3][2] * rz)  //   vec3f_dot(a1[3], a2[i])
                  - (      tx * rx +       ty * ry +       tz * rz); // - vec3f_dot(a2[3], a2[i])
-        temp++;
+        dstp++;
     }
     MTXF_END(dst);
 }
@@ -827,25 +854,25 @@ void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
  */
 void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
     register s32 i;
-    register f32 *temp1 = (f32 *)dest;
-    register f32 *temp2 = (f32 *)camMtx;
-    f32 y[3];
+    register f32 *destp = (f32 *)dest;
+    register f32 *camp = (f32 *)camMtx;
+    Vec3f y;
     register f32 *x = y;
-    register f32 *temp3 = (f32 *)objMtx;
+    register f32 *objp = (f32 *)objMtx;
 
     for (i = 0; i < 3; i++) {
-        *x = (temp3[12] - temp2[12]);
-        temp2++;
-        temp3++;
+        *x = (objp[12] - camp[12]);
+        camp++;
+        objp++;
         x = (f32 *)(((u32)x) + 4);
     }
-    temp2 -= 3;
+    camp -= 3;
     for (i = 0; i < 3; i++) {
-        *temp1 = ((x[-3] * temp2[0])
-                + (x[-2] * temp2[1])
-                + (x[-1] * temp2[2]));
-        temp1++;
-        temp2 += 4;
+        *destp = ((x[-3] * camp[0])
+                + (x[-2] * camp[1])
+                + (x[-1] * camp[2]));
+        destp++;
+        camp += 4;
     }
 }
 
@@ -1333,7 +1360,7 @@ s32 anim_spline_poll(Vec3f result) {
 
 /**
  * @brief Checks if a ray intersects a surface using Möller–Trumbore intersection algorithm.
- * 
+ *
  * @param orig is the starting point of the ray.
  * @param dir is the normalized ray direction.
  * @param dir_length is the length of the ray.
@@ -1381,7 +1408,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     f32 u = (f * vec3f_dot(s, h));
     // Check if 'u' is within bounds.
     if ((u < 0.0f) || (u > 1.0f)) return FALSE;
-    // Make 'q' the cross product of 's' and edge 1. 
+    // Make 'q' the cross product of 's' and edge 1.
     Vec3f q;
     vec3f_cross(q, s, e1);
     // Make 'v' the cos(angle) between the ray and 'q', divided by 'det'.
