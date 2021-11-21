@@ -316,24 +316,19 @@ void vec3f_normalize(Vec3f dest) {
     }
 }
 
+struct CopyMat4 {
+    f32 a[16];
+};
+
 /// Copy matrix 'src' to 'dest'.
 UNUSED void mtxf_copy(register Mat4 dest, register Mat4 src) {
-    f32 m[8];
-    s32 i, j;
-    for (i = 0; i < 2; i++) {
-        for (j = 0; j < 8; j++) {
-            m[j] = src[i][j];
-        }
-        for (j = 0; j < 8; j++) {
-            dest[i][j] = m[j];
-        }
-    }
+    *((struct CopyMat4 *) dest) = *((struct CopyMat4 *) src);
 }
 
 /// Set mtx to the identity matrix.
 void mtxf_identity(register Mat4 mtx) {
-    s32 i;
-    f32 *dest;
+    register s32 i;
+    register f32 *dest;
     for (dest = ((f32 *) mtx + 1), i = 0; i < 14; dest++, i++) {
         *dest = 0;
     }
@@ -380,20 +375,20 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 src, register Vec3f s) {
  * to the point. Note that the bottom row is assumed to be [0, 0, 0, 1], which is
  * true for transformation matrices if the translation has a w component of 1.
  */
-UNUSED void mtxf_mul_vec3s(Mat4 dst, Vec3s b) {
-    register f32 x = b[0];
-    register f32 y = b[1];
-    register f32 z = b[2];
-    register f32 *dstp = (f32 *)dst;
+UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s dest) {
+    register f32 x = dest[0];
+    register f32 y = dest[1];
+    register f32 z = dest[2];
+    register f32 *mtxp = (f32 *)mtx;
+    register s16 *dstp = dest;
     register s32 i;
-    register s16 *c = b;
     for (i = 0; i < 3; i++) {
-        c[0] = ((dstp[ 0] * x)
-              + (dstp[ 4] * y)
-              + (dstp[ 8] * z)
-              +  dstp[12]);
-        c++;
+        *dstp = ((mtxp[ 0] * x)
+               + (mtxp[ 4] * y)
+               + (mtxp[ 8] * z)
+               +  mtxp[12]);
         dstp++;
+        mtxp++;
     }
 }
 
@@ -411,7 +406,7 @@ void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
     register f32 z = src[2];
     register f32 *dstp = (f32 *)dst;
     register f32 *mtxp = (f32 *)mtx;
-    s32 i;
+    register s32 i;
     for (i = 0; i < 3; i++) {
         *dstp = ((mtxp[0] * x)
                + (mtxp[4] * y)
@@ -421,13 +416,14 @@ void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
     }
 }
 
+// Transform 'dst' by 'mtx' from 'src' with translation.
 void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src) {
     register f32 x = src[0];
     register f32 y = src[1];
     register f32 z = src[2];
     register f32 *dstp = (f32 *)dst;
     register f32 *mtxp = (f32 *)mtx;
-    s32 i;
+    register s32 i;
     for (i = 0; i < 3; i++) {
         *dstp = ((mtxp[ 0] * x)
                + (mtxp[ 4] * y)
@@ -447,7 +443,7 @@ void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src) {
  * i.e. a matrix representing a linear transformation over 3 space.
  */
 void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
-    s32 i;
+    register s32 i;
     for (i = 0; i < 3; i++) {
         dst[i] = vec3_dot(mtx[i], src);
     }
@@ -571,16 +567,16 @@ void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
  */
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
     Vec3f colX, colY, colZ;
-    register f32 dx = (to[0] - from[0]);
-    register f32 dz = (to[2] - from[2]);
+    register f32 dx = to[0] - from[0];
+    register f32 dz = to[2] - from[2];
     register f32 invLength = sqrtf(sqr(dx) + sqr(dz));
     invLength = -(1.0f / MAX(invLength, NEAR_ZERO));
     dx *= invLength;
     dz *= invLength;
     f32 sr  = sins(roll);
     colY[1] = coss(roll);
-    colY[0] = ( sr * dz);
-    colY[2] = (-sr * dx);
+    colY[0] =  sr * dz;
+    colY[2] = -sr * dx;
     vec3f_diff(colZ, from, to); // to & from are swapped
     vec3f_normalize(colZ);
     vec3f_cross(colX, colY, colZ);
@@ -607,22 +603,19 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
  * 'mtx' is the look-at matrix from the camera.
  * 'position' is the position of the object in the world.
  * 'scale' is the scale of the object.
- * 'angle' rotates the object while still facing the camera.
+ * 'roll' rotates the object while still facing the camera.
  */
-void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 angle) {
+void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) {
     register s32 i;
     register f32 sx = scale[0];
     register f32 sy = scale[1];
     register f32 sz = scale[2];
-    register f32 tx = position[0];
-    register f32 ty = position[1];
-    register f32 tz = position[2];
-    register f32 *srcp, *dstp = (f32 *)dest;
+    register f32 *dstp = (f32 *)dest;
     for (i = 0; i < 16; i++) {
         *dstp = 0;
         dstp++;
     }
-    if (angle == 0x0) {
+    if (roll == 0x0) {
         // ((u32 *) dest)[0] = FLOAT_ONE;
         dest[0][0] = sx; // [0][0]
         dest[0][1] = 0;
@@ -630,26 +623,16 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 angle)
         // ((u32 *) dest)[5] = FLOAT_ONE;
         dest[1][1] = sy; // [1][1]
     } else {
-        dest[0][0] = (coss(angle) * sx);
-        dest[0][1] = (sins(angle) * sx);
-        dest[1][0] = (-dest[0][1] * sy);
-        dest[1][1] = ( dest[0][0] * sy);
+        dest[0][0] =  coss(roll) * sx;
+        dest[0][1] =  sins(roll) * sx;
+        dest[1][0] = -dest[0][1] * sy;
+        dest[1][1] =  dest[0][0] * sy;
     }
     // ((u32 *) dest)[10] = FLOAT_ONE;
     dest[2][2] = sz; // [2][2]
     dest[2][3] = 0;
+    linear_mtxf_mul_vec3f_and_translate(src, dest[3], position);
     ((u32 *) dest)[15] = FLOAT_ONE; // [3][3]
-
-    dstp = (f32 *)dest;
-    srcp = (f32 *)src;
-    for (i = 0; i < 3; i++) {
-        dstp[12] = ((srcp[ 0] * tx)
-                  + (srcp[ 4] * ty)
-                  + (srcp[ 8] * tz)
-                  +  srcp[12]);
-        dstp++;
-        srcp++;
-    }
 }
 
 void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, Vec3f scale) {
@@ -657,17 +640,23 @@ void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, 
     register f32 y = translation[1];
     register f32 z = translation[2];
     mtxf_scale_vec3f(dest, throwMatrix, scale);
-    s32 i;
+    register f32 *dstp = (f32 *)dest[3];
+    register f32 *srcp = (f32 *)src[3];
+    register f32 *thp = (f32 *)throwMatrix;
+    register s32 i;
     for (i = 0; i < 3; i++) {
-        dest[3][i] = (throwMatrix[0][i] * x)
-                   + (throwMatrix[1][i] * y)
-                   + (throwMatrix[2][i] * z)
-                   + src[3][i];
+        *dstp = ((thp[0] * x)
+               + (thp[4] * y)
+               + (thp[8] * z)
+               + srcp[0]);
+        dstp++;
+        srcp++;
+        thp++;
     }
     ((u32 *) dest)[15] = FLOAT_ONE;
 }
 
-static void vec3f_create_axis_normals(Vec3f colX, Vec3f colY, Vec3f colZ) {
+static void vec3f_create_axis_normals_from_up_dir(Vec3f colX, Vec3f colY, Vec3f colZ) {
     vec3f_normalize(colY);
     vec3f_cross(colX, colY, colZ);
     vec3f_normalize(colX);
@@ -687,7 +676,7 @@ void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 y
     Vec3f leftDir;
     Vec3f forwardDir;
     vec3f_set(forwardDir, sins(yaw), 0.0f, coss(yaw));
-    vec3f_create_axis_normals(leftDir, upDir, forwardDir);
+    vec3f_create_axis_normals_from_up_dir(leftDir, upDir, forwardDir);
     Vec3f entry;
     vec3f_prod(entry, leftDir, scale);
     linear_mtxf_mul_vec3f(src, dest[0], entry);
@@ -711,7 +700,7 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
     Vec3f leftDir;
     Vec3f forwardDir;
     vec3f_set(forwardDir, sins(yaw), 0.0f, coss(yaw));
-    vec3f_create_axis_normals(leftDir, upDir, forwardDir);
+    vec3f_create_axis_normals_from_up_dir(leftDir, upDir, forwardDir);
     vec3f_copy(dest[0], leftDir);
     vec3f_copy(dest[1], upDir);
     vec3f_copy(dest[2], forwardDir);
@@ -719,12 +708,14 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
     MTXF_END(dest);
 }
 
-static void find_terrain_triangle_floor(Vec3f point, Vec3f pos, s32 yaw, s32 angle, f32 radius, f32 height, f32 minY) {
+static void find_floor_at_relative_angle(Vec3f point, Vec3f pos, s32 yaw, s32 angle, f32 radius, f32 height, f32 minY) {
     Angle dir = yaw + angle;
     point[0] = pos[0] + (radius * sins(dir));
     point[2] = pos[2] + (radius * coss(dir));
     point[1] = find_floor_height(point[0], height, point[2]);
-    if (point[1] - pos[1] < minY) point[1] = pos[1];
+    if (point[1] - pos[1] < minY) {
+        point[1] = pos[1];
+    }
 }
 
 /**
@@ -741,15 +732,15 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     Vec3f xColumn, yColumn, zColumn;
     f32 minY   = (-radius * 3);
     f32 height = (pos[1] + 150);
-    find_terrain_triangle_floor(point0, pos, yaw, DEGREES( 60), radius, height, minY);
-    find_terrain_triangle_floor(point1, pos, yaw, DEGREES(180), radius, height, minY);
-    find_terrain_triangle_floor(point2, pos, yaw, DEGREES(-60), radius, height, minY);
+    find_floor_at_relative_angle(point0, pos, yaw, DEGREES( 60), radius, height, minY);
+    find_floor_at_relative_angle(point1, pos, yaw, DEGREES(180), radius, height, minY);
+    find_floor_at_relative_angle(point2, pos, yaw, DEGREES(-60), radius, height, minY);
 
     f32 avgY = average_3(point0[1], point1[1], point2[1]);
 
     vec3f_set(zColumn, sins(yaw), 0.0f, coss(yaw));
     find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
-    vec3f_create_axis_normals(xColumn, yColumn, zColumn);
+    vec3f_create_axis_normals_from_up_dir(xColumn, yColumn, zColumn);
     vec3f_copy(mtx[0], xColumn);
     vec3f_copy(mtx[1], yColumn);
     vec3f_copy(mtx[2], zColumn);
@@ -821,7 +812,7 @@ void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
     register f32 ty = a2[3][1];
     register f32 tz = a2[3][2];
     register f32 rx, ry, rz;
-    s32 i;
+    register s32 i;
     for (i = 0; i < 3; i++) {
         rx = a2[i][0];
         ry = a2[i][1];
@@ -999,11 +990,14 @@ void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, 
  * Construct the 'to' point which is distance 'dist' away from the 'from' position,
  * and has the angles pitch and yaw.
  */
-#define vec3_set_dist_and_angle(from, to, dist, pitch, yaw) { \
-    register f32 dcos = (dist * coss(pitch)); \
-    to[0] = (from[0] + (dcos * sins(yaw  ))); \
-    to[1] = (from[1] + (dist * sins(pitch))); \
-    to[2] = (from[2] + (dcos * coss(yaw  ))); \
+#define vec3_set_dist_and_angle(from, to, dist, pitch, yaw) {   \
+    register f32 x = from[0];                                   \
+    register f32 y = from[1];                                   \
+    register f32 z = from[2];                                   \
+    register f32 dcos = (dist * coss(pitch));                   \
+    to[0] = (x + (dcos * sins(yaw  )));                         \
+    to[1] = (y + (dist * sins(pitch)));                         \
+    to[2] = (z + (dcos * coss(yaw  )));                         \
 }
 void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, Angle32 pitch, Angle32 yaw) {
     vec3_set_dist_and_angle(from, to, dist, pitch, yaw);
@@ -1011,6 +1005,7 @@ void vec3f_set_dist_and_angle(Vec3f from, Vec3f to, f32 dist, Angle32 pitch, Ang
 void vec3s_set_dist_and_angle(Vec3s from, Vec3s to, s16 dist, Angle32 pitch, Angle32 yaw) {
     vec3_set_dist_and_angle(from, to, dist, pitch, yaw);
 }
+#undef vec3_set_dist_and_angle
 
 /**
  * Similar to approach_s32, but converts to s16 and allows for overflow between 32767 and -32768

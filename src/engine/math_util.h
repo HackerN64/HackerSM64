@@ -532,7 +532,7 @@ void mtxf_copy(Mat4 dest, Mat4 src);
 void mtxf_identity(Mat4 mtx);
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll);
 void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, Vec3f scale);
-void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle);
+void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 roll);
 void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw);
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw);
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius);
@@ -552,11 +552,12 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b);
 void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
 void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src);
 void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
-// extern void mtxf_to_mtx_asm(register void *dest, register void *src);
-FORCE_INLINE void mtxf_to_mtx(register void *dest, register void *src) {
-    // mtxf_to_mtx_asm(dest, src);
-    guMtxF2L(src, dest);
-}
+// // extern void mtxf_to_mtx_asm(register void *dest, register void *src);
+// FORCE_INLINE void mtxf_to_mtx(register void *dest, register void *src) {
+//     // mtxf_to_mtx_asm(dest, src);
+//     guMtxF2L(src, dest);
+// }
+#define mtxf_to_mtx(dest, src) guMtxF2L(src, dest)
 // Vector get/set functions
 void vec2f_get_lateral_dist(                   Vec2f from, Vec2f to,            f32 *lateralDist                            );
 void vec3f_get_lateral_dist(                   Vec3f from, Vec3f to,            f32 *lateralDist                            );
