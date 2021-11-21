@@ -190,16 +190,15 @@ const Gfx dl_silhouette_begin[] = {
     gsDPPipeSync(),
     gsDPSetRenderMode((SCHWA | GBL_c1(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA)),
                       (SCHWA | GBL_c2(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA))),
-    gsSPSetGeometryMode(G_FOG),                  /* Enable fog                  */
-    gsSPFogPosition(0, 1),                       /* Fox position                */
-    gsDPSetFogColor(0, 0, 0, SILHOUETTE       ), /* silhouette color & alpha    */
-    gsDPSetEnvColor(0, 0, 0, SIL_CVG_THRESHOLD), /* silhouette env transparency */
+    gsDPSetFogColor(0, 0, 0, SILHOUETTE       ), /* Silhouette color & alpha    */
+    gsDPSetEnvColor(0, 0, 0, SIL_CVG_THRESHOLD), /* Silhouette env transparency */
     gsSPEndDisplayList(),
 };
+
 const Gfx dl_silhouette_end[] = {
     gsDPPipeSync(),
-    gsSPClearGeometryMode(G_FOG),                /* Disable fog                 */
-    gsDPSetEnvColor(255, 255, 255, 255),         /* Reset env color & alpha     */
+    gsDPSetFogColor(  0,   0,   0, 255), /* Reset fog color & alpha */
+    gsDPSetEnvColor(255, 255, 255, 255), /* Reset env color & alpha */
     gsSPEndDisplayList(),
 };
 #endif

@@ -1712,7 +1712,7 @@ s32 execute_mario_action(struct MarioState *m) {
 #ifdef PUPPYCAM
         if (!(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_FREE)) {
 #endif
-            mario_handle_special_floors(m);  
+            mario_handle_special_floors(m);
 #ifdef PUPPYCAM
         }
 #endif
