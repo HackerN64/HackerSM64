@@ -2110,11 +2110,15 @@ enum oBehParams2ndByteTTCPitBlock {
     #define TREADMILL_BP_UNKNOWN                            0x2
 
 /* Activated Back-and-Forth Platform */
+    /* oBehParams1stByte */
     /* (bparam1 & 0x03) aka platform type */
     #define ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT          0x0
     #define ACTIVATED_BF_PLAT_TYPE_BITFS_MESH_PLAT          0x1
     #define ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR           0x2
     #define ACTIVATED_BF_PLAT_TYPES_MASK                    0x3
+    /* oBehParams2ndByte */
+    #define ACTIVATED_BF_PLAT_DISTANCE_MASK                 0x7F
+    #define ACTIVATED_BF_PLAT_FLAG_VERTICAL                 (1 << 7)
 
 /* Unagi */
     /* oBehParams2ndByte */
