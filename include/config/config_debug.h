@@ -53,6 +53,7 @@
 // Forces a crash when the game starts. Useful for debugging the crash screen.
 //#define DEBUG_FORCE_CRASH_ON_BOOT
 
+
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
 
 #ifdef COMPLETE_SAVE_FILE

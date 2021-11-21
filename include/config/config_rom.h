@@ -24,6 +24,7 @@
 #define BORDER_HEIGHT_CONSOLE  0
 #define BORDER_HEIGHT_EMULATOR 0
 
+
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
 
 #ifndef TARGET_N64

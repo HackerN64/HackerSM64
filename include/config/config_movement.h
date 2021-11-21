@@ -66,7 +66,7 @@
 // Mario can swing around poles and jump off them while swinging.
 #define POLE_SWING
 
-// If A and Z are pressed on the same frame, Mario will long jump instead of ground pound.
+// If A and Z are pressed on the same frame while running, Mario will long jump instead of ground pound.
 #define EASIER_LONG_JUMPS
 
 // Holding A while bouncing on an enemy will bounce Mario higher

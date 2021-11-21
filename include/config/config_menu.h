@@ -21,6 +21,7 @@
 // Decides the warp node "exit course" takes you to (has no effect if you disable exit course)
 #define EXIT_COURSE_NODE 0x1F
 
+
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
 
 #ifdef DISABLE_EXIT_COURSE
