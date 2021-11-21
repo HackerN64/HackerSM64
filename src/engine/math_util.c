@@ -455,12 +455,12 @@ void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
 
 /// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates.
 void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
-    register f32 sx   = sins(rot[0]);
-    register f32 cx   = coss(rot[0]);
-    register f32 sy   = sins(rot[1]);
-    register f32 cy   = coss(rot[1]);
-    register f32 sz   = sins(rot[2]);
-    register f32 cz   = coss(rot[2]);
+    register f32 sx = sins(rot[0]);
+    register f32 cx = coss(rot[0]);
+    register f32 sy = sins(rot[1]);
+    register f32 cy = coss(rot[1]);
+    register f32 sz = sins(rot[2]);
+    register f32 cz = coss(rot[2]);
     register f32 sysz = (sy * sz);
     register f32 cycz = (cy * cz);
     dest[0][0] = ((sysz * sx) + cycz);
@@ -480,12 +480,12 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
 
 /// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates.
 UNUSED void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
-    register f32 sx   = sins(rot[0]);
-    register f32 cx   = coss(rot[0]);
-    register f32 sy   = sins(rot[1]);
-    register f32 cy   = coss(rot[1]);
-    register f32 sz   = sins(rot[2]);
-    register f32 cz   = coss(rot[2]);
+    register f32 sx = sins(rot[0]);
+    register f32 cx = coss(rot[0]);
+    register f32 sy = sins(rot[1]);
+    register f32 cy = coss(rot[1]);
+    register f32 sz = sins(rot[2]);
+    register f32 cz = coss(rot[2]);
     dest[0][0] = (cy * cz);
     dest[0][1] = (cy * sz);
     dest[0][2] = -sy;
@@ -667,6 +667,14 @@ void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, 
     ((u32 *) dest)[15] = FLOAT_ONE;
 }
 
+static void vec3f_create_axis_normals(Vec3f colX, Vec3f colY, Vec3f colZ) {
+    vec3f_normalize(colY);
+    vec3f_cross(colX, colY, colZ);
+    vec3f_normalize(colX);
+    vec3f_cross(colZ, colX, colY);
+    vec3f_normalize(colZ);
+}
+
 /**
  * Mostly the same as 'mtxf_align_terrain_normal', but also applies a scale and multiplication.
  * 'src' is the matrix to multiply from
@@ -676,15 +684,10 @@ void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, 
  * 'yaw' is the angle which it should face
  */
 void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
-    Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
-    vec3f_set(lateralDir, sins(yaw), 0.0f, coss(yaw));
-    vec3f_normalize(upDir);
-    vec3f_cross(leftDir, upDir, lateralDir);
-    vec3f_normalize(leftDir);
-    vec3f_cross(forwardDir, leftDir, upDir);
-    vec3f_normalize(forwardDir);
+    vec3f_set(forwardDir, sins(yaw), 0.0f, coss(yaw));
+    vec3f_create_axis_normals(leftDir, upDir, forwardDir);
     Vec3f entry;
     vec3f_prod(entry, leftDir, scale);
     linear_mtxf_mul_vec3f(src, dest[0], entry);
@@ -705,20 +708,23 @@ void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 y
  * 'pos' is the object's position in the world
  */
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
-    Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
-    vec3f_set(lateralDir, sins(yaw), 0.0f, coss(yaw));
-    vec3f_normalize(upDir);
-    vec3f_cross(leftDir, upDir, lateralDir);
-    vec3f_normalize(leftDir);
-    vec3f_cross(forwardDir, leftDir, upDir);
-    vec3f_normalize(forwardDir);
+    vec3f_set(forwardDir, sins(yaw), 0.0f, coss(yaw));
+    vec3f_create_axis_normals(leftDir, upDir, forwardDir);
     vec3f_copy(dest[0], leftDir);
     vec3f_copy(dest[1], upDir);
     vec3f_copy(dest[2], forwardDir);
     vec3f_copy(dest[3], pos);
     MTXF_END(dest);
+}
+
+static void find_terrain_triangle_floor(Vec3f point, Vec3f pos, s32 yaw, s32 angle, f32 radius, f32 height, f32 minY) {
+    Angle dir = yaw + angle;
+    point[0] = pos[0] + (radius * sins(dir));
+    point[2] = pos[2] + (radius * coss(dir));
+    point[1] = find_floor_height(point[0], height, point[2]);
+    if (point[1] - pos[1] < minY) point[1] = pos[1];
 }
 
 /**
@@ -730,36 +736,20 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
  * 'radius' is the distance from each triangle vertex to the center
  */
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
-    struct Surface *floor;
     Vec3f point0, point1, point2;
-    Vec3f forward;
+    // Vec3f forward;
     Vec3f xColumn, yColumn, zColumn;
     f32 minY   = (-radius * 3);
     f32 height = (pos[1] + 150);
-
-    point0[0] = (pos[0] + (radius * sins(yaw + DEGREES( 60))));
-    point0[2] = (pos[2] + (radius * coss(yaw + DEGREES( 60))));
-    point0[1] = find_floor(point0[0], height, point0[2], &floor);
-    point1[0] = (pos[0] + (radius * sins(yaw + DEGREES(180))));
-    point1[2] = (pos[2] + (radius * coss(yaw + DEGREES(180))));
-    point1[1] = find_floor(point1[0], height, point1[2], &floor);
-    point2[0] = (pos[0] + (radius * sins(yaw + DEGREES(-60))));
-    point2[2] = (pos[2] + (radius * coss(yaw + DEGREES(-60))));
-    point2[1] = find_floor(point2[0], height, point2[2], &floor);
-
-    if (point0[1] - pos[1] < minY) point0[1] = pos[1];
-    if (point1[1] - pos[1] < minY) point1[1] = pos[1];
-    if (point2[1] - pos[1] < minY) point2[1] = pos[1];
+    find_terrain_triangle_floor(point0, pos, yaw, DEGREES( 60), radius, height, minY);
+    find_terrain_triangle_floor(point1, pos, yaw, DEGREES(180), radius, height, minY);
+    find_terrain_triangle_floor(point2, pos, yaw, DEGREES(-60), radius, height, minY);
 
     f32 avgY = average_3(point0[1], point1[1], point2[1]);
 
-    vec3f_set(forward, sins(yaw), 0.0f, coss(yaw));
+    vec3f_set(zColumn, sins(yaw), 0.0f, coss(yaw));
     find_vector_perpendicular_to_plane(yColumn, point0, point1, point2);
-    vec3f_normalize(yColumn);
-    vec3f_cross(xColumn, yColumn, forward);
-    vec3f_normalize(xColumn);
-    vec3f_cross(zColumn, xColumn, yColumn);
-    vec3f_normalize(zColumn);
+    vec3f_create_axis_normals(xColumn, yColumn, zColumn);
     vec3f_copy(mtx[0], xColumn);
     vec3f_copy(mtx[1], yColumn);
     vec3f_copy(mtx[2], zColumn);
