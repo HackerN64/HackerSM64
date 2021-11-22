@@ -159,11 +159,9 @@ FORCE_INLINE void vec3s_set(Vec3s dest, const s16 x, const s16 y, const s16 z) {
     register fmt sum, sum2;             \
     register s32 i;                     \
     for (i = 0; i < 3; i++) {           \
-        sum = *(a);                     \
-        (a)++;                          \
+        sum = *(a)++;                   \
         sum2 = *dstp;                   \
-        *dstp = (sum + sum2);           \
-        dstp++;                         \
+        *dstp++ = (sum + sum2);         \
     }                                   \
 }
 void vec3f_add(Vec3f dest, const Vec3f a) { vec3_add_func(f32, dest, a); }
@@ -177,12 +175,9 @@ void vec3s_add(Vec3s dest, const Vec3s a) { vec3_add_func(s16, dest, a); }
     register fmt sum, sum2;             \
     register s32 i;                     \
     for (i = 0; i < 3; i++) {           \
-        sum = *(a);                     \
-        (a)++;                          \
-        sum2 = *(b);                    \
-        (b)++;                          \
-        *dstp = (sum + sum2);           \
-        dstp++;                         \
+        sum = *(a)++;                   \
+        sum2 = *(b)++;                  \
+        *dstp++ = (sum + sum2);         \
     }                                   \
 }
 void vec3f_sum(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_sum_func(f32, dest, a, b); }
@@ -297,9 +292,9 @@ void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b) {
     register f32 x2 = b[0];
     register f32 y2 = b[1];
     register f32 z2 = b[2];
-    dest[0] = ((y1 * z2) - (z1 * y2));
-    dest[1] = ((z1 * x2) - (x1 * z2));
-    dest[2] = ((x1 * y2) - (y1 * x2));
+    dest[0] = (y1 * z2) - (z1 * y2);
+    dest[1] = (z1 * x2) - (x1 * z2);
+    dest[2] = (x1 * y2) - (y1 * x2);
 }
 
 /// Scale vector 'dest' so it has length 1
@@ -357,15 +352,15 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 src, register Vec3f s) {
     register f32 x = s[0];
     register f32 y = s[1];
     register f32 z = s[2];
-    register f32 *destp = (f32 *)dest;
+    register f32 *dstp = (f32 *)dest;
     register f32 *srcp = (f32 *)src;
     register s32 i;
     for (i = 0; i < 4; i++) {
-        destp[ 0] = (srcp[ 0] * x);
-        destp[ 4] = (srcp[ 4] * y);
-        destp[ 8] = (srcp[ 8] * z);
-        destp[12] =  srcp[12];
-        destp++;
+        dstp[ 0] = (srcp[ 0] * x);
+        dstp[ 4] = (srcp[ 4] * y);
+        dstp[ 8] = (srcp[ 8] * z);
+        dstp[12] =  srcp[12];
+        dstp++;
         srcp++;
     }
 }
@@ -380,14 +375,28 @@ UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s dest) {
     register f32 y = dest[1];
     register f32 z = dest[2];
     register f32 *mtxp = (f32 *)mtx;
-    register s16 *dstp = dest;
+    register s16 *dstp = (s16 *)dest;
     register s32 i;
     for (i = 0; i < 3; i++) {
-        *dstp = ((mtxp[ 0] * x)
-               + (mtxp[ 4] * y)
-               + (mtxp[ 8] * z)
-               +  mtxp[12]);
-        dstp++;
+        *dstp++ = ((mtxp[ 0] * x)
+                 + (mtxp[ 4] * y)
+                 + (mtxp[ 8] * z)
+                 +  mtxp[12]);
+        mtxp++;
+    }
+}
+
+void mtxf_translate_local_vec3f(Mat4 mtx, Vec3f dest, Vec3f src) {
+    register f32 x = src[0];
+    register f32 y = src[1];
+    register f32 z = src[2];
+    register f32 *mtxp = (f32 *)mtx;
+    register f32 *dstp = (f32 *)dest;
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        *dstp++ += ((mtxp[0] * x)
+                  + (mtxp[4] * y)
+                  + (mtxp[8] * z));
         mtxp++;
     }
 }
@@ -400,36 +409,34 @@ UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s dest) {
  * | 0 0 0 1 |
  * i.e. a matrix representing a linear transformation over 3 space.
  */
-void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
+void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dest, Vec3f src) {
     register f32 x = src[0];
     register f32 y = src[1];
     register f32 z = src[2];
-    register f32 *dstp = (f32 *)dst;
     register f32 *mtxp = (f32 *)mtx;
+    register f32 *dstp = (f32 *)dest;
     register s32 i;
     for (i = 0; i < 3; i++) {
-        *dstp = ((mtxp[0] * x)
-               + (mtxp[4] * y)
-               + (mtxp[8] * z));
-        dstp++;
+        *dstp++ = ((mtxp[0] * x)
+                 + (mtxp[4] * y)
+                 + (mtxp[8] * z));
         mtxp++;
     }
 }
 
 // Transform 'dst' by 'mtx' from 'src' with translation.
-void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src) {
+void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dest, Vec3f src) {
     register f32 x = src[0];
     register f32 y = src[1];
     register f32 z = src[2];
-    register f32 *dstp = (f32 *)dst;
     register f32 *mtxp = (f32 *)mtx;
+    register f32 *dstp = (f32 *)dest;
     register s32 i;
     for (i = 0; i < 3; i++) {
-        *dstp = ((mtxp[ 0] * x)
-               + (mtxp[ 4] * y)
-               + (mtxp[ 8] * z)
-               +  mtxp[12]);
-        dstp++;
+        *dstp++ = ((mtxp[ 0] * x)
+                 + (mtxp[ 4] * y)
+                 + (mtxp[ 8] * z)
+                 +  mtxp[12]);
         mtxp++;
     }
 }
@@ -442,10 +449,16 @@ void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src) {
  * | 0 0 0 1 |
  * i.e. a matrix representing a linear transformation over 3 space.
  */
-void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src) {
+void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dest, Vec3f src) {
+    register f32 x = src[0];
+    register f32 y = src[1];
+    register f32 z = src[2];
+    register f32 *dstp = (f32 *)dest;
     register s32 i;
     for (i = 0; i < 3; i++) {
-        dst[i] = vec3_dot(mtx[i], src);
+        *dstp++ = ((mtx[i][0] * x)
+                 + (mtx[i][1] * y)
+                 + (mtx[i][2] * z)); // vec3_dot(mtx[i], src);
     }
 }
 
@@ -612,8 +625,7 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) 
     register f32 *dstp = (f32 *)dest;
     register s32 i;
     for (i = 0; i < 12; i++) {
-        *dstp = 0;
-        dstp++;
+        *dstp++ = 0;
     }
     if (roll == 0x0) {
         // ((u32 *) dest)[0] = FLOAT_ONE;
@@ -644,11 +656,10 @@ void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, 
     register f32 *thp = (f32 *)throwMatrix;
     register s32 i;
     for (i = 0; i < 3; i++) {
-        *dstp = ((thp[0] * x)
-               + (thp[4] * y)
-               + (thp[8] * z)
-               + srcp[0]);
-        dstp++;
+        *dstp++ = ((thp[0] * x)
+                 + (thp[4] * y)
+                 + (thp[8] * z)
+                 + srcp[0]);
         srcp++;
         thp++;
     }
@@ -779,10 +790,9 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
     for (i = 0; i < 16; i++) {
         vec3_copy(entry, ap);
         for (bp = (f32 *)b; (i & 3) != 3; i++) {
-            *destp = ((entry[0] * bp[0])
-                    + (entry[1] * bp[4])
-                    + (entry[2] * bp[8]));
-            destp++;
+            *destp++ = ((entry[0] * bp[0])
+                      + (entry[1] * bp[4])
+                      + (entry[2] * bp[8]));
             bp++;
         }
         *destp = 0;
@@ -805,8 +815,7 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
     register f32 *mtxp = (f32 *)mtx;
     register s32 i;
     for (i = 0; i < 16; i++) {
-        *mtxp = 0;
-        mtxp++;
+        *mtxp++ = 0;
     }
     MATENTRY(0,  c)
     MATENTRY(1,  s)
@@ -861,10 +870,9 @@ void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
     }
     camp -= 3;
     for (i = 0; i < 3; i++) {
-        *destp = ((x[-3] * camp[0])
-                + (x[-2] * camp[1])
-                + (x[-1] * camp[2]));
-        destp++;
+        *destp++ = ((x[-3] * camp[0])
+                  + (x[-2] * camp[1])
+                  + (x[-1] * camp[2]));
         camp += 4;
     }
 }

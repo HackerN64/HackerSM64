@@ -1420,11 +1420,11 @@ void cur_obj_move_using_fvel_and_gravity(void) {
 }
 
 void obj_set_pos_relative(struct Object *obj, struct Object *other, f32 dleft, f32 dy, f32 dforward) {
-    f32 facingZ = coss(other->oMoveAngleYaw);
-    f32 facingX = sins(other->oMoveAngleYaw);
+    register f32 facingZ = coss(other->oMoveAngleYaw);
+    register f32 facingX = sins(other->oMoveAngleYaw);
 
-    f32 dz = dforward * facingZ - dleft * facingX;
-    f32 dx = dforward * facingX + dleft * facingZ;
+    register f32 dz = dforward * facingZ - dleft * facingX;
+    register f32 dx = dforward * facingX + dleft * facingZ;
 
     obj->oMoveAngleYaw = other->oMoveAngleYaw;
 
@@ -1434,8 +1434,8 @@ void obj_set_pos_relative(struct Object *obj, struct Object *other, f32 dleft, f
 }
 
 s32 cur_obj_angle_to_home(void) {
-    f32 dx = o->oHomeX - o->oPosX;
-    f32 dz = o->oHomeZ - o->oPosZ;
+    register f32 dx = o->oHomeX - o->oPosX;
+    register f32 dz = o->oHomeZ - o->oPosZ;
     return atan2s(dz, dx);
 }
 
@@ -1452,14 +1452,7 @@ void obj_set_gfx_pos_at_obj_pos(struct Object *obj1, struct Object *obj2) {
  * coordinates, and then add it to the vector at posIndex.
  */
 void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateIndex) {
-    Vec3f d;
-    vec3f_copy(d, &obj->rawData.asF32[localTranslateIndex]);
-    s32 i;
-    for (i = 0; i < 3; i++) {
-        obj->rawData.asF32[posIndex + i] += ((obj->transform[0][i] * d[0])
-                                           + (obj->transform[1][i] * d[1])
-                                           + (obj->transform[2][i] * d[2]));
-    }
+    mtxf_translate_local_vec3f(obj->transform, &obj->rawData.asF32[posIndex], &obj->rawData.asF32[localTranslateIndex]);
 }
 
 void obj_build_transform_from_pos_and_angle(struct Object *obj, s16 posIndex, s16 angleIndex) {

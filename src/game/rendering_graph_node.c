@@ -582,7 +582,7 @@ void geo_process_translation_rotation(struct GraphNodeTranslationRotation *node)
     vec3s_to_vec3f(translation, node->translation);
     mtxf_rotate_zxy_and_translate_and_mul(node->rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
 /**
@@ -596,7 +596,7 @@ void geo_process_translation(struct GraphNodeTranslation *node) {
     vec3s_to_vec3f(translation, node->translation);
     mtxf_rotate_zxy_and_translate_and_mul(gVec3sZero, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
 /**
@@ -607,7 +607,7 @@ void geo_process_translation(struct GraphNodeTranslation *node) {
 void geo_process_rotation(struct GraphNodeRotation *node) {
     mtxf_rotate_zxy_and_translate_and_mul(node->rotation, gVec3fZero, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
 /**
@@ -621,7 +621,7 @@ void geo_process_scale(struct GraphNodeScale *node) {
     vec3f_set(scaleVec, node->scale, node->scale, node->scale);
     mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], scaleVec);
     inc_mat_stack();
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
 /**
@@ -643,7 +643,7 @@ void geo_process_billboard(struct GraphNodeBillboard *node) {
     mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], translation, scale, gCurGraphNodeCamera->roll);
 
     inc_mat_stack();
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
 /**
@@ -655,7 +655,7 @@ void geo_process_z_offset(struct GraphNodeZOffset *node) {
     mtxf_z_offset(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], node->zOffset);
 
     inc_mat_stack();
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
 /**
@@ -664,7 +664,7 @@ void geo_process_z_offset(struct GraphNodeZOffset *node) {
  * parent node. It processes its children if it has them.
  */
 void geo_process_display_list(struct GraphNodeDisplayList *node) {
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
     gMatStackIndex++;
 }
 
@@ -761,7 +761,7 @@ void geo_process_animated_part(struct GraphNodeAnimatedPart *node) {
     }
     mtxf_rotate_xyz_and_translate_and_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
 /**
@@ -799,10 +799,9 @@ void geo_process_bone(struct GraphNodeBone *node) {
         rotation[1] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
         rotation[2] += gCurrAnimData[retrieve_animation_index(gCurrAnimFrame, &gCurrAnimAttribute)];
     }
-
     mtxf_rotate_xyz_and_translate_and_mul(rotation, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
     inc_mat_stack();
-    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+    append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
 /**

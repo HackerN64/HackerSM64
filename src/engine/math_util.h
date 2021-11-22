@@ -546,13 +546,14 @@ void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
 void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);
 void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx);
+void mtxf_translate_local_vec3f(Mat4 mtx, Vec3f dest, Vec3f src);
 // Matrix multiplication
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b);
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s);
 void mtxf_mul_vec3s(Mat4 mtx, Vec3s b);
-void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
-void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dst, Vec3f src);
-void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dst, Vec3f src);
+void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dest, Vec3f src);
+void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dest, Vec3f src);
+void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dest, Vec3f src);
 // // extern void mtxf_to_mtx_asm(register void *dest, register void *src);
 // FORCE_INLINE void mtxf_to_mtx(register void *dest, register void *src) {
 //     // mtxf_to_mtx_asm(dest, src);
