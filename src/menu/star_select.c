@@ -119,7 +119,7 @@ void render_100_coin_star(u8 stars) {
 void bhv_act_selector_init(void) {
     s16 i = 0;
     s32 selectorModelIDs[10];
-    u8 stars = save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
+    u8 stars = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
 
     sVisibleStars = 0;
     while (i != sObtainedStars) {

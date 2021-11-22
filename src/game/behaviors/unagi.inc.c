@@ -23,7 +23,7 @@ void bhv_unagi_init(void) {
     } else {
         o->oPathedStartWaypoint = segmented_to_virtual(jrb_seg7_trajectory_unagi_2);
         o->oAction = UNAGI_ACT_IN_CAVE;
-        if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_JRB) & STAR_FLAG_ACT_2) {
+        if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_2) {
             o->oAnimState = UNAGI_ANIM_STATE_HAS_TRANSPARENT_STAR;
         } else {
             o->oAnimState = UNAGI_ANIM_STATE_HAS_STAR;
