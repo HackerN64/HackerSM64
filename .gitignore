@@ -73,6 +73,7 @@ build/*
 !/textures/crash_custom/*.png
 # libultra
 
+!/lib/**/*.o
 !/lib/*.a
 !/lib/gcclib/*.a
 !/lib/gcclib/divbreak/*.a
