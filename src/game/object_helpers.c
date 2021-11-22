@@ -1456,7 +1456,9 @@ void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateInd
     vec3f_copy(d, &obj->rawData.asF32[localTranslateIndex]);
     s32 i;
     for (i = 0; i < 3; i++) {
-        obj->rawData.asF32[posIndex + i] += ((obj->transform[0][i] * d[0]) + (obj->transform[1][i] * d[1]) + (obj->transform[2][i] * d[2]));
+        obj->rawData.asF32[posIndex + i] += ((obj->transform[0][i] * d[0])
+                                           + (obj->transform[1][i] * d[1])
+                                           + (obj->transform[2][i] * d[2]));
     }
 }
 

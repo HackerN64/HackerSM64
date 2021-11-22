@@ -647,6 +647,18 @@ void geo_process_billboard(struct GraphNodeBillboard *node) {
 }
 
 /**
+ * Process a Z offset node. The last element in the matrix scales the
+ * distance from the camera.
+ * For the rest it acts as a normal display list node.
+ */
+void geo_process_z_offset(struct GraphNodeZOffset *node) {
+    mtxf_z_offset(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], node->zOffset);
+
+    inc_mat_stack();
+    append_dl_and_return(((struct GraphNodeDisplayList *)node));
+}
+
+/**
  * Process a display list node. It draws a display list without first pushing
  * a transformation on the stack, so all transformations are inherited from the
  * parent node. It processes its children if it has them.
@@ -1162,6 +1174,7 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                     case GRAPH_NODE_TYPE_GENERATED_LIST:       geo_process_generated_list      ((struct GraphNodeGenerated           *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_BACKGROUND:           geo_process_background          ((struct GraphNodeBackground          *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_HELD_OBJ:             geo_process_held_object         ((struct GraphNodeHeldObject          *) curGraphNode); break;
+                    case GRAPH_NODE_TYPE_Z_OFFSET:             geo_process_z_offset            ((struct GraphNodeZOffset             *) curGraphNode); break;
                     default:                                   geo_try_process_children        ((struct GraphNode                    *) curGraphNode); break;
                 }
             }

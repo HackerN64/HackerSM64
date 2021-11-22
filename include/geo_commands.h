@@ -59,6 +59,7 @@ enum GeoLayoutCommands {
     /*0x1F*/ GEO_CMD_NOP_1F,
     /*0x20*/ GEO_CMD_NODE_CULLING_RADIUS,
     /*0x21*/ GEO_CMD_BONE,
+    /*0x22*/ GEO_CMD_Z_OFFSET,
 };
 
 // geo layout macros
@@ -484,5 +485,14 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_BONE, layer, 0x0000), \
     CMD_HHHHHH(tx, ty, tz, rx, ry, rz), \
     CMD_PTR(displayList)
+
+/**
+ * 0x22: Create a z offset scene graph node.
+ *   0x01: unused
+ *   0x02: s16 zOffset
+ */
+#define GEO_Z_OFFSET(zOffset) \
+    CMD_BBH(GEO_CMD_Z_OFFSET, 0x00, zOffset)
+
 
 #endif // GEO_COMMANDS_H

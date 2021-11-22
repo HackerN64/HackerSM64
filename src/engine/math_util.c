@@ -351,7 +351,7 @@ UNUSED void mtxf_translate(Mat4 dest, Vec3f b) {
 }
 
 /**
- * Set matrix 'dest' to 'mtx' scaled by vector s
+ * Set matrix 'dest' to 'src' scaled by vector s
  */
 void mtxf_scale_vec3f(Mat4 dest, Mat4 src, register Vec3f s) {
     register f32 x = s[0];
@@ -653,6 +653,17 @@ void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, 
         thp++;
     }
     ((u32 *) dest)[15] = FLOAT_ONE;
+}
+
+/**
+ * Set 'dest' to 'src', with its last entry as a scale of the z position, offset by 'zOffset'.
+ */
+void mtxf_z_offset(Mat4 dest, Mat4 src, s32 zOffset) {
+    mtxf_copy(dest, src);
+    register f32 z = dest[3][2];
+    if (zOffset != 0 && z != 0) {
+        dest[3][3] = (z + zOffset) / z;
+    }
 }
 
 static void vec3f_create_axis_normals_from_up_dir(Vec3f colX, Vec3f colY, Vec3f colZ) {

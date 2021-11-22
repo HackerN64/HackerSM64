@@ -67,6 +67,7 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_GENERATED_LIST,
     GRAPH_NODE_TYPE_BACKGROUND,
     GRAPH_NODE_TYPE_HELD_OBJ,
+    GRAPH_NODE_TYPE_Z_OFFSET,
     GRAPH_NODE_TYPE_CULLING_RADIUS,
     GRAPH_NODE_TYPE_ROOT,
     GRAPH_NODE_TYPE_START,
@@ -100,6 +101,7 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_BACKGROUND           = (0x2C | GRAPH_NODE_TYPE_FUNCTIONAL),
     GRAPH_NODE_TYPE_HELD_OBJ             = (0x2E | GRAPH_NODE_TYPE_FUNCTIONAL),
     GRAPH_NODE_TYPE_CULLING_RADIUS       =  0x2F,
+    GRAPH_NODE_TYPE_Z_OFFSET             =  0x30,
 
     GRAPH_NODE_TYPES_MASK                =  0xFF,
 };
@@ -391,7 +393,16 @@ struct GraphNodeHeldObject {
 struct GraphNodeCullingRadius {
     /*0x00*/ struct GraphNode node;
     /*0x14*/ s16 cullingRadius; // specifies the 'sphere radius' for purposes of frustum culling
-    // u8 filler[2];
+    u8 filler[2];
+};
+
+/** A node that offsets the z position in camera space while also scaling everything else to
+ * make it look the same.
+ */
+struct GraphNodeZOffset {
+    /*0x00*/ struct GraphNode node;
+    /*0x14*/ void *displayList;
+    /*0x18*/ s32 zOffset;
 };
 
 extern struct GraphNodeMasterList  *gCurGraphNodeMasterList;
@@ -430,6 +441,7 @@ struct GraphNodeObjectParent        *init_graph_node_object_parent       (struct
 struct GraphNodeGenerated           *init_graph_node_generated           (struct AllocOnlyPool *pool, struct GraphNodeGenerated           *graphNode, GraphNodeFunc gfxFunc, s32 parameter);
 struct GraphNodeBackground          *init_graph_node_background          (struct AllocOnlyPool *pool, struct GraphNodeBackground          *graphNode, u16 background, GraphNodeFunc backgroundFunc, s32 zero);
 struct GraphNodeHeldObject          *init_graph_node_held_object         (struct AllocOnlyPool *pool, struct GraphNodeHeldObject          *graphNode, struct Object *objNode, Vec3s translation, GraphNodeFunc nodeFunc, s32 playerIndex);
+struct GraphNodeZOffset             *init_graph_node_z_offset            (struct AllocOnlyPool *pool, struct GraphNodeZOffset             *graphNode, s16 zOffset);
 
 struct GraphNode *geo_add_child       (struct GraphNode *parent, struct GraphNode *childNode);
 struct GraphNode *geo_remove_child    (struct GraphNode *graphNode);
