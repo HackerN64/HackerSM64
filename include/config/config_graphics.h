@@ -76,3 +76,10 @@
 
 // Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
 //#define DISABLE_SHADOWS
+
+
+// -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
+
+#ifndef F3DEX_GBI_SHARED
+#undef OBJECTS_REJ // Non F3DEX-based ucodes do NOT support ucode switching.
+#endif // !F3DEX_GBI_SHARED

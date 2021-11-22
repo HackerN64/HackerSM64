@@ -262,7 +262,11 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.type = M_GFXTASK;
     gGfxSPTask->task.t.ucode_boot = rspbootTextStart;
     gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
+#ifdef F3DEX_GBI_SHARED
     gGfxSPTask->task.t.flags = (OS_TASK_LOADABLE | OS_TASK_DP_WAIT);
+#else
+    gGfxSPTask->task.t.flags = 0x0;
+#endif
 #ifdef  L3DEX2_ALONE
     gGfxSPTask->task.t.ucode = gspL3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspL3DEX2_fifoDataStart;
