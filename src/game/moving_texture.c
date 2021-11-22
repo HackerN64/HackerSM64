@@ -555,19 +555,12 @@ void *get_quad_collection_from_id(u32 id) {
  * quadCollection.
  */
 void movtex_change_texture_format(u32 quadCollectionId, Gfx **gfx) {
-    switch (quadCollectionId) {
-        case HMC_MOVTEX_TOXIC_MAZE_MIST:
-            gSPDisplayList((*gfx)++, dl_waterbox_ia16_begin);
-            break;
-        case SSL_MOVTEX_TOXBOX_QUICKSAND_MIST:
-            gSPDisplayList((*gfx)++, dl_waterbox_ia16_begin);
-            break;
-        case JRB_MOVTEX_INITIAL_MIST:
-            gSPDisplayList((*gfx)++, dl_waterbox_ia16_begin);
-            break;
-        default:
-            gSPDisplayList((*gfx)++, dl_waterbox_rgba16_begin);
-            break;
+    if (quadCollectionId == HMC_MOVTEX_TOXIC_MAZE_MIST
+     || quadCollectionId == SSL_MOVTEX_TOXBOX_QUICKSAND_MIST
+     || quadCollectionId == JRB_MOVTEX_INITIAL_MIST) {
+        gSPDisplayList((*gfx)++, dl_waterbox_ia16_begin);
+    } else {
+        gSPDisplayList((*gfx)++, dl_waterbox_rgba16_begin);
     }
 }
 
