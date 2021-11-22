@@ -470,14 +470,15 @@ enum GeoLayoutCommands {
 
 /**
  * 0x21: Create a scene graph node that is rotated by the object's animation + an initial rotation.
- *       u8 drawingLayer
- *       s16 xTranslation
- *       s16 yTranslation
- *       s16 zTranslation
- *       s16 xRotation
- *       s16 yRotation
- *       s16 zRotation
- *       u32 displayList: dislay list segmented address
+ *   0x01: u8 drawingLayer
+ *   0x02: unused
+ *   0x04: s16 xTranslation
+ *   0x08: s16 yTranslation
+ *   0x0A: s16 zTranslation
+ *   0x0C: s16 xRotation
+ *   0x0E: s16 yRotation
+ *   0x10: s16 zRotation
+ *   0x12: u32 displayList: dislay list segmented address
  */
 #define GEO_BONE(layer, tx, ty, tz, rx, ry, rz, displayList) \
     CMD_BBH(GEO_CMD_BONE, layer, 0x0000), \

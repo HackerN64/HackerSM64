@@ -304,7 +304,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         }
     }
 
-    Gfx *displayList = alloc_display_list(6 * sizeof(Gfx));
+    Gfx *displayList = alloc_display_list(4 * sizeof(Gfx));
 
     if (displayList == NULL) {
         return NULL;

@@ -606,22 +606,22 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
  * 'roll' rotates the object while still facing the camera.
  */
 void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) {
-    register s32 i;
     register f32 sx = scale[0];
     register f32 sy = scale[1];
     register f32 sz = scale[2];
     register f32 *dstp = (f32 *)dest;
-    for (i = 0; i < 16; i++) {
+    register s32 i;
+    for (i = 0; i < 12; i++) {
         *dstp = 0;
         dstp++;
     }
     if (roll == 0x0) {
         // ((u32 *) dest)[0] = FLOAT_ONE;
-        dest[0][0] = sx; // [0][0]
+        dest[0][0] = sx;
         dest[0][1] = 0;
         dest[1][0] = 0;
         // ((u32 *) dest)[5] = FLOAT_ONE;
-        dest[1][1] = sy; // [1][1]
+        dest[1][1] = sy;
     } else {
         dest[0][0] =  coss(roll) * sx;
         dest[0][1] =  sins(roll) * sx;
@@ -629,10 +629,9 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) 
         dest[1][1] =  dest[0][0] * sy;
     }
     // ((u32 *) dest)[10] = FLOAT_ONE;
-    dest[2][2] = sz; // [2][2]
-    dest[2][3] = 0;
+    dest[2][2] = sz;
     linear_mtxf_mul_vec3f_and_translate(src, dest[3], position);
-    ((u32 *) dest)[15] = FLOAT_ONE; // [3][3]
+    ((u32 *) dest)[15] = FLOAT_ONE;
 }
 
 void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, Vec3f scale) {
