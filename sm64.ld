@@ -216,6 +216,7 @@ SECTIONS
       BUILD_DIR/src/game*.o(.rodata*);
       BUILD_DIR/src/engine*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
+      . = ALIGN(0x10);
    }
    END_SEG(engine)
    BEGIN_NOLOAD(engine)
