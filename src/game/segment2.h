@@ -29,6 +29,9 @@ extern Gfx dl_screen_transition_end[];
 extern Gfx dl_transition_draw_filled_region[];
 extern Gfx dl_shadow_circle[];
 extern Gfx dl_shadow_square[];
+#if STAR_GLOW
+extern Gfx dl_star_glow[];
+#endif
 extern Gfx dl_shadow_end[];
 extern Gfx dl_skybox_begin[];
 extern Gfx dl_skybox_tile_tex_settings[];
