@@ -107,13 +107,13 @@ void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, 
     ((destFmt *) dest)[1] = y;                       \
     ((destFmt *) dest)[2] = z;                       \
 }
-void vec3f_copy    (Vec3f dest, const Vec3f src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
+void vec3f_copy    (Vec3f dest, const Vec3f src) { vec3_copy_bits(f32, dest, f32, src); } // 32 -> 32
 void vec3i_copy    (Vec3i dest, const Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
 void vec3s_copy    (Vec3s dest, const Vec3s src) { vec3_copy_bits(s16, dest, s16, src); } // 16 -> 16
 void vec3s_to_vec3i(Vec3i dest, const Vec3s src) { vec3_copy_bits(s32, dest, s16, src); } // 16 -> 32
 void vec3s_to_vec3f(Vec3f dest, const Vec3s src) { vec3_copy_bits(f32, dest, s16, src); } // 16 -> 32
 void vec3i_to_vec3s(Vec3s dest, const Vec3i src) { vec3_copy_bits(s16, dest, s32, src); } // 32 -> 16
-void vec3i_to_vec3f(Vec3f dest, const Vec3i src) { vec3_copy_bits(s32, dest, s32, src); } // 32 -> 32
+void vec3i_to_vec3f(Vec3f dest, const Vec3i src) { vec3_copy_bits(f32, dest, s32, src); } // 32 -> 32
 
 void surface_normal_to_vec3f(Vec3f dest, struct Surface *surf) {
     register f32 x = surf->normal.x;
