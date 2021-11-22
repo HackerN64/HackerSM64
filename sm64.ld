@@ -176,7 +176,10 @@ SECTIONS
       */librtc.a:*.o(.text);
       */libz.a:*.o(.text);
       */libhvqm2.a:*.o(.text);
-      BUILD_DIR/lib/rsp.o(.text);
+      lib/rspboot.o(.text);
+#include "rsptext.inc.ld"
+      BUILD_DIR/lib/aspMain.o(.text*);
+      lib/PR/audio/n_aspMain.o(.text*);
       lib/PR/hvqm/hvqm2sp1.o(.text);
       _mainSegmentTextEnd = .;
 
@@ -195,8 +198,9 @@ SECTIONS
       */libhvqm2.a:*.o(.data*);
       */librtc.a:*.o(.data*);
       */libz.a:*.o(.data*);
-
-      BUILD_DIR/lib/rsp.o(.data*);
+#include "rspdata.inc.ld"
+      BUILD_DIR/lib/aspMain.o(.data*);
+      lib/PR/audio/n_aspMain.o(.data*);
       lib/PR/hvqm/hvqm2sp1.o(.data*);
 
       /* rodata */
@@ -215,7 +219,6 @@ SECTIONS
       */librtc.a:*.o(.rodata*);
       */libz.a:*.o(.rodata*);
 
-      BUILD_DIR/lib/rsp.o(.rodata*);
       lib/PR/hvqm/hvqm2sp1.o(.rodata*);
    }
    END_SEG(main)
@@ -260,6 +263,8 @@ SECTIONS
       /* rodata */
       BUILD_DIR/src/game*.o(.rodata*);
       BUILD_DIR/src/engine*.o(.rodata*);
+      /* BUILD_DIR/src/usb*.o(.rodata*); */
+      . = ALIGN(0x10);
    }
    END_SEG(engine)
    BEGIN_NOLOAD(engine)

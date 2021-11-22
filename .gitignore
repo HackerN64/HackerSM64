@@ -101,6 +101,7 @@ build/*
 
 # libultra
 
+!/lib/**/*.o
 !/lib/*.a
 lib/libs2d_engine.a
 !/lib/gcclib/*.a
