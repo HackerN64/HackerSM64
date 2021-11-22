@@ -294,6 +294,37 @@ void bhv_unlock_door_star_loop(void) {
     }
 }
 
+#ifdef BOUNCY_MARIO
+/**
+ * Scales Mario based on hus vertical velocity to make him look bouncy.
+ */
+Gfx *geo_mario_bouncy(s32 callContext, UNUSED struct GraphNode *node, Mat4 *mtx) {
+    static Vec3f gMarioScale = { 1.0f, 1.0f, 1.0f };
+    const f32 minYScale = 1.0f;
+    f32 yScale, hScale;
+    Vec3f scale;
+    if (callContext == GEO_CONTEXT_RENDER) {
+        if (gMarioState->vel[1] == 0.0f
+         || gMarioState->action == ACT_DIVE
+         || (gMarioState->action & ACT_FLAG_STATIONARY)) {
+            vec3f_copy(scale, gVec3fOne);
+        } else {
+            yScale = 1.0f + (gMarioState->vel[1] / 256.0f);
+            if (yScale < minYScale) {
+                yScale = minYScale;
+                hScale = 1.0f / minYScale;
+            } else {
+                hScale = 1.0f / yScale;
+            }
+            vec3f_set(scale, hScale, yScale, hScale);
+        }
+        approach_vec3f_asymptotic(gMarioScale, scale, 0.5f, 0.5f, 0.5f);
+        mtxf_scale_vec3f(*mtx, *mtx, gMarioScale);
+    }
+    return NULL;
+}
+#endif
+
 /**
  * Generate a display list that sets the correct blend mode and color for mirror Mario.
  */
