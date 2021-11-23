@@ -615,7 +615,7 @@ Gfx *geo_switch_mario_hand_grab_pos(s32 callContext, struct GraphNode *node, Mat
  */
 Gfx *geo_render_mirror_mario(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
     f32 mirroredX;
-    struct Object *mario = gMarioStates[0].marioObj;
+    struct Object *mario = gMarioState->marioObj;
 
     switch (callContext) {
         case GEO_CONTEXT_CREATE:
@@ -628,7 +628,7 @@ Gfx *geo_render_mirror_mario(s32 callContext, struct GraphNode *node, UNUSED Mat
             geo_remove_child(&gMirrorMario.node);
             break;
         case GEO_CONTEXT_RENDER:
-            if (mario->header.gfx.pos[0] > 1700.0f) {
+            if (mario->header.gfx.pos[0] > CASTLE_MIRROR_THRESHOLD_X) {
                 // TODO: Is this a geo layout copy or a graph node copy?
                 gMirrorMario.sharedChild = mario->header.gfx.sharedChild;
                 gMirrorMario.areaIndex = mario->header.gfx.areaIndex;

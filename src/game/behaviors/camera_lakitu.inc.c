@@ -150,7 +150,7 @@ void bhv_camera_lakitu_update(void) {
             }
         } else {
             f32 mirroredX = (CASTLE_MIRROR_X - gLakituState.curPos[0]);
-            if (gLakituState.curPos[0] < 1700.0f || mirroredX < 0.0f) {
+            if (gMarioObject->header.gfx.pos[0] < CASTLE_MIRROR_THRESHOLD_X || mirroredX < 0.0f) {
                 cur_obj_hide();
             } else {
                 cur_obj_unhide();

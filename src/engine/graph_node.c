@@ -629,7 +629,6 @@ struct GraphNode *geo_make_first_child(struct GraphNode *newFirstChild) {
     return parent;
 }
 
-#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 /**
  * Helper function for geo_call_global_function_nodes that recursively
  * traverses the scene graph and calls the functions of global nodes.
@@ -638,12 +637,20 @@ void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 call
     struct GraphNode **globalPtr;
     struct GraphNode *curNode = graphNode;
     struct FnGraphNode *asFnNode;
+    s16 type;
 
     do {
         asFnNode = (struct FnGraphNode *) curNode;
-
-        if ((curNode->type & GRAPH_NODE_TYPE_FUNCTIONAL) && (asFnNode->func != NULL)) {
-            asFnNode->func(callContext, curNode, NULL);
+        type = curNode->type;
+        if (type == GRAPH_NODE_TYPE_PERSPECTIVE
+         || type == GRAPH_NODE_TYPE_SWITCH_CASE
+         || type == GRAPH_NODE_TYPE_CAMERA
+         || type == GRAPH_NODE_TYPE_GENERATED_LIST
+         || type == GRAPH_NODE_TYPE_BACKGROUND
+         || type == GRAPH_NODE_TYPE_HELD_OBJ) {
+            if (asFnNode->func != NULL) {
+                asFnNode->func(callContext, curNode, NULL);
+            }
         }
 
         if (curNode->children != NULL) {
@@ -696,7 +703,6 @@ void geo_call_global_function_nodes(struct GraphNode *graphNode, s32 callContext
         gCurGraphNodeRoot = 0;
     }
 }
-#endif
 
 /**
  * When objects are cleared, this is called on all object nodes (loaded or unloaded).

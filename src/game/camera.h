@@ -11,9 +11,10 @@
 
 #include "level_table.h"
 
-// X position of the mirror
-// 0x875C3D = 8870973, 0x800 = 2048, 8870973 / 2048 = ~4331.52978515625
-#define CASTLE_MIRROR_X ((f32)0x875C3D / 0x800)
+// X position of the mirror in the castle.
+#define CASTLE_MIRROR_X 4332.0f // 4331.529785f
+// X position of where Mirror Mario/Lakitu starts rendering.
+#define CASTLE_MIRROR_THRESHOLD_X 1700.0f
 
 /**
  * @file camera.h
