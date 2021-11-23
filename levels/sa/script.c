@@ -16,8 +16,8 @@
 #include "levels/sa/header.h"
 
 static const LevelScript script_func_local_1[] = {
-    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x00, 0x00, 0x00, 0x00), /*beh*/ bhvFishSpawner),
-    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x00, 0x02, 0x00, 0x00), /*beh*/ bhvFishSpawner),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x00, 0x10, 0x00, 0x00), /*beh*/ bhvFishSpawner),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ 0, -1000, 0, /*angle*/ 0, 0, 0, /*behParam*/ BP(0x00, 0x12, 0x00, 0x00), /*beh*/ bhvFishSpawner),
     RETURN(),
 };
 
