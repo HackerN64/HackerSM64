@@ -62,6 +62,9 @@
 // Scales Mario based on hus vertical velocity to make him look bouncy.
 #define BOUNCY_MARIO
 
+// Makes Mario's scaling smooth when he is squished under an object.
+#define SMOOTH_SQUISH
+
 // Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
 // NOTE: Still breaks occasionally, and PUPPYLIGHT_NODE might not work in areas that aren't area 1.
 //#define PUPPYLIGHTS

@@ -975,7 +975,7 @@ s32 act_spawn_spin_airborne(struct MarioState *m) {
         if (set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 0) { // first anim frame
             play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
         }
-    
+
     } else { // under 300 units above floor, enter freefall animation
         m->actionState = ACT_STATE_SPAWN_SPIN_AIRBORNE_FALLING;
         set_mario_animation(m, MARIO_ANIM_GENERAL_FALL);
@@ -1451,6 +1451,9 @@ s32 act_squished(struct MarioState *m) {
     f32 squishAmount;
     s16 surfAngle;
     s32 underSteepSurf = FALSE; // seems to be responsible for setting velocity?
+#ifdef SMOOTH_SQUISH
+    Vec3f nextScale;
+#endif
 
     f32 spaceUnderCeil = m->ceilHeight - m->floorHeight;
     if (spaceUnderCeil < 0) {
@@ -1469,9 +1472,15 @@ s32 act_squished(struct MarioState *m) {
             if (spaceUnderCeil >= 10.1f) {
                 // Mario becomes a pancake
                 squishAmount = spaceUnderCeil / 160.0f;
+#ifdef SMOOTH_SQUISH
+                f32 hscale = 2.0f - squishAmount;
+                vec3f_set(nextScale, hscale, squishAmount, hscale);
+                approach_vec3f_asymptotic(m->marioObj->header.gfx.scale, nextScale, 0.5f, 0.5f, 0.5f);
+#else
                 vec3f_set(m->marioObj->header.gfx.scale, 2.0f - squishAmount,
                                                                 squishAmount,
                                                          2.0f - squishAmount);
+#endif
             } else {
                 if (!(m->flags & MARIO_METAL_CAP) && m->invincTimer == 0) {
                     // cap on: 3 units; cap off: 4.5 units
