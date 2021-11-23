@@ -299,27 +299,26 @@ void bhv_unlock_door_star_loop(void) {
  * Scales Mario based on hus vertical velocity to make him look bouncy.
  */
 Gfx *geo_mario_bouncy(s32 callContext, UNUSED struct GraphNode *node, Mat4 *mtx) {
-    static Vec3f gMarioScale = { 1.0f, 1.0f, 1.0f };
-    const f32 minYScale = 1.0f;
-    f32 yScale, hScale;
+    static Vec3f sMarioScale = { 1.0f, 1.0f, 1.0f };
+    const f32 minYScale = 0.95f;
+    register f32 yScale, hScale;
     Vec3f scale;
     if (callContext == GEO_CONTEXT_RENDER) {
-        if (gMarioState->vel[1] == 0.0f
-         || gMarioState->action == ACT_DIVE
-         || (gMarioState->action & ACT_FLAG_STATIONARY)) {
+        f32 yVel = gMarioState->vel[1];
+        u32 action = gMarioState->action;
+        if (yVel == 0.0f
+         || action == ACT_DIVE
+         || action == ACT_SHOT_FROM_CANNON
+         || (action & ACT_FLAG_STATIONARY)) {
             vec3f_copy(scale, gVec3fOne);
         } else {
-            yScale = 1.0f + (gMarioState->vel[1] / 256.0f);
-            if (yScale < minYScale) {
-                yScale = minYScale;
-                hScale = 1.0f / minYScale;
-            } else {
-                hScale = 1.0f / yScale;
-            }
+            yScale = 1.0f + (yVel / 256.0f);
+            yScale = CLAMP(yScale, minYScale, 2.0f);
+            hScale = 2.0f - yScale;
             vec3f_set(scale, hScale, yScale, hScale);
         }
-        approach_vec3f_asymptotic(gMarioScale, scale, 0.5f, 0.5f, 0.5f);
-        mtxf_scale_vec3f(*mtx, *mtx, gMarioScale);
+        approach_vec3f_asymptotic(sMarioScale, scale, 0.5f, 0.5f, 0.5f);
+        mtxf_scale_vec3f(*mtx, *mtx, sMarioScale);
     }
     return NULL;
 }
