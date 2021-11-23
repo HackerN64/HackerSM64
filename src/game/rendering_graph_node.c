@@ -853,7 +853,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  * matrix to determine where the origin (0,0,0) in object space will be once
  * transformed to camera space (x+ = right, y+ = up, z = 'coming out the screen').
  * In 3D graphics, you typically model the world as being moved in front of a
- * static camera instead of a moving camera through a static world, which in
+ * camera instead of a moving camera through a world, which in
  * this case simplifies calculations. Note that the perspective matrix is not
  * on the matrix stack, so there are still calculations with the fov to compute
  * the slope of the lines of the frustum.
