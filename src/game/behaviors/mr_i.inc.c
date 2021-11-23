@@ -12,15 +12,16 @@ void bhv_piranha_particle_loop(void) {
 }
 
 void mr_i_piranha_particle_act_move(void) {
-    // Take pitch into account
+#ifdef MR_I_PITCH
     o->oVelX = (o->oForwardVel *  coss(o->oMoveAnglePitch) * sins(o->oMoveAngleYaw));
     o->oVelY = (o->oForwardVel * -sins(o->oMoveAnglePitch)                         );
     o->oVelZ = (o->oForwardVel *  coss(o->oMoveAnglePitch) * coss(o->oMoveAngleYaw));
     vec3f_add(&o->oPosVec, &o->oVelVec);
+#endif
     cur_obj_scale(3.0f);
     o->oForwardVel = 20.0f;
     cur_obj_update_floor_and_walls();
-    if (0x8000 & o->oInteractStatus) {
+    if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         o->oAction = MR_I_PIRANHA_PARTICLE_ACT_INTERACTED;
     } else if ((o->oTimer > 100) || (o->oMoveFlags & OBJ_MOVE_HIT_WALL) || o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM) {
         obj_mark_for_deletion(o);
@@ -48,10 +49,15 @@ void bhv_mr_i_particle_loop(void) {
 void spawn_mr_i_particle(void) {
     f32 yScale = o->header.gfx.scale[1];
     struct Object *particle = spawn_object(o, MODEL_PURPLE_MARBLE, bhvMrIParticle);
-    // Take pitch into account
+#ifdef MR_I_PITCH
     particle->oPosX += ((90.0f * yScale) *  coss(o->oMoveAnglePitch) * sins(o->oMoveAngleYaw));
     particle->oPosY += ((90.0f * yScale) * -sins(o->oMoveAnglePitch) + (50.0f * yScale)      );
     particle->oPosZ += ((90.0f * yScale) *  coss(o->oMoveAnglePitch) * coss(o->oMoveAngleYaw));
+#else
+    particle->oPosY += 50.0f * yScale;
+    particle->oPosX += sins(o->oMoveAngleYaw) * 90.0f * yScale;
+    particle->oPosZ += coss(o->oMoveAngleYaw) * 90.0f * yScale;
+#endif
     cur_obj_play_sound_2(SOUND_OBJ_MRI_SHOOT);
 }
 

@@ -7,7 +7,7 @@
 // -- COIN --
 
 // The distance from Mario which coin formations spawn coins at.
-// Vanilla is 2000.0f. 
+// Vanilla is 2000.0f.
 // Set this to o->oDrawingDistance for a more reasonable range at the cost of performance.
 #define COIN_FORMATION_DISTANCE 2000.0f
 
@@ -58,6 +58,11 @@
 
 // Fixes being able to pick up Bowser from anywhere within in his hitbox after having passed through the tail hitbox once.
 #define BOWSER_TAIL_GRAB_FIX
+
+// -- MR. I --
+
+// Takes pitch into account when Mr. I shoots a projectile (vanilla only does horizontal movement).
+#define MR_I_PITCH
 
 // -- CHAIN CHOMP --
 
