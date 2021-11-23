@@ -56,6 +56,7 @@ enum GeoUpdateLayerTransparencyModes {
     GEO_TRANSPARENCY_MODE_NORMAL    =  0,
     GEO_TRANSPARENCY_MODE_NO_DITHER = 10,
     GEO_TRANSPARENCY_MODE_DECAL     = 20,
+    GEO_TRANSPARENCY_MODE_INTER     = 30,
 };
 
 Gfx *geo_update_projectile_pos_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx);
