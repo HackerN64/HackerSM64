@@ -126,7 +126,7 @@ SECTIONS
    . = _hvqbufSegmentBssEnd;
 #endif
 
-   BEGIN_SEG(main, .) SUBALIGN(16)
+   BEGIN_SEG(main, .)
    {
       KEEP(BUILD_DIR/asm/entry.o(.text));
 
