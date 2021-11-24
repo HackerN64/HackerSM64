@@ -314,27 +314,27 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             currList = node->listHeads[currLayer];
 #endif
 #if defined(DISABLE_AA) || !SILHOUETTE
-            // Set the render mode for the entire layer.
+            // Set the render mode for the current layer.
             gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer],
                                                  mode2List->modes[currLayer]);
+#else
+            if (currPhase == RENDER_PHASE_NON_SILHOUETTE) {
+                // To properly cover the silhouette, disable AA.
+                // The silhouette model does not have AA due to the hack used to prevent triangle overlap.
+                gDPSetRenderMode(gDisplayListHead++, (mode1List->modes[currLayer] & ~IM_RD),
+                                                     (mode2List->modes[currLayer] & ~IM_RD));
+            } else {
+                // Set the render mode for the current dl.
+                gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer],
+                                                     mode2List->modes[currLayer]);
+            }
 #endif
+            // Iterate through all the displaylists on the current layer.
             while (currList != NULL) {
 #if SILHOUETTE
                 // Apply transformation to the dl.
                 gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
                           (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
- #ifndef DISABLE_AA
-                if (currPhase == RENDER_PHASE_NON_SILHOUETTE) {
-                    // To properly cover the silhouette, disable AA.
-                    // The silhouette model does not have AA due to the hack used to prevent triangle overlap.
-                    gDPSetRenderMode(gDisplayListHead++, (mode1List->modes[currLayer] & ~IM_RD),
-                                                         (mode2List->modes[currLayer] & ~IM_RD));
-                } else {
-                    // Set the render mode for the current dl.
-                    gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer],
-                                                         mode2List->modes[currLayer]);
-                }
- #endif
                 if (currPhase == RENDER_PHASE_SILHOUETTE) {
                     // Add the current display list to the master list, with silhouette F3d.
                     gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
