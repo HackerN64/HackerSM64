@@ -982,11 +982,13 @@ void lakitu_zoom(f32 rangeDist, s16 rangePitch) {
     }
 
     if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
-        if ((sLakituPitch += rangePitch / 13) > rangePitch) {
+        sLakituPitch += rangePitch / 13;
+        if (sLakituPitch > rangePitch) {
             sLakituPitch = rangePitch;
         }
     } else {
-        if ((sLakituPitch -= rangePitch / 13) < 0) {
+        sLakituPitch -= rangePitch / 13;
+        if (sLakituPitch < 0) {
             sLakituPitch = 0;
         }
     }
@@ -1556,9 +1558,7 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     if (dist > maxDist) {
         dist = maxDist;
     }
-    if ((absPitch = pitch) < 0) {
-        absPitch = -absPitch;
-    }
+    absPitch = abss(pitch);
 
     // Determine the yaw speed based on absPitch. A higher absPitch (further away from looking straight)
     // translates to a slower speed

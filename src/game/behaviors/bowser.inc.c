@@ -1580,18 +1580,15 @@ void bowser_thrown_dropped_update(void) {
     // Set throw action and vel values
     cur_obj_get_thrown_or_placed(1.0f, 1.0f, BOWSER_ACT_THROWN);
     // Set swing speed based of angle
-    f32 swingSpd = ((o->oBowserHeldAngleVelYaw / 3000.0f) * 70.0f);
     // If less than 0, reduce speed
-    if (swingSpd < 0.0f) {
-        swingSpd = -swingSpd;
-    }
+    f32 swingSpd = absf((o->oBowserHeldAngleVelYaw / 3000.0f) * 70.0f);
     // If more than 90, increase speed
     if (swingSpd > 90.0f) {
         swingSpd *= 2.5f;
     }
     // Set distance speed when throwing
-    o->oForwardVel = ( coss(o->oBowserHeldAnglePitch) * swingSpd);
-    o->oVelY       = (-sins(o->oBowserHeldAnglePitch) * swingSpd);
+    o->oForwardVel =  coss(o->oBowserHeldAnglePitch) * swingSpd;
+    o->oVelY       = -sins(o->oBowserHeldAnglePitch) * swingSpd;
     cur_obj_become_intangible();
 
     // Reset timer and subactions
