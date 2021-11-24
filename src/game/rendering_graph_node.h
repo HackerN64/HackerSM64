@@ -90,14 +90,6 @@ enum HeadsList {
 
 #define RENDER_PHASE_FIRST 0
 
-struct RenderPhase {
-    u8 startLayer;
-    u8 endLayer;
-#ifdef OBJECTS_REJ
-    u8 headsIndex : 1;
-#endif
-};
-
 void geo_process_node_and_siblings(struct GraphNode *firstNode);
 void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor);
 

@@ -83,7 +83,7 @@ struct RenderModeContainer {
 };
 
 /* Rendermode settings for cycle 1 for all 13 layers. */
-struct RenderModeContainer renderModeTable_1Cycle[2] = {
+static struct RenderModeContainer renderModeTable_1Cycle[2] = {
     { {
         G_RM_OPA_SURF,                      // LAYER_FORCE
         G_RM_AA_OPA_SURF,                   // LAYER_OPAQUE
@@ -122,7 +122,7 @@ struct RenderModeContainer renderModeTable_1Cycle[2] = {
 };
 
 /* Rendermode settings for cycle 2 for all 13 layers. */
-struct RenderModeContainer renderModeTable_2Cycle[2] = {
+static struct RenderModeContainer renderModeTable_2Cycle[2] = {
     { {
         G_RM_OPA_SURF2,                     // LAYER_FORCE
         G_RM_AA_OPA_SURF2,                  // LAYER_OPAQUE
@@ -168,32 +168,6 @@ struct GraphNodeObject *gCurGraphNodeObject = NULL;
 struct GraphNodeHeldObject *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
 
-#ifdef OBJECTS_REJ
-static void reset_clipping(void) {
-    if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
-        make_viewport_clip_rect(&sEndCutsceneVp);
-    } else {
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
-    }
-}
-
-static void switch_ucode(s32 headsIndex) {
-    if (headsIndex == LIST_HEADS_REJ) {
-        if (gIsConsole) {
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo);
-        } else {
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo);
-        }
-        init_rcp(KEEP_ZBUFFER);
-        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
-    } else { // LIST_HEADS_ZEX
-        gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
-        init_rcp(KEEP_ZBUFFER);
-        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
-    }
-}
-#endif
-
 #ifdef F3DEX_GBI_2
 LookAt lookAt;
 #endif
@@ -226,6 +200,14 @@ static const Gfx dl_silhouette_end[] = {
 };
 #undef SCHWA
 #endif
+
+struct RenderPhase {
+    u8 startLayer;
+    u8 endLayer;
+#ifdef OBJECTS_REJ
+    u8 headsIndex : 1;
+#endif
+};
 
 //                                              startLayer                      endLayer                        headsIndex
 static struct RenderPhase sRenderPhases[] = {
@@ -261,6 +243,32 @@ static struct RenderPhase sRenderPhases[] = {
  #endif
 #endif
 };
+
+#ifdef OBJECTS_REJ
+static void reset_clipping(void) {
+    if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
+        make_viewport_clip_rect(&sEndCutsceneVp);
+    } else {
+        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
+    }
+}
+
+static void switch_ucode(s32 headsIndex) {
+    if (headsIndex == LIST_HEADS_REJ) {
+        if (gIsConsole) {
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo);
+        } else {
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo);
+        }
+        init_rcp(KEEP_ZBUFFER);
+        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
+    } else { // LIST_HEADS_ZEX
+        gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
+        init_rcp(KEEP_ZBUFFER);
+        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
+    }
+}
+#endif
 
 /**
  * Process a master list node. This has been modified, so now it runs twice, for each microcode.
@@ -308,6 +316,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         }
         // Iterate through the layers on the current render phase.
         for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
+            // Set 'currList' to the first DisplayListNode on the current layer.
 #ifdef OBJECTS_REJ
             currList = node->listHeads[headsIndex][currLayer];
 #else
@@ -332,7 +341,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             // Iterate through all the displaylists on the current layer.
             while (currList != NULL) {
 #if SILHOUETTE
-                // Apply transformation to the dl.
+                // Add the display list's transformation to the master list.
                 gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
                           (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
                 if (currPhase == RENDER_PHASE_SILHOUETTE) {
@@ -344,10 +353,11 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
                     // Add the current display list to the master list.
                     gSPDisplayList(gDisplayListHead++, currList->displayList);
                 }
-#else // SILHOUETTE
+#else
                 // Add the current display list to the master list.
                 gSPDisplayList(gDisplayListHead++, currList->displayList);
-#endif // SILHOUETTE
+#endif
+                // Move to the next DisplayListNode.
                 currList = currList->next;
             }
         }
