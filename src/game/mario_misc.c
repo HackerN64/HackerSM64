@@ -307,9 +307,8 @@ Gfx *geo_mario_bouncy(s32 callContext, UNUSED struct GraphNode *node, Mat4 *mtx)
         f32 yVel = gMarioState->vel[1];
         u32 action = gMarioState->action;
         if (yVel == 0.0f
-         || action == ACT_DIVE
-         || action == ACT_SHOT_FROM_CANNON
-         || (action & ACT_FLAG_STATIONARY)) {
+         || action == ACT_GROUND_POUND
+         || (action & (ACT_FLAG_STATIONARY | ACT_FLAG_DIVING | ACT_FLAG_SWIMMING_OR_FLYING))) {
             vec3f_copy(scale, gVec3fOne);
         } else {
             yScale = 1.0f + (yVel / 256.0f);
