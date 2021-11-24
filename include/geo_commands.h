@@ -381,11 +381,12 @@ enum GeoLayoutCommands {
 /**
  * 0x18: Create dynamically generated displaylist scene graph node
  *   0x01: unused
- *   0x02: s16 parameter
- *   0x04: GraphNodeFunc function
+ *   0x04: s32 parameter
+ *   0x08: GraphNodeFunc function
  */
 #define GEO_ASM(param, function) \
-    CMD_BBH(GEO_CMD_NODE_GENERATED, 0x00, param), \
+    CMD_BBH(GEO_CMD_NODE_GENERATED, 0x00, 0x0000), \
+    CMD_W(param), \
     CMD_PTR(function)
 
 /**

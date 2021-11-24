@@ -22,7 +22,7 @@ Gfx *geo_envfx_main(s32 callContext, struct GraphNode *node, Mat4 mtxf) {
 
     if (callContext == GEO_CONTEXT_RENDER && gCurGraphNodeCamera != NULL) {
         struct GraphNodeGenerated *execNode = (struct GraphNodeGenerated *) node;
-        u32 *params = &execNode->parameter; // accessed a s32 as 2 u16s by pointing to the variable and
+        s32 *params = &execNode->parameter; // accessed a s32 as 2 u16s by pointing to the variable and
                                             // casting to a local struct as necessary.
 
         if (GET_HIGH_U16_OF_32(*params) != gAreaUpdateCounter) {
