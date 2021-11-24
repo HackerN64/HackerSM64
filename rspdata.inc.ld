@@ -68,6 +68,11 @@
       lib/PR/f3dex2/fifo/gspF3DEX2.Rej.fifo.o(.data);
 #endif
 
+/* Fast3DLX2 Rej Data */
+#ifdef F3DLX2_REJ_GBI
+      lib/PR/f3dex2/fifo/gspF3DLX2.Rej.fifo.o(.data);
+#endif
+
 /* Line3DEX2 Data */
 #ifdef L3DEX2_GBI
       lib/PR/f3dex2/fifo/gspL3DEX2.fifo.o(.data);

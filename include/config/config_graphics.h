@@ -23,18 +23,8 @@
 // Disable AA (Improves console performance but causes visible seams between unconnected geometry).
 //#define DISABLE_AA
 
-// Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
-#define IA8_COINS
-
-// Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti)
-#define IA8_30FPS_COINS
-
 // Use .rej microcode for certain objects (experimental).
 //#define OBJECTS_REJ
-
-// Culls objects which are out of view vertically (the game already does this horizontally).
-// NOTE: This may cause some shadows to disappear if their parent object is far enough out of view.
-#define VERTICAL_CULLING
 
 // Mario's silhouette when behind solid objects/surfaces
 // Also enables new render layers, such as LAYER_ALPHA_DECAL.
@@ -43,6 +33,10 @@
 // Also, this also disables anti-aliasing on Mario.
 #define SILHOUETTE 127
 
+// Culls objects which are out of view vertically (the game already does this horizontally).
+// NOTE: This may cause some shadows to disappear if their parent object is far enough out of view.
+#define VERTICAL_CULLING
+
 // The default drawing distance for objects.
 // Vanilla is 4000.0f.
 // NOTE: Setting this higher has a large performance impact.
@@ -50,6 +44,12 @@
 
 // Use 64x64 quarter shadow textures (Vanilla are 16x16).
 #define HD_SHADOWS
+
+// Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
+#define IA8_COINS
+
+// Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti)
+#define IA8_30FPS_COINS
 
 // Glowing effect for Power Stars.
 // The number is the size of the glow. Set to 0 to disable.
@@ -85,6 +85,16 @@
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
 
+#ifndef F3DZEX_GBI_2
+#undef OBJECTS_REJ // OBJECTS_REJ requires f3dzex.
+#endif // !F3DZEX_GBI_2
+
 #ifndef F3DEX_GBI_SHARED
 #undef OBJECTS_REJ // Non F3DEX-based ucodes do NOT support ucode switching.
 #endif // !F3DEX_GBI_SHARED
+
+#ifdef OBJECTS_REJ
+// Enable required ucodes.
+#define F3DEX2_REJ_GBI
+#define F3DLX2_REJ_GBI
+#endif // OBJECTS_REJ

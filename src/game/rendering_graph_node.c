@@ -168,13 +168,28 @@ struct GraphNodeObject *gCurGraphNodeObject = NULL;
 struct GraphNodeHeldObject *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
 
-#if defined(OBJECTS_REJ) && defined(F3DZEX_GBI_2)
-// u8 ucodeTestSwitch = 1;
-void reset_clipping(void) {
+#ifdef OBJECTS_REJ
+static void reset_clipping(void) {
     if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
         make_viewport_clip_rect(&sEndCutsceneVp);
     } else {
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
+    }
+}
+
+static void switch_ucode(s32 headsIndex) {
+    if (headsIndex == LIST_HEADS_REJ) {
+        if (gIsConsole) {
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo);
+        } else {
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo);
+        }
+        init_rcp(KEEP_ZBUFFER);
+        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
+    } else { // LIST_HEADS_ZEX
+        gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
+        init_rcp(KEEP_ZBUFFER);
+        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
     }
 }
 #endif
@@ -184,33 +199,78 @@ LookAt lookAt;
 #endif
 
 #if SILHOUETTE
-#define SIL_CVG_THRESHOLD    0x3F // 32..255, 63 seems to give best results
+// AA_EN        Enable anti aliasing (not actually used for AA in this case).
+// IM_RD        Enable reading coverage value.
+// CLR_ON_CVG   Don't change the color unless coverage overflows. This helps prevent triangle overlap.
+// CVG_DST_WRAP Wrap the coverage value on overflow.
+// CVG_X_ALPHA  Coverage and alpha will be multiplied and both will be the same. This makes texture alpha work (eg. Wing Cap wings).
+// FORCE_BL     Force Blending.
 #define SCHWA (AA_EN | IM_RD | CLR_ON_CVG | CVG_DST_WRAP | CVG_X_ALPHA | FORCE_BL)
-const Gfx dl_silhouette_begin[] = {
+static const Gfx dl_silhouette_begin[] = {
     gsDPPipeSync(),
+    // Set the render mode for the silhouette so that it gets its color and alpha from the fog register.
     gsDPSetRenderMode((SCHWA | GBL_c1(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA)),
                       (SCHWA | GBL_c2(G_BL_CLR_FOG, G_BL_A_FOG, G_BL_CLR_MEM, G_BL_1MA))),
-    gsDPSetFogColor(0, 0, 0, SILHOUETTE       ), /* Silhouette color & alpha    */
-    gsDPSetEnvColor(0, 0, 0, SIL_CVG_THRESHOLD), /* Silhouette env transparency */
+    // Set the silhouette's color & alpha.
+    gsDPSetFogColor(0, 0, 0, SILHOUETTE),
+    // Hacky way to prevent triangle overlap. 32..255. 63 seems to give best results.
+    gsDPSetEnvColor(0, 0, 0, 0x3F),
     gsSPEndDisplayList(),
 };
 
-const Gfx dl_silhouette_end[] = {
+static const Gfx dl_silhouette_end[] = {
     gsDPPipeSync(),
-    gsDPSetFogColor(  0,   0,   0, 255), /* Reset fog color & alpha */
-    gsDPSetEnvColor(255, 255, 255, 255), /* Reset env color & alpha */
+    gsDPSetFogColor(  0,   0,   0, 255), // Reset fog color & alpha
+    gsDPSetEnvColor(255, 255, 255, 255), // Reset env color & alpha
     gsSPEndDisplayList(),
 };
+#undef SCHWA
 #endif
+
+//                                              startLayer                      endLayer                        headsIndex
+static struct RenderPhase sRenderPhases[] = {
+#ifdef OBJECTS_REJ
+ #if SILHOUETTE
+    // Silhouette, .rej
+    /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    LIST_HEADS_ZEX },
+    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE,   LIST_HEADS_REJ },
+    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_ZB_FIRST,                 LAYER_LAST_BEFORE_SILHOUETTE,   LIST_HEADS_ZEX },
+    /* RENDER_PHASE_REJ_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          LIST_HEADS_REJ },
+    /* RENDER_PHASE_REJ_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          LIST_HEADS_REJ },
+    /* RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST,  LIST_HEADS_REJ },
+    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST,                     LIST_HEADS_ZEX },
+    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     LIST_HEADS_REJ },
+ #else
+    // No silhouette, .rej
+    /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    LIST_HEADS_ZEX },
+    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_FIRST,                    LAYER_ZB_LAST,                  LIST_HEADS_REJ },
+    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_ZB_FIRST,                 LAYER_LAST,                     LIST_HEADS_ZEX },
+    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     LIST_HEADS_REJ },
+ #endif
+#else
+ #if SILHOUETTE
+    // Silhouette, no .rej
+    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE    },
+    /* RENDER_PHASE_ZEX_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST           },
+    /* RENDER_PHASE_ZEX_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST           },
+    /* RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST   },
+    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST                      },
+ #else
+    // No silhouette, no .rej
+    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_FIRST,                    LAYER_LAST                      },
+ #endif
+#endif
+};
 
 /**
  * Process a master list node. This has been modified, so now it runs twice, for each microcode.
- It iterates through the first 5 layers of if the first index using F3DLX2.Rej, then it switches
- to F3DZEX and iterates through all layers, then switches back to F3DLX2.Rej and finishes the last
- 3. It does this, because layers 5-7 are non zbuffered, and just doing 0-7 of ZEX, then 0-7 of REJ
- would make the ZEX 0-4 render on top of Rej's 5-7.
+ * It iterates through the first 5 layers of if the first index using F3DLX2.Rej, then it switches
+ * to F3DZEX and iterates through all layers, then switches back to F3DLX2.Rej and finishes the last
+ * 3. It does this, because layers 5-7 are non zbuffered, and just doing 0-7 of ZEX, then 0-7 of REJ
+ * would make the ZEX 0-4 render on top of Rej's 5-7.
  */
 void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
+    struct RenderPhase *renderPhase;
     struct DisplayListNode *currList;
     s32 currLayer     = LAYER_FIRST;
     s32 startLayer    = LAYER_FIRST;
@@ -218,139 +278,101 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #ifdef OBJECTS_REJ
     s32 headsIndex    = LIST_HEADS_ZEX;
 #endif
-    s32 renderPhase   = RENDER_PHASE_FIRST;
+    s32 currPhase     = RENDER_PHASE_FIRST;
     s32 enableZBuffer = (node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0;
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
 
 #ifdef F3DEX_GBI_2
     Mtx lMtx;
-#ifdef FIX_REFLECT_MTX
+ #ifdef FIX_REFLECT_MTX
     guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 0.0f, -1.0f, 0.0f /* up */);
-#else
+ #else
     guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 1.0f, 0.0f, 0.0f /* up */);
-#endif
-#endif
-    // if (gPlayer1Controller->buttonPressed & L_TRIG) {
-    //     ucodeTestSwitch ^= 1;
-    // }
-    // print_text_fmt_int(32, 32, "%d", ucodeTestSwitch);
-    for (renderPhase = 0; renderPhase < RENDER_PHASE_END; renderPhase++) {
-        switch (renderPhase) {
-#if SILHOUETTE
+ #endif
+#endif // F3DEX_GBI_2
+    for (currPhase = RENDER_PHASE_FIRST; currPhase < RENDER_PHASE_END; currPhase++) {
+        renderPhase = &sRenderPhases[currPhase];
+        startLayer  = renderPhase->startLayer;
+        endLayer    = renderPhase->endLayer;
 #ifdef OBJECTS_REJ
-            case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
-            case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
-            case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
-            case RENDER_PHASE_REJ_SILHOUETTE:         headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
-            case RENDER_PHASE_REJ_NON_SILHOUETTE:     headsIndex = LIST_HEADS_REJ; startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
-            case RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE: headsIndex = LIST_HEADS_REJ; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_OCCLUDE_SILHOUETTE_LAST; break;
-            case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_LAST;                    break;
-            case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
-#else
-            case RENDER_PHASE_ZEX_BEFORE_SILHOUETTE:  startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST_BEFORE_SILHOUETTE;  break;
-            case RENDER_PHASE_ZEX_SILHOUETTE:         startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
-            case RENDER_PHASE_ZEX_NON_SILHOUETTE:     startLayer = LAYER_SILHOUETTE_FIRST;         endLayer = LAYER_SILHOUETTE_LAST;         break;
-            case RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE: startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_OCCLUDE_SILHOUETTE_LAST; break;
-            case RENDER_PHASE_ZEX_AFTER_SILHOUETTE:   startLayer = LAYER_OCCLUDE_SILHOUETTE_FIRST; endLayer = LAYER_LAST;                    break;
-#endif
-#else
-#ifdef OBJECTS_REJ
-            case RENDER_PHASE_ZEX_BG:                 headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_FIRST;                    endLayer = LAYER_FIRST;                   break;
-            case RENDER_PHASE_REJ_ZB:                 headsIndex = LIST_HEADS_REJ; startLayer = LAYER_FIRST;                    endLayer = LAYER_ZB_LAST;                 break;
-            case RENDER_PHASE_ZEX_ALL:                headsIndex = LIST_HEADS_ZEX; startLayer = LAYER_ZB_FIRST;                 endLayer = LAYER_LAST;                    break;
-            case RENDER_PHASE_REJ_NON_ZB:             headsIndex = LIST_HEADS_REJ; startLayer = LAYER_NON_ZB_FIRST;             endLayer = LAYER_LAST;                    break;
-#else
-            case RENDER_PHASE_ZEX_ALL:                startLayer = LAYER_FIRST;                    endLayer = LAYER_LAST;                    break;
-#endif
-#endif
-        }
-#if defined(OBJECTS_REJ) && defined(F3DZEX_GBI_2)
-        // Load rejection on pass 2. ZEX is loaded afterwards.
-        if (headsIndex == LIST_HEADS_REJ) {
-            if (gIsConsole) {
-                gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo);
-            } else {
-                gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo);
-            }
-            init_rcp(KEEP_ZBUFFER);
-            gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
-        } else {
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
-            init_rcp(KEEP_ZBUFFER);
-            gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
-        }
+        headsIndex  = renderPhase->headsIndex;
+        switch_ucode(headsIndex);
         gSPLookAt(gDisplayListHead++, &lookAt);
         reset_clipping();
 #endif
         if (enableZBuffer) {
+            // Enable z buffer.
             gDPPipeSync(gDisplayListHead++);
             gSPSetGeometryMode(gDisplayListHead++, G_ZBUFFER);
         }
+        // Iterate through the layers on the current render phase.
         for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
 #ifdef OBJECTS_REJ
             currList = node->listHeads[headsIndex][currLayer];
 #else
             currList = node->listHeads[currLayer];
 #endif
-#if defined(DISABLE_AA) || !defined(SILHOUETTE)
-            gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer], mode2List->modes[currLayer]);
+#if defined(DISABLE_AA) || !SILHOUETTE
+            // Set the render mode for the entire layer.
+            gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer],
+                                                 mode2List->modes[currLayer]);
 #endif
             while (currList != NULL) {
 #if SILHOUETTE
-#ifdef OBJECTS_REJ
-                if (renderPhase == RENDER_PHASE_REJ_SILHOUETTE) {
-                    gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
-                } else if (renderPhase == RENDER_PHASE_REJ_NON_SILHOUETTE) {
-#else
-                if (renderPhase == RENDER_PHASE_ZEX_SILHOUETTE) {
-                    gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
-                } else if (renderPhase == RENDER_PHASE_ZEX_NON_SILHOUETTE) {
-#endif
-                    gSPDisplayList(gDisplayListHead++, dl_silhouette_end);
-#ifndef DISABLE_AA
-                    // Use normal mode list, no AA
+                // Apply transformation to the dl.
+                gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
+                          (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
+ #ifndef DISABLE_AA
+                if (currPhase == RENDER_PHASE_NON_SILHOUETTE) {
+                    // To properly cover the silhouette, disable AA.
+                    // The silhouette model does not have AA due to the hack used to prevent triangle overlap.
                     gDPSetRenderMode(gDisplayListHead++, (mode1List->modes[currLayer] & ~IM_RD),
                                                          (mode2List->modes[currLayer] & ~IM_RD));
                 } else {
-                    gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer], mode2List->modes[currLayer]);
-#endif
+                    // Set the render mode for the current dl.
+                    gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer],
+                                                         mode2List->modes[currLayer]);
                 }
-#endif
-                gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
-                          G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+ #endif
+                if (currPhase == RENDER_PHASE_SILHOUETTE) {
+                    // Add the current display list to the master list, with silhouette F3d.
+                    gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
+                    gSPDisplayList(gDisplayListHead++, currList->displayList);
+                    gSPDisplayList(gDisplayListHead++, dl_silhouette_end);
+                } else {
+                    // Add the current display list to the master list.
+                    gSPDisplayList(gDisplayListHead++, currList->displayList);
+                }
+#else // SILHOUETTE
+                // Add the current display list to the master list.
                 gSPDisplayList(gDisplayListHead++, currList->displayList);
+#endif // SILHOUETTE
                 currList = currList->next;
             }
         }
     }
     if (enableZBuffer) {
+        // Disable z buffer.
         gDPPipeSync(gDisplayListHead++);
         gSPClearGeometryMode(gDisplayListHead++, G_ZBUFFER);
     }
 #ifdef F3DZEX_GBI_2
-#ifdef VISUAL_DEBUG
+ #ifdef VISUAL_DEBUG
     if (hitboxView) render_debug_boxes(DEBUG_UCODE_REJ);
-#endif
-#ifdef OBJECTS_REJ
+ #endif
+ #ifdef OBJECTS_REJ
     gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
     init_rcp(KEEP_ZBUFFER);
     gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
     reset_clipping();
+ #endif
 #endif
-#endif
-
 #ifdef VISUAL_DEBUG
     if ( hitboxView) render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
     if (surfaceView) visual_surface_loop();
 #endif
 }
-#if SILHOUETTE
-#undef SIL_CVG_THRESHOLD
-#undef SCHWA
-#undef SET_SILHOUETTE_F3D
-#undef CLEAR_SILHOUETTE_F3D
-#endif
 
 /**
  * Appends the display list to one of the master lists based on the layer
@@ -364,18 +386,18 @@ void geo_append_display_list(void *displayList, s32 layer) {
 #ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);
 #endif
-#if defined(F3DZEX_GBI_2) || (SILHOUETTE > 0)
+#if defined(OBJECTS_REJ) || SILHOUETTE
     if (gCurGraphNodeObject != NULL) {
-#if defined(OBJECTS_REJ) && defined(F3DZEX_GBI_2)
-        if (/* gIsConsole && */ (gCurGraphNodeObject->node.flags & GRAPH_RENDER_UCODE_REJ)/* && ucodeTestSwitch*/) {
+ #ifdef OBJECTS_REJ
+        if (/* gIsConsole && */ (gCurGraphNodeObject->node.flags & GRAPH_RENDER_UCODE_REJ)) {
             index = LIST_HEADS_REJ;
         }
-#endif
-#if SILHOUETTE
+ #endif
+ #if SILHOUETTE
         if (gCurGraphNodeObject->node.flags & GRAPH_RENDER_SILHOUETTE) {
-#if defined(OBJECTS_REJ) && defined(F3DZEX_GBI_2)
+  #ifdef OBJECTS_REJ
             index = LIST_HEADS_REJ;
-#endif
+  #endif
             switch (layer) {
                 case LAYER_OPAQUE: layer = LAYER_SILHOUETTE_OPAQUE; break;
                 case LAYER_ALPHA:  layer = LAYER_SILHOUETTE_ALPHA;  break;
@@ -387,9 +409,9 @@ void geo_append_display_list(void *displayList, s32 layer) {
                 case LAYER_ALPHA:  layer = LAYER_OCCLUDE_SILHOUETTE_ALPHA;  break;
             }
         }
-#endif
+ #endif // SILHOUETTE
     }
-#endif
+#endif // F3DZEX_GBI_2 || SILHOUETTE
     if (gCurGraphNodeMasterList != 0) {
         struct DisplayListNode *listNode =
             alloc_only_pool_alloc(gDisplayListHeap, sizeof(struct DisplayListNode));
