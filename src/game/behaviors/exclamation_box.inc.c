@@ -2,13 +2,12 @@
 
 struct ExclamationBoxContents {
     u8 id;
-    u8 unk1;
     u8 behParams;
     ModelID16 model;
     const BehaviorScript *behavior;
 };
 
-struct ObjectHitbox sExclamationBoxHitbox = {
+static struct ObjectHitbox sExclamationBoxHitbox = {
     /* interactType:      */ INTERACT_BREAKABLE,
     /* downOffset:        */ 5,
     /* damageOrCoinValue: */ 0,
@@ -20,23 +19,23 @@ struct ObjectHitbox sExclamationBoxHitbox = {
     /* hurtboxHeight:     */ 30,
 };
 
-struct ExclamationBoxContents sExclamationBoxContents[] = {
-    { EXCLAMATION_BOX_BP_WING_CAP,         0, 0, MODEL_MARIOS_WING_CAP,  bhvWingCap               },
-    { EXCLAMATION_BOX_BP_METAL_CAP,        0, 0, MODEL_MARIOS_METAL_CAP, bhvMetalCap              },
-    { EXCLAMATION_BOX_BP_VANISH_CAP,       0, 0, MODEL_MARIOS_CAP,       bhvVanishCap             },
-    { EXCLAMATION_BOX_BP_KOOPA_SHELL,      0, 0, MODEL_KOOPA_SHELL,      bhvKoopaShell            },
-    { EXCLAMATION_BOX_BP_COINS_1,          0, 0, MODEL_YELLOW_COIN,      bhvSingleCoinGetsSpawned },
-    { EXCLAMATION_BOX_BP_COINS_3,          0, 0, MODEL_NONE,             bhvThreeCoinsSpawn       },
-    { EXCLAMATION_BOX_BP_COINS_10,         0, 0, MODEL_NONE,             bhvTenCoinsSpawn         },
-    { EXCLAMATION_BOX_BP_1UP_WALKING,      0, 0, MODEL_1UP,              bhv1upWalking            },
-    { EXCLAMATION_BOX_BP_STAR_1,           0, 0, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY, 0, 0, MODEL_1UP,              bhv1upRunningAway        },
-    { EXCLAMATION_BOX_BP_STAR_2,           0, 1, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_STAR_3,           0, 2, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_STAR_4,           0, 3, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_STAR_5,           0, 4, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_STAR_6,           0, 5, MODEL_STAR,             bhvSpawnedStar           },
-    { EXCLAMATION_BOX_BP_NULL,             0, 0, MODEL_NONE,             NULL                     }
+static struct ExclamationBoxContents sExclamationBoxContents[] = {
+    { EXCLAMATION_BOX_BP_WING_CAP,         0, MODEL_MARIOS_WING_CAP,  bhvWingCap               },
+    { EXCLAMATION_BOX_BP_METAL_CAP,        0, MODEL_MARIOS_METAL_CAP, bhvMetalCap              },
+    { EXCLAMATION_BOX_BP_VANISH_CAP,       0, MODEL_MARIOS_CAP,       bhvVanishCap             },
+    { EXCLAMATION_BOX_BP_KOOPA_SHELL,      0, MODEL_KOOPA_SHELL,      bhvKoopaShell            },
+    { EXCLAMATION_BOX_BP_COINS_1,          0, MODEL_YELLOW_COIN,      bhvSingleCoinGetsSpawned },
+    { EXCLAMATION_BOX_BP_COINS_3,          0, MODEL_NONE,             bhvThreeCoinsSpawn       },
+    { EXCLAMATION_BOX_BP_COINS_10,         0, MODEL_NONE,             bhvTenCoinsSpawn         },
+    { EXCLAMATION_BOX_BP_1UP_WALKING,      0, MODEL_1UP,              bhv1upWalking            },
+    { EXCLAMATION_BOX_BP_STAR_1,           0, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY, 0, MODEL_1UP,              bhv1upRunningAway        },
+    { EXCLAMATION_BOX_BP_STAR_2,           1, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_STAR_3,           2, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_STAR_4,           3, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_STAR_5,           4, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_STAR_6,           5, MODEL_STAR,             bhvSpawnedStar           },
+    { EXCLAMATION_BOX_BP_NULL,             0, MODEL_NONE,             NULL                     }
 };
 
 void bhv_rotating_exclamation_mark_loop(void) {
