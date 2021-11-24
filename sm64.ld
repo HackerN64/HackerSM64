@@ -154,7 +154,7 @@ SECTIONS
       gMapStrings   = 0;
 #endif
 
-   BEGIN_SEG(main, .) SUBALIGN(16)
+   BEGIN_SEG(main, .)
    {
       KEEP(BUILD_DIR/asm/entry.o(.text));
       KEEP(BUILD_DIR/asm/n64_assert.o(.text));
