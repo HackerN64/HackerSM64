@@ -43,6 +43,11 @@
 // Also, this also disables anti-aliasing on Mario.
 #define SILHOUETTE 127
 
+// The default drawing distance for objects.
+// Vanilla is 4000.0f.
+// NOTE: Setting this higher has a large performance impact.
+#define DEFAULT_DRAWING_DISTANCE 4000.0f
+
 // Use 64x64 quarter shadow textures (Vanilla are 16x16).
 #define HD_SHADOWS
 
