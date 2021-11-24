@@ -154,7 +154,7 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
     return NULL;
 }
 
-void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
+FORCE_INLINE void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
     linear_mtxf_mul_vec3f_and_translate(mtx, &obj->oPosVec, &obj->oParentRelativePosVec);
 }
 
@@ -212,7 +212,7 @@ s32 cur_obj_rotate_yaw_toward(s16 target, s16 increment) {
     return ((o->oAngleVelYaw = (s16)((s16) o->oMoveAngleYaw - startYaw)) == 0);
 }
 
-s32 obj_angle_to_object(struct Object *obj1, struct Object *obj2) {
+FORCE_INLINE s32 obj_angle_to_object(struct Object *obj1, struct Object *obj2) {
     return atan2s((obj2->oPosZ - obj1->oPosZ), (obj2->oPosX - obj1->oPosX));
 }
 
@@ -243,17 +243,17 @@ s32 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleI
     return targetAngle;
 }
 
-void obj_set_parent_relative_pos(struct Object *obj, s16 relX, s16 relY, s16 relZ) {
-    vec3_set(&obj->oParentRelativePosVec, relX, relY, relZ);
+FORCE_INLINE void obj_set_parent_relative_pos(struct Object *obj, s16 relX, s16 relY, s16 relZ) {
+    vec3f_set(&obj->oParentRelativePosVec, relX, relY, relZ);
 }
 
-void obj_set_pos(struct Object *obj, s16 x, s16 y, s16 z) {
-    vec3_set(&obj->oPosVec, x, y, z);
+FORCE_INLINE void obj_set_pos(struct Object *obj, s16 x, s16 y, s16 z) {
+    vec3f_set(&obj->oPosVec, x, y, z);
 }
 
 void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll) {
-    vec3_set(&obj->oFaceAngleVec, pitch, yaw, roll);
-    vec3_set(&obj->oMoveAngleVec, pitch, yaw, roll);
+    vec3i_set(&obj->oFaceAngleVec, pitch, yaw, roll);
+    vec3i_set(&obj->oMoveAngleVec, pitch, yaw, roll);
 }
 
 /*
@@ -398,11 +398,11 @@ struct Object *spawn_object_relative_with_scale(s16 behaviorParam, s16 relativeP
     return obj;
 }
 
-void cur_obj_move_using_vel(void) {
+FORCE_INLINE void cur_obj_move_using_vel(void) {
     vec3f_add(&o->oPosVec, &o->oVelVec);
 }
 
-void obj_copy_graph_y_offset(struct Object *dst, struct Object *src) {
+FORCE_INLINE void obj_copy_graph_y_offset(struct Object *dst, struct Object *src) {
     dst->oGraphYOffset = src->oGraphYOffset;
 }
 
@@ -411,7 +411,7 @@ void obj_copy_pos_and_angle(struct Object *dst, struct Object *src) {
     obj_copy_angle(dst, src);
 }
 
-void obj_copy_pos(struct Object *dst, struct Object *src) {
+FORCE_INLINE void obj_copy_pos(struct Object *dst, struct Object *src) {
     vec3f_copy(&dst->oPosVec, &src->oPosVec);
 }
 
@@ -420,7 +420,7 @@ void obj_copy_angle(struct Object *dst, struct Object *src) {
     vec3i_copy(&dst->oFaceAngleVec, &src->oFaceAngleVec);
 }
 
-void obj_set_gfx_pos_from_pos(struct Object *obj) {
+FORCE_INLINE void obj_set_gfx_pos_from_pos(struct Object *obj) {
     vec3f_copy(obj->header.gfx.pos, &obj->oPosVec);
 }
 
@@ -488,19 +488,19 @@ void cur_obj_disable_rendering_and_become_intangible(struct Object *obj) {
     obj_become_intangible(obj);
 }
 
-void cur_obj_enable_rendering(void) {
+FORCE_INLINE void cur_obj_enable_rendering(void) {
     o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 }
 
-void cur_obj_disable_rendering(void) {
+FORCE_INLINE void cur_obj_disable_rendering(void) {
     o->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
 }
 
-void cur_obj_unhide(void) {
+FORCE_INLINE void cur_obj_unhide(void) {
     o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
 }
 
-void cur_obj_hide(void) {
+FORCE_INLINE void cur_obj_hide(void) {
     o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
 }
 
@@ -639,15 +639,11 @@ struct Object *cur_obj_find_nearby_held_actor(const BehaviorScript *behavior, f3
     return foundObj;
 }
 
-static void cur_obj_reset_timer_and_subaction(void) {
-    o->oTimer = 0;
-    o->oSubAction = 0;
-}
-
 void cur_obj_change_action(s32 action) {
     o->oAction = action;
     o->oPrevAction = action;
-    cur_obj_reset_timer_and_subaction();
+    o->oTimer = 0;
+    o->oSubAction = 0;
 }
 
 void cur_obj_set_vel_from_mario_vel(f32 min, f32 mul) {
@@ -681,11 +677,11 @@ s32 cur_obj_check_if_near_animation_end(void) {
     return (animFrame == nearLoopEnd);
 }
 
-s32 cur_obj_check_if_at_animation_end(void) {
+FORCE_INLINE s32 cur_obj_check_if_at_animation_end(void) {
     return (o->header.gfx.animInfo.animFrame == o->header.gfx.animInfo.currAnim->loopEnd - 1);
 }
 
-s32 cur_obj_check_anim_frame(s32 frame) {
+FORCE_INLINE s32 cur_obj_check_anim_frame(s32 frame) {
     return (o->header.gfx.animInfo.animFrame == frame);
 }
 
@@ -703,11 +699,11 @@ s32 cur_obj_check_frame_prior_current_frame(s16 *frame) {
     return FALSE;
 }
 
-s32 mario_is_in_air_action(void) {
+FORCE_INLINE s32 mario_is_in_air_action(void) {
     return (gMarioStates[0].action & ACT_FLAG_AIR);
 }
 
-s32 mario_is_dive_sliding(void) {
+FORCE_INLINE s32 mario_is_dive_sliding(void) {
     return (gMarioStates[0].action == ACT_DIVE_SLIDE);
 }
 
@@ -776,19 +772,19 @@ void cur_obj_get_dropped(void) {
     cur_obj_move_after_thrown_or_dropped(0.0f, 0.0f);
 }
 
-void obj_set_model(struct Object *obj, ModelID16 modelID) {
+FORCE_INLINE void obj_set_model(struct Object *obj, ModelID16 modelID) {
     obj->header.gfx.sharedChild = gLoadedGraphNodes[modelID];
 }
 
-void cur_obj_set_model(ModelID16 modelID) {
+FORCE_INLINE void cur_obj_set_model(ModelID16 modelID) {
     o->header.gfx.sharedChild = gLoadedGraphNodes[modelID];
 }
 
-s32 obj_has_model(struct Object *obj, ModelID16 modelID) {
+FORCE_INLINE s32 obj_has_model(struct Object *obj, ModelID16 modelID) {
     return (obj->header.gfx.sharedChild == gLoadedGraphNodes[modelID]);
 }
 
-s32 cur_obj_has_model(ModelID16 modelID) {
+FORCE_INLINE s32 cur_obj_has_model(ModelID16 modelID) {
     return (o->header.gfx.sharedChild == gLoadedGraphNodes[modelID]);
 }
 
@@ -804,7 +800,7 @@ ModelID32 obj_get_model_id(struct Object *obj) {
     return MODEL_NONE;
 }
 
-void mario_set_flag(s32 flag) {
+FORCE_INLINE void mario_set_flag(s32 flag) {
     gMarioStates[0].flags |= flag;
 }
 
@@ -833,21 +829,21 @@ void cur_obj_disable(void) {
     cur_obj_become_intangible();
 }
 
-void cur_obj_become_intangible(void) {
+FORCE_INLINE void cur_obj_become_intangible(void) {
     // When the timer is negative, the object is intangible and the timer doesn't count down
     o->oIntangibleTimer = -1;
 }
 
-void obj_become_intangible(struct Object *obj) {
+FORCE_INLINE void obj_become_intangible(struct Object *obj) {
     // When the timer is negative, the object is intangible and the timer doesn't count down
     obj->oIntangibleTimer = -1;
 }
 
-void cur_obj_become_tangible(void) {
+FORCE_INLINE void cur_obj_become_tangible(void) {
     o->oIntangibleTimer = 0;
 }
 
-void obj_become_tangible(struct Object *obj) {
+FORCE_INLINE void obj_become_tangible(struct Object *obj) {
     obj->oIntangibleTimer = 0;
 }
 
@@ -1110,19 +1106,19 @@ s32 obj_check_if_collided_with_object(struct Object *obj1, struct Object *obj2) 
     return FALSE;
 }
 
-void cur_obj_set_behavior(const BehaviorScript *behavior) {
+FORCE_INLINE void cur_obj_set_behavior(const BehaviorScript *behavior) {
     o->behavior = segmented_to_virtual(behavior);
 }
 
-void obj_set_behavior(struct Object *obj, const BehaviorScript *behavior) {
+FORCE_INLINE void obj_set_behavior(struct Object *obj, const BehaviorScript *behavior) {
     obj->behavior = segmented_to_virtual(behavior);
 }
 
-s32 cur_obj_has_behavior(const BehaviorScript *behavior) {
+FORCE_INLINE s32 cur_obj_has_behavior(const BehaviorScript *behavior) {
     return (o->behavior == segmented_to_virtual(behavior));
 }
 
-s32 obj_has_behavior(struct Object *obj, const BehaviorScript *behavior) {
+FORCE_INLINE s32 obj_has_behavior(struct Object *obj, const BehaviorScript *behavior) {
     return (obj->behavior == segmented_to_virtual(behavior));
 }
 
@@ -1154,7 +1150,7 @@ s32 cur_obj_outside_home_rectangle(f32 minX, f32 maxX, f32 minZ, f32 maxZ) {
     return FALSE;
 }
 
-void cur_obj_set_pos_to_home(void) {
+FORCE_INLINE void cur_obj_set_pos_to_home(void) {
     vec3f_copy(&o->oPosVec, &o->oHomeVec);
 }
 
@@ -1179,7 +1175,7 @@ void cur_obj_start_cam_event(UNUSED struct Object *obj, s32 cameraEvent) {
     gSecondCameraFocus = o;
 }
 
-void obj_set_billboard(struct Object *obj) {
+FORCE_INLINE void obj_set_billboard(struct Object *obj) {
     obj->header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD;
 }
 
@@ -1219,11 +1215,11 @@ static void obj_spawn_loot_coins(struct Object *obj, s32 numCoins, f32 baseYVel,
     }
 }
 
-void obj_spawn_loot_blue_coins(struct Object *obj, s32 numCoins, f32 baseYVel, s16 posJitter) {
+FORCE_INLINE void obj_spawn_loot_blue_coins(struct Object *obj, s32 numCoins, f32 baseYVel, s16 posJitter) {
     obj_spawn_loot_coins(obj, numCoins, baseYVel, bhvBlueCoinJumping, posJitter, MODEL_BLUE_COIN);
 }
 
-void obj_spawn_loot_yellow_coins(struct Object *obj, s32 numCoins, f32 baseYVel) {
+FORCE_INLINE void obj_spawn_loot_yellow_coins(struct Object *obj, s32 numCoins, f32 baseYVel) {
     obj_spawn_loot_coins(obj, numCoins, baseYVel, bhvSingleCoinGetsSpawned, 0, MODEL_YELLOW_COIN);
 }
 
@@ -1356,7 +1352,7 @@ static void cur_obj_update_floor_and_resolve_wall_collisions(s16 steepSlopeDegre
     }
 }
 
-void cur_obj_update_floor_and_walls(void) {
+FORCE_INLINE void cur_obj_update_floor_and_walls(void) {
     cur_obj_update_floor_and_resolve_wall_collisions(60);
 }
 
@@ -1454,7 +1450,7 @@ void obj_set_gfx_pos_at_obj_pos(struct Object *obj1, struct Object *obj2) {
  * Transform the vector at localTranslateIndex into the object's local
  * coordinates, and then add it to the vector at posIndex.
  */
-void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateIndex) {
+FORCE_INLINE void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateIndex) {
     mtxf_translate_local_vec3f(obj->transform, &obj->rawData.asF32[posIndex], &obj->rawData.asF32[localTranslateIndex]);
 }
 
@@ -1497,15 +1493,15 @@ void obj_create_transform_from_self(struct Object *obj) {
     vec3f_copy(obj->transform[3], &obj->oPosVec);
 }
 
-void cur_obj_rotate_move_angle_using_vel(void) {
+FORCE_INLINE void cur_obj_rotate_move_angle_using_vel(void) {
     vec3i_add(&o->oMoveAngleVec, &o->oAngleVelVec);
 }
 
-void cur_obj_rotate_face_angle_using_vel(void) {
+FORCE_INLINE void cur_obj_rotate_face_angle_using_vel(void) {
     vec3i_add(&o->oFaceAngleVec, &o->oAngleVelVec);
 }
 
-void cur_obj_set_face_angle_to_move_angle(void) {
+FORCE_INLINE void cur_obj_set_face_angle_to_move_angle(void) {
     vec3i_copy(&o->oFaceAngleVec, &o->oMoveAngleVec);
 }
 
@@ -1550,8 +1546,8 @@ void chain_segment_init(struct ChainSegment *segment) {
     vec3_zero(segment->angle);
 }
 
-f32 random_f32_around_zero(f32 diameter) {
-    return random_float() * diameter - diameter / 2;
+FORCE_INLINE f32 random_f32_around_zero(f32 diameter) {
+    return (random_float() * diameter - diameter / 2);
 }
 
 void obj_scale_random(struct Object *obj, f32 rangeLength, f32 minScale) {
@@ -1581,7 +1577,7 @@ void cur_obj_set_pos_via_transform(void) {
     vec3f_add(&o->oPosVec, &o->oVelVec);
 }
 
-s32 cur_obj_reflect_move_angle_off_wall(void) {
+FORCE_INLINE s32 cur_obj_reflect_move_angle_off_wall(void) {
     return (s16)(o->oWallAngle - ((s16) o->oMoveAngleYaw - (s16) o->oWallAngle) + 0x8000);
 }
 
@@ -1653,11 +1649,11 @@ s32 cur_obj_wait_then_blink(s32 timeUntilBlinking, s32 numBlinks) {
     return FALSE;
 }
 
-s32 cur_obj_is_mario_ground_pounding_platform(void) {
+FORCE_INLINE s32 cur_obj_is_mario_ground_pounding_platform(void) {
     return ((gMarioObject->platform == o) && (gMarioStates[0].action == ACT_GROUND_POUND_LAND));
 }
 
-void spawn_mist_particles(void) {
+FORCE_INLINE void spawn_mist_particles(void) {
     spawn_mist_particles_variable(0, 0, 46.0f);
 }
 
@@ -1729,7 +1725,7 @@ void cur_obj_set_pos_to_home_with_debug(void) {
     cur_obj_scale(gDebugInfo[DEBUG_PAGE_ENEMYINFO][3] / 100.0f + 1.0f);
 }
 
-s32 cur_obj_is_mario_on_platform(void) {
+FORCE_INLINE s32 cur_obj_is_mario_on_platform(void) {
     return (gMarioObject->platform == o);
 }
 
@@ -1745,9 +1741,8 @@ UNUSED s32 cur_obj_shake_y_until(s32 cycles, s32 amount) {
     return (o->oTimer == cycles * 2);
 }
 
-void cur_obj_call_action_function(ObjActionFunc actionFunctions[]) {
-    ObjActionFunc actionFunction = actionFunctions[o->oAction];
-    actionFunction();
+FORCE_INLINE void cur_obj_call_action_function(ObjActionFunc actionFunctions[]) {
+    actionFunctions[o->oAction]();
 }
 
 s32 cur_obj_mario_far_away(void) {
@@ -1756,7 +1751,7 @@ s32 cur_obj_mario_far_away(void) {
     return (o->oDistanceToMario > 2000.0f && vec3_sumsq(d) > sqr(2000.0f));
 }
 
-s32 is_mario_moving_fast_or_in_air(s32 speedThreshold) {
+FORCE_INLINE s32 is_mario_moving_fast_or_in_air(s32 speedThreshold) {
     return (
         (gMarioState->forwardVel > speedThreshold) ||
         (gMarioState->action & ACT_FLAG_AIR)
@@ -1840,7 +1835,7 @@ void obj_explode_and_spawn_coins(f32 mistSize, s32 coinType) {
     }
 }
 
-void obj_set_collision_data(struct Object *obj, const void *segAddr) {
+FORCE_INLINE void obj_set_collision_data(struct Object *obj, const void *segAddr) {
     obj->collisionData = segmented_to_virtual(segAddr);
 }
 
@@ -1868,23 +1863,23 @@ Gfx *geo_offset_klepto_held_object(s32 callContext, struct GraphNode *node, UNUS
     return NULL;
 }
 
-s32 obj_is_hidden(struct Object *obj) {
+FORCE_INLINE s32 obj_is_hidden(struct Object *obj) {
     return (obj->header.gfx.node.flags & GRAPH_RENDER_INVISIBLE);
 }
 
-void enable_time_stop(void) {
+FORCE_INLINE void enable_time_stop(void) {
     gTimeStopState |= TIME_STOP_ENABLED;
 }
 
-void disable_time_stop(void) {
+FORCE_INLINE void disable_time_stop(void) {
     gTimeStopState &= ~TIME_STOP_ENABLED;
 }
 
-void set_time_stop_flags(s32 flags) {
+FORCE_INLINE void set_time_stop_flags(s32 flags) {
     gTimeStopState |= flags;
 }
 
-void clear_time_stop_flags(s32 flags) {
+FORCE_INLINE void clear_time_stop_flags(s32 flags) {
     gTimeStopState &= (flags ^ 0xFFFFFFFF);
 }
 
@@ -1897,7 +1892,7 @@ s32 cur_obj_can_mario_activate_textbox(f32 radius, f32 height, UNUSED s32 unused
          && mario_ready_to_speak());
 }
 
-s32 cur_obj_can_mario_activate_textbox_2(f32 radius, f32 height) {
+FORCE_INLINE s32 cur_obj_can_mario_activate_textbox_2(f32 radius, f32 height) {
     // The last argument here is unused. When this function is called directly the argument is always set to 0x7FFF.
     return cur_obj_can_mario_activate_textbox(radius, height, 0x1000);
 }
@@ -2081,7 +2076,7 @@ UNUSED s32 mario_is_within_rectangle(s16 minX, s16 maxX, s16 minZ, s16 maxZ) {
     return TRUE;
 }
 
-void cur_obj_shake_screen(s32 shake) {
+FORCE_INLINE void cur_obj_shake_screen(s32 shake) {
     set_camera_shake_from_point(shake, o->oPosX, o->oPosY, o->oPosZ);
 }
 

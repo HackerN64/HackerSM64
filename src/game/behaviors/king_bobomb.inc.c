@@ -41,7 +41,7 @@ void king_bobomb_act_inactive(void) { // act 0
     }
 }
 
-s32 mario_is_far_below_object(f32 min) {
+FORCE_INLINE s32 mario_is_far_below_object(f32 min) {
     return (min < o->oPosY - gMarioObject->oPosY);
 }
 
