@@ -433,7 +433,11 @@ const BehaviorScript bhvMrIIris[] = {
 const BehaviorScript bhvMrIParticle[] = {
     BEGIN(OBJ_LIST_LEVEL),
     BILLBOARD(),
+#ifdef MR_I_PITCH
+    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+#else
     OR_INT(oFlags, (OBJ_FLAG_MOVE_XZ_USING_FVEL | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+#endif
     SET_INT(oIntangibleTimer, 0),
     SET_HITBOX(50, 50),
     SET_INT(oDamageOrCoinValue, 1),
