@@ -290,7 +290,6 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     s32 enableZBuffer = (node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0;
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
-
 #ifdef F3DEX_GBI_2
     Mtx lMtx;
  #ifdef FIX_REFLECT_MTX

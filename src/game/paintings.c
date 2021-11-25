@@ -495,7 +495,7 @@ void painting_update_floors(struct Painting *painting) {
     s32 paintingId3    = (painting->id * 3);
     s8  rippleFlags    = RIPPLE_FLAGS_NONE;
     s16 marioFloorType = SURFACE_DEFAULT;
-    
+
     if (gMarioState->floor != NULL) marioFloorType = gMarioState->floor->type;
 
     /* The area in front of every painting in the game (except HMC and CotMC, which   *\
@@ -1029,12 +1029,10 @@ void move_ddd_painting(struct Painting *painting, UNUSED f32 frontPos, f32 backP
 }
 #else
 void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32 speed) {
-    // Obtain the DDD star flags
-    u32 dddFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_DDD));
     // Get the other save file flags
     u32 saveFileFlags = save_file_get_flags();
     // Find out whether Board Bowser's Sub was collected
-    u32 bowsersSubBeaten = dddFlags & BOARD_BOWSERS_SUB;
+    u32 bowsersSubBeaten = (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_DDD)) & BOARD_BOWSERS_SUB);
     // Check whether DDD has already moved back
     u32 dddBack = saveFileFlags & SAVE_FLAG_DDD_MOVED_BACK;
 

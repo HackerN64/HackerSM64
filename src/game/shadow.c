@@ -240,6 +240,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         isPlayer = TRUE;
     } else if (notHeldObj && (gCurGraphNodeObject != &gMirrorMario) && obj->oFloor) {
         // Object is not player but has a referenced floor.
+        //! Some objects only get their oFloor from bhv_init_room, which skips dynamic floors.
         s->floor       = obj->oFloor;
         s->floorHeight = obj->oFloorHeight;
     } else {
@@ -253,6 +254,10 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     }
     // Hide shadow if the object is too high.
     if (pos[1] - s->floorHeight > 1024.0f) {
+        return NULL;
+    }
+    // Hide shadow if it's above the object.
+    if (s->floorHeight > pos[1]) {
         return NULL;
     }
 
