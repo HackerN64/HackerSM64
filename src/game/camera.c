@@ -2543,7 +2543,9 @@ void set_camera_mode(struct Camera *c, s16 mode, s16 frames) {
         sLakituPitch = 0;
         sAreaYawChange = 0;
 // #ifdef CAMERA_FIX
-//         if ((sMarioCamState->action & ACT_GROUP_MASK) != ACT_GROUP_SUBMERGED) mode = CAMERA_MODE_8_DIRECTIONS;
+//         if ((sMarioCamState->action & ACT_GROUP_MASK) != ACT_GROUP_SUBMERGED) {
+//             mode = CAMERA_MODE_8_DIRECTIONS;
+//         }
 // #endif
 
         sModeInfo.newMode = (mode != -1) ? mode : sModeInfo.lastMode;
@@ -2731,7 +2733,9 @@ void update_camera(struct Camera *c) {
     c->mode = gLakituState.mode;
     c->defMode = gLakituState.defMode;
 #ifdef CAMERA_FIX
-    if (gCurrDemoInput != NULL) camera_course_processing(c);
+    if (gCurrDemoInput != NULL) {
+        camera_course_processing(c);
+    }
 #else
     camera_course_processing(c);
 #endif
@@ -3077,7 +3081,9 @@ void init_camera(struct Camera *c) {
     c->yaw = gLakituState.yaw;
     c->nextYaw = gLakituState.yaw;
 #ifdef CAMERA_FIX
-    if (gCurrDemoInput == NULL) set_camera_mode(c, CAMERA_MODE_8_DIRECTIONS, 0);
+    if (gCurrDemoInput == NULL) {
+        set_camera_mode(c, CAMERA_MODE_8_DIRECTIONS, 0);
+    }
 #endif
 #ifdef PUPPYCAM
     puppycam_init();
@@ -3138,6 +3144,9 @@ void select_mario_cam_mode(void) {
  * Allocate the GraphNodeCamera's config.camera, and copy `c`'s focus to the Camera's area center point.
  */
 void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
+#ifndef CAMERA_FIX
+    s16 mode = gc->config.mode;
+#endif
     struct Camera *c = alloc_only_pool_alloc(pool, sizeof(struct Camera));
 
     gc->config.camera = c;
@@ -3145,7 +3154,6 @@ void create_camera(struct GraphNodeCamera *gc, struct AllocOnlyPool *pool) {
     c->mode = CAMERA_MODE_8_DIRECTIONS;
     c->defMode = CAMERA_MODE_8_DIRECTIONS;
 #else
-    s16 mode = gc->config.mode;
     c->mode = mode;
     c->defMode = mode;
 #endif
