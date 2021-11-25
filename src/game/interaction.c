@@ -759,8 +759,10 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
             m->breathCounter = 0;
 #endif
 #endif
-            if (m->capTimer > 1) m->capTimer = 1;
-        } else { 
+            if (m->capTimer > 1) {
+                m->capTimer = 1;
+            }
+        } else {
             starGrabAction = ACT_STAR_DANCE_NO_EXIT;
         }
 
@@ -769,7 +771,11 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         }
 
         if (m->action & ACT_FLAG_AIR) {
-            starGrabAction = ((m->pos[1] < m->floorHeight + 1024.0f) ? ACT_FALL_AFTER_STAR_GRAB : ACT_STAR_DANCE_WATER);
+            if ((m->pos[1] > m->floorHeight + 1024.0f) || SURFACE_IS_UNSAFE(m->floor->type)) {
+                starGrabAction = ACT_STAR_DANCE_WATER;
+            } else {
+                starGrabAction = ACT_FALL_AFTER_STAR_GRAB;
+            }
         }
 
         spawn_object(obj, MODEL_NONE, bhvStarKeyCollectionPuffSpawner);
