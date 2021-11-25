@@ -3,12 +3,13 @@
 
 /**
  * TLB Segment Names
- * 
+ *
  * Most are set in sm64.ld, Makefile.split, and in level scripts, some are set elsewuere.
  * If you change these numbers, make sure to also change them in Makefile.split,
  *  and in your level scripts (in places marked with *seg*).
- * 
+ *
  * TODO: Make this an enum without breaking sm64.ld
+ * TODO: Find a way to use these with SEG_ADDRESS in sm64.ld without breaking Fast64
  * TODO: Find a way to use these with SEG_ADDRESS in Makefile.split
  */
 
