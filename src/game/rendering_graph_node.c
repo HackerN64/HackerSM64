@@ -340,10 +340,10 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #endif
             // Iterate through all the displaylists on the current layer.
             while (currList != NULL) {
-#if SILHOUETTE
                 // Add the display list's transformation to the master list.
                 gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
                           (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
+#if SILHOUETTE
                 if (currPhase == RENDER_PHASE_SILHOUETTE) {
                     // Add the current display list to the master list, with silhouette F3d.
                     gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
