@@ -12,6 +12,11 @@ enum ActionStatesIdle { // act_idle, act_metal_water_standing
     ACT_STATE_IDLE_RESET_OR_SLEEP
 };
 
+enum ActionArgsIdle { // act_idle
+    ACT_ARG_IDLE_NO_WALL,
+    ACT_ARG_IDLE_AGAINST_WALL,
+};
+
 enum ActionStatesStartSleeping { // act_start_sleeping
     ACT_STATE_START_SLEEPING_IDLE,
     ACT_STATE_START_SLEEPING_SCRATCH,
