@@ -60,11 +60,11 @@ Vec3f sObjSavedPos;
 void wiggler_jumped_on_attack_handler(void);
 void huge_goomba_weakly_attacked(void);
 
-static s32 obj_is_rendering_enabled(void) {
+static FORCE_INLINE s32 obj_is_rendering_enabled(void) {
     return (o->header.gfx.node.flags & GRAPH_RENDER_ACTIVE);
 }
 
-static s32 obj_get_pitch_from_vel(void) {
+static FORCE_INLINE s32 obj_get_pitch_from_vel(void) {
     return -atan2s(o->oForwardVel, o->oVelY);
 }
 
@@ -159,7 +159,7 @@ static void obj_rotate_yaw_and_bounce_off_walls(s16 targetYaw, s16 turnAmount) {
     cur_obj_rotate_yaw_toward(targetYaw, turnAmount);
 }
 
-static s32 obj_get_pitch_to_home(f32 latDistToHome) {
+static FORCE_INLINE s32 obj_get_pitch_to_home(f32 latDistToHome) {
     return atan2s(latDistToHome, (o->oPosY - o->oHomeY));
 }
 
@@ -252,11 +252,11 @@ static s32 approach_f32_ptr(f32 *px, f32 target, f32 delta) {
     return FALSE;
 }
 
-static s32 obj_forward_vel_approach(f32 target, f32 delta) {
+static FORCE_INLINE s32 obj_forward_vel_approach(f32 target, f32 delta) {
     return approach_f32_ptr(&o->oForwardVel, target, delta);
 }
 
-static s32 obj_y_vel_approach(f32 target, f32 delta) {
+static FORCE_INLINE s32 obj_y_vel_approach(f32 target, f32 delta) {
     return approach_f32_ptr(&o->oVelY, target, delta);
 }
 
