@@ -545,11 +545,12 @@ void puppyprint_render_standard(void) {
 
     // Very little point printing useless info if Mario doesn't even exist.
     if (gMarioState->marioObj) {
-        sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
+        sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#F: %d#A: %x",
             (s32)(gMarioState->pos[0]),
             (s32)(gMarioState->pos[1]),
             (s32)(gMarioState->pos[2]),
             (u16)(gMarioState->faceAngle[1]),
+            (s32)(gMarioState->forwardVel),
             (u32)(gMarioState->action & ACT_ID_MASK));
         print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
     }
