@@ -418,16 +418,21 @@ void update_walking_speed(struct MarioState *m) {
         m->forwardVel = 48.0f;
     }
 
-#ifdef GROUND_SPEED_FLIP
+#if defined(GROUND_SPEED_FLIP) || defined(BACKWARDS_CONTROLS_FIX)
+    s16 targetYaw;
     if ((m->forwardVel < -10.0f) && analog_stick_held_back(m)) {
+#ifdef GROUND_SPEED_FLIP
         // Flip Mario if he is moving backwards
         m->faceAngle[1] += 0x8000;
-        m->forwardVel   *= -1.0f;
+        m->forwardVel *= -1.0f;
+    }
+    targetYaw = m->intendedYaw;
+#elif defined(BACKWARDS_CONTROLS_FIX)
+        targetYaw = m->intendedYaw + 0x8000;
+    } else {
+        targetYaw = m->intendedYaw;
     }
 #endif
-
-#ifdef BACKWARDS_CONTROLS_FIX
-    s16 targetYaw = ((m->forwardVel < 0.0f) ? (m->intendedYaw + 0x8000) : m->intendedYaw);
 #else
     s16 targetYaw = m->intendedYaw;
 #endif
