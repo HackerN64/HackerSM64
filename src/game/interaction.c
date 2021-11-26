@@ -534,30 +534,30 @@ UNUSED static u32 unused_determine_knockback_action(struct MarioState *m) {
 u32 determine_knockback_action(struct MarioState *m, UNUSED s32 arg) {
     u32 bonkAction;
 
-    s16 terrainIndex = 0; // 1 = air, 2 = water, 0 = default //! TODO: enum
-    s16 strengthIndex = 0;
+    s16 terrainIndex = KNOCKBACK_TERRAIN_INDEX_DEFAULT;
+    s16 strengthIndex = KNOCKBACK_STRENGTH_INDEX_SOFT;
 
     s16 angleToObject = mario_obj_angle_to_object(m, m->interactObj);
     s16 facingDYaw = abs_angle_diff(angleToObject, m->faceAngle[1]);
     s16 remainingHealth = m->health - 0x40 * m->hurtCounter;
 
     if (m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
-        terrainIndex = 2;
+        terrainIndex = KNOCKBACK_TERRAIN_INDEX_WATER;
     } else if (m->action & (ACT_FLAG_AIR | ACT_FLAG_ON_POLE | ACT_FLAG_HANGING)) {
-        terrainIndex = 1;
+        terrainIndex = KNOCKBACK_TERRAIN_INDEX_AIR;
     }
 
     if (remainingHealth < 0x100) {
-        strengthIndex = 2;
+        strengthIndex = KNOCKBACK_STRENGTH_INDEX_HARD;
     } else if (m->interactObj->oDamageOrCoinValue >= 4) {
-        strengthIndex = 2;
+        strengthIndex = KNOCKBACK_STRENGTH_INDEX_HARD;
     } else if (m->interactObj->oDamageOrCoinValue >= 2) {
-        strengthIndex = 1;
+        strengthIndex = KNOCKBACK_STRENGTH_INDEX_NORMAL;
     }
 
     m->faceAngle[1] = angleToObject;
 
-    if (terrainIndex == 2) {
+    if (terrainIndex == KNOCKBACK_TERRAIN_INDEX_WATER) {
         if (m->forwardVel < 28.0f) {
             mario_set_forward_vel(m, 28.0f);
         }

@@ -123,6 +123,18 @@ enum Interactions {
     INT_ATTACK_NOT_WEAK_FROM_ABOVE = (INT_GROUND_POUND_OR_TWIRL | INT_PUNCH | INT_KICK | INT_TRIP |                                                                  INT_HIT_FROM_BELOW),
 };
 
+// For sForwardKnockbackActions & sBackwardKnockbackActions in determine_knockback_action()
+enum KnockbackActionTerrainIndex {
+    KNOCKBACK_TERRAIN_INDEX_DEFAULT,
+    KNOCKBACK_TERRAIN_INDEX_AIR,
+    KNOCKBACK_TERRAIN_INDEX_WATER,
+};
+enum KnockbackActionStrengthIndex {
+    KNOCKBACK_STRENGTH_INDEX_SOFT,
+    KNOCKBACK_STRENGTH_INDEX_NORMAL,
+    KNOCKBACK_STRENGTH_INDEX_HARD,
+};
+
 s32 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj);
 void mario_stop_riding_object(struct MarioState *m);
 void mario_grab_used_object(struct MarioState *m);
