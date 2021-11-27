@@ -95,10 +95,14 @@ s32 intro_level_select(void) {
     u32 index = 0;
     if ((gPlayer1Controller->rawStickY < -60)
      || (gPlayer1Controller->rawStickX < -60)
-     || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD))) index++;
+     || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD))) {
+         index++;
+    }
     if ((gPlayer1Controller->rawStickY > 60)
      || (gPlayer1Controller->rawStickX > 60)
-     || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD))) index += 2;
+     || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD))) {
+         index += 2;
+    }
     if (((index ^ gLevelSelectHoldKeyIndex) & index) == 2) {
         if (gCurrLevelNum > LEVEL_MAX) {
             gCurrLevelNum = LEVEL_MIN;
@@ -129,7 +133,9 @@ s32 intro_level_select(void) {
         gLevelSelectHoldKeyTimer++;
         gLevelSelectHoldKeyIndex = index;
     }
-    if ((index & 0x3) == 0) gLevelSelectHoldKeyTimer = 0;
+    if ((index & 0x3) == 0) {
+        gLevelSelectHoldKeyTimer = 0;
+    }
     if (gCurrLevelNum > LEVEL_MAX) gCurrLevelNum = LEVEL_MIN; // exceeded max. set to min.
     if (gCurrLevelNum < LEVEL_MIN) gCurrLevelNum = LEVEL_MAX; // exceeded min. set to max.
     // Use file 4 and last act as a test
@@ -144,7 +150,7 @@ s32 intro_level_select(void) {
     if (gPlayer1Controller->buttonPressed & (START_BUTTON | A_BUTTON)) {
         // ... the level select quit combo is being pressed, which uses START. If this
         // is the case, quit the menu instead.
-        if (gPlayer1Controller->buttonDown == (Z_TRIG | START_BUTTON | L_CBUTTONS)) { // quit level select
+        if (gPlayer1Controller->buttonDown & (Z_TRIG | L_TRIG | START_BUTTON)) { // quit level select
             gDebugLevelSelect = FALSE;
             return LEVEL_RESTART_GAME;
         }
@@ -188,7 +194,7 @@ s32 intro_regular(void) {
         // calls level ID 100 (or 101 adding level select bool value)
         // defined in level_intro_mario_head_regular JUMP_IF commands
         // 100 is File Select - 101 is Level Select
-        level = (LEVEL_FILE_SELECT + gDebugLevelSelect);
+        level = LEVEL_FILE_SELECT + gDebugLevelSelect;
         sPlayMarioGreeting = TRUE;
     }
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
