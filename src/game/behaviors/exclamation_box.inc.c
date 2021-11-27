@@ -47,12 +47,16 @@ void bhv_rotating_exclamation_mark_loop(void) {
 void exclamation_box_act_init(void) {
     if (o->oBehParams2ndByte < EXCLAMATION_BOX_BP_KOOPA_SHELL) {
         o->oAnimState = o->oBehParams2ndByte;
+#ifdef EXCLAMATION_BOXES_ALWAYS_SOLID
+        o->oAction = EXCLAMATION_BOX_ACT_ACTIVE;
+#else
         if ((save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte])
          || (GET_BPARAM1(o->oBehParams) != EXCLAMATION_BOX_BP1_NEEDS_SWITCH)) {
             o->oAction = EXCLAMATION_BOX_ACT_ACTIVE;
         } else {
             o->oAction = EXCLAMATION_BOX_ACT_OUTLINE;
         }
+#endif
     } else {
         o->oAnimState = EXCLAMATION_BOX_ANIM_STATE_YELLOW;
         o->oAction = EXCLAMATION_BOX_ACT_ACTIVE;
@@ -65,11 +69,13 @@ void exclamation_box_act_outline(void) {
         spawn_object(o, MODEL_EXCLAMATION_POINT, bhvRotatingExclamationMark);
         cur_obj_set_model(MODEL_EXCLAMATION_BOX_OUTLINE);
     }
+#ifndef EXCLAMATION_BOXES_ALWAYS_SOLID
     if ((save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte])
      || (GET_BPARAM1(o->oBehParams) != EXCLAMATION_BOX_BP1_NEEDS_SWITCH)) {
         o->oAction = EXCLAMATION_BOX_ACT_ACTIVE;
         cur_obj_set_model(MODEL_EXCLAMATION_BOX);
     }
+#endif
 }
 
 void exclamation_box_act_active(void) {
