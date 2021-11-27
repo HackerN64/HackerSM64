@@ -682,10 +682,10 @@ const BehaviorScript bhvSmallParticleBubbles[] = {
     DEACTIVATE(),
 };
 
-const BehaviorScript bhvFishGroup[] = {
+const BehaviorScript bhvAquariumBubbles[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_fish_group_loop),
+        CALL_NATIVE(bhv_aquarium_bubbles_loop),
     END_LOOP(),
 };
 
