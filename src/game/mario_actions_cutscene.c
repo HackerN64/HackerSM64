@@ -1073,7 +1073,7 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
                     play_sound(SOUND_ACTION_PAT_BACK, m->marioObj->header.gfx.cameraToObject);
                     //! fallthrough
                 case 111:
-                    play_sound(SOUND_ACTION_KEY_UNKNOWN45C, m->marioObj->header.gfx.cameraToObject);
+                    play_sound(SOUND_ACTION_KEY_PUT_AWAY, m->marioObj->header.gfx.cameraToObject);
                     // no break
             }
             handle_save_menu(m);

@@ -228,7 +228,7 @@ static void platform_on_track_act_move_along_track(void) {
         if (o->oPlatformOnTrackPrevWaypointFlags != WAYPOINT_FLAGS_NONE && !o->oPlatformOnTrackIsNotSkiLift) {
             if (o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_END
              || o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_PLATFORM_ON_TRACK_PAUSE) {
-                cur_obj_play_sound_2(SOUND_GENERAL_ELEVATOR_WOBBLE_LOWPRIO);
+                cur_obj_play_sound_2(SOUND_GENERAL_ELEVATOR_WOBBLE);
 
                 o->oForwardVel = 0.0f;
                 if (o->oPlatformOnTrackPrevWaypointFlags == WAYPOINT_FLAGS_END) {

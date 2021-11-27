@@ -1140,7 +1140,7 @@ u32 interact_snufit_bullet(struct MarioState *m, UNUSED u32 interactType, struct
     if (!sInvulnerable && !(m->flags & MARIO_VANISH_CAP)) {
         if (m->flags & MARIO_METAL_CAP) {
             obj->oInteractStatus = (INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED);
-            play_sound(SOUND_ACTION_SNUFFIT_BULLET_HIT_METAL, m->marioObj->header.gfx.cameraToObject);
+            play_sound(SOUND_ACTION_SNUFIT_BULLET_HIT_METAL, m->marioObj->header.gfx.cameraToObject);
         } else {
             obj->oInteractStatus = (INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO);
             m->interactObj = obj;
