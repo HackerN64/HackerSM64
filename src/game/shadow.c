@@ -55,7 +55,7 @@ s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
     } else if (distFromFloor >= 600.0f) {
         return 120;
     } else {
-        return ((((120 - solidity) * distFromFloor) / 600.0f) + (f32) solidity);
+        return (((120 - solidity) * distFromFloor) / 600.0f) + (f32) solidity;
     }
 }
 
@@ -139,7 +139,7 @@ s32 init_shadow(Vec3f pos, s16 shadowScale, s8 shadowType, u8 overwriteSolidity)
  * depending on curr's relation to start and end.
  */
 void linearly_interpolate_solidity_positive(u8 finalSolidity, s16 curr, s16 start, s16 end) {
-    if ((curr >= 0) && (curr < start)) {
+    if (curr >= 0 && curr < start) {
         s->solidity = 0;
     } else if (end < curr) {
         s->solidity = finalSolidity;
@@ -158,7 +158,7 @@ void linearly_interpolate_solidity_negative(u8 initialSolidity, s16 curr, s16 st
     // will have the surprising behavior of hiding the shadow until start.
     // This is not necessarily a bug, since this function is only used once,
     // with start == 0.
-    if ((curr >= start) && (end >= curr)) {
+    if (curr >= start && end >= curr) {
         s->solidity = ((f32) initialSolidity * (1.0f - (f32)(curr - start) / (end - start)));
     } else {
         s->solidity = 0;
@@ -191,20 +191,20 @@ s32 correct_shadow_solidity_for_animations(u8 initialSolidity) {
  * Slightly change the height of a shadow in levels with lava.
  */
 void correct_lava_shadow_height(void) {
-    SurfaceType type = s->floor->type;
-    if ((gCurrLevelNum == LEVEL_BITFS) && (type == SURFACE_BURNING)) {
-        if (s->floorHeight < -3000.0f) {
-            s->floorHeight = -3062.0f;
-            s->flags |= SHADOW_FLAG_WATER_BOX;
-        } else if (s->floorHeight > 3400.0f) {
-            s->floorHeight =  3492.0f;
+    if (s->floor->type == SURFACE_BURNING) {
+        if (gCurrLevelNum == LEVEL_BITFS) {
+            if (s->floorHeight < -3000.0f) {
+                s->floorHeight = -3062.0f;
+                s->flags |= SHADOW_FLAG_WATER_BOX;
+            } else if (s->floorHeight > 3400.0f) {
+                s->floorHeight =  3492.0f;
+                s->flags |= SHADOW_FLAG_WATER_BOX;
+            }
+        } else if ((gCurrLevelNum  == LEVEL_LLL)
+                && (gCurrAreaIndex == 1)) {
+            s->floorHeight = 5.0f;
             s->flags |= SHADOW_FLAG_WATER_BOX;
         }
-    } else if ((gCurrLevelNum  == LEVEL_LLL)
-            && (gCurrAreaIndex == 1)
-            && (type  == SURFACE_BURNING)) {
-        s->floorHeight = 5.0f;
-        s->flags |= SHADOW_FLAG_WATER_BOX;
     }
 }
 
@@ -213,7 +213,7 @@ void correct_lava_shadow_height(void) {
  * shadowType 0 uses a circle texture, the rest use a square texture.
  * Uses environment alpha for shadow solidity.
  */
-void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
+static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
     gSPDisplayList(displayListHead++, (shadowType ? dl_shadow_square : dl_shadow_circle));
     gDPSetEnvColor(displayListHead++, 255, 255, 255, s->solidity);
     gSPDisplayList(displayListHead++, dl_shadow_end);
@@ -224,20 +224,22 @@ void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
  * Create a shadow at the absolute position given, with the given parameters.
  * Return a pointer to the display list representing the shadow.
  */
-Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 shadowType) {
+Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 shadowType, s8 shifted) {
     struct Object *obj = gCurGraphNodeObjectNode;
-    s8 isPlayer = FALSE;
-    s8 notHeldObj = (gCurGraphNodeHeldObject == NULL);
     // Check if the object exists.
     if (obj == NULL) {
         return NULL;
     }
+    register f32 x = pos[0];
+    register f32 y = pos[1];
+    register f32 z = pos[2];
+    s8 isPlayer   = (obj == gMarioObject);
+    s8 notHeldObj = (gCurGraphNodeHeldObject == NULL);
     // Attempt to use existing floors before finding a new one.
-    if (notHeldObj && (obj == gMarioObject) && gMarioState->floor) {
+    if (notHeldObj && isPlayer && gMarioState->floor) {
         // Object is player and has a referenced floor.
         s->floor       = gMarioState->floor;
         s->floorHeight = gMarioState->floorHeight;
-        isPlayer = TRUE;
     } else if (notHeldObj && (gCurGraphNodeObject != &gMirrorMario) && obj->oFloor) {
         // Object is not player but has a referenced floor.
         //! Some objects only get their oFloor from bhv_init_room, which skips dynamic floors.
@@ -245,42 +247,52 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         s->floorHeight = obj->oFloorHeight;
     } else {
         // Object has no referenced floor, so find a new one.
-        gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
-        s->floorHeight = find_floor(pos[0], pos[1], pos[2], &s->floor);
+        // gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
+        s->floorHeight = find_floor(x, y, z, &s->floor);
         // No shadow if OOB.
         if (s->floor == NULL) {
             return NULL;
         }
+        // No need to shift the shadow height later since the find_floor call uses the shifted position.
+        shifted = FALSE;
+    }
+
+    // Read the floor's normals
+    struct Surface *floor = s->floor;
+    register f32 nx = floor->normal.x;
+    register f32 ny = floor->normal.y;
+    register f32 nz = floor->normal.z;
+
+    // If the animation changes the shadow position, move it to the position.
+    if (shifted) {
+        s->floorHeight = -((x * nx) + (z * nz) + floor->originOffset) / ny;
+    }
+
+    f32 distToShadow = (pos[1] - s->floorHeight);
+    // Hide shadow if the object is below it.
+    if (distToShadow < -80.0f) {
+        return NULL;
     }
     // Hide shadow if the object is too high.
-    if (pos[1] - s->floorHeight > 1024.0f) {
+    if (distToShadow > 1024.0f) {
         return NULL;
     }
-    // Hide shadow if it's above the object.
-    if (s->floorHeight > pos[1]) {
-        return NULL;
-    }
+
+    vec3f_set(s->floorNormal, nx, ny, nz);
 
     // Check for ice floor, which is usually a transparent surface.
     s->flags = SHADOW_FLAGS_NONE;
     if (s->floor->type == SURFACE_ICE) {
         s->flags |= SHADOW_FLAG_ICE;
     }
-    // Read the floor's normals
-    surface_normal_to_vec3f(s->floorNormal, s->floor);
 
     f32 scaleXMod = 1.0f;
     f32 scaleZMod = 1.0f;
 
     if (isPlayer) {
-        // Update s->flags if Mario is on a flying carpet.
-        if ((gCurrLevelNum == LEVEL_RR)
-         && (s->floor->object != NULL)
-         && (s->floor->object->behavior == segmented_to_virtual(bhvPlatformOnTrack))) {
-            s->flags |= SHADOW_FLAG_CARPET;
-        }
         // Set the shadow solidity manually for certain Mario animations.
-        switch (correct_shadow_solidity_for_animations(shadowSolidity)) {
+        s32 solidityAction = correct_shadow_solidity_for_animations(shadowSolidity);
+        switch (solidityAction) {
             case SHADOW_SOLIDITY_NO_SHADOW:
                 return NULL;
             case SHADOW_SOILDITY_ALREADY_SET:
@@ -295,6 +307,13 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
                 break;
             default:
                 return NULL;
+        }
+        // Update s->flags and raise the shadow 5 units on the flying carpet so it doesn't clip into it.
+        if ((gCurrLevelNum == LEVEL_RR)
+         && (floor->object != NULL)
+         && (floor->object->behavior == segmented_to_virtual(bhvPlatformOnTrack))) {
+            s->floorHeight += 5;
+            s->flags |= SHADOW_FLAG_CARPET;
         }
         correct_lava_shadow_height();
     } else {
@@ -317,11 +336,6 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
 
     // Generate the shadow display list with type and solidity.
     add_shadow_to_display_list(displayList, shadowType);
-
-    // Raise the shadow 5 units on the flying carpet so it doesn't clip into it.
-    if (s->flags & SHADOW_FLAG_CARPET) {
-        s->floorHeight += 5;
-    }
 
     // scale[1] is set at the end of init_shadow().
     f32 baseScale = (s->scale[1] * 0.5f);
