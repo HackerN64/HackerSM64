@@ -262,7 +262,7 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.type = M_GFXTASK;
     gGfxSPTask->task.t.ucode_boot = rspbootTextStart;
     gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
-#ifdef F3DEX_GBI_SHARED
+#if defined(F3DEX_GBI_SHARED) && defined(OBJECTS_REJ)
     gGfxSPTask->task.t.flags = (OS_TASK_LOADABLE | OS_TASK_DP_WAIT);
 #else
     gGfxSPTask->task.t.flags = 0x0;
