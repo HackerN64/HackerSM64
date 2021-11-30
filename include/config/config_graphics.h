@@ -15,10 +15,11 @@
 // When increasing this, you should probably also increase the GFX pool size. (the GFX_POOL_SIZE define in src/game/game_init.h)
 #define SKYBOX_SIZE 1
 
+// This makes GEO_RENDER_RANGE assume the camera is always exactly 50 units away.
 // When this option is enabled, LODs will ONLY work on console.
 // When this option is disabled, LODs will work regardless of whether console or emulator is used.
 // Regardless of whether this setting is enabled or not, you can use gIsConsole to wrap your own code in a console check.
-#define AUTO_LOD
+//#define AUTO_LOD
 
 // Disable AA (Improves console performance but causes visible seams between unconnected geometry).
 //#define DISABLE_AA
