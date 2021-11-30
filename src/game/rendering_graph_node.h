@@ -40,9 +40,8 @@ enum HeadsList {
  #if SILHOUETTE
     // Silhouette, .rej
     enum RenderPhases {
-        RENDER_PHASE_ZEX_BG,
-        RENDER_PHASE_REJ_ZB,
         RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
+        RENDER_PHASE_REJ_ZB,
         RENDER_PHASE_REJ_SILHOUETTE,
         RENDER_PHASE_REJ_NON_SILHOUETTE,
         RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE,

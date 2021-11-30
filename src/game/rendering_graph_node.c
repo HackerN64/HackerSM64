@@ -214,9 +214,8 @@ static struct RenderPhase sRenderPhases[] = {
 #ifdef OBJECTS_REJ
  #if SILHOUETTE
     // Silhouette, .rej
-    /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    LIST_HEADS_ZEX },
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE,   LIST_HEADS_REJ },
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_ZB_FIRST,                 LAYER_LAST_BEFORE_SILHOUETTE,   LIST_HEADS_ZEX },
+    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE,   LIST_HEADS_ZEX },
+    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_LAST_BEFORE_SILHOUETTE,   LIST_HEADS_REJ },
     /* RENDER_PHASE_REJ_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          LIST_HEADS_REJ },
     /* RENDER_PHASE_REJ_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          LIST_HEADS_REJ },
     /* RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST,  LIST_HEADS_REJ },
@@ -225,7 +224,7 @@ static struct RenderPhase sRenderPhases[] = {
  #else
     // No silhouette, .rej
     /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    LIST_HEADS_ZEX },
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_FIRST,                    LAYER_ZB_LAST,                  LIST_HEADS_REJ },
+    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_ZB_LAST,                  LIST_HEADS_REJ },
     /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_ZB_FIRST,                 LAYER_LAST,                     LIST_HEADS_ZEX },
     /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     LIST_HEADS_REJ },
  #endif
@@ -344,7 +343,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
                           (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
 #if SILHOUETTE
                 if (currPhase == RENDER_PHASE_SILHOUETTE) {
-                    // Add the current display list to the master list, with silhouette F3d.
+                    // Add the current display list to the master list, with silhouette F3D.
                     gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
                     gSPDisplayList(gDisplayListHead++, currList->displayList);
                     gSPDisplayList(gDisplayListHead++, dl_silhouette_end);
