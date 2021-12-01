@@ -23,8 +23,8 @@
  * An array consisting of all the hardcoded rectangle shadows in the game.
  */
 static ShadowRectangle sShadowRectangles[2] = {
-    { 3.6f, 2.3f, TRUE }, // Spindel
-    { 2.0f, 1.8f, TRUE }, // Whomp
+    { 7.2f, 4.6f, TRUE }, // Spindel
+    { 4.0f, 3.6f, TRUE }, // Whomp
 };
 
 struct Shadow gCurrShadow;
@@ -83,10 +83,10 @@ f32 get_water_level_below_shadow(Vec3f pos, struct Surface **waterFloor) {
  *                          be dimmed based on its distance to the floor
  */
 s32 init_shadow(Vec3f pos, s16 shadowScale, s8 shadowType, u8 overwriteSolidity) {
+    f32 baseScale;
     struct Surface *waterFloor = NULL;
     // Check for water under the shadow.
     f32 waterLevel = get_water_level_below_shadow(pos, &waterFloor);
-
     // if (gEnvironmentRegions != 0) {
     //     waterLevel = get_water_level_below_shadow(s);
     // }
@@ -125,11 +125,12 @@ s32 init_shadow(Vec3f pos, s16 shadowScale, s8 shadowType, u8 overwriteSolidity)
             s->solidity = dim_shadow_with_distance(overwriteSolidity, dy);
         }
 
-        s->scale[1] = scale_shadow_with_distance(shadowScale, dy);
+        baseScale = scale_shadow_with_distance(shadowScale, dy);
     } else {
         s->solidity = overwriteSolidity;
-        s->scale[1] = shadowScale;
+        baseScale = shadowScale;
     }
+    vec3f_set(s->scale, baseScale, baseScale, baseScale);
 
     return !(s->solidity);
 }
@@ -286,9 +287,6 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         s->flags |= SHADOW_FLAG_ICE;
     }
 
-    f32 scaleXMod = 1.0f;
-    f32 scaleZMod = 1.0f;
-
     if (isPlayer) {
         // Set the shadow solidity manually for certain Mario animations.
         s32 solidityAction = correct_shadow_solidity_for_animations(shadowSolidity);
@@ -323,8 +321,8 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         // Get the scaling modifiers for rectangular shadows (Whomp and Spindel).
         if (shadowType >= SHADOW_RECTANGLE_HARDCODED_OFFSET) {
             s8 idx = shadowType - SHADOW_RECTANGLE_HARDCODED_OFFSET;
-            scaleXMod = sShadowRectangles[idx].halfWidth;
-            scaleZMod = sShadowRectangles[idx].halfLength;
+            s->scale[0] *= sShadowRectangles[idx].scaleX;
+            s->scale[2] *= sShadowRectangles[idx].scaleZ;
         }
     }
 
@@ -336,12 +334,6 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
 
     // Generate the shadow display list with type and solidity.
     add_shadow_to_display_list(displayList, shadowType);
-
-    // scale[1] is set at the end of init_shadow().
-    f32 baseScale = (s->scale[1] * 0.5f);
-    s->scale[0] = (baseScale * scaleXMod);
-    s->scale[1] = baseScale;
-    s->scale[2] = (baseScale * scaleZMod);
 
     // Move the shadow position to the floor height.
     pos[1] = s->floorHeight;

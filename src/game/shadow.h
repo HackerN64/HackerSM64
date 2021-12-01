@@ -79,10 +79,10 @@ enum ShadowSolidity {
  * A struct containing info about hardcoded rectangle shadows.
  */
 typedef struct {
-    /* Half the width of the rectangle. */
-    f32 halfWidth;
-    /* Half the length of the rectangle. */
-    f32 halfLength;
+    /* X scale of the rectangle. */
+    f32 scaleX;
+    /* Z scale of the rectangle. */
+    f32 scaleZ;
     /* Flag for if this shadow be smaller when its object is further away. */
     u8 scaleWithDistance : 1;
 } ShadowRectangle;
