@@ -236,7 +236,7 @@ enum MacroPresets {
     macro_empty_231,
     macro_empty_232,
     macro_empty_233,
-    macro_chirp_chirp,
+    macro_bub_spawner,
     macro_seaweed_bundle,
     macro_beta_chest,
     macro_water_mine,
@@ -367,7 +367,16 @@ enum MacroPresets {
     macro_empty_362,
     macro_empty_363,
     macro_empty_364,
+#ifdef FLOOMBAS
+    macro_empty_365,
+    macro_floomba,
+    macro_huge_floomba,
+    macro_tiny_floomba,
+    macro_floomba_triplet_spawner,
+    macro_floomba_quintuplet_spawner
+#else
     macro_empty_365
+#endif
 };
 
 #endif // MACRO_PRESET_NAMES_H
