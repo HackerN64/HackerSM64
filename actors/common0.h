@@ -40,12 +40,12 @@ extern const GeoLayout bowling_ball_track_geo[];
 
 // breakable_box
 extern const GeoLayout breakable_box_geo[];
-extern const GeoLayout breakable_box_small_geo[];
-extern const Gfx breakable_box_seg8_dl_08012C30[];
-extern const Gfx breakable_box_seg8_dl_08012CD8[];
-extern const Gfx breakable_box_seg8_dl_08012D20[];
-extern const Gfx breakable_box_seg8_dl_08012D48[];
-extern const Collision breakable_box_seg8_collision_08012D70[];
+extern const GeoLayout breakable_box_no_shadow_geo[];
+extern const Gfx breakable_box_seg8_sub_dl_end[];
+extern const Gfx breakable_box_seg8_sub_dl_begin[];
+extern const Gfx breakable_box_seg8_dl_crazy_box[];
+extern const Gfx breakable_box_seg8_dl_cork_box[];
+extern const Collision breakable_box_seg8_collision[];
 
 // cannon_barrel
 extern const GeoLayout cannon_barrel_geo[];
@@ -69,7 +69,7 @@ extern const GeoLayout checkerboard_platform_geo[];
 extern const Gfx checkerboard_platform_seg8_dl_0800D5C0[];
 extern const Gfx checkerboard_platform_seg8_dl_0800D618[];
 extern const Gfx checkerboard_platform_seg8_dl_0800D680[];
-extern const Collision checkerboard_platform_seg8_collision_0800D710[];
+extern const Collision checkerboard_platform_seg8_collision_platform[];
 
 // chuckya
 extern const GeoLayout chuckya_geo[];
@@ -123,7 +123,7 @@ extern const Gfx exclamation_box_outline_seg8_dl_08024FE8[];
 extern const Gfx exclamation_box_outline_seg8_dl_08025968[];
 extern const Gfx exclamation_box_outline_seg8_dl_080259F8[];
 extern const Gfx exclamation_box_outline_seg8_dl_08025EC0[];
-extern const Gfx exclamation_box_outline_seg8_dl_08025F08[];
+extern const Gfx exclamation_box_outline_seg8_dl_exclamation_point[];
 extern const Collision exclamation_box_outline_seg8_collision_08025F78[];
 
 // flyguy
@@ -146,6 +146,10 @@ extern const Gfx goomba_seg8_dl_0801B560[];
 extern const Gfx goomba_seg8_dl_0801B5A0[];
 extern const Gfx goomba_seg8_dl_0801B5C8[];
 extern const Gfx goomba_seg8_dl_0801B5F0[];
+#ifdef FLOOMBAS
+extern const Gfx floomba_seg8_dl_face[];
+extern const Gfx floomba_seg8_dl_blink[];
+#endif
 extern const Gfx goomba_seg8_dl_0801B658[];
 extern const Gfx goomba_seg8_dl_0801B690[];
 extern const Gfx goomba_seg8_dl_0801CE20[];
@@ -161,8 +165,8 @@ extern const Gfx heart_seg8_dl_0800DFE0[];
 
 // koopa_shell
 extern const GeoLayout koopa_shell_geo[];
-extern const GeoLayout koopa_shell2_geo[];
-extern const GeoLayout koopa_shell3_geo[];
+// extern const GeoLayout koopa_shell2_geo[];
+// extern const GeoLayout koopa_shell3_geo[];
 extern const Gfx koopa_shell_seg8_dl_08027108[];
 extern const Gfx koopa_shell_seg8_dl_08027170[];
 extern const Gfx koopa_shell_seg8_dl_08027258[];

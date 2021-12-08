@@ -10,7 +10,7 @@
 #include "bubble/geo.inc.c"
 #include "walk_smoke/geo.inc.c"
 #include "burn_smoke/geo.inc.c"
-#include "stomp_smoke/geo.inc.c"
+#include "small_water_splash/geo.inc.c"
 #include "water_wave/geo.inc.c"
 #include "sparkle/geo.inc.c"
 #include "water_splash/geo.inc.c"

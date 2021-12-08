@@ -5,16 +5,16 @@
 
 // penguin
 extern const GeoLayout penguin_geo[];
-extern const Gfx penguin_seg5_dl_05006188[];
-extern const Gfx penguin_seg5_dl_050061C8[];
-extern const Gfx penguin_seg5_dl_050061F8[];
-extern const Gfx penguin_seg5_dl_05006380[];
-extern const Gfx penguin_seg5_dl_050063C8[];
-extern const Gfx penguin_seg5_dl_05006428[];
-extern const Gfx penguin_seg5_dl_05006458[];
-extern const Gfx penguin_seg5_dl_05006488[];
-extern const Gfx penguin_seg5_dl_050064B8[];
-extern const Gfx penguin_seg5_dl_050064E8[];
+extern const Gfx penguin_seg5_sub_dl_eyes_model[];
+extern const Gfx penguin_seg5_sub_dl_beak_model[];
+extern const Gfx penguin_seg5_sub_dl_head_model[];
+extern const Gfx penguin_seg5_sub_dl_head_begin[];
+extern const Gfx penguin_seg5_dl_head[];
+extern const Gfx penguin_seg5_dl_head_eyes_open[];
+extern const Gfx penguin_seg5_dl_head_eyes_half_closed[];
+extern const Gfx penguin_seg5_dl_head_eyes_closed[];
+extern const Gfx penguin_seg5_dl_head_eyes_angry[];
+extern const Gfx penguin_seg5_dl_head_eyes_sad[];
 extern const Gfx penguin_seg5_dl_05007198[];
 extern const Gfx penguin_seg5_dl_050071E8[];
 extern const Gfx penguin_seg5_dl_05007238[];
