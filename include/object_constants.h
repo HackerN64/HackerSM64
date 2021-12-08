@@ -5,91 +5,105 @@
 // field-specific and object-specific constants, e.g. actions.
 
 /* activeFlags */
-#define ACTIVE_FLAG_DEACTIVATED                     (0 <<  0) // 0x0000
-#define ACTIVE_FLAG_ACTIVE                          (1 <<  0) // 0x0001
-#define ACTIVE_FLAG_FAR_AWAY                        (1 <<  1) // 0x0002
-#define ACTIVE_FLAG_UNUSED                          (1 <<  2) // 0x0004
-#define ACTIVE_FLAG_IN_DIFFERENT_ROOM               (1 <<  3) // 0x0008
-#define ACTIVE_FLAG_UNIMPORTANT                     (1 <<  4) // 0x0010
-#define ACTIVE_FLAG_INITIATED_TIME_STOP             (1 <<  5) // 0x0020
-#define ACTIVE_FLAG_MOVE_THROUGH_GRATE              (1 <<  6) // 0x0040
-#define ACTIVE_FLAG_DITHERED_ALPHA                  (1 <<  7) // 0x0080
-#define ACTIVE_FLAG_ALLOCATED                       (1 <<  8) // 0x0100
-#define ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY    (1 <<  9) // 0x0200
-#define ACTIVE_FLAG_IGNORE_ENV_BOXES                (1 << 10) // 0x0400
+enum ObjActiveFlags {
+    ACTIVE_FLAG_DEACTIVATED                    = (0 <<  0), // 0x0000
+    ACTIVE_FLAG_ACTIVE                         = (1 <<  0), // 0x0001
+    ACTIVE_FLAG_FAR_AWAY                       = (1 <<  1), // 0x0002
+    ACTIVE_FLAG_UNUSED                         = (1 <<  2), // 0x0004
+    ACTIVE_FLAG_IN_DIFFERENT_ROOM              = (1 <<  3), // 0x0008
+    ACTIVE_FLAG_UNIMPORTANT                    = (1 <<  4), // 0x0010
+    ACTIVE_FLAG_INITIATED_TIME_STOP            = (1 <<  5), // 0x0020
+    ACTIVE_FLAG_MOVE_THROUGH_GRATE             = (1 <<  6), // 0x0040
+    ACTIVE_FLAG_DITHERED_ALPHA                 = (1 <<  7), // 0x0080
+    ACTIVE_FLAG_ALLOCATED                      = (1 <<  8), // 0x0100
+    ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY   = (1 <<  9), // 0x0200
+    ACTIVE_FLAG_IGNORE_ENV_BOXES               = (1 << 10), // 0x0400
+};
 
 /* respawnInfoType */
-#define RESPAWN_INFO_TYPE_NULL                      0x00
-#define RESPAWN_INFO_TYPE_32                        0x01
-#define RESPAWN_INFO_TYPE_16                        0x02
+enum RespawnInfoType {
+    RESPAWN_INFO_TYPE_NULL,
+    RESPAWN_INFO_TYPE_NORMAL,
+    RESPAWN_INFO_TYPE_MACRO_OBJECT
+};
 
 /* respawnInfo */
 #define RESPAWN_INFO_DONT_RESPAWN                   0xFF
 
 /* oFlags */
-#define OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE           (1 <<  0) // 0x00000001
-#define OBJ_FLAG_MOVE_XZ_USING_FVEL                 (1 <<  1) // 0x00000002
-#define OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL           (1 <<  2) // 0x00000004
-#define OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW           (1 <<  3) // 0x00000008
-#define OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE       (1 <<  4) // 0x00000010
-#define OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX  (1 <<  5) // 0x00000020
-#define OBJ_FLAG_COMPUTE_DIST_TO_MARIO              (1 <<  6) // 0x00000040
-#define OBJ_FLAG_ACTIVE_FROM_AFAR                   (1 <<  7) // 0x00000080
-#define OBJ_FLAG_PLAYER                             (1 <<  8) // 0x00000100
-#define OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT       (1 <<  9) // 0x00000200
-#define OBJ_FLAG_HOLDABLE                           (1 << 10) // 0x00000400
-#define OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM    (1 << 11) // 0x00000800
-#define OBJ_FLAG_1000                               (1 << 12) // 0x00001000
-#define OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO             (1 << 13) // 0x00002000
-#define OBJ_FLAG_PERSISTENT_RESPAWN                 (1 << 14) // 0x00004000
-#define OBJ_FLAG_VELOCITY_PLATFORM                  (1 << 15) // 0x00008000
-#define OBJ_FLAG_DONT_CALC_COLL_DIST                (1 << 16) // 0x00010000
-#define OBJ_FLAG_EMIT_LIGHT                         (1 << 17) // 0x00020000
-#define OBJ_FLAG_UCODE_LARGE                        (1 << 18) // 0x00040000
-#define OBJ_FLAG_SILHOUETTE                         (1 << 19) // 0x00080000
-#define OBJ_FLAG_OCCLUDE_SILHOUETTE                 (1 << 20) // 0x00100000
-#define OBJ_FLAG_OPACITY_FROM_CAMERA_DIST           (1 << 21) // 0x00200000
-#define OBJ_FLAG_UCODE_SMALL                        (1 << 22) // 0x00400000
-#define OBJ_FLAG_HITBOX_WAS_SET                     (1 << 30) // 0x40000000
+enum ObjFlags {
+    OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE          = (1 <<  0), // 0x00000001
+    OBJ_FLAG_MOVE_XZ_USING_FVEL                = (1 <<  1), // 0x00000002
+    OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL          = (1 <<  2), // 0x00000004
+    OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW          = (1 <<  3), // 0x00000008
+    OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE      = (1 <<  4), // 0x00000010
+    OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX = (1 <<  5), // 0x00000020
+    OBJ_FLAG_COMPUTE_DIST_TO_MARIO             = (1 <<  6), // 0x00000040
+    OBJ_FLAG_ACTIVE_FROM_AFAR                  = (1 <<  7), // 0x00000080
+    OBJ_FLAG_PLAYER                            = (1 <<  8), // 0x00000100
+    OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT      = (1 <<  9), // 0x00000200
+    OBJ_FLAG_HOLDABLE                          = (1 << 10), // 0x00000400
+    OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM   = (1 << 11), // 0x00000800
+    OBJ_FLAG_1000                              = (1 << 12), // 0x00001000
+    OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO            = (1 << 13), // 0x00002000
+    OBJ_FLAG_PERSISTENT_RESPAWN                = (1 << 14), // 0x00004000
+    OBJ_FLAG_VELOCITY_PLATFORM                 = (1 << 15), // 0x00008000
+    OBJ_FLAG_DONT_CALC_COLL_DIST               = (1 << 16), // 0x00010000
+    OBJ_FLAG_UCODE_SMALL                       = (1 << 17), // 0x00020000
+    OBJ_FLAG_UCODE_LARGE                       = (1 << 18), // 0x00040000
+    OBJ_FLAG_SILHOUETTE                        = (1 << 19), // 0x00080000
+    OBJ_FLAG_OCCLUDE_SILHOUETTE                = (1 << 20), // 0x00100000
+    OBJ_FLAG_OPACITY_FROM_CAMERA_DIST          = (1 << 21), // 0x00200000
+    OBJ_FLAG_EMIT_LIGHT                        = (1 << 22), // 0x00400000
+    OBJ_FLAG_HITBOX_WAS_SET                    = (1 << 30), // 0x40000000
+};
 
 /* oHeldState */
-#define HELD_FREE                                   0x00
-#define HELD_HELD                                   0x01
-#define HELD_THROWN                                 0x02
-#define HELD_DROPPED                                0x03
+enum HeldState {
+    HELD_FREE,
+    HELD_HELD,
+    HELD_THROWN,
+    HELD_DROPPED
+};
 
 /* oDialogState */
-#define DIALOG_STATUS_ENABLE_TIME_STOP              0x00
-#define DIALOG_STATUS_INTERRUPT                     0x01
-#define DIALOG_STATUS_START_DIALOG                  0x02
-#define DIALOG_STATUS_STOP_DIALOG                   0x03
-#define DIALOG_STATUS_DISABLE_TIME_STOP             0x04
+enum DialogState {
+    DIALOG_STATUS_ENABLE_TIME_STOP,
+    DIALOG_STATUS_INTERRUPT,
+    DIALOG_STATUS_START_DIALOG,
+    DIALOG_STATUS_STOP_DIALOG,
+    DIALOG_STATUS_DISABLE_TIME_STOP
+};
 
-#define DIALOG_FLAG_NONE                            (0 << 0) // 0x00
-#define DIALOG_FLAG_TURN_TO_MARIO                   (1 << 0) // 0x01 // cutscene only
-#define DIALOG_FLAG_TEXT_DEFAULT                    (1 << 1) // 0x02
-#define DIALOG_FLAG_TEXT_RESPONSE                   (1 << 2) // 0x04 // non-cutscene only
-#define DIALOG_FLAG_UNK_CAPSWITCH                   (1 << 3) // 0x08 // not defined
-#define DIALOG_FLAG_TIME_STOP_ENABLED               (1 << 4) // 0x10
+enum DialogFlags {
+    DIALOG_FLAG_NONE                           = (0 <<  0), // 0x00
+    DIALOG_FLAG_TURN_TO_MARIO                  = (1 <<  0), // 0x01 // cutscene only
+    DIALOG_FLAG_TEXT_DEFAULT                   = (1 <<  1), // 0x02
+    DIALOG_FLAG_TEXT_RESPONSE                  = (1 <<  2), // 0x04 // non-cutscene only
+    DIALOG_FLAG_UNK_CAPSWITCH                  = (1 <<  3), // 0x08 // not defined
+    DIALOG_FLAG_TIME_STOP_ENABLED              = (1 <<  4), // 0x10
+};
 
 /* oMoveFlags */
-#define OBJ_MOVE_LANDED                             (1 <<  0) // 0x0001
-#define OBJ_MOVE_ON_GROUND                          (1 <<  1) // 0x0002  // mutually exclusive to OBJ_MOVE_LANDED
-#define OBJ_MOVE_LEFT_GROUND                        (1 <<  2) // 0x0004
-#define OBJ_MOVE_ENTERED_WATER                      (1 <<  3) // 0x0008
-#define OBJ_MOVE_AT_WATER_SURFACE                   (1 <<  4) // 0x0010
-#define OBJ_MOVE_UNDERWATER_OFF_GROUND              (1 <<  5) // 0x0020
-#define OBJ_MOVE_UNDERWATER_ON_GROUND               (1 <<  6) // 0x0040
-#define OBJ_MOVE_IN_AIR                             (1 <<  7) // 0x0080
-#define OBJ_MOVE_OUT_SCOPE                          (1 <<  8) // 0x0100
-#define OBJ_MOVE_HIT_WALL                           (1 <<  9) // 0x0200
-#define OBJ_MOVE_HIT_EDGE                           (1 << 10) // 0x0400
-#define OBJ_MOVE_ABOVE_LAVA                         (1 << 11) // 0x0800
-#define OBJ_MOVE_LEAVING_WATER                      (1 << 12) // 0x1000
-#define OBJ_MOVE_BOUNCE                             (1 << 13) // 0x2000
-#ifndef VERSION_JP
-#define OBJ_MOVE_ABOVE_DEATH_BARRIER                (1 << 14) // 0x4000
-#endif
+enum ObjMoveFlags {
+    OBJ_MOVE_NONE                              = (0 <<  0), // 0x0000
+    OBJ_MOVE_LANDED                            = (1 <<  0), // 0x0001
+    OBJ_MOVE_ON_GROUND                         = (1 <<  1), // 0x0002 // mutually exclusive to OBJ_MOVE_LANDED
+    OBJ_MOVE_LEFT_GROUND                       = (1 <<  2), // 0x0004
+    OBJ_MOVE_ENTERED_WATER                     = (1 <<  3), // 0x0008
+    OBJ_MOVE_AT_WATER_SURFACE                  = (1 <<  4), // 0x0010
+    OBJ_MOVE_UNDERWATER_OFF_GROUND             = (1 <<  5), // 0x0020
+    OBJ_MOVE_UNDERWATER_ON_GROUND              = (1 <<  6), // 0x0040
+    OBJ_MOVE_IN_AIR                            = (1 <<  7), // 0x0080
+    OBJ_MOVE_OUT_SCOPE                         = (1 <<  8), // 0x0100
+    OBJ_MOVE_HIT_WALL                          = (1 <<  9), // 0x0200
+    OBJ_MOVE_HIT_EDGE                          = (1 << 10), // 0x0400
+    OBJ_MOVE_ABOVE_LAVA                        = (1 << 11), // 0x0800
+    OBJ_MOVE_LEAVING_WATER                     = (1 << 12), // 0x1000
+    OBJ_MOVE_BOUNCE                            = (1 << 13), // 0x2000
+    OBJ_MOVE_ABOVE_DEATH_BARRIER               = (1 << 14), // 0x4000
+    OBJ_MOVE_UNUSED                            = (1 << 15), // 0x8000
+};
 
 #define OBJ_MOVE_MASK_ON_GROUND (OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND)
 #define OBJ_MOVE_MASK_IN_WATER (\
@@ -99,317 +113,475 @@
     OBJ_MOVE_UNDERWATER_ON_GROUND)
 
 /* oActiveParticleFlags */
-#define ACTIVE_PARTICLE_NONE                        (0 <<  0) // 0x00000000
-#define ACTIVE_PARTICLE_DUST                        (1 <<  0) // 0x00000001
-#define ACTIVE_PARTICLE_UNUSED_1                    (1 <<  1) // 0x00000002
-#define ACTIVE_PARTICLE_UNUSED_2                    (1 <<  2) // 0x00000004
-#define ACTIVE_PARTICLE_SPARKLES                    (1 <<  3) // 0x00000008
-#define ACTIVE_PARTICLE_H_STAR                      (1 <<  4) // 0x00000010
-#define ACTIVE_PARTICLE_BUBBLE                      (1 <<  5) // 0x00000020
-#define ACTIVE_PARTICLE_WATER_SPLASH                (1 <<  6) // 0x00000040
-#define ACTIVE_PARTICLE_IDLE_WATER_WAVE             (1 <<  7) // 0x00000080
-#define ACTIVE_PARTICLE_SHALLOW_WATER_WAVE          (1 <<  8) // 0x00000100
-#define ACTIVE_PARTICLE_PLUNGE_BUBBLE               (1 <<  9) // 0x00000200
-#define ACTIVE_PARTICLE_WAVE_TRAIL                  (1 << 10) // 0x00000400
-#define ACTIVE_PARTICLE_FIRE                        (1 << 11) // 0x00000800
-#define ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH        (1 << 12) // 0x00001000
-#define ACTIVE_PARTICLE_LEAF                        (1 << 13) // 0x00002000
-#define ACTIVE_PARTICLE_DIRT                        (1 << 14) // 0x00004000
-#define ACTIVE_PARTICLE_MIST_CIRCLE                 (1 << 15) // 0x00008000
-#define ACTIVE_PARTICLE_SNOW                        (1 << 16) // 0x00010000
-#define ACTIVE_PARTICLE_BREATH                      (1 << 17) // 0x00020000
-#define ACTIVE_PARTICLE_V_STAR                      (1 << 18) // 0x00040000
-#define ACTIVE_PARTICLE_TRIANGLE                    (1 << 19) // 0x00080000
+enum ActiveParticleFlags {
+    ACTIVE_PARTICLE_NONE                       = (0 <<  0), // 0x00000000
+    ACTIVE_PARTICLE_DUST                       = (1 <<  0), // 0x00000001
+    ACTIVE_PARTICLE_UNUSED_1                   = (1 <<  1), // 0x00000002
+    ACTIVE_PARTICLE_UNUSED_2                   = (1 <<  2), // 0x00000004
+    ACTIVE_PARTICLE_SPARKLES                   = (1 <<  3), // 0x00000008
+    ACTIVE_PARTICLE_H_STAR                     = (1 <<  4), // 0x00000010
+    ACTIVE_PARTICLE_BUBBLE                     = (1 <<  5), // 0x00000020
+    ACTIVE_PARTICLE_WATER_SPLASH               = (1 <<  6), // 0x00000040
+    ACTIVE_PARTICLE_IDLE_WATER_WAVE            = (1 <<  7), // 0x00000080
+    ACTIVE_PARTICLE_SHALLOW_WATER_WAVE         = (1 <<  8), // 0x00000100
+    ACTIVE_PARTICLE_PLUNGE_BUBBLE              = (1 <<  9), // 0x00000200
+    ACTIVE_PARTICLE_WAVE_TRAIL                 = (1 << 10), // 0x00000400
+    ACTIVE_PARTICLE_FIRE                       = (1 << 11), // 0x00000800
+    ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH       = (1 << 12), // 0x00001000
+    ACTIVE_PARTICLE_LEAF                       = (1 << 13), // 0x00002000
+    ACTIVE_PARTICLE_DIRT                       = (1 << 14), // 0x00004000
+    ACTIVE_PARTICLE_MIST_CIRCLE                = (1 << 15), // 0x00008000
+    ACTIVE_PARTICLE_SNOW                       = (1 << 16), // 0x00010000
+    ACTIVE_PARTICLE_BREATH                     = (1 << 17), // 0x00020000
+    ACTIVE_PARTICLE_V_STAR                     = (1 << 18), // 0x00040000
+    ACTIVE_PARTICLE_TRIANGLE                   = (1 << 19), // 0x00080000
+};
+
+/* oBehParams */
+
+/**
+ * behParams: oBehParams
+ * index: index of bparam in oBehParams
+ * val: bparam value
+ * num: number of bparams to read as one value
+ */
+// Number of bparams in oBehParams
+#define NUM_BPARAMS 4
+// Number of bits in one bparam
+#define BPARAM_SIZE 8
+// Number of bits in bparam bitmask
+#define BPARAM_MASK_SIZE(num) (BPARAM_SIZE * (num))
+// bparam bitmask ('num' 1 -> 0xFF, 'num' 2 -> 0xFFFF, etc.)
+#define BPARAM_MASK(num) BITMASK(BPARAM_MASK_SIZE(num))
+// Returns the amount of bits to shift a bparam value ('index' == bparam index)
+#define BPARAM_NSHIFT(index, num) (((NUM_BPARAMS - ((num) - 1)) - (index)) * BPARAM_SIZE)
+// Returns the bparam(s) value shifted to the index location in oBehParams
+#define SHIFTED_BPARAM(val, index, num) (((val) & BPARAM_MASK(num)) << BPARAM_NSHIFT((index), (num)))
+// Returns the bparam(s) value from the index location in oBehParams
+#define GET_BPARAMS(behParams, index, num) ((behParams >> BPARAM_NSHIFT((index), (num))) & BPARAM_MASK(num))
+// bparam mask shifted to the index location in oBehParams
+#define BPARAM_SHIFTED_MASK(index, num) (BPARAM_MASK(num) << BPARAM_NSHIFT((index), (num)))
+// oBehParams with the specified bparam(s) cleared
+#define CLEARED_BPARAM(behParams, index, num) ((behParams) & ~BPARAM_SHIFTED_MASK((index), (num)))
+
+// Get a u8 bparam from oBehParams
+#define GET_BPARAM1(behParams) GET_BPARAMS((behParams), 1, 1)
+#define GET_BPARAM2(behParams) GET_BPARAMS((behParams), 2, 1)
+#define GET_BPARAM3(behParams) GET_BPARAMS((behParams), 3, 1)
+#define GET_BPARAM4(behParams) GET_BPARAMS((behParams), 4, 1)
+
+// Read 2 bparams as a single value
+#define GET_BPARAM12(behParams) GET_BPARAMS((behParams), 1, 2)
+#define GET_BPARAM23(behParams) GET_BPARAMS((behParams), 2, 2)
+#define GET_BPARAM34(behParams) GET_BPARAMS((behParams), 3, 2)
+
+// Read 3 bparams as a single value
+#define GET_BPARAM123(behParams) GET_BPARAMS((behParams), 1, 3)
+#define GET_BPARAM234(behParams) GET_BPARAMS((behParams), 2, 3)
+
+// Set a bparam in oBehParams without overwriting other bparams
+#define SET_BPARAM(behParams, val, index, num) (behParams) = (CLEARED_BPARAM((behParams), (index), (num)) | SHIFTED_BPARAM((val), (index), (num)))
+#define SET_BPARAM1(behParams, val) SET_BPARAM((behParams), (val), 1, 1)
+#define SET_BPARAM2(behParams, val) SET_BPARAM((behParams), (val), 2, 1)
+#define SET_BPARAM3(behParams, val) SET_BPARAM((behParams), (val), 3, 1)
+#define SET_BPARAM4(behParams, val) SET_BPARAM((behParams), (val), 4, 1)
+
+// Set a bparam in oBehParams, clearing other bparams
+#define SET_FULL_BPARAM(behParams, val, index, num) (behParams) = SHIFTED_BPARAM((val), (index), (num))
+#define SET_FULL_BPARAM1(behParams, val) SET_FULL_BPARAM((behParams), (val), 1, 1)
+#define SET_FULL_BPARAM2(behParams, val) SET_FULL_BPARAM((behParams), (val), 2, 1)
+#define SET_FULL_BPARAM3(behParams, val) SET_FULL_BPARAM((behParams), (val), 3, 1)
+#define SET_FULL_BPARAM4(behParams, val) SET_FULL_BPARAM((behParams), (val), 4, 1)
+
+// OR a bparam into an index in oBehParams
+#define OR_BPARAM(behParams, val, index, num) (behParams) |= SHIFTED_BPARAM((val), (index), (num))
+#define OR_BPARAM1(behParams, val) OR_BPARAM((behParams), (val), 1, 1)
+#define OR_BPARAM2(behParams, val) OR_BPARAM((behParams), (val), 2, 1)
+#define OR_BPARAM3(behParams, val) OR_BPARAM((behParams), (val), 3, 1)
+#define OR_BPARAM4(behParams, val) OR_BPARAM((behParams), (val), 4, 1)
+
+// NAND a bparam into an index in oBehParams
+#define NAND_BPARAM(behParams, val, index, num) (behParams) &= ~SHIFTED_BPARAM((val), (index), (num))
+#define NAND_BPARAM1(behParams, val) NAND_BPARAM((behParams), (val), 1, 1)
+#define NAND_BPARAM2(behParams, val) NAND_BPARAM((behParams), (val), 2, 1)
+#define NAND_BPARAM3(behParams, val) NAND_BPARAM((behParams), (val), 3, 1)
+#define NAND_BPARAM4(behParams, val) NAND_BPARAM((behParams), (val), 4, 1)
+
+// Current object bparams
+#define BPARAM1 GET_BPARAM1(o->oBehParams)
+#define BPARAM2 GET_BPARAM2(o->oBehParams)
+#define BPARAM3 GET_BPARAM3(o->oBehParams)
+#define BPARAM4 GET_BPARAM4(o->oBehParams)
+
+
 
 /* oBehParams2ndByte */
-#define OBJ_BP_NONE                                         0x0
+enum ObjGeneralBehParams {
+    OBJ_BP_NONE
+};
 
 /* oAction */
-#define OBJ_ACT_PROJECTILE_HIT_MARIO                       -0x1
+enum ObjGeneralProjectileActions {
+    OBJ_ACT_PROJECTILE_HIT_MARIO = -1
+};
 
 /* oAction */
-#define OBJ_ACT_LAVA_DEATH                                  100
-#define OBJ_ACT_DEATH_PLANE_DEATH                           101
+enum ObjGeneralDeathActions {
+    OBJ_ACT_LAVA_DEATH = 100,
+    OBJ_ACT_DEATH_PLANE_DEATH
+};
 
-#define OBJ_ACT_HORIZONTAL_KNOCKBACK                        100
-#define OBJ_ACT_VERTICAL_KNOCKBACK                          101
-#define OBJ_ACT_SQUISHED                                    102
+enum ObjGeneralKnockbackActions {
+    OBJ_ACT_HORIZONTAL_KNOCKBACK = 100,
+    OBJ_ACT_VERTICAL_KNOCKBACK,
+    OBJ_ACT_SQUISHED
+};
 
 /* oAnimState */
-#define OBJ_ANIM_STATE_INIT_ANIM                           -0x1
-#define OBJ_ANIM_STATE_DEFAULT                              0x0
-    /* cur_obj_update_blinking */
-#define OBJ_BLINKING_ANIM_STATE_EYES_OPEN                   0x0
-#define OBJ_BLINKING_ANIM_STATE_EYES_CLOSED                 0x1
+enum ObjGeneralAnimStates {
+    OBJ_ANIM_STATE_INIT_ANIM = -1,
+    OBJ_ANIM_STATE_DEFAULT   =  0
+};
 
-/* Animations */
-#define OBJ_ANIM_NONE                                      -0x1
-
-/* gTTCSpeedSetting */
-#define TTC_SPEED_SLOW                                      0x0
-#define TTC_SPEED_FAST                                      0x1
-#define TTC_SPEED_RANDOM                                    0x2
-#define TTC_SPEED_STOPPED                                   0x3
+/* cur_obj_update_blinking */
+enum AnimStateBlinking {
+    OBJ_BLINKING_ANIM_STATE_EYES_OPEN,
+    OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
+};
 
 /* geo_update_layer_transparency */
-#define TRANSPARENCY_ANIM_STATE_OPAQUE                      0x0
-#define TRANSPARENCY_ANIM_STATE_TRANSPARENT                 0x1
+enum AnimStateLayerTransparency {
+    TRANSPARENCY_ANIM_STATE_OPAQUE,
+    TRANSPARENCY_ANIM_STATE_TRANSPARENT
+};
+
+/* Animations */
+enum ObjGeneralAnimations {
+    OBJ_ANIM_NONE = -1
+};
+
+/* gTTCSpeedSetting */
+enum TTCSpeedSetting {
+    TTC_SPEED_SLOW,
+    TTC_SPEED_FAST,
+    TTC_SPEED_RANDOM,
+    TTC_SPEED_STOPPED
+};
 
 /* Orange Number */
-    /* oBehParams2ndByte, oAnimState */
-    #define ORANGE_NUMBER_0                                 0x0
-    #define ORANGE_NUMBER_1                                 0x1
-    #define ORANGE_NUMBER_2                                 0x2
-    #define ORANGE_NUMBER_3                                 0x3
-    #define ORANGE_NUMBER_4                                 0x4
-    #define ORANGE_NUMBER_5                                 0x5
-    #define ORANGE_NUMBER_6                                 0x6
-    #define ORANGE_NUMBER_7                                 0x7
-    #define ORANGE_NUMBER_8                                 0x8
-    #define ORANGE_NUMBER_9                                 0x9
-    #define ORANGE_NUMBER_A                                 0xA
-    #define ORANGE_NUMBER_B                                 0xB
-    #define ORANGE_NUMBER_C                                 0xC
-    #define ORANGE_NUMBER_D                                 0xD
-    #define ORANGE_NUMBER_E                                 0xE
-    #define ORANGE_NUMBER_F                                 0xF
+enum OrangeNumbers { // oBehParams2ndByte, oAnimState
+    ORANGE_NUMBER_0,
+    ORANGE_NUMBER_1,
+    ORANGE_NUMBER_2,
+    ORANGE_NUMBER_3,
+    ORANGE_NUMBER_4,
+    ORANGE_NUMBER_5,
+    ORANGE_NUMBER_6,
+    ORANGE_NUMBER_7,
+    ORANGE_NUMBER_8,
+    ORANGE_NUMBER_9,
+    ORANGE_NUMBER_A,
+    ORANGE_NUMBER_B,
+    ORANGE_NUMBER_C,
+    ORANGE_NUMBER_D,
+    ORANGE_NUMBER_E,
+    ORANGE_NUMBER_F
+};
 
 /* Coin Type */
-    /* coinType */
-    #define COIN_TYPE_NONE                                  0x0
-    #define COIN_TYPE_YELLOW                                0x1
-    #define COIN_TYPE_BLUE                                  0x2
+enum CoinTypes { // coinType
+    COIN_TYPE_NONE,
+    COIN_TYPE_YELLOW,
+    COIN_TYPE_BLUE
+};
+
+/* Bouncing Coin */
+enum oActionsBouncingCoin {
+    BOUNCING_COIN_ACT_FALLING,
+    BOUNCING_COIN_ACT_BOUNCING
+};
 
 /* Hidden Blue Coin */
-    /* oAction */
-    #define HIDDEN_BLUE_COIN_ACT_INACTIVE                   0x0
-    #define HIDDEN_BLUE_COIN_ACT_WAITING                    0x1
-    #define HIDDEN_BLUE_COIN_ACT_ACTIVE                     0x2
+enum oActionsHiddenBlueCoin {
+    HIDDEN_BLUE_COIN_ACT_INACTIVE,
+    HIDDEN_BLUE_COIN_ACT_WAITING,
+    HIDDEN_BLUE_COIN_ACT_ACTIVE
+};
 
 /* Blue Coin Switch */
-    /* oAction */
-    #define BLUE_COIN_SWITCH_ACT_IDLE                       0x0
-    #define BLUE_COIN_SWITCH_ACT_RECEDING                   0x1
-    #define BLUE_COIN_SWITCH_ACT_TICKING                    0x2
-    #define BLUE_COIN_SWITCH_ACT_EXTENDING                  0x3
+enum oActionsBlueCoinSwitch {
+    BLUE_COIN_SWITCH_ACT_IDLE,
+    BLUE_COIN_SWITCH_ACT_RECEDING,
+    BLUE_COIN_SWITCH_ACT_TICKING,
+    BLUE_COIN_SWITCH_ACT_EXTENDING
+};
 
 /* Moving Blue Coin */
-    /* oAction */
-    #define MOV_BCOIN_ACT_STILL                             0x0
-    #define MOV_BCOIN_ACT_MOVING                            0x1
-    #define MOV_BCOIN_ACT_SLOWING_DOWN                      0x2
-    #define MOV_BCOIN_ACT_STOPPED                           0x3
-    #define MOV_BCOIN_ACT_FLICKERING                        0x4
+enum oActionsMovingBlueCoin {
+    MOV_BCOIN_ACT_STILL,
+    MOV_BCOIN_ACT_MOVING,
+    MOV_BCOIN_ACT_SLOWING_DOWN,
+    MOV_BCOIN_ACT_STOPPED,
+    MOV_BCOIN_ACT_FLICKERING
+};
 
 /* Yellow Coin */
-    /* oBehParams2ndByte */
-    #define YELLOW_COIN_BP_ONE_COIN                         0x1
+enum oBehParams2ndByteYellowCoin {
+    YELLOW_COIN_BP_NO_COINS,
+    YELLOW_COIN_BP_ONE_COIN
+};
 
 /* Moving Yellow Coin */
-    /* oAction */
-    #define MOV_YCOIN_ACT_IDLE                              0x0
-    #define MOV_YCOIN_ACT_BLINKING                          0x1
-    /* oSubAction */
+enum oActionsMovingYellowCoin {
+    MOV_YCOIN_ACT_IDLE,
+    MOV_YCOIN_ACT_BLINKING
+};
 
 /* Coin Formation */
-    /* (oBehParams2ndByte & 0x7) */
-    #define COIN_FORMATION_BP_HORIZONTAL_LINE               0x0
-    #define COIN_FORMATION_BP_VERTICAL_LINE                 0x1
-    #define COIN_FORMATION_BP_HORIZONTAL_RING               0x2
-    #define COIN_FORMATION_BP_VERTICAL_RING                 0x3
-    #define COIN_FORMATION_BP_ARROW                         0x4
-    /* oAction */
-    #define COIN_FORMATION_ACT_INACTIVE                     0x0
-    #define COIN_FORMATION_ACT_ACTIVE                       0x1
-    #define COIN_FORMATION_ACT_DEACTIVATE                   0x2
+enum CoinFormationFlags {
+    COIN_FORMATION_FLAG_NONE     = (0 << 0),
+    COIN_FORMATION_FLAG_VERTICAL = (1 << 0),
+    COIN_FORMATION_FLAG_RING     = (1 << 1),
+    COIN_FORMATION_FLAG_ARROW    = (1 << 2),
+    COIN_FORMATION_FLAG_FLYING   = (1 << 4),
+};
+enum oBehParams2ndByteCoinFormation {
+    COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE = (COIN_FORMATION_FLAG_NONE),
+    COIN_FORMATION_BP_SHAPE_VERTICAL_LINE   = (COIN_FORMATION_FLAG_VERTICAL),
+    COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING = (COIN_FORMATION_FLAG_RING),
+    COIN_FORMATION_BP_SHAPE_VERTICAL_RING   = (COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL),
+    COIN_FORMATION_BP_SHAPE_ARROW           = (COIN_FORMATION_FLAG_ARROW),
+    COIN_FORMATION_BP_SHAPE_MASK = 0x07,
+    COIN_FORMATION_BP_FLYING     = 0x10
+};
+enum oActionsCoinFormation {
+    COIN_FORMATION_ACT_INACTIVE,
+    COIN_FORMATION_ACT_ACTIVE,
+    COIN_FORMATION_ACT_DEACTIVATE
+};
 
 /* Coin Inside Boo */
-    /* oAction */
-    #define COIN_INSIDE_BOO_ACT_CARRIED                     0x0
-    #define COIN_INSIDE_BOO_ACT_DROPPED                     0x1
+enum oBehParam1stByteCoinInsideBoo {
+    COIN_INSIDE_BOO_BP_BLUE_COIN,
+    COIN_INSIDE_BOO_BP_YELLOW_COIN,
+};
+enum oActionsCoinInsideBoo {
+    COIN_INSIDE_BOO_ACT_CARRIED,
+    COIN_INSIDE_BOO_ACT_DROPPED
+};
 
 /* 1-Up Mushroom */
-    /* oBehParams2ndByte */
-    #define MUSHROOM_BP_REQUIRES_NONE                       0x0
-    #define MUSHROOM_BP_REQUIRES_BOWSER_1                   0x1
-    #define MUSHROOM_BP_REQUIRES_BOWSER_2                   0x2
-    /* oAction */
-    #define MUSHROOM_ACT_INIT                               0x0
-    #define MUSHROOM_ACT_MOVING                             0x1
-    #define MUSHROOM_ACT_DISAPPEARING                       0x2
-    #define MUSHROOM_ACT_LOOP_IN_AIR                        0x3
+enum oBehParams2ndByte1UpMushroom {
+    MUSHROOM_BP_REQUIRES_NONE,
+    MUSHROOM_BP_REQUIRES_BOWSER_1,
+    MUSHROOM_BP_REQUIRES_BOWSER_2
+};
+enum oActions1UpMushroom {
+    MUSHROOM_ACT_INIT,
+    MUSHROOM_ACT_MOVING,
+    MUSHROOM_ACT_DISAPPEARING,
+    MUSHROOM_ACT_LOOP_IN_AIR
+};
 
 /* Bob-omb */
-    /* oBehParams2ndByte */
-    #define BOBOMB_BP_STYPE_GENERIC                         0x0
-    #define BOBOMB_BP_STYPE_STATIONARY                      0x1
-    /* oAction */
-    #define BOBOMB_ACT_PATROL                               0x0
-    #define BOBOMB_ACT_LAUNCHED                             0x1
-    #define BOBOMB_ACT_CHASE_MARIO                          0x2
-    #define BOBOMB_ACT_EXPLODE                              0x3
-    /* oAnimState */
-    #define BOBOMB_ANIM_STATE_EYES_OPEN                     OBJ_BLINKING_ANIM_STATE_EYES_OPEN
-    #define BOBOMB_ANIM_STATE_EYES_CLOSED                   OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
-    /* Animations */
-    #define BOBOMB_ANIM_WALKING                             0x0
-    #define BOBOMB_ANIM_HELD                                0x1
+enum oBehParams2ndByteBobOmb {
+    BOBOMB_BP_STYPE_GENERIC,
+    BOBOMB_BP_STYPE_STATIONARY
+};
+enum oActionsBobOmb {
+    BOBOMB_ACT_PATROL,
+    BOBOMB_ACT_LAUNCHED,
+    BOBOMB_ACT_CHASE_MARIO,
+    BOBOMB_ACT_EXPLODE
+};
+enum AnimIDsBobOmb {
+    BOBOMB_ANIM_WALKING,
+    BOBOMB_ANIM_HELD
+};
 
 /* Bob-omb Buddy */
-    /* oBehParams2ndByte */
-    #define BOBOMB_BUDDY_BP_STYPE_GENERIC                   0x0
-    #define BOBOMB_BUDDY_BP_STYPE_BOB_GRASS_KBB             0x1
-    #define BOBOMB_BUDDY_BP_STYPE_BOB_CANNON_KBB            0x2
-    #define BOBOMB_BUDDY_BP_STYPE_BOB_GRASS                 0x3
-    /* oAction */
-    #define BOBOMB_BUDDY_ACT_IDLE                           0x0
-    #define BOBOMB_BUDDY_ACT_TURN_TO_TALK                   0x2
-    #define BOBOMB_BUDDY_ACT_TALK                           0x3
-    /* oBobombBuddyRole */
-    #define BOBOMB_BUDDY_ROLE_ADVICE                        0x0
-    #define BOBOMB_BUDDY_ROLE_CANNON                        0x1
-    /* oBobombBuddyCannonStatus */
-    #define BOBOMB_BUDDY_CANNON_UNOPENED                    0x0
-    #define BOBOMB_BUDDY_CANNON_OPENING                     0x1
-    #define BOBOMB_BUDDY_CANNON_OPENED                      0x2
-    #define BOBOMB_BUDDY_CANNON_STOP_TALKING                0x3
-    /* oBobombBuddyHasTalkedToMario */
-    #define BOBOMB_BUDDY_HAS_NOT_TALKED                     0x0
-    #define BOBOMB_BUDDY_HAS_TALKED                         0x2
+enum oBehParams2ndByteBobOmbBuddy {
+    BOBOMB_BUDDY_BP_STYPE_GENERIC,
+    BOBOMB_BUDDY_BP_STYPE_BOB_GRASS_KBB,
+    BOBOMB_BUDDY_BP_STYPE_BOB_CANNON_KBB,
+    BOBOMB_BUDDY_BP_STYPE_BOB_GRASS
+};
+enum oActionsBobOmbBuddy {
+    BOBOMB_BUDDY_ACT_IDLE,
+    BOBOMB_BUDDY_ACT_1,
+    BOBOMB_BUDDY_ACT_TURN_TO_TALK,
+    BOBOMB_BUDDY_ACT_TALK
+};
+enum oBobombBuddyRoles {
+    BOBOMB_BUDDY_ROLE_ADVICE,
+    BOBOMB_BUDDY_ROLE_CANNON
+};
+enum oBobombBuddyCannonStatuses {
+    BOBOMB_BUDDY_CANNON_UNOPENED,
+    BOBOMB_BUDDY_CANNON_OPENING,
+    BOBOMB_BUDDY_CANNON_OPENED,
+    BOBOMB_BUDDY_CANNON_STOP_TALKING
+};
+enum oBobombBuddyHasTalkedToMarioStates {
+    BOBOMB_BUDDY_HAS_NOT_TALKED,
+    BOBOMB_BUDDY_TALKED_STATE_UNUSED,
+    BOBOMB_BUDDY_HAS_TALKED
+};
 
 /* Bowser */
-    /* oBehParams2ndByte */
-    #define BOWSER_BP_BITDW                                 0x0
-    #define BOWSER_BP_BITFS                                 0x1
-    #define BOWSER_BP_BITS                                  0x2
-    /* Tail oAction */
-    #define BOWSER_ACT_TAIL_DEFAULT                         0x00
-    #define BOWSER_ACT_TAIL_THROWN                          0x01
-    #define BOWSER_ACT_TAIL_TOUCHED_MARIO                   0x02
-    /* oAction */
-    #define BOWSER_ACT_DEFAULT                              0x00
-    #define BOWSER_ACT_THROWN                               0x01
-    #define BOWSER_ACT_JUMP_ONTO_STAGE                      0x02
-    #define BOWSER_ACT_DANCE                                0x03
-    #define BOWSER_ACT_DEAD                                 0x04
-    #define BOWSER_ACT_WAIT                                 0x05
-    #define BOWSER_ACT_INTRO_WALK                           0x06
-    #define BOWSER_ACT_CHARGE_MARIO                         0x07
-    #define BOWSER_ACT_SPIT_FIRE_INTO_SKY                   0x08
-    #define BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR                 0x09
-    #define BOWSER_ACT_HIT_EDGE                             0x0A
-    #define BOWSER_ACT_TURN_FROM_EDGE                       0x0B
-    #define BOWSER_ACT_HIT_MINE                             0x0C
-    #define BOWSER_ACT_BIG_JUMP                             0x0D
-    #define BOWSER_ACT_WALK_TO_MARIO                        0x0E
-    #define BOWSER_ACT_BREATH_FIRE                          0x0F
-    #define BOWSER_ACT_TELEPORT                             0x10
-    #define BOWSER_ACT_QUICK_JUMP                           0x11
-    #define BOWSER_ACT_UNUSED_SLOW_WALK                     0x12
-    #define BOWSER_ACT_TILT_LAVA_PLATFORM                   0x13
-    /* oAnimState */
-    #define BOWSER_ANIM_STATE_OPAQUE                        TRANSPARENCY_ANIM_STATE_OPAQUE
-    #define BOWSER_ANIM_STATE_TRANSPARENT                   TRANSPARENCY_ANIM_STATE_TRANSPARENT
-    #define BOWSER_ANIM_STATE_INVISIBLE                     0x02
-    /* Animations */
-    #define BOWSER_ANIM_STAND_UP                            0x00
-    #define BOWSER_ANIM_STAND_UP_UNUSED                     0x01 // slightly different
-    #define BOWSER_ANIM_SHAKING                             0x02
-    #define BOWSER_ANIM_GRABBED                             0x03
-    #define BOWSER_ANIM_BROKEN                              0x04 // broken animation
-    #define BOWSER_ANIM_FALL_DOWN                           0x05 // unused
-    #define BOWSER_ANIM_BREATH                              0x06
-    #define BOWSER_ANIM_JUMP                                0x07 // unused, short jump, replaced by start/stop
-    #define BOWSER_ANIM_JUMP_STOP                           0x08
-    #define BOWSER_ANIM_JUMP_START                          0x09
-    #define BOWSER_ANIM_DANCE                               0x0A
-    #define BOWSER_ANIM_BREATH_UP                           0x0B
-    #define BOWSER_ANIM_IDLE                                0x0C
-    #define BOWSER_ANIM_SLOW_GAIT                           0x0D
-    #define BOWSER_ANIM_LOOK_DOWN_STOP_WALK                 0x0E
-    #define BOWSER_ANIM_LOOK_UP_START_WALK                  0x0F
-    #define BOWSER_ANIM_FLIP_DOWN                           0x10
-    #define BOWSER_ANIM_LAY_DOWN                            0x11
-    #define BOWSER_ANIM_RUN_START                           0x12
-    #define BOWSER_ANIM_RUN                                 0x13
-    #define BOWSER_ANIM_RUN_STOP                            0x14
-    #define BOWSER_ANIM_RUN_SLIP                            0x15
-    #define BOWSER_ANIM_BREATH_QUICK                        0x16
-    #define BOWSER_ANIM_EDGE_MOVE                           0x17
-    #define BOWSER_ANIM_EDGE_STOP                           0x18
-    #define BOWSER_ANIM_FLIP                                0x19
-    #define BOWSER_ANIM_STAND_UP_FROM_FLIP                  0x1A
-    /* oBowserCamAct */
-    #define BOWSER_CAM_ACT_IDLE                             0x0
-    #define BOWSER_CAM_ACT_WALK                             0x1
-    #define BOWSER_CAM_ACT_END                              0x2
-    /* oBowserStatus */
-    #define BOWSER_STATUS_ANGLE_MARIO                       (1 <<  1) // 0x00000002
-    #define BOWSER_STATUS_ANGLE_CENTRE                      (1 <<  2) // 0x00000004
-    #define BOWSER_STATUS_DIST_MARIO                        (1 <<  3) // 0x00000008
-    #define BOWSER_STATUS_DIST_CENTRE                       (1 <<  4) // 0x00000010
-    #define BOWSER_STATUS_BIG_JUMP                          (1 << 16) // 0x00010000
-    #define BOWSER_STATUS_FIRE_SKY                          (1 << 17) // 0x00020000
-    /* oBowserGrabbedStatus */
-    #define BOWSER_GRAB_STATUS_NONE                         0x0
-    #define BOWSER_GRAB_STATUS_GRABBED                      0x1
-    #define BOWSER_GRAB_STATUS_HOLDING                      0x2
+enum oBehParams2ndByteBowser {
+    BOWSER_BP_BITDW,
+    BOWSER_BP_BITFS,
+    BOWSER_BP_BITS
+};
+enum oActionsBowserTail {
+    BOWSER_ACT_TAIL_DEFAULT,
+    BOWSER_ACT_TAIL_THROWN,
+    BOWSER_ACT_TAIL_TOUCHED_MARIO
+};
+enum oActionsBowser {
+    BOWSER_ACT_DEFAULT,
+    BOWSER_ACT_THROWN,
+    BOWSER_ACT_JUMP_ONTO_STAGE,
+    BOWSER_ACT_DANCE,
+    BOWSER_ACT_DEAD,
+    BOWSER_ACT_WAIT,
+    BOWSER_ACT_INTRO_WALK,
+    BOWSER_ACT_CHARGE_MARIO,
+    BOWSER_ACT_SPIT_FIRE_INTO_SKY,
+    BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR,
+    BOWSER_ACT_HIT_EDGE,
+    BOWSER_ACT_TURN_FROM_EDGE,
+    BOWSER_ACT_HIT_MINE,
+    BOWSER_ACT_BIG_JUMP,
+    BOWSER_ACT_WALK_TO_MARIO,
+    BOWSER_ACT_BREATH_FIRE,
+    BOWSER_ACT_TELEPORT,
+    BOWSER_ACT_QUICK_JUMP,
+    BOWSER_ACT_UNUSED_SLOW_WALK,
+    BOWSER_ACT_TILT_LAVA_PLATFORM,
+};
+enum oAnimStatesBowser {
+    BOWSER_ANIM_STATE_OPAQUE      = TRANSPARENCY_ANIM_STATE_OPAQUE,
+    BOWSER_ANIM_STATE_TRANSPARENT = TRANSPARENCY_ANIM_STATE_TRANSPARENT,
+    BOWSER_ANIM_STATE_INVISIBLE   = 0x02,
+};
+enum animIDsBowser {
+    BOWSER_ANIM_STAND_UP,
+    BOWSER_ANIM_STAND_UP_UNUSED, // slightly different
+    BOWSER_ANIM_SHAKING,
+    BOWSER_ANIM_GRABBED,
+    BOWSER_ANIM_BROKEN,          // broken animation
+    BOWSER_ANIM_FALL_DOWN,       // unused
+    BOWSER_ANIM_BREATH,
+    BOWSER_ANIM_JUMP,            // unused, short jump, replaced by start/stop
+    BOWSER_ANIM_JUMP_STOP,
+    BOWSER_ANIM_JUMP_START,
+    BOWSER_ANIM_DANCE,
+    BOWSER_ANIM_BREATH_UP,
+    BOWSER_ANIM_IDLE,
+    BOWSER_ANIM_SLOW_GAIT,
+    BOWSER_ANIM_LOOK_DOWN_STOP_WALK,
+    BOWSER_ANIM_LOOK_UP_START_WALK,
+    BOWSER_ANIM_FLIP_DOWN,
+    BOWSER_ANIM_LAY_DOWN,
+    BOWSER_ANIM_RUN_START,
+    BOWSER_ANIM_RUN,
+    BOWSER_ANIM_RUN_STOP,
+    BOWSER_ANIM_RUN_SLIP,
+    BOWSER_ANIM_BREATH_QUICK,
+    BOWSER_ANIM_EDGE_MOVE,
+    BOWSER_ANIM_EDGE_STOP,
+    BOWSER_ANIM_FLIP,
+    BOWSER_ANIM_STAND_UP_FROM_FLIP,
+};
+enum oBowserCamActions {
+    BOWSER_CAM_ACT_IDLE,
+    BOWSER_CAM_ACT_WALK,
+    BOWSER_CAM_ACT_END
+};
+enum oBowserStatuses {
+    BOWSER_STATUS_ANGLE_MARIO  = (1 <<  1), // 0x00000002
+    BOWSER_STATUS_ANGLE_CENTER = (1 <<  2), // 0x00000004
+    BOWSER_STATUS_DIST_MARIO   = (1 <<  3), // 0x00000008
+    BOWSER_STATUS_DIST_CENTER  = (1 <<  4), // 0x00000010
+    BOWSER_STATUS_BIG_JUMP     = (1 << 16), // 0x00010000
+    BOWSER_STATUS_FIRE_SKY     = (1 << 17), // 0x00020000
+};
+enum oBowserGrabbedStatuses {
+    BOWSER_GRAB_STATUS_NONE,
+    BOWSER_GRAB_STATUS_GRABBED,
+    BOWSER_GRAB_STATUS_HOLDING
+};
     /* oSubAction */
-        /* BOWSER_ACT_THROWN */
-    #define BOWSER_SUB_ACT_THROWN_BOUNCE                    0x0
-    #define BOWSER_SUB_ACT_THROWN_STOP                      0x1
-        /* BOWSER_ACT_DEAD */
-    #define BOWSER_SUB_ACT_DEAD_FLY_BACK                    0x0
-    #define BOWSER_SUB_ACT_DEAD_BOUNCE                      0x1
-    #define BOWSER_SUB_ACT_DEAD_WAIT                        0x2
-    #define BOWSER_SUB_ACT_DEAD_DEFAULT_END                 0x3
-    #define BOWSER_SUB_ACT_DEAD_DEFAULT_END_OVER            0x4
-    #define BOWSER_SUB_ACT_DEAD_FINAL_END                   0xA
-    #define BOWSER_SUB_ACT_DEAD_FINAL_END_OVER              0xB
-        /* BOWSER_ACT_INTRO_WALK */
-    #define BOWSER_SUB_ACT_INTRO_WALK_LOOK_UP               0x0
-    #define BOWSER_SUB_ACT_INTRO_WALK_SLOWLY                0x1
-    #define BOWSER_SUB_ACT_INTRO_WALK_STOP                  0x2
-        /* BOWSER_ACT_CHARGE_MARIO */
-    #define BOWSER_SUB_ACT_CHARGE_START                     0x0
-    #define BOWSER_SUB_ACT_CHARGE_RUN                       0x1
-    #define BOWSER_SUB_ACT_CHARGE_END                       0x2
-    #define BOWSER_SUB_ACT_CHARGE_SLIP                      0x3
-        /* BOWSER_ACT_TELEPORT */
-    #define BOWSER_SUB_ACT_TELEPORT_START                   0x0
-    #define BOWSER_SUB_ACT_TELEPORT_MOVE                    0x1
-    #define BOWSER_SUB_ACT_TELEPORT_STOP                    0x2
-        /* BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR */
-    #define BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_START            0x0
-    #define BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_STOP             0x1
-        /* BOWSER_ACT_HIT_EDGE */
-    #define BOWSER_SUB_ACT_HIT_EDGE_START                   0x0
-    #define BOWSER_SUB_ACT_HIT_EDGE_STOP                    0x1
-        /* BOWSER_ACT_TURN_FROM_EDGE */
-    #define BOWSER_SUB_ACT_TURN_FROM_EDGE_START             0x0
-    #define BOWSER_SUB_ACT_TURN_FROM_EDGE_STOP              0x1
-    #define BOWSER_SUB_ACT_TURN_FROM_EDGE_END               0x2
-        /* BOWSER_ACT_HIT_MINE */
-    #define BOWSER_SUB_ACT_HIT_MINE_START                   0x0
-    #define BOWSER_SUB_ACT_HIT_MINE_FALL                    0x1
-    #define BOWSER_SUB_ACT_HIT_MINE_STOP                    0x2
-        /* BOWSER_ACT_JUMP_ONTO_STAGE */
-    #define BOWSER_SUB_ACT_JUMP_ON_STAGE_IDLE               0x0
-    #define BOWSER_SUB_ACT_JUMP_ON_STAGE_START              0x1
-    #define BOWSER_SUB_ACT_JUMP_ON_STAGE_LAND               0x2
-    #define BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP               0x3
-        /* BOWSER_ACT_BIG_JUMP */
-    #define BOWSER_SUB_ACT_BIG_JUMP_START                   0x0
-    #define BOWSER_SUB_ACT_BIG_JUMP_LAND                    0x1
-    #define BOWSER_SUB_ACT_BIG_JUMP_STOP                    0x2
-        /* BOWSER_ACT_WALK_TO_MARIO */
-    #define BOWSER_SUB_ACT_WALK_TO_MARIO_START              0x0
-    #define BOWSER_SUB_ACT_WALK_TO_MARIO_WALKING            0x1
-    #define BOWSER_SUB_ACT_WALK_TO_MARIO_STOP               0x2
-        /* BOWSER_ACT_QUICK_JUMP */
-    #define BOWSER_SUB_ACT_QUICK_JUMP_START                 0x0
-    #define BOWSER_SUB_ACT_QUICK_JUMP_LAND                  0x1
-    #define BOWSER_SUB_ACT_QUICK_JUMP_STOP                  0x2
+enum oSubActionBowserActThrown { // BOWSER_ACT_THROWN
+    BOWSER_SUB_ACT_THROWN_BOUNCE,
+    BOWSER_SUB_ACT_THROWN_STOP
+};
+enum oSubActionBowserActDead { // BOWSER_ACT_DEAD
+    BOWSER_SUB_ACT_DEAD_FLY_BACK,
+    BOWSER_SUB_ACT_DEAD_BOUNCE,
+    BOWSER_SUB_ACT_DEAD_WAIT,
+    BOWSER_SUB_ACT_DEAD_DEFAULT_END,
+    BOWSER_SUB_ACT_DEAD_DEFAULT_END_OVER,
+    BOWSER_SUB_ACT_DEAD_FINAL_END = 0xA,
+    BOWSER_SUB_ACT_DEAD_FINAL_END_OVER
+};
+enum oSubActionBowserActIntroWalk { // BOWSER_ACT_INTRO_WALK
+    BOWSER_SUB_ACT_INTRO_WALK_LOOK_UP,
+    BOWSER_SUB_ACT_INTRO_WALK_SLOWLY,
+    BOWSER_SUB_ACT_INTRO_WALK_STOP
+};
+enum oSubActionBowserActChargeMario { // BOWSER_ACT_CHARGE_MARIO
+    BOWSER_SUB_ACT_CHARGE_START,
+    BOWSER_SUB_ACT_CHARGE_RUN,
+    BOWSER_SUB_ACT_CHARGE_END,
+    BOWSER_SUB_ACT_CHARGE_SLIP
+};
+enum oSubActionBowserActTeleport { // BOWSER_ACT_TELEPORT
+    BOWSER_SUB_ACT_TELEPORT_START,
+    BOWSER_SUB_ACT_TELEPORT_MOVE,
+    BOWSER_SUB_ACT_TELEPORT_STOP
+};
+enum oSubActionBowserActSpitFireOntoFloor { // BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR
+    BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_START,
+    BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_STOP
+};
+enum oSubActionBowserActHitEdge { // BOWSER_ACT_HIT_EDGE
+    BOWSER_SUB_ACT_HIT_EDGE_START,
+    BOWSER_SUB_ACT_HIT_EDGE_STOP
+};
+enum oSubActionBowserActTurnFromEdge { // BOWSER_ACT_TURN_FROM_EDGE
+    BOWSER_SUB_ACT_TURN_FROM_EDGE_START,
+    BOWSER_SUB_ACT_TURN_FROM_EDGE_STOP,
+    BOWSER_SUB_ACT_TURN_FROM_EDGE_END
+};
+enum oSubActionBowserActHitMine { // BOWSER_ACT_HIT_MINE
+    BOWSER_SUB_ACT_HIT_MINE_START,
+    BOWSER_SUB_ACT_HIT_MINE_FALL,
+    BOWSER_SUB_ACT_HIT_MINE_STOP
+};
+enum oSubActionBowserActJumpOntoStage { // BOWSER_ACT_JUMP_ONTO_STAGE
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_IDLE,
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_START,
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_LAND,
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP
+};
+enum oSubActionBowserActBigJump { // BOWSER_ACT_BIG_JUMP
+    BOWSER_SUB_ACT_BIG_JUMP_START,
+    BOWSER_SUB_ACT_BIG_JUMP_LAND,
+    BOWSER_SUB_ACT_BIG_JUMP_STOP
+};
+enum oSubActionBowserActWalkToMario { // BOWSER_ACT_WALK_TO_MARIO
+    BOWSER_SUB_ACT_WALK_TO_MARIO_START,
+    BOWSER_SUB_ACT_WALK_TO_MARIO_WALKING,
+    BOWSER_SUB_ACT_WALK_TO_MARIO_STOP
+};
+enum oSubActionBowserActQuickJump { // BOWSER_ACT_QUICK_JUMP
+    BOWSER_SUB_ACT_QUICK_JUMP_START,
+    BOWSER_SUB_ACT_QUICK_JUMP_LAND,
+    BOWSER_SUB_ACT_QUICK_JUMP_STOP
+};
 
 /* Bowser BITS Platform */
     /* oAction */
@@ -590,50 +762,65 @@
     #define JUMPING_BOX_SUB_ACT_IDLE_RESET_TIMER            0x1
 
 /* Exclamation Box */
-    /* oBehParams2ndByte, ExclamationBoxContents->id */
-    #define EXCLAMATION_BOX_BP_WING_CAP                     0x0
-    #define EXCLAMATION_BOX_BP_METAL_CAP                    0x1
-    #define EXCLAMATION_BOX_BP_VANISH_CAP                   0x2
-    #define EXCLAMATION_BOX_BP_KOOPA_SHELL                  0x3
-    #define EXCLAMATION_BOX_BP_COINS_1                      0x4
-    #define EXCLAMATION_BOX_BP_COINS_3                      0x5
-    #define EXCLAMATION_BOX_BP_COINS_10                     0x6
-    #define EXCLAMATION_BOX_BP_1UP_WALKING                  0x7
-    #define EXCLAMATION_BOX_BP_STAR_1                       0x8
-    #define EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY             0x9
-    #define EXCLAMATION_BOX_BP_STAR_2                       0xA
-    #define EXCLAMATION_BOX_BP_STAR_3                       0xB
-    #define EXCLAMATION_BOX_BP_STAR_4                       0xC
-    #define EXCLAMATION_BOX_BP_STAR_5                       0xD
-    #define EXCLAMATION_BOX_BP_STAR_6                       0xE
-    #define EXCLAMATION_BOX_BP_NULL                         0x63
-    /* oAction */
-    #define EXCLAMATION_BOX_ACT_INIT                        0x0
-    #define EXCLAMATION_BOX_ACT_OUTLINE                     0x1
-    #define EXCLAMATION_BOX_ACT_ACTIVE                      0x2
-    #define EXCLAMATION_BOX_ACT_SCALING                     0x3
-    #define EXCLAMATION_BOX_ACT_EXPLODE                     0x4
-    #define EXCLAMATION_BOX_ACT_WAIT_FOR_RESPAWN            0x5
-    /* oAnimState */
-    #define EXCLAMATION_BOX_ANIM_STATE_RED                  0x0
-    #define EXCLAMATION_BOX_ANIM_STATE_GREEN                0x1
-    #define EXCLAMATION_BOX_ANIM_STATE_BLUE                 0x2
-    #define EXCLAMATION_BOX_ANIM_STATE_YELLOW               0x3
+enum ExclamationBoxContentsList { // oBehParams2ndByte, ExclamationBoxContents->id
+    EXCLAMATION_BOX_BP_WING_CAP,
+    EXCLAMATION_BOX_BP_METAL_CAP,
+    EXCLAMATION_BOX_BP_VANISH_CAP,
+    EXCLAMATION_BOX_BP_KOOPA_SHELL,
+    EXCLAMATION_BOX_BP_COINS_1,
+    EXCLAMATION_BOX_BP_COINS_3,
+    EXCLAMATION_BOX_BP_COINS_10,
+    EXCLAMATION_BOX_BP_1UP_WALKING,
+    EXCLAMATION_BOX_BP_STAR_1,
+    EXCLAMATION_BOX_BP_1UP_RUNNING_AWAY,
+    EXCLAMATION_BOX_BP_STAR_2,
+    EXCLAMATION_BOX_BP_STAR_3,
+    EXCLAMATION_BOX_BP_STAR_4,
+    EXCLAMATION_BOX_BP_STAR_5,
+    EXCLAMATION_BOX_BP_STAR_6,
+    EXCLAMATION_BOX_BP_NULL = 99
+};
+enum oBehParam1stByteExclamationBox {
+    EXCLAMATION_BOX_BP1_NEEDS_SWITCH,
+    EXCLAMATION_BOX_BP1_ALWAYS_ACTIVE,
+};
+enum oActionsExclamationBox {
+    EXCLAMATION_BOX_ACT_INIT,
+    EXCLAMATION_BOX_ACT_OUTLINE,
+    EXCLAMATION_BOX_ACT_ACTIVE,
+    EXCLAMATION_BOX_ACT_SCALING,
+    EXCLAMATION_BOX_ACT_EXPLODE,
+    EXCLAMATION_BOX_ACT_WAIT_FOR_RESPAWN
+};
+enum oAnimStatesExcalamationBox {
+    EXCLAMATION_BOX_ANIM_STATE_RED,
+    EXCLAMATION_BOX_ANIM_STATE_GREEN,
+    EXCLAMATION_BOX_ANIM_STATE_BLUE,
+    EXCLAMATION_BOX_ANIM_STATE_YELLOW
+};
 
 /* Cap Switch */
-    /* oAction */
-    #define CAP_SWITCH_ACT_INIT                             0x0
-    #define CAP_SWITCH_ACT_IDLE                             0x1
-    #define CAP_SWITCH_ACT_BEING_PRESSED                    0x2
-    #define CAP_SWITCH_ACT_DONE                             0x3
+enum oBehParams2ndByteCapSwitch {
+    CAP_SWITCH_BP_WING_CAP,
+    CAP_SWITCH_BP_METAL_CAP,
+    CAP_SWITCH_BP_VANISH_CAP,
+    CAP_SWITCH_BP_YELLOW_CAP,
+};
+enum oActionsCapSwitch {
+    CAP_SWITCH_ACT_INIT,
+    CAP_SWITCH_ACT_IDLE_UNPRESSED,
+    CAP_SWITCH_ACT_BEING_PRESSED,
+    CAP_SWITCH_ACT_IDLE_PRESSED
+};
 
 /* Mario Cap */
-    /* oAction */
-    #define CAP_ACT_MOVE                                    0x0
-    #define CAP_ACT_QUICKSAND                               0xA
-    #define CAP_ACT_MOVING_QUICKSAND                        0xB
-    #define CAP_ACT_INSTANT_QUICKSAND                       0xC
-    #define CAP_ACT_INSTANT_MOVING_QUICKSAND                0xD
+enum oActionsMarioCap {
+    CAP_ACT_MOVE,
+    CAP_ACT_QUICKSAND = 0xA,
+    CAP_ACT_MOVING_QUICKSAND,
+    CAP_ACT_INSTANT_QUICKSAND,
+    CAP_ACT_INSTANT_MOVING_QUICKSAND,
+};
 
 /* Koopa Shell */
     /* oAction */
@@ -662,27 +849,33 @@
     #define OPENED_CANNON_ACT_TURNING_YAW                   0x6
 
 /* Door */
-    /* oAction */
-    #define DOOR_ACT_CLOSED                                 0x0
-    #define DOOR_ACT_PULLED                                 0x1
-    #define DOOR_ACT_PUSHED                                 0x2
-    #define DOOR_ACT_WARP_PULLED                            0x3
-    #define DOOR_ACT_WARP_PUSHED                            0x4
-    /* Animations */
-    #define DOOR_ANIM_CLOSED                                0x0
-    #define DOOR_ANIM_PULLED                                0x1
-    #define DOOR_ANIM_PUSHED                                0x2
-    #define DOOR_ANIM_WARP_PULLED                           0x3
-    #define DOOR_ANIM_WARP_PUSHED                           0x4
+enum oBehParams1stByteKeyDoor {
+    KEY_DOOR_BP1_BASEMENT,
+    KEY_DOOR_BP1_UPSTAIRS,
+};
+enum oActionsDoor {
+    DOOR_ACT_CLOSED,
+    DOOR_ACT_PULLED,
+    DOOR_ACT_PUSHED,
+    DOOR_ACT_WARP_PULLED,
+    DOOR_ACT_WARP_PUSHED,
+};
+enum animIDsDoor {
+    DOOR_ANIM_CLOSED,
+    DOOR_ANIM_PULLED,
+    DOOR_ANIM_PUSHED,
+    DOOR_ANIM_WARP_PULLED,
+    DOOR_ANIM_WARP_PUSHED,
+};
 
 /* Star Door */
-    /* oAction */
-    #define STAR_DOOR_ACT_CLOSED                            0x0
-    #define STAR_DOOR_ACT_OPENING                           0x1
-    #define STAR_DOOR_ACT_OPEN                              0x2
-    #define STAR_DOOR_ACT_CLOSING                           0x3
-    #define STAR_DOOR_ACT_RESET                             0x4
-
+enum oActionsStarDoor {
+    STAR_DOOR_ACT_CLOSED,
+    STAR_DOOR_ACT_OPENING,
+    STAR_DOOR_ACT_OPEN,
+    STAR_DOOR_ACT_CLOSING,
+    STAR_DOOR_ACT_RESET,
+};
 /* Castle Trap Door */
     /* oAction */
     #define CASTLE_FLOOR_TRAP_ACT_OPEN_DETECT               0x0
@@ -772,6 +965,17 @@
     /* oAction */
     #define JS_RING_SPAWNER_ACT_ACTIVE                      0x0
     #define JS_RING_SPAWNER_ACT_INACTIVE                    0x1
+
+/* Star General */
+enum oBehParam1stByteStarAct { // BPARAM1
+    STAR_BP_ACT_1,
+    STAR_BP_ACT_2,
+    STAR_BP_ACT_3,
+    STAR_BP_ACT_4,
+    STAR_BP_ACT_5,
+    STAR_BP_ACT_6,
+    STAR_BP_ACT_100_COINS,
+};
 
 /* Hidden Star */
     /* oAction */
@@ -914,18 +1118,20 @@
     #define WF_SLID_BRICK_PTFM_ACT_RETRACT                  0x2
 
 /* Sliding Platform */
-    #define SLIDING_PLATFORM_TYPE_MASK                      0x0380
-    #define SLIDING_PLATFORM_LENGTH_MASK                    0x003F
-    #define SLIDING_PLATFORM_DIRECTION_MASK                 0x0040
-    /* collisionDataIndex */
-    #define SLIDING_PLATFORM_BP_BITS_SLIDING_PLATFORM       0x0
-    #define SLIDING_PLATFORM_BP_BITS_TWIN_SLIDING_PLATFORMS 0x1
-    #define SLIDING_PLATFORM_BP_BITFS_MOVING_SQUARE         0x2
-    #define SLIDING_PLATFORM_BP_BITFS_SLIDING_PLATFORM      0x3
-    #define SLIDING_PLATFORM_BP_RR_SLIDING_PLATFORM         0x4
-    #define SLIDING_PLATFORM_BP_RR_PYRAMID                  0x5
-    #define SLIDING_PLATFORM_BP_NULL                        0x6
-    #define SLIDING_PLATFORM_BP_BITDW_SLIDING_PLATFORM      0x7
+enum oBehParams1stByteSlidingPlatform { // collisionDataIndex
+    /*0x00*/ SLIDING_PLATFORM_BP1_BITS_SLIDING_PLATFORM,
+    /*0x01*/ SLIDING_PLATFORM_BP1_BITS_TWIN_SLIDING_PLATFORMS,
+    /*0x02*/ SLIDING_PLATFORM_BP1_BITFS_MOVING_SQUARE,
+    /*0x03*/ SLIDING_PLATFORM_BP1_BITFS_SLIDING_PLATFORM,
+    /*0x04*/ SLIDING_PLATFORM_BP1_RR_SLIDING_PLATFORM,
+    /*0x05*/ SLIDING_PLATFORM_BP1_RR_PYRAMID,
+    /*0x06*/ SLIDING_PLATFORM_BP1_NULL,
+    /*0x07*/ SLIDING_PLATFORM_BP1_BITDW_SLIDING_PLATFORM,
+    /*0x07*/ SLIDING_PLATFORM_BP1_TYPES_MASK = 0x07,
+};
+    /* bparam2 */
+    #define SLIDING_PLATFORM_BP2_LENGTH_MASK                 0x3F
+    #define SLIDING_PLATFORM_BP2_FLAG_INVERTED               (1 << 6)
 
 /* BITDW Pyramid Platforms */
     /* oAction */
@@ -1173,20 +1379,38 @@
     #define ARROW_LIFT_ACT_MOVING_BACK                      0x2
 
 /* Toad */
-    /* Animations */
-    #define TOAD_ANIM_0                                     0x0 //! anim name
-    #define TOAD_ANIM_6                                     0x6 //! anim name
+enum animIDsToad {
+    TOAD_ANIM_WEST_WAVE_THEN_TURN, // 1 frame
+    TOAD_ANIM_WEST_WALKING,
+    TOAD_ANIM_EAST_NOD_THEN_TURN,  // 1 frame
+    TOAD_ANIM_EAST_WALKING,
+    TOAD_ANIM_WEST_STANDING,
+    TOAD_ANIM_EAST_STANDING,
+    TOAD_ANIM_WEST_WAVING_BOTH_ARMS,
+    TOAD_ANIM_EAST_WAVING_ONE_ARM,
+};
 
 /* Intro Peach */
-    /* oAction */
-    #define PEACH_ACT_INIT                                  0x0
-    #define PEACH_ACT_FADE_1                                0x1
-    #define PEACH_ACT_UNFADE                                0x2
-    #define PEACH_ACT_FADE_2                                0x3
-    /* Animations */
-    #define PEACH_ANIM_0                                    0x0 //! anim name
-
-/* Yoshi */
+enum oActionsIntroPeach {
+    PEACH_ACT_INIT,
+    PEACH_ACT_FADE_1,
+    PEACH_ACT_UNFADE,
+    PEACH_ACT_FADE_2,
+};
+enum animIDsPeach { //! TODO: anim names 0-3 & 6-8
+    PEACH_ANIM_0,
+    PEACH_ANIM_1,
+    PEACH_ANIM_2,
+    PEACH_ANIM_3,
+    PEACH_ANIM_DESCEND_FROM_WINDOW,
+    PEACH_ANIM_LOOK_UP_AND_OPEN_EYES,
+    PEACH_ANIM_DIALOG_1_PART_1,
+    PEACH_ANIM_DIALOG_1_PART_2,
+    PEACH_ANIM_DIALOG_1_PART_3,
+    PEACH_ANIM_THANKS_TO_YOU,
+    PEACH_ANIM_KISS,
+    PEACH_ANIM_WAVING,
+};
 
 /* Yoshi */
     /* oAction */
@@ -1202,6 +1426,13 @@
     #define YOSHI_ANIM_WALK                                 0x1
     #define YOSHI_ANIM_JUMP                                 0x2
 
+/* Koopa Race end waypoint */
+enum oKoopaRaceEndpointRaceStatuses {
+    KOOPA_RACE_ENDPOINT_STATUS_MARIO_CHEATED = -1,
+    KOOPA_RACE_ENDPOINT_STATUS_KOOPA_WON     =  0,
+    KOOPA_RACE_ENDPOINT_STATUS_MARIO_WON     =  1,
+};
+
 /* Koopa (General) */
     /* oBehParams2ndByte */
     #define KOOPA_BP_UNSHELLED                              0x0
@@ -1210,9 +1441,6 @@
     #define KOOPA_BP_KOOPA_THE_QUICK_BOB                    (KOOPA_BP_KOOPA_THE_QUICK_BASE + KOOPA_THE_QUICK_BOB_INDEX)
     #define KOOPA_BP_KOOPA_THE_QUICK_THI                    (KOOPA_BP_KOOPA_THE_QUICK_BASE + KOOPA_THE_QUICK_THI_INDEX)
     #define KOOPA_BP_TINY                                   0x4
-    /* oAnimState */
-    #define KOOPA_ANIM_STATE_EYES_OPEN                      OBJ_BLINKING_ANIM_STATE_EYES_OPEN
-    #define KOOPA_ANIM_STATE_EYES_CLOSED                    OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
     /* Animations */
     #define KOOPA_ANIM_SHELLED_UNUSED3                      0x0
     #define KOOPA_ANIM_SHELLED_RUN_AWAY                     0x1
@@ -1285,12 +1513,18 @@
     #define POKEY_PART_BP_LOWEST                            (POKEY_NUM_SEGMENTS - 0x1)
 
 /* Swoop */
-    /* oAction */
-    #define SWOOP_ACT_IDLE                                  0x0
-    #define SWOOP_ACT_MOVE                                  0x1
-    /* Animations */
-    #define SWOOP_ANIM_FLY                                  0x0
-    #define SWOOP_ANIM_IDLE                                 0x1
+enum oBehParams2ndByteSwoop {
+    SWOOP_BP_0,
+    SWOOP_BP_1,
+};
+enum oActionsSwoop {
+    SWOOP_ACT_IDLE,
+    SWOOP_ACT_MOVE,
+};
+enum animIDsSwoop {
+    SWOOP_ANIM_FLY,
+    SWOOP_ANIM_IDLE,
+};
 
 /* Fly guy */
     /* oBehParams2ndByte */
@@ -1306,26 +1540,37 @@
 
 /* Goomba triplet spawner */
     /* oBehParams2ndByte */
-    #define GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK             0x00000003
-    #define GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK    0x000000FC
+    #define GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK             0x03
+    #define GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK    0xFC
     /* oAction */
     #define GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED             0x0
     #define GOOMBA_TRIPLET_SPAWNER_ACT_LOADED               0x1
 
 /* Goomba */
     /* oBehParams2ndByte */
-    #define GOOMBA_SIZE_REGULAR                             0x0
-    #define GOOMBA_SIZE_HUGE                                0x1
-    #define GOOMBA_SIZE_TINY                                0x2
-    #define GOOMBA_BP_SIZE_MASK                             0x3
-    #define GOOMBA_BP_TRIPLET_FLAG_MASK                     0x000000FC
+    #define GOOMBA_SIZE_REGULAR                             0x00
+    #define GOOMBA_SIZE_HUGE                                0x01
+    #define GOOMBA_SIZE_TINY                                0x02
+    #define GOOMBA_BP_SIZE_MASK                             0x03
+    #define GOOMBA_BP_TRIPLET_FLAG_MASK                     0xFC
+#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+    /* BPARAM3 */
+    #define GOOMBA_BP3_FLOOMBA_MIRRORED_STARTUP_ANIM        (1 << 7)
+#endif
     /* oAction */
     #define GOOMBA_ACT_WALK                                 0x0
     #define GOOMBA_ACT_ATTACKED_MARIO                       0x1
     #define GOOMBA_ACT_JUMP                                 0x2
+#if defined(HD_INTRO_TEXTURES) && defined(FLOOMBAS)
+    #define FLOOMBA_ACT_STARTUP                             0x3
+#endif
     /* oAnimState */
     #define GOOMBA_ANIM_STATE_EYES_OPEN                     OBJ_BLINKING_ANIM_STATE_EYES_OPEN
     #define GOOMBA_ANIM_STATE_EYES_CLOSED                   OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
+#ifdef FLOOMBAS
+    #define FLOOMBA_ANIM_STATE_EYES_OPEN                    (OBJ_BLINKING_ANIM_STATE_EYES_OPEN + 2)
+    #define FLOOMBA_ANIM_STATE_EYES_CLOSED                  (OBJ_BLINKING_ANIM_STATE_EYES_CLOSED + 2)
+#endif
     /* Animations */
     #define GOOMBA_ANIM_DEFAULT                             0x0
 
@@ -1354,7 +1599,6 @@
 
 /* Wooden post */
     /* oBehParams */
-    #define WOODEN_POST_BP_NO_COINS_MASK                    0x0000FF00
 
 /* Wiggler */
     /* oAction */
@@ -1416,7 +1660,7 @@
     #define INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2         0x65
     #define INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_3         0x66
     /* Animations */
-    #define INTRO_LAKITU_ACT_DEFAULT                        0x0
+    #define INTRO_LAKITU_ANIM_DEFAULT                       0x0
 
 /* Camera Lakitu */
     /* oBehParams2ndByte */
@@ -1448,6 +1692,7 @@
 /* Monty mole */
     /* oBehParams2ndByte */
     #define MONTY_MOLE_BP_NO_ROCK                           0x0
+    #define MONTY_MOLE_BP_ROCK                              0x1
     /* oAction */
     #define MONTY_MOLE_ACT_SELECT_HOLE                      0x0
     #define MONTY_MOLE_ACT_RISE_FROM_HOLE                   0x1
@@ -1476,8 +1721,8 @@
 
 /* Ukiki */
     /* oBehParams2ndByte */
-    #define UKIKI_CAGE                                      0x0
-    #define UKIKI_CAP                                       0x1
+    #define UKIKI_BP_CAGE                                   0x0
+    #define UKIKI_BP_CAP                                    0x1
     /* oAction */
     #define UKIKI_ACT_IDLE                                  0x0
     #define UKIKI_ACT_RUN                                   0x1
@@ -1534,7 +1779,8 @@
     #define UKIKI_ANIM_STATE_EYE_CLOSED                     0x1
     #define UKIKI_ANIM_STATE_CAP_ON                         0x2
     /* oUkikiHasCap */
-    #define UKIKI_CAP_ON                                    0x1 //!
+    #define UKIKI_CAP_OFF                                   0x0
+    #define UKIKI_CAP_ON                                    0x1
 
 /* Ukiki Cage Star */
     /* oAction */
@@ -1593,24 +1839,31 @@
     #define CHECKERBOARD_PLATFORM_ACT_ROTATE_DOWN           0x4
 
 /* Platform on track */
-    /* oAction */
-    #define PLATFORM_ON_TRACK_ACT_INIT                      0x0
-    #define PLATFORM_ON_TRACK_ACT_WAIT_FOR_MARIO            0x1
-    #define PLATFORM_ON_TRACK_ACT_MOVE_ALONG_TRACK          0x2
-    #define PLATFORM_ON_TRACK_ACT_PAUSE_BRIEFLY             0x3
-    #define PLATFORM_ON_TRACK_ACT_FALL                      0x4
-    /* oBehParams >> 16 */
-    #define PLATFORM_ON_TRACK_BP_MASK_PATH                  0xF
-    #define PLATFORM_ON_TRACK_BP_MASK_TYPE                  (0x7 << 4)
-    #define PLATFORM_ON_TRACK_BP_RETURN_TO_START            (1 <<  8)
-    #define PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR             (1 <<  9)
-    #define PLATFORM_ON_TRACK_BP_DONT_TURN_YAW              (1 << 10)
-    #define PLATFORM_ON_TRACK_BP_DONT_TURN_ROLL             (1 << 11)
-    /* oPlatformOnTrackType */
-    #define PLATFORM_ON_TRACK_TYPE_CARPET                   0x0
-    #define PLATFORM_ON_TRACK_TYPE_SKI_LIFT                 0x1
-    #define PLATFORM_ON_TRACK_TYPE_CHECKERED                0x2
-    #define PLATFORM_ON_TRACK_TYPE_GRATE                    0x3
+enum oActionsPlatformOnTrack {
+    PLATFORM_ON_TRACK_ACT_INIT,
+    PLATFORM_ON_TRACK_ACT_WAIT_FOR_MARIO,
+    PLATFORM_ON_TRACK_ACT_MOVE_ALONG_TRACK,
+    PLATFORM_ON_TRACK_ACT_PAUSE_BRIEFLY,
+    PLATFORM_ON_TRACK_ACT_FALL,
+};
+enum oBehParams2ndBytePlatformOnTrack {
+    PLATFORM_ON_TRACK_BP_SPAWN_BALLS     = (1 << 7), // 0x80
+
+    PLATFORM_ON_TRACK_BP_MASK_TYPE       = 0x70,
+    PLATFORM_ON_TRACK_BP_MASK_PATH       = 0x0F,
+};
+enum oBehParams1stBytePlatformOnTrack {
+    PLATFORM_ON_TRACK_BP_RETURN_TO_START = (1 << 0), // 0x1
+    PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR  = (1 << 1), // 0x2
+    PLATFORM_ON_TRACK_BP_DONT_TURN_YAW   = (1 << 2), // 0x4
+    PLATFORM_ON_TRACK_BP_DONT_TURN_ROLL  = (1 << 4), // 0x8
+};
+enum oPlatformOnTrackTypes {
+    PLATFORM_ON_TRACK_TYPE_CARPET,
+    PLATFORM_ON_TRACK_TYPE_SKI_LIFT,
+    PLATFORM_ON_TRACK_TYPE_CHECKERED,
+    PLATFORM_ON_TRACK_TYPE_GRATE,
+};
 
 /* HMC Controllable Platform */
     /* oBehParams2ndByte / sControllablePlatformDirectionState */
@@ -1684,35 +1937,41 @@
     #define PYRAMID_WALL_ACT_MOVING_UP                      0x1
 
 /* Tox Box */
-    /* oBehParams2ndByte */
-    #define TOX_BOX_BP_PATTERN_1                            0x0
-    #define TOX_BOX_BP_PATTERN_2                            0x1
-    #define TOX_BOX_BP_PATTERN_3                            0x2
-    /* oAction */
-    #define TOX_BOX_ACT_END                                -0x1
-    #define TOX_BOX_ACT_INIT                                0x0
-    #define TOX_BOX_ACT_STEP                                0x1
-    #define TOX_BOX_ACT_WAIT                                0x2
-    #define TOX_BOX_ACT_MOVE_FORWARD                        0x3
-    #define TOX_BOX_ACT_MOVE_BACKWARD                       0x4
-    #define TOX_BOX_ACT_MOVE_DOWN                           0x5
-    #define TOX_BOX_ACT_MOVE_UP                             0x6
+enum BehParamsToxBoxPatterns { // oBehParams2ndByte
+    TOX_BOX_BP_PATTERN_1,
+    TOX_BOX_BP_PATTERN_2,
+    TOX_BOX_BP_PATTERN_3
+};
+
+enum oActionsToxBox {
+    TOX_BOX_ACT_END = -1,
+    TOX_BOX_ACT_INIT,
+    TOX_BOX_ACT_STEP,
+    TOX_BOX_ACT_WAIT,
+    TOX_BOX_ACT_MOVE_FORWARD,
+    TOX_BOX_ACT_MOVE_BACKWARD,
+    TOX_BOX_ACT_MOVE_DOWN,
+    TOX_BOX_ACT_MOVE_UP
+};
 
 /* Penguins (general) */
-    /* Walking sounds */
-    #define PENGUIN_SOUND_WALK_BABY                         0x0
-    #define PENGUIN_SOUND_WALK_BIG                          0x1
-    /* geo_switch_tuxie_mother_eyes */
-    #define PENGUIN_ANIM_STATE_EYES_OPEN                    0x0
-    #define PENGUIN_ANIM_STATE_EYES_HALF_CLOSED             0x1
-    #define PENGUIN_ANIM_STATE_EYES_CLOSED                  0x2
-    #define PENGUIN_ANIM_STATE_EYES_ANGRY                   0x3
-    #define PENGUIN_ANIM_STATE_EYES_SAD                     0x4
-    /* Animations */
-    #define PENGUIN_ANIM_WALK                               0x0
-    #define PENGUIN_ANIM_DIVE_SLIDE                         0x1
-    #define PENGUIN_ANIM_STAND_UP                           0x2
-    #define PENGUIN_ANIM_IDLE                               0x3
+enum PenguinWalkingSounds {
+    PENGUIN_SOUND_WALK_BABY,
+    PENGUIN_SOUND_WALK_BIG
+};
+enum oAnimStatesPenguin { // geo_switch_tuxie_mother_eyes
+    PENGUIN_ANIM_STATE_EYES_OPEN,
+    PENGUIN_ANIM_STATE_EYES_HALF_CLOSED,
+    PENGUIN_ANIM_STATE_EYES_CLOSED,
+    PENGUIN_ANIM_STATE_EYES_ANGRY,
+    PENGUIN_ANIM_STATE_EYES_SAD
+};
+enum AnimIDsPenguin { // Animations
+    PENGUIN_ANIM_WALK,
+    PENGUIN_ANIM_DIVE_SLIDE,
+    PENGUIN_ANIM_STAND_UP,
+    PENGUIN_ANIM_IDLE
+};
 
 /* Racing Penguin */
     /* oBehParams2ndByte */
@@ -1771,21 +2030,23 @@
     #define SNOW_MOUND_ACT_MOVE                             0x0
     #define SNOW_MOUND_ACT_SINK                             0x1
 
-/* Snowman Head */
-    /* oAction */
-    #define SNOWMANS_HEAD_ACT_ASK                           0x0
-    #define SNOWMANS_HEAD_ACT_NONE                          0x1
-    #define SNOWMANS_HEAD_ACT_JUMPING                       0x2
-    #define SNOWMANS_HEAD_ACT_LAND                          0x3
-    #define SNOWMANS_HEAD_ACT_THANK                         0x4
+/* Snowman's Head */
+enum oActionsSnowmansHead {
+    SNOWMANS_HEAD_ACT_ASK,
+    SNOWMANS_HEAD_ACT_NONE,
+    SNOWMANS_HEAD_ACT_JUMPING,
+    SNOWMANS_HEAD_ACT_LAND,
+    SNOWMANS_HEAD_ACT_THANK,
+};
 
-/* Snowman Bottom */
-    /* oAction */
-    #define SNOWMANS_BOTTOM_ACT_WAITING                     0x0
-    #define SNOWMANS_BOTTOM_ACT_FOLLOW_PATH                 0x1
-    #define SNOWMANS_BOTTOM_ACT_FINAL_STRETCH               0x2
-    #define SNOWMANS_BOTTOM_ACT_REACH_END                   0x3
-    #define SNOWMANS_BOTTOM_ACT_COLLISION                   0x4
+/* Snowman's Bottom */
+enum oActionsSnowmansBottom {
+    SNOWMANS_BOTTOM_ACT_WAITING,
+    SNOWMANS_BOTTOM_ACT_FOLLOW_PATH,
+    SNOWMANS_BOTTOM_ACT_FINAL_STRETCH,
+    SNOWMANS_BOTTOM_ACT_REACH_END,
+    SNOWMANS_BOTTOM_ACT_COLLISION,
+};
 
 /* Water Bomb Cannon */
     /* oBehParams2ndByte */
@@ -1822,12 +2083,18 @@
 
 /* TTC cog */
     /* oBehParams2ndByte */
-    #define TTC_COG_BP_SHAPE_MASK                           0x00000002
+    #define TTC_COG_BP_SHAPE_MASK                           0x02
     #define TTC_COG_BP_SHAPE_HEXAGON                        (0 << 1)
     #define TTC_COG_BP_SHAPE_TRIANGLE                       (1 << 1)
-    #define TTC_COG_BP_DIR_MASK                             0x00000001
+    #define TTC_COG_BP_DIR_MASK                             0x01
     #define TTC_COG_BP_DIR_CCW                              (0 << 0) // TODO: Check these
     #define TTC_COG_BP_DIR_CW                               (1 << 0)
+
+/* TTC Pit Block */
+enum oBehParams2ndByteTTCPitBlock {
+    TTC_PIT_BLOCK_BP_0,
+    TTC_PIT_BLOCK_BP_1,
+};
 
 /* TTC 2D Rotator */
     /* oBehParams2ndByte */
@@ -1839,12 +2106,14 @@
     #define TREADMILL_BP_LARGE                              0x0
     #define TREADMILL_BP_SMALL                              0x1
     #define TREADMILL_BP_SIZE_MASK                          0x1
+    #define TREADMILL_BP_UNKNOWN                            0x2
 
 /* Activated Back-and-Forth Platform */
-    /* ((u16)(o->oBehParams >> 16) &         0x0300) >> 8 aka platform type */
+    /* (bparam1 & 0x03) aka platform type */
     #define ACTIVATED_BF_PLAT_TYPE_BITS_ARROW_PLAT          0x0
     #define ACTIVATED_BF_PLAT_TYPE_BITFS_MESH_PLAT          0x1
     #define ACTIVATED_BF_PLAT_TYPE_BITFS_ELEVATOR           0x2
+    #define ACTIVATED_BF_PLAT_TYPES_MASK                    0x3
 
 /* Unagi */
     /* oBehParams2ndByte */
@@ -1905,18 +2174,24 @@
     /* Animations */
     #define HAUNTED_CHAIR_ANIM_DEFAULT                      0x0
 
-/* Fire piranha plant */
-    /* oAction */
-    #define FIRE_PIRANHA_PLANT_ACT_HIDE                     0x0
-    #define FIRE_PIRANHA_PLANT_ACT_GROW                     0x1
-    /* Animations */
-    #define FIRE_PIRANHA_PLANT_ANIM_SHRINK                  0x0
-    #define FIRE_PIRANHA_PLANT_ANIM_UNUSED_1                0x1
-    #define FIRE_PIRANHA_PLANT_ANIM_ATTACKED                0x2
-    #define FIRE_PIRANHA_PLANT_ANIM_UNUSED_3                0x3
-    #define FIRE_PIRANHA_PLANT_ANIM_GROW                    0x4
+/* Fire Piranha Plant */
+enum oBehParam2ndByteFirePiranhaPlant {
+    FIRE_PIRANHA_PLANT_BP_NORMAL,
+    FIRE_PIRANHA_PLANT_BP_THI,
+};
+enum oActionsFirePiranhaPlant {
+    FIRE_PIRANHA_PLANT_ACT_HIDE,
+    FIRE_PIRANHA_PLANT_ACT_GROW,
+};
+enum animIDsFirePiranhaPlant {
+    FIRE_PIRANHA_PLANT_ANIM_SHRINK,
+    FIRE_PIRANHA_PLANT_ANIM_UNUSED_1,
+    FIRE_PIRANHA_PLANT_ANIM_ATTACKED,
+    FIRE_PIRANHA_PLANT_ANIM_UNUSED_3,
+    FIRE_PIRANHA_PLANT_ANIM_GROW,
+};
 
-/* Fire spitter */
+/* Fire Spitter */
     /* oAction */
     #define FIRE_SPITTER_ACT_IDLE                           0x0
     #define FIRE_SPITTER_ACT_SPIT_FIRE                      0x1
@@ -2202,6 +2477,7 @@
 
 /* Triplet butterfly */
     /* oBehParams2ndByte */
+    #define TRIPLET_BUTTERFLY_BP_0                          0x0
     #define TRIPLET_BUTTERFLY_BP_BUTTERFLY_NUM              0x3
     #define TRIPLET_BUTTERFLY_BP_NO_BOMBS                   0x4
     /* oAction */
@@ -2398,34 +2674,42 @@
     #define WHITE_PUFF_EXPLODE_BP_SLOW_FADE                 0x3
 
 /* Dirt Particle */
-    /* oAnimState */
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_RED               0x0
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_GREEN             0x1
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_BLUE              0x2
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_DIRT              0x3
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW            0x4
-    #define TINY_DIRT_PARTICLE_ANIM_STATE_BILLBOARD         0x5
+enum oAnimStatesTinyDirtParticle {
+    TINY_DIRT_PARTICLE_ANIM_STATE_RED,
+    TINY_DIRT_PARTICLE_ANIM_STATE_GREEN,
+    TINY_DIRT_PARTICLE_ANIM_STATE_BLUE,
+    TINY_DIRT_PARTICLE_ANIM_STATE_DIRT,
+    TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW,
+    TINY_DIRT_PARTICLE_ANIM_STATE_BILLBOARD
+};
 
 /* Cartoon Star Particle */
-    /* oAnimState */
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_RED            0x0
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_GREEN          0x1
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_BLUE           0x2
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_YELLOW         0x3
-    #define CARTOON_STAR_PARTICLE_ANIM_STATE_BILLBOARD      0x4
+enum oAnimStatesCartoonStarParticle {
+    CARTOON_STAR_PARTICLE_ANIM_STATE_RED,
+    CARTOON_STAR_PARTICLE_ANIM_STATE_GREEN,
+    CARTOON_STAR_PARTICLE_ANIM_STATE_BLUE,
+    CARTOON_STAR_PARTICLE_ANIM_STATE_YELLOW,
+    CARTOON_STAR_PARTICLE_ANIM_STATE_BILLBOARD
+};
 
 /* Music Touch */
-    /* oAction */
-    #define MUSIC_TOUCH_ACT_PLAY_SOUND                      0x0
-    #define MUSIC_TOUCH_ACT_DONE                            0x1
+enum oActionsMusicTouch {
+    MUSIC_TOUCH_ACT_PLAY_SOUND,
+    MUSIC_TOUCH_ACT_DONE
+};
 
 /* Intro Scene */
-    /* gCutsceneObjSpawn */
-    #define CUTSCENE_OBJ_NONE                               0x0
-    #define CUTSCENE_OBJ_BEGINNING_PEACH                    0x5
-    #define CUTSCENE_OBJ_BEGINNING_LAKITU                   0x6
-    #define CUTSCENE_OBJ_7_END_BIRDS_1                      0x7
-    #define CUTSCENE_OBJ_5_END_BIRDS_2                      0x8
-    #define CUTSCENE_OBJ_2_END_BIRDS_1                      0x9
+enum gCutsceneObjSpawns {
+    CUTSCENE_OBJ_NONE,
+    CUTSCENE_OBJ_UNUSED_1,
+    CUTSCENE_OBJ_UNUSED_2,
+    CUTSCENE_OBJ_UNUSED_3,
+    CUTSCENE_OBJ_UNUSED_4,
+    CUTSCENE_OBJ_BEGINNING_PEACH,
+    CUTSCENE_OBJ_BEGINNING_LAKITU,
+    CUTSCENE_OBJ_7_END_BIRDS_1,
+    CUTSCENE_OBJ_5_END_BIRDS_2,
+    CUTSCENE_OBJ_2_END_BIRDS_1
+};
 
 #endif // OBJECT_CONSTANTS_H
