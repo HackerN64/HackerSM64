@@ -6,7 +6,7 @@ CI4 textures will always assume a 16 color palette is used, and CI8 textures a 2
 
 ## Libraries Used (All MIT licensed)
 
-* **Exoquant** by Dennis Ranke, for color reduction. https://github.com/exoticorn/exoquant
+* **Exoquant** by Dennis Ranke, for color reduction. https://github.com/exoticorn/exoquant 
 * **stb** by Sean Barrett, for loading PNG images. https://github.com/nothings/stb
 
 ## PNG -> CI4 + Palette
