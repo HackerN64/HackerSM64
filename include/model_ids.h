@@ -428,7 +428,7 @@
 #define MODEL_SCUTTLEBUG                  0x65        // scuttlebug_geo
 #define MODEL_MR_I_IRIS                   0x66        // mr_i_iris_geo
 #define MODEL_MR_I_BODY                   0x67        // mr_i_geo
-#define MODEL_MR_I_BODY MODEL_MR_I // backwards compatibility
+#define MODEL_MR_I MODEL_MR_I_BODY // backwards compatibility
 #define MODEL_DORRIE                      0x68        // dorrie_geo
 
 // other models
