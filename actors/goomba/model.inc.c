@@ -51,6 +51,16 @@ ALIGNED8 static const Texture goomba_seg8_texture_0801A530[] = {
 #include "actors/goomba/goomba_face_blink.rgba16.inc.c"
 };
 
+#ifdef FLOOMBAS
+ALIGNED8 static const Texture floomba_seg8_texture_face[] = {
+#include "actors/goomba/custom_floomba_face.rgba16.inc.c"
+};
+
+ALIGNED8 static const Texture floomba_seg8_texture_blink[] = {
+#include "actors/goomba/custom_floomba_face_blink.rgba16.inc.c"
+};
+#endif
+
 // 0x0801AD30
 static const Lights1 goomba_seg8_lights_0801AD30 = gdSPDefLights1(
     0x7f, 0x7f, 0x7f,
@@ -259,6 +269,24 @@ const Gfx goomba_seg8_dl_0801B5F0[] = {
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPBranchList(goomba_seg8_dl_0801B5A0),
 };
+
+#ifdef FLOOMBAS
+const Gfx floomba_seg8_dl_face[] = {
+    gsSPDisplayList(goomba_seg8_dl_0801B560),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, floomba_seg8_texture_face),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPBranchList(goomba_seg8_dl_0801B5A0),
+};
+
+const Gfx floomba_seg8_dl_blink[] = {
+    gsSPDisplayList(goomba_seg8_dl_0801B560),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, floomba_seg8_texture_blink),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPBranchList(goomba_seg8_dl_0801B5A0),
+};
+#endif
 
 // 0x0801B618
 static const Vtx goomba_seg8_vertex_0801B618[] = {
