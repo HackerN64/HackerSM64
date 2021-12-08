@@ -10,10 +10,21 @@
 
 #define BIT(i)  (1 << (i))
 #define BITMASK(size) ((BIT(size)) - 1)
-#define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
+#define SHIFTED_BITMASK(size, shift) (BITMASK(size) << shift)
 
-struct Config
-{
+// #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
+#define COND_BIT(cond, dst, flag) { \
+    if ((cond)) {                   \
+        (dst) |=  (flag);           \
+    } else {                        \
+        (dst) &= ~(flag);           \
+    }                               \
+}
+
+#define SCREEN_CENTER_X (SCREEN_WIDTH  / 2)
+#define SCREEN_CENTER_Y (SCREEN_HEIGHT / 2)
+
+struct Config {
     f32 audioFrequency;
 #ifdef WIDE
     s16 widescreen;
@@ -21,13 +32,12 @@ struct Config
     u8 tvType;
 };
 
-struct Controller
-{
+struct Controller {
   /*0x00*/ s16 rawStickX;       //
   /*0x02*/ s16 rawStickY;       //
-  /*0x04*/ float stickX;        // [-64, 64] positive is right
-  /*0x08*/ float stickY;        // [-64, 64] positive is up
-  /*0x0C*/ float stickMag;      // distance from center [0, 64]
+  /*0x04*/ f32 stickX;          // [-64, 64] positive is right
+  /*0x08*/ f32 stickY;          // [-64, 64] positive is up
+  /*0x0C*/ f32 stickMag;        // distance from center [0, 64]
   /*0x10*/ u16 buttonDown;
   /*0x12*/ u16 buttonPressed;
   /*0x14*/ OSContStatus *statusData;
@@ -82,6 +92,8 @@ typedef u32 MarioInteraction;
 typedef u32 InteractType;
 typedef u32 MarioStep;
 
+typedef void (*ObjActionFunc)(void);
+
 typedef s8  ObjAction8;
 typedef s32 ObjAction32;
 typedef s16 ColFlags;
@@ -130,12 +142,14 @@ typedef u8    IA16Component;
 typedef u16   IA16;
 typedef u8    RGBA16Component; // components u5 & u1
 typedef u16   RGBA16;
+typedef u32   RGBA16Return32;
 typedef u32   RGBA16FILL;      // RGBA16 but twice, Used for gDPSetFillColor
 typedef u8    RGBA32Component;
 typedef u32   RGBA32;
 typedef u8    CI4;             // u4
 typedef u8    CI8;
 typedef Color Texture;
+typedef u32   Texture32;
 
 typedef s16   TextureCoord;
 
@@ -176,28 +190,28 @@ enum SpTaskState {
     SPTASK_STATE_FINISHED_DP
 };
 
-struct SPTask
-{
+struct SPTask {
     /*0x00*/ OSTask task;
     /*0x40*/ OSMesgQueue *msgqueue;
     /*0x44*/ OSMesg msg;
     /*0x48*/ enum SpTaskState state;
 }; // size = 0x4C, align = 0x8
 
-struct VblankHandler
-{
+struct VblankHandler {
     OSMesgQueue *queue;
     OSMesg msg;
 };
 
-#define ANIM_FLAG_NOLOOP     (1 << 0) // 0x01
-#define ANIM_FLAG_FORWARD    (1 << 1) // 0x02
-#define ANIM_FLAG_NO_ACCEL   (1 << 2) // 0x04
-#define ANIM_FLAG_HOR_TRANS  (1 << 3) // 0x08
-#define ANIM_FLAG_VERT_TRANS (1 << 4) // 0x10
-#define ANIM_FLAG_DISABLED   (1 << 5) // 0x20
-#define ANIM_FLAG_NO_TRANS   (1 << 6) // 0x40
-#define ANIM_FLAG_UNUSED     (1 << 7) // 0x80
+enum AnimFlags {
+    ANIM_FLAG_NOLOOP     = BIT(0), // 0x01
+    ANIM_FLAG_FORWARD    = BIT(1), // 0x02
+    ANIM_FLAG_NO_ACCEL   = BIT(2), // 0x04
+    ANIM_FLAG_HOR_TRANS  = BIT(3), // 0x08
+    ANIM_FLAG_VERT_TRANS = BIT(4), // 0x10
+    ANIM_FLAG_DISABLED   = BIT(5), // 0x20
+    ANIM_FLAG_NO_TRANS   = BIT(6), // 0x40
+    ANIM_FLAG_UNUSED     = BIT(7), // 0x80
+};
 
 struct Animation {
     /*0x00*/ s16 flags;
@@ -213,8 +227,7 @@ struct Animation {
 
 #define ANIMINDEX_NUMPARTS(animindex) (sizeof(animindex) / sizeof(u16) / 6 - 1)
 
-struct GraphNode
-{
+struct GraphNode {
     /*0x00*/ s16 type; // structure type
     /*0x02*/ s16 flags; // hi = drawing layer, lo = rendering modes
     /*0x04*/ struct GraphNode *prev;
@@ -223,8 +236,7 @@ struct GraphNode
     /*0x10*/ struct GraphNode *children;
 };
 
-struct AnimInfo
-{
+struct AnimInfo {
     /*0x00 0x38*/ s16 animID;
     /*0x02 0x3A*/ s16 animYTrans;
     /*0x04 0x3C*/ struct Animation *curAnim;
@@ -234,8 +246,7 @@ struct AnimInfo
     /*0x10 0x48*/ s32 animAccel;
 };
 
-struct GraphNodeObject
-{
+struct GraphNodeObject {
     /*0x00*/ struct GraphNode node;
     /*0x14*/ struct GraphNode *sharedChild;
     /*0x18*/ s8 areaIndex;
@@ -247,10 +258,12 @@ struct GraphNodeObject
     /*0x4C*/ struct SpawnInfo *spawnInfo;
     /*0x50*/ Mat4 *throwMatrix; // matrix ptr
     /*0x54*/ Vec3f cameraToObject;
+#ifdef OBJECTS_REJ
+    u16 ucode;
+#endif
 };
 
-struct ObjectNode
-{
+struct ObjectNode {
     struct GraphNodeObject gfx;
     struct ObjectNode *next;
     struct ObjectNode *prev;
@@ -258,24 +271,27 @@ struct ObjectNode
 
 #ifdef PUPPYLIGHTS
 struct PuppyLight {
-    Vec3t pos[2]; //The location of the light. First index is the absolute position, second index are offsets.
-    s16 yaw; //Used by cubes. Allows epic rotating of the volume.
-    s16 room; //Which room to use. -1 is visible from all rooms.
-    s8 epicentre; //What percentage inside the volume you'll be before maximum light strength is applied. (E.g: 100 will be full strength always, and 0 will be full strength at the centre.)
-    u8 flags; //Some stuff to define how the volume is used. Mostly just shape stuff, but can potentially have other uses.
-    u8 rgba[4]; //Colour. Go on, take even the tiniest guess as to what this entails.
-    u8 area; //Which section of the level this light is stored in.
-    u8 active:1; //Whether the light will actually work. Mostly intended to be used for objects.
+    Vec3t pos[2];   // The location of the light. First index is the absolute position, second index are offsets.
+    s16 yaw;        // Used by cubes. Allows epic rotating of the volume.
+    RoomData room;  // Which room to use. -1 is visible from all rooms.
+    s8 epicentre;   // What percentage inside the volume you'll be before maximum light strength is applied. (E.g: 100 will be full strength always, and 0 will be full strength at the centre.)
+    u8 flags;       // Some stuff to define how the volume is used. Mostly just shape stuff, but can potentially have other uses.
+    ColorRGBA rgba; // Colour. Go on, take even the tiniest guess as to what this entails.
+    u8 area;        // Which section of the level this light is stored in.
+    u8 active: 1;   // Whether the light will actually work. Mostly intended to be used for objects.
 };
 #endif
 
 // NOTE: Since ObjectNode is the first member of Object, it is difficult to determine
 // whether some of these pointers point to ObjectNode or Object.
 
+#ifdef PUPPYLIGHTS
 #define MAX_OBJECT_FIELDS 0x51
+#else
+#define MAX_OBJECT_FIELDS 0x50
+#endif
 
-struct Object
-{
+struct Object {
     /*0x000*/ struct ObjectNode header;
     /*0x068*/ struct Object *parentObj;
     /*0x06C*/ struct Object *prevObj;
@@ -284,8 +300,7 @@ struct Object
     /*0x076*/ s16 numCollidedObjs;
     /*0x078*/ struct Object *collidedObjs[4];
     /*0x088*/
-    union
-    {
+    union {
         // Object fields. See object_fields.h.
         u32 asU32[MAX_OBJECT_FIELDS];
         s32 asS32[MAX_OBJECT_FIELDS];
@@ -338,8 +353,7 @@ struct Object
 #endif
 };
 
-struct ObjectHitbox
-{
+struct ObjectHitbox {
     /*0x00*/ u32 interactType;
     /*0x04*/ u8 downOffset;
     /*0x05*/ s8 damageOrCoinValue;
@@ -351,14 +365,18 @@ struct ObjectHitbox
     /*0x0E*/ s16 hurtboxHeight;
 };
 
-struct Waypoint
-{
+struct Waypoint {
     s16 flags;
     Vec3s pos;
 };
 
-struct Surface
-{
+struct Normal {
+    /*0x00*/ f32 x;
+    /*0x04*/ f32 y;
+    /*0x08*/ f32 z;
+};
+
+struct Surface {
     /*0x00*/ TerrainData type;
     /*0x02*/ TerrainData force;
     /*0x04*/ s8 flags;
@@ -368,17 +386,21 @@ struct Surface
     /*0x0A*/ Vec3t vertex1;
     /*0x10*/ Vec3t vertex2;
     /*0x16*/ Vec3t vertex3;
-    /*0x1C*/ struct {
-        f32 x;
-        f32 y;
-        f32 z;
-    } normal;
+    /*0x1C*/ struct Normal normal;
     /*0x28*/ f32 originOffset;
     /*0x2C*/ struct Object *object;
 };
 
-struct MarioBodyState
-{
+#define PUNCH_STATE_TIMER_MASK          0b00111111
+#define PUNCH_STATE_TYPES_MASK          0b11000000
+
+enum PunchStateTypes {
+    PUNCH_STATE_TYPE_FIRST_PUNCH  = (0 << 6),
+    PUNCH_STATE_TYPE_SECOND_PUNCH = (1 << 6),
+    PUNCH_STATE_TYPE_KICK         = (2 << 6),
+};
+
+struct MarioBodyState {
     /*0x00*/ u32 action;
     /*0x04*/ s8 capState; /// see MarioCapGSCId
     /*0x05*/ s8 eyeState;
@@ -390,11 +412,10 @@ struct MarioBodyState
     /*0x0C*/ Vec3s torsoAngle;
     /*0x12*/ Vec3s headAngle;
     /*0x18*/ Vec3f heldObjLastPosition; /// also known as HOLP
-    u8 padding[4];
+    // u8 filler[4];
 };
 
-struct MarioState
-{
+struct MarioState {
     /*0x00*/ u16 playerID;
     /*0x02*/ u16 input;
     /*0x04*/ u32 flags;
@@ -456,9 +477,13 @@ struct MarioState
     /*0xBC*/ f32 peakHeight;
     /*0xC0*/ f32 quicksandDepth;
     /*0xC4*/ f32 windGravity;
+    // -- HackerSM64 MarioState fields begin --
 #ifdef BREATH_METER
              s16 breath;
              u8  breathCounter;
+#endif
+#ifdef PREVENT_DEATH_LOOP
+             u8  isDead : 1;
 #endif
            Vec3f lastSafePos;
            Vec3f prevPos;
@@ -468,6 +493,7 @@ struct MarioState
            Angle moveYaw;
            Angle ceilYaw;
            Angle wallYaw;
+    // -- HackerSM64 MarioState fields end --
 };
 
 #endif // TYPES_H
