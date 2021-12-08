@@ -51,13 +51,7 @@ const Gfx tree_seg3_sub_dl_bubbly_right_side[] = {
 };
 
 // 0x0302FEE8 - 0x0302FF60
-const Gfx tree_seg3_dl_bubbly[] = {
-    gsDPPipeSync(),
-#ifdef OBJ_OPACITY_BY_CAM_DIST
-    gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
-#else
-    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
-#endif
+const Gfx tree_seg3_sub_dl_bubbly[] = {
     gsSPClearGeometryMode(G_LIGHTING),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -71,6 +65,18 @@ const Gfx tree_seg3_dl_bubbly[] = {
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_LIGHTING),
     gsSPEndDisplayList(),
+};
+
+const Gfx tree_seg3_dl_bubbly[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
+    gsSPBranchList(tree_seg3_sub_dl_bubbly),
+};
+//! These shouldn't need to be separate. However, silhouette moment.
+const Gfx tree_seg3_dl_bubbly_transparent[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
+    gsSPBranchList(tree_seg3_sub_dl_bubbly),
 };
 
 // 0x0302FF60
@@ -87,13 +93,7 @@ static const Vtx tree_seg3_vertex_spiky[] = {
 };
 
 // 0x03030FA0 - 0x03031048
-const Gfx tree_seg3_dl_spiky[] = {
-    gsDPPipeSync(),
-#ifdef OBJ_OPACITY_BY_CAM_DIST
-    gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
-#else
-    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
-#endif
+const Gfx tree_seg3_sub_dl_spiky[] = {
     gsSPClearGeometryMode(G_SHADING_SMOOTH),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -114,19 +114,25 @@ const Gfx tree_seg3_dl_spiky[] = {
     gsSPEndDisplayList(),
 };
 
+const Gfx tree_seg3_dl_spiky[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
+    gsSPBranchList(tree_seg3_sub_dl_spiky),
+};
+//! These shouldn't need to be separate. However, silhouette moment.
+const Gfx tree_seg3_dl_spiky_transparent[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
+    gsSPBranchList(tree_seg3_sub_dl_spiky),
+};
+
 // 0x03031048
 ALIGNED8 static const Texture tree_seg3_texture_snowy_pine[] = {
 #include "actors/tree/snowy_pine_tree.rgba16.inc.c"
 };
 
 // 0x03032088 - 0x03032130
-const Gfx tree_seg3_dl_snowy_pine[] = {
-    gsDPPipeSync(),
-#ifdef OBJ_OPACITY_BY_CAM_DIST
-    gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
-#else
-    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
-#endif
+const Gfx tree_seg3_sub_dl_snowy_pine[] = {
     gsSPClearGeometryMode(G_SHADING_SMOOTH),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -147,6 +153,18 @@ const Gfx tree_seg3_dl_snowy_pine[] = {
     gsSPEndDisplayList(),
 };
 
+const Gfx tree_seg3_dl_snowy_pine[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
+    gsSPBranchList(tree_seg3_sub_dl_snowy_pine),
+};
+//! These shouldn't need to be separate. However, silhouette moment.
+const Gfx tree_seg3_dl_snowy_pine_transparent[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
+    gsSPBranchList(tree_seg3_sub_dl_snowy_pine),
+};
+
 // 0x03032218
 ALIGNED8 static const Texture tree_seg3_texture_palm[] = {
 #include "actors/tree/palm_tree.rgba16.inc.c"
@@ -161,13 +179,7 @@ static const Vtx tree_seg3_vertex_palm[] = {
 };
 
 // 0x03033258 - 0x03033300
-const Gfx tree_seg3_dl_palm[] = {
-    gsDPPipeSync(),
-#ifdef OBJ_OPACITY_BY_CAM_DIST
-    gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
-#else
-    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
-#endif
+const Gfx tree_seg3_sub_dl_palm[] = {
     gsSPClearGeometryMode(G_SHADING_SMOOTH),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
@@ -186,4 +198,16 @@ const Gfx tree_seg3_dl_palm[] = {
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_SHADING_SMOOTH),
     gsSPEndDisplayList(),
+};
+
+const Gfx tree_seg3_dl_palm[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
+    gsSPBranchList(tree_seg3_sub_dl_palm),
+};
+//! These shouldn't need to be separate. However, silhouette moment.
+const Gfx tree_seg3_dl_palm_transparent[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
+    gsSPBranchList(tree_seg3_sub_dl_palm),
 };
