@@ -32,10 +32,10 @@ extern "C" {
 /* Routines for fetch TLB info */
 
 extern u32		__osGetTLBASID(void);
-extern u32		__osGetTLBPageMask(s32);
-extern u32		__osGetTLBHi(s32);
-extern u32		__osGetTLBLo0(s32);
-extern u32		__osGetTLBLo1(s32);
+extern u32		__osGetTLBPageMask(s32 index);
+extern u32		__osGetTLBHi(      s32 index);
+extern u32		__osGetTLBLo0(     s32 index);
+extern u32		__osGetTLBLo1(     s32 index);
 
 
 #endif /* _LANGUAGE_C */

@@ -148,21 +148,21 @@ typedef struct {
 
 /* file system interface */
 
-extern s32 osPfsInitPak(OSMesgQueue *, OSPfs *, int);
-extern s32 osPfsRepairId(OSPfs *);
-extern s32 osPfsInit(OSMesgQueue *, OSPfs *, int);
-extern s32 osPfsReFormat(OSPfs *, OSMesgQueue *, int);
-extern s32 osPfsChecker(OSPfs *);
-extern s32 osPfsAllocateFile(OSPfs *, u16, u32, u8 *, u8 *, int, s32 *);
-extern s32 osPfsFindFile(OSPfs *, u16, u32, u8 *, u8 *, s32 *);
-extern s32 osPfsDeleteFile(OSPfs *, u16, u32, u8 *, u8 *);
-extern s32 osPfsReadWriteFile(OSPfs *, s32, u8, int, int, u8 *);
-extern s32 osPfsFileState(OSPfs *, s32, OSPfsState *);
-extern s32 osPfsGetLabel(OSPfs *, u8 *, int *);
-extern s32 osPfsSetLabel(OSPfs *, u8 *);
-extern s32 osPfsIsPlug(OSMesgQueue *, u8 *);
-extern s32 osPfsFreeBlocks(OSPfs *, s32 *);
-extern s32 osPfsNumFiles(OSPfs *, s32 *, s32 *);
+extern s32 osPfsInitPak(OSMesgQueue *mq, OSPfs *pfs, int controller_no);
+extern s32 osPfsRepairId(     OSPfs *pfs);
+extern s32 osPfsInit(   OSMesgQueue *mq, OSPfs *pfs, int controller_no);
+extern s32 osPfsReFormat(     OSPfs *pfs, OSMesgQueue *mq, int);
+extern s32 osPfsChecker(      OSPfs *pfs);
+extern s32 osPfsAllocateFile( OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, int length, s32 *file_no);
+extern s32 osPfsFindFile(     OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name,             s32 *file_no);
+extern s32 osPfsDeleteFile(   OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name);
+extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, int offset, int nbytes, u8 *data_buffer);
+extern s32 osPfsFileState(    OSPfs *pfs, s32 file_no, OSPfsState *state);
+extern s32 osPfsGetLabel(     OSPfs *pfs, u8 *label, int *length);
+extern s32 osPfsSetLabel(     OSPfs *pfs, u8 *label);
+extern s32 osPfsIsPlug( OSMesgQueue *mq, u8 *bitpattern);
+extern s32 osPfsFreeBlocks(   OSPfs *pfs, s32 *bytes_not_used);
+extern s32 osPfsNumFiles(     OSPfs *pfs, s32 *max_files, s32 *files_used);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

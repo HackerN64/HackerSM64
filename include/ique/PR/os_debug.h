@@ -93,8 +93,8 @@ typedef struct {
 
 /* Profiler Interface */
 
-extern void		osProfileInit(OSProf *, u32 profcnt);
-extern void		osProfileStart(u32);
+extern void		osProfileInit(OSProf *profp, u32 profcnt);
+extern void		osProfileStart(u32 microseconds);
 extern void		osProfileFlush(void);
 extern void		osProfileStop(void);
 

@@ -167,9 +167,9 @@ extern "C" {
 #define ERR_OSTHPROFILESTOP_LAR         147
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
-typedef	void (*OSErrorHandler)(s16, s16, ...);
+typedef	void (*OSErrorHandler)(s16 code, s16 numArgs, ...);
 
-OSErrorHandler	osSetErrorHandler(OSErrorHandler);
+OSErrorHandler	osSetErrorHandler(OSErrorHandler func);
 #endif
 
 #ifdef _LANGUAGE_C_PLUS_PLUS

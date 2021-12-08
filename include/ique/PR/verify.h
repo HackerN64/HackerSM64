@@ -52,16 +52,16 @@ typedef struct {
 	unsigned short	width;			/* 0x34 */
 	unsigned short	height;			/* 0x36 */
 
-	unsigned int	frameBuffer0Addr;	/* 0x38 */
-	unsigned int	frameBuffer1Addr;	/* 0x3c */
+	unsigned int	framebuffer0Addr;	/* 0x38 */
+	unsigned int	framebuffer1Addr;	/* 0x3c */
 	
 	unsigned int	zBufferAddr;		/* 0x40 */
 
 	unsigned long	magicNumber;		/* 0x44 */
 	unsigned long	version;		/* 0x48 */
 
-	unsigned int	frameBufferFormat;	/* 0x4c */
-	unsigned int	frameBufferSize;	/* 0x50 */
+	unsigned int	framebufferFormat;	/* 0x4c */
+	unsigned int	framebufferSize;	/* 0x50 */
 	
         unsigned int    staticSegAddr;          /* 0x54 */
         unsigned int    staticSegSize;          /* 0x58 */

@@ -142,15 +142,15 @@ extern void __osInitialize_emu(void);
 /* Game <> Host data transfer functions */
 
 extern s32		osTestHost(void);
-extern void		osReadHost(void *, u32);
-extern void		osWriteHost(void *, u32);
+extern void		osReadHost( void *vAddr, u32 nbytes);
+extern void		osWriteHost(void *vAddr, u32 nbytes);
 extern void		osAckRamromRead(void);
 extern void		osAckRamromWrite(void);
 
 #ifdef BBPLAYER
 /* BB versions of osReadHost and osWriteHost that returns upon error */
-extern s32		osBbReadHost(void *, u32);
-extern s32		osBbWriteHost(void *, u32);
+extern s32		osBbReadHost( void *vAddr, u32 nbytes);
+extern s32		osBbWriteHost(void *vAddr, u32 nbytes);
 #endif
 
 /* RDB port operations */
