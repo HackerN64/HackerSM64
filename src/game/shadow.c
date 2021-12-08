@@ -323,6 +323,11 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             s8 idx = shadowType - SHADOW_RECTANGLE_HARDCODED_OFFSET;
             s->scale[0] *= sShadowRectangles[idx].scaleX;
             s->scale[2] *= sShadowRectangles[idx].scaleZ;
+            if (sShadowRectangles[idx].scaleWithDistance) {
+                f32 dy = (pos[1] - s->floorHeight);
+                scale_shadow_with_distance(s->scale[0], dy);
+                scale_shadow_with_distance(s->scale[2], dy);
+            }
         }
     }
 
