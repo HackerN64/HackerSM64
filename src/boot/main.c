@@ -27,7 +27,7 @@
 #define MESG_START_GFX_SPTASK 103
 #define MESG_NMI_REQUEST 104
 
-OSThread gUnkThread; // unused?
+// OSThread gUnkThread; // unused?
 OSThread gIdleThread;
 OSThread gMainThread;
 OSThread gGameLoopThread;
@@ -64,29 +64,29 @@ s8 sAudioEnabled = TRUE;
 u32 gNumVblanks = 0;
 s8 gResetTimer = 0;
 s8 gNmiResetBarsTimer = 0;
-#ifdef DEBUG_LEVEL_SELECT
-s8 gDebugLevelSelect = TRUE;
-#else
-s8 gDebugLevelSelect = FALSE;
-#endif
+s8 gDebugLevelSelect  = FALSE;
 
+#ifdef VANILLA_DEBUG
 s8 gShowDebugText = FALSE;
 
 // unused
-void handle_debug_key_sequences(void) {
-    static u16 sDebugTextKeySequence[] = { D_JPAD, D_JPAD, U_JPAD, U_JPAD,
-                                           L_JPAD, R_JPAD, L_JPAD, R_JPAD };
-    static s16 sDebugTextKey = 0;
+UNUSED static u16 sDebugTextKeySequence[] = {
+    D_JPAD, D_JPAD, U_JPAD, U_JPAD, L_JPAD, R_JPAD, L_JPAD, R_JPAD
+};
+static s16 sDebugTextKey = 0;
+UNUSED void handle_debug_key_sequences(void) {
     if (gPlayer3Controller->buttonPressed != 0) {
         if (sDebugTextKeySequence[sDebugTextKey++] == gPlayer3Controller->buttonPressed) {
             if (sDebugTextKey == ARRAY_COUNT(sDebugTextKeySequence)) {
-                sDebugTextKey = 0, gShowDebugText ^= 1;
+                sDebugTextKey = 0;
+                gShowDebugText ^= 1;
             }
         } else {
             sDebugTextKey = 0;
         }
     }
 }
+#endif
 
 void setup_mesg_queues(void) {
     osCreateMesgQueue(&gDmaMesgQueue, gDmaMesgBuf, ARRAY_COUNT(gDmaMesgBuf));
@@ -107,10 +107,10 @@ void alloc_pool(void) {
     void *end = (void *) (SEG_POOL_START + POOL_SIZE);
 
     main_pool_init(start, end);
-    gEffectsMemoryPool = mem_pool_init(0x4000, MEMORY_POOL_LEFT);
-    #ifdef PUPPYLIGHTS
+    gEffectsMemoryPool = mem_pool_init(EFFECTS_MEMORY_POOL, MEMORY_POOL_LEFT);
+#ifdef PUPPYLIGHTS
     gLightsPool = mem_pool_init(PUPPYLIGHTS_POOL, MEMORY_POOL_LEFT);
-    #endif
+#endif
 }
 
 void create_thread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri) {
@@ -140,8 +140,12 @@ void receive_new_tasks(void) {
     while (osRecvMesg(&gSPTaskMesgQueue, (OSMesg *) &spTask, OS_MESG_NOBLOCK) != -1) {
         spTask->state = SPTASK_STATE_NOT_STARTED;
         switch (spTask->task.t.type) {
-            case 2:   sNextAudioSPTask = spTask; break;
-            case 1: sNextDisplaySPTask = spTask; break;
+            case 2:
+                sNextAudioSPTask = spTask;
+                break;
+            case 1:
+                sNextDisplaySPTask = spTask;
+                break;
         }
     }
 
@@ -247,9 +251,9 @@ void handle_sp_complete(void) {
             // The gfx task completed before we had time to interrupt it.
             // Mark it finished, just like below.
             curSPTask->state = SPTASK_STATE_FINISHED;
-            #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
             profiler_update(rspGenTime, rspDelta);
-            #endif
+#endif
         }
 
         // Start the audio task, as expected by handle_vblank.
@@ -311,10 +315,10 @@ void thread3_main(UNUSED void *arg) {
     osSyncPrintf("Linker  : %s\n", __linker__);
 #endif
 
-    create_thread(&gSoundThread, 4, thread4_sound, NULL, (gThread4Stack + 0x2000), 20);
+    create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, (gThread4Stack + 0x2000), 20);
     osStartThread(&gSoundThread);
 
-    create_thread(&gGameLoopThread, 5, thread5_game_loop, NULL, (gThread5Stack + 0x2000), 10);
+    create_thread(&gGameLoopThread, THREAD_5_GAME_LOOP, thread5_game_loop, NULL, (gThread5Stack + 0x2000), 10);
     osStartThread(&gGameLoopThread);
 
     while (TRUE) {
@@ -324,11 +328,21 @@ void thread3_main(UNUSED void *arg) {
 #endif
         osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
         switch ((uintptr_t) msg) {
-            case MESG_VI_VBLANK:        handle_vblank();      break;
-            case MESG_SP_COMPLETE:      handle_sp_complete(); break;
-            case MESG_DP_COMPLETE:      handle_dp_complete(); break;
-            case MESG_START_GFX_SPTASK: start_gfx_sptask();   break;
-            case MESG_NMI_REQUEST:      handle_nmi_request(); break;
+            case MESG_VI_VBLANK:
+                handle_vblank();
+                break;
+            case MESG_SP_COMPLETE:
+                handle_sp_complete();
+                break;
+            case MESG_DP_COMPLETE:
+                handle_dp_complete();
+                break;
+            case MESG_START_GFX_SPTASK:
+                start_gfx_sptask();
+                break;
+            case MESG_NMI_REQUEST:
+                handle_nmi_request();
+                break;
         }
 #if PUPPYPRINT_DEBUG
         profiler_update(taskTime, first);
@@ -341,9 +355,15 @@ void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *q
     handler->msg = msg;
 
     switch (index) {
-        case 1: gVblankHandler1 = handler; break;
-        case 2: gVblankHandler2 = handler; break;
-        case 3: gVblankHandler3 = handler; break;
+        case 1:
+            gVblankHandler1 = handler;
+            break;
+        case 2:
+            gVblankHandler2 = handler;
+            break;
+        case 3:
+            gVblankHandler3 = handler;
+            break;
     }
 }
 
@@ -422,25 +442,22 @@ void get_audio_frequency(void) {
 void thread1_idle(UNUSED void *arg) {
 
     osCreateViManager(OS_PRIORITY_VIMGR);
-    switch ( osTvType ) {
-    case OS_TV_NTSC:
-        // NTSC
-        //osViSetMode(&osViModeTable[OS_VI_NTSC_LAN1]);
-        VI = osViModeTable[OS_VI_NTSC_LAN1];
-        gConfig.tvType = MODE_NTSC;
-        break;
-    case OS_TV_MPAL:
-        // MPAL
-        //osViSetMode(&osViModeTable[OS_VI_MPAL_LAN1]);
-        VI = osViModeTable[OS_VI_NTSC_LAN1];
-        gConfig.tvType = MODE_MPAL;
-        break;
-    case OS_TV_PAL:
-        // PAL
-        //osViSetMode(&osViModeTable[OS_VI_PAL_LAN1]);
-        VI = osViModeTable[OS_VI_NTSC_LAN1];
-        gConfig.tvType = MODE_PAL;
-        break;
+    switch (osTvType) {
+        case OS_TV_NTSC:
+            //osViSetMode(&osViModeTable[OS_VI_NTSC_LAN1]);
+            VI = osViModeTable[OS_VI_NTSC_LAN1];
+            gConfig.tvType = MODE_NTSC;
+            break;
+        case OS_TV_MPAL:
+            //osViSetMode(&osViModeTable[OS_VI_MPAL_LAN1]);
+            VI = osViModeTable[OS_VI_NTSC_LAN1];
+            gConfig.tvType = MODE_MPAL;
+            break;
+        case OS_TV_PAL:
+            //osViSetMode(&osViModeTable[OS_VI_PAL_LAN1]);
+            VI = osViModeTable[OS_VI_NTSC_LAN1];
+            gConfig.tvType = MODE_PAL;
+            break;
     }
     get_audio_frequency();
     change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -449,7 +466,7 @@ void thread1_idle(UNUSED void *arg) {
     osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
     osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
-    create_thread(&gMainThread, 3, thread3_main, NULL, gThread3Stack + 0x2000, 100);
+    create_thread(&gMainThread, THREAD_3_MAIN, thread3_main, NULL, gThread3Stack + 0x2000, 100);
     osStartThread(&gMainThread);
 
     osSetThreadPri(NULL, 0);
@@ -461,7 +478,8 @@ void thread1_idle(UNUSED void *arg) {
 }
 
 #if CLEARRAM
-void ClearRAM(void) {
+void ClearRAM(void)
+{
     bzero(_mainSegmentEnd, (size_t)osMemSize - (size_t)OS_K0_TO_PHYSICAL(_mainSegmentEnd));
 }
 #endif
@@ -490,6 +508,6 @@ void main_func(void) {
 #ifdef ISVPRINT
     osInitialize_fakeisv();
 #endif
-    create_thread(&gIdleThread, 1, thread1_idle, NULL, gIdleThreadStack + 0x800, 100);
+    create_thread(&gIdleThread, THREAD_1_IDLE, thread1_idle, NULL, gIdleThreadStack + 0x800, 100);
     osStartThread(&gIdleThread);
 }
