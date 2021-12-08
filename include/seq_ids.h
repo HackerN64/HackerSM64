@@ -5,6 +5,7 @@
 // optionally OR'd with SEQ_VARIATION.
 #define SEQ_BASE_ID 0x7f
 #define SEQ_VARIATION 0x80
+#define SEQUENCE_NONE 0xFF
 
 #define SEQ_MENU_GAME_OVER (SEQ_MENU_TITLE_SCREEN | SEQ_VARIATION)
 
