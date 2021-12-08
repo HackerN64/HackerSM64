@@ -12,3 +12,6 @@ const struct Animation *const piranha_plant_seg6_anims_0601C31C[] = {
     &piranha_plant_seg6_anim_0601C304,
     NULL,
 };
+
+// huh? this isnt following the Bin ID format?
+UNUSED static const u64 piranha_plant_unused_1 = 1;

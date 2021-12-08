@@ -1,5 +1,9 @@
 // Whomp
 
+// ???
+UNUSED static const u64 whomp_unused_1 = 2;
+
+
 // 0x0601C360
 ALIGNED8 static const Texture whomp_seg6_texture_0601C360[] = {
 #include "actors/whomp/whomp_back.rgba16.inc.c"

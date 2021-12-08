@@ -1,5 +1,8 @@
 // Snowman
 
+// ???
+UNUSED static const u64 snowman_unused_1 = 1;
+
 // Unreferenced light group
 UNUSED static const Lights1 snowman_lights_unused1 = gdSPDefLights1(
     0x0d, 0x0c, 0x28,

@@ -66,3 +66,7 @@ static const struct Animation spindrift_seg5_anim_050006AC = {
     spindrift_seg5_animindex_050005F8,
     0,
 };
+
+
+// False Bin ID?
+UNUSED static const u64 spindrift_unused_1 = 1;

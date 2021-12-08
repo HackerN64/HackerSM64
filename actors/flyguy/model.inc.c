@@ -1,5 +1,8 @@
 // Flyguy
 
+// ???
+UNUSED static const u64 flyguy_unused_1 = 0;
+
 // 0x0800E088
 ALIGNED8 static const Texture flyguy_seg8_texture_0800E088[] = {
 #include "actors/flyguy/flyguy_cloth_wrinkle.rgba16.inc.c"

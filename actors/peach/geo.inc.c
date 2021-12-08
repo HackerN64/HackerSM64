@@ -132,7 +132,7 @@ const GeoLayout peach_geo[] = {
    GEO_OPEN_NODE(),
       GEO_SCALE(0x00, 16384),
       GEO_OPEN_NODE(),
-         GEO_ASM(10, geo_update_layer_transparency),
+         GEO_ASM(GEO_TRANSPARENCY_MODE_NO_DITHER, geo_update_layer_transparency),
          GEO_SWITCH_CASE(2, geo_switch_anim_state),
          GEO_OPEN_NODE(),
             GEO_BRANCH(1, peach_geo_000098),
@@ -142,3 +142,5 @@ const GeoLayout peach_geo[] = {
    GEO_CLOSE_NODE(),
    GEO_END(),
 };
+
+UNUSED static const u64 peach_unused_1 = 0;

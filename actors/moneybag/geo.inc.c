@@ -44,7 +44,7 @@ const GeoLayout moneybag_geo[] = {
    GEO_OPEN_NODE(),
       GEO_SCALE(0x00, 16384),
       GEO_OPEN_NODE(),
-         GEO_ASM(0, geo_update_layer_transparency),
+         GEO_ASM(GEO_TRANSPARENCY_MODE_NORMAL, geo_update_layer_transparency),
          GEO_SWITCH_CASE(2, geo_switch_anim_state),
          GEO_OPEN_NODE(),
             GEO_BRANCH(1, moneybag_geo_000000),
@@ -54,3 +54,5 @@ const GeoLayout moneybag_geo[] = {
    GEO_CLOSE_NODE(),
    GEO_END(),
 };
+
+UNUSED static const u64 moneybag_unused_1 = 0;

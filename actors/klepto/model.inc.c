@@ -1,5 +1,8 @@
 // Possible Removed Actor File
 
+// Bin ID? What is this?
+UNUSED static const u64 klepto_unused_1 = 0;
+
 // Klepto
 
 // 0x05000008
