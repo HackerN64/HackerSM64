@@ -13,6 +13,7 @@
 #include "mario_geo_switch_case_ids.h"
 #include "surface_terrains.h"
 #include "macros.h"
+#include "segments.h"
 
 // Crash handler enhancement
 #ifdef CRASH_SCREEN_INCLUDED
@@ -54,8 +55,7 @@
 #define COS80   0.17364818f // braking action
 #define COS85   0.23344536f
 
-enum RenderLayers
-{
+enum RenderLayers {
     LAYER_FORCE,
     LAYER_OPAQUE,
     LAYER_OPAQUE_INTER,
@@ -71,8 +71,13 @@ enum RenderLayers
     LAYER_TRANSPARENT_DECAL,
     LAYER_TRANSPARENT,
     LAYER_TRANSPARENT_INTER,
-    LAYER_COUNT,
+    LAYER_COUNT
 };
+
+#define LAYER_FIRST                         LAYER_FORCE
+#define LAYER_LAST                          (LAYER_COUNT - 1)
+
+#define LAYER_ZB_FIRST                      LAYER_OPAQUE
 #if SILHOUETTE
 #define LAYER_ZB_LAST                       LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #define LAYER_SILHOUETTE_FIRST              LAYER_SILHOUETTE_OPAQUE
@@ -83,7 +88,7 @@ enum RenderLayers
 #define LAYER_OPAQUE_ORIG                   LAYER_OPAQUE
 #define LAYER_ALPHA_ORIG                    LAYER_ALPHA
 #else
-#define LAYER_ZB_LAST LAYER_ALPHA
+#define LAYER_ZB_LAST                       LAYER_ALPHA
 #define LAYER_ALPHA_DECAL                   LAYER_ALPHA
 #define LAYER_SILHOUETTE_OPAQUE             LAYER_OPAQUE // is zbuffered
 #define LAYER_SILHOUETTE_ALPHA              LAYER_ALPHA  // is zbuffered
@@ -91,132 +96,169 @@ enum RenderLayers
 #define LAYER_OCCLUDE_SILHOUETTE_ALPHA      LAYER_ALPHA  // is zbuffered
 #endif
 
+#define LAYER_NON_ZB_FIRST                  (LAYER_ZB_LAST + 1)
+#define LAYER_NON_ZB_LAST                   LAYER_LAST
 
-#define LAYER_FIRST_NON_ZB                  (LAYER_ZB_LAST + 1)
+enum MarioInput {
+    INPUT_NONE                   = /* 0x0000 */ (0 <<  0),
+    INPUT_NONZERO_ANALOG         = /* 0x0001 */ (1 <<  0),
+    INPUT_A_PRESSED              = /* 0x0002 */ (1 <<  1),
+    INPUT_OFF_FLOOR              = /* 0x0004 */ (1 <<  2),
+    INPUT_ABOVE_SLIDE            = /* 0x0008 */ (1 <<  3),
+    INPUT_FIRST_PERSON           = /* 0x0010 */ (1 <<  4),
+    INPUT_IDLE                   = /* 0x0020 */ (1 <<  5),
+    INPUT_SQUISHED               = /* 0x0040 */ (1 <<  6),
+    INPUT_A_DOWN                 = /* 0x0080 */ (1 <<  7),
+    INPUT_IN_POISON_GAS          = /* 0x0100 */ (1 <<  8),
+    INPUT_IN_WATER               = /* 0x0200 */ (1 <<  9),
+    INPUT_STOMPED                = /* 0x0400 */ (1 << 10),
+    INPUT_INTERACT_OBJ_GRABBABLE = /* 0x0800 */ (1 << 11),
+    INPUT_B_DOWN                 = /* 0x1000 */ (1 << 12),
+    INPUT_B_PRESSED              = /* 0x2000 */ (1 << 13),
+    INPUT_Z_DOWN                 = /* 0x4000 */ (1 << 14),
+    INPUT_Z_PRESSED              = /* 0x8000 */ (1 << 15),
+};
+enum GroundStep {
+    GROUND_STEP_LEFT_GROUND,
+    GROUND_STEP_NONE,
+    GROUND_STEP_HIT_WALL,
+    GROUND_STEP_HIT_WALL_STOP_QSTEPS = GROUND_STEP_HIT_WALL,
+    GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS
+};
 
-#define INPUT_NONZERO_ANALOG                /* 0x0001 */ (1 <<  0)
-#define INPUT_A_PRESSED                     /* 0x0002 */ (1 <<  1)
-#define INPUT_OFF_FLOOR                     /* 0x0004 */ (1 <<  2)
-#define INPUT_ABOVE_SLIDE                   /* 0x0008 */ (1 <<  3)
-#define INPUT_FIRST_PERSON                  /* 0x0010 */ (1 <<  4)
-#define INPUT_IDLE                          /* 0x0020 */ (1 <<  5)
-#define INPUT_SQUISHED                      /* 0x0040 */ (1 <<  6)
-#define INPUT_A_DOWN                        /* 0x0080 */ (1 <<  7)
-#define INPUT_IN_POISON_GAS                 /* 0x0100 */ (1 <<  8)
-#define INPUT_IN_WATER                      /* 0x0200 */ (1 <<  9)
-#define INPUT_STOMPED                       /* 0x0400 */ (1 << 10)
-#define INPUT_INTERACT_OBJ_GRABBABLE        /* 0x0800 */ (1 << 11)
-#define INPUT_B_DOWN                        /* 0x1000 */ (1 << 12)
-#define INPUT_B_PRESSED                     /* 0x2000 */ (1 << 13)
-#define INPUT_Z_DOWN                        /* 0x4000 */ (1 << 14)
-#define INPUT_Z_PRESSED                     /* 0x8000 */ (1 << 15)
+enum AirStepCheck {
+    AIR_STEP_CHECK_NONE,
+    AIR_STEP_CHECK_LEDGE_GRAB,
+    AIR_STEP_CHECK_HANG
+};
 
-#define GROUND_STEP_LEFT_GROUND              0
-#define GROUND_STEP_NONE                     1
-#define GROUND_STEP_HIT_WALL                 2
-#define GROUND_STEP_HIT_WALL_STOP_QSTEPS     2
-#define GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS 3
+enum AirStep {
+    AIR_STEP_NONE,
+    AIR_STEP_LANDED,
+    AIR_STEP_HIT_WALL,
+    AIR_STEP_GRABBED_LEDGE,
+    AIR_STEP_GRABBED_CEILING,
+    AIR_STEP_UNK,
+    AIR_STEP_HIT_LAVA_WALL,
+    AIR_STEP_HIT_CEILING
+};
 
-#define AIR_STEP_CHECK_LEDGE_GRAB       0x1
-#define AIR_STEP_CHECK_HANG             0x2
+enum WaterStep {
+    WATER_STEP_NONE,
+    WATER_STEP_HIT_FLOOR,
+    WATER_STEP_HIT_CEILING,
+    WATER_STEP_CANCELLED,
+    WATER_STEP_HIT_WALL
+};
 
-#define AIR_STEP_NONE                   0x0
-#define AIR_STEP_LANDED                 0x1
-#define AIR_STEP_HIT_WALL               0x2
-#define AIR_STEP_GRABBED_LEDGE          0x3
-#define AIR_STEP_GRABBED_CEILING        0x4
-#define AIR_STEP_HIT_LAVA_WALL          0x6
-#define AIR_STEP_HIT_CEILING            0x7
+enum MarioParticleFlags {
+    PARTICLE_NONE                 = /* 0x00000000 */ (0 <<  0),
+    PARTICLE_DUST                 = /* 0x00000001 */ (1 <<  0),
+    PARTICLE_VERTICAL_STAR        = /* 0x00000002 */ (1 <<  1),
+    PARTICLE_2                    = /* 0x00000004 */ (1 <<  2),
+    PARTICLE_SPARKLES             = /* 0x00000008 */ (1 <<  3),
+    PARTICLE_HORIZONTAL_STAR      = /* 0x00000010 */ (1 <<  4),
+    PARTICLE_BUBBLE               = /* 0x00000020 */ (1 <<  5),
+    PARTICLE_WATER_SPLASH         = /* 0x00000040 */ (1 <<  6),
+    PARTICLE_IDLE_WATER_WAVE      = /* 0x00000080 */ (1 <<  7),
+    PARTICLE_SHALLOW_WATER_WAVE   = /* 0x00000100 */ (1 <<  8),
+    PARTICLE_PLUNGE_BUBBLE        = /* 0x00000200 */ (1 <<  9),
+    PARTICLE_WAVE_TRAIL           = /* 0x00000400 */ (1 << 10),
+    PARTICLE_FIRE                 = /* 0x00000800 */ (1 << 11),
+    PARTICLE_SHALLOW_WATER_SPLASH = /* 0x00001000 */ (1 << 12),
+    PARTICLE_LEAF                 = /* 0x00002000 */ (1 << 13),
+    PARTICLE_SNOW                 = /* 0x00004000 */ (1 << 14),
+    PARTICLE_DIRT                 = /* 0x00008000 */ (1 << 15),
+    PARTICLE_MIST_CIRCLE          = /* 0x00010000 */ (1 << 16),
+    PARTICLE_BREATH               = /* 0x00020000 */ (1 << 17),
+    PARTICLE_TRIANGLE             = /* 0x00040000 */ (1 << 18),
+    PARTICLE_19                   = /* 0x00080000 */ (1 << 19),
+};
 
-#define WATER_STEP_NONE                 0x0
-#define WATER_STEP_HIT_FLOOR            0x1
-#define WATER_STEP_HIT_CEILING          0x2
-#define WATER_STEP_CANCELLED            0x3
-#define WATER_STEP_HIT_WALL             0x4
+enum ModelStates {
+    MODEL_STATE_ALPHA       =  (1 << 8),                      //  0x100
+    MODEL_STATE_NOISE_ALPHA = ((1 << 7) | MODEL_STATE_ALPHA), // (0x080 | MODEL_STATE_ALPHA)
+    MODEL_STATE_METAL       =  (1 << 9),                      //  0x200
+    MODEL_STATE_MASK        =  0xFF
+};
 
-#define PARTICLE_DUST                   /* 0x00000001 */ (1 <<  0)
-#define PARTICLE_VERTICAL_STAR          /* 0x00000002 */ (1 <<  1)
-#define PARTICLE_2                      /* 0x00000004 */ (1 <<  2)
-#define PARTICLE_SPARKLES               /* 0x00000008 */ (1 <<  3)
-#define PARTICLE_HORIZONTAL_STAR        /* 0x00000010 */ (1 <<  4)
-#define PARTICLE_BUBBLE                 /* 0x00000020 */ (1 <<  5)
-#define PARTICLE_WATER_SPLASH           /* 0x00000040 */ (1 <<  6)
-#define PARTICLE_IDLE_WATER_WAVE        /* 0x00000080 */ (1 <<  7)
-#define PARTICLE_SHALLOW_WATER_WAVE     /* 0x00000100 */ (1 <<  8)
-#define PARTICLE_PLUNGE_BUBBLE          /* 0x00000200 */ (1 <<  9)
-#define PARTICLE_WAVE_TRAIL             /* 0x00000400 */ (1 << 10)
-#define PARTICLE_FIRE                   /* 0x00000800 */ (1 << 11)
-#define PARTICLE_SHALLOW_WATER_SPLASH   /* 0x00001000 */ (1 << 12)
-#define PARTICLE_LEAF                   /* 0x00002000 */ (1 << 13)
-#define PARTICLE_SNOW                   /* 0x00004000 */ (1 << 14)
-#define PARTICLE_DIRT                   /* 0x00008000 */ (1 << 15)
-#define PARTICLE_MIST_CIRCLE            /* 0x00010000 */ (1 << 16)
-#define PARTICLE_BREATH                 /* 0x00020000 */ (1 << 17)
-#define PARTICLE_TRIANGLE               /* 0x00040000 */ (1 << 18)
-#define PARTICLE_19                     /* 0x00080000 */ (1 << 19)
-
-#define MODEL_STATE_ALPHA                (1 << 8)                      //  0x100
-#define MODEL_STATE_NOISE_ALPHA         ((1 << 7) | MODEL_STATE_ALPHA) // (0x080 | MODEL_STATE_ALPHA)
-#define MODEL_STATE_METAL                (1 << 9)                      //  0x200
-
-#define MODEL_STATE_MASK                0xFF
-
-#define MARIO_NORMAL_CAP                /* 0x00000001 */ (1 <<  0)
-#define MARIO_VANISH_CAP                /* 0x00000002 */ (1 <<  1)
-#define MARIO_METAL_CAP                 /* 0x00000004 */ (1 <<  2)
-#define MARIO_WING_CAP                  /* 0x00000008 */ (1 <<  3)
-#define MARIO_CAP_ON_HEAD               /* 0x00000010 */ (1 <<  4)
-#define MARIO_CAP_IN_HAND               /* 0x00000020 */ (1 <<  5)
-#define MARIO_METAL_SHOCK               /* 0x00000040 */ (1 <<  6)
-#define MARIO_TELEPORTING               /* 0x00000080 */ (1 <<  7)
-#define MARIO_JUMPING                   /* 0x00000100 */ (1 <<  8)
-#define MARIO_NO_PURPLE_SWITCH          /* 0x00002000 */ (1 << 13)
-#define MARIO_ACTION_SOUND_PLAYED       /* 0x00010000 */ (1 << 16)
-#define MARIO_MARIO_SOUND_PLAYED        /* 0x00020000 */ (1 << 17)
-#define MARIO_FALL_SOUND_PLAYED         /* 0x00040000 */ (1 << 18)
-#define MARIO_PUNCHING                  /* 0x00100000 */ (1 << 20)
-#define MARIO_KICKING                   /* 0x00200000 */ (1 << 21)
-#define MARIO_TRIPPING                  /* 0x00400000 */ (1 << 22)
-#define MARIO_LEDGE_CLIMB_CAMERA        /* 0x02000000 */ (1 << 25)
-#define MARIO_AIR_HIT_WALL              /* 0x40000000 */ (1 << 30)
-#define MARIO_PUSHING                   /* 0x80000000 */ (1 << 31)
-
-#define MARIO_SPECIAL_CAPS (MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP)
-#define MARIO_CAPS (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS)
+enum MarioFlags {
+    MARIO_NONE                = /* 0x00000000 */ (0 <<  0),
+    MARIO_NORMAL_CAP          = /* 0x00000001 */ (1 <<  0),
+    MARIO_VANISH_CAP          = /* 0x00000002 */ (1 <<  1),
+    MARIO_METAL_CAP           = /* 0x00000004 */ (1 <<  2),
+    MARIO_WING_CAP            = /* 0x00000008 */ (1 <<  3),
+    MARIO_CAP_ON_HEAD         = /* 0x00000010 */ (1 <<  4),
+    MARIO_CAP_IN_HAND         = /* 0x00000020 */ (1 <<  5),
+    MARIO_METAL_SHOCK         = /* 0x00000040 */ (1 <<  6),
+    MARIO_TELEPORTING         = /* 0x00000080 */ (1 <<  7),
+    MARIO_JUMPING             = /* 0x00000100 */ (1 <<  8),
+    MARIO_UNUSED_9            = /* 0x00000200 */ (1 <<  9),
+    MARIO_UNUSED_10           = /* 0x00000400 */ (1 << 10),
+    MARIO_UNUSED_11           = /* 0x00000800 */ (1 << 11),
+    MARIO_UNUSED_12           = /* 0x00001000 */ (1 << 12),
+    MARIO_NO_PURPLE_SWITCH    = /* 0x00002000 */ (1 << 13),
+    MARIO_UNUSED_14           = /* 0x00004000 */ (1 << 14),
+    MARIO_UNUSED_15           = /* 0x00008000 */ (1 << 15),
+    MARIO_ACTION_SOUND_PLAYED = /* 0x00010000 */ (1 << 16),
+    MARIO_MARIO_SOUND_PLAYED  = /* 0x00020000 */ (1 << 17),
+    MARIO_FALL_SOUND_PLAYED   = /* 0x00040000 */ (1 << 18),
+    MARIO_UNUSED_19           = /* 0x00080000 */ (1 << 19),
+    MARIO_PUNCHING            = /* 0x00100000 */ (1 << 20),
+    MARIO_KICKING             = /* 0x00200000 */ (1 << 21),
+    MARIO_TRIPPING            = /* 0x00400000 */ (1 << 22),
+    MARIO_UNUSED_23           = /* 0x00800000 */ (1 << 23),
+    MARIO_UNUSED_24           = /* 0x01000000 */ (1 << 24),
+    MARIO_LEDGE_CLIMB_CAMERA  = /* 0x02000000 */ (1 << 25),
+    MARIO_UNUSED_26           = /* 0x04000000 */ (1 << 26),
+    MARIO_UNUSED_27           = /* 0x08000000 */ (1 << 27),
+    MARIO_UNUSED_28           = /* 0x10000000 */ (1 << 28),
+    MARIO_UNUSED_29           = /* 0x20000000 */ (1 << 29),
+    MARIO_AIR_HIT_WALL        = /* 0x40000000 */ (1 << 30),
+    MARIO_PUSHING             = /* 0x80000000 */ (1 << 31),
+    MARIO_SPECIAL_CAPS        = (MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP),
+    MARIO_CAPS                = (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS),
+};
 
 #define ACT_ID_MASK                         0x000001FF
 
-#define ACT_GROUP_MASK                      0x000001C0
-#define ACT_GROUP_STATIONARY                /* 0x00000000 */ (0 << 6)
-#define ACT_GROUP_MOVING                    /* 0x00000040 */ (1 << 6)
-#define ACT_GROUP_AIRBORNE                  /* 0x00000080 */ (2 << 6)
-#define ACT_GROUP_SUBMERGED                 /* 0x000000C0 */ (3 << 6)
-#define ACT_GROUP_CUTSCENE                  /* 0x00000100 */ (4 << 6)
-#define ACT_GROUP_AUTOMATIC                 /* 0x00000140 */ (5 << 6)
-#define ACT_GROUP_OBJECT                    /* 0x00000180 */ (6 << 6)
+enum MarioActionGroups {
+    ACT_GROUP_STATIONARY = /* 0x00000000 */ (0 << 6),
+    ACT_GROUP_MOVING     = /* 0x00000040 */ (1 << 6),
+    ACT_GROUP_AIRBORNE   = /* 0x00000080 */ (2 << 6),
+    ACT_GROUP_SUBMERGED  = /* 0x000000C0 */ (3 << 6),
+    ACT_GROUP_CUTSCENE   = /* 0x00000100 */ (4 << 6),
+    ACT_GROUP_AUTOMATIC  = /* 0x00000140 */ (5 << 6),
+    ACT_GROUP_OBJECT     = /* 0x00000180 */ (6 << 6),
+    ACT_GROUP_CUSTOM     = /* 0x000001C0 */ (7 << 6),
+    ACT_GROUP_MASK       = 0x000001C0
+};
 
-#define ACT_FLAG_STATIONARY                 /* 0x00000200 */ (1 <<  9)
-#define ACT_FLAG_MOVING                     /* 0x00000400 */ (1 << 10)
-#define ACT_FLAG_AIR                        /* 0x00000800 */ (1 << 11)
-#define ACT_FLAG_INTANGIBLE                 /* 0x00001000 */ (1 << 12)
-#define ACT_FLAG_SWIMMING                   /* 0x00002000 */ (1 << 13)
-#define ACT_FLAG_METAL_WATER                /* 0x00004000 */ (1 << 14)
-#define ACT_FLAG_SHORT_HITBOX               /* 0x00008000 */ (1 << 15)
-#define ACT_FLAG_RIDING_SHELL               /* 0x00010000 */ (1 << 16)
-#define ACT_FLAG_INVULNERABLE               /* 0x00020000 */ (1 << 17)
-#define ACT_FLAG_BUTT_OR_STOMACH_SLIDE      /* 0x00040000 */ (1 << 18)
-#define ACT_FLAG_DIVING                     /* 0x00080000 */ (1 << 19)
-#define ACT_FLAG_ON_POLE                    /* 0x00100000 */ (1 << 20)
-#define ACT_FLAG_HANGING                    /* 0x00200000 */ (1 << 21)
-#define ACT_FLAG_IDLE                       /* 0x00400000 */ (1 << 22)
-#define ACT_FLAG_ATTACKING                  /* 0x00800000 */ (1 << 23)
-#define ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION /* 0x01000000 */ (1 << 24)
-#define ACT_FLAG_CONTROL_JUMP_HEIGHT        /* 0x02000000 */ (1 << 25)
-#define ACT_FLAG_ALLOW_FIRST_PERSON         /* 0x04000000 */ (1 << 26)
-#define ACT_FLAG_PAUSE_EXIT                 /* 0x08000000 */ (1 << 27)
-#define ACT_FLAG_SWIMMING_OR_FLYING         /* 0x10000000 */ (1 << 28)
-#define ACT_FLAG_WATER_OR_TEXT              /* 0x20000000 */ (1 << 29)
-#define ACT_FLAG_THROWING                   /* 0x80000000 */ (1 << 31)
+enum MarioActionFlags {
+    ACT_FLAG_STATIONARY                 = /* 0x00000200 */ (1 <<  9),
+    ACT_FLAG_MOVING                     = /* 0x00000400 */ (1 << 10),
+    ACT_FLAG_AIR                        = /* 0x00000800 */ (1 << 11),
+    ACT_FLAG_INTANGIBLE                 = /* 0x00001000 */ (1 << 12),
+    ACT_FLAG_SWIMMING                   = /* 0x00002000 */ (1 << 13),
+    ACT_FLAG_METAL_WATER                = /* 0x00004000 */ (1 << 14),
+    ACT_FLAG_SHORT_HITBOX               = /* 0x00008000 */ (1 << 15),
+    ACT_FLAG_RIDING_SHELL               = /* 0x00010000 */ (1 << 16),
+    ACT_FLAG_INVULNERABLE               = /* 0x00020000 */ (1 << 17),
+    ACT_FLAG_BUTT_OR_STOMACH_SLIDE      = /* 0x00040000 */ (1 << 18),
+    ACT_FLAG_DIVING                     = /* 0x00080000 */ (1 << 19),
+    ACT_FLAG_ON_POLE                    = /* 0x00100000 */ (1 << 20),
+    ACT_FLAG_HANGING                    = /* 0x00200000 */ (1 << 21),
+    ACT_FLAG_IDLE                       = /* 0x00400000 */ (1 << 22),
+    ACT_FLAG_ATTACKING                  = /* 0x00800000 */ (1 << 23),
+    ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION = /* 0x01000000 */ (1 << 24),
+    ACT_FLAG_CONTROL_JUMP_HEIGHT        = /* 0x02000000 */ (1 << 25),
+    ACT_FLAG_ALLOW_FIRST_PERSON         = /* 0x04000000 */ (1 << 26),
+    ACT_FLAG_PAUSE_EXIT                 = /* 0x08000000 */ (1 << 27),
+    ACT_FLAG_SWIMMING_OR_FLYING         = /* 0x10000000 */ (1 << 28),
+    ACT_FLAG_WATER_OR_TEXT              = /* 0x20000000 */ (1 << 29),
+    ACT_FLAG_UNUSED                     = /* 0x40000000 */ (1 << 30),
+    ACT_FLAG_THROWING                   = /* 0x80000000 */ (1 << 31),
+};
 
 #define ACT_UNINITIALIZED              0x00000000 // (0x000)
 
@@ -232,8 +274,13 @@ enum RenderLayers
 #define ACT_STANDING_AGAINST_WALL      0x0C400209 // (0x009 | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
 #define ACT_COUGHING                   0x0C40020A // (0x00A | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
 #define ACT_SHIVERING                  0x0C40020B // (0x00B | ACT_FLAG_STATIONARY | ACT_FLAG_IDLE | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+#define ACT_UNUSED_00C                 0x0000000C // (0x00C)
 #define ACT_IN_QUICKSAND               0x0002020D // (0x00D | ACT_FLAG_STATIONARY | ACT_FLAG_INVULNERABLE)
 #define ACT_NO_STANDING_DEATH          0x0002020E // (0x00E | ACT_FLAG_STATIONARY | ACT_FLAG_INVULNERABLE)
+#define ACT_UNUSED_00F                 0x0000000F // (0x00F)
+#define ACT_UNUSED_010                 0x00000010 // (0x010)
+
+#define ACT_UNUSED_01F                 0x0000001F // (0x01F)
 #define ACT_CROUCHING                  0x0C008220 // (0x020 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
 #define ACT_START_CROUCHING            0x0C008221 // (0x021 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
 #define ACT_STOP_CROUCHING             0x0C008222 // (0x022 | ACT_FLAG_STATIONARY | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
@@ -242,6 +289,9 @@ enum RenderLayers
 #define ACT_SLIDE_KICK_SLIDE_STOP      0x08000225 // (0x025 | ACT_FLAG_STATIONARY | ACT_FLAG_PAUSE_EXIT)
 #define ACT_SHOCKWAVE_BOUNCE           0x00020226 // (0x026 | ACT_FLAG_STATIONARY | ACT_FLAG_INVULNERABLE)
 #define ACT_FIRST_PERSON               0x0C000227 // (0x027 | ACT_FLAG_STATIONARY | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
+#define ACT_UNUSED_028                 0x00000028 // (0x028)
+
+#define ACT_UNUSED_02E                 0x0000002E // (0x02E)
 #define ACT_BACKFLIP_LAND_STOP         0x0800022F // (0x02F | ACT_FLAG_STATIONARY | ACT_FLAG_PAUSE_EXIT)
 #define ACT_JUMP_LAND_STOP             0x0C000230 // (0x030 | ACT_FLAG_STATIONARY | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
 #define ACT_DOUBLE_JUMP_LAND_STOP      0x0C000231 // (0x031 | ACT_FLAG_STATIONARY | ACT_FLAG_ALLOW_FIRST_PERSON | ACT_FLAG_PAUSE_EXIT)
@@ -250,6 +300,7 @@ enum RenderLayers
 #define ACT_HOLD_JUMP_LAND_STOP        0x08000234 // (0x034 | ACT_FLAG_STATIONARY | ACT_FLAG_PAUSE_EXIT)
 #define ACT_HOLD_FREEFALL_LAND_STOP    0x08000235 // (0x035 | ACT_FLAG_STATIONARY | ACT_FLAG_PAUSE_EXIT)
 #define ACT_AIR_THROW_LAND             0x80000A36 // (0x036 | ACT_FLAG_STATIONARY | ACT_FLAG_AIR | ACT_FLAG_THROWING)
+#define ACT_UNUSED_037                 0x00000037 // (0x037)
 #define ACT_TWIRL_LAND                 0x18800238 // (0x038 | ACT_FLAG_STATIONARY | ACT_FLAG_ATTACKING | ACT_FLAG_PAUSE_EXIT | ACT_FLAG_SWIMMING_OR_FLYING)
 #define ACT_LAVA_BOOST_LAND            0x08000239 // (0x039 | ACT_FLAG_STATIONARY | ACT_FLAG_PAUSE_EXIT)
 #define ACT_TRIPLE_JUMP_LAND_STOP      0x0800023A // (0x03A | ACT_FLAG_STATIONARY | ACT_FLAG_PAUSE_EXIT)
@@ -261,6 +312,7 @@ enum RenderLayers
 
 // group 0x040: moving (ground) actions
 #define ACT_WALKING                    0x04000440 // (0x040 | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_FIRST_PERSON)
+#define ACT_UNUSED_041                 0x00000041 // (0x041)
 #define ACT_HOLD_WALKING               0x00000442 // (0x042 | ACT_FLAG_MOVING)
 #define ACT_TURNING_AROUND             0x00000443 // (0x043 | ACT_FLAG_MOVING)
 #define ACT_FINISH_TURNING_AROUND      0x00000444 // (0x044 | ACT_FLAG_MOVING)
@@ -271,6 +323,10 @@ enum RenderLayers
 #define ACT_BURNING_GROUND             0x00020449 // (0x049 | ACT_FLAG_MOVING | ACT_FLAG_INVULNERABLE)
 #define ACT_DECELERATING               0x0400044A // (0x04A | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_FIRST_PERSON)
 #define ACT_HOLD_DECELERATING          0x0000044B // (0x04B | ACT_FLAG_MOVING)
+#define ACT_UNUSED_04C                 0x0000004C // (0x04C)
+#define ACT_UNUSED_04D                 0x0000004D // (0x04D)
+#define ACT_UNUSED_04E                 0x0000004E // (0x04E)
+#define ACT_UNUSED_04F                 0x0000004F // (0x04F)
 #define ACT_BEGIN_SLIDING              0x00000050 // (0x050)
 #define ACT_HOLD_BEGIN_SLIDING         0x00000051 // (0x051)
 #define ACT_BUTT_SLIDE                 0x00840452 // (0x052 | ACT_FLAG_MOVING | ACT_FLAG_BUTT_OR_STOMACH_SLIDE | ACT_FLAG_ATTACKING)
@@ -279,8 +335,14 @@ enum RenderLayers
 #define ACT_HOLD_STOMACH_SLIDE         0x008C0455 // (0x055 | ACT_FLAG_MOVING | ACT_FLAG_BUTT_OR_STOMACH_SLIDE | ACT_FLAG_DIVING | ACT_FLAG_ATTACKING)
 #define ACT_DIVE_SLIDE                 0x00880456 // (0x056 | ACT_FLAG_MOVING | ACT_FLAG_DIVING | ACT_FLAG_ATTACKING)
 #define ACT_MOVE_PUNCHING              0x00800457 // (0x057 | ACT_FLAG_MOVING | ACT_FLAG_ATTACKING)
+#define ACT_UNUSED_058                 0x00000058 // (0x058)
 #define ACT_CROUCH_SLIDE               0x04808459 // (0x059 | ACT_FLAG_MOVING | ACT_FLAG_SHORT_HITBOX | ACT_FLAG_ATTACKING | ACT_FLAG_ALLOW_FIRST_PERSON)
 #define ACT_SLIDE_KICK_SLIDE           0x0080045A // (0x05A | ACT_FLAG_MOVING | ACT_FLAG_ATTACKING)
+#define ACT_UNUSED_05B                 0x0000005B // (0x05B)
+#define ACT_UNUSED_05C                 0x0000005C // (0x05C)
+#define ACT_UNUSED_05D                 0x0000005D // (0x05D)
+#define ACT_UNUSED_05E                 0x0000005E // (0x05E)
+#define ACT_UNUSED_05F                 0x0000005F // (0x05F)
 #define ACT_HARD_BACKWARD_GROUND_KB    0x00020460 // (0x060 | ACT_FLAG_MOVING | ACT_FLAG_INVULNERABLE)
 #define ACT_HARD_FORWARD_GROUND_KB     0x00020461 // (0x061 | ACT_FLAG_MOVING | ACT_FLAG_INVULNERABLE)
 #define ACT_BACKWARD_GROUND_KB         0x00020462 // (0x062 | ACT_FLAG_MOVING | ACT_FLAG_INVULNERABLE)
@@ -289,6 +351,11 @@ enum RenderLayers
 #define ACT_SOFT_FORWARD_GROUND_KB     0x00020465 // (0x065 | ACT_FLAG_MOVING | ACT_FLAG_INVULNERABLE)
 #define ACT_GROUND_BONK                0x00020466 // (0x066 | ACT_FLAG_MOVING | ACT_FLAG_INVULNERABLE)
 #define ACT_DEATH_EXIT_LAND            0x00020467 // (0x067 | ACT_FLAG_MOVING | ACT_FLAG_INVULNERABLE)
+#define ACT_UNUSED_068                 0x00000068 // (0x068)
+#define ACT_UNUSED_06C                 0x0000006C // (0x06C)
+#define ACT_UNUSED_06D                 0x0000006D // (0x06D)
+#define ACT_UNUSED_06E                 0x0000006E // (0x06E)
+#define ACT_UNUSED_06F                 0x0000006F // (0x06F)
 #define ACT_JUMP_LAND                  0x04000470 // (0x070 | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_FIRST_PERSON)
 #define ACT_FREEFALL_LAND              0x04000471 // (0x071 | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_FIRST_PERSON)
 #define ACT_DOUBLE_JUMP_LAND           0x04000472 // (0x072 | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_FIRST_PERSON)
@@ -300,12 +367,18 @@ enum RenderLayers
 #define ACT_TRIPLE_JUMP_LAND           0x04000478 // (0x078 | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_FIRST_PERSON)
 #define ACT_LONG_JUMP_LAND             0x00000479 // (0x079 | ACT_FLAG_MOVING)
 #define ACT_BACKFLIP_LAND              0x0400047A // (0x07A | ACT_FLAG_MOVING | ACT_FLAG_ALLOW_FIRST_PERSON)
+#define ACT_UNUSED_07B                 0x0000007B // (0x07B)
+#define ACT_UNUSED_07C                 0x0000007C // (0x07C)
+#define ACT_UNUSED_07D                 0x0000007D // (0x07D)
+#define ACT_UNUSED_07E                 0x0000007E // (0x07E)
+#define ACT_UNUSED_07F                 0x0000007F // (0x07F)
 
 // group 0x080: airborne actions
 #define ACT_JUMP                       0x03000880 // (0x080 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
 #define ACT_DOUBLE_JUMP                0x03000881 // (0x081 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
 #define ACT_TRIPLE_JUMP                0x01000882 // (0x082 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_BACKFLIP                   0x01000883 // (0x083 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
+#define ACT_UNUSED_084                 0x00000084 // (0x084)
 #define ACT_STEEP_JUMP                 0x03000885 // (0x085 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
 #define ACT_WALL_KICK_AIR              0x03000886 // (0x086 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
 #define ACT_SIDE_FLIP                  0x01000887 // (0x087 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
@@ -315,18 +388,30 @@ enum RenderLayers
 #define ACT_FREEFALL                   0x0100088C // (0x08C | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_TOP_OF_POLE_JUMP           0x0300088D // (0x08D | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
 #define ACT_BUTT_SLIDE_AIR             0x0300088E // (0x08E | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
+#define ACT_UNUSED_08F                 0x0000008F // (0x08F)
+#define ACT_UNUSED_090                 0x00000090 // (0x090)
+#define ACT_UNUSED_091                 0x00000091 // (0x091)
+#define ACT_UNUSED_092                 0x00000092 // (0x092)
+#define ACT_UNUSED_093                 0x00000093 // (0x093)
 #define ACT_FLYING_TRIPLE_JUMP         0x03000894 // (0x094 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
+#define ACT_UNUSED_095                 0x00000095 // (0x095)
+#define ACT_UNUSED_096                 0x00000096 // (0x096)
+#define ACT_UNUSED_097                 0x00000097 // (0x097)
 #define ACT_SHOT_FROM_CANNON           0x00880898 // (0x098 | ACT_FLAG_AIR | ACT_FLAG_DIVING | ACT_FLAG_ATTACKING)
 #define ACT_FLYING                     0x10880899 // (0x099 | ACT_FLAG_AIR | ACT_FLAG_DIVING | ACT_FLAG_ATTACKING | ACT_FLAG_SWIMMING_OR_FLYING)
 #define ACT_RIDING_SHELL_JUMP          0x0281089A // (0x09A | ACT_FLAG_AIR | ACT_FLAG_RIDING_SHELL | ACT_FLAG_ATTACKING | ACT_FLAG_CONTROL_JUMP_HEIGHT)
 #define ACT_RIDING_SHELL_FALL          0x0081089B // (0x09B | ACT_FLAG_AIR | ACT_FLAG_RIDING_SHELL | ACT_FLAG_ATTACKING)
 #define ACT_VERTICAL_WIND              0x1008089C // (0x09C | ACT_FLAG_AIR | ACT_FLAG_DIVING | ACT_FLAG_SWIMMING_OR_FLYING)
+#define ACT_UNUSED_09D                 0x0000009D // (0x09D)
+#define ACT_UNUSED_09E                 0x0000009E // (0x09E)
+#define ACT_UNUSED_09F                 0x0000009F // (0x09F)
 #define ACT_HOLD_JUMP                  0x030008A0 // (0x0A0 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION | ACT_FLAG_CONTROL_JUMP_HEIGHT)
 #define ACT_HOLD_FREEFALL              0x010008A1 // (0x0A1 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_HOLD_BUTT_SLIDE_AIR        0x010008A2 // (0x0A2 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_HOLD_WATER_JUMP            0x010008A3 // (0x0A3 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_TWIRLING                   0x108008A4 // (0x0A4 | ACT_FLAG_AIR | ACT_FLAG_ATTACKING | ACT_FLAG_SWIMMING_OR_FLYING)
 #define ACT_FORWARD_ROLLOUT            0x010008A6 // (0x0A6 | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
+#define ACT_UNUSED_0A5                 0x000000A5 // (0x0A5)
 #define ACT_AIR_HIT_WALL               0x000008A7 // (0x0A7 | ACT_FLAG_AIR)
 #define ACT_RIDING_HOOT                0x000004A8 // (0x0A8 | ACT_FLAG_MOVING)
 #define ACT_GROUND_POUND               0x008008A9 // (0x0A9 | ACT_FLAG_AIR | ACT_FLAG_ATTACKING)
@@ -345,8 +430,12 @@ enum RenderLayers
 #define ACT_SOFT_BONK                  0x010208B6 // (0x0B6 | ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_LAVA_BOOST                 0x010208B7 // (0x0B7 | ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_GETTING_BLOWN              0x010208B8 // (0x0B8 | ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
+#define ACT_UNUSED_0B9                 0x000000B9 // (0x0B9)
+
+#define ACT_UNUSED_0BC                 0x000000BC // (0x0BC)
 #define ACT_THROWN_FORWARD             0x010208BD // (0x0BD | ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 #define ACT_THROWN_BACKWARD            0x010208BE // (0x0BE | ACT_FLAG_AIR | ACT_FLAG_INVULNERABLE | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
+#define ACT_UNUSED_0BF                 0x000000BF // (0x0BF)
 
 // group 0x0C0: submerged actions
 #define ACT_WATER_IDLE                 0x380022C0 // (0x0C0 | ACT_FLAG_STATIONARY | ACT_FLAG_SWIMMING | ACT_FLAG_PAUSE_EXIT | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
@@ -358,6 +447,13 @@ enum RenderLayers
 #define ACT_FORWARD_WATER_KB           0x300222C6 // (0x0C6 | ACT_FLAG_STATIONARY | ACT_FLAG_SWIMMING | ACT_FLAG_INVULNERABLE | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_WATER_DEATH                0x300032C7 // (0x0C7 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_WATER_SHOCKED              0x300222C8 // (0x0C8 | ACT_FLAG_STATIONARY | ACT_FLAG_SWIMMING | ACT_FLAG_INVULNERABLE | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
+#define ACT_UNUSED_0C9                 0x000000C9 // (0x0C9)
+#define ACT_UNUSED_0CA                 0x000000CA // (0x0CA)
+#define ACT_UNUSED_0CB                 0x000000CB // (0x0CB)
+#define ACT_UNUSED_0CC                 0x000000CC // (0x0CC)
+#define ACT_UNUSED_0CD                 0x000000CD // (0x0CD)
+#define ACT_UNUSED_0CE                 0x000000CE // (0x0CE)
+#define ACT_UNUSED_0CF                 0x000000CF // (0x0CF)
 #define ACT_BREASTSTROKE               0x300024D0 // (0x0D0 | ACT_FLAG_MOVING | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_SWIMMING_END               0x300024D1 // (0x0D1 | ACT_FLAG_MOVING | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_FLUTTER_KICK               0x300024D2 // (0x0D2 | ACT_FLAG_MOVING | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
@@ -365,10 +461,31 @@ enum RenderLayers
 #define ACT_HOLD_SWIMMING_END          0x300024D4 // (0x0D4 | ACT_FLAG_MOVING | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_HOLD_FLUTTER_KICK          0x300024D5 // (0x0D5 | ACT_FLAG_MOVING | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_WATER_SHELL_SWIMMING       0x300024D6 // (0x0D6 | ACT_FLAG_MOVING | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
+#define ACT_UNUSED_0D7                 0x000000D7 // (0x0D7)
+#define ACT_UNUSED_0D8                 0x000000D8 // (0x0D8)
+#define ACT_UNUSED_0D9                 0x000000D9 // (0x0D9)
+#define ACT_UNUSED_0DA                 0x000000DA // (0x0DA)
+#define ACT_UNUSED_0DB                 0x000000DB // (0x0DB)
+#define ACT_UNUSED_0DC                 0x000000DC // (0x0DC)
+#define ACT_UNUSED_0DD                 0x000000DD // (0x0DD)
+#define ACT_UNUSED_0DE                 0x000000DE // (0x0DE)
+#define ACT_UNUSED_0DF                 0x000000DF // (0x0DF)
 #define ACT_WATER_THROW                0x300024E0 // (0x0E0 | ACT_FLAG_MOVING | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_WATER_PUNCH                0x300024E1 // (0x0E1 | ACT_FLAG_MOVING | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_WATER_PLUNGE               0x300022E2 // (0x0E2 | ACT_FLAG_STATIONARY | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
 #define ACT_CAUGHT_IN_WHIRLPOOL        0x300222E3 // (0x0E3 | ACT_FLAG_STATIONARY | ACT_FLAG_SWIMMING | ACT_FLAG_INVULNERABLE | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT)
+#define ACT_UNUSED_0E4                 0x000000E4 // (0x0E4)
+#define ACT_UNUSED_0E5                 0x000000E5 // (0x0E5)
+#define ACT_UNUSED_0E6                 0x000000E6 // (0x0E6)
+#define ACT_UNUSED_0E7                 0x000000E7 // (0x0E7)
+#define ACT_UNUSED_0E8                 0x000000E8 // (0x0E8)
+#define ACT_UNUSED_0E9                 0x000000E9 // (0x0E9)
+#define ACT_UNUSED_0EA                 0x000000EA // (0x0EA)
+#define ACT_UNUSED_0EB                 0x000000EB // (0x0EB)
+#define ACT_UNUSED_0EC                 0x000000EC // (0x0EC)
+#define ACT_UNUSED_0ED                 0x000000ED // (0x0ED)
+#define ACT_UNUSED_0EE                 0x000000EE // (0x0EE)
+#define ACT_UNUSED_0EF                 0x000000EF // (0x0EF)
 #define ACT_METAL_WATER_STANDING       0x080042F0 // (0x0F0 | ACT_FLAG_STATIONARY | ACT_FLAG_METAL_WATER | ACT_FLAG_PAUSE_EXIT)
 #define ACT_HOLD_METAL_WATER_STANDING  0x080042F1 // (0x0F1 | ACT_FLAG_STATIONARY | ACT_FLAG_METAL_WATER | ACT_FLAG_PAUSE_EXIT)
 #define ACT_METAL_WATER_WALKING        0x000044F2 // (0x0F2 | ACT_FLAG_MOVING | ACT_FLAG_METAL_WATER)
@@ -381,6 +498,10 @@ enum RenderLayers
 #define ACT_HOLD_METAL_WATER_JUMP      0x000044F9 // (0x0F9 | ACT_FLAG_MOVING | ACT_FLAG_METAL_WATER)
 #define ACT_METAL_WATER_JUMP_LAND      0x000044FA // (0x0FA | ACT_FLAG_MOVING | ACT_FLAG_METAL_WATER)
 #define ACT_HOLD_METAL_WATER_JUMP_LAND 0x000044FB // (0x0FB | ACT_FLAG_MOVING | ACT_FLAG_METAL_WATER)
+#define ACT_UNUSED_0FC                 0x000000FC // (0x0FC)
+#define ACT_UNUSED_0FD                 0x000000FD // (0x0FD)
+#define ACT_UNUSED_0FE                 0x000000FE // (0x0FE)
+#define ACT_UNUSED_0FF                 0x000000FF // (0x0FF)
 
 // group 0x100: cutscene actions
 #define ACT_DISAPPEARED                0x00001300 // (0x100 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
@@ -394,7 +515,12 @@ enum RenderLayers
 #define ACT_READING_SIGN               0x00001308 // (0x108 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
 #define ACT_JUMBO_STAR_CUTSCENE        0x00001909 // (0x109 | ACT_FLAG_AIR | ACT_FLAG_INTANGIBLE)
 #define ACT_WAITING_FOR_DIALOG         0x0000130A // (0x10A | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
+#define ACT_UNUSED_10B                 0x0000010B // (0x10B)
+#define ACT_UNUSED_10C                 0x0000010C // (0x10C)
+#define ACT_UNUSED_10D                 0x0000010D // (0x10D)
+#define ACT_UNUSED_10E                 0x0000010E // (0x10E)
 #define ACT_DEBUG_FREE_MOVE            0x0000130F // (0x10F | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
+#define ACT_UNUSED_110                 0x00000110 // (0x110)
 #define ACT_STANDING_DEATH             0x00021311 // (0x111 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
 #define ACT_QUICKSAND_DEATH            0x00021312 // (0x112 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
 #define ACT_ELECTROCUTION              0x00021313 // (0x113 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
@@ -405,6 +531,11 @@ enum RenderLayers
 #define ACT_END_PEACH_CUTSCENE         0x00001918 // (0x118 | ACT_FLAG_AIR | ACT_FLAG_INTANGIBLE)
 #define ACT_CREDITS_CUTSCENE           0x00001319 // (0x119 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
 #define ACT_END_WAVING_CUTSCENE        0x0000131A // (0x11A | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
+#define ACT_UNUSED_11B                 0x0000011B // (0x11B)
+#define ACT_UNUSED_11C                 0x0000011C // (0x11C)
+#define ACT_UNUSED_11D                 0x0000011D // (0x11D)
+#define ACT_UNUSED_11E                 0x0000011E // (0x11E)
+#define ACT_UNUSED_11F                 0x0000011F // (0x11F)
 #define ACT_PULLING_DOOR               0x00001320 // (0x120 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
 #define ACT_PUSHING_DOOR               0x00001321 // (0x121 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
 #define ACT_WARP_DOOR_SPAWN            0x00001322 // (0x122 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
@@ -421,6 +552,7 @@ enum RenderLayers
 #define ACT_FALLING_EXIT_AIRBORNE      0x0000192D // (0x12D | ACT_FLAG_AIR | ACT_FLAG_INTANGIBLE)
 #define ACT_UNLOCKING_KEY_DOOR         0x0000132E // (0x12E | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
 #define ACT_UNLOCKING_STAR_DOOR        0x0000132F // (0x12F | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
+#define ACT_UNUSED_130                 0x00000130 // (0x130)
 #define ACT_ENTERING_STAR_DOOR         0x00001331 // (0x131 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
 #define ACT_SPAWN_NO_SPIN_AIRBORNE     0x00001932 // (0x132 | ACT_FLAG_AIR | ACT_FLAG_INTANGIBLE)
 #define ACT_SPAWN_NO_SPIN_LANDING      0x00001333 // (0x133 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
@@ -434,6 +566,8 @@ enum RenderLayers
 #define ACT_BUTT_STUCK_IN_GROUND       0x0002033B // (0x13B | ACT_FLAG_STATIONARY | ACT_FLAG_INVULNERABLE)
 #define ACT_FEET_STUCK_IN_GROUND       0x0002033C // (0x13C | ACT_FLAG_STATIONARY | ACT_FLAG_INVULNERABLE)
 #define ACT_PUTTING_ON_CAP             0x0000133D // (0x13D | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
+#define ACT_UNUSED_13E                 0x0000013E // (0x13E)
+#define ACT_UNUSED_13F                 0x0000013F // (0x13F)
 
 // group 0x140: "automatic" actions
 #define ACT_HOLDING_POLE               0x08100340 // (0x140 | ACT_FLAG_STATIONARY | ACT_FLAG_ON_POLE | ACT_FLAG_PAUSE_EXIT)
@@ -442,6 +576,8 @@ enum RenderLayers
 #define ACT_CLIMBING_POLE              0x00100343 // (0x143 | ACT_FLAG_STATIONARY | ACT_FLAG_ON_POLE)
 #define ACT_TOP_OF_POLE_TRANSITION     0x00100344 // (0x144 | ACT_FLAG_STATIONARY | ACT_FLAG_ON_POLE)
 #define ACT_TOP_OF_POLE                0x00100345 // (0x145 | ACT_FLAG_STATIONARY | ACT_FLAG_ON_POLE)
+#define ACT_UNUSED_146                 0x00000146 // (0x146)
+#define ACT_UNUSED_147                 0x00000147 // (0x147)
 #define ACT_START_HANGING              0x08200348 // (0x148 | ACT_FLAG_STATIONARY | ACT_FLAG_HANGING | ACT_FLAG_PAUSE_EXIT)
 #define ACT_HANGING                    0x00200349 // (0x149 | ACT_FLAG_STATIONARY | ACT_FLAG_HANGING)
 #define ACT_HANG_MOVING                0x0020054A // (0x14A | ACT_FLAG_MOVING | ACT_FLAG_HANGING)
@@ -450,21 +586,123 @@ enum RenderLayers
 #define ACT_LEDGE_CLIMB_SLOW_2         0x0000054D // (0x14D | ACT_FLAG_MOVING)
 #define ACT_LEDGE_CLIMB_DOWN           0x0000054E // (0x14E | ACT_FLAG_MOVING)
 #define ACT_LEDGE_CLIMB_FAST           0x0000054F // (0x14F | ACT_FLAG_MOVING)
+#define ACT_UNUSED_150                 0x00000150 // (0x150)
+#define ACT_UNUSED_151                 0x00000151 // (0x151)
+#define ACT_UNUSED_152                 0x00000152 // (0x152)
+#define ACT_UNUSED_153                 0x00000153 // (0x153)
+#define ACT_UNUSED_154                 0x00000154 // (0x154)
+#define ACT_UNUSED_155                 0x00000155 // (0x155)
+#define ACT_UNUSED_156                 0x00000156 // (0x156)
+#define ACT_UNUSED_157                 0x00000157 // (0x157)
+#define ACT_UNUSED_158                 0x00000158 // (0x158)
+#define ACT_UNUSED_159                 0x00000159 // (0x159)
+#define ACT_UNUSED_15A                 0x0000015A // (0x15A)
+#define ACT_UNUSED_15B                 0x0000015B // (0x15B)
+#define ACT_UNUSED_15C                 0x0000015C // (0x15C)
+#define ACT_UNUSED_15D                 0x0000015D // (0x15D)
+#define ACT_UNUSED_15E                 0x0000015E // (0x15E)
+#define ACT_UNUSED_15F                 0x0000015F // (0x15F)
+#define ACT_UNUSED_160                 0x00000160 // (0x160)
+#define ACT_UNUSED_161                 0x00000161 // (0x161)
+#define ACT_UNUSED_162                 0x00000162 // (0x162)
+#define ACT_UNUSED_163                 0x00000163 // (0x163)
+#define ACT_UNUSED_164                 0x00000164 // (0x164)
+#define ACT_UNUSED_165                 0x00000165 // (0x165)
+#define ACT_UNUSED_166                 0x00000166 // (0x166)
+#define ACT_UNUSED_167                 0x00000167 // (0x167)
+#define ACT_UNUSED_168                 0x00000168 // (0x168)
+#define ACT_UNUSED_169                 0x00000169 // (0x169)
+#define ACT_UNUSED_16A                 0x0000016A // (0x16A)
+#define ACT_UNUSED_16B                 0x0000016B // (0x16B)
+#define ACT_UNUSED_16C                 0x0000016C // (0x16C)
+#define ACT_UNUSED_16D                 0x0000016D // (0x16D)
+#define ACT_UNUSED_16E                 0x0000016E // (0x16E)
+#define ACT_UNUSED_16F                 0x0000016F // (0x16F)
 #define ACT_GRABBED                    0x00020370 // (0x170 | ACT_FLAG_STATIONARY | ACT_FLAG_INVULNERABLE)
 #define ACT_IN_CANNON                  0x00001371 // (0x171 | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE)
 #define ACT_TORNADO_TWIRLING           0x10020372 // (0x172 | ACT_FLAG_STATIONARY | ACT_FLAG_INVULNERABLE | ACT_FLAG_SWIMMING_OR_FLYING)
+#define ACT_UNUSED_173                 0x00000173 // (0x173)
+#define ACT_UNUSED_174                 0x00000174 // (0x174)
+#define ACT_UNUSED_175                 0x00000175 // (0x175)
+#define ACT_UNUSED_176                 0x00000176 // (0x176)
+#define ACT_UNUSED_177                 0x00000177 // (0x177)
+#define ACT_UNUSED_178                 0x00000178 // (0x178)
+#define ACT_UNUSED_179                 0x00000179 // (0x179)
+#define ACT_UNUSED_17A                 0x0000017A // (0x17A)
+#define ACT_UNUSED_17B                 0x0000017B // (0x17B)
+#define ACT_UNUSED_17C                 0x0000017C // (0x17C)
+#define ACT_UNUSED_17D                 0x0000017D // (0x17D)
+#define ACT_UNUSED_17E                 0x0000017E // (0x17E)
+#define ACT_UNUSED_17F                 0x0000017F // (0x17F)
 
 // group 0x180: object actions
 #define ACT_PUNCHING                   0x00800380 // (0x180 | ACT_FLAG_STATIONARY | ACT_FLAG_ATTACKING)
+#define ACT_UNUSED_181                 0x00000181 // (0x181)
+#define ACT_UNUSED_182                 0x00000182 // (0x182)
 #define ACT_PICKING_UP                 0x00000383 // (0x183 | ACT_FLAG_STATIONARY)
+#define ACT_UNUSED_184                 0x00000184 // (0x184)
 #define ACT_DIVE_PICKING_UP            0x00000385 // (0x185 | ACT_FLAG_STATIONARY)
 #define ACT_STOMACH_SLIDE_STOP         0x00000386 // (0x186 | ACT_FLAG_STATIONARY)
 #define ACT_PLACING_DOWN               0x00000387 // (0x187 | ACT_FLAG_STATIONARY)
 #define ACT_THROWING                   0x80000588 // (0x188 | ACT_FLAG_MOVING | ACT_FLAG_THROWING)
 #define ACT_HEAVY_THROW                0x80000589 // (0x189 | ACT_FLAG_MOVING | ACT_FLAG_THROWING)
+#define ACT_UNUSED_18A                 0x0000018A // (0x18A)
+#define ACT_UNUSED_18B                 0x0000018B // (0x18B)
+#define ACT_UNUSED_18C                 0x0000018C // (0x18C)
+#define ACT_UNUSED_18D                 0x0000018D // (0x18D)
+#define ACT_UNUSED_18E                 0x0000018E // (0x18E)
+#define ACT_UNUSED_18F                 0x0000018F // (0x18F)
 #define ACT_PICKING_UP_BOWSER          0x00000390 // (0x190 | ACT_FLAG_STATIONARY)
 #define ACT_HOLDING_BOWSER             0x00000391 // (0x191 | ACT_FLAG_STATIONARY)
 #define ACT_RELEASING_BOWSER           0x00000392 // (0x192 | ACT_FLAG_STATIONARY)
+#define ACT_UNUSED_193                 0x00000193 // (0x193)
+#define ACT_UNUSED_194                 0x00000194 // (0x194)
+#define ACT_UNUSED_195                 0x00000195 // (0x195)
+#define ACT_UNUSED_196                 0x00000196 // (0x196)
+#define ACT_UNUSED_197                 0x00000197 // (0x197)
+#define ACT_UNUSED_198                 0x00000198 // (0x198)
+#define ACT_UNUSED_199                 0x00000199 // (0x199)
+#define ACT_UNUSED_19A                 0x0000019A // (0x19A)
+#define ACT_UNUSED_19B                 0x0000019B // (0x19B)
+#define ACT_UNUSED_19C                 0x0000019C // (0x19C)
+#define ACT_UNUSED_19D                 0x0000019D // (0x19D)
+#define ACT_UNUSED_19E                 0x0000019E // (0x19E)
+#define ACT_UNUSED_19F                 0x0000019F // (0x19F)
+#define ACT_UNUSED_1A0                 0x000001A0 // (0x1A0)
+#define ACT_UNUSED_1A1                 0x000001A1 // (0x1A1)
+#define ACT_UNUSED_1A2                 0x000001A2 // (0x1A2)
+#define ACT_UNUSED_1A3                 0x000001A3 // (0x1A3)
+#define ACT_UNUSED_1A4                 0x000001A4 // (0x1A4)
+#define ACT_UNUSED_1A5                 0x000001A5 // (0x1A5)
+#define ACT_UNUSED_1A6                 0x000001A6 // (0x1A6)
+#define ACT_UNUSED_1A7                 0x000001A7 // (0x1A7)
+#define ACT_UNUSED_1A8                 0x000001A8 // (0x1A8)
+#define ACT_UNUSED_1A9                 0x000001A9 // (0x1A9)
+#define ACT_UNUSED_1AA                 0x000001AA // (0x1AA)
+#define ACT_UNUSED_1AB                 0x000001AB // (0x1AB)
+#define ACT_UNUSED_1AC                 0x000001AC // (0x1AC)
+#define ACT_UNUSED_1AD                 0x000001AD // (0x1AD)
+#define ACT_UNUSED_1AE                 0x000001AE // (0x1AE)
+#define ACT_UNUSED_1AF                 0x000001AF // (0x1AF)
+#define ACT_UNUSED_1B0                 0x000001B0 // (0x1B0)
+#define ACT_UNUSED_1B1                 0x000001B1 // (0x1B1)
+#define ACT_UNUSED_1B2                 0x000001B2 // (0x1B2)
+#define ACT_UNUSED_1B3                 0x000001B3 // (0x1B3)
+#define ACT_UNUSED_1B4                 0x000001B4 // (0x1B4)
+#define ACT_UNUSED_1B5                 0x000001B5 // (0x1B5)
+#define ACT_UNUSED_1B6                 0x000001B6 // (0x1B6)
+#define ACT_UNUSED_1B7                 0x000001B7 // (0x1B7)
+#define ACT_UNUSED_1B8                 0x000001B8 // (0x1B8)
+#define ACT_UNUSED_1B9                 0x000001B9 // (0x1B9)
+#define ACT_UNUSED_1BA                 0x000001BA // (0x1BA)
+#define ACT_UNUSED_1BB                 0x000001BB // (0x1BB)
+#define ACT_UNUSED_1BC                 0x000001BC // (0x1BC)
+#define ACT_UNUSED_1BD                 0x000001BD // (0x1BD)
+#define ACT_UNUSED_1BE                 0x000001BE // (0x1BE)
+#define ACT_UNUSED_1BF                 0x000001BF // (0x1BF)
+
+// group 0x1C0: custom actions
+// 0x1C0 - 0x1FF
 
 /*
  this input mask is unused by the controller,
@@ -480,5 +718,7 @@ enum RenderLayers
                        U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS   )
 
 #define C_BUTTONS     (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS   )
+
+#define JPAD_BUTTONS  (U_JPAD     | D_JPAD     | L_JPAD     | R_JPAD       )
 
 #endif // SM64_H
