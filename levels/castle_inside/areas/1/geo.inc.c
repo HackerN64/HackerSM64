@@ -173,7 +173,7 @@ const GeoLayout castle_geo_001200[] = {
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07032FC0),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07033158),
       GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(256, geo_painting_draw),
+      GEO_ASM(PAINTING_ID(0, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -192,7 +192,7 @@ const GeoLayout castle_geo_001260[] = {
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07035178),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07035288),
       GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(258, geo_painting_draw),
+      GEO_ASM(PAINTING_ID(2, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -256,7 +256,7 @@ const GeoLayout castle_geo_0013B8[] = {
 
 // 0x0E001400
 const GeoLayout castle_geo_001400[] = {
-   GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -269,7 +269,7 @@ const GeoLayout castle_geo_001400[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM_WITH_FUNC(64, 50, 7000, geo_camera_fov),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(13, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
+            GEO_CAMERA(CAMERA_MODE_FIXED, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
             GEO_OPEN_NODE(),
                GEO_SWITCH_CASE(17, geo_switch_area),
                GEO_OPEN_NODE(),
@@ -292,7 +292,7 @@ const GeoLayout castle_geo_001400[] = {
                   GEO_BRANCH(1, castle_geo_0013B8), // 0x0E0013B8
                GEO_CLOSE_NODE(),
                GEO_RENDER_OBJ(),
-               GEO_ASM(0, geo_envfx_main),
+               GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

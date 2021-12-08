@@ -10,32 +10,32 @@
 #include "levels/ending/cake_eu.inc.c"
 
 // 0x07023000 - 0x07023FFF
-ALIGNED8 static const Texture cake_end_texture_eu_35[] = {
+ALIGNED8 static const Texture cake_end_texture_eu_35_thank_you[] = {
 #include "levels/ending/eu_023000.rgba16.inc.c"
 };
 
 // 0x07024000 - 0x07024FFF
-ALIGNED8 static const Texture cake_end_texture_eu_36[] = {
+ALIGNED8 static const Texture cake_end_texture_eu_36_merci[] = {
 #include "levels/ending/eu_024000.rgba16.inc.c"
 };
 
 // 0x07025000 - 0x07025FFF
-ALIGNED8 static const Texture cake_end_texture_eu_37[] = {
+ALIGNED8 static const Texture cake_end_texture_eu_37_vrelen_dank[] = {
 #include "levels/ending/eu_025000.rgba16.inc.c"
 };
 
 // 0x07026000 - 0x07026FFF
-ALIGNED8 static const Texture cake_end_texture_eu_38[] = {
+ALIGNED8 static const Texture cake_end_texture_eu_38_the_end[] = {
 #include "levels/ending/eu_026000.rgba16.inc.c"
 };
 
 // 0x07027000 - 0x07027FFF
-ALIGNED8 static const Texture cake_end_texture_eu_39[] = {
+ALIGNED8 static const Texture cake_end_texture_eu_39_fin[] = {
 #include "levels/ending/eu_027000.rgba16.inc.c"
 };
 
 // 0x07028000 - 0x07028FFF
-ALIGNED8 static const Texture cake_end_texture_eu_40[] = {
+ALIGNED8 static const Texture cake_end_texture_eu_40_ende[] = {
 #include "levels/ending/eu_028000.rgba16.inc.c"
 };
 
@@ -193,7 +193,7 @@ const Gfx dl_cake_end_screen[] = {
 };
 
 // 0x070296D8 - 0x070296F8
-static const Gfx dl_cake_end_eu_070296D8[] = {
+static const Gfx dl_cake_end_eu_end[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(G_CYC_1CYCLE),
     gsDPSetTexturePersp(G_TP_PERSP),
@@ -202,50 +202,50 @@ static const Gfx dl_cake_end_eu_070296D8[] = {
 
 #ifndef EU_CUSTOM_CAKE_FIX
 // 0x070296F8 - 0x07029768
-const Gfx dl_cake_end_screen_eu_070296F8[] = {
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_38),
+const Gfx dl_cake_end_screen_eu_english[] = {
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_38_the_end),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
     gsSPTextureRectangle(128 << 2, 200 << 2, (128 + 63) << 2, (200 + 31) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10),
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_35),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_35_thank_you),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
     gsSPTextureRectangle(128 << 2, 125 << 2, (128 + 63) << 2, (125 + 31) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10),
-    gsSPDisplayList(dl_cake_end_eu_070296D8),
+    gsSPDisplayList(dl_cake_end_eu_end),
     gsSPEndDisplayList(),
 };
 
 // 0x07029768 - 0x070297D8
-const Gfx dl_cake_end_screen_eu_07029768[] = {
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_39),
+const Gfx dl_cake_end_screen_eu_french[] = {
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_39_fin),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
     gsSPTextureRectangle(128 << 2, 200 << 2, (128 + 63) << 2, (200 + 31) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10),
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_36),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_36_merci),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
     gsSPTextureRectangle(128 << 2, 125 << 2, (128 + 63) << 2, (125 + 31) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10),
-    gsSPDisplayList(dl_cake_end_eu_070296D8),
+    gsSPDisplayList(dl_cake_end_eu_end),
     gsSPEndDisplayList(),
 };
 
 // 0x070297D8 - 0x07029848
-const Gfx dl_cake_end_screen_eu_070297D8[] = {
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_40),
+const Gfx dl_cake_end_screen_eu_german[] = {
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_40_ende),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
     gsSPTextureRectangle(128 << 2, 200 << 2, (128 + 63) << 2, (200 + 31) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10),
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_37),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cake_end_texture_eu_37_vrelen_dank),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
     gsSPTextureRectangle(128 << 2, 125 << 2, (128 + 63) << 2, (125 + 31) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10),
-    gsSPDisplayList(dl_cake_end_eu_070296D8),
+    gsSPDisplayList(dl_cake_end_eu_end),
     gsSPEndDisplayList(),
 };
 
 #else
 const Gfx dl_cake_end_screen_eu_fix[] = {
-    gsSPDisplayList(dl_cake_end_eu_070296D8),
+    gsSPDisplayList(dl_cake_end_eu_end),
     gsSPEndDisplayList(),
 };
 #endif
@@ -258,14 +258,14 @@ const Gfx dl_cake_end_screen_eu_fix[] = {
 #define NUM_CAKE_TEXTURES 40
 #define NUM_CAKE_TEXTURES_X 5
 #define NUM_CAKE_TEXTURES_Y (NUM_CAKE_TEXTURES / NUM_CAKE_TEXTURES_X)
-#define CAKE_TEX_WIDTH (320 / NUM_CAKE_TEXTURES_X)
-#define CAKE_TEX_HEIGHT (240 / NUM_CAKE_TEXTURES_Y)
+#define CAKE_TEX_WIDTH (SCREEN_WIDTH  / NUM_CAKE_TEXTURES_X)
+#define CAKE_TEX_HEIGHT (SCREEN_HEIGHT / NUM_CAKE_TEXTURES_Y)
 
 #define MAKE_RECT_VERTICES(i, startX, startY, dx, dy, starts, startt) \
-    {{{2 + (((i) % NUM_CAKE_TEXTURES_X) * (CAKE_TEX_WIDTH - 1) + startX +  0), 240 - 6 - (((i) / NUM_CAKE_TEXTURES_X) * (CAKE_TEX_HEIGHT - 1) + startY +  0), -1}, 0, {(starts +  0) << 5, (startt +  0) << 5}, {0xFF, 0xFF, 0xFF, 0xFF}}},\
-    {{{2 + (((i) % NUM_CAKE_TEXTURES_X) * (CAKE_TEX_WIDTH - 1) + startX + dx), 240 - 6 - (((i) / NUM_CAKE_TEXTURES_X) * (CAKE_TEX_HEIGHT - 1) + startY +  0), -1}, 0, {(starts + dx) << 5, (startt +  0) << 5}, {0xFF, 0xFF, 0xFF, 0xFF}}},\
-    {{{2 + (((i) % NUM_CAKE_TEXTURES_X) * (CAKE_TEX_WIDTH - 1) + startX +  0), 240 - 6 - (((i) / NUM_CAKE_TEXTURES_X) * (CAKE_TEX_HEIGHT - 1) + startY + dy), -1}, 0, {(starts +  0) << 5, (startt + dy) << 5}, {0xFF, 0xFF, 0xFF, 0xFF}}},\
-    {{{2 + (((i) % NUM_CAKE_TEXTURES_X) * (CAKE_TEX_WIDTH - 1) + startX + dx), 240 - 6 - (((i) / NUM_CAKE_TEXTURES_X) * (CAKE_TEX_HEIGHT - 1) + startY + dy), -1}, 0, {(starts + dx) << 5, (startt + dy) << 5}, {0xFF, 0xFF, 0xFF, 0xFF}}}
+    {{{2 + (((i) % NUM_CAKE_TEXTURES_X) * (CAKE_TEX_WIDTH - 1) + startX +  0), (SCREEN_HEIGHT - 6) - (((i) / NUM_CAKE_TEXTURES_X) * (CAKE_TEX_HEIGHT - 1) + startY +  0), -1}, 0, {(starts +  0) << 5, (startt +  0) << 5}, {0xFF, 0xFF, 0xFF, 0xFF}}},\
+    {{{2 + (((i) % NUM_CAKE_TEXTURES_X) * (CAKE_TEX_WIDTH - 1) + startX + dx), (SCREEN_HEIGHT - 6) - (((i) / NUM_CAKE_TEXTURES_X) * (CAKE_TEX_HEIGHT - 1) + startY +  0), -1}, 0, {(starts + dx) << 5, (startt +  0) << 5}, {0xFF, 0xFF, 0xFF, 0xFF}}},\
+    {{{2 + (((i) % NUM_CAKE_TEXTURES_X) * (CAKE_TEX_WIDTH - 1) + startX +  0), (SCREEN_HEIGHT - 6) - (((i) / NUM_CAKE_TEXTURES_X) * (CAKE_TEX_HEIGHT - 1) + startY + dy), -1}, 0, {(starts +  0) << 5, (startt + dy) << 5}, {0xFF, 0xFF, 0xFF, 0xFF}}},\
+    {{{2 + (((i) % NUM_CAKE_TEXTURES_X) * (CAKE_TEX_WIDTH - 1) + startX + dx), (SCREEN_HEIGHT - 6) - (((i) / NUM_CAKE_TEXTURES_X) * (CAKE_TEX_HEIGHT - 1) + startY + dy), -1}, 0, {(starts + dx) << 5, (startt + dy) << 5}, {0xFF, 0xFF, 0xFF, 0xFF}}}
 
 #define MAKE_TEXT_VERTICES(i) \
     MAKE_RECT_VERTICES(i, 0, 0, CAKE_TEX_WIDTH - 1, CAKE_TEX_HEIGHT - 1, 0, 0)

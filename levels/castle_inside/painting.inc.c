@@ -561,6 +561,8 @@ static const PaintingData *const inside_castle_seg7_painting_texture_maps_070225
     inside_castle_seg7_painting_texture_map_top_07021FFC,
 };
 
+UNUSED static const u64 castle_inside_unused_0 = 0x0;
+
 
 // 0x07022528 - 0x07022540
 static const Lights1 inside_castle_seg7_lights_07022528 = gdSPDefLights1(
@@ -572,7 +574,7 @@ static const Lights1 inside_castle_seg7_lights_07022528 = gdSPDefLights1(
 // No gdSPDefLights1 macro defined because of odd different light value (0xff and 0xfa)
 static const Lights1 inside_castle_seg7_lights_07022540 = {
     {{  {0x40, 0x40, 0x80}, 0, {0x40, 0x40, 0x80}, 0} },
-    {{{ {0x64, 0x64, 0xff}, 0, {0x64, 0x64, 0xfa}, 0, {0x28, 0x28, 0x28},0} }}
+    {{{ {0x64, 0x64, 0xff}, 0, {0x64, 0x64, 0xfa}, 0, {0x28, 0x28, 0x28},0} }} 
 };
 
 // 0x07022558 - 0x07022598
@@ -1060,6 +1062,9 @@ static const PaintingData inside_castle_seg7_painting_env_map_texture_map_070226
 static const PaintingData *const inside_castle_seg7_painting_env_map_texture_maps_07023044[] = {
     inside_castle_seg7_painting_env_map_texture_map_07022660,
 };
+
+UNUSED static const u64 castle_inside_unused_1 = 0x0;
+
 
 // 0x07023050 - 0x070230B0
 static const Gfx inside_castle_seg7_painting_dl_07023050[] = {

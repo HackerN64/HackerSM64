@@ -1,5 +1,5 @@
 // 0x0701AD54 - 0x0701ADD8
-const Collision bits_seg7_collision_0701AD54[] = {
+const Collision bits_seg7_collision_arrow_platform[] = {
     COL_INIT(),
     COL_VERTEX_INIT(0x8),
     COL_VERTEX(-460, 0, -306),

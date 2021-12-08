@@ -1,3 +1,6 @@
+// TODO: what is this? 0700C4C0-0700C4C8 [8,8]
+UNUSED static const u64 castle_grounds_unused_0 = 0;
+
 // 0x0700C4C8 - 0x0700C4E0
 static const Lights1 castle_grounds_seg7_lights_0700C4C8 = gdSPDefLights1(
     0x66, 0x00, 0x00,
@@ -9,6 +12,9 @@ static const Lights1 castle_grounds_seg7_lights_0700C4E0 = gdSPDefLights1(
     0x66, 0x66, 0x66,
     0xff, 0xff, 0xff, 0x28, 0x28, 0x28
 );
+
+// TODO: what is this? 0700C4F8-0700C500 [8,8]
+UNUSED static const u64 castle_grounds_unused_1 = 0;
 
 // 0x0700C500 - 0x0700C530
 static const Vtx castle_grounds_seg7_vertex_0700C500[] = {

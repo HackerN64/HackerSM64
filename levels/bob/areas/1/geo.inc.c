@@ -1,6 +1,6 @@
 // 0x0E000488
 const GeoLayout bob_geo_000488[] = {
-   GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -13,7 +13,7 @@ const GeoLayout bob_geo_000488[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 30000, geo_camera_fov),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(1, 0, 2000, 6000, 3072, 0, -4608, geo_camera_main),
+            GEO_CAMERA(CAMERA_MODE_RADIAL, 0, 2000, 6000, 3072, 0, -4608, geo_camera_main),
             GEO_OPEN_NODE(),
                GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_07004390),
                GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_07009D80),
@@ -22,7 +22,7 @@ const GeoLayout bob_geo_000488[] = {
                GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700DD18),
                GEO_DISPLAY_LIST(LAYER_OPAQUE, bob_seg7_dl_0700E338),
                GEO_RENDER_OBJ(),
-               GEO_ASM(0, geo_envfx_main),
+               GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

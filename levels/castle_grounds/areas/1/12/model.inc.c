@@ -1,3 +1,5 @@
+// TODO: what is this? 0700C960-0700C968 [8,8]
+UNUSED static const u64 castle_grounds_unused_2 = 0;
 
 // 0x0700C968 - 0x0700C9A8
 static const Vtx castle_grounds_seg7_vertex_0700C968[] = {

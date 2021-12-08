@@ -1,6 +1,6 @@
 // 0x0E00051C
 const GeoLayout ccm_geo_00051C[] = {
-   GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -13,7 +13,7 @@ const GeoLayout ccm_geo_00051C[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 12800, geo_camera_fov),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(1, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
+            GEO_CAMERA(CAMERA_MODE_RADIAL, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
             GEO_OPEN_NODE(),
                GEO_DISPLAY_LIST(LAYER_OPAQUE, ccm_seg7_dl_0700B090),
                GEO_DISPLAY_LIST(LAYER_OPAQUE, ccm_seg7_dl_0700B1D8),
@@ -21,9 +21,9 @@ const GeoLayout ccm_geo_00051C[] = {
                GEO_DISPLAY_LIST(LAYER_ALPHA, ccm_seg7_dl_0700D578),
                GEO_DISPLAY_LIST(LAYER_TRANSPARENT_DECAL, ccm_seg7_dl_0700DDF0),
                GEO_ASM(   0, geo_movtex_pause_control),
-               GEO_ASM(0x0501, geo_movtex_draw_water_regions),
+               GEO_ASM(CCM_MOVTEX_PENGUIN_PUDDLE_WATER, geo_movtex_draw_water_regions),
                GEO_RENDER_OBJ(),
-               GEO_ASM(   1, geo_envfx_main),
+               GEO_ASM(ENVFX_SNOW_NORMAL, geo_envfx_main),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
