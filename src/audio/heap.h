@@ -5,18 +5,19 @@
 
 #include "internal.h"
 
-#define SOUND_LOAD_STATUS_NOT_LOADED     0
-#define SOUND_LOAD_STATUS_IN_PROGRESS    1
-#define SOUND_LOAD_STATUS_COMPLETE       2
-#define SOUND_LOAD_STATUS_DISCARDABLE    3
-#define SOUND_LOAD_STATUS_4              4
-#define SOUND_LOAD_STATUS_5              5
+enum SoundLoadStatus {
+    SOUND_LOAD_STATUS_NOT_LOADED,
+    SOUND_LOAD_STATUS_IN_PROGRESS,
+    SOUND_LOAD_STATUS_COMPLETE,
+    SOUND_LOAD_STATUS_DISCARDABLE,
+    SOUND_LOAD_STATUS_4,
+    SOUND_LOAD_STATUS_5
+};
 
 #define IS_BANK_LOAD_COMPLETE(bankId) (gBankLoadStatus[bankId] >= SOUND_LOAD_STATUS_COMPLETE)
 #define IS_SEQ_LOAD_COMPLETE(seqId) (gSeqLoadStatus[seqId] >= SOUND_LOAD_STATUS_COMPLETE)
 
-struct SoundAllocPool
-{
+struct SoundAllocPool {
     u8 *start;
     u8 *cur;
     u32 size;
@@ -34,15 +35,13 @@ struct SeqOrBankEntry {
 #endif
 }; // size = 0xC
 
-struct PersistentPool
-{
+struct PersistentPool {
     /*0x00*/ u32 numEntries;
     /*0x04*/ struct SoundAllocPool pool;
     /*0x14*/ struct SeqOrBankEntry entries[32];
 }; // size = 0x194
 
-struct TemporaryPool
-{
+struct TemporaryPool {
     /*EU,   SH*/
     /*0x00, 0x00*/ u32 nextSide;
     /*0x04,     */ struct SoundAllocPool pool;
@@ -59,21 +58,18 @@ struct TemporaryPool
     /*0x28, 0x2A   entries[1].id  */
 }; // size = 0x2C
 
-struct SoundMultiPool
-{
+struct SoundMultiPool {
     /*0x000*/ struct PersistentPool persistent;
     /*0x194*/ struct TemporaryPool temporary;
     /*     */ u32 pad2[4];
 }; // size = 0x1D0
 
-struct Unk1Pool
-{
+struct Unk1Pool {
     struct SoundAllocPool pool;
     struct SeqOrBankEntry entries[32];
 };
 
-struct UnkEntry
-{
+struct UnkEntry {
     s8 used;
     s8 medium;
     s8 bankId;
@@ -83,8 +79,7 @@ struct UnkEntry
     u32 size;
 };
 
-struct UnkPool
-{
+struct UnkPool {
     /*0x00*/  struct SoundAllocPool pool;
     /*0x10*/  struct UnkEntry entries[64];
     /*0x510*/ s32 numEntries;
@@ -118,6 +113,9 @@ void *soundAlloc(struct SoundAllocPool *pool, u32 size);
 void *sound_alloc_uninitialized(struct SoundAllocPool *pool, u32 size);
 void sound_init_main_pools(s32 sizeForAudioInitPool);
 void sound_alloc_pool_init(struct SoundAllocPool *pool, void *memAddr, u32 size);
+#if PUPPYPRINT_DEBUG
+void puppyprint_get_allocated_pools(s32 *audioPoolList);
+#endif
 #ifdef VERSION_SH
 void *alloc_bank_or_seq(s32 poolIdx, s32 size, s32 arg3, s32 id);
 void *get_bank_or_seq(s32 poolIdx, s32 arg1, s32 id);

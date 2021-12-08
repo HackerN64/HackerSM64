@@ -17,15 +17,19 @@
 #define MAX_UPDATES_PER_FRAME 4
 #endif
 
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
- // Size determined by ((all delaysBaselineL/R values * 8) / (2 ^ Minimum Downsample Factor)) + array pointers (0x80).
- // The default value can be increased or decreased in conjunction with the values in delaysBaselineL/R
-#define BETTER_REVERB_SIZE 0xF200
+#define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
-// #define BETTER_REVERB_SIZE 0x7A00 // Default for use only with a downsampling value of 3 (i.e. double the emulator default)
-// #define BETTER_REVERB_SIZE 0x1E200 // Default for use with a downsampling value of 1 (i.e. no downsampling at all)
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
 
 #define NUM_ALLPASS 12 // Number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
+#define BETTER_REVERB_PTR_SIZE ALIGN16(NUM_ALLPASS * sizeof(s32*) * 2) // Allocation space consumed by dynamically allocated pointers
+
+ // Size determined by (all delaysBaselineL/R values * 8) / (2 ^ Minimum Downsample Factor).
+ // The default value can be increased or decreased in conjunction with the values in delaysBaselineL/R
+#define BETTER_REVERB_SIZE ALIGN16(0xF200 + BETTER_REVERB_PTR_SIZE)
+
+// #define BETTER_REVERB_SIZE (0x7A00 + BETTER_REVERB_PTR_SIZE) // Default for use only with a downsampling value of 3 (i.e. double the emulator default)
+// #define BETTER_REVERB_SIZE (0x1E200 + BETTER_REVERB_PTR_SIZE) // Default for use with a downsampling value of 1 (i.e. no downsampling at all)
 
 extern s8 betterReverbDownsampleConsole;
 extern s8 betterReverbDownsampleEmulator;
@@ -45,12 +49,23 @@ extern s32 **delayBufsL;
 extern s32 **delayBufsR;
 
 extern u8 toggleBetterReverb;
+#define REVERB_WINDOW_SIZE_MAX 0x2000
+
 #else
+
 #define BETTER_REVERB_SIZE 0
+
+#ifdef VERSION_EU
+#define REVERB_WINDOW_SIZE_MAX 0x1000
+#else
+#define REVERB_WINDOW_SIZE_MAX 0x1000
 #endif
 
-struct ReverbRingBufferItem
-{
+#endif
+
+#define REVERB_WINDOW_HEAP_SIZE (REVERB_WINDOW_SIZE_MAX * sizeof(s16) * 2)
+
+struct ReverbRingBufferItem {
     s16 numSamplesAfterDownsampling;
     s16 chunkLen; // never read
     s16 *toDownsampleLeft;
@@ -60,8 +75,7 @@ struct ReverbRingBufferItem
     s16 lengthB; // second length in ring buffer (from pos 0)
 }; // size = 0x14
 
-struct SynthesisReverb
-{
+struct SynthesisReverb {
     /*0x00, 0x00, 0x00*/ u8 resampleFlags;
     /*0x01, 0x01, 0x01*/ u8 useReverb;
     /*0x02, 0x02, 0x02*/ u8 framesLeftToIgnore;
@@ -85,8 +99,7 @@ struct SynthesisReverb
     /*0x08, 0x0C, 0x14*/ s32 nextRingBufferPos;
     /*0x0C, 0x10, 0x18*/ s32 unkC; // never read
     /*0x10, 0x14, 0x1C*/ s32 bufSizePerChannel;
-    struct
-    {
+    struct {
         s16 *left;
         s16 *right;
     } ringBuffer;

@@ -5,12 +5,7 @@
 #include "data.h"
 #include "seqplayer.h"
 #include "game/main.h"
-
-#ifdef VERSION_JP
-#define US_FLOAT2(x) x##.0
-#else
-#define US_FLOAT2(x) x
-#endif
+#include "engine/math_util.h"
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 recalculateVolume) {
@@ -58,18 +53,15 @@ void sequence_channel_process_sound(struct SequenceChannel *seqChannel, s32 reca
 }
 #else
 static void sequence_channel_process_sound(struct SequenceChannel *seqChannel) {
-    f32 channelVolume;
-    f32 panLayerWeight;
-    f32 panFromChannel;
     s32 i;
 
-    channelVolume = seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume;
+    f32 channelVolume = seqChannel->volume * seqChannel->volumeScale * seqChannel->seqPlayer->fadeVolume;
     if (seqChannel->seqPlayer->muted && (seqChannel->muteBehavior & MUTE_BEHAVIOR_SOFTEN) != 0) {
         channelVolume *= seqChannel->seqPlayer->muteVolumeScale;
     }
 
-    panFromChannel = seqChannel->pan * seqChannel->panChannelWeight;
-    panLayerWeight = US_FLOAT(1.0) - seqChannel->panChannelWeight;
+    f32 panFromChannel = seqChannel->pan * seqChannel->panChannelWeight;
+    f32 panLayerWeight = 1.0f - seqChannel->panChannelWeight;
 
     for (i = 0; i < 4; i++) {
         struct SequenceChannelLayer *layer = seqChannel->layers[i];
@@ -90,13 +82,7 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
         seqPlayer->recalculateVolume = TRUE;
 #endif
-
-        if (seqPlayer->fadeVolume > US_FLOAT2(1)) {
-            seqPlayer->fadeVolume = US_FLOAT2(1);
-        }
-        if (seqPlayer->fadeVolume < 0) {
-            seqPlayer->fadeVolume = 0;
-        }
+        seqPlayer->fadeVolume = CLAMP(seqPlayer->fadeVolume, 0, 1);
 
         if (--seqPlayer->fadeRemainingFrames == 0) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
@@ -146,8 +132,6 @@ void sequence_player_process_sound(struct SequencePlayer *seqPlayer) {
 }
 
 f32 get_portamento_freq_scale(struct Portamento *p) {
-    u32 v0;
-    f32 result;
 #if defined(VERSION_JP) || defined(VERSION_US)
     if (p->mode == 0) {
         return 1.0f;
@@ -155,43 +139,38 @@ f32 get_portamento_freq_scale(struct Portamento *p) {
 #endif
 
     p->cur += p->speed;
-    v0 = (u32) p->cur;
+    u32 v0 = (u32) p->cur;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    if (v0 > 127)
+    if (v0 > 127) {
 #else
-    if (v0 >= 127)
+    if (v0 >= 127) {
 #endif
-    {
         v0 = 127;
     }
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    result = US_FLOAT(1.0) + p->extent * (gPitchBendFrequencyScale[v0 + 128] - US_FLOAT(1.0));
+    return (1.0f + (p->extent * (gPitchBendFrequencyScale[v0 + 128] - 1.0f)));
 #else
-    result = US_FLOAT(1.0) + p->extent * (gPitchBendFrequencyScale[v0 + 127] - US_FLOAT(1.0));
+    return (1.0f + (p->extent * (gPitchBendFrequencyScale[v0 + 127] - 1.0f)));
 #endif
-    return result;
 }
 
+s32 get_vibrato_pitch_change(struct VibratoState *vib) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
-s16 get_vibrato_pitch_change(struct VibratoState *vib) {
-    s32 index;
     vib->time += (s32) vib->rate;
-    index = (vib->time >> 10) & 0x3F;
+    s32 index = (vib->time >> 10) & 0x3F;
     return vib->curve[index] >> 8;
 }
 #else
-s8 get_vibrato_pitch_change(struct VibratoState *vib) {
-    s32 index;
     vib->time += vib->rate;
 
-    index = (vib->time >> 10) & 0x3F;
+    s32 index = (vib->time >> 10) & 0x3F;
 
     switch (index & 0x30) {
         case 0x10:
             index = 31 - index;
-            // fall through
+            // fallthrough
 
         case 0x00:
             return vib->curve[index];
@@ -210,10 +189,6 @@ s8 get_vibrato_pitch_change(struct VibratoState *vib) {
 #endif
 
 f32 get_vibrato_freq_scale(struct VibratoState *vib) {
-    s32 pitchChange;
-    f32 extent;
-    f32 result;
-
     if (vib->delay != 0) {
         vib->delay--;
         return 1;
@@ -252,15 +227,14 @@ f32 get_vibrato_freq_scale(struct VibratoState *vib) {
         return 1.0f;
     }
 
-    pitchChange = get_vibrato_pitch_change(vib);
-    extent = (f32) vib->extent / US_FLOAT(4096.0);
+    s32 pitchChange = get_vibrato_pitch_change(vib);
+    f32 extent = (f32) vib->extent / 4096.0f;
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    result = US_FLOAT(1.0) + extent * (gPitchBendFrequencyScale[pitchChange + 128] - US_FLOAT(1.0));
+    return 1.0f + extent * (gPitchBendFrequencyScale[pitchChange + 128] - 1.0f);
 #else
-    result = US_FLOAT(1.0) + extent * (gPitchBendFrequencyScale[pitchChange + 127] - US_FLOAT(1.0));
+    return 1.0f + extent * (gPitchBendFrequencyScale[pitchChange + 127] - 1.0f);
 #endif
-    return result;
 }
 
 void note_vibrato_update(struct Note *note) {
@@ -282,8 +256,6 @@ void note_vibrato_update(struct Note *note) {
 }
 
 void note_vibrato_init(struct Note *note) {
-    struct VibratoState *vib;
-    UNUSED struct SequenceChannel *seqChannel;
 #if defined(VERSION_EU) || defined(VERSION_SH)
     struct NotePlaybackState *seqPlayerState = (struct NotePlaybackState *) &note->priority;
 #endif
@@ -291,7 +263,7 @@ void note_vibrato_init(struct Note *note) {
     note->vibratoFreqScale = 1.0f;
     note->portamentoFreqScale = 1.0f;
 
-    vib = &note->vibratoState;
+    struct VibratoState *vib = &note->vibratoState;
 
 /* This code was probably removed from EU and SH for a reason; probably because it's dumb and makes vibrato harder to use well.
 #if defined(VERSION_JP) || defined(VERSION_US)
@@ -327,7 +299,7 @@ void note_vibrato_init(struct Note *note) {
 #else
     vib->curve = gVibratoCurve;
     vib->seqChannel = note->parentLayer->seqChannel;
-    seqChannel = vib->seqChannel;
+    struct SequenceChannel *seqChannel = vib->seqChannel;
 
     if ((vib->extentChangeTimer = seqChannel->vibratoExtentChangeDelay) == 0) {
         vib->extent = seqChannel->vibratoExtentTarget;
@@ -390,20 +362,19 @@ s32 adsr_update(struct AdsrState *adsr) {
                 break;
             }
         }
-        // fall through
+        // fallthrough
 
         case ADSR_STATE_START_LOOP:
             adsr->envIndex = 0;
 #if defined(VERSION_JP) || defined(VERSION_US)
-            adsr->currentHiRes = adsr->current << 0x10;
+            adsr->currentHiRes = (adsr->current << 0x10);
 #endif
             adsr->state = ADSR_STATE_LOOP;
 
 #ifdef VERSION_SH
             restart:
 #endif
-            // fall through
-
+            // fallthrough
         case ADSR_STATE_LOOP:
             adsr->delay = BSWAP16(adsr->envelope[adsr->envIndex].delay);
             switch (adsr->delay) {

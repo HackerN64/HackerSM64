@@ -11,14 +11,6 @@
 #include "audio/external.h"
 #include "audio/effects.h"
 
-#define PORTAMENTO_IS_SPECIAL(x) ((x).mode & 0x80)
-#define PORTAMENTO_MODE(x) ((x).mode & ~0x80)
-#define PORTAMENTO_MODE_1 1
-#define PORTAMENTO_MODE_2 2
-#define PORTAMENTO_MODE_3 3
-#define PORTAMENTO_MODE_4 4
-#define PORTAMENTO_MODE_5 5
-
 #define COPT 0
 #if COPT
 #define M64_READ_U8(state, dst) \
@@ -34,7 +26,6 @@
     dst = _pc;                  \
 }
 #endif
-
 
 #if COPT
 #define M64_READ_S16(state, dst) \
@@ -115,23 +106,20 @@ struct Instrument **instOut = _instOut;\
 #endif
 
 void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
-    struct SequencePlayer *seqPlayer;   // sp5C, t4
-    struct SequenceChannel *seqChannel; // sp58, t5
     struct M64ScriptState *state;
     struct Portamento *portamento;
     struct AudioBankSound *sound;
     struct Instrument *instrument;
     struct Drum *drum;
     s32 temp_a0_5;
-    u8 sameSound;
     u8 cmd;                             // a0 sp3E, EU s2
     u8 cmdSemitone;                     // sp3D, t0
     u16 sp3A = 0;                       // t2, a0, a1
     f32 tuning;                         // f0
-    s32 vel = 0;                        // sp30, t3
+    s32 vel  = 0;                       // sp30, t3
     s32 usedSemitone;                   // a1
     f32 freqScale = 0.0f;               // sp28, f0
-    f32 sp24 = 0.0f;
+    f32 sp24      = 0.0f;
     f32 temp_f12;
     f32 temp_f2;
 
@@ -143,7 +131,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
 #pragma inline routine(get_instrument)
 #endif
 
-    sameSound = TRUE;
+    u8 sameSound = TRUE;
     if ((*layer).enabled == FALSE) {
         return;
     }
@@ -166,8 +154,8 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
         layer->portamento.mode = 0;
     }
 
-    seqChannel = (*layer).seqChannel;
-    seqPlayer = (*seqChannel).seqPlayer;
+    struct SequenceChannel *seqChannel = (*layer).seqChannel;
+    struct SequencePlayer  *seqPlayer = (*seqChannel).seqPlayer;
     for (;;) {
         state = &layer->scriptState;
         //M64_READ_U8(state, cmd);
@@ -222,7 +210,7 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                 if (cmd == 0xc1) {
                     layer->velocitySquare = (f32)(temp_a0_5 * temp_a0_5);
                 } else {
-                    layer->pan = (f32) temp_a0_5 / US_FLOAT(128.0);
+                    layer->pan = (f32) temp_a0_5 / 128.0f;
                 }
                 break;
 
@@ -373,7 +361,7 @@ l1138:
                 } else {
                     layer->adsr.envelope = drum->envelope;
                     layer->adsr.releaseRate = drum->releaseRate;
-                    layer->pan = FLOAT_CAST(drum->pan) / US_FLOAT(128.0);
+                    layer->pan = FLOAT_CAST(drum->pan) / 128.0f;
                     layer->sound = &drum->sound;
                     layer->freqScale = layer->sound->tuning;
                 }
@@ -424,13 +412,13 @@ l1138:
                                 goto l13cc;
                         }
 l13cc:
-                        portamento->extent = sp24 / freqScale - US_FLOAT(1.0);
+                        portamento->extent = sp24 / freqScale - 1.0f;
                         if (PORTAMENTO_IS_SPECIAL((*layer).portamento)) {
-                            portamento->speed = US_FLOAT(32512.0) * FLOAT_CAST((*seqPlayer).tempo)
+                            portamento->speed = 32512.0f * FLOAT_CAST((*seqPlayer).tempo)
                                                 / ((f32)(*layer).delay * (f32) gTempoInternalToExternal
                                                    * FLOAT_CAST((*layer).portamentoTime));
                         } else {
-                            portamento->speed = US_FLOAT(127.0) / FLOAT_CAST((*layer).portamentoTime);
+                            portamento->speed = 127.0f / FLOAT_CAST((*layer).portamentoTime);
                         }
                         portamento->cur = 0.0f;
                         layer->freqScale = freqScale;

@@ -6,6 +6,17 @@
 #include "internal.h"
 #include "playback.h"
 
+#define PORTAMENTO_IS_SPECIAL(x) ((x).mode &  0x80)
+#define PORTAMENTO_MODE(x)       ((x).mode & ~0x80)
+enum PortamentoModes {
+    PORTAMENTO_MODE_0,
+    PORTAMENTO_MODE_1,
+    PORTAMENTO_MODE_2,
+    PORTAMENTO_MODE_3,
+    PORTAMENTO_MODE_4,
+    PORTAMENTO_MODE_5
+};
+
 void seq_channel_layer_disable(struct SequenceChannelLayer *seqPlayer);
 void sequence_channel_disable(struct SequenceChannel *seqPlayer);
 void sequence_player_disable(struct SequencePlayer* seqPlayer);

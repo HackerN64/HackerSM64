@@ -25,7 +25,7 @@
     aSetBuffer(pkt, 0, c + DMEM_ADDR_WET_LEFT_CH, 0, DEFAULT_LEN_1CH - c);                             \
     aLoadBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.left + (off)));                  \
     aSetBuffer(pkt, 0, c + DMEM_ADDR_WET_RIGHT_CH, 0, DEFAULT_LEN_1CH - c);                            \
-    aLoadBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)))
+    aLoadBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
 
 #define aSetSaveBufferPair(pkt, c, d, off)                                                             \
     aSetBuffer(pkt, 0, 0, c + DMEM_ADDR_WET_LEFT_CH, d);                                               \
@@ -62,12 +62,8 @@ struct NoteSubEu *gNoteSubsEu;
 // just that the reverb structure is chosen from an array with index
 // Identical in EU.
 void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex, s32 reverbIndex) {
-    struct ReverbRingBufferItem *item;
     struct SynthesisReverb *reverb = &gSynthesisReverbs[reverbIndex];
-    s32 srcPos;
-    s32 dstPos;
-    s32 nSamples;
-    s32 excessiveSamples;
+    s32 srcPos, dstPos;
     if (reverb->downsampleRate != 1) {
         if (reverb->framesLeftToIgnore == 0) {
             // Now that the RSP has finished, downsample the samples produced two frames ago by skipping
@@ -79,10 +75,8 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex, s32 reverbIndex) 
 
             for (srcPos = 0, dstPos = 0; dstPos < item->lengthA / 2;
                  srcPos += reverb->downsampleRate, dstPos++) {
-                reverb->ringBuffer.left[item->startPos + dstPos] =
-                    item->toDownsampleLeft[srcPos];
-                reverb->ringBuffer.right[item->startPos + dstPos] =
-                    item->toDownsampleRight[srcPos];
+                reverb->ringBuffer.left[item->startPos + dstPos] = item->toDownsampleLeft[srcPos];
+                reverb->ringBuffer.right[item->startPos + dstPos] = item->toDownsampleRight[srcPos];
             }
             for (dstPos = 0; dstPos < item->lengthB / 2; srcPos += reverb->downsampleRate, dstPos++) {
                 reverb->ringBuffer.left[dstPos] = item->toDownsampleLeft[srcPos];
@@ -91,9 +85,9 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex, s32 reverbIndex) 
         }
     }
 
-    item = &reverb->items[reverb->curFrame][updateIndex];
-    nSamples = chunkLen / reverb->downsampleRate;
-    excessiveSamples = (nSamples + reverb->nextRingBufferPos) - reverb->bufSizePerChannel;
+    struct ReverbRingBufferItem *item = &reverb->items[reverb->curFrame][updateIndex];
+    s32 nSamples = chunkLen / reverb->downsampleRate;
+    s32 excessiveSamples = (nSamples + reverb->nextRingBufferPos) - reverb->bufSizePerChannel;
     if (excessiveSamples < 0) {
         // There is space in the ring buffer before it wraps around
         item->lengthA = nSamples * 2;
@@ -141,8 +135,7 @@ void func_sh_802ed644(s32 updateIndexStart, s32 noteIndex) {
 }
 
 void synthesis_load_note_subs_eu(s32 updateIndex) {
-    struct NoteSubEu *src;
-    struct NoteSubEu *dest;
+    struct NoteSubEu *src, *dest;
     s32 i;
 
     for (i = 0; i < gMaxSimultaneousNotes; i++) {
@@ -216,7 +209,7 @@ u64 *synthesis_resample_and_mix_reverb(u64 *cmd, s32 bufLen, s16 reverbIndex, s1
         aAddMixer(cmd++, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_LEFT_CH, DEFAULT_LEN_2CH);
         aMix(cmd++, 0x8000 + gSynthesisReverbs[reverbIndex].reverbGain, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_WET_LEFT_CH, DEFAULT_LEN_2CH);
     } else {
-        startPad = (item->startPos % 8u) * 2;
+        startPad = (item->startPos & 0x7) * 2;
         paddedLengthA = ALIGN(startPad + item->lengthA, 4);
 
         cmd = synthesis_load_reverb_ring_buffer(cmd, DMEM_ADDR_RESAMPLED, (item->startPos - startPad / 2), DEFAULT_LEN_1CH, reverbIndex);
@@ -243,11 +236,8 @@ u64 *synthesis_resample_and_mix_reverb(u64 *cmd, s32 bufLen, s16 reverbIndex, s1
 }
 
 u64 *synthesis_load_reverb_samples(u64 *cmd, s16 reverbIndex, s16 updateIndex) {
-    struct ReverbRingBufferItem *item;
-    struct SynthesisReverb *reverb;
-
-    reverb = &gSynthesisReverbs[reverbIndex];
-    item = &reverb->items[reverb->curFrame][updateIndex];
+    struct SynthesisReverb *reverb = &gSynthesisReverbs[reverbIndex];
+    struct ReverbRingBufferItem *item = &reverb->items[reverb->curFrame][updateIndex];
     // Get the oldest samples in the ring buffer into the wet channels
     cmd = synthesis_load_reverb_ring_buffer(cmd, DMEM_ADDR_RESAMPLED, item->startPos, item->lengthA, reverbIndex);
     if (item->lengthB != 0) {
@@ -258,9 +248,7 @@ u64 *synthesis_load_reverb_samples(u64 *cmd, s16 reverbIndex, s16 updateIndex) {
 }
 
 u64 *synthesis_save_reverb_samples(u64 *cmd, s16 reverbIndex, s16 updateIndex) {
-    struct ReverbRingBufferItem *item;
-
-    item = &gSynthesisReverbs[reverbIndex].items[gSynthesisReverbs[reverbIndex].curFrame][updateIndex];
+    struct ReverbRingBufferItem *item = &gSynthesisReverbs[reverbIndex].items[gSynthesisReverbs[reverbIndex].curFrame][updateIndex];
     switch (gSynthesisReverbs[reverbIndex].downsampleRate) {
         case 1:
             // Put the oldest samples in the ring buffer into the wet channels
@@ -283,11 +271,8 @@ u64 *synthesis_save_reverb_samples(u64 *cmd, s16 reverbIndex, s16 updateIndex) {
 }
 
 u64 *func_sh_802EDF24(u64 *cmd, s16 reverbIndex, s16 updateIndex) {
-    struct ReverbRingBufferItem *item;
-    struct SynthesisReverb *reverb;
-
-    reverb = &gSynthesisReverbs[reverbIndex];
-    item = &reverb->items[reverb->curFrame][updateIndex];
+    struct SynthesisReverb *reverb = &gSynthesisReverbs[reverbIndex];
+    struct ReverbRingBufferItem *item = &reverb->items[reverb->curFrame][updateIndex];
     // Put the oldest samples in the ring buffer into the wet channels
     cmd = synthesis_save_reverb_ring_buffer(cmd, DMEM_ADDR_RESAMPLED, item->startPos, item->lengthA, reverbIndex);
     if (item->lengthB != 0) {
@@ -670,7 +655,7 @@ skip:
         flags = A_INIT;
         noteSubEu->needsInit = FALSE;
     }
-    flags = flags | sp56;
+    flags |= sp56;
     cmd = final_resample(cmd, synthesisState, bufLen * 2, resamplingRateFixedPoint,
             noteSamplesDmemAddrBeforeResampling, flags);
     if ((flags & 1) != 0) {
@@ -745,12 +730,9 @@ u64 *final_resample(u64 *cmd, struct NoteSynthesisState *synthesisState, s32 cou
 }
 
 u64 *process_envelope(u64 *cmd, struct NoteSubEu *note, struct NoteSynthesisState *synthesisState, s32 nSamples, u16 inBuf, s32 headsetPanSettings, UNUSED u32 flags) {
-    u16 sourceRight;
-    u16 sourceLeft;
-    u16 targetLeft;
-    u16 targetRight;
-    s16 rampLeft;
-    s16 rampRight;
+    u16 sourceRight, sourceLeft;
+    u16 targetLeft, targetRight;
+    s16 rampLeft, rampRight;
     s32 sourceReverbVol;
     s16 rampReverb;
     s32 reverbVolDiff = 0;
@@ -841,7 +823,6 @@ u64 *note_apply_headset_pan_effects(u64 *cmd, struct NoteSubEu *noteSubEu, struc
     u16 pitch;
     u8 prevPanShift;
     u8 panShift;
-    UNUSED u8 unkDebug;
 
     switch (leftRight) {
         case 1:
