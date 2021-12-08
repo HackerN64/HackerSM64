@@ -45,7 +45,7 @@ index 17c773ed..677a5ae9 100644
 --- a/levels/entry.c
 +++ b/levels/entry.c
 @@ -15,3 +15,12 @@ const LevelScript level_script_entry[] = {
-     EXECUTE(/*seg*/ 0x14, /*script*/ _introSegmentRomStart, /*scriptEnd*/ _introSegmentRomEnd, /*entry*/ level_intro_splash_screen),
+     EXECUTE(/*seg*/ SEGMENT_MENU_INTRO, /*script*/ _introSegmentRomStart, /*scriptEnd*/ _introSegmentRomEnd, /*entry*/ level_intro_splash_screen),
      JUMP(/*target*/ level_script_entry),
  };
 +
@@ -54,7 +54,7 @@ index 17c773ed..677a5ae9 100644
 +    SLEEP(/*frames*/ 2),
 +    BLACKOUT(/*active*/ FALSE),
 +    SET_REG(/*value*/ 0),
-+    EXECUTE(/*seg*/ 0x14, /*script*/ _introSegmentRomStart, /*scriptEnd*/ _introSegmentRomEnd, /*entry*/ level_intro_entry_error_screen),
++    EXECUTE(/*seg*/ SEGMENT_MENU_INTRO, /*script*/ _introSegmentRomStart, /*scriptEnd*/ _introSegmentRomEnd, /*entry*/ level_intro_entry_error_screen),
 +    JUMP(/*target*/ level_script_entry_error_screen),
 +};
 diff --git a/levels/intro/geo.c b/levels/intro/geo.c
@@ -66,7 +66,7 @@ index 30a87806..6bf7b79a 100644
  #include "levels/intro/header.h"
 
 +const GeoLayout intro_geo_error_screen[] = {
-+    GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
++    GEO_NODE_SCREEN_AREA(0, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
 +    GEO_OPEN_NODE(),
 +        GEO_ZBUFFER(0),
 +        GEO_OPEN_NODE(),
@@ -85,7 +85,7 @@ index 30a87806..6bf7b79a 100644
 +
  // 0x0E0002D0
  const GeoLayout intro_geo_splash_screen[] = {
-    GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+    GEO_NODE_SCREEN_AREA(0, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
 diff --git a/levels/intro/header.h b/levels/intro/header.h
 index 99277e86..04797cd7 100644
 --- a/levels/intro/header.h
@@ -110,7 +110,7 @@ index 04b8fc4c..ca9058c4 100644
 +const LevelScript level_intro_entry_error_screen[] = {
 +    INIT_LEVEL(),
 +    FIXED_LOAD(/*loadAddr*/ _goddardSegmentStart, /*romStart*/ _goddardSegmentRomStart, /*romEnd*/ _goddardSegmentRomEnd),
-+    LOAD_YAY0(/*seg*/ 0x07, _intro_segment_7SegmentRomStart, _intro_segment_7SegmentRomEnd),
++    LOAD_YAY0(/*seg*/ SEGMENT_LEVEL_DATA, _intro_segment_7SegmentRomStart, _intro_segment_7SegmentRomEnd),
 +    ALLOC_LEVEL_POOL(),
 +
 +    AREA(/*index*/ 1, intro_geo_error_screen),
@@ -119,7 +119,7 @@ index 04b8fc4c..ca9058c4 100644
 +    FREE_LEVEL_POOL(),
 +    LOAD_AREA(/*area*/ 1),
 +    SLEEP(/*frames*/ 32767),
-+    EXIT_AND_EXECUTE(/*seg*/ 0x14, _introSegmentRomStart, _introSegmentRomEnd, level_intro_entry_error_screen),
++    EXIT_AND_EXECUTE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_entry_error_screen),
 +};
 +
  const LevelScript level_intro_splash_screen[] = {
