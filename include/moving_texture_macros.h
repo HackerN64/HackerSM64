@@ -3,20 +3,6 @@
 
 #include "game/moving_texture.h"
 
-// From gMovingTextureIdList
-#define TEXTURE_WATER            0
-#define TEXTURE_MIST             1
-#define TEXTURE_JRB_WATER        2
-#define TEXTURE_UNK_WATER        3
-#define TEXTURE_LAVA             4
-#define TEX_QUICKSAND_SSL        5
-#define TEX_PYRAMID_SAND_SSL     6
-#define TEX_YELLOW_TRI_TTC       7
-
-// Moving Texture rotations
-#define ROTATE_CLOCKWISE         0
-#define ROTATE_COUNTER_CLOCKWISE 1
-
 // Moving texture load quad tris start
 #define MOV_TEX_INIT_LOAD(amount) \
     amount, 0
