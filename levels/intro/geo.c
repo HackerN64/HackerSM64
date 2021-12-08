@@ -19,7 +19,7 @@
 
 // 0x0E0002D0
 const GeoLayout intro_geo_splash_screen[] = {
-   GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(0, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -32,9 +32,12 @@ const GeoLayout intro_geo_splash_screen[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM(45, 128, 16384),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(0, 0, 0, 3200, 0, 0, 0, 0x00000000),
+            GEO_CAMERA(CAMERA_MODE_NONE, 0, 0, 3200, 0, 0, 0, 0x00000000),
             GEO_OPEN_NODE(),
                GEO_ASM(0, geo_intro_super_mario_64_logo),
+#if defined(HD_INTRO_TEXTURES) && defined(FLOOMBAS)
+               GEO_RENDER_OBJ(),
+#endif
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
@@ -48,7 +51,7 @@ const GeoLayout intro_geo_splash_screen[] = {
 
 // 0x0E00035C
 const GeoLayout intro_geo_mario_head_regular[] = {
-   GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(0, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -72,7 +75,7 @@ const GeoLayout intro_geo_mario_head_regular[] = {
 #if ENABLE_RUMBLE
    GEO_ZBUFFER(0),
    GEO_OPEN_NODE(),
-      GEO_ASM(0, geo_intro_rumble_pak_graphic),
+      GEO_ASM(INTRO_CONTEXT_NORMAL, geo_intro_rumble_pak_graphic),
    GEO_CLOSE_NODE(),
 #endif
    GEO_CLOSE_NODE(),
@@ -81,7 +84,7 @@ const GeoLayout intro_geo_mario_head_regular[] = {
 
 // 0x0E0003B8
 const GeoLayout intro_geo_mario_head_dizzy[] = {
-   GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(0, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -105,7 +108,7 @@ const GeoLayout intro_geo_mario_head_dizzy[] = {
 #if ENABLE_RUMBLE
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
-         GEO_ASM(1, geo_intro_rumble_pak_graphic),
+         GEO_ASM(INTRO_CONTEXT_GAME_OVER, geo_intro_rumble_pak_graphic),
       GEO_CLOSE_NODE(),
 #endif
    GEO_CLOSE_NODE(),
@@ -114,7 +117,7 @@ const GeoLayout intro_geo_mario_head_dizzy[] = {
 
 // 0x0E000414
 const GeoLayout intro_geo_debug_level_select[] = {
-   GEO_NODE_SCREEN_AREA(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(0, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -127,7 +130,7 @@ const GeoLayout intro_geo_debug_level_select[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM(45, 128, 16384),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(0, 0, 0, 1200, 0, 0, 0, 0x00000000),
+            GEO_CAMERA(CAMERA_MODE_NONE, 0, 0, 1200, 0, 0, 0, 0x00000000),
             GEO_OPEN_NODE(),
                GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, -230, 300, 0, debug_level_select_dl_07000858),
                GEO_TRANSLATE_NODE_WITH_DL(LAYER_OPAQUE, -120, 300, 0, debug_level_select_dl_07001100),

@@ -152,7 +152,7 @@ const GeoLayout hmc_geo_000850[] = {
       GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_07014C00),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, hmc_seg7_dl_07014E48),
       GEO_ASM(   0, geo_movtex_pause_control),
-      GEO_ASM(0x0702, geo_movtex_draw_water_regions),
+      GEO_ASM(HMC_MOVTEX_TOXIC_MAZE_MIST, geo_movtex_draw_water_regions),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -189,7 +189,7 @@ const GeoLayout hmc_geo_000938[] = {
       GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_0701A080),
       GEO_DISPLAY_LIST(LAYER_ALPHA, hmc_seg7_dl_0701A400),
       GEO_ASM(   0, geo_movtex_pause_control),
-      GEO_ASM(0x0702, geo_movtex_draw_water_regions),
+      GEO_ASM(HMC_MOVTEX_TOXIC_MAZE_MIST, geo_movtex_draw_water_regions),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -210,8 +210,8 @@ const GeoLayout hmc_geo_000998[] = {
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, hmc_seg7_dl_0701F818),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_0701FD58),
       GEO_ASM(   0, geo_movtex_pause_control),
-      GEO_ASM(0x0701, geo_movtex_draw_water_regions),
-      GEO_ASM(0x0702, geo_movtex_draw_water_regions),
+      GEO_ASM(HMC_MOVTEX_DORRIE_POOL_WATER, geo_movtex_draw_water_regions),
+      GEO_ASM(HMC_MOVTEX_TOXIC_MAZE_MIST, geo_movtex_draw_water_regions),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -231,7 +231,7 @@ const GeoLayout hmc_geo_000A18[] = {
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, hmc_seg7_dl_0701F818),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_0701FD58),
       GEO_ASM(   0, geo_movtex_pause_control),
-      GEO_ASM(0x0701, geo_movtex_draw_water_regions),
+      GEO_ASM(HMC_MOVTEX_DORRIE_POOL_WATER,  geo_movtex_draw_water_regions),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -249,7 +249,7 @@ const GeoLayout hmc_geo_000A88[] = {
       GEO_ASM(   0, geo_painting_update),
       GEO_ASM(   PAINTING_ID(0, 0), geo_painting_draw),
       GEO_ASM(   0, geo_movtex_pause_control),
-      GEO_ASM(0x0701, geo_movtex_draw_water_regions),
+      GEO_ASM(HMC_MOVTEX_DORRIE_POOL_WATER, geo_movtex_draw_water_regions),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -267,7 +267,7 @@ const GeoLayout hmc_geo_000AE8[] = {
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, hmc_seg7_dl_07021BA0),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, hmc_seg7_dl_070228A0),
       GEO_ASM(   0, geo_movtex_pause_control),
-      GEO_ASM(0x0701, geo_movtex_draw_water_regions),
+      GEO_ASM(HMC_MOVTEX_DORRIE_POOL_WATER,  geo_movtex_draw_water_regions),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -289,7 +289,7 @@ const GeoLayout hmc_geo_000B48[] = {
 
 // 0x0E000B90
 const GeoLayout hmc_geo_000B90[] = {
-   GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -302,7 +302,7 @@ const GeoLayout hmc_geo_000B90[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 12800, geo_camera_fov),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(16, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
+            GEO_CAMERA(CAMERA_MODE_FREE_ROAM, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
             GEO_OPEN_NODE(),
                GEO_SWITCH_CASE(18, geo_switch_area),
                GEO_OPEN_NODE(),
@@ -326,7 +326,7 @@ const GeoLayout hmc_geo_000B90[] = {
                   GEO_BRANCH(1, hmc_geo_000B48), // 0x0E000B48
                GEO_CLOSE_NODE(),
                GEO_RENDER_OBJ(),
-               GEO_ASM(0, geo_envfx_main),
+               GEO_ASM(ENVFX_MODE_NONE, geo_envfx_main),
             GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),

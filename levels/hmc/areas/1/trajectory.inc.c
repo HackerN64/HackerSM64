@@ -1,5 +1,5 @@
 // 0x0702B86C - 0x0702B8E0
-const Trajectory hmc_seg7_trajectory_0702B86C[] = {
+const Trajectory hmc_seg7_trajectory_checkerboard_platform[] = {
     TRAJECTORY_POS(0, /*pos*/ 1272, 2000, 5120),
     TRAJECTORY_POS(1, /*pos*/ 1272, 2000, 3500),
     TRAJECTORY_POS(2, /*pos*/ 1800, 2100, 3000),
