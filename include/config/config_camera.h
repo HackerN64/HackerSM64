@@ -4,7 +4,7 @@
  * CAMERA SETTINGS *
  *******************/
 
-// Force the camera mode to your choice
+// Force the camera mode to your choice (except when swimming or flying)
 //      Note: this is very aggressive (e.g. removes door cutscenes)
 //      Search for FORCED_CAMERA_MODE in camera.c for more information
 #define FORCED_CAMERA_MODE        CAMERA_MODE_8_DIRECTIONS
@@ -53,4 +53,7 @@
 #endif
 #ifndef DEEP_WATER_CAMERA_MODE
 #define DEEP_WATER_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
+#endif
+#ifndef FLYING_CAMERA_MODE
+#define FLYING_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
 #endif
