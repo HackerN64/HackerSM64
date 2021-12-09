@@ -70,7 +70,7 @@ init_graph_node_ortho_projection(struct AllocOnlyPool *pool, struct GraphNodeOrt
  */
 struct GraphNodePerspective *init_graph_node_perspective(struct AllocOnlyPool *pool,
                                                          struct GraphNodePerspective *graphNode,
-                                                         f32 fov, s16 near, u16 far,
+                                                         f32 fov, u16 near, u16 far,
                                                          GraphNodeFunc nodeFunc, s32 unused) {
     if (pool != NULL) {
         graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodePerspective));
@@ -566,11 +566,8 @@ struct GraphNode *geo_add_child(struct GraphNode *parent, struct GraphNode *chil
  * gets thrown out when changing areas.
  */
 struct GraphNode *geo_remove_child(struct GraphNode *graphNode) {
-    struct GraphNode *parent;
-    struct GraphNode **firstChild;
-
-    parent = graphNode->parent;
-    firstChild = &parent->children;
+    struct GraphNode *parent = graphNode->parent;
+    struct GraphNode **firstChild = &parent->children;
 
     // Remove link with siblings
     graphNode->prev->next = graphNode->next;
@@ -596,18 +593,14 @@ struct GraphNode *geo_remove_child(struct GraphNode *graphNode) {
  * is independent from processing group order, where Mario is not first.)
  */
 struct GraphNode *geo_make_first_child(struct GraphNode *newFirstChild) {
-    struct GraphNode *lastSibling;
-    struct GraphNode *parent;
-    struct GraphNode **firstChild;
-
-    parent = newFirstChild->parent;
-    firstChild = &parent->children;
+    struct GraphNode *parent = newFirstChild->parent;
+    struct GraphNode **firstChild = &parent->children;
 
     if (*firstChild != newFirstChild) {
         if ((*firstChild)->prev != newFirstChild) {
             newFirstChild->prev->next = newFirstChild->next;
             newFirstChild->next->prev = newFirstChild->prev;
-            lastSibling = (*firstChild)->prev;
+            struct GraphNode *lastSibling = (*firstChild)->prev;
             newFirstChild->prev = lastSibling;
             newFirstChild->next = *firstChild;
             (*firstChild)->prev = newFirstChild;
@@ -619,16 +612,15 @@ struct GraphNode *geo_make_first_child(struct GraphNode *newFirstChild) {
     return parent;
 }
 
+#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 /**
  * Helper function for geo_call_global_function_nodes that recursively
  * traverses the scene graph and calls the functions of global nodes.
  */
 void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 callContext) {
     struct GraphNode **globalPtr;
-    struct GraphNode *curNode;
+    struct GraphNode *curNode = graphNode;
     struct FnGraphNode *asFnNode;
-
-    curNode = graphNode;
 
     do {
         asFnNode = (struct FnGraphNode *) curNode;
@@ -689,6 +681,7 @@ void geo_call_global_function_nodes(struct GraphNode *graphNode, s32 callContext
         gCurGraphNodeRoot = 0;
     }
 }
+#endif
 
 /**
  * When objects are cleared, this is called on all object nodes (loaded or unloaded).
@@ -704,7 +697,7 @@ void geo_reset_object_node(struct GraphNodeObject *graphNode) {
  * Initialize an object node using the given parameters
  */
 void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f pos, Vec3s angle) {
-    vec3f_set(graphNode->scale, 1.0f, 1.0f, 1.0f);
+    vec3_same(graphNode->scale, 1.0f);
     vec3f_copy(graphNode->pos, pos);
     vec3s_copy(graphNode->angle, angle);
 
@@ -723,16 +716,14 @@ void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f po
  * Initialize and object node using the given SpawnInfo struct
  */
 void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo *spawn) {
-    vec3f_set(graphNode->scale, 1.0f, 1.0f, 1.0f);
+    vec3_same(graphNode->scale, 1.0f);
     vec3s_copy(graphNode->angle, spawn->startAngle);
 
-    graphNode->pos[0] = (f32) spawn->startPos[0];
-    graphNode->pos[1] = (f32) spawn->startPos[1];
-    graphNode->pos[2] = (f32) spawn->startPos[2];
+    vec3s_to_vec3f(graphNode->pos, spawn->startPos);
 
     graphNode->areaIndex = spawn->areaIndex;
     graphNode->activeAreaIndex = spawn->activeAreaIndex;
-    graphNode->sharedChild = spawn->modelNode;
+    graphNode->sharedChild = spawn->model;
     graphNode->spawnInfo = spawn;
     graphNode->throwMatrix = NULL;
     graphNode->animInfo.curAnim = 0;
@@ -804,9 +795,7 @@ s32 retrieve_animation_index(s32 frame, u16 **attributes) {
  */
 s16 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
     s32 result;
-    struct Animation *anim;
-
-    anim = obj->curAnim;
+    struct Animation *anim = obj->curAnim;
 
     if (obj->animTimer == gAreaUpdateCounter || anim->flags & ANIM_FLAG_NO_ACCEL) {
         if (accelAssist != NULL) {
@@ -861,7 +850,7 @@ s16 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
  * currently happens in-line in geo_process_shadow where it also accounts for
  * animations without lateral translation.
  */
-void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f position) {
+UNUSED void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f position) {
     struct Animation *animation = obj->animInfo.curAnim;
 
     if (animation != NULL) {
@@ -886,7 +875,7 @@ void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f posit
  * Unused function to find the root of the geo node tree, which should be a
  * GraphNodeRoot. If it is not for some reason, null is returned.
  */
-struct GraphNodeRoot *geo_find_root(struct GraphNode *graphNode) {
+UNUSED struct GraphNodeRoot *geo_find_root(struct GraphNode *graphNode) {
     struct GraphNodeRoot *resGraphNode = NULL;
 
     while (graphNode->parent != NULL) {
