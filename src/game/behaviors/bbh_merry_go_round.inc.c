@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvMerryGoRound.
  * This is the merry-go-round in BBH.
@@ -21,13 +22,11 @@ static void handle_merry_go_round_music(void) {
         }
     } else {
         // Get Mario's floor and floor surface type
-        struct Surface *marioFloor;
+        struct Surface *marioFloor = gMarioState->floor;
         u16 marioFloorType;
 
-        find_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &marioFloor);
-
         if (marioFloor == NULL) {
-            marioFloorType = 0;
+            marioFloorType = SURFACE_DEFAULT;
         } else {
             marioFloorType = marioFloor->type;
         }
