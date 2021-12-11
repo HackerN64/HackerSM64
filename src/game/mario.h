@@ -37,7 +37,6 @@ s16 find_floor_slope(struct MarioState *m, s16 yawOffset);
 Bool32 set_mario_wall(struct MarioState *m, struct Surface *wall);
 Bool32 set_mario_ceil(struct MarioState *m, struct Surface *ceil,  f32 ceilHeight);
 Bool32 set_mario_floor(struct MarioState *m, struct Surface *floor, f32 floorHeight);
-Bool32 analog_stick_held_back(struct MarioState *m);
 void update_mario_sound_and_camera(struct MarioState *m);
 void set_steep_jump_action(struct MarioState *m);
 u32 set_mario_action(struct MarioState *m, u32 action, u32 actionArg);
