@@ -5,8 +5,12 @@
 
 #include "types.h"
 
-#define MEMORY_POOL_LEFT  0
-#define MEMORY_POOL_RIGHT 1
+enum MemoryPoolSide {
+    MEMORY_POOL_LEFT,
+    MEMORY_POOL_RIGHT
+};
+
+#define NUM_TLB_SEGMENTS 32
 
 struct AllocOnlyPool {
     s32 totalSpace;
@@ -34,12 +38,9 @@ struct DmaHandlerList {
     void *bufTarget;
 };
 
-#ifndef INCLUDED_FROM_MEMORY_C
-// Declaring this variable extern puts it in the wrong place in the bss order
-// when this file is included from memory.c (first instead of last). Hence,
-// ifdef hack. It was very likely subject to bss reordering originally.
+#define EFFECTS_MEMORY_POOL 0x4000
+
 extern struct MemoryPool *gEffectsMemoryPool;
-#endif
 
 uintptr_t set_segment_base_addr(s32 segment, void *addr);
 void *get_segment_base_addr(s32 segment);
