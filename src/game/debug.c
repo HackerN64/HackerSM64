@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "engine/behavior_script.h"
 #include "engine/surface_collision.h"
+#include "engine/math_util.h"
 #include "game_init.h"
 #include "main.h"
 #include "object_constants.h"
@@ -14,10 +15,14 @@
 #include "sm64.h"
 #include "types.h"
 
-#define DEBUG_INFO_NOFLAGS (0 << 0)
-#define DEBUG_INFO_FLAG_DPRINT (1 << 0)
-#define DEBUG_INFO_FLAG_LSELECT (1 << 1)
-#define DEBUG_INFO_FLAG_ALL 0xFF
+#ifdef VANILLA_DEBUG
+
+enum DebugInfoFlags {
+    DEBUG_INFO_NOFLAGS      = (0 << 0),
+    DEBUG_INFO_FLAG_DPRINT  = (1 << 0),
+    DEBUG_INFO_FLAG_LSELECT = (1 << 1),
+    DEBUG_INFO_FLAG_ALL     = 0xFF
+};
 
 s16 gDebugPrintState1[6]; // prints top-down?
 s16 gDebugPrintState2[6]; // prints bottom-up?
@@ -62,11 +67,11 @@ s16 sDebugInfoButtonSeq[] = { U_CBUTTONS, L_CBUTTONS, D_CBUTTONS, R_CBUTTONS, -1
  * counts. They likely have stubbed out code that calculated the clock count and
  * its difference for consecutive calls.
  */
-s64 get_current_clock(void) {
+UNUSED s64 get_current_clock(void) {
     return 0;
 }
 
-s64 get_clock_difference(UNUSED s64 cycles) {
+UNUSED s64 get_clock_difference(UNUSED s64 cycles) {
     return 0;
 }
 
@@ -164,7 +169,10 @@ void print_mapinfo(void) {
 #ifndef VERSION_EU
     print_debug_top_down_mapinfo("area %x", area);
     print_debug_top_down_mapinfo("wx   %d", gCurrentObject->oPosX);
-    print_debug_top_down_mapinfo("wy   %d", gCurrentObject->oPosY);
+    //! Fat finger: programmer hit tab instead of space. Japanese
+    // thumb shift keyboards had the tab key next to the spacebar,
+    // so this was likely the reason.
+    print_debug_top_down_mapinfo("wy\t  %d", gCurrentObject->oPosY);
     print_debug_top_down_mapinfo("wz   %d", gCurrentObject->oPosZ);
     print_debug_top_down_mapinfo("bgY  %d", bgY);
     print_debug_top_down_mapinfo("angY %d", angY);
@@ -178,6 +186,7 @@ void print_mapinfo(void) {
     if (gCurrentObject->oPosY < water) {
         print_debug_top_down_mapinfo("water %d", water);
     }
+#endif
 }
 
 void print_checkinfo(void) {
@@ -269,7 +278,6 @@ void reset_debug_objectinfo(void) {
     gUnknownWallCount = 0;
     gObjectCounter = 0;
     sDebugStringArrPrinted = FALSE;
-    gDoorRenderingTimer = 0;
 
     set_print_state_info(gDebugPrintState1, 20, 185, 40, 200, -15);
     set_print_state_info(gDebugPrintState2, 180, 30, 0, 150, 15);
@@ -382,7 +390,7 @@ void try_modify_debug_controls(void) {
 }
 
 // possibly a removed debug control (TODO: check DD)
-void stub_debug_5(void) {
+void stub_debug_control(void) {
 }
 
 /*
@@ -505,3 +513,5 @@ void debug_enemy_unknown(s16 *enemyArr) {
     enemyArr[6] = gDebugInfo[DEBUG_PAGE_ENEMYINFO][3];
     enemyArr[7] = gDebugInfo[DEBUG_PAGE_ENEMYINFO][4];
 }
+
+#endif
