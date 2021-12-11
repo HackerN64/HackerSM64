@@ -36,10 +36,8 @@ static char sLevelSelectStageNames[64][16] = {
 #ifndef DISABLE_DEMO
 static u16 sDemoCountdown = 0;
 #endif
-#ifndef VERSION_JP
 static s16 sPlayMarioGreeting = TRUE;
 static s16 sPlayMarioGameOver = TRUE;
-#endif
 
 #ifndef DISABLE_DEMO
 #define PRESS_START_DEMO_TIMER 800
@@ -93,14 +91,22 @@ u8 gLevelSelectHoldKeyTimer = 0;
  * count if an input was received. signals the stage to be started
  * or the level select to be exited if start or the quit combo is pressed.
  */
-s16 intro_level_select(void) {
+s32 intro_level_select(void) {
     u32 index = 0;
-    if ((gPlayer1Controller->rawStickY < -60)
-     || (gPlayer1Controller->rawStickX < -60)
-     || (gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD))) index++;
-    if ((gPlayer1Controller->rawStickY > 60)
-     || (gPlayer1Controller->rawStickX > 60)
-     || (gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD))) index += 2;
+    if (gPlayer1Controller->rawStickY < -60
+        || gPlayer1Controller->rawStickX < -60
+        || gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD | L_CBUTTONS | L_JPAD)
+    ) {
+            index++;
+    }
+
+    if (gPlayer1Controller->rawStickY > 60
+        || gPlayer1Controller->rawStickX > 60
+        || gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD | R_CBUTTONS | R_JPAD)
+    ) {
+            index += 2;
+    }
+
     if (((index ^ gLevelSelectHoldKeyIndex) & index) == 2) {
         if (gCurrLevelNum > LEVEL_MAX) {
             gCurrLevelNum = LEVEL_MIN;
@@ -112,6 +118,7 @@ s16 intro_level_select(void) {
             gCurrLevelNum++;
         }
     }
+
     if (((index ^ gLevelSelectHoldKeyIndex) & index) == 1) {
         if (gCurrLevelNum < LEVEL_MIN) {
             // Same applies to here as above
@@ -124,6 +131,7 @@ s16 intro_level_select(void) {
             gCurrLevelNum--;
         }
     }
+
     if (gLevelSelectHoldKeyTimer == 10) {
         gLevelSelectHoldKeyTimer = 8;
         gLevelSelectHoldKeyIndex = 0;
@@ -131,16 +139,19 @@ s16 intro_level_select(void) {
         gLevelSelectHoldKeyTimer++;
         gLevelSelectHoldKeyIndex = index;
     }
+
     if ((index & 0x3) == 0) gLevelSelectHoldKeyTimer = 0;
     if (gCurrLevelNum > LEVEL_MAX) gCurrLevelNum = LEVEL_MIN; // exceeded max. set to min.
     if (gCurrLevelNum < LEVEL_MIN) gCurrLevelNum = LEVEL_MAX; // exceeded min. set to max.
     // Use file 4 and last act as a test
     gCurrSaveFileNum = 4;
-    gCurrActNum      = 6;
+    gCurrActNum = 6;
+
     print_text_centered(160, 80, "SELECT STAGE");
     print_text_centered(160, 30, "PRESS START BUTTON");
     print_text_fmt_int(40, 60, "%2d", gCurrLevelNum);
     print_text(80, 60, sLevelSelectStageNames[gCurrLevelNum - 1]); // print stage name
+
     // start being pressed signals the stage to be started. that is, unless...
     if (gPlayer1Controller->buttonPressed & (START_BUTTON | A_BUTTON)) {
         // ... the level select quit combo is being pressed, which uses START. If this
@@ -162,12 +173,11 @@ s16 intro_level_select(void) {
 s32 intro_regular(void) {
     s32 level = LEVEL_NONE;
 
-#ifndef VERSION_JP
     // When the game stars, gGlobalTimer is less than 129 frames,
     // so Mario greets the player. After that, he will always say
     // "press start to play" when it goes back to the title screen
     // (using SAVE AND QUIT)
-    if (sPlayMarioGreeting == TRUE) {
+    if (sPlayMarioGreeting) {
         if (gGlobalTimer < 129) {
             play_sound(SOUND_MARIO_HELLO, gGlobalSoundSource);
         } else {
@@ -175,9 +185,12 @@ s32 intro_regular(void) {
         }
         sPlayMarioGreeting = FALSE;
     }
-#endif
     print_intro_text();
-
+#ifdef DEBUG_LEVEL_SELECT
+    if (gPlayer3Controller->buttonDown & L_TRIG) {
+        gDebugLevelSelect = TRUE;
+    }
+#endif
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
@@ -188,9 +201,7 @@ s32 intro_regular(void) {
         // defined in level_intro_mario_head_regular JUMP_IF commands
         // 100 is File Select - 101 is Level Select
         level = (LEVEL_FILE_SELECT + gDebugLevelSelect);
-#ifndef VERSION_JP
         sPlayMarioGreeting = TRUE;
-#endif
     }
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     return run_level_id_or_demo(level);
@@ -205,12 +216,10 @@ s32 intro_regular(void) {
 s32 intro_game_over(void) {
     s32 level = LEVEL_NONE;
 
-#ifndef VERSION_JP
     if (sPlayMarioGameOver == TRUE) {
         play_sound(SOUND_MARIO_GAME_OVER, gGlobalSoundSource);
         sPlayMarioGameOver = FALSE;
     }
-#endif
 
     print_intro_text();
 
@@ -222,9 +231,7 @@ s32 intro_game_over(void) {
 #endif
         // same criteria as intro_regular
         level = LEVEL_FILE_SELECT + gDebugLevelSelect;
-#ifndef VERSION_JP
         sPlayMarioGameOver = TRUE;
-#endif
     }
 #if !defined(DISABLE_DEMO) && defined(KEEP_MARIO_HEAD)
     return run_level_id_or_demo(level);
@@ -241,7 +248,7 @@ s32 intro_game_over(void) {
 s32 intro_play_its_a_me_mario(void) {
     set_background_music(0, SEQ_SOUND_PLAYER, 0);
     play_sound(SOUND_MENU_COIN_ITS_A_ME_MARIO, gGlobalSoundSource);
-    return (LEVEL_NONE + 1);
+    return LEVEL_NONE + 1;
 }
 
 /**
@@ -249,18 +256,22 @@ s32 intro_play_its_a_me_mario(void) {
  * Returns a level ID after their criteria is met.
  */
 s32 lvl_intro_update(s16 arg, UNUSED s32 unusedArg) {
-    s32 retVar = LEVEL_NONE;
-
     switch (arg) {
-        case LVL_INTRO_PLAY_ITS_A_ME_MARIO: retVar = intro_play_its_a_me_mario(); break;
+        case LVL_INTRO_PLAY_ITS_A_ME_MARIO: return intro_play_its_a_me_mario();
 #ifdef KEEP_MARIO_HEAD
-        case LVL_INTRO_REGULAR:             retVar = intro_regular();             break;
-        case LVL_INTRO_GAME_OVER:           retVar = intro_game_over();           break;
+        case LVL_INTRO_REGULAR:             return intro_regular();
+        case LVL_INTRO_GAME_OVER:           return intro_game_over();
 #else
-        case LVL_INTRO_REGULAR:             // fall through
-        case LVL_INTRO_GAME_OVER:           retVar = (LEVEL_FILE_SELECT + gDebugLevelSelect);   break;
+        case LVL_INTRO_REGULAR:
+#ifdef DEBUG_LEVEL_SELECT
+            if (gPlayer3Controller->buttonDown & L_TRIG) {
+                gDebugLevelSelect = TRUE;
+            }
 #endif
-        case LVL_INTRO_LEVEL_SELECT:        retVar = intro_level_select();        break; //! this runs on save and quit for some reason?
+            // fallthrough
+        case LVL_INTRO_GAME_OVER:           return (LEVEL_FILE_SELECT + gDebugLevelSelect);
+#endif
+        case LVL_INTRO_LEVEL_SELECT:        return intro_level_select();
+        default: return LEVEL_NONE;
     }
-    return retVar;
 }
