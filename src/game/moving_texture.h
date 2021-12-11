@@ -6,8 +6,10 @@
 #include "macros.h"
 #include "types.h"
 
-#define ROTATE_CLOCKWISE         0
-#define ROTATE_COUNTER_CLOCKWISE 1
+enum MovtexRotations {
+    ROTATE_CLOCKWISE,
+    ROTATE_COUNTER_CLOCKWISE
+};
 
 /// Ids for textures used for moving textures
 enum MovtexRectTextureId {
