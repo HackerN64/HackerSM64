@@ -10,6 +10,7 @@
 #include "sound_init.h"
 #include "level_table.h"
 #include "course_table.h"
+#include "level_commands.h"
 #include "rumble_init.h"
 #include "config.h"
 #ifdef SRAM
@@ -226,7 +227,7 @@ static void save_main_menu_data(void) {
         add_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
 
         // Back up data
-        //bcopy(&gSaveBuffer.menuData[0], &gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]));
+        bcopy(&gSaveBuffer.menuData[0], &gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]));
 
         // Write to EEPROM
         write_eeprom_data(gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData));
@@ -357,7 +358,7 @@ void save_file_load_all(void) {
 
     // Verify the main menu data and create a backup copy if only one of the slots is valid.
     validSlots = verify_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
-    //validSlots |= verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1;
+    validSlots |= verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1;
     switch (validSlots) {
         case 0: // Neither copy is correct
             wipe_main_menu_data();
@@ -389,37 +390,35 @@ void save_file_load_all(void) {
 }
 
 #ifdef PUPPYCAM
-void puppycam_check_save(void)
-{
-    if (gSaveBuffer.menuData[0].firstBoot != 4 || gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5 || gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5)
-    {
+void puppycam_check_save(void) {
+    if (gSaveBuffer.menuData[0].firstBoot != 4
+        || gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5
+        || gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5) {
         wipe_main_menu_data();
         gSaveBuffer.menuData[0].firstBoot = 4;
         puppycam_default_config();
     }
 }
 
-void puppycam_get_save(void)
-{
+void puppycam_get_save(void) {
     gPuppyCam.options = gSaveBuffer.menuData[0].saveOptions;
 
     gSaveBuffer.menuData[0].firstBoot = gSaveBuffer.menuData[0].firstBoot;
-    #ifdef WIDE
+#ifdef WIDE
     gConfig.widescreen = save_file_get_widescreen_mode();
-    #endif
+#endif
 
     puppycam_check_save();
 }
 
-void puppycam_set_save(void)
-{
+void puppycam_set_save(void) {
     gSaveBuffer.menuData[0].saveOptions = gPuppyCam.options;
 
     gSaveBuffer.menuData[0].firstBoot = 4;
 
-    #ifdef WIDE
+#ifdef WIDE
     save_file_set_widescreen_mode(gConfig.widescreen);
-    #endif
+#endif
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
@@ -449,18 +448,18 @@ void save_file_reload(void) {
  */
 void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
     s32 fileIndex = gCurrSaveFileNum - 1;
-    s32 courseIndex = gCurrCourseNum - 1;
+    s32 courseIndex = COURSE_NUM_TO_INDEX(gCurrCourseNum);
 #ifdef GLOBAL_STAR_IDS
-    s32 starByte = (starIndex / 7) - 1;
+    s32 starByte = COURSE_NUM_TO_INDEX(starIndex / 7);
     s32 starFlag = 1 << (starIndex % 7);
 #else
     s32 starFlag = 1 << starIndex;
 #endif
 
-    gLastCompletedCourseNum     = courseIndex + 1;
-    gLastCompletedStarNum       = starIndex + 1;
+    gLastCompletedCourseNum = courseIndex + 1;
+    gLastCompletedStarNum = starIndex + 1;
     sUnusedGotGlobalCoinHiScore = FALSE;
-    gGotFileCoinHiScore         = FALSE;
+    gGotFileCoinHiScore = FALSE;
 
     if (courseIndex >= COURSE_NUM_TO_INDEX(COURSE_MIN)
         && courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
@@ -476,7 +475,7 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
             touch_coin_score_age(fileIndex, courseIndex);
 
             gGotFileCoinHiScore = TRUE;
-            gSaveFileModified   = TRUE;
+            gSaveFileModified = TRUE;
         }
     }
 
@@ -522,7 +521,7 @@ s32 save_file_exists(s32 fileIndex) {
 u32 save_file_get_max_coin_score(s32 courseIndex) {
     s32 fileIndex;
     s32 maxCoinScore = -1;
-    s32 maxScoreAge  = -1;
+    s32 maxScoreAge = -1;
     s32 maxScoreFileNum = 0;
 
     for (fileIndex = 0; fileIndex < NUM_SAVE_FILES; fileIndex++) {
@@ -537,9 +536,14 @@ u32 save_file_get_max_coin_score(s32 courseIndex) {
             }
         }
     }
-    return (maxScoreFileNum << 16) + max(maxCoinScore, 0);
+    return (maxScoreFileNum << 16) + MAX(maxCoinScore, 0);
 }
 
+#ifdef COMPLETE_SAVE_FILE
+s32 save_file_get_course_star_count(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
+    return 7;
+}
+#else
 s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
     s32 i;
     s32 count = 0;
@@ -553,6 +557,7 @@ s32 save_file_get_course_star_count(s32 fileIndex, s32 courseIndex) {
     }
     return count;
 }
+#endif
 
 s32 save_file_get_total_star_count(s32 fileIndex, s32 minCourse, s32 maxCourse) {
     s32 count = 0;
@@ -578,16 +583,44 @@ void save_file_clear_flags(u32 flags) {
 }
 
 u32 save_file_get_flags(void) {
+#ifdef COMPLETE_SAVE_FILE
+    return (SAVE_FLAG_FILE_EXISTS            |
+            SAVE_FLAG_HAVE_WING_CAP          |
+            SAVE_FLAG_HAVE_METAL_CAP         |
+            SAVE_FLAG_HAVE_VANISH_CAP        |
+            SAVE_FLAG_UNLOCKED_BASEMENT_DOOR |
+            SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR |
+            SAVE_FLAG_DDD_MOVED_BACK         |
+            SAVE_FLAG_MOAT_DRAINED           |
+            SAVE_FLAG_UNLOCKED_PSS_DOOR      |
+            SAVE_FLAG_UNLOCKED_WF_DOOR       |
+            SAVE_FLAG_UNLOCKED_CCM_DOOR      |
+            SAVE_FLAG_UNLOCKED_JRB_DOOR      |
+            SAVE_FLAG_UNLOCKED_BITDW_DOOR    |
+            SAVE_FLAG_UNLOCKED_BITFS_DOOR    |
+            SAVE_FLAG_UNLOCKED_50_STAR_DOOR  |
+            SAVE_FLAG_COLLECTED_TOAD_STAR_1  |
+            SAVE_FLAG_COLLECTED_TOAD_STAR_2  |
+            SAVE_FLAG_COLLECTED_TOAD_STAR_3  |
+            SAVE_FLAG_COLLECTED_MIPS_STAR_1  |
+            SAVE_FLAG_COLLECTED_MIPS_STAR_2);
+#else
     if (gCurrCreditsEntry != NULL || gCurrDemoInput != NULL) {
         return 0;
     }
     return gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags;
+#endif
 }
 
 /**
  * Return the bitset of obtained stars in the specified course.
  * If course is COURSE_NONE, return the bitset of obtained castle secret stars.
  */
+#ifdef COMPLETE_SAVE_FILE
+u32 save_file_get_star_flags(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
+    return 0x7F;
+}
+#else
 u32 save_file_get_star_flags(s32 fileIndex, s32 courseIndex) {
     u32 starFlags;
 
@@ -599,6 +632,7 @@ u32 save_file_get_star_flags(s32 fileIndex, s32 courseIndex) {
 
     return starFlags;
 }
+#endif
 
 /**
  * Add to the bitset of obtained stars in the specified course.
@@ -615,22 +649,32 @@ void save_file_set_star_flags(s32 fileIndex, s32 courseIndex, u32 starFlags) {
     gSaveFileModified = TRUE;
 }
 
+#ifdef COMPLETE_SAVE_FILE
+s32 save_file_get_course_coin_score(UNUSED s32 fileIndex, UNUSED s32 courseIndex) {
+    return MAX_NUM_COINS;
+}
+#else
 s32 save_file_get_course_coin_score(s32 fileIndex, s32 courseIndex) {
     return gSaveBuffer.files[fileIndex][0].courseCoinScores[courseIndex];
 }
+#endif
 
 /**
  * Return TRUE if the cannon is unlocked in the current course.
  */
 s32 save_file_is_cannon_unlocked(void) {
-    return (gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] & (1 << 7)) != 0;
+#ifdef UNLOCK_ALL
+    return TRUE;
+#else
+    return (gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] & COURSE_FLAG_CANNON_UNLOCKED) != 0;
+#endif
 }
 
 /**
  * Sets the cannon status to unlocked in the current course.
  */
 void save_file_set_cannon_unlocked(void) {
-    gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] |= (1 << 7);
+    gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] |= COURSE_FLAG_CANNON_UNLOCKED;
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
 }
@@ -640,7 +684,9 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
 
     saveFile->capLevel = gCurrLevelNum;
     saveFile->capArea = gCurrAreaIndex;
+#ifndef SAVE_NUM_LIVES
     vec3s_set(saveFile->capPos, x, y, z);
+#endif
     save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
 }
 
@@ -650,11 +696,29 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
 
     if (saveFile->capLevel == gCurrLevelNum && saveFile->capArea == gCurrAreaIndex
         && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
+#ifdef SAVE_NUM_LIVES
+        vec3_zero(capPos);
+#else
         vec3s_copy(capPos, saveFile->capPos);
+#endif
         return TRUE;
     }
     return FALSE;
 }
+
+#ifdef SAVE_NUM_LIVES
+void save_file_set_num_lives(s8 numLives) {
+    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+    saveFile->numLives = numLives;
+    saveFile->flags |= SAVE_FLAG_FILE_EXISTS;
+    gSaveFileModified = TRUE;
+}
+
+s32 save_file_get_num_lives(void) {
+    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
+    return saveFile->numLives;
+}
+#endif
 
 void save_file_set_sound_mode(u16 mode) {
     set_sound_mode(mode);
@@ -665,7 +729,7 @@ void save_file_set_sound_mode(u16 mode) {
 }
 
 #ifdef WIDE
-u8 save_file_get_widescreen_mode(void) {
+u32 save_file_get_widescreen_mode(void) {
     return gSaveBuffer.menuData[0].wideMode;
 }
 
@@ -677,29 +741,35 @@ void save_file_set_widescreen_mode(u8 mode) {
 }
 #endif
 
-u16 save_file_get_sound_mode(void) {
+u32 save_file_get_sound_mode(void) {
     return gSaveBuffer.menuData[0].soundMode;
 }
 
 void save_file_move_cap_to_default_location(void) {
     if (save_file_get_flags() & SAVE_FLAG_CAP_ON_GROUND) {
         switch (gSaveBuffer.files[gCurrSaveFileNum - 1][0].capLevel) {
-            case LEVEL_SSL: save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO     ); break;
-            case LEVEL_SL:  save_file_set_flags(SAVE_FLAG_CAP_ON_MR_BLIZZARD); break;
-            case LEVEL_TTM: save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI      ); break;
+            case LEVEL_SSL:
+                save_file_set_flags(SAVE_FLAG_CAP_ON_KLEPTO);
+                break;
+            case LEVEL_SL:
+                save_file_set_flags(SAVE_FLAG_CAP_ON_MR_BLIZZARD);
+                break;
+            case LEVEL_TTM:
+                save_file_set_flags(SAVE_FLAG_CAP_ON_UKIKI);
+                break;
         }
         save_file_clear_flags(SAVE_FLAG_CAP_ON_GROUND);
     }
 }
 
-#ifdef VERSION_EU
+#if MULTILANG
 void eu_set_language(u16 language) {
     gSaveBuffer.menuData[0].language = language;
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }
 
-u16 eu_get_language(void) {
+u32 eu_get_language(void) {
     return gSaveBuffer.menuData[0].language;
 }
 #endif
@@ -714,13 +784,13 @@ void disable_warp_checkpoint(void) {
  * game should set a warp checkpoint.
  */
 void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode) {
-    if (warpNode->destLevel & 0x80) {
+    if (warpNode->destLevel & WARP_CHECKPOINT) {
         // Overwrite the warp checkpoint variables.
-        gWarpCheckpoint.actNum    = gCurrActNum;
+        gWarpCheckpoint.actNum = gCurrActNum;
         gWarpCheckpoint.courseNum = gCurrCourseNum;
-        gWarpCheckpoint.levelID   = warpNode->destLevel & 0x7F;
-        gWarpCheckpoint.areaNum   = warpNode->destArea;
-        gWarpCheckpoint.warpNode  = warpNode->destNode;
+        gWarpCheckpoint.levelID = warpNode->destLevel & 0x7F;
+        gWarpCheckpoint.areaNum = warpNode->destArea;
+        gWarpCheckpoint.warpNode = warpNode->destNode;
     }
 }
 

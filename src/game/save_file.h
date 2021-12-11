@@ -30,18 +30,25 @@ struct SaveFile {
     // cap can always be found in a fixed spot within the course
     u8 capLevel;
     u8 capArea;
-    Vec3s capPos;
+#ifdef SAVE_NUM_LIVES
+    s8 numLives;
+    u8 filler[5];
+#else
+    // Note: the coordinates get set, but are never actually used, since the
+    // cap can always be found in a fixed spot within the course
+    Vec3s capPos; // 48 bits
+#endif
 
     u32 flags;
 
     // Star flags for each course.
     // The most significant bit of the byte *following* each course is set if the
     // cannon is open.
-    u8 courseStars[COURSE_COUNT];
+    u8 courseStars[COURSE_COUNT]; // 200 bits
 
-    u8 courseCoinScores[COURSE_STAGES_COUNT];
+    u8 courseCoinScores[COURSE_STAGES_COUNT]; // 120 bits
 
-    struct SaveBlockSignature signature;
+    struct SaveBlockSignature signature; // 32 bits
 };
 
 enum SaveFileIndex {
@@ -61,7 +68,7 @@ struct MainMenuSaveData {
     u8 wideMode: 1;
 #endif
 
-#ifdef VERSION_EU
+#if MULTILANG
     u8 language: 2;
 #define SUBTRAHEND 8
 #else
@@ -69,10 +76,10 @@ struct MainMenuSaveData {
 #endif
     u8 firstBoot;
 
+    #ifdef PUPPYCAM
     // Pad to match the EEPROM size of 0x200 (10 bytes on JP/US, 8 bytes on EU)
     //u8 filler[EEPROM_SIZE / 2 - SUBTRAHEND - NUM_SAVE_FILES * (4 + sizeof(struct SaveFile))];
 
-    #ifdef PUPPYCAM
     struct gPuppyOptions saveOptions;
     #endif
     struct SaveBlockSignature signature;
@@ -101,33 +108,51 @@ extern u8 gCurrCourseStarFlags;
 extern u8 gSpecialTripleJump;
 extern s8 gLevelToCourseNumTable[];
 
+enum CourseFlags {
+    COURSE_FLAG_CANNON_UNLOCKED      = (1 <<  7), /* 0x00000080 */
+};
+
 // game progress flags
-#define SAVE_FLAG_FILE_EXISTS            /* 0x00000001 */ (1 << 0)
-#define SAVE_FLAG_HAVE_WING_CAP          /* 0x00000002 */ (1 << 1)
-#define SAVE_FLAG_HAVE_METAL_CAP         /* 0x00000004 */ (1 << 2)
-#define SAVE_FLAG_HAVE_VANISH_CAP        /* 0x00000008 */ (1 << 3)
-#define SAVE_FLAG_HAVE_KEY_1             /* 0x00000010 */ (1 << 4)
-#define SAVE_FLAG_HAVE_KEY_2             /* 0x00000020 */ (1 << 5)
-#define SAVE_FLAG_UNLOCKED_BASEMENT_DOOR /* 0x00000040 */ (1 << 6)
-#define SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR /* 0x00000080 */ (1 << 7)
-#define SAVE_FLAG_DDD_MOVED_BACK         /* 0x00000100 */ (1 << 8)
-#define SAVE_FLAG_MOAT_DRAINED           /* 0x00000200 */ (1 << 9)
-#define SAVE_FLAG_UNLOCKED_PSS_DOOR      /* 0x00000400 */ (1 << 10)
-#define SAVE_FLAG_UNLOCKED_WF_DOOR       /* 0x00000800 */ (1 << 11)
-#define SAVE_FLAG_UNLOCKED_CCM_DOOR      /* 0x00001000 */ (1 << 12)
-#define SAVE_FLAG_UNLOCKED_JRB_DOOR      /* 0x00002000 */ (1 << 13)
-#define SAVE_FLAG_UNLOCKED_BITDW_DOOR    /* 0x00004000 */ (1 << 14)
-#define SAVE_FLAG_UNLOCKED_BITFS_DOOR    /* 0x00008000 */ (1 << 15)
-#define SAVE_FLAG_CAP_ON_GROUND          /* 0x00010000 */ (1 << 16)
-#define SAVE_FLAG_CAP_ON_KLEPTO          /* 0x00020000 */ (1 << 17)
-#define SAVE_FLAG_CAP_ON_UKIKI           /* 0x00040000 */ (1 << 18)
-#define SAVE_FLAG_CAP_ON_MR_BLIZZARD     /* 0x00080000 */ (1 << 19)
-#define SAVE_FLAG_UNLOCKED_50_STAR_DOOR  /* 0x00100000 */ (1 << 20)
-#define SAVE_FLAG_COLLECTED_TOAD_STAR_1  /* 0x01000000 */ (1 << 24)
-#define SAVE_FLAG_COLLECTED_TOAD_STAR_2  /* 0x02000000 */ (1 << 25)
-#define SAVE_FLAG_COLLECTED_TOAD_STAR_3  /* 0x04000000 */ (1 << 26)
-#define SAVE_FLAG_COLLECTED_MIPS_STAR_1  /* 0x08000000 */ (1 << 27)
-#define SAVE_FLAG_COLLECTED_MIPS_STAR_2  /* 0x10000000 */ (1 << 28)
+enum SaveProgressFlags {
+    SAVE_FLAG_FILE_EXISTS            = (1 <<  0), /* 0x00000001 */
+    SAVE_FLAG_HAVE_WING_CAP          = (1 <<  1), /* 0x00000002 */
+    SAVE_FLAG_HAVE_METAL_CAP         = (1 <<  2), /* 0x00000004 */
+    SAVE_FLAG_HAVE_VANISH_CAP        = (1 <<  3), /* 0x00000008 */
+    SAVE_FLAG_HAVE_KEY_1             = (1 <<  4), /* 0x00000010 */
+    SAVE_FLAG_HAVE_KEY_2             = (1 <<  5), /* 0x00000020 */
+    SAVE_FLAG_UNLOCKED_BASEMENT_DOOR = (1 <<  6), /* 0x00000040 */
+    SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR = (1 <<  7), /* 0x00000080 */
+    SAVE_FLAG_DDD_MOVED_BACK         = (1 <<  8), /* 0x00000100 */
+    SAVE_FLAG_MOAT_DRAINED           = (1 <<  9), /* 0x00000200 */
+    SAVE_FLAG_UNLOCKED_PSS_DOOR      = (1 << 10), /* 0x00000400 */
+    SAVE_FLAG_UNLOCKED_WF_DOOR       = (1 << 11), /* 0x00000800 */
+    SAVE_FLAG_UNLOCKED_CCM_DOOR      = (1 << 12), /* 0x00001000 */
+    SAVE_FLAG_UNLOCKED_JRB_DOOR      = (1 << 13), /* 0x00002000 */
+    SAVE_FLAG_UNLOCKED_BITDW_DOOR    = (1 << 14), /* 0x00004000 */
+    SAVE_FLAG_UNLOCKED_BITFS_DOOR    = (1 << 15), /* 0x00008000 */
+    SAVE_FLAG_CAP_ON_GROUND          = (1 << 16), /* 0x00010000 */
+    SAVE_FLAG_CAP_ON_KLEPTO          = (1 << 17), /* 0x00020000 */
+    SAVE_FLAG_CAP_ON_UKIKI           = (1 << 18), /* 0x00040000 */
+    SAVE_FLAG_CAP_ON_MR_BLIZZARD     = (1 << 19), /* 0x00080000 */
+    SAVE_FLAG_UNLOCKED_50_STAR_DOOR  = (1 << 20), /* 0x00100000 */
+    SAVE_FLAG_COLLECTED_TOAD_STAR_1  = (1 << 24), /* 0x01000000 */
+    SAVE_FLAG_COLLECTED_TOAD_STAR_2  = (1 << 25), /* 0x02000000 */
+    SAVE_FLAG_COLLECTED_TOAD_STAR_3  = (1 << 26), /* 0x04000000 */
+    SAVE_FLAG_COLLECTED_MIPS_STAR_1  = (1 << 27), /* 0x08000000 */
+    SAVE_FLAG_COLLECTED_MIPS_STAR_2  = (1 << 28), /* 0x10000000 */
+};
+
+enum StarFlags {
+    STAR_FLAGS_NONE         = (0 << 0), // 0x00
+    STAR_FLAG_ACT_1         = (1 << 0), // 0x01
+    STAR_FLAG_ACT_2         = (1 << 1), // 0x02
+    STAR_FLAG_ACT_3         = (1 << 2), // 0x04
+    STAR_FLAG_ACT_4         = (1 << 3), // 0x08
+    STAR_FLAG_ACT_5         = (1 << 4), // 0x10
+    STAR_FLAG_ACT_6         = (1 << 5), // 0x20
+    STAR_FLAG_ACT_100_COINS = (1 << 6), // 0x40
+    STAR_FLAG_LAST          = STAR_FLAG_ACT_100_COINS
+};
 
 #define SAVE_FLAG_TO_STAR_FLAG(cmd) (((cmd) >> 24) & 0x7F)
 #define STAR_FLAG_TO_SAVE_FLAG(cmd) ((cmd) << 24)
@@ -168,10 +193,14 @@ s32 save_file_is_cannon_unlocked(void);
 void save_file_set_cannon_unlocked(void);
 void save_file_set_cap_pos(s16 x, s16 y, s16 z);
 s32 save_file_get_cap_pos(Vec3s capPos);
+#ifdef SAVE_NUM_LIVES
+s32 save_file_get_num_lives(void);
+void save_file_set_num_lives(s8 numLives);
+#endif
 void save_file_set_sound_mode(u16 mode);
-u16 save_file_get_sound_mode(void);
+u32 save_file_get_sound_mode(void);
 #ifdef WIDE
-u8 save_file_get_widescreen_mode(void);
+u32 save_file_get_widescreen_mode(void);
 void save_file_set_widescreen_mode(u8 mode);
 #endif
 void save_file_move_cap_to_default_location(void);
@@ -180,7 +209,7 @@ void disable_warp_checkpoint(void);
 void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode);
 s32 check_warp_checkpoint(struct WarpNode *warpNode);
 
-#ifdef VERSION_EU
+#if MULTILANG
 enum EuLanguages {
     LANGUAGE_ENGLISH,
     LANGUAGE_FRENCH,
@@ -188,7 +217,9 @@ enum EuLanguages {
 };
 
 void eu_set_language(u16 language);
-u16 eu_get_language(void);
+u32 eu_get_language(void);
+#else
+#define LANGUAGE_ENGLISH 0
 #endif
 
 #endif // SAVE_FILE_H
