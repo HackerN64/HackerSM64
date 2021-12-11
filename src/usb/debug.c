@@ -1,13 +1,13 @@
 /***************************************************************
                             debug.c
-
+                               
 A basic debug library that makes use of the USB library for N64
-flashcarts.
+flashcarts. 
 https://github.com/buu342/N64-UNFLoader
 ***************************************************************/
 #include "debug.h"
 #ifndef LIBDRAGON
-    #include <ultra64.h>
+    #include <ultra64.h> 
     #include <PR/os_internal.h> // Needed for Crash's Linux toolchain
 #else
     #include <libdragon.h>
@@ -20,36 +20,36 @@ https://github.com/buu342/N64-UNFLoader
 
 
 #if DEBUG_MODE
-
+    
     /*********************************
                Definitions
     *********************************/
-
+    
     #define MSG_FAULT 0x10
     #define MSG_READ  0x11
     #define MSG_WRITE 0x12
-
+    
     #define USBERROR_NONE    0
     #define USBERROR_NOTTEXT 1
     #define USBERROR_UNKNOWN 2
     #define USBERROR_TOOMUCH 3
     #define USBERROR_CUSTOM  4
-
+    
     #define HASHTABLE_SIZE 7
     #define COMMAND_TOKENS 10
     #define BUFFER_SIZE    256
-
+    
     /*********************************
     Libultra types (for libdragon)
     *********************************/
 
     #ifdef LIBDRAGON
-        typedef unsigned char      u8;
+        typedef unsigned char      u8;	
         typedef unsigned short     u16;
         typedef unsigned long      u32;
         typedef unsigned long long u64;
 
-        typedef signed char s8;
+        typedef signed char s8;	
         typedef short       s16;
         typedef long        s32;
         typedef long long   s64;
@@ -67,42 +67,42 @@ https://github.com/buu342/N64-UNFLoader
         typedef float  f32;
         typedef double f64;
     #endif
-
+    
     /*********************************
                  Structs
     *********************************/
 
     // Register struct
-    typedef struct
+    typedef struct 
     {
         u32 mask;
         u32 value;
         char *string;
     } regDesc;
-
+    
     // Thread message struct
-    typedef struct
+    typedef struct 
     {
         int msgtype;
         int datatype;
         void* buff;
         int size;
     } usbMesg;
-
+        
     // Debug command struct
-    typedef struct
+    typedef struct 
     {
         char* command;
         char* description;
         char* (*execute)();
         void* next;
     } debugCommand;
-
-
+    
+    
     /*********************************
             Function Prototypes
     *********************************/
-
+    
     #ifndef LIBDRAGON
         // Threads
         #if USE_FAULTTHREAD
@@ -117,8 +117,8 @@ https://github.com/buu342/N64-UNFLoader
     #else
         static void debug_thread_usb(void *arg);
     #endif
-
-
+    
+    
     /*********************************
                  Globals
     *********************************/
@@ -134,12 +134,12 @@ https://github.com/buu342/N64-UNFLoader
     // Debug globals
     static char  debug_initialized = 0;
     static char  debug_buffer[BUFFER_SIZE];
-
+    
     // Commands hashtable related
     static debugCommand* debug_commands_hashtable[HASHTABLE_SIZE];
     static debugCommand  debug_commands_elements[MAX_COMMANDS];
     static int debug_commands_count = 0;
-
+    
     // Command parsing related
     static int debug_command_current = 0;
     static int debug_command_totaltokens = 0;
@@ -160,7 +160,7 @@ https://github.com/buu342/N64-UNFLoader
             static OSThread    faultThread;
             static u64         faultThreadStack[FAULT_THREAD_STACK/sizeof(u64)];
         #endif
-
+        
         // USB thread globals
         static OSMesgQueue usbMessageQ;
         static OSMesg      usbMessageBuf;
@@ -265,47 +265,47 @@ https://github.com/buu342/N64-UNFLoader
     /*********************************
              Debug functions
     *********************************/
-
+    
     /*==============================
         debug_initialize
         Initializes the debug library
     ==============================*/
-
+    
     void debug_initialize()
     {
         // Initialize the USB functions
         if (!usb_initialize())
             return;
-
+    
         // Overwrite osSyncPrintf
         #ifndef LIBDRAGON
             #if OVERWRITE_OSPRINT
                 __printfunc = (void*)debug_osSyncPrintf_implementation;
             #endif
-
+            
             // Initialize the fault thread
             #if USE_FAULTTHREAD
-                osCreateThread(&faultThread, FAULT_THREAD_ID, debug_thread_fault, 0,
-                                (faultThreadStack+FAULT_THREAD_STACK/sizeof(u64)),
+                osCreateThread(&faultThread, FAULT_THREAD_ID, debug_thread_fault, 0, 
+                                (faultThreadStack+FAULT_THREAD_STACK/sizeof(u64)), 
                                 FAULT_THREAD_PRI);
                 osStartThread(&faultThread);
             #endif
-
+            
             // Initialize the USB thread
-            osCreateThread(&usbThread, USB_THREAD_ID, debug_thread_usb, 0,
-                            (usbThreadStack+USB_THREAD_STACK/sizeof(u64)),
+            osCreateThread(&usbThread, USB_THREAD_ID, debug_thread_usb, 0, 
+                            (usbThreadStack+USB_THREAD_STACK/sizeof(u64)), 
                             USB_THREAD_PRI);
             osStartThread(&usbThread);
         #endif
-
+        
         // Mark the debug mode as initialized
         debug_initialized = 1;
         #if DEBUG_INIT_MSG
             debug_printf("Debug mode initialized!\n\n");
         #endif
     }
-
-
+    
+    
     #ifndef LIBDRAGON
         /*==============================
             printf_handler
@@ -315,14 +315,14 @@ https://github.com/buu342/N64-UNFLoader
             @param The length of the string
             @returns The end of the buffer that was written to
         ==============================*/
-
+        
         static void* printf_handler(void *buf, const char *str, size_t len)
         {
             return ((char *) memcpy(buf, str, len) + len);
         }
     #endif
-
-
+     
+     
     /*==============================
         debug_printf
         Prints a formatted message to the developer's command prompt.
@@ -330,13 +330,13 @@ https://github.com/buu342/N64-UNFLoader
         @param A string to print
         @param variadic arguments to print as well
     ==============================*/
-
+    
     void debug_printf(const char* message, ...)
     {
         int len = 0;
         usbMesg msg;
         va_list args;
-
+        
         // use the internal libultra printf function to format the string
         va_start(args, message);
         #ifndef LIBDRAGON
@@ -345,11 +345,11 @@ https://github.com/buu342/N64-UNFLoader
             len = vsprintf(debug_buffer, message, args);
         #endif
         va_end(args);
-
+        
         // Attach the '\0' if necessary
         if (0 <= len)
             debug_buffer[len] = '\0';
-
+        
         // Send the printf to the usb thread
         msg.msgtype = MSG_WRITE;
         msg.datatype = DATATYPE_TEXT;
@@ -361,19 +361,19 @@ https://github.com/buu342/N64-UNFLoader
             debug_thread_usb(&msg);
         #endif
     }
-
-
+    
+    
     /*==============================
         debug_dumpbinary
         Dumps a binary file through USB
         @param The file to dump
         @param The size of the file
     ==============================*/
-
+    
     void debug_dumpbinary(void* file, int size)
     {
         usbMesg msg;
-
+        
         // Send the binary file to the usb thread
         msg.msgtype = MSG_WRITE;
         msg.datatype = DATATYPE_RAWBINARY;
@@ -385,27 +385,27 @@ https://github.com/buu342/N64-UNFLoader
             debug_thread_usb(&msg);
         #endif
     }
-
-
+    
+    
     /*==============================
         debug_screenshot
         Sends the currently displayed framebuffer through USB.
         DOES NOT PAUSE DRAWING THREAD! Using outside the drawing
         thread may lead to a screenshot with visible tearing
     ==============================*/
-
+    
     void debug_screenshot()
     {
         usbMesg msg;
         int data[4];
-
+        
         // These addresses were obtained from http://en64.shoutwiki.com/wiki/VI_Registers_Detailed
         void* frame = (void*)(0x80000000|(*(u32*)0xA4400004)); // Same as calling osViGetCurrentFramebuffer() in libultra
         u32 yscale = (*(u32*)0xA4400034);
         u32 w = (*(u32*)0xA4400008);
         u32 h = ((((*(u32*)0xA4400028)&0x3FF)-(((*(u32*)0xA4400028)>>16)&0x3FF))*yscale)/2048;
         u8 depth = (((*(u32*)0xA4400000)&0x03) == 0x03) ? 4 : 2;
-
+        
         // Ensure debug mode is initialized
         if (!debug_initialized)
             return;
@@ -415,7 +415,7 @@ https://github.com/buu342/N64-UNFLoader
         data[1] = depth;
         data[2] = w;
         data[3] = h;
-
+        
         // Send the header to the USB thread
         msg.msgtype = MSG_WRITE;
         msg.datatype = DATATYPE_HEADER;
@@ -453,12 +453,12 @@ https://github.com/buu342/N64-UNFLoader
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
         volatile char crash;
-
+        
         // Set the assert data
         assert_expr = expression;
         assert_line = line;
         assert_file = file;
-
+        
         // If on libdragon, print where the assertion failed
         #ifdef LIBDRAGON
             debug_printf("Assertion failed in file '%s', line %d.\n", assert_file, assert_line);
@@ -468,8 +468,8 @@ https://github.com/buu342/N64-UNFLoader
         crash = *(volatile char *)1;
 #pragma GCC diagnostic pop
     }
-
-
+    
+    
     /*==============================
         debug_addcommand
         Adds a command for the USB to listen for
@@ -477,23 +477,23 @@ https://github.com/buu342/N64-UNFLoader
         @param The command description
         @param The function pointer to execute
     ==============================*/
-
+    
     void debug_addcommand(char* command, char* description, char* (*execute)())
     {
         int entry = command[0]%HASHTABLE_SIZE;
         debugCommand* slot = debug_commands_hashtable[entry];
-
+        
         // Ensure debug mode is initialized
         if (!debug_initialized)
             return;
-
+        
         // Ensure we haven't hit the command limit
         if (debug_commands_count == MAX_COMMANDS)
         {
             debug_printf("Max commands exceeded!\n");
             return;
         }
-
+        
         // Look for an empty spot in the hash table
         if (slot != NULL)
         {
@@ -503,53 +503,53 @@ https://github.com/buu342/N64-UNFLoader
         }
         else
             debug_commands_hashtable[entry] = &debug_commands_elements[debug_commands_count];
-
+            
         // Fill this spot with info about this command
         debug_commands_elements[debug_commands_count].command     = command;
         debug_commands_elements[debug_commands_count].description = description;
         debug_commands_elements[debug_commands_count].execute     = execute;
         debug_commands_count++;
     }
-
-
+    
+    
     /*==============================
         debug_printcommands
         Prints a list of commands to the developer's command prompt.
     ==============================*/
-
+    
     void debug_printcommands()
     {
         int i;
-
+        
         // Ensure debug mode is initialized
         if (!debug_initialized)
             return;
-
+        
         // Ensure there are commands to print
         if (debug_commands_count == 0)
             return;
-
+        
         // Print the commands
         debug_printf("Available USB commands\n----------------------\n");
         for (i=0; i<debug_commands_count; i++)
             debug_printf("%d. %s\n\t%s\n", i+1, debug_commands_elements[i].command, debug_commands_elements[i].description);
         debug_printf("\n");
     }
-
-
+    
+    
     /*==============================
         debug_pollcommands
         Check the USB for incoming commands
     ==============================*/
-
+    
     void debug_pollcommands()
     {
         usbMesg msg;
-
+    
         // Ensure debug mode is initialized
         if (!debug_initialized)
             return;
-
+    
         // Send a read message to the USB thread
         msg.msgtype = MSG_READ;
         #ifndef LIBDRAGON
@@ -558,25 +558,25 @@ https://github.com/buu342/N64-UNFLoader
             debug_thread_usb(&msg);
         #endif
     }
-
-
+    
+    
     /*==============================
         debug_sizecommand
         Returns the size of the data from this part of the command
         @return The size of the data in bytes, or 0
     ==============================*/
-
+    
     int debug_sizecommand()
     {
         // If we're out of commands to read, return 0
         if (debug_command_current == debug_command_totaltokens)
             return 0;
-
+        
         // Otherwise, return the amount of data to read
         return debug_command_incoming_size[debug_command_current];
     }
-
-
+    
+    
     /*==============================
         debug_parsecommand
         Stores the next part of the incoming command into the provided buffer.
@@ -584,22 +584,22 @@ https://github.com/buu342/N64-UNFLoader
         If you pass NULL, it skips this command.
         @param The buffer to store the data in
     ==============================*/
-
+    
     void debug_parsecommand(void* buffer)
     {
         u8 curr = debug_command_current;
-
+        
         // Skip this command if no buffer exists
         if (buffer == NULL)
         {
             debug_command_current++;
             return;
         }
-
+            
         // If we're out of commands to read, do nothing
         if (curr == debug_command_totaltokens)
             return;
-
+            
         // Read from the correct offset
         usb_skip(debug_command_incoming_start[curr]);
         usb_read(buffer, debug_command_incoming_size[curr]);
@@ -607,13 +607,13 @@ https://github.com/buu342/N64-UNFLoader
         debug_command_current++;
     }
 
-
+    
     /*==============================
         debug_commands_setup
-        Reads the entire incoming string and breaks it into parts for
+        Reads the entire incoming string and breaks it into parts for 
         debug_parsecommand and debug_sizecommand
     ==============================*/
-
+    
     static void debug_commands_setup()
     {
         int i;
@@ -621,17 +621,17 @@ https://github.com/buu342/N64-UNFLoader
         int dataleft = datasize;
         int filesize = 0;
         char filestep = 0;
-
+        
         // Initialize the starting offsets at -1
         memset(debug_command_incoming_start, -1, COMMAND_TOKENS*sizeof(int));
-
+        
         // Read data from USB in blocks
         while (dataleft > 0)
         {
             int readsize = BUFFER_SIZE;
             if (readsize > dataleft)
                 readsize = dataleft;
-
+        
             // Read a block from USB
             memset(debug_buffer, 0, BUFFER_SIZE);
             usb_read(debug_buffer, readsize);
@@ -642,7 +642,7 @@ https://github.com/buu342/N64-UNFLoader
                 // If we're not reading a file
                 int offset = datasize-dataleft;
                 u8 tok = debug_command_totaltokens;
-
+                
                 // Decide what to do based on the current character
                 switch (debug_buffer[i])
                 {
@@ -655,7 +655,7 @@ https://github.com/buu342/N64-UNFLoader
                                 debug_command_incoming_size[tok] = offset-debug_command_incoming_start[tok];
                                 debug_command_totaltokens++;
                             }
-
+                            
                             if (debug_buffer[i] == '\0')
                                 dataleft = 0;
                             break;
@@ -668,7 +668,7 @@ https://github.com/buu342/N64-UNFLoader
                         // Decide what to do based on the file handle
                         if (filestep == 0 && debug_command_incoming_start[tok] == -1)
                         {
-                            // Store the data offsets and sizes in the global command buffers
+                            // Store the data offsets and sizes in the global command buffers 
                             debug_command_incoming_start[tok] = offset;
                         }
                         else if (filestep == 1)
@@ -678,11 +678,11 @@ https://github.com/buu342/N64-UNFLoader
                         }
                         else if (filestep > 1)
                         {
-                            // Store the file offsets and sizes in the global command buffers
+                            // Store the file offsets and sizes in the global command buffers 
                             debug_command_incoming_start[tok] = offset;
                             debug_command_incoming_size[tok] = filesize;
                             debug_command_totaltokens++;
-
+                            
                             // Skip a bunch of bytes
                             if ((readsize-i)-filesize < 0)
                                 usb_skip(filesize-(readsize-i));
@@ -696,12 +696,12 @@ https://github.com/buu342/N64-UNFLoader
                 dataleft--;
             }
         }
-
+        
         // Rewind the USB fully
         usb_rewind(datasize);
     }
-
-
+    
+    
     /*==============================
         debug_thread_usb
         Handles the USB thread
@@ -728,13 +728,13 @@ https://github.com/buu342/N64-UNFLoader
                 // Wait for a USB message to arrive
                 osRecvMesg(&usbMessageQ, (OSMesg *)&threadMsg, OS_MESG_BLOCK);
             #endif
-
+            
             // Ensure there's no data in the USB (which handles MSG_READ)
             while (usb_poll() != 0)
             {
                 int header = usb_poll();
                 debugCommand* entry;
-
+                
                 // Ensure we're receiving a text command
                 if (USBHEADER_GETTYPE(header) != DATATYPE_TEXT)
                 {
@@ -742,14 +742,14 @@ https://github.com/buu342/N64-UNFLoader
                     usb_purge();
                     break;
                 }
-
+                
                 // Initialize the command trackers
                 debug_command_totaltokens = 0;
                 debug_command_current = 0;
-
+                    
                 // Break the USB command into parts
                 debug_commands_setup();
-
+                
                 // Ensure we don't read past our buffer
                 if (debug_sizecommand() > BUFFER_SIZE)
                 {
@@ -757,17 +757,17 @@ https://github.com/buu342/N64-UNFLoader
                     usb_purge();
                     break;
                 }
-
+                
                 // Read from the USB to retrieve the command name
                 debug_parsecommand(debug_buffer);
-
+                
                 // Iterate through the hashtable to see if we find the command
                 entry = debug_commands_hashtable[debug_buffer[0]%HASHTABLE_SIZE];
                 while (entry != NULL)
                 {
                     // If we found the command
                     if (!strncmp(debug_buffer, entry->command, debug_command_incoming_size[0]))
-                    {
+                    {                            
                         // Execute the command function and exit the while loop
                         debug_command_error = entry->execute();
                         if (debug_command_error != NULL)
@@ -777,7 +777,7 @@ https://github.com/buu342/N64-UNFLoader
                     }
                     entry = entry->next;
                 }
-
+                
                 // If no command was found
                 if (entry == NULL)
                 {
@@ -786,7 +786,7 @@ https://github.com/buu342/N64-UNFLoader
                     errortype = USBERROR_UNKNOWN;
                 }
             }
-
+            
             // Spit out an error if there was one during the command parsing
             if (errortype != USBERROR_NONE)
             {
@@ -808,7 +808,7 @@ https://github.com/buu342/N64-UNFLoader
                 }
                 errortype = USBERROR_NONE;
             }
-
+            
             // Handle the other USB messages
             switch (threadMsg->msgtype)
             {
@@ -823,10 +823,10 @@ https://github.com/buu342/N64-UNFLoader
             #endif
         }
     }
-
+    
     #ifndef LIBDRAGON
         #if OVERWRITE_OSPRINT
-
+        
             /*==============================
                 debug_osSyncPrintf_implementation
                 Overwrites osSyncPrintf calls with this one
@@ -835,31 +835,31 @@ https://github.com/buu342/N64-UNFLoader
                 @param The amount of characters to write
                 @returns The end of the buffer that was written to
             ==============================*/
-
+        
             static void* debug_osSyncPrintf_implementation(void *unused, const char *str, size_t len)
             {
                 void* ret;
                 usbMesg msg;
-
+                
                 // Clear the debug buffer and copy the formatted string to it
                 memset(debug_buffer, 0, len+1);
                 ret =  ((char *) memcpy(debug_buffer, str, len) + len);
-
+                
                 // Send the printf to the usb thread
                 msg.msgtype = MSG_WRITE;
                 msg.datatype = DATATYPE_TEXT;
                 msg.buff = debug_buffer;
                 msg.size = len+1;
                 osSendMesg(&usbMessageQ, (OSMesg)&msg, OS_MESG_BLOCK);
-
+                
                 // Return the end of the buffer
                 return ret;
             }
-
-        #endif
+            
+        #endif 
 
         #if USE_FAULTTHREAD
-
+            
             /*==============================
                 debug_printreg
                 Prints info about a register
@@ -872,9 +872,9 @@ https://github.com/buu342/N64-UNFLoader
             {
                 char first = 1;
                 debug_printf("%s\t\t0x%08x <", name, value);
-                while (desc->mask != 0)
+                while (desc->mask != 0) 
                 {
-                    if ((value & desc->mask) == desc->value)
+                    if ((value & desc->mask) == desc->value) 
                     {
                         (first) ? (first = 0) : ((void)debug_printf(","));
                         debug_printf("%s", desc->string);
@@ -883,14 +883,14 @@ https://github.com/buu342/N64-UNFLoader
                 }
                 debug_printf(">\n");
             }
-
-
+            
+            
             /*==============================
                 debug_thread_fault
                 Handles the fault thread
                 @param Arbitrary data that the thread can receive
             ==============================*/
-
+            
             static void debug_thread_fault(void *arg)
             {
                 OSMesg msg;
@@ -905,10 +905,10 @@ https://github.com/buu342/N64-UNFLoader
                 {
                     // Wait for a fault message to arrive
                     osRecvMesg(&faultMessageQ, (OSMesg *)&msg, OS_MESG_BLOCK);
-
+                    
                     // Get the faulted thread
                     curr = (OSThread *)__osGetCurrFaultedThread();
-                    if (curr != NULL)
+                    if (curr != NULL) 
                     {
                         __OSThreadContext* context = &curr->context;
 
@@ -921,7 +921,7 @@ https://github.com/buu342/N64-UNFLoader
                             debug_printf("cause\t\tAssertion failed in file '%s', line %d.\n", assert_file, assert_line);
                         debug_printreg(context->sr, "sr", srDesc);
                         debug_printf("badvaddr\t0x%08x\n\n", context->badvaddr);
-
+                        
                         // Print the registers
                         debug_printf("at 0x%016llx v0 0x%016llx v1 0x%016llx\n", context->at, context->v0, context->v1);
                         debug_printf("a0 0x%016llx a1 0x%016llx a2 0x%016llx\n", context->a0, context->a1, context->a2);
@@ -948,8 +948,8 @@ https://github.com/buu342/N64-UNFLoader
                     }
                 }
             }
-
+            
         #endif
     #endif
-
+    
 #endif
