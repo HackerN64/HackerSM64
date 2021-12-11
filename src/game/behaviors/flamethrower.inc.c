@@ -50,12 +50,13 @@ void bhv_flamethrower_flame_loop(void) {
 void bhv_flamethrower_loop(void) {
     if (o->oAction == FLAMETHROWER_ACT_IDLE) {
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-        if (gCurrLevelNum != LEVEL_BBH || gMarioOnMerryGoRound) {
+        if (gCurrLevelNum != LEVEL_BBH || gMarioOnMerryGoRound)
+#endif
+        {
             if (o->oDistanceToMario < 2000.0f) {
                 o->oAction = FLAMETHROWER_ACT_BLOW_FIRE;
             }
         }
-#endif
     } else if (o->oAction == FLAMETHROWER_ACT_BLOW_FIRE) {
         ModelID32 model = MODEL_RED_FLAME;
         f32 flameVel = 95.0f;
