@@ -48,7 +48,7 @@ static u32 sMenuSoundsExtra[] = {
     NO_SOUND,
     SOUND_ENV_BOAT_ROCKING1,
     SOUND_ENV_ELEVATOR3,
-    SOUND_ENV_UNKNOWN2,
+    SOUND_ENV_BOWLING_BALL_ROLL,
     SOUND_ENV_WATERFALL1,
     SOUND_ENV_WATERFALL2,
     SOUND_ENV_ELEVATOR1,
@@ -115,7 +115,7 @@ void raise_background_noise(s32 a) {
  * Called from threads: thread5_game_loop
  */
 void disable_background_sound(void) {
-    if (!sBgMusicDisabled) {
+    if (sBgMusicDisabled == FALSE) {
         sBgMusicDisabled = TRUE;
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_BACKGROUND);
     }
@@ -125,7 +125,7 @@ void disable_background_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void enable_background_sound(void) {
-    if (sBgMusicDisabled) {
+    if (sBgMusicDisabled == TRUE) {
         sBgMusicDisabled = FALSE;
         sound_banks_enable(SEQ_PLAYER_SFX, SOUND_BANKS_BACKGROUND);
     }
@@ -153,7 +153,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
     } else if (soundMenuFlags & SOUND_MENU_FLAG_HANDISAPPEAR) {
         play_sound(SOUND_MENU_HAND_DISAPPEAR, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_UNKNOWN1) {
-        play_sound(SOUND_MENU_UNK0C, gGlobalSoundSource);
+        play_sound(SOUND_MENU_UNK0C_FLAG_UNKNOWN1, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_PINCHMARIOFACE) {
         play_sound(SOUND_MENU_PINCH_MARIO_FACE, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_PINCHMARIOFACE2) {
@@ -166,7 +166,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
         play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
     }
 
-    if (soundMenuFlags & 0x100) {
+    if (soundMenuFlags & SOUND_MENU_FLAG_EXTRA) {
         play_menu_sounds_extra(20, NULL);
     }
 #if ENABLE_RUMBLE
@@ -198,6 +198,7 @@ void play_painting_eject_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void play_infinite_stairs_music(void) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     u8 shouldPlay = FALSE;
 
     /* Infinite stairs? */
@@ -217,6 +218,7 @@ void play_infinite_stairs_music(void) {
             func_80321080(500);
         }
     }
+#endif
 }
 
 /**
@@ -230,7 +232,10 @@ void set_background_music(u16 a, u16 seqArgs, s16 fadeTimer) {
             sound_reset(a);
         }
 
-        if (!gNeverEnteredCastle || seqArgs != SEQ_LEVEL_INSIDE_CASTLE) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+        if (!gNeverEnteredCastle || seqArgs != SEQ_LEVEL_INSIDE_CASTLE)
+#endif
+        {
             play_music(SEQ_PLAYER_LEVEL, seqArgs, fadeTimer);
             sCurrentMusic = seqArgs;
         }
@@ -333,6 +338,7 @@ void audio_game_loop_tick(void) {
 void thread4_sound(UNUSED void *arg) {
     audio_init();
     sound_init();
+
 #if PUPPYPRINT_DEBUG
     OSTime lastTime;
 #endif
