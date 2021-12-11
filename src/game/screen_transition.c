@@ -33,10 +33,10 @@ u8 set_transition_color_fade_alpha(s8 fadeType, s8 fadeTimer, u8 transTime) {
     u8 time = 0;
 
     switch (fadeType) {
-        case 0:
+        case COLOR_TRANS_FADE_INTO_COLOR:
             time = (f32) sTransitionColorFadeCount[fadeTimer] * 255.0 / (f32)(transTime - 1) + 0.5; // fade in
             break;
-        case 1:
+        case COLOR_TRANS_FADE_FROM_COLOR:
             time = (1.0 - sTransitionColorFadeCount[fadeTimer] / (f32)(transTime - 1)) * 255.0 + 0.5; // fade out
             break;
     }
@@ -73,13 +73,13 @@ s32 dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *t
 }
 
 s32 render_fade_transition_from_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *transData) {
-    u8 alpha = set_transition_color_fade_alpha(1, fadeTimer, transTime);
+    u8 alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_FROM_COLOR, fadeTimer, transTime);
 
     return dl_transition_color(fadeTimer, transTime, transData, alpha);
 }
 
 s32 render_fade_transition_into_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *transData) {
-    u8 alpha = set_transition_color_fade_alpha(0, fadeTimer, transTime);
+    u8 alpha = set_transition_color_fade_alpha(COLOR_TRANS_FADE_INTO_COLOR, fadeTimer, transTime);
 
     return dl_transition_color(fadeTimer, transTime, transData, alpha);
 }
@@ -93,25 +93,33 @@ s16 calc_tex_transition_radius(s8 fadeTimer, s8 transTime, struct WarpTransition
 }
 
 f32 calc_tex_transition_time(s8 fadeTimer, s8 transTime, struct WarpTransitionData *transData) {
-    f32 dx = transData->startTexX - transData->endTexX;
-    f32 dy = transData->startTexY - transData->endTexY;
-    return (f32) sTransitionColorFadeCount[fadeTimer] * sqrtf(sqr(dx) + sqr(dy)) / (f32)(transTime - 1);
+    f32 startX = transData->startTexX;
+    f32 startY = transData->startTexY;
+    f32 endX = transData->endTexX;
+    f32 endY = transData->endTexY;
+    f32 sqrtfXY = sqrtf((startX - endX) * (startX - endX) + (startY - endY) * (startY - endY));
+    f32 result = (f32) sTransitionColorFadeCount[fadeTimer] * sqrtfXY / (f32)(transTime - 1);
+
+    return result;
 }
 
 u16 convert_tex_transition_angle_to_pos(struct WarpTransitionData *transData) {
-    f32 dx = transData->endTexX - transData->startTexX;
-    f32 dy = transData->endTexY - transData->startTexY;
-    return atan2s(dx, dy);
+    f32 x = transData->endTexX - transData->startTexX;
+    f32 y = transData->endTexY - transData->startTexY;
+
+    return atan2s(x, y);
 }
 
 s16 center_tex_transition_x(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransPos) {
     f32 x = transData->startTexX + coss(texTransPos) * texTransTime;
-    return (s16)(x + 0.5f);
+
+    return (s16)(x + 0.5);
 }
 
 s16 center_tex_transition_y(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransPos) {
     f32 y = transData->startTexY + sins(texTransPos) * texTransTime;
-    return (s16)(y + 0.5f);
+
+    return (s16)(y + 0.5);
 }
 
 void make_tex_transition_vertex(Vtx *verts, s32 n, s8 fadeTimer, struct WarpTransitionData *transData, s16 centerTransX, s16 centerTransY,
@@ -122,8 +130,8 @@ void make_tex_transition_vertex(Vtx *verts, s32 n, s8 fadeTimer, struct WarpTran
     u16 zeroTimer = sTransitionTextureFadeCount[fadeTimer];
     f32 centerX = texRadius1 * coss(zeroTimer) - texRadius2 * sins(zeroTimer) + centerTransX;
     f32 centerY = texRadius1 * sins(zeroTimer) + texRadius2 * coss(zeroTimer) + centerTransY;
-    s16 x = round_float(centerX);
-    s16 y = round_float(centerY);
+    s16 x = roundf(centerX);
+    s16 y = roundf(centerY);
 
     make_vertex(verts, n, x, y, -1, tx * 32, ty * 32, r, g, b, 255);
 }
@@ -167,7 +175,7 @@ s32 render_textured_transition(s8 fadeTimer, s8 transTime, struct WarpTransition
 
     if (verts != NULL) {
         load_tex_transition_vertex(verts, fadeTimer, transData, centerTransX, centerTransY, texTransRadius, transTexType);
-        gSPDisplayList(gDisplayListHead++, dl_proj_mtx_fullscreen)
+        gSPDisplayList(gDisplayListHead++, dl_proj_mtx_fullscreen);
         gDPSetCombineMode(gDisplayListHead++, G_CC_SHADE, G_CC_SHADE);
         gDPSetRenderMode(gDisplayListHead++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
         gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts), 8, 0);
@@ -198,18 +206,39 @@ s32 render_textured_transition(s8 fadeTimer, s8 transTime, struct WarpTransition
 
 s32 render_screen_transition(s8 fadeTimer, s8 transType, u8 transTime, struct WarpTransitionData *transData) {
     switch (transType) {
-        case WARP_TRANSITION_FADE_FROM_COLOR:  return render_fade_transition_from_color(fadeTimer, transTime, transData); break;
-        case WARP_TRANSITION_FADE_INTO_COLOR:  return render_fade_transition_into_color(fadeTimer, transTime, transData); break;
-        case WARP_TRANSITION_FADE_FROM_STAR:   return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_STAR,   TRANS_TYPE_MIRROR); break;
-        case WARP_TRANSITION_FADE_INTO_STAR:   return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_STAR,   TRANS_TYPE_MIRROR); break;
-        case WARP_TRANSITION_FADE_FROM_CIRCLE: return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_CIRCLE, TRANS_TYPE_MIRROR); break;
-        case WARP_TRANSITION_FADE_INTO_CIRCLE: return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_CIRCLE, TRANS_TYPE_MIRROR); break;
-        case WARP_TRANSITION_FADE_FROM_MARIO:  return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_MARIO,  TRANS_TYPE_CLAMP ); break;
-        case WARP_TRANSITION_FADE_INTO_MARIO:  return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_MARIO,  TRANS_TYPE_CLAMP ); break;
-        case WARP_TRANSITION_FADE_FROM_BOWSER: return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR); break;
-        case WARP_TRANSITION_FADE_INTO_BOWSER: return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR); break;
+        case WARP_TRANSITION_FADE_FROM_COLOR:
+            return render_fade_transition_from_color(fadeTimer, transTime, transData);
+            break;
+        case WARP_TRANSITION_FADE_INTO_COLOR:
+            return render_fade_transition_into_color(fadeTimer, transTime, transData);
+            break;
+        case WARP_TRANSITION_FADE_FROM_STAR:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_STAR, TRANS_TYPE_MIRROR);
+            break;
+        case WARP_TRANSITION_FADE_INTO_STAR:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_STAR, TRANS_TYPE_MIRROR);
+            break;
+        case WARP_TRANSITION_FADE_FROM_CIRCLE:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_CIRCLE, TRANS_TYPE_MIRROR);
+            break;
+        case WARP_TRANSITION_FADE_INTO_CIRCLE:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_CIRCLE, TRANS_TYPE_MIRROR);
+            break;
+        case WARP_TRANSITION_FADE_FROM_MARIO:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_MARIO, TRANS_TYPE_CLAMP);
+            break;
+        case WARP_TRANSITION_FADE_INTO_MARIO:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_MARIO, TRANS_TYPE_CLAMP);
+            break;
+        case WARP_TRANSITION_FADE_FROM_BOWSER:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR);
+            break;
+        case WARP_TRANSITION_FADE_INTO_BOWSER:
+            return render_textured_transition(fadeTimer, transTime, transData, TEX_TRANS_BOWSER, TRANS_TYPE_MIRROR);
+            break;
     }
-    return 0;
+
+    return FALSE;
 }
 
 Gfx *render_cannon_circle_base(void) {
@@ -223,10 +252,10 @@ Gfx *render_cannon_circle_base(void) {
     Gfx *g = dlist;
 
     if (verts != NULL && dlist != NULL) {
-        make_vertex(verts, 0, 0, 0, -1, -1152, 1824, 0, 0, 0, 255);
-        make_vertex(verts, 1, SCREEN_WIDTH, 0, -1, 1152, 1824, 0, 0, 0, 255);
-        make_vertex(verts, 2, SCREEN_WIDTH, SCREEN_HEIGHT, -1, 1152, 192, 0, 0, 0, 255);
-        make_vertex(verts, 3, 0, SCREEN_HEIGHT, -1, -1152, 192, 0, 0, 0, 255);
+        make_vertex(verts, 0,            0,             0, -1, -1152, 1824, 0, 0, 0, 255);
+        make_vertex(verts, 1, SCREEN_WIDTH,             0, -1,  1152, 1824, 0, 0, 0, 255);
+        make_vertex(verts, 2, SCREEN_WIDTH, SCREEN_HEIGHT, -1,  1152,  192, 0, 0, 0, 255);
+        make_vertex(verts, 3,            0, SCREEN_HEIGHT, -1, -1152,  192, 0, 0, 0, 255);
 
 #ifdef WIDESCREEN
         // Render black rectangles outside the 4:3 area.
@@ -248,8 +277,8 @@ Gfx *render_cannon_circle_base(void) {
 #ifdef WIDESCREEN
         gDPSetCombineMode(g++, G_CC_SHADE, G_CC_SHADE);
         gSPVertex(g++, VIRTUAL_TO_PHYSICAL(verts + 4), 4, 4);
-        gSP2Triangles(g++, 4, 0, 3, 0, 4, 3, 7, 0);
-        gSP2Triangles(g++, 1, 5, 6, 0, 1, 6, 2, 0);
+        gSP2Triangles(g++, 4, 0, 3, 0x0, 4, 3, 7, 0x0);
+        gSP2Triangles(g++, 1, 5, 6, 0x0, 1, 6, 2, 0x0);
 #endif
         gSPDisplayList(g++, dl_screen_transition_end);
         gSPEndDisplayList(g);
