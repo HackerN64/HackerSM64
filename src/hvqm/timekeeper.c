@@ -53,7 +53,7 @@ static OSMesg         aiMessages[AI_MSG_SIZE];
 /***********************************************************************
  * Ring buffer for reserving display of image
  *
- *     As soon as image (frame buffer) is complete, put into this
+ *     As soon as image (frame buffer) is complete, put into this 
  *     ring buffer, wait for display time to come and set in VI.
  ***********************************************************************/
 #define  VIDEO_RING_SIZE  NUM_CFBs
@@ -70,7 +70,7 @@ static int  videoRingRead;	/* Ring buffer read index */
 
 /***********************************************************************
  * Ring buffer for reserving playback of audio
- *
+ * 
  *     As soon as audio (PCM data) is complete, put into this
  *     ring buffer and push as soon as AI FIFO is free.
  ***********************************************************************/
@@ -93,7 +93,7 @@ static u32  aiFIFOsamples;	/* Number of PCM samples waiting in AI FIFO */
 static u32  aiDAsamples;	/* Number of samples AI is DMA transferring to DA */
 
 /***********************************************************************
- * Buffer for matching PCM transfer data length to PCM_ALIGN
+ * Buffer for matching PCM transfer data length to PCM_ALIGN 
  ***********************************************************************/
 static s16 pcmModBuf[(PCM_ALIGN-1)*PCM_CHANNELS];
 
@@ -133,7 +133,7 @@ static OSTime  last_time;
  *     The time that has passed since the start of HVQM2 movie playback
  *   is calculated back from the number of samples that have finished
  *   playing (samples_played) and the sampling rate (samples_per_sec).
- *     The time after samples_played was first updated is supplemented
+ *     The time after samples_played was first updated is supplemented 
  *   with osGetTime().
  *
  * Returned value
@@ -219,7 +219,7 @@ static void timekeeperProc(void UNUSED*argument) {
     s32 pcm_mod_samples;	/* The number of PCM samples left over */
     tkAudioProc audioproc;
     OSTime present_vtime;
-
+    
     /* Acquire retrace event */
     osCreateMesgQueue( &viMessageQ, viMessages, VI_MSG_SIZE );
     osViSetEvent( &viMessageQ, 0, 1 );
@@ -231,11 +231,11 @@ static void timekeeperProc(void UNUSED*argument) {
   /*
    * Create and start audio DA counter thread
    */
-    osCreateThread(&daCounterThread, DA_COUNTER_THREAD_ID, daCounterProc,
-		 NULL, daCounterStack + (STACKSIZE/sizeof(u64)),
+    osCreateThread(&daCounterThread, DA_COUNTER_THREAD_ID, daCounterProc, 
+		 NULL, daCounterStack + (STACKSIZE/sizeof(u64)), 
 		 (OSPri)DA_COUNTER_PRIORITY);
     osStartThread(&daCounterThread);
-
+    
     osRecvMesg(&tkCmdMesgQ, (OSMesg *)&cmd, OS_MESG_BLOCK);
 
     /*
@@ -245,10 +245,10 @@ static void timekeeperProc(void UNUSED*argument) {
       osSendMesg( &tkResMesgQ, NULL, OS_MESG_BLOCK );
       osRecvMesg( &tkCmdMesgQ, (OSMesg *)&cmd, OS_MESG_BLOCK );
     }
-
+    
     tkClockDisable();
     audioproc = (cmd->rewind)();
-
+    
     samples_per_sec = cmd->samples_per_sec;
     if (samples_per_sec) osAiSetFrequency(samples_per_sec);
 
@@ -275,7 +275,7 @@ static void timekeeperProc(void UNUSED*argument) {
     osSendMesg( &tkResMesgQ, NULL, OS_MESG_BLOCK ); /* Notification that playback preparations are finished */
 
     present_vtime = osGetTime();
-
+    
     while (!video_done || videoRingCount > 0 || pushed_cfb != NULL ||
 	    !audio_done || audioRingCount > 0 || aiFIFOsamples > 0) {
         u64 present_time;
@@ -288,7 +288,7 @@ static void timekeeperProc(void UNUSED*argument) {
         last_vtime = present_vtime;
         present_vtime = osGetTime();
         present_time = tkGetTime() + OS_CYCLES_TO_USEC(present_vtime - last_vtime);
-
+        
         if (pushed_cfb != NULL) {
             /* The display has switched from showing_cfb to pushed_cfb (it should have) */
             if (!video_started) {
@@ -311,11 +311,11 @@ static void timekeeperProc(void UNUSED*argument) {
             pushed_cfb = NULL;
             pushed_cfb_statP = NULL;
         }
-
+        
 	/*
 	 * Push the next frame buffer to the VI
 	 *
-	 *     Before the start of video display (video_started == 0),
+	 *     Before the start of video display (video_started == 0), 
 	 *   wait until audio data is prepared for playback
          *   (audioRingCount > 0).
 	 */
@@ -331,12 +331,12 @@ static void timekeeperProc(void UNUSED*argument) {
 	    --videoRingCount;
 	  }
 	}
-
+        
 	/*
 	 * Push the next PCM data to the AI
 	 *
-	 *      Before the start of video display (video_started == 0)
-	 *    wait until the display of the first image frame
+	 *      Before the start of video display (video_started == 0) 
+	 *    wait until the display of the first image frame 
          *    has begun (video_started == 1).
 	 */
 	if ( video_started ) {
@@ -398,14 +398,14 @@ static void timekeeperProc(void UNUSED*argument) {
 	  }
 	  else audio_done = 1;
 	}
-
+        
 	if ( osRecvMesg( &tkCmdMesgQ, (OSMesg *)&cmd, OS_MESG_NOBLOCK ) == 0 )
 	  {
 	    /*
 	     * tkStop() or tkStart() has been executed
-	     *
+	     * 
 	     *     Set 1 in video_done and end this playback loop
-             *   after playback of the current movie's video and
+             *   after playback of the current movie's video and 
 	     *   and audio has completely finished.
 	     */
 	    video_done = 1;
@@ -426,8 +426,8 @@ createTimekeeper(void)
 {
   osCreateMesgQueue( &tkCmdMesgQ, &tkCmdMesgBuf, 1 );
   osCreateMesgQueue( &tkResMesgQ, &tkResMesgBuf, 1 );
-  osCreateThread( &tkThread, TIMEKEEPER_THREAD_ID, timekeeperProc,
-		 NULL, tkStack + (STACKSIZE/sizeof(u64)),
+  osCreateThread( &tkThread, TIMEKEEPER_THREAD_ID, timekeeperProc, 
+		 NULL, tkStack + (STACKSIZE/sizeof(u64)), 
 		 (OSPri)TIMEKEEPER_PRIORITY );
   osStartThread( &tkThread );
 }
@@ -443,9 +443,9 @@ createTimekeeper(void)
  *    Directs the timekeeper to play a new movie.  Playback of the
  *  movie starts after callback of "rewind" by the timekeeper.  After
  *  this, the HVQM2 video records are read and decoded and the
- *  completed frame buffers are handed over to the timekeeper by
+ *  completed frame buffers are handed over to the timekeeper by 
  *  tkPushVideoframe() in succession to play the video part of the movie.
- *  As for the audio, the timekeeper itself calls the callback
+ *  As for the audio, the timekeeper itself calls the callback 
  *  function (the value returned by rewind) that gets the PCM data as
  *  needed to playback the audio.
  *
@@ -485,7 +485,7 @@ tkStop( void )
 /***********************************************************************
  *
  * void tkPushVideoframe(void *vaddr, u32 *statP, u64 disptime)
- *
+ * 
  * Argument
  *     vaddr     Frame buffer address
  *     statP     Pointer to state flag data regarding vaddr
@@ -496,8 +496,8 @@ tkStop( void )
  *  The timekeeper displays the frame buffer after waiting for the
  *  "disptime" amount of time to pass from the start of the movie.
  *
- *    To wait for the display of the vaddr frame buffer or to
- *  indicate that something is being displayed, the CFB_SHOWING
+ *    To wait for the display of the vaddr frame buffer or to 
+ *  indicate that something is being displayed, the CFB_SHOWING 
  *  flag is set in the u32 type data pointed to by the statP pointer.
  *  At the time when display of vaddr is finished, (once its display
  *  is over and display has switched to another frame buffer) this

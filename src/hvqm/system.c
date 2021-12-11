@@ -1,10 +1,10 @@
-/*
+/* 
  *  N64-HVQM2 library  Sample program
- *
+ * 
  *  FILE : system.c (boot program/system utility)
- *
+ * 
  *  Copyright (C) 1998,1999 NINTENDO Co.,Ltd.
- *
+ * 
  */
 
 /* 1998-12-15 */
@@ -15,7 +15,7 @@
 
 /***********************************************************************
  *
- * void romcpy(void *dest, void *src, u32 len, s32 pri, OSIoMesg *mb,
+ * void romcpy(void *dest, void *src, u32 len, s32 pri, OSIoMesg *mb, 
  *             OSMesgQueue *mq)
  *
  * Arguments
@@ -27,12 +27,12 @@
  *     mq        Message queue receiving notification of end of DMA
  *
  * Explanation
- *     DMA transfers "len" bytes from ROM address "SRC" to DRAM
+ *     DMA transfers "len" bytes from ROM address "SRC" to DRAM 
  *  address "dest" and returns after waiting for end of DMA. The
- *  data cache of the transfer destination in DRAM is invalidated
+ *  data cache of the transfer destination in DRAM is invalidated 
  *  ahead of time.
  *
- *     The parameters have the same meaning as for osPiStartDma()
+ *     The parameters have the same meaning as for osPiStartDma() 
  *
  ***********************************************************************/
 void
