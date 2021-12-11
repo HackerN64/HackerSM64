@@ -378,10 +378,12 @@ void render_init(void) {
     if (IO_READ(DPC_PIPEBUSY_REG) == 0) {
         gIsConsole = FALSE;
         gBorderHeight = BORDER_HEIGHT_EMULATOR;
+        gIsVC = IS_VC();
     } else {
         gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
+
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
@@ -419,8 +421,6 @@ void select_gfx_pool(void) {
  * - Selects which framebuffer will be rendered and displayed to next time.
  */
 void display_and_vsync(void) {
-    if (!gIsConsole) gIsVC = IS_VC();
-
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
