@@ -29,27 +29,95 @@ struct ObjShape *gShapeSilverSpark = NULL;    // @ 801A82F0
 struct ObjShape *gShapeRedStar = NULL;     // @ 801A82F4
 struct ObjShape *gShapeSilverStar = NULL;  // @ 801A82F8
 
+// Not sure what this data is, but it looks like stub animation data
+
+static struct GdAnimTransform unusedAnimData1[] = {
+    { {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} },
+};
+
+UNUSED static struct AnimDataInfo unusedAnim1 = { ARRAY_COUNT(unusedAnimData1), GD_ANIM_SCALE3F_ROT3F_POS3F_2, unusedAnimData1 };
+
+static struct GdAnimTransform unusedAnimData2[] = {
+    { {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} },
+};
+
+UNUSED static struct AnimDataInfo unusedAnim2 = { ARRAY_COUNT(unusedAnimData2), GD_ANIM_SCALE3F_ROT3F_POS3F_2, unusedAnimData2 };
+
+static struct GdAnimTransform unusedAnimData3[] = {
+    { {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} },
+};
+
+UNUSED static struct AnimDataInfo unusedAnim3 = { ARRAY_COUNT(unusedAnimData3), GD_ANIM_SCALE3F_ROT3F_POS3F_2, unusedAnimData3 };
+
+UNUSED static s32 sUnref801A838C[6] = { 0 };
+struct ObjShape *sSimpleShape = NULL;
+UNUSED static s32 sUnref801A83A8[31] = { 0 };
+UNUSED static struct DynList sSimpleDylist[8] = {  // unused
+    BeginList(),
+    StartGroup("simpleg"),
+    MakeDynObj(D_NET, "simple"),
+    SetType(3),
+    SetShapePtrPtr(&sSimpleShape),
+    EndGroup("simpleg"),
+    UseObj("simpleg"),
+    EndList(),
+};
+static struct DynList sDynlist801A84E4[3] = {
+    BeginList(),
+    SetFlag(0x1800),
+    EndList(),
+};
+UNUSED static struct DynList sDynlist801A85B3[5] = {
+    BeginList(), CallList(sDynlist801A84E4), SetFlag(0x400), SetFriction(0.04, 0.01, 0.01),
+    EndList(),
+};
+UNUSED static struct DynList sDynlist801A85A4[4] = {
+    BeginList(),
+    CallList(sDynlist801A84E4),
+    SetFriction(0.04, 0.01, 0.01),
+    EndList(),
+};
+UNUSED static struct DynList sDynlist801A8604[4] = {
+    BeginList(),
+    CallList(sDynlist801A84E4),
+    SetFriction(0.005, 0.005, 0.005),
+    EndList(),
+};
+static f64 D_801A8668 = 0.0;
+
 // bss
+UNUSED static u8 sUnrefSpaceB00[0x2C];    // @ 801BAB00
 static struct ObjGroup *sCubeShapeGroup;  // @ 801BAB2C
+UNUSED static u8 sUnrefSpaceB30[0xC];     // @ 801BAB30
 static struct ObjShape *sCubeShape;       // @ 801BAB3C
+UNUSED static u8 sUnrefSpaceB40[0x8];     // @ 801BAB40
 static char sGdLineBuf[0x100];            // @ 801BAB48
 static s32 sGdLineBufCsr;                 // @ 801BAC48
 static struct GdFile *sGdShapeFile;       // @ 801BAC4C
 static struct ObjShape *sGdShapeListHead; // @ 801BAC50
 static u32 sGdShapeCount;                 // @ 801BAC54
+UNUSED static u8 sUnrefSpaceC58[0x8];     // @ 801BAC58
 static struct GdVec3f D_801BAC60;
+UNUSED static u32 sUnrefSpaceC6C;         // @ 801BAC6C
+UNUSED static u32 sUnrefSpaceC70;         // @ 801BAC70
 static struct ObjPlane *D_801BAC74;
 static struct ObjPlane *D_801BAC78; // sShapeNetHead?
+UNUSED static u8 sUnrefSpaceC80[0x1C];    // @ 801BAC80
 static struct ObjFace *D_801BAC9C;
 static struct ObjFace *D_801BACA0;
+UNUSED static u8 sUnrefSpaceCA8[0x10];    // @ 801BACA8
 /// factor for scaling vertices in an `ObjShape` when calling `scale_verts_in_shape()`
 static struct GdVec3f sVertexScaleFactor;
 /// factor for translating vertices in an `ObjShape` when calling `translate_verts_in_shape()`
 static struct GdVec3f sVertexTranslateOffset;
+UNUSED static u8 sUnrefSpaceCD8[0x30];    // @ 801BACD8
 static struct ObjGroup *D_801BAD08; // group of planes from make_netfromshape
+UNUSED static u8 sUnrefSpaceD10[0x20];    // @ 801BAD10
+static struct GdVec3f sShapeCenter;   // printed with "c="
+UNUSED static u8 sUnrefSpaceD40[0x120];   // @ 801BAD40
 
 // Forward Declarations
-struct ObjMaterial *find_or_add_new_mtl(struct ObjGroup *group, s32 a1, f32 r, f32 g, f32 b);
+struct ObjMaterial *find_or_add_new_mtl(struct ObjGroup *, s32, f32, f32, f32);
 
 /* @ 245A50 for 0x40 */
 /* Something to do with shape list/group initialization? */
@@ -93,7 +161,7 @@ void calc_face_normal(struct ObjFace *face) {
         p3.z = vtx3->pos.z;
 
         // calculate the cross product of edges (p2 - p1) and (p3 - p2)
-        // not sure why each component is multiplied by 1000. maybe to avoid loss of precision when normalizing?
+        // not sure why each component is multiplied by 1000. maybe to avoid loss of precision when normalizing? 
         normal.x = (((p2.y - p1.y) * (p3.z - p2.z)) - ((p2.z - p1.z) * (p3.y - p2.y))) * mul;
         normal.y = (((p2.z - p1.z) * (p3.x - p2.x)) - ((p2.x - p1.x) * (p3.z - p2.z))) * mul;
         normal.z = (((p2.x - p1.x) * (p3.y - p2.y)) - ((p2.y - p1.y) * (p3.x - p2.x))) * mul;
@@ -290,6 +358,7 @@ s32 scan_to_next_non_whitespace(void) {
 
         if (curChar == '\x1a') { //'SUB' character: "soft EOF" in older systems
             return FALSE;
+            continue; // unreachable
         }
 
         if (is_line_end(curChar)) {
@@ -314,6 +383,7 @@ s32 is_next_buf_word(char *a0) {
     for (curChar = get_and_advance_buf(); curChar != '\0'; curChar = get_and_advance_buf()) {
         if (is_white_space(curChar) || is_line_end(curChar)) {
             break;
+            continue; // unreachable + nonsensical
         }
         wordBuf[bufLength] = curChar;
         bufLength++;
@@ -395,6 +465,11 @@ s32 getint(s32 *intPtr) {
     return !!bufCsr;
 }
 
+/* @ 246838 for 0x14 */
+void Unknown80198068(UNUSED f32 a0) {
+    printf("max=%f\n", a0);
+}
+
 /* @ 24684C for 0x6C */
 void func_8019807C(struct ObjVertex *vtx) {
     gd_rot_2d_vec(D_801BAC60.x, &vtx->pos.y, &vtx->pos.z);
@@ -407,6 +482,23 @@ void func_801980E8(f32 *a0) {
     gd_rot_2d_vec(D_801BAC60.x, &a0[1], &a0[2]);
     gd_rot_2d_vec(D_801BAC60.y, &a0[0], &a0[2]);
     gd_rot_2d_vec(D_801BAC60.z, &a0[0], &a0[1]);
+}
+
+/* @ 246924 for 0x30 */
+void Unknown80198154(f32 x, f32 y, f32 z) {
+    D_801BAC60.x = x;
+    D_801BAC60.y = y;
+    D_801BAC60.z = z;
+}
+
+/* @ 246954 for 0x6c */
+void Unknown80198184(struct ObjShape *shape, f32 x, f32 y, f32 z) {
+    UNUSED struct GdVec3f unusedVec;
+    unusedVec.x = x;
+    unusedVec.y = y;
+    unusedVec.z = z;
+
+    apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) func_8019807C, shape->vtxGroup);
 }
 
 /* @ 2469C0 for 0xc8 */
@@ -461,6 +553,53 @@ void translate_verts_in_shape(struct ObjShape *shape, f32 x, f32 y, f32 z) {
     sVertexTranslateOffset.z = z;
 
     apply_to_obj_types_in_group(OBJ_TYPE_ALL, (applyproc_t) translate_obj_position, shape->vtxGroup);
+}
+
+/* @ 246C14 for 0xe0 */
+void Unknown80198444(struct ObjVertex *vtx) {
+    f64 distance;
+
+    add_obj_pos_to_bounding_box(&vtx->header);
+
+    distance = vtx->pos.x * vtx->pos.x + vtx->pos.y * vtx->pos.y + vtx->pos.z * vtx->pos.z;
+
+    if (distance != 0.0) {
+        distance = gd_sqrt_d(distance); // sqrtd?
+
+        if (distance > D_801A8668) {
+            D_801A8668 = distance;
+        }
+    }
+}
+
+/* @ 246CF4 for 0xc4 */
+void Unknown80198524(struct ObjVertex *vtx) {
+    vtx->pos.x -= sShapeCenter.x;
+    vtx->pos.y -= sShapeCenter.y;
+    vtx->pos.z -= sShapeCenter.z;
+
+    vtx->pos.x /= D_801A8668;
+    vtx->pos.y /= D_801A8668;
+    vtx->pos.z /= D_801A8668;
+}
+
+/* @ 246DB8 for 0x11c */
+void Unknown801985E8(struct ObjShape *shape) {
+    struct GdBoundingBox bbox;
+
+    D_801A8668 = 0.0;
+    reset_bounding_box();
+    apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) Unknown80198444, shape->vtxGroup);
+
+    get_some_bounding_box(&bbox);
+
+    sShapeCenter.x = (f32)((bbox.minX + bbox.maxX) / 2.0); //? 2.0f
+    sShapeCenter.y = (f32)((bbox.minY + bbox.maxY) / 2.0); //? 2.0f
+    sShapeCenter.z = (f32)((bbox.minZ + bbox.maxZ) / 2.0); //? 2.0f
+
+    gd_print_vec("c=", &sShapeCenter);
+
+    apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) Unknown80198524, shape->vtxGroup);
 }
 
 /* @ 246ED4 for 0x4FC; orig name: func_80198704 */
@@ -779,6 +918,8 @@ void read_ARK_shape(struct ObjShape *shape, char *fileName) {
     struct ObjVertex *sp3C;        // newly made vtx
     struct ObjVertex *sp38 = NULL; // first made vtx
     struct ObjMaterial *sp34;      // found or new mtl for face
+    UNUSED s32 sp30 = 0;
+    UNUSED s32 sp2C = 0;
 
     shape->mtlGroup = make_group(0);
 
@@ -899,6 +1040,7 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
     s32 parI;
     s32 row;
     s32 col;
+    UNUSED s32 sp4C = 0;
     struct ObjShape *gridShape;
     f32 sp44;
     struct ObjFace *sp40 = NULL;  // first made shape?
@@ -929,7 +1071,7 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
     gridShape->faceCount = 0;
     gridShape->vtxCount = 0;
 
-    sp44 = 2.0f / a3;
+    sp44 = 2.0 / a3; //? 2.0f
     sp5C = -1.0f;
     sp6C = 0.0f;
     sp70 = -1.0f;
@@ -942,8 +1084,8 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
                 objBuf[row][col] = gd_make_vertex(sp68, sp6C, sp70);
             } else if (gridType == OBJ_TYPE_PARTICLES) {
                 objBuf[row][col] = make_particle(0, 0, sp68, sp6C + 2.0f, sp70);
-                ((struct ObjParticle *) objBuf[row][col])->unk44 = (1.0f + sp68) / 2.0f;
-                ((struct ObjParticle *) objBuf[row][col])->unk48 = (1.0f + sp70) / 2.0f;
+                ((struct ObjParticle *) objBuf[row][col])->unk44 = (1.0 + sp68) / 2.0;
+                ((struct ObjParticle *) objBuf[row][col])->unk48 = (1.0 + sp70) / 2.0;
             }
             sp68 += sp44;
         }
@@ -997,6 +1139,11 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
 
     printf("grid: points=%d, faces=%d\n", gridShape->vtxGroup->id, gridShape->faceGroup->id);
     return gridShape;
+}
+
+/* @ 248614 for 0x44 */
+void Unknown80199E44(UNUSED s32 a0, struct GdObj *a1, struct GdObj *a2, UNUSED s32 a3) {
+    UNUSED struct ObjGroup *sp1C = make_group(2, a1, a2);
 }
 
 /* @ 248658 for 0x5c */

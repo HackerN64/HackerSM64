@@ -22,6 +22,7 @@ void func_801911A8(struct ObjJoint *j);
 void func_80191220(struct ObjJoint *j);
 void func_801913C0(struct ObjJoint *j);
 void func_801913F0(struct ObjJoint *j);
+void stub_joints_2(struct ObjJoint *j);
 void reset_joint(struct ObjJoint *j);
 void func_80191824(struct ObjJoint *j);
 void func_80191E88(struct ObjGroup *grp);

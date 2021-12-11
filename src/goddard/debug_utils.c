@@ -153,7 +153,9 @@ void remove_all_memtrackers(void) {
         sMemTrackers[i].total = 0.0f;
     }
 
+#ifdef AVOID_UB
     sNumActiveMemTrackers = 0;
+#endif
 }
 
 /**
@@ -457,7 +459,11 @@ void fatal_printf(const char *fmt, ...) {
                         gd_printf("%s", va_arg(vl, char *));
                         break;
                     case 'c':
+#ifdef AVOID_UB
                         gd_printf("%c", (char)va_arg(vl, int));
+#else
+                        gd_printf("%c", va_arg(vl, char));
+#endif
                         break;
                     case 'x':
                         gd_printf("%x", va_arg(vl, s32));
@@ -522,7 +528,9 @@ void imout(void) {
  * TODO: figure out type of rng generator?
  */
 f32 gd_rand_float(void) {
+    u32 temp;
     u32 i;
+    f32 val;
 
     for (i = 0; i < 4; i++) {
         if (sPrimarySeed & 0x80000000) {
@@ -535,12 +543,14 @@ f32 gd_rand_float(void) {
 
     /* Seed Switch */
     if ((sPrimarySeed ^= gd_get_ostime()) & 1) {
-        u32 temp = sPrimarySeed;
+        temp = sPrimarySeed;
         sPrimarySeed = sSecondarySeed;
         sSecondarySeed = temp;
     }
 
-    return (sPrimarySeed & 0xFFFF) / 65535.0f;
+    val = (sPrimarySeed & 0xFFFF) / 65535.0; // 65535.0f
+
+    return val;
 }
 
 /**

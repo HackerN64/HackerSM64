@@ -21,6 +21,9 @@
  */
 
 // bss
+static char sDefSettingsMenuStr[0x100];
+static struct GdVec3f sStaticVec;
+UNUSED static struct GdVec3f unusedVec;
 static struct ObjGadget *sCurGadgetPtr;
 
 // forward declarations
@@ -40,6 +43,19 @@ void get_objvalue(union ObjVarVal *dst, enum ValPtrType type, void *base, size_t
         default:
             fatal_printf("%s: Undefined ValueType", "get_objvalue");
     }
+}
+
+/* 239F78 -> 23A00C */
+void Unknown8018B7A8(void *a0) {
+    struct GdVec3f sp1C;
+
+    set_cur_dynobj(a0);
+    d_get_init_pos(&sp1C);
+
+    sp1C.x += sStaticVec.x;
+    sp1C.y += sStaticVec.y;
+    sp1C.z += sStaticVec.z;
+    d_set_world_pos(sp1C.x, sp1C.y, sp1C.z);
 }
 
 /* 23A190 -> 23A250 */
@@ -157,7 +173,7 @@ void reset_gadget(struct ObjGadget *gdgt) {
         fatal_printf("gadget has zero range (%f -> %f)\n", gdgt->rangeMin, gdgt->rangeMax);
     }
 
-    range = (1.0f / (gdgt->rangeMax - gdgt->rangeMin));
+    range = (f32)(1.0 / (gdgt->rangeMax - gdgt->rangeMin));
 
     if (gdgt->valueGrp != NULL) {
         vp = (struct ObjValPtr *) gdgt->valueGrp->firstMember->obj;

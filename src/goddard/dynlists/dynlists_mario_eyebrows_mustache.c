@@ -41,7 +41,7 @@ struct DynList dynlist_mario_eyebrow_right_shape[] = {
     StartGroup(DYNOBJ_MARIO_RIGHT_EYEBROW_MTL_GROUP),
         MakeDynObj(D_MATERIAL, 0),
             SetId(0),
-            SetAmbient(0.0, 0.0, 0.0),
+            SetAmbient(0.0, 0.005, 0.0),  // Why is green 0.005 on the right eyebrow, but 0.0 on the left eyebrow?
             SetDiffuse(0.0, 0.0, 0.0),
     EndGroup(DYNOBJ_MARIO_RIGHT_EYEBROW_MTL_GROUP),
 

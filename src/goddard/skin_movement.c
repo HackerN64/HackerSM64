@@ -135,7 +135,8 @@ void reset_weight(struct ObjWeight *weight) {
     sResetWeightVtxNum = 0;
     if ((skinGroup = gGdSkinNet->skinGrp) != NULL) {
         // Go through every vertex in the skin group, and reset the weight if the vertex is managed by the weight
-        apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) reset_weight_vtx, skinGroup);
+        vtxCount =
+            apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) reset_weight_vtx, skinGroup);
     } else {
         fatal_printf("reset_weight(): Skin net has no SkinGroup");
     }
