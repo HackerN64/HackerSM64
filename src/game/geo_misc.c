@@ -62,31 +62,18 @@ void make_vertex(Vtx *vtx, s32 n, f32 x, f32 y, f32 z, s16 tx, s16 ty, u8 r, u8 
     vtx[n].v.cn[3] = a;
 }
 
-/**
- * Round `num` to the nearest `s16`.
- */
-s16 round_float(f32 num) {
-    // Note that double literals are used here, rather than float literals.
-    if (num >= 0.0) {
-        return num + 0.5;
-    } else {
-        return num - 0.5;
-    }
-}
-
+#define NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT 10
 /**
  * Create a display list for the light in the castle lobby that shows the
  * player where to look to enter Tower of the Wing Cap.
  */
 Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSED Mat4 mtx) {
-    s32 flags;
-    struct GraphNodeGenerated *generatedNode;
     Gfx *displayListHead = NULL;
     Gfx *displayList = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        flags = save_file_get_flags();
-        if (gHudDisplay.stars >= 10 && !(flags & SAVE_FLAG_HAVE_WING_CAP)) {
+        s32 flags = save_file_get_flags();
+        if (gHudDisplay.stars >= NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT && !(flags & SAVE_FLAG_HAVE_WING_CAP)) {
             displayList = alloc_display_list(2 * sizeof(*displayList));
 
             if (displayList == NULL) {
@@ -95,7 +82,7 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
                 displayListHead = displayList;
             }
 
-            generatedNode = (struct GraphNodeGenerated *) node;
+            struct GraphNodeGenerated *generatedNode = (struct GraphNodeGenerated *) node;
             SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_TRANSPARENT);
 
             gSPDisplayList(displayListHead++, dl_castle_lobby_wing_cap_light);
@@ -105,12 +92,12 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
 
     return displayList;
 }
+#undef NUM_STARS_REQUIRED_FOR_WING_CAP_LIGHT
 
 /**
  * Update static timer variables that control the flying carpets' ripple effect.
  */
-Gfx *geo_exec_flying_carpet_timer_update(s32 callContext, UNUSED struct GraphNode *node,
-                                         UNUSED Mat4 mtx) {
+Gfx *geo_exec_flying_carpet_timer_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     if (callContext != GEO_CONTEXT_RENDER) {
         sFlyingCarpetRippleTimer = 0;
         sPrevAreaTimer = gAreaUpdateCounter - 1;
@@ -135,7 +122,7 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
     Vtx *verts;
     struct GraphNodeGenerated *generatedNode = (struct GraphNodeGenerated *) node;
 
-    s16 *sp64 = segmented_to_virtual(&flying_carpet_static_vertex_data);
+    s16 *vertexData = segmented_to_virtual(&flying_carpet_static_vertex_data);
     Gfx *displayList = NULL;
     Gfx *displayListHead = NULL;
     struct Object *curGraphNodeObject;
@@ -148,17 +135,18 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
         if (verts == NULL || displayList == NULL) {
             return NULL;
         }
+
         SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_OPAQUE);
 
         for (n = 0; n <= 20; n++) {
             row = n / 3;
             col = n % 3;
 
-            x = sp64[n * 4 + 0];
-            y = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0);
-            z = sp64[n * 4 + 1];
-            tx = sp64[n * 4 + 2];
-            ty = sp64[n * 4 + 3];
+            x = vertexData[n * 4 + 0];
+            y = round_float(sins(sFlyingCarpetRippleTimer + (row << 12) + (col << 14)) * 20.0f);
+            z = vertexData[n * 4 + 1];
+            tx = vertexData[n * 4 + 2];
+            ty = vertexData[n * 4 + 3];
 
             make_vertex(verts, n, x, y, z, tx, ty, 0, 127, 0, 255);
         }
@@ -200,25 +188,26 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Ma
     if (callContext == GEO_CONTEXT_RENDER) {
         displayList = alloc_display_list(3 * sizeof(*displayList));
         displayListHead = displayList;
+
         SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_OPAQUE);
-#ifdef VERSION_EU
+#if MULTILANG
         gSPDisplayList(displayListHead++, dl_cake_end_screen);
 #else
         gSPDisplayList(displayListHead++, dl_proj_mtx_fullscreen);
 #endif
-#ifdef VERSION_EU
+#if MULTILANG
 #ifdef EU_CUSTOM_CAKE_FIX
     gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_fix);
 #else
     switch (eu_get_language()) {
             case LANGUAGE_ENGLISH:
-                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_070296F8);
+                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_english);
                 break;
             case LANGUAGE_FRENCH:
-                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_07029768);
+                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_french );
                 break;
             case LANGUAGE_GERMAN:
-                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_070297D8);
+                gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_german );
                 break;
         }
 #endif
