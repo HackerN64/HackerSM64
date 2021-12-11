@@ -4,7 +4,7 @@
 
 // This is how many indexes of timers are saved at once. higher creates a smoother average, but naturally uses more RAM. 15's fine.
 // #define NUM_PERF_ITERATIONS   15
-#define NUM_PERF_ITERATIONS   120
+#define NUM_PERF_ITERATIONS   16
 #define NUM_BENCH_ITERATIONS 150
 #define LOG_BUFFER_SIZE       16
 
