@@ -12,6 +12,7 @@
 #include "engine/behavior_script.h"
 #include "audio/external.h"
 #include "obj_behaviors.h"
+#include "level_geo.h"
 
 /**
  * This file contains the function that handles 'environment effects',
@@ -38,12 +39,12 @@ s16 gSnowParticleCount;
 s16 gSnowParticleMaxCount;
 
 /* DATA */
-s8 gEnvFxMode = 0;
+s8 gEnvFxMode = ENVFX_MODE_NONE;
 
 /// Template for a snow particle triangle
-Vtx gSnowTempVtx[3] = { { { { -5,  5,  0 }, 0, {   0,   0 }, { 0x7F, 0x7F, 0x7F, 0xFF } } },
-                        { { { -5, -5,  0 }, 0, {   0, 960 }, { 0x7F, 0x7F, 0x7F, 0xFF } } },
-                        { { {  5,  5,  0 }, 0, { 960,   0 }, { 0x7F, 0x7F, 0x7F, 0xFF } } } };
+Vtx gSnowTempVtx[3] = { { { { -5, 5, 0 }, 0, { 0, 0 }, { 0x7F, 0x7F, 0x7F, 0xFF } } },
+                        { { { -5, -5, 0 }, 0, { 0, 960 }, { 0x7F, 0x7F, 0x7F, 0xFF } } },
+                        { { { 5, 5, 0 }, 0, { 960, 0 }, { 0x7F, 0x7F, 0x7F, 0xFF } } } };
 
 // Change these to make snowflakes smaller or bigger
 struct SnowFlakeVertex gSnowFlakeVertex1 = { -5, 5, 0 };
@@ -114,7 +115,7 @@ void envfx_update_snowflake_count(s32 mode, Vec3s marioPos) {
             waterLevel = find_water_level(marioPos[0], marioPos[2]);
 
             gSnowParticleCount =
-                (((s32)((waterLevel - 400.0f - (f32) marioPos[1]) * 0.001) << 0x10) >> 0x10) * 5;
+                (((s32)((waterLevel - 400.0f - (f32) marioPos[1]) * 0.001f) << 0x10) >> 0x10) * 5;
 
             if (gSnowParticleCount < 0) {
                 gSnowParticleCount = 0;
