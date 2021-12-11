@@ -26,7 +26,6 @@
 #include "sram.h"
 #endif
 #include "puppyprint.h"
-#include <prevent_bss_reordering.h>
 #include "puppycam2.h"
 #include "debug_box.h"
 #include "vc_check.h"
@@ -101,49 +100,58 @@ struct DemoInput gRecordedDemoInput = { 0 };
 /**
  * Sets the initial RDP (Reality Display Processor) rendering settings.
  */
-void init_rdp(void) {
-    gDPPipeSync(gDisplayListHead++);
-    gDPPipelineMode(gDisplayListHead++, G_PM_1PRIMITIVE);
+const Gfx init_rdp[] = {
+    gsDPPipeSync(),
+    gsDPPipelineMode(G_PM_1PRIMITIVE),
 
-    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    gDPSetCombineMode(gDisplayListHead++, G_CC_SHADE, G_CC_SHADE);
+    gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
 
-    gDPSetTextureLOD(gDisplayListHead++, G_TL_TILE);
-    gDPSetTextureLUT(gDisplayListHead++, G_TT_NONE);
-    gDPSetTextureDetail(gDisplayListHead++, G_TD_CLAMP);
-    gDPSetTexturePersp(gDisplayListHead++, G_TP_PERSP);
-    gDPSetTextureFilter(gDisplayListHead++, G_TF_BILERP);
-    gDPSetTextureConvert(gDisplayListHead++, G_TC_FILT);
+    gsDPSetTextureLOD(G_TL_TILE),
+    gsDPSetTextureLUT(G_TT_NONE),
+    gsDPSetTextureDetail( G_TD_CLAMP),
+    gsDPSetTexturePersp(G_TP_PERSP),
+    gsDPSetTextureFilter( G_TF_BILERP),
+    gsDPSetTextureConvert(G_TC_FILT),
 
-    gDPSetCombineKey(gDisplayListHead++, G_CK_NONE);
-    gDPSetAlphaCompare(gDisplayListHead++, G_AC_NONE);
-    gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gDPSetColorDither(gDisplayListHead++, G_CD_MAGICSQ);
-    gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
+    gsDPSetCombineKey(G_CK_NONE),
+    gsDPSetAlphaCompare(G_AC_NONE),
+    gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
+    gsDPSetColorDither(G_CD_MAGICSQ),
+    gsDPSetCycleType(G_CYC_FILL),
 
-    gDPSetAlphaDither(gDisplayListHead++, G_AD_PATTERN);
-    gDPPipeSync(gDisplayListHead++);
-}
+// #ifdef VERSION_SH
+    gsDPSetAlphaDither(G_AD_PATTERN),
+// #endif
+    gsSPEndDisplayList(),
+};
 
 /**
  * Sets the initial RSP (Reality Signal Processor) settings.
  */
-void init_rsp(void) {
-
-    gSPClearGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG
-                        | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD);
-
-    gSPSetGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING);
-
-    gSPNumLights(gDisplayListHead++, NUMLIGHTS_1);
-    gSPTexture(gDisplayListHead++, 0, 0, 0, G_TX_RENDERTILE, G_OFF);
-
+const Gfx init_rsp[] = {
+    gsDPPipeSync(),
+    gsSPClearGeometryMode(G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD),
+    gsSPSetGeometryMode(G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING),
+    gsSPNumLights(NUMLIGHTS_1),
+    gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
     // @bug Failing to set the clip ratio will result in warped triangles in F3DEX2
     // without this change: https://jrra.zone/n64/doc/n64man/gsp/gSPClipRatio.htm
 #ifdef F3DEX_GBI_2
-    gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
+    gsSPClipRatio(FRUSTRATIO_1),
 #endif
+    gsSPEndDisplayList(),
+};
+
+#ifdef S2DEX_TEXT_ENGINE
+void my_rdp_init(void) {
+    gSPDisplayList(gDisplayListHead++, init_rdp);
 }
+
+void my_rsp_init(void) {
+    gSPDisplayList(gDisplayListHead++, init_rsp);
+}
+#endif
 
 /**
  * Initialize the z buffer for the current frame.
@@ -274,39 +282,27 @@ void create_gfx_task_structure(void) {
 #ifdef  L3DEX2_ALONE
     gGfxSPTask->task.t.ucode = gspL3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspL3DEX2_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspL3DEX2_fifoTextEnd - (u8 *) gspL3DEX2_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspL3DEX2_fifoDataEnd - (u8 *) gspL3DEX2_fifoDataStart);
 #elif  F3DZEX_GBI_2
     gGfxSPTask->task.t.ucode = gspF3DZEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DZEX2_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DZEX2_PosLight_fifoTextEnd - (u8 *) gspF3DZEX2_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DZEX2_PosLight_fifoDataEnd - (u8 *) gspF3DZEX2_PosLight_fifoDataStart);
 #elif   F3DEX2PL_GBI
     gGfxSPTask->task.t.ucode = gspF3DEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX2_PosLight_fifoTextEnd - (u8 *) gspF3DEX2_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX2_PosLight_fifoDataEnd - (u8 *) gspF3DEX2_PosLight_fifoDataStart);
 #elif   F3DEX_GBI_2
     gGfxSPTask->task.t.ucode = gspF3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX2_fifoTextEnd - (u8 *) gspF3DEX2_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX2_fifoDataEnd - (u8 *) gspF3DEX2_fifoDataStart);
 #elif   F3DEX_GBI
     gGfxSPTask->task.t.ucode = gspF3DEX_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX_fifoTextEnd - (u8 *) gspF3DEX_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX_fifoDataEnd - (u8 *) gspF3DEX_fifoDataStart);
 #elif   SUPER3D_GBI
-    gGfxSPTask->task.t.ucode = gspSuper3DTextStart;
-    gGfxSPTask->task.t.ucode_data = gspSuper3DDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspSuper3DTextEnd - (u8 *) gspSuper3DTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspSuper3DDataEnd - (u8 *) gspSuper3DDataStart);
+    gGfxSPTask->task.t.ucode = gspSuper3D_fifoTextStart;
+    gGfxSPTask->task.t.ucode_data = gspSuper3D_fifoDataStart; 
 #else
     gGfxSPTask->task.t.ucode = gspFast3D_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspFast3D_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspFast3D_fifoTextEnd - (u8 *) gspFast3D_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspFast3D_fifoDataEnd - (u8 *) gspFast3D_fifoDataStart);
 #endif
+    gGfxSPTask->task.t.ucode_size = SP_UCODE_SIZE; // (this size is ignored)
+    gGfxSPTask->task.t.ucode_data_size = SP_UCODE_DATA_SIZE;
     gGfxSPTask->task.t.dram_stack = (u64 *) gGfxSPTaskStack;
     gGfxSPTask->task.t.dram_stack_size = SP_DRAM_STACK_SIZE8;
     gGfxSPTask->task.t.output_buff = gGfxSPTaskOutputBuffer;
@@ -323,10 +319,10 @@ void create_gfx_task_structure(void) {
  */
 void init_rcp(s32 resetZB) {
     move_segment_table_to_dmem();
-    init_rdp();
-    init_rsp();
+    gSPDisplayList(gDisplayListHead++, init_rdp);
+    gSPDisplayList(gDisplayListHead++, init_rsp);
     init_z_buffer(resetZB);
-    select_frame_buffer();
+    select_framebuffer();
 }
 
 /**
@@ -376,27 +372,30 @@ void draw_reset_bars(void) {
  * Initial settings for the first rendered frame.
  */
 void render_init(void) {
+#ifdef DEBUG_FORCE_CRASH_ON_BOOT
+    FORCE_CRASH
+#endif
     if (IO_READ(DPC_PIPEBUSY_REG) == 0) {
-        gIsConsole = 0;
+        gIsConsole = FALSE;
         gBorderHeight = BORDER_HEIGHT_EMULATOR;
     } else {
-        gIsConsole = 1;
+        gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
     }
     gGfxPool = &gGfxPools[0];
-    set_segment_base_addr(1, gGfxPool->buffer);
+    set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
     gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
     init_rcp(CLEAR_ZBUFFER);
-    clear_frame_buffer(0);
+    clear_framebuffer(0);
     end_master_display_list();
     exec_display_list(&gGfxPool->spTask);
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
     if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
-        sRenderingFrameBuffer++;
+        sRenderingFramebuffer++;
     }
     gGlobalTimer++;
 }
@@ -406,10 +405,10 @@ void render_init(void) {
  */
 void select_gfx_pool(void) {
     gGfxPool = &gGfxPools[gGlobalTimer % ARRAY_COUNT(gGfxPools)];
-    set_segment_base_addr(1, gGfxPool->buffer);
-    gGfxSPTask       = &gGfxPool->spTask;
+    set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
+    gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd      = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxPoolEnd = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
 }
 
 /**
@@ -420,21 +419,23 @@ void select_gfx_pool(void) {
  * - Selects which framebuffer will be rendered and displayed to next time.
  */
 void display_and_vsync(void) {
-    gIsVC = IS_VC();
-    if (IO_READ(DPC_PIPEBUSY_REG) && gIsConsole != 1) {
-        gIsConsole = 1;
-        gBorderHeight = BORDER_HEIGHT_CONSOLE;
-    }
-    //gIsConsole = (IO_READ(DPC_PIPEBUSY_REG));
+    if (!gIsConsole) gIsVC = IS_VC();
+
+#ifndef UNLOCK_FPS
     osRecvMesg(&gGfxVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+#endif
     if (gGoddardVblankCallback != NULL) {
         gGoddardVblankCallback();
         gGoddardVblankCallback = NULL;
     }
     exec_display_list(&gGfxPool->spTask);
+#ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-    osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFrameBuffers[sRenderedFramebuffer]));
+#endif
+    osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
+#ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+#endif
     // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
     if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
         if (++sRenderedFramebuffer == 3) {
@@ -510,7 +511,7 @@ void run_demo_inputs(void) {
         } else {
             // Backup the start button if it is pressed, since we don't want the
             // demo input to override the mask where start may have been pressed.
-            u16 startPushed = (gControllers[0].controllerData->button & START_BUTTON);
+            u16 startPushed = gControllers[0].controllerData->button & START_BUTTON;
 
             // Perform the demo inputs by assigning the current button mask and the stick inputs.
             gControllers[0].controllerData->stick_x = gCurrDemoInput->rawStickX;
@@ -548,13 +549,25 @@ void adjust_analog_stick(struct Controller *controller) {
     controller->stickY = 0;
 
     // Modulate the rawStickX and rawStickY to be the new f32 values by adding/subtracting 6.
-    if (controller->rawStickX <= -8) controller->stickX = controller->rawStickX + 6;
-    if (controller->rawStickX >=  8) controller->stickX = controller->rawStickX - 6;
-    if (controller->rawStickY <= -8) controller->stickY = controller->rawStickY + 6;
-    if (controller->rawStickY >=  8) controller->stickY = controller->rawStickY - 6;
+    if (controller->rawStickX <= -8) {
+        controller->stickX = controller->rawStickX + 6;
+    }
+
+    if (controller->rawStickX >= 8) {
+        controller->stickX = controller->rawStickX - 6;
+    }
+
+    if (controller->rawStickY <= -8) {
+        controller->stickY = controller->rawStickY + 6;
+    }
+
+    if (controller->rawStickY >= 8) {
+        controller->stickY = controller->rawStickY - 6;
+    }
 
     // Calculate f32 magnitude from the center by vector length.
-    controller->stickMag = sqrtf(sqr(controller->stickX) + sqr(controller->stickY));
+    controller->stickMag =
+        sqrtf(controller->stickX * controller->stickX + controller->stickY * controller->stickY);
 
     // Magnitude cannot exceed 64.0f: if it does, modify the values
     // appropriately to flatten the values down to the allowed maximum value.
@@ -573,8 +586,9 @@ void read_controller_inputs(s32 threadID) {
 
     // If any controllers are plugged in, update the controller information.
     if (gControllerBits) {
-        if (threadID == 5)
+        if (threadID == THREAD_5_GAME_LOOP) {
             osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
+        }
         osContGetReadData(&gControllerPads[0]);
 #if ENABLE_RUMBLE
         release_rumble_pak_control();
@@ -597,26 +611,26 @@ void read_controller_inputs(s32 threadID) {
             controller->buttonDown = controller->controllerData->button;
             adjust_analog_stick(controller);
         } else { // otherwise, if the controllerData is NULL, 0 out all of the inputs.
-            controller->rawStickX     = 0;
-            controller->rawStickY     = 0;
+            controller->rawStickX = 0;
+            controller->rawStickY = 0;
             controller->buttonPressed = 0;
-            controller->buttonDown    = 0;
-            controller->stickX        = 0;
-            controller->stickY        = 0;
-            controller->stickMag      = 0;
+            controller->buttonDown = 0;
+            controller->stickX = 0;
+            controller->stickY = 0;
+            controller->stickMag = 0;
         }
     }
 
     // For some reason, player 1's inputs are copied to player 3's port.
     // This potentially may have been a way the developers "recorded"
     // the inputs for demos, despite record_demo existing.
-    gPlayer3Controller->rawStickX     = gPlayer1Controller->rawStickX;
-    gPlayer3Controller->rawStickY     = gPlayer1Controller->rawStickY;
-    gPlayer3Controller->stickX        = gPlayer1Controller->stickX;
-    gPlayer3Controller->stickY        = gPlayer1Controller->stickY;
-    gPlayer3Controller->stickMag      = gPlayer1Controller->stickMag;
+    gPlayer3Controller->rawStickX = gPlayer1Controller->rawStickX;
+    gPlayer3Controller->rawStickY = gPlayer1Controller->rawStickY;
+    gPlayer3Controller->stickX = gPlayer1Controller->stickX;
+    gPlayer3Controller->stickY = gPlayer1Controller->stickY;
+    gPlayer3Controller->stickMag = gPlayer1Controller->stickMag;
     gPlayer3Controller->buttonPressed = gPlayer1Controller->buttonPressed;
-    gPlayer3Controller->buttonDown    = gPlayer1Controller->buttonDown;
+    gPlayer3Controller->buttonDown = gPlayer1Controller->buttonDown;
 }
 
 /**
@@ -669,7 +683,7 @@ void init_controllers(void) {
  */
 void setup_game_memory(void) {
     // Setup general Segment 0
-    set_segment_base_addr(0, (void *) 0x80000000);
+    set_segment_base_addr(SEGMENT_MAIN, (void *)RAM_START);
     // Create Mesg Queues
     osCreateMesgQueue(&gGfxVblankQueue, gGfxMesgBuf, ARRAY_COUNT(gGfxMesgBuf));
     osCreateMesgQueue(&gGameVblankQueue, gGameMesgBuf, ARRAY_COUNT(gGameMesgBuf));
@@ -679,24 +693,23 @@ void setup_game_memory(void) {
     gPhysicalFramebuffers[1] = VIRTUAL_TO_PHYSICAL(gFramebuffer1);
     gPhysicalFramebuffers[2] = VIRTUAL_TO_PHYSICAL(gFramebuffer2);
     // Setup Mario Animations
-    gMarioAnimsMemAlloc = main_pool_alloc(0x4000, MEMORY_POOL_LEFT);
-    set_segment_base_addr(17, (void *) gMarioAnimsMemAlloc);
+    gMarioAnimsMemAlloc = main_pool_alloc(MARIO_ANIMS_POOL_SIZE, MEMORY_POOL_LEFT);
+    set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
     // Setup Demo Inputs List
-    gDemoInputsMemAlloc = main_pool_alloc(0x800, MEMORY_POOL_LEFT);
-    set_segment_base_addr(24, (void *) gDemoInputsMemAlloc);
+    gDemoInputsMemAlloc = main_pool_alloc(DEMO_INPUTS_POOL_SIZE, MEMORY_POOL_LEFT);
+    set_segment_base_addr(SEGMENT_DEMO_INPUTS, (void *) gDemoInputsMemAlloc);
     setup_dma_table_list(&gDemoInputsBuf, gDemoInputs, gDemoInputsMemAlloc);
     // Setup Level Script Entry
-    load_segment(0x10, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
+    load_segment(SEGMENT_LEVEL_ENTRY, _entrySegmentRomStart, _entrySegmentRomEnd, MEMORY_POOL_LEFT, NULL, NULL);
     // Setup Segment 2 (Fonts, Text, etc)
-    load_segment_decompress(2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
+    load_segment_decompress(SEGMENT_SEGMENT2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
 }
 
 /**
  * Main game loop thread. Runs forever as long as the game continues.
  */
 void thread5_game_loop(UNUSED void *arg) {
-    struct LevelCommand *addr;
 #if PUPPYPRINT_DEBUG
     OSTime lastTime = 0;
 #endif
@@ -720,7 +733,7 @@ void thread5_game_loop(UNUSED void *arg) {
     set_vblank_handler(2, &gGameVblankHandler, &gGameVblankQueue, (OSMesg) 1);
 
     // Point address to the entry point into the level script data.
-    addr = segmented_to_virtual(level_script_entry);
+    struct LevelCommand *addr = segmented_to_virtual(level_script_entry);
 
     play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
     set_sound_mode(save_file_get_sound_mode());
@@ -739,8 +752,9 @@ void thread5_game_loop(UNUSED void *arg) {
         while (TRUE) {
             lastTime = osGetTime();
             collisionTime[perfIteration] = 0;
+                // graphTime[perfIteration] = 0;
             behaviourTime[perfIteration] = 0;
-            dmaTime[perfIteration] = 0;
+                  dmaTime[perfIteration] = 0;
 #endif
 
         // If any controllers are plugged in, start read the data for when
@@ -754,16 +768,18 @@ void thread5_game_loop(UNUSED void *arg) {
 
         audio_game_loop_tick();
         select_gfx_pool();
-        read_controller_inputs(5);
+        read_controller_inputs(THREAD_5_GAME_LOOP);
         addr = level_script_execute(addr);
-#if PUPPYPRINT_DEBUG == 0 && defined(VISUAL_DEBUG)
+#if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();
 #endif
 #if PUPPYPRINT_DEBUG
         profiler_update(scriptTime, lastTime);
+        scriptTime[perfIteration] -= profilerTime[perfIteration];
+        scriptTime[perfIteration] -= profilerTime2[perfIteration];
             if (benchmarkLoop > 0 && benchOption == 0) {
                 benchmarkLoop--;
-                benchMark[benchmarkLoop] = osGetTime() - lastTime;
+                benchMark[benchmarkLoop] = (osGetTime() - lastTime);
                 if (benchmarkLoop == 0) {
                     puppyprint_profiler_finished();
                     break;
@@ -776,13 +792,14 @@ void thread5_game_loop(UNUSED void *arg) {
 #endif
 
         display_and_vsync();
-
+#ifdef VANILLA_DEBUG
         // when debug info is enabled, print the "BUF %d" information.
         if (gShowDebugText) {
             // subtract the end of the gfx pool with the display list to obtain the
             // amount of free space remaining.
             print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
         }
+#endif
 #if 0
         if (gPlayer1Controller->buttonPressed & L_TRIG) {
             osStartThread(&hvqmThread);
