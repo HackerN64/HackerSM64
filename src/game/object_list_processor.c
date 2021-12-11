@@ -95,7 +95,7 @@ struct Object *gMarioObject;
  * second player. This is speculation, based on its position and its usage in
  * shadow.c.
  */
-struct Object *gLuigiObject;
+// struct Object *gLuigiObject;
 
 /**
  * The object whose behavior script is currently being updated.
@@ -143,15 +143,11 @@ s32 gNumStaticSurfaces;
  */
 struct MemoryPool *gObjectMemoryPool;
 
-
-s16 gCheckingSurfaceCollisionsForCamera;
-s16 gFindFloorIncludeSurfaceIntangible;
-s16 gFindFloorExcludeDynamic;
+s16 gCollisionFlags = COLLISION_FLAGS_NONE;
 TerrainData *gEnvironmentRegions;
 s32 gEnvironmentLevels[20];
 RoomData gDoorAdjacentRooms[60][2];
 s16 gMarioCurrentRoom;
-s16 gDoorRenderingTimer;
 s16 gTHIWaterDrained;
 s16 gTTCSpeedSetting;
 s16 gMarioShotFromCannon;
@@ -214,7 +210,7 @@ struct ParticleProperties sParticleTypes[] = {
     { PARTICLE_DIRT,                 ACTIVE_PARTICLE_DIRT,                 MODEL_NONE,                 bhvDirtParticleSpawner },
     { PARTICLE_MIST_CIRCLE,          ACTIVE_PARTICLE_MIST_CIRCLE,          MODEL_NONE,                 bhvMistCircParticleSpawner },
     { PARTICLE_TRIANGLE,             ACTIVE_PARTICLE_TRIANGLE,             MODEL_NONE,                 bhvTriangleParticleSpawner },
-    { 0, 0, MODEL_NONE, NULL },
+    { PARTICLE_NONE, ACTIVE_PARTICLE_NONE, MODEL_NONE, NULL },
 };
 
 /**
@@ -227,17 +223,32 @@ void copy_mario_state_to_object(void) {
     if (gCurrentObject != gMarioObject) {
         i++;
     }
-    vec3_copy(&gCurrentObject->oVelVec, gMarioStates[i].vel);
-    vec3_copy(&gCurrentObject->oPosVec, gMarioStates[i].pos);
-    vec3_copy(&gCurrentObject->oMoveAngleVec, gCurrentObject->header.gfx.angle);
-    vec3_copy(&gCurrentObject->oFaceAngleVec, gCurrentObject->header.gfx.angle);
-    vec3_copy(&gCurrentObject->oAngleVelVec, gMarioStates[i].angleVel);
+
+    gCurrentObject->oVelX = gMarioStates[i].vel[0];
+    gCurrentObject->oVelY = gMarioStates[i].vel[1];
+    gCurrentObject->oVelZ = gMarioStates[i].vel[2];
+
+    gCurrentObject->oPosX = gMarioStates[i].pos[0];
+    gCurrentObject->oPosY = gMarioStates[i].pos[1];
+    gCurrentObject->oPosZ = gMarioStates[i].pos[2];
+
+    gCurrentObject->oMoveAnglePitch = gCurrentObject->header.gfx.angle[0];
+    gCurrentObject->oMoveAngleYaw = gCurrentObject->header.gfx.angle[1];
+    gCurrentObject->oMoveAngleRoll = gCurrentObject->header.gfx.angle[2];
+
+    gCurrentObject->oFaceAnglePitch = gCurrentObject->header.gfx.angle[0];
+    gCurrentObject->oFaceAngleYaw = gCurrentObject->header.gfx.angle[1];
+    gCurrentObject->oFaceAngleRoll = gCurrentObject->header.gfx.angle[2];
+
+    gCurrentObject->oAngleVelPitch = gMarioStates[i].angleVel[0];
+    gCurrentObject->oAngleVelYaw = gMarioStates[i].angleVel[1];
+    gCurrentObject->oAngleVelRoll = gMarioStates[i].angleVel[2];
 }
 
 /**
  * Spawn a particle at gCurrentObject's location.
  */
-void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *behavior) {
+void spawn_particle(u32 activeParticleFlag, ModelID16 model, const BehaviorScript *behavior) {
     if (!(gCurrentObject->oActiveParticleFlags & activeParticleFlag)) {
         struct Object *particle;
         gCurrentObject->oActiveParticleFlags |= activeParticleFlag;
@@ -399,12 +410,12 @@ void set_object_respawn_info_bits(struct Object *obj, u8 bits) {
     u16 *info16;
 
     switch (obj->respawnInfoType) {
-        case RESPAWN_INFO_TYPE_32:
+        case RESPAWN_INFO_TYPE_NORMAL:
             info32 = (u32 *) obj->respawnInfo;
             *info32 |= bits << 8;
             break;
 
-        case RESPAWN_INFO_TYPE_16:
+        case RESPAWN_INFO_TYPE_MACRO_OBJECT:
             info16 = (u16 *) obj->respawnInfo;
             *info16 |= bits << 8;
             break;
@@ -468,24 +479,30 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
             object->oBehParams = spawnInfo->behaviorArg;
             // The second byte of the behavior parameters is copied over to a special field
             // as it is the most frequently used by objects.
-            object->oBehParams2ndByte = ((spawnInfo->behaviorArg) >> 16) & 0xFF;
+            object->oBehParams2ndByte = GET_BPARAM2(spawnInfo->behaviorArg);
 
             object->behavior = script;
             object->unused1 = 0;
 
             // Record death/collection in the SpawnInfo
-            object->respawnInfoType = RESPAWN_INFO_TYPE_32;
+            object->respawnInfoType = RESPAWN_INFO_TYPE_NORMAL;
             object->respawnInfo = &spawnInfo->behaviorArg;
 
+            // Usually this checks if bparam4 is 1 to decide if this is mario
+            // This change allows any object to use that param
             if (object->behavior == segmented_to_virtual(bhvMario)) {
                 gMarioObject = object;
                 geo_make_first_child(&object->header.gfx.node);
             }
 
             geo_obj_init_spawninfo(&object->header.gfx, spawnInfo);
-            vec3_copy(&object->oPosVec, spawnInfo->startPos);
-            vec3_copy(&object->oFaceAngleVec, spawnInfo->startAngle);
-            vec3_copy(&object->oMoveAngleVec, spawnInfo->startAngle);
+
+            vec3s_to_vec3f(&object->oPosVec, spawnInfo->startPos);
+
+            vec3s_to_vec3i(&object->oFaceAngleVec, spawnInfo->startAngle);
+
+            vec3s_to_vec3i(&object->oMoveAngleVec, spawnInfo->startAngle);
+
             object->oFloorHeight = find_floor(object->oPosX, object->oPosY, object->oPosZ, &object->oFloor);
         }
 
@@ -519,7 +536,7 @@ void clear_objects(void) {
         geo_reset_object_node(&gObjectPool[i].header.gfx);
     }
 
-    gObjectMemoryPool = mem_pool_init(0x800, MEMORY_POOL_LEFT);
+    gObjectMemoryPool = mem_pool_init(OBJECT_MEMORY_POOL, MEMORY_POOL_LEFT);
     gObjectLists = gObjectListArray;
 
     clear_dynamic_surfaces();
@@ -529,7 +546,7 @@ void clear_objects(void) {
  * Update spawner and surface objects.
  */
 void update_terrain_objects(void) {
-    gObjectCounter  = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
+    gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
     gObjectCounter += update_objects_in_list(&gObjectLists[OBJ_LIST_SURFACE]);
 }
 
@@ -589,64 +606,71 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  * and object surface management.
  */
 void update_objects(UNUSED s32 unused) {
-    s64 cycleCounts[30];
+    //s64 cycleCounts[30];
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
 #endif
 
-    cycleCounts[0] = get_current_clock();
+    // cycleCounts[0] = get_current_clock();
 
     gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
 
     gNumRoomedObjectsInMarioRoom = 0;
     gNumRoomedObjectsNotInMarioRoom = 0;
-    gCheckingSurfaceCollisionsForCamera = FALSE;
+    gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
 
     reset_debug_objectinfo();
-    stub_debug_5();
+    stub_debug_control();
 
     gObjectLists = gObjectListArray;
 
     // If time stop is not active, unload object surfaces
-    cycleCounts[1] = get_clock_difference(cycleCounts[0]);
+    // cycleCounts[1] = get_clock_difference(cycleCounts[0]);
     clear_dynamic_surfaces();
 
     // Update spawners and objects with surfaces
-    cycleCounts[2] = get_clock_difference(cycleCounts[0]);
+    // cycleCounts[2] = get_clock_difference(cycleCounts[0]);
     update_terrain_objects();
 
-    // If Mario was touching a moving platform at the end of last frame, apply displacement now
-    //! If the platform object unloaded and a different object took its place, displacement could be applied incorrectly
+    // If Mario was touching a moving platform at the end of last frame, apply
+    // displacement now
+    //! If the platform object unloaded and a different object took its place,
+    //  displacement could be applied incorrectly
     apply_mario_platform_displacement();
 
     // Detect which objects are intersecting
-    cycleCounts[3] = get_clock_difference(cycleCounts[0]);
+    // cycleCounts[3] = get_clock_difference(cycleCounts[0]);
     detect_object_collisions();
 
     // Update all other objects that haven't been updated yet
-    cycleCounts[4] = get_clock_difference(cycleCounts[0]);
+    // cycleCounts[4] = get_clock_difference(cycleCounts[0]);
     update_non_terrain_objects();
 
     // Unload any objects that have been deactivated
-    cycleCounts[5] = get_clock_difference(cycleCounts[0]);
+    // cycleCounts[5] = get_clock_difference(cycleCounts[0]);
     unload_deactivated_objects();
 
     // Check if Mario is on a platform object and save this object
-    cycleCounts[6] = get_clock_difference(cycleCounts[0]);
+    // cycleCounts[6] = get_clock_difference(cycleCounts[0]);
     update_mario_platform();
 
-    cycleCounts[7] = get_clock_difference(cycleCounts[0]);
+    // cycleCounts[7] = get_clock_difference(cycleCounts[0]);
 
-    cycleCounts[0] = 0;
+    // cycleCounts[0] = 0;
     try_print_debug_mario_object_info();
 
-    // If time stop was enabled this frame, activate it now so that it will take effect next frame
-    COND_BIT((gTimeStopState & TIME_STOP_ENABLED), gTimeStopState, TIME_STOP_ACTIVE);
+    // If time stop was enabled this frame, activate it now so that it will
+    // take effect next frame
+    if (gTimeStopState & TIME_STOP_ENABLED) {
+        gTimeStopState |= TIME_STOP_ACTIVE;
+    } else {
+        gTimeStopState &= ~TIME_STOP_ACTIVE;
+    }
 
     gPrevFrameObjectCount = gObjectCounter;
 #if PUPPYPRINT_DEBUG
     profiler_update(behaviourTime, first);
-    behaviourTime[perfIteration] -= collisionTime[perfIteration]+colTime;
+    behaviourTime[perfIteration] -= collisionTime[perfIteration] - colTime;
 #endif
 }
