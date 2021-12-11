@@ -793,7 +793,7 @@ s32 retrieve_animation_index(s32 frame, u16 **attributes) {
  * whether it plays forwards or backwards, and whether it stops or loops at
  * the end etc.
  */
-s16 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
+s32 geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist) {
     s32 result;
     struct Animation *anim = obj->curAnim;
 

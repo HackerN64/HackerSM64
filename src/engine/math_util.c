@@ -70,7 +70,6 @@ s32 random_sign(void) {
     return a0;                  \
 }
 
-// Unused, uncomment here and mathutil.h if needed
 f32 min_3f(f32 a, f32 b, f32 c) { min_3_func(a, b, c); }
 s32 min_3i(s32 a, s32 b, s32 c) { min_3_func(a, b, c); }
 s32 min_3s(s16 a, s16 b, s16 c) { min_3_func(a, b, c); }
