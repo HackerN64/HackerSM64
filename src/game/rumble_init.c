@@ -12,8 +12,6 @@ OSThread gRumblePakThread;
 
 OSPfs gRumblePakPfs;
 
-s8 D_SH_8031D8F8[0x60];
-
 OSMesg gRumblePakSchedulerMesgBuf[1];
 OSMesgQueue gRumblePakSchedulerMesgQueue;
 OSMesg gRumbleThreadVIMesgBuf[1];
@@ -122,7 +120,7 @@ static void update_rumble_data_queue(void) {
     if (gRumbleDataQueue[0].comm) {
         gCurrRumbleSettings.count = 0;
         gCurrRumbleSettings.start = 4;
-        gCurrRumbleSettings.comm = gRumbleDataQueue[0].comm;
+        gCurrRumbleSettings.comm  = gRumbleDataQueue[0].comm;
         gCurrRumbleSettings.timer = gRumbleDataQueue[0].time;
         gCurrRumbleSettings.level = gRumbleDataQueue[0].level;
         gCurrRumbleSettings.decay = gRumbleDataQueue[0].decay;
@@ -154,22 +152,14 @@ void queue_rumble_decay(s16 decay) {
     gRumbleDataQueue[2].decay = decay;
 }
 
-u8 is_rumble_finished_and_queue_empty(void) {
+u32 is_rumble_finished_and_queue_empty(void) {
     if (gCurrRumbleSettings.start + gCurrRumbleSettings.timer >= 4) {
         return FALSE;
     }
 
-    if (gRumbleDataQueue[0].comm != 0) {
-        return FALSE;
-    }
-
-    if (gRumbleDataQueue[1].comm != 0) {
-        return FALSE;
-    }
-
-    if (gRumbleDataQueue[2].comm != 0) {
-        return FALSE;
-    }
+    if (gRumbleDataQueue[0].comm != 0) return FALSE;
+    if (gRumbleDataQueue[1].comm != 0) return FALSE;
+    if (gRumbleDataQueue[2].comm != 0) return FALSE;
 
     return TRUE;
 }
@@ -203,24 +193,12 @@ void reset_rumble_timers_vibrate(s32 level) {
         gCurrRumbleSettings.slip = 4;
     }
 
-    if (level == 4) {
-        gCurrRumbleSettings.vibrate = 1;
-    }
-
-    if (level == 3) {
-        gCurrRumbleSettings.vibrate = 2;
-    }
-
-    if (level == 2) {
-        gCurrRumbleSettings.vibrate = 3;
-    }
-
-    if (level == 1) {
-        gCurrRumbleSettings.vibrate = 4;
-    }
-
-    if (level == 0) {
-        gCurrRumbleSettings.vibrate = 5;
+    switch (level) {
+        case 0: gCurrRumbleSettings.vibrate = 5; break;
+        case 1: gCurrRumbleSettings.vibrate = 4; break;
+        case 2: gCurrRumbleSettings.vibrate = 3; break;
+        case 3: gCurrRumbleSettings.vibrate = 2; break;
+        case 4: gCurrRumbleSettings.vibrate = 1; break;
     }
 }
 
@@ -283,17 +261,20 @@ void cancel_rumble(void) {
 
 void create_thread_6(void) {
     osCreateMesgQueue(&gRumbleThreadVIMesgQueue, gRumbleThreadVIMesgBuf, 1);
-    osCreateThread(&gRumblePakThread, 6, thread6_rumble_loop, NULL, gThread6Stack + 0x2000, 30);
+    osCreateThread(&gRumblePakThread, THREAD_6_RUMBLE, thread6_rumble_loop, NULL, gThread6Stack + 0x2000, 30);
     osStartThread(&gRumblePakThread);
 }
+
+#define VRTC 0x56525443
 
 void rumble_thread_update_vi(void) {
     if (!sRumblePakThreadActive) {
         return;
     }
 
-    // 0x56525443 = 'VRTC'
-    osSendMesg(&gRumbleThreadVIMesgQueue, (OSMesg) 0x56525443, OS_MESG_NOBLOCK);
+    osSendMesg(&gRumbleThreadVIMesgQueue, (OSMesg) VRTC, OS_MESG_NOBLOCK);
 }
+
+#undef VRTC
 
 #endif
