@@ -3,6 +3,19 @@
 
 #include "config.h"
 
+enum ThreadID {
+    THREAD_0,
+    THREAD_1_IDLE,
+    THREAD_2_CRASH_SCREEN,
+    THREAD_3_MAIN,
+    THREAD_4_SOUND,
+    THREAD_5_GAME_LOOP,
+    THREAD_6_RUMBLE,
+    THREAD_7_HVQM,
+    THREAD_8_TIMEKEEPER,
+    THREAD_9_DA_COUNTER,
+};
+
 struct RumbleData {
     u8  comm;
     u8  level;
@@ -20,9 +33,10 @@ struct RumbleSettings {
     s16 vibrate;
     s16 decay;
 };
+
 extern struct Config gConfig;
 
-extern OSThread gUnkThread;
+// extern OSThread gUnkThread;
 extern OSThread gIdleThread;
 extern OSThread gMainThread;
 extern OSThread gGameLoopThread;
@@ -65,7 +79,9 @@ extern u32 gNumVblanks;
 extern s8 gResetTimer;
 extern s8 gNmiResetBarsTimer;
 extern s8 gDebugLevelSelect;
+#ifdef VANILLA_DEBUG
 extern s8 gShowDebugText;
+#endif
 
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg);
 void dispatch_audio_sptask(struct SPTask *spTask);
