@@ -5,6 +5,48 @@
 
 #include "types.h"
 
+enum ActionStatesIdle { // act_idle, act_metal_water_standing
+    ACT_STATE_IDLE_HEAD_LEFT,
+    ACT_STATE_IDLE_HEAD_RIGHT,
+    ACT_STATE_IDLE_HEAD_CENTER,
+    ACT_STATE_IDLE_RESET_OR_SLEEP
+};
+
+enum ActionStatesStartSleeping { // act_start_sleeping
+    ACT_STATE_START_SLEEPING_IDLE,
+    ACT_STATE_START_SLEEPING_SCRATCH,
+    ACT_STATE_START_SLEEPING_YAWN,
+    ACT_STATE_START_SLEEPING_SITTING,
+    ACT_STATE_START_SLEEPING_SLEEP
+};
+
+enum ActionStatesSleeping { // act_sleeping
+    ACT_SLEEPING_STATE_IDLE,
+    ACT_SLEEPING_STATE_START_LYING,
+    ACT_SLEEPING_STATE_LYING
+};
+
+enum ActionStatesShivering { // act_shivering
+    ACT_STATE_SHIVERING_WARMING_HAND,
+    ACT_STATE_SHIVERING_SHAKE,
+    ACT_STATE_SHIVERING_RETURN_TO_IDLE
+};
+
+enum ActionStatesTwirlLand { // act_twirl_land
+    ACT_STATE_TWIRL_LAND_0,
+    ACT_STATE_TWIRL_LAND_1
+};
+
+enum ActionStatesGroundPoundLand { // act_ground_pound_land
+    ACT_STATE_GROUND_POUND_LAND_0,
+    ACT_STATE_GROUND_POUND_LAND_1
+};
+
+enum ActionStatesFirstPerson { // act_first_person
+    ACT_STATE_FIRST_PERSON_SET_MODE,
+    ACT_STATE_FIRST_PERSON_IDLE
+};
+
 s32 check_common_idle_cancels(struct MarioState *m);
 s32 check_common_hold_idle_cancels(struct MarioState *m);
 s32 act_idle(struct MarioState *m);
@@ -28,7 +70,7 @@ s32 act_stop_crouching(struct MarioState *m);
 s32 act_start_crawling(struct MarioState *m);
 s32 act_stop_crawling(struct MarioState *m);
 s32 act_shockwave_bounce(struct MarioState *m);
-s32 landing_step(struct MarioState *m, s32 arg1, u32 action);
+s32 landing_step(struct MarioState *m, s32 animID, u32 action);
 s32 check_common_landing_cancels(struct MarioState *m, u32 action);
 s32 act_jump_land_stop(struct MarioState *m);
 s32 act_double_jump_land_stop(struct MarioState *m);
