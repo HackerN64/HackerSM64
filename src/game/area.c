@@ -1,7 +1,6 @@
 #include <PR/ultratypes.h>
 
 #include "config.h"
-#include "prevent_bss_reordering.h"
 #include "area.h"
 #include "sm64.h"
 #include "gfx_dimensions.h"
@@ -25,10 +24,11 @@
 #include "dialog_ids.h"
 #include "puppyprint.h"
 #include "debug_box.h"
+#include "engine/colors.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
-struct Area gAreaData[8];
+struct Area gAreaData[AREA_COUNT];
 
 struct WarpTransition gWarpTransition;
 
@@ -44,14 +44,15 @@ struct GraphNode **gLoadedGraphNodes = gGraphNodePointers;
 struct Area *gAreas = gAreaData;
 struct Area *gCurrentArea = NULL;
 struct CreditsEntry *gCurrCreditsEntry = NULL;
+
 Vp *gViewportOverride = NULL;
 Vp *gViewportClip = NULL;
 s16 gWarpTransDelay = 0;
-u32 gFBSetColor = 0;
-u32 gWarpTransFBSetColor = 0;
-u8 gWarpTransRed = 0;
-u8 gWarpTransGreen = 0;
-u8 gWarpTransBlue = 0;
+RGBA16FILL gFBSetColor = 0;
+RGBA16FILL gWarpTransFBSetColor = 0;
+Color gWarpTransRed= 0;
+Color gWarpTransGreen = 0;
+Color gWarpTransBlue = 0;
 s16 gCurrSaveFileNum = 1;
 s16 gCurrLevelNum = LEVEL_MIN;
 
@@ -71,8 +72,8 @@ const BehaviorScript *sWarpBhvSpawnTable[] = {
 };
 
 u8 sSpawnTypeFromWarpBhv[] = {
-    MARIO_SPAWN_DOOR_WARP,             MARIO_SPAWN_UNKNOWN_02,           MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_UNKNOWN_03,
-    MARIO_SPAWN_UNKNOWN_03,            MARIO_SPAWN_TELEPORT,             MARIO_SPAWN_INSTANT_ACTIVE,        MARIO_SPAWN_AIRBORNE,
+    MARIO_SPAWN_DOOR_WARP,             MARIO_SPAWN_IDLE,                 MARIO_SPAWN_PIPE,                  MARIO_SPAWN_PIPE,
+    MARIO_SPAWN_PIPE,                  MARIO_SPAWN_TELEPORT,             MARIO_SPAWN_INSTANT_ACTIVE,        MARIO_SPAWN_AIRBORNE,
     MARIO_SPAWN_HARD_AIR_KNOCKBACK,    MARIO_SPAWN_SPIN_AIRBORNE_CIRCLE, MARIO_SPAWN_DEATH,                 MARIO_SPAWN_SPIN_AIRBORNE,
     MARIO_SPAWN_FLYING,                MARIO_SPAWN_SWIMMING,             MARIO_SPAWN_PAINTING_STAR_COLLECT, MARIO_SPAWN_PAINTING_DEATH,
     MARIO_SPAWN_AIRBORNE_STAR_COLLECT, MARIO_SPAWN_AIRBORNE_DEATH,       MARIO_SPAWN_LAUNCH_STAR_COLLECT,   MARIO_SPAWN_LAUNCH_DEATH,
@@ -83,7 +84,7 @@ Vp gViewport = { {
     { 640, 480, 511, 0 },
 } };
 
-#ifdef VERSION_EU
+#if MULTILANG
 const char *gNoControllerMsg[] = {
     "NO CONTROLLER",
     "MANETTE DEBRANCHEE",
@@ -91,16 +92,16 @@ const char *gNoControllerMsg[] = {
 };
 #endif
 
-void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, u8 red, u8 green, u8 blue) {
-    u16 color = ((red >> 3) << 11) | ((green >> 3) << 6) | ((blue >> 3) << 1) | 1;
+void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
+    RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
 
     gFBSetColor = (color << 16) | color;
     gViewportOverride = vpOverride;
     gViewportClip = vpClip;
 }
 
-void set_warp_transition_rgb(u8 red, u8 green, u8 blue) {
-    u16 warpTransitionRGBA16 = ((red >> 3) << 11) | ((green >> 3) << 6) | ((blue >> 3) << 1) | 1;
+void set_warp_transition_rgb(Color red, Color green, Color blue) {
+    RGBA16 warpTransitionRGBA16 = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
 
     gWarpTransFBSetColor = (warpTransitionRGBA16 << 16) | warpTransitionRGBA16;
     gWarpTransRed = red;
@@ -109,15 +110,15 @@ void set_warp_transition_rgb(u8 red, u8 green, u8 blue) {
 }
 
 void print_intro_text(void) {
-#ifdef VERSION_EU
+#if MULTILANG
     s32 language = eu_get_language();
 #endif
     if ((gGlobalTimer & 31) < 20) {
         if (gControllerBits == 0) {
-#ifdef VERSION_EU
-            print_text_centered(SCREEN_WIDTH / 2, 20, gNoControllerMsg[language]);
+#if MULTILANG
+            print_text_centered(SCREEN_CENTER_X, 20, gNoControllerMsg[language]);
 #else
-            print_text_centered(SCREEN_WIDTH / 2, 20, "NO CONTROLLER");
+            print_text_centered(SCREEN_CENTER_X, 20, "NO CONTROLLER");
 #endif
         } else {
 #ifdef VERSION_EU
@@ -132,14 +133,14 @@ void print_intro_text(void) {
 
 u32 get_mario_spawn_type(struct Object *obj) {
     s32 i;
-    const BehaviorScript *behavior = virtual_to_segmented(0x13, obj->behavior);
+    const BehaviorScript *behavior = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, obj->behavior);
 
     for (i = 0; i < 20; i++) {
         if (sWarpBhvSpawnTable[i] == behavior) {
             return sSpawnTypeFromWarpBhv[i];
         }
     }
-    return 0;
+    return MARIO_SPAWN_NONE;
 }
 
 struct ObjectWarpNode *area_get_warp_node(u8 id) {
@@ -154,7 +155,7 @@ struct ObjectWarpNode *area_get_warp_node(u8 id) {
 }
 
 struct ObjectWarpNode *area_get_warp_node_from_params(struct Object *obj) {
-    return area_get_warp_node((obj->oBehParams & 0x00FF0000) >> 16);
+    return area_get_warp_node(GET_BPARAM2(obj->oBehParams));
 }
 
 void load_obj_warp_nodes(void) {
@@ -182,10 +183,10 @@ void clear_areas(void) {
     gWarpTransition.pauseRendering = FALSE;
     gMarioSpawnInfo->areaIndex = -1;
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < AREA_COUNT; i++) {
         gAreaData[i].index = i;
-        gAreaData[i].flags = 0;
-        gAreaData[i].terrainType = 0;
+        gAreaData[i].flags = AREA_FLAG_UNLOAD;
+        gAreaData[i].terrainType = TERRAIN_GRASS;
         gAreaData[i].graphNode = NULL;
         gAreaData[i].terrainData = NULL;
         gAreaData[i].surfaceRooms = NULL;
@@ -209,14 +210,18 @@ void clear_area_graph_nodes(void) {
     s32 i;
 
     if (gCurrentArea != NULL) {
+#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
+#endif
         gCurrentArea = NULL;
         gWarpTransition.isActive = FALSE;
     }
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < AREA_COUNT; i++) {
         if (gAreaData[i].graphNode != NULL) {
+#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
             geo_call_global_function_nodes(&gAreaData[i].graphNode->node, GEO_CONTEXT_AREA_INIT);
+#endif
             gAreaData[i].graphNode = NULL;
         }
     }
@@ -237,14 +242,18 @@ void load_area(s32 index) {
         }
 
         load_obj_warp_nodes();
+#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_LOAD);
+#endif
     }
 }
 
 void unload_area(void) {
     if (gCurrentArea != NULL) {
         unload_objects_from_area(0, gCurrentArea->index);
+#ifndef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
+#endif
 
         gCurrentArea->flags = AREA_FLAG_UNLOAD;
         gCurrentArea = NULL;
@@ -260,14 +269,16 @@ void load_mario_area(void) {
         gCurrentArea->flags |= AREA_FLAG_LOAD;
         spawn_objects_from_info(0, gMarioSpawnInfo);
     }
+
     if (gAreaSkyboxStart[gCurrAreaIndex - 1]) {
-        load_segment_decompress(0x0A, gAreaSkyboxStart[gCurrAreaIndex - 1], gAreaSkyboxEnd[gCurrAreaIndex - 1]);
+        load_segment_decompress(SEGMENT_SKYBOX, gAreaSkyboxStart[gCurrAreaIndex - 1], gAreaSkyboxEnd[gCurrAreaIndex - 1]);
     }
 }
 
 void unload_mario_area(void) {
-    if (gCurrentArea != NULL && (gCurrentArea->flags & AREA_FLAG_LOAD)) {
+    if ((gCurrentArea != NULL) && (gCurrentArea->flags & AREA_FLAG_LOAD)) {
         unload_objects_from_area(0, gMarioSpawnInfo->activeAreaIndex);
+
         gCurrentArea->flags &= ~AREA_FLAG_LOAD;
         if (gCurrentArea->flags == AREA_FLAG_UNLOAD) {
             unload_area();
@@ -283,10 +294,10 @@ void change_area(s32 index) {
         load_area(index);
 
         gCurrentArea->flags = areaFlags;
-        gMarioObject->oActiveParticleFlags = 0;
+        gMarioObject->oActiveParticleFlags = ACTIVE_PARTICLE_NONE;
     }
 
-    if (areaFlags & 0x01) {
+    if (areaFlags & AREA_FLAG_LOAD) {
         gMarioObject->header.gfx.areaIndex = index, gMarioSpawnInfo->areaIndex = index;
     }
 }
@@ -300,7 +311,7 @@ void area_update_objects(void) {
  * Sets up the information needed to play a warp transition, including the
  * transition type, time in frames, and the RGB color that will fill the screen.
  */
-void play_transition(s16 transType, s16 time, u8 red, u8 green, u8 blue) {
+void play_transition(s16 transType, s16 time, Color red, Color green, Color blue) {
 #ifndef L3DEX2_ALONE
     gWarpTransition.isActive = TRUE;
     gWarpTransition.type = transType;
@@ -308,13 +319,13 @@ void play_transition(s16 transType, s16 time, u8 red, u8 green, u8 blue) {
     gWarpTransition.pauseRendering = FALSE;
 
     // The lowest bit of transType determines if the transition is fading in or out.
-    if (transType & 1) {
+    if (transType & WARP_TRANSITION_FADE_INTO) {
         set_warp_transition_rgb(red, green, blue);
     } else {
         red = gWarpTransRed, green = gWarpTransGreen, blue = gWarpTransBlue;
     }
 
-    if (transType < 8) { // if transition is RGB
+    if (transType < WARP_TRANSITION_TYPE_STAR) { // if transition is WARP_TRANSITION_TYPE_COLOR
         gWarpTransition.data.red = red;
         gWarpTransition.data.green = green;
         gWarpTransition.data.blue = blue;
@@ -327,22 +338,22 @@ void play_transition(s16 transType, s16 time, u8 red, u8 green, u8 blue) {
         // If you really wanted to, you could place the start at one corner and the end at
         // the opposite corner. This will make the transition image look like it is moving
         // across the screen.
-        gWarpTransition.data.startTexX = SCREEN_WIDTH / 2;
-        gWarpTransition.data.startTexY = SCREEN_HEIGHT / 2;
-        gWarpTransition.data.endTexX = SCREEN_WIDTH / 2;
-        gWarpTransition.data.endTexY = SCREEN_HEIGHT / 2;
+        gWarpTransition.data.startTexX = SCREEN_CENTER_X;
+        gWarpTransition.data.startTexY = SCREEN_CENTER_Y;
+        gWarpTransition.data.endTexX = SCREEN_CENTER_X;
+        gWarpTransition.data.endTexY = SCREEN_CENTER_Y;
 
         gWarpTransition.data.texTimer = 0;
 
-        if (transType & 1) { // Is the image fading in?
+        if (transType & WARP_TRANSITION_FADE_INTO) { // Is the image fading in?
             gWarpTransition.data.startTexRadius = GFX_DIMENSIONS_FULL_RADIUS;
-            if (transType >= 0x0F) {
+            if (transType >= WARP_TRANSITION_FADES_INTO_LARGE) {
                 gWarpTransition.data.endTexRadius = 16;
             } else {
                 gWarpTransition.data.endTexRadius = 0;
             }
         } else { // The image is fading out. (Reverses start & end circles)
-            if (transType >= 0x0E) {
+            if (transType >= WARP_TRANSITION_FADES_FROM_LARGE) {
                 gWarpTransition.data.startTexRadius = 16;
             } else {
                 gWarpTransition.data.startTexRadius = 0;
@@ -364,6 +375,10 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 }
 
 void render_game(void) {
+#if PUPPYPRINT_DEBUG
+    OSTime first   = osGetTime();
+    OSTime colTime = collisionTime[perfIteration];
+#endif
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
         if (gCurrentArea->graphNode) {
             geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);
@@ -398,7 +413,7 @@ void render_game(void) {
                 gWarpTransition.isActive = !render_screen_transition(0, gWarpTransition.type, gWarpTransition.time,
                                                                      &gWarpTransition.data);
                 if (!gWarpTransition.isActive) {
-                    if (gWarpTransition.type & 1) {
+                    if (gWarpTransition.type & WARP_TRANSITION_FADE_INTO) {
                         gWarpTransition.pauseRendering = TRUE;
                     } else {
                         set_warp_transition_rgb(0, 0, 0);
@@ -417,11 +432,13 @@ void render_game(void) {
         }
     }
 
-
-    #if PUPPYPRINT_DEBUG
-    puppyprint_render_profiler();
-    #endif
-
     gViewportOverride = NULL;
-    gViewportClip = NULL;
+    gViewportClip     = NULL;
+
+#if PUPPYPRINT_DEBUG
+    profiler_update(graphTime, first);
+    graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
+    // graphTime[perfIteration] -=   profilerTime[perfIteration]; //! Graph time is inaccurate and wrongly reaches 0 sometimes
+    puppyprint_render_profiler();
+#endif
 }
