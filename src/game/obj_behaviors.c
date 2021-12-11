@@ -40,12 +40,6 @@
  * specific behaviors. Few functions besides the bhv_ functions are used elsewhere in the repo.
  */
 
-#define OBJ_COL_FLAG_GROUNDED   (1 << 0)
-#define OBJ_COL_FLAG_HIT_WALL   (1 << 1)
-#define OBJ_COL_FLAG_UNDERWATER (1 << 2)
-#define OBJ_COL_FLAG_NO_Y_VEL   (1 << 3)
-#define OBJ_COL_FLAGS_LANDED    (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
-
 /**
  * Current object floor as defined in object_step.
  */
@@ -85,18 +79,12 @@ void set_yoshi_as_not_dead(void) {
  * opacity?
  */
 Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *node, UNUSED Mat4 *mtx) {
-    Gfx *gfxHead;
+    Gfx *gfxHead = NULL;
     Gfx *gfx;
-    struct Object *heldObject;
-    struct Object *obj;
-    UNUSED struct Object *unusedObject;
-
-    gfxHead = NULL;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        heldObject = (struct Object *) gCurGraphNodeObject;
-        obj = (struct Object *) node;
-        unusedObject = (struct Object *) node;
+        struct Object *heldObject = (struct Object *) gCurGraphNodeObject;
+        struct Object *obj = (struct Object *) node;
 
 
         if (gCurGraphNodeHeldObject != NULL) {
@@ -116,14 +104,9 @@ Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *no
 }
 
 /**
- * An absolute value function.
+ * Backwards compatibility, used to be a duplicate function
  */
-f32 absf_2(f32 f) {
-    if (f < 0) {
-        f *= -1.0f;
-    }
-    return f;
-}
+#define absf_2 absf
 
 /**
  * Turns an object away from floors/walls that it runs into.
@@ -223,13 +206,8 @@ void obj_orient_graph(struct Object *obj, f32 normalX, f32 normalY, f32 normalZ)
         return;
     }
 
-    objVisualPosition[0] = obj->oPosX;
-    objVisualPosition[1] = obj->oPosY + obj->oGraphYOffset;
-    objVisualPosition[2] = obj->oPosZ;
-
-    surfaceNormals[0] = normalX;
-    surfaceNormals[1] = normalY;
-    surfaceNormals[2] = normalZ;
+    vec3f_copy_y_off(objVisualPosition, &obj->oPosVec, obj->oGraphYOffset);
+    vec3f_set(surfaceNormals, normalX, normalY, normalZ);
 
     mtxf_align_terrain_normal(*throwMatrix, surfaceNormals, objVisualPosition, obj->oFaceAngleYaw);
     obj->header.gfx.throwMatrix = throwMatrix;
@@ -257,11 +235,11 @@ void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 obj
 
     // Caps vertical speed with a "terminal velocity".
     o->oVelY -= o->oGravity;
-    if (o->oVelY > 75.0f) {
-        o->oVelY = 75.0f;
+    if (o->oVelY > 75.0) {
+        o->oVelY = 75.0;
     }
-    if (o->oVelY < -75.0f) {
-        o->oVelY = -75.0f;
+    if (o->oVelY < -75.0) {
+        o->oVelY = -75.0;
     }
 
     o->oPosY += o->oVelY;
@@ -283,13 +261,13 @@ void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 obj
         obj_orient_graph(o, floor_nX, floor_nY, floor_nZ);
 
         // Adds horizontal component of gravity for horizontal speed.
-        f32 nxz = (sqr(floor_nX) + sqr(floor_nZ));
-        f32 nxyz = (nxz + sqr(floor_nY));
-        objVelX += floor_nX * (nxz) / (nxyz) * o->oGravity * 2;
-        objVelZ += floor_nZ * (nxz) / (nxyz) * o->oGravity * 2;
+        f32 nxz = sqr(floor_nX) + sqr(floor_nZ);
+        f32 vel = ((nxz) / (nxz + sqr(floor_nY))) * o->oGravity * 2;
+        objVelX += floor_nX * vel;
+        objVelZ += floor_nZ * vel;
 
-        if (objVelX < 0.000001f && objVelX > -0.000001f) objVelX = 0;
-        if (objVelZ < 0.000001f && objVelZ > -0.000001f) objVelZ = 0;
+        if (objVelX < NEAR_ZERO && objVelX > -NEAR_ZERO) objVelX = 0;
+        if (objVelZ < NEAR_ZERO && objVelZ > -NEAR_ZERO) objVelZ = 0;
 
         if (objVelX != 0 || objVelZ != 0) {
             o->oMoveAngleYaw = atan2s(objVelZ, objVelX);
@@ -339,16 +317,16 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
         obj_orient_graph(o, floor_nX, floor_nY, floor_nZ);
 
         // Adds horizontal component of gravity for horizontal speed.
-        f32 nxz = (sqr(floor_nX) + sqr(floor_nZ));
-        f32 nxyz = (nxz + sqr(floor_nY));
-        objVelX += floor_nX * (nxz) / (nxyz) * netYAccel * 2;
-        objVelZ += floor_nZ * (nxz) / (nxyz) * netYAccel * 2;
+        f32 nxz = sqr(floor_nX) + sqr(floor_nZ);
+        f32 velm = (nxz / (nxz + sqr(floor_nY))) * netYAccel * 2;
+        objVelX += floor_nX * velm;
+        objVelZ += floor_nZ * velm;
     }
 
-    if (objVelX < 0.000001f && objVelX > -0.000001f) objVelX = 0;
-    if (objVelZ < 0.000001f && objVelZ > -0.000001f) objVelZ = 0;
+    if (objVelX < NEAR_ZERO && objVelX > -NEAR_ZERO) objVelX = 0;
+    if (objVelZ < NEAR_ZERO && objVelZ > -NEAR_ZERO) objVelZ = 0;
 
-    if (o->oVelY < 0.000001f && o->oVelY > -0.000001f) {
+    if (o->oVelY < NEAR_ZERO && o->oVelY > -NEAR_ZERO) {
         o->oVelY = 0;
     }
 
@@ -366,11 +344,8 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
  * Updates an objects position from oForwardVel and oMoveAngleYaw.
  */
 void obj_update_pos_vel_xz(void) {
-    f32 xVel = o->oForwardVel * sins(o->oMoveAngleYaw);
-    f32 zVel = o->oForwardVel * coss(o->oMoveAngleYaw);
-
-    o->oPosX += xVel;
-    o->oPosZ += zVel;
+    o->oPosX += o->oForwardVel * sins(o->oMoveAngleYaw);
+    o->oPosZ += o->oForwardVel * coss(o->oMoveAngleYaw);
 }
 
 /**
@@ -418,6 +393,10 @@ s16 object_step(void) {
     }
 
     floorY = find_floor(objX + objVelX, objY, objZ + objVelZ, &sObjFloor);
+
+    o->oFloor       = sObjFloor;
+    o->oFloorHeight = floorY;
+
     if (turn_obj_away_from_steep_floor(sObjFloor, floorY, objVelX, objVelZ) == 1) {
         waterY = find_water_level(objX + objVelX, objZ + objVelZ);
         if (waterY > objY) {
@@ -451,9 +430,8 @@ s16 object_step(void) {
  * Used for boulders, falling pillars, and the rolling snowman body.
  */
 s16 object_step_without_floor_orient(void) {
-    s16 collisionFlags = 0;
     sOrientObjWithFloor = FALSE;
-    collisionFlags = object_step();
+    s16 collisionFlags = object_step();
     sOrientObjWithFloor = TRUE;
 
     return collisionFlags;
@@ -462,67 +440,56 @@ s16 object_step_without_floor_orient(void) {
 /**
  * Uses an object's forward velocity and yaw to move its X, Y, and Z positions.
  * This does accept an object as an argument, though it is always called with `o`.
- * If it wasn't called with `o`, it would modify `o`'s X and Z velocities based on
- * `obj`'s forward velocity and yaw instead of `o`'s, and wouldn't update `o`'s
- * position.
  */
 void obj_move_xyz_using_fvel_and_yaw(struct Object *obj) {
-    o->oVelX = obj->oForwardVel * sins(obj->oMoveAngleYaw);
-    o->oVelZ = obj->oForwardVel * coss(obj->oMoveAngleYaw);
+    obj->oVelX = obj->oForwardVel * sins(obj->oMoveAngleYaw);
+    obj->oVelZ = obj->oForwardVel * coss(obj->oMoveAngleYaw);
 
-    obj->oPosX += o->oVelX;
-    obj->oPosY += obj->oVelY;
-    obj->oPosZ += o->oVelZ;
+    vec3f_add(&obj->oPosVec, &obj->oVelVec);
 }
 
 /**
  * Checks if a point is within distance from Mario's graphical position. Test is exclusive.
  */
-s8 is_point_within_radius_of_mario(f32 x, f32 y, f32 z, s32 dist) {
-    f32 mGfxX = gMarioObject->header.gfx.pos[0];
-    f32 mGfxY = gMarioObject->header.gfx.pos[1];
-    f32 mGfxZ = gMarioObject->header.gfx.pos[2];
+s32 is_point_within_radius_of_mario(f32 x, f32 y, f32 z, s32 dist) {
+    f32 dx = x - gMarioObject->header.gfx.pos[0];
+    f32 dy = y - gMarioObject->header.gfx.pos[1];
+    f32 dz = z - gMarioObject->header.gfx.pos[2];
 
-    if ((x - mGfxX) * (x - mGfxX) + (y - mGfxY) * (y - mGfxY) + (z - mGfxZ) * (z - mGfxZ)
-        < (f32)(dist * dist)) {
-        return TRUE;
-    }
-
-    return FALSE;
+    return sqr(dx) + sqr(dy) + sqr(dz) < (f32)sqr(dist);
 }
 
 /**
  * Checks whether a point is within distance of a given point. Test is exclusive.
  */
-s8 is_point_close_to_object(struct Object *obj, f32 x, f32 y, f32 z, s32 dist) {
-    f32 objX = obj->oPosX;
-    f32 objY = obj->oPosY;
-    f32 objZ = obj->oPosZ;
+s32 is_point_close_to_object(struct Object *obj, f32 x, f32 y, f32 z, s32 dist) {
+    f32 dx = x - obj->oPosX;
+    f32 dy = y - obj->oPosY;
+    f32 dz = z - obj->oPosZ;
 
-    if ((x - objX) * (x - objX) + (y - objY) * (y - objY) + (z - objZ) * (z - objZ)
-        < (f32)(dist * dist)) {
-        return TRUE;
-    }
-
-    return FALSE;
+    return sqr(dx) + sqr(dy) + sqr(dz) < (f32)sqr(dist);
 }
 
 /**
  * Sets an object as visible if within a certain distance of Mario's graphical position.
  */
 void set_object_visibility(struct Object *obj, s32 dist) {
-    COND_BIT((!is_point_within_radius_of_mario(obj->oPosX, obj->oPosY, obj->oPosZ, dist)), obj->header.gfx.node.flags, GRAPH_RENDER_INVISIBLE);
+    COND_BIT(
+        !is_point_within_radius_of_mario(obj->oPosX, obj->oPosY, obj->oPosZ, dist),
+        obj->header.gfx.node.flags,
+        GRAPH_RENDER_INVISIBLE
+    );
 }
 
 /**
  * Turns an object towards home if Mario is not near to it.
  */
-s8 obj_return_home_if_safe(struct Object *obj, f32 homeX, f32 y, f32 homeZ, s32 dist) {
+s32 obj_return_home_if_safe(struct Object *obj, f32 homeX, f32 y, f32 homeZ, s32 dist) {
     f32 homeDistX = homeX - obj->oPosX;
     f32 homeDistZ = homeZ - obj->oPosZ;
     s16 angleTowardsHome = atan2s(homeDistZ, homeDistX);
 
-    if (is_point_within_radius_of_mario(homeX, y, homeZ, dist) == TRUE) {
+    if (is_point_within_radius_of_mario(homeX, y, homeZ, dist)) {
         return TRUE;
     } else {
         obj->oMoveAngleYaw = approach_s16_symmetric(obj->oMoveAngleYaw, angleTowardsHome, 320);
@@ -553,7 +520,7 @@ void obj_return_and_displace_home(struct Object *obj, f32 homeX, UNUSED f32 home
  * A series of checks using sin and cos to see if a given angle is facing in the same direction
  * of a given angle, within a certain range.
  */
-s8 obj_check_if_facing_toward_angle(u32 base, u32 goal, s16 range) {
+s32 obj_check_if_facing_toward_angle(u32 base, u32 goal, s16 range) {
     s16 dAngle = (u16) goal - (u16) base;
 
     if (((f32) sins(-range) < (f32) sins(dAngle)) && ((f32) sins(dAngle) < (f32) sins(range))
@@ -567,7 +534,7 @@ s8 obj_check_if_facing_toward_angle(u32 base, u32 goal, s16 range) {
 /**
  * Finds any wall collisions and returns what the displacement vector would be.
  */
-s8 obj_find_wall_displacement(Vec3f dist, f32 x, f32 y, f32 z, f32 radius) {
+s32 obj_find_wall_displacement(Vec3f dist, f32 x, f32 y, f32 z, f32 radius) {
     struct WallCollisionData hitbox;
     hitbox.x = x;
     hitbox.y = y;
@@ -604,7 +571,7 @@ void obj_spawn_yellow_coins(struct Object *obj, s8 nCoins) {
 /**
  * Controls whether certain objects should flicker/when to despawn.
  */
-s8 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan) {
+s32 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan) {
     if (obj->oTimer < lifeSpan) {
         return FALSE;
     }
@@ -622,15 +589,16 @@ s8 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan) {
 /**
  * Checks if a given room is Mario's current room, even if on an object.
  */
-s8 current_mario_room_check(s16 room) {
-    s16 result;
+s32 current_mario_room_check(RoomData room) {
+    s32 result;
 
     // Since object surfaces have room 0, this tests if the surface is an
     // object first and uses the last room if so.
     if (gMarioCurrentRoom == 0) {
-        return (room == sPrevCheckMarioRoom);
+        return room == sPrevCheckMarioRoom;
     } else {
-        result = (room == gMarioCurrentRoom);
+        result = room == gMarioCurrentRoom;
+
         sPrevCheckMarioRoom = gMarioCurrentRoom;
     }
 
@@ -640,25 +608,25 @@ s8 current_mario_room_check(s16 room) {
 /**
  * Triggers dialog when Mario is facing an object and controls it while in the dialog.
  */
-s16 trigger_obj_dialog_when_facing(s32 *inDialog, s16 dialogID, f32 dist, s32 actionArg) {
-    if ((is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, (s32) dist) == TRUE
-         && obj_check_if_facing_toward_angle(o->oFaceAngleYaw, gMarioObject->header.gfx.angle[1] + 0x8000, 0x1000) == TRUE
-         && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x1000) == TRUE)
+s32 trigger_obj_dialog_when_facing(s32 *inDialog, s16 dialogID, f32 dist, s32 actionArg) {
+    if ((is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, (s32) dist)
+         && obj_check_if_facing_toward_angle(o->oFaceAngleYaw, gMarioObject->header.gfx.angle[1] + 0x8000, 0x1000)
+         && obj_check_if_facing_toward_angle(o->oMoveAngleYaw, o->oAngleToMario, 0x1000))
         || (*inDialog == TRUE)) {
         *inDialog = TRUE;
 
-        if (set_mario_npc_dialog(actionArg) == MARIO_DIALOG_STATUS_SPEAK) { //If Mario is speaking.
+        if (set_mario_npc_dialog(actionArg) == MARIO_DIALOG_STATUS_SPEAK) { // If Mario is speaking.
             s16 dialogResponse = cutscene_object_with_dialog(CUTSCENE_DIALOG, o, dialogID);
             if (dialogResponse != DIALOG_RESPONSE_NONE) {
                 set_mario_npc_dialog(MARIO_DIALOG_STOP);
                 *inDialog = FALSE;
                 return dialogResponse;
             }
-            return 0;
+            return DIALOG_RESPONSE_NONE;
         }
     }
 
-    return 0;
+    return DIALOG_RESPONSE_NONE;
 }
 
 /**
@@ -688,7 +656,7 @@ void obj_check_floor_death(s16 collisionFlags, struct Surface *floor) {
  * Controls an object dying in lava by creating smoke, sinking the object, playing
  * audio, and eventually despawning it. Returns TRUE when the obj is dead.
  */
-s8 obj_lava_death(void) {
+s32 obj_lava_death(void) {
     struct Object *deathSmoke;
 
     if (o->oTimer > 30) {
@@ -700,7 +668,7 @@ s8 obj_lava_death(void) {
     }
 
     if ((o->oTimer % 8) == 0) {
-        cur_obj_play_sound_2(SOUND_OBJ_BULLY_EXPLODE_2);
+        cur_obj_play_sound_2(SOUND_OBJ_BULLY_EXPLODE_LAVA);
         deathSmoke = spawn_object(o, MODEL_SMOKE, bhvBobombBullyDeathSmoke);
         deathSmoke->oPosX += random_float() * 20.0f;
         deathSmoke->oPosY += random_float() * 20.0f;
@@ -715,13 +683,13 @@ s8 obj_lava_death(void) {
  * Spawns an orange number object relatively, such as those that count up for secrets.
  */
 void spawn_orange_number(s8 behParam, s16 relX, s16 relY, s16 relZ) {
-    struct Object *orangeNumber;
+#ifdef DIALOG_INDICATOR
+    if (behParam > ORANGE_NUMBER_F) return;
+#else
+    if (behParam > ORANGE_NUMBER_9) return;
+#endif
 
-    if (behParam >= 10) {
-        return;
-    }
-
-    orangeNumber = spawn_object_relative(behParam, relX, relY, relZ, o, MODEL_NUMBER, bhvOrangeNumber);
+    struct Object *orangeNumber = spawn_object_relative(behParam, relX, relY, relZ, o, MODEL_NUMBER, bhvOrangeNumber);
     orangeNumber->oPosY += 25.0f;
 }
 
@@ -734,7 +702,7 @@ s8 sDebugTimer = 0;
 /**
  * Unused presumably debug function that tracks for a sequence of inputs.
  */
-UNUSED s8 debug_sequence_tracker(s16 debugInputSequence[]) {
+UNUSED s32 debug_sequence_tracker(s16 debugInputSequence[]) {
     // If end of sequence reached, return true.
     if (debugInputSequence[sDebugSequenceTracker] == 0) {
         sDebugSequenceTracker = 0;
@@ -768,7 +736,7 @@ UNUSED s8 debug_sequence_tracker(s16 debugInputSequence[]) {
 #include "behaviors/bubble.inc.c"
 #include "behaviors/water_wave.inc.c"
 #include "behaviors/explosion.inc.c"
-#include "behaviors/corkbox.inc.c"
+#include "behaviors/respawner.inc.c"
 #include "behaviors/bully.inc.c"
 #include "behaviors/water_ring.inc.c"
 #include "behaviors/bowser_bomb.inc.c"

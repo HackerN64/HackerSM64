@@ -7,6 +7,16 @@
 #include "macros.h"
 #include "types.h"
 
+enum ObjCollisionFlags {
+    OBJ_COL_FLAGS_NONE      = (0 << 0),
+    OBJ_COL_FLAG_GROUNDED   = (1 << 0),
+    OBJ_COL_FLAG_HIT_WALL   = (1 << 1),
+    OBJ_COL_FLAG_UNDERWATER = (1 << 2),
+    OBJ_COL_FLAG_NO_Y_VEL   = (1 << 3),
+    OBJ_COL_FLAGS_LANDED    = (OBJ_COL_FLAG_GROUNDED | OBJ_COL_FLAG_NO_Y_VEL)
+};
+
+//! Lots of these are duplicates
 void set_yoshi_as_not_dead(void);
 s32 coin_step(s16 *collisionFlagsPtr);
 void moving_coin_flicker(void);
@@ -64,7 +74,7 @@ void butterfly_act_follow_mario(void);
 void butterfly_act_return_home(void);
 void bhv_butterfly_loop(void);
 void bhv_hoot_init(void);
-f32  hoot_find_next_floor(f32 dist);
+f32 hoot_find_next_floor(f32 dist);
 void hoot_floor_bounce(void);
 void hoot_free_step(s16 fastOscY, s32 speed);
 void hoot_player_set_yaw(void);
@@ -87,7 +97,7 @@ void bhv_bobomb_bully_death_smoke_init(void);
 void bhv_bobomb_explosion_bubble_init(void);
 void bhv_bobomb_explosion_bubble_loop(void);
 void bhv_respawner_loop(void);
-void create_respawner(s32 arg0, const BehaviorScript *behToSpawn, s32 minSpawnDist);
+void create_respawner(ModelID32 model, const BehaviorScript *behToSpawn, s32 minSpawnDist);
 void bhv_small_bully_init(void);
 void bhv_big_bully_init(void);
 void bully_check_mario_collision(void);
@@ -100,7 +110,7 @@ void bully_step(void);
 void bully_spawn_coin(void);
 void bully_act_level_death(void);
 void bhv_bully_loop(void);
-void big_bully_spawn_minion(s32 arg0, s32 arg1, s32 arg2, s16 arg3);
+void big_bully_spawn_minion(s32 x, s32 y, s32 z, s16 ry);
 void bhv_big_bully_with_minions_init(void);
 void big_bully_spawn_star(void);
 void bhv_big_bully_with_minions_loop(void);
@@ -137,7 +147,7 @@ void bhv_wf_sliding_platform_init(void);
 void bhv_wf_sliding_platform_loop(void);
 void bhv_moneybag_init(void);
 void moneybag_check_mario_collision(void);
-void moneybag_jump(s8 collisionFlags);
+void moneybag_jump(s16 collisionFlags);
 void moneybag_act_move_around(void);
 void moneybag_act_return_home(void);
 void moneybag_act_disappear(void);
