@@ -125,7 +125,6 @@ void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
 #include "behaviors/piranha_bubbles.inc.c"
 #include "behaviors/purple_switch.inc.c"
 #include "behaviors/metal_box.inc.c"
-#include "behaviors/switch_hidden_objects.inc.c"
 #include "behaviors/breakable_box.inc.c"
 
 // not sure what this is doing here. not in a behavior file.
@@ -151,20 +150,19 @@ Gfx *geo_move_mario_part_from_parent(s32 callContext, UNUSED struct GraphNode *n
 #include "behaviors/jumping_box.inc.c"
 #include "behaviors/boo_cage.inc.c"
 
-static s16 sSpawnSparkleParticleAngle = 0x0;
-
 // not in behavior file
 // n is the number of objects to spawn, r if the rate of change of phase (frequency?)
 void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
+    static s16 spawnSparkleParticleAngle = 0x0;
     s32 i;
     s16 separation = 0x10000 / n; // Evenly spread around a circle
 
     for (i = 0; i < n; i++) {
-        spawn_object_relative(0, sins(sSpawnSparkleParticleAngle + i * separation) * radius, (i + 1) * height,
-                              coss(sSpawnSparkleParticleAngle + i * separation) * radius, o, MODEL_NONE, bhvSparkleSpawn);
+        spawn_object_relative(OBJ_BP_NONE, sins(spawnSparkleParticleAngle + i * separation) * radius, (i + 1) * height,
+                              coss(spawnSparkleParticleAngle + i * separation) * radius, o, MODEL_NONE, bhvSparkleSpawn);
     }
 
-    sSpawnSparkleParticleAngle += r * 0x100;
+    spawnSparkleParticleAngle += r * 0x100;
 }
 
 #include "behaviors/beta_boo_key.inc.c"
@@ -195,15 +193,15 @@ void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
 #include "behaviors/piranha_plant.inc.c"
 #include "behaviors/bowser_puzzle_piece.inc.c"
 
-s32 set_obj_anim_with_accel_and_sound(s16 frame1, s16 frame2, s32 sound) {
-    f32 range;
-    if ((range = o->header.gfx.animInfo.animAccel / (f32) 0x10000) == 0)
-        range = 1.0f;
+void set_obj_anim_with_accel_and_sound(s16 frame1, s16 frame2, s32 sound) {
+    s32 range = o->header.gfx.animInfo.animAccel / 0x10000;
+    if (range == 0) {
+        range = 1;
+    }
+
     if (cur_obj_check_anim_frame_in_range(frame1, range) || cur_obj_check_anim_frame_in_range(frame2, range)) {
         cur_obj_play_sound_2(sound);
-        return TRUE;
     }
-    return FALSE;
 }
 
 #include "behaviors/tuxie.inc.c"
