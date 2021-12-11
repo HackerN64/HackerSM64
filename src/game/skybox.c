@@ -9,7 +9,8 @@
 #include "save_file.h"
 #include "segment2.h"
 #include "sm64.h"
-
+#include "geo_commands.h"
+#include "color_presets.h"
 
 /**
  * @file skybox.c
@@ -90,9 +91,9 @@ SkyboxTexture *sSkyboxTextures[10] = {
  * The skybox color mask.
  * The final color of each pixel is computed from the bitwise AND of the color and the texture.
  */
-u8 sSkyboxColors[][3] = {
-    { 0x50, 0x64, 0x5A },
-    { 0xFF, 0xFF, 0xFF },
+ColorRGB sSkyboxColors[] = {
+    COLOR_RGB_JRB_SKY,
+    COLOR_RGB_WHITE,
 };
 
 /**
@@ -160,19 +161,13 @@ s32 calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
 
     // Scale by 360 / fov
     f32 degreesToScale = 360.0f * pitchInDegrees / 90.0f;
-    s32 roundedY = round_float(degreesToScale);
+    s32 roundedY = roundf(degreesToScale);
 
     // Since pitch can be negative, and the tile grid starts 1 octant above the camera's focus, add
     // 5 octants to the y position
     s32 scaledY = roundedY + (5 * SKYBOX_SIZE) * SKYBOX_TILE_HEIGHT;
 
-    if (scaledY > SKYBOX_HEIGHT) {
-        scaledY = SKYBOX_HEIGHT;
-    }
-    if (scaledY < SCREEN_HEIGHT) {
-        scaledY = SCREEN_HEIGHT;
-    }
-    return scaledY;
+    return CLAMP(scaledY, SCREEN_HEIGHT, SKYBOX_HEIGHT);
 }
 
 /**
@@ -241,9 +236,9 @@ void *create_skybox_ortho_matrix(s8 player) {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
 
 #ifdef WIDESCREEN
-    f32 half_width = (4.0f / 3.0f) / GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_WIDTH / 2;
-    f32 center = (sSkyBoxInfo[player].scaledX + SCREEN_WIDTH / 2);
-    if (half_width < SCREEN_WIDTH / 2) {
+    f32 half_width = (4.0f / 3.0f) / GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_CENTER_X;
+    f32 center = (sSkyBoxInfo[player].scaledX + SCREEN_CENTER_X);
+    if (half_width < SCREEN_CENTER_X) {
         // A wider screen than 4:3
         left = center - half_width;
         right = center + half_width;
@@ -291,25 +286,21 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
  * @param posX,posY,posZ The camera's position
  * @param focX,focY,focZ The camera's focus.
  */
-Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov,
-                                    f32 posX, f32 posY, f32 posZ,
-                                    f32 focX, f32 focY, f32 focZ) {
-    f32 cameraFaceX = focX - posX;
-    f32 cameraFaceY = focY - posY;
-    f32 cameraFaceZ = focZ - posZ;
+Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, Vec3f focus) {
     s8 colorIndex = 1;
 
     // If the "Plunder in the Sunken Ship" star in JRB is collected, make the sky darker and slightly green
-    if (background == 8
-        && !(save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & (1 << 0))) {
+    if (background == BACKGROUND_ABOVE_CLOUDS
+        && !(save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
         colorIndex = 0;
     }
 
     //! fov is always set to 90.0f. If this line is removed, then the game crashes because fov is 0 on
     //! the first frame, which causes a floating point divide by 0
     fov = 90.0f;
-    sSkyBoxInfo[player].yaw = atan2s(cameraFaceZ, cameraFaceX);
-    sSkyBoxInfo[player].pitch = atan2s(sqrtf(sqr(cameraFaceX) + sqr(cameraFaceZ)), cameraFaceY);
+    s16 yaw;
+    vec3f_get_angle(pos, focus, &sSkyBoxInfo[player].pitch, &yaw);
+    sSkyBoxInfo[player].yaw = yaw;
     sSkyBoxInfo[player].scaledX = calculate_skybox_scaled_x(player, fov);
     sSkyBoxInfo[player].scaledY = calculate_skybox_scaled_y(player, fov);
     sSkyBoxInfo[player].upperLeftTile = get_top_left_tile_idx(player);
