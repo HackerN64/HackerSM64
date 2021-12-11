@@ -128,15 +128,78 @@ endif
 
 LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
+
+#==============================================================================#
+# Optimization flags                                                           #
+#==============================================================================#
+
+# Default non-gcc opt flags
+DEFAULT_OPT_FLAGS = -Ofast
+
+# Main opt flags
+GCC_MAIN_OPT_FLAGS = \
+  -Ofast \
+  --param case-values-threshold=20 \
+  --param max-completely-peeled-insns=10 \
+  --param max-unrolled-insns=10 \
+  -finline-limit=1 \
+  -freorder-blocks-algorithm=simple  \
+  -ffunction-sections \
+  -fdata-sections
+
+# Surface Collision
+GCC_COLLISION_OPT_FLAGS = \
+  -Ofast \
+  --param case-values-threshold=20 \
+  --param max-completely-peeled-insns=100 \
+  --param max-unrolled-insns=100 \
+  -finline-limit=0 \
+  -fno-inline \
+  -freorder-blocks-algorithm=simple  \
+  -ffunction-sections \
+  -fdata-sections \
+  -falign-functions=32
+
+# Math Util
+GCC_MATH_UTIL_OPT_FLAGS = \
+  -Ofast \
+  -fno-unroll-loops \
+  -fno-peel-loops \
+  --param case-values-threshold=20  \
+  -ffunction-sections \
+  -fdata-sections \
+  -falign-functions=32
+#   - setting any sort of -finline-limit has shown to worsen performance with math_util.c,
+#     lower values were the worst, the higher you go - the closer performance gets to not setting it at all
+
+# Rendering graph node
+GCC_GRAPH_NODE_OPT_FLAGS = \
+  -Ofast \
+  --param case-values-threshold=20 \
+  --param max-completely-peeled-insns=100 \
+  --param max-unrolled-insns=100 \
+  -finline-limit=0 \
+  -freorder-blocks-algorithm=simple  \
+  -ffunction-sections \
+  -fdata-sections \
+  -falign-functions=32
+#==============================================================================#
+
 ifeq ($(COMPILER),gcc)
   NON_MATCHING := 1
   MIPSISET     := -mips3
-  OPT_FLAGS    := -Ofast
+  OPT_FLAGS           := $(GCC_MAIN_OPT_FLAGS)
+  COLLISION_OPT_FLAGS  = $(GCC_COLLISION_OPT_FLAGS)
+  MATH_UTIL_OPT_FLAGS  = $(GCC_MATH_UTIL_OPT_FLAGS)
+  GRAPH_NODE_OPT_FLAGS = $(GCC_GRAPH_NODE_OPT_FLAGS)
 else ifeq ($(COMPILER),clang)
   NON_MATCHING := 1
   # clang doesn't support ABI 'o32' for 'mips3'
   MIPSISET     := -mips2
-  OPT_FLAGS    := -Ofast
+  OPT_FLAGS    := $(DEFAULT_OPT_FLAGS)
+  COLLISION_OPT_FLAGS  = $(DEFAULT_OPT_FLAGS)
+  MATH_UTIL_OPT_FLAGS  = $(DEFAULT_OPT_FLAGS)
+  GRAPH_NODE_OPT_FLAGS = $(DEFAULT_OPT_FLAGS)
 endif
 
 
@@ -159,7 +222,7 @@ TARGET_STRING := sm64
 
 # UNF - whether to use UNFLoader flashcart library
 #   1 - includes code in ROM
-#   0 - does not
+#   0 - does not 
 UNF ?= 0
 $(eval $(call validate-option,UNF,0 1))
 ifeq ($(UNF),1)
@@ -171,7 +234,7 @@ endif
 # ISVPRINT - whether to fake IS-Viewer presence,
 # allowing for usage of CEN64 (and possibly Project64) to print messages to terminal.
 #   1 - includes code in ROM
-#   0 - does not
+#   0 - does not 
 ISVPRINT ?= 0
 $(eval $(call validate-option,ISVPRINT,0 1))
 ifeq ($(ISVPRINT),1)
@@ -189,7 +252,7 @@ endif
 
 # HVQM - whether to use HVQM fmv library
 #   1 - includes code in ROM
-#   0 - does not
+#   0 - does not 
 HVQM ?= 0
 $(eval $(call validate-option,HVQM,0 1))
 ifeq ($(HVQM),1)
@@ -224,7 +287,7 @@ $(eval $(call validate-option,GZIPVER,std libdef))
 
 # GODDARD - whether to use libgoddard (Mario Head)
 #   1 - includes code in ROM
-#   0 - does not
+#   0 - does not 
 GODDARD ?= 0
 $(eval $(call validate-option,GODDARD,0 1))
 ifeq ($(GODDARD),1)
@@ -401,9 +464,11 @@ DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)
 # C compiler options
 CFLAGS = -G 0 $(OPT_FLAGS) $(TARGET_CFLAGS) $(MIPSISET) $(DEF_INC_CFLAGS)
 ifeq ($(COMPILER),gcc)
-  CFLAGS += -mno-shared -march=vr4300 -mfix4300 -mabi=32 -mhard-float -mdivide-breaks -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra -Wno-missing-braces
+  CFLAGS += -mno-shared -march=vr4300 -mfix4300 -mabi=32 -mhard-float -mdivide-breaks -fno-stack-protector -fno-common -fno-zero-initialized-in-bss -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
+  CFLAGS += -Wno-missing-braces
 else ifeq ($(COMPILER),clang)
-  CFLAGS += -target mips -mabi=32 -G 0 -mhard-float -fomit-frame-pointer -fno-stack-protector -fno-common -I include -I src/ -I $(BUILD_DIR)/include -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra -Wno-missing-braces -fno-jump-tables
+  CFLAGS += -target mips -mabi=32 -G 0 -mhard-float -fomit-frame-pointer -fno-stack-protector -fno-common -I include -I src/ -I $(BUILD_DIR)/include -fno-PIC -mno-abicalls -fno-strict-aliasing -fno-inline-functions -ffreestanding -fwrapv -Wall -Wextra
+  CFLAGS += -Wno-missing-braces -fno-jump-tables
 else
   CFLAGS += -non_shared -Wab,-r4300_mul -Xcpluscomm -Xfullwarn -signed -32
 endif
@@ -446,7 +511,7 @@ else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
-EMULATOR = ~/Downloads/mupen64plus/mupen64plus-gui
+EMULATOR = mupen64plus
 EMU_FLAGS =
 LOADER = loader64
 LOADER_FLAGS = -vwf
@@ -494,6 +559,10 @@ distclean: clean
 
 test: $(ROM)
 	$(EMULATOR) $(EMU_FLAGS) $<
+
+test-pj64: $(ROM)
+	wine ~/Desktop/new64/Project64.exe $<
+# someone2639
 
 load: $(ROM)
 	$(LOADER) $(LOADER_FLAGS) $<
@@ -546,9 +615,17 @@ $(BUILD_DIR)/src/usb/usb.o: OPT_FLAGS := -O0
 $(BUILD_DIR)/src/usb/usb.o: CFLAGS += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
 $(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := -O0
 $(BUILD_DIR)/src/usb/debug.o: CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
-$(BUILD_DIR)/src/audio/*.o: OPT_FLAGS := -Os -fno-jump-tables
-$(BUILD_DIR)/src/engine/math_util.o: OPT_FLAGS := -Ofast -fno-unroll-loops -fno-peel-loops --param case-values-threshold=20
-$(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := -Ofast --param case-values-threshold=20
+# File specific opt flags
+$(BUILD_DIR)/src/audio/*.o:                   OPT_FLAGS := -Os -fno-jump-tables
+
+$(BUILD_DIR)/src/engine/surface_collision.o:  OPT_FLAGS := $(COLLISION_OPT_FLAGS)
+$(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := $(MATH_UTIL_OPT_FLAGS)
+$(BUILD_DIR)/src/game/rendering_graph_node.o: OPT_FLAGS := $(GRAPH_NODE_OPT_FLAGS)
+
+# $(info OPT_FLAGS:            $(OPT_FLAGS))
+# $(info COLLISION_OPT_FLAGS:  $(COLLISION_OPT_FLAGS))
+# $(info MATH_UTIL_OPT_FLAGS:  $(MATH_UTIL_OPT_FLAGS))
+# $(info GRAPH_NODE_OPT_FLAGS: $(GRAPH_NODE_OPT_FLAGS))
 
 ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) asm/debug $(GODDARD_SRC_DIRS) $(LIBZ_SRC_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) rsp include) $(YAY0_DIR) $(addprefix $(YAY0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION)
 
@@ -559,7 +636,7 @@ $(BUILD_DIR)/include/text_strings.h: $(BUILD_DIR)/include/text_menu_strings.h
 $(BUILD_DIR)/src/menu/file_select.o: $(BUILD_DIR)/include/text_strings.h
 $(BUILD_DIR)/src/menu/star_select.o: $(BUILD_DIR)/include/text_strings.h
 $(BUILD_DIR)/src/game/ingame_menu.o: $(BUILD_DIR)/include/text_strings.h
-$(BUILD_DIR)/src/game/puppycam2.o: $(BUILD_DIR)/include/text_strings.h
+$(BUILD_DIR)/src/game/puppycam2.o:   $(BUILD_DIR)/include/text_strings.h
 
 
 
