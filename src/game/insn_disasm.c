@@ -1,5 +1,7 @@
 #include <PR/ultratypes.h>
 #include <stdio.h>
+
+#include "sm64.h"
 #include "macros.h"
 #include "farcall.h"
 
@@ -17,7 +19,7 @@ enum ParamTypes {
     PARAM_LUI,
 };
 
-extern far char *parse_map(u32);
+extern far char *parse_map(u32 pc);
 static char insn_as_string[100];
 
 typedef struct __attribute__((packed)) {
@@ -105,7 +107,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         }
     }
 
-    for (int i = 0;  i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
+    for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
 
     for (int i = 0; i < ARRAY_COUNT(insn_db); i++) {
         if (insn.i.opcode != 0 && insn.i.opcode == insn_db[i].opcode) {
@@ -124,7 +126,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     break;
                 case PARAM_JAL:
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
-                    if ((u32)parse_map != 0x80345678) {
+                    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
                         strp += sprintf(strp, "%-8s %s", insn_db[i].name,
                                                          parse_map(target)
                         );
@@ -144,8 +146,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
             }
             successful_print = 1;
             break;
-        }
-        else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
+        } else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
                 strp += sprintf(strp, "%-8s %s %s %s", insn_db[i].name,
                                                    registerMaps[insn.i.rdata.rd],
                                                    registerMaps[insn.i.rs],
@@ -165,6 +166,3 @@ char *insn_disasm(InsnData insn, u32 isPC) {
 
     return insn_as_string;
 }
-
-
-
