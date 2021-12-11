@@ -229,12 +229,11 @@ static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
 
 // TODO:
 //      - Breakout create_shadow_below_xyz into multiple functions
-//      - Use 'shifted' parameter again
 /**
  * Create a shadow at the absolute position given, with the given parameters.
  * Return a pointer to the display list representing the shadow.
  */
-Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 shadowType) {
+Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 shadowType, s8 shifted) {
     struct Object *obj = gCurGraphNodeObjectNode;
     // Check if the object exists.
     if (obj == NULL) {
@@ -265,6 +264,8 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         if (s->floor == NULL) {
             return NULL;
         }
+        // No need to shift the shadow height later since the find_floor call uses the shifted position.
+        shifted = FALSE;
     }
 
     // Read the floor's normals
@@ -272,6 +273,11 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     register f32 nx = floor->normal.x;
     register f32 ny = floor->normal.y;
     register f32 nz = floor->normal.z;
+
+    // If the animation changes the shadow position, move it to the position.
+    if (shifted) {
+        s->floorHeight = -((x * nx) + (z * nz) + floor->originOffset) / ny;
+    }
 
     f32 distToShadow = (pos[1] - s->floorHeight);
     // Hide shadow if the object is below it.
@@ -329,6 +335,11 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             s8 idx = shadowType - SHADOW_RECTANGLE_HARDCODED_OFFSET;
             s->scale[0] *= sShadowRectangles[idx].scaleX;
             s->scale[2] *= sShadowRectangles[idx].scaleZ;
+            if (sShadowRectangles[idx].scaleWithDistance) {
+                f32 dy = (pos[1] - s->floorHeight);
+                scale_shadow_with_distance(s->scale[0], dy);
+                scale_shadow_with_distance(s->scale[2], dy);
+            }
         }
     }
 
