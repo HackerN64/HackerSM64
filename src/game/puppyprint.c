@@ -747,7 +747,7 @@ void puppyprint_profiler_process(void) {
         }
     }
 
-    if (!(gGlobalTimer & NUM_PERF_ITERATIONS)) {
+    if (!(gGlobalTimer % NUM_PERF_ITERATIONS)) {
         get_average_perf_time(   scriptTime);
         get_average_perf_time(behaviourTime);
         get_average_perf_time(collisionTime);
@@ -843,141 +843,8 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
     gDPFillRectangle(gDisplayListHead++, x1, y1, x2 - cycleadd, y2 - cycleadd);
 }
 
-#include "level_update.h"
-
-void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font) {
-    *offsetY = 0;
-    u8 **textKern = segmented_to_virtual(puppyprint_kerning_lut);
-    u8 *textLen = segmented_to_virtual(textKern[font]);
-
-    if (letter >= '0' && letter <= '9') { // Line 1
-        *textX = ((letter - '0') * 4);
-        *textY = 0;
-        *spaceX = textLen[(letter - '0') +  0];
-    } else if (letter >= 'A' && letter <= 'P') { // Line 2
-        *textX = ((letter - 'A') * 4);
-        *textY = 6;
-        *spaceX = textLen[(letter - 'A') + 16];
-    } else if (letter >= 'Q' && letter <= 'Z') { // Line 3
-        *textX = ((letter - 'Q') * 4);
-        *textY = 12;
-        *spaceX = textLen[(letter - 'Q') + 32];
-    } else if (letter >= 'a' && letter <= 'p') { // Line 4
-        *textX = ((letter - 'a') * 4);
-        *textY = 18;
-        *spaceX = textLen[(letter - 'a') + 48];
-    } else if (letter >= 'q' && letter <= 'z') { // Line 5
-        *textX = ((letter - 'q') * 4);
-        *textY = 24;
-        *spaceX = textLen[(letter - 'q') + 64];
-    } else { // Space, the final frontier.
-        *textX  = 128;
-        *textY  =  12;
-        *spaceX =   2;
-    }
-
-    switch (letter) {
-        case '-': *textX = 40; *textY =  0; *spaceX = textLen[10]; break; // Hyphen
-        case '+': *textX = 44; *textY =  0; *spaceX = textLen[11]; break; // Plus
-        case '(': *textX = 48; *textY =  0; *spaceX = textLen[12]; break; // Open Bracket
-        case ')': *textX = 52; *textY =  0; *spaceX = textLen[13]; break; // Close Bracket
-        case '!': *textX = 56; *textY =  0; *spaceX = textLen[14]; break; // Exclamation mark
-        case '?': *textX = 60; *textY =  0; *spaceX = textLen[15]; break; // Question mark
-
-        case '"': *textX = 40; *textY = 12; *spaceX = textLen[42]; break; // Speech mark
-        case'\'': *textX = 44; *textY = 12; *spaceX = textLen[43]; break; // Apostrophe
-        case ':': *textX = 48; *textY = 12; *spaceX = textLen[44]; break; // Colon
-        case ';': *textX = 52; *textY = 12; *spaceX = textLen[45]; break; // Semicolon
-        case '.': *textX = 56; *textY = 12; *spaceX = textLen[46]; break; // Full stop
-        case ',': *textX = 60; *textY = 12; *spaceX = textLen[47]; break; // Comma
-
-        case '~': *textX = 40; *textY = 24; *spaceX = textLen[74]; break; // Tilde
-        case '@': *textX = 44; *textY = 24; *spaceX = textLen[75]; break; // Umlaut
-        case '^': *textX = 48; *textY = 24; *spaceX = textLen[76]; break; // Caret
-        case '/': *textX = 52; *textY = 24; *spaceX = textLen[77]; break; // Slash
-        case '_': *textX = 56; *textY = 24; *spaceX = textLen[78]; break; // Percent
-        case '&': *textX = 60; *textY = 24; *spaceX = textLen[79]; break; // Ampersand
-
-        // This is for the letters that sit differently on the line. It just moves them down a bit.
-        case 'g': *offsetY = 1; break;
-        case 'q': *offsetY = 1; break;
-        case 'p': if (font == FONT_DEFAULT) *offsetY = 3; break;
-        case 'y': if (font == FONT_DEFAULT) *offsetY = 1; break;
-    }
-}
-
-s8 shakeToggle = 0;
-s8  waveToggle = 0;
-
-s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
-    s32 len = 0;
-    while ((str[i + len] != '>') && ((i + len) < (signed)strlen(str))) len++;
-    len++;
-
-    if (runCMD) {
-        if (strncmp((str + i), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
-            // Each value is taken from the strong. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
-            s32 r = (((str[i +  5] - '0') * 10)
-                  +   (str[i +  6] - '0'));
-            s32 g = (((str[i +  7] - '0') * 10)
-                  +   (str[i +  8] - '0'));
-            s32 b = (((str[i +  9] - '0') * 10)
-                  +   (str[i + 10] - '0'));
-            s32 a = (((str[i + 11] - '0') * 10)
-                  +   (str[i + 12] - '0'));
-            // Multiply each value afterwards by 2.575f to make 255.
-            print_set_envcolour((r * 2.575f),
-                                (g * 2.575f),
-                                (b * 2.575f),
-                                (a * 2.575f));
-        } else if (strncmp((str + i), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
-            s32 r   = (((str[i +  6] - '0') * 10)
-                    +   (str[i +  7] - '0'));
-            s32 g   = (((str[i +  8] - '0') * 10)
-                    +   (str[i +  9] - '0'));
-            s32 b   = (((str[i + 10] - '0') * 10)
-                    +   (str[i + 11] - '0'));
-            s32 a   = (((str[i + 12] - '0') * 10)
-                    +   (str[i + 13] - '0'));
-            s32 r2  = (((str[i + 15] - '0') * 10)
-                    +   (str[i + 16] - '0'));
-            s32 g2  = (((str[i + 17] - '0') * 10)
-                    +   (str[i + 18] - '0'));
-            s32 b2  = (((str[i + 19] - '0') * 10)
-                    +   (str[i + 20] - '0'));
-            s32 a2  = (((str[i + 21] - '0') * 10)
-                    +   (str[i + 22] - '0'));
-            s32 spd = (((str[i + 24] - '0') * 10)
-                    +   (str[i + 25] - '0'));
-            // Find the median.
-            s32 r3 = (r + r2) * 1.2875f;
-            s32 g3 = (g + g2) * 1.2875f;
-            s32 b3 = (b + b2) * 1.2875f;
-            s32 a3 = (a + a2) * 1.2875f;
-            // Find the difference.
-            s32 r4 = (r - r2) * 1.2875f;
-            s32 g4 = (g - g2) * 1.2875f;
-            s32 b4 = (b - b2) * 1.2875f;
-            s32 a4 = (a - a2) * 1.2875f;
-            // Now start from the median, and wave from end to end with the difference, to create the fading effect.
-            f32 sTimer = sins(gGlobalTimer * spd * 50);
-            print_set_envcolour((r3 + (sTimer * r4)),
-                                (g3 + (sTimer * g4)),
-                                (b3 + (sTimer * b4)),
-                                (a3 + (sTimer * a4)));
-        } else if (strncmp((str + i), "<RAINBOW>", 8) == 0) { // Toggles the happy colours :o) Do it again to disable it.
-            s32 r = (coss( gGlobalTimer * 600         ) + 1) * 127;
-            s32 g = (coss((gGlobalTimer * 600) + 21845) + 1) * 127;
-            s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
-            print_set_envcolour(r, g, b, 255);
-        } else if (strncmp((str + i), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
-            shakeToggle ^= 1;
-        } else if (strncmp((str + i), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
-            waveToggle  ^= 1;
-        }
-    }
-    return len;
-}
+extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
+extern void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font);
 
 s32 get_text_width(const char *str, s32 font) {
     s32 i       = 0;
@@ -1023,6 +890,9 @@ const Gfx dl_small_text_begin[] = {
     gsDPSetTextureFilter(G_TF_POINT),
     gsSPEndDisplayList(),
 };
+
+s8 shakeToggle = 0;
+s8  waveToggle = 0;
 
 void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 font) {
     s32 textX = 0;
@@ -1138,6 +1008,137 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
+}
+
+s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
+    s32 len = 0;
+    while ((str[i + len] != '>') && ((i + len) < (signed)strlen(str))) len++;
+    len++;
+
+    if (runCMD) {
+        if (strncmp((str + i), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
+            // Each value is taken from the strong. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
+            s32 r = (((str[i +  5] - '0') * 10)
+                  +   (str[i +  6] - '0'));
+            s32 g = (((str[i +  7] - '0') * 10)
+                  +   (str[i +  8] - '0'));
+            s32 b = (((str[i +  9] - '0') * 10)
+                  +   (str[i + 10] - '0'));
+            s32 a = (((str[i + 11] - '0') * 10)
+                  +   (str[i + 12] - '0'));
+            // Multiply each value afterwards by 2.575f to make 255.
+            print_set_envcolour((r * 2.575f),
+                                (g * 2.575f),
+                                (b * 2.575f),
+                                (a * 2.575f));
+        } else if (strncmp((str + i), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
+            s32 r   = (((str[i +  6] - '0') * 10)
+                    +   (str[i +  7] - '0'));
+            s32 g   = (((str[i +  8] - '0') * 10)
+                    +   (str[i +  9] - '0'));
+            s32 b   = (((str[i + 10] - '0') * 10)
+                    +   (str[i + 11] - '0'));
+            s32 a   = (((str[i + 12] - '0') * 10)
+                    +   (str[i + 13] - '0'));
+            s32 r2  = (((str[i + 15] - '0') * 10)
+                    +   (str[i + 16] - '0'));
+            s32 g2  = (((str[i + 17] - '0') * 10)
+                    +   (str[i + 18] - '0'));
+            s32 b2  = (((str[i + 19] - '0') * 10)
+                    +   (str[i + 20] - '0'));
+            s32 a2  = (((str[i + 21] - '0') * 10)
+                    +   (str[i + 22] - '0'));
+            s32 spd = (((str[i + 24] - '0') * 10)
+                    +   (str[i + 25] - '0'));
+            // Find the median.
+            s32 r3 = (r + r2) * 1.2875f;
+            s32 g3 = (g + g2) * 1.2875f;
+            s32 b3 = (b + b2) * 1.2875f;
+            s32 a3 = (a + a2) * 1.2875f;
+            // Find the difference.
+            s32 r4 = (r - r2) * 1.2875f;
+            s32 g4 = (g - g2) * 1.2875f;
+            s32 b4 = (b - b2) * 1.2875f;
+            s32 a4 = (a - a2) * 1.2875f;
+            // Now start from the median, and wave from end to end with the difference, to create the fading effect.
+            f32 sTimer = sins(gGlobalTimer * spd * 50);
+            print_set_envcolour((r3 + (sTimer * r4)),
+                                (g3 + (sTimer * g4)),
+                                (b3 + (sTimer * b4)),
+                                (a3 + (sTimer * a4)));
+        } else if (strncmp((str + i), "<RAINBOW>", 8) == 0) { // Toggles the happy colours :o) Do it again to disable it.
+            s32 r = (coss( gGlobalTimer * 600         ) + 1) * 127;
+            s32 g = (coss((gGlobalTimer * 600) + 21845) + 1) * 127;
+            s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
+            print_set_envcolour(r, g, b, 255);
+        } else if (strncmp((str + i), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
+            shakeToggle ^= 1;
+        } else if (strncmp((str + i), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
+            waveToggle  ^= 1;
+        }
+    }
+    return len;
+}
+
+void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font) {
+    *offsetY = 0;
+    u8 **textKern = segmented_to_virtual(puppyprint_kerning_lut);
+    u8 *textLen = segmented_to_virtual(textKern[font]);
+
+    if (letter >= '0' && letter <= '9') { // Line 1
+        *textX = ((letter - '0') * 4);
+        *textY = 0;
+        *spaceX = textLen[(letter - '0') +  0];
+    } else if (letter >= 'A' && letter <= 'P') { // Line 2
+        *textX = ((letter - 'A') * 4);
+        *textY = 6;
+        *spaceX = textLen[(letter - 'A') + 16];
+    } else if (letter >= 'Q' && letter <= 'Z') { // Line 3
+        *textX = ((letter - 'Q') * 4);
+        *textY = 12;
+        *spaceX = textLen[(letter - 'Q') + 32];
+    } else if (letter >= 'a' && letter <= 'p') { // Line 4
+        *textX = ((letter - 'a') * 4);
+        *textY = 18;
+        *spaceX = textLen[(letter - 'a') + 48];
+    } else if (letter >= 'q' && letter <= 'z') { // Line 5
+        *textX = ((letter - 'q') * 4);
+        *textY = 24;
+        *spaceX = textLen[(letter - 'q') + 64];
+    } else { // Space, the final frontier.
+        *textX  = 128;
+        *textY  =  12;
+        *spaceX =   2;
+    }
+
+    switch (letter) {
+        case '-': *textX = 40; *textY =  0; *spaceX = textLen[10]; break; // Hyphen
+        case '+': *textX = 44; *textY =  0; *spaceX = textLen[11]; break; // Plus
+        case '(': *textX = 48; *textY =  0; *spaceX = textLen[12]; break; // Open Bracket
+        case ')': *textX = 52; *textY =  0; *spaceX = textLen[13]; break; // Close Bracket
+        case '!': *textX = 56; *textY =  0; *spaceX = textLen[14]; break; // Exclamation mark
+        case '?': *textX = 60; *textY =  0; *spaceX = textLen[15]; break; // Question mark
+
+        case '"': *textX = 40; *textY = 12; *spaceX = textLen[42]; break; // Speech mark
+        case'\'': *textX = 44; *textY = 12; *spaceX = textLen[43]; break; // Apostrophe
+        case ':': *textX = 48; *textY = 12; *spaceX = textLen[44]; break; // Colon
+        case ';': *textX = 52; *textY = 12; *spaceX = textLen[45]; break; // Semicolon
+        case '.': *textX = 56; *textY = 12; *spaceX = textLen[46]; break; // Full stop
+        case ',': *textX = 60; *textY = 12; *spaceX = textLen[47]; break; // Comma
+
+        case '~': *textX = 40; *textY = 24; *spaceX = textLen[74]; break; // Tilde
+        case '@': *textX = 44; *textY = 24; *spaceX = textLen[75]; break; // Umlaut
+        case '^': *textX = 48; *textY = 24; *spaceX = textLen[76]; break; // Caret
+        case '/': *textX = 52; *textY = 24; *spaceX = textLen[77]; break; // Slash
+        case '_': *textX = 56; *textY = 24; *spaceX = textLen[78]; break; // Percent
+        case '&': *textX = 60; *textY = 24; *spaceX = textLen[79]; break; // Ampersand
+
+        // This is for the letters that sit differently on the line. It just moves them down a bit.
+        case 'g': *offsetY = 1; break;
+        case 'q': *offsetY = 1; break;
+        case 'p': if (font == FONT_DEFAULT) *offsetY = 3; break;
+        case 'y': if (font == FONT_DEFAULT) *offsetY = 1; break;
+    }
 }
 
 void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNUSED s32 scaleX, UNUSED s32 scaleY, s32 mode) {
