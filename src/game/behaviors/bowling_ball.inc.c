@@ -241,7 +241,8 @@ void bhv_free_bowling_ball_init(void) {
 }
 
 void bhv_free_bowling_ball_roll_loop(void) {
-    s16 collisionFlags = object_step();
+    // See comment below about collisionFlags
+    /* s16 collisionFlags = */ object_step();
 
     bowling_ball_set_hitbox();
 

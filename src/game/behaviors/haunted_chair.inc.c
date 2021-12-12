@@ -98,7 +98,7 @@ void haunted_chair_act_1(void) {
 
                 obj_compute_vel_from_move_pitch(50.0f);
             } else if (o->oHauntedChairSpinTimer > 20) {
-                if (gGlobalTimer & 4 == 0) {
+                if ((gGlobalTimer & 4) == 0) {
                     cur_obj_play_sound_2(SOUND_GENERAL_HAUNTED_CHAIR_SWISH_AIR);
                 }
 

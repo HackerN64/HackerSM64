@@ -88,7 +88,7 @@ struct DynListBankInfo {
 static OSMesgQueue D_801BE830; // controller msg queue
 static OSMesg D_801BE848[10];
 u8 EUpad1[0x40];
-static OSMesgQueue D_801BE8B0;
+UNUSED static OSMesgQueue D_801BE8B0;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
 // static u32 unref_801be870[16];
 // static u32 unref_801be8e0[25];
@@ -167,7 +167,7 @@ static LookAt D_801BE7D0[3];
 static OSMesgQueue D_801BE830; // controller msg queue
 static OSMesg D_801BE848[10];
 UNUSED static u32 unref_801be870[16];
-static OSMesgQueue D_801BE8B0;
+UNUSED static OSMesgQueue D_801BE8B0;
 static OSMesgQueue sGdDMAQueue; // @ 801BE8C8
 UNUSED static u32 unref_801be8e0[25];
 static OSMesg sGdMesgBuf[1]; // @ 801BE944
@@ -201,7 +201,7 @@ static s32 D_801A86BC = 1;
 static s32 D_801A86C0 = 0; // gd_dl id for something?
 UNUSED static u32 unref_801a86C4 = 10;
 static s32 sMtxParamType = G_MTX_PROJECTION;
-static struct GdVec3f D_801A86CC = { 1.0f, 1.0f, 1.0f };
+UNUSED static struct GdVec3f D_801A86CC = { 1.0f, 1.0f, 1.0f };
 static struct ObjView *sActiveView = NULL;  // @ 801A86D8 current view? used when drawing dl
 static struct ObjView *sScreenView = NULL; // @ 801A86DC
 static struct ObjView *D_801A86E0 = NULL;
@@ -506,11 +506,11 @@ static Gfx gd_dl_sparkle[] = {
     gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
     gsDPSetRenderMode(G_RM_AA_ZB_TEX_EDGE, G_RM_NOOP2),
     gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, 
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, 
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPVertex(gd_vertex_sparkle, 4, 0),
@@ -659,7 +659,7 @@ static Gfx gd_dl_mario_face_shine[] = {
     gsDPSetTexturePersp(G_TP_PERSP),
     gsDPSetTextureFilter(G_TF_BILERP),
     gsDPSetCombineMode(G_CC_HILITERGBA, G_CC_HILITERGBA),
-    gsDPLoadTextureBlock(gd_texture_mario_face_shine, G_IM_FMT_IA, G_IM_SIZ_8b, 32, 32, 0, 
+    gsDPLoadTextureBlock(gd_texture_mario_face_shine, G_IM_FMT_IA, G_IM_SIZ_8b, 32, 32, 0,
                         G_TX_WRAP | G_TX_NOMIRROR, G_TX_WRAP | G_TX_NOMIRROR, 5, 5, G_TX_NOLOD, G_TX_NOLOD),
     gsDPPipeSync(),
     gsSPEndDisplayList(),
@@ -1266,7 +1266,7 @@ void gd_vblank(void) {
 }
 
 /**
- * Copies the player1 controller data from p1cont to sGdContPads[0]. 
+ * Copies the player1 controller data from p1cont to sGdContPads[0].
  */
 void gd_copy_p1_contpad(OSContPad *p1cont) {
     u32 i;                                    // 24
@@ -2362,7 +2362,7 @@ void parse_p1_controller(void) {
     OSContPad *currInputs;
     OSContPad *prevInputs;
 
-    // Copy current inputs to previous 
+    // Copy current inputs to previous
     u8 *src = (u8 *) gdctrl;
     u8 *dest = (u8 *) gdctrl->prevFrame;
     for (i = 0; i < sizeof(struct GdControl); i++) {
@@ -2476,7 +2476,7 @@ void parse_p1_controller(void) {
     }
 }
 
-void stub_renderer_4(f32 arg0) {
+UNUSED void stub_renderer_4(f32 arg0) {
     return;
 
     // dead code
@@ -2489,7 +2489,7 @@ void stub_renderer_4(f32 arg0) {
 /**
  * Unused
  */
-void Unknown801A32F4(s32 arg0) {
+UNUSED void Unknown801A32F4(s32 arg0) {
     D_801BD774 = GD_LOWER_24(arg0) + D_801BAF28;
 }
 
@@ -2959,7 +2959,7 @@ void func_801A520C(void) {
 
     start_timer("1frame");
     start_timer("cpu");
-    stub_renderer_9();
+    // stub_renderer_9();
     reset_cur_dl_indices();
     parse_p1_controller();
     setup_timers();
@@ -2972,21 +2972,21 @@ void func_801A520C(void) {
     }
     split_timer("netupd");
     split_timer("cpu");
-    func_801A4808();
+    // func_801A4808();
     restart_timer("cpu");
-    func_801A025C();
+    // func_801A025C();
     update_cursor();
-    func_801A4918();
+    // func_801A4918();
     stop_timer("1frame");
     sTracked1FrameTime = get_scaled_timer_total("1frame");
     split_timer("cpu");
-    func_801A01EC();
+    // func_801A01EC();
 }
 
 /**
  * Unused
  */
-void Unknown801A5344(void) {
+UNUSED void Unknown801A5344(void) {
     if ((sActiveView = sScreenView) == NULL) {
         return;
     }
@@ -2997,8 +2997,8 @@ void Unknown801A5344(void) {
     gd_set_one_cycle();
     gd_enddlsplist_parent();
     func_801A4848(sScreenView->gdDlNum);
-    stub_renderer_9();
-    func_801A4808();
+    // stub_renderer_9();
+    // func_801A4808();
     sScreenView->gdDlNum = 0;
 }
 
@@ -3097,7 +3097,7 @@ void gd_init(void) {
  * functions from IRIS GL.
  * @param buf  pointer to an array of 16-bit values
  * @param len  maximum number of values to store
- */ 
+ */
 void init_pick_buf(s16 *buf, s32 len) {
     buf[0] = 0;
     buf[1] = 0;
@@ -3536,7 +3536,7 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
             fatal_printf("load_dynlist() unkown bank");
     }
 
-#define PAGE_SIZE 65536  // size of a 64K TLB page 
+#define PAGE_SIZE 65536  // size of a 64K TLB page
 
     segSize = dynlistSegEnd - dynlistSegStart;
     allocSegSpace = gd_malloc_temp(segSize + PAGE_SIZE);
@@ -3585,7 +3585,7 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
 /**
  * Unused (not called)
  */
-void stub_renderer_20(UNUSED u32 a0) {
+UNUSED void stub_renderer_20(UNUSED u32 a0) {
 }
 
 /**
@@ -3687,5 +3687,5 @@ void func_801A71CC(struct ObjNet *net) {
 }
 
 /* 255EB0 -> 255EC0 */
-void stub_renderer_21(void) {
+UNUSED void stub_renderer_21(void) {
 }

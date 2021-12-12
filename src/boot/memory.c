@@ -158,10 +158,12 @@ void *main_pool_alloc(u32 size, u32 side) {
         sPoolFreeSpace -= size;
         if (side == MEMORY_POOL_LEFT) {
             newListHead = (struct MainPoolBlock *) ((u8 *) sPoolListHeadL + size);
-            if (newListHead >= (u32)&_framebuffersSegmentBssStart && newListHead <= (u32)&_framebuffersSegmentBssEnd)
-                newListHead = ALIGN16((u32)&_framebuffersSegmentBssEnd + 0x40);
-            if (newListHead >= (u32)&_zbufferSegmentBssStart && newListHead <= (u32)&_zbufferSegmentBssEnd)
-                newListHead = ALIGN16((u32)&_zbufferSegmentBssEnd + 0x40);
+            if ((u32)newListHead >= (u32)&_framebuffersSegmentBssStart && (u32)newListHead <= (u32)&_framebuffersSegmentBssEnd) {
+                newListHead = (struct MainPoolBlock *)ALIGN16((u32)&_framebuffersSegmentBssEnd + 0x40);
+            }
+            if ((u32)newListHead >= (u32)&_zbufferSegmentBssStart && (u32)newListHead <= (u32)&_zbufferSegmentBssEnd) {
+                newListHead = (struct MainPoolBlock *)ALIGN16((u32)&_zbufferSegmentBssEnd + 0x40);
+            }
             sPoolListHeadL->next = newListHead;
             newListHead->prev = sPoolListHeadL;
             newListHead->next = NULL;

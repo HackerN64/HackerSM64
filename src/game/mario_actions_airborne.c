@@ -539,6 +539,7 @@ s32 act_freefall(struct MarioState *m) {
     }
 
     switch (m->actionArg) {
+        default:
         case ACT_ARG_FREEFALL_GENERAL:
             animation = MARIO_ANIM_GENERAL_FALL;
             break;
