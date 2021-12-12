@@ -909,7 +909,7 @@ void cur_obj_update(void) {
         objFlags & OBJ_FLAG_UCODE_LARGE // marked as large
         || (objListIndex == OBJ_LIST_SURFACE && !(objFlags & OBJ_FLAG_UCODE_SMALL)) // surface and _not_ marked as small
     ) {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_ZEX;
+        o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
     } else {
         o->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
     }

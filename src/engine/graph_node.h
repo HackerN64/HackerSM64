@@ -20,10 +20,13 @@ enum GraphRenderFlags {
     GRAPH_RENDER_OCCLUDE_SILHOUETTE = (1 << 7), // 0x0080
 };
 
-// only used when OBJECTS_REJ is enabled
+// UCode indices for listHeads & listTails
 enum GraphNodeUCodes {
-    GRAPH_NODE_UCODE_ZEX,
+    GRAPH_NODE_UCODE_DEFAULT,
+#ifdef OBJECTS_REJ
     GRAPH_NODE_UCODE_REJ,
+#endif
+    GRAPH_NODE_NUM_UCODES,
 };
 
 // The amount of bits to use for the above flags out of a s16 variable.
@@ -182,13 +185,8 @@ struct DisplayListNode {
  */
 struct GraphNodeMasterList {
     /*0x00*/ struct GraphNode node;
-#ifdef OBJECTS_REJ
-    /*0x14*/ struct DisplayListNode *listHeads[2][LAYER_COUNT];
-    /*0x34*/ struct DisplayListNode *listTails[2][LAYER_COUNT];
-#else
-    /*0x14*/ struct DisplayListNode *listHeads[LAYER_COUNT];
-    /*0x34*/ struct DisplayListNode *listTails[LAYER_COUNT];
-#endif
+    /*0x14*/ struct DisplayListNode *listHeads[GRAPH_NODE_NUM_UCODES][LAYER_COUNT];
+    /*0x34*/ struct DisplayListNode *listTails[GRAPH_NODE_NUM_UCODES][LAYER_COUNT];
 };
 
 /** Simply used as a parent to group multiple children.

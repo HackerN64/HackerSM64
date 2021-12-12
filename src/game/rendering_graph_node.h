@@ -32,11 +32,6 @@ enum AnimType {
 #define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_NON_ZB_FIRST) || ((layer) <= LAYER_LAST   ))
 
 #ifdef OBJECTS_REJ
-enum HeadsList {
-    LIST_HEADS_ZEX,
-    LIST_HEADS_REJ,
-};
-
  #if SILHOUETTE
     // Silhouette, .rej
     enum RenderPhases {

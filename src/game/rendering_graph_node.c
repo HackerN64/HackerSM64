@@ -202,28 +202,28 @@ struct RenderPhase {
     u8 startLayer;
     u8 endLayer;
 #ifdef OBJECTS_REJ
-    u8 headsIndex : 1;
+    u8 ucode;
 #endif
 };
 
-//                                              startLayer                      endLayer                        headsIndex
+//                                               startLayer                      endLayer                        ucode
 static struct RenderPhase sRenderPhases[] = {
 #ifdef OBJECTS_REJ
  #if SILHOUETTE
     // Silhouette, .rej
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE,   LIST_HEADS_ZEX },
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_LAST_BEFORE_SILHOUETTE,   LIST_HEADS_REJ },
-    /* RENDER_PHASE_REJ_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          LIST_HEADS_REJ },
-    /* RENDER_PHASE_REJ_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          LIST_HEADS_REJ },
-    /* RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST,  LIST_HEADS_REJ },
-    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST,                     LIST_HEADS_ZEX },
-    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     LIST_HEADS_REJ },
+    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE,   GRAPH_NODE_UCODE_DEFAULT },
+    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_LAST_BEFORE_SILHOUETTE,   GRAPH_NODE_UCODE_REJ     },
+    /* RENDER_PHASE_REJ_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          GRAPH_NODE_UCODE_REJ     },
+    /* RENDER_PHASE_REJ_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST,          GRAPH_NODE_UCODE_REJ     },
+    /* RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST,  GRAPH_NODE_UCODE_REJ     },
+    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST,                     GRAPH_NODE_UCODE_DEFAULT },
+    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     GRAPH_NODE_UCODE_REJ     },
  #else
     // No silhouette, .rej
-    /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    LIST_HEADS_ZEX },
-    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_ZB_LAST,                  LIST_HEADS_REJ },
-    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_ZB_FIRST,                 LAYER_LAST,                     LIST_HEADS_ZEX },
-    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     LIST_HEADS_REJ },
+    /* RENDER_PHASE_ZEX_BG                  */ { LAYER_FIRST,                    LAYER_FIRST,                    GRAPH_NODE_UCODE_DEFAULT },
+    /* RENDER_PHASE_REJ_ZB                  */ { LAYER_ZB_FIRST,                 LAYER_ZB_LAST,                  GRAPH_NODE_UCODE_REJ     },
+    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_ZB_FIRST,                 LAYER_LAST,                     GRAPH_NODE_UCODE_DEFAULT },
+    /* RENDER_PHASE_REJ_NON_ZB              */ { LAYER_NON_ZB_FIRST,             LAYER_LAST,                     GRAPH_NODE_UCODE_REJ     },
  #endif
 #else
  #if SILHOUETTE
@@ -241,27 +241,33 @@ static struct RenderPhase sRenderPhases[] = {
 };
 
 #ifdef OBJECTS_REJ
-static void reset_clipping(void) {
+void switch_ucode(s32 ucode) {
+    // Set the ucode and RCP settings
+    switch (ucode) {
+        default: // GRAPH_NODE_UCODE_DEFAULT
+        case GRAPH_NODE_UCODE_DEFAULT:
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo); // F3DZEX2_PosLight
+            // Reset the RCP settings
+            init_rcp(KEEP_ZBUFFER);
+            break;
+        case GRAPH_NODE_UCODE_REJ:
+            // Use .rej Microcode, skip sub-pixel processing on console
+            if (gIsConsole) {
+                gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
+            } else {
+                gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
+            }
+            // Reset the RCP settings
+            init_rcp(KEEP_ZBUFFER);
+            // Set the clip ratio (see init_rsp)
+            gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
+            break;
+    }
+    // Reset clipping
     if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
         make_viewport_clip_rect(&sEndCutsceneVp);
     } else {
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
-    }
-}
-
-static void switch_ucode(s32 headsIndex) {
-    if (headsIndex == LIST_HEADS_REJ) {
-        if (gIsConsole) {
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo);
-        } else {
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo);
-        }
-        init_rcp(KEEP_ZBUFFER);
-        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
-    } else { // LIST_HEADS_ZEX
-        gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
-        init_rcp(KEEP_ZBUFFER);
-        gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
     }
 }
 #endif
@@ -279,35 +285,35 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     s32 currLayer     = LAYER_FIRST;
     s32 startLayer    = LAYER_FIRST;
     s32 endLayer      = LAYER_LAST;
-#ifdef OBJECTS_REJ
-    s32 headsIndex    = LIST_HEADS_ZEX;
-#endif
-    s32 currPhase     = RENDER_PHASE_FIRST;
+    s32 ucode         = GRAPH_NODE_UCODE_DEFAULT;
+    s32 phaseIndex    = RENDER_PHASE_FIRST;
     s32 enableZBuffer = (node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0;
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
 
 #ifdef F3DEX_GBI_2
+    // @bug This is where the LookAt values should be calculated but aren't.
+    // As a result, environment mapping is broken on Fast3DEX2 without the
+    // changes below.
     Mtx lMtx;
  #ifdef FIX_REFLECT_MTX
     guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 0.0f, -1.0f, 0.0f /* up */);
  #else
-    // @bug This is where the LookAt values should be calculated but aren't.
-    // As a result, environment mapping is broken on Fast3DEX2 without the
-    // changes below.
     guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 1.0f, 0.0f, 0.0f /* up */);
  #endif
 #endif // F3DEX_GBI_2
 
-    for (currPhase = RENDER_PHASE_FIRST; currPhase < RENDER_PHASE_END; currPhase++) {
-        renderPhase = &sRenderPhases[currPhase];
+    // Loop through the render phases
+    for (phaseIndex = RENDER_PHASE_FIRST; phaseIndex < RENDER_PHASE_END; phaseIndex++) {
+        // Get the render phase information.
+        renderPhase = &sRenderPhases[phaseIndex];
         startLayer  = renderPhase->startLayer;
         endLayer    = renderPhase->endLayer;
 #ifdef OBJECTS_REJ
-        headsIndex  = renderPhase->headsIndex;
-        switch_ucode(headsIndex);
+        ucode       = renderPhase->ucode;
+        // Set the ucode for the current render phase
+        switch_ucode(ucode);
         gSPLookAt(gDisplayListHead++, &lookAt);
-        reset_clipping();
 #endif
         if (enableZBuffer) {
             // Enable z buffer.
@@ -317,17 +323,13 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         // Iterate through the layers on the current render phase.
         for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
             // Set 'currList' to the first DisplayListNode on the current layer.
-#ifdef OBJECTS_REJ
-            currList = node->listHeads[headsIndex][currLayer];
-#else
-            currList = node->listHeads[currLayer];
-#endif
+            currList = node->listHeads[ucode][currLayer];
 #if defined(DISABLE_AA) || !SILHOUETTE
             // Set the render mode for the current layer.
             gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer],
                                                  mode2List->modes[currLayer]);
 #else
-            if (currPhase == RENDER_PHASE_NON_SILHOUETTE) {
+            if (phaseIndex == RENDER_PHASE_NON_SILHOUETTE) {
                 // To properly cover the silhouette, disable AA.
                 // The silhouette model does not have AA due to the hack used to prevent triangle overlap.
                 gDPSetRenderMode(gDisplayListHead++, (mode1List->modes[currLayer] & ~IM_RD),
@@ -344,7 +346,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
                 gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
                           (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
 #if SILHOUETTE
-                if (currPhase == RENDER_PHASE_SILHOUETTE) {
+                if (phaseIndex == RENDER_PHASE_SILHOUETTE) {
                     // Add the current display list to the master list, with silhouette F3D.
                     gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
                     gSPDisplayList(gDisplayListHead++, currList->displayList);
@@ -368,16 +370,11 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         gDPPipeSync(gDisplayListHead++);
         gSPClearGeometryMode(gDisplayListHead++, G_ZBUFFER);
     }
-#ifdef F3DZEX_GBI_2
- #ifdef VISUAL_DEBUG
+#if defined(F3DZEX_GBI_2) && defined(VISUAL_DEBUG)
     if (hitboxView) render_debug_boxes(DEBUG_UCODE_REJ);
- #endif
- #ifdef OBJECTS_REJ
-    gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo);
-    init_rcp(KEEP_ZBUFFER);
-    gSPClipRatio(gDisplayListHead++, FRUSTRATIO_1);
-    reset_clipping();
- #endif
+#endif
+#ifdef OBJECTS_REJ
+    switch_ucode(GRAPH_NODE_UCODE_DEFAULT);
 #endif
 #ifdef VISUAL_DEBUG
     if ( hitboxView) render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
@@ -391,24 +388,17 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
  * render modes of layers.
  */
 void geo_append_display_list(void *displayList, s32 layer) {
-#ifdef OBJECTS_REJ
-    s32 index = LIST_HEADS_ZEX;
-#endif
+    s32 ucode = GRAPH_NODE_UCODE_DEFAULT;
 #ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);
 #endif
 #if defined(OBJECTS_REJ) || SILHOUETTE
     if (gCurGraphNodeObject != NULL) {
  #ifdef OBJECTS_REJ
-        if (gCurGraphNodeObject->ucode == GRAPH_NODE_UCODE_REJ) {
-            index = LIST_HEADS_REJ;
-        }
+        ucode = gCurGraphNodeObject->ucode;
  #endif
  #if SILHOUETTE
         if (gCurGraphNodeObject->node.flags & GRAPH_RENDER_SILHOUETTE) {
-  #ifdef OBJECTS_REJ
-            index = LIST_HEADS_REJ;
-  #endif
             switch (layer) {
                 case LAYER_OPAQUE: layer = LAYER_SILHOUETTE_OPAQUE; break;
                 case LAYER_ALPHA:  layer = LAYER_SILHOUETTE_ALPHA;  break;
@@ -423,28 +413,19 @@ void geo_append_display_list(void *displayList, s32 layer) {
  #endif // SILHOUETTE
     }
 #endif // F3DZEX_GBI_2 || SILHOUETTE
-    if (gCurGraphNodeMasterList != 0) {
+    if (gCurGraphNodeMasterList != NULL) {
         struct DisplayListNode *listNode =
             alloc_only_pool_alloc(gDisplayListHeap, sizeof(struct DisplayListNode));
 
         listNode->transform = gMatStackFixed[gMatStackIndex];
         listNode->displayList = displayList;
-        listNode->next = 0;
-#ifdef OBJECTS_REJ
-        if (gCurGraphNodeMasterList->listHeads[index][layer] == 0) {
-            gCurGraphNodeMasterList->listHeads[index][layer] = listNode;
+        listNode->next = NULL;
+        if (gCurGraphNodeMasterList->listHeads[ucode][layer] == NULL) {
+            gCurGraphNodeMasterList->listHeads[ucode][layer] = listNode;
         } else {
-            gCurGraphNodeMasterList->listTails[index][layer]->next = listNode;
+            gCurGraphNodeMasterList->listTails[ucode][layer]->next = listNode;
         }
-        gCurGraphNodeMasterList->listTails[index][layer] = listNode;
-#else
-        if (gCurGraphNodeMasterList->listHeads[layer] == 0) {
-            gCurGraphNodeMasterList->listHeads[layer] = listNode;
-        } else {
-            gCurGraphNodeMasterList->listTails[layer]->next = listNode;
-        }
-        gCurGraphNodeMasterList->listTails[layer] = listNode;
-#endif
+        gCurGraphNodeMasterList->listTails[ucode][layer] = listNode;
     }
 }
 
@@ -469,17 +450,14 @@ static void append_dl_and_return(struct GraphNodeDisplayList *node) {
  * Process the master list node.
  */
 void geo_process_master_list(struct GraphNodeMasterList *node) {
-    s32 i;
+    s32 ucode, layer;
 
     if (gCurGraphNodeMasterList == NULL && node->node.children != NULL) {
         gCurGraphNodeMasterList = node;
-        for (i = 0; i < LAYER_COUNT; i++) {
-#ifdef OBJECTS_REJ
-            node->listHeads[LIST_HEADS_ZEX][i] = NULL;
-            node->listHeads[LIST_HEADS_REJ][i] = NULL;
-#else
-            node->listHeads[i] = NULL;
-#endif
+        for (ucode = 0; ucode < GRAPH_NODE_NUM_UCODES; ucode++) {
+            for (layer = LAYER_FIRST; layer < LAYER_COUNT; layer++) {
+                node->listHeads[ucode][layer] = NULL;
+            }
         }
         geo_process_node_and_siblings(node->node.children);
         geo_process_master_list_sub(gCurGraphNodeMasterList);

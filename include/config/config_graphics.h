@@ -72,7 +72,7 @@
 // #define DISABLE_SHADOWS
 
 
-// -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
+// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
 
 #ifndef F3DZEX_GBI_2
 #undef OBJECTS_REJ // OBJECTS_REJ requires f3dzex.
