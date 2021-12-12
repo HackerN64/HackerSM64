@@ -25,6 +25,12 @@
 #else
     .ascii "E"                  /* NTSC-U (North America) */
 #endif
+
+#if defined(PUPPYCAM) && defined(EEP4K)
+    #undef EEP4K
+    #define EEP16K
+#endif
+
 #if defined(SRAM)
     .byte  0x32                 /* Version */
 #elif defined(EEP16K)
