@@ -997,22 +997,24 @@ void puppycam_wall_angle(void) {
 
 void puppycam_projection_behaviours(void) {
     f32 turnRate = 1;
+    f32 turnMag = ABS(gPlayer1Controller->rawStickX / 80.0f);
 
     // This will only be executed if Mario's the target. If it's not, it'll reset the
     if (gPuppyCam.targetObj == gMarioState->marioObj) {
         if ((gPuppyCam.options.turnAggression > 0 && gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_TURN_HELPER && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_8DIR) &&
-        gMarioState->vel[1] == 0.0f && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_4DIR) && gPuppyCam.options.inputType != 2) || (gMarioState->action == ACT_SHOT_FROM_CANNON || gMarioState->action == ACT_FLYING)) { // Holy hell this is getting spicy.
+        gMarioState->vel[1] == 0.0f && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_4DIR) && gPuppyCam.options.inputType != 2) || gMarioState->action == ACT_SHOT_FROM_CANNON || gMarioState->action == ACT_FLYING) { // Holy hell this is getting spicy.
             // With turn aggression enabled, or if Mario's sliding, adjust the camera view behind mario.
             if (gPuppyCam.options.turnAggression > 0 || gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE || gMarioState->action == ACT_SHOT_FROM_CANNON || gMarioState->action == ACT_FLYING) {
                 if (gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE) {
                     turnRate = 4; // If he's sliding, do it 4x as fast.
                 }
+                if (gMarioState->action == ACT_SHOT_FROM_CANNON || gMarioState->action == ACT_FLYING)
+                    turnMag = 1;
                 // The deal here, is if Mario's moving, or he's sliding and the camera's within 90 degrees behind him, it'll auto focus behind him, with an intensity based on the camera's centre speed.
                 // It also scales with forward velocity, so it's a gradual effect as he speeds up.
-                if ((ABS(gPlayer1Controller->rawStickX) > 20 && !(gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE)) ||
-                    (gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE &&
-                     (s16)ABS(((gPuppyCam.yaw + 0x8000) % 0xFFFF - 0x8000) - ((gMarioState->faceAngle[1]) % 0xFFFF - 0x8000)) < 0x3000 ))
-                gPuppyCam.yawTarget = approach_angle(gPuppyCam.yawTarget, (gMarioState->faceAngle[1] + 0x8000), ((gPuppyCam.options.turnAggression * 10) * ABS(gMarioState->forwardVel / 32) * ABS(gPlayer1Controller->rawStickX / 80.0f) * turnRate));
+                if ((ABS(gPlayer1Controller->rawStickX) > 20 && !(gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE)) || (gMarioState->action == ACT_SHOT_FROM_CANNON) ||
+                    (gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE && (s16)ABS(((gPuppyCam.yaw + 0x8000) % 0xFFFF - 0x8000) - ((gMarioState->faceAngle[1]) % 0xFFFF - 0x8000)) < 0x3000 ))
+                gPuppyCam.yawTarget = approach_angle(gPuppyCam.yawTarget, (gMarioState->faceAngle[1] + 0x8000), ((gPuppyCam.options.turnAggression * 10) * ABS(gMarioState->forwardVel / 32) * turnMag * turnRate));
             }
         } else { //If none of the above is true, it'll attempt to do this instead.
             // If the camera's in these modes, snap the yaw to prevent desync.
