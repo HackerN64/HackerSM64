@@ -51,6 +51,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
     if (callContext == GEO_CONTEXT_RENDER) {
         struct Object *objectGraphNode = (struct Object *) gCurGraphNodeObject; // TODO: change this to object pointer?
         struct GraphNodeGenerated *currentGraphNode = (struct GraphNodeGenerated *) node;
+        s32 parameter = currentGraphNode->parameter;
 
         if (gCurGraphNodeHeldObject != NULL) {
             objectGraphNode = gCurGraphNodeHeldObject->objNode;
@@ -62,7 +63,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
         Gfx *dlHead = dlStart;
 
         if (objectOpacity == 0xFF) {
-            if (currentGraphNode->parameter == GEO_TRANSPARENCY_MODE_DECAL) {
+            if (parameter == GEO_TRANSPARENCY_MODE_DECAL) {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT_DECAL);
             } else {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_OPAQUE);
@@ -70,20 +71,22 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
 
             objectGraphNode->oAnimState = TRANSPARENCY_ANIM_STATE_OPAQUE;
         } else {
-            if (currentGraphNode->parameter == GEO_TRANSPARENCY_MODE_DECAL) {
+            if (parameter == GEO_TRANSPARENCY_MODE_DECAL) {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT_DECAL);
+            } else if (parameter == GEO_TRANSPARENCY_MODE_INTER) {
+                SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT_INTER);
             } else {
                 SET_GRAPH_NODE_LAYER(currentGraphNode->fnNode.node.flags, LAYER_TRANSPARENT);
             }
 
             objectGraphNode->oAnimState = TRANSPARENCY_ANIM_STATE_TRANSPARENT;
 
-            if (objectOpacity == 0x00 && segmented_to_virtual(bhvBowser) == objectGraphNode->behavior) {
+            if ((objectOpacity == 0x00) && segmented_to_virtual(bhvBowser) == objectGraphNode->behavior) {
                 objectGraphNode->oAnimState = BOWSER_ANIM_STATE_INVISIBLE;
             }
 
-            if (currentGraphNode->parameter != GEO_TRANSPARENCY_MODE_NO_DITHER
-                && (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA)) {
+            if ((parameter != GEO_TRANSPARENCY_MODE_NO_DITHER)
+             && (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA)) {
                 gDPSetAlphaCompare(dlHead++, G_AC_DITHER);
             }
         }
