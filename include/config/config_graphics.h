@@ -29,12 +29,10 @@
 // Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti)
 #define IA8_30FPS_COINS
 
-#ifdef F3DEX_GBI_2 // !Safeguard
-// Use .rej microcode for certain objects (experimental - only should be used when F3DEX_GBI_2 is defined).
+// Use .rej microcode for certain objects (experimental - only should be used when F3DZEX_GBI_2 is defined).
 // So far - recent tests have show that this has reduced performance overall due to CPU load,
 // though in some cases it may perform better.
 // #define OBJECTS_REJ
-#endif
 
 /**
  * Mario's silhouette when behind solid objects/surfaces
@@ -65,10 +63,27 @@
 // Uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
 // It is sideways in vanilla, and since vanilla's environment map textures are sideways too, they will appear as sideways in-game if this is enabled.
 // Make sure your custom environment map textures are the correct orientation.
-#define FIX_REFLECT_MTX
+// #define FIX_REFLECT_MTX
 
 // This improves performance a bit, and does not seem to break anything.
 #define DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 
 // Disables object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
-//#define DISABLE_SHADOWS
+// #define DISABLE_SHADOWS
+
+
+// -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
+
+#ifndef F3DZEX_GBI_2
+#undef OBJECTS_REJ // OBJECTS_REJ requires f3dzex.
+#endif // !F3DZEX_GBI_2
+
+#ifndef F3DEX_GBI_SHARED
+#undef OBJECTS_REJ // Non F3DEX-based ucodes do NOT support ucode switching.
+#endif // !F3DEX_GBI_SHARED
+
+#ifdef OBJECTS_REJ
+// Enable required ucodes.
+#define F3DEX2_REJ_GBI
+#define F3DLX2_REJ_GBI
+#endif // OBJECTS_REJ
