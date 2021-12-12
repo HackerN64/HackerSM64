@@ -50,7 +50,7 @@ struct MemoryPool {
     struct MemoryBlock freeList;
 };
 
-extern uintptr_t sSegmentTable[NUM_TLB_SEGMENTS];
+extern uintptr_t sSegmentTable[32];
 extern u32 sPoolFreeSpace;
 extern u8 *sPoolStart;
 extern u8 *sPoolEnd;
@@ -65,7 +65,7 @@ extern struct MainPoolBlock *sPoolListHeadR;
 struct MemoryPool *gEffectsMemoryPool;
 
 
-uintptr_t sSegmentTable[NUM_TLB_SEGMENTS];
+uintptr_t sSegmentTable[32];
 u32 sPoolFreeSpace;
 u8 *sPoolStart;
 u8 *sPoolEnd;
