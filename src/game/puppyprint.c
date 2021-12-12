@@ -686,6 +686,8 @@ void render_page_menu(void) {
 void puppyprint_render_profiler(void) {
     OSTime first = osGetTime();
 
+    print_set_envcolour(255, 255, 255, 255);
+
     if (!fDebug) {
         profiler_update(profilerTime, first);
         return;

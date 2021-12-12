@@ -879,7 +879,7 @@ void puppycam_terrain_angle(void) {
         adjustSpeed = 0.25f;
         farFromSurface = TRUE;
     } else {
-        adjustSpeed = CLAMP(MAX(gMarioState->forwardVel/480.0f, gPuppyCam.yawAcceleration/100.0f), 0.05f, 1.0f);
+        adjustSpeed = CLAMP(MAX(gMarioState->forwardVel/400.0f, gPuppyCam.yawAcceleration/100.0f), 0.05f, 1.0f);
 
         f32 x = gPuppyCam.targetObj->oPosX - (10 * sins(gPuppyCam.yaw));
         f32 z = gPuppyCam.targetObj->oPosZ - (10 * coss(gPuppyCam.yaw));
@@ -1000,10 +1000,10 @@ void puppycam_projection_behaviours(void) {
 
     // This will only be executed if Mario's the target. If it's not, it'll reset the
     if (gPuppyCam.targetObj == gMarioState->marioObj) {
-        if (gPuppyCam.options.turnAggression > 0 && gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_TURN_HELPER && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_8DIR) &&
-        gMarioState->vel[1] == 0.0f && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_4DIR) && gPuppyCam.options.inputType != 2) { // Holy hell this is getting spicy.
+        if ((gPuppyCam.options.turnAggression > 0 && gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_TURN_HELPER && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_8DIR) &&
+        gMarioState->vel[1] == 0.0f && !(gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_INPUT_4DIR) && gPuppyCam.options.inputType != 2) || (gMarioState->action == ACT_SHOT_FROM_CANNON || gMarioState->action == ACT_FLYING)) { // Holy hell this is getting spicy.
             // With turn aggression enabled, or if Mario's sliding, adjust the camera view behind mario.
-            if (gPuppyCam.options.turnAggression > 0 || gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE) {
+            if (gPuppyCam.options.turnAggression > 0 || gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE || gMarioState->action == ACT_SHOT_FROM_CANNON || gMarioState->action == ACT_FLYING) {
                 if (gMarioState->action & ACT_FLAG_BUTT_OR_STOMACH_SLIDE) {
                     turnRate = 4; // If he's sliding, do it 4x as fast.
                 }
@@ -1036,11 +1036,11 @@ void puppycam_projection_behaviours(void) {
 
         if (gMarioState->action == ACT_SLEEPING || gMarioState->action == ACT_START_SLEEPING) {
             gPuppyCam.zoom = approach_f32_asymptotic(gPuppyCam.zoom,gPuppyCam.zoomPoints[0],0.01f);
-        } else if (gMarioState->action & ACT_FLAG_SWIMMING && gMarioState->waterLevel-100 - gMarioState->pos[1] > 5) {
-            // When moving underwater, the camera will zoom in on Mayro.
+        } else if ((gMarioState->action & ACT_FLAG_SWIMMING_OR_FLYING && gMarioState->waterLevel-100 - gMarioState->pos[1] > 5) || gMarioState->action == ACT_FLYING) {
+            // When moving underwater or flying, the camera will zoom in on Mayro.
             gPuppyCam.zoom = approach_f32_asymptotic(gPuppyCam.zoom, MAX(gPuppyCam.zoomTarget/1.5f, gPuppyCam.zoomPoints[0]), 0.2f);
         } else {
-            gPuppyCam.zoom = approach_f32_asymptotic(gPuppyCam.zoom,gPuppyCam.zoomTarget,0.2f);
+            gPuppyCam.zoom = approach_f32_asymptotic(gPuppyCam.zoom,gPuppyCam.zoomTarget, 0.2f);
         }
         // Attempts at automatic adjustment that only apply when moving or jumping.
         if (gMarioState->action & ACT_FLAG_MOVING || gMarioState->action & ACT_FLAG_AIR || (gMarioState->action & ACT_FLAG_SWIMMING && !gMarioState->waterLevel-100 - gMarioState->pos[1] > 5 && gMarioState->forwardVel != 0.0f)) {
@@ -1061,7 +1061,7 @@ void puppycam_projection_behaviours(void) {
             gPuppyCam.zoom = approach_f32_asymptotic((f32)gPuppyCam.zoom, 250.0f, CLAMP((f32)((gPuppyCam.pitch - 0x38C0) / 3072.0f), 0.0f, 1.0f));
         }
 
-        if (!(gMarioState->action & ACT_FLAG_SWIMMING)) {
+        if (!(gMarioState->action & ACT_FLAG_SWIMMING_OR_FLYING)) {
             gPuppyCam.floorY[0] = softClamp(gPuppyCam.targetObj->oPosY - gPuppyCam.lastTargetFloorHeight, -180, 300);
             gPuppyCam.floorY[1] = softClamp(gPuppyCam.targetObj->oPosY - gPuppyCam.lastTargetFloorHeight, -180, 350);
             gPuppyCam.swimPitch = approach_f32_asymptotic(gPuppyCam.swimPitch,0,0.2f);
@@ -1072,7 +1072,7 @@ void puppycam_projection_behaviours(void) {
             gPuppyCam.lastTargetFloorHeight = gPuppyCam.targetObj->oPosY;
 
             gPuppyCam.yawTarget = approach_angle(gPuppyCam.yawTarget, (gMarioState->faceAngle[1] + 0x8000), (1000 * (gMarioState->forwardVel / 32)));
-            if (gMarioState->waterLevel - 100 - gMarioState->pos[1] > 5 && gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_PITCH_ROTATION) {
+            if ((gMarioState->waterLevel - 100 - gMarioState->pos[1] > 5 && gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_PITCH_ROTATION) || gMarioState->action == ACT_FLYING || gMarioState->action == ACT_SHOT_FROM_CANNON) {
                 gPuppyCam.swimPitch = approach_f32_asymptotic(gPuppyCam.swimPitch,gMarioState->faceAngle[0] / 10, 0.05f);
             } else {
                 gPuppyCam.swimPitch = approach_f32_asymptotic(gPuppyCam.swimPitch, 0, 0.2f);
@@ -1087,6 +1087,14 @@ void puppycam_projection_behaviours(void) {
 
         // This will shift the intended yaw when wall kicking, to align with the wall being kicked.
         // puppycam_wall_angle();
+
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+if (gMarioState->floor != NULL && gMarioState->floor->type == SURFACE_LOOK_UP_WARP && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 10) {
+        if (gPuppyCam.pitchTarget >= 0x7000) {
+            level_trigger_warp(gMarioState, WARP_OP_LOOK_UP);
+        }
+    }
+#endif
     } else {
         puppycam_reset_values();
     }
