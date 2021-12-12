@@ -963,10 +963,12 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             shadowScale = node->shadowScale * gCurGraphNodeObject->scale[0];
         }
 
-        if (gCurrAnimEnabled
-            && (gCurrAnimType == ANIM_TYPE_TRANSLATION
-                || gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION)
-        ) {
+        s8 shifted = (gCurrAnimEnabled
+                      && (gCurrAnimType == ANIM_TYPE_TRANSLATION
+                       || gCurrAnimType == ANIM_TYPE_LATERAL_TRANSLATION)
+        );
+
+        if (shifted) {
             struct GraphNode *geo = node->node.children;
             f32 objScale = 1.0f;
             if (geo != NULL && geo->type == GRAPH_NODE_TYPE_SCALE) {
@@ -989,8 +991,8 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             shadowPos[2] += -animOffset[0] * sinAng + animOffset[2] * cosAng;
         }
 
-        Gfx *shadowList = create_shadow_below_xyz(shadowPos, shadowScale,
-                                                  node->shadowSolidity, node->shadowType);
+        Gfx *shadowList = create_shadow_below_xyz(shadowPos, shadowScale * 0.5f,
+                                                  node->shadowSolidity, node->shadowType, shifted);
 
         if (shadowList != NULL) {
             mtxf_shadow(gMatStack[gMatStackIndex + 1], *gCurGraphNodeCamera->matrixPtr,

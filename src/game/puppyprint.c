@@ -728,8 +728,10 @@ void puppyprint_profiler_process(void) {
         }
     }
 
-    if ((gPlayer1Controller->buttonDown    & L_TRIG)
-     && (gPlayer1Controller->buttonPressed & U_JPAD)) {
+    if ((gPlayer1Controller->buttonPressed & (L_TRIG | U_JPAD))
+        && (gPlayer1Controller->buttonDown & L_TRIG)
+        && (gPlayer1Controller->buttonDown & U_JPAD)
+    ) {
         fDebug    ^= TRUE;
         sDebugMenu = FALSE;
     }
