@@ -430,13 +430,13 @@ extern f32 gSineTable[];
 
 /// Scale vector 'v' so it has length 1
 #define vec3_normalize(v) {                                     \
-    register f32 NAME_INVMAG(v) = vec3_mag((v));                \
+    f32 NAME_INVMAG(v) = vec3_mag((v));                         \
     NAME_INVMAG(v) = (1.0f / MAX(NAME_INVMAG(v), NEAR_ZERO));   \
     vec3_mul_val((v), NAME_INVMAG(v));                          \
 }
 
 #define vec3_normalize_max(v, max) {    \
-    register f32 v##_mag = vec3_mag(v); \
+    f32 v##_mag = vec3_mag(v);          \
     v##_mag = MAX(v##_mag, NEAR_ZERO);  \
     if (v##_mag > max) {                \
         v##_mag = (max / v##_mag);      \
@@ -558,8 +558,8 @@ void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dest, Vec3f src);
 void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dest, Vec3f src);
 void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dest, Vec3f src);
 
-extern void mtxf_to_mtx_asm(register void *dest, register void *src);
-ALWAYS_INLINE void mtxf_to_mtx(register void *dest, register void *src) {
+extern void mtxf_to_mtx_asm(void *dest, void *src);
+ALWAYS_INLINE void mtxf_to_mtx(void *dest, void *src) {
     mtxf_to_mtx_asm(dest, src);
     // guMtxF2L(src, dest);
 }
