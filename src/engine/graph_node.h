@@ -9,6 +9,15 @@
 #include "geo_commands.h"
 #include "game/memory.h"
 
+// UCode indices for listHeads & listTails
+enum GraphNodeUCodes {
+    GRAPH_NODE_UCODE_DEFAULT,
+#ifdef OBJECTS_REJ
+    GRAPH_NODE_UCODE_REJ,
+#endif
+    GRAPH_NODE_NUM_UCODES,
+};
+
 enum GraphRenderFlags {
     GRAPH_RENDER_ACTIVE             = (1 << 0), // 0x0001
     GRAPH_RENDER_CHILDREN_FIRST     = (1 << 1), // 0x0002
@@ -20,32 +29,26 @@ enum GraphRenderFlags {
     GRAPH_RENDER_OCCLUDE_SILHOUETTE = (1 << 7), // 0x0080
 };
 
-// UCode indices for listHeads & listTails
-enum GraphNodeUCodes {
-    GRAPH_NODE_UCODE_DEFAULT,
-#ifdef OBJECTS_REJ
-    GRAPH_NODE_UCODE_REJ,
-#endif
-    GRAPH_NODE_NUM_UCODES,
-};
-
-// The amount of bits to use for the above flags out of a s16 variable.
-// The remaining bits to the left are used for the render layers.
-// The vanilla value is 8, allowing for 8 flags and 255 layers.
-// The flags on top are used for ucode switching when rej is enabled,
 /**
- * The amount of bits to use for the above flags out of a s16 variable.
- * The remaining bits to the left are used for the render layers,
- * up until the ucode flags if OBJECTS_REJ is enabled, which allows up to
- * 64 layers, otherwise the number of layers can go all the way up to 255.
+ * The amount of bits to use for the above flags out of an s16 variable.
+ * The remaining bits to the left are used for the render layers.
+ * The vanilla value is 8, allowing for 8 flags and 255 layers.
  */
+#define GRAPH_RENDER_FLAGS_SIZE 8
 
-#define GRAPH_RENDER_FLAGS_SIZE  8
-#define GRAPH_RENDER_LAYERS_MASK 0xFF00
-#define GRAPH_RENDER_FLAGS_MASK  0x00FF
+// 0xFF00 when GRAPH_RENDER_FLAGS_SIZE is 8
+#define GRAPH_RENDER_LAYERS_MASK (BITMASK(16 - GRAPH_RENDER_FLAGS_SIZE) << GRAPH_RENDER_FLAGS_SIZE)
+// 0x00FF when GRAPH_RENDER_FLAGS_SIZE is 8
+#define GRAPH_RENDER_FLAGS_MASK  BITMASK(GRAPH_RENDER_FLAGS_SIZE)
 
+#if GRAPH_RENDER_FLAGS_SIZE == 8
+// Optimize the vanilla values
 #define SET_GRAPH_NODE_LAYER(flags, layer) ((flags) = ((flags) & GRAPH_RENDER_FLAGS_MASK) | ((layer) << GRAPH_RENDER_FLAGS_SIZE))
 #define GET_GRAPH_NODE_LAYER(flags)        (flags >> GRAPH_RENDER_FLAGS_SIZE)
+#else
+#define SET_GRAPH_NODE_LAYER(flags, layer) ((flags) = ((flags) & GRAPH_RENDER_FLAGS_MASK) | (((layer) << GRAPH_RENDER_FLAGS_SIZE) & GRAPH_RENDER_LAYERS_MASK))
+#define GET_GRAPH_NODE_LAYER(flags)        ((flags & GRAPH_RENDER_LAYERS_MASK) >> GRAPH_RENDER_FLAGS_SIZE)
+#endif
 
 #ifdef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 // The discriminant for different types of geo nodes
