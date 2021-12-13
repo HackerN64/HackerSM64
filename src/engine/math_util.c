@@ -645,6 +645,7 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) 
     }
     // ((u32 *) dest)[10] = FLOAT_ONE;
     dest[2][2] = sz;
+
     linear_mtxf_mul_vec3f_and_translate(src, dest[3], position);
     ((u32 *) dest)[15] = FLOAT_ONE;
 }
