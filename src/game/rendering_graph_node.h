@@ -28,56 +28,60 @@ enum AnimType {
     ANIM_TYPE_ROTATION
 };
 
-#ifdef OBJECTS_REJ
-enum HeadsList {
-    LIST_HEADS_ZEX,
-    LIST_HEADS_REJ,
-};
-#endif
-
 #define IS_LAYER_ZB(    layer) (((layer) >= LAYER_ZB_FIRST    ) || ((layer) <= LAYER_ZB_LAST))
 #define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_NON_ZB_FIRST) || ((layer) <= LAYER_LAST   ))
 
+#ifdef OBJECTS_REJ
+ #if SILHOUETTE
+    // Silhouette, .rej
+    enum RenderPhases {
+        RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
+        RENDER_PHASE_REJ_ZB,
+        RENDER_PHASE_REJ_SILHOUETTE,
+        RENDER_PHASE_REJ_NON_SILHOUETTE,
+        RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE,
+        RENDER_PHASE_ZEX_AFTER_SILHOUETTE,
+        RENDER_PHASE_REJ_NON_ZB,
+        RENDER_PHASE_END,
+    };
+    #define RENDER_PHASE_SILHOUETTE RENDER_PHASE_REJ_SILHOUETTE
+    #define RENDER_PHASE_NON_SILHOUETTE RENDER_PHASE_REJ_NON_SILHOUETTE
+ #else
+    // No silhouette, .rej
+    enum RenderPhases {
+        RENDER_PHASE_ZEX_BG,
+        RENDER_PHASE_REJ_ZB,
+        RENDER_PHASE_ZEX_ALL,
+        RENDER_PHASE_REJ_NON_ZB,
+        RENDER_PHASE_END,
+    };
+ #endif
+#else
+ #if SILHOUETTE
+    // Silhouette, no .rej
+    enum RenderPhases {
+        RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
+        RENDER_PHASE_ZEX_SILHOUETTE,
+        RENDER_PHASE_ZEX_NON_SILHOUETTE,
+        RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE,
+        RENDER_PHASE_ZEX_AFTER_SILHOUETTE,
+        RENDER_PHASE_END,
+    };
+    #define RENDER_PHASE_SILHOUETTE RENDER_PHASE_ZEX_SILHOUETTE
+    #define RENDER_PHASE_NON_SILHOUETTE RENDER_PHASE_ZEX_NON_SILHOUETTE
+ #else
+    // No silhouette, no .rej
+    enum RenderPhases {
+        RENDER_PHASE_ZEX_ALL,
+        RENDER_PHASE_END,
+    };
+ #endif
+#endif
+
 #if SILHOUETTE
 #define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))
-#ifdef OBJECTS_REJ
-enum RenderPhase { // Silhouette, .rej
-    RENDER_PHASE_ZEX_BG,
-    RENDER_PHASE_REJ_ZB,
-    RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
-    RENDER_PHASE_REJ_SILHOUETTE,
-    RENDER_PHASE_REJ_NON_SILHOUETTE,
-    RENDER_PHASE_REJ_OCCLUDE_SILHOUETTE,
-    RENDER_PHASE_ZEX_AFTER_SILHOUETTE,
-    RENDER_PHASE_REJ_NON_ZB,
-    RENDER_PHASE_END,
-};
-#else
-enum RenderPhase { // Silhouette, no .rej
-    RENDER_PHASE_ZEX_BEFORE_SILHOUETTE,
-    RENDER_PHASE_ZEX_SILHOUETTE,
-    RENDER_PHASE_ZEX_NON_SILHOUETTE,
-    RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE,
-    RENDER_PHASE_ZEX_AFTER_SILHOUETTE,
-    RENDER_PHASE_END,
-};
 #endif
-#else
-#ifdef OBJECTS_REJ
-enum RenderPhase { // No silhouette, .rej
-    RENDER_PHASE_ZEX_BG,
-    RENDER_PHASE_REJ_ZB,
-    RENDER_PHASE_ZEX_ALL,
-    RENDER_PHASE_REJ_NON_ZB,
-    RENDER_PHASE_END,
-};
-#else
-enum RenderPhase { // No silhouette, no .rej
-    RENDER_PHASE_ZEX_ALL,
-    RENDER_PHASE_END,
-};
-#endif
-#endif
+
 #define RENDER_PHASE_FIRST 0
 
 void geo_process_node_and_siblings(struct GraphNode *firstNode);
