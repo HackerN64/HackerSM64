@@ -71,6 +71,8 @@
 // Disables object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
 // #define DISABLE_SHADOWS
 
+// Use old shadow IDs for Fast64 compatibility
+#define LEGACY_SHADOW_IDS
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
 

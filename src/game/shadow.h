@@ -23,7 +23,7 @@ enum ShadowType {
      * This defines an offset after which rectangular shadows with custom
      * widths and heights can be defined.
      */
-    SHADOW_RECTANGLE_HARDCODED_OFFSET = 10,
+    SHADOW_RECTANGLE_HARDCODED_OFFSET = 50,
     SHADOW_RECTANGLE_SPINDEL          = (0 + SHADOW_RECTANGLE_HARDCODED_OFFSET),
     SHADOW_RECTANGLE_WHOMP            = (1 + SHADOW_RECTANGLE_HARDCODED_OFFSET),
 };
