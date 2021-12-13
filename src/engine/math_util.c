@@ -357,10 +357,10 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 src, Vec3f s) {
     f32 *srcp = (f32 *)src;
     s32 i;
     for (i = 0; i < 4; i++) {
-        dstp[ 0] = (srcp[ 0] * x);
-        dstp[ 4] = (srcp[ 4] * y);
-        dstp[ 8] = (srcp[ 8] * z);
-        dstp[12] =  srcp[12];
+        dstp[ 0] = srcp[ 0] * x;
+        dstp[ 4] = srcp[ 4] * y;
+        dstp[ 8] = srcp[ 8] * z;
+        dstp[12] = srcp[12];
         dstp++;
         srcp++;
     }
@@ -625,15 +625,15 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) 
     f32 sz = scale[2];
     f32 *dstp = (f32 *)dest;
     s32 i;
+
     for (i = 0; i < 12; i++) {
         *dstp++ = 0;
     }
+
     if (roll == 0x0) {
-        // ((u32 *) dest)[0] = FLOAT_ONE;
         dest[0][0] = sx;
         dest[0][1] = 0;
         dest[1][0] = 0;
-        // ((u32 *) dest)[5] = FLOAT_ONE;
         dest[1][1] = sy;
     } else {
         dest[0][0] =  coss(roll) * sx;
@@ -641,8 +641,8 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) 
         dest[1][0] = -dest[0][1] * sy;
         dest[1][1] =  dest[0][0] * sy;
     }
-    // ((u32 *) dest)[10] = FLOAT_ONE;
     dest[2][2] = sz;
+
     linear_mtxf_mul_vec3f_and_translate(src, dest[3], position);
     ((u32 *) dest)[15] = FLOAT_ONE;
 }
@@ -753,7 +753,6 @@ static void find_floor_at_relative_angle(Vec3f point, Vec3f pos, s32 yaw, s32 an
  */
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     Vec3f point0, point1, point2;
-    // Vec3f forward;
     Vec3f xColumn, yColumn, zColumn;
     f32 minY   = (-radius * 3);
     f32 height = (pos[1] + 150);
