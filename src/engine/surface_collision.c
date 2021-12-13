@@ -37,8 +37,9 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     register struct Surface *surf;
     register f32 offset;
     register f32 radius = data->radius;
-    register Vec3f pos = { data->x, data->y + data->offsetY, data->z };
-    register Vec3f v0, v1, v2;
+
+    Vec3f pos = { data->x, data->y + data->offsetY, data->z };
+    Vec3f v0, v1, v2;
     register f32 d00, d01, d11, d20, d21;
     register f32 invDenom;
     register f32 v, w;
@@ -377,7 +378,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
  **************************************************/
 
 static s32 check_within_floor_triangle_bounds(s32 x, s32 z, struct Surface *surf) {
-    register Vec3i vx, vz;
+    Vec3i vx, vz;
     vx[0] = surf->vertex1[0];
     vz[0] = surf->vertex1[2];
     vx[1] = surf->vertex2[0];

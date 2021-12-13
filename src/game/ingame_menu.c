@@ -689,20 +689,20 @@ void int_to_str(s32 num, u8 *dst) {
         return;
     }
 
-    digit[1] = (num / 100);
-    digit[2] = ((num - (digit[1] * 100)) / 10);
-    digit[3] = ((num - (digit[1] * 100)) - (digit[2] * 10));
+    digit[0] = (num / 100);
+    digit[1] = ((num - (digit[0] * 100)) / 10);
+    digit[2] = ((num - (digit[0] * 100)) - (digit[1] * 10));
 
-    if (digit[1] != 0) {
+    if (digit[0] != 0) {
         dst[pos++] = digit[1];
     }
 
-    if ((digit[2] != 0)
-     || (digit[1] != 0)) {
-        dst[pos++] = digit[2];
+    if ((digit[1] != 0)
+     || (digit[0] != 0)) {
+        dst[pos++] = digit[1];
     }
 
-    dst[pos++] = digit[3];
+    dst[pos++] = digit[2];
     dst[pos] = DIALOG_CHAR_TERMINATOR;
 }
 

@@ -224,14 +224,14 @@ f32 lateral_dist_between_objects(struct Object *obj1, struct Object *obj2) {
 }
 
 f32 dist_between_objects(struct Object *obj1, struct Object *obj2) {
-    register Vec3f d;
+    Vec3f d;
     vec3_diff(d, &obj2->oPosVec, &obj1->oPosVec);
     return vec3_mag(d);
 }
 
 // Skip sqrtf
 f32 dist_between_objects_squared(struct Object *obj1, struct Object *obj2) {
-    register Vec3f d;
+    Vec3f d;
     vec3_diff(d, &obj2->oPosVec, &obj1->oPosVec);
     return vec3_sumsq(d);
 }
