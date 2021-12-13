@@ -823,6 +823,7 @@ static void level_cmd_puppyvolume(void) {
 
     sPuppyVolumeStack[gPuppyVolumeCount]->shape = CMD_GET(u8,  33);
     sPuppyVolumeStack[gPuppyVolumeCount]->room  = CMD_GET(s16, 34);
+    sPuppyVolumeStack[gPuppyVolumeCount]->fov  = CMD_GET(u8, 36);
     sPuppyVolumeStack[gPuppyVolumeCount]->area  = sCurrAreaIndex;
 
     gPuppyVolumeCount++;

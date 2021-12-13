@@ -33,14 +33,15 @@
 
 #include "include/command_macros_base.h"
 
-#define PUPPYVOLUME(x, y, z, length, height, width, yaw, functionptr, anglesptr, addflags, removeflags, flagpersistance, room, shape) \
+#define PUPPYVOLUME(x, y, z, length, height, width, yaw, functionptr, anglesptr, addflags, removeflags, flagpersistance, room, shape, fov) \
     CMD_BBH(0x3D, 0x24, x), \
     CMD_HHHHHH(y, z, length, height, width, yaw), \
     CMD_PTR(functionptr), \
     CMD_PTR(anglesptr), \
     CMD_W(addflags), \
     CMD_W(removeflags), \
-    CMD_BBH(flagpersistance, shape, room)
+    CMD_BBH(flagpersistance, shape, room) \
+    CMD_BBH(fov, 0x0, 0x0)
 
 struct gPuppyOptions
 {
@@ -121,25 +122,26 @@ struct sPuppyAngles
 //Structurally, it's exactly the same as CutsceneSplinePoint
 struct sPuppySpline
 {
+    Vec3s pos; // The vector pos of the spline index itself.
     s8 index;  // The index of the spline. Ends with -1
     u8 speed;  // The amount of frames it takes to get through this index.
-    Vec3s pos; // The vector pos of the spline index itself.
 };
 
 //A bounding volume for activating puppycamera scripts and angles.
 struct sPuppyVolume
 {
-    Vec3s pos;                   // The set position of the volume
-    Vec3s radius;                // Where it extends.
-    s16 rot;                     // The rotational angle of the volume.
     s32 (*func)();               // a pointer to a function. Optional.
     struct sPuppyAngles *angles; // A pointer to a gPuppyAngles struct. Optional
     s32 flagsAdd;                // Adds behaviour flags.
     s32 flagsRemove;             // Removes behaviour flags.
+    Vec3s pos;                   // The set position of the volume
+    Vec3s radius;                // Where it extends.
+    s16 rot;                     // The rotational angle of the volume.
+    s16 room;
     u8 flagPersistance;          // Decides if adding or removing the flags is temporary or permanent.
     u8 shape;
-    s16 room;
     u8 area;
+    u8 fov;
 };
 
 enum gPuppyCamBeh
