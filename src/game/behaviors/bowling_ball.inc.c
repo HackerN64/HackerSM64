@@ -241,8 +241,7 @@ void bhv_free_bowling_ball_init(void) {
 }
 
 void bhv_free_bowling_ball_roll_loop(void) {
-    // See comment below about collisionFlags
-    /* s16 collisionFlags = */ object_step();
+    object_step();
 
     bowling_ball_set_hitbox();
 
@@ -251,7 +250,7 @@ void bhv_free_bowling_ball_roll_loop(void) {
         cur_obj_play_sound_1(SOUND_ENV_BOWLING_BALL_ROLL);
     }
 
-    /* Always false, commented out to suppress compiler warnings */
+    /* Always false, commented out to suppress compiler warnings. */
     // if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) && !(collisionFlags & OBJ_COL_FLAGS_LANDED)) {
     //     cur_obj_play_sound_2(SOUND_GENERAL_QUIET_POUND1_LOWPRIO);
     // }
