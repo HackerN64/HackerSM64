@@ -625,6 +625,7 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) 
     f32 sz = scale[2];
     f32 *dstp = (f32 *)dest;
     s32 i;
+
     for (i = 0; i < 12; i++) {
         *dstp++ = 0;
     }
