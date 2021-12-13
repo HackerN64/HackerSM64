@@ -862,6 +862,12 @@ f64 gd_sqrt_d(f64 x) {
 #if defined(ISVPRINT) || defined(UNF)
 #define stubbed_printf osSyncPrintf
 #else
+/**
+ * Unused
+ */
+f64 stub_renderer_1(UNUSED f64 x) {
+    return 0.0;
+}
 
 /* 249BCC -> 24A19C */
 void gd_printf(const char *format, ...) {
@@ -1055,6 +1061,13 @@ void branch_cur_dl_to_num(s32 dlNum) {
 }
 
 /**
+ * Unused (not called)
+ */
+Gfx *get_dl_gfx(s32 num) {
+    return sGdDLArray[num]->gfx;
+}
+
+/**
  * Creates `ObjShape`s for the stars and sparkles
  */
 void setup_stars(void) {
@@ -1175,6 +1188,10 @@ void gdm_setup(void) {
     reset_cur_dl_indices();
     setup_stars();
     imout();
+}
+
+/* 24AC18 -> 24AC2C */
+void stub_renderer_2(UNUSED u32 a0) {
 }
 
 /* 24AC2C -> 24AC80; not called; orig name: Unknown8019C45C */
@@ -1988,6 +2005,24 @@ void gd_dl_flush_vertices(void) {
     func_801A0038();
 }
 
+/**
+ * Unused - called by func_801A520C
+ */
+static void func_801A01EC(void) {
+    if (D_801BE8B0.validCount >= D_801BE8B0.msgCount) {
+        osRecvMesg(&D_801BE8B0, &sGdDMACompleteMsg, OS_MESG_BLOCK);
+    }
+    osRecvMesg(&D_801BE8B0, &sGdDMACompleteMsg, OS_MESG_BLOCK);
+}
+
+/**
+ * Unused - called by func_801A520C
+ */
+static void func_801A025C(void) {
+    gGdFrameBufNum ^= 1;
+    osViSwapBuffer(sScreenView->parent->colourBufs[gGdFrameBufNum]);
+}
+
 /* 24EA88 -> 24EAF4 */
 void set_render_alpha(f32 alpha) {
     sAlpha = alpha * 255.0f;
@@ -2290,6 +2325,11 @@ void gd_set_one_cycle(void) {
     update_render_mode();
 }
 
+/* 250B30 -> 250B44 */
+void stub_renderer_3(void) {
+    UNUSED u8 filler[16];
+}
+
 /* 250B44 -> 250B58 */
 void gddl_is_loading_stub_dl(UNUSED s32 dlLoad) {
 }
@@ -2511,6 +2551,27 @@ void func_801A3370(f32 x, f32 y, f32 z) {
     D_801BD768.z += z;
 }
 
+/**
+ * Unused
+ */
+void Unknown801A33F8(f32 x, f32 y, f32 z) {
+    gd_dl_mul_trans_matrix(x - D_801BD768.x, y - D_801BD768.y, z - D_801BD768.z);
+
+    D_801BD768.x = x;
+    D_801BD768.y = y;
+    D_801BD768.z = z;
+}
+
+/**
+ * Unused
+ */
+void Unknown801A347C(f32 x, f32 y, f32 z) {
+    D_801A86CC.x = x;
+    D_801A86CC.y = y;
+    D_801A86CC.z = z;
+    gd_dl_scale(x, y, z);
+}
+
 /* 251CB0 -> 251D44; orig name: func_801A34E0 */
 void border_active_view(void) {
     if (sActiveView->flags & VIEW_BORDERED) {
@@ -2627,6 +2688,10 @@ void gd_setproperty(enum GdProperty prop, f32 f1, f32 f2, f32 f3) {
         default:
             fatal_printf("gd_setproperty(): Unkown property");
     }
+}
+
+/* 2522B0 -> 2522C0 */
+void stub_renderer_5(void) {
 }
 
 /* 2522C0 -> 25245C */
@@ -2757,6 +2822,44 @@ void gd_init_controllers(void) {
     }
 }
 
+/* 252BAC -> 252BC0 */
+void stub_renderer_6(UNUSED struct GdObj *obj) {
+}
+
+/**
+ * Unused - This is likely a stub version of the `defpup` function from the IRIX
+ * Graphics Library. It was used to define a popup menu. See the IRIX "Graphics
+ * Library Reference Manual, C Edition" for details.
+ *
+ * @param menufmt  a format string defining the menu items to be added to the
+ *                 popup menu.
+ * @return  an identifier of the menu just defined
+ */
+long defpup(UNUSED const char *menufmt, ...) {
+    //! @bug no return; function was stubbed
+#ifdef AVOID_UB
+   return 0;
+#endif
+}
+
+/**
+ * Unused - called when the user picks an item from the "Control Type" menu.
+ * Presumably, this would allow switching inputs between controller, keyboard,
+ * and mouse.
+ *
+ * @param itemId  ID of the menu item that was clicked
+ *                (1 = "U-64 Analogue Joystick", 2 = "Keyboard", 3 = "Mouse")
+ */
+void menu_cb_control_type(UNUSED u32 itemId) {
+}
+
+/**
+ * Unused - called when the user clicks the "Re-Calibrate Controller" item from
+ * the "Dynamics" menu.
+ */
+void menu_cb_recalibrate_controller(UNUSED u32 itemId) {
+}
+
 /* 252C08 -> 252C70 */
 void func_801A4438(f32 x, f32 y, f32 z) {
     sTextDrawPos.x = x - (sActiveView->lowerRight.x / 2.0f);
@@ -2802,11 +2905,66 @@ s32 gd_gentexture(void *texture, s32 fmt, s32 size, UNUSED u32 arg3, UNUSED u32 
     return dl;
 }
 
+/**
+ * Unused (not called)
+ */
+void *load_texture_from_file(const char *file, s32 fmt, s32 size, u32 arg3, u32 arg4) {
+    struct GdFile *txFile; // 3c
+    void *texture;         // 38
+    u32 txSize;            // 34
+    u32 i;                 // 30
+    u16 *txHalf;           // 2C
+    u8 buf[3];             // 28
+    u8 alpha;              // 27
+    s32 dl;                // 20
+
+    txFile = gd_fopen(file, "r");
+    if (txFile == NULL) {
+        fatal_print("Cant load texture");
+    }
+    txSize = gd_get_file_size(txFile);
+    texture = gd_malloc_perm(txSize / 3 * 2);
+    if (texture == NULL) {
+        fatal_printf("Cant allocate memory for texture");
+    }
+    txHalf = (u16 *) texture;
+    for (i = 0; i < txSize / 3; i++) {
+        gd_fread((s8 *) buf, 3, 1, txFile);
+        alpha = 0xFF;
+        *txHalf = ((buf[2] >> 3) << 11) | ((buf[1] >> 3) << 6) | ((buf[0] >> 3) << 1) | (alpha >> 7);
+        txHalf++;
+    }
+    gd_printf("Loaded texture '%s' (%d bytes)\n", file, txSize);
+    gd_fclose(txFile);
+    dl = gd_gentexture(texture, fmt, size, arg3, arg4);
+    gd_printf("Generated '%s' (%d) display list ok.\n", file, dl);
+
+    return texture;
+}
+
 /* 252F88 -> 252FAC */
 void Unknown801A47B8(struct ObjView *v) {
     if (v->flags & VIEW_SAVE_TO_GLOBAL) {
         D_801BE994 = v;
     }
+}
+
+void stub_renderer_7(void) {
+}
+
+/* 252FC4 -> 252FD8 */
+void stub_renderer_8(UNUSED u32 arg0) {
+}
+
+/**
+ * Unused - called by func_801A520C and Unknown801A5344
+ */
+void func_801A4808(void) {
+    while (D_801A8674 != 0) {
+        ;
+    }
+
+    return;
 }
 
 /* 253018 -> 253084 */
@@ -2819,6 +2977,16 @@ void func_801A4848(s32 linkDl) {
     sCurrentGdDl = curDl;
 }
 
+/**
+ * Unused - called by func_801A520C and Unknown801A5344
+ */
+void stub_renderer_9(void) {
+}
+
+/* 253094 -> 2530A8 */
+void stub_renderer_10(UNUSED u32 arg0) {
+}
+
 /* 2530A8 -> 2530C0 */
 void stub_draw_label_text(UNUSED char *s) {
     UNUSED u8 filler1[4];
@@ -2829,6 +2997,35 @@ void stub_draw_label_text(UNUSED char *s) {
 /* 2530C0 -> 2530D8; orig name: func_801A48F0 */
 void set_active_view(struct ObjView *v) {
     sActiveView = v;
+}
+
+void stub_renderer_11(void) {
+}
+
+/**
+ * Unused - called by func_801A520C
+ */
+void func_801A4918(void) {
+    f32 x;     // c
+    f32 y;     // 8
+    u32 ydiff; // 4
+
+    if (sHandView == NULL || sMenuView == NULL) {
+        return;
+    }
+
+    x = sHandView->upperLeft.x;
+    y = sHandView->upperLeft.y;
+
+    if (!(x > sMenuView->upperLeft.x && x < sMenuView->upperLeft.x + sMenuView->lowerRight.x
+          && y > sMenuView->upperLeft.y && y < sMenuView->upperLeft.y + sMenuView->lowerRight.y)) {
+        return;
+    }
+    ydiff = (y - sMenuView->upperLeft.y) / 25.0f;
+
+    if (ydiff < sItemsInMenu) {
+        sMenuGadgets[ydiff]->drawFlags |= OBJ_HIGHLIGHTED;
+    }
 }
 
 /* 2532D4 -> 2533DC */
@@ -3093,6 +3290,34 @@ void gd_init(void) {
 }
 
 /**
+ * Unused - reverses the characters in `str`.
+ */
+void reverse_string(char *str, s32 len) {
+    char buf[100];
+    s32 i;
+
+    for (i = 0; i < len; i++) {
+        buf[i] = str[len - i - 1];
+    }
+
+    for (i = 0; i < len; i++) {
+        str[i] = buf[i];
+    }
+}
+
+/* 254168 -> 25417C */
+void stub_renderer_12(UNUSED s8 *arg0) {
+}
+
+/* 25417C -> 254190 */
+void stub_renderer_13(UNUSED void *arg0) {
+}
+
+/* 254190 -> 2541A4 */
+void stub_renderer_14(UNUSED s8 *arg0) {
+}
+
+/**
  * Initializes the pick buffer. This functions like the `pick` or `gselect`
  * functions from IRIS GL.
  * @param buf  pointer to an array of 16-bit values
@@ -3120,6 +3345,18 @@ void store_in_pickbuf(s16 data) {
 ** (datasize is always 2) */
 s32 get_cur_pickbuf_offset(UNUSED s16 *arg0) {
     return sPickBufPosition / 3;
+}
+
+/* 254250 -> 254264 */
+void stub_renderer_15(UNUSED u32 arg0) {
+}
+
+/* 254264 -> 254278 */
+void stub_renderer_16(UNUSED u32 arg0) {
+}
+
+/* 254278 -> 254288 */
+void stub_renderer_17(void) {
 }
 
 /* 254288 -> 2542B0 */
@@ -3480,6 +3717,14 @@ void make_timer_gadgets(void) {
     add_debug_view(timersview);
 
     return;
+}
+
+/* 255600 -> 255614 */
+void stub_renderer_18(UNUSED u32 a0) {
+}
+
+/* 255614 -> 255628 */
+void stub_renderer_19(UNUSED u32 a0) {
 }
 
 #ifndef NO_SEGMENTED_MEMORY

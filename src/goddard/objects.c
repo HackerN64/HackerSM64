@@ -884,6 +884,14 @@ s32 stub_objects_2(void) {
     return sp4;
 }
 
+/**
+ * Unused - called by __main__
+ */
+s32 make_scene(void) {
+    s32 sp4 = 0;
+    return sp4;
+}
+
 /* @ 22CA00 for 0x88 */
 static void reset_joint_or_net(struct GdObj *obj) {
     struct GdObj *localObjPtr = obj;
@@ -1100,6 +1108,58 @@ void func_8017E9EC(struct ObjNet *net) {
     sp18 = gd_vec3f_magnitude(&net->torque);
     gd_create_rot_mat_angular(&sp1C, &sp5C, -sp18);
     gd_mult_mat4f(&D_801B9DC8, &sp1C, &D_801B9DC8);
+}
+
+/**
+ * Unused (called by func_801A71CC) - returns TRUE if any of the four corners of
+ * box1's X-Z plane lie within box2's X-Z plane
+ */
+s32 gd_plane_point_within(struct GdBoundingBox *box1, struct GdBoundingBox *box2) {
+    // test if min x and min z of box1 are within box2
+    if (box1->minX >= box2->minX) {
+        if (box1->minX <= box2->maxX) {
+            if (box1->minZ >= box2->minZ) {
+                if (box1->minZ <= box2->maxZ) {
+                    return TRUE;
+                }
+            }
+        }
+    }
+
+    // test if max x and min z of box1 are within box2
+    if (box1->maxX >= box2->minX) {
+        if (box1->maxX <= box2->maxX) {
+            if (box1->minZ >= box2->minZ) {
+                if (box1->minZ <= box2->maxZ) {
+                    return TRUE;
+                }
+            }
+        }
+    }
+
+    // test if max x and max z of box1 are within box2
+    if (box1->maxX >= box2->minX) {
+        if (box1->maxX <= box2->maxX) {
+            if (box1->maxZ >= box2->minZ) {
+                if (box1->maxZ <= box2->maxZ) {
+                    return TRUE;
+                }
+            }
+        }
+    }
+
+    // test if min x and max z of box1 are within box2
+    if (box1->minX >= box2->minX) {
+        if (box1->minX <= box2->maxX) {
+            if (box1->maxZ >= box2->minZ) {
+                if (box1->maxZ <= box2->maxZ) {
+                    return TRUE;
+                }
+            }
+        }
+    }
+
+    return FALSE;
 }
 
 /* @ 22D824 for 0x1BC */
