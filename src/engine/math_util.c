@@ -656,6 +656,7 @@ void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, 
     f32 *srcp = (f32 *)src[3];
     f32 *thp = (f32 *)throwMatrix;
     s32 i;
+
     for (i = 0; i < 3; i++) {
         *dstp++ = ((thp[0] * x)
                  + (thp[4] * y)
