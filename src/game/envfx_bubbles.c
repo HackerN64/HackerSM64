@@ -440,6 +440,8 @@ void envfx_set_bubble_texture(s32 mode, s16 index) {
             imageArr = segmented_to_virtual(&bubble_ptr_0B006848);
             frame = 0;
             break;
+        default:
+            return;
     }
 
     gDPSetTextureImage(sGfxCursor++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, *(imageArr + frame));

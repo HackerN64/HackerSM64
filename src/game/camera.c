@@ -812,8 +812,8 @@ void pan_ahead_of_player(struct Camera *c) {
     vec3f_add(c->focus, pan);
 }
 
-s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw) {
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw) {
     switch (gCurrLevelArea) {
         case AREA_WDW_MAIN:
             yaw = clamp_positions_and_find_yaw(pos, origin, 4508.f, -3739.f, 4508.f, -3739.f);
@@ -828,9 +828,9 @@ s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw) {
             yaw = clamp_positions_and_find_yaw(pos, origin, 2458.f, -2458.f, 2458.f, -2458.f);
             break;
     }
-#endif
     return yaw;
 }
+#endif
 
 /**
  * Rotates the camera around the area's center point.
@@ -847,8 +847,9 @@ s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     sAreaYaw = camYaw - sModeOffsetYaw;
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
     focus_on_mario(focus, pos, posY + yOff, focusY + yOff, sLakituDist + baseDist, pitch, camYaw);
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     camYaw = find_in_bounds_yaw_wdw_bob_thi(pos, focus, camYaw);
-
+#endif
     return camYaw;
 }
 
@@ -867,10 +868,11 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
     focus_on_mario(focus, pos, posY + yOff, focusY + yOff, sLakituDist + baseDist, pitch, camYaw);
     pan_ahead_of_player(c);
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelArea == AREA_DDD_SUB) {
         camYaw = clamp_positions_and_find_yaw(pos, focus, 6839.f, 995.f, 5994.f, -3945.f);
     }
-
+#endif
     return camYaw;
 }
 
@@ -2288,19 +2290,13 @@ void mode_mario_camera(struct Camera *c) {
 s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     /// The returned yaw
     s16 camYaw;
-    // unused
-    s16 focPitch;
     /// The focus (Mario)'s yaw around the stairs
     s16 focYaw;
-    // unused
-    s16 posPitch;
     /// The camera's yaw around the stairs
     s16 posYaw;
     Vec3f cPos;
     Vec3f checkPos;
     struct Surface *floor;
-    // unused
-    f32 dist;
     f32 focusHeight;
     f32 floorHeight;
     f32 focY;
@@ -4465,7 +4461,6 @@ void shake_camera_roll(s16 *roll) {
 s32 offset_yaw_outward_radial(struct Camera *c, s16 areaYaw) {
     s16 yawGoal = DEGREES(60);
     s16 yaw = sModeOffsetYaw;
-    f32 distFromAreaCenter;
     Vec3f areaCenter;
     s16 dYaw;
     switch (gCurrLevelArea) {
@@ -4804,15 +4799,13 @@ s32 determine_dance_cutscene(UNUSED struct Camera *c) {
  * @return `pullResult` or `pushResult` depending on Mario's door action
  */
 u8 open_door_cutscene(u8 pullResult, u8 pushResult) {
-    s16 result;
-
     if (sMarioCamState->action == ACT_PULLING_DOOR) {
-        result = pullResult;
+        return pullResult;
     }
     if (sMarioCamState->action == ACT_PUSHING_DOOR) {
-        result = pushResult;
+        return pushResult;
     }
-    return result;
+    return CUTSCENE_NONE;
 }
 
 /**
@@ -5298,8 +5291,8 @@ void set_fixed_cam_axis_sa_lobby(UNUSED s16 preset) {
  *      Only block area mode changes if Mario is in a cannon,
  *      or if the camera is in Mario mode and Mario is not swimming or in water with the metal cap
  */
-void check_blocking_area_processing(const u8 *mode) {
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
+void check_blocking_area_processing(const u8 *mode) {
     if (sMarioCamState->action & ACT_FLAG_METAL_WATER ||
                         *mode == DEEP_WATER_CAMERA_MODE || *mode == WATER_SURFACE_CAMERA_MODE) {
         sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
@@ -5315,6 +5308,7 @@ void check_blocking_area_processing(const u8 *mode) {
         sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
     }
 #else
+void check_blocking_area_processing(UNUSED const u8 *mode) {
     sStatusFlags |= CAM_FLAG_BLOCK_AREA_PROCESSING;
 #endif
 }

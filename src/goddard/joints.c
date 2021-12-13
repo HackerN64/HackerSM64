@@ -664,7 +664,7 @@ void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 
     UNUSED u8 filler1[4];
     UNUSED u32 unused = 0;
     UNUSED u8 filler2[12]; // unused vec?
-    struct GdVec3f sp24C;
+    struct GdVec3f sp24C = { 0.0f, 0.0f, 0.0f };
     struct GdVec3f sp240;
     UNUSED u8 filler3[8];
     s32 sp234; // i?
