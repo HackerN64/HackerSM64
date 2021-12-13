@@ -629,6 +629,7 @@ void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) 
     for (i = 0; i < 12; i++) {
         *dstp++ = 0;
     }
+
     if (roll == 0x0) {
         // ((u32 *) dest)[0] = FLOAT_ONE;
         dest[0][0] = sx;
