@@ -828,11 +828,9 @@ s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw) {
             yaw = clamp_positions_and_find_yaw(pos, origin, 2458.f, -2458.f, 2458.f, -2458.f);
             break;
     }
-#else
-s16 find_in_bounds_yaw_wdw_bob_thi(UNUSED Vec3f pos, UNUSED Vec3f origin, s16 yaw) {
-#endif
     return yaw;
 }
+#endif
 
 /**
  * Rotates the camera around the area's center point.
@@ -849,8 +847,9 @@ s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     sAreaYaw = camYaw - sModeOffsetYaw;
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
     focus_on_mario(focus, pos, posY + yOff, focusY + yOff, sLakituDist + baseDist, pitch, camYaw);
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     camYaw = find_in_bounds_yaw_wdw_bob_thi(pos, focus, camYaw);
-
+#endif
     return camYaw;
 }
 
@@ -869,10 +868,11 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
     focus_on_mario(focus, pos, posY + yOff, focusY + yOff, sLakituDist + baseDist, pitch, camYaw);
     pan_ahead_of_player(c);
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelArea == AREA_DDD_SUB) {
         camYaw = clamp_positions_and_find_yaw(pos, focus, 6839.f, 995.f, 5994.f, -3945.f);
     }
-
+#endif
     return camYaw;
 }
 
