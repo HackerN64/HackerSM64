@@ -9,11 +9,6 @@
 
 #include "course_table.h"
 
-#if defined(PUPPYCAM) && defined(EEP4K)
-    #undef EEP4K
-    #define EEP16K
-#endif
-
 #if defined(SRAM)
     #define EEPROM_SIZE 0x8000
 #elif defined(EEP16K)
@@ -91,7 +86,7 @@ struct SaveBuffer {
     // Each of the four save files has two copies. If one is bad, the other is used as a backup.
     struct SaveFile files[NUM_SAVE_FILES][2];
     // The main menu data has two copies. If one is bad, the other is used as a backup.
-    struct MainMenuSaveData menuData[2];
+    struct MainMenuSaveData menuData;
 };
 
 #ifdef PUPPYCAM
