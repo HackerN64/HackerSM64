@@ -894,8 +894,12 @@ void obj_mark_for_deletion(struct Object *obj) {
 #ifdef PUPPYLIGHTS
     obj_disable_light(obj);
 #endif
-    obj->activeFlags &= ~(ACTIVE_FLAG_ACTIVE | ACTIVE_FLAG_INITIATED_TIME_STOP);
-    // obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+    //! This clears all activeFlags. Since some of these flags disable behavior,
+    //  setting it to 0 could potentially enable unexpected behavior. After an
+    //  object is marked for deletion, it still updates on that frame (I think),
+    //  so this is worth looking into.
+    //! NOTE: Changing this can cause reference issues!
+    obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
 }
 
 void cur_obj_disable(void) {
