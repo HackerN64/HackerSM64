@@ -282,7 +282,7 @@ static void floomba_act_startup(void) {
         o->oBehParams--;
         return;
     }
-    
+
     cur_obj_unhide();
 
     if ((GET_BPARAM3(o->oBehParams) & 0x7F) > o->oZoomCounter) {

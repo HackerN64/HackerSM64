@@ -498,6 +498,7 @@ void render_score_menu_buttons(struct Object *scoreButton) {
 }
 
 #define SCORE_TIMER 31
+
 /**
  * In the score menu, checks if a button was clicked to play a sound, button state and other functions.
  */
@@ -2035,7 +2036,7 @@ void print_save_file_scores(s8 fileIndex) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
-    for ((i = 0); (i < COURSE_STAGES_MAX); (i++)) {
+    for (i = 0; i < COURSE_STAGES_MAX; i++) {
         print_menu_generic_string((LEVEL_NAME_X + ((i < 9) * LEVEL_NUM_PAD)), (23 + (12 * (i + 1))), segmented_to_virtual(levelNameTable[i]));
         print_score_file_star_score(              fileIndex, i, STAR_SCORE_X, (23 + (12 * (i + 1))));
         print_score_file_course_coin_score(       fileIndex, i,          213, (23 + (12 * (i + 1))));

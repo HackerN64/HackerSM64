@@ -46,7 +46,8 @@ void bhv_openable_grill_loop(void) {
             break;
 
         case OEPNABLE_GRILL_IDLE_CLOSED:
-            if ((o->oOpenableGrillFloorSwitchObj = cur_obj_nearest_object_with_behavior(bhvFloorSwitchGrills)) != NULL) {
+            if ((o->oOpenableGrillFloorSwitchObj =
+                 cur_obj_nearest_object_with_behavior(bhvFloorSwitchGrills)) != NULL) {
                 o->oAction++;
             }
             break;

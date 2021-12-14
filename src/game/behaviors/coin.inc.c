@@ -16,20 +16,20 @@ struct ObjectHitbox sYellowCoinHitbox = {
  *     3
  *   4   6
  * 5   2   7
- * 
+ *
  *     1
- * 
+ *
  *     0
  **/
 s16 sCoinArrowPositions[][2] = {
-    { 0, -150 },
-    { 0, -50 },
-    { 0, 50 },
-    { 0, 150 },
-    { -50, 100 },
-    { -100, 50 },
-    { 50, 100 },
-    { 100, 50 },
+    {    0, -150 },
+    {    0,  -50 },
+    {    0,   50 },
+    {    0,  150 },
+    {  -50,  100 },
+    { -100,   50 },
+    {   50,  100 },
+    {  100,   50 },
 };
 
 s32 bhv_coin_sparkles_init(void) {
@@ -243,7 +243,7 @@ void bhv_coin_formation_loop(void) {
             break;
         case COIN_FORMATION_ACT_ACTIVE:
             if (o->oDistanceToMario > (COIN_FORMATION_DISTANCE + 100.0f)) {
-                o->oAction = COIN_FORMATION_ACT_DEACTIVATE;
+                o->oAction++; // COIN_FORMATION_ACT_DEACTIVATE
             }
             break;
         case COIN_FORMATION_ACT_DEACTIVATE:
@@ -263,7 +263,7 @@ void coin_inside_boo_act_dropped(void) {
         cur_obj_play_sound_2(SOUND_GENERAL_COIN_DROP);
     }
 
-    if (o->oTimer > 90 || o->oMoveFlags & OBJ_MOVE_LANDED) {
+    if (o->oTimer > 90 || (o->oMoveFlags & OBJ_MOVE_LANDED)) {
         obj_set_hitbox(o, &sYellowCoinHitbox);
         cur_obj_become_tangible();
         cur_obj_set_behavior(bhvYellowCoin);

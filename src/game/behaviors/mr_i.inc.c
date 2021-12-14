@@ -296,7 +296,7 @@ void bhv_mr_i_body_loop(void) {
 
     if (
         o->oAction != MR_I_BODY_ACT_SPIN_DEATH
-        && (o->oDistanceToMario > 3000.0f || o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)
+        && ((o->oDistanceToMario > 3000.0f) || (o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM))
     ) {
         o->oAction = MR_I_BODY_ACT_FAR_AWAY;
     }

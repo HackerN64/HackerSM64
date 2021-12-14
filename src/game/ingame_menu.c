@@ -900,6 +900,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+
     strIdx = gDialogTextPos;
 
     if (gDialogBoxState == DIALOG_STATE_HORIZONTAL) {
@@ -1223,20 +1224,22 @@ void render_dialog_entries(void) {
 
     render_dialog_box_type(dialog, dialog->linesPerBox);
 
-    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE,
-                  // Horizontal scissoring isn't really required and can potentially mess up widescreen enhancements.
+    gDPSetScissor(
+        gDisplayListHead++, G_SC_NON_INTERLACE,
+        // Horizontal scissoring isn't really required and can potentially mess up widescreen enhancements.
 #ifdef WIDESCREEN
-                  0,
+        0,
 #else
-                  ensure_nonnegative(dialog->leftOffset),
+        ensure_nonnegative(dialog->leftOffset),
 #endif
-                  ensure_nonnegative(DIAG_VAL2 - dialog->width),
+        ensure_nonnegative(DIAG_VAL2 - dialog->width),
 #ifdef WIDESCREEN
-                  SCREEN_WIDTH,
+        SCREEN_WIDTH,
 #else
-                  ensure_nonnegative(DIAG_VAL3 + dialog->leftOffset),
+        ensure_nonnegative(dialog->leftOffset + DIAG_VAL3),
 #endif
-                  ensure_nonnegative(240 + ((dialog->linesPerBox * 80) / DIAG_VAL4) - dialog->width));
+        ensure_nonnegative(240 + ((dialog->linesPerBox * 80) / DIAG_VAL4) - dialog->width)
+    );
     handle_dialog_text_and_pages(0, dialog, lowerBound);
 
     if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {

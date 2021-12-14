@@ -184,6 +184,7 @@ void bhv_intro_lakitu_loop(void) {
             break;
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_1:
             cur_obj_enable_rendering();
+
             vec3f_set(offset, -100.0f, 100.0f, 300.0f);
             offset_rotated(toPoint, gCamera->pos, offset, sMarioCamState->faceAngle);
             vec3f_copy(&o->oPosVec, toPoint);
@@ -193,7 +194,7 @@ void bhv_intro_lakitu_loop(void) {
             o->oFaceAnglePitch = o->oMoveAnglePitch / 2;
             o->oFaceAngleYaw = o->oMoveAngleYaw;
 
-            o->oAction = INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2;
+            o->oAction++; // INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2
             break;
 
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_2:

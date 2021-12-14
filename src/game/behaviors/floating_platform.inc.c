@@ -28,6 +28,7 @@ void floating_platform_act_move_to_home(void) {
         }
 
         o->oFloatingPlatformMarioWeightWobbleOffset += o->oVelY;
+
         if (o->oFloatingPlatformMarioWeightWobbleOffset > 90.0f) {
             o->oFloatingPlatformMarioWeightWobbleOffset = 90.0f;
         }

@@ -91,7 +91,7 @@ void bhv_koopa_init(void) {
  */
 static void koopa_play_footstep_sound(s8 animFrame1, s8 animFrame2) {
     cur_obj_play_sound_at_anim_range(
-        animFrame1, 
+        animFrame1,
         animFrame2,
         (o->header.gfx.scale[0] > 1.5f) ? SOUND_OBJ_KOOPA_THE_QUICK_WALK : SOUND_OBJ_KOOPA_WALK
     );

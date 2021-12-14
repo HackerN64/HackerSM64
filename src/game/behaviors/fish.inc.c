@@ -170,6 +170,7 @@ static void fish_act_flee(void) {
     if (o->oForwardVel < o->oFishGoalVel) {
         o->oForwardVel += 0.5f;
     }
+
     o->oFishGoalY = gMarioObject->oPosY + o->oFishHeightOffset;
 
     // Rotate fish away from Mario.

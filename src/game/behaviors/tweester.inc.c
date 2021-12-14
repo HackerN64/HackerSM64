@@ -138,7 +138,7 @@ ObjActionFunc sTweesterActions[] = {
 };
 
 /**
- * Loop behavior for Tweester. 
+ * Loop behavior for Tweester.
  * Loads the hitbox and calls its relevant action.
  */
 void bhv_tweester_loop(void) {

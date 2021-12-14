@@ -71,15 +71,15 @@ void falling_bowser_plat_act_fall(void) {
     if (!(o->oTimer & 1) && o->oTimer < 14) {
         s16 angle = sBowserFallingPlatform[o->oBehParams2ndByte].angle
                     + (gDebugInfo[DEBUG_PAGE_EFFECTINFO][1] << 8);
-        f32 val = -(o->oTimer / 2) * 290 + 1740;
+        f32 shake = -(o->oTimer / 2) * 290 + 1740;
         Vec3f pos;
         vec3f_copy(pos, &o->oPosVec);
-        o->oPosX = sBowserFallingPlatform[o->oBehParams2ndByte].posX + (sins(angle + 0x14B0) * val);
-        o->oPosZ = sBowserFallingPlatform[o->oBehParams2ndByte].posZ + (coss(angle + 0x14B0) * val);
+        o->oPosX = sBowserFallingPlatform[o->oBehParams2ndByte].posX + (sins(angle + 0x14B0) * shake);
+        o->oPosZ = sBowserFallingPlatform[o->oBehParams2ndByte].posZ + (coss(angle + 0x14B0) * shake);
         o->oPosY = 307.0f;
         spawn_mist_particles_variable(4, 0, 100.0f);
-        o->oPosX = sBowserFallingPlatform[o->oBehParams2ndByte].posX + (sins(angle - 0x14B0) * val);
-        o->oPosZ = sBowserFallingPlatform[o->oBehParams2ndByte].posZ + (coss(angle - 0x14B0) * val);
+        o->oPosX = sBowserFallingPlatform[o->oBehParams2ndByte].posX + (sins(angle - 0x14B0) * shake);
+        o->oPosZ = sBowserFallingPlatform[o->oBehParams2ndByte].posZ + (coss(angle - 0x14B0) * shake);
         spawn_mist_particles_variable(4, 0, 100);
         vec3f_copy(&o->oPosVec, pos);
     }

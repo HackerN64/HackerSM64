@@ -152,7 +152,7 @@ void bookshelf_manager_act_0(void) {
 
     if (!(o->activeFlags & ACTIVE_FLAG_IN_DIFFERENT_ROOM)) {
         for (i = 0; i < 3; i++) {
-            spawn_object_relative(i, sBookSwitchPositions[i].relPosX, sBookSwitchPositions[i].relPosY, 0, o, 
+            spawn_object_relative(i, sBookSwitchPositions[i].relPosX, sBookSwitchPositions[i].relPosY, 0, o,
                                   MODEL_BOOKEND, bhvBookSwitch);
         }
 

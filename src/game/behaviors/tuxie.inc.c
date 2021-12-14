@@ -50,7 +50,7 @@ void tuxies_mother_act_receiving_baby(void) {
                 s32 babyParam   = GET_BPARAM2(o->prevObj->oBehParams);
                 s32 dialogID = ((motherParam == babyParam) ? DIALOG_058 : DIALOG_059);
 
-                if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP, 
+                if (cur_obj_update_dialog_with_cutscene(MARIO_DIALOG_LOOK_UP,
                         DIALOG_FLAG_TURN_TO_MARIO, CUTSCENE_DIALOG, dialogID)) {
                     o->oSubAction = dialogID == DIALOG_058
                         ? MOTHER_PENGUIN_SUB_ACT_CORRECT_BABY
