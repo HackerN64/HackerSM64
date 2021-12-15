@@ -25,7 +25,7 @@ void bhv_unagi_init(void) {
         o->oAction = UNAGI_ACT_IN_CAVE;
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS 
         // !HackerSM64: Show transparent star if collected
-        if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_JRB) & STAR_FLAG_ACT_2) {
+        if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_2) {
             o->oAnimState = UNAGI_ANIM_STATE_HAS_TRANSPARENT_STAR;
         } else {
             o->oAnimState = UNAGI_ANIM_STATE_HAS_STAR;
