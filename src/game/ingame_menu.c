@@ -694,7 +694,7 @@ void int_to_str(s32 num, u8 *dst) {
     digit[2] = ((num - (digit[0] * 100)) - (digit[1] * 10));
 
     if (digit[0] != 0) {
-        dst[pos++] = digit[1];
+        dst[pos++] = digit[0];
     }
 
     if ((digit[1] != 0)
