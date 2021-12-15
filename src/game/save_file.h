@@ -85,7 +85,7 @@ struct MainMenuSaveData {
 struct SaveBuffer {
     // Each of the four save files has two copies. If one is bad, the other is used as a backup.
     struct SaveFile files[NUM_SAVE_FILES][2];
-    // The main menu data has two copies. If one is bad, the other is used as a backup.
+    // Main menu data, storing config options.
     struct MainMenuSaveData menuData;
 };
 
