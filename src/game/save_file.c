@@ -205,58 +205,39 @@ static void add_save_block_signature(void *buffer, s32 size, u16 magic) {
     sig->chksum = calc_checksum(buffer, size);
 }
 
-/**
- * Copy main menu data from one backup slot to the other slot.
- */
-static void restore_main_menu_data(s32 srcSlot) {
-    s32 destSlot = srcSlot ^ 1;
-
-    // Compute checksum on source data
-    add_save_block_signature(&gSaveBuffer.menuData[srcSlot], sizeof(gSaveBuffer.menuData[srcSlot]), MENU_DATA_MAGIC);
-
-    // Copy source data to destination
-    bcopy(&gSaveBuffer.menuData[srcSlot], &gSaveBuffer.menuData[destSlot], sizeof(gSaveBuffer.menuData[destSlot]));
-
-    // Write destination data to EEPROM
-    write_eeprom_data(&gSaveBuffer.menuData[destSlot], sizeof(gSaveBuffer.menuData[destSlot]));
-}
-
 static void save_main_menu_data(void) {
     if (gMainMenuDataModified) {
         // Compute checksum
-        add_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
-
-        // Back up data
-        bcopy(&gSaveBuffer.menuData[0], &gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]));
+        add_save_block_signature(&gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData), MENU_DATA_MAGIC);
 
         // Write to EEPROM
-        write_eeprom_data(gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData));
+        write_eeprom_data(&gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData));
 
         gMainMenuDataModified = FALSE;
     }
 }
 
 static void wipe_main_menu_data(void) {
-    bzero(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]));
+    bzero(&gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData));
 
     // Set score ages for all courses to 3, 2, 1, and 0, respectively.
-    gSaveBuffer.menuData[0].coinScoreAges[0] = 0x3FFFFFFF;
-    gSaveBuffer.menuData[0].coinScoreAges[1] = 0x2AAAAAAA;
-    gSaveBuffer.menuData[0].coinScoreAges[2] = 0x15555555;
+    gSaveBuffer.menuData.coinScoreAges[0] = 0x3FFFFFFF;
+    gSaveBuffer.menuData.coinScoreAges[1] = 0x2AAAAAAA;
+    gSaveBuffer.menuData.coinScoreAges[2] = 0x15555555;
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }
 
 static s32 get_coin_score_age(s32 fileIndex, s32 courseIndex) {
-    return (gSaveBuffer.menuData[0].coinScoreAges[fileIndex] >> (2 * courseIndex)) & 0x3;
+    return (gSaveBuffer.menuData.coinScoreAges[fileIndex] >> (2 * courseIndex)) & 0x3;
 }
 
 static void set_coin_score_age(s32 fileIndex, s32 courseIndex, s32 age) {
     s32 mask = 0x3 << (2 * courseIndex);
 
-    gSaveBuffer.menuData[0].coinScoreAges[fileIndex] &= ~mask;
-    gSaveBuffer.menuData[0].coinScoreAges[fileIndex] |= age << (2 * courseIndex);
+    gSaveBuffer.menuData.coinScoreAges[fileIndex] &= ~mask;
+    gSaveBuffer.menuData.coinScoreAges[fileIndex] |= age << (2 * courseIndex);
 }
 
 /**
@@ -321,7 +302,7 @@ void save_file_do_save(s32 fileIndex) {
               sizeof(gSaveBuffer.files[fileIndex][1]));
 
         // Write to EEPROM
-        write_eeprom_data(gSaveBuffer.files[fileIndex], sizeof(gSaveBuffer.files[fileIndex]));
+        write_eeprom_data(&gSaveBuffer.files[fileIndex], sizeof(gSaveBuffer.files[fileIndex]));
 
         gSaveFileModified = FALSE;
     }
@@ -356,20 +337,10 @@ void save_file_load_all(void) {
     bzero(&gSaveBuffer, sizeof(gSaveBuffer));
     read_eeprom_data(&gSaveBuffer, sizeof(gSaveBuffer));
 
-    // Verify the main menu data and create a backup copy if only one of the slots is valid.
-    validSlots = verify_save_block_signature(&gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]), MENU_DATA_MAGIC);
-    validSlots |= verify_save_block_signature(&gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]),MENU_DATA_MAGIC) << 1;
-    switch (validSlots) {
-        case 0: // Neither copy is correct
-            wipe_main_menu_data();
-            break;
-        case 1: // Slot 0 is correct and slot 1 is incorrect
-            restore_main_menu_data(0);
-            break;
-        case 2: // Slot 1 is correct and slot 0 is incorrect
-            restore_main_menu_data(1);
-            break;
-    }
+    // Verify the main menu data and wipe it if invalid.
+    validSlots = verify_save_block_signature(&gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData), MENU_DATA_MAGIC);
+    if (!validSlots)
+        wipe_main_menu_data();
 
     for (file = 0; file < NUM_SAVE_FILES; file++) {
         // Verify the save file and create a backup copy if only one of the slots is valid.
@@ -391,19 +362,19 @@ void save_file_load_all(void) {
 
 #ifdef PUPPYCAM
 void puppycam_check_save(void) {
-    if (gSaveBuffer.menuData[0].firstBoot != 4
-        || gSaveBuffer.menuData[0].saveOptions.sensitivityX < 5
-        || gSaveBuffer.menuData[0].saveOptions.sensitivityY < 5) {
+    if (gSaveBuffer.menuData.firstBoot != 4
+        || gSaveBuffer.menuData.saveOptions.sensitivityX < 5
+        || gSaveBuffer.menuData.saveOptions.sensitivityY < 5) {
         wipe_main_menu_data();
-        gSaveBuffer.menuData[0].firstBoot = 4;
+        gSaveBuffer.menuData.firstBoot = 4;
         puppycam_default_config();
     }
 }
 
 void puppycam_get_save(void) {
-    gPuppyCam.options = gSaveBuffer.menuData[0].saveOptions;
+    gPuppyCam.options = gSaveBuffer.menuData.saveOptions;
 
-    gSaveBuffer.menuData[0].firstBoot = gSaveBuffer.menuData[0].firstBoot;
+    gSaveBuffer.menuData.firstBoot = gSaveBuffer.menuData.firstBoot;
 #ifdef WIDE
     gConfig.widescreen = save_file_get_widescreen_mode();
 #endif
@@ -412,9 +383,9 @@ void puppycam_get_save(void) {
 }
 
 void puppycam_set_save(void) {
-    gSaveBuffer.menuData[0].saveOptions = gPuppyCam.options;
+    gSaveBuffer.menuData.saveOptions = gPuppyCam.options;
 
-    gSaveBuffer.menuData[0].firstBoot = 4;
+    gSaveBuffer.menuData.firstBoot = 4;
 
 #ifdef WIDE
     save_file_set_widescreen_mode(gConfig.widescreen);
@@ -434,9 +405,6 @@ void save_file_reload(void) {
     // Copy save file data from backup
     bcopy(&gSaveBuffer.files[gCurrSaveFileNum - 1][1], &gSaveBuffer.files[gCurrSaveFileNum - 1][0],
           sizeof(gSaveBuffer.files[gCurrSaveFileNum - 1][0]));
-
-    // Copy main menu data from backup
-    bcopy(&gSaveBuffer.menuData[1], &gSaveBuffer.menuData[0], sizeof(gSaveBuffer.menuData[0]));
 
     gMainMenuDataModified = FALSE;
     gSaveFileModified = FALSE;
@@ -722,7 +690,7 @@ s32 save_file_get_num_lives(void) {
 
 void save_file_set_sound_mode(u16 mode) {
     set_sound_mode(mode);
-    gSaveBuffer.menuData[0].soundMode = mode;
+    gSaveBuffer.menuData.soundMode = mode;
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
@@ -730,11 +698,11 @@ void save_file_set_sound_mode(u16 mode) {
 
 #ifdef WIDE
 u32 save_file_get_widescreen_mode(void) {
-    return gSaveBuffer.menuData[0].wideMode;
+    return gSaveBuffer.menuData.wideMode;
 }
 
 void save_file_set_widescreen_mode(u8 mode) {
-    gSaveBuffer.menuData[0].wideMode = mode;
+    gSaveBuffer.menuData.wideMode = mode;
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
@@ -742,7 +710,7 @@ void save_file_set_widescreen_mode(u8 mode) {
 #endif
 
 u32 save_file_get_sound_mode(void) {
-    return gSaveBuffer.menuData[0].soundMode;
+    return gSaveBuffer.menuData.soundMode;
 }
 
 void save_file_move_cap_to_default_location(void) {
@@ -764,13 +732,13 @@ void save_file_move_cap_to_default_location(void) {
 
 #if MULTILANG
 void eu_set_language(u16 language) {
-    gSaveBuffer.menuData[0].language = language;
+    gSaveBuffer.menuData.language = language;
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }
 
 u32 eu_get_language(void) {
-    return gSaveBuffer.menuData[0].language;
+    return gSaveBuffer.menuData.language;
 }
 #endif
 
