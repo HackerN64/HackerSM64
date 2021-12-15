@@ -337,7 +337,7 @@ void save_file_load_all(void) {
     bzero(&gSaveBuffer, sizeof(gSaveBuffer));
     read_eeprom_data(&gSaveBuffer, sizeof(gSaveBuffer));
 
-    // Verify the main menu data and create a backup copy if only one of the slots is valid.
+    // Verify the main menu data and wipe it if invalid.
     validSlots = verify_save_block_signature(&gSaveBuffer.menuData, sizeof(gSaveBuffer.menuData), MENU_DATA_MAGIC);
     if (!validSlots)
         wipe_main_menu_data();
