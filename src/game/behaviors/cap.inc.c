@@ -115,7 +115,7 @@ void cap_scale_vertically(void) {
     o->header.gfx.scale[1] = coss(o->oCapScaleAngle) * 0.3f + 0.7f;
     if (o->oCapScaleAngle == 0x10000) {
         o->oCapScaleAngle = 0;
-        o->oCapDoScaleVertically = 2;
+        o->oCapDoScaleVertically = FALSE;
     }
 }
 
@@ -125,7 +125,7 @@ void wing_vanish_cap_act_0(void) {
     if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         cap_check_quicksand();
         if (o->oVelY != 0.0f) {
-            o->oCapDoScaleVertically = 1;
+            o->oCapDoScaleVertically = TRUE;
             o->oVelY = 0.0f;
         }
     }
@@ -225,14 +225,14 @@ void normal_cap_set_save_flags(void) {
 
 void normal_cap_act_0(void) {
     o->oFaceAngleYaw += o->oForwardVel * 128.0f;
-    o->oFaceAnglePitch += o->oForwardVel *  80.0f;
+    o->oFaceAnglePitch += o->oForwardVel * 80.0f;
     s16 collisionFlags = object_step();
 
     if (collisionFlags & OBJ_COL_FLAG_GROUNDED) {
         cap_check_quicksand();
 
         if (o->oVelY != 0.0f) {
-            o->oCapDoScaleVertically = 1;
+            o->oCapDoScaleVertically = TRUE;
             o->oVelY = 0.0f;
             o->oFaceAnglePitch = 0;
         }
