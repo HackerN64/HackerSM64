@@ -885,11 +885,12 @@ void puppycam_terrain_angle(void) {
         f32 z = gPuppyCam.targetObj->oPosZ - (10 * coss(gPuppyCam.yaw));
 
         f32 floorHeight = find_floor_height(x, gPuppyCam.targetObj->oPosY+100, z);
+        f32 diff = gMarioState->floorHeight - floorHeight;
 
-        if (ABS(gMarioState->floorHeight - floorHeight) > 350) {
+        if (ABS(diff) > 50.f) {
             gPuppyCam.intendedTerrainPitch = 0;
         } else {
-            floorPitch = -atan2s(30.0f, gMarioState->floorHeight - floorHeight);
+            floorPitch = -atan2s(30.0f, diff);
             gPuppyCam.intendedTerrainPitch = approach_f32_asymptotic(gPuppyCam.intendedTerrainPitch, floorPitch, adjustSpeed);
             gotTheOkay = TRUE;
         }
