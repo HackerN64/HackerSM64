@@ -2008,7 +2008,7 @@ void gd_dl_flush_vertices(void) {
 /**
  * Unused - called by func_801A520C
  */
-static void func_801A01EC(void) {
+UNUSED static void func_801A01EC(void) {
     if (D_801BE8B0.validCount >= D_801BE8B0.msgCount) {
         osRecvMesg(&D_801BE8B0, &sGdDMACompleteMsg, OS_MESG_BLOCK);
     }
@@ -2018,7 +2018,7 @@ static void func_801A01EC(void) {
 /**
  * Unused - called by func_801A520C
  */
-static void func_801A025C(void) {
+UNUSED static void func_801A025C(void) {
     gGdFrameBufNum ^= 1;
     osViSwapBuffer(sScreenView->parent->colourBufs[gGdFrameBufNum]);
 }
@@ -3393,7 +3393,7 @@ union ObjVarVal *cvrt_val_to_kb(union ObjVarVal *dst, union ObjVarVal src) {
 }
 
 /* 254450 -> 254560 */
-void Unknown801A5C80(struct ObjGroup *parentGroup) {
+UNUSED void Unknown801A5C80(struct ObjGroup *parentGroup) {
     struct ObjLabel *label;      // 3c
     struct ObjGroup *debugGroup; // 38
 
@@ -3415,7 +3415,7 @@ void Unknown801A5C80(struct ObjGroup *parentGroup) {
 }
 
 /* 254560 -> 2547C8 */
-void Unknown801A5D90(struct ObjGroup *arg0) {
+UNUSED void Unknown801A5D90(struct ObjGroup *arg0) {
     struct ObjLabel *mtLabel;  // 254
     struct ObjGroup *labelgrp; // 250
     struct ObjView *memview;   // 24c
@@ -3480,11 +3480,10 @@ void Unknown801A5D90(struct ObjGroup *arg0) {
 }
 
 /* 2547C8 -> 254AC0 */
-void Unknown801A5FF8(struct ObjGroup *arg0) {
+UNUSED void Unknown801A5FF8(struct ObjGroup *arg0) {
     struct ObjView *menuview;      // 3c
     UNUSED struct ObjLabel *label; // 38
     struct ObjGroup *menugrp;      // 34
-    UNUSED u8 filler[8];
 
     d_start_group("menug");
     sMenuGadgets[0] = d_makeobj(D_GADGET, "menu0");
