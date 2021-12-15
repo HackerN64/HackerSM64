@@ -984,7 +984,7 @@ s32 approach_s16(s32 current, s32 target, s32 inc, s32 dec) {
     } else { // target < current
         current = ((dist < -dec) ? (current - dec) : target);
     }
-    return current;
+    return (s16)current;
 }
 Bool32 approach_s16_bool(s16 *current, s32 target, s32 inc, s32 dec) {
     *current = approach_s16(*current, target, inc, dec);
