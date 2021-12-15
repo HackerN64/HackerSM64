@@ -3419,7 +3419,7 @@ UNUSED void Unknown801A5D90(struct ObjGroup *arg0) {
     struct ObjLabel *mtLabel;  // 254
     struct ObjGroup *labelgrp; // 250
     struct ObjView *memview;   // 24c
-    s32 trackerNum;            // memtracker id and/or i
+    s32 trackerNum;                 // memtracker id and/or i
     s32 sp244;                 // label y position?
     s32 sp240;                 // done checking all memtrakcers
     s32 sp23C;                 // memtracker label made?
