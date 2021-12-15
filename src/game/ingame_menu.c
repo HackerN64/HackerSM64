@@ -2184,21 +2184,23 @@ s32 render_course_complete_screen(void) {
 }
 
 s32 render_menus_and_dialogs(void) {
+    s32 mode = MENU_OPT_NONE;
+
     create_dl_ortho_matrix();
 
     if (gMenuMode != MENU_MODE_NONE) {
         switch (gMenuMode) {
             case MENU_MODE_UNUSED_0:
-                return render_pause_courses_and_castle();
+                mode = render_pause_courses_and_castle();
                 break;
             case MENU_MODE_RENDER_PAUSE_SCREEN:
-                return render_pause_courses_and_castle();
+                mode = render_pause_courses_and_castle();
                 break;
             case MENU_MODE_RENDER_COURSE_COMPLETE_SCREEN:
-                return render_course_complete_screen();
+                mode = render_course_complete_screen();
                 break;
             case MENU_MODE_UNUSED_3:
-                return render_course_complete_screen();
+                mode = render_course_complete_screen();
                 break;
         }
 
@@ -2207,12 +2209,12 @@ s32 render_menus_and_dialogs(void) {
         // The Peach "Dear Mario" message needs to be repositioned separately
         if (gDialogID == DIALOG_020) {
             print_peach_letter_message();
-            return MENU_OPT_NONE;
+            return mode;
         }
 
         render_dialog_entries();
         gDialogColorFadeTimer = (s16) gDialogColorFadeTimer + 0x1000;
     }
 
-    return MENU_OPT_NONE;
+    return mode;
 }
