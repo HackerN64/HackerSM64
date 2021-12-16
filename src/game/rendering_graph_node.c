@@ -240,6 +240,8 @@ static struct RenderPhase sRenderPhases[] = {
 #endif
 };
 
+extern const Gfx init_rsp[];
+
 #ifdef OBJECTS_REJ
 void switch_ucode(s32 ucode) {
     // Set the ucode and RCP settings
@@ -247,8 +249,8 @@ void switch_ucode(s32 ucode) {
         default: // GRAPH_NODE_UCODE_DEFAULT
         case GRAPH_NODE_UCODE_DEFAULT:
             gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo); // F3DZEX2_PosLight
-            // Reset the RCP settings
-            init_rcp(KEEP_ZBUFFER);
+            // Reload the necessary RSP settings
+            gSPDisplayList(gDisplayListHead++, init_rsp);
             break;
         case GRAPH_NODE_UCODE_REJ:
             // Use .rej Microcode, skip sub-pixel processing on console
@@ -257,17 +259,11 @@ void switch_ucode(s32 ucode) {
             } else {
                 gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
             }
-            // Reset the RCP settings
-            init_rcp(KEEP_ZBUFFER);
+            // Reload the necessary RSP settings
+            gSPDisplayList(gDisplayListHead++, init_rsp);
             // Set the clip ratio (see init_rsp)
             gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
             break;
-    }
-    // Reset clipping
-    if (gMarioState->action == ACT_CREDITS_CUTSCENE) {
-        make_viewport_clip_rect(&sEndCutsceneVp);
-    } else {
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH, (SCREEN_HEIGHT - gBorderHeight));
     }
 }
 #endif
