@@ -243,8 +243,8 @@ void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
     *z += diff_z * invDenom;
 }
 
-static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf, const f32 margin) {
-    s32 addMargin = (surf->type != SURFACE_HANGABLE);
+static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf, f32 margin) {
+    s32 addMargin = surf->type != SURFACE_HANGABLE && !FLT_IS_NONZERO(margin);
     Vec3i vx, vz;
     vx[0] = surf->vertex1[0];
     vz[0] = surf->vertex1[2];
@@ -450,6 +450,12 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
     return floor;
 }
 
+// Generic triangle bounds func
+ALWAYS_INLINE static s32 check_within_bounds_y_norm(s32 x, s32 z, struct Surface *surf) {
+    if (surf->normal.y >= NORMAL_FLOOR_THRESHOLD) return check_within_floor_triangle_bounds(x, z, surf);
+    return check_within_ceil_triangle_bounds(x, z, surf, 0);
+}
+
 /**
  * Iterate through the list of water floors and find the first water floor under a given point.
  */
@@ -462,20 +468,22 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
     f32 curHeight = FLOOR_LOWER_LIMIT;
     f32 bottomHeight = FLOOR_LOWER_LIMIT;
     f32 curBottomHeight = FLOOR_LOWER_LIMIT;
+    f32 buffer = FIND_FLOOR_BUFFER;
 
     // Iterate through the list of water floors until there are no more water floors.
+    // SURFACE_NEW_WATER_BOTTOM
     while (bottomSurfaceNode != NULL) {
         surf = bottomSurfaceNode->surface;
         bottomSurfaceNode = bottomSurfaceNode->next;
 
         // skip wall angled water
-        if (absf(surf->normal.y) < NORMAL_FLOOR_THRESHOLD) continue;
+        if (surf->type != SURFACE_NEW_WATER_BOTTOM || absf(surf->normal.y) < NORMAL_FLOOR_THRESHOLD) continue;
 
-        if (surf->type != SURFACE_NEW_WATER_BOTTOM || !check_within_floor_triangle_bounds(x, z, surf)) continue;
+        if (!check_within_bounds_y_norm(x, z, surf)) continue;
 
         curBottomHeight = get_surface_height_at_location(x, z, surf);
 
-        if (curBottomHeight < y - FIND_FLOOR_BUFFER) {
+        if (curBottomHeight < y + buffer) {
             continue;
         } else {
             bottomHeight = curBottomHeight;
@@ -483,14 +491,15 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
     }
 
     // Iterate through the list of water tops until there are no more water tops.
+    // SURFACE_NEW_WATER
     while (topSurfaceNode != NULL) {
         surf = topSurfaceNode->surface;
         topSurfaceNode = topSurfaceNode->next;
 
-        // skip wall angled water bottoms
-        if (absf(surf->normal.y) < NORMAL_FLOOR_THRESHOLD) continue;
+        // skip water tops or wall angled water bottoms
+        if (surf->type == SURFACE_NEW_WATER_BOTTOM || absf(surf->normal.y) < NORMAL_FLOOR_THRESHOLD) continue;
 
-        if ((surf->type == SURFACE_NEW_WATER_BOTTOM) || !check_within_floor_triangle_bounds(x, z, surf)) continue;
+        if (!check_within_bounds_y_norm(x, z, surf)) continue;
 
         curHeight = get_surface_height_at_location(x, z, surf);
 
