@@ -654,6 +654,8 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
     saveFile->capArea = gCurrAreaIndex;
 #ifndef SAVE_NUM_LIVES
     vec3s_set(saveFile->capPos, x, y, z);
+#else
+    (void) x; (void) y; (void) z; // Address compiler warnings for unused variables
 #endif
     save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
 }

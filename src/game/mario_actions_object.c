@@ -37,7 +37,7 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
     switch (m->actionArg) {
         case ACT_ARG_PUNCH_SEQUENCE_YAH:
             play_sound(SOUND_MARIO_PUNCH_YAH, m->marioObj->header.gfx.cameraToObject);
-            // fall through
+            FALL_THROUGH;
         case ACT_ARG_PUNCH_SEQUENCE_FIRST_PUNCH:
             set_mario_animation(m, MARIO_ANIM_FIRST_PUNCH);
             if (is_anim_past_end(m)) {
