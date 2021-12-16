@@ -4974,15 +4974,11 @@ void warp_camera(f32 displacementX, f32 displacementY, f32 displacementZ) {
  */
 void approach_camera_height(struct Camera *c, f32 goal, f32 inc) {
     if (sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
-        if (c->pos[1] < goal) {
-            if ((c->pos[1] += inc) > goal) {
-                c->pos[1] = goal;
-            }
-        } else {
-            if ((c->pos[1] -= inc) < goal) {
-                c->pos[1] = goal;
-            }
-        }
+#ifdef FAST_VERTICAL_CAMERA_MOVEMENT
+        approach_f32_asymptotic_bool(&c->pos[1], goal, inc);
+#else
+        approach_f32_symmetric_bool(&c->pos[1], goal, inc);
+#endif
     } else {
         c->pos[1] = goal;
     }
