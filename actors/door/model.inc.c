@@ -18,7 +18,7 @@ ALIGNED8 static const Texture door_seg3_texture_polished_wooden_door[] = {
 };
 
 // 0x0300AD10
-ALIGNED8 static const Texture door_seg3_texture_polished_wooden_door_overlay[] = {
+ALIGNED8 static const Texture door_seg3_texture_polished_wooden_door_sides[] = {
 #include "actors/door/polished_wooden_door_overlay.rgba16.inc.c"
 };
 
@@ -28,7 +28,7 @@ ALIGNED8 static const Texture door_seg3_texture_rough_wooden_door[] = {
 };
 
 // 0x0300CD10
-ALIGNED8 static const Texture door_seg3_texture_rough_wooden_door_overlay[] = {
+ALIGNED8 static const Texture door_seg3_texture_rough_wooden_door_sides[] = {
 #include "actors/door/rough_wooden_door_overlay.rgba16.inc.c"
 };
 
@@ -38,7 +38,7 @@ ALIGNED8 static const Texture door_seg3_texture_metal_door[] = {
 };
 
 // 0x0300E510
-ALIGNED8 static const Texture door_seg3_texture_metal_door_overlay[] = {
+ALIGNED8 static const Texture door_seg3_texture_metal_door_sides[] = {
 #include "actors/door/metal_door_overlay.rgba16.inc.c"
 };
 
@@ -48,7 +48,7 @@ ALIGNED8 static const Texture door_seg3_texture_cave_door[] = {
 };
 
 // 0x0300FD10
-ALIGNED8 static const Texture door_seg3_texture_cave_door_overlay[] = {
+ALIGNED8 static const Texture door_seg3_texture_cave_door_sides[] = {
 #include "actors/door/hmc_mural_door_overlay.rgba16.inc.c"
 };
 
@@ -58,7 +58,7 @@ ALIGNED8 static const Texture door_seg3_texture_spooky_door[] = {
 };
 
 // 0x03011510
-ALIGNED8 static const Texture door_seg3_texture_spooky_door_overlay[] = {
+ALIGNED8 static const Texture door_seg3_texture_spooky_door_sides[] = {
 #include "actors/door/bbh_door_overlay.rgba16.inc.c"
 };
 
@@ -83,35 +83,35 @@ ALIGNED8 static const Texture door_seg3_texture_lock[] = {
 };
 
 // 0x03013910
-static const Vtx door_seg3_vertex_polished_wooden_door_near_overlay[] = {
-    {{{   -12,      0,    -58}, 0, {     0,      0}, {0x81, 0x00, 0x00, 0xff}}},
-    {{{   -12,      0,     59}, 0, {   990,      0}, {0x81, 0x00, 0x00, 0xff}}},
-    {{{   -12,   1024,     59}, 0, {   990,   2012}, {0x81, 0x00, 0x00, 0xff}}},
-    {{{   -12,   1024,    -58}, 0, {   990,   2012}, {0x00, 0x7f, 0x00, 0xff}}},
-    {{{   -12,   1024,     59}, 0, {     0,   2012}, {0x00, 0x7f, 0x00, 0xff}}},
-    {{{   604,   1024,     59}, 0, {     0,      0}, {0x00, 0x7f, 0x00, 0xff}}},
-    {{{   604,   1024,    -58}, 0, {   990,      0}, {0x00, 0x7f, 0x00, 0xff}}},
-    {{{   604,      0,    -58}, 0, {     0,      0}, {0x00, 0x81, 0x00, 0xff}}},
-    {{{   -12,      0,     59}, 0, {   990,   2012}, {0x00, 0x81, 0x00, 0xff}}},
-    {{{   -12,      0,    -58}, 0, {     0,   2012}, {0x00, 0x81, 0x00, 0xff}}},
-    {{{   604,      0,     59}, 0, {   990,      0}, {0x00, 0x81, 0x00, 0xff}}},
-    {{{   604,      0,     59}, 0, {     0,      0}, {0x7f, 0x00, 0x00, 0xff}}},
-    {{{   604,      0,    -58}, 0, {   990,      0}, {0x7f, 0x00, 0x00, 0xff}}},
-    {{{   604,   1024,    -58}, 0, {   990,   2012}, {0x7f, 0x00, 0x00, 0xff}}},
-    {{{   604,   1024,     59}, 0, {     0,   2012}, {0x7f, 0x00, 0x00, 0xff}}},
-    {{{   -12,   1024,    -58}, 0, {     0,   2012}, {0x81, 0x00, 0x00, 0xff}}},
+static const Vtx door_seg3_vertex_polished_wooden_door_near_sides[] = {
+    {{{   -16,      0,    -60}, 0, {     0,      0}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{   -16,      0,     60}, 0, {   992,      0}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{   -16,   1024,     60}, 0, {   992,   2016}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{   -16,   1024,    -60}, 0, {   992,   2016}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   -16,   1024,     60}, 0, {     0,   2016}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   600,   1024,     60}, 0, {     0,      0}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   600,   1024,    -60}, 0, {   992,      0}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   600,      0,    -60}, 0, {     0,      0}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   -16,      0,     60}, 0, {   992,   2016}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   -16,      0,    -60}, 0, {     0,   2016}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   600,      0,     60}, 0, {   992,      0}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   600,      0,     60}, 0, {     0,      0}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   600,      0,    -60}, 0, {   992,      0}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   600,   1024,    -60}, 0, {   992,   2016}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   600,   1024,     60}, 0, {     0,   2016}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   -16,   1024,    -60}, 0, {     0,   2016}, {0x81, 0x00, 0x00, 0xff}}},
 };
 
 // 0x03013A10
 static const Vtx door_seg3_vertex_polished_wooden_door_near[] = {
-    {{{   604,      0,    -58}, 0, {   974,   1820}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   -12,      0,    -58}, 0, {     0,   1816}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   -12,   1024,    -58}, 0, {     0,    124}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   604,   1024,    -58}, 0, {   974,    128}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   -12,      0,     59}, 0, {     0,   1816}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   604,      0,     59}, 0, {   974,   1812}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   604,   1024,     59}, 0, {   974,    132}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   -12,   1024,     59}, 0, {     0,    140}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   600,      0,    -60}, 0, {   976,   1820}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   -16,      0,    -60}, 0, {     0,   1820}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   -16,   1024,    -60}, 0, {     0,    128}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   600,   1024,    -60}, 0, {   976,    128}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   -16,      0,     60}, 0, {     0,   1820}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   600,      0,     60}, 0, {   976,   1820}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   600,   1024,     60}, 0, {   976,    128}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   -16,   1024,     60}, 0, {     0,    128}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x03013A90
@@ -148,12 +148,12 @@ static const Vtx door_seg3_vertex_polished_wooden_door_handle_2[] = {
 
 // 0x03013C10 - 0x03013CC8
 const Gfx door_seg3_sub_dl_polished_wooden_door_near[] = {
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_polished_wooden_door_overlay),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_polished_wooden_door_sides),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPLight(&door_seg3_lights_default.l, 1),
     gsSPLight(&door_seg3_lights_default.a, 2),
-    gsSPVertex(door_seg3_vertex_polished_wooden_door_near_overlay, 16, 0),
+    gsSPVertex(door_seg3_vertex_polished_wooden_door_near_sides, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
     gsSP2Triangles( 7, 10,  8, 0x0, 11, 12, 13, 0x0),
@@ -242,26 +242,26 @@ const Gfx door_seg3_dl_cabin_door_near[] = {
 
 // 0x03013F20
 static const Vtx door_seg3_vertex_polished_wooden_door_far[] = {
-    {{{   591,      0,    -58}, 0, {   976,   1808}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{    -8,   1010,    -58}, 0, {   -16,    148}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   591,   1010,    -58}, 0, {   990,    140}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{    -8,      0,    -58}, 0, {   -30,   1812}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{    -8,      0,     59}, 0, {     0,   1816}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   591,   1010,     59}, 0, {   974,    132}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{    -8,   1010,     59}, 0, {     0,    140}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   591,      0,     59}, 0, {   974,   1812}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,      0,    -60}, 0, {   976,   1820}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,   1010,    -60}, 0, {     0,    128}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   591,   1010,    -60}, 0, {   976,    128}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,      0,    -60}, 0, {     0,   1820}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,      0,     60}, 0, {     0,   1820}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,   1010,     60}, 0, {   976,    128}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{    -8,   1010,     60}, 0, {     0,    128}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,      0,     60}, 0, {   976,   1820}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x03013FA0
 static const Vtx door_seg3_vertex_polished_wooden_door_far_handle[] = {
-    {{{   492,    468,   -152}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   546,    412,   -152}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   492,    357,   -152}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   437,    412,   -152}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   492,    468,    153}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   492,    357,    153}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   546,    412,    153}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   437,    412,    153}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   492,    468,   -154}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   546,    412,   -154}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   492,    357,   -154}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   437,    412,   -154}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   492,    468,    154}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   492,    357,    154}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   546,    412,    154}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   437,    412,    154}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x03014020 - 0x03014100
@@ -318,10 +318,10 @@ static const Vtx door_seg3_vertex_star_sign_near[] = {
 
 // 0x03014180
 static const Vtx door_seg3_vertex_star_sign_far[] = {
-    {{{   441,    850,     59}, 0, {   992,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   141,    850,     59}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   141,    550,     59}, 0, {     0,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   441,    550,     59}, 0, {   992,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   441,    850,     60}, 0, {   992,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   141,    850,     60}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   141,    550,     60}, 0, {     0,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   441,    550,     60}, 0, {   992,    992}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x030141C0 - 0x03014218
@@ -409,32 +409,96 @@ const Gfx door_seg3_dl_three_stars_far[] = {
     gsSPBranchList(door_seg3_vertex_star_sign_end),
 };
 
+static const Vtx door_seg3_vertex_key_door_sides[] = {
+    {{{   -16,   1024,    -60}, 0, {     0,   2016}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{   -16,      0,    -60}, 0, {     0,      0}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{   -16,      0,     60}, 0, {   992,      0}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{   -16,   1024,     60}, 0, {   992,   2016}, {0x81, 0x00, 0x00, 0xff}}},
+
+    {{{   -16,   1024,    -60}, 0, {   992,   2016}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   -16,   1024,     60}, 0, {     0,   2016}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   600,   1024,     60}, 0, {     0,      0}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   600,   1024,    -60}, 0, {   992,      0}, {0x00, 0x7f, 0x00, 0xff}}},
+
+    {{{   600,      0,    -60}, 0, {     0,      0}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   -16,      0,     60}, 0, {   992,   2016}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   -16,      0,    -60}, 0, {     0,   2016}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   600,      0,     60}, 0, {   992,      0}, {0x00, 0x81, 0x00, 0xff}}},
+
+    {{{   600,      0,     60}, 0, {     0,      0}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   600,      0,    -60}, 0, {   992,      0}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   600,   1024,    -60}, 0, {   992,   2016}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   600,   1024,     60}, 0, {     0,   2016}, {0x7f, 0x00, 0x00, 0xff}}},
+};
+
+const Gfx door_seg3_sub_dl_key_door_sides[] = {
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_polished_wooden_door_sides),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPLight(&door_seg3_lights_default.l, 1),
+    gsSPLight(&door_seg3_lights_default.a, 2),
+    gsSPVertex(door_seg3_vertex_key_door_sides, 16, 0),
+    gsSP2Triangles( 0,  1,  3, 0x0,  1,  2,  3, 0x0),
+    gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
+    gsSP2Triangles( 8,  9, 10, 0x0,  8, 11,  9, 0x0),
+    gsSP2Triangles(12, 13, 14, 0x0, 12, 14, 15, 0x0),
+    gsSPEndDisplayList(),
+};
+
+static const Vtx door_seg3_vertex_key_door[] = {
+    // right, lock on left
+    {{{   600,      0,    -60}, 0, {   976,   1820}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   -16,      0,    -60}, 0, {     0,   1820}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   -16,   1024,    -60}, 0, {     0,    128}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   600,   1024,    -60}, 0, {   976,    128}, {0x00, 0x00, 0x81, 0xff}}},
+
+    {{{   600,    544,    -60}, 0, {   976,    928}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   400,    544,    -60}, 0, {   624,    928}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   400,    916,    -60}, 0, {   624,    304}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   600,    916,    -60}, 0, {   976,    304}, {0x00, 0x00, 0x81, 0xff}}},
+    // left, lock on right
+    {{{   -16,      0,     60}, 0, {     0,   1820}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   600,      0,     60}, 0, {   976,   1820}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   600,   1024,     60}, 0, {   976,    128}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   -16,   1024,     60}, 0, {     0,    128}, {0x00, 0x00, 0x7f, 0xff}}},
+
+    {{{   600,    916,     60}, 0, {   976,    304}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   400,    544,     60}, 0, {   624,    928}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   600,    544,     60}, 0, {   976,    928}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   400,    916,     60}, 0, {   624,    304}, {0x00, 0x00, 0x7f, 0xff}}},
+};
+
+const Gfx door_seg3_sub_dl_key_door[] = {
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_polished_wooden_door),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(door_seg3_vertex_key_door, 16, 0),
+    // right, lock on left
+    gsSP2Triangles( 0,  1,  5, 0x0,  0,  5,  4, 0x0),
+    gsSP2Triangles( 1,  2,  5, 0x0,  2,  3,  6, 0x0),
+    gsSP2Triangles( 2,  6,  5, 0x0,  3,  7,  6, 0x0),
+    // left, lock on right
+    gsSP2Triangles( 8,  9, 13, 0x0,  8, 13, 11, 0x0),
+    gsSP2Triangles( 9, 14, 13, 0x0, 10, 11, 15, 0x0),
+    gsSP2Triangles(10, 15, 12, 0x0, 11, 13, 15, 0x0),
+    gsSPEndDisplayList(),
+};
+
+
 // 0x03014370
-static const Vtx door_seg3_vertex_lock_far[] = {
-    {{{   595,    916,     59}, 0, {   480,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   405,    544,     59}, 0, {     0,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   595,    544,     59}, 0, {   480,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   405,    916,     59}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   595,    544,    -58}, 0, {   480,    992}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   405,    544,    -58}, 0, {     0,    992}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   405,    916,    -58}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   595,    916,    -58}, 0, {   480,      0}, {0x00, 0x00, 0x81, 0xff}}},
+static const Vtx door_seg3_vertex_lock[] = {
+    {{{   600,    916,     60}, 0, {   480,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   400,    544,     60}, 0, {     0,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   600,    544,     60}, 0, {   480,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   400,    916,     60}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   600,    544,    -60}, 0, {   480,    992}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   400,    544,    -60}, 0, {     0,    992}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   400,    916,    -60}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   600,    916,    -60}, 0, {   480,      0}, {0x00, 0x00, 0x81, 0xff}}},
 };
 
-// 0x030143F0
-static const Vtx door_seg3_vertex_lock_near[] = {
-    {{{   595,    916,     64}, 0, {   480,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   405,    544,     64}, 0, {     0,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   595,    544,     64}, 0, {   480,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   405,    916,     64}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   595,    544,    -63}, 0, {   480,    992}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   405,    544,    -63}, 0, {     0,    992}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   405,    916,    -63}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   595,    916,    -63}, 0, {   480,      0}, {0x00, 0x00, 0x81, 0xff}}},
-};
-
-// 0x03014470 - 0x030144E0
-const Gfx door_seg3_sub_dl_lock_begin[] = {
+// 0x03014528 - 0x03014540
+const Gfx door_seg3_sub_dl_lock[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
     gsSPClearGeometryMode(G_SHADING_SMOOTH),
@@ -448,11 +512,7 @@ const Gfx door_seg3_sub_dl_lock_begin[] = {
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 32 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
     gsSPLight(&door_seg3_lights_default.l, 1),
     gsSPLight(&door_seg3_lights_default.a, 2),
-    gsSPEndDisplayList(),
-};
-
-// 0x030144E0 - 0x03014528
-const Gfx door_seg3_sub_dl_lock_end[] = {
+    gsSPVertex(door_seg3_vertex_lock, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
@@ -463,64 +523,72 @@ const Gfx door_seg3_sub_dl_lock_end[] = {
 };
 
 // 0x03014528 - 0x03014540
-const Gfx door_seg3_dl_lock_far[] = {
-    gsSPDisplayList(door_seg3_sub_dl_lock_begin),
-    gsSPVertex(door_seg3_vertex_lock_far, 8, 0),
-    gsSPBranchList(door_seg3_sub_dl_lock_end),
-};
-
-// 0x03014540 - 0x03014558
-const Gfx door_seg3_dl_lock_near[] = {
-    gsSPDisplayList(door_seg3_sub_dl_lock_begin),
-    gsSPVertex(door_seg3_vertex_lock_near, 8, 0),
-    gsSPBranchList(door_seg3_sub_dl_lock_end),
+const Gfx door_seg3_dl_key_door[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
+    gsSPClearGeometryMode(G_SHADING_SMOOTH),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 6, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC),
+    gsSPDisplayList(door_seg3_sub_dl_key_door_sides),
+    gsSPDisplayList(door_seg3_sub_dl_key_door),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_SHADING_SMOOTH),
+    gsSPDisplayList(door_seg3_sub_dl_polished_wooden_door_handle_1),
+    gsSPDisplayList(door_seg3_sub_dl_polished_wooden_door_handle_2),
+    gsSPDisplayList(door_seg3_sub_dl_lock),
+    gsSPEndDisplayList(),
 };
 
 // 0x03014558
-static const Vtx door_seg3_vertex_themed_door_overlay[] = {
-    {{{    -8,   1000,    -58}, 0, {     0,     70}, {0x81, 0x00, 0x00, 0xff}}},
-    {{{    -8,      0,    -58}, 0, {     0,    936}, {0x81, 0x00, 0x00, 0xff}}},
-    {{{    -8,      0,     59}, 0, {   990,    936}, {0x81, 0x00, 0x00, 0xff}}},
-    {{{    -8,      0,    -58}, 0, {   990,    114}, {0x00, 0x81, 0x00, 0xff}}},
-    {{{   591,      0,    -58}, 0, {   990,    856}, {0x00, 0x81, 0x00, 0xff}}},
-    {{{   591,      0,     59}, 0, {     0,    856}, {0x00, 0x81, 0x00, 0xff}}},
-    {{{    -8,      0,     59}, 0, {     0,    114}, {0x00, 0x81, 0x00, 0xff}}},
-    {{{    -8,   1000,     59}, 0, {     0,    114}, {0x00, 0x7f, 0x00, 0xff}}},
-    {{{   591,   1000,    -58}, 0, {   990,    856}, {0x00, 0x7f, 0x00, 0xff}}},
-    {{{    -8,   1000,    -58}, 0, {   990,    114}, {0x00, 0x7f, 0x00, 0xff}}},
-    {{{   591,   1000,     59}, 0, {     0,    856}, {0x00, 0x7f, 0x00, 0xff}}},
-    {{{   591,   1000,     59}, 0, {   990,     70}, {0x7f, 0x00, 0x00, 0xff}}},
-    {{{   591,      0,     59}, 0, {   990,    936}, {0x7f, 0x00, 0x00, 0xff}}},
-    {{{   591,      0,    -58}, 0, {     0,    936}, {0x7f, 0x00, 0x00, 0xff}}},
-    {{{   591,   1000,    -58}, 0, {     0,     70}, {0x7f, 0x00, 0x00, 0xff}}},
-    {{{    -8,   1000,     59}, 0, {   990,     70}, {0x81, 0x00, 0x00, 0xff}}},
+static const Vtx door_seg3_vertex_themed_door_sides[] = {
+    {{{    -8,   1000,    -60}, 0, {     0,     70}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{    -8,      0,    -60}, 0, {     0,    936}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{    -8,      0,     60}, 0, {   992,    936}, {0x81, 0x00, 0x00, 0xff}}},
+    {{{    -8,      0,    -60}, 0, {   992,    114}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   591,      0,    -60}, 0, {   992,    856}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{   591,      0,     60}, 0, {     0,    856}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{    -8,      0,     60}, 0, {     0,    114}, {0x00, 0x81, 0x00, 0xff}}},
+    {{{    -8,   1000,     60}, 0, {     0,    114}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   591,   1000,    -60}, 0, {   992,    856}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{    -8,   1000,    -60}, 0, {   992,    114}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   591,   1000,     60}, 0, {     0,    856}, {0x00, 0x7f, 0x00, 0xff}}},
+    {{{   591,   1000,     60}, 0, {   992,     70}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   591,      0,     60}, 0, {   992,    936}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   591,      0,    -60}, 0, {     0,    936}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{   591,   1000,    -60}, 0, {     0,     70}, {0x7f, 0x00, 0x00, 0xff}}},
+    {{{    -8,   1000,     60}, 0, {   992,     70}, {0x81, 0x00, 0x00, 0xff}}},
 };
 
 // 0x03014658
 static const Vtx door_seg3_vertex_themed_door[] = {
-    {{{    -8,      0,     59}, 0, {   990,   2012}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   591,   1000,     59}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{    -8,   1000,     59}, 0, {   990,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   591,      0,     59}, 0, {     0,   2012}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   591,      0,    -58}, 0, {     0,   2012}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{    -8,      0,    -58}, 0, {   990,   2012}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{    -8,   1000,    -58}, 0, {   990,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   591,   1000,    -58}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,      0,     60}, 0, {   992,   2016}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,   1000,     60}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{    -8,   1000,     60}, 0, {   992,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,      0,     60}, 0, {     0,   2016}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,      0,    -60}, 0, {     0,   2016}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,      0,    -60}, 0, {   992,   2016}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,   1000,    -60}, 0, {   992,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   591,   1000,    -60}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
 };
 
 // 0x030146D8
 static const Vtx door_seg3_vertex_themed_handle_near_1[] = {
-    {{{   492,    468,   -152}, 0, {     0,      0}, {0xe8, 0x47, 0x9a, 0xff}}},
-    {{{   414,    412,    -98}, 0, {     0,      0}, {0x82, 0x00, 0x00, 0xff}}},
-    {{{   492,    491,    -98}, 0, {     0,      0}, {0x00, 0x7e, 0x00, 0xff}}},
-    {{{   492,    468,    153}, 0, {     0,      0}, {0x18, 0x47, 0x66, 0xff}}},
-    {{{   492,    357,    153}, 0, {     0,      0}, {0xe9, 0xb8, 0x65, 0xff}}},
-    {{{   546,    412,    153}, 0, {     0,      0}, {0x5b, 0xe2, 0x53, 0xff}}},
-    {{{   437,    412,    153}, 0, {     0,      0}, {0xa5, 0x1d, 0x53, 0xff}}},
-    {{{   492,    491,     99}, 0, {     0,      0}, {0x00, 0x7e, 0x00, 0xff}}},
-    {{{   569,    412,     99}, 0, {     0,      0}, {0x7e, 0x00, 0x00, 0xff}}},
-    {{{   492,    334,     99}, 0, {     0,      0}, {0x00, 0x82, 0x00, 0xff}}},
-    {{{   414,    412,     99}, 0, {     0,      0}, {0x82, 0x00, 0x00, 0xff}}},
+    {{{   492,    468,   -154}, 0, {     0,      0}, {0xe8, 0x47, 0x9a, 0xff}}},
+    {{{   414,    412,   -100}, 0, {     0,      0}, {0x82, 0x00, 0x00, 0xff}}},
+    {{{   492,    491,   -100}, 0, {     0,      0}, {0x00, 0x7e, 0x00, 0xff}}},
+    {{{   492,    468,    154}, 0, {     0,      0}, {0x18, 0x47, 0x66, 0xff}}},
+    {{{   492,    357,    154}, 0, {     0,      0}, {0xe9, 0xb8, 0x65, 0xff}}},
+    {{{   546,    412,    154}, 0, {     0,      0}, {0x5b, 0xe2, 0x53, 0xff}}},
+    {{{   437,    412,    154}, 0, {     0,      0}, {0xa5, 0x1d, 0x53, 0xff}}},
+    {{{   492,    491,    100}, 0, {     0,      0}, {0x00, 0x7e, 0x00, 0xff}}},
+    {{{   569,    412,    100}, 0, {     0,      0}, {0x7e, 0x00, 0x00, 0xff}}},
+    {{{   492,    334,    100}, 0, {     0,      0}, {0x00, 0x82, 0x00, 0xff}}},
+    {{{   414,    412,    100}, 0, {     0,      0}, {0x82, 0x00, 0x00, 0xff}}},
     {{{   492,    468,     44}, 0, {     0,      0}, {0xdb, 0x6f, 0xd1, 0xff}}},
     {{{   437,    412,     44}, 0, {     0,      0}, {0x91, 0xdb, 0xd2, 0xff}}},
     {{{   492,    357,     44}, 0, {     0,      0}, {0x26, 0x91, 0xd2, 0xff}}},
@@ -529,18 +597,18 @@ static const Vtx door_seg3_vertex_themed_handle_near_1[] = {
 
 // 0x030147C8
 static const Vtx door_seg3_vertex_themed_handle_near_2[] = {
-    {{{   492,    491,    -98}, 0, {     0,      0}, {0x00, 0x7e, 0x00, 0xff}}},
-    {{{   437,    412,    -43}, 0, {     0,      0}, {0x90, 0x24, 0x2e, 0xff}}},
-    {{{   492,    468,    -43}, 0, {     0,      0}, {0x26, 0x6f, 0x2f, 0xff}}},
-    {{{   492,    468,   -152}, 0, {     0,      0}, {0xe8, 0x47, 0x9a, 0xff}}},
-    {{{   546,    412,   -152}, 0, {     0,      0}, {0x5b, 0x1d, 0xae, 0xff}}},
-    {{{   492,    357,   -152}, 0, {     0,      0}, {0x18, 0xb9, 0x9b, 0xff}}},
-    {{{   437,    412,   -152}, 0, {     0,      0}, {0xa6, 0xe2, 0xad, 0xff}}},
-    {{{   414,    412,    -98}, 0, {     0,      0}, {0x82, 0x00, 0x00, 0xff}}},
-    {{{   569,    412,    -98}, 0, {     0,      0}, {0x7e, 0x00, 0x00, 0xff}}},
-    {{{   492,    334,    -98}, 0, {     0,      0}, {0x00, 0x82, 0x00, 0xff}}},
-    {{{   492,    357,    -43}, 0, {     0,      0}, {0xdb, 0x90, 0x2e, 0xff}}},
-    {{{   546,    412,    -43}, 0, {     0,      0}, {0x70, 0xdb, 0x2e, 0xff}}},
+    {{{   492,    491,   -100}, 0, {     0,      0}, {0x00, 0x7e, 0x00, 0xff}}},
+    {{{   437,    412,    -44}, 0, {     0,      0}, {0x90, 0x24, 0x2e, 0xff}}},
+    {{{   492,    468,    -44}, 0, {     0,      0}, {0x26, 0x6f, 0x2f, 0xff}}},
+    {{{   492,    468,   -154}, 0, {     0,      0}, {0xe8, 0x47, 0x9a, 0xff}}},
+    {{{   546,    412,   -154}, 0, {     0,      0}, {0x5b, 0x1d, 0xae, 0xff}}},
+    {{{   492,    357,   -154}, 0, {     0,      0}, {0x18, 0xb9, 0x9b, 0xff}}},
+    {{{   437,    412,   -154}, 0, {     0,      0}, {0xa6, 0xe2, 0xad, 0xff}}},
+    {{{   414,    412,   -100}, 0, {     0,      0}, {0x82, 0x00, 0x00, 0xff}}},
+    {{{   569,    412,   -100}, 0, {     0,      0}, {0x7e, 0x00, 0x00, 0xff}}},
+    {{{   492,    334,   -100}, 0, {     0,      0}, {0x00, 0x82, 0x00, 0xff}}},
+    {{{   492,    357,    -44}, 0, {     0,      0}, {0xdb, 0x90, 0x2e, 0xff}}},
+    {{{   546,    412,    -44}, 0, {     0,      0}, {0x70, 0xdb, 0x2e, 0xff}}},
 };
 
 // 0x03014888 - 0x030149C0
@@ -570,10 +638,10 @@ const Gfx door_seg3_sub_dl_themed_handle_near[] = { // TODO: Combine vertices
 };
 
 // 0x030149C0 - 0x03014A20
-const Gfx door_seg3_sub_dl_themed_door_overlay[] = {
+const Gfx door_seg3_sub_dl_themed_door_sides[] = {
     gsSPLight(&door_seg3_lights_default.l, 1),
     gsSPLight(&door_seg3_lights_default.a, 2),
-    gsSPVertex(door_seg3_vertex_themed_door_overlay, 16, 0),
+    gsSPVertex(door_seg3_vertex_themed_door_sides, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
     gsSP2Triangles( 7, 10,  8, 0x0, 11, 12, 13, 0x0),
@@ -605,10 +673,10 @@ const Gfx door_seg3_dl_rough_wooden_door_near[] = {
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_rough_wooden_door_overlay),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_rough_wooden_door_sides),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPDisplayList(door_seg3_sub_dl_themed_door_overlay),
+    gsSPDisplayList(door_seg3_sub_dl_themed_door_sides),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC),
@@ -631,10 +699,10 @@ const Gfx door_seg3_dl_rough_wooden_door2_near[] = {
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_rough_wooden_door_overlay),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_rough_wooden_door_sides),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPDisplayList(door_seg3_sub_dl_themed_door_overlay),
+    gsSPDisplayList(door_seg3_sub_dl_themed_door_sides),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC),
@@ -657,10 +725,10 @@ const Gfx door_seg3_dl_metal_door_near[] = {
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_metal_door_overlay),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_metal_door_sides),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPDisplayList(door_seg3_sub_dl_themed_door_overlay),
+    gsSPDisplayList(door_seg3_sub_dl_themed_door_sides),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC),
@@ -683,10 +751,10 @@ const Gfx door_seg3_dl_cave_door_near[] = {
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_cave_door_overlay),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_cave_door_sides),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPDisplayList(door_seg3_sub_dl_themed_door_overlay),
+    gsSPDisplayList(door_seg3_sub_dl_themed_door_sides),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC),
@@ -709,10 +777,10 @@ const Gfx door_seg3_dl_haunted_door_near[] = {
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_spooky_door_overlay),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, door_seg3_texture_spooky_door_sides),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPDisplayList(door_seg3_sub_dl_themed_door_overlay),
+    gsSPDisplayList(door_seg3_sub_dl_themed_door_sides),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 6, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (64 - 1) << G_TEXTURE_IMAGE_FRAC),
@@ -731,26 +799,26 @@ const Gfx door_seg3_dl_haunted_door_near[] = {
 
 // 0x03014DF0
 static const Vtx door_seg3_vertex_themed_door_far[] = {
-    {{{   591,      0,    -58}, 0, {     0,   2012}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{    -8,   1000,    -58}, 0, {   990,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   591,   1000,    -58}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{    -8,      0,    -58}, 0, {   990,   2012}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{    -8,      0,     59}, 0, {   990,   2012}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   591,   1000,     59}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{    -8,   1000,     59}, 0, {   990,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   591,      0,     59}, 0, {     0,   2012}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,      0,    -60}, 0, {     0,   2016}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,   1000,    -60}, 0, {   992,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   591,   1000,    -60}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,      0,    -60}, 0, {   992,   2016}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{    -8,      0,     60}, 0, {   992,   2016}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,   1000,     60}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{    -8,   1000,     60}, 0, {   992,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   591,      0,     60}, 0, {     0,   2016}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x03014E70
 static const Vtx door_seg3_vertex_themed_handle_far[] = {
-    {{{   492,    468,    153}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   492,    357,    153}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   546,    412,    153}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   437,    412,    153}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   492,    468,   -152}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   546,    412,   -152}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   492,    357,   -152}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
-    {{{   437,    412,   -152}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   492,    468,    154}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   492,    357,    154}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   546,    412,    154}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   437,    412,    154}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{   492,    468,   -154}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   546,    412,   -154}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   492,    357,   -154}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
+    {{{   437,    412,   -154}, 0, {     0,      0}, {0x00, 0x00, 0x81, 0xff}}},
 };
 
 // 0x03014EF0 - 0x03014F30
