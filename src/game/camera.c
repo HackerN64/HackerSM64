@@ -1208,7 +1208,7 @@ s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     Vec3f marioOffset;
     Vec3f camOffset;
     /// Adjusts the focus to look where Mario is facing. Unused since marioOffset is copied to focus
-    Vec3f focOffset;
+    Vec3f focOffset = { 0 };
     s16 pathPitch;
     s16 pathYaw;
     f32 camParDist;
