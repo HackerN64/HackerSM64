@@ -649,7 +649,7 @@ void geo_process_scale(struct GraphNodeScale *node) {
  */
 void geo_process_billboard(struct GraphNodeBillboard *node) {
     Vec3f translation;
-    Vec3f scale;
+    Vec3f scale = { 1.0f, 1.0f, 1.0f };
 
     vec3s_to_vec3f(translation, node->translation);
 
