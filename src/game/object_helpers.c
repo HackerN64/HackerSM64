@@ -2041,6 +2041,7 @@ s32 cur_obj_update_dialog(s32 actionArg, s32 dialogFlags, s32 dialogID, UNUSED s
             }
             // Fall through so that Mario's action is interrupted immediately
             // after time is stopped
+            FALL_THROUGH;
 #else
         case DIALOG_STATUS_ENABLE_TIME_STOP:
             //! We enable time stop even if Mario is not ready to speak. This
@@ -2126,6 +2127,7 @@ s32 cur_obj_update_dialog_with_cutscene(s32 actionArg, s32 dialogFlags, s32 cuts
             }
             // Fall through so that Mario's action is interrupted immediately
             // after time is stopped
+            FALL_THROUGH;
 #else
         case DIALOG_STATUS_ENABLE_TIME_STOP:
             //! We enable time stop even if Mario is not ready to speak. This

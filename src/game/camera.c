@@ -1528,6 +1528,7 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
             case AREA_BOB:
                 pos[1] += 125.f;
                 //! fall through, makes the BoB boss fight camera move up twice as high as it should
+                FALL_THROUGH;
             case AREA_WF:
                 pos[1] += 125.f;
         }
