@@ -81,7 +81,7 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
 
             objectGraphNode->oAnimState = TRANSPARENCY_ANIM_STATE_TRANSPARENT;
 
-            if ((objectOpacity == 0x00) && segmented_to_virtual(bhvBowser) == objectGraphNode->behavior) {
+            if (objectOpacity == 0x00 && segmented_to_virtual(bhvBowser) == objectGraphNode->behavior) {
                 objectGraphNode->oAnimState = BOWSER_ANIM_STATE_INVISIBLE;
             }
 
