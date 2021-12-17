@@ -85,8 +85,8 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
                 objectGraphNode->oAnimState = BOWSER_ANIM_STATE_INVISIBLE;
             }
 
-            if ((parameter != GEO_TRANSPARENCY_MODE_NO_DITHER)
-             && (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA)) {
+            if (parameter != GEO_TRANSPARENCY_MODE_NO_DITHER
+                && (objectGraphNode->activeFlags & ACTIVE_FLAG_DITHERED_ALPHA)) {
                 gDPSetAlphaCompare(dlHead++, G_AC_DITHER);
             }
         }
