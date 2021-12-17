@@ -120,7 +120,7 @@ static void update_rumble_data_queue(void) {
     if (gRumbleDataQueue[0].comm) {
         gCurrRumbleSettings.count = 0;
         gCurrRumbleSettings.start = 4;
-        gCurrRumbleSettings.comm  = gRumbleDataQueue[0].comm;
+        gCurrRumbleSettings.event  = gRumbleDataQueue[0].comm;
         gCurrRumbleSettings.timer = gRumbleDataQueue[0].time;
         gCurrRumbleSettings.level = gRumbleDataQueue[0].level;
         gCurrRumbleSettings.decay = gRumbleDataQueue[0].decay;

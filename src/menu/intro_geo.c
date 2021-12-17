@@ -263,7 +263,7 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     return dl;
 }
 
-#if ENABLE_RUMBLE
+#if defined(VERSION_SH)
 extern Gfx title_screen_bg_dl_rumble_pak[];
 #endif
 #ifdef GODDARD_EASTER_EGG
@@ -405,7 +405,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 }
 #endif
 
-#if ENABLE_RUMBLE
+#if defined(VERSION_SH)
 Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
     Gfx *dlIter;
