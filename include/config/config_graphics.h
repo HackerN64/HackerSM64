@@ -71,7 +71,8 @@
 // Disables object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
 // #define DISABLE_SHADOWS
 
-// Use old shadow IDs for Fast64 compatibility
+// Use old shadow IDs for Fast64 compatibility. This is a temporary fix until Fast64 is updated to use the enum defines.
+// NOTE: When this is enabled, The 49th hardcoded rectangle shadow will act as a regular circular shadow, due to Mario's shadow ID being 99 in vanilla.
 #define LEGACY_SHADOW_IDS
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
