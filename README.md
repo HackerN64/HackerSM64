@@ -11,23 +11,24 @@ This repo needs gcc in order to be able to build it. To install it, run `sudo ap
 This is a fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in `config.h`):
 
 **Credits**
-- ArticJaguar725: Most audio configuration and layout changes, colored ia4 text, floombas, a bunch of random bugfixes, and more
-- CowQuack: Adjustable skybox sizes, area-specific skybox function
-- thecozies: Water surface types, general maintenance, and time
-- MrComit: General use object defines, JUMP_KICK_FIX, LEDGE_GRABS_CHECK_SLOPE_ANGLE
-- aglab2: bugfixes (particularly puppycam), refactor stuff
-- someone2639: math.s and crash screen disam, stack trace, map packing, shiftable segments 2
-- Arthurtilly: Platform Displacement 2
-- Reonu: Starting the project/repo, widescreen, various defines for hacker QoL
-- JoshDuMan: decomp guy, general assistance
-- Arceveti: silouhette, shadow optimisation, better hanging, breath meter
-- axollyon: silouhette, ideas guy
-- Wiseguy:  silouhette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
-- Kaze: Graph node optimisations
-- Pyro Jay: Texture improvements, repo banner art, some QoL stuff
-- CrashOveride: creating the `ultrasm64` repo
-- falcobuster: coordinate overflow fix (world scale), ASM version of extended bounds
-- anonymous_moose: porting falco's extended bounds to decomp
+- **ArticJaguar725**: Most audio configuration and layout changes, colored ia4 text, floombas, a bunch of random bugfixes, and more
+- **CowQuack**: Adjustable skybox sizes, area-specific skybox function
+- **thecozies**: Water surface types, general maintenance, and time
+- **MrComit**: General use object defines, JUMP_KICK_FIX, LEDGE_GRABS_CHECK_SLOPE_ANGLE
+- **aglab2**: bugfixes (particularly puppycam), refactor stuff
+- **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2
+- **Arthurtilly**: Platform Displacement 2
+- **Fazana**: PuppyLib, ucode swapping, Audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
+- **Reonu**: Starting the project/repo, widescreen, various defines for hacker QoL
+- **JoshDuMan**: decomp guy, general assistance
+- **Arceveti**: silouhette, shadow optimisation, better hanging, breath meter
+- **axollyon**: silouhette, ideas guy
+- **Wiseguy**:  silouhette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
+- **Kaze**: Graph node optimisations
+- **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
+- **CrashOveride**: creating the `ultrasm64` repo
+- **falcobuster**: coordinate overflow fix (world scale), ASM version of extended bounds
+- **anonymous_moose**: porting falco's extended bounds to decomp
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
