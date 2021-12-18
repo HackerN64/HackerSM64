@@ -17,6 +17,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - MrComit: General use object defines, JUMP_KICK_FIX, LEDGE_GRABS_CHECK_SLOPE_ANGLE
 - aglab2: bugfixes (particularly puppycam), refactor stuff
 - someone2639: math.s and crash screen disam, stack trace, map packing, shiftable segments 2
+- Arthurtilly: Platform Displacement 2
 - Reonu: Starting the project/repo, widescreen, various defines for hacker QoL
 - JoshDuMan: decomp guy, general assistance
 - Arceveti: silouhette, shadow optimisation, better hanging, breath meter
