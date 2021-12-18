@@ -1267,7 +1267,9 @@ s32 anim_spline_poll(Vec3f result) {
     vec3_zero(result);
     spline_get_weights(weights, gSplineKeyframeFraction, gSplineState);
     for (i = 0; i < 4; i++) {
-        vec3_sum_val(result, gSplineKeyframe[i], weights[i]);
+        result[0] += weights[i] * gSplineKeyframe[i][1];
+        result[1] += weights[i] * gSplineKeyframe[i][2];
+        result[2] += weights[i] * gSplineKeyframe[i][3];
     }
 
     gSplineKeyframeFraction += (gSplineKeyframe[0][0] / 1000.0f);
