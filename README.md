@@ -11,7 +11,7 @@ This repo needs gcc in order to be able to build it. To install it, run `sudo ap
 This is a fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in `config.h`):
 
 **Credits**
-- **ArticJaguar725**: Most audio configuration and layout changes, colored ia4 text, floombas, a bunch of random bugfixes, and more
+- **ArcticJaguar725**: Most audio configuration and layout changes, colored ia4 text, floombas, a bunch of random bugfixes, and more
 - **CowQuack**: Adjustable skybox sizes, area-specific skybox function
 - **thecozies**: Water surface types, general maintenance, and time
 - **MrComit**: General use object defines, JUMP_KICK_FIX, LEDGE_GRABS_CHECK_SLOPE_ANGLE
