@@ -26,6 +26,8 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - Kaze: Graph node optimisations
 - Pyro Jay: Texture improvements, repo banner art, some QoL stuff
 - CrashOveride: creating the `ultrasm64` repo
+- falcobuster: coordinate overflow fix (world scale), ASM version of extended bounds
+- anonymous_moose: porting falco's extended bounds to decomp
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
