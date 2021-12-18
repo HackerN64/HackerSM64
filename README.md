@@ -16,7 +16,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **thecozies**: Water surface types, general maintenance, and time
 - **MrComit**: General use object defines, JUMP_KICK_FIX, LEDGE_GRABS_CHECK_SLOPE_ANGLE
 - **aglab2**: bugfixes (particularly puppycam), refactor stuff
-- **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2
+- **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2, S2DEX engine
 - **Arthurtilly**: Platform Displacement 2
 - **Fazana**: PuppyLib, ucode swapping, Audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
 - **Reonu**: Starting the project/repo, widescreen, various defines for hacker QoL
