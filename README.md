@@ -1,7 +1,5 @@
 # ![](https://i.imgur.com/CeOukzk.gif) HackerSM64 ![](https://i.imgur.com/s0LUbTo.gif)
 
-**[Thank you to Kaze Emanuar for these major optimizations!](https://www.youtube.com/watch?v=uYPH-NH3B6k)
-
 **AFTER CLONING THE REPO, CHECK OUT THE `include/config.h` FILE BEFORE ANYTHING ELSE! IT THERE'S A LOT OF STUFF IN THIS REPO THAT CAN BE TOGGLED THERE.**
 
 HackerSM64 now has a discord server! https://discord.gg/brETAakcXr
@@ -11,6 +9,28 @@ This repo needs BOTH an US ROM and a JP ROM in order to build. Place baserom.us.
 This repo needs gcc in order to be able to build it. To install it, run `sudo apt install gcc-mips-linux-gnu`
 
 This is a fork of the ultrasm64 repo by CrashOveride which includes the following commonly used patches (patches marked with `*` are toggleable in `config.h`):
+
+**Credits**
+- **ArcticJaguar725**: Most audio configuration and layout changes, colored ia4 text, floombas, a bunch of random bugfixes, and more
+- **CowQuack**: Adjustable skybox sizes, area-specific skybox function
+- **thecozies**: Water surface types, general maintenance, and time
+- **MrComit**: General use object defines, JUMP_KICK_FIX, LEDGE_GRABS_CHECK_SLOPE_ANGLE
+- **aglab2**: bugfixes (particularly puppycam), refactor stuff
+- **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2, S2DEX engine
+- **Arthurtilly**: Platform Displacement 2
+- **Fazana**: PuppyLib, ucode swapping, Audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
+- **Reonu**: Starting the project/repo, widescreen, various defines for hacker QoL
+- **JoshDuMan**: decomp guy, general assistance
+- **Arceveti**: silhouette, shadow optimisation, better hanging, breath meter
+- **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
+- **Wiseguy**:  silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
+- **Kaze**: Graph node optimisations, automatic optimal collision distance
+- **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
+- **CrashOveride**: creating the `ultrasm64` repo
+- **falcobuster**: coordinate overflow fix (world scale), ASM version of extended bounds
+- **anonymous_moose**: porting falco's extended bounds to decomp
+
+Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
 **Lighting Engine by Wiseguy**
 - Lighting Engine is available on a separate branch `(lighting-engine)`. Instructions on how to use it are in the readme of that branch.

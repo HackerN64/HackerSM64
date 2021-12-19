@@ -623,7 +623,6 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
 }
 
 #ifdef AUTO_COLLISION_DISTANCE
-// From Kaze
 static void get_optimal_coll_dist(struct Object *obj) {
     register f32 thisVertDist, maxDist = 0.0f;
     Vec3f v;
