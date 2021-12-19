@@ -851,7 +851,7 @@ const BehaviorScript bhvExitPodiumWarp[] = {
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_INT(oInteractType, INTERACT_WARP),
     DROP_TO_FLOOR(),
-    SET_FLOAT(oDrawingDistance,   8000),
+    SET_FLOAT(oDrawingDistance, 8000),
     SET_FLOAT(oCollisionDistance, 8000),
     LOAD_COLLISION_DATA(ttm_seg7_collision_podium_warp),
     SET_INT(oIntangibleTimer, 0),
