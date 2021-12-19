@@ -446,18 +446,15 @@ void thread1_idle(UNUSED void *arg) {
 	switch ( osTvType ) {
 	case OS_TV_NTSC:
 		// NTSC
-        //osViSetMode(&osViModeTable[OS_VI_NTSC_LAN1]);
-        VI = osViModeTable[OS_VI_NTSC_LAN1];
+        VI = osViModeNtscLan1;
 		break;
 	case OS_TV_MPAL:
 		// MPAL
-        //osViSetMode(&osViModeTable[OS_VI_MPAL_LAN1]);
-        VI = osViModeTable[OS_VI_MPAL_LAN1];
+        VI = osViModeMpalLan1;
 		break;
 	case OS_TV_PAL:
 		// PAL
-		//osViSetMode(&osViModeTable[OS_VI_PAL_LAN1]);
-        VI = osViModeTable[OS_VI_PAL_LAN1];
+        VI = osViModePalLan1;
 		break;
 	}
     change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
