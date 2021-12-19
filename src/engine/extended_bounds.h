@@ -2,9 +2,6 @@
 #define __EXTENDED_BOUNDS_H__
 
 /*
-    Better Extended Bounds by anonymous_moose
-        Thanks to someone2639 for the shiftable segments patch
-        Thanks to Wiseguy for the Surface Pool Full error code and 4x bounds fix
 
     0: Regular bounds
         Same as vanilla sm64, boundaries are (-8192 to 8191)

@@ -24,7 +24,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **Arceveti**: silhouette, shadow optimisation, better hanging, breath meter
 - **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
 - **Wiseguy**:  silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
-- **Kaze**: Graph node optimisations
+- **Kaze**: Graph node optimisations, automatic optimal collision distance
 - **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
 - **CrashOveride**: creating the `ultrasm64` repo
 - **falcobuster**: coordinate overflow fix (world scale), ASM version of extended bounds
