@@ -21,9 +21,9 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **Fazana**: PuppyLib, ucode swapping, Audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
 - **Reonu**: Starting the project/repo, widescreen, various defines for hacker QoL
 - **JoshDuMan**: decomp guy, general assistance
-- **Arceveti**: silouhette, shadow optimisation, better hanging, breath meter
-- **axollyon**: silouhette, ideas guy
-- **Wiseguy**:  silouhette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
+- **Arceveti**: silhouette, shadow optimisation, better hanging, breath meter
+- **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
+- **Wiseguy**:  silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
 - **Kaze**: Graph node optimisations
 - **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
 - **CrashOveride**: creating the `ultrasm64` repo
