@@ -11,6 +11,16 @@
  * can be composed of either 4 or 9 vertices.
  */
 enum ShadowType {
+#ifdef LEGACY_SHADOW_IDS
+    SHADOW_CIRCLE           = 5,
+    SHADOW_CIRCLE_PLAYER    = SHADOW_CIRCLE,
+    SHADOW_CIRCLE_4_VERTS   = SHADOW_CIRCLE,
+    SHADOW_CIRCLE_9_VERTS   = SHADOW_CIRCLE,
+    SHADOW_SQUARE           = 6,
+    SHADOW_SQUARE_PERMANENT = 7,
+    SHADOW_SQUARE_SCALABLE  = SHADOW_SQUARE,
+    SHADOW_SQUARE_TOGGLABLE = SHADOW_SQUARE,
+#else
     SHADOW_CIRCLE           = 0,
     SHADOW_CIRCLE_PLAYER    = SHADOW_CIRCLE,
     SHADOW_CIRCLE_4_VERTS   = SHADOW_CIRCLE,
@@ -19,6 +29,7 @@ enum ShadowType {
     SHADOW_SQUARE_PERMANENT = 2,
     SHADOW_SQUARE_SCALABLE  = SHADOW_SQUARE,
     SHADOW_SQUARE_TOGGLABLE = SHADOW_SQUARE,
+#endif
     /**
      * This defines an offset after which rectangular shadows with custom
      * widths and heights can be defined.
