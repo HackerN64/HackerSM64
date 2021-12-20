@@ -243,7 +243,7 @@ void stop_and_set_height_to_floor(struct MarioState *m) {
     m->vel[1] = 0.0f;
 
     // Hackersm64: this condition fixes potential downwarps
-    if (m->pos[1] <= m->floorHeight + 160.0f) {
+    if ((m->flags & MARIO_TELEPORTING) || m->pos[1] <= m->floorHeight + 160.0f) {
         m->pos[1] = m->floorHeight;
     }
 
