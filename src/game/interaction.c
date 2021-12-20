@@ -776,12 +776,21 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         queue_rumble_data(5, 80);
 #endif
 
+#ifdef POWER_STARS_HEAL
+        m->hurtCounter = 0;
+        m->healCounter = 31;
+ #ifdef BREATH_METER
+        m->breathCounter = 31;
+ #endif
+        if (!noExit) {
+#else // !POWER_STARS_HEAL
         if (!noExit) {
             m->hurtCounter = 0;
             m->healCounter = 0;
-#ifdef BREATH_METER
+ #ifdef BREATH_METER
             m->breathCounter = 0;
-#endif
+ #endif
+#endif // !POWER_STARS_HEAL
             if (m->capTimer > 1) {
                 m->capTimer = 1;
             }
