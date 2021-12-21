@@ -15,7 +15,7 @@
 // Save number of lives to the save file (Does nothing if DISABLE_LIVES is enabled)
 #define SAVE_NUM_LIVES
 
-// The number of lives Mario starts with after a game over or starting the game for the first time.
+// The number of lives Mario starts with after a game over or starting the game for the first time (must be lower than 127)
 #define DEFAULT_NUM_LIVES 4
 
 // This can be 0..127
@@ -62,7 +62,7 @@
 // Prevents infinite death loops by always restoring Mario's health when he's warped to any kind of warp while dead.
 #define PREVENT_DEATH_LOOP
 
-// The level that the game starts in after file select
+// The level that the game starts in after file select. The levelscript needs to have a MARIO_POS command for this to work.
 #define START_LEVEL LEVEL_CASTLE_GROUNDS
 
 
@@ -71,3 +71,6 @@
 #ifdef DISABLE_LIVES
 #undef SAVE_NUM_LIVES
 #endif // DISABLE_LIVES
+#ifndef START_LEVEL
+#define START_LEVEL LEVEL_CASTLE_GROUNDS
+#endif
