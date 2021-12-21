@@ -251,7 +251,6 @@ SECTIONS
       BUILD_DIR/src/game/obj_behaviors.o(.text*);
       BUILD_DIR/src/game/object_helpers.o(.text*);
       BUILD_DIR/src/game/rendering_graph_node.o(.text*);
-      BUILD_DIR/asm/math.o(.text*);
       BUILD_DIR/src/engine/math_util.o(.text*);
       BUILD_DIR/src/engine/surface_collision.o(.text*);
       BUILD_DIR/src/engine/surface_load.o(.text*);

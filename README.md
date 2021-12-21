@@ -23,11 +23,11 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **JoshDuMan**: decomp guy, general assistance
 - **Arceveti**: silhouette, shadow optimisation, better hanging, breath meter
 - **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
-- **Wiseguy**:  silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
+- **Wiseguy**:  World scale reimplementation, silhouette, graph node optimisations, instant input patch, cake screen fix, segmented code support, and various optimizations/fixes
 - **Kaze**: Graph node optimisations, automatic optimal collision distance
 - **Pyro Jay**: Texture improvements, repo banner art, some QoL stuff
 - **CrashOveride**: creating the `ultrasm64` repo
-- **falcobuster**: coordinate overflow fix (world scale), ASM version of extended bounds
+- **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds
 - **anonymous_moose**: porting falco's extended bounds to decomp
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
@@ -99,7 +99,7 @@ Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 - Instant warp offset fix (makes the instant warp offset work even when warping to a different area) *
 - haveyourcake, also known as cake screen fix. Made by Wiseguy and ported/PR'd by Cheezepin
 - Tree particle fix (Whether a tree uses snow particles or not is decided via the model IDs instead of the course number) *
-- Coordinate overflow fix by falcobuster. Your levels will render correctly on console and LLE emulators even when using 2x or 4x bounds, while not hurting anything on HLE plugins. *This is automatic now, you don't have to set WORLD_SCALE manually.*
+- Adjustable world scale. You can change the geometry scaling of your level, which allow large levels to render correctly on console and LLE emulators while not hurting anything on HLE plugins.
 - A couple vanilla texture fixes
 - Smoke fix (the smoke texture uses the correct texture format)
 
