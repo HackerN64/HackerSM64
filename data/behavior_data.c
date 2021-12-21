@@ -851,6 +851,7 @@ const BehaviorScript bhvExitPodiumWarp[] = {
     OR_INT(oFlags, (OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_INT(oInteractType, INTERACT_WARP),
     DROP_TO_FLOOR(),
+    SET_FLOAT(oDrawingDistance, 8000),
     SET_FLOAT(oCollisionDistance, 8000),
     LOAD_COLLISION_DATA(ttm_seg7_collision_podium_warp),
     SET_INT(oIntangibleTimer, 0),
@@ -1468,7 +1469,7 @@ const BehaviorScript bhvBitfsTiltingInvertedPyramid[] = {
 
 const BehaviorScript bhvSquishablePlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_UCODE_LARGE)),
+    OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST | OBJ_FLAG_UCODE_LARGE)),
     LOAD_COLLISION_DATA(bitfs_seg7_collision_squishable_platform),
     SET_FLOAT(oCollisionDistance, 10000),
     CALL_NATIVE(bhv_platform_normals_init),
@@ -2047,7 +2048,7 @@ const BehaviorScript bhvTiltingBowserLavaPlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST | OBJ_FLAG_UCODE_LARGE)),
     LOAD_COLLISION_DATA(bowser_2_seg7_collision_tilting_platform),
-    SET_FLOAT(oDrawingDistance,   20000),
+    SET_FLOAT(oDrawingDistance, 20000),
     SET_FLOAT(oCollisionDistance, 20000),
     SET_INT(oFaceAngleYaw, 0x0),
     SET_HOME(),
@@ -2060,7 +2061,7 @@ const BehaviorScript bhvTiltingBowserLavaPlatform[] = {
 const BehaviorScript bhvFallingBowserPlatform[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_DONT_CALC_COLL_DIST | OBJ_FLAG_UCODE_LARGE)),
-    SET_FLOAT(oDrawingDistance,   20000),
+    SET_FLOAT(oDrawingDistance, 20000),
     SET_FLOAT(oCollisionDistance, 20000),
     SET_HOME(),
     BEGIN_LOOP(),
@@ -2232,7 +2233,7 @@ const BehaviorScript bhvWaterLevelPillar[] = {
 
 const BehaviorScript bhvDddWarp[] = {
     BEGIN(OBJ_LIST_SURFACE),
-    OR_INT(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_FLOAT(oCollisionDistance, 30000),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_ddd_warp_loop),
@@ -2721,6 +2722,7 @@ const BehaviorScript bhvInSunkenShip3[] = {
     OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_UCODE_LARGE)),
     LOAD_COLLISION_DATA(jrb_seg7_collision_in_sunken_ship_3),
     SET_HOME(),
+    SET_FLOAT(oDrawingDistance, 4000),
     SET_FLOAT(oCollisionDistance, 4000),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_ship_part_3_loop),
@@ -2766,6 +2768,7 @@ const BehaviorScript bhvInSunkenShip2[] = {
     LOAD_COLLISION_DATA(jrb_seg7_collision_in_sunken_ship_2),
     // Sunken ship - common:
     OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_UCODE_LARGE)),
+    SET_FLOAT(oDrawingDistance, 4000),
     SET_FLOAT(oCollisionDistance, 4000),
     CALL(bhvSunkenShipSetRotation),
     BEGIN_LOOP(),
@@ -4327,6 +4330,7 @@ const BehaviorScript bhvPyramidElevator[] = {
     OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_UCODE_LARGE)),
     LOAD_COLLISION_DATA(ssl_seg7_collision_pyramid_elevator),
     SET_HOME(),
+    SET_FLOAT(oDrawingDistance, 20000),
     SET_FLOAT(oCollisionDistance, 20000),
     CALL_NATIVE(bhv_pyramid_elevator_init),
     BEGIN_LOOP(),
@@ -4349,6 +4353,7 @@ const BehaviorScript bhvPyramidTop[] = {
     OR_LONG(oFlags, (OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_UCODE_LARGE)),
     LOAD_COLLISION_DATA(ssl_seg7_collision_pyramid_top),
     SET_HOME(),
+    SET_FLOAT(oDrawingDistance, 20000),
     SET_FLOAT(oCollisionDistance, 20000),
     CALL_NATIVE(bhv_pyramid_top_init),
     BEGIN_LOOP(),
@@ -4478,7 +4483,7 @@ const BehaviorScript bhvBigBoulder[] = {
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_FLOAT(oGraphYOffset, 180),
     CALL_NATIVE(bhv_big_boulder_init),
-    SET_FLOAT(oCollisionDistance, 20000),
+    SET_FLOAT(oDrawingDistance, 20000),
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
         CALL_NATIVE(bhv_big_boulder_loop),
@@ -5574,6 +5579,7 @@ const BehaviorScript bhvOctagonalPlatformRotating[] = {
 const BehaviorScript bhvAnimatesOnFloorSwitchPress[] = {
     BEGIN(OBJ_LIST_SURFACE),
     OR_LONG(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_UCODE_LARGE)),
+    SET_FLOAT(oDrawingDistance, 8000),
     SET_FLOAT(oCollisionDistance, 8000),
     CALL_NATIVE(bhv_animates_on_floor_switch_press_init),
     BEGIN_LOOP(),
