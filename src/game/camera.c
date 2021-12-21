@@ -690,6 +690,9 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
     f32 marioFloorHeight, marioCeilHeight, camFloorHeight;
     f32 baseOff = 125.f;
     f32 camCeilHeight = find_ceil(c->pos[0], gLakituState.goalPos[1] - 50.f, c->pos[2], &surface);
+#ifdef FAST_VERTICAL_CAMERA_MOVEMENT
+    f32 approachRate = 20.0f;
+#endif
 
     if (sMarioCamState->action & ACT_FLAG_HANGING) {
         marioCeilHeight = sMarioGeometry.currCeilHeight;
@@ -725,7 +728,14 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
                 c->pos[1] = goalHeight;
             }
         }
+
+#ifdef FAST_VERTICAL_CAMERA_MOVEMENT
+        approachRate += ABS(c->pos[1] - goalHeight) / 20;
+        approach_camera_height(c, goalHeight, approachRate);
+#else
         approach_camera_height(c, goalHeight, 20.f);
+#endif
+
         if (camCeilHeight != CELL_HEIGHT_LIMIT) {
             camCeilHeight -= baseOff;
             if ((c->pos[1] > camCeilHeight && sMarioGeometry.currFloorHeight + baseOff < camCeilHeight)
