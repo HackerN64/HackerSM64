@@ -158,8 +158,10 @@ void puppyprint_calculate_ram_usage(void) {
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
     #define CYCLE_CONV
+    #define RDP_CYCLE_CONV(x) (x)
 #else
     #define CYCLE_CONV OS_CYCLES_TO_USEC
+    #define RDP_CYCLE_CONV(x) ((10 * (x)) / 625) // 62.5 million cycles per frame
 #endif
 
 void puppyprint_profiler_finished(void) {
@@ -705,16 +707,24 @@ void profiler_update(u32 *time, OSTime time2) {
     time[perfIteration] = (osGetTime() - time2);
 }
 
-void get_average_perf_time(u32 *time) {
+void get_average_perf_time(u32 *time, s32 is_rdp) {
     // This takes all but the last index of the timer array, and creates an average value, which is written to the last index.
     s32 i     = 0;
     s32 total = 0;
-    for (i = 0; i < (NUM_PERF_ITERATIONS - 1); i++) {
+    for (i = 0; i < NUM_PERF_ITERATIONS; i++) {
         total += time[i];
     }
 
     total /= NUM_PERF_ITERATIONS;
-    time[NUM_PERF_ITERATIONS] = CYCLE_CONV(MAX(total, 0));
+    total = MAX(total, 0);
+    if (is_rdp)
+    {
+        time[NUM_PERF_ITERATIONS] = RDP_CYCLE_CONV(total);
+    }
+    else
+    {
+        time[NUM_PERF_ITERATIONS] = CYCLE_CONV(total);
+    }
 }
 
 void puppyprint_profiler_process(void) {
@@ -752,29 +762,29 @@ void puppyprint_profiler_process(void) {
     }
 
     if (!(gGlobalTimer % NUM_PERF_ITERATIONS)) {
-        get_average_perf_time(   scriptTime);
-        get_average_perf_time(behaviourTime);
-        get_average_perf_time(collisionTime);
-        get_average_perf_time(    graphTime);
-        get_average_perf_time(    audioTime);
-        get_average_perf_time(      dmaTime);
-        get_average_perf_time( dmaAudioTime);
-        get_average_perf_time(    faultTime);
-        get_average_perf_time(     taskTime);
-        get_average_perf_time( profilerTime);
-        get_average_perf_time( profilerTime2);
-        get_average_perf_time(   cameraTime);
+        get_average_perf_time(    scriptTime, FALSE);
+        get_average_perf_time( behaviourTime, FALSE);
+        get_average_perf_time( collisionTime, FALSE);
+        get_average_perf_time(     graphTime, FALSE);
+        get_average_perf_time(     audioTime, FALSE);
+        get_average_perf_time(       dmaTime, FALSE);
+        get_average_perf_time(  dmaAudioTime, FALSE);
+        get_average_perf_time(     faultTime, FALSE);
+        get_average_perf_time(      taskTime, FALSE);
+        get_average_perf_time(  profilerTime, FALSE);
+        get_average_perf_time( profilerTime2, FALSE);
+        get_average_perf_time(    cameraTime, FALSE);
 
         // Performed twice a frame without fail, so doubled to have a more representative value.
            audioTime[NUM_PERF_ITERATIONS] *= 2;
         dmaAudioTime[NUM_PERF_ITERATIONS] *= 2;
              dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
 
-        get_average_perf_time(rspGenTime);
+        get_average_perf_time(rspGenTime, FALSE);
 
-        get_average_perf_time(bufferTime);
-        get_average_perf_time(  tmemTime);
-        get_average_perf_time(   busTime);
+        get_average_perf_time(bufferTime, TRUE);
+        get_average_perf_time(  tmemTime, TRUE);
+        get_average_perf_time(   busTime, TRUE);
 
         rdpTime = bufferTime[NUM_PERF_ITERATIONS];
         rdpTime = MAX(rdpTime, tmemTime[NUM_PERF_ITERATIONS]);
