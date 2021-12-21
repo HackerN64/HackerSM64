@@ -551,9 +551,9 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b);
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, Vec3f s);
 void mtxf_mul_vec3s(Mat4 mtx, Vec3s b);
 
-extern void mtxf_to_mtx_asm(register void *dest, register void *src);
+extern void mtxf_to_mtx_fast(register s16 *dest, register float *src);
 ALWAYS_INLINE void mtxf_to_mtx(register void *dest, register void *src) {
-    mtxf_to_mtx_asm(dest, src);
+    mtxf_to_mtx_fast((s16*)dest, (float*)src);
     // guMtxF2L(src, dest);
 }
 
