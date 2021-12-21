@@ -579,6 +579,8 @@ void func_eu_802e9bec(s32 player, s32 channel, s32 arg2) {
 
 #else
 
+extern s8 sAudioEnabled;
+
 /**
  * Called from threads: thread4_sound
  */
@@ -649,8 +651,11 @@ struct SPTask *create_next_audio_frame_task(void) {
     // For the function to match we have to preserve some arbitrary variable
     // across this function call.
     flags = 0;
-    gAudioCmd = synthesis_execute(gAudioCmd, &writtenCmds, gCurrAiBuffer, gAiBufferLengths[index]);
-    gAudioRandom = ((gAudioRandom + gAudioFrameCount) * gAudioFrameCount);
+    if (sAudioEnabled)
+    {
+        gAudioCmd = synthesis_execute(gAudioCmd, &writtenCmds, gCurrAiBuffer, gAiBufferLengths[index]);
+        gAudioRandom = ((gAudioRandom + gAudioFrameCount) * gAudioFrameCount);
+    }
 
     index = gAudioTaskIndex;
     gAudioTask->msgqueue = NULL;
