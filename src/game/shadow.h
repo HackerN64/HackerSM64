@@ -39,34 +39,21 @@ enum ShadowType {
     SHADOW_RECTANGLE_WHOMP            = (1 + SHADOW_RECTANGLE_HARDCODED_OFFSET),
 };
 
-enum ShadowFlags {
-    SHADOW_FLAGS_NONE         = (0 << 0),
-    // Flag for if the current shadow is above water or lava.
-    SHADOW_FLAG_WATER_BOX     = (1 << 0),
-    SHADOW_FLAG_WATER_SURFACE = (1 << 1),
-    // Flag for if Mario is on ice.
-    SHADOW_FLAG_ICE           = (1 << 2),
-    // Flag for if Mario is on a flying carpet.
-    SHADOW_FLAG_CARPET        = (1 << 3),
-};
-#define SHADOW_FLAGS_TRANSPARENT (SHADOW_FLAG_WATER_BOX | SHADOW_FLAG_WATER_SURFACE | SHADOW_FLAG_ICE | SHADOW_FLAG_CARPET)
-
 /**
  * Encapsulation of information about a shadow.
  */
 struct Shadow {
-    /* The y-position of the floor (or water or lava) underneath the object. */
-    f32 floorHeight;
-    /* The floor underneath the object. */
-    struct Surface *floor;
     /* Normal vector of the floor. */
     Vec3f floorNormal;
     /* Size of the shadow. */
     Vec3f scale;
     /* Initial solidity of the shadow, from 0 to 255 (just an alpha value). */
     Alpha solidity;
-    /* Various flags. */
-    s8 flags;
+    /*
+     * Whether the shadow is a decal or not.
+     * It should not be a decal when it's on a transparent surface (water, lava, ice, flying carpet, etc.).
+     */
+    u8 isDecal : 1;
 };
 
 enum ShadowSolidity {

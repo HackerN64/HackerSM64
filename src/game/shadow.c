@@ -60,22 +60,6 @@ s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
 }
 
 /**
- * Return the water level below a shadow, or 0 if the water level is below
- * -10,000.
- */
-f32 get_water_level_below_shadow(Vec3f pos, struct Surface **waterFloor) {
-    f32 waterLevel = find_water_level_and_floor(pos[0], pos[2], waterFloor);
-
-    if (waterLevel < FLOOR_LOWER_LIMIT_MISC) {
-        return FLOOR_LOWER_LIMIT_MISC;
-    } else if (pos[1] >= waterLevel && s->floorHeight <= waterLevel) {
-        s->flags |= SHADOW_FLAG_WATER_BOX;
-    }
-
-    return waterLevel;
-}
-
-/**
  * Initialize a shadow. Return 0 on success, 1 on failure.
  *
  * @param pos Position of the parent object (not the shadow)
@@ -83,51 +67,17 @@ f32 get_water_level_below_shadow(Vec3f pos, struct Surface **waterFloor) {
  * @param overwriteSolidity Flag for whether the existing shadow solidity should
  *                          be dimmed based on its distance to the floor
  */
-s32 init_shadow(Vec3f pos, s16 shadowScale, s8 shadowType, u8 overwriteSolidity) {
+s32 init_shadow(f32 distToShadow, s16 shadowScale, s8 shadowType, u8 overwriteSolidity) {
     f32 baseScale;
-    struct Surface *waterFloor = NULL;
-    // Check for water under the shadow.
-    f32 waterLevel = get_water_level_below_shadow(pos, &waterFloor);
-    // if (gEnvironmentRegions != 0) {
-    //     waterLevel = get_water_level_below_shadow(s);
-    // }
-
-    if (s->flags & SHADOW_FLAG_WATER_BOX) {
-        // If there is water under the shadow, put the shadow on the water.
-        s->floorHeight = waterLevel;
-
-        if (waterFloor != NULL) {
-            // If the water is a surface:
-            s->floor    = waterFloor;
-            s->flags   &= ~SHADOW_FLAG_WATER_BOX;
-            s->flags   |=  SHADOW_FLAG_WATER_SURFACE;
-            s->solidity = 200;
-        } else {
-            // If the water is an environment box:
-            s->flags &= ~SHADOW_FLAG_WATER_SURFACE;
-            // Assume that the water is flat, so the normal vector points up.
-            s->floorNormal[0] = 0.0f;
-            ((u32 *) s->floorNormal)[1] = FLOAT_ONE;
-            s->floorNormal[2] = 0.0f;
-        }
-
-    } else {
-        // Don't draw a shadow if the floor is lower than expected possible,
-        // or if the y-normal is negative (an unexpected result).
-        if (s->floorNormal[1] <= 0.0f || s->floorHeight < FLOOR_LOWER_LIMIT_MISC) {
-            return TRUE;
-        }
-    }
 
     if (shadowType != SHADOW_SQUARE_PERMANENT) {
         // Set solidity and scale based on distance.
-        f32 dy = (pos[1] - s->floorHeight);
 
         if (overwriteSolidity) {
-            s->solidity = dim_shadow_with_distance(overwriteSolidity, dy);
+            s->solidity = dim_shadow_with_distance(overwriteSolidity, distToShadow);
         }
 
-        baseScale = scale_shadow_with_distance(shadowScale, dy);
+        baseScale = scale_shadow_with_distance(shadowScale, distToShadow);
     } else {
         s->solidity = overwriteSolidity;
         baseScale = shadowScale;
@@ -192,28 +142,26 @@ s32 correct_shadow_solidity_for_animations(u8 initialSolidity) {
     }
 }
 
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 /**
  * Slightly change the height of a shadow in levels with lava.
  */
-void correct_lava_shadow_height(void) {
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-    if (s->floor->type == SURFACE_BURNING) {
-        if (gCurrLevelNum == LEVEL_BITFS) {
-            if (s->floorHeight < -3000.0f) {
-                s->floorHeight = -3062.0f;
-                s->flags |= SHADOW_FLAG_WATER_BOX;
-            } else if (s->floorHeight > 3400.0f) {
-                s->floorHeight =  3492.0f;
-                s->flags |= SHADOW_FLAG_WATER_BOX;
-            }
-        } else if (gCurrLevelNum == LEVEL_LLL
-                   && gCurrAreaIndex == 1) {
-            s->floorHeight = 5.0f;
-            s->flags |= SHADOW_FLAG_WATER_BOX;
+void correct_lava_shadow_height(f32 *floorHeight) {
+    if (gCurrLevelNum == LEVEL_BITFS) {
+        if (*floorHeight < -3000.0f) {
+            *floorHeight = -3062.0f;
+            s->isDecal = FALSE;
+        } else if (*floorHeight > 3400.0f) {
+            *floorHeight = 3492.0f;
+            s->isDecal = FALSE;
         }
+    } else if (gCurrLevelNum == LEVEL_LLL
+               && gCurrAreaIndex == 1) {
+        *floorHeight = 5.0f;
+        s->isDecal = FALSE;
     }
-#endif
 }
+#endif
 
 /**
  * Add a shadow to the given display list.
@@ -231,7 +179,7 @@ static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
     gSPEndDisplayList(displayListHead);
 }
 
-// TODO:
+//! TODO:
 //      - Breakout create_shadow_below_xyz into multiple functions
 /**
  * Create a shadow at the absolute position given, with the given parameters.
@@ -244,63 +192,130 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         return NULL;
     }
 
-    register f32 x = pos[0];
-    register f32 y = pos[1];
-    register f32 z = pos[2];
+    // The floor underneath the object.
+    struct Surface *floor = NULL;
+    // The y-position of the floor (or water or lava) underneath the object.
+    f32 floorHeight = FLOOR_LOWER_LIMIT_MISC;
+    f32 x = pos[0];
+    f32 y = pos[1];
+    f32 z = pos[2];
     s8 isPlayer   = (obj == gMarioObject);
     s8 notHeldObj = (gCurGraphNodeHeldObject == NULL);
 
     // Attempt to use existing floors before finding a new one.
     if (notHeldObj && isPlayer && gMarioState->floor) {
-        // Object is player and has a referenced floor.
-        s->floor       = gMarioState->floor;
-        s->floorHeight = gMarioState->floorHeight;
+        // The object is Mario and has a referenced floor.
+        floor       = gMarioState->floor;
+        floorHeight = gMarioState->floorHeight;
     } else if (notHeldObj && (gCurGraphNodeObject != &gMirrorMario) && obj->oFloor) {
-        // Object is not player but has a referenced floor.
+        // The object is not Mario but has a referenced floor.
         //! Some objects only get their oFloor from bhv_init_room, which skips dynamic floors.
-        s->floor       = obj->oFloor;
-        s->floorHeight = obj->oFloorHeight;
+        floor       = obj->oFloor;
+        floorHeight = obj->oFloorHeight;
     } else {
-        // Object has no referenced floor, so find a new one.
+        // The object has no referenced floor, so find a new one.
         // gCollisionFlags |= COLLISION_FLAG_RETURN_FIRST;
-        s->floorHeight = find_floor(x, y, z, &s->floor);
-        // No shadow if OOB.
-        if (s->floor == NULL) {
+        floorHeight = find_floor(x, y, z, &floor);
+
+        // No shadow if the position is OOB.
+        if (floor == NULL) {
             return NULL;
         }
-        // No need to shift the shadow height later since the find_floor call uses the shifted position.
+
+        // Skip shifting the shadow height later, since the find_floor call above uses the already shifted position.
         shifted = FALSE;
     }
 
-    // Read the floor's normals
-    struct Surface *floor = s->floor;
-    register f32 nx = floor->normal.x;
-    register f32 ny = floor->normal.y;
-    register f32 nz = floor->normal.z;
+    // The shadow is a decal by default.
+    s->isDecal = TRUE;
 
-    // If the animation changes the shadow position, move it to the position.
-    if (shifted) {
-        s->floorHeight = -((x * nx) + (z * nz) + floor->originOffset) / ny;
+    // Check for water under the shadow.
+    struct Surface *waterFloor = NULL;
+    f32 waterLevel = find_water_level_and_floor(x, y, z, &waterFloor);
+
+    // Whether the floor is an environment box rather than an actual surface.
+    s32 isEnvBox = FALSE;
+
+    if (waterLevel > FLOOR_LOWER_LIMIT_MISC
+        && y >= waterLevel
+        && floorHeight <= waterLevel) {
+        // Skip shifting the shadow height later, since the find_water_level_and_floor call above uses the already shifted position.
+        shifted = FALSE;
+
+        // If there is water under the shadow, put the shadow on the water.
+        floorHeight = waterLevel;
+
+        // Don't use the decal layer, since water is transparent.
+        s->isDecal = FALSE;
+
+        // Check whether the water is an environment box or a water surface.
+        if (waterFloor != NULL) { // Water surfaces:
+            floor = waterFloor;
+        } else { // Environment boxes:
+            isEnvBox = TRUE;
+        }
+    } else { // Normal surfaces:
+        TerrainData type = floor->type;
+        if (type == SURFACE_ICE) {
+            // Ice floors are usually transparent.
+            s->isDecal = FALSE;
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+        } else if (type == SURFACE_BURNING) {
+            // Set the shadow height to the lava height in specific areas.
+            correct_lava_shadow_height(&floorHeight);
+#endif
+        } else if (gCurrLevelNum == LEVEL_RR
+                   && floor->object != NULL
+                   && floor->object->behavior == segmented_to_virtual(bhvPlatformOnTrack)) {
+            // Raise the shadow 5 units so the shadow doesn't clip into the flying carpet.
+            floorHeight += 5;
+            // The flying carpet is transparent.
+            s->isDecal = FALSE;
+        }
     }
 
-    f32 distToShadow = (pos[1] - s->floorHeight);
-    // Hide shadow if the object is below it.
+    f32 nx, ny, nz;
+    if (isEnvBox) {
+        // Assume the floor is flat.
+        nx = 0.0f;
+        ny = 1.0f;
+        nz = 0.0f;
+    } else {
+        // Read the floor's normals.
+        nx = floor->normal.x;
+        ny = floor->normal.y;
+        nz = floor->normal.z;
+
+        // No shadow if the y-normal is negative (an unexpected result).
+        if (ny <= 0.0f) {
+            return NULL;
+        }
+
+        // If the animation changes the shadow position, move its height to the new position.
+        if (shifted) {
+            floorHeight = -((x * nx) + (z * nz) + floor->originOffset) / ny;
+        }
+    }
+
+    // No shadow if the floor is lower than expected possible,
+    if (floorHeight < FLOOR_LOWER_LIMIT_MISC) {
+        return NULL;
+    }
+
+    // Get the vertical distance to the shadow, now that the final shadow height is set.
+    f32 distToShadow = (y - floorHeight);
+
+    // No shadow if the object is below it.
     if (distToShadow < -80.0f) {
         return NULL;
     }
 
-    // Hide shadow if the object is too high.
-    if (distToShadow > 1024.0f) {
+    // No shadow if the non-Mario object is too high.
+    if (!isPlayer && distToShadow > 1024.0f) {
         return NULL;
     }
 
     vec3f_set(s->floorNormal, nx, ny, nz);
-
-    // Check for ice floor, which is usually a transparent surface.
-    s->flags = SHADOW_FLAGS_NONE;
-    if (s->floor->type == SURFACE_ICE) {
-        s->flags |= SHADOW_FLAG_ICE;
-    }
 
     if (isPlayer) {
         // Set the shadow solidity manually for certain Mario animations.
@@ -309,28 +324,20 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             case SHADOW_SOLIDITY_NO_SHADOW:
                 return NULL;
             case SHADOW_SOILDITY_ALREADY_SET:
-                if (init_shadow(pos, shadowScale, shadowType, /* overwriteSolidity */ 0)) {
+                if (init_shadow(distToShadow, shadowScale, shadowType, /* overwriteSolidity */ 0)) {
                     return NULL;
                 }
                 break;
             case SHADOW_SOLIDITY_NOT_YET_SET:
-                if (init_shadow(pos, shadowScale, shadowType, shadowSolidity)) {
+                if (init_shadow(distToShadow, shadowScale, shadowType, shadowSolidity)) {
                     return NULL;
                 }
                 break;
             default:
                 return NULL;
         }
-        // Update s->flags and raise the shadow 5 units on the flying carpet so it doesn't clip into it.
-        if (gCurrLevelNum == LEVEL_RR
-            && floor->object != NULL
-            && floor->object->behavior == segmented_to_virtual(bhvPlatformOnTrack)) {
-            s->floorHeight += 5;
-            s->flags |= SHADOW_FLAG_CARPET;
-        }
-        correct_lava_shadow_height();
     } else {
-        if (init_shadow(pos, shadowScale, shadowType, shadowSolidity)) {
+        if (init_shadow(distToShadow, shadowScale, shadowType, shadowSolidity)) {
             return NULL;
         }
 
@@ -340,9 +347,8 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             s->scale[0] *= sShadowRectangles[idx].scaleX;
             s->scale[2] *= sShadowRectangles[idx].scaleZ;
             if (sShadowRectangles[idx].scaleWithDistance) {
-                f32 dy = (pos[1] - s->floorHeight);
-                scale_shadow_with_distance(s->scale[0], dy);
-                scale_shadow_with_distance(s->scale[2], dy);
+                scale_shadow_with_distance(s->scale[0], distToShadow);
+                scale_shadow_with_distance(s->scale[2], distToShadow);
             }
         }
     }
@@ -357,7 +363,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     add_shadow_to_display_list(displayList, shadowType);
 
     // Move the shadow position to the floor height.
-    pos[1] = s->floorHeight;
+    pos[1] = floorHeight;
 
     return displayList;
 }
