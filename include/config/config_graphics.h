@@ -30,9 +30,9 @@
 #define IA8_30FPS_COINS
 
 // Use .rej microcode for certain objects (experimental - only should be used when F3DZEX_GBI_2 is defined).
-// So far - recent tests have show that this has reduced performance overall due to CPU load,
-// though in some cases it may perform better.
-// #define OBJECTS_REJ
+// For advanced users only. Does not work perfectly out the box, best used when exported actor models are
+// using 64 vertex sizes, offered by Fast64 in the microcode menu.
+ #define OBJECTS_REJ
 
 /**
  * Mario's silhouette when behind solid objects/surfaces

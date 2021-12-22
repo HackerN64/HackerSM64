@@ -905,14 +905,13 @@ void cur_obj_update(void) {
         objListIndex = ((bhvScript[0] >> 16) & 0xFFFF);
     }
 
-    if (
-        objFlags & OBJ_FLAG_UCODE_LARGE // marked as large
-        || (objListIndex == OBJ_LIST_SURFACE && !(objFlags & OBJ_FLAG_UCODE_SMALL)) // surface and _not_ marked as small
-    ) {
-        o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
-    } else {
+    if (objFlags & OBJ_FLAG_UCODE_SMALL) {
         o->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
     }
+    else {
+        o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
+    }
+
 #endif
 #ifdef OBJ_OPACITY_BY_CAM_DIST
     if (objFlags & OBJ_FLAG_OPACITY_FROM_CAMERA_DIST) {
