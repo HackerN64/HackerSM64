@@ -62,7 +62,7 @@ struct SPTask        *sCurrentAudioSPTask   = NULL;
 struct SPTask        *sCurrentDisplaySPTask = NULL;
 struct SPTask        *sNextAudioSPTask      = NULL;
 struct SPTask        *sNextDisplaySPTask    = NULL;
-s8  sAudioEnabled      = TRUE;
+s8  gAudioEnabled      = TRUE;
 u32 gNumVblanks        = 0;
 s8  gResetTimer        = 0;
 s8  gNmiResetBarsTimer = 0;
@@ -215,7 +215,7 @@ void handle_vblank(void) {
         if (gActiveSPTask != NULL) {
             interrupt_gfx_sptask();
         } else {
-            if (sAudioEnabled) {
+            if (gAudioEnabled) {
                 start_sptask(M_AUDTASK);
             } else {
                 pretend_audio_sptask_done();
@@ -259,7 +259,7 @@ void handle_sp_complete(void) {
         }
 
         // Start the audio task, as expected by handle_vblank.
-        if (sAudioEnabled) {
+        if (gAudioEnabled) {
             start_sptask(M_AUDTASK);
         } else {
             pretend_audio_sptask_done();
@@ -375,7 +375,7 @@ void send_sp_task_message(OSMesg *msg) {
 }
 
 void dispatch_audio_sptask(struct SPTask *spTask) {
-    if (sAudioEnabled && spTask != NULL) {
+    if (gAudioEnabled && spTask != NULL) {
         osWritebackDCacheAll();
         osSendMesg(&gSPTaskMesgQueue, spTask, OS_MESG_NOBLOCK);
     }
@@ -396,11 +396,11 @@ void exec_display_list(struct SPTask *spTask) {
 }
 
 void turn_on_audio(void) {
-    sAudioEnabled = TRUE;
+    gAudioEnabled = TRUE;
 }
 
 void turn_off_audio(void) {
-    sAudioEnabled = FALSE;
+    gAudioEnabled = FALSE;
     while (sCurrentAudioSPTask != NULL) {
         ;
     }
