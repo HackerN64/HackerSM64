@@ -300,7 +300,7 @@ enum BehaviorCommands {
 #define BEGIN_REPEAT_UNUSED(count) \
     BC_BB(BHV_CMD_BEGIN_REPEAT_UNUSED, count)
 
-#define OR_INT(field, value) LOAD_ANIMATIONS(field, value)
+#define OR_LONG(field, value) LOAD_ANIMATIONS(field, value)
 
 // Loads the animations for the object. <field> is always set to oAnimations.
 #define LOAD_ANIMATIONS(field, anims) \
