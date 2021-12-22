@@ -67,6 +67,9 @@ struct MainMenuSaveData {
 #ifdef WIDE
     u8 wideMode: 1;
 #endif
+#ifdef REONUCAM
+    u8 cameraSpeedSetting: 3;
+#endif
 
 #if MULTILANG
     u8 language: 2;
@@ -199,6 +202,10 @@ u32 save_file_get_sound_mode(void);
 #ifdef WIDE
 u32 save_file_get_widescreen_mode(void);
 void save_file_set_widescreen_mode(u8 mode);
+#endif
+#ifdef REONUCAM
+u8 save_file_get_camera_speed(void);
+void save_file_set_camera_speed(u8 speed);
 #endif
 void save_file_move_cap_to_default_location(void);
 

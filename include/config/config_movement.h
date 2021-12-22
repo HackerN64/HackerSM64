@@ -66,7 +66,7 @@
 #define HANGING_FIX
 
 // The last frame that will be considered a firsty when wallkicking
-#define FIRSTY_LAST_FRAME 1
+#define FIRSTY_LAST_FRAME 0
 
 // The maximum angle the player can wall kick, in degrees. 0..90. To allow 45 degree wall kicks, you must supply `46` to allow 45 and under.
 #define WALL_KICK_DEGREES 45

@@ -74,6 +74,10 @@
  *
  */
 
+#ifdef REONUCAM
+struct ReonucamState gReonucamState = { 2, FALSE, FALSE, FALSE, 1, 0, 0 };
+#endif
+
 // BSS
 /**
  * Stores Lakitu's position from the last frame, used for transitioning in next_lakitu_state()
@@ -451,6 +455,30 @@ CameraTransition sModeTransitions[] = {
 // Move these two tables to another include file?
 extern u8 sDanceCutsceneIndexTable[][4];
 extern u8 sZoomOutAreaMasks[];
+
+#ifdef REONUCAM
+// Returns the camera speed based on the user's camera speed setting
+f32 set_camera_speed(void) {
+    switch(gReonucamState.speed) {
+        case 0:
+            return 0.5f;
+            break;
+        case 1:
+            return 1;
+            break;
+        case 2:
+            return 1.5f;
+            break;
+        case 3:
+            return 2;
+            break;
+        case 4:
+            return 3.5f;
+            break;
+    }
+    return 0;
+}
+#endif
 
 /**
  * Starts a camera shake triggered by an interaction
@@ -871,8 +899,29 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 pitch = look_down_slopes(camYaw);
     f32 posY;
     f32 focusY;
+#ifdef REONUCAM
+    f32 yOff;
+#else
     f32 yOff = 125.f;
+#endif
     f32 baseDist = 1000.f;
+
+#ifdef REONUCAM
+    if (gMarioState->action & ACT_FLAG_SWIMMING) {
+        yOff = -125.f;
+    } else {
+        yOff = 125.f;
+    }
+
+    if ((gPlayer1Controller->buttonDown & R_TRIG) && (gPlayer1Controller->buttonDown & U_CBUTTONS)) {
+        gReonucamState.keepCliffCam = 1;
+        pitch = DEGREES(60);
+    } else if (((gPlayer1Controller->buttonDown & U_CBUTTONS) || (gPlayer1Controller->buttonDown & R_TRIG)) && gReonucamState.keepCliffCam) {
+        pitch = DEGREES(60);
+    } else {
+        gReonucamState.keepCliffCam = 0;
+    }
+#endif
 
     sAreaYaw = camYaw;
     calc_y_to_curr_floor(&posY, 1.f, 200.f, &focusY, 0.9f, 200.f);
@@ -1115,13 +1164,59 @@ s32 snap_to_45_degrees(s16 angle) {
     return angle;
 }
 
+#ifdef REONUCAM
+void reonucam_handler(void) {
+    // Get the camera speed based on the user's setting
+    f32 cameraSpeed = set_camera_speed();
+
+    if ((gPlayer1Controller->buttonPressed & L_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
+        s8DirModeBaseYaw -= DEGREES(45);
+    } else if ((gPlayer1Controller->buttonPressed & R_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
+        s8DirModeBaseYaw += DEGREES(45);
+    }
+
+    if (gPlayer1Controller->buttonDown & R_TRIG) {
+        if (gPlayer1Controller->buttonDown & L_CBUTTONS) {
+            s8DirModeBaseYaw -= DEGREES(cameraSpeed);
+        } else if (gPlayer1Controller->buttonDown & R_CBUTTONS) {
+            s8DirModeBaseYaw += DEGREES(cameraSpeed);
+        }
+        gReonucamState.rButtonCounter++; // This increses whenever R is held.
+    } else {
+        if (gReonucamState.rButtonCounter > 0 && gReonucamState.rButtonCounter <= 5 && !((gPlayer1Controller->buttonDown & L_CBUTTONS) || (gPlayer1Controller->buttonDown & R_CBUTTONS) || (gMarioState->action & ACT_FLAG_SWIMMING_OR_FLYING))) {
+            // This centers the camera behind mario. It triggers when you let go of R in less than 5 frames.
+            s8DirModeYawOffset = 0;
+            s8DirModeBaseYaw = gMarioState->faceAngle[1]-0x8000;
+            gMarioState->area->camera->yaw = s8DirModeBaseYaw;
+            play_sound_rbutton_changed();
+        }
+        gReonucamState.rButtonCounter = 0;
+    }
+    if (gPlayer1Controller->buttonPressed & R_TRIG) {
+        if (gReonucamState.rButtonCounter2 <= 5) {
+            set_cam_angle(CAM_ANGLE_MARIO); // Enter mario cam if R is pressed 2 times in less than 5 frames
+            gReonucamState.rButtonCounter2 = 6;
+        } else {
+            gReonucamState.rButtonCounter2 = 0;
+        }
+    } else {
+        gReonucamState.rButtonCounter2++;
+     }
+    if (gPlayer1Controller->buttonPressed & D_JPAD) {
+       s8DirModeBaseYaw = (s8DirModeBaseYaw + 0x1000) & 0xE000; // Lock the camera to the nearest 45deg axis
+    }
+}
+#endif
+
 /**
  * A mode that only has 8 camera angles, 45 degrees apart
  */
 void mode_8_directions_camera(struct Camera *c) {
     Vec3f pos;
     s16 oldAreaYaw = sAreaYaw;
-
+#ifdef REONUCAM
+    reonucam_handler();
+#else
     radial_camera_input(c);
 
     if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
@@ -1148,13 +1243,19 @@ void mode_8_directions_camera(struct Camera *c) {
         s8DirModeYawOffset = snap_to_45_degrees(s8DirModeYawOffset);
     }
 #endif
-
+#endif
     lakitu_zoom(400.f, 0x900);
     c->nextYaw = update_8_directions_camera(c, c->focus, pos);
+#ifdef REONUCAM
+    set_camera_height(c, pos[1]);
+#endif
     c->pos[0] = pos[0];
     c->pos[2] = pos[2];
     sAreaYawChange = sAreaYaw - oldAreaYaw;
+#ifndef REONUCAM
     set_camera_height(c, pos[1]);
+#endif
+
 }
 
 /**
@@ -2875,6 +2976,11 @@ void update_camera(struct Camera *c) {
     OSTime first   = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
 #endif
+
+#ifdef REONUCAM
+    extern s16 s8DirModeBaseYaw;
+#endif
+
     gCamera = c;
     update_camera_hud_status(c);
     if (c->cutscene == CUTSCENE_NONE
@@ -2885,14 +2991,23 @@ void update_camera(struct Camera *c) {
         // Only process R_TRIG if 'fixed' is not selected in the menu
         if (cam_select_alt_mode(CAM_SELECTION_NONE) == CAM_SELECTION_MARIO) {
             if (gPlayer1Controller->buttonPressed & R_TRIG) {
+                #ifdef REONUCAM
+                if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
+                    s8DirModeBaseYaw = ((gMarioState->faceAngle[1]-0x8000) + 0x1000) & 0xE000;    
+                    set_cam_angle(CAM_ANGLE_LAKITU);
+                }              
+                #else
                 if (set_cam_angle(0) == CAM_ANGLE_LAKITU) {
                     set_cam_angle(CAM_ANGLE_MARIO);
                 } else {
                     set_cam_angle(CAM_ANGLE_LAKITU);
                 }
+                #endif
             }
         }
+    #ifndef REONUCAM
         play_sound_if_cam_switched_to_lakitu_or_mario();
+    #endif
     }
 
     // Initialize the camera
@@ -4551,15 +4666,21 @@ void play_camera_buzz_if_c_sideways(void) {
 }
 
 void play_sound_cbutton_up(void) {
+#ifndef REONUCAM
     play_sound(SOUND_MENU_CAMERA_ZOOM_IN, gGlobalSoundSource);
+#endif
 }
 
 void play_sound_cbutton_down(void) {
+#ifndef REONUCAM
     play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
+#endif
 }
 
 void play_sound_cbutton_side(void) {
+#ifndef REONUCAM
     play_sound(SOUND_MENU_CAMERA_TURN, gGlobalSoundSource);
+#endif
 }
 
 void play_sound_button_change_blocked(void) {
@@ -4658,7 +4779,11 @@ void radial_camera_input(struct Camera *c) {
     }
 
     // Zoom in / enter C-Up
+#ifdef REONUCAM
+    if ((gPlayer1Controller->buttonPressed & U_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
+#else
     if (gPlayer1Controller->buttonPressed & U_CBUTTONS) {
+#endif
         if (gCameraMovementFlags & CAM_MOVE_ZOOMED_OUT) {
             gCameraMovementFlags &= ~CAM_MOVE_ZOOMED_OUT;
             play_sound_cbutton_up();
@@ -4746,6 +4871,7 @@ void handle_c_button_movement(struct Camera *c) {
         }
     }
 }
+
 
 /**
  * Zero the 10 cvars.
@@ -5212,7 +5338,11 @@ void set_camera_mode_8_directions(struct Camera *c) {
     if (c->mode != CAMERA_MODE_8_DIRECTIONS) {
         c->mode = CAMERA_MODE_8_DIRECTIONS;
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
+    #ifdef REONUCAM
+        s8DirModeBaseYaw = ((gMarioState->faceAngle[1]-0x8000) + 0x1000) & 0xE000;
+    #else
         s8DirModeBaseYaw = 0;
+    #endif
         s8DirModeYawOffset = 0;
     }
 }

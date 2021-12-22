@@ -33,6 +33,8 @@
 // Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 // #define PUPPYCAM
 
+// Enables Reonucam
+#define REONUCAM
 
 /**********************************/
 /***** Vanilla config options *****/
