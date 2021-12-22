@@ -127,7 +127,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         if ((d00 * surf->normal.x) + (d01 * surf->normal.z) < (corner_threshold * offset)) continue;
 
     hasCollision:
-        if (data->numWalls < MAX_REFEREMCED_WALLS) {
+        if (data->numWalls < MAX_REFERENCED_WALLS) {
             data->walls[data->numWalls++] = surf;
         }
         numCols++;
