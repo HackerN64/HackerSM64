@@ -153,28 +153,8 @@ static const Gfx dl_debug_box_begin[] = {
     gsDPSetRenderMode(G_RM_ZB_XLU_SURF, G_RM_NOOP2),
     gsSPClearGeometryMode(G_CULL_BACK),
     gsSPSetGeometryMode(G_ZBUFFER),
-    gsSPTexture(0, 0, 0, 0, G_OFF),
+    gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
     gsDPSetCombineLERP(0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT),
-    gsSPEndDisplayList(),
-};
-
-static const Gfx dl_debug_box_begin_water[] = {
-    gsDPPipeSync(),
-    gsDPSetRenderMode(G_RM_ZB_XLU_SURF, G_RM_NOOP2),
-    gsSPClearGeometryMode(G_LIGHTING),
-    gsSPSetGeometryMode(G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH),
-    gsSPTexture(0, 0, 0, 0, G_OFF),
-    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsSPEndDisplayList(),
-};
-
-static const Gfx dl_debug_box_end[] = {
-    gsDPPipeSync(),
-    gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
-    gsSPClearGeometryMode(G_LIGHTING | G_CULL_BACK),
-    gsSPTexture(0, 0, 0, 0, G_OFF),
-    gsDPSetCombineMode(G_CC_FADE, G_CC_FADE),
-    gsDPSetEnvColor(0xFF, 0xFF, 0xFF, 0xFF),
     gsSPEndDisplayList(),
 };
 
@@ -182,9 +162,19 @@ static const Gfx dl_visual_surface[] = {
     gsDPPipeSync(),
     gsDPSetRenderMode(G_RM_ZB_XLU_DECAL, G_RM_NOOP2),
     gsSPClearGeometryMode(G_LIGHTING),
-    gsSPSetGeometryMode(G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH),
-    gsSPTexture(0, 0, 0, 0, G_OFF),
+    gsSPSetGeometryMode(G_ZBUFFER),
+    gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
+    gsSPEndDisplayList(),
+};
+
+static const Gfx dl_debug_box_end[] = {
+    gsDPPipeSync(),
+    gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
+    gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK),
+    gsSPClearGeometryMode(G_ZBUFFER),
+    gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsDPSetEnvColor(0xFF, 0xFF, 0xFF, 0xFF),
     gsSPEndDisplayList(),
 };
 
@@ -218,7 +208,7 @@ void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < (2 * NUM_SPATIAL_PARTITIONS); i++) {
         switch (i) {
             case 0: node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next; colorRGB_copy(col, (ColorRGB)COLOR_RGB_GREEN ); break;
             case 1: node =  gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next; colorRGB_copy(col, (ColorRGB)COLOR_RGB_GREEN ); break;
@@ -272,11 +262,14 @@ void iterate_surfaces_envbox(Vtx *verts) {
     }
 }
 
-#if defined(F3DEX_GBI_2) || defined(F3DEX_GBI)
+// VERTCOUNT = The highest number divisible by 6, which is less than the maximum vertex buffer divided by 2.
+// The vertex buffer is 64 if OBJECTS_REJ is enabled, 32 otherwise.
+//! TODO: Why can this only use half of the vertex buffer?
+#ifdef OBJECTS_REJ
 #define VERTCOUNT 30
 #else
 #define VERTCOUNT 12
-#endif // F3DEX_GBI_2
+#endif // OBJECTS_REJ
 
 void visual_surface_display(Vtx *verts, s32 iteration) {
     s32 vts = (iteration ? gVisualOffset : gVisualSurfaceCount);
@@ -307,7 +300,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
                                              (count + 1),
                                              (count + 2), 0x0);
             vts   -= 3;
-            vtl   -= 6;
+            vtl   -= 3;
             count += 3;
         }
     }
@@ -377,7 +370,7 @@ void visual_surface_loop(void) {
 
     iterate_surfaces_envbox(verts);
 
-    gSPDisplayList(gDisplayListHead++, dl_debug_box_begin_water);
+    gDPSetRenderMode(gDisplayListHead++, G_RM_ZB_XLU_SURF, G_RM_NOOP2);
 
     visual_surface_display(verts, 1);
 

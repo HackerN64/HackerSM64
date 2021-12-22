@@ -366,10 +366,10 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         gDPPipeSync(gDisplayListHead++);
         gSPClearGeometryMode(gDisplayListHead++, G_ZBUFFER);
     }
-#if defined(F3DZEX_GBI_2) && defined(VISUAL_DEBUG)
-    if (hitboxView) render_debug_boxes(DEBUG_UCODE_REJ);
-#endif
 #ifdef OBJECTS_REJ
+ #if defined(F3DZEX_GBI_2) && defined(VISUAL_DEBUG)
+    if (hitboxView) render_debug_boxes(DEBUG_UCODE_REJ);
+ #endif
     switch_ucode(GRAPH_NODE_UCODE_DEFAULT);
 #endif
 #ifdef VISUAL_DEBUG
