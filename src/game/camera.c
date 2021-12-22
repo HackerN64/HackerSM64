@@ -75,7 +75,7 @@
  */
 
 #ifdef REONUCAM
-struct ReonucamState gReonucamState = { 2, FALSE, FALSE, FALSE, 1, 0, 0 };
+struct ReonucamState gReonucamState = { 2, FALSE, FALSE, FALSE, 1, 0, };
 #endif
 
 // BSS
@@ -1216,6 +1216,7 @@ void mode_8_directions_camera(struct Camera *c) {
     s16 oldAreaYaw = sAreaYaw;
 #ifdef REONUCAM
     reonucam_handler();
+    radial_camera_input(c);
 #else
     radial_camera_input(c);
 
@@ -1255,7 +1256,6 @@ void mode_8_directions_camera(struct Camera *c) {
 #ifndef REONUCAM
     set_camera_height(c, pos[1]);
 #endif
-
 }
 
 /**
@@ -2991,23 +2991,23 @@ void update_camera(struct Camera *c) {
         // Only process R_TRIG if 'fixed' is not selected in the menu
         if (cam_select_alt_mode(CAM_SELECTION_NONE) == CAM_SELECTION_MARIO) {
             if (gPlayer1Controller->buttonPressed & R_TRIG) {
-                #ifdef REONUCAM
+#ifdef REONUCAM
                 if (set_cam_angle(0) == CAM_ANGLE_MARIO) {
-                    s8DirModeBaseYaw = ((gMarioState->faceAngle[1]-0x8000) + 0x1000) & 0xE000;    
+                    s8DirModeBaseYaw = snap_to_45_degrees(s8DirModeBaseYaw);
                     set_cam_angle(CAM_ANGLE_LAKITU);
                 }              
-                #else
+#else
                 if (set_cam_angle(0) == CAM_ANGLE_LAKITU) {
                     set_cam_angle(CAM_ANGLE_MARIO);
                 } else {
                     set_cam_angle(CAM_ANGLE_LAKITU);
                 }
-                #endif
+#endif
             }
         }
-    #ifndef REONUCAM
+#ifndef REONUCAM
         play_sound_if_cam_switched_to_lakitu_or_mario();
-    #endif
+#endif
     }
 
     // Initialize the camera
@@ -5338,11 +5338,11 @@ void set_camera_mode_8_directions(struct Camera *c) {
     if (c->mode != CAMERA_MODE_8_DIRECTIONS) {
         c->mode = CAMERA_MODE_8_DIRECTIONS;
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
-    #ifdef REONUCAM
-        s8DirModeBaseYaw = ((gMarioState->faceAngle[1]-0x8000) + 0x1000) & 0xE000;
-    #else
+#ifdef REONUCAM
+        s8DirModeBaseYaw = snap_to_45_degrees(s8DirModeBaseYaw);
+#else
         s8DirModeBaseYaw = 0;
-    #endif
+#endif
         s8DirModeYawOffset = 0;
     }
 }
