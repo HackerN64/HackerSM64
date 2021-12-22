@@ -262,7 +262,7 @@ void switch_ucode(s32 ucode) {
             // Reload the necessary RSP settings
             gSPDisplayList(gDisplayListHead++, init_rsp);
             // Set the clip ratio (see init_rsp)
-            gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
+            gSPClipRatio(gDisplayListHead++, FRUSTRATIO_3);
             break;
     }
 }
