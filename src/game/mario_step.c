@@ -242,10 +242,8 @@ void stop_and_set_height_to_floor(struct MarioState *m) {
     mario_set_forward_vel(m, 0.0f);
     m->vel[1] = 0.0f;
 
-    // Hackersm64: this condition fixes potential downwarps
-    if (m->pos[1] <= m->floorHeight + 160.0f) {
-        m->pos[1] = m->floorHeight;
-    }
+    //! This is responsible for some downwarps.
+    m->pos[1] = m->floorHeight;
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
