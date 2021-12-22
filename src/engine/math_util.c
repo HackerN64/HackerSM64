@@ -4,13 +4,13 @@
 #include "engine/graph_node.h"
 #include "math_util.h"
 #include "surface_collision.h"
-#include "extended_bounds.h"
 #include "trig_tables.inc.c"
 #include "surface_load.h"
 #include "game/puppyprint.h"
 #include "game/rendering_graph_node.h"
 
 #include "config.h"
+#include "config/config_world.h"
 
 
 Vec3f gVec3fX    = {  1.0f,  0.0f,  0.0f };
@@ -1490,8 +1490,6 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
         }
     }
 }
-
-#include <world_scale.h>
 
 // Constructs a float in registers, which can be faster than gcc's default of loading a float from rodata.
 // Especially fast for halfword floats, which get loaded with a `lui` + `mtc1`.

@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-#include "engine/extended_bounds.h"
+#include "config/config_world.h"
 
 // The y coord is moved upward by this amount when finding floors and ceilings.
 // Vanilla value is 78.

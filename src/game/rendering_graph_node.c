@@ -11,16 +11,15 @@
 #include "shadow.h"
 #include "sm64.h"
 #include "game_init.h"
-#include "engine/extended_bounds.h"
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "level_update.h"
 #include "behavior_data.h"
 #include "string.h"
 #include "color_presets.h"
-#include "world_scale.h"
 
 #include "config.h"
+#include "config/config_world.h"
 
 /**
  * This file contains the code that processes the scene graph for rendering.
