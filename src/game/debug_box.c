@@ -300,7 +300,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
                                              (count + 1),
                                              (count + 2), 0x0);
             vts   -= 3;
-            vtl   -= 6;
+            vtl   -= 3;
             count += 3;
         }
     }
