@@ -34,7 +34,7 @@
 // #define PUPPYCAM
 
 // Enables Reonucam, a custom camera that aims to be a more feature-rich "aglabcam" that also uses less buttons.
-// An explanationof the features can be seen here: https://www.youtube.com/watch?v=TQNkznX9Z3k
+// An explanation the features can be seen here: https://www.youtube.com/watch?v=TQNkznX9Z3k (please note that the analog feature shown at the end is no longer present)
 #define REONUCAM
 
 /**********************************/
