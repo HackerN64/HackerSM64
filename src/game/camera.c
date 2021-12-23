@@ -75,7 +75,7 @@
  */
 
 #ifdef REONUCAM
-struct ReonucamState gReonucamState = { 2, FALSE, FALSE, FALSE, 1, 0, };
+struct ReonucamState gReonucamState = { 2, FALSE, FALSE, FALSE, 0, 0, };
 #endif
 
 // BSS
@@ -1163,13 +1163,13 @@ s32 snap_to_45_degrees(s16 angle) {
 void reonucam_handler(void) {
     // Get the camera speed based on the user's setting
     f32 cameraSpeed = set_camera_speed();
-
+    //45º rotations
     if ((gPlayer1Controller->buttonPressed & L_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
         s8DirModeBaseYaw -= DEGREES(45);
     } else if ((gPlayer1Controller->buttonPressed & R_CBUTTONS) && !(gPlayer1Controller->buttonDown & R_TRIG)) {
         s8DirModeBaseYaw += DEGREES(45);
     }
-
+    //Smooth rotation
     if (gPlayer1Controller->buttonDown & R_TRIG) {
         if (gPlayer1Controller->buttonDown & L_CBUTTONS) {
             s8DirModeBaseYaw -= DEGREES(cameraSpeed);
