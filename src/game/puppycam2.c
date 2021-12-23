@@ -1092,12 +1092,17 @@ void puppycam_projection_behaviours(void) {
         // puppycam_wall_angle();
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-if (gMarioState->floor != NULL && gMarioState->floor->type == SURFACE_LOOK_UP_WARP && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 10) {
+ #ifdef UNLOCK_ALL
+    if (gMarioState->floor != NULL && gMarioState->floor->type == SURFACE_LOOK_UP_WARP) {
+ #else // !UNLOCK_ALL
+    if (gMarioState->floor != NULL && gMarioState->floor->type == SURFACE_LOOK_UP_WARP
+        && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 10) {
+ #endif // !UNLOCK_ALL
         if (gPuppyCam.pitchTarget >= 0x7000) {
             level_trigger_warp(gMarioState, WARP_OP_LOOK_UP);
         }
     }
-#endif
+#endif // ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     } else {
         puppycam_reset_values();
     }

@@ -2243,12 +2243,16 @@ const BehaviorScript bhvDddWarp[] = {
 
 const BehaviorScript bhvMoatGrills[] = {
     BEGIN(OBJ_LIST_SURFACE),
+#ifdef UNLOCK_ALL
+    DEACTIVATE(),
+#else
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(castle_grounds_seg7_collision_moat_grills),
     SET_FLOAT(oCollisionDistance, 30000),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_moat_grills_loop),
     END_LOOP(),
+#endif
 };
 
 const BehaviorScript bhvClockMinuteHand[] = {
@@ -4428,6 +4432,9 @@ const BehaviorScript bhvSandSoundLoop[] = {
 
 const BehaviorScript bhvHiddenAt120Stars[] = {
     BEGIN(OBJ_LIST_SURFACE),
+#ifdef UNLOCK_ALL
+    DEACTIVATE(),
+#else
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     LOAD_COLLISION_DATA(castle_grounds_seg7_collision_cannon_grill),
     SET_FLOAT(oCollisionDistance, 4000),
@@ -4435,6 +4442,7 @@ const BehaviorScript bhvHiddenAt120Stars[] = {
     BEGIN_LOOP(),
         CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
+#endif
 };
 
 const BehaviorScript bhvSnowmansBottom[] = {
