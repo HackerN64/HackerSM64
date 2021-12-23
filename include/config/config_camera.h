@@ -68,3 +68,22 @@
 #ifndef FLYING_CAMERA_MODE
 #define FLYING_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
 #endif
+
+// Reonucam overrides
+#ifdef REONUCAM
+    // Use course default mode
+    #ifndef USE_COURSE_DEFAULT_MODE
+    #define USE_COURSE_DEFAULT_MODE
+    #endif
+
+    // Force camera mode to 8 Dir
+    #ifdef FORCED_CAMERA_MODE
+    #undef FORCED_CAMERA_MODE
+    #endif
+    #define FORCED_CAMERA_MODE CAMERA_MODE_8_DIRECTIONS
+
+    // Disable vanilla cam processing
+    #ifdef ENABLE_VANILLA_CAM_PROCESSING
+    #undef ENABLE_VANILLA_CAM_PROCESSING
+    #endif
+#endif
