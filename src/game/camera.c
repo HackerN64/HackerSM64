@@ -2846,6 +2846,9 @@ void set_camera_mode(struct Camera *c, s16 mode, s16 frames) {
 #ifndef ENABLE_VANILLA_CAM_PROCESSING
         if (mode == CAMERA_MODE_8_DIRECTIONS) {
             // Helps transition from any camera mode to 8dir
+#ifdef REONUCAM
+            s8DirModeBaseYaw = 0;
+#endif
             s8DirModeYawOffset = snap_to_45_degrees(c->yaw);
         }
 #endif
