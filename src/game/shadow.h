@@ -53,7 +53,7 @@ struct Shadow {
      * Whether the shadow is a decal or not.
      * It should not be a decal when it's on a transparent surface (water, lava, ice, flying carpet, etc.).
      */
-    u8 isDecal : 1;
+    s8 isDecal;
 };
 
 enum ShadowSolidity {
