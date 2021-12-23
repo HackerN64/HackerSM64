@@ -1390,51 +1390,53 @@ void set_submerged_cam_preset_and_spawn_bubbles(struct MarioState *m) {
     f32 heightBelowWater;
     s16 camPreset;
 #ifdef REONUCAM
-    extern s16 s8DirModeBaseYaw;
-    if (!gReonucamState.waterCamOverride) {
+    // skip if not submerged
+    if ((m->action & ACT_GROUP_MASK) != ACT_GROUP_SUBMERGED) return;
+
+    // R Trigger toggles camera mode override
+    if ((gPlayer1Controller->buttonPressed & R_TRIG) && (m->action & ACT_FLAG_SWIMMING)) {
+        gReonucamState.waterCamOverride ^= 1;
+    }
+
+    // If override, set mode to 8 dir. Otherwise, use normal water processing
+    if (gReonucamState.waterCamOverride) {
+        if (m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    } else {
+#else
+    if ((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) {
 #endif
-        if ((m->action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED) {
-            heightBelowWater = (f32)(m->waterLevel - 80) - m->pos[1];
-            camPreset = m->area->camera->mode;
+        heightBelowWater = (f32)(m->waterLevel - 80) - m->pos[1];
+        camPreset = m->area->camera->mode;
 
-            if (m->action & ACT_FLAG_METAL_WATER) {
-    #ifdef USE_COURSE_DEFAULT_MODE
-                // Being metal and in the water uses the default camera mode
-                if (camPreset != m->area->camera->defMode) {
-                    set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
-                }
-    #else
-                if (camPreset != CAMERA_MODE_CLOSE) {
-                    set_camera_mode(m->area->camera, CAMERA_MODE_CLOSE, 1);
-                }
-    #endif
-            } else {
-                if ((heightBelowWater > 800.0f) && (camPreset != DEEP_WATER_CAMERA_MODE)) {
-                    set_camera_mode(m->area->camera, DEEP_WATER_CAMERA_MODE, 1);
-                }
+        if (m->action & ACT_FLAG_METAL_WATER) {
+#ifdef USE_COURSE_DEFAULT_MODE
+            // Being metal and in the water uses the default camera mode
+            if (camPreset != m->area->camera->defMode) {
+                set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
+            }
+#else
+            if (camPreset != CAMERA_MODE_CLOSE) {
+                set_camera_mode(m->area->camera, CAMERA_MODE_CLOSE, 1);
+            }
+#endif
+        } else {
+            if ((heightBelowWater > 800.0f) && (camPreset != DEEP_WATER_CAMERA_MODE)) {
+                set_camera_mode(m->area->camera, DEEP_WATER_CAMERA_MODE, 1);
+            }
 
-                if ((heightBelowWater < 400.0f) && (camPreset != WATER_SURFACE_CAMERA_MODE)) {
-                    set_camera_mode(m->area->camera, WATER_SURFACE_CAMERA_MODE, 1);
-                }
+            if ((heightBelowWater < 400.0f) && (camPreset != WATER_SURFACE_CAMERA_MODE)) {
+                set_camera_mode(m->area->camera, WATER_SURFACE_CAMERA_MODE, 1);
+            }
 
-                // As long as Mario isn't drowning or at the top
-                // of the water with his head out, spawn bubbles.
-                if (!(m->action & ACT_FLAG_INTANGIBLE)) {
-                    if ((m->pos[1] < (f32)(m->waterLevel - 160)) || (m->faceAngle[0] < -0x800)) {
-                        m->particleFlags |= PARTICLE_BUBBLE;
-                    }
+            // As long as Mario isn't drowning or at the top
+            // of the water with his head out, spawn bubbles.
+            if (!(m->action & ACT_FLAG_INTANGIBLE)) {
+                if ((m->pos[1] < (f32)(m->waterLevel - 160)) || (m->faceAngle[0] < -0x800)) {
+                    m->particleFlags |= PARTICLE_BUBBLE;
                 }
             }
         }
-#ifdef REONUCAM
-    } else {
-        set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
     }
-    if ((gPlayer1Controller->buttonPressed & R_TRIG) && (m->action & ACT_FLAG_SWIMMING)) {
-        s8DirModeBaseYaw = ((gMarioState->faceAngle[1]-0x8000) + 0x1000) & 0xE000;
-        gReonucamState.waterCamOverride ^= 1;
-     }
-#endif
 }
 
 /**
