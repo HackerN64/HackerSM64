@@ -1464,7 +1464,7 @@ void reset_red_coins_collected(void) {
 }
 
 #ifdef REONUCAM
-void render_camera_speed_setting(void) {
+void render_reonucam_speed_setting(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     switch (gReonucamState.speed) {
@@ -1969,7 +1969,7 @@ s32 render_pause_courses_and_castle(void) {
         render_widescreen_setting();
 #endif
 #ifdef REONUCAM
-        render_camera_speed_setting();
+        render_reonucam_speed_setting();
 #endif
     if (gDialogTextAlpha < 250) {
         gDialogTextAlpha += 25;
