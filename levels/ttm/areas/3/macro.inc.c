@@ -4,7 +4,7 @@ const MacroObject ttm_seg7_area_3_macro_objs[] = {
     MACRO_OBJECT(/*preset*/ macro_yellow_coin_2,        /*yaw*/   0, /*pos*/ -6328,  3349,  5771),
     MACRO_OBJECT(/*preset*/ macro_yellow_coin_2,        /*yaw*/   0, /*pos*/ -6842,  2616,  4400),
     MACRO_OBJECT(/*preset*/ macro_1up_sliding,          /*yaw*/   0, /*pos*/ -7128,  1807,  2285),
-    MACRO_OBJECT(/*preset*/ macro_coin_line_horizontal, /*yaw*/   0, /*pos*/ -1471, -3646,  1198),
+    MACRO_OBJECT(/*preset*/ macro_coin_line_horizontal, /*yaw*/   0, /*pos*/ -1471, -3848,  1198),
     MACRO_OBJECT(/*preset*/ macro_yellow_coin_2,        /*yaw*/   0, /*pos*/ -2839,  -618, -6855),
     MACRO_OBJECT(/*preset*/ macro_yellow_coin_2,        /*yaw*/   0, /*pos*/ -1242, -1448, -4400),
     MACRO_OBJECT(/*preset*/ macro_yellow_coin_2,        /*yaw*/   0, /*pos*/ -2444,  -618, -6666),
