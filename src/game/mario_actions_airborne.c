@@ -1715,13 +1715,13 @@ s32 act_flying(struct MarioState *m) {
         }
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
+
 #ifdef REONUCAM
-    if (gReonucamState.flyingCamOverride) {
-        set_camera_mode(m->area->camera, CAMERA_MODE_BEHIND_MARIO, 1);
-    } else {
+    if (!gReonucamState.flyingCamOverride && m->area->camera->mode != FLYING_CAMERA_MODE) {
+        set_camera_mode(m->area->camera, FLYING_CAMERA_MODE, 1);
+    } else if (gReonucamState.flyingCamOverride && m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) {
         set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
-     }
-    
+    }
 #else
     if (m->area->camera->mode != FLYING_CAMERA_MODE) {
         set_camera_mode(m->area->camera, FLYING_CAMERA_MODE, 1);
