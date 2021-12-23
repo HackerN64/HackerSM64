@@ -462,19 +462,14 @@ f32 set_camera_speed(void) {
     switch(gReonucamState.speed) {
         case 0:
             return 0.5f;
-            break;
         case 1:
             return 1;
-            break;
         case 2:
             return 1.5f;
-            break;
         case 3:
             return 2;
-            break;
         case 4:
             return 3.5f;
-            break;
     }
     return 0;
 }

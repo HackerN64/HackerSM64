@@ -1696,6 +1696,12 @@ s32 act_shot_from_cannon(struct MarioState *m) {
 s32 act_flying(struct MarioState *m) {
     s16 startPitch = m->faceAngle[0];
 
+#ifdef REONUCAM
+    if (gPlayer1Controller->buttonPressed & R_TRIG) {
+        gReonucamState.flyingCamOverride ^= 1;
+    }
+#endif
+
     if (m->input & INPUT_Z_PRESSED) {
         if (m->area->camera->mode == FLYING_CAMERA_MODE) {
             set_camera_mode(m->area->camera, m->area->camera->defMode, 1);
@@ -1709,10 +1715,18 @@ s32 act_flying(struct MarioState *m) {
         }
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
-
+#ifdef REONUCAM
+    if (gReonucamState.flyingCamOverride) {
+        set_camera_mode(m->area->camera, CAMERA_MODE_BEHIND_MARIO, 1);
+    } else {
+        set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+     }
+    
+#else
     if (m->area->camera->mode != FLYING_CAMERA_MODE) {
         set_camera_mode(m->area->camera, FLYING_CAMERA_MODE, 1);
     }
+#endif
 
     if (m->actionState == ACT_STATE_FLYING_SPIN) {
         if (m->actionArg == ACT_ARG_FLYING_FROM_CANNON) {
