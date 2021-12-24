@@ -1198,7 +1198,7 @@ void reonucam_handler(void) {
         gReonucamState.rButtonCounter2++;
      }
     if (gPlayer1Controller->buttonPressed & D_JPAD) {
-       s8DirModeBaseYaw = (s8DirModeBaseYaw + 0x1000) & 0xE000; // Lock the camera to the nearest 45deg axis
+       s8DirModeBaseYaw = snap_to_45_degrees(s8DirModeBaseYaw); // Lock the camera to the nearest 45deg axis
     }
 }
 #endif
