@@ -46,10 +46,14 @@ void bhv_rotating_exclamation_mark_loop(void) {
 }
 
 void exclamation_box_act_init(void) {
+#ifdef UNLOCK_ALL
+    u8 tangible = TRUE;
+#else
+    u8 tangible = save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte];
+#endif
     if (o->oBehParams2ndByte < EXCLAMATION_BOX_BP_KOOPA_SHELL) {
         o->oAnimState = o->oBehParams2ndByte;
-        if ((save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte])
-         || (GET_BPARAM1(o->oBehParams) != EXCLAMATION_BOX_BP1_NEEDS_SWITCH)) {
+        if ((tangible) || (GET_BPARAM1(o->oBehParams) != EXCLAMATION_BOX_BP1_NEEDS_SWITCH)) {
             o->oAction = EXCLAMATION_BOX_ACT_ACTIVE;
         } else {
             o->oAction = EXCLAMATION_BOX_ACT_OUTLINE;
