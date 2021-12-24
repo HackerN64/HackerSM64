@@ -33,6 +33,10 @@
 // Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 // #define PUPPYCAM
 
+// Note: Reonucam is available, but because we had no time to test it properly, it's included as a patch rather than being in the code by default.
+// Run this command to apply the patch if you want to use it: 
+// tools/apply_patch.sh enhancements/reonucam.patch
+// Consider it a beta, but it should work fine. Please report any bugs with it. Applying the patch will simply add a define here, so you can still turn it off even after patching.
 
 /**********************************/
 /***** Vanilla config options *****/
