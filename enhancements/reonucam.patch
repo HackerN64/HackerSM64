@@ -1,18 +1,19 @@
 diff --git a/include/config/config_camera.h b/include/config/config_camera.h
-index 9c0b573c..5c56fd47 100644
+index 5752ab85..a1585533 100644
 --- a/include/config/config_camera.h
 +++ b/include/config/config_camera.h
-@@ -33,6 +33,9 @@
+@@ -33,6 +33,10 @@
  // Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
  // #define PUPPYCAM
  
 +// Enables Reonucam, a custom camera that aims to be a more feature-rich "aglabcam" that also uses less buttons.
 +// An explanation the features can be seen here: https://www.youtube.com/watch?v=TQNkznX9Z3k (please note that the analog feature shown at the end is no longer present)
 +#define REONUCAM
- 
- /**********************************/
- /***** Vanilla config options *****/
-@@ -66,3 +69,22 @@
++
+ // Note: Reonucam is available, but because we had no time to test it properly, it's included as a patch rather than being in the code by default.
+ // Run this command to apply the patch if you want to use it: 
+ // tools/apply_patch.sh enhancements/reonucam.patch
+@@ -70,3 +74,22 @@
  #ifndef FLYING_CAMERA_MODE
  #define FLYING_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
  #endif
@@ -56,7 +57,7 @@ index c5ee3fa8..22b43a2f 100644
  
  /**
 diff --git a/src/game/camera.c b/src/game/camera.c
-index 82e6b893..c2b7a8b9 100644
+index 819f235c..bdc07159 100644
 --- a/src/game/camera.c
 +++ b/src/game/camera.c
 @@ -74,6 +74,10 @@
