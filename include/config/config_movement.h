@@ -21,7 +21,7 @@
 #define HANGING_SPEED 12.0f
 
 // Prevents Mario from falling asleep while idle
-#define NO_SLEEP
+// #define NO_SLEEP
 
 // Disables fall damage
 #define NO_FALL_DAMAGE
