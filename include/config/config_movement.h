@@ -78,6 +78,9 @@
 // Disable BLJs and crush SimpleFlips's dreams
 //#define DISABLE_BLJ
 
+// Re-enable upwarping when entering water. Forces you to only enter water from the top
+// #define WATER_PLUNGE_UPWARP
+
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
 
