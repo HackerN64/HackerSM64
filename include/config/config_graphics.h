@@ -48,7 +48,7 @@
 #define HD_SHADOWS
 
 // Makes certain objects (mainly trees) transparent when the camera gets close.
-#define OBJ_OPACITY_BY_CAM_DIST
+// #define OBJ_OPACITY_BY_CAM_DIST
 
 // Fixes the game reading the ia8 burn smoke texture as an rgba16.
 #define BURN_SMOKE_FIX

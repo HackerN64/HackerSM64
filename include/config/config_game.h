@@ -45,7 +45,7 @@
 #define EASIER_DIALOG_TRIGGER
 
 // Show an "A" when Mario is able to talk [requires EASIER_DIALOG_TRIGGER]
-#define DIALOG_INDICATOR
+// #define DIALOG_INDICATOR
 
 // Include the English characters that were missing from US segment2
 // J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
