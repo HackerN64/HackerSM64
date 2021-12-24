@@ -2975,10 +2975,6 @@ void update_camera(struct Camera *c) {
     OSTime colTime = collisionTime[perfIteration];
 #endif
 
-#ifdef REONUCAM
-    extern s16 s8DirModeBaseYaw;
-#endif
-
     gCamera = c;
     update_camera_hud_status(c);
     if (c->cutscene == CUTSCENE_NONE
