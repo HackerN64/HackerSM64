@@ -1131,8 +1131,9 @@ s32 set_water_plunge_action(struct MarioState *m) {
     m->forwardVel = m->forwardVel / 4.0f;
     m->vel[1] = m->vel[1] / 2.0f;
 
-    // !BUG: Causes waterbox upwarp
-    // m->pos[1] = m->waterLevel - 100;
+#ifdef WATER_PLUNGE_UPWARP
+    m->pos[1] = m->waterLevel - 100;
+#endif
 
     m->faceAngle[2] = 0;
 
