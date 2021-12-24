@@ -19,7 +19,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **someone2639**: math.s and crash screen disam, stack trace, map packing, shiftable segments 2, S2DEX engine
 - **Arthurtilly**: Platform Displacement 2
 - **Fazana**: PuppyLib, ucode swapping, Audio load time optimisations (with Arctic), general hacker qol improvements, visual debug
-- **Reonu**: Starting the project/repo, widescreen, various defines for hacker QoL
+- **Reonu**: Starting the project/repo, widescreen, reonucam, various defines for hacker QoL
 - **JoshDuMan**: decomp guy, general assistance
 - **Arceveti**: silhouette, shadow optimisation, better hanging, breath meter
 - **axollyon**: Console testing, bugfixes, idea-guying, and had a hand in silhouettes
