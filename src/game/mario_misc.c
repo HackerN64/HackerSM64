@@ -183,50 +183,42 @@ void bhv_toad_message_loop(void) {
 
 void bhv_toad_message_init(void) {
     s32 saveFlags = save_file_get_flags();
-#ifndef UNLOCK_ALL
+#ifdef UNLOCK_ALL
+    s32 starCount = 999;
+#else
     s32 starCount = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
-    s32 enoughStars = TRUE;
 #endif
     s32 dialogId = GET_BPARAM1(o->oBehParams);
+    s32 enoughStars = TRUE;
 
     switch (dialogId) {
         case TOAD_STAR_1_DIALOG:
-#ifndef UNLOCK_ALL
             enoughStars = (starCount >= TOAD_STAR_1_REQUIREMENT);
-#endif
             if (saveFlags & SAVE_FLAG_COLLECTED_TOAD_STAR_1) {
                 dialogId = TOAD_STAR_1_DIALOG_AFTER;
             }
             break;
         case TOAD_STAR_2_DIALOG:
-#ifndef UNLOCK_ALL
             enoughStars = (starCount >= TOAD_STAR_2_REQUIREMENT);
-#endif
             if (saveFlags & SAVE_FLAG_COLLECTED_TOAD_STAR_2) {
                 dialogId = TOAD_STAR_2_DIALOG_AFTER;
             }
             break;
         case TOAD_STAR_3_DIALOG:
-#ifndef UNLOCK_ALL
             enoughStars = (starCount >= TOAD_STAR_3_REQUIREMENT);
-#endif
             if (saveFlags & SAVE_FLAG_COLLECTED_TOAD_STAR_3) {
                 dialogId = TOAD_STAR_3_DIALOG_AFTER;
             }
             break;
     }
-#ifndef UNLOCK_ALL
     if (enoughStars) {
-#endif
         o->oToadMessageDialogId = dialogId;
         o->oToadMessageRecentlyTalked = FALSE;
         o->oToadMessageState = TOAD_MESSAGE_FADED;
         o->oOpacity = 81;
-#ifndef UNLOCK_ALL
     } else {
         obj_mark_for_deletion(o);
     }
-#endif
 }
 
 static void star_door_unlock_spawn_particles(s16 angleOffset) {
