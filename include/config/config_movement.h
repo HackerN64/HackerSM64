@@ -13,7 +13,7 @@
 
 // Improved hanging:
 // - Doesn't require holding down the A button
-// - Percise turning control
+// - Precise turning control
 // - Prevents falling from the edges
 #define BETTER_HANGING
 
