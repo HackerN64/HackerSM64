@@ -29,9 +29,9 @@
 //#define CUSTOM_DEBUG
 
 // Include Puppyprint, a display library for text and large images.
-#define PUPPYPRINT
+//#define PUPPYPRINT
 // Include a custom, enhanced performance profiler (Requires PUPPYPRINT).
-#define PUPPYPRINT_DEBUG 1
+//#define PUPPYPRINT_DEBUG 1
 
 // Use cycles instead of microseconds in Puppyprint debug output.
 //#define PUPPYPRINT_DEBUG_CYCLES
