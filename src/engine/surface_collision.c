@@ -329,7 +329,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     OSTime first = osGetTime();
 #endif
     s32 x = posX;
-    s32 y = posY + FIND_FLOOR_CEIL_BUFFER;
+    s32 y = posY;
     s32 z = posZ;
     *pceil = NULL;
 
@@ -401,7 +401,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
     register struct Surface *surf, *floor = NULL;
     register SurfaceType type = SURFACE_DEFAULT;
     register f32 height;
-    register s32 bufferY = (y + FIND_FLOOR_CEIL_BUFFER);
+    register s32 bufferY = y + FIND_FLOOR_BUFFER;
 
     // Iterate through the list of floors until there are no more floors.
     while (surfaceNode != NULL) {
@@ -468,7 +468,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
     f32 curHeight = FLOOR_LOWER_LIMIT;
     f32 bottomHeight = FLOOR_LOWER_LIMIT;
     f32 curBottomHeight = FLOOR_LOWER_LIMIT;
-    f32 buffer = FIND_FLOOR_CEIL_BUFFER;
+    f32 buffer = FIND_FLOOR_BUFFER;
 
     // Iterate through the list of water floors until there are no more water floors.
     // SURFACE_NEW_WATER_BOTTOM
