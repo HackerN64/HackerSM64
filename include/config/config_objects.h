@@ -15,7 +15,7 @@
 #define COIN_LAVA_FLICKER
 
 // Allow for retries on collecting the remaining blue coins from a blue coin switch.
-#define BLUE_COIN_SWITCH_RETRY
+//#define BLUE_COIN_SWITCH_RETRY
 
 // -- GOOMBA --
 
