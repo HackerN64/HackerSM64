@@ -3319,7 +3319,7 @@ const Gfx intro_seg7_dl_main_logo[] = {
 
 // 0x0700B420 - 0x0700B460
 static const Vtx intro_seg7_vertex_copyright[] = {
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_CREDIT
     {{{    80,     60,     -1}, 0, {     0,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 0
     {{{   240,     60,     -1}, 0, {256<<5,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 1
 
@@ -3338,7 +3338,7 @@ static const Vtx intro_seg7_vertex_copyright[] = {
 
 // 0x0700B460 - 0x0700B4A0
 static const Vtx intro_seg7_vertex_trademark[] = {
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_CREDIT
     {{{   268,    192,     -1}, 0, {     0,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 0
     {{{   284,    192,     -1}, 0, { 64<<5,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 1
 
@@ -3355,7 +3355,7 @@ static const Vtx intro_seg7_vertex_trademark[] = {
 #endif
 };
 
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_CREDIT
 // 0x0700B4A0 - 0x0700B4A2
 ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 #include "levels/intro/made_with_hackersm64.custom.i4.inc.c"
@@ -3399,7 +3399,7 @@ ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 // 0x0700C6A0 - 0x0700C790
 const Gfx intro_seg7_dl_copyright_trademark[] = {
     gsDPPipeSync(),
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_CREDIT
     gsDPSetCombineMode(G_CC_MODULATEFADE, G_CC_MODULATEFADE),
 #else
     gsDPSetCombineMode(G_CC_DECALFADE, G_CC_DECALFADE),
@@ -3407,7 +3407,7 @@ const Gfx intro_seg7_dl_copyright_trademark[] = {
     gsDPSetTextureFilter(G_TF_POINT),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
 
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_CREDIT
     gsDPLoadTextureBlock_4b(intro_seg7_texture_copyright, G_IM_FMT_I, 256, 32, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 8, 5, G_TX_NOLOD, G_TX_NOLOD),
     gsSPVertex(intro_seg7_vertex_copyright, 6, 0),
     gsSP2Triangles( 0,  3,  1, 0x0,  0,  2,  3, 0x0),

@@ -605,7 +605,7 @@
 #ifdef FLOOMBAS
 #define /*0x110*/ oIsFloomba OBJECT_FIELD_S32(0x22)
 
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_FLOOMBAS
 #define /*0x1AC*/ oZoomCounter OBJECT_FIELD_S32(0x49)
 #define /*0x1B0*/ oZoomPosZ    OBJECT_FIELD_F32(0x4A)
 #endif
