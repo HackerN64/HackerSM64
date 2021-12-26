@@ -5137,7 +5137,7 @@ const BehaviorScript bhvFloomba[] = {
     GOTO(bhvGoomba + 1),
 };
 
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_FLOOMBAS
 const BehaviorScript bhvFloombaStartup[] = {
     BEGIN(OBJ_LIST_PUSHABLE),
     SET_INT(oIsFloomba, TRUE),
