@@ -93,7 +93,10 @@
 #define F3DEX2_REJ_GBI
 #define F3DLX2_REJ_GBI
 #endif // OBJECTS_REJ
+
 // Enable floombas if the intro floombas are enabled
 #ifdef INTRO_FLOOMBAS
-#define FLOOMBAS
+    #ifndef FLOOMBAS
+        #define FLOOMBAS
+    #endif
 #endif
