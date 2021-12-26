@@ -4,8 +4,11 @@
  * GRAPHICS SETTINGS *
  *********************/
 
-// Use HD versions of the intro splash screen textures. This includes "Made with HackerSM64".
-#define HD_INTRO_TEXTURES
+// Show a watermark in the title screen that reads "Made with HackerSM64", instead of the copyright message
+#define INTRO_CREDIT
+
+// Spawn floombas in the title screen
+#define INTRO_FLOOMBAS
 
 // Enable widescreen (16:9) support
 #define WIDE
@@ -90,3 +93,7 @@
 #define F3DEX2_REJ_GBI
 #define F3DLX2_REJ_GBI
 #endif // OBJECTS_REJ
+// Enable floombas if the intro floombas are enabled
+#ifdef INTRO_FLOOMBAS
+#define FLOOMBAS
+#endif

@@ -452,7 +452,7 @@ extern const BehaviorScript bhvGoomba[];
 extern const BehaviorScript bhvGoombaTripletSpawner[];
 #ifdef FLOOMBAS
 extern const BehaviorScript bhvFloomba[];
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_FLOOMBAS
 extern const BehaviorScript bhvFloombaStartup[];
 #endif
 extern const BehaviorScript bhvFloombaTripletSpawner[];

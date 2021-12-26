@@ -124,7 +124,7 @@ void bhv_goomba_init(void) {
     if (o->oIsFloomba) {
         o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
     }
-#ifdef HD_INTRO_TEXTURES
+#ifdef INTRO_FLOOMBAS
     if (o->oAction == FLOOMBA_ACT_STARTUP) {
         o->oZoomPosZ = o->oPosZ;
         o->oGoombaScale = 0.0f;
@@ -266,7 +266,7 @@ static void goomba_act_jump(void) {
     }
 }
 
-#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+#if defined(FLOOMBAS) && defined(INTRO_FLOOMBAS)
 static void floomba_act_startup(void) {
     if (GET_BPARAM3(o->oBehParams) & GOOMBA_BP3_FLOOMBA_MIRRORED_STARTUP_ANIM) {
         struct Animation *currAnim = o->header.gfx.animInfo.curAnim;
@@ -335,7 +335,7 @@ void bhv_goomba_update(void) {
         if (o->oGoombaScale == 0.0f || (animSpeed = (o->oForwardVel / o->oGoombaScale * 0.4f)) < 1.0f) {
             animSpeed = 1.0f;
         }
-#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+#if defined(FLOOMBAS) && defined(INTRO_FLOOMBAS)
         if (o->oAction == FLOOMBA_ACT_STARTUP) {
             animSpeed = (GET_BPARAM1(o->oBehParams) / 16.0f);
         }
@@ -352,7 +352,7 @@ void bhv_goomba_update(void) {
             case GOOMBA_ACT_JUMP:
                 goomba_act_jump();
                 break;
-#if defined(FLOOMBAS) && defined(HD_INTRO_TEXTURES)
+#if defined(FLOOMBAS) && defined(INTRO_FLOOMBAS)
             case FLOOMBA_ACT_STARTUP:
                 floomba_act_startup();
                 break;
