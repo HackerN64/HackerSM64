@@ -73,3 +73,12 @@
 
 // The number of segments Wiggler has, not including the head. Vanilla is 4.
 #define WIGGLER_NUM_SEGMENTS     4
+
+// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
+
+// Enable floombas if the intro floombas are enabled
+#ifdef INTRO_FLOOMBAS
+    #ifndef FLOOMBAS
+        #define FLOOMBAS
+    #endif
+#endif
