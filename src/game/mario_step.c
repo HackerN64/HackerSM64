@@ -519,8 +519,8 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             return AIR_STEP_NONE;
         }
 
-        //! Potential clipping when platforms moving up while mario's falling?
-        if (nextPos[1] <= m->floorHeight && nextPos[1] > m->floorHeight - 160.0f) {
+        //! Potential subframe downwarp->upwarp?
+        if (nextPos[1] <= m->floorHeight) {
             m->pos[1] = m->floorHeight;
             return AIR_STEP_LANDED;
         }
