@@ -283,7 +283,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     resolve_and_return_wall_collisions(nextPos, 60.0f, 50.0f, &upperWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
+    f32 ceilHeight = find_ceil(nextPos[0], MAX(floorHeight, nextPos[1]) + 3.0f, nextPos[2], &ceil);
 
     f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
 
@@ -465,7 +465,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     resolve_and_return_wall_collisions(nextPos, 30.0f, 50.0f, &lowerWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
+    f32 ceilHeight = find_ceil(nextPos[0], MAX(floorHeight, nextPos[1]) + 3.0f, nextPos[2], &ceil);
 
     f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
 

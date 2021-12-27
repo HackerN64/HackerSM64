@@ -76,7 +76,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     resolve_and_return_wall_collisions(nextPos, 10.0f, 110.0f, &wallData);
     struct Surface *wall = wallData.numWalls == 0 ? NULL : wallData.walls[0];
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
+    f32 ceilHeight = find_ceil(nextPos[0], MAX(floorHeight, nextPos[1]) + 3.0f, nextPos[2], &ceil);
 
     if (floor == NULL) {
         return WATER_STEP_CANCELLED;

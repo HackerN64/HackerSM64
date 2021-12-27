@@ -260,7 +260,7 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     set_mario_wall(m, wallCollisionData.numWalls == 0 ? NULL : wallCollisionData.walls[0]);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
+    f32 ceilHeight = find_ceil(nextPos[0], MAX(floorHeight, nextPos[1]) + 3.0f, nextPos[2], &ceil);
 
     if (floor == NULL) {
         return HANG_HIT_CEIL_OR_OOB;
