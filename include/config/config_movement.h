@@ -9,19 +9,19 @@
 
 // Fixes Mario's turn ground radius by allowing Mario to turn around at any speed.
 // Basically a simpler version of GROUND_TURN_FIX but smoother & closer to vanilla.
-#define GROUND_TURNING_AROUND_FIX
+// #define GROUND_TURNING_AROUND_FIX
 
 // Improved hanging:
 // - Doesn't require holding down the A button
-// - Percise turning control
-// - Preventis falling from the edges
+// - Precise turning control
+// - Prevents falling from the edges
 #define BETTER_HANGING
 
 // Change the movement speed when hanging from a ceiling (the vanilla value is 4.0f, has no effect if BETTER_HANGING is enabled)
 #define HANGING_SPEED 12.0f
 
 // Prevents Mario from falling asleep while idle
-#define NO_SLEEP
+// #define NO_SLEEP
 
 // Disables fall damage
 #define NO_FALL_DAMAGE

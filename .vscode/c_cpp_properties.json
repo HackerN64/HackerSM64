@@ -6,6 +6,7 @@
                 "${workspaceFolder}/include/n64/**",
                 "${workspaceFolder}/include/**",
                 "${workspaceFolder}/textures/**",
+                "${workspaceFolder}/build/us_n64/**",
                 "${workspaceFolder}/**"
             ],
             "forcedInclude": [
