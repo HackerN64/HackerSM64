@@ -560,7 +560,7 @@ s32 act_debug_free_move(struct MarioState *m) {
 
     set_mario_wall(m, ((wallData.numWalls > 0) ? wallData.walls[0] : NULL));
     f32 floorHeight = find_floor(pos[0], pos[1], pos[2], &floor);
-    f32 ceilHeight = find_ceil(pos[0], MAX(floorHeight, pos[1]) + 3.0f, pos[2], &ceil);
+    f32 ceilHeight = vec3f_find_ceil(pos, floorHeight, &ceil);
 
     if (floor == NULL) return FALSE;
 

@@ -1293,7 +1293,7 @@ void update_mario_geometry_inputs(struct MarioState *m) {
         m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
     }
 
-    m->ceilHeight = find_ceil(m->pos[0], MAX(m->floorHeight, m->pos[1]) + 3.0f, m->pos[2], &m->ceil);
+    m->ceilHeight = vec3f_find_ceil(m->pos, m->floorHeight, &m->ceil);
     gasLevel = find_poison_gas_level(m->pos[0], m->pos[2]);
     m->waterLevel = find_water_level(m->pos[0], m->pos[2]);
 
