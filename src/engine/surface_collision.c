@@ -108,7 +108,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         goto hasCollision;
 
     edge_1_2:
-        // if (offset < 0) continue;
+        if (offset < 0) continue;
         CALC_OFFSET(v0, goto edge_1_3);
 
     edge_1_3:
