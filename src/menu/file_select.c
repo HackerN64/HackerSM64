@@ -2131,7 +2131,7 @@ s32 lvl_init_menu_values_and_cursor_pos(UNUSED s32 arg, UNUSED s32 unused) {
     sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
     sSoundMode = save_file_get_sound_mode();
 #ifdef WIDE
-    gCurrLevelNum = 0x01;
+    gCurrLevelNum = LEVEL_UNKNOWN_1;
 #endif
     return 0;
 }
