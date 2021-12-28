@@ -191,15 +191,15 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
 
-    // Check for surfaces that are a part of level geometry.
-    node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
-    numCollisions += find_wall_collisions_from_list(node, colData);
-
     if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
         // Check for surfaces belonging to objects.
         node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
         numCollisions += find_wall_collisions_from_list(node, colData);
     }
+
+    // Check for surfaces that are a part of level geometry.
+    node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
+    numCollisions += find_wall_collisions_from_list(node, colData);
 
     gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 #ifdef VANILLA_DEBUG
@@ -344,23 +344,35 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
 
-    // Check for surfaces that are a part of level geometry.
-    struct SurfaceNode *surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next;
-    struct Surface *ceil = find_ceil_from_list(surfaceList, x, y, z, &height);
+    struct SurfaceNode *surfaceList;
+    struct Surface *ceil = NULL;
+    struct Surface *dynamicCeil = NULL;
 
-    if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
+    s32 includeDynamic = !(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC);
+
+    if (includeDynamic) {
         // Check for surfaces belonging to objects.
         surfaceList = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next;
-        struct Surface *dynamicCeil = find_ceil_from_list(surfaceList, x, y, z, &dynamicHeight);
+        dynamicCeil = find_ceil_from_list(surfaceList, x, y, z, &dynamicHeight);
 
-        if (dynamicHeight < height) {
-            ceil = dynamicCeil;
-            height = dynamicHeight;
-        }
+        // In the next check, only check for ceilings lower than the previous check.
+        height = dynamicHeight;
     }
 
+    // Check for surfaces that are a part of level geometry.
+    surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS].next;
+    ceil = find_ceil_from_list(surfaceList, x, y, z, &height);
+
+    // Use the lower ceiling.
+    if (includeDynamic && height >= dynamicHeight) {
+        ceil   = dynamicCeil;
+        height = dynamicHeight;
+    }
+
+    // To prevent accidentally leaving the floor tangible, stop checking for it.
     gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 
+    // Return the ceiling.
     *pceil = ceil;
 #ifdef VANILLA_DEBUG
     // Increment the debug tracker.
@@ -575,26 +587,40 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     // Each level is split into cells to limit load, find the appropriate cell.
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
-    // Check for surfaces that are a part of level geometry.
-    struct SurfaceNode *surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
-    struct Surface *floor = find_floor_from_list(surfaceList, x, y, z, &height);
-    if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
-        // In the next check, only check for floors higher than the previous check
-        dynamicHeight = height;
+
+    struct SurfaceNode *surfaceList;
+    struct Surface *floor = NULL;
+    struct Surface *dynamicFloor = NULL;
+
+    s32 includeDynamic = !(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC);
+
+    if (includeDynamic) {
         // Check for surfaces belonging to objects.
         surfaceList = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
-        struct Surface *dynamicFloor = find_floor_from_list(surfaceList, x, y, z, &dynamicHeight);
-        if (dynamicHeight > height) {
-            floor  = dynamicFloor;
-            height = dynamicHeight;
-        }
+        dynamicFloor = find_floor_from_list(surfaceList, x, y, z, &dynamicHeight);
+
+        // In the next check, only check for floors higher than the previous check.
+        height = dynamicHeight;
     }
+
+    // Check for surfaces that are a part of level geometry.
+    surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
+    floor = find_floor_from_list(surfaceList, x, y, z, &height);
+
+    // Use the higher floor.
+    if (includeDynamic && height <= dynamicHeight) {
+        floor  = dynamicFloor;
+        height = dynamicHeight;
+    }
+
     // To prevent accidentally leaving the floor tangible, stop checking for it.
     gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
     // If a floor was missed, increment the debug counter.
     if (floor == NULL) {
         gNumFindFloorMisses++;
     }
+
+    // Return the floor.
     *pfloor = floor;
 #ifdef VANILLA_DEBUG
     // Increment the debug tracker.
