@@ -40,17 +40,33 @@
 #endif
 
 #ifdef COMPLETE_SAVE_FILE
-    #define UNLOCK_ALL
+    #ifndef UNLOCK_ALL
+        #define UNLOCK_ALL
+    #endif
 #endif // COMPLETE_SAVE_FILE
 
 #ifdef DEBUG_ALL
-    #define DEBUG_LEVEL_SELECT
-    #define ENABLE_DEBUG_FREE_MOVE
-    #define PUPPYPRINT
-    #define PUPPYPRINT_DEBUG 1
-    #define VISUAL_DEBUG
-    #define UNLOCK_ALL
-    #define COMPLETE_SAVE_FILE
+    #ifndef DEBUG_LEVEL_SELECT
+        #define DEBUG_LEVEL_SELECT
+    #endif
+    #ifndef ENABLE_DEBUG_FREE_MOVE
+        #define ENABLE_DEBUG_FREE_MOVE
+    #endif
+    #ifndef PUPPYPRINT
+        #define PUPPYPRINT
+    #endif
+    #ifndef PUPPYPRINT_DEBUG 1
+        #define PUPPYPRINT_DEBUG 1
+    #endif
+    #ifndef VISUAL_DEBUG
+        #define VISUAL_DEBUG
+    #endif
+    #ifndef UNLOCK_ALL
+        #define UNLOCK_ALL
+    #endif
+    #ifndef COMPLETE_SAVE_FILE
+        #define COMPLETE_SAVE_FILE
+    #endif
 #endif // DEBUG_ALL
 
 #ifdef DISABLE_ALL
@@ -74,7 +90,9 @@
  */
 
 #ifdef FORCED_CAMERA_MODE
-    #define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode
+    #ifndef USE_COURSE_DEFAULT_MODE
+        #define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode
+    #endif
 #endif
 
 #ifndef WATER_SURFACE_CAMERA_MODE
@@ -109,7 +127,10 @@
 
 #ifndef KEEP_MARIO_HEAD
     #undef GODDARD_EASTER_EGG
-    #define DISABLE_DEMO
+
+    #ifndef DISABLE_DEMO
+        #define DISABLE_DEMO
+    #endif
 #endif // !KEEP_MARIO_HEAD
 
 /*****************
@@ -141,6 +162,8 @@
  */
 
 #ifndef TARGET_N64
+    #undef BORDER_HEIGHT_CONSOLE
+    #undef BORDER_HEIGHT_EMULATOR
     #define BORDER_HEIGHT_CONSOLE  0
     #define BORDER_HEIGHT_EMULATOR 0
 #endif // !TARGET_N64
