@@ -55,7 +55,7 @@
     #ifndef PUPPYPRINT
         #define PUPPYPRINT
     #endif
-    #ifndef PUPPYPRINT_DEBUG 1
+    #ifndef PUPPYPRINT_DEBUG
         #define PUPPYPRINT_DEBUG 1
     #endif
     #ifndef VISUAL_DEBUG
