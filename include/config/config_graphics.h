@@ -23,6 +23,10 @@
 // Regardless of whether this setting is enabled or not, you can use gIsConsole to wrap your own code in a console check.
 #define AUTO_LOD
 
+// Include Puppyprint, a display library for text and large images.
+// Automatically included when PUPPYPRINT_DEBUG is enabled
+// #define PUPPYPRINT
+
 // Disable AA (Improves console performance but causes visible seams between unconnected geometry).
 // #define DISABLE_AA
 

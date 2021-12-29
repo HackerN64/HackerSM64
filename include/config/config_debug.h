@@ -5,7 +5,7 @@
  ******************/
 
 // Enables most debug options
-//#define DEBUG_ALL
+// #define DEBUG_ALL
 
 // Disables all debug options (except PUPPYPRINT)
 #define DISABLE_ALL
@@ -22,16 +22,8 @@
 // Enable debug free move (DPad up to enter, A to exit).
 #define ENABLE_DEBUG_FREE_MOVE
 
-// Include vanilla debug functionality.
-//#define VANILLA_DEBUG
-
-// Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
-//#define CUSTOM_DEBUG
-
-// Include Puppyprint, a display library for text and large images.
-//#define PUPPYPRINT
-// Include a custom, enhanced performance profiler (Requires PUPPYPRINT).
-//#define PUPPYPRINT_DEBUG 1
+// Include a custom, enhanced performance profiler (Enables PUPPYPRINT by default in config_safeguards).
+// #define PUPPYPRINT_DEBUG 1
 
 // Use cycles instead of microseconds in Puppyprint debug output.
 //#define PUPPYPRINT_DEBUG_CYCLES
@@ -45,13 +37,19 @@
 
 // Same as above, but also reads all save file flags as complete.
 // This will not overwrite existing save file data unless you save over it.
-//#define COMPLETE_SAVE_FILE
+// #define COMPLETE_SAVE_FILE
+
+// Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
+// #define CUSTOM_DEBUG
 
 // Removes the limit on FPS
-//#define UNLOCK_FPS
+// #define UNLOCK_FPS
+
+// Include vanilla debug functionality.
+// #define VANILLA_DEBUG
 
 // Forces a crash when the game starts. Useful for debugging the crash screen.
-//#define DEBUG_FORCE_CRASH_ON_BOOT
+// #define DEBUG_FORCE_CRASH_ON_BOOT
 
 // -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
 
