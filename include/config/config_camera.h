@@ -50,23 +50,5 @@
 // This is automatically enabled when ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS is enabled,
 // but feel free to override it if you really want to for some reason
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-#define ENABLE_VANILLA_CAM_PROCESSING
-#endif
-
-
-/**************************************/
-/****** Compatibility safeguards ******/
-/**************************************/
-// Don't change these unless you know what you're doing
-#ifdef FORCED_CAMERA_MODE
-#define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode
-#endif
-#ifndef WATER_SURFACE_CAMERA_MODE
-#define WATER_SURFACE_CAMERA_MODE CAMERA_MODE_WATER_SURFACE
-#endif
-#ifndef DEEP_WATER_CAMERA_MODE
-#define DEEP_WATER_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
-#endif
-#ifndef FLYING_CAMERA_MODE
-#define FLYING_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
+    #define ENABLE_VANILLA_CAM_PROCESSING
 #endif

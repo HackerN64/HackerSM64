@@ -50,34 +50,3 @@
 
 // Forces a crash when the game starts. Useful for debugging the crash screen.
 // #define DEBUG_FORCE_CRASH_ON_BOOT
-
-// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
-
-#ifdef COMPLETE_SAVE_FILE
-#define UNLOCK_ALL
-#endif // COMPLETE_SAVE_FILE
-
-#ifdef DEBUG_ALL
-#define DEBUG_LEVEL_SELECT
-#define ENABLE_DEBUG_FREE_MOVE
-#define PUPPYPRINT
-#define PUPPYPRINT_DEBUG 1
-#define VISUAL_DEBUG
-#define UNLOCK_ALL
-#define COMPLETE_SAVE_FILE
-#endif // DEBUG_ALL
-
-#ifdef DISABLE_ALL
-#undef DEBUG_ALL
-#undef TEST_LEVEL
-#undef DEBUG_LEVEL_SELECT
-#undef ENABLE_DEBUG_FREE_MOVE
-#undef VANILLA_DEBUG
-#undef CUSTOM_DEBUG
-#undef PUPPYPRINT_DEBUG
-#undef PUPPYPRINT_DEBUG_CYCLES
-#undef VISUAL_DEBUG
-#undef UNLOCK_ALL
-#undef COMPLETE_SAVE_FILE
-#undef DEBUG_FORCE_CRASH_ON_BOOT
-#endif // DISABLE_ALL

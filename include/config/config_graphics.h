@@ -81,20 +81,3 @@
 // Use old shadow IDs for Fast64 compatibility. This is a temporary fix until Fast64 is updated to use the enum defines.
 // NOTE: When this is enabled, The 49th hardcoded rectangle shadow will act as a regular circular shadow, due to Mario's shadow ID being 99 in vanilla.
 #define LEGACY_SHADOW_IDS
-
-// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
-
-#ifndef F3DZEX_GBI_2
-#undef OBJECTS_REJ // OBJECTS_REJ requires f3dzex.
-#endif // !F3DZEX_GBI_2
-
-#ifndef F3DEX_GBI_SHARED
-#undef OBJECTS_REJ // Non F3DEX-based ucodes do NOT support ucode switching.
-#endif // !F3DEX_GBI_SHARED
-
-#ifdef OBJECTS_REJ
-// Enable required ucodes.
-#define F3DEX2_REJ_GBI
-#define F3DLX2_REJ_GBI
-#endif // OBJECTS_REJ
-
