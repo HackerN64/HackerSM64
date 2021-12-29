@@ -34,39 +34,36 @@
  */
 
 #ifdef PUPPYPRINT_DEBUG
-    #ifndef PUPPYPRINT
-        #define PUPPYPRINT
-    #endif
+    #undef PUPPYPRINT
+    #define PUPPYPRINT
 #endif
 
 #ifdef COMPLETE_SAVE_FILE
-    #ifndef UNLOCK_ALL
-        #define UNLOCK_ALL
-    #endif
+    #undef UNLOCK_ALL
+    #define UNLOCK_ALL
 #endif // COMPLETE_SAVE_FILE
 
 #ifdef DEBUG_ALL
-    #ifndef DEBUG_LEVEL_SELECT
-        #define DEBUG_LEVEL_SELECT
-    #endif
-    #ifndef ENABLE_DEBUG_FREE_MOVE
-        #define ENABLE_DEBUG_FREE_MOVE
-    #endif
-    #ifndef PUPPYPRINT
-        #define PUPPYPRINT
-    #endif
-    #ifndef PUPPYPRINT_DEBUG
-        #define PUPPYPRINT_DEBUG 1
-    #endif
-    #ifndef VISUAL_DEBUG
-        #define VISUAL_DEBUG
-    #endif
-    #ifndef UNLOCK_ALL
-        #define UNLOCK_ALL
-    #endif
-    #ifndef COMPLETE_SAVE_FILE
-        #define COMPLETE_SAVE_FILE
-    #endif
+    #undef DEBUG_LEVEL_SELECT
+    #define DEBUG_LEVEL_SELECT
+
+    #undef ENABLE_DEBUG_FREE_MOVE
+    #define ENABLE_DEBUG_FREE_MOVE
+
+    #undef PUPPYPRINT
+    #define PUPPYPRINT
+
+    #undef PUPPYPRINT_DEBUG
+    #define PUPPYPRINT_DEBUG 1
+
+    #undef VISUAL_DEBUG
+    #define VISUAL_DEBUG
+
+    #undef UNLOCK_ALL
+    #define UNLOCK_ALL
+
+    #undef COMPLETE_SAVE_FILE
+    #define COMPLETE_SAVE_FILE
 #endif // DEBUG_ALL
 
 #ifdef DISABLE_ALL
@@ -90,9 +87,8 @@
  */
 
 #ifdef FORCED_CAMERA_MODE
-    #ifndef USE_COURSE_DEFAULT_MODE
-        #define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode
-    #endif
+    #undef USE_COURSE_DEFAULT_MODE
+    #define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode
 #endif
 
 #ifndef WATER_SURFACE_CAMERA_MODE
@@ -128,9 +124,8 @@
 #ifndef KEEP_MARIO_HEAD
     #undef GODDARD_EASTER_EGG
 
-    #ifndef DISABLE_DEMO
-        #define DISABLE_DEMO
-    #endif
+    #undef DISABLE_DEMO
+    #define DISABLE_DEMO
 #endif // !KEEP_MARIO_HEAD
 
 /*****************
@@ -151,9 +146,8 @@
 
 // Enable floombas if the intro floombas are enabled
 #ifdef INTRO_FLOOMBAS
-    #ifndef FLOOMBAS
-        #define FLOOMBAS
-    #endif
+    #undef FLOOMBAS
+    #define FLOOMBAS
 #endif
 
 
@@ -163,7 +157,8 @@
 
 #ifndef TARGET_N64
     #undef BORDER_HEIGHT_CONSOLE
-    #undef BORDER_HEIGHT_EMULATOR
     #define BORDER_HEIGHT_CONSOLE  0
+
+    #undef BORDER_HEIGHT_EMULATOR
     #define BORDER_HEIGHT_EMULATOR 0
 #endif // !TARGET_N64
