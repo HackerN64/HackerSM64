@@ -4,12 +4,15 @@
  * MOVEMENT SETTINGS *
  *********************/
 
-// Fixes Mario's turn ground radius by making it dependent on the analog stick magnitude.
-//#define GROUND_TURN_FIX
+// Changes Mario's ground turn radius by making it dependent on the analog stick magnitude and speed.
+// #define VELOCITY_BASED_TURN_SPEED
 
-// Fixes Mario's turn ground radius by allowing Mario to turn around at any speed.
-// Basically a simpler version of GROUND_TURN_FIX but smoother & closer to vanilla.
-// #define GROUND_TURNING_AROUND_FIX
+// Allows Mario to easily side flip when moving forwards at any speed
+// #define SIDE_FLIP_AT_LOW_SPEEDS
+
+// Allows Mario to aim towards a new direction at the end of turning around,
+// and allows Mario to turn around multiple times in a row
+// #define RESET_DIRECTION_WHEN_TURNING_AROUND
 
 // Improved hanging:
 // - Doesn't require holding down the A button
@@ -80,10 +83,3 @@
 
 // Re-enable upwarping when entering water. Forces you to only enter water from the top
 // #define WATER_PLUNGE_UPWARP
-
-
-// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
-
-// #ifdef GROUND_TURNING_AROUND_FIX
-// #undef GROUND_TURN_FIX
-// #endif // GROUND_TURNING_AROUND_FIX
