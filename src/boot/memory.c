@@ -327,6 +327,16 @@ void *load_to_fixed_pool_addr(u8 *destAddr, u8 *srcStart, u8 *srcEnd) {
  * base address of segment to this address.
  */
 void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
+#ifdef UNCOMPRESSED
+    u32 compSize = ALIGN16(srcEnd - srcStart);
+    void *dest = main_pool_alloc(compSize, MEMORY_POOL_LEFT);
+    
+    if (dest != NULL) {
+        dma_read(dest, srcStart, srcEnd);
+        set_segment_base_addr(segment, dest);
+    } else {
+    }
+#else
     void *dest = NULL;
 
 #ifdef GZIP
@@ -343,13 +353,8 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
     u32 *size = (u32 *) (compressed + 4);
 #endif
     if (compressed != NULL) {
-#ifdef UNCOMPRESSED
-        dest = main_pool_alloc(compSize, MEMORY_POOL_LEFT);
-        dma_read(dest, srcStart, srcEnd);
-#else
         dma_read(compressed, srcStart, srcEnd);
         dest = main_pool_alloc(*size, MEMORY_POOL_LEFT);
-#endif
         if (dest != NULL) {
 			osSyncPrintf("start decompress\n");
 #ifdef GZIP
@@ -370,12 +375,17 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         }
     } else {
     }
+#endif
     return dest;
 }
 
 void *load_segment_decompress_heap(u32 segment, u8 *srcStart, u8 *srcEnd) {
     UNUSED void *dest = NULL;
 
+#ifdef UNCOMPRESSED
+    dma_read(gDecompressionHeap, srcStart, srcEnd);
+    set_segment_base_addr(segment, gDecompressionHeap);
+#else
 #ifdef GZIP
     u32 compSize = (srcEnd - 4 - srcStart);
 #else
@@ -387,11 +397,7 @@ void *load_segment_decompress_heap(u32 segment, u8 *srcStart, u8 *srcEnd) {
     u32 *size = (u32 *) (compressed + compSize);
 #endif
     if (compressed != NULL) {
-#ifdef UNCOMPRESSED
-        dma_read(gDecompressionHeap, srcStart, srcEnd);
-#else
         dma_read(compressed, srcStart, srcEnd);
-#endif
 #ifdef GZIP
         expand_gzip(compressed, gDecompressionHeap, compSize, (u32)size);
 #elif RNC1
@@ -407,6 +413,7 @@ void *load_segment_decompress_heap(u32 segment, u8 *srcStart, u8 *srcEnd) {
         main_pool_free(compressed);
     } else {
     }
+#endif
     return gDecompressionHeap;
 }
 
