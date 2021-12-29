@@ -31,7 +31,7 @@
 
 /*
  * Stars don't kick you out of the level
- * In v2.0 there are numerous issues with this define that can be seen here https://github.com/Reonu/HackerSM64/issues/264
+ * In v2.0 there are numerous issues with this define that can be seen here https://github.com/Reonu/HackerSM64/issues/258
  * Use at your own risk.
 */
 // #define NON_STOP_STARS
