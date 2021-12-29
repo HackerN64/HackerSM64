@@ -4,9 +4,11 @@
  * GAME SETTINGS *
  *****************/
 
-// Enables some mechanics that change behavior depending on hardcoded level numbers.
-// You may also need to change sLevelsWithRooms in object_helpers.c
-// TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic
+/** 
+ * Enables some mechanics that change behavior depending on hardcoded level numbers.
+ * You may also need to change sLevelsWithRooms in object_helpers.c
+ * TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic
+*/
 // #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
 // Disable lives and hide the lives counter
@@ -26,6 +28,7 @@
 
 // Air/Breath meter is separate from health meter when underwater
 // #define BREATH_METER
+
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
 #define X_COIN_STAR 100
 
