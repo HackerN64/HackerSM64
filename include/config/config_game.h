@@ -45,7 +45,9 @@
 #define AREA_COUNT 8
 
 // Makes signs and NPCs easier to talk to.
-#define EASIER_DIALOG_TRIGGER
+// NOTE: Currently has issues with talking to Bowser post-fight,
+// https://github.com/Reonu/HackerSM64/issues/273
+// #define EASIER_DIALOG_TRIGGER
 
 // Show an "A" when Mario is able to talk [requires EASIER_DIALOG_TRIGGER]
 // #define DIALOG_INDICATOR
