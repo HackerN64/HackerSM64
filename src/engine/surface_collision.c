@@ -43,7 +43,6 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     register f32 d00, d01, d11, d20, d21;
     register f32 invDenom;
     register f32 v, w;
-    register f32 margin_radius = radius - 1.0f;
     register TerrainData type = SURFACE_DEFAULT;
     s32 numCols = 0;
 
@@ -51,6 +50,8 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
     if (radius > 200) {
         radius = 200;
     }
+
+    f32 margin_radius = radius - 1.0f;
 
     // Stay in this loop until out of walls.
     while (surfaceNode != NULL) {
