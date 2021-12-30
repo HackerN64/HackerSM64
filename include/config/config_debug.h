@@ -39,9 +39,6 @@
 // This will not overwrite existing save file data unless you save over it.
 // #define COMPLETE_SAVE_FILE
 
-// Custom debug mode. Press DPAD left to show the debug UI. Press DPAD right to enter the noclip mode.
-// #define CUSTOM_DEBUG
-
 // Removes the limit on FPS
 // #define UNLOCK_FPS
 

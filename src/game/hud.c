@@ -399,18 +399,6 @@ void render_hud_mario_lives(void) {
     print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(54), HUD_TOP_Y, "%d", gHudDisplay.lives);
 }
 
-#ifdef CUSTOM_DEBUG
-void render_debug_mode(void) {
-    print_text(180, 40, "DEBUG MODE");
-    print_text_fmt_int(5, 20, "Z %d", gMarioState->pos[2]);
-    print_text_fmt_int(5, 40, "Y %d", gMarioState->pos[1]);
-    print_text_fmt_int(5, 60, "X %d", gMarioState->pos[0]);
-    print_text_fmt_int(10, 100, "SPD %d", (s32) gMarioState->forwardVel);
-    print_text_fmt_int(10, 120, "ANG 0*%04x", (u16) gMarioState->faceAngle[1]);
-    print_fps(10,80);
-}
-#endif
-
 /**
  * Renders the amount of coins collected.
  */
@@ -603,11 +591,6 @@ void render_hud(void) {
         if (gSurfacePoolError & NOT_ENOUGH_ROOM_FOR_SURFACES) print_text(10, 40, "SURFACE POOL FULL");
         if (gSurfacePoolError & NOT_ENOUGH_ROOM_FOR_NODES) print_text(10, 60, "SURFACE NODE POOL FULL");
 
-#ifdef CUSTOM_DEBUG
-        if (gCustomDebugMode) {
-            render_debug_mode();
-        }
-#endif
 #ifdef PUPPYPRINT
         print_set_envcolour(255, 255, 255, 255);
 #endif
