@@ -23,10 +23,3 @@
 // There is generally no reason to have a value other than 0 for emulator. As for console, it provides a (small) performance boost.
 #define BORDER_HEIGHT_CONSOLE  0
 #define BORDER_HEIGHT_EMULATOR 0
-
-// -- Compatibility safeguards. Don't mess with these unless you know what you're doing.--
-
-#ifndef TARGET_N64
-#define BORDER_HEIGHT_CONSOLE  0
-#define BORDER_HEIGHT_EMULATOR 0
-#endif // !TARGET_N64
