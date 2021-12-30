@@ -445,18 +445,15 @@ void update_walking_speed(struct MarioState *m) {
         m->forwardVel = 48.0f;
     }
 
-#ifdef GROUND_TURN_FIX
+#ifdef VELOCITY_BASED_TURN_SPEED
     if ((m->heldObj == NULL) && !(m->action & ACT_FLAG_SHORT_HITBOX)) {
         if (m->forwardVel >= 16.0f) {
             s16 turnRange = abs_angle_diff(m->faceAngle[1], m->intendedYaw);
             f32 fac = (m->forwardVel + m->intendedMag);
             turnRange *= (1.0f - (CLAMP(fac, 0.0f, 32.0f) / 32.0f));
             turnRange = MAX(turnRange, 0x800);
+
             approach_angle_bool(&m->faceAngle[1], m->intendedYaw, turnRange);
-            // f32 fac = (m->intendedMag + m->forwardVel);
-            // fac = (1.0f - (CLAMP(fac, 0.0f, 32.0f) / 32.0f));
-            // s16 turnRange = (0x800 + ((0x7FFF - 0x800) * fac));
-            // approach_angle_bool(&m->faceAngle[1], m->intendedYaw, turnRange);
         } else {
             m->faceAngle[1] = m->intendedYaw;
         }
@@ -780,7 +777,7 @@ s32 act_walking(struct MarioState *m) {
         return begin_braking_action(m);
     }
 
-#ifdef GROUND_TURNING_AROUND_FIX
+#ifdef SIDE_FLIP_AT_LOW_SPEEDS
     if (analog_stick_held_back(m) && m->forwardVel >= 0.0f) {
 #else
     if (analog_stick_held_back(m) && m->forwardVel >= 16.0f) {
@@ -1003,7 +1000,7 @@ s32 act_finish_turning_around(struct MarioState *m) {
         return set_jumping_action(m, ACT_SIDE_FLIP, 0);
     }
 
-#ifdef GROUND_TURNING_AROUND_FIX
+#ifdef RESET_DIRECTION_WHEN_TURNING_AROUND
     if (analog_stick_held_back(m)) {
         return set_mario_action(m, ACT_TURNING_AROUND, 0);
     }
@@ -1020,7 +1017,7 @@ s32 act_finish_turning_around(struct MarioState *m) {
         set_mario_action(m, ACT_WALKING, 0);
     }
 
-#ifdef GROUND_TURNING_AROUND_FIX
+#ifdef RESET_DIRECTION_WHEN_TURNING_AROUND
     if (m->input & INPUT_NONZERO_ANALOG) {
         m->marioObj->header.gfx.angle[1] += 0x8000;
     } else {
