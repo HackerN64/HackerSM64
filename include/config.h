@@ -19,3 +19,7 @@
 #include "config/config_movement.h"
 #include "config/config_objects.h"
 #include "config/config_rom.h"
+
+
+/* WARNING: Compatibility safeguards - don't remove this file unless you know what you're doing */
+#include "config/config_safeguards.h"

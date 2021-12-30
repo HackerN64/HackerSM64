@@ -4,6 +4,9 @@
  * GRAPHICS SETTINGS *
  *********************/
 
+// Size of how large the master display list (gDisplayListHead) can be. 6400 is vanilla
+#define GFX_POOL_SIZE 10000
+
 // Show a watermark in the title screen that reads "Made with HackerSM64", instead of the copyright message
 #define INTRO_CREDIT
 
@@ -15,13 +18,17 @@
 
 // Skybox size modifier, changing this will add support for larger skybox images. NOTE: Vanilla skyboxes may break if you change this option. Be sure to rescale them accordingly.
 // Whenever you change this, make sure to run "make -C tools clean" to rebuild the skybox tool (alternatively go into skyconv.c and change the file in any way (like adding/deleting a space) to specifically rebuild that tool).
-// When increasing this, you should probably also increase the GFX pool size. (the GFX_POOL_SIZE define in src/game/game_init.h)
+// When increasing this, you should probably also increase the GFX pool size. (the GFX_POOL_SIZE define above)
 #define SKYBOX_SIZE 1
 
 // When this option is enabled, LODs will ONLY work on console.
 // When this option is disabled, LODs will work regardless of whether console or emulator is used.
 // Regardless of whether this setting is enabled or not, you can use gIsConsole to wrap your own code in a console check.
 #define AUTO_LOD
+
+// Include Puppyprint, a display library for text and large images.
+// Automatically included when PUPPYPRINT_DEBUG is enabled
+// #define PUPPYPRINT
 
 // Disable AA (Improves console performance but causes visible seams between unconnected geometry).
 // #define DISABLE_AA
@@ -77,20 +84,3 @@
 // Use old shadow IDs for Fast64 compatibility. This is a temporary fix until Fast64 is updated to use the enum defines.
 // NOTE: When this is enabled, The 49th hardcoded rectangle shadow will act as a regular circular shadow, due to Mario's shadow ID being 99 in vanilla.
 #define LEGACY_SHADOW_IDS
-
-// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
-
-#ifndef F3DZEX_GBI_2
-#undef OBJECTS_REJ // OBJECTS_REJ requires f3dzex.
-#endif // !F3DZEX_GBI_2
-
-#ifndef F3DEX_GBI_SHARED
-#undef OBJECTS_REJ // Non F3DEX-based ucodes do NOT support ucode switching.
-#endif // !F3DEX_GBI_SHARED
-
-#ifdef OBJECTS_REJ
-// Enable required ucodes.
-#define F3DEX2_REJ_GBI
-#define F3DLX2_REJ_GBI
-#endif // OBJECTS_REJ
-
