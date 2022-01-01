@@ -803,7 +803,7 @@ void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u
     gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = red;
     gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = green;
     gPointLights[gPointLightCount].l.pl.colc[2] = gPointLights[gPointLightCount].l.pl.col[2] = blue;
-    gPointLights[gPointLightCount].l.pl.constant_attenuation = (constantFalloff == 0) ? 1 : constantFalloff;
+    gPointLights[gPointLightCount].l.pl.constant_attenuation = (constantFalloff == 0) ? 8 : constantFalloff;
     gPointLights[gPointLightCount].l.pl.linear_attenuation = linearFalloff;
     gPointLights[gPointLightCount].l.pl.quadratic_attenuation = quadraticFalloff;
     gPointLights[gPointLightCount].worldPos[0] = pos[0];
@@ -846,15 +846,15 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     for (i = 0; i < gPointLightCount; i++)
     {
         vec3s_copy(gPointLights[i].l.pl.pos, gPointLights[i].worldPos);
-        mtxf_mul_vec3s(gMatStack[gMatStackIndex], gPointLights[i].l.pl.pos);
+        mtxf_mul_vec3s_world_scale(gMatStack[gMatStackIndex], gPointLights[i].l.pl.pos);
     }
 
     // Transform the directional light if enabled
     if (gLightDirTransformEnabled)
     {
-        gDirectionalLight.l->l.dir[0] = -(s8)(gLightDir[0] * gMatStack[gMatStackIndex][0][0] + gLightDir[1] * gMatStack[gMatStackIndex][1][0] + gLightDir[2] * gMatStack[gMatStackIndex][2][0]);
-        gDirectionalLight.l->l.dir[1] = -(s8)(gLightDir[0] * gMatStack[gMatStackIndex][0][1] + gLightDir[1] * gMatStack[gMatStackIndex][1][1] + gLightDir[2] * gMatStack[gMatStackIndex][2][1]);
-        gDirectionalLight.l->l.dir[2] = -(s8)(gLightDir[0] * gMatStack[gMatStackIndex][0][2] + gLightDir[1] * gMatStack[gMatStackIndex][1][2] + gLightDir[2] * gMatStack[gMatStackIndex][2][2]);
+        gDirectionalLight.l->l.dir[0] = -(s8)((gLightDir[0] * gMatStack[gMatStackIndex][0][0] + gLightDir[1] * gMatStack[gMatStackIndex][1][0] + gLightDir[2] * gMatStack[gMatStackIndex][2][0]) / WORLD_SCALE);
+        gDirectionalLight.l->l.dir[1] = -(s8)((gLightDir[0] * gMatStack[gMatStackIndex][0][1] + gLightDir[1] * gMatStack[gMatStackIndex][1][1] + gLightDir[2] * gMatStack[gMatStackIndex][2][1]) / WORLD_SCALE);
+        gDirectionalLight.l->l.dir[2] = -(s8)((gLightDir[0] * gMatStack[gMatStackIndex][0][2] + gLightDir[1] * gMatStack[gMatStackIndex][1][2] + gLightDir[2] * gMatStack[gMatStackIndex][2][2]) / WORLD_SCALE);
     }
     else
     {
@@ -1541,7 +1541,7 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
 
             node->light->l.pl.quadratic_attenuation = node->a;
             node->light->l.pl.linear_attenuation = node->b;
-            node->light->l.pl.constant_attenuation = (node->c == 0) ? 1 : node->c;
+            node->light->l.pl.constant_attenuation = (node->c == 0) ? 8 : node->c;
             break;
         case LIGHT_TYPE_AMBIENT:
             if (!gOverrideAmbientLight)

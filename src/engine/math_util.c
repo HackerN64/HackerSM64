@@ -742,7 +742,7 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
  * to the point. Note that the bottom row is assumed to be [0, 0, 0, 1], which is
  * true for transformation matrices if the translation has a w component of 1.
  */
-UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
+void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
     register f32 x = b[0];
     register f32 y = b[1];
     register f32 z = b[2];
@@ -754,6 +754,24 @@ UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
               + (y * temp2[ 4])
               + (z * temp2[ 8])
               +      temp2[12]);
+        c++;
+        temp2++;
+    }
+}
+
+// Same as above, but incorporates WORLD_SCALE
+void mtxf_mul_vec3s_world_scale(Mat4 mtx, Vec3s b) {
+    register f32 x = b[0];
+    register f32 y = b[1];
+    register f32 z = b[2];
+    register f32 *temp2 = (f32 *)mtx;
+    register s32 i;
+    register s16 *c = b;
+    for (i = 0; i < 3; i++) {
+        c[0] = ((x * temp2[ 0])
+              + (y * temp2[ 4])
+              + (z * temp2[ 8])
+              +      temp2[12]) / WORLD_SCALE;
         c++;
         temp2++;
     }

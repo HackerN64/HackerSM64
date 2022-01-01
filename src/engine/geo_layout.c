@@ -753,7 +753,7 @@ void geo_layout_cmd_node_culling_radius(void) {
 }
 
 /* Advanced lighting engine
-  0x21: Add a scene light to this area.
+  GEO_CMD_SCENE_LIGHT: Add a scene light to this area.
    cmd+0x01: u8 lightType (0 is regular, 1 is point)
    cmd+0x02: u8 red
    cmd+0x03: u8 green
