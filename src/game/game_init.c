@@ -26,6 +26,13 @@
 #include "sram.h"
 #endif
 #include "puppyprint.h"
+#include <prevent_bss_reordering.h>
+
+#include <point_lights.h>
+
+// FIXME: I'm not sure all of these variables belong in this file, but I don't
+// know of a good way to split them
+struct Controller gControllers[3];
 #include "puppycam2.h"
 #include "debug_box.h"
 #include "vc_check.h"
@@ -783,6 +790,11 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
         read_controller_inputs(THREAD_5_GAME_LOOP);
+
+        // Reset the point light count before running the level script
+        // This is because the level script is responsible for calling the function
+        // that updates objects, which is where objects that emit light create their point lights
+        gPointLightCount = gAreaPointLightCount;
         addr = level_script_execute(addr);
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();

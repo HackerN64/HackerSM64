@@ -389,6 +389,16 @@ enum BehaviorCommands {
     BC_B(BHV_CMD_SPAWN_WATER_DROPLET), \
     BC_PTR(dropletParams)
 
+// Advanced lighting Engine
+// Sets an object's light color
+#define SET_LIGHT_COLOR(r, g, b) \
+    BC_BBBB(0x38, r, g, b)
+    
+// Advanced lighting Engine
+// Sets an object's light falloff
+#define SET_LIGHT_FALLOFF(constant, linear, quadratic) \
+    BC_B0H(0x39, constant), \
+    BC_HH(linear, quadratic)
 
 const BehaviorScript bhvStarDoor[] = {
     BEGIN(OBJ_LIST_SURFACE),
@@ -4791,8 +4801,11 @@ const BehaviorScript bhvControllablePlatformSub[] = {
 
 const BehaviorScript bhvBreakableBoxSmall[] = {
     BEGIN(OBJ_LIST_DESTRUCTIVE),
-    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
     DROP_TO_FLOOR(),
+    SET_LIGHT_COLOR(255, 0, 0),
+    SET_LIGHT_FALLOFF(0, 0, 10),
+    SET_FLOAT(oGraphYOffset, 25),
     SET_HOME(),
     CALL_NATIVE(bhv_breakable_box_small_init),
     BEGIN_LOOP(),

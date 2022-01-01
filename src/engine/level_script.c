@@ -390,9 +390,14 @@ static void level_cmd_free_level_pool(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
+#include <point_lights.h>
+
 static void level_cmd_begin_area(void) {
     u8 areaIndex = CMD_GET(u8, 2);
     void *geoLayoutAddr = CMD_GET(void *, 4);
+
+    gAreaPointLightCount = 0;
+    gLightDirTransformEnabled = 0;
 
     if (areaIndex < AREA_COUNT) {
         struct GraphNodeRoot *screenArea =

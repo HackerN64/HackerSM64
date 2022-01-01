@@ -58,6 +58,9 @@ enum ObjFlags {
     OBJ_FLAG_HITBOX_WAS_SET                    = (1 << 30), // 0x40000000
 };
 
+// Flag to make objects emit a point light (was OBJ_FLAG_1000)
+#define OBJ_FLAG_EMIT_LIGHT                       (1 << 12) // 0x00001000
+
 /* oHeldState */
 enum HeldState {
     HELD_FREE,

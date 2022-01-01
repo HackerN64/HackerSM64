@@ -43,6 +43,7 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NOP_1F                    */ geo_layout_cmd_nop3,
     /*GEO_CMD_NODE_CULLING_RADIUS       */ geo_layout_cmd_node_culling_radius,
     /*GEO_CMD_NODE_BONE                 */ geo_layout_cmd_bone,
+    /*Advanced lighting engine          */ geo_layout_cmd_scene_light,
 };
 
 struct GraphNode gObjParentGraphNode;
@@ -751,9 +752,43 @@ void geo_layout_cmd_node_culling_radius(void) {
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
+/* Advanced lighting engine
+  0x21: Add a scene light to this area.
+   cmd+0x01: u8 lightType (0 is regular, 1 is point)
+   cmd+0x02: u8 red
+   cmd+0x03: u8 green
+   cmd+0x04: u8 blue
+   cmd+0x05: u8 x direction (directional light) or quadratic falloff (point light)
+   cmd+0x06: u8 y direction (directional light) or linear falloff (point light)
+   cmd+0x07: u8 z direction (directional light) or unused (point light)
+*/
+void geo_layout_cmd_scene_light(void) {
+    struct GraphNodeSceneLight *graphNode;
+    u8 lightType, a, b, c;
+    u8 color[3];
+
+    lightType = cur_geo_cmd_u8(0x01);
+    color[0] = cur_geo_cmd_u8(0x02);
+    color[1] = cur_geo_cmd_u8(0x03);
+    color[2] = cur_geo_cmd_u8(0x04);
+    a = cur_geo_cmd_u8(0x05);
+    b = cur_geo_cmd_u8(0x06);
+    c = cur_geo_cmd_u8(0x07);
+
+    graphNode = init_graph_node_scene_light(gGraphNodePool, graphNode, lightType, color, a, b, c);
+    register_scene_graph_node(&graphNode->node);
+
+    gGeoLayoutCommand += (
+        /* command Id */ sizeof(u8) +
+        /* light type */ sizeof(u8) +
+        /* color */ sizeof(u8) * 3 +
+        /* quadratic falloff */ sizeof(u8) +
+        /* linear falloff */ sizeof(u8) +
+        /* unused */ sizeof(u8)) << CMD_SIZE_SHIFT;
 /*
   Create a scene graph node that is rotated by the object's animation + an initial rotation.
 */
+}
 void geo_layout_cmd_bone(void) {
     struct GraphNodeBone *graphNode;
     Vec3s translation;

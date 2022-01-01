@@ -1,0 +1,366 @@
+diff --git a/data/behavior_data.c b/data/behavior_data.c
+index 8a6a828..28fcc1f 100644
+--- a/data/behavior_data.c
++++ b/data/behavior_data.c
+@@ -328,6 +328,16 @@
+     BC_B(0x37), \
+     BC_PTR(dropletParams)
+ 
++// Advanced lighting Engine
++// Sets an object's light color
++#define SET_LIGHT_COLOR(r, g, b) \
++    BC_BBBB(0x38, r, g, b)
++    
++// Advanced lighting Engine
++// Sets an object's light falloff
++#define SET_LIGHT_FALLOFF(constant, linear, quadratic) \
++    BC_B0H(0x39, constant), \
++    BC_HH(linear, quadratic)
+ 
+ const BehaviorScript bhvStarDoor[] = {
+     BEGIN(OBJ_LIST_SURFACE),
+@@ -4850,6 +4860,8 @@ const BehaviorScript bhvBreakableBoxSmall[] = {
+     BEGIN(OBJ_LIST_DESTRUCTIVE),
+     OR_INT(oFlags, (OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE | OBJ_FLAG_EMIT_LIGHT)),
+     DROP_TO_FLOOR(),
++    SET_LIGHT_COLOR(255, 0, 0),
++    SET_LIGHT_FALLOFF(0, 0, 10),
+     SET_FLOAT(oGraphYOffset, 25),
+     SET_HOME(),
+     CALL_NATIVE(bhv_breakable_box_small_init),
+diff --git a/include/PR/gbi.h b/include/PR/gbi.h
+index 1714a3b..b3c87b0 100644
+--- a/include/PR/gbi.h
++++ b/include/PR/gbi.h
+@@ -1411,7 +1411,7 @@ typedef struct {
+ 
+ typedef struct {
+   unsigned char	col[3];		/* diffuse light value (rgba) */
+-  char 		is_point;
++  char 		constant_attenuation;
+   unsigned char	colc[3];	/* copy of diffuse light value (rgba) */
+   char 		linear_attenuation;
+   signed short	pos[3];		/* direction of light (normalized) */
+diff --git a/include/PR/ucode.h b/include/PR/ucode.h
+index b47743a..37fd197 100644
+--- a/include/PR/ucode.h
++++ b/include/PR/ucode.h
+@@ -2,11 +2,7 @@
+ #define _ULTRA64_UCODE_H_
+ 
+ #define SP_DRAM_STACK_SIZE8 0x400
+-#ifdef F3DZEX_GBI_2
+-#define SP_UCODE_SIZE       0x1630
+-#else
+ #define SP_UCODE_SIZE       0x1000
+-#endif
+ #define SP_UCODE_DATA_SIZE  0x800
+ 
+ // standard boot ucode
+diff --git a/include/object_fields.h b/include/object_fields.h
+index 3aa02d7..7a6d96a 100644
+--- a/include/object_fields.h
++++ b/include/object_fields.h
+@@ -1164,5 +1164,6 @@
+ #define /*0x148*/ oLightColor                 OBJECT_FIELD_S32(0x30) // 0xRRGGBB00
+ #define /*0x1A4*/ oLightQuadraticFalloff      OBJECT_FIELD_S16(0x47, 0)
+ #define /*0x1A6*/ oLightLinearFalloff         OBJECT_FIELD_S16(0x47, 1)
++#define /*0x098*/ oLightConstantFalloff       OBJECT_FIELD_S16(0x04, 0)
+ 
+ #endif // OBJECT_FIELDS_H
+diff --git a/include/point_lights.h b/include/point_lights.h
+index 0378153..87ee92f 100644
+--- a/include/point_lights.h
++++ b/include/point_lights.h
+@@ -34,6 +34,13 @@ extern struct SceneLight gPointLights[];
+ extern u8 gAreaPointLightCount;
+ extern u8 gPointLightCount;
+ 
+-void emit_light(Vec3f pos, u32 color, u32 quadraticFalloff, u32 linearFalloff);
++// Sets the scene's directional light, overrides whatever may be set in the area's geolayout
++void set_directional_light(Vec3f direction, s32 red, s32 green, s32 blue);
++
++// Sets the scene's ambient light, overrides whatever may be set in the area's geolayout
++void set_ambient_light(s32 red, s32 green, s32 blue);
++
++// Emits a point light with the given parameters
++void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff);
+ 
+ #endif
+diff --git a/src/engine/behavior_script.c b/src/engine/behavior_script.c
+index 90b4fe7..bdc9c49 100644
+--- a/src/engine/behavior_script.c
++++ b/src/engine/behavior_script.c
+@@ -839,6 +839,34 @@ static s32 bhv_cmd_animate_texture(void) {
+     return BHV_PROC_CONTINUE;
+ }
+ 
++// Advanced lighting engine
++// Command 0x38: Sets an object's light color
++// Usage: SET_LIGHT_COLOR(red, green, blue)
++static s32 bhv_cmd_set_light_color(void) {
++    u32 color = BHV_CMD_GET_U32(0) << 8;
++
++    gCurrentObject->oLightColor = color;
++
++    gCurBhvCommand++;
++    return BHV_PROC_CONTINUE;
++}
++
++// Advanced lighting engine
++// Command 0x39: Sets an object's light falloff
++// Usage: SET_LIGHT_FALLOFF(constant, linear, quadratic)
++static s32 bhv_cmd_set_light_falloff(void) {
++    s32 constantFalloff = BHV_CMD_GET_2ND_S16(0);
++    s32 linearFalloff = BHV_CMD_GET_1ST_S16(1);
++    s32 quadraticFalloff = BHV_CMD_GET_2ND_S16(1);
++
++    gCurrentObject->oLightQuadraticFalloff = quadraticFalloff;
++    gCurrentObject->oLightLinearFalloff = linearFalloff;
++    gCurrentObject->oLightConstantFalloff = constantFalloff;
++
++    gCurBhvCommand += 2;
++    return BHV_PROC_CONTINUE;
++}
++
+ void stub_behavior_script_2(void) {
+ }
+ 
+@@ -900,6 +928,8 @@ static BhvCommandProc BehaviorCmdTable[] = {
+     bhv_cmd_disable_rendering,
+     bhv_cmd_set_int_unused,
+     bhv_cmd_spawn_water_droplet,
++    bhv_cmd_set_light_color,
++    bhv_cmd_set_light_falloff,
+ };
+ 
+ #include <point_lights.h>
+@@ -1011,19 +1041,24 @@ void cur_obj_update(void) {
+     // create a point light at this object
+     if ((objFlags & OBJ_FLAG_EMIT_LIGHT) && gPointLightCount < MAX_POINT_LIGHTS)
+     {
++        s32 red   = (gCurrentObject->oLightColor >> 24) & 0xFF;
++        s32 green = (gCurrentObject->oLightColor >> 16) & 0xFF;
++        s32 blue  = (gCurrentObject->oLightColor >>  8) & 0xFF;
+         if (gCurrentObject->header.gfx.node.flags & GRAPH_RENDER_ACTIVE)
+         {
+             emit_light(gCurrentObject->header.gfx.pos,
+-                       gCurrentObject->oLightColor,
++                       red, green, blue,
+                        gCurrentObject->oLightQuadraticFalloff,
+-                       gCurrentObject->oLightLinearFalloff);
++                       gCurrentObject->oLightLinearFalloff,
++                       gCurrentObject->oLightConstantFalloff);
+         }
+         else if (gMarioState->heldObj == gCurrentObject)
+         {
+             emit_light(gMarioState->marioBodyState->heldObjLastPosition,
+-                       gCurrentObject->oLightColor,
++                       red, green, blue,
+                        gCurrentObject->oLightQuadraticFalloff,
+-                       gCurrentObject->oLightLinearFalloff);
++                       gCurrentObject->oLightLinearFalloff,
++                       gCurrentObject->oLightConstantFalloff);
+         }
+     }
+ }
+diff --git a/src/game/behaviors/breakable_box_small.inc.c b/src/game/behaviors/breakable_box_small.inc.c
+index 9ab1aa7..4db67be 100644
+--- a/src/game/behaviors/breakable_box_small.inc.c
++++ b/src/game/behaviors/breakable_box_small.inc.c
+@@ -20,9 +20,6 @@ void bhv_breakable_box_small_init(void) {
+     obj_set_hitbox(o, &sBreakableBoxSmallHitbox);
+     o->oAnimState = 1;
+     o->activeFlags |= ACTIVE_FLAG_UNK9;
+-    o->oLightColor = 0xBC954E00;
+-    o->oLightQuadraticFalloff = 15;
+-    o->oLightLinearFalloff = 255;
+ }
+ 
+ void small_breakable_box_spawn_dust(void) {
+diff --git a/src/game/object_list_processor.c b/src/game/object_list_processor.c
+index 291adbe..dd628de 100644
+--- a/src/game/object_list_processor.c
++++ b/src/game/object_list_processor.c
+@@ -274,37 +274,11 @@ Vec3f intersect;
+ void bhv_mario_update(void) {
+     u32 particleFlags = 0;
+     s32 i;
+-    Vec3f dir;
+-    Vec3f rayStart;
+-    struct SurfaceNode *node;
+-    f32 intDist;
+ 
+     particleFlags = execute_mario_action(gCurrentObject);
+ 
+     gCurrentObject->oMarioParticleFlags = particleFlags;
+ 
+-    rayStart[0] = gMarioState->pos[0];
+-    rayStart[1] = gMarioState->pos[1] + 80;
+-    rayStart[2] = gMarioState->pos[2];
+-
+-    dir[0] = sins(gMarioState->faceAngle[1]);
+-    dir[1] = 0;
+-    dir[2] = coss(gMarioState->faceAngle[1]);
+-
+-    // intDist = raycast(rayStart, dir, 1000.0f, intersect, &node);
+-
+-    // if (intDist >= 0.0f)
+-    // {
+-        // char text[20];
+-        // struct Object* particle;
+-        // sprintf(text, "hit: %4.0f %4.0f %4.0f %4.0f", intDist, intersect[0], intersect[1], intersect[2]);
+-        // print_text(20, 20, text);
+-        // particle = spawn_object(gMarioObject, MODEL_SPARKLES, bhvCoinSparkles);
+-        // particle->oPosX = intersect[0] - dir[0] * 10;
+-        // particle->oPosY = intersect[1] - dir[1] * 10;
+-        // particle->oPosZ = intersect[2] - dir[2] * 10;
+-    // }
+-
+     // Mario code updates MarioState's versions of position etc, so we need
+     // to sync it with the Mario object
+     copy_mario_state_to_object();
+diff --git a/src/game/rendering_graph_node.c b/src/game/rendering_graph_node.c
+index b708281..3bd6a29 100644
+--- a/src/game/rendering_graph_node.c
++++ b/src/game/rendering_graph_node.c
+@@ -311,6 +311,8 @@ extern struct MarioState *gMarioState;
+ struct SceneLight gPointLights[MAX_POINT_LIGHTS];
+ s8 gLightDir[3] = {0x28, 0x28, 0x28};
+ u8 gLightDirTransformEnabled = 0;
++u8 gOverrideDirectionalLight = FALSE;
++u8 gOverrideAmbientLight = FALSE;
+ u8 gPointLightCount = 0;
+ u8 gAreaPointLightCount = 0;
+ 
+@@ -485,7 +487,7 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
+ 
+             lightDist = sqrtf(distancesSq[i]);
+             lightScale = 1.0f / ((1.0f / 65536.0f) * (
+-                0.25f * lights[i]->l.pl.is_point +
++                0.25f * lights[i]->l.pl.constant_attenuation +
+                 2.0f * lightDist * lights[i]->l.pl.linear_attenuation +
+                 0.3f * lightDist * lightDist * lights[i]->l.pl.quadratic_attenuation) + 1.0f);
+ 
+@@ -524,12 +526,38 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
+     return pointLightsDlHead;
+ }
+ 
+-void emit_light(Vec3f pos, u32 color, u32 quadraticFalloff, u32 linearFalloff)
++// Sets the scene's directional light, overrides whatever may be set in the area's geolayout
++void set_directional_light(Vec3f direction, s32 red, s32 green, s32 blue)
+ {
+-    gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = (color >> 24) & 0xFF;
+-    gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = (color >> 16) & 0xFF;
+-    gPointLights[gPointLightCount].l.pl.colc[2] = gPointLights[gPointLightCount].l.pl.col[2] = (color >> 8)  & 0xFF;
+-    gPointLights[gPointLightCount].l.pl.is_point = 0x08;
++    Vec3f directionNormalized;
++    vec3f_copy(directionNormalized, direction);
++    vec3f_normalize(directionNormalized);
++    gLightDir[0] = (s8)(s32)(directionNormalized[0] * 0x40);
++    gLightDir[1] = (s8)(s32)(directionNormalized[1] * 0x40);
++    gLightDir[2] = (s8)(s32)(directionNormalized[2] * 0x40);
++    gDirectionalLight.l[0].l.colc[0] = gDirectionalLight.l[0].l.col[0] = red;
++    gDirectionalLight.l[0].l.colc[1] = gDirectionalLight.l[0].l.col[1] = green;
++    gDirectionalLight.l[0].l.colc[2] = gDirectionalLight.l[0].l.col[2] = blue;
++    gLightDirTransformEnabled = TRUE;
++    gOverrideDirectionalLight = TRUE;
++}
++
++// Sets the scene's ambient light, overrides whatever may be set in the area's geolayout
++void set_ambient_light(s32 red, s32 green, s32 blue)
++{
++    gDirectionalLight.a.l.colc[0] = gDirectionalLight.a.l.col[0] = red;
++    gDirectionalLight.a.l.colc[1] = gDirectionalLight.a.l.col[1] = green;
++    gDirectionalLight.a.l.colc[2] = gDirectionalLight.a.l.col[2] = blue;
++    gOverrideAmbientLight = TRUE;
++}
++
++// Emits a point light with the given parameters
++void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u32 linearFalloff, u32 constantFalloff)
++{
++    gPointLights[gPointLightCount].l.pl.colc[0] = gPointLights[gPointLightCount].l.pl.col[0] = red;
++    gPointLights[gPointLightCount].l.pl.colc[1] = gPointLights[gPointLightCount].l.pl.col[1] = green;
++    gPointLights[gPointLightCount].l.pl.colc[2] = gPointLights[gPointLightCount].l.pl.col[2] = blue;
++    gPointLights[gPointLightCount].l.pl.constant_attenuation = (constantFalloff == 0) ? 1 : constantFalloff;
+     gPointLights[gPointLightCount].l.pl.linear_attenuation = linearFalloff;
+     gPointLights[gPointLightCount].l.pl.quadratic_attenuation = quadraticFalloff;
+     gPointLights[gPointLightCount].worldPos[0] = pos[0];
+@@ -561,18 +589,6 @@ void geo_process_camera(struct GraphNodeCamera *node) {
+ 
+     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+     geo_append_display_list(setLightsDL, LAYER_OPAQUE);
+-    // gSPNumLights(gDisplayListHead++, NUMLIGHTS_2);
+-    // gSPLight(gDisplayListHead++, gDirectionalLight.l, LIGHT_1);
+-    // gSPLight(gDisplayListHead++, &gPointLights[0].l, LIGHT_2);
+-    // gSPLight(gDisplayListHead++, &gDirectionalLight.a, LIGHT_2);
+-
+-    // gPointLights[0].l.pl.is_point = 0x08;
+-    // gPointLights[0].l.pl.pos[0] = 100;
+-    // gPointLights[0].l.pl.pos[1] = 100;
+-    // gPointLights[0].l.pl.pos[2] = -500;
+-    // gPointLights[0].l.pl.colc[0] = gPointLights[0].l.pl.col[0] = 0xFF;
+-    // gPointLights[0].l.pl.colc[1] = gPointLights[0].l.pl.col[1] = 0xFF;
+-    // gPointLights[0].l.pl.colc[2] = gPointLights[0].l.pl.col[2] = 0xFF;
+ 
+     mtxf_lookat(cameraTransform, node->pos, node->focus, node->roll);
+     mtxf_mul(gMatStack[gMatStackIndex + 1], cameraTransform, gMatStack[gMatStackIndex]);
+@@ -614,6 +630,8 @@ void geo_process_camera(struct GraphNodeCamera *node) {
+         gDirectionalLight.l->l.dir[1] = gLightDir[1];
+         gDirectionalLight.l->l.dir[2] = gLightDir[2];
+     }
++    gOverrideAmbientLight = FALSE;
++    gOverrideDirectionalLight = FALSE;
+     
+     // Set up the light display list
+     // This has to be done after the area's GeoLayout is processed, as
+@@ -1264,15 +1282,18 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
+     switch (node->lightType)
+     {
+         case LIGHT_TYPE_DIRECTIONAL:
+-            // Set the directional light color
+-            gDirectionalLight.l->l.colc[0] = gDirectionalLight.l->l.col[0] = node->color[0];
+-            gDirectionalLight.l->l.colc[1] = gDirectionalLight.l->l.col[1] = node->color[1];
+-            gDirectionalLight.l->l.colc[2] = gDirectionalLight.l->l.col[2] = node->color[2];
+-
+-            // Set the pre transformed light direction
+-            gLightDir[0] = node->a;
+-            gLightDir[1] = node->b;
+-            gLightDir[2] = node->c;
++            if (!gOverrideDirectionalLight)
++            {
++                // Set the directional light color
++                gDirectionalLight.l->l.colc[0] = gDirectionalLight.l->l.col[0] = node->color[0];
++                gDirectionalLight.l->l.colc[1] = gDirectionalLight.l->l.col[1] = node->color[1];
++                gDirectionalLight.l->l.colc[2] = gDirectionalLight.l->l.col[2] = node->color[2];
++
++                // Set the pre transformed light direction
++                gLightDir[0] = node->a;
++                gLightDir[1] = node->b;
++                gLightDir[2] = node->c;
++            }
+             break;
+         case LIGHT_TYPE_POINT:
+         case LIGHT_TYPE_POINT_OCCLUDE:
+@@ -1293,13 +1314,16 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
+ 
+             node->light->l.pl.quadratic_attenuation = node->a;
+             node->light->l.pl.linear_attenuation = node->b;
+-            node->light->l.pl.is_point = node->c;
++            node->light->l.pl.constant_attenuation = (node->c == 0) ? 1 : node->c;
+             break;
+         case LIGHT_TYPE_AMBIENT:
+-            // Set the ambient light color
+-            gDirectionalLight.a.l.colc[0] = gDirectionalLight.a.l.col[0] = node->color[0];
+-            gDirectionalLight.a.l.colc[1] = gDirectionalLight.a.l.col[1] = node->color[1];
+-            gDirectionalLight.a.l.colc[2] = gDirectionalLight.a.l.col[2] = node->color[2];
++            if (!gOverrideAmbientLight)
++            {
++                // Set the ambient light color
++                gDirectionalLight.a.l.colc[0] = gDirectionalLight.a.l.col[0] = node->color[0];
++                gDirectionalLight.a.l.colc[1] = gDirectionalLight.a.l.col[1] = node->color[1];
++                gDirectionalLight.a.l.colc[2] = gDirectionalLight.a.l.col[2] = node->color[2];
++            }
+             break;
+     }
+ 

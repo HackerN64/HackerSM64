@@ -1,3 +1,4 @@
+
 #include <ultra64.h>
 
 #include "sm64.h"
@@ -1301,6 +1302,7 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
     sWarpCheckpointActive = FALSE;
     gCurrLevelNum = levelNum;
     gCurrCourseNum = gLevelToCourseNumTable[levelNum - 1];
+		if (gCurrLevelNum == LEVEL_JRB) return 0;
 
     if (gCurrDemoInput != NULL || gCurrCreditsEntry != NULL || gCurrCourseNum == COURSE_NONE) {
         return FALSE;

@@ -111,6 +111,7 @@ const LevelScript level_main_scripts_entry[] = {
     LOAD_MODEL_FROM_GEO(MODEL_EXPLOSION,               explosion_geo),
     LOAD_MODEL_FROM_GEO(MODEL_DIRT_ANIMATION,          dirt_animation_geo),
     LOAD_MODEL_FROM_GEO(MODEL_CARTOON_STAR,            cartoon_star_geo),
+    LOAD_MODEL_FROM_GEO(MODEL_LANTERN,                 lantern_geo),
 #ifdef IA8_30FPS_COINS
     LOAD_MODEL_FROM_GEO(MODEL_SILVER_COIN,             silver_coin_geo),
     LOAD_MODEL_FROM_GEO(MODEL_SILVER_COIN_NO_SHADOW,   silver_coin_no_shadow_geo),
