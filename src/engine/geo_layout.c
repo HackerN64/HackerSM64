@@ -785,10 +785,10 @@ void geo_layout_cmd_scene_light(void) {
         /* quadratic falloff */ sizeof(u8) +
         /* linear falloff */ sizeof(u8) +
         /* unused */ sizeof(u8)) << CMD_SIZE_SHIFT;
+}
 /*
   Create a scene graph node that is rotated by the object's animation + an initial rotation.
 */
-}
 void geo_layout_cmd_bone(void) {
     struct GraphNodeBone *graphNode;
     Vec3s translation;
