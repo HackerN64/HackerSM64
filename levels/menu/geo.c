@@ -141,7 +141,7 @@ const GeoLayout geo_menu_generic_button[] = {
 
 // 0x0E000380
 const GeoLayout geo_menu_file_select_strings_and_menu_cursor[] = {
-   GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -154,7 +154,7 @@ const GeoLayout geo_menu_file_select_strings_and_menu_cursor[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM(45, 100, 25000),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(0, 0, 0, 1000, 0, 0, 0, 0x00000000),
+            GEO_CAMERA(CAMERA_MODE_NONE, 0, 0, 1000, 0, 0, 0, 0x00000000),
             GEO_OPEN_NODE(),
                GEO_RENDER_OBJ(),
             GEO_CLOSE_NODE(),
@@ -170,7 +170,7 @@ const GeoLayout geo_menu_file_select_strings_and_menu_cursor[] = {
 
 // 0x0E000408
 const GeoLayout geo_menu_act_selector_strings[] = {
-   GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+   GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -183,7 +183,7 @@ const GeoLayout geo_menu_act_selector_strings[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM(45, 100, 25000),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(0, 0, 0, 1000, 0, 0, 0, 0x00000000),
+            GEO_CAMERA(CAMERA_MODE_NONE, 0, 0, 1000, 0, 0, 0, 0x00000000),
             GEO_OPEN_NODE(),
                GEO_RENDER_OBJ(),
             GEO_CLOSE_NODE(),

@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvHauntedBookshelf.
  * This is the bookshelf that recedes after solving the puzzle of the haunted books.
@@ -17,10 +18,6 @@ void bhv_haunted_bookshelf_loop(void) {
 
     switch (o->oAction) {
         case HAUNTED_BOOKSHELF_ACT_IDLE:
-            // ???
-            if (o->oTimer == 0) {
-            }
-
             // This code never runs, since the action is set to 1 directly
             // by bhvHauntedBookshelfManager. Maybe this was
             // intended to be used to set the action instead?
@@ -29,10 +26,11 @@ void bhv_haunted_bookshelf_loop(void) {
             }
 
             break;
+
         case HAUNTED_BOOKSHELF_ACT_RECEDE:
             // Move the bookshelf and play the sound
             o->oPosX += 5.0f;
-            cur_obj_play_sound_1(SOUND_ENV_ELEVATOR4_2);
+            cur_obj_play_sound_1(SOUND_ENV_HAUNTED_BOOKSHELF_RECEDE);
 
             // Delete the object after 102 frames
             if (o->oTimer > 101) {
@@ -40,6 +38,7 @@ void bhv_haunted_bookshelf_loop(void) {
             }
 
             break;
+
         default:
             break;
     }

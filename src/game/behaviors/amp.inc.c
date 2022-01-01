@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvHomingAmp and bhvCirclingAmp.
  * These are distinct objects; one chases (homes in on) Mario,
@@ -21,12 +22,10 @@ static struct ObjectHitbox sAmpHitbox = {
  * Homing amp initialization function.
  */
 void bhv_homing_amp_init(void) {
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
-    o->oGravity = 0;
-    o->oFriction = 1.0;
-    o->oBuoyancy = 1.0;
+    vec3f_copy(&o->oHomeVec, &o->oPosVec);
+    o->oGravity = 0.0f;
+    o->oFriction = 1.0f;
+    o->oBuoyancy = 1.0f;
     o->oHomingAmpAvgY = o->oHomeY;
 
     // Homing amps start at 1/10th their normal size.
@@ -47,18 +46,12 @@ static void check_amp_attack(void) {
     obj_set_hitbox(o, &sAmpHitbox);
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-        // Unnecessary if statement, maybe caused by a macro for
-        //     if (o->oInteractStatus & INT_STATUS_INTERACTED)
-        //         o->oAction = X;
-        // ?
-        if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-            // This function is used for both normal amps and homing amps,
-            // AMP_ACT_ATTACK_COOLDOWN == HOMING_AMP_ACT_ATTACK_COOLDOWN
-            o->oAction = AMP_ACT_ATTACK_COOLDOWN;
-        }
+        // This function is used for both normal amps and homing amps,
+        // AMP_ACT_ATTACK_COOLDOWN == HOMING_AMP_ACT_ATTACK_COOLDOWN
+        o->oAction = AMP_ACT_ATTACK_COOLDOWN;
 
         // Clear interact status
-        o->oInteractStatus = 0;
+        o->oInteractStatus = INT_STATUS_NONE;
     }
 }
 
@@ -81,14 +74,14 @@ static void homing_amp_appear_loop(void) {
     // evaluates to 0.1, which is the same as it was before. After 30 frames, it ends at
     // a scale factor of 0.97. The amp remains at 97% of its real height for 60 more frames.
     if (o->oTimer < 30) {
-        cur_obj_scale(0.1 + 0.9 * (f32)(o->oTimer / 30.0f));
+        cur_obj_scale(0.1f + 0.9f * (f32)(o->oTimer / 30.0f));
     } else {
         o->oAnimState = 1;
     }
 
     // Once the timer becomes greater than 90, i.e. 91 frames have passed,
     // reset the amp's size and start chasing Mario.
-    if (o->oTimer >= 91) {
+    if (o->oTimer > 90) {
         cur_obj_scale(1.0f);
         o->oAction = HOMING_AMP_ACT_CHASE;
         o->oAmpYPhase = 0;
@@ -121,7 +114,7 @@ static void homing_amp_chase_loop(void) {
             o->oHomingAmpAvgY = gMarioObject->header.gfx.pos[1] + 150.0f;
         }
 
-        if (o->oTimer >= 31) {
+        if (o->oTimer > 30) {
             o->oHomingAmpLockedOn = FALSE;
         }
     } else {
@@ -129,7 +122,7 @@ static void homing_amp_chase_loop(void) {
         // while curving towards him.
         o->oForwardVel = 10.0f;
 
-        obj_turn_toward_object(o, gMarioObject, 16, 0x400);
+        obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 0x400);
 
         // The amp's average Y will approach Mario's graphical Y position + 250
         // at a rate of 10 units per frame. Interestingly, this is different from
@@ -155,20 +148,16 @@ static void homing_amp_chase_loop(void) {
  * Give up on chasing Mario.
  */
 static void homing_amp_give_up_loop(void) {
-    UNUSED u8 filler[8];
-
     // Move forward for 152 frames
     o->oForwardVel = 15.0f;
 
-    if (o->oTimer >= 151) {
+    if (o->oTimer > 150) {
         // Hide the amp and reset it back to its inactive state
-        o->oPosX = o->oHomeX;
-        o->oPosY = o->oHomeY;
-        o->oPosZ = o->oHomeZ;
+        vec3f_copy(&o->oPosVec, &o->oHomeVec);
         o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
         o->oAction = HOMING_AMP_ACT_INACTIVE;
         o->oAnimState = 0;
-        o->oForwardVel = 0;
+        o->oForwardVel = 0.0f;
         o->oHomingAmpAvgY = o->oHomeY;
     }
 }
@@ -179,15 +168,15 @@ static void homing_amp_give_up_loop(void) {
 static void amp_attack_cooldown_loop(void) {
     // Turn intangible and wait for 90 frames before chasing Mario again after hitting him.
     o->header.gfx.animInfo.animFrame += 2;
-    o->oForwardVel = 0;
+    o->oForwardVel = 0.0f;
 
     cur_obj_become_intangible();
 
-    if (o->oTimer >= 31) {
+    if (o->oTimer > 30) {
         o->oAnimState = 0;
     }
 
-    if (o->oTimer >= 91) {
+    if (o->oTimer > 90) {
         o->oAnimState = 1;
         cur_obj_become_tangible();
         o->oAction = HOMING_AMP_ACT_CHASE;
@@ -235,9 +224,7 @@ void bhv_homing_amp_loop(void) {
  * Circling amp initialization function.
  */
 void bhv_circling_amp_init(void) {
-    o->oHomeX = o->oPosX;
-    o->oHomeY = o->oPosY;
-    o->oHomeZ = o->oPosZ;
+    vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oAnimState = 1;
 
     // Determine the radius of the circling amp's circle
@@ -272,11 +259,11 @@ void bhv_circling_amp_init(void) {
 static void fixed_circling_amp_idle_loop(void) {
     // Turn towards Mario, in both yaw and pitch.
     f32 xToMario = gMarioObject->header.gfx.pos[0] - o->oPosX;
-    f32 yToMario = gMarioObject->header.gfx.pos[1] + 120.0f - o->oPosY;
+    f32 yToMario = gMarioObject->header.gfx.pos[1] - o->oPosY + 120.0f;
     f32 zToMario = gMarioObject->header.gfx.pos[2] - o->oPosZ;
     s16 vAngleToMario = atan2s(sqrtf(xToMario * xToMario + zToMario * zToMario), -yToMario);
 
-    obj_turn_toward_object(o, gMarioObject, 19, 0x1000);
+    obj_turn_toward_object(o, gMarioObject, O_FACE_ANGLE_YAW_INDEX, 0x1000);
     o->oFaceAnglePitch = approach_s16_symmetric(o->oFaceAnglePitch, vAngleToMario, 0x1000);
 
     // Oscillate 40 units up and down.
@@ -334,7 +321,6 @@ void bhv_circling_amp_loop(void) {
             } else {
                 circling_amp_idle_loop();
             }
-
             break;
 
         case AMP_ACT_ATTACK_COOLDOWN:

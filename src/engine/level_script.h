@@ -5,7 +5,7 @@
 
 struct LevelCommand;
 
-extern u8 level_script_entry[];
+extern LevelScript level_script_entry[];
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd);
 

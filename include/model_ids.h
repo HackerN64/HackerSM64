@@ -1,30 +1,12 @@
 #ifndef MODEL_IDS_H
 #define MODEL_IDS_H
 
-#define ACT_1 (1 << 0)
-#define ACT_2 (1 << 1)
-#define ACT_3 (1 << 2)
-#define ACT_4 (1 << 3)
-#define ACT_5 (1 << 4)
-#define ACT_6 (1 << 5)
-
-// If an object is set as active for the first 5 acts only, it is treated as always active.
-// It's possible that there were only planned to be 5 acts per level early in development.
-// Hence, they added a macro so they wouldn't have to change the acts for every object.
-#define ALL_ACTS_MACRO ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5
-#define ALL_ACTS       ACT_1 | ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6
-
-#define COIN_FORMATION_FLAG_VERTICAL  (1 << 0)
-#define COIN_FORMATION_FLAG_RING      (1 << 1)
-#define COIN_FORMATION_FLAG_ARROW     (1 << 2)
-#define COIN_FORMATION_FLAG_FLYING    (1 << 4)
-
-#define MODEL_NONE                        0x00
+#define MODEL_NONE                             0x00
 
 /* Global models that are loaded for every level */
 
-#define MODEL_MARIO                       0x01        // mario_geo
-#define MODEL_LUIGI                       0x02        // unused
+#define MODEL_MARIO                            0x01        // mario_geo
+#define MODEL_LUIGI                            0x02        // unused
 
 /* Various static level geometry, the geo layout differs but terrain object presets treat them the same.*/
 
@@ -212,9 +194,6 @@
 
 // vcutm
 #define MODEL_VCUTM_SEESAW_PLATFORM               0x36        // vcutm_geo_0001F0
-#define MODEL_VCUTM_CHECKERBOARD_PLATFORM_SPAWNER 0x37        //! @bug this object doesn't have a geo associated with it, yet is placed in vcutm.
-                                                              //  This causes a crash when the player quickly looks towards the
-                                                              //  checkerboard platforms after spawning but before it is unloaded.
 
 // bitfs
 #define MODEL_BITFS_PLATFORM_ON_TRACK             0x36        // bitfs_geo_000758
@@ -255,20 +234,20 @@
 #define MODEL_LLL_SINKING_RECTANGULAR_PLATFORM    0x3F        // lll_geo_000BC8
 #define MODEL_LLL_SINKING_SQUARE_PLATFORMS        0x40        // lll_geo_000BE0
 #define MODEL_LLL_TILTING_SQUARE_PLATFORM         0x41        // lll_geo_000BF8
-#define MODEL_LLL_BOWSER_PIECE_1                  0x43        // lll_geo_000C10
-#define MODEL_LLL_BOWSER_PIECE_2                  0x44        // lll_geo_000C30
-#define MODEL_LLL_BOWSER_PIECE_3                  0x45        // lll_geo_000C50
-#define MODEL_LLL_BOWSER_PIECE_4                  0x46        // lll_geo_000C70
-#define MODEL_LLL_BOWSER_PIECE_5                  0x47        // lll_geo_000C90
-#define MODEL_LLL_BOWSER_PIECE_6                  0x48        // lll_geo_000CB0
-#define MODEL_LLL_BOWSER_PIECE_7                  0x49        // lll_geo_000CD0
-#define MODEL_LLL_BOWSER_PIECE_8                  0x4A        // lll_geo_000CF0
-#define MODEL_LLL_BOWSER_PIECE_9                  0x4B        // lll_geo_000D10
-#define MODEL_LLL_BOWSER_PIECE_10                 0x4C        // lll_geo_000D30
-#define MODEL_LLL_BOWSER_PIECE_11                 0x4D        // lll_geo_000D50
-#define MODEL_LLL_BOWSER_PIECE_12                 0x4E        // lll_geo_000D70
-#define MODEL_LLL_BOWSER_PIECE_13                 0x4F        // lll_geo_000D90
-#define MODEL_LLL_BOWSER_PIECE_14                 0x50        // lll_geo_000DB0
+#define MODEL_LLL_BOWSER_PIECE_1                  0x43        // lll_geo_bowser_puzzle_piece_1
+#define MODEL_LLL_BOWSER_PIECE_2                  0x44        // lll_geo_bowser_puzzle_piece_2
+#define MODEL_LLL_BOWSER_PIECE_3                  0x45        // lll_geo_bowser_puzzle_piece_3
+#define MODEL_LLL_BOWSER_PIECE_4                  0x46        // lll_geo_bowser_puzzle_piece_4
+#define MODEL_LLL_BOWSER_PIECE_5                  0x47        // lll_geo_bowser_puzzle_piece_5
+#define MODEL_LLL_BOWSER_PIECE_6                  0x48        // lll_geo_bowser_puzzle_piece_6
+#define MODEL_LLL_BOWSER_PIECE_7                  0x49        // lll_geo_bowser_puzzle_piece_7
+#define MODEL_LLL_BOWSER_PIECE_8                  0x4A        // lll_geo_bowser_puzzle_piece_8
+#define MODEL_LLL_BOWSER_PIECE_9                  0x4B        // lll_geo_bowser_puzzle_piece_9
+#define MODEL_LLL_BOWSER_PIECE_10                 0x4C        // lll_geo_bowser_puzzle_piece_10
+#define MODEL_LLL_BOWSER_PIECE_11                 0x4D        // lll_geo_bowser_puzzle_piece_11
+#define MODEL_LLL_BOWSER_PIECE_12                 0x4E        // lll_geo_bowser_puzzle_piece_12
+#define MODEL_LLL_BOWSER_PIECE_13                 0x4F        // lll_geo_bowser_puzzle_piece_13
+#define MODEL_LLL_BOWSER_PIECE_14                 0x50        // lll_geo_bowser_puzzle_piece_14
 #define MODEL_LLL_MOVING_OCTAGONAL_MESH_PLATFORM  0x36        // lll_geo_000B08
 #define MODEL_LLL_SINKING_ROCK_BLOCK              0x37        // lll_geo_000DD0
 #define MODEL_LLL_ROLLING_LOG                     0x39        // lll_geo_000DE8
@@ -385,7 +364,7 @@
 
 // group 9
 #define MODEL_BOO                         0x54        // boo_geo
-#define MODEL_BETA_BOO_KEY                   0x55        // small_key_geo
+#define MODEL_BETA_BOO_KEY                0x55        // small_key_geo
 #define MODEL_HAUNTED_CHAIR               0x56        // haunted_chair_geo
 #define MODEL_MAD_PIANO                   0x57        // mad_piano_geo
 #define MODEL_BOOKEND_PART                0x58        // bookend_part_geo
@@ -448,7 +427,8 @@
 #define MODEL_SWOOP                       0x64        // swoop_geo
 #define MODEL_SCUTTLEBUG                  0x65        // scuttlebug_geo
 #define MODEL_MR_I_IRIS                   0x66        // mr_i_iris_geo
-#define MODEL_MR_I                        0x67        // mr_i_geo
+#define MODEL_MR_I_BODY                   0x67        // mr_i_geo
+#define MODEL_MR_I MODEL_MR_I_BODY // backwards compatibility
 #define MODEL_DORRIE                      0x68        // dorrie_geo
 
 // other models
@@ -466,7 +446,8 @@
 #define MODEL_CANNON_BARREL               0x7F        // cannon_barrel_geo
 #define MODEL_CANNON_BASE                 0x80        // cannon_base_geo
 #define MODEL_BREAKABLE_BOX               0x81        // breakable_box_geo
-#define MODEL_BREAKABLE_BOX_SMALL         0x82        // breakable_box_small_geo
+#define MODEL_BREAKABLE_BOX_NO_SHADOW     0x82        // breakable_box_no_shadow_geo
+#define MODEL_BREAKABLE_BOX_SMALL MODEL_BREAKABLE_BOX_NO_SHADOW // backwards compatibility
 #define MODEL_EXCLAMATION_BOX_OUTLINE     0x83        // exclamation_box_outline_geo
 #define MODEL_EXCLAMATION_POINT           0x84        // exclamation_point_seg8_dl_08025F08
 #define MODEL_MARIOS_WINGED_METAL_CAP     0x85        // marios_winged_metal_cap_geo
@@ -495,7 +476,7 @@
 #define MODEL_BURN_SMOKE_UNUSED           0x9C        // burn_smoke_geo - unused & duplicated
 // find me
 #define MODEL_WHITE_PARTICLE_DL           0x9E        // white_particle_dl
-#define MODEL_SAND_DUST                   0x9F        // sand_seg3_dl_0302BCD0
+#define MODEL_SAND_DUST                   0x9F        // sand_seg3_dl_particle
 #define MODEL_WHITE_PARTICLE              0xA0        // white_particle_dl
 #define MODEL_PEBBLE                      0xA1        // pebble_seg3_dl_0301CB00
 #define MODEL_LEAVES                      0xA2        // leaves_geo
@@ -562,7 +543,12 @@
 #define MODEL_PEACH                       0xDE        // peach_geo
 #define MODEL_CHUCKYA                     0xDF        // chuckya_geo
 #define MODEL_WHITE_PUFF                  0xE0        // white_puff_geo
-#define MODEL_TRAJECTORY_MARKER_BALL          0xE1        // bowling_ball_track_geo - duplicate used in SSL Pyramid small sized and as a track ball
+#define MODEL_TRAJECTORY_MARKER_BALL      0xE1        // bowling_ball_track_geo - duplicate used in SSL Pyramid small sized and as a track ball
+
+#ifdef IA8_30FPS_COINS
+#define MODEL_SILVER_COIN                 0xE2        // silver_coin_geo
+#define MODEL_SILVER_COIN_NO_SHADOW       0xE3        // silver_coin_no_shadow_geo
+#endif
 
 #define MODEL_LANTERN 0xF0
 

@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvAlphaBooKey and bhvBetaBooKey.
  * They were apparently intended to be a key that would be contained in boos
@@ -39,7 +40,7 @@ void bhv_alpha_boo_key_loop(void) {
 
         // Delete the object and spawn sparkles
         obj_mark_for_deletion(o);
-        spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles);
+        spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
     }
 }
 
@@ -94,11 +95,11 @@ static void beta_boo_key_dropped_loop(void) {
             // One theory about this code is that there was a boo spawner, which
             // spawned "false" boos and one "true" boo with the key, and the player
             // was intended to find the one with the key to progress.
-            o->parentObj->oInteractStatus = TRUE;
+            o->parentObj->oInteractStatus = TRUE; //! Note: Not a flag, treated as a TRUE/FALSE statement
 
             // Delete the object and spawn sparkles
             obj_mark_for_deletion(o);
-            spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles);
+            spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
         }
     }
 }
@@ -163,8 +164,11 @@ static void beta_boo_key_inside_boo_loop(void) {
     o->oFaceAngleYaw += 0x200;
 }
 
-static void (*sBetaBooKeyActions[])(void) = { beta_boo_key_inside_boo_loop, beta_boo_key_drop,
-                                              beta_boo_key_dropped_loop };
+static ObjActionFunc sBetaBooKeyActions[] = {
+    beta_boo_key_inside_boo_loop,
+    beta_boo_key_drop,
+    beta_boo_key_dropped_loop,
+};
 
 /**
  * Update function for bhvBetaBooKey.

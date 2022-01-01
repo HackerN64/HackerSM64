@@ -126,7 +126,7 @@ typedef struct {
         OSMesgQueue  	*acsQueue;	/* Access queue */
 					/* Raw DMA routine */
         s32             (*dma)(s32, u32, void *, u32);
-        s32             (*edma)(OSPiHandle *, s32, u32, void *, u32);
+        s32             (*edma)(OSPiHandle *piHandle, s32, u32 devAddr, void *vAddr, u32 nbytes);
 } OSDevMgr;
 
 
@@ -196,11 +196,10 @@ extern OSPiHandle      *__osPiTable;    /* The head of OSPiHandle link list */
 /* Peripheral interface (Pi) */
 extern u32 		osPiGetStatus(void);
 extern s32		osPiGetDeviceType(void);
-extern s32		osPiWriteIo(u32, u32);
-extern s32		osPiReadIo(u32, u32 *);
-extern s32		osPiStartDma(OSIoMesg *, s32, s32, u32, void *, u32,
-				     OSMesgQueue *);
-extern void		osCreatePiManager(OSPri, OSMesgQueue *, OSMesg *, s32);
+extern s32		osPiWriteIo(u32 devAddr, u32  data);
+extern s32		osPiReadIo( u32 devAddr, u32 *data);
+extern s32		osPiStartDma(OSIoMesg *mb, s32 priority, s32 direction, u32 devAddr, void *vAddr, u32 nbytes, OSMesgQueue *mq);
+extern void		osCreatePiManager(OSPri pri, OSMesgQueue *cmdQ, OSMesg *cmdBuf, s32 cmdMsgCnt);
 
 /* Enhanced PI interface */
 
@@ -208,11 +207,11 @@ extern OSPiHandle *osCartRomInit(void);
 extern OSPiHandle *osLeoDiskInit(void);
 extern OSPiHandle *osDriveRomInit(void);
 
-extern s32 osEPiDeviceType(OSPiHandle *, OSPiInfo *);
-extern s32 osEPiWriteIo(OSPiHandle *, u32 , u32 );
-extern s32 osEPiReadIo(OSPiHandle *, u32 , u32 *);
-extern s32 osEPiStartDma(OSPiHandle *, OSIoMesg *, s32);
-extern s32 osEPiLinkHandle(OSPiHandle *);
+extern s32 osEPiDeviceType(OSPiHandle *piHandle, OSPiInfo *piInfo);
+extern s32 osEPiWriteIo(   OSPiHandle *piHandle, u32 devAddr, u32  data);
+extern s32 osEPiReadIo(    OSPiHandle *piHandle, u32 devAddr, u32 *data);
+extern s32 osEPiStartDma(  OSPiHandle *piHandle, OSIoMesg *mb, s32 direction);
+extern s32 osEPiLinkHandle(OSPiHandle *piHandle);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

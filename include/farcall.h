@@ -22,7 +22,7 @@ Simply place any code you want in any groupX_geo.c or any level's script.c (see 
 To call segment code from normal code or vice versa (or segment code from other segmented code)
  - Add `#include "farcall.h"` to the given file
  - Declare any functions that are not in that file like so (with far)
-    `far void print_text(s32, s32, const char*);`
+    `far void print_text(s32 x, s32 y, const char *str);`
  - Call any functions that are not in the file like so:
     `farcall(print_text)(10, 10 "test");`
 
@@ -39,7 +39,7 @@ If you have code in a groupX_geo.c file, you must load it in level scripts by do
   This has two extra arguments, which should be passed as `_groupX_geoSegmentNoloadStart` and `_groupX_geoSegmentNoloadEnd`.
   For example, if you added code to group3's geo segment:
 
-LOAD_RAW_WITH_CODE(0x0C, _group3_geoSegmentRomStart,  _group3_geoSegmentRomEnd, _group3_geoSegmentNoloadStart, _group3_geoSegmentNoloadEnd),
+LOAD_RAW_WITH_CODE(SEGMENT_GROUPA_GEO, _group3_geoSegmentRomStart,  _group3_geoSegmentRomEnd, _group3_geoSegmentNoloadStart, _group3_geoSegmentNoloadEnd),
 
 For convenience, included is a new header: src/game/obj_behaviors_2_nonstatic.h. In addition to effectively removing
   the static keyword from object_behaviors_2.c, this header defines prototypes for all functions in that file. This

@@ -8,32 +8,40 @@ extern struct OSMesgQueue OSMesgQueue1;
 extern struct OSMesgQueue OSMesgQueue2;
 extern struct OSMesgQueue OSMesgQueue3;
 
+// Since the audio session is just one now, the reverb settings are duplicated to match the original audio setting scenario.
+// It's a bit hacky but whatever lol. Index range must be defined, since it's needed by the compiler.
+// To increase reverb window sizes beyond 64, please increase the REVERB_WINDOW_SIZE_MAX in heap.c by a factor of 0x40 and update AUDIO_HEAP_SIZE by 4x the same amount.
 #ifdef VERSION_EU
-struct ReverbSettingsEU sReverbSettings[] = {
-    { 0x04, 0x0c, 0x2fff },
-    { 0x04, 0x0a, 0x47ff },
-    { 0x04, 0x10, 0x2fff },
-    { 0x04, 0x0e, 0x3fff },
-    { 0x04, 0x0c, 0x4fff },
-    { 0x04, 0x0a, 0x37ff }
+struct ReverbSettingsEU sReverbSettings[8] = {
+    { /*Downsample Rate*/ 1, /*Window Size*/ 64, /*Gain*/ 0x2FFF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 40, /*Gain*/ 0x47FF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 64, /*Gain*/ 0x2FFF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 60, /*Gain*/ 0x3FFF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 48, /*Gain*/ 0x4FFF },
+    { /*Downsample Rate*/ 1, /*Window Size*/ 64, /*Gain*/ 0x2FFF }, // Duplicate of the first index
+    { /*Downsample Rate*/ 1, /*Window Size*/ 40, /*Gain*/ 0x47FF }, // Duplicate of the second index
+    { /*Downsample Rate*/ 1, /*Window Size*/ 40, /*Gain*/ 0x37FF },
 };
+/**
+1: Frequency
+2: Unk1 - Should be 1
+3: Simultaneous Notes
+4: Number of Reverberations
+5: Unk2 - Should be 0
+6: Volume
+7: Unk3 - Should be 0
+8: Persistent Sequence Memory
+9: Persistent Bank Memory
+10: Temporary Sequence Memory
+11: Temporary Bank Memory
+*/
+
 struct AudioSessionSettingsEU gAudioSessionPresets[] = {
-    { 0x00007d00, 0x01, 0x10, 0x01, 0x00, &sReverbSettings[0], 0x7fff, 0x0000, 0x00003a40, 0x00006d00,
-      0x00004400, 0x00002a00 },
-    { 0x00007d00, 0x01, 0x10, 0x01, 0x00, &sReverbSettings[1], 0x7fff, 0x0000, 0x00003a40, 0x00006d00,
-      0x00004400, 0x00002a00 },
-    { 0x00007d00, 0x01, 0x10, 0x01, 0x00, &sReverbSettings[2], 0x7fff, 0x0000, 0x00003a40, 0x00006d00,
-      0x00004400, 0x00002a00 },
-    { 0x00007d00, 0x01, 0x10, 0x01, 0x00, &sReverbSettings[3], 0x7fff, 0x0000, 0x00003a40, 0x00006d00,
-      0x00004400, 0x00002a00 },
-    { 0x00007d00, 0x01, 0x10, 0x01, 0x00, &sReverbSettings[4], 0x7fff, 0x0000, 0x00003a40, 0x00006d00,
-      0x00004400, 0x00002a00 },
-    { 0x00007d00, 0x01, 0x10, 0x01, 0x00, &sReverbSettings[0], 0x7fff, 0x0000, 0x00004000, 0x00006e00,
-      0x00003f00, 0x00002a00 },
-    { 0x00007d00, 0x01, 0x10, 0x01, 0x00, &sReverbSettings[1], 0x7fff, 0x0000, 0x00004100, 0x00006e00,
-      0x00004400, 0x00002a80 },
-    { 0x00007d00, 0x01, 0x14, 0x01, 0x00, &sReverbSettings[5], 0x7fff, 0x0000, 0x00003500, 0x00006280,
-      0x00004000, 0x00001b00 }
+#ifdef EXPAND_AUDIO_HEAP
+    { /*1*/ 32000,/*2*/ 1,/*3*/ 40,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ 0x8200,/*9*/ 0xDC00,/*10*/ 0xE800,/*11*/ 0x5500 },
+#else
+    { /*1*/ 32000,/*2*/ 1,/*3*/ 20,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ 0x4100,/*9*/ 0x6E00,/*10*/ 0x7400,/*11*/ 0x2A80 },
+#endif
 };
 #endif
 
@@ -48,70 +56,38 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 // - memory used for persistent banks
 // - memory used for temporary sequences
 // - memory used for temporary banks
+
+// To increase reverb window sizes beyond 0x1000, please increase the REVERB_WINDOW_SIZE_MAX in heap.c and update AUDIO_HEAP_SIZE by the same amount.
 #if defined(VERSION_JP) || defined(VERSION_US)
+struct ReverbSettingsUS gReverbSettings[18] = {
+    { 1, 0x0C00, 0x2FFF },
+    { 1, 0x0A00, 0x47FF },
+    { 1, 0x1000, 0x2FFF },
+    { 1, 0x0E00, 0x3FFF },
+    { 1, 0x0C00, 0x4FFF },
+    { 1, 0x0C00, 0x2FFF },
+    { 1, 0x0A00, 0x47FF },
+    { 1, 0x0800, 0x37FF },
+    { 1, 0x0800, 0x2FFF },
+    { 1, 0x0800, 0x3FFF },
+    { 1, 0x1000, 0x3FFF },
+    { 1, 0x1000, 0x2FFF },
+    { 1, 0x0C00, 0x3FFF },
+    { 1, 0x0800, 0x4FFF },
+    { 1, 0x0800, 0x2FFF },
+    { 1, 0x0800, 0x2FFF },
+    { 1, 0x0800, 0x2FFF },
+    { 1, 0x0800, 0x2FFF },
+};
+
+// TODO: Does using 40/20 instead of 32/16 for gMaxSimultaneousNotes cause memory problems at high capacities or is it good as is?
 #ifdef EXPAND_AUDIO_HEAP
-struct AudioSessionSettings gAudioSessionPresets[18] = {
-#ifdef VERSION_JP
-    { 32000, 32, 1, 0x0800, 0x2FFF, 0x7FFF, 0x7200, 0xC000, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x0A00, 0x47FF, 0x7FFF, 0x7200, 0xC000, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x1000, 0x2FFF, 0x7FFF, 0x7200, 0xC000, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x0E00, 0x3FFF, 0x7FFF, 0x7200, 0xC000, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x0C00, 0x4FFF, 0x7FFF, 0x7200, 0xC000, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x0800, 0x2FFF, 0x7FFF, 0x7C00, 0xC400, 0x7E00, 0x5400 },
-    { 32000, 32, 1, 0x0A00, 0x47FF, 0x7FFF, 0x7E00, 0xC400, 0x8800, 0x5500 },
-    { 32000, 40, 1, 0x0800, 0x37FF, 0x7FFF, 0x6600, 0xAA00, 0x8000, 0x3600 },
-#else
-    { 32000, 32, 1, 0x0C00, 0x2FFF, 0x7FFF, 0x7400, 0xDA00, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x0A00, 0x47FF, 0x7FFF, 0x7400, 0xDA00, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x1000, 0x2FFF, 0x7FFF, 0x7400, 0xDA00, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x0E00, 0x3FFF, 0x7FFF, 0x7400, 0xDA00, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x0C00, 0x4FFF, 0x7FFF, 0x7400, 0xDA00, 0x8800, 0x5400 },
-    { 32000, 32, 1, 0x0C00, 0x2FFF, 0x7FFF, 0x8000, 0xDC00, 0x7E00, 0x5400 },
-    { 32000, 32, 1, 0x0A00, 0x47FF, 0x7FFF, 0x8200, 0xDC00, 0x8800, 0x5500 },
-    { 32000, 40, 1, 0x0800, 0x37FF, 0x7FFF, 0x6980, 0xC500, 0x8000, 0x3600 },
-#endif
-    { 27000, 32, 1, 0x0800, 0x2FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 27000, 32, 1, 0x0800, 0x3FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 27000, 32, 1, 0x1000, 0x2FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 27000, 32, 1, 0x1000, 0x3FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 27000, 32, 1, 0x0C00, 0x4FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 32000, 28, 1, 0x0800, 0x2FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 32000, 24, 1, 0x0800, 0x2FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 32000, 20, 1, 0x0800, 0x2FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 32000, 16, 1, 0x0800, 0x2FFF, 0x7FFF, 0x4A00, 0xAA00, 0xE800, 0x4800 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+struct AudioSessionSettings gAudioSessionPresets[1] = {
+    { 32000, 40, 1, 0x1000, 0x2FFF, 0x7FFF, 0x8200, 0xDC00, 0xE800, 0x5500 },
 };
 #else
-struct AudioSessionSettings gAudioSessionPresets[18] = {
-#ifdef VERSION_JP
-    { 32000, 16, 1, 0x0800, 0x2FFF, 0x7FFF, 0x3900, 0x6000, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x0A00, 0x47FF, 0x7FFF, 0x3900, 0x6000, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x1000, 0x2FFF, 0x7FFF, 0x3900, 0x6000, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x0E00, 0x3FFF, 0x7FFF, 0x3900, 0x6000, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x0C00, 0x4FFF, 0x7FFF, 0x3900, 0x6000, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x0800, 0x2FFF, 0x7FFF, 0x3E00, 0x6200, 0x3F00, 0x2A00 },
-    { 32000, 16, 1, 0x0A00, 0x47FF, 0x7FFF, 0x3F00, 0x6200, 0x4400, 0x2A80 },
-    { 32000, 20, 1, 0x0800, 0x37FF, 0x7FFF, 0x3300, 0x5500, 0x4000, 0x1B00 },
-#else
-    { 32000, 16, 1, 0x0C00, 0x2FFF, 0x7FFF, 0x3A00, 0x6D00, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x0A00, 0x47FF, 0x7FFF, 0x3A00, 0x6D00, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x1000, 0x2FFF, 0x7FFF, 0x3A00, 0x6D00, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x0E00, 0x3FFF, 0x7FFF, 0x3A00, 0x6D00, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x0C00, 0x4FFF, 0x7FFF, 0x3A00, 0x6D00, 0x4400, 0x2A00 },
-    { 32000, 16, 1, 0x0C00, 0x2FFF, 0x7FFF, 0x4000, 0x6E00, 0x3F00, 0x2A00 },
-    { 32000, 16, 1, 0x0A00, 0x47FF, 0x7FFF, 0x4100, 0x6E00, 0x4400, 0x2A80 },
-    { 32000, 20, 1, 0x0800, 0x37FF, 0x7FFF, 0x34C0, 0x6280, 0x4000, 0x1B00 },
-#endif
-    { 27000, 16, 1, 0x0800, 0x2FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 27000, 16, 1, 0x0800, 0x3FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 27000, 16, 1, 0x1000, 0x2FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 27000, 16, 1, 0x1000, 0x3FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 27000, 16, 1, 0x0C00, 0x4FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 32000, 14, 1, 0x0800, 0x2FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 32000, 12, 1, 0x0800, 0x2FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 32000, 10, 1, 0x0800, 0x2FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 32000, 8, 1, 0x0800, 0x2FFF, 0x7FFF, 0x2500, 0x5500, 0x7400, 0x2400 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+struct AudioSessionSettings gAudioSessionPresets[1] = {
+    { 32000, 20, 1, 0x1000, 0x2FFF, 0x7FFF, 0x4100, 0x6E00, 0x7400, 0x2A80 },
 };
 #endif
 #endif
@@ -125,15 +101,15 @@ u16 gAudioCosineTable[128] = {
     26220,  25975, 25726, 25473, 25216, 24956, 24691, 24423, 24151, 23875, 23596, 23313, 23026,
     22736,  22442, 22145, 21845, 21541, 21234, 20924, 20610, 20294, 19974, 19651, 19325, 18997,
     18665,  18331, 17993, 17653, 17310, 16965, 16617, 16266, 15913, 15558, 15200, 14840, 14477,
-    14113,  13746, 13377, 13006, 12633, 12258, 11881, 11503, 11122, 10740, 10357, 9971,  9584,
-    9196,   8806,  8415,  8023,  7630,  7235,  6839,  6442,  6044,  5646,  5246,  4845,  4444,
-    4042,   3640,  3237,  2833,  2429,  2025,  1620,  1216,  810,   405,   0,
+    14113,  13746, 13377, 13006, 12633, 12258, 11881, 11503, 11122, 10740, 10357,  9971,  9584,
+     9196,   8806,  8415,  8023,  7630,  7235,  6839,  6442,  6044,  5646,  5246,  4845,  4444,
+     4042,   3640,  3237,  2833,  2429,  2025,  1620,  1216,   810,   405,     0,
 };
 #endif
 
 // Transforms a pitch scale factor in -127..127 into a frequency scale factor
 // between -1 and +1 octave.
-// gPitchBendFrequencyScale[k] = 0.5 * 2^(k/127)
+// gPitchBendFrequencyScale[k] = (0.5 * 2^(k/127))
 #ifndef VERSION_SH
 #if defined(VERSION_EU)
 f32 gPitchBendFrequencyScale[256] = {
@@ -141,7 +117,7 @@ f32 gPitchBendFrequencyScale[256] = {
 #else
 f32 gPitchBendFrequencyScale[255] = {
 #endif
-    0.5f,      0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f, 0.522315f,
+    0.500000f, 0.502736f, 0.505488f, 0.508254f, 0.511036f, 0.513833f, 0.516645f, 0.519472f, 0.522315f,
     0.525174f, 0.528048f, 0.530938f, 0.533843f, 0.536765f, 0.539702f, 0.542656f, 0.545626f, 0.548612f,
     0.551614f, 0.554633f, 0.557669f, 0.560721f, 0.563789f, 0.566875f, 0.569977f, 0.573097f, 0.576233f,
     0.579387f, 0.582558f, 0.585746f, 0.588951f, 0.592175f, 0.595415f, 0.598674f, 0.601950f, 0.605245f,
@@ -155,7 +131,7 @@ f32 gPitchBendFrequencyScale[255] = {
     0.858284f, 0.862982f, 0.867704f, 0.872453f, 0.877228f, 0.882029f, 0.886856f, 0.891709f, 0.896590f,
     0.901496f, 0.906430f, 0.911391f, 0.916379f, 0.921394f, 0.926436f, 0.931507f, 0.936604f, 0.941730f,
     0.946884f, 0.952066f, 0.957277f, 0.962516f, 0.967783f, 0.973080f, 0.978405f, 0.983760f, 0.989144f,
-    0.994557f, 1.0f,      1.005473f, 1.010975f, 1.016508f, 1.022071f, 1.027665f, 1.033289f, 1.038944f,
+    0.994557f, 1.000000f, 1.005473f, 1.010975f, 1.016508f, 1.022071f, 1.027665f, 1.033289f, 1.038944f,
     1.044630f, 1.050347f, 1.056095f, 1.061875f, 1.067687f, 1.073530f, 1.079405f, 1.085312f, 1.091252f,
     1.097224f, 1.103229f, 1.109267f, 1.115337f, 1.121441f, 1.127579f, 1.133750f, 1.139955f, 1.146193f,
     1.152466f, 1.158773f, 1.165115f, 1.171491f, 1.177903f, 1.184349f, 1.190831f, 1.197348f, 1.203901f,
@@ -169,7 +145,7 @@ f32 gPitchBendFrequencyScale[255] = {
     1.707225f, 1.716569f, 1.725963f, 1.735409f, 1.744906f, 1.754456f, 1.764058f, 1.773712f, 1.783419f,
     1.793179f, 1.802993f, 1.812860f, 1.822782f, 1.832757f, 1.842788f, 1.852873f, 1.863013f, 1.873209f,
     1.883461f, 1.893768f, 1.904132f, 1.914553f, 1.925031f, 1.935567f, 1.946159f, 1.956810f, 1.967520f,
-    1.978287f, 1.989114f, 2.0f
+    1.978287f, 1.989114f, 2.000000f
 };
 
 // Frequencies for notes using the standard twelve-tone equal temperament scale.
@@ -410,7 +386,12 @@ s16 sSawtoothWave[0x40] = {
     -0x4FFF, -19455, -0x47FF, -17407, -0x3FFF, -15359, -0x37FF, -13311, -0x2FFF, -11263, -10239,
     -9215,   -8191,  -7167,   -6143,  -5119,   -4095,  -3071,   -2047,  -1023,
 };
-s16 *gWaveSamples[4] = { sSawtoothWave, sTriangleWave, sSineWave, sSquareWave };
+s16 *gWaveSamples[4] = {
+    sSawtoothWave,
+    sTriangleWave,
+    sSineWave,
+    sSquareWave
+};
 #endif
 
 #ifdef VERSION_SH
@@ -915,7 +896,6 @@ u16 unk_sh_data_4[] = {
 
 #ifndef VERSION_SH
 s16 gTatumsPerBeat = TATUMS_PER_BEAT;
-s8 gUnusedCount80333EE8 = UNUSED_COUNT_80333EE8;
 s32 gAudioHeapSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE);
 s32 gAudioInitPoolSize = DOUBLE_SIZE_ON_64_BIT(AUDIO_INIT_POOL_SIZE);
 volatile s32 gAudioLoadLock = AUDIO_LOCK_UNINITIALIZED;
@@ -926,9 +906,12 @@ u8 bufferDelete2[12] = { 0 };
 u8 D_EU_80302010 = 0;
 u8 D_EU_80302014 = 0;
 
-struct OSMesgQueue *OSMesgQueues[4] = { &OSMesgQueue0, &OSMesgQueue1, &OSMesgQueue2, &OSMesgQueue3 };
-#elif defined(VERSION_JP) || defined(VERSION_US)
-s8 sUnused8033EF8 = 24;
+struct OSMesgQueue *OSMesgQueues[4] = {
+    &OSMesgQueue0,
+    &OSMesgQueue1,
+    &OSMesgQueue2,
+    &OSMesgQueue3
+};
 #endif
 
 // .bss
@@ -957,11 +940,6 @@ s32 gRefreshRate;
 
 ALIGNED8 s16 *gAiBuffers[NUMAIBUFFERS];
 s16 gAiBufferLengths[NUMAIBUFFERS];
-
-#if defined(VERSION_JP) || defined(VERSION_US)
-u32 gUnused80226E58[0x10];
-u16 gUnused80226E98[0x10];
-#endif
 
 u32 gAudioRandom;
 

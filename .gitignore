@@ -71,8 +71,38 @@ build/*
 !/assets/**/*custom*.bin
 !/assets/**/*custom*/**/*.bin
 !/textures/crash_custom/*.png
+
+# Specific assets
+!/actors/breath_meter/breath_meter_*.png
+!/actors/coin/coin_*.ia8.png
+!/textures/segment2/light_quarter_circle.ia16.png
+!/textures/segment2/segment2.hud_char_j.rgba16.png
+!/textures/segment2/segment2.hud_char_q.rgba16.png
+!/textures/segment2/segment2.hud_char_v.rgba16.png
+!/textures/segment2/segment2.hud_char_x.rgba16.png
+!/textures/segment2/segment2.hud_char_z.rgba16.png
+!/textures/segment2/segment2.umlaut_us.rgba16.png
+!/textures/segment2/segment2.beta_key.rgba16.png
+!/textures/segment2/segment2.decimal_point.rgba16.png
+!/textures/segment2/segment2.exclamation.rgba16.png
+!/textures/segment2/segment2.double_exclamation.rgba16.png
+!/textures/segment2/segment2.question.rgba16.png
+!/textures/segment2/segment2.ampersand.rgba16.png
+!/textures/segment2/segment2.percent.rgba16.png
+!/textures/segment2/segment2.minus.rgba16.png
+!/textures/segment2/segment2.minus2.rgba16.png
+!/textures/segment2/segment2.yellow_coin.rgba16.png
+!/textures/segment2/segment2.blue_coin.rgba16.png
+!/textures/segment2/segment2.red_coin.rgba16.png
+!/textures/segment2/segment2.silver_coin.*.png
+!/textures/segment2/shadow_quarter_circle_64.ia8.png
+!/textures/segment2/shadow_quarter_square_64.ia8.png
+
+
+
 # libultra
 
+!/lib/**/*.o
 !/lib/*.a
 lib/libs2d_engine.a
 !/lib/gcclib/*.a

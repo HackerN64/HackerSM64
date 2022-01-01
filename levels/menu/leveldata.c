@@ -598,18 +598,16 @@ ALIGNED8 static const Texture texture_menu_hud_char_kana_dakuten_do[] = {
 // Menu HUD print table, only used in JP
 // 0x0700ABD0
 const Texture *const menu_hud_lut[] = {
-    texture_menu_hud_char_katakana_hu, texture_menu_hud_char_katakana_small_a,         texture_menu_hud_char_katakana_i, texture_menu_hud_char_katakana_ru,
-    texture_menu_hud_char_katakana_se,      texture_menu_hud_char_katakana_re,        texture_menu_hud_char_katakana_ku, texture_menu_hud_char_katakana_to,
-    texture_menu_hud_char_hiragana_wo,      texture_menu_hud_char_katakana_ko, texture_menu_hud_char_kana_handakuten_pi, texture_menu_hud_char_choonpu,
-    texture_menu_hud_char_hiragana_su,      texture_menu_hud_char_hiragana_ru,        texture_menu_hud_char_hiragana_ke, texture_menu_hud_char_katakana_ma,
-    texture_menu_hud_char_katakana_ri,       texture_menu_hud_char_katakana_o,        texture_menu_hud_char_katakana_su, texture_menu_hud_char_katakana_a,
-    texture_menu_hud_char_hiragana_mi,  texture_menu_hud_char_hira_dakuten_do,        texture_menu_hud_char_hiragana_no, texture_menu_hud_char_question,
-    texture_menu_hud_char_katakana_sa,       texture_menu_hud_char_katakana_u,         texture_menu_hud_char_katakana_n, texture_menu_hud_char_kana_dakuten_do,
+    texture_menu_hud_char_katakana_hu, texture_menu_hud_char_katakana_small_a, texture_menu_hud_char_katakana_i,         texture_menu_hud_char_katakana_ru,
+    texture_menu_hud_char_katakana_se, texture_menu_hud_char_katakana_re,      texture_menu_hud_char_katakana_ku,        texture_menu_hud_char_katakana_to,
+    texture_menu_hud_char_hiragana_wo, texture_menu_hud_char_katakana_ko,      texture_menu_hud_char_kana_handakuten_pi, texture_menu_hud_char_choonpu,
+    texture_menu_hud_char_hiragana_su, texture_menu_hud_char_hiragana_ru,      texture_menu_hud_char_hiragana_ke,        texture_menu_hud_char_katakana_ma,
+    texture_menu_hud_char_katakana_ri, texture_menu_hud_char_katakana_o,       texture_menu_hud_char_katakana_su,        texture_menu_hud_char_katakana_a,
+    texture_menu_hud_char_hiragana_mi, texture_menu_hud_char_hira_dakuten_do,  texture_menu_hud_char_hiragana_no,        texture_menu_hud_char_question,
+    texture_menu_hud_char_katakana_sa, texture_menu_hud_char_katakana_u,       texture_menu_hud_char_katakana_n,         texture_menu_hud_char_kana_dakuten_do,
 };
 
 #if defined(VERSION_JP) || defined(VERSION_SH)
-UNUSED static const u64 menu_unused_0 = 0;
-
 // 0x0700AC48
 ALIGNED8 static const Texture texture_menu_font_char_jp_0[] = {
 #include "levels/menu/main_menu_seg7.0AC48.ia8.inc.c"
@@ -1716,8 +1714,6 @@ const Gfx dl_menu_ia8_text_end[] = {
     gsDPSetTextureFilter(G_TF_BILERP),
     gsSPEndDisplayList(),
 };
-
-UNUSED static const u64 menu_unused_1 = 0;
 
 #ifdef VERSION_EU
 

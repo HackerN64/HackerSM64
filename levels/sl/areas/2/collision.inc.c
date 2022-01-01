@@ -191,10 +191,10 @@ const Collision sl_seg7_area_2_collision[] = {
     COL_VERTEX(205, 614, -204),
     COL_VERTEX(512, 614, -613),
     COL_VERTEX(1024, 614, -613),
-    COL_VERTEX(-1975, 0, -1433),
-    COL_VERTEX(-1975, 614, -1433),
-    COL_VERTEX(-1975, 0, -1228),
-    COL_VERTEX(-1975, 614, -1228),
+    COL_VERTEX(-1945, 0, -1433),
+    COL_VERTEX(-1945, 614, -1433),
+    COL_VERTEX(-1945, 0, -1228),
+    COL_VERTEX(-1945, 614, -1228),
     COL_TRI_INIT(SURFACE_DEFAULT, 106),
     COL_TRI(12, 9, 7),
     COL_TRI(0, 1, 2),
@@ -407,7 +407,7 @@ const Collision sl_seg7_area_2_collision[] = {
     COL_TRI(146, 187, 145),
     COL_TRI_STOP(),
     COL_SPECIAL_INIT(1),
-    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start, /*pos*/ 0, 0, 2867, /*yaw*/ 128), // unused, probably an early way to set intial position
+    SPECIAL_OBJECT_WITH_YAW(/*preset*/ special_null_start, /*pos*/ 0, 0, 2867, /*yaw*/ 128), // unused, probably an early way to set initial position
     COL_END(),
 };
 

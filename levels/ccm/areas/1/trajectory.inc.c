@@ -34,7 +34,7 @@ const Trajectory ccm_seg7_trajectory_snowman[] = {
 };
 
 // 0x0701669C - 0x070166E6
-const Trajectory ccm_seg7_trajectory_0701669C[] = {
+const Trajectory ccm_seg7_trajectory_ropeway_lift[] = {
     TRAJECTORY_POS(0, /*pos*/   571, -4450,  6426),
     TRAJECTORY_POS(1, /*pos*/  -198, -4120,  6426),
     TRAJECTORY_POS(2, /*pos*/ -1222, -3569,  6426),

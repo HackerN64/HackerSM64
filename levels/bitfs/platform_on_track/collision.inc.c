@@ -1,5 +1,5 @@
 // 0x070157E0 - 0x07015858
-const Collision bitfs_seg7_collision_070157E0[] = {
+const Collision bitfs_seg7_collision_platform_on_track[] = {
     COL_INIT(),
     COL_VERTEX_INIT(0x8),
     COL_VERTEX(307, 0, -306),

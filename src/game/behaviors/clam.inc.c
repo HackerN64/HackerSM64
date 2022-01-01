@@ -14,34 +14,33 @@ struct ObjectHitbox sClamShellHitbox = {
 
 void clam_act_0(void) {
     if (cur_obj_init_anim_check_frame(0, 25)) {
-        cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL3);
+        cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL_CLOSE);
         spawn_mist_from_global();
         cur_obj_become_tangible();
 
-        o->oClamUnkF4 = 10;
+        o->oClamShakeTimer = 10;
         o->oTimer = 0;
     } else if (o->oTimer > 150 && o->oDistanceToMario < 500.0f) {
-        cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL2);
+        cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL_OPEN);
         o->oAction = 1;
-    } else if (o->oClamUnkF4 != 0) {
-        o->oClamUnkF4 -= 1;
+    } else if (o->oClamShakeTimer != 0) {
+        o->oClamShakeTimer--;
         cur_obj_shake_y(3.0f);
     }
 }
 
 void clam_act_1(void) {
-    s16 val06;
-    s16 val04;
-    s16 val02;
+    s16 i;
+    s16 bubblesX, bubblesZ;
 
     if (o->oTimer > 150) {
         o->oAction = 0;
     } else if (obj_is_rendering_enabled() && cur_obj_init_anim_check_frame(1, 8)) {
-        for (val06 = -0x2000; val06 < 0x2000; val06 += 0x555) {
-            val04 = (s16)(100.0f * sins(val06));
-            val02 = (s16)(100.0f * coss(val06));
+        for (i = -0x2000; i < 0x2000; i += 0x555) {
+            bubblesX = (s16)(100.0f * sins(i));
+            bubblesZ = (s16)(100.0f * coss(i));
 
-            spawn_object_relative(0, val04, 30, val02, o, MODEL_BUBBLE, bhvBubbleMaybe);
+            spawn_object_relative(0, bubblesX, 30, bubblesZ, o, MODEL_BUBBLE, bhvBubbleMaybe);
         }
     } else if (cur_obj_check_anim_frame(30)) {
         cur_obj_become_intangible();

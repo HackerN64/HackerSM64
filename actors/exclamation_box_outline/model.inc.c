@@ -224,7 +224,7 @@ const Gfx exclamation_box_outline_seg8_dl_08025EC0[] = {
 };
 
 // 0x08025F08 - 0x08025F78
-const Gfx exclamation_box_outline_seg8_dl_08025F08[] = {
+const Gfx exclamation_box_outline_seg8_dl_exclamation_point[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
     gsSPClearGeometryMode(G_CULL_BACK | G_SHADING_SMOOTH),

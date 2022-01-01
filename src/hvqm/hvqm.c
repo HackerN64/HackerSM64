@@ -123,7 +123,7 @@ void hvqm_main_proc() {
     hvqtask.t.yield_data_size = HVQM2_YIELD_DATA_SIZE;
 
     init_cfb();
-    osViSwapBuffer( gFrameBuffers[NUM_CFBs-1] );
+    osViSwapBuffer( gFramebuffers[NUM_CFBs-1] );
 
     romcpy(hvqm_header, (void *)_capcomSegmentRomStart, sizeof(HVQM2Header), OS_MESG_PRI_NORMAL, &videoDmaMesgBlock, &videoDmaMessageQ);
 
@@ -147,7 +147,7 @@ void hvqm_main_proc() {
 
             if ( disptime > 0 && tkGetTime() > 0) {
                 if ( tkGetTime() < (disptime - (usec_per_frame * 2)) ) {
-                   tkPushVideoframe( gFrameBuffers[prev_bufno], &cfb_status[prev_bufno], disptime );
+                   tkPushVideoframe( gFramebuffers[prev_bufno], &cfb_status[prev_bufno], disptime );
                    continue;
                   //if ( video_remain == 0 ) break;
                 }
@@ -195,8 +195,8 @@ void hvqm_main_proc() {
                  */
                 hvqtask.t.flags = 0;
                 status = hvqm2DecodeSP1( hvqbuf, frame_format, 
-                           &gFrameBuffers[bufno][screen_offset], 
-                           &gFrameBuffers[prev_bufno][screen_offset], 
+                           &gFramebuffers[bufno][screen_offset], 
+                           &gFramebuffers[prev_bufno][screen_offset], 
                            hvqwork, &hvq_sparg, hvq_spfifo );
 
                 osWritebackDCacheAll();
@@ -205,7 +205,7 @@ void hvqm_main_proc() {
                  * Process last half in the RSP
                  */
                 if ( status > 0 ) {
-                    osInvalDCache( (void *)gFrameBuffers[bufno], sizeof gFrameBuffers[bufno] );
+                    osInvalDCache( (void *)gFramebuffers[bufno], sizeof gFramebuffers[bufno] );
                     osSpTaskStart( &hvqtask );
                     osRecvMesg( &spMesgQ, NULL, OS_MESG_BLOCK );
                 }
@@ -216,7 +216,7 @@ void hvqm_main_proc() {
         if ( prev_bufno >= 0 && prev_bufno != bufno ) 
           release_cfb( prev_bufno );
 
-        tkPushVideoframe( gFrameBuffers[bufno], &cfb_status[bufno], disptime );
+        tkPushVideoframe( gFramebuffers[bufno], &cfb_status[bufno], disptime );
 
         prev_bufno = bufno;
         disptime += usec_per_frame;

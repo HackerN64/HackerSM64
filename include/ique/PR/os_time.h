@@ -98,11 +98,11 @@ typedef struct OSTimer_s {
 
 /* Timer interface */
 
-extern OSTime		osGetTime(void);
-extern void		osSetTime(OSTime);
-extern int		osSetTimer(OSTimer *, OSTime, OSTime,
-				   OSMesgQueue *, OSMesg);
-extern int		osStopTimer(OSTimer *);
+extern OSTime	osGetTime(void);
+extern void		osSetTime(OSTime time);
+extern int		osSetTimer( OSTimer *timer, OSTime countdown, OSTime interval,
+				   OSMesgQueue *mq, OSMesg msg);
+extern int		osStopTimer(OSTimer *timer);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

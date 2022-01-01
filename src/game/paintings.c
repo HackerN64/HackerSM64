@@ -4,6 +4,7 @@
 #include "area.h"
 #include "engine/graph_node.h"
 #include "engine/surface_collision.h"
+#include "engine/math_util.h"
 #include "game_init.h"
 #include "geo_misc.h"
 #include "levels/castle_inside/header.h"
@@ -12,6 +13,7 @@
 #include "mario.h"
 #include "memory.h"
 #include "moving_texture.h"
+#include "level_update.h"
 #include "object_list_processor.h"
 #include "paintings.h"
 #include "save_file.h"
@@ -212,12 +214,11 @@ void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
  * @return Mario's y position inside the painting (bounded).
  */
 f32 painting_mario_y(struct Painting *painting) {
-    //! Unnecessary use of double constants
     // Add 50 to make the ripple closer to Mario's center of mass.
-    f32 relY = gPaintingMarioYPos - painting->posY + 50.0;
+    f32 relY = gPaintingMarioYPos - painting->posY + 50.0f;
 
-    if (relY < 0.0) {
-        relY = 0.0;
+    if (relY < 0.0f) {
+        relY = 0.0f;
     } else if (relY > painting->size) {
         relY = painting->size;
     }
@@ -230,8 +231,8 @@ f32 painting_mario_y(struct Painting *painting) {
 f32 painting_mario_z(struct Painting *painting) {
     f32 relZ = painting->posZ - gPaintingMarioZPos;
 
-    if (relZ < 0.0) {
-        relZ = 0.0;
+    if (relZ < 0.0f) {
+        relZ = 0.0f;
     } else if (relZ > painting->size) {
         relZ = painting->size;
     }
@@ -254,9 +255,7 @@ f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
             return painting->size / 2.0; // some concentric ripples don't care about Mario
             break;
     }
-#ifdef AVOID_UB
     return 0.0f;
-#endif
 }
 
 /**
@@ -282,9 +281,8 @@ f32 painting_nearest_4th(struct Painting *painting) {
     } else if (painting->floorEntered & ENTER_RIGHT) {
         return thirdQuarter;
     }
-#ifdef AVOID_UB
+
     return 0.0f;
-#endif
 }
 
 /**
@@ -293,8 +291,8 @@ f32 painting_nearest_4th(struct Painting *painting) {
 f32 painting_mario_x(struct Painting *painting) {
     f32 relX = gPaintingMarioXPos - painting->posX;
 
-    if (relX < 0.0) {
-        relX = 0.0;
+    if (relX < 0.0f) {
+        relX = 0.0f;
     } else if (relX > painting->size) {
         relX = painting->size;
     }
@@ -313,12 +311,11 @@ f32 painting_ripple_x(struct Painting *painting, s8 xSource) {
             return painting_mario_x(painting);
             break;
         case MIDDLE_X: // concentric rippling may not care about Mario
-            return painting->size / 2.0;
+            return painting->size / 2.0f;
             break;
     }
-#ifdef AVOID_UB
+
     return 0.0f;
-#endif
 }
 
 /**
@@ -583,15 +580,14 @@ void painting_update_ripple_state(struct Painting *painting) {
     if (gPaintingUpdateCounter != gLastPaintingUpdateCounter) {
         painting->currRippleMag *= painting->rippleDecay;
 
-        //! After ~6.47 days, paintings with RIPPLE_TRIGGER_CONTINUOUS will increment this to
-        //! 16777216 (1 << 24), at which point it will freeze (due to floating-point
-        //! imprecision?) and the painting will stop rippling. This happens to HMC, DDD, and
-        //! CotMC.
-        painting->rippleTimer += 1.0;
+        if (painting->rippleTimer >= ((1 << 24) - 1.0f)) {
+            painting->rippleTimer = 0.0f;
+        }
+        painting->rippleTimer += 1.0f;
     }
     if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
         // if the painting is barely rippling, make it stop rippling
-        if (painting->currRippleMag <= 1.0) {
+        if (painting->currRippleMag <= 1.0f) {
             painting->state = PAINTING_IDLE;
             gRipplingPainting = NULL;
         }
@@ -685,8 +681,7 @@ void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
     s16 i;
 
     gPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, numTris * sizeof(struct PaintingMeshVertex));
-    if (gPaintingMesh == NULL) {
-    }
+
     // accesses are off by 1 since the first entry is the number of vertices
     for (i = 0; i < numTris; i++) {
         gPaintingMesh[i].pos[0] = mesh[i * 3 + 1];
@@ -713,12 +708,11 @@ void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
  *
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
-void painting_calculate_triangle_normals(s16 *mesh, s16 numVtx, s16 numTris) {
+void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx, PaintingData numTris) {
     s16 i;
 
     gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, numTris * sizeof(Vec3f));
-    if (gPaintingTriNorms == NULL) {
-    }
+
     for (i = 0; i < numTris; i++) {
         s16 tri = numVtx * 3 + i * 3 + 2; // Add 2 because of the 2 length entries preceding the list
         s16 v0 = mesh[tri];
@@ -776,8 +770,7 @@ s8 normalize_component(f32 comp) {
  *
  * The table used in game, seg2_painting_mesh_neighbor_tris, is in bin/segment2.c.
  */
-void painting_average_vertex_normals(s16 *neighborTris, s16 numVtx) {
-    UNUSED s16 unused;
+void painting_average_vertex_normals(PaintingData *neighborTris, PaintingData numVtx) {
     s16 tri;
     s16 i;
     s16 j;
@@ -807,7 +800,7 @@ void painting_average_vertex_normals(s16 *neighborTris, s16 numVtx) {
         nz /= neighbors;
         nlen = sqrtf(nx * nx + ny * ny + nz * nz);
 
-        if (nlen == 0.0) {
+        if (nlen == 0.0f) {
             gPaintingMesh[i].norm[0] = 0;
             gPaintingMesh[i].norm[1] = 0;
             gPaintingMesh[i].norm[2] = 0;
@@ -845,9 +838,6 @@ Gfx *render_painting(u8 *img, s16 tWidth, s16 tHeight, s16 *textureMap, s16 mapV
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
     Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
-
-    if (verts == NULL || dlist == NULL) {
-    }
 
     gLoadBlockTexture(gfx++, tWidth, tHeight, G_IM_FMT_RGBA, img);
 
@@ -915,9 +905,6 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
     Gfx *dlist = alloc_display_list(5 * sizeof(Gfx));
     Gfx *gfx = dlist;
 
-    if (rotX == NULL || rotY == NULL || translate == NULL || dlist == NULL) {
-    }
-
     guTranslate(translate, painting->posX, painting->posY, painting->posZ);
     guRotate(rotX, painting->pitch, 1.0f, 0.0f, 0.0f);
     guRotate(rotY, painting->yaw, 0.0f, 1.0f, 0.0f);
@@ -936,15 +923,15 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
  * Ripple a painting that has 1 or more images that need to be mapped
  */
 Gfx *painting_ripple_image(struct Painting *painting) {
-    s16 meshVerts;
-    s16 meshTris;
-    s16 i;
-    s16 *textureMap;
-    s16 imageCount = painting->imageCount;
-    s16 tWidth = painting->textureWidth;
-    s16 tHeight = painting->textureHeight;
-    s16 **textureMaps = segmented_to_virtual(painting->textureMaps);
-    u8 **textures = segmented_to_virtual(painting->textureArray);
+    PaintingData meshVerts;
+    PaintingData meshTris;
+    PaintingData i;
+    PaintingData *textureMap;
+    PaintingData imageCount = painting->imageCount;
+    PaintingData tWidth = painting->textureWidth;
+    PaintingData tHeight = painting->textureHeight;
+    PaintingData **textureMaps = segmented_to_virtual(painting->textureMaps);
+    Texture **textures = segmented_to_virtual(painting->textureArray);
     Gfx *dlist = alloc_display_list((imageCount + 6) * sizeof(Gfx));
     Gfx *gfx = dlist;
 
@@ -1107,9 +1094,15 @@ void reset_painting(struct Painting *painting) {
  *  2 (0b10): set x coordinate to backPos
  *  3 (0b11): same as 2. Bit 0 is ignored
  */
+#ifdef UNLOCK_ALL
+void move_ddd_painting(struct Painting *painting, UNUSED f32 frontPos, f32 backPos, UNUSED f32 speed) {
+    painting->posX = backPos;
+    gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
+}
+#else
 void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32 speed) {
     // Obtain the DDD star flags
-    u32 dddFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_DDD - 1);
+    u32 dddFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_DDD));
     // Get the other save file flags
     u32 saveFileFlags = save_file_get_flags();
     // Find out whether Board Bowser's Sub was collected
@@ -1120,12 +1113,12 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
     if (!bowsersSubBeaten && !dddBack) {
         // If we haven't collected the star or moved the painting, put the painting at the front
         painting->posX = frontPos;
-        gDddPaintingStatus = 0;
+        gDddPaintingStatus = DDD_FLAGS_NONE;
     } else if (bowsersSubBeaten && !dddBack) {
         // If we've collected the star but not moved the painting back,
         // Each frame, move the painting by a certain speed towards the back area.
         painting->posX += speed;
-        gDddPaintingStatus = BOWSERS_SUB_BEATEN;
+        gDddPaintingStatus = DDD_FLAG_BOWSERS_SUB_BEATEN;
         if (painting->posX >= backPos) {
             painting->posX = backPos;
             // Tell the save file that we've moved DDD back.
@@ -1134,21 +1127,19 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
     } else if (bowsersSubBeaten && dddBack) {
         // If the painting has already moved back, place it in the back position.
         painting->posX = backPos;
-        gDddPaintingStatus = BOWSERS_SUB_BEATEN | DDD_BACK;
+        gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
     }
 }
+#endif
 
 /**
  * Set the painting's node's layer based on its alpha
  */
 void set_painting_layer(struct GraphNodeGenerated *gen, struct Painting *painting) {
-    switch (painting->alpha) {
-        case 0xFF: // Opaque
-            gen->fnNode.node.flags = (gen->fnNode.node.flags & 0xFF) | (LAYER_OPAQUE << 8);
-            break;
-        default:
-            gen->fnNode.node.flags = (gen->fnNode.node.flags & 0xFF) | (LAYER_TRANSPARENT << 8);
-            break;
+    if (painting->alpha == 0xFF) { // Opaque
+        SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_OPAQUE);
+    } else {
+        SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_TRANSPARENT);
     }
 }
 
@@ -1249,14 +1240,11 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
         // Update the painting
         painting_update_floors(painting);
-        switch ((s16) painting->pitch) {
+        if (painting->pitch == 0x0) {
             // only paintings with 0 pitch are treated as walls
-            case 0:
-                wall_painting_update(painting, paintingGroup);
-                break;
-            default:
-                floor_painting_update(painting, paintingGroup);
-                break;
+            wall_painting_update(painting, paintingGroup);
+        } else {
+            floor_painting_update(painting, paintingGroup);
         }
     }
     return paintingDlist;
@@ -1265,7 +1253,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 /**
  * Update the painting system's local copy of Mario's current floor and position.
  */
-Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 c) {
+Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     struct Surface *surface;
 
     // Reset the update counter
@@ -1276,7 +1264,7 @@ Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED 
         gLastPaintingUpdateCounter = gPaintingUpdateCounter;
         gPaintingUpdateCounter = gAreaUpdateCounter;
 
-        // Store Mario's floor and position
+        // Store Mario's position
         find_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &surface);
         gPaintingMarioFloorType = surface->type;
         gPaintingMarioXPos = gMarioObject->oPosX;

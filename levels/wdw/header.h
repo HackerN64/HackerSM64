@@ -36,10 +36,10 @@ extern const MacroObject wdw_seg7_area_2_macro_objs[];
 extern const Collision wdw_seg7_collision_square_floating_platform[];
 extern const Collision wdw_seg7_collision_arrow_lift[];
 extern const Collision wdw_seg7_collision_070184C8[];
-extern const Collision wdw_seg7_collision_07018528[];
+extern const Collision wdw_seg7_collision_hidden_platform[];
 extern const Collision wdw_seg7_collision_express_elevator_platform[];
 extern const Collision wdw_seg7_collision_rect_floating_platform[];
-extern const Collision wdw_seg7_collision_070186B4[];
+extern const Collision wdw_seg7_collision_rotating_platform[];
 extern const struct MovtexQuadCollection wdw_movtex_area1_water[];
 extern const struct MovtexQuadCollection wdw_movtex_area2_water[];
 

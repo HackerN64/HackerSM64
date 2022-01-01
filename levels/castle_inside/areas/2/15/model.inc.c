@@ -235,7 +235,7 @@ static const Gfx inside_castle_seg7_dl_07057C20[] = {
 
 // 0x07057D30 - 0x07057D88
 static const Gfx inside_castle_seg7_dl_07057D30[] = {
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07008000),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_bowser_top_left),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPLight(&inside_castle_seg7_lights_07057398.l, 1),
@@ -248,7 +248,7 @@ static const Gfx inside_castle_seg7_dl_07057D30[] = {
 
 // 0x07057D88 - 0x07057DD0
 static const Gfx inside_castle_seg7_dl_07057D88[] = {
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07008800),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_bowser_top_right),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPVertex(inside_castle_seg7_vertex_07057850, 8, 0),
@@ -259,7 +259,7 @@ static const Gfx inside_castle_seg7_dl_07057D88[] = {
 
 // 0x07057DD0 - 0x07057E18
 static const Gfx inside_castle_seg7_dl_07057DD0[] = {
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07009000),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_bowser_bottom_left),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPVertex(inside_castle_seg7_vertex_070578D0, 8, 0),
@@ -270,7 +270,7 @@ static const Gfx inside_castle_seg7_dl_07057DD0[] = {
 
 // 0x07057E18 - 0x07057E60
 static const Gfx inside_castle_seg7_dl_07057E18[] = {
-    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_07009800),
+    gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_bowser_bottom_right),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
     gsSPVertex(inside_castle_seg7_vertex_07057950, 8, 0),

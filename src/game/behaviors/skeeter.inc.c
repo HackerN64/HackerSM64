@@ -1,6 +1,8 @@
-struct Struct80331C38 {
-    s16 unk00;
-    s16 unk02;
+// skeeter.inc.c
+
+struct SkeeterRelPos {
+    s16 relPosX;
+    s16 relPosZ;
 };
 
 struct ObjectHitbox sSkeeterHitbox = {
@@ -15,7 +17,7 @@ struct ObjectHitbox sSkeeterHitbox = {
     /* hurtboxHeight:     */ 90,
 };
 
-struct Struct80331C38 D_80331C38[] = {
+struct SkeeterRelPos sSkeeterRelPositions[] = {
     { 0xFF7E, 0xFF42 },
     { 0x0082, 0xFF42 },
     { 0xFF4C, 0x0082 },
@@ -26,7 +28,7 @@ static void skeeter_spawn_waves(void) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        spawn_object_relative_with_scale(0, D_80331C38[i].unk00, 0, D_80331C38[i].unk02, 0.8f, o,
+        spawn_object_relative_with_scale(0, sSkeeterRelPositions[i].relPosX, 0, sSkeeterRelPositions[i].relPosZ, 0.8f, o,
                                          MODEL_IDLE_WATER_WAVE, bhvSkeeterWave);
     }
 }
@@ -45,15 +47,14 @@ static void skeeter_act_idle(void) {
         if (o->oMoveFlags & OBJ_MOVE_AT_WATER_SURFACE) {
             skeeter_spawn_waves();
             if (o->oTimer > 60
-                && obj_smooth_turn(&o->oSkeeterUnk1AC, &o->oMoveAngleYaw, o->oSkeeterTargetAngle, 0.02f,
-                                   5, 50, 200)) {
+                && obj_smooth_turn(&o->oSkeeterAngleVel, &o->oMoveAngleYaw, o->oSkeeterTargetAngle, 0.02f, 5, 50, 200)) {
                 if (o->oSkeeterWaitTime != 0) {
-                    o->oSkeeterWaitTime -= 1;
+                    o->oSkeeterWaitTime--;
                 } else if (cur_obj_check_if_near_animation_end()) {
                     cur_obj_play_sound_2(SOUND_OBJ_WALKING_WATER);
                     o->oAction = SKEETER_ACT_LUNGE;
                     o->oForwardVel = 80.0f;
-                    o->oSkeeterUnk1AC = 0;
+                    o->oSkeeterAngleVel = 0;
                 }
             }
         }
@@ -90,34 +91,34 @@ static void skeeter_act_lunge(void) {
 }
 
 static void skeeter_act_walk(void) {
-    f32 sp24;
+    f32 accel;
 
     if (!(o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND)) {
         o->oAction = SKEETER_ACT_IDLE;
     } else {
-        obj_forward_vel_approach(o->oSkeeterUnkFC, 0.4f);
-        sp24 = 0.12f * o->oForwardVel;
+        obj_forward_vel_approach(o->oSkeeterTargetForwardVel, 0.4f);
+        accel = 0.12f * o->oForwardVel;
 
-        cur_obj_init_animation_with_accel_and_sound(2, sp24);
+        cur_obj_init_animation_with_accel_and_sound(2, accel);
         cur_obj_play_sound_at_anim_range(3, 13, SOUND_OBJ_SKEETER_WALK);
 
-        if (o->oSkeeterUnkF8 != 0) {
-            o->oSkeeterUnkF8 = obj_resolve_collisions_and_turn(o->oSkeeterTargetAngle, 0x400);
+        if (o->oSkeeterTurningAwayFromWall) {
+            o->oSkeeterTurningAwayFromWall = obj_resolve_collisions_and_turn(o->oSkeeterTargetAngle, 0x400);
         } else {
             if (o->oDistanceToMario >= 25000.0f) {
                 o->oSkeeterTargetAngle = o->oAngleToMario;
                 o->oSkeeterWaitTime = random_linear_offset(20, 30);
             }
 
-            if ((o->oSkeeterUnkF8 = obj_bounce_off_walls_edges_objects(&o->oSkeeterTargetAngle)) == 0) {
+            if (!(o->oSkeeterTurningAwayFromWall = obj_bounce_off_walls_edges_objects(&o->oSkeeterTargetAngle))) {
                 if (o->oDistanceToMario < 500.0f) {
                     o->oSkeeterTargetAngle = o->oAngleToMario;
-                    o->oSkeeterUnkFC = 20.0f;
+                    o->oSkeeterTargetForwardVel = 20.0f;
                 } else {
-                    o->oSkeeterUnkFC = 10.0f;
+                    o->oSkeeterTargetForwardVel = 10.0f;
                     if (o->oSkeeterWaitTime != 0) {
-                        o->oSkeeterWaitTime -= 1;
-                    } else if (cur_obj_check_if_near_animation_end() != 0) {
+                        o->oSkeeterWaitTime--;
+                    } else if (cur_obj_check_if_near_animation_end()) {
                         if (random_u16() & 0x0003) {
                             o->oSkeeterTargetAngle = obj_random_fixed_turn(0x2000);
                             o->oSkeeterWaitTime = random_linear_offset(100, 100);

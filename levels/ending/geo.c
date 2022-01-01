@@ -14,8 +14,8 @@
 #include "levels/ending/header.h"
 
 // 0x0E000050
-const GeoLayout ending_geo_000050[] = {
-   GEO_NODE_SCREEN_AREA(10, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+const GeoLayout ending_geo_area_1[] = {
+   GEO_NODE_SCREEN_AREA(10, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_CENTER_X, SCREEN_CENTER_Y),
    GEO_OPEN_NODE(),
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -31,7 +31,7 @@ const GeoLayout ending_geo_000050[] = {
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM_WITH_FUNC(45, 100, 12800, geo_camera_fov),
          GEO_OPEN_NODE(),
-            GEO_CAMERA(1, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
+            GEO_CAMERA(CAMERA_MODE_RADIAL, 0, 2000, 6000, 0, 0, 0, geo_camera_main),
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
    GEO_CLOSE_NODE(),

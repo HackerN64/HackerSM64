@@ -7,7 +7,7 @@
 #include "types.h"
 #include "synthesis.h"
 
-#define AUDIO_LOCK_UNINITIALIZED 0
+#define AUDIO_LOCK_UNINITIALIZED 0x00000000
 #define AUDIO_LOCK_NOT_LOADING 0x76557364
 #define AUDIO_LOCK_LOADING 0x19710515
 
@@ -16,8 +16,10 @@
 // constant .data
 #if defined(VERSION_EU) || defined(VERSION_SH)
 extern struct AudioSessionSettingsEU gAudioSessionPresets[];
+extern struct ReverbSettingsEU sReverbSettings[8];
 #else
-extern struct AudioSessionSettings gAudioSessionPresets[18];
+extern struct AudioSessionSettings gAudioSessionPresets[1];
+extern struct ReverbSettingsUS gReverbSettings[18];
 #endif
 extern u16 D_80332388[128]; // unused
 
@@ -66,7 +68,6 @@ extern f32 gVolRampingRhs128[128];
 
 // non-constant .data
 extern s16 gTatumsPerBeat;
-extern s8 gUnusedCount80333EE8;
 extern s32 gAudioHeapSize; // AUDIO_HEAP_SIZE
 extern s32 gAudioInitPoolSize; // AUDIO_INIT_POOL_SIZE
 extern volatile s32 gAudioLoadLock;
@@ -105,22 +106,19 @@ extern s16 gAiBufferLengths[NUMAIBUFFERS];
 #define AIBUFFER_LEN (0xa0 * 16)
 #endif
 
-extern u32 gUnused80226E58[0x10];
-extern u16 gUnused80226E98[0x10];
-
 extern u32 gAudioRandom;
 
 #ifdef EXPAND_AUDIO_HEAP
-#if defined(VERSION_US) || defined(VERSION_JP)
-#define EXT_AUDIO_HEAP_SIZE 0x24400
-#define EXT_AUDIO_INIT_POOL_SIZE 0x8000
+#if defined(VERSION_US) || defined(VERSION_JP) || defined(VERSION_EU)
+#define EXT_AUDIO_HEAP_SIZE      0x27400
+#define EXT_AUDIO_INIT_POOL_SIZE 0x02000
 #else
-// EU and SH versions not yet supported for extended audio heap
-#define EXT_AUDIO_HEAP_SIZE 0x24400
-#define EXT_AUDIO_INIT_POOL_SIZE 0x8000
+// SH not yet supported for expanded audio heap
+#define EXT_AUDIO_HEAP_SIZE      0x0
+#define EXT_AUDIO_INIT_POOL_SIZE 0x0
 #endif
 #else
-#define EXT_AUDIO_HEAP_SIZE 0x0
+#define EXT_AUDIO_HEAP_SIZE      0x0
 #define EXT_AUDIO_INIT_POOL_SIZE 0x0
 #endif
 
@@ -150,14 +148,14 @@ extern OSMesgQueue *D_SH_80350FA8;
 #endif
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-#define UNUSED_COUNT_80333EE8 24
-#define AUDIO_HEAP_SIZE (0x2c500 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
-#define AUDIO_INIT_POOL_SIZE (0x2c00 + EXT_AUDIO_INIT_POOL_SIZE)
+#define AUDIO_HEAP_BASE 0x36B00
+#define AUDIO_INIT_POOL_SIZE (0x2C00 + EXT_AUDIO_INIT_POOL_SIZE)
 #else
-#define UNUSED_COUNT_80333EE8 16
-#define AUDIO_HEAP_SIZE (0x31150 + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE)
+#define AUDIO_HEAP_BASE 0x30750
 #define AUDIO_INIT_POOL_SIZE (0x2500 + EXT_AUDIO_INIT_POOL_SIZE)
 #endif
+
+#define AUDIO_HEAP_SIZE (AUDIO_HEAP_BASE + EXT_AUDIO_HEAP_SIZE + EXT_AUDIO_INIT_POOL_SIZE + BETTER_REVERB_SIZE + REVERB_WINDOW_HEAP_SIZE)
 
 #ifdef VERSION_SH
 extern u32 D_SH_80315EF0;

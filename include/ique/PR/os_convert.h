@@ -98,8 +98,8 @@ extern "C" {
 
 /* Address translation routines and macros */
 
-extern u32		 osVirtualToPhysical(void *);
-extern void *		 osPhysicalToVirtual(u32);
+extern u32   osVirtualToPhysical(void *vaddr);
+extern void *osPhysicalToVirtual(u32   paddr);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

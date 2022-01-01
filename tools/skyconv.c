@@ -357,7 +357,7 @@ static void write_cake_c() {
             fputs("};\n\n", cFile);
         }
     } else {
-        fprintf(cFile, "ALIGNED8 static const u8 cake_end_texture_data[] = {\n");
+        fprintf(cFile, "ALIGNED8 static const Texture cake_end_texture_data[] = {\n");
         for (int i = 0; i < numTiles; ++i) {
             print_raw_data(cFile, &tiles[i]);
             fputc(',', cFile);
@@ -535,7 +535,7 @@ static int parse_arguments(int argc, char *argv[]) {
 
             output = argv[i];
         }
-        
+
         if (strcmp(argv[i], "--type") == 0) {
             if (++i >= argc || type != InvalidType) {
                 goto invalid;
@@ -576,7 +576,7 @@ bool imageMatchesDimensions(int width, int height) {
             break;
         }
     }
-    
+
     if (!matchesDimensions) {
         if (type != CakeEU) {
             fprintf(stderr, "err: That type of image must be either %d x %d or %d x %d. Yours is %d x %d.\n",
@@ -645,7 +645,7 @@ int main(int argc, char *argv[]) {
             }
 
             allocate_tiles();
-            
+
             init_tiles(image, expanded);
             switch (type) {
                 case Skybox:

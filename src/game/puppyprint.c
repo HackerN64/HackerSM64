@@ -25,14 +25,13 @@ a modern game engine's developer's console.
 
 #include <ultra64.h>
 
-#ifdef PUPPYPRINT
-
 #include "config.h"
 #include "game_init.h"
 #include "memory.h"
 #include "print.h"
-#include "segment2.h"
 #include "string.h"
+#include "stdarg.h"
+#include "printf.h"
 #include "engine/math_util.h"
 #include "engine/behavior_script.h"
 #include "camera.h"
@@ -41,54 +40,79 @@ a modern game engine's developer's console.
 #include "object_list_processor.h"
 #include "engine/surface_load.h"
 #include "audio/data.h"
+#include "audio/heap.h"
 #include "hud.h"
 #include "debug_box.h"
+#include "color_presets.h"
 
-u8 currEnv[4];
-u8 fDebug = 0;
+#ifdef PUPPYPRINT
+
+ColorRGBA currEnv;
+#ifdef ENABLE_CREDITS_BENCHMARK
+u8 fDebug = TRUE;
+#else
+u8 fDebug = FALSE;
+#endif
 
 #if PUPPYPRINT_DEBUG
-s8 benchViewer = 0;
-u8 benchOption = 0;
-s8 logViewer = 0;
-//Profiler values
-s8 perfIteration = 0;
-s16 benchmarkLoop = 0;
+s8 benchViewer  = FALSE;
+u8 benchOption  = 0;
+s8 logViewer    = FALSE;
+u8 sPPDebugPage = 0;
+u8 sDebugMenu   = FALSE;
+u8 sDebugOption = 0;
+// Profiler values
+s8  perfIteration  = 0;
+s16 benchmarkLoop  = 0;
 s32 benchmarkTimer = 0;
 s32 benchmarkProgramTimer = 0;
-s8 benchmarkType = 0;
-//General
-OSTime cpuTime = 0;
-OSTime rspTime = 0;
-OSTime rdpTime = 0;
-OSTime ramTime = 0;
-OSTime loadTime = 0;
-OSTime gLastOSTime = 0;
-OSTime rspDelta = 0;
-s32 benchMark[NUM_BENCH_ITERATIONS+2];
-//CPU
-OSTime collisionTime[NUM_PERF_ITERATIONS+1];
-OSTime behaviourTime[NUM_PERF_ITERATIONS+1];
-OSTime scriptTime[NUM_PERF_ITERATIONS+1];
-OSTime graphTime[NUM_PERF_ITERATIONS+1];
-OSTime audioTime[NUM_PERF_ITERATIONS+1];
-OSTime dmaTime[NUM_PERF_ITERATIONS+1];
-OSTime dmaAudioTime[NUM_PERF_ITERATIONS+1];
-//RSP
-OSTime audioTime[NUM_PERF_ITERATIONS+1];
-OSTime rspGenTime[NUM_PERF_ITERATIONS+1];
-//RDP
-OSTime bufferTime[NUM_PERF_ITERATIONS+1];
-OSTime tmemTime[NUM_PERF_ITERATIONS+1];
-OSTime busTime[NUM_PERF_ITERATIONS+1];
-//RAM
-s8 ramViewer = 0;
-s32 ramsizeSegment[33] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-s32 audioPool[12];
+s8  benchmarkType  = 0;
+// General
+u32     cpuTime = 0;
+u32     rspTime = 0;
+u32     rdpTime = 0;
+u32     ramTime = 0;
+u32    loadTime = 0;
+u32 gLastOSTime = 0;
+u32    rspDelta = 0;
+s32       benchMark[NUM_BENCH_ITERATIONS + 2];
+// CPU
+u32 collisionTime[NUM_PERF_ITERATIONS + 1];
+u32 behaviourTime[NUM_PERF_ITERATIONS + 1];
+u32    scriptTime[NUM_PERF_ITERATIONS + 1];
+u32     graphTime[NUM_PERF_ITERATIONS + 1];
+u32     audioTime[NUM_PERF_ITERATIONS + 1];
+u32       dmaTime[NUM_PERF_ITERATIONS + 1];
+u32  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
+u32     faultTime[NUM_PERF_ITERATIONS + 1];
+u32      taskTime[NUM_PERF_ITERATIONS + 1];
+u32  profilerTime[NUM_PERF_ITERATIONS + 1];
+u32 profilerTime2[NUM_PERF_ITERATIONS + 1];
+u32    cameraTime[NUM_PERF_ITERATIONS + 1];
+// RSP
+u32     audioTime[NUM_PERF_ITERATIONS + 1];
+u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
+// RDP
+u32    bufferTime[NUM_PERF_ITERATIONS + 1];
+u32      tmemTime[NUM_PERF_ITERATIONS + 1];
+u32       busTime[NUM_PERF_ITERATIONS + 1];
+// RAM
+s8  ramViewer = FALSE;
+s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0
+};
+s8  audioRamViewer = FALSE;
 s32 mempool;
-//Collision
-u8 collisionViewer = 0;
-s32 numSurfaces = 0;
 
 extern u8 _mainSegmentStart[];
 extern u8 _mainSegmentEnd[];
@@ -101,122 +125,140 @@ extern u8 _buffersSegmentBssEnd[];
 extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentEnd[];
 
-//Here is stored the rom addresses of the global code segments. If you get rid of any, it's best to just write them as NULL.
-s32 ramP[5][2] = {
-    {&_buffersSegmentBssStart, &_buffersSegmentBssEnd},
-    {&_mainSegmentStart, &_mainSegmentEnd},
-    {&_engineSegmentStart, &_engineSegmentEnd},
-    {&_framebuffersSegmentBssStart, &_framebuffersSegmentBssEnd},
-    {&_goddardSegmentStart, &_goddardSegmentEnd},
+// Here is stored the rom addresses of the global code segments. If you get rid of any, it's best to just write them as NULL.
+u32 ramP[5][2] = {
+    {(u32)_buffersSegmentBssStart,      (u32)_buffersSegmentBssEnd},
+    {(u32)_mainSegmentStart,            (u32)_mainSegmentEnd},
+    {(u32)_engineSegmentStart,          (u32)_engineSegmentEnd},
+    {(u32)_framebuffersSegmentBssStart, (u32)_framebuffersSegmentBssEnd},
+    {(u32)_goddardSegmentStart,         (u32)_goddardSegmentEnd},
 };
 
-void puppyprint_calculate_ram_usage(void)
-{
-    s32 temp[2];
+void puppyprint_calculate_ram_usage(void) {
+    u32 temp[2];
     s32 i = 0;
 
-    for (i = 0; i < 5; i++)
-    {
-        if (!ramP[i][0] || !ramP[i][1])
+    for (i = 0; i < 5; i++) {
+        if (!ramP[i][0] || !ramP[i][1]) {
             continue;
+        }
         temp[0] = ramP[i][0];
         temp[1] = ramP[i][1];
         ramsizeSegment[i] = temp[1] - temp[0];
     }
 
-    //These are a bit hacky, but what can ye do eh?
-    //gEffectsMemoryPool is 0x4000, gObjectsMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
-    ramsizeSegment[5] = 0x4000 + 0x800;
-    ramsizeSegment[6] = (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + (SURFACE_POOL_SIZE * sizeof(struct Surface));
-    ramsizeSegment[7] = gAudioHeapSize + gAudioInitPoolSize;
-    ramsizeSegment[8] = audioPool[0] + audioPool[1] + audioPool[2] + audioPool[3] + audioPool[4] + audioPool[5] +
-                        audioPool[6] + audioPool[7] + audioPool[8] + audioPool[9] + audioPool[10] + audioPool[11];
+    // These are a bit hacky, but what can ye do eh?
+    // gEffectsMemoryPool is 0x4000, gObjectMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
+    ramsizeSegment[5] = (EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL
+                       + EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL);
+    ramsizeSegment[6] = ((SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode))
+                       + (     SURFACE_POOL_SIZE * sizeof(struct Surface    )));
+    ramsizeSegment[7] = gAudioHeapSize;
 }
 
-void puppyprint_profiler_finished(void)
-{
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+    #define CYCLE_CONV
+    #define RDP_CYCLE_CONV(x) (x)
+#else
+    #define CYCLE_CONV OS_CYCLES_TO_USEC
+    #define RDP_CYCLE_CONV(x) ((10 * (x)) / 625) // 62.5 million cycles per frame
+#endif
+
+void puppyprint_profiler_finished(void) {
     s32 i = 0;
-    benchMark[NUM_BENCH_ITERATIONS] = 0;
-    benchMark[NUM_BENCH_ITERATIONS+1] = 0;
+    benchMark[NUM_BENCH_ITERATIONS    ] = 0;
+    benchMark[NUM_BENCH_ITERATIONS + 1] = 0;
     benchmarkTimer = 300;
-    benchViewer = 0;
-    for (i = 0; i < NUM_BENCH_ITERATIONS-2; i++)
-    {
+    benchViewer    = FALSE;
+
+    for (i = 0; i < (NUM_BENCH_ITERATIONS - 2); i++) {
         benchMark[NUM_BENCH_ITERATIONS] += benchMark[i];
-        if (benchMark[i] > benchMark[NUM_BENCH_ITERATIONS+1])
-            benchMark[NUM_BENCH_ITERATIONS+1] = benchMark[i];
+        if (benchMark[i] > benchMark[NUM_BENCH_ITERATIONS + 1]) {
+            benchMark[NUM_BENCH_ITERATIONS + 1] = benchMark[i];
+        }
     }
+
     benchMark[NUM_BENCH_ITERATIONS] /= NUM_BENCH_ITERATIONS;
-    benchmarkProgramTimer = OS_CYCLES_TO_USEC(osGetTime() - benchmarkProgramTimer);
+    benchmarkProgramTimer = CYCLE_CONV(osGetTime() - benchmarkProgramTimer);
 }
 
-//RGB colour lookup table for colouring all the funny ram prints.
-u8 colourChart[33][3] = {
-    {255, 0, 0},
-    {0, 0, 255},
-    {0, 255, 0},
-    {255, 255, 0},
-    {255, 0, 255},
-    {255, 127, 0},
-    {0, 255, 255},
-    {51, 255, 51},
-    {255, 153, 153},
-    {204, 0, 102},
-    {0, 153, 153},
-    {153, 255, 153},
-    {0, 0, 128},
-    {128, 0, 128},
-    {218, 165, 32},
-    {107, 142, 35},
-    {188, 143, 143},
-    {210, 105, 30},
-    {154, 205, 50},
-    {165, 42, 42},
-    {255, 105, 180},
-    {139, 69, 19},
-    {250, 240, 230},
-    {95, 158, 160},
-    {60, 179, 113},
-    {255, 69, 0},
-    {128, 0, 0},
-    {216, 191, 216},
-    {244, 164, 96},
-    {176, 196, 222},
-    {255, 255, 255}};
+// RGB colour lookup table for colouring all the funny ram prints.
+ColorRGB colourChart[NUM_TLB_SEGMENTS + 1] = {
+    { 255,   0,   0 },
+    {  63,  63, 255 },
+    {   0, 255,   0 },
+    { 255, 255,   0 },
+    { 255,   0, 255 },
+    { 255, 127,   0 },
+    {   0, 255, 255 },
+    {  51, 255,  51 },
+    { 255, 153, 153 },
+    { 204,   0, 102 },
+    {   0, 153, 153 },
+    { 153, 255, 153 },
+    {   0,   0, 128 },
+    { 128,   0, 128 },
+    { 218, 165,  32 },
+    { 107, 142,  35 },
+    { 188, 143, 143 },
+    { 210, 105,  30 },
+    { 154, 205,  50 },
+    { 165,  42,  42 },
+    { 255, 105, 180 },
+    { 139,  69,  19 },
+    { 250, 240, 230 },
+    {  95, 158, 160 },
+    {  60, 179, 113 },
+    { 255,  69,   0 },
+    { 128,   0,   0 },
+    { 216, 191, 216 },
+    { 244, 164,  96 },
+    { 176, 196, 222 },
+    { 255, 255, 255 }
+};
 
-//Change this to alter the width of the bar at the bottom.
-#define BAR_LENGTH 200
+// Change this to alter the width of the bar at the bottom.
+#define RAM_BAR_LENGTH 200
+#define RAM_BAR_MIN    (SCREEN_CENTER_X - (RAM_BAR_LENGTH / 2))
+#define RAM_BAR_MAX    (SCREEN_CENTER_X + (RAM_BAR_LENGTH / 2))
+#define RAM_BAR_TOP    (SCREEN_HEIGHT - 30)
+#define RAM_BAR_BOTTOM (SCREEN_HEIGHT - 22)
 
-void print_ram_bar(void)
-{
+void print_ram_bar(void) {
     s32 i = 0;
     f32 perfPercentage;
     s32 graphPos = 0;
-    s32 prevGraph = 160-(BAR_LENGTH/2);
+    s32 prevGraph = RAM_BAR_MIN;
     s32 ramsize = osGetMemSize();
 
     prepare_blank_box();
 
-    for (i = 0; i < 32; i++)
-    {
-        if (ramsizeSegment[i] == 0)
+    for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
+        if (ramsizeSegment[i] == 0) {
             continue;
-        perfPercentage = (f32)ramsizeSegment[i]/ramsize;
-        graphPos = prevGraph + CLAMP((BAR_LENGTH*perfPercentage), 1, 160+(BAR_LENGTH/2));
-        render_blank_box(prevGraph, 210, graphPos, 218, colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
+        }
+
+        perfPercentage = (RAM_BAR_LENGTH * ((f32)ramsizeSegment[i] / ramsize));
+        graphPos = (prevGraph + CLAMP(perfPercentage, 1, RAM_BAR_MAX));
+        render_blank_box(prevGraph, RAM_BAR_TOP, graphPos, RAM_BAR_BOTTOM,
+            colourChart[i][0],
+            colourChart[i][1],
+            colourChart[i][2], 255);
         prevGraph = graphPos;
     }
-    perfPercentage = (f32)ramsizeSegment[32]/ramsize;
-    graphPos = prevGraph + CLAMP((BAR_LENGTH*perfPercentage), 1, 160+(BAR_LENGTH/2));
-    render_blank_box(prevGraph, 210, graphPos, 218, 255, 255, 255, 255);
+
+    perfPercentage = (RAM_BAR_LENGTH * ((f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize));
+    graphPos = (prevGraph + CLAMP(perfPercentage, 1, RAM_BAR_MAX));
+    render_blank_box(prevGraph, RAM_BAR_TOP, graphPos, RAM_BAR_BOTTOM, 255, 255, 255, 255);
     prevGraph = graphPos;
 
-    render_blank_box(prevGraph, 210, 160+(BAR_LENGTH/2), 218, 0, 0, 0, 255);
+    render_blank_box(prevGraph, RAM_BAR_TOP, RAM_BAR_MAX, RAM_BAR_BOTTOM, 0, 0, 0, 255);
 
     finish_blank_box();
 }
-//Another epic lookup table, for text this time.
-const char ramNames[9][32] = {
+
+// Another epic lookup table, for text this time.
+const char ramNames[8][32] = {
     "Buffers",
     "Main",
     "Engine",
@@ -225,68 +267,146 @@ const char ramNames[9][32] = {
     "Pools",
     "Collision",
     "Audio Heap",
-    "Audio Pools",
 };
 
-s8 nameTable = sizeof(ramNames)/32;
+s8 nameTable = sizeof(ramNames) / NUM_TLB_SEGMENTS;
 
-void print_ram_overview(void)
-{
+void print_ram_overview(void) {
     s32 i = 0;
     char textBytes[32];
     s32 x = 80;
     s32 y = 16;
     s32 drawn = 0;
     prepare_blank_box();
-    render_blank_box(0, 0, 320, 240, 0, 0, 0, 192);
+    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
     finish_blank_box();
 
-    for (i = 0; i < 33; i++)
-    {
-        if (drawn == 16)
-        {
+    for (i = 0; i <= NUM_TLB_SEGMENTS; i++) {
+        if (drawn == 16) {
             x = 240;
-            y = 16;
+            y =  16;
         }
-        if (ramsizeSegment[i] == 0)
+
+        if (ramsizeSegment[i] == 0) {
             continue;
-        if (i < 9)
-        {
+        }
+
+        if (i < 8) {
             sprintf(textBytes, "%s: %X", ramNames[i], ramsizeSegment[i]);
+        } else {
+            sprintf(textBytes, "Segment %02X: %X", ((i - nameTable) + 2), ramsizeSegment[i]);
         }
-        else
-        {
-            sprintf(textBytes, "Segment %02X: %X",i-nameTable+2, ramsizeSegment[i]);
-        }
+
         print_set_envcolour(colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
-        print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL);
+        print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
         y += 12;
         drawn++;
     }
+
+    sprintf(textBytes, "RAM: %06X/%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available() / (f32)mempool) * 100));
+    print_small_text(SCREEN_CENTER_X, (SCREEN_HEIGHT - 16), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+
+    print_ram_bar();
 }
 
-void benchmark_custom(void)
-{
-    if (benchmarkLoop == 0 || benchOption != 2)
-        return;
-    OSTime lastTime;
-    while (TRUE)
-    {
-        lastTime = osGetTime();
-        //Insert your function here!
+const char *audioPoolNames[NUM_AUDIO_POOLS] = {
+    "gAudioInitPool",
+    "gNotesAndBuffersPool",
+    "gSeqLoadedPool.persistent.pool",
+    "gSeqLoadedPool.temporary.pool",
+    "gBankLoadedPool.persistent.pool",
+    "gBankLoadedPool.temporary.pool",
+#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+    "gBetterReverbPool",
+#endif
+};
 
-        if (benchmarkLoop > 0 && benchOption == 2)
-        {
+void print_audio_ram_overview(void) {
+    char textBytes[128];
+    const s32 x = 16;
+    s32 y = 16;
+    s32 i =  0;
+    s32 percentage = 0;
+    s32 tmpY = y;
+    s32 totalMemory[2] = { 0, 0 };
+    s32 audioPoolSizes[NUM_AUDIO_POOLS][2];
+    prepare_blank_box();
+    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
+    finish_blank_box();
+
+    puppyprint_get_allocated_pools(audioPoolSizes[0]);
+
+    y += 24;
+    for (i = 0; i < NUM_AUDIO_POOLS; i++) {
+        if (audioPoolSizes[i][0] == 0) {
+            percentage = 1000;
+        } else {
+            percentage = (((s64) audioPoolSizes[i][1] * 1000) / audioPoolSizes[i][0]);
+        }
+
+        sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
+                audioPoolSizes[i][1],
+                audioPoolSizes[i][0],
+                percentage / 10,
+                percentage % 10);
+
+        print_set_envcolour(colourChart[i][0],
+                            colourChart[i][1],
+                            colourChart[i][2], 255);
+        print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+
+        y += 12;
+
+        totalMemory[0] += audioPoolSizes[i][0];
+        totalMemory[1] += audioPoolSizes[i][1];
+    }
+
+    if (totalMemory[0] == 0) {
+        percentage = 0;
+    } else {
+        percentage = (((s64) totalMemory[1] * 1000) / totalMemory[0]);
+    }
+    if (totalMemory[0] == gAudioHeapSize) {
+        sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d_)",
+                totalMemory[1],
+                totalMemory[0],
+                percentage / 10,
+                percentage % 10);
+    } else {
+        sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (Incorrect!)",
+                totalMemory[1],
+                totalMemory[0]);
+    }
+
+    print_set_envcolour(colourChart[30][0],
+                        colourChart[30][1],
+                        colourChart[30][2], 255);
+    print_small_text(x, tmpY, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+}
+
+void benchmark_custom(void) {
+    if ((benchmarkLoop == 0)
+     || (benchOption != 2)) {
+        return;
+    }
+
+    OSTime lastTime;
+    while (TRUE) {
+        lastTime = osGetTime();
+        // Insert your function here!
+
+        if ((benchmarkLoop > 0)
+         && (benchOption == 2)) {
             benchmarkLoop--;
-            benchMark[benchmarkLoop] = osGetTime() - lastTime;
-            if (benchmarkLoop == 0)
-            {
+
+            benchMark[benchmarkLoop] = (osGetTime() - lastTime);
+            if (benchmarkLoop == 0) {
                 puppyprint_profiler_finished();
                 break;
             }
-        }
-        else
+        } else {
             break;
+        }
     }
 }
 
@@ -296,763 +416,846 @@ const char benchNames[][32] = {
     "Custom",
 };
 
-void print_which_benchmark(void)
-{
+void print_which_benchmark(void) {
     char textBytes[40];
 
     prepare_blank_box();
-    render_blank_box(110, 115, 210, 160, 0, 0, 0, 255);
+    render_blank_box((SCREEN_CENTER_X - 50), 115, (SCREEN_CENTER_X + 50), 160, 0, 0, 0, 255);
     finish_blank_box();
     sprintf(textBytes, "Select Option#%s#L: Confirm", benchNames[benchOption]);
-    print_small_text(160,120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL);
+    print_small_text(SCREEN_CENTER_X, 120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
 }
 
 char consoleLogTable[LOG_BUFFER_SIZE][255];
 
-void append_puppyprint_log(char str[255])
-{
-    s32 i;
-    for (i = 0; i < LOG_BUFFER_SIZE-1; i++)
-    {
-        memcpy(consoleLogTable[i], consoleLogTable[i+1], 255);
-    }
-        memcpy(consoleLogTable[LOG_BUFFER_SIZE-1], str, 255);
+static char *write_to_buf(char *buffer, const char *data, size_t size) {
+    return (char *) memcpy(buffer, data, size) + size;
 }
 
-#define LINE_HEIGHT 8 + ((LOG_BUFFER_SIZE-1)*12)
-void print_console_log(void)
-{
+void append_puppyprint_log(const char *str, ...) {
+    s32 i;
+    char textBytes[255];
+
+    memset(textBytes, 0, sizeof(textBytes));
+    va_list arguments;
+    va_start(arguments, str);
+    if ((_Printf(write_to_buf, textBytes, str, arguments)) <= 0) {
+        va_end(arguments);
+        return;
+    }
+#ifdef UNF
+    osSyncPrintf(textBytes);
+#endif
+    for (i = 0; i < (LOG_BUFFER_SIZE - 1); i++) {
+        memcpy(consoleLogTable[i], consoleLogTable[i + 1], 255);
+    }
+    memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, 255);
+    va_end(arguments);
+}
+
+#define LINE_HEIGHT (8 + ((LOG_BUFFER_SIZE - 1) * 12))
+void print_console_log(void) {
     s32 i;
     prepare_blank_box();
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 96);
     finish_blank_box();
-    for (i = 0; i < LOG_BUFFER_SIZE; i++)
-    {
-        if (consoleLogTable[i] == NULL)
+
+    for (i = 0; i < LOG_BUFFER_SIZE; i++) {
+        if (consoleLogTable[i] == NULL) {
             continue;
-        print_small_text(16, (LINE_HEIGHT)-(i*12), consoleLogTable[i], PRINT_TEXT_ALIGN_LEFT, PRINT_ALL);
+        }
+        print_small_text(16, (LINE_HEIGHT - (i * 12)), consoleLogTable[i], PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
     }
 }
 #undef LINE_HEIGHT
 
+extern u8 viewCycle;
+extern s16 gVisualSurfaceCount;
+#ifndef VISUAL_DEBUG
+    #define gVisualSurfaceCount 0
+#endif
+
+void puppyprint_render_collision(void) {
+    char textBytes[200];
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+    sprintf(textBytes, "Collision:<COL_99505099> %dc", collisionTime[NUM_PERF_ITERATIONS]);
+#else
+    sprintf(textBytes, "Collision:<COL_99505099> %dus", collisionTime[NUM_PERF_ITERATIONS]);
+#endif
+    print_small_text(304, 48, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
+
+    sprintf(textBytes, "Pool Size: %X#Node Size: %X#Surfaces Allocated: %d#Nodes Allocated: %d#Current Cell: %d", (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)), (SURFACE_POOL_SIZE * sizeof(struct Surface)),
+            gSurfacesAllocated, gSurfaceNodesAllocated, gVisualSurfaceCount);
+    print_small_text(304, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
+
+
+#ifdef VISUAL_DEBUG
+    print_small_text(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
+    switch (viewCycle) {
+        case 0: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 1: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 2: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 3: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+    }
+    if (gPlayer1Controller->buttonPressed & R_JPAD) viewCycle++;
+    if (gPlayer1Controller->buttonPressed & L_JPAD) viewCycle--;
+
+    if (viewCycle == 4) {
+        viewCycle = 0;
+    }
+    if (viewCycle == 255) {
+        viewCycle = 3;
+    }
+
+    hitboxView  = ((viewCycle == 1) || (viewCycle == 3));
+    surfaceView = ((viewCycle == 2) || (viewCycle == 3));
+#endif
+}
+
+struct CPUBar {
+    u32 *time;
+    ColorRGB colour;
+    const char str[32];
+};
+
 extern void print_fps(s32 x, s32 y);
 
-void puppyprint_render_profiler(void)
-{
-    s32 perfPercentage[5];
+struct CPUBar cpu_ordering_table[] = {
+    { collisionTime, COLOR_RGB_RED,     { "Collision: <COL_99505099>" }},
+    {     graphTime, COLOR_RGB_BLUE,    {     "Graph: <COL_50509999>" }},
+    { behaviourTime, COLOR_RGB_GREEN,   { "Behaviour: <COL_50995099>" }},
+    {     audioTime, COLOR_RGB_YELLOW,  {     "Audio: <COL_99995099>" }},
+    {    cameraTime, COLOR_RGB_CYAN,    {    "Camera: <COL_50999999>" }},
+    {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_99509999>" }},
+};
+
+#define CPU_TABLE_MAX (sizeof(cpu_ordering_table) / sizeof(struct CPUBar))
+#define ADDTIMES MAX(((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX]) / 80), 1)
+
+void print_basic_profiling(void) {
+    char textBytes[90];
+    print_fps(16, 40);
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+    sprintf(textBytes, "CPU: %dc (%d_)#RSP: %dc (%d_)#RDP: %dc (%d_)",
+            cpuTime, (cpuTime / 15625),
+            rspTime, (rspTime / 15625),
+            rdpTime, (rdpTime / 15625));
+#else
+    sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)",
+            cpuTime, (cpuTime / 333),
+            rspTime, (rspTime / 333),
+            rdpTime, (rdpTime / 333));
+#endif
+    print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+}
+
+void puppyprint_render_standard(void) {
+    s32 perfPercentage[CPU_TABLE_MAX];
     s32 graphPos;
     s32 prevGraph;
-    OSTime cpuCount = OS_CYCLES_TO_USEC(cpuTime+audioTime[NUM_PERF_ITERATIONS]+dmaAudioTime[NUM_PERF_ITERATIONS]);
+    u32 i;
+    s32 viewedNums;
     char textBytes[80];
 
-    if (!fDebug)
-        return;
+    print_basic_profiling();
 
-    sprintf(textBytes, "RAM: %06X /%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available()/(f32)mempool)*100));
-    print_small_text(160, 224, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL);
+    sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
+    print_small_text(16, 124, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
-    if (!ramViewer && !benchViewer && !logViewer)
-    {
-        print_fps(16,40);
-        sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)", (s32)cpuCount, (s32)OS_CYCLES_TO_USEC(cpuTime)/333, (s32)OS_CYCLES_TO_USEC(rspTime), (s32)OS_CYCLES_TO_USEC(rspTime)/333, (s32)OS_CYCLES_TO_USEC(rdpTime), (s32)OS_CYCLES_TO_USEC(rdpTime)/333);
-        print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL);
-
-        sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
-        print_small_text(16, 124, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL);
-
-        //Very little point printing useless info if Mayro doesn't even exist.
-        if (gMarioState->marioObj)
-        {
-            sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X", (s32)(gMarioState->pos[0]), (s32)(gMarioState->pos[1]), (s32)(gMarioState->pos[2]), (u16)(gMarioState->faceAngle[1]));
-            print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL);
-        }
-        //Same for the camera, especially so because this will crash otherwise.
-        if (gCamera)
-        {
-            sprintf(textBytes, "Camera Pos#X: %d#Y: %d#Z: %d#D: %X", (s32)(gCamera->pos[0]), (s32)(gCamera->pos[1]), (s32)(gCamera->pos[2]), (u16)(gCamera->yaw));
-            print_small_text(304, 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL);
-        }
-
-        if (benchmarkTimer > 0)
-        {
-            benchmarkTimer--;
-            prepare_blank_box();
-            //sprintf(textBytes, "Benchmark: %dus#High: %dus", (s32)OS_CYCLES_TO_USEC(benchMark[NUM_BENCH_ITERATIONS]), (s32)OS_CYCLES_TO_USEC(benchMark[NUM_BENCH_ITERATIONS+1]));
-            sprintf(textBytes, "Done in %0.000f seconds#Benchmark: %dus#High: %dus", (f32)(benchmarkProgramTimer)*0.000001f, (s32)OS_CYCLES_TO_USEC(benchMark[NUM_BENCH_ITERATIONS]), (s32)OS_CYCLES_TO_USEC(benchMark[NUM_BENCH_ITERATIONS+1]));
-            render_blank_box(160-(get_text_width(textBytes)/2)-4, 158, 160+(get_text_width(textBytes)/2)+4, 196, 0, 0, 0, 255);
-            print_set_envcolour(255, 255, 255, 255);
-            print_small_text(160, 160, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL);
-            finish_blank_box();
-        }
-
-        #define ADDTIMES MAX((collisionTime[NUM_PERF_ITERATIONS] + graphTime[NUM_PERF_ITERATIONS] + behaviourTime[NUM_PERF_ITERATIONS] + audioTime[NUM_PERF_ITERATIONS] + dmaTime[NUM_PERF_ITERATIONS])/80, 1)
-        perfPercentage[0] = MAX((collisionTime[NUM_PERF_ITERATIONS]/ADDTIMES), 1);
-        perfPercentage[1] = MAX((graphTime[NUM_PERF_ITERATIONS]/ADDTIMES), 1);
-        perfPercentage[2] = MAX((behaviourTime[NUM_PERF_ITERATIONS]/ADDTIMES), 1);
-        perfPercentage[3] = MAX((audioTime[NUM_PERF_ITERATIONS]/ADDTIMES), 1);
-        perfPercentage[4] = MAX((dmaTime[NUM_PERF_ITERATIONS]/ADDTIMES), 1);
-        #undef ADDTIMES
-
-        sprintf(textBytes, "Collision: <COL_99505099>%dus", (s32)OS_CYCLES_TO_USEC(collisionTime[NUM_PERF_ITERATIONS]));
-        print_small_text(304, 40, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL);
-        sprintf(textBytes, "Graph: <COL_50509999>%dus", (s32)OS_CYCLES_TO_USEC(graphTime[NUM_PERF_ITERATIONS]));
-        print_small_text(304, 52, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL);
-        sprintf(textBytes, "Behaviour: <COL_50995099>%dus", (s32)OS_CYCLES_TO_USEC(behaviourTime[NUM_PERF_ITERATIONS]));
-        print_small_text(304, 64, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL);
-        sprintf(textBytes, "Audio: <COL_99995099>%dus", (s32)OS_CYCLES_TO_USEC(audioTime[NUM_PERF_ITERATIONS]));
-        print_small_text(304, 76, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL);
-        sprintf(textBytes, "DMA: <COL_99509999>%dus", (s32)OS_CYCLES_TO_USEC(dmaTime[NUM_PERF_ITERATIONS]));
-        print_small_text(304, 88, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL);
-
-        //Render CPU breakdown bar.
-        prepare_blank_box();
-        graphPos = 224 + perfPercentage[0];
-        render_blank_box(224, 104, graphPos, 112, 255, 0, 0, 255);
-        prevGraph = graphPos;
-        graphPos += perfPercentage[1];
-        render_blank_box(prevGraph, 104, graphPos, 112, 0, 0, 255, 255);
-        prevGraph = graphPos;
-        graphPos += perfPercentage[2];
-        render_blank_box(prevGraph, 104, graphPos, 112, 0, 255, 0, 255);
-        prevGraph = graphPos;
-        graphPos += perfPercentage[3];
-        render_blank_box(prevGraph, 104, graphPos, 112, 255, 255, 0, 255);
-        prevGraph = graphPos;
-        graphPos += perfPercentage[4];
-        render_blank_box(prevGraph, 104, 304, 112, 255, 0, 255, 255);
+#ifndef ENABLE_CREDITS_BENCHMARK
+    // Very little point printing useless info if Mario doesn't even exist.
+    if (gMarioState->marioObj) {
+        sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
+            (s32)(gMarioState->pos[0]),
+            (s32)(gMarioState->pos[1]),
+            (s32)(gMarioState->pos[2]),
+            (u16)(gMarioState->faceAngle[1]),
+            (u32)(gMarioState->action & ACT_ID_MASK));
+        print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
     }
-    else
-    if (ramViewer)
-        print_ram_overview();
-    else
-    if (logViewer)
-        print_console_log();
-    else
-    if (benchViewer)
-        print_which_benchmark();
+    // Same for the camera, especially so because this will crash otherwise.
+    if (gCamera) {
+        sprintf(textBytes, "Camera Pos#X: %d#Y: %d#Z: %d#D: %X",
+            (s32)(gCamera->pos[0]),
+            (s32)(gCamera->pos[1]),
+            (s32)(gCamera->pos[2]),
+            (u16)(gCamera->yaw));
+        print_small_text((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+    }
+#endif
 
-    print_ram_bar();
+    // Just to keep screen estate a little friendlier.
+#define MX NUM_PERF_ITERATIONS
+    for (i = 0; i < CPU_TABLE_MAX; i++) {
+        perfPercentage[i] = MAX((cpu_ordering_table[i].time[MX] / ADDTIMES), 0);
+    }
+#undef ADDTIMES
+#undef MX
+
+    viewedNums = 0;
+    for (i = 0; i < CPU_TABLE_MAX; i++) {
+        s32 num = cpu_ordering_table[i].time[NUM_PERF_ITERATIONS];
+        if (num != 0) {
+#ifdef PUPPYPRINT_DEBUG_CYCLES
+            sprintf(textBytes, "%s%dc", cpu_ordering_table[i].str, num);
+#else
+            sprintf(textBytes, "%s%dus", cpu_ordering_table[i].str, num);
+#endif
+            print_small_text((SCREEN_WIDTH - 16), (40 + (viewedNums * 12)), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+            viewedNums++;
+        }
+    }
+
+    s32 barY = (28 + (viewedNums * 12)) + 16;
+    prepare_blank_box();
+    viewedNums = 0;
+
+    // Render CPU breakdown bar.
+    for (i = 0; i < CPU_TABLE_MAX; i++) {
+        if (perfPercentage[i] == 0
+            && (i != CPU_TABLE_MAX - 1)) {
+            continue;
+        }
+
+        if (viewedNums == 0) {
+            graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
+            render_blank_box((SCREEN_WIDTH - 96), barY, graphPos, (barY + 8),
+                cpu_ordering_table[i].colour[0],
+                cpu_ordering_table[i].colour[1],
+                cpu_ordering_table[i].colour[2], 255);
+        } else if (i == (CPU_TABLE_MAX - 1)) {
+            graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
+            render_blank_box(prevGraph, barY, (SCREEN_WIDTH - 16), (barY + 8),
+                cpu_ordering_table[i].colour[0],
+                cpu_ordering_table[i].colour[1],
+                cpu_ordering_table[i].colour[2], 255);
+        } else {
+            graphPos += perfPercentage[i];
+            render_blank_box(prevGraph, barY, graphPos, (barY + 8),
+                cpu_ordering_table[i].colour[0],
+                cpu_ordering_table[i].colour[1],
+                cpu_ordering_table[i].colour[2], 255);
+        }
+
+        viewedNums++;
+        prevGraph = graphPos;
+    }
+
+    finish_blank_box();
 }
 
-void profiler_update(OSTime *time, OSTime time2)
-{
-    time[perfIteration] = osGetTime() - time2;
+void puppyprint_render_minimal(void) {
+    print_basic_profiling();
 }
 
-void get_average_perf_time(OSTime *time)
-{
-    //This takes all but the last index of the timer array, and creates an average value, which is written to the last index.
-    s32 i = 0;
+struct PuppyPrintPage ppPages[] = {
+    {&puppyprint_render_standard,  "Standard" },
+    {&puppyprint_render_minimal,   "Minimal"  },
+    {&print_audio_ram_overview,    "Audio"    },
+    {&print_ram_overview,          "Segments" },
+    {&puppyprint_render_collision, "Collision"},
+    {&print_console_log,           "Log"      },
+};
+
+#define MENU_BOX_WIDTH 128
+#define MAX_DEBUG_OPTIONS (sizeof(ppPages) / sizeof(struct PuppyPrintPage))
+
+void render_page_menu(void) {
+    s32 i;
+    s32 posY;
+    s32 scrollY = (36 / (MAX_DEBUG_OPTIONS - 1));
+
+    prepare_blank_box();
+    render_blank_box(32, 32, (32 + MENU_BOX_WIDTH), (32 + 72), 0x00, 0x00, 0x00, 0xC0);
+    render_blank_box(((32 + MENU_BOX_WIDTH) - 8), (32 + (scrollY * sDebugOption)), (32 + MENU_BOX_WIDTH), (32 + (scrollY * sDebugOption) + 36), 0xFF, 0xFF, 0xFF, 0xFF);
+    finish_blank_box();
+
+    for (i = 0; i < (s32)MAX_DEBUG_OPTIONS; i++) {
+        s32 yOffset = ((sDebugOption > 5) ? (sDebugOption - 5) : 0);
+        posY = (38 + ((i - yOffset) * 10));
+        if ((posY > 32) && (posY < 90)) {
+            if (sDebugOption == i) {
+                print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
+            } else {
+                print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
+            }
+
+            print_small_text((28 + (MENU_BOX_WIDTH / 2)), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
+        }
+    }
+}
+
+void puppyprint_render_profiler(void) {
+    OSTime first = osGetTime();
+
+    print_set_envcolour(255, 255, 255, 255);
+
+    if (!fDebug) {
+        profiler_update(profilerTime, first);
+        return;
+    }
+
+    (ppPages[sPPDebugPage].func)();
+
+    if (sDebugMenu) {
+        render_page_menu();
+    }
+    profiler_update(profilerTime, first);
+}
+
+void profiler_update(u32 *time, OSTime time2) {
+    time[perfIteration] = (osGetTime() - time2);
+}
+
+void get_average_perf_time(u32 *time, s32 is_rdp) {
+    // This takes all but the last index of the timer array, and creates an average value, which is written to the last index.
+    s32 i     = 0;
     s32 total = 0;
-    for (i = 0; i < NUM_PERF_ITERATIONS-1; i++)
-    {
+    for (i = 0; i < NUM_PERF_ITERATIONS; i++) {
         total += time[i];
     }
-    time[NUM_PERF_ITERATIONS] = total/NUM_PERF_ITERATIONS;
+
+    total /= NUM_PERF_ITERATIONS;
+    total = MAX(total, 0);
+    if (is_rdp)
+    {
+        time[NUM_PERF_ITERATIONS] = RDP_CYCLE_CONV(total);
+    }
+    else
+    {
+        time[NUM_PERF_ITERATIONS] = CYCLE_CONV(total);
+    }
 }
 
-void puppyprint_profiler_process(void)
-{
+void puppyprint_profiler_process(void) {
     bufferTime[perfIteration] = (IO_READ(DPC_BUFBUSY_REG));
-    tmemTime[perfIteration] = (IO_READ(DPC_TMEM_REG));
-    busTime[perfIteration] = (IO_READ(DPC_PIPEBUSY_REG));
+      tmemTime[perfIteration] = (IO_READ(DPC_TMEM_REG));
+       busTime[perfIteration] = (IO_READ(DPC_PIPEBUSY_REG));
     OSTime newTime = osGetTime();
 
-    if (gGlobalTimer % 15 == 0)
-    {
-        get_average_perf_time(scriptTime);
-        get_average_perf_time(behaviourTime);
-        get_average_perf_time(collisionTime);
-        get_average_perf_time(graphTime);
-        get_average_perf_time(audioTime);
-        get_average_perf_time(dmaTime);
-        get_average_perf_time(dmaAudioTime);
+    if (fDebug && (gPlayer1Controller->buttonPressed & L_TRIG)) {
+        sDebugMenu ^= TRUE;
+        if (sDebugMenu == FALSE) {
+            sPPDebugPage = sDebugOption;
+        }
+    }
 
-        dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
+    if ((gPlayer1Controller->buttonPressed & (L_TRIG | U_JPAD))
+        && (gPlayer1Controller->buttonDown & L_TRIG)
+        && (gPlayer1Controller->buttonDown & U_JPAD)
+    ) {
+        fDebug    ^= TRUE;
+        sDebugMenu = FALSE;
+    }
 
-        get_average_perf_time(rspGenTime);
+    if (sDebugMenu) {
+        if (gPlayer1Controller->buttonPressed & U_JPAD) sDebugOption--;
+        if (gPlayer1Controller->buttonPressed & D_JPAD) sDebugOption++;
 
-        get_average_perf_time(bufferTime);
-        get_average_perf_time(tmemTime);
-        get_average_perf_time(busTime);
+        if (sDebugOption == 255) {
+            sDebugOption = ((sizeof(ppPages) / sizeof(struct PuppyPrintPage)) - 1);
+        }
+
+        if (sDebugOption >= (sizeof(ppPages) / sizeof(struct PuppyPrintPage))) {
+            sDebugOption = 0;
+        }
+    }
+
+    if (!(gGlobalTimer % NUM_PERF_ITERATIONS)) {
+        get_average_perf_time(    scriptTime, FALSE);
+        get_average_perf_time( behaviourTime, FALSE);
+        get_average_perf_time( collisionTime, FALSE);
+        get_average_perf_time(     graphTime, FALSE);
+        get_average_perf_time(     audioTime, FALSE);
+        get_average_perf_time(       dmaTime, FALSE);
+        get_average_perf_time(  dmaAudioTime, FALSE);
+        get_average_perf_time(     faultTime, FALSE);
+        get_average_perf_time(      taskTime, FALSE);
+        get_average_perf_time(  profilerTime, FALSE);
+        get_average_perf_time( profilerTime2, FALSE);
+        get_average_perf_time(    cameraTime, FALSE);
+
+        // Performed twice a frame without fail, so doubled to have a more representative value.
+           audioTime[NUM_PERF_ITERATIONS] *= 2;
+        dmaAudioTime[NUM_PERF_ITERATIONS] *= 2;
+             dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
+
+        get_average_perf_time(rspGenTime, FALSE);
+
+        get_average_perf_time(bufferTime, TRUE);
+        get_average_perf_time(  tmemTime, TRUE);
+        get_average_perf_time(   busTime, TRUE);
 
         rdpTime = bufferTime[NUM_PERF_ITERATIONS];
         rdpTime = MAX(rdpTime, tmemTime[NUM_PERF_ITERATIONS]);
-        rdpTime = MAX(rdpTime, busTime[NUM_PERF_ITERATIONS]);
-        cpuTime = scriptTime[NUM_PERF_ITERATIONS];
-        rspTime = rspGenTime[NUM_PERF_ITERATIONS];
+        rdpTime = MAX(rdpTime,  busTime[NUM_PERF_ITERATIONS]);
+#if BBPLAYER == 1 // iQue RDP registers need to be halved to be correct.
+        rdpTime /= 2;
+#endif
+        cpuTime = (scriptTime[NUM_PERF_ITERATIONS]
+                 +   taskTime[NUM_PERF_ITERATIONS]
+                 +  faultTime[NUM_PERF_ITERATIONS]
+                 +  audioTime[NUM_PERF_ITERATIONS]);
+        rspTime =  rspGenTime[NUM_PERF_ITERATIONS];
         puppyprint_calculate_ram_usage();
     }
 
     gLastOSTime = newTime;
-    if (gGlobalTimer > 5)
-        IO_WRITE(DPC_STATUS_REG, DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR);
-
-    if (fDebug)
-    {
-        if (gPlayer1Controller->buttonPressed & D_JPAD)
-        {
-            benchViewer ^= 1;
-            ramViewer = 0;
-            logViewer = 0;
-        }
-        else
-        if (gPlayer1Controller->buttonPressed & U_JPAD)
-        {
-            ramViewer ^= 1;
-            benchViewer = 0;
-            logViewer = 0;
-        }
-        else
-        if (gPlayer1Controller->buttonPressed & L_JPAD)
-        {
-            logViewer ^= 1;
-            ramViewer = 0;
-            benchViewer = 0;
-        }
-        #ifdef VISUAL_DEBUG
-        else
-        if (!benchViewer && !ramViewer && !logViewer)
-        {
-            debug_box_input();
-        }
-        #endif
-        if (benchViewer)
-        {
-            if (gPlayer1Controller->buttonPressed & R_JPAD)
-                benchOption++;
-            if (gPlayer1Controller->buttonPressed & L_JPAD)
-                benchOption--;
-            if (benchOption == 255)
-                benchOption = 2;
-            if (benchOption > 2)
-                benchOption = 0;
-            if (gPlayer1Controller->buttonPressed & L_TRIG)
-            {
-                benchmarkLoop = NUM_BENCH_ITERATIONS;
-                benchmarkProgramTimer = osGetTime();
-            }
-        }
-        benchmark_custom();
+    if (gGlobalTimer > 5) {
+        IO_WRITE(DPC_STATUS_REG, (DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR));
     }
-    if (gPlayer1Controller->buttonDown & U_JPAD && gPlayer1Controller->buttonPressed & L_TRIG)
-    {
-        ramViewer = 0;
-        benchViewer = 0;
-        fDebug ^= 1;
-    }
-
-
-    if (perfIteration++ == NUM_PERF_ITERATIONS-1)
+    if (perfIteration++ == (NUM_PERF_ITERATIONS - 1)) {
         perfIteration = 0;
+    }
+    profiler_update(profilerTime2, newTime);
 }
 #endif
 
-void print_set_envcolour(s32 r, s32 g, s32 b, s32 a)
-{
-    if (r != currEnv[0] || g != currEnv[1] || b != currEnv[2] || a != currEnv[3])
-    {
-        gDPSetEnvColor(gDisplayListHead++, (u8)r, (u8)g, (u8)b, (u8)a);
-        currEnv[0] = r;
-        currEnv[1] = g;
-        currEnv[2] = b;
-        currEnv[3] = a;
+void print_set_envcolour(s32 r, s32 g, s32 b, s32 a) {
+    if ((r != currEnv[0])
+        || (g != currEnv[1])
+        || (b != currEnv[2])
+        || (a != currEnv[3])) {
+        gDPSetEnvColor(gDisplayListHead++, (Color)r, (Color)g, (Color)b, (Color)a);
+        vec4_set(currEnv, r, g, b, a);
     }
 }
 
 #define BLANK 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
 
-void prepare_blank_box(void)
-{
+void prepare_blank_box(void) {
     gDPSetCombineMode(gDisplayListHead++, BLANK, BLANK);
 }
 
-void finish_blank_box(void)
-{
+void finish_blank_box(void) {
     print_set_envcolour(255, 255, 255, 255);
-    gSPDisplayList(gDisplayListHead++,dl_hud_img_end);
+    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
 }
 
-//This does some epic shenanigans to figure out the optimal way to draw this.
-//If the width is a multiple of 4, then use fillmode (fastest)
-//Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
-void render_blank_box(s16 x1, s16 y1, s16 x2, s16 y2, u8 r, u8 g, u8 b, u8 a)
-{
+// This does some epic shenanigans to figure out the optimal way to draw this.
+// If the width is a multiple of 4, then use fillmode (fastest)
+// Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
+void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a) {
     s32 cycleadd = 0;
-    if (ABS(x1 - x2) % 4 == 0 && a == 255)
-    {
-        gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
+    if (((absi(x1 - x2) % 4) == 0) && (a == 255)) {
+        gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP);
         cycleadd = 1;
-    }
-    else
-    {
+    } else {
         gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
-        if (a == 255)
-        {
+        if (a == 255) {
             gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
-        }
-        else
-        {
+        } else {
             gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         }
         cycleadd = 0;
     }
+
     gDPPipeSync(gDisplayListHead++);
-    gDPSetFillColor(gDisplayListHead++, GPACK_RGBA5551(r, g, b, 1) << 16 | GPACK_RGBA5551(r, g, b, 1));
+    gDPSetFillColor(gDisplayListHead++, (GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1));
     print_set_envcolour(r, g, b, a);
-    gDPFillRectangle(gDisplayListHead++, x1, y1, x2-cycleadd, y2-cycleadd);
+    gDPFillRectangle(gDisplayListHead++, x1, y1, x2 - cycleadd, y2 - cycleadd);
 }
 
+extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
+extern void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font);
 
-u8 textLen[] = {
-    /*0*/ 6, /*1*/ 5, /*2*/ 7, /*3*/ 7, /*4*/ 7, /*5*/ 7, /*6*/ 8, /*7*/ 7, /*8*/ 7, /*9*/ 6, /*-*/ 8, /*+*/ 8, /*(*/ 5, /*)*/ 5, /*!*/ 4, /*?*/ 6,
-    /*A*/ 7, /*B*/ 7, /*C*/ 7, /*D*/ 7, /*E*/ 6, /*F*/ 5, /*G*/ 8, /*H*/ 6, /*I*/ 6, /*J*/ 5, /*K*/ 7, /*L*/ 6, /*M*/ 7, /*N*/ 7, /*O*/ 7, /*P*/ 6,
-    /*Q*/ 8, /*R*/ 6, /*S*/ 7, /*T*/ 7, /*U*/ 7, /*V*/ 7, /*W*/ 8, /*X*/ 7, /*Y*/ 7, /*Z*/ 7, /*"*/ 5, /*'*/ 2, /*:*/ 3, /*;*/ 3, /*.*/ 3, /*,*/ 3,
-    /*a*/ 7, /*b*/ 7, /*c*/ 6, /*d*/ 7, /*e*/ 7, /*f*/ 7, /*g*/ 7, /*h*/ 7, /*i*/ 3, /*j*/ 5, /*k*/ 8, /*l*/ 4, /*m*/ 7, /*n*/ 7, /*o*/ 7, /*p*/ 7,
-    /*q*/ 7, /*r*/ 6, /*s*/ 6, /*t*/ 6, /*u*/ 6, /*v*/ 7, /*w*/ 8, /*x*/ 6, /*y*/ 8, /*z*/ 7, /*~*/ 8, /*..*/ 7, /*^*/ 8, /*/*/ 8, /*%*/ 8, /*&*/ 8,
-};
-
-#include "level_update.h"
-
-void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY)
-{
-    *offsetY = 0;
-    //Line 1
-    if (letter >= '0' && letter <= '9')
-    {
-        *textX = (letter - '0') * 4;
-        *textY = 0;
-        *spaceX = textLen[letter - '0'];
-    }
-    else
-    //Line 2
-    if (letter >= 'A' && letter <= 'P')
-    {
-        *textX = ((letter - 'A') * 4);
-        *textY = 6;
-        *spaceX = textLen[letter - 'A'+16];
-    }
-    else
-    //Line 3
-    if (letter >= 'Q' && letter <= 'Z')
-    {
-        *textX = ((letter - 'Q') * 4);
-        *textY = 12;
-        *spaceX = textLen[letter - 'Q'+32];
-    }
-    else
-    //Line 4
-    if (letter >= 'a' && letter <= 'p')
-    {
-        *textX = ((letter - 'a') * 4);
-        *textY = 18;
-        *spaceX = textLen[letter - 'a'+48];
-    }
-    else
-    //Line 5
-    if (letter >= 'q' && letter <= 'z')
-    {
-        *textX = ((letter - 'q') * 4);
-        *textY = 24;
-        *spaceX = textLen[letter - 'q'+64];
-    }
-    else
-    {//Space, the final frontier.
-        *textX = 128;
-        *textY = 0;
-        *spaceX = 2;
-    }
-
-    switch (letter)
-    {
-        case '-': *textX = 40; *textY = 0; *spaceX = textLen[10]; break; //Hyphen
-        case '+': *textX = 44; *textY = 0; *spaceX = textLen[11]; break; //Plus
-        case '(': *textX = 48; *textY = 0; *spaceX = textLen[12]; break; //Open Bracket
-        case ')': *textX = 52; *textY = 0; *spaceX = textLen[13]; break; //Close Bracket
-        case '!': *textX = 56; *textY = 0; *spaceX = textLen[14]; break; //Exclamation mark
-        case '?': *textX = 60; *textY = 0; *spaceX = textLen[15]; break; //Question mark
-
-        case '"': *textX = 40; *textY = 12; *spaceX = textLen[42]; break; //Speech mark
-        case 0x27: *textX = 44; *textY = 12; *spaceX = textLen[43]; break; //Apostrophe.
-        case ':': *textX = 48; *textY = 12; *spaceX = textLen[44]; break; //Colon
-        case ';': *textX = 52; *textY = 12; *spaceX = textLen[45]; break; //Semicolon
-        case '.': *textX = 56; *textY = 12; *spaceX = textLen[46]; break; //Full stop
-        case ',': *textX = 60; *textY = 12; *spaceX = textLen[47]; break; //Comma
-
-        case '~': *textX = 40; *textY = 24; *spaceX = textLen[74]; break; //Tilde
-        case '@': *textX = 44; *textY = 24; *spaceX = textLen[75]; break; //Umlaut
-        case '^': *textX = 48; *textY = 24; *spaceX = textLen[76]; break; //Caret
-        case '/': *textX = 52; *textY = 24; *spaceX = textLen[77]; break; //Slash
-        case '_': *textX = 56; *textY = 24; *spaceX = textLen[78]; break; //Percent
-        case '&': *textX = 60; *textY = 24; *spaceX = textLen[79]; break; //Ampersand
-
-        //This is for the letters that sit differently on the line. It just moves them down a bit.
-        case 'g': *offsetY = 1; break;
-        case 'q': *offsetY = 1; break;
-        case 'p': *offsetY = 3; break;
-        case 'y': *offsetY = 1; break;
-    }
-}
-
-s8 shakeToggle = 0;
-s8 waveToggle = 0;
-
-s32 text_iterate_command(const char *str, s32 i, s32 runCMD)
-{
-    s32 len = 0;
-    while (str[i+len] != '>' && i+len < (signed)strlen(str))
-        len++;
-    len++;
-
-    if (runCMD)
-    {
-        if (strncmp(str+i, "<COL_xxxxxxxx>", 5) == 0) //Simple text colour effect. goes up to 99 for each, so 99000000 is red.
-        {
-            s32 r, g, b, a;
-            //Each value is taken from the strong. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
-            r = (str[i+5] - '0')*10;
-            r += str[i+6] - '0';
-            g = (str[i+7] - '0')*10;
-            g += str[i+8] - '0';
-            b = (str[i+9] - '0')*10;
-            b += str[i+10] - '0';
-            a = (str[i+11] - '0')*10;
-            a += str[i+12] - '0';
-            //Multiply each value afterwards by 2.575f to make 255.
-            print_set_envcolour(r*2.575f, g*2.575f, b*2.575f, a*2.575f);
-        }
-        else
-        if (strncmp(str+i, "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) //Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
-        {
-            s32 r, g, b, a, r2, g2, b2, a2, spd, r3, g3, b3, a3, r4, g4, b4, a4;
-            r = (str[i+6] - '0')*10;
-            r += str[i+7] - '0';
-            g = (str[i+8] - '0')*10;
-            g += str[i+9] - '0';
-            b = (str[i+10] - '0')*10;
-            b += str[i+11] - '0';
-            a = (str[i+12] - '0')*10;
-            a += str[i+13] - '0';
-            r2 = (str[i+15] - '0')*10;
-            r2 += str[i+16] - '0';
-            g2 = (str[i+17] - '0')*10;
-            g2 += str[i+18] - '0';
-            b2 = (str[i+19] - '0')*10;
-            b2 += str[i+20] - '0';
-            a2 = (str[i+21] - '0')*10;
-            a2 += str[i+22] - '0';
-            spd = (str[i+24] - '0')*10;
-            spd += str[i+25] - '0';
-
-            //Find the median.
-            r3 = (r + r2)*1.2875f;
-            g3 = (g + g2)*1.2875f;
-            b3 = (b + b2)*1.2875f;
-            a3 = (a + a2)*1.2875f;
-            //Find the difference.
-            r4 = (r - r2)*1.2875f;
-            g4 = (g - g2)*1.2875f;
-            b4 = (b - b2)*1.2875f;
-            a4 = (a - a2)*1.2875f;
-            //Now start from the median, and wave from end to end with the difference, to create the fading effect.
-            print_set_envcolour(r3 + ((sins(gGlobalTimer*spd*50)) * r4), g3 + ((sins(gGlobalTimer*spd*50)) * g4), b3 + ((sins(gGlobalTimer*spd*50)) * b4), a3 + ((sins(gGlobalTimer*spd*50)) * a4));
-        }
-        else
-        if (strncmp(str+i, "<RAINBOW>", 8) == 0) //Toggles the happy colours :o) Do it again to disable it.
-        {
-            s32 r, g, b;
-            r = (coss(gGlobalTimer*600)+1)*127;
-            g = (coss((gGlobalTimer*600)+21845)+1)*127;
-            b = (coss((gGlobalTimer*600)-21845)+1)*127;
-            print_set_envcolour(r, g, b, 255);
-        }
-        else
-        if (strncmp(str+i, "<SHAKE>", 7) == 0) //Toggles text that shakes on the spot. Do it again to disable it.
-        {
-            shakeToggle^=1;
-        }
-        else
-        if (strncmp(str+i, "<WAVE>", 6) == 0) //Toggles text that waves around. Do it again to disable it.
-        {
-            waveToggle^=1;
-        }
-
-    }
-
-    return len;
-}
-
-s32 get_text_width(const char *str)
-{
-    s32 i= 0;
+s32 get_text_width(const char *str, s32 font) {
+    s32 i       = 0;
     s32 textPos = 0;
-    s32 wideX = 0;
+    s32 wideX   = 0;
     s32 textX, textY, offsetY, spaceX;
 
-    for (i = 0; i < (signed)strlen(str); i++)
-    {
-    if (str[i] == '#')
-    {
-        i++;
-        textPos = 0;
-    }
-    if (str[i] == '<')
-    {
-        i+= text_iterate_command(str, i, FALSE);
-    }
-    get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY);
-    textPos+=spaceX+1;
-    wideX = MAX(textPos, wideX);
+    for (i = 0; i < (signed)strlen(str); i++) {
+        if (str[i] == '#') {
+            i++;
+            textPos = 0;
+        }
+        if (str[i] == '<') {
+            i += text_iterate_command(str, i, FALSE);
+        }
+
+        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+        textPos += spaceX + 1;
+        wideX = MAX(textPos, wideX);
     }
     return wideX;
 }
 
-s32 get_text_height(const char *str)
-{
+s32 get_text_height(const char *str) {
     s32 i= 0;
     s32 textPos = 0;
 
-    for (i = 0; i < (signed)strlen(str); i++)
-    {
-    if (str[i] == '#')
-    {
-        i++;
-        textPos+=12;
+    for (i = 0; i < (signed)strlen(str); i++) {
+        if (str[i] == '#') {
+            i++;
+            textPos += 12;
+        }
     }
-    }
+
     return textPos;
 }
 
-void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount)
-{
+const Gfx dl_small_text_begin[] = {
+    gsDPPipeSync(),
+    gsDPSetCycleType(    G_CYC_1CYCLE),
+    gsDPSetTexturePersp( G_TP_NONE),
+    gsDPSetCombineMode(  G_CC_FADEA, G_CC_FADEA),
+    gsDPSetTextureFilter(G_TF_POINT),
+    gsSPEndDisplayList(),
+};
+
+s8 shakeToggle = 0;
+s8  waveToggle = 0;
+
+void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 font) {
     s32 textX = 0;
     s32 textY = 0;
     s32 offsetY = 0;
     s32 i = 0;
-    s32 textPos[2] = {0,0};
+    s32 textPos[2] = { 0, 0 };
     s32 spaceX = 0;
-    s32 wideX[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+    s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     s32 tx = amount;
     s32 shakePos[2];
     s32 wavePos;
     s32 lines = 0;
     s32 xlu = currEnv[3];
-    s32 prevxlu = 256; //Set out of bounds, so it will *always* be different at first.
+    s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
+    Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
 
     shakeToggle = 0;
-    waveToggle = 0;
+    waveToggle  = 0;
 
-    if (amount == PRINT_ALL)
+    if (amount == PRINT_ALL) {
         tx = (signed)strlen(str);
-    gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
-    gDPSetTexturePersp(gDisplayListHead++, G_TP_NONE);
-    gDPSetCombineMode(gDisplayListHead++, G_CC_FADEA, G_CC_FADEA);
-    gDPSetTextureFilter(gDisplayListHead++, G_TF_POINT);
-    if (align == PRINT_TEXT_ALIGN_CENTRE)
-    {
-        for (i = 0; i < (signed)strlen(str); i++)
-        {
-        if (str[i] == '#')
-        {
-            i++;
-            textPos[0] = 0;
-            lines++;
-        }
-        if (str[i] == '<')
-        {
-            i+= text_iterate_command(str, i, FALSE);
-        }
-        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY);
-        textPos[0]+=spaceX+1;
-        wideX[lines] = MAX(textPos[0], wideX[lines]);
-        }
-        textPos[0] = -(wideX[0]/2);
     }
-    else
-    if (align == PRINT_TEXT_ALIGN_RIGHT)
-    {
-        for (i = 0; i < (signed)strlen(str); i++)
-        {
-        if (str[i] == '#')
-        {
-            i++;
-            textPos[0] = 0;
-            lines++;
-        }
-        else
-        {
-            textPos[0]+=spaceX+1;
-        }
-        if (str[i] == '<')
-        {
-            i+= text_iterate_command(str, i, FALSE);
-        }
-        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY);
 
-        wideX[lines] = MAX(textPos[0], wideX[lines]);
+    gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
+    if (align == PRINT_TEXT_ALIGN_CENTRE) {
+        for (i = 0; i < (signed)strlen(str); i++) {
+            if (str[i] == '#') {
+                i++;
+                textPos[0] = 0;
+                lines++;
+            }
+
+            if (str[i] == '<') {
+                i += text_iterate_command(str, i, FALSE);
+            }
+
+            get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+            textPos[0] += (spaceX + 1);
+            wideX[lines] = MAX(textPos[0], wideX[lines]);
+        }
+
+        textPos[0] = -(wideX[0] / 2);
+    } else if (align == PRINT_TEXT_ALIGN_RIGHT) {
+        for (i = 0; i < (signed)strlen(str); i++) {
+            if (str[i] == '#') {
+                i++;
+                textPos[0] = 0;
+                lines++;
+            } else {
+                textPos[0] += (spaceX + 1);
+            }
+
+            if (str[i] == '<') {
+                i += text_iterate_command(str, i, FALSE);
+            }
+
+            get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+
+            wideX[lines] = MAX(textPos[0], wideX[lines]);
         }
         textPos[0] = -wideX[0];
     }
+
     lines = 0;
-    gDPLoadTextureBlock_4b(gDisplayListHead++, segmented_to_virtual(small_font), G_IM_FMT_I, 128, 60, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, 0, 0, 0, 0, 0);
-    for (i = 0; i < tx; i++)
-    {
-        if (str[i] == '#')
-        {
+    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    for (i = 0; i < tx; i++) {
+        if (str[i] == '#') {
             i++;
             lines++;
-            if (align == PRINT_TEXT_ALIGN_RIGHT)
-                textPos[0] = -(wideX[lines]);
-            else
-                textPos[0] = -(wideX[lines]/2);
+            if (align == PRINT_TEXT_ALIGN_RIGHT) {
+                textPos[0] = -(wideX[lines]    );
+            } else {
+                textPos[0] = -(wideX[lines] / 2);
+            }
             textPos[1] += 12;
         }
-        if (str[i] == '<')
-        {
-            i+= text_iterate_command(str, i, TRUE);
+
+        if (str[i] == '<') {
+            i += text_iterate_command(str, i, TRUE);
         }
-        if (shakeToggle)
-        {
-            shakePos[0] = -1+(random_u16() % 2);
-            shakePos[1] = -1+(random_u16() % 2);
-        }
-        else
-        {
+
+        if (shakeToggle) {
+            shakePos[0] = (-1 + (random_u16() & 0x1));
+            shakePos[1] = (-1 + (random_u16() & 0x1));
+        } else {
             shakePos[0] = 0;
             shakePos[1] = 0;
         }
-        if (waveToggle)
-        {
-            wavePos = (sins((gGlobalTimer*3000)+(i*10000)))*2;
-        }
-        else
-        {
+
+        if (waveToggle) {
+            wavePos = ((sins((gGlobalTimer * 3000) + (i * 10000))) * 2);
+        } else {
             wavePos = 0;
         }
-        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY);
-        if (xlu != prevxlu)
-        {
+
+        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+        if (xlu != prevxlu) {
             prevxlu = xlu;
-            if (xlu > 250)
-            {
+            if (xlu > 250) {
                 gDPSetRenderMode(gDisplayListHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
-            }
-            else
-            {
+            } else {
                 gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF);
             }
         }
-        gSPScisTextureRectangle(gDisplayListHead++, (x+shakePos[0]+textPos[0]) << 2, (y+shakePos[1]+offsetY+textPos[1]+wavePos) << 2, (x+textPos[0]+shakePos[0]+8) << 2, (y+wavePos+offsetY+shakePos[1]+12+textPos[1]) << 2, G_TX_RENDERTILE, textX << 6, textY << 6, 1 << 10, 1 << 10);
-        textPos[0]+=spaceX+1;
+
+        gSPScisTextureRectangle(gDisplayListHead++, ((x + shakePos[0] + textPos[0]     ) << 2),
+                                                    ((y + shakePos[1] + offsetY + textPos[1] + wavePos) << 2),
+                                                    ((x +  textPos[0] + shakePos[0] + 8) << 2),
+                                                    ((y + wavePos + offsetY + shakePos[1] + 12 + textPos[1]) << 2),
+                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), (1 << 10), (1 << 10));
+        textPos[0] += (spaceX + 1);
     }
+
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
-void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, s32 scaleX, s32 scaleY, s32 mode)
-{
-    s32 posW, posH, imW, imH, peakH, maskW, maskH, cycles, num, i, modeSC, mOne;
-    i = 0;
-    num = 256;
-    maskW = 1;
-    maskH = 1;
+s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
+    s32 len = 0;
+    while ((str[i + len] != '>') && ((i + len) < (signed)strlen(str))) len++;
+    len++;
 
-    if (mode == G_CYC_COPY)
-    {
-        gDPSetCycleType(gDisplayListHead++, mode);
+    if (runCMD) {
+        if (strncmp((str + i), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
+            // Each value is taken from the strong. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
+            s32 r = (((str[i +  5] - '0') * 10)
+                  +   (str[i +  6] - '0'));
+            s32 g = (((str[i +  7] - '0') * 10)
+                  +   (str[i +  8] - '0'));
+            s32 b = (((str[i +  9] - '0') * 10)
+                  +   (str[i + 10] - '0'));
+            s32 a = (((str[i + 11] - '0') * 10)
+                  +   (str[i + 12] - '0'));
+            // Multiply each value afterwards by 2.575f to make 255.
+            print_set_envcolour((r * 2.575f),
+                                (g * 2.575f),
+                                (b * 2.575f),
+                                (a * 2.575f));
+        } else if (strncmp((str + i), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
+            s32 r   = (((str[i +  6] - '0') * 10)
+                    +   (str[i +  7] - '0'));
+            s32 g   = (((str[i +  8] - '0') * 10)
+                    +   (str[i +  9] - '0'));
+            s32 b   = (((str[i + 10] - '0') * 10)
+                    +   (str[i + 11] - '0'));
+            s32 a   = (((str[i + 12] - '0') * 10)
+                    +   (str[i + 13] - '0'));
+            s32 r2  = (((str[i + 15] - '0') * 10)
+                    +   (str[i + 16] - '0'));
+            s32 g2  = (((str[i + 17] - '0') * 10)
+                    +   (str[i + 18] - '0'));
+            s32 b2  = (((str[i + 19] - '0') * 10)
+                    +   (str[i + 20] - '0'));
+            s32 a2  = (((str[i + 21] - '0') * 10)
+                    +   (str[i + 22] - '0'));
+            s32 spd = (((str[i + 24] - '0') * 10)
+                    +   (str[i + 25] - '0'));
+            // Find the median.
+            s32 r3 = (r + r2) * 1.2875f;
+            s32 g3 = (g + g2) * 1.2875f;
+            s32 b3 = (b + b2) * 1.2875f;
+            s32 a3 = (a + a2) * 1.2875f;
+            // Find the difference.
+            s32 r4 = (r - r2) * 1.2875f;
+            s32 g4 = (g - g2) * 1.2875f;
+            s32 b4 = (b - b2) * 1.2875f;
+            s32 a4 = (a - a2) * 1.2875f;
+            // Now start from the median, and wave from end to end with the difference, to create the fading effect.
+            f32 sTimer = sins(gGlobalTimer * spd * 50);
+            print_set_envcolour((r3 + (sTimer * r4)),
+                                (g3 + (sTimer * g4)),
+                                (b3 + (sTimer * b4)),
+                                (a3 + (sTimer * a4)));
+        } else if (strncmp((str + i), "<RAINBOW>", 8) == 0) { // Toggles the happy colours :o) Do it again to disable it.
+            s32 r = (coss( gGlobalTimer * 600         ) + 1) * 127;
+            s32 g = (coss((gGlobalTimer * 600) + 21845) + 1) * 127;
+            s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
+            print_set_envcolour(r, g, b, 255);
+        } else if (strncmp((str + i), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
+            shakeToggle ^= 1;
+        } else if (strncmp((str + i), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
+            waveToggle  ^= 1;
+        }
+    }
+    return len;
+}
+
+void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font) {
+    *offsetY = 0;
+    u8 **textKern = segmented_to_virtual(puppyprint_kerning_lut);
+    u8 *textLen = segmented_to_virtual(textKern[font]);
+
+    if (letter >= '0' && letter <= '9') { // Line 1
+        *textX = ((letter - '0') * 4);
+        *textY = 0;
+        *spaceX = textLen[(letter - '0') +  0];
+    } else if (letter >= 'A' && letter <= 'P') { // Line 2
+        *textX = ((letter - 'A') * 4);
+        *textY = 6;
+        *spaceX = textLen[(letter - 'A') + 16];
+    } else if (letter >= 'Q' && letter <= 'Z') { // Line 3
+        *textX = ((letter - 'Q') * 4);
+        *textY = 12;
+        *spaceX = textLen[(letter - 'Q') + 32];
+    } else if (letter >= 'a' && letter <= 'p') { // Line 4
+        *textX = ((letter - 'a') * 4);
+        *textY = 18;
+        *spaceX = textLen[(letter - 'a') + 48];
+    } else if (letter >= 'q' && letter <= 'z') { // Line 5
+        *textX = ((letter - 'q') * 4);
+        *textY = 24;
+        *spaceX = textLen[(letter - 'q') + 64];
+    } else { // Space, the final frontier.
+        *textX  = 128;
+        *textY  =  12;
+        *spaceX =   2;
+    }
+
+    switch (letter) {
+        case '-': *textX = 40; *textY =  0; *spaceX = textLen[10]; break; // Hyphen
+        case '+': *textX = 44; *textY =  0; *spaceX = textLen[11]; break; // Plus
+        case '(': *textX = 48; *textY =  0; *spaceX = textLen[12]; break; // Open Bracket
+        case ')': *textX = 52; *textY =  0; *spaceX = textLen[13]; break; // Close Bracket
+        case '!': *textX = 56; *textY =  0; *spaceX = textLen[14]; break; // Exclamation mark
+        case '?': *textX = 60; *textY =  0; *spaceX = textLen[15]; break; // Question mark
+
+        case '"': *textX = 40; *textY = 12; *spaceX = textLen[42]; break; // Speech mark
+        case'\'': *textX = 44; *textY = 12; *spaceX = textLen[43]; break; // Apostrophe
+        case ':': *textX = 48; *textY = 12; *spaceX = textLen[44]; break; // Colon
+        case ';': *textX = 52; *textY = 12; *spaceX = textLen[45]; break; // Semicolon
+        case '.': *textX = 56; *textY = 12; *spaceX = textLen[46]; break; // Full stop
+        case ',': *textX = 60; *textY = 12; *spaceX = textLen[47]; break; // Comma
+
+        case '~': *textX = 40; *textY = 24; *spaceX = textLen[74]; break; // Tilde
+        case '@': *textX = 44; *textY = 24; *spaceX = textLen[75]; break; // Umlaut
+        case '^': *textX = 48; *textY = 24; *spaceX = textLen[76]; break; // Caret
+        case '/': *textX = 52; *textY = 24; *spaceX = textLen[77]; break; // Slash
+        case '_': *textX = 56; *textY = 24; *spaceX = textLen[78]; break; // Percent
+        case '&': *textX = 60; *textY = 24; *spaceX = textLen[79]; break; // Ampersand
+
+        // This is for the letters that sit differently on the line. It just moves them down a bit.
+        case 'g': *offsetY = 1; break;
+        case 'q': *offsetY = 1; break;
+        case 'p': if (font == FONT_DEFAULT) *offsetY = 3; break;
+        case 'y': if (font == FONT_DEFAULT) *offsetY = 1; break;
+    }
+}
+
+void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNUSED s32 scaleX, UNUSED s32 scaleY, s32 mode) {
+    s32 posW, posH, imW, imH, modeSC, mOne;
+    s32 i     = 0;
+    s32 num   = 256;
+    s32 maskW = 1;
+    s32 maskH = 1;
+
+    if (mode == G_CYC_COPY) {
+        gDPSetCycleType( gDisplayListHead++, mode);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP2);
         modeSC = 4;
-        mOne = 1;
-    }
-    else
-    {
-        gDPSetCycleType(gDisplayListHead++, mode);
+        mOne   = 1;
+    } else {
+        gDPSetCycleType( gDisplayListHead++, mode);
         gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         modeSC = 1;
-        mOne = 0;
+        mOne   = 0;
     }
 
+    // Find how best to seperate the horizontal. Keep going until it finds a whole value.
+    while (TRUE) {
+        f32 val = (f32)width / (f32)num;
 
-    //Find how best to seperate the horizontal. Keep going until it finds a whole value.
-    while (1)
-    {
-        f32 val =  (f32)width/(f32)num;
-
-        if ((s32)val == val && (s32) val >= 1)
-        {
+        if ((s32)val == val && (s32) val >= 1) {
             imW = num;
             break;
         }
         num /= 2;
-        if (num == 1)
-        {
-            print_text(32,32,"IMAGE WIDTH FAILURE");
+        if (num == 1) {
+            print_text(32, 32, "IMAGE WIDTH FAILURE");
             return;
         }
     }
-    //Find the tile height
-    imH = 64/(imW/32); //This gets the vertical amount.
+    // Find the tile height
+    imH = 64 / (imW / 32); // This gets the vertical amount.
 
     num = 2;
-    //Find the width mask
-    while (1)
-    {
-        if ((s32) num == imW)
+    // Find the width mask
+    while (TRUE) {
+        if ((s32) num == imW) {
             break;
-
-        num*=2;
+        }
+        num *= 2;
         maskW++;
-        if (maskW == 9)
-        {
-            print_text(32,32,"WIDTH MASK FAILURE");
+        if (maskW == 9) {
+            print_text(32, 32, "WIDTH MASK FAILURE");
             return;
         }
     }
     num = 2;
-    //Find the height mask
-    while (1)
-    {
-        if ((s32) num == imH)
+    // Find the height mask
+    while (TRUE) {
+        if ((s32) num == imH) {
             break;
-
-        num*=2;
+        }
+        num *= 2;
         maskH++;
-        if (maskH == 9)
-        {
-            print_text(32,32,"HEIGHT MASK FAILURE");
+        if (maskH == 9) {
+            print_text(32, 32, "HEIGHT MASK FAILURE");
             return;
         }
     }
     num = height;
-    //Find the height remainder
-    peakH = height - (height % imH);
-    cycles = (width*peakH)/(imW*imH);
+    // Find the height remainder
+    s32 peakH  = height - (height % imH);
+    s32 cycles = (width * peakH) / (imW * imH);
 
-    //Pass 1
-    for (i = 0; i < cycles; i++)
-    {
+    // Pass 1
+    for (i = 0; i < cycles; i++) {
         posW = 0;
-        posH = (i*imH);
-        while (posH >= peakH)
-        {
+        posH = i * imH;
+        while (posH >= peakH) {
             posW += imW;
             posH -= peakH;
         }
+
         gDPLoadSync(gDisplayListHead++);
-        gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, posW+imW-1, posH+imH-1, 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
-        gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW+imW-mOne) << 2,(y + posH + imH-mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
+        gDPLoadTextureTile(gDisplayListHead++,
+            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+        gSPScisTextureRectangle(gDisplayListHead++,
+            ((x + posW) << 2),
+            ((y + posH) << 2),
+            (((x + posW + imW) - mOne) << 2),
+            (((y + posH + imH) - mOne) << 2),
+            G_TX_RENDERTILE, 0, 0, (modeSC << 10), (1 << 10));
     }
-    //If there's a remainder on the vertical side, then it will cycle through that too.
-    if (height-peakH != 0)
-    {
+    // If there's a remainder on the vertical side, then it will cycle through that too.
+    if (height-peakH != 0) {
         posW = 0;
         posH = peakH;
-        for (i = 0; i < (width/imW); i++)
-        {
-            posW = i*imW;
+        for (i = 0; i < (width / imW); i++) {
+            posW = i * imW;
             gDPLoadSync(gDisplayListHead++);
-            gDPLoadTextureTile(gDisplayListHead++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, posW+imW-1, height-1, 0,  G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, maskW, maskH, 0, 0);
-            gSPScisTextureRectangle(gDisplayListHead++, (x + posW) << 2, (y + posH) << 2, (x + posW+imW-mOne) << 2,(y + posH + imH-mOne) << 2, G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
+            gDPLoadTextureTile(gDisplayListHead++,
+                image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+            gSPScisTextureRectangle(gDisplayListHead++,
+                (x + posW) << 2,
+                (y + posH) << 2,
+                ((x + posW + imW) - mOne) << 2,
+                ((y + posH + imH) - mOne) << 2,
+                G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
         }
     }
 }

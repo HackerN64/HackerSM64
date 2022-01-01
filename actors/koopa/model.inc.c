@@ -2077,8 +2077,10 @@ const Gfx koopa_seg6_dl_0600C498[] = {
     gsSPVertex(koopa_seg6_vertex_0600B560, 9, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP1Triangle( 6,  7,  8, 0x0),
-    gsSPLight((u8*)koopa_seg6_texture_06002648 + 0x20, 1), //! this malformed light results in a
-    gsSPLight((u8*)koopa_seg6_texture_06002648 + 0x18, 2), //! koopa appearing to wear pink shorts.
+#ifdef KOOPA_KEEP_PINK_SHORTS
+    gsSPLight((Texture*)koopa_seg6_texture_06002648 + 0x20, 1), // this malformed light results in a
+    gsSPLight((Texture*)koopa_seg6_texture_06002648 + 0x18, 2), // koopa appearing to wear pink shorts.
+#endif
     gsSPVertex(koopa_seg6_vertex_0600B5F0, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  0, 0x0,  8,  5,  9, 0x0),

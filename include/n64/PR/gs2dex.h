@@ -372,16 +372,16 @@ extern	u64	gspS2DEX2_fifoTextStart[], gspS2DEX2_fifoTextEnd[];
 extern	u64	gspS2DEX2_fifoDataStart[], gspS2DEX2_fifoDataEnd[];
 extern	u64	gspS2DEX2_xbusTextStart[], gspS2DEX2_xbusTextEnd[];
 extern	u64	gspS2DEX2_xbusDataStart[], gspS2DEX2_xbusDataEnd[];
-extern	void	guS2DInitBg(uObjBg *);
+extern	void	guS2DInitBg(uObjBg *bg);
 
 #ifdef	F3DEX_GBI_2
 # define guS2DEmuBgRect1Cyc	guS2D2EmuBgRect1Cyc	/*Wrapper*/
 # define guS2DEmuSetScissor	guS2D2EmuSetScissor	/*Wrapper*/
-  extern void	guS2D2EmuSetScissor(u32, u32, u32, u32, u8);
-  extern void	guS2D2EmuBgRect1Cyc(Gfx **, uObjBg *);
+  extern void	guS2D2EmuSetScissor(u32 ulx, u32 uly, u32 lrx, u32 lry, u8 bilerp);
+  extern void	guS2D2EmuBgRect1Cyc(Gfx **gdl, uObjBg *bg);
 #else
-  extern void	guS2DEmuSetScissor(u32, u32, u32, u32, u8);
-  extern void	guS2DEmuBgRect1Cyc(Gfx **, uObjBg *);
+  extern void	guS2DEmuSetScissor(u32 ulx, u32 uly, u32 lrx, u32 lry, u8 bilerp);
+  extern void	guS2DEmuBgRect1Cyc(Gfx **gdl, uObjBg *bg);
 #endif
 
 #ifdef _LANGUAGE_C_PLUS_PLUS

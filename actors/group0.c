@@ -14,7 +14,7 @@
 
 #include "burn_smoke/model.inc.c"
 
-#include "stomp_smoke/model.inc.c"
+#include "small_water_splash/model.inc.c"
 
 #include "water_wave/model.inc.c"
 

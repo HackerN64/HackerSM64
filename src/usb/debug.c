@@ -449,7 +449,11 @@ https://github.com/buu342/N64-UNFLoader
     ==============================*/
 
     void _debug_assert(const char* expression, const char* file, int line)
-    {    
+    {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+        volatile char crash;
+        
         // Set the assert data
         assert_expr = expression;
         assert_line = line;
@@ -460,8 +464,9 @@ https://github.com/buu342/N64-UNFLoader
             debug_printf("Assertion failed in file '%s', line %d.\n", assert_file, assert_line);
         #endif
 
-        // Intentionally cause a null pointer exception
-        *((char*)(NULL)) = 0;
+        // Intentionally cause a TLB exception on load/instruction fetch
+        crash = *(volatile char *)1;
+#pragma GCC diagnostic pop
     }
     
     

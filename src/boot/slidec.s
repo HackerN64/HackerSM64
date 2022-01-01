@@ -3,7 +3,7 @@
  * Programmed By Melody-Yoshi *
  ******************************/
 /* How to use this function.
-	void slidstart(unsigned char *,unsigned char *);
+	void slidstart(unsigned char *compress, unsigned char *decompress);
 	first argument is top address of compress data.(align 4)
 	next argument is top address of decompress.
 */

@@ -54,7 +54,7 @@ extern "C" {
  */
 
 #define	OS_CLOCK_RATE		62500000LL
-#define	OS_CPU_COUNTER		(OS_CLOCK_RATE*3/4)
+#define	OS_CPU_COUNTER		(OS_CLOCK_RATE*3/4) // 46875000
 
 
 #if defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS)
@@ -98,8 +98,8 @@ extern "C" {
 
 /* Address translation routines and macros */
 
-extern u32		 osVirtualToPhysical(void *);
-extern void *		 osPhysicalToVirtual(u32);
+extern u32   osVirtualToPhysical(void *vaddr);
+extern void *osPhysicalToVirtual(u32   paddr);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

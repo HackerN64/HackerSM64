@@ -1,8 +1,13 @@
-// ddd_warp.c.inc
+// ddd_warp.inc.c
 
 void bhv_ddd_warp_loop(void) {
-    if (gDddPaintingStatus & BOWSERS_SUB_BEATEN)
+#ifndef UNLOCK_ALL
+    if (gDddPaintingStatus & DDD_FLAG_BOWSERS_SUB_BEATEN) {
+#endif
         o->collisionData = segmented_to_virtual(inside_castle_seg7_collision_ddd_warp_2);
-    else
+#ifndef UNLOCK_ALL
+    } else {
         o->collisionData = segmented_to_virtual(inside_castle_seg7_collision_ddd_warp);
+    }
+#endif
 }

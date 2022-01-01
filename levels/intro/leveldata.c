@@ -3298,7 +3298,7 @@ static const Gfx intro_seg7_dl_0700ADC0[] = {
 };
 
 // 0x0700B3A0 - 0x0700B420
-const Gfx intro_seg7_dl_0700B3A0[] = {
+const Gfx intro_seg7_dl_main_logo[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
     gsSPClearGeometryMode(G_LIGHTING),
@@ -3318,63 +3318,114 @@ const Gfx intro_seg7_dl_0700B3A0[] = {
 };
 
 // 0x0700B420 - 0x0700B460
-static const Vtx intro_seg7_vertex_0700B420[] = {
-    {{{    96,     42,     -1}, 0, {     0,    512}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{   224,     42,     -1}, 0, {  4096,    512}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{   224,     58,     -1}, 0, {  4096,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{    96,     58,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
+static const Vtx intro_seg7_vertex_copyright[] = {
+#ifdef INTRO_CREDIT
+    {{{    80,     60,     -1}, 0, {     0,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 0
+    {{{   240,     60,     -1}, 0, {256<<5,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 1
+
+    {{{    80,     48,     -1}, 0, {     0,  16<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 2
+    {{{   240,     48,     -1}, 0, {256<<5,  16<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 3
+
+    {{{    80,     36,     -1}, 0, {     0,  32<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 4
+    {{{   240,     36,     -1}, 0, {256<<5,  32<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 5
+#else
+    {{{    96,     58,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 0
+    {{{   224,     58,     -1}, 0, {128<<5,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 1
+    {{{    96,     42,     -1}, 0, {     0,  16<<5}, {0xff, 0xff, 0xff, 0xff}}}, // 2
+    {{{   224,     42,     -1}, 0, {128<<5,  16<<5}, {0xff, 0xff, 0xff, 0xff}}}, // 3
+#endif
 };
 
 // 0x0700B460 - 0x0700B4A0
-static const Vtx intro_seg7_vertex_0700B460[] = {
-    {{{   268,    180,     -1}, 0, {     0,    512}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{   284,    180,     -1}, 0, {   544,    512}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{   284,    196,     -1}, 0, {   544,      0}, {0xff, 0xff, 0xff, 0xff}}},
-    {{{   268,    196,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}},
+static const Vtx intro_seg7_vertex_trademark[] = {
+#ifdef INTRO_CREDIT
+    {{{   268,    192,     -1}, 0, {     0,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 0
+    {{{   284,    192,     -1}, 0, { 64<<5,      0}, {0x00, 0xff, 0xf7, 0xff}}}, // 1
+
+    {{{   268,    184,     -1}, 0, {     0,  32<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 2
+    {{{   284,    184,     -1}, 0, { 64<<5,  32<<5}, {0x00, 0xff, 0xff, 0xff}}}, // 3
+
+    {{{   268,    176,     -1}, 0, {     0,  64<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 4
+    {{{   284,    176,     -1}, 0, { 64<<5,  64<<5}, {0x00, 0x7f, 0xff, 0xff}}}, // 5
+#else
+    {{{   268,    196,     -1}, 0, {     0,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 0
+    {{{   284,    196,     -1}, 0, {   544,      0}, {0xff, 0xff, 0xff, 0xff}}}, // 1
+    {{{   268,    180,     -1}, 0, {     0,    512}, {0xff, 0xff, 0xff, 0xff}}}, // 2
+    {{{   284,    180,     -1}, 0, {   544,    512}, {0xff, 0xff, 0xff, 0xff}}}, // 3
+#endif
 };
+
+#ifdef INTRO_CREDIT
+// 0x0700B4A0 - 0x0700B4A2
+ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
+#include "levels/intro/made_with_hackersm64.custom.i4.inc.c"
+};
+// 0x0700C4A0 - 0x0700D4A0
+ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
+#include "levels/intro/tm.custom.i4.inc.c"
+};
+#else
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 // 0x0700B4A0 - 0x0700B4A2
-ALIGNED8 static const Texture intro_seg7_texture_0700B4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 #include "levels/intro/2_eu_copyright.rgba16.inc.c"
 };
-
 #else
 // 0x0700B4A0 - 0x0700B4A2
-ALIGNED8 static const Texture intro_seg7_texture_0700B4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 #include "levels/intro/2_copyright.rgba16.inc.c"
 };
 #endif
 
 #if defined(VERSION_EU)
 // 0x0700C4A0 - 0x0700D4A0
-ALIGNED8 static const u8 intro_seg7_texture_0700C4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/3_eu_tm.rgba16.inc.c"
 };
 #elif defined(VERSION_SH)
-ALIGNED8 static const u8 intro_seg7_texture_0700C4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/3_sh_tm.rgba16.inc.c"
 };
 #else
 // 0x0700C4A0 - 0x0700D4A0
-ALIGNED8 static const Texture intro_seg7_texture_0700C4A0[] = {
+ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/3_tm.rgba16.inc.c"
 };
 #endif
 
+#endif
+
 // 0x0700C6A0 - 0x0700C790
-const Gfx intro_seg7_dl_0700C6A0[] = {
+const Gfx intro_seg7_dl_copyright_trademark[] = {
     gsDPPipeSync(),
+#ifdef INTRO_CREDIT
+    gsDPSetCombineMode(G_CC_MODULATEFADE, G_CC_MODULATEFADE),
+#else
     gsDPSetCombineMode(G_CC_DECALFADE, G_CC_DECALFADE),
+#endif
+    gsDPSetTextureFilter(G_TF_POINT),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
 
-    gsDPLoadTextureBlock(intro_seg7_texture_0700B4A0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 7, 4, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPVertex(intro_seg7_vertex_0700B420, 4, 0),
-    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-
-    gsDPLoadTextureBlock(intro_seg7_texture_0700C4A0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
-    gsSPVertex(intro_seg7_vertex_0700B460, 4, 0),
-    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+#ifdef INTRO_CREDIT
+    gsDPLoadTextureBlock_4b(intro_seg7_texture_copyright, G_IM_FMT_I, 256, 32, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 8, 5, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPVertex(intro_seg7_vertex_copyright, 6, 0),
+    gsSP2Triangles( 0,  3,  1, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 2,  5,  3, 0x0,  2,  4,  5, 0x0),
+    
+    gsDPLoadTextureBlock_4b(intro_seg7_texture_trademark, G_IM_FMT_I, 64, 64, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 6, 6, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPVertex(intro_seg7_vertex_trademark, 6, 0),
+    gsSP2Triangles( 0,  3,  1, 0x0,  0,  2,  3, 0x0),
+    gsSP2Triangles( 2,  5,  3, 0x0,  2,  4,  5, 0x0),
+#else
+    gsDPLoadTextureBlock(intro_seg7_texture_copyright, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 7, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPVertex(intro_seg7_vertex_copyright, 4, 0),
+    gsSP2Triangles( 0,  3,  1, 0x0,  0,  2,  3, 0x0),
+    
+    gsDPLoadTextureBlock(intro_seg7_texture_trademark, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsSPVertex(intro_seg7_vertex_trademark, 4, 0),
+    gsSP2Triangles( 0,  3,  1, 0x0,  0,  2,  3, 0x0),
+#endif
 
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
@@ -3382,11 +3433,12 @@ const Gfx intro_seg7_dl_0700C6A0[] = {
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsDPSetEnvColor(255, 255, 255, 255),
     gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
+    gsDPSetTextureFilter(G_TF_BILERP),
     gsSPEndDisplayList(),
 };
 
 // 0x0700C790
-const f32 intro_seg7_table_0700C790[] = {
+const f32 intro_seg7_table_scale_1[] = {
     0.016000f, 0.052000f, 0.002500f, 0.148300f,
     0.189200f, 0.035200f, 0.471600f, 0.525300f,
     0.116600f, 0.875800f, 0.947000f, 0.222100f,
@@ -3405,7 +3457,7 @@ const f32 intro_seg7_table_0700C790[] = {
 };
 
 // 0x0700C880
-const f32 intro_seg7_table_0700C880[] = {
+const f32 intro_seg7_table_scale_2[] = {
     1.000000f, 1.000000f, 1.000000f, 0.987300f,
     0.987300f, 0.987300f, 0.951400f, 0.951400f,
     0.951400f, 0.896000f, 0.896000f, 0.896000f,

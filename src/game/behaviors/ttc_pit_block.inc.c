@@ -56,11 +56,9 @@ void bhv_ttc_pit_block_update(void) {
         cur_obj_move_using_fvel_and_gravity();
 
         if (clamp_f32(&o->oPosY, o->oHomeY, o->oTTCPitBlockPeakY)) {
-            o->oTTCPitBlockDir = o->oTTCPitBlockDir ^ 0x1;
+            o->oTTCPitBlockDir ^= 0x1;
 
-            if ((o->oTTCPitBlockWaitTime =
-                     sTTCPitBlockProperties[gTTCSpeedSetting][o->oTTCPitBlockDir & 0x1].waitTime)
-                < 0) {
+            if ((o->oTTCPitBlockWaitTime = sTTCPitBlockProperties[gTTCSpeedSetting][o->oTTCPitBlockDir & 0x1].waitTime) < 0) {
                 o->oTTCPitBlockWaitTime = random_mod_offset(10, 20, 6);
             }
 

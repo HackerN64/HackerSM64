@@ -1,3 +1,4 @@
+
 /**
  * Behavior for bhvBetaTrampolineTop and bhvBetaTrampolineSpring.
  * This was a trampoline that was never finished. The model and collision
@@ -28,9 +29,9 @@ void bhv_beta_trampoline_spring_loop(void) {
     // scale the spring by (the displacement)/10 + 1.
     // For this to work correctly, the arbitrary value of 10
     // must be replaced with 150 (the height of the trampoline).
-    // Note that all of the numbers in this if/else block are doubles.
-    if ((yDisplacement = o->oPosY - o->oHomeY) >= 0) {
-        yScale = yDisplacement / 10.0 + 1.0;
+    yDisplacement = o->oPosY - o->oHomeY;
+    if (yDisplacement >= 0) {
+        yScale = yDisplacement / 150.0f + 1.0f;
     } else {
         // Otherwise (if the trampoline is compressed),
         // scale by 1 - (the displacement)/500.
@@ -38,7 +39,7 @@ void bhv_beta_trampoline_spring_loop(void) {
         // must be replaced with 150 (the height of the trampoline),
         // as with the above code.
         yDisplacement = -yDisplacement;
-        yScale = 1.0 - yDisplacement / 500.0;
+        yScale = 1.0f - yDisplacement / 150.0f;
     }
 
     // Scale the spring

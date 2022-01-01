@@ -9,7 +9,6 @@
 #include "main.h"
 #include "paintings.h"
 #include "print.h"
-#include "profiler.h"
 #include "save_file.h"
 #include "seq_ids.h"
 #include "sm64.h"
@@ -19,7 +18,6 @@
 
 #define MUSIC_NONE 0xFFFF
 
-static Vec3f unused80339DC0;
 static OSMesgQueue sSoundMesgQueue;
 static OSMesg sSoundMesgBuf[1];
 static struct VblankHandler sSoundVblankHandler;
@@ -31,8 +29,9 @@ static u8 sBgMusicDisabled = FALSE;
 static u16 sCurrentMusic = MUSIC_NONE;
 static u16 sCurrentShellMusic = MUSIC_NONE;
 static u16 sCurrentCapMusic = MUSIC_NONE;
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 static u8 sPlayingInfiniteStairs = FALSE;
-UNUSED static u8 unused8032C6D8[16] = { 0 };
+#endif
 static s16 sSoundMenuModeToSoundMode[] = { SOUND_MODE_STEREO, SOUND_MODE_MONO, SOUND_MODE_HEADSET };
 // Only the 20th array element is used.
 static u32 sMenuSoundsExtra[] = {
@@ -51,7 +50,7 @@ static u32 sMenuSoundsExtra[] = {
     NO_SOUND,
     SOUND_ENV_BOAT_ROCKING1,
     SOUND_ENV_ELEVATOR3,
-    SOUND_ENV_UNKNOWN2,
+    SOUND_ENV_BOWLING_BALL_ROLL,
     SOUND_ENV_WATERFALL1,
     SOUND_ENV_WATERFALL2,
     SOUND_ENV_ELEVATOR1,
@@ -156,7 +155,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
     } else if (soundMenuFlags & SOUND_MENU_FLAG_HANDISAPPEAR) {
         play_sound(SOUND_MENU_HAND_DISAPPEAR, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_UNKNOWN1) {
-        play_sound(SOUND_MENU_UNK0C, gGlobalSoundSource);
+        play_sound(SOUND_MENU_UNK0C_FLAG_UNKNOWN1, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_PINCHMARIOFACE) {
         play_sound(SOUND_MENU_PINCH_MARIO_FACE, gGlobalSoundSource);
     } else if (soundMenuFlags & SOUND_MENU_FLAG_PINCHMARIOFACE2) {
@@ -169,7 +168,7 @@ void play_menu_sounds(s16 soundMenuFlags) {
         play_sound(SOUND_MENU_CAMERA_ZOOM_OUT, gGlobalSoundSource);
     }
 
-    if (soundMenuFlags & 0x100) {
+    if (soundMenuFlags & SOUND_MENU_FLAG_EXTRA) {
         play_menu_sounds_extra(20, NULL);
     }
 #if ENABLE_RUMBLE
@@ -201,6 +200,7 @@ void play_painting_eject_sound(void) {
  * Called from threads: thread5_game_loop
  */
 void play_infinite_stairs_music(void) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     u8 shouldPlay = FALSE;
 
     /* Infinite stairs? */
@@ -220,6 +220,7 @@ void play_infinite_stairs_music(void) {
             func_80321080(500);
         }
     }
+#endif
 }
 
 /**
@@ -233,7 +234,10 @@ void set_background_music(u16 a, u16 seqArgs, s16 fadeTimer) {
             sound_reset(a);
         }
 
-        if (!gNeverEnteredCastle || seqArgs != SEQ_LEVEL_INSIDE_CASTLE) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+        if (!gNeverEnteredCastle || seqArgs != SEQ_LEVEL_INSIDE_CASTLE)
+#endif
+        {
             play_music(SEQ_PLAYER_LEVEL, seqArgs, fadeTimer);
             sCurrentMusic = seqArgs;
         }
@@ -336,54 +340,46 @@ void audio_game_loop_tick(void) {
 void thread4_sound(UNUSED void *arg) {
     audio_init();
     sound_init();
-    #if PUPPYPRINT_DEBUG
-    OSTime lastTime;
-    #endif
 
-    // Zero-out unused vector
-    vec3f_copy(unused80339DC0, gVec3fZero);
+#if PUPPYPRINT_DEBUG
+    OSTime lastTime;
+#endif
 
     osCreateMesgQueue(&sSoundMesgQueue, sSoundMesgBuf, ARRAY_COUNT(sSoundMesgBuf));
     set_vblank_handler(1, &sSoundVblankHandler, &sSoundMesgQueue, (OSMesg) 512);
 
-    while (TRUE)
-    {
+    while (TRUE) {
         OSMesg msg;
 
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
-        #if PUPPYPRINT_DEBUG
-        while (TRUE)
-        {
+#if PUPPYPRINT_DEBUG
+        while (TRUE) {
             lastTime = osGetTime();
             dmaAudioTime[perfIteration] = 0;
-            #endif
+#endif
             if (gResetTimer < 25) {
                 struct SPTask *spTask;
-                profiler_log_thread4_time();
                 spTask = create_next_audio_frame_task();
                 if (spTask != NULL) {
                     dispatch_audio_sptask(spTask);
                 }
-                profiler_log_thread4_time();
-                #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
                 profiler_update(audioTime, lastTime);
                 audioTime[perfIteration] -= dmaAudioTime[perfIteration];
-                if (benchmarkLoop > 0 && benchOption == 1)
-                {
+                if (benchmarkLoop > 0 && benchOption == 1) {
                     benchmarkLoop--;
                     benchMark[benchmarkLoop] = osGetTime() - lastTime;
-                    if (benchmarkLoop == 0)
-                    {
+                    if (benchmarkLoop == 0) {
                         puppyprint_profiler_finished();
                         break;
                     }
-                }
-                else
+                } else {
                     break;
-                #endif
+                }
+#endif
             }
-        #if PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG
         }
-        #endif
+#endif
     }
 }

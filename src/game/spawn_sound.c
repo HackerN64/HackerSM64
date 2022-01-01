@@ -18,29 +18,25 @@
 void exec_anim_sound_state(struct SoundState *soundStates) {
     s32 stateIdx = gCurrentObject->oSoundStateID;
 
-    switch (soundStates[stateIdx].playSound) {
-        // since we have an array of sound states corresponding to
-        // various behaviors, not all entries intend to play sounds. the
-        // boolean being 0 for unused entries skips these states.
-        case FALSE:
-            break;
-        case TRUE: {
-            s32 animFrame;
+    // since we have an array of sound states corresponding to
+    // various behaviors, not all entries intend to play sounds. the
+    // boolean being 0 for unused entries skips these states.
+    if (soundStates[stateIdx].playSound) {
+        s32 animFrame;
 
-            // in the sound state information, -1 (0xFF) is for empty
-            // animFrame entries. These checks skips them.
-            if ((animFrame = soundStates[stateIdx].animFrame1) >= 0) {
-                if (cur_obj_check_anim_frame(animFrame)) {
-                    cur_obj_play_sound_2(soundStates[stateIdx].soundMagic);
-                }
+        // in the sound state information, -1 (0xFF) is for empty
+        // animFrame entries. These checks skips them.
+        if ((animFrame = soundStates[stateIdx].animFrame1) >= 0) {
+            if (cur_obj_check_anim_frame(animFrame)) {
+                cur_obj_play_sound_2(soundStates[stateIdx].soundMagic);
             }
+        }
 
-            if ((animFrame = soundStates[stateIdx].animFrame2) >= 0) {
-                if (cur_obj_check_anim_frame(animFrame)) {
-                    cur_obj_play_sound_2(soundStates[stateIdx].soundMagic);
-                }
+        if ((animFrame = soundStates[stateIdx].animFrame2) >= 0) {
+            if (cur_obj_check_anim_frame(animFrame)) {
+                cur_obj_play_sound_2(soundStates[stateIdx].soundMagic);
             }
-        } break;
+        }
     }
 }
 
@@ -49,9 +45,9 @@ void exec_anim_sound_state(struct SoundState *soundStates) {
  * (Breakable walls, King Bobomb exploding, etc)
  */
 void create_sound_spawner(s32 soundMagic) {
-    struct Object *obj = spawn_object(gCurrentObject, 0, bhvSoundSpawner);
+    struct Object *obj = spawn_object(gCurrentObject, MODEL_NONE, bhvSoundSpawner);
 
-    obj->oSoundEffectUnkF4 = soundMagic;
+    obj->oSoundEffectBits = soundMagic;
 }
 
 /*
@@ -75,7 +71,7 @@ void cur_obj_play_sound_2(s32 soundMagic) {
         if (soundMagic == SOUND_OBJ_POUNDING_LOUD) {
             queue_rumble_data(3, 60);
         }
-        if (soundMagic == SOUND_OBJ_WHOMP_LOWPRIO) {
+        if (soundMagic == SOUND_OBJ_WHOMP) {
             queue_rumble_data(5, 80);
         }
 #endif
@@ -93,8 +89,7 @@ void cur_obj_play_sound_2(s32 soundMagic) {
  * Technically, these functions are only educated guesses. Trust these
  * interpretations at your own discretion.
  */
-s32 calc_dist_to_volume_range_1(f32 distance) // range from 60-124
-{
+s32 calc_dist_to_volume_range_1(f32 distance) { // range from 60-124
     s32 volume;
 
     if (distance < 500.0f) {
@@ -108,8 +103,7 @@ s32 calc_dist_to_volume_range_1(f32 distance) // range from 60-124
     return volume;
 }
 
-s32 calc_dist_to_volume_range_2(f32 distance) // range from 79.2-143.2
-{
+s32 calc_dist_to_volume_range_2(f32 distance) { // range from 79.2-143.2
     s32 volume;
 
     if (distance < 1300.0f) {

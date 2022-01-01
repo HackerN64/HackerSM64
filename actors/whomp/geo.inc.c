@@ -4,7 +4,7 @@ const GeoLayout whomp_geo[] = {
    GEO_OPEN_NODE(),
       GEO_TRANSLATE_NODE(0x00, 0, 0, -50),
       GEO_OPEN_NODE(),
-         GEO_SHADOW(0x01 + SHADOW_RECTANGLE_HARDCODED_OFFSET, 0xB4, 0),
+         GEO_SHADOW(SHADOW_RECTANGLE_WHOMP, 0xB4, 100),
          GEO_OPEN_NODE(),
             GEO_SCALE(0x00, 16384),
             GEO_OPEN_NODE(),

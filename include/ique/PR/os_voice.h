@@ -87,16 +87,16 @@ typedef struct {		/* Voice Recognition System */
  */
 
 /* Voice Recognition System */
-extern s32 osVoiceInit(OSMesgQueue *, OSVoiceHandle *, int);
+extern s32 osVoiceInit(OSMesgQueue *siMessageQ, OSVoiceHandle *hd, int channel);
 extern s32 osVoiceCheckWord(u8 *data);
-extern s32 osVoiceClearDictionary(OSVoiceHandle *, u8);
-extern s32 osVoiceControlGain(OSVoiceHandle *, s32, s32);
-extern s32 osVoiceSetWord(OSVoiceHandle *, u8 *);
-extern s32 osVoiceStartReadData(OSVoiceHandle *);
-extern s32 osVoiceStopReadData(OSVoiceHandle *);
-extern s32 osVoiceGetReadData(OSVoiceHandle *, OSVoiceData *);
-extern s32 osVoiceMaskDictionary(OSVoiceHandle *, u8 *, int);
-extern void osVoiceCountSyllables(u8 *, u32 *);
+extern s32 osVoiceClearDictionary(OSVoiceHandle *hd, u8 words);
+extern s32 osVoiceControlGain(    OSVoiceHandle *hd, s32 analog, s32 digital);
+extern s32 osVoiceSetWord(        OSVoiceHandle *hd, u8 *word);
+extern s32 osVoiceStartReadData(  OSVoiceHandle *hd);
+extern s32 osVoiceStopReadData(   OSVoiceHandle *hd);
+extern s32 osVoiceGetReadData(    OSVoiceHandle *hd, OSVoiceData *result);
+extern s32 osVoiceMaskDictionary( OSVoiceHandle *hd, u8 *maskpattern, int size);
+extern void osVoiceCountSyllables(u8 *word, u32 *syllable);
 
 
 #endif  /* defined(_LANGUAGE_C) || defined(_LANGUAGE_C_PLUS_PLUS) */

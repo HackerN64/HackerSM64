@@ -80,7 +80,7 @@
         @return The data header, or 0
     ==============================*/
     
-    extern unsigned int usb_poll();
+    extern unsigned long usb_poll();
     
     
     /*==============================

@@ -32,9 +32,9 @@ extern "C" {
 /* Serial interface (Si) */
 
 extern u32 		__osSiGetStatus(void);
-extern s32		__osSiRawWriteIo(u32, u32);
-extern s32		__osSiRawReadIo(u32, u32 *);
-extern s32		__osSiRawStartDma(s32, void *);
+extern s32		__osSiRawWriteIo(u32 devAddr, u32  data);
+extern s32		__osSiRawReadIo( u32 devAddr, u32 *data);
+extern s32		__osSiRawStartDma(s32 direction, void *dramAddr);
 
 
 #endif /* _LANGUAGE_C */

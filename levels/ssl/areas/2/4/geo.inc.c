@@ -4,7 +4,7 @@ const GeoLayout ssl_geo_0005D8[] = {
    GEO_OPEN_NODE(),
       GEO_RENDER_RANGE(-1000, 4000),
       GEO_OPEN_NODE(),
-         GEO_ASM(0x802, geo_movtex_draw_colored_2_no_update),
+         GEO_ASM(MOVTEX_SSL_SAND_PIT_PYRAMID, geo_movtex_draw_colored_2_no_update),
       GEO_CLOSE_NODE(),
       GEO_RENDER_RANGE(4000, 12800),
       GEO_OPEN_NODE(),

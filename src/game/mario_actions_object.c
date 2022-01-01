@@ -35,15 +35,15 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
     }
 
     switch (m->actionArg) {
-        case 0:
+        case ACT_ARG_PUNCH_SEQUENCE_YAH:
             play_sound(SOUND_MARIO_PUNCH_YAH, m->marioObj->header.gfx.cameraToObject);
-            // fall through
-        case 1:
+            FALL_THROUGH;
+        case ACT_ARG_PUNCH_SEQUENCE_FIRST_PUNCH:
             set_mario_animation(m, MARIO_ANIM_FIRST_PUNCH);
             if (is_anim_past_end(m)) {
-                m->actionArg = 2;
+                m->actionArg = ACT_ARG_PUNCH_SEQUENCE_FIRST_PUNCH_FAST;
             } else {
-                m->actionArg = 1;
+                m->actionArg = ACT_ARG_PUNCH_SEQUENCE_FIRST_PUNCH;
             }
 
             if (m->marioObj->header.gfx.animInfo.animFrame >= 2) {
@@ -54,12 +54,12 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
                 m->flags |= MARIO_PUNCHING;
             }
 
-            if (m->actionArg == 2) {
-                m->marioBodyState->punchState = (0 << 6) | 4;
+            if (m->actionArg == ACT_ARG_PUNCH_SEQUENCE_FIRST_PUNCH_FAST) {
+                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_FIRST_PUNCH | 0x4);
             }
             break;
 
-        case 2:
+        case ACT_ARG_PUNCH_SEQUENCE_FIRST_PUNCH_FAST:
             set_mario_animation(m, MARIO_ANIM_FIRST_PUNCH_FAST);
 
             if (m->marioObj->header.gfx.animInfo.animFrame <= 0) {
@@ -67,7 +67,7 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
             }
 
             if (m->input & INPUT_B_PRESSED) {
-                m->actionArg = 3;
+                m->actionArg = ACT_ARG_PUNCH_SEQUENCE_WAH;
             }
 
             if (is_anim_at_end(m)) {
@@ -75,34 +75,34 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
             }
             break;
 
-        case 3:
+        case ACT_ARG_PUNCH_SEQUENCE_WAH:
             play_sound(SOUND_MARIO_PUNCH_WAH, m->marioObj->header.gfx.cameraToObject);
-            // fall through
-        case 4:
+            // fallthrough
+        case ACT_ARG_PUNCH_SEQUENCE_SECOND_PUNCH:
             set_mario_animation(m, MARIO_ANIM_SECOND_PUNCH);
             if (is_anim_past_end(m)) {
-                m->actionArg = 5;
+                m->actionArg = ACT_ARG_PUNCH_SEQUENCE_SECOND_PUNCH_FAST;
             } else {
-                m->actionArg = 4;
+                m->actionArg = ACT_ARG_PUNCH_SEQUENCE_SECOND_PUNCH;
             }
 
             if (m->marioObj->header.gfx.animInfo.animFrame > 0) {
                 m->flags |= MARIO_PUNCHING;
             }
 
-            if (m->actionArg == 5) {
-                m->marioBodyState->punchState = (1 << 6) | 4;
+            if (m->actionArg == ACT_ARG_PUNCH_SEQUENCE_SECOND_PUNCH_FAST) {
+                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_SECOND_PUNCH | 0x4);
             }
             break;
 
-        case 5:
+        case ACT_ARG_PUNCH_SEQUENCE_SECOND_PUNCH_FAST:
             set_mario_animation(m, MARIO_ANIM_SECOND_PUNCH_FAST);
             if (m->marioObj->header.gfx.animInfo.animFrame <= 0) {
                 m->flags |= MARIO_PUNCHING;
             }
 
             if (m->input & INPUT_B_PRESSED) {
-                m->actionArg = 6;
+                m->actionArg = ACT_ARG_PUNCH_SEQUENCE_GROUND_KICK;
             }
 
             if (is_anim_at_end(m)) {
@@ -110,11 +110,11 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
             }
             break;
 
-        case 6:
+        case ACT_ARG_PUNCH_SEQUENCE_GROUND_KICK:
             play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1);
             animFrame = set_mario_animation(m, MARIO_ANIM_GROUND_KICK);
             if (animFrame == 0) {
-                m->marioBodyState->punchState = (2 << 6) | 6;
+                m->marioBodyState->punchState = (PUNCH_STATE_TYPE_KICK | 0x6);
             }
 
             if (animFrame >= 0 && animFrame < 8) {
@@ -126,7 +126,7 @@ s32 mario_update_punch_sequence(struct MarioState *m) {
             }
             break;
 
-        case 9:
+        case ACT_ARG_PUNCH_SEQUENCE_BREAKDANCE:
             play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1);
             set_mario_animation(m, MARIO_ANIM_BREAKDANCE);
             animFrame = m->marioObj->header.gfx.animInfo.animFrame;
@@ -153,11 +153,11 @@ s32 act_punching(struct MarioState *m) {
         return check_common_action_exits(m);
     }
 
-    if (m->actionState == 0 && (m->input & INPUT_A_DOWN)) {
+    if (m->actionState == ACT_STATE_PUNCHING_CAN_JUMP_KICK && (m->input & INPUT_A_DOWN)) {
         return set_mario_action(m, ACT_JUMP_KICK, 0);
     }
 
-    m->actionState = 1;
+    m->actionState = ACT_STATE_PUNCHING_NO_JUMP_KICK;
     if (m->actionArg == 0) {
         m->actionTimer = 7;
     }
@@ -181,16 +181,16 @@ s32 act_picking_up(struct MarioState *m) {
         return drop_and_set_mario_action(m, ACT_FREEFALL, 0);
     }
 
-    if (m->actionState == 0 && is_anim_at_end(m)) {
+    if (m->actionState == ACT_STATE_PICKING_UP_GRAB && is_anim_at_end(m)) {
         //! While the animation is playing, it is possible for the used object
         // to unload. This allows you to pick up a vacant or newly loaded object
         // slot (cloning via fake object).
         mario_grab_used_object(m);
         play_sound_if_no_flag(m, SOUND_MARIO_HRMM, MARIO_MARIO_SOUND_PLAYED);
-        m->actionState = 1;
+        m->actionState = ACT_STATE_PICKING_UP_HOLDING;
     }
 
-    if (m->actionState == 1) {
+    if (m->actionState == ACT_STATE_PICKING_UP_HOLDING) {
         if (m->heldObj->oInteractionSubtype & INT_SUBTYPE_GRABS_MARIO) {
             m->marioBodyState->grabPos = GRAB_POS_HEAVY_OBJ;
             set_mario_animation(m, MARIO_ANIM_GRAB_HEAVY_OBJECT);
@@ -215,6 +215,14 @@ s32 act_dive_picking_up(struct MarioState *m) {
         return drop_and_set_mario_action(m, ACT_SHOCKWAVE_BOUNCE, 0);
     }
 
+#ifdef HANDS_FREE_HOLDING_FIX
+    if (m->input & INPUT_OFF_FLOOR) {
+        return drop_and_set_mario_action(m, ACT_FREEFALL, 0);
+    }
+    if (m->input & INPUT_ABOVE_SLIDE) {
+        return drop_and_set_mario_action(m, ACT_BEGIN_SLIDING, 0);
+    }
+#else
     //! Hands-free holding. Landing on a slope or being pushed off a ledge while
     // landing from a dive grab sets Mario's action to a non-holding action
     // without dropping the object, causing the hands-free holding glitch.
@@ -225,6 +233,7 @@ s32 act_dive_picking_up(struct MarioState *m) {
     if (m->input & INPUT_ABOVE_SLIDE) {
         return set_mario_action(m, ACT_BEGIN_SLIDING, 0);
     }
+#endif
 
     animated_stationary_ground_step(m, MARIO_ANIM_STOP_SLIDE_LIGHT_OBJ, ACT_HOLD_IDLE);
     return FALSE;
@@ -313,8 +322,8 @@ s32 act_stomach_slide_stop(struct MarioState *m) {
 }
 
 s32 act_picking_up_bowser(struct MarioState *m) {
-    if (m->actionState == 0) {
-        m->actionState = 1;
+    if (m->actionState == ACT_STATE_PICKING_UP_GRAB) {
+        m->actionState = ACT_STATE_PICKING_UP_HOLDING;
         m->angleVel[1] = 0;
         m->marioBodyState->grabPos = GRAB_POS_BOWSER;
         mario_grab_used_object(m);
@@ -337,15 +346,11 @@ s32 act_holding_bowser(struct MarioState *m) {
     s16 spin;
 
     if (m->input & INPUT_B_PRESSED) {
-#ifndef VERSION_JP
         if (m->angleVel[1] <= -0xE00 || m->angleVel[1] >= 0xE00) {
             play_sound(SOUND_MARIO_SO_LONGA_BOWSER, m->marioObj->header.gfx.cameraToObject);
         } else {
             play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
         }
-#else
-        play_sound(SOUND_MARIO_HERE_WE_GO, m->marioObj->header.gfx.cameraToObject);
-#endif
         return set_mario_action(m, ACT_RELEASING_BOWSER, 0);
     }
 
@@ -368,26 +373,16 @@ s32 act_holding_bowser(struct MarioState *m) {
             // spin = acceleration
             spin = (s16)(m->intendedYaw - m->twirlYaw) / 0x80;
 
-            if (spin < -0x80) {
-                spin = -0x80;
-            }
-            if (spin > 0x80) {
-                spin = 0x80;
-            }
+            spin = CLAMP(spin, -0x80, 0x80);
 
             m->twirlYaw = m->intendedYaw;
             m->angleVel[1] += spin;
 
-            if (m->angleVel[1] > 0x1000) {
-                m->angleVel[1] = 0x1000;
-            }
-            if (m->angleVel[1] < -0x1000) {
-                m->angleVel[1] = -0x1000;
-            }
+            m->angleVel[1] = CLAMP(m->angleVel[1], -0x1000, 0x1000);
         }
     } else {
         m->actionArg = 0;
-        m->angleVel[1] = approach_s32(m->angleVel[1], 0, 64, 64);
+        m->angleVel[1] = approach_s32(m->angleVel[1], 0x0, 0x40, 0x40);
     }
 
     // spin = starting yaw

@@ -1,7 +1,7 @@
 // 0x070160D8 - 0x0701633C
 const MacroObject wdw_seg7_area_1_macro_objs[] = {
     MACRO_OBJECT_WITH_BEH_PARAM(/*preset*/ macro_wooden_signpost,             /*yaw*/   0, /*pos*/ -2077,  2816,  -660, /*behParam*/ DIALOG_081),
-    MACRO_OBJECT(/*preset*/ macro_bobomb_buddy_opens_cannon,   /*yaw*/   0, /*pos*/    -2,  2944,  3583),
+    MACRO_OBJECT(/*preset*/ macro_bobomb_buddy_opens_cannon,   /*yaw*/   0, /*pos*/    -2,  3200,  3583),
     MACRO_OBJECT(/*preset*/ macro_coin_ring_horizontal,        /*yaw*/   0, /*pos*/ -2057,  2800,  -500),
     MACRO_OBJECT(/*preset*/ macro_coin_line_horizontal,        /*yaw*/  90, /*pos*/  1500,  1741,  2191),
     MACRO_OBJECT(/*preset*/ macro_blue_coin_switch,            /*yaw*/   0, /*pos*/   500,   384,   250),

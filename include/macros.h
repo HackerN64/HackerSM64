@@ -25,6 +25,12 @@
 #define UNUSED
 #endif
 
+#ifdef __GNUC__
+#define FALL_THROUGH __attribute__((fallthrough))
+#else
+#define FALL_THROUGH
+#endif
+
 // Avoid undefined behaviour for non-returning functions
 #ifdef __GNUC__
 #define NORETURN __attribute__((noreturn))
@@ -53,6 +59,20 @@
 #define ALIGNED16
 #endif
 
+// Align to 16-byte boundary for audio lib requirements
+#ifdef __GNUC__
+#define ALIGNED64 __attribute__((aligned(64)))
+#else
+#define ALIGNED64
+#endif
+
+// Align to 16-byte boundary for audio lib requirements
+#ifdef __GNUC__
+#define ALWAYS_INLINE inline __attribute__((always_inline))
+#else
+#define ALWAYS_INLINE inline
+#endif
+
 #ifndef NO_SEGMENTED_MEMORY
 // convert a virtual address to physical.
 #define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
@@ -68,5 +88,13 @@
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr))
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
 #endif
+
+enum VIModes {
+    MODE_NTSC,
+    MODE_MPAL,
+    MODE_PAL,
+};
+
+#define FORCE_CRASH { *(vs8*)0 = 0; }
 
 #endif // MACROS_H

@@ -61,16 +61,16 @@ extern "C" {
 
 /* Rumble PAK interface */
 
-extern s32 osMotorInit(OSMesgQueue *, OSPfs *, int);
+extern s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int controller_no);
 #if	1
 #define MOTOR_START		1
 #define MOTOR_STOP		0
 #define	osMotorStart(x)		__osMotorAccess((x), MOTOR_START)
 #define	osMotorStop(x)		__osMotorAccess((x), MOTOR_STOP)
-extern s32 __osMotorAccess(OSPfs *, s32);
+extern s32 __osMotorAccess(OSPfs *pfs, s32 flag);
 #else
-extern s32 osMotorStop(OSPfs *);
-extern s32 osMotorStart(OSPfs *);
+extern s32 osMotorStop( OSPfs *pfs);
+extern s32 osMotorStart(OSPfs *pfs);
 #endif
 
 

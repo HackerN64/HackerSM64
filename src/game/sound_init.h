@@ -5,18 +5,23 @@
 
 #include "macros.h"
 
-#define SOUND_MENU_FLAG_HANDAPPEAR              0x01
-#define SOUND_MENU_FLAG_HANDISAPPEAR            0x02
-#define SOUND_MENU_FLAG_UNKNOWN1                0x04
-#define SOUND_MENU_FLAG_PINCHMARIOFACE          0x08
-#define SOUND_MENU_FLAG_PINCHMARIOFACE2         0x10
-#define SOUND_MENU_FLAG_LETGOMARIOFACE          0x20
-#define SOUND_MENU_FLAG_CAMERAZOOMIN            0x40
-#define SOUND_MENU_FLAG_CAMERAZOOMOUT           0x80
+enum SoundMenuFlags {
+    SOUND_MENU_FLAG_HANDAPPEAR      = (1 << 0), // 0x001
+    SOUND_MENU_FLAG_HANDISAPPEAR    = (1 << 1), // 0x002
+    SOUND_MENU_FLAG_UNKNOWN1        = (1 << 2), // 0x004
+    SOUND_MENU_FLAG_PINCHMARIOFACE  = (1 << 3), // 0x008
+    SOUND_MENU_FLAG_PINCHMARIOFACE2 = (1 << 4), // 0x010
+    SOUND_MENU_FLAG_LETGOMARIOFACE  = (1 << 5), // 0x020
+    SOUND_MENU_FLAG_CAMERAZOOMIN    = (1 << 6), // 0x040
+    SOUND_MENU_FLAG_CAMERAZOOMOUT   = (1 << 7), // 0x080
+    SOUND_MENU_FLAG_EXTRA           = (1 << 8), // 0x100
+};
 
-#define SOUND_MENU_MODE_STEREO       0
-#define SOUND_MENU_MODE_MONO         1
-#define SOUND_MENU_MODE_HEADSET      2
+enum SoundMenuMode {
+    SOUND_MENU_MODE_STEREO,
+    SOUND_MENU_MODE_MONO,
+    SOUND_MENU_MODE_HEADSET
+};
 
 void reset_volume(void);
 void raise_background_noise(s32 a);

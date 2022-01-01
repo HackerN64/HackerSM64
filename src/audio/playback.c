@@ -13,11 +13,10 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput);
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 #ifdef VERSION_SH
-void note_set_vel_pan_reverb(struct Note *note, struct ReverbInfo *reverbInfo)
+void note_set_vel_pan_reverb(struct Note *note, struct ReverbInfo *reverbInfo) {
 #else
-void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbVol)
+void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbVol) {
 #endif
-{
     struct NoteSubEu *sub = &note->noteSubEu;
     f32 volRight, volLeft;
     u8 strongRight;
@@ -26,8 +25,6 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
 #ifdef VERSION_EU
     u16 unkMask = ~0x80;
 #else
-    UNUSED u32 pad;
-    UNUSED u32 pad1;
     f32 velocity;
     u8 pan;
     u8 reverbVol;
@@ -135,9 +132,9 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         stubbed_printf("Audio: setvol: volume minus %f\n", velocity);
         velocity = 0.0f;
     }
-    if (velocity > 32767.f) {
+    if (velocity > 32767.0f) {
         stubbed_printf("Audio: setvol: volume overflow %f\n", velocity);
-        velocity = 32767.f;
+        velocity = 32767.0f;
     }
 
     sub->targetVolLeft =  ((s32) (velocity * volLeft) & 0xffff) >> 5;
@@ -155,11 +152,7 @@ void note_set_vel_pan_reverb(struct Note *note, f32 velocity, u8 pan, u8 reverbV
         return;
     }
 
-    if (sub->needsInit) {
-        sub->envMixerNeedsInit = TRUE;
-    } else {
-        sub->envMixerNeedsInit = FALSE;
-    }
+    sub->envMixerNeedsInit = sub->needsInit;
 }
 
 #ifdef VERSION_SH
@@ -179,7 +172,7 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput) {
     }
 #endif
     if (resamplingRateInput < 2.0f) {
-        tempSub->hasTwoAdpcmParts = 0;
+        tempSub->hasTwoAdpcmParts = FALSE;
 
         if (MIN_RESAMPLING_RATE < resamplingRateInput) {
             resamplingRate = MIN_RESAMPLING_RATE;
@@ -188,7 +181,7 @@ void note_set_resampling_rate(struct Note *note, f32 resamplingRateInput) {
         }
 
     } else {
-        tempSub->hasTwoAdpcmParts = 1;
+        tempSub->hasTwoAdpcmParts = TRUE;
         if (2 * MIN_RESAMPLING_RATE < resamplingRateInput) {
             resamplingRate = MIN_RESAMPLING_RATE;
         } else {
@@ -214,7 +207,7 @@ struct AudioBankSound *instrument_get_audio_bank_sound(struct Instrument *instru
 struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
     struct Instrument *inst;
 
-    if (IS_BANK_LOAD_COMPLETE(bankId) == FALSE) {
+    if (!IS_BANK_LOAD_COMPLETE(bankId)) {
         stubbed_printf("Audio: voiceman: No bank error %d\n", bankId);
         gAudioErrorFlags = bankId + 0x10000000;
         return NULL;
@@ -256,7 +249,7 @@ struct Drum *get_drum(s32 bankId, s32 drumId) {
     struct Drum *drum;
 
 #ifdef VERSION_SH
-    if (IS_BANK_LOAD_COMPLETE(bankId) == FALSE) {
+    if (!IS_BANK_LOAD_COMPLETE(bankId)) {
         stubbed_printf("Audio: voiceman: No bank error %d\n", bankId);
         gAudioErrorFlags = bankId + 0x10000000;
         return NULL;
@@ -359,12 +352,9 @@ void process_notes(void) {
     struct NotePlaybackState *playbackState;
     struct NoteSubEu *noteSubEu;
 #ifndef VERSION_SH
-    UNUSED u8 pad[12];
     u8 reverbVol;
-    UNUSED u8 pad3;
     u8 pan;
 #else
-    UNUSED u8 pad[8];
     struct ReverbInfo reverbInfo;
 #endif
     u8 bookOffset;
@@ -456,9 +446,6 @@ void process_notes(void) {
 #endif
         d:
         if (playbackState->priority != NOTE_PRIORITY_DISABLED) {
-#ifdef VERSION_SH
-            if (1) {}
-#endif
             noteSubEu = &note->noteSubEu;
 #ifdef VERSION_SH
             if (playbackState->unkSH34 >= 1 || noteSubEu->finished) {
@@ -490,10 +477,6 @@ void process_notes(void) {
                         goto skip;
                     }
                 }
-#ifndef VERSION_SH
-                if (1) {
-                }
-#endif
             } else if (playbackState->adsr.state == ADSR_STATE_DISABLED) {
                 note_disable(note);
                 audio_list_remove(&note->listItem);
@@ -540,8 +523,6 @@ void process_notes(void) {
                 velocity = attributes->velocity;
                 pan = attributes->pan;
                 reverbVol = attributes->reverbVol;
-                if (1) {
-                }
                 bookOffset = noteSubEu->bookOffset;
             } else {
                 frequency = playbackState->parentLayer->noteFreqScale;
@@ -616,7 +597,7 @@ void process_notes(void) {
             frequency *= note->vibratoFreqScale * note->portamentoFreqScale;
             cap = 3.99992f;
             if (gAiFrequency != 32006) {
-                frequency *= US_FLOAT(32000.0) / (f32) gAiFrequency;
+                frequency *= (32000.0f / (f32) gAiFrequency);
             }
             frequency = (frequency < cap ? frequency : cap);
             scale *= 4.3498e-5f; // ~1 / 23000
@@ -647,7 +628,7 @@ struct AudioBankSound *instrument_get_audio_bank_sound(struct Instrument *instru
 struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
     struct Instrument *inst;
 
-    if (IS_BANK_LOAD_COMPLETE(bankId) == FALSE) {
+    if (!IS_BANK_LOAD_COMPLETE(bankId)) {
         gAudioErrorFlags = bankId + 0x10000000;
         return NULL;
     }
@@ -669,7 +650,7 @@ struct Instrument *get_instrument_inner(s32 bankId, s32 instId) {
 struct Drum *get_drum(s32 bankId, s32 drumId) {
     struct Drum *drum;
 
-    if (IS_BANK_LOAD_COMPLETE(bankId) == FALSE) {
+    if (!IS_BANK_LOAD_COMPLETE(bankId)) {
         gAudioErrorFlags = bankId + 0x10000000;
         return NULL;
     }
@@ -862,21 +843,21 @@ void build_synthetic_wave(struct Note *note, struct SequenceChannelLayer *seqLay
     u8 lim;
     u8 origSampleCount = note->sampleCount;
 
-    if (seqLayer->freqScale < US_FLOAT(1.0)) {
+    if (seqLayer->freqScale < 1.0f) {
         note->sampleCount = 64;
-        seqLayer->freqScale *= US_FLOAT(1.0465);
+        seqLayer->freqScale *= 1.0465f;
         stepSize = 1;
-    } else if (seqLayer->freqScale < US_FLOAT(2.0)) {
+    } else if (seqLayer->freqScale < 2.0f) {
         note->sampleCount = 32;
-        seqLayer->freqScale *= US_FLOAT(0.52325);
+        seqLayer->freqScale *= 0.52325f;
         stepSize = 2;
-    } else if (seqLayer->freqScale < US_FLOAT(4.0)) {
+    } else if (seqLayer->freqScale < 4.0f) {
         note->sampleCount = 16;
-        seqLayer->freqScale *= US_FLOAT(0.26263);
+        seqLayer->freqScale *= 0.26263f;
         stepSize = 4;
     } else {
         note->sampleCount = 8;
-        seqLayer->freqScale *= US_FLOAT(0.13081);
+        seqLayer->freqScale *= 0.13081f;
         stepSize = 8;
     }
 
@@ -1022,8 +1003,7 @@ void note_pool_clear(struct NotePool *pool) {
 }
 
 void note_pool_fill(struct NotePool *pool, s32 count) {
-    s32 i;
-    s32 j;
+    s32 i, j;
     struct Note *note;
     struct AudioListItem *source;
     struct AudioListItem *dest;
@@ -1130,7 +1110,6 @@ struct Note *pop_node_with_lower_prio(struct AudioListItem *list, s32 limit) {
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLayer) {
-    UNUSED s32 pad[4];
     s16 instId;
     struct NoteSubEu *sub = &note->noteSubEu;
 
@@ -1172,7 +1151,7 @@ s32 note_init_for_layer(struct Note *note, struct SequenceChannelLayer *seqLayer
     note->prevParentLayer = NO_LAYER;
     note->parentLayer = seqLayer;
     note->priority = seqLayer->seqChannel->notePriority;
-    if (IS_BANK_LOAD_COMPLETE(seqLayer->seqChannel->bankId) == FALSE) {
+    if (!IS_BANK_LOAD_COMPLETE(seqLayer->seqChannel->bankId)) {
         return TRUE;
     }
 

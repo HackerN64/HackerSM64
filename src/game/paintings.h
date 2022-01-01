@@ -11,29 +11,37 @@
 #define PAINTING_ID(id, grp) id | (grp << 8)
 
 /// The default painting side length
-#define PAINTING_SIZE 614.0
+#define PAINTING_SIZE 614.0f
 
-#define PAINTING_ID_DDD 7
+#define PAINTING_ID_DDD 0x7
 
-#define BOARD_BOWSERS_SUB 1
+#define BOARD_BOWSERS_SUB (1 << 0)
 
-#define BOWSERS_SUB_BEATEN 0x2
-#define DDD_BACK 0x1
+enum DDDPaintingFlags {
+    DDD_FLAGS_NONE              = (0 << 0), // 0x0
+    DDD_FLAG_BACK               = (1 << 0), // 0x1
+    DDD_FLAG_BOWSERS_SUB_BEATEN = (1 << 1), // 0x2
+};
 
-#define PAINTING_IDLE 0
-#define PAINTING_RIPPLE 1
-#define PAINTING_ENTERED 2
+enum PaintingState {
+    PAINTING_IDLE,
+    PAINTING_RIPPLE,
+    PAINTING_ENTERED
+};
 
-#define RIPPLE_TRIGGER_PROXIMITY 10
-#define RIPPLE_TRIGGER_CONTINUOUS 20
+enum RippleTriggers {
+    RIPPLE_TRIGGER_PROXIMITY  = 10,
+    RIPPLE_TRIGGER_CONTINUOUS = 20,
+};
 
-/// Painting that uses 1 or more images as a texture
-#define PAINTING_IMAGE 0
-/// Painting that has one texture used for an environment map effect
-#define PAINTING_ENV_MAP 1
+enum PaintingType {
+    /// Painting that uses 1 or more images as a texture
+    PAINTING_IMAGE,
+    /// Painting that has one texture used for an environment map effect
+    PAINTING_ENV_MAP
+};
 
-struct Painting
-{
+struct Painting {
     s16 id;
     /// How many images should be drawn when the painting is rippling.
     s8 imageCount;
@@ -103,7 +111,7 @@ struct Painting
     s8 rippleTrigger;
 
     /// The painting's transparency. Determines what layer the painting is in.
-    u8 alpha;
+    Alpha alpha;
 
     /// True if Mario was under the painting's y coordinate last frame
     s8 marioWasUnder;
@@ -121,14 +129,9 @@ struct Painting
  * Contains the position and normal of a vertex in the painting's generated mesh.
  */
 struct PaintingMeshVertex {
-    /*0x00*/ s16 pos[3];
-    /*0x06*/ s8 norm[3];
+    /*0x00*/ Vec3s pos;
+    /*0x06*/ Vec3c norm;
 };
-
-extern s16 gPaintingMarioFloorType;
-extern f32 gPaintingMarioXPos;
-extern f32 gPaintingMarioYPos;
-extern f32 gPaintingMarioZPos;
 
 extern struct PaintingMeshVertex *gPaintingMesh;
 extern Vec3f *gPaintingTriNorms;
@@ -136,6 +139,6 @@ extern struct Painting *gRipplingPainting;
 extern s8 gDddPaintingStatus;
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
-Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 c);
+Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx);
 
 #endif // PAINTINGS_H

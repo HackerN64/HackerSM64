@@ -11,10 +11,12 @@
 // which *is* orthogonal to the other. SEQ implicitly includes CHANNEL.
 // If none of the CHANNEL/SEQ/GLOBAL_FREELIST bits are set, all three locations
 // are tried.
-#define NOTE_ALLOC_LAYER 1
-#define NOTE_ALLOC_CHANNEL 2
-#define NOTE_ALLOC_SEQ 4
-#define NOTE_ALLOC_GLOBAL_FREELIST 8
+enum NoteAlloc {
+    NOTE_ALLOC_LAYER           = (1 << 0), // 0x1
+    NOTE_ALLOC_CHANNEL         = (1 << 1), // 0x2
+    NOTE_ALLOC_SEQ             = (1 << 2), // 0x4
+    NOTE_ALLOC_GLOBAL_FREELIST = (1 << 3), // 0x8
+};
 
 void process_notes(void);
 void seq_channel_layer_note_decay(struct SequenceChannelLayer *seqLayer);

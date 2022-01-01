@@ -42,7 +42,7 @@ void bhv_ttc_pendulum_update(void) {
 
         // Stay still for a while
         if (o->oTTCPendulumDelay != 0) {
-            o->oTTCPendulumDelay -= 1;
+            o->oTTCPendulumDelay--;
         } else {
             // Accelerate in the direction that moves angle to zero
             if (o->oTTCPendulumAngle * o->oTTCPendulumAccelDir > 0.0f) {
@@ -78,7 +78,6 @@ void bhv_ttc_pendulum_update(void) {
 
             o->oTTCPendulumAngle += o->oTTCPendulumAngleVel;
         }
-    } else {
     }
 
     o->oFaceAngleRoll = (s32) o->oTTCPendulumAngle;

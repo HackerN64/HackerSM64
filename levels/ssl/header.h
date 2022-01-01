@@ -18,8 +18,8 @@ extern const GeoLayout ssl_geo_0007CC[];
 extern const GeoLayout ssl_geo_00088C[];
 
 // leveldata
-extern const u8 ssl_pyramid_sand[];
-extern const u8 ssl_quicksand[];
+extern const Texture ssl_pyramid_sand[];
+extern const Texture ssl_quicksand[];
 extern const Gfx ssl_dl_quicksand_pit_begin[];
 extern const Gfx ssl_dl_quicksand_pit_end[];
 extern const Gfx ssl_dl_pyramid_quicksand_pit_begin[];

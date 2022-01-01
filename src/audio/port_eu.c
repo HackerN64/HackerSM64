@@ -4,6 +4,7 @@
 #include "data.h"
 #include "seqplayer.h"
 #include "synthesis.h"
+#include "engine/math_util.h"
 
 #ifdef VERSION_EU
 
@@ -21,11 +22,7 @@
 #define SAMPLES_TO_OVERPRODUCE 0x10
 #define EXTRA_BUFFERED_AI_SAMPLES_TARGET 0x40
 
-#ifdef VERSION_JP
-typedef u16 FadeT;
-#else
 typedef s32 FadeT;
-#endif
 
 extern volatile u8 gAudioResetStatus;
 extern u8 gAudioResetPresetIdToLoad;
@@ -36,7 +33,7 @@ void func_8031D690(s32 player, FadeT fadeInTime);
 void seq_player_fade_to_zero_volume(s32 player, FadeT fadeOutTime);
 void decrease_sample_dma_ttls(void);
 s32 audio_shut_down_and_reset_step(void);
-void func_802ad7ec(u32);
+void func_802ad7ec(u32 arg0);
 
 struct SPTask *create_next_audio_frame_task(void) {
     u32 samplesRemainingInAI;
@@ -95,12 +92,8 @@ struct SPTask *create_next_audio_frame_task(void) {
 
     gAiBufferLengths[index] = ((gAudioBufferParameters.samplesPerFrameTarget - samplesRemainingInAI +
          EXTRA_BUFFERED_AI_SAMPLES_TARGET) & ~0xf) + SAMPLES_TO_OVERPRODUCE;
-    if (gAiBufferLengths[index] < gAudioBufferParameters.minAiBufferLength) {
-        gAiBufferLengths[index] = gAudioBufferParameters.minAiBufferLength;
-    }
-    if (gAiBufferLengths[index] > gAudioBufferParameters.maxAiBufferLength) {
-        gAiBufferLengths[index] = gAudioBufferParameters.maxAiBufferLength;
-    }
+    gAiBufferLengths[index] = CLAMP(gAiBufferLengths[index], gAudioBufferParameters.minAiBufferLength,
+                                                             gAudioBufferParameters.maxAiBufferLength);
 
     if (osRecvMesg(OSMesgQueues[1], &sp2C, OS_MESG_NOBLOCK) != -1) {
         func_802ad7ec((u32) sp2C);
@@ -139,48 +132,45 @@ void eu_process_audio_cmd(struct EuAudioCmd *cmd) {
     s32 i;
 
     switch (cmd->u.s.op) {
-    case 0x81:
-        preload_sequence(cmd->u.s.arg2, 3);
-        break;
+        case 0x81:
+            preload_sequence(cmd->u.s.arg2, 3);
+            break;
 
-    case 0x82:
-    case 0x88:
-        load_sequence(cmd->u.s.arg1, cmd->u.s.arg2, cmd->u.s.arg3);
-        func_8031D690(cmd->u.s.arg1, cmd->u2.as_s32);
-        break;
+        case 0x82:
+        case 0x88:
+            load_sequence(cmd->u.s.arg1, cmd->u.s.arg2, cmd->u.s.arg3);
+            func_8031D690(cmd->u.s.arg1, cmd->u2.as_s32);
+            break;
 
-    case 0x83:
-        if (gSequencePlayers[cmd->u.s.arg1].enabled != FALSE) {
-            if (cmd->u2.as_s32 == 0) {
-                sequence_player_disable(&gSequencePlayers[cmd->u.s.arg1]);
+        case 0x83:
+            if (gSequencePlayers[cmd->u.s.arg1].enabled) {
+                if (cmd->u2.as_s32 == 0) {
+                    sequence_player_disable(&gSequencePlayers[cmd->u.s.arg1]);
+                } else {
+                    seq_player_fade_to_zero_volume(cmd->u.s.arg1, cmd->u2.as_s32);
+                }
             }
-            else {
-                seq_player_fade_to_zero_volume(cmd->u.s.arg1, cmd->u2.as_s32);
+            break;
+
+        case 0xf0:
+            gSoundMode = cmd->u2.as_s32;
+            break;
+
+        case 0xf1:
+            for (i = 0; i < 4; i++) {
+                gSequencePlayers[i].muted = TRUE;
+                gSequencePlayers[i].recalculateVolume = TRUE;
             }
-        }
-        break;
+            break;
 
-    case 0xf0:
-        gSoundMode = cmd->u2.as_s32;
-        break;
-
-    case 0xf1:
-        for (i = 0; i < 4; i++) {
-            gSequencePlayers[i].muted = TRUE;
-            gSequencePlayers[i].recalculateVolume = TRUE;
-        }
-        break;
-
-    case 0xf2:
-        for (i = 0; i < 4; i++) {
-            gSequencePlayers[i].muted = FALSE;
-            gSequencePlayers[i].recalculateVolume = TRUE;
-        }
-        break;
+        case 0xf2:
+            for (i = 0; i < 4; i++) {
+                gSequencePlayers[i].muted = FALSE;
+                gSequencePlayers[i].recalculateVolume = TRUE;
+            }
+            break;
     }
 }
-
-const char undefportcmd[] = "Undefined Port Command %d\n";
 
 extern OSMesgQueue *OSMesgQueues[];
 extern u8 D_EU_80302010;
@@ -261,58 +251,55 @@ void func_802ad7ec(u32 arg0) {
             seqPlayer = &gSequencePlayers[cmd->u.s.arg1];
             if ((cmd->u.s.op & 0x80) != 0) {
                 eu_process_audio_cmd(cmd);
-            }
-            else if ((cmd->u.s.op & 0x40) != 0) {
+            } else if ((cmd->u.s.op & 0x40) != 0) {
                 switch (cmd->u.s.op) {
-                case 0x41:
-                    seqPlayer->fadeVolumeScale = cmd->u2.as_f32;
-                    seqPlayer->recalculateVolume = TRUE;
-                    break;
+                    case 0x41:
+                        seqPlayer->fadeVolumeScale = cmd->u2.as_f32;
+                        seqPlayer->recalculateVolume = TRUE;
+                        break;
 
-                case 0x47:
-                    seqPlayer->tempo = cmd->u2.as_s32 * TATUMS_PER_BEAT;
-                    break;
+                    case 0x47:
+                        seqPlayer->tempo = cmd->u2.as_s32 * TATUMS_PER_BEAT;
+                        break;
 
-                case 0x48:
-                    seqPlayer->transposition = cmd->u2.as_s8;
-                    break;
+                    case 0x48:
+                        seqPlayer->transposition = cmd->u2.as_s8;
+                        break;
 
-                case 0x46:
-                    seqPlayer->seqVariationEu[cmd->u.s.arg3] = cmd->u2.as_s8;
-                    break;
+                    case 0x46:
+                        seqPlayer->seqVariationEu[cmd->u.s.arg3] = cmd->u2.as_s8;
+                        break;
                 }
-            }
-            else if (seqPlayer->enabled != FALSE && cmd->u.s.arg2 < 0x10) {
+            } else if (seqPlayer->enabled != FALSE && cmd->u.s.arg2 < 0x10) {
                 chan = seqPlayer->channels[cmd->u.s.arg2];
-                if (IS_SEQUENCE_CHANNEL_VALID(chan))
-                {
+                if (IS_SEQUENCE_CHANNEL_VALID(chan)) {
                     switch (cmd->u.s.op) {
-                    case 1:
-                        chan->volumeScale = cmd->u2.as_f32;
-                        chan->changes.as_bitfields.volume = TRUE;
-                        break;
-                    case 2:
-                        chan->volume = cmd->u2.as_f32;
-                        chan->changes.as_bitfields.volume = TRUE;
-                        break;
-                    case 3:
-                        chan->newPan = cmd->u2.as_s8;
-                        chan->changes.as_bitfields.pan = TRUE;
-                        break;
-                    case 4:
-                        chan->freqScale = cmd->u2.as_f32;
-                        chan->changes.as_bitfields.freqScale = TRUE;
-                        break;
-                    case 5:
-                        chan->reverbVol = cmd->u2.as_s8;
-                        break;
-                    case 6:
-                        if (cmd->u.s.arg3 < 8) {
-                            chan->soundScriptIO[cmd->u.s.arg3] = cmd->u2.as_s8;
-                        }
-                        break;
-                    case 8:
-                        chan->stopSomething2 = cmd->u2.as_s8;
+                        case 1:
+                            chan->volumeScale = cmd->u2.as_f32;
+                            chan->changes.as_bitfields.volume = TRUE;
+                            break;
+                        case 2:
+                            chan->volume = cmd->u2.as_f32;
+                            chan->changes.as_bitfields.volume = TRUE;
+                            break;
+                        case 3:
+                            chan->newPan = cmd->u2.as_s8;
+                            chan->changes.as_bitfields.pan = TRUE;
+                            break;
+                        case 4:
+                            chan->freqScale = cmd->u2.as_f32;
+                            chan->changes.as_bitfields.freqScale = TRUE;
+                            break;
+                        case 5:
+                            chan->reverbVol = cmd->u2.as_s8;
+                            break;
+                        case 6:
+                            if (cmd->u.s.arg3 < 8) {
+                                chan->soundScriptIO[cmd->u.s.arg3] = cmd->u2.as_s8;
+                            }
+                            break;
+                        case 8:
+                            chan->stopSomething2 = cmd->u2.as_s8;
                     }
                 }
             }
