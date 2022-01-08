@@ -978,25 +978,25 @@ void vec3f_get_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, Angle *pitch, Ang
     Vec3f d;
     vec3_diff(d, to, from);
     f32 xz = sqr(d[0]) + sqr(d[2]);
-    *dist           = sqrtf(xz + sqr(d[1]));
-    *pitch          = atan2s(sqrtf(xz), d[1]);
-    *yaw            = atan2s(d[2], d[0]);
+    *dist  = sqrtf(xz + sqr(d[1]));
+    *pitch = atan2s(sqrtf(xz), d[1]);
+    *yaw   = atan2s(d[2], d[0]);
 }
 void vec3s_get_dist_and_angle(Vec3s from, Vec3s to, s16 *dist, Angle *pitch, Angle *yaw) {
     Vec3s d;
     vec3_diff(d, to, from);
     f32 xz = sqr(d[0]) + sqr(d[2]);
-    *dist           = sqrtf(xz + sqr(d[1]));
-    *pitch          = atan2s(sqrtf(xz), d[1]);
-    *yaw            = atan2s(d[2], d[0]);
+    *dist  = sqrtf(xz + sqr(d[1]));
+    *pitch = atan2s(sqrtf(xz), d[1]);
+    *yaw   = atan2s(d[2], d[0]);
 }
 void vec3f_to_vec3s_get_dist_and_angle(Vec3f from, Vec3s to, f32 *dist, Angle *pitch, Angle *yaw) {
     Vec3f d;
     vec3_diff(d, to, from);
     f32 xz = sqr(d[0]) + sqr(d[2]);
-    *dist           = sqrtf(xz + sqr(d[1]));
-    *pitch          = atan2s(sqrtf(xz), d[1]);
-    *yaw            = atan2s(d[2], d[0]);
+    *dist  = sqrtf(xz + sqr(d[1]));
+    *pitch = atan2s(sqrtf(xz), d[1]);
+    *yaw   = atan2s(d[2], d[0]);
 }
 
 /// Finds the distance, horizontal distance, and angles between two vectors.
@@ -1004,10 +1004,10 @@ void vec3f_get_dist_and_lateral_dist_and_angle(Vec3f from, Vec3f to, f32 *dist, 
     Vec3f d;
     vec3_diff(d, to, from);
     f32 xz = sqr(d[0]) + sqr(d[2]);
-    *dist           = sqrtf(xz + sqr(d[1]));
-    *lateralDist    = sqrtf(xz);
-    *pitch          = atan2s(*lateralDist, d[1]);
-    *yaw            = atan2s(d[2], d[0]);
+    *dist        = sqrtf(xz + sqr(d[1]));
+    *lateralDist = sqrtf(xz);
+    *pitch       = atan2s(*lateralDist, d[1]);
+    *yaw         = atan2s(d[2], d[0]);
 }
 
 /**
@@ -1274,7 +1274,7 @@ enum gSplineStates {
  */
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c) {
     f32 tinv  = 1 - t;
-    f32 tinv2 = tinv  * tinv;
+    f32 tinv2 = tinv * tinv;
     f32 tinv3 = tinv2 * tinv;
     f32 t2 = t * t;
     f32 t3 = t2 * t;
