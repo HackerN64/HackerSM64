@@ -98,7 +98,8 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             }
         }
 
-        // Dot of normal and pos, + origin offset
+        // Dot of normal and pos, + origin offset.
+        //! TODO: Is 'offset' just the distance from 'pos' to the triangle?
         offset = (surf->normal.x * pos[0])
                + (surf->normal.y * pos[1])
                + (surf->normal.z * pos[2])
@@ -114,71 +115,80 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         // Vector from vertex 1 to pos
         vec3_diff(v2, pos,           surf->vertex1);
 
-        // Face
+        // Face dot products.
         d00 = vec3_dot(v0, v0);
         d01 = vec3_dot(v0, v1);
         d11 = vec3_dot(v1, v1);
         d20 = vec3_dot(v2, v0);
         d21 = vec3_dot(v2, v1);
 
+        // Inverse denom.
         invDenom = (d00 * d11) - (d01 * d01);
         if (FLT_IS_NONZERO(invDenom)) {
             invDenom = 1.0f / invDenom;
         }
 
         if (check_wall_triangle_vw(d00, d01, d11, d20, d21, invDenom)) {
+            // Skip if behind surface.
             if (offset < 0) {
                 continue;
             }
 
-            // Edge 1-2
+            // Edge 1-2.
             if (check_wall_triangle_edge(v0, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
-                // Edge 1-3
+                // Edge 1-3.
                 if (check_wall_triangle_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+                    // Edge 3 vector.
                     vec3_diff(v1, surf->vertex3, surf->vertex2);
+                    // Vector from vertex 2 to pos.
                     vec3_diff(v2, pos, surf->vertex2);
-                    // Edge 2-3
+                    // Edge 2-3.
                     if (check_wall_triangle_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
                         continue;
                     }
                 }
             }
 
-            // Check collision
+            // Check collision.
             if (FLT_IS_NONZERO(invDenom)) {
                 invDenom = (offset / invDenom);
             }
 
-            // Update pos
+            // Update pos.
             pos[0] += (d00 *= invDenom);
             pos[2] += (d01 *= invDenom);
+
+            // Increase margin_radius.
+            //! TODO: What's this for?
             margin_radius += 0.01f;
 
+            // dot(v0, v0) * normal.x + dot(v0, v1) * normal.z
             if ((d00 * surf->normal.x) + (d01 * surf->normal.z) < (corner_threshold * offset)) {
                 continue;
             }
         } else {
-            // Update pos
+            // Update pos.
             pos[0] += surf->normal.x * (radius - offset);
             pos[2] += surf->normal.z * (radius - offset);
         }
 
-        // The surface has collision
+        // The surface has collision.
         if (data->numWalls < MAX_REFERENCED_WALLS) {
             data->walls[data->numWalls++] = surf;
         }
         numCols++;
 
+        // If COLLISION_FLAG_RETURN_FIRST, return the first wall.
         if (gCollisionFlags & COLLISION_FLAG_RETURN_FIRST) {
             break;
         }
     }
 
-    // Update the position in the collisionData
+    // Update the collisionData's position.
     data->x = pos[0];
     data->z = pos[2];
 
-    // Return the number of wall collisions
+    // Return the number of wall collisions.
     return numCols;
 }
 
