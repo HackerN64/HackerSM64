@@ -360,9 +360,10 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
 #ifdef ALL_SURFACES_HAVE_FORCE
         *data += 4;
 #else
-        *data += 3;
         if (hasForce) {
-            (*data)++;
+            *data += 4;
+        } else {
+            *data += 3;
         }
 #endif
     }
