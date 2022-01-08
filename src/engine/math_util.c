@@ -651,7 +651,9 @@ void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, 
     f32 x = translation[0];
     f32 y = translation[1];
     f32 z = translation[2];
+
     mtxf_scale_vec3f(dest, throwMatrix, scale);
+
     f32 *dstp = (f32 *)dest[3];
     f32 *srcp = (f32 *)src[3];
     f32 *thp = (f32 *)throwMatrix;
