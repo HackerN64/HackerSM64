@@ -13,12 +13,12 @@
 #include "config/config_world.h"
 
 
-Vec3f gVec3fX    = {  1.0f,  0.0f,  0.0f };
-Vec3f gVec3fY    = {  0.0f,  1.0f,  0.0f };
-Vec3f gVec3fZ    = {  0.0f,  0.0f,  1.0f };
-Vec3f gVec3fNX   = { -1.0f,  0.0f,  0.0f };
-Vec3f gVec3fNY   = {  0.0f, -1.0f,  0.0f };
-Vec3f gVec3fNZ   = {  0.0f,  0.0f, -1.0f };
+Mat4 identityMtx = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
 Vec3f gVec3fZero = {  0.0f,  0.0f,  0.0f };
 Vec3f gVec3fOne  = {  1.0f,  1.0f,  1.0f };
 Vec3s gVec3sZero = {     0,     0,     0 };
@@ -69,7 +69,6 @@ s32 random_sign(void) {
     if (a2 < a0) a0 = a2;       \
     return a0;                  \
 }
-
 f32 min_3f(f32 a, f32 b, f32 c) { min_3_func(a, b, c); }
 s32 min_3i(s32 a, s32 b, s32 c) { min_3_func(a, b, c); }
 s32 min_3s(s16 a, s16 b, s16 c) { min_3_func(a, b, c); }
