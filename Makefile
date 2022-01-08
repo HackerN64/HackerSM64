@@ -325,10 +325,6 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
     ifeq ($(DUMMY),FAIL)
       $(error Failed to extract assets)
     endif
-    DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
-    ifeq ($(DUMMY),FAIL)
-      $(error Failed to extract assets)
-    endif
   endif
 
   # Make tools if out of date
