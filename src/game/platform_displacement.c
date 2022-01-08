@@ -20,57 +20,23 @@ struct Object *gMarioPlatform = NULL;
  * within 4 units of the floor. Set his referenced platform object accordingly.
  */
 void update_mario_platform(void) {
-    struct Surface *floor;
-    f32 marioX, marioY, marioZ;
-    f32 floorHeight;
-    u32 awayFromFloor;
+    struct Surface *floor = gMarioState->floor;
 
-    if (gMarioObject == NULL) {
+    if (gMarioObject == NULL || floor == NULL) {
         return;
     }
+    
+    struct Object *floorObj = floor->object;
 
-    //! If Mario moves onto a rotating platform in a PU, the find_floor call
-    //  will detect the platform and he will end up receiving a large amount
-    //  of displacement since he is considered to be far from the platform's
-    //  axis of rotation.
-
-    marioX = gMarioObject->oPosX;
-    marioY = gMarioObject->oPosY;
-    marioZ = gMarioObject->oPosZ;
-    floorHeight = find_floor(marioX, marioY, marioZ, &floor);
-
-    awayFromFloor =  absf(marioY - floorHeight) >= 4.0f;
-
-    if (awayFromFloor) {
-        gMarioPlatform = NULL;
-        gMarioObject->platform = NULL;
+    if (floor != NULL
+     && floorObj != NULL
+     && absf(gMarioObject->oPosY - gMarioState->floorHeight) < 4.0f) {
+        gMarioPlatform = floorObj;
+        gMarioObject->platform = floorObj;
     } else {
-        if (floor != NULL && floor->object != NULL) {
-            gMarioPlatform = floor->object;
-            gMarioObject->platform = floor->object;
-        } else {
-            gMarioPlatform = NULL;
-            gMarioObject->platform = NULL;
-        }
+        gMarioPlatform         = NULL;
+        gMarioObject->platform = NULL;
     }
-}
-
-/**
- * Get Mario's position and store it in x, y, and z.
- */
-void get_mario_pos(f32 *x, f32 *y, f32 *z) {
-    *x = gMarioStates[0].pos[0];
-    *y = gMarioStates[0].pos[1];
-    *z = gMarioStates[0].pos[2];
-}
-
-/**
- * Set Mario's position.
- */
-void set_mario_pos(f32 x, f32 y, f32 z) {
-    gMarioStates[0].pos[0] = x;
-    gMarioStates[0].pos[1] = y;
-    gMarioStates[0].pos[2] = z;
 }
 
 #ifdef PLATFORM_DISPLACEMENT_2
@@ -78,21 +44,6 @@ static struct PlatformDisplacementInfo sMarioDisplacementInfo;
 static Vec3f sMarioAmountDisplaced;
 
 extern s32 gGlobalTimer;
-
-/**
- * Upscale or downscale a vector by another vector.
- */
-static void scale_vec3f(Vec3f dst, Vec3f src, Vec3f scale, u32 doInverted) {
-    if (doInverted) {
-        dst[0] = src[0] / scale[0];
-        dst[1] = src[1] / scale[1];
-        dst[2] = src[2] / scale[2];
-    } else {
-        dst[0] = src[0] * scale[0];
-        dst[1] = src[1] * scale[1];
-        dst[2] = src[2] * scale[2];
-    }
-}
 
 /**
  * Apply one frame of platform displacement to Mario or an object using the given
@@ -116,8 +67,10 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
     vec3f_sub(posDifference, displaceInfo->prevPos);
 
     if ((platform == displaceInfo->prevPlatform) && (gGlobalTimer == displaceInfo->prevTimer + 1)) {
+        // Upscale position
+        vec3f_prod(scaledPos, displaceInfo->prevTransformedPos, platform->header.gfx.scale);
+
         // Transform from relative positions to world positions
-        scale_vec3f(scaledPos, displaceInfo->prevTransformedPos, platform->header.gfx.scale, FALSE);
         linear_mtxf_mul_vec3f(*platform->header.gfx.throwMatrix, pos, scaledPos);
 
         // Add on how much Mario moved in the previous frame
@@ -133,14 +86,14 @@ void apply_platform_displacement(struct PlatformDisplacementInfo *displaceInfo, 
 
     // Apply velocity-based displacement for certain objects (like the TTC Treadmills)
     if (platform->oFlags & OBJ_FLAG_VELOCITY_PLATFORM) {
-        pos[0] += platform->oVelX;
-        pos[1] += platform->oVelY;
-        pos[2] += platform->oVelZ;
+        vec3f_add(pos, &platform->oVelVec);
     }
 
     // Transform from world positions to relative positions for use next frame
     linear_mtxf_transpose_mul_vec3f(*platform->header.gfx.throwMatrix, scaledPos, pos);
-    scale_vec3f(displaceInfo->prevTransformedPos, scaledPos, platform->header.gfx.scale, TRUE);
+
+    // Downscale position
+    vec3f_quot(displaceInfo->prevTransformedPos, scaledPos, platform->header.gfx.scale);
     vec3f_add(pos, platformPos);
 
     // If the object is Mario, set inertia
@@ -224,71 +177,53 @@ void apply_mario_platform_displacement(void) {
  * platform. If isMario is false, use gCurrentObject.
  */
 void apply_platform_displacement(u32 isMario, struct Object *platform) {
-    f32 x, y, z;
-    f32 platformPosX, platformPosY, platformPosZ;
+    Vec3f pos;
+    Vec3f platformPos;
     Vec3f currentObjectOffset;
     Vec3f relativeOffset;
     Vec3f newObjectOffset;
     Vec3s rotation;
     Mat4 displaceMatrix;
 
-    rotation[0] = platform->oAngleVelPitch;
-    rotation[1] = platform->oAngleVelYaw;
-    rotation[2] = platform->oAngleVelRoll;
+    vec3s_copy(rotation, &platform->oAngleVelVec);
 
     if (isMario) {
-        get_mario_pos(&x, &y, &z);
+        vec3f_copy(pos, gMarioStates[0].pos);
     } else {
-        x = gCurrentObject->oPosX;
-        y = gCurrentObject->oPosY;
-        z = gCurrentObject->oPosZ;
+        vec3f_copy(pos, &o->oPosVec);
     }
 
-    x += platform->oVelX;
-    z += platform->oVelZ;
+    pos[0] += platform->oVelX;
+    pos[2] += platform->oVelZ;
 
-    if (rotation[0] != 0 || rotation[1] != 0 || rotation[2] != 0) {
-        // unusedPitch = rotation[0];
-        // unusedRoll  = rotation[2];
-        // unusedYaw   = platform->oFaceAngleYaw;
-
+    if (rotation[0] != 0
+     || rotation[1] != 0
+     || rotation[2] != 0) {
         if (isMario) {
             gMarioStates[0].faceAngle[1] += rotation[1];
         }
 
-        platformPosX = platform->oPosX;
-        platformPosY = platform->oPosY;
-        platformPosZ = platform->oPosZ;
+        vec3f_copy(platformPos, &platform->oPosVec);
 
-        currentObjectOffset[0] = x - platformPosX;
-        currentObjectOffset[1] = y - platformPosY;
-        currentObjectOffset[2] = z - platformPosZ;
+        vec3f_diff(currentObjectOffset, pos, platformPos);
 
-        rotation[0] = platform->oFaceAnglePitch - platform->oAngleVelPitch;
-        rotation[1] = platform->oFaceAngleYaw - platform->oAngleVelYaw;
-        rotation[2] = platform->oFaceAngleRoll - platform->oAngleVelRoll;
+        vec3_diff(rotation, &platform->oFaceAngleVec, &platform->oAngleVelVec);
 
         mtxf_rotate_zxy_and_translate(displaceMatrix, currentObjectOffset, rotation);
         linear_mtxf_transpose_mul_vec3f(displaceMatrix, relativeOffset, currentObjectOffset);
 
-        rotation[0] = platform->oFaceAnglePitch;
-        rotation[1] = platform->oFaceAngleYaw;
-        rotation[2] = platform->oFaceAngleRoll;
+        vec3i_to_vec3s(rotation, &platform->oFaceAngleVec);
 
         mtxf_rotate_zxy_and_translate(displaceMatrix, currentObjectOffset, rotation);
         linear_mtxf_mul_vec3f(displaceMatrix, newObjectOffset, relativeOffset);
 
-        x = platformPosX + newObjectOffset[0];
-        y = platformPosY + newObjectOffset[1];
-        z = platformPosZ + newObjectOffset[2];
+        vec3f_sum(pos, platformPos, newObjectOffset);
     }
 
     if (isMario) {
-        set_mario_pos(x, y, z);
+        vec3f_copy(gMarioStates[0].pos, pos);
     } else {
-        gCurrentObject->oPosX = x;
-        gCurrentObject->oPosY = y;
-        gCurrentObject->oPosZ = z;
+        vec3f_copy(&o->oPosVec, pos);
     }
 }
 

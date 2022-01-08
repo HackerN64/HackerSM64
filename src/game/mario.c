@@ -651,7 +651,9 @@ s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
 Bool32 set_mario_wall(struct MarioState *m, struct Surface *wall) {
     if (m->wall != wall) {
         m->wall = wall;
-        if (m->wall != NULL) m->wallYaw = SURFACE_YAW(wall);
+        if (m->wall != NULL) {
+            m->wallYaw = SURFACE_YAW(wall);
+        }
     }
     return (m->wall != NULL);
 }
@@ -659,7 +661,9 @@ Bool32 set_mario_wall(struct MarioState *m, struct Surface *wall) {
 Bool32 set_mario_ceil(struct MarioState *m, struct Surface *ceil, f32 ceilHeight) {
     if (m->ceil != ceil) {
         m->ceil = ceil;
-        if (m->ceil != NULL) m->ceilYaw = SURFACE_YAW(ceil);
+        if (m->ceil != NULL) {
+            m->ceilYaw = SURFACE_YAW(ceil);
+        }
     }
     m->ceilHeight = ceilHeight;
     return (m->ceil != NULL);
@@ -668,7 +672,9 @@ Bool32 set_mario_ceil(struct MarioState *m, struct Surface *ceil, f32 ceilHeight
 Bool32 set_mario_floor(struct MarioState *m, struct Surface *floor, f32 floorHeight) {
     if (m->floor != floor) {
         m->floor = floor;
-        if (m->floor != NULL) m->floorYaw = SURFACE_YAW(floor);
+        if (m->floor != NULL) {
+            m->floorYaw = SURFACE_YAW(floor);
+        }
     }
     m->floorHeight = floorHeight;
     return (m->floor != NULL);

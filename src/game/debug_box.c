@@ -167,6 +167,15 @@ static const Gfx dl_visual_surface[] = {
     gsSPEndDisplayList(),
 };
 
+static const Gfx dl_visual_surface_2[] = {
+    gsDPPipeSync(),
+    gsDPSetRenderMode(G_RM_ZB_XLU_SURF, G_RM_NOOP2),
+    gsSPClearGeometryMode(G_LIGHTING),
+    gsSPSetGeometryMode(G_ZBUFFER),
+    gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
+    gsSPEndDisplayList(),
+};
+
 static const Gfx dl_debug_box_end[] = {
     gsDPPipeSync(),
     gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
@@ -343,7 +352,7 @@ s32 iterate_surface_count(s32 x, s32 z) {
     return j;
 }
 
-void visual_surface_loop(void) {
+void visual_surface_loop(s32 isDecal) {
     if (!gSurfaceNodesAllocated
      || !gSurfacesAllocated
      || !gMarioState->marioObj) {
@@ -360,7 +369,11 @@ void visual_surface_loop(void) {
     }
     mtxf_to_mtx(mtx, gMatStack[1]);
 
-    gSPDisplayList(gDisplayListHead++, dl_visual_surface);
+    if (isDecal) {
+        gSPDisplayList(gDisplayListHead++, dl_visual_surface);
+    } else {
+        gSPDisplayList(gDisplayListHead++, dl_visual_surface_2);
+    }
 
     gSPMatrix(gDisplayListHead++, mtx, (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
 

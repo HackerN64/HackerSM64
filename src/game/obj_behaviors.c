@@ -379,7 +379,6 @@ s16 object_step(void) {
     f32 objY = o->oPosY;
     f32 objZ = o->oPosZ;
 
-    f32 floorY;
     f32 waterY = FLOOR_LOWER_LIMIT_MISC;
 
     f32 objVelX = o->oForwardVel * sins(o->oMoveAngleYaw);
@@ -392,7 +391,7 @@ s16 object_step(void) {
         collisionFlags += OBJ_COL_FLAG_HIT_WALL;
     }
 
-    floorY = find_floor(objX + objVelX, objY, objZ + objVelZ, &sObjFloor);
+    f32 floorY = find_floor(objX + objVelX, objY, objZ + objVelZ, &sObjFloor);
 
     o->oFloor       = sObjFloor;
     o->oFloorHeight = floorY;

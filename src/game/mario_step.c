@@ -325,6 +325,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     } else {
         oldWallDYaw = 0x0;
     }
+
     for (i = 0; i < upperWall.numWalls; i++) {
         wallDYaw = abs_angle_diff(SURFACE_YAW(upperWall.walls[i]), m->faceAngle[1]);
         if (wallDYaw > oldWallDYaw) {

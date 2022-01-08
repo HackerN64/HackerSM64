@@ -374,7 +374,10 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #endif
 #ifdef VISUAL_DEBUG
     if ( hitboxView) render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
-    if (surfaceView) visual_surface_loop();
+    if (surfaceView) {
+        visual_surface_loop(FALSE);
+        visual_surface_loop(TRUE);
+    }
 #endif
 }
 
