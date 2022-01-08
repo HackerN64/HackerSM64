@@ -6,8 +6,7 @@
 
 /** 
  * Enables some mechanics that change behavior depending on hardcoded level numbers.
- * You may also need to change sLevelsWithRooms in object_helpers.c
- * TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic
+// TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic.
 */
 // #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
@@ -62,7 +61,7 @@
 // If this is disabled, backup assets will be used.
 // #define COMPLETE_EN_US_SEGMENT2
 
-/// Removes multi-language cake screen
+// Removes multi-language cake screen
 #define EU_CUSTOM_CAKE_FIX
 
 // Adds multiple languages to the game. Just a placeholder for the most part, because it only works with EU, and must be enabled with EU.
