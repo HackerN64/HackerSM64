@@ -754,7 +754,7 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
 /**
  * Finds the height of water at a given location.
  */
-s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
+s32 find_water_level(s32 x, s32 y, s32 z) {
     s32 val;
     s32 loX, hiX, loZ, hiZ;
     TerrainData *p = gEnvironmentRegions;
@@ -762,7 +762,7 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-    s32 waterLevel = find_water_floor(x, ((gCollisionFlags & COLLISION_FLAG_CAMERA) ? gLakituState.pos[1] : gMarioState->pos[1]), z, &floor);
+    s32 waterLevel = find_water_floor(x, y, z, &floor);
 
     if ((p != NULL) && (waterLevel == FLOOR_LOWER_LIMIT)) {
         s32 numRegions = *p++;

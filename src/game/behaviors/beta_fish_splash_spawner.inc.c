@@ -13,5 +13,5 @@
  * Update function for bhvBetaFishSplashSpawner.
  */
 void bhv_beta_fish_splash_spawner_loop(void) {
-    // UNUSED f32 waterLevel = find_water_level(o->oPosX, o->oPosZ);
+    // UNUSED f32 waterLevel = find_water_level(o->oPosX, o->oPosY, o->oPosZ);
 }

@@ -222,7 +222,7 @@ void bhv_fish_loop(void) {
 
     // oFishWaterLevel tracks if a fish has roamed out of water.
     // This can't happen in Secret Aquarium, so set it to 0.
-    o->oFishWaterLevel = find_water_level(o->oPosX, o->oPosZ);
+    o->oFishWaterLevel = find_water_level(o->oPosX, o->oPosY, o->oPosZ);
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS //! TODO: Make this a param
     if (gCurrLevelNum == LEVEL_SA) {
         o->oFishWaterLevel = 0.0f;

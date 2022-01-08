@@ -285,7 +285,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
 
-    f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
+    f32 waterLevel = find_water_level(nextPos[0], nextPos[1], nextPos[2]);
 
     if (floor == NULL) {
         return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
@@ -468,7 +468,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
 
-    f32 waterLevel = find_water_level(nextPos[0], nextPos[2]);
+    f32 waterLevel = find_water_level(nextPos[0], nextPos[1], nextPos[2]);
 
     //! The water pseudo floor is not referenced when your intended qstep is
     // out of bounds, so it won't detect you as landing.

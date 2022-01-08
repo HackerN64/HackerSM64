@@ -84,7 +84,7 @@ void bhv_koopa_shell_loop(void) {
             obj_copy_pos(o, gMarioObject);
             floor = cur_obj_update_floor_height_and_get_floor();
 
-            if (absf(find_water_level(o->oPosX, o->oPosZ) - o->oPosY) < 10.0f) {
+            if (absf(find_water_level(o->oPosX, o->oPosY, o->oPosZ) - o->oPosY) < 10.0f) {
                 koopa_shell_spawn_water_drop();
             } else if (absf(o->oPosY - o->oFloorHeight) < 5.0f) {
                 if (floor != NULL && floor->type == SURFACE_BURNING) {

@@ -56,7 +56,7 @@ void bubba_act_attack(void) {
         } else if (o->oBubbaLungeTimer < 15) {
             o->oAnimState = 1;
         } else if (o->oBubbaLungeTimer == 20) {
-            s16 targetPitch = 10000 - (s16)(20.0f * (find_water_level(o->oPosX, o->oPosZ) - o->oPosY));
+            s16 targetPitch = 10000 - (s16)(20.0f * (find_water_level(o->oPosX, o->oPosY, o->oPosZ) - o->oPosY));
             o->oBubbaTargetPitch -= targetPitch;
             o->oMoveAnglePitch = o->oBubbaTargetPitch;
             o->oBubbaMovePitch = 40.0f;

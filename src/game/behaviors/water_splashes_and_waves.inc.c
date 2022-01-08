@@ -49,7 +49,7 @@ struct WaterDropletParams gShallowWaterWaveDropletParams = {
 void bhv_water_splash_spawn_droplets(void) {
     s32 i;
     if (o->oTimer == 0) {
-        o->oPosY = find_water_level(o->oPosX, o->oPosZ);
+        o->oPosY = find_water_level(o->oPosX, o->oPosY, o->oPosZ);
     }
 
     if (o->oPosY > FLOOR_LOWER_LIMIT_MISC) { // Make sure it is not at the default water level
@@ -60,7 +60,7 @@ void bhv_water_splash_spawn_droplets(void) {
 }
 
 void bhv_water_droplet_loop(void) {
-    f32 waterLevel = find_water_level(o->oPosX, o->oPosZ);
+    f32 waterLevel = find_water_level(o->oPosX, o->oPosY, o->oPosZ);
 
     if (o->oTimer == 0) {
         if (cur_obj_has_model(MODEL_FISH)) {
@@ -102,7 +102,7 @@ void bhv_water_droplet_splash_init(void) {
 }
 
 void bhv_bubble_splash_init(void) {
-    f32 waterLevel = find_water_level(o->oPosX, o->oPosZ);
+    f32 waterLevel = find_water_level(o->oPosX, o->oPosY, o->oPosZ);
     obj_scale_xyz(o, 0.5f, 1.0f, 0.5f);
     o->oPosY = waterLevel + 5.0f;
 }
@@ -121,7 +121,7 @@ void bhv_wave_trail_shrink(void) {
         obj_mark_for_deletion(o);
         return;
     }
-    o->oPosY = find_water_level(o->oPosX, o->oPosZ) + 5.0f;
+    o->oPosY = find_water_level(o->oPosX, o->oPosY, o->oPosZ) + 5.0f;
 
     if (o->oTimer == 0) {
         o->oWaveTrailSize = o->header.gfx.scale[0];

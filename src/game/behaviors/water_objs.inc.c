@@ -34,7 +34,7 @@ void bhv_water_air_bubble_loop(void) {
         }
     }
 
-    if (find_water_level(o->oPosX, o->oPosZ) < o->oPosY) {
+    if (find_water_level(o->oPosX, o->oPosY, o->oPosZ) < o->oPosY) {
         obj_mark_for_deletion(o);
     }
 
@@ -68,7 +68,7 @@ void bhv_small_water_wave_loop(void) {
     o->header.gfx.scale[1] = sins(o->oWaterObjScaleYAngle) * 0.2f + 1.0f;
     o->oWaterObjScaleYAngle += o->oWaterObjScaleYAngleVel;
 
-    if (o->oPosY > find_water_level(o->oPosX, o->oPosZ)) {
+    if (o->oPosY > find_water_level(o->oPosX, o->oPosY, o->oPosZ)) {
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
         o->oPosY += 5.0f;
         if (gFreeObjectList.next != NULL) {
@@ -99,7 +99,7 @@ void bhv_particle_loop() {
     o->oPosY += 5.0f;
     obj_translate_xz_random(o, 4.0f);
     scale_bubble_sin();
-    if (o->oTimer != 0 && o->oPosY > find_water_level(o->oPosX, o->oPosZ)) {
+    if (o->oTimer != 0 && o->oPosY > find_water_level(o->oPosX, o->oPosY, o->oPosZ)) {
         obj_mark_for_deletion(o);
         try_to_spawn_object(5, 0, o, MODEL_SMALL_WATER_SPLASH, bhvObjectWaterSplash);
     }

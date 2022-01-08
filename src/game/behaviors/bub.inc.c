@@ -143,7 +143,7 @@ ObjActionFunc sCheepCheepActions[] = {
 };
 
 void bhv_bub_loop(void) {
-    o->oCheepCheepWaterLevel = find_water_level(o->oPosX, o->oPosZ);
+    o->oCheepCheepWaterLevel = find_water_level(o->oPosX, o->oPosY, o->oPosZ);
     o->oCheepCheepTargetY = gMarioObject->oPosY + o->oCheepCheepTargetYOffset;
     o->oWallHitboxRadius = 30.0f;
 
