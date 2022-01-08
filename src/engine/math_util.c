@@ -831,26 +831,26 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
     ((s16 *) mtx)[15] = 1;
 }
 
-// void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
-//     f32 *dstp = (f32 *)dst;
-//     f32 tx = a2[3][0];
-//     f32 ty = a2[3][1];
-//     f32 tz = a2[3][2];
-//     f32 rx, ry, rz;
-//     s32 i;
-//     for (i = 0; i < 3; i++) {
-//         rx = a2[i][0];
-//         ry = a2[i][1];
-//         rz = a2[i][2];
-//         dstp[ 0] = (a1[0][0] * rx + a1[0][1] * ry + a1[0][2] * rz); //   dot(a1[0], a2[i])
-//         dstp[ 4] = (a1[1][0] * rx + a1[1][1] * ry + a1[1][2] * rz); //   dot(a1[1], a2[i])
-//         dstp[ 8] = (a1[2][0] * rx + a1[2][1] * ry + a1[2][2] * rz); //   dot(a1[2], a2[i])
-//         dstp[12] = (a1[3][0] * rx + a1[3][1] * ry + a1[3][2] * rz)  //   dot(a1[3], a2[i])
-//                  - (      tx * rx +       ty * ry +       tz * rz); // - dot(a2[3], a2[i])
-//         dstp++;
-//     }
-//     MTXF_END(dst);
-// }
+void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
+    f32 *dstp = (f32 *)dst;
+    f32 tx = a2[3][0];
+    f32 ty = a2[3][1];
+    f32 tz = a2[3][2];
+    f32 rx, ry, rz;
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        rx = a2[i][0];
+        ry = a2[i][1];
+        rz = a2[i][2];
+        dstp[ 0] = (a1[0][0] * rx + a1[0][1] * ry + a1[0][2] * rz); //   dot(a1[0], a2[i])
+        dstp[ 4] = (a1[1][0] * rx + a1[1][1] * ry + a1[1][2] * rz); //   dot(a1[1], a2[i])
+        dstp[ 8] = (a1[2][0] * rx + a1[2][1] * ry + a1[2][2] * rz); //   dot(a1[2], a2[i])
+        dstp[12] = (a1[3][0] * rx + a1[3][1] * ry + a1[3][2] * rz)  //   dot(a1[3], a2[i])
+                 - (      tx * rx +       ty * ry +       tz * rz); // - dot(a2[3], a2[i])
+        dstp++;
+    }
+    MTXF_END(dst);
+}
 
 /**
  * Extract a position given an object's transformation matrix and a camera matrix.
