@@ -29,16 +29,18 @@ static s32 check_wall_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDen
 }
 
 s32 check_wall_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invDenom, f32 *offset, f32 margin_radius) {
-    if (FLT_IS_NONZERO(vert[1])) {
-        f32 v = (v2[1] / vert[1]);
+    f32 y = vert[1];
+
+    if (FLT_IS_NONZERO(y)) {
+        f32 v = (v2[1] / y);
         if (v < 0.0f || v > 1.0f) {
             return TRUE;
         }
 
-        *d00 = ((vert[0] * v) - v2[0]);
-        *d01 = ((vert[2] * v) - v2[2]);
+        *d00 = (vert[0] * v) - v2[0];
+        *d01 = (vert[2] * v) - v2[2];
         *invDenom = sqrtf(sqr(*d00) + sqr(*d01));
-        *offset = (*invDenom - margin_radius);
+        *offset = *invDenom - margin_radius;
 
         return (*offset > 0.0f);
     }
@@ -72,9 +74,9 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
 
     // Stay in this loop until out of walls.
     while (surfaceNode != NULL) {
-        surf        = surfaceNode->surface;
+        surf = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
-        type        = surf->type;
+        type = surf->type;
 
         // Exclude a large number of walls immediately to optimize.
         if (pos[1] < surf->lowerY || pos[1] > surf->upperY) continue;
@@ -90,6 +92,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             if (type == SURFACE_VANISH_CAP_WALLS && o != NULL) {
                 // If an object can pass through a vanish cap wall, pass through.
                 if (o->activeFlags & ACTIVE_FLAG_MOVE_THROUGH_GRATE) continue;
+
                 // If Mario has a vanish cap, pass through the vanish cap wall.
                 if (o == gMarioObject && gMarioState->flags & MARIO_VANISH_CAP) continue;
             }
