@@ -14,7 +14,7 @@
  *                      WALLS                     *
  **************************************************/
 
-static s32 check_wall_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDenom) {
+static s32 check_wall_triangle_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDenom) {
     f32 v = ((d11 * d20) - (d01 * d21)) * invDenom;
     if (v < 0.0f || v > 1.0f) {
         return TRUE;
@@ -28,7 +28,7 @@ static s32 check_wall_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDen
     return FALSE;
 }
 
-s32 check_wall_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invDenom, f32 *offset, f32 margin_radius) {
+s32 check_wall_triangle_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invDenom, f32 *offset, f32 margin_radius) {
     f32 y = vert[1];
 
     if (FLT_IS_NONZERO(y)) {
@@ -126,19 +126,19 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
             invDenom = 1.0f / invDenom;
         }
 
-        if (check_wall_vw(d00, d01, d11, d20, d21, invDenom)) {
+        if (check_wall_triangle_vw(d00, d01, d11, d20, d21, invDenom)) {
             if (offset < 0) {
                 continue;
             }
 
             // Edge 1-2
-            if (check_wall_edge(v0, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+            if (check_wall_triangle_edge(v0, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
                 // Edge 1-3
-                if (check_wall_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+                if (check_wall_triangle_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
                     vec3_diff(v1, surf->vertex3, surf->vertex2);
                     vec3_diff(v2, pos, surf->vertex2);
                     // Edge 2-3
-                    if (check_wall_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
+                    if (check_wall_triangle_edge(v1, v2, &d00, &d01, &invDenom, &offset, margin_radius)) {
                         continue;
                     }
                 }
