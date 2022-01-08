@@ -116,11 +116,12 @@ s32 check_kick_or_dive_in_air(struct MarioState *m) {
     return FALSE;
 }
 
-s32 should_get_stuck_in_ground(struct MarioState *m) {
 #ifdef NO_GETTING_BURIED
+s32 should_get_stuck_in_ground(UNUSED struct MarioState *m) {
     return FALSE;
+}
 #else
-
+s32 should_get_stuck_in_ground(struct MarioState *m) {
     u32 terrainType = m->area->terrainType & TERRAIN_MASK;
     struct Surface *floor = m->floor;
     s32 flags = floor->flags;
@@ -134,8 +135,8 @@ s32 should_get_stuck_in_ground(struct MarioState *m) {
     }
 
     return FALSE;
-#endif
 }
+#endif
 
 s32 check_fall_damage_or_get_stuck(struct MarioState *m, u32 hardFallAction) {
     if (should_get_stuck_in_ground(m)) {
