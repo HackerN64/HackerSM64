@@ -121,7 +121,6 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
     }
 
     if (absf(o->oPosX) > 8000.0f) o->oPosX = xPrev;
-
     if (absf(o->oPosZ) > 8000.0f) o->oPosZ = zPrev;
 
     if (floorY + 125.0f > o->oPosY) {

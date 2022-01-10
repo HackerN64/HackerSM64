@@ -1891,7 +1891,7 @@ static void jumbo_star_cutscene_flying(struct MarioState *m) {
         case ACT_STATE_JUMBO_STAR_CUTSCENE_FLYING_INIT:
             set_mario_animation(m, MARIO_ANIM_WING_CAP_FLY);
             anim_spline_init(sJumboStarKeyframes);
-            m->actionState = ACT_STATE_JUMBO_STAR_CUTSCENE_FLYING_ANGLES;
+            m->actionState++; // ACT_STATE_JUMBO_STAR_CUTSCENE_FLYING_ANGLES
             // fallthrough
         case ACT_STATE_JUMBO_STAR_CUTSCENE_FLYING_ANGLES:
             if (anim_spline_poll(targetPos)) {

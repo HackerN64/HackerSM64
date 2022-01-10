@@ -15,7 +15,7 @@
 #define COIN_LAVA_FLICKER
 
 // Allow for retries on collecting the remaining blue coins from a blue coin switch.
-//#define BLUE_COIN_SWITCH_RETRY
+// #define BLUE_COIN_SWITCH_RETRY
 
 // -- GOOMBA --
 
@@ -36,7 +36,7 @@
 
 // -- MR I --
 
-// Uncomment to allow MR I to shoot his particle in any direction 
+// Uncomment to allow Mr I to shoot his particle in any direction.
 // #define MR_I_PITCH_SHOOTING
 
 // -- WATER RING --
@@ -56,8 +56,8 @@
 
 // -- PLATFORM ON TRACK --
 
-// The speed of a platform on a track can be controlled by standing near the front or back of it
-//#define CONTROLLABLE_PLATFORM_SPEED
+// The speed of a platform on a track can be controlled by standing near the front or back of it.
+// #define CONTROLLABLE_PLATFORM_SPEED
 
 // -- CHAIN CHOMP --
 

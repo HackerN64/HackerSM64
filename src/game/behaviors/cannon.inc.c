@@ -40,7 +40,7 @@ void opened_cannon_act_rising(void) { // act 4
     }
 
     o->oPosY += 5.0f;
-    f32 horizontalVel = (f32)(((o->oTimer / 2) & 0x1) - 0.5f) * 2; 
+    f32 horizontalVel = (f32)(((o->oTimer / 2) & 0x1) - 0.5f) * 2;
     o->oPosX += horizontalVel;
     o->oPosZ += horizontalVel;
 

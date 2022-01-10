@@ -18,13 +18,8 @@ void bhv_spindel_loop(void) {
         }
     }
 
-    s32 shake = 10 - o->oSpindelMoveTimer;
+    s32 shake = absi(10 - o->oSpindelMoveTimer) - 6;
 
-    if (shake < 0) {
-        shake *= -1;
-    }
-
-    shake -= 6;
     if (shake < 0) {
         shake = 0;
     }

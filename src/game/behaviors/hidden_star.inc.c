@@ -40,7 +40,8 @@ void bhv_hidden_star_trigger_loop(void) {
                 spawn_orange_number(hiddenStar->oHiddenStarTriggerCounter, 0, 0, 0);
             }
 
-            play_sound(SOUND_MENU_COLLECT_SECRET + (((u8) hiddenStar->oHiddenStarTriggerCounter - 1) << 16), gGlobalSoundSource);
+            play_sound(SOUND_MENU_COLLECT_SECRET
+                       + (((u8) hiddenStar->oHiddenStarTriggerCounter - 1) << 16), gGlobalSoundSource);
         }
 
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;

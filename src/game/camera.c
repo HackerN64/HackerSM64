@@ -1606,9 +1606,9 @@ u8 sDanceCutsceneTable[] = {
  * Third entry is seemingly unused.
  */
 struct ParallelTrackingPoint sBBHLibraryParTrackPath[] = {
-    { 1, { -929.0f, 1619.0f, -1490.0f }, 50.0f, 0.0f },
+    { 1, {  -929.0f, 1619.0f, -1490.0f }, 50.0f, 0.0f },
     { 0, { -2118.0f, 1619.0f, -1490.0f }, 50.0f, 0.0f },
-    { 0, { 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f },
+    { 0, {     0.0f,    0.0f,     0.0f },  0.0f, 0.0f },
 };
 
 s32 unused_update_mode_5_camera(UNUSED struct Camera *c, UNUSED Vec3f focus, UNUSED Vec3f pos) {

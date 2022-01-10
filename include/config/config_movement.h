@@ -30,7 +30,7 @@
 #define NO_FALL_DAMAGE
 
 // Disables the scream that mario makes when falling off a great height (this is separate from actual fall damage)
-//#define NO_FALL_DAMAGE_SOUND
+// #define NO_FALL_DAMAGE_SOUND
 
 // Fall height for normal fall damage. Vanilla is 1150.0f
 #define FALL_DAMAGE_HEIGHT_SMALL 1150.0f
@@ -45,13 +45,13 @@
 // #define HANDS_FREE_HOLDING_FIX
 
 // Prevents Mario losing his cap.
-//#define PREVENT_CAP_LOSS
+// #define PREVENT_CAP_LOSS
 
 // Platform displacement 2 also known as momentum patch. Makes Mario keep the momemtum from moving platforms. Doesn't break treadmills anymore!
 #define PLATFORM_DISPLACEMENT_2
 
 // Use Shindou's pole behavior
-//#define SHINDOU_POLES
+// #define SHINDOU_POLES
 
 // If A and Z are pressed on the same frame, Mario will long jump instead of ground pound.
 #define EASIER_LONG_JUMPS
@@ -79,7 +79,7 @@
 // #define LEDGE_GRABS_CHECK_SLOPE_ANGLE
 
 // Disable BLJs and crush SimpleFlips's dreams
-//#define DISABLE_BLJ
+// #define DISABLE_BLJ
 
 // Re-enable upwarping when entering water. Forces you to only enter water from the top
 // #define WATER_PLUNGE_UPWARP

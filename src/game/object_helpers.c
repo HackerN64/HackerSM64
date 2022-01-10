@@ -234,9 +234,9 @@ s32 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleI
     switch (angleIndex) {
         case O_MOVE_ANGLE_PITCH_INDEX:
         case O_FACE_ANGLE_PITCH_INDEX:
-            d[0] = target->oPosX - obj->oPosX;
+            d[0] =  target->oPosX - obj->oPosX;
             d[1] = -target->oPosY + obj->oPosY;
-            d[2] = target->oPosZ - obj->oPosZ;
+            d[2] =  target->oPosZ - obj->oPosZ;
 
             targetAngle = atan2s(sqrtf(sqr(d[0]) + sqr(d[2])), d[1]);
             break;

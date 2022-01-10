@@ -467,7 +467,7 @@ void geo_process_master_list(struct GraphNodeMasterList *node) {
 /**
  * Process an orthographic projection node.
  */
- void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node) {
+void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node) {
     if (node->node.children != NULL) {
         Mtx *mtx = alloc_display_list(sizeof(*mtx));
         f32 scale = node->scale / 2.0f;

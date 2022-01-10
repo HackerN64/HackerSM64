@@ -316,7 +316,7 @@ void bowser_bitdw_actions(void) {
         o->oBowserIsReacting = FALSE;
         // Set starting Bowser level actions, randomly he can also start
         // dancing after the introduction
-        if (!gCurrDemoInput) { // demo check because entry exits post JP
+        if (gCurrDemoInput == NULL) { // demo check because entry exits post JP
             if (rand < 0.1f) {
                 o->oAction = BOWSER_ACT_DANCE; // 10% chance
             } else {
@@ -375,10 +375,12 @@ void bowser_bits_action_list(void) {
             } else {
                 o->oAction = BOWSER_ACT_BREATH_FIRE;
             } // far away
-        } else if (rand < 0.5f) {
-            o->oAction = BOWSER_ACT_BIG_JUMP; // 50% chance
         } else {
-            o->oAction = BOWSER_ACT_CHARGE_MARIO;
+            if (rand < 0.5f) {
+                o->oAction = BOWSER_ACT_BIG_JUMP; // 50% chance
+            } else {
+                o->oAction = BOWSER_ACT_CHARGE_MARIO;
+            }
         }
     } else {
         // Keep walking
@@ -487,7 +489,7 @@ void bowser_act_walk_to_mario(void) {
     // Also special case for BitFS
     if (o->oBehParams2ndByte == BOWSER_BP_BITFS) {
         turnSpeed = 0x400;
-    } else { // BOWSER_BP_BitDW or BOWSER_BP_BitS
+    } else { // BOWSER_BP_BITDW or BOWSER_BP_BITS
         if (o->oHealth >= 3) {
             turnSpeed = 0x400;
         } else if (o->oHealth == 2) {
@@ -987,7 +989,7 @@ void bowser_act_jump_onto_stage(void) {
     struct Surface *floor = o->oFloor;
 
     // Set dynamic floor check (Object platforms)
-    s32 onDynamicFloor = floor != NULL && floor->flags & SURFACE_FLAG_DYNAMIC;
+    s32 onDynamicFloor = (floor != NULL && (floor->flags & SURFACE_FLAG_DYNAMIC));
     // Set status Jump
     o->oBowserStatus |= BOWSER_STATUS_BIG_JUMP;
 
@@ -1589,11 +1591,8 @@ void bowser_thrown_dropped_update(void) {
     // Set throw action and vel values
     cur_obj_get_thrown_or_placed(1.0f, 1.0f, BOWSER_ACT_THROWN);
     // Set swing speed based of angle
-    f32 swingSpd = o->oBowserHeldAngleVelYaw / 3000.0f * 70.0f;
     // If less than 0, reduce speed
-    if (swingSpd < 0.0f) {
-        swingSpd = -swingSpd;
-    }
+    f32 swingSpd = absf((o->oBowserHeldAngleVelYaw / 3000.0f) * 70.0f);
     // If more than 90, increase speed
     if (swingSpd > 90.0f) {
         swingSpd *= 2.5f;
@@ -1872,6 +1871,7 @@ Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s3
     if (callContext == GEO_CONTEXT_RENDER) {
         struct Object *obj = (struct Object *) gCurGraphNodeObject;
         struct GraphNodeGenerated *graphNode = (struct GraphNodeGenerated *) node;
+
         if (gCurGraphNodeHeldObject != NULL) {
             obj = gCurGraphNodeHeldObject->objNode;
         }
@@ -1882,7 +1882,9 @@ Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s3
         } else {
             SET_GRAPH_NODE_LAYER(graphNode->fnNode.node.flags, LAYER_TRANSPARENT);
         }
+
         Gfx *gfx = gfxHead = alloc_display_list(2 * sizeof(Gfx));
+
         // If TRUE, clear lighting to give rainbow color
         if (obj->oBowserRainbowLight) {
             gSPClearGeometryMode(gfx++, G_LIGHTING);

@@ -51,6 +51,7 @@ s32 bhv_mips_find_furthest_waypoint_to_mario(void) {
     f32 distanceToMario;
     struct Waypoint **pathBase = segmented_to_virtual(&inside_castle_seg7_trajectory_mips);
     f32 dx, dz;
+
     // For each waypoint in MIPS path...
     for (i = 0; i < 10; i++) {
         struct Waypoint *waypoint = segmented_to_virtual(pathBase[i]);

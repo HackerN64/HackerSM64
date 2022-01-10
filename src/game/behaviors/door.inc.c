@@ -83,9 +83,11 @@ void bhv_door_loop(void) {
             play_warp_door_open_noise();
             break;
     }
+
     if (o->oAction == DOOR_ACT_CLOSED) {
         load_object_collision_model();
     }
+
     bhv_door_rendering_loop();
 }
 

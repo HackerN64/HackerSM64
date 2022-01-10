@@ -26,9 +26,7 @@ void spawn_child_obj_relative(struct Object *parent, s16 xOffset, s16 yOffset, s
 
 void bhv_intro_scene_loop(void) {
     if (gCutsceneObjSpawn != CUTSCENE_OBJ_NONE) {
-        o->oPosX = gCamera->pos[0];
-        o->oPosY = gCamera->pos[1];
-        o->oPosZ = gCamera->pos[2];
+        vec3f_copy(&o->oPosVec, gCamera->pos);
 
         o->oMoveAnglePitch = 0;
         o->oMoveAngleYaw = 0;

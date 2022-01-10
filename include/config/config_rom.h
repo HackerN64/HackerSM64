@@ -10,7 +10,7 @@
 
 // Support Rumble Pak
 // Currently not recommended, as it may cause random crashes.
-//#define ENABLE_RUMBLE (1 || VERSION_SH)
+// #define ENABLE_RUMBLE (1 || VERSION_SH)
 
 // Clear RAM on boot
 #define CLEARRAM 1
