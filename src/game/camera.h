@@ -90,6 +90,18 @@
 #define CAM_MODE_LAKITU_WAS_ZOOMED_OUT  0x02
 #define CAM_MODE_MARIO_SELECTED         0x04
 
+#ifdef REONUCAM
+struct ReonucamState {
+    u8 speed;
+    u8 waterCamOverride;
+    u8 flyingCamOverride;
+    u8 keepCliffCam;
+    u16 rButtonCounter;
+    u16 rButtonCounter2;
+};
+extern struct ReonucamState gReonucamState;
+#endif
+
 enum CameraSelection {
     CAM_SELECTION_NONE,
     CAM_SELECTION_MARIO,
