@@ -715,6 +715,19 @@ u32 save_file_get_sound_mode(void) {
     return gSaveBuffer.menuData.soundMode;
 }
 
+#ifdef REONUCAM
+void save_file_set_camera_speed(u8 speed) {
+    gSaveBuffer.menuData.cameraSpeedSetting = speed;
+    gMainMenuDataModified = TRUE;
+    save_main_menu_data();
+}
+
+u8 save_file_get_camera_speed(void) {
+    return gSaveBuffer.menuData.cameraSpeedSetting;
+}
+
+#endif
+
 void save_file_move_cap_to_default_location(void) {
     if (save_file_get_flags() & SAVE_FLAG_CAP_ON_GROUND) {
         switch (gSaveBuffer.files[gCurrSaveFileNum - 1][0].capLevel) {

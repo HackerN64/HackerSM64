@@ -63,6 +63,14 @@ void *languageTable[][3] = {
 #endif
 };
 
+#ifdef REONUCAM
+u8 textCamInfoSlowest[] = { TEXT_CAM_INFO_SLOWEST };
+u8 textCamInfoSlow[] = { TEXT_CAM_INFO_SLOW };
+u8 textCamInfoMedium[] = { TEXT_CAM_INFO_MEDIUM };
+u8 textCamInfoFast[] = { TEXT_CAM_INFO_FAST};
+u8 textCamInfoFastest[] = { TEXT_CAM_INFO_FASTEST };
+#endif
+
 extern u8 gLastCompletedCourseNum;
 extern u8 gLastCompletedStarNum;
 
@@ -1455,6 +1463,48 @@ void reset_red_coins_collected(void) {
     gRedCoinsCollected = 0;
 }
 
+#ifdef REONUCAM
+void render_reonucam_speed_setting(void) {
+    gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    switch (gReonucamState.speed) {
+        case 0:
+            print_generic_string(190, 20, textCamInfoSlowest);
+            break;
+        case 1:
+            print_generic_string(190, 20, textCamInfoSlow);
+            break;
+        case 2:
+            print_generic_string(190, 20, textCamInfoMedium);
+            break;
+        case 3:
+            print_generic_string(190, 20, textCamInfoFast);
+            break;
+        case 4:
+            print_generic_string(190, 20, textCamInfoFastest);
+            break;
+    }
+    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
+
+    if (gPlayer1Controller->buttonPressed & R_JPAD) {
+        if (gReonucamState.speed < 4) {
+            gReonucamState.speed += 1;
+        } else {
+            gReonucamState.speed = 0;
+        }
+        save_file_set_camera_speed(gReonucamState.speed);
+    } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
+        if (gReonucamState.speed > 0) {
+            gReonucamState.speed -= 1;
+        } else {
+            gReonucamState.speed = 4;
+        }
+        save_file_set_camera_speed(gReonucamState.speed);
+    }
+}
+#endif
+
+
 void change_dialog_camera_angle(void) {
     if (cam_select_alt_mode(0) == CAM_SELECTION_MARIO) {
         gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
@@ -1917,6 +1967,9 @@ s32 render_pause_courses_and_castle(void) {
     }
 #if defined(WIDE) && !defined(PUPPYCAM)
         render_widescreen_setting();
+#endif
+#ifdef REONUCAM
+        render_reonucam_speed_setting();
 #endif
     if (gDialogTextAlpha < 250) {
         gDialogTextAlpha += 25;
