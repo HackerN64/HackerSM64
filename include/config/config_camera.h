@@ -27,10 +27,10 @@
 // Makes the camera approach Mario's height much more quickly.
 #define FAST_VERTICAL_CAMERA_MOVEMENT
 
-// Enables "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the D-pad.
+// Enable "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the D-pad.
 #define PARALLEL_LAKITU_CAM
 
-// Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
+// Enable Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 // #define PUPPYCAM
 
 // Note: Reonucam is available, but because we had no time to test it properly, it's included as a patch rather than being in the code by default.

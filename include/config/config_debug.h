@@ -4,10 +4,10 @@
  * DEBUG SETTINGS *
  ******************/
 
-// Enables most debug options, including PUPPYPRINT_DEBUG.
+// Enable most debug options, including PUPPYPRINT_DEBUG.
 // #define DEBUG_ALL
 
-// Disables all debug options (except PUPPYPRINT).
+// Disable all debug options (except PUPPYPRINT).
 #define DISABLE_ALL
 
 // TEST LEVEL

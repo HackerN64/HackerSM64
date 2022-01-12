@@ -36,7 +36,7 @@
 
 // -- MR I --
 
-// Uncomment to allow MR I to shoot his particle in any direction.
+// Uncomment to allow Mr I to shoot his particle in any direction.
 // #define MR_I_PITCH_SHOOTING
 
 // -- WATER RING --

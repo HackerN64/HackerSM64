@@ -26,10 +26,10 @@
 // Prevents Mario from falling asleep while idle.
 // #define NO_SLEEP
 
-// Disables fall damage.
+// Disable fall damage.
 #define NO_FALL_DAMAGE
 
-// Disables the scream that mario makes when falling off a great height (this is separate from actual fall damage).
+// Disable the scream that mario makes when falling off a great height (this is separate from actual fall damage).
 // #define NO_FALL_DAMAGE_SOUND
 
 // Fall height for normal fall damage. Vanilla is 1150.0f.
@@ -38,7 +38,7 @@
 // Fall height for double fall damage. Vanilla is 3000.0f.
 #define FALL_DAMAGE_HEIGHT_LARGE 3000.0f
 
-// Disables Mario getting stuck in snow and sand when falling.
+// Disable Mario getting stuck in snow and sand when falling.
 // #define NO_GETTING_BURIED
 
 // Prevents hands-free holding. (WARNING: Enabling this may make you a total buzzkill).
@@ -59,7 +59,7 @@
 // Hold Z while twirling to descend faster.
 #define Z_TWIRL
 
-// Disables bonks when ground pounding next to a wall.
+// Disable bonks when ground pounding next to a wall.
 #define DISABLE_GROUNDPOUND_BONK
 
 // Allows Mario to jump kick on steep surfaces that are set to be non slippery, instead of being forced to dive.

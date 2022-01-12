@@ -30,7 +30,7 @@
 // Automatically included when PUPPYPRINT_DEBUG is enabled.
 // #define PUPPYPRINT
 
-// Disables AA (Improves console performance but causes visible seams between unconnected geometry).
+// Disable AA (Improves console performance but causes visible seams between unconnected geometry).
 // #define DISABLE_AA
 
 // Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
@@ -78,7 +78,7 @@
 // This improves performance a bit, and does not seem to break anything.
 #define DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
 
-// Disables object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
+// Disable object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
 // #define DISABLE_SHADOWS
 
 // Use old shadow IDs for Fast64 compatibility. This is a temporary fix until Fast64 is updated to use the enum defines.
