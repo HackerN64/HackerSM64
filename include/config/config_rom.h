@@ -12,7 +12,7 @@
 // Currently not recommended, as it may cause random crashes.
 // #define ENABLE_RUMBLE (1 || VERSION_SH)
 
-// Screen Size Defines
+// Screen Size Defines.
 #define SCREEN_WIDTH  320
 #define SCREEN_HEIGHT 240
 
