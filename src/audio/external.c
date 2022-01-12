@@ -1262,7 +1262,7 @@ static void update_game_sound(void) {
 #endif
                                 } else {
 #if defined(VERSION_EU) || defined(VERSION_SH)
-                                    func_802ad728((x04020000 | ((channelIndex & 0xff) << 8),
+                                    func_802ad728(0x04020000 | ((channelIndex & 0xff) << 8),
                                         get_sound_freq_scale(bank, soundIndex) + ((f32) sSoundMovingSpeed[bank] / 400.0f));
 #else
                                     value = get_sound_freq_scale(bank, soundIndex);

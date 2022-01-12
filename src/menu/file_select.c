@@ -122,7 +122,7 @@ unsigned char textEraseFileButton[] = { TEXT_ERASE_FILE_BUTTON };
 unsigned char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO }, { TEXT_HEADSET } };
 
 #if MULTILANG
-unsigned char textLanguageSelect[][17] = {  { TEXT_LANGUAGE_SELECT }};
+unsigned char textLanguageSelect[][17] = { { TEXT_LANGUAGE_SELECT } };
 #endif
 
 unsigned char textSoundSelect[] = { TEXT_SOUND_SELECT };
@@ -1788,7 +1788,7 @@ void print_sound_mode_menu_strings(void) {
 
     print_hud_lut_string(HUD_LUT_DIFF, SOUND_HUD_X, 32, LANGUAGE_ARRAY(textSoundSelect));
 #if MULTILANG
-    print_hud_lut_string(HUD_LUT_DIFF, 47, 101, LANGUAGE_ARRAY(textLanguageSelect));
+    print_hud_lut_string(HUD_LUT_DIFF, 47, 101, LANGUAGE_ARRAY(textLanguageSelect[0]));
 #endif
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);

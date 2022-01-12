@@ -421,6 +421,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
             break;
 
         case 2:
+        default:
             arg0 = &gUnusedLoadedPool;
             table = gUnkLoadStatus;
             break;
@@ -770,6 +771,7 @@ void *get_bank_or_seq_inner(s32 poolIdx, s32 arg1, s32 bankId) {
             loadedPool = &gBankLoadedPool;
             break;
         case 2:
+        default:
             loadedPool = &gUnusedLoadedPool;
             break;
     }
@@ -931,7 +933,7 @@ void decrease_reverb_gain(void) {
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 s32 audio_shut_down_and_reset_step(void) {
-    s32 i, j;
+    s32 i;
 
     switch (gAudioResetStatus) {
         case 5:
@@ -1007,7 +1009,7 @@ void init_reverb_eu(void) {
     gNumSynthesisReverbs = preset->numReverbs;
     for (j = 0; j < gNumSynthesisReverbs; j++) {
         reverb = &gSynthesisReverbs[j];
-        reverbSettings = &sReverbSettings[MIN((gAudioResetPresetIdToLoad + j), (sizeof(sReverbSettings) / sizeof(struct ReverbSettingsEU)) - 1)];
+        reverbSettings = &sReverbSettings[MIN((u32)(gAudioResetPresetIdToLoad + j), (sizeof(sReverbSettings) / sizeof(struct ReverbSettingsEU)) - 1)];
         reverb->windowSize = (reverbSettings->windowSize * 0x40);
         reverb->downsampleRate = reverbSettings->downsampleRate;
         reverb->reverbGain = reverbSettings->gain;

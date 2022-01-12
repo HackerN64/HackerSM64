@@ -513,7 +513,7 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
     u32 *aiBufPtr;
     u64 *cmd = cmdBuf;
     s32 chunkLen;
-    s32 nextVolRampTable;
+    s32 nextVolRampTable = 0;
 
     for (i = gAudioBufferParameters.updatesPerFrame; i > 0; i--) {
         process_sequences(i - 1);
@@ -634,7 +634,7 @@ u64 *synthesis_resample_and_mix_reverb(u64 *cmd, s32 bufLen, s16 reverbIndex, s1
         aMix(cmd++, 0, 0x7fff, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_LEFT_CH);
         aMix(cmd++, 0, 0x8000 + gSynthesisReverbs[reverbIndex].reverbGain, DMEM_ADDR_WET_LEFT_CH, DMEM_ADDR_WET_LEFT_CH);
     } else {
-        startPad = (item->startPos & 0x7) * 2
+        startPad = (item->startPos & 0x7) * 2;
         paddedLengthA = AUDIO_ALIGN(startPad + item->lengthA, 4);
 
         cmd = synthesis_load_reverb_ring_buffer(cmd, DMEM_ADDR_RESAMPLED, (item->startPos - startPad / 2), DEFAULT_LEN_1CH, reverbIndex);
