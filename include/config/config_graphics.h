@@ -66,6 +66,10 @@
 // Disable the fix to Koopa's unshelled model.
 #define KOOPA_KEEP_PINK_SHORTS
 
+// Copies the object graph node (model) to the star dance cutscene's object.
+// This has a side effect of making the star dance star also transparent when Mario collects a transparent star.
+// #define CELEBRATION_STAR_COPY_MODEL
+
 // Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
 // NOTE: Stil breaks occasionally, and PUPPYLIGHT_NODE doesn't work in areas that aren't area 1.
 // #define PUPPYLIGHTS
