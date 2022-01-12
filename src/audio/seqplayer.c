@@ -448,19 +448,16 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
     struct Instrument *instrument;
     struct Drum *drum;
     s32 temp_a0_5;
+    u16 sp3A = 0;
 #ifdef VERSION_EU
-    u16 sp3A;
     s32 sameSound = TRUE;
 #else
     u8 sameSound = TRUE;
 #endif
     u8 cmd;
     UNUSED u8 cmdSemitone;
-#ifndef VERSION_EU
-    u16 sp3A;
-#endif
     f32 tuning;
-    s32 vel;
+    s32 vel = 0;
     UNUSED s32 usedSemitone;
     f32 freqScale;
 #ifndef VERSION_EU
@@ -1139,6 +1136,7 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                 cmd = m64_read_u8(state) + 0x80;
                 layer->freqScaleMultiplier = unk_sh_data_1[cmd];
                 // missing break :)
+                FALL_THROUGH;
 
             default:
                 switch (cmd & 0xf0) {
@@ -1286,8 +1284,8 @@ s32 seq_channel_layer_process_script_part4(struct SequenceChannelLayer *layer, s
 
 s32 seq_channel_layer_process_script_part3(struct SequenceChannelLayer *layer, s32 cmd) {
     struct M64ScriptState *state = &layer->scriptState;
-    u16 sp3A;
-    s32 vel;
+    u16 sp3A = 0;
+    s32 vel = 0;
     struct SequenceChannel *seqChannel = layer->seqChannel;
     struct SequencePlayer *seqPlayer = seqChannel->seqPlayer;
 
@@ -1653,7 +1651,7 @@ void sequence_channel_process_script(struct SequenceChannel *seqChannel) {
                         } else {
                             eu_stubbed_printf_1("SUB:ERR:BANK %d NOT CACHED.\n", cmd);
                         }
-                        // fallthrough
+                        FALL_THROUGH;
 #endif
 
                     case 0xc1: // chan_setinstr ("set program"?)
