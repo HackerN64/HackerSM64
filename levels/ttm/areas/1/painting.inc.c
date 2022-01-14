@@ -1,13 +1,13 @@
 #include "game/paintings.h"
 
 // 0x070122F0 - 0x07012308
-static const Lights1 ttm_seg7_lights_070122F0 = gdSPDefLights1(
+static const Lights1 ttm_seg7_lights_slide_painting = gdSPDefLights1(
     0x50, 0x50, 0x50,
     0xff, 0xff, 0xff, 0x32, 0x32, 0x32
 );
 
 // 0x07012308 - 0x07012388
-static const Vtx ttm_seg7_vertex_07012308[] = {
+static const Vtx ttm_seg7_vertex_slide_painting[] = {
     {{{     0,      0,      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{   614,      0,      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{   614,    307,      0}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
@@ -19,24 +19,24 @@ static const Vtx ttm_seg7_vertex_07012308[] = {
 };
 
 // 0x07012388 - 0x070123A0
-const Gfx ttm_seg7_dl_07012388[] = {
+const Gfx ttm_seg7_sub_dl_slide_painting_bottom[] = {
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPEndDisplayList(),
 };
 
 // 0x070123A0 - 0x070123B8
-const Gfx ttm_seg7_dl_070123A0[] = {
+const Gfx ttm_seg7_sub_dl_slide_painting_top[] = {
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
     gsSPEndDisplayList(),
 };
 
 // 0x070123B8 - 0x07012410
-const Gfx ttm_seg7_dl_070123B8[] = {
+const Gfx ttm_seg7_sub_dl_slide_painting_normal_begin[] = {
     gsDPPipeSync(),
     gsSPSetGeometryMode(G_LIGHTING | G_SHADING_SMOOTH),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
-    gsSPLight(&ttm_seg7_lights_070122F0.l, 1),
-    gsSPLight(&ttm_seg7_lights_070122F0.a, 2),
+    gsSPLight(&ttm_seg7_lights_slide_painting.l, 1),
+    gsSPLight(&ttm_seg7_lights_slide_painting.a, 2),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
@@ -46,7 +46,7 @@ const Gfx ttm_seg7_dl_070123B8[] = {
 };
 
 // 0x07012410 - 0x07012430
-const Gfx ttm_seg7_dl_07012410[] = {
+const Gfx ttm_seg7_sub_dl_slide_painting_normal_end[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
@@ -54,7 +54,7 @@ const Gfx ttm_seg7_dl_07012410[] = {
 };
 
 // 0x07012430 - 0x07012450
-static const Gfx ttm_seg7_painting_dl_07012430[] = {
+static const Gfx ttm_seg7_painting_dl_slide_normal_ripple[] = {
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (64 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
@@ -529,23 +529,23 @@ UNUSED static const u64 ttm_unused_0 = 0x0;
 
 
 // 0x07012E98 - 0x07012EF8
-static const Gfx ttm_seg7_painting_dl_07012E98[] = {
-    gsSPDisplayList(ttm_seg7_dl_070123B8),
-    gsSPVertex(ttm_seg7_vertex_07012308, 8, 0),
+static const Gfx ttm_seg7_painting_dl_slide_normal[] = {
+    gsSPDisplayList(ttm_seg7_sub_dl_slide_painting_normal_begin),
+    gsSPVertex(ttm_seg7_vertex_slide_painting, 8, 0),
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ttm_seg7_texture_07004000),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
-    gsSPDisplayList(ttm_seg7_dl_07012388),
+    gsSPDisplayList(ttm_seg7_sub_dl_slide_painting_bottom),
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ttm_seg7_texture_07003000),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 64 * 32 - 1, CALC_DXT(64, G_IM_SIZ_16b_BYTES)),
-    gsSPDisplayList(ttm_seg7_dl_070123A0),
-    gsSPDisplayList(ttm_seg7_dl_07012410),
+    gsSPDisplayList(ttm_seg7_sub_dl_slide_painting_top),
+    gsSPDisplayList(ttm_seg7_sub_dl_slide_painting_normal_end),
     gsSPEndDisplayList(),
 };
 
 // 0x07012EF8 - 0x07012F78
-ALIGNED8 static const Texture *const ttm_seg7_painting_textures_07012EF8[] = {
+ALIGNED8 static const Texture *const ttm_seg7_painting_textures_slide[] = {
     ttm_seg7_texture_07004000, ttm_seg7_texture_07003000,
 };
 
@@ -565,11 +565,11 @@ struct Painting ttm_slide_painting = {
     /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
     /* Curr Ripple Timer */    0.0f,
     /* Curr Ripple x, y */     0.0f,    0.0f,
-    /* Normal DList */ ttm_seg7_painting_dl_07012E98,
+    /* Normal DList */ ttm_seg7_painting_dl_slide_normal,
     /* Texture Maps */ ttm_seg7_painting_texture_maps_07012E88,
-    /* Textures */     ttm_seg7_painting_textures_07012EF8,
+    /* Textures */     ttm_seg7_painting_textures_slide,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ ttm_seg7_painting_dl_07012430,
+    /* Ripple DList */ ttm_seg7_painting_dl_slide_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */

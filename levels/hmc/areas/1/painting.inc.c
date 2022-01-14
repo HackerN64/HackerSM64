@@ -1,59 +1,21 @@
 #include "game/paintings.h"
 
-// 0x070241B8 - 0x070241D0
-static const Lights1 hmc_seg7_lights_070241B8 = gdSPDefLights1(
-    0x50, 0x50, 0x50,
-    0xff, 0xff, 0xff, 0x32, 0x32, 0x32
+// 0x070241D0 - 0x070241E8
+static const Lights1 hmc_seg7_lights_cotmc_pool = gdSPDefLights1(
+    0x40, 0x40, 0x80,
+    0x64, 0x64, 0xff, 0x28, 0x28, 0x28
 );
 
-// 0x070241D0 - 0x070241E8
-// No gdSPDefLights1 macro defined because of odd different light value (0xff and 0xfa)
-static const Lights1 hmc_seg7_lights_070241D0 = {
-    {{  {0x40, 0x40, 0x80}, 0, {0x40, 0x40, 0x80}, 0} },
-    {{{ {0x64, 0x64, 0xff}, 0, {0x64, 0x64, 0xfa}, 0, {0x28, 0x28, 0x28},0} }}
-};
-
-// Appears to lock 4 of the sides when shimmering and in use. Unused.
-// 0x070241E8 - 0x07024228
-static const Vtx hmc_seg7_vertex_070241E8[] = {
-    {{{     0,      0,      0}, 0, {   -32,    990}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,      0,      0}, 0, {  6100,    990}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,    614,      0}, 0, {  6100,  -5142}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{     0,    614,      0}, 0, {   -32,  -5142}, {0x00, 0x00, 0x7f, 0xff}}},
-};
-
 // 0x07024228 - 0x07024268
-static const Vtx hmc_seg7_vertex_07024228[] = {
+static const Vtx hmc_seg7_vertex_cotmc_pool[] = {
     {{{     0,      0,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{   614,      0,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{   614,    614,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
     {{{     0,    614,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
-// Unused
-// 0x07024268 - 0x070242A0
-const Gfx hmc_seg7_dl_07024268[] = {
-    gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
-    gsSPLight(&hmc_seg7_lights_070241B8.l, 1),
-    gsSPLight(&hmc_seg7_lights_070241B8.a, 2),
-    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
-    gsSPVertex(hmc_seg7_vertex_070241E8, 4, 0),
-    gsSPEndDisplayList(),
-};
-
-// Unused
-// 0x070242A0 - 0x070242D0
-const Gfx hmc_seg7_dl_070242A0[] = {
-    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
-    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
-    gsDPPipeSync(),
-    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsSPEndDisplayList(),
-};
-
 // 0x070242D0 - 0x070242F0
-static const Gfx hmc_seg7_painting_dl_070242D0[] = {
+static const Gfx hmc_seg7_painting_dl_cotmc_normal_ripple[] = {
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
     gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
@@ -61,7 +23,7 @@ static const Gfx hmc_seg7_painting_dl_070242D0[] = {
 };
 
 // 0x070242F0 - 0x07024CD2
-static const PaintingData hmc_seg7_pool_texture_map_070242F0[] = {
+static const PaintingData hmc_seg7_pool_texture_map_cotmc[] = {
     157, // num mappings
     // Format:
     // mesh vtx ID, texture X, texture Y
@@ -493,28 +455,28 @@ static const PaintingData hmc_seg7_pool_texture_map_070242F0[] = {
 };
 
 // 0x07024CD4
-static const PaintingData *const hmc_seg7_painting_texture_maps_07024CD4[] = {
-    hmc_seg7_pool_texture_map_070242F0,
+static const PaintingData *const hmc_seg7_painting_texture_maps_cotmc[] = {
+    hmc_seg7_pool_texture_map_cotmc,
 };
 
 // 0x07024CE0 - 0x070254E0
-ALIGNED8 static const Texture hmc_seg7_texture_07024CE0[] = {
+ALIGNED8 static const Texture hmc_seg7_texture_cotmc_pool_env[] = {
 #include "levels/hmc/7.rgba16.inc.c"
 };
 
 // 0x070254E0 - 0x07025518
-static const Gfx hmc_seg7_painting_dl_070254E0[] = {
+static const Gfx hmc_seg7_painting_dl_cotmc_normal[] = {
     gsDPPipeSync(),
-    gsSPLight(&hmc_seg7_lights_070241D0.l, 1),
-    gsSPLight(&hmc_seg7_lights_070241D0.a, 2),
-    gsSPVertex(hmc_seg7_vertex_07024228, 4, 0),
+    gsSPLight(&hmc_seg7_lights_cotmc_pool.l, 1),
+    gsSPLight(&hmc_seg7_lights_cotmc_pool.a, 2),
+    gsSPVertex(hmc_seg7_vertex_cotmc_pool, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPEndDisplayList(),
 };
 
 // 0x07025518 - 0x07025594
-const Texture *const hmc_seg7_painting_textures_07025518[] = {
-    hmc_seg7_texture_07024CE0,
+const Texture *const hmc_seg7_painting_textures_cotmc[] = {
+    hmc_seg7_texture_cotmc_pool_env,
 };
 
 // 0x0702551C (PaintingData)
@@ -533,11 +495,11 @@ struct Painting cotmc_painting = {
     /* Ripple Dispersion */    0.0f,    15.0f,    15.0f,
     /* Curr Ripple Timer */    0.0f,
     /* Curr Ripple x, y */     0.0f,  0.0f,
-    /* Normal DList */ hmc_seg7_painting_dl_070254E0,
-    /* Texture Maps */ hmc_seg7_painting_texture_maps_07024CD4,
-    /* Textures */     hmc_seg7_painting_textures_07025518,
+    /* Normal DList */ hmc_seg7_painting_dl_cotmc_normal,
+    /* Texture Maps */ hmc_seg7_painting_texture_maps_cotmc,
+    /* Textures */     hmc_seg7_painting_textures_cotmc,
     /* Texture w, h */ 32, 32,
-    /* Ripple DList */ hmc_seg7_painting_dl_070242D0,
+    /* Ripple DList */ hmc_seg7_painting_dl_cotmc_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
