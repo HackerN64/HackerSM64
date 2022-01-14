@@ -546,7 +546,7 @@ void check_instant_warp(void) {
 
 s16 music_unchanged_through_warp(s16 arg) {
     struct ObjectWarpNode *warpNode = area_get_warp_node(arg);
-    s16 levelNum = warpNode->node.destLevel & 0x7F;
+    s16 levelNum = (warpNode->node.destLevel & WARP_DEST_LEVEL_NUM_MASK);
 
     s16 destArea = warpNode->node.destArea;
     s16 unchanged = TRUE;
@@ -661,7 +661,7 @@ void initiate_painting_warp(void) {
                     sWarpCheckpointActive = check_warp_checkpoint(&warpNode);
                 }
 
-                initiate_warp(warpNode.destLevel & 0x7F, warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
+                initiate_warp((warpNode.destLevel & WARP_DEST_LEVEL_NUM_MASK), warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
                 check_if_should_set_warp_checkpoint(&warpNode);
 
                 play_transition_after_delay(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255, 45);
@@ -873,7 +873,7 @@ void initiate_delayed_warp(void) {
                 default:
                     warpNode = area_get_warp_node(sSourceWarpNodeId);
 
-                    initiate_warp(warpNode->node.destLevel & 0x7F, warpNode->node.destArea,
+                    initiate_warp((warpNode->node.destLevel & WARP_DEST_LEVEL_NUM_MASK), warpNode->node.destArea,
                                   warpNode->node.destNode, sDelayedWarpArg);
 
                     check_if_should_set_warp_checkpoint(&warpNode->node);

@@ -114,6 +114,8 @@ enum WarpCheckpointFlags {
     WARP_CHECKPOINT    = (1 << 7), // 0x80
 };
 
+#define WARP_DEST_LEVEL_NUM_MASK 0x7F
+
 enum LevelCommandCreateWhirlpoolCondition {
     WHIRLPOOL_COND_ALWAYS,
     WHIRLPOOL_COND_BOWSER2_NOT_BEATEN,
