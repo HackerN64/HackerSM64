@@ -196,8 +196,8 @@ s16 gLastPaintingUpdateCounter = 0;
  * Stop paintings in paintingGroup from rippling if their id is different from *idptr.
  */
 void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
-    s16 id = *idptr;
-    s16 index = 0;
+    PaintingData id = *idptr;
+    PaintingData index = 0;
 
     while (paintingGroup[index] != NULL) {
         struct Painting *painting = segmented_to_virtual(paintingGroup[index]);
@@ -206,6 +206,7 @@ void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
         if (painting->id != id) {
             painting->state = 0;
         }
+
         index++;
     }
 }
@@ -239,22 +240,6 @@ f32 painting_mario_z(struct Painting *painting) {
 }
 
 /**
- * @return The y origin for the ripple, based on ySource.
- *         For floor paintings, the z-axis is treated as y.
- */
-f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
-    switch (ySource) {
-        case MARIO_Y:
-            return painting_mario_y(painting); // normal wall paintings
-        case MARIO_Z:
-            return painting_mario_z(painting); // floor paintings use X and Z
-        case MIDDLE_Y:
-            return (painting->size * 0.5f); // some concentric ripples don't care about Mario
-    }
-    return 0.0f;
-}
-
-/**
  * Return the quarter of the painting that is closest to the floor Mario entered.
  */
 f32 painting_nearest_4th(struct Painting *painting) {
@@ -277,6 +262,7 @@ f32 painting_nearest_4th(struct Painting *painting) {
     } else if (painting->floorEntered & RIPPLE_FLAG_ENTER_RIGHT) {
         return thirdQuarter;
     }
+
     return 0.0f;
 }
 
@@ -290,9 +276,25 @@ f32 painting_ripple_x(struct Painting *painting, s8 xSource) {
         case MARIO_X: // horizontally placed paintings use X and Z
             return painting_mario_x(painting);
         case MIDDLE_X: // concentric rippling may not care about Mario
-            return painting->size * 0.5f;
+            return (painting->size * 0.5f);
     }
 
+    return 0.0f;
+}
+
+/**
+ * @return The y origin for the ripple, based on ySource.
+ *         For floor paintings, the z-axis is treated as y.
+ */
+f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
+    switch (ySource) {
+        case MARIO_Y:
+            return painting_mario_y(painting); // normal wall paintings
+        case MARIO_Z:
+            return painting_mario_z(painting); // floor paintings use X and Z
+        case MIDDLE_Y:
+            return (painting->size * 0.5f); // some concentric ripples don't care about Mario
+    }
     return 0.0f;
 }
 
@@ -325,6 +327,7 @@ void painting_state(s8 state, struct Painting *painting, struct Painting *painti
             painting->dispersionFactor = painting->entryDispersionFactor;
             break;
     }
+
     painting->state = state;
     painting->rippleX = painting_ripple_x(painting, xSource);
     painting->rippleY = painting_ripple_y(painting, ySource);
@@ -334,6 +337,7 @@ void painting_state(s8 state, struct Painting *painting, struct Painting *painti
     if (resetTimer == RESET_TIMER) {
         painting->rippleTimer = 0.0f;
     }
+
     gRipplingPainting = painting;
 }
 
