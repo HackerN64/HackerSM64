@@ -606,17 +606,6 @@ s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
 }
 
 /**
- * If movable, return the ripple function at (posX, posY)
- * else return 0
- */
-s32 ripple_if_movable(struct Painting *painting, s16 movable, s16 posX, s16 posY) {
-    if (movable) {
-        return calculate_ripple_at_point(painting, posX, posY);
-    }
-    return 0;
-}
-
-/**
  * Allocates and generates a mesh for the rippling painting effect by modifying the passed in `mesh`
  * based on the painting's current ripple state.
  *
@@ -638,7 +627,7 @@ s32 ripple_if_movable(struct Painting *painting, s16 movable, s16 posX, s16 posY
 void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
     s16 i;
 
-    gPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, numTris * sizeof(struct PaintingMeshVertex));
+    gPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(struct PaintingMeshVertex)));
 
     // accesses are off by 1 since the first entry is the number of vertices
     for (i = 0; i < numTris; i++) {
@@ -646,8 +635,10 @@ void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
         gPaintingMesh[i].pos[1] = mesh[(i * 3) + 2];
         // The "z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
         // actual coordinate, it just determines whether the vertex moves
-        gPaintingMesh[i].pos[2] = ripple_if_movable(painting, mesh[(i * 3) + 3], gPaintingMesh[i].pos[0],
-                                                                                 gPaintingMesh[i].pos[1]);
+        if (mesh[(i * 3) + 3]) {
+            gPaintingMesh[i].pos[2] = calculate_ripple_at_point(painting, gPaintingMesh[i].pos[0],
+                                                                          gPaintingMesh[i].pos[1]);
+        }
     }
 }
 
@@ -689,11 +680,11 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
 s32 normalize_component(f32 comp) {
     s8 rounded;
     if (comp > 0.0f) {
-        rounded = comp * 127.0f + 0.5f; // round up
+        rounded = (comp * 127.0f) + 0.5f; // round up
     } else if (comp < 0.0f) {
-        rounded = comp * 128.0f - 0.5f; // round down
+        rounded = (comp * 128.0f) - 0.5f; // round down
     } else {
-        rounded = 0;                    // don't round 0
+        rounded = 0;                      // don't round 0
     }
     return rounded;
 }
@@ -767,7 +758,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
     PaintingData remGroupTris = mapTris % 5;
     PaintingData numVtx = mapTris * 3;
 
-    PaintingData commands = triGroups * 2 + remGroupTris + 7;
+    PaintingData commands = (triGroups * 2) + remGroupTris + 7;
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
     Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -815,7 +806,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
     // One group left with < 5 triangles
     triGroup = (mapVerts * 3) + groupM + 2;
     // Map the texture to the triangles
-    for (map = 0; map < remGroupTris * 3; map++) {
+    for (map = 0; map < (remGroupTris * 3); map++) {
         mapping3 = textureMap[triGroup + map] * 3;
         meshVtx  = textureMap[mapping3 + 1];
         tx       = textureMap[mapping3 + 2];
@@ -831,7 +822,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
     }
 
     // Draw the triangles individually
-    gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + triGroups * 15), remGroupTris * 3, 0);
+    gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + triGroups * 15), (remGroupTris * 3), 0);
     for (group = 0; group < remGroupTris; group++) {
         groupM = (group * 3);
         gSP1Triangle(gfx++, groupM + 0,
@@ -1169,7 +1160,6 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     if (callContext != GEO_CONTEXT_RENDER) {
         reset_painting(painting);
     } else if (callContext == GEO_CONTEXT_RENDER) {
-
         // Update the ddd painting before drawing
         if (group == 1 && id == PAINTING_ID_DDD) {
             move_ddd_painting(painting, 3456.0f, 5529.6f, 20.0f);
