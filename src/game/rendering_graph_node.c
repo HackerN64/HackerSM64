@@ -367,7 +367,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         gSPClearGeometryMode(gDisplayListHead++, G_ZBUFFER);
     }
 #ifdef OBJECTS_REJ
- #if defined(F3DZEX_GBI_2) && defined(VISUAL_DEBUG)
+ #if defined(F3DEX_GBI_2) && defined(VISUAL_DEBUG)
     if (hitboxView) render_debug_boxes(DEBUG_UCODE_REJ);
  #endif
     switch_ucode(GRAPH_NODE_UCODE_DEFAULT);
@@ -408,7 +408,7 @@ void geo_append_display_list(void *displayList, s32 layer) {
         }
  #endif // SILHOUETTE
     }
-#endif // F3DZEX_GBI_2 || SILHOUETTE
+#endif // F3DEX_GBI_2 || SILHOUETTE
     if (gCurGraphNodeMasterList != NULL) {
         struct DisplayListNode *listNode =
             alloc_only_pool_alloc(gDisplayListHeap, sizeof(struct DisplayListNode));

@@ -14,9 +14,9 @@
  * config_graphics
  */
 
-#ifndef F3DZEX_GBI_2
-    #undef OBJECTS_REJ // OBJECTS_REJ requires f3dzex.
-#endif // !F3DZEX_GBI_2
+#ifndef F3DEX_GBI_2
+    #undef OBJECTS_REJ // OBJECTS_REJ requires f3dex2.
+#endif // !F3DEX_GBI_2
 
 #ifndef F3DEX_GBI_SHARED
     #undef OBJECTS_REJ // Non F3DEX-based ucodes do NOT support ucode switching.
