@@ -170,6 +170,25 @@ struct Painting **sPaintingGroups[] = {
     sTtmPaintings,
 };
 
+enum PaintingGroups {
+    PAINTING_GROUP_HMC,
+    PAINTING_GROUP_INSIDE_CASTLE,
+    PAINTING_GROUP_TTM,
+};
+
+s32 get_painting_group(void) {
+    switch (gCurrLevelNum) {
+        case LEVEL_HMC:
+            return PAINTING_GROUP_HMC;
+        case LEVEL_CASTLE:
+            return PAINTING_GROUP_INSIDE_CASTLE;
+        case LEVEL_TTM:
+            return PAINTING_GROUP_TTM;
+        default:
+            return PAINTING_GROUP_INSIDE_CASTLE;
+    }
+}
+
 s16 gPaintingUpdateCounter = 1;
 s16 gLastPaintingUpdateCounter = 0;
 
@@ -192,18 +211,22 @@ void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
 }
 
 /**
+ * @return Mario's x position inside the painting (bounded).
+ */
+f32 painting_mario_x(struct Painting *painting) {
+    f32 relX = gPaintingMarioPos[0] - painting->pos[0];
+
+    return CLAMP(relX, 0.0f, painting->size);
+}
+
+/**
  * @return Mario's y position inside the painting (bounded).
  */
 f32 painting_mario_y(struct Painting *painting) {
     // Add 50 to make the ripple closer to Mario's center of mass.
     f32 relY = (gPaintingMarioPos[1] - painting->pos[1]) + 50.0f;
 
-    if (relY < 0.0f) {
-        relY = 0.0f;
-    } else if (relY > painting->size) {
-        relY = painting->size;
-    }
-    return relY;
+    return CLAMP(relY, 0.0f, painting->size);
 }
 
 /**
@@ -212,12 +235,7 @@ f32 painting_mario_y(struct Painting *painting) {
 f32 painting_mario_z(struct Painting *painting) {
     f32 relZ = painting->pos[2] - gPaintingMarioPos[2];
 
-    if (relZ < 0.0f) {
-        relZ = 0.0f;
-    } else if (relZ > painting->size) {
-        relZ = painting->size;
-    }
-    return relZ;
+    return CLAMP(relZ, 0.0f, painting->size);
 }
 
 /**
@@ -228,13 +246,10 @@ f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
     switch (ySource) {
         case MARIO_Y:
             return painting_mario_y(painting); // normal wall paintings
-            break;
         case MARIO_Z:
             return painting_mario_z(painting); // floor paintings use X and Z
-            break;
         case MIDDLE_Y:
             return (painting->size * 0.5f); // some concentric ripples don't care about Mario
-            break;
     }
     return 0.0f;
 }
@@ -266,33 +281,16 @@ f32 painting_nearest_4th(struct Painting *painting) {
 }
 
 /**
- * @return Mario's x position inside the painting (bounded).
- */
-f32 painting_mario_x(struct Painting *painting) {
-    f32 relX = gPaintingMarioPos[0] - painting->pos[0];
-
-    if (relX < 0.0f) {
-        relX = 0.0f;
-    } else if (relX > painting->size) {
-        relX = painting->size;
-    }
-    return relX;
-}
-
-/**
  * @return The x origin for the ripple, based on xSource.
  */
 f32 painting_ripple_x(struct Painting *painting, s8 xSource) {
     switch (xSource) {
         case NEAREST_4TH: // normal wall paintings
             return painting_nearest_4th(painting);
-            break;
         case MARIO_X: // horizontally placed paintings use X and Z
             return painting_mario_x(painting);
-            break;
         case MIDDLE_X: // concentric rippling may not care about Mario
             return painting->size * 0.5f;
-            break;
     }
 
     return 0.0f;
@@ -684,7 +682,7 @@ s32 normalize_component(f32 comp) {
     } else if (comp < 0.0f) {
         rounded = (comp * 128.0f) - 0.5f; // round down
     } else {
-        rounded = 0;                      // don't round 0
+        rounded = 0; // don't round 0
     }
     return rounded;
 }
@@ -1151,7 +1149,7 @@ void floor_painting_update(struct Painting *painting, struct Painting *paintingG
  */
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *gen = (struct GraphNodeGenerated *) node;
-    s32 group = ((gen->parameter >> 8) & 0xFF);
+    s32 group = get_painting_group(); // ((gen->parameter >> 8) & 0xFF);
     s32 id = (gen->parameter & 0xFF);
     Gfx *paintingDlist = NULL;
     struct Painting **paintingGroup = sPaintingGroups[group];
@@ -1161,7 +1159,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         reset_painting(painting);
     } else if (callContext == GEO_CONTEXT_RENDER) {
         // Update the ddd painting before drawing
-        if (group == 1 && id == PAINTING_ID_DDD) {
+        if (group == PAINTING_GROUP_INSIDE_CASTLE && id == PAINTING_ID_DDD) {
             move_ddd_painting(painting, 3456.0f, 5529.6f, 20.0f);
         }
 
