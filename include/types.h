@@ -309,6 +309,7 @@ struct Object {
 #if !IS_64_BIT
         s16 *asS16P[MAX_OBJECT_FIELDS];
         s32 *asS32P[MAX_OBJECT_FIELDS];
+        f32 *asF32P[MAX_OBJECT_FIELDS];
         struct Animation **asAnims[MAX_OBJECT_FIELDS];
         struct Waypoint *asWaypoint[MAX_OBJECT_FIELDS];
         struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
@@ -322,6 +323,7 @@ struct Object {
     union {
         s16 *asS16P[MAX_OBJECT_FIELDS];
         s32 *asS32P[MAX_OBJECT_FIELDS];
+        f32 *asF32P[MAX_OBJECT_FIELDS];
         struct Animation **asAnims[MAX_OBJECT_FIELDS];
         struct Waypoint *asWaypoint[MAX_OBJECT_FIELDS];
         struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
