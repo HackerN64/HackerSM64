@@ -196,8 +196,8 @@ s16 gLastPaintingUpdateCounter = 0;
  * Stop paintings in paintingGroup from rippling if their id is different from *idptr.
  */
 void stop_other_paintings(s16 *idptr, struct Painting *paintingGroup[]) {
-    PaintingData id = *idptr;
     PaintingData index = 0;
+    PaintingData id = *idptr;
 
     while (paintingGroup[index] != NULL) {
         struct Painting *painting = segmented_to_virtual(paintingGroup[index]);
@@ -273,7 +273,7 @@ f32 painting_ripple_x(struct Painting *painting, s8 xSource) {
     switch (xSource) {
         case NEAREST_4TH: // normal wall paintings
             return painting_nearest_4th(painting);
-        case MARIO_X: // horizontally placed paintings use X and Z
+        case MARIO_X: // horizontally placed (floor) paintings use X and Z
             return painting_mario_x(painting);
         case MIDDLE_X: // concentric rippling may not care about Mario
             return (painting->size * 0.5f);
@@ -288,12 +288,12 @@ f32 painting_ripple_x(struct Painting *painting, s8 xSource) {
  */
 f32 painting_ripple_y(struct Painting *painting, s8 ySource) {
     switch (ySource) {
-        case MARIO_Y:
-            return painting_mario_y(painting); // normal wall paintings
-        case MARIO_Z:
-            return painting_mario_z(painting); // floor paintings use X and Z
-        case MIDDLE_Y:
-            return (painting->size * 0.5f); // some concentric ripples don't care about Mario
+        case MARIO_Y: // normal wall paintings
+            return painting_mario_y(painting);
+        case MARIO_Z: // horizontally placed (floor) paintings use X and Z
+            return painting_mario_z(painting);
+        case MIDDLE_Y: // concentric rippling may not care about Mario
+            return (painting->size * 0.5f);
     }
     return 0.0f;
 }
@@ -499,11 +499,13 @@ void floor_painting_continuous_rippling(struct Painting *painting, struct Painti
  * Check for Mario entering one of the special floors associated with the painting.
  */
 void painting_update_floors(struct Painting *painting) {
-    s32 paintingId3 = (painting->id * 3);
+    PaintingData paintingId = painting->id;
     s8 rippleFlags = RIPPLE_FLAGS_NONE;
-    s16 marioFloorType = SURFACE_DEFAULT;
+    TerrainData marioFloorType = SURFACE_DEFAULT;
 
-    if (gMarioState->floor != NULL) marioFloorType = gMarioState->floor->type;
+    if (gMarioState->floor != NULL) {
+        marioFloorType = gMarioState->floor->type;
+    }
 
     /* The area in front of every painting in the game (except HMC and CotMC, which   *\
     |* act a little differently) is made up of 3 special floor triangles with special *|
@@ -511,12 +513,12 @@ void painting_update_floors(struct Painting *painting) {
     \* and sets a bitfield accordingly.                                               */
 
     // check if Mario's current floor is one of the special floors
-    if (marioFloorType == (paintingId3 + SURFACE_PAINTING_WOBBLE_A6)) rippleFlags |= RIPPLE_FLAG_RIPPLE_LEFT;
-    if (marioFloorType == (paintingId3 + SURFACE_PAINTING_WOBBLE_A7)) rippleFlags |= RIPPLE_FLAG_RIPPLE_MIDDLE;
-    if (marioFloorType == (paintingId3 + SURFACE_PAINTING_WOBBLE_A8)) rippleFlags |= RIPPLE_FLAG_RIPPLE_RIGHT;
-    if (marioFloorType == (paintingId3 + SURFACE_PAINTING_WARP_D3  )) rippleFlags |= RIPPLE_FLAG_ENTER_LEFT;
-    if (marioFloorType == (paintingId3 + SURFACE_PAINTING_WARP_D4  )) rippleFlags |= RIPPLE_FLAG_ENTER_MIDDLE;
-    if (marioFloorType == (paintingId3 + SURFACE_PAINTING_WARP_D5  )) rippleFlags |= RIPPLE_FLAG_ENTER_RIGHT;
+    if (marioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WOBBLE_A6)) rippleFlags |= RIPPLE_FLAG_RIPPLE_LEFT;
+    if (marioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WOBBLE_A7)) rippleFlags |= RIPPLE_FLAG_RIPPLE_MIDDLE;
+    if (marioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WOBBLE_A8)) rippleFlags |= RIPPLE_FLAG_RIPPLE_RIGHT;
+    if (marioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WARP_D3  )) rippleFlags |= RIPPLE_FLAG_ENTER_LEFT;
+    if (marioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WARP_D4  )) rippleFlags |= RIPPLE_FLAG_ENTER_MIDDLE;
+    if (marioFloorType == ((paintingId * 3) + SURFACE_PAINTING_WARP_D5  )) rippleFlags |= RIPPLE_FLAG_ENTER_RIGHT;
 
     painting->lastFloor = painting->currFloor;
     // at most 1 of these will be nonzero;
@@ -626,7 +628,7 @@ s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
  *
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
-void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
+void painting_generate_mesh(struct Painting *painting, PaintingData *mesh, PaintingData numTris) {
     s16 i;
 
     gPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(struct PaintingMeshVertex)));
@@ -640,6 +642,8 @@ void painting_generate_mesh(struct Painting *painting, s16 *mesh, s16 numTris) {
         if (mesh[(i * 3) + 3]) {
             gPaintingMesh[i].pos[2] = calculate_ripple_at_point(painting, gPaintingMesh[i].pos[0],
                                                                           gPaintingMesh[i].pos[1]);
+        } else {
+            gPaintingMesh[i].pos[2] = 0;
         }
     }
 }
@@ -663,13 +667,16 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
     s16 i;
     Vec3s v;
     Vec3f vp0, vp1, vp2;
-    gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
+
+    gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, numTris * sizeof(Vec3f));
+
     for (i = 0; i < numTris; i++) {
-        PaintingData tri = ((numVtx * 3) + (i * 3) + 2); // Add 2 because of the 2 length entries preceding the list
+        PaintingData tri = (numVtx * 3) + (i * 3) + 2; // Add 2 because of the 2 length entries preceding the list
         vec3s_copy(v, &mesh[tri]);
         vec3s_to_vec3f(vp0, gPaintingMesh[v[0]].pos);
         vec3s_to_vec3f(vp1, gPaintingMesh[v[1]].pos);
         vec3s_to_vec3f(vp2, gPaintingMesh[v[2]].pos);
+
         // Cross product to find each triangle's normal vector
         find_vector_perpendicular_to_plane(gPaintingTriNorms[i], vp0, vp1, vp2);
     }
@@ -680,15 +687,13 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
  * rounding away from 0.
  */
 s32 normalize_component(f32 comp) {
-    s8 rounded;
     if (comp > 0.0f) {
-        rounded = (comp * 127.0f) + 0.5f; // round up
+        return (s8)((comp * 127.0f) + 0.5f); // round up
     } else if (comp < 0.0f) {
-        rounded = (comp * 128.0f) - 0.5f; // round down
+        return (s8)((comp * 128.0f) - 0.5f); // round down
     } else {
-        rounded = 0; // don't round 0
+        return 0; // don't round 0
     }
-    return rounded;
 }
 
 /**
@@ -747,12 +752,12 @@ void painting_average_vertex_normals(PaintingData *neighborTris, PaintingData nu
  * painting.
  */
 Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, PaintingData *textureMap, PaintingData mapVerts, PaintingData mapTris, Alpha alpha) {
-    PaintingData group, groupM;
+    PaintingData group;
     PaintingData map;
     PaintingData triGroup;
+    PaintingData mapping;
     PaintingData meshVtx;
     PaintingData tx, ty;
-    s32 mapping3;
 
     // We can fit 15 (16 / 3) vertices in the RSP's vertex buffer.
     // Group triangles by 5, with one remainder group.
@@ -769,67 +774,62 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
 
     // Draw the groups of 5 first
     for (group = 0; group < triGroups; group++) {
-        groupM = (group * 15);
 
         // The triangle groups are the second part of the texture map.
         // Each group is a list of 15 mappings
-        triGroup = (mapVerts * 3) + groupM + 2;
+        triGroup = (mapVerts * 3) + (group * 15) + 2;
         for (map = 0; map < 15; map++) {
-
             // The mapping is just an index into the earlier part of the textureMap
             // Some mappings are repeated, for example, when multiple triangles share a vertex
-            mapping3 = textureMap[triGroup + map] * 3;
+            mapping = textureMap[triGroup + map];
 
             // The first entry is the ID of the vertex in the mesh
-            meshVtx = textureMap[mapping3 + 1];
+            meshVtx = textureMap[mapping * 3 + 1];
 
             // The next two are the texture coordinates for that vertex
-            tx = textureMap[mapping3 + 2];
-            ty = textureMap[mapping3 + 3];
+            tx = textureMap[(mapping * 3) + 2];
+            ty = textureMap[(mapping * 3) + 3];
 
             // Map the texture and place it in the verts array
-            make_vertex(verts, (groupM + map), gPaintingMesh[meshVtx].pos[0],
-                                               gPaintingMesh[meshVtx].pos[1],
-                                               gPaintingMesh[meshVtx].pos[2],
-                                               tx, ty,
-                                               gPaintingMesh[meshVtx].norm[0],
-                                               gPaintingMesh[meshVtx].norm[1],
-                                               gPaintingMesh[meshVtx].norm[2],
-                                               alpha);
+            make_vertex(verts, ((group * 15) + map), gPaintingMesh[meshVtx].pos[0],
+                                                     gPaintingMesh[meshVtx].pos[1],
+                                                     gPaintingMesh[meshVtx].pos[2],
+                                                     tx, ty,
+                                                     gPaintingMesh[meshVtx].norm[0],
+                                                     gPaintingMesh[meshVtx].norm[1],
+                                                     gPaintingMesh[meshVtx].norm[2],
+                                                     alpha);
         }
 
         // Load the vertices and draw the 5 triangles
-        gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + groupM), 15, 0);
+        gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + (group * 15)), 15, 0);
         gSPDisplayList(gfx++, dl_paintings_draw_ripples);
     }
 
-    groupM = (triGroups * 15);
-
     // One group left with < 5 triangles
-    triGroup = (mapVerts * 3) + groupM + 2;
+    triGroup = (mapVerts * 3) + (triGroups * 15) + 2;
     // Map the texture to the triangles
     for (map = 0; map < (remGroupTris * 3); map++) {
-        mapping3 = textureMap[triGroup + map] * 3;
-        meshVtx  = textureMap[mapping3 + 1];
-        tx       = textureMap[mapping3 + 2];
-        ty       = textureMap[mapping3 + 3];
-        make_vertex(verts, (groupM + map), gPaintingMesh[meshVtx].pos[0],
-                                           gPaintingMesh[meshVtx].pos[1],
-                                           gPaintingMesh[meshVtx].pos[2],
-                                           tx, ty,
-                                           gPaintingMesh[meshVtx].norm[0],
-                                           gPaintingMesh[meshVtx].norm[1],
-                                           gPaintingMesh[meshVtx].norm[2],
-                                           alpha);
+        mapping = textureMap[triGroup + map];
+        meshVtx = textureMap[(mapping * 3) + 1];
+        tx = textureMap[(mapping * 3) + 2];
+        ty = textureMap[(mapping * 3) + 3];
+        make_vertex(verts, ((triGroups * 15) + map), gPaintingMesh[meshVtx].pos[0],
+                                                     gPaintingMesh[meshVtx].pos[1],
+                                                     gPaintingMesh[meshVtx].pos[2],
+                                                     tx, ty,
+                                                     gPaintingMesh[meshVtx].norm[0],
+                                                     gPaintingMesh[meshVtx].norm[1],
+                                                     gPaintingMesh[meshVtx].norm[2],
+                                                     alpha);
     }
 
     // Draw the triangles individually
-    gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + triGroups * 15), (remGroupTris * 3), 0);
+    gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + (triGroups * 15)), (remGroupTris * 3), 0);
     for (group = 0; group < remGroupTris; group++) {
-        groupM = (group * 3);
-        gSP1Triangle(gfx++, groupM + 0,
-                            groupM + 1,
-                            groupM + 2, 0);
+        gSP1Triangle(gfx++, ((group * 3) + 0),
+                            ((group * 3) + 1),
+                            ((group * 3) + 2), 0);
     }
 
     gSPEndDisplayList(gfx);
@@ -1041,7 +1041,7 @@ void move_ddd_painting(struct Painting *painting, UNUSED f32 frontPos, f32 backP
 }
 #else
 void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32 speed) {
-    // Find out whether Board Bowser's Sub was collected
+    // Obtain the DDD star flags and find out whether Board Bowser's Sub was collected
     u32 bowsersSubBeaten = (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD)) & BOARD_BOWSERS_SUB);
     // Get the other save file flags and check whether DDD has already moved back
     u32 dddBack = (save_file_get_flags() & SAVE_FLAG_DDD_MOVED_BACK);
@@ -1056,7 +1056,7 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
         painting->pos[0] += speed;
         gDddPaintingStatus = DDD_FLAG_BOWSERS_SUB_BEATEN;
         if (painting->pos[0] >= backPos) {
-            painting->pos[0]  = backPos;
+            painting->pos[0] = backPos;
             // Tell the save file that we've moved DDD back.
             save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
         }
