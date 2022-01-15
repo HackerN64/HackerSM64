@@ -58,7 +58,7 @@
 
 // Include the English characters that were missing from US segment2
 // J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
-// [MAKE SURE TO ALSO BUILD FROM JP/SH AND EU TO OBTAIN THE ASSETS]
+// [MAKE SURE TO HAVE EU AND JP/SH BASEROMS TO OBTAIN THE ASSETS]
 // If this is disabled, backup assets will be used.
 // #define COMPLETE_EN_US_SEGMENT2
 

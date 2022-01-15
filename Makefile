@@ -108,7 +108,7 @@ else ifeq ($(GRUCODE),l3dex2) # Line3DEX2
 else ifeq ($(GRUCODE),f3dex2pl) # Fast3DEX2_PosLight
   DEFINES += F3DEX2PL_GBI=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX (2.08J / Animal Forest - Dōbutsu no Mori)
-  DEFINES += F3DZEX_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
+  DEFINES += F3DZEX_NON_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 else ifeq ($(GRUCODE),super3d) # Super3D
   $(warning Super3D is experimental. Try at your own risk.)
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
@@ -323,11 +323,25 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
   ifeq ($(NOEXTRACT),0)
     DUMMY != $(PYTHON) extract_assets.py $(VERSION) >&2 || echo FAIL
     ifeq ($(DUMMY),FAIL)
-      $(error Failed to extract assets)
+      $(error Failed to extract assets from US ROM)
     endif
-    DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
-    ifeq ($(DUMMY),FAIL)
-      $(error Failed to extract assets)
+    ifneq (,$(wildcard baserom.jp.z64))
+      DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
+      ifeq ($(DUMMY),FAIL)
+        $(error Failed to extract assets from JP ROM)
+      endif
+    endif
+    ifneq (,$(wildcard baserom.eu.z64))
+      DUMMY != $(PYTHON) extract_assets.py eu >&2 || echo FAIL
+      ifeq ($(DUMMY),FAIL)
+        $(error Failed to extract assets from EU ROM)
+      endif
+    endif
+    ifneq (,$(wildcard baserom.sh.z64))
+      DUMMY != $(PYTHON) extract_assets.py sh >&2 || echo FAIL
+      ifeq ($(DUMMY),FAIL)
+        $(error Failed to extract assets from SH ROM)
+      endif
     endif
   endif
 
