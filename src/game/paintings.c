@@ -589,10 +589,10 @@ s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
     f32 rippleX = painting->rippleX;
     f32 rippleY = painting->rippleY;
 
-    f32 size = (painting->size / PAINTING_SIZE);
+    f32 sizeRatio = (painting->size / PAINTING_SIZE);
 
-    posX *= size;
-    posY *= size;
+    posX *= sizeRatio;
+    posY *= sizeRatio;
     f32 dx = (posX - rippleX);
     f32 dy = (posY - rippleY);
     f32 distanceToOrigin = sqrtf(sqr(dx) + sqr(dy));
