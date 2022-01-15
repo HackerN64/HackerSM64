@@ -28,6 +28,7 @@
 #if !IS_64_BIT
 #define OBJECT_FIELD_S16P(index)          rawData.asS16P[index]
 #define OBJECT_FIELD_S32P(index)          rawData.asS32P[index]
+#define OBJECT_FIELD_F32P(index)          rawData.asF32P[index]
 #define OBJECT_FIELD_ANIMS(index)         rawData.asAnims[index]
 #define OBJECT_FIELD_WAYPOINT(index)      rawData.asWaypoint[index]
 #define OBJECT_FIELD_CHAIN_SEGMENT(index) rawData.asChainSegment[index]
