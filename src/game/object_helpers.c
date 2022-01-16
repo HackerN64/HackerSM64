@@ -215,15 +215,11 @@ s32 cur_obj_rotate_yaw_toward(s16 target, s16 increment) {
     startYaw = (s16) o->oMoveAngleYaw;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, target, increment);
 
-    if ((o->oAngleVelYaw = (s16)((s16) o->oMoveAngleYaw - startYaw)) == 0) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+    return ((o->oAngleVelYaw = (s16)((s16) o->oMoveAngleYaw - startYaw)) == 0);
 }
 
 s32 obj_angle_to_object(struct Object *obj1, struct Object *obj2) {
-    return atan2s(obj2->oPosZ - obj1->oPosZ, obj2->oPosX - obj1->oPosX);
+    return atan2s((obj2->oPosZ - obj1->oPosZ), (obj2->oPosX - obj1->oPosX));
 }
 
 s32 obj_turn_toward_object(struct Object *obj, struct Object *target, s16 angleIndex, s16 turnAmount) {
@@ -530,8 +526,8 @@ void cur_obj_set_pos_relative(struct Object *other, f32 dleft, f32 dy, f32 dforw
     f32 facingZ = coss(other->oMoveAngleYaw);
     f32 facingX = sins(other->oMoveAngleYaw);
 
-    f32 dz = dforward * facingZ - dleft * facingX;
-    f32 dx = dforward * facingX + dleft * facingZ;
+    f32 dz = (dforward * facingZ) - (dleft * facingX);
+    f32 dx = (dforward * facingX) + (dleft * facingZ);
 
     o->oMoveAngleYaw = other->oMoveAngleYaw;
 
@@ -556,7 +552,7 @@ u32 get_object_list_from_behavior(const BehaviorScript *behavior) {
     // If the first behavior command is "begin", then get the object list header
     // from there
     if ((behavior[0] >> 24) == 0) {
-        objectList = (behavior[0] >> 16) & 0xFFFF;
+        objectList = ((behavior[0] >> 16) & 0xFFFF);
     } else {
         objectList = OBJ_LIST_DEFAULT;
     }
@@ -571,7 +567,9 @@ struct Object *cur_obj_nearest_object_with_behavior(const BehaviorScript *behavi
 
 f32 cur_obj_dist_to_nearest_object_with_behavior(const BehaviorScript *behavior) {
     f32 dist;
-    if (cur_obj_find_nearest_object_with_behavior(behavior, &dist) == NULL) dist = 15000.0f;
+    if (cur_obj_find_nearest_object_with_behavior(behavior, &dist) == NULL) {
+        dist = 15000.0f;
+    }
     return dist;
 }
 
@@ -699,7 +697,9 @@ void cur_obj_extend_animation_if_at_end(void) {
     s32 animFrame = o->header.gfx.animInfo.animFrame;
     s32 nearLoopEnd = o->header.gfx.animInfo.curAnim->loopEnd - 2;
 
-    if (animFrame == nearLoopEnd) o->header.gfx.animInfo.animFrame--;
+    if (animFrame == nearLoopEnd) {
+        o->header.gfx.animInfo.animFrame--;
+    }
 }
 
 s32 cur_obj_check_if_near_animation_end(void) {
@@ -710,21 +710,21 @@ s32 cur_obj_check_if_near_animation_end(void) {
         return TRUE;
     }
 
-    return animFrame == nearLoopEnd;
+    return (animFrame == nearLoopEnd);
 }
 
 s32 cur_obj_check_if_at_animation_end(void) {
-    return o->header.gfx.animInfo.animFrame == o->header.gfx.animInfo.curAnim->loopEnd - 1;
+    return (o->header.gfx.animInfo.animFrame == o->header.gfx.animInfo.curAnim->loopEnd - 1);
 }
 
 s32 cur_obj_check_anim_frame(s32 frame) {
-    return o->header.gfx.animInfo.animFrame == frame;
+    return (o->header.gfx.animInfo.animFrame == frame);
 }
 
 s32 cur_obj_check_anim_frame_in_range(s32 startFrame, s32 rangeLength) {
     s32 animFrame = o->header.gfx.animInfo.animFrame;
 
-    return animFrame >= startFrame && animFrame < startFrame + rangeLength;
+    return (animFrame >= startFrame && animFrame < startFrame + rangeLength);
 }
 
 s32 cur_obj_check_frame_prior_current_frame(s16 *frame) {
@@ -740,11 +740,11 @@ s32 cur_obj_check_frame_prior_current_frame(s16 *frame) {
 }
 
 s32 mario_is_in_air_action(void) {
-    return gMarioStates[0].action & ACT_FLAG_AIR;
+    return (gMarioStates[0].action & ACT_FLAG_AIR);
 }
 
 s32 mario_is_dive_sliding(void) {
-    return gMarioStates[0].action == ACT_DIVE_SLIDE;
+    return (gMarioStates[0].action == ACT_DIVE_SLIDE);
 }
 
 void cur_obj_set_y_vel_and_animation(f32 yVel, s32 animIndex) {
@@ -974,7 +974,7 @@ static void cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlo
 }
 
 static void cur_obj_move_update_underwater_flags(void) {
-    f32 decelY = (f32)(sqrtf(o->oVelY * o->oVelY) * (o->oDragStrength * 7.0f)) / 100.0L;
+    f32 decelY = (f32)(absf(o->oVelY) * (o->oDragStrength * 7.0f)) / 100.0f;
 
     if (o->oVelY > 0) {
         o->oVelY -= decelY;
@@ -1085,7 +1085,7 @@ void cur_obj_move_y(f32 gravity, f32 bounciness, f32 buoyancy) {
 
 static s32 clear_move_flag(u32 *bitSet, s32 flag) {
     if (*bitSet & flag) {
-        *bitSet &= flag ^ 0xFFFFFFFF;
+        *bitSet &= (flag ^ 0xFFFFFFFF);
         return TRUE;
     } else {
         return FALSE;
@@ -1463,8 +1463,8 @@ void obj_set_pos_relative(struct Object *obj, struct Object *other, f32 dleft, f
     f32 facingZ = coss(other->oMoveAngleYaw);
     f32 facingX = sins(other->oMoveAngleYaw);
 
-    f32 dz = dforward * facingZ - dleft * facingX;
-    f32 dx = dforward * facingX + dleft * facingZ;
+    f32 dz = (dforward * facingZ) - (dleft * facingX);
+    f32 dx = (dforward * facingX) + (dleft * facingZ);
 
     obj->oMoveAngleYaw = other->oMoveAngleYaw;
 
@@ -1591,11 +1591,11 @@ void chain_segment_init(struct ChainSegment *segment) {
 }
 
 f32 random_f32_around_zero(f32 diameter) {
-    return random_float() * diameter - diameter / 2;
+    return ((random_float() * diameter) - (diameter / 2));
 }
 
 void obj_scale_random(struct Object *obj, f32 rangeLength, f32 minScale) {
-    f32 scale = random_float() * rangeLength + minScale;
+    f32 scale = (random_float() * rangeLength) + minScale;
     obj_scale(obj, scale);
 }
 
@@ -1644,7 +1644,7 @@ void cur_obj_spawn_particles(struct SpawnParticlesInfo *info) {
     }
 
     for (i = 0; i < numParticles; i++) {
-        scale = random_float() * (info->sizeRange * 0.1f) + info->sizeBase * 0.1f;
+        scale = (random_float() * (info->sizeRange * 0.1f)) + (info->sizeBase * 0.1f);
 
         particle = spawn_object(o, info->model, bhvWhitePuffExplosion);
 
@@ -1654,8 +1654,8 @@ void cur_obj_spawn_particles(struct SpawnParticlesInfo *info) {
         particle->oDragStrength = info->dragStrength;
 
         particle->oPosY += info->offsetY;
-        particle->oForwardVel = random_float() * info->forwardVelRange + info->forwardVelBase;
-        particle->oVelY = random_float() * info->velYRange + info->velYBase;
+        particle->oForwardVel = (random_float() * info->forwardVelRange) + info->forwardVelBase;
+        particle->oVelY = (random_float() * info->velYRange) + info->velYBase;
 
         obj_scale(particle, scale);
     }
@@ -1665,18 +1665,18 @@ void obj_set_hitbox(struct Object *obj, struct ObjectHitbox *hitbox) {
     if (!(obj->oFlags & OBJ_FLAG_HITBOX_WAS_SET)) {
         obj->oFlags |= OBJ_FLAG_HITBOX_WAS_SET;
 
-        obj->oInteractType = hitbox->interactType;
+        obj->oInteractType      = hitbox->interactType;
         obj->oDamageOrCoinValue = hitbox->damageOrCoinValue;
-        obj->oHealth = hitbox->health;
-        obj->oNumLootCoins = hitbox->numLootCoins;
+        obj->oHealth            = hitbox->health;
+        obj->oNumLootCoins      = hitbox->numLootCoins;
 
         cur_obj_become_tangible();
     }
 
-    obj->hitboxRadius = obj->header.gfx.scale[0] * hitbox->radius;
-    obj->hitboxHeight = obj->header.gfx.scale[1] * hitbox->height;
-    obj->hurtboxRadius = obj->header.gfx.scale[0] * hitbox->hurtboxRadius;
-    obj->hurtboxHeight = obj->header.gfx.scale[1] * hitbox->hurtboxHeight;
+    obj->hitboxRadius     = obj->header.gfx.scale[0] * hitbox->radius;
+    obj->hitboxHeight     = obj->header.gfx.scale[1] * hitbox->height;
+    obj->hurtboxRadius    = obj->header.gfx.scale[0] * hitbox->hurtboxRadius;
+    obj->hurtboxHeight    = obj->header.gfx.scale[1] * hitbox->hurtboxHeight;
     obj->hitboxDownOffset = obj->header.gfx.scale[1] * hitbox->downOffset;
 }
 
@@ -1697,13 +1697,7 @@ s32 cur_obj_wait_then_blink(s32 timeUntilBlinking, s32 numBlinks) {
 }
 
 s32 cur_obj_is_mario_ground_pounding_platform(void) {
-    if (gMarioObject->platform == o) {
-        if (gMarioStates[0].action == ACT_GROUND_POUND_LAND) {
-            return TRUE;
-        }
-    }
-
-    return FALSE;
+    return ((gMarioObject->platform == o) && (gMarioStates[0].action == ACT_GROUND_POUND_LAND));
 }
 
 void spawn_mist_particles(void) {
@@ -1771,23 +1765,15 @@ s32 cur_obj_progress_direction_table(void) {
 void cur_obj_scale_over_time(s32 axis, s32 times, f32 start, f32 end) {
     f32 scale = ((end - start) * ((f32) o->oTimer / times)) + start;
 
-    if (axis & SCALE_AXIS_X) {
-        o->header.gfx.scale[0] = scale;
-    }
-
-    if (axis & SCALE_AXIS_Y) {
-        o->header.gfx.scale[1] = scale;
-    }
-
-    if (axis & SCALE_AXIS_Z) {
-        o->header.gfx.scale[2] = scale;
-    }
+    if (axis & SCALE_AXIS_X) o->header.gfx.scale[0] = scale;
+    if (axis & SCALE_AXIS_Y) o->header.gfx.scale[1] = scale;
+    if (axis & SCALE_AXIS_Z) o->header.gfx.scale[2] = scale;
 }
 
 void cur_obj_set_pos_to_home_with_debug(void) {
     vec3_sum(&o->oPosVec, &o->oHomeVec, gDebugInfo[DEBUG_PAGE_ENEMYINFO]);
 
-    cur_obj_scale(gDebugInfo[DEBUG_PAGE_ENEMYINFO][3] / 100.0f + 1.0f);
+    cur_obj_scale((gDebugInfo[DEBUG_PAGE_ENEMYINFO][3] / 100.0f) + 1.0f);
 }
 
 s32 cur_obj_is_mario_on_platform(void) {
@@ -1803,7 +1789,7 @@ s32 cur_obj_shake_y_until(s32 cycles, s32 amount) {
         o->oPosY += amount;
     }
 
-    return o->oTimer == cycles * 2;
+    return (o->oTimer == cycles * 2);
 }
 
 void cur_obj_call_action_function(ObjActionFunc actionFunctions[]) {
@@ -2263,11 +2249,7 @@ s32 player_performed_grab_escape_action(void) {
         return TRUE;
     }
 
-    if (gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON | Z_TRIG)) {
-        return TRUE;
-    }
-
-    return FALSE;
+    return (gPlayer1Controller->buttonPressed & (A_BUTTON | B_BUTTON | Z_TRIG));
 }
 
 void cur_obj_unused_play_footstep_sound(s32 animFrame1, s32 animFrame2, s32 sound) {
