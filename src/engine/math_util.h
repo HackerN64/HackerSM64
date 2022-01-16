@@ -543,8 +543,8 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw);
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius);
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);
 // Translation & rotation
+void mtx_rotate_xy(Mtx *mtx, s32 angle);
 void mtxf_translate(Mat4 dest, Vec3f b);
-void mtxf_rotate_xy(Mtx *mtx, s32 angle);
 void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
 void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot);
 void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src);

@@ -817,7 +817,7 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
 #define MATENTRY(a, b)                          \
     ((s16 *) mtx)[a     ] = (((s32) b) >> 16);  \
     ((s16 *) mtx)[a + 16] = (((s32) b) & 0xFFFF);
-void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
+void mtx_rotate_xy(Mtx *mtx, s32 angle) {
     s32 c = (coss(angle) * 0x10000);
     s32 s = (sins(angle) * 0x10000);
     f32 *mtxp = (f32 *)mtx;
