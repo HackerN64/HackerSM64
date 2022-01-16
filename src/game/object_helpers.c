@@ -1120,8 +1120,8 @@ void cur_obj_compute_vel_xz(void) {
 }
 
 f32 increment_velocity_toward_range(f32 value, f32 center, f32 zeroThreshold, f32 increment) {
-    f32 relative;
-    if ((relative = value - center) > 0) {
+    f32 relative = value - center;
+    if (relative > 0) {
         if (relative < zeroThreshold) {
             return 0.0f;
         } else {
@@ -1492,12 +1492,7 @@ void obj_set_gfx_pos_at_obj_pos(struct Object *obj1, struct Object *obj2) {
  * coordinates, and then add it to the vector at posIndex.
  */
 void obj_translate_local(struct Object *obj, s16 posIndex, s16 localTranslateIndex) {
-    Vec3f d;
-    vec3f_copy(d, &obj->rawData.asF32[localTranslateIndex]);
-
-    obj->rawData.asF32[posIndex + 0] += ((obj->transform[0][0] * d[0]) + (obj->transform[1][0] * d[1]) + (obj->transform[2][0] * d[2]));
-    obj->rawData.asF32[posIndex + 1] += ((obj->transform[0][1] * d[0]) + (obj->transform[1][1] * d[1]) + (obj->transform[2][1] * d[2]));
-    obj->rawData.asF32[posIndex + 2] += ((obj->transform[0][2] * d[0]) + (obj->transform[1][2] * d[1]) + (obj->transform[2][2] * d[2]));
+    mtxf_translate_local_vec3f(obj->transform, &obj->rawData.asF32[posIndex], &obj->rawData.asF32[localTranslateIndex]);
 }
 
 void obj_build_transform_from_pos_and_angle(struct Object *obj, s16 posIndex, s16 angleIndex) {
