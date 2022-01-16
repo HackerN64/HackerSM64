@@ -894,8 +894,8 @@ void cur_obj_update(void) {
     }
 
 #if SILHOUETTE
-    COND_BIT((  objFlags & OBJ_FLAG_SILHOUETTE         ), o->header.gfx.node.flags, GRAPH_RENDER_SILHOUETTE        );
-    COND_BIT((  objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE ), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
+    COND_BIT((objFlags & OBJ_FLAG_SILHOUETTE        ), o->header.gfx.node.flags, GRAPH_RENDER_SILHOUETTE        );
+    COND_BIT((objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
 #endif
 #ifdef OBJECTS_REJ
     s32 objListIndex = OBJ_LIST_PLAYER;

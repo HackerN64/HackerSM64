@@ -306,7 +306,7 @@ struct Object *spawn_object_rel_with_rot(struct Object *parent, ModelID32 model,
 
 struct Object *spawn_obj_with_transform_flags(struct Object *parent, ModelID32 model, const BehaviorScript *behavior) {
     struct Object *newObj = spawn_object(parent, model, behavior);
-    newObj->oFlags |= OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX | OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM;
+    newObj->oFlags |= (OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX | OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM);
     return newObj;
 }
 
@@ -1504,7 +1504,7 @@ void obj_build_transform_from_pos_and_angle(struct Object *obj, s16 posIndex, s1
     Vec3f translate;
     vec3f_copy(translate, &obj->rawData.asF32[posIndex]);
     Vec3s rotation;
-    vec3i_to_vec3s(rotation,  &obj->rawData.asS32[angleIndex]);
+    vec3i_to_vec3s(rotation, &obj->rawData.asS32[angleIndex]);
     mtxf_rotate_zxy_and_translate(obj->transform, translate, rotation);
 }
 
