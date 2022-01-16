@@ -700,6 +700,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
     }
 
     gSPEndDisplayList(gfx);
+
     return dlist;
 }
 
@@ -767,6 +768,7 @@ Gfx *painting_ripple_image(struct Painting *painting) {
     gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
     gSPDisplayList(gfx++, dl_paintings_rippling_end);
     gSPEndDisplayList(gfx);
+
     return dlist;
 }
 
@@ -1033,7 +1035,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         reset_painting(painting);
     } else if (callContext == GEO_CONTEXT_RENDER) {
         // Update the ddd painting before drawing
-        if (group == PAINTING_GROUP_INSIDE_CASTLE && id == ddd_painting.id) {
+        if (group == PAINTING_GROUP_INSIDE_CASTLE && id == PAINTING_ID_DDD) {
             move_ddd_painting(painting, 3456.0f, 5529.6f, 20.0f);
         }
 
@@ -1045,7 +1047,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
         // Update the painting
         painting_update_floors(painting);
-        if (painting->pitch == 0x0) {
+        if (!FLT_IS_NONZERO(painting->pitch)) {
             // only paintings with 0 pitch are treated as walls
             wall_painting_update(painting, paintingGroup);
         } else {

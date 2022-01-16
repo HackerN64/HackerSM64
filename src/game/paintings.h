@@ -13,6 +13,8 @@
 /// The default painting side length
 #define PAINTING_SIZE 614.0f
 
+#define PAINTING_ID_DDD 0x7
+
 enum PaintingGroups {
     PAINTING_GROUP_HMC,
     PAINTING_GROUP_INSIDE_CASTLE,
