@@ -13,9 +13,11 @@
 /// The default painting side length
 #define PAINTING_SIZE 614.0f
 
-#define PAINTING_ID_DDD 0x7
-
-#define BOARD_BOWSERS_SUB (1 << 0)
+enum PaintingGroups {
+    PAINTING_GROUP_HMC,
+    PAINTING_GROUP_INSIDE_CASTLE,
+    PAINTING_GROUP_TTM,
+};
 
 enum DDDPaintingFlags {
     DDD_FLAGS_NONE              = (0 << 0), // 0x0
@@ -30,8 +32,35 @@ enum PaintingState {
 };
 
 enum RippleTriggers {
-    RIPPLE_TRIGGER_PROXIMITY  = 10,
-    RIPPLE_TRIGGER_CONTINUOUS = 20,
+    RIPPLE_TRIGGER_PROXIMITY,
+    RIPPLE_TRIGGER_CONTINUOUS,
+};
+
+enum PaintingRippleFlags {
+    // Not rippling.
+    RIPPLE_FLAGS_NONE  = (0 << 0), // 0x00
+    // Triggers an entry ripple.
+    RIPPLE_FLAG_ENTER  = (1 << 0), // 0x01
+    // Triggers a passive ripple.
+    RIPPLE_FLAG_RIPPLE = (1 << 1), // 0x02
+};
+
+enum PaintingXSources {
+    /// Use the 1/4th part of the painting that is nearest to Mario's current floor.
+    NEAREST_4TH,
+    /// Use Mario's relative x position. @see painting_mario_x
+    MARIO_X,
+    /// Use the x center of the painting.
+    MIDDLE_X,
+};
+
+enum PaintingYSources {
+    /// Use Mario's relative y position. @see painting_mario_y
+    MARIO_Y,
+    /// Use Mario's relative z position. @see painting_mario_z
+    MARIO_Z,
+    /// Use the y center of the painting.
+    MIDDLE_Y,
 };
 
 enum PaintingType {
@@ -42,7 +71,7 @@ enum PaintingType {
 };
 
 struct Painting {
-    s16 id;
+    PaintingData id;
     /// How many images should be drawn when the painting is rippling.
     s8 imageCount;
     /// Either PAINTING_IMAGE or PAINTING_ENV_MAP
