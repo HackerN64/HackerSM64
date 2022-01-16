@@ -29,6 +29,7 @@
 #include "puppycam2.h"
 #include "debug_box.h"
 #include "vc_check.h"
+#include "profiling.h"
 
 // First 3 controller slots
 struct Controller gControllers[3];
@@ -762,6 +763,7 @@ void thread5_game_loop(UNUSED void *arg) {
     render_init();
 
     while (TRUE) {
+        fast_profiler_frame_setup();
         // If the reset timer is active, run the process to reset the game.
         if (gResetTimer != 0) {
             draw_reset_bars();
@@ -788,6 +790,7 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
         read_controller_inputs(THREAD_5_GAME_LOOP);
+        fast_profiler_update(PROFILER_TIME_CONTROLLERS);
         addr = level_script_execute(addr);
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();
