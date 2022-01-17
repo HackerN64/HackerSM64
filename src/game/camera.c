@@ -1683,9 +1683,8 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     if (dist > maxDist) {
         dist = maxDist;
     }
-    if ((absPitch = pitch) < 0) {
-        absPitch = -absPitch;
-    }
+
+    absPitch = abss(pitch);
 
     // Determine the yaw speed based on absPitch. A higher absPitch (further away from looking straight)
     // translates to a slower speed

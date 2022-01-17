@@ -344,10 +344,10 @@ static void eyerok_hand_act_die(void) {
 }
 
 static void eyerok_hand_act_retreat(void) {
-    f32 distToHome = cur_obj_lateral_dist_to_home();
+    f32 distToHome = cur_obj_lateral_dist_to_home() - 40.0f;
     s16 angleToHome = cur_obj_angle_to_home();
 
-    if ((distToHome -= 40.0f) < 0.0f) {
+    if (distToHome < 0.0f) {
         distToHome = 0.0f;
     }
 
