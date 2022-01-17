@@ -8,17 +8,47 @@
 #include "types.h"
 
 /// Use to properly set a GraphNodeGenerated's parameter to point to the right painting
-#define PAINTING_ID(id, grp) id | (grp << 8)
+#define PAINTING_ID(id, grp) (id | (grp << 8))
 
 /// The default painting side length
 #define PAINTING_SIZE 614.0f
 
-#define PAINTING_ID_DDD 0x7
+enum HMCPaintingIDs {
+    /*0x0*/ PAINTING_ID_HMC_COTMC,
+};
+
+enum CastlePaintingIDs {
+    /*0x0*/ PAINTING_ID_CASTLE_BOB,
+    /*0x1*/ PAINTING_ID_CASTLE_CCM,
+    /*0x2*/ PAINTING_ID_CASTLE_WF,
+    /*0x3*/ PAINTING_ID_CASTLE_JRB,
+    /*0x4*/ PAINTING_ID_CASTLE_LLL,
+    /*0x5*/ PAINTING_ID_CASTLE_SSL,
+    /*0x6*/ PAINTING_ID_CASTLE_HMC,
+    /*0x7*/ PAINTING_ID_CASTLE_DDD,
+    /*0x8*/ PAINTING_ID_CASTLE_WDW,
+    /*0x9*/ PAINTING_ID_CASTLE_THI_TINY,
+    /*0xA*/ PAINTING_ID_CASTLE_TTM,
+    /*0xB*/ PAINTING_ID_CASTLE_TTC,
+    /*0xC*/ PAINTING_ID_CASTLE_SL,
+    /*0xD*/ PAINTING_ID_CASTLE_THI_HUGE,
+    /*0xE*/ PAINTING_ID_CASTLE_RR,
+};
+
+#define PAINTING_ID_DDD PAINTING_ID_CASTLE_DDD
+
+enum TTMPaintingIDs {
+    /*0x0*/ PAINTING_ID_TTM_SLIDE,
+};
+
+#define PAINTING_ID_NULL -1
 
 enum PaintingGroups {
     PAINTING_GROUP_HMC,
     PAINTING_GROUP_INSIDE_CASTLE,
     PAINTING_GROUP_TTM,
+    PAINTING_NUM_GROUPS,
+    PAINTING_GROUP_NULL = -1,
 };
 
 enum DDDPaintingFlags {
@@ -150,7 +180,7 @@ struct Painting {
     u8 marioWentUnder : 1;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
-    /// By default a painting is 614.0 x 614.0
+    /// By default a painting is 614.0f x 614.0f
     f32 size;
 };
 
