@@ -17,6 +17,11 @@
 // Allow for retries on collecting the remaining blue coins from a blue coin switch.
 // #define BLUE_COIN_SWITCH_RETRY
 
+// -- EXCLAMATION BOX --
+
+// Makes all cap boxes solid regardless of whether their cap switch is pressed.
+#define EXCLAMATION_BOXES_ALWAYS_SOLID
+
 // -- GOOMBA --
 
 // Tiny Goombas (from THI) always drop their coin.

@@ -47,7 +47,7 @@ void bhv_rotating_exclamation_mark_loop(void) {
 void exclamation_box_act_init(void) {
     if (o->oBehParams2ndByte < EXCLAMATION_BOX_BP_KOOPA_SHELL) {
         o->oAnimState = o->oBehParams2ndByte;
-#ifdef UNLOCK_ALL
+#if defined(UNLOCK_ALL) || defined(EXCLAMATION_BOXES_ALWAYS_SOLID)
         u8 tangible = TRUE;
 #else
         u8 tangible = ((save_file_get_flags() & sCapSaveFlags[o->oBehParams2ndByte])
