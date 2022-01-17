@@ -1760,6 +1760,12 @@ s32 common_landing_cancels(struct MarioState *m, struct LandingAction *landingAc
         return set_mario_action(m, landingAction->offFloorAction, 0);
     }
 
+#ifdef ATTACK_FROM_LANDING
+    if (check_ground_dive_or_punch(m)) {
+        return TRUE;
+    }
+#endif
+
     return FALSE;
 }
 

@@ -65,8 +65,11 @@
 // Disables bonks when ground pounding next to a wall.
 #define DISABLE_GROUNDPOUND_BONK
 
-// Allows Mario to jump kick on steep surfaces that are set to be non slippery, instead of being forced to dive.
+// Allow Mario to jump kick on steep surfaces that are set to be non slippery, instead of being forced to dive.
 #define JUMP_KICK_FIX
+
+// Allow Mario to transition into a punch/dive/jump kick action when landing.
+#define ATTACK_FROM_LANDING
 
 // Allow Mario to grab hangable ceilings from any state.
 #define HANGING_FIX
