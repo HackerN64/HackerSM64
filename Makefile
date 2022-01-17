@@ -526,9 +526,9 @@ else
 endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
 EMULATOR = mupen64plus
-EMU_FLAGS =
-LOADER = loader64
-LOADER_FLAGS = -vwf
+EMU_FLAGS = --noosd
+LOADER = UNFLoader
+LOADER_FLAGS = -d
 SHA1SUM = sha1sum
 PRINT = printf
 
@@ -579,7 +579,7 @@ test-pj64: $(ROM)
 # someone2639
 
 load: $(ROM)
-	$(LOADER) $(LOADER_FLAGS) $<
+	$(LOADER) $(LOADER_FLAGS) -r $<
 
 libultra: $(BUILD_DIR)/libultra.a
 
