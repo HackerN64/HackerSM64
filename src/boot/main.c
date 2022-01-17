@@ -19,6 +19,7 @@
 #endif
 #include "game/puppyprint.h"
 #include "game/puppylights.h"
+#include "game/profiling.h"
 
 // Message IDs
 enum MessageIDs {
@@ -189,6 +190,7 @@ void start_gfx_sptask(void) {
         rspDelta = osGetTime();
 #endif
         start_sptask(M_GFXTASK);
+        fast_profiler_rsp_started(PROFILER_RSP_GFX);
     }
 }
 
@@ -220,6 +222,7 @@ void handle_vblank(void) {
             } else {
                 pretend_audio_sptask_done();
             }
+            fast_profiler_rsp_started(PROFILER_RSP_AUDIO);
         }
     } else {
         if (gActiveSPTask == NULL
@@ -229,6 +232,7 @@ void handle_vblank(void) {
             rspDelta = osGetTime();
 #endif
             start_sptask(M_GFXTASK);
+            fast_profiler_rsp_started(PROFILER_RSP_GFX);
         }
     }
 #if ENABLE_RUMBLE
@@ -256,6 +260,9 @@ void handle_sp_complete(void) {
 #if PUPPYPRINT_DEBUG
             profiler_update(rspGenTime, rspDelta);
 #endif
+            fast_profiler_rsp_completed(PROFILER_RSP_GFX);
+        } else {
+            fast_profiler_rsp_yielded();
         }
 
         // Start the audio task, as expected by handle_vblank.
@@ -264,12 +271,19 @@ void handle_sp_complete(void) {
         } else {
             pretend_audio_sptask_done();
         }
+        fast_profiler_rsp_started(PROFILER_RSP_AUDIO);
     } else {
         curSPTask->state = SPTASK_STATE_FINISHED;
         if (curSPTask->task.t.type == M_AUDTASK) {
+            fast_profiler_rsp_completed(PROFILER_RSP_AUDIO);
             // After audio tasks come gfx tasks.
             if ((sCurrentDisplaySPTask != NULL)
              && (sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED)) {
+                if (sCurrentDisplaySPTask->state == SPTASK_STATE_INTERRUPTED) {
+                    fast_profiler_rsp_resumed();
+                } else {
+                    fast_profiler_rsp_started(PROFILER_RSP_GFX);
+                }
                 start_sptask(M_GFXTASK);
             }
             sCurrentAudioSPTask = NULL;
@@ -283,6 +297,7 @@ void handle_sp_complete(void) {
 #if PUPPYPRINT_DEBUG
             profiler_update(rspGenTime, rspDelta);
 #endif
+            fast_profiler_rsp_completed(PROFILER_RSP_GFX);
         }
     }
 }
