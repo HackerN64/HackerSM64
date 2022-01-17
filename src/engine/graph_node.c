@@ -542,6 +542,25 @@ struct GraphNodeHeldObject *init_graph_node_held_object(struct AllocOnlyPool *po
 }
 
 /**
+ * Allocates and returns a newly created Z offset node
+ */
+struct GraphNodeZOffset *init_graph_node_z_offset(struct AllocOnlyPool *pool,
+                                                  struct GraphNodeZOffset *graphNode,
+                                                  s16 zOffset) {
+    if (pool != NULL) {
+        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeZOffset));
+    }
+
+    if (graphNode != NULL) {
+        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_Z_OFFSET);
+        graphNode->displayList = NULL;
+        graphNode->zOffset = zOffset;
+    }
+
+    return graphNode;
+}
+
+/**
  * Adds 'childNode' to the end of the list children from 'parent'
  */
 struct GraphNode *geo_add_child(struct GraphNode *parent, struct GraphNode *childNode) {

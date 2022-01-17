@@ -42,7 +42,8 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NOP_1E                    */ geo_layout_cmd_nop2,
     /*GEO_CMD_NOP_1F                    */ geo_layout_cmd_nop3,
     /*GEO_CMD_NODE_CULLING_RADIUS       */ geo_layout_cmd_node_culling_radius,
-    /*GEO_CMD_NODE_BONE                 */ geo_layout_cmd_bone,
+    /*GEO_CMD_BONE                      */ geo_layout_cmd_bone,
+    /*GEO_CMD_Z_OFFSET                  */ geo_layout_cmd_z_offset,
 };
 
 struct GraphNode gObjParentGraphNode;
@@ -773,6 +774,15 @@ void geo_layout_cmd_bone(void) {
     register_scene_graph_node(&graphNode->node);
 
     gGeoLayoutCommand = (u8 *) cmdPos;
+}
+
+/*
+  Create a z offset scene graph node.
+*/
+void geo_layout_cmd_z_offset(void) {
+    struct GraphNodeZOffset *graphNode = init_graph_node_z_offset(gGraphNodePool, NULL, cur_geo_cmd_s16(0x02));
+    register_scene_graph_node(&graphNode->node);
+    gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
 struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
