@@ -347,17 +347,18 @@ s32 perform_ground_step(struct MarioState *m) {
     s32 i;
     u32 stepResult;
     Vec3f intendedPos;
-    const f32 numSteps = 4.0f;
+    const f32 numSteps = NUM_STEPS_GROUND;
 
     set_mario_wall(m, NULL);
 
-    for (i = 0; i < 4; i++) {
-        intendedPos[0] = m->pos[0] + m->floor->normal.y * (m->vel[0] / numSteps);
-        intendedPos[2] = m->pos[2] + m->floor->normal.y * (m->vel[2] / numSteps);
+    for (i = 0; i < NUM_STEPS_GROUND; i++) {
+        intendedPos[0] = m->pos[0] + (m->floor->normal.y * (m->vel[0] / numSteps));
+        intendedPos[2] = m->pos[2] + (m->floor->normal.y * (m->vel[2] / numSteps));
         intendedPos[1] = m->pos[1];
 
         stepResult = perform_ground_quarter_step(m, intendedPos);
-        if (stepResult == GROUND_STEP_LEFT_GROUND || stepResult == GROUND_STEP_HIT_WALL_STOP_QSTEPS) {
+        if (stepResult == GROUND_STEP_LEFT_GROUND
+         || stepResult == GROUND_STEP_HIT_WALL_STOP_QSTEPS) {
             break;
         }
     }
@@ -677,17 +678,17 @@ void apply_vertical_wind(struct MarioState *m) {
 
 s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     Vec3f intendedPos;
-    const f32 numSteps = 4.0f;
+    const f32 numSteps = NUM_STEPS_AIR;
     s32 i;
     s32 quarterStepResult;
     s32 stepResult = AIR_STEP_NONE;
 
     set_mario_wall(m, NULL);
 
-    for (i = 0; i < 4; i++) {
-        intendedPos[0] = m->pos[0] + m->vel[0] / numSteps;
-        intendedPos[1] = m->pos[1] + m->vel[1] / numSteps;
-        intendedPos[2] = m->pos[2] + m->vel[2] / numSteps;
+    for (i = 0; i < NUM_STEPS_AIR; i++) {
+        intendedPos[0] = m->pos[0] + (m->vel[0] / numSteps);
+        intendedPos[1] = m->pos[1] + (m->vel[1] / numSteps);
+        intendedPos[2] = m->pos[2] + (m->vel[2] / numSteps);
 
         quarterStepResult = perform_air_quarter_step(m, intendedPos, stepArg);
 
@@ -695,9 +696,10 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
             stepResult = quarterStepResult;
         }
 
-        if (quarterStepResult == AIR_STEP_LANDED || quarterStepResult == AIR_STEP_GRABBED_LEDGE
-            || quarterStepResult == AIR_STEP_GRABBED_CEILING
-            || quarterStepResult == AIR_STEP_HIT_LAVA_WALL) {
+        if (quarterStepResult == AIR_STEP_LANDED
+         || quarterStepResult == AIR_STEP_GRABBED_LEDGE
+         || quarterStepResult == AIR_STEP_GRABBED_CEILING
+         || quarterStepResult == AIR_STEP_HIT_LAVA_WALL) {
             break;
         }
     }

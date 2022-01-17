@@ -163,10 +163,12 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
 }
 
 static u32 perform_water_step(struct MarioState *m) {
+    s32 i;
     u32 stepResult;
     Vec3f nextPos;
     Vec3f step;
     struct Object *marioObj = m->marioObj;
+    const f32 numSteps = NUM_STEPS_WATER;
 
     vec3f_copy(step, m->vel);
 
@@ -174,16 +176,22 @@ static u32 perform_water_step(struct MarioState *m) {
         apply_water_current(m, step);
     }
 
-    nextPos[0] = m->pos[0] + step[0];
-    nextPos[1] = m->pos[1] + step[1];
-    nextPos[2] = m->pos[2] + step[2];
+    for (i = 0; i < NUM_STEPS_WATER; i++) {
+        nextPos[0] = m->pos[0] + (step[0] / numSteps);
+        nextPos[1] = m->pos[1] + (step[1] / numSteps);
+        nextPos[2] = m->pos[2] + (step[2] / numSteps);
 
-    if (nextPos[1] > m->waterLevel - 80) {
-        nextPos[1] = m->waterLevel - 80;
-        m->vel[1] = 0.0f;
+        if (nextPos[1] > m->waterLevel - 80) {
+            nextPos[1] = m->waterLevel - 80;
+            m->vel[1] = 0.0f;
+        }
+
+        stepResult = perform_water_full_step(m, nextPos);
+
+        if (stepResult == WATER_STEP_CANCELLED) {
+            break;
+        }
     }
-
-    stepResult = perform_water_full_step(m, nextPos);
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, -m->faceAngle[0], m->faceAngle[1], m->faceAngle[2]);
@@ -289,11 +297,13 @@ static void update_swimming_pitch(struct MarioState *m) {
     }
 
     if (m->faceAngle[0] < targetPitch) {
-        if ((m->faceAngle[0] += pitchVel) > targetPitch) {
+        m->faceAngle[0] += pitchVel;
+        if (m->faceAngle[0] > targetPitch) {
             m->faceAngle[0] = targetPitch;
         }
     } else if (m->faceAngle[0] > targetPitch) {
-        if ((m->faceAngle[0] -= pitchVel) < targetPitch) {
+        m->faceAngle[0] -= pitchVel;
+        if (m->faceAngle[0] < targetPitch) {
             m->faceAngle[0] = targetPitch;
         }
     }
@@ -443,7 +453,11 @@ static void common_swimming_step(struct MarioState *m, s16 swimStrength) {
         case WATER_STEP_HIT_FLOOR:
             floorPitch = -find_floor_slope(m, -0x8000);
             if (m->faceAngle[0] < floorPitch) {
+#ifdef SMOOTH_PITCH_WHEN_HITTING_FLOOR_UNDERWATER
+                approach_angle_bool(&m->faceAngle[0], floorPitch, 0x800);
+#else
                 m->faceAngle[0] = floorPitch;
+#endif
             }
             break;
 
