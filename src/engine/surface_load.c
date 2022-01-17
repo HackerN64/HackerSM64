@@ -507,15 +507,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     }
 
     if (macroObjects != NULL && *macroObjects != -1) {
-        // If the first macro object presetID is within the range [0, 29].
-        // Generally an early spawning method, every object is in BBH (the first level).
-        if (0 <= *macroObjects && *macroObjects < 30) {
-            spawn_macro_objects_hardcoded(index, macroObjects);
-        }
-        // A more general version that can spawn more objects.
-        else {
-            spawn_macro_objects(index, macroObjects);
-        }
+        spawn_macro_objects(index, macroObjects);
     }
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
