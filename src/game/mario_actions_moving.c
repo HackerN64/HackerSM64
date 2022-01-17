@@ -1826,9 +1826,13 @@ s32 act_long_jump_land(struct MarioState *m) {
     }
 #endif
 
+#ifdef IMMEDIATE_LONG_JUMPS
+    sLongJumpLandAction.aPressedAction = ((m->input & INPUT_Z_DOWN) ? ACT_LONG_JUMP : ACT_JUMP);
+#else
     if (!(m->input & INPUT_Z_DOWN)) {
         m->input &= ~INPUT_A_PRESSED;
     }
+#endif
 
     if (common_landing_cancels(m, &sLongJumpLandAction, set_jumping_action)) {
         return TRUE;

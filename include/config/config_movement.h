@@ -56,6 +56,9 @@
 // If A and Z are pressed on the same frame while running, Mario will long jump instead of ground pound.
 #define EASIER_LONG_JUMPS
 
+// Enable being able to immediately long jump after landing from a long jump
+#define IMMEDIATE_LONG_JUMPS
+
 // Hold Z while twirling to descend faster.
 #define Z_TWIRL
 
