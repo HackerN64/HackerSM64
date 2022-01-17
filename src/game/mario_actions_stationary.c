@@ -112,7 +112,7 @@ s32 act_idle(struct MarioState *m) {
         return set_mario_action(m, ACT_COUGHING, 0);
     }
 
-    if (!(m->actionArg & 1) && m->health < 0x300) {
+    if (!(m->actionArg & ACT_ARG_IDLE_AGAINST_WALL) && m->health < 0x300) {
         return set_mario_action(m, ACT_PANTING, 0);
     }
 
@@ -130,7 +130,7 @@ s32 act_idle(struct MarioState *m) {
 #endif
     }
 
-    if (m->actionArg & 1) {
+    if (m->actionArg & ACT_ARG_IDLE_AGAINST_WALL) {
         set_mario_animation(m, MARIO_ANIM_STAND_AGAINST_WALL);
     } else {
         switch (m->actionState) {
