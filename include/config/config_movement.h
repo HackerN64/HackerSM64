@@ -53,7 +53,7 @@
 // Use Shindou's pole behavior.
 // #define SHINDOU_POLES
 
-// If A and Z are pressed on the same frame, Mario will long jump instead of ground pound.
+// If A and Z are pressed on the same frame while running, Mario will long jump instead of ground pound.
 #define EASIER_LONG_JUMPS
 
 // Hold Z while twirling to descend faster.

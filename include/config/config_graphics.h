@@ -71,15 +71,15 @@
 // #define CELEBRATION_STAR_COPY_MODEL
 
 // Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
-// NOTE: Stil breaks occasionally, and PUPPYLIGHT_NODE doesn't work in areas that aren't area 1.
+// NOTE: Still breaks occasionally, and PUPPYLIGHT_NODE might not work in areas that aren't area 1.
 // #define PUPPYLIGHTS
 
 // Uses the correct "up" vector for the guLookAtReflect call in geo_process_master_list_sub.
-// It is sideways in vanilla, and since vanilla's environment map textures are sideways too, they will appear as sideways in-game if this is enabled.
+// It is sideways in vanilla, and since vanilla's environment map textures are sideways too, those will appear as sideways in-game if this is enabled.
 // Make sure your custom environment map textures are the correct orientation.
 // #define FIX_REFLECT_MTX
 
-// Disables object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
+// Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
 // #define DISABLE_SHADOWS
 
 // Use old shadow IDs for Fast64 compatibility. This is a temporary fix until Fast64 is updated to use the enum defines.
