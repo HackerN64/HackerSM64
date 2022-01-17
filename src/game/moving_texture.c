@@ -87,7 +87,7 @@ enum MovtexAttributes {
  */
 struct MovtexObject {
     /// number that geo nodes have as parameter to refer to this mesh
-    u32 geoId;
+    s32 geoId;
     /// which texture to use for this mesh, index into gMovtexIdToTexture
     s32 textureId;
     /// amount of moving vertices
@@ -489,7 +489,7 @@ extern Movtex ttm_movtex_puddle[];
 /**
  * Find the quadCollection for a given quad collection id.
  */
-void *get_quad_collection_from_id(u32 id) {
+void *get_quad_collection_from_id(s32 id) {
     switch (id) {
         case BBH_MOVTEX_MERRY_GO_ROUND_WATER_ENTRANCE:
             return bbh_movtex_merry_go_round_water_entrance;
@@ -548,7 +548,7 @@ void *get_quad_collection_from_id(u32 id) {
  * Write to 'gfx' a command to set the current texture format for the given
  * quadCollection.
  */
-void movtex_change_texture_format(u32 quadCollectionId, Gfx **gfx) {
+void movtex_change_texture_format(s32 quadCollectionId, Gfx **gfx) {
     switch (quadCollectionId) {
         case HMC_MOVTEX_TOXIC_MAZE_MIST:
             gSPDisplayList((*gfx)++, dl_waterbox_ia16_begin);

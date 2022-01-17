@@ -662,12 +662,12 @@ void geo_layout_cmd_node_object_parent(void) {
 void geo_layout_cmd_node_generated(void) {
     struct GraphNodeGenerated *graphNode =
         init_graph_node_generated(gGraphNodePool, NULL,
-                                  (GraphNodeFunc) cur_geo_cmd_ptr(0x04), // asm function
-                                  cur_geo_cmd_s16(0x02));                // parameter
+                                  (GraphNodeFunc) cur_geo_cmd_ptr(0x08), // asm function
+                                  cur_geo_cmd_s32(0x04));                // parameter
 
     register_scene_graph_node(&graphNode->fnNode.node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
+    gGeoLayoutCommand += 0x0C << CMD_SIZE_SHIFT;
 }
 
 /*

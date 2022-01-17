@@ -330,7 +330,7 @@ struct GraphNodeObjectParent {
  */
 struct GraphNodeGenerated {
     /*0x00*/ struct FnGraphNode fnNode;
-    /*0x18*/ u32 parameter; // extra context for the function
+    /*0x18*/ s32 parameter; // extra context for the function
 };
 
 /** GraphNode that draws a background image or a rectangle of a color.
