@@ -17,13 +17,6 @@ extern Vec3i gVec3iZero;
 extern Vec3f gVec3fOne;
 extern Vec3s gVec3sOne;
 
-/**
- * Converts an angle in degrees to sm64's s16 angle units. For example, DEGREES(90) == 0x4000
- * This should be used mainly to make camera code clearer at first glance.
- */
-// #define DEGREES(x) ((x) * 0x10000 / 360)
-#define DEGREES(x) ((x) * 0x2000 / 45)
-// #define DEGREES(x) (((x) << 13) / 45)
 
 /*
  * The sine and cosine tables overlap, but "#define gCosineTable (gSineTable +
@@ -55,6 +48,12 @@ extern f32 gSineTable[];
 #define radians_to_angle(  x) (Angle)(((f32)(x) / M_PI    ) * 0x8000)
 #define degrees_to_radians(x) (f32)(   (f32)(x) * RAD_PER_DEG       )
 #define radians_to_degrees(x) (f32)(   (f32)(x) * DEG_PER_RAD       )
+
+/**
+ * Converts an angle in degrees to sm64's s16 angle units. For example, DEGREES(90) == 0x4000
+ * This should be used mainly to make camera code clearer at first glance.
+ */
+#define DEGREES(x) degrees_to_angle(x)
 
 #define signum_positive(x) ((x < 0) ? -1 : 1)
 
@@ -468,7 +467,8 @@ ALWAYS_INLINE s32 absi(s32 in) {
 }
 #define abss absi
 
-#define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
+// #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
+#define FLT_IS_NONZERO(x) ((s32)(x) != 0)
 
 // RNG
 u32 random_u16(void);
