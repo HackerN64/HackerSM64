@@ -57,6 +57,10 @@
 // Use 64x64 quarter shadow textures (Vanilla are 16x16).
 #define HD_SHADOWS
 
+// Glowing effect for Power Stars.
+// The number is the size of the glow. Set to 0 to disable.
+#define STAR_GLOW 144
+
 // Makes certain objects (mainly trees) transparent when the camera gets close.
 // #define OBJ_OPACITY_BY_CAM_DIST
 

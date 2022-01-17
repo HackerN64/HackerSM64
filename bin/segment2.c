@@ -2539,9 +2539,11 @@ ALIGNED8 static const Texture texture_shadow_quarter_square[] = {
 };
 #endif
 
-UNUSED ALIGNED8 static const Texture texture_radial_light[] = {
+#if STAR_GLOW
+ALIGNED8 static const Texture texture_radial_light[] = {
 #include "textures/segment2/light_quarter_circle.ia16.inc.c"
 };
+#endif
 
 const Texture texture_transition_star_half[] = {
 #include "textures/segment2/segment2.0F458.ia8.inc.c"
@@ -2691,6 +2693,39 @@ const Gfx dl_shadow_end[] = {
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPEndDisplayList(),
 };
+
+#if STAR_GLOW
+// 0x0302C288 - 0x0302C2C8
+const Vtx vertex_star_glow[] = {
+    {{{ -STAR_GLOW, -STAR_GLOW,      0}, 0, {     0,   2032}, 0xFF, 0xF0, 0x00, 0xFF}},
+    {{{  STAR_GLOW, -STAR_GLOW,      0}, 0, {  2032,   2032}, 0xFF, 0xF0, 0x00, 0xFF}},
+    {{{  STAR_GLOW,  STAR_GLOW,      0}, 0, {  2032,      0}, 0xFF, 0xF0, 0x00, 0xFF}},
+    {{{ -STAR_GLOW,  STAR_GLOW,      0}, 0, {     0,      0}, 0xFF, 0xF0, 0x00, 0xFF}},
+};
+
+// 0x0302C300 - 0x0302C
+const Gfx dl_star_glow[] = {
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_MODULATERGBA, G_CC_MODULATERGBA),
+    gsSPClearGeometryMode(G_LIGHTING | G_SHADING_SMOOTH),
+    gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, (G_TX_WRAP | G_TX_MIRROR), 5, G_TX_NOLOD, (G_TX_WRAP | G_TX_MIRROR), 5, G_TX_NOLOD),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    gsDPTileSync(),
+    gsDPSetTile(G_IM_FMT_IA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, (G_TX_WRAP | G_TX_MIRROR), 5, G_TX_NOLOD, (G_TX_WRAP | G_TX_MIRROR), 5, G_TX_NOLOD),
+    gsDPSetTileSize(0, 0, 0, ((32 - 1) << G_TEXTURE_IMAGE_FRAC), ((32 - 1) << G_TEXTURE_IMAGE_FRAC)),
+
+    gsDPSetTextureImage(G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture_radial_light),
+    gsDPLoadSync(),
+    gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
+    gsSPVertex(vertex_star_glow, 4, 0),
+    gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+
+    gsDPTileSync(),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsSPSetGeometryMode(G_LIGHTING | G_SHADING_SMOOTH),
+    gsSPEndDisplayList(),
+};
+#endif
 
 // 0x02014660 - 0x02014698
 const Gfx dl_proj_mtx_fullscreen[] = {

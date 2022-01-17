@@ -43,6 +43,17 @@ const GeoLayout klepto_geo[] = {
                                  GEO_TRANSLATE_ROTATE_WITH_DL(LAYER_OCCLUDE_SILHOUETTE_OPAQUE, 0, 100, 0, 180, 270, 0, star_seg3_dl_body),
                                  GEO_ASM(0, geo_offset_klepto_held_object),
                                  GEO_TRANSLATE_ROTATE_WITH_DL(LAYER_OCCLUDE_SILHOUETTE_ALPHA, 0, 100, 0, 180, 270, 0, star_seg3_dl_eyes),
+#if STAR_GLOW
+                                 GEO_OPEN_NODE(),
+                                    GEO_BILLBOARD(),
+                                    GEO_OPEN_NODE(),
+                                       GEO_Z_OFFSET(48),
+                                       GEO_OPEN_NODE(),
+                                          GEO_DISPLAY_LIST(LAYER_TRANSPARENT_INTER, dl_star_glow),
+                                       GEO_CLOSE_NODE(),
+                                    GEO_CLOSE_NODE(),
+                                 GEO_CLOSE_NODE(),
+#endif
                               GEO_CLOSE_NODE(),
                            GEO_CLOSE_NODE(),
                            GEO_NODE_START(), // KLEPTO_ANIM_STATE_HOLDING_TRANSPARENT_STAR

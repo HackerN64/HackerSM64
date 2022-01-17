@@ -2,7 +2,7 @@
 const GeoLayout unagi_geo[] = {
    GEO_CULLING_RADIUS(2000),
    GEO_OPEN_NODE(),
-      GEO_SCALE(0x00, 16384),
+      GEO_SCALE(0x00, 49152),
       GEO_OPEN_NODE(),
          GEO_ANIMATED_PART(LAYER_OPAQUE, 0, 0, 0, NULL),
          GEO_OPEN_NODE(),
@@ -16,16 +16,28 @@ const GeoLayout unagi_geo[] = {
                      GEO_OPEN_NODE(),
                         GEO_SWITCH_CASE(3, geo_switch_anim_state),
                         GEO_OPEN_NODE(),
-                           GEO_NODE_START(),
-                           GEO_NODE_START(),
+                           GEO_NODE_START(), // UNAGI_ANIM_STATE_NO_STAR
+                           GEO_NODE_START(), // UNAGI_ANIM_STATE_HAS_STAR
                            GEO_OPEN_NODE(),
                               GEO_SCALE(0x00, 16384),
                               GEO_OPEN_NODE(),
                                  GEO_TRANSLATE_ROTATE_WITH_DL(LAYER_OCCLUDE_SILHOUETTE_OPAQUE, 2000, 0, 0, 0, 0, 0, star_seg3_dl_body),
                                  GEO_TRANSLATE_ROTATE_WITH_DL(LAYER_OCCLUDE_SILHOUETTE_ALPHA, 2000, 0, 0, 0, 0, 0, star_seg3_dl_eyes),
+#if STAR_GLOW
+                                 GEO_TRANSLATE_ROTATE(LAYER_FORCE, 2000, 0, 0, 0, 0, 0),
+                                 GEO_OPEN_NODE(),
+                                    GEO_BILLBOARD(),
+                                    GEO_OPEN_NODE(),
+                                       GEO_Z_OFFSET(48),
+                                       GEO_OPEN_NODE(),
+                                          GEO_DISPLAY_LIST(LAYER_TRANSPARENT_INTER, dl_star_glow),
+                                       GEO_CLOSE_NODE(),
+                                    GEO_CLOSE_NODE(),
+                                 GEO_CLOSE_NODE(),
+#endif
                               GEO_CLOSE_NODE(),
                            GEO_CLOSE_NODE(),
-                           GEO_NODE_START(),
+                           GEO_NODE_START(), // UNAGI_ANIM_STATE_HAS_TRANSPARENT_STAR
                            GEO_OPEN_NODE(),
                               GEO_SCALE(0x00, 16384),
                               GEO_OPEN_NODE(),
