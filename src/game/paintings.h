@@ -30,7 +30,7 @@ enum DDDPaintingFlags {
 enum PaintingState {
     PAINTING_IDLE,
     PAINTING_RIPPLE,
-    PAINTING_ENTERED
+    PAINTING_ENTERED,
 };
 
 enum RippleTriggers {

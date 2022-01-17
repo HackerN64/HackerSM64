@@ -31,6 +31,7 @@
 #include "puppyprint.h"
 #include "puppylights.h"
 #include "level_commands.h"
+#include "paintings.h"
 
 #include "config.h"
 
@@ -103,29 +104,29 @@ const char *credits20[] = { "1EXECUTIVE PRODUCER", "HIROSHI YAMAUCHI" };
 
 
 struct CreditsEntry sCreditsSequence[] = {
-    { LEVEL_CASTLE_GROUNDS, 1, 1, -128, { 0, 8000, 0 }, NULL },
-    { LEVEL_BOB, 1, 1, 117, { 713, 3918, -3889 }, credits01 },
-    { LEVEL_WF, 1, 50, 46, { 347, 5376, 326 }, credits02 },
-    { LEVEL_JRB, 1, 18, 22, { 3800, -4840, 2727 }, credits03 },
-    { LEVEL_CCM, 2, 34, 25, { -5464, 6656, -6575 }, credits04 },
-    { LEVEL_BBH, 1, 1, 60, { 257, 1922, 2580 }, credits05 },
-    { LEVEL_HMC, 1, -15, 123, { -6469, 1616, -6054 }, credits06 },
-    { LEVEL_THI, 3, 17, -32, { 508, 1024, 1942 }, credits07 },
-    { LEVEL_LLL, 2, 33, 124, { -73, 82, -1467 }, credits08 },
-    { LEVEL_SSL, 1, 65, 98, { -5906, 1024, -2576 }, credits09 },
-    { LEVEL_DDD, 1, 50, 47, { -4884, -4607, -272 }, credits10 },
-    { LEVEL_SL, 1, 17, -34, { 1925, 3328, 563 }, credits11 },
-    { LEVEL_WDW, 1, 33, 105, { -537, 1850, 1818 }, credits12 },
-    { LEVEL_TTM, 1, 2, -33, { 2613, 313, 1074 }, credits13 },
-    { LEVEL_THI, 1, 51, 54, { -2609, 512, 856 }, credits14 },
-    { LEVEL_TTC, 1, 17, -72, { -1304, -71, -967 }, credits15 },
-    { LEVEL_RR, 1, 33, 64, { 1565, 1024, -148 }, credits16 },
-    { LEVEL_SA, 1, 1, 24, { -1050, -1330, -1559 }, credits17 },
-    { LEVEL_COTMC, 1, 49, -16, { -254, 415, -6045 }, credits18 },
-    { LEVEL_DDD, 2, -111, -64, { 3948, 1185, -104 }, credits19 },
-    { LEVEL_CCM, 1, 33, 31, { 3169, -4607, 5240 }, credits20 },
-    { LEVEL_CASTLE_GROUNDS, 1, 1, -128, { 0, 906, -1200 }, NULL },
-    { LEVEL_NONE, 0, 1, 0, { 0, 0, 0 }, NULL },
+    { LEVEL_CASTLE_GROUNDS, 1,    1, -128, {     0,  8000,     0 }, NULL      },
+    { LEVEL_BOB,            1,    1,  117, {   713,  3918, -3889 }, credits01 },
+    { LEVEL_WF,             1,   50,   46, {   347,  5376,   326 }, credits02 },
+    { LEVEL_JRB,            1,   18,   22, {  3800, -4840,  2727 }, credits03 },
+    { LEVEL_CCM,            2,   34,   25, { -5464,  6656, -6575 }, credits04 },
+    { LEVEL_BBH,            1,    1,   60, {   257,  1922,  2580 }, credits05 },
+    { LEVEL_HMC,            1,  -15,  123, { -6469,  1616, -6054 }, credits06 },
+    { LEVEL_THI,            3,   17,  -32, {   508,  1024,  1942 }, credits07 },
+    { LEVEL_LLL,            2,   33,  124, {   -73,    82, -1467 }, credits08 },
+    { LEVEL_SSL,            1,   65,   98, { -5906,  1024, -2576 }, credits09 },
+    { LEVEL_DDD,            1,   50,   47, { -4884, -4607,  -272 }, credits10 },
+    { LEVEL_SL,             1,   17,  -34, {  1925,  3328,   563 }, credits11 },
+    { LEVEL_WDW,            1,   33,  105, {  -537,  1850,  1818 }, credits12 },
+    { LEVEL_TTM,            1,    2,  -33, {  2613,   313,  1074 }, credits13 },
+    { LEVEL_THI,            1,   51,   54, { -2609,   512,   856 }, credits14 },
+    { LEVEL_TTC,            1,   17,  -72, { -1304,   -71,  -967 }, credits15 },
+    { LEVEL_RR,             1,   33,   64, {  1565,  1024,  -148 }, credits16 },
+    { LEVEL_SA,             1,    1,   24, { -1050, -1330, -1559 }, credits17 },
+    { LEVEL_COTMC,          1,   49,  -16, {  -254,   415, -6045 }, credits18 },
+    { LEVEL_DDD,            2, -111,  -64, {  3948,  1185,  -104 }, credits19 },
+    { LEVEL_CCM,            1,   33,   31, {  3169, -4607,  5240 }, credits20 },
+    { LEVEL_CASTLE_GROUNDS, 1,    1, -128, {     0,   906, -1200 }, NULL      },
+    { LEVEL_NONE,           0,    1,    0, {     0,     0,     0 }, NULL      },
 };
 
 struct MarioState gMarioStates[1];
@@ -210,15 +211,15 @@ void load_level_init_text(u32 arg) {
 
     switch (dialogID) {
         case DIALOG_129:
-            gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_VANISH_CAP;
+            gotAchievement = (save_file_get_flags() & SAVE_FLAG_HAVE_VANISH_CAP);
             break;
 
         case DIALOG_130:
-            gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_METAL_CAP;
+            gotAchievement = (save_file_get_flags() & SAVE_FLAG_HAVE_METAL_CAP);
             break;
 
         case DIALOG_131:
-            gotAchievement = save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP;
+            gotAchievement = (save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP);
             break;
 
         case (u8)DIALOG_NONE: // 255, cast value to u8 to match (-1)
@@ -227,7 +228,7 @@ void load_level_init_text(u32 arg) {
 
         default:
             gotAchievement =
-                save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+                save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
             break;
     }
 
@@ -250,18 +251,18 @@ void set_mario_initial_cap_powerup(struct MarioState *m) {
     u32 capCourseIndex = gCurrCourseNum - COURSE_CAP_COURSES;
 
     switch (capCourseIndex) {
-        case COURSE_COTMC - COURSE_CAP_COURSES:
-            m->flags |= MARIO_METAL_CAP | MARIO_CAP_ON_HEAD;
+        case (COURSE_COTMC - COURSE_CAP_COURSES):
+            m->flags |= (MARIO_METAL_CAP | MARIO_CAP_ON_HEAD);
             m->capTimer = 600;
             break;
 
-        case COURSE_TOTWC - COURSE_CAP_COURSES:
-            m->flags |= MARIO_WING_CAP | MARIO_CAP_ON_HEAD;
+        case (COURSE_TOTWC - COURSE_CAP_COURSES):
+            m->flags |= (MARIO_WING_CAP | MARIO_CAP_ON_HEAD);
             m->capTimer = 1200;
             break;
 
-        case COURSE_VCUTM - COURSE_CAP_COURSES:
-            m->flags |= MARIO_VANISH_CAP | MARIO_CAP_ON_HEAD;
+        case (COURSE_VCUTM - COURSE_CAP_COURSES):
+            m->flags |= (MARIO_VANISH_CAP | MARIO_CAP_ON_HEAD);
             m->capTimer = 600;
             break;
     }
@@ -505,7 +506,7 @@ void check_instant_warp(void) {
     if (gCurrLevelNum == LEVEL_CASTLE) {
  #else // !UNLOCK_ALL
     if (gCurrLevelNum == LEVEL_CASTLE
-        && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 70) {
+        && save_file_get_total_star_count((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 70) {
  #endif // !UNLOCK_ALL
         return;
     }
@@ -518,18 +519,11 @@ void check_instant_warp(void) {
             struct InstantWarp *warp = &gCurrentArea->instantWarps[index];
 
             if (warp->id != 0) {
-                gMarioState->pos[0] += warp->displacement[0];
-                gMarioState->pos[1] += warp->displacement[1];
-                gMarioState->pos[2] += warp->displacement[2];
-
-                gMarioState->marioObj->oPosX = gMarioState->pos[0];
-                gMarioState->marioObj->oPosY = gMarioState->pos[1];
-                gMarioState->marioObj->oPosZ = gMarioState->pos[2];
+                vec3_add(gMarioState->pos, warp->displacement);
+                vec3f_copy(&gMarioState->marioObj->oPosVec, gMarioState->pos);
 
                 // Fix instant warp offset not working when warping across different areas
-                gMarioObject->header.gfx.pos[0] = gMarioState->pos[0];
-                gMarioObject->header.gfx.pos[1] = gMarioState->pos[1];
-                gMarioObject->header.gfx.pos[2] = gMarioState->pos[2];
+                vec3f_copy(gMarioObject->header.gfx.pos, gMarioState->pos);
 
                 cameraAngle = gMarioState->area->camera->yaw;
 
@@ -564,8 +558,9 @@ s16 music_unchanged_through_warp(s16 arg) {
         u16 destParam1 = gAreas[destArea].musicParam;
         u16 destParam2 = gAreas[destArea].musicParam2;
 
-        unchanged = levelNum == gCurrLevelNum && destParam1 == gCurrentArea->musicParam
-               && destParam2 == gCurrentArea->musicParam2;
+        unchanged = (levelNum == gCurrLevelNum
+                && destParam1 == gCurrentArea->musicParam
+                && destParam2 == gCurrentArea->musicParam2);
 
         if (get_current_background_music() != destParam2) {
             unchanged = FALSE;
@@ -598,20 +593,16 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
     s32 i = 0;
 #endif
 #ifdef PUPPYCAM
-    if (sWarpDest.type == WARP_TYPE_CHANGE_LEVEL)
-    {
-        for (i = 0; i < gPuppyVolumeCount; i++)
-        {
+    if (sWarpDest.type == WARP_TYPE_CHANGE_LEVEL) {
+        for (i = 0; i < gPuppyVolumeCount; i++) {
             mem_pool_free(gPuppyMemoryPool, sPuppyVolumeStack[i]);
         }
         gPuppyVolumeCount = 0;
     }
 #endif
 #ifdef PUPPYLIGHTS
-    if (sWarpDest.type == WARP_TYPE_CHANGE_LEVEL)
-    {
-        for (i = 0; i < gNumLights; i++)
-        {
+    if (sWarpDest.type == WARP_TYPE_CHANGE_LEVEL) {
+        for (i = 0; i < gNumLights; i++) {
             mem_pool_free(gLightsPool, gPuppyLights[i]);
         }
         gNumLights = 0;
@@ -809,7 +800,7 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
         }
 
         if (fadeMusic && gCurrDemoInput == NULL) {
-            fadeout_music((3 * sDelayedWarpTimer / 2) * 8 - 2);
+            fadeout_music(((3 * sDelayedWarpTimer / 2) * 8) - 2);
         }
     }
 
@@ -843,7 +834,7 @@ void initiate_delayed_warp(void) {
 
                 case WARP_OP_CREDITS_END:
                     warp_special(WARP_SPECIAL_ENDING);
-                    sound_banks_enable(SEQ_PLAYER_SFX, SOUND_BANKS_ALL & ~SOUND_BANKS_DISABLED_AFTER_CREDITS);
+                    sound_banks_enable(SEQ_PLAYER_SFX, (SOUND_BANKS_ALL & ~SOUND_BANKS_DISABLED_AFTER_CREDITS));
                     break;
 
                 case WARP_OP_DEMO_NEXT:
@@ -860,7 +851,7 @@ void initiate_delayed_warp(void) {
                     sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_ALL);
 
                     gCurrCreditsEntry++;
-                    gCurrActNum = gCurrCreditsEntry->actNum & 0x07;
+                    gCurrActNum = (gCurrCreditsEntry->actNum & 0x07);
                     if ((gCurrCreditsEntry + 1)->levelNum == LEVEL_NONE) {
                         destWarpNode = WARP_NODE_CREDITS_END;
                     } else {
@@ -888,10 +879,10 @@ void initiate_delayed_warp(void) {
 
 void update_hud_values(void) {
     if (gCurrCreditsEntry == NULL) {
-        s16 numHealthWedges = gMarioState->health > 0 ? gMarioState->health >> 8 : 0;
+        s16 numHealthWedges = ((gMarioState->health > 0) ? (gMarioState->health >> 8) : 0);
 
 #ifdef BREATH_METER
-        s16 numBreathWedges = gMarioState->breath > 0 ? gMarioState->breath >> 8 : 0;
+        s16 numBreathWedges = ((gMarioState->breath > 0) ? (gMarioState->breath >> 8) : 0);
 #endif
         COND_BIT((gCurrCourseNum >= COURSE_MIN), gHudDisplay.flags, HUD_DISPLAY_FLAG_COIN_COUNT);
 
@@ -920,7 +911,6 @@ void update_hud_values(void) {
         }
 #endif
 
-#if BUGFIX_MAX_LIVES
         if (gMarioState->numCoins > 999) {
             gMarioState->numCoins = 999;
         }
@@ -928,11 +918,6 @@ void update_hud_values(void) {
         if (gHudDisplay.coins > 999) {
             gHudDisplay.coins = 999;
         }
-#else
-        if (gMarioState->numCoins > 999) {
-            gMarioState->numLives = (s8) 999; //! Wrong variable
-        }
-#endif
 
         gHudDisplay.stars = gMarioState->numStars;
         gHudDisplay.lives = gMarioState->numLives;
@@ -974,7 +959,7 @@ s32 play_mode_normal(void) {
     if (gCurrDemoInput != NULL) {
         print_intro_text();
         if (gPlayer1Controller->buttonPressed & END_DEMO) {
-            level_trigger_warp(gMarioState, gCurrLevelNum == LEVEL_PSS ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT);
+            level_trigger_warp(gMarioState, (gCurrLevelNum == LEVEL_PSS) ? WARP_OP_DEMO_END : WARP_OP_DEMO_NEXT);
         } else if (!gWarpTransition.isActive && sDelayedWarpOp == WARP_OP_NONE
                    && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
             level_trigger_warp(gMarioState, WARP_OP_DEMO_NEXT);
@@ -1318,11 +1303,13 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
         return FALSE;
     }
 
-    if (gCurrLevelNum != LEVEL_BOWSER_1 && gCurrLevelNum != LEVEL_BOWSER_2 && gCurrLevelNum != LEVEL_BOWSER_3) {
+    if (gCurrLevelNum != LEVEL_BOWSER_1
+     && gCurrLevelNum != LEVEL_BOWSER_2
+     && gCurrLevelNum != LEVEL_BOWSER_3) {
         gMarioState->numCoins = 0;
         gHudDisplay.coins = 0;
         gCurrCourseStarFlags =
-            save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum));
+            save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(gCurrCourseNum));
     }
 
     if (gSavedCourseNum != gCurrCourseNum) {

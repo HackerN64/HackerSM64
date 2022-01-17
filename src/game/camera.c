@@ -3036,7 +3036,7 @@ void update_camera(struct Camera *c) {
     start_cutscene(c, get_cutscene_from_mario_status(c));
     gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
 #ifdef PUPPYCAM
-    if (!gPuppyCam.enabled || c->cutscene != 0 || gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
+    if (!gPuppyCam.enabled || c->cutscene != CUTSCENE_NONE || gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
 #endif
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (gCurrLevelNum != LEVEL_CASTLE) {
@@ -4862,16 +4862,18 @@ u8 get_cutscene_from_mario_status(struct Camera *c) {
                 cutscene = CUTSCENE_EXIT_PAINTING_SUCC;
                 break;
             case ACT_SPECIAL_EXIT_AIRBORNE:
-                if (gPrevLevel == LEVEL_BOWSER_1 || gPrevLevel == LEVEL_BOWSER_2
-                    || gPrevLevel == LEVEL_BOWSER_3) {
+                if (gPrevLevel == LEVEL_BOWSER_1
+                 || gPrevLevel == LEVEL_BOWSER_2
+                 || gPrevLevel == LEVEL_BOWSER_3) {
                     cutscene = CUTSCENE_EXIT_BOWSER_SUCC;
                 } else {
                     cutscene = CUTSCENE_EXIT_SPECIAL_SUCC;
                 }
                 break;
             case ACT_SPECIAL_DEATH_EXIT:
-                if (gPrevLevel == LEVEL_BOWSER_1 || gPrevLevel == LEVEL_BOWSER_2
-                    || gPrevLevel == LEVEL_BOWSER_3) {
+                if (gPrevLevel == LEVEL_BOWSER_1
+                 || gPrevLevel == LEVEL_BOWSER_2
+                 || gPrevLevel == LEVEL_BOWSER_3) {
                     cutscene = CUTSCENE_EXIT_BOWSER_DEATH;
                 } else {
                     cutscene = CUTSCENE_NONPAINTING_DEATH;
@@ -9566,9 +9568,6 @@ void cutscene_double_doors_end(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
 }
 
-void cutscene_enter_painting_stub(UNUSED struct Camera *c) {
-}
-
 /**
  * Plays when Mario enters a painting. The camera flies up to the painting's center, then it slowly
  * zooms in until the star select screen appears.
@@ -9584,7 +9583,7 @@ void cutscene_enter_painting(struct Camera *c) {
 
     if (gRipplingPainting != NULL) {
         paintingAngle[0] = 0;
-        paintingAngle[1] = (s32)((gRipplingPainting->yaw / 360.0f) * 65536.0f); // convert degrees to IAU
+        paintingAngle[1] = DEGREES(gRipplingPainting->yaw); // convert degrees to IAU
         paintingAngle[2] = 0;
 
         focusOffset[0] = gRipplingPainting->size * 0.5f;

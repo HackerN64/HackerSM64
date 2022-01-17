@@ -54,12 +54,10 @@
  *      Paintings that use RIPPLE_TRIGGER_CONTINUOUS try to transition to this state as soon as possible,
  *          usually when Mario enters the room.
  *
- *      A PROXIMITY painting will automatically reset to IDLE if its ripple magnitude becomes small
- *          enough.
+ *      A PROXIMITY painting will automatically reset to IDLE if its ripple magnitude becomes small enough.
  *
  * Paintings in the PAINTING_ENTERED state have been entered by Mario.
- *      A CONTINUOUS painting will automatically reset to RIPPLE if its ripple magnitude becomes small
- *          enough.
+ *      A CONTINUOUS painting will automatically reset to RIPPLE if its ripple magnitude becomes small enough.
  */
 
 // A copy of Mario's position
@@ -130,7 +128,7 @@ s16 gLastPaintingUpdateCounter = 0;
  * Stop paintings in paintingGroup from rippling if their id is different from *idptr.
  */
 void stop_other_paintings(PaintingData *idptr, struct Painting *paintingGroup[]) {
-    PaintingData index = 0;
+    s16 index = 0;
     PaintingData id = *idptr;
 
     while (paintingGroup[index] != NULL) {
@@ -138,7 +136,7 @@ void stop_other_paintings(PaintingData *idptr, struct Painting *paintingGroup[])
 
         // stop all rippling except for the selected painting
         if (painting->id != id) {
-            painting->state = 0;
+            painting->state = PAINTING_IDLE;
         }
 
         index++;
@@ -252,7 +250,6 @@ void painting_state(s8 state, struct Painting *painting, struct Painting *painti
     painting->rippleY = painting_ripple_y(painting, ySource);
     gPaintingMarioYEntry = gPaintingMarioPos[1];
 
-    // Because true or false would be too simple...
     if (resetTimer) {
         painting->rippleTimer = 0.0f;
     }
@@ -388,7 +385,7 @@ void painting_update_floors(struct Painting *painting) {
     // if (SURFACE_IS_PAINTING_WARP(marioFloorType)) rippleFlags |= RIPPLE_FLAG_ENTER;
 
     painting->lastFloor = painting->currFloor;
-    // at most 1 of these will be nonzero;
+    // at most 1 of these will be nonzero
     painting->currFloor = rippleFlags;
 
     // floorEntered is true iff currFloor is true and lastFloor is false
@@ -416,6 +413,7 @@ void painting_update_ripple_state(struct Painting *painting) {
         if (painting->rippleTimer >= ((1 << 24) - 1.0f)) {
             painting->rippleTimer = 0.0f;
         }
+
         painting->rippleTimer += 1.0f;
     }
     if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
@@ -425,7 +423,6 @@ void painting_update_ripple_state(struct Painting *painting) {
             gRipplingPainting = NULL;
         }
     } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
-
         // if the painting is doing the entry ripple but the ripples are as small as those from the
         // passive ripple, make it do a passive ripple
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
@@ -600,13 +597,13 @@ void painting_average_vertex_normals(PaintingData *neighborTris, PaintingData nu
         vec3_div_val(n, neighbors);
         f32 nlen = vec3_sumsq(n);
 
-        if (nlen == 0.0f) {
-            vec3_zero(gPaintingMesh[i].norm);
-        } else {
+        if (FLT_IS_NONZERO(nlen)) {
             nlen = sqrtf(nlen);
             gPaintingMesh[i].norm[0] = normalize_component(n[0] / nlen);
             gPaintingMesh[i].norm[1] = normalize_component(n[1] / nlen);
             gPaintingMesh[i].norm[2] = normalize_component(n[2] / nlen);
+        } else {
+            vec3_zero(gPaintingMesh[i].norm);
         }
     }
 }
@@ -675,6 +672,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
 
     // One group left with < 5 triangles
     triGroup = (mapVerts * 3) + (triGroups * 15) + 2;
+
     // Map the texture to the triangles
     for (map = 0; map < (remGroupTris * 3); map++) {
         mapping = textureMap[triGroup + map];
@@ -693,6 +691,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
 
     // Draw the triangles individually
     gSPVertex(gfx++, VIRTUAL_TO_PHYSICAL(verts + (triGroups * 15)), (remGroupTris * 3), 0);
+
     for (group = 0; group < remGroupTris; group++) {
         gSP1Triangle(gfx++, ((group * 3) + 0),
                             ((group * 3) + 1),
@@ -955,13 +954,10 @@ void set_painting_layer(struct GraphNodeGenerated *gen, struct Painting *paintin
  * Display either a normal painting or a rippling one depending on the painting's ripple status
  */
 Gfx *display_painting(struct Painting *painting) {
-    switch (painting->state) {
-        case PAINTING_IDLE:
-            return display_painting_not_rippling(painting);
-            break;
-        default:
-            return display_painting_rippling(painting);
-            break;
+    if (painting->state == PAINTING_IDLE) {
+        return display_painting_not_rippling(painting);
+    } else {
+        return display_painting_rippling(painting);
     }
 }
 
@@ -1047,11 +1043,12 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
         // Update the painting
         painting_update_floors(painting);
-        if (!FLT_IS_NONZERO(painting->pitch)) {
-            // only paintings with 0 pitch are treated as walls
-            wall_painting_update(painting, paintingGroup);
-        } else {
+
+        // Only paintings with 0 pitch are treated as walls
+        if (FLT_IS_NONZERO(painting->pitch)) {
             floor_painting_update(painting, paintingGroup);
+        } else {
+            wall_painting_update(painting, paintingGroup);
         }
     }
 
@@ -1073,5 +1070,6 @@ Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED 
         // Store Mario's position
         vec3f_copy(gPaintingMarioPos, &gMarioObject->oPosVec);
     }
+
     return NULL;
 }
