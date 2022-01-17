@@ -585,9 +585,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData, struct Ob
 
     s32 flags = surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC;
 
-    // The DDD warp is initially loaded at the origin and moved to the proper
-    // position in paintings.c and doesn't update its room, so set it here.
-    RoomData room = (obj->behavior == segmented_to_virtual(bhvDddWarp)) ? 5 : 0;
+    RoomData room = 0;
 
     for (i = 0; i < numSurfaces; i++) {
         struct Surface *surface = read_surface_data(vertexData, data);

@@ -4851,7 +4851,7 @@ u8 get_cutscene_from_mario_status(struct Camera *c) {
         if (sMarioCamState->cameraEvent == CAM_EVENT_CANNON) {
             cutscene = CUTSCENE_ENTER_CANNON;
         }
-        if (SURFACE_IS_PAINTING_WARP(sMarioGeometry.currFloorType)) {
+        if (get_active_painting_id() != PAINTING_ID_NULL) {
             cutscene = CUTSCENE_ENTER_PAINTING;
         }
         switch (sMarioCamState->action) {
@@ -9573,7 +9573,7 @@ void cutscene_double_doors_end(struct Camera *c) {
  * zooms in until the star select screen appears.
  */
 void cutscene_enter_painting(struct Camera *c) {
-    struct Surface *floor, *highFloor;
+    struct Surface *highFloor;
     Vec3f paintingPos, focus, focusOffset;
     Vec3s paintingAngle;
 
@@ -9582,9 +9582,10 @@ void cutscene_enter_painting(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
 
     if (gRipplingPainting != NULL) {
-        paintingAngle[0] = 0;
-        paintingAngle[1] = DEGREES(gRipplingPainting->yaw); // convert degrees to IAU
-        paintingAngle[2] = 0;
+        // Convert degrees to IAU
+        paintingAngle[0] = DEGREES(gRipplingPainting->rotation[0]);
+        paintingAngle[1] = DEGREES(gRipplingPainting->rotation[1]);
+        paintingAngle[2] = DEGREES(gRipplingPainting->rotation[2]);
 
         focusOffset[0] = gRipplingPainting->size * 0.5f;
         focusOffset[1] = focusOffset[0];
@@ -9608,14 +9609,18 @@ void cutscene_enter_painting(struct Camera *c) {
             approach_vec3f_asymptotic(c->pos, focus, 0.9f, 0.9f, 0.9f);
         }
 
-        find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 50.0f, sMarioCamState->pos[2], &floor);
+        // find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 50.0f, sMarioCamState->pos[2], &floor);
 
-        if ((floor->type < SURFACE_PAINTING_WOBBLE_A6)
-         || (floor->type > SURFACE_PAINTING_WARP_F9)) {
-            c->cutscene = CUTSCENE_NONE;
-            gCutsceneTimer = CUTSCENE_STOP;
-            sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
-        }
+        // if ((floor->type < SURFACE_PAINTING_WOBBLE_A6)
+        //  || (floor->type > SURFACE_PAINTING_WARP_F9)) {
+        // if (get_active_painting_id() == PAINTING_ID_NULL) {
+        //     c->cutscene = CUTSCENE_NONE;
+        //     gCutsceneTimer = CUTSCENE_STOP;
+        //     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
+        // }
+        //! The above, without painting floors, breaks the painting entering cutscene. However, without it,
+        //  if Mario somehow triggers this cutscene without triggering the warp (eg. debug free move), the
+        //  camera will be stuck focused on the painting even if Mario leaves.
     }
     c->mode = CAMERA_MODE_CLOSE;
 }

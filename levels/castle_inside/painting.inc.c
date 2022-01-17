@@ -1316,13 +1316,13 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_sl[] =
 
 // 0x07023620 - 0x07023698
 struct Painting bob_painting = {
-    /* id */ 0x0000,
+    /* id */ PAINTING_ID_CASTLE_BOB,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,    90.0f,
-    /* Position */ -5222.4f,   409.6f,   -153.6f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,    90.0f,     0.0f,
+    /* Position */ -5222.4f,   409.6f,  -153.6f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
     /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
@@ -1339,16 +1339,17 @@ struct Painting bob_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023698 - 0x07023710
 struct Painting ccm_painting = {
-    /* id */ 0x0001,
+    /* id */ PAINTING_ID_CASTLE_CCM,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,     0.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,     0.0f,     0.0f,
     /* Position */ -2611.2f,  -307.2f, -4352.0f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1366,16 +1367,17 @@ struct Painting ccm_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023710 - 0x07023788
 struct Painting wf_painting = {
-    /* id */ 0x0002,
+    /* id */ PAINTING_ID_CASTLE_WF,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,     0.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,     0.0f,     0.0f,
     /* Position */   -51.2f,  -204.8f, -4505.6f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1393,16 +1395,17 @@ struct Painting wf_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023788 - 0x07023800
 struct Painting jrb_painting = {
-    /* id */ 0x0003,
+    /* id */ PAINTING_ID_CASTLE_JRB,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,   270.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,   270.0f,     0.0f,
     /* Position */  4300.8f,   409.6f,  -537.6f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1420,16 +1423,17 @@ struct Painting jrb_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023800 - 0x07023878
 struct Painting lll_painting = {
-    /* id */ 0x0004,
+    /* id */ PAINTING_ID_CASTLE_LLL,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,     0.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,     0.0f,     0.0f,
     /* Position */ -1689.6f, -1126.4f, -3942.4f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1447,16 +1451,17 @@ struct Painting lll_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023878 - 0x070238F0
 struct Painting ssl_painting = {
-    /* id */ 0x0005,
+    /* id */ PAINTING_ID_CASTLE_SSL,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,   180.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,   180.0f,     0.0f,
     /* Position */ -2611.2f, -1177.6f, -1075.2f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1474,16 +1479,17 @@ struct Painting ssl_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x070238F0 - 0x07023968
 struct Painting hmc_painting = {
-    /* id */ 0x000E,
+    /* id */ PAINTING_ID_CASTLE_HMC,
     /* Image Count */ 0x01,
     /* Texture Type */ PAINTING_ENV_MAP,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */   270.0f,   0.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */   270.0f,     0.0f,     0.0f,
     /* Position */  2099.2f, -1484.8f, -2278.4f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    10.0f,    30.0f,
@@ -1501,16 +1507,17 @@ struct Painting hmc_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  768.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023968 - 0x070239E0
 struct Painting ddd_painting = {
-    /* id */ 0x0007,
+    /* id */ PAINTING_ID_CASTLE_DDD,
     /* Image Count */ 0x01,
     /* Texture Type */ PAINTING_ENV_MAP,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */    0.0f, 270.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */    0.0f,   270.0f,    0.0f,
     /* Position */ 3456.0f, -1075.2f, 1587.2f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    10.0f,    30.0f,
@@ -1528,16 +1535,17 @@ struct Painting ddd_painting = {
     /* Alpha */ 0xB4,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  819.2f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x070239E0 - 0x07023A58
 struct Painting wdw_painting = {
-    /* id */ 0x0008,
+    /* id */ PAINTING_ID_CASTLE_WDW,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,     0.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,     0.0f,     0.0f,
     /* Position */ -966.656f, 1305.6f, -143.36f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1555,16 +1563,17 @@ struct Painting wdw_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023A58 - 0x07023AD0
 struct Painting thi_tiny_painting = {
-    /* id */ 0x0009,
+    /* id */ PAINTING_ID_CASTLE_THI_TINY,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,   180.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,   180.0f,     0.0f,
     /* Position */ -4598.7842f, 1354.752f, 3005.44f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1582,16 +1591,17 @@ struct Painting thi_tiny_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  393.216f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023AD0 - 0x07023B48
 struct Painting ttm_painting = {
-    /* id */ 0x000A,
+    /* id */ PAINTING_ID_CASTLE_TTM,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */      0.0f,   180.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */      0.0f,   180.0f,     0.0f,
     /* Position */ -546.816f, 1356.8f, 3813.376f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1609,16 +1619,17 @@ struct Painting ttm_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  256.0f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023B48 - 0x07023BC0
 struct Painting ttc_painting = {
-    /* id */ 0x000B,
+    /* id */ PAINTING_ID_CASTLE_TTC,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */       0.0f,   180.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */       0.0f,   180.0f,     0.0f,
     /* Position */ 0.0f, 2713.6f, 7232.5122f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1636,16 +1647,17 @@ struct Painting ttc_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  409.6f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023BC0 - 0x07023C38
 struct Painting sl_painting = {
-    /* id */ 0x000C,
+    /* id */ PAINTING_ID_CASTLE_SL,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */     0.0f,     0.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */     0.0f,     0.0f,     0.0f,
     /* Position */ 3179.52f, 1408.0f, -271.36f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
@@ -1663,16 +1675,17 @@ struct Painting sl_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  716.8f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
 
 // 0x07023C38 - 0x07023CB0
 struct Painting thi_huge_painting = {
-    /* id */ 0x000D,
+    /* id */ PAINTING_ID_CASTLE_THI_HUGE,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ 0x00, 0x00, 0x00 /* which of the painting's nearby special floors Mario's on */,
-    /* Ripple Status */ 0x00,
-    /* Rotation */      0.0f,     0.0f,
+    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
+    /* Ripple Status */ PAINTING_IDLE,
+    /* Rotation */      0.0f,     0.0f,     0.0f,
     /* Position */ -5614.5918f, 1510.4f, -3292.16f,
     /*                         curr   passive     entry */
     /* Ripple Magnitude */     0.0f,    40.0f,   160.0f,
@@ -1690,4 +1703,5 @@ struct Painting thi_huge_painting = {
     /* Alpha */ 0xFF,
     /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  1638.4f,
+    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };

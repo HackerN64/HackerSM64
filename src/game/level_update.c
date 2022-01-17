@@ -613,8 +613,8 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
 
 // From Surface 0xD3 to 0xFC
 #define PAINTING_WARP_INDEX_START 0x00 // Value greater than or equal to Surface 0xD3
-#define PAINTING_WARP_INDEX_FA 0x2A    // THI Huge Painting index left
-#define PAINTING_WARP_INDEX_END 0x2D   // Value less than Surface 0xFD
+#define PAINTING_WARP_INDEX_FA    0x2A // THI Huge Painting index left
+#define PAINTING_WARP_INDEX_END   0x2D // Value less than Surface 0xFD
 
 /**
  * Check if Mario is above and close to a painting warp floor, and return the
@@ -622,13 +622,10 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
  */
 struct WarpNode *get_painting_warp_node(void) {
     struct WarpNode *warpNode = NULL;
-    s32 paintingIndex = gMarioState->floor->type - SURFACE_PAINTING_WARP_D3;
+    s32 id = get_active_painting_id();
 
-    if (paintingIndex >= PAINTING_WARP_INDEX_START && paintingIndex < PAINTING_WARP_INDEX_END) {
-        if (paintingIndex < PAINTING_WARP_INDEX_FA
-            || gMarioState->pos[1] - gMarioState->floorHeight < 80.0f) {
-            warpNode = &gCurrentArea->paintingWarpNodes[paintingIndex];
-        }
+    if (id != PAINTING_ID_NULL) {
+        warpNode = &gCurrentArea->paintingWarpNodes[id];
     }
 
     return warpNode;
@@ -638,37 +635,35 @@ struct WarpNode *get_painting_warp_node(void) {
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
 void initiate_painting_warp(void) {
-    if (gCurrentArea->paintingWarpNodes != NULL && gMarioState->floor != NULL) {
-        struct WarpNode warpNode;
-        struct WarpNode *pWarpNode = get_painting_warp_node();
+    struct WarpNode warpNode;
+    struct WarpNode *pWarpNode = get_painting_warp_node();
 
-        if (pWarpNode != NULL) {
-            if (gMarioState->action & ACT_FLAG_INTANGIBLE) {
-                play_painting_eject_sound();
-            } else if (pWarpNode->id != 0) {
-                warpNode = *pWarpNode;
+    if (pWarpNode != NULL) {
+        if (gMarioState->action & ACT_FLAG_INTANGIBLE) {
+            play_painting_eject_sound();
+        } else if (pWarpNode->id != 0) {
+            warpNode = *pWarpNode;
 
-                if (!(warpNode.destLevel & WARP_NO_CHECKPOINT)) {
-                    sWarpCheckpointActive = check_warp_checkpoint(&warpNode);
-                }
-
-                initiate_warp((warpNode.destLevel & WARP_DEST_LEVEL_NUM_MASK), warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
-                check_if_should_set_warp_checkpoint(&warpNode);
-
-                play_transition_after_delay(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255, 45);
-                level_set_transition(74, basic_update);
-
-                set_mario_action(gMarioState, ACT_DISAPPEARED, 0);
-
-                gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
-
-                play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
-                fadeout_music(398);
-#if ENABLE_RUMBLE
-                queue_rumble_data(80, 70);
-                queue_rumble_decay(1);
-#endif
+            if (!(warpNode.destLevel & WARP_NO_CHECKPOINT)) {
+                sWarpCheckpointActive = check_warp_checkpoint(&warpNode);
             }
+
+            initiate_warp((warpNode.destLevel & WARP_DEST_LEVEL_NUM_MASK), warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
+            check_if_should_set_warp_checkpoint(&warpNode);
+
+            play_transition_after_delay(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255, 45);
+            level_set_transition(74, basic_update);
+
+            set_mario_action(gMarioState, ACT_DISAPPEARED, 0);
+
+            gMarioState->marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
+
+            play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
+            fadeout_music(398);
+#if ENABLE_RUMBLE
+            queue_rumble_data(80, 70);
+            queue_rumble_decay(1);
+#endif
         }
     }
 }

@@ -134,8 +134,6 @@ extern const Gfx inside_castle_seg7_dl_07068B10[];
 extern const Collision inside_castle_seg7_area_1_collision[];
 extern const Collision inside_castle_seg7_area_2_collision[];
 extern const Collision inside_castle_seg7_area_3_collision[];
-extern const Collision inside_castle_seg7_collision_ddd_warp[];
-extern const Collision inside_castle_seg7_collision_ddd_warp_2[];
 extern const MacroObject inside_castle_seg7_area_1_macro_objs[];
 extern const MacroObject inside_castle_seg7_area_2_macro_objs[];
 extern const MacroObject inside_castle_seg7_area_3_macro_objs[];

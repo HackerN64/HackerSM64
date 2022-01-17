@@ -13,6 +13,12 @@
 /// The default painting side length
 #define PAINTING_SIZE 614.0f
 
+#define PAINTING_OBJECT_DEPTH PAINTING_SIZE
+
+#define PAINTING_OBJECT_MARGIN (PAINTING_SIZE / 2)
+
+#define PAINTING_MARIO_Y_OFFSET 50.0f
+
 enum HMCPaintingIDs {
     /*0x0*/ PAINTING_ID_HMC_COTMC,
 };
@@ -34,8 +40,6 @@ enum CastlePaintingIDs {
     /*0xD*/ PAINTING_ID_CASTLE_THI_HUGE,
     /*0xE*/ PAINTING_ID_CASTLE_RR,
 };
-
-#define PAINTING_ID_DDD PAINTING_ID_CASTLE_DDD
 
 enum TTMPaintingIDs {
     /*0x0*/ PAINTING_ID_TTM_SLIDE,
@@ -78,19 +82,15 @@ enum PaintingRippleFlags {
 };
 
 enum PaintingXSources {
-    /// Use the 1/4th part of the painting that is nearest to Mario's current floor.
-    NEAREST_4TH,
-    /// Use Mario's relative x position. @see painting_mario_x
+    /// Use Mario's local x position.
     MARIO_X,
     /// Use the x center of the painting.
     MIDDLE_X,
 };
 
 enum PaintingYSources {
-    /// Use Mario's relative y position. @see painting_mario_y
+    /// Use Mario's local y position.
     MARIO_Y,
-    /// Use Mario's relative z position. @see painting_mario_z
-    MARIO_Z,
     /// Use the y center of the painting.
     MIDDLE_Y,
 };
@@ -120,8 +120,7 @@ struct Painting {
     s8 state;
 
     /// The painting's rotation
-    f32 pitch;
-    f32 yaw;
+    Vec3f rotation;
 
     /// The painting's position
     Vec3f pos;
@@ -182,6 +181,9 @@ struct Painting {
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f
     f32 size;
+
+    /// Mario's position relative to the painting's position and rotation
+    Vec3f marioLocalPos;
 };
 
 /**
@@ -199,5 +201,10 @@ extern s8 gDddPaintingStatus;
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
 Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx);
+
+void bhv_painting_init(void);
+void bhv_painting_loop(void);
+
+s32 get_active_painting_id(void);
 
 #endif // PAINTINGS_H

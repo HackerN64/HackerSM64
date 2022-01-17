@@ -18,8 +18,6 @@ const GeoLayout ttm_geo_000A70[] = {
                GEO_DISPLAY_LIST(LAYER_OPAQUE, ttm_seg7_dl_0700A120),
                GEO_DISPLAY_LIST(LAYER_OPAQUE, ttm_seg7_dl_0700A2E0),
                GEO_RENDER_OBJ(),
-               GEO_ASM(0,                                                      geo_painting_update),
-               GEO_ASM(PAINTING_ID(PAINTING_ID_TTM_SLIDE, PAINTING_GROUP_TTM), geo_painting_draw),
                GEO_ASM(0,                                 geo_movtex_pause_control),
                GEO_ASM(MOVTEX_TTM_BEGIN_WATERFALL,        geo_movtex_draw_nocolor),
                GEO_ASM(MOVTEX_TTM_END_WATERFALL,          geo_movtex_draw_nocolor),
