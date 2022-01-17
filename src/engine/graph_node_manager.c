@@ -3,6 +3,7 @@
 #include "types.h"
 
 #include "graph_node.h"
+#include "math_util.h"
 
 #if IS_64_BIT
 static s16 next_s16_in_geo_script(s16 **src) {
@@ -49,9 +50,9 @@ s16 *read_vec3s(Vec3s dst, s16 *src) {
  * range.
  */
 s16 *read_vec3s_angle(Vec3s dst, s16 *src) {
-    dst[0] = (next_s16_in_geo_script(&src) << 15) / 180;
-    dst[1] = (next_s16_in_geo_script(&src) << 15) / 180;
-    dst[2] = (next_s16_in_geo_script(&src) << 15) / 180;
+    dst[0] = degrees_to_angle(next_s16_in_geo_script(&src));
+    dst[1] = degrees_to_angle(next_s16_in_geo_script(&src));
+    dst[2] = degrees_to_angle(next_s16_in_geo_script(&src));
     return src;
 }
 
