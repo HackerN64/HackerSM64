@@ -31,11 +31,9 @@ void bhv_jrb_floating_ship_loop(void) {
 }
 
 void bhv_jrb_sliding_box_loop(void) {
-    Mat4 mtx;
-    Vec3f shipToBoxPos1;
-    Vec3f shipToBoxPos2;
     Vec3s shipRotation;
     struct Object *shipObj;
+
     if (o->oJrbSlidingBoxShipObj == NULL) {
         shipObj = cur_obj_nearest_object_with_behavior(bhvJrbFloatingShipCollision);
 
@@ -46,10 +44,7 @@ void bhv_jrb_sliding_box_loop(void) {
     } else {
         shipObj = o->oJrbSlidingBoxShipObj;
         vec3i_to_vec3s(shipRotation, &shipObj->oFaceAngleVec);
-        vec3f_copy(shipToBoxPos1, &o->oParentRelativePosVec);
-        mtxf_rotate_zxy_and_translate(mtx, shipToBoxPos1, shipRotation);
-        linear_mtxf_mul_vec3f(mtx, shipToBoxPos2, shipToBoxPos1);
-        vec3f_sum(&o->oPosVec, &shipObj->oPosVec, shipToBoxPos2);
+        vec3f_local_pos_to_world_pos(&o->oPosVec, &o->oParentRelativePosVec, &shipObj->oPosVec, shipRotation);
         o->oFaceAnglePitch = shipObj->oFaceAnglePitch;
     }
 

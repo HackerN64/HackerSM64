@@ -565,6 +565,10 @@ ALWAYS_INLINE void mtxf_to_mtx(void *dest, void *src) {
     // guMtxF2L(src, dest);
 }
 
+// Local/World pos conversions
+void vec3f_local_pos_to_world_pos(Vec3f destWorldPos, Vec3f srcLocalPos, Vec3f originPos, Vec3s rotation);
+void vec3f_world_pos_to_local_pos(Vec3f destLocalPos, Vec3f srcWorldPos, Vec3f originPos, Vec3s rotation);
+
 // Vector get/set functions
 void vec2f_get_lateral_dist(                   Vec2f from, Vec2f to,            f32 *lateralDist                            );
 void vec3f_get_lateral_dist(                   Vec3f from, Vec3f to,            f32 *lateralDist                            );
