@@ -28,7 +28,7 @@ extern const BehaviorScript bhvSmallParticle[];
 extern const BehaviorScript bhvPlungeBubble[];
 extern const BehaviorScript bhvSmallParticleSnow[];
 extern const BehaviorScript bhvSmallParticleBubbles[];
-extern const BehaviorScript bhvFishGroup[];
+extern const BehaviorScript bhvAquariumBubbles[];
 extern const BehaviorScript bhvCannon[];
 extern const BehaviorScript bhvCannonBarrel[];
 extern const BehaviorScript bhvCannonBaseUnused[];
