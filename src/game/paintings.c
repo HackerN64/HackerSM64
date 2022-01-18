@@ -647,10 +647,11 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
  * Orient the painting mesh for rendering.
  */
 Gfx *painting_model_view_transform(struct Painting *painting) {
-    Gfx *dlist = alloc_display_list(5 * sizeof(Gfx));
+    s32 isObj = (gCurGraphNodeObjectNode != NULL);
+    Gfx *dlist = alloc_display_list((isObj ? 2 : 6) * sizeof(Gfx));
     Gfx *gfx = dlist;
 
-    if (gCurGraphNodeObjectNode == NULL) {
+    if (!isObj) {
         Mtx *translate = alloc_display_list(sizeof(Mtx));
         guTranslate(translate, painting->pos[0], painting->pos[1], painting->pos[2]);
         gSPMatrix(gfx++, translate, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH  ));
@@ -663,10 +664,9 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
         guRotate(rotY, painting->rotation[1], 0.0f, 1.0f, 0.0f);
         gSPMatrix(gfx++, rotY,      (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
 
-        //! TODO: Why doesn't this work?
-        // Mtx *rotZ = alloc_display_list(sizeof(Mtx));
-        // guRotate(rotZ, painting->rotation[2], 0.0f, 0.0f, 1.0f);
-        // gSPMatrix(gfx++, rotZ,      (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
+        Mtx *rotZ = alloc_display_list(sizeof(Mtx));
+        guRotate(rotZ, painting->rotation[2], 0.0f, 0.0f, 1.0f);
+        gSPMatrix(gfx++, rotZ,      (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
     }
 
     Mtx *scale = alloc_display_list(sizeof(Mtx));
