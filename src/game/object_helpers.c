@@ -770,7 +770,7 @@ void cur_obj_unrender_set_action_and_anim(s32 animIndex, s32 action) {
 
 static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
     o->oMoveFlags = 0;
-    o->oFloorHeight = find_floor(o->oPosX, o->oPosY + 160.0f, o->oPosZ, &o->oFloor);
+    o->oFloorHeight = find_floor(o->oPosX, (o->oPosY + MARIO_HITBOX_HEIGHT), o->oPosZ, &o->oFloor);
 
     if (o->oFloorHeight > o->oPosY) {
         o->oPosY = o->oFloorHeight;
@@ -1939,8 +1939,8 @@ void clear_time_stop_flags(s32 flags) {
 s32 cur_obj_can_mario_activate_textbox(f32 radius, f32 height, UNUSED s32 unused) {
     return (
         o->oDistanceToMario < 1500.0f
-        && o->oPosY < gMarioObject->oPosY + 160.0f
-        && gMarioObject->oPosY < o->oPosY + height
+        && o->oPosY < (gMarioObject->oPosY + MARIO_HITBOX_HEIGHT)
+        && gMarioObject->oPosY < (o->oPosY + height)
         && !(gMarioStates[0].action & ACT_FLAG_AIR)
         && lateral_dist_between_objects(o, gMarioObject) < radius
         && mario_ready_to_speak()

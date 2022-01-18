@@ -29,3 +29,12 @@
 
 // Checks for ceilings from Mario's actual height instead of from the floor height.
 #define EXPOSED_CEILINGS_FIX
+
+// Mario's normal hitbox height.
+#define MARIO_HITBOX_HEIGHT 160
+
+// Mario's hitbox height when in certain actions such as crouching or crawling.
+#define MARIO_SHORT_HITBOX_HEIGHT 100
+
+// The radius of Mario's collision when checking for walls.
+#define MARIO_COLLISION_RADIUS 50

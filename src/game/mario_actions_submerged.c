@@ -73,7 +73,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     struct WallCollisionData wallData;
     struct Surface *ceil, *floor;
 
-    resolve_and_return_wall_collisions(nextPos, 10.0f, 110.0f, &wallData);
+    resolve_and_return_wall_collisions(nextPos, 10.0f, (MARIO_HITBOX_HEIGHT - 50.0f), &wallData);
     struct Surface *wall = wallData.numWalls == 0 ? NULL : wallData.walls[0];
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
@@ -83,7 +83,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     }
 
     if (nextPos[1] >= floorHeight) {
-        if (ceilHeight - nextPos[1] >= 160.0f) {
+        if ((ceilHeight - nextPos[1]) >= MARIO_HITBOX_HEIGHT) {
             vec3f_copy(m->pos, nextPos);
             set_mario_floor(m, floor, floorHeight);
 
@@ -94,12 +94,12 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
             }
         }
 
-        if (ceilHeight - floorHeight <= 160.0f) {
+        if ((ceilHeight - floorHeight) <= MARIO_HITBOX_HEIGHT) {
             return WATER_STEP_CANCELLED;
         }
 
-        if (nextPos[1] >= ceilHeight - 160.0f) {
-            vec3f_set(m->pos, nextPos[0], ceilHeight - 160.0f, nextPos[2]);
+        if (nextPos[1] >= (ceilHeight - MARIO_HITBOX_HEIGHT)) {
+            vec3f_set(m->pos, nextPos[0], (ceilHeight - MARIO_HITBOX_HEIGHT), nextPos[2]);
             set_mario_floor(m, floor, floorHeight);
             return WATER_STEP_HIT_CEILING;
         } else {
@@ -108,7 +108,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
             return WATER_STEP_NONE;
         }
     } else {
-        if (ceilHeight - floorHeight < 160.0f) {
+        if ((ceilHeight - floorHeight) < MARIO_HITBOX_HEIGHT) {
             return WATER_STEP_CANCELLED;
         }
 

@@ -1661,9 +1661,9 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
 
     // Short hitbox for crouching/crawling/etc.
     if (m->action & ACT_FLAG_SHORT_HITBOX) {
-        m->marioObj->hitboxHeight = 100.0f;
+        m->marioObj->hitboxHeight = MARIO_SHORT_HITBOX_HEIGHT;
     } else {
-        m->marioObj->hitboxHeight = 160.0f;
+        m->marioObj->hitboxHeight = MARIO_HITBOX_HEIGHT;
     }
 
     if ((m->flags & MARIO_TELEPORTING) && (m->fadeWarpOpacity != MODEL_STATE_MASK)) {

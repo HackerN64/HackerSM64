@@ -44,7 +44,7 @@ void bhv_kickable_board_loop(void) {
             if (o->oTimer > 30) {
                 attackValue = check_mario_attacking();
                 if (attackValue) {
-                    if (gMarioObject->oPosY > o->oPosY + 160.0f && attackValue == WF_ATTACK_AIR) {
+                    if (gMarioObject->oPosY > (o->oPosY + MARIO_HITBOX_HEIGHT) && attackValue == WF_ATTACK_AIR) {
                         o->oAction++;
                         cur_obj_play_sound_2(SOUND_GENERAL_BUTTON_PRESS_2);
                     } else {

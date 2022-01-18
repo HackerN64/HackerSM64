@@ -931,7 +931,7 @@ s32 act_ground_pound(struct MarioState *m) {
     if (m->actionState == 0) {
         if (m->actionTimer < 10) {
             yOffset = 20 - 2 * m->actionTimer;
-            if (m->pos[1] + yOffset + 160.0f < m->ceilHeight) {
+            if ((m->pos[1] + yOffset + MARIO_HITBOX_HEIGHT) < m->ceilHeight) {
                 m->pos[1] += yOffset;
                 m->peakHeight = m->pos[1];
                 vec3f_copy(m->marioObj->header.gfx.pos, m->pos);

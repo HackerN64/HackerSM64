@@ -556,7 +556,7 @@ s32 act_debug_free_move(struct MarioState *m) {
 
     // TODO: Add ability to ignore collision
     //      - spawn pseudo floor object to prevent OOB death
-    resolve_and_return_wall_collisions(pos, 60.0f, 50.0f, &wallData);
+    resolve_and_return_wall_collisions(pos, 60.0f, MARIO_COLLISION_RADIUS, &wallData);
 
     set_mario_wall(m, ((wallData.numWalls > 0) ? wallData.walls[0] : NULL));
     f32 floorHeight = find_floor(pos[0], pos[1], pos[2], &floor);
@@ -564,12 +564,12 @@ s32 act_debug_free_move(struct MarioState *m) {
 
     if (floor == NULL) return FALSE;
 
-    if (ceilHeight - floorHeight >= 160.0f) {
+    if ((ceilHeight - floorHeight) >= MARIO_HITBOX_HEIGHT) {
         if (floor != NULL && pos[1] < floorHeight) {
             pos[1] = floorHeight;
         }
-        if (ceil != NULL && pos[1] + 160.0f > ceilHeight) {
-            pos[1] = ceilHeight - 160.0f;
+        if (ceil != NULL && (pos[1] + MARIO_HITBOX_HEIGHT) > ceilHeight) {
+            pos[1] = (ceilHeight - MARIO_HITBOX_HEIGHT);
         }
         vec3f_copy(m->pos, pos);
     }
@@ -1519,7 +1519,7 @@ s32 act_squished(struct MarioState *m) {
 
     switch (m->actionState) {
         case ACT_STATE_SQUISHED_SCALING:
-            if (spaceUnderCeil > 160.0f) {
+            if (spaceUnderCeil > MARIO_HITBOX_HEIGHT) {
                 m->squishTimer = 0;
                 return set_mario_action(m, ACT_IDLE, 0);
             }
@@ -1528,13 +1528,15 @@ s32 act_squished(struct MarioState *m) {
 
             if (spaceUnderCeil >= 10.1f) {
                 // Mario becomes a pancake
-                squishAmount = spaceUnderCeil / 160.0f;
-                vec3f_set(m->marioObj->header.gfx.scale, 2.0f - squishAmount, squishAmount,
+                squishAmount = (spaceUnderCeil / MARIO_HITBOX_HEIGHT);
+                vec3f_set(m->marioObj->header.gfx.scale,
+                          2.0f - squishAmount,
+                          squishAmount,
                           2.0f - squishAmount);
             } else {
                 if (!(m->flags & MARIO_METAL_CAP) && m->invincTimer == 0) {
                     // cap on: 3 units; cap off: 4.5 units
-                    m->hurtCounter += m->flags & MARIO_CAP_ON_HEAD ? 12 : 18;
+                    m->hurtCounter += ((m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18);
                     play_sound_if_no_flag(m, SOUND_MARIO_ATTACKED, MARIO_MARIO_SOUND_PLAYED);
                 }
 

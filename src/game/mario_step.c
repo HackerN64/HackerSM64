@@ -133,27 +133,31 @@ u32 mario_update_quicksand(struct MarioState *m, f32 sinkingSpeed) {
 
         switch (m->floor->type) {
             case SURFACE_SHALLOW_QUICKSAND:
-                if ((m->quicksandDepth += sinkingSpeed) >= 10.0f) {
+                m->quicksandDepth += sinkingSpeed;
+                if (m->quicksandDepth >= 10.0f) {
                     m->quicksandDepth = 10.0f;
                 }
                 break;
 
             case SURFACE_SHALLOW_MOVING_QUICKSAND:
-                if ((m->quicksandDepth += sinkingSpeed) >= 25.0f) {
+                m->quicksandDepth += sinkingSpeed;
+                if (m->quicksandDepth >= 25.0f) {
                     m->quicksandDepth = 25.0f;
                 }
                 break;
 
             case SURFACE_QUICKSAND:
             case SURFACE_MOVING_QUICKSAND:
-                if ((m->quicksandDepth += sinkingSpeed) >= 60.0f) {
+                m->quicksandDepth += sinkingSpeed;
+                if (m->quicksandDepth >= 60.0f) {
                     m->quicksandDepth = 60.0f;
                 }
                 break;
 
             case SURFACE_DEEP_QUICKSAND:
             case SURFACE_DEEP_MOVING_QUICKSAND:
-                if ((m->quicksandDepth += sinkingSpeed) >= 160.0f) {
+                m->quicksandDepth += sinkingSpeed;
+                if (m->quicksandDepth >= MARIO_HITBOX_HEIGHT) {
                     update_mario_sound_and_camera(m);
                     return drop_and_set_mario_action(m, ACT_QUICKSAND_DEATH, 0);
                 }
@@ -260,7 +264,7 @@ s32 stationary_ground_step(struct MarioState *m) {
         stepResult = perform_ground_step(m);
     } else {
         // Hackersm64: this condition fixes potential downwarps
-        if (m->pos[1] <= m->floorHeight + 160.0f) {
+        if (m->pos[1] <= (m->floorHeight + MARIO_HITBOX_HEIGHT)) {
             m->pos[1] = m->floorHeight;
         }
 
@@ -279,8 +283,8 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     s16 wallDYaw;
     s32 oldWallDYaw;
 
-    resolve_and_return_wall_collisions(nextPos, 30.0f, 24.0f, &lowerWall);
-    resolve_and_return_wall_collisions(nextPos, 60.0f, 50.0f, &upperWall);
+    resolve_and_return_wall_collisions(nextPos, 30.0f, ((MARIO_COLLISION_RADIUS / 2) - 1), &lowerWall);
+    resolve_and_return_wall_collisions(nextPos, 60.0f, MARIO_COLLISION_RADIUS, &upperWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
@@ -298,7 +302,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     }
 
     if (nextPos[1] > floorHeight + 100.0f) {
-        if (nextPos[1] + 160.0f >= ceilHeight) {
+        if ((nextPos[1] + MARIO_HITBOX_HEIGHT) >= ceilHeight) {
             return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
         }
 
@@ -307,7 +311,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
         return GROUND_STEP_LEFT_GROUND;
     }
 
-    if (floorHeight + 160.0f >= ceilHeight) {
+    if ((floorHeight + MARIO_HITBOX_HEIGHT) >= ceilHeight) {
         return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
     }
 
@@ -401,7 +405,7 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *prevWall,
 
     ledgePos[0] = nextPos[0] - (wall->normal.x * 60.0f);
     ledgePos[2] = nextPos[2] - (wall->normal.z * 60.0f);
-    ledgePos[1] = find_floor(ledgePos[0], nextPos[1] + 160.0f, ledgePos[2], ledgeFloor);
+    ledgePos[1] = find_floor(ledgePos[0], (nextPos[1] + MARIO_HITBOX_HEIGHT), ledgePos[2], ledgeFloor);
 
     if (ledgeFloor == NULL
         || (*ledgeFloor) == NULL
@@ -463,8 +467,8 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
 
     vec3f_copy(nextPos, intendedPos);
 
-    resolve_and_return_wall_collisions(nextPos, 150.0f, 50.0f, &upperWall);
-    resolve_and_return_wall_collisions(nextPos, 30.0f, 50.0f, &lowerWall);
+    resolve_and_return_wall_collisions(nextPos, 150.0f, MARIO_COLLISION_RADIUS, &upperWall);
+    resolve_and_return_wall_collisions(nextPos, 30.0f, MARIO_COLLISION_RADIUS, &lowerWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
@@ -492,7 +496,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
 
     //! This check uses f32, but findFloor uses short (overflow jumps)
     if (nextPos[1] <= floorHeight) {
-        if (ceilHeight - floorHeight > 160.0f) {
+        if ((ceilHeight - floorHeight) > MARIO_HITBOX_HEIGHT) {
             m->pos[0] = nextPos[0];
             m->pos[2] = nextPos[2];
             set_mario_floor(m, floor, floorHeight);
@@ -505,7 +509,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         return AIR_STEP_LANDED;
     }
 
-    if (nextPos[1] + 160.0f > ceilHeight) {
+    if ((nextPos[1] + MARIO_HITBOX_HEIGHT) > ceilHeight) {
         if (m->vel[1] >= 0.0f) {
             m->vel[1] = 0.0f;
 

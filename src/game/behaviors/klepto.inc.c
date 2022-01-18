@@ -238,7 +238,7 @@ static void klepto_act_dive_at_mario(void) {
                 o->oKleptoPitchToTarget = obj_turn_pitch_toward_mario(0.0f, 0);
                 o->oKleptoYawToTarget = o->oAngleToMario;
 
-                if (dy < 160.0f) {
+                if (dy < MARIO_HITBOX_HEIGHT) {
                     o->oSubAction++;
                 }
             }
