@@ -89,22 +89,26 @@ s32 gEnteredPaintingId = PAINTING_ID_NULL;
  */
 s8 gDddPaintingStatus;
 
+// HMC painting group
 struct Painting *sHmcPaintings[] = {
     &cotmc_painting,
     NULL,
 };
 
+// Inside Castle painting group
 struct Painting *sInsideCastlePaintings[] = {
     &bob_painting, &ccm_painting, &wf_painting,  &jrb_painting,      &lll_painting,
     &ssl_painting, &hmc_painting, &ddd_painting, &wdw_painting,      &thi_tiny_painting,
     &ttm_painting, &ttc_painting, &sl_painting,  &thi_huge_painting, NULL,
 };
 
+// TTM painting group
 struct Painting *sTtmPaintings[] = {
     &ttm_slide_painting,
     NULL,
 };
 
+// Array of all painting groups
 struct Painting **sPaintingGroups[] = {
     sHmcPaintings,
     sInsideCastlePaintings,
@@ -114,6 +118,9 @@ struct Painting **sPaintingGroups[] = {
 s16 gPaintingUpdateCounter = 1;
 s16 gLastPaintingUpdateCounter = 0;
 
+/**
+ * Get the painting group from gCurrLevelNum.
+ */
 UNUSED s32 get_painting_group(void) {
     switch (gCurrLevelNum) {
         case LEVEL_HMC:
@@ -178,10 +185,12 @@ void painting_state(s8 state, struct Painting *painting, struct Painting *painti
 
     painting->state = state;
 
+    // Set the ripple position
     painting->rippleX = (xSource == MIDDLE_X) ? (painting->size * 0.5f) : painting->marioLocalPos[0];
     painting->rippleY = (ySource == MIDDLE_Y) ? (painting->size * 0.5f) : painting->marioLocalPos[1];
 
-    gPaintingMarioYEntry = gMarioObject->oPosY;// + PAINTING_MARIO_Y_OFFSET;
+    // Set Mario's Y position for the WDW water level
+    gPaintingMarioYEntry = gMarioObject->oPosY;
 
     if (resetTimer) {
         painting->rippleTimer = 0.0f;
@@ -296,28 +305,35 @@ void painting_update_floors(struct Painting *painting) {
     Vec3f marioLocalPos;
     Vec3s rotation;
 
+    // Add PAINTING_MARIO_Y_OFFSET to make the ripple closer to Mario's center of mass.
     vec3f_copy_y_off(marioWorldPos, &gMarioObject->oPosVec, PAINTING_MARIO_Y_OFFSET);
 
+    // Get the painting's rotation.
     rotation[0] = DEGREES(painting->rotation[0]);
     rotation[1] = DEGREES(painting->rotation[1]);
     rotation[2] = DEGREES(painting->rotation[2]);
 
+    // Get Mario's position in the painting's local space.
     vec3f_world_pos_to_local_pos(marioLocalPos, marioWorldPos, painting->pos, rotation);
 
+    // Reset the global current warping painting.
     gEnteredPaintingId = PAINTING_ID_NULL;
 
-    // Check if Mario entered the area behind the painting
-    if (marioLocalPos[0] > -PAINTING_OBJECT_MARGIN
-     && marioLocalPos[0] < (painting->size + PAINTING_OBJECT_MARGIN)
-     && marioLocalPos[1] > -PAINTING_OBJECT_MARGIN
-     && marioLocalPos[1] < (painting->size + PAINTING_OBJECT_MARGIN)) {
-        if (marioLocalPos[2] < 100.0f
-         && marioLocalPos[2] >   0.0f) {
+    // Check if Mario is within the painting bounds laterally in local space.
+    if (marioLocalPos[0] > -PAINTING_EDGE_MARGIN
+     && marioLocalPos[0] < (painting->size + PAINTING_EDGE_MARGIN)
+     && marioLocalPos[1] > -PAINTING_EDGE_MARGIN
+     && marioLocalPos[1] < (painting->size + PAINTING_EDGE_MARGIN)) {
+        // Check whether Mario is in the wobble zone.
+        if (marioLocalPos[2] < PAINTING_WOBBLE_DEPTH
+         && marioLocalPos[2] > 0.0f) {
             rippleFlags |= RIPPLE_FLAG_RIPPLE;
         }
+        // Check whether Mario is in the warp zone.
         if (marioLocalPos[2] < 0.0f
-         && marioLocalPos[2] > -PAINTING_OBJECT_DEPTH) {
+         && marioLocalPos[2] > -PAINTING_WARP_DEPTH) {
             rippleFlags |= RIPPLE_FLAG_ENTER;
+            // Set the global current warping painting.
             gEnteredPaintingId = painting->id;
         }
     }
@@ -330,8 +346,10 @@ void painting_update_floors(struct Painting *painting) {
     // (Mario just entered the floor on this frame)
     painting->floorEntered = ((painting->lastFloor ^ painting->currFloor) & painting->currFloor);
 
+    // Check if Mario has fallen below the painting in the previous frame (used for floor paintings)
     painting->marioWasUnder = painting->marioIsUnder;
-    // Check if Mario has fallen below the painting (used for floor paintings)
+
+    // Check if Mario has fallen below the painting in the current frame (used for floor paintings)
     painting->marioIsUnder = (marioLocalPos[2] < 0.0f);
 
     // Mario "went under" if he was not under last frame, but is under now
@@ -651,28 +669,38 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
     Gfx *dlist = alloc_display_list((isObj ? 2 : 6) * sizeof(Gfx));
     Gfx *gfx = dlist;
 
+    // Only apply translation and rotation if those haven't already been applied by the parent object.
     if (!isObj) {
+        // Translation
         Mtx *translate = alloc_display_list(sizeof(Mtx));
         guTranslate(translate, painting->pos[0], painting->pos[1], painting->pos[2]);
-        gSPMatrix(gfx++, translate, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH  ));
+        gSPMatrix(gfx++, translate, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
+        // Pitch
         Mtx *rotX = alloc_display_list(sizeof(Mtx));
         guRotate(rotX, painting->rotation[0], 1.0f, 0.0f, 0.0f);
-        gSPMatrix(gfx++, rotX,      (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
+        gSPMatrix(gfx++, rotX, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
 
+        // Yaw
         Mtx *rotY = alloc_display_list(sizeof(Mtx));
         guRotate(rotY, painting->rotation[1], 0.0f, 1.0f, 0.0f);
-        gSPMatrix(gfx++, rotY,      (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
+        gSPMatrix(gfx++, rotY, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
 
+        // Roll
         Mtx *rotZ = alloc_display_list(sizeof(Mtx));
         guRotate(rotZ, painting->rotation[2], 0.0f, 0.0f, 1.0f);
-        gSPMatrix(gfx++, rotZ,      (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
+        gSPMatrix(gfx++, rotZ, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
     }
 
+    // Scale
     Mtx *scale = alloc_display_list(sizeof(Mtx));
     f32 sizeRatio = (painting->size / PAINTING_SIZE);
     guScale(scale, sizeRatio, sizeRatio, sizeRatio);
-    gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
+    if (isObj) {
+        gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
+    } else {
+        gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
+    }
 
     gSPEndDisplayList(gfx);
 
@@ -963,10 +991,13 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     struct Object *obj = gCurGraphNodeObjectNode;
     u8 isObj = (obj != NULL);
     if (isObj) {
+        // Use the object's behavior params for the painting group and id.
         gen->parameter = GET_BPARAM12(obj->oBehParams);
     }
     u8 group = ((gen->parameter >> 8) & 0xFF);
     u8 id    = ((gen->parameter >> 0) & 0xFF);
+
+    // Failsafe for nonexistent painting groups.
     if (group >= PAINTING_NUM_GROUPS) {
         return NULL;
     }
@@ -976,6 +1007,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     struct Painting *painting = segmented_to_virtual(paintingGroup[id]);
 
     if (isObj) {
+        // Use the object's position and rotation as the painting's position and rotation.
         vec3f_copy(painting->pos, &obj->oPosVec);
         painting->rotation[0] = angle_to_degrees(obj->oFaceAnglePitch);
         painting->rotation[1] = angle_to_degrees(obj->oFaceAngleYaw);
@@ -983,18 +1015,22 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     }
 
     if (callContext != GEO_CONTEXT_RENDER) {
+        // Reset the update counter
         gLastPaintingUpdateCounter = gAreaUpdateCounter - 1;
         gPaintingUpdateCounter = gAreaUpdateCounter;
 
         reset_painting(painting);
     } else if (callContext == GEO_CONTEXT_RENDER) {
+        // Reset the update counter
         gLastPaintingUpdateCounter = gPaintingUpdateCounter;
         gPaintingUpdateCounter = gAreaUpdateCounter;
 
+#if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
         // Update the ddd painting before drawing
         if (group == PAINTING_GROUP_INSIDE_CASTLE && id == PAINTING_ID_CASTLE_DDD) {
             move_ddd_painting(painting, 3456.0f, 5529.6f, 20.0f);
         }
+#endif
 
         // Determine if the painting is transparent
         if (painting->alpha == 0xFF) { // Opaque
@@ -1024,6 +1060,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     return paintingDlist;
 }
 
+// Backwards compatibility
 UNUSED Gfx *geo_painting_update(UNUSED s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     return NULL;
 }
@@ -1037,8 +1074,11 @@ s32 get_active_painting_id(void) {
 }
 
 void bhv_painting_init(void) {
+    // Get the painting group and id from the behavior params.
     u8 group = GET_BPARAM1(o->oBehParams);
     u8 id    = GET_BPARAM2(o->oBehParams);
+
+    // Failsafe for nonexistent painting groups.
     if (group >= PAINTING_NUM_GROUPS) {
         return;
     }
@@ -1049,15 +1089,17 @@ void bhv_painting_init(void) {
 
     Vec3f roomFloorCheckPos;
 
-    // The center of the painting with a 100.0f z offset
-    Vec3f distPos = { halfSize, halfSize, 100.0f };
+    // The center of the painting with a z offset since paintings are usually between floor triangles.
+    Vec3f distPos = { halfSize, halfSize, PAINTING_WOBBLE_DEPTH };
 
+    // Get the painting object's rotation.
     Vec3s rotation;
     vec3i_to_vec3s(rotation, &o->oFaceAngleVec);
 
-    // Set 'roomFloorCheckPos' to the center of the painting
+    // Set 'roomFloorCheckPos' to world space coords.
     vec3f_local_pos_to_world_pos(roomFloorCheckPos, distPos, &o->oPosVec, rotation);
 
+    // Set the object's room so that paintings only render in their room.
     o->oRoom = get_room_at_pos(roomFloorCheckPos[0],
                                roomFloorCheckPos[1],
                                roomFloorCheckPos[2]);

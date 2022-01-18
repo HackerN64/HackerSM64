@@ -7,22 +7,34 @@
 #include "macros.h"
 #include "types.h"
 
-/// Use to properly set a GraphNodeGenerated's parameter to point to the right painting
+/// Use to properly set a GraphNodeGenerated's parameter to point to the right painting.
+/// Use this for both bparam1 and bparam2 for painting objects.
 #define PAINTING_ID(id, grp) (id | (grp << 8))
 
-/// The default painting side length
+/// The default painting side length.
 #define PAINTING_SIZE 614.0f
 
-#define PAINTING_OBJECT_DEPTH PAINTING_SIZE
+/// The depth of the area in front of the painting which triggers ripples without warping.
+#define PAINTING_WOBBLE_DEPTH 100.0f
 
-#define PAINTING_OBJECT_MARGIN (PAINTING_SIZE / 2)
+/// The depth of the area behind the painting which triggers the warp.
+#define PAINTING_WARP_DEPTH PAINTING_SIZE
 
+/// The space around the edges in which Mario is still considered within painting bounds.
+#define PAINTING_EDGE_MARGIN (PAINTING_SIZE / 2)
+
+/// This is added to Mario's Y position to make the ripple closer to Mario's center of mass.
 #define PAINTING_MARIO_Y_OFFSET 50.0f
 
+/// 'get_active_painting_id' returns this when Mario isn't in a painting's warp zone.
+#define PAINTING_ID_NULL -1
+
+// HMC painting group
 enum HMCPaintingIDs {
     /*0x0*/ PAINTING_ID_HMC_COTMC,
 };
 
+// Inside Castle painting group
 enum CastlePaintingIDs {
     /*0x0*/ PAINTING_ID_CASTLE_BOB,
     /*0x1*/ PAINTING_ID_CASTLE_CCM,
@@ -41,12 +53,12 @@ enum CastlePaintingIDs {
     /*0xE*/ PAINTING_ID_CASTLE_RR,
 };
 
+// TTM painting group
 enum TTMPaintingIDs {
     /*0x0*/ PAINTING_ID_TTM_SLIDE,
 };
 
-#define PAINTING_ID_NULL -1
-
+// Painting group ids
 enum PaintingGroups {
     PAINTING_GROUP_HMC,
     PAINTING_GROUP_INSIDE_CASTLE,
@@ -55,23 +67,27 @@ enum PaintingGroups {
     PAINTING_GROUP_NULL = -1,
 };
 
+// gDddPaintingStatus
 enum DDDPaintingFlags {
     DDD_FLAGS_NONE              = (0 << 0), // 0x0
     DDD_FLAG_BACK               = (1 << 0), // 0x1
     DDD_FLAG_BOWSERS_SUB_BEATEN = (1 << 1), // 0x2
 };
 
+// Painting->state
 enum PaintingState {
     PAINTING_IDLE,
     PAINTING_RIPPLE,
     PAINTING_ENTERED,
 };
 
+// Painting->rippleTrigger
 enum RippleTriggers {
     RIPPLE_TRIGGER_PROXIMITY,
     RIPPLE_TRIGGER_CONTINUOUS,
 };
 
+// Painting->lastFloor, Painting->currFloor, Painting->floorEntered
 enum PaintingRippleFlags {
     // Not rippling.
     RIPPLE_FLAGS_NONE  = (0 << 0), // 0x00
@@ -95,6 +111,7 @@ enum PaintingYSources {
     MIDDLE_Y,
 };
 
+// Painting->textureType
 enum PaintingType {
     /// Painting that uses 1 or more images as a texture
     PAINTING_IMAGE,
