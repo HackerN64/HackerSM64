@@ -181,7 +181,7 @@ static void chain_chomp_sub_act_lunge(void) {
             o->oChainChompSignedMaxDistBetweenChainParts = 30.0f;
         }
 
-        // // TODO: What is this
+        // // TODO: What is this?
         // if ((val04 = (900.0f - o->oChainChompDistToPivot)) > 220.0f) {
         //     val04 = 220.0f;
         // }

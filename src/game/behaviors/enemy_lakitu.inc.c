@@ -2,7 +2,7 @@
 /**
  * Behavior for bhvEnemyLakitu.
  * Lakitu comes before it spawned spinies in processing order.
- * TODO: bhvCloud processing oredr
+ * TODO: bhvCloud processing order
  */
 
 /**
