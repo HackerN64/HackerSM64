@@ -161,8 +161,7 @@ void stop_other_paintings(PaintingData *idptr, struct Painting *paintingGroup[])
  * @param xSource,ySource what to use for the x and y origin of the ripple
  * @param resetTimer if TRUE, set the timer to 0
  */
-void painting_state(s8 state, struct Painting *painting, struct Painting *paintingGroup[],
-                    s8 xSource, s8 ySource, s8 resetTimer) {
+void painting_state(s32 state, struct Painting *painting, struct Painting *paintingGroup[], s8 centerRipples, s8 resetTimer) {
     // make sure no other paintings are rippling
     stop_other_paintings(&painting->id, paintingGroup);
 
@@ -186,8 +185,14 @@ void painting_state(s8 state, struct Painting *painting, struct Painting *painti
     painting->state = state;
 
     // Set the ripple position
-    painting->rippleX = (xSource == MIDDLE_X) ? (painting->size * 0.5f) : painting->marioLocalPos[0];
-    painting->rippleY = (ySource == MIDDLE_Y) ? (painting->size * 0.5f) : painting->marioLocalPos[1];
+    if (centerRipples) {
+        f32 centerPos = (painting->size * 0.5f);
+        painting->rippleX = centerPos;
+        painting->rippleY = centerPos;
+    } else {
+        painting->rippleX = painting->marioLocalPos[0];
+        painting->rippleY = painting->marioLocalPos[1];
+    }
 
     // Set Mario's Y position for the WDW water level
     gPaintingMarioYEntry = gMarioObject->oPosY;
@@ -205,11 +210,11 @@ void painting_state(s8 state, struct Painting *painting, struct Painting *painti
 void wall_painting_proximity_idle(struct Painting *painting, struct Painting *paintingGroup[]) {
     // Check for Mario triggering a ripple
     if (painting->floorEntered & RIPPLE_FLAG_RIPPLE) {
-        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Y, TRUE);
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, FALSE, TRUE);
 
     // Check for Mario entering
     } else if (painting->floorEntered & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Y, TRUE);
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
     }
 }
 
@@ -218,7 +223,7 @@ void wall_painting_proximity_idle(struct Painting *painting, struct Painting *pa
  */
 void wall_painting_proximity_rippling(struct Painting *painting, struct Painting *paintingGroup[]) {
     if (painting->floorEntered & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Y, TRUE);
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
     }
 }
 
@@ -228,9 +233,9 @@ void wall_painting_proximity_rippling(struct Painting *painting, struct Painting
 void wall_painting_continuous_idle(struct Painting *painting, struct Painting *paintingGroup[]) {
     // Check for Mario entering
     if (painting->floorEntered & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Y, TRUE);
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
     } else {
-        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, TRUE);
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, TRUE, TRUE);
     }
 }
 
@@ -239,7 +244,7 @@ void wall_painting_continuous_idle(struct Painting *painting, struct Painting *p
  */
 void wall_painting_continuous_rippling(struct Painting *painting, struct Painting *paintingGroup[]) {
     if (painting->floorEntered & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Y, FALSE);
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, FALSE);
     }
 }
 
@@ -251,11 +256,11 @@ void wall_painting_continuous_rippling(struct Painting *painting, struct Paintin
 void floor_painting_proximity_idle(struct Painting *painting, struct Painting *paintingGroup[]) {
     // Check for Mario triggering a ripple
     if (painting->floorEntered & RIPPLE_FLAG_RIPPLE) {
-        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MARIO_X, MARIO_Y, TRUE);
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, FALSE, TRUE);
 
     // Only check for Mario entering if he jumped below the surface
     } else if (painting->marioWentUnder && (painting->currFloor & RIPPLE_FLAG_ENTER)) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Y, TRUE);
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
     }
 }
 
@@ -266,7 +271,7 @@ void floor_painting_proximity_idle(struct Painting *painting, struct Painting *p
  */
 void floor_painting_proximity_rippling(struct Painting *painting, struct Painting *paintingGroup[]) {
     if (painting->marioWentUnder && (painting->currFloor & RIPPLE_FLAG_ENTER)) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Y, TRUE);
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
     }
 }
 
@@ -280,9 +285,9 @@ void floor_painting_proximity_rippling(struct Painting *painting, struct Paintin
 void floor_painting_continuous_idle(struct Painting *painting, struct Painting *paintingGroup[]) {
     // Check for Mario entering
     if (painting->currFloor & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Y, TRUE);
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
     } else {
-        painting_state(PAINTING_RIPPLE, painting, paintingGroup, MIDDLE_X, MIDDLE_Y, TRUE);
+        painting_state(PAINTING_RIPPLE, painting, paintingGroup, TRUE, TRUE);
     }
 }
 
@@ -291,7 +296,7 @@ void floor_painting_continuous_idle(struct Painting *painting, struct Painting *
  */
 void floor_painting_continuous_rippling(struct Painting *painting, struct Painting *paintingGroup[]) {
     if (painting->marioWentUnder && (painting->currFloor & RIPPLE_FLAG_ENTER)) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, MARIO_X, MARIO_Y, FALSE);
+        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, FALSE);
     }
 }
 
@@ -1032,6 +1037,9 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         }
 #endif
 
+        // Update the painting
+        painting_update_floors(painting);
+
         // Determine if the painting is transparent
         if (painting->alpha == 0xFF) { // Opaque
             SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_OPAQUE);
@@ -1045,9 +1053,6 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         } else {
             paintingDlist = display_painting_rippling(painting);
         }
-
-        // Update the painting
-        painting_update_floors(painting);
 
         // Only paintings with 0 pitch are treated as walls
         if (FLT_IS_NONZERO(painting->rotation[0])) {
