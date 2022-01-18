@@ -95,22 +95,18 @@ void bhv_door_init(void) {
     f32 x = o->oPosX;
     f32 y = o->oPosY;
     f32 z = o->oPosZ;
-    struct Surface *floor;
 
-    find_room_floor(x, y, z, &floor);
-    if (floor != NULL) o->oDoorSelfRoom = floor->room;
+    o->oDoorSelfRoom = get_room_at_pos(x, y, z);
 
     x = o->oPosX + sins(o->oMoveAngleYaw) *  200.0f;
     z = o->oPosZ + coss(o->oMoveAngleYaw) *  200.0f;
 
-    find_room_floor(x, y, z, &floor);
-    if (floor != NULL) o->oDoorForwardRoom = floor->room;
+    o->oDoorForwardRoom = get_room_at_pos(x, y, z);
 
     x = o->oPosX + sins(o->oMoveAngleYaw) * -200.0f;
     z = o->oPosZ + coss(o->oMoveAngleYaw) * -200.0f;
 
-    find_room_floor(x, y, z, &floor);
-    if (floor != NULL) o->oDoorBackwardRoom = floor->room;
+    o->oDoorBackwardRoom = get_room_at_pos(x, y, z);
 
     if (o->oDoorSelfRoom > 0 && o->oDoorSelfRoom < 60) {
         gDoorAdjacentRooms[o->oDoorSelfRoom][0] = o->oDoorForwardRoom;

@@ -1058,16 +1058,9 @@ void bhv_painting_init(void) {
     // Set 'roomFloorCheckPos' to the center of the painting
     vec3f_local_pos_to_world_pos(roomFloorCheckPos, distPos, &o->oPosVec, rotation);
 
-    struct Surface *floor;
-
-    find_room_floor(roomFloorCheckPos[0],
-                    roomFloorCheckPos[1],
-                    roomFloorCheckPos[2],
-                    &floor);
-
-    if (floor != NULL) {
-        o->oRoom = floor->room;
-    }
+    o->oRoom = get_room_at_pos(roomFloorCheckPos[0],
+                               roomFloorCheckPos[1],
+                               roomFloorCheckPos[2]);
 }
 
 void bhv_painting_loop(void) {
