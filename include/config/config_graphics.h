@@ -44,6 +44,9 @@
 // using 64 vertex sizes, offered by Fast64 in the microcode menu.
 // #define OBJECTS_REJ
 
+// Culls objects which are out of view vertically (the game already does this horizontally).
+// #define VERTICAL_CULLING
+
 /**
  * Mario's silhouette when behind solid objects/surfaces.
  * Also enables new render layers, such as LAYER_ALPHA_DECAL.

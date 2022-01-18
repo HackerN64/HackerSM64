@@ -983,6 +983,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
 s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
+    // Don't render if the object is invisible.
     if (node->node.flags & GRAPH_RENDER_INVISIBLE) {
         return FALSE;
     }
@@ -997,7 +998,7 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
         cullingRadius = 300;
     }
 
-    // Don't render if the object is close to or behind the camera
+    // Don't render if the object is close to or behind the camera.
     if (matrix[3][2] > -100.0f + cullingRadius) {
         return FALSE;
     }
@@ -1023,13 +1024,16 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     // HackerSM64: This multiplication is done regardless of aspect ratio to fix object pop-in on the edges of the screen (which happens at 4:3 too)
     // hScreenEdge *= GFX_DIMENSIONS_ASPECT_RATIO;
 
+    // The edges of the view
+    f32 max = ( hScreenEdge + cullingRadius);
+    f32 min = (-hScreenEdge - cullingRadius);
+
     // Check whether the object is horizontally in view
-    if (matrix[3][0] > hScreenEdge + cullingRadius) {
-        return FALSE;
-    }
-    if (matrix[3][0] < -hScreenEdge - cullingRadius) {
-        return FALSE;
-    }
+    if (matrix[3][0] > max || matrix[3][0] < min) return FALSE;
+#ifdef VERTICAL_CULLING
+    // Check whether the object is vertically in view
+    if (matrix[3][1] > max || matrix[3][1] < min) return FALSE;
+#endif
 
     return TRUE;
 }
