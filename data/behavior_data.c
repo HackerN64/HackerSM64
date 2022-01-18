@@ -914,7 +914,7 @@ const BehaviorScript bhvSpawnedStar[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INT(oBehParams2ndByte, SPAWN_STAR_POS_CUTSCENE_BP_SPAWN_AT_HOME),
-    GOTO(bhvSpawnedStarNoLevelExit + 1 + 1),
+    GOTO(bhvSpawnedStarNoLevelExit + 1 + 2),
 };
 
 const BehaviorScript bhvSpawnedStarNoLevelExit[] = {
@@ -1125,7 +1125,7 @@ const BehaviorScript bhvTriangleParticleSpawner[] = {
 const BehaviorScript bhvDoorWarp[] = {
     BEGIN(OBJ_LIST_SURFACE),
     SET_INT(oInteractType, INTERACT_WARP_DOOR),
-    GOTO(bhvDoor + 1 + 1),
+    GOTO(bhvDoor + 1 + 2),
 };
 
 const BehaviorScript bhvDoor[] = {
@@ -2252,7 +2252,7 @@ const BehaviorScript bhvMoatGrills[] = {
 const BehaviorScript bhvClockMinuteHand[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     SET_INT(oAngleVelRoll, -0x180),
-    GOTO(bhvClockHourHand + 1 + 1),
+    GOTO(bhvClockHourHand + 1 + 2),
 };
 
 const BehaviorScript bhvClockHourHand[] = {
@@ -3225,7 +3225,7 @@ const BehaviorScript bhvWhompKingBoss[] = {
     BEGIN(OBJ_LIST_SURFACE),
     SET_INT(oBehParams2ndByte, WHOMP_BP_KING),
     SET_INT(oHealth, 3),
-    GOTO(bhvSmallWhomp + 1 + 1),
+    GOTO(bhvSmallWhomp + 1 + 2),
 };
 
 const BehaviorScript bhvSmallWhomp[] = {
@@ -3368,7 +3368,7 @@ const BehaviorScript bhvShallowWaterSplash[] = {
 const BehaviorScript bhvObjectWaveTrail[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    GOTO(bhvWaveTrail + 1 + 1 + 2), // Wave trail - common
+    GOTO(bhvWaveTrail + 1 + 2 + 2), // Wave trail - common
 };
 
 // The waves created by Mario while he is swimming.
@@ -3716,6 +3716,7 @@ const BehaviorScript bhvBobombBuddy[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_INT(oBobombBuddyRole, 0),
+    // Bob-omb Buddy - common:
     LOAD_ANIMATIONS(oAnimations, bobomb_seg8_anims_0802396C),
     SET_INTERACT_TYPE(INTERACT_TEXT),
     DROP_TO_FLOOR(),
@@ -3733,7 +3734,7 @@ const BehaviorScript bhvBobombBuddyOpensCannon[] = {
     BEGIN(OBJ_LIST_GENACTOR),
     OR_INT(oFlags, (OBJ_FLAG_PERSISTENT_RESPAWN | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_HOLDABLE | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     SET_INT(oBobombBuddyRole, 1),
-    GOTO(bhvBobombBuddy + 1 + 2),
+    GOTO(bhvBobombBuddy + 1 + 2 + 2),
 };
 
 const BehaviorScript bhvCannonClosed[] = {

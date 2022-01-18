@@ -511,7 +511,7 @@ static s32 bhv_cmd_drop_to_floor(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// Command 0x18: No operation. Unused.
+// Command 0x18: Adds an integer to the specified field.
 // Usage: ADD_INT(field)
 static s32 bhv_cmd_add_int(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
@@ -523,7 +523,7 @@ static s32 bhv_cmd_add_int(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// Command 0x1A: No operation. Unused.
+// Command 0x1A: Performs a bitwise OR with the specified field and the given integer.
 // Usage: OR_INT(field)
 static s32 bhv_cmd_or_int(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
@@ -535,7 +535,7 @@ static s32 bhv_cmd_or_int(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// Command 0x19: No operation. Unused.
+// Command 0x19: Sets the specified field to an integer.
 // Usage: SET_INT(field)
 static s32 bhv_cmd_set_int(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
