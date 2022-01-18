@@ -567,7 +567,7 @@ s32 act_ledge_grab(struct MarioState *m) {
         m->actionTimer++;
     }
 #ifdef LEDGE_GRABS_CHECK_SLOPE_ANGLE
-    if (m->floor->normal.y < COS25) {
+    if (m->floor != NULL && m->floor->normal.y < COS25) {
         return let_go_of_ledge(m);
     }
 #endif

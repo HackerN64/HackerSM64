@@ -19,7 +19,7 @@
 
 s32 check_common_idle_cancels(struct MarioState *m) {
     mario_drop_held_object(m);
-    if (m->floor->normal.y < COS73) {
+    if (m->floor != NULL && m->floor->normal.y < COS73) {
         return mario_push_off_steep_floor(m, ACT_FREEFALL, 0);
     }
 
@@ -60,7 +60,7 @@ s32 check_common_idle_cancels(struct MarioState *m) {
 }
 
 s32 check_common_hold_idle_cancels(struct MarioState *m) {
-    if (m->floor->normal.y < COS73) {
+    if (m->floor != NULL && m->floor->normal.y < COS73) {
         return mario_push_off_steep_floor(m, ACT_HOLD_FREEFALL, 0);
     }
 
@@ -161,7 +161,9 @@ s32 act_idle(struct MarioState *m) {
                 m->actionState = ACT_STATE_IDLE_HEAD_LEFT;
 #else
                 f32 deltaYOfFloorBehindMario = m->pos[1] - find_floor_height_relative_polar(m, -0x8000, 60.0f);
-                if (deltaYOfFloorBehindMario < -24.0f || 24.0f < deltaYOfFloorBehindMario || m->floor->flags & SURFACE_FLAG_DYNAMIC) {
+                if (deltaYOfFloorBehindMario < -24.0f
+                 || 24.0f < deltaYOfFloorBehindMario
+                 || (m->floor != NULL && (m->floor->flags & SURFACE_FLAG_DYNAMIC))) {
                     m->actionState = ACT_STATE_IDLE_HEAD_LEFT;
                 } else {
                     // If Mario hasn't turned his head 10 times yet, stay idle instead of going to sleep.
@@ -1040,9 +1042,9 @@ s32 act_first_person(struct MarioState *m) {
     }
 
 #ifdef UNLOCK_ALL
-    if (m->floor->type == SURFACE_LOOK_UP_WARP) {
+    if (m->floor != NULL && m->floor->type == SURFACE_LOOK_UP_WARP) {
 #else
-    if (m->floor->type == SURFACE_LOOK_UP_WARP
+    if (m->floor != NULL && m->floor->type == SURFACE_LOOK_UP_WARP
         && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX)) >= 10) {
 #endif
         s16 headRX = m->statusForCamera->headRotation[0];

@@ -148,8 +148,12 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     s16 facingDYaw;
 
     struct Surface *floor = m->floor;
-    s16 slopeAngle = atan2s(floor->normal.z, floor->normal.x);
-    f32 steepness = sqrtf(floor->normal.x * floor->normal.x + floor->normal.z * floor->normal.z);
+    s16 slopeAngle = 0x0;
+    f32 steepness = 0.0f;
+    if (floor != NULL) {
+        slopeAngle = atan2s(floor->normal.z, floor->normal.x);
+        steepness = sqrtf(sqr(floor->normal.x) + sqr(floor->normal.z));
+    }
 
     m->slideVelX += accel * steepness * sins(slopeAngle);
     m->slideVelZ += accel * steepness * coss(slopeAngle);
@@ -269,7 +273,10 @@ void apply_slope_accel(struct MarioState *m) {
     f32 slopeAccel;
 
     struct Surface *floor = m->floor;
-    f32 steepness = sqrtf(sqr(floor->normal.x) + sqr(floor->normal.z));
+    f32 steepness = 0.0f;
+    if (floor != NULL) {
+        steepness = sqrtf(sqr(floor->normal.x) + sqr(floor->normal.z));
+    }
 
     s16 floorDYaw = abs_angle_diff(m->floorYaw, m->faceAngle[1]);
 
@@ -335,7 +342,7 @@ void update_shell_speed(struct MarioState *m) {
     f32 maxTargetSpeed;
     f32 targetSpeed;
 
-    if (m->floorHeight < m->waterLevel) {
+    if (m->floor != NULL && m->floorHeight < m->waterLevel) {
         set_mario_floor(m, &gWaterSurfacePseudoFloor, m->waterLevel);
         m->floor->originOffset = -m->waterLevel;
         // m->floor->originOffset = m->waterLevel; //! (Original code) Negative origin offset
@@ -358,8 +365,8 @@ void update_shell_speed(struct MarioState *m) {
     if (m->forwardVel <= 0.0f) {
         m->forwardVel += 1.1f;
     } else if (m->forwardVel <= targetSpeed) {
-        m->forwardVel += 1.1f - m->forwardVel / 58.0f;
-    } else if (m->floor->normal.y >= 0.95f) {
+        m->forwardVel += 1.1f - (m->forwardVel / 58.0f);
+    } else if (m->floor != NULL && m->floor->normal.y >= 0.95f) {
         m->forwardVel -= 1.0f;
     }
 
@@ -436,8 +443,8 @@ void update_walking_speed(struct MarioState *m) {
         m->forwardVel += 1.1f;
     } else if (m->forwardVel <= targetSpeed) {
         // If accelerating
-        m->forwardVel += 1.1f - m->forwardVel / 43.0f;
-    } else if (m->floor->normal.y >= 0.95f) {
+        m->forwardVel += 1.1f - (m->forwardVel / 43.0f);
+    } else if (m->floor != NULL && m->floor->normal.y >= 0.95f) {
         m->forwardVel -= 1.0f;
     }
 
@@ -505,7 +512,7 @@ s32 begin_braking_action(struct MarioState *m) {
         return set_mario_action(m, ACT_STANDING_AGAINST_WALL, 0);
     }
 
-    if (m->forwardVel >= 16.0f && m->floor->normal.y >= COS80) {
+    if (m->forwardVel >= 16.0f && m->floor != NULL && m->floor->normal.y >= COS80) {
         return set_mario_action(m, ACT_BRAKING, 0);
     }
 
@@ -1226,7 +1233,7 @@ s32 act_riding_shell_ground(struct MarioState *m) {
     }
 
     tilt_body_ground_shell(m, startYaw);
-    if (m->floor->type == SURFACE_BURNING) {
+    if (m->floor != NULL && m->floor->type == SURFACE_BURNING) {
         play_sound(SOUND_MOVING_RIDING_SHELL_LAVA, m->marioObj->header.gfx.cameraToObject);
     } else {
         play_sound(SOUND_MOVING_TERRAIN_RIDING_SHELL + m->terrainSoundAddend,
@@ -1722,8 +1729,10 @@ u32 common_landing_action(struct MarioState *m, s16 animation, u32 airAction) {
     set_mario_animation(m, animation);
     play_mario_landing_sound_once(m, SOUND_ACTION_TERRAIN_LANDING);
 
-    if (m->floor->type >= SURFACE_SHALLOW_QUICKSAND && m->floor->type <= SURFACE_MOVING_QUICKSAND) {
-        m->quicksandDepth += (4 - m->actionTimer) * 3.5f - 0.5f;
+    if (m->floor != NULL
+     && m->floor->type >= SURFACE_SHALLOW_QUICKSAND
+     && m->floor->type <= SURFACE_MOVING_QUICKSAND) {
+        m->quicksandDepth += ((4 - m->actionTimer) * 3.5f) - 0.5f;
     }
 
     return stepResult;
@@ -1734,7 +1743,7 @@ s32 common_landing_cancels(struct MarioState *m, struct LandingAction *landingAc
     //! Everything here, including floor steepness, is checked before checking
     // if Mario is actually on the floor. This leads to e.g. remote sliding.
 
-    if (m->floor->normal.y < COS73) {
+    if (m->floor != NULL && m->floor->normal.y < COS73) {
         return mario_push_off_steep_floor(m, landingAction->verySteepAction, 0);
     }
 

@@ -815,7 +815,7 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
 
         if (m->action & ACT_FLAG_AIR) {
 #ifdef MIDAIR_STAR_DANCE
-            if ((m->pos[1] > m->floorHeight + 1024.0f) || SURFACE_IS_UNSAFE(m->floor->type)) {
+            if ((m->pos[1] > m->floorHeight + 1024.0f) || (m->floor != NULL && SURFACE_IS_UNSAFE(m->floor->type))) {
                 starGrabAction = ACT_STAR_DANCE_WATER;
             } else {
                 starGrabAction = ACT_FALL_AFTER_STAR_GRAB;

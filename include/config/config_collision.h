@@ -38,3 +38,6 @@
 
 // The radius of Mario's collision when checking for walls.
 #define MARIO_COLLISION_RADIUS 50
+
+// Allow Mario to be in OOB areas.
+// #define ALLOW_OOB

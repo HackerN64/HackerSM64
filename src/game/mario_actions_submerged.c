@@ -124,7 +124,7 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
     f32 distance, strength;
     s16 pitchToWhirlpool, yawToWhirlpool;
 
-    if (m->floor->type == SURFACE_FLOWING_WATER) {
+    if (m->floor != NULL && m->floor->type == SURFACE_FLOWING_WATER) {
         s16 currentAngle = m->floor->force << 8;
         f32 currentSpeed = sWaterCurrentSpeeds[m->floor->force >> 8];
 
@@ -1128,8 +1128,8 @@ static void update_metal_water_walking_speed(struct MarioState *m) {
     if (m->forwardVel <= 0.0f) {
         m->forwardVel += 1.1f;
     } else if (m->forwardVel <= targetSpeed) {
-        m->forwardVel += 1.1f - m->forwardVel / 43.0f;
-    } else if (m->floor->normal.y >= 0.95f) {
+        m->forwardVel += 1.1f - (m->forwardVel / 43.0f);
+    } else if (m->floor != NULL && m->floor->normal.y >= 0.95f) {
         m->forwardVel -= 1.0f;
     }
 

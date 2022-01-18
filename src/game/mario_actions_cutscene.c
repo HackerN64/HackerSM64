@@ -518,8 +518,14 @@ s32 act_debug_free_move(struct MarioState *m) {
     Vec3f pos;
 
     f32 speed = (gPlayer1Controller->buttonDown & B_BUTTON) ? 4.0f : 1.0f;
-    if (gPlayer1Controller->buttonDown & Z_TRIG) speed = 0.01f;
-    if (m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+
+    if (gPlayer1Controller->buttonDown & Z_TRIG) {
+        speed = 0.01f;
+    }
+
+    if (m->area->camera->mode != CAMERA_MODE_8_DIRECTIONS) {
+        set_camera_mode(m->area->camera, CAMERA_MODE_8_DIRECTIONS, 1);
+    }
 
     set_mario_animation(m, MARIO_ANIM_A_POSE);
     vec3f_copy(pos, m->pos);
@@ -555,14 +561,18 @@ s32 act_debug_free_move(struct MarioState *m) {
     }
 
     // TODO: Add ability to ignore collision
-    //      - spawn pseudo floor object to prevent OOB death
+    //      - spawn pseudo floor object to prevent OOB death or make ALLOW_OOB a variable
     resolve_and_return_wall_collisions(pos, 60.0f, MARIO_COLLISION_RADIUS, &wallData);
 
     set_mario_wall(m, ((wallData.numWalls > 0) ? wallData.walls[0] : NULL));
     f32 floorHeight = find_floor(pos[0], pos[1], pos[2], &floor);
     f32 ceilHeight = find_mario_ceil(pos, floorHeight, &ceil);
 
-    if (floor == NULL) return FALSE;
+#ifndef ALLOW_OOB
+    if (floor == NULL) {
+        return FALSE;
+    }
+#endif
 
     if ((ceilHeight - floorHeight) >= MARIO_HITBOX_HEIGHT) {
         if (floor != NULL && pos[1] < floorHeight) {
@@ -2634,8 +2644,10 @@ static s32 act_end_waving_cutscene(struct MarioState *m) {
 }
 
 static s32 check_for_instant_quicksand(struct MarioState *m) {
-    if (m->floor->type == SURFACE_INSTANT_QUICKSAND && m->action & ACT_FLAG_INVULNERABLE
-        && m->action != ACT_QUICKSAND_DEATH) {
+    if (m->floor != NULL
+     && m->floor->type == SURFACE_INSTANT_QUICKSAND
+     && (m->action & ACT_FLAG_INVULNERABLE)
+     && m->action != ACT_QUICKSAND_DEATH) {
         update_mario_sound_and_camera(m);
         return drop_and_set_mario_action(m, ACT_QUICKSAND_DEATH, 0);
     }

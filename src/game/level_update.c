@@ -499,7 +499,7 @@ void warp_credits(void) {
 
 void check_instant_warp(void) {
     s16 cameraAngle;
-    struct Surface *floor;
+    struct Surface *floor = gMarioState->floor;
 
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
  #ifdef UNLOCK_ALL
@@ -512,7 +512,7 @@ void check_instant_warp(void) {
     }
 #endif // ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
-    if ((floor = gMarioState->floor) != NULL) {
+    if (floor != NULL) {
         s32 index = floor->type - SURFACE_INSTANT_WARP_1B;
         if (index >= INSTANT_WARP_INDEX_START && index < INSTANT_WARP_INDEX_STOP
             && gCurrentArea->instantWarps != NULL) {
