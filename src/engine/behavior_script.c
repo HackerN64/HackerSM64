@@ -25,6 +25,7 @@
 #define BHV_CMD_GET_1ST_S16(index) (s16)(gCurBhvCommand[index] >> 16)
 #define BHV_CMD_GET_2ND_S16(index) (s16)(gCurBhvCommand[index] & 0xFFFF)
 
+#define BHV_CMD_GET_S32(index)     (s32)(gCurBhvCommand[index])
 #define BHV_CMD_GET_U32(index)     (u32)(gCurBhvCommand[index])
 #define BHV_CMD_GET_VPTR(index)    (void *)(gCurBhvCommand[index])
 
@@ -336,9 +337,9 @@ static s32 bhv_cmd_set_float(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// Command 0x10: Sets the specified field to an integer.
-// Usage: SET_INT(field, value)
-static s32 bhv_cmd_set_int(void) {
+// Command 0x10: Sets the specified field to a short.
+// Usage: SET_SHORT(field, value)
+static s32 bhv_cmd_set_short(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
     s16 value = BHV_CMD_GET_2ND_S16(0);
 
@@ -437,9 +438,9 @@ static s32 bhv_cmd_add_float(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// Command 0x0F: Adds an integer to the specified field.
-// Usage: ADD_INT(field, value)
-static s32 bhv_cmd_add_int(void) {
+// Command 0x0F: Adds a short to the specified field.
+// Usage: ADD_SHORT(field, value)
+static s32 bhv_cmd_add_short(void) {
     u8 field = BHV_CMD_GET_2ND_U8(0);
     s16 value = BHV_CMD_GET_2ND_S16(0);
 
@@ -449,15 +450,15 @@ static s32 bhv_cmd_add_int(void) {
     return BHV_PROC_CONTINUE;
 }
 
-// Command 0x11: Performs a bitwise OR with the specified field and the given integer.
+// Command 0x11: Performs a bitwise OR with the specified field and the given short.
 // Usually used to set an object's flags.
-// Usage: OR_INT(field, value)
-static s32 bhv_cmd_or_int(void) {
-    u8 objectOffset = BHV_CMD_GET_2ND_U8(0);
+// Usage: OR_SHORT(field, value)
+static s32 bhv_cmd_or_short(void) {
+    u8 field = BHV_CMD_GET_2ND_U8(0);
     s32 value = BHV_CMD_GET_2ND_S16(0);
 
     value &= 0xFFFF;
-    cur_obj_or_int(objectOffset, value);
+    cur_obj_or_int(field, value);
 
     gCurBhvCommand++;
     return BHV_PROC_CONTINUE;
@@ -511,29 +512,38 @@ static s32 bhv_cmd_drop_to_floor(void) {
 }
 
 // Command 0x18: No operation. Unused.
-// Usage: CMD_NOP_1(field)
-static s32 bhv_cmd_nop_1(void) {
-    UNUSED u8 field = BHV_CMD_GET_2ND_U8(0);
+// Usage: ADD_INT(field)
+static s32 bhv_cmd_add_int(void) {
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    s32 value = BHV_CMD_GET_S32(1);
 
-    gCurBhvCommand++;
+    cur_obj_add_int(field, value);
+
+    gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
 }
 
 // Command 0x1A: No operation. Unused.
-// Usage: CMD_NOP_3(field)
-static s32 bhv_cmd_nop_3(void) {
-    UNUSED u8 field = BHV_CMD_GET_2ND_U8(0);
+// Usage: OR_INT(field)
+static s32 bhv_cmd_or_int(void) {
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    s32 value = BHV_CMD_GET_S32(1);
 
-    gCurBhvCommand++;
+    cur_obj_or_int(field, value);
+
+    gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
 }
 
 // Command 0x19: No operation. Unused.
-// Usage: CMD_NOP_2(field)
-static s32 bhv_cmd_nop_2(void) {
-    UNUSED u8 field = BHV_CMD_GET_2ND_U8(0);
+// Usage: SET_INT(field)
+static s32 bhv_cmd_set_int(void) {
+    u8 field = BHV_CMD_GET_2ND_U8(0);
+    s32 value = BHV_CMD_GET_S32(1);
 
-    gCurBhvCommand++;
+    cur_obj_set_int(field, value);
+
+    gCurBhvCommand += 2;
     return BHV_PROC_CONTINUE;
 }
 
@@ -770,18 +780,18 @@ static BhvCommandProc BehaviorCmdTable[] = {
     /*BHV_CMD_CALL_NATIVE           */ bhv_cmd_call_native,
     /*BHV_CMD_ADD_FLOAT             */ bhv_cmd_add_float,
     /*BHV_CMD_SET_FLOAT             */ bhv_cmd_set_float,
-    /*BHV_CMD_ADD_INT               */ bhv_cmd_add_int,
-    /*BHV_CMD_SET_INT               */ bhv_cmd_set_int,
-    /*BHV_CMD_OR_INT                */ bhv_cmd_or_int,
+    /*BHV_CMD_ADD_SHORT             */ bhv_cmd_add_short,
+    /*BHV_CMD_SET_SHORT             */ bhv_cmd_set_short,
+    /*BHV_CMD_OR_SHORT              */ bhv_cmd_or_short,
     /*BHV_CMD_BIT_CLEAR             */ bhv_cmd_bit_clear,
     /*BHV_CMD_SET_INT_RAND_RSHIFT   */ bhv_cmd_set_int_rand_rshift,
     /*BHV_CMD_SET_RANDOM_FLOAT      */ bhv_cmd_set_random_float,
     /*BHV_CMD_SET_RANDOM_INT        */ bhv_cmd_set_random_int,
     /*BHV_CMD_ADD_RANDOM_FLOAT      */ bhv_cmd_add_random_float,
     /*BHV_CMD_ADD_INT_RAND_RSHIFT   */ bhv_cmd_add_int_rand_rshift,
-    /*BHV_CMD_NOP_1                 */ bhv_cmd_nop_1,
-    /*BHV_CMD_NOP_2                 */ bhv_cmd_nop_2,
-    /*BHV_CMD_NOP_3                 */ bhv_cmd_nop_3,
+    /*BHV_CMD_ADD_INT               */ bhv_cmd_add_int,
+    /*BHV_CMD_SET_INT               */ bhv_cmd_set_int,
+    /*BHV_CMD_OR_INT                */ bhv_cmd_or_int,
     /*BHV_CMD_SET_MODEL             */ bhv_cmd_set_model,
     /*BHV_CMD_SPAWN_CHILD           */ bhv_cmd_spawn_child,
     /*BHV_CMD_DEACTIVATE            */ bhv_cmd_deactivate,
