@@ -205,102 +205,6 @@ void painting_state(s32 state, struct Painting *painting, struct Painting *paint
 }
 
 /**
- * Idle update function for wall paintings that use RIPPLE_TRIGGER_PROXIMITY.
- */
-void wall_painting_proximity_idle(struct Painting *painting, struct Painting *paintingGroup[]) {
-    // Check for Mario triggering a ripple
-    if (painting->floorEntered & RIPPLE_FLAG_RIPPLE) {
-        painting_state(PAINTING_RIPPLE, painting, paintingGroup, FALSE, TRUE);
-
-    // Check for Mario entering
-    } else if (painting->floorEntered & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
-    }
-}
-
-/**
- * Rippling update function for wall paintings that use RIPPLE_TRIGGER_PROXIMITY.
- */
-void wall_painting_proximity_rippling(struct Painting *painting, struct Painting *paintingGroup[]) {
-    if (painting->floorEntered & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
-    }
-}
-
-/**
- * Idle update function for wall paintings that use RIPPLE_TRIGGER_CONTINUOUS.
- */
-void wall_painting_continuous_idle(struct Painting *painting, struct Painting *paintingGroup[]) {
-    // Check for Mario entering
-    if (painting->floorEntered & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
-    } else {
-        painting_state(PAINTING_RIPPLE, painting, paintingGroup, TRUE, TRUE);
-    }
-}
-
-/**
- * Rippling update function for wall paintings that use RIPPLE_TRIGGER_CONTINUOUS.
- */
-void wall_painting_continuous_rippling(struct Painting *painting, struct Painting *paintingGroup[]) {
-    if (painting->floorEntered & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, FALSE);
-    }
-}
-
-/**
- * Idle update function for floor paintings that use RIPPLE_TRIGGER_PROXIMITY.
- *
- * No floor paintings use RIPPLE_TRIGGER_PROXIMITY in the game.
- */
-void floor_painting_proximity_idle(struct Painting *painting, struct Painting *paintingGroup[]) {
-    // Check for Mario triggering a ripple
-    if (painting->floorEntered & RIPPLE_FLAG_RIPPLE) {
-        painting_state(PAINTING_RIPPLE, painting, paintingGroup, FALSE, TRUE);
-
-    // Only check for Mario entering if he jumped below the surface
-    } else if (painting->marioWentUnder && (painting->currFloor & RIPPLE_FLAG_ENTER)) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
-    }
-}
-
-/**
- * Rippling update function for floor paintings that use RIPPLE_TRIGGER_PROXIMITY.
- *
- * No floor paintings use RIPPLE_TRIGGER_PROXIMITY in the game.
- */
-void floor_painting_proximity_rippling(struct Painting *painting, struct Painting *paintingGroup[]) {
-    if (painting->marioWentUnder && (painting->currFloor & RIPPLE_FLAG_ENTER)) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
-    }
-}
-
-/**
- * Idle update function for floor paintings that use RIPPLE_TRIGGER_CONTINUOUS.
- *
- * Both floor paintings (HMC and CotMC) are hidden behind a door, which hides the ripple's start up.
- * The floor just inside the doorway is RIPPLE_FLAG_RIPPLE_LEFT, so the painting starts rippling as soon as Mario
- * enters the room.
- */
-void floor_painting_continuous_idle(struct Painting *painting, struct Painting *paintingGroup[]) {
-    // Check for Mario entering
-    if (painting->currFloor & RIPPLE_FLAG_ENTER) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
-    } else {
-        painting_state(PAINTING_RIPPLE, painting, paintingGroup, TRUE, TRUE);
-    }
-}
-
-/**
- * Rippling update function for floor paintings that use RIPPLE_TRIGGER_CONTINUOUS.
- */
-void floor_painting_continuous_rippling(struct Painting *painting, struct Painting *paintingGroup[]) {
-    if (painting->marioWentUnder && (painting->currFloor & RIPPLE_FLAG_ENTER)) {
-        painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, FALSE);
-    }
-}
-
-/**
  * Check for Mario entering one of the special floors associated with the painting.
  */
 void painting_update_floors(struct Painting *painting) {
@@ -343,22 +247,13 @@ void painting_update_floors(struct Painting *painting) {
         }
     }
 
-    painting->lastFloor = painting->currFloor;
+    painting->lastFlags = painting->currFlags;
     // at most 1 of these will be nonzero
-    painting->currFloor = rippleFlags;
+    painting->currFlags = rippleFlags;
 
-    // floorEntered is true iff currFloor is true and lastFloor is false
+    // changedFlags is true if currFlags is true and lastFlags is false
     // (Mario just entered the floor on this frame)
-    painting->floorEntered = ((painting->lastFloor ^ painting->currFloor) & painting->currFloor);
-
-    // Check if Mario has fallen below the painting in the previous frame (used for floor paintings)
-    painting->marioWasUnder = painting->marioIsUnder;
-
-    // Check if Mario has fallen below the painting in the current frame (used for floor paintings)
-    painting->marioIsUnder = (marioLocalPos[2] < 0.0f);
-
-    // Mario "went under" if he was not under last frame, but is under now
-    painting->marioWentUnder = ((painting->marioWasUnder ^ painting->marioIsUnder) & painting->marioIsUnder);
+    painting->changedFlags = ((painting->lastFlags ^ painting->currFlags) & painting->currFlags);
 
     vec3f_copy(painting->marioLocalPos, marioLocalPos);
 }
@@ -845,12 +740,9 @@ Gfx *display_painting_not_rippling(struct Painting *painting) {
  * Clear Mario-related state and clear gRipplingPainting.
  */
 void reset_painting(struct Painting *painting) {
-    painting->lastFloor = RIPPLE_FLAGS_NONE;
-    painting->currFloor = RIPPLE_FLAGS_NONE;
-    painting->floorEntered = RIPPLE_FLAGS_NONE;
-    painting->marioWasUnder = FALSE;
-    painting->marioIsUnder = FALSE;
-    painting->marioWentUnder = FALSE;
+    painting->lastFlags = RIPPLE_FLAGS_NONE;
+    painting->currFlags = RIPPLE_FLAGS_NONE;
+    painting->changedFlags = RIPPLE_FLAGS_NONE;
 
     gRipplingPainting = NULL;
 
@@ -934,60 +826,6 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
 #endif
 
 /**
- * Update function for wall paintings.
- * Calls a different update function depending on the painting's ripple trigger and current state.
- */
-void wall_painting_update(struct Painting *painting, struct Painting *paintingGroup[]) {
-    if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
-        switch (painting->state) {
-            case PAINTING_IDLE:
-                wall_painting_proximity_idle(painting, paintingGroup);
-                break;
-            case PAINTING_RIPPLE:
-                wall_painting_proximity_rippling(painting, paintingGroup);
-                break;
-        }
-    } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
-        switch (painting->state) {
-            case PAINTING_IDLE:
-                wall_painting_continuous_idle(painting, paintingGroup);
-                break;
-            case PAINTING_RIPPLE:
-                wall_painting_continuous_rippling(painting, paintingGroup);
-                break;
-        }
-    }
-}
-
-/**
- * Update function for floor paintings (HMC and CotMC)
- * Calls a different update function depending on the painting's ripple trigger and current state.
- *
- * No floor paintings use RIPPLE_TRIGGER_PROXIMITY in the game.
- */
-void floor_painting_update(struct Painting *painting, struct Painting *paintingGroup[]) {
-    if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
-        switch (painting->state) {
-            case PAINTING_IDLE:
-                floor_painting_proximity_idle(painting, paintingGroup);
-                break;
-            case PAINTING_RIPPLE:
-                floor_painting_proximity_rippling(painting, paintingGroup);
-                break;
-        }
-    } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
-        switch (painting->state) {
-            case PAINTING_IDLE:
-                floor_painting_continuous_idle(painting, paintingGroup);
-                break;
-            case PAINTING_RIPPLE:
-                floor_painting_continuous_rippling(painting, paintingGroup);
-                break;
-        }
-    }
-}
-
-/**
  * Render and update the painting whose id and group matches the values in the GraphNode's parameter.
  * Use PAINTING_ID(id, group) to set the right parameter in a level's geo layout.
  */
@@ -1054,11 +892,22 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
             paintingDlist = display_painting_rippling(painting);
         }
 
-        // Only paintings with 0 pitch are treated as walls
-        if (FLT_IS_NONZERO(painting->rotation[0])) {
-            floor_painting_update(painting, paintingGroup);
-        } else {
-            wall_painting_update(painting, paintingGroup);
+        if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
+            if (painting->changedFlags & RIPPLE_FLAG_ENTER) {
+                // Proximity painting enter ripple
+                painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
+            } else if (painting->state != PAINTING_ENTERED && (painting->changedFlags & RIPPLE_FLAG_RIPPLE)) {
+                // Proximity painting wobble ripple
+                painting_state(PAINTING_RIPPLE, painting, paintingGroup, FALSE, TRUE);
+            }
+        } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
+            if (painting->changedFlags & RIPPLE_FLAG_ENTER) {
+                // Continuous painting enter ripple
+                painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, FALSE);
+            } else if (painting->state == PAINTING_IDLE) {
+                // Continuous painting idle ripple
+                painting_state(PAINTING_RIPPLE, painting, paintingGroup, TRUE, TRUE);
+            }
         }
     }
 

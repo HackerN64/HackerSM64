@@ -1337,7 +1337,6 @@ struct Painting bob_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1365,7 +1364,6 @@ struct Painting ccm_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1393,7 +1391,6 @@ struct Painting wf_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1421,7 +1418,6 @@ struct Painting jrb_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1449,7 +1445,6 @@ struct Painting lll_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1477,7 +1472,6 @@ struct Painting ssl_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1505,7 +1499,6 @@ struct Painting hmc_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_env_map_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  768.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1533,7 +1526,6 @@ struct Painting ddd_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_env_map_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xB4,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  819.2f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1561,7 +1553,6 @@ struct Painting wdw_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  614.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1589,7 +1580,6 @@ struct Painting thi_tiny_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  393.216f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1617,7 +1607,6 @@ struct Painting ttm_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  256.0f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1645,7 +1634,6 @@ struct Painting ttc_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  409.6f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1673,7 +1661,6 @@ struct Painting sl_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  716.8f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
@@ -1701,7 +1688,6 @@ struct Painting thi_huge_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  1638.4f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };

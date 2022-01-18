@@ -572,7 +572,6 @@ struct Painting ttm_slide_painting = {
     /* Ripple DList */ ttm_seg7_painting_dl_slide_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Mario Below */  0x00, 0x00, 0x00, /* Whether or not Mario is below the painting */
     /* Size */  460.8f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };

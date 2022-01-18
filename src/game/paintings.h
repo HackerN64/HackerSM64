@@ -87,7 +87,7 @@ enum RippleTriggers {
     RIPPLE_TRIGGER_CONTINUOUS,
 };
 
-// Painting->lastFloor, Painting->currFloor, Painting->floorEntered
+// Painting->lastFlags, Painting->currFlags, Painting->changedFlags
 enum PaintingRippleFlags {
     // Not rippling.
     RIPPLE_FLAGS_NONE  = (0 << 0), // 0x00
@@ -126,12 +126,12 @@ struct Painting {
     /// Either PAINTING_IMAGE or PAINTING_ENV_MAP
     s8 textureType;
 
-    /// The floor Mario was on last frame
-    s8 lastFloor;
-    /// The floor Mario is currently on
-    s8 currFloor;
-    /// The floor Mario just entered
-    s8 floorEntered;
+    /// The previous frame's ripple flags
+    s8 lastFlags;
+    /// The current frame's ripple flags
+    s8 currFlags;
+    /// The flags that are true in currFlags and false in lastFlags
+    s8 changedFlags;
 
     /// The painting's state, see top of paintings.c
     s8 state;
@@ -187,13 +187,6 @@ struct Painting {
 
     /// The painting's transparency. Determines what layer the painting is in.
     Alpha alpha;
-
-    /// True if Mario was under the painting's y coordinate last frame
-    u8 marioWasUnder : 1;
-    /// True if Mario is currently under the painting's y coordinate
-    u8 marioIsUnder : 1;
-    /// True if Mario just went under the painting's y coordinate on this frame
-    u8 marioWentUnder : 1;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f

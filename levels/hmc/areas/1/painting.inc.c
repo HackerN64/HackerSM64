@@ -502,7 +502,6 @@ struct Painting cotmc_painting = {
     /* Ripple DList */ hmc_seg7_painting_dl_cotmc_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xFF,
-    /* Mario Below */  RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* Whether or not Mario is below the painting */
     /* Size */  723.968018f,
     /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
 };
