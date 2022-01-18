@@ -10,9 +10,10 @@ enum ProfilerTime {
     PROFILER_TIME_FPS,
     PROFILER_TIME_CONTROLLERS,
     PROFILER_TIME_LEVEL_SCRIPT,
-    PROFILER_TIME_TERRAIN,
-    PROFILER_TIME_OBJECTS,
+    PROFILER_TIME_OBJECTS1,
+    PROFILER_TIME_OBJECTS2,
     PROFILER_TIME_GFX,
+    PROFILER_TIME_AUDIO,
     PROFILER_TIME_TOTAL,
     PROFILER_TIME_TMEM,
     PROFILER_TIME_PIPE,
@@ -34,6 +35,8 @@ void fast_profiler_frame_setup();
 void fast_profiler_rsp_started(enum ProfilerRSPTime which);
 void fast_profiler_rsp_completed(enum ProfilerRSPTime which);
 void fast_profiler_rsp_resumed();
+void fast_profiler_audio_started();
+void fast_profiler_audio_completed();
 // See profiling.c to see why fast_profiler_rsp_yielded isn't its own function
 static ALWAYS_INLINE void fast_profiler_rsp_yielded() {
     fast_profiler_rsp_resumed();

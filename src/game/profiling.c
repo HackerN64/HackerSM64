@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <PR/os_internal_reg.h>
 #include "game_init.h"
 
 #include "profiling.h"
@@ -20,6 +21,9 @@ u32 rsp_pending_times[PROFILER_RSP_COUNT];
 u32 prev_start;
 u32 start;
 u32 prev_time;
+u32 audio_start;
+u32 audio_buffer_index;
+u32 preempted_time;
 
 static void buffer_update(ProfileTimeData* data, u32 new, int buffer_index) {
     u32 old = data->counts[buffer_index];
@@ -33,7 +37,17 @@ void fast_profiler_update(enum ProfilerTime which) {
     u32 diff;
     ProfileTimeData* cur_data = &all_profiling_data[which];
 
-    diff = cur_time - prev_time;    
+    diff = cur_time - prev_time;
+
+    u32 saved = __osDisableInt();
+    u32 cur_preempted_time = preempted_time;
+    preempted_time = 0;
+    __osRestoreInt(saved);
+    if (cur_preempted_time > 0) {
+        diff -= cur_preempted_time;
+        start += cur_preempted_time;
+    }
+    
     buffer_update(cur_data, diff, profile_buffer_index);
     prev_time = cur_time;
 }
@@ -65,6 +79,25 @@ void fast_profiler_rsp_resumed() {
 //     rsp_pending_times[PROFILER_RSP_GFX] = osGetCount() - rsp_pending_times[PROFILER_RSP_GFX];
 // }
 
+void fast_profiler_audio_started() {
+    audio_start = osGetCount();
+}
+
+void fast_profiler_audio_completed() {
+    ProfileTimeData* cur_data = &all_profiling_data[PROFILER_TIME_AUDIO];
+    u32 time = osGetCount() - audio_start;
+    u32 cur_index = audio_buffer_index;
+
+    preempted_time = time;
+    buffer_update(cur_data, time, cur_index);
+    cur_index++;
+    if (cur_index >= PROFILING_BUFFER_SIZE) {
+        cur_index = 0;
+    }
+
+    audio_buffer_index = cur_index;
+}
+
 static void update_fps_timer() {
     u32 diff = start - prev_start;
 
@@ -73,7 +106,12 @@ static void update_fps_timer() {
 }
 
 static void update_total_timer() {
-    prev_time = start;
+    u32 saved = __osDisableInt();
+    u32 cur_preempted_time = preempted_time;
+    preempted_time = 0;
+    __osRestoreInt(saved);
+
+    prev_time = start + cur_preempted_time;
     fast_profiler_update(PROFILER_TIME_TOTAL);
 }
 
@@ -112,9 +150,10 @@ void fast_profiler_print_times() {
         "CPU\n"
         "CONT: %7d\n"
         "LEVEL:%7d\n"
-        "TERR: %7d\n"
-        "OBJ:  %7d\n"
+        "OBJ1: %7d\n"
+        "OBJ2: %7d\n"
         "GFX:  %7d\n"
+        "AUDIO:%7d\n"
         "TOTAL:%7d\n"
         "RDP\n"
         "TMEM: %7d\n"
@@ -127,10 +166,11 @@ void fast_profiler_print_times() {
         1000000.0f / microseconds[PROFILER_TIME_FPS],
         microseconds[PROFILER_TIME_CONTROLLERS],
         microseconds[PROFILER_TIME_LEVEL_SCRIPT],
-        microseconds[PROFILER_TIME_TERRAIN],
-        microseconds[PROFILER_TIME_OBJECTS],
+        microseconds[PROFILER_TIME_OBJECTS1],
+        microseconds[PROFILER_TIME_OBJECTS2],
         microseconds[PROFILER_TIME_GFX],
-        microseconds[PROFILER_TIME_TOTAL],
+        microseconds[PROFILER_TIME_AUDIO] * 2, // audio is 60Hz, so double the average
+        microseconds[PROFILER_TIME_TOTAL] + microseconds[PROFILER_TIME_AUDIO] * 2, // audio time is removed from the main thread profiling, so add it back here
         microseconds[PROFILER_TIME_TMEM],
         microseconds[PROFILER_TIME_CMD],
         microseconds[PROFILER_TIME_PIPE],
@@ -152,6 +192,7 @@ void fast_profiler_print_times() {
 
 void fast_profiler_frame_setup() {
     profile_buffer_index++;
+    preempted_time = 0;
 
     if (profile_buffer_index >= PROFILING_BUFFER_SIZE) {
         profile_buffer_index = 0;
