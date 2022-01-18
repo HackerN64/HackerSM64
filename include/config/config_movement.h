@@ -92,7 +92,7 @@
 // When Mario hits a floor underwater, his pitch approaches the floor pitch instead of instantly snapping to it.
 #define SMOOTH_PITCH_WHEN_HITTING_FLOOR_UNDERWATER
 
-// Number of steps (quartersteps):
-#define NUM_STEPS_GROUND 4 // Vanilla is 4
-#define NUM_STEPS_AIR    4 // Vanilla is 4
-#define NUM_STEPS_WATER  1 // Vanilla is 1
+// Number of subframe steps (quarter steps).
+#define NUM_STEPS_GROUND 16 // Vanilla is 4. 16 is recommended.
+#define NUM_STEPS_AIR    16 // Vanilla is 4. 16 is recommended.
+#define NUM_STEPS_WATER   4 // Vanilla is 1.  4 is recommended.
