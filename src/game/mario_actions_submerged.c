@@ -164,11 +164,10 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
 
 static u32 perform_water_step(struct MarioState *m) {
     s32 i;
-    u32 stepResult;
+    u32 stepResult = WATER_STEP_NONE;
     Vec3f nextPos;
     Vec3f step;
-    struct Object *marioObj = m->marioObj;
-    const f32 numSteps = NUM_STEPS_WATER;
+    const f32 numSteps = get_num_steps(m, NUM_STEPS_WATER);
 
     vec3f_copy(step, m->vel);
 
@@ -176,7 +175,7 @@ static u32 perform_water_step(struct MarioState *m) {
         apply_water_current(m, step);
     }
 
-    for (i = 0; i < NUM_STEPS_WATER; i++) {
+    for (i = 0; i < numSteps; i++) {
         nextPos[0] = m->pos[0] + (step[0] / numSteps);
         nextPos[1] = m->pos[1] + (step[1] / numSteps);
         nextPos[2] = m->pos[2] + (step[2] / numSteps);
@@ -193,8 +192,8 @@ static u32 perform_water_step(struct MarioState *m) {
         }
     }
 
-    vec3f_copy(marioObj->header.gfx.pos, m->pos);
-    vec3s_set(marioObj->header.gfx.angle, -m->faceAngle[0], m->faceAngle[1], m->faceAngle[2]);
+    vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
+    vec3s_set(m->marioObj->header.gfx.angle, -m->faceAngle[0], m->faceAngle[1], m->faceAngle[2]);
 
     return stepResult;
 }

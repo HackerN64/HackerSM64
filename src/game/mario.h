@@ -25,6 +25,11 @@ void play_mario_landing_sound_once(struct MarioState *m, u32 soundBits);
 void play_mario_heavy_landing_sound(struct MarioState *m, u32 soundBits);
 void play_mario_heavy_landing_sound_once(struct MarioState *m, u32 soundBits);
 void play_mario_sound(struct MarioState *m, s32 primarySoundBits, s32 scondarySoundBits);
+#ifdef VARIABLE_NUM_STEPS
+s32 get_num_steps(struct MarioState *m, s32 numSteps);
+#else
+#define get_num_steps(m, numSteps) numSteps
+#endif
 void mario_set_forward_vel(struct MarioState *m, f32 speed);
 s32 mario_get_floor_class(struct MarioState *m);
 u32 mario_get_terrain_sound_addend(struct MarioState *m);

@@ -361,6 +361,16 @@ void play_mario_sound(struct MarioState *m, s32 actionSound, s32 marioSound) {
  *                     ACTIONS                    *
  **************************************************/
 
+#ifdef VARIABLE_NUM_STEPS
+/**
+ * Gets the number of subframe steps (quarter steps) for Mario's movement.
+ */
+s32 get_num_steps(struct MarioState *m, s32 numSteps) {
+    s32 steps = (MAX(m->moveSpeed, m->intendedMag) / (f32)numSteps);
+    return MAX(steps, numSteps);
+}
+#endif
+
 /**
  * Sets Mario's other velocities from his forward speed.
  */

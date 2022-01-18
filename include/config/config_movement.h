@@ -96,3 +96,7 @@
 #define NUM_STEPS_GROUND 16 // Vanilla is 4. 16 is recommended.
 #define NUM_STEPS_AIR    16 // Vanilla is 4. 16 is recommended.
 #define NUM_STEPS_WATER   4 // Vanilla is 1.  4 is recommended.
+
+// Increases/decreases the number of subframe steps (quarter steps) depending on Mario's speed.
+// Not needed if the above values are high enough.
+// #define VARIABLE_NUM_STEPS
