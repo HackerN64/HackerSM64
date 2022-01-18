@@ -100,7 +100,7 @@ extern const BehaviorScript bhvUkikiCageStar[];
 extern const BehaviorScript bhvUkikiCage[];
 extern const BehaviorScript bhvBitfsSinkingPlatforms[];
 extern const BehaviorScript bhvBitfsSinkingCagePlatform[];
-extern const BehaviorScript bhvDddMovingPole[];
+extern const BehaviorScript bhvBitfsSinkingCagePole[];
 extern const BehaviorScript bhvBitfsTiltingInvertedPyramid[];
 extern const BehaviorScript bhvSquishablePlatform[];
 extern const BehaviorScript bhvCutOutObject[];
