@@ -186,7 +186,7 @@ void bhv_toad_message_init(void) {
 #ifdef UNLOCK_ALL
     s32 starCount = 999;
 #else
-    s32 starCount = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
+    s32 starCount = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
 #endif
     s32 dialogId = GET_BPARAM1(o->oBehParams);
     s32 enoughStars = TRUE;

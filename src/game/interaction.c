@@ -1008,7 +1008,7 @@ u32 get_door_save_file_flag(struct Object *door) {
 u32 interact_door(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
     s16 requiredNumStars = (obj->oBehParams >> 24);
 #ifndef UNLOCK_ALL
-    s16 numStars = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
+    s16 numStars = save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX));
 #endif
     if (m->action == ACT_WALKING || m->action == ACT_DECELERATING) {
 #ifndef UNLOCK_ALL

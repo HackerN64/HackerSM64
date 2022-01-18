@@ -1096,7 +1096,7 @@ void puppycam_projection_behaviours(void) {
     if (gMarioState->floor != NULL && gMarioState->floor->type == SURFACE_LOOK_UP_WARP) {
  #else // !UNLOCK_ALL
     if (gMarioState->floor != NULL && gMarioState->floor->type == SURFACE_LOOK_UP_WARP
-        && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1) >= 10) {
+        && save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_MIN), COURSE_NUM_TO_INDEX(COURSE_MAX) >= 10) {
  #endif // !UNLOCK_ALL
         if (gPuppyCam.pitchTarget >= 0x7000) {
             level_trigger_warp(gMarioState, WARP_OP_LOOK_UP);
