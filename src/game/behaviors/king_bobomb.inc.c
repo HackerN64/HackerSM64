@@ -325,18 +325,18 @@ ObjActionFunc sKingBobombActions[] = {
 };
 
 struct SoundState sKingBobombSoundStates[] = {
-    { 0, 0, 0, NO_SOUND },
-    { 1, 1, 20, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO },
-    { 0, 0, 0, NO_SOUND },
-    { 0, 0, 0, NO_SOUND },
-    { 1, 15, -1, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO },
-    { 0, 0, 0, NO_SOUND },
-    { 0, 0, 0, NO_SOUND },
-    { 0, 0, 0, NO_SOUND },
-    { 0, 0, 0, NO_SOUND },
-    { 1, 33, -1, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO },
-    { 0, 0, 0, NO_SOUND },
-    { 1, 1, 15, SOUND_OBJ_KING_BOBOMB_POUNDING1_HIGHPRIO },
+    { 0,  0,  0, NO_SOUND                       },
+    { 1,  1, 20, SOUND_OBJ_KING_BOBOMB_POUNDING },
+    { 0,  0,  0, NO_SOUND                       },
+    { 0,  0,  0, NO_SOUND                       },
+    { 1, 15, -1, SOUND_OBJ_KING_BOBOMB_POUNDING },
+    { 0,  0,  0, NO_SOUND                       },
+    { 0,  0,  0, NO_SOUND                       },
+    { 0,  0,  0, NO_SOUND                       },
+    { 0,  0,  0, NO_SOUND                       },
+    { 1, 33, -1, SOUND_OBJ_KING_BOBOMB_POUNDING },
+    { 0,  0,  0, NO_SOUND                       },
+    { 1,  1, 15, SOUND_OBJ_KING_BOBOMB_POUNDING },
 };
 
 void king_bobomb_move(void) {

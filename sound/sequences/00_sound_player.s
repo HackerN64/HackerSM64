@@ -89,7 +89,7 @@ chan_dyncall
 .poll_023589:
 chan_delay1
 chan_ioreadval 0
-chan_bltz .skip_023589 // if we have a signal: 
+chan_bltz .skip_023589 // if we have a signal:
   chan_beqz .force_stop_023589 // told to stop
   chan_jump .start_playing_023589 // told to play something else
 .skip_023589:
@@ -243,118 +243,118 @@ chan_iowriteval 5
 chan_end
 
 .channel0_table:
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_grass
-sound_ref .sound_action_jump_water
-sound_ref .sound_action_jump_stone
-sound_ref .sound_action_jump_spooky
-sound_ref .sound_action_jump_snow
-sound_ref .sound_action_jump_ice
-sound_ref .sound_action_jump_sand
-sound_ref .sound_action_landing_default
-sound_ref .sound_action_landing_grass
-sound_ref .sound_action_landing_water
-sound_ref .sound_action_landing_stone
-sound_ref .sound_action_landing_spooky
-sound_ref .sound_action_landing_snow
-sound_ref .sound_action_landing_ice
-sound_ref .sound_action_landing_sand
-sound_ref .sound_action_step_default
-sound_ref .sound_action_step_grass
-sound_ref .sound_action_step_water
-sound_ref .sound_action_step_stone
-sound_ref .sound_action_step_spooky
-sound_ref .sound_action_step_snow
-sound_ref .sound_action_step_ice
-sound_ref .sound_action_step_sand
-sound_ref .sound_action_body_hit_ground_default
-sound_ref .sound_action_body_hit_ground_grass
-sound_ref .sound_action_body_hit_ground_water
-sound_ref .sound_action_body_hit_ground_stone
-sound_ref .sound_action_body_hit_ground_spooky
-sound_ref .sound_action_body_hit_ground_snow
-sound_ref .sound_action_body_hit_ground_ice
-sound_ref .sound_action_body_hit_ground_sand
-sound_ref .sound_action_step_tiptoe_default
-sound_ref .sound_action_step_tiptoe_grass
-sound_ref .sound_action_step_tiptoe_water
-sound_ref .sound_action_step_tiptoe_stone
-sound_ref .sound_action_step_tiptoe_spooky
-sound_ref .sound_action_step_tiptoe_snow
-sound_ref .sound_action_step_tiptoe_ice
-sound_ref .sound_action_step_tiptoe_sand
-sound_ref .sound_action_metal_jump
-sound_ref .sound_action_metal_landing
-sound_ref .sound_action_metal_step
-sound_ref .sound_action_metal_heavy_landing
-sound_ref .sound_action_clap_hands_cold
-sound_ref .sound_action_hanging_step
-sound_ref .sound_action_quicksand_step
-sound_ref .sound_action_metal_step_tiptoe
-sound_ref .chan_4E5
-sound_ref .chan_4F1
-sound_ref .chan_4FD
-sound_ref .sound_action_swim
-sound_ref .chan_522
-sound_ref .sound_action_throw
-sound_ref .sound_action_key_swish
-sound_ref .sound_action_spin
-sound_ref .sound_action_spin
-sound_ref .sound_action_spin
-sound_ref .sound_action_climb_up_tree
-sound_ref .sound_action_climb_down_tree
-sound_ref .chan_582
-sound_ref .chan_591
-sound_ref .chan_5A3
-sound_ref .sound_action_pat_back
-sound_ref .sound_action_brush_hair
-sound_ref .sound_action_climb_up_pole
-sound_ref .sound_action_metal_bonk
-sound_ref .sound_action_unstuck_from_ground
-sound_ref .sound_action_hit
-sound_ref .sound_action_bonk
-sound_ref .sound_action_enter_bbh
-sound_ref .sound_action_swim_fast
-sound_ref .sound_action_stuck_in_ground_default
-sound_ref .sound_action_stuck_in_ground_default
-sound_ref .sound_action_stuck_in_ground_default
-sound_ref .sound_action_stuck_in_ground_default
-sound_ref .sound_action_stuck_in_ground_default
-sound_ref .sound_action_stuck_in_ground_snow
-sound_ref .sound_action_stuck_in_ground_sand
-sound_ref .sound_action_stuck_in_ground_sand
-sound_ref .sound_action_metal_jump_water
-sound_ref .sound_action_metal_land_water
-sound_ref .sound_action_metal_step_water
-sound_ref .chan_731
-sound_ref .chan_743
-sound_ref .chan_756
-sound_ref .sound_action_flying_fast
-sound_ref .sound_action_teleport
-sound_ref .chan_7A5
-sound_ref .sound_action_bounce_off_object
-sound_ref .chan_7ED
-sound_ref .sound_action_read_sign
-sound_ref .chan_810
-sound_ref .chan_828
-sound_ref .sound_action_intro_unk45e
-sound_ref .sound_action_intro_unk45f
-sound_ref .sound_action_heavy_landing_default
-sound_ref .sound_action_heavy_landing_grass
-sound_ref .sound_action_heavy_landing_water
-sound_ref .sound_action_heavy_landing_stone
-sound_ref .sound_action_heavy_landing_spooky
-sound_ref .sound_action_heavy_landing_snow
-sound_ref .sound_action_heavy_landing_ice
-sound_ref .sound_action_heavy_landing_sand
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
-sound_ref .sound_action_jump_default
+/*0x00*/ sound_ref .sound_action_jump_default
+/*0x01*/ sound_ref .sound_action_jump_grass
+/*0x02*/ sound_ref .sound_action_jump_water
+/*0x03*/ sound_ref .sound_action_jump_stone
+/*0x04*/ sound_ref .sound_action_jump_spooky
+/*0x05*/ sound_ref .sound_action_jump_snow
+/*0x06*/ sound_ref .sound_action_jump_ice
+/*0x07*/ sound_ref .sound_action_jump_sand
+/*0x08*/ sound_ref .sound_action_landing_default
+/*0x09*/ sound_ref .sound_action_landing_grass
+/*0x0A*/ sound_ref .sound_action_landing_water
+/*0x0B*/ sound_ref .sound_action_landing_stone
+/*0x0C*/ sound_ref .sound_action_landing_spooky
+/*0x0D*/ sound_ref .sound_action_landing_snow
+/*0x0E*/ sound_ref .sound_action_landing_ice
+/*0x0F*/ sound_ref .sound_action_landing_sand
+/*0x10*/ sound_ref .sound_action_step_default
+/*0x11*/ sound_ref .sound_action_step_grass
+/*0x12*/ sound_ref .sound_action_step_water
+/*0x13*/ sound_ref .sound_action_step_stone
+/*0x14*/ sound_ref .sound_action_step_spooky
+/*0x15*/ sound_ref .sound_action_step_snow
+/*0x16*/ sound_ref .sound_action_step_ice
+/*0x17*/ sound_ref .sound_action_step_sand
+/*0x18*/ sound_ref .sound_action_body_hit_ground_default
+/*0x19*/ sound_ref .sound_action_body_hit_ground_grass
+/*0x1A*/ sound_ref .sound_action_body_hit_ground_water
+/*0x1B*/ sound_ref .sound_action_body_hit_ground_stone
+/*0x1C*/ sound_ref .sound_action_body_hit_ground_spooky
+/*0x1D*/ sound_ref .sound_action_body_hit_ground_snow
+/*0x1E*/ sound_ref .sound_action_body_hit_ground_ice
+/*0x1F*/ sound_ref .sound_action_body_hit_ground_sand
+/*0x20*/ sound_ref .sound_action_step_tiptoe_default
+/*0x21*/ sound_ref .sound_action_step_tiptoe_grass
+/*0x22*/ sound_ref .sound_action_step_tiptoe_water
+/*0x23*/ sound_ref .sound_action_step_tiptoe_stone
+/*0x24*/ sound_ref .sound_action_step_tiptoe_spooky
+/*0x25*/ sound_ref .sound_action_step_tiptoe_snow
+/*0x26*/ sound_ref .sound_action_step_tiptoe_ice
+/*0x27*/ sound_ref .sound_action_step_tiptoe_sand
+/*0x28*/ sound_ref .sound_action_metal_jump
+/*0x29*/ sound_ref .sound_action_metal_landing
+/*0x2A*/ sound_ref .sound_action_metal_step
+/*0x2B*/ sound_ref .sound_action_metal_heavy_landing
+/*0x2C*/ sound_ref .sound_action_clap_hands_cold
+/*0x2D*/ sound_ref .sound_action_hanging_step
+/*0x2E*/ sound_ref .sound_action_quicksand_step
+/*0x2F*/ sound_ref .sound_action_metal_step_tiptoe
+/*0x30*/ sound_ref .chan_4E5
+/*0x31*/ sound_ref .chan_4F1
+/*0x32*/ sound_ref .chan_4FD
+/*0x33*/ sound_ref .sound_action_swim
+/*0x34*/ sound_ref .chan_522
+/*0x35*/ sound_ref .sound_action_throw
+/*0x36*/ sound_ref .sound_action_key_swish
+/*0x37*/ sound_ref .sound_action_spin
+/*0x38*/ sound_ref .sound_action_spin
+/*0x39*/ sound_ref .sound_action_spin
+/*0x3A*/ sound_ref .sound_action_climb_up_tree
+/*0x3B*/ sound_ref .sound_action_climb_down_tree
+/*0x3C*/ sound_ref .chan_582
+/*0x3D*/ sound_ref .sound_action_take_off_cap
+/*0x3E*/ sound_ref .sound_action_put_on_cap
+/*0x3F*/ sound_ref .sound_action_pat_back
+/*0x40*/ sound_ref .sound_action_brush_hair
+/*0x41*/ sound_ref .sound_action_climb_up_pole
+/*0x42*/ sound_ref .sound_action_metal_bonk
+/*0x43*/ sound_ref .sound_action_unstuck_from_ground
+/*0x44*/ sound_ref .sound_action_hit
+/*0x45*/ sound_ref .sound_action_bonk
+/*0x46*/ sound_ref .sound_action_enter_bbh
+/*0x47*/ sound_ref .sound_action_swim_fast
+/*0x48*/ sound_ref .sound_action_stuck_in_ground_default
+/*0x49*/ sound_ref .sound_action_stuck_in_ground_default
+/*0x4A*/ sound_ref .sound_action_stuck_in_ground_default
+/*0x4B*/ sound_ref .sound_action_stuck_in_ground_default
+/*0x4C*/ sound_ref .sound_action_stuck_in_ground_default
+/*0x4D*/ sound_ref .sound_action_stuck_in_ground_snow
+/*0x4E*/ sound_ref .sound_action_stuck_in_ground_sand
+/*0x4F*/ sound_ref .sound_action_stuck_in_ground_sand
+/*0x50*/ sound_ref .sound_action_metal_jump_water
+/*0x51*/ sound_ref .sound_action_metal_land_water
+/*0x52*/ sound_ref .sound_action_metal_step_water
+/*0x53*/ sound_ref .chan_731
+/*0x54*/ sound_ref .chan_743
+/*0x55*/ sound_ref .chan_756
+/*0x56*/ sound_ref .sound_action_flying_fast
+/*0x57*/ sound_ref .sound_action_teleport
+/*0x58*/ sound_ref .sound_action_snufit_bullet_hit_metal
+/*0x59*/ sound_ref .sound_action_bounce_off_object
+/*0x5A*/ sound_ref .chan_7ED
+/*0x5B*/ sound_ref .sound_action_read_sign
+/*0x5C*/ sound_ref .sound_action_key_put_away
+/*0x5D*/ sound_ref .chan_828
+/*0x5E*/ sound_ref .sound_action_intro_fly_out_from_bridge
+/*0x5F*/ sound_ref .sound_action_intro_fly_around_pipe
+/*0x60*/ sound_ref .sound_action_heavy_landing_default
+/*0x61*/ sound_ref .sound_action_heavy_landing_grass
+/*0x62*/ sound_ref .sound_action_heavy_landing_water
+/*0x63*/ sound_ref .sound_action_heavy_landing_stone
+/*0x64*/ sound_ref .sound_action_heavy_landing_spooky
+/*0x65*/ sound_ref .sound_action_heavy_landing_snow
+/*0x66*/ sound_ref .sound_action_heavy_landing_ice
+/*0x67*/ sound_ref .sound_action_heavy_landing_sand
+/*0x68*/ sound_ref .sound_action_jump_default
+/*0x69*/ sound_ref .sound_action_jump_default
+/*0x6A*/ sound_ref .sound_action_jump_default
+/*0x6B*/ sound_ref .sound_action_jump_default
+/*0x6C*/ sound_ref .sound_action_jump_default
+/*0x6D*/ sound_ref .sound_action_jump_default
+/*0x6E*/ sound_ref .sound_action_jump_default
+/*0x6F*/ sound_ref .sound_action_jump_default
 
 .sound_action_jump_default:
 chan_setbank 1
@@ -998,7 +998,7 @@ layer_note1 39, 0x4, 127
 layer_note1 41, 0x12, 127
 layer_end
 
-.chan_591:
+.sound_action_take_off_cap:
 chan_setbank 1
 chan_setinstr 1
 chan_setenvelope .envelope_32C4
@@ -1010,7 +1010,7 @@ layer_note1 38, 0x6, 127
 layer_note1 41, 0x6, 127
 layer_end
 
-.chan_5A3:
+.sound_action_put_on_cap:
 chan_setbank 1
 chan_setinstr 1
 chan_setenvelope .envelope_32C4
@@ -1328,7 +1328,7 @@ layer_portamento 0x81, 20, 100
 layer_note1 27, 0x30, 127
 layer_end
 
-.chan_7A5:
+.sound_action_snufit_bullet_hit_metal:
 chan_setbank 1
 chan_setinstr 7
 chan_setenvelope .envelope_3344
@@ -1392,7 +1392,7 @@ chan_end
 layer_note1 41, 0x3c, 127
 layer_end
 
-.chan_810:
+.sound_action_key_put_away:
 chan_setbank 1
 chan_setinstr 1
 chan_setenvelope .envelope_32C4
@@ -1424,7 +1424,7 @@ layer_portamento 0x85, 3, 255
 layer_note1 39, 0xf, 100
 layer_end
 
-.sound_action_intro_unk45e:
+.sound_action_intro_fly_out_from_bridge:
 chan_setbank 5
 chan_setinstr 6
 chan_setenvelope .envelope_33AC
@@ -1440,7 +1440,7 @@ layer_portamento 0x85, 26, 240
 layer_note1 51, 0x53, 127
 layer_end
 
-.sound_action_intro_unk45f:
+.sound_action_intro_fly_around_pipe:
 chan_setbank 5
 chan_setinstr 6
 chan_setenvelope .envelope_33AC
@@ -1525,62 +1525,62 @@ chan_setlayer 1, .layer_3F1
 chan_end
 
 .channel1_table:
-sound_ref .sound_moving_slide_default
-sound_ref .sound_moving_slide_grass
-sound_ref .sound_moving_slide_water
-sound_ref .sound_moving_slide_stone
-sound_ref .sound_moving_slide_spooky
-sound_ref .sound_moving_slide_snow
-sound_ref .sound_moving_slide_ice
-sound_ref .sound_moving_slide_sand
-sound_ref .sound_moving_slide_default
-sound_ref .sound_moving_slide_grass
-sound_ref .sound_moving_slide_water
-sound_ref .sound_moving_slide_stone
-sound_ref .sound_moving_slide_spooky
-sound_ref .sound_moving_slide_snow
-sound_ref .sound_moving_slide_ice
-sound_ref .sound_moving_slide_sand
-sound_ref .sound_moving_lava_burn
-sound_ref .sound_moving_slide_down_pole
-sound_ref .sound_moving_slide_down_tree
-sound_ref .sound_general_coin
-sound_ref .sound_moving_quicksand_death
-sound_ref .sound_general_coin
-sound_ref .sound_moving_shocked
-sound_ref .sound_moving_flying
-sound_ref .sound_moving_almost_drowning
-sound_ref .sound_moving_aim_cannon
-sound_ref .chan_AC3
-sound_ref .sound_moving_slide_stone
-sound_ref .sound_moving_slide_spooky
-sound_ref .sound_moving_slide_snow
-sound_ref .sound_moving_slide_ice
-sound_ref .sound_moving_slide_sand
-sound_ref .sound_moving_riding_shell_default
-sound_ref .sound_moving_riding_shell_grass
-sound_ref .sound_moving_riding_shell_water
-sound_ref .sound_moving_riding_shell_stone
-sound_ref .sound_moving_riding_shell_spooky
-sound_ref .sound_moving_riding_shell_snow
-sound_ref .sound_moving_riding_shell_ice
-sound_ref .sound_moving_riding_shell_sand
-sound_ref .sound_moving_riding_shell_lava
-sound_ref .sound_moving_riding_shell_grass
-sound_ref .sound_moving_riding_shell_water
-sound_ref .sound_moving_riding_shell_stone
-sound_ref .sound_moving_riding_shell_spooky
-sound_ref .sound_moving_riding_shell_snow
-sound_ref .sound_moving_riding_shell_ice
-sound_ref .sound_moving_riding_shell_sand
-sound_ref .sound_moving_riding_shell_default
-sound_ref .sound_moving_riding_shell_grass
-sound_ref .sound_moving_riding_shell_water
-sound_ref .sound_moving_riding_shell_stone
-sound_ref .sound_moving_riding_shell_spooky
-sound_ref .sound_moving_riding_shell_snow
-sound_ref .sound_moving_riding_shell_ice
-sound_ref .sound_moving_riding_shell_sand
+/*0x00*/ sound_ref .sound_moving_slide_default
+/*0x01*/ sound_ref .sound_moving_slide_grass
+/*0x02*/ sound_ref .sound_moving_slide_water
+/*0x03*/ sound_ref .sound_moving_slide_stone
+/*0x04*/ sound_ref .sound_moving_slide_spooky
+/*0x05*/ sound_ref .sound_moving_slide_snow
+/*0x06*/ sound_ref .sound_moving_slide_ice
+/*0x07*/ sound_ref .sound_moving_slide_sand
+/*0x08*/ sound_ref .sound_moving_slide_default
+/*0x09*/ sound_ref .sound_moving_slide_grass
+/*0x0A*/ sound_ref .sound_moving_slide_water
+/*0x0B*/ sound_ref .sound_moving_slide_stone
+/*0x0C*/ sound_ref .sound_moving_slide_spooky
+/*0x0D*/ sound_ref .sound_moving_slide_snow
+/*0x0E*/ sound_ref .sound_moving_slide_ice
+/*0x0F*/ sound_ref .sound_moving_slide_sand
+/*0x10*/ sound_ref .sound_moving_lava_burn
+/*0x11*/ sound_ref .sound_moving_slide_down_pole
+/*0x12*/ sound_ref .sound_moving_slide_down_tree
+/*0x13*/ sound_ref .sound_general_coin
+/*0x14*/ sound_ref .sound_moving_quicksand_death
+/*0x15*/ sound_ref .sound_general_coin
+/*0x16*/ sound_ref .sound_moving_shocked
+/*0x17*/ sound_ref .sound_moving_flying
+/*0x18*/ sound_ref .sound_moving_almost_drowning
+/*0x19*/ sound_ref .sound_moving_aim_cannon
+/*0x1A*/ sound_ref .chan_AC3
+/*0x1B*/ sound_ref .sound_moving_slide_stone
+/*0x1C*/ sound_ref .sound_moving_slide_spooky
+/*0x1D*/ sound_ref .sound_moving_slide_snow
+/*0x1E*/ sound_ref .sound_moving_slide_ice
+/*0x1F*/ sound_ref .sound_moving_slide_sand
+/*0x20*/ sound_ref .sound_moving_riding_shell_default
+/*0x21*/ sound_ref .sound_moving_riding_shell_grass
+/*0x22*/ sound_ref .sound_moving_riding_shell_water
+/*0x23*/ sound_ref .sound_moving_riding_shell_stone
+/*0x24*/ sound_ref .sound_moving_riding_shell_spooky
+/*0x25*/ sound_ref .sound_moving_riding_shell_snow
+/*0x26*/ sound_ref .sound_moving_riding_shell_ice
+/*0x27*/ sound_ref .sound_moving_riding_shell_sand
+/*0x28*/ sound_ref .sound_moving_riding_shell_lava
+/*0x29*/ sound_ref .sound_moving_riding_shell_grass
+/*0x2A*/ sound_ref .sound_moving_riding_shell_water
+/*0x2B*/ sound_ref .sound_moving_riding_shell_stone
+/*0x2C*/ sound_ref .sound_moving_riding_shell_spooky
+/*0x2D*/ sound_ref .sound_moving_riding_shell_snow
+/*0x2E*/ sound_ref .sound_moving_riding_shell_ice
+/*0x2F*/ sound_ref .sound_moving_riding_shell_sand
+/*0x30*/ sound_ref .sound_moving_riding_shell_default
+/*0x31*/ sound_ref .sound_moving_riding_shell_grass
+/*0x32*/ sound_ref .sound_moving_riding_shell_water
+/*0x33*/ sound_ref .sound_moving_riding_shell_stone
+/*0x34*/ sound_ref .sound_moving_riding_shell_spooky
+/*0x35*/ sound_ref .sound_moving_riding_shell_snow
+/*0x36*/ sound_ref .sound_moving_riding_shell_ice
+/*0x37*/ sound_ref .sound_moving_riding_shell_sand
 
 .sound_moving_slide_default:
 chan_setbank 3
@@ -1975,70 +1975,70 @@ layer_note1 56, 0xa, 127
 layer_jump .layer_BAA
 
 .channel2_table:
-sound_ref .sound_mario_jump_yah
-sound_ref .sound_mario_jump_wah
-sound_ref .sound_mario_jump_hoo
-sound_ref .sound_mario_hoohoo
-sound_ref .sound_mario_yahoo
-sound_ref .sound_mario_uh
-sound_ref .sound_mario_hrmm
-sound_ref .sound_mario_wah2
-sound_ref .sound_mario_whoa
-sound_ref .sound_mario_eeuh
-sound_ref .sound_mario_attacked
-sound_ref .sound_mario_ooof
-sound_ref .sound_mario_here_we_go
-sound_ref .sound_mario_yawning
-sound_ref .sound_mario_snoring1
-sound_ref .sound_mario_snoring2
-sound_ref .sound_mario_waaaooow
-sound_ref .sound_mario_haha
-sound_ref .sound_mario_panting1
-sound_ref .sound_mario_uh2
-sound_ref .sound_mario_on_fire
-sound_ref .sound_mario_dying
-sound_ref .sound_mario_panting_cold
-sound_ref .sound_mario_coughing3
-sound_ref .sound_mario_panting1
-sound_ref .sound_mario_panting2
-sound_ref .sound_mario_panting3
-sound_ref .sound_mario_coughing1
-sound_ref .sound_mario_coughing2
-sound_ref .sound_mario_coughing3
-sound_ref .sound_mario_punch_yah
-sound_ref .sound_mario_punch_hoo
-sound_ref .sound_mario_mama_mia
-sound_ref .sound_mario_okey_dokey
-sound_ref .sound_mario_ground_pound_wah
-sound_ref .sound_mario_drowning
-sound_ref .sound_mario_punch_wah
-sound_ref .sound_mario_uh
-sound_ref .sound_mario_hrmm
-sound_ref .sound_mario_wah2
-sound_ref .sound_peach_dear_mario
-sound_ref .sound_mario_jump_hoo
-sound_ref .sound_mario_jump_hoo
-sound_ref .sound_mario_yahoo
-sound_ref .sound_mario_yahoo
-sound_ref .sound_mario_yahoo
-sound_ref .sound_mario_waha
-sound_ref .sound_mario_yippee
-sound_ref .sound_mario_doh
-sound_ref .sound_mario_game_over
-sound_ref .sound_mario_hello
-sound_ref .sound_mario_press_start_to_play
-sound_ref .sound_mario_twirl_bounce
-sound_ref .sound_mario_snoring3
-sound_ref .sound_mario_so_longa_bowser
-sound_ref .sound_mario_ima_tired
-sound_ref .sound_peach_mario
-sound_ref .sound_peach_power_of_the_stars
-sound_ref .sound_peach_thanks_to_you
-sound_ref .sound_peach_thank_you_mario
-sound_ref .sound_peach_something_special
-sound_ref .sound_peach_bake_a_cake
-sound_ref .sound_peach_for_mario
-sound_ref .sound_peach_mario2
+/*0x00*/ sound_ref .sound_mario_jump_yah
+/*0x01*/ sound_ref .sound_mario_jump_wah
+/*0x02*/ sound_ref .sound_mario_jump_hoo
+/*0x03*/ sound_ref .sound_mario_hoohoo
+/*0x04*/ sound_ref .sound_mario_yahoo
+/*0x05*/ sound_ref .sound_mario_uh
+/*0x06*/ sound_ref .sound_mario_hrmm
+/*0x07*/ sound_ref .sound_mario_wah2
+/*0x08*/ sound_ref .sound_mario_whoa
+/*0x09*/ sound_ref .sound_mario_eeuh
+/*0x0A*/ sound_ref .sound_mario_attacked
+/*0x0B*/ sound_ref .sound_mario_ooof
+/*0x0C*/ sound_ref .sound_mario_here_we_go
+/*0x0D*/ sound_ref .sound_mario_yawning
+/*0x0E*/ sound_ref .sound_mario_snoring1
+/*0x0F*/ sound_ref .sound_mario_snoring2
+/*0x10*/ sound_ref .sound_mario_waaaooow
+/*0x11*/ sound_ref .sound_mario_haha
+/*0x12*/ sound_ref .sound_mario_panting1
+/*0x13*/ sound_ref .sound_mario_uh2
+/*0x14*/ sound_ref .sound_mario_on_fire
+/*0x15*/ sound_ref .sound_mario_dying
+/*0x16*/ sound_ref .sound_mario_panting_cold
+/*0x17*/ sound_ref .sound_mario_coughing3
+/*0x18*/ sound_ref .sound_mario_panting1
+/*0x19*/ sound_ref .sound_mario_panting2
+/*0x1A*/ sound_ref .sound_mario_panting3
+/*0x1B*/ sound_ref .sound_mario_coughing1
+/*0x1C*/ sound_ref .sound_mario_coughing2
+/*0x1D*/ sound_ref .sound_mario_coughing3
+/*0x1E*/ sound_ref .sound_mario_punch_yah
+/*0x1F*/ sound_ref .sound_mario_punch_hoo
+/*0x20*/ sound_ref .sound_mario_mama_mia
+/*0x21*/ sound_ref .sound_mario_okey_dokey
+/*0x22*/ sound_ref .sound_mario_ground_pound_wah
+/*0x23*/ sound_ref .sound_mario_drowning
+/*0x24*/ sound_ref .sound_mario_punch_wah
+/*0x25*/ sound_ref .sound_mario_uh
+/*0x26*/ sound_ref .sound_mario_hrmm
+/*0x27*/ sound_ref .sound_mario_wah2
+/*0x28*/ sound_ref .sound_peach_dear_mario
+/*0x29*/ sound_ref .sound_mario_jump_hoo
+/*0x2A*/ sound_ref .sound_mario_jump_hoo
+/*0x2B*/ sound_ref .sound_mario_yahoo
+/*0x2C*/ sound_ref .sound_mario_yahoo
+/*0x2D*/ sound_ref .sound_mario_yahoo
+/*0x2E*/ sound_ref .sound_mario_waha
+/*0x2F*/ sound_ref .sound_mario_yippee
+/*0x30*/ sound_ref .sound_mario_doh
+/*0x31*/ sound_ref .sound_mario_game_over
+/*0x32*/ sound_ref .sound_mario_hello
+/*0x33*/ sound_ref .sound_mario_press_start_to_play
+/*0x34*/ sound_ref .sound_mario_twirl_bounce
+/*0x35*/ sound_ref .sound_mario_snoring3
+/*0x36*/ sound_ref .sound_mario_so_longa_bowser
+/*0x37*/ sound_ref .sound_mario_ima_tired
+/*0x38*/ sound_ref .sound_peach_mario
+/*0x39*/ sound_ref .sound_peach_power_of_the_stars
+/*0x3A*/ sound_ref .sound_peach_thanks_to_you
+/*0x3B*/ sound_ref .sound_peach_thank_you_mario
+/*0x3C*/ sound_ref .sound_peach_something_special
+/*0x3D*/ sound_ref .sound_peach_bake_a_cake
+/*0x3E*/ sound_ref .sound_peach_for_mario
+/*0x3F*/ sound_ref .sound_peach_mario2
 
 .sound_mario_jump_hoo:
 chan_setbank 8
@@ -2667,141 +2667,141 @@ layer_end
   chan_setinstr 0
   chan_setlayer 0, .layer_FA2_eu
   chan_end
-  
+
   .layer_FA2_eu:
   layer_delay 0x5
   layer_end
 #endif
 
 .channel38_table:
-sound_ref .sound_general_activate_cap_switch
-sound_ref .sound_menu_enter_hole
-sound_ref .sound_menu_enter_hole
-sound_ref .sound_general_flame_out
-sound_ref .sound_general_open_wood_door
-sound_ref .sound_general_close_wood_door
-sound_ref .sound_general_open_iron_door
-sound_ref .sound_general_close_iron_door
-sound_ref .sound_general_bubbles
-sound_ref .sound_general_moving_water
-sound_ref .sound_general_swish_water
-sound_ref .sound_general_quiet_bubble
-sound_ref .sound_general_volcano_explosion
-sound_ref .sound_general_quiet_bubble2
-sound_ref .sound_general_castle_trap_open
-sound_ref .sound_general_wall_explosion
-sound_ref .sound_general_coin
-sound_ref .sound_general_coin
-sound_ref .sound_general_coin_water
-sound_ref .sound_general_coin_water
-sound_ref .sound_general_coin_water
-sound_ref .sound_general_coin_water
-sound_ref .sound_general_short_star
-sound_ref .sound_general_big_clock
-sound_ref .sound_general_loud_pound
-sound_ref .sound_general_loud_pound
-sound_ref .sound_general_short_pound
-sound_ref .sound_general_short_pound
-sound_ref .sound_general_short_pound
-sound_ref .sound_general_short_pound
-sound_ref .sound_general_short_pound
-sound_ref .sound_general_short_pound
-sound_ref .sound_general_open_chest
-sound_ref .sound_general_open_chest
-sound_ref .sound_general_clam_shell1
-sound_ref .sound_general_clam_shell1
-sound_ref .sound_general_box_landing
-sound_ref .chan_12EB
-sound_ref .sound_general_clam_shell2
-sound_ref .sound_general_clam_shell3
-sound_ref .sound_general_painting_eject
-sound_ref .sound_general_painting_eject
-sound_ref .sound_general_painting_eject
-sound_ref .sound_general_painting_eject
-sound_ref .sound_menu_star_sound
-sound_ref .sound_general_platform
-sound_ref .sound_general_bobomb_explosion
-sound_ref .sound_general_bowser_bomb_explosion
-sound_ref .sound_general_coin_spurt
-sound_ref .sound_general_explosion6
-sound_ref .chan_13D4
-sound_ref .sound_general_coin
-sound_ref .sound_general_boat_tilt1
-sound_ref .sound_general_boat_tilt2
-sound_ref .sound_general_coin_drop
-sound_ref .chan_1429
-sound_ref .sound_general_pendulum_swing
-sound_ref .sound_general_chain_chomp1
-sound_ref .sound_general_chain_chomp2
-sound_ref .sound_general_door_turn_key
-sound_ref .sound_general_moving_in_sand
-sound_ref .chan_1519
-sound_ref .sound_general_moving_platform_switch
-sound_ref .sound_general_cage_open
-sound_ref .sound_general_quiet_pound1
-sound_ref .sound_general_break_box
-sound_ref .sound_general_door_insert_key
-sound_ref .sound_general_quiet_pound2
-sound_ref .sound_general_big_pound
-sound_ref .chan_15CD
-sound_ref .chan_15DA
-sound_ref .sound_general_cannon_up
-sound_ref .sound_general_grindel_spindel_roll
-sound_ref .sound_general_explosion7
-sound_ref .sound_general_shake_coffin
-sound_ref .sound_general_pyramid_top_spin
-sound_ref .sound_general_pyramid_top_explosion
-sound_ref .sound_general_race_gun_shot
-sound_ref .sound_general_star_door_open
-sound_ref .sound_general_star_door_close
-sound_ref .sound_general_bird_chirp2
-sound_ref .sound_obj_bird_chirp3
-sound_ref .sound_obj_bird_chirp1
-sound_ref .sound_air_castle_outdoors_ambient
-sound_ref .sound_general_switch_tick_fast
-sound_ref .sound_general_switch_tick_slow
-sound_ref .sound_general_pound_rock
-sound_ref .sound_general_star_appears
-sound_ref .sound_general_collect_1up
-sound_ref .sound_general_rotating_block_alert
-sound_ref .sound_general_button_press
-sound_ref .sound_general_elevator_move
-sound_ref .sound_general_swish_air
-sound_ref .sound_general_haunted_chair
-sound_ref .sound_general_soft_landing
-sound_ref .sound_general_haunted_chair_move
-sound_ref .sound_general_bowser_explode
-sound_ref .sound_general_bowser_key
-sound_ref .sound_general_bowser_platform
-sound_ref .sound_general_1up_appear
-sound_ref .sound_general_heart_spin
-sound_ref .sound_general_pound_wood_post
-sound_ref .sound_general_water_level_trig
-sound_ref .sound_general_switch_door_open
-sound_ref .sound_general_red_coin
-sound_ref .sound_general_birds_fly_away
-sound_ref .sound_general_right_answer
-sound_ref .sound_general_metal_pound
-sound_ref .sound_general_boing1
-sound_ref .sound_general_boing2
-sound_ref .sound_general_yoshi_walk
-sound_ref .sound_general_enemy_alert1
-sound_ref .sound_general_yoshi_talk
-sound_ref .sound_general_splattering
-sound_ref .sound_general_boing3
-sound_ref .sound_general_grand_star
-sound_ref .sound_general_grand_star_jump
-sound_ref .sound_general_boat_rock
-sound_ref .sound_general_vanish_sfx
-sound_ref .sound_menu_enter_hole
-sound_ref .sound_general_red_coin
-sound_ref .sound_general_birds_fly_away
-sound_ref .sound_general_right_answer
-sound_ref .sound_general_metal_pound
-sound_ref .sound_general_boing1
-sound_ref .sound_general_boing2
-sound_ref .sound_general_yoshi_walk
-sound_ref .sound_general_enemy_alert1
+/*0x00*/ sound_ref .sound_general_activate_cap_switch
+/*0x01*/ sound_ref .sound_menu_enter_hole
+/*0x02*/ sound_ref .sound_menu_enter_hole
+/*0x03*/ sound_ref .sound_general_flame_out
+/*0x04*/ sound_ref .sound_general_open_wood_door
+/*0x05*/ sound_ref .sound_general_close_wood_door
+/*0x06*/ sound_ref .sound_general_open_iron_door
+/*0x07*/ sound_ref .sound_general_close_iron_door
+/*0x08*/ sound_ref .sound_general_bubbles
+/*0x09*/ sound_ref .sound_general_moving_water
+/*0x0A*/ sound_ref .sound_general_swish_water
+/*0x0B*/ sound_ref .sound_general_quiet_bubble
+/*0x0C*/ sound_ref .sound_general_volcano_explosion
+/*0x0D*/ sound_ref .sound_general_quiet_bubble2
+/*0x0E*/ sound_ref .sound_general_castle_trap_open
+/*0x0F*/ sound_ref .sound_general_wall_explosion
+/*0x10*/ sound_ref .sound_general_coin
+/*0x11*/ sound_ref .sound_general_coin
+/*0x12*/ sound_ref .sound_general_coin_water
+/*0x13*/ sound_ref .sound_general_coin_water
+/*0x14*/ sound_ref .sound_general_coin_water
+/*0x15*/ sound_ref .sound_general_coin_water
+/*0x16*/ sound_ref .sound_general_short_star
+/*0x17*/ sound_ref .sound_general_big_clock
+/*0x18*/ sound_ref .sound_general_loud_pound
+/*0x19*/ sound_ref .sound_general_loud_pound
+/*0x1A*/ sound_ref .sound_general_short_pound
+/*0x1B*/ sound_ref .sound_general_short_pound
+/*0x1C*/ sound_ref .sound_general_short_pound
+/*0x1D*/ sound_ref .sound_general_short_pound
+/*0x1E*/ sound_ref .sound_general_short_pound
+/*0x1F*/ sound_ref .sound_general_short_pound
+/*0x20*/ sound_ref .sound_general_open_chest
+/*0x21*/ sound_ref .sound_general_open_chest
+/*0x22*/ sound_ref .sound_general_open_chest_water
+/*0x23*/ sound_ref .sound_general_open_chest_water
+/*0x24*/ sound_ref .sound_general_box_landing
+/*0x25*/ sound_ref .sound_general_rolling_log
+/*0x26*/ sound_ref .sound_general_clam_shell_open
+/*0x27*/ sound_ref .sound_general_clam_shell_close
+/*0x28*/ sound_ref .sound_general_painting_eject
+/*0x29*/ sound_ref .sound_general_painting_eject
+/*0x2A*/ sound_ref .sound_general_painting_eject
+/*0x2B*/ sound_ref .sound_general_painting_eject
+/*0x2C*/ sound_ref .sound_menu_star_sound
+/*0x2D*/ sound_ref .sound_general_platform
+/*0x2E*/ sound_ref .sound_general_bobomb_explosion
+/*0x2F*/ sound_ref .sound_general_bowser_bomb_explosion
+/*0x30*/ sound_ref .sound_general_coin_spurt
+/*0x31*/ sound_ref .sound_general_explosion6
+/*0x32*/ sound_ref .chan_13D4
+/*0x33*/ sound_ref .sound_general_coin
+/*0x34*/ sound_ref .sound_general_boat_tilt1
+/*0x35*/ sound_ref .sound_general_boat_tilt2
+/*0x36*/ sound_ref .sound_general_coin_drop
+/*0x37*/ sound_ref .chan_1429
+/*0x38*/ sound_ref .sound_general_pendulum_swing
+/*0x39*/ sound_ref .sound_general_chain_chomp1
+/*0x3A*/ sound_ref .sound_general_chain_chomp2
+/*0x3B*/ sound_ref .sound_general_door_turn_key
+/*0x3C*/ sound_ref .sound_general_moving_in_sand
+/*0x3D*/ sound_ref .chan_1519
+/*0x3E*/ sound_ref .sound_general_moving_platform_switch
+/*0x3F*/ sound_ref .sound_general_cage_open
+/*0x40*/ sound_ref .sound_general_quiet_pound1
+/*0x41*/ sound_ref .sound_general_break_box
+/*0x42*/ sound_ref .sound_general_door_insert_key
+/*0x43*/ sound_ref .sound_general_quiet_pound2
+/*0x44*/ sound_ref .sound_general_big_pound
+/*0x45*/ sound_ref .chan_15CD
+/*0x46*/ sound_ref .chan_15DA
+/*0x47*/ sound_ref .sound_general_cannon_up
+/*0x48*/ sound_ref .sound_general_grindel_spindel_roll
+/*0x49*/ sound_ref .sound_general_explosion7
+/*0x4A*/ sound_ref .sound_general_shake_coffin
+/*0x4B*/ sound_ref .sound_general_pyramid_top_spin
+/*0x4C*/ sound_ref .sound_general_pyramid_top_explosion
+/*0x4D*/ sound_ref .sound_general_race_gun_shot
+/*0x4E*/ sound_ref .sound_general_star_door_open
+/*0x4F*/ sound_ref .sound_general_star_door_close
+/*0x50*/ sound_ref .sound_general_bird_chirp2
+/*0x51*/ sound_ref .sound_obj_bird_chirp3
+/*0x52*/ sound_ref .sound_obj_bird_chirp1
+/*0x53*/ sound_ref .sound_air_castle_outdoors_ambient
+/*0x54*/ sound_ref .sound_general_switch_tick_fast
+/*0x55*/ sound_ref .sound_general_switch_tick_slow
+/*0x56*/ sound_ref .sound_general_pound_rock
+/*0x57*/ sound_ref .sound_general_star_appears
+/*0x58*/ sound_ref .sound_general_collect_1up
+/*0x59*/ sound_ref .sound_general_rotating_block_alert
+/*0x5A*/ sound_ref .sound_general_button_press
+/*0x5B*/ sound_ref .sound_general_elevator_move
+/*0x5C*/ sound_ref .sound_general_swish_air
+/*0x5D*/ sound_ref .sound_general_haunted_chair_spin
+/*0x5E*/ sound_ref .sound_general_soft_landing
+/*0x5F*/ sound_ref .sound_general_haunted_chair_fall
+/*0x60*/ sound_ref .sound_general_bowser_explode
+/*0x61*/ sound_ref .sound_general_bowser_key
+/*0x62*/ sound_ref .sound_general_bowser_platform
+/*0x63*/ sound_ref .sound_general_1up_appear
+/*0x64*/ sound_ref .sound_general_heart_spin
+/*0x65*/ sound_ref .sound_general_pound_wood_post
+/*0x66*/ sound_ref .sound_general_water_level_trig
+/*0x67*/ sound_ref .sound_general_switch_door_open
+/*0x68*/ sound_ref .sound_general_red_coin
+/*0x69*/ sound_ref .sound_general_birds_fly_away
+/*0x6A*/ sound_ref .sound_general_right_answer
+/*0x6B*/ sound_ref .sound_general_elevator_land
+/*0x6C*/ sound_ref .sound_general_boing1
+/*0x6D*/ sound_ref .sound_general_boing2
+/*0x6E*/ sound_ref .sound_general_yoshi_walk
+/*0x6F*/ sound_ref .sound_general_enemy_alert1
+/*0x70*/ sound_ref .sound_general_yoshi_talk
+/*0x71*/ sound_ref .sound_general_splattering
+/*0x72*/ sound_ref .sound_general_boing3
+/*0x73*/ sound_ref .sound_general_grand_star
+/*0x74*/ sound_ref .sound_general_grand_star_jump
+/*0x75*/ sound_ref .sound_general_boat_rock
+/*0x76*/ sound_ref .sound_general_vanish_sfx
+/*0x77*/ sound_ref .sound_menu_enter_hole
+/*0x78*/ sound_ref .sound_general_red_coin
+/*0x79*/ sound_ref .sound_general_birds_fly_away
+/*0x7A*/ sound_ref .sound_general_right_answer
+/*0x7B*/ sound_ref .sound_general_elevator_land
+/*0x7C*/ sound_ref .sound_general_boing1
+/*0x7D*/ sound_ref .sound_general_boing2
+/*0x7E*/ sound_ref .sound_general_yoshi_walk
+/*0x7F*/ sound_ref .sound_general_enemy_alert1
 
 .sound_general_activate_cap_switch:
 chan_setbank 5
@@ -3141,7 +3141,7 @@ layer_portamento 0x81, 27, 255
 layer_note1 25, 0x5a, 108
 layer_end
 
-.sound_general_clam_shell1:
+.sound_general_open_chest_water:
 chan_setbank 4
 chan_setinstr 11
 chan_setlayer 0, .layer_12C7
@@ -3169,7 +3169,7 @@ layer_portamento 0x82, 36, 255
 layer_note1 27, 0x9, 115
 layer_end
 
-.chan_12EB:
+.sound_general_rolling_log:
 chan_setbank 4
 chan_setinstr 2
 chan_setenvelope .envelope_3454
@@ -3185,7 +3185,7 @@ layer_portamento 0x2, 17, 0x28
 layer_note1 5, 0x60, 127
 layer_end
 
-.sound_general_clam_shell2:
+.sound_general_clam_shell_open:
 chan_setbank 4
 chan_setinstr 11
 chan_setlayer 0, .layer_130B
@@ -3197,7 +3197,7 @@ layer_note1 31, 0x6, 110
 layer_transpose 8
 layer_jump .layer_12CA
 
-.sound_general_clam_shell3:
+.sound_general_clam_shell_close:
 chan_setbank 4
 chan_setinstr 5
 chan_setlayer 0, .layer_131E
@@ -3892,7 +3892,7 @@ layer_portamento 0x81, 44, 255
 layer_note1 32, 0x12, 100
 layer_end
 
-.sound_general_haunted_chair:
+.sound_general_haunted_chair_spin:
 chan_setbank 9
 chan_setinstr 3
 chan_setenvelope .envelope_3428
@@ -3915,7 +3915,7 @@ chan_end
 layer_note1 29, 0xc, 127
 layer_end
 
-.sound_general_haunted_chair_move:
+.sound_general_haunted_chair_fall:
 chan_setbank 4
 chan_setinstr 1
 chan_setlayer 0, .layer_17C4
@@ -4225,7 +4225,7 @@ layer_note1 58, 0x2, 45
 layer_loopend
 layer_end
 
-.sound_general_metal_pound:
+.sound_general_elevator_land:
 chan_setbank 7
 chan_setinstr 1
 chan_setlayer 0, .layer_1A00
@@ -4396,46 +4396,46 @@ layer_note1 31, 0x32, 115
 layer_end
 
 .channel4_table:
-sound_ref .sound_env_waterfall1
-sound_ref .sound_env_waterfall1
-sound_ref .sound_env_elevator1
-sound_ref .sound_env_droning1
-sound_ref .sound_env_droning1
-sound_ref .sound_env_wind1
-sound_ref .sound_env_moving_sand_snow
-sound_ref .chan_1BE5
-sound_ref .sound_env_elevator2
-sound_ref .sound_env_water
-sound_ref .chan_1C46
-sound_ref .sound_env_boat_rocking1
-sound_ref .sound_env_elevator3
-sound_ref .sound_env_elevator4
-sound_ref .sound_env_movingsand
-sound_ref .sound_env_merry_go_round_creaking
-sound_ref .sound_env_wind2
-sound_ref .sound_air_rough_slide
-sound_ref .chan_1D42
-sound_ref .sound_env_sliding
-sound_ref .sound_env_star
-sound_ref .chan_1D81
-sound_ref .sound_env_water_drain
-sound_ref .sound_env_metal_box_push
-sound_ref .sound_env_sink_quicksand
-sound_ref .sound_air_peach_twinkle
-sound_ref .sound_env_elevator1
-sound_ref .sound_env_droning1
-sound_ref .sound_env_waterfall1
-sound_ref .sound_env_waterfall1
-sound_ref .sound_env_waterfall1
-sound_ref .sound_env_waterfall1
-sound_ref .sound_menu_enter_hole
-sound_ref .sound_general_elevator_move
-sound_ref .sound_env_elevator1
-sound_ref .sound_env_droning1
-sound_ref .sound_env_waterfall1
-sound_ref .sound_env_waterfall1
-sound_ref .sound_env_waterfall1
-sound_ref .sound_env_waterfall1
+/*0x00*/ sound_ref .sound_env_waterfall1
+/*0x01*/ sound_ref .sound_env_waterfall1
+/*0x02*/ sound_ref .sound_env_elevator1
+/*0x03*/ sound_ref .sound_env_droning1
+/*0x04*/ sound_ref .sound_env_droning1
+/*0x05*/ sound_ref .sound_env_wind1
+/*0x06*/ sound_ref .sound_env_moving_sand_snow
+/*0x07*/ sound_ref .chan_1BE5
+/*0x08*/ sound_ref .sound_env_elevator2
+/*0x09*/ sound_ref .sound_env_water
+/*0x0A*/ sound_ref .sound_env_bowling_ball_roll
+/*0x0B*/ sound_ref .sound_env_boat_rocking1
+/*0x0C*/ sound_ref .sound_env_elevator3
+/*0x0D*/ sound_ref .sound_env_elevator4
+/*0x0E*/ sound_ref .sound_env_movingsand
+/*0x0F*/ sound_ref .sound_env_merry_go_round_creaking
+/*0x10*/ sound_ref .sound_env_wind2
+/*0x11*/ sound_ref .sound_air_rough_slide
+/*0x12*/ sound_ref .chan_1D42
+/*0x13*/ sound_ref .sound_env_sliding
+/*0x14*/ sound_ref .sound_env_star
+/*0x15*/ sound_ref .sound_env_moving_big_platform
+/*0x16*/ sound_ref .sound_env_water_drain
+/*0x17*/ sound_ref .sound_env_metal_box_push
+/*0x18*/ sound_ref .sound_env_sink_quicksand
+/*0x19*/ sound_ref .sound_air_peach_twinkle
+/*0x1A*/ sound_ref .sound_env_elevator1
+/*0x1B*/ sound_ref .sound_env_droning1
+/*0x1C*/ sound_ref .sound_env_waterfall1
+/*0x1D*/ sound_ref .sound_env_waterfall1
+/*0x1E*/ sound_ref .sound_env_waterfall1
+/*0x1F*/ sound_ref .sound_env_waterfall1
+/*0x20*/ sound_ref .sound_menu_enter_hole
+/*0x21*/ sound_ref .sound_general_elevator_move
+/*0x22*/ sound_ref .sound_env_elevator1
+/*0x23*/ sound_ref .sound_env_droning1
+/*0x24*/ sound_ref .sound_env_waterfall1
+/*0x25*/ sound_ref .sound_env_waterfall1
+/*0x26*/ sound_ref .sound_env_waterfall1
+/*0x27*/ sound_ref .sound_env_waterfall1
 
 .sound_env_waterfall1:
 chan_setbank 5
@@ -4579,7 +4579,7 @@ layer_note1 32, 0x31, 127
 layer_note1 38, 0x1f, 127
 layer_jump .layer_1C22
 
-.chan_1C46:
+.sound_env_bowling_ball_roll:
 chan_setbank 6
 chan_setinstr 15
 chan_setlayer 0, .layer_1C4E
@@ -4762,7 +4762,7 @@ layer_portamento 0x81, 38, 127
 layer_note1 39, 0x9, 127
 layer_jump .layer_1D77
 
-.chan_1D81:
+.sound_env_moving_big_platform:
 chan_setval 50
 chan_call .set_reverb
 chan_setbank 4
@@ -4877,134 +4877,134 @@ layer_note1 43, 0x1b58, 63
 layer_jump .layer_1E47
 
 .channel59_table:
-sound_ref .sound_obj_sushi_shark_water_sound
-sound_ref .sound_obj_mri_shoot
-sound_ref .sound_obj_baby_penguin_walk
-sound_ref .sound_obj_bowser_walk
-sound_ref .sound_obj_bowser_roar
-sound_ref .sound_obj_bowser_tail_pickup
-sound_ref .sound_obj_bowser_defeated
-sound_ref .sound_obj_bowser_spinning
-sound_ref .sound_obj_bowser_inhaling
-sound_ref .sound_obj_big_penguin_walk
-sound_ref .sound_obj_boo_bounce_top
-sound_ref .sound_obj_boo_laugh_short
-sound_ref .sound_obj_thwomp
-sound_ref .sound_obj_cannon1
-sound_ref .sound_obj_cannon2
-sound_ref .sound_obj_cannon3
-sound_ref .sound_obj_piranha_plant_bite
-sound_ref .sound_obj_piranha_plant_dying
-sound_ref .sound_obj_jump_walk_water
-sound_ref .chan_20B2
-sound_ref .sound_obj_mri_death
-sound_ref .sound_obj_pounding1
-sound_ref .sound_obj_king_bobomb
-sound_ref .sound_obj_bully_metal
-sound_ref .sound_obj_bully_explode
-sound_ref .sound_obj_bowser_puzzle_piece_move
-sound_ref .sound_obj_pounding_cannon
-sound_ref .sound_obj_bully_walk
-sound_ref .sound_obj_bully_attacked
-sound_ref .chan_2177
-sound_ref .chan_218E
-sound_ref .sound_obj_baby_penguin_dive
-sound_ref .sound_obj_goomba_walk
-sound_ref .sound_obj_ukiki_chatter_long
-sound_ref .sound_obj_monty_mole_lakitu_attack
-sound_ref .chan_21FF
-sound_ref .sound_obj_dying_enemy1
-sound_ref .sound_obj_cannon4
-sound_ref .sound_obj_dying_enemy2
-sound_ref .sound_obj_bobomb_walk
-sound_ref .sound_obj_something_landing
-sound_ref .sound_obj_diving_in_water
-sound_ref .sound_obj_snow_sand1
-sound_ref .sound_obj_snow_sand2
-sound_ref .sound_obj_default_death
-sound_ref .sound_obj_big_penguin_yell
-sound_ref .sound_obj_water_bomb_bouncing
-sound_ref .sound_obj_goomba_alert
-sound_ref .sound_obj_stomped
-sound_ref .chan_233D
-sound_ref .sound_obj_diving_into_water
-sound_ref .sound_obj_piranha_plant_shrink
-sound_ref .sound_obj_koopa_the_quick_walk
-sound_ref .sound_obj_koopa_walk
-sound_ref .sound_obj_bully_walking
-sound_ref .sound_obj_dorrie
-sound_ref .sound_obj_bowser_laugh
-sound_ref .sound_obj_ukiki_chatter_short
-sound_ref .sound_obj_ukiki_chatter_idle
-sound_ref .sound_obj_ukiki_step_default
-sound_ref .sound_obj_ukiki_step_leaves
-sound_ref .sound_obj_koopa_talk
-sound_ref .sound_obj_koopa_damage
-sound_ref .sound_obj_klepto1
-sound_ref .sound_obj_klepto2
-sound_ref .sound_obj_king_bobomb_talk
-sound_ref .sound_obj_king_bobomb_damage
-sound_ref .sound_obj_scuttlebug_walk
-sound_ref .sound_obj_scuttlebug_alert
-sound_ref .sound_obj_baby_penguin_yell
-sound_ref .sound_obj_king_bobomb_jump
-sound_ref .sound_obj_king_whomp_death
-sound_ref .sound_obj_boo_laugh_long
-sound_ref .sound_obj_swoop
-sound_ref .sound_obj_eel
-sound_ref .sound_obj_eyerok_show_eye
-sound_ref .sound_obj_mr_blizzard_alert
-sound_ref .sound_obj_snufit_shoot
-sound_ref .sound_obj_skeeter_walk
-sound_ref .sound_obj_walking_water
-sound_ref .sound_general_bird_chirp2
-sound_ref .sound_obj_bird_chirp3
-sound_ref .sound_obj_bird_chirp1
-sound_ref .sound_air_castle_outdoors_ambient
-sound_ref .sound_obj_piranha_plant_appear
-sound_ref .sound_obj_flame_blown
-sound_ref .sound_obj_mad_piano_chomping
-sound_ref .sound_obj_large_bully_attacked
-sound_ref .sound_obj_bobomb_buddy_talk
-sound_ref .chan_26A9
-sound_ref .sound_obj_eyerok_sound_short
-sound_ref .sound_obj_eyerok_sound_long
-sound_ref .sound_obj_wiggler_high_pitch
-sound_ref .sound_obj_heaveho_tossed
-sound_ref .sound_obj_wiggler_death
-sound_ref .sound_obj_bowser_intro_laugh
-sound_ref .sound_obj_enemy_death_high
-sound_ref .sound_obj_enemy_death_low
-sound_ref .sound_obj_swoop_death
-sound_ref .sound_obj_koopa_flyguy_pokey_death
-sound_ref .sound_obj_snowman_bounce
-sound_ref .sound_obj_snowman_explode
-sound_ref .sound_obj_bowser_teleport
-sound_ref .sound_obj_monty_mole_appear
-sound_ref .sound_obj_pounding_loud
-sound_ref .sound_obj_boss_dialog_grunt
-sound_ref .sound_obj_mips_rabbit
-sound_ref .sound_obj_mri_spinning
-sound_ref .sound_obj_mips_rabbit_water
-sound_ref .sound_obj_eyerok_explode
-sound_ref .sound_obj_chuckya_death
-sound_ref .sound_obj_wiggler_talk
-sound_ref .sound_obj_wiggler_attacked
-sound_ref .sound_obj_wiggler_low_pitch
-sound_ref .sound_obj_snufit_skeeter_death
-sound_ref .sound_obj_bubba_chomp
-sound_ref .sound_obj_enemy_defeat_shrink
-sound_ref .sound_obj_bowser_tail_pickup
-sound_ref .sound_obj_bowser_defeated
-sound_ref .sound_obj_bowser_spinning
-sound_ref .sound_obj_klepto2
-sound_ref .sound_obj_king_bobomb_talk
-sound_ref .sound_obj_baby_penguin_walk
-sound_ref .sound_obj_bowser_walk
-sound_ref .sound_obj_bowser_roar
-sound_ref .sound_obj_bowser_tail_pickup
-sound_ref .sound_obj_bowser_defeated
-sound_ref .sound_obj_bowser_spinning
+/*0x00*/ sound_ref .sound_obj_sushi_shark_water_sound
+/*0x01*/ sound_ref .sound_obj_mri_shoot
+/*0x02*/ sound_ref .sound_obj_baby_penguin_walk
+/*0x03*/ sound_ref .sound_obj_bowser_walk
+/*0x04*/ sound_ref .sound_obj_bowser_roar
+/*0x05*/ sound_ref .sound_obj_bowser_tail_pickup
+/*0x06*/ sound_ref .sound_obj_bowser_defeated
+/*0x07*/ sound_ref .sound_obj_bowser_spinning
+/*0x08*/ sound_ref .sound_obj_bowser_inhaling
+/*0x09*/ sound_ref .sound_obj_big_penguin_walk
+/*0x0A*/ sound_ref .sound_obj_boo_bounce_top
+/*0x0B*/ sound_ref .sound_obj_boo_laugh_short
+/*0x0C*/ sound_ref .sound_obj_thwomp
+/*0x0D*/ sound_ref .sound_obj_cannon_rise
+/*0x0E*/ sound_ref .sound_obj_cannon_turn
+/*0x0F*/ sound_ref .sound_obj_cannon_barrel_pitch
+/*0x10*/ sound_ref .sound_obj_piranha_plant_bite
+/*0x11*/ sound_ref .sound_obj_piranha_plant_dying
+/*0x12*/ sound_ref .sound_obj_jump_walk_water
+/*0x13*/ sound_ref .sound_obj_bomp_slide
+/*0x14*/ sound_ref .sound_obj_mri_death
+/*0x15*/ sound_ref .sound_obj_pounding1
+/*0x16*/ sound_ref .sound_obj_king_bobomb
+/*0x17*/ sound_ref .sound_obj_bully_metal
+/*0x18*/ sound_ref .sound_obj_bully_explode
+/*0x19*/ sound_ref .sound_obj_bowser_puzzle_piece_move
+/*0x1A*/ sound_ref .sound_obj_pounding_cannon
+/*0x1B*/ sound_ref .sound_obj_bully_walk
+/*0x1C*/ sound_ref .sound_obj_small_bully_attacked
+/*0x1D*/ sound_ref .sound_obj_grab_mario
+/*0x1E*/ sound_ref .sound_obj_release_mario
+/*0x1F*/ sound_ref .sound_obj_baby_penguin_dive
+/*0x20*/ sound_ref .sound_obj_goomba_walk
+/*0x21*/ sound_ref .sound_obj_ukiki_chatter_long
+/*0x22*/ sound_ref .sound_obj_monty_mole_lakitu_attack
+/*0x23*/ sound_ref .chan_21FF
+/*0x24*/ sound_ref .sound_obj_dying_enemy1
+/*0x25*/ sound_ref .sound_obj_cannon4
+/*0x26*/ sound_ref .sound_obj_dying_enemy2
+/*0x27*/ sound_ref .sound_obj_bobomb_walk
+/*0x28*/ sound_ref .sound_obj_something_landing
+/*0x29*/ sound_ref .sound_obj_diving_in_water
+/*0x2A*/ sound_ref .sound_obj_snow_sand1
+/*0x2B*/ sound_ref .sound_obj_snow_sand2
+/*0x2C*/ sound_ref .sound_obj_default_death
+/*0x2D*/ sound_ref .sound_obj_big_penguin_yell
+/*0x2E*/ sound_ref .sound_obj_water_bomb_bouncing
+/*0x2F*/ sound_ref .sound_obj_goomba_alert
+/*0x30*/ sound_ref .sound_obj_stomped
+/*0x31*/ sound_ref .chan_233D
+/*0x32*/ sound_ref .sound_obj_diving_into_water
+/*0x33*/ sound_ref .sound_obj_piranha_plant_shrink
+/*0x34*/ sound_ref .sound_obj_koopa_the_quick_walk
+/*0x35*/ sound_ref .sound_obj_koopa_walk
+/*0x36*/ sound_ref .sound_obj_bully_walking
+/*0x37*/ sound_ref .sound_obj_dorrie
+/*0x38*/ sound_ref .sound_obj_bowser_laugh
+/*0x39*/ sound_ref .sound_obj_ukiki_chatter_short
+/*0x3A*/ sound_ref .sound_obj_ukiki_chatter_idle
+/*0x3B*/ sound_ref .sound_obj_ukiki_step_default
+/*0x3C*/ sound_ref .sound_obj_ukiki_step_leaves
+/*0x3D*/ sound_ref .sound_obj_koopa_talk
+/*0x3E*/ sound_ref .sound_obj_koopa_damage
+/*0x3F*/ sound_ref .sound_obj_klepto_turn
+/*0x40*/ sound_ref .sound_obj_klepto_attacked
+/*0x41*/ sound_ref .sound_obj_king_bobomb_talk
+/*0x42*/ sound_ref .sound_obj_king_bobomb_damage
+/*0x43*/ sound_ref .sound_obj_scuttlebug_walk
+/*0x44*/ sound_ref .sound_obj_scuttlebug_alert
+/*0x45*/ sound_ref .sound_obj_baby_penguin_yell
+/*0x46*/ sound_ref .sound_obj_king_bobomb_jump
+/*0x47*/ sound_ref .sound_obj_king_whomp_death
+/*0x48*/ sound_ref .sound_obj_boo_laugh_long
+/*0x49*/ sound_ref .sound_obj_swoop_wake_up
+/*0x4A*/ sound_ref .sound_obj_eel
+/*0x4B*/ sound_ref .sound_obj_eyerok_show_eye
+/*0x4C*/ sound_ref .sound_obj_mr_blizzard_alert
+/*0x4D*/ sound_ref .sound_obj_snufit_shoot
+/*0x4E*/ sound_ref .sound_obj_skeeter_walk
+/*0x4F*/ sound_ref .sound_obj_walking_water
+/*0x50*/ sound_ref .sound_general_bird_chirp2
+/*0x51*/ sound_ref .sound_obj_bird_chirp3
+/*0x52*/ sound_ref .sound_obj_bird_chirp1
+/*0x53*/ sound_ref .sound_air_castle_outdoors_ambient
+/*0x54*/ sound_ref .sound_obj_piranha_plant_appear
+/*0x55*/ sound_ref .sound_obj_flame_blown
+/*0x56*/ sound_ref .sound_obj_mad_piano_chomping
+/*0x57*/ sound_ref .sound_obj_large_bully_attacked
+/*0x58*/ sound_ref .sound_obj_bobomb_buddy_talk
+/*0x59*/ sound_ref .chan_26A9
+/*0x5A*/ sound_ref .sound_obj_eyerok_sound_short
+/*0x5B*/ sound_ref .sound_obj_eyerok_sound_long
+/*0x5C*/ sound_ref .sound_obj_wiggler_high_pitch
+/*0x5D*/ sound_ref .sound_obj_heaveho_tossed
+/*0x5E*/ sound_ref .sound_obj_wiggler_death
+/*0x5F*/ sound_ref .sound_obj_bowser_intro_laugh
+/*0x60*/ sound_ref .sound_obj_enemy_death_high
+/*0x61*/ sound_ref .sound_obj_enemy_death_low
+/*0x62*/ sound_ref .sound_obj_swoop_death
+/*0x63*/ sound_ref .sound_obj_koopa_flyguy_pokey_death
+/*0x64*/ sound_ref .sound_obj_snowman_bounce
+/*0x65*/ sound_ref .sound_obj_snowman_explode
+/*0x66*/ sound_ref .sound_obj_bowser_teleport
+/*0x67*/ sound_ref .sound_obj_monty_mole_appear
+/*0x68*/ sound_ref .sound_obj_pounding_loud
+/*0x69*/ sound_ref .sound_obj_boss_dialog_grunt
+/*0x6A*/ sound_ref .sound_obj_mips_rabbit
+/*0x6B*/ sound_ref .sound_obj_mri_spinning
+/*0x6C*/ sound_ref .sound_obj_mips_rabbit_water
+/*0x6D*/ sound_ref .sound_obj_eyerok_explode
+/*0x6E*/ sound_ref .sound_obj_chuckya_death
+/*0x6F*/ sound_ref .sound_obj_wiggler_talk
+/*0x70*/ sound_ref .sound_obj_wiggler_attacked
+/*0x71*/ sound_ref .sound_obj_wiggler_low_pitch
+/*0x72*/ sound_ref .sound_obj_snufit_skeeter_death
+/*0x73*/ sound_ref .sound_obj_bubba_chomp
+/*0x74*/ sound_ref .sound_obj_enemy_defeat_shrink
+/*0x75*/ sound_ref .sound_obj_bowser_tail_pickup
+/*0x76*/ sound_ref .sound_obj_bowser_defeated
+/*0x77*/ sound_ref .sound_obj_bowser_spinning
+/*0x78*/ sound_ref .sound_obj_klepto_attacked
+/*0x79*/ sound_ref .sound_obj_king_bobomb_talk
+/*0x7A*/ sound_ref .sound_obj_baby_penguin_walk
+/*0x7B*/ sound_ref .sound_obj_bowser_walk
+/*0x7C*/ sound_ref .sound_obj_bowser_roar
+/*0x7D*/ sound_ref .sound_obj_bowser_tail_pickup
+/*0x7E*/ sound_ref .sound_obj_bowser_defeated
+/*0x7F*/ sound_ref .sound_obj_bowser_spinning
 
 .sound_general_swish_water:
 chan_setbank 6
@@ -5186,7 +5186,7 @@ layer_end
 layer_note1 31, 0x2a, 127
 layer_end
 
-.sound_obj_cannon1:
+.sound_obj_cannon_rise:
 chan_setbank 6
 chan_setinstr 10
 chan_setlayer 0, .layer_2061
@@ -5196,7 +5196,7 @@ chan_end
 layer_note1 39, 0xd2, 127
 layer_end
 
-.sound_obj_cannon2:
+.sound_obj_cannon_turn:
 chan_setbank 6
 chan_setinstr 11
 chan_setlayer 0, .layer_206E
@@ -5206,7 +5206,7 @@ chan_end
 layer_note1 39, 0xd2, 127
 layer_end
 
-.sound_obj_cannon3:
+.sound_obj_cannon_barrel_pitch:
 chan_setbank 6
 chan_setinstr 12
 chan_setlayer 0, .layer_207B
@@ -5251,7 +5251,7 @@ chan_end
 layer_note1 59, 0x24, 105
 layer_end
 
-.chan_20B2:
+.sound_obj_bomp_slide:
 chan_setbank 6
 chan_setinstr 15
 chan_setlayer 0, .layer_20BA
@@ -5370,7 +5370,7 @@ layer_note1 51, 0x4, 80
 layer_delay 0x1e
 layer_end
 
-.sound_obj_bully_attacked:
+.sound_obj_small_bully_attacked:
 chan_setbank 7
 chan_setinstr 12
 chan_setlayer 0, .layer_2160
@@ -5388,7 +5388,7 @@ layer_note1 22, 0x9, 127
 layer_note1 24, 0x1c, 127
 layer_end
 
-.chan_2177:
+.sound_obj_grab_mario:
 chan_setbank 7
 chan_setinstr 3
 chan_setlayer 0, .layer_217F
@@ -5401,7 +5401,7 @@ layer_portamento 0x81, 27, 255
 layer_note1 48, 0x5, 100
 layer_end
 
-.chan_218E:
+.sound_obj_release_mario:
 chan_setbank 6
 chan_setinstr 5
 chan_setlayer 0, .layer_2196
@@ -5861,7 +5861,7 @@ layer_note1 39, 0x6, 105
 layer_note1 27, 0x12, 105
 layer_end
 
-.sound_obj_klepto1:
+.sound_obj_klepto_turn:
 chan_setbank 7
 chan_setinstr 9
 chan_setlayer 0, .layer_2476
@@ -5874,7 +5874,7 @@ layer_note1 41, 0x6, 127
 layer_note1 37, 0x24, 127
 layer_end
 
-.sound_obj_klepto2:
+.sound_obj_klepto_attacked:
 chan_setbank 7
 chan_setinstr 9
 chan_setlayer 0, .layer_248A
@@ -5996,7 +5996,7 @@ chan_end
 layer_note1 55, 0x32, 127
 layer_end
 
-.sound_obj_swoop:
+.sound_obj_swoop_wake_up:
 chan_setbank 7
 chan_setinstr 7
 chan_setlayer 0, .layer_254A
@@ -6601,38 +6601,38 @@ layer_note1 34, 0x10, 105
 layer_end
 
 .channel6_table:
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .chan_29C2
-sound_ref .sound_air_lakitu_fly
-sound_ref .sound_air_amp_buzz
-sound_ref .sound_air_blow_fire
-sound_ref .sound_air_rough_slide
-sound_ref .sound_air_heaveho_move
-sound_ref .chan_2A3D
-sound_ref .sound_air_bobomb_lit_fuse
-sound_ref .sound_air_howling_wind
-sound_ref .sound_air_chuckya_move
-sound_ref .sound_air_peach_twinkle
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_castle_outdoors_ambient
-sound_ref .chan_29C2
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .chan_29C2
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
-sound_ref .sound_air_bowser_spit_fire
+/*0x00*/ sound_ref .sound_air_bowser_spit_fire
+/*0x01*/ sound_ref .chan_29C2
+/*0x02*/ sound_ref .sound_air_lakitu_fly
+/*0x03*/ sound_ref .sound_air_amp_buzz
+/*0x04*/ sound_ref .sound_air_blow_fire
+/*0x05*/ sound_ref .sound_air_rough_slide
+/*0x06*/ sound_ref .sound_air_heaveho_move
+/*0x07*/ sound_ref .chan_2A3D
+/*0x08*/ sound_ref .sound_air_bobomb_lit_fuse
+/*0x09*/ sound_ref .sound_air_howling_wind
+/*0x0A*/ sound_ref .sound_air_chuckya_move
+/*0x0B*/ sound_ref .sound_air_peach_twinkle
+/*0x0C*/ sound_ref .sound_air_bowser_spit_fire
+/*0x0D*/ sound_ref .sound_air_bowser_spit_fire
+/*0x0E*/ sound_ref .sound_air_bowser_spit_fire
+/*0x0F*/ sound_ref .sound_air_bowser_spit_fire
+/*0x10*/ sound_ref .sound_air_castle_outdoors_ambient
+/*0x11*/ sound_ref .chan_29C2
+/*0x12*/ sound_ref .sound_air_bowser_spit_fire
+/*0x13*/ sound_ref .sound_air_bowser_spit_fire
+/*0x14*/ sound_ref .sound_air_bowser_spit_fire
+/*0x15*/ sound_ref .sound_air_bowser_spit_fire
+/*0x16*/ sound_ref .sound_air_bowser_spit_fire
+/*0x17*/ sound_ref .sound_air_bowser_spit_fire
+/*0x18*/ sound_ref .sound_air_bowser_spit_fire
+/*0x19*/ sound_ref .chan_29C2
+/*0x1A*/ sound_ref .sound_air_bowser_spit_fire
+/*0x1B*/ sound_ref .sound_air_bowser_spit_fire
+/*0x1C*/ sound_ref .sound_air_bowser_spit_fire
+/*0x1D*/ sound_ref .sound_air_bowser_spit_fire
+/*0x1E*/ sound_ref .sound_air_bowser_spit_fire
+/*0x1F*/ sound_ref .sound_air_bowser_spit_fire
 
 .sound_air_bowser_spit_fire:
 chan_setbank 7
@@ -6850,70 +6850,70 @@ layer_jump .layer_2B0F
 layer_end
 
 .channel7_table:
-sound_ref .sound_menu_change_select
-sound_ref .sound_menu_reverse_pause
-sound_ref .sound_menu_pause
-sound_ref .sound_menu_pause
-sound_ref .sound_menu_message_appear
-sound_ref .sound_menu_message_disappear
-sound_ref .sound_menu_camera_zoom_in
-sound_ref .sound_menu_camera_zoom_out
-sound_ref .sound_menu_pinch_mario_face
-sound_ref .sound_menu_let_go_mario_face
-sound_ref .sound_menu_hand_appear
-sound_ref .sound_menu_hand_disappear
-sound_ref .chan_2D18
-sound_ref .sound_menu_power_meter
-sound_ref .sound_menu_camera_buzz
-sound_ref .sound_menu_camera_turn
-sound_ref .chan_2DA8
-sound_ref .sound_menu_click_file_select
-sound_ref .sound_menu_read_sign
-sound_ref .sound_menu_message_next_page
-sound_ref .sound_menu_coin_its_a_me_mario
-sound_ref .sound_menu_yoshi_gain_lives
-sound_ref .sound_menu_enter_pipe
-sound_ref .sound_menu_exit_pipe
-sound_ref .sound_menu_bowser_laugh
-sound_ref .sound_menu_enter_hole
-sound_ref .sound_menu_click_change_view
-sound_ref .sound_menu_camera_unused1
-sound_ref .sound_menu_camera_unused2
-sound_ref .sound_menu_mario_castle_warp
-sound_ref .sound_menu_star_sound
-sound_ref .sound_menu_thank_you_playing_my_game
-sound_ref .sound_menu_read_a_sign
-sound_ref .sound_menu_exit_a_sign
-sound_ref .sound_menu_mario_castle_warp2
-sound_ref .sound_menu_star_sound_okey_dokey
-sound_ref .sound_menu_star_sound_lets_a_go
-sound_ref .sound_menu_yoshi_gain_lives
-sound_ref .sound_menu_enter_pipe
-sound_ref .sound_menu_exit_pipe
-sound_ref .sound_menu_collect_red_coin
-sound_ref .sound_menu_collect_red_coin
-sound_ref .sound_menu_collect_red_coin
-sound_ref .sound_menu_collect_red_coin
-sound_ref .sound_menu_collect_red_coin
-sound_ref .sound_menu_collect_red_coin
-sound_ref .sound_menu_collect_red_coin
-sound_ref .sound_menu_collect_red_coin
-sound_ref .sound_menu_collect_secret
-sound_ref .sound_menu_collect_secret
-sound_ref .sound_menu_collect_secret
-sound_ref .sound_menu_collect_secret
-sound_ref .sound_menu_collect_secret
-sound_ref .sound_menu_collect_secret
-sound_ref .sound_menu_collect_secret
-sound_ref .sound_menu_collect_secret
-sound_ref .sound_menu_pinch_mario_face
-sound_ref .sound_menu_let_go_mario_face
-sound_ref .sound_menu_hand_appear
-sound_ref .sound_menu_hand_disappear
-sound_ref .chan_2D18
-sound_ref .sound_menu_power_meter
-sound_ref .sound_menu_camera_buzz
-sound_ref .sound_menu_camera_turn
+/*0x00*/ sound_ref .sound_menu_change_select
+/*0x01*/ sound_ref .sound_menu_reverse_pause
+/*0x02*/ sound_ref .sound_menu_pause
+/*0x03*/ sound_ref .sound_menu_pause
+/*0x04*/ sound_ref .sound_menu_message_appear
+/*0x05*/ sound_ref .sound_menu_message_disappear
+/*0x06*/ sound_ref .sound_menu_camera_zoom_in
+/*0x07*/ sound_ref .sound_menu_camera_zoom_out
+/*0x08*/ sound_ref .sound_menu_pinch_mario_face
+/*0x09*/ sound_ref .sound_menu_let_go_mario_face
+/*0x0A*/ sound_ref .sound_menu_hand_appear
+/*0x0B*/ sound_ref .sound_menu_hand_disappear
+/*0x0C*/ sound_ref .chan_2D18
+/*0x0D*/ sound_ref .sound_menu_power_meter
+/*0x0E*/ sound_ref .sound_menu_camera_buzz
+/*0x0F*/ sound_ref .sound_menu_camera_turn
+/*0x10*/ sound_ref .chan_2DA8
+/*0x11*/ sound_ref .sound_menu_click_file_select
+/*0x12*/ sound_ref .sound_menu_read_sign
+/*0x13*/ sound_ref .sound_menu_message_next_page
+/*0x14*/ sound_ref .sound_menu_coin_its_a_me_mario
+/*0x15*/ sound_ref .sound_menu_yoshi_gain_lives
+/*0x16*/ sound_ref .sound_menu_enter_pipe
+/*0x17*/ sound_ref .sound_menu_exit_pipe
+/*0x18*/ sound_ref .sound_menu_bowser_laugh
+/*0x19*/ sound_ref .sound_menu_enter_hole
+/*0x1A*/ sound_ref .sound_menu_click_change_view
+/*0x1B*/ sound_ref .sound_menu_camera_unused1
+/*0x1C*/ sound_ref .sound_menu_camera_unused2
+/*0x1D*/ sound_ref .sound_menu_mario_castle_warp
+/*0x1E*/ sound_ref .sound_menu_star_sound
+/*0x1F*/ sound_ref .sound_menu_thank_you_playing_my_game
+/*0x20*/ sound_ref .sound_menu_read_a_sign
+/*0x21*/ sound_ref .sound_menu_exit_a_sign
+/*0x22*/ sound_ref .sound_menu_mario_castle_warp2
+/*0x23*/ sound_ref .sound_menu_star_sound_okey_dokey
+/*0x24*/ sound_ref .sound_menu_star_sound_lets_a_go
+/*0x25*/ sound_ref .sound_menu_yoshi_gain_lives
+/*0x26*/ sound_ref .sound_menu_enter_pipe
+/*0x27*/ sound_ref .sound_menu_exit_pipe
+/*0x28*/ sound_ref .sound_menu_collect_red_coin
+/*0x29*/ sound_ref .sound_menu_collect_red_coin
+/*0x2A*/ sound_ref .sound_menu_collect_red_coin
+/*0x2B*/ sound_ref .sound_menu_collect_red_coin
+/*0x2C*/ sound_ref .sound_menu_collect_red_coin
+/*0x2D*/ sound_ref .sound_menu_collect_red_coin
+/*0x2E*/ sound_ref .sound_menu_collect_red_coin
+/*0x2F*/ sound_ref .sound_menu_collect_red_coin
+/*0x30*/ sound_ref .sound_menu_collect_secret
+/*0x31*/ sound_ref .sound_menu_collect_secret
+/*0x32*/ sound_ref .sound_menu_collect_secret
+/*0x33*/ sound_ref .sound_menu_collect_secret
+/*0x34*/ sound_ref .sound_menu_collect_secret
+/*0x35*/ sound_ref .sound_menu_collect_secret
+/*0x36*/ sound_ref .sound_menu_collect_secret
+/*0x37*/ sound_ref .sound_menu_collect_secret
+/*0x38*/ sound_ref .sound_menu_pinch_mario_face
+/*0x39*/ sound_ref .sound_menu_let_go_mario_face
+/*0x3A*/ sound_ref .sound_menu_hand_appear
+/*0x3B*/ sound_ref .sound_menu_hand_disappear
+/*0x3C*/ sound_ref .chan_2D18
+/*0x3D*/ sound_ref .sound_menu_power_meter
+/*0x3E*/ sound_ref .sound_menu_camera_buzz
+/*0x3F*/ sound_ref .sound_menu_camera_turn
 
 .sound_menu_change_select:
 chan_setbank 9

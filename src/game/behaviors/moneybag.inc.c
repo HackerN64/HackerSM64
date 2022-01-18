@@ -62,7 +62,7 @@ void moneybag_jump(s16 collisionFlags) {
 
             if (cur_obj_check_if_near_animation_end()) {
                 o->oMoneybagJumpState = MONEYBAG_JUMP_JUMP;
-                cur_obj_play_sound_2(SOUND_GENERAL_MONEYBAG_BOING_LOWPRIO);
+                cur_obj_play_sound_2(SOUND_GENERAL_MONEYBAG_BOING);
             }
             break;
 

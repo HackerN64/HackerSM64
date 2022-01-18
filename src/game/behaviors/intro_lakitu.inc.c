@@ -108,7 +108,7 @@ void bhv_intro_lakitu_loop(void) {
                     cur_obj_play_sound_2(SOUND_ACTION_FLYING_FAST);
                     break;
                 case 581:
-                    cur_obj_play_sound_2(SOUND_ACTION_INTRO_UNK45E);
+                    cur_obj_play_sound_2(SOUND_ACTION_INTRO_FLY_OUT_FROM_BRIDGE);
                     break;
 #endif
                 case 73:
@@ -129,7 +129,7 @@ void bhv_intro_lakitu_loop(void) {
                 cur_obj_play_sound_2(SOUND_ACTION_FLYING_FAST);
             }
             if (o->oTimer == 485) {
-                cur_obj_play_sound_2(SOUND_ACTION_INTRO_UNK45E);
+                cur_obj_play_sound_2(SOUND_ACTION_INTRO_FLY_OUT_FROM_BRIDGE);
             }
 #endif
             break;
@@ -179,7 +179,7 @@ void bhv_intro_lakitu_loop(void) {
             }
 
             if (o->oTimer == 14) {
-                cur_obj_play_sound_2(SOUND_ACTION_INTRO_UNK45F);
+                cur_obj_play_sound_2(SOUND_ACTION_INTRO_FLY_AROUND_PIPE);
             }
             break;
         case INTRO_LAKITU_ACT_CUTSCENE_END_WAVING_1:
