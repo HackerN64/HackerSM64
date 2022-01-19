@@ -81,18 +81,18 @@ extern "C" {
  *
  */
 
-extern s32 	osRomType;	/* Bulk or cartridge ROM. 0=cartridge 1=bulk */
-extern void 	*osRomBase;	/* Rom base address of the game image */
-extern s32 	osTvType;	/* 0 = PAL, 1 = NTSC, 2 = MPAL */
-extern s32 	osResetType;	/* 0 = cold reset, 1 = NMI */
-extern s32 	osCicId;
-extern s32 	osVersion;
-extern u32	osMemSize;	/* Memory Size */
+extern s32 	osRomType __attribute__((section(".data")));;	/* Bulk or cartridge ROM. 0=cartridge 1=bulk */
+extern void 	*osRomBase __attribute__((section(".data")));	/* Rom base address of the game image */
+extern s32 	osTvType __attribute__((section(".data")));	/* 0 = PAL, 1 = NTSC, 2 = MPAL */
+extern s32 	osResetType __attribute__((section(".data")));	/* 0 = cold reset, 1 = NMI */
+extern s32 	osCicId __attribute__((section(".data")));
+extern s32 	osVersion __attribute__((section(".data")));
+extern u32	osMemSize __attribute__((section(".data")));	/* Memory Size */
 extern s32	osAppNMIBuffer[];
 
-extern u64	osClockRate;
+extern u64	osClockRate __attribute__((section(".data")));
 
-extern OSIntMask __OSGlobalIntMask;	/* global interrupt mask */
+extern OSIntMask __OSGlobalIntMask __attribute__((section(".data")));	/* global interrupt mask */
 
 
 /**************************************************************************

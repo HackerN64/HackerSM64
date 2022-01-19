@@ -159,6 +159,7 @@ SECTIONS
    {
       KEEP(BUILD_DIR/asm/entry.o(.text*));
       KEEP(BUILD_DIR/asm/n64_assert.o(.text*));
+      KEEP(BUILD_DIR/asm/setgp.o(.text*));
 
       BUILD_DIR/src/boot*.o(.text*);
       BUILD_DIR/src/hvqm*.o(.text*);
@@ -185,11 +186,11 @@ SECTIONS
       _mainSegmentTextEnd = .;
 
       /* data */
-      BUILD_DIR/asm/n64_assert.o(.*data*);
-      BUILD_DIR/src/boot*.o(.*data*);
-      BUILD_DIR/src/audio*.o(.*data*);
+      BUILD_DIR/asm/n64_assert.o(.data*);
+      BUILD_DIR/src/boot*.o(.data*);
+      BUILD_DIR/src/audio*.o(.data*);
 #ifdef S2DEX_TEXT_ENGINE
-      lib/libs2d_engine.a:*(.*data*);
+      lib/libs2d_engine.a:*(.data*);
 #endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(.data*);
@@ -225,21 +226,21 @@ SECTIONS
    END_SEG(main)
    BEGIN_NOLOAD(main)
    {
-      BUILD_DIR/src/boot*.o(.*bss*);
-      BUILD_DIR/src/hvqm*.o(.*bss*);
-      BUILD_DIR/src/usb*.o(.*bss*);
-      BUILD_DIR/src/audio*.o(.*bss*);
+      BUILD_DIR/src/boot*.o(.bss*);
+      BUILD_DIR/src/hvqm*.o(.bss*);
+      BUILD_DIR/src/usb*.o(.bss*);
+      BUILD_DIR/src/audio*.o(.bss*);
 #ifdef S2DEX_TEXT_ENGINE
-      lib/libs2d_engine.a:*(.*bss*);
+      lib/libs2d_engine.a:*(.bss*);
 #endif
 #if defined(ISVPRINT) || defined(UNF)
       */libultra_d.a:*.o(COMMON);
       */libultra_d.a:*.o(.scommon);
-      */libultra_d.a:*.o(.*bss*);
+      */libultra_d.a:*.o(.bss*);
 #else
       */libultra_rom.a:*.o(COMMON);
       */libultra_rom.a:*.o(.scommon);
-      */libultra_rom.a:*.o(.*bss*);
+      */libultra_rom.a:*.o(.bss*);
 #endif
       */libhvqm2.a:*.o(.bss*);
       */librtc.a:*.o(.bss*);
@@ -268,10 +269,6 @@ SECTIONS
       BUILD_DIR/src/game*.o(.data*);
       BUILD_DIR/src/engine*.o(.data*);
       BUILD_DIR/src/usb*.o(.data*);
-      /* sdata */
-      BUILD_DIR/src/game*.o(.sdata*);
-      BUILD_DIR/src/engine*.o(.sdata*);
-      BUILD_DIR/src/usb*.o(.data*);
       /* rodata */
       BUILD_DIR/src/game*.o(.rodata*);
       BUILD_DIR/src/engine*.o(.rodata*);
@@ -281,13 +278,33 @@ SECTIONS
    END_SEG(engine)
    BEGIN_NOLOAD(engine)
    {
-      BUILD_DIR/src/game*.o(.*bss*);
+      BUILD_DIR/src/game*.o(.bss*);
       BUILD_DIR/src/engine*.o(.bss*);
       . = ALIGN(0x40);
    }
    END_NOLOAD(engine)
-
-   . = _engineSegmentBssEnd;
+   _gp = . + 0x8000;
+   BEGIN_SEG(sdata, .)
+   {
+      BUILD_DIR/src/game*.o(.sdata*);
+      BUILD_DIR/src/audio*.o(.sdata*);
+      BUILD_DIR/src/engine*.o(.sdata*);
+      BUILD_DIR/src/usb*.o(.sdata*);
+      BUILD_DIR/src/menu*.o(.sdata*);
+      BUILD_DIR/src/boot*.o(.sdata*);
+   }
+   END_SEG(sdata)
+   BEGIN_NOLOAD(sbss)
+   {
+      BUILD_DIR/src/game*.o(.sbss*);
+      BUILD_DIR/src/audio*.o(.sbss*);
+      BUILD_DIR/src/engine*.o(.sbss*);
+      BUILD_DIR/src/usb*.o(.sbss*);
+      BUILD_DIR/src/menu*.o(.sbss*);
+      BUILD_DIR/src/boot*.o(.sbss*);
+      . = ALIGN(0x40);
+   }
+   END_NOLOAD(sbss)
    BEGIN_NOLOAD(framebuffers)
    {
       BUILD_DIR/src/buffers/framebuffers.o(.bss*);

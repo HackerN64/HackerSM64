@@ -51,9 +51,9 @@ struct SnowFlakeVertex gSnowFlakeVertex1 = { -5, 5, 0 };
 struct SnowFlakeVertex gSnowFlakeVertex2 = { -5, -5, 0 };
 struct SnowFlakeVertex gSnowFlakeVertex3 = { 5, 5, 0 };
 
-extern void *tiny_bubble_dl_0B006AB0;
-extern void *tiny_bubble_dl_0B006A50;
-extern void *tiny_bubble_dl_0B006CD8;
+extern void *tiny_bubble_dl_0B006AB0 __attribute__((section(".data")));
+extern void *tiny_bubble_dl_0B006A50 __attribute__((section(".data")));
+extern void *tiny_bubble_dl_0B006CD8 __attribute__((section(".data")));
 
 /**
  * Initialize snow particles by allocating a buffer for storing their state

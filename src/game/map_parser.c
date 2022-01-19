@@ -14,7 +14,7 @@ struct MapEntry {
 };
 extern u8 gMapStrings[];
 extern struct MapEntry gMapEntries[];
-extern u32 gMapEntrySize;
+extern u32 gMapEntrySize __attribute__((section(".data")));
 extern u8 _mapDataSegmentRomStart[];
 
 

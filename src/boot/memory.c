@@ -464,6 +464,22 @@ void *load_segment_decompress_heap(u32 segment, u8 *srcStart, u8 *srcEnd) {
     return gDecompressionHeap;
 }
 
+extern u8 _gp[];
+extern u8 _sdataSegmentStart[];
+extern u8 _sdataSegmentEnd[];
+extern u8 _sdataSegmentRomStart[];
+extern u8 _sdataSegmentRomEnd[];
+
+void load_sdata(void) {
+    void *startAddr = (void *) _sdataSegmentStart;
+    u32 totalSize = _sdataSegmentEnd - _sdataSegmentStart;
+
+    bzero(startAddr, totalSize);
+    osWritebackDCacheAll();
+    dma_read(startAddr, _sdataSegmentRomStart, _sdataSegmentRomEnd);
+    osInvalDCache(startAddr, totalSize);
+}
+
 void load_engine_code_segment(void) {
     void *startAddr = (void *) _engineSegmentStart;
     u32 totalSize = _engineSegmentEnd - _engineSegmentStart;
