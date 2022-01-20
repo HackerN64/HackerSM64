@@ -146,7 +146,7 @@ s8 gNeverEnteredCastle;
 struct MarioState *gMarioState = &gMarioStates[0];
 s8 sWarpCheckpointActive = FALSE;
 
-u16 level_control_timer(s32 timerOp) {
+u32 level_control_timer(s32 timerOp) {
     switch (timerOp) {
         case TIMER_CONTROL_SHOW:
             gHudDisplay.flags |= HUD_DISPLAY_FLAG_TIMER;
@@ -673,7 +673,7 @@ void initiate_painting_warp(void) {
  * based on the warp operation and sometimes Mario's used object.
  * Return the time left until the delayed warp is initiated.
  */
-s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
+s32 level_trigger_warp(struct MarioState *m, s32 warpOp) {
     s32 fadeMusic = TRUE;
 
     if (sDelayedWarpOp == WARP_OP_NONE) {
