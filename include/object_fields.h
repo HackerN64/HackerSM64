@@ -9,6 +9,7 @@
 #ifdef OBJECT_FIELDS_INDEX_DIRECTLY
 #define OBJECT_FIELD_U32(index)           index
 #define OBJECT_FIELD_S32(index)           index
+#define OBJECT_FIELD_U16(index, subIndex) index
 #define OBJECT_FIELD_S16(index, subIndex) index
 #define OBJECT_FIELD_F32(index)           index
 #define OBJECT_FIELD_S16P(index)          index
@@ -18,11 +19,13 @@
 #define OBJECT_FIELD_CHAIN_SEGMENT(index) index
 #define OBJECT_FIELD_OBJ(index)           index
 #define OBJECT_FIELD_SURFACE(index)       index
+#define OBJECT_FIELD_PAINTING(index)      index
 #define OBJECT_FIELD_VPTR(index)          index
 #define OBJECT_FIELD_CVPTR(index)         index
 #else
 #define OBJECT_FIELD_U32(index)           rawData.asU32[index]
 #define OBJECT_FIELD_S32(index)           rawData.asS32[index]
+#define OBJECT_FIELD_U16(index, subIndex) rawData.asU16[index][subIndex]
 #define OBJECT_FIELD_S16(index, subIndex) rawData.asS16[index][subIndex]
 #define OBJECT_FIELD_F32(index)           rawData.asF32[index]
 #if !IS_64_BIT
@@ -34,6 +37,7 @@
 #define OBJECT_FIELD_CHAIN_SEGMENT(index) rawData.asChainSegment[index]
 #define OBJECT_FIELD_OBJ(index)           rawData.asObject[index]
 #define OBJECT_FIELD_SURFACE(index)       rawData.asSurface[index]
+#define OBJECT_FIELD_PAINTING(index)      rawData.asPainting[index]
 #define OBJECT_FIELD_VPTR(index)          rawData.asVoidPtr[index]
 #define OBJECT_FIELD_CVPTR(index)         rawData.asConstVoidPtr[index]
 #else
@@ -44,6 +48,7 @@
 #define OBJECT_FIELD_CHAIN_SEGMENT(index) ptrData.asChainSegment[index]
 #define OBJECT_FIELD_OBJ(index)           ptrData.asObject[index]
 #define OBJECT_FIELD_SURFACE(index)       ptrData.asSurface[index]
+#define OBJECT_FIELD_PAINTING(index)      rawData.asPainting[index]
 #define OBJECT_FIELD_VPTR(index)          ptrData.asVoidPtr[index]
 #define OBJECT_FIELD_CVPTR(index)         ptrData.asConstVoidPtr[index]
 #endif
@@ -161,9 +166,7 @@
 #define /*0x198*/ oNumLootCoins                                 OBJECT_FIELD_S32(0x44)
 #define /*0x19C*/ oDrawingDistance                              OBJECT_FIELD_F32(0x45)
 #define /*0x1A0*/ oRoom                                         OBJECT_FIELD_S32(0x46)
-// 0x1A4 is unused, possibly related to 0x1A8 in removed macro purposes.
-#define /*0x1A8*/ oUnusedCoinParams                             OBJECT_FIELD_U32(0x48)
-// 0x1AC-0x1B2 (0x48-0x4A) are object specific and defined below the common fields.
+// 0x1A4-0x1B2 (0x47-0x4A) are object specific and defined below the common fields.
 #define /*0x1B4*/ oWallAngle                  OBJECT_FIELD_S32(0x4B)
 #define /*0x1B8*/ oFloorType                  OBJECT_FIELD_S16(0x4C, 0)
 #define /*0x1BA*/ oFloorRoom                  OBJECT_FIELD_S16(0x4C, 1)
@@ -258,15 +261,18 @@
 #define /*0x0FC*/ oBobombFuseTimer  OBJECT_FIELD_S32(0x1D)
 
 /* Bob-omb Buddy */
-#define /*0x0F4*/ oBobombBuddyBlinkTimer       OBJECT_FIELD_S32(0x1B)
-#define /*0x0F8*/ oBobombBuddyHasTalkedToMario OBJECT_FIELD_S32(0x1C)
-#define /*0x0FC*/ oBobombBuddyRole             OBJECT_FIELD_S32(0x1D)
-#define /*0x100*/ oBobombBuddyCannonStatus     OBJECT_FIELD_S32(0x1E)
-#define /*0x108*/ O_BOBOMB_BUDDY_POS_COPY_INDEX   0x20
-#define /*0x108*/ oBobombBuddyPosCopyVec       OBJECT_FIELD_F32(O_BOBOMB_BUDDY_POS_COPY_INDEX)
-#define /*0x108*/ oBobombBuddyPosXCopy         OBJECT_FIELD_F32(O_BOBOMB_BUDDY_POS_COPY_INDEX + 0)
-#define /*0x10C*/ oBobombBuddyPosYCopy         OBJECT_FIELD_F32(O_BOBOMB_BUDDY_POS_COPY_INDEX + 1)
-#define /*0x110*/ oBobombBuddyPosZCopy         OBJECT_FIELD_F32(O_BOBOMB_BUDDY_POS_COPY_INDEX + 2)
+#define /*0x0F4*/ oBobombBuddyBlinkTimer            OBJECT_FIELD_S32(0x1B)
+#define /*0x0F8*/ oBobombBuddyHasTalkedToMario      OBJECT_FIELD_S32(0x1C)
+#define /*0x0FC*/ oBobombBuddyRole                  OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ oBobombBuddyCannonStatus          OBJECT_FIELD_S32(0x1E)
+#define /*0x108*/ O_BOBOMB_BUDDY_POS_COPY_INDEX     0x20
+#define /*0x108*/ O_BOBOMB_BUDDY_POS_COPY_X_INDEX   (O_BOBOMB_BUDDY_POS_COPY_INDEX + 0)
+#define /*0x10C*/ O_BOBOMB_BUDDY_POS_COPY_Y_INDEX   (O_BOBOMB_BUDDY_POS_COPY_INDEX + 1)
+#define /*0x110*/ O_BOBOMB_BUDDY_POS_COPY_Z_INDEX   (O_BOBOMB_BUDDY_POS_COPY_INDEX + 2)
+#define /*0x108*/ oBobombBuddyPosCopyVec            OBJECT_FIELD_F32(O_BOBOMB_BUDDY_POS_COPY_INDEX)
+#define /*0x108*/ oBobombBuddyPosXCopy              OBJECT_FIELD_F32(O_BOBOMB_BUDDY_POS_COPY_X_INDEX)
+#define /*0x10C*/ oBobombBuddyPosYCopy              OBJECT_FIELD_F32(O_BOBOMB_BUDDY_POS_COPY_Y_INDEX)
+#define /*0x110*/ oBobombBuddyPosZCopy              OBJECT_FIELD_F32(O_BOBOMB_BUDDY_POS_COPY_Z_INDEX)
 
 /* Bob-omb Explosion Bubble */
 #define /*0x0FC*/ oBobombExpBubGfxScaleFacX OBJECT_FIELD_S32(0x1D)

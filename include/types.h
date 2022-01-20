@@ -304,6 +304,7 @@ struct Object {
         // Object fields. See object_fields.h.
         u32 asU32[MAX_OBJECT_FIELDS];
         s32 asS32[MAX_OBJECT_FIELDS];
+        s16 asU16[MAX_OBJECT_FIELDS][2];
         s16 asS16[MAX_OBJECT_FIELDS][2];
         f32 asF32[MAX_OBJECT_FIELDS];
 #if !IS_64_BIT
@@ -315,6 +316,7 @@ struct Object {
         struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
         struct Object *asObject[MAX_OBJECT_FIELDS];
         struct Surface *asSurface[MAX_OBJECT_FIELDS];
+        struct Painting *asPainting[MAX_OBJECT_FIELDS];
         void *asVoidPtr[MAX_OBJECT_FIELDS];
         const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
 #endif
@@ -329,6 +331,7 @@ struct Object {
         struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
         struct Object *asObject[MAX_OBJECT_FIELDS];
         struct Surface *asSurface[MAX_OBJECT_FIELDS];
+        struct Painting *asPainting[MAX_OBJECT_FIELDS];
         void *asVoidPtr[MAX_OBJECT_FIELDS];
         const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
     } ptrData;
