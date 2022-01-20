@@ -10,5 +10,5 @@
 
 glabel setgp
     lui $gp, %hi(_gp)
-    jal $ra
+    jr $ra
      addiu $gp, %lo(_gp)
