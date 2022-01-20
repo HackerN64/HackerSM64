@@ -55,7 +55,7 @@
  * Also, this also disables anti-aliasing on Mario.
  * NOTE: Regarding performance, silhouette seems to lose 1-2 frames on console.
  */
-// #define SILHOUETTE 127
+#define SILHOUETTE 127
 
 // The default drawing distance for objects.
 // Vanilla is 4000.0f.
