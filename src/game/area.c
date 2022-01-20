@@ -93,20 +93,26 @@ const char *gNoControllerMsg[] = {
 #endif
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
-    RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
+    RGBA16 color = (((red   >> 3) << IDX_RGBA16_R)
+                  | ((green >> 3) << IDX_RGBA16_G)
+                  | ((blue  >> 3) << IDX_RGBA16_B)
+                  | MSK_RGBA16_A);
 
-    gFBSetColor = (color << 16) | color;
+    gFBSetColor = ((color << 16) | color);
     gViewportOverride = vpOverride;
     gViewportClip = vpClip;
 }
 
 void set_warp_transition_rgb(Color red, Color green, Color blue) {
-    RGBA16 warpTransitionRGBA16 = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
+    RGBA16 warpTransitionRGBA16 = (((red   >> 3) << IDX_RGBA16_R)
+                                 | ((green >> 3) << IDX_RGBA16_G)
+                                 | ((blue  >> 3) << IDX_RGBA16_B)
+                                 | MSK_RGBA16_A);
 
-    gWarpTransFBSetColor = (warpTransitionRGBA16 << 16) | warpTransitionRGBA16;
-    gWarpTransRed = red;
+    gWarpTransFBSetColor = ((warpTransitionRGBA16 << 16) | warpTransitionRGBA16);
+    gWarpTransRed   = red;
     gWarpTransGreen = green;
-    gWarpTransBlue = blue;
+    gWarpTransBlue  = blue;
 }
 
 void print_intro_text(void) {
@@ -140,6 +146,7 @@ u32 get_mario_spawn_type(struct Object *obj) {
             return sSpawnTypeFromWarpBhv[i];
         }
     }
+
     return MARIO_SPAWN_NONE;
 }
 
@@ -151,6 +158,7 @@ struct ObjectWarpNode *area_get_warp_node(u8 id) {
             break;
         }
     }
+
     return node;
 }
 
@@ -290,7 +298,8 @@ void change_area(s32 index) {
     }
 
     if (areaFlags & AREA_FLAG_LOAD) {
-        gMarioObject->header.gfx.areaIndex = index, gMarioSpawnInfo->areaIndex = index;
+        gMarioObject->header.gfx.areaIndex = index;
+        gMarioSpawnInfo->areaIndex = index;
     }
 }
 
@@ -314,17 +323,19 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
     if (transType & WARP_TRANSITION_FADE_INTO) {
         set_warp_transition_rgb(red, green, blue);
     } else {
-        red = gWarpTransRed, green = gWarpTransGreen, blue = gWarpTransBlue;
+        red   = gWarpTransRed;
+        green = gWarpTransGreen;
+        blue  = gWarpTransBlue;
     }
 
     if (transType < WARP_TRANSITION_TYPE_STAR) { // if transition is WARP_TRANSITION_TYPE_COLOR
-        gWarpTransition.data.red = red;
+        gWarpTransition.data.red   = red;
         gWarpTransition.data.green = green;
-        gWarpTransition.data.blue = blue;
+        gWarpTransition.data.blue  = blue;
     } else { // if transition is textured
-        gWarpTransition.data.red = red;
+        gWarpTransition.data.red   = red;
         gWarpTransition.data.green = green;
-        gWarpTransition.data.blue = blue;
+        gWarpTransition.data.blue  = blue;
 
         // Both the start and end textured transition are always located in the middle of the screen.
         // If you really wanted to, you could place the start at one corner and the end at
@@ -332,8 +343,8 @@ void play_transition(s16 transType, s16 time, Color red, Color green, Color blue
         // across the screen.
         gWarpTransition.data.startTexX = SCREEN_CENTER_X;
         gWarpTransition.data.startTexY = SCREEN_CENTER_Y;
-        gWarpTransition.data.endTexX = SCREEN_CENTER_X;
-        gWarpTransition.data.endTexY = SCREEN_CENTER_Y;
+        gWarpTransition.data.endTexX   = SCREEN_CENTER_X;
+        gWarpTransition.data.endTexY   = SCREEN_CENTER_Y;
 
         gWarpTransition.data.texTimer = 0;
 
@@ -368,7 +379,7 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 
 void render_game(void) {
 #if PUPPYPRINT_DEBUG
-    OSTime first   = osGetTime();
+    OSTime first = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
 #endif
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
@@ -396,9 +407,10 @@ void render_game(void) {
 
         if (gViewportClip != NULL) {
             make_viewport_clip_rect(gViewportClip);
-        } else
+        } else {
             gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
                           SCREEN_HEIGHT - gBorderHeight);
+        }
 
         if (gWarpTransition.isActive) {
             if (gWarpTransDelay == 0) {
@@ -425,12 +437,11 @@ void render_game(void) {
     }
 
     gViewportOverride = NULL;
-    gViewportClip     = NULL;
+    gViewportClip = NULL;
 
 #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);
     graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
-    // graphTime[perfIteration] -=   profilerTime[perfIteration]; //! Graph time is inaccurate and wrongly reaches 0 sometimes
     puppyprint_render_profiler();
 #endif
 }

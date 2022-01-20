@@ -66,17 +66,6 @@ void spawn_macro_abs_special(ModelID32 model, const BehaviorScript *behavior, s1
     newObj->oMacroUnk110 = (f32) unkC;
 }
 
-UNUSED static void spawn_macro_coin_unknown(const BehaviorScript *behavior, s16 a1[]) {
-    struct Object *obj;
-    ModelID16 model = bhvYellowCoin == behavior ? MODEL_YELLOW_COIN : MODEL_NONE;
-
-    obj = spawn_object_abs_with_rot(&gMacroObjectDefaultParent, 0, model, behavior,
-                                    a1[1], a1[2], a1[3], 0, convert_rotation(a1[0]), 0);
-
-    obj->oUnusedCoinParams = a1[4];
-    obj->oBehParams = (a1[4] & 0xFF) >> 16;
-}
-
 struct LoadedMacroObject {
     /*0x00*/ Angle yaw;
     /*0x02*/ Vec3s pos;
@@ -135,7 +124,6 @@ void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList) {
                          0x0                                // Z-rotation
                      );
 
-            newObj->oUnusedCoinParams =    macroObject.params;
             newObj->oBehParams        = (((macroObject.params & 0x00FF) << 16) // Set 2nd byte from lower bits (shifted).
                                         | (macroObject.params & 0xFF00));      // Set 3rd byte from upper bits.
             newObj->oBehParams2ndByte =   (macroObject.params & 0x00FF);       // Set 2nd byte from lower bits.
