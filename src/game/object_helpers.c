@@ -160,7 +160,7 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
     return NULL;
 }
 
-ALWAYS_INLINE void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
+void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj) {
     linear_mtxf_mul_vec3f_and_translate(mtx, &obj->oPosVec, &obj->oParentRelativePosVec);
 }
 
@@ -502,16 +502,16 @@ void obj_init_animation_with_sound(struct Object *obj, const struct Animation * 
 
 void cur_obj_enable_rendering_and_become_tangible(struct Object *obj) {
     obj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
-    obj->oIntangibleTimer = 0;
-}
-
-void cur_obj_enable_rendering(void) {
-    o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
+    obj_become_tangible(obj);
 }
 
 void cur_obj_disable_rendering_and_become_intangible(struct Object *obj) {
     obj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
-    obj->oIntangibleTimer = -1;
+    obj_become_intangible(obj);
+}
+
+void cur_obj_enable_rendering(void) {
+    o->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
 }
 
 void cur_obj_disable_rendering(void) {
@@ -572,24 +572,24 @@ struct Object *cur_obj_nearest_object_with_behavior(const BehaviorScript *behavi
 f32 cur_obj_dist_to_nearest_object_with_behavior(const BehaviorScript *behavior) {
     f32 dist;
     if (cur_obj_find_nearest_object_with_behavior(behavior, &dist) == NULL) {
-        dist = 15000.0f;
+        dist = F32_MAX;
     }
     return dist;
 }
 
 struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *behavior, f32 *dist) {
-    uintptr_t *behaviorAddr = segmented_to_virtual(behavior);
+    BehaviorScript *behaviorAddr = segmented_to_virtual(behavior);
     struct ObjectNode *listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
     struct Object *obj = (struct Object *) listHead->next;
     struct Object *closestObj = NULL;
-    f32 minDist = 0x20000;
+    f32 minDist = F32_MAX;
 
     while (obj != (struct Object *) listHead) {
         if (obj->behavior == behaviorAddr
             && obj->activeFlags != ACTIVE_FLAG_DEACTIVATED
             && obj != o
         ) {
-            f32 objDist = dist_between_objects(o, obj);
+            f32 objDist = dist_between_objects_squared(o, obj);
             if (objDist < minDist) {
                 closestObj = obj;
                 minDist = objDist;
@@ -599,7 +599,7 @@ struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *b
         obj = (struct Object *) obj->header.next;
     }
 
-    *dist = minDist;
+    *dist = sqrtf(minDist);
     return closestObj;
 }
 
@@ -883,6 +883,11 @@ void cur_obj_become_intangible(void) {
     o->oIntangibleTimer = -1;
 }
 
+void obj_become_intangible(struct Object *obj) {
+    // When the timer is negative, the object is intangible and the timer doesn't count down
+    obj->oIntangibleTimer = -1;
+}
+
 void cur_obj_become_tangible(void) {
     o->oIntangibleTimer = 0;
 }
@@ -943,7 +948,10 @@ static void cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlo
         && intendedFloor != NULL
         && intendedFloor->room != 0
         && o->oRoom != intendedFloor->room
-        && intendedFloor->room != 18) {
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+        && intendedFloor->room != 18
+#endif
+        ) {
         // Don't leave native room
         return;
     }
@@ -1641,8 +1649,7 @@ void cur_obj_spawn_particles(struct SpawnParticlesInfo *info) {
         numParticles = 10;
     }
 
-    // We're close to running out of object slots, so don't spawn particles at
-    // all
+    // We're close to running out of object slots, so don't spawn particles at all
     if (gPrevFrameObjectCount > (OBJECT_POOL_CAPACITY - 30)) {
         numParticles = 0;
     }
@@ -1752,7 +1759,7 @@ s32 cur_obj_set_direction_table(s8 *pattern) {
 
 s32 cur_obj_progress_direction_table(void) {
     s8 action;
-    s8 *pattern  = o->oToxBoxMovementPattern;
+    s8 *pattern = o->oToxBoxMovementPattern;
     s32 nextStep = o->oToxBoxMovementStep + 1;
 
     if (pattern[nextStep] != -1) {
@@ -1805,7 +1812,7 @@ s32 cur_obj_mario_far_away(void) {
     Vec3f d;
     vec3f_diff(d, &o->oHomeVec, &gMarioObject->oPosVec);
 
-    return o->oDistanceToMario > 2000.0f && vec3_sumsq(d) > sqr(2000.0f);
+    return (o->oDistanceToMario > 2000.0f && vec3_sumsq(d) > sqr(2000.0f));
 }
 
 s32 is_mario_moving_fast_or_in_air(s32 speedThreshold) {
@@ -1913,11 +1920,7 @@ Gfx *geo_offset_klepto_held_object(s32 callContext, struct GraphNode *node, UNUS
 }
 
 s32 obj_is_hidden(struct Object *obj) {
-    if (obj->header.gfx.node.flags & GRAPH_RENDER_INVISIBLE) {
-        return TRUE;
-    } else {
-        return FALSE;
-    }
+    return (obj->header.gfx.node.flags & GRAPH_RENDER_INVISIBLE);
 }
 
 void enable_time_stop(void) {
@@ -1933,7 +1936,7 @@ void set_time_stop_flags(s32 flags) {
 }
 
 void clear_time_stop_flags(s32 flags) {
-    gTimeStopState = gTimeStopState & (flags ^ 0xFFFFFFFF);
+    gTimeStopState &= (flags ^ 0xFFFFFFFF);
 }
 
 s32 cur_obj_can_mario_activate_textbox(f32 radius, f32 height, UNUSED s32 unused) {

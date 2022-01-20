@@ -147,6 +147,7 @@ void obj_mark_for_deletion(struct Object *obj);
 #define mark_obj_for_deletion obj_mark_for_deletion
 void cur_obj_disable(void);
 void cur_obj_become_intangible(void);
+void obj_become_intangible(struct Object *obj);
 void cur_obj_become_tangible(void);
 void obj_become_tangible(struct Object *obj);
 void cur_obj_update_floor_height(void);
