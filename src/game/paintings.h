@@ -87,20 +87,6 @@ enum PaintingRippleFlags {
     RIPPLE_FLAG_RIPPLE = (1 << 1), // 0x02
 };
 
-enum PaintingXSources {
-    /// Use Mario's local x position.
-    MARIO_X,
-    /// Use the x center of the painting.
-    MIDDLE_X,
-};
-
-enum PaintingYSources {
-    /// Use Mario's local y position.
-    MARIO_Y,
-    /// Use the y center of the painting.
-    MIDDLE_Y,
-};
-
 // Painting->textureType
 enum PaintingType {
     /// Painting that uses 1 or more images as a texture
