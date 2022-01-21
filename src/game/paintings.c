@@ -84,11 +84,6 @@ struct Object *gRipplingPainting = NULL;
  */
 struct Object *gEnteredPainting = NULL;
 
-/**
- * Whether the DDD painting is moved forward, should being moving backwards, or has already moved backwards.
- */
-s8 gDddPaintingStatus;
-
 // HMC painting group
 struct Painting *sHmcPaintings[] = {
     &cotmc_painting,
@@ -720,16 +715,10 @@ void reset_painting(struct Object *obj) {
  *
  * When the painting reaches backPos, a save flag is set so that the painting will spawn at backPos
  * whenever it loads.
- *
- * This function also sets gDddPaintingStatus, which controls the warp:
- *  0 (0b00): set x coordinate to frontPos
- *  2 (0b10): set x coordinate to backPos
- *  3 (0b11): same as 2. Bit 0 is ignored
  */
 void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed) {
 #ifdef UNLOCK_ALL
     obj->oPosX = backPos;
-    gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
     return;
 #endif
     // Obtain the DDD star flags and find out whether Board Bowser's Sub was collected
@@ -740,12 +729,10 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
     if (!bowsersSubBeaten && !dddBack) {
         // If we haven't collected the star or moved the painting, put the painting at the front
         obj->oPosX = frontPos;
-        gDddPaintingStatus = DDD_FLAGS_NONE;
     } else if (bowsersSubBeaten && !dddBack) {
         // If we've collected the star but not moved the painting back,
         // Each frame, move the painting by a certain speed towards the back area.
         obj->oPosX += speed;
-        gDddPaintingStatus = DDD_FLAG_BOWSERS_SUB_BEATEN;
         if (obj->oPosX >= backPos) {
             obj->oPosX = backPos;
             // Tell the save file that we've moved DDD back.
@@ -754,7 +741,6 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
     } else if (bowsersSubBeaten && dddBack) {
         // If the painting has already moved back, place it in the back position.
         obj->oPosX = backPos;
-        gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
     }
 }
 

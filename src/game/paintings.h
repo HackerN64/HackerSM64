@@ -64,13 +64,6 @@ enum PaintingGroups {
     PAINTING_GROUP_NULL = -1,
 };
 
-// gDddPaintingStatus
-enum DDDPaintingFlags {
-    DDD_FLAGS_NONE              = (0 << 0), // 0x0
-    DDD_FLAG_BACK               = (1 << 0), // 0x1
-    DDD_FLAG_BOWSERS_SUB_BEATEN = (1 << 1), // 0x2
-};
-
 // Painting->state
 enum PaintingState {
     PAINTING_IDLE,
@@ -177,7 +170,6 @@ extern struct PaintingMeshVertex *gPaintingMesh;
 extern Vec3f *gPaintingTriNorms;
 extern struct Object *gRipplingPainting;
 extern struct Object *gEnteredPainting;
-extern s8 gDddPaintingStatus;
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
 
