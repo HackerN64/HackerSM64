@@ -122,7 +122,7 @@ struct Painting {
     /// Display list used when the painting is normal.
     const Gfx *normalDisplayList;
     /// Data used to map the texture to the mesh
-    const s16 *const *textureMaps;
+    const PaintingData *const *textureMaps;
 
     // Texture data
     const Texture *const *textureArray;

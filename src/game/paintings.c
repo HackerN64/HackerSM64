@@ -86,29 +86,41 @@ struct Object *gEnteredPainting = NULL;
 
 // HMC painting group
 struct Painting *sHmcPaintings[] = {
-    &cotmc_painting,
+    /*0x0*/ &cotmc_painting,
     NULL,
 };
 
 // Inside Castle painting group
 struct Painting *sInsideCastlePaintings[] = {
-    &bob_painting, &ccm_painting, &wf_painting,  &jrb_painting,      &lll_painting,
-    &ssl_painting, &hmc_painting, &ddd_painting, &wdw_painting,      &thi_tiny_painting,
-    &ttm_painting, &ttc_painting, &sl_painting,  &thi_huge_painting, &rr_painting,
+    /*0x0*/ &bob_painting,
+    /*0x1*/ &ccm_painting,
+    /*0x2*/ &wf_painting,
+    /*0x3*/ &jrb_painting,
+    /*0x4*/ &lll_painting,
+    /*0x5*/ &ssl_painting,
+    /*0x6*/ &hmc_painting,
+    /*0x7*/ &ddd_painting,
+    /*0x8*/ &wdw_painting,
+    /*0x9*/ &thi_tiny_painting,
+    /*0xA*/ &ttm_painting,
+    /*0xB*/ &ttc_painting,
+    /*0xC*/ &sl_painting,
+    /*0xD*/ &thi_huge_painting,
+    /*0xE*/ &rr_painting,
     NULL,
 };
 
 // TTM painting group
 struct Painting *sTtmPaintings[] = {
-    &ttm_slide_painting,
+    /*0x0*/ &ttm_slide_painting,
     NULL,
 };
 
 // Array of all painting groups
 struct Painting **sPaintingGroups[] = {
-    sHmcPaintings,
-    sInsideCastlePaintings,
-    sTtmPaintings,
+    /*0x0*/ sHmcPaintings,
+    /*0x1*/ sInsideCastlePaintings,
+    /*0x2*/ sTtmPaintings,
 };
 
 /**
@@ -212,7 +224,7 @@ void painting_update_floors(struct Object *obj) {
         }
     }
 
-    s16 lastFlags = obj->oPaintingCurrFlags;
+    s8 lastFlags = obj->oPaintingCurrFlags;
     // at most 1 of these will be nonzero
     obj->oPaintingCurrFlags = rippleFlags;
 
@@ -326,7 +338,7 @@ void painting_generate_mesh(struct Painting *painting, PaintingData *mesh, Paint
 
     // accesses are off by 1 since the first entry is the number of vertices
     for (i = 0; i < numTris; i++) {
-        tri = i * 3;
+        tri = (i * 3);
         gPaintingMesh[i].pos[0] = mesh[tri + 1];
         gPaintingMesh[i].pos[1] = mesh[tri + 2];
         // The "z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
@@ -363,7 +375,7 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
     gPaintingTriNorms = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(Vec3f)));
 
     for (i = 0; i < numTris; i++) {
-        PaintingData tri = (numVtx * 3) + (i * 3) + 2; // Add 2 because of the 2 length entries preceding the list
+        PaintingData tri = ((numVtx * 3) + (i * 3) + 2); // Add 2 because of the 2 length entries preceding the list
         vec3s_copy(v, &mesh[tri]);
         vec3s_to_vec3f(vp0, gPaintingMesh[v[0]].pos);
         vec3s_to_vec3f(vp1, gPaintingMesh[v[1]].pos);
@@ -453,11 +465,11 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
 
     // We can fit 15 (16 / 3) vertices in the RSP's vertex buffer.
     // Group triangles by 5, with one remainder group.
-    PaintingData triGroups = mapTris / 5;
-    PaintingData remGroupTris = mapTris % 5;
-    PaintingData numVtx = mapTris * 3;
+    PaintingData triGroups    = (mapTris / 5);
+    PaintingData remGroupTris = (mapTris % 5);
+    PaintingData numVtx       = (mapTris * 3);
 
-    PaintingData commands = (triGroups * 2) + remGroupTris + 7;
+    PaintingData commands = ((triGroups * 2) + remGroupTris + 7);
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
     Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -468,7 +480,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
     for (group = 0; group < triGroups; group++) {
         // The triangle groups are the second part of the texture map.
         // Each group is a list of 15 mappings
-        triGroup = (mapVerts * 3) + (group * 15) + 2;
+        triGroup = ((mapVerts * 3) + (group * 15) + 2);
 
         for (map = 0; map < 15; map++) {
             // The mapping is just an index into the earlier part of the textureMap
@@ -499,7 +511,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
     }
 
     // One group left with < 5 triangles
-    triGroup = (mapVerts * 3) + (triGroups * 15) + 2;
+    triGroup = ((mapVerts * 3) + (triGroups * 15) + 2);
 
     // Map the texture to the triangles
     for (map = 0; map < (remGroupTris * 3); map++) {
@@ -540,7 +552,12 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
 
     // Scale
     Mtx *scale = alloc_display_list(sizeof(Mtx));
-    guScale(scale, (painting->sizeX / PAINTING_SIZE), (painting->sizeY / PAINTING_SIZE), 1.0f);
+    guScale(
+        scale,
+        (painting->sizeX / PAINTING_SIZE),
+        (painting->sizeY / PAINTING_SIZE),
+        1.0f
+    );
     gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
     gSPEndDisplayList(gfx);
@@ -613,6 +630,7 @@ Gfx *painting_ripple_env_mapped(struct Painting *painting) {
     PaintingData *textureMap = segmented_to_virtual(textureMaps[0]);
     PaintingData meshVerts = textureMap[0];
     PaintingData meshTris = textureMap[(meshVerts * 3) + 1];
+
     gSPDisplayList(gfx++, render_painting(tArray[0], tWidth, tHeight, textureMap, meshVerts, meshTris, painting->alpha));
 
     // Update the ripple, may automatically reset the painting's state.
@@ -756,7 +774,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         return NULL;
     }
 
-    // Failsafe for nonexistent painting groups.
+    // Failsafes for nonexistent painting groups.
     if (obj->oPaintingGroup >= PAINTING_NUM_GROUPS) {
         return NULL;
     }
@@ -781,7 +799,8 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
 #if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
         // Update the ddd painting before drawing
-        if (obj->oPaintingGroup == PAINTING_GROUP_INSIDE_CASTLE && obj->oPaintingId == PAINTING_ID_CASTLE_DDD) {
+        if (obj->oPaintingGroup == PAINTING_GROUP_INSIDE_CASTLE
+         && obj->oPaintingId == PAINTING_ID_CASTLE_DDD) {
             move_ddd_painting(obj, 3456.0f, 5529.6f, 20.0f);
         }
 #endif
