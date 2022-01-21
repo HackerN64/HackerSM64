@@ -9579,7 +9579,7 @@ void cutscene_enter_painting(struct Camera *c) {
     set_fov_function(CAM_FOV_APP_20);
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
 
-    struct Object *ripplingPainting = gRipplingPainting;
+    struct Object *ripplingPainting = gCutsceneFocus;
 
     if (ripplingPainting != NULL) {
         f32 size = ((ripplingPainting->oPaintingPtr->sizeX + ripplingPainting->oPaintingPtr->sizeY) / 2.0f);

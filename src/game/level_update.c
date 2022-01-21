@@ -31,6 +31,7 @@
 #include "puppyprint.h"
 #include "puppylights.h"
 #include "level_commands.h"
+#include "behavior_data.h"
 #include "paintings.h"
 
 #include "config.h"
@@ -612,6 +613,13 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
 }
 
 /**
+ * Checks whether 'obj' is the entered painting.
+ */
+s32 obj_is_entered_painting(struct Object *obj) {
+    return (obj->oPaintingId == gEnteredPaintingId);
+}
+
+/**
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
 void initiate_painting_warp(void) {
@@ -649,7 +657,14 @@ void initiate_painting_warp(void) {
                 queue_rumble_data(80, 70);
                 queue_rumble_decay(1);
 #endif
-                cutscene_object(CUTSCENE_ENTER_PAINTING, NULL);
+                cutscene_object(
+                    CUTSCENE_ENTER_PAINTING,
+                    obj_nearest_object_with_behavior_and_condition(
+                        gMarioObject,
+                        bhvPainting,
+                        obj_is_entered_painting
+                    )
+                );
             }
         }
     } else {

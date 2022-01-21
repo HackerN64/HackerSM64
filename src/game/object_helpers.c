@@ -603,6 +603,32 @@ struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *b
     return closestObj;
 }
 
+struct Object *obj_nearest_object_with_behavior_and_condition(struct Object *curObj, const BehaviorScript *behavior, s32 condition(struct Object *obj)) {
+    BehaviorScript *behaviorAddr = segmented_to_virtual(behavior);
+    struct ObjectNode *listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
+    struct Object *obj = (struct Object *) listHead->next;
+    struct Object *closestObj = NULL;
+    f32 minDist = F32_MAX;
+
+    while (obj != (struct Object *) listHead) {
+        if (obj->behavior == behaviorAddr
+            && obj->activeFlags != ACTIVE_FLAG_DEACTIVATED
+            && obj != curObj
+            && condition(obj)
+        ) {
+            f32 objDist = dist_between_objects_squared(curObj, obj);
+            if (objDist < minDist) {
+                closestObj = obj;
+                minDist = objDist;
+            }
+        }
+
+        obj = (struct Object *) obj->header.next;
+    }
+
+    return closestObj;
+}
+
 struct Object *find_unimportant_object(void) {
     struct ObjectNode *listHead = &gObjectLists[OBJ_LIST_UNIMPORTANT];
     struct ObjectNode *obj = listHead->next;
