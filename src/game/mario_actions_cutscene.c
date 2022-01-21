@@ -588,7 +588,7 @@ void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
         switch (++m->actionTimer) {
             case 1:
                 celebStar = spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
-#ifdef CELEBRATION_STAR_COPY_MODEL
+#ifdef STAR_DANCE_USES_STARS_MODEL
                 celebStar->header.gfx.sharedChild = m->interactObj->header.gfx.sharedChild;
 #else
                 if (obj_has_model(m->interactObj, MODEL_BOWSER_KEY)) {
