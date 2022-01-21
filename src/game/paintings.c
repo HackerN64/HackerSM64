@@ -77,7 +77,7 @@ Vec3f *gPaintingTriNorms;
 /**
  * The painting that is currently rippling. Only one painting can be rippling at once.
  */
-struct Painting *gRipplingPainting;
+struct Object *gRipplingPainting;
 
 /**
  * The id of the painting Mario has entered.
@@ -99,7 +99,8 @@ struct Painting *sHmcPaintings[] = {
 struct Painting *sInsideCastlePaintings[] = {
     &bob_painting, &ccm_painting, &wf_painting,  &jrb_painting,      &lll_painting,
     &ssl_painting, &hmc_painting, &ddd_painting, &wdw_painting,      &thi_tiny_painting,
-    &ttm_painting, &ttc_painting, &sl_painting,  &thi_huge_painting, NULL,
+    &ttm_painting, &ttc_painting, &sl_painting,  &thi_huge_painting, &rr_painting,
+    NULL,
 };
 
 // TTM painting group
@@ -114,9 +115,6 @@ struct Painting **sPaintingGroups[] = {
     sInsideCastlePaintings,
     sTtmPaintings,
 };
-
-s16 gPaintingUpdateCounter = 1;
-s16 gLastPaintingUpdateCounter = 0;
 
 /**
  * Get the painting group from gCurrLevelNum.
@@ -135,25 +133,6 @@ UNUSED s32 get_painting_group(void) {
 }
 
 /**
- * Stop paintings in paintingGroup from rippling if their id is different from *idptr.
- */
-void stop_other_paintings(PaintingData *idptr, struct Painting *paintingGroup[]) {
-    s16 index = 0;
-    PaintingData id = *idptr;
-
-    while (paintingGroup[index] != NULL) {
-        struct Painting *painting = segmented_to_virtual(paintingGroup[index]);
-
-        // stop all rippling except for the selected painting
-        if (painting->id != id) {
-            painting->state = PAINTING_IDLE;
-        }
-
-        index++;
-    }
-}
-
-/**
  * Set the painting's state, causing it to start a passive ripple or a ripple from Mario entering.
  *
  * @param state The state to enter
@@ -161,53 +140,51 @@ void stop_other_paintings(PaintingData *idptr, struct Painting *paintingGroup[])
  * @param xSource,ySource what to use for the x and y origin of the ripple
  * @param resetTimer if TRUE, set the timer to 0
  */
-void painting_state(s32 state, struct Painting *painting, struct Painting *paintingGroup[], s8 centerRipples, s8 resetTimer) {
-    // make sure no other paintings are rippling
-    stop_other_paintings(&painting->id, paintingGroup);
+void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 resetTimer) {
+    struct Painting *painting = obj->oPaintingPtr;
 
     // use a different set of variables depending on the state
     switch (state) {
         case PAINTING_RIPPLE:
-            painting->currRippleMag    = painting->passiveRippleMag;
-            painting->rippleDecay      = painting->passiveRippleDecay;
-            painting->currRippleRate   = painting->passiveRippleRate;
-            painting->dispersionFactor = painting->passiveDispersionFactor;
+            obj->oPaintingCurrRippleMag    = painting->passiveRippleMag;
+            obj->oPaintingRippleDecay      = painting->passiveRippleDecay;
+            obj->oPaintingCurrRippleRate   = painting->passiveRippleRate;
+            obj->oPaintingDispersionFactor = painting->passiveDispersionFactor;
             break;
 
         case PAINTING_ENTERED:
-            painting->currRippleMag    = painting->entryRippleMag;
-            painting->rippleDecay      = painting->entryRippleDecay;
-            painting->currRippleRate   = painting->entryRippleRate;
-            painting->dispersionFactor = painting->entryDispersionFactor;
+            obj->oPaintingCurrRippleMag    = painting->entryRippleMag;
+            obj->oPaintingRippleDecay      = painting->entryRippleDecay;
+            obj->oPaintingCurrRippleRate   = painting->entryRippleRate;
+            obj->oPaintingDispersionFactor = painting->entryDispersionFactor;
             break;
     }
 
-    painting->state = state;
+    obj->oPaintingState = state;
 
     // Set the ripple position
     if (centerRipples) {
-        f32 centerPos = (painting->size * 0.5f);
-        painting->rippleX = centerPos;
-        painting->rippleY = centerPos;
+        obj->oPaintingRippleX = (painting->sizeX * 0.5f);
+        obj->oPaintingRippleY = (painting->sizeY * 0.5f);
     } else {
-        painting->rippleX = painting->marioLocalPos[0];
-        painting->rippleY = painting->marioLocalPos[1];
+        obj->oPaintingRippleX = obj->oPaintingLocalMarioPosX;
+        obj->oPaintingRippleY = obj->oPaintingLocalMarioPosY;
     }
 
     // Set Mario's Y position for the WDW water level
     gPaintingMarioYEntry = gMarioObject->oPosY;
 
     if (resetTimer) {
-        painting->rippleTimer = 0.0f;
+        obj->oPaintingRippleTimer = 0;
     }
 
-    gRipplingPainting = painting;
+    gRipplingPainting = obj;
 }
 
 /**
  * Check for Mario entering one of the special floors associated with the painting.
  */
-void painting_update_floors(struct Painting *painting) {
+void painting_update_floors(struct Object *obj) {
     s8 rippleFlags = RIPPLE_FLAGS_NONE;
 
     Vec3f marioWorldPos;
@@ -218,21 +195,16 @@ void painting_update_floors(struct Painting *painting) {
     vec3f_copy_y_off(marioWorldPos, &gMarioObject->oPosVec, PAINTING_MARIO_Y_OFFSET);
 
     // Get the painting's rotation.
-    rotation[0] = DEGREES(painting->rotation[0]);
-    rotation[1] = DEGREES(painting->rotation[1]);
-    rotation[2] = DEGREES(painting->rotation[2]);
+    vec3i_to_vec3s(rotation, &obj->oFaceAngleVec);
 
     // Get Mario's position in the painting's local space.
-    vec3f_world_pos_to_local_pos(marioLocalPos, marioWorldPos, painting->pos, rotation);
-
-    // Reset the global current warping painting.
-    gEnteredPaintingId = PAINTING_ID_NULL;
+    vec3f_world_pos_to_local_pos(marioLocalPos, marioWorldPos, &obj->oPosVec, rotation);
 
     // Check if Mario is within the painting bounds laterally in local space.
     if (marioLocalPos[0] > -PAINTING_EDGE_MARGIN
-     && marioLocalPos[0] < (painting->size + PAINTING_EDGE_MARGIN)
+     && marioLocalPos[0] < (obj->oPaintingPtr->sizeX + PAINTING_EDGE_MARGIN)
      && marioLocalPos[1] > -PAINTING_EDGE_MARGIN
-     && marioLocalPos[1] < (painting->size + PAINTING_EDGE_MARGIN)) {
+     && marioLocalPos[1] < (obj->oPaintingPtr->sizeY + PAINTING_EDGE_MARGIN)) {
         // Check whether Mario is in the wobble zone.
         if (marioLocalPos[2] < PAINTING_WOBBLE_DEPTH
          && marioLocalPos[2] > 0.0f) {
@@ -242,20 +214,19 @@ void painting_update_floors(struct Painting *painting) {
         if (marioLocalPos[2] < 0.0f
          && marioLocalPos[2] > -PAINTING_WARP_DEPTH) {
             rippleFlags |= RIPPLE_FLAG_ENTER;
-            // Set the global current warping painting.
-            gEnteredPaintingId = painting->id;
         }
     }
 
-    painting->lastFlags = painting->currFlags;
+    s16 lastFlags = obj->oPaintingCurrFlags;
     // at most 1 of these will be nonzero
-    painting->currFlags = rippleFlags;
+    obj->oPaintingCurrFlags = rippleFlags;
 
     // changedFlags is true if currFlags is true and lastFlags is false
     // (Mario just entered the floor on this frame)
-    painting->changedFlags = ((painting->lastFlags ^ painting->currFlags) & painting->currFlags);
+    obj->oPaintingChangedFlags = ((lastFlags ^ obj->oPaintingCurrFlags) & obj->oPaintingCurrFlags);
 
-    vec3f_copy(painting->marioLocalPos, marioLocalPos);
+    obj->oPaintingLocalMarioPosX = marioLocalPos[0];
+    obj->oPaintingLocalMarioPosY = marioLocalPos[1];
 }
 
 /**
@@ -265,31 +236,34 @@ void painting_update_floors(struct Painting *painting) {
  * ripple's magnitude becomes small enough.
  */
 void painting_update_ripple_state(struct Painting *painting) {
-    if (gPaintingUpdateCounter != gLastPaintingUpdateCounter) {
-        painting->currRippleMag *= painting->rippleDecay;
+    struct Object *obj = gCurGraphNodeObjectNode;
 
-        if (painting->rippleTimer >= ((1 << 24) - 1.0f)) {
-            painting->rippleTimer = 0.0f;
+    if (obj->oPaintingUpdateCounter != obj->oLastPaintingUpdateCounter) {
+        obj->oPaintingCurrRippleMag *= obj->oPaintingRippleDecay;
+
+        if (obj->oPaintingRippleTimer >= (S16_MAX - 1)) {
+            obj->oPaintingRippleTimer = 0;
         }
 
-        painting->rippleTimer += 1.0f;
+        obj->oPaintingRippleTimer++;
     }
     if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
         // if the painting is barely rippling, make it stop rippling
-        if (painting->currRippleMag <= 1.0f) {
-            painting->state = PAINTING_IDLE;
+        if (obj->oPaintingCurrRippleMag <= 1.0f) {
+            obj->oPaintingState = PAINTING_IDLE;
             gRipplingPainting = NULL;
         }
     } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
         // if the painting is doing the entry ripple but the ripples are as small as those from the
         // passive ripple, make it do a passive ripple
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
-        if ((painting->state == PAINTING_ENTERED) && (painting->currRippleMag <= painting->passiveRippleMag)) {
-            painting->state = PAINTING_RIPPLE;
-            painting->currRippleMag    = painting->passiveRippleMag;
-            painting->rippleDecay      = painting->passiveRippleDecay;
-            painting->currRippleRate   = painting->passiveRippleRate;
-            painting->dispersionFactor = painting->passiveDispersionFactor;
+        if ((obj->oPaintingState == PAINTING_ENTERED)
+         && (obj->oPaintingCurrRippleMag <= painting->passiveRippleMag)) {
+            obj->oPaintingState = PAINTING_RIPPLE;
+            obj->oPaintingCurrRippleMag    = painting->passiveRippleMag;
+            obj->oPaintingRippleDecay      = painting->passiveRippleDecay;
+            obj->oPaintingCurrRippleRate   = painting->passiveRippleRate;
+            obj->oPaintingDispersionFactor = painting->passiveDispersionFactor;
         }
     }
 }
@@ -298,28 +272,20 @@ void painting_update_ripple_state(struct Painting *painting) {
  * @return the ripple function at posX, posY
  * note that posX and posY correspond to a point on the face of the painting, not actual axes
  */
-s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
+s32 calculate_ripple_at_point(struct Object *obj, f32 dx, f32 dy) {
     /// Controls the peaks of the ripple.
-    f32 rippleMag = painting->currRippleMag;
+    f32 rippleMag = obj->oPaintingCurrRippleMag;
     /// Controls the ripple's frequency
-    f32 rippleRate = painting->currRippleRate;
+    f32 rippleRate = obj->oPaintingCurrRippleRate;
     /// Controls how fast the ripple spreads
-    f32 dispersionFactor = painting->dispersionFactor;
+    f32 dispersionFactor = obj->oPaintingDispersionFactor;
     /// How far the ripple has spread
-    f32 rippleTimer = painting->rippleTimer;
-    /// x and y ripple origin
-    f32 rippleX = painting->rippleX;
-    f32 rippleY = painting->rippleY;
+    f32 rippleTimer = obj->oPaintingRippleTimer;
 
-    f32 sizeRatio = (painting->size / PAINTING_SIZE);
-
-    posX *= sizeRatio;
-    posY *= sizeRatio;
-    f32 dx = (posX - rippleX);
-    f32 dy = (posY - rippleY);
     f32 distanceToOrigin = sqrtf(sqr(dx) + sqr(dy));
     // A larger dispersionFactor makes the ripple spread slower
-    f32 rippleDistance = distanceToOrigin / dispersionFactor;
+    f32 rippleDistance = (distanceToOrigin / dispersionFactor);
+
     if (rippleTimer < rippleDistance) {
         // if the ripple hasn't reached the point yet, make the point magnitude 0
         return 0;
@@ -351,19 +317,28 @@ s32 calculate_ripple_at_point(struct Painting *painting, f32 posX, f32 posY) {
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
 void painting_generate_mesh(struct Painting *painting, PaintingData *mesh, PaintingData numTris) {
-    s16 i;
+    struct Object *obj = gCurGraphNodeObjectNode;
+    s32 i, tri;
 
     gPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(struct PaintingMeshVertex)));
 
+    /// x and y ripple origin
+    f32 rippleX = obj->oPaintingRippleX;
+    f32 rippleY = obj->oPaintingRippleY;
+
+    f32 sizeRatioX = (painting->sizeX / PAINTING_SIZE);
+    f32 sizeRatioY = (painting->sizeY / PAINTING_SIZE);
+
     // accesses are off by 1 since the first entry is the number of vertices
     for (i = 0; i < numTris; i++) {
-        gPaintingMesh[i].pos[0] = mesh[(i * 3) + 1];
-        gPaintingMesh[i].pos[1] = mesh[(i * 3) + 2];
+        tri = i * 3;
+        gPaintingMesh[i].pos[0] = mesh[tri + 1];
+        gPaintingMesh[i].pos[1] = mesh[tri + 2];
         // The "z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
         // actual coordinate, it just determines whether the vertex moves
-        if (mesh[(i * 3) + 3]) {
-            gPaintingMesh[i].pos[2] = calculate_ripple_at_point(painting, gPaintingMesh[i].pos[0],
-                                                                          gPaintingMesh[i].pos[1]);
+        if (mesh[tri + 3]) {
+            gPaintingMesh[i].pos[2] = calculate_ripple_at_point(obj, ((gPaintingMesh[i].pos[0] * sizeRatioX) - rippleX),
+                                                                     ((gPaintingMesh[i].pos[1] * sizeRatioY) - rippleY));
         } else {
             gPaintingMesh[i].pos[2] = 0;
         }
@@ -449,7 +424,7 @@ void painting_average_vertex_normals(PaintingData *neighborTris, PaintingData nu
             vec3f_add(n, gPaintingTriNorms[tri]);
         }
         // Move to the next vertex's entry
-        entry += neighbors + 1;
+        entry += (neighbors + 1);
 
         // average the surface normals from each neighboring tri
         vec3_div_val(n, neighbors);
@@ -565,42 +540,13 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
  * Orient the painting mesh for rendering.
  */
 Gfx *painting_model_view_transform(struct Painting *painting) {
-    s32 isObj = (gCurGraphNodeObjectNode != NULL);
-    Gfx *dlist = alloc_display_list((isObj ? 2 : 6) * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(2 * sizeof(Gfx));
     Gfx *gfx = dlist;
-
-    // Only apply translation and rotation if those haven't already been applied by the parent object.
-    if (!isObj) {
-        // Translation
-        Mtx *translate = alloc_display_list(sizeof(Mtx));
-        guTranslate(translate, painting->pos[0], painting->pos[1], painting->pos[2]);
-        gSPMatrix(gfx++, translate, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
-
-        // Pitch
-        Mtx *rotX = alloc_display_list(sizeof(Mtx));
-        guRotate(rotX, painting->rotation[0], 1.0f, 0.0f, 0.0f);
-        gSPMatrix(gfx++, rotX, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
-
-        // Yaw
-        Mtx *rotY = alloc_display_list(sizeof(Mtx));
-        guRotate(rotY, painting->rotation[1], 0.0f, 1.0f, 0.0f);
-        gSPMatrix(gfx++, rotY, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
-
-        // Roll
-        Mtx *rotZ = alloc_display_list(sizeof(Mtx));
-        guRotate(rotZ, painting->rotation[2], 0.0f, 0.0f, 1.0f);
-        gSPMatrix(gfx++, rotZ, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
-    }
 
     // Scale
     Mtx *scale = alloc_display_list(sizeof(Mtx));
-    f32 sizeRatio = (painting->size / PAINTING_SIZE);
-    guScale(scale, sizeRatio, sizeRatio, sizeRatio);
-    if (isObj) {
-        gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
-    } else {
-        gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH));
-    }
+    guScale(scale, (painting->sizeX / PAINTING_SIZE), (painting->sizeY / PAINTING_SIZE), 1.0f);
+    gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
     gSPEndDisplayList(gfx);
 
@@ -611,9 +557,9 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
  * Ripple a painting that has 1 or more images that need to be mapped
  */
 Gfx *painting_ripple_image(struct Painting *painting) {
+    s16 i;
     PaintingData meshVerts;
     PaintingData meshTris;
-    PaintingData i;
     PaintingData *textureMap;
     PaintingData imageCount = painting->imageCount;
     PaintingData tWidth = painting->textureWidth;
@@ -739,10 +685,9 @@ Gfx *display_painting_not_rippling(struct Painting *painting) {
 /**
  * Clear Mario-related state and clear gRipplingPainting.
  */
-void reset_painting(struct Painting *painting) {
-    painting->lastFlags = RIPPLE_FLAGS_NONE;
-    painting->currFlags = RIPPLE_FLAGS_NONE;
-    painting->changedFlags = RIPPLE_FLAGS_NONE;
+void reset_painting(struct Object *obj) {
+    obj->oPaintingCurrFlags = RIPPLE_FLAGS_NONE;
+    obj->oPaintingChangedFlags = RIPPLE_FLAGS_NONE;
 
     gRipplingPainting = NULL;
 
@@ -750,18 +695,18 @@ void reset_painting(struct Painting *painting) {
     // Make sure all variables are reset correctly.
     // With segmented memory the segments that contain the relevant
     // Painting structs are reloaded from ROM upon level load.
-    painting->state = PAINTING_IDLE;
-    painting->currRippleMag = 0.0f;
-    painting->rippleDecay = 1.0f;
-    painting->currRippleRate = 0.0f;
-    painting->dispersionFactor = 0.0f;
-    painting->rippleTimer = 0.0f;
-    painting->rippleX = 0.0f;
-    painting->rippleY = 0.0f;
-    if (painting == &ddd_painting) {
+    obj->oPaintingState = PAINTING_IDLE;
+    obj->oPaintingCurrRippleMag = 0.0f;
+    obj->oPaintingRippleDecay = 1.0f;
+    obj->oPaintingCurrRippleRate = 0.0f;
+    obj->oPaintingDispersionFactor = 0.0f;
+    obj->oPaintingRippleTimer = 0;
+    obj->oPaintingRippleX = 0;
+    obj->oPaintingRippleY = 0;
+    if (obj->oPaintingPtr == &ddd_painting) {
         // Move DDD painting to initial position, in case the animation
         // that moves the painting stops during level unload.
-        painting->pos[0] = 3456.0f;
+        obj->oPosX = 3456.0f;
     }
 #endif
 }
@@ -781,18 +726,12 @@ void reset_painting(struct Painting *painting) {
  *  2 (0b10): set x coordinate to backPos
  *  3 (0b11): same as 2. Bit 0 is ignored
  */
+void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed) {
 #ifdef UNLOCK_ALL
-void move_ddd_painting(struct Painting *painting, UNUSED f32 frontPos, f32 backPos, UNUSED f32 speed) {
-    painting->pos[0] = backPos;
+    obj->oPosX = backPos;
     gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
-
-    struct Object *obj = gCurGraphNodeObjectNode;
-    if (obj != NULL) {
-        obj->oPosX = painting->pos[0];
-    }
-}
-#else
-void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32 speed) {
+    return;
+#endif
     // Obtain the DDD star flags and find out whether Board Bowser's Sub was collected
     u32 bowsersSubBeaten = (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD)) & STAR_FLAG_ACT_1);
     // Get the other save file flags and check whether DDD has already moved back
@@ -800,30 +739,24 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
 
     if (!bowsersSubBeaten && !dddBack) {
         // If we haven't collected the star or moved the painting, put the painting at the front
-        painting->pos[0] = frontPos;
+        obj->oPosX = frontPos;
         gDddPaintingStatus = DDD_FLAGS_NONE;
     } else if (bowsersSubBeaten && !dddBack) {
         // If we've collected the star but not moved the painting back,
         // Each frame, move the painting by a certain speed towards the back area.
-        painting->pos[0] += speed;
+        obj->oPosX += speed;
         gDddPaintingStatus = DDD_FLAG_BOWSERS_SUB_BEATEN;
-        if (painting->pos[0] >= backPos) {
-            painting->pos[0] = backPos;
+        if (obj->oPosX >= backPos) {
+            obj->oPosX = backPos;
             // Tell the save file that we've moved DDD back.
             save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
         }
     } else if (bowsersSubBeaten && dddBack) {
         // If the painting has already moved back, place it in the back position.
-        painting->pos[0] = backPos;
+        obj->oPosX = backPos;
         gDddPaintingStatus = (DDD_FLAG_BOWSERS_SUB_BEATEN | DDD_FLAG_BACK);
     }
-
-    struct Object *obj = gCurGraphNodeObjectNode;
-    if (obj != NULL) {
-        obj->oPosX = painting->pos[0];
-    }
 }
-#endif
 
 /**
  * Render and update the painting whose id and group matches the values in the GraphNode's parameter.
@@ -832,119 +765,117 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *gen = (struct GraphNodeGenerated *) node;
     struct Object *obj = gCurGraphNodeObjectNode;
-    u8 isObj = (obj != NULL);
-    if (isObj) {
-        // Use the object's behavior params for the painting group and id.
-        gen->parameter = GET_BPARAM12(obj->oBehParams);
+
+    if (obj == NULL) {
+        return NULL;
     }
-    u8 group = ((gen->parameter >> 8) & 0xFF);
-    u8 id    = ((gen->parameter >> 0) & 0xFF);
 
     // Failsafe for nonexistent painting groups.
-    if (group >= PAINTING_NUM_GROUPS) {
+    if (obj->oPaintingGroup >= PAINTING_NUM_GROUPS) {
         return NULL;
     }
 
     Gfx *paintingDlist = NULL;
-    struct Painting **paintingGroup = sPaintingGroups[group];
-    struct Painting *painting = segmented_to_virtual(paintingGroup[id]);
+    struct Painting *painting = obj->oPaintingPtr;
 
-    if (isObj) {
-        // Use the object's position and rotation as the painting's position and rotation.
-        vec3f_copy(painting->pos, &obj->oPosVec);
-        painting->rotation[0] = angle_to_degrees(obj->oFaceAnglePitch);
-        painting->rotation[1] = angle_to_degrees(obj->oFaceAngleYaw);
-        painting->rotation[2] = angle_to_degrees(obj->oFaceAngleRoll);
+    if (painting == NULL) {
+        return NULL;
     }
 
     if (callContext != GEO_CONTEXT_RENDER) {
         // Reset the update counter
-        gLastPaintingUpdateCounter = gAreaUpdateCounter - 1;
-        gPaintingUpdateCounter = gAreaUpdateCounter;
+        obj->oLastPaintingUpdateCounter = (gAreaUpdateCounter - 1);
+        obj->oPaintingUpdateCounter = gAreaUpdateCounter;
 
-        reset_painting(painting);
+        reset_painting(obj);
     } else if (callContext == GEO_CONTEXT_RENDER) {
         // Reset the update counter
-        gLastPaintingUpdateCounter = gPaintingUpdateCounter;
-        gPaintingUpdateCounter = gAreaUpdateCounter;
+        obj->oLastPaintingUpdateCounter = obj->oPaintingUpdateCounter;
+        obj->oPaintingUpdateCounter = gAreaUpdateCounter;
 
 #if defined(ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS) || defined(UNLOCK_ALL)
         // Update the ddd painting before drawing
-        if (group == PAINTING_GROUP_INSIDE_CASTLE && id == PAINTING_ID_CASTLE_DDD) {
-            move_ddd_painting(painting, 3456.0f, 5529.6f, 20.0f);
+        if (obj->oPaintingGroup == PAINTING_GROUP_INSIDE_CASTLE && obj->oPaintingId == PAINTING_ID_CASTLE_DDD) {
+            move_ddd_painting(obj, 3456.0f, 5529.6f, 20.0f);
         }
 #endif
 
         // Update the painting
-        painting_update_floors(painting);
+        painting_update_floors(obj);
 
-        // Determine if the painting is transparent
-        if (painting->alpha == 0xFF) { // Opaque
-            SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_OPAQUE);
-        } else {
-            SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_TRANSPARENT);
-        }
+        // Draw the painting
+        if (painting->imageCount > 0
+         && painting->normalDisplayList != NULL
+         && painting->textureMaps != NULL
+         && painting->textureArray != NULL
+         && painting->textureWidth > 0
+         && painting->textureHeight > 0
+         && painting->alpha > 0) {
+            // Determine if the painting is transparent
+            if (painting->alpha == 0xFF) { // Opaque
+                SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_OPAQUE);
+            } else {
+                SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_TRANSPARENT);
+            }
 
-        // Draw before updating
-        if (painting->state == PAINTING_IDLE) {
-            paintingDlist = display_painting_not_rippling(painting);
-        } else {
-            paintingDlist = display_painting_rippling(painting);
+            if (obj->oPaintingState == PAINTING_IDLE) {
+                paintingDlist = display_painting_not_rippling(painting);
+            } else {
+                paintingDlist = display_painting_rippling(painting);
+            }
         }
 
         if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
-            if (painting->changedFlags & RIPPLE_FLAG_ENTER) {
+            if (obj->oPaintingChangedFlags & RIPPLE_FLAG_ENTER) {
                 // Proximity painting enter ripple
-                painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, TRUE);
-            } else if (painting->state != PAINTING_ENTERED && (painting->changedFlags & RIPPLE_FLAG_RIPPLE)) {
+                painting_state(obj, PAINTING_ENTERED, FALSE, TRUE);
+            } else if (obj->oPaintingState != PAINTING_ENTERED && (obj->oPaintingChangedFlags & RIPPLE_FLAG_RIPPLE)) {
                 // Proximity painting wobble ripple
-                painting_state(PAINTING_RIPPLE, painting, paintingGroup, FALSE, TRUE);
+                painting_state(obj, PAINTING_RIPPLE, FALSE, TRUE);
             }
         } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
-            if (painting->changedFlags & RIPPLE_FLAG_ENTER) {
+            if (obj->oPaintingChangedFlags & RIPPLE_FLAG_ENTER) {
                 // Continuous painting enter ripple
-                painting_state(PAINTING_ENTERED, painting, paintingGroup, FALSE, FALSE);
-            } else if (painting->state == PAINTING_IDLE) {
+                painting_state(obj, PAINTING_ENTERED, FALSE, FALSE);
+            } else if (obj->oPaintingState == PAINTING_IDLE) {
                 // Continuous painting idle ripple
-                painting_state(PAINTING_RIPPLE, painting, paintingGroup, TRUE, TRUE);
+                painting_state(obj, PAINTING_RIPPLE, TRUE, TRUE);
             }
+        }
+
+        if (obj->oPaintingCurrFlags & RIPPLE_FLAG_ENTER) {
+            // Mario has entered the painting.
+            gEnteredPaintingId = obj->oPaintingId;
+        } else if (gEnteredPaintingId == obj->oPaintingId) {
+            // Reset gEnteredPaintingId if it's this painting and this painting is not entered.
+            gEnteredPaintingId = PAINTING_ID_NULL;
         }
     }
 
     return paintingDlist;
 }
 
-// Backwards compatibility
-UNUSED Gfx *geo_painting_update(UNUSED s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
-    return NULL;
-}
-
-s32 get_active_painting_id(void) {
-    if (gCurrentArea->paintingWarpNodes == NULL) {
-        gEnteredPaintingId = PAINTING_ID_NULL;
-    }
-
-    return gEnteredPaintingId;
-}
-
 void bhv_painting_init(void) {
     // Get the painting group and id from the behavior params.
-    u8 group = GET_BPARAM1(o->oBehParams);
-    u8 id    = GET_BPARAM2(o->oBehParams);
+    o->oPaintingGroup = GET_BPARAM1(o->oBehParams);
+    o->oPaintingId    = GET_BPARAM2(o->oBehParams);
 
     // Failsafe for nonexistent painting groups.
-    if (group >= PAINTING_NUM_GROUPS) {
+    if (o->oPaintingGroup >= PAINTING_NUM_GROUPS) {
         return;
     }
 
-    struct Painting **paintingGroup = sPaintingGroups[group];
-    struct Painting *painting = segmented_to_virtual(paintingGroup[id]);
-    f32 halfSize = (painting->size * 0.5f);
+    struct Painting **paintingGroup = sPaintingGroups[o->oPaintingGroup];
+    o->oPaintingPtr = segmented_to_virtual(paintingGroup[o->oPaintingId]);
 
     Vec3f roomFloorCheckPos;
 
     // The center of the painting with a z offset since paintings are usually between floor triangles.
-    Vec3f distPos = { halfSize, halfSize, PAINTING_WOBBLE_DEPTH };
+    Vec3f distPos = {
+        (o->oPaintingPtr->sizeX * 0.5f),
+        (o->oPaintingPtr->sizeY * 0.5f),
+        PAINTING_WOBBLE_DEPTH
+    };
 
     // Get the painting object's rotation.
     Vec3s rotation;

@@ -26,7 +26,7 @@
 /// This is added to Mario's Y position to make the ripple closer to Mario's center of mass.
 #define PAINTING_MARIO_Y_OFFSET 50.0f
 
-/// 'get_active_painting_id' returns this when Mario isn't in a painting's warp zone.
+/// 'gEnteredPaintingId' returns this when Mario isn't in a painting's warp zone.
 #define PAINTING_ID_NULL -1
 
 // HMC painting group
@@ -120,55 +120,28 @@ enum PaintingType {
 };
 
 struct Painting {
+    /// Id of the painting warp node.
     PaintingData id;
     /// How many images should be drawn when the painting is rippling.
     s8 imageCount;
     /// Either PAINTING_IMAGE or PAINTING_ENV_MAP
     s8 textureType;
 
-    /// The previous frame's ripple flags
-    s8 lastFlags;
-    /// The current frame's ripple flags
-    s8 currFlags;
-    /// The flags that are true in currFlags and false in lastFlags
-    s8 changedFlags;
-
-    /// The painting's state, see top of paintings.c
-    s8 state;
-
-    /// The painting's rotation
-    Vec3f rotation;
-
-    /// The painting's position
-    Vec3f pos;
-
     /// Controls how high the peaks of the ripple are.
-    f32 currRippleMag;
     f32 passiveRippleMag;
     f32 entryRippleMag;
 
     /// Multiplier that controls how fast the ripple regresses to the IDLE state.
-    f32 rippleDecay;
     f32 passiveRippleDecay;
     f32 entryRippleDecay;
 
     /// Controls the ripple's frequency
-    f32 currRippleRate;
     f32 passiveRippleRate;
     f32 entryRippleRate;
 
-    /// The rate at which the magnitude of the ripple decreases as you move farther from the central
-    /// point of the ripple
-    f32 dispersionFactor;
+    /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple
     f32 passiveDispersionFactor;
     f32 entryDispersionFactor;
-
-    /// How far the ripple has spread
-    f32 rippleTimer;
-
-    /// The x and y origin of the ripple
-    f32 rippleX;
-    f32 rippleY;
 
     /// Display list used when the painting is normal.
     const Gfx *normalDisplayList;
@@ -182,6 +155,7 @@ struct Painting {
 
     /// Display list used when the painting is rippling.
     const Gfx *rippleDisplayList;
+
     /// Controls when a passive ripple starts. RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
     s8 rippleTrigger;
 
@@ -190,10 +164,8 @@ struct Painting {
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f
-    f32 size;
-
-    /// Mario's position relative to the painting's position and rotation
-    Vec3f marioLocalPos;
+    f32 sizeX;
+    f32 sizeY;
 };
 
 /**
@@ -206,11 +178,11 @@ struct PaintingMeshVertex {
 
 extern struct PaintingMeshVertex *gPaintingMesh;
 extern Vec3f *gPaintingTriNorms;
-extern struct Painting *gRipplingPainting;
+extern struct Object *gRipplingPainting;
 extern s8 gDddPaintingStatus;
+extern s32 gEnteredPaintingId;
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
-Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx);
 
 void bhv_painting_init(void);
 void bhv_painting_loop(void);

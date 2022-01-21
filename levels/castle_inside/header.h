@@ -71,6 +71,7 @@ extern struct Painting ttm_painting;
 extern struct Painting ttc_painting;
 extern struct Painting sl_painting;
 extern struct Painting thi_huge_painting;
+extern struct Painting rr_painting;
 extern const Gfx inside_castle_seg7_dl_bowser_1_painting[];
 extern const Gfx inside_castle_seg7_dl_07028FD0[];
 extern const Gfx inside_castle_seg7_dl_07029578[];

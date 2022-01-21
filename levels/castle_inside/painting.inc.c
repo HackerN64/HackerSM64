@@ -1263,27 +1263,33 @@ static const Gfx inside_castle_seg7_painting_dl_ddd[] = {
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_bob[] = {
-    inside_castle_seg7_texture_0700B800, inside_castle_seg7_texture_0700A800,
+    inside_castle_seg7_texture_0700B800,
+    inside_castle_seg7_texture_0700A800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ccm[] = {
-    inside_castle_seg7_texture_0700D800, inside_castle_seg7_texture_0700C800,
+    inside_castle_seg7_texture_0700D800,
+    inside_castle_seg7_texture_0700C800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_wf[] = {
-    inside_castle_seg7_texture_0700F800, inside_castle_seg7_texture_0700E800,
+    inside_castle_seg7_texture_0700F800,
+    inside_castle_seg7_texture_0700E800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_jrb[] = {
-    inside_castle_seg7_texture_07011800, inside_castle_seg7_texture_07010800,
+    inside_castle_seg7_texture_07011800,
+    inside_castle_seg7_texture_07010800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_lll[] = {
-    inside_castle_seg7_texture_07012800, inside_castle_seg7_texture_07013800,
+    inside_castle_seg7_texture_07012800,
+    inside_castle_seg7_texture_07013800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ssl[] = {
-    inside_castle_seg7_texture_07015800, inside_castle_seg7_texture_07014800,
+    inside_castle_seg7_texture_07015800,
+    inside_castle_seg7_texture_07014800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_hmc_env[] = {
@@ -1295,41 +1301,40 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ddd_en
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_wdw[] = {
-    inside_castle_seg7_texture_07018800, inside_castle_seg7_texture_07017800,
+    inside_castle_seg7_texture_07018800,
+    inside_castle_seg7_texture_07017800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_thi[] = {
-    inside_castle_seg7_texture_0701A800, inside_castle_seg7_texture_07019800,
+    inside_castle_seg7_texture_0701A800,
+    inside_castle_seg7_texture_07019800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ttm[] = {
-    inside_castle_seg7_texture_0701C800, inside_castle_seg7_texture_0701B800,
+    inside_castle_seg7_texture_0701C800,
+    inside_castle_seg7_texture_0701B800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_ttc[] = {
-    inside_castle_seg7_texture_0701E800, inside_castle_seg7_texture_0701D800,
+    inside_castle_seg7_texture_0701E800,
+    inside_castle_seg7_texture_0701D800,
 };
 
 ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_sl[] = {
-    inside_castle_seg7_texture_07020800, inside_castle_seg7_texture_0701F800,
+    inside_castle_seg7_texture_07020800,
+    inside_castle_seg7_texture_0701F800,
 };
 
 // 0x07023620 - 0x07023698
-struct Painting bob_painting = {
+const struct Painting bob_painting = {
     /* id */ PAINTING_ID_CASTLE_BOB,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,    90.0f,     0.0f,
-    /* Position */ -5222.4f,   409.6f,  -153.6f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,    0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_bob,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_bob,
@@ -1337,26 +1342,19 @@ struct Painting bob_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  614.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023698 - 0x07023710
-struct Painting ccm_painting = {
+const struct Painting ccm_painting = {
     /* id */ PAINTING_ID_CASTLE_CCM,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,     0.0f,     0.0f,
-    /* Position */ -2611.2f,  -307.2f, -4352.0f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_ccm,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_ccm,
@@ -1364,26 +1362,19 @@ struct Painting ccm_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  614.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023710 - 0x07023788
-struct Painting wf_painting = {
+const struct Painting wf_painting = {
     /* id */ PAINTING_ID_CASTLE_WF,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,     0.0f,     0.0f,
-    /* Position */   -51.2f,  -204.8f, -4505.6f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_wf,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_wf,
@@ -1391,26 +1382,19 @@ struct Painting wf_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  614.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023788 - 0x07023800
-struct Painting jrb_painting = {
+const struct Painting jrb_painting = {
     /* id */ PAINTING_ID_CASTLE_JRB,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,   270.0f,     0.0f,
-    /* Position */  4300.8f,   409.6f,  -537.6f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_jrb,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_jrb,
@@ -1418,26 +1402,19 @@ struct Painting jrb_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  614.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023800 - 0x07023878
-struct Painting lll_painting = {
+const struct Painting lll_painting = {
     /* id */ PAINTING_ID_CASTLE_LLL,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,     0.0f,     0.0f,
-    /* Position */ -1689.6f, -1126.4f, -3942.4f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_lll,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_lll,
@@ -1445,26 +1422,19 @@ struct Painting lll_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  614.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023878 - 0x070238F0
-struct Painting ssl_painting = {
+const struct Painting ssl_painting = {
     /* id */ PAINTING_ID_CASTLE_SSL,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,   180.0f,     0.0f,
-    /* Position */ -2611.2f, -1177.6f, -1075.2f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_ssl,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_ssl,
@@ -1472,26 +1442,19 @@ struct Painting ssl_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  614.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  614.0f, 614.0f,
 };
 
 // 0x070238F0 - 0x07023968
-struct Painting hmc_painting = {
+const struct Painting hmc_painting = {
     /* id */ PAINTING_ID_CASTLE_HMC,
     /* Image Count */ 0x01,
     /* Texture Type */ PAINTING_ENV_MAP,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */   270.0f,     0.0f,     0.0f,
-    /* Position */  2099.2f, -1484.8f, -2278.4f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    10.0f,    30.0f,
-    /* Ripple Decay */         1.0f,     1.0f,    0.98f,
-    /* Ripple Rate */          0.0f,    0.05f,    0.05f,
-    /* Ripple Dispersion */    0.0f,    15.0f,    15.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,   0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    10.0f,    30.0f,
+    /* Ripple Decay */         1.0f,    0.98f,
+    /* Ripple Rate */         0.05f,    0.05f,
+    /* Ripple Dispersion */   15.0f,    15.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_hmc,
     /* Texture Maps */ inside_castle_seg7_painting_env_map_texture_maps_07023044,
     /* Textures */     inside_castle_seg7_painting_textures_hmc_env,
@@ -1499,26 +1462,19 @@ struct Painting hmc_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_env_map_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xFF,
-    /* Size */  768.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  768.0f, 768.0f,
 };
 
 // 0x07023968 - 0x070239E0
-struct Painting ddd_painting = {
+const struct Painting ddd_painting = {
     /* id */ PAINTING_ID_CASTLE_DDD,
     /* Image Count */ 0x01,
     /* Texture Type */ PAINTING_ENV_MAP,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */    0.0f,   270.0f,    0.0f,
-    /* Position */ 3456.0f, -1075.2f, 1587.2f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    10.0f,    30.0f,
-    /* Ripple Decay */         1.0f,     1.0f,    0.98f,
-    /* Ripple Rate */          0.0f,    0.05f,    0.05f,
-    /* Ripple Dispersion */    0.0f,    15.0f,    15.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,   0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    10.0f,    30.0f,
+    /* Ripple Decay */         1.0f,    0.98f,
+    /* Ripple Rate */         0.05f,    0.05f,
+    /* Ripple Dispersion */   15.0f,    15.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_ddd,
     /* Texture Maps */ inside_castle_seg7_painting_env_map_texture_maps_07023044,
     /* Textures */     inside_castle_seg7_painting_textures_ddd_env,
@@ -1526,26 +1482,19 @@ struct Painting ddd_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_env_map_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xB4,
-    /* Size */  819.2f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  819.2f, 819.2f,
 };
 
 // 0x070239E0 - 0x07023A58
-struct Painting wdw_painting = {
+const struct Painting wdw_painting = {
     /* id */ PAINTING_ID_CASTLE_WDW,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,     0.0f,     0.0f,
-    /* Position */ -966.656f, 1305.6f, -143.36f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_wdw,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_wdw,
@@ -1553,26 +1502,19 @@ struct Painting wdw_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  614.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023A58 - 0x07023AD0
-struct Painting thi_tiny_painting = {
+const struct Painting thi_tiny_painting = {
     /* id */ PAINTING_ID_CASTLE_THI_TINY,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,   180.0f,     0.0f,
-    /* Position */ -4598.7842f, 1354.752f, 3005.44f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_thi,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_thi,
@@ -1580,26 +1522,19 @@ struct Painting thi_tiny_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  393.216f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  393.216f, 393.216f,
 };
 
 // 0x07023AD0 - 0x07023B48
-struct Painting ttm_painting = {
+const struct Painting ttm_painting = {
     /* id */ PAINTING_ID_CASTLE_TTM,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */      0.0f,   180.0f,     0.0f,
-    /* Position */ -546.816f, 1356.8f, 3813.376f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_ttm,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_ttm,
@@ -1607,26 +1542,19 @@ struct Painting ttm_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  256.0f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  256.0f, 256.0f,
 };
 
 // 0x07023B48 - 0x07023BC0
-struct Painting ttc_painting = {
+const struct Painting ttc_painting = {
     /* id */ PAINTING_ID_CASTLE_TTC,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */       0.0f,   180.0f,     0.0f,
-    /* Position */ 0.0f, 2713.6f, 7232.5122f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_ttc,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_ttc,
@@ -1634,26 +1562,19 @@ struct Painting ttc_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  409.6f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  409.6f, 409.6f,
 };
 
 // 0x07023BC0 - 0x07023C38
-struct Painting sl_painting = {
+const struct Painting sl_painting = {
     /* id */ PAINTING_ID_CASTLE_SL,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */     0.0f,     0.0f,     0.0f,
-    /* Position */ 3179.52f, 1408.0f, -271.36f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,     0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_sl,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_sl,
@@ -1661,26 +1582,19 @@ struct Painting sl_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  716.8f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  716.8f, 716.8f,
 };
 
 // 0x07023C38 - 0x07023CB0
-struct Painting thi_huge_painting = {
+const struct Painting thi_huge_painting = {
     /* id */ PAINTING_ID_CASTLE_THI_HUGE,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */      0.0f,     0.0f,     0.0f,
-    /* Position */ -5614.5918f, 1510.4f, -3292.16f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    40.0f,   160.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.12f,    0.07f,
-    /* Ripple Dispersion */    0.0f,    80.0f,    60.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,    0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    40.0f,   160.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.12f,    0.07f,
+    /* Ripple Dispersion */   80.0f,    60.0f,
     /* Normal DList */ inside_castle_seg7_painting_dl_thi,
     /* Texture Maps */ inside_castle_seg7_painting_texture_maps_07022518,
     /* Textures */     inside_castle_seg7_painting_textures_thi,
@@ -1688,6 +1602,24 @@ struct Painting thi_huge_painting = {
     /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  1638.4f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  1638.4f, 1638.4f,
+};
+
+const struct Painting rr_painting = {
+    /* id */ PAINTING_ID_CASTLE_THI_HUGE,
+    /* Image Count */ 0x00,
+    /* Texture Type */ PAINTING_IMAGE,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    40.0f,   160.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.12f,    0.07f,
+    /* Ripple Dispersion */   80.0f,    60.0f,
+    /* Normal DList */ NULL,
+    /* Texture Maps */ NULL,
+    /* Textures */     NULL,
+    /* Texture w, h */  0,  0,
+    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Alpha */ 0x00,
+    /* Size */  204.8f, 204.8f,
 };

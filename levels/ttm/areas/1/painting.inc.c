@@ -546,25 +546,20 @@ static const Gfx ttm_seg7_painting_dl_slide_normal[] = {
 
 // 0x07012EF8 - 0x07012F78
 ALIGNED8 static const Texture *const ttm_seg7_painting_textures_slide[] = {
-    ttm_seg7_texture_07004000, ttm_seg7_texture_07003000,
+    ttm_seg7_texture_07004000,
+    ttm_seg7_texture_07003000,
 };
 
 // 0x07012F00 (PaintingData)
-struct Painting ttm_slide_painting = {
+const struct Painting ttm_slide_painting = {
     /* id */ PAINTING_ID_TTM_SLIDE,
     /* Image Count */ 0x02,
     /* Texture Type */ PAINTING_IMAGE,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */    0.0f,   90.0f,     0.0f,
-    /* Position */ 3072.0f, 921.6f, -819.2f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    20.0f,    80.0f,
-    /* Ripple Decay */         1.0f,  0.9608f,  0.9524f,
-    /* Ripple Rate */          0.0f,    0.24f,    0.14f,
-    /* Ripple Dispersion */    0.0f,    40.0f,    30.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,    0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    20.0f,    80.0f,
+    /* Ripple Decay */      0.9608f,  0.9524f,
+    /* Ripple Rate */         0.24f,    0.14f,
+    /* Ripple Dispersion */   40.0f,    30.0f,
     /* Normal DList */ ttm_seg7_painting_dl_slide_normal,
     /* Texture Maps */ ttm_seg7_painting_texture_maps_07012E88,
     /* Textures */     ttm_seg7_painting_textures_slide,
@@ -572,6 +567,5 @@ struct Painting ttm_slide_painting = {
     /* Ripple DList */ ttm_seg7_painting_dl_slide_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
-    /* Size */  460.8f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  460.8f, 460.8f,
 };

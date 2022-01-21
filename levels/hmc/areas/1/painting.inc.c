@@ -480,21 +480,15 @@ const Texture *const hmc_seg7_painting_textures_cotmc[] = {
 };
 
 // 0x0702551C (PaintingData)
-struct Painting cotmc_painting = {
+const struct Painting cotmc_painting = {
     /* id */ PAINTING_ID_HMC_COTMC,
     /* Image Count */ 0x01,
     /* Texture Type */ PAINTING_ENV_MAP,
-    /* Floor Status */ RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, RIPPLE_FLAGS_NONE, /* which of the painting's nearby special floors Mario's on */
-    /* Ripple Status */ PAINTING_IDLE,
-    /* Rotation */ 270.0f,  0.0f,     0.0f,
-    /* Position */ 2989.055908f, -4485.120117f, 5135.359863f,
-    /*                         curr   passive     entry */
-    /* Ripple Magnitude */     0.0f,    10.0f,    30.0f,
-    /* Ripple Decay */         1.0f,     1.0f,    0.98f,
-    /* Ripple Rate */          0.0f,    0.05f,    0.05f,
-    /* Ripple Dispersion */    0.0f,    15.0f,    15.0f,
-    /* Curr Ripple Timer */    0.0f,
-    /* Curr Ripple x, y */     0.0f,  0.0f,
+    /*                      passive     entry */
+    /* Ripple Magnitude */    10.0f,    30.0f,
+    /* Ripple Decay */         1.0f,    0.98f,
+    /* Ripple Rate */         0.05f,    0.05f,
+    /* Ripple Dispersion */   15.0f,    15.0f,
     /* Normal DList */ hmc_seg7_painting_dl_cotmc_normal,
     /* Texture Maps */ hmc_seg7_painting_texture_maps_cotmc,
     /* Textures */     hmc_seg7_painting_textures_cotmc,
@@ -502,6 +496,5 @@ struct Painting cotmc_painting = {
     /* Ripple DList */ hmc_seg7_painting_dl_cotmc_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xFF,
-    /* Size */  723.968018f,
-    /* Local Mario Position */ 0.0f, 0.0f, 0.0f,
+    /* Size */  723.968018f, 723.968018f,
 };
