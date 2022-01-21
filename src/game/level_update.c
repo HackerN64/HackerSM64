@@ -70,13 +70,13 @@ const char *credits08[] = { "3COURSE DESIGNERS", "YOSHIKI HARUHANA", "MAKOTO MIY
 #ifdef VERSION_US
 const char *credits09[] = { "1SOUND COMPOSER", "KOJI KONDO" };
 // ...as well as sound effects and sound programmer in order to make room for screen text writer, Mario voice, and Peach voice
-const char *credits10[] = { "4SOUND EFFECTS", "SOUND PROGRAMMER", "YOJI INAGAKI", "HIDEAKI SHIMIZU" }; 
+const char *credits10[] = { "4SOUND EFFECTS", "SOUND PROGRAMMER", "YOJI INAGAKI", "HIDEAKI SHIMIZU" };
 const char *credits11[] = { "23-D ANIMATORS", "YOSHIAKI KOIZUMI", "SATORU TAKIZAWA" };
 const char *credits12[] = { "1ADDITIONAL GRAPHICS", "MASANAO ARIMOTO" };
 const char *credits13[] = { "3TECHNICAL SUPPORT", "TAKAO SAWANO", "HIROHITO YOSHIMOTO", "HIROTO YADA" };
 const char *credits14[] = { "1TECHNICAL SUPPORT", "SGI N64 PROJECT STAFF" };
 const char *credits15[] = { "2PROGRESS MANAGEMENT", "KIMIYOSHI FUKUI", "KEIZO KATO" };
-const char *credits16[] = { "5SCREEN TEXT WRITER", "TRANSLATION", "LESLIE SWAN", "MINA AKINO", "HIRO YAMADA" }; 
+const char *credits16[] = { "5SCREEN TEXT WRITER", "TRANSLATION", "LESLIE SWAN", "MINA AKINO", "HIRO YAMADA" };
 #else // VERSION_EU
 // ...as well as sound composer, sound effects, and sound programmer, and...
 const char *credits09[] = { "7SOUND COMPOSER", "SOUND EFFECTS", "SOUND PROGRAMMER", "KOJI KONDO", "YOJI INAGAKI", "HIDEAKI SHIMIZU" };
@@ -613,13 +613,6 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
 }
 
 /**
- * Checks whether 'obj' is the entered painting.
- */
-s32 obj_is_entered_painting(struct Object *obj) {
-    return (obj->oPaintingId == gEnteredPaintingId);
-}
-
-/**
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
 void initiate_painting_warp(void) {
@@ -627,9 +620,9 @@ void initiate_painting_warp(void) {
     struct WarpNode *pWarpNode = NULL;
 
     if (gCurrentArea->paintingWarpNodes == NULL) {
-        gEnteredPaintingId = PAINTING_ID_NULL;
-    } else if (gEnteredPaintingId != PAINTING_ID_NULL) {
-        pWarpNode = &gCurrentArea->paintingWarpNodes[gEnteredPaintingId];
+        gEnteredPainting = NULL;
+    } else if (gEnteredPainting != NULL) {
+        pWarpNode = &gCurrentArea->paintingWarpNodes[gEnteredPainting->oPaintingId];
 
         if (pWarpNode != NULL) {
             if (gMarioState->action & ACT_FLAG_INTANGIBLE) {
@@ -657,14 +650,7 @@ void initiate_painting_warp(void) {
                 queue_rumble_data(80, 70);
                 queue_rumble_decay(1);
 #endif
-                cutscene_object(
-                    CUTSCENE_ENTER_PAINTING,
-                    obj_nearest_object_with_behavior_and_condition(
-                        gMarioObject,
-                        bhvPainting,
-                        obj_is_entered_painting
-                    )
-                );
+                cutscene_object(CUTSCENE_ENTER_PAINTING, gEnteredPainting);
             }
         }
     } else {

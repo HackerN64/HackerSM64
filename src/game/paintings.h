@@ -26,9 +26,6 @@
 /// This is added to Mario's Y position to make the ripple closer to Mario's center of mass.
 #define PAINTING_MARIO_Y_OFFSET 50.0f
 
-/// 'gEnteredPaintingId' returns this when Mario isn't in a painting's warp zone.
-#define PAINTING_ID_NULL -1
-
 // HMC painting group
 enum HMCPaintingIDs {
     /*0x0*/ PAINTING_ID_HMC_COTMC,
@@ -179,8 +176,8 @@ struct PaintingMeshVertex {
 extern struct PaintingMeshVertex *gPaintingMesh;
 extern Vec3f *gPaintingTriNorms;
 extern struct Object *gRipplingPainting;
+extern struct Object *gEnteredPainting;
 extern s8 gDddPaintingStatus;
-extern s32 gEnteredPaintingId;
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
 

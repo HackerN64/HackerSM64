@@ -603,7 +603,7 @@ struct Object *cur_obj_find_nearest_object_with_behavior(const BehaviorScript *b
     return closestObj;
 }
 
-struct Object *obj_nearest_object_with_behavior_and_condition(struct Object *curObj, const BehaviorScript *behavior, s32 condition(struct Object *obj)) {
+UNUSED struct Object *obj_nearest_object_with_behavior_and_condition(struct Object *curObj, const BehaviorScript *behavior, s32 condition(struct Object *obj)) {
     BehaviorScript *behaviorAddr = segmented_to_virtual(behavior);
     struct ObjectNode *listHead = &gObjectLists[get_object_list_from_behavior(behaviorAddr)];
     struct Object *obj = (struct Object *) listHead->next;

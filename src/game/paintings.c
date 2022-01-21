@@ -77,12 +77,12 @@ Vec3f *gPaintingTriNorms;
 /**
  * The painting that is currently rippling. Only one painting can be rippling at once.
  */
-struct Object *gRipplingPainting;
+struct Object *gRipplingPainting = NULL;
 
 /**
  * The id of the painting Mario has entered.
  */
-s32 gEnteredPaintingId = PAINTING_ID_NULL;
+struct Object *gEnteredPainting = NULL;
 
 /**
  * Whether the DDD painting is moved forward, should being moving backwards, or has already moved backwards.
@@ -845,10 +845,10 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
 
         if (obj->oPaintingCurrFlags & RIPPLE_FLAG_ENTER) {
             // Mario has entered the painting.
-            gEnteredPaintingId = obj->oPaintingId;
-        } else if (gEnteredPaintingId == obj->oPaintingId) {
-            // Reset gEnteredPaintingId if it's this painting and this painting is not entered.
-            gEnteredPaintingId = PAINTING_ID_NULL;
+            gEnteredPainting = obj;
+        } else if (gEnteredPainting == obj) {
+            // Reset gEnteredPainting if it's this painting and this painting is not entered.
+            gEnteredPainting = NULL;
         }
     }
 
