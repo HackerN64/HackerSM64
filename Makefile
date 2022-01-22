@@ -108,7 +108,7 @@ else ifeq ($(GRUCODE),l3dex2) # Line3DEX2
 else ifeq ($(GRUCODE),f3dex2pl) # Fast3DEX2_PosLight
   DEFINES += F3DEX2PL_GBI=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 else ifeq ($(GRUCODE),f3dzex) # Fast3DZEX (2.08J / Animal Forest - Dōbutsu no Mori)
-  DEFINES += F3DZEX_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
+  DEFINES += F3DZEX_NON_GBI_2=1 F3DEX_GBI_2=1 F3DEX_GBI_SHARED=1
 else ifeq ($(GRUCODE),super3d) # Super3D
   $(warning Super3D is experimental. Try at your own risk.)
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1

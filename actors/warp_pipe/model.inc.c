@@ -96,7 +96,7 @@ static const Vtx warp_pipe_seg3_vertex_03007DC0[] = {
 
 // 0x03007E40
 ALIGNED8 static const Texture warp_pipe_seg3_texture_03007E40[] = {
-#include "actors/warp_pipe/warp_pipe_side.rgba16.inc.c"
+#include "actors/warp_pipe/warp_pipe_side.custom.rgba16.inc.c"
 };
 
 // 0x03008E40 - 0x03008F98

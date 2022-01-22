@@ -33,7 +33,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
 **Lighting Engine by Wiseguy**
-- Lighting Engine is available on a separate branch ([base/lighting-engine](https://github.com/Reonu/HackerSM64/tree/base/lighting-engine)). Instructions on how to use it are in the readme of that branch.
+- Lighting Engine is available on a separate branch ([base/lighting-engine-wip](https://github.com/Reonu/HackerSM64/tree/base/lighting-engine-wip)). Instructions on how to use it are in the readme of that branch.
 - Alternatively, the main repo has `Puppylights` available, which is a more lightweight, but limited lighting library intended to be used to modify existing light properties. You can look at `puppylights.c` to find out how to use it.
 
 **Puppycam**
