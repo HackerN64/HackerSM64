@@ -21,13 +21,13 @@
 // Hold L + Z and press Start while on the level select menu to turn it off.
 #define DEBUG_LEVEL_SELECT
 
-// Enable debug free move (D-pad up to enter, A to exit).
+// Enables debug free move (D-pad up to enter, A to exit).
 #define ENABLE_DEBUG_FREE_MOVE
 
-// Include a custom, enhanced performance profiler. (Enables PUPPYPRINT by default in config_safeguards).
+// Enables a custom, enhanced performance profiler. (Enables PUPPYPRINT by default in config_safeguards).
 #define PUPPYPRINT_DEBUG 1
 
-// Use cycles instead of microseconds in Puppyprint debug output.
+// Uses cycles instead of microseconds in Puppyprint debug output.
 // #define PUPPYPRINT_DEBUG_CYCLES
 
 // A vanilla style debug mode. It doesn't rely on a text engine, but it's much less powerful that PUPPYPRINT_DEBUG.
@@ -38,7 +38,7 @@
 // If puppyprint is enabled, then this can be cycled only while the screen is active.
 #define VISUAL_DEBUG
 
-// Open all courses and doors. Used for debugging purposes to unlock all content.
+// Opens all courses and doors. Used for debugging purposes to unlock all content.
 #define UNLOCK_ALL
 
 // Same as above, but also reads all save file flags as complete.
@@ -48,7 +48,7 @@
 // Removes the limit on FPS.
 // #define UNLOCK_FPS
 
-// Include vanilla debug functionality.
+// Includes vanilla debug functionality.
 // #define VANILLA_DEBUG
 
 // Forces a crash when the game starts. Useful for debugging the crash screen.

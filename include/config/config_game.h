@@ -8,13 +8,13 @@
 // TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic.
 // #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
-// Disable lives and hide the lives counter.
+// Disables lives and hides the lives counter.
 #define DISABLE_LIVES
 
-// Save number of lives to the save file (Does nothing if DISABLE_LIVES is enabled).
+// Saves the number of lives to the save file (Does nothing if DISABLE_LIVES is enabled).
 #define SAVE_NUM_LIVES
 
-// The number of lives Mario starts with after a game over or starting the game for the first time (must be lower than 127).
+// This is the number of lives Mario starts with after a game over or starting the game for the first time (must be lower than 127).
 #define DEFAULT_NUM_LIVES 4
 
 // This can be 0..127.
@@ -45,16 +45,14 @@
 #define AREA_COUNT 8
 
 // Makes signs and NPCs easier to talk to.
-// NOTE: Currently has issues with talking to Bowser post-fight,
-// https://github.com/Reonu/HackerSM64/issues/273
 // #define EASIER_DIALOG_TRIGGER
 
-// Show an "A" when Mario is able to talk [requires EASIER_DIALOG_TRIGGER].
+// Shows an "A" when Mario is able to talk [requires EASIER_DIALOG_TRIGGER].
 // #define DIALOG_INDICATOR
 
 // Include the English characters that were missing from US segment2
 // J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
-// [MAKE SURE TO HAVE EU AND JP/SH BASEROMS TO OBTAIN THE ASSETS]
+// [MAKE SURE TO INCLUDE EU AND JP/SH BASEROMS IN THE REPO TO OBTAIN THE ASSETS]
 // If this is disabled, backup assets will be used.
 // #define COMPLETE_EN_US_SEGMENT2
 
@@ -67,5 +65,6 @@
 // Prevents infinite death loops by always restoring Mario's health when he's warped to any kind of warp while dead.
 #define PREVENT_DEATH_LOOP
 
-// The level that the game starts in after file select. The levelscript needs to have a MARIO_POS command for this to work.
+// The level that the game starts with immediately after file select.
+// The levelscript needs to have a MARIO_POS command for this to work.
 #define START_LEVEL LEVEL_CASTLE_GROUNDS

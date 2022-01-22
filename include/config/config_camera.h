@@ -4,7 +4,7 @@
  * CAMERA SETTINGS *
  *******************/
 
-// Force the camera mode to your choice (except when swimming or flying)
+// Forces the camera mode to your choice (except when swimming or flying).
 // It does this by setting the area's camera->defMode to this mode, and also
 // changes hardcoded modes to use c->defMode.
 //      Note: removes door cutscenes due to the way they're designed to work with specific modes.

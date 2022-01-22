@@ -66,11 +66,11 @@ s32 check_fall_damage(struct MarioState *m, u32 hardFallAction) {
 
     f32 fallHeight = m->peakHeight - m->pos[1];
 
-    f32 damageHeight = 1150.0f;
+    f32 damageHeight = FALL_DAMAGE_HEIGHT_SMALL;
 
     if (m->action != ACT_TWIRLING && m->floor != NULL && m->floor->type != SURFACE_BURNING) {
         if (m->vel[1] < -55.0f) {
-            if (fallHeight > 3000.0f) {
+            if (fallHeight > FALL_DAMAGE_HEIGHT_LARGE) {
                 m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 16 : 24;
 #if ENABLE_RUMBLE
                 queue_rumble_data(5, 80);

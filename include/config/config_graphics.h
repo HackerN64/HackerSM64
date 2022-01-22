@@ -4,16 +4,16 @@
  * GRAPHICS SETTINGS *
  *********************/
 
-// Size of how large the master display list (gDisplayListHead) can be. 6400 is vanilla.
+// The size of the master display list (gDisplayListHead). 6400 is vanilla.
 #define GFX_POOL_SIZE 0x4000
 
-// Show a watermark in the title screen that reads "Made with HackerSM64", instead of the copyright message.
+// Show a watermark on the title screen that reads "Made with HackerSM64", instead of the copyright message.
 #define INTRO_CREDIT
 
-// Spawn floombas in the title screen.
+// Spawns floombas on the title screen.
 #define INTRO_FLOOMBAS
 
-// Enable widescreen (16:9) support.
+// Enables widescreen (16:9) support.
 #define WIDE
 
 // Skybox size modifier, changing this will add support for larger skybox images. NOTE: Vanilla skyboxes may break if you change this option. Be sure to rescale them accordingly.
@@ -26,8 +26,8 @@
 // Regardless of whether this setting is enabled or not, you can use gIsConsole to wrap your own code in a console check.
 #define AUTO_LOD
 
-// Include Puppyprint, a display library for text and large images.
-// Automatically included when PUPPYPRINT_DEBUG is enabled.
+// Enables Puppyprint, a display library for text and large images.
+// Automatically enabled when PUPPYPRINT_DEBUG is enabled.
 // #define PUPPYPRINT
 
 // Disables AA (Improves console performance but causes visible seams between unconnected geometry).
@@ -75,7 +75,7 @@
 // Fixes the game reading the ia8 burn smoke texture as an rgba16.
 #define BURN_SMOKE_FIX
 
-// Disable the fix to Koopa's unshelled model.
+// Disables the fix to Koopa's unshelled model.
 #define KOOPA_KEEP_PINK_SHORTS
 
 // Copies the object graph node (model) to the star dance cutscene's object.
@@ -94,6 +94,6 @@
 // Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
 // #define DISABLE_SHADOWS
 
-// Use old shadow IDs for Fast64 compatibility. This is a temporary fix until Fast64 is updated to use the enum defines.
+// Uses old shadow IDs for Fast64 compatibility. This is a temporary fix until Fast64 is updated to use the enum defines.
 // NOTE: When this is enabled, The 49th hardcoded rectangle shadow will act as a regular circular shadow, due to Mario's shadow ID being 99 in vanilla.
 #define LEGACY_SHADOW_IDS

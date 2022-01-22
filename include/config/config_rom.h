@@ -8,7 +8,7 @@
 // The end quote should be here:               "
 #define INTERNAL_ROM_NAME "HackerSM64          "
 
-// Support Rumble Pak
+// Enables Rumble Pak Support.
 // Currently not recommended, as it may cause random crashes.
 // #define ENABLE_RUMBLE (1 || VERSION_SH)
 
