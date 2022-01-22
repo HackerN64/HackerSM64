@@ -60,7 +60,7 @@ InsnTemplate insn_db[] = {
     {R_TYPE, PARAM_NONE, 0, 0b011010, "DIV"},
     {R_TYPE, PARAM_NONE, 0, 0b011011, "DIVU"},
     {R_TYPE, PARAM_NONE, 0, 0b001000, "JR"},
- 
+
     {I_TYPE, PARAM_NONE, 0b101000, 0, "SB"},
     {I_TYPE, PARAM_NONE, 0b100000, 0, "LB"},
     {I_TYPE, PARAM_NONE, 0b100100, 0, "LBU"},
@@ -107,7 +107,9 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         }
     }
 
-    for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
+    for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) {
+        insn_as_string[i] = 0;
+    }
 
     for (int i = 0; i < ARRAY_COUNT(insn_db); i++) {
         if (insn.i.opcode != 0 && insn.i.opcode == insn_db[i].opcode) {
