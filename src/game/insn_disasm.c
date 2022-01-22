@@ -53,32 +53,32 @@ typedef struct __attribute__((packed)) {
 
 
 InsnTemplate insn_db[] = {
-    {R_TYPE, PARAM_NONE, 0, 0b100000, "ADD"},
-    {R_TYPE, PARAM_NONE, 0, 0b100001, "ADDU"},
-    {I_TYPE, PARAM_SWAP_RS_IMM,  0b001001, 0, "ADDIU"},
-    {R_TYPE, PARAM_NONE, 0, 0b100100, "AND"},
-    {R_TYPE, PARAM_NONE, 0, 0b011010, "DIV"},
-    {R_TYPE, PARAM_NONE, 0, 0b011011, "DIVU"},
-    {R_TYPE, PARAM_NONE, 0, 0b001000, "JR"},
- 
-    {I_TYPE, PARAM_NONE, 0b101000, 0, "SB"},
-    {I_TYPE, PARAM_NONE, 0b100000, 0, "LB"},
-    {I_TYPE, PARAM_NONE, 0b100100, 0, "LBU"},
-    {I_TYPE, PARAM_NONE, 0b101001, 0, "SH"},
-    {I_TYPE, PARAM_NONE, 0b100001, 0, "LH"},
-    {I_TYPE, PARAM_NONE, 0b100101, 0, "LHU"},
-    {I_TYPE, PARAM_NONE, 0b101011, 0, "SW"},
-    {I_TYPE, PARAM_NONE, 0b100011, 0, "LW"},
-    {I_TYPE, PARAM_LUI,  0b001111, 0, "LUI"},
+    {R_TYPE, PARAM_NONE,               0, 0b100000, "ADD"},
+    {R_TYPE, PARAM_NONE,               0, 0b100001, "ADDU"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b001001,        0, "ADDIU"},
+    {R_TYPE, PARAM_NONE,               0, 0b100100, "AND"},
+    {R_TYPE, PARAM_NONE,               0, 0b011010, "DIV"},
+    {R_TYPE, PARAM_NONE,               0, 0b011011, "DIVU"},
+    {R_TYPE, PARAM_NONE,               0, 0b001000, "JR"},
+
+    {I_TYPE, PARAM_NONE,        0b101000,        0, "SB"},
+    {I_TYPE, PARAM_NONE,        0b100000,        0, "LB"},
+    {I_TYPE, PARAM_NONE,        0b100100,        0, "LBU"},
+    {I_TYPE, PARAM_NONE,        0b101001,        0, "SH"},
+    {I_TYPE, PARAM_NONE,        0b100001,        0, "LH"},
+    {I_TYPE, PARAM_NONE,        0b100101,        0, "LHU"},
+    {I_TYPE, PARAM_NONE,        0b101011,        0, "SW"},
+    {I_TYPE, PARAM_NONE,        0b100011,        0, "LW"},
+    {I_TYPE, PARAM_LUI,         0b001111,        0, "LUI"},
 
     // branches
-    {I_TYPE, PARAM_SWAP_RS_IMM, 0b000100, 0, "BEQ"},
-    {I_TYPE, PARAM_SWAP_RS_IMM, 0b000101, 0, "BNE"},
-    {R_TYPE, PARAM_NONE, 0, 0b110100, "TEQ"},
-    {R_TYPE, PARAM_NONE, 0, 0b001001, "JALR"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b000100,        0, "BEQ"},
+    {I_TYPE, PARAM_SWAP_RS_IMM, 0b000101,        0, "BNE"},
+    {R_TYPE, PARAM_NONE,               0, 0b110100, "TEQ"},
+    {R_TYPE, PARAM_NONE,               0, 0b001001, "JALR"},
 
     // jal (special)
-    {J_TYPE, PARAM_JAL, 0b000011, 0, "JAL"}
+    {J_TYPE, PARAM_JAL,         0b000011,        0, "JAL"}
 };
 
 
@@ -101,25 +101,27 @@ char *insn_disasm(InsnData insn, u32 isPC) {
 
     if (insn.d == 0) { // trivial case
         if (isPC) {
-            return "NOP <-- CRASH";
+            return "@C0C0C0FFNOP @FF7F7FFF<-- CRASH";
         } else {
-            return "NOP";
+            return "@C0C0C0FFNOP";
         }
     }
 
-    for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) insn_as_string[i] = 0;
+    for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) {
+        insn_as_string[i] = 0;
+    }
 
     for (int i = 0; i < ARRAY_COUNT(insn_db); i++) {
         if (insn.i.opcode != 0 && insn.i.opcode == insn_db[i].opcode) {
             switch (insn_db[i].arbitraryParam) {
                 case PARAM_SWAP_RS_IMM:
-                    strp += sprintf(strp, "%-8s %s %s  %04X", insn_db[i].name,
+                    strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s %s @7FFF7FFF0x%04X", insn_db[i].name,
                                                registerMaps[insn.i.rt],
                                                registerMaps[insn.i.rs],
                                                insn.i.immediate
                     ); break;
                 case PARAM_LUI:
-                    strp += sprintf(strp, "%-8s %s %04X", insn_db[i].name,
+                    strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s @7FFF7FFF0x%04X", insn_db[i].name,
                                                registerMaps[insn.i.rt],
                                                insn.i.immediate
                     ); break;
@@ -127,17 +129,17 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                 case PARAM_JAL:
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
                     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
-                        strp += sprintf(strp, "%-8s %s", insn_db[i].name,
+                        strp += sprintf(strp, "@FFFFC0FF%-8s @FFFF7FFF%s", insn_db[i].name,
                                                          parse_map(target)
                         );
                     } else {
-                        strp += sprintf(strp, "%-8s %08X", insn_db[i].name,
+                        strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%08X", insn_db[i].name,
                                                            target
                         );
                     }
                     break;
                 case PARAM_NONE:
-                    strp += sprintf(strp, "%-8s %s %04X (%s)", insn_db[i].name,
+                    strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s @7FFF7FFF0x%04X @c7FFFFFF(%s)", insn_db[i].name,
                                                    registerMaps[insn.i.rt],
                                                    insn.i.immediate,
                                                    registerMaps[insn.i.rs]
@@ -147,7 +149,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
             successful_print = 1;
             break;
         } else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
-                strp += sprintf(strp, "%-8s %s %s %s", insn_db[i].name,
+                strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s %s %s", insn_db[i].name,
                                                    registerMaps[insn.i.rdata.rd],
                                                    registerMaps[insn.i.rs],
                                                    registerMaps[insn.i.rt]
@@ -161,7 +163,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
     }
 
     if (isPC) {
-        sprintf(strp, " <-- CRASH");
+        sprintf(strp, " @FF7F7FFF<-- CRASH");
     }
 
     return insn_as_string;
