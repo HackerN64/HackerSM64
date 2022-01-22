@@ -139,7 +139,20 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return (char *) memcpy(buffer, data, size) + size;
 }
 
-void crash_screen_print_color(s32 x, s32 y, RGBA16 color, const char *fmt, ...) {
+u32 index_to_hex(u32 glyph) {
+    u32 ret = 0;
+    if (glyph >= 48 && glyph <= 57) { // 0-9
+        ret = (glyph - 48);
+    } else if (glyph >= 65 && glyph <= 70) { // A-F
+        ret = (glyph - 65) + 10;
+    } else if (glyph >= 97 && glyph <= 102) { // a-f
+        ret = (glyph - 97) + 10;
+    }
+    return (ret & 0xF);
+}
+
+
+void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     u32 glyph;
     char buf[0x108];
     bzero(&buf, sizeof(buf));
@@ -149,25 +162,50 @@ void crash_screen_print_color(s32 x, s32 y, RGBA16 color, const char *fmt, ...) 
 
     s32 size = _Printf(write_to_buf, buf, fmt, args);
 
+    RGBA16 color = COLOR_RGBA16_WHITE;
+
     if (size > 0) {
         char *ptr = buf;
 
         while (*ptr) {
             glyph = (*ptr & 0x7f);
 
-            if (glyph != 0xff) {
-                crash_screen_draw_glyph(x, y, glyph, color);
-            }
+            if (glyph == 64) { // @
+                ptr++;
+                if (!*ptr) {
+                    break;
+                }
+                s32 i, j;
+                Color component = 0;
+                ColorRGBA rgba = { 0, 0, 0, 0 };
+                color = 0;
+                for (i = 0; i < 4; i++) {
+                    for (j = 0; j < 2; j++) {
+                        if (!*ptr) {
+                            break;
+                        }
+                        glyph = (*ptr & 0x7f);
+                        component |= (index_to_hex(glyph) << ((1 - j) * 4));
+                        ptr++;
+                    }
+                    rgba[i] = component;
+                    component = 0;
+                }
+                color = GPACK_RGBA5551(rgba[0], rgba[1], rgba[2], rgba[3]);
 
-            ptr++;
-            x += 6;
+            } else {
+                if (glyph != 0xff) {
+                    crash_screen_draw_glyph(x, y, glyph, color);
+                }
+
+                ptr++;
+                x += 6;
+            }
         }
     }
 
     va_end(args);
 }
-
-#define crash_screen_print(x, y, ...) crash_screen_print_color(x, y, COLOR_RGBA16_CRASH_WHITE, __VA_ARGS__)
 
 void crash_screen_sleep(s32 ms) {
     u64 cycles = ms * 1000LL * osClockRate / 1000000ULL;
@@ -202,17 +240,17 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
-    crash_screen_print_color(30, 20, COLOR_RGBA16_CRASH_THREAD, "THREAD:%d", thread->id);
-    crash_screen_print_color(90, 20, COLOR_RGBA16_CRASH_CAUSE, "(%s)", gCauseDesc[cause]);
+    crash_screen_print(30, 20, "@7F7FFFFFTHREAD:%d", thread->id);
+    crash_screen_print(90, 20, "@FF7F00FF(%s)", gCauseDesc[cause]);
     crash_screen_print(30, 30, "PC:%08X    SR:%08X    VA:%08X ", tc->pc, tc->sr, tc->badvaddr);
     osWritebackDCacheAll();
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
-        crash_screen_print_color(30, 40, COLOR_RGBA16_CRASH_CURRFUNC, "CRASH AT:");
+        crash_screen_print(30, 40, "@FF7F7FFFCRASH AT:");
         if (fname == NULL) {
-            crash_screen_print_color(90, 40, COLOR_RGBA16_GRAY, "UNKNOWN");
+            crash_screen_print(90, 40, "&@7F7F7FFFUNKNOWN");
         } else {
-            crash_screen_print_color(90, 40, COLOR_RGBA16_CRASH_FUNCTION, "%s", fname);
+            crash_screen_print(90, 40, "@FFFF7FFF%s", fname);
         }
     }
     crash_screen_print(30,  50, "AT:%08X    V0:%08X    V1:%08X", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
@@ -266,11 +304,11 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
     u32 temp_sp = (tc->sp + 0x14);
 
     crash_screen_print(30, 20, "STACK TRACE FROM %08X:", temp_sp);
-    crash_screen_print_color(30, 30, COLOR_RGBA16_CRASH_CURRFUNC, "CURRFUNC:");
+    crash_screen_print(30, 30, "@FF7F7FFFCURRFUNC:");
     if ((u32) parse_map == MAP_PARSER_ADDRESS) {
         crash_screen_print(90, 30, "NONE");
     } else {
-        crash_screen_print_color(90, 30, COLOR_RGBA16_CRASH_FUNCTION, "%s", parse_map(tc->pc));
+        crash_screen_print(90, 30, "@FFFF7FFF%s", parse_map(tc->pc));
     }
 
     osWritebackDCacheAll();
@@ -296,18 +334,18 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
                     i--;
                 } else {
                     crash_screen_print(30, (40 + (i * 10)), "%08X:", addr);
-                    crash_screen_print_color(90, (40 + (i * 10)), COLOR_RGBA16_LIGHT_GRAY, "UNKNOWN");
+                    crash_screen_print(90, (40 + (i * 10)), "@BDBDBDFFUNKNOWN");
                 }
             } else {
                 crash_screen_print(30, (40 + (i * 10)), "%08X:", addr);
-                crash_screen_print_color(90, (40 + (i * 10)), COLOR_RGBA16_CRASH_FUNCTION_2, "%s", fname);
+                crash_screen_print(90, (40 + (i * 10)), "@FFFFBDFF%s", fname);
             }
         }
     }
 
     crash_screen_draw_rect(25, 218, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
-    crash_screen_print_color( 30, 220, COLOR_RGBA16_LIGHT_GRAY, "up/down: scroll");
-    crash_screen_print_color(180, 220, COLOR_RGBA16_LIGHT_GRAY, "a: toggle unknowns");
+    crash_screen_print( 30, 220, "@BDBDBDFFup/down: scroll");
+    crash_screen_print(180, 220, "@BDBDBDFFa: toggle unknowns");
 
     osWritebackDCacheAll();
 }
@@ -333,7 +371,7 @@ void draw_disasm(OSThread *thread) {
     }
 
     crash_screen_draw_rect(25, 218, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
-    crash_screen_print_color(30, 220, COLOR_RGBA16_LIGHT_GRAY, "up/down: scroll");
+    crash_screen_print(30, 220, "@BDBDBDFFup/down: scroll");
 
     osWritebackDCacheAll();
 }
@@ -356,16 +394,16 @@ extern void warp_special(s32 arg);
 
 void draw_controls(UNUSED OSThread *thread) {
     s32 y = 15;
-    crash_screen_print(      30, (y += 10), "CRASH SCREEN CONTROLS");
-    crash_screen_print(      40, (y += 20), "START:");
-    crash_screen_print_color(40, (y += 10), COLOR_RGBA16_LIGHT_GRAY, "toggle framebuffer background");
-    crash_screen_print(      40, (y += 20), "Z:");
-    crash_screen_print_color(40, (y += 10), COLOR_RGBA16_LIGHT_GRAY, "toggle framebuffer only view");
-    crash_screen_print(      40, (y += 20), "ANALOG STICK, D-PAD, OR C BUTTONS:");
-    crash_screen_print(      50, (y += 20), "LEFT/RIGHT:");
-    crash_screen_print_color(50, (y += 10), COLOR_RGBA16_LIGHT_GRAY, "switch page");
-    crash_screen_print(      50, (y += 20), "UP/DOWN:");
-    crash_screen_print_color(50, (y += 10), COLOR_RGBA16_LIGHT_GRAY, "scroll page");
+    crash_screen_print(30, (y += 10), "CRASH SCREEN CONTROLS");
+    crash_screen_print(40, (y += 20), "START:");
+    crash_screen_print(40, (y += 10), "@BDBDBDFFtoggle framebuffer background");
+    crash_screen_print(40, (y += 20), "Z:");
+    crash_screen_print(40, (y += 10), "@BDBDBDFFtoggle framebuffer only view");
+    crash_screen_print(40, (y += 20), "ANALOG STICK, D-PAD, OR C BUTTONS:");
+    crash_screen_print(50, (y += 20), "LEFT/RIGHT:");
+    crash_screen_print(50, (y += 10), "@BDBDBDFFswitch page");
+    crash_screen_print(50, (y += 20), "UP/DOWN:");
+    crash_screen_print(50, (y += 10), "@BDBDBDFFscroll page");
 
     osWritebackDCacheAll();
 }
@@ -471,8 +509,8 @@ void draw_crash_screen(OSThread *thread) {
             if (sDrawFrameBuffer) {
                 crash_screen_draw_rect(25, 8, 270, 222, COLOR_RGBA16_CRASH_BACKGROUND, TRUE);
             }
-            crash_screen_print_color( 30, 10, COLOR_RGBA16_LIGHT_GRAY, "HackerSM64 v%s", HACKERSM64_VERSION);
-            crash_screen_print_color(234, 10, COLOR_RGBA16_LIGHT_GRAY, "<Page:%02d>", crashPage);
+            crash_screen_print( 30, 10, "@BDBDBDFFHackerSM64 v%s", HACKERSM64_VERSION);
+            crash_screen_print(234, 10, "@BDBDBDFF<Page:%02d>", crashPage);
             crash_screen_draw_rect(25, 18, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
             switch (crashPage) {
                 case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
