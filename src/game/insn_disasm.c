@@ -101,7 +101,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
 
     if (insn.d == 0) { // trivial case
         if (isPC) {
-            return "@C0C0C0FFNOP @FF0000FF<-- CRASH";
+            return "@C0C0C0FFNOP @FF7F7FFF<-- CRASH";
         } else {
             return "@C0C0C0FFNOP";
         }
@@ -115,7 +115,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         if (insn.i.opcode != 0 && insn.i.opcode == insn_db[i].opcode) {
             switch (insn_db[i].arbitraryParam) {
                 case PARAM_SWAP_RS_IMM:
-                    strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s %s  @7FFF7FFF0x%04X", insn_db[i].name,
+                    strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%s %s @7FFF7FFF0x%04X", insn_db[i].name,
                                                registerMaps[insn.i.rt],
                                                registerMaps[insn.i.rs],
                                                insn.i.immediate
@@ -163,7 +163,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
     }
 
     if (isPC) {
-        sprintf(strp, " @FF0000FF<-- CRASH");
+        sprintf(strp, " @FF7F7FFF<-- CRASH");
     }
 
     return insn_as_string;

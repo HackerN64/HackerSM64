@@ -218,9 +218,9 @@ void crash_screen_print_float_reg(s32 x, s32 y, s32 regNum, void *addr) {
     s32 exponent = ((bits & 0x7f800000U) >> 0x17) - 0x7F;
 
     if ((exponent >= -0x7E && exponent <= 0x7F) || bits == 0x0) {
-        crash_screen_print(x, y, "F%02d:%.3e",  regNum, *(f32 *) addr);
+        crash_screen_print(x, y, "@3FC07FFFF%02d:@FFFFFFFF%.3e",  regNum, *(f32 *) addr);
     } else {
-        crash_screen_print(x, y, "F%02d:%08XD", regNum, *(u32 *) addr);
+        crash_screen_print(x, y, "@3FC07FFFF%02d:@FFFFFFFF%08XD", regNum, *(u32 *) addr);
     }
 }
 
@@ -228,7 +228,7 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
     s32 i;
     u32 bit = BIT(17);
 
-    crash_screen_print(30, 155, "FPCSR:%08X", fpcsr);
+    crash_screen_print(30, 155, "@3FC07FFFFPCSR:@FFFFFFFF%08X", fpcsr);
     for (i = 0; i < 6; i++) {
         if (fpcsr & bit) {
             crash_screen_print(132, 155, "(%s)", gFpcsrDesc[i]);
@@ -241,28 +241,28 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
 void draw_crash_context(OSThread *thread, s32 cause) {
     __OSThreadContext *tc = &thread->context;
     crash_screen_print(30, 20, "@7F7FFFFFTHREAD:%d", thread->id);
-    crash_screen_print(90, 20, "@FF7F00FF(%s)", gCauseDesc[cause]);
-    crash_screen_print(30, 30, "PC:%08X    SR:%08X    VA:%08X ", tc->pc, tc->sr, tc->badvaddr);
+    crash_screen_print(90, 20, "@FF3F00FF(%s)", gCauseDesc[cause]);
     osWritebackDCacheAll();
     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
-        crash_screen_print(30, 40, "@FF7F7FFFCRASH AT:");
+        crash_screen_print(30, 30, "@FF7F7FFFCRASH AT:");
         if (fname == NULL) {
-            crash_screen_print(90, 40, "&@7F7F7FFFUNKNOWN");
+            crash_screen_print(90, 30, "&@7F7F7FFFUNKNOWN");
         } else {
-            crash_screen_print(90, 40, "@FFFF7FFF%s", fname);
+            crash_screen_print(90, 30, "@FFFF7FFF%s", fname);
         }
     }
-    crash_screen_print(30,  50, "AT:%08X    V0:%08X    V1:%08X", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
-    crash_screen_print(30,  60, "A0:%08X    A1:%08X    A2:%08X", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
-    crash_screen_print(30,  70, "A3:%08X    T0:%08X    T1:%08X", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
-    crash_screen_print(30,  80, "T2:%08X    T3:%08X    T4:%08X", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
-    crash_screen_print(30,  90, "T5:%08X    T6:%08X    T7:%08X", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
-    crash_screen_print(30, 100, "S0:%08X    S1:%08X    S2:%08X", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
-    crash_screen_print(30, 110, "S3:%08X    S4:%08X    S5:%08X", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
-    crash_screen_print(30, 120, "S6:%08X    S7:%08X    T8:%08X", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
-    crash_screen_print(30, 130, "T9:%08X    GP:%08X    SP:%08X", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
-    crash_screen_print(30, 140, "S8:%08X    RA:%08X",            (u32) tc->s8, (u32) tc->ra);
+    crash_screen_print(30,  40, "@3FC07FFFPC:@FFFFFFFF%08X    @3FC07FFFSR:@FFFFFFFF%08X    @3FC07FFFVA:@FFFFFFFF%08X", (u32) tc->pc, (u32) tc->sr, (u32) tc->badvaddr);
+    crash_screen_print(30,  50, "@3FC07FFFAT:@FFFFFFFF%08X    @3FC07FFFV0:@FFFFFFFF%08X    @3FC07FFFV1:@FFFFFFFF%08X", (u32) tc->at, (u32) tc->v0, (u32) tc->v1);
+    crash_screen_print(30,  60, "@3FC07FFFA0:@FFFFFFFF%08X    @3FC07FFFA1:@FFFFFFFF%08X    @3FC07FFFA2:@FFFFFFFF%08X", (u32) tc->a0, (u32) tc->a1, (u32) tc->a2);
+    crash_screen_print(30,  70, "@3FC07FFFA3:@FFFFFFFF%08X    @3FC07FFFT0:@FFFFFFFF%08X    @3FC07FFFT1:@FFFFFFFF%08X", (u32) tc->a3, (u32) tc->t0, (u32) tc->t1);
+    crash_screen_print(30,  80, "@3FC07FFFT2:@FFFFFFFF%08X    @3FC07FFFT3:@FFFFFFFF%08X    @3FC07FFFT4:@FFFFFFFF%08X", (u32) tc->t2, (u32) tc->t3, (u32) tc->t4);
+    crash_screen_print(30,  90, "@3FC07FFFT5:@FFFFFFFF%08X    @3FC07FFFT6:@FFFFFFFF%08X    @3FC07FFFT7:@FFFFFFFF%08X", (u32) tc->t5, (u32) tc->t6, (u32) tc->t7);
+    crash_screen_print(30, 100, "@3FC07FFFS0:@FFFFFFFF%08X    @3FC07FFFS1:@FFFFFFFF%08X    @3FC07FFFS2:@FFFFFFFF%08X", (u32) tc->s0, (u32) tc->s1, (u32) tc->s2);
+    crash_screen_print(30, 110, "@3FC07FFFS3:@FFFFFFFF%08X    @3FC07FFFS4:@FFFFFFFF%08X    @3FC07FFFS5:@FFFFFFFF%08X", (u32) tc->s3, (u32) tc->s4, (u32) tc->s5);
+    crash_screen_print(30, 120, "@3FC07FFFS6:@FFFFFFFF%08X    @3FC07FFFS7:@FFFFFFFF%08X    @3FC07FFFT8:@FFFFFFFF%08X", (u32) tc->s6, (u32) tc->s7, (u32) tc->t8);
+    crash_screen_print(30, 130, "@3FC07FFFT9:@FFFFFFFF%08X    @3FC07FFFGP:@FFFFFFFF%08X    @3FC07FFFSP:@FFFFFFFF%08X", (u32) tc->t9, (u32) tc->gp, (u32) tc->sp);
+    crash_screen_print(30, 140, "@3FC07FFFS8:@FFFFFFFF%08X    @3FC07FFFRA:@FFFFFFFF%08X",                              (u32) tc->s8, (u32) tc->ra);
     crash_screen_print_fpcsr(tc->fpcsr);
 
     osWritebackDCacheAll();
