@@ -24,7 +24,7 @@
 #define MAX_NUM_COINS   999
 
 // Air/breath meter is separate from health meter when underwater.
-// #define BREATH_METER
+#define BREATH_METER
 
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
 #define X_COIN_STAR 100

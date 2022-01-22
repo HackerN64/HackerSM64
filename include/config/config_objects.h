@@ -14,7 +14,7 @@
 #define COIN_LAVA_FLICKER
 
 // Allows for retries on collecting the remaining blue coins from a blue coin switch.
-// #define BLUE_COIN_SWITCH_RETRY
+#define BLUE_COIN_SWITCH_RETRY
 
 // -- EXCLAMATION BOX --
 
@@ -24,7 +24,7 @@
 // -- GOOMBA --
 
 // Tiny Goombas (from THI) always drop their coin.
-// #define TINY_GOOMBA_ALWAYS_DROPS_COIN
+#define TINY_GOOMBA_ALWAYS_DROPS_COIN
 
 // Floombas! These fellas sport custom behaviors (bhvFloomba, bhvFloombaTripletSpawner) and of course the iconic Floomba texture.
 // Also supports macros (macro_floomba, macro_huge_floomba, macro_tiny_floomba, macro_floomba_triplet_spawner, macro_floomba_quintuplet_spawner).
@@ -41,7 +41,7 @@
 // -- MR I --
 
 // Enables Mr I to shoot his particle in any direction.
-// #define MR_I_PITCH_SHOOTING
+#define MR_I_PITCH_SHOOTING
 
 // -- WATER RING --
 

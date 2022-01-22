@@ -42,7 +42,7 @@
 // #define NO_GETTING_BURIED
 
 // Prevents hands-free holding.
-// #define HANDS_FREE_HOLDING_FIX
+#define HANDS_FREE_HOLDING_FIX
 
 // Prevents Mario from losing his cap.
 // #define PREVENT_CAP_LOSS
@@ -81,7 +81,7 @@
 #define WALL_KICK_DEGREES 45
 
 // This is vanilla behavior, disable it to allow ledge grabbing regardless of floor pitch.
-// #define LEDGE_GRABS_CHECK_SLOPE_ANGLE
+#define LEDGE_GRABS_CHECK_SLOPE_ANGLE
 
 // Disables BLJs and crushes SimpleFlips's dreams.
 // #define DISABLE_BLJ
