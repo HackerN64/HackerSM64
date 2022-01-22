@@ -4,7 +4,7 @@
  * CAMERA SETTINGS *
  *******************/
 
-// Force the camera mode to your choice (except when swimming or flying)
+// Forces the camera mode to your choice (except when swimming or flying).
 // It does this by setting the area's camera->defMode to this mode, and also
 // changes hardcoded modes to use c->defMode.
 //      Note: removes door cutscenes due to the way they're designed to work with specific modes.
@@ -27,10 +27,10 @@
 // Makes the camera approach Mario's height much more quickly.
 #define FAST_VERTICAL_CAMERA_MOVEMENT
 
-// Enable "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the D-pad.
+// Enables "parallel lakitu camera" or "aglab cam" which lets you move the camera smoothly with the D-pad.
 #define PARALLEL_LAKITU_CAM
 
-// Enable Puppy Camera 2, a rewritten camera that can be freely configured and modified.
+// Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 // #define PUPPYCAM
 
 // Note: Reonucam is available, but because we had no time to test it properly, it's included as a patch rather than being in the code by default.

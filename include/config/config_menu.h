@@ -6,7 +6,7 @@
 
 // -- EXIT COURSE SETTINGS --
 
-// Disable Exit Course.
+// Disables Exit Course.
 // #define DISABLE_EXIT_COURSE
 
 // Decides whether you can exit course while moving (has no effect if you disable Exit Course).
