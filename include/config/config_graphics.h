@@ -66,7 +66,7 @@
 // Disable the fix to Koopa's unshelled model.
 #define KOOPA_KEEP_PINK_SHORTS
 
-// Copies the object graph node (model) to the star dance cutscene's object.
+// Uses the star object's model in the star dance cutscene.
 // This has a side effect of making the star dance star also transparent when Mario collects a transparent star.
 // #define STAR_DANCE_USES_STARS_MODEL
 
