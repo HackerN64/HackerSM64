@@ -467,8 +467,7 @@ s32 act_hang_moving(struct MarioState *m) {
 
 #ifdef BETTER_HANGING
     // determine animation speed from forward velocity
-    set_mario_anim_with_accel(
-        m,
+    set_mario_anim_with_accel(m,
         (m->actionArg & 0x1) ? MARIO_ANIM_MOVE_ON_WIRE_NET_RIGHT : MARIO_ANIM_MOVE_ON_WIRE_NET_LEFT,
         (m->forwardVel + 1.0f) * 0x2000
     );
@@ -489,7 +488,9 @@ s32 act_hang_moving(struct MarioState *m) {
 
 #ifdef BETTER_HANGING
     if (m->input & INPUT_IDLE) {
-        if (m->marioObj->header.gfx.animInfo.animFrame > 6) m->actionArg ^= 1;
+        if (m->marioObj->header.gfx.animInfo.animFrame > 6) {
+            m->actionArg ^= 1;
+        }
         set_mario_action(m, ACT_HANGING, m->actionArg);
     } else if (is_anim_past_end(m)) {
         m->actionArg ^= 1;
@@ -520,6 +521,7 @@ s32 let_go_of_ledge(struct MarioState *m) {
     m->pos[2] -= 60.0f * coss(m->faceAngle[1]);
 
     f32 floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
+
     if (floorHeight < m->pos[1] - 100.0f) {
         m->pos[1] -= 100.0f;
     } else {
