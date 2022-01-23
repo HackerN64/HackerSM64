@@ -231,7 +231,7 @@ void crash_screen_print_fpcsr(u32 fpcsr) {
     crash_screen_print(30, 155, "@3FC07FFFFPCSR:@FFFFFFFF%08X", fpcsr);
     for (i = 0; i < 6; i++) {
         if (fpcsr & bit) {
-            crash_screen_print(132, 155, "(%s)", gFpcsrDesc[i]);
+            crash_screen_print(132, 155, "@FF3F00FF(%s)", gFpcsrDesc[i]);
             return;
         }
         bit >>= 1;
@@ -412,8 +412,14 @@ extern u16 sRenderedFramebuffer;
 
 void reload_crash_screen_framebuffer(void) {
     if (sDrawFrameBuffer) {
-        memcpy(gFramebuffers[2], gFramebuffers[sRenderedFramebuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
-        gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[2];
+        s32 crashScreenFrameBufferIndex;
+        if (gIsConsole) {
+            crashScreenFrameBufferIndex = ((sRenderedFramebuffer + 1) % 3);
+        } else {
+            crashScreenFrameBufferIndex = 2;
+        }
+        memcpy(gFramebuffers[crashScreenFrameBufferIndex], gFramebuffers[sRenderedFramebuffer], ((SCREEN_WIDTH * SCREEN_HEIGHT) * sizeof(RGBA16)));
+        gCrashScreen.framebuffer = (RGBA16 *) gFramebuffers[crashScreenFrameBufferIndex];
     } else {
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA16_BLACK, FALSE);
     }
