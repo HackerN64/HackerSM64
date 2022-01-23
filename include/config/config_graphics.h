@@ -57,7 +57,7 @@
 // Use 64x64 quarter shadow textures (Vanilla are 16x16).
 #define HD_SHADOWS
 
-// Stretches shadows to fit the terrain instead of rotatin them to align with it.
+// Stretches shadows to fit the terrain instead of rotating them to align with it.
 // This makes them maintain a constant horizontal size.
 // Performs better than regular shadows.
 // #define SHEAR_SHADOWS
