@@ -1680,9 +1680,9 @@ void mtxf_to_mtx_fast(s16* dst, float* src)
     for (i = 0; i < 4; i++)
     {
         // Read the three input in the current row (assume the fourth is zero)
-        float a = src[4 * i + 0];
-        float b = src[4 * i + 1];
-        float c = src[4 * i + 2];
+        float a = src[(4 * i) + 0];
+        float b = src[(4 * i) + 1];
+        float c = src[(4 * i) + 2];
         float a_scaled = mul_without_nop(a,scale);
         float b_scaled = mul_without_nop(b,scale);
         float c_scaled = mul_without_nop(c,scale);
@@ -1697,19 +1697,19 @@ void mtxf_to_mtx_fast(s16* dst, float* src)
         // Write the integer part of a, as well as garbage into the next two bytes.
         // Those two bytes will get overwritten by the integer part of b.
         // This prevents needing to shift or mask the integer value of a.
-        *(s32*)(&dst[4 * i +  0]) = a_int;
+        *(s32*)(&dst[(4 * i) +  0]) = a_int;
         // Write the fractional part of a
-        dst[4 * i + 16] = (s16)a_int;
+        dst[(4 * i) + 16] = (s16)a_int;
 
         // Write the integer part of b using swl to avoid needing to shift.
-        swl(dst + 4 * i, b_int, 2);
+        swl(dst + (4 * i), b_int, 2);
         // Write the fractional part of b.
-        dst[4 * i + 17] = (s16)b_int;
+        dst[(4 * i) + 17] = (s16)b_int;
 
         // Write the integer part of c and two zeroes for the 4th column.
-        *(s32*)(&dst[4 * i + 2]) = c_high;
+        *(s32*)(&dst[(4 * i) + 2]) = c_high;
         // Write the fractional part of c and two zeroes for the 4th column
-        *(s32*)(&dst[4 * i + 18]) = c_low;
+        *(s32*)(&dst[(4 * i) + 18]) = c_low;
     }
     // Write 1.0 to the bottom right entry in the output matrix
     // The low half was already set to zero in the loop, so we only need
