@@ -468,7 +468,6 @@ ALWAYS_INLINE s32 absi(s32 in) {
 #define abss absi
 
 #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
-// #define FLT_IS_NONZERO(x) ((s32)(x) != 0)
 
 // RNG
 u32 random_u16(void);
