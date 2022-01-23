@@ -248,7 +248,7 @@ void switch_ucode(s32 ucode) {
     switch (ucode) {
         default: // GRAPH_NODE_UCODE_DEFAULT
         case GRAPH_NODE_UCODE_DEFAULT:
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_PosLight_fifo); // F3DZEX2_PosLight
+            gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_NoN_PosLight_fifo); // F3DZEX2_PosLight
             // Reload the necessary RSP settings
             gSPDisplayList(gDisplayListHead++, init_rsp);
             break;

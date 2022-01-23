@@ -908,20 +908,11 @@ void cur_obj_update(void) {
     COND_BIT((objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
 #endif
 #ifdef OBJECTS_REJ
-    s32 objListIndex = OBJ_LIST_PLAYER;
-
-    BehaviorScript *bhvScript = segmented_to_virtual(o->behavior);
-    if ((bhvScript[0] >> 24) == 0) {
-        objListIndex = ((bhvScript[0] >> 16) & 0xFFFF);
-    }
-
     if (objFlags & OBJ_FLAG_UCODE_SMALL) {
         o->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
-    }
-    else {
+    } else {
         o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
     }
-
 #endif
 #ifdef OBJ_OPACITY_BY_CAM_DIST
     if (objFlags & OBJ_FLAG_OPACITY_FROM_CAMERA_DIST) {
