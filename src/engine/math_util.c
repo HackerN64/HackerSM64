@@ -592,6 +592,31 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle)
  * 'scale' is the scale of the shadow
  * 'yaw' is the angle which it should face
  */
+#ifdef SHEAR_SHADOWS
+void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
+    float hxy = -upDir[0]/upDir[1];
+    float hzy = -upDir[2]/upDir[1];
+    float cosyaw = coss(yaw);
+    float sinyaw = sins(yaw);
+    
+    Vec3f entry;
+    entry[0] = scale[0] * cosyaw;
+    entry[1] = scale[0] * cosyaw * hxy  - scale[0] * sinyaw * hzy;
+    entry[2] = -scale[0] * sinyaw;
+    linear_mtxf_mul_vec3f(src, dest[0], entry);
+    entry[0] = 0;
+    entry[1] = scale[1];
+    entry[2] = 0;
+    linear_mtxf_mul_vec3f(src, dest[1], entry);
+    entry[0] = scale[2] * sinyaw;
+    entry[1] = scale[2] * sinyaw * hxy  + scale[2] * cosyaw * hzy;
+    entry[2] = scale[2] * cosyaw;
+    linear_mtxf_mul_vec3f(src, dest[2], entry);
+    linear_mtxf_mul_vec3f(src, dest[3], pos);
+    vec3f_add(dest[3], src[3]);
+    MTXF_END(dest);
+}
+#else
 void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
     Vec3f lateralDir;
     Vec3f leftDir;
@@ -613,6 +638,7 @@ void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 y
     vec3f_add(dest[3], src[3]);
     MTXF_END(dest);
 }
+#endif
 
 /**
  * Set 'dest' to a transformation matrix that aligns an object with the terrain
@@ -1530,40 +1556,63 @@ static ALWAYS_INLINE float construct_float(const float f)
     return f_out;
 }
 
+static ALWAYS_INLINE float mul_without_nop(float a, float b)
+{
+    float ret;
+    __asm__ ("mul.s %0, %1, %2"
+                         : "=f"(ret)
+                         : "f"(a), "f"(b));
+    return ret;
+}
+
+static ALWAYS_INLINE void swl(void* addr, s32 val, const int offset)
+{
+    __asm__ ("swl %1, %2(%0)"
+                        : 
+                        : "g"(addr), "g"(val), "I"(offset));
+}
+
 // Converts a floating point matrix to a fixed point matrix
 // Makes some assumptions about certain fields in the matrix, which will always be true for valid matrices.
-__attribute__((optimize("Os")))
+__attribute__((optimize("Os"))) __attribute__((aligned(32)))
 void mtxf_to_mtx_fast(s16* dst, float* src)
 {
+    int i;
     float scale = construct_float(65536.0f / WORLD_SCALE);
-    // Iterate over pairs of values in the input matrix
-    for (int i = 0; i < 8; i++)
+    // Iterate over rows of values in the input matrix
+    for (i = 0; i < 4; i++)
     {
-        // Read the first input in the current pair
-        float a = src[2 * i + 0];
+        // Read the three input in the current row (assume the fourth is zero)
+        float a = src[4 * i + 0];
+        float b = src[4 * i + 1];
+        float c = src[4 * i + 2];
+        float a_scaled = mul_without_nop(a,scale);
+        float b_scaled = mul_without_nop(b,scale);
+        float c_scaled = mul_without_nop(c,scale);
 
-        // Convert the first input to fixed
-        s32 a_int = (s32)(a * scale);
-        dst[2 * i +  0] = (s16)(a_int >> 16);
-        dst[2 * i + 16] = (s16)(a_int >>  0);
+        // Convert the three inputs to fixed
+        s32 a_int = (s32)a_scaled;
+        s32 b_int = (s32)b_scaled;
+        s32 c_int = (s32)c_scaled;
+        s32 c_high = c_int & 0xFFFF0000;
+        s32 c_low = c_int << 16;
+        
+        // Write the integer part of a, as well as garbage into the next two bytes.
+        // Those two bytes will get overwritten by the integer part of b.
+        // This prevents needing to shift or mask the integer value of a.
+        *(s32*)(&dst[4 * i +  0]) = a_int;
+        // Write the fractional part of a
+        dst[4 * i + 16] = (s16)a_int;
 
-        // If this is the left half of the matrix, convert the second input to fixed
-        if ((i & 1) == 0)
-        {
-            // Read the second input in the current pair
-            float b = src[2 * i + 1];
-            s32 b_int = (s32)(b * scale);
-            dst[2 * i +  1] = (s16)(b_int >> 16);
-            dst[2 * i + 17] = (s16)(b_int >>  0);
-        }
-        // Otherwise, skip the second input because column 4 will always be zero
-        // Row 4 column 4 is handled after the loop.
-        else
-        {
-            dst[2 * i +  1] = 0;
-            dst[2 * i + 17] = 0;
-        }
+        // Write the integer part of b using swl to avoid needing to shift.
+        swl(dst + 4 * i, b_int, 2);
+        // Write the fractional part of b.
+        dst[4 * i + 17] = (s16)b_int;
 
+        // Write the integer part of c and two zeroes for the 4th column.
+        *(s32*)(&dst[4 * i + 2]) = c_high;
+        // Write the fractional part of c and two zeroes for the 4th column
+        *(s32*)(&dst[4 * i + 18]) = c_low;
     }
     // Write 1.0 to the bottom right entry in the output matrix
     // The low half was already set to zero in the loop, so we only need

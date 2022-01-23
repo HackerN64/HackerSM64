@@ -57,6 +57,11 @@
 // Use 64x64 quarter shadow textures (Vanilla are 16x16).
 #define HD_SHADOWS
 
+// Stretches shadows to fit the terrain instead of rotatin them to align with it.
+// This makes them maintain a constant horizontal size.
+// Performs better than regular shadows.
+// #define SHEAR_SHADOWS
+
 // Makes certain objects (mainly trees) transparent when the camera gets close.
 // #define OBJ_OPACITY_BY_CAM_DIST
 
