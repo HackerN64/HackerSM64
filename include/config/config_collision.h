@@ -39,5 +39,11 @@
 // The radius of Mario's collision when checking for walls.
 #define MARIO_COLLISION_RADIUS 50
 
+// The minimum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it.
+#define LEDGE_GRAB_MIN_HEIGHT 100
+
+// The maximum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it.
+#define LEDGE_GRAB_MAX_HEIGHT 160
+
 // Allow Mario to be in OOB areas.
 // #define ALLOW_OOB

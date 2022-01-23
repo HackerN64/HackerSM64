@@ -388,45 +388,68 @@ s32 perform_ground_step(struct MarioState *m) {
     return stepResult;
 }
 
-// Horizontal dot product of surface normal
-#define hdot_surf(surf, vec) (((surf)->normal.x * (vec)[0]) + ((surf)->normal.z * (vec)[2]))
-
-struct Surface *check_ledge_grab(struct MarioState *m, struct Surface *prevWall, struct Surface *wall, Vec3f intendedPos, Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
-    struct Surface *returnedWall = wall;
-    if (m->vel[1] > 0.0f || wall == NULL) {
-        return NULL;
-    }
-
-    if (prevWall == NULL) {
-        prevWall = wall;
-    }
-
-    // Return the already grabbed wall if Mario is moving into it more than the newly tested wall.
-    if (hdot_surf(prevWall, m->vel) < hdot_surf(wall, m->vel)) {
-        returnedWall = prevWall;
-    }
+struct Surface *check_ledge_grab(struct MarioState *m, struct WallCollisionData *wallData, Vec3f intendedPos, Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
+    struct Surface *prevWall = NULL;
+    struct Surface *wall = NULL;
+    f32 prevPush = F32_MAX;
+    f32 currPush = F32_MAX;
+    f32 velX = m->vel[0];
+    f32 velZ = m->vel[2];
+    f32 nx, nz;
+    f32 displacementX = (nextPos[0] - intendedPos[0]);
+    f32 displacementZ = (nextPos[2] - intendedPos[2]);
 
     // Only ledge grab if the wall displaced Mario in the opposite direction of his velocity.
     // hdot(displacement, vel).
-    if (
-        ((nextPos[0] - intendedPos[0]) * m->vel[0]) + ((nextPos[2] - intendedPos[2]) * m->vel[2]) > 0.0f
-    ) {
-        returnedWall = prevWall;
-    }
-
-    ledgePos[0] = nextPos[0] - (wall->normal.x * 60.0f);
-    ledgePos[2] = nextPos[2] - (wall->normal.z * 60.0f);
-    ledgePos[1] = find_floor(ledgePos[0], (nextPos[1] + MARIO_HITBOX_HEIGHT), ledgePos[2], ledgeFloor);
-
-    if (ledgeFloor == NULL
-        || (*ledgeFloor) == NULL
-        || ledgePos[1] < nextPos[1] + 100.0f
-        || (*ledgeFloor)->normal.y < COS25 // H64 TODO: check if floor is actually slippery
-        || SURFACE_IS_UNSAFE((*ledgeFloor)->type)) {
+    if ((displacementX * velX) + (displacementZ * velZ) > 0.0f) {
         return NULL;
     }
 
-    return returnedWall;
+    s32 i;
+    for (i = 0; i < wallData->numWalls; i++) {
+        // Get the current wall.
+        wall = wallData->walls[i];
+
+        // Make sure the wall exists.
+        if (wall == NULL) {
+            continue;
+        }
+
+        // Get the wall's normals.
+        nx = wall->normal.x;
+        nz = wall->normal.z;
+
+        // The amount Mario is moving into the wall.
+        // Smaller = better wall angle.
+        // This is similar to abs_angle_diff(wallYaw, moveYaw).
+        // hdot(normal, vel)
+        currPush = (nx * velX) + (nz * velZ);
+
+        // Skip the wall if Mario is moving less into it than into a previous wall.
+        if (prevWall != NULL && currPush > prevPush) {
+            continue;
+        }
+
+        // Get the floor check position.
+        ledgePos[0] = nextPos[0] - (nx * (MARIO_COLLISION_RADIUS + 10.0f));
+        ledgePos[2] = nextPos[2] - (nz * (MARIO_COLLISION_RADIUS + 10.0f));
+        ledgePos[1] = find_floor(ledgePos[0], (nextPos[1] + LEDGE_GRAB_MAX_HEIGHT), ledgePos[2], ledgeFloor);
+
+        // Check if the floor above the wall can be grabbed.
+        if (ledgeFloor == NULL
+         || (*ledgeFloor) == NULL
+         || ledgePos[1] < nextPos[1] + LEDGE_GRAB_MIN_HEIGHT
+         || (*ledgeFloor)->normal.y < COS25 // H64 TODO: check if floor is actually slippery
+         || SURFACE_IS_UNSAFE((*ledgeFloor)->type)) {
+            continue;
+        }
+
+        // The current wall is a valid ledge grab.
+        prevWall = wall;
+        prevPush = currPush;
+    }
+
+    return prevWall;
 }
 
 #undef hdot_surf
@@ -468,18 +491,19 @@ s32 bonk_or_hit_lava_wall(struct MarioState *m, struct WallCollisionData *wallDa
 }
 
 s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepArg) {
-    s16 i;
     s32 stepResult = AIR_STEP_NONE;
 
     Vec3f nextPos, ledgePos;
     struct WallCollisionData upperWall, lowerWall;
-    struct Surface *ceil, *floor, *ledgeFloor;
+    struct Surface *ceil = NULL;
+    struct Surface *floor = NULL;
+    struct Surface *ledgeFloor = NULL;
     struct Surface *grabbedWall = NULL;
 
     vec3f_copy(nextPos, intendedPos);
 
     resolve_and_return_wall_collisions(nextPos, 150.0f, MARIO_COLLISION_RADIUS, &upperWall);
-    resolve_and_return_wall_collisions(nextPos, 30.0f, MARIO_COLLISION_RADIUS, &lowerWall);
+    resolve_and_return_wall_collisions(nextPos,  30.0f, MARIO_COLLISION_RADIUS, &lowerWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
@@ -490,6 +514,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     // out of bounds, so it won't detect you as landing.
 
 #ifndef ALLOW_OOB
+    // Check if Mario is OOB.
     if (floor == NULL) {
         if (nextPos[1] <= m->floorHeight) {
             m->pos[1] = m->floorHeight;
@@ -501,13 +526,14 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     }
 #endif
 
+    // Use a flat pseudo floor at the water's height when riding a shell.
     if ((m->action & ACT_FLAG_RIDING_SHELL) && floorHeight < waterLevel) {
         floorHeight = waterLevel;
         floor = &gWaterSurfacePseudoFloor;
         floor->originOffset = -floorHeight;
     }
 
-    //! This check uses f32, but findFloor uses short (overflow jumps)
+    // If the next position is under the floor, Mario has landed.
     if (nextPos[1] <= floorHeight) {
         if ((ceilHeight - floorHeight) > MARIO_HITBOX_HEIGHT) {
             m->pos[0] = nextPos[0];
@@ -522,22 +548,26 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         return AIR_STEP_LANDED;
     }
 
+    // Check if Mario hit a ceiling.
     if ((nextPos[1] + MARIO_HITBOX_HEIGHT) > ceilHeight) {
         if (m->vel[1] >= 0.0f) {
             m->vel[1] = 0.0f;
 
 #ifdef HANGING_FIX
-            // Grab ceiling unless they just were grabbing a ceiling
-            if (!(m->prevAction & ACT_FLAG_HANGING) && ceil != NULL && ceil->type == SURFACE_HANGABLE) {
+            // Grab the ceiling unless Mario was already grabbing a ceiling.
+            s32 canHang = !(m->prevAction & ACT_FLAG_HANGING);
 #else
-            if ((stepArg & AIR_STEP_CHECK_HANG) && ceil != NULL && ceil->type == SURFACE_HANGABLE) {
+            s32 canHang = (stepArg & AIR_STEP_CHECK_HANG);
 #endif
+            if (canHang && ceil != NULL && ceil->type == SURFACE_HANGABLE) {
                 return AIR_STEP_GRABBED_CEILING;
             }
 
+            // Mario hits a normal ceiling.
             return AIR_STEP_NONE;
         }
 
+        // If the next position is under the floor, Mario has landed.
         //! Potential subframe downwarp->upwarp?
         if (nextPos[1] <= m->floorHeight) {
             m->pos[1] = m->floorHeight;
@@ -551,42 +581,54 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     //! When the wall is not completely vertical or there is a slight wall
     // misalignment, you can activate these conditions in unexpected situations
 
-    if ((stepArg & AIR_STEP_CHECK_LEDGE_GRAB) && upperWall.numWalls == 0 && lowerWall.numWalls != 0) {
-        for (i = 0; i < lowerWall.numWalls; i++) {
-            grabbedWall = check_ledge_grab(m, grabbedWall, lowerWall.walls[i], intendedPos, nextPos, ledgePos, &ledgeFloor);
-            if (grabbedWall != NULL) {
-                stepResult = AIR_STEP_GRABBED_LEDGE;
-            }
-        }
-
-        if (stepResult == AIR_STEP_GRABBED_LEDGE && grabbedWall != NULL && ledgeFloor != NULL && ledgePos != NULL) {
+    // Check if Mario can grab a wall.
+    if (m->vel[1] <= 0.0f
+     && (stepArg & AIR_STEP_CHECK_LEDGE_GRAB)
+     && upperWall.numWalls == 0
+     && lowerWall.numWalls > 0) {
+        // Check if any walls are grabbable.
+        grabbedWall = check_ledge_grab(m, &lowerWall, intendedPos, nextPos, ledgePos, &ledgeFloor);
+        if (grabbedWall != NULL
+         && ledgeFloor != NULL
+         && ledgePos != NULL) {
             vec3f_copy(m->pos, ledgePos);
             set_mario_floor(m, floor, ledgePos[1]);
             m->faceAngle[0] = 0x0;
             m->faceAngle[1] = SURFACE_YAW(grabbedWall) + 0x8000;
+            stepResult = AIR_STEP_GRABBED_LEDGE;
         } else {
             vec3f_copy(m->pos, nextPos);
             set_mario_floor(m, floor, floorHeight);
         }
+
         return stepResult;
     }
 
+    // Update Mario's position and floor.
     vec3f_copy(m->pos, nextPos);
     set_mario_floor(m, floor, floorHeight);
 
+    // Check for upper walls.
     if (upperWall.numWalls > 0) {
-        stepResult  = bonk_or_hit_lava_wall(m, &upperWall);
+        stepResult = bonk_or_hit_lava_wall(m, &upperWall);
+
+        // Skip checking lower walls if there is an upper wall.
         if (stepResult != AIR_STEP_NONE) {
             return stepResult;
         }
     }
 
-    return (lowerWall.numWalls > 0) ? bonk_or_hit_lava_wall(m, &lowerWall) : AIR_STEP_NONE;
+    // Check for lower walls.
+    if (lowerWall.numWalls > 0) {
+        stepResult = bonk_or_hit_lava_wall(m, &lowerWall);
+    }
+
+    return stepResult;
 }
 
 void apply_twirl_gravity(struct MarioState *m) {
 #ifdef Z_TWIRL
-    f32 Zmodifier = m->input & INPUT_Z_DOWN ? 4.0f : 1.0f;
+    f32 Zmodifier = (m->input & INPUT_Z_DOWN) ? 4.0f : 1.0f;
 #endif
     f32 heaviness = 1.0f;
 
@@ -631,13 +673,15 @@ void apply_gravity(struct MarioState *m) {
         if (m->vel[1] < -75.0f) {
             m->vel[1] = -75.0f;
         }
-    } else if (m->action == ACT_LONG_JUMP || m->action == ACT_SLIDE_KICK
-               || m->action == ACT_BBH_ENTER_SPIN) {
+    } else if (m->action == ACT_LONG_JUMP
+            || m->action == ACT_SLIDE_KICK
+            || m->action == ACT_BBH_ENTER_SPIN) {
         m->vel[1] -= 2.0f;
         if (m->vel[1] < -75.0f) {
             m->vel[1] = -75.0f;
         }
-    } else if (m->action == ACT_LAVA_BOOST || m->action == ACT_FALL_AFTER_STAR_GRAB) {
+    } else if (m->action == ACT_LAVA_BOOST
+            || m->action == ACT_FALL_AFTER_STAR_GRAB) {
         m->vel[1] -= 3.2f;
         if (m->vel[1] < -65.0f) {
             m->vel[1] = -65.0f;
@@ -659,7 +703,8 @@ void apply_gravity(struct MarioState *m) {
 
         m->vel[1] -= 2.0f;
         if (m->vel[1] < -37.5f) {
-            if ((m->vel[1] += 4.0f) > -37.5f) {
+            m->vel[1] += 4.0f;
+            if (m->vel[1] > -37.5f) {
                 m->vel[1] = -37.5f;
             }
         }
@@ -675,7 +720,7 @@ void apply_vertical_wind(struct MarioState *m) {
     f32 maxVelY;
 
     if (m->action != ACT_GROUND_POUND) {
-        f32 offsetY = m->pos[1] - -1500.0f;
+        f32 offsetY = m->pos[1] + 1500.0f;
 
         if (m->floor != NULL
          && m->floor->type == SURFACE_VERTICAL_WIND
