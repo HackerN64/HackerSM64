@@ -908,7 +908,12 @@ void cur_obj_update(void) {
     COND_BIT((objFlags & OBJ_FLAG_OCCLUDE_SILHOUETTE), o->header.gfx.node.flags, GRAPH_RENDER_OCCLUDE_SILHOUETTE);
 #endif
 #ifdef OBJECTS_REJ
-    if (objFlags & OBJ_FLAG_UCODE_SMALL) {
+    s32 objListIndex = OBJ_LIST_PLAYER;
+
+    BehaviorScript *bhvScript = segmented_to_virtual(o->behavior);
+    objListIndex = ((bhvScript[0] >> 16) & 0xFFFF);
+
+    if ((objListIndex != OBJ_LIST_SURFACE) && (objFlags & OBJ_FLAG_UCODE_SMALL)) {
         o->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;
     } else {
         o->header.gfx.ucode = GRAPH_NODE_UCODE_DEFAULT;
