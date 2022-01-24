@@ -283,13 +283,16 @@ void mario_drop_held_object(struct MarioState *m) {
 
         obj_set_held_state(m->heldObj, bhvCarrySomethingDropped);
 
+#ifdef HOLP_HEIGHT_FIX
+        vec3f_copy(&m->heldObj->oPosVec, m->marioBodyState->heldObjLastPosition);
+#else
         //! When dropping an object instead of throwing it, it will be put at Mario's
         // y-positon instead of the HOLP's y-position. This fact is often exploited when
         // cloning objects.
         m->heldObj->oPosX = m->marioBodyState->heldObjLastPosition[0];
-        // m->heldObj->oPosY = m->marioBodyState->heldObjLastPosition[1];
         m->heldObj->oPosY = m->pos[1];
         m->heldObj->oPosZ = m->marioBodyState->heldObjLastPosition[2];
+#endif
 
         m->heldObj->oMoveAngleYaw = m->faceAngle[1];
 

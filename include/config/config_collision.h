@@ -30,6 +30,9 @@
 // Checks for ceilings from Mario's actual height instead of from the floor height.
 #define EXPOSED_CEILINGS_FIX
 
+// Uses the correct HOLP height rather than Mario's height when dropping a held object.
+#define HOLP_HEIGHT_FIX
+
 // Mario's normal hitbox height.
 #define MARIO_HITBOX_HEIGHT 160
 
