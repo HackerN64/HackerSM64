@@ -758,9 +758,9 @@ u32 interact_coin(struct MarioState *m, UNUSED u32 interactType, struct Object *
 
 u32 interact_water_ring(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
 #ifdef BREATH_METER
-    m->breathCounter += 4 * obj->oDamageOrCoinValue;
+    m->breathCounter += (4 * obj->oDamageOrCoinValue);
 #else
-    m->healCounter += 4 * obj->oDamageOrCoinValue;
+    m->healCounter += (4 * obj->oDamageOrCoinValue);
 #endif
     obj->oInteractStatus = INT_STATUS_INTERACTED;
     return FALSE;

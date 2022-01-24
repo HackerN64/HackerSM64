@@ -18,10 +18,10 @@
 #define DEFAULT_NUM_LIVES 4
 
 // This can be 0..127.
-#define MAX_NUM_LIVES   100
+#define MAX_NUM_LIVES 100
 
 // This can be 0..32767.
-#define MAX_NUM_COINS   999
+#define MAX_NUM_COINS 999
 
 // Air/breath meter is separate from health meter when underwater.
 #define BREATH_METER
