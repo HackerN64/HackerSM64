@@ -129,8 +129,8 @@ void hoot_surface_collision(f32 xPrev, UNUSED f32 yPrev, f32 zPrev) {
 }
 
 void hoot_act_ascent(f32 xPrev, f32 zPrev) {
-    f32 negX = 0 - o->oPosX;
-    f32 negZ = 0 - o->oPosZ;
+    f32 negX = -o->oPosX;
+    f32 negZ = -o->oPosZ;
     s16 angleToOrigin = atan2s(negZ, negX);
 
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, angleToOrigin, 0x500);

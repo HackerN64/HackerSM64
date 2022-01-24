@@ -20,8 +20,8 @@ void bhv_rotating_clock_arm_loop(void) {
         // If Mario is touching the Tick Tock Clock painting...
         if (marioSurface != NULL
             && (marioSurface->type == SURFACE_TTC_PAINTING_1
-                || marioSurface->type == SURFACE_TTC_PAINTING_2
-                || marioSurface->type == SURFACE_TTC_PAINTING_3)) {
+             || marioSurface->type == SURFACE_TTC_PAINTING_2
+             || marioSurface->type == SURFACE_TTC_PAINTING_3)) {
             // And this is the minute hand...
             if (cur_obj_has_behavior(bhvClockMinuteHand)) {
                 // Set Tick Tick Clock's speed based on the angle of the hand.

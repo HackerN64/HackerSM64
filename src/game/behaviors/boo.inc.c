@@ -16,9 +16,9 @@ static struct ObjectHitbox sBooGivingStarHitbox = {
 
 // Relative positions
 static s16 sCourtyardBooTripletPositions[][3] = {
-    { 0, 50, 0 },
-    { 210, 110, 210 },
-    { -210, 70, -210 },
+    {    0,  50,    0 },
+    {  210, 110,  210 },
+    { -210,  70, -210 },
 };
 
 static void boo_stop(void) {
@@ -61,11 +61,7 @@ static s32 boo_should_be_active(void) {
     }
 
     if (cur_obj_has_behavior(bhvMerryGoRoundBigBoo) || cur_obj_has_behavior(bhvMerryGoRoundBoo)) {
-        if (gMarioOnMerryGoRound == TRUE) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
+        return gMarioOnMerryGoRound;
     } else if (o->oRoom == -1) {
         if (o->oDistanceToMario < activationRadius) {
             return TRUE;
@@ -93,7 +89,7 @@ void bhv_courtyard_boo_triplet_init(void) {
                 sCourtyardBooTripletPositions[i][0],
                 sCourtyardBooTripletPositions[i][1],
                 sCourtyardBooTripletPositions[i][2],
-                o, MODEL_BOO, bhvGhostHuntBoo );
+                o, MODEL_BOO, bhvGhostHuntBoo);
             OR_BPARAM1(boo->oBehParams, COIN_INSIDE_BOO_BP_YELLOW_COIN);
             boo->oMoveAngleYaw = random_u16();
         }

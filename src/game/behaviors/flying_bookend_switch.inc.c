@@ -19,7 +19,7 @@ struct ObjectHitbox sFlyingBookendHitbox = {
 
 struct BookSwitchPosition sBookSwitchPositions[] = {
     { 52, 150 },
-    { 135, 3 },
+    { 135,  3 },
     { -75, 78 },
 };
 

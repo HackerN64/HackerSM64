@@ -11,7 +11,7 @@ static f32 sTTCPendulumInitialAccels[] = {
     /* TTC_SPEED_SLOW    */ 13.0f,
     /* TTC_SPEED_FAST    */ 22.0f,
     /* TTC_SPEED_RANDOM  */ 13.0f,
-    /* TTC_SPEED_STOPPED */ 0.0f,
+    /* TTC_SPEED_STOPPED */  0.0f,
 };
 
 /**

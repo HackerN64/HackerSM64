@@ -39,7 +39,10 @@ static struct LllOctagonalMeshAction gLllOctagonalMeshAction1[] = {
 };
 
 // picked by oBehParams2ndByte
-static struct LllOctagonalMeshAction *gLllOctagonalMeshActionList[] = { gLllOctagonalMeshAction0, gLllOctagonalMeshAction1 };
+static struct LllOctagonalMeshAction *gLllOctagonalMeshActionList[] = {
+    gLllOctagonalMeshAction0,
+    gLllOctagonalMeshAction1
+};
 
 s32 lll_octagonal_mesh_move(struct LllOctagonalMeshAction *actionTable, s32 actionOffset) {
     struct LllOctagonalMeshAction *action = &(actionTable[actionOffset]);
@@ -95,7 +98,7 @@ s32 lll_octagonal_mesh_find_y_offset(s32 *standTimer, f32 *posOffset, s32 standT
     }
 
     posOffset[0] = sins(standTimer[0]) * moveDownAmount;
-    return standTimer[0] == 0 || standTimer[0] == 0x4000;
+    return (standTimer[0] == 0 || standTimer[0] == 0x4000);
 }
 
 void bhv_lll_moving_octagonal_mesh_platform_loop(void) {

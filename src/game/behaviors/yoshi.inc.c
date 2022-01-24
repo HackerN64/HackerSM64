@@ -3,7 +3,12 @@
 // X/Z coordinates of Yoshi's homes that he switches between.
 // Note that this doesn't contain the Y coordinate since the castle roof is flat,
 // so o->oHomeY is never updated.
-static s16 sYoshiHomeLocations[] = { 0, -5625, -1364, -5912, -1403, -4609, -1004, -5308 };
+static s16 sYoshiHomeLocations[] = {
+        0, -5625,
+    -1364, -5912,
+    -1403, -4609,
+    -1004, -5308
+};
 
 void bhv_yoshi_init(void) {
     o->oGravity = 2.0f;

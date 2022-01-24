@@ -11,7 +11,7 @@ struct WFRotatingPlatformData {
 };
 
 struct WFRotatingPlatformData sWFRotatingPlatformData[] = {
-    { 0, 100, wf_seg7_collision_rotating_platform, 2000 },
+    { 0, 100,  wf_seg7_collision_rotating_platform, 2000 },
     { 0, 150, wdw_seg7_collision_rotating_platform, 1000 }
 };
 

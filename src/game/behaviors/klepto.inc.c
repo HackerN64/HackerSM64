@@ -13,9 +13,9 @@ static struct ObjectHitbox sKleptoHitbox = {
 };
 
 static Vec3f sKleptoTargetPositions[] = {
-    { 2200.0f, 1250.0f, -2820.0f },
+    {  2200.0f, 1250.0f, -2820.0f },
     { -6200.0f, 1250.0f, -2800.0f },
-    { -6200.0f, 1250.0f, 1150.0f },
+    { -6200.0f, 1250.0f,  1150.0f },
 };
 
 static u8 sKleptoAttackHandlers[] = { 2, 2, 5, 5, 2, 2 };
@@ -100,20 +100,20 @@ static void klepto_change_target(void) {
         s32 i;
         f32 dx, dz;
         f32 targetDist;
-        f32 minTargetDist = 99999.0f;
+        f32 minTargetDist = F32_MAX;
 
         for (i = 0; i < 3; i++) {
             dx = gMarioObject->oPosX - sKleptoTargetPositions[i][0];
             dz = gMarioObject->oPosZ - sKleptoTargetPositions[i][2];
 
-            targetDist = sqrtf(dx * dx + dz * dz);
+            targetDist = sqrtf(sqr(dx) + sqr(dz));
             if (targetDist < minTargetDist) {
                 minTargetDist = targetDist;
                 newTarget = i;
             }
         }
     } else {
-        newTarget = random_u16() % 3;
+        newTarget = (random_u16() % 3);
     }
 
     o->oKleptoHomeYOffset  = 400 * absi(newTarget - o->oKleptoTargetNumber);

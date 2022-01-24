@@ -66,20 +66,20 @@ struct BowserPuzzlePiece {
  * (* = star platform)
  */
 static struct BowserPuzzlePiece sBowserPuzzlePieces[] = {
-    { MODEL_LLL_BOWSER_PIECE_1, -5, -15, 1, sPieceActions01 },
-    { MODEL_LLL_BOWSER_PIECE_2, 5, -15, 0, sPieceActions02 },
-    { MODEL_LLL_BOWSER_PIECE_3, -15, -5, 0, sPieceActions03 },
-    { MODEL_LLL_BOWSER_PIECE_4, -5, -5, 0, sPieceActions04 },
-    { MODEL_LLL_BOWSER_PIECE_5, 5, -5, 0, sPieceActions05 },
-    { MODEL_LLL_BOWSER_PIECE_6, 15, -5, 0, sPieceActions06 },
-    { MODEL_LLL_BOWSER_PIECE_7, -15, 5, 0, sPieceActions07 },
-    { MODEL_LLL_BOWSER_PIECE_8, -5, 5, 0, sPieceActions08 },
-    { MODEL_LLL_BOWSER_PIECE_9, 5, 5, 0, sPieceActions09 },
-    { MODEL_LLL_BOWSER_PIECE_10, 15, 5, 0, sPieceActions10 },
-    { MODEL_LLL_BOWSER_PIECE_11, -15, 15, 0, sPieceActions11 },
-    { MODEL_LLL_BOWSER_PIECE_12, -5, 15, 0, sPieceActions12 },
-    { MODEL_LLL_BOWSER_PIECE_13, 5, 15, 0, sPieceActions13 },
-    { MODEL_LLL_BOWSER_PIECE_14, 15, 15, 0, sPieceActions14 }
+    { MODEL_LLL_BOWSER_PIECE_1,   -5, -15, 1, sPieceActions01 },
+    { MODEL_LLL_BOWSER_PIECE_2,    5, -15, 0, sPieceActions02 },
+    { MODEL_LLL_BOWSER_PIECE_3,  -15,  -5, 0, sPieceActions03 },
+    { MODEL_LLL_BOWSER_PIECE_4,   -5,  -5, 0, sPieceActions04 },
+    { MODEL_LLL_BOWSER_PIECE_5,    5,  -5, 0, sPieceActions05 },
+    { MODEL_LLL_BOWSER_PIECE_6,   15,  -5, 0, sPieceActions06 },
+    { MODEL_LLL_BOWSER_PIECE_7,  -15,   5, 0, sPieceActions07 },
+    { MODEL_LLL_BOWSER_PIECE_8,   -5,   5, 0, sPieceActions08 },
+    { MODEL_LLL_BOWSER_PIECE_9,    5,   5, 0, sPieceActions09 },
+    { MODEL_LLL_BOWSER_PIECE_10,  15,   5, 0, sPieceActions10 },
+    { MODEL_LLL_BOWSER_PIECE_11, -15,  15, 0, sPieceActions11 },
+    { MODEL_LLL_BOWSER_PIECE_12,  -5,  15, 0, sPieceActions12 },
+    { MODEL_LLL_BOWSER_PIECE_13,   5,  15, 0, sPieceActions13 },
+    { MODEL_LLL_BOWSER_PIECE_14,  15,  15, 0, sPieceActions14 }
 };
 
 /**

@@ -21,9 +21,9 @@ void bhv_jrb_floating_ship_loop(void) {
     o->oShipPart3LoopPitch += 0x100;
 
     o->oFaceAnglePitch = sins(o->oShipPart3LoopPitch) * 0x400;
-    o->oFaceAngleRoll = sins(o->oShipPart3LoopRoll ) * 0x400;
+    o->oFaceAngleRoll = sins(o->oShipPart3LoopRoll) * 0x400;
     o->oAngleVelPitch = o->oFaceAnglePitch - initialPitch;
-    o->oAngleVelRoll = o->oFaceAngleRoll  - initialRoll;
+    o->oAngleVelRoll = o->oFaceAngleRoll - initialRoll;
 
     if (gMarioObject->oPosY > 1000.0f) {
         cur_obj_play_sound_1(SOUND_ENV_BOAT_ROCKING1);
