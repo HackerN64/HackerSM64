@@ -37,7 +37,6 @@ static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_RR_SEESAW_PLATFORM,          /*pos*/   614, -3574,  6564, /*angle*/  0, 270,   0, /*behParam*/ 0x00050000, /*beh*/ bhvSeesawPlatform),
     OBJECT(/*model*/ MODEL_RR_SWINGING_PLATFORM,        /*pos*/ -3557,  -809,  4619, /*angle*/  0,   0,   0, /*behParam*/ 0x00000000, /*beh*/ bhvSwingPlatform),
     OBJECT(/*model*/ MODEL_RR_SWINGING_PLATFORM,        /*pos*/ -2213, -2582,  6257, /*angle*/  0,   0,   0, /*behParam*/ 0x00000000, /*beh*/ bhvSwingPlatform),
-    OBJECT(/*model*/ MODEL_NONE,                        /*pos*/     0,     0,     0, /*angle*/  0,   0,   0, /*behParam*/ 0x00000000, /*beh*/ bhvDonutPlatformSpawner),
     OBJECT(/*model*/ MODEL_RR_ELEVATOR_PLATFORM,        /*pos*/ -2684,  1546,   -36, /*angle*/  0,   0,   0, /*behParam*/ 0x00050000, /*beh*/ bhvRrElevatorPlatform),
     OBJECT(/*model*/ MODEL_RR_TRICKY_TRIANGLES,         /*pos*/  5862, -1347,  6564, /*angle*/  0,   0,   0, /*behParam*/ 0x00020000, /*beh*/ bhvAnimatesOnFloorSwitchPress),
     OBJECT(/*model*/ MODEL_PURPLE_SWITCH,               /*pos*/  4428, -1936,  6564, /*angle*/  0,   0,   0, /*behParam*/ 0x00000000, /*beh*/ bhvFloorSwitchAnimatesObject),
@@ -51,6 +50,17 @@ static const LevelScript script_func_local_1[] = {
 };
 
 static const LevelScript script_func_local_2[] = {
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -4887, -2908,  6564, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -4376, -2089,  6564, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  -179, -2089,  6564, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  1356, -2089,  6564, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  2482, -2089,  6564, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -6730, -2089,  6522, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -7345, -2447,  6522, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  -169,  1229,  -173, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/  1282,  2520,   -32, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -1165,  2662,  -187, /*angle*/ 0, 0, 0, /*behParam*/ 0x00030000, /*beh*/ bhvDonutRow),
+    OBJECT(/*model*/ MODEL_NONE, /*pos*/ -2156,  2211,   -87, /*angle*/ 0, 0, 0, /*behParam*/ 0x00010000, /*beh*/ bhvDonutRow),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -5809, -1834,  5719, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlamethrower),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/ -4838, -1015,  4081, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlamethrower),
     OBJECT(/*model*/ MODEL_NONE, /*pos*/  3301, -1834,  5617, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvFlamethrower),
@@ -60,11 +70,11 @@ static const LevelScript script_func_local_2[] = {
 };
 
 static const LevelScript script_func_local_3[] = {
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/  1450,  3400, -2352, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/ -4200,  6700, -4450, /*angle*/ 0, 0, 0, /*behParam*/ 0x01000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/  1450,  3400, -2352, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStar,              /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/ -4200,  6700, -4450, /*angle*/ 0, 0, 0, /*behParam*/ 0x01000000, /*beh*/ bhvStar,              /*acts*/ ALL_ACTS),
     OBJECT_WITH_ACTS(/*model*/ MODEL_NONE, /*pos*/ -5150, -1400,     0, /*angle*/ 0, 0, 0, /*behParam*/ 0x02000000, /*beh*/ bhvHiddenRedCoinStar, /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/ -5850,  -700,  4950, /*angle*/ 0, 0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
-    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/  3700,  -400,  6600, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvStar,                 /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/ -5850,  -700,  4950, /*angle*/ 0, 0, 0, /*behParam*/ 0x03000000, /*beh*/ bhvStar,              /*acts*/ ALL_ACTS),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_STAR, /*pos*/  3700,  -400,  6600, /*angle*/ 0, 0, 0, /*behParam*/ 0x04000000, /*beh*/ bhvStar,              /*acts*/ ALL_ACTS),
     RETURN(),
 };
 

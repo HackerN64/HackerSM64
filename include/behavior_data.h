@@ -527,6 +527,7 @@ extern const BehaviorScript bhvClamShell[];
 extern const BehaviorScript bhvSkeeter[];
 extern const BehaviorScript bhvSkeeterWave[];
 extern const BehaviorScript bhvSwingPlatform[];
+extern const BehaviorScript bhvDonutRow[];
 extern const BehaviorScript bhvDonutPlatformSpawner[];
 extern const BehaviorScript bhvDonutPlatform[];
 extern const BehaviorScript bhvDDDPole[];

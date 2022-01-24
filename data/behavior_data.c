@@ -5959,9 +5959,16 @@ const BehaviorScript bhvSwingPlatform[] = {
     END_LOOP(),
 };
 
+const BehaviorScript bhvDonutRow[] = {
+    BEGIN(OBJ_LIST_DEFAULT),
+    DISABLE_RENDERING(),
+    CALL_NATIVE(bhv_donut_row_init),
+    DEACTIVATE(),
+};
+
 const BehaviorScript bhvDonutPlatformSpawner[] = {
     BEGIN(OBJ_LIST_SPAWNER),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    OR_INT(oFlags, (OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_donut_platform_spawner_update),
     END_LOOP(),

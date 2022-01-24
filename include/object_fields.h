@@ -482,7 +482,7 @@
 #define /*0x0F8*/ oRRCruiserWingInitPitch OBJECT_FIELD_S32(0x1C)
 
 /* Donut Platform Spawner */
-#define /*0x0F4*/ oDonutPlatformSpawnerSpawnedPlatforms OBJECT_FIELD_S32(0x1B)
+#define /*0x0F4*/ oDonutPlatformObject  OBJECT_FIELD_OBJ(0x1B)
 
 /* Door */
 #define /*0x088*/ oDoorIsRendering  OBJECT_FIELD_S32(0x00)

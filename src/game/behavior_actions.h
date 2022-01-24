@@ -532,6 +532,7 @@ void bhv_skeeter_update(void);
 void bhv_skeeter_wave_update(void);
 void bhv_swing_platform_init(void);
 void bhv_swing_platform_update(void);
+void bhv_donut_row_init(void);
 void bhv_donut_platform_spawner_update(void);
 void bhv_donut_platform_update(void);
 void bhv_ddd_pole_init(void);
