@@ -49,4 +49,5 @@
 #define LEDGE_GRAB_MAX_HEIGHT 160
 
 // Allow Mario to be in OOB areas.
+// On console, this crashes soon after Mario reaches about 65536 units from the area's origin.
 // #define ALLOW_OOB

@@ -1616,14 +1616,12 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
 
 // Constructs a float in registers, which can be faster than gcc's default of loading a float from rodata.
 // Especially fast for halfword floats, which get loaded with a `lui` + `mtc1`.
-static ALWAYS_INLINE float construct_float(const float f)
-{
+static ALWAYS_INLINE float construct_float(const float f) {
     u32 r;
     float f_out;
     u32 i = *(u32*)(&f);
 
-    if (!__builtin_constant_p(i))
-    {
+    if (!__builtin_constant_p(i)) {
         return *(float*)(&i);
     }
 
@@ -1653,8 +1651,7 @@ static ALWAYS_INLINE float construct_float(const float f)
     return f_out;
 }
 
-static ALWAYS_INLINE float mul_without_nop(float a, float b)
-{
+static ALWAYS_INLINE float mul_without_nop(float a, float b) {
     float ret;
     __asm__ ("mul.s %0, %1, %2"
                          : "=f"(ret)
@@ -1662,8 +1659,7 @@ static ALWAYS_INLINE float mul_without_nop(float a, float b)
     return ret;
 }
 
-static ALWAYS_INLINE void swl(void* addr, s32 val, const int offset)
-{
+static ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
     __asm__ ("swl %1, %2(%0)"
                         : 
                         : "g"(addr), "g"(val), "I"(offset));
@@ -1672,27 +1668,25 @@ static ALWAYS_INLINE void swl(void* addr, s32 val, const int offset)
 // Converts a floating point matrix to a fixed point matrix
 // Makes some assumptions about certain fields in the matrix, which will always be true for valid matrices.
 __attribute__((optimize("Os"))) __attribute__((aligned(32)))
-void mtxf_to_mtx_fast(s16* dst, float* src)
-{
+void mtxf_to_mtx_fast(s16* dst, float* src) {
     int i;
     float scale = construct_float(65536.0f / WORLD_SCALE);
     // Iterate over rows of values in the input matrix
-    for (i = 0; i < 4; i++)
-    {
+    for (i = 0; i < 4; i++) {
         // Read the three input in the current row (assume the fourth is zero)
         float a = src[(4 * i) + 0];
         float b = src[(4 * i) + 1];
         float c = src[(4 * i) + 2];
-        float a_scaled = mul_without_nop(a,scale);
-        float b_scaled = mul_without_nop(b,scale);
-        float c_scaled = mul_without_nop(c,scale);
+        float a_scaled = mul_without_nop(a, scale);
+        float b_scaled = mul_without_nop(b, scale);
+        float c_scaled = mul_without_nop(c, scale);
 
         // Convert the three inputs to fixed
         s32 a_int = (s32)a_scaled;
         s32 b_int = (s32)b_scaled;
         s32 c_int = (s32)c_scaled;
-        s32 c_high = c_int & 0xFFFF0000;
-        s32 c_low = c_int << 16;
+        s32 c_high = (c_int & 0xFFFF0000);
+        s32 c_low = (c_int << 16);
         
         // Write the integer part of a, as well as garbage into the next two bytes.
         // Those two bytes will get overwritten by the integer part of b.
