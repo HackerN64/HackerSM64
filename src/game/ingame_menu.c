@@ -149,8 +149,12 @@ void create_dl_identity_matrix(void) {
     guMtxIdent(matrix);
 #endif
 
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    Gfx* dlHead = gDisplayListHead;
+
+    gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW  | G_MTX_LOAD | G_MTX_NOPUSH);
+    gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+
+    gDisplayListHead = dlHead;
 }
 
 void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
@@ -162,12 +166,13 @@ void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
 
     guTranslate(matrix, x, y, z);
 
-    if (pushOp == MENU_MTX_PUSH) {
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-    }
-
-    if (pushOp == MENU_MTX_NOPUSH) {
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+    switch (pushOp) {
+        case MENU_MTX_PUSH:
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
+            break;
+        case MENU_MTX_NOPUSH:
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+            break;
     }
 }
 
@@ -180,12 +185,13 @@ void create_dl_rotation_matrix(s8 pushOp, f32 a, f32 x, f32 y, f32 z) {
 
     guRotate(matrix, a, x, y, z);
 
-    if (pushOp == MENU_MTX_PUSH) {
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-    }
-
-    if (pushOp == MENU_MTX_NOPUSH) {
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+    switch (pushOp) {
+        case MENU_MTX_PUSH:
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
+            break;
+        case MENU_MTX_NOPUSH:
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+            break;
     }
 }
 
@@ -198,12 +204,13 @@ void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
 
     guScale(matrix, x, y, z);
 
-    if (pushOp == MENU_MTX_PUSH) {
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-    }
-
-    if (pushOp == MENU_MTX_NOPUSH) {
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+    switch (pushOp) {
+        case MENU_MTX_PUSH:
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
+            break;
+        case MENU_MTX_NOPUSH:
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+            break;
     }
 }
 
@@ -218,10 +225,14 @@ void create_dl_ortho_matrix(void) {
 
     guOrtho(matrix, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
 
-    // Should produce G_RDPHALF_1 in Fast3D
-    gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
+    Gfx* dlHead = gDisplayListHead;
 
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+    // Should produce G_RDPHALF_1 in Fast3D
+    gSPPerspNormalize(dlHead++, 0xFFFF);
+
+    gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+
+    gDisplayListHead = dlHead;
 }
 
 // Unused
@@ -263,19 +274,23 @@ void render_generic_char(u8 c) {
     void *unpackedTexture = alloc_ia8_text_from_i1(packedTexture, 8, 16);
 #endif
 
+    Gfx* dlHead = gDisplayListHead;
+
 #ifndef VERSION_EU
-    gDPPipeSync(gDisplayListHead++);
+    gDPPipeSync(dlHead++);
 #endif
 #if defined(VERSION_JP) || defined(VERSION_SH)
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));
+    gDPSetTextureImage(dlHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));
 #else
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(packedTexture));
+    gDPSetTextureImage(dlHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(packedTexture));
 #endif
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
+    gSPDisplayList(dlHead++, dl_ia_text_tex_settings);
 #ifdef VERSION_EU
-    gSPTextureRectangleFlip(gDisplayListHead++, gDialogX << 2, (gDialogY - 16) << 2,
+    gSPTextureRectangleFlip(dlHead++, gDialogX << 2, (gDialogY - 16) << 2,
                             (gDialogX + 8) << 2, gDialogY << 2, G_TX_RENDERTILE, 8 << 6, 4 << 6, 1 << 10, 1 << 10);
 #endif
+
+    gDisplayListHead = dlHead;
 }
 #endif
 
@@ -309,17 +324,22 @@ Texture32 *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
 void render_generic_char(u8 c) {
     void **fontLUT = segmented_to_virtual(main_font_lut);
     void *packedTexture = segmented_to_virtual(fontLUT[c]);
+
+    Gfx* dlHead = gDisplayListHead;
+
 #if MULTILANG
     void *unpackedTexture = alloc_ia4_tex_from_i1(packedTexture, 8, 8);
 
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));
+    gDPPipeSync(dlHead++);
+    gDPSetTextureImage(dlHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));
 #else
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(packedTexture));
+    gDPPipeSync(dlHead++);
+    gDPSetTextureImage(dlHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(packedTexture));
 #endif
 
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
+    gSPDisplayList(dlHead++, dl_ia_text_tex_settings);
+
+    gDisplayListHead = dlHead;
 }
 
 
@@ -403,9 +423,9 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                 strPos--;
                 if (customColor == 1) {
                     gDPSetEnvColor(gDisplayListHead++, rgbaColors[0],
-                                                    rgbaColors[1],
-                                                    rgbaColors[2],
-                                                    rgbaColors[3]);
+                                                       rgbaColors[1],
+                                                       rgbaColors[2],
+                                                       rgbaColors[3]);
                 } else if (customColor == 2) {
                     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
                     customColor = 0;
@@ -478,30 +498,35 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, const u8 *str) {
         xStride = 12; //? Shindou uses this.
     }
 
+    Gfx* dlHead = gDisplayListHead;
+
     while (str[strPos] != GLOBAR_CHAR_TERMINATOR) {
         switch (str[strPos]) {
             case GLOBAL_CHAR_SPACE:
                 curX += 8;
                 break;
             default:
-                gDPPipeSync(gDisplayListHead++);
+                gDPPipeSync(dlHead++);
 
-                if (hudLUT == HUD_LUT_JPMENU) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT1[str[strPos]]);
+                switch (hudLUT) {
+                    case HUD_LUT_JPMENU:
+                        gDPSetTextureImage(dlHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT1[str[strPos]]);
+                        break;
+                    case HUD_LUT_GLOBAL:
+                        gDPSetTextureImage(dlHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos]]);
+                        break;
                 }
 
-                if (hudLUT == HUD_LUT_GLOBAL) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos]]);
-                }
-
-                gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
-                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 16) << 2,
+                gSPDisplayList(dlHead++, dl_rgba16_load_tex_block);
+                gSPTextureRectangle(dlHead++, curX << 2, curY << 2, (curX + 16) << 2,
                                     (curY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
                 curX += xStride;
         }
         strPos++;
     }
+
+    gDisplayListHead = dlHead;
 }
 
 
@@ -511,6 +536,8 @@ void print_menu_generic_string(s16 x, s16 y, const u8 *str) {
     u32 curX = x;
     u32 curY = y;
     void **fontLUT = segmented_to_virtual(menu_font_lut);
+
+    Gfx* dlHead = gDisplayListHead;
 
     while (str[strPos] != DIALOG_CHAR_TERMINATOR) {
         switch (str[strPos]) {
@@ -524,17 +551,17 @@ void print_menu_generic_string(s16 x, s16 y, const u8 *str) {
                 curX += 4;
                 break;
             default:
-                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[str[strPos]]);
-                gDPLoadSync(gDisplayListHead++);
-                gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
-                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
+                gDPSetTextureImage(dlHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[str[strPos]]);
+                gDPLoadSync(dlHead++);
+                gDPLoadBlock(dlHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
+                gSPTextureRectangle(dlHead++, curX << 2, curY << 2, (curX + 8) << 2,
                                     (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
                 if (mark != DIALOG_MARK_NONE) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[DIALOG_CHAR_MARK_START + mark]);
-                    gDPLoadSync(gDisplayListHead++);
-                    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
-                    gSPTextureRectangle(gDisplayListHead++, (curX + 6) << 2, (curY - 7) << 2,
+                    gDPSetTextureImage(dlHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[DIALOG_CHAR_MARK_START + mark]);
+                    gDPLoadSync(dlHead++);
+                    gDPLoadBlock(dlHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
+                    gSPTextureRectangle(dlHead++, (curX + 6) << 2, (curY - 7) << 2,
                                         (curX + 6 + 8) << 2, (curY - 7 + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
                     mark = DIALOG_MARK_NONE;
@@ -543,6 +570,8 @@ void print_menu_generic_string(s16 x, s16 y, const u8 *str) {
         }
         strPos++;
     }
+
+    gDisplayListHead = dlHead;
 }
 
 void print_credits_string(s16 x, s16 y, const u8 *str) {
@@ -551,12 +580,14 @@ void print_credits_string(s16 x, s16 y, const u8 *str) {
     u32 curX = x;
     u32 curY = y;
 
-    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
+    Gfx* dlHead = gDisplayListHead;
+
+    gDPSetTile(dlHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0,
                 G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
-    gDPTileSync(gDisplayListHead++);
-    gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
+    gDPTileSync(dlHead++);
+    gDPSetTile(dlHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 2, 0, G_TX_RENDERTILE, 0,
                 G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
-    gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
+    gDPSetTileSize(dlHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
 
     while (str[strPos] != GLOBAR_CHAR_TERMINATOR) {
         switch (str[strPos]) {
@@ -564,17 +595,19 @@ void print_credits_string(s16 x, s16 y, const u8 *str) {
                 curX += 4;
                 break;
             default:
-                gDPPipeSync(gDisplayListHead++);
-                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos]]);
-                gDPLoadSync(gDisplayListHead++);
-                gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
-                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
+                gDPPipeSync(dlHead++);
+                gDPSetTextureImage(dlHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos]]);
+                gDPLoadSync(dlHead++);
+                gDPLoadBlock(dlHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
+                gSPTextureRectangle(dlHead++, curX << 2, curY << 2, (curX + 8) << 2,
                                     (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                 curX += 7;
                 break;
         }
         strPos++;
     }
+
+    gDisplayListHead = dlHead;
 }
 
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex) {
@@ -783,30 +816,34 @@ void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
 void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum, u8 *customColor) {
     u8 colorFade;
 
+    Gfx* dlHead = gDisplayListHead;
+
     if (colorMode == 1) {
         if (lineNum == 1) {
-            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+            gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
         } else {
             if (lineNum == gDialogLineNum) {
                 colorFade = (gSineTable[gDialogColorFadeTimer >> 4] * 50.0f) + 200.0f;
-                gDPSetEnvColor(gDisplayListHead++, colorFade, colorFade, colorFade, 255);
+                gDPSetEnvColor(dlHead++, colorFade, colorFade, colorFade, 255);
             } else {
-                gDPSetEnvColor(gDisplayListHead++, 200, 200, 200, 255);
+                gDPSetEnvColor(dlHead++, 200, 200, 200, 255);
             }
         }
     } else {
         switch (gDialogBoxType) {
             case DIALOG_TYPE_ROTATE:
                 if (*customColor == 2) {
-                    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+                    gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
                     *customColor = 0;
                 }
                 break;
             case DIALOG_TYPE_ZOOM:
-                gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
+                gDPSetEnvColor(dlHead++, 0, 0, 0, 255);
                 break;
         }
     }
+
+    gDisplayListHead = dlHead;
 }
 
 #define X_VAL3 0.0f
@@ -1020,13 +1057,17 @@ void render_dialog_triangle_choice(void) {
 
     create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogLineNum * X_VAL4_1) - X_VAL4_2, Y_VAL4_1 - (gLastDialogLineNum * Y_VAL4_2), 0);
 
+    Gfx* dlHead = gDisplayListHead;
+
     if (gDialogBoxType == DIALOG_TYPE_ROTATE) {
-        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+        gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
     } else {
-        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
+        gDPSetEnvColor(dlHead++, 0, 0, 0, 255);
     }
 
-    gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
+    gSPDisplayList(dlHead++, dl_draw_triangle);
+
+    gDisplayListHead = dlHead;
 }
 
 #define X_VAL5 118.0f
@@ -1045,14 +1086,18 @@ void render_dialog_triangle_next(s8 linesPerBox) {
     create_dl_scale_matrix(MENU_MTX_NOPUSH, X_Y_VAL6, X_Y_VAL6, 1.0f);
     create_dl_rotation_matrix(MENU_MTX_NOPUSH, -DEFAULT_DIALOG_BOX_ANGLE, 0, 0, 1.0f);
 
+    Gfx* dlHead = gDisplayListHead;
+
     if (gDialogBoxType == DIALOG_TYPE_ROTATE) { // White Text
-        gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+        gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
     } else { // Black Text
-        gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
+        gDPSetEnvColor(dlHead++, 0, 0, 0, 255);
     }
 
-    gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    gSPDisplayList(dlHead++, dl_draw_triangle);
+    gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
+
+    gDisplayListHead = dlHead;
 }
 
 void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
@@ -1261,8 +1306,12 @@ void reset_cutscene_msg_fade(void) {
 }
 
 void dl_rgba16_begin_cutscene_msg_fade(void) {
-    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
+    Gfx* dlHead = gDisplayListHead;
+
+    gSPDisplayList(dlHead++, dl_rgba16_text_begin);
+    gDPSetEnvColor(dlHead++, 255, 255, 255, gCutsceneMsgFade);
+
+    gDisplayListHead = dlHead;
 }
 
 void dl_rgba16_stop_cutscene_msg_fade(void) {
@@ -1319,7 +1368,7 @@ void do_cutscene_handler(void) {
     if (gCutsceneMsgIndex == -1) {
         return;
     }
-    
+
     create_dl_ortho_matrix();
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
@@ -1383,22 +1432,31 @@ void print_peach_letter_message(void) {
 
     create_dl_translation_matrix(MENU_MTX_PUSH, 97.0f, 118.0f, 0);
 
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
-    gSPDisplayList(gDisplayListHead++, castle_grounds_seg7_dl_0700EA58);
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 20, 20, 20, gCutsceneMsgFade);
+    Gfx* dlHead = gDisplayListHead;
+
+    gDPSetEnvColor(dlHead++, 255, 255, 255, gCutsceneMsgFade);
+    gSPDisplayList(dlHead++, castle_grounds_seg7_dl_0700EA58);
+    gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
+    gSPDisplayList(dlHead++, dl_ia_text_begin);
+    gDPSetEnvColor(dlHead++, 20, 20, 20, gCutsceneMsgFade);
+
+    gDisplayListHead = dlHead;
 
     print_generic_string(STR_X, STR_Y, str);
+
+    dlHead = gDisplayListHead;
+
 #ifdef VERSION_JP
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+    gSPDisplayList(dlHead++, dl_ia_text_end);
+    gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
 #else
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    gDPSetEnvColor(gDisplayListHead++, 200, 80, 120, gCutsceneMsgFade);
-    gSPDisplayList(gDisplayListHead++, castle_grounds_seg7_us_dl_0700F2E8);
+    gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
+    gSPDisplayList(dlHead++, dl_ia_text_end);
+    gDPSetEnvColor(dlHead++, 200, 80, 120, gCutsceneMsgFade);
+    gSPDisplayList(dlHead++, castle_grounds_seg7_us_dl_0700F2E8);
 #endif
+
+    gDisplayListHead = dlHead;
 
     // at the start/end of message, reset the fade.
     if (gCutsceneMsgTimer == 0) {
@@ -1482,9 +1540,13 @@ void shade_screen(void) {
     create_dl_scale_matrix(MENU_MTX_NOPUSH, 2.6f, 3.4f, 1.0f);
 #endif
 
-    gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 110);
-    gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    Gfx* dlHead = gDisplayListHead;
+
+    gDPSetEnvColor(dlHead++, 0, 0, 0, 110);
+    gSPDisplayList(dlHead++, dl_draw_text_bg_box);
+    gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
+
+    gDisplayListHead = dlHead;
 }
 
 void print_animated_red_coin(s16 x, s16 y) {
@@ -1492,30 +1554,35 @@ void print_animated_red_coin(s16 x, s16 y) {
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0);
     create_dl_scale_matrix(MENU_MTX_NOPUSH, 0.2f, 0.2f, 1.0f);
-    gDPSetRenderMode(gDisplayListHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
+
+    Gfx* dlHead = gDisplayListHead;
+
+    gDPSetRenderMode(dlHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
 
 #ifdef IA8_30FPS_COINS
     switch (globalTimer & 0x7) {
-        case 0: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_0     ); break;
-        case 1: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_22_5  ); break;
-        case 2: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_45    ); break;
-        case 3: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_67_5  ); break;
-        case 4: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_90    ); break;
-        case 5: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_67_5_r); break;
-        case 6: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_45_r  ); break;
-        case 7: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_22_5_r); break;
+        case 0: gSPDisplayList(dlHead++, coin_seg3_dl_red_0     ); break;
+        case 1: gSPDisplayList(dlHead++, coin_seg3_dl_red_22_5  ); break;
+        case 2: gSPDisplayList(dlHead++, coin_seg3_dl_red_45    ); break;
+        case 3: gSPDisplayList(dlHead++, coin_seg3_dl_red_67_5  ); break;
+        case 4: gSPDisplayList(dlHead++, coin_seg3_dl_red_90    ); break;
+        case 5: gSPDisplayList(dlHead++, coin_seg3_dl_red_67_5_r); break;
+        case 6: gSPDisplayList(dlHead++, coin_seg3_dl_red_45_r  ); break;
+        case 7: gSPDisplayList(dlHead++, coin_seg3_dl_red_22_5_r); break;
     }
 #else
     switch (globalTimer & 0x6) {
-        case 0: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_front     ); break;
-        case 2: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_tilt_right); break;
-        case 4: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_side      ); break;
-        case 6: gSPDisplayList(gDisplayListHead++, coin_seg3_dl_red_tilt_left ); break;
+        case 0: gSPDisplayList(dlHead++, coin_seg3_dl_red_front     ); break;
+        case 2: gSPDisplayList(dlHead++, coin_seg3_dl_red_tilt_right); break;
+        case 4: gSPDisplayList(dlHead++, coin_seg3_dl_red_side      ); break;
+        case 6: gSPDisplayList(dlHead++, coin_seg3_dl_red_tilt_left ); break;
     }
 #endif
 
-    gDPSetRenderMode(gDisplayListHead++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    gDPSetRenderMode(dlHead++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
+    gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
+
+    gDisplayListHead = dlHead;
 }
 
 void render_pause_red_coins(void) {

@@ -1252,7 +1252,7 @@ void print_menu_cursor(void) {
     if (sCursorClickingTimer != 0)
         // Grabbing
         gSPDisplayList(gDisplayListHead++, dl_menu_grabbing_hand);
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+        gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
     if (sCursorClickingTimer != 0) {
         sCursorClickingTimer++; // This is a very strange way to implement a timer? It counts up and
                                 // then resets to 0 instead of just counting down to 0.

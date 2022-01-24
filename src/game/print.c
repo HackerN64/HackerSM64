@@ -365,9 +365,13 @@ s32 char_to_glyph_index(char c) {
 void add_glyph_texture(s8 glyphIndex) {
     const Texture *const *glyphs = segmented_to_virtual(main_hud_lut);
 
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, glyphs[glyphIndex]);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_load_tex_block);
+    Gfx* dlHead = gDisplayListHead;
+
+    gDPPipeSync(dlHead++);
+    gDPSetTextureImage(dlHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, glyphs[glyphIndex]);
+    gSPDisplayList(dlHead++, dl_hud_img_load_tex_block);
+
+    gDisplayListHead = dlHead;
 }
 
 #ifndef WIDESCREEN
@@ -433,10 +437,14 @@ void render_text_labels(void) {
         return;
     }
 
+    Gfx* dlHead = gDisplayListHead;
+
     guOrtho(mtx, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
-    gSPPerspNormalize((Gfx *) (gDisplayListHead++), 0xFFFF);
-    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
+    gSPPerspNormalize((Gfx *) (dlHead++), 0xFFFF);
+    gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    gSPDisplayList(dlHead++, dl_hud_img_begin);
+
+    gDisplayListHead = dlHead;
 
     for (i = 0; i < sTextLabelsCount; i++) {
         for (j = 0; j < sTextLabels[i]->length; j++) {

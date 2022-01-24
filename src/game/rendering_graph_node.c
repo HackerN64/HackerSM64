@@ -243,26 +243,26 @@ static struct RenderPhase sRenderPhases[] = {
 extern const Gfx init_rsp[];
 
 #ifdef OBJECTS_REJ
-void switch_ucode(s32 ucode) {
+void switch_ucode(Gfx* dlHead, s32 ucode) {
     // Set the ucode and RCP settings
     switch (ucode) {
         default: // GRAPH_NODE_UCODE_DEFAULT
         case GRAPH_NODE_UCODE_DEFAULT:
-            gSPLoadUcodeL(gDisplayListHead++, gspF3DZEX2_NoN_PosLight_fifo); // F3DZEX2_PosLight
+            gSPLoadUcodeL(dlHead++, gspF3DZEX2_NoN_PosLight_fifo); // F3DZEX2_PosLight
             // Reload the necessary RSP settings
-            gSPDisplayList(gDisplayListHead++, init_rsp);
+            gSPDisplayList(dlHead++, init_rsp);
             break;
         case GRAPH_NODE_UCODE_REJ:
             // Use .rej Microcode, skip sub-pixel processing on console
             if (gIsConsole) {
-                gSPLoadUcodeL(gDisplayListHead++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
+                gSPLoadUcodeL(dlHead++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
             } else {
-                gSPLoadUcodeL(gDisplayListHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
+                gSPLoadUcodeL(dlHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
             }
             // Reload the necessary RSP settings
-            gSPDisplayList(gDisplayListHead++, init_rsp);
+            gSPDisplayList(dlHead++, init_rsp);
             // Set the clip ratio (see init_rsp)
-            gSPClipRatio(gDisplayListHead++, FRUSTRATIO_2);
+            gSPClipRatio(dlHead++, FRUSTRATIO_2);
             break;
     }
 }
@@ -299,6 +299,8 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
  #endif
 #endif // F3DEX_GBI_2
 
+    Gfx* dlHead = gDisplayListHead;
+
     // Loop through the render phases
     for (phaseIndex = RENDER_PHASE_FIRST; phaseIndex < RENDER_PHASE_END; phaseIndex++) {
         // Get the render phase information.
@@ -308,13 +310,13 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #ifdef OBJECTS_REJ
         ucode       = renderPhase->ucode;
         // Set the ucode for the current render phase
-        switch_ucode(ucode);
-        gSPLookAt(gDisplayListHead++, &lookAt);
+        switch_ucode(dlHead, ucode);
+        gSPLookAt(dlHead++, &lookAt);
 #endif
         if (enableZBuffer) {
             // Enable z buffer.
-            gDPPipeSync(gDisplayListHead++);
-            gSPSetGeometryMode(gDisplayListHead++, G_ZBUFFER);
+            gDPPipeSync(dlHead++);
+            gSPSetGeometryMode(dlHead++, G_ZBUFFER);
         }
         // Iterate through the layers on the current render phase.
         for (currLayer = startLayer; currLayer <= endLayer; currLayer++) {
@@ -322,38 +324,38 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
             currList = node->listHeads[ucode][currLayer];
 #if defined(DISABLE_AA) || !SILHOUETTE
             // Set the render mode for the current layer.
-            gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer],
+            gDPSetRenderMode(dlHead++, mode1List->modes[currLayer],
                                                  mode2List->modes[currLayer]);
 #else
             if (phaseIndex == RENDER_PHASE_NON_SILHOUETTE) {
                 // To properly cover the silhouette, disable AA.
                 // The silhouette model does not have AA due to the hack used to prevent triangle overlap.
-                gDPSetRenderMode(gDisplayListHead++, (mode1List->modes[currLayer] & ~IM_RD),
+                gDPSetRenderMode(dlHead++, (mode1List->modes[currLayer] & ~IM_RD),
                                                      (mode2List->modes[currLayer] & ~IM_RD));
             } else {
                 // Set the render mode for the current dl.
-                gDPSetRenderMode(gDisplayListHead++, mode1List->modes[currLayer],
+                gDPSetRenderMode(dlHead++, mode1List->modes[currLayer],
                                                      mode2List->modes[currLayer]);
             }
 #endif
             // Iterate through all the displaylists on the current layer.
             while (currList != NULL) {
                 // Add the display list's transformation to the master list.
-                gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
+                gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(currList->transform),
                           (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
 #if SILHOUETTE
                 if (phaseIndex == RENDER_PHASE_SILHOUETTE) {
                     // Add the current display list to the master list, with silhouette F3D.
-                    gSPDisplayList(gDisplayListHead++, dl_silhouette_begin);
-                    gSPDisplayList(gDisplayListHead++, currList->displayList);
-                    gSPDisplayList(gDisplayListHead++, dl_silhouette_end);
+                    gSPDisplayList(dlHead++, dl_silhouette_begin);
+                    gSPDisplayList(dlHead++, currList->displayList);
+                    gSPDisplayList(dlHead++, dl_silhouette_end);
                 } else {
                     // Add the current display list to the master list.
-                    gSPDisplayList(gDisplayListHead++, currList->displayList);
+                    gSPDisplayList(dlHead++, currList->displayList);
                 }
 #else
                 // Add the current display list to the master list.
-                gSPDisplayList(gDisplayListHead++, currList->displayList);
+                gSPDisplayList(dlHead++, currList->displayList);
 #endif
                 // Move to the next DisplayListNode.
                 currList = currList->next;
@@ -363,17 +365,25 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 
     if (enableZBuffer) {
         // Disable z buffer.
-        gDPPipeSync(gDisplayListHead++);
-        gSPClearGeometryMode(gDisplayListHead++, G_ZBUFFER);
+        gDPPipeSync(dlHead++);
+        gSPClearGeometryMode(dlHead++, G_ZBUFFER);
     }
+
+    gDisplayListHead = dlHead;
+
 #ifdef OBJECTS_REJ
  #if defined(F3DEX_GBI_2) && defined(VISUAL_DEBUG)
-    if (hitboxView) render_debug_boxes(DEBUG_UCODE_REJ);
+    if (hitboxView) {
+        render_debug_boxes(DEBUG_UCODE_REJ);
+    }
  #endif
-    switch_ucode(GRAPH_NODE_UCODE_DEFAULT);
+    switch_ucode(gDisplayListHead, GRAPH_NODE_UCODE_DEFAULT);
 #endif
+
 #ifdef VISUAL_DEBUG
-    if ( hitboxView) render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
+    if (hitboxView) {
+        render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
+    }
     if (surfaceView) {
         visual_surface_loop(FALSE);
         visual_surface_loop(TRUE);
@@ -476,9 +486,13 @@ void geo_process_ortho_projection(struct GraphNodeOrthoProjection *node) {
         f32 top = (gCurGraphNodeRoot->y - gCurGraphNodeRoot->height) * scale;
         f32 bottom = (gCurGraphNodeRoot->y + gCurGraphNodeRoot->height) * scale;
 
+        Gfx* dlHead = gDisplayListHead;
+
         guOrtho(mtx, left, right, bottom, top, -2.0f, 2.0f, 1.0f);
-        gSPPerspNormalize(gDisplayListHead++, 0xFFFF);
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+        gSPPerspNormalize(dlHead++, 0xFFFF);
+        gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+
+        gDisplayListHead = dlHead;
 
         geo_process_node_and_siblings(node->node.children);
     }
@@ -504,10 +518,14 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         sAspectRatio = 4.0f / 3.0f; // 1.33333f
 #endif
 
-        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / (f32)WORLD_SCALE, node->far / (f32)WORLD_SCALE, 1.0f);
-        gSPPerspNormalize(gDisplayListHead++, perspNorm);
+        Gfx* dlHead = gDisplayListHead;
 
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / (f32)WORLD_SCALE, node->far / (f32)WORLD_SCALE, 1.0f);
+        gSPPerspNormalize(dlHead++, perspNorm);
+
+        gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+
+        gDisplayListHead = dlHead;
 
         gCurGraphNodeCamFrustum = node;
         geo_process_node_and_siblings(node->fnNode.node.children);
@@ -1268,9 +1286,7 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
             clear_framebuffer(clearColor);
             make_viewport_clip_rect(b);
             *viewport = *b;
-        }
-
-        else if (c != NULL) {
+        } else if (c != NULL) {
             clear_framebuffer(clearColor);
             make_viewport_clip_rect(c);
         }
@@ -1278,9 +1294,15 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         mtxf_identity(gMatStack[gMatStackIndex]);
         mtxf_to_mtx(initialMatrix, gMatStack[gMatStackIndex]);
         gMatStackFixed[gMatStackIndex] = initialMatrix;
-        gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewport));
-        gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(gMatStackFixed[gMatStackIndex]),
+
+        Gfx* dlHead = gDisplayListHead;
+
+        gSPViewport(dlHead++, VIRTUAL_TO_PHYSICAL(viewport));
+        gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(gMatStackFixed[gMatStackIndex]),
                   G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+
+        gDisplayListHead = dlHead;
+
         gCurGraphNodeRoot = node;
         if (node->node.children != NULL) {
             geo_process_node_and_siblings(node->node.children);

@@ -286,33 +286,37 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
     s32 count = VERTCOUNT;
     s32 ntx = 0;
 
+    Gfx* dlHead = gDisplayListHead;
+
     while (vts > 0) {
         if (count == VERTCOUNT) {
             ntx = MIN(VERTCOUNT, vts);
-            gSPVertex(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
+            gSPVertex(dlHead++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
             count = 0;
             vtl   = VERTCOUNT;
         }
 
         if (vtl >= 6) {
-            gSP2Triangles(gDisplayListHead++, (count + 0),
-                                              (count + 1),
-                                              (count + 2), 0x0,
-                                              (count + 3),
-                                              (count + 4),
-                                              (count + 5), 0x0);
+            gSP2Triangles(dlHead++, (count + 0),
+                                    (count + 1),
+                                    (count + 2), 0x0,
+                                    (count + 3),
+                                    (count + 4),
+                                    (count + 5), 0x0);
             vts   -= 6;
             vtl   -= 6;
             count += 6;
         } else if (vtl >= 3) {
-            gSP1Triangle(gDisplayListHead++, (count + 0),
-                                             (count + 1),
-                                             (count + 2), 0x0);
+            gSP1Triangle(dlHead++, (count + 0),
+                                   (count + 1),
+                                   (count + 2), 0x0);
             vts   -= 3;
             vtl   -= 3;
             count += 3;
         }
     }
+
+    gDisplayListHead = dlHead;
 }
 
 s32 iterate_surface_count(s32 x, s32 z) {
@@ -322,7 +326,9 @@ s32 iterate_surface_count(s32 x, s32 z) {
     TerrainData *p = gEnvironmentRegions;
     s32 numRegions;
 
-    if (is_outside_level_bounds(x, z)) return 0;
+    if (is_outside_level_bounds(x, z)) {
+        return 0;
+    }
 
     s32 cellX = GET_CELL_COORD(x);
     s32 cellZ = GET_CELL_COORD(z);
@@ -488,24 +494,28 @@ static void render_box(int index) {
                    ((f32) box->bounds[1] * 0.01f),
                    ((f32) box->bounds[2] * 0.01f));
 
-    gSPMatrix(gDisplayListHead++, mtx,       (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
-    gSPMatrix(gDisplayListHead++, translate, (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
-    gSPMatrix(gDisplayListHead++, rotate,    (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
-    gSPMatrix(gDisplayListHead++, scale,     (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
+    Gfx* dlHead = gDisplayListHead;
 
-    gDPSetEnvColor(gDisplayListHead++, ((color >> 16) & 0xFF),
-                                       ((color >>  8) & 0xFF),
-                                       ((color      ) & 0xFF),
-                                       ((color >> 24) & 0xFF));
+    gSPMatrix(dlHead++, mtx,       (G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH));
+    gSPMatrix(dlHead++, translate, (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
+    gSPMatrix(dlHead++, rotate,    (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
+    gSPMatrix(dlHead++, scale,     (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
+
+    gDPSetEnvColor(dlHead++, ((color >> 16) & 0xFF),
+                             ((color >>  8) & 0xFF),
+                             ((color      ) & 0xFF),
+                             ((color >> 24) & 0xFF));
 
     if (box->type & DEBUG_SHAPE_BOX) {
-        gSPDisplayList(gDisplayListHead++, dl_debug_box_verts);
+        gSPDisplayList(dlHead++, dl_debug_box_verts);
     }
     if (box->type & DEBUG_SHAPE_CYLINDER) {
-        gSPDisplayList(gDisplayListHead++, dl_debug_cylinder_verts);
+        gSPDisplayList(dlHead++, dl_debug_cylinder_verts);
     }
 
-    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+    gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
+
+    gDisplayListHead = dlHead;
 }
 
 void render_debug_boxes(s32 type) {
@@ -526,6 +536,7 @@ void render_debug_boxes(s32 type) {
     if (type & DEBUG_BOX_CLEAR) {
         sNumBoxes = 0;
     }
+
     gSPDisplayList(gDisplayListHead++, dl_debug_box_end);
 }
 

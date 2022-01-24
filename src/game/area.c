@@ -387,10 +387,15 @@ void render_game(void) {
             geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);
         }
 
-        gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&gViewport));
+        Gfx* dlHead = gDisplayListHead;
 
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+        gSPViewport(dlHead++, VIRTUAL_TO_PHYSICAL(&gViewport));
+
+        gDPSetScissor(dlHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
                       SCREEN_HEIGHT - gBorderHeight);
+
+        gDisplayListHead = dlHead;
+
         render_hud();
 
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

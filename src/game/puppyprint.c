@@ -837,22 +837,28 @@ void finish_blank_box(void) {
 // Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
 void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a) {
     s32 cycleadd = 0;
+
+    Gfx* dlHead = gDisplayListHead;
+
     if (((absi(x1 - x2) % 4) == 0) && (a == 255)) {
-        gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
-        gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP);
+        gDPSetCycleType(dlHead++, G_CYC_FILL);
+        gDPSetRenderMode(dlHead++, G_RM_NOOP, G_RM_NOOP);
         cycleadd = 1;
     } else {
-        gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
+        gDPSetCycleType(dlHead++, G_CYC_1CYCLE);
         if (a == 255) {
-            gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
+            gDPSetRenderMode(dlHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
         } else {
-            gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+            gDPSetRenderMode(dlHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         }
         cycleadd = 0;
     }
 
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetFillColor(gDisplayListHead++, (GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1));
+    gDPPipeSync(dlHead++);
+    gDPSetFillColor(dlHead++, (GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1));
+
+    gDisplayListHead = dlHead;
+
     print_set_envcolour(r, g, b, a);
     gDPFillRectangle(gDisplayListHead++, x1, y1, x2 - cycleadd, y2 - cycleadd);
 }
@@ -1162,14 +1168,16 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
     s32 maskW = 1;
     s32 maskH = 1;
 
+    Gfx* dlHead = gDisplayListHead;
+
     if (mode == G_CYC_COPY) {
-        gDPSetCycleType( gDisplayListHead++, mode);
-        gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP2);
+        gDPSetCycleType(dlHead++, mode);
+        gDPSetRenderMode(dlHead++, G_RM_NOOP, G_RM_NOOP2);
         modeSC = 4;
         mOne   = 1;
     } else {
-        gDPSetCycleType( gDisplayListHead++, mode);
-        gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+        gDPSetCycleType(dlHead++, mode);
+        gDPSetRenderMode(dlHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         modeSC = 1;
         mOne   = 0;
     }
@@ -1231,10 +1239,10 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             posH -= peakH;
         }
 
-        gDPLoadSync(gDisplayListHead++);
-        gDPLoadTextureTile(gDisplayListHead++,
+        gDPLoadSync(dlHead++);
+        gDPLoadTextureTile(dlHead++,
             image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
-        gSPScisTextureRectangle(gDisplayListHead++,
+        gSPScisTextureRectangle(dlHead++,
             ((x + posW) << 2),
             ((y + posH) << 2),
             (((x + posW + imW) - mOne) << 2),
@@ -1247,10 +1255,10 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
         posH = peakH;
         for (i = 0; i < (width / imW); i++) {
             posW = i * imW;
-            gDPLoadSync(gDisplayListHead++);
-            gDPLoadTextureTile(gDisplayListHead++,
+            gDPLoadSync(dlHead++);
+            gDPLoadTextureTile(dlHead++,
                 image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
-            gSPScisTextureRectangle(gDisplayListHead++,
+            gSPScisTextureRectangle(dlHead++,
                 (x + posW) << 2,
                 (y + posH) << 2,
                 ((x + posW + imW) - mOne) << 2,
@@ -1258,6 +1266,8 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
                 G_TX_RENDERTILE, 0, 0, modeSC << 10, 1 << 10);
         }
     }
+
+    gDisplayListHead = dlHead;
 }
 
 #endif

@@ -94,10 +94,13 @@ void *virtual_to_segmented(u32 segment, const void *addr) {
 
 void move_segment_table_to_dmem(void) {
     s32 i;
+    Gfx* dlHead = gDisplayListHead;
 
     for (i = 0; i < 16; i++) {
-        gSPSegment(gDisplayListHead++, i, sSegmentTable[i]);
+        gSPSegment(dlHead++, i, sSegmentTable[i]);
     }
+
+    gDisplayListHead = dlHead;
 }
 #else
 void *segmented_to_virtual(const void *addr) {
