@@ -59,8 +59,8 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
 
     vec3f_copy_y_off(m->pos, &m->usedObj->oPosVec, marioObj->oMarioPolePos + offsetY);
 
-    s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f)
-                 + f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
+    s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, MARIO_COLLISION_RADIUS)
+                 + f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, ((MARIO_COLLISION_RADIUS / 2) - 1));
 
     f32 ceilHeight = find_mario_ceil(m->pos, m->pos[1], &ceil);
     if (m->pos[1] > ceilHeight - MARIO_HITBOX_HEIGHT) {
@@ -789,7 +789,8 @@ s32 act_tornado_twirling(struct MarioState *m) {
         m->vel[1] += 1.0f;
     }
 
-    if ((marioObj->oMarioTornadoPosY += m->vel[1]) < 0.0f) {
+    marioObj->oMarioTornadoPosY += m->vel[1];
+    if (marioObj->oMarioTornadoPosY < 0.0f) {
         marioObj->oMarioTornadoPosY = 0.0f;
     }
     if (marioObj->oMarioTornadoPosY > usedObj->hitboxHeight) {
@@ -812,11 +813,11 @@ s32 act_tornado_twirling(struct MarioState *m) {
     sinAngleVel = sins(marioObj->oMarioTornadoYawVel);
     cosAngleVel = coss(marioObj->oMarioTornadoYawVel);
 
-    nextPos[0] = usedObj->oPosX + dx * cosAngleVel + dz * sinAngleVel;
-    nextPos[2] = usedObj->oPosZ - dx * sinAngleVel + dz * cosAngleVel;
+    nextPos[0] = usedObj->oPosX + (dx * cosAngleVel) + (dz * sinAngleVel);
+    nextPos[2] = usedObj->oPosZ - (dx * sinAngleVel) + (dz * cosAngleVel);
     nextPos[1] = usedObj->oPosY + marioObj->oMarioTornadoPosY;
 
-    f32_find_wall_collision(&nextPos[0], &nextPos[1], &nextPos[2], 60.0f, 50.0f);
+    f32_find_wall_collision(&nextPos[0], &nextPos[1], &nextPos[2], 60.0f, MARIO_COLLISION_RADIUS);
 
     floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     if (floor != NULL) {

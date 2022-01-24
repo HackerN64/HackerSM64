@@ -326,7 +326,7 @@ void mario_stop_riding_and_holding(struct MarioState *m) {
 }
 
 u32 does_mario_have_normal_cap_on_head(struct MarioState *m) {
-    return (m->flags & (MARIO_CAPS | MARIO_CAP_ON_HEAD)) == (MARIO_NORMAL_CAP | MARIO_CAP_ON_HEAD);
+    return ((m->flags & (MARIO_CAPS | MARIO_CAP_ON_HEAD)) == (MARIO_NORMAL_CAP | MARIO_CAP_ON_HEAD));
 }
 
 #ifdef PREVENT_CAP_LOSS
@@ -372,7 +372,7 @@ void mario_retrieve_cap(void) {
     mario_drop_held_object(gMarioState);
     save_file_clear_flags(SAVE_FLAG_CAP_ON_KLEPTO | SAVE_FLAG_CAP_ON_UKIKI);
     gMarioState->flags &= ~MARIO_CAP_ON_HEAD;
-    gMarioState->flags |= MARIO_NORMAL_CAP | MARIO_CAP_IN_HAND;
+    gMarioState->flags |= (MARIO_NORMAL_CAP | MARIO_CAP_IN_HAND);
 }
 
 u32 able_to_grab_object(struct MarioState *m, UNUSED struct Object *obj) {
@@ -624,7 +624,7 @@ void push_mario_out_of_object(struct MarioState *m, struct Object *obj, f32 padd
         newMarioX = obj->oPosX + (minDistance * sins(pushAngle));
         newMarioZ = obj->oPosZ + (minDistance * coss(pushAngle));
 
-        f32_find_wall_collision(&newMarioX, &m->pos[1], &newMarioZ, 60.0f, 50.0f);
+        f32_find_wall_collision(&newMarioX, &m->pos[1], &newMarioZ, 60.0f, MARIO_COLLISION_RADIUS);
 
         f32 floorHeight = find_floor(newMarioX, m->pos[1], newMarioZ, &floor);
         if (floor != NULL) {
@@ -700,7 +700,7 @@ u32 take_damage_and_knock_back(struct MarioState *m, struct Object *obj) {
 
     if (!sInvulnerable && !(m->flags & MARIO_VANISH_CAP)
         && !(obj->oInteractionSubtype & INT_SUBTYPE_DELAY_INVINCIBILITY)) {
-        obj->oInteractStatus = INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO;
+        obj->oInteractStatus = (INT_STATUS_INTERACTED | INT_STATUS_ATTACKED_MARIO);
         m->interactObj = obj;
 
         damage = take_damage_from_interact_object(m);
@@ -731,7 +731,7 @@ void reset_mario_pitch(struct MarioState *m) {
 
 u32 interact_coin(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
     m->numCoins += obj->oDamageOrCoinValue;
-    m->healCounter += 4 * obj->oDamageOrCoinValue;
+    m->healCounter += (4 * obj->oDamageOrCoinValue);
 #ifdef BREATH_METER
     m->breathCounter += (4 * obj->oDamageOrCoinValue);
 #endif
@@ -828,13 +828,13 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
         spawn_object(obj, MODEL_NONE, bhvStarKeyCollectionPuffSpawner);
 
         obj->oInteractStatus = INT_STATUS_INTERACTED;
-        m->interactObj       = obj;
-        m->usedObj           = obj;
+        m->interactObj = obj;
+        m->usedObj     = obj;
 
 #ifdef GLOBAL_STAR_IDS
-        starIndex = (obj->oBehParams >> 24) & 0xFF;
+        starIndex = ((obj->oBehParams >> 24) & 0xFF);
 #else
-        starIndex = (obj->oBehParams >> 24) & 0x1F;
+        starIndex = ((obj->oBehParams >> 24) & 0x1F);
 #endif
         save_file_collect_star_or_key(m->numCoins, starIndex);
 
@@ -865,8 +865,8 @@ u32 interact_bbh_entrance(struct MarioState *m, UNUSED u32 interactType, struct 
         mario_stop_riding_and_holding(m);
 
         obj->oInteractStatus = INT_STATUS_INTERACTED;
-        m->interactObj       = obj;
-        m->usedObj           = obj;
+        m->interactObj = obj;
+        m->usedObj     = obj;
 
         if (m->action & ACT_FLAG_AIR) {
             return set_mario_action(m, ACT_BBH_ENTER_SPIN, 0);
@@ -902,8 +902,8 @@ u32 interact_warp(struct MarioState *m, UNUSED u32 interactType, struct Object *
     } else {
         if (m->action != ACT_EMERGE_FROM_PIPE) {
             obj->oInteractStatus = INT_STATUS_INTERACTED;
-            m->interactObj       = obj;
-            m->usedObj           = obj;
+            m->interactObj = obj;
+            m->usedObj     = obj;
 
 #if ENABLE_RUMBLE
             if (obj->collisionData == segmented_to_virtual(warp_pipe_seg3_collision_03009AC8)) {
@@ -989,10 +989,11 @@ u32 interact_warp_door(struct MarioState *m, UNUSED u32 interactType, struct Obj
 
 u32 get_door_save_file_flag(struct Object *door) {
     u32 saveFileFlag = 0;
-    s16 requiredNumStars = door->oBehParams >> 24;
+    s16 requiredNumStars = (door->oBehParams >> 24);
 
-    s16 isCcmDoor = door->oPosX < 0.0f;
-    s16 isPssDoor = door->oPosY > 500.0f;
+    //! Hardcoded vanilla position check
+    s16 isCcmDoor = (door->oPosX < 0.0f);
+    s16 isPssDoor = (door->oPosY > 500.0f);
 
     switch (requiredNumStars) {
         case  1: saveFileFlag = (isPssDoor ? SAVE_FLAG_UNLOCKED_PSS_DOOR : SAVE_FLAG_UNLOCKED_WF_DOOR ); break;
@@ -1071,8 +1072,8 @@ u32 interact_cannon_base(struct MarioState *m, UNUSED u32 interactType, struct O
     if (m->action != ACT_IN_CANNON) {
         mario_stop_riding_and_holding(m);
         obj->oInteractStatus = INT_STATUS_INTERACTED;
-        m->interactObj       = obj;
-        m->usedObj           = obj;
+        m->interactObj = obj;
+        m->usedObj     = obj;
         return set_mario_action(m, ACT_IN_CANNON, 0);
     }
 
@@ -1098,8 +1099,8 @@ u32 interact_tornado(struct MarioState *m, UNUSED u32 interactType, struct Objec
         update_mario_sound_and_camera(m);
 
         obj->oInteractStatus = INT_STATUS_INTERACTED;
-        m->interactObj       = obj;
-        m->usedObj           = obj;
+        m->interactObj = obj;
+        m->usedObj     = obj;
 
         marioObj->oMarioTornadoYawVel = 0x400;
         marioObj->oMarioTornadoPosY = m->pos[1] - obj->oPosY;
@@ -1120,8 +1121,8 @@ u32 interact_whirlpool(struct MarioState *m, UNUSED u32 interactType, struct Obj
     if (m->action != ACT_CAUGHT_IN_WHIRLPOOL) {
         mario_stop_riding_and_holding(m);
         obj->oInteractStatus = INT_STATUS_INTERACTED;
-        m->interactObj       = obj;
-        m->usedObj           = obj;
+        m->interactObj = obj;
+        m->usedObj     = obj;
 
         m->forwardVel = 0.0f;
 
@@ -1166,7 +1167,7 @@ u32 interact_flame(struct MarioState *m, UNUSED u32 interactType, struct Object 
         queue_rumble_data(5, 80);
 #endif
         obj->oInteractStatus = INT_STATUS_INTERACTED;
-        m->interactObj       = obj;
+        m->interactObj = obj;
 
         if ((m->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER))
             || m->waterLevel - m->pos[1] > 50.0f) {
@@ -1399,7 +1400,7 @@ u32 interact_spiny_walking(struct MarioState *m, UNUSED u32 interactType, struct
     u32 interaction = determine_interaction(m, obj);
 
     if (interaction & INT_PUNCH) {
-        obj->oInteractStatus = INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED | ATTACK_PUNCH;
+        obj->oInteractStatus = (INT_STATUS_INTERACTED | INT_STATUS_WAS_ATTACKED | ATTACK_PUNCH);
         bounce_back_from_attack(m, interaction);
     } else if (take_damage_and_knock_back(m, obj)) {
         return TRUE;
@@ -1453,8 +1454,9 @@ u32 interact_koopa_shell(struct MarioState *m, UNUSED u32 interactType, struct O
     if (!(m->action & ACT_FLAG_RIDING_SHELL)) {
         u32 interaction = determine_interaction(m, obj);
 
-        if (interaction == INT_HIT_FROM_ABOVE || m->action == ACT_WALKING
-            || m->action == ACT_HOLD_WALKING) {
+        if (interaction == INT_HIT_FROM_ABOVE
+         || m->action == ACT_WALKING
+         || m->action == ACT_HOLD_WALKING) {
             m->interactObj = obj;
             m->usedObj = obj;
             m->riddenObj = obj;
@@ -1548,7 +1550,7 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
 }
 
 u32 interact_hoot(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    s32 actionId = m->action & ACT_ID_MASK;
+    s32 actionId = (m->action & ACT_ID_MASK);
 
     //! Can pause to advance the global timer without falling too far, allowing
     // you to regrab after letting go.
@@ -1692,7 +1694,9 @@ u32 mario_can_talk(struct MarioState *m, u32 arg) {
 
         s16 animID = m->marioObj->header.gfx.animInfo.animID;
 
-        if (animID == MARIO_ANIM_SIDESTEP_RIGHT || animID == MARIO_ANIM_SIDESTEP_LEFT || animID == MARIO_ANIM_PUSHING) {
+        if (animID == MARIO_ANIM_SIDESTEP_RIGHT
+         || animID == MARIO_ANIM_SIDESTEP_LEFT
+         || animID == MARIO_ANIM_PUSHING) {
             return TRUE;
         }
     }
@@ -1796,8 +1800,8 @@ u32 interact_text(struct MarioState *m, UNUSED u32 interactType, struct Object *
 void check_kick_or_punch_wall(struct MarioState *m) {
     if (m->flags & (MARIO_PUNCHING | MARIO_KICKING | MARIO_TRIPPING)) {
         struct WallCollisionData detector;
-        detector.x = m->pos[0] + (50.0f * sins(m->faceAngle[1]));
-        detector.z = m->pos[2] + (50.0f * coss(m->faceAngle[1]));
+        detector.x = m->pos[0] + ((f32)MARIO_COLLISION_RADIUS * sins(m->faceAngle[1]));
+        detector.z = m->pos[2] + ((f32)MARIO_COLLISION_RADIUS * coss(m->faceAngle[1]));
         detector.y = m->pos[1];
         detector.offsetY = 80.0f;
         detector.radius = 5.0f;
@@ -1822,7 +1826,7 @@ void check_kick_or_punch_wall(struct MarioState *m) {
 
 void mario_process_interactions(struct MarioState *m) {
     sDelayInvincTimer = FALSE;
-    sInvulnerable = (m->action & ACT_FLAG_INVULNERABLE) || m->invincTimer != 0;
+    sInvulnerable = ((m->action & ACT_FLAG_INVULNERABLE) || m->invincTimer != 0);
 
     if (!(m->action & ACT_FLAG_INTANGIBLE) && m->collidedObjInteractTypes != 0) {
         s32 i;

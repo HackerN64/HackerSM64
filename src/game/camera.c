@@ -5146,7 +5146,8 @@ s16 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
         if (gCamera->cutscene != 0 || !(gCameraMovementFlags & CAM_MOVE_C_UP_MODE)) {
             floorHeight = find_floor(newPos[0], newPos[1], newPos[2], &floor);
             if (floorHeight != FLOOR_LOWER_LIMIT) {
-                if ((floorHeight += 125.f) > newPos[1]) {
+                floorHeight += 125.f;
+                if (newPos[1] < floorHeight) {
                     newPos[1] = floorHeight;
                 }
             }
@@ -5180,8 +5181,9 @@ s32 set_camera_mode_fixed(struct Camera *c, s16 x, s16 y, s16 z) {
     f32 posY = y;
     f32 posZ = z;
 
-    if (sFixedModeBasePosition[0] != posX || sFixedModeBasePosition[1] != posY
-        || sFixedModeBasePosition[2] != posZ) {
+    if (sFixedModeBasePosition[0] != posX
+     || sFixedModeBasePosition[1] != posY
+     || sFixedModeBasePosition[2] != posZ) {
         basePosSet = TRUE;
         sStatusFlags &= ~CAM_FLAG_SMOOTH_MOVEMENT;
     }
