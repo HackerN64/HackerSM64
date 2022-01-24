@@ -645,7 +645,7 @@ struct ObjView *make_view(const char *name, s32 flags, s32 projectionType, s32 u
     newView->unk48 = 1.0f;
     newView->unk4C = 1.0f;
 
-    newView->colour.r = newView->id * 0.1; //? 0.1f, unless the extra precision was wanted for the tenth
+    newView->colour.r = newView->id * 0.1f;
     newView->colour.g = 0.06f;
     newView->colour.b = 1.0f;
 
@@ -1044,12 +1044,12 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     gd_cross_vec3f(&sp70, a1, &sp94);
     sp2C = (f32) gd_sqrt_d((sp94.x * sp94.x) + (sp94.z * sp94.z));
 
-    if (sp2C > 1000.0) { //? 1000.0f
+    if (sp2C > 1000.0f) {
         sp2C = 1000.0f;
     }
 
-    sp2C /= 1000.0;    //? 1000.0f
-    sp2C = 1.0 - sp2C; //? 1.0f - sp2C
+    sp2C /= 1000.0f;
+    sp2C = 1.0f - sp2C;
 
     sp88.x = a2->x * sp2C;
     sp88.y = a2->y * sp2C;
@@ -1082,9 +1082,9 @@ void func_8017E838(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     sp64.y -= sp18.y;
     sp64.z -= sp18.z;
 
-    sp64.x *= 0.01; //? 0.01f;
-    sp64.y *= 0.01; //? 0.01f;
-    sp64.z *= 0.01; //? 0.01f;
+    sp64.x *= 0.01f;
+    sp64.y *= 0.01f;
+    sp64.z *= 0.01f;
 
     gd_cross_vec3f(a2, &sp64, &sp70);
     gd_clamp_vec3f(&sp70, 5.0f);
@@ -1766,8 +1766,8 @@ void func_8018100C(struct ObjLight *light) {
     UNUSED u8 filler[12];
 
     if (light->unk40 == 3) {
-        if (light->unk30 > 0.0) { //? 0.0f
-            light->unk30 -= 0.2;  //? 0.2f
+        if (light->unk30 > 0.0f) {
+            light->unk30 -= 0.2f;
         }
 
         if (light->unk30 < 0.0f) {
@@ -1780,44 +1780,6 @@ void func_8018100C(struct ObjLight *light) {
 
         light->unk3C &= ~1;
     }
-    // if (1)?
-    return;
-    // unreachable
-    light->position.x += light->unk80.x;
-    light->position.y += light->unk80.y;
-    light->position.z += light->unk80.z;
-
-    // should be position.x for second comparison?
-    if (light->position.x > 500.0f || light->position.y < -500.0f) {
-        light->unk80.x = -light->unk80.x;
-    }
-
-    if (light->position.y > 500.0f || light->position.y < -500.0f) {
-        light->unk80.y = -light->unk80.y;
-    }
-
-    if (light->position.z > 500.0f || light->position.z < -500.0f) {
-        light->unk80.z = -light->unk80.z;
-    }
-
-    return;
-    // more unreachable
-    D_801A81C0 += 1.0; //? 1.0f
-    D_801A81C4 += 0.6; //? 0.6f
-
-    gd_set_identity_mat4(&mtx);
-    gd_absrot_mat4(&mtx, GD_Y_AXIS, light->unk68.y);
-    gd_absrot_mat4(&mtx, GD_X_AXIS, light->unk68.x);
-    gd_absrot_mat4(&mtx, GD_Z_AXIS, light->unk68.z);
-    gd_mat4f_mult_vec3f(&light->unk8C, &mtx);
-
-    light->position.x = light->unk8C.x;
-    light->position.y = light->unk8C.y;
-    light->position.z = light->unk8C.z;
-    return;
-    // even more unreachable
-    gd_mat4f_mult_vec3f(&light->unk80, &mtx);
-    imout(); // this call would cause an issue if it was reachable
 }
 
 /* @ 22FB48 for 0x38; orig name: func_80181378 */

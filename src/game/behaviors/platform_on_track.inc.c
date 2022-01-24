@@ -241,7 +241,7 @@ static void platform_on_track_act_move_along_track(void) {
         } else {
             // The ski lift accelerates, while the others instantly start
             if (!o->oPlatformOnTrackIsNotSkiLift) {
-                obj_forward_vel_approach(10.0, 0.1f);
+                obj_forward_vel_approach(10.0f, 0.1f);
             } else {
 #ifdef CONTROLLABLE_PLATFORM_SPEED
                 f32 targetVel = gMarioObject->platform == o

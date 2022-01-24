@@ -173,7 +173,7 @@ void reset_gadget(struct ObjGadget *gdgt) {
         fatal_printf("gadget has zero range (%f -> %f)\n", gdgt->rangeMin, gdgt->rangeMax);
     }
 
-    range = (f32)(1.0 / (gdgt->rangeMax - gdgt->rangeMin));
+    range = (f32)(1.0f / (gdgt->rangeMax - gdgt->rangeMin));
 
     if (gdgt->valueGrp != NULL) {
         vp = (struct ObjValPtr *) gdgt->valueGrp->firstMember->obj;

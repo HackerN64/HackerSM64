@@ -266,7 +266,7 @@ u32 print_list_stats(struct GMemBlock *block, s32 printBlockInfo, s32 permanence
             entries++;
             if (printBlockInfo) {
                 gd_printf("     %6.2fk (%d bytes)\n",
-                          (f32) block->size / 1024.0, //? 1024.0f
+                          (f32) block->size / 1024.0f,
                           block->size);
             }
             totalSize += block->size;
@@ -275,7 +275,7 @@ u32 print_list_stats(struct GMemBlock *block, s32 printBlockInfo, s32 permanence
     }
 
     gd_printf("Total %6.2fk (%d bytes) in %d entries\n",
-              (f32) totalSize / 1024.0, //? 1024.0f
+              (f32) totalSize / 1024.0f,
               totalSize, entries);
 
     return entries;

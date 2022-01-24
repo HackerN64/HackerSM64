@@ -235,11 +235,11 @@ void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 obj
 
     // Caps vertical speed with a "terminal velocity".
     o->oVelY -= o->oGravity;
-    if (o->oVelY > 75.0) {
-        o->oVelY = 75.0;
+    if (o->oVelY > 75.0f) {
+        o->oVelY = 75.0f;
     }
-    if (o->oVelY < -75.0) {
-        o->oVelY = -75.0;
+    if (o->oVelY < -75.0f) {
+        o->oVelY = -75.0f;
     }
 
     o->oPosY += o->oVelY;

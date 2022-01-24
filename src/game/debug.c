@@ -158,7 +158,7 @@ void print_mapinfo(void) {
     UNUSED s32 area;  // unused in EU
     UNUSED s32 angY;  // unused in EU
 
-    angY = gCurrentObject->oMoveAngleYaw / 182.044000;
+    angY = gCurrentObject->oMoveAngleYaw / 182.044000f;
     area = ((s32) gCurrentObject->oPosX + 0x2000) / 1024
            + ((s32) gCurrentObject->oPosZ + 0x2000) / 1024 * 16;
 

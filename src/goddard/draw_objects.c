@@ -46,19 +46,19 @@ struct BetaVtx {
 };
 
 // data
-static struct GdColour sClrWhite = { 1.0, 1.0, 1.0 };            // @ 801A8070
-static struct GdColour sClrRed = { 1.0, 0.0, 0.0 };              // @ 801A807C
-static struct GdColour sClrGreen = { 0.0, 1.0, 0.0 };            // @ 801A8088
-static struct GdColour sClrBlue = { 0.0, 0.0, 1.0 };             // @ 801A8094
-static struct GdColour sClrErrDarkBlue = { 0.0, 0.0, 6.0 };      // @ 801A80A0
-static struct GdColour sClrPink = { 1.0, 0.0, 1.0 };             // @ 801A80AC
-static struct GdColour sClrBlack = { 0.0, 0.0, 0.0 };            // @ 801A80B8
-static struct GdColour sClrGrey = { 0.6, 0.6, 0.6 };             // @ 801A80C4
-static struct GdColour sClrDarkGrey = { 0.4, 0.4, 0.4 };         // @ 801A80D0
-static struct GdColour sClrYellow = { 1.0, 1.0, 0.0 };           // @ 801A80DC
-static struct GdColour sLightColours[1] = { { 1.0, 1.0, 0.0 } }; // @ 801A80E8
-static struct GdColour *sSelectedColour = &sClrRed;              // @ 801A80F4
-struct ObjCamera *gViewUpdateCamera = NULL;                      // @ 801A80F8
+static struct GdColour sClrWhite        =   { 1.0f, 1.0f, 1.0f };   // @ 801A8070
+static struct GdColour sClrRed          =   { 1.0f, 0.0f, 0.0f };   // @ 801A807C
+static struct GdColour sClrGreen        =   { 0.0f, 1.0f, 0.0f };   // @ 801A8088
+static struct GdColour sClrBlue         =   { 0.0f, 0.0f, 1.0f };   // @ 801A8094
+static struct GdColour sClrErrDarkBlue  =   { 0.0f, 0.0f, 6.0f };   // @ 801A80A0
+static struct GdColour sClrPink         =   { 1.0f, 0.0f, 1.0f };   // @ 801A80AC
+static struct GdColour sClrBlack        =   { 0.0f, 0.0f, 0.0f };   // @ 801A80B8
+static struct GdColour sClrGrey         =   { 0.6f, 0.6f, 0.6f };   // @ 801A80C4
+static struct GdColour sClrDarkGrey     =   { 0.4f, 0.4f, 0.4f };   // @ 801A80D0
+static struct GdColour sClrYellow       =   { 1.0f, 1.0f, 0.0f };   // @ 801A80DC
+static struct GdColour sLightColours[1] = { { 1.0f, 1.0f, 0.0f } }; // @ 801A80E8
+static struct GdColour *sSelectedColour = &sClrRed;                 // @ 801A80F4
+struct ObjCamera *gViewUpdateCamera = NULL;                         // @ 801A80F8
 UNUSED static void *sUnref801A80FC = NULL;
 static s32 sUnreadShapeFlag = 0;       // @ 801A8100
 struct GdColour *sColourPalette[5] = { // @ 801A8104
@@ -70,10 +70,16 @@ struct GdColour *sWhiteBlack[2] = {
     &sClrBlack,
 };
 UNUSED static Mat4f sUnref801A8120 = {
-    { 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0 }
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f }
 };
 UNUSED static Mat4f sUnrefIden801A8160 = {
-    { 1.0, 0.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0 }, { 0.0, 0.0, 0.0, 1.0 }
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f }
 };
 static s32 sLightDlCounter = 1; // @ 801A81A0
 UNUSED static s32 sUnref801A81A4[4] = { 0 };
@@ -154,7 +160,7 @@ void Unknown801781DC(struct ObjZone *zone) {
         if (sp2C > 600.0f) {
             sp2C = 600.0f;
         }
-        sp2C = 1.0 - sp2C / 600.0;
+        sp2C = 1.0f - sp2C / 600.0f;
         unk->unk30->normal.x = sp2C * light->colour.r;
         unk->unk30->normal.y = sp2C * light->colour.g;
         unk->unk30->normal.z = sp2C * light->colour.b;
@@ -289,7 +295,7 @@ void draw_light(struct ObjLight *light) {
         sp94.y = -light->unk80.y;
         sp94.z = -light->unk80.z;
         gd_create_origin_lookat(&sp54, &sp94, 0.0f);
-        uMultiplier = light->unk38 / 45.0;
+        uMultiplier = light->unk38 / 45.0f;
         shape = gSpotShape;
         uMatPtr = &sp54;
     } else {
@@ -425,7 +431,7 @@ void Unknown80178ECC(f32 v0X, f32 v0Y, f32 v0Z, f32 v1X, f32 v1Y, f32 v1Z) {
     f32 difX = v1X - v0X;
     f32 difZ = v1Z - v0Z;
 
-    gd_dl_make_triangle(v0X, v0Y, v0Z, v1X, v1Y, v1Z, v0X + difY * 0.1, v0Y + difX * 0.1, v0Z + difZ * 0.1);
+    gd_dl_make_triangle(v0X, v0Y, v0Z, v1X, v1Y, v1Z, v0X + difY * 0.1f, v0Y + difX * 0.1f, v0Z + difZ * 0.1f);
 }
 
 /**
@@ -709,8 +715,8 @@ void world_pos_to_screen_coords(struct GdVec3f *pos, struct ObjCamera *cam, stru
         return;
     }
 
-    pos->x *= 256.0 / -pos->z;
-    pos->y *= 256.0 / pos->z;
+    pos->x *= 256.0f / -pos->z;
+    pos->y *= 256.0f / pos->z;
     pos->x += view->lowerRight.x / 2.0f;
     pos->y += view->lowerRight.y / 2.0f;
 }
@@ -785,8 +791,8 @@ void drawscene(enum SceneType process, struct ObjGroup *interactables, struct Ob
                       sUpdateViewState.view->clipping.x, sUpdateViewState.view->clipping.y);
     } else {
         gd_create_ortho_matrix(
-            -sUpdateViewState.view->lowerRight.x / 2.0, sUpdateViewState.view->lowerRight.x / 2.0,
-            -sUpdateViewState.view->lowerRight.y / 2.0, sUpdateViewState.view->lowerRight.y / 2.0,
+            -sUpdateViewState.view->lowerRight.x / 2.0f, sUpdateViewState.view->lowerRight.x / 2.0f,
+            -sUpdateViewState.view->lowerRight.y / 2.0f, sUpdateViewState.view->lowerRight.y / 2.0f,
             sUpdateViewState.view->clipping.x, sUpdateViewState.view->clipping.y);
     }
 
@@ -876,7 +882,7 @@ void draw_particle(struct GdObj *obj) {
     if (ptc->timeout > 0) {
         white = sColourPalette[0];
         black = sWhiteBlack[1];
-        brightness = ptc->timeout / 10.0;
+        brightness = ptc->timeout / 10.0f;
         sLightColours[0].r = (white->r - black->r) * brightness + black->r;
         sLightColours[0].g = (white->g - black->g) * brightness + black->g;
         sLightColours[0].b = (white->b - black->b) * brightness + black->b;
@@ -1041,11 +1047,11 @@ void Proc8017A980(struct ObjLight *light) {
     sp24 = light->unk30;
     if (light->flags & LIGHT_UNK02) {
         sp20 = -gd_dot_vec3f(&sLightPositionCache[light->id], &light->unk80);
-        sp1C = 1.0 - light->unk38 / 90.0;
+        sp1C = 1.0f - light->unk38 / 90.0f;
         if (sp20 > sp1C) {
-            sp20 = (sp20 - sp1C) * (1.0 / (1.0 - sp1C));
-            if (sp20 > 1.0) {
-                sp20 = 1.0;
+            sp20 = (sp20 - sp1C) * (1.0f / (1.0f - sp1C));
+            if (sp20 > 1.0f) {
+                sp20 = 1.0f;
             } else if (sp20 < 0.0f) {
                 sp20 = 0.0f;
             }

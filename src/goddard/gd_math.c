@@ -55,7 +55,7 @@ void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 y
         d.x = norm.z;
     }
 
-    invLength = -1.0 / gd_sqrt_f(SQ(d.z) + SQ(d.y) + SQ(d.x));
+    invLength = -1.0f / gd_sqrt_f(SQ(d.z) + SQ(d.y) + SQ(d.x));
     d.z *= invLength;
     d.y *= invLength;
     d.x *= invLength;
@@ -64,7 +64,7 @@ void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 y
     colX.y = xColY * d.z - zColY * d.x;
     colX.x = zColY * d.y - yColY * d.z;
 
-    invLength = 1.0 / gd_sqrt_f(SQ(colX.z) + SQ(colX.y) + SQ(colX.x));
+    invLength = 1.0f / gd_sqrt_f(SQ(colX.z) + SQ(colX.y) + SQ(colX.x));
 
     colX.z *= invLength;
     colX.y *= invLength;
@@ -74,7 +74,7 @@ void gd_mat4f_lookat(Mat4f *mtx, f32 xFrom, f32 yFrom, f32 zFrom, f32 xTo, f32 y
     yColY = d.x * colX.z - d.z * colX.x;
     xColY = d.z * colX.y - d.y * colX.z;
 
-    invLength = 1.0 / gd_sqrt_f(SQ(zColY) + SQ(yColY) + SQ(xColY));
+    invLength = 1.0f / gd_sqrt_f(SQ(zColY) + SQ(yColY) + SQ(xColY));
 
     zColY *= invLength;
     yColY *= invLength;
@@ -283,7 +283,7 @@ void UNUSED gd_rot_mat_about_row(Mat4f *mat, s32 row, f32 ang) {
     vec.y = (*mat)[row][1];
     vec.z = (*mat)[row][2];
 
-    gd_create_rot_mat_angular(&rot, &vec, ang / 2.0);
+    gd_create_rot_mat_angular(&rot, &vec, ang / 2.0f);
     gd_mult_mat4f(mat, &rot, mat);
 }
 
@@ -315,7 +315,7 @@ void gd_absrot_mat4(Mat4f *mtx, s32 axisnum, f32 ang) {
             fatal_printf("absrot_matrix4(): Bad axis num");
     }
 
-    gd_create_rot_mat_angular(&rMat, &rot, ang / 2.0); //? 2.0f
+    gd_create_rot_mat_angular(&rMat, &rot, ang / 2.0f);
     gd_mult_mat4f(mtx, &rMat, mtx);
 }
 
@@ -678,8 +678,8 @@ void UNUSED gd_create_quat_rot_mat(f32 quat[4], UNUSED s32 unused, Mat4f *mtx) {
             k = 1;
         }
 
-        twoIJ = 2.0 * quat[i] * quat[j];
-        two0K = 2.0 * quat[k] * quat[0];
+        twoIJ = 2.0f * quat[i] * quat[j];
+        two0K = 2.0f * quat[k] * quat[0];
 
         (*mtx)[j][i] = twoIJ - two0K;
         (*mtx)[i][j] = twoIJ + two0K;
@@ -714,7 +714,7 @@ void gd_create_rot_matrix(Mat4f *mtx, struct GdVec3f *vec, f32 s, f32 c) {
     rev.y = vec->y;
     rev.x = vec->z;
 
-    oneMinusCos = 1.0 - c;
+    oneMinusCos = 1.0f - c;
 
     (*mtx)[0][0] = oneMinusCos * rev.z * rev.z + c;
     (*mtx)[0][1] = oneMinusCos * rev.z * rev.y + s * rev.x;
@@ -741,11 +741,8 @@ void gd_create_rot_matrix(Mat4f *mtx, struct GdVec3f *vec, f32 s, f32 c) {
  * Creates a rotation matrix about vector 'vec' with ang in degrees.
  */
 void gd_create_rot_mat_angular(Mat4f *mtx, struct GdVec3f *vec, f32 ang) {
-    f32 s;
-    f32 c;
-
-    s = gd_sin_d(ang / (DEG_PER_RAD / 2.0));
-    c = gd_cos_d(ang / (DEG_PER_RAD / 2.0));
+    f32 s = gd_sin_d(ang / (DEG_PER_RAD / 2.0f));
+    f32 c = gd_cos_d(ang / (DEG_PER_RAD / 2.0f));
 
     gd_create_rot_matrix(mtx, vec, s, c);
 }

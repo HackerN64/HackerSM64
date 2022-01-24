@@ -34,10 +34,10 @@ u8 set_transition_color_fade_alpha(s8 fadeType, s8 fadeTimer, u8 transTime) {
 
     switch (fadeType) {
         case COLOR_TRANS_FADE_INTO_COLOR:
-            time = (f32) sTransitionColorFadeCount[fadeTimer] * 255.0 / (f32)(transTime - 1) + 0.5; // fade in
+            time = (f32) sTransitionColorFadeCount[fadeTimer] * 255.0f / (f32)(transTime - 1) + 0.5f; // fade in
             break;
         case COLOR_TRANS_FADE_FROM_COLOR:
-            time = (1.0 - sTransitionColorFadeCount[fadeTimer] / (f32)(transTime - 1)) * 255.0 + 0.5; // fade out
+            time = (1.0f - sTransitionColorFadeCount[fadeTimer] / (f32)(transTime - 1)) * 255.0f + 0.5f; // fade out
             break;
     }
     return time;
@@ -117,13 +117,13 @@ u16 convert_tex_transition_angle_to_pos(struct WarpTransitionData *transData) {
 s16 center_tex_transition_x(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransPos) {
     f32 x = transData->startTexX + coss(texTransPos) * texTransTime;
 
-    return (s16)(x + 0.5);
+    return (s16)(x + 0.5f);
 }
 
 s16 center_tex_transition_y(struct WarpTransitionData *transData, f32 texTransTime, u16 texTransPos) {
     f32 y = transData->startTexY + sins(texTransPos) * texTransTime;
 
-    return (s16)(y + 0.5);
+    return (s16)(y + 0.5f);
 }
 
 void make_tex_transition_vertex(Vtx *verts, s32 n, s8 fadeTimer, struct WarpTransitionData *transData, s16 centerTransX, s16 centerTransY,

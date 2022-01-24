@@ -548,7 +548,7 @@ f32 gd_rand_float(void) {
         sSecondarySeed = temp;
     }
 
-    val = (sPrimarySeed & 0xFFFF) / 65535.0; // 65535.0f
+    val = (sPrimarySeed & 0xFFFF) / 65535.0f;
 
     return val;
 }

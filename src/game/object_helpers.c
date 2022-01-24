@@ -938,7 +938,7 @@ static void apply_drag_to_value(f32 *value, f32 dragStrength) {
 
     if (*value != 0) {
         //! Can overshoot if |*value| > 1 / (dragStrength * 0.0001)
-        decel = sqr(*value) * (dragStrength * 0.0001L);
+        decel = sqr(*value) * (dragStrength * 0.0001f);
 
         if (*value > 0) {
             *value -= decel;

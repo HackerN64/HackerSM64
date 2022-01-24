@@ -89,7 +89,7 @@ void func_80181894(struct ObjJoint *joint) {
             linkedObj = link->obj;
             curWeight = (struct ObjWeight *) linkedObj;
 
-            if (curWeight->weightVal > 0.0) { //? 0.0f
+            if (curWeight->weightVal > 0.0f) {
                 stackVec.x = curWeight->vec20.x;
                 stackVec.y = curWeight->vec20.y;
                 stackVec.z = curWeight->vec20.z;

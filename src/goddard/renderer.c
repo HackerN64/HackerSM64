@@ -692,7 +692,7 @@ static Gfx gd_dl_rdp_init[] = {
 
 UNUSED static u32 gd_unused_pad1 = 0;
 
-float sGdPerspTimer = 1.0;
+float sGdPerspTimer = 1.0f;
 
 UNUSED static u32 gd_unused_pad2 = 0;
 
@@ -2092,8 +2092,8 @@ void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
     sp40.y = cam->unkE8[1][2] + arg4->y;
     sp40.x = cam->unkE8[2][2] + arg4->z;
     sp3C = sqrtf(SQ(sp40.z) + SQ(sp40.y) + SQ(sp40.x));
-    if (sp3C > 0.1) {
-        sp3C = 1.0 / sp3C; //? 1.0f
+    if (sp3C > 0.1f) {
+        sp3C = 1.0f / sp3C;
         sp40.z *= sp3C;
         sp40.y *= sp3C;
         sp40.x *= sp3C;
@@ -2491,10 +2491,10 @@ void parse_p1_controller(void) {
 
     // deadzone checks
     if (ABS(gdctrl->stickX) >= 6) {
-        gdctrl->csrX += gdctrl->stickX * 0.1;
+        gdctrl->csrX += gdctrl->stickX * 0.1f;
     }
     if (ABS(gdctrl->stickY) >= 6) {
-        gdctrl->csrY -= gdctrl->stickY * 0.1;
+        gdctrl->csrY -= gdctrl->stickY * 0.1f;
     }
 
     // clamp cursor position within screen view bounds
@@ -2520,7 +2520,7 @@ UNUSED void stub_renderer_4(f32 arg0) {
     return;
 
     // dead code
-    if (D_801BD768.x * D_801A86CC.x + arg0 * 2.0f > 160.0) {
+    if (D_801BD768.x * D_801A86CC.x + arg0 * 2.0f > 160.0f) {
         func_801A3370(D_801BD758.x - D_801BD768.x, -20.0f, 0.0f);
         D_801BD768.x = D_801BD758.x;
     }
@@ -3388,7 +3388,7 @@ void add_debug_view(struct ObjView *view) {
 union ObjVarVal *cvrt_val_to_kb(union ObjVarVal *dst, union ObjVarVal src) {
     union ObjVarVal temp;
 
-    temp.f = src.f / 1024.0; //? 1024.0f
+    temp.f = src.f / 1024.0f;
     return (*dst = temp, dst);
 }
 

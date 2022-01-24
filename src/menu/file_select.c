@@ -1244,7 +1244,7 @@ void handle_controller_cursor_input(void) {
  */
 void print_menu_cursor(void) {
     handle_controller_cursor_input();
-    create_dl_translation_matrix(MENU_MTX_PUSH, sCursorPos[0] + 160.0f - 5.0, sCursorPos[1] + 120.0f - 25.0, 0.0f);
+    create_dl_translation_matrix(MENU_MTX_PUSH, sCursorPos[0] + 160.0f - 5.0f, sCursorPos[1] + 120.0f - 25.0f, 0.0f);
     // Get the right graphic to use for the cursor.
     if (sCursorClickingTimer == 0)
         // Idle

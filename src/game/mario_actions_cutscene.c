@@ -1900,7 +1900,7 @@ static void jumbo_star_cutscene_taking_off(struct MarioState *m) {
         }
     }
 
-    vec3f_set(m->pos, 0.0f, 307.0, marioObj->oMarioJumboStarCutscenePosZ);
+    vec3f_set(m->pos, 0.0f, 307.0f, marioObj->oMarioJumboStarCutscenePosZ);
     update_mario_pos_for_anim(m);
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
