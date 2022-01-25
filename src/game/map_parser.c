@@ -78,4 +78,19 @@ char *find_function_in_stack(u32 *sp) {
     return NULL;
 }
 
+char *find_prev_function_in_stack(u32 *sp) {
+    for (int i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
+        u32 val = *sp;
+        val = *(u32 *)val;
+        *sp -= 4;
+
+        if (((val >= (u32)_mainSegmentStart   ) && (val <= (u32)_mainSegmentTextEnd   ))
+         || ((val >= (u32)_engineSegmentStart ) && (val <= (u32)_engineSegmentTextEnd ))
+         || ((val >= (u32)_goddardSegmentStart) && (val <= (u32)_goddardSegmentTextEnd))) {
+            return parse_map(val);
+        }
+    }
+
+    return NULL;
+}
 
