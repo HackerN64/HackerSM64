@@ -345,7 +345,6 @@ void update_shell_speed(struct MarioState *m) {
     if (m->floor != NULL && m->floorHeight < m->waterLevel) {
         set_mario_floor(m, &gWaterSurfacePseudoFloor, m->waterLevel);
         m->floor->originOffset = -m->waterLevel;
-        // m->floor->originOffset = m->waterLevel; //! (Original code) Negative origin offset
     }
 
     if (m->floor != NULL && m->floor->type == SURFACE_SLOW) {

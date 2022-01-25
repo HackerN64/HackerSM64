@@ -66,26 +66,30 @@ void stub_mario_step_2(void) {
 }
 
 void transfer_bully_speed(struct BullyCollisionData *obj1, struct BullyCollisionData *obj2) {
-    f32 rx = obj2->posX - obj1->posX;
-    f32 rz = obj2->posZ - obj1->posZ;
+    f32 rx = (obj2->posX - obj1->posX);
+    f32 rz = (obj2->posZ - obj1->posZ);
 
-    //! Bully NaN crash
     f32 rzx = sqr(rx) + sqr(rz);
-    f32 projectedV1 = (rx * obj1->velX + rz * obj1->velZ) / rzx;
-    f32 projectedV2 = (-rx * obj2->velX - rz * obj2->velZ) / rzx;
+    f32 projectedV1 = (( rx * obj1->velX) + (rz * obj1->velZ));
+    f32 projectedV2 = ((-rx * obj2->velX) - (rz * obj2->velZ));
 
-    // Kill speed along r. Convert one object's speed along r and transfer it to
-    // the other object.
-    f32 p1x = projectedV1 * rx;
-    f32 p1z = projectedV1 * rz;
-    f32 p2x = projectedV2 * -rx;
-    f32 p2z = projectedV2 * -rz;
+    if (FLT_IS_NONZERO(rzx)) {
+        rzx = 1.0f / rzx;
+        projectedV1 *= rzx;
+        projectedV2 *= rzx;
+    }
 
-    obj2->velX += obj2->conversionRatio * p1x - p2x;
-    obj2->velZ += obj2->conversionRatio * p1z - p2z;
+    // Kill speed along r. Convert one object's speed along r and transfer it to the other object.
+    f32 p1x = (projectedV1 *  rx);
+    f32 p1z = (projectedV1 *  rz);
+    f32 p2x = (projectedV2 * -rx);
+    f32 p2z = (projectedV2 * -rz);
 
-    obj1->velX += -p1x + obj1->conversionRatio * p2x;
-    obj1->velZ += -p1z + obj1->conversionRatio * p2z;
+    obj2->velX += (obj2->conversionRatio * p1x) - p2x;
+    obj2->velZ += (obj2->conversionRatio * p1z) - p2z;
+
+    obj1->velX += (obj1->conversionRatio * p2x) - p1x;
+    obj1->velZ += (obj1->conversionRatio * p2z) - p1z;
 
     //! Bully battery
 }
