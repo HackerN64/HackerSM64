@@ -62,7 +62,6 @@ static struct SurfaceNode *alloc_surface_node(void) {
  * initialize the surface.
  */
 static struct Surface *alloc_surface(void) {
-
     struct Surface *surface = &sSurfacePool[gSurfacesAllocated++];
 
     if (gSurfacesAllocated >= sSurfacePoolSize) {
@@ -82,7 +81,7 @@ static struct Surface *alloc_surface(void) {
  * Iterates through the entire partition, clearing the surfaces.
  */
 static void clear_spatial_partition(SpatialPartitionCell *cells) {
-    register s32 i = sqr(NUM_CELLS);
+    s32 i = sqr(NUM_CELLS);
 
     while (i--) {
         (*cells)[SPATIAL_PARTITION_FLOORS].next = NULL;
@@ -535,9 +534,9 @@ void clear_dynamic_surfaces(void) {
 void transform_object_vertices(TerrainData **data, TerrainData *vertexData, struct Object *obj) {
     Mat4 *objectTransform = &obj->transform;
 
-    register s32 numVertices = *(*data)++;
+    s32 numVertices = *(*data)++;
 
-    register TerrainData *vertices = *data;
+    TerrainData *vertices = *data;
 
     if (obj->header.gfx.throwMatrix == NULL) {
         obj->header.gfx.throwMatrix = objectTransform;
@@ -575,7 +574,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData, struct Ob
     TerrainData hasForce = surface_has_force(surfaceType);
 #endif
 
-    s32 flags = surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC;
+    s32 flags = (surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC);
 
     RoomData room = 0;
 
@@ -615,11 +614,11 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData, struct Ob
 
 #ifdef AUTO_COLLISION_DISTANCE
 static f32 get_optimal_collision_distance(struct Object *obj) {
-    register f32 thisVertDist, maxDist = 0.0f;
+    f32 thisVertDist, maxDist = 0.0f;
     Vec3f thisVertPos, scale;
     TerrainData *collisionData = obj->collisionData;
     collisionData++;
-    register u32 vertsLeft = *(collisionData)++;
+    u32 vertsLeft = *(collisionData)++;
 
     vec3_copy(scale, obj->header.gfx.scale);
 
@@ -644,7 +643,7 @@ static f32 get_optimal_collision_distance(struct Object *obj) {
     }
 
     // Only run sqrtf once.
-    return sqrtf(maxDist) + 100.0f;
+    return (sqrtf(maxDist) + 100.0f);
 }
 #endif
 
