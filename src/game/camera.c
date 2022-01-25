@@ -632,18 +632,16 @@ void unused_set_camera_pitch_shake_env(s16 shake) {
  */
 void calc_y_to_curr_floor(f32 *posOff, f32 posMul, f32 posBound, f32 *focOff, f32 focMul, f32 focBound) {
     f32 floorHeight = sMarioGeometry.currFloorHeight;
-    f32 waterHeight;
 
     if (!(sMarioCamState->action & ACT_FLAG_METAL_WATER)) {
-        //! @bug this should use sMarioGeometry.waterHeight
-        if (floorHeight < (waterHeight = find_water_level(sMarioCamState->pos[0], sMarioCamState->pos[1], sMarioCamState->pos[2]))) {
-            floorHeight = waterHeight;
+        if (floorHeight < sMarioGeometry.waterHeight) {
+            floorHeight = sMarioGeometry.waterHeight;
         }
     }
 
     if (sMarioCamState->action & ACT_FLAG_ON_POLE) {
-        if (sMarioGeometry.currFloorHeight >= gMarioStates[0].usedObj->oPosY && sMarioCamState->pos[1]
-                   < 0.7f * gMarioStates[0].usedObj->hitboxHeight + gMarioStates[0].usedObj->oPosY) {
+        if (sMarioGeometry.currFloorHeight >= gMarioStates[0].usedObj->oPosY
+         && sMarioCamState->pos[1] < (0.7f * gMarioStates[0].usedObj->hitboxHeight) + gMarioStates[0].usedObj->oPosY) {
             posBound = 1200;
         }
     }
