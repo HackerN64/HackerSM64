@@ -515,6 +515,7 @@ enum oBowserStatuses {
     BOWSER_STATUS_DIST_CENTER  = (1 <<  4), // 0x00000010
     BOWSER_STATUS_BIG_JUMP     = (1 << 16), // 0x00010000
     BOWSER_STATUS_FIRE_SKY     = (1 << 17), // 0x00020000
+    BOWSER_STATUS_MASK         = 0xFF
 };
 enum oBowserGrabbedStatuses {
     BOWSER_GRAB_STATUS_NONE,

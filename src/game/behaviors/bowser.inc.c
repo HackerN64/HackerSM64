@@ -243,14 +243,14 @@ void bowser_act_wait(void) {
  */
 void bowser_act_intro_walk(void) {
     // First look up and walk
-    if (o->oSubAction == 0) {
+    if (o->oSubAction == BOWSER_SUB_ACT_INTRO_WALK_LOOK_UP) {
         if (bowser_set_anim_look_up_and_walk()) {
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_INTRO_WALK_SLOWLY
         }
     // Then slowly walk
-    } else if (o->oSubAction == 1) {
+    } else if (o->oSubAction == BOWSER_SUB_ACT_INTRO_WALK_SLOWLY) {
         if (bowser_set_anim_slow_gait()) {
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_INTRO_WALK_STOP
         }
     // And finally stop, and set to wait mode
     } else if (bowser_set_anim_look_down_stop_walk()) {
@@ -501,13 +501,13 @@ void bowser_act_walk_to_mario(void) {
 
     cur_obj_rotate_yaw_toward(o->oAngleToMario, turnSpeed);
 
-    if (o->oSubAction == 0) {
+    if (o->oSubAction == BOWSER_SUB_ACT_WALK_TO_MARIO_START) {
         o->oBowserTimer = 0;
         // Start walking
         if (bowser_set_anim_look_up_and_walk()) {
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_WALK_TO_MARIO_WALKING
         }
-    } else if (o->oSubAction == 1) {
+    } else if (o->oSubAction == BOWSER_SUB_ACT_WALK_TO_MARIO_WALKING) {
         // Keep walking slowly
         if (bowser_set_anim_slow_gait()) {
             o->oBowserTimer++;
@@ -518,7 +518,7 @@ void bowser_act_walk_to_mario(void) {
                 }
             // Do subaction below if angles is less than 0x2000
             } else if (angleFromMario < 0x2000) {
-                o->oSubAction++;
+                o->oSubAction++; // BOWSER_SUB_ACT_WALK_TO_MARIO_STOP
             }
         }
     // Stop walking and set to default action
@@ -543,7 +543,7 @@ void bowser_act_teleport(void) {
             }
             // Bowser is invisible, move angle to face Mario
             if (o->oOpacity == 0) {
-                o->oSubAction++;
+                o->oSubAction++; // BOWSER_SUB_ACT_TELEPORT_MOVE
                 o->oMoveAngleYaw = o->oAngleToMario;
             }
             break;
@@ -619,7 +619,7 @@ void bowser_act_hit_mine(void) {
     // Play flip animation
     if (o->oSubAction == BOWSER_SUB_ACT_HIT_MINE_START) {
         cur_obj_init_animation_with_sound(BOWSER_ANIM_FLIP);
-        o->oSubAction++;
+        o->oSubAction++; // BOWSER_SUB_ACT_HIT_MINE_FALL
         o->oBowserTimer = 0;
     // Play flip animation again, extend it and play bounce effects
     } else if (o->oSubAction == BOWSER_SUB_ACT_HIT_MINE_FALL) {
@@ -631,7 +631,7 @@ void bowser_act_hit_mine(void) {
             cur_obj_init_animation_with_sound(BOWSER_ANIM_STAND_UP_FROM_FLIP);
             o->oVelY = 0.0f;
             o->oForwardVel = 0.0f;
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_HIT_MINE_STOP
         }
     // Play these actions once he is stand up
     } else if (o->oSubAction == BOWSER_SUB_ACT_HIT_MINE_STOP) {
@@ -698,7 +698,7 @@ void bowser_short_second_hop(void) {
  * Makes Bowser do a big jump
  */
 void bowser_act_big_jump(void) {
-    if (o->oSubAction == 0) {
+    if (o->oSubAction == BOWSER_SUB_ACT_BIG_JUMP_START) {
         // Set jump animation
         if (bowser_set_anim_jump()) {
             // Set vel depending of the stage and status
@@ -709,9 +709,9 @@ void bowser_act_big_jump(void) {
             }
             o->oBowserTimer = 0;
             bowser_short_second_hop();
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_BIG_JUMP_LAND
         }
-    } else if (o->oSubAction == 1) {
+    } else if (o->oSubAction == BOWSER_SUB_ACT_BIG_JUMP_LAND) {
         // Reset Bowser back on stage in BitS if he doesn't land properly
         if (o->oBehParams2ndByte == BOWSER_BP_BITS && o->oBowserStatus & BOWSER_STATUS_BIG_JUMP) {
             bowser_reset_fallen_off_stage();
@@ -720,7 +720,7 @@ void bowser_act_big_jump(void) {
         if (bowser_land()) {
             o->oBowserStatus &= ~BOWSER_STATUS_BIG_JUMP;
             o->oForwardVel = 0.0f;
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_BIG_JUMP_STOP
             // Spawn shockwave (BitS only) if is not on a platform
             bowser_spawn_shockwave();
             // Tilt platform in BitFS
@@ -738,18 +738,18 @@ void bowser_act_big_jump(void) {
  * Makes Bowser do a "quick" jump in BitDW
  */
 void bowser_act_quick_jump(void) {
-    if (o->oSubAction == 0) {
+    if (o->oSubAction == BOWSER_SUB_ACT_QUICK_JUMP_START) {
         // Set fixed val positions while jumping
         if (bowser_set_anim_jump()) {
             o->oVelY = 60.0f;
             o->oForwardVel = 50.0f;
             o->oBowserTimer = 0;
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_QUICK_JUMP_LAND
         }
     // Lands then quickly returns to default action
-    } else if (o->oSubAction == 1) {
+    } else if (o->oSubAction == BOWSER_SUB_ACT_QUICK_JUMP_LAND) {
         if (bowser_land()) {
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_QUICK_JUMP_STOP
         }
     } else if (cur_obj_check_if_near_animation_end()) {
         o->oAction = BOWSER_ACT_DEFAULT;
@@ -767,18 +767,18 @@ void bowser_act_hit_edge(void) {
     }
 
     switch (o->oSubAction) {
-        case 0:
+        case BOWSER_SUB_ACT_HIT_EDGE_START:
             // Move on the edge
             cur_obj_init_animation_with_sound(BOWSER_ANIM_EDGE_MOVE);
             if (cur_obj_check_if_near_animation_end()) {
                 o->oBowserTimer++;
             }
             if (o->oBowserTimer > 0) {
-                o->oSubAction++;
+                o->oSubAction++; // BOWSER_SUB_ACT_HIT_EDGE_STOP
             }
             break;
 
-        case 1:
+        case BOWSER_SUB_ACT_HIT_EDGE_STOP:
             // Stop moving on the edge
             cur_obj_init_animation_with_sound(BOWSER_ANIM_EDGE_STOP);
             // Turn around once the animation ends
@@ -820,13 +820,13 @@ void bowser_act_spit_fire_onto_floor(void) {
  * Returns TRUE once the timer is bigger than the time set
  */
 s32 bowser_turn_on_timer(s32 time, s16 yaw) {
-    if (o->oSubAction == 0) {
+    if (o->oSubAction == BOWSER_SUB_ACT_TURN_FROM_EDGE_START) {
         if (cur_obj_init_animation_and_check_if_near_end(BOWSER_ANIM_LOOK_UP_START_WALK)) {
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_TURN_FROM_EDGE_STOP
         }
-    } else if (o->oSubAction == 1) {
+    } else if (o->oSubAction == BOWSER_SUB_ACT_TURN_FROM_EDGE_STOP) {
         if (cur_obj_init_animation_and_check_if_near_end(BOWSER_ANIM_LOOK_DOWN_STOP_WALK)) {
-            o->oSubAction++;
+            o->oSubAction++; // BOWSER_SUB_ACT_TURN_FROM_EDGE_END
         }
     } else {
         cur_obj_init_animation_with_sound(BOWSER_ANIM_IDLE);
@@ -946,14 +946,14 @@ void bowser_act_thrown(void) {
     if (o->oTimer < 2) {
         o->oBowserTimer = 0;
     }
-    if (o->oSubAction == 0) {
+    if (o->oSubAction == BOWSER_SUB_ACT_THROWN_BOUNCE) {
         // Play shake animations and do bounce effects
         cur_obj_init_animation_with_sound(BOWSER_ANIM_SHAKING);
         bowser_bounce_effects(&o->oBowserTimer);
         // Reset speed when he moves on ground
         if (o->oMoveFlags & OBJ_MOVE_ON_GROUND) {
             o->oForwardVel = 0.0f;
-            o->oSubAction++; // stops this current subaction
+            o->oSubAction++; // BOWSER_SUB_ACT_THROWN_STOP
         }
     // Stand up and after play, set to default act
     } else if (cur_obj_init_animation_and_check_if_near_end(BOWSER_ANIM_STAND_UP)) {
@@ -1003,7 +1003,7 @@ void bowser_act_jump_onto_stage(void) {
             o->oFaceAnglePitch += 0x800;
             o->oFaceAngleRoll += 0x800;
             if (!(o->oFaceAnglePitch & 0xFFFF)) {
-                o->oSubAction++;
+                o->oSubAction++; // BOWSER_SUB_ACT_JUMP_ON_STAGE_START
             }
             bowser_set_goal_invisible();
             break;
@@ -1016,7 +1016,7 @@ void bowser_act_jump_onto_stage(void) {
                 o->oVelY = 150.0f;
                 o->oBowserTargetOpacity = 255;
                 o->oBowserTimer = 0;
-                o->oSubAction++;
+                o->oSubAction++; // BOWSER_SUB_ACT_JUMP_ON_STAGE_LAND
             } else {
                 bowser_set_goal_invisible();
             }
@@ -1039,7 +1039,7 @@ void bowser_act_jump_onto_stage(void) {
             // Land on stage
             if (bowser_land()) {
                 o->oDragStrength = 10.0f;
-                o->oSubAction++;
+                o->oSubAction++; // BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP
                 // Spawn shockwave (BitS only) if is not on a platform
                 if (onDynamicFloor == FALSE) {
                     bowser_spawn_shockwave();
@@ -1625,7 +1625,7 @@ void bhv_bowser_loop(void) {
     angleToCenter = abs_angle_diff(o->oMoveAngleYaw, o->oBowserAngleToCenter);
 
     // Reset Status
-    o->oBowserStatus &= ~0xFF;
+    o->oBowserStatus &= ~BOWSER_STATUS_MASK;
 
     // Set bitflag status for distance/angle values
     // Only the first one is used
