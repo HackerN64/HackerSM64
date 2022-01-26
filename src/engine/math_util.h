@@ -443,9 +443,9 @@ extern f32 gSineTable[];
     }                                   \
 }
 
-#define ABS(x)  (((x) > 0) ? (x) : -(x))
+// Inline functions:
 
-/// From Wiseguy
+/// Rounding
 ALWAYS_INLINE s32 roundf(f32 in) {
     f32 tmp;
     s32 out;
@@ -453,20 +453,28 @@ ALWAYS_INLINE s32 roundf(f32 in) {
     __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
     return out;
 }
-// backwards compatibility
+//// Backwards compatibility
 #define round_float(in) roundf(in)
 
 /// Absolute value
+#define ABS(x)  (((x) > 0) ? (x) : -(x))
 ALWAYS_INLINE f32 absf(f32 in) {
     f32 out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
     return out;
 }
 ALWAYS_INLINE s32 absi(s32 in) {
-    return ABS(in);
+    register s32 t0 = (in >> 31);
+    return ((in ^ t0) - t0);
 }
-#define abss absi
+ALWAYS_INLINE s32 abss(s16 in) {
+    register s32 t0 = (in >> 31);
+    return ((in ^ t0) - t0);
+}
 
+// On console, (x != 0) still returns true for denormalized floats,
+// which will count as a division by zero when divided and crash.
+// For console compatibility, use this check instead when avoiding a division by zero.
 #define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
 
 // RNG
