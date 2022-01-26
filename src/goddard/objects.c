@@ -1762,9 +1762,6 @@ void move_cameras_in_grp(struct ObjGroup *group) {
 
 /* @ 22F7DC for 0x36C*/
 void func_8018100C(struct ObjLight *light) {
-    Mat4f mtx;
-    UNUSED u8 filler[12];
-
     if (light->unk40 == 3) {
         if (light->unk30 > 0.0f) {
             light->unk30 -= 0.2f;
