@@ -1878,7 +1878,7 @@ void init_mario(void) {
 
     mario_reset_bodystate(gMarioState);
     update_mario_info_for_cam(gMarioState);
-    gMarioState->marioBodyState->punchState = 0;
+    gMarioState->marioBodyState->punchState = PUNCH_STATE_TYPE_NONE;
 
     vec3f_copy(&gMarioState->marioObj->oPosVec, gMarioState->pos);
     vec3s_to_vec3i(&gMarioState->marioObj->oMoveAngleVec, gMarioState->faceAngle);
