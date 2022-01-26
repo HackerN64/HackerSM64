@@ -261,7 +261,7 @@ void play_mario_jump_sound(struct MarioState *m) {
  * Adjusts the volume/pitch of sounds from Mario's speed.
  */
 void adjust_sound_for_speed(struct MarioState *m) {
-    s32 absForwardVel = (m->forwardVel > 0.0f) ? m->forwardVel : -m->forwardVel;
+    s32 absForwardVel = absf(m->forwardVel);
     set_sound_moving_speed(SOUND_BANK_MOVING, (absForwardVel > 100) ? 100 : absForwardVel);
 }
 
@@ -846,7 +846,8 @@ u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actionArg) {
             break;
 
         case ACT_DIVE:
-            if ((forwardVel = m->forwardVel + 15.0f) > 48.0f) {
+            forwardVel = m->forwardVel + 15.0f;
+            if (forwardVel > 48.0f) {
                 forwardVel = 48.0f;
             }
             mario_set_forward_vel(m, forwardVel);
@@ -855,11 +856,12 @@ u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actionArg) {
         case ACT_LONG_JUMP:
             m->marioObj->header.gfx.animInfo.animID = -1;
             set_mario_y_vel_based_on_fspeed(m, 30.0f, 0.0f);
-            m->marioObj->oMarioLongJumpIsSlow = m->forwardVel > 16.0f ? FALSE : TRUE;
+            m->marioObj->oMarioLongJumpIsSlow = !(m->forwardVel > 16.0f);
 
             //! (BLJ's) This properly handles long jumps from getting forward speed with
             //  too much velocity, but misses backwards longs allowing high negative speeds.
-            if ((m->forwardVel *= 1.5f) > 48.0f) {
+            m->forwardVel *= 1.5f;
+            if (m->forwardVel > 48.0f) {
                 m->forwardVel = 48.0f;
             }
             break;
@@ -902,7 +904,7 @@ u32 set_mario_action_moving(struct MarioState *m, u32 action, UNUSED u32 actionA
             break;
 
         case ACT_HOLD_WALKING:
-            if (0.0f <= forwardVel && forwardVel < mag / 2.0f) {
+            if (0.0f <= forwardVel && forwardVel < (mag / 2.0f)) {
                 m->forwardVel = mag / 2.0f;
             }
             break;
@@ -1146,12 +1148,10 @@ s32 transition_submerged_to_airborne(struct MarioState *m) {
 
     vec3_zero(m->angleVel);
 
-    if (m->heldObj == NULL) {
-        if (m->input & INPUT_A_DOWN) return set_mario_action(m, ACT_DIVE, 0);
-        else return set_mario_action(m, ACT_FREEFALL, 0);
+    if (m->input & INPUT_A_DOWN) {
+        return set_mario_action(m, (m->heldObj ? ACT_HOLD_JUMP : ACT_DIVE), 0);
     } else {
-        if (m->input & INPUT_A_DOWN) return set_mario_action(m, ACT_HOLD_JUMP, 0);
-        else return set_mario_action(m, ACT_HOLD_FREEFALL, 0);
+        return set_mario_action(m, (m->heldObj ? ACT_HOLD_FREEFALL : ACT_FREEFALL), 0);
     }
 }
 
