@@ -353,7 +353,7 @@ static void boo_chase_mario(f32 minDY, s16 yawIncrement, f32 mul) {
             boo_oscillate(FALSE);
         }
     } else {
-        o->oInteractType = 0;
+        o->oInteractType = INTERACT_NONE;
         boo_stop();
     }
 }

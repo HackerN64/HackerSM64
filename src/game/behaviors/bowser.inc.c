@@ -127,7 +127,7 @@ void bhv_bowser_body_anchor_loop(void) {
         // Clear interaction type at the last sub action in BitS
         // Fixes collision coliding after defeating him
         if (o->parentObj->oSubAction == BOWSER_SUB_ACT_DEAD_FINAL_END_OVER) {
-            o->oInteractType = 0;
+            o->oInteractType = INTERACT_NONE;
         } else {
             o->oInteractType = INTERACT_TEXT;
         }
