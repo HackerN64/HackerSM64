@@ -17,14 +17,14 @@ void bowser_tail_anchor_act_default(void) {
 
     if (bowser->oAction == BOWSER_ACT_TILT_LAVA_PLATFORM) {
         // Bowser cannot be touched when he tilts BitFS platform
-        bowser->oIntangibleTimer = -1;
+        obj_become_intangible(bowser);
     } else if (obj_check_if_collided_with_object(o, gMarioObject)) {
         // When Mario collides his tail, it now gets
         // intangible so he can grab it through
-        bowser->oIntangibleTimer = 0;
+        obj_become_tangible(bowser);
         o->oAction = BOWSER_ACT_TAIL_TOUCHED_MARIO;
     } else {
-        bowser->oIntangibleTimer = -1;
+        obj_become_intangible(bowser);
     }
 }
 
@@ -44,7 +44,7 @@ void bowser_tail_anchor_thrown(void) {
 void bowser_tail_anchor_act_touched_mario(void) {
     // Return to main action when Bowser tilts BitFS platform
     if (o->parentObj->oAction == BOWSER_ACT_TILT_LAVA_PLATFORM) {
-        o->parentObj->oIntangibleTimer = -1;
+        obj_become_intangible(o->parentObj);
         o->oAction = BOWSER_ACT_TAIL_DEFAULT;
     }
     cur_obj_become_intangible();
@@ -67,7 +67,7 @@ void bhv_bowser_tail_anchor_loop(void) {
 
     // Make it intangible while Bowser is dead
     if (o->parentObj->oAction == BOWSER_ACT_DEAD) {
-        o->parentObj->oIntangibleTimer = -1;
+        obj_become_intangible(o->parentObj);
     }
 
     o->oInteractStatus = INT_STATUS_NONE;
