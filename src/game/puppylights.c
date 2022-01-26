@@ -259,8 +259,8 @@ void puppylights_object_emit(struct Object *obj) {
     }
     if (obj->oFlags & OBJ_FLAG_EMIT_LIGHT) {
         f64 dist = ((obj->oPosX - gMarioState->pos[0]) * (obj->oPosX - gMarioState->pos[0])) +
-               ((obj->oPosY - gMarioState->pos[1]) * (obj->oPosY - gMarioState->pos[1])) +
-               ((obj->oPosZ - gMarioState->pos[2]) * (obj->oPosZ - gMarioState->pos[2]));
+                   ((obj->oPosY - gMarioState->pos[1]) * (obj->oPosY - gMarioState->pos[1])) +
+                   ((obj->oPosZ - gMarioState->pos[2]) * (obj->oPosZ - gMarioState->pos[2]));
         f64 lightSize = ((obj->puppylight.pos[1][0]) * (obj->puppylight.pos[1][0])) +
                         ((obj->puppylight.pos[1][1]) * (obj->puppylight.pos[1][1])) +
                         ((obj->puppylight.pos[1][2]) * (obj->puppylight.pos[1][2]));
@@ -269,7 +269,7 @@ void puppylights_object_emit(struct Object *obj) {
         }
         if (obj->oLightID == 0xFFFF) {
             s32 fadingExists = FALSE;
-            if (ABS(gNumLights - gDynLightStart) < MAX_LIGHTS_DYNAMIC) {
+            if (absi(gNumLights - gDynLightStart) < MAX_LIGHTS_DYNAMIC) {
                 goto deallocate;
             }
             for (i = gDynLightStart; i < MIN(gDynLightStart+MAX_LIGHTS_DYNAMIC, MAX_LIGHTS); i++) {

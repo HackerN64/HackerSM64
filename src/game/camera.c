@@ -729,7 +729,7 @@ void set_camera_height(struct Camera *c, f32 goalHeight) {
         }
 
 #ifdef FAST_VERTICAL_CAMERA_MOVEMENT
-        approachRate += ABS(c->pos[1] - goalHeight) / 20;
+        approachRate += absf(c->pos[1] - goalHeight) / 20;
         approach_camera_height(c, goalHeight, approachRate);
 #else
         approach_camera_height(c, goalHeight, 20.f);
@@ -1101,14 +1101,20 @@ void mode_radial_camera(struct Camera *c) {
 
 s32 snap_to_45_degrees(s16 angle) {
     if (angle % DEGREES(45)) {
-        s16 d1 = ABS(angle) % DEGREES(45);
+        s16 d1 = abss(angle) % DEGREES(45);
         s16 d2 = DEGREES(45) - d1;
         if (angle > 0) {
-            if (d1 < d2) return angle - d1;
-            else return angle + d2;
+            if (d1 < d2) {
+                return angle - d1;
+            } else {
+                return angle + d2;
+            }
         } else {
-            if (d1 < d2) return angle + d1;
-            else return angle - d2;
+            if (d1 < d2) {
+                return angle + d1;
+            } else {
+                return angle - d2;
+            }
         }
     }
     return angle;
@@ -6877,7 +6883,7 @@ void cutscene_ending_mario_fall_focus_mario(struct Camera *c) {
     Vec3f offset;
     vec3f_set(offset, 0.f, 80.f, 0.f);
 
-    offset[2] = ABS(sMarioCamState->pos[1] - c->pos[1]) * -0.1f;
+    offset[2] = absf(sMarioCamState->pos[1] - c->pos[1]) * -0.1f;
     if (offset[2] > -100.f) {
         offset[2] = -100.f;
     }
@@ -8003,7 +8009,7 @@ void cutscene_red_coin_star_warp(struct Camera *c) {
     posYaw = calculate_yaw(sCutsceneVars[1].point, c->pos);
     yaw = calculate_yaw(sCutsceneVars[1].point, sMarioCamState->pos);
 
-    if (ABS(yaw - posYaw + DEGREES(90)) < ABS(yaw - posYaw - DEGREES(90))) {
+    if (absi((yaw - posYaw) + DEGREES(90)) < absi((yaw - posYaw) - DEGREES(90))) {
         yaw += DEGREES(90);
     } else {
         yaw -= DEGREES(90);
