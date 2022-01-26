@@ -26,27 +26,7 @@ void handle_cap_ukiki_reset(void) {
  * the cap ukiki.
  */
 s32 is_cap_ukiki_and_mario_has_normal_cap_on_head(void) {
-    return o->oBehParams2ndByte == UKIKI_BP_CAP && does_mario_have_normal_cap_on_head(gMarioState);
-}
-
-/**
- * Unused copy of geo_update_projectile_pos_from_parent. Perhaps a copy paste mistake.
- */
-Gfx *geo_update_projectile_pos_from_parent_copy(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
-    Mat4 mtx2;
-
-    if (callContext == GEO_CONTEXT_RENDER) {
-        // TODO: change global type to Object pointer
-        struct Object *obj = (struct Object *) gCurGraphNodeObject;
-
-        if (obj->prevObj != NULL) {
-            create_transformation_from_matrices(mtx2, mtx, *gCurGraphNodeCamera->matrixPtr);
-            obj_update_pos_from_parent_transformation(mtx2, obj->prevObj);
-            obj_set_gfx_pos_from_pos(obj->prevObj);
-        }
-    }
-
-    return NULL;
+    return (o->oBehParams2ndByte == UKIKI_BP_CAP && does_mario_have_normal_cap_on_head(gMarioState));
 }
 
 /**
