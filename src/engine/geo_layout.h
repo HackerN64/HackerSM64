@@ -7,12 +7,6 @@
 #include "macros.h"
 #include "types.h"
 
-enum GeoCommandFlags {
-    GEO_CMD_FLAGS_RESET,
-    GEO_CMD_FLAGS_SET,
-    GEO_CMD_FLAGS_CLEAR
-};
-
 #define CMD_SIZE_SHIFT (sizeof(void *) >> 3)
 #define CMD_PROCESS_OFFSET(offset) (((offset) & 3) | (((offset) & ~3) << CMD_SIZE_SHIFT))
 

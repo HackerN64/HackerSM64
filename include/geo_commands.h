@@ -10,7 +10,28 @@
 #include "game/mario_misc.h"
 #include "game/mario_actions_cutscene.h"
 
-// sky background params
+#define GEO_PARAMS_LAST_BIT 7
+#define GEO_PARAMS_HAS_DL_BIT BIT(GEO_PARAMS_LAST_BIT) // 0x80
+#define GEO_PARAMS_SHIFT 4
+#define GEO_PARAMS_DRAWING_LAYER_MASK BITMASK(GEO_PARAMS_SHIFT) // 0xF
+#define GEO_PARAMS_ARGS_MASK (BITMASK(GEO_PARAMS_LAST_BIT - GEO_PARAMS_SHIFT) << GEO_PARAMS_SHIFT) // 0x70
+
+// GEO_CMD_NODE_TRANSLATION_ROTATION types
+enum TranslationRotationNodeParams {
+    TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION,
+    TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION,
+    TRANSLATION_ROTATION_NODE_TYPE_ROTATION,
+    TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION,
+};
+
+// GEO_CMD_UPDATE_NODE_FLAGS
+enum GeoCommandFlags {
+    GEO_CMD_FLAGS_RESET,
+    GEO_CMD_FLAGS_SET,
+    GEO_CMD_FLAGS_CLEAR
+};
+
+// Sky background params
 enum SkyBackgroundParams {
     BACKGROUND_OCEAN_SKY,
     BACKGROUND_FLAMING_SKY,
@@ -233,10 +254,10 @@ enum GeoLayoutCommands {
  *     0x10: [u32 displayList: if MSbit of params set, display list segmented address]
  */
 #define GEO_TRANSLATE_ROTATE(layer, tx, ty, tz, rx, ry, rz) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (0x00 | layer), 0x0000), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION << GEO_PARAMS_SHIFT) | layer), 0x0000), \
     CMD_HHHHHH(tx, ty, tz, rx, ry, rz)
 #define GEO_TRANSLATE_ROTATE_WITH_DL(layer, tx, ty, tz, rx, ry, rz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (0x00 | layer | 0x80), 0x0000), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION << GEO_PARAMS_SHIFT) | layer | GEO_PARAMS_HAS_DL_BIT), 0x0000), \
     CMD_HHHHHH(tx, ty, tz, rx, ry, rz), \
     CMD_PTR(displayList)
 
@@ -248,10 +269,10 @@ enum GeoLayoutCommands {
  *     0x08: [u32 displayList: if MSbit of params set, display list segmented address]
  */
 #define GEO_TRANSLATE(layer, tx, ty, tz) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (0x10 | layer), tx), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION << GEO_PARAMS_SHIFT) | layer), tx), \
     CMD_HH(ty, tz)
 #define GEO_TRANSLATE_WITH_DL(layer, tx, ty, tz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (0x10 | layer | 0x80), tx), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION << GEO_PARAMS_SHIFT) | layer | GEO_PARAMS_HAS_DL_BIT), tx), \
     CMD_HH(ty, tz), \
     CMD_PTR(displayList)
 
@@ -263,10 +284,10 @@ enum GeoLayoutCommands {
  *     0x08: [u32 displayList: if MSbit of params set, display list segmented address]
  */
 #define GEO_ROTATE(layer, rx, ry, rz) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (0x20 | layer), rx), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_ROTATION << GEO_PARAMS_SHIFT) | layer), rx), \
     CMD_HH(ry, rz)
 #define GEO_ROTATE_WITH_DL(layer, rx, ry, rz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (0x20 | layer | 0x80), rx), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_ROTATION << GEO_PARAMS_SHIFT) | layer | GEO_PARAMS_HAS_DL_BIT), rx), \
     CMD_HH(ry, rz), \
     CMD_PTR(displayList)
 
@@ -276,9 +297,9 @@ enum GeoLayoutCommands {
  *     0x04: [u32 displayList: if MSbit of params set, display list segmented address]
  */
 #define GEO_ROTATE_Y(layer, ry) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (0x30 | layer), ry)
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION << GEO_PARAMS_SHIFT) | layer), ry)
 #define GEO_ROTATE_Y_WITH_DL(layer, ry, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (0x30 | layer | 0x80), ry), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION << GEO_PARAMS_SHIFT) | layer | GEO_PARAMS_HAS_DL_BIT), ry), \
     CMD_PTR(displayList)
 
 /**
@@ -295,7 +316,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_TRANSLATION, layer, ux), \
     CMD_HH(uy, uz)
 #define GEO_TRANSLATE_NODE_WITH_DL(layer, ux, uy, uz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION, (layer | 0x80), ux), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION, (layer | GEO_PARAMS_HAS_DL_BIT), ux), \
     CMD_HH(uy, uz), \
     CMD_PTR(displayList)
 
@@ -313,7 +334,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_ROTATION, layer, ux), \
     CMD_HH(uy, uz)
 #define GEO_ROTATION_NODE_WITH_DL(layer, ux, uy, uz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_ROTATION, (layer | 0x80), ux), \
+    CMD_BBH(GEO_CMD_NODE_ROTATION, (layer | GEO_PARAMS_HAS_DL_BIT), ux), \
     CMD_HH(uy, uz), \
     CMD_PTR(displayList)
 
@@ -344,7 +365,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_BILLBOARD, layer, tx), \
     CMD_HH(ty, tz)
 #define GEO_BILLBOARD_WITH_PARAMS_AND_DL(layer, tx, ty, tz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_BILLBOARD, (layer | 0x80), tx), \
+    CMD_BBH(GEO_CMD_NODE_BILLBOARD, (layer | GEO_PARAMS_HAS_DL_BIT), tx), \
     CMD_HH(ty, tz), \
     CMD_PTR(displayList)
 #define GEO_BILLBOARD() \
@@ -441,7 +462,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_SCALE, layer, 0x0000), \
     CMD_W(scale)
 #define GEO_SCALE_WITH_DL(layer, scale, displayList) \
-    CMD_BBH(GEO_CMD_NODE_SCALE, (layer | 0x80), 0x0000), \
+    CMD_BBH(GEO_CMD_NODE_SCALE, (layer | GEO_PARAMS_HAS_DL_BIT), 0x0000), \
     CMD_W(scale), \
     CMD_PTR(displayList)
 

@@ -371,11 +371,11 @@ void geo_layout_cmd_node_camera(void) {
 /*
   0x10: Create translation & rotation scene graph node with optional display list
    cmd+0x01: u8 params
-     (params & 0x80): if set, enable displayList field and drawingLayer
-     ((params & 0x70)>>4): fieldLayout
-     (params & 0x0F): drawingLayer
+     (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
+     ((params & GEO_PARAMS_ARGS_MASK) >> GEO_PARAMS_SHIFT): fieldLayout
+     (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
 
-   fieldLayout == 0:
+   fieldLayout == TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION:
     cmd+0x04: s16 xTranslation
     cmd+0x06: s16 yTranslation
     cmd+0x08: s16 zTranslation
@@ -383,22 +383,22 @@ void geo_layout_cmd_node_camera(void) {
     cmd+0x0C: s16 yRotation
     cmd+0x0E: s16 zRotation
 
-   fieldLayout == 1:
+   fieldLayout == TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION:
     cmd+0x02: s16 xTranslation
     cmd+0x04: s16 yTranslation
     cmd+0x06: s16 zTranslation
     (rotation gets copied from gVec3sZero)
 
-   fieldLayout == 2:
+   fieldLayout == TRANSLATION_ROTATION_NODE_TYPE_ROTATION:
     cmd+0x02: s16 xRotation
     cmd+0x04: s16 yRotation
     cmd+0x06: s16 zRotation
     (translation gets copied from gVec3sZero)
 
-   fieldLayout == 3:
+   fieldLayout == TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION:
     cmd+0x02: s16 yRotation
+    (x and z rotation are set to 0)
     (translation gets copied from gVec3sZero)
-    (x and z translation are set to 0)
 
    [cmd+var: void *displayList]
 */
@@ -413,29 +413,29 @@ void geo_layout_cmd_node_translation_rotation(void) {
     s16 params = cur_geo_cmd_u8(0x01);
     s16 *cmdPos = (s16 *) gGeoLayoutCommand;
 
-    switch ((params & 0x70) >> 4) {
-        case 0:
+    switch ((params & GEO_PARAMS_ARGS_MASK) >> GEO_PARAMS_SHIFT) {
+        case TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION:
             cmdPos = read_vec3s(translation, &cmdPos[2]);
             cmdPos = read_vec3s_angle(rotation, cmdPos);
             break;
-        case 1:
+        case TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION:
             cmdPos = read_vec3s(translation, &cmdPos[1]);
             vec3s_copy(rotation, gVec3sZero);
             break;
-        case 2:
+        case TRANSLATION_ROTATION_NODE_TYPE_ROTATION:
             cmdPos = read_vec3s_angle(rotation, &cmdPos[1]);
             vec3s_copy(translation, gVec3sZero);
             break;
-        case 3:
+        case TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION:
             vec3s_copy(translation, gVec3sZero);
             vec3s_set(rotation, 0, (cmdPos[1] << 15) / 180, 0); // degrees
             cmdPos += 2 << CMD_SIZE_SHIFT;
             break;
     }
 
-    if (params & 0x80) {
+    if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = *(void **) &cmdPos[0];
-        drawingLayer = params & 0x0F;
+        drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
         cmdPos += 2 << CMD_SIZE_SHIFT;
     }
 
@@ -449,8 +449,8 @@ void geo_layout_cmd_node_translation_rotation(void) {
 /*
   0x11: Create translation scene graph node with optional display list
    cmd+0x01: u8 params
-     (params & 0x80): if set, enable displayList field and drawingLayer
-     (params & 0x0F): drawingLayer
+     (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
+     (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
    cmd+0x02: s16 xTranslation
    cmd+0x04: s16 yTranslation
    cmd+0x06: s16 zTranslation
@@ -468,9 +468,9 @@ void geo_layout_cmd_node_translation(void) {
 
     cmdPos = read_vec3s(translation, &cmdPos[1]);
 
-    if (params & 0x80) {
+    if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = *(void **) &cmdPos[0];
-        drawingLayer = params & 0x0F;
+        drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
         cmdPos += 2 << CMD_SIZE_SHIFT;
     }
 
@@ -485,8 +485,8 @@ void geo_layout_cmd_node_translation(void) {
 /*
   0x12: Create ? scene graph node
    cmd+0x01: u8 params
-     (params & 0x80): if set, enable displayList field and drawingLayer
-     (params & 0x0F): drawingLayer
+     (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
+     (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
    cmd+0x02: s16 unkX
    cmd+0x04: s16 unkY
    cmd+0x06: s16 unkZ
@@ -504,9 +504,9 @@ void geo_layout_cmd_node_rotation(void) {
 
     cmdPos = read_vec3s_angle(angle, &cmdPos[1]);
 
-    if (params & 0x80) {
+    if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = *(void **) &cmdPos[0];
-        drawingLayer = params & 0x0F;
+        drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
         cmdPos += 2 << CMD_SIZE_SHIFT;
     }
 
@@ -520,8 +520,8 @@ void geo_layout_cmd_node_rotation(void) {
 /*
   0x1D: Create scale scene graph node with optional display list
    cmd+0x01: u8 params
-     (params & 0x80): if set, enable displayList field and drawingLayer
-     (params & 0x0F): drawingLayer
+     (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
+     (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
    cmd+0x04: u32 scale (0x10000 = 1.0)
   [cmd+0x08: void *displayList]
 */
@@ -533,9 +533,9 @@ void geo_layout_cmd_node_scale(void) {
     f32 scale = cur_geo_cmd_u32(0x04) / 65536.0f;
     void *displayList = NULL;
 
-    if (params & 0x80) {
+    if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = cur_geo_cmd_ptr(0x08);
-        drawingLayer = params & 0x0F;
+        drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
         gGeoLayoutCommand += 4 << CMD_SIZE_SHIFT;
     }
 
@@ -579,8 +579,8 @@ void geo_layout_cmd_node_animated_part(void) {
 /*
   0x14: Create billboarding node with optional display list
    cmd+0x01: u8 params
-     (params & 0x80): if set, enable displayList field and drawingLayer
-     (params & 0x0F): drawingLayer
+     (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
+     (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
    cmd+0x02: s16 xTranslation
    cmd+0x04: s16 yTranslation
    cmd+0x06: s16 zTranslation
@@ -596,9 +596,9 @@ void geo_layout_cmd_node_billboard(void) {
 
     cmdPos = read_vec3s(translation, &cmdPos[1]);
 
-    if (params & 0x80) {
+    if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = *(void **) &cmdPos[0];
-        drawingLayer = params & 0x0F;
+        drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
         cmdPos += 2 << CMD_SIZE_SHIFT;
     }
 
