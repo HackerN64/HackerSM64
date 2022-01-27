@@ -298,15 +298,21 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     resolve_and_return_wall_collisions(nextPos, 60.0f, MARIO_COLLISION_RADIUS, &upperWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
 
-    f32 waterLevel = find_water_level(nextPos[0], nextPos[1], nextPos[2]);
-
-#ifndef ALLOW_OOB
-    if (floor == NULL) {
+    s32 isOOB = FALSE;
+#ifdef ALLOW_NULL_FLOORS
+ #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
+    isOOB = (is_outside_level_bounds(nextPos[0], nextPos[2]));
+ #endif
+#else
+    isOOB = (floor == NULL);
+#endif
+    if (isOOB) {
         return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
     }
-#endif
+
+    f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
+    f32 waterLevel = find_water_level(nextPos[0], nextPos[1], nextPos[2]);
 
     if ((m->action & ACT_FLAG_RIDING_SHELL) && floorHeight < waterLevel) {
         floorHeight = waterLevel;
@@ -514,12 +520,20 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
 
     f32 waterLevel = find_water_level(nextPos[0], nextPos[1], nextPos[2]);
 
-    //! The water pseudo floor is not referenced when your intended qstep is
-    // out of bounds, so it won't detect you as landing.
+    s32 isOOB = FALSE;
 
-#ifndef ALLOW_OOB
+#ifdef ALLOW_NULL_FLOORS
+ #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
+    isOOB = is_outside_level_bounds(nextPos[0], nextPos[2]);
+ #endif
+#else
+    isOOB = (floor == NULL);
+#endif
+
     // Check if Mario is OOB.
-    if (floor == NULL) {
+    if (isOOB) {
+        //! The water pseudo floor is not referenced when your intended qstep is
+        // out of bounds, so it won't detect you as landing.
         if (nextPos[1] <= m->floorHeight) {
             m->pos[1] = m->floorHeight;
             return AIR_STEP_LANDED;
@@ -528,7 +542,6 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         m->pos[1] = nextPos[1];
         return AIR_STEP_HIT_WALL;
     }
-#endif
 
     // Use a flat pseudo floor at the water's height when riding a shell.
     if ((m->action & ACT_FLAG_RIDING_SHELL) && floorHeight < waterLevel) {

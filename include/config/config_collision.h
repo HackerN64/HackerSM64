@@ -48,6 +48,9 @@
 // The maximum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it.
 #define LEDGE_GRAB_MAX_HEIGHT 160
 
-// Allow Mario to be in OOB areas.
-// On console, this crashes soon after Mario reaches about 65536 units from the area's origin.
-// #define ALLOW_OOB
+// Allows Mario to be in places without a floor.
+// #define ALLOW_NULL_FLOORS
+
+// Allows Mario to leave the level boundaries.
+// Console will crash soon after Mario reaches about 65536 units from the area's origin.
+// #define ALLOW_OUTSIDE_LEVEL_BOUNDS

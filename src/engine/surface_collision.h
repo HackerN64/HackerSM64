@@ -15,12 +15,6 @@
 #define FLOOR_LOWER_LIMIT           -11000
 #define FLOOR_LOWER_LIMIT_MISC      (FLOOR_LOWER_LIMIT + 1000)
 
-#define is_outside_level_bounds(xPos, zPos) \
-    (((xPos) <= -LEVEL_BOUNDARY_MAX) ||     \
-     ((xPos) >=  LEVEL_BOUNDARY_MAX) ||     \
-     ((zPos) <= -LEVEL_BOUNDARY_MAX) ||     \
-     ((zPos) >=  LEVEL_BOUNDARY_MAX))
-
 #define get_surface_height_at_location(xPos, zPos, surf) (-(((xPos) * (surf)->normal.x) + ((zPos) * (surf)->normal.z) + (surf)->originOffset) / (surf)->normal.y)
 
 #define SURFACE_YAW(s) (atan2s(((s)->normal.z), ((s)->normal.x)))
@@ -42,6 +36,7 @@ struct WallCollisionData {
     /*0x18*/ struct Surface *walls[MAX_REFERENCED_WALLS];
 };
 
+s32 is_outside_level_bounds(s32 xPos, s32 zPos);
 s32 f32_find_wall_collision(f32 *xPtr, f32 *yPtr, f32 *zPtr, f32 offsetY, f32 radius);
 s32 find_wall_collisions(struct WallCollisionData *colData);
 void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struct WallCollisionData *collisionData);

@@ -562,18 +562,27 @@ s32 act_debug_free_move(struct MarioState *m) {
     }
 
     // TODO: Add ability to ignore collision
-    //      - spawn pseudo floor object to prevent OOB death or make ALLOW_OOB a variable
+    //      - spawn pseudo floor object to prevent OOB death or make ALLOW_NULL_FLOORS a variable
     resolve_and_return_wall_collisions(pos, 60.0f, MARIO_COLLISION_RADIUS, &wallData);
 
     set_mario_wall(m, ((wallData.numWalls > 0) ? wallData.walls[0] : NULL));
     f32 floorHeight = find_floor(pos[0], pos[1], pos[2], &floor);
-    f32 ceilHeight = find_mario_ceil(pos, floorHeight, &ceil);
 
-#ifndef ALLOW_OOB
-    if (floor == NULL) {
+    s32 isOOB = FALSE;
+
+#ifdef ALLOW_NULL_FLOORS
+ #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
+    isOOB = (is_outside_level_bounds(pos[0], pos[2]));
+ #endif
+#else
+    isOOB = (floor == NULL);
+#endif
+
+    if (isOOB) {
         return FALSE;
     }
-#endif
+
+    f32 ceilHeight = find_mario_ceil(pos, floorHeight, &ceil);
 
     if ((ceilHeight - floorHeight) >= MARIO_HITBOX_HEIGHT) {
         if (floor != NULL && pos[1] < floorHeight) {

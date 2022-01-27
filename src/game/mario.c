@@ -1298,16 +1298,24 @@ void update_mario_geometry_inputs(struct MarioState *m) {
 
     m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
 
-#ifndef ALLOW_OOB
+    s32 isOOB = FALSE;
+
+#ifdef ALLOW_NULL_FLOORS
+ #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
+    isOOB = is_outside_level_bounds(m->pos[0], m->pos[2]);
+ #endif
+#else
+    isOOB = (m->floor == NULL);
+#endif
+
     // If Mario is OOB, move his position to his graphical position (which was not updated)
     // and check for the floor there.
     // This can cause errant behavior when combined with astral projection,
     // since the graphical position was not Mario's previous location.
-    if (m->floor == NULL) {
+    if (isOOB) {
         vec3f_copy(m->pos, m->marioObj->header.gfx.pos);
         m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
     }
-#endif
 
     m->ceilHeight = find_mario_ceil(m->pos, m->floorHeight, &m->ceil);
     f32 gasLevel = find_poison_gas_level(m->pos[0], m->pos[2]);
@@ -1341,10 +1349,8 @@ void update_mario_geometry_inputs(struct MarioState *m) {
         if (m->pos[1] < (gasLevel - 100.0f)) {
             m->input |= INPUT_IN_POISON_GAS;
         }
-#ifndef ALLOW_OOB
-    } else {
+    } else if (isOOB) {
         level_trigger_warp(m, WARP_OP_DEATH);
-#endif
     }
 }
 
@@ -1764,12 +1770,18 @@ s32 execute_mario_action(UNUSED struct Object *obj) {
 #endif
         mario_process_interactions(gMarioState);
 
-#ifndef ALLOW_OOB
+        s32 isOOB = FALSE;
+#ifdef ALLOW_NULL_FLOORS
+ #ifndef ALLOW_OUTSIDE_LEVEL_BOUNDS
+        isOOB = is_outside_level_bounds(gMarioState->pos[0], gMarioState->pos[2]);
+ #endif
+#else
+        isOOB = (gMarioState->floor == NULL);
+#endif
         // If Mario is OOB, stop executing actions.
-        if (gMarioState->floor == NULL) {
+        if (isOOB) {
             return ACTIVE_PARTICLE_NONE;
         }
-#endif
 
         // The function can loop through many action shifts in one frame,
         // which can lead to unexpected sub-frame behavior. Could potentially hang

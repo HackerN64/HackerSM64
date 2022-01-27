@@ -10,6 +10,13 @@
 #include "surface_load.h"
 #include "game/puppyprint.h"
 
+s32 is_outside_level_bounds(s32 xPos, s32 zPos) {
+    return ((xPos <= -LEVEL_BOUNDARY_MAX)
+         || (xPos >=  LEVEL_BOUNDARY_MAX)
+         || (zPos <= -LEVEL_BOUNDARY_MAX)
+         || (zPos >=  LEVEL_BOUNDARY_MAX));
+}
+
 /**************************************************
  *                      WALLS                     *
  **************************************************/
