@@ -175,7 +175,6 @@ LookAt lookAt;
 // CVG_DST_WRAP Wrap the coverage value on overflow.
 // CVG_X_ALPHA  Coverage and alpha will be multiplied and both will be the same. This makes texture alpha work (eg. Wing Cap wings).
 // FORCE_BL     Force Blending.
-#define SIL_CVG_THRESHOLD 0x3F // 32..255, 63 seems to give best results
 #define SCHWA (AA_EN | IM_RD | CLR_ON_CVG | CVG_DST_WRAP | CVG_X_ALPHA | FORCE_BL)
 static const Gfx dl_silhouette_begin[] = {
     gsDPPipeSync(),
