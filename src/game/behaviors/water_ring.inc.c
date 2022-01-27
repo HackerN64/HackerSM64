@@ -42,8 +42,8 @@ void bhv_jet_stream_water_ring_init(void) {
     o->oFaceAnglePitch = 0x8000;
 }
 
-#ifdef FIX_WATER_RINGS
 void water_ring_check_collection(UNUSED f32 avgScale, struct Object *ringManager) {
+#ifdef FIX_WATER_RINGS
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
 #else
     f32 marioDistInFront = water_ring_calc_mario_dist();
@@ -51,7 +51,7 @@ void water_ring_check_collection(UNUSED f32 avgScale, struct Object *ringManager
     if (!is_point_close_to_object(o, gMarioObject->header.gfx.pos[0],
                                      gMarioObject->header.gfx.pos[1] + 80.0f,
                                      gMarioObject->header.gfx.pos[2],
-                                    (avgScale + 0.2f) * 120.0f)) {
+                                     (avgScale + 0.2f) * 120.0f)) {
         o->oWaterRingMarioDistInFront = marioDistInFront;
         return;
     }
