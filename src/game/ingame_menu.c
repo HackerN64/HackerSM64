@@ -157,6 +157,17 @@ void create_dl_identity_matrix(void) {
     gDisplayListHead = dlHead;
 }
 
+void menu_mtx_push_op(Mtx *matrix, s8 pushOp) {
+    switch (pushOp) {
+        case MENU_MTX_PUSH:
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
+            break;
+        case MENU_MTX_NOPUSH:
+            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+            break;
+    }
+}
+
 void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
     Mtx *matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
 
@@ -166,14 +177,7 @@ void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
 
     guTranslate(matrix, x, y, z);
 
-    switch (pushOp) {
-        case MENU_MTX_PUSH:
-            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-            break;
-        case MENU_MTX_NOPUSH:
-            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
-            break;
-    }
+    menu_mtx_push_op(matrix, pushOp);
 }
 
 void create_dl_rotation_matrix(s8 pushOp, f32 a, f32 x, f32 y, f32 z) {
@@ -185,14 +189,7 @@ void create_dl_rotation_matrix(s8 pushOp, f32 a, f32 x, f32 y, f32 z) {
 
     guRotate(matrix, a, x, y, z);
 
-    switch (pushOp) {
-        case MENU_MTX_PUSH:
-            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-            break;
-        case MENU_MTX_NOPUSH:
-            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
-            break;
-    }
+    menu_mtx_push_op(matrix, pushOp);
 }
 
 void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
@@ -204,14 +201,7 @@ void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z) {
 
     guScale(matrix, x, y, z);
 
-    switch (pushOp) {
-        case MENU_MTX_PUSH:
-            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH);
-            break;
-        case MENU_MTX_NOPUSH:
-            gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
-            break;
-    }
+    menu_mtx_push_op(matrix, pushOp);
 }
 
 void create_dl_ortho_matrix(void) {
@@ -1662,7 +1652,6 @@ void render_pause_my_score_coins(void) {
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)
