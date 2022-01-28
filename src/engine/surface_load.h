@@ -13,6 +13,12 @@
 
 extern u8 gSurfacePoolError;
 
+// Flags for error messages.
+enum SurfaceErrors {
+    NOT_ENOUGH_ROOM_FOR_SURFACES = BIT(0),
+    NOT_ENOUGH_ROOM_FOR_NODES    = BIT(1),
+};
+
 struct SurfaceNode {
     struct SurfaceNode *next;
     struct Surface *surface;

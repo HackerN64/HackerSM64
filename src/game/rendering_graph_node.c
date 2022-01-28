@@ -519,7 +519,9 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
 
         Gfx* dlHead = gDisplayListHead;
 
-        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, (node->near / (f32)WORLD_SCALE), (node->far / (f32)WORLD_SCALE), 1.0f);
+        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio,
+                      (node->near / (f32)WORLD_SCALE),
+                      (node->far  / (f32)WORLD_SCALE), 1.0f);
         gSPPerspNormalize(dlHead++, perspNorm);
 
         gSPMatrix(dlHead++, VIRTUAL_TO_PHYSICAL(mtx), (G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH));

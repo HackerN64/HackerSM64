@@ -237,8 +237,9 @@ void load_area(s32 index) {
         gCurrAreaIndex = gCurrentArea->index;
 
         if (gCurrentArea->terrainData != NULL) {
-            load_area_terrain(index, gCurrentArea->terrainData, gCurrentArea->surfaceRooms,
-                              gCurrentArea->macroObjects);
+            load_area_terrain(index, gCurrentArea->terrainData,
+                                     gCurrentArea->surfaceRooms,
+                                     gCurrentArea->macroObjects);
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {

@@ -1,8 +1,8 @@
 #pragma once
 
-/*****************************
- * COMPATIBILITY SAFE GUARDS *
- *****************************/
+/****************************
+ * COMPATIBILITY SAFEGUARDS *
+ ****************************/
 
 /**
  * NOTE: Only mess with these if you know what you're doing!
