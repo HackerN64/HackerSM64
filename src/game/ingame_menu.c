@@ -1087,8 +1087,6 @@ void render_dialog_triangle_next(s8 linesPerBox) {
     gSPDisplayList(dlHead++, dl_draw_triangle);
     gSPPopMatrix(dlHead++, G_MTX_MODELVIEW);
 
-    gDPSetEnvColor(dlHead++, 255, 255, 255, 255);
-
     gDisplayListHead = dlHead;
 }
 
