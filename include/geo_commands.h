@@ -16,14 +16,6 @@
 #define GEO_PARAMS_DRAWING_LAYER_MASK BITMASK(GEO_PARAMS_SHIFT) // 0xF
 #define GEO_PARAMS_ARGS_MASK (BITMASK(GEO_PARAMS_LAST_BIT - GEO_PARAMS_SHIFT) << GEO_PARAMS_SHIFT) // 0x70
 
-// GEO_CMD_NODE_TRANSLATION_ROTATION types
-enum TranslationRotationNodeParams {
-    TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION,
-    TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION,
-    TRANSLATION_ROTATION_NODE_TYPE_ROTATION,
-    TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION,
-};
-
 // GEO_CMD_UPDATE_NODE_FLAGS
 enum GeoCommandFlags {
     GEO_CMD_FLAGS_RESET,
@@ -63,30 +55,28 @@ enum GeoLayoutCommands {
     /*0x0E*/ GEO_CMD_NODE_SWITCH_CASE,
     /*0x0F*/ GEO_CMD_NODE_CAMERA,
     /*0x10*/ GEO_CMD_NODE_TRANSLATION_ROTATION,
-    /*0x11*/ GEO_CMD_NODE_TRANSLATION,
-    /*0x12*/ GEO_CMD_NODE_ROTATION,
-    /*0x13*/ GEO_CMD_NODE_ANIMATED_PART,
-    /*0x14*/ GEO_CMD_NODE_BILLBOARD,
-    /*0x15*/ GEO_CMD_NODE_DISPLAY_LIST,
-    /*0x16*/ GEO_CMD_NODE_SHADOW,
-    /*0x17*/ GEO_CMD_NODE_OBJECT_PARENT,
-    /*0x18*/ GEO_CMD_NODE_GENERATED,
-    /*0x19*/ GEO_CMD_NODE_BACKGROUND,
-    /*0x1A*/ GEO_CMD_NOP_1A,
-    /*0x1B*/ GEO_CMD_COPY_VIEW,
-    /*0x1C*/ GEO_CMD_NODE_HELD_OBJ,
-    /*0x1D*/ GEO_CMD_NODE_SCALE,
-    /*0x1E*/ GEO_CMD_NOP_1E,
-    /*0x1F*/ GEO_CMD_NOP_1F,
-    /*0x20*/ GEO_CMD_NODE_CULLING_RADIUS,
-    /*0x21*/ GEO_CMD_BONE,
-    /*0x22*/ GEO_CMD_Z_OFFSET,
+    /*0x11*/ GEO_CMD_NODE_ANIMATED_PART,
+    /*0x12*/ GEO_CMD_NODE_BILLBOARD,
+    /*0x13*/ GEO_CMD_NODE_DISPLAY_LIST,
+    /*0x14*/ GEO_CMD_NODE_SHADOW,
+    /*0x15*/ GEO_CMD_NODE_OBJECT_PARENT,
+    /*0x16*/ GEO_CMD_NODE_GENERATED,
+    /*0x17*/ GEO_CMD_NODE_BACKGROUND,
+    /*0x18*/ GEO_CMD_NOP_1,
+    /*0x19*/ GEO_CMD_COPY_VIEW,
+    /*0x1A*/ GEO_CMD_NODE_HELD_OBJ,
+    /*0x1B*/ GEO_CMD_NODE_SCALE,
+    /*0x1C*/ GEO_CMD_NOP_2,
+    /*0x1D*/ GEO_CMD_NOP_3,
+    /*0x1E*/ GEO_CMD_NODE_CULLING_RADIUS,
+    /*0x1F*/ GEO_CMD_BONE,
+    /*0x20*/ GEO_CMD_Z_OFFSET,
 };
 
 // geo layout macros
 
 /**
- * 0x00: Branch and store return address
+ * GEO_CMD_BRANCH_AND_LINK: Branch and store return address
  *   0x04: scriptTarget, segment address of geo layout
  */
 #define GEO_BRANCH_AND_LINK(scriptTarget) \
@@ -94,14 +84,14 @@ enum GeoLayoutCommands {
     CMD_PTR(scriptTarget)
 
 /**
- * 0x01: Terminate geo layout
+ * GEO_CMD_END: Terminate geo layout
  *   0x01-0x03: unused
  */
 #define GEO_END() \
     CMD_BBH(GEO_CMD_END, 0x00, 0x0000)
 
 /**
- * 0x02: Branch
+ * GEO_CMD_BRANCH: Branch
  *   0x01: if 1, store next geo layout address on stack
  *   0x02-0x03: unused
  *   0x04: scriptTarget, segment address of geo layout
@@ -111,28 +101,28 @@ enum GeoLayoutCommands {
     CMD_PTR(scriptTarget)
 
 /**
- * 0x03: Return from branch
+ * GEO_CMD_RETURN: Return from branch
  *   0x01-0x03: unused
  */
 #define GEO_RETURN() \
     CMD_BBH(GEO_CMD_RETURN, 0x00, 0x0000)
 
 /**
- * 0x04: Open node
+ * GEO_CMD_OPEN_NODE: Open node
  *   0x01-0x03: unused
  */
 #define GEO_OPEN_NODE() \
     CMD_BBH(GEO_CMD_OPEN_NODE, 0x00, 0x0000)
 
 /**
- * 0x05: Close node
+ * GEO_CMD_CLOSE_NODE: Close node
  *   0x01-0x03: unused
  */
 #define GEO_CLOSE_NODE() \
     CMD_BBH(GEO_CMD_CLOSE_NODE, 0x00, 0x0000)
 
 /**
- * 0x06: Register the current node at the given index in the gGeoViews array
+ * GEO_CMD_ASSIGN_AS_VIEW: Register the current node at the given index in the gGeoViews array
  *   0x01: unused
  *   0x02: s16 index
  */
@@ -140,7 +130,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_ASSIGN_AS_VIEW, 0x00, index)
 
 /**
- * 0x07: Update current scene graph node flags
+ * GEO_CMD_UPDATE_NODE_FLAGS: Update current scene graph node flags
  *   0x01: u8 operation (0 = reset, 1 = set, 2 = clear)
  *   0x02: s16 bits
  */
@@ -148,7 +138,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_UPDATE_NODE_FLAGS, operation, flagBits)
 
 /**
- * 0x08: Create screen area scene graph node
+ * GEO_CMD_NODE_ROOT: Create screen area scene graph node
  *   0x01: unused
  *   0x02: s16 num entries (+2) to allocate
  *   0x04: s16 x
@@ -162,14 +152,14 @@ enum GeoLayoutCommands {
     CMD_HH(width, height)
 
 /**
- * 0x09: Create orthographic projection scene graph node
+ * GEO_CMD_NODE_ORTHO_PROJECTION: Create orthographic projection scene graph node
  *   0x02: s16 scale as percentage
  */
 #define GEO_NODE_ORTHO(scale) \
     CMD_BBH(GEO_CMD_NODE_ORTHO_PROJECTION, 0x00, scale)
 
 /**
- * 0x0A: Create camera frustum scene graph node
+ * GEO_CMD_NODE_PERSPECTIVE: Create camera frustum scene graph node
  *   0x01: u8  if nonzero, enable function field
  *   0x02: s16 field of view
  *   0x04: u16 near
@@ -185,14 +175,14 @@ enum GeoLayoutCommands {
     CMD_PTR(func)
 
 /**
- * 0x0B: Create a root scene graph node
+ * GEO_CMD_NODE_START: Create a root scene graph node
  *   0x01-0x03: unused
  */
 #define GEO_NODE_START() \
     CMD_BBH(GEO_CMD_NODE_START, 0x00, 0x0000)
 
 /**
- * 0x0C: Create zbuffer-toggling scene graph node
+ * GEO_CMD_NODE_MASTER_LIST: Create zbuffer-toggling scene graph node
  *   0x01: u8 enableZBuffer (1 = on, 0 = off)
  *   0x02-0x03: unused
  */
@@ -200,7 +190,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_MASTER_LIST, enable, 0x0000)
 
 /**
- * 0x0D: Create render range scene graph node
+ * GEO_CMD_NODE_LEVEL_OF_DETAIL: Create render range scene graph node
  *   0x01-0x03: unused
  *   0x04: s16 minDistance
  *   0x06: s16 maxDistance
@@ -210,7 +200,7 @@ enum GeoLayoutCommands {
     CMD_HH(minDistance, maxDistance)
 
 /**
- * 0x0E: Create switch-case scene graph node
+ * GEO_CMD_NODE_SWITCH_CASE: Create switch-case scene graph node
  *   0x01: unused
  *   0x02: s16 numCases
  *   0x04: GraphNodeFunc caseSelectorFunc
@@ -220,7 +210,7 @@ enum GeoLayoutCommands {
     CMD_PTR(function)
 
 /**
- * 0x0F: Create a camera scene graph node.
+ * GEO_CMD_NODE_CAMERA: Create a camera scene graph node.
  *   0x01: unused
  *   0x02: s16 camera type
  *   0x04: s16 posX
@@ -237,14 +227,14 @@ enum GeoLayoutCommands {
     CMD_PTR(function)
 
 /**
- * 0x10: Create translation & rotation scene graph node with optional display list
+ * GEO_CMD_NODE_TRANSLATION_ROTATION: Create translation & rotation scene graph node with optional display list
  * Four different versions of 0x10
  *   cmd+0x01: u8 params
  *     0b1000_0000: if set, enable displayList field and drawingLayer
  *     0b0111_0000: fieldLayout (determines how rest of data is formatted
  *     0b0000_1111: drawingLayer
  *
- *   fieldLayout = 0: Translate & Rotate
+ *   Translate & Rotate
  *     0x04: s16 xTranslation
  *     0x06: s16 yTranslation
  *     0x08: s16 zTranslation
@@ -254,92 +244,75 @@ enum GeoLayoutCommands {
  *     0x10: [u32 displayList: if MSbit of params set, display list segmented address]
  */
 #define GEO_TRANSLATE_ROTATE(layer, tx, ty, tz, rx, ry, rz) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION << GEO_PARAMS_SHIFT) | layer), 0x0000), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (layer), 0x0000), \
     CMD_HHHHHH(tx, ty, tz, rx, ry, rz)
 #define GEO_TRANSLATE_ROTATE_WITH_DL(layer, tx, ty, tz, rx, ry, rz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION << GEO_PARAMS_SHIFT) | layer | GEO_PARAMS_HAS_DL_BIT), 0x0000), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (layer | GEO_PARAMS_HAS_DL_BIT), 0x0000), \
     CMD_HHHHHH(tx, ty, tz, rx, ry, rz), \
     CMD_PTR(displayList)
 
 /**
- *   fieldLayout = 1: Translate
- *     0x02: s16 xTranslation
- *     0x04: s16 yTranslation
- *     0x06: s16 zTranslation
- *     0x08: [u32 displayList: if MSbit of params set, display list segmented address]
+ * GEO_CMD_NODE_TRANSLATION_ROTATION: Translate
+ *     0x04: s16 xTranslation
+ *     0x06: s16 yTranslation
+ *     0x08: s16 zTranslation
+ *     0x0A: s16 xRotation (0)
+ *     0x0C: s16 yRotation (0)
+ *     0x0E: s16 zRotation (0)
+ *     0x10: [u32 displayList: if MSbit of params set, display list segmented address]
  */
 #define GEO_TRANSLATE(layer, tx, ty, tz) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION << GEO_PARAMS_SHIFT) | layer), tx), \
-    CMD_HH(ty, tz)
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (layer), 0x0000), \
+    CMD_HHHHHH(tx, ty, tz, 0, 0, 0)
 #define GEO_TRANSLATE_WITH_DL(layer, tx, ty, tz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION << GEO_PARAMS_SHIFT) | layer | GEO_PARAMS_HAS_DL_BIT), tx), \
-    CMD_HH(ty, tz), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (layer | GEO_PARAMS_HAS_DL_BIT), 0x0000), \
+    CMD_HHHHHH(tx, ty, tz, 0, 0, 0), \
     CMD_PTR(displayList)
 
 /**
- *   fieldLayout = 2: Rotate
- *     0x02: s16 xRotation
- *     0x04: s16 yRotation
- *     0x06: s16 zRotation
- *     0x08: [u32 displayList: if MSbit of params set, display list segmented address]
+ * GEO_CMD_NODE_TRANSLATION_ROTATION: Rotate
+ *     0x04: s16 xTranslation (0)
+ *     0x06: s16 yTranslation (0)
+ *     0x08: s16 zTranslation (0)
+ *     0x0A: s16 xRotation
+ *     0x0C: s16 yRotation
+ *     0x0E: s16 zRotation
+ *     0x10: [u32 displayList: if MSbit of params set, display list segmented address]
  */
 #define GEO_ROTATE(layer, rx, ry, rz) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_ROTATION << GEO_PARAMS_SHIFT) | layer), rx), \
-    CMD_HH(ry, rz)
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (layer), 0x0000), \
+    CMD_HHHHHH(0, 0, 0, rx, ry, rz)
 #define GEO_ROTATE_WITH_DL(layer, rx, ry, rz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_ROTATION << GEO_PARAMS_SHIFT) | layer | GEO_PARAMS_HAS_DL_BIT), rx), \
-    CMD_HH(ry, rz), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (layer | GEO_PARAMS_HAS_DL_BIT), 0x0000), \
+    CMD_HHHHHH(0, 0, 0, rx, ry, rz), \
     CMD_PTR(displayList)
 
 /**
- *   fieldLayout = 3: Rotate Y
- *     0x02: s16 yRotation
- *     0x04: [u32 displayList: if MSbit of params set, display list segmented address]
+ * GEO_CMD_NODE_TRANSLATION_ROTATION: Rotate Y degrees (unused)
+ *     0x04: s16 xTranslation (0)
+ *     0x06: s16 yTranslation (0)
+ *     0x08: s16 zTranslation (0)
+ *     0x0A: s16 xRotation (0)
+ *     0x0C: s16 yRotation (converted from degrees)
+ *     0x0E: s16 zRotation (0)
+ *     0x10: [u32 displayList: if MSbit of params set, display list segmented address]
  */
 #define GEO_ROTATE_Y(layer, ry) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION << GEO_PARAMS_SHIFT) | layer), ry)
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (layer), 0x0000), \
+    CMD_HHHHHH(0, 0, 0, 0, degrees_to_angle(ry), 0)
 #define GEO_ROTATE_Y_WITH_DL(layer, ry, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, ((TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION << GEO_PARAMS_SHIFT) | layer | GEO_PARAMS_HAS_DL_BIT), ry), \
+    CMD_BBH(GEO_CMD_NODE_TRANSLATION_ROTATION, (layer | GEO_PARAMS_HAS_DL_BIT), 0x0000), \
+    CMD_HHHHHH(0, 0, 0, 0, degrees_to_angle(ry), 0), \
     CMD_PTR(displayList)
 
-/**
- * 0x11: Create translation scene graph node with optional display list
- *   0x01: u8 params
- *     0b1000_0000: if set, enable displayList field and drawingLayer
- *     0b0000_1111: drawingLayer
- *   0x02: s16 translationX
- *   0x04: s16 translationY
- *   0x06: s16 translationZ
- *   0x08: [u32 displayList: if MSbit of params set, display list segmented address]
- */
-#define GEO_TRANSLATE_NODE(layer, ux, uy, uz) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION, layer, ux), \
-    CMD_HH(uy, uz)
-#define GEO_TRANSLATE_NODE_WITH_DL(layer, ux, uy, uz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_TRANSLATION, (layer | GEO_PARAMS_HAS_DL_BIT), ux), \
-    CMD_HH(uy, uz), \
-    CMD_PTR(displayList)
+// Backwards compatibility
+#define GEO_TRANSLATE_NODE          GEO_TRANSLATE
+#define GEO_TRANSLATE_NODE_WITH_DL  GEO_TRANSLATE_WITH_DL
+#define GEO_ROTATION_NODE           GEO_ROTATE
+#define GEO_ROTATION_NODE_WITH_DL   GEO_ROTATE_WITH_DL
 
 /**
- * 0x12: Create rotation scene graph node with optional display list
- *   0x01: u8 params
- *      0b1000_0000: if set, enable displayList field and drawingLayer
- *      0b0000_1111: drawingLayer
- *   0x02: s16 rotationX
- *   0x04: s16 rotationY
- *   0x06: s16 rotationZ
- *   0x08: [u32 displayList: if MSbit of params set, display list segmented address]
- */
-#define GEO_ROTATION_NODE(layer, ux, uy, uz) \
-    CMD_BBH(GEO_CMD_NODE_ROTATION, layer, ux), \
-    CMD_HH(uy, uz)
-#define GEO_ROTATION_NODE_WITH_DL(layer, ux, uy, uz, displayList) \
-    CMD_BBH(GEO_CMD_NODE_ROTATION, (layer | GEO_PARAMS_HAS_DL_BIT), ux), \
-    CMD_HH(uy, uz), \
-    CMD_PTR(displayList)
-
-/**
- * 0x13: Create a scene graph node that is rotated by the object's animation.
+ * GEO_CMD_NODE_ANIMATED_PART: Create a scene graph node that is rotated by the object's animation.
  *   0x01: u8 drawingLayer
  *   0x02: s16 xTranslation
  *   0x04: s16 yTranslation
@@ -352,7 +325,7 @@ enum GeoLayoutCommands {
     CMD_PTR(displayList)
 
 /**
- * 0x14: Create billboarding node with optional display list
+ * GEO_CMD_NODE_BILLBOARD: Create billboarding node with optional display list
  *   0x01: u8 params
  *      0b1000_0000: if set, enable displayList field and drawingLayer
  *      0b0000_1111: drawingLayer
@@ -372,7 +345,7 @@ enum GeoLayoutCommands {
     GEO_BILLBOARD_WITH_PARAMS(0, 0, 0, 0)
 
 /**
- * 0x15: Create plain display list scene graph node
+ * GEO_CMD_NODE_DISPLAY_LIST: Create plain display list scene graph node
  *   0x01: u8 drawingLayer
  *   0x02-0x03: unused
  *   0x04: u32 displayList: display list segmented address
@@ -382,7 +355,7 @@ enum GeoLayoutCommands {
     CMD_PTR(displayList)
 
 /**
- * 0x16: Create shadow scene graph node
+ * GEO_CMD_NODE_SHADOW: Create shadow scene graph node
  *   0x01: unused
  *   0x02: s16 shadowType (cast to u8)
  *   0x04: s16 shadowSolidity (cast to u8)
@@ -393,14 +366,14 @@ enum GeoLayoutCommands {
     CMD_HH(solidity, scale)
 
 /**
- * 0x17: Create render object scene graph node
+ * GEO_CMD_NODE_OBJECT_PARENT: Create render object scene graph node
  *   0x01-0x03: unused
  */
 #define GEO_RENDER_OBJ() \
     CMD_BBH(GEO_CMD_NODE_OBJECT_PARENT, 0x00, 0x0000)
 
 /**
- * 0x18: Create dynamically generated displaylist scene graph node
+ * GEO_CMD_NODE_GENERATED: Create dynamically generated displaylist scene graph node
  *   0x01: unused
  *   0x04: s32 parameter
  *   0x08: GraphNodeFunc function
@@ -411,7 +384,7 @@ enum GeoLayoutCommands {
     CMD_PTR(function)
 
 /**
- * 0x19: Create background scene graph node
+ * GEO_CMD_NODE_BACKGROUND: Create background scene graph node
  *   0x02: s16 background: background ID, or RGBA5551 color if backgroundFunc is null
  *   0x04: GraphNodeFunc backgroundFunc
  */
@@ -422,14 +395,14 @@ enum GeoLayoutCommands {
     GEO_BACKGROUND(background, NULL)
 
 /**
- * 0x1A: No operation
+ * GEO_CMD_NOP_1: No operation
  */
-#define GEO_NOP_1A() \
-    CMD_BBH(GEO_CMD_NOP_1A, 0x00, 0x0000), \
+#define GEO_NOP_1() \
+    CMD_BBH(GEO_CMD_NOP_1, 0x00, 0x0000), \
     CMD_HH(0x0000, 0x0000)
 
 /**
- * 0x1B: Copy the shared children from an object parent node from a specific view
+ * GEO_CMD_COPY_VIEW: Copy the shared children from an object parent node from a specific view
  * to a newly created object parent.
  *   0x02: s16 index of array
  */
@@ -437,7 +410,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_COPY_VIEW, 0x00, index)
 
 /**
- * 0x1C: Create a held object scene graph node
+ * GEO_CMD_NODE_HELD_OBJ: Create a held object scene graph node
  *  cmd+0x01: u8 unused
  *  cmd+0x02: s16 offsetX
  *  cmd+0x04: s16 offsetY
@@ -450,7 +423,7 @@ enum GeoLayoutCommands {
     CMD_PTR(nodeFunc)
 
 /**
- * 0x1D: Create scale scene graph node with optional display list
+ * GEO_CMD_NODE_SCALE: Create scale scene graph node with optional display list
  *   0x01: u8 params
  *     0b1000_0000: if set, enable displayList field and drawingLayer
  *     0b0000_1111: drawingLayer
@@ -467,23 +440,23 @@ enum GeoLayoutCommands {
     CMD_PTR(displayList)
 
 /**
- * 0x1E: No operation
+ * GEO_CMD_NOP_2: No operation
  */
-#define GEO_NOP_1E() \
-    CMD_BBH(GEO_CMD_NOP_1E, 0x00, 0x0000), \
+#define GEO_NOP_2() \
+    CMD_BBH(GEO_CMD_NOP_2, 0x00, 0x0000), \
     CMD_HH(0x0000, 0x0000)
 
 /**
- * 0x1F: No operation
+ * GEO_CMD_NOP_3: No operation
  */
-#define GEO_NOP_1F() \
-    CMD_BBH(GEO_CMD_NOP_1F, 0x00, 0x0000), \
+#define GEO_NOP_3() \
+    CMD_BBH(GEO_CMD_NOP_3, 0x00, 0x0000), \
     CMD_HH(0x0000, 0x0000), \
     CMD_HH(0x0000, 0x0000), \
     CMD_HH(0x0000, 0x0000)
 
 /**
- * 0x20: Create a scene graph node that specifies for an object the radius that
+ * GEO_CMD_NODE_CULLING_RADIUS: Create a scene graph node that specifies for an object the radius that
  * is used for frustum culling.
  *   0x01: unused
  *   0x02: s16 cullingRadius
@@ -492,7 +465,7 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_CULLING_RADIUS, 0x00, cullingRadius)
 
 /**
- * 0x21: Create a scene graph node that is rotated by the object's animation + an initial rotation.
+ * GEO_CMD_BONE: Create a scene graph node that is rotated by the object's animation + an initial rotation.
  *   0x01: u8 drawingLayer
  *   0x02: unused
  *   0x04: s16 xTranslation
@@ -509,7 +482,7 @@ enum GeoLayoutCommands {
     CMD_PTR(displayList)
 
 /**
- * 0x22: Create a z offset scene graph node.
+ * GEO_CMD_Z_OFFSET: Create a z offset scene graph node.
  *   0x01: unused
  *   0x02: s16 zOffset
  */

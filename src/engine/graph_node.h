@@ -59,8 +59,6 @@ enum GraphNodeTypes {
     GRAPH_NODE_TYPE_SWITCH_CASE,
     GRAPH_NODE_TYPE_CAMERA,
     GRAPH_NODE_TYPE_TRANSLATION_ROTATION,
-    GRAPH_NODE_TYPE_TRANSLATION,
-    GRAPH_NODE_TYPE_ROTATION,
     GRAPH_NODE_TYPE_OBJECT,
     GRAPH_NODE_TYPE_ANIMATED_PART,
     GRAPH_NODE_TYPE_BONE,
@@ -224,28 +222,9 @@ struct GraphNodeTranslationRotation {
     /*0x1E*/ Vec3s rotation;
 };
 
-/** GraphNode that translates itself and its children.
- *  Usage example: SUPER MARIO logo letters in debug level select.
- *  The display list can be null, in which case it won't draw anything itself.
- */
-struct GraphNodeTranslation {
-    /*0x00*/ struct GraphNode node;
-    /*0x14*/ void *displayList;
-    /*0x18*/ Vec3s translation;
-    // u8 filler[2];
-};
-
-/** GraphNode that rotates itself and its children.
- *  Usage example: Mario torso / head rotation. Its parameters are dynamically
- *  set by a parent script node in that case.
- *  The display list can be null, in which case it won't draw anything itself.
- */
-struct GraphNodeRotation {
-    /*0x00*/ struct GraphNode node;
-    /*0x14*/ void *displayList;
-    /*0x18*/ Vec3s rotation;
-    // u8 filler[2];
-};
+// Backwards compatibility
+#define GraphNodeTranslation GraphNodeTranslationRotation
+#define GraphNodeRotation    GraphNodeTranslationRotation
 
 /** GraphNode part that transforms itself and its children based on animation
  *  data. This animation data is not stored in the node itself but in global
@@ -393,8 +372,6 @@ struct GraphNodeLevelOfDetail       *init_graph_node_render_range        (struct
 struct GraphNodeSwitchCase          *init_graph_node_switch_case         (struct AllocOnlyPool *pool, struct GraphNodeSwitchCase          *graphNode, s16 numCases, s16 selectedCase, GraphNodeFunc nodeFunc, s32 unused);
 struct GraphNodeCamera              *init_graph_node_camera              (struct AllocOnlyPool *pool, struct GraphNodeCamera              *graphNode, f32 *pos, f32 *focus, GraphNodeFunc func, s32 mode);
 struct GraphNodeTranslationRotation *init_graph_node_translation_rotation(struct AllocOnlyPool *pool, struct GraphNodeTranslationRotation *graphNode, s32 drawingLayer, void *displayList, Vec3s translation, Vec3s rotation);
-struct GraphNodeTranslation         *init_graph_node_translation         (struct AllocOnlyPool *pool, struct GraphNodeTranslation         *graphNode, s32 drawingLayer, void *displayList, Vec3s translation);
-struct GraphNodeRotation            *init_graph_node_rotation            (struct AllocOnlyPool *pool, struct GraphNodeRotation            *graphNode, s32 drawingLayer, void *displayList, Vec3s rotation);
 struct GraphNodeScale               *init_graph_node_scale               (struct AllocOnlyPool *pool, struct GraphNodeScale               *graphNode, s32 drawingLayer, void *displayList, f32 scale);
 struct GraphNodeObject              *init_graph_node_object              (struct AllocOnlyPool *pool, struct GraphNodeObject              *graphNode, struct GraphNode *sharedChild, Vec3f pos, Vec3s angle, Vec3f scale);
 struct GraphNodeCullingRadius       *init_graph_node_culling_radius      (struct AllocOnlyPool *pool, struct GraphNodeCullingRadius       *graphNode, s16 radius);

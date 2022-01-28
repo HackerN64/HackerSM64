@@ -619,33 +619,6 @@ void geo_process_translation_rotation(struct GraphNodeTranslationRotation *node)
 }
 
 /**
- * Process a translation node. A transformation matrix based on the node's
- * translation is created and pushed on both the float and fixed point matrix stacks.
- * For the rest it acts as a normal display list node.
- */
-void geo_process_translation(struct GraphNodeTranslation *node) {
-    Vec3f translation;
-
-    vec3s_to_vec3f(translation, node->translation);
-    mtxf_rotate_zxy_and_translate_and_mul(gVec3sZero, translation, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
-
-    inc_mat_stack();
-    append_dl_and_return((struct GraphNodeDisplayList *)node);
-}
-
-/**
- * Process a rotation node. A transformation matrix based on the node's
- * rotation is created and pushed on both the float and fixed point matrix stacks.
- * For the rest it acts as a normal display list node.
- */
-void geo_process_rotation(struct GraphNodeRotation *node) {
-    mtxf_rotate_zxy_and_translate_and_mul(node->rotation, gVec3fZero, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
-
-    inc_mat_stack();
-    append_dl_and_return((struct GraphNodeDisplayList *)node);
-}
-
-/**
  * Process a scaling node. A transformation matrix based on the node's
  * scale is created and pushed on both the float and fixed point matrix stacks.
  * For the rest it acts as a normal display list node.
@@ -1106,7 +1079,9 @@ void geo_process_object(struct Object *node) {
 
             if (node->header.gfx.sharedChild != NULL) {
 #ifdef VISUAL_DEBUG
-                if (hitboxView) visualise_object_hitbox(node);
+                if (hitboxView) {
+                    visualise_object_hitbox(node);
+                }
 #endif
                 gCurGraphNodeObject = (struct GraphNodeObject *) node;
                 node->header.gfx.sharedChild->parent = &node->header.gfx.node;
@@ -1231,8 +1206,6 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                     case GRAPH_NODE_TYPE_SWITCH_CASE:          geo_process_switch              ((struct GraphNodeSwitchCase          *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_CAMERA:               geo_process_camera              ((struct GraphNodeCamera              *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_TRANSLATION_ROTATION: geo_process_translation_rotation((struct GraphNodeTranslationRotation *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_TRANSLATION:          geo_process_translation         ((struct GraphNodeTranslation         *) curGraphNode); break;
-                    case GRAPH_NODE_TYPE_ROTATION:             geo_process_rotation            ((struct GraphNodeRotation            *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_OBJECT:               geo_process_object              ((struct Object                       *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_ANIMATED_PART:        geo_process_animated_part       ((struct GraphNodeAnimatedPart        *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_BONE:                 geo_process_bone                ((struct GraphNodeBone                *) curGraphNode); break;

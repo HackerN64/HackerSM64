@@ -26,8 +26,6 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NODE_SWITCH_CASE          */ geo_layout_cmd_node_switch_case,
     /*GEO_CMD_NODE_CAMERA               */ geo_layout_cmd_node_camera,
     /*GEO_CMD_NODE_TRANSLATION_ROTATION */ geo_layout_cmd_node_translation_rotation,
-    /*GEO_CMD_NODE_TRANSLATION          */ geo_layout_cmd_node_translation,
-    /*GEO_CMD_NODE_ROTATION             */ geo_layout_cmd_node_rotation,
     /*GEO_CMD_NODE_ANIMATED_PART        */ geo_layout_cmd_node_animated_part,
     /*GEO_CMD_NODE_BILLBOARD            */ geo_layout_cmd_node_billboard,
     /*GEO_CMD_NODE_DISPLAY_LIST         */ geo_layout_cmd_node_display_list,
@@ -35,12 +33,12 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NODE_OBJECT_PARENT        */ geo_layout_cmd_node_object_parent,
     /*GEO_CMD_NODE_GENERATED            */ geo_layout_cmd_node_generated,
     /*GEO_CMD_NODE_BACKGROUND           */ geo_layout_cmd_node_background,
-    /*GEO_CMD_NOP_1A                    */ geo_layout_cmd_nop,
+    /*GEO_CMD_NOP_1                     */ geo_layout_cmd_nop,
     /*GEO_CMD_COPY_VIEW                 */ geo_layout_cmd_copy_view,
     /*GEO_CMD_NODE_HELD_OBJ             */ geo_layout_cmd_node_held_obj,
     /*GEO_CMD_NODE_SCALE                */ geo_layout_cmd_node_scale,
-    /*GEO_CMD_NOP_1E                    */ geo_layout_cmd_nop2,
-    /*GEO_CMD_NOP_1F                    */ geo_layout_cmd_nop3,
+    /*GEO_CMD_NOP_2                     */ geo_layout_cmd_nop2,
+    /*GEO_CMD_NOP_3                     */ geo_layout_cmd_nop3,
     /*GEO_CMD_NODE_CULLING_RADIUS       */ geo_layout_cmd_node_culling_radius,
     /*GEO_CMD_BONE                      */ geo_layout_cmd_bone,
     /*GEO_CMD_Z_OFFSET                  */ geo_layout_cmd_z_offset,
@@ -100,7 +98,7 @@ s16 gGeoLayoutReturnIndex; // similar to RA register in MIPS
 u8 *gGeoLayoutCommand;
 
 /*
-  0x00: Branch and store return address
+  GEO_CMD_BRANCH_AND_LINK: Branch and store return address
    cmd+0x04: void *branchTarget
 */
 void geo_layout_cmd_branch_and_link(void) {
@@ -110,7 +108,7 @@ void geo_layout_cmd_branch_and_link(void) {
     gGeoLayoutCommand = segmented_to_virtual(cur_geo_cmd_ptr(0x04));
 }
 
-// 0x01: Terminate geo layout
+// GEO_CMD_END: Terminate geo layout
 void geo_layout_cmd_end(void) {
     gGeoLayoutStackIndex = gGeoLayoutReturnIndex;
     gGeoLayoutReturnIndex = gGeoLayoutStack[--gGeoLayoutStackIndex] & 0xFFFF;
@@ -119,7 +117,7 @@ void geo_layout_cmd_end(void) {
 }
 
 /*
-  0x02: Branch
+  GEO_CMD_BRANCH: Branch
    cmd+0x04: void *branchTarget
 */
 void geo_layout_cmd_branch(void) {
@@ -130,26 +128,26 @@ void geo_layout_cmd_branch(void) {
     gGeoLayoutCommand = segmented_to_virtual(cur_geo_cmd_ptr(0x04));
 }
 
-// 0x03: Return from branch
+// GEO_CMD_RETURN: Return from branch
 void geo_layout_cmd_return(void) {
     gGeoLayoutCommand = (u8 *) gGeoLayoutStack[--gGeoLayoutStackIndex];
 }
 
-// 0x04: Open node
+// GEO_CMD_OPEN_NODE: Open node
 void geo_layout_cmd_open_node(void) {
     gCurGraphNodeList[gCurGraphNodeIndex + 1] = gCurGraphNodeList[gCurGraphNodeIndex];
     gCurGraphNodeIndex++;
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
-// 0x05: Close node
+// GEO_CMD_CLOSE_NODE: Close node
 void geo_layout_cmd_close_node(void) {
     gCurGraphNodeIndex--;
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
 /*
-  0x06: Register the current node as a view
+  GEO_CMD_ASSIGN_AS_VIEW: Register the current node as a view
    cmd+0x02: index
 
   Register the current node in the gGeoViews array at the given index
@@ -165,7 +163,7 @@ void geo_layout_cmd_assign_as_view(void) {
 }
 
 /*
-  0x07: Update current scene graph node flags
+  GEO_CMD_UPDATE_NODE_FLAGS: Update current scene graph node flags
    cmd+0x01: u8 operation (0 = reset, 1 = set, 2 = clear)
    cmd+0x02: s16 bits
 */
@@ -189,7 +187,7 @@ void geo_layout_cmd_update_node_flags(void) {
 }
 
 /*
-  0x08: Create a scene graph root node that specifies the viewport
+  GEO_CMD_NODE_ROOT: Create a scene graph root node that specifies the viewport
    cmd+0x02: s16 num entries (+2) to allocate for gGeoViews
    cmd+0x04: s16 x
    cmd+0x06: s16 y
@@ -228,7 +226,7 @@ void geo_layout_cmd_node_root(void) {
 }
 
 /*
-  0x09: Create orthographic projection scene graph node
+  GEO_CMD_NODE_ORTHO_PROJECTION: Create orthographic projection scene graph node
    cmd+0x02: s16 scale as a percentage (usually it's 100)
 */
 void geo_layout_cmd_node_ortho_projection(void) {
@@ -243,7 +241,7 @@ void geo_layout_cmd_node_ortho_projection(void) {
 }
 
 /*
-  0x0A: Create camera frustum scene graph node
+  GEO_CMD_NODE_PERSPECTIVE: Create camera frustum scene graph node
    cmd+0x01: u8  if nonzero, enable frustumFunc field
    cmd+0x02: s16 field of view
    cmd+0x04: u16 near
@@ -271,7 +269,7 @@ void geo_layout_cmd_node_perspective(void) {
 }
 
 /*
-  0x0B: Create a scene graph node that groups other nodes without any
+  GEO_CMD_NODE_START: Create a scene graph node that groups other nodes without any
   additional functionality
 */
 void geo_layout_cmd_node_start(void) {
@@ -282,13 +280,13 @@ void geo_layout_cmd_node_start(void) {
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
-// 0x1F: No operation
+// GEO_CMD_NOP_3: No operation
 void geo_layout_cmd_nop3(void) {
     gGeoLayoutCommand += 0x10 << CMD_SIZE_SHIFT;
 }
 
 /*
-  0x0C: Create z-buffer-toggling scene graph node
+  GEO_CMD_NODE_MASTER_LIST: Create z-buffer-toggling scene graph node
    cmd+0x01: u8 enableZBuffer (1 = on, 0 = off)
 */
 void geo_layout_cmd_node_master_list(void) {
@@ -300,7 +298,7 @@ void geo_layout_cmd_node_master_list(void) {
 }
 
 /*
-  0x0D: Create a level of detail graph node, which only renders at a certain
+  GEO_CMD_LEVEL_OF_DETAIL: Create a level of detail graph node, which only renders at a certain
   distance interval from the camera.
    cmd+0x04: s16 minDistance
    cmd+0x06: s16 maxDistance
@@ -318,7 +316,7 @@ void geo_layout_cmd_node_level_of_detail(void) {
 }
 
 /*
-  0x0E: Create switch-case scene graph node
+  GEO_CMD_NODE_SWITCH_CASE: Create switch-case scene graph node
    cmd+0x02: s16 initialSelectedCase
    cmd+0x04: GraphNodeFunc caseSelectorFunc
 
@@ -339,7 +337,7 @@ void geo_layout_cmd_node_switch_case(void) {
 }
 
 /*
- 0x0F: Create a camera scene graph node (GraphNodeCamera). The focus sets the Camera's areaCen position.
+  GEO_CMD_NODE_CAMERA: Create a camera scene graph node (GraphNodeCamera). The focus sets the Camera's areaCen position.
   cmd+0x02: s16 camera type (changes from course to course)
   cmd+0x04: s16 posX
   cmd+0x06: s16 posY
@@ -369,7 +367,7 @@ void geo_layout_cmd_node_camera(void) {
 }
 
 /*
-  0x10: Create translation & rotation scene graph node with optional display list
+  GEO_CMD_NODE_TRANSLATION_ROTATION: Create translation & rotation scene graph node with optional display list
    cmd+0x01: u8 params
      (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
      ((params & GEO_PARAMS_ARGS_MASK) >> GEO_PARAMS_SHIFT): fieldLayout
@@ -413,25 +411,8 @@ void geo_layout_cmd_node_translation_rotation(void) {
     s16 params = cur_geo_cmd_u8(0x01);
     s16 *cmdPos = (s16 *) gGeoLayoutCommand;
 
-    switch ((params & GEO_PARAMS_ARGS_MASK) >> GEO_PARAMS_SHIFT) {
-        case TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION_ROTATION:
-            cmdPos = read_vec3s(translation, &cmdPos[2]);
-            cmdPos = read_vec3s_angle(rotation, cmdPos);
-            break;
-        case TRANSLATION_ROTATION_NODE_TYPE_TRANSLATION:
-            cmdPos = read_vec3s(translation, &cmdPos[1]);
-            vec3s_copy(rotation, gVec3sZero);
-            break;
-        case TRANSLATION_ROTATION_NODE_TYPE_ROTATION:
-            cmdPos = read_vec3s_angle(rotation, &cmdPos[1]);
-            vec3s_copy(translation, gVec3sZero);
-            break;
-        case TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION:
-            vec3s_copy(translation, gVec3sZero);
-            vec3s_set(rotation, 0, degrees_to_angle(cmdPos[1]), 0); // degrees
-            cmdPos += 2 << CMD_SIZE_SHIFT;
-            break;
-    }
+    cmdPos = read_vec3s(translation, &cmdPos[2]);
+    cmdPos = read_vec3s_angle(rotation, cmdPos);
 
     if (params & GEO_PARAMS_HAS_DL_BIT) {
         displayList = *(void **) &cmdPos[0];
@@ -447,78 +428,7 @@ void geo_layout_cmd_node_translation_rotation(void) {
 }
 
 /*
-  0x11: Create translation scene graph node with optional display list
-   cmd+0x01: u8 params
-     (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
-     (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
-   cmd+0x02: s16 xTranslation
-   cmd+0x04: s16 yTranslation
-   cmd+0x06: s16 zTranslation
-  [cmd+0x08: void *displayList]
-*/
-void geo_layout_cmd_node_translation(void) {
-    struct GraphNodeTranslation *graphNode;
-
-    Vec3s translation;
-
-    s16 drawingLayer = LAYER_FIRST;
-    s16 params = cur_geo_cmd_u8(0x01);
-    s16 *cmdPos = (s16 *) gGeoLayoutCommand;
-    void *displayList = NULL;
-
-    cmdPos = read_vec3s(translation, &cmdPos[1]);
-
-    if (params & GEO_PARAMS_HAS_DL_BIT) {
-        displayList = *(void **) &cmdPos[0];
-        drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
-        cmdPos += 2 << CMD_SIZE_SHIFT;
-    }
-
-    graphNode =
-        init_graph_node_translation(gGraphNodePool, NULL, drawingLayer, displayList, translation);
-
-    register_scene_graph_node(&graphNode->node);
-
-    gGeoLayoutCommand = (u8 *) cmdPos;
-}
-
-/*
-  0x12: Create ? scene graph node
-   cmd+0x01: u8 params
-     (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
-     (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
-   cmd+0x02: s16 unkX
-   cmd+0x04: s16 unkY
-   cmd+0x06: s16 unkZ
-  [cmd+0x08: void *displayList]
-*/
-void geo_layout_cmd_node_rotation(void) {
-    struct GraphNodeRotation *graphNode;
-
-    Vec3s angle;
-
-    s16 drawingLayer = LAYER_FIRST;
-    s16 params = cur_geo_cmd_u8(0x01);
-    s16 *cmdPos = (s16 *) gGeoLayoutCommand;
-    void *displayList = NULL;
-
-    cmdPos = read_vec3s_angle(angle, &cmdPos[1]);
-
-    if (params & GEO_PARAMS_HAS_DL_BIT) {
-        displayList = *(void **) &cmdPos[0];
-        drawingLayer = (params & GEO_PARAMS_DRAWING_LAYER_MASK);
-        cmdPos += 2 << CMD_SIZE_SHIFT;
-    }
-
-    graphNode = init_graph_node_rotation(gGraphNodePool, NULL, drawingLayer, displayList, angle);
-
-    register_scene_graph_node(&graphNode->node);
-
-    gGeoLayoutCommand = (u8 *) cmdPos;
-}
-
-/*
-  0x1D: Create scale scene graph node with optional display list
+  GEO_CMD_NODE_SCALE: Create scale scene graph node with optional display list
    cmd+0x01: u8 params
      (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
      (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
@@ -546,13 +456,13 @@ void geo_layout_cmd_node_scale(void) {
     gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
 }
 
-// 0x1E: No operation
+// GEO_CMD_NOP_2: No operation
 void geo_layout_cmd_nop2(void) {
     gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
 }
 
 /*
-  0x13: Create a scene graph node that is rotated by the object's animation.
+  GEO_CMD_NODE_ANIMATED_PART: Create a scene graph node that is rotated by the object's animation.
    cmd+0x01: u8 drawingLayer
    cmd+0x02: s16 xTranslation
    cmd+0x04: s16 yTranslation
@@ -577,7 +487,7 @@ void geo_layout_cmd_node_animated_part(void) {
 }
 
 /*
-  0x14: Create billboarding node with optional display list
+  GEO_CMD_NODE_BILLBOARD: Create billboarding node with optional display list
    cmd+0x01: u8 params
      (params & GEO_PARAMS_HAS_DL_BIT): if set, enable displayList field and drawingLayer
      (params & GEO_PARAMS_DRAWING_LAYER_MASK): drawingLayer
@@ -610,7 +520,7 @@ void geo_layout_cmd_node_billboard(void) {
 }
 
 /*
-  0x15: Create plain display list scene graph node
+  GEO_CMD_NODE_DISPLAY_LIST: Create plain display list scene graph node
    cmd+0x01: u8 drawingLayer
    cmd+0x04: void *displayList
 */
@@ -627,7 +537,7 @@ void geo_layout_cmd_node_display_list(void) {
 }
 
 /*
-  0x16: Create shadow scene graph node
+  GEO_CMD_NODE_SHADOW: Create shadow scene graph node
    cmd+0x02: s16 shadowType
    cmd+0x04: s16 shadowSolidity
    cmd+0x06: s16 shadowScale
@@ -645,7 +555,7 @@ void geo_layout_cmd_node_shadow(void) {
     gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
 }
 
-// 0x17: Create scene graph node that manages the group of all object nodes
+// GEO_CMD_NODE_OBJECT_PARENT: Create scene graph node that manages the group of all object nodes
 void geo_layout_cmd_node_object_parent(void) {
     struct GraphNodeObjectParent *graphNode = init_graph_node_object_parent(gGraphNodePool, NULL, &gObjParentGraphNode);
 
@@ -655,7 +565,7 @@ void geo_layout_cmd_node_object_parent(void) {
 }
 
 /*
-  0x18: Create dynamically generated displaylist scene graph node
+  GEO_CMD_NODE_GENERATED: Create dynamically generated displaylist scene graph node
    cmd+0x02: s16 parameter
    cmd+0x04: GraphNodeFunc func
 */
@@ -671,7 +581,7 @@ void geo_layout_cmd_node_generated(void) {
 }
 
 /*
-  0x19: Create background scene graph node
+  GEO_CMD_NODE_BACKGROUND: Create background scene graph node
    cmd+0x02: s16 background // background ID, or RGBA5551 color if backgroundFunc is null
    cmd+0x04: GraphNodeFunc backgroundFunc
 */
@@ -687,13 +597,13 @@ void geo_layout_cmd_node_background(void) {
     gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
 }
 
-// 0x1A: No operation
+// GEO_CMD_NOP_1: No operation
 void geo_layout_cmd_nop(void) {
     gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
 }
 
 /*
-  0x1B: Copy the shared children from the object parent from a specific view
+  GEO_LAYOUT_CMD_COPY_VIEW: Copy the shared children from the object parent from a specific view
   to a newly created object parent node.
    cmd+0x02: s16 index (of gGeoViews)
 */
@@ -720,7 +630,7 @@ void geo_layout_cmd_copy_view(void) {
 }
 
 /*
-  0x1C: Create a held object scene graph node
+  GEO_CMD_NODE_HELD_OBJ: Create a held object scene graph node
    cmd+0x01: u8 unused
    cmd+0x02: s16 offsetX
    cmd+0x04: s16 offsetY
@@ -742,7 +652,7 @@ void geo_layout_cmd_node_held_obj(void) {
 }
 
 /*
-  0x20: Create a scene graph node that specifies for an object the radius that
+  GEO_CMD_NODE_CULLING_RADIUS: Create a scene graph node that specifies for an object the radius that
    is used for frustum culling.
    cmd+0x02: s16 cullingRadius
 */
@@ -753,7 +663,7 @@ void geo_layout_cmd_node_culling_radius(void) {
 }
 
 /*
-  Create a scene graph node that is rotated by the object's animation + an initial rotation.
+  GEO_CMD_BONE: Create a scene graph node that is rotated by the object's animation + an initial rotation.
 */
 void geo_layout_cmd_bone(void) {
     struct GraphNodeBone *graphNode;
@@ -777,7 +687,7 @@ void geo_layout_cmd_bone(void) {
 }
 
 /*
-  Create a z offset scene graph node.
+  GEO_CMD_Z_OFFSET: Create a z offset scene graph node.
 */
 void geo_layout_cmd_z_offset(void) {
     struct GraphNodeZOffset *graphNode = init_graph_node_z_offset(gGraphNodePool, NULL, cur_geo_cmd_s16(0x02));

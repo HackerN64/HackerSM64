@@ -225,49 +225,6 @@ init_graph_node_translation_rotation(struct AllocOnlyPool *pool,
 }
 
 /**
- * Allocates and returns a newly created translation node
- */
-struct GraphNodeTranslation *init_graph_node_translation(struct AllocOnlyPool *pool,
-                                                         struct GraphNodeTranslation *graphNode,
-                                                         s32 drawingLayer, void *displayList,
-                                                         Vec3s translation) {
-    if (pool != NULL) {
-        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeTranslation));
-    }
-
-    if (graphNode != NULL) {
-        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_TRANSLATION);
-
-        vec3s_copy(graphNode->translation, translation);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
-        graphNode->displayList = displayList;
-    }
-
-    return graphNode;
-}
-
-/**
- * Allocates and returns a newly created rotation node
- */
-struct GraphNodeRotation *init_graph_node_rotation(struct AllocOnlyPool *pool,
-                                                   struct GraphNodeRotation *graphNode,
-                                                   s32 drawingLayer, void *displayList,
-                                                   Vec3s rotation) {
-    if (pool != NULL) {
-        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeRotation));
-    }
-
-    if (graphNode != NULL) {
-        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_ROTATION);
-        vec3s_copy(graphNode->rotation, rotation);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
-        graphNode->displayList = displayList;
-    }
-
-    return graphNode;
-}
-
-/**
  * Allocates and returns a newly created scaling node
  */
 struct GraphNodeScale *init_graph_node_scale(struct AllocOnlyPool *pool,

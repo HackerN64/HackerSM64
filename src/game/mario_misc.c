@@ -390,10 +390,12 @@ Gfx *geo_mario_tilt_torso(s32 callContext, struct GraphNode *node, UNUSED Mat4 *
     s32 action = bodyState->action;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        struct GraphNodeRotation *rotNode = (struct GraphNodeRotation *) node->next;
+        struct GraphNodeTranslationRotation *rotNode = (struct GraphNodeTranslationRotation *) node->next;
 
-        if (action != ACT_BUTT_SLIDE && action != ACT_HOLD_BUTT_SLIDE && action != ACT_WALKING
-            && action != ACT_RIDING_SHELL_GROUND) {
+        if (action != ACT_BUTT_SLIDE
+         && action != ACT_HOLD_BUTT_SLIDE
+         && action != ACT_WALKING
+         && action != ACT_RIDING_SHELL_GROUND) {
             vec3_zero(bodyState->torsoAngle);
         }
         rotNode->rotation[0] = bodyState->torsoAngle[1];
@@ -412,7 +414,7 @@ Gfx *geo_mario_head_rotation(s32 callContext, struct GraphNode *node, UNUSED Mat
     s32 action = bodyState->action;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        struct GraphNodeRotation *rotNode = (struct GraphNodeRotation *) node->next;
+        struct GraphNodeTranslationRotation *rotNode = (struct GraphNodeTranslationRotation *) node->next;
         struct Camera *camera = gCurGraphNodeCamera->config.camera;
 
         if (camera->mode == CAMERA_MODE_C_UP) {
@@ -527,7 +529,7 @@ Gfx *geo_mario_rotate_wing_cap_wings(s32 callContext, struct GraphNode *node, UN
     struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        struct GraphNodeRotation *rotNode = (struct GraphNodeRotation *) node->next;
+        struct GraphNodeTranslationRotation *rotNode = (struct GraphNodeTranslationRotation *) node->next;
 
         if (!gBodyStates[asGenerated->parameter >> 1].wingFlutter) {
             rotX = (coss((gAreaUpdateCounter & 0xF) << 12) + 1.0f) * 4096.0f;
