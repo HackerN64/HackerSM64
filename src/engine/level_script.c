@@ -486,9 +486,9 @@ static void level_cmd_place_object(void) {
                                        CMD_GET(s16, 6),
                                        CMD_GET(s16, 8));
 
-        vec3s_set(spawnInfo->startAngle, DEGREES(CMD_GET(s16, 10)),
-                                         DEGREES(CMD_GET(s16, 12)),
-                                         DEGREES(CMD_GET(s16, 14)));
+        vec3s_set(spawnInfo->startAngle, degrees_to_angle(CMD_GET(s16, 10)),
+                                         degrees_to_angle(CMD_GET(s16, 12)),
+                                         degrees_to_angle(CMD_GET(s16, 14)));
 
         spawnInfo->areaIndex = sCurrAreaIndex;
         spawnInfo->activeAreaIndex = sCurrAreaIndex;
@@ -699,7 +699,7 @@ static void level_cmd_set_mario_start_pos(void) {
 #else
     vec3s_copy(gMarioSpawnInfo->startPos, CMD_GET(Vec3s, 6));
 #endif
-    vec3s_set(gMarioSpawnInfo->startAngle, 0, CMD_GET(s16, 4) * 0x8000 / 180, 0);
+    vec3s_set(gMarioSpawnInfo->startAngle, 0, degrees_to_angle(CMD_GET(s16, 4)), 0);
 
     sCurrentCmd = CMD_NEXT;
 }

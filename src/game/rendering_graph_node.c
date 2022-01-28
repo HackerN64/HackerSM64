@@ -932,11 +932,11 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             f32 sinAng = sins(gCurGraphNodeObject->angle[1]);
             f32 cosAng = coss(gCurGraphNodeObject->angle[1]);
 
-            shadowPos[0] +=  animOffset[0] * cosAng + animOffset[2] * sinAng;
-            shadowPos[2] += -animOffset[0] * sinAng + animOffset[2] * cosAng;
+            shadowPos[0] += ( animOffset[0] * cosAng) + (animOffset[2] * sinAng);
+            shadowPos[2] += (-animOffset[0] * sinAng) + (animOffset[2] * cosAng);
         }
 
-        Gfx *shadowList = create_shadow_below_xyz(shadowPos, shadowScale * 0.5f,
+        Gfx *shadowList = create_shadow_below_xyz(shadowPos, (shadowScale * 0.5f),
                                                   node->shadowSolidity, node->shadowType, shifted);
 
         if (shadowList != NULL) {
@@ -1019,7 +1019,7 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     }
 
     // half of the fov in in-game angle units instead of degrees
-    s16 halfFov = (((((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f) + 1.0f) * 32768.0f) / 180.0f) + 0.5f;
+    s16 halfFov = (degrees_to_angle(((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f) + 1.0f) + 0.5f);
 
     f32 hScreenEdge = -matrix[3][2] * tans(halfFov);
     // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get

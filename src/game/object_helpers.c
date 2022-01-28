@@ -1345,7 +1345,7 @@ static s32 cur_obj_detect_steep_floor(s16 steepAngleDegrees) {
         if (intendedFloorHeight < FLOOR_LOWER_LIMIT_MISC) {
             o->oWallAngle = (o->oMoveAngleYaw + 0x8000);
             return TRUE;
-        } else if ((intendedFloor->normal.y < coss((s16)(steepAngleDegrees * (0x10000 / 360))))
+        } else if ((intendedFloor->normal.y < coss(degrees_to_angle(steepAngleDegrees)))
                    && (deltaFloorHeight > 0)
                    && (intendedFloorHeight > o->oPosY)) {
             o->oWallAngle = SURFACE_YAW(intendedFloor);
@@ -1461,7 +1461,7 @@ void cur_obj_move_standard(s16 steepSlopeAngleDegrees) {
         } else if (steepSlopeAngleDegrees == -78) {
             steepSlopeNormalY = -COS78;
         } else {
-            steepSlopeNormalY = coss(DEGREES(steepSlopeAngleDegrees));
+            steepSlopeNormalY = coss(degrees_to_angle(steepSlopeAngleDegrees));
         }
 
         cur_obj_compute_vel_xz();

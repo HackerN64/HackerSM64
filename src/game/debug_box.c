@@ -488,8 +488,8 @@ static void render_box(int index) {
      || (scale     == NULL)) return;
 
     mtxf_to_mtx(mtx, gMatStack[1]);
-    guTranslate(translate, box->center[0],  box->center[1],  box->center[2]);
-    guRotate(rotate, ((box->yaw / (f32)0x10000) * 360.0f), 0, 1.0f, 0);
+    guTranslate(translate, box->center[0], box->center[1], box->center[2]);
+    guRotate(rotate, angle_to_degrees(box->yaw), 0, 1.0f, 0);
     guScale(scale, ((f32) box->bounds[0] * 0.01f),
                    ((f32) box->bounds[1] * 0.01f),
                    ((f32) box->bounds[2] * 0.01f));

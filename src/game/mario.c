@@ -1230,7 +1230,7 @@ void debug_print_speed_action_normal(struct MarioState *m) {
             floor_nY = m->floor->normal.y;
         }
 
-        print_text_fmt_int(210, 88, "ANG %d", (atan2s(floor_nY, steepness) * 180.0f) / 32768.0f);
+        print_text_fmt_int(210, 88, "ANG %d", angle_to_degrees(atan2s(floor_nY, steepness)));
 
         print_text_fmt_int(210, 72, "SPD %d", m->forwardVel);
 

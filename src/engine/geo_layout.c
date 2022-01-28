@@ -428,7 +428,7 @@ void geo_layout_cmd_node_translation_rotation(void) {
             break;
         case TRANSLATION_ROTATION_NODE_TYPE_Y_ROTATION:
             vec3s_copy(translation, gVec3sZero);
-            vec3s_set(rotation, 0, (cmdPos[1] << 15) / 180, 0); // degrees
+            vec3s_set(rotation, 0, degrees_to_angle(cmdPos[1]), 0); // degrees
             cmdPos += 2 << CMD_SIZE_SHIFT;
             break;
     }
