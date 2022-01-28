@@ -47,7 +47,7 @@ a modern game engine's developer's console.
 
 #ifdef PUPPYPRINT
 
-static Alpha sCurrAlpha = 0xFF;
+ColorRGBA gCurrEnv = { 0xFF, 0xFF, 0xFF, 0xFF };
 #ifdef ENABLE_CREDITS_BENCHMARK
 u8 fDebug = TRUE;
 #else
@@ -812,8 +812,13 @@ void puppyprint_profiler_process(void) {
 #endif
 
 void print_set_envcolour(s32 r, s32 g, s32 b, s32 a) {
-    gDPSetEnvColor(gDisplayListHead++, (Color)r, (Color)g, (Color)b, (Color)a);
-    sCurrAlpha = a;
+    if ((r != gCurrEnv[0])
+     || (g != gCurrEnv[1])
+     || (b != gCurrEnv[2])
+     || (a != gCurrEnv[3])) {
+        gDPSetEnvColor(gDisplayListHead++, (Color)r, (Color)g, (Color)b, (Color)a);
+        vec4_set(gCurrEnv, r, g, b, a);
+    }
 }
 
 #define BLANK 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
@@ -915,7 +920,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     s32 shakePos[2];
     s32 wavePos;
     s32 lines = 0;
-    s32 xlu = sCurrAlpha;
+    s32 xlu = gCurrEnv[3];
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
     Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
 

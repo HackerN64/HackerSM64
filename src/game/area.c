@@ -435,6 +435,11 @@ void render_game(void) {
     gViewportOverride = NULL;
     gViewportClip     = NULL;
 
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
+#ifdef PUPPYPRINT
+    vec4_same(gCurrEnv, 255);
+#endif
+
 #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);
     graphTime[perfIteration] -= (collisionTime[perfIteration] - colTime);
