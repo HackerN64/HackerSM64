@@ -51,7 +51,6 @@ extern u8 gPuppyFont;
 extern s8 perfIteration;
 extern s16 benchmarkLoop;
 extern s32 benchmarkTimer;
-extern ColorRGBA currEnv;
 extern s32 ramsizeSegment[33];
 extern s8 nameTable;
 extern s32 mempool;
