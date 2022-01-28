@@ -33,12 +33,9 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NODE_OBJECT_PARENT        */ geo_layout_cmd_node_object_parent,
     /*GEO_CMD_NODE_GENERATED            */ geo_layout_cmd_node_generated,
     /*GEO_CMD_NODE_BACKGROUND           */ geo_layout_cmd_node_background,
-    /*GEO_CMD_NOP_1                     */ geo_layout_cmd_nop,
     /*GEO_CMD_COPY_VIEW                 */ geo_layout_cmd_copy_view,
     /*GEO_CMD_NODE_HELD_OBJ             */ geo_layout_cmd_node_held_obj,
     /*GEO_CMD_NODE_SCALE                */ geo_layout_cmd_node_scale,
-    /*GEO_CMD_NOP_2                     */ geo_layout_cmd_nop2,
-    /*GEO_CMD_NOP_3                     */ geo_layout_cmd_nop3,
     /*GEO_CMD_NODE_CULLING_RADIUS       */ geo_layout_cmd_node_culling_radius,
     /*GEO_CMD_BONE                      */ geo_layout_cmd_bone,
     /*GEO_CMD_Z_OFFSET                  */ geo_layout_cmd_z_offset,
@@ -280,11 +277,6 @@ void geo_layout_cmd_node_start(void) {
     gGeoLayoutCommand += 0x04 << CMD_SIZE_SHIFT;
 }
 
-// GEO_CMD_NOP_3: No operation
-void geo_layout_cmd_nop3(void) {
-    gGeoLayoutCommand += 0x10 << CMD_SIZE_SHIFT;
-}
-
 /*
   GEO_CMD_NODE_MASTER_LIST: Create z-buffer-toggling scene graph node
    cmd+0x01: u8 enableZBuffer (1 = on, 0 = off)
@@ -456,11 +448,6 @@ void geo_layout_cmd_node_scale(void) {
     gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
 }
 
-// GEO_CMD_NOP_2: No operation
-void geo_layout_cmd_nop2(void) {
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
-}
-
 /*
   GEO_CMD_NODE_ANIMATED_PART: Create a scene graph node that is rotated by the object's animation.
    cmd+0x01: u8 drawingLayer
@@ -594,11 +581,6 @@ void geo_layout_cmd_node_background(void) {
 
     register_scene_graph_node(&graphNode->fnNode.node);
 
-    gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
-}
-
-// GEO_CMD_NOP_1: No operation
-void geo_layout_cmd_nop(void) {
     gGeoLayoutCommand += 0x08 << CMD_SIZE_SHIFT;
 }
 

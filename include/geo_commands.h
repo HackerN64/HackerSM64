@@ -62,15 +62,12 @@ enum GeoLayoutCommands {
     /*0x15*/ GEO_CMD_NODE_OBJECT_PARENT,
     /*0x16*/ GEO_CMD_NODE_GENERATED,
     /*0x17*/ GEO_CMD_NODE_BACKGROUND,
-    /*0x18*/ GEO_CMD_NOP_1,
-    /*0x19*/ GEO_CMD_COPY_VIEW,
-    /*0x1A*/ GEO_CMD_NODE_HELD_OBJ,
-    /*0x1B*/ GEO_CMD_NODE_SCALE,
-    /*0x1C*/ GEO_CMD_NOP_2,
-    /*0x1D*/ GEO_CMD_NOP_3,
-    /*0x1E*/ GEO_CMD_NODE_CULLING_RADIUS,
-    /*0x1F*/ GEO_CMD_BONE,
-    /*0x20*/ GEO_CMD_Z_OFFSET,
+    /*0x18*/ GEO_CMD_COPY_VIEW,
+    /*0x19*/ GEO_CMD_NODE_HELD_OBJ,
+    /*0x1A*/ GEO_CMD_NODE_SCALE,
+    /*0x1B*/ GEO_CMD_NODE_CULLING_RADIUS,
+    /*0x1C*/ GEO_CMD_BONE,
+    /*0x1D*/ GEO_CMD_Z_OFFSET,
 };
 
 // geo layout macros
@@ -395,13 +392,6 @@ enum GeoLayoutCommands {
     GEO_BACKGROUND(background, NULL)
 
 /**
- * GEO_CMD_NOP_1: No operation
- */
-#define GEO_NOP_1() \
-    CMD_BBH(GEO_CMD_NOP_1, 0x00, 0x0000), \
-    CMD_HH(0x0000, 0x0000)
-
-/**
  * GEO_CMD_COPY_VIEW: Copy the shared children from an object parent node from a specific view
  * to a newly created object parent.
  *   0x02: s16 index of array
@@ -438,22 +428,6 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_SCALE, (layer | GEO_PARAMS_HAS_DL_BIT), 0x0000), \
     CMD_W(scale), \
     CMD_PTR(displayList)
-
-/**
- * GEO_CMD_NOP_2: No operation
- */
-#define GEO_NOP_2() \
-    CMD_BBH(GEO_CMD_NOP_2, 0x00, 0x0000), \
-    CMD_HH(0x0000, 0x0000)
-
-/**
- * GEO_CMD_NOP_3: No operation
- */
-#define GEO_NOP_3() \
-    CMD_BBH(GEO_CMD_NOP_3, 0x00, 0x0000), \
-    CMD_HH(0x0000, 0x0000), \
-    CMD_HH(0x0000, 0x0000), \
-    CMD_HH(0x0000, 0x0000)
 
 /**
  * GEO_CMD_NODE_CULLING_RADIUS: Create a scene graph node that specifies for an object the radius that
