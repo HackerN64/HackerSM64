@@ -214,8 +214,8 @@ void iterate_surfaces_visual(s32 x, s32 z, Vtx *verts) {
 
     if (is_outside_level_bounds(x, z)) return;
 
-    s32 cellX = GET_CELL_COORD(x);
-    s32 cellZ = GET_CELL_COORD(z);
+    s32 cellX = get_cell_coord(x);
+    s32 cellZ = get_cell_coord(z);
 
     for (i = 0; i < (2 * NUM_SPATIAL_PARTITIONS); i++) {
         switch (i) {
@@ -330,8 +330,8 @@ s32 iterate_surface_count(s32 x, s32 z) {
         return 0;
     }
 
-    s32 cellX = GET_CELL_COORD(x);
-    s32 cellZ = GET_CELL_COORD(z);
+    s32 cellX = get_cell_coord(x);
+    s32 cellZ = get_cell_coord(z);
 
     for (i = 0; i < (2 * NUM_SPATIAL_PARTITIONS); i++) {
         switch (i) {

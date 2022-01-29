@@ -10,11 +10,25 @@
 #include "surface_load.h"
 #include "game/puppyprint.h"
 
+/**************************************************
+ *                   GENERAL USE                  *
+ **************************************************/
+
+/**
+ * Checks whether the coords are within level boundaries laterally.
+ */
 s32 is_outside_level_bounds(s32 xPos, s32 zPos) {
     return ((xPos <= -LEVEL_BOUNDARY_MAX)
          || (xPos >=  LEVEL_BOUNDARY_MAX)
          || (zPos <= -LEVEL_BOUNDARY_MAX)
          || (zPos >=  LEVEL_BOUNDARY_MAX));
+}
+
+/**
+ * Converts a single coordinate value into the corresponding cell coordinate value on the same axis.
+ */
+s32 get_cell_coord(s32 coord) {
+    return (((coord + LEVEL_BOUNDARY_MAX) / CELL_SIZE) % NUM_CELLS);
 }
 
 /**************************************************
@@ -231,6 +245,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     s32 numCollisions = 0;
     s32 x = colData->x;
     s32 z = colData->z;
+    s32 radius = colData->radius;
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
@@ -245,18 +260,25 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     }
 
     // World (level) consists of a 16x16 grid. Find where the collision is on the grid (round toward -inf)
-    s32 cellX = GET_CELL_COORD(x);
-    s32 cellZ = GET_CELL_COORD(z);
+    s32 cellX, cellZ;
+    s32 minCellX = get_cell_coord(x - radius);
+    s32 maxCellX = get_cell_coord(x + radius);
+    s32 minCellZ = get_cell_coord(z - radius);
+    s32 maxCellZ = get_cell_coord(z + radius);
 
-    if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
-        // Check for surfaces belonging to objects.
-        node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
-        numCollisions += find_wall_collisions_from_list(node, colData);
+    for (cellZ = minCellZ; cellZ <= maxCellZ; cellZ++) {
+        for (cellX = minCellX; cellX <= maxCellX; cellX++) {
+            if (!(gCollisionFlags & COLLISION_FLAG_EXCLUDE_DYNAMIC)) {
+                // Check for surfaces belonging to objects.
+                node = gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
+                numCollisions += find_wall_collisions_from_list(node, colData);
+            }
+
+            // Check for surfaces that are a part of level geometry.
+            node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
+            numCollisions += find_wall_collisions_from_list(node, colData);
+        }
     }
-
-    // Check for surfaces that are a part of level geometry.
-    node = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS].next;
-    numCollisions += find_wall_collisions_from_list(node, colData);
 
     gCollisionFlags &= ~(COLLISION_FLAG_RETURN_FIRST | COLLISION_FLAG_EXCLUDE_DYNAMIC | COLLISION_FLAG_INCLUDE_INTANGIBLE);
 #ifdef VANILLA_DEBUG
@@ -406,8 +428,8 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     }
 
     // Each level is split into cells to limit load, find the appropriate cell.
-    s32 cellX = GET_CELL_COORD(x);
-    s32 cellZ = GET_CELL_COORD(z);
+    s32 cellX = get_cell_coord(x);
+    s32 cellZ = get_cell_coord(z);
 
     struct SurfaceNode *surfaceList;
     struct Surface *ceil = NULL;
@@ -636,8 +658,8 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     }
 
     // Each level is split into cells to limit load, find the appropriate cell.
-    s32 cellX = GET_CELL_COORD(x);
-    s32 cellZ = GET_CELL_COORD(z);
+    s32 cellX = get_cell_coord(x);
+    s32 cellZ = get_cell_coord(z);
 
     struct SurfaceNode *surfaceList;
     struct Surface *floor = NULL;
@@ -712,8 +734,8 @@ f32 find_water_floor(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor) {
     }
 
     // Each level is split into cells to limit load, find the appropriate cell.
-    s32 cellX = GET_CELL_COORD(x);
-    s32 cellZ = GET_CELL_COORD(z);
+    s32 cellX = get_cell_coord(x);
+    s32 cellZ = get_cell_coord(z);
 
     // Check for surfaces that are a part of level geometry.
     struct SurfaceNode *surfaceList = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER].next;
@@ -889,8 +911,8 @@ void debug_surface_list_info(f32 xPos, f32 zPos) {
     s32 numWalls  = 0;
     s32 numCeils  = 0;
 
-    s32 cellX = GET_CELL_COORD(xPos);
-    s32 cellZ = GET_CELL_COORD(zPos);
+    s32 cellX = get_cell_coord(xPos);
+    s32 cellZ = get_cell_coord(zPos);
 
     list = gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next;
     numFloors += surface_list_length(list);

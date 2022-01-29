@@ -20,7 +20,7 @@
  * Higher numbers = smaller cells = higher performance + higher RAM usage.
  * Lower numbers = larger cells = lower perfocmance + lower RAM usage.
  * For best performance results, this should be a power of 2,
- * since that allows for GET_CELL_COORD to be optimized.
+ * since that allows for get_cell_coord to be optimized.
  * Vanilla: 16
  */
 #define NUM_CELLS 32
@@ -69,11 +69,3 @@
  * Vanilla: 7000
  */
 #define SURFACE_NODE_POOL_SIZE (SURFACE_POOL_SIZE * 4)
-
-
-// -- Macros --
-
-/**
- * Use this to convert game units to cell coordinates:
- */
-#define GET_CELL_COORD(p) ((((s32)(p) + LEVEL_BOUNDARY_MAX) / CELL_SIZE) % NUM_CELLS)
