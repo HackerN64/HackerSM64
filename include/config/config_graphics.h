@@ -52,7 +52,8 @@
  * Also enables new render layers, such as LAYER_ALPHA_DECAL.
  * The number is the intensity of the silhouette, from 0-255.
  * NOTE: The overlap between Mario's model parts is visible on certain HLE plugins.
- * Also, this also disables anti-aliasing on Mario.
+ * NOTE: This disables anti-aliasing on Mario's model. This doesn't have much of
+ * an effect on an emulator, but is very noticeable on console.
  * NOTE: Regarding performance, silhouette seems to lose 1-2 frames on console.
  */
 #define SILHOUETTE 127
