@@ -942,12 +942,12 @@ static void apply_drag_to_value(f32 *value, f32 dragStrength) {
 
         if (*value > 0) {
             *value -= decel;
-            if (*value < 0.001L) {
+            if (*value < 0.001f) {
                 *value = 0;
             }
         } else {
             *value += decel;
-            if (*value > -0.001L) {
+            if (*value > -0.001f) {
                 *value = 0;
             }
         }
@@ -1130,8 +1130,8 @@ static s32 clear_move_flag(u32 *bitSet, s32 flag) {
     }
 }
 
-void cur_obj_unused_resolve_wall_collisions(f32 offsetY, f32 radius) {
-    if (radius > 0.1L) {
+UNUSED void cur_obj_unused_resolve_wall_collisions(f32 offsetY, f32 radius) {
+    if (radius > 0.1f) {
         f32_find_wall_collision(&o->oPosX, &o->oPosY, &o->oPosZ, offsetY, radius);
     }
 }
