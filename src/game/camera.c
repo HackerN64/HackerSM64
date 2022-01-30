@@ -3806,7 +3806,7 @@ s32 collide_with_walls(Vec3f pos, f32 offsetY, f32 radius) {
             normY = wall->normal.y;
             normZ = wall->normal.z;
             originOffset = wall->originOffset;
-            offset = normX * newPos[i][0] + normY * newPos[i][1] + normZ * newPos[i][2] + originOffset;
+            offset = (normX * newPos[i][0]) + (normY * newPos[i][1]) + (normZ * newPos[i][2]) + originOffset;
             offsetAbsolute = absf(offset);
             if (offsetAbsolute < radius) {
                 newPos[i][0] += normX * (radius - offset);

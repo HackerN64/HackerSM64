@@ -1661,7 +1661,7 @@ static ALWAYS_INLINE float mul_without_nop(float a, float b) {
 
 static ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
     __asm__ ("swl %1, %2(%0)"
-                        : 
+                        :
                         : "g"(addr), "g"(val), "I"(offset));
 }
 
@@ -1687,7 +1687,7 @@ void mtxf_to_mtx_fast(s16* dst, float* src) {
         s32 c_int = (s32)c_scaled;
         s32 c_high = (c_int & 0xFFFF0000);
         s32 c_low = (c_int << 16);
-        
+
         // Write the integer part of a, as well as garbage into the next two bytes.
         // Those two bytes will get overwritten by the integer part of b.
         // This prevents needing to shift or mask the integer value of a.
