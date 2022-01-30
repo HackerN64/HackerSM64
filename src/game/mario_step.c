@@ -8,6 +8,7 @@
 #include "audio/external.h"
 #include "game_init.h"
 #include "interaction.h"
+#include "level_update.h"
 #include "mario_step.h"
 
 #include "config.h"
@@ -367,16 +368,23 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
 }
 
 s32 perform_ground_step(struct MarioState *m) {
-    s32 i;
     u32 stepResult = GROUND_STEP_NONE;
     Vec3f intendedPos;
-    const f32 numSteps = get_num_steps(m, NUM_STEPS_GROUND);
 
     set_mario_wall(m, NULL);
 
     f32 ny = ((m->floor != NULL) ? m->floor->normal.y : 1.0f);
 
-    for (i = 0; i < numSteps; i++) {
+#ifdef RAYCAST_WALL_COLLISION
+    intendedPos[0] = m->pos[0] + (ny * m->vel[0]);
+    intendedPos[2] = m->pos[2] + (ny * m->vel[2]);
+    intendedPos[1] = m->pos[1];
+
+    raycast_collision_walls(m->pos, intendedPos, MARIO_COLLISION_OFFSET_GROUND_UPPER);
+    stepResult = perform_ground_quarter_step(m, intendedPos);
+#else
+    const f32 numSteps = get_num_steps(m, NUM_STEPS_GROUND);
+    for (s32 i = 0; i < numSteps; i++) {
         intendedPos[0] = m->pos[0] + (ny * (m->vel[0] / numSteps));
         intendedPos[2] = m->pos[2] + (ny * (m->vel[2] / numSteps));
         intendedPos[1] = m->pos[1];
@@ -387,6 +395,7 @@ s32 perform_ground_step(struct MarioState *m) {
             break;
         }
     }
+#endif
 
     m->terrainSoundAddend = mario_get_terrain_sound_addend(m);
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
@@ -760,15 +769,20 @@ void apply_vertical_wind(struct MarioState *m) {
 }
 
 s32 perform_air_step(struct MarioState *m, u32 stepArg) {
-    s32 i;
-    s32 quarterStepResult;
     s32 stepResult = AIR_STEP_NONE;
     Vec3f intendedPos;
-    const f32 numSteps = get_num_steps(m, NUM_STEPS_AIR);
 
     set_mario_wall(m, NULL);
 
-    for (i = 0; i < numSteps; i++) {
+#ifdef RAYCAST_WALL_COLLISION
+    vec3f_sum(intendedPos, m->pos, m->vel);
+
+    raycast_collision_walls(m->pos, intendedPos, MARIO_COLLISION_OFFSET_AIR_UPPER);
+    stepResult = perform_air_quarter_step(m, intendedPos, stepArg);
+#else
+    s32 quarterStepResult;
+    const f32 numSteps = get_num_steps(m, NUM_STEPS_AIR);
+    for (s32 i = 0; i < numSteps; i++) {
         intendedPos[0] = m->pos[0] + (m->vel[0] / numSteps);
         intendedPos[1] = m->pos[1] + (m->vel[1] / numSteps);
         intendedPos[2] = m->pos[2] + (m->vel[2] / numSteps);
@@ -786,6 +800,7 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
             break;
         }
     }
+#endif
 
     if (m->vel[1] >= 0.0f) {
         m->peakHeight = m->pos[1];

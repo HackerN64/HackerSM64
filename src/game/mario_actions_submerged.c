@@ -74,7 +74,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     struct Surface *ceil, *floor;
 
     resolve_and_return_wall_collisions(nextPos, MARIO_COLLISION_OFFSET_WATER, MARIO_COLLISION_RADIUS_WATER, &wallData);
-    struct Surface *wall = wallData.numWalls == 0 ? NULL : wallData.walls[0];
+    struct Surface *wall = (wallData.numWalls == 0) ? NULL : wallData.walls[0];
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
 
@@ -163,11 +163,9 @@ static void apply_water_current(struct MarioState *m, Vec3f step) {
 }
 
 static u32 perform_water_step(struct MarioState *m) {
-    s32 i;
     u32 stepResult = WATER_STEP_NONE;
     Vec3f nextPos;
     Vec3f step;
-    const f32 numSteps = get_num_steps(m, NUM_STEPS_WATER);
 
     vec3f_copy(step, m->vel);
 
@@ -175,13 +173,29 @@ static u32 perform_water_step(struct MarioState *m) {
         apply_water_current(m, step);
     }
 
-    for (i = 0; i < numSteps; i++) {
+#ifdef RAYCAST_WALL_COLLISION
+    vec3f_sum(nextPos, m->pos, step);
+
+    s32 waterHeight = m->waterLevel - 80;
+
+    if (nextPos[1] > waterHeight) {
+        nextPos[1] = waterHeight;
+        m->vel[1] = 0.0f;
+    }
+
+    raycast_collision_walls(m->pos, nextPos, MARIO_COLLISION_OFFSET_WATER);
+    stepResult = perform_water_full_step(m, nextPos);
+#else
+    const f32 numSteps = get_num_steps(m, NUM_STEPS_WATER);
+    for (s32 i = 0; i < numSteps; i++) {
         nextPos[0] = m->pos[0] + (step[0] / numSteps);
         nextPos[1] = m->pos[1] + (step[1] / numSteps);
         nextPos[2] = m->pos[2] + (step[2] / numSteps);
 
-        if (nextPos[1] > m->waterLevel - 80) {
-            nextPos[1] = m->waterLevel - 80;
+        s32 waterHeight = m->waterLevel - 80;
+
+        if (nextPos[1] > waterHeight) {
+            nextPos[1] = waterHeight;
             m->vel[1] = 0.0f;
         }
 
@@ -191,6 +205,7 @@ static u32 perform_water_step(struct MarioState *m) {
             break;
         }
     }
+#endif
 
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
     vec3s_set(m->marioObj->header.gfx.angle, -m->faceAngle[0], m->faceAngle[1], m->faceAngle[2]);

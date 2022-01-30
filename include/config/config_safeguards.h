@@ -142,6 +142,15 @@
 
 
 /*****************
+ * config_movement.h
+ */
+
+#ifdef RAYCAST_WALL_COLLISION
+    #undef VARIABLE_NUM_STEPS
+#endif // RAYCAST_WALL_COLLISION
+
+
+/*****************
  * config_objects.h
  */
 

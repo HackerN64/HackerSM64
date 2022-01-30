@@ -309,13 +309,36 @@ void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struc
     pos[2] = collisionData->z;
 }
 
+/**
+ * Send a raycast from pos to intendedPos shifted upward by yOffset,
+ * and set intendedPos to the collided point if the ray reaches a wall.
+ */
+void raycast_collision_walls(Vec3f pos, Vec3f intendedPos, f32 yOffset) {
+    UNUSED struct Surface *surf;
+    Vec3f dir;
+
+    // Shift pos and intendedPos upward by yOffset.
+    pos[1]         += yOffset;
+    intendedPos[1] += yOffset;
+
+    // Get the vector from pos to intendedPos.
+    vec3f_diff(dir, intendedPos, pos);
+
+    // Send the raycast and find the new pos.
+    find_surface_on_ray(pos, dir, &surf, intendedPos, RAYCAST_FIND_WALL);
+
+    // Shift pos and intendedPos back down.
+    pos[1]         -= yOffset;
+    intendedPos[1] -= yOffset;
+}
+
 /**************************************************
  *                     CEILINGS                   *
  **************************************************/
 
 void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
-    register f32 diff_x = target1[0] - *x + target2[0] - *x;
-    register f32 diff_z = target1[2] - *z + target2[2] - *z;
+    register f32 diff_x = (target1[0] - *x) + (target2[0] - *x);
+    register f32 diff_z = (target1[2] - *z) + (target2[2] - *z);
     register f32 invDenom = margin / sqrtf(sqr(diff_x) + sqr(diff_z));
 
     *x += diff_x * invDenom;

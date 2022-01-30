@@ -24,6 +24,7 @@ enum RaycastFlags {
     RAYCAST_FIND_WALL  = (1 << 1),
     RAYCAST_FIND_CEIL  = (1 << 2),
     RAYCAST_FIND_WATER = (1 << 3),
+    RAYCAST_FIND_SOLID = (RAYCAST_FIND_FLOOR | RAYCAST_FIND_WALL | RAYCAST_FIND_CEIL),
     RAYCAST_FIND_ALL   = (0xFFFFFFFF)
 };
 
@@ -41,6 +42,7 @@ s32 get_cell_coord(s32 coord);
 s32 f32_find_wall_collision(f32 *xPtr, f32 *yPtr, f32 *zPtr, f32 offsetY, f32 radius);
 s32 find_wall_collisions(struct WallCollisionData *colData);
 void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struct WallCollisionData *collisionData);
+void raycast_collision_walls(Vec3f intendedPos, Vec3f pos, f32 yOffset);
 f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil);
 
 // Finds the ceiling from a vec3f and a minimum height (with 3 unit vertical buffer).
