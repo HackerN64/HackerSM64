@@ -294,8 +294,8 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     s16 wallDYaw;
     s32 oldWallDYaw;
 
-    resolve_and_return_wall_collisions(nextPos, 30.0f, ((MARIO_COLLISION_RADIUS / 2) - 1), &lowerWall);
-    resolve_and_return_wall_collisions(nextPos, 60.0f, MARIO_COLLISION_RADIUS, &upperWall);
+    resolve_and_return_wall_collisions(nextPos, MARIO_COLLISION_OFFSET_GROUND_LOWER, MARIO_COLLISION_RADIUS_LOWER, &lowerWall);
+    resolve_and_return_wall_collisions(nextPos, MARIO_COLLISION_OFFSET_GROUND_UPPER, MARIO_COLLISION_RADIUS_UPPER, &upperWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
 
@@ -441,8 +441,8 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct WallCollisionData 
         }
 
         // Get the floor check position.
-        ledgePos[0] = nextPos[0] - (nx * (MARIO_COLLISION_RADIUS + 10.0f));
-        ledgePos[2] = nextPos[2] - (nz * (MARIO_COLLISION_RADIUS + 10.0f));
+        ledgePos[0] = nextPos[0] - (nx * MARIO_LEDGE_GRAB_DISTANCE);
+        ledgePos[2] = nextPos[2] - (nz * MARIO_LEDGE_GRAB_DISTANCE);
         ledgePos[1] = find_floor(ledgePos[0], (nextPos[1] + LEDGE_GRAB_MAX_HEIGHT), ledgePos[2], ledgeFloor);
 
         // Check if the floor above the wall can be grabbed.
@@ -512,8 +512,8 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
 
     vec3f_copy(nextPos, intendedPos);
 
-    resolve_and_return_wall_collisions(nextPos, 150.0f, MARIO_COLLISION_RADIUS, &upperWall);
-    resolve_and_return_wall_collisions(nextPos,  30.0f, MARIO_COLLISION_RADIUS, &lowerWall);
+    resolve_and_return_wall_collisions(nextPos, MARIO_COLLISION_OFFSET_AIR_UPPER, MARIO_COLLISION_RADIUS_UPPER, &upperWall);
+    resolve_and_return_wall_collisions(nextPos, MARIO_COLLISION_OFFSET_AIR_LOWER, MARIO_COLLISION_RADIUS_UPPER, &lowerWall);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);

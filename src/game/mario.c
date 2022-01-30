@@ -1293,8 +1293,8 @@ void update_mario_joystick_inputs(struct MarioState *m) {
  * Resolves wall collisions, and updates a variety of inputs.
  */
 void update_mario_geometry_inputs(struct MarioState *m) {
-    f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, MARIO_COLLISION_RADIUS);
-    f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, ((MARIO_COLLISION_RADIUS / 2) - 1));
+    f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], MARIO_COLLISION_OFFSET_GROUND_UPPER, MARIO_COLLISION_RADIUS_UPPER);
+    f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], MARIO_COLLISION_OFFSET_GROUND_LOWER, MARIO_COLLISION_RADIUS_LOWER);
 
     m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
 

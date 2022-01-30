@@ -19,8 +19,6 @@
 
 #include "config.h"
 
-#define HANG_DISTANCE 144.0f
-
 void add_tree_leaf_particles(struct MarioState *m) {
     if (m->usedObj->behavior == segmented_to_virtual(bhvTree)) {
         // make leaf effect spawn higher on the Shifting Sand Land palm tree
@@ -59,8 +57,8 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
 
     vec3f_copy_y_off(m->pos, &m->usedObj->oPosVec, marioObj->oMarioPolePos + offsetY);
 
-    s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, MARIO_COLLISION_RADIUS)
-                 + f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, ((MARIO_COLLISION_RADIUS / 2) - 1));
+    s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], MARIO_COLLISION_OFFSET_GROUND_UPPER, MARIO_COLLISION_RADIUS_UPPER)
+                 + f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], MARIO_COLLISION_OFFSET_GROUND_LOWER, MARIO_COLLISION_RADIUS_LOWER);
 
     f32 ceilHeight = find_mario_ceil(m->pos, m->pos[1], &ceil);
     if (m->pos[1] > ceilHeight - MARIO_HITBOX_HEIGHT) {
@@ -257,7 +255,7 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     struct Surface *ceil, *floor;
     struct WallCollisionData wallCollisionData;
 
-    resolve_and_return_wall_collisions(nextPos, 50.0f, MARIO_COLLISION_RADIUS, &wallCollisionData);
+    resolve_and_return_wall_collisions(nextPos, MARIO_COLLISION_OFFSET_HANGING, MARIO_COLLISION_RADIUS_UPPER, &wallCollisionData);
     set_mario_wall(m, ((wallCollisionData.numWalls == 0) ? NULL : wallCollisionData.walls[0]));
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
@@ -269,14 +267,14 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     if (ceil == NULL) {
         return HANG_LEFT_CEIL;
     }
-    if (ceilHeight - floorHeight <= HANG_DISTANCE) {
+    if (ceilHeight - floorHeight <= MARIO_HANGING_HEIGHT_OFFSET) {
         return HANG_HIT_CEIL_OR_OOB;
     }
     if (ceil->type != SURFACE_HANGABLE) {
         return HANG_LEFT_CEIL;
     }
 
-    f32 ceilOffset = ceilHeight - (nextPos[1] + HANG_DISTANCE);
+    f32 ceilOffset = ceilHeight - (nextPos[1] + MARIO_HANGING_HEIGHT_OFFSET);
     if (ceilOffset < -30.0f) {
         return HANG_HIT_CEIL_OR_OOB;
     }
@@ -284,7 +282,7 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
         return HANG_LEFT_CEIL;
     }
 
-    nextPos[1] = m->ceilHeight - HANG_DISTANCE;
+    nextPos[1] = m->ceilHeight - MARIO_HANGING_HEIGHT_OFFSET;
     vec3f_copy(m->pos, nextPos);
 
     set_mario_floor(m, floor, floorHeight);
@@ -348,7 +346,7 @@ void update_hang_stationary(struct MarioState *m) {
     m->slideVelX = 0.0f;
     m->slideVelZ = 0.0f;
 
-    m->pos[1] = m->ceilHeight - HANG_DISTANCE;
+    m->pos[1] = m->ceilHeight - MARIO_HANGING_HEIGHT_OFFSET;
     vec3f_copy(m->vel, gVec3fZero);
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
 #ifdef BETTER_HANGING
@@ -817,7 +815,7 @@ s32 act_tornado_twirling(struct MarioState *m) {
     nextPos[2] = usedObj->oPosZ - (dx * sinAngleVel) + (dz * cosAngleVel);
     nextPos[1] = usedObj->oPosY + marioObj->oMarioTornadoPosY;
 
-    f32_find_wall_collision(&nextPos[0], &nextPos[1], &nextPos[2], 60.0f, MARIO_COLLISION_RADIUS);
+    f32_find_wall_collision(&nextPos[0], &nextPos[1], &nextPos[2], MARIO_COLLISION_OFFSET_TWIRLING, MARIO_COLLISION_RADIUS_UPPER);
 
     floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     if (floor != NULL) {

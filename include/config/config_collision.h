@@ -33,6 +33,15 @@
 // Uses the correct HOLP height rather than Mario's height when dropping a held object.
 #define HOLP_HEIGHT_FIX
 
+// Allows Mario to be in places without a floor.
+// #define ALLOW_NULL_FLOORS
+
+// Allows Mario to leave the level boundaries.
+// Console will crash soon after Mario reaches about 65536 units from the area's origin.
+// #define ALLOW_OUTSIDE_LEVEL_BOUNDS
+
+// -- Mario collision constants --
+
 // Mario's normal hitbox height.
 #define MARIO_HITBOX_HEIGHT 160
 
@@ -40,17 +49,38 @@
 #define MARIO_SHORT_HITBOX_HEIGHT 100
 
 // The radius of Mario's collision when checking for walls.
-#define MARIO_COLLISION_RADIUS 50
+#define MARIO_COLLISION_RADIUS_UPPER 50
+#define MARIO_COLLISION_RADIUS_LOWER 24
+
+#define MARIO_COLLISION_RADIUS_WATER 110
+
+#define MARIO_PUNCH_KICK_RADIUS MARIO_COLLISION_OFFSET_GROUND_UPPER
+
+// The height of Mario's collision when checking for walls.
+#define MARIO_COLLISION_OFFSET_GROUND_UPPER 60
+#define MARIO_COLLISION_OFFSET_GROUND_LOWER 30
+
+#define MARIO_COLLISION_OFFSET_AIR_UPPER 150
+#define MARIO_COLLISION_OFFSET_AIR_LOWER 30
+
+#define MARIO_COLLISION_OFFSET_WATER 10
+
+#define MARIO_COLLISION_OFFSET_DEBUG_FREE_MOVE (MARIO_HITBOX_HEIGHT / 2)
+
+#define MARIO_COLLISION_OFFSET_HANGING 50
+
+#define MARIO_COLLISION_OFFSET_TWIRLING 60
+
+#define MARIO_PUNCH_KICK_HEIGHT (MARIO_HITBOX_HEIGHT / 2)
+
+// The distance from the ceiling Mario is while hanging/grabbing it.
+#define MARIO_HANGING_HEIGHT_OFFSET 144.0f
+
+// The distance from Mario to check for ledge grabs laterally.
+#define MARIO_LEDGE_GRAB_DISTANCE (MARIO_COLLISION_RADIUS_UPPER + 10)
 
 // The minimum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it.
 #define LEDGE_GRAB_MIN_HEIGHT 100
 
 // The maximum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it.
 #define LEDGE_GRAB_MAX_HEIGHT 160
-
-// Allows Mario to be in places without a floor.
-// #define ALLOW_NULL_FLOORS
-
-// Allows Mario to leave the level boundaries.
-// Console will crash soon after Mario reaches about 65536 units from the area's origin.
-// #define ALLOW_OUTSIDE_LEVEL_BOUNDS

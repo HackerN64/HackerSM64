@@ -73,7 +73,7 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     struct WallCollisionData wallData;
     struct Surface *ceil, *floor;
 
-    resolve_and_return_wall_collisions(nextPos, 10.0f, (MARIO_HITBOX_HEIGHT - 50.0f), &wallData);
+    resolve_and_return_wall_collisions(nextPos, MARIO_COLLISION_OFFSET_WATER, MARIO_COLLISION_RADIUS_WATER, &wallData);
     struct Surface *wall = wallData.numWalls == 0 ? NULL : wallData.walls[0];
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);

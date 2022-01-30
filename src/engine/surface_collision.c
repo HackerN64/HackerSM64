@@ -533,7 +533,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
 
         // Get the exact height of the floor under the current location.
         height = get_surface_height_at_location(x, z, surf);
-        
+
         // Exclude floors higher than the check height.
         if (height > y) continue;
 

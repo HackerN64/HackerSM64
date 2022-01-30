@@ -627,7 +627,7 @@ void push_mario_out_of_object(struct MarioState *m, struct Object *obj, f32 padd
         newMarioX = obj->oPosX + (minDistance * sins(pushAngle));
         newMarioZ = obj->oPosZ + (minDistance * coss(pushAngle));
 
-        f32_find_wall_collision(&newMarioX, &m->pos[1], &newMarioZ, 60.0f, MARIO_COLLISION_RADIUS);
+        f32_find_wall_collision(&newMarioX, &m->pos[1], &newMarioZ, MARIO_COLLISION_OFFSET_GROUND_UPPER, MARIO_COLLISION_RADIUS_UPPER);
 
         f32 floorHeight = find_floor(newMarioX, m->pos[1], newMarioZ, &floor);
         if (floor != NULL) {
@@ -1803,10 +1803,10 @@ u32 interact_text(struct MarioState *m, UNUSED u32 interactType, struct Object *
 void check_kick_or_punch_wall(struct MarioState *m) {
     if (m->flags & (MARIO_PUNCHING | MARIO_KICKING | MARIO_TRIPPING)) {
         struct WallCollisionData detector;
-        detector.x = m->pos[0] + ((f32)MARIO_COLLISION_RADIUS * sins(m->faceAngle[1]));
-        detector.z = m->pos[2] + ((f32)MARIO_COLLISION_RADIUS * coss(m->faceAngle[1]));
+        detector.x = m->pos[0] + (MARIO_PUNCH_KICK_RADIUS * sins(m->faceAngle[1]));
+        detector.z = m->pos[2] + (MARIO_PUNCH_KICK_RADIUS * coss(m->faceAngle[1]));
         detector.y = m->pos[1];
-        detector.offsetY = 80.0f;
+        detector.offsetY = MARIO_PUNCH_KICK_HEIGHT;
         detector.radius = 5.0f;
 
         if (find_wall_collisions(&detector) > 0) {
@@ -1856,7 +1856,7 @@ void mario_process_interactions(struct MarioState *m) {
     //! If the kick/punch flags are set and an object collision changes Mario's
     // action, he will get the kick/punch wall speed anyway.
     check_kick_or_punch_wall(m);
-    m->flags &= ~MARIO_PUNCHING & ~MARIO_KICKING & ~MARIO_TRIPPING;
+    m->flags &= ~(MARIO_PUNCHING | MARIO_KICKING | MARIO_TRIPPING);
 
     if (!(m->marioObj->collidedObjInteractTypes & (INTERACT_WARP_DOOR | INTERACT_DOOR))) {
         sDisplayingDoorText = FALSE;
