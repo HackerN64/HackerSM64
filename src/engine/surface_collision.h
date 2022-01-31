@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-#include "config/config_world.h"
+#include "surface_load.h"
 
 // The y coord is moved upward by this amount when finding floors.
 // Vanilla value is 78.
@@ -20,11 +20,11 @@
 #define SURFACE_YAW(s) (atan2s(((s)->normal.z), ((s)->normal.x)))
 
 enum RaycastFlags {
-    RAYCAST_FIND_FLOOR = (1 << 0),
-    RAYCAST_FIND_WALL  = (1 << 1),
-    RAYCAST_FIND_CEIL  = (1 << 2),
-    RAYCAST_FIND_WATER = (1 << 3),
-    RAYCAST_FIND_SOLID = (RAYCAST_FIND_FLOOR | RAYCAST_FIND_WALL | RAYCAST_FIND_CEIL),
+    RAYCAST_FIND_FLOOR = BIT(SPATIAL_PARTITION_FLOORS),
+    RAYCAST_FIND_CEIL  = BIT(SPATIAL_PARTITION_CEILS),
+    RAYCAST_FIND_WALL  = BIT(SPATIAL_PARTITION_WALLS),
+    RAYCAST_FIND_WATER = BIT(SPATIAL_PARTITION_WATER),
+    RAYCAST_FIND_SOLID = (RAYCAST_FIND_FLOOR | RAYCAST_FIND_CEIL | RAYCAST_FIND_WALL),
     RAYCAST_FIND_ALL   = (0xFFFFFFFF)
 };
 

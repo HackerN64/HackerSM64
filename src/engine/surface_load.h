@@ -3,7 +3,7 @@
 
 #include <PR/ultratypes.h>
 
-#include "surface_collision.h"
+#include "config/config_world.h"
 #include "types.h"
 
 #define SURFACE_VERTICAL_BUFFER 5
