@@ -1534,22 +1534,21 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
 void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
     // Skip if OOB
     if ((cellX >= 0) && (cellX <= (NUM_CELLS - 1)) && (cellZ >= 0) && (cellZ <= (NUM_CELLS - 1))) {
-        // Iterate through each surface in this partition
-        if ((normalized_dir[1] > -NEAR_ONE) && (flags & RAYCAST_FIND_CEIL)) {
-            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-        }
-        if ((normalized_dir[1] <  NEAR_ONE) && (flags & RAYCAST_FIND_FLOOR)) {
-            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-        }
-        if (flags & RAYCAST_FIND_WALL) {
-            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-        }
-        if (flags & RAYCAST_FIND_WATER) {
-            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
-            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+        f32 ny = normalized_dir[1];
+        s32 rayUp   = (ny >  NEAR_ONE);
+        s32 rayDown = (ny < -NEAR_ONE);
+        
+        for (s32 i = 0; i < NUM_SPATIAL_PARTITIONS; i++) {
+            if ((rayDown && (i == SPATIAL_PARTITION_CEILS ))
+             || (rayUp   && (i == SPATIAL_PARTITION_FLOORS))) {
+                continue;
+            }
+
+            if (flags & BIT(i)) {
+                // Iterate through each surface in this partition
+                find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][i].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+                find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][i].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            }
         }
     }
 }
