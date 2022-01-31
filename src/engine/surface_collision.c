@@ -317,12 +317,11 @@ void raycast_collision_walls(Vec3f pos, Vec3f intendedPos, f32 yOffset) {
     UNUSED struct Surface *surf;
     Vec3f dir;
 
-    // Shift pos and intendedPos upward by yOffset.
-    pos[1]         += yOffset;
-    intendedPos[1] += yOffset;
-
-    // Get the vector from pos to intendedPos.
+    // Get the vector from pos to the original intendedPos.
     vec3f_diff(dir, intendedPos, pos);
+
+    // Shift the source pos upward by yOffset.
+    pos[1] += yOffset;
 
     // Send the raycast and find the new pos.
     find_surface_on_ray(pos, dir, &surf, intendedPos, RAYCAST_FIND_WALL);
