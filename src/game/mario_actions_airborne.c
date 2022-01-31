@@ -625,12 +625,15 @@ s32 act_wall_kick_air(struct MarioState *m) {
 }
 
 s32 act_long_jump(struct MarioState *m) {
-    s32 animation;
-    if (!m->marioObj->oMarioLongJumpIsSlow) {
-        animation = MARIO_ANIM_FAST_LONGJUMP;
-    } else {
-        animation = MARIO_ANIM_SLOW_LONGJUMP;
+#ifdef PITCHED_LONG_JUMPS
+    if (m->actionTimer++ == 0) {
+        if (!mario_facing_downhill(m, 0) && (m->pos[1] <= m->floorHeight)) {
+            m->vel[1] += (m->vel[1] * sins(m->movePitch));
+        }
     }
+#endif
+
+    s32 animation = m->marioObj->oMarioLongJumpIsSlow ? MARIO_ANIM_SLOW_LONGJUMP : MARIO_ANIM_FAST_LONGJUMP;
 
     play_mario_sound(m, SOUND_ACTION_TERRAIN_JUMP, SOUND_MARIO_YAHOO);
 

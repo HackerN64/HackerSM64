@@ -59,6 +59,9 @@
 // Enable being able to immediately long jump after landing from a long jump
 #define IMMEDIATE_LONG_JUMPS
 
+// Prevents long jumps getting canceled by steep floors by increasing Mario's initial vertical velocity when long jumping uphill.
+#define PITCHED_LONG_JUMPS
+
 // Enables the ability to hold Z while twirling to descend faster.
 #define Z_TWIRL
 
