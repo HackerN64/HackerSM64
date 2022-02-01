@@ -1179,7 +1179,6 @@ s32 act_exit_land_save_dialog(struct MarioState *m) {
                     cutscene_take_cap_off(m);
                     break;
                 case 37:
-                // fallthrough
                 case 53:
                     play_sound(SOUND_ACTION_BRUSH_HAIR, m->marioObj->header.gfx.cameraToObject);
                     break;
@@ -1416,7 +1415,7 @@ s32 act_bbh_enter_spin(struct MarioState *m) {
 
 s32 act_bbh_enter_jump(struct MarioState *m) {
     play_mario_action_sound(
-        m, m->flags & MARIO_METAL_CAP ? SOUND_ACTION_METAL_JUMP : SOUND_ACTION_TERRAIN_JUMP, 1);
+        m, (m->flags & MARIO_METAL_CAP) ? SOUND_ACTION_METAL_JUMP : SOUND_ACTION_TERRAIN_JUMP, 1);
     play_mario_jump_sound(m);
 
     if (m->actionState == ACT_STATE_BBH_ENTER_JUMP_INIT) {
@@ -1523,7 +1522,7 @@ s32 act_shocked(struct MarioState *m) {
     } else {
         if (m->actionTimer >= 6) {
             m->invincTimer = 30;
-            set_mario_action(m, m->health < 0x0100 ? ACT_ELECTROCUTION : ACT_IDLE, 0);
+            set_mario_action(m, (m->health < 0x0100) ? ACT_ELECTROCUTION : ACT_IDLE, 0);
         }
         stop_and_set_height_to_floor(m);
     }
@@ -1990,13 +1989,9 @@ void generate_yellow_sparkles(s16 x, s16 y, s16 z, f32 radius) {
     spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn, x + offsetX, y + offsetY,
                               z + offsetZ, 0, 0, 0);
 
-    //! copy paste error
     offsetX = offsetX * 4 / 3;
-    offsetX = offsetY * 4 / 3;
-    offsetX = offsetZ * 4 / 3;
-    // Fix below:
-    // offsetY = offsetY * 4 / 3;
-    // offsetZ = offsetZ * 4 / 3;
+    offsetY = offsetY * 4 / 3;
+    offsetZ = offsetZ * 4 / 3;
 
     spawn_object_abs_with_rot(gCurrentObject, 0, MODEL_NONE, bhvSparkleSpawn, x - offsetX, y - offsetY,
                               z - offsetZ, 0, 0, 0);
