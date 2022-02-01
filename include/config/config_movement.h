@@ -105,4 +105,5 @@
 // #define VARIABLE_NUM_STEPS
 
 // Sends a raycast between Mario's current and next position so that walls don't get skipped.
+// This also removes subframe steps (quarter steps).
 #define RAYCAST_WALL_COLLISION
