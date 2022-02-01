@@ -2918,7 +2918,6 @@ void d_get_matrix(Mat4f *dst) {
         case OBJ_TYPE_NETS:
             gd_copy_mat4f(&((struct ObjNet *) dynobj)->mat128, dst);
             break;
-            break; // lol
         case OBJ_TYPE_JOINTS:
             gd_copy_mat4f(&((struct ObjJoint *) dynobj)->matE8, dst);
             break;

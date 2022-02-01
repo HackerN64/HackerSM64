@@ -921,7 +921,6 @@ void gd_printf(const char *format, ...) {
                         csr++;
                         *csr = '\0';
                         break;
-                        break; // needed to match
                     case 'f':
                         val.f = (f32) va_arg(args, double);
                         csr = sprint_val_withspecifiers(csr, val, spec);

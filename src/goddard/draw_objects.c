@@ -460,9 +460,6 @@ void draw_face(struct ObjFace *face) {
                 }
             }
         }
-
-        if (FALSE) {
-        }
     }
 
     check_tri_display(face->vtxCount);
@@ -660,16 +657,10 @@ void draw_camera(struct ObjCamera *cam) {
         sp44.x += cam->lookAt.x;
         sp44.y += cam->lookAt.y;
         sp44.z += cam->lookAt.z;
-        ; // needed to match
     } else {
         sp44.x = cam->lookAt.x;
         sp44.y = cam->lookAt.y;
         sp44.z = cam->lookAt.z;
-    }
-
-    if (0) {
-        // dead code
-        gd_printf("%f,%f,%f\n", cam->worldPos.x, cam->worldPos.y, cam->worldPos.z);
     }
 
     if (ABS(cam->worldPos.x - sp44.x) + ABS(cam->worldPos.z - sp44.z) == 0.0f) {
@@ -886,7 +877,6 @@ void draw_particle(struct GdObj *obj) {
         sLightColours[0].r = (white->r - black->r) * brightness + black->r;
         sLightColours[0].g = (white->g - black->g) * brightness + black->g;
         sLightColours[0].b = (white->b - black->b) * brightness + black->b;
-        ; // needed to match
     } else {
         sLightColours[0].r = 0.0f;
         sLightColours[0].g = 0.0f;
@@ -989,7 +979,6 @@ void draw_plane(struct GdObj *obj) {
 
     if (obj->drawFlags & OBJ_HIGHLIGHTED) {
         obj->drawFlags &= ~OBJ_HIGHLIGHTED;
-        ; // needed to match; presumably setting up the color to draw the plane with
     } else {
         sUseSelectedColor = FALSE;
     }

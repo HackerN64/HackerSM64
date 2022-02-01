@@ -116,7 +116,7 @@ static void boo_approach_target_opacity_and_update_scale(void) {
     }
 
     scale = (o->oOpacity / 255.0f * 0.4f + 0.6f) * o->oBooBaseScale;
-    obj_scale(o, scale); // why no cur_obj_scale? was cur_obj_scale written later?
+    cur_obj_scale(scale);
 }
 
 static void boo_oscillate(s32 ignoreOpacity) {

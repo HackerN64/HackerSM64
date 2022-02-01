@@ -125,7 +125,6 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                                                registerMaps[insn.i.rt],
                                                insn.i.immediate
                     ); break;
-                    break;
                 case PARAM_JAL:
                     target = 0x80000000 | ((insn.d & 0x1FFFFFF) * 4);
                     if ((u32)parse_map != MAP_PARSER_ADDRESS) {
