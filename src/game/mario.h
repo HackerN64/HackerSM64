@@ -38,7 +38,7 @@ u32 mario_floor_is_slippery(struct MarioState *m);
 s32 mario_floor_is_slope(struct MarioState *m);
 s32 mario_floor_is_steep(struct MarioState *m);
 f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f32 distFromMario);
-s16 find_floor_slope(struct MarioState *m, s16 yawOffset);
+s32 find_floor_slope(struct MarioState *m, s16 yawOffset);
 Bool32 set_mario_wall(struct MarioState *m, struct Surface *wall);
 Bool32 set_mario_ceil(struct MarioState *m, struct Surface *ceil,  f32 ceilHeight);
 Bool32 set_mario_floor(struct MarioState *m, struct Surface *floor, f32 floorHeight);

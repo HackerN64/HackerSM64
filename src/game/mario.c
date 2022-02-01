@@ -633,7 +633,7 @@ f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f
 /**
  * Returns the slope of the floor based off points around Mario.
  */
-s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
+s32 find_floor_slope(struct MarioState *m, s16 yawOffset) {
     struct Surface *floor = m->floor;
     f32 forwardFloorY, backwardFloorY;
     f32 forwardYDelta, backwardYDelta;
@@ -671,7 +671,7 @@ s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
         result = atan2s(5.0f, backwardYDelta);
     }
 
-    return result;
+    return (s16)result;
 }
 
 Bool32 set_mario_wall(struct MarioState *m, struct Surface *wall) {
