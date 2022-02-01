@@ -469,7 +469,7 @@ void print_console_log(void) {
 }
 #undef LINE_HEIGHT
 
-extern u8 viewCycle;
+extern u8 gVisualDebugViewCycle;
 extern s16 gVisualSurfaceCount;
 #ifndef VISUAL_DEBUG
     #define gVisualSurfaceCount 0
@@ -491,24 +491,24 @@ void puppyprint_render_collision(void) {
 
 #ifdef VISUAL_DEBUG
     print_small_text(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
-    switch (viewCycle) {
+    switch (gVisualDebugViewCycle) {
         case 0: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
         case 1: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
         case 2: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
         case 3: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
     }
-    if (gPlayer1Controller->buttonPressed & R_JPAD) viewCycle++;
-    if (gPlayer1Controller->buttonPressed & L_JPAD) viewCycle--;
+    if (gPlayer1Controller->buttonPressed & R_JPAD) gVisualDebugViewCycle++;
+    if (gPlayer1Controller->buttonPressed & L_JPAD) gVisualDebugViewCycle--;
 
-    if (viewCycle == 4) {
-        viewCycle = 0;
+    if (gVisualDebugViewCycle == 4) {
+        gVisualDebugViewCycle = 0;
     }
-    if (viewCycle == 255) {
-        viewCycle = 3;
+    if (gVisualDebugViewCycle == 255) {
+        gVisualDebugViewCycle = 3;
     }
 
-    hitboxView  = ((viewCycle == 1) || (viewCycle == 3));
-    surfaceView = ((viewCycle == 2) || (viewCycle == 3));
+    hitboxView  = ((gVisualDebugViewCycle == 1) || (gVisualDebugViewCycle == 3));
+    surfaceView = ((gVisualDebugViewCycle == 2) || (gVisualDebugViewCycle == 3));
 #endif
 }
 

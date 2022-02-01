@@ -187,17 +187,17 @@ static const Gfx dl_debug_box_end[] = {
     gsSPEndDisplayList(),
 };
 
-u8 viewCycle = 0;
+u8 gVisualDebugViewCycle = 0;
 
 // Puppyprint will call this from elsewhere.
 void debug_box_input(void) {
     if (gPlayer1Controller->buttonPressed & R_JPAD) {
-        viewCycle++;
-        if (viewCycle > 3) {
-            viewCycle = 0;
+        gVisualDebugViewCycle++;
+        if (gVisualDebugViewCycle > 3) {
+            gVisualDebugViewCycle = 0;
         }
-        hitboxView = viewCycle == 1 || viewCycle == 3;
-        surfaceView = viewCycle == 2 || viewCycle == 3;
+        hitboxView  = (gVisualDebugViewCycle == 1 || gVisualDebugViewCycle == 3);
+        surfaceView = (gVisualDebugViewCycle == 2 || gVisualDebugViewCycle == 3);
     }
 }
 
@@ -373,6 +373,7 @@ void visual_surface_loop(s32 isDecal) {
     if ((mtx == NULL) || (verts == NULL)) {
         return;
     }
+
     mtxf_to_mtx(mtx, gMatStack[1]);
 
     if (isDecal) {
@@ -426,7 +427,9 @@ static void append_debug_box(Vec3f center, Vec3f bounds, s16 yaw, s32 type) {
  * Ex: 0xFF0000 becomes 0x7FFF0000
  */
 void debug_box_color(u32 color) {
-    if ((color >> 24) == 0) color |= (DBG_BOX_ALPHA << 24);
+    if ((color >> 24) == 0) {
+        color |= (DBG_BOX_ALPHA << 24);
+    }
     sCurBoxColor = color;
 }
 
@@ -485,7 +488,9 @@ static void render_box(int index) {
     if ((mtx       == NULL)
      || (translate == NULL)
      || (rotate    == NULL)
-     || (scale     == NULL)) return;
+     || (scale     == NULL)) {
+        return;
+    }
 
     mtxf_to_mtx(mtx, gMatStack[1]);
     guTranslate(translate, box->center[0], box->center[1], box->center[2]);
