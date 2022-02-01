@@ -102,8 +102,8 @@ Gfx dl_debug_cylinder_verts[] = {
 	gsSPEndDisplayList(),
 };
 
-u8 hitboxView  = FALSE;
-u8 surfaceView = FALSE;
+u8 gVisualHitboxView  = FALSE;
+u8 gVisualSurfaceView = FALSE;
 
 /**
  * Internal struct containing box info
@@ -196,8 +196,8 @@ void debug_box_input(void) {
         if (gVisualDebugViewCycle >= VISUAL_DEBUG_NUM_VIEWS) {
             gVisualDebugViewCycle = VISUAL_DEBUG_VIEW_NONE;
         }
-        hitboxView  = (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES || gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES);
-        surfaceView = (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_SURFACES || gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES);
+        gVisualHitboxView  = (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES || gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES);
+        gVisualSurfaceView = (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_SURFACES || gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES);
     }
 }
 
@@ -404,7 +404,7 @@ void visual_surface_loop(s32 isDecal) {
  * If there are already MAX_DEBUG_BOXES boxes, does nothing.
  */
 static void append_debug_box(Vec3f center, Vec3f bounds, s16 yaw, s32 type) {
-    if (hitboxView) {
+    if (gVisualHitboxView) {
         if (sNumBoxes >= MAX_DEBUG_BOXES) return;
 
         vec3f_to_vec3s(sBoxes[sNumBoxes].center, center);

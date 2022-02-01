@@ -36,8 +36,11 @@ enum VisualDebugViewCycles {
     VISUAL_DEBUG_NUM_VIEWS,
 };
 
-extern u8 hitboxView;
-extern u8 surfaceView;
+extern u8 gVisualDebugViewCycle;
+extern u8 gVisualHitboxView;
+extern u8 gVisualSurfaceView;
+extern s16 gVisualSurfaceCount;
+
 extern void debug_box_input(void);
 
 void debug_box_color(u32 color);

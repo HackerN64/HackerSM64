@@ -469,8 +469,6 @@ void print_console_log(void) {
 }
 #undef LINE_HEIGHT
 
-extern u8 gVisualDebugViewCycle;
-extern s16 gVisualSurfaceCount;
 #ifndef VISUAL_DEBUG
     #define gVisualSurfaceCount 0
 #endif
@@ -507,8 +505,8 @@ void puppyprint_render_collision(void) {
         gVisualDebugViewCycle = VISUAL_DEBUG_NUM_VIEWS - 1;
     }
 
-    hitboxView  = ((gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES) || (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES));
-    surfaceView = ((gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_SURFACES) || (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES));
+    gVisualHitboxView  = ((gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES) || (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES));
+    gVisualSurfaceView = ((gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_SURFACES) || (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES));
 #endif
 }
 

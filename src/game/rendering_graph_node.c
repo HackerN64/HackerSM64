@@ -156,12 +156,12 @@ struct RenderModeContainer renderModeTable_2Cycle[2] = { { {
         G_RM_AA_ZB_XLU_INTER2,              // LAYER_TRANSPARENT_INTER
     } } };
 
-ALIGNED16 struct GraphNodeRoot *gCurGraphNodeRoot = NULL;
-ALIGNED16 struct GraphNodeMasterList *gCurGraphNodeMasterList = NULL;
+ALIGNED16 struct GraphNodeRoot        *gCurGraphNodeRoot       = NULL;
+ALIGNED16 struct GraphNodeMasterList  *gCurGraphNodeMasterList = NULL;
 ALIGNED16 struct GraphNodePerspective *gCurGraphNodeCamFrustum = NULL;
-ALIGNED16 struct GraphNodeCamera *gCurGraphNodeCamera = NULL;
-ALIGNED16 struct GraphNodeObject *gCurGraphNodeObject = NULL;
-ALIGNED16 struct GraphNodeHeldObject *gCurGraphNodeHeldObject = NULL;
+ALIGNED16 struct GraphNodeCamera      *gCurGraphNodeCamera     = NULL;
+ALIGNED16 struct GraphNodeObject      *gCurGraphNodeObject     = NULL;
+ALIGNED16 struct GraphNodeHeldObject  *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
 
 #ifdef F3DEX_GBI_2
@@ -372,7 +372,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 
 #ifdef OBJECTS_REJ
  #if defined(F3DEX_GBI_2) && defined(VISUAL_DEBUG)
-    if (hitboxView) {
+    if (gVisualHitboxView) {
         render_debug_boxes(DEBUG_UCODE_REJ);
     }
  #endif
@@ -380,10 +380,10 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #endif
 
 #ifdef VISUAL_DEBUG
-    if (hitboxView) {
+    if (gVisualHitboxView) {
         render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
     }
-    if (surfaceView) {
+    if (gVisualSurfaceView) {
         visual_surface_loop(FALSE);
         visual_surface_loop(TRUE);
     }
@@ -1079,7 +1079,7 @@ void geo_process_object(struct Object *node) {
 
             if (node->header.gfx.sharedChild != NULL) {
 #ifdef VISUAL_DEBUG
-                if (hitboxView) {
+                if (gVisualHitboxView) {
                     visualise_object_hitbox(node);
                 }
 #endif
