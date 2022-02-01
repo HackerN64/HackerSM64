@@ -7394,6 +7394,7 @@ void cutscene_dance_default_rotate(struct Camera *c) {
     }
 }
 
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 /**
  * If the camera's yaw is out of the range of `absYaw` +- `yawMax`, then set the yaw to `absYaw`
  */
@@ -7401,18 +7402,15 @@ void star_dance_bound_yaw(struct Camera *c, s16 absYaw, s16 yawMax) {
     s16 yaw;
 
     vec3f_get_yaw(sMarioCamState->pos, c->pos, &yaw);
-    s16 yawFromAbs = yaw - absYaw;
+    s16 yawFromAbs = abss(yaw - absYaw);
 
-    // Because angles are s16, this checks if yaw is negative
-    if ((yawFromAbs & 0x8000) != 0) {
-        yawFromAbs = -yawFromAbs;
-    }
     if (yawFromAbs > yawMax) {
         yaw = absYaw;
         c->nextYaw = yaw;
         c->yaw = yaw;
     }
 }
+#endif
 
 /**
  * Start the closeup dance cutscene by restricting the camera's yaw in certain areas.
