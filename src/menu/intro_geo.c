@@ -14,14 +14,14 @@
 #include "audio/external.h"
 
 // frame counts for the zoom in, hold, and zoom out of title model
-#define INTRO_STEPS_ZOOM_IN 20
-#define INTRO_STEPS_HOLD_1 75
+#define INTRO_STEPS_ZOOM_IN  20
+#define INTRO_STEPS_HOLD_1   75
 #define INTRO_STEPS_ZOOM_OUT 91
 
 // background types
 enum IntroBackgroundTypes {
     INTRO_BACKGROUND_SUPER_MARIO,
-    INTRO_BACKGROUND_GAME_OVER
+    INTRO_BACKGROUND_GAME_OVER,
 };
 
 struct GraphNodeMore {
@@ -140,7 +140,10 @@ static float yCoords[] = {
 };
 
 // table that points to either the "Super Mario 64" or "Game Over" tables
-static const Texture *const *textureTables[] = { mario_title_texture_table, game_over_texture_table };
+static const Texture *const *textureTables[] = {
+    mario_title_texture_table,
+    game_over_texture_table
+};
 
 /**
  * Generates a display list for a single background tile
@@ -176,7 +179,9 @@ static s8 introBackgroundIndexTable[] = {
 };
 
 // only one table of indexes listed
-static s8 *introBackgroundTables[] = { introBackgroundIndexTable };
+static s8 *introBackgroundTables[] = {
+    introBackgroundIndexTable
+};
 
 /**
  * Geo callback to render the intro background tiles
@@ -189,7 +194,7 @@ Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED 
     Gfx *dlIter = NULL;
     s32 i;
 
-    if (callContext == GEO_CONTEXT_RENDER) {  // draw
+    if (callContext == GEO_CONTEXT_RENDER) { // draw
         dl = alloc_display_list(16 * sizeof(*dl));
         dlIter = dl;
         SET_GRAPH_NODE_LAYER(graphNode->node.flags, LAYER_OPAQUE);
@@ -263,7 +268,7 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     return dl;
 }
 
-#if defined(VERSION_SH)
+#ifdef ENABLE_RUMBLE
 extern Gfx title_screen_bg_dl_rumble_pak[];
 #endif
 #ifdef GODDARD_EASTER_EGG
@@ -291,14 +296,19 @@ s8 sFaceToggleOrder[] = {
 s8 sFaceCounter = 0;
 
 void intro_gen_face_texrect(Gfx **dlIter) {
-    s32 x;
-    s32 y;
+    s32 x, y;
 
     for (y = 0; y < 6; y++) {
         for (x = 0; x < 8; x++) {
-            if (sFaceVisible[y*8 + x] != 0) {
-                gSPTextureRectangle((*dlIter)++, (x * 40) << 2, (y * 40) << 2, (x * 40 + 39) << 2, (y * 40 + 39) << 2, 0,
-                                    0, 0, 4 << 10, 1 << 10);
+            if (sFaceVisible[(y * 8) + x] != 0) {
+                gSPTextureRectangle((*dlIter)++, ( (x * 40)       << 2),
+                                                 ( (y * 40)       << 2),
+                                                 (((x * 40) + 39) << 2),
+                                                 (((y * 40) + 39) << 2),
+                                                 0,
+                                                 0, 0,
+                                                 (4 << 10),
+                                                 (1 << 10));
             }
         }
     }
@@ -328,7 +338,7 @@ Gfx *intro_draw_face(u16 *image, s32 imageW, s32 imageH) {
     return dl;
 }
 
-RGBA16Return32 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH, s32 xOffset, s32 yOffset) {
+RGBA16 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s32 sampleH, s32 xOffset, s32 yOffset) {
     s32 pixel;
     f32 size = (1.0f / (sampleW * sampleH));
     ColorRGBf color;
@@ -341,15 +351,15 @@ RGBA16Return32 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s
         return NULL;
     }
 
-    for ((iy = 0); (iy < imageH); (iy++)) {
+    for (iy = 0; iy < imageH; iy++) {
         idy = ((sampleH * iy) + yOffset);
-        for ((ix = 0); (ix < imageW); (ix++)) {
+        for (ix = 0; ix < imageW; ix++) {
             vec3_zero(color);
             idx = ((sampleW * ix) + xOffset);
 
-            for ((sy = 0); (sy < sampleH); (sy++)) {
+            for (sy = 0; sy < sampleH; sy++) {
                 sdy = ((SCREEN_WIDTH * (idy + sy)) + idx);
-                for ((sx = 0); (sx < sampleW); (sx++)) {
+                for (sx = 0; sx < sampleW; sx++) {
                     // pixel = SCREEN_WIDTH * (sampleH * iy + sy + yOffset) + (sampleW * ix + xOffset) + sx;
                     pixel = fb[sdy + sx];
                     color[0] += RGBA16_R(pixel);
@@ -358,13 +368,13 @@ RGBA16Return32 *intro_sample_frame_buffer(s32 imageW, s32 imageH, s32 sampleW, s
                 }
             }
 
-            image[imageH * iy + ix] = ((R_RGBA16((RGBA16)((color[0] * size) + 0.5f)) & 0xFFFF) |
-                                       (G_RGBA16((RGBA16)((color[1] * size) + 0.5f)) & 0xFFFF) |
-                                       (B_RGBA16((RGBA16)((color[2] * size) + 0.5f)) & 0xFFFF) | MSK_RGBA16_A);
+            image[(imageH * iy) + ix] = ((R_RGBA16((RGBA16)((color[0] * size) + 0.5f)) & 0xFFFF) |
+                                         (G_RGBA16((RGBA16)((color[1] * size) + 0.5f)) & 0xFFFF) |
+                                         (B_RGBA16((RGBA16)((color[2] * size) + 0.5f)) & 0xFFFF) | MSK_RGBA16_A);
         }
     }
 
-    return (RGBA16Return32 *)image;
+    return image;
 }
 
 Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED void *context) {
@@ -393,7 +403,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 
         // Draw while the first or last face is visible.
         if (sFaceVisible[0] == 1 || sFaceVisible[17] == 1) {
-            RGBA16 *image = (RGBA16 *)intro_sample_frame_buffer(40, 40, 2, 2, 120, 80);
+            RGBA16 *image = intro_sample_frame_buffer(40, 40, 2, 2, 120, 80);
             if (image != NULL) {
                 SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
                 dl = intro_draw_face(image, 40, 40);
@@ -405,7 +415,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
 }
 #endif
 
-#if defined(VERSION_SH)
+#ifdef ENABLE_RUMBLE
 Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSED void *context) {
     struct GraphNodeGenerated *genNode = (struct GraphNodeGenerated *)node;
     Gfx *dlIter;

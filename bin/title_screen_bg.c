@@ -113,12 +113,18 @@ ALIGNED8 static const Texture title_texture_game_over_3[] = {
 
 // 0x0A0065C0
 const Texture *const mario_title_texture_table[] = {
-    title_texture_title_0, title_texture_title_1, title_texture_title_2, title_texture_title_3,
+    title_texture_title_0,
+    title_texture_title_1,
+    title_texture_title_2,
+    title_texture_title_3,
 };
 
 // 0x0A0065D0
 const Texture *const game_over_texture_table[] = {
-    title_texture_game_over_0, title_texture_game_over_1, title_texture_game_over_2, title_texture_game_over_3,
+    title_texture_game_over_0,
+    title_texture_game_over_1,
+    title_texture_game_over_2,
+    title_texture_game_over_3,
 };
 
 UNUSED static const u64 title_screen_bg_unused_0 = 0;
@@ -143,7 +149,7 @@ const Gfx title_screen_bg_dl_face_easter_egg_end[] = {
 };
 #endif
 
-#if defined(VERSION_SH)
+#ifdef ENABLE_RUMBLE
 ALIGNED8 static const Texture title_texture_rumble_pak[] = {
 #include "textures/title_screen_bg/title_screen_bg.06648.rgba16.inc.c"
 };
