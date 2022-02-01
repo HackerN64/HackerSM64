@@ -187,17 +187,17 @@ static const Gfx dl_debug_box_end[] = {
     gsSPEndDisplayList(),
 };
 
-u8 gVisualDebugViewCycle = 0;
+u8 gVisualDebugViewCycle = VISUAL_DEBUG_VIEW_NONE;
 
 // Puppyprint will call this from elsewhere.
 void debug_box_input(void) {
     if (gPlayer1Controller->buttonPressed & R_JPAD) {
         gVisualDebugViewCycle++;
-        if (gVisualDebugViewCycle > 3) {
-            gVisualDebugViewCycle = 0;
+        if (gVisualDebugViewCycle >= VISUAL_DEBUG_NUM_VIEWS) {
+            gVisualDebugViewCycle = VISUAL_DEBUG_VIEW_NONE;
         }
-        hitboxView  = (gVisualDebugViewCycle == 1 || gVisualDebugViewCycle == 3);
-        surfaceView = (gVisualDebugViewCycle == 2 || gVisualDebugViewCycle == 3);
+        hitboxView  = (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES || gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES);
+        surfaceView = (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_SURFACES || gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES);
     }
 }
 

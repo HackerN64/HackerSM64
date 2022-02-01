@@ -17,15 +17,23 @@
 #define MAX_DEBUG_BOXES 512
 
 enum DebugBoxFlags {
-    DEBUG_SHAPE_BOX      = (1 << 0), // 0x01
-    DEBUG_SHAPE_CYLINDER = (1 << 1), // 0x02
-    DEBUG_UCODE_DEFAULT  = (1 << 2), // 0x04
+    DEBUG_SHAPE_BOX      = BIT(0), // 0x01
+    DEBUG_SHAPE_CYLINDER = BIT(1), // 0x02
+    DEBUG_UCODE_DEFAULT  = BIT(2), // 0x04
 #ifdef OBJECTS_REJ
-    DEBUG_UCODE_REJ      = (1 << 3), // 0x08
+    DEBUG_UCODE_REJ      = BIT(3), // 0x08
 #else
     DEBUG_UCODE_REJ      = DEBUG_UCODE_DEFAULT,
 #endif
-    DEBUG_BOX_CLEAR      = (1 << 4), // 0x10
+    DEBUG_BOX_CLEAR      = BIT(4), // 0x10
+};
+
+enum VisualDebugViewCycles {
+    VISUAL_DEBUG_VIEW_NONE,
+    VISUAL_DEBUG_VIEW_HITBOXES,
+    VISUAL_DEBUG_VIEW_SURFACES,
+    VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES,
+    VISUAL_DEBUG_NUM_VIEWS,
 };
 
 extern u8 hitboxView;

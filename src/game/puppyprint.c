@@ -492,23 +492,23 @@ void puppyprint_render_collision(void) {
 #ifdef VISUAL_DEBUG
     print_small_text(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
     switch (gVisualDebugViewCycle) {
-        case 0: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 1: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 2: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 3: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case VISUAL_DEBUG_VIEW_NONE:                  print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case VISUAL_DEBUG_VIEW_HITBOXES:              print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case VISUAL_DEBUG_VIEW_SURFACES:              print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
     }
     if (gPlayer1Controller->buttonPressed & R_JPAD) gVisualDebugViewCycle++;
     if (gPlayer1Controller->buttonPressed & L_JPAD) gVisualDebugViewCycle--;
 
-    if (gVisualDebugViewCycle == 4) {
-        gVisualDebugViewCycle = 0;
+    if (gVisualDebugViewCycle == VISUAL_DEBUG_NUM_VIEWS) {
+        gVisualDebugViewCycle = VISUAL_DEBUG_VIEW_NONE;
     }
     if (gVisualDebugViewCycle == 255) {
-        gVisualDebugViewCycle = 3;
+        gVisualDebugViewCycle = VISUAL_DEBUG_NUM_VIEWS - 1;
     }
 
-    hitboxView  = ((gVisualDebugViewCycle == 1) || (gVisualDebugViewCycle == 3));
-    surfaceView = ((gVisualDebugViewCycle == 2) || (gVisualDebugViewCycle == 3));
+    hitboxView  = ((gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES) || (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES));
+    surfaceView = ((gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_SURFACES) || (gVisualDebugViewCycle == VISUAL_DEBUG_VIEW_HITBOXES_AND_SURFACES));
 #endif
 }
 
