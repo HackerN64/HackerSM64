@@ -1270,24 +1270,21 @@
 #define /*0x0F4*/ oPaintingPtr                  OBJECT_FIELD_PAINTING(0x1B)
 #define /*0x0F8*/ oPaintingGroup                OBJECT_FIELD_S16(0x1C, 0)
 #define /*0x0FA*/ oPaintingId                   OBJECT_FIELD_S16(0x1C, 1)
-
 #define /*0x1AC*/ oPaintingLocalMarioPosX       OBJECT_FIELD_S16(0x1D, 0)
 #define /*0x1AE*/ oPaintingLocalMarioPosY       OBJECT_FIELD_S16(0x1D, 1)
 #define /*0x100*/ oPaintingRippleX              OBJECT_FIELD_S16(0x1E, 0)
 #define /*0x104*/ oPaintingRippleY              OBJECT_FIELD_S16(0x1E, 1)
-
 #define /*0x108*/ oPaintingUpdateCounter        OBJECT_FIELD_S16(0x1F, 0)
 #define /*0x10C*/ oLastPaintingUpdateCounter    OBJECT_FIELD_S16(0x1F, 1)
-
 #define /*0x10C*/ oPaintingCurrFlags            OBJECT_FIELD_S16(0x21, 0)
 #define /*0x10E*/ oPaintingChangedFlags         OBJECT_FIELD_S16(0x21, 1)
 #define /*0x110*/ oPaintingState                OBJECT_FIELD_S16(0x22, 0)
 #define /*0x114*/ oPaintingRippleTimer          OBJECT_FIELD_S16(0x22, 1)
-
 #define /*0x1A4*/ oPaintingCurrRippleMag        OBJECT_FIELD_F32(0x47)
 #define /*0x1A8*/ oPaintingRippleDecay          OBJECT_FIELD_F32(0x48)
 #define /*0x1AC*/ oPaintingCurrRippleRate       OBJECT_FIELD_F32(0x49)
 #define /*0x1B0*/ oPaintingDispersionFactor     OBJECT_FIELD_F32(0x4A)
+
 
 /*Custom general defines:
 
