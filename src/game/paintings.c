@@ -875,7 +875,7 @@ void bhv_painting_init(void) {
 
     Vec3f roomFloorCheckPos;
 
-    // The center of the painting with a z offset since paintings are usually between floor triangles.
+    // The center of the painting with a z offset since paintings are usually between floor triangles laterally.
     Vec3f distPos = {
         (o->oPaintingPtr->sizeX * 0.5f),
         (o->oPaintingPtr->sizeY * 0.5f),
