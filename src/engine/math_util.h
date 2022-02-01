@@ -443,9 +443,26 @@ extern f32 gSineTable[];
     }                                   \
 }
 
+
 // Inline functions:
 
-/// Rounding
+/// Rounds towards infinity
+ALWAYS_INLINE s32 ceilf(f32 in) {
+    f32 tmp;
+    s32 out;
+    __asm__("ceil.w.s  %0,%1" : "=f" (tmp) : "f" (in ));
+    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
+    return out;
+}
+/// Rounds towards negative infinity
+ALWAYS_INLINE s32 floorf(f32 in) {
+    f32 tmp;
+    s32 out;
+    __asm__("floor.w.s %0,%1" : "=f" (tmp) : "f" (in ));
+    __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
+    return out;
+}
+/// Rounds towards the nearest integer
 ALWAYS_INLINE s32 roundf(f32 in) {
     f32 tmp;
     s32 out;
@@ -453,24 +470,29 @@ ALWAYS_INLINE s32 roundf(f32 in) {
     __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
     return out;
 }
-//// Backwards compatibility
+/// Backwards compatibility
 #define round_float(in) roundf(in)
 
-/// Absolute value
+
+/// Type-agnostic ternary for absolute value
 #define ABS(x)  (((x) > 0) ? (x) : -(x))
+/// Absolute value of a float value
 ALWAYS_INLINE f32 absf(f32 in) {
     f32 out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
     return out;
 }
+/// Absolute value of an integer value
 ALWAYS_INLINE s32 absi(s32 in) {
     register s32 t0 = (in >> 31);
     return ((in ^ t0) - t0);
 }
+/// Absolute value of a short value
 ALWAYS_INLINE s32 abss(s16 in) {
     register s32 t0 = (in >> 31);
     return ((in ^ t0) - t0);
 }
+
 
 // On console, (x != 0) still returns true for denormalized floats,
 // which will count as a division by zero when divided and crash.
