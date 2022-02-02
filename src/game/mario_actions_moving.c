@@ -206,62 +206,64 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
 }
 
 s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
-    f32 lossFactor;
-    f32 accel;
-    f32 oldSpeed;
-    f32 newSpeed;
-
     s32 stopped = FALSE;
 
-    s16 intendedDYaw = m->intendedYaw - m->slideYaw;
-    f32 forward = coss(intendedDYaw);
+    s16 intendedDYaw = (m->intendedYaw - m->slideYaw);
+    f32 forward  = coss(intendedDYaw);
     f32 sideward = sins(intendedDYaw);
 
     //! 10k glitch
     if (forward < 0.0f && m->forwardVel >= 0.0f) {
-        forward *= 0.5f + 0.5f * m->forwardVel / 100.0f;
+        forward *= (m->forwardVel / 200.0f) + 0.5f;
     }
+
+    f32 mag = (m->intendedMag / 32.0f);
+
+    f32 accel;
+    f32 lossFactor = (mag * forward * 0.02f);
 
     switch (mario_get_floor_class(m)) {
         case SURFACE_CLASS_VERY_SLIPPERY:
             accel = 10.0f;
-            lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.98f;
+            lossFactor += 0.98f;
             break;
 
         case SURFACE_CLASS_SLIPPERY:
             accel = 8.0f;
-            lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.96f;
+            lossFactor += 0.96f;
             break;
 
         default:
             accel = 7.0f;
-            lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.92f;
+            lossFactor += 0.92f;
             break;
 
         case SURFACE_CLASS_NOT_SLIPPERY:
             accel = 5.0f;
-            lossFactor = m->intendedMag / 32.0f * forward * 0.02f + 0.92f;
+            lossFactor += 0.92f;
             break;
     }
 
-    oldSpeed = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+    f32 oldSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
-    //! This is attempting to use trig derivatives to rotate Mario's speed.
-    // It is slightly off/asymmetric since it uses the new X speed, but the old
-    // Z speed.
-    m->slideVelX += m->slideVelZ * (m->intendedMag / 32.0f) * sideward * 0.05f;
-    m->slideVelZ -= m->slideVelX * (m->intendedMag / 32.0f) * sideward * 0.05f;
+    // This uses trig derivatives to rotate Mario's speed.
+    f32 modifier = (mag * sideward * 0.05f);
+    f32 slideVelXModifier = (m->slideVelZ * modifier);
+    f32 slideVelZModifier = (m->slideVelX * modifier);
 
-    newSpeed = sqrtf(m->slideVelX * m->slideVelX + m->slideVelZ * m->slideVelZ);
+    m->slideVelX += slideVelXModifier;
+    m->slideVelZ -= slideVelZModifier;
+
+    f32 newSpeed = sqrtf(sqr(m->slideVelX) + sqr(m->slideVelZ));
 
     if (oldSpeed > 0.0f && newSpeed > 0.0f) {
-        m->slideVelX = m->slideVelX * oldSpeed / newSpeed;
-        m->slideVelZ = m->slideVelZ * oldSpeed / newSpeed;
+        m->slideVelX = (m->slideVelX * oldSpeed / newSpeed);
+        m->slideVelZ = (m->slideVelZ * oldSpeed / newSpeed);
     }
 
     update_sliding_angle(m, accel, lossFactor);
 
-    if (!mario_floor_is_slope(m) && m->forwardVel * m->forwardVel < stopSpeed * stopSpeed) {
+    if (!mario_floor_is_slope(m) && (sqr(m->forwardVel) < sqr(stopSpeed))) {
         mario_set_forward_vel(m, 0.0f);
         stopped = TRUE;
     }
