@@ -10883,25 +10883,20 @@ static UNUSED void unused_deactivate_sleeping_camera(UNUSED struct MarioState *m
     sStatusFlags &= ~CAM_FLAG_SLEEPING;
 }
 
-void set_fov_30(UNUSED struct MarioState *m) {
-    sFOVState.fov = 30.f;
+void set_fov(f32 fov) {
+    sFOVState.fov = fov;
 }
 
-void approach_fov_20(UNUSED struct MarioState *m) {
-    camera_approach_f32_symmetric_bool(&sFOVState.fov, 20.f, 0.3f);
+void approach_fov(f32 fov, f32 inc) {
+    camera_approach_f32_symmetric_bool(&sFOVState.fov, fov, inc);
 }
 
-void set_fov_45(UNUSED struct MarioState *m) {
-    sFOVState.fov = 45.f;
-}
-
-void set_fov_29(UNUSED struct MarioState *m) {
-    sFOVState.fov = 29.f;
-}
-
-void zoom_fov_30(UNUSED struct MarioState *m) {
-    // Pretty sure approach_f32_asymptotic_bool would do a much nicer job here, but you do you, Nintendo.
-    camera_approach_f32_symmetric_bool(&sFOVState.fov, 30.f, (30.f - sFOVState.fov) / 60.f);
+void zoom_fov(f32 fov, f32 div) {
+    if (FLT_IS_NONZERO(div)) {
+        approach_f32_asymptotic_bool(&sFOVState.fov, fov, (1.0f / div));
+    } else {
+        set_fov(fov);
+    }
 }
 
 /**
@@ -10912,39 +10907,15 @@ void fov_default(struct MarioState *m) {
     sStatusFlags &= ~CAM_FLAG_SLEEPING;
 
     if ((m->action == ACT_SLEEPING) || (m->action == ACT_START_SLEEPING)) {
-        camera_approach_f32_symmetric_bool(&sFOVState.fov, 30.f, (30.f - sFOVState.fov) / 30.f);
+        zoom_fov(30.0f, 30.0f);
         sStatusFlags |= CAM_FLAG_SLEEPING;
     } else {
-        camera_approach_f32_symmetric_bool(&sFOVState.fov, 45.f, (45.f - sFOVState.fov) / 30.f);
+        zoom_fov(45.0f, 30.0f);
         sFOVState.unusedIsSleeping = 0;
     }
     if (m->area->camera->cutscene == CUTSCENE_0F_UNUSED) {
-        sFOVState.fov = 45.f;
+        set_fov(45.0f);
     }
-}
-
-void approach_fov_30(UNUSED struct MarioState *m) {
-    camera_approach_f32_symmetric_bool(&sFOVState.fov, 30.f, 1.f);
-}
-
-void approach_fov_60(UNUSED struct MarioState *m) {
-    camera_approach_f32_symmetric_bool(&sFOVState.fov, 60.f, 1.f);
-}
-
-void approach_fov_45(struct MarioState *m) {
-    f32 targetFoV = sFOVState.fov;
-
-    if (m->area->camera->mode == CAMERA_MODE_FIXED && m->area->camera->cutscene == 0) {
-        targetFoV = 45.f;
-    } else {
-        targetFoV = 45.f;
-    }
-
-    sFOVState.fov = approach_f32(sFOVState.fov, targetFoV, 2.f, 2.f);
-}
-
-void approach_fov_80(UNUSED struct MarioState *m) {
-    camera_approach_f32_symmetric_bool(&sFOVState.fov, 80.f, 3.5f);
 }
 
 /**
@@ -10952,15 +10923,11 @@ void approach_fov_80(UNUSED struct MarioState *m) {
  * If there's a cutscene, sets fov to 45. Otherwise sets fov to 60.
  */
 void set_fov_bbh(struct MarioState *m) {
-    f32 targetFoV = sFOVState.fov;
-
     if (m->area->camera->mode == CAMERA_MODE_FIXED && m->area->camera->cutscene == 0) {
-        targetFoV = 60.f;
+        approach_fov(60.0f, 2.0f);
     } else {
-        targetFoV = 45.f;
+        approach_fov(45.0f, 2.0f);
     }
-
-    sFOVState.fov = approach_f32(sFOVState.fov, targetFoV, 2.f, 2.f);
 }
 
 /**
@@ -10974,13 +10941,13 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context) 
     if (callContext == GEO_CONTEXT_RENDER) {
         switch (fovFunc) {
             case CAM_FOV_SET_45:
-                set_fov_45(marioState);
+                set_fov(45.0f);
                 break;
             case CAM_FOV_SET_29:
-                set_fov_29(marioState);
+                set_fov(29.0f);
                 break;
             case CAM_FOV_ZOOM_30:
-                zoom_fov_30(marioState);
+                zoom_fov(30.0f, 60.0f);
                 break;
             case CAM_FOV_DEFAULT:
                 fov_default(marioState);
@@ -10989,22 +10956,22 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context) 
                 set_fov_bbh(marioState);
                 break;
             case CAM_FOV_APP_45:
-                approach_fov_45(marioState);
+                approach_fov(45.0f, 2.0f);
                 break;
             case CAM_FOV_SET_30:
-                set_fov_30(marioState);
+                set_fov(30.0f);
                 break;
             case CAM_FOV_APP_20:
-                approach_fov_20(marioState);
+                approach_fov(20.0f, 0.3f);
                 break;
             case CAM_FOV_APP_80:
-                approach_fov_80(marioState);
+                approach_fov(80.0f, 3.5f);
                 break;
             case CAM_FOV_APP_30:
-                approach_fov_30(marioState);
+                approach_fov(30.0f, 1.0f);
                 break;
             case CAM_FOV_APP_60:
-                approach_fov_60(marioState);
+                approach_fov(60.0f, 1.0f);
                 break;
             //! No default case
         }
