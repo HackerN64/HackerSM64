@@ -664,7 +664,7 @@ static s32 int_sci_notation(s32 base, s32 significand) {
 }
 
 /* 23C1C8 -> 23C468; orig name: func_8018D9F8 */
-char *sprint_val_withspecifiers(char *str, union PrintVal val, char *specifiers) {
+UNUSED char *sprint_val_withspecifiers(char *str, union PrintVal val, char *specifiers) {
     s32 fracPart; // sp3C
     s32 intPart;  // sp38
     s32 intPrec;  // sp34
