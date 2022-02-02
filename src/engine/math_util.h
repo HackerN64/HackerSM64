@@ -516,8 +516,8 @@ void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max);
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max);
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max);
 // Vector comparison
-s32 vec3f_compare_f32(Vec3f vec, f32 x, f32 y, f32 z);
-s32 vec3f_compare(Vec3f a, Vec3f b);
+Bool32 vec3f_compare_f32(Vec3f vec, f32 x, f32 y, f32 z);
+Bool32 vec3f_compare(Vec3f a, Vec3f b);
 // Vector copy
 void vec3f_copy    (Vec3f dest, const Vec3f src);
 void vec3i_copy    (Vec3i dest, const Vec3i src);

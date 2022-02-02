@@ -100,7 +100,7 @@ void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max) { min_max_3_func(a, b, 
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, c, min, max); }
 
 /// Compares a vector to three floats, return TRUE if they match.
-s32 vec3f_compare_f32(Vec3f vec, f32 x, f32 y, f32 z) {
+Bool32 vec3f_compare_f32(Vec3f vec, f32 x, f32 y, f32 z) {
     f32 vecX = vec[0];
     f32 vecY = vec[1];
     f32 vecZ = vec[2];
@@ -108,7 +108,7 @@ s32 vec3f_compare_f32(Vec3f vec, f32 x, f32 y, f32 z) {
 }
 
 /// Compares two vectors, return TRUE if they match.
-s32 vec3f_compare(Vec3f a, Vec3f b) {
+Bool32 vec3f_compare(Vec3f a, Vec3f b) {
     f32 aX = a[0];
     f32 aY = a[1];
     f32 aZ = a[2];
