@@ -99,6 +99,25 @@ void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max) { min_max_3_func(a, b, 
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max) { min_max_3_func(a, b, c, min, max); }
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, c, min, max); }
 
+/// Compares a vector to three floats, return TRUE if they match.
+s32 vec3f_compare_f32(Vec3f vec, f32 x, f32 y, f32 z) {
+    f32 vecX = vec[0];
+    f32 vecY = vec[1];
+    f32 vecZ = vec[2];
+    return (x == vecX && y == vecY && z == vecZ);
+}
+
+/// Compares two vectors, return TRUE if they match.
+s32 vec3f_compare(Vec3f a, Vec3f b) {
+    f32 aX = a[0];
+    f32 aY = a[1];
+    f32 aZ = a[2];
+    f32 bX = b[0];
+    f32 bY = b[1];
+    f32 bZ = b[2];
+    return (aX == bX && aY == bY && aZ == bZ);
+}
+
 /// Copy vector 'src' to 'dest'
 #define vec3_copy_bits(destFmt, dest, srcFmt, src) {\
     destFmt x = ((srcFmt *) src)[0];                \
@@ -1172,7 +1191,9 @@ s32 approach_f32_signed(f32 *current, f32 target, f32 inc) {
  * Edits the current value directly, returns TRUE if the target has been reached, FALSE otherwise.
  */
 s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier) {
-    if (multiplier > 1.0f) multiplier = 1.0f;
+    if (multiplier > 1.0f) {
+        multiplier = 1.0f;
+    }
 
     *current = (*current + ((target - *current) * multiplier));
     return (*current != target);
@@ -1222,7 +1243,9 @@ s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor) {
 
 s32 abs_angle_diff(s16 a0, s16 a1) {
     s16 diff = (a1 - a0);
-    if (diff == -0x8000) return 0x7FFF;
+    if (diff == -0x8000) {
+        return 0x7FFF;
+    }
     return abss(diff);
 }
 
@@ -1231,7 +1254,7 @@ s32 abs_angle_diff(s16 a0, s16 a1) {
  * the resulting angle is in range [0, 0x2000] (1/8 of a circle).
  */
 static u32 atan2_lookup(f32 y, f32 x) {
-    return x == 0
+    return (x == 0)
         ? 0x0
         : atans(y / x);
 }
