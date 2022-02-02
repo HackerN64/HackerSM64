@@ -87,31 +87,31 @@ void reset_volume(void) {
 /**
  * Called from threads: thread5_game_loop
  */
-void lower_background_noise(s32 a) {
-    switch (a) {
-        case 1:
+void lower_background_noise(s32 op) {
+    switch (op) {
+        case BG_NOISE_OP_TOGGLE_MUTE:
             set_audio_muted(TRUE);
             break;
-        case 2:
+        case BG_NOISE_OP_SEQ:
             seq_player_lower_volume(SEQ_PLAYER_LEVEL, 60, 40);
             break;
     }
-    sMusicVolume |= a;
+    sMusicVolume |= op;
 }
 
 /**
  * Called from threads: thread5_game_loop
  */
-void raise_background_noise(s32 a) {
-    switch (a) {
-        case 1:
+void raise_background_noise(s32 op) {
+    switch (op) {
+        case BG_NOISE_OP_TOGGLE_MUTE:
             set_audio_muted(FALSE);
             break;
-        case 2:
+        case BG_NOISE_OP_SEQ:
             seq_player_unlower_volume(SEQ_PLAYER_LEVEL, 60);
             break;
     }
-    sMusicVolume &= ~a;
+    sMusicVolume &= ~op;
 }
 
 /**

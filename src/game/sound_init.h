@@ -5,6 +5,12 @@
 
 #include "macros.h"
 
+enum BackgroundNoiseOp {
+    BG_NOISE_OP_NONE,
+    BG_NOISE_OP_TOGGLE_MUTE,
+    BG_NOISE_OP_SEQ,
+};
+
 enum SoundMenuFlags {
     SOUND_MENU_FLAG_HANDAPPEAR      = (1 << 0), // 0x001
     SOUND_MENU_FLAG_HANDISAPPEAR    = (1 << 1), // 0x002
@@ -26,8 +32,8 @@ enum SoundMenuMode {
 extern s8 sPaintingEjectSoundPlayed;
 
 void reset_volume(void);
-void raise_background_noise(s32 a);
-void lower_background_noise(s32 a);
+void raise_background_noise(s32 op);
+void lower_background_noise(s32 op);
 void disable_background_sound(void);
 void enable_background_sound(void);
 void set_sound_mode(u16 soundMode);
