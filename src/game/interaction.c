@@ -1587,7 +1587,7 @@ u32 interact_cap(struct MarioState *m, UNUSED u32 interactType, struct Object *o
         m->interactObj = obj;
         obj->oInteractStatus = INT_STATUS_INTERACTED;
 
-        m->flags &= ~MARIO_CAP_ON_HEAD & ~MARIO_CAP_IN_HAND;
+        m->flags &= ~(MARIO_CAP_ON_HEAD | MARIO_CAP_IN_HAND);
         m->flags |= capFlag;
 
         switch (capFlag) {
@@ -1596,7 +1596,7 @@ u32 interact_cap(struct MarioState *m, UNUSED u32 interactType, struct Object *o
             case MARIO_WING_CAP:   capTime = 1800; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP  ); break;
         }
 
-        if (capTime > m->capTimer) {
+        if (m->capTimer < capTime) {
             m->capTimer = capTime;
         }
 

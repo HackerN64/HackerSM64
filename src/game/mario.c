@@ -1599,9 +1599,9 @@ void sink_mario_in_quicksand(struct MarioState *m) {
  * 0x4444449249255555
  *
  * Equals [1000]^5 . [100]^8 . [10]^9 . [1] in binary, which is
- * 100010001000100010001001001001001001001001001010101010101010101.
+ * 0100010001000100010001001001001001001001001001010101010101010101.
  */
-u64 sCapFlickerFrames = 0b100010001000100010001001001001001001001001001010101010101010101;
+static const u64 sCapFlickerFrames = 0b0100010001000100010001001001001001001001001001010101010101010101;
 
 /**
  * Updates the cap flags mainly based on the cap timer.
@@ -1614,9 +1614,11 @@ u32 update_and_return_cap_flags(struct MarioState *m) {
         action = m->action;
 
         if ((m->capTimer <= 60)
-            || ((action != ACT_READING_AUTOMATIC_DIALOG) && (action != ACT_READING_NPC_DIALOG)
-                && (action != ACT_READING_SIGN) && (action != ACT_IN_CANNON))) {
-            m->capTimer -= 1;
+            || ((action != ACT_READING_AUTOMATIC_DIALOG)
+             && (action != ACT_READING_NPC_DIALOG)
+             && (action != ACT_READING_SIGN)
+             && (action != ACT_IN_CANNON))) {
+            m->capTimer--;
         }
 
         if (m->capTimer == 0) {
