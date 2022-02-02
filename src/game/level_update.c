@@ -248,6 +248,7 @@ void init_door_warp(struct SpawnInfo *spawnInfo, u32 warpDestFlags) {
     spawnInfo->startPos[2] += 300.0f * coss(spawnInfo->startAngle[1]);
 }
 
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 void set_mario_initial_cap_powerup(struct MarioState *m) {
     u32 capCourseIndex = gCurrCourseNum - COURSE_CAP_COURSES;
 
@@ -268,6 +269,7 @@ void set_mario_initial_cap_powerup(struct MarioState *m) {
             break;
     }
 }
+#endif
 
 void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg) {
     switch (spawnType) {
@@ -334,7 +336,9 @@ void set_mario_initial_action(struct MarioState *m, u32 spawnType, u32 actionArg
     }
 #endif
 
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     set_mario_initial_cap_powerup(m);
+#endif
 }
 
 void init_mario_after_warp(void) {
