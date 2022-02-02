@@ -2073,10 +2073,11 @@ enum oActionsSnowmansBottom {
     #define WATER_BOMB_ACT_EXPLODE                          0x3
 
 /* TTC Painting Clock Arm */
-    /* oAction */
-    #define CLOCK_ARM_ACT_CHECK_DEFAULT                     0x0
-    #define CLOCK_ARM_ACT_MOVING                            0x1
-    #define CLOCK_ARM_ACT_STOP                              0x2
+enum oActionsTTCPaintingClockArm {
+    TTC_PAINTING_CLOCK_ARM_WAIT,
+    TTC_PAINTING_CLOCK_ARM_ACT_MOVING,
+    TTC_PAINTING_CLOCK_ARM_ACT_STOPPED,
+};
 
 /* TTC rotating solid */
     /* oBehParams2ndByte */
