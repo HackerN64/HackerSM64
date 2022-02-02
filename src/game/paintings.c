@@ -304,37 +304,40 @@ void painting_generate_mesh(struct Painting *painting, PaintingData *mesh, Paint
 
     /// Controls the peaks of the ripple.
     f32 rippleMag = obj->oPaintingCurrRippleMag;
-    /// Controls the ripple's frequency
+    /// Controls the ripple's frequency.
     f32 rippleRate = obj->oPaintingCurrRippleRate;
-    /// Controls how fast the ripple spreads
+    /// Controls how fast the ripple spreads.
     f32 dispersionFactor = obj->oPaintingDispersionFactor;
-    /// How far the ripple has spread
+    /// How far the ripple has spread.
     f32 rippleTimer = obj->oPaintingRippleTimer;
 
-    /// x and y ripple origin
+    /// X and Y ripple origin.
     f32 rippleX = obj->oPaintingRippleX;
     f32 rippleY = obj->oPaintingRippleY;
 
     f32 sizeRatioX = (painting->sizeX / PAINTING_SIZE);
     f32 sizeRatioY = (painting->sizeY / PAINTING_SIZE);
 
-    // accesses are off by 1 since the first entry is the number of vertices
+    f32 dx, dy;
+    f32 rippleDistance;
+
+    // Loop through all the painting vertices and calculate the ripple magnitude at each point.
+    // Accesses are off by 1 since the first entry is the number of vertices.
     for (i = 0; i < numTris; i++) {
         tri = (i * 3);
         paintingMesh->pos[0] = mesh[tri + 1];
         paintingMesh->pos[1] = mesh[tri + 2];
-        // The "z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
-        // actual coordinate, it just determines whether the vertex moves
+        // The "Z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
+        // actual coordinate, it just determines whether the vertex moves.
         if (mesh[tri + 3]) {
-            // Calculate the ripple magnitude at the given point
-            f32 dx = ((paintingMesh->pos[0] * sizeRatioX) - rippleX);
-            f32 dy = ((paintingMesh->pos[1] * sizeRatioY) - rippleY);
-            f32 distanceToOrigin = sqrtf(sqr(dx) + sqr(dy));
-            // A larger dispersionFactor makes the ripple spread slower
-            f32 rippleDistance = (distanceToOrigin / dispersionFactor);
+            // Scale and calculate the distance to the ripple origin.
+            dx = ((paintingMesh->pos[0] * sizeRatioX) - rippleX);
+            dy = ((paintingMesh->pos[1] * sizeRatioY) - rippleY);
+            // A larger dispersionFactor makes the ripple spread slower.
+            rippleDistance = sqrtf(sqr(dx) + sqr(dy)) / dispersionFactor;
 
             if (rippleTimer < rippleDistance) {
-                // If the ripple hasn't reached the point yet, make the point magnitude 0
+                // If the ripple hasn't reached the point yet, make the point magnitude 0.
                 paintingMesh->pos[2] = 0;
             } else {
                 // Use a cosine wave to make the ripple go up and down,
