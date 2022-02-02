@@ -858,7 +858,7 @@ f64 gd_sqrt_d(f64 x) {
 }
 
 
-#if defined(ISVPRINT) || defined(UNF)
+#ifdef GODDARD_DEBUG_PRINTF
 #define stubbed_printf osSyncPrintf
 #else
 /* 249BCC -> 24A19C */

@@ -44,7 +44,7 @@ f64 gd_sin_d(f64 x);
 f64 gd_cos_d(f64 x);
 f64 gd_sqrt_d(f64 x);
 
-#if defined(ISVPRINT) || defined(UNF)
+#ifdef GODDARD_DEBUG_PRINTF
 #define gd_printf osSyncPrintf
 #else
 void gd_printf(const char *format, ...);

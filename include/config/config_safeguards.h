@@ -123,10 +123,15 @@
 
 #ifndef KEEP_MARIO_HEAD
     #undef GODDARD_EASTER_EGG
+    #undef GODDARD_DEBUG_PRINTF
 
     #undef DISABLE_DEMO
     #define DISABLE_DEMO
 #endif // !KEEP_MARIO_HEAD
+
+#if !defined(ISVPRINT) && !defined(UNF)
+    #undef GODDARD_DEBUG_PRINTF
+#endif // !ISVPRINT && !UNF
 
 
 /*****************
