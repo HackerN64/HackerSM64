@@ -2930,7 +2930,9 @@ void update_camera(struct Camera *c) {
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
     camera_course_processing(c);
 #else
-    if (gCurrDemoInput != NULL) camera_course_processing(c);
+    if (gCurrDemoInput != NULL) {
+        camera_course_processing(c);
+    }
 #endif
     sCButtonsPressed = find_c_buttons_pressed(sCButtonsPressed, gPlayer1Controller->buttonPressed, gPlayer1Controller->buttonDown);
 
@@ -4817,7 +4819,7 @@ u8 open_door_cutscene(u8 pullResult, u8 pushResult) {
  *
  * @return the cutscene that should start, 0 if none
  */
-u8 get_cutscene_from_mario_status(struct Camera *c) {
+u32 get_cutscene_from_mario_status(struct Camera *c) {
     u8 cutscene = c->cutscene;
 
     if (cutscene == CUTSCENE_NONE) {
@@ -5082,7 +5084,7 @@ void determine_pushing_or_pulling_door(s16 *rotation) {
  *
  * @return Lakitu's next yaw, which is the same as the yaw passed in if no transition happened
  */
-s16 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
+s32 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
                       Vec3f oldPos, Vec3f oldFoc, s16 yaw) {
     s16 yawVelocity;
     s16 pitchVelocity;
@@ -5123,9 +5125,9 @@ s16 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
     // Transition from the last mode to the current one
     if (sModeTransition.framesLeft > 0) {
         vec3f_get_dist_and_angle(curFoc, curPos, &goalDist, &goalPitch, &goalYaw);
-        distVelocity = abss(goalDist - sModeTransition.posDist) / distTimer;
-        pitchVelocity = abss(goalPitch - sModeTransition.posPitch) / angleTimer;
-        yawVelocity = abss(goalYaw - sModeTransition.posYaw) / angleTimer;
+        distVelocity = absf(goalDist - sModeTransition.posDist) / distTimer;
+        pitchVelocity = absf(goalPitch - sModeTransition.posPitch) / angleTimer;
+        yawVelocity = absf(goalYaw - sModeTransition.posYaw) / angleTimer;
 
         camera_approach_f32_symmetric_bool(&sModeTransition.posDist, goalDist, distVelocity);
         camera_approach_s16_symmetric_bool(&sModeTransition.posYaw, goalYaw, yawVelocity);
@@ -5166,7 +5168,7 @@ s16 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
         sStatusFlags &= ~CAM_FLAG_TRANSITION_OUT_OF_C_UP;
     }
     vec3f_copy(sModeTransition.marioPos, sMarioCamState->pos);
-    return yaw;
+    return (s16)yaw;
 }
 
 static UNUSED void stop_transitional_movement(void) {
@@ -6183,10 +6185,8 @@ struct CutsceneSplinePoint sEndingLookAtSkyFocus[] = {
  * Activates any CameraTriggers that Mario is inside.
  * Then, applies area-specific processing to the camera, such as setting the default mode, or changing
  * the mode based on the terrain type Mario is standing on.
- *
- * @return the camera's mode after processing, although this is unused in the code
  */
-s16 camera_course_processing(struct Camera *c) {
+void camera_course_processing(struct Camera *c) {
     s16 level = gCurrLevelNum;
     s8 area = gCurrentArea->index;
     // Bounds iterator
@@ -6360,7 +6360,6 @@ s16 camera_course_processing(struct Camera *c) {
         sModeInfo.lastMode = c->mode;
         c->mode = oldMode;
     }
-    return c->mode;
 }
 
 /**
@@ -6564,7 +6563,7 @@ UNUSED s32 unused_dialog_cutscene_response(u8 cutscene) {
     }
 }
 
-s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID) {
+s32 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID) {
     s16 response = DIALOG_RESPONSE_NONE;
 
     if ((gCamera->cutscene == CUTSCENE_NONE) && (sObjectCutscene == CUTSCENE_NONE)) {
@@ -6584,14 +6583,14 @@ s16 cutscene_object_with_dialog(u8 cutscene, struct Object *obj, s16 dialogID) {
     return response;
 }
 
-s16 cutscene_object_without_dialog(u8 cutscene, struct Object *obj) {
+s32 cutscene_object_without_dialog(u8 cutscene, struct Object *obj) {
     return cutscene_object_with_dialog(cutscene, obj, DIALOG_NONE);
 }
 
 /**
  * @return 0 if not started, 1 if started, and -1 if finished
  */
-s16 cutscene_object(u8 cutscene, struct Object *obj) {
+s32 cutscene_object(u8 cutscene, struct Object *obj) {
     s16 status = 0;
 
     if ((gCamera->cutscene == 0) && (sObjectCutscene == 0)) {
@@ -9610,12 +9609,10 @@ void cutscene_enter_painting(struct Camera *c) {
         } else {
             approach_vec3f_asymptotic(c->pos, focus, 0.9f, 0.9f, 0.9f);
         }
-
-        if (ripplingPainting == NULL) {
-            c->cutscene = CUTSCENE_NONE;
-            gCutsceneTimer = CUTSCENE_STOP;
-            sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
-        }
+    } else {
+        c->cutscene = CUTSCENE_NONE;
+        gCutsceneTimer = CUTSCENE_STOP;
+        sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     }
 
     c->mode = CAMERA_MODE_CLOSE;
