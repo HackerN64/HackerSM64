@@ -453,7 +453,7 @@ void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex) {
  */
 void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
     gObjectLists = gObjectListArray;
-    gTimeStopState = 0;
+    gTimeStopState = TIME_STOP_FLAGS_NONE;
 
     gWDWWaterLevelChanging = FALSE;
     gMarioOnMerryGoRound = FALSE;
@@ -519,7 +519,7 @@ void clear_objects(void) {
 
     gEnteredPainting = NULL;
     gTHIWaterDrained = 0;
-    gTimeStopState = 0;
+    gTimeStopState = TIME_STOP_FLAGS_NONE;
     gMarioObject = NULL;
     gMarioCurrentRoom = 0;
 

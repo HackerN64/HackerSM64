@@ -12,6 +12,7 @@
  * and also track some miscellaneous info.
  */
 enum gTimeStopStateFlags {
+    TIME_STOP_FLAGS_NONE        = (0 << 0),
     TIME_STOP_UNKNOWN_0         = (1 << 0),
     TIME_STOP_ENABLED           = (1 << 1),
     TIME_STOP_DIALOG            = (1 << 2),
