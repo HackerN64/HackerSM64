@@ -492,6 +492,8 @@ ALWAYS_INLINE s32 abss(s16 in) {
     register s32 t0 = (in >> 31);
     return ((in ^ t0) - t0);
 }
+/// Backwards compatibility, used to be a duplicate function
+#define absf_2 absf
 
 
 // On console, (x != 0) still returns true for denormalized floats,

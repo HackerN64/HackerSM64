@@ -104,20 +104,15 @@ Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *no
 }
 
 /**
- * Backwards compatibility, used to be a duplicate function
- */
-#define absf_2 absf
-
-/**
  * Turns an object away from floors/walls that it runs into.
  */
-void turn_obj_away_from_surface(f32 velX, f32 velZ, f32 nX, UNUSED f32 nY, f32 nZ, f32 *objYawX,
-                            f32 *objYawZ) {
-    *objYawX = (nZ * nZ - nX * nX) * velX / (nX * nX + nZ * nZ)
-               - 2 * velZ * (nX * nZ) / (nX * nX + nZ * nZ);
-
-    *objYawZ = (nX * nX - nZ * nZ) * velZ / (nX * nX + nZ * nZ)
-               - 2 * velX * (nX * nZ) / (nX * nX + nZ * nZ);
+void turn_obj_away_from_surface(f32 velX, f32 velZ, f32 nX, UNUSED f32 nY, f32 nZ, f32 *objYawX, f32 *objYawZ) {
+    f32 sqrX = sqr(nX);
+    f32 sqrZ = sqr(nZ);
+    f32 sqrXZ = (1.0f / (sqrX + sqrZ));
+    f32 nXZ2 = (2 * (nX * nZ) * sqrXZ);
+    *objYawX = ((sqrZ - sqrX) * velX * sqrXZ) - (velZ * nXZ2);
+    *objYawZ = ((sqrX - sqrZ) * velZ * sqrXZ) - (velX * nXZ2);
 }
 
 /**
@@ -233,14 +228,10 @@ void calc_new_obj_vel_and_pos_y(struct Surface *objFloor, f32 objFloorY, f32 obj
     f32 floor_nZ = objFloor->normal.z;
     f32 objFriction;
 
-    // Caps vertical speed with a "terminal velocity".
     o->oVelY -= o->oGravity;
-    if (o->oVelY > 75.0f) {
-        o->oVelY = 75.0f;
-    }
-    if (o->oVelY < -75.0f) {
-        o->oVelY = -75.0f;
-    }
+
+    // Caps vertical speed with a "terminal velocity".
+    o->oVelY = CLAMP(o->oVelY, -75.0f, 75.0f);
 
     o->oPosY += o->oVelY;
 
@@ -283,16 +274,11 @@ void calc_new_obj_vel_and_pos_y_underwater(struct Surface *objFloor, f32 floorY,
     f32 floor_nY = objFloor->normal.y;
     f32 floor_nZ = objFloor->normal.z;
 
-    f32 netYAccel = (1.0f - o->oBuoyancy) * (-1.0f * o->oGravity);
+    f32 netYAccel = (1.0f - o->oBuoyancy) * -o->oGravity;
     o->oVelY -= netYAccel;
 
     // Caps vertical speed with a "terminal velocity".
-    if (o->oVelY > 75.0f) {
-        o->oVelY = 75.0f;
-    }
-    if (o->oVelY < -75.0f) {
-        o->oVelY = -75.0f;
-    }
+    o->oVelY = CLAMP(o->oVelY, -75.0f, 75.0f);
 
     o->oPosY += o->oVelY;
 
@@ -455,7 +441,7 @@ s32 is_point_within_radius_of_mario(f32 x, f32 y, f32 z, s32 dist) {
     f32 dy = y - gMarioObject->header.gfx.pos[1];
     f32 dz = z - gMarioObject->header.gfx.pos[2];
 
-    return sqr(dx) + sqr(dy) + sqr(dz) < (f32)sqr(dist);
+    return ((sqr(dx) + sqr(dy) + sqr(dz)) < (f32)sqr(dist));
 }
 
 /**
@@ -466,7 +452,7 @@ s32 is_point_close_to_object(struct Object *obj, f32 x, f32 y, f32 z, s32 dist) 
     f32 dy = y - obj->oPosY;
     f32 dz = z - obj->oPosZ;
 
-    return sqr(dx) + sqr(dy) + sqr(dz) < (f32)sqr(dist);
+    return ((sqr(dx) + sqr(dy) + sqr(dz)) < (f32)sqr(dist));
 }
 
 /**
@@ -589,19 +575,13 @@ s32 obj_flicker_and_disappear(struct Object *obj, s16 lifeSpan) {
  * Checks if a given room is Mario's current room, even if on an object.
  */
 s32 current_mario_room_check(RoomData room) {
-    s32 result;
-
     // Since object surfaces have room 0, this tests if the surface is an
     // object first and uses the last room if so.
-    if (gMarioCurrentRoom == 0) {
-        return room == sPrevCheckMarioRoom;
-    } else {
-        result = room == gMarioCurrentRoom;
-
+    if (gMarioCurrentRoom != 0) {
         sPrevCheckMarioRoom = gMarioCurrentRoom;
     }
 
-    return result;
+    return (room == sPrevCheckMarioRoom);
 }
 
 /**
