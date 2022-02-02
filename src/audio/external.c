@@ -1362,7 +1362,7 @@ static void update_game_sound(void) {
                     delete_sound_from_bank(bank, soundIndex);
                 }
                 // If sound has finished playing, then delete it
-                // @bug (JP sound glitch) On JP, ...->layers[0] has not been checked for null,
+                //! @bug (JP sound glitch) On JP, ...->layers[0] has not been checked for null,
                 // so this access can crash if an earlier layer allocation failed due to too
                 // many sounds playing at once. This crash is comparatively common; RTA
                 // speedrunners even have a setup for avoiding it within the SSL pyramid:
@@ -2260,7 +2260,7 @@ void stop_background_music(u16 seqId) {
         sBackgroundMusicQueue[i].seqId = sBackgroundMusicQueue[i + 1].seqId;
     }
 
-    // @bug? If the sequence queue is full and we attempt to stop a sequence
+    //! @bug? If the sequence queue is full and we attempt to stop a sequence
     // that isn't in the queue, this writes out of bounds. Can that happen?
     sBackgroundMusicQueue[i].priority = 0;
 }

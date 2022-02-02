@@ -6431,7 +6431,7 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
     // The distance from Mario to Lakitu
     checkDist = 0.0f;
     /// The radius used to find potential walls to avoid.
-    /// @bug Increases to 250.f, but the max collision radius is 200.f
+    //! @bug Increases to 250.f, but the max collision radius is 200.f
     coarseRadius = 150.0f;
     /// This only increases when there is a wall collision found in the coarse pass
     fineRadius = 100.0f;
@@ -6730,7 +6730,7 @@ void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw
     s16 pitch, yaw, pitchCap;
 
     // Change the camera rotation to match the 2nd player's stick
-    approach_s16_asymptotic_bool(&sCreditsPlayer2Yaw, -(s16)(gPlayer2Controller->stickX * 250.f), 4);
+    approach_s16_asymptotic_bool(&sCreditsPlayer2Yaw,   -(s16)(gPlayer2Controller->stickX * 250.f), 4);
     approach_s16_asymptotic_bool(&sCreditsPlayer2Pitch, -(s16)(gPlayer2Controller->stickY * 265.f), 4);
     vec3f_get_dist_and_angle(c->pos, c->focus, &distCamToFocus, &pitch, &yaw);
 
@@ -10911,8 +10911,7 @@ void set_fov_29(UNUSED struct MarioState *m) {
 }
 
 void zoom_fov_30(UNUSED struct MarioState *m) {
-    // Pretty sure approach_f32_asymptotic_bool would do a much nicer job here, but you do you,
-    // Nintendo.
+    // Pretty sure approach_f32_asymptotic_bool would do a much nicer job here, but you do you, Nintendo.
     camera_approach_f32_symmetric_bool(&sFOVState.fov, 30.f, (30.f - sFOVState.fov) / 60.f);
 }
 

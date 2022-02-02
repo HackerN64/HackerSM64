@@ -164,9 +164,7 @@ ALIGNED16 struct GraphNodeObject      *gCurGraphNodeObject     = NULL;
 ALIGNED16 struct GraphNodeHeldObject  *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
 
-#ifdef F3DEX_GBI_2
 LookAt lookAt;
-#endif
 
 #if SILHOUETTE
 // AA_EN        Enable anti aliasing (not actually used for AA in this case).
@@ -286,17 +284,12 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
 
-#ifdef F3DEX_GBI_2
-    // @bug This is where the LookAt values should be calculated but aren't.
-    // As a result, environment mapping is broken on Fast3DEX2 without the
-    // changes below.
     Mtx lMtx;
- #ifdef FIX_REFLECT_MTX
+#ifdef FIX_REFLECT_MTX
     guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 0.0f, -1.0f, 0.0f /* up */);
- #else
+#else
     guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 1.0f, 0.0f, 0.0f /* up */);
- #endif
-#endif // F3DEX_GBI_2
+#endif
 
     Gfx* dlHead = gDisplayListHead;
 
@@ -384,6 +377,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
     }
     if (gVisualSurfaceView) {
+        // Renders twice, once as decal and once as non-decal.
         visual_surface_loop(FALSE);
         visual_surface_loop(TRUE);
     }
@@ -397,9 +391,9 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
  */
 void geo_append_display_list(void *displayList, s32 layer) {
     s32 ucode = GRAPH_NODE_UCODE_DEFAULT;
-#ifdef F3DEX_GBI_2
+
     gSPLookAt(gDisplayListHead++, &lookAt);
-#endif
+
 #if defined(OBJECTS_REJ) || SILHOUETTE
     if (gCurGraphNodeObject != NULL) {
  #ifdef OBJECTS_REJ
@@ -420,7 +414,7 @@ void geo_append_display_list(void *displayList, s32 layer) {
         }
  #endif // SILHOUETTE
     }
-#endif // F3DEX_GBI_2 || SILHOUETTE
+#endif // OBJECTS_REJ || SILHOUETTE
     if (gCurGraphNodeMasterList != NULL) {
         struct DisplayListNode *listNode =
             alloc_only_pool_alloc(gDisplayListHeap, sizeof(struct DisplayListNode));
@@ -1122,9 +1116,7 @@ void geo_process_object_parent(struct GraphNodeObjectParent *node) {
 void geo_process_held_object(struct GraphNodeHeldObject *node) {
     Vec3f translation;
 
-#ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);
-#endif
 
     if (node->fnNode.func != NULL) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);
