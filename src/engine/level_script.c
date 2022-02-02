@@ -881,7 +881,10 @@ static void level_cmd_puppylight_node(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
-static void (*LevelScriptJumpTable[])(void) = {
+typedef void (*LevelCommandFunc)(void);
+
+// See enum 'LevelCommands' in 'level_commands.h'.
+LevelCommandFunc LevelScriptJumpTable[] = {
     /*LEVEL_CMD_LOAD_AND_EXECUTE            */ level_cmd_load_and_execute,
     /*LEVEL_CMD_EXIT_AND_EXECUTE            */ level_cmd_exit_and_execute,
     /*LEVEL_CMD_EXIT                        */ level_cmd_exit,
