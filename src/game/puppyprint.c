@@ -444,7 +444,7 @@ void append_puppyprint_log(const char *str, ...) {
         return;
     }
 #ifdef UNF
-    osSyncPrintf(textBytes);
+    osSyncPrintf("%s\n", textBytes);
 #endif
     for (i = 0; i < (LOG_BUFFER_SIZE - 1); i++) {
         memcpy(consoleLogTable[i], consoleLogTable[i + 1], 255);
