@@ -626,12 +626,12 @@ void geo_call_global_function_nodes_helper(struct GraphNode *graphNode, s32 call
         }
 
         if (curNode->children != NULL) {
-            switch (curNode->type) {
-                case GRAPH_NODE_TYPE_MASTER_LIST:
-                    globalPtr = (struct GraphNode **) &gCurGraphNodeMasterList;
-                    break;
+            switch (type) {
                 case GRAPH_NODE_TYPE_PERSPECTIVE:
                     globalPtr = (struct GraphNode **) &gCurGraphNodeCamFrustum;
+                    break;
+                case GRAPH_NODE_TYPE_MASTER_LIST:
+                    globalPtr = (struct GraphNode **) &gCurGraphNodeMasterList;
                     break;
                 case GRAPH_NODE_TYPE_CAMERA:
                     globalPtr = (struct GraphNode **) &gCurGraphNodeCamera;
@@ -699,10 +699,8 @@ void geo_obj_init(struct GraphNodeObject *graphNode, void *sharedChild, Vec3f po
     graphNode->throwMatrix = NULL;
     graphNode->animInfo.curAnim = NULL;
 
-    graphNode->node.flags |=  GRAPH_RENDER_ACTIVE;
-    graphNode->node.flags &= ~GRAPH_RENDER_INVISIBLE;
-    graphNode->node.flags |=  GRAPH_RENDER_HAS_ANIMATION;
-    graphNode->node.flags &= ~GRAPH_RENDER_BILLBOARD;
+    graphNode->node.flags |= (GRAPH_RENDER_ACTIVE | GRAPH_RENDER_HAS_ANIMATION);
+    graphNode->node.flags &= ~(GRAPH_RENDER_INVISIBLE | GRAPH_RENDER_BILLBOARD);
 }
 
 /**
@@ -721,10 +719,8 @@ void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo 
     graphNode->throwMatrix = NULL;
     graphNode->animInfo.curAnim = 0;
 
-    graphNode->node.flags |= GRAPH_RENDER_ACTIVE;
-    graphNode->node.flags &= ~GRAPH_RENDER_INVISIBLE;
-    graphNode->node.flags |= GRAPH_RENDER_HAS_ANIMATION;
-    graphNode->node.flags &= ~GRAPH_RENDER_BILLBOARD;
+    graphNode->node.flags |= (GRAPH_RENDER_ACTIVE | GRAPH_RENDER_HAS_ANIMATION);
+    graphNode->node.flags &= ~(GRAPH_RENDER_INVISIBLE | GRAPH_RENDER_BILLBOARD);
 }
 
 /**
