@@ -744,15 +744,14 @@ extern u8 _gd_dynlistsSegmentRomStart[];
 extern u8 _gd_dynlistsSegmentRomEnd[];
 
 // forward declarations
-u32 new_gddl_from(Gfx *, s32);
-void gd_setup_cursor(struct ObjGroup *);
+u32 new_gddl_from(Gfx *dl, s32 arg1);
+void gd_setup_cursor(struct ObjGroup *parentgrp);
 void parse_p1_controller(void);
 void update_cursor(void);
-void update_view_and_dl(struct ObjView *);
+void update_view_and_dl(struct ObjView *view);
 static void update_render_mode(void);
-void gddl_is_loading_shine_dl(s32);
-void func_801A3370(f32, f32, f32);
-void gd_put_sprite(u16 *, s32, s32, s32, s32);
+void gddl_is_loading_shine_dl(s32 dlLoad);
+void gd_put_sprite(u16 *sprite, s32 x, s32 y, s32 wx, s32 wy);
 void reset_cur_dl_indices(void);
 
 // TODO: make a gddl_num_t?
@@ -862,13 +861,6 @@ f64 gd_sqrt_d(f64 x) {
 #if defined(ISVPRINT) || defined(UNF)
 #define stubbed_printf osSyncPrintf
 #else
-/**
- * Unused
- */
-f64 stub_renderer_1(UNUSED f64 x) {
-    return 0.0;
-}
-
 /* 249BCC -> 24A19C */
 void gd_printf(const char *format, ...) {
     s32 i;
@@ -1187,10 +1179,6 @@ void gdm_setup(void) {
     reset_cur_dl_indices();
     setup_stars();
     imout();
-}
-
-/* 24AC18 -> 24AC2C */
-void stub_renderer_2(UNUSED u32 a0) {
 }
 
 /* 24AC2C -> 24AC80; not called; orig name: Unknown8019C45C */
@@ -2320,11 +2308,6 @@ void gd_set_one_cycle(void) {
     update_render_mode();
 }
 
-/* 250B30 -> 250B44 */
-void stub_renderer_3(void) {
-    UNUSED u8 filler[16];
-}
-
 /* 250B44 -> 250B58 */
 void gddl_is_loading_stub_dl(UNUSED s32 dlLoad) {
 }
@@ -2511,16 +2494,6 @@ void parse_p1_controller(void) {
     }
 }
 
-UNUSED void stub_renderer_4(f32 arg0) {
-    return;
-
-    // dead code
-    if (D_801BD768.x * D_801A86CC.x + arg0 * 2.0f > 160.0f) {
-        func_801A3370(D_801BD758.x - D_801BD768.x, -20.0f, 0.0f);
-        D_801BD768.x = D_801BD758.x;
-    }
-}
-
 /**
  * Unused
  */
@@ -2539,7 +2512,7 @@ void func_801A3324(f32 x, f32 y, f32 z) {
 }
 
 /* 251B40 -> 251BC8 */
-void func_801A3370(f32 x, f32 y, f32 z) {
+UNUSED void func_801A3370(f32 x, f32 y, f32 z) {
     gd_dl_mul_trans_matrix(x, y, z);
     D_801BD768.x += x;
     D_801BD768.y += y;
@@ -2685,10 +2658,6 @@ void gd_setproperty(enum GdProperty prop, f32 f1, f32 f2, f32 f3) {
     }
 }
 
-/* 2522B0 -> 2522C0 */
-void stub_renderer_5(void) {
-}
-
 /* 2522C0 -> 25245C */
 void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
     uintptr_t orthoMtx;
@@ -2808,10 +2777,6 @@ void gd_init_controllers(void) {
     for (i = 0; i < sizeof(OSContPad); i++) {
         ((u8 *) p1cont)[i] = 0;
     }
-}
-
-/* 252BAC -> 252BC0 */
-void stub_renderer_6(UNUSED struct GdObj *obj) {
 }
 
 /**
@@ -2934,13 +2899,6 @@ void Unknown801A47B8(struct ObjView *v) {
     }
 }
 
-void stub_renderer_7(void) {
-}
-
-/* 252FC4 -> 252FD8 */
-void stub_renderer_8(UNUSED u32 arg0) {
-}
-
 /**
  * Unused - called by func_801A520C and Unknown801A5344
  */
@@ -2962,16 +2920,6 @@ void func_801A4848(s32 linkDl) {
     sCurrentGdDl = curDl;
 }
 
-/**
- * Unused - called by func_801A520C and Unknown801A5344
- */
-void stub_renderer_9(void) {
-}
-
-/* 253094 -> 2530A8 */
-void stub_renderer_10(UNUSED u32 arg0) {
-}
-
 /* 2530A8 -> 2530C0 */
 void stub_draw_label_text(UNUSED char *s) {
     UNUSED u8 filler1[4];
@@ -2982,9 +2930,6 @@ void stub_draw_label_text(UNUSED char *s) {
 /* 2530C0 -> 2530D8; orig name: func_801A48F0 */
 void set_active_view(struct ObjView *v) {
     sActiveView = v;
-}
-
-void stub_renderer_11(void) {
 }
 
 /**
@@ -3141,7 +3086,6 @@ void func_801A520C(void) {
 
     start_timer("1frame");
     start_timer("cpu");
-    // stub_renderer_9();
     reset_cur_dl_indices();
     parse_p1_controller();
     setup_timers();
@@ -3179,7 +3123,6 @@ UNUSED void Unknown801A5344(void) {
     gd_set_one_cycle();
     gd_enddlsplist_parent();
     func_801A4848(sScreenView->gdDlNum);
-    // stub_renderer_9();
     // func_801A4808();
     sScreenView->gdDlNum = 0;
 }
@@ -3290,18 +3233,6 @@ void reverse_string(char *str, s32 len) {
     }
 }
 
-/* 254168 -> 25417C */
-void stub_renderer_12(UNUSED s8 *arg0) {
-}
-
-/* 25417C -> 254190 */
-void stub_renderer_13(UNUSED void *arg0) {
-}
-
-/* 254190 -> 2541A4 */
-void stub_renderer_14(UNUSED s8 *arg0) {
-}
-
 /**
  * Initializes the pick buffer. This functions like the `pick` or `gselect`
  * functions from IRIS GL.
@@ -3330,18 +3261,6 @@ void store_in_pickbuf(s16 data) {
 ** (datasize is always 2) */
 s32 get_cur_pickbuf_offset(UNUSED s16 *arg0) {
     return sPickBufPosition / 3;
-}
-
-/* 254250 -> 254264 */
-void stub_renderer_15(UNUSED u32 arg0) {
-}
-
-/* 254264 -> 254278 */
-void stub_renderer_16(UNUSED u32 arg0) {
-}
-
-/* 254278 -> 254288 */
-void stub_renderer_17(void) {
 }
 
 /* 254288 -> 2542B0 */
@@ -3703,14 +3622,6 @@ void make_timer_gadgets(void) {
     return;
 }
 
-/* 255600 -> 255614 */
-void stub_renderer_18(UNUSED u32 a0) {
-}
-
-/* 255614 -> 255628 */
-void stub_renderer_19(UNUSED u32 a0) {
-}
-
 #ifndef NO_SEGMENTED_MEMORY
 /**
  * Copies `size` bytes of data from ROM address `romAddr` to RAM address `vAddr`.
@@ -3814,12 +3725,6 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
 /**
  * Unused (not called)
  */
-UNUSED void stub_renderer_20(UNUSED u32 a0) {
-}
-
-/**
- * Unused (not called)
- */
 void func_801A71CC(struct ObjNet *net) {
     s32 i; // spB4
     s32 j; // spB0
@@ -3913,8 +3818,4 @@ void func_801A71CC(struct ObjNet *net) {
             fatal_printf("plane not in any zones\n");
         }
     }
-}
-
-/* 255EB0 -> 255EC0 */
-UNUSED void stub_renderer_21(void) {
 }
