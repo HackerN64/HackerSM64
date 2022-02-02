@@ -4967,8 +4967,8 @@ s32 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
     if (sModeTransition.framesLeft > 0) {
         vec3f_get_dist_and_angle(curFoc, curPos, &goalDist, &goalPitch, &goalYaw);
         distVelocity = absf(goalDist - sModeTransition.posDist) / distTimer;
-        pitchVelocity = absf(goalPitch - sModeTransition.posPitch) / angleTimer;
-        yawVelocity = absf(goalYaw - sModeTransition.posYaw) / angleTimer;
+        pitchVelocity = absi(goalPitch - sModeTransition.posPitch) / angleTimer;
+        yawVelocity = absi(goalYaw - sModeTransition.posYaw) / angleTimer;
 
         camera_approach_f32_symmetric_bool(&sModeTransition.posDist, goalDist, distVelocity);
         camera_approach_s16_symmetric_bool(&sModeTransition.posYaw, goalYaw, yawVelocity);
