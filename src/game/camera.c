@@ -6750,19 +6750,8 @@ void player2_rotate_cam(struct Camera *c, s16 minPitch, s16 maxPitch, s16 minYaw
         minPitch = pitchCap;
     }
 
-    if (sCreditsPlayer2Pitch > maxPitch) {
-        sCreditsPlayer2Pitch = maxPitch;
-    }
-    if (sCreditsPlayer2Pitch < minPitch) {
-        sCreditsPlayer2Pitch = minPitch;
-    }
-
-    if (sCreditsPlayer2Yaw > maxYaw) {
-        sCreditsPlayer2Yaw = maxYaw;
-    }
-    if (sCreditsPlayer2Yaw < minYaw) {
-        sCreditsPlayer2Yaw = minYaw;
-    }
+    sCreditsPlayer2Pitch = CLAMP(sCreditsPlayer2Pitch, minPitch, maxPitch);
+    sCreditsPlayer2Yaw = CLAMP(sCreditsPlayer2Yaw, minYaw, maxYaw);
 
     pitch += sCreditsPlayer2Pitch;
     yaw += sCreditsPlayer2Yaw;
