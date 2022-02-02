@@ -336,17 +336,22 @@ void raycast_collision_walls(Vec3f pos, Vec3f intendedPos, f32 yOffset) {
  **************************************************/
 
 void add_ceil_margin(s32 *x, s32 *z, Vec3s target1, Vec3s target2, f32 margin) {
-    register f32 diff_x = (target1[0] - *x) + (target2[0] - *x);
-    register f32 diff_z = (target1[2] - *z) + (target2[2] - *z);
-    register f32 invDenom = margin / sqrtf(sqr(diff_x) + sqr(diff_z));
+    f32 dx = ((target1[0] - *x) + (target2[0] - *x));
+    f32 dz = ((target1[2] - *z) + (target2[2] - *z));
+    f32 invDenom = (sqr(dx) + sqr(dz));
 
-    *x += diff_x * invDenom;
-    *z += diff_z * invDenom;
+    if (FLT_IS_NONZERO(invDenom)) {
+        invDenom = (margin / sqrtf(invDenom));
+
+        *x += (dx * invDenom);
+        *z += (dz * invDenom);
+    }
 }
 
 static s32 check_within_ceil_triangle_bounds(s32 x, s32 z, struct Surface *surf, f32 margin) {
-    s32 addMargin = surf->type != SURFACE_HANGABLE && !FLT_IS_NONZERO(margin);
+    s32 addMargin = (FLT_IS_NONZERO(margin) && (surf->type != SURFACE_HANGABLE));
     Vec3i vx, vz;
+
     vx[0] = surf->vertex1[0];
     vz[0] = surf->vertex1[2];
     if (addMargin) add_ceil_margin(&vx[0], &vz[0], surf->vertex2, surf->vertex3, margin);
