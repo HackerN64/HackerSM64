@@ -99,8 +99,8 @@ void setup_mesg_queues(void) {
     osCreateMesgQueue(&gIntrMesgQueue, gIntrMesgBuf, ARRAY_COUNT(gIntrMesgBuf));
     osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
 
-    osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
-    osSetEventMesg(OS_EVENT_DP, &gIntrMesgQueue, (OSMesg) MESG_DP_COMPLETE);
+    osSetEventMesg(OS_EVENT_SP,     &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
+    osSetEventMesg(OS_EVENT_DP,     &gIntrMesgQueue, (OSMesg) MESG_DP_COMPLETE);
     osSetEventMesg(OS_EVENT_PRENMI, &gIntrMesgQueue, (OSMesg) MESG_NMI_REQUEST);
 }
 
@@ -142,10 +142,10 @@ void receive_new_tasks(void) {
     while (osRecvMesg(&gSPTaskMesgQueue, (OSMesg *) &spTask, OS_MESG_NOBLOCK) != -1) {
         spTask->state = SPTASK_STATE_NOT_STARTED;
         switch (spTask->task.t.type) {
-            case 2:
+            case M_AUDTASK:
                 sNextAudioSPTask = spTask;
                 break;
-            case 1:
+            case M_GFXTASK:
                 sNextDisplaySPTask = spTask;
                 break;
         }
@@ -407,10 +407,10 @@ void turn_off_audio(void) {
 }
 
 void change_vi(OSViMode *mode, int width, int height){
-    mode->comRegs.width  = width;
+    mode->comRegs.width = width;
     mode->comRegs.xScale = ((width * 512) / 320);
     if (height > 240) {
-        mode->comRegs.ctrl     |= 0x40;
+        mode->comRegs.ctrl |= 0x40;
         mode->fldRegs[0].origin = (width * 2);
         mode->fldRegs[1].origin = (width * 4);
         mode->fldRegs[0].yScale = (0x2000000 | ((height * 1024) / 240));
@@ -486,7 +486,7 @@ extern u32 gISVFlag;
 
 void osInitialize_fakeisv() {
     /* global flag to skip `__checkHardware_isv` from being called. */
-    gISVFlag = 0x49533634;  // 'IS64'
+    gISVFlag = 0x49533634; // 'IS64'
 
     /* printf writes go to this address, cen64(1) has this hardcoded. */
     gISVDbgPrnAdrs = 0x13FF0000;
