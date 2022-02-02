@@ -301,12 +301,12 @@ void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
     load_engine_code_segment();
-#ifndef UNF
-    crash_screen_init();
-#endif
 
+    // Only one crash handler can be used at a time.
 #ifdef UNF
     debug_initialize();
+#else
+    crash_screen_init();
 #endif
 
 #ifdef DEBUG
