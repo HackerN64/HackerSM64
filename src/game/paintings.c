@@ -276,35 +276,6 @@ void painting_update_ripple_state(struct Painting *painting) {
 }
 
 /**
- * @return the ripple function at posX, posY
- * note that posX and posY correspond to a point on the face of the painting, not actual axes
- */
-s32 calculate_ripple_at_point(struct Object *obj, f32 dx, f32 dy) {
-    /// Controls the peaks of the ripple.
-    f32 rippleMag = obj->oPaintingCurrRippleMag;
-    /// Controls the ripple's frequency
-    f32 rippleRate = obj->oPaintingCurrRippleRate;
-    /// Controls how fast the ripple spreads
-    f32 dispersionFactor = obj->oPaintingDispersionFactor;
-    /// How far the ripple has spread
-    f32 rippleTimer = obj->oPaintingRippleTimer;
-
-    f32 distanceToOrigin = sqrtf(sqr(dx) + sqr(dy));
-    // A larger dispersionFactor makes the ripple spread slower
-    f32 rippleDistance = (distanceToOrigin / dispersionFactor);
-
-    if (rippleTimer < rippleDistance) {
-        // if the ripple hasn't reached the point yet, make the point magnitude 0
-        return 0;
-    } else {
-        // use a cosine wave to make the ripple go up and down,
-        // scaled by the painting's ripple magnitude
-        // round it to an int and return it
-        return roundf(rippleMag * coss((s16)((rippleRate * (rippleTimer - rippleDistance)) * 0x10000)));
-    }
-}
-
-/**
  * Allocates and generates a mesh for the rippling painting effect by modifying the passed in `mesh`
  * based on the painting's current ripple state.
  *
@@ -329,6 +300,17 @@ void painting_generate_mesh(struct Painting *painting, PaintingData *mesh, Paint
 
     gPaintingMesh = mem_pool_alloc(gEffectsMemoryPool, (numTris * sizeof(struct PaintingMeshVertex)));
 
+    struct PaintingMeshVertex *paintingMesh = gPaintingMesh;
+
+    /// Controls the peaks of the ripple.
+    f32 rippleMag = obj->oPaintingCurrRippleMag;
+    /// Controls the ripple's frequency
+    f32 rippleRate = obj->oPaintingCurrRippleRate;
+    /// Controls how fast the ripple spreads
+    f32 dispersionFactor = obj->oPaintingDispersionFactor;
+    /// How far the ripple has spread
+    f32 rippleTimer = obj->oPaintingRippleTimer;
+
     /// x and y ripple origin
     f32 rippleX = obj->oPaintingRippleX;
     f32 rippleY = obj->oPaintingRippleY;
@@ -339,16 +321,32 @@ void painting_generate_mesh(struct Painting *painting, PaintingData *mesh, Paint
     // accesses are off by 1 since the first entry is the number of vertices
     for (i = 0; i < numTris; i++) {
         tri = (i * 3);
-        gPaintingMesh[i].pos[0] = mesh[tri + 1];
-        gPaintingMesh[i].pos[1] = mesh[tri + 2];
+        paintingMesh->pos[0] = mesh[tri + 1];
+        paintingMesh->pos[1] = mesh[tri + 2];
         // The "z coordinate" of each vertex in the mesh is either 1 or 0. Instead of being an
         // actual coordinate, it just determines whether the vertex moves
         if (mesh[tri + 3]) {
-            gPaintingMesh[i].pos[2] = calculate_ripple_at_point(obj, ((gPaintingMesh[i].pos[0] * sizeRatioX) - rippleX),
-                                                                     ((gPaintingMesh[i].pos[1] * sizeRatioY) - rippleY));
+            // Calculate the ripple magnitude at the given point
+            f32 dx = ((paintingMesh->pos[0] * sizeRatioX) - rippleX);
+            f32 dy = ((paintingMesh->pos[1] * sizeRatioY) - rippleY);
+            f32 distanceToOrigin = sqrtf(sqr(dx) + sqr(dy));
+            // A larger dispersionFactor makes the ripple spread slower
+            f32 rippleDistance = (distanceToOrigin / dispersionFactor);
+
+            if (rippleTimer < rippleDistance) {
+                // If the ripple hasn't reached the point yet, make the point magnitude 0
+                paintingMesh->pos[2] = 0;
+            } else {
+                // Use a cosine wave to make the ripple go up and down,
+                // scaled by the painting's ripple magnitude,
+                // round it to an int and return it.
+                paintingMesh->pos[2] = roundf(rippleMag * coss((s16)((rippleRate * (rippleTimer - rippleDistance)) * 0x10000)));
+            }
         } else {
-            gPaintingMesh[i].pos[2] = 0;
+            paintingMesh->pos[2] = 0;
         }
+
+        paintingMesh++;
     }
 }
 
