@@ -150,7 +150,11 @@ void yoshi_finish_jumping_and_despawn_loop(void) {
 void yoshi_give_present_loop(void) {
     s32 globalTimer = gGlobalTimer;
 
+#ifdef DISABLE_LIVES
+    if (TRUE) {
+#else
     if (gHudDisplay.lives == 100) {
+#endif
 #ifdef SAVE_NUM_LIVES
         save_file_set_num_lives(gMarioState->numLives);
 #endif
