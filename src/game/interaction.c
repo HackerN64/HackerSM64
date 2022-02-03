@@ -130,7 +130,7 @@ u32 get_mario_cap_flag(struct Object *capObject) {
         return MARIO_VANISH_CAP;
     }
 
-    return 0;
+    return MARIO_NONE;
 }
 
 /**
@@ -144,11 +144,7 @@ u32 object_facing_mario(struct MarioState *m, struct Object *obj, s16 angleRange
     s16 angleToMario = atan2s(dz, dx);
     s16 dAngle = angleToMario - obj->oMoveAngleYaw;
 
-    if (-angleRange <= dAngle && dAngle <= angleRange) {
-        return TRUE;
-    }
-
-    return FALSE;
+    return (-angleRange <= dAngle && dAngle <= angleRange);
 }
 
 s16 mario_obj_angle_to_object(struct MarioState *m, struct Object *obj) {
@@ -1583,7 +1579,7 @@ u32 interact_cap(struct MarioState *m, UNUSED u32 interactType, struct Object *o
     u16 capMusic = 0;
     u16 capTime = 0;
 
-    if (m->action != ACT_GETTING_BLOWN && capFlag != 0) {
+    if (m->action != ACT_GETTING_BLOWN && capFlag != MARIO_NONE) {
         m->interactObj = obj;
         obj->oInteractStatus = INT_STATUS_INTERACTED;
 
@@ -1591,9 +1587,9 @@ u32 interact_cap(struct MarioState *m, UNUSED u32 interactType, struct Object *o
         m->flags |= capFlag;
 
         switch (capFlag) {
-            case MARIO_VANISH_CAP: capTime =  600; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP  ); break;
-            case MARIO_METAL_CAP:  capTime =  600; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_METAL_CAP); break;
-            case MARIO_WING_CAP:   capTime = 1800; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP  ); break;
+            case MARIO_VANISH_CAP: capTime = VANISH_CAP_TIME; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP  ); break;
+            case MARIO_METAL_CAP:  capTime =  METAL_CAP_TIME; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_METAL_CAP); break;
+            case MARIO_WING_CAP:   capTime =   WING_CAP_TIME; capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP  ); break;
         }
 
         if (m->capTimer < capTime) {

@@ -1706,11 +1706,12 @@ UNUSED static void debug_update_mario_cap(u16 button, s32 flags, u16 capTimer, u
     // This checks for Z_TRIG instead of Z_DOWN flag
     // (which is also what other debug functions do),
     // so likely debug behavior rather than unused behavior.
-    if ((gPlayer1Controller->buttonDown & Z_TRIG) && (gPlayer1Controller->buttonPressed & button)
-        && !(gMarioState->flags & flags)) {
+    if ((gPlayer1Controller->buttonDown & Z_TRIG)
+     && (gPlayer1Controller->buttonPressed & button)
+     && !(gMarioState->flags & flags)) {
         gMarioState->flags |= (flags + MARIO_CAP_ON_HEAD);
 
-        if (capTimer > gMarioState->capTimer) {
+        if (gMarioState->capTimer < capTimer) {
             gMarioState->capTimer = capTimer;
         }
 

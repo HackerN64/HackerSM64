@@ -4,6 +4,13 @@
  * SPECIFIC OBJECT SETTINGS *
  ****************************/
 
+// -- MARIO'S CAP --
+
+// The time each type of cap power-up lasts
+#define VANISH_CAP_TIME  600
+#define  METAL_CAP_TIME  600
+#define   WING_CAP_TIME 1800
+
 // -- COIN --
 
 // The distance from Mario at which coin formations spawn their coins. Vanilla is 2000.0f.
