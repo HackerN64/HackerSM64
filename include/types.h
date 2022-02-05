@@ -8,9 +8,9 @@
 #include "macros.h"
 #include "config.h"
 
-#define BIT(i)  (1 << (i))
-#define BITMASK(size) ((BIT(size)) - 1)
-#define SHIFTED_BITMASK(size, shift) (BITMASK(size) << shift)
+#define BIT(i)                          (1 << (i))
+#define BITMASK(size)                   ((BIT(size)) - 1)
+#define SHIFTED_BITMASK(size, shift)    (BITMASK(size) << shift)
 
 // #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
 #define COND_BIT(cond, dst, flag) { \
@@ -48,13 +48,11 @@ struct Controller {
 };
 
 // -- Booleans --
-
 typedef u8  Bool8;
 typedef u16 Bool16;
 typedef u32 Bool32;
 
 // -- Vectors --
-
 typedef u8 Vec2uc[2];
 typedef s8  Vec2c[2];
 typedef s16 Vec2s[2];
@@ -150,11 +148,9 @@ typedef u8    CI4;             // u4
 typedef u8    CI8;
 typedef Color Texture;
 typedef u32   Texture32;
-
 typedef s16   TextureCoord;
 
 // -- Models --
-
 typedef u8  ModelID8;
 typedef u16 ModelID16;
 typedef u32 ModelID32;
@@ -169,7 +165,6 @@ typedef s32 AnimFrame32;
 typedef s32 AnimAccel;
 
 // -- Misc. Data --
-
 typedef s16 DialogID16;
 typedef s32 DialogID;
 typedef s32 DrawingLayer;
@@ -180,7 +175,11 @@ typedef s16 MacroObject;
 typedef s16 Trajectory;
 typedef u8  CutsceneID;
 
-typedef u8 uchar;
+// -- Unsigned Types --
+typedef u64 ulonglong;
+typedef u32 uint;
+typedef u16 ushort;
+typedef u8  uchar;
 
 enum SpTaskState {
     SPTASK_STATE_NOT_STARTED,
