@@ -293,13 +293,15 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     for (phaseIndex = RENDER_PHASE_FIRST; phaseIndex < RENDER_PHASE_END; phaseIndex++) {
         // Get the render phase information.
         renderPhase = &sRenderPhases[phaseIndex];
-        startLayer  = renderPhase->startLayer;
-        endLayer    = renderPhase->endLayer;
+        startLayer = renderPhase->startLayer;
+        endLayer   = renderPhase->endLayer;
 #ifdef OBJECTS_REJ
-        ucode       = renderPhase->ucode;
-        // Set the ucode for the current render phase
-        switch_ucode(dlHead, ucode);
-        gSPLookAt(dlHead++, &lookAt);
+        if (ucode != renderPhase->ucode) {
+            ucode = renderPhase->ucode;
+            // Set the ucode for the current render phase
+            switch_ucode(dlHead, ucode);
+            gSPLookAt(dlHead++, &lookAt);
+        }
 #endif
         if (enableZBuffer) {
             // Enable z buffer.
