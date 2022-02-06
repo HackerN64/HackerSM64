@@ -1642,57 +1642,6 @@ void find_surface_on_ray_between_points(Vec3f pos1, Vec3f pos2, struct Surface *
     find_surface_on_ray(pos1, dir, hit_surface, hit_pos, flags);
 }
 
-// Constructs a float in registers, which can be faster than gcc's default of loading a float from rodata.
-// Especially fast for halfword floats, which get loaded with a `lui` + `mtc1`.
-static ALWAYS_INLINE float construct_float(const float f) {
-    u32 r;
-    float f_out;
-    u32 i = *(u32*)(&f);
-
-    if (!__builtin_constant_p(i)) {
-        return *(float*)(&i);
-    }
-
-    u32 upper = (i >> 16);
-    u32 lower = (i >>  0) & 0xFFFF;
-
-    if ((i & 0xFFFF) == 0) {
-        __asm__ ("lui %0, %1"
-                                : "=r"(r)
-                                : "K"(upper));
-    } else if ((i & 0xFFFF0000) == 0) {
-        __asm__ ("addiu %0, $0, %1"
-                                : "+r"(r)
-                                : "K"(lower));
-    } else {
-        __asm__ ("lui %0, %1"
-                                : "=r"(r)
-                                : "K"(upper));
-        __asm__ ("addiu %0, %0, %1"
-                                : "+r"(r)
-                                : "K"(lower));
-    }
-
-    __asm__ ("mtc1 %1, %0"
-                         : "=f"(f_out)
-                         : "r"(r));
-    return f_out;
-}
-
-static ALWAYS_INLINE float mul_without_nop(float a, float b) {
-    float ret;
-    __asm__ ("mul.s %0, %1, %2"
-                         : "=f"(ret)
-                         : "f"(a), "f"(b));
-    return ret;
-}
-
-static ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
-    __asm__ ("swl %1, %2(%0)"
-                        :
-                        : "g"(addr), "g"(val), "I"(offset));
-}
-
 // Converts a floating point matrix to a fixed point matrix
 // Makes some assumptions about certain fields in the matrix, which will always be true for valid matrices.
 __attribute__((optimize("Os"))) __attribute__((aligned(32)))

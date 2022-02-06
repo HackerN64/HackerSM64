@@ -496,6 +496,67 @@ ALWAYS_INLINE s32 abss(s16 in) {
 #define absf_2 absf
 
 
+/// Constructs a float in registers, which can be faster than gcc's default of loading a float from rodata.
+/// Especially fast for halfword floats, which get loaded with a `lui` + `mtc1`.
+ALWAYS_INLINE float construct_float(const float f) {
+    u32 r;
+    float f_out;
+    u32 i = *(u32*)(&f);
+
+    if (!__builtin_constant_p(i)) {
+        return *(float*)(&i);
+    }
+
+    u32 upper = (i >> 16);
+    u32 lower = (i >>  0) & 0xFFFF;
+
+    if ((i & 0xFFFF) == 0) {
+        __asm__ ("lui %0, %1"
+                                : "=r"(r)
+                                : "K"(upper));
+    } else if ((i & 0xFFFF0000) == 0) {
+        __asm__ ("addiu %0, $0, %1"
+                                : "+r"(r)
+                                : "K"(lower));
+    } else {
+        __asm__ ("lui %0, %1"
+                                : "=r"(r)
+                                : "K"(upper));
+        __asm__ ("addiu %0, %0, %1"
+                                : "+r"(r)
+                                : "K"(lower));
+    }
+
+    __asm__ ("mtc1 %1, %0"
+                         : "=f"(f_out)
+                         : "r"(r));
+    return f_out;
+}
+
+/// Multiply two floats without a nop.
+ALWAYS_INLINE float mul_without_nop(float a, float b) {
+    float ret;
+    __asm__ ("mul.s %0, %1, %2"
+                         : "=f"(ret)
+                         : "f"(a), "f"(b));
+    return ret;
+}
+
+/// Write a 32 bit value into the low order bytes of a register.
+ALWAYS_INLINE void swr(void* addr, s32 val, const int offset) {
+    __asm__ ("swr %1, %2(%0)"
+                        :
+                        : "g"(addr), "g"(val), "I"(offset));
+}
+
+/// Write a 32 bit value into the high order bytes of a register.
+ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
+    __asm__ ("swl %1, %2(%0)"
+                        :
+                        : "g"(addr), "g"(val), "I"(offset));
+}
+
+
 // On console, (x != 0) still returns true for denormalized floats,
 // which will count as a division by zero when divided and crash.
 // For console compatibility, use this check instead when avoiding a division by zero.
