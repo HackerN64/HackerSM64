@@ -31,6 +31,7 @@ enum AnimType {
 #define IS_LAYER_ZB(    layer) (((layer) >= LAYER_ZB_FIRST    ) || ((layer) <= LAYER_ZB_LAST))
 #define IS_LAYER_NON_ZB(layer) (((layer) >= LAYER_NON_ZB_FIRST) || ((layer) <= LAYER_LAST   ))
 
+// Index names for sRenderPhases:
 #ifdef OBJECTS_REJ
  #if SILHOUETTE
     // Silhouette, .rej
