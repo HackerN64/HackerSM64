@@ -6296,7 +6296,7 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
                     status = 1;
                     wall = colData.walls[colData.numWalls - 1];
                     // wallYaw is parallel to the wall, not perpendicular
-                    wallYaw = SURFACE_YAW(wall) + DEGREES(90);
+                    wallYaw = get_surface_yaw(wall) + DEGREES(90);
                     // Calculate the avoid direction. The function returns the opposite direction so add 180
                     // degrees.
                     *avoidYaw = calc_avoid_yaw(yawFromMario, wallYaw) + DEGREES(180);
@@ -6312,7 +6312,7 @@ s32 rotate_camera_around_walls(UNUSED struct Camera *c, Vec3f cPos, s16 *avoidYa
 
             if (find_wall_collisions(&colData) != 0) {
                 wall = colData.walls[colData.numWalls - 1];
-                horWallNorm = SURFACE_YAW(wall);
+                horWallNorm = get_surface_yaw(wall);
                 wallYaw = horWallNorm + DEGREES(90);
                 // If Mario would be blocked by the surface, then avoid it
                 if ((is_range_behind_surface(sMarioCamState->pos, cPos, wall, yawRange, SURFACE_WALL_MISC) == 0)

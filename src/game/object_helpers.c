@@ -1348,7 +1348,7 @@ static s32 cur_obj_detect_steep_floor(s16 steepAngleDegrees) {
         } else if ((intendedFloor->normal.y < coss(degrees_to_angle(steepAngleDegrees)))
                    && (deltaFloorHeight > 0)
                    && (intendedFloorHeight > o->oPosY)) {
-            o->oWallAngle = SURFACE_YAW(intendedFloor);
+            o->oWallAngle = get_surface_yaw(intendedFloor);
             return TRUE;
         } else {
             return FALSE;
@@ -1374,7 +1374,7 @@ s32 cur_obj_resolve_wall_collisions(void) {
             o->oPosZ = collisionData.z;
             struct Surface *wall = collisionData.walls[collisionData.numWalls - 1];
 
-            o->oWallAngle = SURFACE_YAW(wall);
+            o->oWallAngle = get_surface_yaw(wall);
             return (abs_angle_diff(o->oWallAngle, o->oMoveAngleYaw) > 0x4000);
         }
     }

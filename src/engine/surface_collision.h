@@ -15,8 +15,6 @@
 #define FLOOR_LOWER_LIMIT           -11000
 #define FLOOR_LOWER_LIMIT_MISC      (FLOOR_LOWER_LIMIT + 1000)
 
-#define SURFACE_YAW(s) (atan2s(((s)->normal.z), ((s)->normal.x)))
-
 enum RaycastFlags {
     RAYCAST_FIND_FLOOR = BIT(SPATIAL_PARTITION_FLOORS),
     RAYCAST_FIND_CEIL  = BIT(SPATIAL_PARTITION_CEILS),
@@ -38,6 +36,7 @@ struct WallCollisionData {
 s32 is_outside_level_bounds(s32 xPos, s32 zPos);
 s32 get_cell_coord(s32 coord);
 f32 get_surface_height_at_pos(f32 xPos, f32 zPos, struct Surface *surf);
+s32 get_surface_yaw(struct Surface *surf);
 s32 f32_find_wall_collision(f32 *xPtr, f32 *yPtr, f32 *zPtr, f32 offsetY, f32 radius);
 s32 find_wall_collisions(struct WallCollisionData *colData);
 void resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius, struct WallCollisionData *collisionData);
@@ -66,5 +65,6 @@ void debug_surface_list_info(f32 xPos, f32 zPos);
 // Backwards compatibility
 #define GET_CELL_COORD                  get_cell_coord
 #define get_surface_height_at_location  get_surface_height_at_pos
+#define SURFACE_YAW                     get_surface_yaw
 
 #endif // SURFACE_COLLISION_H

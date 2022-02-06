@@ -351,7 +351,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     }
 
     for (i = 0; i < upperWall.numWalls; i++) {
-        wallDYaw = abs_angle_diff(SURFACE_YAW(upperWall.walls[i]), m->faceAngle[1]);
+        wallDYaw = abs_angle_diff(get_surface_yaw(upperWall.walls[i]), m->faceAngle[1]);
         if (wallDYaw > oldWallDYaw) {
             oldWallDYaw = wallDYaw;
             set_mario_wall(m, upperWall.walls[i]);
@@ -493,7 +493,7 @@ s32 bonk_or_hit_lava_wall(struct MarioState *m, struct WallCollisionData *wallDa
             }
 
             // Update wall reference (bonked wall) only if the new wall has a better facing angle
-            wallDYaw = abs_angle_diff(SURFACE_YAW(wallData->walls[i]), m->faceAngle[1]);
+            wallDYaw = abs_angle_diff(get_surface_yaw(wallData->walls[i]), m->faceAngle[1]);
             if (wallDYaw > oldWallDYaw) {
                 oldWallDYaw = wallDYaw;
                 set_mario_wall(m, wallData->walls[i]);
@@ -620,7 +620,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             vec3f_copy(m->pos, ledgePos);
             set_mario_floor(m, floor, ledgePos[1]);
             m->faceAngle[0] = 0x0;
-            m->faceAngle[1] = SURFACE_YAW(grabbedWall) + 0x8000;
+            m->faceAngle[1] = get_surface_yaw(grabbedWall) + 0x8000;
             stepResult = AIR_STEP_GRABBED_LEDGE;
         } else {
             vec3f_copy(m->pos, nextPos);

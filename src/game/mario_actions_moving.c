@@ -104,7 +104,7 @@ void check_ledge_climb_down(struct MarioState *m) {
             f32 floorHeight = find_floor(wallCols.x, wallCols.y, wallCols.z, &floor);
             if (floor != NULL && (wallCols.y - floorHeight) > MARIO_HITBOX_HEIGHT) {
                 wall = wallCols.walls[wallCols.numWalls - 1];
-                s16 wallAngle = SURFACE_YAW(wall);
+                s16 wallAngle = get_surface_yaw(wall);
 
                 if (abs_angle_diff(wallAngle, m->faceAngle[1]) < 0x4000) {
                     m->pos[0] = wallCols.x - (20.0f * wall->normal.x);
@@ -151,7 +151,7 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     s16 slopeAngle = 0x0;
     f32 steepness = 0.0f;
     if (floor != NULL) {
-        slopeAngle = SURFACE_YAW(floor);
+        slopeAngle = get_surface_yaw(floor);
         steepness = sqrtf(sqr(floor->normal.x) + sqr(floor->normal.z));
     }
 

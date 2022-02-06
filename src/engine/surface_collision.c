@@ -42,6 +42,13 @@ f32 get_surface_height_at_pos(f32 xPos, f32 zPos, struct Surface *surf) {
     return -((xPos * nx) + (zPos * nz) + oo) / ny;
 }
 
+/**
+ * Gets the yaw facing angle of a surface.
+ */
+s32 get_surface_yaw(struct Surface *surf) {
+    return (s16)atan2s((surf->normal.z), (surf->normal.x));
+}
+
 /**************************************************
  *                      WALLS                     *
  **************************************************/

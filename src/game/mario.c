@@ -667,7 +667,7 @@ Bool32 set_mario_wall(struct MarioState *m, struct Surface *wall) {
     if (m->wall != wall) {
         m->wall = wall;
         if (m->wall != NULL) {
-            m->wallYaw = SURFACE_YAW(wall);
+            m->wallYaw = get_surface_yaw(wall);
         }
     }
     return (m->wall != NULL);
@@ -677,7 +677,7 @@ Bool32 set_mario_ceil(struct MarioState *m, struct Surface *ceil, f32 ceilHeight
     if (m->ceil != ceil) {
         m->ceil = ceil;
         if (m->ceil != NULL) {
-            m->ceilYaw = SURFACE_YAW(ceil);
+            m->ceilYaw = get_surface_yaw(ceil);
         }
     }
     m->ceilHeight = ceilHeight;
@@ -688,7 +688,7 @@ Bool32 set_mario_floor(struct MarioState *m, struct Surface *floor, f32 floorHei
     if (m->floor != floor) {
         m->floor = floor;
         if (m->floor != NULL) {
-            m->floorYaw = SURFACE_YAW(floor);
+            m->floorYaw = get_surface_yaw(floor);
         }
     }
     m->floorHeight = floorHeight;
@@ -1298,7 +1298,7 @@ void update_mario_geometry_inputs(struct MarioState *m) {
     m->waterLevel = find_water_level(m->pos[0], m->pos[1], m->pos[2]);
 
     if (m->floor != NULL) {
-        m->floorYaw = SURFACE_YAW(m->floor);
+        m->floorYaw = get_surface_yaw(m->floor);
         m->terrainSoundAddend = mario_get_terrain_sound_addend(m);
 
         if ((m->pos[1] > (m->waterLevel - 40)) && mario_floor_is_slippery(m)) {

@@ -991,7 +991,7 @@ void puppycam_wall_angle(void) {
     } else {
         return;
     }
-    s16 wallYaw = SURFACE_YAW(wall) + 0x4000;
+    s16 wallYaw = get_surface_yaw(wall) + 0x4000;
 
     wallYaw -= gPuppyCam.yawTarget;
     if (wallYaw % 0x4000) {
