@@ -1508,7 +1508,7 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     // Find the floor of the arena
     pos[1] = find_floor(c->areaCenX, CELL_HEIGHT_LIMIT, c->areaCenZ, &floor);
     if (floor != NULL) {
-        pos[1] = 300.0f + get_surface_height_at_location(pos[0], pos[2], floor);
+        pos[1] = 300.0f + get_surface_height_at_pos(pos[0], pos[2], floor);
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
         switch (gCurrLevelArea) {
             case AREA_BOB:

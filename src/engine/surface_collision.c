@@ -31,6 +31,17 @@ s32 get_cell_coord(s32 coord) {
     return (((coord + LEVEL_BOUNDARY_MAX) / CELL_SIZE) % NUM_CELLS);
 }
 
+/**
+ * Gets the height of a point at 'xPos' and 'zPos' coplanar to the triangle of 'surf'.
+ */
+f32 get_surface_height_at_pos(f32 xPos, f32 zPos, struct Surface *surf) {
+    f32 nx = surf->normal.x;
+    f32 ny = surf->normal.y;
+    f32 nz = surf->normal.z;
+    f32 oo = surf->originOffset;
+    return -((xPos * nx) + (zPos * nz) + oo) / ny;
+}
+
 /**************************************************
  *                      WALLS                     *
  **************************************************/
@@ -405,7 +416,7 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
         if (!check_within_ceil_triangle_bounds(x, z, surf, 1.5f)) continue;
 
         // Find the height of the ceil at the given location
-        height = get_surface_height_at_location(x, z, surf);
+        height = get_surface_height_at_pos(x, z, surf);
 
         // Exclude ceilings lower than the check height.
         if (height < y) continue;
@@ -559,7 +570,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
         if (!check_within_floor_triangle_bounds(x, z, surf)) continue;
 
         // Get the exact height of the floor under the current location.
-        height = get_surface_height_at_location(x, z, surf);
+        height = get_surface_height_at_pos(x, z, surf);
 
         // Exclude floors higher than the check height.
         if (height > y) continue;
@@ -619,7 +630,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
 
         if (!check_within_bounds_y_norm(x, z, surf)) continue;
 
-        curBottomHeight = get_surface_height_at_location(x, z, surf);
+        curBottomHeight = get_surface_height_at_pos(x, z, surf);
 
         if (curBottomHeight < bufferY) {
             continue;
@@ -639,7 +650,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
 
         if (!check_within_bounds_y_norm(x, z, surf)) continue;
 
-        curHeight = get_surface_height_at_location(x, z, surf);
+        curHeight = get_surface_height_at_pos(x, z, surf);
 
         if (bottomHeight != FLOOR_LOWER_LIMIT && curHeight > bottomHeight) continue;
 
