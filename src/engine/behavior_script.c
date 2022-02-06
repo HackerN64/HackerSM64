@@ -17,16 +17,27 @@
 #include "game/puppylights.h"
 
 // Macros for retrieving arguments from behavior scripts.
+#define BHV_CMD_GET_1ST_S8(index)  (s8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
 #define BHV_CMD_GET_1ST_U8(index)  (u8)((gCurBhvCommand[index] >> 24) & 0xFF) // unused
+
+#define BHV_CMD_GET_2ND_S8(index)  (s8)((gCurBhvCommand[index] >> 16) & 0xFF) // unused
 #define BHV_CMD_GET_2ND_U8(index)  (u8)((gCurBhvCommand[index] >> 16) & 0xFF)
-#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >> 8) & 0xFF)
-#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index]) & 0xFF)
+
+#define BHV_CMD_GET_3RD_S8(index)  (s8)((gCurBhvCommand[index] >>  8) & 0xFF) // unused
+#define BHV_CMD_GET_3RD_U8(index)  (u8)((gCurBhvCommand[index] >>  8) & 0xFF)
+
+#define BHV_CMD_GET_4TH_S8(index)  (s8)((gCurBhvCommand[index] >>  0) & 0xFF) // unused
+#define BHV_CMD_GET_4TH_U8(index)  (u8)((gCurBhvCommand[index] >>  0) & 0xFF)
 
 #define BHV_CMD_GET_1ST_S16(index) (s16)(gCurBhvCommand[index] >> 16)
+#define BHV_CMD_GET_1ST_U16(index) (u16)(gCurBhvCommand[index] >> 16)         // unused
+
 #define BHV_CMD_GET_2ND_S16(index) (s16)(gCurBhvCommand[index] & 0xFFFF)
+#define BHV_CMD_GET_2ND_U16(index) (u16)(gCurBhvCommand[index] & 0xFFFF)      // unused
 
 #define BHV_CMD_GET_S32(index)     (s32)(gCurBhvCommand[index])
 #define BHV_CMD_GET_U32(index)     (u32)(gCurBhvCommand[index])
+
 #define BHV_CMD_GET_VPTR(index)    (void *)(gCurBhvCommand[index])
 
 #define BHV_CMD_GET_ADDR_OF_CMD(index) (uintptr_t)(&gCurBhvCommand[index])
