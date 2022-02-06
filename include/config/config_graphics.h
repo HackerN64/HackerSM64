@@ -39,13 +39,13 @@
 // Similar to the above, but 30 FPS (Textures by InTheBeef, cleaned up by Arceveti).
 #define IA8_30FPS_COINS
 
-// Use .rej microcode for certain objects (experimental - only should be used when F3DEX_GBI_2 is defined).
-// For advanced users only. Does not work perfectly out the box, best used when exported actor models are
-// using 64 vertex sizes, offered by Fast64 in the microcode menu.
+/**
+ * Use .rej microcode for certain objects (experimental - only should be used when F3DEX_GBI_2 is defined).
+ * For advanced users only. Does not work perfectly out the box, best used when exported actor models are
+ * using 64 vertex sizes, offered by Fast64 in the microcode menu.
+ * NOTE: This can affect draw order.
+ */
 // #define OBJECTS_REJ
-
-// Culls objects which are out of view vertically (the game already does this horizontally).
-// #define VERTICAL_CULLING
 
 /**
  * Mario's silhouette when behind solid objects/surfaces.
@@ -55,8 +55,12 @@
  * NOTE: This disables anti-aliasing on Mario's model. This doesn't have much of
  * an effect on an emulator, but is very noticeable on console.
  * NOTE: Regarding performance, silhouette seems to lose 1-2 frames on console.
+ * NOTE: This can affect draw order.
  */
 #define SILHOUETTE 127
+
+// Culls objects which are out of view vertically (the game already does this horizontally).
+// #define VERTICAL_CULLING
 
 // The default drawing distance for objects.
 // Vanilla is 4000.0f.
