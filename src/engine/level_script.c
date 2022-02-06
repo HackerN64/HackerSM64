@@ -73,30 +73,14 @@ static s32 eval_script_op(s8 op, s32 arg) {
     s32 result = FALSE;
 
     switch (op) {
-        case 0:
-            result = sRegister & arg;
-            break;
-        case 1:
-            result = !(sRegister & arg);
-            break;
-        case 2:
-            result = sRegister == arg;
-            break;
-        case 3:
-            result = sRegister != arg;
-            break;
-        case 4:
-            result = sRegister < arg;
-            break;
-        case 5:
-            result = sRegister <= arg;
-            break;
-        case 6:
-            result = sRegister > arg;
-            break;
-        case 7:
-            result = sRegister >= arg;
-            break;
+        case OP_AND:  result =  (sRegister &  arg); break;
+        case OP_NAND: result = !(sRegister &  arg); break;
+        case OP_EQ:   result =  (sRegister == arg); break;
+        case OP_NEQ:  result =  (sRegister != arg); break;
+        case OP_LT:   result =  (sRegister <  arg); break;
+        case OP_LEQ:  result =  (sRegister <= arg); break;
+        case OP_GT:   result =  (sRegister >  arg); break;
+        case OP_GEQ:  result =  (sRegister >= arg); break;
     }
 
     return result;
