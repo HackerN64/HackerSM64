@@ -1636,6 +1636,12 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     }
 }
 
+void find_surface_on_ray_between_points(Vec3f pos1, Vec3f pos2, struct Surface **hit_surface, Vec3f hit_pos, s32 flags) {
+    Vec3f dir;
+    vec3f_diff(dir, pos2, pos1);
+    find_surface_on_ray(pos1, dir, hit_surface, hit_pos, flags);
+}
+
 // Constructs a float in registers, which can be faster than gcc's default of loading a float from rodata.
 // Especially fast for halfword floats, which get loaded with a `lui` + `mtc1`.
 static ALWAYS_INLINE float construct_float(const float f) {
