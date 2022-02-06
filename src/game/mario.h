@@ -6,6 +6,15 @@
 #include "macros.h"
 #include "types.h"
 
+enum FloorSoundtypes {
+    FLOOR_SOUND_TYPE_DEFAULT,
+    FLOOR_SOUND_TYPE_HARD,
+    FLOOR_SOUND_TYPE_SLIPPERY,
+    FLOOR_SOUND_TYPE_VERY_SLIPPERY,
+    FLOOR_SOUND_TYPE_NOISE_DEFAULT,
+    FLOOR_SOUND_TYPE_NOISE_SLIPPERY,
+};
+
 s32 is_anim_at_end(struct MarioState *m);
 s32 is_anim_past_end(struct MarioState *m);
 s16 set_mario_animation(struct MarioState *m, s32 targetAnimID);

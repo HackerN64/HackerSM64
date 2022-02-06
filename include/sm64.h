@@ -178,10 +178,11 @@ enum MarioParticleFlags {
 };
 
 enum ModelStates {
-    MODEL_STATE_ALPHA       =  (1 << 8),                      //  0x100
-    MODEL_STATE_NOISE_ALPHA = ((1 << 7) | MODEL_STATE_ALPHA), // (0x080 | MODEL_STATE_ALPHA)
-    MODEL_STATE_METAL       =  (1 << 9),                      //  0x200
-    MODEL_STATE_MASK        =  0xFF
+    MODEL_STATE_NORMAL      =  0x0,
+    MODEL_STATE_ALPHA       =  BIT(8),                      //  0x100
+    MODEL_STATE_NOISE_ALPHA = (BIT(7) | MODEL_STATE_ALPHA), // (0x080 | MODEL_STATE_ALPHA)
+    MODEL_STATE_METAL       =  BIT(9),                      //  0x200
+    MODEL_STATE_MASK        =  BITMASK(8),
 };
 
 enum MarioFlags {
