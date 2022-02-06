@@ -80,7 +80,7 @@ enum AnimType {
 #endif
 
 #if SILHOUETTE
-#define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))
+    #define IS_LAYER_SILHOUETTE(layer) (((layer) >= LAYER_SILHOUETTE_FIRST) || ((layer) <= LAYER_SILHOUETTE_LAST))
 #endif
 
 #define RENDER_PHASE_FIRST 0
