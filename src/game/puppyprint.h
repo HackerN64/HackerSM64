@@ -56,6 +56,7 @@ extern s32 ramsizeSegment[33];
 extern s8 nameTable;
 extern s32 mempool;
 extern u8 benchOption;
+extern f32 textSize;
 
 // General
 extern u32 cpuTime;
@@ -79,6 +80,7 @@ extern u32      taskTime[NUM_PERF_ITERATIONS + 1];
 extern u32    cameraTime[NUM_PERF_ITERATIONS + 1];
 extern u32  profilerTime[NUM_PERF_ITERATIONS + 1];
 extern u32 profilerTime2[NUM_PERF_ITERATIONS + 1];
+extern u32 controllerTime[NUM_PERF_ITERATIONS + 1];
 // RSP
 extern u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
 // RDP

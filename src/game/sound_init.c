@@ -353,33 +353,19 @@ void thread4_sound(UNUSED void *arg) {
 
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
 #if PUPPYPRINT_DEBUG
-        while (TRUE) {
-            lastTime = osGetTime();
-            dmaAudioTime[perfIteration] = 0;
+        lastTime = osGetTime();
+        dmaAudioTime[perfIteration] = 0;
 #endif
-            if (gResetTimer < 25) {
-                struct SPTask *spTask;
-                spTask = create_next_audio_frame_task();
-                if (spTask != NULL) {
-                    dispatch_audio_sptask(spTask);
-                }
-#if PUPPYPRINT_DEBUG
-                profiler_update(audioTime, lastTime);
-                audioTime[perfIteration] -= dmaAudioTime[perfIteration];
-                if (benchmarkLoop > 0 && benchOption == 1) {
-                    benchmarkLoop--;
-                    benchMark[benchmarkLoop] = osGetTime() - lastTime;
-                    if (benchmarkLoop == 0) {
-                        puppyprint_profiler_finished();
-                        break;
-                    }
-                } else {
-                    break;
-                }
-#endif
+        if (gResetTimer < 25) {
+            struct SPTask *spTask;
+            spTask = create_next_audio_frame_task();
+            if (spTask != NULL) {
+                dispatch_audio_sptask(spTask);
             }
 #if PUPPYPRINT_DEBUG
-        }
+            profiler_update(audioTime, lastTime);
+            audioTime[perfIteration] -= dmaAudioTime[perfIteration];
 #endif
+        }
     }
 }

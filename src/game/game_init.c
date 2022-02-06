@@ -726,6 +726,7 @@ void setup_game_memory(void) {
 void thread5_game_loop(UNUSED void *arg) {
 #if PUPPYPRINT_DEBUG
     OSTime lastTime = 0;
+    OSTime first = 0;
 #endif
 
     setup_game_memory();
@@ -763,12 +764,10 @@ void thread5_game_loop(UNUSED void *arg) {
             continue;
         }
 #if PUPPYPRINT_DEBUG
-        while (TRUE) {
-            lastTime = osGetTime();
-            collisionTime[perfIteration] = 0;
-                // graphTime[perfIteration] = 0;
-            behaviourTime[perfIteration] = 0;
-                  dmaTime[perfIteration] = 0;
+        lastTime = osGetTime();
+        collisionTime[perfIteration] = 0;
+        behaviourTime[perfIteration] = 0;
+        dmaTime[perfIteration] = 0;
 #endif
 
         // If any controllers are plugged in, start read the data for when
@@ -780,9 +779,12 @@ void thread5_game_loop(UNUSED void *arg) {
             osContStartReadData(&gSIEventMesgQueue);
         }
 
+
         audio_game_loop_tick();
         select_gfx_pool();
+        first = osGetTime();
         read_controller_inputs(THREAD_5_GAME_LOOP);
+        profiler_update(controllerTime, first);
         addr = level_script_execute(addr);
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();
@@ -791,17 +793,6 @@ void thread5_game_loop(UNUSED void *arg) {
         profiler_update(scriptTime, lastTime);
         scriptTime[perfIteration] -= profilerTime[perfIteration];
         scriptTime[perfIteration] -= profilerTime2[perfIteration];
-            if (benchmarkLoop > 0 && benchOption == 0) {
-                benchmarkLoop--;
-                benchMark[benchmarkLoop] = (osGetTime() - lastTime);
-                if (benchmarkLoop == 0) {
-                    puppyprint_profiler_finished();
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
         puppyprint_profiler_process();
 #endif
 

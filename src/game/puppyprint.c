@@ -63,10 +63,6 @@ u8 sDebugMenu   = FALSE;
 u8 sDebugOption = 0;
 // Profiler values
 s8  perfIteration  = 0;
-s16 benchmarkLoop  = 0;
-s32 benchmarkTimer = 0;
-s32 benchmarkProgramTimer = 0;
-s8  benchmarkType  = 0;
 // General
 u32     cpuTime = 0;
 u32     rspTime = 0;
@@ -75,7 +71,6 @@ u32     ramTime = 0;
 u32    loadTime = 0;
 u32 gLastOSTime = 0;
 u32    rspDelta = 0;
-s32       benchMark[NUM_BENCH_ITERATIONS + 2];
 // CPU
 u32 collisionTime[NUM_PERF_ITERATIONS + 1];
 u32 behaviourTime[NUM_PERF_ITERATIONS + 1];
@@ -89,6 +84,7 @@ u32      taskTime[NUM_PERF_ITERATIONS + 1];
 u32  profilerTime[NUM_PERF_ITERATIONS + 1];
 u32 profilerTime2[NUM_PERF_ITERATIONS + 1];
 u32    cameraTime[NUM_PERF_ITERATIONS + 1];
+u32 controllerTime[NUM_PERF_ITERATIONS + 1];
 // RSP
 u32     audioTime[NUM_PERF_ITERATIONS + 1];
 u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
@@ -163,24 +159,6 @@ void puppyprint_calculate_ram_usage(void) {
     #define CYCLE_CONV OS_CYCLES_TO_USEC
     #define RDP_CYCLE_CONV(x) ((10 * (x)) / 625) // 62.5 million cycles per frame
 #endif
-
-void puppyprint_profiler_finished(void) {
-    s32 i = 0;
-    benchMark[NUM_BENCH_ITERATIONS    ] = 0;
-    benchMark[NUM_BENCH_ITERATIONS + 1] = 0;
-    benchmarkTimer = 300;
-    benchViewer    = FALSE;
-
-    for (i = 0; i < (NUM_BENCH_ITERATIONS - 2); i++) {
-        benchMark[NUM_BENCH_ITERATIONS] += benchMark[i];
-        if (benchMark[i] > benchMark[NUM_BENCH_ITERATIONS + 1]) {
-            benchMark[NUM_BENCH_ITERATIONS + 1] = benchMark[i];
-        }
-    }
-
-    benchMark[NUM_BENCH_ITERATIONS] /= NUM_BENCH_ITERATIONS;
-    benchmarkProgramTimer = CYCLE_CONV(osGetTime() - benchmarkProgramTimer);
-}
 
 // RGB colour lookup table for colouring all the funny ram prints.
 ColorRGB colourChart[NUM_TLB_SEGMENTS + 1] = {
@@ -384,48 +362,6 @@ void print_audio_ram_overview(void) {
     print_small_text(x, tmpY, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
-void benchmark_custom(void) {
-    if ((benchmarkLoop == 0)
-     || (benchOption != 2)) {
-        return;
-    }
-
-    OSTime lastTime;
-    while (TRUE) {
-        lastTime = osGetTime();
-        // Insert your function here!
-
-        if ((benchmarkLoop > 0)
-         && (benchOption == 2)) {
-            benchmarkLoop--;
-
-            benchMark[benchmarkLoop] = (osGetTime() - lastTime);
-            if (benchmarkLoop == 0) {
-                puppyprint_profiler_finished();
-                break;
-            }
-        } else {
-            break;
-        }
-    }
-}
-
-const char benchNames[][32] = {
-    "Game Thread",
-    "Audio Thread",
-    "Custom",
-};
-
-void print_which_benchmark(void) {
-    char textBytes[40];
-
-    prepare_blank_box();
-    render_blank_box((SCREEN_CENTER_X - 50), 115, (SCREEN_CENTER_X + 50), 160, 0, 0, 0, 255);
-    finish_blank_box();
-    sprintf(textBytes, "Select Option#%s#L: Confirm", benchNames[benchOption]);
-    print_small_text(SCREEN_CENTER_X, 120, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-}
-
 char consoleLogTable[LOG_BUFFER_SIZE][255];
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
@@ -527,10 +463,11 @@ struct CPUBar cpu_ordering_table[] = {
     {     audioTime, COLOR_RGB_YELLOW,  {     "Audio: <COL_99995099>" }},
     {    cameraTime, COLOR_RGB_CYAN,    {    "Camera: <COL_50999999>" }},
     {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_99509999>" }},
+    { controllerTime, COLOR_RGB_ORANGE, {       "Pad: <COL_99755099>" }},
 };
 
 #define CPU_TABLE_MAX (sizeof(cpu_ordering_table) / sizeof(struct CPUBar))
-#define ADDTIMES MAX(((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX]) / 80), 1)
+#define ADDTIMES MAX(((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX] + controllerTime[MX]) / 80), 1)
 
 void print_basic_profiling(void) {
     char textBytes[90];
@@ -774,6 +711,7 @@ void puppyprint_profiler_process(void) {
         get_average_perf_time(  profilerTime, FALSE);
         get_average_perf_time( profilerTime2, FALSE);
         get_average_perf_time(    cameraTime, FALSE);
+        get_average_perf_time(controllerTime, FALSE);
 
         // Performed twice a frame without fail, so doubled to have a more representative value.
            audioTime[NUM_PERF_ITERATIONS] *= 2;
@@ -857,8 +795,42 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
     gDPFillRectangle(gDisplayListHead++, x1, y1, x2 - cycleadd, y2 - cycleadd);
 }
 
+// Same as above, but with rounded edges.
+// Follows all the same rules of usage.
+void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a)
+{
+    s32 cycleadd = 0;
+    gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
+    if (a == 255) {
+        gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
+    } else {
+        gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+    }
+    gDPPipeSync(gDisplayListHead++);
+    gDPSetFillColor(gDisplayListHead++, GPACK_RGBA5551(r, g, b, 1) << 16 | GPACK_RGBA5551(r, g, b, 1));
+    print_set_envcolour(r, g, b, a);
+    gDPFillRectangle(gDisplayListHead++, x1+4, y1, x2-4, y1+1);
+    gDPFillRectangle(gDisplayListHead++, x1+2, y1+1, x2-2, y1+2);
+    gDPFillRectangle(gDisplayListHead++, x1+1, y1+2, x2-1, y1+4);
+    gDPFillRectangle(gDisplayListHead++, x1+1, y2-4, x2-1, y2-2);
+    gDPFillRectangle(gDisplayListHead++, x1+2, y2-2, x2-2, y2-1);
+    gDPFillRectangle(gDisplayListHead++, x1+4, y2-1, x2-4, y2);
+    if (ABS(x1 - x2) % 4 == 0 && a == 255) {
+        gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
+        gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP);
+        cycleadd = 1;
+    }
+    gDPFillRectangle(gDisplayListHead++, x1, y1+4, x2 - cycleadd, y2-4 - cycleadd);
+}
+
 extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
 extern void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font);
+
+s8 shakeToggle = 0;
+s8  waveToggle = 0;
+f32 textSize = 1.0f; // The value that's used as a baseline multiplier before applying text size modifiers. Make sure to set it back when you're done.
+f32 textSizeTotal = 1.0f; // The value that's read to set the text size. Do not mess with this.
+f32 textSizeTemp = 1.0f; // The value that's set when modifying text size mid draw. Also do not mess with this.
 
 s32 get_text_width(const char *str, s32 font) {
     s32 i       = 0;
@@ -866,8 +838,11 @@ s32 get_text_width(const char *str, s32 font) {
     s32 wideX   = 0;
     s32 textX, textY, offsetY, spaceX;
 
+    textSizeTemp = 1.0f;
+    textSizeTotal = textSizeTemp * textSize;
+
     for (i = 0; i < (signed)strlen(str); i++) {
-        if (str[i] == '#') {
+        if (str[i] == '#' || str[i] == 0x0A) {
             i++;
             textPos = 0;
         }
@@ -876,7 +851,7 @@ s32 get_text_width(const char *str, s32 font) {
         }
 
         get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
-        textPos += spaceX + 1;
+        textPos += (spaceX + 1) * textSizeTotal;
         wideX = MAX(textPos, wideX);
     }
     return wideX;
@@ -884,12 +859,19 @@ s32 get_text_width(const char *str, s32 font) {
 
 s32 get_text_height(const char *str) {
     s32 i= 0;
-    s32 textPos = 0;
+    s32 textPos;
+
+    textSizeTemp = 1.0f;
+    textSizeTotal = textSizeTemp * textSize;
+    textPos = 12 * textSizeTotal;
 
     for (i = 0; i < (signed)strlen(str); i++) {
-        if (str[i] == '#') {
+        if (str[i] == '#' || str[i] == 0x0A) {
             i++;
-            textPos += 12;
+            textPos += 12 * textSizeTotal;
+        }
+        if (str[i] == '<') {
+            i += text_iterate_command(str, i, FALSE);
         }
     }
 
@@ -904,9 +886,6 @@ const Gfx dl_small_text_begin[] = {
     gsDPSetTextureFilter(G_TF_POINT),
     gsSPEndDisplayList(),
 };
-
-s8 shakeToggle = 0;
-s8  waveToggle = 0;
 
 void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 font) {
     s32 textX = 0;
@@ -926,6 +905,8 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
 
     shakeToggle = 0;
     waveToggle  = 0;
+    textSizeTemp = 1.0f;
+    textSizeTotal = textSizeTemp * textSize;
 
     if (amount == PRINT_ALL) {
         tx = (signed)strlen(str);
@@ -934,7 +915,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
     if (align == PRINT_TEXT_ALIGN_CENTRE) {
         for (i = 0; i < (signed)strlen(str); i++) {
-            if (str[i] == '#') {
+            if (str[i] == '#' || str[i] == 0x0A) {
                 i++;
                 textPos[0] = 0;
                 lines++;
@@ -945,19 +926,19 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
             }
 
             get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
-            textPos[0] += (spaceX + 1);
+            textPos[0] += (spaceX + 1) * textSizeTotal;
             wideX[lines] = MAX(textPos[0], wideX[lines]);
         }
 
         textPos[0] = -(wideX[0] / 2);
     } else if (align == PRINT_TEXT_ALIGN_RIGHT) {
         for (i = 0; i < (signed)strlen(str); i++) {
-            if (str[i] == '#') {
+            if (str[i] == '#' || str[i] == 0x0A) {
                 i++;
                 textPos[0] = 0;
                 lines++;
             } else {
-                textPos[0] += (spaceX + 1);
+                textPos[0] += (spaceX + 1) * textSizeTotal;
             }
 
             if (str[i] == '<') {
@@ -974,7 +955,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     lines = 0;
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     for (i = 0; i < tx; i++) {
-        if (str[i] == '#') {
+        if (str[i] == '#' || str[i] == 0x0A) {
             i++;
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
@@ -982,7 +963,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
             } else {
                 textPos[0] = -(wideX[lines] / 2);
             }
-            textPos[1] += 12;
+            textPos[1] += 12 * textSizeTotal;
         }
 
         if (str[i] == '<') {
@@ -1015,10 +996,10 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
 
         gSPScisTextureRectangle(gDisplayListHead++, ((x + shakePos[0] + textPos[0]     ) << 2),
                                                     ((y + shakePos[1] + offsetY + textPos[1] + wavePos) << 2),
-                                                    ((x +  textPos[0] + shakePos[0] + 8) << 2),
-                                                    ((y + wavePos + offsetY + shakePos[1] + 12 + textPos[1]) << 2),
-                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), (1 << 10), (1 << 10));
-        textPos[0] += (spaceX + 1);
+                                                    ((x +  textPos[0] + shakePos[0] + (u16)(8 * textSizeTotal)) << 2),
+                                                    ((y + wavePos + offsetY + shakePos[1] + (u16)(12 * textSizeTotal) + textPos[1]) << 2),
+                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), 1024/textSizeTotal, 1024/textSizeTotal);
+        textPos[0] += (spaceX + 1) * textSizeTotal;
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1029,9 +1010,19 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     while ((str[i + len] != '>') && ((i + len) < (signed)strlen(str))) len++;
     len++;
 
+    // Ignores runCMD, because it's important this is ALWAYS ran.
+    if (strncmp((str + i), "<SIZE_xxx>", 5) == 0) { // Set the text size here. 100 is scale 1.0, with 001 being scale 0.01. this caps at 999. Going lower than 001
+            // Will make the text unreadable on console, so only do it,
+            textSizeTemp = (str[i + 6] - '0');
+            textSizeTemp += (str[i + 7] - '0')/10.0f;
+            textSizeTemp += (str[i + 8] - '0')/100.0f;
+            textSizeTemp = CLAMP(textSizeTemp, 0.01f, 10.0f);
+            textSizeTotal = textSizeTemp * textSize;
+    }
+
     if (runCMD) {
         if (strncmp((str + i), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
-            // Each value is taken from the strong. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
+            // Each value is taken from the string. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
             s32 r = (((str[i +  5] - '0') * 10)
                   +   (str[i +  6] - '0'));
             s32 g = (((str[i +  7] - '0') * 10)
