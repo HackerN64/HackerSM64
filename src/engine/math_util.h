@@ -638,11 +638,11 @@ Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec);
 #define approach_s16_symmetric_bool(current, target, inc) approach_s16_bool((current), (target), (inc), (inc))
 #define approach_s32_symmetric_bool(current, target, inc) approach_s32_bool((current), (target), (inc), (inc))
 #define approach_f32_symmetric_bool(current, target, inc) approach_f32_bool((current), (target), (inc), (inc))
-s32 approach_f32_signed(f32 *current, f32 target, f32 inc);
-s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier);
-f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
-s32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor);
-s32 approach_s16_asymptotic(s16 current, s16 target, s16 divisor);
+Bool32 approach_f32_signed(f32 *current, f32 target, f32 inc);
+Bool32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier);
+f32    approach_f32_asymptotic(f32 current, f32 target, f32 multiplier);
+Bool32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor);
+s32    approach_s16_asymptotic(s16 current, s16 target, s16 divisor);
 // Angles
 s32 abs_angle_diff(s16 a0, s16 a1);
 s32 atan2s(f32 y, f32 x);

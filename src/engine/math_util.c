@@ -1169,7 +1169,7 @@ Bool32 approach_f32_bool(f32 *current, f32 target, f32 inc, f32 dec) {
     return !(*current == target);
 }
 
-s32 approach_f32_signed(f32 *current, f32 target, f32 inc) {
+Bool32 approach_f32_signed(f32 *current, f32 target, f32 inc) {
     *current += inc;
     if (inc >= 0.0f) {
         if (*current > target) {
@@ -1190,7 +1190,7 @@ s32 approach_f32_signed(f32 *current, f32 target, f32 inc) {
  * and adding a fraction of that to the current value.
  * Edits the current value directly, returns TRUE if the target has been reached, FALSE otherwise.
  */
-s32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier) {
+Bool32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier) {
     if (multiplier > 1.0f) {
         multiplier = 1.0f;
     }
@@ -1211,7 +1211,7 @@ f32 approach_f32_asymptotic(f32 current, f32 target, f32 multiplier) {
  * is reached. Note: Since this function takes integers as parameters, the last argument is the
  * reciprocal of what it would be in the previous two functions.
  */
-s32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor) {
+Bool32 approach_s16_asymptotic_bool(s16 *current, s16 target, s16 divisor) {
     s16 temp = *current;
     if (divisor == 0) {
         *current = target;
