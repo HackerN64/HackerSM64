@@ -1921,6 +1921,10 @@ void obj_set_collision_data(struct Object *obj, const void *segAddr) {
     obj->collisionData = segmented_to_virtual(segAddr);
 }
 
+void cur_obj_set_collision_data(const void *segAddr) {
+    o->collisionData = segmented_to_virtual(segAddr);
+}
+
 void cur_obj_if_hit_wall_bounce_away(void) {
     if (o->oMoveFlags & OBJ_MOVE_HIT_WALL) {
         o->oMoveAngleYaw = o->oWallAngle;
