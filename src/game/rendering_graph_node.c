@@ -225,14 +225,14 @@ static struct RenderPhase sRenderPhases[] = {
 #else
  #if SILHOUETTE
     // Silhouette, no .rej
-    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE    },
-    /* RENDER_PHASE_ZEX_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST           },
-    /* RENDER_PHASE_ZEX_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST           },
-    /* RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST   },
-    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST                      },
+    /* RENDER_PHASE_ZEX_BEFORE_SILHOUETTE   */ { LAYER_FIRST,                    LAYER_LAST_BEFORE_SILHOUETTE   },
+    /* RENDER_PHASE_ZEX_SILHOUETTE          */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST          },
+    /* RENDER_PHASE_ZEX_NON_SILHOUETTE      */ { LAYER_SILHOUETTE_FIRST,         LAYER_SILHOUETTE_LAST          },
+    /* RENDER_PHASE_ZEX_OCCLUDE_SILHOUETTE  */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_OCCLUDE_SILHOUETTE_LAST  },
+    /* RENDER_PHASE_ZEX_AFTER_SILHOUETTE    */ { LAYER_OCCLUDE_SILHOUETTE_FIRST, LAYER_LAST                     },
  #else
     // No silhouette, no .rej
-    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_FIRST,                    LAYER_LAST                      },
+    /* RENDER_PHASE_ZEX_ALL                 */ { LAYER_FIRST,                    LAYER_LAST                     },
  #endif
 #endif
 };
@@ -250,15 +250,15 @@ void switch_ucode(Gfx* dlHead, s32 ucode) {
             gSPDisplayList(dlHead++, init_rsp);
             break;
         case GRAPH_NODE_UCODE_REJ:
-            // Use .rej Microcode, skip sub-pixel processing on console
+            // Use .rej Microcode, skip sub-pixel processing on console.
             if (gIsConsole) {
                 gSPLoadUcodeL(dlHead++, gspF3DLX2_Rej_fifo); // F3DLX2_Rej
             } else {
                 gSPLoadUcodeL(dlHead++, gspF3DEX2_Rej_fifo); // F3DEX2_Rej
             }
-            // Reload the necessary RSP settings
+            // Reload the necessary RSP settings.
             gSPDisplayList(dlHead++, init_rsp);
-            // Set the clip ratio (see init_rsp)
+            // Set the clip ratio (see init_rsp).
             gSPClipRatio(dlHead++, FRUSTRATIO_2);
             break;
     }
@@ -266,11 +266,7 @@ void switch_ucode(Gfx* dlHead, s32 ucode) {
 #endif
 
 /**
- * Process a master list node. This has been modified, so now it runs twice, for each microcode.
- * It iterates through the first 5 layers of if the first index using F3DLX2.Rej, then it switches
- * to F3DZEX and iterates through all layers, then switches back to F3DLX2.Rej and finishes the last
- * 3. It does this, because layers 5-7 are non zbuffered, and just doing 0-7 of ZEX, then 0-7 of REJ
- * would make the ZEX 0-4 render on top of Rej's 5-7.
+ * Process a master list node. This has been modified, so now it iterates through sRenderPhases to determine the draw order.
  */
 void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     struct RenderPhase *renderPhase;
@@ -280,7 +276,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     s32 endLayer      = LAYER_LAST;
     s32 ucode         = GRAPH_NODE_UCODE_DEFAULT;
     s32 phaseIndex    = RENDER_PHASE_FIRST;
-    s32 enableZBuffer = (node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0;
+    s32 enableZBuffer = ((node->node.flags & GRAPH_RENDER_Z_BUFFER) != 0);
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
 
