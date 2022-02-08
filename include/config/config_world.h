@@ -18,7 +18,7 @@
 /**
  * The number of cells along each axis in an area.
  * Higher numbers = smaller cells = higher performance + higher RAM usage.
- * Lower numbers = larger cells = lower perfocmance + lower RAM usage.
+ * Lower numbers = larger cells = lower performance + lower RAM usage.
  * For best performance results, this should be a power of 2,
  * since that allows for get_cell_coord to be optimized.
  * Vanilla: 16
