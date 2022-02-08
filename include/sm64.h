@@ -36,33 +36,8 @@
 #define SET_LOW_U16_OF_32(var, x)  ((var) = ((var) & MASK_16_HIGH) | ((u16)(x)))
 #define SET_LOW_S16_OF_32(var, x)  ((var) = ((var) & MASK_16_HIGH) | ((s16)(x)))
 
-// Common cos values for degrees, often used for surface Y normals
-// These are different than coss()
-#define COS0    1.0f
-#define COS1    0.99984770f // mario_floor_is_slippery, mario_floor_is_slope
-#define COS5    0.99619470f // mario_floor_is_slope
-#define COS10   0.98480775f // act_butt_slide_air, act_hold_butt_slide_air, mario_floor_is_slippery, mario_floor_is_slope
-#define COS15   0.96592583f // mario_floor_is_slope
-#define COS20   0.93969262f // mario_floor_is_slippery, mario_floor_is_slope, mario_floor_is_steep
-#define COS25   0.90630779f // ledge grabs
-#define COS30   0.86602540f // should_get_stuck_in_ground, mario_floor_is_steep
-#define COS35   0.81915204f
-#define COS36   0.80901699f
-#define COS38   0.78801075f // mario_floor_is_slippery default
-#define COS40   0.76604444f
-#define COS45   0.70710678f // SURFACE_FLAG_X_PROJECTION
-#define COS50   0.64278761f
-#define COS55   0.57357644f
-#define COS60   0.5f
-#define COS65   0.42261826f
-#define COS70   0.34202014f
-#define COS73   0.29237169f // common_landing_cancels, check_common_idle_cancels, check_common_hold_idle_cancels
-#define COS75   0.25881905f
-#define COS78   0.20791169f
-#define COS80   0.17364818f // braking action
-#define COS85   0.087155743f
-#define COS90   0.0f
 
+// Render layer defines (see graph_node and rendering_graph_node).
 enum RenderLayers {
     LAYER_FORCE,
     LAYER_OPAQUE,
