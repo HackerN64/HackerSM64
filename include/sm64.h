@@ -23,12 +23,18 @@
 #endif
 
 // Pointer casting is technically UB, and avoiding it gets rid of endian issues as well as a nice side effect.
+#define MASK_16_LOW  BITMASK(16)         // 0x0000FFFF
+#define MASK_16_HIGH (MASK_16_LOW << 16) // 0xFFFF0000
+
 #define GET_HIGH_U16_OF_32(var) ((u16)((var) >> 16))
 #define GET_HIGH_S16_OF_32(var) ((s16)((var) >> 16))
-#define GET_LOW_U16_OF_32(var) ((u16)((var) & 0xFFFF))
-#define GET_LOW_S16_OF_32(var) ((s16)((var) & 0xFFFF))
-#define SET_HIGH_U16_OF_32(var, x) ((var) = ((var) & 0xFFFF) | ((x) << 16))
-#define SET_HIGH_S16_OF_32(var, x) ((var) = ((var) & 0xFFFF) | ((x) << 16))
+#define GET_LOW_U16_OF_32(var)  ((u16)((var) & MASK_16_LOW))
+#define GET_LOW_S16_OF_32(var)  ((s16)((var) & MASK_16_LOW))
+
+#define SET_HIGH_U16_OF_32(var, x) ((var) = ((var) & MASK_16_LOW)  | ((x) << 16))
+#define SET_HIGH_S16_OF_32(var, x) ((var) = ((var) & MASK_16_LOW)  | ((x) << 16))
+#define SET_LOW_U16_OF_32(var, x)  ((var) = ((var) & MASK_16_HIGH) | ((u16)(x)))
+#define SET_LOW_S16_OF_32(var, x)  ((var) = ((var) & MASK_16_HIGH) | ((s16)(x)))
 
 // Common cos values for degrees, often used for surface Y normals
 // These are different than coss()
