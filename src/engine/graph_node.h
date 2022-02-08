@@ -19,14 +19,14 @@ enum GraphNodeUCodes {
 };
 
 enum GraphRenderFlags {
-    GRAPH_RENDER_ACTIVE             = (1 << 0), // 0x0001
-    GRAPH_RENDER_CHILDREN_FIRST     = (1 << 1), // 0x0002
-    GRAPH_RENDER_BILLBOARD          = (1 << 2), // 0x0004
-    GRAPH_RENDER_Z_BUFFER           = (1 << 3), // 0x0008
-    GRAPH_RENDER_INVISIBLE          = (1 << 4), // 0x0010
-    GRAPH_RENDER_HAS_ANIMATION      = (1 << 5), // 0x0020
-    GRAPH_RENDER_SILHOUETTE         = (1 << 6), // 0x0040
-    GRAPH_RENDER_OCCLUDE_SILHOUETTE = (1 << 7), // 0x0080
+    GRAPH_RENDER_ACTIVE             = BIT(0), // 0x0001
+    GRAPH_RENDER_CHILDREN_FIRST     = BIT(1), // 0x0002
+    GRAPH_RENDER_BILLBOARD          = BIT(2), // 0x0004
+    GRAPH_RENDER_Z_BUFFER           = BIT(3), // 0x0008
+    GRAPH_RENDER_INVISIBLE          = BIT(4), // 0x0010
+    GRAPH_RENDER_HAS_ANIMATION      = BIT(5), // 0x0020
+    GRAPH_RENDER_SILHOUETTE         = BIT(6), // 0x0040
+    GRAPH_RENDER_OCCLUDE_SILHOUETTE = BIT(7), // 0x0080
 };
 
 /**
@@ -397,7 +397,7 @@ void geo_obj_init_spawninfo(struct GraphNodeObject *graphNode, struct SpawnInfo 
 void geo_obj_init_animation(struct GraphNodeObject *graphNode, struct Animation **animPtrAddr);
 void geo_obj_init_animation_accel(struct GraphNodeObject *graphNode, struct Animation **animPtrAddr, u32 animAccel);
 
-s32  retrieve_animation_index(s32 frame, u16 **attributes);
+s32  retrieve_animation_index(s32 frame, AnimIndex **attributes);
 
 s32  geo_update_animation_frame(struct AnimInfo *obj, s32 *accelAssist);
 void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3f position);

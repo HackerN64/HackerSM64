@@ -763,7 +763,7 @@ void geo_obj_init_animation_accel(struct GraphNodeObject *graphNode, struct Anim
  * and the second s16 the actual index. This index can be used to index in the array
  * with actual animation values.
  */
-s32 retrieve_animation_index(s32 frame, u16 **attributes) {
+s32 retrieve_animation_index(s32 frame, AnimIndex **attributes) {
     s32 result;
 
     if (frame < (*attributes)[0]) {
@@ -843,8 +843,8 @@ UNUSED void geo_retreive_animation_translation(struct GraphNodeObject *obj, Vec3
     struct Animation *animation = obj->animInfo.curAnim;
 
     if (animation != NULL) {
-        u16 *attribute = segmented_to_virtual((void *) animation->index);
-        s16 *values = segmented_to_virtual((void *) animation->values);
+        AnimIndex *attribute = segmented_to_virtual((void *) animation->index);
+        AnimValue *values = segmented_to_virtual((void *) animation->values);
 
         s16 frame = obj->animInfo.animFrame;
 

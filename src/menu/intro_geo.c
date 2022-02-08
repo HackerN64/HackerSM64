@@ -314,7 +314,7 @@ void intro_gen_face_texrect(Gfx **dlIter) {
     }
 }
 
-Gfx *intro_draw_face(u16 *image, s32 imageW, s32 imageH) {
+Gfx *intro_draw_face(RGBA16 *image, s32 imageW, s32 imageH) {
     Gfx *dlIter;
 
     Gfx *dl = alloc_display_list(130 * sizeof(Gfx));
@@ -327,7 +327,7 @@ Gfx *intro_draw_face(u16 *image, s32 imageW, s32 imageH) {
 
     gSPDisplayList(dlIter++, title_screen_bg_dl_face_easter_egg_begin);
 
-    gDPLoadTextureBlock(dlIter++, VIRTUAL_TO_PHYSICAL(image), G_IM_FMT_RGBA, G_IM_SIZ_16b, imageW, imageH, 0, G_TX_CLAMP | G_TX_NOMIRROR, G_TX_CLAMP | G_TX_NOMIRROR, 6, 6, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock(dlIter++, VIRTUAL_TO_PHYSICAL(image), G_IM_FMT_RGBA, G_IM_SIZ_16b, imageW, imageH, 0, (G_TX_CLAMP | G_TX_NOMIRROR), (G_TX_CLAMP | G_TX_NOMIRROR), 6, 6, G_TX_NOLOD, G_TX_NOLOD);
 
     intro_gen_face_texrect(&dlIter);
 

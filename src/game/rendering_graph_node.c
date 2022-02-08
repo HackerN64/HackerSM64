@@ -61,8 +61,8 @@ struct GeoAnimState {
     /*0x01*/ u8 enabled;
     /*0x02*/ s16 frame;
     /*0x04*/ f32 translationMultiplier;
-    /*0x08*/ u16 *attribute;
-    /*0x0C*/ s16 *data;
+    /*0x08*/ AnimIndex *attribute;
+    /*0x0C*/ AnimValue *data;
 };
 
 // For some reason, this is a GeoAnimState struct, but the current state consists
@@ -73,8 +73,8 @@ u8 gCurrAnimType;
 u8 gCurrAnimEnabled;
 s16 gCurrAnimFrame;
 f32 gCurrAnimTranslationMultiplier;
-u16 *gCurrAnimAttribute;
-s16 *gCurrAnimData;
+AnimIndex *gCurrAnimAttribute;
+AnimValue *gCurrAnimData;
 
 struct AllocOnlyPool *gDisplayListHeap;
 

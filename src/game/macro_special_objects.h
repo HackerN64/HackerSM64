@@ -14,7 +14,7 @@ void spawn_macro_abs_special(ModelID32 model, const BehaviorScript *behavior, s1
 void spawn_macro_objects(s32 areaIndex, MacroObject *macroObjList);
 void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList);
 #ifdef NO_SEGMENTED_MEMORY
-u32 get_special_objects_size(s16 *data);
+u32 get_special_objects_size(MacroObject *data);
 #endif
 
 #endif // MACRO_SPECIAL_OBJECTS_H

@@ -199,8 +199,8 @@ void spawn_special_objects(s32 areaIndex, TerrainData **specialObjList) {
 }
 
 #ifdef NO_SEGMENTED_MEMORY
-u32 get_special_objects_size(s16 *data) {
-    s16 *startPos = data;
+u32 get_special_objects_size(MacroObject *data) {
+    MacroObject *startPos = data;
     s32 i;
     u8 presetID;
     s32 offset;

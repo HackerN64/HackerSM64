@@ -219,12 +219,12 @@ struct Animation {
     /*0x06*/ s16 loopStart;
     /*0x08*/ s16 loopEnd;
     /*0x0A*/ s16 unusedBoneCount;
-    /*0x0C*/ const s16 *values;
-    /*0x10*/ const u16 *index;
+    /*0x0C*/ const AnimValue *values;
+    /*0x10*/ const AnimIndex *index;
     /*0x14*/ u32 length; // only used with Mario animations to determine how much to load. 0 otherwise.
 };
 
-#define ANIMINDEX_NUMPARTS(animindex) (sizeof(animindex) / sizeof(u16) / 6 - 1)
+#define ANIMINDEX_NUMPARTS(animindex) (sizeof(animindex) / sizeof(AnimIndex) / 6 - 1)
 
 struct GraphNode {
     /*0x00*/ s16 type; // structure type

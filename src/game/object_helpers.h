@@ -13,13 +13,15 @@ struct ChainSegment {
 };
 
 enum WaterDropletFlags {
-    WATER_DROPLET_FLAG_RAND_ANGLE               = (1 << 1), // 0x02
-    WATER_DROPLET_FLAG_RAND_OFFSET_XZ           = (1 << 2), // 0x04 // Unused
-    WATER_DROPLET_FLAG_RAND_OFFSET_XYZ          = (1 << 3), // 0x08 // Unused
-    WATER_DROPLET_FLAG_UNUSED                   = (1 << 4), // 0x10 // Unused
-    WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL     = (1 << 5), // 0x20
-    WATER_DROPLET_FLAG_RAND_ANGLE_INCR_BACKWARD = (1 << 6), // 0x40
-    WATER_DROPLET_FLAG_RAND_ANGLE_INCR_FORWARD  = (1 << 7), // 0x80 // Unused
+    WATER_DROPLET_FLAGS_NONE                    = 0x0,    // 0x00
+    WATER_DROPLET_FLAG_UNUSED_0                 = BIT(0), // 0x01 // Unused
+    WATER_DROPLET_FLAG_RAND_ANGLE               = BIT(1), // 0x02
+    WATER_DROPLET_FLAG_RAND_OFFSET_XZ           = BIT(2), // 0x04 // Unused
+    WATER_DROPLET_FLAG_RAND_OFFSET_XYZ          = BIT(3), // 0x08 // Unused
+    WATER_DROPLET_FLAG_UNUSED_5                 = BIT(4), // 0x10 // Unused
+    WATER_DROPLET_FLAG_SET_Y_TO_WATER_LEVEL     = BIT(5), // 0x20
+    WATER_DROPLET_FLAG_RAND_ANGLE_INCR_BACKWARD = BIT(6), // 0x40
+    WATER_DROPLET_FLAG_RAND_ANGLE_INCR_FORWARD  = BIT(7), // 0x80 // Unused
 };
 
 // Call spawn_water_droplet with this struct to spawn an object.
@@ -129,7 +131,7 @@ s32 cur_obj_check_if_near_animation_end(void);
 s32 cur_obj_check_if_at_animation_end(void);
 s32 cur_obj_check_anim_frame(s32 frame);
 s32 cur_obj_check_anim_frame_in_range(s32 startFrame, s32 rangeLength);
-s32 cur_obj_check_frame_prior_current_frame(s16 *a0);
+s32 cur_obj_check_frame_prior_current_frame(s16 *frame);
 s32 mario_is_in_air_action(void);
 s32 mario_is_dive_sliding(void);
 void cur_obj_set_y_vel_and_animation(f32 yVel, s32 animIndex);
