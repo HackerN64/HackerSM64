@@ -28,8 +28,7 @@ struct WallCollisionData {
     /*0x00*/ f32 x, y, z;
     /*0x0C*/ f32 offsetY;
     /*0x10*/ f32 radius;
-    /*0x14*/ u8 filler[2];
-    /*0x16*/ s16 numWalls;
+    /*0x14*/ s32 numWalls;
     /*0x18*/ struct Surface *walls[MAX_REFERENCED_WALLS];
 };
 
