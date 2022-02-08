@@ -1631,6 +1631,8 @@ u32 update_and_return_cap_flags(struct MarioState *m) {
     return flags;
 }
 
+#define VANISH_CAP_OPACITY 128 // 0-255
+
 /**
  * Updates the Mario's cap, rendering, and hitbox.
  */
@@ -1639,7 +1641,7 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
     s32 flags = update_and_return_cap_flags(m);
 
     if (flags & MARIO_VANISH_CAP) {
-        bodyState->modelState = MODEL_STATE_NOISE_ALPHA;
+        bodyState->modelState = (MODEL_STATE_ALPHA | VANISH_CAP_OPACITY);
     }
 
     if (flags & (MARIO_METAL_CAP | MARIO_METAL_SHOCK)) {
@@ -1676,8 +1678,8 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
         m->marioObj->hitboxHeight = MARIO_HITBOX_HEIGHT;
     }
 
-    if ((m->flags & MARIO_TELEPORTING) && (m->fadeWarpOpacity != MODEL_STATE_MASK)) {
-        bodyState->modelState &= ~MODEL_STATE_MASK;
+    if ((m->flags & MARIO_TELEPORTING) && (m->fadeWarpOpacity != 0xFF)) {
+        bodyState->modelState &= ~MODEL_STATE_OPACITY_MASK;
         bodyState->modelState |= (MODEL_STATE_ALPHA | m->fadeWarpOpacity);
     }
 }

@@ -5,13 +5,46 @@
 
 #include "types.h"
 
+enum GroundStep {
+    GROUND_STEP_LEFT_GROUND,
+    GROUND_STEP_NONE,
+    GROUND_STEP_HIT_WALL,
+    GROUND_STEP_HIT_WALL_STOP_QSTEPS = GROUND_STEP_HIT_WALL,
+    GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS
+};
+
+enum AirStepCheck {
+    AIR_STEP_CHECK_NONE,
+    AIR_STEP_CHECK_LEDGE_GRAB,
+    AIR_STEP_CHECK_HANG
+};
+
+enum AirStep {
+    AIR_STEP_NONE,
+    AIR_STEP_LANDED,
+    AIR_STEP_HIT_WALL,
+    AIR_STEP_GRABBED_LEDGE,
+    AIR_STEP_GRABBED_CEILING,
+    AIR_STEP_UNK,
+    AIR_STEP_HIT_LAVA_WALL,
+    AIR_STEP_HIT_CEILING
+};
+
+enum WaterStep {
+    WATER_STEP_NONE,
+    WATER_STEP_HIT_FLOOR,
+    WATER_STEP_HIT_CEILING,
+    WATER_STEP_CANCELLED,
+    WATER_STEP_HIT_WALL
+};
+
 struct BullyCollisionData {
-  /*0x00*/ f32 conversionRatio;
-  /*0x04*/ f32 radius;
-  /*0x08*/ f32 posX;
-  /*0x0C*/ f32 posZ;
-  /*0x10*/ f32 velX;
-  /*0x14*/ f32 velZ;
+    /*0x00*/ f32 conversionRatio;
+    /*0x04*/ f32 radius;
+    /*0x08*/ f32 posX;
+    /*0x0C*/ f32 posZ;
+    /*0x10*/ f32 velX;
+    /*0x14*/ f32 velZ;
 };
 
 extern struct Surface gWaterSurfacePseudoFloor;

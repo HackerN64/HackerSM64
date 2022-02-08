@@ -17,9 +17,9 @@
 
 // Crash handler enhancement
 #ifdef CRASH_SCREEN_INCLUDED
-#define DEBUG_ASSERT(exp) do { if (!(exp)) _n64_assert(__FILE__, __LINE__, #exp, 1); } while (0)
+    #define DEBUG_ASSERT(exp) do { if (!(exp)) _n64_assert(__FILE__, __LINE__, #exp, 1); } while (0)
 #else
-#define DEBUG_ASSERT(exp)
+    #define DEBUG_ASSERT(exp)
 #endif
 
 // Pointer casting is technically UB, and avoiding it gets rid of endian issues as well as a nice side effect.
@@ -80,6 +80,7 @@ enum RenderLayers {
 #define LAYER_LAST                          (LAYER_COUNT - 1)
 
 #define LAYER_ZB_FIRST                      LAYER_OPAQUE
+
 #if SILHOUETTE
     #define LAYER_ZB_LAST                       LAYER_OCCLUDE_SILHOUETTE_ALPHA
     #define LAYER_SILHOUETTE_FIRST              LAYER_SILHOUETTE_OPAQUE
@@ -98,166 +99,170 @@ enum RenderLayers {
 #define LAYER_NON_ZB_FIRST                  (LAYER_ZB_LAST + 1)
 #define LAYER_NON_ZB_LAST                   LAYER_LAST
 
+
+// MarioState.input
+
 enum MarioInput {
-    INPUT_NONE                   = /* 0x0000 */ (0 <<  0),
-    INPUT_NONZERO_ANALOG         = /* 0x0001 */ (1 <<  0),
-    INPUT_A_PRESSED              = /* 0x0002 */ (1 <<  1),
-    INPUT_OFF_FLOOR              = /* 0x0004 */ (1 <<  2),
-    INPUT_ABOVE_SLIDE            = /* 0x0008 */ (1 <<  3),
-    INPUT_FIRST_PERSON           = /* 0x0010 */ (1 <<  4),
-    INPUT_IDLE                   = /* 0x0020 */ (1 <<  5),
-    INPUT_SQUISHED               = /* 0x0040 */ (1 <<  6),
-    INPUT_A_DOWN                 = /* 0x0080 */ (1 <<  7),
-    INPUT_IN_POISON_GAS          = /* 0x0100 */ (1 <<  8),
-    INPUT_IN_WATER               = /* 0x0200 */ (1 <<  9),
-    INPUT_STOMPED                = /* 0x0400 */ (1 << 10),
-    INPUT_INTERACT_OBJ_GRABBABLE = /* 0x0800 */ (1 << 11),
-    INPUT_B_DOWN                 = /* 0x1000 */ (1 << 12),
-    INPUT_B_PRESSED              = /* 0x2000 */ (1 << 13),
-    INPUT_Z_DOWN                 = /* 0x4000 */ (1 << 14),
-    INPUT_Z_PRESSED              = /* 0x8000 */ (1 << 15),
-};
-enum GroundStep {
-    GROUND_STEP_LEFT_GROUND,
-    GROUND_STEP_NONE,
-    GROUND_STEP_HIT_WALL,
-    GROUND_STEP_HIT_WALL_STOP_QSTEPS = GROUND_STEP_HIT_WALL,
-    GROUND_STEP_HIT_WALL_CONTINUE_QSTEPS
+    INPUT_NONE                   = 0x0,     // 0x0000
+    INPUT_NONZERO_ANALOG         = BIT( 0), // 0x0001
+    INPUT_A_PRESSED              = BIT( 1), // 0x0002
+    INPUT_OFF_FLOOR              = BIT( 2), // 0x0004
+    INPUT_ABOVE_SLIDE            = BIT( 3), // 0x0008
+    INPUT_FIRST_PERSON           = BIT( 4), // 0x0010
+    INPUT_IDLE                   = BIT( 5), // 0x0020
+    INPUT_SQUISHED               = BIT( 6), // 0x0040
+    INPUT_A_DOWN                 = BIT( 7), // 0x0080
+    INPUT_IN_POISON_GAS          = BIT( 8), // 0x0100
+    INPUT_IN_WATER               = BIT( 9), // 0x0200
+    INPUT_STOMPED                = BIT(10), // 0x0400
+    INPUT_INTERACT_OBJ_GRABBABLE = BIT(11), // 0x0800
+    INPUT_B_DOWN                 = BIT(12), // 0x1000
+    INPUT_B_PRESSED              = BIT(13), // 0x2000
+    INPUT_Z_DOWN                 = BIT(14), // 0x4000
+    INPUT_Z_PRESSED              = BIT(15), // 0x8000
 };
 
-enum AirStepCheck {
-    AIR_STEP_CHECK_NONE,
-    AIR_STEP_CHECK_LEDGE_GRAB,
-    AIR_STEP_CHECK_HANG
-};
 
-enum AirStep {
-    AIR_STEP_NONE,
-    AIR_STEP_LANDED,
-    AIR_STEP_HIT_WALL,
-    AIR_STEP_GRABBED_LEDGE,
-    AIR_STEP_GRABBED_CEILING,
-    AIR_STEP_UNK,
-    AIR_STEP_HIT_LAVA_WALL,
-    AIR_STEP_HIT_CEILING
-};
-
-enum WaterStep {
-    WATER_STEP_NONE,
-    WATER_STEP_HIT_FLOOR,
-    WATER_STEP_HIT_CEILING,
-    WATER_STEP_CANCELLED,
-    WATER_STEP_HIT_WALL
-};
+// MarioState.particleFlags
 
 enum MarioParticleFlags {
-    PARTICLE_NONE                 = /* 0x00000000 */ (0 <<  0),
-    PARTICLE_DUST                 = /* 0x00000001 */ (1 <<  0),
-    PARTICLE_VERTICAL_STAR        = /* 0x00000002 */ (1 <<  1),
-    PARTICLE_2                    = /* 0x00000004 */ (1 <<  2),
-    PARTICLE_SPARKLES             = /* 0x00000008 */ (1 <<  3),
-    PARTICLE_HORIZONTAL_STAR      = /* 0x00000010 */ (1 <<  4),
-    PARTICLE_BUBBLE               = /* 0x00000020 */ (1 <<  5),
-    PARTICLE_WATER_SPLASH         = /* 0x00000040 */ (1 <<  6),
-    PARTICLE_IDLE_WATER_WAVE      = /* 0x00000080 */ (1 <<  7),
-    PARTICLE_SHALLOW_WATER_WAVE   = /* 0x00000100 */ (1 <<  8),
-    PARTICLE_PLUNGE_BUBBLE        = /* 0x00000200 */ (1 <<  9),
-    PARTICLE_WAVE_TRAIL           = /* 0x00000400 */ (1 << 10),
-    PARTICLE_FIRE                 = /* 0x00000800 */ (1 << 11),
-    PARTICLE_SHALLOW_WATER_SPLASH = /* 0x00001000 */ (1 << 12),
-    PARTICLE_LEAF                 = /* 0x00002000 */ (1 << 13),
-    PARTICLE_SNOW                 = /* 0x00004000 */ (1 << 14),
-    PARTICLE_DIRT                 = /* 0x00008000 */ (1 << 15),
-    PARTICLE_MIST_CIRCLE          = /* 0x00010000 */ (1 << 16),
-    PARTICLE_BREATH               = /* 0x00020000 */ (1 << 17),
-    PARTICLE_TRIANGLE             = /* 0x00040000 */ (1 << 18),
-    PARTICLE_19                   = /* 0x00080000 */ (1 << 19),
+    PARTICLE_NONE                 = 0x0,     // 0x00000000
+    PARTICLE_DUST                 = BIT( 0), // 0x00000001
+    PARTICLE_VERTICAL_STAR        = BIT( 1), // 0x00000002
+    PARTICLE_2                    = BIT( 2), // 0x00000004
+    PARTICLE_SPARKLES             = BIT( 3), // 0x00000008
+    PARTICLE_HORIZONTAL_STAR      = BIT( 4), // 0x00000010
+    PARTICLE_BUBBLE               = BIT( 5), // 0x00000020
+    PARTICLE_WATER_SPLASH         = BIT( 6), // 0x00000040
+    PARTICLE_IDLE_WATER_WAVE      = BIT( 7), // 0x00000080
+    PARTICLE_SHALLOW_WATER_WAVE   = BIT( 8), // 0x00000100
+    PARTICLE_PLUNGE_BUBBLE        = BIT( 9), // 0x00000200
+    PARTICLE_WAVE_TRAIL           = BIT(10), // 0x00000400
+    PARTICLE_FIRE                 = BIT(11), // 0x00000800
+    PARTICLE_SHALLOW_WATER_SPLASH = BIT(12), // 0x00001000
+    PARTICLE_LEAF                 = BIT(13), // 0x00002000
+    PARTICLE_SNOW                 = BIT(14), // 0x00004000
+    PARTICLE_DIRT                 = BIT(15), // 0x00008000
+    PARTICLE_MIST_CIRCLE          = BIT(16), // 0x00010000
+    PARTICLE_BREATH               = BIT(17), // 0x00020000
+    PARTICLE_TRIANGLE             = BIT(18), // 0x00040000
+    PARTICLE_19                   = BIT(19), // 0x00080000
+    PARTICLE_20                   = BIT(20), // 0x00100000
+    PARTICLE_21                   = BIT(21), // 0x00200000
+    PARTICLE_22                   = BIT(22), // 0x00400000
+    PARTICLE_23                   = BIT(23), // 0x00800000
+    PARTICLE_24                   = BIT(24), // 0x01000000
+    PARTICLE_25                   = BIT(25), // 0x02000000
+    PARTICLE_26                   = BIT(26), // 0x04000000
+    PARTICLE_27                   = BIT(27), // 0x08000000
+    PARTICLE_28                   = BIT(28), // 0x10000000
+    PARTICLE_29                   = BIT(29), // 0x20000000
+    PARTICLE_30                   = BIT(30), // 0x40000000
+    PARTICLE_31                   = BIT(31), // 0x80000000
 };
+
+
+// MarioState.modelState
+
+#define MARIO_STATE_ALPHA_SIZE 8
 
 enum ModelStates {
-    MODEL_STATE_NORMAL      =  0x0,
-    MODEL_STATE_ALPHA       =  BIT(8),                      //  0x100
-    MODEL_STATE_NOISE_ALPHA = (BIT(7) | MODEL_STATE_ALPHA), // (0x080 | MODEL_STATE_ALPHA)
-    MODEL_STATE_METAL       =  BIT(9),                      //  0x200
-    MODEL_STATE_MASK        =  BITMASK(8),
+    MODEL_STATE_NORMAL       = 0x0,    // 0x0000
+    // bits 0 - 7 reserved for alpha.
+    MODEL_STATE_ALPHA        = BIT(8), // 0x0100
+    MODEL_STATE_METAL        = BIT(9), // 0x0200
+    MODEL_STATE_OPACITY_MASK = BITMASK(MARIO_STATE_ALPHA_SIZE), // bits 0 - 7
 };
 
+
+// MarioState.flags
+
 enum MarioFlags {
-    MARIO_NONE                = /* 0x00000000 */ (0 <<  0),
-    MARIO_NORMAL_CAP          = /* 0x00000001 */ (1 <<  0),
-    MARIO_VANISH_CAP          = /* 0x00000002 */ (1 <<  1),
-    MARIO_METAL_CAP           = /* 0x00000004 */ (1 <<  2),
-    MARIO_WING_CAP            = /* 0x00000008 */ (1 <<  3),
-    MARIO_CAP_ON_HEAD         = /* 0x00000010 */ (1 <<  4),
-    MARIO_CAP_IN_HAND         = /* 0x00000020 */ (1 <<  5),
-    MARIO_METAL_SHOCK         = /* 0x00000040 */ (1 <<  6),
-    MARIO_TELEPORTING         = /* 0x00000080 */ (1 <<  7),
-    MARIO_JUMPING             = /* 0x00000100 */ (1 <<  8),
-    MARIO_UNUSED_9            = /* 0x00000200 */ (1 <<  9),
-    MARIO_UNUSED_10           = /* 0x00000400 */ (1 << 10),
-    MARIO_UNUSED_11           = /* 0x00000800 */ (1 << 11),
-    MARIO_UNUSED_12           = /* 0x00001000 */ (1 << 12),
-    MARIO_NO_PURPLE_SWITCH    = /* 0x00002000 */ (1 << 13),
-    MARIO_UNUSED_14           = /* 0x00004000 */ (1 << 14),
-    MARIO_UNUSED_15           = /* 0x00008000 */ (1 << 15),
-    MARIO_ACTION_SOUND_PLAYED = /* 0x00010000 */ (1 << 16),
-    MARIO_MARIO_SOUND_PLAYED  = /* 0x00020000 */ (1 << 17),
-    MARIO_FALL_SOUND_PLAYED   = /* 0x00040000 */ (1 << 18),
-    MARIO_UNUSED_19           = /* 0x00080000 */ (1 << 19),
-    MARIO_PUNCHING            = /* 0x00100000 */ (1 << 20),
-    MARIO_KICKING             = /* 0x00200000 */ (1 << 21),
-    MARIO_TRIPPING            = /* 0x00400000 */ (1 << 22),
-    MARIO_UNUSED_23           = /* 0x00800000 */ (1 << 23),
-    MARIO_UNUSED_24           = /* 0x01000000 */ (1 << 24),
-    MARIO_LEDGE_CLIMB_CAMERA  = /* 0x02000000 */ (1 << 25),
-    MARIO_UNUSED_26           = /* 0x04000000 */ (1 << 26),
-    MARIO_UNUSED_27           = /* 0x08000000 */ (1 << 27),
-    MARIO_UNUSED_28           = /* 0x10000000 */ (1 << 28),
-    MARIO_UNUSED_29           = /* 0x20000000 */ (1 << 29),
-    MARIO_AIR_HIT_WALL        = /* 0x40000000 */ (1 << 30),
-    MARIO_PUSHING             = /* 0x80000000 */ (1 << 31),
+    MARIO_NONE                = 0x0,     // 0x00000000
+    MARIO_NORMAL_CAP          = BIT( 0), // 0x00000001
+    MARIO_VANISH_CAP          = BIT( 1), // 0x00000002
+    MARIO_METAL_CAP           = BIT( 2), // 0x00000004
+    MARIO_WING_CAP            = BIT( 3), // 0x00000008
+    MARIO_CAP_ON_HEAD         = BIT( 4), // 0x00000010
+    MARIO_CAP_IN_HAND         = BIT( 5), // 0x00000020
+    MARIO_METAL_SHOCK         = BIT( 6), // 0x00000040
+    MARIO_TELEPORTING         = BIT( 7), // 0x00000080
+    MARIO_JUMPING             = BIT( 8), // 0x00000100
+    MARIO_UNUSED_9            = BIT( 9), // 0x00000200
+    MARIO_UNUSED_10           = BIT(10), // 0x00000400
+    MARIO_UNUSED_11           = BIT(11), // 0x00000800
+    MARIO_UNUSED_12           = BIT(12), // 0x00001000
+    MARIO_NO_PURPLE_SWITCH    = BIT(13), // 0x00002000
+    MARIO_UNUSED_14           = BIT(14), // 0x00004000
+    MARIO_UNUSED_15           = BIT(15), // 0x00008000
+    MARIO_ACTION_SOUND_PLAYED = BIT(16), // 0x00010000
+    MARIO_MARIO_SOUND_PLAYED  = BIT(17), // 0x00020000
+    MARIO_FALL_SOUND_PLAYED   = BIT(18), // 0x00040000
+    MARIO_UNUSED_19           = BIT(19), // 0x00080000
+    MARIO_PUNCHING            = BIT(20), // 0x00100000
+    MARIO_KICKING             = BIT(21), // 0x00200000
+    MARIO_TRIPPING            = BIT(22), // 0x00400000
+    MARIO_UNUSED_23           = BIT(23), // 0x00800000
+    MARIO_UNUSED_24           = BIT(24), // 0x01000000
+    MARIO_LEDGE_CLIMB_CAMERA  = BIT(25), // 0x02000000
+    MARIO_UNUSED_26           = BIT(26), // 0x04000000
+    MARIO_UNUSED_27           = BIT(27), // 0x08000000
+    MARIO_UNUSED_28           = BIT(28), // 0x10000000
+    MARIO_UNUSED_29           = BIT(29), // 0x20000000
+    MARIO_AIR_HIT_WALL        = BIT(30), // 0x40000000
+    MARIO_PUSHING             = BIT(31), // 0x80000000
     MARIO_SPECIAL_CAPS        = (MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP),
     MARIO_CAPS                = (MARIO_NORMAL_CAP | MARIO_SPECIAL_CAPS),
 };
 
-#define ACT_ID_MASK                         0x000001FF
+
+// MarioState.action
+
+#define ACT_ID_SIZE 9 // Number of bits reserved for the action id.
+#define ACT_ID_MASK BITMASK(ACT_ID_SIZE) // bits 0 - 8 (0x1FF)
+
+#define ACT_GROUP_SHIFT 6 // The rightmost bit used for checking the group id.
+#define ACTS_PER_GROUP BIT(ACT_GROUP_SHIFT) // 64 actions per group.
+
+#define ACT_GROUP_MASK (ACT_ID_MASK & ~BITMASK(ACT_GROUP_SHIFT)) // Only bits 6 - 8 (highest 3 bits of act id) are used to determine the action group.
 
 enum MarioActionGroups {
-    ACT_GROUP_STATIONARY = /* 0x00000000 */ (0 << 6),
-    ACT_GROUP_MOVING     = /* 0x00000040 */ (1 << 6),
-    ACT_GROUP_AIRBORNE   = /* 0x00000080 */ (2 << 6),
-    ACT_GROUP_SUBMERGED  = /* 0x000000C0 */ (3 << 6),
-    ACT_GROUP_CUTSCENE   = /* 0x00000100 */ (4 << 6),
-    ACT_GROUP_AUTOMATIC  = /* 0x00000140 */ (5 << 6),
-    ACT_GROUP_OBJECT     = /* 0x00000180 */ (6 << 6),
-    ACT_GROUP_CUSTOM     = /* 0x000001C0 */ (7 << 6),
-    ACT_GROUP_MASK       = 0x000001C0
+    ACT_GROUP_STATIONARY = (0 * ACTS_PER_GROUP), // (0 << ACT_GROUP_SHIFT) // 0x00000000
+    ACT_GROUP_MOVING     = (1 * ACTS_PER_GROUP), // (1 << ACT_GROUP_SHIFT) // 0x00000040
+    ACT_GROUP_AIRBORNE   = (2 * ACTS_PER_GROUP), // (2 << ACT_GROUP_SHIFT) // 0x00000080
+    ACT_GROUP_SUBMERGED  = (3 * ACTS_PER_GROUP), // (3 << ACT_GROUP_SHIFT) // 0x000000C0
+    ACT_GROUP_CUTSCENE   = (4 * ACTS_PER_GROUP), // (4 << ACT_GROUP_SHIFT) // 0x00000100
+    ACT_GROUP_AUTOMATIC  = (5 * ACTS_PER_GROUP), // (5 << ACT_GROUP_SHIFT) // 0x00000140
+    ACT_GROUP_OBJECT     = (6 * ACTS_PER_GROUP), // (6 << ACT_GROUP_SHIFT) // 0x00000180
+    ACT_GROUP_CUSTOM     = (7 * ACTS_PER_GROUP), // (7 << ACT_GROUP_SHIFT) // 0x000001C0
 };
 
 enum MarioActionFlags {
-    ACT_FLAG_STATIONARY                 = /* 0x00000200 */ (1 <<  9),
-    ACT_FLAG_MOVING                     = /* 0x00000400 */ (1 << 10),
-    ACT_FLAG_AIR                        = /* 0x00000800 */ (1 << 11),
-    ACT_FLAG_INTANGIBLE                 = /* 0x00001000 */ (1 << 12),
-    ACT_FLAG_SWIMMING                   = /* 0x00002000 */ (1 << 13),
-    ACT_FLAG_METAL_WATER                = /* 0x00004000 */ (1 << 14),
-    ACT_FLAG_SHORT_HITBOX               = /* 0x00008000 */ (1 << 15),
-    ACT_FLAG_RIDING_SHELL               = /* 0x00010000 */ (1 << 16),
-    ACT_FLAG_INVULNERABLE               = /* 0x00020000 */ (1 << 17),
-    ACT_FLAG_BUTT_OR_STOMACH_SLIDE      = /* 0x00040000 */ (1 << 18),
-    ACT_FLAG_DIVING                     = /* 0x00080000 */ (1 << 19),
-    ACT_FLAG_ON_POLE                    = /* 0x00100000 */ (1 << 20),
-    ACT_FLAG_HANGING                    = /* 0x00200000 */ (1 << 21),
-    ACT_FLAG_IDLE                       = /* 0x00400000 */ (1 << 22),
-    ACT_FLAG_ATTACKING                  = /* 0x00800000 */ (1 << 23),
-    ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION = /* 0x01000000 */ (1 << 24),
-    ACT_FLAG_CONTROL_JUMP_HEIGHT        = /* 0x02000000 */ (1 << 25),
-    ACT_FLAG_ALLOW_FIRST_PERSON         = /* 0x04000000 */ (1 << 26),
-    ACT_FLAG_PAUSE_EXIT                 = /* 0x08000000 */ (1 << 27),
-    ACT_FLAG_SWIMMING_OR_FLYING         = /* 0x10000000 */ (1 << 28),
-    ACT_FLAG_WATER_OR_TEXT              = /* 0x20000000 */ (1 << 29),
-    ACT_FLAG_UNUSED                     = /* 0x40000000 */ (1 << 30),
-    ACT_FLAG_THROWING                   = /* 0x80000000 */ (1 << 31),
+    ACT_FLAGS_NONE                      = 0x0,     // 0x00000000
+    // bits 0 - 8 reserved for action id.
+    ACT_FLAG_STATIONARY                 = BIT( 9), // 0x00000200
+    ACT_FLAG_MOVING                     = BIT(10), // 0x00000400
+    ACT_FLAG_AIR                        = BIT(11), // 0x00000800
+    ACT_FLAG_INTANGIBLE                 = BIT(12), // 0x00001000
+    ACT_FLAG_SWIMMING                   = BIT(13), // 0x00002000
+    ACT_FLAG_METAL_WATER                = BIT(14), // 0x00004000
+    ACT_FLAG_SHORT_HITBOX               = BIT(15), // 0x00008000
+    ACT_FLAG_RIDING_SHELL               = BIT(16), // 0x00010000
+    ACT_FLAG_INVULNERABLE               = BIT(17), // 0x00020000
+    ACT_FLAG_BUTT_OR_STOMACH_SLIDE      = BIT(18), // 0x00040000
+    ACT_FLAG_DIVING                     = BIT(19), // 0x00080000
+    ACT_FLAG_ON_POLE                    = BIT(20), // 0x00100000
+    ACT_FLAG_HANGING                    = BIT(21), // 0x00200000
+    ACT_FLAG_IDLE                       = BIT(22), // 0x00400000
+    ACT_FLAG_ATTACKING                  = BIT(23), // 0x00800000
+    ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION = BIT(24), // 0x01000000
+    ACT_FLAG_CONTROL_JUMP_HEIGHT        = BIT(25), // 0x02000000
+    ACT_FLAG_ALLOW_FIRST_PERSON         = BIT(26), // 0x04000000
+    ACT_FLAG_PAUSE_EXIT                 = BIT(27), // 0x08000000
+    ACT_FLAG_SWIMMING_OR_FLYING         = BIT(28), // 0x10000000
+    ACT_FLAG_WATER_OR_TEXT              = BIT(29), // 0x20000000
+    ACT_FLAG_UNUSED                     = BIT(30), // 0x40000000
+    ACT_FLAG_THROWING                   = BIT(31), // 0x80000000
 };
 
 #define ACT_UNINITIALIZED              (0x000)
@@ -704,13 +709,14 @@ enum MarioActionFlags {
 // group 0x1C0: custom actions
 // 0x1C0 - 0x1FF
 
-/*
- this input mask is unused by the controller,
- but END_DEMO is used internally to signal
- the demo to end. This button cannot
- be pressed normally by a controller.
-*/
-#define END_DEMO       (1 << 7)
+
+/**
+ * this input mask is unused by the controller,
+ * but END_DEMO is used internally to signal
+ * the demo to end. This button cannot
+ * be pressed normally by a controller.
+ */
+#define END_DEMO       BIT(7) // 0x0080
 
 #define VALID_BUTTONS (A_BUTTON   | B_BUTTON   | Z_TRIG     | START_BUTTON | \
                        U_JPAD     | D_JPAD     | L_JPAD     | R_JPAD       | \
