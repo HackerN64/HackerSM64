@@ -660,7 +660,6 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll);
 void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, Vec3f scale);
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 roll);
 void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw);
-void mtxf_z_offset(Mat4 dest, Mat4 src, s32 zOffset);
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw);
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius);
 void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2);

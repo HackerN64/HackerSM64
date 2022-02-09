@@ -691,17 +691,6 @@ void mtxf_held_object(Mat4 dest, Mat4 src, Mat4 throwMatrix, Vec3f translation, 
 }
 
 /**
- * Set 'dest' to 'src', with its last entry as a scale of the z position, offset by 'zOffset'.
- */
-void mtxf_z_offset(Mat4 dest, Mat4 src, s32 zOffset) {
-    mtxf_copy(dest, src);
-    f32 z = dest[3][2];
-    if (zOffset != 0 && z != 0) {
-        dest[3][3] = (z + zOffset) / z;
-    }
-}
-
-/**
  * Creates 'colX' and 'colZ' perpendicular to 'colY' input;
  */
 static void vec3f_create_axis_normals_from_up_dir(Vec3f colX, Vec3f colY, Vec3f colZ) {
@@ -1662,6 +1651,7 @@ void mtxf_to_mtx_fast(s16* dst, float* src) {
         s32 a_int = (s32)a_scaled;
         s32 b_int = (s32)b_scaled;
         s32 c_int = (s32)c_scaled;
+
         s32 c_high = (c_int & 0xFFFF0000);
         s32 c_low = (c_int << 16);
 
@@ -1675,12 +1665,12 @@ void mtxf_to_mtx_fast(s16* dst, float* src) {
         // Write the integer part of b using swl to avoid needing to shift.
         swl(dst + (4 * i), b_int, 2);
         // Write the fractional part of b.
-        dst[(4 * i) + 17] = (s16)b_int;
+        dst[(4 * i) + 16 + 1] = (s16)b_int;
 
         // Write the integer part of c and two zeroes for the 4th column.
         *(s32*)(&dst[(4 * i) + 2]) = c_high;
         // Write the fractional part of c and two zeroes for the 4th column
-        *(s32*)(&dst[(4 * i) + 18]) = c_low;
+        *(s32*)(&dst[(4 * i) + 16 + 2]) = c_low;
     }
     // Write 1.0 to the bottom right entry in the output matrix
     // The low half was already set to zero in the loop, so we only need

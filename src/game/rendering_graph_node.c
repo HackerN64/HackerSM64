@@ -655,9 +655,24 @@ void geo_process_billboard(struct GraphNodeBillboard *node) {
  * For the rest it acts as a normal display list node.
  */
 void geo_process_z_offset(struct GraphNodeZOffset *node) {
-    mtxf_z_offset(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex], node->zOffset);
+    Mat4 *src = gMatStack[gMatStackIndex];
+
+    f32 zOffset = node->zOffset;
+    f32 zPos = gMatStack[gMatStackIndex][3][2];
+
+    mtxf_copy(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
 
     inc_mat_stack();
+
+    if (zOffset != 0 && FLT_IS_NONZERO(zPos)) {
+        f32 z = (zPos + zOffset) / zPos;
+
+        s32 fixed_val = FTOFIX32(z);
+        s16 *dst = (s16 *)gMatStackFixed[gMatStackIndex];
+        dst[15] = (fixed_val >> 16);
+        dst[31] = (fixed_val & 0xFFFF);
+    }
+
     append_dl_and_return((struct GraphNodeDisplayList *)node);
 }
 
