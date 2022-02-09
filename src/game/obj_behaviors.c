@@ -118,7 +118,7 @@ void turn_obj_away_from_surface(f32 velX, f32 velZ, f32 nX, UNUSED f32 nY, f32 n
 /**
  * Finds any wall collisions, applies them, and turns away from the surface.
  */
-s8 obj_find_wall(f32 objNewX, f32 objY, f32 objNewZ, f32 objVelX, f32 objVelZ) {
+s32 obj_find_wall(f32 objNewX, f32 objY, f32 objNewZ, f32 objVelX, f32 objVelZ) {
     struct WallCollisionData hitbox;
     f32 wall_nX, wall_nY, wall_nZ, objVelXCopy, objVelZCopy, objYawX, objYawZ;
 
@@ -153,7 +153,7 @@ s8 obj_find_wall(f32 objNewX, f32 objY, f32 objNewZ, f32 objVelX, f32 objVelZ) {
 /**
  * Turns an object away from steep floors, similarly to walls.
  */
-s8 turn_obj_away_from_steep_floor(struct Surface *objFloor, f32 floorY, f32 objVelX, f32 objVelZ) {
+s32 turn_obj_away_from_steep_floor(struct Surface *objFloor, f32 floorY, f32 objVelX, f32 objVelZ) {
     f32 floor_nX, floor_nY, floor_nZ, objVelXCopy, objVelZCopy, objYawX, objYawZ;
 
     if (objFloor == NULL) {
@@ -360,7 +360,7 @@ void obj_splash(s32 waterY, s32 objY) {
  * Generic object move function. Handles walls, water, floors, and gravity.
  * Returns flags for certain interactions.
  */
-s16 object_step(void) {
+s32 object_step(void) {
     f32 objX = o->oPosX;
     f32 objY = o->oPosY;
     f32 objZ = o->oPosZ;
@@ -370,10 +370,10 @@ s16 object_step(void) {
     f32 objVelX = o->oForwardVel * sins(o->oMoveAngleYaw);
     f32 objVelZ = o->oForwardVel * coss(o->oMoveAngleYaw);
 
-    s16 collisionFlags = 0;
+    s16 collisionFlags = OBJ_COL_FLAGS_NONE;
 
     // Find any wall collisions, receive the push, and set the flag.
-    if (obj_find_wall(objX + objVelX, objY, objZ + objVelZ, objVelX, objVelZ) == 0) {
+    if (!obj_find_wall(objX + objVelX, objY, objZ + objVelZ, objVelX, objVelZ)) {
         collisionFlags += OBJ_COL_FLAG_HIT_WALL;
     }
 
@@ -382,7 +382,7 @@ s16 object_step(void) {
     o->oFloor       = sObjFloor;
     o->oFloorHeight = floorY;
 
-    if (turn_obj_away_from_steep_floor(sObjFloor, floorY, objVelX, objVelZ) == 1) {
+    if (turn_obj_away_from_steep_floor(sObjFloor, floorY, objVelX, objVelZ)) {
         waterY = find_water_level(objX + objVelX, objY, objZ + objVelZ);
         if (waterY > objY) {
             calc_new_obj_vel_and_pos_y_underwater(sObjFloor, floorY, objVelX, objVelZ, waterY);
@@ -414,7 +414,7 @@ s16 object_step(void) {
  * Takes an object step but does not orient with the object's floor.
  * Used for boulders, falling pillars, and the rolling snowman body.
  */
-s16 object_step_without_floor_orient(void) {
+s32 object_step_without_floor_orient(void) {
     sOrientObjWithFloor = FALSE;
     s16 collisionFlags = object_step();
     sOrientObjWithFloor = TRUE;

@@ -35,9 +35,9 @@ s32 detect_object_hitbox_overlap(struct Object *a, struct Object *b) {
         f32 dyb_top = b->hitboxHeight + dyb_bottom;
 
         if (dya_bottom > dyb_top
-            || dya_top < dyb_bottom
-            || a->numCollidedObjs >= 4
-            || b->numCollidedObjs >= 4) {
+         || dyb_bottom > dya_top
+         || a->numCollidedObjs >= 4
+         || b->numCollidedObjs >= 4) {
             return FALSE;
         }
         a->collidedObjs[a->numCollidedObjs] = b;
@@ -68,7 +68,8 @@ s32 detect_object_hurtbox_overlap(struct Object *a, struct Object *b) {
         f32 dya_top = a->hitboxHeight  + dya_bottom;
         f32 dyb_top = b->hurtboxHeight + dyb_bottom;
 
-        if (dya_bottom > dyb_top || dya_top < dyb_bottom) {
+        if (dya_bottom > dyb_top
+         || dyb_bottom > dya_top) {
             return FALSE;
         }
         if (a == gMarioObject) {
