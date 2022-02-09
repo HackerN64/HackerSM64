@@ -679,6 +679,9 @@ void mtxf_mul_vec3s(Mat4 mtx, Vec3s b);
 void linear_mtxf_mul_vec3f(Mat4 mtx, Vec3f dest, Vec3f src);
 void linear_mtxf_mul_vec3f_and_translate(Mat4 mtx, Vec3f dest, Vec3f src);
 void linear_mtxf_transpose_mul_vec3f(Mat4 mtx, Vec3f dest, Vec3f src);
+// Fixed point matrix conversions:
+f32 mtx_get_float(Mtx *mtx, u32 index);
+void mtx_set_float(Mtx *mtx, u32 index, f32 val);
 
 extern void mtxf_to_mtx_fast(s16 *dest, float *src);
 ALWAYS_INLINE void mtxf_to_mtx(void *dest, void *src) {

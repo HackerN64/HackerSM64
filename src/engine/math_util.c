@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include "game/debug.h"
 
 #include "sm64.h"
 #include "engine/graph_node.h"
@@ -846,6 +847,34 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
 }
 
 /**
+ * Returns a float value from an index in a fixed point matrix.
+ */
+f32 mtx_get_float(Mtx *mtx, u32 index) {
+    f32 ret = 0.0f;
+    if (index < 16) {
+        s16 *src = (s16 *)mtx;
+        s32 fixed_val = (src[index +  0] << 16)
+                    | (src[index + 16] & 0xFFFF);
+        f32 scale = construct_float(1.0f / (float)0x00010000);
+        ret = mul_without_nop((f32)fixed_val, scale);
+    }
+    return ret;
+}
+
+/**
+ * Writes a float value to a fixed point matrix.
+ */
+void mtx_set_float(Mtx *mtx, u32 index, f32 val) {
+    if (index < 16) {
+        f32 scale = construct_float((float)0x00010000);
+        s32 fixed_val = mul_without_nop(val, scale);
+        s16 *dst = (s16 *)mtx;
+        dst[index +  0] = (fixed_val >> 16);
+        dst[index + 16] = (fixed_val & 0xFFFF);
+    }
+}
+
+/**
  * Set 'mtx' to a transformation matrix that rotates around the z axis.
  */
 #define MATENTRY(a, b)                          \
@@ -1636,7 +1665,7 @@ void find_surface_on_ray_between_points(Vec3f pos1, Vec3f pos2, struct Surface *
 __attribute__((optimize("Os"))) __attribute__((aligned(32)))
 void mtxf_to_mtx_fast(s16* dst, float* src) {
     int i;
-    float scale = construct_float(65536.0f / WORLD_SCALE);
+    float scale = construct_float((float)0x00010000 / WORLD_SCALE);
     // Iterate over rows of values in the input matrix
     for (i = 0; i < 4; i++) {
         // Read the three input in the current row (assume the fourth is zero)
