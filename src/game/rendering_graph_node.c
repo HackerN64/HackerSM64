@@ -655,8 +655,6 @@ void geo_process_billboard(struct GraphNodeBillboard *node) {
  * For the rest it acts as a normal display list node.
  */
 void geo_process_z_offset(struct GraphNodeZOffset *node) {
-    Mat4 *src = gMatStack[gMatStackIndex];
-
     f32 zOffset = node->zOffset;
     f32 zPos = gMatStack[gMatStackIndex][3][2];
 
