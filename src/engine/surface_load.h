@@ -20,8 +20,8 @@ enum SurfaceErrors {
 };
 
 struct SurfaceNode {
-    struct SurfaceNode *next;
-    struct Surface *surface;
+    /*0x00*/ struct SurfaceNode *next;
+    /*0x04*/ struct Surface *surface;
 };
 
 enum SpatialPartitions {
