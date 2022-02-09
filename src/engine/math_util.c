@@ -317,12 +317,28 @@ void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b) {
     dest[2] = (x1 * y2) - (y1 * x2);
 }
 
-/// Scale vector 'dest' so it has length 1
+/// Scale vector 'dest' so it has length 1.
 void vec3f_normalize(Vec3f dest) {
-    f32 mag = (sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
+    f32 mag = vec3_sumsq(dest);
     if (mag > construct_float(NEAR_ZERO)) {
         f32 invsqrt = (construct_float(1.0f) / sqrtf(mag));
         vec3_mul_val(dest, invsqrt);
+    } else {
+        // Default to up vector.
+        dest[0] = 0;
+        ((u32 *) dest)[1] = FLOAT_ONE;
+        dest[2] = 0;
+    }
+}
+
+/// Scale vector 'dest' so it has length at most 'max'.
+void vec3f_normalize_max(Vec3f dest, f32 max) {
+    f32 mag = vec3_sumsq(dest);
+    if (mag > construct_float(NEAR_ZERO)) {
+        if (mag > sqr(max)) {
+            f32 invsqrt = max / sqrtf(mag);
+            vec3_mul_val(dest, invsqrt);
+        }
     } else {
         // Default to up vector.
         dest[0] = 0;

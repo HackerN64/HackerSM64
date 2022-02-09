@@ -452,26 +452,8 @@ extern f32 gSineTable[];
     ((u32 *)(mtx))[15] = FLOAT_ONE;             \
 }
 
-#define NAME_INVMAG(v) v##_invmag
 
-/// Scale vector 'v' so it has length 1
-#define vec3_normalize(v) {                                                                     \
-    f32 NAME_INVMAG(v) = vec3_mag((v));                                                         \
-    NAME_INVMAG(v) = (construct_float(1.0f) / MAX(NAME_INVMAG(v), construct_float(NEAR_ZERO))); \
-    vec3_mul_val((v), NAME_INVMAG(v));                                                          \
-}
-
-#define vec3_normalize_max(v, max) {                    \
-    f32 v##_mag = vec3_mag(v);                          \
-    v##_mag = MAX(v##_mag, construct_float(NEAR_ZERO)); \
-    if (v##_mag > max) {                                \
-        v##_mag = (max / v##_mag);                      \
-        vec3_mul_val(v, v##_mag);                       \
-    }                                                   \
-}
-
-
-// Inline functions:
+// Inline asm functions:
 
 /// Rounds towards infinity
 ALWAYS_INLINE s32 ceilf(f32 in) {
@@ -652,6 +634,7 @@ void vec3s_quot(Vec3s dest, const Vec3s a, const Vec3s b);
 f32  vec3f_dot(              const Vec3f a, const Vec3f b);
 void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b);
 void vec3f_normalize(Vec3f dest);
+void vec3f_normalize_max(Vec3f dest, f32 max);
 // Mtxf operations
 void mtxf_copy(Mat4 dest, Mat4 src);
 // Create specific matrices
