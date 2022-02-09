@@ -83,7 +83,7 @@ Gfx *geo_exec_inside_castle_light(s32 callContext, struct GraphNode *node, UNUSE
             }
 
             struct GraphNodeGenerated *generatedNode = (struct GraphNodeGenerated *) node;
-            SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_TRANSPARENT);
+            generatedNode->fnNode.node.drawingLayer = LAYER_TRANSPARENT;
 
             gSPDisplayList(displayListHead++, dl_castle_lobby_wing_cap_light);
             gSPEndDisplayList(displayListHead);
@@ -136,7 +136,7 @@ Gfx *geo_exec_flying_carpet_create(s32 callContext, struct GraphNode *node, UNUS
             return NULL;
         }
 
-        SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_OPAQUE);
+        generatedNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
 
         for (n = 0; n <= 20; n++) {
             row = n / 3;
@@ -189,7 +189,7 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Ma
         displayList = alloc_display_list(3 * sizeof(*displayList));
         displayListHead = displayList;
 
-        SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_OPAQUE);
+        generatedNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
 #if MULTILANG
         gSPDisplayList(displayListHead++, dl_cake_end_screen);
 #else

@@ -217,7 +217,7 @@ init_graph_node_translation_rotation(struct AllocOnlyPool *pool,
 
         vec3s_copy(graphNode->translation, translation);
         vec3s_copy(graphNode->rotation, rotation);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
+        graphNode->node.drawingLayer = drawingLayer;
         graphNode->displayList = displayList;
     }
 
@@ -236,7 +236,7 @@ struct GraphNodeScale *init_graph_node_scale(struct AllocOnlyPool *pool,
 
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_SCALE);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
+        graphNode->node.drawingLayer = drawingLayer;
         graphNode->scale = scale;
         graphNode->displayList = displayList;
     }
@@ -306,7 +306,7 @@ struct GraphNodeAnimatedPart *init_graph_node_animated_part(struct AllocOnlyPool
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_ANIMATED_PART);
         vec3s_copy(graphNode->translation, translation);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
+        graphNode->node.drawingLayer = drawingLayer;
         graphNode->displayList = displayList;
     }
 
@@ -328,7 +328,7 @@ struct GraphNodeBone *init_graph_node_bone(struct AllocOnlyPool *pool,
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_BONE);
         vec3s_copy(graphNode->translation, translation);
         vec3s_copy(graphNode->rotation, rotation);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
+        graphNode->node.drawingLayer = drawingLayer;
         graphNode->displayList = displayList;
     }
 
@@ -349,7 +349,7 @@ struct GraphNodeBillboard *init_graph_node_billboard(struct AllocOnlyPool *pool,
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_BILLBOARD);
         vec3s_copy(graphNode->translation, translation);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
+        graphNode->node.drawingLayer = drawingLayer;
         graphNode->displayList = displayList;
     }
 
@@ -368,7 +368,7 @@ struct GraphNodeDisplayList *init_graph_node_display_list(struct AllocOnlyPool *
 
     if (graphNode != NULL) {
         init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_DISPLAY_LIST);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
+        graphNode->node.drawingLayer = drawingLayer;
         graphNode->displayList = displayList;
     }
 

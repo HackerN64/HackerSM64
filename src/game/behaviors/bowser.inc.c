@@ -1877,11 +1877,7 @@ Gfx *geo_bits_bowser_coloring(s32 callContext, struct GraphNode *node, UNUSED s3
         }
 
         // Set layers if object is transparent or not
-        if (obj->oOpacity == 255) {
-            SET_GRAPH_NODE_LAYER(graphNode->fnNode.node.flags, LAYER_OPAQUE);
-        } else {
-            SET_GRAPH_NODE_LAYER(graphNode->fnNode.node.flags, LAYER_TRANSPARENT);
-        }
+        graphNode->fnNode.node.drawingLayer = (obj->oOpacity == 255) ? LAYER_OPAQUE : LAYER_TRANSPARENT;
 
         Gfx *gfx = gfxHead = alloc_display_list(2 * sizeof(Gfx));
 

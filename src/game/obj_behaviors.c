@@ -93,7 +93,7 @@ Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *no
 
         gfxHead = alloc_display_list(3 * sizeof(Gfx));
         gfx = gfxHead;
-        SET_GRAPH_NODE_LAYER(obj->header.gfx.node.flags, LAYER_TRANSPARENT);
+        obj->header.gfx.node.drawingLayer = LAYER_TRANSPARENT;
 
         gDPSetEnvColor(gfx++, 255, 255, 255, heldObject->oOpacity);
 

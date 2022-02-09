@@ -305,7 +305,7 @@ Gfx *geo_cannon_circle_base(s32 callContext, struct GraphNode *node, UNUSED Mat4
 
     if (callContext == GEO_CONTEXT_RENDER && gCurrentArea != NULL
         && gCurrentArea->camera->mode == CAMERA_MODE_INSIDE_CANNON) {
-        SET_GRAPH_NODE_LAYER(graphNode->fnNode.node.flags, LAYER_TRANSPARENT);
+        graphNode->fnNode.node.drawingLayer = LAYER_TRANSPARENT;
 #ifndef L3DEX2_ALONE
         dlist = render_cannon_circle_base();
 #endif

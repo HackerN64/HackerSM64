@@ -18,7 +18,7 @@ enum GraphNodeUCodes {
     GRAPH_NODE_NUM_UCODES,
 };
 
-enum GraphRenderFlags {
+enum GraphNodeFlags {
     GRAPH_RENDER_ACTIVE             = BIT(0), // 0x0001
     GRAPH_RENDER_CHILDREN_FIRST     = BIT(1), // 0x0002
     GRAPH_RENDER_BILLBOARD          = BIT(2), // 0x0004
@@ -28,27 +28,6 @@ enum GraphRenderFlags {
     GRAPH_RENDER_SILHOUETTE         = BIT(6), // 0x0040
     GRAPH_RENDER_OCCLUDE_SILHOUETTE = BIT(7), // 0x0080
 };
-
-/**
- * The amount of bits to use for the above flags out of an s16 variable.
- * The remaining bits to the left are used for the render layers.
- * The vanilla value is 8, allowing for 8 flags and 255 layers.
- */
-#define GRAPH_RENDER_FLAGS_SIZE 8
-
-// 0xFF00 when GRAPH_RENDER_FLAGS_SIZE is 8
-#define GRAPH_RENDER_LAYERS_MASK (BITMASK(16 - GRAPH_RENDER_FLAGS_SIZE) << GRAPH_RENDER_FLAGS_SIZE)
-// 0x00FF when GRAPH_RENDER_FLAGS_SIZE is 8
-#define GRAPH_RENDER_FLAGS_MASK  BITMASK(GRAPH_RENDER_FLAGS_SIZE)
-
-#if GRAPH_RENDER_FLAGS_SIZE == 8
-// Optimize the vanilla values
-#define SET_GRAPH_NODE_LAYER(flags, layer) ((flags) = ((flags) & GRAPH_RENDER_FLAGS_MASK) | ((layer) << GRAPH_RENDER_FLAGS_SIZE))
-#define GET_GRAPH_NODE_LAYER(flags)        (flags >> GRAPH_RENDER_FLAGS_SIZE)
-#else
-#define SET_GRAPH_NODE_LAYER(flags, layer) ((flags) = ((flags) & GRAPH_RENDER_FLAGS_MASK) | (((layer) << GRAPH_RENDER_FLAGS_SIZE) & GRAPH_RENDER_LAYERS_MASK))
-#define GET_GRAPH_NODE_LAYER(flags)        ((flags & GRAPH_RENDER_LAYERS_MASK) >> GRAPH_RENDER_FLAGS_SIZE)
-#endif
 
 // The discriminant for different types of geo nodes
 enum GraphNodeTypes {

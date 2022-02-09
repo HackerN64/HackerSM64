@@ -818,11 +818,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
          && painting->textureHeight > 0
          && painting->alpha > 0) {
             // Determine if the painting is transparent
-            if (painting->alpha == 0xFF) { // Opaque
-                SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_OCCLUDE_SILHOUETTE_OPAQUE);
-            } else {
-                SET_GRAPH_NODE_LAYER(gen->fnNode.node.flags, LAYER_TRANSPARENT);
-            }
+            gen->fnNode.node.drawingLayer = (painting->alpha == 0xFF) ? LAYER_OCCLUDE_SILHOUETTE_OPAQUE : LAYER_TRANSPARENT;
 
             if (obj->oPaintingState == PAINTING_IDLE) {
                 paintingDlist = display_painting_not_rippling(painting);

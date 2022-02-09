@@ -49,7 +49,7 @@ Gfx *geo_intro_super_mario_64_logo(s32 callContext, struct GraphNode *node, UNUS
     } else if (callContext == GEO_CONTEXT_RENDER) {
         f32 *scaleTable1 = segmented_to_virtual(intro_seg7_table_scale_1);
         f32 *scaleTable2 = segmented_to_virtual(intro_seg7_table_scale_2);
-        SET_GRAPH_NODE_LAYER(graphNode->flags, LAYER_OPAQUE);
+        graphNode->drawingLayer = LAYER_OPAQUE;
         Mtx *scaleMat = alloc_display_list(sizeof(*scaleMat));
         dl = alloc_display_list(4 * sizeof(*dl));
         dlIter = dl;
@@ -97,10 +97,10 @@ Gfx *geo_intro_tm_copyright(s32 callContext, struct GraphNode *node, UNUSED void
         gSPDisplayList(dlIter++, dl_proj_mtx_fullscreen);
         gDPSetEnvColor(dlIter++, 255, 255, 255, sTmCopyrightAlpha);
         if (sTmCopyrightAlpha == 255) { // opaque
-            SET_GRAPH_NODE_LAYER(graphNode->flags, LAYER_OPAQUE);
+            graphNode->drawingLayer = LAYER_OPAQUE;
             gDPSetRenderMode(dlIter++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
         } else { // blend
-            SET_GRAPH_NODE_LAYER(graphNode->flags, LAYER_TRANSPARENT);
+            graphNode->drawingLayer = LAYER_TRANSPARENT;
             gDPSetRenderMode(dlIter++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
         }
         gSPDisplayList(dlIter++, &intro_seg7_dl_copyright_trademark); // draw model
@@ -197,7 +197,7 @@ Gfx *geo_intro_regular_backdrop(s32 callContext, struct GraphNode *node, UNUSED 
     if (callContext == GEO_CONTEXT_RENDER) { // draw
         dl = alloc_display_list(16 * sizeof(*dl));
         dlIter = dl;
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, LAYER_OPAQUE);
+        graphNode->node.drawingLayer = LAYER_OPAQUE;
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
         gSPDisplayList(dlIter++, &title_screen_bg_dl_start);
         for (i = 0; i < 12; ++i) {
@@ -254,7 +254,7 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
         if (sGameOverTableIndex != 11) {
             sGameOverFrameCounter++;
         }
-        SET_GRAPH_NODE_LAYER(graphNode->flags, LAYER_OPAQUE);
+        graphNode->drawingLayer = LAYER_OPAQUE;
 
         // draw all the tiles
         gSPDisplayList(dlIter++, &dl_proj_mtx_fullscreen);
@@ -405,7 +405,7 @@ Gfx *geo_intro_face_easter_egg(s32 callContext, struct GraphNode *node, UNUSED v
         if (sFaceVisible[0] == 1 || sFaceVisible[17] == 1) {
             RGBA16 *image = intro_sample_frame_buffer(40, 40, 2, 2, 120, 80);
             if (image != NULL) {
-                SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
+                genNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
                 dl = intro_draw_face(image, 40, 40);
             }
         }
@@ -425,7 +425,7 @@ Gfx *geo_intro_rumble_pak_graphic(s32 callContext, struct GraphNode *node, UNUSE
     if (callContext != GEO_CONTEXT_RENDER) {
         dl = NULL;
     } else if (callContext == GEO_CONTEXT_RENDER) {
-        SET_GRAPH_NODE_LAYER(genNode->fnNode.node.flags, LAYER_OPAQUE);
+        genNode->fnNode.node.drawingLayer = LAYER_OPAQUE;
         s32 introContext = genNode->parameter & 0xFF;
         if (introContext == INTRO_CONTEXT_NORMAL) {
             backgroundTileSix = introBackgroundIndexTable[6];

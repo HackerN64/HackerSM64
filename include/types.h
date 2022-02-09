@@ -228,7 +228,8 @@ struct Animation {
 
 struct GraphNode {
     /*0x00*/ s16 type; // structure type
-    /*0x02*/ s16 flags; // hi = drawing layer, lo = rendering modes
+    /*0x02*/ s8 drawingLayer;
+    /*0x03*/ s8 flags;
     /*0x04*/ struct GraphNode *prev;
     /*0x08*/ struct GraphNode *next;
     /*0x0C*/ struct GraphNode *parent;
