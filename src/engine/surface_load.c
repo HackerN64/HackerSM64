@@ -653,6 +653,11 @@ void load_object_collision_model(void) {
         marioDist = dist_between_objects(obj, gMarioObject);
     }
 
+#ifdef LOAD_OBJECT_COLLISION_NEAR_CAMERA
+    f32 camDist = absf(obj->header.gfx.cameraToObject[2]);
+    marioDist = MIN(marioDist, camDist);
+#endif
+
 #ifdef AUTO_COLLISION_DISTANCE
     f32 colDist;
     if (collisionData == NULL) {

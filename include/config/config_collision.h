@@ -11,6 +11,9 @@
 // Automatically calculates the optimal collision distance for an object based on its vertices.
 #define AUTO_COLLISION_DISTANCE
 
+// Allows objects to use camera distance to determine whether to load collision if the camera is closer than Mario.
+#define LOAD_OBJECT_COLLISION_NEAR_CAMERA
+
 // Allows all surfaces types to have force, (doesn't require setting force, just allows it to be optional).
 #define ALL_SURFACES_HAVE_FORCE
 
