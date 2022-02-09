@@ -261,11 +261,11 @@ extern const Texture water_0900B800[];
 extern const Texture *const flower_bubbles_textures_ptr_0B002008[];
 extern const Texture *const lava_bubble_ptr_0B006020[];
 extern const Texture *const bubble_ptr_0B006848[];
-extern const Gfx tiny_bubble_dl_0B006A50[];
-extern const Gfx tiny_bubble_dl_0B006AB0[];
-extern const Gfx tiny_bubble_dl_0B006CD8[];
-extern const Gfx tiny_bubble_dl_0B006D38[];
-extern const Gfx tiny_bubble_dl_0B006D68[];
+extern const Gfx envfx_dl_gray_snowflake[];
+extern const Gfx envfx_dl_end[];
+extern const Gfx envfx_dl_blue_snowflake[];
+extern const Gfx envfx_dl_bubbles_begin[];
+extern const Gfx envfx_dl_bubbles_texture_format[];
 
 // title_screen_bg
 extern const Gfx title_screen_bg_dl_start[];

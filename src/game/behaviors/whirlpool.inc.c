@@ -39,22 +39,18 @@ void bhv_whirlpool_loop(void) {
         o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
 
         // not sure if actually an array
-        gEnvFxBubbleConfig[ENVFX_STATE_PARTICLECOUNT] = 60;
-        gEnvFxBubbleConfig[ENVFX_STATE_SRC_X] = o->oPosX;
-        gEnvFxBubbleConfig[ENVFX_STATE_SRC_Z] = o->oPosZ;
-        gEnvFxBubbleConfig[ENVFX_STATE_DEST_X] = o->oPosX;
-        gEnvFxBubbleConfig[ENVFX_STATE_DEST_Y] = o->oPosY;
-        gEnvFxBubbleConfig[ENVFX_STATE_DEST_Z] = o->oPosZ;
-        gEnvFxBubbleConfig[ENVFX_STATE_SRC_Y] = o->oPosY + 800.0f;
-        gEnvFxBubbleConfig[ENVFX_STATE_PITCH] = o->oWhirlpoolInitFacePitch;
-        gEnvFxBubbleConfig[ENVFX_STATE_YAW] = o->oWhirlpoolInitFaceRoll;
+        gEnvFxBubbleConfig->particleCount = 60;
+        vec3_copy_y_off(gEnvFxBubbleConfig->src, &o->oPosVec, 800.0f);
+        vec3f_to_vec3s(gEnvFxBubbleConfig->dest, &o->oPosVec);
+        gEnvFxBubbleConfig->angle[0] = o->oWhirlpoolInitFacePitch;
+        gEnvFxBubbleConfig->angle[1] = o->oWhirlpoolInitFaceRoll;
 
         whirpool_orient_graph();
 
         o->oFaceAngleYaw += 8000;
     } else {
         o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
-        gEnvFxBubbleConfig[ENVFX_STATE_PARTICLECOUNT] = 0;
+        gEnvFxBubbleConfig->particleCount = 0;
     }
 
     cur_obj_play_sound_1(SOUND_ENV_WATER);
@@ -64,12 +60,10 @@ void bhv_whirlpool_loop(void) {
 
 void bhv_jet_stream_loop(void) {
     if (o->oDistanceToMario < 5000.0f) {
-        gEnvFxBubbleConfig[ENVFX_STATE_PARTICLECOUNT] = 60;
-        gEnvFxBubbleConfig[ENVFX_STATE_SRC_X] = o->oPosX;
-        gEnvFxBubbleConfig[ENVFX_STATE_SRC_Y] = o->oPosY;
-        gEnvFxBubbleConfig[ENVFX_STATE_SRC_Z] = o->oPosZ;
+        gEnvFxBubbleConfig->particleCount = 60;
+        vec3f_to_vec3s(gEnvFxBubbleConfig->src, &o->oPosVec);
     } else {
-        gEnvFxBubbleConfig[ENVFX_STATE_PARTICLECOUNT] = 0;
+        gEnvFxBubbleConfig->particleCount = 0;
     }
 
     cur_obj_play_sound_1(SOUND_ENV_WATER);
