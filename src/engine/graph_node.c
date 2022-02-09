@@ -15,6 +15,7 @@
  */
 void init_scene_graph_node_links(struct GraphNode *graphNode, s32 type) {
     graphNode->type = type;
+    graphNode->drawingLayer = LAYER_FIRST;
     graphNode->flags = GRAPH_RENDER_ACTIVE;
     graphNode->prev = graphNode;
     graphNode->next = graphNode;
