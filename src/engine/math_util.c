@@ -1,5 +1,4 @@
 #include <ultra64.h>
-#include "game/debug.h"
 
 #include "sm64.h"
 #include "engine/graph_node.h"
@@ -854,7 +853,7 @@ f32 mtx_get_float(Mtx *mtx, u32 index) {
     if (index < 16) {
         s16 *src = (s16 *)mtx;
         s32 fixed_val = (src[index +  0] << 16)
-                    | (src[index + 16] & 0xFFFF);
+                      | (src[index + 16] & 0xFFFF);
         f32 scale = construct_float(1.0f / (float)0x00010000);
         ret = mul_without_nop((f32)fixed_val, scale);
     }
