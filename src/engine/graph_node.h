@@ -19,6 +19,7 @@ enum GraphNodeUCodes {
 };
 
 enum GraphNodeFlags {
+    GRAPH_RENDER_NONE               = 0x0,    // 0x0000
     GRAPH_RENDER_ACTIVE             = BIT(0), // 0x0001
     GRAPH_RENDER_CHILDREN_FIRST     = BIT(1), // 0x0002
     GRAPH_RENDER_BILLBOARD          = BIT(2), // 0x0004
