@@ -1679,7 +1679,7 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
     }
 
     if ((m->flags & MARIO_TELEPORTING) && (m->fadeWarpOpacity != 0xFF)) {
-        bodyState->modelState &= ~MODEL_STATE_OPACITY_MASK;
+        bodyState->modelState &= ~MODEL_STATE_NOISE_OPACITY_MASK;
         bodyState->modelState |= (MODEL_STATE_ALPHA | m->fadeWarpOpacity);
     }
 }

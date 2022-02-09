@@ -148,11 +148,11 @@ enum MarioParticleFlags {
 #define MARIO_STATE_ALPHA_SIZE 8
 
 enum ModelStates {
-    MODEL_STATE_NORMAL       = 0x0,    // 0x0000
-    // bits 0 - 7 reserved for alpha.
-    MODEL_STATE_ALPHA        = BIT(8), // 0x0100
-    MODEL_STATE_METAL        = BIT(9), // 0x0200
-    MODEL_STATE_OPACITY_MASK = BITMASK(MARIO_STATE_ALPHA_SIZE), // bits 0 - 7
+    MODEL_STATE_NORMAL             = 0x0,    // 0x0000
+    // bits 0 - 7 reserved for noise opacity/threshold.
+    MODEL_STATE_ALPHA              = BIT(8), // 0x0100
+    MODEL_STATE_METAL              = BIT(9), // 0x0200
+    MODEL_STATE_NOISE_OPACITY_MASK = BITMASK(MARIO_STATE_ALPHA_SIZE), // bits 0 - 7
 };
 
 
