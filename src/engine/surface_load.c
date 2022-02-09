@@ -115,9 +115,9 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
 
     if (SURFACE_IS_NEW_WATER(surface->type)) {
         listIndex = SPATIAL_PARTITION_WATER;
-    } else if (surface->normal.y > NORMAL_FLOOR_THRESHOLD) {
+    } else if (surface->normal.y > construct_float(NORMAL_FLOOR_THRESHOLD)) {
         listIndex = SPATIAL_PARTITION_FLOORS;
-    } else if (surface->normal.y < NORMAL_CEIL_THRESHOLD) {
+    } else if (surface->normal.y < construct_float(NORMAL_CEIL_THRESHOLD)) {
         listIndex = SPATIAL_PARTITION_CEILS;
         sortDir = -1; // lowest to highest, then insertion order
     } else {
@@ -629,7 +629,7 @@ static f32 get_optimal_collision_distance(struct Object *obj) {
     }
 
     // Only run sqrtf once.
-    return (sqrtf(maxDist) + 100.0f);
+    return (sqrtf(maxDist) + construct_float(100.0f));
 }
 #endif
 
@@ -649,7 +649,7 @@ void load_object_collision_model(void) {
 
     // On an object's first frame, the distance is set to 19000.0f.
     // If the distance hasn't been updated, update it now.
-    if (marioDist == 19000.0f) {
+    if (marioDist == construct_float(19000.0f)) {
         marioDist = dist_between_objects(obj, gMarioObject);
     }
 

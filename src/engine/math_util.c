@@ -321,8 +321,8 @@ void vec3f_cross(Vec3f dest, const Vec3f a, const Vec3f b) {
 /// Scale vector 'dest' so it has length 1
 void vec3f_normalize(Vec3f dest) {
     f32 mag = (sqr(dest[0]) + sqr(dest[1]) + sqr(dest[2]));
-    if (mag > NEAR_ZERO) {
-        f32 invsqrt = (1.0f / sqrtf(mag));
+    if (mag > construct_float(NEAR_ZERO)) {
+        f32 invsqrt = (construct_float(1.0f) / sqrtf(mag));
         vec3_mul_val(dest, invsqrt);
     } else {
         // Default to up vector.
@@ -605,7 +605,7 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
     f32 dx = to[0] - from[0];
     f32 dz = to[2] - from[2];
     f32 invLength = sqrtf(sqr(dx) + sqr(dz));
-    invLength = -(1.0f / MAX(invLength, NEAR_ZERO));
+    invLength = (construct_float(-1.0f) / MAX(invLength, construct_float(NEAR_ZERO)));
     dx *= invLength;
     dz *= invLength;
     f32 sr  = sins(roll);
@@ -1209,8 +1209,8 @@ Bool32 approach_f32_signed(f32 *current, f32 target, f32 inc) {
  * Edits the current value directly, returns TRUE if the target has been reached, FALSE otherwise.
  */
 Bool32 approach_f32_asymptotic_bool(f32 *current, f32 target, f32 multiplier) {
-    if (multiplier > 1.0f) {
-        multiplier = 1.0f;
+    if (multiplier > construct_float(1.0f)) {
+        multiplier = construct_float(1.0f);
     }
 
     *current = (*current + ((target - *current) * multiplier));
@@ -1369,36 +1369,39 @@ void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c) {
     f32 tinv3 = tinv2 * tinv;
     f32 t2 = t * t;
     f32 t3 = t2 * t;
+    const f32 half    = construct_float(0.5f);
+    const f32 quarter = construct_float(0.25f);
+    const f32 sixth   = construct_float(1.0f / 6.0f);
 
     switch (gSplineState) {
         case CURVE_BEGIN_1:
             result[0] = tinv3;
-            result[1] = ( t3 * 1.75f) - (t2 * 4.5f) + (t * 3.0f);
-            result[2] = (-t3 * (11 / 12.0f)) + (t2 * 1.5f);
-            result[3] = t3 * (1 / 6.0f);
+            result[1] = ( t3 * construct_float(1.75f)) - (t2 * construct_float(4.5f)) + (t * construct_float(3.0f));
+            result[2] = (-t3 * construct_float(11 / 12.0f)) + (t2 * construct_float(1.5f));
+            result[3] = t3 * sixth;
             break;
         case CURVE_BEGIN_2:
-            result[0] = tinv3 * 0.25f;
-            result[1] = (t3 * (7 / 12.0f)) - (t2 * 1.25f) + (t * 0.25f) + (7 / 12.0f);
-            result[2] = (-t3 * 0.5f) + (t2 * 0.5f) + (t * 0.5f) + (1 / 6.0f);
-            result[3] = t3 * (1 / 6.0f);
+            result[0] = tinv3 * quarter;
+            result[1] = (t3 * construct_float(7 / 12.0f)) - (t2 * construct_float(1.25f)) + (t * quarter) + construct_float(7 / 12.0f);
+            result[2] = (-t3 * half) + (t2 * half) + (t * half) + sixth;
+            result[3] = t3 * sixth;
             break;
         case CURVE_MIDDLE:
-            result[0] = tinv3 * (1.0f / 6.0f);
-            result[1] = (t3 * 0.5f) - t2 + (4.0f / 6.0f);
-            result[2] = (-t3 * 0.5f) + (t2 * 0.5f) + (t * 0.5f) + (1.0f / 6.0f);
-            result[3] = t3 * (1.0f / 6.0f);
+            result[0] = tinv3 * sixth;
+            result[1] = (t3 * half) - t2 + construct_float(4.0f / 6.0f);
+            result[2] = (-t3 * half) + (t2 * half) + (t * half) + sixth;
+            result[3] = t3 * sixth;
             break;
         case CURVE_END_1:
-            result[0] = tinv3 * (1.0f /  6.0f);
-            result[1] = (-tinv3 * 0.5f) + (tinv2 * 0.5f) + (tinv * 0.5f) + (1.0f / 6.0f);
-            result[2] = (tinv3 * (7.0f / 12.0f)) - (tinv2 * 1.25f) + (tinv * 0.25f) + (7.0f / 12.0f);
-            result[3] = t3 * 0.25f;
+            result[0] = tinv3 * sixth;
+            result[1] = (-tinv3 * half) + (tinv2 * half) + (tinv * half) + sixth;
+            result[2] = (tinv3 * construct_float(7.0f / 12.0f)) - (tinv2 * construct_float(1.25f)) + (tinv * quarter) + construct_float(7.0f / 12.0f);
+            result[3] = t3 * quarter;
             break;
         case CURVE_END_2:
-            result[0] = tinv3 * (1.0f / 6.0f);
-            result[1] = (-tinv3 * (11.0f / 12.0f)) + (tinv2 * 1.5f);
-            result[2] = (tinv3 * 1.75f) - (tinv2 * 4.5f) + (tinv * 3.0f);
+            result[0] = tinv3 * sixth;
+            result[1] = (-tinv3 * construct_float(11.0f / 12.0f)) + (tinv2 * construct_float(1.5f));
+            result[2] = (tinv3 * construct_float(1.75f)) - (tinv2 * construct_float(4.5f)) + (tinv * construct_float(3.0f));
             result[3] = t3;
             break;
     }
@@ -1436,7 +1439,7 @@ s32 anim_spline_poll(Vec3f result) {
         result[2] += weights[i] * gSplineKeyframe[i][3];
     }
 
-    gSplineKeyframeFraction += (gSplineKeyframe[0][0] / 1000.0f);
+    gSplineKeyframeFraction += (gSplineKeyframe[0][0] * construct_float(1.0f / 1000.0f));
     if (gSplineKeyframeFraction >= 1) {
         gSplineKeyframe++;
         gSplineKeyframeFraction--;
@@ -1504,7 +1507,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     // Determine the cos(angle) difference between ray and surface normals.
     f32 det = vec3f_dot(e1, h);
     // Check if we're perpendicular from the surface.
-    if ((det > -NEAR_ZERO) && (det < NEAR_ZERO)) return FALSE;
+    if ((det > construct_float(-NEAR_ZERO)) && (det < construct_float(NEAR_ZERO))) return FALSE;
     // Check if we're making contact with the surface.
     // Make f the inverse of the cos(angle) between ray and surface normals.
     f32 f = 1.0f / det; // invDet
@@ -1526,7 +1529,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     // Make '*length' the cos(angle) betqwwn edge 2 and 'q', divided by 'det'.
     *length = f * vec3f_dot(e2, q);
     // Check if the length to the hit point is shorter than the ray length.
-    if ((*length <= NEAR_ZERO) || (*length > dir_length)) return FALSE;
+    if ((*length <= construct_float(NEAR_ZERO)) || (*length > dir_length)) return FALSE;
     // Successful contact.
     // Make 'add_dir' into 'dir' scaled by 'length'.
     Vec3f add_dir;
@@ -1576,8 +1579,8 @@ void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized
     // Skip if OOB
     if ((cellX >= 0) && (cellX <= (NUM_CELLS - 1)) && (cellZ >= 0) && (cellZ <= (NUM_CELLS - 1))) {
         f32 ny = normalized_dir[1];
-        s32 rayUp   = (ny >  NEAR_ONE);
-        s32 rayDown = (ny < -NEAR_ONE);
+        s32 rayUp   = (ny >  construct_float(NEAR_ONE));
+        s32 rayDown = (ny < -construct_float(NEAR_ONE));
         
         for (s32 i = 0; i < NUM_SPATIAL_PARTITIONS; i++) {
             if ((rayDown && (i == SPATIAL_PARTITION_CEILS ))
@@ -1598,7 +1601,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     Vec3f normalized_dir;
     f32 step;
     s32 i;
-    const f32 invcell = 1.0f / CELL_SIZE;
+    const f32 invcell = construct_float(1.0f / CELL_SIZE);
 
     // Set that no surface has been hit
     *hit_surface = NULL;
@@ -1619,7 +1622,7 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     s32 cellPrevZ = cellZ;
 
     // Don't do DDA if straight down
-    if ((normalized_dir[1] >= NEAR_ONE) || (normalized_dir[1] <= -NEAR_ONE)) {
+    if ((normalized_dir[1] >= construct_float(NEAR_ONE)) || (normalized_dir[1] <= construct_float(-NEAR_ONE))) {
         find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
         return;
     }

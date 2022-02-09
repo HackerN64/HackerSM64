@@ -193,7 +193,7 @@ void geo_layout_cmd_node_root(void) {
 */
 void geo_layout_cmd_node_ortho_projection(void) {
     struct GraphNodeOrthoProjection *graphNode;
-    f32 scale = (f32) cur_geo_cmd_s16(0x02) / 100.0f;
+    f32 scale = (f32) cur_geo_cmd_s16(0x02) * construct_float(1.0f / 100.0f);
 
     graphNode = init_graph_node_ortho_projection(gGraphNodePool, NULL, scale);
 
@@ -397,7 +397,7 @@ void geo_layout_cmd_node_scale(void) {
 
     s16 drawingLayer = LAYER_FIRST;
     s16 params = cur_geo_cmd_u8(0x01);
-    f32 scale = cur_geo_cmd_u32(0x04) / 65536.0f;
+    f32 scale = cur_geo_cmd_u32(0x04) * construct_float(1.0f / 65536.0f);
     void *displayList = NULL;
 
     if (params & GEO_PARAMS_HAS_DL_BIT) {

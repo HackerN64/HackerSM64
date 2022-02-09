@@ -64,17 +64,17 @@ extern f32 gSineTable[];
 #define coss(x) gCosineTable[(u16) (x) >> 4]
 #define tans(x) (sins(x) / coss(x))
 #define cots(x) (coss(x) / sins(x))
-#define atans(x) gArctanTable[(s32)((((x) * 1024) + 0.5f))] // is this correct? used for atan2_lookup
+#define atans(x) gArctanTable[(s32)((((x) * 1024) + construct_float(0.5f)))] // is this correct? used for atan2_lookup
 
-#define RAD_PER_DEG (M_PI / 180.0f)
-#define DEG_PER_RAD (180.0f / M_PI)
+#define RAD_PER_DEG construct_float(M_PI / 180.0f)
+#define DEG_PER_RAD construct_float(180.0f / M_PI)
 
-#define angle_to_degrees(  x) (f32)(((Angle)(x) / 65536.0f) * 360.0f)
-#define degrees_to_angle(  x) (Angle)(((f32)(x) * 0x10000 ) / 360   )
-#define angle_to_radians(  x) (f32)(((Angle)(x) * M_PI    ) / 0x8000)
-#define radians_to_angle(  x) (Angle)(((f32)(x) / M_PI    ) * 0x8000)
-#define degrees_to_radians(x) (f32)(   (f32)(x) * RAD_PER_DEG       )
-#define radians_to_degrees(x) (f32)(   (f32)(x) * DEG_PER_RAD       )
+#define angle_to_degrees(x) (f32)((Angle)(x) * construct_float(360.0f / (f32)0x10000))
+#define degrees_to_angle(x) (Angle)((f32)(x) * construct_float((f32)0x10000 / 360.0f))
+#define angle_to_radians(x) (f32)((Angle)(x) * construct_float(M_PI / (f32)0x8000))
+#define radians_to_angle(x) (Angle)((f32)(x) * construct_float((f32)0x8000 / M_PI))
+#define degrees_to_radians(x) (f32)((f32)(x) * construct_float(M_PI / 180.0f))
+#define radians_to_degrees(x) (f32)((f32)(x) * construct_float(180.0f / M_PI))
 
 /**
  * Converts an angle in degrees to sm64's s16 angle units. For example, DEGREES(90) == 0x4000
@@ -455,19 +455,19 @@ extern f32 gSineTable[];
 #define NAME_INVMAG(v) v##_invmag
 
 /// Scale vector 'v' so it has length 1
-#define vec3_normalize(v) {                                     \
-    f32 NAME_INVMAG(v) = vec3_mag((v));                         \
-    NAME_INVMAG(v) = (1.0f / MAX(NAME_INVMAG(v), NEAR_ZERO));   \
-    vec3_mul_val((v), NAME_INVMAG(v));                          \
+#define vec3_normalize(v) {                                                                     \
+    f32 NAME_INVMAG(v) = vec3_mag((v));                                                         \
+    NAME_INVMAG(v) = (construct_float(1.0f) / MAX(NAME_INVMAG(v), construct_float(NEAR_ZERO))); \
+    vec3_mul_val((v), NAME_INVMAG(v));                                                          \
 }
 
-#define vec3_normalize_max(v, max) {    \
-    f32 v##_mag = vec3_mag(v);          \
-    v##_mag = MAX(v##_mag, NEAR_ZERO);  \
-    if (v##_mag > max) {                \
-        v##_mag = (max / v##_mag);      \
-        vec3_mul_val(v, v##_mag);       \
-    }                                   \
+#define vec3_normalize_max(v, max) {                    \
+    f32 v##_mag = vec3_mag(v);                          \
+    v##_mag = MAX(v##_mag, construct_float(NEAR_ZERO)); \
+    if (v##_mag > max) {                                \
+        v##_mag = (max / v##_mag);                      \
+        vec3_mul_val(v, v##_mag);                       \
+    }                                                   \
 }
 
 
@@ -587,7 +587,7 @@ ALWAYS_INLINE void swl(void* addr, s32 val, const int offset) {
 // On console, (x != 0) still returns true for denormalized floats,
 // which will count as a division by zero when divided and crash.
 // For console compatibility, use this check instead when avoiding a division by zero.
-#define FLT_IS_NONZERO(x) (absf(x) > NEAR_ZERO)
+#define FLT_IS_NONZERO(x) (absf(x) > construct_float(NEAR_ZERO))
 
 // RNG
 u32 random_u16(void);

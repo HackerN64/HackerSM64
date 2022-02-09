@@ -55,12 +55,12 @@ s32 get_surface_yaw(struct Surface *surf) {
 
 static s32 check_wall_triangle_vw(f32 d00, f32 d01, f32 d11, f32 d20, f32 d21, f32 invDenom) {
     f32 v = ((d11 * d20) - (d01 * d21)) * invDenom;
-    if (v < 0.0f || v > 1.0f) {
+    if (v < 0.0f || v > construct_float(1.0f)) {
         return TRUE;
     }
 
     f32 w = ((d00 * d21) - (d01 * d20)) * invDenom;
-    if (w < 0.0f || w > 1.0f || v + w > 1.0f) {
+    if (w < 0.0f || w > construct_float(1.0f) || v + w > construct_float(1.0f)) {
         return TRUE;
     }
 
@@ -72,7 +72,7 @@ s32 check_wall_triangle_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invD
 
     if (FLT_IS_NONZERO(y)) {
         f32 v = (v2[1] / y);
-        if (v < 0.0f || v > 1.0f) {
+        if (v < 0.0f || v > construct_float(1.0f)) {
             return TRUE;
         }
 
@@ -92,7 +92,7 @@ s32 check_wall_triangle_edge(Vec3f vert, Vec3f v2, f32 *d00, f32 *d01, f32 *invD
  * have given their wall push.
  */
 static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struct WallCollisionData *data) {
-    const f32 corner_threshold = -0.9f;
+    const f32 corner_threshold = construct_float(-0.9f);
     struct Surface *surf;
     f32 offset;
     f32 radius = data->radius;
@@ -109,7 +109,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         radius = 200;
     }
 
-    f32 margin_radius = radius - 1.0f;
+    f32 margin_radius = radius - construct_float(1.0f);
 
     // Stay in this loop until out of walls.
     while (surfaceNode != NULL) {
@@ -164,7 +164,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
         // Inverse denom.
         invDenom = (d00 * d11) - (d01 * d01);
         if (FLT_IS_NONZERO(invDenom)) {
-            invDenom = 1.0f / invDenom;
+            invDenom = (construct_float(1.0f) / invDenom);
         }
 
         if (check_wall_triangle_vw(d00, d01, d11, d20, d21, invDenom)) {
@@ -199,7 +199,7 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
 
             // Increase margin_radius.
             //! TODO: What's this for?
-            margin_radius += 0.01f;
+            margin_radius += construct_float(0.01f);
 
             // dot(v0, v0) * normal.x + dot(v0, v1) * normal.z
             if ((d00 * surf->normal.x) + (d01 * surf->normal.z) < (corner_threshold * offset)) {
@@ -456,8 +456,8 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-    f32 height        = CELL_HEIGHT_LIMIT;
-    f32 dynamicHeight = CELL_HEIGHT_LIMIT;
+    f32 height        = construct_float(CELL_HEIGHT_LIMIT);
+    f32 dynamicHeight = construct_float(CELL_HEIGHT_LIMIT);
 
     s32 x = posX;
     s32 y = posY;
@@ -605,7 +605,7 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
 
 // Generic triangle bounds func
 ALWAYS_INLINE static s32 check_within_bounds_y_norm(s32 x, s32 z, struct Surface *surf) {
-    if (surf->normal.y >= NORMAL_FLOOR_THRESHOLD) {
+    if (surf->normal.y >= construct_float(NORMAL_FLOOR_THRESHOLD)) {
         return check_within_floor_triangle_bounds(x, z, surf);
     } else {
         return check_within_ceil_triangle_bounds(x, z, surf, 0);
@@ -620,10 +620,11 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
     struct Surface *floor = NULL;
     struct SurfaceNode *topSurfaceNode = surfaceNode;
     struct SurfaceNode *bottomSurfaceNode = surfaceNode;
-    f32 height = FLOOR_LOWER_LIMIT;
-    f32 curHeight = FLOOR_LOWER_LIMIT;
-    f32 bottomHeight = FLOOR_LOWER_LIMIT;
-    f32 curBottomHeight = FLOOR_LOWER_LIMIT;
+    const f32 minHeight = construct_float(FLOOR_LOWER_LIMIT);
+    f32 height = minHeight;
+    f32 curHeight = minHeight;
+    f32 bottomHeight = minHeight;
+    f32 curBottomHeight = minHeight;
     f32 bufferY = y + FIND_FLOOR_BUFFER;
 
     // Iterate through the list of water floors until there are no more water floors.
@@ -633,7 +634,7 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
         bottomSurfaceNode = bottomSurfaceNode->next;
 
         // skip wall angled water
-        if (surf->type != SURFACE_NEW_WATER_BOTTOM || absf(surf->normal.y) < NORMAL_FLOOR_THRESHOLD) continue;
+        if (surf->type != SURFACE_NEW_WATER_BOTTOM || absf(surf->normal.y) < construct_float(NORMAL_FLOOR_THRESHOLD)) continue;
 
         if (!check_within_bounds_y_norm(x, z, surf)) continue;
 
@@ -653,13 +654,13 @@ struct Surface *find_water_floor_from_list(struct SurfaceNode *surfaceNode, s32 
         topSurfaceNode = topSurfaceNode->next;
 
         // skip water tops or wall angled water bottoms
-        if (surf->type == SURFACE_NEW_WATER_BOTTOM || absf(surf->normal.y) < NORMAL_FLOOR_THRESHOLD) continue;
+        if (surf->type == SURFACE_NEW_WATER_BOTTOM || absf(surf->normal.y) < construct_float(NORMAL_FLOOR_THRESHOLD)) continue;
 
         if (!check_within_bounds_y_norm(x, z, surf)) continue;
 
         curHeight = get_surface_height_at_pos(x, z, surf);
 
-        if (bottomHeight != FLOOR_LOWER_LIMIT && curHeight > bottomHeight) continue;
+        if (bottomHeight != minHeight && curHeight > bottomHeight) continue;
 
         if (curHeight > height) {
             height = curHeight;
@@ -686,8 +687,8 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
 #endif
-    f32 height        = FLOOR_LOWER_LIMIT;
-    f32 dynamicHeight = FLOOR_LOWER_LIMIT;
+    f32 height        = construct_float(FLOOR_LOWER_LIMIT);
+    f32 dynamicHeight = construct_float(FLOOR_LOWER_LIMIT);
 
     s32 x = xPos;
     s32 y = yPos + FIND_FLOOR_BUFFER;
@@ -768,7 +769,7 @@ s32 get_room_at_pos(f32 x, f32 y, f32 z) {
  * Find the highest water floor under a given position and return the height.
  */
 f32 find_water_floor(s32 xPos, s32 yPos, s32 zPos, struct Surface **pfloor) {
-    f32 height = FLOOR_LOWER_LIMIT;
+    f32 height = construct_float(FLOOR_LOWER_LIMIT);
 
     s32 x = xPos;
     s32 y = yPos;

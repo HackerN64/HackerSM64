@@ -393,9 +393,9 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
  */
 s32 normalize_component(f32 comp) {
     if (comp > 0.0f) {
-        return (s8)((comp * 127.0f) + 0.5f); // round up
+        return (s8)((comp * construct_float(127.0f)) + construct_float(0.5f)); // round up
     } else if (comp < 0.0f) {
-        return (s8)((comp * 128.0f) - 0.5f); // round down
+        return (s8)((comp * construct_float(128.0f)) - construct_float(0.5f)); // round down
     } else {
         return 0; // don't round 0
     }
@@ -557,7 +557,7 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
         scale,
         (painting->sizeX / PAINTING_SIZE),
         (painting->sizeY / PAINTING_SIZE),
-        1.0f
+        construct_float(1.0f)
     );
     gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
 
@@ -874,8 +874,8 @@ void bhv_painting_init(void) {
 
     // The center of the painting with a z offset since paintings are usually between floor triangles laterally.
     Vec3f distPos = {
-        (o->oPaintingPtr->sizeX * 0.5f),
-        (o->oPaintingPtr->sizeY * 0.5f),
+        (o->oPaintingPtr->sizeX * construct_float(0.5f)),
+        (o->oPaintingPtr->sizeY * construct_float(0.5f)),
         PAINTING_WOBBLE_DEPTH
     };
 

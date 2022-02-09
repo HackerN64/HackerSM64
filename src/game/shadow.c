@@ -35,12 +35,15 @@ struct Shadow *s = &gCurrShadow;
  * initial size of the shadow and the current distance.
  */
 f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
+    f32 half = construct_float(0.5f);
+    f32 dist = construct_float(600.0f);
+
     if (distFromFloor <= 0.0f) {
         return initial;
-    } else if (distFromFloor >= 600.0f) {
-        return initial * 0.5f;
+    } else if (distFromFloor >= dist) {
+        return initial * half;
     } else {
-        return initial * (1.0f - ((distFromFloor * 0.5f) / 600.0f));
+        return initial * (construct_float(1.0f) - ((distFromFloor * half) / dist));
     }
 }
 
@@ -48,14 +51,16 @@ f32 scale_shadow_with_distance(f32 initial, f32 distFromFloor) {
  * Dim a shadow when its parent object is further from the ground.
  */
 s32 dim_shadow_with_distance(u8 solidity, f32 distFromFloor) {
+    f32 dist = construct_float(600.0f);
+
     if (solidity < 121) {
         return solidity;
     } else if (distFromFloor <= 0.0f) {
         return solidity;
-    } else if (distFromFloor >= 600.0f) {
+    } else if (distFromFloor >= dist) {
         return 120;
     } else {
-        return (((120 - solidity) * distFromFloor) / 600.0f) + (f32) solidity;
+        return (((120 - solidity) * distFromFloor) / dist) + (f32) solidity;
     }
 }
 
@@ -72,7 +77,6 @@ s32 init_shadow(f32 distToShadow, s16 shadowScale, s8 shadowType, u8 overwriteSo
 
     if (shadowType != SHADOW_SQUARE_PERMANENT) {
         // Set solidity and scale based on distance.
-
         if (overwriteSolidity) {
             s->solidity = dim_shadow_with_distance(overwriteSolidity, distToShadow);
         }
@@ -91,8 +95,7 @@ s32 init_shadow(f32 distToShadow, s16 shadowScale, s8 shadowType, u8 overwriteSo
  * Linearly interpolate a shadow's solidity between zero and finalSolidity
  * depending on curr's relation to start and end.
  */
-void linearly_interpolate_solidity_positive(u8 finalSolidity, s16 curr, s16 start,
-                                            s16 end) {
+void linearly_interpolate_solidity_positive(u8 finalSolidity, s16 curr, s16 start, s16 end) {
     if (curr >= 0 && curr < start) {
         s->solidity = 0;
     } else if (end < curr) {
@@ -107,14 +110,13 @@ void linearly_interpolate_solidity_positive(u8 finalSolidity, s16 curr, s16 star
  * depending on curr's relation to start and end. Note that if curr < start,
  * the solidity will be zero.
  */
-void linearly_interpolate_solidity_negative(u8 initialSolidity, s16 curr, s16 start,
-                                            s16 end) {
+void linearly_interpolate_solidity_negative(u8 initialSolidity, s16 curr, s16 start, s16 end) {
     // The curr < start case is not handled. Thus, if start != 0, this function
     // will have the surprising behavior of hiding the shadow until start.
     // This is not necessarily a bug, since this function is only used once,
     // with start == 0.
     if (curr >= start && end >= curr) {
-        s->solidity = ((f32) initialSolidity * (1.0f - (f32)(curr - start) / (end - start)));
+        s->solidity = ((f32) initialSolidity * (construct_float(1.0f) - (f32)(curr - start) / (end - start)));
     } else {
         s->solidity = 0;
     }
@@ -148,16 +150,16 @@ s32 correct_shadow_solidity_for_animations(u8 initialSolidity) {
  */
 void correct_lava_shadow_height(f32 *floorHeight) {
     if (gCurrLevelNum == LEVEL_BITFS) {
-        if (*floorHeight < -3000.0f) {
-            *floorHeight = -3062.0f;
+        if (*floorHeight < construct_float(-3000.0f)) {
+            *floorHeight = construct_float(-3062.0f);
             s->isDecal = FALSE;
-        } else if (*floorHeight > 3400.0f) {
-            *floorHeight = 3492.0f;
+        } else if (*floorHeight > construct_float(3400.0f)) {
+            *floorHeight = construct_float(3492.0f);
             s->isDecal = FALSE;
         }
     } else if (gCurrLevelNum == LEVEL_LLL
                && gCurrAreaIndex == 1) {
-        *floorHeight = 5.0f;
+        *floorHeight = construct_float(5.0f);
         s->isDecal = FALSE;
     }
 }
@@ -192,10 +194,12 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         return NULL;
     }
 
+    const f32 minHeight = construct_float(FLOOR_LOWER_LIMIT_MISC);
+
     // The floor underneath the object.
     struct Surface *floor = NULL;
     // The y-position of the floor (or water or lava) underneath the object.
-    f32 floorHeight = FLOOR_LOWER_LIMIT_MISC;
+    f32 floorHeight = minHeight;
     f32 x = pos[0];
     f32 y = pos[1];
     f32 z = pos[2];
@@ -235,7 +239,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     // Whether the floor is an environment box rather than an actual surface.
     s32 isEnvBox = FALSE;
 
-    if (waterLevel > FLOOR_LOWER_LIMIT_MISC
+    if (waterLevel > minHeight
         && y >= waterLevel
         && floorHeight <= waterLevel) {
         // Skip shifting the shadow height later, since the find_water_level_and_floor call above uses the already shifted position.
@@ -277,7 +281,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     if (isEnvBox) {
         // Assume the floor is flat.
         nx = 0.0f;
-        ny = 1.0f;
+        ny = construct_float(1.0f);
         nz = 0.0f;
     } else {
         // Read the floor's normals.
@@ -297,7 +301,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     }
 
     // No shadow if the floor is lower than expected possible,
-    if (floorHeight < FLOOR_LOWER_LIMIT_MISC) {
+    if (floorHeight < minHeight) {
         return NULL;
     }
 
@@ -305,12 +309,12 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     f32 distToShadow = (y - floorHeight);
 
     // No shadow if the object is below it.
-    if (distToShadow < -80.0f) {
+    if (distToShadow < construct_float(-80.0f)) {
         return NULL;
     }
 
     // No shadow if the non-Mario object is too high.
-    if (!isPlayer && distToShadow > 1024.0f) {
+    if (!isPlayer && distToShadow > construct_float(1024.0f)) {
         return NULL;
     }
 

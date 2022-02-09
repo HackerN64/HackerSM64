@@ -60,7 +60,7 @@ void obj_update_gfx_pos_and_angle(struct Object *obj) {
 #define OBJ_OPACITY_NEAR   128.0f
 #define OBJ_OPACITY_LENGTH 512.0f
 void obj_set_opacity_from_cam_dist(struct Object *obj) {
-    s32 opacityDist = ((-obj->header.gfx.cameraToObject[2] - OBJ_OPACITY_NEAR) * (256.0f / OBJ_OPACITY_LENGTH));
+    s32 opacityDist = ((-obj->header.gfx.cameraToObject[2] - construct_float(OBJ_OPACITY_NEAR)) * construct_float(256.0f / OBJ_OPACITY_LENGTH));
 #ifdef OBJECTS_REJ
     if (opacityDist > 0) {
         obj->header.gfx.ucode = GRAPH_NODE_UCODE_REJ;

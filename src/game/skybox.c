@@ -141,7 +141,7 @@ s32 calculate_skybox_scaled_x(s8 player, f32 fov) {
 
     f32 yawScaled = SCREEN_WIDTH * yaw / degrees_to_angle(fov);
     // Round the scaled yaw. Since yaw is a u16, it doesn't need to check for < 0
-    s32 scaledX = yawScaled + 0.5f;
+    s32 scaledX = yawScaled + construct_float(0.5f);
 
     if (scaledX > SKYBOX_WIDTH) {
         scaledX -= scaledX / SKYBOX_WIDTH * SKYBOX_WIDTH;
@@ -160,7 +160,7 @@ s32 calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
     f32 pitchInDegrees = angle_to_degrees(sSkyBoxInfo[player].pitch);
 
     // Scale by 360 / fov
-    f32 degreesToScale = pitchInDegrees * 360.0f / 90.0f;
+    f32 degreesToScale = pitchInDegrees * construct_float(360.0f / 90.0f);
     s32 roundedY = roundf(degreesToScale);
 
     // Since pitch can be negative, and the tile grid starts 1 octant above the camera's focus, add
@@ -232,17 +232,17 @@ void *create_skybox_ortho_matrix(s8 player) {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
 
 #ifdef WIDESCREEN
-    f32 half_width = (4.0f / 3.0f) / GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_CENTER_X;
+    f32 half_width = construct_float(4.0f / 3.0f) / GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_CENTER_X;
     f32 center = (sSkyBoxInfo[player].scaledX + SCREEN_CENTER_X);
     if (half_width < SCREEN_CENTER_X) {
         // A wider screen than 4:3
-        left = center - half_width;
+        left  = center - half_width;
         right = center + half_width;
     }
 #endif
 
     if (mtx != NULL) {
-        guOrtho(mtx, left, right, bottom, top, 0.0f, 3.0f, 1.0f);
+        guOrtho(mtx, left, right, bottom, top, 0.0f, construct_float(3.0f), construct_float(1.0f));
     }
 
     return mtx;
@@ -297,7 +297,7 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, V
 
     //! fov is always set to 90.0f. If this line is removed, then the game crashes because fov is 0 on
     //! the first frame, which causes a floating point divide by 0
-    fov = 90.0f;
+    fov = construct_float(90.0f);
     s16 yaw;
     vec3f_get_angle(pos, focus, &sSkyBoxInfo[player].pitch, &yaw);
     sSkyBoxInfo[player].yaw = yaw;

@@ -30,7 +30,7 @@ void update_mario_platform(void) {
 
     if (floor != NULL
      && floorObj != NULL
-     && absf(gMarioObject->oPosY - gMarioState->floorHeight) < 4.0f) {
+     && absf(gMarioObject->oPosY - gMarioState->floorHeight) < construct_float(4.0f)) {
         gMarioPlatform = floorObj;
         gMarioObject->platform = floorObj;
     } else {

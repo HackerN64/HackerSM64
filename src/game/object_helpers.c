@@ -488,7 +488,7 @@ void cur_obj_init_animation_with_sound(s32 animIndex) {
 
 void cur_obj_init_animation_with_accel_and_sound(s32 animIndex, f32 accel) {
     struct Animation **anims = o->oAnimations;
-    s32 animAccel = (s32)(accel * 65536.0f);
+    s32 animAccel = (s32)(accel * construct_float(65536.0f));
     geo_obj_init_animation_accel(&o->header.gfx, &anims[animIndex], animAccel);
     o->oSoundStateID = animIndex;
 }
@@ -545,7 +545,7 @@ UNUSED void cur_obj_unused_init_on_floor(void) {
 
     o->oPosY = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
     if (o->oPosY < FLOOR_LOWER_LIMIT_MISC) {
-        cur_obj_set_pos_relative(o->parentObj, 0.0f, 0.0f, -70.0f);
+        cur_obj_set_pos_relative(o->parentObj, 0.0f, 0.0f, construct_float(-70.0f));
         o->oPosY = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
     }
 }

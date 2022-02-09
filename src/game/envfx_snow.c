@@ -102,7 +102,7 @@ void envfx_update_snowflake_count(s32 mode, Vec3s marioPos) {
             waterLevel = find_water_level(marioPos[0], marioPos[1], marioPos[2]);
 
             sSnowParticleCount =
-                (((s32)((waterLevel - 400.0f - (f32) marioPos[1]) * 0.001f) << 0x10) >> 0x10) * 5;
+                (((s32)((waterLevel - construct_float(400.0f) - (f32) marioPos[1]) * construct_float(0.001f)) << 0x10) >> 0x10) * 5;
 
             if (sSnowParticleCount < 0) {
                 sSnowParticleCount = 0;
@@ -178,14 +178,14 @@ void envfx_update_snow_normal(s32 snowCylinderX, s32 snowCylinderY, s32 snowCyli
         particle->isAlive =
             envfx_is_snowflake_alive(i, snowCylinderX, snowCylinderY, snowCylinderZ);
         if (!particle->isAlive) {
-            particle->pos[0] = (400.0f * random_float()) - 200.0f + snowCylinderX + (s16)(deltaX * 2);
-            particle->pos[2] = (400.0f * random_float()) - 200.0f + snowCylinderZ + (s16)(deltaZ * 2);
-            particle->pos[1] = (200.0f * random_float()) + snowCylinderY;
+            particle->pos[0] = (construct_float(400.0f) * random_float()) - construct_float(200.0f) + snowCylinderX + (s16)(deltaX * 2);
+            particle->pos[2] = (construct_float(400.0f) * random_float()) - construct_float(200.0f) + snowCylinderZ + (s16)(deltaZ * 2);
+            particle->pos[1] = (construct_float(200.0f) * random_float()) + snowCylinderY;
             particle->isAlive = TRUE;
         } else {
-            particle->pos[0] += (random_float() * 2) - 1.0f + (s16)(deltaX / 1.2f);
-            particle->pos[2] += (random_float() * 2) - 1.0f + (s16)(deltaZ / 1.2f);
-            particle->pos[1] -= 2 - (s16)(deltaY * 0.8f);
+            particle->pos[0] += (random_float() * 2) - construct_float(1.0f) + (s16)(deltaX * construct_float(1.0f / 1.2f));
+            particle->pos[2] += (random_float() * 2) - construct_float(1.0f) + (s16)(deltaZ * construct_float(1.0f / 1.2f));
+            particle->pos[1] -= 2 - (s16)(deltaY * construct_float(0.8f));
         }
 
         particle++;
@@ -213,14 +213,14 @@ void envfx_update_snow_blizzard(s32 snowCylinderX, s32 snowCylinderY, s32 snowCy
         particle->isAlive =
             envfx_is_snowflake_alive(i, snowCylinderX, snowCylinderY, snowCylinderZ);
         if (!particle->isAlive) {
-            particle->pos[0] = (400.0f * random_float()) - 200.0f + snowCylinderX + (s16)(deltaX * 2);
-            particle->pos[2] = (400.0f * random_float()) - 200.0f + snowCylinderZ + (s16)(deltaZ * 2);
-            particle->pos[1] = (400.0f * random_float()) - 200.0f + snowCylinderY;
+            particle->pos[0] = (construct_float(400.0f) * random_float()) - construct_float(200.0f) + snowCylinderX + (s16)(deltaX * 2);
+            particle->pos[2] = (construct_float(400.0f) * random_float()) - construct_float(200.0f) + snowCylinderZ + (s16)(deltaZ * 2);
+            particle->pos[1] = (construct_float(400.0f) * random_float()) - construct_float(200.0f) + snowCylinderY;
             particle->isAlive = TRUE;
         } else {
-            particle->pos[0] += (random_float() * 2) - 1.0f + (s16)(deltaX / 1.2f) + 20.0f;
-            particle->pos[2] += (random_float() * 2) - 1.0f + (s16)(deltaZ / 1.2f);
-            particle->pos[1] -= 5 - (s16)(deltaY * 0.8f);
+            particle->pos[0] += (random_float() * 2) - construct_float(1.0f) + (s16)(deltaX * construct_float(1.0f / 1.2f)) + construct_float(20.0f);
+            particle->pos[2] += (random_float() * 2) - construct_float(1.0f) + (s16)(deltaZ * construct_float(1.0f / 1.2f));
+            particle->pos[1] -= 5 - (s16)(deltaY * construct_float(0.8f));
         }
 
         particle++;
@@ -243,9 +243,9 @@ void envfx_update_snow_water(s32 snowCylinderX, s32 snowCylinderY, s32 snowCylin
         particle->isAlive =
             envfx_is_snowflake_alive(i, snowCylinderX, snowCylinderY, snowCylinderZ);
         if (!particle->isAlive) {
-            particle->pos[0] = (400.0f * random_float()) - 200.0f + snowCylinderX;
-            particle->pos[1] = (400.0f * random_float()) - 200.0f + snowCylinderY;
-            particle->pos[2] = (400.0f * random_float()) - 200.0f + snowCylinderZ;
+            particle->pos[0] = (construct_float(400.0f) * random_float()) - construct_float(200.0f) + snowCylinderX;
+            particle->pos[1] = (construct_float(400.0f) * random_float()) - construct_float(200.0f) + snowCylinderY;
+            particle->pos[2] = (construct_float(400.0f) * random_float()) - construct_float(200.0f) + snowCylinderZ;
             particle->isAlive = TRUE;
         }
 

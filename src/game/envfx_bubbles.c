@@ -55,7 +55,7 @@ s32 particle_is_laterally_close(s32 index, s32 x, s32 z, s32 distance) {
  * Used to position flower particles
  */
 s32 random_flower_offset(void) {
-    s32 result = (random_float() * 2000.0f) - 1000.0f;
+    s32 result = (random_float() * construct_float(2000.0f)) - construct_float(1000.0f);
     if (result < 0) {
         result -= 1000;
     } else {
@@ -84,7 +84,7 @@ void envfx_update_flower(Vec3s centerPos) {
             particle->pos[2] = random_flower_offset() + centerZ;
             particle->pos[1] = find_floor_height(particle->pos[0], CELL_HEIGHT_LIMIT, particle->pos[2]);
             particle->isAlive = TRUE;
-            particle->animFrame = random_float() * 5.0f;
+            particle->animFrame = random_float() * construct_float(5.0f);
         } else if (!(globalTimer & 3)) {
             particle->animFrame++;
             if (particle->animFrame > 5) {
@@ -113,8 +113,8 @@ void envfx_set_lava_bubble_position(s32 index, Vec3s centerPos) {
     s16 centerY = centerPos[1];
     s16 centerZ = centerPos[2];
 
-    particle->pos[0] = (random_float() * 6000.0f) - 3000.0f + centerX;
-    particle->pos[2] = (random_float() * 6000.0f) - 3000.0f + centerZ;
+    particle->pos[0] = (random_float() * construct_float(6000.0f)) - construct_float(3000.0f) + centerX;
+    particle->pos[2] = (random_float() * construct_float(6000.0f)) - construct_float(3000.0f) + centerZ;
 
     if (particle->pos[0] > 8000) {
         particle->pos[0] = 16000 - particle->pos[0];
@@ -163,7 +163,7 @@ void envfx_update_lava(Vec3s centerPos) {
         particle++;
     }
 
-    if (((s8)(s32)(random_float() * 16.0f)) == 8) {
+    if (((s8)(s32)(random_float() * construct_float(16.0f))) == 8) {
         play_sound(SOUND_GENERAL_QUIET_BUBBLE2, gGlobalSoundSource);
     }
 }
@@ -217,8 +217,8 @@ void envfx_update_whirlpool(void) {
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
         particle->isAlive = envfx_is_whirlpool_bubble_alive(i);
         if (!particle->isAlive) {
-            particle->distFromCenter = random_float() * 1000.0f;
-            particle->angleFromCenter = random_float() * 65536.0f;
+            particle->distFromCenter  = random_float() * construct_float(1000.0f);
+            particle->angleFromCenter = random_float() * construct_float(65536.0f);
             particle->pos[0] =
                 gEnvFxBubbleConfig->src[0]
                 + sins(particle->angleFromCenter) * particle->distFromCenter;
@@ -226,7 +226,7 @@ void envfx_update_whirlpool(void) {
                 gEnvFxBubbleConfig->src[2]
                 + coss(particle->angleFromCenter) * particle->distFromCenter;
             particle->bubbleY =
-                gEnvFxBubbleConfig->src[1] + (random_float() * 100.0f - 50.0f);
+                gEnvFxBubbleConfig->src[1] + ((random_float() * construct_float(100.0f)) - construct_float(50.0f));
             particle->pos[1] = particle->bubbleY;
             particle->isAlive = TRUE;
 
@@ -276,7 +276,7 @@ void envfx_update_jetstream(void) {
     for (i = 0; i < sBubbleParticleMaxCount; i++) {
         particle->isAlive = envfx_is_jestream_bubble_alive(i);
         if (!particle->isAlive) {
-            particle->distFromCenter = random_float() * 300.0f;
+            particle->distFromCenter = random_float() * construct_float(300.0f);
             particle->angleFromCenter = random_u16();
             particle->pos[0] =
                 gEnvFxBubbleConfig->src[0]
@@ -285,11 +285,11 @@ void envfx_update_jetstream(void) {
                 gEnvFxBubbleConfig->src[2]
                 + coss(particle->angleFromCenter) * particle->distFromCenter;
             particle->pos[1] =
-                gEnvFxBubbleConfig->src[1] + (random_float() * 400.0f - 200.0f);
+                gEnvFxBubbleConfig->src[1] + ((random_float() * construct_float(400.0f)) - construct_float(200.0f));
         } else {
             particle->distFromCenter += 10;
-            particle->pos[0] += sins(particle->angleFromCenter) * 10.0f;
-            particle->pos[2] += coss(particle->angleFromCenter) * 10.0f;
+            particle->pos[0] += sins(particle->angleFromCenter) * construct_float(10.0f);
+            particle->pos[2] += coss(particle->angleFromCenter) * construct_float(10.0f);
             particle->pos[1] -= (particle->distFromCenter / 30) - 50;
         }
 
@@ -339,7 +339,7 @@ s32 envfx_init_bubble(s32 mode) {
 
     if (mode == ENVFX_LAVA_BUBBLES) {
         for (i = 0; i < sBubbleParticleCount; i++) {
-            (gEnvFxBuffer + i)->animFrame = random_float() * 7.0f;
+            (gEnvFxBuffer + i)->animFrame = random_float() * construct_float(7.0f);
         }
     }
 
