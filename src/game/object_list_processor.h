@@ -102,11 +102,11 @@ extern s32 gNumStaticSurfaces;
 extern struct MemoryPool *gObjectMemoryPool;
 
 enum CollisionFlags {
-    COLLISION_FLAGS_NONE              = (0 << 0),
-    COLLISION_FLAG_RETURN_FIRST       = (1 << 1),
-    COLLISION_FLAG_CAMERA             = (1 << 2),
-    COLLISION_FLAG_INCLUDE_INTANGIBLE = (1 << 3),
-    COLLISION_FLAG_EXCLUDE_DYNAMIC    = (1 << 4),
+    COLLISION_FLAGS_NONE              = 0x0,
+    COLLISION_FLAG_RETURN_FIRST       = BIT(0),
+    COLLISION_FLAG_CAMERA             = BIT(1),
+    COLLISION_FLAG_INCLUDE_INTANGIBLE = BIT(2),
+    COLLISION_FLAG_EXCLUDE_DYNAMIC    = BIT(3),
 };
 
 extern s16 gCollisionFlags;

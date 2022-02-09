@@ -166,17 +166,19 @@ struct ObjectNode gObjectListArray[16];
 /**
  * The order that object lists are processed in a frame.
  */
-s8 sObjectListUpdateOrder[] = { OBJ_LIST_SPAWNER,
-                                OBJ_LIST_SURFACE,
-                                OBJ_LIST_POLELIKE,
-                                OBJ_LIST_PLAYER,
-                                OBJ_LIST_PUSHABLE,
-                                OBJ_LIST_GENACTOR,
-                                OBJ_LIST_DESTRUCTIVE,
-                                OBJ_LIST_LEVEL,
-                                OBJ_LIST_DEFAULT,
-                                OBJ_LIST_UNIMPORTANT,
-                                -1 };
+s8 sObjectListUpdateOrder[] = {
+    OBJ_LIST_SPAWNER,
+    OBJ_LIST_SURFACE,
+    OBJ_LIST_POLELIKE,
+    OBJ_LIST_PLAYER,
+    OBJ_LIST_PUSHABLE,
+    OBJ_LIST_GENACTOR,
+    OBJ_LIST_DESTRUCTIVE,
+    OBJ_LIST_LEVEL,
+    OBJ_LIST_DEFAULT,
+    OBJ_LIST_UNIMPORTANT,
+    -1
+};
 
 /**
  * Info needed to spawn particles and keep track of which have been spawned for
@@ -193,57 +195,37 @@ struct ParticleProperties {
  * A table mapping particle flags to various properties use when spawning a particle.
  */
 struct ParticleProperties sParticleTypes[] = {
-    { PARTICLE_DUST,                 ACTIVE_PARTICLE_DUST,                 MODEL_MIST,                 bhvMistParticleSpawner },
+    { PARTICLE_DUST,                 ACTIVE_PARTICLE_DUST,                 MODEL_MIST,                 bhvMistParticleSpawner     },
     { PARTICLE_VERTICAL_STAR,        ACTIVE_PARTICLE_V_STAR,               MODEL_NONE,                 bhvVertStarParticleSpawner },
-    { PARTICLE_HORIZONTAL_STAR,      ACTIVE_PARTICLE_H_STAR,               MODEL_NONE,                 bhvHorStarParticleSpawner },
-    { PARTICLE_SPARKLES,             ACTIVE_PARTICLE_SPARKLES,             MODEL_SPARKLES,             bhvSparkleParticleSpawner },
-    { PARTICLE_BUBBLE,               ACTIVE_PARTICLE_BUBBLE,               MODEL_BUBBLE,               bhvBubbleParticleSpawner },
-    { PARTICLE_WATER_SPLASH,         ACTIVE_PARTICLE_WATER_SPLASH,         MODEL_WATER_SPLASH,         bhvWaterSplash },
-    { PARTICLE_IDLE_WATER_WAVE,      ACTIVE_PARTICLE_IDLE_WATER_WAVE,      MODEL_IDLE_WATER_WAVE,      bhvIdleWaterWave },
-    { PARTICLE_PLUNGE_BUBBLE,        ACTIVE_PARTICLE_PLUNGE_BUBBLE,        MODEL_WHITE_PARTICLE_SMALL, bhvPlungeBubble },
-    { PARTICLE_WAVE_TRAIL,           ACTIVE_PARTICLE_WAVE_TRAIL,           MODEL_WAVE_TRAIL,           bhvWaveTrail },
-    { PARTICLE_FIRE,                 ACTIVE_PARTICLE_FIRE,                 MODEL_RED_FLAME,            bhvFireParticleSpawner },
-    { PARTICLE_SHALLOW_WATER_WAVE,   ACTIVE_PARTICLE_SHALLOW_WATER_WAVE,   MODEL_NONE,                 bhvShallowWaterWave },
-    { PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, MODEL_NONE,                 bhvShallowWaterSplash },
-    { PARTICLE_LEAF,                 ACTIVE_PARTICLE_LEAF,                 MODEL_NONE,                 bhvLeafParticleSpawner },
-    { PARTICLE_SNOW,                 ACTIVE_PARTICLE_SNOW,                 MODEL_NONE,                 bhvSnowParticleSpawner },
-    { PARTICLE_BREATH,               ACTIVE_PARTICLE_BREATH,               MODEL_NONE,                 bhvBreathParticleSpawner },
-    { PARTICLE_DIRT,                 ACTIVE_PARTICLE_DIRT,                 MODEL_NONE,                 bhvDirtParticleSpawner },
+    { PARTICLE_HORIZONTAL_STAR,      ACTIVE_PARTICLE_H_STAR,               MODEL_NONE,                 bhvHorStarParticleSpawner  },
+    { PARTICLE_SPARKLES,             ACTIVE_PARTICLE_SPARKLES,             MODEL_SPARKLES,             bhvSparkleParticleSpawner  },
+    { PARTICLE_BUBBLE,               ACTIVE_PARTICLE_BUBBLE,               MODEL_BUBBLE,               bhvBubbleParticleSpawner   },
+    { PARTICLE_WATER_SPLASH,         ACTIVE_PARTICLE_WATER_SPLASH,         MODEL_WATER_SPLASH,         bhvWaterSplash             },
+    { PARTICLE_IDLE_WATER_WAVE,      ACTIVE_PARTICLE_IDLE_WATER_WAVE,      MODEL_IDLE_WATER_WAVE,      bhvIdleWaterWave           },
+    { PARTICLE_PLUNGE_BUBBLE,        ACTIVE_PARTICLE_PLUNGE_BUBBLE,        MODEL_WHITE_PARTICLE_SMALL, bhvPlungeBubble            },
+    { PARTICLE_WAVE_TRAIL,           ACTIVE_PARTICLE_WAVE_TRAIL,           MODEL_WAVE_TRAIL,           bhvWaveTrail               },
+    { PARTICLE_FIRE,                 ACTIVE_PARTICLE_FIRE,                 MODEL_RED_FLAME,            bhvFireParticleSpawner     },
+    { PARTICLE_SHALLOW_WATER_WAVE,   ACTIVE_PARTICLE_SHALLOW_WATER_WAVE,   MODEL_NONE,                 bhvShallowWaterWave        },
+    { PARTICLE_SHALLOW_WATER_SPLASH, ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH, MODEL_NONE,                 bhvShallowWaterSplash      },
+    { PARTICLE_LEAF,                 ACTIVE_PARTICLE_LEAF,                 MODEL_NONE,                 bhvLeafParticleSpawner     },
+    { PARTICLE_SNOW,                 ACTIVE_PARTICLE_SNOW,                 MODEL_NONE,                 bhvSnowParticleSpawner     },
+    { PARTICLE_BREATH,               ACTIVE_PARTICLE_BREATH,               MODEL_NONE,                 bhvBreathParticleSpawner   },
+    { PARTICLE_DIRT,                 ACTIVE_PARTICLE_DIRT,                 MODEL_NONE,                 bhvDirtParticleSpawner     },
     { PARTICLE_MIST_CIRCLE,          ACTIVE_PARTICLE_MIST_CIRCLE,          MODEL_NONE,                 bhvMistCircParticleSpawner },
     { PARTICLE_TRIANGLE,             ACTIVE_PARTICLE_TRIANGLE,             MODEL_NONE,                 bhvTriangleParticleSpawner },
-    { PARTICLE_NONE,                 ACTIVE_PARTICLE_NONE,                 MODEL_NONE,                 NULL },
+    { PARTICLE_NONE,                 ACTIVE_PARTICLE_NONE,                 MODEL_NONE,                 NULL                       },
 };
 
 /**
  * Copy position, velocity, and angle variables from MarioState to the Mario
  * object.
  */
-void copy_mario_state_to_object(void) {
-    s32 i = 0;
-    // L is real
-    if (gCurrentObject != gMarioObject) {
-        i++;
-    }
-
-    gCurrentObject->oVelX = gMarioStates[i].vel[0];
-    gCurrentObject->oVelY = gMarioStates[i].vel[1];
-    gCurrentObject->oVelZ = gMarioStates[i].vel[2];
-
-    gCurrentObject->oPosX = gMarioStates[i].pos[0];
-    gCurrentObject->oPosY = gMarioStates[i].pos[1];
-    gCurrentObject->oPosZ = gMarioStates[i].pos[2];
-
-    gCurrentObject->oMoveAnglePitch = gCurrentObject->header.gfx.angle[0];
-    gCurrentObject->oMoveAngleYaw = gCurrentObject->header.gfx.angle[1];
-    gCurrentObject->oMoveAngleRoll = gCurrentObject->header.gfx.angle[2];
-
-    gCurrentObject->oFaceAnglePitch = gCurrentObject->header.gfx.angle[0];
-    gCurrentObject->oFaceAngleYaw = gCurrentObject->header.gfx.angle[1];
-    gCurrentObject->oFaceAngleRoll = gCurrentObject->header.gfx.angle[2];
-
-    gCurrentObject->oAngleVelPitch = gMarioStates[i].angleVel[0];
-    gCurrentObject->oAngleVelYaw = gMarioStates[i].angleVel[1];
-    gCurrentObject->oAngleVelRoll = gMarioStates[i].angleVel[2];
+void copy_mario_state_to_object(struct MarioState *m) {
+    vec3f_copy(&o->oVelVec, m->vel);
+    vec3f_copy(&o->oPosVec, m->pos);
+    vec3s_to_vec3i(&o->oMoveAngleVec, o->header.gfx.angle);
+    vec3s_to_vec3i(&o->oFaceAngleVec, o->header.gfx.angle);
+    vec3s_to_vec3i(&o->oAngleVelVec, m->angleVel);
 }
 
 /**
@@ -258,29 +240,33 @@ void spawn_particle(u32 activeParticleFlag, ModelID16 model, const BehaviorScrip
     }
 }
 
+void spawn_mario_particles(u32 particleFlags) {
+    struct ParticleProperties *particle;
+
+    for (particle = sParticleTypes; particle->particleFlag != 0; particle++) {
+        if (particleFlags & particle->particleFlag) {
+            spawn_particle(particle->activeParticleFlag,
+                           particle->model,
+                           particle->behavior);
+        }
+    }
+}
+
 /**
  * Mario's primary behavior update function.
  */
 void bhv_mario_update(void) {
-    u32 particleFlags = 0;
-    s32 i;
+    struct MarioState *m = gMarioState;
+    u32 particleFlags = ACTIVE_PARTICLE_NONE;
 
-    particleFlags = execute_mario_action(gMarioState);
+    particleFlags = execute_mario_action(m);
     gCurrentObject->oMarioParticleFlags = particleFlags;
 
     // Mario code updates MarioState's versions of position etc, so we need
     // to sync it with the Mario object
-    copy_mario_state_to_object();
+    copy_mario_state_to_object(m);
 
-    i = 0;
-    while (sParticleTypes[i].particleFlag != 0) {
-        if (particleFlags & sParticleTypes[i].particleFlag) {
-            spawn_particle(sParticleTypes[i].activeParticleFlag, sParticleTypes[i].model,
-                           sParticleTypes[i].behavior);
-        }
-
-        i++;
-    }
+    spawn_mario_particles(particleFlags);
 }
 
 /**
@@ -373,7 +359,7 @@ s32 update_objects_in_list(struct ObjectNode *objList) {
 /**
  * Unload any objects in the list that have been deactivated.
  */
-s32 unload_deactivated_objects_in_list(struct ObjectNode *objList) {
+void unload_deactivated_objects_in_list(struct ObjectNode *objList) {
     struct ObjectNode *obj = objList->next;
 
     while (objList != obj) {
@@ -386,8 +372,7 @@ s32 unload_deactivated_objects_in_list(struct ObjectNode *objList) {
             if (gCurrentObject->oLightID != 0xFFFF)
                 obj_disable_light(gCurrentObject);
 #endif
-            // Prevent object from respawning after exiting and re-entering the
-            // area
+            // Prevent object from respawning after exiting and re-entering the area
             if (!(gCurrentObject->oFlags & OBJ_FLAG_PERSISTENT_RESPAWN)) {
                 set_object_respawn_info_bits(gCurrentObject, RESPAWN_INFO_DONT_RESPAWN);
             }
@@ -395,16 +380,13 @@ s32 unload_deactivated_objects_in_list(struct ObjectNode *objList) {
             unload_object(gCurrentObject);
         }
     }
-
-    return 0;
 }
 
 /**
  * OR the object's respawn info with bits << 8. If bits = 0xFF, this prevents
  * the object from respawning after leaving and re-entering the area.
  * For macro objects, respawnInfo points to the 16 bit entry in the macro object
- * list. For other objects, it points to the 32 bit behaviorArg in the
- * SpawnInfo.
+ * list. For other objects, it points to the 32 bit behaviorArg in the SpawnInfo.
  */
 void set_object_respawn_info_bits(struct Object *obj, u8 bits) {
     u32 *info32;
@@ -432,9 +414,9 @@ void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex) {
     struct ObjectNode *list;
     s32 i;
     gObjectLists = gObjectListArray;
+    list = gObjectLists;
 
     for (i = 0; i < NUM_OBJ_LISTS; i++) {
-        list = gObjectLists + i;
         node = list->next;
 
         while (node != list) {
@@ -445,6 +427,8 @@ void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex) {
                 unload_object(obj);
             }
         }
+
+        list++;
     }
 }
 
@@ -461,7 +445,7 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
     clear_mario_platform();
 
     if (gCurrAreaIndex == 2) {
-        gCCMEnteredSlide |= 1;
+        gCCMEnteredSlide = TRUE;
     }
 
     while (spawnInfo != NULL) {
@@ -498,10 +482,8 @@ void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo) {
 
             geo_obj_init_spawninfo(&object->header.gfx, spawnInfo);
 
-            vec3s_to_vec3f(&object->oPosVec, spawnInfo->startPos);
-
+            vec3s_to_vec3f(&object->oPosVec,       spawnInfo->startPos);
             vec3s_to_vec3i(&object->oFaceAngleVec, spawnInfo->startAngle);
-
             vec3s_to_vec3i(&object->oMoveAngleVec, spawnInfo->startAngle);
 
             object->oFloorHeight = find_floor(object->oPosX, object->oPosY, object->oPosZ, &object->oFloor);
@@ -548,8 +530,8 @@ void clear_objects(void) {
  * Update spawner and surface objects.
  */
 void update_terrain_objects(void) {
-    gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
-    gObjectCounter += update_objects_in_list(&gObjectLists[OBJ_LIST_SURFACE]);
+    gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER])
+                   + update_objects_in_list(&gObjectLists[OBJ_LIST_SURFACE]);
 }
 
 /**
@@ -558,11 +540,10 @@ void update_terrain_objects(void) {
  */
 void update_non_terrain_objects(void) {
     s32 listIndex;
+    s32 i;
 
-    s32 i = 2;
-    while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
+    for (i = 2; (listIndex = sObjectListUpdateOrder[i]) != -1; i++) {
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
-        i++;
     }
 }
 
@@ -571,11 +552,10 @@ void update_non_terrain_objects(void) {
  */
 void unload_deactivated_objects(void) {
     s32 listIndex;
+    s32 i;
 
-    s32 i = 0;
-    while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
+    for (i = 0; (listIndex = sObjectListUpdateOrder[i]) != -1; i++) {
         unload_deactivated_objects_in_list(&gObjectLists[listIndex]);
-        i++;
     }
 
     // TIME_STOP_UNKNOWN_0 was most likely intended to be used to track whether
@@ -608,7 +588,7 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  * and object surface management.
  */
 void update_objects(UNUSED s32 unused) {
-    //s64 cycleCounts[30];
+    // s64 cycleCounts[30];
 #if PUPPYPRINT_DEBUG
     OSTime first = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
@@ -620,6 +600,7 @@ void update_objects(UNUSED s32 unused) {
 
     gNumRoomedObjectsInMarioRoom = 0;
     gNumRoomedObjectsNotInMarioRoom = 0;
+
     gCollisionFlags &= ~COLLISION_FLAG_CAMERA;
 
     reset_debug_objectinfo();
@@ -664,11 +645,7 @@ void update_objects(UNUSED s32 unused) {
 
     // If time stop was enabled this frame, activate it now so that it will
     // take effect next frame
-    if (gTimeStopState & TIME_STOP_ENABLED) {
-        gTimeStopState |= TIME_STOP_ACTIVE;
-    } else {
-        gTimeStopState &= ~TIME_STOP_ACTIVE;
-    }
+    COND_BIT((gTimeStopState & TIME_STOP_ENABLED), gTimeStopState, TIME_STOP_ACTIVE);
 
     gPrevFrameObjectCount = gObjectCounter;
 #if PUPPYPRINT_DEBUG
