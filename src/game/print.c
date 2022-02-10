@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "print.h"
 #include "segment2.h"
+#include "engine/math_util.h"
 
 /**
  * This file handles printing and formatting the colorful text that
@@ -33,7 +34,7 @@ s32 int_pow(s32 n, s32 exponent) {
     s32 i;
 
     for (i = 0; i < exponent; i++) {
-        result = n * result;
+        result *= n;
     }
 
     return result;
@@ -99,9 +100,9 @@ void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 
 
             // FIXME: Why doesn't [] match?
             if (digit < 10) {
-                *(dest + len + numDigits - 1 - i) = digit + '0';
+                dest[len + numDigits - 1 - i] = digit + '0';
             } else {
-                *(dest + len + numDigits - 1 - i) = digit + '7';
+                dest[len + numDigits - 1 - i] = digit + '7';
             }
 
             n -= digit * powBase;
@@ -194,9 +195,9 @@ void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
             parse_width_field(str, &srcIndex, &width, &zeroPad);
 
             if (str[srcIndex] != 'b'
-                && str[srcIndex] != 'o'
-                && str[srcIndex] != 'd'
-                && str[srcIndex] != 'x') {
+             && str[srcIndex] != 'o'
+             && str[srcIndex] != 'd'
+             && str[srcIndex] != 'x') {
                 break;
             }
             if (str[srcIndex] == 'b') base =  2;
@@ -275,7 +276,7 @@ void print_text_centered(s32 x, s32 y, const char *str) {
     }
 
     sTextLabels[sTextLabelsCount]->length = length;
-    sTextLabels[sTextLabelsCount]->x = x - length * 6; // * 12 / 2;
+    sTextLabels[sTextLabelsCount]->x = x - (length * 6); // * 12 / 2;
     sTextLabels[sTextLabelsCount]->y = y;
     sTextLabelsCount++;
 }
@@ -284,77 +285,24 @@ void print_text_centered(s32 x, s32 y, const char *str) {
  * Converts a char into the proper colorful glyph for the char.
  */
 s32 char_to_glyph_index(char c) {
-    if (c >= 'A' && c <= 'Z') {
-        return c - 55;
-    }
-
-    if (c >= 'a' && c <= 'z') {
-        return c - 87;
-    }
-
-    if (c >= '0' && c <= '9') {
-        return c - 48;
-    }
-
-    if (c == ' ') {
-        return GLYPH_SPACE;
-    }
-
-    if (c == '!') {
-        return GLYPH_EXCLAMATION_PNT; // !, JP only
-    }
-
-    if (c == '#') {
-        return GLYPH_TWO_EXCLAMATION; // !!, JP only
-    }
-
-    if (c == '?') {
-        return GLYPH_QUESTION_MARK; // ?, JP only
-    }
-
-    if (c == '&') {
-        return GLYPH_AMPERSAND; // &, JP only
-    }
-
-    if (c == '/') {
-        return GLYPH_PERCENT; // %, JP only
-    }
-
-    if (c == '-') {
-        return GLYPH_MINUS; // minus
-    }
-
-    if (c == '*') {
-        return GLYPH_MULTIPLY; // x
-    }
-
-    if (c == '$') {
-        return GLYPH_COIN; // coin
-    }
-
-    if (c == '@') {
-        return GLYPH_RED_COIN; // red coin
-    }
-
-    if (c == '+') {
-        return GLYPH_SILVER_COIN; // silver coin
-    }
-
-    if (c == ',') {
-        return GLYPH_MARIO_HEAD; // Imagine I drew Mario's head
-    }
-
-    if (c == '^') {
-        return GLYPH_STAR; // star
-    }
-
-    if (c == '.') {
-        return GLYPH_PERIOD; // large shaded dot, JP only
-    }
-
-    if (c == '|') {
-        return GLYPH_BETA_KEY; // beta key, JP only. Reused for Ü in EU.
-    }
+    if (c >= 'A' && c <= 'Z') return (c - 55);
+    if (c >= 'a' && c <= 'z') return (c - 87);
+    if (c >= '0' && c <= '9') return (c - 48);
+    if (c == ' ') return GLYPH_SPACE;
+    if (c == '!') return GLYPH_EXCLAMATION_PNT; // !, JP only
+    if (c == '#') return GLYPH_TWO_EXCLAMATION; // !!, JP only
+    if (c == '?') return GLYPH_QUESTION_MARK;   // ?, JP only
+    if (c == '&') return GLYPH_AMPERSAND;       // &, JP only
+    if (c == '/') return GLYPH_PERCENT;         // %, JP only
+    if (c == '-') return GLYPH_MINUS;           // minus
+    if (c == '*') return GLYPH_MULTIPLY;        // x
+    if (c == '$') return GLYPH_COIN;            // coin
+    if (c == '@') return GLYPH_RED_COIN;        // red coin
+    if (c == '+') return GLYPH_SILVER_COIN;     // silver coin
+    if (c == ',') return GLYPH_MARIO_HEAD;      // Imagine I drew Mario's head
+    if (c == '^') return GLYPH_STAR;            // star
+    if (c == '.') return GLYPH_PERIOD;          // large shaded dot, JP only
+    if (c == '|') return GLYPH_BETA_KEY;        // beta key, JP only. Reused for Ü in EU.
 
     return GLYPH_SPACE;
 }
@@ -379,21 +327,8 @@ void add_glyph_texture(s8 glyphIndex) {
  * Clips textrect into the boundaries defined.
  */
 void clip_to_bounds(s32 *x, s32 *y) {
-    if (*x < TEXRECT_MIN_X) {
-        *x = TEXRECT_MIN_X;
-    }
-
-    if (*x > TEXRECT_MAX_X) {
-        *x = TEXRECT_MAX_X;
-    }
-
-    if (*y < TEXRECT_MIN_Y) {
-        *y = TEXRECT_MIN_Y;
-    }
-
-    if (*y > TEXRECT_MAX_Y) {
-        *y = TEXRECT_MAX_Y;
-    }
+    *x = CLAMP(*x, TEXRECT_MIN_X, TEXRECT_MAX_X);
+    *y = CLAMP(*y, TEXRECT_MIN_Y, TEXRECT_MAX_Y);
 }
 #endif
 
@@ -401,7 +336,7 @@ void clip_to_bounds(s32 *x, s32 *y) {
  * Renders the glyph that's set at the given position.
  */
 void render_textrect(s32 x, s32 y, s32 pos) {
-    s32 rectBaseX = x + pos * 12;
+    s32 rectBaseX = x + (pos * 12);
     s32 rectBaseY = 224 - y;
     s32 rectX;
     s32 rectY;
@@ -421,16 +356,14 @@ void render_textrect(s32 x, s32 y, s32 pos) {
  * a for loop.
  */
 void render_text_labels(void) {
-    s32 i;
-    s32 j;
+    s32 i, j;
     s8 glyphIndex;
-    Mtx *mtx;
 
     if (sTextLabelsCount == 0) {
         return;
     }
 
-    mtx = alloc_display_list(sizeof(*mtx));
+    Mtx *mtx = alloc_display_list(sizeof(*mtx));
 
     if (mtx == NULL) {
         sTextLabelsCount = 0;

@@ -1257,21 +1257,18 @@ void render_dialog_entries(void) {
 
     render_dialog_box_type(dialog, dialog->linesPerBox);
 
+#ifdef WIDESCREEN
+    // Horizontal scissoring isn't really required and can potentially mess up widescreen enhancements.
+    s16 ulx = 0;
+    s16 lrx = SCREEN_WIDTH;
+#else
+    s16 ulx = ensure_nonnegative(dialog->leftOffset);
+    s16 lrx = ensure_nonnegative(dialog->leftOffset + DIAG_VAL3);
+#endif
     gDPSetScissor(
         gDisplayListHead++, G_SC_NON_INTERLACE,
-        // Horizontal scissoring isn't really required and can potentially mess up widescreen enhancements.
-#ifdef WIDESCREEN
-        0,
-#else
-        ensure_nonnegative(dialog->leftOffset),
-#endif
-        ensure_nonnegative(DIAG_VAL2 - dialog->width),
-#ifdef WIDESCREEN
-        SCREEN_WIDTH,
-#else
-        ensure_nonnegative(dialog->leftOffset + DIAG_VAL3),
-#endif
-        ensure_nonnegative(240 + ((dialog->linesPerBox * 80) / DIAG_VAL4) - dialog->width)
+        ulx, ensure_nonnegative(DIAG_VAL2 - dialog->width),
+        lrx, ensure_nonnegative(240 + ((dialog->linesPerBox * 80) / DIAG_VAL4) - dialog->width)
     );
     handle_dialog_text_and_pages(0, dialog, lowerBound);
 
