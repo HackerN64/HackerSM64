@@ -127,6 +127,7 @@ void linearly_interpolate_solidity_negative(u8 initialSolidity, s16 curr, s16 st
  */
 s32 correct_shadow_solidity_for_animations(u8 initialSolidity) {
     s16 animFrame = gMarioObject->header.gfx.animInfo.animFrame;
+
     switch (gMarioObject->header.gfx.animInfo.animID) {
         case MARIO_ANIM_IDLE_ON_LEDGE:
             return SHADOW_SOLIDITY_NO_SHADOW;
@@ -171,12 +172,11 @@ void correct_lava_shadow_height(f32 *floorHeight) {
  * Uses environment alpha for shadow solidity.
  */
 static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
-    if (shadowType == SHADOW_CIRCLE) {
-        gSPDisplayList(displayListHead++, dl_shadow_circle);
-    } else {
-        gSPDisplayList(displayListHead++, dl_shadow_square);
-    }
-    gDPSetEnvColor(displayListHead++, 255, 255, 255, s->solidity);
+    Gfx *shapeDl = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
+    Alpha solidity = s->solidity;
+
+    gSPDisplayList(displayListHead++, shapeDl);
+    gDPSetEnvColor(displayListHead++, 255, 255, 255, solidity);
     gSPDisplayList(displayListHead++, dl_shadow_end);
     gSPEndDisplayList(displayListHead);
 }
@@ -188,29 +188,31 @@ static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
  * Return a pointer to the display list representing the shadow.
  */
 Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 shadowType, s8 shifted) {
+    const f32 floorLowerLimitMisc = construct_float(FLOOR_LOWER_LIMIT_MISC);
+
     struct Object *obj = gCurGraphNodeObjectNode;
     // Check if the object exists.
     if (obj == NULL) {
         return NULL;
     }
 
-    const f32 minHeight = construct_float(FLOOR_LOWER_LIMIT_MISC);
-
     // The floor underneath the object.
     struct Surface *floor = NULL;
     // The y-position of the floor (or water or lava) underneath the object.
-    f32 floorHeight = minHeight;
+    f32 floorHeight = floorLowerLimitMisc;
     f32 x = pos[0];
     f32 y = pos[1];
     f32 z = pos[2];
     s8 isPlayer   = (obj == gMarioObject);
     s8 notHeldObj = (gCurGraphNodeHeldObject == NULL);
 
+    struct MarioState *m;
+
     // Attempt to use existing floors before finding a new one.
-    if (notHeldObj && isPlayer && gMarioState->floor) {
+    if (notHeldObj && isPlayer && (m = gMarioState)->floor) {
         // The object is Mario and has a referenced floor.
-        floor       = gMarioState->floor;
-        floorHeight = gMarioState->floorHeight;
+        floor       = m->floor;
+        floorHeight = m->floorHeight;
     } else if (notHeldObj && (gCurGraphNodeObject != &gMirrorMario) && obj->oFloor) {
         // The object is not Mario but has a referenced floor.
         //! Some objects only get their oFloor from bhv_init_room, which skips dynamic floors.
@@ -239,7 +241,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     // Whether the floor is an environment box rather than an actual surface.
     s32 isEnvBox = FALSE;
 
-    if (waterLevel > minHeight
+    if (waterLevel > floorLowerLimitMisc
         && y >= waterLevel
         && floorHeight <= waterLevel) {
         // Skip shifting the shadow height later, since the find_water_level_and_floor call above uses the already shifted position.
@@ -267,9 +269,9 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             // Set the shadow height to the lava height in specific areas.
             correct_lava_shadow_height(&floorHeight);
 #endif
-        } else if (floor->object != NULL
-                   && floor->object->behavior == segmented_to_virtual(bhvPlatformOnTrack)
-                   && floor->object->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET) {
+        } else if (((obj = floor->object) != NULL)
+                && (obj->behavior == segmented_to_virtual(bhvPlatformOnTrack))
+                && (obj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET)) {
             // Raise the shadow 5 units so the shadow doesn't clip into the flying carpet.
             floorHeight += 5;
             // The flying carpet is transparent.
@@ -301,7 +303,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     }
 
     // No shadow if the floor is lower than expected possible,
-    if (floorHeight < minHeight) {
+    if (floorHeight < floorLowerLimitMisc) {
         return NULL;
     }
 
