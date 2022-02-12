@@ -100,7 +100,7 @@ void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max) { min_max_3_func(a, b, 
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max) { min_max_3_func(a, b, c, min, max); }
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, c, min, max); }
 
-/// Copy vector 'src' to 'dest'
+/// Perform a bitwise copy from vector 'src' to 'dest'
 #define vec3_copy_bits(destFmt, dest, srcFmt, src) { \
     register destFmt x = ((srcFmt *) src)[0];        \
     register destFmt y = ((srcFmt *) src)[1];        \
@@ -255,7 +255,7 @@ void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_prod_func(s16, 
 #undef vec3_prod_func
 
 
-/// Add vector 'a' to 'dest'
+/// Performs element-wise division of two 3-vectors
 #define vec3_div_func(fmt, dest, a) {   \
     register fmt x = ((fmt *) a)[0];    \
     register fmt y = ((fmt *) a)[1];    \
@@ -269,7 +269,7 @@ void vec3i_div(Vec3i dest, const Vec3i a) { vec3_div_func(s32, dest, a); }
 void vec3s_div(Vec3s dest, const Vec3s a) { vec3_div_func(s16, dest, a); }
 #undef vec3_div_func
 
-/// Make 'dest' the sum of vectors a and b.
+/// Make 'dest' the quotient of vectors a and b.
 #define vec3_quot_func(fmt, dest, a, b) {   \
     register fmt x1 = ((fmt *) a)[0];       \
     register fmt y1 = ((fmt *) a)[1];       \
