@@ -350,7 +350,7 @@ void update_hang_stationary(struct MarioState *m) {
     vec3f_copy(m->vel, gVec3fZero);
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
 #ifdef BETTER_HANGING
-    vec3s_set(m->marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
+    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
 #endif
 }
 

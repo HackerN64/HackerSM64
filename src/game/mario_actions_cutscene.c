@@ -509,7 +509,7 @@ s32 act_reading_sign(struct MarioState *m) {
     }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
-    vec3s_set(marioObj->header.gfx.angle, 0x0, m->faceAngle[1], 0x0);
+    vec3s_set(marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
     return FALSE;
 }
 
