@@ -118,7 +118,7 @@ Bool32 vec3f_compare(Vec3f a, Vec3f b) {
     return (aX == bX && aY == bY && aZ == bZ);
 }
 
-/// Copy vector 'src' to 'dest'
+/// Perform a bitwise copy from vector 'src' to 'dest'.
 #define vec3_copy_bits(destFmt, dest, srcFmt, src) {\
     destFmt x = ((srcFmt *) src)[0];                \
     destFmt y = ((srcFmt *) src)[1];                \
@@ -268,7 +268,7 @@ void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_prod_func(s16, 
 #undef vec3_prod_func
 
 
-/// Add vector 'a' to 'dest'
+/// Performs element-wise division of two 3-vectors.
 #define vec3_div_func(fmt, dest, a) {   \
     fmt x = ((fmt *) a)[0];             \
     fmt y = ((fmt *) a)[1];             \
@@ -282,7 +282,7 @@ void vec3i_div(Vec3i dest, const Vec3i a) { vec3_div_func(s32, dest, a); }
 void vec3s_div(Vec3s dest, const Vec3s a) { vec3_div_func(s16, dest, a); }
 #undef vec3_div_func
 
-/// Make 'dest' the sum of vectors a and b.
+/// Make 'dest' the quotient of vectors a and b.
 #define vec3_quot_func(fmt, dest, a, b) {   \
     fmt x1 = ((fmt *) a)[0];                \
     fmt y1 = ((fmt *) a)[1];                \
