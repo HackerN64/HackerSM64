@@ -1,8 +1,4 @@
 // 0x0700B4F0 - 0x0700B508
-static const Lights1 bitdw_seg7_lights_0700B4F0 = gdSPDefLights1(
-    0x39, 0x6f, 0x5d,
-    0x79, 0xeb, 0xc5, 0x28, 0x28, 0x28
-);
 
 // 0x0700B508 - 0x0700B5F8
 static const Vtx bitdw_seg7_vertex_0700B508[] = {
@@ -73,8 +69,8 @@ static const Gfx bitdw_seg7_dl_0700B808[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, sky_09000800),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&bitdw_seg7_lights_0700B4F0.l, 1),
-    gsSPLight(&bitdw_seg7_lights_0700B4F0.a, 2),
+    gsSPLightColor(LIGHT_1, 0x79ebc5ff),
+    gsSPLightColor(LIGHT_2, 0x396f5dff),
     gsSPVertex(bitdw_seg7_vertex_0700B508, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
