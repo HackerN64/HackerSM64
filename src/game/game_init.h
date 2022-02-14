@@ -30,7 +30,7 @@ enum ZBmodes {
     CLEAR_ZBUFFER = 1,
 };
 
-extern struct Controller gControllers[3];
+extern struct Controller gControllers[4];
 extern OSContStatus gControllerStatuses[4];
 extern OSContPad gControllerPads[4];
 extern OSMesgQueue gGameVblankQueue;
@@ -65,6 +65,7 @@ extern void (*gGoddardVblankCallback)(void);
 extern struct Controller *gPlayer1Controller;
 extern struct Controller *gPlayer2Controller;
 extern struct Controller *gPlayer3Controller;
+extern struct Controller *gPlayer4Controller;
 extern struct DemoInput *gCurrDemoInput;
 extern u16 gDemoInputListID;
 extern struct DemoInput gRecordedDemoInput;

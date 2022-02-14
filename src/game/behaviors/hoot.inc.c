@@ -68,11 +68,11 @@ void hoot_free_step(s16 fastOscY, s32 speed) {
 
 void hoot_player_set_yaw(void) {
 #ifdef HOOT_YAW_FIX
-    Angle turnSpeed  = gMarioState->intendedMag * 0x20;
+    Angle turnSpeed = gMarioState->intendedMag * 32;
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, gMarioState->intendedYaw, turnSpeed);
 #else
-    s16 stickX = gPlayer3Controller->rawStickX;
-    s16 stickY = gPlayer3Controller->rawStickY;
+    s16 stickX = gPlayer1Controller->rawStickX;
+    s16 stickY = gPlayer1Controller->rawStickY;
     if (stickX < 10 && stickX > -10) stickX = 0;
     if (stickY < 10 && stickY > -10) stickY = 0;
     o->oMoveAngleYaw -= 5 * stickX;
