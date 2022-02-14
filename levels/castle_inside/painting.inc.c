@@ -571,11 +571,10 @@ static const Lights1 inside_castle_seg7_lights_07022528 = gdSPDefLights1(
 );
 
 // 0x07022540 - 0x07022558
-// No gdSPDefLights1 macro defined because of odd different light value (0xff and 0xfa)
-static const Lights1 inside_castle_seg7_lights_07022540 = {
-    {{  {0x40, 0x40, 0x80}, 0, {0x40, 0x40, 0x80}, 0} },
-    {{{ {0x64, 0x64, 0xff}, 0, {0x64, 0x64, 0xfa}, 0, {0x28, 0x28, 0x28},0} }} 
-};
+static const Lights1 inside_castle_seg7_lights_07022540 = gdSPDefLights1(
+    0x40, 0x40, 0x80,
+    0x64, 0x64, 0xFF, 0x28, 0x28, 0x28
+);
 
 // 0x07022558 - 0x07022598
 static const Vtx inside_castle_seg7_vertex_07022558[] = {
