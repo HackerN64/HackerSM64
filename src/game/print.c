@@ -98,7 +98,6 @@ void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 
             powBase = int_pow(base, i);
             digit = n / powBase;
 
-            // FIXME: Why doesn't [] match?
             if (digit < 10) {
                 dest[len + numDigits - 1 - i] = digit + '0';
             } else {
