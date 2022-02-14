@@ -37,9 +37,10 @@
 
 #define CMD_GET(type, offset) (*(type *) (CMD_PROCESS_OFFSET(offset) + (u8 *) sCurrentCmd))
 
-// These are equal
 #define CMD_NEXT ((struct LevelCommand *) ((u8 *) sCurrentCmd + (sCurrentCmd->size << CMD_SIZE_SHIFT)))
-#define NEXT_CMD ((struct LevelCommand *) ((sCurrentCmd->size << CMD_SIZE_SHIFT) + (u8 *) sCurrentCmd))
+
+// Backwards compatibility
+#define NEXT_CMD CMD_NEXT
 
 struct LevelCommand {
     /*00*/ u8 type;
@@ -90,7 +91,7 @@ static void level_cmd_load_and_execute(void) {
     main_pool_push_state();
     load_segment(CMD_GET(s16, 2), CMD_GET(void *, 4), CMD_GET(void *, 8), MEMORY_POOL_LEFT, CMD_GET(void *, 16), CMD_GET(void *, 20));
 
-    *sStackTop++ = (uintptr_t) NEXT_CMD;
+    *sStackTop++ = (uintptr_t) CMD_NEXT;
     *sStackTop++ = (uintptr_t) sStackBase;
     sStackBase = sStackTop;
 
@@ -145,7 +146,7 @@ static void level_cmd_jump(void) {
 }
 
 static void level_cmd_jump_and_link(void) {
-    *sStackTop++ = (uintptr_t) NEXT_CMD;
+    *sStackTop++ = (uintptr_t) CMD_NEXT;
     sCurrentCmd = segmented_to_virtual(CMD_GET(void *, 4));
 }
 
@@ -154,7 +155,7 @@ static void level_cmd_return(void) {
 }
 
 static void level_cmd_jump_and_link_push_arg(void) {
-    *sStackTop++ = (uintptr_t) NEXT_CMD;
+    *sStackTop++ = (uintptr_t) CMD_NEXT;
     *sStackTop++ = CMD_GET(s16, 2);
     sCurrentCmd = CMD_NEXT;
 }
@@ -174,7 +175,7 @@ static void level_cmd_jump_repeat(void) {
 }
 
 static void level_cmd_loop_begin(void) {
-    *sStackTop++ = (uintptr_t) NEXT_CMD;
+    *sStackTop++ = (uintptr_t) CMD_NEXT;
     *sStackTop++ = 0;
     sCurrentCmd = CMD_NEXT;
 }
@@ -198,7 +199,7 @@ static void level_cmd_jump_if(void) {
 
 static void level_cmd_jump_and_link_if(void) {
     if (eval_script_op(CMD_GET(u8, 2), CMD_GET(s32, 4))) {
-        *sStackTop++ = (uintptr_t) NEXT_CMD;
+        *sStackTop++ = (uintptr_t) CMD_NEXT;
         sCurrentCmd = segmented_to_virtual(CMD_GET(void *, 8));
     } else {
         sCurrentCmd = CMD_NEXT;
