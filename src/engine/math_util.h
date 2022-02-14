@@ -66,15 +66,15 @@ extern f32 gSineTable[];
 #define cots(x) (coss(x) / sins(x))
 #define atans(x) gArctanTable[(s32)((((x) * 1024) + construct_float(0.5f)))] // is this correct? used for atan2_lookup
 
-#define RAD_PER_DEG construct_float(M_PI / 180.0f)
-#define DEG_PER_RAD construct_float(180.0f / M_PI)
+#define RAD_PER_DEG (M_PI / 180.0f)
+#define DEG_PER_RAD (180.0f / M_PI)
 
-#define angle_to_degrees(x) (f32)((Angle)(x) * construct_float(360.0f / (f32)0x10000))
-#define degrees_to_angle(x) (Angle)((f32)(x) * construct_float((f32)0x10000 / 360.0f))
-#define angle_to_radians(x) (f32)((Angle)(x) * construct_float(M_PI / (f32)0x8000))
-#define radians_to_angle(x) (Angle)((f32)(x) * construct_float((f32)0x8000 / M_PI))
-#define degrees_to_radians(x) (f32)((f32)(x) * construct_float(M_PI / 180.0f))
-#define radians_to_degrees(x) (f32)((f32)(x) * construct_float(180.0f / M_PI))
+#define angle_to_degrees(x) (f32)((Angle)(x) * 360.0f / (f32)0x10000)
+#define degrees_to_angle(x) (Angle)((f32)(x) * (f32)0x10000 / 360.0f)
+#define angle_to_radians(x) (f32)((Angle)(x) * M_PI / (f32)0x8000)
+#define radians_to_angle(x) (Angle)((f32)(x) * (f32)0x8000 / M_PI)
+#define degrees_to_radians(x) (f32)((f32)(x) * M_PI / 180.0f)
+#define radians_to_degrees(x) (f32)((f32)(x) * 180.0f / M_PI)
 
 /**
  * Converts an angle in degrees to sm64's s16 angle units. For example, DEGREES(90) == 0x4000
