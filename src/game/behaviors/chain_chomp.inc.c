@@ -9,6 +9,11 @@
  * The chain parts are processed starting at the post and ending at the chomp.
  */
 
+#define CHAIN_CHOMP_CHAIN_MAX_DIST_BETWEEN_PARTS 180.0f
+
+#define CHAIN_CHOMP_LOAD_DIST   (3000.0f + (CHAIN_CHOMP_NUM_SEGMENTS * CHAIN_CHOMP_CHAIN_MAX_DIST_BETWEEN_PARTS))
+#define CHAIN_CHOMP_UNLOAD_DIST (4000.0f + (CHAIN_CHOMP_NUM_SEGMENTS * CHAIN_CHOMP_CHAIN_MAX_DIST_BETWEEN_PARTS))
+
 /**
  * Hitbox for chain chomp.
  */
@@ -48,7 +53,7 @@ static void chain_chomp_act_uninitialized(void) {
     struct ChainSegment *segments;
     s32 i;
 
-    if (o->oDistanceToMario < 3000.0f) {
+    if (o->oDistanceToMario < CHAIN_CHOMP_LOAD_DIST) {
         segments = mem_pool_alloc(gObjectMemoryPool, CHAIN_CHOMP_NUM_SEGMENTS * sizeof(struct ChainSegment));
         if (segments != NULL) {
             // Each segment represents the offset of a chain part to the pivot.
@@ -142,7 +147,7 @@ static void chain_chomp_sub_act_turn(void) {
 
                         o->oSubAction = CHAIN_CHOMP_SUB_ACT_LUNGE;
                         // o->oChainChompMaxDistFromPivotPerChainPart = 900.0f / CHAIN_CHOMP_NUM_SEGMENTS;
-                        o->oChainChompMaxDistFromPivotPerChainPart = 180.0f;
+                        o->oChainChompMaxDistFromPivotPerChainPart = CHAIN_CHOMP_CHAIN_MAX_DIST_BETWEEN_PARTS;
                         o->oForwardVel = 140.0f;
                         o->oVelY = 20.0f;
                         o->oGravity = 0.0f;
@@ -313,7 +318,7 @@ static void chain_chomp_act_move(void) {
     f32 maxDistToPivot;
 
     // Unload chain if mario is far enough
-    if (o->oChainChompReleaseStatus == CHAIN_CHOMP_NOT_RELEASED && o->oDistanceToMario > 4000.0f) {
+    if (o->oChainChompReleaseStatus == CHAIN_CHOMP_NOT_RELEASED && o->oDistanceToMario > CHAIN_CHOMP_UNLOAD_DIST) {
         o->oAction = CHAIN_CHOMP_ACT_UNLOAD_CHAIN;
         o->oForwardVel = o->oVelY = 0.0f;
     } else {
@@ -383,7 +388,7 @@ static void chain_chomp_act_move(void) {
         if (obj_check_attacks(&sChainChompHitbox, o->oAction) != 0) {
             o->oSubAction = CHAIN_CHOMP_SUB_ACT_LUNGE;
             // o->oChainChompMaxDistFromPivotPerChainPart = (900.0f / CHAIN_CHOMP_NUM_SEGMENTS);
-            o->oChainChompMaxDistFromPivotPerChainPart =  180.0f; // ((CHAIN_CHOMP_NUM_SEGMENTS * 180.0f) / CHAIN_CHOMP_NUM_SEGMENTS);
+            o->oChainChompMaxDistFromPivotPerChainPart = CHAIN_CHOMP_CHAIN_MAX_DIST_BETWEEN_PARTS; // ((CHAIN_CHOMP_NUM_SEGMENTS * CHAIN_CHOMP_CHAIN_MAX_DIST_BETWEEN_PARTS) / CHAIN_CHOMP_NUM_SEGMENTS);
             o->oForwardVel = 0.0f;
             o->oVelY = 300.0f;
             o->oGravity = -4.0f;
@@ -487,3 +492,7 @@ void bhv_chain_chomp_gate_update(void) {
         obj_mark_for_deletion(o);
     }
 }
+
+#undef CHAIN_CHOMP_CHAIN_MAX_DIST_BETWEEN_PARTS
+#undef CHAIN_CHOMO_LOAD_DIST
+#undef CHAIN_CHOMO_UNLOAD_DIST

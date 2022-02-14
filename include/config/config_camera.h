@@ -33,6 +33,10 @@
 // Enables Puppy Camera 2, a rewritten camera that can be freely configured and modified.
 // #define PUPPYCAM
 
+// Note: Reonucam is available, but because we had no time to test it properly, it's included as a patch rather than being in the code by default.
+// Run this command to apply the patch if you want to use it: 
+// tools/apply_patch.sh enhancements/reonucam.patch
+// Consider it a beta, but it should work fine. Please report any bugs with it. Applying the patch will simply add a define here, so you can still turn it off even after patching.
 
 /**********************************/
 /***** Vanilla config options *****/
@@ -46,23 +50,5 @@
 // This is automatically enabled when ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS is enabled,
 // but feel free to override it if you really want to for some reason
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
-#define ENABLE_VANILLA_CAM_PROCESSING
-#endif
-
-
-/**************************************/
-/****** Compatibility safeguards ******/
-/**************************************/
-// Don't change these unless you know what you're doing
-#ifdef FORCED_CAMERA_MODE
-#define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode
-#endif
-#ifndef WATER_SURFACE_CAMERA_MODE
-#define WATER_SURFACE_CAMERA_MODE CAMERA_MODE_WATER_SURFACE
-#endif
-#ifndef DEEP_WATER_CAMERA_MODE
-#define DEEP_WATER_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
-#endif
-#ifndef FLYING_CAMERA_MODE
-#define FLYING_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
+    #define ENABLE_VANILLA_CAM_PROCESSING
 #endif

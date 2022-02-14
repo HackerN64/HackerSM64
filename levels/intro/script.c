@@ -33,7 +33,7 @@ const LevelScript level_intro_splash_screen[] = {
     LOAD_GODDARD(),
     LOAD_BEHAVIOR_DATA(),
     LOAD_LEVEL_DATA(intro),
-#if defined(HD_INTRO_TEXTURES) && defined(FLOOMBAS)
+#if defined(FLOOMBAS) && defined(INTRO_FLOOMBAS)
     LOAD_COMMON0(),
 
     // Load "Super Mario 64" logo

@@ -1131,8 +1131,9 @@ s32 set_water_plunge_action(struct MarioState *m) {
     m->forwardVel = m->forwardVel / 4.0f;
     m->vel[1] = m->vel[1] / 2.0f;
 
-    // !BUG: Causes waterbox upwarp
-    // m->pos[1] = m->waterLevel - 100;
+#ifdef WATER_PLUNGE_UPWARP
+    m->pos[1] = m->waterLevel - 100;
+#endif
 
     m->faceAngle[2] = 0;
 
@@ -1212,23 +1213,6 @@ void update_mario_button_inputs(struct MarioState *m) {
     if (m->controller->buttonPressed & A_BUTTON) m->input |= INPUT_A_PRESSED;
     if (m->controller->buttonDown    & A_BUTTON) m->input |= INPUT_A_DOWN;
 
-#ifdef CUSTOM_DEBUG
-    if (m->controller->buttonPressed & L_JPAD) {
-        gCustomDebugMode ^= 1;
-    }
-    if (gCustomDebugMode) {
-        if (m->controller->buttonPressed & R_JPAD) {
-            if (gMarioState->action == ACT_DEBUG_FREE_MOVE) {
-                set_mario_action(gMarioState, ACT_IDLE, 0);
-            } else {
-                set_mario_action(gMarioState, ACT_DEBUG_FREE_MOVE, 0);
-            }
-        }
-    } else if (gMarioState->action == ACT_DEBUG_FREE_MOVE) {
-        set_mario_action(gMarioState, ACT_IDLE, 0);
-    }
-#endif
-
     // Don't update for these buttons if squished.
     if (m->squishTimer == 0) {
         if (m->controller->buttonDown    & B_BUTTON) m->input |= INPUT_B_DOWN;
@@ -1292,7 +1276,7 @@ void update_mario_geometry_inputs(struct MarioState *m) {
         m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
     }
 
-    m->ceilHeight = find_ceil(m->pos[0], m->pos[1] + 3.0f, m->pos[2], &m->ceil);
+    m->ceilHeight = find_mario_ceil(m->pos, m->floorHeight, &m->ceil);
     gasLevel = find_poison_gas_level(m->pos[0], m->pos[2]);
     m->waterLevel = find_water_level(m->pos[0], m->pos[2]);
 

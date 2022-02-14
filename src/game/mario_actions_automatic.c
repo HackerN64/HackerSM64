@@ -61,7 +61,7 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
     s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f)
                  + f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 30.0f, 24.0f);
 
-    f32 ceilHeight = find_ceil(m->pos[0], m->pos[1] + 3.0f, m->pos[2], &ceil);
+    f32 ceilHeight = find_mario_ceil(m->pos, m->pos[1], &ceil);
     if (m->pos[1] > ceilHeight - 160.0f) {
         m->pos[1] = ceilHeight - 160.0f;
         marioObj->oMarioPolePos = m->pos[1] - m->usedObj->oPosY;
@@ -260,7 +260,7 @@ s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     set_mario_wall(m, wallCollisionData.numWalls == 0 ? NULL : wallCollisionData.walls[0]);
 
     f32 floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
-    f32 ceilHeight = find_ceil(nextPos[0], nextPos[1] + 3.0f, nextPos[2], &ceil);
+    f32 ceilHeight = find_mario_ceil(nextPos, floorHeight, &ceil);
 
     if (floor == NULL) {
         return HANG_HIT_CEIL_OR_OOB;

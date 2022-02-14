@@ -923,9 +923,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
             inc_mat_stack();
             geo_append_display_list(
                 (void *) VIRTUAL_TO_PHYSICAL(shadowList),
-                (gCurrShadow.flags & SHADOW_FLAGS_TRANSPARENT)
-                    ? LAYER_TRANSPARENT
-                    : LAYER_TRANSPARENT_DECAL
+                gCurrShadow.isDecal ? LAYER_TRANSPARENT_DECAL : LAYER_TRANSPARENT
             );
 
             gMatStackIndex--;

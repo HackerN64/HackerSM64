@@ -8,8 +8,7 @@
 
 #include "types.h"
 #include "memory.h"
-
-#define GFX_POOL_SIZE 10000 // Size of how large the master display list (gDisplayListHead) can be. 6400 is vanilla
+#include "config.h"
 
 #define MARIO_ANIMS_POOL_SIZE 0x4000
 #define DEMO_INPUTS_POOL_SIZE 0x800
@@ -50,7 +49,7 @@ extern struct GfxPool *gGfxPool;
 extern u8 gControllerBits;
 extern u8 gIsConsole;
 extern u8 gBorderHeight;
-#ifdef CUSTOM_DEBUG
+#ifdef VANILLA_STYLE_CUSTOM_DEBUG
 extern u8 gCustomDebugMode;
 #endif
 extern u8 *gAreaSkyboxStart[AREA_COUNT];

@@ -4,8 +4,10 @@
  * GAME SETTINGS *
  *****************/
 
-// Enables some mechanics that change behavior depending on hardcoded level numbers.
-// TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic.
+/** 
+ * Enables some mechanics that change behavior depending on hardcoded level numbers.
+ * TODO: separate this into separate defines, behavior params, or make these mechanics otherwise dynamic
+*/
 // #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
 // Disable lives and hide the lives counter
@@ -25,10 +27,15 @@
 
 // Air/Breath meter is separate from health meter when underwater
 // #define BREATH_METER
+
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
 #define X_COIN_STAR 100
 
-// Stars don't kick you out of the level
+/*
+ * Stars don't kick you out of the level (does not play nicely with vanilla)
+ * In v2.0 there are numerous issues with this define that can be seen here https://github.com/Reonu/HackerSM64/issues/258
+ * Use at your own risk.
+*/
 // #define NON_STOP_STARS
 
 // Uncomment this if you want global star IDs (useful for creating an open world hack ala MVC)
@@ -41,10 +48,12 @@
 #define AREA_COUNT 8
 
 // Makes signs and NPCs easier to talk to.
-#define EASIER_DIALOG_TRIGGER
+// NOTE: Currently has issues with talking to Bowser post-fight,
+// https://github.com/Reonu/HackerSM64/issues/273
+// #define EASIER_DIALOG_TRIGGER
 
 // Show an "A" when Mario is able to talk [requires EASIER_DIALOG_TRIGGER]
-#define DIALOG_INDICATOR
+// #define DIALOG_INDICATOR
 
 // Include the English characters that were missing from US segment2
 // J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
@@ -63,13 +72,3 @@
 
 // The level that the game starts in after file select. The levelscript needs to have a MARIO_POS command for this to work.
 #define START_LEVEL LEVEL_CASTLE_GROUNDS
-
-
-// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
-
-#ifdef DISABLE_LIVES
-#undef SAVE_NUM_LIVES
-#endif // DISABLE_LIVES
-#ifndef START_LEVEL
-#define START_LEVEL LEVEL_CASTLE_GROUNDS
-#endif

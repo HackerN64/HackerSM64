@@ -17,12 +17,3 @@
 #define EXIT_COURSE_LEVEL LEVEL_CASTLE
 #define EXIT_COURSE_AREA 0x01
 #define EXIT_COURSE_NODE 0x1F
-
-// -- Compatibility safeguards. Don't mess with these unless you know what you're doing. --
-
-#ifdef DISABLE_EXIT_COURSE
-#undef EXIT_COURSE_WHILE_MOVING
-#undef EXIT_COURSE_LEVEL
-#undef EXIT_COURSE_AREA
-#undef EXIT_COURSE_NODE
-#endif // DISABLE_EXIT_COURSE
