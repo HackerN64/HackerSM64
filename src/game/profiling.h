@@ -29,6 +29,7 @@ enum ProfilerRSPTime {
     PROFILER_RSP_COUNT
 };
 
+#ifdef USE_PROFILER
 void fast_profiler_update(enum ProfilerTime which);
 void fast_profiler_print_times();
 void fast_profiler_frame_setup();
@@ -41,5 +42,16 @@ void fast_profiler_audio_completed();
 static ALWAYS_INLINE void fast_profiler_rsp_yielded() {
     fast_profiler_rsp_resumed();
 }
+#else
+#define fast_profiler_update(which)
+#define fast_profiler_print_times()
+#define fast_profiler_frame_setup()
+#define fast_profiler_rsp_started(which)
+#define fast_profiler_rsp_completed(which)
+#define fast_profiler_rsp_resumed()
+#define fast_profiler_audio_started()
+#define fast_profiler_audio_completed()
+#define fast_profiler_rsp_yielded()
+#endif
 
 #endif

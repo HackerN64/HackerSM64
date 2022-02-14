@@ -5,6 +5,8 @@
 #include "profiling.h"
 #include "fasttext.h"
 
+#ifdef USE_PROFILER
+
 #define RDP_CYCLE_CONV(x) ((10 * (x)) / 625) // 62.5 million cycles per frame
 
 typedef struct {
@@ -200,3 +202,5 @@ void fast_profiler_frame_setup() {
 
     prev_time = start = osGetCount();
 }
+
+#endif
