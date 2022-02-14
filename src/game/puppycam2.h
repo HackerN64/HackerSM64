@@ -3,33 +3,53 @@
 
 #ifdef PUPPYCAM
 
-//How many times to store the terrain pitch. This stores it over 10 frames to help smooth over changes in curvature.
+// How many times to store the terrain pitch. This stores it over 10 frames to help smooth over changes in curvature.
 #define NUM_PITCH_ITERATIONS 10
-
-#define PUPPYCAM_FLAGS_CUTSCENE (1 << 0) // 0x0001
-#define PUPPYCAM_FLAGS_SMOOTH   (1 << 1) // 0x0002
-
-#define PUPPY_ERROR_POOL_FULL 0x1
 
 #define PUPPY_NULL 15151
 #define MAX_PUPPYCAM_VOLUMES 128
 
-#define PUPPYCAM_BEHAVIOUR_TEMPORARY 0x0
-#define PUPPYCAM_BEHAVIOUR_PERMANENT 0x1
+enum PuppyCamBehaviors {
+    PUPPYCAM_BEHAVIOUR_TEMPORARY,
+    PUPPYCAM_BEHAVIOUR_PERMANENT,
+};
 
-#define PUPPYVOLUME_SHAPE_BOX        0x0
-#define PUPPYVOLUME_SHAPE_CYLINDER   0x1
+enum PuppyVolumeShapes {
+    PUPPYVOLUME_SHAPE_BOX,
+    PUPPYVOLUME_SHAPE_CYLINDER,
+};
 
-#define PUPPYCAM_MODE3_ZOOMED_IN            (1 << 0) // 0x1
-#define PUPPYCAM_MODE3_ZOOMED_MED           (1 << 1) // 0x2
-#define PUPPYCAM_MODE3_ZOOMED_OUT           (1 << 2) // 0x4
-#define PUPPYCAM_MODE3_ENTER_FIRST_PERSON   (1 << 3) // 0x8
+enum PuppyCamInputTypes {
+    PUPPYCAM_INPUT_TYPE_DOUBLE_TAP,
+    PUPPYCAM_INPUT_TYPE_SINGLE_PRESS,
+    PUPPYCAM_INPUT_TYPE_CLASSIC,
+};
 
-#define PUPPYSPLINE_NONE                    (1 << 0) // 0x1 // Will not write to focus at all.
-#define PUPPYSPLINE_FOLLOW                  (1 << 1) // 0x2 // Focus will follow a separate spline, but will mirror the speed and progress of the pos.
+enum PuppyCamFlags {
+    PUPPYCAM_FLAGS_CUTSCENE           = BIT(0), // 0x0001
+    PUPPYCAM_FLAGS_SMOOTH             = BIT(1), // 0x0002
+};
 
-#define PUPPYDEBUG_LOCK_CONTROLS            (1 << 0) // 0x1
-#define PUPPYDEBUG_TRACK_MARIO              (1 << 1) // 0x2
+enum PuppyErrors {
+    PUPPY_ERROR_POOL_FULL             = BIT(0),
+};
+
+enum PuppycamMode3ZoomFlags {
+    PUPPYCAM_MODE3_ZOOMED_IN          = BIT(0), // 0x1
+    PUPPYCAM_MODE3_ZOOMED_MED         = BIT(1), // 0x2
+    PUPPYCAM_MODE3_ZOOMED_OUT         = BIT(2), // 0x4
+    PUPPYCAM_MODE3_ENTER_FIRST_PERSON = BIT(3), // 0x8
+};
+
+enum PuppySplineFlags {
+    PUPPYSPLINE_NONE                  = BIT(0), // 0x1 // Will not write to focus at all.
+    PUPPYSPLINE_FOLLOW                = BIT(1), // 0x2 // Focus will follow a separate spline, but will mirror the speed and progress of the pos.
+};
+
+enum PuppyDebugFlags {
+    PUPPYDEBUG_LOCK_CONTROLS          = BIT(0), // 0x1
+    PUPPYDEBUG_TRACK_MARIO            = BIT(1), // 0x2
+};
 
 #include "include/command_macros_base.h"
 
@@ -109,7 +129,7 @@ struct gPuppyStruct
 
 };
 
-//A second container for bounds that have 2 pairs of coordinates. Optional.
+// A second container for bounds that have 2 pairs of coordinates. Optional.
 struct sPuppyAngles
 {
     Vec3s pos;
@@ -119,7 +139,7 @@ struct sPuppyAngles
     s16 zoom;
 };
 
-//Structurally, it's exactly the same as CutsceneSplinePoint
+// Structurally, it's exactly the same as CutsceneSplinePoint
 struct sPuppySpline
 {
     Vec3s pos; // The vector pos of the spline index itself.
@@ -127,7 +147,7 @@ struct sPuppySpline
     u8 speed;  // The amount of frames it takes to get through this index.
 };
 
-//A bounding volume for activating puppycamera scripts and angles.
+// A bounding volume for activating puppycamera scripts and angles.
 struct sPuppyVolume
 {
     s32 (*func)();               // a pointer to a function. Optional.
@@ -146,31 +166,31 @@ struct sPuppyVolume
 
 enum gPuppyCamBeh
 {
-    PUPPYCAM_BEHAVIOUR_X_MOVEMENT       = (1 <<  0), // 0x0001
-    PUPPYCAM_BEHAVIOUR_Y_MOVEMENT       = (1 <<  1), // 0x0002
-    PUPPYCAM_BEHAVIOUR_Z_MOVEMENT       = (1 <<  2), // 0x0004
+    PUPPYCAM_BEHAVIOUR_X_MOVEMENT       = BIT( 0), // 0x0001
+    PUPPYCAM_BEHAVIOUR_Y_MOVEMENT       = BIT( 1), // 0x0002
+    PUPPYCAM_BEHAVIOUR_Z_MOVEMENT       = BIT( 2), // 0x0004
 
-    PUPPYCAM_BEHAVIOUR_YAW_ROTATION     = (1 <<  3), // 0x0008
-    PUPPYCAM_BEHAVIOUR_PITCH_ROTATION   = (1 <<  4), // 0x0010
-    PUPPYCAM_BEHAVIOUR_ZOOM_CHANGE      = (1 <<  5), // 0x0020
+    PUPPYCAM_BEHAVIOUR_YAW_ROTATION     = BIT( 3), // 0x0008
+    PUPPYCAM_BEHAVIOUR_PITCH_ROTATION   = BIT( 4), // 0x0010
+    PUPPYCAM_BEHAVIOUR_ZOOM_CHANGE      = BIT( 5), // 0x0020
 
-    PUPPYCAM_BEHAVIOUR_INPUT_NORMAL     = (1 <<  6), // 0x0040
-    PUPPYCAM_BEHAVIOUR_INPUT_8DIR       = (1 <<  7), // 0x0080
-    PUPPYCAM_BEHAVIOUR_INPUT_4DIR       = (1 <<  8), // 0x0100
-    PUPPYCAM_BEHAVIOUR_INPUT_2D         = (1 <<  9), // 0x0200
+    PUPPYCAM_BEHAVIOUR_INPUT_NORMAL     = BIT( 6), // 0x0040
+    PUPPYCAM_BEHAVIOUR_INPUT_8DIR       = BIT( 7), // 0x0080
+    PUPPYCAM_BEHAVIOUR_INPUT_4DIR       = BIT( 8), // 0x0100
+    PUPPYCAM_BEHAVIOUR_INPUT_2D         = BIT( 9), // 0x0200
 
-    PUPPYCAM_BEHAVIOUR_SLIDE_CORRECTION = (1 << 10), // 0x0400
-    PUPPYCAM_BEHAVIOUR_TURN_HELPER      = (1 << 11), // 0x0800
-    PUPPYCAM_BEHAVIOUR_HEIGHT_HELPER    = (1 << 12), // 0x1000
-    PUPPYCAM_BEHAVIOUR_PANSHIFT         = (1 << 13), // 0x2000
+    PUPPYCAM_BEHAVIOUR_SLIDE_CORRECTION = BIT(10), // 0x0400
+    PUPPYCAM_BEHAVIOUR_TURN_HELPER      = BIT(11), // 0x0800
+    PUPPYCAM_BEHAVIOUR_HEIGHT_HELPER    = BIT(12), // 0x1000
+    PUPPYCAM_BEHAVIOUR_PANSHIFT         = BIT(13), // 0x2000
 
-    PUPPYCAM_BEHAVIOUR_COLLISION        = (1 << 14), // 0x4000
+    PUPPYCAM_BEHAVIOUR_COLLISION        = BIT(14), // 0x4000
 
-    PUPPYCAM_BEHAVIOUR_FREE             = (1 << 15), // 0x8000
+    PUPPYCAM_BEHAVIOUR_FREE             = BIT(15), // 0x8000
 
-    PUPPYCAM_BEHAVIOUR_DEFAULT = PUPPYCAM_BEHAVIOUR_X_MOVEMENT | PUPPYCAM_BEHAVIOUR_Y_MOVEMENT | PUPPYCAM_BEHAVIOUR_Z_MOVEMENT |
+    PUPPYCAM_BEHAVIOUR_DEFAULT = (PUPPYCAM_BEHAVIOUR_X_MOVEMENT | PUPPYCAM_BEHAVIOUR_Y_MOVEMENT | PUPPYCAM_BEHAVIOUR_Z_MOVEMENT |
     PUPPYCAM_BEHAVIOUR_YAW_ROTATION | PUPPYCAM_BEHAVIOUR_PITCH_ROTATION | PUPPYCAM_BEHAVIOUR_ZOOM_CHANGE |
-    PUPPYCAM_BEHAVIOUR_HEIGHT_HELPER | PUPPYCAM_BEHAVIOUR_TURN_HELPER | PUPPYCAM_BEHAVIOUR_INPUT_NORMAL | PUPPYCAM_BEHAVIOUR_PANSHIFT | PUPPYCAM_BEHAVIOUR_COLLISION
+    PUPPYCAM_BEHAVIOUR_HEIGHT_HELPER | PUPPYCAM_BEHAVIOUR_TURN_HELPER | PUPPYCAM_BEHAVIOUR_INPUT_NORMAL | PUPPYCAM_BEHAVIOUR_PANSHIFT | PUPPYCAM_BEHAVIOUR_COLLISION)
 };
 
 extern const struct sPuppyAngles puppyAnglesNull;
