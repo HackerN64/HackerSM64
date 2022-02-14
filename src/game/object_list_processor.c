@@ -441,8 +441,6 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
     gWDWWaterLevelChanging = FALSE;
     gMarioOnMerryGoRound = FALSE;
 
-    clear_mario_platform();
-
     if (gCurrAreaIndex == 2) {
         gCCMEnteredSlide = TRUE;
     }

@@ -13,8 +13,6 @@
 
 #include "config.h"
 
-struct Object *gMarioPlatform = NULL;
-
 /**
  * Determine if Mario is standing on a platform object, meaning that he is
  * within 4 units of the floor. Set his referenced platform object accordingly.
@@ -31,10 +29,8 @@ void update_mario_platform(void) {
     if (floor != NULL
      && floorObj != NULL
      && absf(gMarioObject->oPosY - gMarioState->floorHeight) < construct_float(4.0f)) {
-        gMarioPlatform = floorObj;
         gMarioObject->platform = floorObj;
     } else {
-        gMarioPlatform         = NULL;
         gMarioObject->platform = NULL;
     }
 }
@@ -155,10 +151,9 @@ static void apply_mario_inertia(void) {
  * Apply platform displacement or inertia if required.
  */
 void apply_mario_platform_displacement(void) {
-    struct Object *platform;
-
-    platform = gMarioPlatform;
     if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL) {
+        struct Object *platform = gMarioObject->platform;
+
         if (platform != NULL) {
             apply_platform_displacement(&sMarioDisplacementInfo, gMarioState->pos, &gMarioState->faceAngle[1], platform);
             sShouldApplyInertia = TRUE;
@@ -231,17 +226,12 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
  * If Mario's platform is not null, apply platform displacement.
  */
 void apply_mario_platform_displacement(void) {
-    struct Object *platform = gMarioPlatform;
+    if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL) {
+        struct Object *platform = gMarioObject->platform;
 
-    if (!(gTimeStopState & TIME_STOP_ACTIVE) && gMarioObject != NULL && platform != NULL) {
-        apply_platform_displacement(TRUE, platform);
+        if (platform != NULL) {
+            apply_platform_displacement(TRUE, platform);
+        }
     }
 }
 #endif
-
-/**
- * Set Mario's platform to NULL.
- */
-void clear_mario_platform(void) {
-    gMarioPlatform = NULL;
-}
