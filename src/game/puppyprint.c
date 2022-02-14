@@ -897,7 +897,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     s32 tx = amount;
     s32 shakePos[2];
-    s32 wavePos;
+    f32 wavePos;
     s32 lines = 0;
     s32 xlu = currEnv[3];
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
@@ -994,10 +994,10 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
             }
         }
 
-        gSPScisTextureRectangle(gDisplayListHead++, ((x + shakePos[0] + textPos[0]     ) << 2),
-                                                    ((y + shakePos[1] + offsetY + textPos[1] + wavePos) << 2),
-                                                    ((x +  textPos[0] + shakePos[0] + (u16)(8 * textSizeTotal)) << 2),
-                                                    ((y + wavePos + offsetY + shakePos[1] + (u16)(12 * textSizeTotal) + textPos[1]) << 2),
+        gSPScisTextureRectangle(gDisplayListHead++, (x + textPos[0] + (s16)(shakePos[0] * textSizeTotal)) << 2,
+                                                    (y + textPos[1] + (s16)((shakePos[1] + offsetY + wavePos) * textSizeTotal)) << 2,
+                                                    (x + textPos[0] + (s16)((shakePos[0] + 8) * textSizeTotal)) << 2,
+                                                    (y + textPos[1] + (s16)((wavePos + offsetY + shakePos[1] + 12) * textSizeTotal)) << 2,
                                                     G_TX_RENDERTILE, (textX << 6), (textY << 6), 1024/textSizeTotal, 1024/textSizeTotal);
         textPos[0] += (spaceX + 1) * textSizeTotal;
     }
@@ -1023,48 +1023,31 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     if (runCMD) {
         if (strncmp((str + i), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
             // Each value is taken from the string. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
-            s32 r = (((str[i +  5] - '0') * 10)
-                  +   (str[i +  6] - '0'));
-            s32 g = (((str[i +  7] - '0') * 10)
-                  +   (str[i +  8] - '0'));
-            s32 b = (((str[i +  9] - '0') * 10)
-                  +   (str[i + 10] - '0'));
-            s32 a = (((str[i + 11] - '0') * 10)
-                  +   (str[i + 12] - '0'));
-            // Multiply each value afterwards by 2.575f to make 255.
-            print_set_envcolour((r * 2.575f),
-                                (g * 2.575f),
-                                (b * 2.575f),
-                                (a * 2.575f));
+            s32 r = (((str[i +  5] >= 'A') ? str[i +  5] - 'A' + 0xA : str[i +  5] - '0') * 16) + ((str[i +  6] >= 'A') ? str[i +  6] - 'A' + 0xA : str[i +  6] - '0');
+            s32 g = (((str[i +  7] >= 'A') ? str[i +  7] - 'A' + 0xA : str[i +  7] - '0') * 16) + ((str[i +  8] >= 'A') ? str[i +  8] - 'A' + 0xA : str[i +  8] - '0');
+            s32 b = (((str[i +  9] >= 'A') ? str[i +  9] - 'A' + 0xA : str[i +  9] - '0') * 16) + ((str[i +  10] >= 'A') ? str[i +  10] - 'A' + 0xA : str[i +  10] - '0');
+            s32 a = (((str[i +  11] >= 'A') ? str[i +  11] - 'A' + 0xA : str[i +  11] - '0') * 16) + ((str[i +  12] >= 'A') ? str[i +  12] - 'A' + 0xA : str[i +  12] - '0');
+            print_set_envcolour(r, g, b, a);
         } else if (strncmp((str + i), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
-            s32 r   = (((str[i +  6] - '0') * 10)
-                    +   (str[i +  7] - '0'));
-            s32 g   = (((str[i +  8] - '0') * 10)
-                    +   (str[i +  9] - '0'));
-            s32 b   = (((str[i + 10] - '0') * 10)
-                    +   (str[i + 11] - '0'));
-            s32 a   = (((str[i + 12] - '0') * 10)
-                    +   (str[i + 13] - '0'));
-            s32 r2  = (((str[i + 15] - '0') * 10)
-                    +   (str[i + 16] - '0'));
-            s32 g2  = (((str[i + 17] - '0') * 10)
-                    +   (str[i + 18] - '0'));
-            s32 b2  = (((str[i + 19] - '0') * 10)
-                    +   (str[i + 20] - '0'));
-            s32 a2  = (((str[i + 21] - '0') * 10)
-                    +   (str[i + 22] - '0'));
-            s32 spd = (((str[i + 24] - '0') * 10)
-                    +   (str[i + 25] - '0'));
+            s32 r = (((str[i +  6] >= 'A') ? str[i +  6] - 'A' + 0xA : str[i +  6] - '0') * 16) + ((str[i +  7] >= 'A') ? str[i +  7] - 'A' + 0xA : str[i +  7] - '0');
+            s32 g = (((str[i +  9] >= 'A') ? str[i +  9] - 'A' + 0xA : str[i +  9] - '0') * 16) + ((str[i +90] >= 'A') ? str[i +  9] - 'A' + 0xA : str[i +  9] - '0');
+            s32 b = (((str[i +  10] >= 'A') ? str[i +  10] - 'A' + 0xA : str[i +  10] - '0') * 16) + ((str[i +  11] >= 'A') ? str[i +  11] - 'A' + 0xA : str[i +  11] - '0');
+            s32 a = (((str[i +  12] >= 'A') ? str[i +  12] - 'A' + 0xA : str[i +  12] - '0') * 16) + ((str[i +  13] >= 'A') ? str[i +  13] - 'A' + 0xA : str[i +  13] - '0');
+            s32 r2 = (((str[i +  15] >= 'A') ? str[i +  15] - 'A' + 0xA : str[i +  15] - '0') * 16) + ((str[i +  16] >= 'A') ? str[i +  16] - 'A' + 0xA : str[i +  16] - '0');
+            s32 g2 = (((str[i +  17] >= 'A') ? str[i +  17] - 'A' + 0xA : str[i +  17] - '0') * 16) + ((str[i +  18] >= 'A') ? str[i +  18] - 'A' + 0xA : str[i +  18] - '0');
+            s32 b2 = (((str[i +  19] >= 'A') ? str[i +  19] - 'A' + 0xA : str[i +  19] - '0') * 16) + ((str[i +  20] >= 'A') ? str[i +  20] - 'A' + 0xA : str[i +  20] - '0');
+            s32 a2 = (((str[i +  21] >= 'A') ? str[i +  21] - 'A' + 0xA : str[i +  21] - '0') * 16) + ((str[i +  22] >= 'A') ? str[i +  22] - 'A' + 0xA : str[i +  22] - '0');
+            s32 spd = (((str[i +  24] >= 'A') ? str[i +  24] - 'A' + 0xA : str[i +  24] - '0') * 16) + ((str[i +  25] >= 'A') ? str[i +  25] - 'A' + 0xA : str[i +  25] - '0');
             // Find the median.
-            s32 r3 = (r + r2) * 1.2875f;
-            s32 g3 = (g + g2) * 1.2875f;
-            s32 b3 = (b + b2) * 1.2875f;
-            s32 a3 = (a + a2) * 1.2875f;
+            s32 r3 = (r + r2) / 2;
+            s32 g3 = (g + g2) / 2;
+            s32 b3 = (b + b2) / 2;
+            s32 a3 = (a + a2) / 2;
             // Find the difference.
-            s32 r4 = (r - r2) * 1.2875f;
-            s32 g4 = (g - g2) * 1.2875f;
-            s32 b4 = (b - b2) * 1.2875f;
-            s32 a4 = (a - a2) * 1.2875f;
+            s32 r4 = (r - r2) / 2;
+            s32 g4 = (g - g2) / 2;
+            s32 b4 = (b - b2) / 2;
+            s32 a4 = (a - a2) / 2;
             // Now start from the median, and wave from end to end with the difference, to create the fading effect.
             f32 sTimer = sins(gGlobalTimer * spd * 50);
             print_set_envcolour((r3 + (sTimer * r4)),
@@ -1082,7 +1065,7 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
             waveToggle  ^= 1;
         }
     }
-    return len;
+    return len-1;
 }
 
 void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font) {
@@ -1110,7 +1093,11 @@ void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *off
         *textX = ((letter - 'q') * 4);
         *textY = 24;
         *spaceX = textLen[(letter - 'q') + 64];
-    } else { // Space, the final frontier.
+    } else if (letter == '>') {
+        *textX  = 128;
+        *textY  =  12;
+        *spaceX =   0;
+    }else { // Space, the final frontier.
         *textX  = 128;
         *textY  =  12;
         *spaceX =   2;
@@ -1224,7 +1211,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
 
         gDPLoadSync(gDisplayListHead++);
         gDPLoadTextureTile(gDisplayListHead++,
-            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW)), ((posH + imH)), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
         gSPScisTextureRectangle(gDisplayListHead++,
             ((x + posW) << 2),
             ((y + posH) << 2),
@@ -1240,7 +1227,7 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
             posW = i * imW;
             gDPLoadSync(gDisplayListHead++);
             gDPLoadTextureTile(gDisplayListHead++,
-                image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), (height - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+                image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW)), (height), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
             gSPScisTextureRectangle(gDisplayListHead++,
                 (x + posW) << 2,
                 (y + posH) << 2,
