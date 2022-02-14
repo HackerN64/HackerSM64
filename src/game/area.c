@@ -243,7 +243,7 @@ void load_area(s32 index) {
         }
 
         if (gCurrentArea->objectSpawnInfos != NULL) {
-            spawn_objects_from_info(0, gCurrentArea->objectSpawnInfos);
+            spawn_objects_from_info(gCurrentArea->objectSpawnInfos);
         }
 
         load_obj_warp_nodes();
@@ -253,7 +253,7 @@ void load_area(s32 index) {
 
 void unload_area(void) {
     if (gCurrentArea != NULL) {
-        unload_objects_from_area(0, gCurrentArea->index);
+        unload_objects_from_area(gCurrentArea->index);
         geo_call_global_function_nodes(&gCurrentArea->graphNode->node, GEO_CONTEXT_AREA_UNLOAD);
 
         gCurrentArea->flags = AREA_FLAG_UNLOAD;
@@ -268,7 +268,7 @@ void load_mario_area(void) {
 
     if (gCurrentArea->index == gMarioSpawnInfo->areaIndex) {
         gCurrentArea->flags |= AREA_FLAG_LOAD;
-        spawn_objects_from_info(0, gMarioSpawnInfo);
+        spawn_objects_from_info(gMarioSpawnInfo);
     }
 
     if (gAreaSkyboxStart[gCurrAreaIndex - 1]) {
@@ -278,7 +278,7 @@ void load_mario_area(void) {
 
 void unload_mario_area(void) {
     if ((gCurrentArea != NULL) && (gCurrentArea->flags & AREA_FLAG_LOAD)) {
-        unload_objects_from_area(0, gMarioSpawnInfo->activeAreaIndex);
+        unload_objects_from_area(gMarioSpawnInfo->activeAreaIndex);
 
         gCurrentArea->flags &= ~AREA_FLAG_LOAD;
         if (gCurrentArea->flags == AREA_FLAG_UNLOAD) {
@@ -306,7 +306,7 @@ void change_area(s32 index) {
 
 void area_update_objects(void) {
     gAreaUpdateCounter++;
-    update_objects(0);
+    update_objects();
 }
 
 /*

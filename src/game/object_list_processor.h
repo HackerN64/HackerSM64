@@ -12,14 +12,16 @@
  * and also track some miscellaneous info.
  */
 enum gTimeStopStateFlags {
-    TIME_STOP_FLAGS_NONE        = (0 << 0),
-    TIME_STOP_UNKNOWN_0         = (1 << 0),
-    TIME_STOP_ENABLED           = (1 << 1),
-    TIME_STOP_DIALOG            = (1 << 2),
-    TIME_STOP_MARIO_AND_DOORS   = (1 << 3),
-    TIME_STOP_ALL_OBJECTS       = (1 << 4),
-    TIME_STOP_MARIO_OPENED_DOOR = (1 << 5),
-    TIME_STOP_ACTIVE            = (1 << 6),
+    TIME_STOP_FLAGS_NONE        = 0x0,
+    // TIME_STOP_UNKNOWN_0 was most likely intended to be used to track whether
+    // any objects had been deactivated but not removed.
+    TIME_STOP_UNKNOWN_0         = BIT(0),
+    TIME_STOP_ENABLED           = BIT(1),
+    TIME_STOP_DIALOG            = BIT(2),
+    TIME_STOP_MARIO_AND_DOORS   = BIT(3),
+    TIME_STOP_ALL_OBJECTS       = BIT(4),
+    TIME_STOP_MARIO_OPENED_DOOR = BIT(5),
+    TIME_STOP_ACTIVE            = BIT(6),
 };
 
 /**
@@ -126,10 +128,10 @@ extern s16 gMarioOnMerryGoRound;
 
 void bhv_mario_update(void);
 void set_object_respawn_info_bits(struct Object *obj, u8 bits);
-void unload_objects_from_area(UNUSED s32 unused, s32 areaIndex);
-void spawn_objects_from_info(UNUSED s32 unused, struct SpawnInfo *spawnInfo);
+void unload_objects_from_area(s32 areaIndex);
+void spawn_objects_from_info(struct SpawnInfo *spawnInfo);
 void clear_objects(void);
-void update_objects(UNUSED s32 unused);
+void update_objects(void);
 
 
 #endif // OBJECT_LIST_PROCESSOR_H
