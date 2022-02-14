@@ -127,10 +127,6 @@ const Gfx init_rdp[] = {
     gsSPEndDisplayList(),
 };
 
-Lights1 defaultLight = gdSPDefLights1(
-    0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x28, 0x28, 0x28
-);
-
 /**
  * Sets the initial RSP (Reality Signal Processor) settings.
  */
@@ -138,7 +134,6 @@ const Gfx init_rsp[] = {
     gsDPPipeSync(),
     gsSPClearGeometryMode(G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD),
     gsSPSetGeometryMode(G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING),
-    gsSPSetLights1(defaultLight),
     gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
     // @bug Failing to set the clip ratio will result in warped triangles in F3DEX2
     // without this change: https://jrra.zone/n64/doc/n64man/gsp/gSPClipRatio.htm
@@ -340,6 +335,22 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.yield_data_size = OS_YIELD_DATA_SIZE;
 }
 
+Lights1 defaultLight = gdSPDefLights1(
+    0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x28, 0x28, 0x28
+);
+
+int counter = 0;
+
+void setup_light() {
+    Lights1* curLight = (Lights1*)alloc_display_list(sizeof(Lights1));
+    bcopy(&defaultLight, curLight, sizeof(Lights1));
+    float phase = (float)counter / 30;
+    counter++;
+    curLight->l->l.dir[0] = (s8)(56.6f * sinf(phase));
+    curLight->l->l.dir[2] = (s8)(56.6f * cosf(phase));
+    gSPSetLights1(gDisplayListHead++, (*curLight));
+}
+
 /**
  * Set default RCP (Reality Co-Processor) settings.
  */
@@ -347,6 +358,7 @@ void init_rcp(s32 resetZB) {
     move_segment_table_to_dmem();
     gSPDisplayList(gDisplayListHead++, init_rdp);
     gSPDisplayList(gDisplayListHead++, init_rsp);
+    setup_light();
     init_z_buffer(resetZB);
     select_framebuffer();
 }
