@@ -86,7 +86,7 @@ void butterfly_act_return_home(void) {
         cur_obj_init_animation(BUTTERFLY_ANIM_RESTING);
 
         o->oAction = BUTTERFLY_ACT_RESTING;
-        vec3f_copy(&o->oPosVec, &o->oHomeVec);
+        cur_obj_set_pos_to_home();
     }
 }
 

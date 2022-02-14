@@ -217,8 +217,7 @@ struct ParticleProperties sParticleTypes[] = {
 };
 
 /**
- * Copy position, velocity, and angle variables from MarioState to the Mario
- * object.
+ * Copy position, velocity, and angle variables from MarioState to the Mario object.
  */
 void copy_mario_state_to_object(struct MarioState *m) {
     vec3f_copy(&o->oVelVec, m->vel);

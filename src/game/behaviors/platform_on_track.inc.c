@@ -169,7 +169,7 @@ static void platform_on_track_act_init(void) {
     o->oPlatformOnTrackBaseBallIndex = 0;
 
     vec3s_to_vec3f(&o->oHomeVec, o->oPlatformOnTrackStartWaypoint->pos);
-    vec3f_copy(&o->oPosVec, &o->oHomeVec);
+    cur_obj_set_pos_to_home();
 
     o->oFaceAngleYaw = o->oBehParams2ndByte;
     o->oForwardVel = o->oVelX = o->oVelY = o->oVelZ = o->oPlatformOnTrackDistMovedSinceLastBall = 0.0f;

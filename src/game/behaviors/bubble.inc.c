@@ -17,6 +17,7 @@ void bhv_object_bubble_loop(void) {
             bubbleSplash->oPosX = o->oPosX;
             bubbleSplash->oPosY = bubbleY + 5.0f;
             bubbleSplash->oPosZ = o->oPosZ;
+            obj_set_gfx_pos_from_pos(o);
         }
 
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;

@@ -265,6 +265,10 @@ void obj_set_pos(struct Object *obj, s16 x, s16 y, s16 z) {
     obj->oPosX = x;
     obj->oPosY = y;
     obj->oPosZ = z;
+
+    obj->header.gfx.pos[0] = x;
+    obj->header.gfx.pos[1] = y;
+    obj->header.gfx.pos[2] = z;
 }
 
 void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll) {
@@ -275,6 +279,10 @@ void obj_set_angle(struct Object *obj, s16 pitch, s16 yaw, s16 roll) {
     obj->oMoveAnglePitch = pitch;
     obj->oMoveAngleYaw = yaw;
     obj->oMoveAngleRoll = roll;
+
+    obj->header.gfx.angle[0] = pitch;
+    obj->header.gfx.angle[1] = yaw;
+    obj->header.gfx.angle[2] = roll;
 }
 
 /*
@@ -434,12 +442,33 @@ void obj_copy_pos_and_angle(struct Object *dst, struct Object *src) {
 }
 
 void obj_copy_pos(struct Object *dst, struct Object *src) {
-    vec3f_copy(&dst->oPosVec, &src->oPosVec);
+    f32 x = src->oPosX;
+    f32 y = src->oPosY;
+    f32 z = src->oPosZ;
+
+    dst->oPosX = x;
+    dst->oPosY = y;
+    dst->oPosZ = z;
+
+    dst->header.gfx.pos[0] = x;
+    dst->header.gfx.pos[1] = y;
+    dst->header.gfx.pos[2] = z;
 }
 
 void obj_copy_angle(struct Object *dst, struct Object *src) {
     vec3i_copy(&dst->oMoveAngleVec, &src->oMoveAngleVec);
-    vec3i_copy(&dst->oFaceAngleVec, &src->oFaceAngleVec);
+
+    s32 facePitch = src->oFaceAnglePitch;
+    s32 faceYaw   = src->oFaceAngleYaw;
+    s32 faceRoll  = src->oFaceAngleRoll;
+
+    dst->oFaceAnglePitch = facePitch;
+    dst->oFaceAngleYaw   = faceYaw;
+    dst->oFaceAngleRoll  = faceRoll;
+
+    dst->header.gfx.angle[0] = facePitch;
+    dst->header.gfx.angle[1] = faceYaw;
+    dst->header.gfx.angle[2] = faceRoll;
 }
 
 void obj_set_gfx_pos_from_pos(struct Object *obj) {
@@ -1230,7 +1259,17 @@ s32 cur_obj_outside_home_rectangle(f32 minX, f32 maxX, f32 minZ, f32 maxZ) {
 }
 
 void cur_obj_set_pos_to_home(void) {
-    vec3f_copy(&o->oPosVec, &o->oHomeVec);
+    f32 x = o->oHomeX;
+    f32 y = o->oHomeY;
+    f32 z = o->oHomeZ;
+
+    o->oPosX = x;
+    o->oPosY = y;
+    o->oPosZ = z;
+
+    o->header.gfx.pos[0] = x;
+    o->header.gfx.pos[1] = y;
+    o->header.gfx.pos[2] = z;
 }
 
 void cur_obj_set_pos_to_home_and_stop(void) {

@@ -153,7 +153,7 @@ static void homing_amp_give_up_loop(void) {
 
     if (o->oTimer > 150) {
         // Hide the amp and reset it back to its inactive state
-        vec3f_copy(&o->oPosVec, &o->oHomeVec);
+        cur_obj_set_pos_to_home();
         o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
         o->oAction = HOMING_AMP_ACT_INACTIVE;
         o->oAnimState = 0;
