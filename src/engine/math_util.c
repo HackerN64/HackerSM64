@@ -771,18 +771,14 @@ void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 y
 /**
  * Set 'dest' to a transformation matrix that aligns an object with the terrain
  * based on the normal. Used for enemies.
- * 'upDir' is the terrain normal
+ * 'normal' is the terrain normal
  * 'yaw' is the angle which it should face
  * 'pos' is the object's position in the world
  */
-void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
-    Vec3f leftDir;
-    Vec3f forwardDir;
-    vec3f_set(forwardDir, sins(yaw), 0.0f, coss(yaw));
-    vec3f_create_axis_normals_from_up_dir(leftDir, upDir, forwardDir);
-    vec3f_copy(dest[0], leftDir);
-    vec3f_copy(dest[1], upDir);
-    vec3f_copy(dest[2], forwardDir);
+void mtxf_align_terrain_normal(Mat4 dest, Vec3f normal, Vec3f pos, s32 yaw) {
+    vec3f_copy(dest[1], normal); // up
+    vec3f_set(dest[2], sins(yaw), 0.0f, coss(yaw)); // forward
+    vec3f_create_axis_normals_from_up_dir(dest[0], dest[1], dest[2]);
     vec3f_copy(dest[3], pos);
     MTXF_END(dest);
 }
