@@ -552,11 +552,12 @@ void geo_process_switch(struct GraphNodeSwitchCase *node) {
     }
 }
 
+Mat4 gCameraTransform;
+
 /**
  * Process a camera node.
  */
 void geo_process_camera(struct GraphNodeCamera *node) {
-    Mat4 *cameraTransform = alloc_display_list(sizeof(Mat4));
     Mtx *rollMtx = alloc_display_list(sizeof(*rollMtx));
     Mtx *viewMtx = alloc_display_list(sizeof(Mtx));
 
@@ -567,18 +568,24 @@ void geo_process_camera(struct GraphNodeCamera *node) {
 
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
 
-    mtxf_lookat(*cameraTransform, node->pos, node->focus, node->roll);
+    mtxf_lookat(gCameraTransform, node->pos, node->focus, node->roll);
+
+    // Make a copy of the view matrix and scale it based on WORLD_SCALE
+    Mat4 scaledCamera;
+    mtxf_copy(scaledCamera, gCameraTransform);
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            (*cameraTransform)[i][j] *= WORLD_SCALE;
+            scaledCamera[i][j] *= WORLD_SCALE;
         }
     }
-    guMtxF2L(*cameraTransform, viewMtx);
+    
+    // Convert the scaled matrix to fixed-point and integrate it into the projection matrix stack
+    guMtxF2L(scaledCamera, viewMtx);
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
 
     if (node->fnNode.node.children != 0) {
         gCurGraphNodeCamera = node;
-        node->matrixPtr = cameraTransform;
+        node->matrixPtr = &gCameraTransform;
         geo_process_node_and_siblings(node->fnNode.node.children);
         gCurGraphNodeCamera = NULL;
     }
@@ -972,7 +979,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  *
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
-s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
+s32 obj_is_in_view(struct GraphNodeObject *node) {
     if (node->node.flags & GRAPH_RENDER_INVISIBLE) {
         return FALSE;
     }
@@ -988,7 +995,7 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     }
 
     // Don't render if the object is close to or behind the camera
-    if (matrix[3][2] > -100.0f + cullingRadius) {
+    if (node->cameraToObject[2] > -100.0f + cullingRadius) {
         return FALSE;
     }
 
@@ -996,14 +1003,14 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     //  makes PU travel safe when the camera is locked on the main map.
     //  If Mario were rendered with a depth over 65536 it would cause overflow
     //  when converting the transformation matrix to a fixed point matrix.
-    if (matrix[3][2] < -20000.0f - cullingRadius) {
+    if (node->cameraToObject[2] < -20000.0f - cullingRadius) {
         return FALSE;
     }
 
     // half of the fov in in-game angle units instead of degrees
     s16 halfFov = (((((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f) + 1.0f) * 32768.0f) / 180.0f) + 0.5f;
 
-    f32 hScreenEdge = -matrix[3][2] * tans(halfFov);
+    f32 hScreenEdge = -node->cameraToObject[2] * tans(halfFov);
     // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get
     // the amount of units between the center of the screen and the horizontal edge
     // given the distance from the object to the camera.
@@ -1014,10 +1021,10 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     // hScreenEdge *= GFX_DIMENSIONS_ASPECT_RATIO;
 
     // Check whether the object is horizontally in view
-    if (matrix[3][0] > hScreenEdge + cullingRadius) {
+    if (node->cameraToObject[0] > hScreenEdge + cullingRadius) {
         return FALSE;
     }
-    if (matrix[3][0] < -hScreenEdge - cullingRadius) {
+    if (node->cameraToObject[0] < -hScreenEdge - cullingRadius) {
         return FALSE;
     }
 
@@ -1072,13 +1079,13 @@ void geo_process_object(struct Object *node) {
         }
 
         node->header.gfx.throwMatrix = &gMatStack[++gMatStackIndex];
-        vec3_copy(node->header.gfx.cameraToObject, gMatStack[gMatStackIndex][3]);
+        linear_mtxf_mul_vec3f_and_translate(gCameraTransform, node->header.gfx.cameraToObject, (*node->header.gfx.throwMatrix)[3]);
 
         // FIXME: correct types
         if (node->header.gfx.animInfo.curAnim != NULL) {
             geo_set_animation_globals(&node->header.gfx.animInfo, (node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0);
         }
-        if (obj_is_in_view(&node->header.gfx, gMatStack[gMatStackIndex])) {
+        if (obj_is_in_view(&node->header.gfx)) {
             gMatStackIndex--;
             inc_mat_stack();
 
