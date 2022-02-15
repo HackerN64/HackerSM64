@@ -585,13 +585,12 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle)
 
 /**
  * Mostly the same as 'mtxf_align_terrain_normal', but also applies a scale and multiplication.
- * 'src' is the matrix to multiply from
  * 'upDir' is the terrain normal
  * 'pos' is the object's position in the world
  * 'scale' is the scale of the shadow
  * 'yaw' is the angle which it should face
  */
-void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
+void mtxf_shadow(Mat4 dest, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
@@ -601,15 +600,11 @@ void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 y
     vec3f_normalize(leftDir);
     vec3f_cross(forwardDir, leftDir, upDir);
     vec3f_normalize(forwardDir);
-    Vec3f entry;
-    vec3f_prod(entry, leftDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[0], entry);
-    vec3f_prod(entry, upDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[1], entry);
-    vec3f_prod(entry, forwardDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[2], entry);
-    linear_mtxf_mul_vec3f(src, dest[3], pos);
-    vec3f_add(dest[3], src[3]);
+
+    vec3f_prod(dest[0], leftDir, scale);
+    vec3f_prod(dest[1], upDir, scale);
+    vec3f_prod(dest[2], forwardDir, scale);
+    vec3f_copy(dest[3], pos);
     MTXF_END(dest);
 }
 

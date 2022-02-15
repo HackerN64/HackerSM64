@@ -930,7 +930,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                                                   node->shadowSolidity, node->shadowType, shifted);
 
         if (shadowList != NULL) {
-            mtxf_shadow(gMatStack[gMatStackIndex + 1], *gCurGraphNodeCamera->matrixPtr,
+            mtxf_shadow(gMatStack[gMatStackIndex + 1],
                 gCurrShadow.floorNormal, shadowPos, gCurrShadow.scale, gCurGraphNodeObject->angle[1]);
 
             inc_mat_stack();
