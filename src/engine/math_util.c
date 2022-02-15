@@ -547,41 +547,40 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle)
     register s32 i;
     register f32 sx = scale[0];
     register f32 sy = scale[1];
-    register f32 sz = ((f32 *) scale)[2];
-    register f32 *temp2, *temp = (f32 *)dest;
-    for (i = 0; i < 16; i++) {
-        *temp = 0;
-        temp++;
-    }
-    if (angle == 0x0) {
-        // ((u32 *) dest)[0] = FLOAT_ONE;
-        dest[0][0] = sx; // [0][0]
-        dest[0][1] = 0;
-        dest[1][0] = 0;
-        // ((u32 *) dest)[5] = FLOAT_ONE;
-        dest[1][1] = sy; // [1][1]
-    } else {
-        dest[0][0] = (coss(angle) * sx);
-        dest[0][1] = (sins(angle) * sx);
-        dest[1][0] = (-dest[0][1] * sy);
-        dest[1][1] = ( dest[0][0] * sy);
-    }
-    // ((u32 *) dest)[10] = FLOAT_ONE;
-    // dest[2][2] = sz; // [2][2]
-    ((f32 *) dest)[10] = sz; // [2][2]
-    dest[2][3] = 0;
-    ((u32 *) dest)[15] = FLOAT_ONE; // [3][3]
-
-    temp  = (f32 *)dest;
-    temp2 = (f32 *)mtx;
+    register f32 sz = scale[2];
+    Mat4* cameraMat = &gCameraTransform;
     for (i = 0; i < 3; i++) {
-        temp[12] = ((temp2[ 0] * position[0])
-                  + (temp2[ 4] * position[1])
-                  + (temp2[ 8] * position[2])
-                  +  temp2[12]);
-        temp++;
-        temp2++;
+        for (int j = 0; j < 3; j++) {
+            dest[i][j] = (*cameraMat)[j][i];
+        }
+        dest[i][3] = 0.0f;
     }
+    if (angle != 0x0) {
+        float m00 = dest[0][0];
+        float m01 = dest[0][1];
+        float m02 = dest[0][2];
+        float m10 = dest[1][0];
+        float m11 = dest[1][1];
+        float m12 = dest[1][2];
+        float cosa = coss(angle);
+        float sina = sins(angle);
+        dest[0][0] = cosa * m00 + sina * m10; 
+        dest[0][1] = cosa * m01 + sina * m11; 
+        dest[0][2] = cosa * m02 + sina * m12;
+        dest[1][0] = -sina * m00 + cosa * m10;
+        dest[1][1] = -sina * m01 + cosa * m11;
+        dest[1][2] = -sina * m02 + cosa * m12;
+    }
+    for (i = 0; i < 3; i++) {
+        dest[0][i] *= sx;
+        dest[1][i] *= sy;
+        dest[2][i] *= sz;
+    }
+
+    // Translation = input translation + position
+    vec3f_copy(dest[3], position);
+    vec3f_add(dest[3], mtx[3]);
+    dest[3][3] = 1.0f;
 }
 
 /**
