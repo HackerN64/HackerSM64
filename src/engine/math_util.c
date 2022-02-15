@@ -777,39 +777,6 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
 }
 
 /**
- * Extract a position given an object's transformation matrix and a camera matrix.
- * This is used for determining the world position of the held object: since objMtx
- * inherits the transformation from both the camera and Mario, it calculates this
- * by taking the camera matrix and inverting its transformation by first rotating
- * objMtx back from screen orientation to world orientation, and then subtracting
- * the camera position.
- */
-void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
-    register s32 i;
-    register f32 *temp1 = (f32 *)dest;
-    register f32 *temp2 = (f32 *)camMtx;
-    f32 y[3];
-    register f32 *x = y;
-    register f32 *temp3 = (f32 *)objMtx;
-
-    for (i = 0; i < 3; i++) {
-        *x = (temp3[12] - temp2[12]);
-        temp2++;
-        temp3++;
-        x = (f32 *)(((u32)x) + 4);
-    }
-    temp2 -= 3;
-    for (i = 0; i < 3; i++) {
-        *temp1 = ((x[-3] * temp2[0])
-                + (x[-2] * temp2[1])
-                + (x[-1] * temp2[2]));
-        temp1++;
-        temp2 += 4;
-    }
-}
-
-
-/**
  * Take the vector starting at 'from' pointed at 'to' an retrieve the length
  * of that vector, as well as the yaw and pitch angles.
  * Basically it converts the direction to spherical coordinates.
