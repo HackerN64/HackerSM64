@@ -1129,7 +1129,6 @@ void geo_process_object(struct Object *node) {
         if (node->header.gfx.animInfo.curAnim != NULL) {
             geo_set_animation_globals(&node->header.gfx.animInfo, (node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0);
         }
-
         if (obj_is_in_view(&node->header.gfx)) {
             gMatStackIndex--;
             inc_mat_stack();
@@ -1310,10 +1309,8 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         initialMatrix = alloc_display_list(sizeof(*initialMatrix));
         gCurLookAt = (LookAt*)alloc_display_list(sizeof(LookAt));
         bzero(gCurLookAt, sizeof(LookAt));
-        gCurLookAt->l[1].l.col[1]  = 0x80;
+        gCurLookAt->l[1].l.col[1] = 0x80;
         gCurLookAt->l[1].l.colc[1] = 0x80;
-        gCurLookAt->l[0].l.dir[0] = 0x7F;
-        gCurLookAt->l[1].l.dir[1] = 0x7F;
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
         vec3s_set(viewport->vp.vtrans, (node->x     * 4), (node->y      * 4), 511);
