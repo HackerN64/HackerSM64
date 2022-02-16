@@ -122,7 +122,11 @@ TEXT_ENGINE := none
 ifeq ($(TEXT_ENGINE), s2dex_text_engine)
   DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
   LIBRARIES += s2d_engine
-  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/
+  DUMMY != ls src/s2d_engine/init.c >&2 || echo FAIL
+    ifeq ($(DUMMY),FAIL)
+      $(error S2DEX Text Engine not found. Please run `git submodule update --init` and rebuild.)
+    endif
+  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
 endif
 # add more text engines here
 
