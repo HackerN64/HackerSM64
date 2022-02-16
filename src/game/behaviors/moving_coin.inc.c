@@ -47,7 +47,7 @@ void moving_coin_flicker(void) {
 
 void coin_collected(void) {
     spawn_object(o, MODEL_SPARKLES, bhvCoinSparklesSpawner);
-    o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+    obj_mark_for_deletion(o);
 }
 
 void bhv_moving_yellow_coin_init(void) {

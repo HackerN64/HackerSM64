@@ -95,7 +95,7 @@ void water_ring_act_collected(void) {
     f32 avgScale = ((f32) o->oTimer * 0.2f) + o->oWaterRingAvgScale;
 
     if (o->oTimer > 20) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 
     o->oOpacity -= 10;
@@ -116,7 +116,7 @@ void water_ring_act_not_collected(void) {
     if (o->oTimer > 225) {
         o->oOpacity -= 2;
         if (o->oOpacity < 3) {
-            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            obj_mark_for_deletion(o);
         }
     }
 

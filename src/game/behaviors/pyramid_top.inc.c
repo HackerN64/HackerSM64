@@ -80,7 +80,7 @@ void bhv_pyramid_top_explode(void) {
     }
 
     // Deactivate the pyramid top.
-    o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+    obj_mark_for_deletion(o);
 }
 
 void bhv_pyramid_top_loop(void) {
@@ -130,7 +130,7 @@ void bhv_pyramid_top_fragment_loop(void) {
     o->oFaceAnglePitch += 0x1000;
 
     if (o->oTimer == 60) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
@@ -143,6 +143,6 @@ void bhv_pyramid_pillar_touch_detector_loop(void) {
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
         // Increase the pyramid top's count of pillars touched.
         o->parentObj->oPyramidTopPillarsTouched++;
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }

@@ -92,7 +92,7 @@ void clear_object_lists(struct ObjectNode *objLists) {
  * Free the given object.
  */
 void unload_object(struct Object *obj) {
-    obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+    obj_mark_for_deletion(obj);
     obj->prevObj = NULL;
 
     obj->header.gfx.throwMatrix = NULL;

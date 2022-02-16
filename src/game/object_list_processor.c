@@ -513,7 +513,7 @@ void clear_objects(void) {
     clear_object_lists(gObjectListArray);
 
     for (i = 0; i < OBJECT_POOL_CAPACITY; i++) {
-        gObjectPool[i].activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(&gObjectPool[i]);
         geo_reset_object_node(&gObjectPool[i].header.gfx);
     }
 

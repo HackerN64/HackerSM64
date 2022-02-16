@@ -13,7 +13,7 @@ void bhv_1up_interact(void) {
 #ifdef SAVE_NUM_LIVES
         save_file_set_num_lives(gMarioState->numLives);
 #endif
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
 #endif
@@ -32,11 +32,11 @@ void bhv_1up_init(void) {
 #ifndef UNLOCK_ALL
     if (o->oBehParams2ndByte == MUSHROOM_BP_REQUIRES_BOWSER_1) {
         if (!(save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_1 | SAVE_FLAG_UNLOCKED_BASEMENT_DOOR))) {
-            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            obj_mark_for_deletion(o);
         }
     } else if (o->oBehParams2ndByte == MUSHROOM_BP_REQUIRES_BOWSER_2) {
         if (!(save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR))) {
-            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            obj_mark_for_deletion(o);
         }
     }
 #endif
@@ -282,7 +282,7 @@ void bhv_1up_hidden_trigger_loop(void) {
             nearestHidden1up->o1UpHiddenTimesTriggered++;
         }
 
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
@@ -327,7 +327,7 @@ void bhv_1up_hidden_in_pole_trigger_loop(void) {
             nearestHidden1upInPole->o1UpHiddenTimesTriggered++;
         }
 
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
@@ -339,6 +339,6 @@ void bhv_1up_hidden_in_pole_spawner_loop(void) {
             spawn_object_relative(0, 0, i * -200, 0, o, MODEL_NONE, bhvHidden1upInPoleTrigger);
         }
 
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }

@@ -50,7 +50,7 @@ void celeb_star_act_face_camera(void) {
     }
 
     if (o->oTimer == 59) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
@@ -70,11 +70,11 @@ void bhv_celebration_star_sparkle_loop(void) {
     o->oPosY -= 15.0f;
 
     if (o->oTimer == 12) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
 void bhv_star_key_collection_puff_spawner_loop(void) {
     spawn_mist_particles_variable(0, 10, 30.0f);
-    o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+    obj_mark_for_deletion(o);
 }

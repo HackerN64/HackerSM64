@@ -50,7 +50,7 @@ void bhv_controllable_platform_sub_loop(void) {
     o->oVelZ = o->parentObj->oVelZ;
 
     if (o->parentObj->activeFlags == ACTIVE_FLAG_DEACTIVATED) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 

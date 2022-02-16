@@ -49,7 +49,7 @@ void small_breakable_box_act_move(void) {
         spawn_triangle_break_particles(20, MODEL_DIRT_ANIMATION, 0.7f, 3);
         obj_spawn_yellow_coins(o, 3);
         create_sound_spawner(SOUND_GENERAL_BREAK_BOX);
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 
     obj_check_floor_death(collisionFlags, sObjFloor);
@@ -66,7 +66,7 @@ void breakable_box_small_released_loop(void) {
     // Despawn, and create a corkbox respawner
     if (o->oBreakableBoxSmallFramesSinceReleased > 900) {
         create_respawner(MODEL_BREAKABLE_BOX, bhvBreakableBoxSmall, 3000);
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
@@ -81,7 +81,7 @@ void breakable_box_small_idle_loop(void) {
             break;
 
         case OBJ_ACT_DEATH_PLANE_DEATH:
-            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            obj_mark_for_deletion(o);
             create_respawner(MODEL_BREAKABLE_BOX, bhvBreakableBoxSmall, 3000);
             break;
     }

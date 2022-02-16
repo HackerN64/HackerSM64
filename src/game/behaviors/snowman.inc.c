@@ -93,7 +93,7 @@ void snowmans_bottom_act_final_stretch(void) { // act 2
 
     if (o->oTimer == 200) {
         create_respawner(MODEL_CCM_SNOWMAN_BASE, bhvSnowmansBottom, 3000);
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
@@ -215,10 +215,10 @@ void bhv_snowmans_head_loop(void) {
 void bhv_snowmans_body_checkpoint_loop(void) {
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 800)) {
         o->parentObj->oSnowmansBottomHitCheckpointNearMario = TRUE;
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 
     if (o->parentObj->activeFlags == ACTIVE_FLAG_DEACTIVATED) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }

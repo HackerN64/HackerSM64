@@ -161,7 +161,7 @@ void bhv_hidden_red_coin_star_init(void) {
     if (numRedCoinsRemaining == 0) {
         starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStar, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
         starObj->oBehParams = o->oBehParams;
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 
     o->oHiddenStarTriggerCounter = 8 - numRedCoinsRemaining;
@@ -181,7 +181,7 @@ void bhv_hidden_red_coin_star_loop(void) {
             if (o->oTimer > 2) {
                 spawn_red_coin_cutscene_star(o->oPosX, o->oPosY, o->oPosZ);
                 spawn_mist_particles();
-                o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+                obj_mark_for_deletion(o);
             }
             break;
     }

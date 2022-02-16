@@ -19,7 +19,7 @@ void bhv_explosion_loop(void) {
             spawn_object(o, MODEL_SMOKE, bhvBobombBullyDeathSmoke);
         }
 
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 
     o->oOpacity -= 14;
@@ -51,13 +51,13 @@ void bhv_bobomb_explosion_bubble_loop(void) {
     o->oBobombExpBubGfxScaleFacY += o->oBobombExpBubGfxExpRateY;
 
     if (o->oPosY > waterY) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
         o->oPosY += 5.0f;
         spawn_object(o, MODEL_SMALL_WATER_SPLASH, bhvObjectWaterSplash);
     }
 
     if (o->oTimer > 60) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
     o->oPosY += o->oVelY;
     o->oTimer++;

@@ -21,7 +21,7 @@ void boulder_act_1(void) {
     }
 
     if (o->oPosY < -1000.0f) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 

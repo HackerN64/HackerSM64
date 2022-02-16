@@ -20,6 +20,6 @@ void bhv_object_bubble_loop(void) {
             obj_set_gfx_pos_from_pos(o);
         }
 
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }

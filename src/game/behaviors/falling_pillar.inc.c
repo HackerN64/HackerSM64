@@ -109,7 +109,7 @@ void bhv_falling_pillar_loop(void) {
                 spawn_mist_particles_variable(0, 0, 92.0f);
 
                 // Go invisible.
-                o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+                obj_mark_for_deletion(o);
 
                 // Play the hitting the ground sound.
                 create_sound_spawner(SOUND_GENERAL_BIG_POUND);
@@ -140,6 +140,6 @@ void bhv_falling_pillar_hitbox_loop(void) {
 
     // When the pillar goes inactive, the hitboxes also go inactive.
     if (o->parentObj->activeFlags == ACTIVE_FLAG_DEACTIVATED) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }

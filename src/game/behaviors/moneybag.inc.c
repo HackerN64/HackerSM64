@@ -163,7 +163,7 @@ void moneybag_act_disappear(void) {
     o->oOpacity -= 6;
     if (o->oOpacity < 0) {
         o->oOpacity = 0;
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
@@ -172,7 +172,7 @@ void moneybag_act_death(void) {
         obj_spawn_yellow_coins(o, 5);
         create_sound_spawner(SOUND_GENERAL_SPLATTERING);
         spawn_mist_particles();
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
@@ -183,7 +183,7 @@ void bhv_moneybag_loop(void) {
             o->oOpacity += 12;
             if (o->oOpacity > 255) {
                 o->oOpacity = 255;
-                o->parentObj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+                obj_mark_for_deletion(o->parentObj);
                 o->oAction = MONEYBAG_ACT_MOVE_AROUND;
             }
             break;

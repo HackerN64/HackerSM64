@@ -135,7 +135,7 @@ void bhv_treasure_chest_ship_loop(void) {
                 set_environmental_camera_shake(SHAKE_ENV_JRB_SHIP_DRAIN);
                 if (gEnvironmentRegions[6] < -335) {
                     gEnvironmentRegions[6] = -335;
-                    o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+                    obj_mark_for_deletion(o);
                 }
 #if ENABLE_RUMBLE
                 reset_rumble_timers_vibrate(2);

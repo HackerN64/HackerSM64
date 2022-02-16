@@ -16,7 +16,7 @@ s32 cap_set_hitbox(void) {
     obj_set_hitbox(o, &sCapHitbox);
 
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
         o->oInteractStatus = INT_STATUS_NONE;
         return TRUE;
     }
@@ -37,7 +37,7 @@ void cap_check_quicksand(void) {
 
     switch (sObjFloor->type) {
         case SURFACE_DEATH_PLANE:
-            o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+            obj_mark_for_deletion(o);
             break;
 
         case SURFACE_SHALLOW_QUICKSAND:
@@ -87,14 +87,14 @@ void cap_sink_quicksand(void) {
         case CAP_ACT_INSTANT_QUICKSAND:
             o->oGraphYOffset += -1.0f;
             if (o->oTimer > 20) {
-                o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+                obj_mark_for_deletion(o);
             }
             break;
 
         case CAP_ACT_INSTANT_MOVING_QUICKSAND:
             o->oGraphYOffset += -6.0f;
             if (o->oTimer > 20) {
-                o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+                obj_mark_for_deletion(o);
             }
             o->oFaceAnglePitch = 0x2000;
             break;

@@ -11,7 +11,7 @@ void bhv_cannon_closed_init(void) {
         cannon->oPosZ = o->oHomeZ;
 
         o->oAction = CANNON_TRAP_DOOR_ACT_OPEN;
-        o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        obj_mark_for_deletion(o);
     }
 }
 
