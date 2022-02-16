@@ -187,12 +187,12 @@ s32 intro_regular(void) {
         sPlayMarioGreeting = FALSE;
     }
     print_intro_text();
+    if (gPlayer1Controller->buttonPressed & START_BUTTON) {
 #ifdef DEBUG_LEVEL_SELECT
     if (gPlayer1Controller->buttonDown & L_TRIG) {
         gDebugLevelSelect = TRUE;
     }
 #endif
-    if (gPlayer1Controller->buttonPressed & START_BUTTON) {
         play_sound(SOUND_MENU_STAR_SOUND, gGlobalSoundSource);
 #if ENABLE_RUMBLE
         queue_rumble_data(60, 70);
