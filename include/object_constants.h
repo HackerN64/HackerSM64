@@ -6,25 +6,25 @@
 
 /* activeFlags */
 enum ObjActiveFlags {
-    ACTIVE_FLAG_DEACTIVATED                    = (0 <<  0), // 0x0000
-    ACTIVE_FLAG_ACTIVE                         = (1 <<  0), // 0x0001
-    ACTIVE_FLAG_FAR_AWAY                       = (1 <<  1), // 0x0002
-    ACTIVE_FLAG_UNUSED                         = (1 <<  2), // 0x0004
-    ACTIVE_FLAG_IN_DIFFERENT_ROOM              = (1 <<  3), // 0x0008
-    ACTIVE_FLAG_UNIMPORTANT                    = (1 <<  4), // 0x0010
-    ACTIVE_FLAG_INITIATED_TIME_STOP            = (1 <<  5), // 0x0020
-    ACTIVE_FLAG_MOVE_THROUGH_GRATE             = (1 <<  6), // 0x0040
-    ACTIVE_FLAG_DITHERED_ALPHA                 = (1 <<  7), // 0x0080
-    ACTIVE_FLAG_ALLOCATED                      = (1 <<  8), // 0x0100
-    ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY   = (1 <<  9), // 0x0200
-    ACTIVE_FLAG_IGNORE_ENV_BOXES               = (1 << 10), // 0x0400
+    ACTIVE_FLAG_DEACTIVATED                    = 0x0,
+    ACTIVE_FLAG_ACTIVE                         = BIT( 0), // 0x0001
+    ACTIVE_FLAG_FAR_AWAY                       = BIT( 1), // 0x0002
+    ACTIVE_FLAG_UNUSED                         = BIT( 2), // 0x0004
+    ACTIVE_FLAG_IN_DIFFERENT_ROOM              = BIT( 3), // 0x0008
+    ACTIVE_FLAG_UNIMPORTANT                    = BIT( 4), // 0x0010
+    ACTIVE_FLAG_INITIATED_TIME_STOP            = BIT( 5), // 0x0020
+    ACTIVE_FLAG_MOVE_THROUGH_GRATE             = BIT( 6), // 0x0040
+    ACTIVE_FLAG_DITHERED_ALPHA                 = BIT( 7), // 0x0080
+    ACTIVE_FLAG_ALLOCATED                      = BIT( 8), // 0x0100
+    ACTIVE_FLAG_DESTRUCTIVE_OBJ_DONT_DESTROY   = BIT( 9), // 0x0200
+    ACTIVE_FLAG_IGNORE_ENV_BOXES               = BIT(10), // 0x0400
 };
 
 /* respawnInfoType */
 enum RespawnInfoType {
     RESPAWN_INFO_TYPE_NULL,
     RESPAWN_INFO_TYPE_NORMAL,
-    RESPAWN_INFO_TYPE_MACRO_OBJECT
+    RESPAWN_INFO_TYPE_MACRO_OBJECT,
 };
 
 /* respawnInfo */
@@ -32,38 +32,39 @@ enum RespawnInfoType {
 
 /* oFlags */
 enum ObjFlags {
-    OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE          = (1 <<  0), // 0x00000001
-    OBJ_FLAG_MOVE_XZ_USING_FVEL                = (1 <<  1), // 0x00000002
-    OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL          = (1 <<  2), // 0x00000004
-    OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW          = (1 <<  3), // 0x00000008
-    OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE      = (1 <<  4), // 0x00000010
-    OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX = (1 <<  5), // 0x00000020
-    OBJ_FLAG_COMPUTE_DIST_TO_MARIO             = (1 <<  6), // 0x00000040
-    OBJ_FLAG_ACTIVE_FROM_AFAR                  = (1 <<  7), // 0x00000080
-    OBJ_FLAG_PLAYER                            = (1 <<  8), // 0x00000100
-    OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT      = (1 <<  9), // 0x00000200
-    OBJ_FLAG_HOLDABLE                          = (1 << 10), // 0x00000400
-    OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM   = (1 << 11), // 0x00000800
-    OBJ_FLAG_UNUSED_12                         = (1 << 12), // 0x00001000
-    OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO            = (1 << 13), // 0x00002000
-    OBJ_FLAG_PERSISTENT_RESPAWN                = (1 << 14), // 0x00004000
-    OBJ_FLAG_VELOCITY_PLATFORM                 = (1 << 15), // 0x00008000
-    OBJ_FLAG_DONT_CALC_COLL_DIST               = (1 << 16), // 0x00010000
-    OBJ_FLAG_UCODE_SMALL                       = (1 << 17), // 0x00020000
-    OBJ_FLAG_UCODE_LARGE                       = (1 << 18), // 0x00040000
-    OBJ_FLAG_SILHOUETTE                        = (1 << 19), // 0x00080000
-    OBJ_FLAG_OCCLUDE_SILHOUETTE                = (1 << 20), // 0x00100000
-    OBJ_FLAG_OPACITY_FROM_CAMERA_DIST          = (1 << 21), // 0x00200000
-    OBJ_FLAG_EMIT_LIGHT                        = (1 << 22), // 0x00400000
-    OBJ_FLAG_UNUSED_23                         = (1 << 23), // 0x00800000
-    OBJ_FLAG_UNUSED_24                         = (1 << 24), // 0x01000000
-    OBJ_FLAG_UNUSED_25                         = (1 << 25), // 0x02000000
-    OBJ_FLAG_UNUSED_26                         = (1 << 26), // 0x04000000
-    OBJ_FLAG_UNUSED_27                         = (1 << 27), // 0x08000000
-    OBJ_FLAG_UNUSED_28                         = (1 << 28), // 0x10000000
-    OBJ_FLAG_UNUSED_29                         = (1 << 29), // 0x20000000
-    OBJ_FLAG_HITBOX_WAS_SET                    = (1 << 30), // 0x40000000
-    OBJ_FLAG_UNUSED_31                         = (1 << 31), // 0x80000000
+    OBJ_FLAGS_NONE                             = 0x0,
+    OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE          = BIT( 0), // 0x00000001
+    OBJ_FLAG_MOVE_XZ_USING_FVEL                = BIT( 1), // 0x00000002
+    OBJ_FLAG_MOVE_Y_WITH_TERMINAL_VEL          = BIT( 2), // 0x00000004
+    OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW          = BIT( 3), // 0x00000008
+    OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE      = BIT( 4), // 0x00000010
+    OBJ_FLAG_UPDATE_TRANSFORM_FOR_THROW_MATRIX = BIT( 5), // 0x00000020
+    OBJ_FLAG_COMPUTE_DIST_TO_MARIO             = BIT( 6), // 0x00000040
+    OBJ_FLAG_ACTIVE_FROM_AFAR                  = BIT( 7), // 0x00000080
+    OBJ_FLAG_PLAYER                            = BIT( 8), // 0x00000100
+    OBJ_FLAG_TRANSFORM_RELATIVE_TO_PARENT      = BIT( 9), // 0x00000200
+    OBJ_FLAG_HOLDABLE                          = BIT(10), // 0x00000400
+    OBJ_FLAG_SET_THROW_MATRIX_FROM_TRANSFORM   = BIT(11), // 0x00000800
+    OBJ_FLAG_UNUSED_12                         = BIT(12), // 0x00001000
+    OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO            = BIT(13), // 0x00002000
+    OBJ_FLAG_PERSISTENT_RESPAWN                = BIT(14), // 0x00004000
+    OBJ_FLAG_VELOCITY_PLATFORM                 = BIT(15), // 0x00008000
+    OBJ_FLAG_DONT_CALC_COLL_DIST               = BIT(16), // 0x00010000
+    OBJ_FLAG_UCODE_SMALL                       = BIT(17), // 0x00020000
+    OBJ_FLAG_UCODE_LARGE                       = BIT(18), // 0x00040000
+    OBJ_FLAG_SILHOUETTE                        = BIT(19), // 0x00080000
+    OBJ_FLAG_OCCLUDE_SILHOUETTE                = BIT(20), // 0x00100000
+    OBJ_FLAG_OPACITY_FROM_CAMERA_DIST          = BIT(21), // 0x00200000
+    OBJ_FLAG_EMIT_LIGHT                        = BIT(22), // 0x00400000
+    OBJ_FLAG_UNUSED_23                         = BIT(23), // 0x00800000
+    OBJ_FLAG_UNUSED_24                         = BIT(24), // 0x01000000
+    OBJ_FLAG_UNUSED_25                         = BIT(25), // 0x02000000
+    OBJ_FLAG_UNUSED_26                         = BIT(26), // 0x04000000
+    OBJ_FLAG_UNUSED_27                         = BIT(27), // 0x08000000
+    OBJ_FLAG_UNUSED_28                         = BIT(28), // 0x10000000
+    OBJ_FLAG_UNUSED_29                         = BIT(29), // 0x20000000
+    OBJ_FLAG_HITBOX_WAS_SET                    = BIT(30), // 0x40000000
+    OBJ_FLAG_UNUSED_31                         = BIT(31), // 0x80000000
 };
 
 /* oHeldState */
@@ -71,7 +72,7 @@ enum HeldState {
     HELD_FREE,
     HELD_HELD,
     HELD_THROWN,
-    HELD_DROPPED
+    HELD_DROPPED,
 };
 
 /* oDialogState */
@@ -80,37 +81,37 @@ enum DialogState {
     DIALOG_STATUS_INTERRUPT,
     DIALOG_STATUS_START_DIALOG,
     DIALOG_STATUS_STOP_DIALOG,
-    DIALOG_STATUS_DISABLE_TIME_STOP
+    DIALOG_STATUS_DISABLE_TIME_STOP,
 };
 
 enum DialogFlags {
-    DIALOG_FLAG_NONE                           = (0 <<  0), // 0x00
-    DIALOG_FLAG_TURN_TO_MARIO                  = (1 <<  0), // 0x01 // cutscene only
-    DIALOG_FLAG_TEXT_DEFAULT                   = (1 <<  1), // 0x02
-    DIALOG_FLAG_TEXT_RESPONSE                  = (1 <<  2), // 0x04 // non-cutscene only
-    DIALOG_FLAG_UNK_CAPSWITCH                  = (1 <<  3), // 0x08 // not defined
-    DIALOG_FLAG_TIME_STOP_ENABLED              = (1 <<  4), // 0x10
+    DIALOG_FLAG_NONE                           = 0x0,
+    DIALOG_FLAG_TURN_TO_MARIO                  = BIT( 0), // 0x01 // cutscene only
+    DIALOG_FLAG_TEXT_DEFAULT                   = BIT( 1), // 0x02
+    DIALOG_FLAG_TEXT_RESPONSE                  = BIT( 2), // 0x04 // non-cutscene only
+    DIALOG_FLAG_UNK_CAPSWITCH                  = BIT( 3), // 0x08 // not defined
+    DIALOG_FLAG_TIME_STOP_ENABLED              = BIT( 4), // 0x10
 };
 
 /* oMoveFlags */
 enum ObjMoveFlags {
-    OBJ_MOVE_NONE                              = (0 <<  0), // 0x0000
-    OBJ_MOVE_LANDED                            = (1 <<  0), // 0x0001
-    OBJ_MOVE_ON_GROUND                         = (1 <<  1), // 0x0002 // mutually exclusive to OBJ_MOVE_LANDED
-    OBJ_MOVE_LEFT_GROUND                       = (1 <<  2), // 0x0004
-    OBJ_MOVE_ENTERED_WATER                     = (1 <<  3), // 0x0008
-    OBJ_MOVE_AT_WATER_SURFACE                  = (1 <<  4), // 0x0010
-    OBJ_MOVE_UNDERWATER_OFF_GROUND             = (1 <<  5), // 0x0020
-    OBJ_MOVE_UNDERWATER_ON_GROUND              = (1 <<  6), // 0x0040
-    OBJ_MOVE_IN_AIR                            = (1 <<  7), // 0x0080
-    OBJ_MOVE_OUT_SCOPE                         = (1 <<  8), // 0x0100
-    OBJ_MOVE_HIT_WALL                          = (1 <<  9), // 0x0200
-    OBJ_MOVE_HIT_EDGE                          = (1 << 10), // 0x0400
-    OBJ_MOVE_ABOVE_LAVA                        = (1 << 11), // 0x0800
-    OBJ_MOVE_LEAVING_WATER                     = (1 << 12), // 0x1000
-    OBJ_MOVE_BOUNCE                            = (1 << 13), // 0x2000
-    OBJ_MOVE_ABOVE_DEATH_BARRIER               = (1 << 14), // 0x4000
-    OBJ_MOVE_UNUSED                            = (1 << 15), // 0x8000
+    OBJ_MOVE_NONE                              = 0x0,
+    OBJ_MOVE_LANDED                            = BIT( 0), // 0x0001
+    OBJ_MOVE_ON_GROUND                         = BIT( 1), // 0x0002 // mutually exclusive to OBJ_MOVE_LANDED
+    OBJ_MOVE_LEFT_GROUND                       = BIT( 2), // 0x0004
+    OBJ_MOVE_ENTERED_WATER                     = BIT( 3), // 0x0008
+    OBJ_MOVE_AT_WATER_SURFACE                  = BIT( 4), // 0x0010
+    OBJ_MOVE_UNDERWATER_OFF_GROUND             = BIT( 5), // 0x0020
+    OBJ_MOVE_UNDERWATER_ON_GROUND              = BIT( 6), // 0x0040
+    OBJ_MOVE_IN_AIR                            = BIT( 7), // 0x0080
+    OBJ_MOVE_OUT_SCOPE                         = BIT( 8), // 0x0100
+    OBJ_MOVE_HIT_WALL                          = BIT( 9), // 0x0200
+    OBJ_MOVE_HIT_EDGE                          = BIT(10), // 0x0400
+    OBJ_MOVE_ABOVE_LAVA                        = BIT(11), // 0x0800
+    OBJ_MOVE_LEAVING_WATER                     = BIT(12), // 0x1000
+    OBJ_MOVE_BOUNCE                            = BIT(13), // 0x2000
+    OBJ_MOVE_ABOVE_DEATH_BARRIER               = BIT(14), // 0x4000
+    OBJ_MOVE_UNUSED                            = BIT(15), // 0x8000
 };
 
 #define OBJ_MOVE_MASK_ON_GROUND (OBJ_MOVE_LANDED | OBJ_MOVE_ON_GROUND)
@@ -122,27 +123,27 @@ enum ObjMoveFlags {
 
 /* oActiveParticleFlags */
 enum ActiveParticleFlags {
-    ACTIVE_PARTICLE_NONE                       = (0 <<  0), // 0x00000000
-    ACTIVE_PARTICLE_DUST                       = (1 <<  0), // 0x00000001
-    ACTIVE_PARTICLE_UNUSED_1                   = (1 <<  1), // 0x00000002
-    ACTIVE_PARTICLE_UNUSED_2                   = (1 <<  2), // 0x00000004
-    ACTIVE_PARTICLE_SPARKLES                   = (1 <<  3), // 0x00000008
-    ACTIVE_PARTICLE_H_STAR                     = (1 <<  4), // 0x00000010
-    ACTIVE_PARTICLE_BUBBLE                     = (1 <<  5), // 0x00000020
-    ACTIVE_PARTICLE_WATER_SPLASH               = (1 <<  6), // 0x00000040
-    ACTIVE_PARTICLE_IDLE_WATER_WAVE            = (1 <<  7), // 0x00000080
-    ACTIVE_PARTICLE_SHALLOW_WATER_WAVE         = (1 <<  8), // 0x00000100
-    ACTIVE_PARTICLE_PLUNGE_BUBBLE              = (1 <<  9), // 0x00000200
-    ACTIVE_PARTICLE_WAVE_TRAIL                 = (1 << 10), // 0x00000400
-    ACTIVE_PARTICLE_FIRE                       = (1 << 11), // 0x00000800
-    ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH       = (1 << 12), // 0x00001000
-    ACTIVE_PARTICLE_LEAF                       = (1 << 13), // 0x00002000
-    ACTIVE_PARTICLE_DIRT                       = (1 << 14), // 0x00004000
-    ACTIVE_PARTICLE_MIST_CIRCLE                = (1 << 15), // 0x00008000
-    ACTIVE_PARTICLE_SNOW                       = (1 << 16), // 0x00010000
-    ACTIVE_PARTICLE_BREATH                     = (1 << 17), // 0x00020000
-    ACTIVE_PARTICLE_V_STAR                     = (1 << 18), // 0x00040000
-    ACTIVE_PARTICLE_TRIANGLE                   = (1 << 19), // 0x00080000
+    ACTIVE_PARTICLE_NONE                       = 0x0,
+    ACTIVE_PARTICLE_DUST                       = BIT( 0), // 0x00000001
+    ACTIVE_PARTICLE_UNUSED_1                   = BIT( 1), // 0x00000002
+    ACTIVE_PARTICLE_UNUSED_2                   = BIT( 2), // 0x00000004
+    ACTIVE_PARTICLE_SPARKLES                   = BIT( 3), // 0x00000008
+    ACTIVE_PARTICLE_H_STAR                     = BIT( 4), // 0x00000010
+    ACTIVE_PARTICLE_BUBBLE                     = BIT( 5), // 0x00000020
+    ACTIVE_PARTICLE_WATER_SPLASH               = BIT( 6), // 0x00000040
+    ACTIVE_PARTICLE_IDLE_WATER_WAVE            = BIT( 7), // 0x00000080
+    ACTIVE_PARTICLE_SHALLOW_WATER_WAVE         = BIT( 8), // 0x00000100
+    ACTIVE_PARTICLE_PLUNGE_BUBBLE              = BIT( 9), // 0x00000200
+    ACTIVE_PARTICLE_WAVE_TRAIL                 = BIT(10), // 0x00000400
+    ACTIVE_PARTICLE_FIRE                       = BIT(11), // 0x00000800
+    ACTIVE_PARTICLE_SHALLOW_WATER_SPLASH       = BIT(12), // 0x00001000
+    ACTIVE_PARTICLE_LEAF                       = BIT(13), // 0x00002000
+    ACTIVE_PARTICLE_DIRT                       = BIT(14), // 0x00004000
+    ACTIVE_PARTICLE_MIST_CIRCLE                = BIT(15), // 0x00008000
+    ACTIVE_PARTICLE_SNOW                       = BIT(16), // 0x00010000
+    ACTIVE_PARTICLE_BREATH                     = BIT(17), // 0x00020000
+    ACTIVE_PARTICLE_V_STAR                     = BIT(18), // 0x00040000
+    ACTIVE_PARTICLE_TRIANGLE                   = BIT(19), // 0x00080000
 };
 
 /* oBehParams */
@@ -225,47 +226,47 @@ enum ActiveParticleFlags {
 
 /* oBehParams2ndByte */
 enum ObjGeneralBehParams {
-    OBJ_BP_NONE
+    OBJ_BP_NONE,
 };
 
 /* oAction */
 enum ObjGeneralProjectileActions {
-    OBJ_ACT_PROJECTILE_HIT_MARIO = -1
+    OBJ_ACT_PROJECTILE_HIT_MARIO = -1,
 };
 
 /* oAction */
 enum ObjGeneralDeathActions {
     OBJ_ACT_LAVA_DEATH = 100,
-    OBJ_ACT_DEATH_PLANE_DEATH
+    OBJ_ACT_DEATH_PLANE_DEATH,
 };
 
 enum ObjGeneralKnockbackActions {
     OBJ_ACT_HORIZONTAL_KNOCKBACK = 100,
     OBJ_ACT_VERTICAL_KNOCKBACK,
-    OBJ_ACT_SQUISHED
+    OBJ_ACT_SQUISHED,
 };
 
 /* oAnimState */
 enum ObjGeneralAnimStates {
     OBJ_ANIM_STATE_INIT_ANIM = -1,
-    OBJ_ANIM_STATE_DEFAULT   =  0
+    OBJ_ANIM_STATE_DEFAULT   =  0,
 };
 
 /* cur_obj_update_blinking */
 enum AnimStateBlinking {
     OBJ_BLINKING_ANIM_STATE_EYES_OPEN,
-    OBJ_BLINKING_ANIM_STATE_EYES_CLOSED
+    OBJ_BLINKING_ANIM_STATE_EYES_CLOSED,
 };
 
 /* geo_update_layer_transparency */
 enum AnimStateLayerTransparency {
     TRANSPARENCY_ANIM_STATE_OPAQUE,
-    TRANSPARENCY_ANIM_STATE_TRANSPARENT
+    TRANSPARENCY_ANIM_STATE_TRANSPARENT,
 };
 
 /* Animations */
 enum ObjGeneralAnimations {
-    OBJ_ANIM_NONE = -1
+    OBJ_ANIM_NONE = -1,
 };
 
 /* gTTCSpeedSetting */
@@ -273,7 +274,7 @@ enum TTCSpeedSetting {
     TTC_SPEED_SLOW,
     TTC_SPEED_FAST,
     TTC_SPEED_RANDOM,
-    TTC_SPEED_STOPPED
+    TTC_SPEED_STOPPED,
 };
 
 /* Orange Number */
@@ -293,27 +294,27 @@ enum OrangeNumbers { // oBehParams2ndByte, oAnimState
     ORANGE_NUMBER_C,
     ORANGE_NUMBER_D,
     ORANGE_NUMBER_E,
-    ORANGE_NUMBER_F
+    ORANGE_NUMBER_F,
 };
 
 /* Coin Type */
 enum CoinTypes { // coinType
     COIN_TYPE_NONE,
     COIN_TYPE_YELLOW,
-    COIN_TYPE_BLUE
+    COIN_TYPE_BLUE,
 };
 
 /* Bouncing Coin */
 enum oActionsBouncingCoin {
     BOUNCING_COIN_ACT_FALLING,
-    BOUNCING_COIN_ACT_BOUNCING
+    BOUNCING_COIN_ACT_BOUNCING,
 };
 
 /* Hidden Blue Coin */
 enum oActionsHiddenBlueCoin {
     HIDDEN_BLUE_COIN_ACT_INACTIVE,
     HIDDEN_BLUE_COIN_ACT_WAITING,
-    HIDDEN_BLUE_COIN_ACT_ACTIVE
+    HIDDEN_BLUE_COIN_ACT_ACTIVE,
 };
 
 /* Blue Coin Switch */
@@ -321,7 +322,7 @@ enum oActionsBlueCoinSwitch {
     BLUE_COIN_SWITCH_ACT_IDLE,
     BLUE_COIN_SWITCH_ACT_RECEDING,
     BLUE_COIN_SWITCH_ACT_TICKING,
-    BLUE_COIN_SWITCH_ACT_EXTENDING
+    BLUE_COIN_SWITCH_ACT_EXTENDING,
 };
 
 /* Moving Blue Coin */
@@ -330,28 +331,28 @@ enum oActionsMovingBlueCoin {
     MOV_BCOIN_ACT_MOVING,
     MOV_BCOIN_ACT_SLOWING_DOWN,
     MOV_BCOIN_ACT_STOPPED,
-    MOV_BCOIN_ACT_FLICKERING
+    MOV_BCOIN_ACT_FLICKERING,
 };
 
 /* Yellow Coin */
 enum oBehParams2ndByteYellowCoin {
     YELLOW_COIN_BP_NO_COINS,
-    YELLOW_COIN_BP_ONE_COIN
+    YELLOW_COIN_BP_ONE_COIN,
 };
 
 /* Moving Yellow Coin */
 enum oActionsMovingYellowCoin {
     MOV_YCOIN_ACT_IDLE,
-    MOV_YCOIN_ACT_BLINKING
+    MOV_YCOIN_ACT_BLINKING,
 };
 
 /* Coin Formation */
 enum CoinFormationFlags {
-    COIN_FORMATION_FLAG_NONE     = (0 << 0),
-    COIN_FORMATION_FLAG_VERTICAL = (1 << 0),
-    COIN_FORMATION_FLAG_RING     = (1 << 1),
-    COIN_FORMATION_FLAG_ARROW    = (1 << 2),
-    COIN_FORMATION_FLAG_FLYING   = (1 << 4),
+    COIN_FORMATION_FLAG_NONE     = 0x0,
+    COIN_FORMATION_FLAG_VERTICAL = BIT(0),
+    COIN_FORMATION_FLAG_RING     = BIT(1),
+    COIN_FORMATION_FLAG_ARROW    = BIT(2),
+    COIN_FORMATION_FLAG_FLYING   = BIT(4),
 };
 enum oBehParams2ndByteCoinFormation {
     COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE = (COIN_FORMATION_FLAG_NONE),
@@ -360,12 +361,12 @@ enum oBehParams2ndByteCoinFormation {
     COIN_FORMATION_BP_SHAPE_VERTICAL_RING   = (COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL),
     COIN_FORMATION_BP_SHAPE_ARROW           = (COIN_FORMATION_FLAG_ARROW),
     COIN_FORMATION_BP_SHAPE_MASK = 0x07,
-    COIN_FORMATION_BP_FLYING     = 0x10
+    COIN_FORMATION_BP_FLYING     = 0x10,
 };
 enum oActionsCoinFormation {
     COIN_FORMATION_ACT_INACTIVE,
     COIN_FORMATION_ACT_ACTIVE,
-    COIN_FORMATION_ACT_DEACTIVATE
+    COIN_FORMATION_ACT_DEACTIVATE,
 };
 
 /* Coin Inside Boo */
@@ -375,36 +376,36 @@ enum oBehParam1stByteCoinInsideBoo {
 };
 enum oActionsCoinInsideBoo {
     COIN_INSIDE_BOO_ACT_CARRIED,
-    COIN_INSIDE_BOO_ACT_DROPPED
+    COIN_INSIDE_BOO_ACT_DROPPED,
 };
 
 /* 1-Up Mushroom */
 enum oBehParams2ndByte1UpMushroom {
     MUSHROOM_BP_REQUIRES_NONE,
     MUSHROOM_BP_REQUIRES_BOWSER_1,
-    MUSHROOM_BP_REQUIRES_BOWSER_2
+    MUSHROOM_BP_REQUIRES_BOWSER_2,
 };
 enum oActions1UpMushroom {
     MUSHROOM_ACT_INIT,
     MUSHROOM_ACT_MOVING,
     MUSHROOM_ACT_DISAPPEARING,
-    MUSHROOM_ACT_LOOP_IN_AIR
+    MUSHROOM_ACT_LOOP_IN_AIR,
 };
 
 /* Bob-omb */
 enum oBehParams2ndByteBobOmb {
     BOBOMB_BP_STYPE_GENERIC,
-    BOBOMB_BP_STYPE_STATIONARY
+    BOBOMB_BP_STYPE_STATIONARY,
 };
 enum oActionsBobOmb {
     BOBOMB_ACT_PATROL,
     BOBOMB_ACT_LAUNCHED,
     BOBOMB_ACT_CHASE_MARIO,
-    BOBOMB_ACT_EXPLODE
+    BOBOMB_ACT_EXPLODE,
 };
-enum AnimIDsBobOmb {
+enum animIDsBobOmb {
     BOBOMB_ANIM_WALKING,
-    BOBOMB_ANIM_HELD
+    BOBOMB_ANIM_HELD,
 };
 
 /* Bob-omb Buddy */
@@ -412,13 +413,13 @@ enum oBehParams2ndByteBobOmbBuddy {
     BOBOMB_BUDDY_BP_STYPE_GENERIC,
     BOBOMB_BUDDY_BP_STYPE_BOB_GRASS_KBB,
     BOBOMB_BUDDY_BP_STYPE_BOB_CANNON_KBB,
-    BOBOMB_BUDDY_BP_STYPE_BOB_GRASS
+    BOBOMB_BUDDY_BP_STYPE_BOB_GRASS,
 };
 enum oActionsBobOmbBuddy {
     BOBOMB_BUDDY_ACT_IDLE,
     BOBOMB_BUDDY_ACT_1,
     BOBOMB_BUDDY_ACT_TURN_TO_TALK,
-    BOBOMB_BUDDY_ACT_TALK
+    BOBOMB_BUDDY_ACT_TALK,
 };
 enum oBobombBuddyRoles {
     BOBOMB_BUDDY_ROLE_ADVICE,
@@ -428,24 +429,24 @@ enum oBobombBuddyCannonStatuses {
     BOBOMB_BUDDY_CANNON_UNOPENED,
     BOBOMB_BUDDY_CANNON_OPENING,
     BOBOMB_BUDDY_CANNON_OPENED,
-    BOBOMB_BUDDY_CANNON_STOP_TALKING
+    BOBOMB_BUDDY_CANNON_STOP_TALKING,
 };
 enum oBobombBuddyHasTalkedToMarioStates {
     BOBOMB_BUDDY_HAS_NOT_TALKED,
     BOBOMB_BUDDY_TALKED_STATE_UNUSED,
-    BOBOMB_BUDDY_HAS_TALKED
+    BOBOMB_BUDDY_HAS_TALKED,
 };
 
 /* Bowser */
 enum oBehParams2ndByteBowser {
     BOWSER_BP_BITDW,
     BOWSER_BP_BITFS,
-    BOWSER_BP_BITS
+    BOWSER_BP_BITS,
 };
 enum oActionsBowserTail {
     BOWSER_ACT_TAIL_DEFAULT,
     BOWSER_ACT_TAIL_THROWN,
-    BOWSER_ACT_TAIL_TOUCHED_MARIO
+    BOWSER_ACT_TAIL_TOUCHED_MARIO,
 };
 enum oActionsBowser {
     BOWSER_ACT_DEFAULT,
@@ -472,7 +473,7 @@ enum oActionsBowser {
 enum oAnimStatesBowser {
     BOWSER_ANIM_STATE_OPAQUE      = TRANSPARENCY_ANIM_STATE_OPAQUE,
     BOWSER_ANIM_STATE_TRANSPARENT = TRANSPARENCY_ANIM_STATE_TRANSPARENT,
-    BOWSER_ANIM_STATE_INVISIBLE   = 0x02,
+    BOWSER_ANIM_STATE_INVISIBLE   = 2,
 };
 enum animIDsBowser {
     BOWSER_ANIM_STAND_UP,
@@ -506,26 +507,26 @@ enum animIDsBowser {
 enum oBowserCamActions {
     BOWSER_CAM_ACT_IDLE,
     BOWSER_CAM_ACT_WALK,
-    BOWSER_CAM_ACT_END
+    BOWSER_CAM_ACT_END,
 };
 enum oBowserStatuses {
-    BOWSER_STATUS_ANGLE_MARIO  = (1 <<  1), // 0x00000002
-    BOWSER_STATUS_ANGLE_CENTER = (1 <<  2), // 0x00000004
-    BOWSER_STATUS_DIST_MARIO   = (1 <<  3), // 0x00000008
-    BOWSER_STATUS_DIST_CENTER  = (1 <<  4), // 0x00000010
-    BOWSER_STATUS_BIG_JUMP     = (1 << 16), // 0x00010000
-    BOWSER_STATUS_FIRE_SKY     = (1 << 17), // 0x00020000
-    BOWSER_STATUS_MASK         = 0xFF
+    BOWSER_STATUS_ANGLE_MARIO  = BIT( 1), // 0x00000002
+    BOWSER_STATUS_ANGLE_CENTER = BIT( 2), // 0x00000004
+    BOWSER_STATUS_DIST_MARIO   = BIT( 3), // 0x00000008
+    BOWSER_STATUS_DIST_CENTER  = BIT( 4), // 0x00000010
+    BOWSER_STATUS_BIG_JUMP     = BIT(16), // 0x00010000
+    BOWSER_STATUS_FIRE_SKY     = BIT(17), // 0x00020000
+    BOWSER_STATUS_MASK         = 0xFF,
 };
 enum oBowserGrabbedStatuses {
     BOWSER_GRAB_STATUS_NONE,
     BOWSER_GRAB_STATUS_GRABBED,
-    BOWSER_GRAB_STATUS_HOLDING
+    BOWSER_GRAB_STATUS_HOLDING,
 };
     /* oSubAction */
 enum oSubActionBowserActThrown { // BOWSER_ACT_THROWN
     BOWSER_SUB_ACT_THROWN_BOUNCE,
-    BOWSER_SUB_ACT_THROWN_STOP
+    BOWSER_SUB_ACT_THROWN_STOP,
 };
 enum oSubActionBowserActDead { // BOWSER_ACT_DEAD
     BOWSER_SUB_ACT_DEAD_FLY_BACK,
@@ -534,241 +535,267 @@ enum oSubActionBowserActDead { // BOWSER_ACT_DEAD
     BOWSER_SUB_ACT_DEAD_DEFAULT_END,
     BOWSER_SUB_ACT_DEAD_DEFAULT_END_OVER,
     BOWSER_SUB_ACT_DEAD_FINAL_END = 0xA,
-    BOWSER_SUB_ACT_DEAD_FINAL_END_OVER
+    BOWSER_SUB_ACT_DEAD_FINAL_END_OVER,
 };
 enum oSubActionBowserActIntroWalk { // BOWSER_ACT_INTRO_WALK
     BOWSER_SUB_ACT_INTRO_WALK_LOOK_UP,
     BOWSER_SUB_ACT_INTRO_WALK_SLOWLY,
-    BOWSER_SUB_ACT_INTRO_WALK_STOP
+    BOWSER_SUB_ACT_INTRO_WALK_STOP,
 };
 enum oSubActionBowserActChargeMario { // BOWSER_ACT_CHARGE_MARIO
     BOWSER_SUB_ACT_CHARGE_START,
     BOWSER_SUB_ACT_CHARGE_RUN,
     BOWSER_SUB_ACT_CHARGE_END,
-    BOWSER_SUB_ACT_CHARGE_SLIP
+    BOWSER_SUB_ACT_CHARGE_SLIP,
 };
 enum oSubActionBowserActTeleport { // BOWSER_ACT_TELEPORT
     BOWSER_SUB_ACT_TELEPORT_START,
     BOWSER_SUB_ACT_TELEPORT_MOVE,
-    BOWSER_SUB_ACT_TELEPORT_STOP
+    BOWSER_SUB_ACT_TELEPORT_STOP,
 };
 enum oSubActionBowserActSpitFireOntoFloor { // BOWSER_ACT_SPIT_FIRE_ONTO_FLOOR
     BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_START,
-    BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_STOP
+    BOWSER_SUB_ACT_SPIT_FIRE_FLOOR_STOP,
 };
 enum oSubActionBowserActHitEdge { // BOWSER_ACT_HIT_EDGE
     BOWSER_SUB_ACT_HIT_EDGE_START,
-    BOWSER_SUB_ACT_HIT_EDGE_STOP
+    BOWSER_SUB_ACT_HIT_EDGE_STOP,
 };
 enum oSubActionBowserActTurnFromEdge { // BOWSER_ACT_TURN_FROM_EDGE
     BOWSER_SUB_ACT_TURN_FROM_EDGE_START,
     BOWSER_SUB_ACT_TURN_FROM_EDGE_STOP,
-    BOWSER_SUB_ACT_TURN_FROM_EDGE_END
+    BOWSER_SUB_ACT_TURN_FROM_EDGE_END,
 };
 enum oSubActionBowserActHitMine { // BOWSER_ACT_HIT_MINE
     BOWSER_SUB_ACT_HIT_MINE_START,
     BOWSER_SUB_ACT_HIT_MINE_FALL,
-    BOWSER_SUB_ACT_HIT_MINE_STOP
+    BOWSER_SUB_ACT_HIT_MINE_STOP,
 };
 enum oSubActionBowserActJumpOntoStage { // BOWSER_ACT_JUMP_ONTO_STAGE
     BOWSER_SUB_ACT_JUMP_ON_STAGE_IDLE,
     BOWSER_SUB_ACT_JUMP_ON_STAGE_START,
     BOWSER_SUB_ACT_JUMP_ON_STAGE_LAND,
-    BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP
+    BOWSER_SUB_ACT_JUMP_ON_STAGE_STOP,
 };
 enum oSubActionBowserActBigJump { // BOWSER_ACT_BIG_JUMP
     BOWSER_SUB_ACT_BIG_JUMP_START,
     BOWSER_SUB_ACT_BIG_JUMP_LAND,
-    BOWSER_SUB_ACT_BIG_JUMP_STOP
+    BOWSER_SUB_ACT_BIG_JUMP_STOP,
 };
 enum oSubActionBowserActWalkToMario { // BOWSER_ACT_WALK_TO_MARIO
     BOWSER_SUB_ACT_WALK_TO_MARIO_START,
     BOWSER_SUB_ACT_WALK_TO_MARIO_WALKING,
-    BOWSER_SUB_ACT_WALK_TO_MARIO_STOP
+    BOWSER_SUB_ACT_WALK_TO_MARIO_STOP,
 };
 enum oSubActionBowserActQuickJump { // BOWSER_ACT_QUICK_JUMP
     BOWSER_SUB_ACT_QUICK_JUMP_START,
     BOWSER_SUB_ACT_QUICK_JUMP_LAND,
-    BOWSER_SUB_ACT_QUICK_JUMP_STOP
+    BOWSER_SUB_ACT_QUICK_JUMP_STOP,
 };
 
 /* Bowser BITS Platform */
-    /* oAction */
-    #define BOWSER_BITS_PLAT_ACT_START                      0x0
-    #define BOWSER_BITS_PLAT_ACT_CHECK                      0x1
-    #define BOWSER_BITS_PLAT_ACT_FALL                       0x2
+enum oActionsBowserBITSPlatform {
+    BOWSER_BITS_PLAT_ACT_START,
+    BOWSER_BITS_PLAT_ACT_CHECK,
+    BOWSER_BITS_PLAT_ACT_FALL,
+};
     /* oSubAction */
-        /* BOWSER_BITS_PLAT_ACT_CHECK */
-    #define BOWSER_BITS_PLAT_SUB_ACT_CHECK_RESET_TIMER      0x0
-    #define BOWSER_BITS_PLAT_SUB_ACT_CHECK_DEBUG_FALL       0x1
+enum oSubActionBowserBITSPlatformActCheck { // BOWSER_BITS_PLAT_ACT_CHECK
+    BOWSER_BITS_PLAT_SUB_ACT_CHECK_RESET_TIMER,
+    BOWSER_BITS_PLAT_SUB_ACT_CHECK_DEBUG_FALL,
+};
 
 /* Bowser Flame */
-    /* oAction */
-    #define BOWSER_FLAME_ACT_FLOATING                       0x0
-    #define BOWSER_FLAME_ACT_LANDED                         0x1
+enum oActionsBowserFlame {
+    BOWSER_FLAME_ACT_FLOATING,
+    BOWSER_FLAME_ACT_LANDED,
+};
 
 /* Blue Bowser Flame */
-    /* oBehParams2ndByte */
-    #define BOWSER_FLAME_BLUE_BP_SPAWN_RED_FLAMES           0x0
-    #define BOWSER_FLAME_BLUE_BP_SPAWN_BLUE_FLAMES          0x1
+enum oBehParams2ndByteBlueBowserFlame {
+    BOWSER_FLAME_BLUE_BP_SPAWN_RED_FLAMES,
+    BOWSER_FLAME_BLUE_BP_SPAWN_BLUE_FLAMES,
+};
 
 /* Bowser Floating Flame */
-    /* oBehParams2ndByte */
-    #define BOWSER_FLOATING_FLAME_SPAWN_RED_FLAME           0x0
-    #define BOWSER_FLOATING_FLAME_SPAWN_BLUE_FLAME_1        0x1
-    #define BOWSER_FLOATING_FLAME_SPAWN_BLUE_FLAME_2        0x2
+enum oBehParams2ndByteBowserFloatingFlame {
+    BOWSER_FLOATING_FLAME_SPAWN_RED_FLAME,
+    BOWSER_FLOATING_FLAME_SPAWN_BLUE_FLAME_1,
+    BOWSER_FLOATING_FLAME_SPAWN_BLUE_FLAME_2,
+};
 
 /* Bowser Key */
-    /* oAction */
-    #define BOWSER_KEY_ACT_BOUNCING                         0x0
-    #define BOWSER_KEY_ACT_LANDED                           0x1
+enum oActionsBowserKey {
+    BOWSER_KEY_ACT_BOUNCING,
+    BOWSER_KEY_ACT_LANDED,
+};
 
 /* Bowser Key Cutscene */
-    /* Animations */
-    #define BOWSER_KEY_CUTSCENE_ANIM_UNLOCK_DOOR            0x0
-    #define BOWSER_KEY_CUTSCENE_ANIM_COURSE_EXIT            0x1
+enum animIDsBowserKeyCutscene {
+    BOWSER_KEY_CUTSCENE_ANIM_UNLOCK_DOOR,
+    BOWSER_KEY_CUTSCENE_ANIM_COURSE_EXIT,
+};
 
 /* Fish Spawer */
-    /* oBehParams2ndByte */
-    #define FISH_SPAWNER_BP_MANY_BLUE                       0x0
-    #define FISH_SPAWNER_BP_FEW_BLUE                        0x1
-    #define FISH_SPAWNER_BP_MANY_CYAN                       0x2
-    #define FISH_SPAWNER_BP_FEW_CYAN                        0x3
-    /* oAction */
-    #define FISH_SPAWNER_ACT_SPAWN                          0x0
-    #define FISH_SPAWNER_ACT_IDLE                           0x1
-    #define FISH_SPAWNER_ACT_RESPAWN                        0x2
+enum oBehParams2ndByteFishSpawner {
+    FISH_SPAWNER_BP_MANY_BLUE,
+    FISH_SPAWNER_BP_FEW_BLUE,
+    FISH_SPAWNER_BP_MANY_CYAN,
+    FISH_SPAWNER_BP_FEW_CYAN,
+};
+enum oActionsFishSpawner {
+    FISH_SPAWNER_ACT_SPAWN,
+    FISH_SPAWNER_ACT_IDLE,
+    FISH_SPAWNER_ACT_RESPAWN,
+};
 
 /* Fish */
-    /* oAction */
-    #define FISH_ACT_INIT                                   0x0
-    #define FISH_ACT_ROAM                                   0x1
-    #define FISH_ACT_FLEE                                   0x2
-    /* Animations */
-    #define FISH_ANIM_DEFAULT                               0x0
+enum oActionsFish {
+    FISH_ACT_INIT,
+    FISH_ACT_ROAM,
+    FISH_ACT_FLEE,
+};
+enum animIDsFish {
+    FISH_ANIM_DEFAULT,
+};
 
 /* Blue Fish Spawner */
-    /* oAction: bhv_blue_fish_spawn_loop */
-    #define BLUE_FISH_ACT_SPAWN                             0x0
-    #define BLUE_FISH_ACT_ROOM                              0x1
-    #define BLUE_FISH_ACT_DUPLICATE                         0x2
+enum oActionsBlueFishSpawner { // bhv_blue_fish_spawn_loop
+    BLUE_FISH_ACT_SPAWN,
+    BLUE_FISH_ACT_ROOM,
+    BLUE_FISH_ACT_DUPLICATE,
+};
 
 /* Blue Fish */
-    /* oAction */
-    #define BLUE_FISH_ACT_DIVE                              0x0
-    #define BLUE_FISH_ACT_TURN                              0x1
-    #define BLUE_FISH_ACT_ASCEND                            0x2
-    #define BLUE_FISH_ACT_TURN_BACK                         0x3
-    /* Animations */
-    #define BLUE_FISH_ANIM_DEFAULT                          0x0
-
-/* Blue Fish */
-    /* oAction */
-    #define BLUE_FISH_ACT_DIVE                              0x0
-    #define BLUE_FISH_ACT_TURN                              0x1
-    #define BLUE_FISH_ACT_ASCEND                            0x2
-    #define BLUE_FISH_ACT_TURN_BACK                         0x3
-    /* Animations */
-    #define BLUE_FISH_ANIM_DEFAULT                          0x0
+enum oActionsBlueFish {
+    BLUE_FISH_ACT_DIVE,
+    BLUE_FISH_ACT_TURN,
+    BLUE_FISH_ACT_ASCEND,
+    BLUE_FISH_ACT_TURN_BACK,
+};
+enum animIDsBlueFish {
+    BLUE_FISH_ANIM_DEFAULT,
+};
 
 /* Cheep Cheep Spawner */
-    /* oAction */
-    #define BUB_SPAWNER_ACT_SPAWN_BUBS                      0x0
-    #define BUB_SPAWNER_ACT_IDLE                            0x1
-    #define BUB_SPAWNER_ACT_REMOVE_BUBS                     0x2
-    #define BUB_SPAWNER_ACT_RESET                           0x3
+enum oActionsBubSpawner {
+    BUB_SPAWNER_ACT_SPAWN_BUBS,
+    BUB_SPAWNER_ACT_IDLE,
+    BUB_SPAWNER_ACT_REMOVE_BUBS,
+    BUB_SPAWNER_ACT_RESET,
+};
 
 /* Cheep Cheep */
-    /* oAction */
-    #define BUB_ACT_INIT                                    0x0
-    #define BUB_ACT_SWIMMING_TOWARDS_MARIO                  0x1
-    #define BUB_ACT_SWIMMING_AWAY_FROM_MARIO                0x2
-    /* Animations */
-    #define BUB_ANIM_SWIM                                   0x0
+enum oActionsBub {
+    BUB_ACT_INIT,
+    BUB_ACT_SWIMMING_TOWARDS_MARIO,
+    BUB_ACT_SWIMMING_AWAY_FROM_MARIO,
+};
+enum animIDsBub {
+    BUB_ANIM_SWIM,
+};
 
 /* Bubba */
-    /* oAction */
-    #define BUBBA_ACT_IDLE                                  0x0
-    #define BUBBA_ACT_ATTACK                                0x1
-    /* oAnimState */
-    #define BUBBA_ANIM_STATE_CLOSED_MOUTH                   0x0
-    #define BUBBA_ANIM_STATE_OPEN_MOUTH                     0x1
+enum oActionsBubba {
+    BUBBA_ACT_IDLE,
+    BUBBA_ACT_ATTACK,
+};
+enum oAnimStatesBubba {
+    BUBBA_ANIM_STATE_CLOSED_MOUTH,
+    BUBBA_ANIM_STATE_OPEN_MOUTH,
+};
 
 /* Seaweed */
-    /* Animations */
-    #define SEAWEED_ANIM_WAVE                               0x0
+enum animIDsSeaweed {
+    SEAWEED_ANIM_WAVE,
+};
 
 /* Clam */
-    /* oAction */
-    #define CLAM_ACT_CLOSING                                0x0
-    #define CLAM_ACT_OPENING                                0x1
-    /* Animations */
-    #define CLAM_ANIM_CLOSING                               0x0
-    #define CLAM_ANIM_OPENING                               0x1
+enum oActionsClam {
+    CLAM_ACT_CLOSING,
+    CLAM_ACT_OPENING,
+};
+enum animIDsClam {
+    CLAM_ANIM_CLOSING,
+    CLAM_ANIM_OPENING,
+};
 
 /* Purple Switch */
-    /* oBehParams2ndByte */
-    #define PURPLE_SWITCH_BP_NO_TICK                        0x0
-    #define PURPLE_SWITCH_BP_ANIMATES                       0x1
-    #define PURPLE_SWITCH_BP_REVEAL_HIDDEN                  0x2
-    /* oAction */
-    #define PURPLE_SWITCH_ACT_IDLE                          0x0
-    #define PURPLE_SWITCH_ACT_PRESSED                       0x1
-    #define PURPLE_SWITCH_ACT_TICKING                       0x2
-    #define PURPLE_SWITCH_ACT_UNPRESSED                     0x3
-    #define PURPLE_SWITCH_ACT_WAIT_FOR_MARIO_TO_GET_OFF     0x4
+enum oBehParams2ndBytePurpleSwitch {
+    PURPLE_SWITCH_BP_NO_TICK,
+    PURPLE_SWITCH_BP_ANIMATES,
+    PURPLE_SWITCH_BP_REVEAL_HIDDEN,
+};
+enum oActionsPurpleSwitch {
+    PURPLE_SWITCH_ACT_IDLE,
+    PURPLE_SWITCH_ACT_PRESSED,
+    PURPLE_SWITCH_ACT_TICKING,
+    PURPLE_SWITCH_ACT_UNPRESSED,
+    PURPLE_SWITCH_ACT_WAIT_FOR_MARIO_TO_GET_OFF,
+};
 
 /* Animates on Floor Switch */
-    /* oBehParams2ndByte */
-    #define ANIMATES_ON_FLOOR_SWITCH_BP_BITS_STAIRS         0x0
-    #define ANIMATES_ON_FLOOR_SWITCH_BP_BITDW_STAIRS        0x1
-    #define ANIMATES_ON_FLOOR_SWITCH_BP_RR_TRIGANGLES       0x2
+enum oBehParams2ndByteAnimatesOnFloorSwitch {
+    ANIMATES_ON_FLOOR_SWITCH_BP_BITS_STAIRS,
+    ANIMATES_ON_FLOOR_SWITCH_BP_BITDW_STAIRS,
+    ANIMATES_ON_FLOOR_SWITCH_BP_RR_TRIGANGLES,
+};
 
 /* Openable Grill */
-    /* oBehParams2ndByte */
-    #define OPENABLE_GRILL_BP_BOB                           0x0
-    #define OPENABLE_GRILL_BP_HMC                           0x1
-    /* oAction */
-    #define OEPNABLE_GRILL_ACT_SPAWN                        0x0
-    #define OEPNABLE_GRILL_IDLE_CLOSED                      0x1
-    #define OEPNABLE_GRILL_OPENING                          0x2
-    #define OEPNABLE_GRILL_IDLE_OPEN                        0x3
+enum oBehParams2ndByteOpenableGrill {
+    OPENABLE_GRILL_BP_BOB,
+    OPENABLE_GRILL_BP_HMC,
+};
+enum oActionsOpenableGrill {
+    OEPNABLE_GRILL_ACT_SPAWN,
+    OEPNABLE_GRILL_IDLE_CLOSED,
+    OEPNABLE_GRILL_OPENING,
+    OEPNABLE_GRILL_IDLE_OPEN,
+};
 
 /* Openable Grill Door */
-    /* oBehParams2ndByte */
-    #define OPENABLE_GRILL_DOOR_BP_SIDE_FLIPPED            -0x1
-    #define OPENABLE_GRILL_DOOR_BP_SIDE_UNFLIPPED           0x1
-    /* oAction */
-    #define OPENABLE_GRILL_DOOR_ACT_CLOSED                  0x0
-    #define OPENABLE_GRILL_DOOR_ACT_OPENING                 0x1
-    #define OPENABLE_GRILL_DOOR_ACT_OPEN                    0x2
+enum oBehParams2ndByteOpenableGrillDoor {
+    OPENABLE_GRILL_DOOR_BP_SIDE_FLIPPED   = -1,
+    OPENABLE_GRILL_DOOR_BP_SIDE_UNFLIPPED =  1,
+};
+enum oActionsOpenableGrillDoor {
+    OPENABLE_GRILL_DOOR_ACT_CLOSED,
+    OPENABLE_GRILL_DOOR_ACT_OPENING,
+    OPENABLE_GRILL_DOOR_ACT_OPEN,
+};
 
 /* Breakable Box */
-    /* oBehParams2ndByte */
-    #define BREAKABLE_BOX_BP_NO_COINS                       0x0
-    #define BREAKABLE_BOX_BP_3_COINS                        0x1
-    #define BREAKABLE_BOX_BP_5_COINS                        0x2
-    #define BREAKABLE_BOX_BP_LARGE                          0x3
-    /* oAction */
-    #define BREAKABLE_BOX_ACT_HIDDEN                        0x0
-    #define BREAKABLE_BOX_ACT_ACTIVE                        0x1
-    #define BREAKABLE_BOX_ACT_BROKEN                        0x2
-    /* oAnimState */
-    #define BREAKABLE_BOX_ANIM_STATE_CRAZY_BOX              0x0
-    #define BREAKABLE_BOX_ANIM_STATE_CORK_BOX               0x1
+enum oBehParams2ndByteBreakableBox {
+    BREAKABLE_BOX_BP_NO_COINS,
+    BREAKABLE_BOX_BP_3_COINS,
+    BREAKABLE_BOX_BP_5_COINS,
+    BREAKABLE_BOX_BP_LARGE,
+};
+enum oActionsBreakableBox {
+    BREAKABLE_BOX_ACT_HIDDEN,
+    BREAKABLE_BOX_ACT_ACTIVE,
+    BREAKABLE_BOX_ACT_BROKEN,
+};
+enum oAnimStatesBreakableBox {
+    BREAKABLE_BOX_ANIM_STATE_CRAZY_BOX,
+    BREAKABLE_BOX_ANIM_STATE_CORK_BOX,
+};
 
 /* Small Breakable Box */
-    /* oAction */
-    #define BREAKABLE_BOX_SMALL_ACT_MOVE                    0x0
+enum oActionsSmallBreakableBox {
+    BREAKABLE_BOX_SMALL_ACT_MOVE,
+};
 
 /* Jumping Box */
-    /* oAction */
-    #define JUMPING_BOX_ACT_IDLE                            0x0
-    #define JUMPING_BOX_ACT_DROPPED                         0x1
+enum oActionsJumpingBox {
+    JUMPING_BOX_ACT_IDLE,
+    JUMPING_BOX_ACT_DROPPED,
+};
     /* oSubAction */
-        /* JUMPING_BOX_ACT_IDLE */
-    #define JUMPING_BOX_SUB_ACT_IDLE_BOUNCING               0x0
-    #define JUMPING_BOX_SUB_ACT_IDLE_RESET_TIMER            0x1
+enum oSubActionJumpingBoxActIdle { // JUMPING_BOX_ACT_IDLE
+    JUMPING_BOX_SUB_ACT_IDLE_BOUNCING,
+    JUMPING_BOX_SUB_ACT_IDLE_RESET_TIMER,
+};
 
 /* Exclamation Box */
 enum ExclamationBoxContentsList { // oBehParams2ndByte, ExclamationBoxContents->id
@@ -832,30 +859,34 @@ enum oActionsMarioCap {
 };
 
 /* Koopa Shell */
-    /* oAction */
-    #define KOOPA_SHELL_ACT_MARIO_NOT_RIDING                0x0
-    #define KOOPA_SHELL_ACT_MARIO_RIDING                    0x1
+enum oActionsKoopaShell {
+    KOOPA_SHELL_ACT_MARIO_NOT_RIDING,
+    KOOPA_SHELL_ACT_MARIO_RIDING,
+};
 
 /* Koopa Shell Underwater */
-    /* oAction */
-    #define KOOPA_SHELL_UNDERWATER_ACT_DEFAULT              0x0
+enum oActionsKoopaShellUnderwater {
+    KOOPA_SHELL_UNDERWATER_ACT_DEFAULT,
+};
 
 /* Cannon Trap Door */
-    /* oAction */
-    #define CANNON_TRAP_DOOR_ACT_CLOSED                     0x0
-    #define CANNON_TRAP_DOOR_ACT_CAM_ZOOM                   0x1
-    #define CANNON_TRAP_DOOR_ACT_OPENING                    0x2
-    #define CANNON_TRAP_DOOR_ACT_OPEN                       0x3
+enum oActionsCannonTrapDoor {
+    CANNON_TRAP_DOOR_ACT_CLOSED,
+    CANNON_TRAP_DOOR_ACT_CAM_ZOOM,
+    CANNON_TRAP_DOOR_ACT_OPENING,
+    CANNON_TRAP_DOOR_ACT_OPEN,
+};
 
 /* Opened Cannon */
-    /* oAction */
-    #define OPENED_CANNON_ACT_IDLE                          0x0
-    #define OPENED_CANNON_ACT_READY                         0x1
-    #define OPENED_CANNON_ACT_SHOOT                         0x2
-    #define OPENED_CANNON_ACT_RESETTING                     0x3
-    #define OPENED_CANNON_ACT_RISING                        0x4
-    #define OPENED_CANNON_ACT_RAISE_BARREL                  0x5
-    #define OPENED_CANNON_ACT_TURNING_YAW                   0x6
+enum oActionsOpenedCannon {
+    OPENED_CANNON_ACT_IDLE,
+    OPENED_CANNON_ACT_READY,
+    OPENED_CANNON_ACT_SHOOT,
+    OPENED_CANNON_ACT_RESETTING,
+    OPENED_CANNON_ACT_RISING,
+    OPENED_CANNON_ACT_RAISE_BARREL,
+    OPENED_CANNON_ACT_TURNING_YAW,
+};
 
 /* Door */
 enum oBehParams1stByteKeyDoor {
@@ -885,95 +916,115 @@ enum oActionsStarDoor {
     STAR_DOOR_ACT_CLOSING,
     STAR_DOOR_ACT_RESET,
 };
+
 /* Castle Trap Door */
-    /* oAction */
-    #define CASTLE_FLOOR_TRAP_ACT_OPEN_DETECT               0x0
-    #define CASTLE_FLOOR_TRAP_ACT_OPEN                      0x1
-    #define CASTLE_FLOOR_TRAP_ACT_CLOSE_DETECT              0x2
-    #define CASTLE_FLOOR_TRAP_ACT_CLOSE                     0x3
-    #define CASTLE_FLOOR_TRAP_ACT_ROTATE                    0x4
+enum oActionsCastleTrapDoor {
+    CASTLE_FLOOR_TRAP_ACT_OPEN_DETECT,
+    CASTLE_FLOOR_TRAP_ACT_OPEN,
+    CASTLE_FLOOR_TRAP_ACT_CLOSE_DETECT,
+    CASTLE_FLOOR_TRAP_ACT_CLOSE,
+    CASTLE_FLOOR_TRAP_ACT_ROTATE,
+};
 
 /* Castle Flag */
-    /* Animations */
-    #define CASTLE_FLAG_ANIM_WAVE                           0x0
+enum animIDsCastleFlag {
+    CASTLE_FLAG_ANIM_WAVE,
+};
 
 /* Homing Amp */
-    /* oAction */
-    #define HOMING_AMP_ACT_INACTIVE                         0x0
-    #define HOMING_AMP_ACT_APPEAR                           0x1
-    #define HOMING_AMP_ACT_CHASE                            0x2
-    #define HOMING_AMP_ACT_GIVE_UP                          0x3
-    #define HOMING_AMP_ACT_ATTACK_COOLDOWN                  0x4
+enum oActionsHomingAmp {
+    HOMING_AMP_ACT_INACTIVE,
+    HOMING_AMP_ACT_APPEAR,
+    HOMING_AMP_ACT_CHASE,
+    HOMING_AMP_ACT_GIVE_UP,
+    HOMING_AMP_ACT_ATTACK_COOLDOWN,
+};
 
 /* Amp */
-    /* oBehParams2ndByte */
-    #define AMP_BP_ROT_RADIUS_200                           0x0
-    #define AMP_BP_ROT_RADIUS_300                           0x1
-    #define AMP_BP_ROT_RADIUS_400                           0x2
-    #define AMP_BP_ROT_RADIUS_0                             0x3
-    /* oAction */
-    #define AMP_ACT_IDLE                                    0x2
-    #define AMP_ACT_ATTACK_COOLDOWN                         0x4
-    /* oAnimState */
-    #define AMP_ANIM_STATE_OFF                              0x0
-    #define AMP_ANIM_STATE_ON                               0x1
-    /* Animations */
-    #define AMP_ANIM_DEFAULT                                0x0
+enum oBehParams2ndByteAmp {
+    AMP_BP_ROT_RADIUS_200,
+    AMP_BP_ROT_RADIUS_300,
+    AMP_BP_ROT_RADIUS_400,
+    AMP_BP_ROT_RADIUS_0,
+};
+enum oActionsAmp {
+    AMP_ACT_IDLE            = 2,
+    AMP_ACT_ATTACK_COOLDOWN = 4,
+};
+enum oAnimStatesAmp {
+    AMP_ANIM_STATE_OFF,
+    AMP_ANIM_STATE_ON,
+};
+enum animIDsAmp {
+    AMP_ANIM_DEFAULT,
+};
 
 /* Butterfly */
-    /* oAction */
-    #define BUTTERFLY_ACT_RESTING                           0x0
-    #define BUTTERFLY_ACT_FOLLOW_MARIO                      0x1
-    #define BUTTERFLY_ACT_RETURN_HOME                       0x2
-    /* Animations */
-    #define BUTTERFLY_ANIM_FLYING                           0x0
-    #define BUTTERFLY_ANIM_RESTING                          0x1
+enum oActionsButterfly {
+    BUTTERFLY_ACT_RESTING,
+    BUTTERFLY_ACT_FOLLOW_MARIO,
+    BUTTERFLY_ACT_RETURN_HOME,
+};
+enum animIDsButterfly {
+    BUTTERFLY_ANIM_FLYING,
+    BUTTERFLY_ANIM_RESTING,
+};
 
 /* Hoot */
-    /* oAction */
-    #define HOOT_ACT_ASCENT                                 0x0
-    #define HOOT_ACT_CARRY                                  0x1
-    #define HOOT_ACT_TIRED                                  0x2
-    /* oHootAvailability */
-    #define HOOT_AVAIL_ASLEEP_IN_TREE                       0x0
-    #define HOOT_AVAIL_WANTS_TO_TALK                        0x1
-    #define HOOT_AVAIL_READY_TO_FLY                         0x2
-    /* Animations */
-    #define HOOT_ANIM_DEFAULT                               0x0
-    #define HOOT_ANIM_HOLDING_MARIO                         0x1
+enum oActionsHoot {
+    HOOT_ACT_ASCENT,
+    HOOT_ACT_CARRY,
+    HOOT_ACT_TIRED,
+};
+enum oHootAvailabilityStates {
+    HOOT_AVAIL_ASLEEP_IN_TREE,
+    HOOT_AVAIL_WANTS_TO_TALK,
+    HOOT_AVAIL_READY_TO_FLY,
+};
+enum animIDsHoot {
+    HOOT_ANIM_DEFAULT,
+    HOOT_ANIM_HOLDING_MARIO,
+};
 
 /* Bully (all variants) */
-    /* oBehParams2ndByte */
-    #define BULLY_BP_SIZE_SMALL                             0x0
-    #define BULLY_BP_SIZE_BIG                               0x1
-    /* oAction */
-    #define BULLY_ACT_PATROL                                0x0
-    #define BULLY_ACT_CHASE_MARIO                           0x1
-    #define BULLY_ACT_KNOCKBACK                             0x2
-    #define BULLY_ACT_BACK_UP                               0x3
-    #define BULLY_ACT_INACTIVE                              0x4
-    #define BULLY_ACT_ACTIVATE_AND_FALL                     0x5
-    /* oBullySubtype */
-    #define BULLY_STYPE_GENERIC                             0x00
-    #define BULLY_STYPE_MINION                              0x01
-    #define BULLY_STYPE_CHILL                               0x10
-    /* Animations */
-    #define BULLY_ANIM_WALKING                              0x0
-    #define BULLY_ANIM_RUNNING                              0x1
-    #define BULLY_ANIM_UNUSED                               0x2
-    #define BULLY_ANIM_BOAST                                0x3
+enum oBehParams2ndByteBully {
+    BULLY_BP_SIZE_SMALL,
+    BULLY_BP_SIZE_BIG,
+};
+enum oActionsBully {
+    BULLY_ACT_PATROL,
+    BULLY_ACT_CHASE_MARIO,
+    BULLY_ACT_KNOCKBACK,
+    BULLY_ACT_BACK_UP,
+    BULLY_ACT_INACTIVE,
+    BULLY_ACT_ACTIVATE_AND_FALL,
+};
+enum oBullySubtypes {
+    BULLY_STYPE_GENERIC = 0x00,
+    BULLY_STYPE_MINION  = 0x01,
+    BULLY_STYPE_CHILL   = 0x10,
+};
+enum animIDsBully {
+    BULLY_ANIM_WALKING,
+    BULLY_ANIM_RUNNING,
+    BULLY_ANIM_UNUSED,
+    BULLY_ANIM_BOAST,
+};
 
 /* Water Ring (all variants) */
-    /* oAction */
-    #define WATER_RING_ACT_NOT_COLLECTED                    0x0
-    #define WATER_RING_ACT_COLLECTED                        0x1
-    /* Animations */
-    #define WATER_RING_ANIM_WOBBLE                          0x0
+enum oActionsWaterRing {
+    WATER_RING_ACT_NOT_COLLECTED,
+    WATER_RING_ACT_COLLECTED,
+};
+enum animIDsWaterRing {
+    WATER_RING_ANIM_WOBBLE,
+};
 
 /* Jet Stream Water Ring Spawner */
-    /* oAction */
-    #define JS_RING_SPAWNER_ACT_ACTIVE                      0x0
-    #define JS_RING_SPAWNER_ACT_INACTIVE                    0x1
+enum oActionsJetStreamWaterRingSpawner {
+    JS_RING_SPAWNER_ACT_ACTIVE,
+    JS_RING_SPAWNER_ACT_INACTIVE,
+};
 
 /* Star General */
 enum oBehParam1stByteStarAct { // BPARAM1
@@ -987,9 +1038,10 @@ enum oBehParam1stByteStarAct { // BPARAM1
 };
 
 /* Hidden Star */
-    /* oAction */
-    #define HIDDEN_STAR_ACT_INACTIVE                        0x0
-    #define HIDDEN_STAR_ACT_ACTIVE                          0x1
+enum oActionsHiddenStar {
+    HIDDEN_STAR_ACT_INACTIVE,
+    HIDDEN_STAR_ACT_ACTIVE,
+};
 
 /* Spawn Star stay at position cutscene */
     /* oBehParams2ndByte */
@@ -1138,9 +1190,10 @@ enum oBehParams1stByteSlidingPlatform { // collisionDataIndex
     /*0x07*/ SLIDING_PLATFORM_BP1_BITDW_SLIDING_PLATFORM,
     /*0x07*/ SLIDING_PLATFORM_BP1_TYPES_MASK = 0x07,
 };
-    /* bparam2 */
-    #define SLIDING_PLATFORM_BP2_LENGTH_MASK                 0x3F
-    #define SLIDING_PLATFORM_BP2_FLAG_INVERTED               (1 << 6)
+enum oBehParams2ndByteSlidingPlatform {
+    SLIDING_PLATFORM_BP2_LENGTH_MASK   = 0x3F,
+    SLIDING_PLATFORM_BP2_FLAG_INVERTED = BIT(6),
+};
 
 /* BITDW Pyramid Platforms */
     /* oAction */
@@ -1422,18 +1475,20 @@ enum animIDsPeach { //! TODO: anim names 0-3 & 6-8
 };
 
 /* Yoshi */
-    /* oAction */
-    #define YOSHI_ACT_IDLE                                  0x0
-    #define YOSHI_ACT_WALK                                  0x1
-    #define YOSHI_ACT_TALK                                  0x2
-    #define YOSHI_ACT_WALK_JUMP_OFF_ROOF                    0x3
-    #define YOSHI_ACT_FINISH_JUMPING_AND_DESPAWN            0x4
-    #define YOSHI_ACT_GIVE_PRESENT                          0x5
-    #define YOSHI_ACT_CREDITS                               0xA
-    /* Animations */
-    #define YOSHI_ANIM_IDLE                                 0x0
-    #define YOSHI_ANIM_WALK                                 0x1
-    #define YOSHI_ANIM_JUMP                                 0x2
+enum oActionsYoshi {
+    YOSHI_ACT_IDLE,
+    YOSHI_ACT_WALK,
+    YOSHI_ACT_TALK,
+    YOSHI_ACT_WALK_JUMP_OFF_ROOF,
+    YOSHI_ACT_FINISH_JUMPING_AND_DESPAWN,
+    YOSHI_ACT_GIVE_PRESENT,
+    YOSHI_ACT_CREDITS = 0xA,
+};
+enum animIDsYoshi {
+    YOSHI_ANIM_IDLE,
+    YOSHI_ANIM_WALK,
+    YOSHI_ANIM_JUMP,
+};
 
 /* Koopa Race end waypoint */
 enum oKoopaRaceEndpointRaceStatuses {
@@ -1564,7 +1619,7 @@ enum animIDsSwoop {
     #define GOOMBA_BP_TRIPLET_FLAG_MASK                     0xFC
 #if defined(FLOOMBAS) && defined(INTRO_FLOOMBAS)
     /* BPARAM3 */
-    #define GOOMBA_BP3_FLOOMBA_MIRRORED_STARTUP_ANIM        (1 << 7)
+    #define GOOMBA_BP3_FLOOMBA_MIRRORED_STARTUP_ANIM        BIT(7)
 #endif
     /* oAction */
     #define GOOMBA_ACT_WALK                                 0x0
@@ -1856,16 +1911,16 @@ enum oActionsPlatformOnTrack {
     PLATFORM_ON_TRACK_ACT_FALL,
 };
 enum oBehParams2ndBytePlatformOnTrack {
-    PLATFORM_ON_TRACK_BP_SPAWN_BALLS     = (1 << 7), // 0x80
+    PLATFORM_ON_TRACK_BP_SPAWN_BALLS     = BIT(7), // 0x80
 
     PLATFORM_ON_TRACK_BP_MASK_TYPE       = 0x70,
     PLATFORM_ON_TRACK_BP_MASK_PATH       = 0x0F,
 };
 enum oBehParams1stBytePlatformOnTrack {
-    PLATFORM_ON_TRACK_BP_RETURN_TO_START = (1 << 0), // 0x1
-    PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR  = (1 << 1), // 0x2
-    PLATFORM_ON_TRACK_BP_DONT_TURN_YAW   = (1 << 2), // 0x4
-    PLATFORM_ON_TRACK_BP_DONT_TURN_ROLL  = (1 << 4), // 0x8
+    PLATFORM_ON_TRACK_BP_RETURN_TO_START = BIT(0), // 0x1
+    PLATFORM_ON_TRACK_BP_DONT_DISAPPEAR  = BIT(1), // 0x2
+    PLATFORM_ON_TRACK_BP_DONT_TURN_YAW   = BIT(2), // 0x4
+    PLATFORM_ON_TRACK_BP_DONT_TURN_ROLL  = BIT(4), // 0x8
 };
 enum oPlatformOnTrackTypes {
     PLATFORM_ON_TRACK_TYPE_CARPET,
@@ -1975,7 +2030,7 @@ enum oAnimStatesPenguin { // geo_switch_tuxie_mother_eyes
     PENGUIN_ANIM_STATE_EYES_ANGRY,
     PENGUIN_ANIM_STATE_EYES_SAD
 };
-enum AnimIDsPenguin { // Animations
+enum animIDsPenguin {
     PENGUIN_ANIM_WALK,
     PENGUIN_ANIM_DIVE_SLIDE,
     PENGUIN_ANIM_STAND_UP,
@@ -2035,9 +2090,10 @@ enum AnimIDsPenguin { // Animations
     #define SL_SNOWMAN_WIND_ACT_BLOWING                     0x2
 
 /* Snow Mound */
-    /* oAction */
-    #define SNOW_MOUND_ACT_MOVE                             0x0
-    #define SNOW_MOUND_ACT_SINK                             0x1
+enum oActionsSnowMound {
+    SNOW_MOUND_ACT_MOVE,
+    SNOW_MOUND_ACT_SINK,
+};
 
 /* Snowman's Head */
 enum oActionsSnowmansHead {
@@ -2058,19 +2114,22 @@ enum oActionsSnowmansBottom {
 };
 
 /* Water Bomb Cannon */
-    /* oBehParams2ndByte */
-    #define WATER_BOMB_CANNON_BP_ACTIVE                     0x0
-    /* oAction */
-    #define WATER_BOMB_CANNON_ACT_HIDDEN                    0x0
-    #define WATER_BOMB_CANNON_ACT_ACTIVE                    0x1
-    #define WATER_BOMB_CANNON_ACT_HIDE                      0x2
+enum oBehParams2ndByteWaterBombCannon {
+    WATER_BOMB_CANNON_BP_ACTIVE = 0x0,
+};
+enum oActionsWaterBombCannon {
+    WATER_BOMB_CANNON_ACT_HIDDEN,
+    WATER_BOMB_CANNON_ACT_ACTIVE,
+    WATER_BOMB_CANNON_ACT_HIDE,
+};
 
 /* Water bomb */
-    /* oAction */
-    #define WATER_BOMB_ACT_SHOT_FROM_CANNON                 0x0
-    #define WATER_BOMB_ACT_INIT                             0x1
-    #define WATER_BOMB_ACT_DROP                             0x2
-    #define WATER_BOMB_ACT_EXPLODE                          0x3
+enum oActionsWaterBomb {
+    WATER_BOMB_ACT_SHOT_FROM_CANNON,
+    WATER_BOMB_ACT_INIT,
+    WATER_BOMB_ACT_DROP,
+    WATER_BOMB_ACT_EXPLODE,
+};
 
 /* TTC Painting Clock Arm */
 enum oActionsTTCPaintingClockArm {
@@ -2080,25 +2139,28 @@ enum oActionsTTCPaintingClockArm {
 };
 
 /* TTC rotating solid */
-    /* oBehParams2ndByte */
-    #define TTC_ROTATING_SOLID_BP_CUBE                      0x0
-    #define TTC_ROTATING_SOLID_BP_TRIANGULAR_PRISM          0x1
+enum oBehParams2ndByteTTCRotatingSolid {
+    TTC_ROTATING_SOLID_BP_CUBE,
+    TTC_ROTATING_SOLID_BP_TRIANGULAR_PRISM,
+};
 
 /* TTC moving bar */
-    /* oAction */
-    #define TTC_MOVING_BAR_ACT_WAIT                         0x0
-    #define TTC_MOVING_BAR_ACT_PULL_BACK                    0x1
-    #define TTC_MOVING_BAR_ACT_EXTEND                       0x2
-    #define TTC_MOVING_BAR_ACT_RETRACT                      0x3
+enum oActionsTTCMovingBar {
+    TTC_MOVING_BAR_ACT_WAIT,
+    TTC_MOVING_BAR_ACT_PULL_BACK,
+    TTC_MOVING_BAR_ACT_EXTEND,
+    TTC_MOVING_BAR_ACT_RETRACT,
+};
 
 /* TTC cog */
-    /* oBehParams2ndByte */
-    #define TTC_COG_BP_SHAPE_MASK                           0x02
-    #define TTC_COG_BP_SHAPE_HEXAGON                        (0 << 1)
-    #define TTC_COG_BP_SHAPE_TRIANGLE                       (1 << 1)
-    #define TTC_COG_BP_DIR_MASK                             0x01
-    #define TTC_COG_BP_DIR_CCW                              (0 << 0) // TODO: Check these
-    #define TTC_COG_BP_DIR_CW                               (1 << 0)
+enum oBehParams2ndByteTTCCog {
+    TTC_COG_BP_SHAPE_MASK     = 0x02,
+    TTC_COG_BP_SHAPE_HEXAGON  = (0 << 1),
+    TTC_COG_BP_SHAPE_TRIANGLE = (1 << 1),
+    TTC_COG_BP_DIR_MASK       = 0x01,
+    TTC_COG_BP_DIR_CCW        = (0 << 0), // TODO: Check these
+    TTC_COG_BP_DIR_CW         = (1 << 0),
+};
 
 /* TTC Pit Block */
 enum oBehParams2ndByteTTCPitBlock {
@@ -2107,16 +2169,18 @@ enum oBehParams2ndByteTTCPitBlock {
 };
 
 /* TTC 2D Rotator */
-    /* oBehParams2ndByte */
-    #define TTC_2D_ROTATOR_BP_HAND                          0x0
-    #define TTC_2D_ROTATOR_BP_2D_COG                        0x1
+enum oBehParams2ndByteTTC2DRotator {
+    TTC_2D_ROTATOR_BP_HAND,
+    TTC_2D_ROTATOR_BP_2D_COG,
+};
 
 /* TTC Treadmill */
-    /* oBehParams2ndByte */
-    #define TREADMILL_BP_LARGE                              0x0
-    #define TREADMILL_BP_SMALL                              0x1
-    #define TREADMILL_BP_SIZE_MASK                          0x1
-    #define TREADMILL_BP_UNKNOWN                            0x2
+enum oBehParams2ndByteTTCTreadmill {
+    TREADMILL_BP_LARGE,
+    TREADMILL_BP_SMALL,
+    TREADMILL_BP_SIZE_MASK = 0x1,
+    TREADMILL_BP_UNKNOWN,
+};
 
 /* Activated Back-and-Forth Platform */
     /* oBehParams1stByte */
@@ -2127,7 +2191,7 @@ enum oBehParams2ndByteTTCPitBlock {
     #define ACTIVATED_BF_PLAT_TYPES_MASK                    0x3
     /* oBehParams2ndByte */
     #define ACTIVATED_BF_PLAT_DISTANCE_MASK                 0x7F
-    #define ACTIVATED_BF_PLAT_FLAG_VERTICAL                 (1 << 7)
+    #define ACTIVATED_BF_PLAT_FLAG_VERTICAL                 BIT(7)
 
 /* Unagi */
     /* oBehParams2ndByte */
@@ -2683,9 +2747,10 @@ enum animIDsFirePiranhaPlant {
     #define WF_ATTACK_AIR                                   0x2
 
 /* White Puff Explosion */
-    /* oBehParams2ndByte */
-    #define WHITE_PUFF_EXPLODE_BP_FAST_FADE                 0x2
-    #define WHITE_PUFF_EXPLODE_BP_SLOW_FADE                 0x3
+enum oBehParams2ndByteWhitePuffExplosion {
+    WHITE_PUFF_EXPLODE_BP_FAST_FADE = 2,
+    WHITE_PUFF_EXPLODE_BP_SLOW_FADE = 3,
+};
 
 /* Dirt Particle */
 enum oAnimStatesTinyDirtParticle {

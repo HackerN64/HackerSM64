@@ -48,7 +48,7 @@ void water_bomb_cannon_act_0(void) {
 void water_bomb_cannon_act_1(void) {
     if (o->oDistanceToMario > 2500.0f) {
         o->oAction = 2;
-    } else if (o->oBehParams2ndByte == 0) {
+    } else if (o->oBehParams2ndByte == WATER_BOMB_CANNON_BP_ACTIVE) {
         if (o->oWaterCannonIdleTimer != 0) {
             o->oWaterCannonIdleTimer--;
         } else {
