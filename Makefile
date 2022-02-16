@@ -570,6 +570,8 @@ test: $(ROM)
 test-pj64: $(ROM)
 	wine ~/Desktop/new64/Project64.exe $<
 # someone2639
+update-s2dex-engine:
+	git -C src/s2d_engine pull
 
 load: $(ROM)
 	$(LOADER) $(LOADER_FLAGS) $<
