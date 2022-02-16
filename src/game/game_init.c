@@ -335,22 +335,6 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.yield_data_size = OS_YIELD_DATA_SIZE;
 }
 
-Lights1 defaultLight = gdSPDefLights1(
-    0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x28, 0x28, 0x28
-);
-
-int counter = 0;
-
-void setup_light() {
-    Lights1* curLight = (Lights1*)alloc_display_list(sizeof(Lights1));
-    bcopy(&defaultLight, curLight, sizeof(Lights1));
-    float phase = (float)counter / 30;
-    counter++;
-    curLight->l->l.dir[0] = (s8)(56.6f * sinf(phase));
-    curLight->l->l.dir[2] = (s8)(56.6f * cosf(phase));
-    gSPSetLights1(gDisplayListHead++, (*curLight));
-}
-
 /**
  * Set default RCP (Reality Co-Processor) settings.
  */
@@ -358,7 +342,6 @@ void init_rcp(s32 resetZB) {
     move_segment_table_to_dmem();
     gSPDisplayList(gDisplayListHead++, init_rdp);
     gSPDisplayList(gDisplayListHead++, init_rsp);
-    setup_light();
     init_z_buffer(resetZB);
     select_framebuffer();
 }
