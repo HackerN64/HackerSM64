@@ -2485,445 +2485,514 @@ enum oActionsBouncingFireball {
     BOUNCING_FIREBALL_SPAWNER_ACT_COOLDOWN,
 };
 
-/* Eyerok boss */
-    /* oAction */
-    #define EYEROK_BOSS_ACT_SLEEP                           0x0
-    #define EYEROK_BOSS_ACT_WAKE_UP                         0x1
-    #define EYEROK_BOSS_ACT_SHOW_INTRO_TEXT                 0x2
-    #define EYEROK_BOSS_ACT_FIGHT                           0x3
-    #define EYEROK_BOSS_ACT_DIE                             0x4
+/* Eyerok Boss */
+enum oActionsEyerokBoss {
+    EYEROK_BOSS_ACT_SLEEP,
+    EYEROK_BOSS_ACT_WAKE_UP,
+    EYEROK_BOSS_ACT_SHOW_INTRO_TEXT,
+    EYEROK_BOSS_ACT_FIGHT,
+    EYEROK_BOSS_ACT_DIE,
+};
     /* oSubAction */
-        /* EYEROK_BOSS_ACT_WAKE_UP */
-    #define EYEROK_BOSS_SUB_ACT_WAKE_LOWER_VOLUME           0x0
-    #define EYEROK_BOSS_SUB_ACT_WAKE_WAIT_FOR_DIALOG        0x1
+enum oSubActionsEyerokBossWakeUp { // EYEROK_BOSS_ACT_WAKE_UP
+    EYEROK_BOSS_SUB_ACT_WAKE_LOWER_VOLUME,
+    EYEROK_BOSS_SUB_ACT_WAKE_WAIT_FOR_DIALOG,
+};
 
-/* Eyerok hand */
-    /* oBehParams2ndByte */
-    #define EYEROK_BP_LEFT_HAND                            -0x1
-    #define EYEROK_BP_RIGHT_HAND                            0x1
-    /* oAction */
-    #define EYEROK_HAND_ACT_SLEEP                           0x0
-    #define EYEROK_HAND_ACT_IDLE                            0x1
-    #define EYEROK_HAND_ACT_OPEN                            0x2
-    #define EYEROK_HAND_ACT_SHOW_EYE                        0x3
-    #define EYEROK_HAND_ACT_CLOSE                           0x4
-    #define EYEROK_HAND_ACT_RETREAT                         0x5
-    #define EYEROK_HAND_ACT_TARGET_MARIO                    0x6
-    #define EYEROK_HAND_ACT_SMASH                           0x7
-    #define EYEROK_HAND_ACT_FIST_PUSH                       0x8
-    #define EYEROK_HAND_ACT_FIST_SWEEP                      0x9
-    #define EYEROK_HAND_ACT_BEGIN_DOUBLE_POUND              0xA // raising for double smash
-    #define EYEROK_HAND_ACT_DOUBLE_POUND                    0xB // double smashing
-    #define EYEROK_HAND_ACT_ATTACKED                        0xC
-    #define EYEROK_HAND_ACT_RECOVER                         0xD
-    #define EYEROK_HAND_ACT_BECOME_ACTIVE                   0xE
-    #define EYEROK_HAND_ACT_DIE                             0xF
-    /* oAnimState */
-    #define EYEROK_HAND_ANIM_STATE_EYE_OPEN                 0x0
-    #define EYEROK_HAND_ANIM_STATE_EYE_MOSTLY_OPEN          0x1
-    #define EYEROK_HAND_ANIM_STATE_EYE_MOSTLY_CLOSED        0x2
-    #define EYEROK_HAND_ANIM_STATE_EYE_CLOSED               0x3
-    /* oEyerokHandAnimStateIndex */
-    #define EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPEN_1         0x0
-    #define EYEROK_HAND_ANIM_STATE_INDEX_EYE_CLOSING        0x1 // mostly open
-    #define EYEROK_HAND_ANIM_STATE_INDEX_EYE_CLOSED         0x2
-    #define EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPENING_1      0x3 // mostly closed
-    #define EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPENING_2      0x4 // mostly open
-    #define EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPEN_2         0x5
-    /* Animations */
-    #define EYEROK_HAND_ANIM_RECOVER                        0x0
-    #define EYEROK_HAND_ANIM_DEATH                          0x1
-    #define EYEROK_HAND_ANIM_IDLE                           0x2
-    #define EYEROK_HAND_ANIM_ATTACKED                       0x3
-    #define EYEROK_HAND_ANIM_OPEN                           0x4
-    #define EYEROK_HAND_ANIM_SHOW_EYE                       0x5
-    #define EYEROK_HAND_ANIM_SLEEPING                       0x6
-    #define EYEROK_HAND_ANIM_CLOSE                          0x7
+/* Eyerok Hand */
+enum oBehParams2ndByteEyerokHand {
+    EYEROK_BP_LEFT_HAND  = -1,
+    EYEROK_BP_RIGHT_HAND =  1,
+};
+enum oActionsEyerokHand {
+    EYEROK_HAND_ACT_SLEEP,
+    EYEROK_HAND_ACT_IDLE,
+    EYEROK_HAND_ACT_OPEN,
+    EYEROK_HAND_ACT_SHOW_EYE,
+    EYEROK_HAND_ACT_CLOSE,
+    EYEROK_HAND_ACT_RETREAT,
+    EYEROK_HAND_ACT_TARGET_MARIO,
+    EYEROK_HAND_ACT_SMASH,
+    EYEROK_HAND_ACT_FIST_PUSH,
+    EYEROK_HAND_ACT_FIST_SWEEP,
+    EYEROK_HAND_ACT_BEGIN_DOUBLE_POUND, // raising for double smash
+    EYEROK_HAND_ACT_DOUBLE_POUND, // double smashing
+    EYEROK_HAND_ACT_ATTACKED,
+    EYEROK_HAND_ACT_RECOVER,
+    EYEROK_HAND_ACT_BECOME_ACTIVE,
+    EYEROK_HAND_ACT_DIE,
+};
+enum oAnimStatesEyerokHand {
+    EYEROK_HAND_ANIM_STATE_EYE_OPEN,
+    EYEROK_HAND_ANIM_STATE_EYE_MOSTLY_OPEN,
+    EYEROK_HAND_ANIM_STATE_EYE_MOSTLY_CLOSED,
+    EYEROK_HAND_ANIM_STATE_EYE_CLOSED,
+};
+enum oEyerokHandAnimStateIndices {
+    EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPEN_1,
+    EYEROK_HAND_ANIM_STATE_INDEX_EYE_CLOSING, // mostly open
+    EYEROK_HAND_ANIM_STATE_INDEX_EYE_CLOSED,
+    EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPENING_1, // mostly closed
+    EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPENING_2, // mostly open
+    EYEROK_HAND_ANIM_STATE_INDEX_EYE_OPEN_2,
+};
+enum animIDsEyerokHand {
+    EYEROK_HAND_ANIM_RECOVER,
+    EYEROK_HAND_ANIM_DEATH,
+    EYEROK_HAND_ANIM_IDLE,
+    EYEROK_HAND_ANIM_ATTACKED,
+    EYEROK_HAND_ANIM_OPEN,
+    EYEROK_HAND_ANIM_SHOW_EYE,
+    EYEROK_HAND_ANIM_SLEEPING,
+    EYEROK_HAND_ANIM_CLOSE,
+};
 
-/* King Bobomb */
-    /* oAction */
-    #define KING_BOBOMB_ACT_INACTIVE                        0x0
-    #define KING_BOBOMB_ACT_ACTIVATE                        0x1
-    #define KING_BOBOMB_ACT_ACTIVE                          0x2
-    #define KING_BOBOMB_ACT_GRABBED_MARIO                   0x3
-    #define KING_BOBOMB_ACT_BEEN_THROWN                     0x4
-    #define KING_BOBOMB_ACT_RETURN_HOME                     0x5
-    #define KING_BOBOMB_ACT_HIT_GROUND                      0x6
-    #define KING_BOBOMB_ACT_DEATH                           0x7
-    #define KING_BOBOMB_ACT_STOP_MUSIC                      0x8
+/* King Bob-omb */
+enum oActionsKingBobomb {
+    KING_BOBOMB_ACT_INACTIVE,
+    KING_BOBOMB_ACT_ACTIVATE,
+    KING_BOBOMB_ACT_ACTIVE,
+    KING_BOBOMB_ACT_GRABBED_MARIO,
+    KING_BOBOMB_ACT_BEEN_THROWN,
+    KING_BOBOMB_ACT_RETURN_HOME,
+    KING_BOBOMB_ACT_HIT_GROUND,
+    KING_BOBOMB_ACT_DEATH,
+    KING_BOBOMB_ACT_STOP_MUSIC,
+};
     /* oSubAction */
-        /* KING_BOBOMB_ACT_INACTIVE */
-    #define KING_BOBOMB_SUB_ACT_INACTIVE_INIT               0x0
-    #define KING_BOBOMB_SUB_ACT_INACTIVE_DIALOG             0x1
-        /* KING_BOBOMB_ACT_GRABBED_MARIO */
-    #define KING_BOBOMB_SUB_ACT_GRABBED_MARIO_GRAB          0x0
-    #define KING_BOBOMB_SUB_ACT_GRABBED_MARIO_HOLDING       0x1
-    #define KING_BOBOMB_SUB_ACT_GRABBED_MARIO_THROW         0x2
-        /* KING_BOBOMB_ACT_BEEN_THROWN */
-    #define KING_BOBOMB_SUB_ACT_THROWN_FALL                 0x0
-    #define KING_BOBOMB_SUB_ACT_THROWN_STAND_UP             0x1
-    #define KING_BOBOMB_SUB_ACT_THROWN_END                  0x2
-        /* KING_BOBOMB_ACT_RETURN_HOME */
-    #define KING_BOBOMB_SUB_ACT_RETURN_HOME_JUMP            0x0
-    #define KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING         0x1
-    #define KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING_END     0x2
-    #define KING_BOBOMB_SUB_ACT_RETURN_HOME_WAIT_FOR_DIALOG 0x3
-    #define KING_BOBOMB_SUB_ACT_RETURN_HOME_DIALOG          0x4
-        /* KING_BOBOMB_ACT_HIT_GROUND */
-    #define KING_BOBOMB_SUB_ACT_HIT_GROUND_HIT              0x0
-    #define KING_BOBOMB_SUB_ACT_HIT_GROUND_STAND_UP         0x1
-    #define KING_BOBOMB_SUB_ACT_HIT_GROUND_START_WALKING    0x2
-    /* Animations */
-    #define KING_BOBOMB_ANIM_GRAB_MARIO                     0x0
-    #define KING_BOBOMB_ANIM_HOLDING_MARIO                  0x1
-    #define KING_BOBOMB_ANIM_HIT_GROUND                     0x2
-    #define KING_BOBOMB_ANIM_UNUSED_3                       0x3
-    #define KING_BOBOMB_ANIM_STOMP                          0x4
-    #define KING_BOBOMB_ANIM_IDLE                           0x5
-    #define KING_BOBOMB_ANIM_HELD                           0x6
-    #define KING_BOBOMB_ANIM_T_POSE                         0x7
-    #define KING_BOBOMB_ANIM_JUMP                           0x8
-    #define KING_BOBOMB_ANIM_THROW_MARIO                    0x9
-    #define KING_BOBOMB_ANIM_STAND_UP                       0xA
-    #define KING_BOBOMB_ANIM_WALKING                        0xB
+enum oSubActionsKingBobombActInactive { // KING_BOBOMB_ACT_INACTIVE
+    KING_BOBOMB_SUB_ACT_INACTIVE_INIT,
+    KING_BOBOMB_SUB_ACT_INACTIVE_DIALOG,
+};
+enum oSubActionsKingBobombActGrabbedMario { // KING_BOBOMB_ACT_GRABBED_MARIO
+    KING_BOBOMB_SUB_ACT_GRABBED_MARIO_GRAB,
+    KING_BOBOMB_SUB_ACT_GRABBED_MARIO_HOLDING,
+    KING_BOBOMB_SUB_ACT_GRABBED_MARIO_THROW,
+};
+enum oSubActionsKingBobombActBeenThrown { // KING_BOBOMB_ACT_BEEN_THROWN
+    KING_BOBOMB_SUB_ACT_THROWN_FALL,
+    KING_BOBOMB_SUB_ACT_THROWN_STAND_UP,
+    KING_BOBOMB_SUB_ACT_THROWN_END,
+};
+enum oSubActionsKingBobombActReturnHome { // KING_BOBOMB_ACT_RETURN_HOME
+    KING_BOBOMB_SUB_ACT_RETURN_HOME_JUMP,
+    KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING,
+    KING_BOBOMB_SUB_ACT_RETURN_HOME_LANDING_END,
+    KING_BOBOMB_SUB_ACT_RETURN_HOME_WAIT_FOR_DIALOG,
+    KING_BOBOMB_SUB_ACT_RETURN_HOME_DIALOG,
+};
+enum oSubActionsKingBobombActHitGround { // KING_BOBOMB_ACT_HIT_GROUND
+    KING_BOBOMB_SUB_ACT_HIT_GROUND_HIT,
+    KING_BOBOMB_SUB_ACT_HIT_GROUND_STAND_UP,
+    KING_BOBOMB_SUB_ACT_HIT_GROUND_START_WALKING,
+};
+enum animIDsKingBobomb {
+    KING_BOBOMB_ANIM_GRAB_MARIO,
+    KING_BOBOMB_ANIM_HOLDING_MARIO,
+    KING_BOBOMB_ANIM_HIT_GROUND,
+    KING_BOBOMB_ANIM_UNUSED_3,
+    KING_BOBOMB_ANIM_STOMP,
+    KING_BOBOMB_ANIM_IDLE,
+    KING_BOBOMB_ANIM_HELD,
+    KING_BOBOMB_ANIM_T_POSE,
+    KING_BOBOMB_ANIM_JUMP,
+    KING_BOBOMB_ANIM_THROW_MARIO,
+    KING_BOBOMB_ANIM_STAND_UP,
+    KING_BOBOMB_ANIM_WALKING,
+};
 
 /* Chuckya */
-    /* oAction */
-    #define CHUCKYA_ACT_MOVING                              0x0
-    #define CHUCKYA_ACT_GRABBED_MARIO                       0x1
-    #define CHUCKYA_ACT_THROWN                              0x2
-    #define CHUCKYA_ACT_RELEASE_MARIO                       0x3
+enum oActionsChuckya {
+    CHUCKYA_ACT_MOVING,
+    CHUCKYA_ACT_GRABBED_MARIO,
+    CHUCKYA_ACT_THROWN,
+    CHUCKYA_ACT_RELEASE_MARIO,
+};
     /* oSubAction */
-        /* CHUCKYA_ACT_MOVING */
-    #define CHUCKYA_SUB_ACT_TURN_TOWARD_MARIO               0x0
-    #define CHUCKYA_SUB_ACT_ACCELERATE                      0x1
-    #define CHUCKYA_SUB_ACT_STOP                            0x2
-    #define CHUCKYA_SUB_ACT_TURN_TOWARD_HOME                0x3
-        /* CHUCKYA_ACT_GRABBED_MARIO */
-    #define CHUCKYA_SUB_ACT_GRAB_MARIO                      0x0
-    #define CHUCKYA_SUB_ACT_HOLD_MARIO                      0x1
-    #define CHUCKYA_SUB_ACT_THROW_MARIO                     0x2
-    /* oCommonAnchorAction */
-    #define COMMON_ANCHOR_ACT_INACTIVE                      0x0
-    #define COMMON_ANCHOR_ACT_SET_MARIO_GFX_TO_POS          0x1
-    #define COMMON_ANCHOR_ACT_THROW_MARIO                   0x2
-    #define COMMON_ANCHOR_ACT_DROP_MARIO                    0x3
-    /* Animations */
-    #define CHUCKYA_ANIM_GRAB_MARIO                         0x0
-    #define CHUCKYA_ANIM_THROW_1                            0x1
-    #define CHUCKYA_ANIM_HELD                               0x2
-    #define CHUCKYA_ANIM_THROW_2                            0x3
-    #define CHUCKYA_ANIM_IDLE                               0x4
-    #define CHUCKYA_ANIM_SPAWN                              0x5
+enum oSubActionsChuckyaActMoving { // CHUCKYA_ACT_MOVING
+    CHUCKYA_SUB_ACT_TURN_TOWARD_MARIO,
+    CHUCKYA_SUB_ACT_ACCELERATE,
+    CHUCKYA_SUB_ACT_STOP,
+    CHUCKYA_SUB_ACT_TURN_TOWARD_HOME,
+};
+enum oSubActionsChuckyaActGrabbedMario { // CHUCKYA_ACT_GRABBED_MARIO
+    CHUCKYA_SUB_ACT_GRAB_MARIO,
+    CHUCKYA_SUB_ACT_HOLD_MARIO,
+    CHUCKYA_SUB_ACT_THROW_MARIO,
+};
+enum oCommonAnchorActions {
+    COMMON_ANCHOR_ACT_INACTIVE,
+    COMMON_ANCHOR_ACT_SET_MARIO_GFX_TO_POS,
+    COMMON_ANCHOR_ACT_THROW_MARIO,
+    COMMON_ANCHOR_ACT_DROP_MARIO,
+};
+enum animIDsChuckya {
+    CHUCKYA_ANIM_GRAB_MARIO,
+    CHUCKYA_ANIM_THROW_1,
+    CHUCKYA_ANIM_HELD,
+    CHUCKYA_ANIM_THROW_2,
+    CHUCKYA_ANIM_IDLE,
+    CHUCKYA_ANIM_SPAWN,
+};
 
 /* Heave Ho */
-    /* oAction */
-    #define HEAVE_HO_ACT_INACTIVE                           0x0
-    #define HEAVE_HO_ACT_WINDING_UP                         0x1
-    #define HEAVE_HO_ACT_MOVING                             0x2
-    #define HEAVE_HO_ACT_THROW_MARIO                        0x3
-    /* Animations */
-    #define HEAVE_HO_ANIM_MOVING                            0x0
-    #define HEAVE_HO_ANIM_THROW                             0x1
-    #define HEAVE_HO_ANIM_WINDING_UP                        0x2
+enum oActionsHeaveHo {
+    HEAVE_HO_ACT_INACTIVE,
+    HEAVE_HO_ACT_WINDING_UP,
+    HEAVE_HO_ACT_MOVING,
+    HEAVE_HO_ACT_THROW_MARIO,
+};
+enum animIDsHeaveHo {
+    HEAVE_HO_ANIM_MOVING,
+    HEAVE_HO_ANIM_THROW,
+    HEAVE_HO_ANIM_WINDING_UP,
+};
 
 /* Klepto */
-    /* oBehParams2ndByte */
-    #define KLEPTO_BP_NO_STAR                               0x0
-    #define KLEPTO_BP_HAS_STAR                              0x1
-    /* oAction */
-    #define KLEPTO_ACT_CIRCLE_TARGET_HOLDING                0x0
-    #define KLEPTO_ACT_APPROACH_TARGET_HOLDING              0x1
-    #define KLEPTO_ACT_WAIT_FOR_MARIO                       0x2
-    #define KLEPTO_ACT_TURN_TOWARD_MARIO                    0x3
-    #define KLEPTO_ACT_DIVE_AT_MARIO                        0x4
-    #define KLEPTO_ACT_RESET_POSITION                       0x5
-    #define KLEPTO_ACT_STRUCK_BY_MARIO                      0x6
-    #define KLEPTO_ACT_RETREAT                              0x7
+enum oBehParams2ndByteKlepto {
+    KLEPTO_BP_NO_STAR,
+    KLEPTO_BP_HAS_STAR,
+};
+enum oActionsKlepto {
+    KLEPTO_ACT_CIRCLE_TARGET_HOLDING,
+    KLEPTO_ACT_APPROACH_TARGET_HOLDING,
+    KLEPTO_ACT_WAIT_FOR_MARIO,
+    KLEPTO_ACT_TURN_TOWARD_MARIO,
+    KLEPTO_ACT_DIVE_AT_MARIO,
+    KLEPTO_ACT_RESET_POSITION,
+    KLEPTO_ACT_STRUCK_BY_MARIO,
+    KLEPTO_ACT_RETREAT,
+};
     /* oSubAction */
-        /* KLEPTO_ACT_DIVE_AT_MARIO */
-    #define KLEPTO_SUB_ACT_DIVE_TURN_PITCH                  0x0
-    #define KLEPTO_SUB_ACT_DIVE_STOP                        0x1
-    /* oAnimState */
-    #define KLEPTO_ANIM_STATE_HOLDING_NOTHING               0x0
-    #define KLEPTO_ANIM_STATE_HOLDING_CAP                   0x1
-    #define KLEPTO_ANIM_STATE_HOLDING_STAR                  0x2
-    #define KLEPTO_ANIM_STATE_HOLDING_TRANSPARENT_STAR      0x3
-    /* Animations */
-    #define KLEPTO_ANIM_DIVE_0                              0x0
-    #define KLEPTO_ANIM_STRUCK_BY_MARIO                     0x1
-    #define KLEPTO_ANIM_DIVE_AT_MARIO_2                     0x2
-    #define KLEPTO_ANIM_DIVE_AT_MARIO_3                     0x3
-    #define KLEPTO_ANIM_DIVE_AT_MARIO_4                     0x4
-    #define KLEPTO_ANIM_DIVE_FLAP_5                         0x5
-    #define KLEPTO_ANIM_DIVE_FLAP_6                         0x6
+enum oSubActionsKleptoActDiveAtMario { // KLEPTO_ACT_DIVE_AT_MARIO
+    KLEPTO_SUB_ACT_DIVE_TURN_PITCH,
+    KLEPTO_SUB_ACT_DIVE_STOP,
+};
+enum oAnimStatesKlepto {
+    KLEPTO_ANIM_STATE_HOLDING_NOTHING,
+    KLEPTO_ANIM_STATE_HOLDING_CAP,
+    KLEPTO_ANIM_STATE_HOLDING_STAR,
+    KLEPTO_ANIM_STATE_HOLDING_TRANSPARENT_STAR,
+};
+enum animIDsKlepto {
+    KLEPTO_ANIM_DIVE_0,
+    KLEPTO_ANIM_STRUCK_BY_MARIO,
+    KLEPTO_ANIM_DIVE_AT_MARIO_2,
+    KLEPTO_ANIM_DIVE_AT_MARIO_3,
+    KLEPTO_ANIM_DIVE_AT_MARIO_4,
+    KLEPTO_ANIM_DIVE_FLAP_5,
+    KLEPTO_ANIM_DIVE_FLAP_6,
+};
 
 /* Bird */
-    /* oBehParams2ndByte */
-    #define BIRD_BP_SPAWNED                                 0x0
-    #define BIRD_BP_SPAWNER                                 0x1
-    /* oAction */
-    #define BIRD_ACT_INACTIVE                               0x0
-    #define BIRD_ACT_FLY                                    0x1
-    /* Animation */
-    #define BIRD_ANIM_FLY                                   0x0
+enum oBehParams2ndByteBird {
+    BIRD_BP_SPAWNED,
+    BIRD_BP_SPAWNER,
+};
+enum oActionsBird {
+    BIRD_ACT_INACTIVE,
+    BIRD_ACT_FLY,
+};
+enum animIDs {
+    BIRD_ANIM_FLY,
+};
 
 /* End Birds */
-    /* oAction */
-    #define END_BIRDS_ACT_INIT                              0x0
-    #define END_BIRDS_ACT_ACTIVE                            0x1
-    /* Animations */
-    #define END_BIRDS_ANIM_FLY                              0x0
+enum oActionsEndBirds {
+    END_BIRDS_ACT_INIT,
+    END_BIRDS_ACT_ACTIVE,
+};
 
 /* Birds Sound */
-    /* oAction */
-    #define SOUND_BIRDS_BP_OBJ2_BIRD_CHIRP1                 0x0
-    #define SOUND_BIRDS_BP_GENERAL2_BIRD_CHIRP2             0x1
-    #define SOUND_BIRDS_BP_OBJ_BIRD_CHIRP3                  0x2
+enum oActionsBirdsSound {
+    SOUND_BIRDS_BP_OBJ2_BIRD_CHIRP1,
+    SOUND_BIRDS_BP_GENERAL2_BIRD_CHIRP2,
+    SOUND_BIRDS_BP_OBJ_BIRD_CHIRP3,
+};
 
 /* Scuttlebug Spawner */
-    /* oAction */
-    #define SCUTTLEBUG_SPAWNER_ACT_ACTIVE                   0x0
-    #define SCUTTLEBUG_SPAWNER_ACT_INACTIVE                 0x1
+enum oActionsScuttlebugSpawner {
+    SCUTTLEBUG_SPAWNER_ACT_ACTIVE,
+    SCUTTLEBUG_SPAWNER_ACT_INACTIVE,
+};
 
 /* Scuttlebug */
-    /* oSubAction */
-    #define SCUTTLEBUG_SUB_ACT_RESET                        0x0
-    #define SCUTTLEBUG_SUB_ACT_MOVING                       0x1
-    #define SCUTTLEBUG_SUB_ACT_HIT_WALL                     0x2
-    #define SCUTTLEBUG_SUB_ACT_ALERT                        0x3
-    #define SCUTTLEBUG_SUB_ACT_JUMP                         0x4
-    #define SCUTTLEBUG_SUB_ACT_LAND                         0x5
-    /* Animations */
-    #define SCUTTLEBUG_ANIM_JUMP                            0x0
-    #define SCUTTLEBUG_ANIM_WALK                            0x1
+enum oSubActionsScuttlebug {
+    SCUTTLEBUG_SUB_ACT_RESET,
+    SCUTTLEBUG_SUB_ACT_MOVING,
+    SCUTTLEBUG_SUB_ACT_HIT_WALL,
+    SCUTTLEBUG_SUB_ACT_ALERT,
+    SCUTTLEBUG_SUB_ACT_JUMP,
+    SCUTTLEBUG_SUB_ACT_LAND,
+};
+enum animIDsScuttlebug {
+    SCUTTLEBUG_ANIM_JUMP,
+    SCUTTLEBUG_ANIM_WALK,
+};
 
 /* Skeeter */
-    /* oAction */
-    #define SKEETER_ACT_IDLE                                0x0
-    #define SKEETER_ACT_LUNGE                               0x1
-    #define SKEETER_ACT_WALK                                0x2
-    /* Animations */
-    #define SKEETER_ANIM_WATER_LUNGE                        0x0
-    #define SKEETER_ANIM_WATER_IDLE                         0x1
-    #define SKEETER_ANIM_WALK                               0x2
-    #define SKEETER_ANIM_IDLE                               0x3
+enum oActionsSkeeter {
+    SKEETER_ACT_IDLE,
+    SKEETER_ACT_LUNGE,
+    SKEETER_ACT_WALK,
+};
+enum animIDsSkeeter {
+    SKEETER_ANIM_WATER_LUNGE,
+    SKEETER_ANIM_WATER_IDLE,
+    SKEETER_ANIM_WALK,
+    SKEETER_ANIM_IDLE,
+};
 
 /* Snufit */
-    /* oAction */
-    #define SNUFIT_ACT_IDLE                                 0x0
-    #define SNUFIT_ACT_SHOOT                                0x1
+enum oActionsSnufit {
+    SNUFIT_ACT_IDLE,
+    SNUFIT_ACT_SHOOT,
+};
 
 /* Snufit Balls (gottem) */
-    /* oAction */
-    #define SNUFIT_BALL_ACT_MOVE                            0x0
-    #define SNUFIT_BALL_ACT_HIT_MARIO                       0x1
+enum oActionsSnufitBalls {
+    SNUFIT_BALL_ACT_MOVE,
+    SNUFIT_BALL_ACT_HIT_MARIO,
+};
 
 /* Tweester */
-    /* oAction */
-    #define TWEESTER_ACT_IDLE                               0x0
-    #define TWEESTER_ACT_CHASE                              0x1
-    #define TWEESTER_ACT_HIDE                               0x2
+enum oActionsTweester {
+    TWEESTER_ACT_IDLE,
+    TWEESTER_ACT_CHASE,
+    TWEESTER_ACT_HIDE,
+};
     /* oSubAction */
-        /* TWEESTER_ACT_IDLE */
-    #define TWEESTER_SUB_ACT_WAIT                           0x0
-    #define TWEESTER_SUB_ACT_GROW                           0x1
-        /* TWEESTER_ACT_CHASE */
-    #define TWEESTER_SUB_ACT_CHASE_MARIO                    0x0
-    #define TWEESTER_SUB_ACT_CHASE_HOME                     0x1
+enum oSubActionTweesterActIdle { // TWEESTER_ACT_IDLE
+    TWEESTER_SUB_ACT_WAIT,
+    TWEESTER_SUB_ACT_GROW,
+};
+enum oSubActionTweesterActChase { // TWEESTER_ACT_CHASE
+    TWEESTER_SUB_ACT_CHASE_MARIO,
+    TWEESTER_SUB_ACT_CHASE_HOME,
+};
 
-/* Triplet butterfly */
-    /* oBehParams2ndByte */
-    #define TRIPLET_BUTTERFLY_BP_0                          0x0
-    #define TRIPLET_BUTTERFLY_BP_BUTTERFLY_NUM              0x3
-    #define TRIPLET_BUTTERFLY_BP_NO_BOMBS                   0x4
-    /* oAction */
-    #define TRIPLET_BUTTERFLY_ACT_INIT                      0x0
-    #define TRIPLET_BUTTERFLY_ACT_WANDER                    0x1
-    #define TRIPLET_BUTTERFLY_ACT_ACTIVATE                  0x2
-    #define TRIPLET_BUTTERFLY_ACT_EXPLODE                   0x3
-    /* oTripletButterflyType */
-    #define TRIPLET_BUTTERFLY_TYPE_NORMAL                  -0x1
-    #define TRIPLET_BUTTERFLY_TYPE_EXPLODES                 0x0
-    #define TRIPLET_BUTTERFLY_TYPE_SPAWN_1UP                0x1
-
+/* Triplet Butterfly */
+enum oBehParams2ndByteTripletButterfly {
+    TRIPLET_BUTTERFLY_BP_0,
+    TRIPLET_BUTTERFLY_BP_BUTTERFLY_NUM = 3,
+    TRIPLET_BUTTERFLY_BP_NO_BOMBS,
+};
+enum oActionsTripletButterfly {
+    TRIPLET_BUTTERFLY_ACT_INIT,
+    TRIPLET_BUTTERFLY_ACT_WANDER,
+    TRIPLET_BUTTERFLY_ACT_ACTIVATE,
+    TRIPLET_BUTTERFLY_ACT_EXPLODE,
+};
+enum oTripletButterflyTypes {
+    TRIPLET_BUTTERFLY_TYPE_NORMAL = -1,
+    TRIPLET_BUTTERFLY_TYPE_EXPLODES,
+    TRIPLET_BUTTERFLY_TYPE_SPAWN_1UP,
+};
 
 /* Changing Water Level */
-    /* oAction */
-    #define WATER_LEVEL_ACT_INIT                            0x0
-    #define WATER_LEVEL_ACT_IDLE                            0x1
+enum oActionsChangingWaterLevel {
+    WATER_LEVEL_ACT_INIT,
+    WATER_LEVEL_ACT_IDLE,
+};
 
 /* Water Level Diamond */
-    /* oAction */
-    // Loading
-    #define WATER_LEVEL_DIAMOND_ACT_INIT                    0x0
-    // Idling when Mario isn't inside its hitbox
-    #define WATER_LEVEL_DIAMOND_ACT_IDLE                    0x1
-    // While the water level is changing
-    #define WATER_LEVEL_DIAMOND_ACT_CHANGE_WATER_LEVEL      0x2
-    // After the water level has changed but Mario hasn't left its hitbox yet
-    #define WATER_LEVEL_DIAMOND_ACT_IDLE_SPINNING           0x3
+enum oActionsWaterLevelDiamond {
+    WATER_LEVEL_DIAMOND_ACT_INIT,               // Loading
+    WATER_LEVEL_DIAMOND_ACT_IDLE,               // Idling when Mario isn't inside its hitbox
+    WATER_LEVEL_DIAMOND_ACT_CHANGE_WATER_LEVEL, // While the water level is changing
+    WATER_LEVEL_DIAMOND_ACT_IDLE_SPINNING,      // After the water level has changed but Mario hasn't left its hitbox yet
+};
 
 /* Castle Water Level Pillars */
-    /* oAction */
-    #define WATER_PILLAR_ACT_UNPOUNDED_IDLE                 0x0
-    #define WATER_PILLAR_ACT_LOWER_SELF                     0x1
-    #define WATER_PILLAR_ACT_POUNDED_1                      0x2
-    #define WATER_PILLAR_ACT_POUNDED_2                      0x3
-    #define WATER_PILLAR_ACT_DRAIN_WATER                    0x4
-    #define WATER_PILLAR_ACT_END                            0x5
+enum oActionsCastleWaterLevelPillars {
+    WATER_PILLAR_ACT_UNPOUNDED_IDLE,
+    WATER_PILLAR_ACT_LOWER_SELF,
+    WATER_PILLAR_ACT_POUNDED_1,
+    WATER_PILLAR_ACT_POUNDED_2,
+    WATER_PILLAR_ACT_DRAIN_WATER,
+    WATER_PILLAR_ACT_END,
+};
 
 /* Mips */
-    /* oBehParams2ndByte */
-    #define MIPS_BP_STAR_1                                  0x0
-    #define MIPS_BP_STAR_2                                  0x1
-    /* oAction */
-    #define MIPS_ACT_WAIT_FOR_NEARBY_MARIO                  0x0
-    #define MIPS_ACT_FOLLOW_PATH                            0x1
-    #define MIPS_ACT_WAIT_FOR_ANIMATION_DONE                0x2
-    #define MIPS_ACT_FALL_DOWN                              0x3
-    #define MIPS_ACT_IDLE                                   0x4
-    /* oMipsStarStatus */
-    #define MIPS_STAR_STATUS_HAVENT_SPAWNED_STAR            0x0
-    #define MIPS_STAR_STATUS_SHOULD_SPAWN_STAR              0x1
-    #define MIPS_STAR_STATUS_ALREADY_SPAWNED_STAR           0x2
-    /* Animations */
-    #define MIPS_ANIM_IDLE                                  0x0
-    #define MIPS_ANIM_HOPPING                               0x1
-    #define MIPS_ANIM_THROWN                                0x2
-    #define MIPS_ANIM_UNUSED                                0x3
-    #define MIPS_ANIM_HELD                                  0x4
+enum oBehParams2ndByteMips {
+    MIPS_BP_STAR_1,
+    MIPS_BP_STAR_2,
+};
+enum oActionsMips {
+    MIPS_ACT_WAIT_FOR_NEARBY_MARIO,
+    MIPS_ACT_FOLLOW_PATH,
+    MIPS_ACT_WAIT_FOR_ANIMATION_DONE,
+    MIPS_ACT_FALL_DOWN,
+    MIPS_ACT_IDLE,
+};
+enum oMipsStarStatuses {
+    MIPS_STAR_STATUS_HAVENT_SPAWNED_STAR,
+    MIPS_STAR_STATUS_SHOULD_SPAWN_STAR,
+    MIPS_STAR_STATUS_ALREADY_SPAWNED_STAR,
+};
+enum animIDsMips {
+    MIPS_ANIM_IDLE,
+    MIPS_ANIM_HOPPING,
+    MIPS_ANIM_THROWN,
+    MIPS_ANIM_UNUSED,
+    MIPS_ANIM_HELD,
+};
 
 /* Falling Pillar */
-    /* oAction */
-    #define FALLING_PILLAR_ACT_IDLE                         0x0
-    #define FALLING_PILLAR_ACT_TURNING                      0x1
-    #define FALLING_PILLAR_ACT_FALLING                      0x2
+enum oActionsFallingPillar {
+    FALLING_PILLAR_ACT_IDLE,
+    FALLING_PILLAR_ACT_TURNING,
+    FALLING_PILLAR_ACT_FALLING,
+};
 
 /* Bowser Puzzle */
-    /* oAction */
-    #define BOWSER_PUZZLE_ACT_SPAWN_PIECES                  0x0
-    #define BOWSER_PUZZLE_ACT_WAIT_FOR_COMPLETE             0x1
-    #define BOWSER_PUZZLE_ACT_DONE                          0x2
-    /* oBowserPuzzleCompletionFlags */
-    #define BOWSER_PUZZLE_COMPLETION_FLAGS_NONE             0x0
-    #define BOWSER_PUZZLE_COMPLETION_FLAG_MARIO_ON_PLATFORM 0x1
-    #define BOWSER_PUZZLE_COMPLETION_FLAG_PUZZLE_COMPLETE   0x2
+enum oActionsBowserPuzzle {
+    BOWSER_PUZZLE_ACT_SPAWN_PIECES,
+    BOWSER_PUZZLE_ACT_WAIT_FOR_COMPLETE,
+    BOWSER_PUZZLE_ACT_DONE,
+};
+enum BowserPuzzleCompletionFlags { // oBowserPuzzleCompletionFlags
+    BOWSER_PUZZLE_COMPLETION_FLAGS_NONE             = 0x0,
+    BOWSER_PUZZLE_COMPLETION_FLAG_MARIO_ON_PLATFORM = BIT(0), // 0x1
+    BOWSER_PUZZLE_COMPLETION_FLAG_PUZZLE_COMPLETE   = BIT(1), // 0x2
+};
 
 /* Bowser Puzzle Piece */
-    /* oAction */
-    #define BOWSER_PUZZLE_PIECE_ACT_IDLE                    0x0
-    #define BOWSER_PUZZLE_PIECE_ACT_LEFT                    0x1
-    #define BOWSER_PUZZLE_PIECE_ACT_RIGHT                   0x2
-    #define BOWSER_PUZZLE_PIECE_ACT_UP                      0x3
-    #define BOWSER_PUZZLE_PIECE_ACT_DOWN                    0x4
+enum oActionsBowserPuzzlePiece {
+    BOWSER_PUZZLE_PIECE_ACT_IDLE,
+    BOWSER_PUZZLE_PIECE_ACT_LEFT,
+    BOWSER_PUZZLE_PIECE_ACT_RIGHT,
+    BOWSER_PUZZLE_PIECE_ACT_UP,
+    BOWSER_PUZZLE_PIECE_ACT_DOWN,
+};
 
 /* Spindrift */
-    /* oAction */
-    #define SPINDRIFT_ACT_ACTIVE                            0x0
-    #define SPINDRIFT_ACT_HIT_MARIO                         0x1
-    /* oAction */
-    #define SPINDRIFT_ANIM_DEFAULT                          0x0
+enum oActionsSpindrift {
+    SPINDRIFT_ACT_ACTIVE,
+    SPINDRIFT_ACT_HIT_MARIO,
+};
+enum animIDsSpindrift {
+    SPINDRIFT_ANIM_DEFAULT,
+};
 
 /* Mr Blizzard */
-    /* oBehParams2ndByte */
-    #define MR_BLIZZARD_STYPE_NO_CAP                        0x0
-    #define MR_BLIZZARD_STYPE_JUMPING                       0x1
-    /* oAction */
-    #define MR_BLIZZARD_ACT_SPAWN_SNOWBALL                  0x0
-    #define MR_BLIZZARD_ACT_HIDE_UNHIDE                     0x1
-    #define MR_BLIZZARD_ACT_RISE_FROM_GROUND                0x2
-    #define MR_BLIZZARD_ACT_ROTATE                          0x3
-    #define MR_BLIZZARD_ACT_THROW_SNOWBALL                  0x4
-    #define MR_BLIZZARD_ACT_BURROW                          0x5
-    #define MR_BLIZZARD_ACT_DEATH                           0x6
-    #define MR_BLIZZARD_ACT_JUMP                            0x7
-    /* oAnimState */
-    #define MR_BLIZZARD_ANIM_STATE_NO_CAP                   0x0
-    #define MR_BLIZZARD_ANIM_STATE_HAS_CAP                  0x1
-    /* Animations */
-    #define MR_BLIZZARD_ANIM_SPAWN_SNOWBALL                 0x0
-    #define MR_BLIZZARD_ANIM_THROW_SNOWBALL                 0x1
+enum oBehParams2ndByteMrBlizzard {
+    MR_BLIZZARD_STYPE_NO_CAP,
+    MR_BLIZZARD_STYPE_JUMPING,
+};
+enum oActionsMrBlizzard {
+    MR_BLIZZARD_ACT_SPAWN_SNOWBALL,
+    MR_BLIZZARD_ACT_HIDE_UNHIDE,
+    MR_BLIZZARD_ACT_RISE_FROM_GROUND,
+    MR_BLIZZARD_ACT_ROTATE,
+    MR_BLIZZARD_ACT_THROW_SNOWBALL,
+    MR_BLIZZARD_ACT_BURROW,
+    MR_BLIZZARD_ACT_DEATH,
+    MR_BLIZZARD_ACT_JUMP,
+};
+enum oAnimStatesMrBlizzard {
+    MR_BLIZZARD_ANIM_STATE_NO_CAP,
+    MR_BLIZZARD_ANIM_STATE_HAS_CAP,
+};
+enum animIDsMrBlizzard {
+    MR_BLIZZARD_ANIM_SPAWN_SNOWBALL,
+    MR_BLIZZARD_ANIM_THROW_SNOWBALL,
+};
 
 /* Mr Blizzard Snowball */
-    /* oAction */
-    #define MR_BLIZZARD_SNOWBALL_ACT_INIT                   0x0
-    #define MR_BLIZZARD_SNOWBALL_ACT_LAUNCH                 0x1
-    #define MR_BLIZZARD_SNOWBALL_ACT_COLLISION              0x2
+enum oActionsMrBlizzardSnowball {
+    MR_BLIZZARD_SNOWBALL_ACT_INIT,
+    MR_BLIZZARD_SNOWBALL_ACT_LAUNCH,
+    MR_BLIZZARD_SNOWBALL_ACT_COLLISION,
+};
 
 /* Mr I */
-    /* oBehParams2ndByte */
-    #define MR_I_BP_NORMAL                                  0x0
-    #define MR_I_BP_LARGE_WITH_STAR                         0x1
-    /* oAction */
-    #define MR_I_BODY_ACT_FAR_AWAY                          0x0
-    #define MR_I_BODY_ACT_IDLE                              0x1
-    #define MR_I_BODY_ACT_LOOKING_AT_MARIO                  0x2
-    #define MR_I_BODY_ACT_SPIN_DEATH                        0x3
+enum oBehParams2ndByteMrI {
+    MR_I_BP_NORMAL,
+    MR_I_BP_LARGE_WITH_STAR,
+};
+enum oActionsMrI {
+    MR_I_BODY_ACT_FAR_AWAY,
+    MR_I_BODY_ACT_IDLE,
+    MR_I_BODY_ACT_LOOKING_AT_MARIO,
+    MR_I_BODY_ACT_SPIN_DEATH,
+};
 
 /* Mr I & Piranha Plant Particle */
-    /* oAction */
-    #define MR_I_PIRANHA_PARTICLE_ACT_MOVE                  0x0
-    #define MR_I_PIRANHA_PARTICLE_ACT_INTERACTED            0x1
+enum oActionsMrIPiranhaPlantParticle {
+    MR_I_PIRANHA_PARTICLE_ACT_MOVE,
+    MR_I_PIRANHA_PARTICLE_ACT_INTERACTED,
+};
 
 /* Bullet Bill */
-    /* oAction */
-    #define BULLET_BILL_ACT_RESET                           0x0
-    #define BULLET_BILL_ACT_IDLE                            0x1
-    #define BULLET_BILL_ACT_CHASING_MARIO                   0x2
-    #define BULLET_BILL_ACT_HIT                             0x3
+enum oActionsBulletBill {
+    BULLET_BILL_ACT_RESET,
+    BULLET_BILL_ACT_IDLE,
+    BULLET_BILL_ACT_CHASING_MARIO,
+    BULLET_BILL_ACT_HIT,
+};
 
 /* Thwomp & Grindel */
-    /* oAction */
-    #define GRINDEL_THWOMP_ACT_RISING                       0x0
-    #define GRINDEL_THWOMP_ACT_FLOATING                     0x1
-    #define GRINDEL_THWOMP_ACT_FALLING                      0x2
-    #define GRINDEL_THWOMP_ACT_LAND                         0x3
-    #define GRINDEL_THWOMP_ACT_ON_GROUND                    0x4
+enum oActionsThwompGrindel {
+    GRINDEL_THWOMP_ACT_RISING,
+    GRINDEL_THWOMP_ACT_FLOATING,
+    GRINDEL_THWOMP_ACT_FALLING,
+    GRINDEL_THWOMP_ACT_LAND,
+    GRINDEL_THWOMP_ACT_ON_GROUND,
+};
 
 /* Whomp */
-    /* oBehParams2ndByte */
-    #define WHOMP_BP_NORMAL                                 0x0
-    #define WHOMP_BP_KING                                   0x1
-    /* oAction */
-    #define WHOMP_ACT_INIT                                  0x0
-    #define WHOMP_ACT_PATROL                                0x1
-    #define WHOMP_ACT_KING_CHASE                            0x2
-    #define WHOMP_ACT_PREPARE_JUMP                          0x3
-    #define WHOMP_ACT_JUMP                                  0x4
-    #define WHOMP_ACT_LAND                                  0x5
-    #define WHOMP_ACT_ON_GROUND_GENERAL                     0x6
-    #define WHOMP_ACT_TURN                                  0x7
-    #define WHOMP_ACT_DIE                                   0x8
-    #define WHOMP_ACT_STOP_BOSS_MUSIC                       0x9
+enum oBehParams2ndByteWhomp {
+    WHOMP_BP_NORMAL,
+    WHOMP_BP_KING,
+};
+enum oActionsWhomp {
+    WHOMP_ACT_INIT,
+    WHOMP_ACT_PATROL,
+    WHOMP_ACT_KING_CHASE,
+    WHOMP_ACT_PREPARE_JUMP,
+    WHOMP_ACT_JUMP,
+    WHOMP_ACT_LAND,
+    WHOMP_ACT_ON_GROUND_GENERAL,
+    WHOMP_ACT_TURN,
+    WHOMP_ACT_DIE,
+    WHOMP_ACT_STOP_BOSS_MUSIC,
+};
     /* oSubAction */
-        /* WHOMP_ACT_INIT */
-    #define WHOMP_SUB_ACT_INIT_IDLE                         0x0
-    #define WHOMP_SUB_ACT_INIT_DIALOG                       0x1
-        /* WHOMP_ACT_LAND */
-    #define WHOMP_SUB_ACT_LAND_EFFECTS                      0x0
-    #define WHOMP_SUB_ACT_LAND_ON_GROUND                    0x1
-        /* WHOMP_ACT_ON_GROUND_GENERAL */
-    #define WHOMP_SUB_ACT_GROUND_LYING_DOWN                 0x0
-    #define WHOMP_SUB_ACT_GROUND_PREPARE_STAND_UP           0x1
-    #define WHOMP_SUB_ACT_GROUND_STAND_UP                   0xA
-        /* WHOMP_ACT_TURN */
-    #define WHOMP_SUB_ACT_TURN_TURNING                      0x0
-    #define WHOMP_SUB_ACT_TURN_END                          0x1
-    /* Animations */
-    #define WHOMP_ANIM_WALK                                 0x0
-    #define WHOMP_ANIM_JUMP                                 0x1
+enum oSubActionsWhompActInit { // WHOMP_ACT_INIT
+    WHOMP_SUB_ACT_INIT_IDLE,
+    WHOMP_SUB_ACT_INIT_DIALOG,
+};
+enum oSubActionsWhompActLand { // WHOMP_ACT_LAND
+    WHOMP_SUB_ACT_LAND_EFFECTS,
+    WHOMP_SUB_ACT_LAND_ON_GROUND,
+};
+enum oSubActionsWhompActOnGroundGeneral { // WHOMP_ACT_ON_GROUND_GENERAL
+    WHOMP_SUB_ACT_GROUND_LYING_DOWN,
+    WHOMP_SUB_ACT_GROUND_PREPARE_STAND_UP,
+    WHOMP_SUB_ACT_GROUND_STAND_UP = 0xA,
+};
+enum oSubActionsWhompActTurn { // WHOMP_ACT_TURN
+    WHOMP_SUB_ACT_TURN_TURNING,
+    WHOMP_SUB_ACT_TURN_END,
+};
+enum animIDsWhomp {
+    WHOMP_ANIM_WALK,
+    WHOMP_ANIM_JUMP,
+};
 
 /* WF Kickable Board */
-    /* oAction */
-    #define KICKABLE_BOARD_ACT_IDLE_VERTICAL                0x0
-    #define KICKABLE_BOARD_ACT_ROCKING                      0x1
-    #define KICKABLE_BOARD_ACT_FALLING                      0x2
-    #define KICKABLE_BOARD_ACT_IDLE_HORIZONTAL              0x3
-    /* check_mario_attacking */
-    #define WF_ATTACK_NONE                                  0x0
-    #define WF_ATTACK_GROUND                                0x1
-    #define WF_ATTACK_AIR                                   0x2
+enum oActionsKickableBoard {
+    KICKABLE_BOARD_ACT_IDLE_VERTICAL,
+    KICKABLE_BOARD_ACT_ROCKING,
+    KICKABLE_BOARD_ACT_FALLING,
+    KICKABLE_BOARD_ACT_IDLE_HORIZONTAL,
+};
+enum WFAttackTypes { // check_mario_attacking
+    WF_ATTACK_NONE,
+    WF_ATTACK_GROUND,
+    WF_ATTACK_AIR,
+};
 
 /* White Puff Explosion */
 enum oBehParams2ndByteWhitePuffExplosion {
