@@ -1,4 +1,0 @@
-[submodule "src/s2d_engine"]
-	path = src/s2d_engine
-	url = https://github.com/someone2639/S2DEX-Text-Engine
-	branch = HackerSM64
