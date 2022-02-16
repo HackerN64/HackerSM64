@@ -1111,14 +1111,12 @@ void visualise_object_hitbox(struct Object *node) {
 void geo_process_object(struct Object *node) {
     if (node->header.gfx.areaIndex == gCurGraphNodeRoot->areaIndex) {
         if (node->header.gfx.throwMatrix != NULL) {
-            mtxf_mul(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix,
-                     gMatStack[gMatStackIndex]);
-            mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
+            mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix, node->header.gfx.scale);
         } else if (node->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
             mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex],
                            node->header.gfx.pos, node->header.gfx.scale, gCurGraphNodeCamera->roll);
         } else {
-            mtxf_rotate_zxy_and_translate_and_mul(node->header.gfx.angle, node->header.gfx.pos, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
+            mtxf_rotate_zxy_and_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos, node->header.gfx.angle);
             mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
         }
 

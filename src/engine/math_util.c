@@ -668,14 +668,14 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 roll) 
         dest[i][3] = 0.0f;
     }
     if (roll != 0x0) {
-        float m00 = dest[0][0];
-        float m01 = dest[0][1];
-        float m02 = dest[0][2];
-        float m10 = dest[1][0];
-        float m11 = dest[1][1];
-        float m12 = dest[1][2];
-        float cosa = coss(roll);
-        float sina = sins(roll);
+        f32 m00 = dest[0][0];
+        f32 m01 = dest[0][1];
+        f32 m02 = dest[0][2];
+        f32 m10 = dest[1][0];
+        f32 m11 = dest[1][1];
+        f32 m12 = dest[1][2];
+        f32 cosa = coss(roll);
+        f32 sina = sins(roll);
         dest[0][0] =  (cosa * m00) + (sina * m10); 
         dest[0][1] =  (cosa * m01) + (sina * m11); 
         dest[0][2] =  (cosa * m02) + (sina * m12);
