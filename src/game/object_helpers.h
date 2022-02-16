@@ -66,7 +66,6 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
 Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void *context);
 Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *context);
 void obj_update_pos_from_parent_transformation(Mat4 mtx, struct Object *obj);
-void create_transformation_from_matrices(Mat4 a0, Mat4 a1, Mat4 a2);
 void obj_set_held_state(struct Object *obj, const BehaviorScript *heldBehavior);
 f32 lateral_dist_between_objects(struct Object *obj1, struct Object *obj2);
 f32 dist_between_objects(struct Object *obj1, struct Object *obj2);

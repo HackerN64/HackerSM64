@@ -1,10 +1,6 @@
 #include "game/paintings.h"
 
 // 0x07021800 - 0x07021818
-static const Lights1 inside_castle_seg7_lights_textured = gdSPDefLights1(
-    0x50, 0x50, 0x50,
-    0xff, 0xff, 0xff, 0x32, 0x32, 0x32
-);
 
 // 0x07021818 - 0x07021898
 static const Vtx inside_castle_seg7_vertex_painting_textured[] = {
@@ -71,8 +67,8 @@ static const Gfx inside_castle_seg7_dl_painting_texture_begin[] = {
     gsDPPipeSync(),
     gsSPSetGeometryMode(G_LIGHTING | G_SHADING_SMOOTH),
     gsDPSetCombineMode(G_CC_MODULATERGB, G_CC_MODULATERGB),
-    gsSPLight(&inside_castle_seg7_lights_textured.l, 1),
-    gsSPLight(&inside_castle_seg7_lights_textured.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x505050ff),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPTileSync(),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
@@ -562,13 +558,6 @@ static const PaintingData *const inside_castle_seg7_painting_texture_maps_070225
 };
 
 UNUSED static const u64 castle_inside_unused_0 = 0x0;
-
-
-// 0x07022540 - 0x07022558
-static const Lights1 inside_castle_seg7_lights_hmc = gdSPDefLights1(
-    0x40, 0x40, 0x80,
-    0x64, 0x64, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x07022598 - 0x070225D8
 static const Vtx inside_castle_seg7_vertex_hmc[] = {
@@ -1249,8 +1238,8 @@ const Gfx inside_castle_seg7_dl_ccm_fake_painting_2[] = {
 // 0x07023580 - 0x070235B8
 static const Gfx inside_castle_seg7_painting_dl_hmc[] = {
     gsDPPipeSync(),
-    gsSPLight(&inside_castle_seg7_lights_hmc.l, 1),
-    gsSPLight(&inside_castle_seg7_lights_hmc.a, 2),
+    gsSPLightColor(LIGHT_1, 0x6464ffff),
+    gsSPLightColor(LIGHT_2, 0x404080ff),
     gsSPVertex(inside_castle_seg7_vertex_hmc, 4, 0),
     gsSP1Triangle( 0,  1,  2, 0x0),
     gsSP1Triangle( 0,  2,  3, 0x0),

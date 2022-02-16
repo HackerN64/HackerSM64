@@ -96,11 +96,6 @@
 // Make sure your custom environment map textures are the correct orientation.
 // #define FIX_REFLECT_MTX
 
-// Stretches shadows to fit the terrain instead of rotating them to align with it.
-// This makes them maintain a constant horizontal size.
-// Performs better than regular shadows.
-// #define SHEAR_SHADOWS
-
 // Disables all object shadows. You'll probably only want this either as a last resort for performance or if you're making a super stylized hack.
 // #define DISABLE_SHADOWS
 

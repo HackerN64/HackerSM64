@@ -63,15 +63,18 @@ const GeoLayout intro_geo_mario_head_regular[] = {
 #endif
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
+#ifdef KEEP_MARIO_HEAD
       GEO_ZBUFFER(1),
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM(45, 128, 16384),
-#ifdef KEEP_MARIO_HEAD
          GEO_OPEN_NODE(),
-            GEO_ASM(2, geo_draw_mario_head_goddard),
+            GEO_CAMERA(CAMERA_MODE_NONE, 0, 0, 1000, 0, 0, 0, 0x00000000),
+            GEO_OPEN_NODE(),
+               GEO_ASM(2, geo_draw_mario_head_goddard),
+            GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
-#endif
       GEO_CLOSE_NODE(),
+#endif
 #ifdef ENABLE_RUMBLE
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),
@@ -96,15 +99,18 @@ const GeoLayout intro_geo_mario_head_dizzy[] = {
 #endif
          GEO_CLOSE_NODE(),
       GEO_CLOSE_NODE(),
+#ifdef KEEP_MARIO_HEAD
       GEO_ZBUFFER(1),
       GEO_OPEN_NODE(),
          GEO_CAMERA_FRUSTUM(45, 128, 16384),
-#ifdef KEEP_MARIO_HEAD
          GEO_OPEN_NODE(),
-            GEO_ASM(3, geo_draw_mario_head_goddard),
+            GEO_CAMERA(CAMERA_MODE_NONE, 0, 0, 1000, 0, 0, 0, 0x00000000),
+            GEO_OPEN_NODE(),
+               GEO_ASM(3, geo_draw_mario_head_goddard),
+            GEO_CLOSE_NODE(),
          GEO_CLOSE_NODE(),
-#endif
       GEO_CLOSE_NODE(),
+#endif
 #ifdef ENABLE_RUMBLE
       GEO_ZBUFFER(0),
       GEO_OPEN_NODE(),

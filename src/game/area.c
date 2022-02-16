@@ -25,6 +25,7 @@
 #include "puppyprint.h"
 #include "debug_box.h"
 #include "engine/colors.h"
+#include "profiling.h"
 
 struct SpawnInfo gPlayerSpawnInfos[1];
 struct GraphNode *gGraphNodePointers[MODEL_ID_COUNT];
@@ -449,6 +450,9 @@ void render_game(void) {
 #ifdef PUPPYPRINT
     vec4_same(gCurrEnv, 255);
 #endif
+    
+    fast_profiler_update(PROFILER_TIME_GFX);
+    fast_profiler_print_times();
 
 #if PUPPYPRINT_DEBUG
     profiler_update(graphTime, first);

@@ -1719,8 +1719,7 @@ void gd_dl_lookat(struct ObjCamera *cam, f32 arg1, f32 arg2, f32 arg3, f32 arg4,
 
     arg7 *= RAD_PER_DEG;
 
-    gd_mat4f_lookat(&cam->unkE8, arg1, arg2, arg3, arg4, arg5, arg6, gd_sin_d(arg7), gd_cos_d(arg7),
-                  0.0f);
+    gd_mat4f_lookat(&cam->unkE8, arg1, arg2, arg3, arg4, arg5, arg6, gd_sin_d(arg7), gd_cos_d(arg7), 0.0f);
 
     mat4_to_mtx(&cam->unkE8, &DL_CURRENT_MTX(sCurrentGdDl));
     gSPMatrix(next_gfx(), osVirtualToPhysical(&DL_CURRENT_MTX(sCurrentGdDl)),

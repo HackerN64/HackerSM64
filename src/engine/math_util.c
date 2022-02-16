@@ -655,30 +655,43 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
  * 'scale' is the scale of the object.
  * 'roll' rotates the object while still facing the camera.
  */
-void mtxf_billboard(Mat4 dest, Mat4 src, Vec3f position, Vec3f scale, s32 roll) {
+void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 roll) {
+    s32 i, j;
     f32 sx = scale[0];
     f32 sy = scale[1];
     f32 sz = scale[2];
-    f32 *dstp = (f32 *)dest;
-    s32 i;
-
-    for (i = 0; i < 12; i++) {
-        *dstp++ = 0;
+    Mat4 *cameraMat = &gCameraTransform;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            dest[i][j] = (*cameraMat)[j][i];
+        }
+        dest[i][3] = 0.0f;
     }
-    if (roll == 0x0) {
-        dest[0][0] = sx;
-        dest[0][1] = 0;
-        dest[1][0] = 0;
-        dest[1][1] = sy;
-    } else {
-        dest[0][0] =  coss(roll) * sx;
-        dest[0][1] =  sins(roll) * sx;
-        dest[1][0] = -dest[0][1] * sy;
-        dest[1][1] =  dest[0][0] * sy;
+    if (roll != 0x0) {
+        float m00 = dest[0][0];
+        float m01 = dest[0][1];
+        float m02 = dest[0][2];
+        float m10 = dest[1][0];
+        float m11 = dest[1][1];
+        float m12 = dest[1][2];
+        float cosa = coss(roll);
+        float sina = sins(roll);
+        dest[0][0] =  (cosa * m00) + (sina * m10); 
+        dest[0][1] =  (cosa * m01) + (sina * m11); 
+        dest[0][2] =  (cosa * m02) + (sina * m12);
+        dest[1][0] = -(sina * m00) + (cosa * m10);
+        dest[1][1] = -(sina * m01) + (cosa * m11);
+        dest[1][2] = -(sina * m02) + (cosa * m12);
     }
-    dest[2][2] = sz;
+    for (i = 0; i < 3; i++) {
+        dest[0][i] *= sx;
+        dest[1][i] *= sy;
+        dest[2][i] *= sz;
+    }
 
-    linear_mtxf_mul_vec3f_and_translate(src, dest[3], position);
+    // Translation = input translation + position
+    vec3f_copy(dest[3], position);
+    vec3f_add(dest[3], mtx[3]);
     ((u32 *) dest)[15] = FLOAT_ONE;
 }
 
@@ -719,54 +732,22 @@ static void vec3f_create_axis_normals_from_up_dir(Vec3f colX, Vec3f colY, Vec3f 
 
 /**
  * Mostly the same as 'mtxf_align_terrain_normal', but also applies a scale and multiplication.
- * 'src' is the matrix to multiply from
  * 'upDir' is the terrain normal
  * 'pos' is the object's position in the world
  * 'scale' is the scale of the shadow
  * 'yaw' is the angle which it should face
  */
-#ifdef SHEAR_SHADOWS
-void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
-    f32 hxy = -upDir[0] / upDir[1];
-    f32 hzy = -upDir[2] / upDir[1];
-    f32 cosyaw = coss(yaw);
-    f32 sinyaw = sins(yaw);
-
-    Vec3f entry;
-    entry[0] = scale[0] * cosyaw;
-    entry[1] = (scale[0] * cosyaw * hxy) - (scale[0] * sinyaw * hzy);
-    entry[2] = -scale[0] * sinyaw;
-    linear_mtxf_mul_vec3f(src, dest[0], entry);
-    entry[0] = 0;
-    entry[1] = scale[1];
-    entry[2] = 0;
-    linear_mtxf_mul_vec3f(src, dest[1], entry);
-    entry[0] = scale[2] * sinyaw;
-    entry[1] = (scale[2] * sinyaw * hxy) + (scale[2] * cosyaw * hzy);
-    entry[2] = scale[2] * cosyaw;
-    linear_mtxf_mul_vec3f(src, dest[2], entry);
-    linear_mtxf_mul_vec3f(src, dest[3], pos);
-    vec3f_add(dest[3], src[3]);
-    MTXF_END(dest);
-}
-#else
-void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
+void mtxf_shadow(Mat4 dest, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
     Vec3f leftDir;
     Vec3f forwardDir;
     vec3f_set(forwardDir, sins(yaw), 0.0f, coss(yaw));
     vec3f_create_axis_normals_from_up_dir(leftDir, upDir, forwardDir);
-    Vec3f entry;
-    vec3f_prod(entry, leftDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[0], entry);
-    vec3f_prod(entry, upDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[1], entry);
-    vec3f_prod(entry, forwardDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[2], entry);
-    linear_mtxf_mul_vec3f(src, dest[3], pos);
-    vec3f_add(dest[3], src[3]);
+    vec3f_prod(dest[0], leftDir, scale);
+    vec3f_prod(dest[1], upDir, scale);
+    vec3f_prod(dest[2], forwardDir, scale);
+    vec3f_copy(dest[3], pos);
     MTXF_END(dest);
 }
-#endif
 
 /**
  * Set 'dest' to a transformation matrix that aligns an object with the terrain
@@ -804,7 +785,7 @@ static void find_floor_at_relative_angle(Vec3f point, Vec3f pos, s32 yaw, s32 an
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
     Vec3f point0, point1, point2;
     Vec3f xColumn, yColumn, zColumn;
-    f32 minY   = (-radius * 3);
+    f32 minY = (-radius * 3);
     f32 height = (pos[1] + 150);
 
     find_floor_at_relative_angle(point0, pos, yaw, DEGREES( 60), radius, height, minY);
@@ -860,8 +841,9 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
 /**
  * Returns a float value from an index in a fixed point matrix.
  */
-f32 mtx_get_float(Mtx *mtx, u32 index) {
+f32 mtx_get_float(Mtx *mtx, u32 xIndex, u32 yIndex) {
     f32 ret = 0.0f;
+    u32 index = (yIndex * 4) + xIndex;
     if (index < 16) {
         s16 *src = (s16 *)mtx;
         s32 fixed_val = (src[index +  0] << 16)
@@ -875,7 +857,8 @@ f32 mtx_get_float(Mtx *mtx, u32 index) {
 /**
  * Writes a float value to a fixed point matrix.
  */
-void mtx_set_float(Mtx *mtx, u32 index, f32 val) {
+void mtx_set_float(Mtx *mtx, f32 val, u32 xIndex, u32 yIndex) {
+    u32 index = (yIndex * 4) + xIndex;
     if (index < 16) {
         f32 scale = construct_float((float)0x00010000);
         s32 fixed_val = mul_without_nop(val, scale);
@@ -926,37 +909,6 @@ void create_transformation_from_matrices(Mat4 dst, Mat4 a1, Mat4 a2) {
         dstp++;
     }
     MTXF_END(dst);
-}
-
-/**
- * Extract a position given an object's transformation matrix and a camera matrix.
- * This is used for determining the world position of the held object: since objMtx
- * inherits the transformation from both the camera and Mario, it calculates this
- * by taking the camera matrix and inverting its transformation by first rotating
- * objMtx back from screen orientation to world orientation, and then subtracting
- * the camera position.
- */
-void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, Mat4 camMtx) {
-    s32 i;
-    f32 *destp = (f32 *)dest;
-    f32 *camp = (f32 *)camMtx;
-    Vec3f y;
-    f32 *x = y;
-    f32 *objp = (f32 *)objMtx;
-
-    for (i = 0; i < 3; i++) {
-        *x = (objp[12] - camp[12]);
-        camp++;
-        objp++;
-        x = (f32 *)(((u32)x) + 4);
-    }
-    camp -= 3;
-    for (i = 0; i < 3; i++) {
-        *destp++ = ((x[-3] * camp[0])
-                  + (x[-2] * camp[1])
-                  + (x[-1] * camp[2]));
-        camp += 4;
-    }
 }
 
 /**

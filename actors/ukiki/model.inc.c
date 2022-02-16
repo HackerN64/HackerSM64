@@ -1,22 +1,10 @@
 // Ukiki
 
 // Unreferenced light group
-UNUSED static const Lights1 ukiki_lights_unused1 = gdSPDefLights1(
-    0x1d, 0x12, 0x07,
-    0x77, 0x48, 0x1f, 0x28, 0x28, 0x28
-);
 
 // Unreferenced light group
-UNUSED static const Lights1 ukiki_lights_unused2 = gdSPDefLights1(
-    0x39, 0x24, 0x18,
-    0xe7, 0x93, 0x61, 0x28, 0x28, 0x28
-);
 
 // 0x05007BA0
-static const Lights1 ukiki_seg5_lights_05007BA0 = gdSPDefLights1(
-    0x39, 0x24, 0x18,
-    0xe7, 0x93, 0x61, 0x28, 0x28, 0x28
-);
 
 // The hell?
 UNUSED static const u64 ukiki_unused_1 = 1;
@@ -42,16 +30,8 @@ ALIGNED8 static const Texture ukiki_seg5_texture_0500A3C0[] = {
 };
 
 // 0x0500ABC0
-static const Lights1 ukiki_seg5_lights_0500ABC0 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500ABD8
-static const Lights1 ukiki_seg5_lights_0500ABD8 = gdSPDefLights1(
-    0x77, 0x66, 0x45,
-    0xee, 0xcd, 0x8a, 0x28, 0x28, 0x28
-);
 
 // 0x0500ABF0
 static const Vtx ukiki_seg5_vertex_0500ABF0[] = {
@@ -144,8 +124,8 @@ static const Vtx ukiki_seg5_vertex_0500AF60[] = {
 
 // 0x0500B040 - 0x0500B1D8
 const Gfx ukiki_seg5_dl_0500B040[] = {
-    gsSPLight(&ukiki_seg5_lights_0500ABC0.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500ABC0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500ABF0, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  1,  0, 0x0),
     gsSP2Triangles( 1,  4,  2, 0x0,  5,  2,  4, 0x0),
@@ -178,8 +158,8 @@ const Gfx ukiki_seg5_dl_0500B040[] = {
 
 // 0x0500B1D8 - 0x0500B278
 const Gfx ukiki_seg5_dl_0500B1D8[] = {
-    gsSPLight(&ukiki_seg5_lights_0500ABD8.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500ABD8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xeecd8aff),
+    gsSPLightColor(LIGHT_2, 0x776645ff),
     gsSPVertex(ukiki_seg5_vertex_0500AF60, 14, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
     gsSP2Triangles( 2,  4,  0, 0x0,  5,  6,  4, 0x0),
@@ -233,10 +213,6 @@ const Gfx ukiki_seg5_dl_0500B310[] = {
 };
 
 // 0x0500B338
-static const Lights1 ukiki_seg5_lights_0500B338 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500B350
 static const Vtx ukiki_seg5_vertex_0500B350[] = {
@@ -308,8 +284,8 @@ const Gfx ukiki_seg5_dl_0500B660[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500B338.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500B338.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500B350, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  1,  0, 0x0),
     gsSP2Triangles( 3,  0,  4, 0x0,  3,  5,  6, 0x0),
@@ -365,10 +341,6 @@ const Gfx ukiki_seg5_dl_0500B820[] = {
 };
 
 // 0x0500B888
-static const Lights1 ukiki_seg5_lights_0500B888 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500B8A0
 static const Vtx ukiki_seg5_vertex_0500B8A0[] = {
@@ -387,8 +359,8 @@ const Gfx ukiki_seg5_dl_0500B920[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500B888.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500B888.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500B8A0, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 1,  4,  5, 0x0,  4,  6,  5, 0x0),
@@ -413,10 +385,6 @@ const Gfx ukiki_seg5_dl_0500B988[] = {
 };
 
 // 0x0500B9E8
-static const Lights1 ukiki_seg5_lights_0500B9E8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500BA00
 static const Vtx ukiki_seg5_vertex_0500BA00[] = {
@@ -436,8 +404,8 @@ const Gfx ukiki_seg5_dl_0500BA90[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500B9E8.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500B9E8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500BA00, 9, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  1,  4, 0x0),
     gsSP2Triangles( 1,  5,  6, 0x0,  1,  6,  2, 0x0),
@@ -465,10 +433,6 @@ const Gfx ukiki_seg5_dl_0500BB28[] = {
 };
 
 // 0x0500BB88
-static const Lights1 ukiki_seg5_lights_0500BB88 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500BBA0
 static const Vtx ukiki_seg5_vertex_0500BBA0[] = {
@@ -486,8 +450,8 @@ const Gfx ukiki_seg5_dl_0500BC10[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500BB88.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500BB88.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500BBA0, 7, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 2,  4,  3, 0x0,  2,  5,  4, 0x0),
@@ -512,10 +476,6 @@ const Gfx ukiki_seg5_dl_0500BC78[] = {
 };
 
 // 0x0500BCD8
-static const Lights1 ukiki_seg5_lights_0500BCD8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500BCF0
 static const Vtx ukiki_seg5_vertex_0500BCF0[] = {
@@ -537,8 +497,8 @@ const Gfx ukiki_seg5_dl_0500BDA0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500BCD8.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500BCD8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500BCF0, 11, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  4, 0x0),
     gsSP2Triangles( 0,  3,  5, 0x0,  0,  2,  6, 0x0),
@@ -566,10 +526,6 @@ const Gfx ukiki_seg5_dl_0500BE38[] = {
 };
 
 // 0x0500BE98
-static const Lights1 ukiki_seg5_lights_0500BE98 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500BEB0
 static const Vtx ukiki_seg5_vertex_0500BEB0[] = {
@@ -591,8 +547,8 @@ const Gfx ukiki_seg5_dl_0500BF60[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500BE98.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500BE98.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500BEB0, 11, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 2,  4,  5, 0x0,  2,  5,  3, 0x0),
@@ -620,10 +576,6 @@ const Gfx ukiki_seg5_dl_0500BFF8[] = {
 };
 
 // 0x0500C058
-static const Lights1 ukiki_seg5_lights_0500C058 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C070
 static const Vtx ukiki_seg5_vertex_0500C070[] = {
@@ -645,8 +597,8 @@ const Gfx ukiki_seg5_dl_0500C120[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500C058.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500C058.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500C070, 11, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  2,  4, 0x0),
     gsSP2Triangles( 2,  1,  5, 0x0,  2,  5,  4, 0x0),
@@ -674,10 +626,6 @@ const Gfx ukiki_seg5_dl_0500C1B8[] = {
 };
 
 // 0x0500C218
-static const Lights1 ukiki_seg5_lights_0500C218 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C230
 static const Vtx ukiki_seg5_vertex_0500C230[] = {
@@ -698,8 +646,8 @@ const Gfx ukiki_seg5_dl_0500C2D0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500C218.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500C218.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500C230, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  4, 0x0),
     gsSP2Triangles( 0,  3,  1, 0x0,  0,  2,  5, 0x0),
@@ -727,10 +675,6 @@ const Gfx ukiki_seg5_dl_0500C368[] = {
 };
 
 // 0x0500C3C8
-static const Lights1 ukiki_seg5_lights_0500C3C8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C3E0
 static const Vtx ukiki_seg5_vertex_0500C3E0[] = {
@@ -752,8 +696,8 @@ const Gfx ukiki_seg5_dl_0500C490[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500C3C8.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500C3C8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500C3E0, 11, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 0,  3,  4, 0x0,  2,  1,  5, 0x0),
@@ -781,10 +725,6 @@ const Gfx ukiki_seg5_dl_0500C528[] = {
 };
 
 // 0x0500C588
-static const Lights1 ukiki_seg5_lights_0500C588 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C5A0
 static const Vtx ukiki_seg5_vertex_0500C5A0[] = {
@@ -806,8 +746,8 @@ const Gfx ukiki_seg5_dl_0500C650[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500C588.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500C588.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500C5A0, 11, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
     gsSP2Triangles( 2,  3,  4, 0x0,  0,  5,  1, 0x0),
@@ -835,10 +775,6 @@ const Gfx ukiki_seg5_dl_0500C6E8[] = {
 };
 
 // 0x0500C748
-static const Lights1 ukiki_seg5_lights_0500C748 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C760
 static const Vtx ukiki_seg5_vertex_0500C760[] = {
@@ -859,8 +795,8 @@ const Gfx ukiki_seg5_dl_0500C800[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500C748.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500C748.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500C760, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 2,  1,  4, 0x0,  2,  4,  3, 0x0),
@@ -888,10 +824,6 @@ const Gfx ukiki_seg5_dl_0500C898[] = {
 };
 
 // 0x0500C8F8
-static const Lights1 ukiki_seg5_lights_0500C8F8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500C910
 static const Vtx ukiki_seg5_vertex_0500C910[] = {
@@ -912,8 +844,8 @@ const Gfx ukiki_seg5_dl_0500C9B0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, ukiki_seg5_texture_0500A3C0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&ukiki_seg5_lights_0500C8F8.l, 1),
-    gsSPLight(&ukiki_seg5_lights_0500C8F8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(ukiki_seg5_vertex_0500C910, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 2,  4,  5, 0x0,  2,  5,  3, 0x0),
@@ -1042,8 +974,8 @@ static const Vtx ukiki_seg5_vertex_0500CE98[] = {
 
 // 0x0500CF68 - 0x0500CFF0
 const Gfx ukiki_seg5_dl_0500CF68[] = {
-    gsSPLight(&ukiki_seg5_lights_05007BA0.l, 1),
-    gsSPLight(&ukiki_seg5_lights_05007BA0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xe79361ff),
+    gsSPLightColor(LIGHT_2, 0x392418ff),
     gsSPVertex(ukiki_seg5_vertex_0500CAA8, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
@@ -1057,8 +989,8 @@ const Gfx ukiki_seg5_dl_0500CF68[] = {
 
 // 0x0500CFF0 - 0x0500D078
 const Gfx ukiki_seg5_dl_0500CFF0[] = {
-    gsSPLight(&ukiki_seg5_lights_05007BA0.l, 1),
-    gsSPLight(&ukiki_seg5_lights_05007BA0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xe79361ff),
+    gsSPLightColor(LIGHT_2, 0x392418ff),
     gsSPVertex(ukiki_seg5_vertex_0500CC28, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
@@ -1072,8 +1004,8 @@ const Gfx ukiki_seg5_dl_0500CFF0[] = {
 
 // 0x0500D078 - 0x0500D108
 const Gfx ukiki_seg5_dl_0500D078[] = {
-    gsSPLight(&ukiki_seg5_lights_05007BA0.l, 1),
-    gsSPLight(&ukiki_seg5_lights_05007BA0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xe79361ff),
+    gsSPLightColor(LIGHT_2, 0x392418ff),
     gsSPVertex(ukiki_seg5_vertex_0500CDA8, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  5,  6, 0x0,  2,  7,  6, 0x0),
@@ -1087,8 +1019,8 @@ const Gfx ukiki_seg5_dl_0500D078[] = {
 
 // 0x0500D108 - 0x0500D198
 const Gfx ukiki_seg5_dl_0500D108[] = {
-    gsSPLight(&ukiki_seg5_lights_05007BA0.l, 1),
-    gsSPLight(&ukiki_seg5_lights_05007BA0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xe79361ff),
+    gsSPLightColor(LIGHT_2, 0x392418ff),
     gsSPVertex(ukiki_seg5_vertex_0500CE98, 13, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  0,  5, 0x0,  4,  5,  6, 0x0),

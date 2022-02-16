@@ -29,6 +29,7 @@
 #include "puppycam2.h"
 #include "debug_box.h"
 #include "vc_check.h"
+#include "profiling.h"
 
 // Gfx handlers
 struct SPTask *gGfxSPTask;
@@ -131,9 +132,6 @@ const Gfx init_rsp[] = {
 
     gsSPClearGeometryMode(G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD),
     gsSPSetGeometryMode(G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING),
-
-    gsSPNumLights(NUMLIGHTS_1),
-
     gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
 
     // Failing to set the clip ratio will result in warped triangles in F3DEX2:
@@ -779,6 +777,7 @@ void thread5_game_loop(UNUSED void *arg) {
     render_init();
 
     while (TRUE) {
+        fast_profiler_frame_setup();
         // If the reset timer is active, run the process to reset the game.
         if (gResetTimer != 0) {
             draw_reset_bars();
@@ -805,6 +804,7 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
         read_controller_inputs(THREAD_5_GAME_LOOP);
+        fast_profiler_update(PROFILER_TIME_CONTROLLERS);
         addr = level_script_execute(addr);
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();
