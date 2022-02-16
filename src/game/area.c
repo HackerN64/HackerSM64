@@ -423,6 +423,14 @@ void render_game(void) {
                 gWarpTransDelay--;
             }
         }
+#ifdef S2DEX_TEXT_ENGINE
+        s2d_init();
+
+        // place any custom text engine code here if not using deferred prints
+
+        s2d_handle_deferred();
+        s2d_stop();
+#endif
     } else {
         render_text_labels();
         if (gViewportClip != NULL) {
