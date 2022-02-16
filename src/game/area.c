@@ -423,6 +423,12 @@ void render_game(void) {
                 gWarpTransDelay--;
             }
         }
+#ifdef S2DEX_TEXT_ENGINE
+        // S2DEX Text Engine render kernel
+        s2d_init();
+        s2d_handle_deferred();
+        s2d_stop();
+#endif
     } else {
         render_text_labels();
         if (gViewportClip != NULL) {
