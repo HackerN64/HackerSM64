@@ -122,11 +122,14 @@ TEXT_ENGINE := none
 ifeq ($(TEXT_ENGINE), s2dex_text_engine)
   DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
   LIBRARIES += s2d_engine
+  # less hacky way to do this?
+  LIBS_DIR += -L src/s2d_engine/build
   DUMMY != ls src/s2d_engine/init.c >&2 || echo FAIL
     ifeq ($(DUMMY),FAIL)
-      $(error S2DEX Text Engine not found. Please run `git submodule update --init` and rebuild.)
+      $(info Grabbing S2DEX Text Engine from `https://github.com/someone2639/S2DEX-Text-Engine`......)
+      D2 != $(shell git clone -b HackerSM64 https://github.com/someone2639/S2DEX-Text-Engine src/s2d_engine)
     endif
-  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/build/lib/ CROSS=$(CROSS)
+  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/$(BUILD_DIR)/lib/
 endif
 # add more text engines here
 
@@ -555,7 +558,7 @@ all: $(ROM)
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
-	make -C src/s2d_engine clean
+	$(RM) -r src/s2d_engine/build
 
 distclean: clean
 	$(PYTHON) extract_assets.py --clean
