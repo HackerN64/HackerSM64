@@ -2386,8 +2386,9 @@ void exit_c_up(struct Camera *c) {
 
         // Search for an open direction to zoom out in, if the camera is changing to close, free roam,
         // or spiral-stairs mode
-        if (sModeInfo.lastMode == CAMERA_MODE_SPIRAL_STAIRS || sModeInfo.lastMode == CAMERA_MODE_CLOSE
-            || sModeInfo.lastMode == CAMERA_MODE_FREE_ROAM) {
+        if (sModeInfo.lastMode == CAMERA_MODE_SPIRAL_STAIRS
+         || sModeInfo.lastMode == CAMERA_MODE_CLOSE
+         || sModeInfo.lastMode == CAMERA_MODE_FREE_ROAM) {
             searching = TRUE;
             // Check the whole circle around Mario for an open direction to zoom out to
             for (sector = 0; sector < 16 && searching == 1; sector++) {
@@ -2395,7 +2396,6 @@ void exit_c_up(struct Camera *c) {
 
                 // If there are no walls this way,
                 if (f32_find_wall_collision(&curPos[0], &curPos[1], &curPos[2], 20.f, 50.f) == 0) {
-
                     // Start close to Mario, check for walls, floors, and ceilings all the way to the
                     // zoomed out distance
                     for (d = curDist; d < gCameraZoomDist; d += 20.f) {
@@ -2951,7 +2951,6 @@ void update_camera(struct Camera *c) {
             (gPlayer1Controller->buttonDown & R_TRIG) && cam_select_alt_mode(0) == CAM_SELECTION_FIXED)
             || (gCameraMovementFlags & CAM_MOVE_FIX_IN_PLACE)
             || (sMarioCamState->action) == ACT_GETTING_BLOWN) {
-
             // If this is the first frame that R_TRIG is held, play the "click" sound
             if (c->cutscene == CUTSCENE_NONE && (gPlayer1Controller->buttonPressed & R_TRIG)
                 && cam_select_alt_mode(0) == CAM_SELECTION_FIXED) {
@@ -3270,7 +3269,6 @@ void zoom_out_if_paused_and_outside(struct GraphNodeCamera *camera) {
     if (gCameraMovementFlags & CAM_MOVE_PAUSE_SCREEN) {
         if (sFramesPaused >= 2) {
             if (sZoomOutAreaMasks[areaMaskIndex] & areaBit) {
-
                 camera->focus[0] = gCamera->areaCenX;
                 camera->focus[1] = (sMarioCamState->pos[1] + gCamera->areaCenY) / 2;
                 camera->focus[2] = gCamera->areaCenZ;
@@ -4336,7 +4334,6 @@ void play_sound_if_cam_switched_to_lakitu_or_mario(void) {
  */
 void radial_camera_input(struct Camera *c) {
     if ((gCameraMovementFlags & CAM_MOVE_ENTERED_ROTATE_SURFACE) || !(gCameraMovementFlags & CAM_MOVE_ROTATE)) {
-
         // If C-L or C-R are pressed, the camera is rotating
         if (gPlayer1Controller->buttonPressed & (L_CBUTTONS | R_CBUTTONS)) {
             gCameraMovementFlags &= ~CAM_MOVE_ENTERED_ROTATE_SURFACE;
@@ -5962,7 +5959,6 @@ void camera_course_processing(struct Camera *c) {
         // Process positional triggers.
         // All triggered events are called, not just the first one.
         while (sCameraTriggers[level][b].event != NULL) {
-
             // Check only the current area's triggers
             if (sCameraTriggers[level][b].area == area) {
                 // Copy the bounding box into center and bounds

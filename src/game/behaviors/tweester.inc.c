@@ -78,8 +78,7 @@ void tweester_act_chase(void) {
     cur_obj_play_sound_1(SOUND_ENV_WIND1);
 
     if (cur_obj_lateral_dist_from_mario_to_home() < activationRadius
-        && o->oSubAction == TWEESTER_SUB_ACT_CHASE_MARIO) {
-
+     && o->oSubAction == TWEESTER_SUB_ACT_CHASE_MARIO) {
         o->oForwardVel = 20.0f;
         cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x200);
         print_debug_top_down_objectinfo("off ", 0);

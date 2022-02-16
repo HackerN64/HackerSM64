@@ -713,7 +713,6 @@ static void process_sound_request(u32 bits, f32 *pos) {
             // Otherwise the new sound will be dropped.
             if ((sSoundBanks[bank][soundIndex].soundBits & SOUNDARGS_MASK_PRIORITY)
                 <= (bits & SOUNDARGS_MASK_PRIORITY)) {
-
                 // If the existing sound is discrete or is a different continuous sound, then
                 // interrupt it and play the new sound instead.
                 // Otherwise the new sound is continuous and equals the existing sound, so we just
@@ -878,7 +877,6 @@ static void select_current_sounds(u8 bank) {
         // playing sound
         if (sSoundBanks[bank][soundIndex].soundStatus != SOUND_STATUS_STOPPED
             && soundIndex == latestSoundIndex) {
-
             // Recompute distance each frame since the sound's position may have changed
             sSoundBanks[bank][soundIndex].distance =
                 sqrtf(sqr(*sSoundBanks[bank][soundIndex].x)
@@ -2017,7 +2015,6 @@ void stop_sound(u32 soundBits, f32 *pos) {
         if ((u16)(soundBits >> SOUNDARGS_SHIFT_SOUNDID)
                 == (u16)(sSoundBanks[bank][soundIndex].soundBits >> SOUNDARGS_SHIFT_SOUNDID)
             && sSoundBanks[bank][soundIndex].x == pos) {
-
             // Mark sound for deletion
             update_background_music_after_sound(bank, soundIndex);
             sSoundBanks[bank][soundIndex].soundBits = NO_SOUND;

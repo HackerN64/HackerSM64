@@ -1383,7 +1383,6 @@ void print_main_menu_strings(void) {
  * Defines IDs for the top message of the score menu and displays it if the ID is called in messageID.
  */
 void score_menu_display_message(s8 messageID) {
-
     switch (messageID) {
         case SCORE_MSG_CHECK_FILE:
             print_hud_lut_string_fade(HUD_LUT_DIFF, CHECK_FILE_X, 35, LANGUAGE_ARRAY(textCheckFile));
@@ -1404,7 +1403,6 @@ void score_menu_display_message(s8 messageID) {
  * Prints score menu strings that shows on the green background menu screen.
  */
 void print_score_menu_strings(void) {
-
     // Update and print the message at the top of the menu.
     if (sMainMenuTimer == FADEOUT_TIMER) {
         sFadeOutText = TRUE;
@@ -1457,7 +1455,6 @@ void print_score_menu_strings(void) {
  * Defines IDs for the top message of the copy menu and displays it if the ID is called in messageID.
  */
 void copy_menu_display_message(s8 messageID) {
-
     switch (messageID) {
         case COPY_MSG_MAIN_TEXT:
             if (sAllFilesExist) {
@@ -1533,7 +1530,6 @@ void copy_menu_update_message(void) {
  * Prints copy menu strings that shows on the blue background menu screen.
  */
 void print_copy_menu_strings(void) {
-
     // Update and print the message at the top of the menu.
     copy_menu_update_message();
     // Print messageID called inside a copy_menu_update_message case
@@ -1730,7 +1726,6 @@ void erase_menu_update_message(void) {
  * Prints erase menu strings that shows on the red background menu screen.
  */
 void print_erase_menu_strings(void) {
-
     // Update and print the message at the top of the menu.
     erase_menu_update_message();
 

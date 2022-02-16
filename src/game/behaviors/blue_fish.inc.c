@@ -106,7 +106,6 @@ void bhv_tank_fish_group_loop(void) {
     switch (o->oAction) {
         case BLUE_FISH_ACT_SPAWN:
             if (gMarioCurrentRoom == 15 || gMarioCurrentRoom == 7) {
-
                 // spawns fifteen fish and moves them within 200.0f
                 for (i = 0; i < 15; i++) {
                     fish = spawn_object_relative(0, 300, 0, -200, o, MODEL_FISH, bhvBlueFish);

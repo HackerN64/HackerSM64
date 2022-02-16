@@ -55,7 +55,6 @@ s32 run_level_id_or_demo(s32 level) {
             // start the demo. 800 frames has passed while
             // player is idle on PRESS START screen.
             if ((++sDemoCountdown) == PRESS_START_DEMO_TIMER) {
-
                 // start the Mario demo animation for the demo list.
                 load_patchable_table(&gDemoInputsBuf, gDemoInputListID);
 

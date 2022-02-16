@@ -89,7 +89,6 @@ void bhv_bowser_flame_spawn_loop(void) {
 
     // Check for Bowser breathing animation
     if (bowser->oSoundStateID == BOWSER_ANIM_BREATH) {
-
         // Start counting anim frames then reset it when it ends
         animFrame = bowser->header.gfx.animInfo.animFrame + 1.0f;
         if (bowser->header.gfx.animInfo.curAnim->loopEnd == animFrame) {

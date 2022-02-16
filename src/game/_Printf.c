@@ -105,7 +105,6 @@ static void _Putfld(printf_struct *a0, va_list *args, u8 type, u8 *buff) {
         a0->num_trailing_zeros = 0;
 
     switch (type) {
-
         case 'c':
             buff[a0->part1_len++] = va_arg(*args, u32);
             break;
@@ -158,7 +157,6 @@ static void _Putfld(printf_struct *a0, va_list *args, u8 type, u8 *buff) {
             if (a0->flags & FLAGS_HASH) {
                 buff[a0->part1_len++] = '0';
                 if (type == 'x' || type == 'X') {
-
                     buff[a0->part1_len++] = type;
                 }
             }

@@ -68,7 +68,6 @@ void snufit_act_idle(void) {
     s32 marioDist = (s32)(o->oDistanceToMario / 10.0f);
 
     if (o->oTimer > marioDist && o->oDistanceToMario < 800.0f) {
-
         // Controls an alternating scaling factor in a cos.
         o->oSnufitBodyScalePeriod
             = approach_s16_symmetric(o->oSnufitBodyScalePeriod, 0, 1500);

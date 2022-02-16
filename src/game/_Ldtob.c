@@ -159,7 +159,6 @@ void _Ldtob(printf_struct *args, u8 type) {
 }
 
 static s16 _Ldunscale(s16 *pex, printf_struct *px) {
-
     unsigned short *ps = (unsigned short *) px;
     short xchar = (ps[_D0] & _DMASK) >> _DOFF;
     if (xchar == _DMAX) { /* NaN or INF */

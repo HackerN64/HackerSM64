@@ -704,7 +704,6 @@ void seq_channel_layer_decay_release_internal(struct SequenceChannelLayer *seqLa
     }
 
     if (note->parentLayer != seqLayer) {
-
 #if defined(VERSION_EU) || defined(VERSION_SH)
         if (note->parentLayer == NO_LAYER && note->wantedParentLayer == NO_LAYER &&
                 note->prevParentLayer == seqLayer && target != ADSR_STATE_DECAY) {

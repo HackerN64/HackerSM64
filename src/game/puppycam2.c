@@ -1135,7 +1135,6 @@ void puppycam_projection_behaviours(void) {
 }
 
 void puppycam_shake(UNUSED s16 x, UNUSED s16 y, UNUSED s16 z) {
-
 }
 
 /// This is the highest level of the basic steps that go into the code. Anything above is called from these following functions.

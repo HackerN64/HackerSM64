@@ -487,8 +487,6 @@ void reload_crash_screen_framebuffer(void) {
 }
 
 void update_crash_screen_input(void) {
-
-
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
         sDrawCrashScreen ^= TRUE;
         updateBuffer = TRUE;
