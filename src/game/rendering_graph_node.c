@@ -497,6 +497,13 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
     }
 }
 
+static f32 get_dist_from_camera(Vec3f pos) {
+    return -((gCameraTransform[0][2] * pos[0])
+           + (gCameraTransform[1][2] * pos[1])
+           + (gCameraTransform[2][2] * pos[2])
+           +  gCameraTransform[3][2]);
+}
+
 /**
  * Process a level of detail node. From the current transformation matrix,
  * the perpendicular distance to the camera is extracted and the children
@@ -505,9 +512,9 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
  */
 void geo_process_level_of_detail(struct GraphNodeLevelOfDetail *node) {
 #ifdef AUTO_LOD
-    f32 distanceFromCam = gIsConsole ? -gMatStack[gMatStackIndex][3][2] : 50.0f;
+    f32 distanceFromCam = gIsConsole ? get_dist_from_camera(gMatStack[gMatStackIndex][3]) : construct_float(50.0f);
 #else
-    f32 distanceFromCam = -gMatStack[gMatStackIndex][3][2];
+    f32 distanceFromCam = get_dist_from_camera(gMatStack[gMatStackIndex][3]);
 #endif
 
     if ((f32)node->minDistance <= distanceFromCam
