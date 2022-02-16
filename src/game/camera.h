@@ -20,10 +20,6 @@
  * @see camera.c
  */
 
-#ifndef ABS2
-#define ABS2(x) ((x) >= 0.f ? (x) : -(x))
-#endif
-
 #define LEVEL_AREA_INDEX(levelNum, areaNum) (((levelNum) << 4) + (areaNum))
 
 /**
@@ -42,53 +38,55 @@
      (level1Area1) << 0)
 
 
-#define AREA_BBH                LEVEL_AREA_INDEX(LEVEL_BBH, 1)
-#define AREA_CCM_OUTSIDE        LEVEL_AREA_INDEX(LEVEL_CCM, 1)
-#define AREA_CCM_SLIDE          LEVEL_AREA_INDEX(LEVEL_CCM, 2)
-#define AREA_CASTLE_LOBBY       LEVEL_AREA_INDEX(LEVEL_CASTLE, 1)
-#define AREA_CASTLE_TIPPY       LEVEL_AREA_INDEX(LEVEL_CASTLE, 2)
-#define AREA_CASTLE_BASEMENT    LEVEL_AREA_INDEX(LEVEL_CASTLE, 3)
-#define AREA_HMC                LEVEL_AREA_INDEX(LEVEL_HMC, 1)
-#define AREA_SSL_OUTSIDE        LEVEL_AREA_INDEX(LEVEL_SSL, 1)
-#define AREA_SSL_PYRAMID        LEVEL_AREA_INDEX(LEVEL_SSL, 2)
-#define AREA_SSL_EYEROK         LEVEL_AREA_INDEX(LEVEL_SSL, 3)
-#define AREA_BOB                LEVEL_AREA_INDEX(LEVEL_BOB, 1)
-#define AREA_SL_OUTSIDE         LEVEL_AREA_INDEX(LEVEL_SL, 1)
-#define AREA_SL_IGLOO           LEVEL_AREA_INDEX(LEVEL_SL, 2)
-#define AREA_WDW_MAIN           LEVEL_AREA_INDEX(LEVEL_WDW, 1)
-#define AREA_WDW_TOWN           LEVEL_AREA_INDEX(LEVEL_WDW, 2)
-#define AREA_JRB_MAIN           LEVEL_AREA_INDEX(LEVEL_JRB, 1)
-#define AREA_JRB_SHIP           LEVEL_AREA_INDEX(LEVEL_JRB, 2)
-#define AREA_THI_HUGE           LEVEL_AREA_INDEX(LEVEL_THI, 1)
-#define AREA_THI_TINY           LEVEL_AREA_INDEX(LEVEL_THI, 2)
-#define AREA_THI_WIGGLER        LEVEL_AREA_INDEX(LEVEL_THI, 3)
-#define AREA_TTC                LEVEL_AREA_INDEX(LEVEL_TTC, 1)
-#define AREA_RR                 LEVEL_AREA_INDEX(LEVEL_RR, 1)
-#define AREA_CASTLE_GROUNDS     LEVEL_AREA_INDEX(LEVEL_CASTLE_GROUNDS, 1)
-#define AREA_BITDW              LEVEL_AREA_INDEX(LEVEL_BITDW, 1)
-#define AREA_VCUTM              LEVEL_AREA_INDEX(LEVEL_VCUTM, 1)
-#define AREA_BITFS              LEVEL_AREA_INDEX(LEVEL_BITFS, 1)
-#define AREA_SA                 LEVEL_AREA_INDEX(LEVEL_SA, 1)
-#define AREA_BITS               LEVEL_AREA_INDEX(LEVEL_BITS, 1)
-#define AREA_LLL_OUTSIDE        LEVEL_AREA_INDEX(LEVEL_LLL, 1)
-#define AREA_LLL_VOLCANO        LEVEL_AREA_INDEX(LEVEL_LLL, 2)
-#define AREA_DDD_WHIRLPOOL      LEVEL_AREA_INDEX(LEVEL_DDD, 1)
-#define AREA_DDD_SUB            LEVEL_AREA_INDEX(LEVEL_DDD, 2)
-#define AREA_WF                 LEVEL_AREA_INDEX(LEVEL_WF, 1)
-#define AREA_ENDING             LEVEL_AREA_INDEX(LEVEL_ENDING, 1)
+#define AREA_BBH                LEVEL_AREA_INDEX(LEVEL_BBH,              1)
+#define AREA_CCM_OUTSIDE        LEVEL_AREA_INDEX(LEVEL_CCM,              1)
+#define AREA_CCM_SLIDE          LEVEL_AREA_INDEX(LEVEL_CCM,              2)
+#define AREA_CASTLE_LOBBY       LEVEL_AREA_INDEX(LEVEL_CASTLE,           1)
+#define AREA_CASTLE_TIPPY       LEVEL_AREA_INDEX(LEVEL_CASTLE,           2)
+#define AREA_CASTLE_BASEMENT    LEVEL_AREA_INDEX(LEVEL_CASTLE,           3)
+#define AREA_HMC                LEVEL_AREA_INDEX(LEVEL_HMC,              1)
+#define AREA_SSL_OUTSIDE        LEVEL_AREA_INDEX(LEVEL_SSL,              1)
+#define AREA_SSL_PYRAMID        LEVEL_AREA_INDEX(LEVEL_SSL,              2)
+#define AREA_SSL_EYEROK         LEVEL_AREA_INDEX(LEVEL_SSL,              3)
+#define AREA_BOB                LEVEL_AREA_INDEX(LEVEL_BOB,              1)
+#define AREA_SL_OUTSIDE         LEVEL_AREA_INDEX(LEVEL_SL,               1)
+#define AREA_SL_IGLOO           LEVEL_AREA_INDEX(LEVEL_SL,               2)
+#define AREA_WDW_MAIN           LEVEL_AREA_INDEX(LEVEL_WDW,              1)
+#define AREA_WDW_TOWN           LEVEL_AREA_INDEX(LEVEL_WDW,              2)
+#define AREA_JRB_MAIN           LEVEL_AREA_INDEX(LEVEL_JRB,              1)
+#define AREA_JRB_SHIP           LEVEL_AREA_INDEX(LEVEL_JRB,              2)
+#define AREA_THI_HUGE           LEVEL_AREA_INDEX(LEVEL_THI,              1)
+#define AREA_THI_TINY           LEVEL_AREA_INDEX(LEVEL_THI,              2)
+#define AREA_THI_WIGGLER        LEVEL_AREA_INDEX(LEVEL_THI,              3)
+#define AREA_TTC                LEVEL_AREA_INDEX(LEVEL_TTC,              1)
+#define AREA_RR                 LEVEL_AREA_INDEX(LEVEL_RR,               1)
+#define AREA_CASTLE_GROUNDS     LEVEL_AREA_INDEX(LEVEL_CASTLE_GROUNDS,   1)
+#define AREA_BITDW              LEVEL_AREA_INDEX(LEVEL_BITDW,            1)
+#define AREA_VCUTM              LEVEL_AREA_INDEX(LEVEL_VCUTM,            1)
+#define AREA_BITFS              LEVEL_AREA_INDEX(LEVEL_BITFS,            1)
+#define AREA_SA                 LEVEL_AREA_INDEX(LEVEL_SA,               1)
+#define AREA_BITS               LEVEL_AREA_INDEX(LEVEL_BITS,             1)
+#define AREA_LLL_OUTSIDE        LEVEL_AREA_INDEX(LEVEL_LLL,              1)
+#define AREA_LLL_VOLCANO        LEVEL_AREA_INDEX(LEVEL_LLL,              2)
+#define AREA_DDD_WHIRLPOOL      LEVEL_AREA_INDEX(LEVEL_DDD,              1)
+#define AREA_DDD_SUB            LEVEL_AREA_INDEX(LEVEL_DDD,              2)
+#define AREA_WF                 LEVEL_AREA_INDEX(LEVEL_WF,               1)
+#define AREA_ENDING             LEVEL_AREA_INDEX(LEVEL_ENDING,           1)
 #define AREA_COURTYARD          LEVEL_AREA_INDEX(LEVEL_CASTLE_COURTYARD, 1)
-#define AREA_PSS                LEVEL_AREA_INDEX(LEVEL_PSS, 1)
-#define AREA_COTMC              LEVEL_AREA_INDEX(LEVEL_COTMC, 1)
-#define AREA_TOTWC              LEVEL_AREA_INDEX(LEVEL_TOTWC, 1)
-#define AREA_BOWSER_1           LEVEL_AREA_INDEX(LEVEL_BOWSER_1, 1)
-#define AREA_WMOTR              LEVEL_AREA_INDEX(LEVEL_WMOTR, 1)
-#define AREA_BOWSER_2           LEVEL_AREA_INDEX(LEVEL_BOWSER_2, 1)
-#define AREA_BOWSER_3           LEVEL_AREA_INDEX(LEVEL_BOWSER_3, 1)
-#define AREA_TTM_OUTSIDE        LEVEL_AREA_INDEX(LEVEL_TTM, 1)
+#define AREA_PSS                LEVEL_AREA_INDEX(LEVEL_PSS,              1)
+#define AREA_COTMC              LEVEL_AREA_INDEX(LEVEL_COTMC,            1)
+#define AREA_TOTWC              LEVEL_AREA_INDEX(LEVEL_TOTWC,            1)
+#define AREA_BOWSER_1           LEVEL_AREA_INDEX(LEVEL_BOWSER_1,         1)
+#define AREA_WMOTR              LEVEL_AREA_INDEX(LEVEL_WMOTR,            1)
+#define AREA_BOWSER_2           LEVEL_AREA_INDEX(LEVEL_BOWSER_2,         1)
+#define AREA_BOWSER_3           LEVEL_AREA_INDEX(LEVEL_BOWSER_3,         1)
+#define AREA_TTM_OUTSIDE        LEVEL_AREA_INDEX(LEVEL_TTM,              1)
 
-#define CAM_MODE_MARIO_ACTIVE           0x01
-#define CAM_MODE_LAKITU_WAS_ZOOMED_OUT  0x02
-#define CAM_MODE_MARIO_SELECTED         0x04
+enum CameraModeFlags {
+    CAM_MODE_MARIO_ACTIVE          = BIT(0), // 0x01
+    CAM_MODE_LAKITU_WAS_ZOOMED_OUT = BIT(1), // 0x02
+    CAM_MODE_MARIO_SELECTED        = BIT(2), // 0x04
+};
 
 enum CameraSelection {
     CAM_SELECTION_NONE,
@@ -124,22 +122,23 @@ enum CameraModes {
 };
 
 enum CameraMovementFlags {
-    CAM_MOVE_RETURN_TO_MIDDLE       = (1 <<  0), // 0x0001
-    CAM_MOVE_ZOOMED_OUT             = (1 <<  1), // 0x0002
-    CAM_MOVE_ROTATE_RIGHT           = (1 <<  2), // 0x0004
-    CAM_MOVE_ROTATE_LEFT            = (1 <<  3), // 0x0008
-    CAM_MOVE_ENTERED_ROTATE_SURFACE = (1 <<  4), // 0x0010
-    CAM_MOVE_METAL_BELOW_WATER      = (1 <<  5), // 0x0020
-    CAM_MOVE_FIX_IN_PLACE           = (1 <<  6), // 0x0040
-    CAM_MOVE_UNKNOWN_8              = (1 <<  7), // 0x0080
-    CAM_MOVING_INTO_MODE            = (1 <<  8), // 0x0100
-    CAM_MOVE_STARTED_EXITING_C_UP   = (1 <<  9), // 0x0200
-    CAM_MOVE_UNKNOWN_11             = (1 << 10), // 0x0400
-    CAM_MOVE_INIT_CAMERA            = (1 << 11), // 0x0800
-    CAM_MOVE_ALREADY_ZOOMED_OUT     = (1 << 12), // 0x1000
-    CAM_MOVE_C_UP_MODE              = (1 << 13), // 0x2000
-    CAM_MOVE_SUBMERGED              = (1 << 14), // 0x4000
-    CAM_MOVE_PAUSE_SCREEN           = (1 << 15), // 0x8000
+    CAM_MOVE_FLAGS_NONE             = 0x0,
+    CAM_MOVE_RETURN_TO_MIDDLE       = BIT( 0), // 0x0001
+    CAM_MOVE_ZOOMED_OUT             = BIT( 1), // 0x0002
+    CAM_MOVE_ROTATE_RIGHT           = BIT( 2), // 0x0004
+    CAM_MOVE_ROTATE_LEFT            = BIT( 3), // 0x0008
+    CAM_MOVE_ENTERED_ROTATE_SURFACE = BIT( 4), // 0x0010
+    CAM_MOVE_METAL_BELOW_WATER      = BIT( 5), // 0x0020
+    CAM_MOVE_FIX_IN_PLACE           = BIT( 6), // 0x0040
+    CAM_MOVE_UNKNOWN_8              = BIT( 7), // 0x0080
+    CAM_MOVING_INTO_MODE            = BIT( 8), // 0x0100
+    CAM_MOVE_STARTED_EXITING_C_UP   = BIT( 9), // 0x0200
+    CAM_MOVE_UNKNOWN_11             = BIT(10), // 0x0400
+    CAM_MOVE_INIT_CAMERA            = BIT(11), // 0x0800
+    CAM_MOVE_ALREADY_ZOOMED_OUT     = BIT(12), // 0x1000
+    CAM_MOVE_C_UP_MODE              = BIT(13), // 0x2000
+    CAM_MOVE_SUBMERGED              = BIT(14), // 0x4000
+    CAM_MOVE_PAUSE_SCREEN           = BIT(15), // 0x8000
 
     CAM_MOVE_ROTATE   = (CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ROTATE_LEFT | CAM_MOVE_RETURN_TO_MIDDLE),
     /// These flags force the camera to move a certain way
@@ -147,40 +146,42 @@ enum CameraMovementFlags {
 };
 
 enum CameraSounds {
-    CAM_SOUND_C_UP_PLAYED           = (1 <<  0), // 0x01
-    CAM_SOUND_MARIO_ACTIVE          = (1 <<  1), // 0x02
-    CAM_SOUND_NORMAL_ACTIVE         = (1 <<  2), // 0x04
-    CAM_SOUND_UNUSED_SELECT_MARIO   = (1 <<  3), // 0x08
-    CAM_SOUND_UNUSED_SELECT_FIXED   = (1 <<  4), // 0x10
-    CAM_SOUND_FIXED_ACTIVE          = (1 <<  5), // 0x20
+    CAM_SOUND_NONE                  = 0x0,
+    CAM_SOUND_C_UP_PLAYED           = BIT(0), // 0x01
+    CAM_SOUND_MARIO_ACTIVE          = BIT(1), // 0x02
+    CAM_SOUND_NORMAL_ACTIVE         = BIT(2), // 0x04
+    CAM_SOUND_UNUSED_SELECT_MARIO   = BIT(3), // 0x08
+    CAM_SOUND_UNUSED_SELECT_FIXED   = BIT(4), // 0x10
+    CAM_SOUND_FIXED_ACTIVE          = BIT(5), // 0x20
 };
 
 enum CameraFlags {
-    CAM_FLAG_SMOOTH_MOVEMENT        = (1 <<  0), // 0x0001
-    CAM_FLAG_BLOCK_SMOOTH_MOVEMENT  = (1 <<  1), // 0x0002
-    CAM_FLAG_FRAME_AFTER_CAM_INIT   = (1 <<  2), // 0x0004
-    CAM_FLAG_CHANGED_PARTRACK_INDEX = (1 <<  3), // 0x0008
-    CAM_FLAG_CCM_SLIDE_SHORTCUT     = (1 <<  4), // 0x0010
-    CAM_FLAG_CAM_NEAR_WALL          = (1 <<  5), // 0x0020
-    CAM_FLAG_SLEEPING               = (1 <<  6), // 0x0040
-    CAM_FLAG_UNUSED_7               = (1 <<  7), // 0x0080
-    CAM_FLAG_UNUSED_8               = (1 <<  8), // 0x0100
-    CAM_FLAG_COLLIDED_WITH_WALL     = (1 <<  9), // 0x0200
-    CAM_FLAG_START_TRANSITION       = (1 << 10), // 0x0400
-    CAM_FLAG_TRANSITION_OUT_OF_C_UP = (1 << 11), // 0x0800
-    CAM_FLAG_BLOCK_AREA_PROCESSING  = (1 << 12), // 0x1000
-    CAM_FLAG_UNUSED_13              = (1 << 13), // 0x2000
-    CAM_FLAG_UNUSED_CUTSCENE_ACTIVE = (1 << 14), // 0x4000
-    CAM_FLAG_BEHIND_MARIO_POST_DOOR = (1 << 15), // 0x8000
+    CAM_FLAGS_NONE                  = 0x0,
+    CAM_FLAG_SMOOTH_MOVEMENT        = BIT( 0), // 0x0001
+    CAM_FLAG_BLOCK_SMOOTH_MOVEMENT  = BIT( 1), // 0x0002
+    CAM_FLAG_FRAME_AFTER_CAM_INIT   = BIT( 2), // 0x0004
+    CAM_FLAG_CHANGED_PARTRACK_INDEX = BIT( 3), // 0x0008
+    CAM_FLAG_CCM_SLIDE_SHORTCUT     = BIT( 4), // 0x0010
+    CAM_FLAG_CAM_NEAR_WALL          = BIT( 5), // 0x0020
+    CAM_FLAG_SLEEPING               = BIT( 6), // 0x0040
+    CAM_FLAG_UNUSED_7               = BIT( 7), // 0x0080
+    CAM_FLAG_UNUSED_8               = BIT( 8), // 0x0100
+    CAM_FLAG_COLLIDED_WITH_WALL     = BIT( 9), // 0x0200
+    CAM_FLAG_START_TRANSITION       = BIT(10), // 0x0400
+    CAM_FLAG_TRANSITION_OUT_OF_C_UP = BIT(11), // 0x0800
+    CAM_FLAG_BLOCK_AREA_PROCESSING  = BIT(12), // 0x1000
+    CAM_FLAG_UNUSED_13              = BIT(13), // 0x2000
+    CAM_FLAG_UNUSED_CUTSCENE_ACTIVE = BIT(14), // 0x4000
+    CAM_FLAG_BEHIND_MARIO_POST_DOOR = BIT(15), // 0x8000
 };
 
 enum CameraStatus {
-    CAM_STATUS_NONE   = (0 << 0), // 0x00
-    CAM_STATUS_MARIO  = (1 << 0), // 0x01
-    CAM_STATUS_LAKITU = (1 << 1), // 0x02
-    CAM_STATUS_FIXED  = (1 << 2), // 0x04
-    CAM_STATUS_C_DOWN = (1 << 3), // 0x08
-    CAM_STATUS_C_UP   = (1 << 4), // 0x10
+    CAM_STATUS_NONE   = 0x0,
+    CAM_STATUS_MARIO  = BIT(0), // 0x01
+    CAM_STATUS_LAKITU = BIT(1), // 0x02
+    CAM_STATUS_FIXED  = BIT(2), // 0x04
+    CAM_STATUS_C_DOWN = BIT(3), // 0x08
+    CAM_STATUS_C_UP   = BIT(4), // 0x10
 
     CAM_STATUS_MODE_GROUP   = (CAM_STATUS_MARIO | CAM_STATUS_LAKITU | CAM_STATUS_FIXED),
     CAM_STATUS_C_MODE_GROUP = (CAM_STATUS_C_DOWN | CAM_STATUS_C_UP),

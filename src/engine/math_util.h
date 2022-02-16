@@ -501,8 +501,9 @@ ALWAYS_INLINE s32 abss(s16 in) {
     register s32 t0 = (in >> 31);
     return ((in ^ t0) - t0);
 }
-/// Backwards compatibility, used to be a duplicate function
+/// Backwards compatibility
 #define absf_2 absf
+#define ABS2   ABS
 
 
 /// Constructs a float in registers, which can be faster than gcc's default of loading a float from rodata.
