@@ -126,7 +126,7 @@ ifeq ($(TEXT_ENGINE), s2dex_text_engine)
     ifeq ($(DUMMY),FAIL)
       $(error S2DEX Text Engine not found. Please run `git submodule update --init` and rebuild.)
     endif
-  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
+  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/build/lib/ CROSS=$(CROSS)
 endif
 # add more text engines here
 
@@ -515,7 +515,7 @@ else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
-EMULATOR = mupen64plus
+EMULATOR = mupen64plus-gui
 EMU_FLAGS =
 LOADER = loader64
 LOADER_FLAGS = -vwf
