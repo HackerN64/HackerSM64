@@ -567,7 +567,7 @@ struct GraphNodeSceneLight *init_graph_node_scene_light(struct AllocOnlyPool *po
         graphNode->c = c;
         if (lightType == LIGHT_TYPE_DIRECTIONAL)
         {
-            gLightDirTransformEnabled = TRUE;
+            gCoherentLightDirEnabled = TRUE;
         }
         else if (lightType == LIGHT_TYPE_POINT || lightType == LIGHT_TYPE_POINT_OCCLUDE)
         {

@@ -15,6 +15,7 @@
 #include "sound_init.h"
 #include "rumble_init.h"
 #include "puppyprint.h"
+#include "profiling.h"
 
 #define MUSIC_NONE 0xFFFF
 
@@ -352,6 +353,7 @@ void thread4_sound(UNUSED void *arg) {
         OSMesg msg;
 
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
+        fast_profiler_audio_started();
 #if PUPPYPRINT_DEBUG
         while (TRUE) {
             lastTime = osGetTime();
@@ -381,5 +383,6 @@ void thread4_sound(UNUSED void *arg) {
 #if PUPPYPRINT_DEBUG
         }
 #endif
+        fast_profiler_audio_completed();
     }
 }

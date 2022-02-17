@@ -26,9 +26,9 @@ struct SceneLight {
 };
 
 extern int gPointLightCompatibilityMode;
-extern Lights1 gDirectionalLight;
+extern Lights1* gCurDirectionalLight;
 extern s8 gLightDir[3];
-extern u8 gLightDirTransformEnabled;
+extern u8 gCoherentLightDirEnabled;
 extern struct SceneLight gPointLights[];
 extern u8 gAreaPointLightCount;
 extern u8 gPointLightCount;

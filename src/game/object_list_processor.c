@@ -21,6 +21,7 @@
 #include "spawn_object.h"
 #include "puppyprint.h"
 #include "puppylights.h"
+#include "profiling.h"
 
 
 /**
@@ -619,6 +620,7 @@ void update_objects(UNUSED s32 unused) {
     OSTime first = osGetTime();
     OSTime colTime = collisionTime[perfIteration];
 #endif
+    fast_profiler_update(PROFILER_TIME_LEVEL_SCRIPT);
 
     // cycleCounts[0] = get_current_clock();
 
@@ -640,6 +642,8 @@ void update_objects(UNUSED s32 unused) {
     // Update spawners and objects with surfaces
     // cycleCounts[2] = get_clock_difference(cycleCounts[0]);
     update_terrain_objects();
+    
+    fast_profiler_update(PROFILER_TIME_OBJECTS1);
 
     // If Mario was touching a moving platform at the end of last frame, apply
     // displacement now
@@ -681,4 +685,6 @@ void update_objects(UNUSED s32 unused) {
     profiler_update(behaviourTime, first);
     behaviourTime[perfIteration] -= collisionTime[perfIteration] - colTime;
 #endif
+    
+    fast_profiler_update(PROFILER_TIME_OBJECTS2);
 }

@@ -165,10 +165,7 @@ ALIGNED16 struct GraphNodeCamera *gCurGraphNodeCamera = NULL;
 ALIGNED16 struct GraphNodeObject *gCurGraphNodeObject = NULL;
 ALIGNED16 struct GraphNodeHeldObject *gCurGraphNodeHeldObject = NULL;
 u16 gAreaUpdateCounter = 0;
-
-#ifdef F3DEX_GBI_2
-LookAt lookAt;
-#endif
+LookAt* gCurLookAt;
 
 #if SILHOUETTE
 // AA_EN        Enable anti aliasing (not actually used for AA in this case).
@@ -289,18 +286,6 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
     struct RenderModeContainer *mode1List = &renderModeTable_1Cycle[enableZBuffer];
     struct RenderModeContainer *mode2List = &renderModeTable_2Cycle[enableZBuffer];
 
-#ifdef F3DEX_GBI_2
-    // @bug This is where the LookAt values should be calculated but aren't.
-    // As a result, environment mapping is broken on Fast3DEX2 without the
-    // changes below.
-    Mtx lMtx;
- #ifdef FIX_REFLECT_MTX
-    guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 0.0f, -1.0f, 0.0f /* up */);
- #else
-    guLookAtReflect(&lMtx, &lookAt, 0.0f, 0.0f, 0.0f, /* eye */ 0.0f, 0.0f, 1.0f, /* at */ 1.0f, 0.0f, 0.0f /* up */);
- #endif
-#endif // F3DEX_GBI_2
-
     // Loop through the render phases
     for (phaseIndex = RENDER_PHASE_FIRST; phaseIndex < RENDER_PHASE_END; phaseIndex++) {
         // Get the render phase information.
@@ -311,7 +296,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
         ucode       = renderPhase->ucode;
         // Set the ucode for the current render phase
         switch_ucode(ucode);
-        gSPLookAt(gDisplayListHead++, &lookAt);
+        gSPLookAt(gDisplayListHead++, gCurLookAt);
 #endif
         if (enableZBuffer) {
             // Enable z buffer.
@@ -388,7 +373,7 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 void geo_append_display_list(void *displayList, s32 layer) {
     s32 ucode = GRAPH_NODE_UCODE_DEFAULT;
 #ifdef F3DEX_GBI_2
-    gSPLookAt(gDisplayListHead++, &lookAt);
+    gSPLookAt(gDisplayListHead++, gCurLookAt);
 #endif
 #if defined(OBJECTS_REJ) || SILHOUETTE
     if (gCurGraphNodeObject != NULL) {
@@ -503,7 +488,7 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
         sAspectRatio = 4.0f / 3.0f; // 1.33333f
 #endif
 
-        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near / (f32)WORLD_SCALE, node->far / (f32)WORLD_SCALE, 1.0f);
+        guPerspective(mtx, &perspNorm, node->fov, sAspectRatio, node->near, node->far, 1.0f);
         gSPPerspNormalize(gDisplayListHead++, perspNorm);
 
         gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
@@ -514,6 +499,13 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
     }
 }
 
+static f32 get_dist_from_camera(Vec3f pos) {
+    return -((gCameraTransform[0][2] * pos[0])
+           + (gCameraTransform[1][2] * pos[1])
+           + (gCameraTransform[2][2] * pos[2])
+           +  gCameraTransform[3][2]);
+}
+
 /**
  * Process a level of detail node. From the current transformation matrix,
  * the perpendicular distance to the camera is extracted and the children
@@ -522,9 +514,9 @@ void geo_process_perspective(struct GraphNodePerspective *node) {
  */
 void geo_process_level_of_detail(struct GraphNodeLevelOfDetail *node) {
 #ifdef AUTO_LOD
-    f32 distanceFromCam = gIsConsole ? -gMatStack[gMatStackIndex][3][2] : 50.0f;
+    f32 distanceFromCam = gIsConsole ? get_dist_from_camera(gMatStack[gMatStackIndex][3]) : 50.0f;
 #else
-    f32 distanceFromCam = -gMatStack[gMatStackIndex][3][2];
+    f32 distanceFromCam = get_dist_from_camera(gMatStack[gMatStackIndex][3]);
 #endif
 
     if ((f32)node->minDistance <= distanceFromCam
@@ -558,15 +550,13 @@ extern struct MarioState *gMarioState;
 
 struct SceneLight gPointLights[MAX_POINT_LIGHTS];
 s8 gLightDir[3] = {0x28, 0x28, 0x28};
-u8 gLightDirTransformEnabled = 0;
+u8 gCoherentLightDirEnabled = 0;
 u8 gOverrideDirectionalLight = FALSE;
 u8 gOverrideAmbientLight = FALSE;
 u8 gPointLightCount = 0;
 u8 gAreaPointLightCount = 0;
 
-Lights1 gDirectionalLight = gdSPDefLights1(
-	0x7F, 0x7F, 0x7F,
-	0xFF, 0xFF, 0xFF, 0x28, 0x28, 0x28);
+Lights1* gCurDirectionalLight;
 
 /**
  * Gets the square of the distance between two vectors
@@ -709,7 +699,7 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
 
     gSPNumLights(pointLightsDl++, NUMLIGHTS_1 + numLightsPicked);
     
-    gSPLight(pointLightsDl++, &gDirectionalLight.l, LIGHT_1);
+    gSPLight(pointLightsDl++, &gCurDirectionalLight->l, LIGHT_1);
 
     // Add the gSPLights to the display list
     for (i = 0; i < numLightsPicked; i++)
@@ -745,9 +735,9 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
             dir[1] *= 120.0f / (lightDist);
             dir[2] *= 120.0f / (lightDist);
 
-            curLight->l.dir[0] = (s8)(dir[0] * (*viewMat)[0][0] + dir[1] * (*viewMat)[1][0] + dir[2] * (*viewMat)[2][0]);
-            curLight->l.dir[1] = (s8)(dir[0] * (*viewMat)[0][1] + dir[1] * (*viewMat)[1][1] + dir[2] * (*viewMat)[2][1]);
-            curLight->l.dir[2] = (s8)(dir[0] * (*viewMat)[0][2] + dir[1] * (*viewMat)[1][2] + dir[2] * (*viewMat)[2][2]);
+            curLight->l.dir[0] = (s8)(dir[0]);
+            curLight->l.dir[1] = (s8)(dir[1]);
+            curLight->l.dir[2] = (s8)(dir[2]);
 
             gSPLight(pointLightsDl++, curLight, LIGHT_2 + i);
         }
@@ -763,7 +753,7 @@ Gfx* createPointLightsDl(Vec3f pos, f32 yOffset)
         pos[1] -= yOffset;
     }
 
-    gSPLight(pointLightsDl++, &gDirectionalLight.a, LIGHT_2 + numLightsPicked);
+    gSPLight(pointLightsDl++, &gCurDirectionalLight->a, LIGHT_2 + numLightsPicked);
 
     // Terminate the display list
     gSPEndDisplayList(pointLightsDl);
@@ -781,19 +771,19 @@ void set_directional_light(Vec3f direction, s32 red, s32 green, s32 blue)
     gLightDir[0] = (s8)(s32)(directionNormalized[0] * 0x40);
     gLightDir[1] = (s8)(s32)(directionNormalized[1] * 0x40);
     gLightDir[2] = (s8)(s32)(directionNormalized[2] * 0x40);
-    gDirectionalLight.l[0].l.colc[0] = gDirectionalLight.l[0].l.col[0] = red;
-    gDirectionalLight.l[0].l.colc[1] = gDirectionalLight.l[0].l.col[1] = green;
-    gDirectionalLight.l[0].l.colc[2] = gDirectionalLight.l[0].l.col[2] = blue;
-    gLightDirTransformEnabled = TRUE;
+    gCurDirectionalLight->l[0].l.colc[0] = gCurDirectionalLight->l[0].l.col[0] = red;
+    gCurDirectionalLight->l[0].l.colc[1] = gCurDirectionalLight->l[0].l.col[1] = green;
+    gCurDirectionalLight->l[0].l.colc[2] = gCurDirectionalLight->l[0].l.col[2] = blue;
+    gCoherentLightDirEnabled = TRUE;
     gOverrideDirectionalLight = TRUE;
 }
 
 // Sets the scene's ambient light, overrides whatever may be set in the area's geolayout
 void set_ambient_light(s32 red, s32 green, s32 blue)
 {
-    gDirectionalLight.a.l.colc[0] = gDirectionalLight.a.l.col[0] = red;
-    gDirectionalLight.a.l.colc[1] = gDirectionalLight.a.l.col[1] = green;
-    gDirectionalLight.a.l.colc[2] = gDirectionalLight.a.l.col[2] = blue;
+    gCurDirectionalLight->a.l.colc[0] = gCurDirectionalLight->a.l.col[0] = red;
+    gCurDirectionalLight->a.l.colc[1] = gCurDirectionalLight->a.l.col[1] = green;
+    gCurDirectionalLight->a.l.colc[2] = gCurDirectionalLight->a.l.col[2] = blue;
     gOverrideAmbientLight = TRUE;
 }
 
@@ -811,16 +801,51 @@ void emit_light(Vec3f pos, s32 red, s32 green, s32 blue, u32 quadraticFalloff, u
     gPointLights[gPointLightCount].worldPos[2] = pos[2];
     gPointLightCount++;
 }
+Mat4 gCameraTransform;
+
+Lights1 defaultLight = gdSPDefLights1(
+    0x3F, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00
+);
+
+Vec3f globalLightDirection = { 0x28, 0x28, 0x28 };
+
+void setup_global_light() {
+    gCurDirectionalLight = (Lights1*)alloc_display_list(sizeof(Lights1));
+    bcopy(&defaultLight, gCurDirectionalLight, sizeof(Lights1));
+    gSPSetLights1(gDisplayListHead++, (*gCurDirectionalLight));
+}
+
+void set_global_light_direction() {
+    if (gCoherentLightDirEnabled)
+    {
+        // Set the light direction in world space
+        gCurDirectionalLight->l->l.dir[0] = -(s8)(gLightDir[0]);
+        gCurDirectionalLight->l->l.dir[1] = -(s8)(gLightDir[1]);
+        gCurDirectionalLight->l->l.dir[2] = -(s8)(gLightDir[2]);
+    }
+    else
+    {
+        // Transform the directional light into view space if not enabled
+        Vec3f transformedLightDirection;
+
+        linear_mtxf_transpose_mul_vec3f(gCameraTransform, transformedLightDirection, globalLightDirection);
+
+        gCurDirectionalLight->l->l.dir[0] = (s8)(transformedLightDirection[0]);
+        gCurDirectionalLight->l->l.dir[1] = (s8)(transformedLightDirection[1]);
+        gCurDirectionalLight->l->l.dir[2] = (s8)(transformedLightDirection[2]);
+    }
+}
+
 /**
  * Process a camera node.
  */
 void geo_process_camera(struct GraphNodeCamera *node) {
-    Mat4 cameraTransform;
     Mtx *rollMtx = alloc_display_list(sizeof(*rollMtx));
     Gfx *setLightsDL = alloc_display_list(sizeof(Gfx) * 3);
     Gfx *levelLightsDL;
     Vec3f probePos = {0, 0, 0};
     s32 i;
+    Mtx *viewMtx = alloc_display_list(sizeof(Mtx));
 
     if (node->fnNode.func != NULL) {
         node->fnNode.func(GEO_CONTEXT_RENDER, &node->fnNode.node, gMatStack[gMatStackIndex]);
@@ -830,38 +855,63 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(rollMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
     geo_append_display_list(setLightsDL, LAYER_OPAQUE);
 
-    mtxf_lookat(cameraTransform, node->pos, node->focus, node->roll);
-    mtxf_mul(gMatStack[gMatStackIndex + 1], cameraTransform, gMatStack[gMatStackIndex]);
-    inc_mat_stack();
-    viewMat = &gMatStack[gMatStackIndex];
+    mtxf_lookat(gCameraTransform, node->pos, node->focus, node->roll);
+
+    // Calculate the lookAt
+#ifdef F3DEX_GBI_2
+    // @bug This is where the LookAt values should be calculated but aren't.
+    // As a result, environment mapping is broken on Fast3DEX2 without the
+    // changes below.
+    Mat4* cameraMatrix = &gCameraTransform;
+ #ifdef FIX_REFLECT_MTX
+    gCurLookAt->l[0].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][0]);
+    gCurLookAt->l[0].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][0]);
+    gCurLookAt->l[0].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][0]);
+    gCurLookAt->l[1].l.dir[0] = (s8)(127.0f * -(*cameraMatrix)[0][1]);
+    gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * -(*cameraMatrix)[1][1]);
+    gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * -(*cameraMatrix)[2][1]);
+ #else
+    gCurLookAt->l[0].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][0]);
+    gCurLookAt->l[0].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][0]);
+    gCurLookAt->l[0].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][0]);
+    gCurLookAt->l[1].l.dir[0] = (s8)(127.0f * (*cameraMatrix)[0][1]);
+    gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * (*cameraMatrix)[1][1]);
+    gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * (*cameraMatrix)[2][1]);
+ #endif
+#endif // F3DEX_GBI_2
+
+    // Make a copy of the view matrix and scale it based on WORLD_SCALE
+    Mat4 scaledCamera;
+    mtxf_copy(scaledCamera, gCameraTransform);
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            scaledCamera[i][j] *= WORLD_SCALE;
+        }
+    }
+    
+    // Convert the scaled matrix to fixed-point and integrate it into the projection matrix stack
+    guMtxF2L(scaledCamera, viewMtx);
+    gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+    setup_global_light();
+
     if (node->fnNode.node.children != 0) {
         gCurGraphNodeCamera = node;
-        node->matrixPtr = &gMatStack[gMatStackIndex];
+        node->matrixPtr = &gCameraTransform;
         geo_process_node_and_siblings(node->fnNode.node.children);
         gCurGraphNodeCamera = NULL;
     }
 
 
-    // Transform the point light positions into screen space
+    // Copy the light's position into the light struct
     for (i = 0; i < gPointLightCount; i++)
     {
         vec3s_copy(gPointLights[i].l.pl.pos, gPointLights[i].worldPos);
-        mtxf_mul_vec3s_world_scale(gMatStack[gMatStackIndex], gPointLights[i].l.pl.pos);
+        gPointLights[i].l.pl.pos[0] /= WORLD_SCALE;
+        gPointLights[i].l.pl.pos[1] /= WORLD_SCALE;
+        gPointLights[i].l.pl.pos[2] /= WORLD_SCALE;
     }
 
-    // Transform the directional light if enabled
-    if (gLightDirTransformEnabled)
-    {
-        gDirectionalLight.l->l.dir[0] = -(s8)((gLightDir[0] * gMatStack[gMatStackIndex][0][0] + gLightDir[1] * gMatStack[gMatStackIndex][1][0] + gLightDir[2] * gMatStack[gMatStackIndex][2][0]) / WORLD_SCALE);
-        gDirectionalLight.l->l.dir[1] = -(s8)((gLightDir[0] * gMatStack[gMatStackIndex][0][1] + gLightDir[1] * gMatStack[gMatStackIndex][1][1] + gLightDir[2] * gMatStack[gMatStackIndex][2][1]) / WORLD_SCALE);
-        gDirectionalLight.l->l.dir[2] = -(s8)((gLightDir[0] * gMatStack[gMatStackIndex][0][2] + gLightDir[1] * gMatStack[gMatStackIndex][1][2] + gLightDir[2] * gMatStack[gMatStackIndex][2][2]) / WORLD_SCALE);
-    }
-    else
-    {
-        gDirectionalLight.l->l.dir[0] = gLightDir[0];
-        gDirectionalLight.l->l.dir[1] = gLightDir[1];
-        gDirectionalLight.l->l.dir[2] = gLightDir[2];
-    }
+    set_global_light_direction();
     gOverrideAmbientLight = FALSE;
     gOverrideDirectionalLight = FALSE;
     
@@ -1187,8 +1237,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
         f32 shadowScale;
 
         if (gCurGraphNodeHeldObject != NULL) {
-            get_pos_from_transform_mtx(shadowPos, gMatStack[gMatStackIndex],
-                                       *gCurGraphNodeCamera->matrixPtr);
+            vec3f_copy(shadowPos, gMatStack[gMatStackIndex][3]);
             shadowScale = node->shadowScale * gCurGraphNodeHeldObject->objNode->header.gfx.scale[0];
         } else {
             vec3f_copy(shadowPos, gCurGraphNodeObject->pos);
@@ -1227,7 +1276,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
                                                   node->shadowSolidity, node->shadowType, shifted);
 
         if (shadowList != NULL) {
-            mtxf_shadow(gMatStack[gMatStackIndex + 1], *gCurGraphNodeCamera->matrixPtr,
+            mtxf_shadow(gMatStack[gMatStackIndex + 1],
                 gCurrShadow.floorNormal, shadowPos, gCurrShadow.scale, gCurGraphNodeObject->angle[1]);
 
             inc_mat_stack();
@@ -1276,7 +1325,7 @@ void geo_process_shadow(struct GraphNodeShadow *node) {
  *
  * Since (0,0,0) is unaffected by rotation, columns 0, 1 and 2 are ignored.
  */
-s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
+s32 obj_is_in_view(struct GraphNodeObject *node) {
     if (node->node.flags & GRAPH_RENDER_INVISIBLE) {
         return FALSE;
     }
@@ -1292,7 +1341,7 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     }
 
     // Don't render if the object is close to or behind the camera
-    if (matrix[3][2] > -100.0f + cullingRadius) {
+    if (node->cameraToObject[2] > -100.0f + cullingRadius) {
         return FALSE;
     }
 
@@ -1300,14 +1349,14 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     //  makes PU travel safe when the camera is locked on the main map.
     //  If Mario were rendered with a depth over 65536 it would cause overflow
     //  when converting the transformation matrix to a fixed point matrix.
-    if (matrix[3][2] < -20000.0f - cullingRadius) {
+    if (node->cameraToObject[2] < -20000.0f - cullingRadius) {
         return FALSE;
     }
 
     // half of the fov in in-game angle units instead of degrees
     s16 halfFov = (((((gCurGraphNodeCamFrustum->fov * sAspectRatio) / 2.0f) + 1.0f) * 32768.0f) / 180.0f) + 0.5f;
 
-    f32 hScreenEdge = -matrix[3][2] * tans(halfFov);
+    f32 hScreenEdge = -node->cameraToObject[2] * tans(halfFov);
     // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get
     // the amount of units between the center of the screen and the horizontal edge
     // given the distance from the object to the camera.
@@ -1318,10 +1367,10 @@ s32 obj_is_in_view(struct GraphNodeObject *node, Mat4 matrix) {
     // hScreenEdge *= GFX_DIMENSIONS_ASPECT_RATIO;
 
     // Check whether the object is horizontally in view
-    if (matrix[3][0] > hScreenEdge + cullingRadius) {
+    if (node->cameraToObject[0] > hScreenEdge + cullingRadius) {
         return FALSE;
     }
-    if (matrix[3][0] < -hScreenEdge - cullingRadius) {
+    if (node->cameraToObject[0] < -hScreenEdge - cullingRadius) {
         return FALSE;
     }
 
@@ -1365,27 +1414,24 @@ void geo_process_object(struct Object *node) {
     s32 i;
     if (node->header.gfx.areaIndex == gCurGraphNodeRoot->areaIndex) {
         if (node->header.gfx.throwMatrix != NULL) {
-            mtxf_mul(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix,
-                     gMatStack[gMatStackIndex]);
-            mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
+            mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], *node->header.gfx.throwMatrix, node->header.gfx.scale);
         } else if (node->header.gfx.node.flags & GRAPH_RENDER_BILLBOARD) {
             mtxf_billboard(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex],
                            node->header.gfx.pos, node->header.gfx.scale, gCurGraphNodeCamera->roll);
         } else {
-            mtxf_rotate_zxy_and_translate_and_mul(node->header.gfx.angle, node->header.gfx.pos, gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex]);
+            mtxf_rotate_zxy_and_translate(gMatStack[gMatStackIndex + 1], node->header.gfx.pos, node->header.gfx.angle);
             mtxf_scale_vec3f(gMatStack[gMatStackIndex + 1], gMatStack[gMatStackIndex + 1], node->header.gfx.scale);
         }
 
         node->header.gfx.throwMatrix = &gMatStack[++gMatStackIndex];
-        vec3_copy(node->header.gfx.cameraToObject, gMatStack[gMatStackIndex][3]);
+        linear_mtxf_mul_vec3f_and_translate(gCameraTransform, node->header.gfx.cameraToObject, (*node->header.gfx.throwMatrix)[3]);
 
         // FIXME: correct types
         if (node->header.gfx.animInfo.curAnim != NULL) {
             geo_set_animation_globals(&node->header.gfx.animInfo, (node->header.gfx.node.flags & GRAPH_RENDER_HAS_ANIMATION) != 0);
         }
-        if (obj_is_in_view(&node->header.gfx, gMatStack[gMatStackIndex])) {
-            Mtx *mtx = alloc_display_list(sizeof(*mtx));
-            
+
+        if (obj_is_in_view(&node->header.gfx)) {            
             // Create the displaylist to set the active point lights
             Gfx* pointLightsDl = createPointLightsDl(&node->oPosX, 80.0f);
 
@@ -1396,7 +1442,6 @@ void geo_process_object(struct Object *node) {
             {
                 geo_append_display_list(pointLightsDl, i);
             }
-            
             gMatStackIndex--;
             inc_mat_stack();
 
@@ -1446,7 +1491,7 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
     Mat4 tempMtx;
 
 #ifdef F3DEX_GBI_2
-    gSPLookAt(gDisplayListHead++, &lookAt);
+    gSPLookAt(gDisplayListHead++, gCurLookAt);
 #endif
 
     if (node->fnNode.func != NULL) {
@@ -1502,19 +1547,16 @@ void geo_process_held_object(struct GraphNodeHeldObject *node) {
  * Processes a scene light, setting its position and other properties
  */
 void geo_process_scene_light(struct GraphNodeSceneLight *node)
-{
-    Vec3f pos;
-
-    
+{    
     switch (node->lightType)
     {
         case LIGHT_TYPE_DIRECTIONAL:
             if (!gOverrideDirectionalLight)
             {
                 // Set the directional light color
-                gDirectionalLight.l->l.colc[0] = gDirectionalLight.l->l.col[0] = node->color[0];
-                gDirectionalLight.l->l.colc[1] = gDirectionalLight.l->l.col[1] = node->color[1];
-                gDirectionalLight.l->l.colc[2] = gDirectionalLight.l->l.col[2] = node->color[2];
+                gCurDirectionalLight->l->l.colc[0] = gCurDirectionalLight->l->l.col[0] = node->color[0];
+                gCurDirectionalLight->l->l.colc[1] = gCurDirectionalLight->l->l.col[1] = node->color[1];
+                gCurDirectionalLight->l->l.colc[2] = gCurDirectionalLight->l->l.col[2] = node->color[2];
 
                 // Set the pre transformed light direction
                 gLightDir[0] = node->a;
@@ -1524,17 +1566,15 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
             break;
         case LIGHT_TYPE_POINT:
         case LIGHT_TYPE_POINT_OCCLUDE:
-            get_pos_from_transform_mtx(pos, gMatStack[gMatStackIndex],
-                                    *gCurGraphNodeCamera->matrixPtr);
             // Set the given point light's color
             node->light->l.pl.colc[0] = node->light->l.pl.col[0] = node->color[0];
             node->light->l.pl.colc[1] = node->light->l.pl.col[1] = node->color[1];
             node->light->l.pl.colc[2] = node->light->l.pl.col[2] = node->color[2];
 
-            // Floors, but is faster
-            node->light->worldPos[0] = (s16)(s32)pos[0];
-            node->light->worldPos[1] = (s16)(s32)pos[1];
-            node->light->worldPos[2] = (s16)(s32)pos[2];
+            // Truncates, but is faster
+            node->light->worldPos[0] = (s16)(s32)gMatStack[gMatStackIndex][3][0];
+            node->light->worldPos[1] = (s16)(s32)gMatStack[gMatStackIndex][3][1];
+            node->light->worldPos[2] = (s16)(s32)gMatStack[gMatStackIndex][3][2];
 
             // More accurate (rounding instead of flooring), but more costly
             //vec3f_to_vec3s(node->light->worldPos, pos);
@@ -1547,9 +1587,9 @@ void geo_process_scene_light(struct GraphNodeSceneLight *node)
             if (!gOverrideAmbientLight)
             {
                 // Set the ambient light color
-                gDirectionalLight.a.l.colc[0] = gDirectionalLight.a.l.col[0] = node->color[0];
-                gDirectionalLight.a.l.colc[1] = gDirectionalLight.a.l.col[1] = node->color[1];
-                gDirectionalLight.a.l.colc[2] = gDirectionalLight.a.l.col[2] = node->color[2];
+                gCurDirectionalLight->a.l.colc[0] = gCurDirectionalLight->a.l.col[0] = node->color[0];
+                gCurDirectionalLight->a.l.colc[1] = gCurDirectionalLight->a.l.col[1] = node->color[1];
+                gCurDirectionalLight->a.l.colc[2] = gCurDirectionalLight->a.l.col[2] = node->color[2];
             }
             break;
     }
@@ -1635,6 +1675,10 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
 
         gDisplayListHeap = alloc_only_pool_init(main_pool_available() - sizeof(struct AllocOnlyPool), MEMORY_POOL_LEFT);
         initialMatrix = alloc_display_list(sizeof(*initialMatrix));
+        gCurLookAt = (LookAt*)alloc_display_list(sizeof(LookAt));
+        bzero(gCurLookAt, sizeof(LookAt));
+        gCurLookAt->l[1].l.col[1] = 0x80;
+        gCurLookAt->l[1].l.colc[1] = 0x80;
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
         vec3s_set(viewport->vp.vtrans, node->x * 4, node->y * 4, 511);
