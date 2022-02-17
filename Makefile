@@ -118,6 +118,7 @@ LIBRARIES := nustd hvqm2 z goddard
 
 # TEXT ENGINES
 #   s2dex_text_engine - Text Engine by someone2639
+TEXT_ENGINE := none
 ifeq ($(TEXT_ENGINE), s2dex_text_engine)
   DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
   LIBRARIES += s2d_engine
