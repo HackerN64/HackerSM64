@@ -902,13 +902,12 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     }
 
 
-    // Copy the light's position into the light struct
+    // Copy the light's position into the light struct and account for WORLD_SCALE
     for (i = 0; i < gPointLightCount; i++)
     {
-        vec3s_copy(gPointLights[i].l.pl.pos, gPointLights[i].worldPos);
-        gPointLights[i].l.pl.pos[0] /= WORLD_SCALE;
-        gPointLights[i].l.pl.pos[1] /= WORLD_SCALE;
-        gPointLights[i].l.pl.pos[2] /= WORLD_SCALE;
+        gPointLights[i].l.pl.pos[0] = gPointLights[i].worldPos[0] / WORLD_SCALE;
+        gPointLights[i].l.pl.pos[1] = gPointLights[i].worldPos[1] / WORLD_SCALE;
+        gPointLights[i].l.pl.pos[2] = gPointLights[i].worldPos[2] / WORLD_SCALE;
     }
 
     set_global_light_direction();
