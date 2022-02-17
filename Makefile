@@ -118,11 +118,17 @@ LIBRARIES := nustd hvqm2 z goddard
 
 # TEXT ENGINES
 #   s2dex_text_engine - Text Engine by someone2639
-TEXT_ENGINE := none
 ifeq ($(TEXT_ENGINE), s2dex_text_engine)
   DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
   LIBRARIES += s2d_engine
-  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/
+  # less hacky way to do this?
+  LIBS_DIR += -L src/s2d_engine/build
+  DUMMY != ls src/s2d_engine/init.c >&2 || echo FAIL
+    ifeq ($(DUMMY),FAIL)
+      $(info Grabbing S2DEX Text Engine from `https://github.com/someone2639/S2DEX-Text-Engine`......)
+      D2 != $(shell git clone -b HackerSM64 https://github.com/someone2639/S2DEX-Text-Engine src/s2d_engine)
+    endif
+  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/$(BUILD_DIR)/lib/
 endif
 # add more text engines here
 
@@ -511,7 +517,7 @@ else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
-EMULATOR = mupen64plus
+EMULATOR = mupen64plus-gui
 EMU_FLAGS =
 LOADER = loader64
 LOADER_FLAGS = -vwf
@@ -551,7 +557,7 @@ all: $(ROM)
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
-	make -C src/s2d_engine clean
+	$(RM) -r src/s2d_engine/build
 
 distclean: clean
 	$(PYTHON) extract_assets.py --clean
