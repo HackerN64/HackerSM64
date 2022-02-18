@@ -85,7 +85,7 @@ void bhv_wiggler_body_part_update(void) {
         //  the floor
         o->oPosY -= 30.0f;
         cur_obj_update_floor_height();
-        if (o->oFloorHeight > o->oPosY) { // TODO: Check ineq swap
+        if (o->oPosY < o->oFloorHeight) {
             o->oPosY = o->oFloorHeight;
         }
     }
