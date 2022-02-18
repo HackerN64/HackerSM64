@@ -24,6 +24,9 @@
 #define FLYING_CAMERA_MODE        CAMERA_MODE_BEHIND_MARIO
 /*******************************************/
 
+// Mario's eye level. Many camera functions add this to the Y position. Vanilla is 125.
+#define MARIO_EYE_LEVEL 125
+
 // Makes the camera approach Mario's height much more quickly.
 #define FAST_VERTICAL_CAMERA_MOVEMENT
 

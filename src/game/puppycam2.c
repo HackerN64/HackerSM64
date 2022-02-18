@@ -142,7 +142,7 @@ void puppycam_boot(void) {
     gPuppyCam.zoomPoints[0] = 600;
     gPuppyCam.zoomPoints[1] = 1000;
     gPuppyCam.zoomPoints[2] = 1500;
-    gPuppyCam.povHeight     = 125;
+    gPuppyCam.povHeight     = MARIO_EYE_LEVEL;
     gPuppyCam.stick2[0]     = 0;
     gPuppyCam.stick2[1]     = 0;
     gPuppyCam.stickN[0]     = 0;

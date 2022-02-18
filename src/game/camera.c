@@ -649,7 +649,7 @@ void focus_on_mario(Vec3f focus, Vec3f pos, f32 posYOff, f32 focYOff, f32 dist, 
 void set_camera_height(struct Camera *c, f32 goalHeight) {
     struct Surface *surface;
     f32 marioFloorHeight, marioCeilHeight, camFloorHeight;
-    f32 baseOff = 125.f;
+    f32 baseOff = MARIO_EYE_LEVEL;
     f32 camCeilHeight = find_ceil(c->pos[0], gLakituState.goalPos[1] - 50.f, c->pos[2], &surface);
 #ifdef FAST_VERTICAL_CAMERA_MOVEMENT
     f32 approachRate = 20.0f;
@@ -812,7 +812,7 @@ s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 camYaw = atan2s(cenDistZ, cenDistX) + sModeOffsetYaw;
     s16 pitch = look_down_slopes(camYaw);
     f32 posY, focusY;
-    f32 yOff = 125.f;
+    f32 yOff = MARIO_EYE_LEVEL;
     f32 baseDist = 1000.f;
 
     sAreaYaw = camYaw - sModeOffsetYaw;
@@ -832,7 +832,7 @@ s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 pitch = look_down_slopes(camYaw);
     f32 posY;
     f32 focusY;
-    f32 yOff = 125.f;
+    f32 yOff = MARIO_EYE_LEVEL;
     f32 baseDist = 1000.f;
 
     sAreaYaw = camYaw;
@@ -1125,8 +1125,8 @@ s32 update_outward_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 camYaw = atan2s(zDistFocToMario, xDistFocToMario) + sModeOffsetYaw + DEGREES(180);
     s16 pitch = look_down_slopes(camYaw);
     f32 baseDist = 1000.f;
-    // A base offset of 125.f is ~= Mario's eye height
-    f32 yOff = 125.f;
+    // A base offset of MARIO_EYE_LEVEL is ~= Mario's eye height
+    f32 yOff = MARIO_EYE_LEVEL;
     f32 posY;
     f32 focusY;
 
@@ -1365,7 +1365,7 @@ s32 update_fixed_camera(struct Camera *c, Vec3f focus, UNUSED Vec3f pos) {
 
     calc_y_to_curr_floor(&focusFloorOff, 1.f, 200.f, &focusFloorOff, 0.9f, 200.f);
     vec3f_copy(focus, sMarioCamState->pos);
-    focus[1] += focusFloorOff + 125.f;
+    focus[1] += focusFloorOff + MARIO_EYE_LEVEL;
     vec3f_get_dist_and_angle(focus, c->pos, &distCamToFocus, &faceAngle[0], &faceAngle[1]);
     faceAngle[2] = 0;
 
@@ -1384,7 +1384,7 @@ s32 update_fixed_camera(struct Camera *c, Vec3f focus, UNUSED Vec3f pos) {
 
     ceilHeight = find_ceil(c->pos[0], goalHeight - 100.f, c->pos[2], &ceiling);
     if (ceilHeight != CELL_HEIGHT_LIMIT) {
-        ceilHeight -= 125.f;
+        ceilHeight -= MARIO_EYE_LEVEL;
         if (goalHeight > ceilHeight) {
             goalHeight = ceilHeight;
         }
@@ -1439,7 +1439,8 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
 
     yaw = sModeOffsetYaw + DEGREES(45);
     // Get boss's position and whether Mario is holding it.
-    if ((obj = gSecondCameraFocus) != NULL) {
+    obj = gSecondCameraFocus;
+    if (obj != NULL) {
         vec3f_copy(secondFocus, &obj->oPosVec);
         heldState = obj->oHeldState;
     } else {
@@ -1460,7 +1461,7 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
 
     // Set the camera focus to the average of Mario and secondFocus
     focus[0] = (sMarioCamState->pos[0] + secondFocus[0]) / 2.f;
-    focus[1] = (sMarioCamState->pos[1] + secondFocus[1]) / 2.f + 125.f;
+    focus[1] = (sMarioCamState->pos[1] + secondFocus[1]) / 2.f + MARIO_EYE_LEVEL;
     focus[2] = (sMarioCamState->pos[2] + secondFocus[2]) / 2.f;
 
     // Calculate the camera's position as an offset from the focus
@@ -1599,7 +1600,7 @@ s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 yawSpeed;
     s16 pitchInc = 32;
     f32 maxDist = 800.f;
-    f32 focYOff = 125.f;
+    f32 focYOff = MARIO_EYE_LEVEL;
 
     // Zoom in when Mario R_TRIG mode is active
     if (sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
@@ -1837,7 +1838,7 @@ s32 update_slide_camera(struct Camera *c) {
         sStatusFlags |= CAM_FLAG_BLOCK_SMOOTH_MOVEMENT;
 
         // Stay above the slide floor
-        floorHeight = find_floor(c->pos[0], c->pos[1] + 200.f, c->pos[2], &floor) + 125.f;
+        floorHeight = find_floor(c->pos[0], c->pos[1] + 200.f, c->pos[2], &floor) + MARIO_EYE_LEVEL;
         if (c->pos[1] < floorHeight) {
             c->pos[1] = floorHeight;
         }
@@ -1873,7 +1874,7 @@ void mode_water_surface_camera(struct Camera *c) {
  */
 s32 update_mario_camera(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 yaw = sMarioCamState->faceAngle[1] + sModeOffsetYaw + DEGREES(180);
-    focus_on_mario(focus, pos, 125.f, 125.f, gCameraZoomDist, DEGREES(8), yaw);
+    focus_on_mario(focus, pos, MARIO_EYE_LEVEL, MARIO_EYE_LEVEL, gCameraZoomDist, DEGREES(8), yaw);
 
     return sMarioCamState->faceAngle[1];
 }
@@ -2063,7 +2064,7 @@ s32 update_default_camera(struct Camera *c) {
         approach_f32_asymptotic_bool(&dist, zoomDist - 100.f, 0.05f);
     }
     vec3f_set_dist_and_angle(sMarioCamState->pos, cPos, dist, pitch, yaw);
-    cPos[1] += posHeight + 125.f;
+    cPos[1] += posHeight + MARIO_EYE_LEVEL;
 
     // Move the camera away from walls and set the collision flag
     if (collide_with_walls(cPos, 10.f, 80.f) != 0) {
@@ -2071,15 +2072,15 @@ s32 update_default_camera(struct Camera *c) {
     }
 
     c->focus[0] = sMarioCamState->pos[0];
-    c->focus[1] = sMarioCamState->pos[1] + 125.f + focHeight;
+    c->focus[1] = sMarioCamState->pos[1] + MARIO_EYE_LEVEL + focHeight;
     c->focus[2] = sMarioCamState->pos[2];
 
-    marioFloorHeight = 125.f + sMarioGeometry.currFloorHeight;
+    marioFloorHeight = MARIO_EYE_LEVEL + sMarioGeometry.currFloorHeight;
     marioFloor = sMarioGeometry.currFloor;
-    camFloorHeight = find_floor(cPos[0], cPos[1] + 50.f, cPos[2], &cFloor) + 125.f;
+    camFloorHeight = find_floor(cPos[0], cPos[1] + 50.f, cPos[2], &cFloor) + MARIO_EYE_LEVEL;
     for (scale = 0.1f; scale < 1.f; scale += 0.2f) {
         scale_along_line(tempPos, cPos, sMarioCamState->pos, scale);
-        tempFloorHeight = find_floor(tempPos[0], tempPos[1], tempPos[2], &tempFloor) + 125.f;
+        tempFloorHeight = find_floor(tempPos[0], tempPos[1], tempPos[2], &tempFloor) + MARIO_EYE_LEVEL;
         if (tempFloor != NULL && tempFloorHeight > marioFloorHeight) {
             marioFloorHeight = tempFloorHeight;
             marioFloor = tempFloor;
@@ -2096,7 +2097,7 @@ s32 update_default_camera(struct Camera *c) {
     // If there's water below the camera, decide whether to keep the camera above the water surface
     waterHeight = find_water_level(cPos[0], cPos[1], cPos[2]);
     if (waterHeight != FLOOR_LOWER_LIMIT) {
-        waterHeight += 125.f;
+        waterHeight += MARIO_EYE_LEVEL;
         distFromWater = waterHeight - marioFloorHeight;
         if (!(gCameraMovementFlags & CAM_MOVE_METAL_BELOW_WATER)) {
             if (distFromWater > 800.f && (sMarioCamState->action & ACT_FLAG_METAL_WATER)) {
@@ -2117,7 +2118,7 @@ s32 update_default_camera(struct Camera *c) {
 
     cPos[1] = camFloorHeight;
     vec3f_copy(tempPos, cPos);
-    tempPos[1] -= 125.f;
+    tempPos[1] -= MARIO_EYE_LEVEL;
     if (marioFloor != NULL && camFloorHeight <= marioFloorHeight) {
         avoidStatus = is_range_behind_surface(c->focus, tempPos, marioFloor, 0, SURFACE_NULL);
         if (avoidStatus != AVOID_STATUS_WALL_NEAR_CAMERA && ceilHeight > marioFloorHeight) {
@@ -2163,7 +2164,7 @@ s32 update_default_camera(struct Camera *c) {
     }
 
     if (sMarioCamState->action & ACT_FLAG_ON_POLE) {
-        camFloorHeight = gMarioStates[0].usedObj->oPosY + 125.f;
+        camFloorHeight = gMarioStates[0].usedObj->oPosY + MARIO_EYE_LEVEL;
         if (sMarioCamState->pos[1] - 100.f > camFloorHeight) {
             camFloorHeight = sMarioCamState->pos[1] - 100.f;
         }
@@ -2256,7 +2257,7 @@ s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     // Focus on Mario, and move the focus up the staircase with him
     calc_y_to_curr_floor(&focusHeight, 1.f, 200.f, &focusHeight, 0.9f, 200.f);
     focus[0] = sMarioCamState->pos[0];
-    focY = sMarioCamState->pos[1] + 125.f + focusHeight;
+    focY = sMarioCamState->pos[1] + MARIO_EYE_LEVEL + focusHeight;
     focus[2] = sMarioCamState->pos[2];
 
     vec3f_copy(cPos, pos);
@@ -2282,7 +2283,7 @@ s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
         if (floorHeight < sMarioGeometry.currFloorHeight) {
             floorHeight = sMarioGeometry.currFloorHeight;
         }
-        floorHeight += 125.f;
+        floorHeight += MARIO_EYE_LEVEL;
         pos[1] = approach_f32(pos[1], floorHeight, 30.f, 30.f);
     }
 
@@ -2304,7 +2305,7 @@ void mode_spiral_stairs_camera(struct Camera *c) {
 s32 update_slide_or_0f_camera(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 yaw = sMarioCamState->faceAngle[1] + sModeOffsetYaw + DEGREES(180);
 
-    focus_on_mario(focus, pos, 125.f, 125.f, 800.f, DEGREES(30), yaw);
+    focus_on_mario(focus, pos, MARIO_EYE_LEVEL, MARIO_EYE_LEVEL, 800.f, DEGREES(30), yaw);
     return sMarioCamState->faceAngle[1];
 }
 
@@ -2455,7 +2456,7 @@ s32 update_c_up(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 pitch = sCUpCameraPitch;
     s16 yaw = sMarioCamState->faceAngle[1] + sModeOffsetYaw + DEGREES(180);
 
-    focus_on_mario(focus, pos, 125.f, 125.f, 250.f, pitch, yaw);
+    focus_on_mario(focus, pos, MARIO_EYE_LEVEL, MARIO_EYE_LEVEL, 250.f, pitch, yaw);
     return sMarioCamState->faceAngle[1];
 }
 
@@ -2557,7 +2558,7 @@ void mode_c_up_camera(struct Camera *c) {
  * Used when Mario is in a cannon.
  */
 s32 update_in_cannon(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
-    focus_on_mario(pos, focus, 125.f + sCannonYOffset, 125.f, 800.f,
+    focus_on_mario(pos, focus, MARIO_EYE_LEVEL + sCannonYOffset, MARIO_EYE_LEVEL, 800.f,
                                     sMarioCamState->faceAngle[0], sMarioCamState->faceAngle[1]);
     return sMarioCamState->faceAngle[1];
 }
@@ -3115,7 +3116,7 @@ void init_camera(struct Camera *c) {
     sHandheldShakeYaw = 0;
     sHandheldShakeRoll = 0;
     c->cutscene = CUTSCENE_NONE;
-    vec3f_set(marioOffset, 0.0f, 125.0f, 400.0f);
+    vec3f_set(marioOffset, 0.0f, MARIO_EYE_LEVEL, 400.0f);
 
     // Set the camera's starting position or start a cutscene for certain levels
     switch (gCurrLevelNum) {
@@ -3206,7 +3207,7 @@ void init_camera(struct Camera *c) {
     offset_rotated(c->pos, sMarioCamState->pos, marioOffset, sMarioCamState->faceAngle);
     if (c->mode != CAMERA_MODE_BEHIND_MARIO) {
         c->pos[1] = find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 100.f,
-                               sMarioCamState->pos[2], &floor) + 125.f;
+                               sMarioCamState->pos[2], &floor) + MARIO_EYE_LEVEL;
     }
     vec3f_copy(c->focus, sMarioCamState->pos);
     vec3f_copy(gLakituState.curPos, c->pos);
@@ -4887,7 +4888,7 @@ s32 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
         if (gCamera->cutscene != 0 || !(gCameraMovementFlags & CAM_MOVE_C_UP_MODE)) {
             floorHeight = find_floor(newPos[0], newPos[1], newPos[2], &floor);
             if (floorHeight != FLOOR_LOWER_LIMIT) {
-                floorHeight += 125.f;
+                floorHeight += MARIO_EYE_LEVEL;
                 if (newPos[1] < floorHeight) {
                     newPos[1] = floorHeight;
                 }
@@ -6095,31 +6096,37 @@ void resolve_geometry_collisions(Vec3f pos) {
     f32 floorY = find_floor(pos[0], pos[1] + 50.f, pos[2], &surf);
     f32 ceilY = find_ceil(pos[0], pos[1] - 50.f, pos[2], &surf);
 
-    if ((FLOOR_LOWER_LIMIT != floorY) && (CELL_HEIGHT_LIMIT == ceilY)) {
-        floorY += 125.f;
+    s32 hasFloor = (floorY != FLOOR_LOWER_LIMIT);
+    s32 hasCeil  = ( ceilY != CELL_HEIGHT_LIMIT);
+
+    if (hasFloor && !hasCeil) {
+        floorY += MARIO_EYE_LEVEL;
         if (pos[1] < floorY) {
             pos[1] = floorY;
         }
     }
 
-    if ((FLOOR_LOWER_LIMIT == floorY) && (CELL_HEIGHT_LIMIT != ceilY)) {
-        ceilY -= 125.f;
+    if (!hasFloor && hasCeil) {
+        ceilY -= MARIO_EYE_LEVEL;
         if (pos[1] > ceilY) {
             pos[1] = ceilY;
         }
     }
 
-    if ((FLOOR_LOWER_LIMIT != floorY) && (CELL_HEIGHT_LIMIT != ceilY)) {
-        floorY += 125.f;
-        ceilY -= 125.f;
+    if (hasFloor && hasCeil) {
+        floorY += MARIO_EYE_LEVEL;
+        ceilY -= MARIO_EYE_LEVEL;
 
-        if ((pos[1] <= floorY) && (pos[1] < ceilY)) {
+        s32 underFloor = (pos[1] <= floorY);
+        s32 aboveCeil  = (pos[1] >=  ceilY);
+
+        if (underFloor && !aboveCeil) {
             pos[1] = floorY;
         }
-        if ((pos[1] > floorY) && (pos[1] >= ceilY)) {
+        if (!underFloor && aboveCeil) {
             pos[1] = ceilY;
         }
-        if ((pos[1] <= floorY) && (pos[1] >= ceilY)) {
+        if (underFloor && aboveCeil) {
             pos[1] = (floorY + ceilY) * 0.5f;
         }
     }
@@ -7145,7 +7152,7 @@ void cutscene_dance_closeup_start(struct Camera *c) {
 void cutscene_dance_closeup_focus_mario(struct Camera *c) {
     Vec3f marioPos;
 
-    vec3f_copy_y_off(marioPos, sMarioCamState->pos, 125.0f);
+    vec3f_copy_y_off(marioPos, sMarioCamState->pos, MARIO_EYE_LEVEL);
     approach_vec3f_asymptotic(sCutsceneVars[9].point, marioPos, 0.2f, 0.2f, 0.2f);
     vec3f_copy(c->focus, sCutsceneVars[9].point);
 }
@@ -7269,7 +7276,7 @@ void cutscene_dance_fly_away_approach_mario(struct Camera *c) {
 void cutscene_dance_fly_away_focus_mario(struct Camera *c) {
     Vec3f marioPos;
 
-    vec3f_copy_y_off(marioPos, sMarioCamState->pos, 125.0f);
+    vec3f_copy_y_off(marioPos, sMarioCamState->pos, MARIO_EYE_LEVEL);
     approach_vec3f_asymptotic(sCutsceneVars[9].point, marioPos, 0.2f, 0.2f, 0.2f);
     vec3f_copy(c->focus, sCutsceneVars[9].point);
 }
@@ -7626,7 +7633,7 @@ void cutscene_exit_waterfall_warp(struct Camera *c) {
  */
 void cutscene_exit_to_castle_grounds_focus_mario(struct Camera *c) {
     vec3f_copy(c->focus, sMarioCamState->pos);
-    c->focus[1] = c->pos[1] + (sMarioCamState->pos[1] + 125.f - c->pos[1]) * 0.5f;
+    c->focus[1] = c->pos[1] + (sMarioCamState->pos[1] + MARIO_EYE_LEVEL - c->pos[1]) * 0.5f;
     approach_vec3f_asymptotic(c->focus, sMarioCamState->pos, 0.05f, 0.4f, 0.05f);
 }
 
@@ -8225,7 +8232,7 @@ void cutscene_dialog_start(struct Camera *c) {
     // Store Mario's position and faceAngle
     sCutsceneVars[8].angle[0] = 0;
     vec3f_copy(sCutsceneVars[8].point, sMarioCamState->pos);
-    sCutsceneVars[8].point[1] += 125.f;
+    sCutsceneVars[8].point[1] += MARIO_EYE_LEVEL;
 
     // Store gCutsceneFocus's position and yaw
     object_pos_to_vec3f(sCutsceneVars[9].point, gCutsceneFocus);
@@ -8447,7 +8454,7 @@ void cutscene_non_painting_set_cam_pos(struct Camera *c) {
 
         default:
             offset_rotated(c->pos, sCutsceneVars[7].point, sCutsceneVars[5].point, sCutsceneVars[7].angle);
-            c->pos[1] = find_floor(c->pos[0], c->pos[1] + 1000.f, c->pos[2], &floor) + 125.f;
+            c->pos[1] = find_floor(c->pos[0], c->pos[1] + 1000.f, c->pos[2], &floor) + MARIO_EYE_LEVEL;
             break;
     }
 }
@@ -8499,12 +8506,12 @@ void cutscene_exit_succ_shake_landing(UNUSED struct Camera *c) {
  * Cutscene that plays when Mario beats bowser and exits the level.
  */
 void cutscene_exit_bowser_succ(struct Camera *c) {
-    cutscene_event(cutscene_exit_succ_start,             c,   0,   0);
-    cutscene_event(cutscene_non_painting_set_cam_pos,    c,   0,  -1);
-    cutscene_event(cutscene_exit_bowser_succ_focus_left, c,  18,  -1);
-    cutscene_event(cutscene_non_painting_set_cam_focus,  c,   0,  -1);
-    cutscene_event(cutscene_exit_bowser_key_toss_shake,  c, 125, 125);
-    cutscene_event(cutscene_exit_succ_shake_landing,     c,  41,  41);
+    cutscene_event(cutscene_exit_succ_start,             c,               0,               0);
+    cutscene_event(cutscene_non_painting_set_cam_pos,    c,               0,              -1);
+    cutscene_event(cutscene_exit_bowser_succ_focus_left, c,              18,              -1);
+    cutscene_event(cutscene_non_painting_set_cam_focus,  c,               0,              -1);
+    cutscene_event(cutscene_exit_bowser_key_toss_shake,  c, MARIO_EYE_LEVEL, MARIO_EYE_LEVEL);
+    cutscene_event(cutscene_exit_succ_shake_landing,     c,              41,              41);
 }
 
 /**
@@ -9199,10 +9206,10 @@ void cutscene_sliding_doors_go_under_doorway(UNUSED struct Camera *c) {
 }
 
 /**
- * Approach a y offset of 125 again.
+ * Approach a y offset of MARIO_EYE_LEVEL again.
  */
 void cutscene_sliding_doors_fly_back_up(UNUSED struct Camera *c) {
-    camera_approach_f32_symmetric_bool(&sCutsceneVars[0].point[1], 125.f, 10.f);
+    camera_approach_f32_symmetric_bool(&sCutsceneVars[0].point[1], MARIO_EYE_LEVEL, 10.f);
 }
 
 /**
@@ -9218,7 +9225,7 @@ void cutscene_sliding_doors_follow_mario(struct Camera *c) {
 
     // Decrease cvar0's offsets, moving the camera behind Mario at his eye height.
     approach_f32_asymptotic_bool(&sCutsceneVars[0].point[0], 0, 0.1f);
-    camera_approach_f32_symmetric_bool(&sCutsceneVars[0].point[2], 125.f, 50.f);
+    camera_approach_f32_symmetric_bool(&sCutsceneVars[0].point[2], MARIO_EYE_LEVEL, 50.f);
     // Update cvar0's angle
     approach_vec3s_asymptotic(sCutsceneVars[0].angle, sMarioCamState->faceAngle, 16, 16, 16);
 
@@ -9227,7 +9234,7 @@ void cutscene_sliding_doors_follow_mario(struct Camera *c) {
     approach_vec3f_asymptotic(c->pos, pos, 0.15f, 0.05f, 0.15f);
 
     // Focus on Mario's eye height
-    set_focus_rel_mario(c, 0, 125.f, 0, 0);
+    set_focus_rel_mario(c, 0, MARIO_EYE_LEVEL, 0, 0);
 }
 
 /**
@@ -9281,7 +9288,7 @@ void cutscene_enter_painting(struct Camera *c) {
         approach_vec3f_asymptotic(c->focus, focus, 0.1f, 0.1f, 0.1f);
         focusOffset[2] = -(((size * 1000.0f) / 2) / 307.0f);
         offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
-        f32 floorHeight = find_floor(focus[0], focus[1] + 500.0f, focus[2], &highFloor) + 125.0f;
+        f32 floorHeight = find_floor(focus[0], focus[1] + 500.0f, focus[2], &highFloor) + MARIO_EYE_LEVEL;
 
         if (focus[1] < floorHeight) {
             focus[1] = floorHeight;
@@ -9369,7 +9376,7 @@ void cutscene_exit_painting_move_to_floor(struct Camera *c) {
     floorHeight[1] = find_floor(sMarioCamState->pos[0], (sMarioCamState->pos[1] + 10.0f), sMarioCamState->pos[2], &floor);
 
     if (floor != NULL) {
-        floorHeight[1] = (floorHeight[1] + ((sMarioCamState->pos[1] - floorHeight[1]) * 0.7f) + 125.0f);
+        floorHeight[1] = (floorHeight[1] + ((sMarioCamState->pos[1] - floorHeight[1]) * 0.7f) + MARIO_EYE_LEVEL);
         approach_vec3f_asymptotic(c->focus, floorHeight, 0.2f, 0.2f, 0.2f);
 
         if (floorHeight[1] < c->pos[1]) {
@@ -9406,7 +9413,7 @@ void cutscene_unused_exit_start(struct Camera *c) {
     vec3f_set(offset, 200.f, 300.f, 200.f);
     vec3s_set(marioAngle, 0, sMarioCamState->faceAngle[1], 0);
     offset_rotated(c->pos, sMarioCamState->pos, offset, marioAngle);
-    set_focus_rel_mario(c, 0.f, 125.f, 0.f, 0);
+    set_focus_rel_mario(c, 0.f, MARIO_EYE_LEVEL, 0.f, 0);
 }
 
 /**
@@ -9415,8 +9422,8 @@ void cutscene_unused_exit_start(struct Camera *c) {
 void cutscene_unused_exit_focus_mario(struct Camera *c) {
     Vec3f focus;
 
-    vec3f_copy_y_off(focus, sMarioCamState->pos, 125.0f);
-    set_focus_rel_mario(c, 0.f, 125.f, 0.f, 0);
+    vec3f_copy_y_off(focus, sMarioCamState->pos, MARIO_EYE_LEVEL);
+    set_focus_rel_mario(c, 0.f, MARIO_EYE_LEVEL, 0.f, 0);
     approach_vec3f_asymptotic(c->focus, focus, 0.02f, 0.001f, 0.02f);
     update_camera_yaw(c);
 }
@@ -9546,9 +9553,9 @@ void cutscene_door_move_behind_mario(struct Camera *c) {
 
     reset_pan_distance(c);
     determine_pushing_or_pulling_door(&doorRotation);
-    set_focus_rel_mario(c, 0.f, 125.f, 0.f, 0);
+    set_focus_rel_mario(c, 0.f, MARIO_EYE_LEVEL, 0.f, 0);
     vec3s_set(sCutsceneVars[0].angle, 0, sMarioCamState->faceAngle[1] + doorRotation, 0);
-    vec3f_set(camOffset, 0.f, 125.f, 250.f);
+    vec3f_set(camOffset, 0.f, MARIO_EYE_LEVEL, 250.f);
 
     offset_rotated(c->pos, sMarioCamState->pos, camOffset, sCutsceneVars[0].angle);
 }
@@ -9560,7 +9567,7 @@ void cutscene_door_follow_mario(struct Camera *c) {
     s16 pitch, yaw;
     f32 dist;
 
-    set_focus_rel_mario(c, 0.f, 125.f, 0.f, 0);
+    set_focus_rel_mario(c, 0.f, MARIO_EYE_LEVEL, 0.f, 0);
     vec3f_get_dist_and_angle(c->focus, c->pos, &dist, &pitch, &yaw);
     camera_approach_f32_symmetric_bool(&dist, 150.f, 7.f);
     vec3f_set_dist_and_angle(c->focus, c->pos, dist, pitch, yaw);
