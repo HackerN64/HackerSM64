@@ -489,12 +489,14 @@ void fatal_printf(const char *fmt, ...) {
  * Adds the function name to the stack trace
  */
 void imin(const char *routine) {
-    sRoutineNames[sNumRoutinesInStack++] = routine;
-    sRoutineNames[sNumRoutinesInStack] = NULL;  //! array bounds is checked after writing this.
+    sRoutineNames[sNumRoutinesInStack] = routine;
+    sNumRoutinesInStack++;
 
     if (sNumRoutinesInStack >= ARRAY_COUNT(sRoutineNames)) {
         fatal_printf("You're in too many routines");
     }
+
+    sRoutineNames[sNumRoutinesInStack] = NULL;
 }
 
 /**
