@@ -293,7 +293,7 @@ void visual_surface_display(Vtx *verts, s32 iteration) {
             ntx = MIN(VERTCOUNT, vts);
             gSPVertex(dlHead++, VIRTUAL_TO_PHYSICAL(verts + (gVisualSurfaceCount - vts)), ntx, 0);
             count = 0;
-            vtl   = VERTCOUNT;
+            vtl = VERTCOUNT;
         }
 
         if (vtl >= 6) {
@@ -368,7 +368,7 @@ void visual_surface_loop(s32 isDecal) {
     Vtx *verts = alloc_display_list((iterate_surface_count(gMarioState->pos[0], gMarioState->pos[2]) * 3) * sizeof(Vtx));
 
     gVisualSurfaceCount = 0;
-    gVisualOffset       = 0;
+    gVisualOffset = 0;
 
     if ((mtx == NULL) || (verts == NULL)) {
         return;
@@ -506,10 +506,10 @@ static void render_box(int index) {
     gSPMatrix(dlHead++, rotate,    (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
     gSPMatrix(dlHead++, scale,     (G_MTX_MODELVIEW | G_MTX_MUL  | G_MTX_NOPUSH));
 
-    gDPSetEnvColor(dlHead++, ((color >> 16) & 0xFF),
-                             ((color >>  8) & 0xFF),
-                             ((color      ) & 0xFF),
-                             ((color >> 24) & 0xFF));
+    gDPSetEnvColor(dlHead++, RGBA32_R(color),
+                             RGBA32_G(color),
+                             RGBA32_B(color),
+                             RGBA32_A(color));
 
     if (box->type & DEBUG_SHAPE_BOX) {
         gSPDisplayList(dlHead++, dl_debug_box_verts);
