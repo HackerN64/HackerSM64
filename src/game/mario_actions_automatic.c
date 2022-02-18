@@ -20,7 +20,7 @@
 #include "config.h"
 
 void add_tree_leaf_particles(struct MarioState *m) {
-    if (m->usedObj->behavior == segmented_to_virtual(bhvTree)) {
+    if (obj_has_behavior(m->usedObj, bhvTree)) {
         // make leaf effect spawn higher on the Shifting Sand Land palm tree
         f32 leafHeight = (obj_has_model(m->usedObj, MODEL_SSL_PALM_TREE) ? 250.0f : 100.0f);
         if (m->pos[1] - m->floorHeight > leafHeight) {
@@ -30,7 +30,7 @@ void add_tree_leaf_particles(struct MarioState *m) {
 }
 
 void play_climbing_sounds(struct MarioState *m, s32 b) {
-    s32 isOnTree = (m->usedObj->behavior == segmented_to_virtual(bhvTree));
+    s32 isOnTree = obj_has_behavior(m->usedObj, bhvTree);
 
     if (b == 1) {
         if (is_anim_past_frame(m, 1)) {

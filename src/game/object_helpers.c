@@ -842,7 +842,7 @@ static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
 }
 
 void cur_obj_get_thrown_or_placed(f32 forwardVel, f32 velY, s32 thrownAction) {
-    if (o->behavior == segmented_to_virtual(bhvBowser)) {
+    if (cur_obj_has_behavior(bhvBowser)) {
         // Interestingly, when bowser is thrown, he is offset slightly to
         // Mario's right
         cur_obj_set_pos_relative(o->parentObj, -41.684f, 85.859f, 321.577f);

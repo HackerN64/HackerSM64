@@ -273,7 +273,7 @@ void mario_grab_used_object(struct MarioState *m) {
 
 void mario_drop_held_object(struct MarioState *m) {
     if (m->heldObj != NULL) {
-        if (m->heldObj->behavior == segmented_to_virtual(bhvKoopaShellUnderwater)) {
+        if (obj_has_behavior(m->heldObj, bhvKoopaShellUnderwater)) {
             stop_shell_music();
         }
 
@@ -298,7 +298,7 @@ void mario_drop_held_object(struct MarioState *m) {
 
 void mario_throw_held_object(struct MarioState *m) {
     if (m->heldObj != NULL) {
-        if (m->heldObj->behavior == segmented_to_virtual(bhvKoopaShellUnderwater)) {
+        if (obj_has_behavior(m->heldObj, bhvKoopaShellUnderwater)) {
             stop_shell_music();
         }
 
@@ -1721,7 +1721,7 @@ u32 check_read_sign(struct MarioState *m, struct Object *obj) {
         && abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]) <= SIGN_RANGE
     ) {
 #ifdef DIALOG_INDICATOR
-        if (obj->behavior == segmented_to_virtual(bhvSignOnWall)) {
+        if (obj_has_behavior(obj, bhvSignOnWall)) {
             spawn_object_relative(ORANGE_NUMBER_A, 0, 180, 32, obj, MODEL_NUMBER, bhvOrangeNumber);
         } else {
             spawn_object_relative(ORANGE_NUMBER_A, 0, 160,  8, obj, MODEL_NUMBER, bhvOrangeNumber);
@@ -1756,7 +1756,7 @@ u32 check_npc_talk(struct MarioState *m, struct Object *obj) {
         && abs_angle_diff(mario_obj_angle_to_object(m, obj), m->faceAngle[1]) <= SIGN_RANGE
     ) {
 #ifdef DIALOG_INDICATOR
-        if (obj->behavior == segmented_to_virtual(bhvYoshi)) {
+        if (obj_has_behavior(obj, bhvYoshi)) {
             spawn_object_relative(ORANGE_NUMBER_A, 0, 256, 64, obj, MODEL_NUMBER, bhvOrangeNumber);
         } else {
             spawn_object_relative(ORANGE_NUMBER_A, 0, 160,  0, obj, MODEL_NUMBER, bhvOrangeNumber);

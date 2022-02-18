@@ -270,7 +270,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             correct_lava_shadow_height(&floorHeight);
 #endif
         } else if (((obj = floor->object) != NULL)
-                && (obj->behavior == segmented_to_virtual(bhvPlatformOnTrack))
+                && (obj_has_behavior(obj, bhvPlatformOnTrack))
                 && (obj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET)) {
             // Raise the shadow 5 units so the shadow doesn't clip into the flying carpet.
             floorHeight += 5;

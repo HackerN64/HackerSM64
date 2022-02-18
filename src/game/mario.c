@@ -1714,7 +1714,7 @@ void queue_rumble_particles(struct MarioState *m) {
     } else if (m->particleFlags & PARTICLE_TRIANGLE) {
         queue_rumble_data(5, 80);
     }
-    if (m->heldObj && m->heldObj->behavior == segmented_to_virtual(bhvBobomb)) {
+    if (m->heldObj && obj_has_behavior(m->heldObj, bhvBobomb)) {
         reset_rumble_timers_slip();
     }
 }

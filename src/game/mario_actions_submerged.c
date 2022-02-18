@@ -874,7 +874,7 @@ static s32 act_water_punch(struct MarioState *m) {
         case ACT_STATE_WATER_PUNCH_PICK_UP:
             set_mario_animation(m, MARIO_ANIM_WATER_PICK_UP_OBJ);
             if (is_anim_at_end(m)) {
-                if (m->heldObj->behavior == segmented_to_virtual(bhvKoopaShellUnderwater)) {
+                if (obj_has_behavior(m->heldObj, bhvKoopaShellUnderwater)) {
                     play_shell_music();
                     set_mario_action(m, ACT_WATER_SHELL_SWIMMING, 0);
                 } else {

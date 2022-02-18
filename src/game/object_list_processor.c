@@ -472,7 +472,7 @@ void spawn_objects_from_info(struct SpawnInfo *spawnInfo) {
 
             // Usually this checks if bparam4 is 1 to decide if this is mario
             // This change allows any object to use that param
-            if (object->behavior == segmented_to_virtual(bhvMario)) {
+            if (obj_has_behavior(object, bhvMario)) {
                 gMarioObject = object;
                 geo_make_first_child(&object->header.gfx.node);
             }
