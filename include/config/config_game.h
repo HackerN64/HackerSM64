@@ -17,10 +17,10 @@
 // This is the number of lives Mario starts with after a game over or starting the game for the first time (must be lower than 127).
 #define DEFAULT_NUM_LIVES 4
 
-// This can be 0..127.
+// This can be 0..127. Vanilla is 100.
 #define MAX_NUM_LIVES 100
 
-// This can be 0..32767.
+// This can be 0..32767. Vanilla is 999.
 #define MAX_NUM_COINS 999
 
 // Air/breath meter is separate from health meter when underwater.
@@ -38,7 +38,7 @@
 // Uncomment this if you want global star IDs (useful for creating an open world hack ala MVC).
 // #define GLOBAL_STAR_IDS
 
-// Number of possible unique model ID's (keep it higher than 256).
+// Number of possible unique model ID's (keep it 256 or higher).
 #define MODEL_ID_COUNT 256
 
 // Number of supported areas per level.

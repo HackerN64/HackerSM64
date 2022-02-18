@@ -45,45 +45,58 @@
 
 // -- Mario collision constants --
 
-// Mario's normal hitbox height.
+// Mario's normal hitbox height. Vanilla is 160.
 #define MARIO_HITBOX_HEIGHT 160
 
-// Mario's hitbox height when in certain actions such as crouching or crawling.
+// Mario's hitbox height when in certain actions such as crouching or crawling. Vanilla is 100.
 #define MARIO_SHORT_HITBOX_HEIGHT 100
 
 // The radius of Mario's collision when checking for walls.
+// Vanilla is 50.
 #define MARIO_COLLISION_RADIUS_UPPER 50
+// Vanilla is 24.
 #define MARIO_COLLISION_RADIUS_LOWER 24
 
+// Vanilla is 110.
 #define MARIO_COLLISION_RADIUS_WATER 110
 
-#define MARIO_PUNCH_KICK_RADIUS MARIO_COLLISION_OFFSET_GROUND_UPPER
+// Vanilla is 60.
+#define MARIO_PUNCH_KICK_RADIUS (MARIO_COLLISION_RADIUS_UPPER + 10)
 
 // The height of Mario's collision when checking for walls.
+// Vanilla is 60.
 #define MARIO_COLLISION_OFFSET_GROUND_UPPER 60
+// Vanilla is 30.
 #define MARIO_COLLISION_OFFSET_GROUND_LOWER 30
 
+// Vanilla is 150.
 #define MARIO_COLLISION_OFFSET_AIR_UPPER 150
+// Vanilla is 30.
 #define MARIO_COLLISION_OFFSET_AIR_LOWER 30
 
+// Vanilla is 10.
 #define MARIO_COLLISION_OFFSET_WATER 10
 
+// Vanilla is(MARIO_HITBOX_HEIGHT / 2).
 #define MARIO_COLLISION_OFFSET_DEBUG_FREE_MOVE (MARIO_HITBOX_HEIGHT / 2)
 
+// Vanilla is 50.
 #define MARIO_COLLISION_OFFSET_HANGING 50
 
+// Vanilla is 60.
 #define MARIO_COLLISION_OFFSET_TWIRLING 60
 
+// Vanilla is (MARIO_HITBOX_HEIGHT / 2).
 #define MARIO_PUNCH_KICK_HEIGHT (MARIO_HITBOX_HEIGHT / 2)
 
-// The distance from the ceiling Mario is while hanging/grabbing it.
-#define MARIO_HANGING_HEIGHT_OFFSET 144.0f
+// The distance from the ceiling Mario is while hanging/grabbing it. Vanilla is 144.
+#define MARIO_HANGING_HEIGHT_OFFSET 144
 
 // The distance from Mario to check for ledge grabs laterally.
 #define MARIO_LEDGE_GRAB_DISTANCE (MARIO_COLLISION_RADIUS_UPPER + 10)
 
-// The minimum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it.
+// The minimum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it. Vanilla is 100.
 #define LEDGE_GRAB_MIN_HEIGHT 100
 
-// The maximum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it.
-#define LEDGE_GRAB_MAX_HEIGHT 160
+// The maximum number of units above Mario's origin a floor must be for Mario to be able to ledge grab on it. Vanilla is 160.
+#define LEDGE_GRAB_MAX_HEIGHT MARIO_HITBOX_HEIGHT

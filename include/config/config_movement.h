@@ -32,11 +32,11 @@
 // Disables the scream that mario makes when falling off a great height (this is separate from actual fall damage).
 // #define NO_FALL_DAMAGE_SOUND
 
-// Fall height for normal fall damage. Vanilla is 1150.0f.
-#define FALL_DAMAGE_HEIGHT_SMALL 1150.0f
+// Fall height for normal fall damage. Vanilla is 1150.
+#define FALL_DAMAGE_HEIGHT_SMALL 1150
 
-// Fall height for double fall damage. Vanilla is 3000.0f.
-#define FALL_DAMAGE_HEIGHT_LARGE 3000.0f
+// Fall height for double fall damage. Vanilla is 3000.
+#define FALL_DAMAGE_HEIGHT_LARGE 3000
 
 // Disables Mario getting stuck in snow and sand when falling.
 // #define NO_GETTING_BURIED
