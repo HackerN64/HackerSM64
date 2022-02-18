@@ -1504,15 +1504,10 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     }
 
     focus[1] = (sMarioCamState->pos[1] + secondFocus[1]) / 2.f + 100.f;
-    if (heldState == 1) {
+    if (heldState == HELD_HELD) {
         focus[1] += 300.f * sins((gMarioStates[0].angleVel[1] > 0.f) ?  gMarioStates[0].angleVel[1]
                                                                      : -gMarioStates[0].angleVel[1]);
     }
-
-    //! Unnecessary conditional, focusDistance is already bounded to 800
-    // if (focusDistance < 400.f) {
-    //     focusDistance = 400.f;
-    // }
 
     // Set C-Down distance and pitch.
     // C-Down will essentially double the distance from the center.
@@ -9153,16 +9148,8 @@ void cutscene_credits(struct Camera *c) {
             focus = sDddSubCreditsSplineFocus;
             break;
         case AREA_CCM_OUTSIDE:
-            //! Checks if the "Snowman's Lost His Head" star was collected. The credits likely would
-            //! have avoided the snowman if the player didn't collect that star, but in the end the
-            //! developers decided against it.
-            if (save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum)) & (1 << 4)) {
-                pos = sCcmOutsideCreditsSplinePositions;
-                focus = sCcmOutsideCreditsSplineFocus;
-            } else {
-                pos = sCcmOutsideCreditsSplinePositions;
-                focus = sCcmOutsideCreditsSplineFocus;
-            }
+            pos = sCcmOutsideCreditsSplinePositions;
+            focus = sCcmOutsideCreditsSplineFocus;
             break;
         default:
             pos = sCcmOutsideCreditsSplinePositions;
@@ -9547,8 +9534,7 @@ void cutscene_door_fix_cam(struct Camera *c) {
  * Loop until Mario is no longer using the door.
  */
 void cutscene_door_loop(struct Camera *c) {
-    //! bitwise AND instead of boolean
-    if ((sMarioCamState->action != ACT_PULLING_DOOR) & (sMarioCamState->action != ACT_PUSHING_DOOR)) {
+    if ((sMarioCamState->action != ACT_PULLING_DOOR) && (sMarioCamState->action != ACT_PUSHING_DOOR)) {
         gCutsceneTimer = CUTSCENE_STOP;
         c->cutscene = 0;
     }
