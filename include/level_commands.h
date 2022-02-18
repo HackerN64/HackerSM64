@@ -317,7 +317,6 @@ enum GoddardScene {
     CMD_PTR(segStart), \
     CMD_PTR(segEnd)
 
-
 #define INIT_LEVEL() \
     CMD_BBH(LEVEL_CMD_INIT_LEVEL, 0x04, 0x0000)
 

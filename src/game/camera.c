@@ -4847,7 +4847,6 @@ s32 next_lakitu_state(Vec3f newPos, Vec3f newFoc, Vec3f curPos, Vec3f curFoc,
             startFoc[i] = oldFoc[i] + sMarioCamState->pos[i] - sModeTransition.marioPos[i];
         }
 
-
         vec3f_get_dist_and_angle(curFoc, startFoc, &sModeTransition.focDist,
                                                    &sModeTransition.focPitch,
                                                    &sModeTransition.focYaw);

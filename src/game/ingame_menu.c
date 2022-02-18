@@ -332,7 +332,6 @@ void render_generic_char(u8 c) {
     gDisplayListHead = dlHead;
 }
 
-
 struct MultiTextEntry {
     u8 length;
     u8 str[4];
@@ -469,7 +468,6 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
-
 /**
  * Prints a hud string depending of the hud table list defined.
  */
@@ -518,7 +516,6 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, const u8 *str) {
 
     gDisplayListHead = dlHead;
 }
-
 
 void print_menu_generic_string(s16 x, s16 y, const u8 *str) {
     UNUSED s8 mark = DIALOG_MARK_NONE; // unused in EU
@@ -650,7 +647,6 @@ s32 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
     // length from the position of the provided center.
     return (s16)(centerPos - (s16)(spacesWidth / 2.0f));
 }
-
 
 s32 get_string_width(u8 *str) {
     s16 strPos = 0;
@@ -1018,7 +1014,6 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                 }
         }
 
-
         strIdx++;
     }
 
@@ -1160,7 +1155,6 @@ u8 *gEndCutsceneStringsEn[] = {
     gEndCutsceneStrEn8,
     NULL
 };
-
 
 u16 gCutsceneMsgFade        =  0;
 s16 gCutsceneMsgIndex       = -1;
@@ -1843,7 +1837,6 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
 
     u8 strVal[8];
     s16 prevCourseIndex = gDialogLineNum;
-
 
     handle_menu_scrolling(
         MENU_SCROLL_VERTICAL, &gDialogLineNum,

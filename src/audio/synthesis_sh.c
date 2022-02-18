@@ -443,7 +443,6 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
         sp56 = 0;
     }
 
-
     synthesisState->unk5 = nParts;
 
     if (noteSubEu->isSyntheticWave) {

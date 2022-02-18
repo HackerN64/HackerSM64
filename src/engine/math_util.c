@@ -19,6 +19,7 @@ Mat4 identityMtx = {
     { 0.0f, 0.0f, 1.0f, 0.0f },
     { 0.0f, 0.0f, 0.0f, 1.0f },
 };
+
 Vec3f gVec3fZero = {  0.0f,  0.0f,  0.0f };
 Vec3f gVec3fOne  = {  1.0f,  1.0f,  1.0f };
 Vec3s gVec3sZero = {     0,     0,     0 };
@@ -266,7 +267,6 @@ void vec3f_prod(Vec3f dest, const Vec3f a, const Vec3f b) { vec3_prod_func(f32, 
 void vec3i_prod(Vec3i dest, const Vec3i a, const Vec3i b) { vec3_prod_func(s32, dest, a, b); }
 void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_prod_func(s16, dest, a, b); }
 #undef vec3_prod_func
-
 
 /// Performs element-wise division of two 3-vectors.
 #define vec3_div_func(fmt, dest, a) {   \

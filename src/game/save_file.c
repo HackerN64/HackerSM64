@@ -164,7 +164,6 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
 }
 #endif
 
-
 /**
  * Sum the bytes in data to data + size - 2. The last two bytes are ignored
  * because that is where the checksum is stored.

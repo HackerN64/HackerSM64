@@ -457,7 +457,6 @@ void func_sh_802f3368(s32 bankId) {
     discard_bank(bankId);
 }
 
-
 void load_sequence_internal(s32 player, s32 seqId, s32 loadAsync);
 void load_sequence(u32 player, u32 seqId, s32 loadAsync) {
     load_sequence_internal(player, seqId, loadAsync);
@@ -589,7 +588,6 @@ void *func_sh_802f3764(s32 poolIdx, s32 idx, s32 *arg2) {
         s32 medium = f->seqArray[idx].medium;
         s32 sp18 = f->seqArray[idx].magic;
         u8 *devAddr = f->seqArray[idx].offset;
-
 
         switch (sp18) {
             case 0:
@@ -1312,7 +1310,6 @@ void func_sh_802f50ec(struct PendingDmaAudioBank *arg0, size_t len) {
     osCreateMesgQueue(&arg0->dmaRetQueue, arg0->mesgs, 1);
     func_sh_802f3dd0(&arg0->ioMesg, 0, 0, arg0->devAddr, arg0->vAddr, len, &arg0->dmaRetQueue, arg0->medium, shindouDebugPrint110);
 }
-
 
 void func_sh_802f517c(UNUSED uintptr_t devAddr, void *vAddr, size_t nbytes, UNUSED s32 arg3) {
     osInvalDCache(vAddr, nbytes);

@@ -716,7 +716,6 @@ static s32 bhv_cmd_scale(void) {
     return BHV_PROC_CONTINUE;
 }
 
-
 // Command 0x30: Sets various parameters that the object uses for calculating physics.
 // Usage: SET_OBJ_PHYSICS(wallHitboxRadius, gravity, bounciness, dragStrength, friction, buoyancy, unused1, unused2)
 static s32 bhv_cmd_set_obj_physics(void) {

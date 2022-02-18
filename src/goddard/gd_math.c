@@ -319,7 +319,6 @@ void gd_absrot_mat4(Mat4f *mtx, s32 axisnum, f32 ang) {
     gd_mult_mat4f(mtx, &rMat, mtx);
 }
 
-
 f32 gd_vec3f_magnitude(struct GdVec3f *vec) {
     return gd_sqrt_f(SQ(vec->x) + SQ(vec->y) + SQ(vec->z));
 }

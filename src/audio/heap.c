@@ -1165,7 +1165,6 @@ void init_reverb_us(s32 presetId) {
 }
 #endif
 
-
 #if defined(VERSION_JP) || defined(VERSION_US)
 void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
     if (sAudioFirstBoot) {

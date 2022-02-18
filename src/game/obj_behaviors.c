@@ -86,7 +86,6 @@ Gfx UNUSED *geo_obj_transparency_something(s32 callContext, struct GraphNode *no
         struct Object *heldObject = (struct Object *) gCurGraphNodeObject;
         struct Object *obj = (struct Object *) node;
 
-
         if (gCurGraphNodeHeldObject != NULL) {
             heldObject = gCurGraphNodeHeldObject->objNode;
         }

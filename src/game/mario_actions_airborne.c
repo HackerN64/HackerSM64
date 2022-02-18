@@ -197,8 +197,8 @@ void update_air_with_turn(struct MarioState *m) {
             m->forwardVel += 2.0f;
         }
 
-        m->vel[0] = m->slideVelX = m->forwardVel * sins(m->faceAngle[1]);
-        m->vel[2] = m->slideVelZ = m->forwardVel * coss(m->faceAngle[1]);
+        m->vel[0] = m->slideVelX = (m->forwardVel * sins(m->faceAngle[1]));
+        m->vel[2] = m->slideVelZ = (m->forwardVel * coss(m->faceAngle[1]));
     }
 }
 
@@ -228,14 +228,8 @@ void update_air_without_turn(struct MarioState *m) {
             m->forwardVel += 2.0f;
         }
 
-        m->slideVelX = m->forwardVel * sins(m->faceAngle[1]);
-        m->slideVelZ = m->forwardVel * coss(m->faceAngle[1]);
-
-        m->slideVelX += sidewaysSpeed * sins(m->faceAngle[1] + 0x4000);
-        m->slideVelZ += sidewaysSpeed * coss(m->faceAngle[1] + 0x4000);
-
-        m->vel[0] = m->slideVelX;
-        m->vel[2] = m->slideVelZ;
+        m->vel[0] = m->slideVelX = (m->forwardVel * sins(m->faceAngle[1])) + (sidewaysSpeed * sins(m->faceAngle[1] + 0x4000));
+        m->vel[2] = m->slideVelZ = (m->forwardVel * coss(m->faceAngle[1])) + (sidewaysSpeed * coss(m->faceAngle[1] + 0x4000));
     }
 }
 
@@ -340,12 +334,7 @@ void update_flying(struct MarioState *m) {
 
     m->faceAngle[0] += m->angleVel[0];
 
-    if (m->faceAngle[0] > DEGREES(60)) {
-        m->faceAngle[0] = DEGREES(60);
-    }
-    if (m->faceAngle[0] < -DEGREES(60)) {
-        m->faceAngle[0] = -DEGREES(60);
-    }
+    m->faceAngle[0] = CLAMP(m->faceAngle[0], -DEGREES(60), DEGREES(60));
 
     m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
     m->vel[1] = m->forwardVel * sins(m->faceAngle[0]);
@@ -684,7 +673,6 @@ s32 act_twirling(struct MarioState *m) {
         yawVelTarget = 0x2800;
     } else
 #endif
-
     if (m->input & INPUT_A_DOWN) {
         yawVelTarget = 0x2000;
     } else {

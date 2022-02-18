@@ -855,7 +855,6 @@ f64 gd_sqrt_d(f64 x) {
     return sqrtf(x);
 }
 
-
 #ifdef GODDARD_DEBUG_PRINTF
 #define stubbed_printf osSyncPrintf
 #else

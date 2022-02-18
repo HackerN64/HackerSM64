@@ -1941,7 +1941,6 @@ s32 cur_obj_set_hitbox_and_die_if_attacked(struct ObjectHitbox *hitbox, s32 deat
     return interacted;
 }
 
-
 void obj_explode_and_spawn_coins(f32 mistSize, s32 coinType) {
     spawn_mist_particles_variable(0, 0, mistSize);
     spawn_triangle_break_particles(30, MODEL_DIRT_ANIMATION, 3.0f, TINY_DIRT_PARTICLE_ANIM_STATE_YELLOW);

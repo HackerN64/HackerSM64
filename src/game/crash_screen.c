@@ -154,7 +154,6 @@ u32 index_to_hex(u32 glyph) {
     return (ret & 0xF);
 }
 
-
 void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
     u32 glyph;
     char buf[0x108];
@@ -287,7 +286,6 @@ void draw_crash_context(OSThread *thread, s32 cause) {
     crash_screen_print_float_reg( 30, 220, 30, &tc->fp30.f.f_even);
 }
 
-
 #if PUPPYPRINT_DEBUG
 void draw_crash_log(void) {
     s32 i;
@@ -387,7 +385,6 @@ void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
             crash_screen_draw_rect(294, (38 + scaledPos), 1, height, COLOR_RGBA16_LIGHT_GRAY, FALSE);
         }
     }
-
 
     crash_screen_draw_rect(25,  28, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
     crash_screen_draw_rect(25,  38, 270, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);

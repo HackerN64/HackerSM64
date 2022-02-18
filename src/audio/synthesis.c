@@ -615,7 +615,6 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
 }
 #endif
 
-
 #ifdef VERSION_EU
 u64 *synthesis_resample_and_mix_reverb(u64 *cmd, s32 bufLen, s16 reverbIndex, s16 updateIndex) {
     struct ReverbRingBufferItem *item;

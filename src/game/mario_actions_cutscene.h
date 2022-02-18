@@ -77,7 +77,6 @@ enum ActionStatesJumboStarCutsceneTakingOff { // jumbo_star_cutscene_taking_off
     ACT_STATE_JUMBO_STAR_CUTSCENE_TAKING_OFF_JUMPING
 };
 
-
 enum ActionStatesJumboStarCutsceneFlying { // jumbo_star_cutscene_flying
     ACT_STATE_JUMBO_STAR_CUTSCENE_FLYING_INIT,
     ACT_STATE_JUMBO_STAR_CUTSCENE_FLYING_ANGLES,
