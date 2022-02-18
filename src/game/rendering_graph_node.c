@@ -1052,9 +1052,9 @@ s32 obj_is_in_view(struct GraphNodeObject *node) {
     s16 halfFov = (degrees_to_angle(((gCurGraphNodeCamFrustum->fov * sAspectRatio) * construct_float(0.5f)) + construct_float(1.0f)) + construct_float(0.5f));
 
     f32 hScreenEdge = -node->cameraToObject[2] * tans(halfFov);
-    // -matrix[3][2] is the depth, which gets multiplied by tan(halfFov) to get
-    // the amount of units between the center of the screen and the horizontal edge
-    // given the distance from the object to the camera.
+    // -node->cameraToObject[2] is the depth, which gets multiplied by tan(halfFov)
+    // to getthe amount of units between the center of the screen and the horizontal
+    // edge given the distance from the object to the camera.
 
     // This multiplication should really be performed on 4:3 as well,
     // but the issue will be more apparent on widescreen.
