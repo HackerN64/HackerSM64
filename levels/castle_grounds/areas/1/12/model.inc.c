@@ -51,7 +51,7 @@ static const Gfx castle_grounds_seg7_dl_0700EA20[] = {
 const Gfx castle_grounds_seg7_dl_0700EA58[] = {
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_DECALFADEA, G_CC_DECALFADEA),
-    gsDPSetRenderMode(G_RM_XLU_SURF, G_RM_XLU_SURF2),
+    gsDPSetRenderMode(G_RM_CLD_SURF, G_RM_CLD_SURF2),
     gsDPSetTextureFilter(G_TF_BILERP),
     gsSPClearGeometryMode(G_LIGHTING),
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),

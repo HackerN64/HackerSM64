@@ -833,6 +833,7 @@ void finish_blank_box(void) {
 // This does some epic shenanigans to figure out the optimal way to draw this.
 // If the width is a multiple of 4, then use fillmode (fastest)
 // Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
+// If the box covers the entire screen, use a render mode that doesn't update coverage values.
 void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a) {
     s32 cycleadd = 0;
 
@@ -847,7 +848,12 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
         if (a == 255) {
             gDPSetRenderMode(dlHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
         } else {
-            gDPSetRenderMode(dlHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+            if (x1 == 0 && x2 == SCREEN_WIDTH
+             && y1 == 0 && y2 == SCREEN_HEIGHT) {
+                gDPSetRenderMode(dlHead++, G_RM_CLD_SURF, G_RM_CLD_SURF2);
+            } else {
+                gDPSetRenderMode(dlHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+            }
         }
         cycleadd = 0;
     }
@@ -887,7 +893,7 @@ s32 get_text_width(const char *str, s32 font) {
 }
 
 s32 get_text_height(const char *str) {
-    s32 i= 0;
+    s32 i = 0;
     s32 textPos = 0;
 
     for (i = 0; i < (signed)strlen(str); i++) {
@@ -1161,8 +1167,8 @@ void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *off
 
 void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNUSED s32 scaleX, UNUSED s32 scaleY, s32 mode) {
     s32 posW, posH, imW, imH, modeSC, mOne;
-    s32 i     = 0;
-    s32 num   = 256;
+    s32 i = 0;
+    s32 num = 256;
     s32 maskW = 1;
     s32 maskH = 1;
 
@@ -1172,12 +1178,12 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
         gDPSetCycleType(dlHead++, mode);
         gDPSetRenderMode(dlHead++, G_RM_NOOP, G_RM_NOOP2);
         modeSC = 4;
-        mOne   = 1;
+        mOne = 1;
     } else {
         gDPSetCycleType(dlHead++, mode);
         gDPSetRenderMode(dlHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         modeSC = 1;
-        mOne   = 0;
+        mOne = 0;
     }
 
     // Find how best to seperate the horizontal. Keep going until it finds a whole value.
@@ -1239,7 +1245,10 @@ void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNU
 
         gDPLoadSync(dlHead++);
         gDPLoadTextureTile(dlHead++,
-            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH, ((posW + imW) - 1), ((posH + imH) - 1), 0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
+            image, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, posW, posH,
+            ((posW + imW) - 1),
+            ((posH + imH) - 1),
+            0, (G_TX_NOMIRROR | G_TX_WRAP), (G_TX_NOMIRROR | G_TX_WRAP), maskW, maskH, 0, 0);
         gSPScisTextureRectangle(dlHead++,
             ((x + posW) << 2),
             ((y + posH) << 2),
