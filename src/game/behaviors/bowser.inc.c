@@ -1604,7 +1604,6 @@ void bowser_thrown_dropped_update(void) {
     // Reset timer and subactions
     o->prevObj->oAction = BOWSER_ACT_TAIL_THROWN; // prevObj is Bowser's Tail
     o->prevObj->oTimer = 0;
-    o->prevObj->oSubAction = 0; //! Tail doesn't have sub actions
 
     o->oTimer = 0;
     o->oSubAction = 0;
@@ -1618,8 +1617,8 @@ void bhv_bowser_loop(void) {
     s16 angleToCenter; // AngleToCenter from Bowser's perspective
 
     // Set distance/angle values
-    o->oBowserDistToCenter = sqrtf(o->oPosX * o->oPosX + o->oPosZ * o->oPosZ);
-    o->oBowserAngleToCenter = atan2s(0.0f - o->oPosZ, 0.0f - o->oPosX);
+    o->oBowserDistToCenter = sqrtf(sqr(o->oPosX) + sqr(o->oPosZ));
+    o->oBowserAngleToCenter = atan2s(-o->oPosZ, -o->oPosX);
     angleToMario = abs_angle_diff(o->oMoveAngleYaw, o->oAngleToMario);
     angleToCenter = abs_angle_diff(o->oMoveAngleYaw, o->oBowserAngleToCenter);
 
