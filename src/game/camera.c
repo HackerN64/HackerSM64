@@ -6742,12 +6742,12 @@ void cutscene_ending_peach_wakeup(struct Camera *c) {
     cutscene_event(cutscene_ending_look_up_at_castle, c,   0,  0);
 #ifdef VERSION_EU
     cutscene_event(cutscene_ending_look_up_at_castle, c, 265, -1);
-    cutscene_spawn_obj(7, 315);
-    cutscene_spawn_obj(9, 355);
+    cutscene_spawn_obj(CUTSCENE_OBJ_7_END_BIRDS_1, 315);
+    cutscene_spawn_obj(CUTSCENE_OBJ_2_END_BIRDS_1, 355);
 #else
     cutscene_event(cutscene_ending_look_up_at_castle, c, 250, -1);
-    cutscene_spawn_obj(7, 300);
-    cutscene_spawn_obj(9, 340);
+    cutscene_spawn_obj(CUTSCENE_OBJ_7_END_BIRDS_1, 300);
+    cutscene_spawn_obj(CUTSCENE_OBJ_2_END_BIRDS_1, 340);
 #endif
     vec3f_set(c->pos, -163.f, 978.f, -1082.f);
     player2_rotate_cam(c, -0x800, 0x2000, -0x2000, 0x2000);
@@ -6817,10 +6817,10 @@ void cutscene_ending_cake_for_mario(struct Camera *c) {
     cutscene_event(cutscene_ending_look_at_sky,  c,   0,   0);
     cutscene_event(cutscene_ending_zoom_fov,     c,   0, 499);
     cutscene_event(cutscene_ending_look_at_sky,  c, 500,  -1);
-    cutscene_spawn_obj(8, 600);
-    cutscene_spawn_obj(8, 608);
-    cutscene_spawn_obj(8, 624);
-    cutscene_spawn_obj(8, 710);
+    cutscene_spawn_obj(CUTSCENE_OBJ_5_END_BIRDS_2, 600);
+    cutscene_spawn_obj(CUTSCENE_OBJ_5_END_BIRDS_2, 608);
+    cutscene_spawn_obj(CUTSCENE_OBJ_5_END_BIRDS_2, 624);
+    cutscene_spawn_obj(CUTSCENE_OBJ_5_END_BIRDS_2, 710);
 }
 
 /**
@@ -7529,9 +7529,6 @@ void cutscene_bowser_arena_end(struct Camera *c) {
  * Cutscene that plays when Mario enters a bowser fight.
  */
 void cutscene_bowser_arena(struct Camera *c) {
-    //! This does nothing, but may have been used in development
-    cutscene_spawn_obj(CUTSCENE_OBJ_UNUSED_2, 0);
-
     if (gSecondCameraFocus != NULL) {
         cutscene_event(cutscene_bowser_arena_mario_dialog,        c,   0,  -1);
         cutscene_event(cutscene_bowser_arena_start,               c,   0,   5);
@@ -8900,7 +8897,7 @@ void play_sound_intro_turn_on_hud(UNUSED struct Camera *c) {
  */
 void cutscene_intro_peach_fly_to_pipe(struct Camera *c) {
     cutscene_event(play_sound_intro_turn_on_hud,               c, 818, 818);
-    cutscene_spawn_obj(6, 1);
+    cutscene_spawn_obj(CUTSCENE_OBJ_BEGINNING_LAKITU, 1);
     cutscene_event(cutscene_intro_peach_start_flying_music,    c,   0,   0);
     cutscene_event(cutscene_intro_peach_start_to_pipe_spline,  c,   0,  -1);
     cutscene_event(cutscene_intro_peach_clear_cutscene_status, c, 717, 717);
