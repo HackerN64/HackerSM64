@@ -10,7 +10,7 @@ extern struct ObjNet* gGdSkinNet;   // @ 801BAAF0
 
 // functions
 void reset_net(struct ObjNet *net);
-struct ObjNet *make_net(UNUSED s32 a0, struct ObjShape *shapedata, struct ObjGroup *a2,
+struct ObjNet *make_net(UNUSED s32 flags, struct ObjShape *shapedata, struct ObjGroup *a2,
                         struct ObjGroup *a3, struct ObjGroup *a4);
 void convert_net_verts(struct ObjNet *net);
 void move_nets(struct ObjGroup *group);

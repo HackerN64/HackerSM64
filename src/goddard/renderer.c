@@ -947,10 +947,7 @@ void draw_indexed_dl(s32 dlNum, s32 gfxIdx) {
 
 /* 24A598 -> 24A610; orig name: func_8019BDC8 */
 void branch_cur_dl_to_num(s32 dlNum) {
-    Gfx *dl;
-    UNUSED u8 filler[8];
-
-    dl = sGdDLArray[dlNum]->gfx;
+    Gfx *dl = sGdDLArray[dlNum]->gfx;
     gSPDisplayList(next_gfx(), GD_VIRTUAL_TO_PHYSICAL(dl));
 }
 
@@ -965,13 +962,13 @@ Gfx *get_dl_gfx(s32 num) {
  * Creates `ObjShape`s for the stars and sparkles
  */
 void setup_stars(void) {
-    gShapeRedStar = make_shape(0, "redstar");
+    gShapeRedStar = make_shape(SHAPE_FLAGS_NONE, "redstar");
     gShapeRedStar->dlNums[0] = new_gddl_from(NULL, 0);
     gShapeRedStar->dlNums[1] = gShapeRedStar->dlNums[0];
     sGdDLArray[gShapeRedStar->dlNums[0]]->dlptr = gd_red_star_dl_array;
     sGdDLArray[gShapeRedStar->dlNums[1]]->dlptr = gd_red_star_dl_array;
 
-    gShapeSilverStar = make_shape(0, "silverstar");
+    gShapeSilverStar = make_shape(SHAPE_FLAGS_NONE, "silverstar");
     gShapeSilverStar->dlNums[0] = new_gddl_from(NULL, 0);
     gShapeSilverStar->dlNums[1] = gShapeSilverStar->dlNums[0];
     sGdDLArray[gShapeSilverStar->dlNums[0]]->dlptr = gd_silver_star_dl_array;
@@ -979,13 +976,13 @@ void setup_stars(void) {
 
     // make_shape names of the dl array they call are misnamed (swapped)
     // "sspark" calls red sparkles and "rspark" calls silver sparkles
-    gShapeRedSpark = make_shape(0, "sspark");
+    gShapeRedSpark = make_shape(SHAPE_FLAGS_NONE, "sspark");
     gShapeRedSpark->dlNums[0] = new_gddl_from(NULL, 0);
     gShapeRedSpark->dlNums[1] = gShapeRedSpark->dlNums[0];
     sGdDLArray[gShapeRedSpark->dlNums[0]]->dlptr = gd_red_sparkle_dl_array;
     sGdDLArray[gShapeRedSpark->dlNums[1]]->dlptr = gd_red_sparkle_dl_array;
 
-    gShapeSilverSpark = make_shape(0, "rspark");
+    gShapeSilverSpark = make_shape(SHAPE_FLAGS_NONE, "rspark");
     gShapeSilverSpark->dlNums[0] = new_gddl_from(NULL, 0);
     gShapeSilverSpark->dlNums[1] = gShapeSilverSpark->dlNums[0];
     sGdDLArray[gShapeSilverSpark->dlNums[0]]->dlptr = gd_silver_sparkle_dl_array;
@@ -1047,8 +1044,6 @@ void gd_add_to_heap(void *addr, u32 size) {
 
 /* 24AAE0 -> 24AB7C */
 void gdm_init(void *blockpool, u32 size) {
-    UNUSED u8 filler[4];
-
     imin("gdm_init");
     // Align downwards?
     size = (size - 8) & ~7;
@@ -1067,8 +1062,6 @@ void gdm_init(void *blockpool, u32 size) {
  * Initializes the Mario head demo
  */
 void gdm_setup(void) {
-    UNUSED u8 filler[4];
-
     imin("gdm_setup");
     sYoshiSceneGrp = NULL;
     sMarioSceneGrp = NULL;
@@ -1104,8 +1097,6 @@ struct ObjView *make_view_withgrp(char *name, struct ObjGroup *grp) {
 
 /* 24AD14 -> 24AEB8 */
 void gdm_maketestdl(s32 id) {
-    UNUSED u8 filler[12];
-
     imin("gdm_maketestdl");
     switch (id) {
         case 0:
@@ -1198,7 +1189,6 @@ s32 gd_sfx_to_play(void) {
 Gfx *gdm_gettestdl(s32 id) {
     struct GdObj *dobj;
     struct GdDisplayList *gddl;
-    UNUSED u8 filler[8];
     struct GdVec3f vec;
 
     start_timer("dlgen");
@@ -1871,7 +1861,6 @@ void func_801A0038(void) {
 
 /* 24E840 -> 24E9BC */
 void gd_dl_flush_vertices(void) {
-    UNUSED u8 filler[4];
     s32 i;
     UNUSED s32 startvtx = sVertexBufStartIndex;
 
@@ -1956,13 +1945,11 @@ void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
                    struct GdVec3f *arg4,   // vector to light source?
                    struct GdColour *colour // light color
 ) {
-    UNUSED u8 filler1[96];
     Hilite *hilite; // 4c
     struct GdVec3f sp40;
     f32 sp3C; // magnitude of sp40
     f32 sp38;
     f32 sp34;
-    UNUSED u8 filler2[24];
 
     sp38 = 32.0f; // x scale factor?
     sp34 = 32.0f; // y scale factor?
@@ -2001,7 +1988,6 @@ void gd_dl_hilite(s32 idx, // material GdDl number; offsets into hilite array
  * Adds some display list commands that perform lighting for a material
  */
 s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
-    UNUSED u8 filler[8];
     s32 i;
     s32 numLights = sNumLights;
     s32 scaledColours[3];
@@ -2012,10 +1998,6 @@ s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
     }
     switch (material) {
         case GD_MTL_TEX_OFF:
-            gddl_is_loading_stub_dl(FALSE);
-            gddl_is_loading_stub_dl(FALSE);
-            gddl_is_loading_stub_dl(FALSE);
-            gddl_is_loading_stub_dl(FALSE);
             gddl_is_loading_shine_dl(FALSE);
             gddl_is_loading_shine_dl(FALSE);
             gddl_is_loading_shine_dl(FALSE);
@@ -2023,7 +2005,6 @@ s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
             numLights = NUMLIGHTS_2;
             break;
         case GD_MTL_STUB_DL:
-            gddl_is_loading_stub_dl(TRUE);
             break;
         case GD_MTL_SHINE_DL:
             gddl_is_loading_shine_dl(TRUE);
@@ -2035,7 +2016,6 @@ s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
         case GD_MTL_BREAK:
             break;
         default:
-            gddl_is_loading_stub_dl(FALSE);
             gddl_is_loading_shine_dl(FALSE);
 
             DL_CURRENT_LIGHT(sCurrentGdDl).a.l.col[0] = colour->r * 255.0f;
@@ -2208,10 +2188,6 @@ void Unknown801A1E70(void) {
 void gd_set_one_cycle(void) {
     gDPSetCycleType(next_gfx(), G_CYC_1CYCLE);
     update_render_mode();
-}
-
-/* 250B44 -> 250B58 */
-void gddl_is_loading_stub_dl(UNUSED s32 dlLoad) {
 }
 
 /* 250B58 -> 250C18 */
@@ -2584,11 +2560,8 @@ void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
 /* 25245C -> 25262C */
 void gd_create_perspective_matrix(f32 fovy, f32 aspect, f32 near, f32 far) {
     u16 perspNorm;
-    UNUSED u8 filler1[4];
     uintptr_t perspecMtx;
     uintptr_t rotMtx;
-    UNUSED u8 filler2[4];
-    UNUSED f32 unused = 0.0625f;
 
     sGdPerspTimer += 0.1;
     guPerspective(&DL_CURRENT_MTX(sCurrentGdDl), &perspNorm, fovy, aspect, near, far, 1.0f);
@@ -2824,9 +2797,6 @@ void func_801A4848(s32 linkDl) {
 
 /* 2530A8 -> 2530C0 */
 void stub_draw_label_text(UNUSED char *s) {
-    UNUSED u8 filler1[4];
-    UNUSED char *save = s;
-    UNUSED u8 filler2[24];
 }
 
 /* 2530C0 -> 2530D8; orig name: func_801A48F0 */
@@ -2967,7 +2937,6 @@ void Proc801A5110(struct ObjView *view) {
 
 /* 253938 -> 2539DC; orig name: func_801A5168 */
 void update_view_and_dl(struct ObjView *view) {
-    UNUSED u8 filler[4];
     s32 prevFlags; // 18
 
     prevFlags = view->flags;
@@ -2984,8 +2953,6 @@ void update_view_and_dl(struct ObjView *view) {
  * Unused - called by __main__
  */
 void func_801A520C(void) {
-    UNUSED u8 filler[8];
-
     start_timer("1frame");
     start_timer("cpu");
     reset_cur_dl_indices();
@@ -3032,7 +2999,6 @@ UNUSED void Unknown801A5344(void) {
 /* 253BC8 -> 2540E0 */
 void gd_init(void) {
     s32 i; // 34
-    UNUSED u8 filler[4];
     s8 *data; // 2c
 
     imin("gd_init");
@@ -3365,7 +3331,7 @@ void gd_setup_cursor(struct ObjGroup *parentgrp) {
     struct ObjGroup *mousegrp; // 30
     UNUSED struct ObjNet *net; // 2c
 
-    sHandShape = make_shape(0, "mouse");
+    sHandShape = make_shape(SHAPE_FLAGS_NONE, "mouse");
     sHandShape->dlNums[0] = gd_startdisplist(7);
     gd_put_sprite((u16 *) gd_texture_hand_open, 100, 100, 32, 32);
     gd_enddlsplist_parent();
@@ -3407,7 +3373,6 @@ void view_proc_print_timers(struct ObjView *self) {
 void make_timer_gadgets(void) {
     struct ObjLabel *timerLabel;
     struct ObjGroup *timerg;
-    UNUSED u8 filler[4];
     struct ObjView *timersview;
     struct ObjGadget *bar1;
     struct ObjGadget *bar2;
@@ -3633,7 +3598,6 @@ void func_801A71CC(struct ObjNet *net) {
     f32 spAC;
     f32 spA8;
     struct GdBoundingBox bbox;
-    UNUSED u8 filler1[4];
     struct ObjZone *sp88;
     register struct ListNode *link;  // s0 (84)
     s32 sp80;                     // linked planes contained in zone?
@@ -3642,13 +3606,9 @@ void func_801A71CC(struct ObjNet *net) {
     register struct ListNode *link2; // s2 (74)
     register struct ListNode *link3; // s3 (70)
     struct GdVec3f sp64;
-    UNUSED u8 filler2[4];
     struct ObjPlane *plane; // 5c
-    UNUSED u8 filler3[4];
     struct ObjZone *linkedZone; // 54
-    UNUSED u8 filler4[4];
     struct ObjPlane *planeL2; // 4c
-    UNUSED u8 filler5[4];
     struct ObjPlane *planeL3; // 44
 
     if (net->unk21C == NULL) {

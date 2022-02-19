@@ -127,7 +127,6 @@ void func_80197280(void) {
  * Computes the normal vector for a face based on three of its vertices.
  */
 void calc_face_normal(struct ObjFace *face) {
-    UNUSED u8 filler1[4];
     struct GdVec3f p1;
     struct GdVec3f p2;
     struct GdVec3f p3;
@@ -135,7 +134,6 @@ void calc_face_normal(struct ObjFace *face) {
     struct ObjVertex *vtx1;
     struct ObjVertex *vtx2;
     struct ObjVertex *vtx3;
-    UNUSED u8 filler2[4];
     f32 mul = 1000.0f;
 
     imin("calc_facenormal");
@@ -256,7 +254,6 @@ void add_3_vtx_to_face(struct ObjFace *face, struct ObjVertex *vtx1, struct ObjV
 struct ObjShape *make_shape(s32 flag, const char *name) {
     struct ObjShape *newShape;
     struct ObjShape *curShapeHead;
-    UNUSED u8 filler[4];
 
     newShape = (struct ObjShape *) make_object(OBJ_TYPE_SHAPES);
 
@@ -600,7 +597,6 @@ void Unknown801985E8(struct ObjShape *shape) {
 
 /* @ 246ED4 for 0x4FC; orig name: func_80198704 */
 void get_3DG1_shape(struct ObjShape *shape) {
-    UNUSED u8 filler[8];
     struct GdVec3f tempNormal; /* maybe? */
     s32 curFaceVtx;
     s32 faceVtxID;
@@ -719,7 +715,6 @@ void get_3DG1_shape(struct ObjShape *shape) {
 
 /* @ 2473D0 for 0x390; orig name: func_80198C00 */
 void get_OBJ_shape(struct ObjShape *shape) {
-    UNUSED u8 filler[4];
     struct GdColour faceClr;
     s32 curFaceVtx;
     s32 faceVtxIndex;
@@ -907,7 +902,6 @@ void read_ARK_shape(struct ObjShape *shape, char *fileName) {
         } data;
     } vtx;
 
-    UNUSED u8 filler[4];
     struct GdVec3f sp48;
     struct ObjFace *sp44;          // newly made face with mtl sp34;
     struct ObjFace *sp40 = NULL;   // first made face
@@ -1026,28 +1020,23 @@ struct GdFile *get_shape_from_file(struct ObjShape *shape, char *fileName) {
 
 /* @ 247F78 for 0x69c; orig name: Unknown801997A8 */
 struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 a3, s32 a4) {
-    UNUSED u8 filler1[4];
     void *objBuf[32][32]; // vertex or particle depending on gridType
     f32 sp70;
     f32 sp6C;
     f32 sp68;
-    UNUSED u8 filler2[8];
     f32 sp5C;
     s32 parI;
     s32 row;
     s32 col;
-    UNUSED s32 sp4C = 0;
     struct ObjShape *gridShape;
     f32 sp44;
     struct ObjFace *sp40 = NULL;  // first made shape?
     struct ObjGroup *parOrVtxGrp; // group of made particles or vertices (based on gridType)
-    UNUSED u8 filler3[4];
     struct ObjGroup *mtlGroup;
     struct GdVec3f *sp30;     // GdVec3f* ? from gd_get_colour
     struct GdVec3f *sp2C;     //^
     struct ObjMaterial *mtl1; // first made material
     struct ObjMaterial *mtl2; // second made material
-    UNUSED u8 filler4[4];
 
     sp30 = (struct GdVec3f *) gd_get_colour(a1);
     sp2C = (struct GdVec3f *) gd_get_colour(a2);
@@ -1063,7 +1052,7 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
     mtl2->type = 0x40;
 
     mtlGroup = make_group(2, mtl1, mtl2);
-    gridShape = make_shape(0, "grid");
+    gridShape = make_shape(SHAPE_FLAGS_NONE, "grid");
     gridShape->faceCount = 0;
     gridShape->vtxCount = 0;
 
@@ -1079,7 +1068,7 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
             if (gridType == OBJ_TYPE_VERTICES) {
                 objBuf[row][col] = gd_make_vertex(sp68, sp6C, sp70);
             } else if (gridType == OBJ_TYPE_PARTICLES) {
-                objBuf[row][col] = make_particle(0, 0, sp68, sp6C + 2.0f, sp70);
+                objBuf[row][col] = make_particle(PTC_FLAGS_NONE, 0, sp68, sp6C + 2.0f, sp70);
                 ((struct ObjParticle *) objBuf[row][col])->unk44 = (1.0f + sp68) / 2.0f;
                 ((struct ObjParticle *) objBuf[row][col])->unk48 = (1.0f + sp70) / 2.0f;
             }
@@ -1117,13 +1106,13 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
 
     if (gridType == OBJ_TYPE_PARTICLES) {
         for (parI = 0; parI <= a3; parI++) {
-            ((struct ObjParticle *) objBuf[parI][0])->flags |= 2;
-            ((struct ObjParticle *) objBuf[parI][a4])->flags |= 2;
+            ((struct ObjParticle *) objBuf[parI][ 0])->flags |= PTC_FLAG_2;
+            ((struct ObjParticle *) objBuf[parI][a4])->flags |= PTC_FLAG_2;
         }
 
         for (parI = 0; parI <= a4; parI++) {
-            ((struct ObjParticle *) objBuf[0][parI])->flags |= 2;
-            ((struct ObjParticle *) objBuf[a3][parI])->flags |= 2;
+            ((struct ObjParticle *) objBuf[ 0][parI])->flags |= PTC_FLAG_2;
+            ((struct ObjParticle *) objBuf[a3][parI])->flags |= PTC_FLAG_2;
         }
     }
 
@@ -1277,9 +1266,7 @@ void animate_mario_head_normal(struct ObjAnimator *self) {
  */
 s32 load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
     struct ObjNet *sp54; // net made with sp48 group
-    UNUSED u8 filler1[8];
     struct ObjGroup *sp48; // Joint group
-    UNUSED u8 filler2[8];
     struct ObjGroup *mainShapesGrp;
     struct GdObj *sp38;       // object list head before making a bunch of joints
     struct GdObj *faceJoint;        // joint on the face that `grabberJoint` pulls
@@ -1318,21 +1305,21 @@ s32 load_mario_head(void (*aniFn)(struct ObjAnimator *)) {
 
     // Make sparkle particles
 
-    particle = make_particle(0, COLOUR_WHITE, 0.0f, 0.0f, 0.0f);
+    particle = make_particle(PTC_FLAGS_NONE, COLOUR_WHITE, 0.0f, 0.0f, 0.0f);
     particle->unk60 = 3;
     particle->unk64 = 3;
     particle->attachedToObj = &camera->header;
     particle->shapePtr = gShapeSilverSpark;
     addto_group(gGdLightGroup, &particle->header);
 
-    particle = make_particle(0, COLOUR_WHITE, 0.0f, 0.0f, 0.0f);
+    particle = make_particle(PTC_FLAGS_NONE, COLOUR_WHITE, 0.0f, 0.0f, 0.0f);
     particle->unk60 = 3;
     particle->unk64 = 2;
     particle->attachedToObj = d_use_obj("N228l"); // DYNOBJ_SILVER_STAR_LIGHT
     particle->shapePtr = gShapeSilverSpark;
     addto_group(gGdLightGroup, &particle->header);
 
-    particle = make_particle(0, COLOUR_RED, 0.0f, 0.0f, 0.0f);
+    particle = make_particle(PTC_FLAGS_NONE, COLOUR_RED, 0.0f, 0.0f, 0.0f);
     particle->unk60 = 3;
     particle->unk64 = 2;
     particle->attachedToObj = d_use_obj("N231l"); // DYNOBJ_RED_STAR_LIGHT
@@ -1420,7 +1407,7 @@ void load_shapes2(void) {
     reset_dynlist();
     func_80197280();
 
-    sCubeShape = make_shape(0, "cube");
+    sCubeShape = make_shape(SHAPE_FLAGS_NONE, "cube");
 
     gSpotShape = (struct ObjShape *) load_dynlist(dynlist_spot_shape);
     scale_verts_in_shape(gSpotShape, 200.0f, 200.0f, 200.0f);
@@ -1505,7 +1492,6 @@ struct ObjGroup *Unknown8019ADC4(UNUSED u32 a0) {
 
 /* @ 249694 for 0x5c */
 struct ObjGroup *Unknown8019AEC4(UNUSED u32 a0) {
-    UNUSED u8 filler[8];
     UNUSED struct GdObj *sp1C = gGdObjectList;
 
     gGdLightGroup = make_group(0);

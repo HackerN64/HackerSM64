@@ -174,7 +174,6 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
                 f32 i, f32 j, f32 k, // translate shape
                 f32 l, f32 m, f32 n, // rotate x, y, z
                 s32 colorIdx, Mat4f *rotMtx) {
-    UNUSED u8 filler[8];
     struct GdVec3f sp1C;
 
     restart_timer("drawshape");
@@ -185,21 +184,21 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
     }
 
     sp1C.x = sp1C.y = sp1C.z = 0.0f;
-    if (flag & 2) {
+    if (flag & SHAPE_FLAG_2) {
         gd_dl_load_trans_matrix(f, g, h);
         sp1C.x += f;
         sp1C.y += g;
         sp1C.z += h;
     }
 
-    if ((flag & 0x10) && rotMtx != NULL) {
+    if ((flag & SHAPE_FLAG_10) && rotMtx != NULL) {
         gd_dl_load_matrix(rotMtx);
         sp1C.x += (*rotMtx)[3][0];
         sp1C.y += (*rotMtx)[3][1];
         sp1C.z += (*rotMtx)[3][2];
     }
 
-    if (flag & 8) {
+    if (flag & SHAPE_FLAG_8) {
         if (m != 0.0f) {
             func_8019F2C4(m, 121);
         }
@@ -235,11 +234,11 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
         update_shaders(shape, &sp1C);
     }
 
-    if (flag & 4) {
+    if (flag & SHAPE_FLAG_4) {
         gd_dl_mul_trans_matrix(i, j, k);
     }
 
-    if (flag & 1) {
+    if (flag & SHAPE_FLAG_1) {
         gd_dl_scale(c, d, e);
     }
 
@@ -251,7 +250,6 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
 void draw_shape_2d(struct ObjShape *shape, s32 flag, UNUSED f32 c, UNUSED f32 d, UNUSED f32 e, f32 f,
                    f32 g, f32 h, UNUSED f32 i, UNUSED f32 j, UNUSED f32 k, UNUSED f32 l, UNUSED f32 m,
                    UNUSED f32 n, UNUSED s32 color, UNUSED s32 p) {
-    UNUSED u8 filler[8];
     struct GdVec3f sp1C;
 
     restart_timer("drawshape2d");
@@ -261,7 +259,7 @@ void draw_shape_2d(struct ObjShape *shape, s32 flag, UNUSED f32 c, UNUSED f32 d,
         return;
     }
 
-    if (flag & 2) {
+    if (flag & SHAPE_FLAG_2) {
         sp1C.x = f;
         sp1C.y = g;
         sp1C.z = h;
@@ -443,7 +441,6 @@ void draw_face(struct ObjFace *face) {
     f32 z;                 // 38
     f32 y;                 // 34
     f32 x;                 // 30
-    UNUSED u8 filler[12];
     s32 i;             // 20; also used to store mtl's gddl number
     s32 hasTextCoords; // 1c
     Vtx *gbiVtx;       // 18
@@ -538,7 +535,6 @@ void Unknown801792F0(struct GdObj *obj) {
 void draw_label(struct ObjLabel *label) {
     struct GdVec3f position;
     char strbuf[0x100];
-    UNUSED u8 filler[16];
     struct ObjValPtr *valptr;
     union ObjVarVal varval;
     valptrproc_t valfn = label->valfn;
@@ -595,7 +591,6 @@ void draw_label(struct ObjLabel *label) {
 void draw_net(struct ObjNet *self) {
     struct ObjNet *net = self;
     s32 netColor;
-    UNUSED u8 filler[80];
 
     if (sSceneProcessType == FIND_PICKS) {
         return;
@@ -725,7 +720,6 @@ void world_pos_to_screen_coords(struct GdVec3f *pos, struct ObjCamera *cam, stru
  */
 void check_grabbable_click(struct GdObj *input) {
     struct GdVec3f objPos;
-    UNUSED u8 filler[12];
     struct GdObj *obj;
     Mat4f *mtx;
 
@@ -768,8 +762,6 @@ void check_grabbable_click(struct GdObj *input) {
  * @param lightgrp lights of `ObjView
  */
 void drawscene(enum SceneType process, struct ObjGroup *interactables, struct ObjGroup *lightgrp) {
-    UNUSED u8 filler[16];
-
     restart_timer("drawscene");
     imin("draw_scene()");
     sUnreadShapeFlag = 0;
@@ -847,8 +839,7 @@ void draw_nothing(UNUSED struct GdObj *nop) {
 void draw_shape_faces(struct ObjShape *shape) {
     sUpdateViewState.mtlDlNum = 0;
     sUpdateViewState.unreadCounter = 0;
-    gddl_is_loading_stub_dl(FALSE);
-    sUnreadShapeFlag = (s32) shape->flag & 1;
+    sUnreadShapeFlag = (s32) shape->flag & SHAPE_FLAG_1;
     set_render_alpha(shape->alpha);
     if (shape->dlNums[gGdFrameBufNum] != 0) {
         draw_indexed_dl(shape->dlNums[gGdFrameBufNum], shape->unk50);
@@ -864,11 +855,9 @@ void draw_shape_faces(struct ObjShape *shape) {
  */
 void draw_particle(struct GdObj *obj) {
     struct ObjParticle *ptc = (struct ObjParticle *) obj;
-    UNUSED u8 filler1[16];
     struct GdColour *white;
     struct GdColour *black;
     f32 brightness;
-    UNUSED u8 filler2[16];
 
     if (ptc->timeout > 0) {
         white = sColourPalette[0];
@@ -903,9 +892,7 @@ void draw_particle(struct GdObj *obj) {
  */
 void draw_bone(struct GdObj *obj) {
     struct ObjBone *bone = (struct ObjBone *) obj;
-    UNUSED u8 filler1[4];
     s32 colour;
-    UNUSED u8 filler2[4];
     struct GdVec3f scale; // guess
 
     return;
@@ -934,14 +921,8 @@ void draw_bone(struct GdObj *obj) {
  */
 void draw_joint(struct GdObj *obj) {
     struct ObjJoint *joint = (struct ObjJoint *) obj;
-    UNUSED u8 filler1[4];
-    UNUSED f32 sp7C = 70.0f;
-    UNUSED u8 filler2[4];
-    UNUSED s32 sp74 = 1;
     s32 colour;
-    UNUSED u8 filler3[8];
     struct ObjShape *boneShape;
-    UNUSED u8 filler4[28];
 
     if ((boneShape = joint->shapePtr) == NULL) {
         return;
@@ -1341,7 +1322,6 @@ void unpick_obj(struct GdObj *obj) {
  */
 void find_closest_pickable_obj(struct GdObj *input) {
     struct GdObj *obj = input;
-    UNUSED u8 filler[12];
     f32 distance;
 
     if (obj->drawFlags & OBJ_IS_GRABBABLE) {

@@ -28,8 +28,6 @@ struct GdControl gGdCtrlPrev; // @ 801B9A18; previous frame's controller info
  * Unused main function possibly from when this was a standalone demo
  */
 u32 __main__(void) {
-    UNUSED u8 filler[4];
-
     gd_printf("%x, %x\n", (u32) (uintptr_t) &D_801A8058, (u32) (uintptr_t) &gGdMoveScene);
     imin("main");
     gd_init();

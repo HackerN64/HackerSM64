@@ -98,7 +98,6 @@ void set_Vtx_norm_buf_1(struct GdVec3f *norm);
 void set_Vtx_norm_buf_2(struct GdVec3f *norm);
 void set_gd_mtx_parameters(s32 params);
 void gd_set_one_cycle(void);
-void gddl_is_loading_stub_dl(UNUSED s32 dlLoad);
 void start_view_dl(struct ObjView *view);
 void border_active_view(void);
 void gd_shading(s32 model);

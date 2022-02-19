@@ -66,8 +66,6 @@ void scale_verts(struct ObjGroup *a0) {
 
 /* @ 23000C for 0x58; orig name: func8018183C*/
 void move_skin(struct ObjNet *net) {
-    UNUSED u8 filler[8];
-
     if (net->shapePtr != NULL) {
         scale_verts(net->shapePtr->scaledVtxGroup);
     }
@@ -109,7 +107,6 @@ void func_80181894(struct ObjJoint *joint) {
 /* @ 2301A0 for 0x110 */
 void reset_weight_vtx(struct ObjVertex *vtx) {
     struct GdVec3f localVec;
-    UNUSED u8 filler[16];
 
     if (sResetWeightVtxNum++ == sResetCurWeight->vtxId) {  // found matching vertex
         sResetCurWeight->vtx = vtx;
@@ -128,7 +125,6 @@ void reset_weight_vtx(struct ObjVertex *vtx) {
 
 void reset_weight(struct ObjWeight *weight) {
     UNUSED u32 vtxCount;
-    UNUSED u8 filler[4];
     struct ObjGroup *skinGroup;
 
     sResetCurWeight = weight;

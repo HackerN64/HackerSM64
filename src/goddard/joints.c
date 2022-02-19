@@ -37,19 +37,18 @@ static struct GdVec3f D_801BAAD0;
 static struct GdVec3f D_801BAAE0;
 
 // forward declarations
-void set_joint_vecs(struct ObjJoint *, f32, f32, f32);
+void set_joint_vecs(struct ObjJoint *j, f32 x, f32 y, f32 z);
 
 /**
- * Controls movement of grabbable joints
+ * @brief 
+ * 
+ * @param self 
+ * @return * Controls 
  */
 void grabbable_joint_update_func(struct ObjJoint *self) {
-    UNUSED u8 filler1[80];
     Mat4f *attObjMtx;
-    UNUSED u8 filler2[4];
     struct GdVec3f offset;  // difference between current position and initial position
-    UNUSED u8 filler3[16];
     register struct ListNode *att;
-    UNUSED u8 filler4[8];
     struct GdObj *attobj;
 
     // The joint acts somewhat like a spring in that the further it is moved
@@ -64,7 +63,7 @@ void grabbable_joint_update_func(struct ObjJoint *self) {
         self->velocity.y = offset.y * -0.25f;
         self->velocity.z = offset.z * -0.25f;
 
-        self->flags |= 0x2000;
+        self->flags |= JOINT_FLAG_2000;
     } else {
         if (gGdCtrl.trgR == FALSE) { // R trigger is released
             // Set velocity so that the joint approaches its initial position
@@ -88,11 +87,11 @@ void grabbable_joint_update_func(struct ObjJoint *self) {
                 }
             }
 
-            if (self->flags & 0x2000) {
+            if (self->flags & JOINT_FLAG_2000) {
                 gd_play_sfx(GD_SFX_LET_GO_FACE);
             }
 
-            self->flags &= ~0x2000;
+            self->flags &= ~JOINT_FLAG_2000;
         } else {
             // freeze position of joint
             self->velocity.x = self->velocity.y = self->velocity.z = 0.0f;
@@ -128,7 +127,6 @@ void eye_joint_update_func(struct ObjJoint *self) {
     Mat4f *sp5C;
     struct GdVec3f sp50;
     struct GdVec3f sp44;
-    UNUSED u8 filler[24];
     register struct ListNode *att;
     struct GdObj *attobj;
 
@@ -221,7 +219,6 @@ void set_joint_vecs(struct ObjJoint *j, f32 x, f32 y, f32 z) {
 struct ObjJoint *make_joint(s32 flags, f32 x, f32 y, f32 z) {
     struct ObjJoint *j; // sp24
     struct ObjJoint *oldhead;
-    UNUSED u8 filler[4];
 
     j = (struct ObjJoint *) make_object(OBJ_TYPE_JOINTS);
     sJointCount++;
@@ -239,11 +236,11 @@ struct ObjJoint *make_joint(s32 flags, f32 x, f32 y, f32 z) {
     j->id = sJointCount;
     j->flags = flags;
 
-    if (!(j->flags & 0x1)) {
+    if (!(j->flags & JOINT_FLAG_1)) {
         sJointNotF1Count++;
     }
 
-    if (j->flags & 0x1) {
+    if (j->flags & JOINT_FLAG_1) {
         j->colourNum = COLOUR_RED;
     } else {
         j->colourNum = COLOUR_PINK;
@@ -275,8 +272,7 @@ struct ObjJoint *make_grabber_joint(struct ObjShape *shape, s32 flags, f32 x, f3
     j->type = 5;
     j->flags |= flags;
     j->colourNum = COLOUR_PINK;
-    j->header.drawFlags |= OBJ_IS_GRABBABLE;
-    j->header.drawFlags |= OBJ_INVISIBLE;
+    j->header.drawFlags |= (OBJ_IS_GRABBABLE | OBJ_INVISIBLE);
     j->updateFunc = grabbable_joint_update_func;
     j->rootAnimator = NULL;
 
@@ -311,7 +307,7 @@ void func_8018F328(struct ObjBone *b) {
 
 /* 23DC9C -> 23DCF0 */
 void func_8018F4CC(struct ObjJoint *j) {
-    if (j->flags & 0x1000) {
+    if (j->flags & JOINT_FLAG_1000) {
         j->unkB4.x = D_801BA968.x;
         j->unkB4.y = D_801BA968.y;
         j->unkB4.z = D_801BA968.z;
@@ -322,7 +318,6 @@ void func_8018F4CC(struct ObjJoint *j) {
 void func_8018F520(struct ObjBone *b) {
     struct ObjJoint *joint1;
     struct ObjJoint *joint2;
-    UNUSED u8 filler[12];
     struct GdVec3f sp90;
     struct GdVec3f sp84;
     struct GdVec3f sp78;
@@ -388,7 +383,6 @@ void func_8018F520(struct ObjBone *b) {
 void func_8018F89C(struct ObjBone *b) {
     struct ObjJoint *spAC;
     struct ObjJoint *spA8;
-    UNUSED u8 filler[68];
     struct ObjGroup *grp; // sp60
     struct ListNode *link;   // sp5c
     Mat4f mtx;            // sp1c
@@ -416,7 +410,7 @@ void func_8018F89C(struct ObjBone *b) {
 
 /* 23E238 -> 23E298 */
 void func_8018FA68(struct ObjBone *b) {
-    if (b->unk104 & (0x8 | 0x2)) {
+    if (b->flags & (BONE_FLAG_8 | BONE_FLAG_2)) {
         func_8018F89C(b);
     } else {
         func_8018F520(b);
@@ -454,7 +448,7 @@ void func_8018FB58(struct ObjBone *b) {
     vec.y = j1->worldPos.y - j2->worldPos.y;
     vec.z = j1->worldPos.z - j2->worldPos.z;
 
-    b->unkF8 = gd_sqrt_d((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z));
+    b->unkF8 = gd_sqrt_d(SQ(vec.x) + SQ(vec.y) + SQ(vec.z));
     b->unkF4 = b->unkF8;
     b->unkFC = b->unkF8;
     func_8018F328(b);
@@ -482,10 +476,9 @@ void add_joint2bone(struct ObjBone *b, struct ObjJoint *j) {
 }
 
 /* 23E56C -> 23E6E4 */
-struct ObjBone *make_bone(s32 a0, struct ObjJoint *j1, struct ObjJoint *j2, UNUSED s32 a3) {
+struct ObjBone *make_bone(s32 flags, struct ObjJoint *j1, struct ObjJoint *j2, UNUSED s32 a3) {
     struct ObjBone *b; // sp34
     struct ObjBone *oldhead;
-    UNUSED u8 filler[20];
 
     b = (struct ObjBone *) make_object(OBJ_TYPE_BONES);
     sBoneCount++;
@@ -499,7 +492,7 @@ struct ObjBone *make_bone(s32 a0, struct ObjJoint *j1, struct ObjJoint *j2, UNUS
     }
     b->unk10C = NULL;
     b->colourNum = 0;
-    b->unk104 = a0;
+    b->flags = flags;
     b->shapePtr = NULL;
     gd_set_identity_mat4(&b->mat70);
     b->spring = 0.8f;
@@ -521,7 +514,7 @@ void stub_joints_1(UNUSED u32 a0) {
 
 /* 23E6F8 -> 23E758; not called */
 void func_8018FF28(struct ObjJoint *a0, struct ObjJoint *a1) {
-    if (a1->flags & 0x1) {
+    if (a1->flags & JOINT_FLAG_1) {
         a0->unk84.x -= a1->unk84.x;
         a0->unk84.y -= a1->unk84.y;
         a0->unk84.z -= a1->unk84.z;
@@ -575,19 +568,19 @@ s32 func_8018FFE8(struct ObjBone **a0, struct ObjJoint **a1, struct ObjJoint *a2
 void func_80190168(struct ObjBone *b, UNUSED struct ObjJoint *a1, UNUSED struct ObjJoint *a2,
                    struct GdVec3f *a3) {
     struct GdVec3f sp7C;
-    UNUSED u8 filler1[24];
     f32 sp60;
     f32 sp5C;
     f32 sp58;
-    UNUSED u8 filler2[60];
 
     return;
+
+    //! Dead code
 
     b->unk58.x = sp7C.x;
     b->unk58.y = sp7C.y;
     b->unk58.z = sp7C.z;
 
-    if (b->unk104 & 0x8) {
+    if (b->flags & BONE_FLAG_8) {
         sp58 = gd_vec3f_magnitude(&sp7C);
         if (sp58 == 0.0f) {
             sp58 = 1.0f;
@@ -595,7 +588,7 @@ void func_80190168(struct ObjBone *b, UNUSED struct ObjJoint *a1, UNUSED struct 
         sp60 = (b->unkF8 / sp58) * b->spring;
     }
 
-    if (b->unk104 & 0x4) {
+    if (b->flags & BONE_FLAG_4) {
         if (sp60 > (sp58 = gd_vec3f_magnitude(&sp7C))) {
             sp5C = b->spring;
             a3->x *= sp5C;
@@ -608,7 +601,7 @@ void func_80190168(struct ObjBone *b, UNUSED struct ObjJoint *a1, UNUSED struct 
         }
     }
 
-    if (b->unk104 & 0x2) {
+    if (b->flags & BONE_FLAG_2) {
         if (sp60 < (sp58 = gd_vec3f_magnitude(&sp7C))) {
             sp5C = b->spring;
             a3->x *= sp5C;
@@ -627,13 +620,11 @@ void func_801903E8(struct ObjJoint *j, struct GdVec3f *a1, f32 x, f32 y, f32 z) 
     f32 sp14;
     struct GdVec3f sp8;
 
-    if (j->flags & 0x1 || (j->flags & 0x1000) == 0) {
+    if (j->flags & JOINT_FLAG_1 || (j->flags & JOINT_FLAG_1000) == 0) {
         j->unk3C.x += x;
         j->unk3C.y += y;
         j->unk3C.z += z;
         a1->x = a1->y = a1->z = 0.0f;
-        ;
-
     } else {
         sp14 = (j->unkB4.x * x) + (j->unkB4.y * y) + (j->unkB4.z * z);
         sp8.x = j->unkB4.x * sp14;
@@ -655,16 +646,11 @@ void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 
     struct ObjJoint *sp274; // = a2?
     struct ObjJoint *sp270; // mid-point of stack array?
     struct ObjJoint *sp26C; // jointstackarr[i]? curjoint?
-    UNUSED u8 filler1[4];
-    UNUSED u32 unused = 0;
-    UNUSED u8 filler2[12]; // unused vec?
     struct GdVec3f sp24C = { 0.0f, 0.0f, 0.0f };
     struct GdVec3f sp240;
-    UNUSED u8 filler3[8];
     s32 sp234; // i?
     s32 sp230;
     s32 sp22C = 1;
-    UNUSED u8 filler4[4];
     s32 sp224;
     s32 sp220;
     struct ObjJoint *sp120[0x40];
@@ -702,7 +688,7 @@ void func_80190574(s32 a0, struct ObjJoint *a1, struct ObjJoint *a2, f32 x, f32 
             }
 
             if (sp220 < 2) {
-                if (sp26C->flags & 0x1) {
+                if (sp26C->flags & JOINT_FLAG_1) {
                     sJointArrLen++;
                     sJointArr[sJointArrLen] = sp274;
                     sJointArrVecs[sJointArrLen].x = -sp24C.x;
@@ -766,7 +752,6 @@ void func_801909B4(void) {
 /* 23F1F0 -> 23F324; not called */
 void func_80190A20(void) {
     struct ObjJoint *j; // sp3c
-    UNUSED u8 filler[4];
     struct GdVec3f vec; // sp2C
     struct ObjGroup *grp;
     struct ListNode *link;
@@ -774,7 +759,7 @@ void func_80190A20(void) {
 
     j = gGdJointList;
     while (j != NULL) {
-        if (j->flags & 0x40) {
+        if (j->flags & JOINT_FLAG_40) {
             grp = j->unk1C4;
             link = grp->firstMember;
             b = (struct ObjBone *) link->obj;
@@ -792,13 +777,11 @@ void func_80190A20(void) {
 /* 23F324 -> 23F638 */
 void func_80190B54(struct ObjJoint *a0, struct ObjJoint *a1, struct GdVec3f *a2) { // b0
     struct GdVec3f spA4;
-    UNUSED u8 filler1[12];
     struct GdVec3f sp8C;
     struct GdVec3f sp80;
     f32 sp7C;
     f32 sp78;
     Mat4f sp38;
-    UNUSED u8 filler2[28];
 
     if (a1 != NULL) {
         spA4.x = a1->unk3C.x;
@@ -855,7 +838,6 @@ void func_80190E68(struct GdObj *obj, f32 x, f32 y, f32 z) {
     struct ObjJoint *sp44;
     struct GdObj *sp40;
     struct GdVec3f vec;
-    UNUSED u8 filler[24];
 
     vec.x = x;
     vec.y = y;
@@ -945,7 +927,6 @@ void func_80191220(struct ObjJoint *j) {
 
 /* 23FB90 -> 23FBC0 */
 void func_801913C0(struct ObjJoint *j) {
-    UNUSED u8 filler[16];
     func_80181894(j);
 }
 
@@ -1017,10 +998,9 @@ void reset_joint(struct ObjJoint *j) {
 /* 23FFF4 -> 2400C4 */
 void func_80191824(struct ObjJoint *j) {
     UNUSED struct ObjNet *sp14;
-    UNUSED u8 filler[16];
 
     sp14 = gGdSkinNet->unk1F0;
-    if (j->flags & 0x1) {
+    if (j->flags & JOINT_FLAG_1) {
         j->worldPos.x = gGdSkinNet->worldPos.x;
         j->worldPos.y = gGdSkinNet->worldPos.y;
         j->worldPos.z = gGdSkinNet->worldPos.z;
@@ -1049,7 +1029,7 @@ void func_801918F4(struct ObjJoint *j) {
 
     sp4 = -4.0f;
 
-    if (!(j->flags & 0x41)) {
+    if (!(j->flags & (JOINT_FLAG_1 | JOINT_FLAG_40))) {
         j->velocity.y += sp4 * 0.2f;
 
         j->unk3C.x += j->velocity.x;
@@ -1087,7 +1067,7 @@ void func_80191A1C(struct ObjBone *a0) {
         gd_normalize_vec3f(&sp24);
 
         sp3C = -sp3C * 50.0f;
-        if (!(((struct ObjJoint *) argjoint)->flags & 0x1)) {
+        if (!(((struct ObjJoint *) argjoint)->flags & JOINT_FLAG_1)) {
             func_80190F3C((struct ObjJoint *) argjoint, sp24.x * sp3C, sp24.y * sp3C, sp24.z * sp3C);
         }
     }
@@ -1099,7 +1079,7 @@ void func_80191BF8(struct ObjJoint *j) {
     f32 sp1C;
     f32 sp18 = -2.0f;
 
-    if (!(j->flags & 0x1)) {
+    if (!(j->flags & JOINT_FLAG_1)) {
         j->unk3C.y += sp18;
     }
 

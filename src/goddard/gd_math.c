@@ -160,8 +160,7 @@ void gd_add_vec3f_to_mat4f_offset(Mat4f *mtx, struct GdVec3f *vec) {
 void gd_create_origin_lookat(Mat4f *mtx, struct GdVec3f *vec, f32 roll) {
     f32 invertedHMag;
     f32 hMag;
-    f32 c;
-    f32 s;
+    f32 s, c;
     f32 radPerDeg = RAD_PER_DEG;
     struct GdVec3f unit;
 
@@ -261,8 +260,7 @@ void gd_clamp_vec3f(struct GdVec3f *vec, f32 limit) {
  * Rotates a 2D vector by some angle in degrees.
  */
 void gd_rot_2d_vec(f32 deg, f32 *x, f32 *y) {
-    f32 xP;
-    f32 yP;
+    f32 xP, yP;
     f32 rad;
 
     rad = deg / DEG_PER_RAD;
@@ -389,8 +387,7 @@ void UNUSED gd_invert_elements_mat4f(Mat4f *src, Mat4f *dst) {
  * Reaches a fatal_print if the determinant is 0.
  */
 void gd_inverse_mat4f(Mat4f *src, Mat4f *dst) {
-    s32 i;
-    s32 j;
+    s32 i, j;
     f32 determinant;
 
     gd_adjunct_mat4f(src, dst);
@@ -468,7 +465,6 @@ void gd_adjunct_mat4f(Mat4f *src, Mat4f *dst) {
  * Returns the determinant of a mat4f matrix.
  */
 f32 gd_mat4f_det(Mat4f *mtx) {
-    f32 det;
     struct InvMat4 inv;
 
     inv.r3.c3 = (*mtx)[0][0];
@@ -488,7 +484,7 @@ f32 gd_mat4f_det(Mat4f *mtx) {
     inv.r1.c0 = (*mtx)[3][2];
     inv.r0.c0 = (*mtx)[3][3];
 
-    det = (inv.r3.c3
+    return (inv.r3.c3
                 * gd_3x3_det(inv.r2.c2, inv.r2.c1, inv.r2.c0,
                              inv.r1.c2, inv.r1.c1, inv.r1.c0,
                              inv.r0.c2, inv.r0.c1, inv.r0.c0)
@@ -504,8 +500,6 @@ f32 gd_mat4f_det(Mat4f *mtx) {
                 * gd_3x3_det(inv.r3.c2, inv.r3.c1, inv.r3.c0,
                              inv.r2.c2, inv.r2.c1, inv.r2.c0,
                              inv.r1.c2, inv.r1.c1, inv.r1.c0);
-
-    return det;
 }
 
 /**
@@ -515,12 +509,8 @@ f32 gd_mat4f_det(Mat4f *mtx) {
 f32 gd_3x3_det(f32 r0c0, f32 r0c1, f32 r0c2,
                f32 r1c0, f32 r1c1, f32 r1c2, 
                f32 r2c0, f32 r2c1, f32 r2c2) {
-    f32 det;
-
-    det = r0c0 * gd_2x2_det(r1c1, r1c2, r2c1, r2c2) - r1c0 * gd_2x2_det(r0c1, r0c2, r2c1, r2c2)
-          + r2c0 * gd_2x2_det(r0c1, r0c2, r1c1, r1c2);
-
-    return det;
+    return r0c0 * gd_2x2_det(r1c1, r1c2, r2c1, r2c2) - r1c0 * gd_2x2_det(r0c1, r0c2, r2c1, r2c2)
+         + r2c0 * gd_2x2_det(r0c1, r0c2, r1c1, r1c2);
 }
 
 /**
@@ -528,9 +518,7 @@ f32 gd_3x3_det(f32 r0c0, f32 r0c1, f32 r0c2,
  * returns the determinant.
  */
 f32 gd_2x2_det(f32 a, f32 b, f32 c, f32 d) {
-    f32 det = a * d - b * c;
-
-    return det;
+    return (a * d) - (b * c);
 }
 
 /**
@@ -557,8 +545,7 @@ void UNUSED gd_create_neg_vec_zero_first_mat_row(Mat4f *mtx, struct GdVec3f *vec
  * Seems to have been meant to create a vector from a quaternion?
  */
 void UNUSED gd_broken_quat_to_vec3f(f32 quat[4], struct GdVec3f *vec, f32 zHalf, s32 i, s32 run) {
-    s32 j;
-    s32 k;
+    s32 j, k;
     UNUSED f32 jVal;
     UNUSED f32 kVal;
     UNUSED struct GdVec3f uVec;
@@ -597,10 +584,8 @@ end:
  * and inverse multiplication.
  */
 void UNUSED gd_quat_rotation(f32 quat[4], UNUSED s32 unused, f32 c, f32 s, s32 i, s32 sign) {
-    s32 j;
-    s32 k;
+    s32 j, k;
     f32 quatVal;
-    UNUSED u8 filler[8];
 
     if ((j = i + 1) >= 4) {
         j = 1;
@@ -622,8 +607,7 @@ void UNUSED gd_quat_rotation(f32 quat[4], UNUSED s32 unused, f32 c, f32 s, s32 i
  * Shifts a matrix up by one row, putting the top row on bottom.
  */
 void gd_shift_mat_up(Mat4f *mtx) {
-    s32 i;
-    s32 j;
+    s32 i, j;
     f32 temp[3];
 
     for (i = 0; i < 3; i++) {
@@ -660,9 +644,7 @@ void UNUSED gd_create_quat_rot_mat(f32 quat[4], UNUSED s32 unused, Mat4f *mtx) {
     f32 twoIJ;
     f32 two0K;
     f32 sqQuat[4];
-    s32 i;
-    s32 j;
-    s32 k;
+    s32 i, j, k;
 
     for (i = 0; i < 4; i++) {
         sqQuat[i] = SQ(quat[i]);
@@ -871,8 +853,6 @@ void gd_mult_mat4f(const Mat4f *mA, const Mat4f *mB, Mat4f *dst) {
  * Printed the prefix at some point, as shown by how the function is used.
  */
 void gd_print_vec(UNUSED const char *prefix, const struct GdVec3f *vec) {
-    UNUSED u8 filler[8];
-
     printf("%f,%f,%f\n", vec->x, vec->y, vec->z);
     printf("\n");
 }
@@ -883,8 +863,6 @@ void gd_print_vec(UNUSED const char *prefix, const struct GdVec3f *vec) {
  * Printed a prefix at some point, as shone by how the function is used.
  */
 void gd_print_bounding_box(UNUSED const char *prefix, UNUSED const struct GdBoundingBox *p) {
-    UNUSED u8 filler[8];
-
     printf("Min X = %f, Max X = %f \n", p->minX, p->maxX);
     printf("Min Y = %f, Max Y = %f \n", p->minY, p->maxY);
     printf("Min Z = %f, Max Z = %f \n", p->minZ, p->maxZ);
@@ -898,8 +876,7 @@ void gd_print_bounding_box(UNUSED const char *prefix, UNUSED const struct GdBoun
  * does have a "Matrix:" prefix, so it was definitely used at one point.
  */
 void gd_print_mtx(UNUSED const char *prefix, const Mat4f *mtx) {
-    s32 i;
-    s32 j;
+    s32 i, j;
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
@@ -929,8 +906,7 @@ void UNUSED gd_print_quat(const char *prefix, const f32 f[4]) {
 void UNUSED gd_rot_mat_offset(Mat4f *dst, f32 x, f32 y, f32 z, s32 copy) {
     f32 adj = 100.0f;
     Mat4f rot;
-    f32 c;
-    f32 s;
+    f32 s, c;
     f32 opp;
     f32 mag;
     struct GdVec3f vec;

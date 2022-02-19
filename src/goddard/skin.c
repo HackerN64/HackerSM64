@@ -88,7 +88,6 @@ void func_80192294(struct ObjNet *net) {
 /* 240ACC -> 240B84 */
 void func_801922FC(struct ObjNet *net) {
     struct ObjGroup *group; // 24
-    UNUSED u8 filler[8];
 
     gGdSkinNet = net;
     // TODO: netype constants?
@@ -104,7 +103,7 @@ void func_801922FC(struct ObjNet *net) {
 }
 
 /* 240B84 -> 240CF8 */
-struct ObjNet *make_net(UNUSED s32 a0, struct ObjShape *shapedata, struct ObjGroup *a2,
+struct ObjNet *make_net(UNUSED s32 flags, struct ObjShape *shapedata, struct ObjGroup *a2,
                         struct ObjGroup *a3, struct ObjGroup *a4) {
     struct ObjNet *net;
 
@@ -196,9 +195,7 @@ void collision_something_801926A4(struct ObjNet *net) {
 
 /* 2412A0 -> 24142C; not called */
 void func_80192AD0(struct ObjNet *net) {
-    UNUSED u8 filler1[4];
     struct ObjGroup *sp60;
-    UNUSED u8 filler2[68];
     struct ObjNet *sp18;
 
     if ((sp60 = net->unk1C8) == NULL) {
@@ -227,7 +224,6 @@ void func_80192AD0(struct ObjNet *net) {
 /* 24142C -> 24149C; orig name: func_80192C5C */
 void move_bonesnet(struct ObjNet *net) {
     struct ObjGroup *sp24;
-    UNUSED u8 filler[12];
 
     imin("move_bonesnet");
     gd_set_identity_mat4(&D_801B9DC8);
@@ -295,10 +291,8 @@ void func_80192CCC(struct ObjNet *net) {
 
 /* 241768 -> 241AB4; orig name: func_80192F98 */
 void convert_gd_verts_to_Vn(struct ObjGroup *grp) {
-    UNUSED u8 filler1[20];
     Vtx *vn;       // 28
     u8 nx, ny, nz; // 24, 25, 26
-    UNUSED u8 filler2[4];
     register struct VtxLink *vtxlink; // a1
 #ifndef GBI_FLOATS
     register s16 *vnPos;              // a2
@@ -343,7 +337,6 @@ void convert_gd_verts_to_Vn(struct ObjGroup *grp) {
 
 /* 241AB4 -> 241BCC; orig name: func_801932E4 */
 void convert_gd_verts_to_Vtx(struct ObjGroup *grp) {
-    UNUSED u8 filler[24];
     register struct VtxLink *vtxlink; // a1
 #ifndef GBI_FLOATS
     register s16 *vtxcoords;          // a2

@@ -431,7 +431,6 @@ void reset_plane(struct ObjPlane *plane) {
     struct ObjFace *sp4C;
     f32 sp48;
     f32 sp44;
-    UNUSED u8 filler[12];
     s32 i;
     s32 sp30;
     register f32 sp28;
@@ -508,7 +507,6 @@ void reset_plane(struct ObjPlane *plane) {
 
 /* @ 22B60C for 0x94; orig name: func_8017CE3C */
 struct ObjPlane *make_plane(s32 inZone, struct ObjFace *a1) {
-    UNUSED u8 filler[4];
     struct ObjPlane *newPlane = (struct ObjPlane *) make_object(OBJ_TYPE_PLANES);
 
     gGdPlaneCount++;
@@ -566,7 +564,7 @@ struct ObjCamera *make_camera(s32 flags, struct GdObj *a1) {
 }
 
 /* @ 22B8BC for 0xA8; orig. name: func_8017D0EC */
-struct ObjMaterial *make_material(UNUSED s32 a0, char *name, s32 id) {
+struct ObjMaterial *make_material(UNUSED s32 flags, char *name, s32 id) {
     struct ObjMaterial *newMtl;
 
     newMtl = (struct ObjMaterial *) make_object(OBJ_TYPE_MATERIALS);
@@ -672,7 +670,7 @@ struct ObjAnimator *make_animator(void) {
 }
 
 /* @ 22BD84 for 0x78; orig name: func_8017D5B4 */
-struct ObjWeight *make_weight(UNUSED s32 a0, s32 vtxId, struct ObjVertex *vtx /* always NULL */, f32 weight) {
+struct ObjWeight *make_weight(UNUSED s32 flags, s32 vtxId, struct ObjVertex *vtx /* always NULL */, f32 weight) {
     struct ObjWeight *newWeight = (struct ObjWeight *) make_object(OBJ_TYPE_WEIGHTS);
 
     newWeight->vtxId = vtxId;
@@ -749,9 +747,7 @@ void format_object_id(char *str, struct GdObj *obj) {
 struct ObjGroup *make_group(s32 count, ...) {
     va_list args;
     s32 i;
-    UNUSED u8 filler1[4];
     struct GdObj *curObj;
-    UNUSED u8 filler2[12];
     struct ObjGroup *newGroup;
     struct ObjGroup *oldGroupListHead;
     struct GdObj *vargObj;
@@ -811,7 +807,6 @@ struct ObjGroup *make_group(s32 count, ...) {
  */
 void addto_group(struct ObjGroup *group, struct GdObj *obj) {
     char strbuf[0x20];
-    UNUSED u8 filler[8];
 
     imin("addto_group");
 
@@ -916,7 +911,6 @@ void menu_cb_reset_positions(void) {
  * Unused (not called) - does nothing useful
  */
 struct GdObj *func_8017E2F0(struct GdObj *obj, enum ObjTypeFlag type) {
-    UNUSED u8 filler[4];
     enum ObjTypeFlag curObjType;
     struct ListNode *node;
 
@@ -953,7 +947,6 @@ s32 apply_to_obj_types_in_group(s32 types, applyproc_t func, struct ObjGroup *gr
     struct GdObj *linkedObj;
     enum ObjTypeFlag linkedObjType;
     applyproc_t objFn;
-    UNUSED u8 filler[32];
     s32 fnAppliedCount = 0;
 
     if (group == NULL) {
@@ -991,14 +984,12 @@ s32 apply_to_obj_types_in_group(s32 types, applyproc_t func, struct ObjGroup *gr
 }
 
 /* @ 22CD54 for 0x2B4 */
-void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
+void func_8017E584(struct ObjNet *net, struct GdVec3f *a1, struct GdVec3f *a2) {
     struct GdVec3f sp94;
     struct GdVec3f sp88;
     struct GdVec3f sp7C;
     struct GdVec3f sp70;
-    UNUSED u8 filler1[64]; // unused MyMatrix4x4? f32[4][4]
     f32 sp2C;
-    UNUSED u8 filler2[4];
     struct GdVec3f sp1C;
 
     sp70.x = a2->x;
@@ -1011,11 +1002,11 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     sp7C.y = a1->y;
     sp7C.z = a1->z;
 
-    sp1C.x = a0->centerOfGravity.x;
-    sp1C.y = a0->centerOfGravity.y;
-    sp1C.z = a0->centerOfGravity.z;
+    sp1C.x = net->centerOfGravity.x;
+    sp1C.y = net->centerOfGravity.y;
+    sp1C.z = net->centerOfGravity.z;
 
-    gd_rotate_and_translate_vec3f(&sp1C, &a0->mat128);
+    gd_rotate_and_translate_vec3f(&sp1C, &net->mat128);
 
     sp7C.x -= sp1C.x;
     sp7C.y -= sp1C.y;
@@ -1028,7 +1019,7 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     }
 
     gd_cross_vec3f(&sp70, a1, &sp94);
-    sp2C = (f32) gd_sqrt_d((sp94.x * sp94.x) + (sp94.z * sp94.z));
+    sp2C = (f32) gd_sqrt_d(SQ(sp94.x) + SQ(sp94.z));
 
     if (sp2C > 1000.0f) {
         sp2C = 1000.0f;
@@ -1041,28 +1032,26 @@ void func_8017E584(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     sp88.y = a2->y * sp2C;
     sp88.z = a2->z * sp2C;
 
-    a0->collDisp.x += sp88.x;
-    a0->collDisp.y += sp88.y;
-    a0->collDisp.z += sp88.z;
+    net->collDisp.x += sp88.x;
+    net->collDisp.y += sp88.y;
+    net->collDisp.z += sp88.z;
 }
 
 /* @ 22D008 for 0x1B4 */
-void func_8017E838(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
-    UNUSED u8 filler1[12];
+void func_8017E838(struct ObjNet *net, struct GdVec3f *a1, struct GdVec3f *a2) {
     struct GdVec3f sp70;
     struct GdVec3f sp64;
-    UNUSED u8 filler2[64];
     struct GdVec3f sp18;
 
     sp64.x = a1->x;
     sp64.y = a1->y;
     sp64.z = a1->z;
 
-    sp18.x = a0->centerOfGravity.x;
-    sp18.y = a0->centerOfGravity.y;
-    sp18.z = a0->centerOfGravity.z;
+    sp18.x = net->centerOfGravity.x;
+    sp18.y = net->centerOfGravity.y;
+    sp18.z = net->centerOfGravity.z;
 
-    gd_rotate_and_translate_vec3f(&sp18, &a0->mat128);
+    gd_rotate_and_translate_vec3f(&sp18, &net->mat128);
 
     sp64.x -= sp18.x;
     sp64.y -= sp18.y;
@@ -1075,9 +1064,9 @@ void func_8017E838(struct ObjNet *a0, struct GdVec3f *a1, struct GdVec3f *a2) {
     gd_cross_vec3f(a2, &sp64, &sp70);
     gd_clamp_vec3f(&sp70, 5.0f);
 
-    a0->collTorque.x += sp70.x;
-    a0->collTorque.y += sp70.y;
-    a0->collTorque.z += sp70.z;
+    net->collTorque.x += sp70.x;
+    net->collTorque.y += sp70.y;
+    net->collTorque.z += sp70.z;
 }
 
 /* @ 22D1BC for 0xA8 */
@@ -1102,47 +1091,35 @@ void func_8017E9EC(struct ObjNet *net) {
  */
 s32 gd_plane_point_within(struct GdBoundingBox *box1, struct GdBoundingBox *box2) {
     // test if min x and min z of box1 are within box2
-    if (box1->minX >= box2->minX) {
-        if (box1->minX <= box2->maxX) {
-            if (box1->minZ >= box2->minZ) {
-                if (box1->minZ <= box2->maxZ) {
-                    return TRUE;
-                }
-            }
-        }
+    if (box1->minX >= box2->minX
+     && box1->minX <= box2->maxX
+     && box1->minZ >= box2->minZ
+     && box1->minZ <= box2->maxZ) {
+        return TRUE;
     }
 
     // test if max x and min z of box1 are within box2
-    if (box1->maxX >= box2->minX) {
-        if (box1->maxX <= box2->maxX) {
-            if (box1->minZ >= box2->minZ) {
-                if (box1->minZ <= box2->maxZ) {
-                    return TRUE;
-                }
-            }
-        }
+    if (box1->maxX >= box2->minX
+     && box1->maxX <= box2->maxX
+     && box1->minZ >= box2->minZ
+     && box1->minZ <= box2->maxZ) {
+        return TRUE;
     }
 
     // test if max x and max z of box1 are within box2
-    if (box1->maxX >= box2->minX) {
-        if (box1->maxX <= box2->maxX) {
-            if (box1->maxZ >= box2->minZ) {
-                if (box1->maxZ <= box2->maxZ) {
-                    return TRUE;
-                }
-            }
-        }
+    if (box1->maxX >= box2->minX
+     && box1->maxX <= box2->maxX
+     && box1->maxZ >= box2->minZ
+     && box1->maxZ <= box2->maxZ) {
+        return TRUE;
     }
 
     // test if min x and max z of box1 are within box2
-    if (box1->minX >= box2->minX) {
-        if (box1->minX <= box2->maxX) {
-            if (box1->maxZ >= box2->minZ) {
-                if (box1->maxZ <= box2->maxZ) {
-                    return TRUE;
-                }
-            }
-        }
+    if (box1->minX >= box2->minX
+     && box1->minX <= box2->maxX
+     && box1->maxZ >= box2->minZ
+     && box1->maxZ <= box2->maxZ) {
+        return TRUE;
     }
 
     return FALSE;
@@ -1152,13 +1129,11 @@ s32 gd_plane_point_within(struct GdBoundingBox *box1, struct GdBoundingBox *box2
 s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj) {
     struct ListNode *curLink;
     struct ObjGroup *curGroup;
-    UNUSED u8 filler1[4];
     Mat4f *parentUnkMtx;
     Mat4f *iMtx;
     Mat4f *unkMtx;
     Mat4f *rotMtx;
     Mat4f *rotMtx2;
-    UNUSED u8 filler2[24];
     struct GdVec3f scale;
 
     if (parentObj != NULL) {
@@ -1206,13 +1181,11 @@ s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj
 s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
     struct ListNode *sp6C;
     struct ObjGroup *sp68;
-    UNUSED u8 filler1[4];
     UNUSED Mat4f *sp60;
     Mat4f *sp5C;
     UNUSED Mat4f *sp58;
     Mat4f *sp54;
     Mat4f *sp50;
-    UNUSED u8 filler2[24];
     struct GdVec3f sp2C;
     s32 count = 0;
 
@@ -1257,11 +1230,6 @@ s32 func_8017F210(struct GdObj *a0, struct GdObj *a1) {
 /* @ 22DB9C for 0x38; a0 might be ObjUnk200000* */
 void func_8017F3CC(struct Unk8017F3CC *a0) {
     gd_rotate_and_translate_vec3f(&a0->unk20, D_801B9E48);
-}
-
-/* @ 22DBD4 for 0x20 */
-void stub_objects_3(UNUSED f32 a0, UNUSED struct GdObj *a1, UNUSED struct GdObj *a2) {
-    UNUSED u8 filler[48];
 }
 
 /**
@@ -1314,8 +1282,6 @@ void move_animator(struct ObjAnimator *animObj) {
     s16(*animDataCam)[6];         // camera GdPlaneH[]?
     struct GdObj *stubObj1 = NULL; // used only for call to stubbed function
     struct GdObj *stubObj2 = NULL; // used only for call to stubbed function
-    UNUSED u8 filler[12];
-    UNUSED struct GdVec3f unusedVec;
     s32 currKeyFrame;
     s32 nextKeyFrame;
     f32 dt;
@@ -1343,10 +1309,6 @@ void move_animator(struct ObjAnimator *animObj) {
     if (animData->type == 0) {
         return;
     }
-
-    unusedVec.x = 4.0f;
-    unusedVec.y = 1.0f;
-    unusedVec.z = 1.0f;
 
     if (animObj->frame > (f32) animData->count) {
         animObj->frame = 1.0f;
@@ -1532,7 +1494,6 @@ void move_animator(struct ObjAnimator *animObj) {
                 } else {
                     if (stubObj2 == NULL) {
                         stubObj2 = linkedObj;
-                        stub_objects_3(animObj->frame, stubObj1, stubObj2);
                     } else {
                         fatal_printf("Too many objects to morph");
                     }
@@ -1547,15 +1508,12 @@ void move_animator(struct ObjAnimator *animObj) {
 
 /* @ 22EDF4 for 0x300; orig name: func_80180624 */
 void drag_picked_object(struct GdObj *inputObj) {
-    UNUSED u8 filler1[12];
     struct GdVec3f displacement;
     struct GdVec3f spC4;
     struct GdControl *ctrl;
     Mat4f sp80;
     Mat4f sp40;
-    UNUSED u8 filler2[12];
     struct GdObj *obj;
-    UNUSED u8 filler3[4];
     f32 dispMag;
 
     ctrl = &gGdCtrl;
@@ -1626,15 +1584,13 @@ void move_camera(struct ObjCamera *cam) {
     struct GdVec3f spE0;
     struct GdVec3f spD4;
     struct GdVec3f spC8;
-    UNUSED u8 filler1[12];
     struct GdVec3f spB0;
     Mat4f sp70;
-    UNUSED u8 filler2[64];
     Mat4f *sp2C;
     struct GdControl *ctrl;
 
     ctrl = &gGdCtrl;
-    if (!(cam->flags & 0x10)) {
+    if (!(cam->flags & CAMERA_FLAG_UNK_10)) {
         return;
     }
 
@@ -1757,11 +1713,11 @@ void func_8018100C(struct ObjLight *light) {
             light->unk30 = 0.0f;
         }
 
-        if ((light->unk3C & 0x1) != 0) {
+        if ((light->unk3C & LIGHT_UNK01) != 0) {
             light->unk30 = 1.0f;
         }
 
-        light->unk3C &= ~1;
+        light->unk3C &= ~LIGHT_UNK01;
     }
 }
 

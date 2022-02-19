@@ -46,28 +46,29 @@ struct DynList {
 /* Goddard Code Object Structs */
 /* Object Type Flags */
 enum ObjTypeFlag {
-    OBJ_TYPE_GROUPS    = 0x00000001,
-    OBJ_TYPE_BONES     = 0x00000002,
-    OBJ_TYPE_JOINTS    = 0x00000004,
-    OBJ_TYPE_PARTICLES = 0x00000008,
-    OBJ_TYPE_SHAPES    = 0x00000010,
-    OBJ_TYPE_NETS      = 0x00000020,
-    OBJ_TYPE_PLANES    = 0x00000040,
-    OBJ_TYPE_FACES     = 0x00000080,
-    OBJ_TYPE_VERTICES  = 0x00000100,
-    OBJ_TYPE_CAMERAS   = 0x00000200,
-    // 0x400 was not used
-    OBJ_TYPE_MATERIALS = 0x00000800,
-    OBJ_TYPE_WEIGHTS   = 0x00001000,
-    OBJ_TYPE_GADGETS   = 0x00002000,
-    OBJ_TYPE_VIEWS     = 0x00004000,
-    OBJ_TYPE_LABELS    = 0x00008000,
-    OBJ_TYPE_ANIMATORS = 0x00010000,
-    OBJ_TYPE_VALPTRS   = 0x00020000,
-    // 0x40000 was not used
-    OBJ_TYPE_LIGHTS    = 0x00080000,
-    OBJ_TYPE_ZONES     = 0x00100000,
-    OBJ_TYPE_UNK200000 = 0x00200000
+    OBJ_TYPES_NONE     = 0x0,
+    OBJ_TYPE_GROUPS    = (1 <<  0), // 0x00000001
+    OBJ_TYPE_BONES     = (1 <<  1), // 0x00000002
+    OBJ_TYPE_JOINTS    = (1 <<  2), // 0x00000004
+    OBJ_TYPE_PARTICLES = (1 <<  3), // 0x00000008
+    OBJ_TYPE_SHAPES    = (1 <<  4), // 0x00000010
+    OBJ_TYPE_NETS      = (1 <<  5), // 0x00000020
+    OBJ_TYPE_PLANES    = (1 <<  6), // 0x00000040
+    OBJ_TYPE_FACES     = (1 <<  7), // 0x00000080
+    OBJ_TYPE_VERTICES  = (1 <<  8), // 0x00000100
+    OBJ_TYPE_CAMERAS   = (1 <<  9), // 0x00000200
+    OBJ_TYPE_UNK400    = (1 << 10), // 0x00000400 // unused
+    OBJ_TYPE_MATERIALS = (1 << 11), // 0x00000800
+    OBJ_TYPE_WEIGHTS   = (1 << 12), // 0x00001000
+    OBJ_TYPE_GADGETS   = (1 << 13), // 0x00002000
+    OBJ_TYPE_VIEWS     = (1 << 14), // 0x00004000
+    OBJ_TYPE_LABELS    = (1 << 15), // 0x00008000
+    OBJ_TYPE_ANIMATORS = (1 << 16), // 0x00010000
+    OBJ_TYPE_VALPTRS   = (1 << 17), // 0x00020000
+    OBJ_TYPE_UNK40000  = (1 << 18), // 0x00040000 // unused
+    OBJ_TYPE_LIGHTS    = (1 << 19), // 0x00080000
+    OBJ_TYPE_ZONES     = (1 << 20), // 0x00100000
+    OBJ_TYPE_UNK200000 = (1 << 21), // 0x00200000
 };
 /* This constant seems to be used to indicate the type of any or all objects */
 #define OBJ_TYPE_ALL 0x00FFFFFF
@@ -77,11 +78,12 @@ enum ObjTypeFlag {
 typedef void (*drawmethod_t)(void *);
 /// Flags for the drawFlags field of an GdObj
 enum ObjDrawingFlags {
-    OBJ_DRAW_UNK01   = 0x01,
-    OBJ_INVISIBLE    = 0x02, ///< This `GdObj` shouldn't be drawn when updating a scene
-    OBJ_PICKED       = 0x04, ///< This `GdObj` is held by the cursor
-    OBJ_IS_GRABBABLE = 0x08, ///< This `GdObj` can be grabbed/picked by the cursor
-    OBJ_HIGHLIGHTED  = 0x10
+    OBJ_DRAW_FLAGS_NONE = 0x0,
+    OBJ_DRAW_UNK01      = (1 << 0), // 0x01
+    OBJ_INVISIBLE       = (1 << 1), // 0x02 ///< This `GdObj` shouldn't be drawn when updating a scene
+    OBJ_PICKED          = (1 << 2), // 0x04 ///< This `GdObj` is held by the cursor
+    OBJ_IS_GRABBABLE    = (1 << 3), // 0x08 ///< This `GdObj` can be grabbed/picked by the cursor
+    OBJ_HIGHLIGHTED     = (1 << 4), // 0x10
 };
 
 /**
@@ -148,6 +150,14 @@ struct ObjGroup {
     /* 0x74 */ s32 id;
 }; /* sizeof = 0x78 */
 
+enum BoneFlags {
+    BONE_FLAGS_NONE = 0x0,
+    BONE_FLAG_1 = (1 << 0), // 0x1 // unused
+    BONE_FLAG_2 = (1 << 1), // 0x2
+    BONE_FLAG_4 = (1 << 2), // 0x4
+    BONE_FLAG_8 = (1 << 3), // 0x8
+};
+
 /* Known linkTypes
  * 0x00 : Normal (link to GdObj)
  * 0x01 : Compressed (vtx or face data)
@@ -171,7 +181,7 @@ struct ObjBone {
     /* 0x0F8 */ f32 unkF8;              // length?
     /* 0x0FC */ f32 unkFC;              // also length?
     /* 0x100 */ s32 colourNum;             // "colour"
-    /* 0x104 */ s32 unk104;             // "flags"
+    /* 0x104 */ s32 flags;
     /* 0x108 */ s32 id;
     /* 0x10C */ struct ObjGroup *unk10C; // group of joints?
     /* 0x110 */ f32 spring;
@@ -179,6 +189,15 @@ struct ObjBone {
     /* 0x118 */ f32 unk118;
     /* 0x11C */ u8  filler3[8];
 }; /* sizeof = 0x124 */
+
+
+enum JointFlags {
+    JOINT_FLAGS_NONE = 0x0,
+    JOINT_FLAG_1     = (1 <<  0), // 0x0001
+    JOINT_FLAG_40    = (1 <<  6), // 0x0040
+    JOINT_FLAG_1000  = (1 << 12), // 0x1000
+    JOINT_FLAG_2000  = (1 << 13), // 0x2000
+};
 
 struct ObjJoint {
     /* 0x000 */ struct GdObj header;
@@ -225,6 +244,16 @@ struct ObjJoint {
     /* 0x228 */ f32 unk228;
 }; /* sizeof = 0x22C */
 
+enum GdParticleFlags {
+    PTC_FLAGS_NONE = 0x0,
+    PTC_FLAG_1     = (1 << 0), // 0x01
+    PTC_FLAG_2     = (1 << 1), // 0x02
+    PTC_FLAG_4     = (1 << 2), // 0x04
+    PTC_FLAG_8     = (1 << 3), // 0x08
+    PTC_FLAG_10    = (1 << 4), // 0x10
+    PTC_FLAG_20    = (1 << 5), // 0x20
+};
+
 /* Particle Types (+60)
    3 = Has groups of other particles in 6C?
 */
@@ -260,6 +289,15 @@ struct ObjParticle {
     /* 0xB8 */ s32 attachFlags;   //attached arg0; "AttFlag"
     /* 0xBC */ struct GdObj *attachedToObj; // object that this object is attached to. looks like can be a Light or Camera
 }; /* sizeof = 0xC0 */
+
+enum GdShapeFlags {
+    SHAPE_FLAGS_NONE = 0x0,
+    SHAPE_FLAG_1     = 0x01,
+    SHAPE_FLAG_2     = 0x02,
+    SHAPE_FLAG_4     = 0x04,
+    SHAPE_FLAG_8     = 0x08,
+    SHAPE_FLAG_10    = 0x10
+};
 
 /**
  * An object that represents the visual portion of a 3D model.
@@ -387,7 +425,14 @@ struct ObjFace {
     /* 0x48 */ struct ObjMaterial *mtl; // initialize to NULL; set by `map_face_materials` from mtlId
 }; /* sizeof = 0x4C */
 
-#define CAMERA_FLAG_CONTROLLABLE 0x4
+enum GdCameraFlags {
+    CAMERA_FLAGS_NONE        = 0x0,
+    CAMERA_FLAG_UNK_01       = (1 << 0), // 0x01 // unused
+    CAMERA_FLAG_UNK_02       = (1 << 1), // 0x02 // unused
+    CAMERA_FLAG_CONTROLLABLE = (1 << 2), // 0x04
+    CAMERA_FLAG_UNK_08       = (1 << 3), // 0x08 // unused
+    CAMERA_FLAG_UNK_10       = (1 << 4), // 0x10
+};
 
 struct ObjCamera {
     /* 0x000 */ struct GdObj header;
@@ -419,11 +464,13 @@ struct ObjCamera {
 }; /* sizeof = 0x190 */
 
 enum GdMtlTypes {
-    GD_MTL_STUB_DL = 0x01,
-    GD_MTL_BREAK = 0x04,
-    GD_MTL_SHINE_DL = 0x10,
-    GD_MTL_TEX_OFF = 0x20,
-    GD_MTL_LIGHTS = 0x40 // uses default case
+    GD_MTL_STUB_DL  = (1 << 0), // 0x01
+    GD_MTL_UNK_02   = (1 << 1), // 0x02
+    GD_MTL_BREAK    = (1 << 2), // 0x04
+    GD_MTL_UNK_08   = (1 << 3), // 0x08
+    GD_MTL_SHINE_DL = (1 << 4), // 0x10
+    GD_MTL_TEX_OFF  = (1 << 5), // 0x20
+    GD_MTL_LIGHTS   = (1 << 6), // 0x40 // uses default case
 };
 
 struct ObjMaterial {
@@ -472,7 +519,7 @@ struct ObjGadget {
     /* 0x38 */ f32 rangeMin;
     /* 0x3C */ f32 rangeMax;
     /* 0x40 */ struct GdVec3f size;   // size (x = width, y = height)
-    /* 0x4C */ struct ObjGroup *valueGrp;  // group containing `ObjValPtr`s controlled by this gadget 
+    /* 0x4C */ struct ObjGroup *valueGrp;  // group containing `ObjValPtr`s controlled by this gadget
     /* 0x50 */ struct ObjShape *shapePtr;
     /* 0x54 */ struct ObjGroup *unk54;  //node group?
     /* 0x58 */ u8 filler2[4];
@@ -480,22 +527,31 @@ struct ObjGadget {
 }; /* sizeof = 0x60 */
 
 enum GdViewFlags {
-    VIEW_2_COL_BUF      = 0x000008,
-    VIEW_ALLOC_ZBUF     = 0x000010,
-    VIEW_SAVE_TO_GLOBAL = 0x000040,
-    VIEW_DEFAULT_PARENT = 0x000100,
-    VIEW_BORDERED       = 0x000400,
-    VIEW_UPDATE         = 0x000800,
-    VIEW_UNK_1000       = 0x001000, // used in setup_view_buffers
-    VIEW_UNK_2000       = 0x002000, // only see together with 0x4000
-    VIEW_UNK_4000       = 0x004000,
-    VIEW_COLOUR_BUF     = 0x008000,
-    VIEW_Z_BUF          = 0x010000,
-    VIEW_1_CYCLE        = 0x020000,
-    VIEW_MOVEMENT       = 0x040000,
-    VIEW_DRAW           = 0x080000,
-    VIEW_WAS_UPDATED    = 0x100000,
-    VIEW_LIGHT          = 0x200000
+    VIEW_FLAGS_NONE     = 0x0,
+    VIEW_UNK_1          = (1 <<  0), // 0x000001
+    VIEW_UNK_2          = (1 <<  1), // 0x000002
+    VIEW_UNK_4          = (1 <<  2), // 0x000004
+    VIEW_2_COL_BUF      = (1 <<  3), // 0x000008
+    VIEW_ALLOC_ZBUF     = (1 <<  4), // 0x000010
+    VIEW_UNK_20         = (1 <<  5), // 0x000020
+    VIEW_SAVE_TO_GLOBAL = (1 <<  6), // 0x000040
+    VIEW_UNK_80         = (1 <<  7), // 0x000080
+    VIEW_DEFAULT_PARENT = (1 <<  8), // 0x000100
+    VIEW_UNK_200        = (1 <<  9), // 0x000200
+    VIEW_BORDERED       = (1 << 10), // 0x000400
+    VIEW_UPDATE         = (1 << 11), // 0x000800
+    VIEW_UNK_1000       = (1 << 12), // 0x001000 // used in setup_view_buffers
+    VIEW_UNK_2000       = (1 << 13), // 0x002000 // only see together with 0x4000
+    VIEW_UNK_4000       = (1 << 14), // 0x004000
+    VIEW_COLOUR_BUF     = (1 << 15), // 0x008000
+    VIEW_Z_BUF          = (1 << 16), // 0x010000
+    VIEW_1_CYCLE        = (1 << 17), // 0x020000
+    VIEW_MOVEMENT       = (1 << 18), // 0x040000
+    VIEW_DRAW           = (1 << 19), // 0x080000
+    VIEW_WAS_UPDATED    = (1 << 20), // 0x100000
+    VIEW_LIGHT          = (1 << 21), // 0x200000
+    VIEW_UNK_400000     = (1 << 22), // 0x400000
+    VIEW_UNK_800000     = (1 << 23), // 0x800000
 };
 
 struct ObjView {
@@ -565,17 +621,18 @@ struct ObjAnimator {
 
 /* Animation Data Types */
 enum GdAnimations {
-    GD_ANIM_EMPTY                 = 0,  // Listed types are how the data are arranged in memory; maybe not be exact type
-    GD_ANIM_MTX4x4                = 1,  // f32[4][4]
-    GD_ANIM_SCALE3F_ROT3F_POS3F   = 2,  // f32[3][3]
-    GD_ANIM_SCALE3S_POS3S_ROT3S   = 3,  // s16[9]
-    GD_ANIM_SCALE3F_ROT3F_POS3F_2 = 4,  // f32[3][3]
-    GD_ANIM_STUB                  = 5,
-    GD_ANIM_ROT3S                 = 6,  // s16[3]
-    GD_ANIM_POS3S                 = 7,  // s16[3]
-    GD_ANIM_ROT3S_POS3S           = 8,  // s16[6]
-    GD_ANIM_MTX4x4F_SCALE3F       = 9,  // {f32 mtx[4][4]; f32 vec[3];}
-    GD_ANIM_CAMERA_EYE3S_LOOKAT3S = 11  // s16[6]
+    GD_ANIM_EMPTY,                 // Listed types are how the data are arranged in memory; maybe not be exact type
+    GD_ANIM_MTX4x4,                // f32[4][4]
+    GD_ANIM_SCALE3F_ROT3F_POS3F,   // f32[3][3]
+    GD_ANIM_SCALE3S_POS3S_ROT3S,   // s16[9]
+    GD_ANIM_SCALE3F_ROT3F_POS3F_2, // f32[3][3]
+    GD_ANIM_STUB,                  
+    GD_ANIM_ROT3S,                 // s16[3]
+    GD_ANIM_POS3S,                 // s16[3]
+    GD_ANIM_ROT3S_POS3S,           // s16[6]
+    GD_ANIM_MTX4x4F_SCALE3F,       // {f32 mtx[4][4]; f32 vec[3];}
+    GD_ANIM_UNK,
+    GD_ANIM_CAMERA_EYE3S_LOOKAT3S, // s16[6]
 };
 /* This struct is pointed to by the `obj` field in ListNode struct in the `animdata` ObjGroup */
 struct AnimDataInfo {
@@ -590,8 +647,9 @@ struct AnimMtxVec {
 };
 
 enum ValPtrType {
-    OBJ_VALUE_INT   = 1,
-    OBJ_VALUE_FLOAT = 2
+    OBJ_VALUE_NONE,
+    OBJ_VALUE_INT,
+    OBJ_VALUE_FLOAT,
 };
 
 /**
@@ -604,13 +662,17 @@ struct ObjValPtr {
     /* 0x14 */ struct GdObj *obj;   // maybe just a void *?
     /* 0x18 */ uintptr_t offset;  // value pointed to is `obj` + `offset`
     /* 0x1C */ enum ValPtrType datatype;
-    /* 0x20 */ s32 flag;       // TODO: better name for this? If 0x40000, then `offset` is an offset to a field in `obj`. Otherwise, `obj` is NULL, and `offset` is the address of a variable. 
+    /* 0x20 */ s32 flag;       // TODO: better name for this? If 0x40000, then `offset` is an offset to a field in `obj`. Otherwise, `obj` is NULL, and `offset` is the address of a variable.
 }; /* sizeof = 0x24 */
 
 enum GdLightFlags {
-    LIGHT_UNK02 = 0x02, // old type of light?
-    LIGHT_NEW_UNCOUNTED = 0x10,
-    LIGHT_UNK20 = 0x20 // new, actually used type of light? used for phong shading?
+    LIGHT_FLAGS_NONE    = 0x0,
+    LIGHT_UNK01         = (1 << 0), // 0x01
+    LIGHT_UNK02         = (1 << 1), // 0x02 // old type of light?
+    LIGHT_UNK04         = (1 << 2), // 0x04
+    LIGHT_UNK08         = (1 << 3), // 0x08
+    LIGHT_NEW_UNCOUNTED = (1 << 4), // 0x10
+    LIGHT_UNK20         = (1 << 5), // 0x20 // new, actually used type of light? used for phong shading?
 };
 
 struct ObjLight {
