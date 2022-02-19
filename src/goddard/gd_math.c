@@ -812,9 +812,6 @@ void gd_mult_mat4f(const Mat4f *mA, const Mat4f *mB, Mat4f *dst) {
     gd_copy_mat4f(&res, dst);
 }
 
-#undef MAT4_MULTIPLY
-#undef MAT4_DOT_PROD
-
 /**
  * Prints a vec3f vector.
  *
