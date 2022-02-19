@@ -120,12 +120,6 @@ void setup_lights(void) {
     gd_setproperty(GD_PROP_AMB_COLOUR, 0.5f, 0.5f, 0.5f);
     gd_setproperty(GD_PROP_CULLING, 1.0f, 0.0f, 0.0f); // set G_CULL_BACK
     return;
-
-    // dead code
-    gd_setproperty(GD_PROP_STUB17, 2.0f, 0.0f, 0.0f);
-    gd_setproperty(GD_PROP_ZBUF_FN, 24.0f, 0.0f, 0.0f);
-    gd_setproperty(GD_PROP_CULLING, 1.0f, 0.0f, 0.0f);
-    return;
 }
 
 /**
