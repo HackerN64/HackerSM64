@@ -1066,9 +1066,9 @@ void func_80191A1C(struct ObjBone *a0) {
         sp24.z -= sp18.z;
         gd_normalize_vec3f(&sp24);
 
-        sp3C = -sp3C * 50.0f;
+        sp3C *= -50.0f;
         if (!(((struct ObjJoint *) argjoint)->flags & JOINT_FLAG_1)) {
-            func_80190F3C((struct ObjJoint *) argjoint, sp24.x * sp3C, sp24.y * sp3C, sp24.z * sp3C);
+            func_80190F3C((struct ObjJoint *) argjoint, (sp24.x * sp3C), (sp24.y * sp3C), (sp24.z * sp3C));
         }
     }
     gGdTempBone = a0;
