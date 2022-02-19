@@ -65,6 +65,7 @@ void bhv_door_loop(void) {
     switch (o->oAction) {
         case DOOR_ACT_CLOSED:
             cur_obj_init_animation_with_sound(DOOR_ANIM_CLOSED);
+            load_object_collision_model();
             break;
         case DOOR_ACT_PULLED:
             door_animation_and_reset(DOOR_ANIM_PULLED);
@@ -82,10 +83,6 @@ void bhv_door_loop(void) {
             door_animation_and_reset(DOOR_ANIM_WARP_PUSHED);
             play_warp_door_open_noise();
             break;
-    }
-
-    if (o->oAction == DOOR_ACT_CLOSED) {
-        load_object_collision_model();
     }
 
     bhv_door_rendering_loop();
