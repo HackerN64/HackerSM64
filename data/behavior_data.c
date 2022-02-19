@@ -4986,6 +4986,7 @@ const BehaviorScript bhvMips[] = {
     DROP_TO_FLOOR(),
     SET_HITBOX(/*Radius*/ 50, /*Height*/ 75),
     SET_INT(oIntangibleTimer, 0),
+    CALL_NATIVE(bhv_init_room),
     CALL_NATIVE(bhv_mips_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_mips_loop),
