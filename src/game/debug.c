@@ -101,7 +101,7 @@ void print_text_array_info(s16 *printState, const char *str, s32 number) {
             || (printState[DEBUG_PSTATE_MAX_X_CURSOR] < printState[DEBUG_PSTATE_Y_CURSOR])) {
             print_text(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                        "DPRINT OVER");
-            printState[DEBUG_PSTATE_DISABLED]++; // why not just = TRUE...
+            printState[DEBUG_PSTATE_DISABLED] = TRUE;
         } else {
             print_text_fmt_int(printState[DEBUG_PSTATE_X_CURSOR], printState[DEBUG_PSTATE_Y_CURSOR],
                                str, number);
@@ -153,26 +153,18 @@ void print_debug_top_down_normal(const char *str, s32 number) {
 void print_mapinfo(void) {
     // EU mostly stubbed this function out.
     struct Surface *pfloor;
-    UNUSED f32 bgY;   // unused in EU
-    UNUSED f32 water; // unused in EU
-    UNUSED s32 area;  // unused in EU
-    UNUSED s32 angY;  // unused in EU
 
-    angY = gCurrentObject->oMoveAngleYaw / 182.044000f;
-    area = ((s32) gCurrentObject->oPosX + 0x2000) / 1024
-           + ((s32) gCurrentObject->oPosZ + 0x2000) / 1024 * 16;
+    s32 angY = angle_to_degrees(gCurrentObject->oMoveAngleYaw);
+    s32 area = ((s32) gCurrentObject->oPosX + 0x2000) / 1024
+             + ((s32) gCurrentObject->oPosZ + 0x2000) / 1024 * 16;
 
-    bgY = find_floor(gCurrentObject->oPosX, gCurrentObject->oPosY, gCurrentObject->oPosZ, &pfloor);
-    water = find_water_level(gCurrentObject->oPosX, gCurrentObject->oPosY, gCurrentObject->oPosZ);
+    f32 bgY = find_floor(gCurrentObject->oPosX, gCurrentObject->oPosY, gCurrentObject->oPosZ, &pfloor);
+    f32 water = find_water_level(gCurrentObject->oPosX, gCurrentObject->oPosY, gCurrentObject->oPosZ);
 
     print_debug_top_down_normal("mapinfo", 0);
-#ifndef VERSION_EU
     print_debug_top_down_mapinfo("area %x", area);
     print_debug_top_down_mapinfo("wx   %d", gCurrentObject->oPosX);
-    //! Fat finger: programmer hit tab instead of space. Japanese
-    // thumb shift keyboards had the tab key next to the spacebar,
-    // so this was likely the reason.
-    print_debug_top_down_mapinfo("wy\t  %d", gCurrentObject->oPosY);
+    print_debug_top_down_mapinfo("wy   %d", gCurrentObject->oPosY);
     print_debug_top_down_mapinfo("wz   %d", gCurrentObject->oPosZ);
     print_debug_top_down_mapinfo("bgY  %d", bgY);
     print_debug_top_down_mapinfo("angY %d", angY);
@@ -186,7 +178,6 @@ void print_mapinfo(void) {
     if (gCurrentObject->oPosY < water) {
         print_debug_top_down_mapinfo("water %d", water);
     }
-#endif
 }
 
 void print_checkinfo(void) {
@@ -211,7 +202,7 @@ void print_string_array_info(const char **strArr) {
     s32 i;
 
     if (!sDebugStringArrPrinted) {
-        sDebugStringArrPrinted++; // again, why not = TRUE...
+        sDebugStringArrPrinted = TRUE;
         for (i = 0; i < 8; i++) {
             // sDebugPage is assumed to be 4 or 5 here.
             print_debug_top_down_mapinfo(strArr[i], gDebugInfo[sDebugPage][i]);
@@ -279,8 +270,8 @@ void reset_debug_objectinfo(void) {
     gObjectCounter = 0;
     sDebugStringArrPrinted = FALSE;
 
-    set_print_state_info(gDebugPrintState1, 20, 185, 40, 200, -15);
-    set_print_state_info(gDebugPrintState2, 180, 30, 0, 150, 15);
+    set_print_state_info(gDebugPrintState1,  20, 185, 40, 200, -15);
+    set_print_state_info(gDebugPrintState2, 180,  30,  0, 150,  15);
     update_debug_dpadmask();
 }
 
