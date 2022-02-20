@@ -29,6 +29,7 @@
 #include "puppycam2.h"
 #include "debug_box.h"
 #include "vc_check.h"
+#include "vc_ultra.h"
 
 // First 3 controller slots
 struct Controller gControllers[3];
@@ -653,7 +654,9 @@ void init_controllers(void) {
 #ifdef EEP
     // strangely enough, the EEPROM probe for save data is done in this function.
     // save pak detection?
-    gEepromProbe = osEepromProbe(&gSIEventMesgQueue);
+    gEepromProbe = IS_VC()
+                 ? osEepromProbeVC(&gSIEventMesgQueue)
+                 : osEepromProbe  (&gSIEventMesgQueue);
 #endif
 #ifdef SRAM
     gSramProbe = nuPiInitSram();

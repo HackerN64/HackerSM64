@@ -52,6 +52,12 @@ s8 gLevelToCourseNumTable[] = {
 STATIC_ASSERT(ARRAY_COUNT(gLevelToCourseNumTable) == LEVEL_COUNT - 1,
               "change this array if you are adding levels");
 #ifdef EEP
+#include "vc_check.h"
+#include "vc_ultra.h"
+
+// Note that for safety reasons use IS_VC() instead gIsVC when working with EEP
+// EEP is used very early in the boot sequence so gIsVC may report 'false'
+
 /**
  * Read from EEPROM to a given address.
  * The EEPROM address is computed using the offset of the destination address from gSaveBuffer.
@@ -70,7 +76,9 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
             block_until_rumble_pak_free();
 #endif
             triesLeft--;
-            status = osEepromLongRead(&gSIEventMesgQueue, offset, buffer, size);
+            status = IS_VC()
+                   ? osEepromLongReadVC(&gSIEventMesgQueue, offset, buffer, size)
+                   : osEepromLongRead  (&gSIEventMesgQueue, offset, buffer, size);
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
@@ -98,7 +106,9 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
             block_until_rumble_pak_free();
 #endif
             triesLeft--;
-            status = osEepromLongWrite(&gSIEventMesgQueue, offset, buffer, size);
+            status = IS_VC()
+                   ? osEepromLongWriteVC(&gSIEventMesgQueue, offset, buffer, size)
+                   : osEepromLongWrite  (&gSIEventMesgQueue, offset, buffer, size);
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
