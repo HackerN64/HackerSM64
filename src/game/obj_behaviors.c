@@ -382,7 +382,7 @@ s32 object_step(void) {
 
     f32 floorY = find_floor(objX + objVelX, objY, objZ + objVelZ, &sObjFloor);
 
-    o->oFloor       = sObjFloor;
+    o->oFloor = sObjFloor;
     o->oFloorHeight = floorY;
 
     if (turn_obj_away_from_steep_floor(sObjFloor, floorY, objVelX, objVelZ)) {

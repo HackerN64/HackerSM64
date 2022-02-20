@@ -1431,12 +1431,6 @@ static void cur_obj_update_floor(void) {
             //! This maybe misses SURFACE_WARP
             o->oMoveFlags |= OBJ_MOVE_ABOVE_DEATH_BARRIER;
         }
-
-        o->oFloorType = floorType;
-        o->oFloorRoom = floor->room;
-    } else {
-        o->oFloorType = SURFACE_DEFAULT;
-        o->oFloorRoom = 0;
     }
 }
 

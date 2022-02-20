@@ -166,10 +166,8 @@
 #define /*0x198*/ oNumLootCoins                                 OBJECT_FIELD_S32(0x44)
 #define /*0x19C*/ oDrawingDistance                              OBJECT_FIELD_F32(0x45)
 #define /*0x1A0*/ oRoom                                         OBJECT_FIELD_S32(0x46)
-// 0x1A4-0x1B2 (0x47-0x4A) are object specific and defined below the common fields.
-#define /*0x1B4*/ oWallAngle                  OBJECT_FIELD_S32(0x4B)
-#define /*0x1B8*/ oFloorType                  OBJECT_FIELD_S16(0x4C, 0)
-#define /*0x1BA*/ oFloorRoom                  OBJECT_FIELD_S16(0x4C, 1)
+// 0x1A4-0x1B2 (0x47-0x4B) are object specific and defined below the common fields.
+#define /*0x1B8*/ oWallAngle                  OBJECT_FIELD_S32(0x4C)
 #define /*0x1BC*/ oAngleToHome                OBJECT_FIELD_S32(0x4D)
 #define /*0x1C0*/ oFloor                      OBJECT_FIELD_SURFACE(0x4E)
 #define /*0x1C4*/ oDeathSound                 OBJECT_FIELD_S32(0x4F)
