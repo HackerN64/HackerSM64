@@ -28,3 +28,8 @@
  * Reverb parameters can be configured in audio/synthesis.c to meet desired aesthetic/performance needs. Currently US/JP only. Hurts emulator and console performance.
  */
 // #define BETTER_REVERB
+
+/**
+ *  Do not restart the music on cap grabs
+ */
+#define PERSISTENT_CAP_MUSIC
