@@ -11,6 +11,11 @@ enum ActionStatesInCannon { // act_in_cannon
     ACT_STATE_IN_CANNON_READY
 };
 
+enum ClimbingSounds { // play_climbing_sounds
+    CLIMBING_SOUND_ARG_CLIMB_UP,
+    CLIMBING_SOUND_ARG_SLIDE_DOWN,
+};
+
 enum PolePositions { // set_pole_position
     POLE_NONE,
     POLE_TOUCHED_FLOOR,

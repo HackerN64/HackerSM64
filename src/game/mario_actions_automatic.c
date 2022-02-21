@@ -29,15 +29,15 @@ void add_tree_leaf_particles(struct MarioState *m) {
     }
 }
 
-void play_climbing_sounds(struct MarioState *m, s32 b) {
+void play_climbing_sounds(struct MarioState *m, s32 direction) {
     s32 isOnTree = obj_has_behavior(m->usedObj, bhvTree);
 
-    if (b == 1) {
+    if (direction == CLIMBING_SOUND_ARG_CLIMB_UP) {
         if (is_anim_past_frame(m, 1)) {
             play_sound(isOnTree ? SOUND_ACTION_CLIMB_UP_TREE : SOUND_ACTION_CLIMB_UP_POLE,
                        m->marioObj->header.gfx.cameraToObject);
         }
-    } else {
+    } else { // CLIMBING_SOUND_ARG_SLIDE_DOWN
         play_sound(isOnTree ? SOUND_MOVING_SLIDE_DOWN_TREE : SOUND_MOVING_SLIDE_DOWN_POLE,
                    m->marioObj->header.gfx.cameraToObject);
     }
@@ -131,7 +131,7 @@ s32 act_holding_pole(struct MarioState *m) {
         marioObj->oMarioPolePos -= m->angleVel[1] / 0x100;
 
         add_tree_leaf_particles(m);
-        play_climbing_sounds(m, 2);
+        play_climbing_sounds(m, CLIMBING_SOUND_ARG_SLIDE_DOWN);
 #if ENABLE_RUMBLE
         reset_rumble_timers_slip();
 #endif
@@ -176,7 +176,7 @@ s32 act_climbing_pole(struct MarioState *m) {
         s32 animSpeed = m->controller->stickY / 4.0f * 0x10000;
         set_mario_anim_with_accel(m, MARIO_ANIM_CLIMB_UP_POLE, animSpeed);
         add_tree_leaf_particles(m);
-        play_climbing_sounds(m, 1);
+        play_climbing_sounds(m, CLIMBING_SOUND_ARG_CLIMB_UP);
     }
 
     return FALSE;
