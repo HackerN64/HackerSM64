@@ -978,7 +978,7 @@ u32 interact_warp_door(struct MarioState *m, UNUSED u32 interactType, struct Obj
             }
 
             m->interactObj = obj;
-            m->usedObj = obj;
+            m->usedObj     = obj;
             return set_mario_action(m, doorAction, actionArg);
         }
     }
@@ -1457,8 +1457,8 @@ u32 interact_koopa_shell(struct MarioState *m, UNUSED u32 interactType, struct O
          || m->action == ACT_WALKING
          || m->action == ACT_HOLD_WALKING) {
             m->interactObj = obj;
-            m->usedObj = obj;
-            m->riddenObj = obj;
+            m->usedObj     = obj;
+            m->riddenObj   = obj;
 
             attack_object(obj, interaction);
             update_mario_sound_and_camera(m);
@@ -1501,7 +1501,7 @@ u32 check_object_grab_mario(struct MarioState *m, UNUSED u32 interactType, struc
 }
 
 u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *obj) {
-    s32 actionId = m->action & ACT_ID_MASK;
+    s32 actionId = (m->action & ACT_ID_MASK);
     if (actionId >= ACT_GROUP_AIRBORNE && actionId < (ACT_HOLD_JUMP & ACT_ID_MASK)) {
         if (!(m->prevAction & ACT_FLAG_ON_POLE) || m->usedObj != obj) {
 #if defined(VERSION_SH) || defined(SHINDOU_POLES)
@@ -1520,9 +1520,9 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
 #endif
 
             m->interactObj = obj;
-            m->usedObj = obj;
-            m->vel[1] = 0.0f;
-            m->forwardVel = 0.0f;
+            m->usedObj     = obj;
+            m->vel[1]      = 0.0f;
+            m->forwardVel  = 0.0f;
 
             // Pole fix
             // If mario is beneath the pole, clamp mario's position to the down-offset of the pole (bottom)
