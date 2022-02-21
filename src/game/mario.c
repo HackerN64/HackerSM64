@@ -370,6 +370,10 @@ s32 get_num_steps(struct MarioState *m, s32 numSteps) {
 }
 #endif
 
+s32 analog_stick_held_back(struct MarioState *m) {
+    return (abs_angle_diff(m->intendedYaw, m->faceAngle[1]) > 0x471C);
+}
+
 /**
  * Sets Mario's other velocities from his forward speed.
  */
