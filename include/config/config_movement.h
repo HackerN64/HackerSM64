@@ -51,7 +51,7 @@
 #define PLATFORM_DISPLACEMENT_2
 
 // Uses Shindou's pole behavior.
-// #define SHINDOU_POLES
+#define SHINDOU_POLES (0 | VERSION_SH)
 
 // If A and Z are pressed on the same frame while running, Mario will long jump instead of ground pound.
 #define EASIER_LONG_JUMPS
