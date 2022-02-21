@@ -56,7 +56,7 @@
 // If A and Z are pressed on the same frame while running, Mario will long jump instead of ground pound.
 #define EASIER_LONG_JUMPS
 
-// Enable being able to immediately long jump after landing from a long jump
+// Enable being able to immediately long jump after landing from a long jump.
 #define IMMEDIATE_LONG_JUMPS
 
 // Prevents long jumps getting canceled by steep floors by increasing Mario's initial vertical velocity when long jumping uphill.
@@ -64,6 +64,9 @@
 
 // Enables the ability to hold Z while twirling to descend faster.
 #define Z_TWIRL
+
+// Enables the ability to dive during the ground pound spin animation, similar to Super Mario Odyssey.
+// #define GROUND_POUND_DIVE
 
 // Disables bonks when ground pounding next to a wall.
 #define DISABLE_GROUNDPOUND_BONK

@@ -926,6 +926,14 @@ s32 act_ground_pound(struct MarioState *m) {
             play_sound(SOUND_ACTION_SPIN, m->marioObj->header.gfx.cameraToObject);
         }
 
+#ifdef GROUND_POUND_DIVE
+        if (m->input & INPUT_B_PRESSED) {
+            m->vel[1] = 25.0f;
+            mario_set_forward_vel(m, 20.0f);
+            return set_mario_action(m, ACT_DIVE, 0);
+        }
+#endif
+
         m->actionTimer++;
         if (m->actionTimer >= m->marioObj->header.gfx.animInfo.curAnim->loopEnd + 4) {
             play_sound(SOUND_MARIO_GROUND_POUND_WAH, m->marioObj->header.gfx.cameraToObject);
