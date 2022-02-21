@@ -100,7 +100,7 @@ static void spiny_act_walk(void) {
             o->oForwardVel *= 0.1f;
             o->oVelY *= 0.7f;
 
-            o->oMoveFlags = 0; // weird flex but okay
+            o->oMoveFlags = OBJ_MOVE_NONE; // weird flex but okay
 
             // Don't allow mario to punch the spiny two frames in a row?
             o->oInteractType = INTERACT_MR_BLIZZARD;
@@ -131,7 +131,7 @@ static void spiny_act_held_by_lakitu(void) {
             o->parentObj->oForwardVel * coss(o->oMoveAngleYaw - o->parentObj->oMoveAngleYaw) + 10.0f;
         o->oVelY = 30.0f;
 
-        o->oMoveFlags = 0; // you do you, spiny
+        o->oMoveFlags = OBJ_MOVE_NONE; // you do you, spiny
     }
 }
 

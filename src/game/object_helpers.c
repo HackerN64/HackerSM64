@@ -822,7 +822,7 @@ void cur_obj_unrender_set_action_and_anim(s32 animIndex, s32 action) {
 }
 
 static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
-    o->oMoveFlags = 0;
+    o->oMoveFlags = OBJ_MOVE_NONE;
     o->oFloorHeight = find_floor(o->oPosX, (o->oPosY + MARIO_HITBOX_HEIGHT), o->oPosZ, &o->oFloor);
 
     if (o->oFloorHeight > o->oPosY) {
