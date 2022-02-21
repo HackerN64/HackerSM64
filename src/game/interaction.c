@@ -1505,10 +1505,9 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
     if (actionId >= ACT_GROUP_AIRBORNE && actionId < (ACT_HOLD_JUMP & ACT_ID_MASK)) {
         if (!(m->prevAction & ACT_FLAG_ON_POLE) || m->usedObj != obj) {
 #if SHINDOU_POLES
-            f32 velConv = m->forwardVel; // conserve the velocity.
             struct Object *marioObj = m->marioObj;
-            u32 lowSpeed = (velConv <= 10.0f);
-            m->angleVel[1] = (s32)(velConv * 0x100 + 0x1000);
+            u32 lowSpeed = (m->forwardVel <= 10.0f);
+            m->angleVel[1] = (s32)(m->forwardVel * 0x100 + 0x1000);
 #else
             u32 lowSpeed = (m->forwardVel <= 10.0f);
             struct Object *marioObj = m->marioObj;
