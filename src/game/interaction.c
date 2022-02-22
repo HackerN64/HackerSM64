@@ -1505,6 +1505,7 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
     if (actionId >= ACT_GROUP_AIRBORNE && actionId < (ACT_HOLD_JUMP & ACT_ID_MASK)) {
         if (!(m->prevAction & ACT_FLAG_ON_POLE) || m->usedObj != obj) {
             u32 lowSpeed = (m->forwardVel <= 10.0f);
+
 #if SHINDOU_POLES
             m->angleVel[1] = (s32)(m->forwardVel * 0x100 + 0x1000);
 #else
@@ -1518,9 +1519,14 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
             m->vel[1]      = 0.0f;
             m->forwardVel  = 0.0f;
 
-            // Pole fix
-            // If mario is beneath the pole, clamp mario's position to the down-offset of the pole (bottom)
-            m->marioObj->oMarioPolePos = ((m->pos[1] - obj->oPosY) < 0) ? -obj->hitboxDownOffset : (m->pos[1] - obj->oPosY);
+            // Pole Fix:
+            f32 grabYPos = MAX(m->pos[1], obj->oFloorHeight); // Mario's original Y position when grabbing the pole.
+            if (grabYPos < obj->oPosY) {
+                // If Mario is beneath the pole, clamp mario's position to the pole bottom.
+                m->marioObj->oMarioPolePos = -obj->hitboxDownOffset - MARIO_POLE_GRAB_OFFSET; // Relative pole bottom.
+            } else {
+                m->marioObj->oMarioPolePos = grabYPos - obj->oPosY; // Relative height on pole.
+            }
 
             if (lowSpeed) {
                 return set_mario_action(m, ACT_GRAB_POLE_SLOW, 0);

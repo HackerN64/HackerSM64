@@ -86,6 +86,9 @@
 // Vanilla is 60.
 #define MARIO_COLLISION_OFFSET_TWIRLING 60
 
+// The height offset of Mario's hands when grabbing a pole. Vanilla is 100.
+#define MARIO_POLE_GRAB_OFFSET 100
+
 // Vanilla is (MARIO_HITBOX_HEIGHT / 2).
 #define MARIO_PUNCH_KICK_HEIGHT (MARIO_HITBOX_HEIGHT / 2)
 

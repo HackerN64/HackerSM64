@@ -44,51 +44,71 @@ void play_climbing_sounds(struct MarioState *m, s32 direction) {
 }
 
 s32 set_pole_position(struct MarioState *m, f32 offsetY) {
-    struct Surface *floor;
-    struct Surface *ceil;
-    s32 result = POLE_NONE;
-    f32 poleTop = m->usedObj->hitboxHeight - 100.0f;
-    f32 poleBottom = -m->usedObj->hitboxDownOffset - 100.0f;
+    struct Object *poleObj  = m->usedObj;
     struct Object *marioObj = m->marioObj;
+    s32 result = POLE_NONE;
 
+    if (poleObj == NULL) {
+        // If Mario is no longer interacting with the pole, stop the pole holding action.
+        set_mario_action(m, ACT_FREEFALL, 0);
+        return POLE_FELL_OFF;
+    }
+
+    // Get the relative top and bottom of the pole.
+    f32 poleTop    =  poleObj->hitboxHeight     - MARIO_POLE_GRAB_OFFSET;
+    f32 poleBottom = -poleObj->hitboxDownOffset - MARIO_POLE_GRAB_OFFSET;
+
+    // Keep Mario on the pole if he reaches the top.
     if (marioObj->oMarioPolePos > poleTop) {
         marioObj->oMarioPolePos = poleTop;
     }
 
-    vec3f_copy_y_off(m->pos, &m->usedObj->oPosVec, marioObj->oMarioPolePos + offsetY);
+    // Set Mario's position to the pole + oMarioPolePos.
+    vec3f_copy_y_off(m->pos, &poleObj->oPosVec, (marioObj->oMarioPolePos + offsetY));
 
+    // Check for wall collisions.
     s32 collided = f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], MARIO_COLLISION_OFFSET_GROUND_UPPER, MARIO_COLLISION_RADIUS_UPPER)
                  + f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], MARIO_COLLISION_OFFSET_GROUND_LOWER, MARIO_COLLISION_RADIUS_LOWER);
 
+    // Prevent Mario from climbing into a ceiling.
+    struct Surface *ceil;
     f32 ceilHeight = find_mario_ceil(m->pos, m->pos[1], &ceil);
     if (m->pos[1] > ceilHeight - MARIO_HITBOX_HEIGHT) {
         m->pos[1] = ceilHeight - MARIO_HITBOX_HEIGHT;
-        marioObj->oMarioPolePos = m->pos[1] - m->usedObj->oPosY;
+        marioObj->oMarioPolePos = m->pos[1] - poleObj->oPosY;
     }
 
-    f32 floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &floor);
+    // Check for a floor.
+    f32 floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &poleObj->oFloor);
+    poleObj->oFloorHeight = floorHeight;
     if (m->pos[1] < floorHeight) {
+        // Mario touched the floor.
         m->pos[1] = floorHeight;
         set_mario_action(m, ACT_IDLE, 0);
         result = POLE_TOUCHED_FLOOR;
     } else if (marioObj->oMarioPolePos < poleBottom) {
-        m->pos[1] = (m->usedObj->oPosY + poleBottom);
+        // Mario left the pole via the bottom.
+        m->pos[1] = (poleObj->oPosY + poleBottom);
         set_mario_action(m, ACT_FREEFALL, 0);
         result = POLE_FELL_OFF;
-    } else if (collided) {
+    } else if (collided > 0) {
         if (m->pos[1] > floorHeight + 20.0f) {
+            // Mario touched a wall.
             m->forwardVel = -2.0f;
             set_mario_action(m, ACT_SOFT_BONK, 0);
             result = POLE_FELL_OFF;
         } else {
+            // Mario touched a wall and the floor.
             set_mario_action(m, ACT_IDLE, 0);
             result = POLE_TOUCHED_FLOOR;
         }
     }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
-    vec3s_set(marioObj->header.gfx.angle, m->usedObj->oMoveAnglePitch, m->faceAngle[1],
-              m->usedObj->oMoveAngleRoll);
+    vec3s_set(marioObj->header.gfx.angle,
+              poleObj->oMoveAnglePitch,
+              m->faceAngle[1],
+              poleObj->oMoveAngleRoll);
 
     return result;
 }
@@ -109,7 +129,7 @@ s32 act_holding_pole(struct MarioState *m) {
     }
 
     if (m->controller->stickY > 16.0f) {
-        f32 poleTop = m->usedObj->hitboxHeight - 100.0f;
+        f32 poleTop = m->usedObj->hitboxHeight - MARIO_POLE_GRAB_OFFSET;
         const BehaviorScript *poleBehavior = virtual_to_segmented(SEGMENT_BEHAVIOR_DATA, m->usedObj->behavior);
 
         if (marioObj->oMarioPolePos < poleTop - 0.4f) {
