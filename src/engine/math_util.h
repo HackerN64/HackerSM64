@@ -577,12 +577,12 @@ u32 random_u16(void);
 f32 random_float(void);
 s32 random_sign(void);
 // Min/Max
-f32  min_3f(   f32 a, f32 b, f32 c);
-s32  min_3i(   s32 a, s32 b, s32 c);
-s32  min_3s(   s16 a, s16 b, s16 c);
-f32  max_3f(   f32 a, f32 b, f32 c);
-s32  max_3i(   s32 a, s32 b, s32 c);
-s32  max_3s(   s16 a, s16 b, s16 c);
+f32  min_3f(    f32 a, f32 b, f32 c);
+s32  min_3i(    s32 a, s32 b, s32 c);
+s32  min_3s(    s16 a, s16 b, s16 c);
+f32  max_3f(    f32 a, f32 b, f32 c);
+s32  max_3i(    s32 a, s32 b, s32 c);
+s32  max_3s(    s16 a, s16 b, s16 c);
 void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max);
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max);
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max);
