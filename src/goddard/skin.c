@@ -268,11 +268,6 @@ void func_80192CCC(struct ObjNet *net) {
         return;
     } // start was pressed
 
-    switch (net->ctrlType) {
-        case 2:
-            break;
-    }
-
     func_80192528(net);
     if ((group = net->unk1C8) != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_80191220, group);
@@ -285,7 +280,7 @@ void func_80192CCC(struct ObjNet *net) {
     gd_mult_mat4f(&net->mat128, &D_801B9DC8, &net->mat128);
     if (group != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_JOINTS, (applyproc_t) func_801913C0, group);
-        apply_to_obj_types_in_group(OBJ_TYPE_BONES, (applyproc_t) func_8018FA68, group);
+        apply_to_obj_types_in_group(OBJ_TYPE_BONES,  (applyproc_t) func_8018FA68, group);
     }
 }
 

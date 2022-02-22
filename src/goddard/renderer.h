@@ -94,8 +94,7 @@ void gd_dl_hilite(s32, struct ObjCamera *, struct GdVec3f *, struct GdVec3f *, s
 void gd_dl_hilite(s32 idx, struct ObjCamera *cam, UNUSED struct GdVec3f *arg2, UNUSED struct GdVec3f *arg3,
                    struct GdVec3f *arg4, struct GdColour *colour);
 s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material);
-void set_Vtx_norm_buf_1(struct GdVec3f *norm);
-void set_Vtx_norm_buf_2(struct GdVec3f *norm);
+void set_Vtx_norm_buf(struct GdVec3f *norm);
 void set_gd_mtx_parameters(s32 params);
 void gd_set_one_cycle(void);
 void start_view_dl(struct ObjView *view);

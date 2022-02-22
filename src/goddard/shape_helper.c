@@ -1044,12 +1044,12 @@ struct ObjShape *make_grid_shape(enum ObjTypeFlag gridType, s32 a1, s32 a2, s32 
     mtl1 = make_material(0, NULL, 1);
     set_cur_dynobj((struct GdObj *) mtl1);
     d_set_diffuse(sp30->x, sp30->y, sp30->z);
-    mtl1->type = 0x40;
+    mtl1->type = GD_MTL_LIGHTS;
 
     mtl2 = make_material(0, NULL, 2);
     set_cur_dynobj((struct GdObj *) mtl2);
     d_set_diffuse(sp2C->x, sp2C->y, sp2C->z);
-    mtl2->type = 0x40;
+    mtl2->type = GD_MTL_LIGHTS;
 
     mtlGroup = make_group(2, mtl1, mtl2);
     gridShape = make_shape(SHAPE_FLAGS_NONE, "grid");

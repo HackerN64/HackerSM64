@@ -17,7 +17,7 @@ struct InvMat4 {
 enum GdRotAxis {
     GD_X_AXIS,
     GD_Y_AXIS,
-    GD_Z_AXIS
+    GD_Z_AXIS,
 };
 
 // Needed for gd_math.c itself.

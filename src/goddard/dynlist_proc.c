@@ -1123,8 +1123,6 @@ void d_set_matgroup(DynObjName name) {
 /**
  * At one time in the past, this set the s and t value of the current
  * dynamic `ObjVertex`. However, this function does nothing now.
- * See `BetaVtx` for a possible remnant of vertex code that had
- * ST coordinates.
  */
 void d_set_texture_st(UNUSED f32 s, UNUSED f32 t) {
     if (sDynListCurObj == NULL) {

@@ -120,9 +120,6 @@ void get_some_bounding_box(struct GdBoundingBox *a0) {
 
 /* @ 22A6A0 for 0x24 */
 void stub_objects_1(UNUSED struct ObjGroup *a0, UNUSED struct GdObj *a1) {
-    UNUSED u8 sp00[8];
-    /* Debug stub? */
-    return;
 }
 
 /**
@@ -577,7 +574,7 @@ struct ObjMaterial *make_material(UNUSED s32 flags, char *name, s32 id) {
 
     newMtl->id = id;
     newMtl->gddlNumber = 0;
-    newMtl->type = 16;
+    newMtl->type = GD_MTL_SHINE_DL;
 
     return newMtl;
 }
@@ -617,7 +614,7 @@ struct ObjView *make_view(const char *name, s32 flags, s32 projectionType, s32 u
 
     addto_group(gGdViewsGroup, &newView->header);
 
-    newView->flags = flags | VIEW_UPDATE | VIEW_LIGHT;
+    newView->flags = (flags | VIEW_UPDATE | VIEW_LIGHT);
     newView->id = sGdViewInfo.count++;
 
     if ((newView->components = parts) != NULL) {

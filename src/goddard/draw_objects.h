@@ -6,25 +6,24 @@
 #include "gd_types.h"
 #include "macros.h"
 
-// TODO: make this an enum without causing bss reordering
-#define COLOUR_BLACK     0
-#define COLOUR_WHITE     1
-#define COLOUR_RED       2
-#define COLOUR_GREEN     3
-#define COLOUR_BLUE      4
-#define COLOUR_GRAY      5
-#define COLOUR_DARK_GRAY 6
-#define COLOUR_DARK_BLUE 7
-#define COLOUR_YELLOW    8
-#define COLOUR_PINK      9
-#define COLOUR_BLACK2   10  // same as COLOUR_BLACK
+enum GdColours {
+    COLOUR_BLACK,
+    COLOUR_WHITE,
+    COLOUR_RED,
+    COLOUR_GREEN,
+    COLOUR_BLUE,
+    COLOUR_GRAY,
+    COLOUR_DARK_GRAY,
+    COLOUR_DARK_BLUE,
+    COLOUR_YELLOW,
+    COLOUR_PINK,
+    COLOUR_BLACK2, // same as COLOUR_BLACK
+};
 
 // data
 extern struct ObjCamera *gViewUpdateCamera;
 
 // bss
-// this is unused, but it needs to be declared before gGdLightGroup
-extern u8 gUnref_801B9B30[0x88];
 extern struct ObjGroup *gGdLightGroup;  // ObjGroup* of ObjLights
 
 // functions

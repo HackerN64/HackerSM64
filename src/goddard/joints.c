@@ -508,10 +508,6 @@ struct ObjBone *make_bone(s32 flags, struct ObjJoint *j1, struct ObjJoint *j2, U
     return b;
 }
 
-/* 23E6E4 -> 23E6F8; not called */
-void stub_joints_1(UNUSED u32 a0) {
-}
-
 /* 23E6F8 -> 23E758; not called */
 void func_8018FF28(struct ObjJoint *a0, struct ObjJoint *a1) {
     if (a1->flags & JOINT_FLAG_1) {
@@ -574,7 +570,7 @@ void func_80190168(struct ObjBone *b, UNUSED struct ObjJoint *a1, UNUSED struct 
 
     return;
 
-    //! Dead code
+    //! dead code
 
     b->unk58.x = sp7C.x;
     b->unk58.y = sp7C.y;

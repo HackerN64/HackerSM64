@@ -32,17 +32,7 @@ void register_light(struct ObjLight *);
  */
 enum SceneType {
     RENDER_SCENE = 26, ///< render the primitives to screen
-    FIND_PICKS = 27    ///< only check position of primitives relative to cursor click
-};
-
-/**
- * A possible remnant of an early `ObjVertex` structure that contained
- * texture S,T coordinates.
- */
-struct BetaVtx {
-    /* 0x00 */ u8 filler[68];
-    /* 0x44 */ f32 s;
-    /* 0x48 */ f32 t;
+    FIND_PICKS   = 27, ///< only check position of primitives relative to cursor click
 };
 
 // data
@@ -82,13 +72,10 @@ UNUSED static Mat4f sUnrefIden801A8160 = {
     { 0.0f, 0.0f, 0.0f, 1.0f }
 };
 static s32 sLightDlCounter = 1; // @ 801A81A0
-UNUSED static s32 sUnref801A81A4[4] = { 0 };
 
 // bss
-u8 gUnref_801B9B30[0x88];
 struct ObjGroup *gGdLightGroup; // @ 801B9BB8; is this the main light group? only light group?
 
-UNUSED static u8 sUnref_801B9BBC[0x40];
 static enum SceneType sSceneProcessType; // @ 801B9C00
 static s32 sUseSelectedColor;            // @ 801B9C04
 static s16 sPickBuffer[100];             ///< buffer of objects near click
@@ -119,7 +106,6 @@ void setup_lights(void) {
     set_light_num(NUMLIGHTS_2);
     gd_setproperty(GD_PROP_AMB_COLOUR, 0.5f, 0.5f, 0.5f);
     gd_setproperty(GD_PROP_CULLING, 1.0f, 0.0f, 0.0f); // set G_CULL_BACK
-    return;
 }
 
 /**
@@ -375,40 +361,28 @@ struct GdColour *gd_get_colour(s32 idx) {
     switch (idx) {
         case COLOUR_BLACK:
             return &sClrBlack;
-            break;
         case COLOUR_WHITE:
             return &sClrWhite;
-            break;
         case COLOUR_RED:
             return &sClrRed;
-            break;
         case COLOUR_GREEN:
             return &sClrGreen;
-            break;
         case COLOUR_BLUE:
             return &sClrBlue;
-            break;
         case COLOUR_GRAY:
             return &sClrGrey;
-            break;
         case COLOUR_DARK_GRAY:
             return &sClrDarkGrey;
-            break;
         case COLOUR_DARK_BLUE:
             return &sClrErrDarkBlue;
-            break;
         case COLOUR_BLACK2:
             return &sClrBlack;
-            break;
         case COLOUR_YELLOW:
             return &sClrYellow;
-            break;
         case COLOUR_PINK:
             return &sClrPink;
-            break;
         case -1:
             return &sLightColours[0];
-            break;
         default:
             return NULL;
     }
@@ -436,11 +410,9 @@ void draw_face(struct ObjFace *face) {
     f32 y;                 // 34
     f32 x;                 // 30
     s32 i;             // 20; also used to store mtl's gddl number
-    s32 hasTextCoords; // 1c
     Vtx *gbiVtx;       // 18
 
     imin("draw_face");
-    hasTextCoords = FALSE;
     if (sUseSelectedColor == FALSE && face->mtlId >= 0) { // -1 == colored face
         if (face->mtl != NULL) {
             if ((i = face->mtl->gddlNumber) != 0) {
@@ -456,7 +428,7 @@ void draw_face(struct ObjFace *face) {
     check_tri_display(face->vtxCount);
 
     if (!gGdUseVtxNormal) {
-        set_Vtx_norm_buf_1(&face->normal);
+        set_Vtx_norm_buf(&face->normal);
     }
 
     for (i = 0; i < face->vtxCount; i++) {
@@ -465,13 +437,7 @@ void draw_face(struct ObjFace *face) {
         y = vtx->pos.y;
         z = vtx->pos.z;
         if (gGdUseVtxNormal) {
-            set_Vtx_norm_buf_2(&vtx->normal);
-        }
-        //! @bug This function seems to have some parts based on older versions of ObjVertex
-        //!      as the struct requests fields passed the end of an ObjVertex.
-        //!      The bad code is statically unreachable, so...
-        if (hasTextCoords) {
-            set_vtx_tc_buf(((struct BetaVtx *) vtx)->s, ((struct BetaVtx *) vtx)->t);
+            set_Vtx_norm_buf(&vtx->normal);
         }
 
         gbiVtx = gd_dl_make_vertex(x, y, z, vtx->alpha);
@@ -731,15 +697,14 @@ void check_grabbable_click(struct GdObj *input) {
     objPos.y = (*mtx)[3][1];
     objPos.z = (*mtx)[3][2];
     world_pos_to_screen_coords(&objPos, gViewUpdateCamera, sUpdateViewState.view);
-    if (ABS(gGdCtrl.csrX - objPos.x) < 20.0f) {
-        if (ABS(gGdCtrl.csrY - objPos.y) < 20.0f) {
-            // store (size, Obj Type, Obj Index) in s16 pick buffer array
-            store_in_pickbuf(2);
-            store_in_pickbuf(obj->type);
-            store_in_pickbuf(obj->index);
-            sGrabCords.x = objPos.x;
-            sGrabCords.y = objPos.y;
-        }
+    if (ABS(gGdCtrl.csrX - objPos.x) < 20.0f
+     && ABS(gGdCtrl.csrY - objPos.y) < 20.0f) {
+        // store (size, Obj Type, Obj Index) in s16 pick buffer array
+        store_in_pickbuf(2);
+        store_in_pickbuf(obj->type);
+        store_in_pickbuf(obj->index);
+        sGrabCords.x = objPos.x;
+        sGrabCords.y = objPos.y;
     }
 }
 
@@ -815,7 +780,6 @@ void drawscene(enum SceneType process, struct ObjGroup *interactables, struct Ob
     gd_dl_pop_matrix();
     imout();
     split_timer("drawscene");
-    return;
 }
 
 /**
@@ -891,7 +855,7 @@ void draw_bone(struct GdObj *obj) {
 
     return;
 
-    // dead code
+    //! dead code
     scale.x = 1.0f;
     scale.y = 1.0f;
     scale.z = bone->unkF8 / 50.0f;
@@ -1466,8 +1430,7 @@ void update_view(struct ObjView *view) {
                 }
 
                 if (sPickedObject != NULL) {
-                    sPickedObject->drawFlags |= OBJ_PICKED;
-                    sPickedObject->drawFlags |= OBJ_HIGHLIGHTED;
+                    sPickedObject->drawFlags |= (OBJ_PICKED | OBJ_HIGHLIGHTED);
                     sUpdateViewState.view->pickedObj = sPickedObject;
                     gGdCtrl.dragStartX = gGdCtrl.csrX = sGrabCords.x;
                     gGdCtrl.dragStartY = gGdCtrl.csrY = sGrabCords.y;
@@ -1477,8 +1440,7 @@ void update_view(struct ObjView *view) {
             find_and_drag_picked_object(sUpdateViewState.view->components);
         } else { // check for any previously picked objects, and turn off?
             if (sUpdateViewState.view->pickedObj != NULL) {
-                sUpdateViewState.view->pickedObj->drawFlags &= ~OBJ_PICKED;
-                sUpdateViewState.view->pickedObj->drawFlags &= ~OBJ_HIGHLIGHTED;
+                sUpdateViewState.view->pickedObj->drawFlags &= ~(OBJ_PICKED | OBJ_HIGHLIGHTED);
                 sUpdateViewState.view->pickedObj = NULL;
             }
         }
@@ -1489,11 +1451,4 @@ void update_view(struct ObjView *view) {
     border_active_view();
     gd_enddlsplist_parent();
     imout();
-    return;
-}
-/**
- * Stub function.
- * @note Not Called
- */
-void stub_draw_objects_1(void) {
 }

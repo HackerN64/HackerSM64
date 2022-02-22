@@ -1277,7 +1277,6 @@ void gdm_getpos(s32 id, struct GdVec3f *dst) {
         default:
             fatal_printf("gdm_getpos(): %d out of range", id);
     }
-    return;
 }
 
 /**
@@ -2089,21 +2088,10 @@ s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
 }
 
 /* 24FDB8 -> 24FE94; orig name: func_801A15E8; only from faces? */
-void set_Vtx_norm_buf_1(struct GdVec3f *norm) {
+void set_Vtx_norm_buf(struct GdVec3f *norm) {
     sVtxCvrtNormBuf[0] = (s8)(norm->x * 127.0f);
     sVtxCvrtNormBuf[1] = (s8)(norm->y * 127.0f);
     sVtxCvrtNormBuf[2] = (s8)(norm->z * 127.0f);
-}
-
-/* 24FE94 -> 24FF80; orig name: func_801A16C4; only from verts? */
-void set_Vtx_norm_buf_2(struct GdVec3f *norm) {
-    sVtxCvrtNormBuf[0] = (s8)(norm->x * 127.0f);
-    sVtxCvrtNormBuf[1] = (s8)(norm->y * 127.0f);
-    sVtxCvrtNormBuf[2] = (s8)(norm->z * 127.0f);
-
-    //? are these stub functions?
-    return; // @ 801A17A0
-    return; // @ 801A17A8
 }
 
 /* 24FF80 -> 24FFDC; orig name: func_801A17B0 */
@@ -2781,8 +2769,6 @@ void func_801A4808(void) {
     while (D_801A8674 != 0) {
         ;
     }
-
-    return;
 }
 
 /* 253018 -> 253084 */
@@ -3088,7 +3074,7 @@ void gd_init(void) {
 /**
  * Unused - reverses the characters in `str`.
  */
-void reverse_string(char *str, s32 len) {
+UNUSED void reverse_string(char *str, s32 len) {
     char buf[100];
     s32 i;
 
@@ -3132,12 +3118,12 @@ s32 get_cur_pickbuf_offset(UNUSED s16 *arg0) {
 }
 
 /* 254288 -> 2542B0 */
-void *Unknown801A5AB8(s32 texnum) {
+UNUSED void *Unknown801A5AB8(s32 texnum) {
     return sLoadedTextures[texnum];
 }
 
 /* 2542B0 -> 254328 */
-void Unknown801A5AE0(s32 arg0) {
+UNUSED void Unknown801A5AE0(s32 arg0) {
     D_801BB018 = arg0;
     if (D_801BB01C != D_801BB018) {
         branch_cur_dl_to_num(sTextureDisplayLists[arg0]);
@@ -3146,7 +3132,7 @@ void Unknown801A5AE0(s32 arg0) {
 }
 
 /* 254328 -> 2543B8; orig name: func_801A5B58 */
-void set_vtx_tc_buf(f32 tcS, f32 tcT) {
+UNUSED void set_vtx_tc_buf(f32 tcS, f32 tcT) {
     sVtxCvrtTCBuf[0] = (s16)(tcS * 512.0f);
     sVtxCvrtTCBuf[1] = (s16)(tcT * 512.0f);
 }
@@ -3485,8 +3471,6 @@ void make_timer_gadgets(void) {
     timersview->flags &= ~VIEW_UPDATE;
     timersview->proc = view_proc_print_timers;
     add_debug_view(timersview);
-
-    return;
 }
 
 #ifndef NO_SEGMENTED_MEMORY
