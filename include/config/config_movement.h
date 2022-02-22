@@ -68,6 +68,10 @@
 // Enables the ability to dive during the ground pound spin animation, similar to Super Mario Odyssey.
 // #define GROUND_POUND_DIVE
 
+// Makes GROUND_POUND_DIVE change Mario's yaw to the exact direction of the analog stick.
+// Has no effect if GROUND_POUND_DIVE is disabled.
+// #define GROUND_POUND_DIVE_CHANGES_DIRECTION
+
 // Disables bonks when ground pounding next to a wall.
 #define DISABLE_GROUNDPOUND_BONK
 

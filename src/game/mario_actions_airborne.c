@@ -928,11 +928,14 @@ s32 act_ground_pound(struct MarioState *m) {
 
 #ifdef GROUND_POUND_DIVE
         if (m->input & INPUT_B_PRESSED) {
+ #ifdef GROUND_POUND_DIVE_CHANGES_DIRECTION
+            m->faceAngle[1] = m->intendedYaw;
+ #endif // GROUND_POUND_DIVE_CHANGES_DIRECTION
             m->vel[1] = 25.0f;
             mario_set_forward_vel(m, 20.0f);
             return set_mario_action(m, ACT_DIVE, 0);
         }
-#endif
+#endif // GROUND_POUND_DIVE
 
         m->actionTimer++;
         if (m->actionTimer >= m->marioObj->header.gfx.animInfo.curAnim->loopEnd + 4) {

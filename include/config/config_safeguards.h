@@ -150,6 +150,10 @@
  * config_movement.h
  */
 
+#ifndef GROUND_POUND_DIVE
+    #undef GROUND_POUND_DIVE_CHANGES_DIRECTION
+#endif // !GROUND_POUND_DIVE
+
 #ifdef RAYCAST_WALL_COLLISION
     #undef VARIABLE_NUM_STEPS
 #endif // RAYCAST_WALL_COLLISION
