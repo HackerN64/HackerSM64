@@ -1072,7 +1072,7 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
                 s32 col2 = get_hex_value_at_offset(newStr, 15, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 15, (2 * j) + 1, TRUE);
 
                 // Final color value determined by median of two colors + a point in the end-to-end width of the difference between the two colors.
-                // Said point changes is based on the sTimer value in the form of a sine wave, which helps to create the fading effect.
+                // Said point changes based on the sTimer value in the form of a sine wave, which helps to create the fading effect.
                 rgba[j] = ((col1 + col2) / 2) + (s32) (sTimer * ((col1 - col2) / 2));
             }
 
