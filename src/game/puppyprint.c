@@ -1062,17 +1062,16 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
             gDPSetEnvColor(gDisplayListHead++, (Color) rgba[0], (Color) rgba[1], (Color) rgba[2], (Color) rgba[3]); // Don't use print_set_envcolour here
         } else if (strncmp((newStr), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
             s32 rgba[4];
-            s32 rgba2[4];
 
             // Find transition speed and set timer value
             s32 spd = get_hex_value_at_offset(newStr, 24, 0, FALSE) | get_hex_value_at_offset(newStr, 24, 1, FALSE);
             f32 sTimer = sins(gGlobalTimer * spd * 50);
 
             for (s32 j = 0; j < 4; j++) {
-                rgba[j] = get_hex_value_at_offset(newStr, 6, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 6, (2 * j) + 1, TRUE);
-                rgba2[j] = get_hex_value_at_offset(newStr, 15, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 15, (2 * j) + 1, TRUE);
+                s32 col1 = get_hex_value_at_offset(newStr, 6, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 6, (2 * j) + 1, TRUE);
+                s32 col2 = get_hex_value_at_offset(newStr, 15, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 15, (2 * j) + 1, TRUE);
 
-                rgba[j] = ((rgba[j] + rgba2[j]) / 2) + (s32) (sTimer * ((rgba[j] - rgba2[j]) / 2));
+                rgba[j] = ((col1 + col2) / 2) + (s32) (sTimer * ((col1 - col2) / 2));
             }
 
             rainbowToggle = 0;
