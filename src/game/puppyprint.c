@@ -414,9 +414,9 @@ extern s16 gVisualSurfaceCount;
 void puppyprint_render_collision(void) {
     char textBytes[200];
 #ifdef PUPPYPRINT_DEBUG_CYCLES
-    sprintf(textBytes, "Collision:<COL_99505099> %dc", collisionTime[NUM_PERF_ITERATIONS]);
+    sprintf(textBytes, "Collision:<COL_FF7F7FFF> %dc", collisionTime[NUM_PERF_ITERATIONS]);
 #else
-    sprintf(textBytes, "Collision:<COL_99505099> %dus", collisionTime[NUM_PERF_ITERATIONS]);
+    sprintf(textBytes, "Collision:<COL_FF7F7FFF> %dus", collisionTime[NUM_PERF_ITERATIONS]);
 #endif
     print_small_text(304, 48, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
@@ -457,13 +457,12 @@ struct CPUBar {
 extern void print_fps(s32 x, s32 y);
 
 struct CPUBar cpu_ordering_table[] = {
-    { collisionTime, COLOR_RGB_RED,     { "Collision: <COL_99505099>" }},
-    {     graphTime, COLOR_RGB_BLUE,    {     "Graph: <COL_50509999>" }},
-    { behaviourTime, COLOR_RGB_GREEN,   { "Behaviour: <COL_50995099>" }},
-    {     audioTime, COLOR_RGB_YELLOW,  {     "Audio: <COL_99995099>" }},
-    {    cameraTime, COLOR_RGB_CYAN,    {    "Camera: <COL_50999999>" }},
-    {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_99509999>" }},
-    { controllerTime, COLOR_RGB_ORANGE, {       "Pad: <COL_99755099>" }},
+    { collisionTime, COLOR_RGB_RED,     { "Collision: <COL_FF7F7FFF>" }},
+    {     graphTime, COLOR_RGB_BLUE,    {     "Graph: <COL_7F7FFFFF>" }},
+    { behaviourTime, COLOR_RGB_GREEN,   { "Behaviour: <COL_7FFF7FFF>" }},
+    {     audioTime, COLOR_RGB_YELLOW,  {     "Audio: <COL_FFFF7FFF>" }},
+    {    cameraTime, COLOR_RGB_CYAN,    {    "Camera: <COL_7FFFFFFF>" }},
+    {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_FF7FFFFF>" }},
 };
 
 #define CPU_TABLE_MAX (sizeof(cpu_ordering_table) / sizeof(struct CPUBar))
