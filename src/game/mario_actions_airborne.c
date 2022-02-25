@@ -928,11 +928,18 @@ s32 act_ground_pound(struct MarioState *m) {
 
 #ifdef GROUND_POUND_DIVE
         if (m->input & INPUT_B_PRESSED) {
+            // Angle diff:
+            s16 intendedDYaw = m->intendedYaw - m->faceAngle[1];
+            // 0..1 mag:
+            f32 intendedMag = m->intendedMag / 32.0f;
+            // Same as update air with/without turn functions:
+            f32 forwardModifier = coss(intendedDYaw) * intendedMag * 1.5f;
+            mario_set_forward_vel(m, 20.0f + forwardModifier);
  #ifdef GROUND_POUND_DIVE_CHANGES_DIRECTION
-            m->faceAngle[1] = m->intendedYaw;
+            // Full mag = fully turn to intendedYaw:
+            m->faceAngle[1] = approach_angle(m->faceAngle[1], m->intendedYaw, (abss(intendedDYaw) * intendedMag));
  #endif // GROUND_POUND_DIVE_CHANGES_DIRECTION
             m->vel[1] = 25.0f;
-            mario_set_forward_vel(m, 20.0f);
             return set_mario_action(m, ACT_DIVE, 0);
         }
 #endif // GROUND_POUND_DIVE
