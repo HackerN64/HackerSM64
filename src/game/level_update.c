@@ -1231,6 +1231,15 @@ s32 init_level(void) {
     return TRUE;
 }
 
+s32 is_bowser_level(u32 level) {
+#ifndef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    return FALSE;
+#endif
+    return (level == LEVEL_BOWSER_1
+         || level == LEVEL_BOWSER_2
+         || level == LEVEL_BOWSER_3);
+}
+
 /**
  * Initialize the current level if initOrUpdate is 0, or update the level if it is 1.
  */
@@ -1292,9 +1301,7 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
         return FALSE;
     }
 
-    if (gCurrLevelNum != LEVEL_BOWSER_1
-     && gCurrLevelNum != LEVEL_BOWSER_2
-     && gCurrLevelNum != LEVEL_BOWSER_3) {
+    if (is_bowser_level(gCurrLevelNum)) {
         gMarioState->numCoins = 0;
         gHudDisplay.coins = 0;
         gCurrCourseStarFlags =

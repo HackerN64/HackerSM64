@@ -174,6 +174,8 @@ void load_level_init_text(u32 arg);
 s32 level_trigger_warp(struct MarioState *m, s32 warpOp);
 void level_set_transition(s16 length, void (*updateFunction)());
 
+s32 is_bowser_level(u32 level);
+
 s32 lvl_init_or_update(                  s16 initOrUpdate, UNUSED s32 levelNum);
 s32 lvl_init_from_save_file(      UNUSED s16 initOrUpdate,        s32 levelNum);
 s32 lvl_set_current_level(        UNUSED s16 initOrUpdate,        s32 levelNum);
