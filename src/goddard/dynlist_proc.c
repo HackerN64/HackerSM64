@@ -1763,10 +1763,8 @@ struct ObjGroup *d_get_att_objgroup(void) {
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_JOINTS:
             return ((struct ObjJoint *) sDynListCurObj)->attachedObjsGrp;
-            break; // lol
         case OBJ_TYPE_NETS:
             return ((struct ObjNet *) sDynListCurObj)->attachedObjsGrp;
-            break; // lol
         default:
             fatal_printf("%s: Object '%s'(%x) does not support this function.", "dGetAttObjGroup()",
                          sDynListCurInfo->name, sDynListCurObj->type);
@@ -1785,10 +1783,8 @@ struct GdObj *d_get_att_to_obj(void) {
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_JOINTS:
             return ((struct ObjJoint *) sDynListCurObj)->attachedToObj;
-            break; // lol
         case OBJ_TYPE_NETS:
             return ((struct ObjNet *) sDynListCurObj)->attachedToObj;
-            break; // lol
         default:
             fatal_printf("%s: Object '%s'(%x) does not support this function.", "dGetAttToObj()",
                          sDynListCurInfo->name, sDynListCurObj->type);
@@ -2053,10 +2049,8 @@ struct GdVec3f *d_get_world_pos_ptr(void) {
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_VERTICES:
             return &((struct ObjVertex *) sDynListCurObj)->pos;
-            break;
         case OBJ_TYPE_PARTICLES:
             return &((struct ObjParticle *) sDynListCurObj)->pos;
-            break;
         default:
             fatal_printf("%s: Object '%s'(%x) does not support this function.", "dGetWorldPosPtr()",
                          sDynListCurInfo->name, sDynListCurObj->type);
@@ -2867,13 +2861,10 @@ struct GdBoundingBox *d_get_bounding_box(void) {
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_NETS:
             return &((struct ObjNet *) sDynListCurObj)->boundingBox;
-            break;
         case OBJ_TYPE_PLANES:
             return &((struct ObjPlane *) sDynListCurObj)->boundingBox;
-            break;
         case OBJ_TYPE_ZONES:
             return &((struct ObjZone *) sDynListCurObj)->boundingBox;
-            break;
         default:
             return &sNullBoundingBox;
     }
@@ -3022,16 +3013,12 @@ Mat4f *d_get_matrix_ptr(void) {
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_NETS:
             return &((struct ObjNet *) sDynListCurObj)->mat128;
-            break;
         case OBJ_TYPE_CAMERAS:
             return &((struct ObjCamera *) sDynListCurObj)->unk64;
-            break;
         case OBJ_TYPE_BONES:
             return &((struct ObjBone *) sDynListCurObj)->mat70;
-            break;
         case OBJ_TYPE_JOINTS:
             return &((struct ObjJoint *) sDynListCurObj)->matE8;
-            break;
         default:
             fatal_printf("%s: Object '%s'(%x) does not support this function.", "dGetMatrixPtr()",
                          sDynListCurInfo->name, sDynListCurObj->type);
@@ -3054,10 +3041,8 @@ Mat4f *d_get_i_mtx_ptr(void) {
     switch (sDynListCurObj->type) {
         case OBJ_TYPE_NETS:
             return &((struct ObjNet *) dynobj)->matE8;
-            break;
         case OBJ_TYPE_JOINTS:
             return &((struct ObjJoint *) dynobj)->mat168;
-            break;
         default:
             fatal_printf("%s: Object '%s'(%x) does not support this function.", "dGetIMatrixPtr()",
                          sDynListCurInfo->name, sDynListCurObj->type);

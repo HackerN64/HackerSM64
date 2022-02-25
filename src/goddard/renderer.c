@@ -2041,7 +2041,6 @@ s32 gd_dl_material_lighting(s32 id, struct GdColour *colour, s32 material) {
                 gd_enddlsplist();
             }
             return 0;
-            break;
     }
     // L801A0EF4
     scaledColours[0] = (s32)(colour->r * sAmbScaleColour.r * 255.0f);

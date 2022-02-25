@@ -172,7 +172,6 @@ u32 mario_update_quicksand(struct MarioState *m, f32 sinkingSpeed) {
             case SURFACE_INSTANT_MOVING_QUICKSAND:
                 update_mario_sound_and_camera(m);
                 return drop_and_set_mario_action(m, ACT_QUICKSAND_DEATH, 0);
-                break;
 
             default:
                 m->quicksandDepth = 0.0f;
