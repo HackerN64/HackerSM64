@@ -69,7 +69,7 @@ s32 dl_transition_color(s8 fadeTimer, u8 transTime, struct WarpTransitionData *t
 
         gSPDisplayList(dlHead++, dl_proj_mtx_fullscreen);
         gDPSetCombineMode(dlHead++, G_CC_SHADE, G_CC_SHADE);
-        gDPSetRenderMode(dlHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+        gDPSetRenderMode(dlHead++, G_RM_CLD_SURF, G_RM_CLD_SURF2);
         gSPVertex(dlHead++, VIRTUAL_TO_PHYSICAL(verts), 4, 0);
         gSPDisplayList(dlHead++, dl_draw_quad_verts_0123);
         gSPDisplayList(dlHead++, dl_screen_transition_end);
@@ -193,7 +193,7 @@ s32 render_textured_transition(s8 fadeTimer, s8 transTime, struct WarpTransition
         gSPDisplayList(dlHead++, dl_transition_draw_filled_region);
         gDPPipeSync(dlHead++);
         gDPSetCombineMode(dlHead++, G_CC_MODULATEIDECALA, G_CC_MODULATEIDECALA);
-        gDPSetRenderMode(dlHead++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+        gDPSetRenderMode(dlHead++, G_RM_CLD_SURF, G_RM_CLD_SURF2);
         gDPSetTextureFilter(dlHead++, G_TF_BILERP);
         switch (transTexType) {
             case TRANS_TYPE_MIRROR:
