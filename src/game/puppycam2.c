@@ -190,7 +190,7 @@ static void newcam_set_language(void) {
 /// CUTSCENE
 
 void puppycam_activate_cutscene(s32 (*scene)(), s32 lockinput) {
-    gPuppyCam.cutscene   = 1;
+    gPuppyCam.cutscene   = CUTSCENE_PUPPYCAM;
     gPuppyCam.sceneTimer = 0;
     gPuppyCam.sceneFunc  = scene;
     gPuppyCam.sceneInput = lockinput;
@@ -275,9 +275,9 @@ s32 puppycam_move_spline(struct sPuppySpline splinePos[], struct sPuppySpline sp
 }
 
 static void puppycam_process_cutscene(void) {
-    if (gPuppyCam.cutscene) {
+    if (gPuppyCam.cutscene != CUTSCENE_NONE) {
         if ((gPuppyCam.sceneFunc)() == 1) {
-            gPuppyCam.cutscene = 0;
+            gPuppyCam.cutscene = CUTSCENE_NONE;
             gPuppyCam.sceneInput = 0;
             gPuppyCam.flags = gPuppyCam.intendedFlags;
         }
@@ -1381,7 +1381,7 @@ static void puppycam_apply(void) {
 
 // The basic loop sequence, which is called outside.
 void puppycam_loop(void) {
-    if (!gPuppyCam.cutscene && sDelayedWarpOp == 0) {
+    if (gPuppyCam.cutscene == CUTSCENE_NONE && sDelayedWarpOp == 0) {
         // Sets this before going through any possible modifications.
         gPuppyCam.flags = gPuppyCam.intendedFlags;
         puppycam_input_core();
@@ -1392,7 +1392,7 @@ void puppycam_loop(void) {
         } else {
             gPuppyCam.opacity = 255;
         }
-    } else if (gPuppyCam.cutscene) {
+    } else if (gPuppyCam.cutscene != CUTSCENE_NONE) {
         gPuppyCam.opacity = 255;
         puppycam_process_cutscene();
     }
