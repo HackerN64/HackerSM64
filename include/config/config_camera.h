@@ -27,6 +27,9 @@
 // Mario's eye level. Many camera functions add this to the Y position. Vanilla is 125.
 #define MARIO_EYE_LEVEL 125
 
+// The number of steps between Mario and the camera to check for walls obstructing Mario. Vanilla is 8.
+#define CAMERA_NUM_OBSTRUCTION_CHECKS 8
+
 // Makes the camera approach Mario's height much more quickly.
 #define FAST_VERTICAL_CAMERA_MOVEMENT
 
