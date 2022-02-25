@@ -1196,7 +1196,7 @@ s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     // Store camera pos, for changing between paths
     vec3f_copy(oldPos, pos);
 
-    vec3f_copy(path[0], sParTrackPath[sParTrackIndex].pos);
+    vec3f_copy(path[0], sParTrackPath[sParTrackIndex + 0].pos);
     vec3f_copy(path[1], sParTrackPath[sParTrackIndex + 1].pos);
 
     f32 distThresh = sParTrackPath[sParTrackIndex].distThresh;
@@ -1223,32 +1223,24 @@ s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     // marioOffset[0] = the (perpendicular) horizontal distance from the path
     // marioOffset[1] = the vertical distance from the path
     // marioOffset[2] = the (parallel) horizontal distance from the path's midpoint
-    pathYaw = -pathYaw;
-    rotate_in_xz(marioOffset, marioOffset, pathYaw);
-    pathYaw = -pathYaw;
-    pathPitch = -pathPitch;
-    rotate_in_yz(marioOffset, marioOffset, pathPitch);
-    pathPitch = -pathPitch;
+    rotate_in_xz(marioOffset, marioOffset, -pathYaw);
+    rotate_in_yz(marioOffset, marioOffset, -pathPitch);
     focOffset[2] = marioOffset[2];
 
     // Repeat above calcs with camOffset
     vec3f_diff(camOffset, pos, parMidPoint);
-    pathYaw = -pathYaw;
-    rotate_in_xz(camOffset, camOffset, pathYaw);
-    pathYaw = -pathYaw;
-    pathPitch = -pathPitch;
-    rotate_in_yz(camOffset, camOffset, pathPitch);
-    pathPitch = -pathPitch;
+    rotate_in_xz(camOffset, camOffset, -pathYaw);
+    rotate_in_yz(camOffset, camOffset, -pathPitch);
 
     // If Mario is distThresh units away from the camera along the path, move the camera
     //! When distThresh != 0, it causes Mario to move slightly towards the camera when running sideways
     //! Set each ParallelTrackingPoint's distThresh to 0 to make Mario truly run parallel to the path
     if (marioOffset[2] > camOffset[2]) {
-        if (marioOffset[2] - camOffset[2] > distThresh) {
+        if (camOffset[2] < marioOffset[2] - distThresh) {
             camOffset[2] = marioOffset[2] - distThresh;
         }
     } else {
-        if (marioOffset[2] - camOffset[2] < -distThresh) {
+        if (camOffset[2] > marioOffset[2] + distThresh) {
             camOffset[2] = marioOffset[2] + distThresh;
         }
     }
