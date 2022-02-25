@@ -721,6 +721,7 @@ s32 abs_angle_diff(s16 a0, s16 a1);
 s32 atan2s(f32 y, f32 x);
 f32 atan2f(f32 a, f32 b);
 // Splines
+void evaluate_cubic_spline(f32 progress, Vec3f pos, Vec3f spline1, Vec3f spline2, Vec3f spline3, Vec3f spline4);
 void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c);
 void anim_spline_init(Vec4s *keyFrames);
 s32  anim_spline_poll(Vec3f result);

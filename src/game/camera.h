@@ -737,7 +737,7 @@ void select_mario_cam_mode(void);
 Gfx *geo_camera_main(s32 callContext, struct GraphNode *g, void *context);
 void object_pos_to_vec3f(Vec3f dst, struct Object *obj);
 void vec3f_to_object_pos(struct Object *obj, Vec3f src);
-s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
+s32 move_point_along_spline(Vec3f pos, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress);
 s32 cam_select_alt_mode(s32 angle);
 s32 set_cam_angle(s32 mode);
 void set_handheld_shake(u8 mode);

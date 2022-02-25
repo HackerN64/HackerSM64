@@ -1288,10 +1288,38 @@ f32 atan2f(f32 y, f32 x) {
     return angle_to_radians(atan2s(y, x));
 }
 
+/**
+ * Produces values using a cubic b-spline curve. Basically Q is the used output,
+ * 'progress' is a value between 0 and 1 that represents the position along the spline,
+ * and a0-a3 are parameters that define the spline.
+ *
+ * The spline is described at www2.cs.uregina.ca/~anima/408/Notes/Interpolation/UniformBSpline.htm
+ */
+void evaluate_cubic_spline(f32 progress, Vec3f pos, Vec3f spline1, Vec3f spline2, Vec3f spline3, Vec3f spline4) {
+    f32 B[4];
+
+    if (progress > 1.0f) {
+        progress = 1.0f;
+    }
+
+    f32 omp = (1.0f - progress);       // 1-p
+    f32 sqp = sqr(progress);           // p^3
+    f32 hcp = (sqp * progress) / 2.0f; // (p^3)/2
+
+    B[0] = cube(omp) / 6.0f;                                    // ((1-p)^3)/6
+    B[1] =  hcp - sqp + (2.0f / 3.0f);                          //  (p^3)/2 - p^2 + 2/3
+    B[2] = -hcp + sqp / 2.0f + progress / 2.0f + (1.0f / 6.0f); // -(p^3)/2 + (p^2)/2 + (p^1)/2 + 1/6
+    B[3] =  hcp / 3.0f;                                         //  (p^3)/6
+
+    pos[0] = (B[0] * spline1[0]) + (B[1] * spline2[0]) + (B[2] * spline3[0]) + (B[3] * spline4[0]);
+    pos[1] = (B[0] * spline1[1]) + (B[1] * spline2[1]) + (B[2] * spline3[1]) + (B[3] * spline4[1]);
+    pos[2] = (B[0] * spline1[2]) + (B[1] * spline2[2]) + (B[2] * spline3[2]) + (B[3] * spline4[2]);
+}
+
 // Variables for a spline curve animation (used for the flight path in the grand star cutscene)
 Vec4s *gSplineKeyframe;
-float gSplineKeyframeFraction;
-int gSplineState;
+f32 gSplineKeyframeFraction;
+s32 gSplineState;
 
 enum gSplineStates {
     CURVE_NONE,
@@ -1381,7 +1409,7 @@ void spline_get_weights(Vec4f result, f32 t, UNUSED s32 c) {
 void anim_spline_init(Vec4s *keyFrames) {
     gSplineKeyframe = keyFrames;
     gSplineKeyframeFraction = 0;
-    gSplineState = 1;
+    gSplineState = CURVE_BEGIN_1;
 }
 
 /**

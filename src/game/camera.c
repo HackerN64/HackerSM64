@@ -2978,7 +2978,7 @@ void update_camera(struct Camera *c) {
         gPuppyCam.yaw = gCamera->yaw;
         if (gMarioState->action == ACT_ENTERING_STAR_DOOR) { // god this is stupid and the fact I have to continue doing this is testament to the idiocy of the star door cutscene >:(
             gPuppyCam.yawTarget = gMarioState->faceAngle[1] + 0x8000;
-            gPuppyCam.yaw = gMarioState->faceAngle[1] + 0x8000;
+            gPuppyCam.yaw       = gMarioState->faceAngle[1] + 0x8000;
         }
     }
     if (c->cutscene == CUTSCENE_NONE
@@ -3326,31 +3326,6 @@ void vec3f_to_object_pos(struct Object *obj, Vec3f src) {
 }
 
 /**
- * Produces values using a cubic b-spline curve. Basically Q is the used output,
- * u is a value between 0 and 1 that represents the position along the spline,
- * and a0-a3 are parameters that define the spline.
- *
- * The spline is described at www2.cs.uregina.ca/~anima/408/Notes/Interpolation/UniformBSpline.htm
- */
-void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f spline1, Vec3f spline2, Vec3f spline3, Vec3f spline4) {
-    f32 B[4];
-    if (u > 1.0f) u = 1.0f;
-
-    register f32 nu = 1.0f - u;
-    register f32 su = sqr(u);
-    register f32 hcu = (su * u) / 2.0f;
-
-    B[0] = cube(nu) / 6.0f;
-    B[1] = hcu - su + (2.0f / 3.0f);
-    B[2] = -hcu + (su / 2.0f) + (u / 2.0f) + (1.0f / 6.0f);
-    B[3] =  hcu / 3.0f;
-
-    Q[0] = (B[0] * spline1[0]) + (B[1] * spline2[0]) + (B[2] * spline3[0]) + (B[3] * spline4[0]);
-    Q[1] = (B[0] * spline1[1]) + (B[1] * spline2[1]) + (B[2] * spline3[1]) + (B[3] * spline4[1]);
-    Q[2] = (B[0] * spline1[2]) + (B[1] * spline2[2]) + (B[2] * spline3[2]) + (B[3] * spline4[2]);
-}
-
-/**
  * Computes the point that is `progress` percent of the way through segment `splineSegment` of `spline`,
  * and stores the result in `p`. `progress` and `splineSegment` are updated if `progress` becomes >= 1.0.
  *
@@ -3371,7 +3346,7 @@ void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f spline1, Vec3f spline2, Vec3f s
  * @return 1 if the point has reached the end of the spline, when `progress` reaches 1.0 or greater, and
  * the 4th CutsceneSplinePoint in the current segment away from spline[splineSegment] has an index of -1.
  */
-s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress) {
+s32 move_point_along_spline(Vec3f pos, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress) {
     s32 finished = FALSE;
     Vec3f controlPoints[4];
     s32 i = 0;
@@ -3385,8 +3360,10 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
         segment = 0;
         u = 0;
     }
-    if (spline[segment].index == -1 || spline[segment + 1].index == -1 || spline[segment + 2].index == -1) {
-        return 1;
+    if (spline[segment + 0].index == -1
+     || spline[segment + 1].index == -1
+     || spline[segment + 2].index == -1) {
+        return TRUE;
     }
 
     for (i = 0; i < 4; i++) {
@@ -3394,7 +3371,7 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
         controlPoints[i][1] = spline[segment + i].point[1];
         controlPoints[i][2] = spline[segment + i].point[2];
     }
-    evaluate_cubic_spline(u, p, controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
+    evaluate_cubic_spline(u, pos, controlPoints[0], controlPoints[1], controlPoints[2], controlPoints[3]);
 
     if (spline[*splineSegment + 1].speed != 0) {
         firstSpeed = 1.0f / spline[*splineSegment + 1].speed;
@@ -3408,7 +3385,7 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
         (*splineSegment)++;
         if (spline[*splineSegment + 3].index == -1) {
             *splineSegment = 0;
-            finished = 1;
+            finished = TRUE;
         }
         (*progress)--;
     }
@@ -4061,10 +4038,10 @@ f32 calc_hor_dist(Vec3f from, Vec3f to) {
  * Rotates a vector in the horizontal plane and copies it to a new vector.
  */
 void rotate_in_xz(Vec3f dst, Vec3f src, s16 yaw) {
-    register f32 x = src[0];
-    register f32 z = src[2];
-    register f32 sy = sins(yaw);
-    register f32 cy = coss(yaw);
+    f32 x = src[0];
+    f32 z = src[2];
+    f32 sy = sins(yaw);
+    f32 cy = coss(yaw);
 
     dst[0] = (z * sy) + (x * cy);
     dst[1] = src[1];
