@@ -48,7 +48,7 @@ UNUSED static struct AnimDataInfo unusedAnim3 = { ARRAY_COUNT(unusedAnimData3), 
 UNUSED static s32 sUnref801A838C[6] = { 0 };
 struct ObjShape *sSimpleShape = NULL;
 UNUSED static s32 sUnref801A83A8[31] = { 0 };
-UNUSED static struct DynList sSimpleDylist[8] = {  // unused
+UNUSED static struct DynList sSimpleDylist[8] = { // unused
     BeginList(),
     StartGroup("simpleg"),
     MakeDynObj(D_NET, "simple"),
@@ -138,7 +138,7 @@ void calc_face_normal(struct ObjFace *face) {
 
     imin("calc_facenormal");
 
-    if (face->vtxCount >= 3) {  // need at least three points to compute a normal
+    if (face->vtxCount >= 3) { // need at least three points to compute a normal
         vtx1 = face->vertices[0];
         p1.x = vtx1->pos.x;
         p1.y = vtx1->pos.y;

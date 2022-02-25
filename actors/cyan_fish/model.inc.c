@@ -8,7 +8,6 @@ ALIGNED8 static const Texture cyan_fish_seg6_texture_0600D468[] = {
 #include "actors/cyan_fish/cyan_fish.rgba16.inc.c"
 };
 
-
 // 0x0600DC80
 static const Vtx cyan_fish_seg6_vertex_0600DC80[] = {
     {{{   -95,     32,      0}, 0, {    32,    436}, {0xa9, 0x5b, 0xff, 0xff}}},

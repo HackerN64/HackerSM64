@@ -1625,7 +1625,7 @@ void move_camera(struct ObjCamera *cam) {
 
     sp2C = &cam->unk64;
     if ((cam->flags & CAMERA_FLAG_CONTROLLABLE) != 0) {
-        if (ctrl->btnB != FALSE && ctrl->prevFrame->btnB == FALSE) {  // new B press
+        if (ctrl->btnB != FALSE && ctrl->prevFrame->btnB == FALSE) { // new B press
             cam->zoomLevel++;
             if (cam->zoomLevel > cam->maxZoomLevel) {
                 cam->zoomLevel = 0;

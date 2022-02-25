@@ -185,8 +185,8 @@ void update_air_with_turn(struct MarioState *m) {
             intendedDYaw = m->intendedYaw - m->faceAngle[1];
             intendedMag = m->intendedMag / 32.0f;
 
-            m->forwardVel += 1.5f * coss(intendedDYaw) * intendedMag;
-            m->faceAngle[1] += 512.0f * sins(intendedDYaw) * intendedMag;
+            m->forwardVel   += coss(intendedDYaw) * intendedMag *   1.5f;
+            m->faceAngle[1] += sins(intendedDYaw) * intendedMag * 512.0f;
         }
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -216,8 +216,8 @@ void update_air_without_turn(struct MarioState *m) {
             intendedDYaw = m->intendedYaw - m->faceAngle[1];
             intendedMag = m->intendedMag / 32.0f;
 
-            m->forwardVel += intendedMag * coss(intendedDYaw) * 1.5f;
-            sidewaysSpeed = intendedMag * sins(intendedDYaw) * 10.0f;
+            m->forwardVel += coss(intendedDYaw) * intendedMag *  1.5f;
+            sidewaysSpeed  = sins(intendedDYaw) * intendedMag * 10.0f;
         }
 
         //! Uncapped air speed. Net positive when moving forward.
@@ -241,7 +241,7 @@ void update_lava_boost_or_twirling(struct MarioState *m) {
         intendedDYaw = m->intendedYaw - m->faceAngle[1];
         intendedMag = m->intendedMag / 32.0f;
 
-        m->forwardVel += coss(intendedDYaw) * intendedMag;
+        m->forwardVel   += coss(intendedDYaw) * intendedMag;
         m->faceAngle[1] += sins(intendedDYaw) * intendedMag * 1024.0f;
 
         if (m->forwardVel < 0.0f) {

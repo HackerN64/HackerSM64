@@ -336,7 +336,7 @@ void bowser_bitfs_actions(void) {
     // Set attacks when Bowser Reacts
     if (!o->oBowserIsReacting) {
         if (o->oBowserStatus & BOWSER_STATUS_ANGLE_MARIO) {
-            if (o->oDistanceToMario < 1300.0f) {  // nearby
+            if (o->oDistanceToMario < 1300.0f) { // nearby
                 if (rand < 0.5f) { // 50% chance
                     o->oAction = BOWSER_ACT_TELEPORT;
                 } else {

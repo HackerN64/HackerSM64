@@ -315,7 +315,6 @@ const Gfx coin_seg3_dl_red_45_r[] = {
     gsSPBranchList(coin_seg3_dl_end),
 };
 
-
 const Gfx coin_seg3_dl_red_22_5_r[] = {
     gsDPPipeSync(),
     gsDPSetTextureImage(G_IM_FMT_IA, G_IM_SIZ_8b, 64, coin_seg3_texture_22_5_ia8),
@@ -379,7 +378,6 @@ const Gfx coin_seg3_dl_secret_45_r[] = {
     gsSPVertex(coin_seg3_vertex_secret_r, 4, 0),
     gsSPBranchList(coin_seg3_dl_end),
 };
-
 
 const Gfx coin_seg3_dl_secret_22_5_r[] = {
     gsDPPipeSync(),

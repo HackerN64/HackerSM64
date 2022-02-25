@@ -108,7 +108,7 @@ void func_80181894(struct ObjJoint *joint) {
 void reset_weight_vtx(struct ObjVertex *vtx) {
     struct GdVec3f localVec;
 
-    if (sResetWeightVtxNum++ == sResetCurWeight->vtxId) {  // found matching vertex
+    if (sResetWeightVtxNum++ == sResetCurWeight->vtxId) { // found matching vertex
         sResetCurWeight->vtx = vtx;
         localVec.x = vtx->pos.x;
         localVec.y = vtx->pos.y;

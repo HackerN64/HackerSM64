@@ -230,7 +230,7 @@ Gfx *geo_intro_gameover_backdrop(s32 callContext, struct GraphNode *node, UNUSED
     Gfx *dlIter = NULL;
     s32 i, j;
 
-    if (callContext != GEO_CONTEXT_RENDER) {  // reset
+    if (callContext != GEO_CONTEXT_RENDER) { // reset
         sGameOverFrameCounter = 0;
         sGameOverTableIndex = -2;
         for (i = 0; i < ARRAY_COUNT(gameOverBackgroundTable); ++i) {

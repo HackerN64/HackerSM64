@@ -476,7 +476,6 @@ const Gfx door_seg3_sub_dl_key_door[] = {
     gsSPEndDisplayList(),
 };
 
-
 // 0x03014370
 static const Vtx door_seg3_vertex_lock[] = {
     {{{   600,    916,     60}, 0, {   480,      0}, {0x00, 0x00, 0x7f, 0xff}}},
