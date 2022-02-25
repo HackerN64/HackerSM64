@@ -1519,14 +1519,17 @@ u32 interact_pole(struct MarioState *m, UNUSED u32 interactType, struct Object *
             m->vel[1]      = 0.0f;
             m->forwardVel  = 0.0f;
 
+            // Check for a floor on the pole.
+            f32 height = find_floor(obj->oPosX, m->pos[1], obj->oPosZ, &obj->oFloor);
+            obj->oFloorHeight = height;
             // Mario's original Y position when grabbing the pole, above the floor.
-            f32 grabYPos = MAX(m->pos[1], obj->oFloorHeight);
-            if (grabYPos < obj->oPosY) {
+            height = MAX(m->pos[1], height);
+            if (height < obj->oPosY) {
                 // If Mario is beneath the pole, clamp mario's position to the relative pole bottom (pole fix).
                 m->marioObj->oMarioPolePos = -obj->hitboxDownOffset - MARIO_POLE_GRAB_OFFSET;
             } else {
                 // Otherwise, use the relative height on the pole.
-                m->marioObj->oMarioPolePos = grabYPos - obj->oPosY;
+                m->marioObj->oMarioPolePos = height - obj->oPosY;
             }
 
             if (lowSpeed) {
