@@ -43,6 +43,9 @@
 // Console will crash soon after Mario reaches about 65536 units from the area's origin.
 // #define ALLOW_OUTSIDE_LEVEL_BOUNDS
 
+// The maximum collision radius when checking for walls. Vanilla is 200.
+#define MAX_COLLISION_RADIUS 200
+
 // -- Mario collision constants --
 
 // Mario's normal hitbox height. Vanilla is 160.

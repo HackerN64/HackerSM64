@@ -117,9 +117,8 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode, struc
 
     TerrainData type = SURFACE_DEFAULT;
 
-    // Max collision radius = 200
-    if (radius > 200) {
-        radius = 200;
+    if (radius > MAX_COLLISION_RADIUS) {
+        radius = MAX_COLLISION_RADIUS;
     }
 
     f32 margin_radius = radius - construct_float(1.0f);
