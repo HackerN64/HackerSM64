@@ -610,7 +610,7 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     mtxf_lookat(gCameraTransform, node->pos, node->focus, node->roll);
 
     // Calculate the lookAt
-    Mat4 *cameraMatrix = &gCameraTransform;
+    Mat4* cameraMatrix = &gCameraTransform;
 #ifdef FIX_REFLECT_MTX
     gCurLookAt->l[0].l.dir[0] = (s8)(127.0f *  (*cameraMatrix)[0][0]);
     gCurLookAt->l[0].l.dir[1] = (s8)(127.0f *  (*cameraMatrix)[1][0]);
@@ -619,12 +619,12 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     gCurLookAt->l[1].l.dir[1] = (s8)(127.0f * -(*cameraMatrix)[1][1]);
     gCurLookAt->l[1].l.dir[2] = (s8)(127.0f * -(*cameraMatrix)[2][1]);
 #else
-    gCurLookAt->l[0].l.dir[0] = (s8)(127.0f *  (*cameraMatrix)[0][0]);
-    gCurLookAt->l[0].l.dir[1] = (s8)(127.0f *  (*cameraMatrix)[1][0]);
-    gCurLookAt->l[0].l.dir[2] = (s8)(127.0f *  (*cameraMatrix)[2][0]);
-    gCurLookAt->l[1].l.dir[0] = (s8)(127.0f *  (*cameraMatrix)[0][1]);
-    gCurLookAt->l[1].l.dir[1] = (s8)(127.0f *  (*cameraMatrix)[1][1]);
-    gCurLookAt->l[1].l.dir[2] = (s8)(127.0f *  (*cameraMatrix)[2][1]);
+    gCurLookAt->l[0].l.dir[0] = (s8)(127.0f *  (*cameraMatrix)[0][1]);
+    gCurLookAt->l[0].l.dir[1] = (s8)(127.0f *  (*cameraMatrix)[1][1]);
+    gCurLookAt->l[0].l.dir[2] = (s8)(127.0f *  (*cameraMatrix)[2][1]);
+    gCurLookAt->l[1].l.dir[0] = (s8)(127.0f *  (*cameraMatrix)[0][0]);
+    gCurLookAt->l[1].l.dir[1] = (s8)(127.0f *  (*cameraMatrix)[1][0]);
+    gCurLookAt->l[1].l.dir[2] = (s8)(127.0f *  (*cameraMatrix)[2][0]);
 #endif
 
     // Make a copy of the view matrix and scale it based on WORLD_SCALE
