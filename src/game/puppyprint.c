@@ -414,9 +414,9 @@ extern s16 gVisualSurfaceCount;
 void puppyprint_render_collision(void) {
     char textBytes[200];
 #ifdef PUPPYPRINT_DEBUG_CYCLES
-    sprintf(textBytes, "Collision:<COL_99505099> %dc", collisionTime[NUM_PERF_ITERATIONS]);
+    sprintf(textBytes, "Collision: <COL_FF7F7FFF>%dc", collisionTime[NUM_PERF_ITERATIONS]);
 #else
-    sprintf(textBytes, "Collision:<COL_99505099> %dus", collisionTime[NUM_PERF_ITERATIONS]);
+    sprintf(textBytes, "Collision: <COL_FF7F7FFF>%dus", collisionTime[NUM_PERF_ITERATIONS]);
 #endif
     print_small_text(304, 48, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
@@ -457,13 +457,12 @@ struct CPUBar {
 extern void print_fps(s32 x, s32 y);
 
 struct CPUBar cpu_ordering_table[] = {
-    { collisionTime, COLOR_RGB_RED,     { "Collision: <COL_99505099>" }},
-    {     graphTime, COLOR_RGB_BLUE,    {     "Graph: <COL_50509999>" }},
-    { behaviourTime, COLOR_RGB_GREEN,   { "Behaviour: <COL_50995099>" }},
-    {     audioTime, COLOR_RGB_YELLOW,  {     "Audio: <COL_99995099>" }},
-    {    cameraTime, COLOR_RGB_CYAN,    {    "Camera: <COL_50999999>" }},
-    {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_99509999>" }},
-    { controllerTime, COLOR_RGB_ORANGE, {       "Pad: <COL_99755099>" }},
+    { collisionTime, COLOR_RGB_RED,     { "Collision: <COL_FF7F7FFF>" }},
+    {     graphTime, COLOR_RGB_BLUE,    {     "Graph: <COL_7F7FFFFF>" }},
+    { behaviourTime, COLOR_RGB_GREEN,   { "Behaviour: <COL_7FFF7FFF>" }},
+    {     audioTime, COLOR_RGB_YELLOW,  {     "Audio: <COL_FFFF7FFF>" }},
+    {    cameraTime, COLOR_RGB_CYAN,    {    "Camera: <COL_7FFFFFFF>" }},
+    {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_FF7FFFFF>" }},
 };
 
 #define CPU_TABLE_MAX (sizeof(cpu_ordering_table) / sizeof(struct CPUBar))
@@ -827,7 +826,8 @@ extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
 extern void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font);
 
 s8 shakeToggle = 0;
-s8  waveToggle = 0;
+s8 waveToggle = 0;
+s8 rainbowToggle = 0;
 f32 textSize = 1.0f; // The value that's used as a baseline multiplier before applying text size modifiers. Make sure to set it back when you're done.
 f32 textSizeTotal = 1.0f; // The value that's read to set the text size. Do not mess with this.
 f32 textSizeTemp = 1.0f; // The value that's set when modifying text size mid draw. Also do not mess with this.
@@ -837,18 +837,27 @@ s32 get_text_width(const char *str, s32 font) {
     s32 textPos = 0;
     s32 wideX   = 0;
     s32 textX, textY, offsetY, spaceX;
+    s32 strLen = (signed)strlen(str);
+    s32 commandOffset;
 
     textSizeTemp = 1.0f;
     textSizeTotal = textSizeTemp * textSize;
 
-    for (i = 0; i < (signed)strlen(str); i++) {
+    for (i = 0; i < strLen; i++) {
         if (str[i] == '#' || str[i] == 0x0A) {
-            i++;
             textPos = 0;
+            continue;
         }
-        if (str[i] == '<') {
-            i += text_iterate_command(str, i, FALSE);
+        while (i < strLen && str[i] == '<') {
+            commandOffset = text_iterate_command(str, i, FALSE);
+            if (commandOffset == 0)
+                break;
+
+            i += commandOffset;
         }
+
+        if (i >= strLen)
+            break;
 
         get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
         textPos += (spaceX + 1) * textSizeTotal;
@@ -860,18 +869,24 @@ s32 get_text_width(const char *str, s32 font) {
 s32 get_text_height(const char *str) {
     s32 i= 0;
     s32 textPos;
+    s32 strLen = (signed)strlen(str);
+    s32 commandOffset;
 
     textSizeTemp = 1.0f;
     textSizeTotal = textSizeTemp * textSize;
     textPos = 12 * textSizeTotal;
 
-    for (i = 0; i < (signed)strlen(str); i++) {
+    for (i = 0; i < strLen; i++) {
         if (str[i] == '#' || str[i] == 0x0A) {
-            i++;
             textPos += 12 * textSizeTotal;
+            continue;
         }
-        if (str[i] == '<') {
-            i += text_iterate_command(str, i, FALSE);
+        while (i < strLen && str[i] == '<') {
+            commandOffset = text_iterate_command(str, i, FALSE);
+            if (commandOffset == 0)
+                break;
+
+            i += commandOffset;
         }
     }
 
@@ -892,6 +907,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     s32 textY = 0;
     s32 offsetY = 0;
     s32 i = 0;
+    s32 j = 0;
     s32 textPos[2] = { 0, 0 };
     s32 spaceX = 0;
     s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -901,29 +917,39 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     s32 lines = 0;
     s32 xlu = currEnv[3];
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
+    s32 strLen = (signed)strlen(str);
+    s32 commandOffset;
     Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
 
     shakeToggle = 0;
-    waveToggle  = 0;
+    waveToggle = 0;
+    rainbowToggle = 0;
     textSizeTemp = 1.0f;
     textSizeTotal = textSizeTemp * textSize;
 
-    if (amount == PRINT_ALL) {
-        tx = (signed)strlen(str);
+    if (amount == PRINT_ALL || amount > strLen) {
+        tx = strLen;
     }
 
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
     if (align == PRINT_TEXT_ALIGN_CENTRE) {
-        for (i = 0; i < (signed)strlen(str); i++) {
+        for (i = 0; i < strLen; i++) {
             if (str[i] == '#' || str[i] == 0x0A) {
-                i++;
                 textPos[0] = 0;
                 lines++;
+                wideX[lines] = 0;
+                continue;
+            }
+            while (i < strLen && str[i] == '<') {
+                commandOffset = text_iterate_command(str, i, FALSE);
+                if (commandOffset == 0)
+                    break;
+
+                i += commandOffset;
             }
 
-            if (str[i] == '<') {
-                i += text_iterate_command(str, i, FALSE);
-            }
+            if (i >= strLen)
+                break;
 
             get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
             textPos[0] += (spaceX + 1) * textSizeTotal;
@@ -932,18 +958,26 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
 
         textPos[0] = -(wideX[0] / 2);
     } else if (align == PRINT_TEXT_ALIGN_RIGHT) {
-        for (i = 0; i < (signed)strlen(str); i++) {
+        for (i = 0; i < strLen; i++) {
             if (str[i] == '#' || str[i] == 0x0A) {
-                i++;
                 textPos[0] = 0;
                 lines++;
-            } else {
-                textPos[0] += (spaceX + 1) * textSizeTotal;
+                wideX[lines] = 0;
+                continue;
             }
 
-            if (str[i] == '<') {
-                i += text_iterate_command(str, i, FALSE);
+            while (i < strLen && str[i] == '<') {
+                commandOffset = text_iterate_command(str, i, FALSE);
+                if (commandOffset == 0)
+                    break;
+
+                i += commandOffset;
             }
+
+            if (i >= strLen)
+                break;
+
+            textPos[0] += (spaceX + 1) * textSizeTotal;
 
             get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
 
@@ -954,9 +988,8 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
 
     lines = 0;
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
-    for (i = 0; i < tx; i++) {
+    for (i = j = 0; i < tx; i++, j++) {
         if (str[i] == '#' || str[i] == 0x0A) {
-            i++;
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
                 textPos[0] = -(wideX[lines]    );
@@ -964,11 +997,19 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
                 textPos[0] = -(wideX[lines] / 2);
             }
             textPos[1] += 12 * textSizeTotal;
+            continue;
         }
 
-        if (str[i] == '<') {
-            i += text_iterate_command(str, i, TRUE);
+        while (i < tx && str[i] == '<') {
+            commandOffset = text_iterate_command(str, i, TRUE);
+            if (commandOffset == 0)
+                break;
+
+            i += commandOffset;
         }
+
+        if (i >= tx)
+            break;
 
         if (shakeToggle) {
             shakePos[0] = (-1 + (random_u16() & 0x1));
@@ -979,7 +1020,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
         }
 
         if (waveToggle) {
-            wavePos = ((sins((gGlobalTimer * 3000) + (i * 10000))) * 2);
+            wavePos = ((sins((gGlobalTimer * 3000) + (j * 10000))) * 2);
         } else {
             wavePos = 0;
         }
@@ -1003,69 +1044,116 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
+
+    // Color reverted to pure white in dl_rgba16_text_end, so carry it over to currEnv!
+    // NOTE: if this behavior is ever removed, make sure currEnv gets enforced here if the text color is ever altered in the text_iterate_command function.
+    currEnv[0] = 255; currEnv[1] = 255; currEnv[2] = 255; currEnv[3] = 255;
+}
+
+// Return color hex nibble
+s32 get_hex_value_at_offset(const char *str, s32 primaryOffset, u32 nibbleOffset, u32 garbageReturnsEnv) {
+    s32 val = str[primaryOffset + nibbleOffset];
+    s32 shiftVal = 4 * ((nibbleOffset + 1) % 2);
+
+    if (nibbleOffset > 7)
+        garbageReturnsEnv = FALSE;
+
+    if (val >= 'A' && val <= 'F')
+        return (val - 'A' + 0xA) << shiftVal;
+    if (val >= 'a' && val <= 'f')
+        return (val - 'a' + 0xA) << shiftVal;
+    if (val >= '0' && val <= '9')
+        return (val - '0') << shiftVal;
+
+    if (garbageReturnsEnv) // Return currEnv color value
+        return currEnv[nibbleOffset / 2] & (0x0F << shiftVal);
+    
+    // Just return 0 otherwise
+    return 0;
 }
 
 s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     s32 len = 0;
-    while ((str[i + len] != '>') && ((i + len) < (signed)strlen(str))) len++;
+    const char *newStr = &str[i];
+    s32 lastCharIndex = (signed)strlen(newStr) - 1;
+
+    while ((newStr[len] != '>') && (len < lastCharIndex)) len++;
+    if (newStr[len] != '>')
+        return 0;
+
     len++;
 
     // Ignores runCMD, because it's important this is ALWAYS ran.
-    if (strncmp((str + i), "<SIZE_xxx>", 5) == 0) { // Set the text size here. 100 is scale 1.0, with 001 being scale 0.01. this caps at 999. Going lower than 001
-            // Will make the text unreadable on console, so only do it,
-            textSizeTemp = (str[i + 6] - '0');
-            textSizeTemp += (str[i + 7] - '0')/10.0f;
-            textSizeTemp += (str[i + 8] - '0')/100.0f;
-            textSizeTemp = CLAMP(textSizeTemp, 0.01f, 10.0f);
-            textSizeTotal = textSizeTemp * textSize;
-    }
+    if (strncmp((newStr), "<SIZE_xxx>", 6) == 0 && len == 10) { // Set the text size here. 100 is scale 1.0, with 001 being scale 0.01. this caps at 999. Going lower than 001
+        // Will make the text unreadable on console, so only do it,
+        textSizeTemp = (newStr[6] - '0');
+        textSizeTemp += (newStr[7] - '0')/10.0f;
+        textSizeTemp += (newStr[8] - '0')/100.0f;
+        textSizeTemp = CLAMP(textSizeTemp, 0.01f, 10.0f);
+        textSizeTotal = textSizeTemp * textSize;
+    } else if (strncmp((newStr), "<COL_xxxxxxxx>", 5) == 0 && len == 14) { // Simple text colour effect. goes up to FF for each, so FF0000FF is red.
+        // Each value is taken from the string. The first is shifted left 4 bits, because it's a larger significant value, then it adds the next digit onto it.
+        // Reverting to envcoluor can be achieved by passing something like <COL_-------->, or it could be combined with real colors for just partial reversion like <COL_FF00FF--> for instance.
+        if (!runCMD)
+            return len;
 
-    if (runCMD) {
-        if (strncmp((str + i), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to 99 for each, so 99000000 is red.
-            // Each value is taken from the string. The first is multiplied by 10, because it's a larger significant value, then it adds the next digit onto it.
-            s32 r = (((str[i +  5] >= 'A') ? str[i +  5] - 'A' + 0xA : str[i +  5] - '0') * 16) + ((str[i +  6] >= 'A') ? str[i +  6] - 'A' + 0xA : str[i +  6] - '0');
-            s32 g = (((str[i +  7] >= 'A') ? str[i +  7] - 'A' + 0xA : str[i +  7] - '0') * 16) + ((str[i +  8] >= 'A') ? str[i +  8] - 'A' + 0xA : str[i +  8] - '0');
-            s32 b = (((str[i +  9] >= 'A') ? str[i +  9] - 'A' + 0xA : str[i +  9] - '0') * 16) + ((str[i +  10] >= 'A') ? str[i +  10] - 'A' + 0xA : str[i +  10] - '0');
-            s32 a = (((str[i +  11] >= 'A') ? str[i +  11] - 'A' + 0xA : str[i +  11] - '0') * 16) + ((str[i +  12] >= 'A') ? str[i +  12] - 'A' + 0xA : str[i +  12] - '0');
-            print_set_envcolour(r, g, b, a);
-        } else if (strncmp((str + i), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
-            s32 r = (((str[i +  6] >= 'A') ? str[i +  6] - 'A' + 0xA : str[i +  6] - '0') * 16) + ((str[i +  7] >= 'A') ? str[i +  7] - 'A' + 0xA : str[i +  7] - '0');
-            s32 g = (((str[i +  9] >= 'A') ? str[i +  9] - 'A' + 0xA : str[i +  9] - '0') * 16) + ((str[i +90] >= 'A') ? str[i +  9] - 'A' + 0xA : str[i +  9] - '0');
-            s32 b = (((str[i +  10] >= 'A') ? str[i +  10] - 'A' + 0xA : str[i +  10] - '0') * 16) + ((str[i +  11] >= 'A') ? str[i +  11] - 'A' + 0xA : str[i +  11] - '0');
-            s32 a = (((str[i +  12] >= 'A') ? str[i +  12] - 'A' + 0xA : str[i +  12] - '0') * 16) + ((str[i +  13] >= 'A') ? str[i +  13] - 'A' + 0xA : str[i +  13] - '0');
-            s32 r2 = (((str[i +  15] >= 'A') ? str[i +  15] - 'A' + 0xA : str[i +  15] - '0') * 16) + ((str[i +  16] >= 'A') ? str[i +  16] - 'A' + 0xA : str[i +  16] - '0');
-            s32 g2 = (((str[i +  17] >= 'A') ? str[i +  17] - 'A' + 0xA : str[i +  17] - '0') * 16) + ((str[i +  18] >= 'A') ? str[i +  18] - 'A' + 0xA : str[i +  18] - '0');
-            s32 b2 = (((str[i +  19] >= 'A') ? str[i +  19] - 'A' + 0xA : str[i +  19] - '0') * 16) + ((str[i +  20] >= 'A') ? str[i +  20] - 'A' + 0xA : str[i +  20] - '0');
-            s32 a2 = (((str[i +  21] >= 'A') ? str[i +  21] - 'A' + 0xA : str[i +  21] - '0') * 16) + ((str[i +  22] >= 'A') ? str[i +  22] - 'A' + 0xA : str[i +  22] - '0');
-            s32 spd = (((str[i +  24] >= 'A') ? str[i +  24] - 'A' + 0xA : str[i +  24] - '0') * 16) + ((str[i +  25] >= 'A') ? str[i +  25] - 'A' + 0xA : str[i +  25] - '0');
-            // Find the median.
-            s32 r3 = (r + r2) / 2;
-            s32 g3 = (g + g2) / 2;
-            s32 b3 = (b + b2) / 2;
-            s32 a3 = (a + a2) / 2;
-            // Find the difference.
-            s32 r4 = (r - r2) / 2;
-            s32 g4 = (g - g2) / 2;
-            s32 b4 = (b - b2) / 2;
-            s32 a4 = (a - a2) / 2;
-            // Now start from the median, and wave from end to end with the difference, to create the fading effect.
-            f32 sTimer = sins(gGlobalTimer * spd * 50);
-            print_set_envcolour((r3 + (sTimer * r4)),
-                                (g3 + (sTimer * g4)),
-                                (b3 + (sTimer * b4)),
-                                (a3 + (sTimer * a4)));
-        } else if (strncmp((str + i), "<RAINBOW>", 8) == 0) { // Toggles the happy colours :o) Do it again to disable it.
+        s32 rgba[4];
+
+        for (s32 j = 0; j < 4; j++) {
+            rgba[j] = get_hex_value_at_offset(newStr, 5, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 5, (2 * j) + 1, TRUE);
+        }
+
+        rainbowToggle = 0;
+        gDPSetEnvColor(gDisplayListHead++, (Color) rgba[0], (Color) rgba[1], (Color) rgba[2], (Color) rgba[3]); // Don't use print_set_envcolour here
+    } else if (strncmp((newStr), "<FADE_xxxxxxxx,xxxxxxxx,xx>", 6) == 0 && len == 27) { // Same as above, except it fades between two colours. The third set of numbers is the speed it fades.
+        if (!runCMD)
+            return len;
+
+        s32 rgba[4];
+
+        // Find transition speed and set timer value
+        s32 spd = get_hex_value_at_offset(newStr, 24, 0, FALSE) | get_hex_value_at_offset(newStr, 24, 1, FALSE);
+        f32 sTimer = sins(gGlobalTimer * spd * 50);
+
+        for (s32 j = 0; j < 4; j++) {
+            s32 col1 = get_hex_value_at_offset(newStr, 6, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 6, (2 * j) + 1, TRUE);
+            s32 col2 = get_hex_value_at_offset(newStr, 15, 2 * j, TRUE) | get_hex_value_at_offset(newStr, 15, (2 * j) + 1, TRUE);
+
+            // Final color value determined by median of two colors + a point in the end-to-end width of the difference between the two colors.
+            // Said point changes based on the sTimer value in the form of a sine wave, which helps to create the fading effect.
+            rgba[j] = ((col1 + col2) / 2) + (s32) (sTimer * ((col1 - col2) / 2));
+        }
+
+        rainbowToggle = 0;
+        gDPSetEnvColor(gDisplayListHead++, (Color) rgba[0], (Color) rgba[1], (Color) rgba[2], (Color) rgba[3]); // Don't use print_set_envcolour here
+    } else if (strncmp((newStr), "<RAINBOW>", 9) == 0) { // Toggles the happy colours :o) Do it again to disable it.
+        if (!runCMD)
+            return len;
+
+        rainbowToggle ^= 1;
+        if (rainbowToggle) {
             s32 r = (coss( gGlobalTimer * 600         ) + 1) * 127;
             s32 g = (coss((gGlobalTimer * 600) + 21845) + 1) * 127;
             s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
-            print_set_envcolour(r, g, b, 255);
-        } else if (strncmp((str + i), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
-            shakeToggle ^= 1;
-        } else if (strncmp((str + i), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
-            waveToggle  ^= 1;
+            gDPSetEnvColor(gDisplayListHead++, (Color) r, (Color) g, (Color) b, (Color) currEnv[3]); // Don't use print_set_envcolour here, also opt to use alpha value from currEnv
+        } else {
+            gDPSetEnvColor(gDisplayListHead++, (Color) currEnv[0], (Color) currEnv[1], (Color) currEnv[2], (Color) currEnv[3]); // Reset text to envcolor
         }
+    } else if (strncmp((newStr), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
+        if (!runCMD)
+            return len;
+
+        shakeToggle ^= 1;
+    } else if (strncmp((newStr), "<WAVE>",  6) == 0) { // Toggles text that waves around. Do it again to disable it.
+        if (!runCMD)
+            return len;
+
+        waveToggle  ^= 1;
+    } else {
+        return 0; // Invalid command string; display everything inside to make this clear to the user.
     }
-    return len-1;
+
+    return len;
 }
 
 void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font) {
@@ -1093,7 +1181,7 @@ void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *off
         *textX = ((letter - 'q') * 4);
         *textY = 24;
         *spaceX = textLen[(letter - 'q') + 64];
-    } else if (letter == '>') {
+    } else if (letter == '<' || letter == '>') {
         *textX  = 128;
         *textY  =  12;
         *spaceX =   0;

@@ -782,9 +782,13 @@ void thread5_game_loop(UNUSED void *arg) {
 
         audio_game_loop_tick();
         select_gfx_pool();
+#if PUPPYPRINT_DEBUG
         first = osGetTime();
         read_controller_inputs(THREAD_5_GAME_LOOP);
         profiler_update(controllerTime, first);
+#else
+        read_controller_inputs(THREAD_5_GAME_LOOP);
+#endif
         addr = level_script_execute(addr);
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();
