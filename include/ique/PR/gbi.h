@@ -486,6 +486,7 @@
 /* typical CC cycle 1 modes */
 #define	G_CC_PRIMITIVE              0, 0, 0, PRIMITIVE, 0, 0, 0, PRIMITIVE
 #define	G_CC_SHADE                  0, 0, 0, SHADE, 0, 0, 0, SHADE
+#define G_CC_ENVIRONMENT			0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
 
 #define	G_CC_MODULATEI              TEXEL0, 0, SHADE, 0, 0, 0, 0, SHADE
 #define	G_CC_MODULATEIDECALA        TEXEL0, 0, SHADE, 0, 0, 0, 0, TEXEL0

@@ -277,12 +277,10 @@ static void puppycam_process_cutscene(void) {
 
 /// MENU
 
-#define BLANK 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
-
 static void puppycam_display_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
     Gfx* dlHead = gDisplayListHead;
 
-    gDPSetCombineMode(dlHead++, BLANK, BLANK);
+    gDPSetCombineMode(dlHead++, G_CC_ENVIRONMENT, G_CC_ENVIRONMENT);
     gDPSetCycleType(  dlHead++, G_CYC_1CYCLE);
     if (a != 255) {
         gDPSetRenderMode(dlHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);

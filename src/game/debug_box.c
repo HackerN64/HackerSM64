@@ -129,7 +129,7 @@ extern Mat4 gMatStack[32]; // XXX: Hack
 /**
  * The debug boxes' default transparency
  */
-#define DBG_BOX_ALPHA     0x7F
+#define DBG_BOX_ALPHA 0x7F
 /**
  * The debug boxes' default color. sCurBoxColor is reset to this every frame.
  */
@@ -154,7 +154,7 @@ static const Gfx dl_debug_box_begin[] = {
     gsSPClearGeometryMode(G_CULL_BACK),
     gsSPSetGeometryMode(G_ZBUFFER),
     gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
-    gsDPSetCombineLERP(0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT),
+    gsDPSetCombineMode(G_CC_ENVIRONMENT, G_CC_ENVIRONMENT),
     gsSPEndDisplayList(),
 };
 

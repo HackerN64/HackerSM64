@@ -819,10 +819,8 @@ void print_set_envcolour(s32 r, s32 g, s32 b, s32 a) {
     }
 }
 
-#define BLANK 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT
-
 void prepare_blank_box(void) {
-    gDPSetCombineMode(gDisplayListHead++, BLANK, BLANK);
+    gDPSetCombineMode(gDisplayListHead++, G_CC_ENVIRONMENT, G_CC_ENVIRONMENT);
 }
 
 void finish_blank_box(void) {
