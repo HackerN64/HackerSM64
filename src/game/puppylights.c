@@ -1,4 +1,4 @@
-///Puppylights 2.0 by Fazana. What happened to 1.0? Tragic accident.
+/// Puppylights 2.0 by Fazana. What happened to 1.0? Tragic accident.
 /**
 Intended for use with manipulating existing Lights1 structs for objects in real time.
 Can support static lights that are loaded with the level, or lights created by objects.
@@ -25,6 +25,7 @@ shaped and rotated correctly, for accurate representation of their properties.
 #include "puppylights.h"
 #include "area.h"
 #include "engine/math_util.h"
+#include "engine/colors.h"
 #include "string.h"
 #include "object_fields.h"
 #include "object_constants.h"
@@ -42,7 +43,11 @@ shaped and rotated correctly, for accurate representation of their properties.
 Lights1 gLevelLight; // Existing ambient light in the area. Will be set by the level script, though can always be changed afterwards if desired.
 u8 levelAmbient = FALSE;
 Lights1 *sLightBase; // The base value where lights are written to when worked with.
-Lights1 sDefaultLights = gdSPDefLights1(0x7F, 0x7F, 0x7F, 0xFE, 0xFE, 0xFE, 0x28, 0x28, 0x28); // Default lights default lights
+Lights1 sDefaultLights = gdSPDefLights1(
+    0x7F, 0x7F, 0x7F,
+    0xFE, 0xFE, 0xFE,
+    0x28, 0x28, 0x28
+); // Default lights
 u16 gNumLights = 0; // How many lights are loaded.
 u16 gDynLightStart = 0; // Where the dynamic lights will start.
 struct PuppyLight *gPuppyLights[MAX_LIGHTS]; // This contains all the loaded data.
@@ -65,7 +70,7 @@ void puppylights_allocate(void) {
             return;
         }
         gPuppyLights[gNumLights]->active = FALSE;
-        gPuppyLights[gNumLights]->flags = 0;
+        gPuppyLights[gNumLights]->flags = PUPPYLIGHT_FLAGS_NONE;
         gNumLights++;
     }
 }
@@ -77,7 +82,7 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     Lights1 *tempLight;
     s32 lightPos[2];
     Vec3i lightRelative;
-    Vec3i lightDir = {0, 0, 0};
+    Vec3i lightDir = { 0x00, 0x00, 0x00 };
     s32 i;
     s32 colour;
     s32 ambient;
@@ -88,9 +93,7 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     Vec3f debugPos[2];
 
     // Relative positions of the object vs. the centre of the node.
-    lightRelative[0] = light->pos[0][0] - obj->oPosX;
-    lightRelative[1] = light->pos[0][1] - obj->oPosY;
-    lightRelative[2] = light->pos[0][2] - obj->oPosZ;
+    vec3_diff(lightRelative, light->pos[0], &obj->oPosVec);
 
     // If the nodes X and Z values are equal, then a check is made if the angle is a derivative of 90.
     // If so, then it will completely skip over the calculation that figures out position from rotation.
@@ -98,36 +101,36 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
     // same result no matter the yaw. If neither is true, then it simply checks if it's 180 degrees, since
     // That will just be the same as 0.
     if (light->pos[1][0] == light->pos[1][2]) {
-        if (light->yaw % 0x4000 == 0 || light->flags & PUPPYLIGHT_SHAPE_CYLINDER) {
+        if ((light->yaw % 0x4000) == 0 || (light->flags & PUPPYLIGHT_SHAPE_CYLINDER)) {
             lightPos[0] = lightRelative[0];
             lightPos[1] = lightRelative[2];
             goto skippingTrig;
         }
-    } else if (light->yaw % 0x8000 == 0) {
+    } else if ((light->yaw % 0x8000) == 0) {
         lightPos[0] = lightRelative[0];
         lightPos[1] = lightRelative[2];
         goto skippingTrig;
     }
 
     // Get the position based off the rotation of the box.
-    lightPos[0] = lightRelative[2] * sins(-light->yaw) + lightRelative[0] * coss(-light->yaw);
-    lightPos[1] = lightRelative[2] * coss(-light->yaw) - lightRelative[0] * sins(-light->yaw);
+    lightPos[0] = (lightRelative[2] * sins(-light->yaw)) + (lightRelative[0] * coss(-light->yaw));
+    lightPos[1] = (lightRelative[2] * coss(-light->yaw)) - (lightRelative[0] * sins(-light->yaw));
     skippingTrig:
 
 #ifdef VISUAL_DEBUG
-    vec3f_set(debugPos[0], light->pos[0][0], light->pos[0][1], light->pos[0][2]);
-    vec3f_set(debugPos[1], light->pos[1][0], light->pos[1][1], light->pos[1][2]);
-    debug_box_color(0x08FF00FF);
+    vec3s_to_vec3f(debugPos[0], light->pos[0]);
+    vec3s_to_vec3f(debugPos[1], light->pos[1]);
+    debug_box_color(COLOR_RGBA32_DEBUG_LIGHT);
     if (light->flags & PUPPYLIGHT_SHAPE_CYLINDER) {
-        debug_box_rot(debugPos[0], debugPos[1], light->yaw, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_DEFAULT);
+        debug_box_rot(debugPos[0], debugPos[1], light->yaw, (DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_DEFAULT));
     } else {
-        debug_box_rot(debugPos[0], debugPos[1], light->yaw, DEBUG_SHAPE_BOX | DEBUG_UCODE_DEFAULT);
+        debug_box_rot(debugPos[0], debugPos[1], light->yaw, (DEBUG_SHAPE_BOX | DEBUG_UCODE_DEFAULT));
     }
 #endif
     // Check if the object is inside the box, after correcting it for rotation.
-    if (-light->pos[1][0] < lightPos[0] && lightPos[0] < light->pos[1][0] &&
-        -light->pos[1][1] < lightRelative[1] && lightRelative[1] < light->pos[1][1] &&
-        -light->pos[1][2] < lightPos[1] && lightPos[1] < light->pos[1][2]) {
+    if (-light->pos[1][0] <      lightPos[0] &&      lightPos[0] < light->pos[1][0]
+     && -light->pos[1][1] < lightRelative[1] && lightRelative[1] < light->pos[1][1]
+     && -light->pos[1][2] <      lightPos[1] &&      lightPos[1] < light->pos[1][2]) {
         // If so, then start making preparations to see how alongside they're in.
         // This takes the largest side of the box and multiplies the other axis to match the numbers.
         // This way, the colour value will scale correctly, no matter which side is entered.
@@ -149,22 +152,20 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
         } else {
             scaleOrig = sqr(lightPos[0]) + sqr(lightRelative[1]) + sqr(lightPos[1]);
         }
-        scaleVal = (light->pos[1][2]*light->pos[1][2]);
+        scaleVal = sqr(light->pos[1][2]);
         // If it's a cylinder, then bin anything outside it.
-        if (light->flags & PUPPYLIGHT_SHAPE_CYLINDER) {
-            if (scaleOrig > scaleVal) {
-                return;
-            }
+        if ((light->flags & PUPPYLIGHT_SHAPE_CYLINDER) && scaleOrig > scaleVal) {
+            return;
         }
-    }
-    else
+    } else {
         return;
+    }
 
-    f32 epc = (f32)(light->epicentre/100.0f);
+    f32 epc = (f32)(light->epicentre / 100.0f);
     tempLight = segmented_to_virtual(src);
-    //Now we have a scale value and a scale factor, we can start lighting things up.
+    // Now we have a scale value and a scale factor, we can start lighting things up.
     // Convert to a percentage.
-    scale = CLAMP(scaleOrig/scaleVal, 0.0f, 1.0f);
+    scale = CLAMP(scaleOrig / scaleVal, 0.0f, 1.0f);
     // Reduce scale2 by the epicentre.
     scale2 = CLAMP((scale - epc) * (1 + epc), 0.0f, 1.0f);
 
@@ -175,25 +176,25 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
         lightDir[1] = ((lightRelative[1]) * 64.0f) / light->pos[1][1];
         lightDir[2] = ((lightRelative[2]) * 64.0f) / light->pos[1][2];
     }
-    //Get direction if applicable.
+    // Get direction if applicable.
     for (i = 0; i < 3; i++) {
-        //So it works by starting from the final colour, and then lerping to the original colour, by a factor of the epicentre corrected scale. Light opacity affects this further.
-        colour = approach_f32_asymptotic(light->rgba[i], tempLight->l[0].l.col[i], scale2 * ((f32)light->rgba[3]/255.0f));
+        // So it works by starting from the final colour, and then lerping to the original colour, by a factor of the epicentre corrected scale. Light opacity affects this further.
+        colour = approach_f32_asymptotic(light->rgba[i], tempLight->l[0].l.col[i], scale2 * ((f32)light->rgba[3] / 255.0f));
         // If it's a directional light, then increase the current ambient by 50%, to give the effect better.
         // Otherwise, just normalise the brightness to keep it in line with the current ambient.
         // And now to apply the values.
-        tempLight->l[0].l.col[i] = colour;
+        tempLight->l[0].l.col[i]  = colour;
         tempLight->l[0].l.colc[i] = colour;
         // Ambient, too.
         if (!(light->flags & PUPPYLIGHT_DIRECTIONAL)) {
-            ambient = approach_f32_asymptotic(light->rgba[i]/2, tempLight->a.l.col[i], scale*((f32)light->rgba[3] / 255.0f));
-            tempLight->a.l.col[i] = ambient;
+            ambient = approach_f32_asymptotic(light->rgba[i] / 2, tempLight->a.l.col[i], scale * ((f32)light->rgba[3] / 255.0f));
+            tempLight->a.l.col[i]  = ambient;
             tempLight->a.l.colc[i] = ambient;
         }
         // A slightly hacky way to offset the ambient lighting in order to prevent directional lighting from having a noticeable change in ambient brightness.
         if (flags & LIGHTFLAG_DIRECTIONAL_OFFSET) {
-            ambient = approach_f32_asymptotic(MIN(tempLight->a.l.col[i] * 2, 0xFF), tempLight->a.l.col[i], scale2*((f32)light->rgba[3] / 255.0f));
-            tempLight->a.l.col[i] = ambient;
+            ambient = approach_f32_asymptotic(MIN(tempLight->a.l.col[i] * 2, 0xFF), tempLight->a.l.col[i], scale2 * ((f32)light->rgba[3] / 255.0f));
+            tempLight->a.l.col[i]  = ambient;
             tempLight->a.l.colc[i] = ambient;
         }
         // Apply direction. It takes the relative positions, and then multiplies them with the perspective matrix to get a correct direction.
@@ -209,7 +210,7 @@ void puppylights_iterate(struct PuppyLight *light, Lights1 *src, struct Object *
 void puppylights_run(Lights1 *src, struct Object *obj, s32 flags, u32 baseColour) {
     s32 i;
     s32 numlights = 0;
-    s32 offsetPlaced = 0;
+    s32 offsetPlaced = FALSE;
     s32 lightFlags = flags;
 
     if (gCurrLevelNum < LEVEL_BBH) {
@@ -220,17 +221,15 @@ void puppylights_run(Lights1 *src, struct Object *obj, s32 flags, u32 baseColour
     // Otherwise, it hardsets a colour to begin with. I don't recommend you use this, simply because it's intended to be used
     // As a hacky quick-fix for models coloured by lights. Lightcoloured models don't blend nearly as nicely as ones coloured
     // By other means.
-    if (baseColour < 0x100) {
-        sLightBase = (levelAmbient ? &gLevelLight : &sDefaultLights);
-    } else {
+    sLightBase = (levelAmbient ? &gLevelLight : &sDefaultLights);
+    if (baseColour >= 0x100) {
         s32 colour;
-        sLightBase = (levelAmbient) ? &gLevelLight : &sDefaultLights;
         for (i = 0; i < 3; i++) {
-            colour = (((baseColour >> (24-(i*8)))) & 0xFF);
-            sLightBase->l[0].l.col[i] = colour;
+            colour = (((baseColour >> (24 - (i * 8)))) & 0xFF);
+            sLightBase->l[0].l.col[i]  = colour;
             sLightBase->l[0].l.colc[i] = colour;
-            sLightBase->a.l.col[i] = colour/2;
-            sLightBase->a.l.colc[i] = colour/2;
+            sLightBase->a.l.col[i]  = colour / 2;
+            sLightBase->a.l.colc[i] = colour / 2;
             sLightBase->l->l.dir[i] = 0x28;
         }
     }
@@ -240,7 +239,7 @@ void puppylights_run(Lights1 *src, struct Object *obj, s32 flags, u32 baseColour
         if (gPuppyLights[i]->rgba[3] > 0 && gPuppyLights[i]->active == TRUE && gPuppyLights[i]->area == gCurrAreaIndex && (gPuppyLights[i]->room == -1 || gPuppyLights[i]->room == gMarioCurrentRoom)) {
             if (gPuppyLights[i]->flags & PUPPYLIGHT_DIRECTIONAL && !offsetPlaced) {
                 lightFlags |= LIGHTFLAG_DIRECTIONAL_OFFSET;
-                offsetPlaced = 1;
+                offsetPlaced = TRUE;
             } else {
                 lightFlags &= ~LIGHTFLAG_DIRECTIONAL_OFFSET;
             }
@@ -258,12 +257,10 @@ void puppylights_object_emit(struct Object *obj) {
         return;
     }
     if (obj->oFlags & OBJ_FLAG_EMIT_LIGHT) {
-        f64 dist = ((obj->oPosX - gMarioState->pos[0]) * (obj->oPosX - gMarioState->pos[0])) +
-                   ((obj->oPosY - gMarioState->pos[1]) * (obj->oPosY - gMarioState->pos[1])) +
-                   ((obj->oPosZ - gMarioState->pos[2]) * (obj->oPosZ - gMarioState->pos[2]));
-        f64 lightSize = ((obj->puppylight.pos[1][0]) * (obj->puppylight.pos[1][0])) +
-                        ((obj->puppylight.pos[1][1]) * (obj->puppylight.pos[1][1])) +
-                        ((obj->puppylight.pos[1][2]) * (obj->puppylight.pos[1][2]));
+        Vec3f marioToObj;
+        vec3f_diff(marioToObj, &obj->oPosVec, gMarioState->pos);
+        f64 dist = vec3_sumsq(marioToObj);
+        f64 lightSize = vec3_sumsq(obj->puppylight.pos[1]);
         if (dist > lightSize) {
             goto deallocate; // That's right. I used a goto. Eat your heart out xkcd.
         }
@@ -272,7 +269,7 @@ void puppylights_object_emit(struct Object *obj) {
             if (absi(gNumLights - gDynLightStart) < MAX_LIGHTS_DYNAMIC) {
                 goto deallocate;
             }
-            for (i = gDynLightStart; i < MIN(gDynLightStart+MAX_LIGHTS_DYNAMIC, MAX_LIGHTS); i++) {
+            for (i = gDynLightStart; i < MIN(gDynLightStart + MAX_LIGHTS_DYNAMIC, MAX_LIGHTS); i++) {
                 if (gPuppyLights[i]->active == TRUE) {
                     if (gPuppyLights[i]->flags & PUPPYLIGHT_DELETE) {
                         fadingExists = TRUE;
@@ -288,7 +285,7 @@ void puppylights_object_emit(struct Object *obj) {
             }
             // Go through all the lights again, now this time, ignore the fading light flag and overwrite them.
             if (fadingExists) {
-                for (i = gDynLightStart; i < MIN(gDynLightStart+MAX_LIGHTS_DYNAMIC, MAX_LIGHTS); i++) {
+                for (i = gDynLightStart; i < MIN(gDynLightStart + MAX_LIGHTS_DYNAMIC, MAX_LIGHTS); i++) {
                     if (gPuppyLights[i]->active == TRUE && !(gPuppyLights[i]->flags & PUPPYLIGHT_DELETE)) {
                         continue;
                     }
@@ -303,15 +300,13 @@ void puppylights_object_emit(struct Object *obj) {
             }
         } else {
             updatepos:
-            gPuppyLights[obj->oLightID]->pos[0][0] = obj->oPosX;
-            gPuppyLights[obj->oLightID]->pos[0][1] = obj->oPosY;
-            gPuppyLights[obj->oLightID]->pos[0][2] = obj->oPosZ;
+            vec3f_to_vec3s(gPuppyLights[obj->oLightID]->pos[0], &obj->oPosVec);
         }
     } else {
         deallocate:
         if (obj->oLightID != 0xFFFF) {
             gPuppyLights[obj->oLightID]->active = FALSE;
-            gPuppyLights[obj->oLightID]->flags = 0;
+            gPuppyLights[obj->oLightID]->flags = PUPPYLIGHT_FLAGS_NONE;
         }
         obj->oLightID = 0xFFFF;
     }
@@ -327,17 +322,18 @@ void set_light_properties(struct PuppyLight *light, s32 x, s32 y, s32 z, s32 off
     light->pos[1][0] = MAX(offsetX, 10);
     light->pos[1][1] = MAX(offsetY, 10);
     light->pos[1][2] = MAX(offsetZ, 10);
-    light->rgba[0] = (colour >> 24) & 0xFF;
-    light->rgba[1] = (colour >> 16) & 0xFF;
-    light->rgba[2] = (colour >>  8) & 0xFF;
-    light->rgba[3] = colour & 0xFF;
+    light->rgba[0] = RGBA32_R(colour);
+    light->rgba[1] = RGBA32_G(colour);
+    light->rgba[2] = RGBA32_B(colour);
+    light->rgba[3] = RGBA32_A(colour);
     light->yaw = yaw;
     light->area = gCurrAreaIndex;
     light->room = room;
     light->epicentre = epicentre;
-    if (!(flags & PUPPYLIGHT_SHAPE_CYLINDER) && flags & PUPPYLIGHT_SHAPE_CUBE)
+    if (!(flags & PUPPYLIGHT_SHAPE_CYLINDER) && (flags & PUPPYLIGHT_SHAPE_CUBE)) {
         light->flags |= PUPPYLIGHT_SHAPE_CYLINDER;
-    light->flags |= flags | PUPPYLIGHT_DYNAMIC;
+    }
+    light->flags |= (flags | PUPPYLIGHT_DYNAMIC);
 }
 
 // You can run these in objects to enable or disable their light properties.
@@ -367,12 +363,14 @@ void delete_lights(void) {
     s32 i;
 
     for (i = 0; i < gNumLights; i++) {
-        if (gPuppyLights[i]->active == TRUE && gPuppyLights[i]->flags & PUPPYLIGHT_DELETE) {
+        if (gPuppyLights[i]->active == TRUE && (gPuppyLights[i]->flags & PUPPYLIGHT_DELETE)) {
             gPuppyLights[i]->pos[1][0] = approach_f32_asymptotic(gPuppyLights[i]->pos[1][0], 0, 0.15f);
             gPuppyLights[i]->pos[1][1] = approach_f32_asymptotic(gPuppyLights[i]->pos[1][1], 0, 0.15f);
             gPuppyLights[i]->pos[1][2] = approach_f32_asymptotic(gPuppyLights[i]->pos[1][2], 0, 0.15f);
-            if (gPuppyLights[i]->pos[1][0] < 1.0f && gPuppyLights[i]->pos[1][1] < 1.0f && gPuppyLights[i]->pos[1][2] < 1.0f) {
-                gPuppyLights[i]->flags &= ~ PUPPYLIGHT_DELETE;
+            if (gPuppyLights[i]->pos[1][0] < 1.0f
+             && gPuppyLights[i]->pos[1][1] < 1.0f
+             && gPuppyLights[i]->pos[1][2] < 1.0f) {
+                gPuppyLights[i]->flags &= ~PUPPYLIGHT_DELETE;
                 gPuppyLights[i]->active = FALSE;
             }
         }
