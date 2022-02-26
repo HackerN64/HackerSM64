@@ -927,8 +927,8 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     textSizeTemp = 1.0f;
     textSizeTotal = textSizeTemp * textSize;
 
-    if (amount == PRINT_ALL) {
-        tx = (signed)strlen(str);
+    if (amount == PRINT_ALL || amount > strLen) {
+        tx = strLen;
     }
 
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
