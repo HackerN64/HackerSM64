@@ -580,7 +580,11 @@ void setup_global_light() {
 
     Vec3f transformedLightDirection;
 
+#ifdef STATIC_LIGHTS
+    vec3f_copy(transformedLightDirection, globalLightDirection);
+#else
     linear_mtxf_transpose_mul_vec3f(gCameraTransform, transformedLightDirection, globalLightDirection);
+#endif
 
     curLight->l->l.dir[0] = (s8)(transformedLightDirection[0]);
     curLight->l->l.dir[1] = (s8)(transformedLightDirection[1]);

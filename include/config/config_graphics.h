@@ -87,6 +87,9 @@
 // This has a side effect of making the star dance star also transparent when Mario collects a transparent star.
 // #define STAR_DANCE_USES_STARS_MODEL
 
+// Makes lights consistent in world space instead of camera space. Vanilla uses camera space.
+// #define STATIC_LIGHTS
+
 // Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
 // NOTE: Still breaks occasionally, and PUPPYLIGHT_NODE might not work in areas that aren't area 1.
 // #define PUPPYLIGHTS
