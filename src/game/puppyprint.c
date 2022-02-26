@@ -893,6 +893,25 @@ s32 get_text_height(const char *str) {
     return textPos;
 }
 
+s32 puppyprint_strlen(const char *str) {
+    s32 i= 0;
+    s32 strLen = (signed)strlen(str);
+    s32 commandOffset;
+    s32 len = 0;
+
+    for (i = 0; i < strLen; i++, len++) {
+        while (i < strLen && str[i] == '<') {
+            commandOffset = text_iterate_command(str, i, FALSE);
+            if (commandOffset == 0)
+                break;
+
+            i += commandOffset;
+        }
+    }
+
+    return len;
+}
+
 const Gfx dl_small_text_begin[] = {
     gsDPPipeSync(),
     gsDPSetCycleType(    G_CYC_1CYCLE),
@@ -912,6 +931,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     s32 spaceX = 0;
     s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     s32 tx = amount;
+    s32 tx2 = tx;
     s32 shakePos[2];
     f32 wavePos;
     s32 lines = 0;
@@ -929,6 +949,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
 
     if (amount == PRINT_ALL || amount > strLen) {
         tx = strLen;
+        tx2 = tx;
     }
 
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
@@ -946,6 +967,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
                     break;
 
                 i += commandOffset;
+                tx2 += commandOffset;
             }
 
             if (i >= strLen)
@@ -972,6 +994,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
                     break;
 
                 i += commandOffset;
+                tx2 += commandOffset;
             }
 
             if (i >= strLen)
@@ -987,8 +1010,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
     }
 
     lines = 0;
+    tx2 = tx;
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
-    for (i = j = 0; i < tx; i++, j++) {
+    for (i = j = 0; i < tx2; i++, j++) {
         if (str[i] == '#' || str[i] == 0x0A) {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
@@ -1000,15 +1024,16 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 
             continue;
         }
 
-        while (i < tx && str[i] == '<') {
+        while (i < tx2 && str[i] == '<') {
             commandOffset = text_iterate_command(str, i, TRUE);
             if (commandOffset == 0)
                 break;
 
             i += commandOffset;
+            tx2 += commandOffset;
         }
 
-        if (i >= tx)
+        if (i >= tx2)
             break;
 
         if (shakeToggle) {
@@ -1067,7 +1092,7 @@ s32 get_hex_value_at_offset(const char *str, s32 primaryOffset, u32 nibbleOffset
 
     if (garbageReturnsEnv) // Return currEnv color value
         return currEnv[nibbleOffset / 2] & (0x0F << shiftVal);
-    
+
     // Just return 0 otherwise
     return 0;
 }
