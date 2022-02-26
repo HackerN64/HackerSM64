@@ -1078,6 +1078,9 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     s32 lastCharIndex = (signed)strlen(newStr) - 1;
 
     while ((newStr[len] != '>') && (len < lastCharIndex)) len++;
+    if (newStr[len] != '>')
+        return 0;
+
     len++;
 
     // Ignores runCMD, because it's important this is ALWAYS ran.
