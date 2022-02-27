@@ -748,7 +748,7 @@ void puppyprint_profiler_process(void) {
 }
 #endif
 
-void print_set_envcolour(s32 r, s32 g, s32 b, s32 a) {
+void print_set_envcolour(u8 r, u8 g, u8 b, u8 a) {
     if ((r != currEnv[0])
         || (g != currEnv[1])
         || (b != currEnv[2])
@@ -772,7 +772,7 @@ void finish_blank_box(void) {
 // This does some epic shenanigans to figure out the optimal way to draw this.
 // If the width is a multiple of 4, then use fillmode (fastest)
 // Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
-void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a) {
+void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
     s32 cycleadd = 0;
     if (((absi(x1 - x2) % 4) == 0) && (a == 255)) {
         gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
@@ -796,7 +796,7 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
 
 // Same as above, but with rounded edges.
 // Follows all the same rules of usage.
-void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a)
+void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a)
 {
     s32 cycleadd = 0;
     gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
@@ -823,7 +823,7 @@ void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 
 }
 
 extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
-extern void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font);
+extern void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, u8 *spaceX, s8 *offsetY, u8 font);
 
 s8 shakeToggle = 0;
 s8 waveToggle = 0;
@@ -836,7 +836,9 @@ s32 get_text_width(const char *str, s32 font) {
     s32 i       = 0;
     s32 textPos = 0;
     s32 wideX   = 0;
-    s32 textX, textY, offsetY, spaceX;
+    s32 textX, textY;
+    s8 offsetY;
+    u8 spaceX;
     s32 strLen = (signed)strlen(str);
     s32 commandOffset;
 
@@ -921,21 +923,21 @@ const Gfx dl_small_text_begin[] = {
     gsSPEndDisplayList(),
 };
 
-void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, s32 font) {
+void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
     s32 textX = 0;
     s32 textY = 0;
-    s32 offsetY = 0;
+    s8 offsetY = 0;
     s32 i = 0;
     s32 j = 0;
     s32 textPos[2] = { 0, 0 };
-    s32 spaceX = 0;
+    u8 spaceX = 0;
     s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     s32 tx = amount;
     s32 tx2 = tx;
-    s32 shakePos[2];
+    s8 shakePos[2];
     f32 wavePos;
-    s32 lines = 0;
-    s32 xlu = currEnv[3];
+    u8 lines = 0;
+    u8 xlu = currEnv[3];
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
     s32 strLen = (signed)strlen(str);
     s32 commandOffset;
@@ -1181,7 +1183,7 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     return len;
 }
 
-void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, s32 *spaceX, s32 *offsetY, s32 font) {
+void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, u8 *spaceX, s8 *offsetY, u8 font) {
     *offsetY = 0;
     u8 **textKern = segmented_to_virtual(puppyprint_kerning_lut);
     u8 *textLen = segmented_to_virtual(textKern[font]);
