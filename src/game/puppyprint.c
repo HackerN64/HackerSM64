@@ -939,7 +939,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     u8 lines = 0;
     u8 xlu = currEnv[3];
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
-    s32 strLen = (signed)strlen(str);
+    s32 strLen = puppyprint_strlen(str);
     s32 commandOffset;
     Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
 
