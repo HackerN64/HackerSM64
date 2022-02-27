@@ -2507,7 +2507,7 @@ void gd_setproperty(enum GdProperty prop, f32 f1, f32 f2, f32 f3) {
                 default:
                     fatal_printf("Bad zbuf function");
             }
-            //? no break?
+            break;
         case GD_PROP_STUB17:
             break;
         case GD_PROP_STUB18:

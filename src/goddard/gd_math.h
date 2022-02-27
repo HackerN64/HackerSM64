@@ -6,14 +6,6 @@
 #include "gd_types.h"
 #include "macros.h"
 
-struct Row4 {
-    f32 c0, c1, c2, c3;
-};
-
-struct InvMat4 {
-    struct Row4 r0, r1, r2, r3;
-};
-
 enum GdRotAxis {
     GD_X_AXIS,
     GD_Y_AXIS,
