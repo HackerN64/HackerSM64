@@ -2071,28 +2071,28 @@ const BehaviorScript bhvFallingBowserPlatform[] = {
     END_LOOP(),
 };
 
-const BehaviorScript bhvBlueBowserFlame[] = {
+const BehaviorScript bhvBowserSkyFlameGroupRising[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INTERACT_TYPE(INTERACT_FLAME),
     BILLBOARD(),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ -400, /*Bounciness*/ -70, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
-    CALL_NATIVE(bhv_blue_bowser_flame_init),
+    CALL_NATIVE(bhv_bowser_sky_flame_group_rising_init),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_blue_bowser_flame_loop),
+        CALL_NATIVE(bhv_bowser_sky_flame_group_rising_loop),
         ANIMATE_TEXTURE(oAnimState, 2),
     END_LOOP(),
 };
 
-const BehaviorScript bhvFlameFloatingLanding[] = {
+const BehaviorScript bhvBowserSkyFlameGroupFalling[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_INTERACT_TYPE(INTERACT_FLAME),
     BILLBOARD(),
     SET_OBJ_PHYSICS(/*Wall hitbox radius*/ 0, /*Gravity*/ -400, /*Bounciness*/ -70, /*Drag strength*/ 1000, /*Friction*/ 1000, /*Buoyancy*/ 200, /*Unused*/ 0, 0),
-    CALL_NATIVE(bhv_flame_floating_landing_init),
+    CALL_NATIVE(bhv_bowser_sky_flame_group_falling_init),
     BEGIN_LOOP(),
-        CALL_NATIVE(bhv_flame_floating_landing_loop),
+        CALL_NATIVE(bhv_bowser_sky_flame_group_falling_loop),
         ANIMATE_TEXTURE(oAnimState, 2),
     END_LOOP(),
 };

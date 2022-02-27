@@ -131,10 +131,10 @@ void bhv_flame_moving_forward_growing_loop(void) {
     }
 }
 
-void bhv_flame_floating_landing_init(void) {
+void bhv_bowser_sky_flame_group_falling_init(void) {
     o->oAnimState = (s32)(random_float() * 10.0f);
     o->oMoveAngleYaw = random_u16();
-    if (o->oBehParams2ndByte != 0) {
+    if (o->oBehParams2ndByte != BOWSER_SKY_FLAME_GROUP_FALLING_BP_RED_FLAMES) {
         o->oForwardVel = random_float() * 5.0f;
     } else {
         o->oForwardVel = random_float() * 70.0f;
@@ -146,7 +146,7 @@ void bhv_flame_floating_landing_init(void) {
 
 f32 sFlameFloatingYLimit[] = { -8.0f, -6.0f, -3.0f };
 
-void bhv_flame_floating_landing_loop(void) {
+void bhv_bowser_sky_flame_group_falling_loop(void) {
     cur_obj_update_floor_and_walls();
     cur_obj_move_standard(78);
     bowser_flame_move();
@@ -160,10 +160,11 @@ void bhv_flame_floating_landing_loop(void) {
     }
 
     if (o->oMoveFlags & OBJ_MOVE_LANDED) {
-        if (o->oBehParams2ndByte == 0) {
+        if (o->oBehParams2ndByte == BOWSER_SKY_FLAME_GROUP_FALLING_BP_RED_FLAMES) {
             spawn_object(o, MODEL_RED_FLAME, bhvFlameLargeBurningOut);
         } else {
-            spawn_object(o, MODEL_NONE, bhvBlueFlamesGroup); //? wonder if they meant MODEL_BLUE_FLAME?
+            // bhvBlueFlamesGroup spawns 3 bouncing blue flames.
+            spawn_object(o, MODEL_NONE, bhvBlueFlamesGroup);
         }
         obj_mark_for_deletion(o);
     }
@@ -171,7 +172,7 @@ void bhv_flame_floating_landing_loop(void) {
     o->oGraphYOffset = o->header.gfx.scale[1] * 14.0f;
 }
 
-void bhv_blue_bowser_flame_init(void) {
+void bhv_bowser_sky_flame_group_rising_init(void) {
     obj_translate_xz_random(o, 80.0f);
     o->oAnimState = (s32)(random_float() * 10.0f);
     o->oVelY = 7.0f;
@@ -182,13 +183,13 @@ void bhv_blue_bowser_flame_init(void) {
     o->oFlameSpeedTimerOffset = (s32)(random_float() * 64.0f);
 }
 
-void bhv_blue_bowser_flame_loop(void) {
+void bhv_bowser_sky_flame_group_rising_loop(void) {
     s32 i;
 
     obj_set_hitbox(o, &sGrowingBowserFlameHitbox);
 
     if (o->oFlameScale < 16.0f) {
-        o->oFlameScale = o->oFlameScale + 0.5f;
+        o->oFlameScale += 0.5f;
     }
 
     cur_obj_scale(o->oFlameScale);
@@ -196,16 +197,19 @@ void bhv_blue_bowser_flame_loop(void) {
     cur_obj_move_standard(78);
 
     if (o->oTimer > 20) {
-        if (o->oBehParams2ndByte == 0) {
+        if (o->oBehParams2ndByte == BOWSER_SKY_FLAME_GROUP_RISING_BP_RED) {
             for (i = 0; i < 3; i++) {
-                spawn_object_relative_with_scale(0, 0, 0, 0, 5.0f, o, MODEL_RED_FLAME,
-                                                 bhvFlameFloatingLanding);
+                spawn_object_relative_with_scale(BOWSER_SKY_FLAME_GROUP_FALLING_BP_RED_FLAMES,
+                                                 0, 0, 0, 5.0f, o, MODEL_RED_FLAME,
+                                                 bhvBowserSkyFlameGroupFalling);
             }
         } else {
-            spawn_object_relative_with_scale(1, 0, 0, 0, 8.0f, o, MODEL_BLUE_FLAME,
-                                             bhvFlameFloatingLanding);
-            spawn_object_relative_with_scale(2, 0, 0, 0, 8.0f, o, MODEL_BLUE_FLAME,
-                                             bhvFlameFloatingLanding);
+            spawn_object_relative_with_scale(BOWSER_SKY_FLAME_GROUP_FALLING_BP_BLUE_FLAMES_1,
+                                             0, 0, 0, 8.0f, o, MODEL_BLUE_FLAME,
+                                             bhvBowserSkyFlameGroupFalling);
+            spawn_object_relative_with_scale(BOWSER_SKY_FLAME_GROUP_FALLING_BP_BLUE_FLAMES_2,
+                                             0, 0, 0, 8.0f, o, MODEL_BLUE_FLAME,
+                                             bhvBowserSkyFlameGroupFalling);
         }
         obj_mark_for_deletion(o);
     }
@@ -238,12 +242,10 @@ void bhv_flame_bouncing_loop(void) {
         obj_mark_for_deletion(o);
     }
 
-    if (bowser != NULL) {
-        if (bowser->oHeldState == HELD_FREE) {
-            if (lateral_dist_between_objects(o, bowser) < 300.0f) {
-                obj_mark_for_deletion(o);
-            }
-        }
+    if (bowser != NULL
+     && bowser->oHeldState == HELD_FREE
+     && lateral_dist_between_objects(o, bowser) < 300.0f) {
+        obj_mark_for_deletion(o);
     }
 }
 

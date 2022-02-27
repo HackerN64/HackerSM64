@@ -582,18 +582,17 @@ void bowser_act_teleport(void) {
  * Makes Bowser do a fire split into the sky
  */
 void bowser_act_spit_fire_into_sky(void) {
-    s32 animFrame;
     // Play animation
     cur_obj_init_animation_with_sound(BOWSER_ANIM_BREATH_UP);
     // Set frames
-    animFrame = o->header.gfx.animInfo.animFrame;
+    s32 animFrame = o->header.gfx.animInfo.animFrame;
     // Spawn flames in the middle of the animation
     if (animFrame > 24 && animFrame < 36) {
         cur_obj_play_sound_1(SOUND_AIR_BOWSER_SPIT_FIRE);
         if (animFrame == 35) { // Spawns Blue flames at this frame
-            spawn_object_relative(1, 0, 400, 100, o, MODEL_RED_FLAME, bhvBlueBowserFlame);
+            spawn_object_relative(BOWSER_SKY_FLAME_GROUP_RISING_BP_BLUE, 0, 400, 100, o, MODEL_RED_FLAME, bhvBowserSkyFlameGroupRising);
         } else { // Spawns Red flames
-            spawn_object_relative(0, 0, 400, 100, o, MODEL_RED_FLAME, bhvBlueBowserFlame);
+            spawn_object_relative(BOWSER_SKY_FLAME_GROUP_RISING_BP_RED,  0, 400, 100, o, MODEL_RED_FLAME, bhvBowserSkyFlameGroupRising);
         }
     }
     // Return to default act once the animation is over
@@ -888,7 +887,7 @@ void bowser_act_charge_mario(void) {
             // Spawn smoke puff while slipping
             o->oBowserTimer = 0;
             cur_obj_init_animation_with_sound(BOWSER_ANIM_RUN_SLIP);
-            spawn_object_relative_with_scale(0, 100, -50, 0, 3.0f, o, MODEL_SMOKE, bhvWhitePuffSmoke2);
+            spawn_object_relative_with_scale(0,  100, -50, 0, 3.0f, o, MODEL_SMOKE, bhvWhitePuffSmoke2);
             spawn_object_relative_with_scale(0, -100, -50, 0, 3.0f, o, MODEL_SMOKE, bhvWhitePuffSmoke2);
             // End Charge once Bowser stops running
             if (approach_f32_signed(&o->oForwardVel, 0, -1.0f)) {

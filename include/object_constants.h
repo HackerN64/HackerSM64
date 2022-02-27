@@ -617,11 +617,17 @@ enum oBehParams2ndByteBlueBowserFlame {
     BOWSER_FLAME_BLUE_BP_SPAWN_BLUE_FLAMES,
 };
 
-/* Bowser Floating Flame */
-enum oBehParams2ndByteBowserFloatingFlame {
-    BOWSER_FLOATING_FLAME_SPAWN_RED_FLAME,
-    BOWSER_FLOATING_FLAME_SPAWN_BLUE_FLAME_1,
-    BOWSER_FLOATING_FLAME_SPAWN_BLUE_FLAME_2,
+/* Bowser Flame Group Rising */
+enum oBehParams2ndByteBowserSkyFlameGroupRising {
+    BOWSER_SKY_FLAME_GROUP_RISING_BP_RED,
+    BOWSER_SKY_FLAME_GROUP_RISING_BP_BLUE,
+};
+
+/* Bowser Flame Group Falling */
+enum oBehParams2ndByteBowserSkyFlameGroupFalling {
+    BOWSER_SKY_FLAME_GROUP_FALLING_BP_RED_FLAMES,
+    BOWSER_SKY_FLAME_GROUP_FALLING_BP_BLUE_FLAMES_1,
+    BOWSER_SKY_FLAME_GROUP_FALLING_BP_BLUE_FLAMES_2,
 };
 
 /* Bowser Key */
