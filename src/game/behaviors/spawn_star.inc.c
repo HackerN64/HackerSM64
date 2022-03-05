@@ -152,7 +152,7 @@ void spawn_no_exit_star(f32 x, f32 y, f32 z) {
 
 void bhv_hidden_red_coin_star_init(void) {
     struct Object *starObj = NULL;
-
+    #ifdef MIN_RED_COINS
     if (gCurrCourseNum != COURSE_JRB) {
         spawn_object(o, MODEL_TRANSPARENT_STAR, bhvRedCoinStarMarker);
     }
@@ -165,14 +165,15 @@ void bhv_hidden_red_coin_star_init(void) {
     }
 
     o->oHiddenStarTriggerCounter = 8 - numRedCoinsRemaining;
+    #endif
 }
 
 void bhv_hidden_red_coin_star_loop(void) {
     gRedCoinsCollected = o->oHiddenStarTriggerCounter;
-
+    #ifdef MIN_RED_COINS
     switch (o->oAction) {
         case HIDDEN_STAR_ACT_INACTIVE:
-            if (o->oHiddenStarTriggerCounter == 8) {
+            if (o->oHiddenStarTriggerCounter == MIN_RED_COINS) {
                 o->oAction = HIDDEN_STAR_ACT_ACTIVE;
             }
             break;
@@ -185,4 +186,5 @@ void bhv_hidden_red_coin_star_loop(void) {
             }
             break;
     }
+    #endif
 }

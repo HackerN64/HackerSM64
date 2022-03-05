@@ -1,6 +1,7 @@
 // hidden_star.inc.c
 
 void bhv_hidden_star_init(void) {
+    #ifdef MIN_STAR_SECRETS
     s16 remainingTriggers = count_objects_with_behavior(bhvHiddenStarTrigger);
     if (remainingTriggers == 0) {
         struct Object *starObj = spawn_object_abs_with_rot(o, 0, MODEL_STAR, bhvStar, o->oPosX, o->oPosY, o->oPosZ, 0, 0, 0);
@@ -9,12 +10,14 @@ void bhv_hidden_star_init(void) {
     }
 
     o->oHiddenStarTriggerCounter = 5 - remainingTriggers;
+    #endif
 }
 
 void bhv_hidden_star_loop(void) {
+    #ifdef MIN_STAR_SECRETS
     switch (o->oAction) {
         case 0:
-            if (o->oHiddenStarTriggerCounter == 5) {
+            if (o->oHiddenStarTriggerCounter == MIN_STAR_SECRETS) {
                 o->oAction = 1;
             }
             break;
@@ -27,16 +30,17 @@ void bhv_hidden_star_loop(void) {
             }
             break;
     }
+    #endif
 }
 
 void bhv_hidden_star_trigger_loop(void) {
     if (obj_check_if_collided_with_object(o, gMarioObject)) {
         struct Object *hiddenStar = cur_obj_nearest_object_with_behavior(bhvHiddenStar);
-
+        #ifdef MIN_STAR_SECRETS
         if (hiddenStar != NULL) {
             hiddenStar->oHiddenStarTriggerCounter++;
 
-            if (hiddenStar->oHiddenStarTriggerCounter != 5) {
+            if (hiddenStar->oHiddenStarTriggerCounter < MIN_STAR_SECRETS) {
                 spawn_orange_number(hiddenStar->oHiddenStarTriggerCounter, 0, 0, 0);
             }
 
@@ -44,15 +48,17 @@ void bhv_hidden_star_trigger_loop(void) {
         }
 
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
+        #endif
     }
 }
 
 void bhv_bowser_course_red_coin_star_loop(void) {
+    #ifdef MIN_RED_COINS
     gRedCoinsCollected = o->oHiddenStarTriggerCounter;
 
     switch (o->oAction) {
         case 0:
-            if (o->oHiddenStarTriggerCounter == 8) {
+            if (o->oHiddenStarTriggerCounter == MIN_RED_COINS) {
                 o->oAction = 1;
             }
             break;
@@ -65,4 +71,5 @@ void bhv_bowser_course_red_coin_star_loop(void) {
             }
             break;
     }
+    #endif
 }

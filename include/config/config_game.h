@@ -32,6 +32,13 @@
 // Number of coins to spawn the "100 coin" star. If you remove the define altogether, then there won't be a 100 coin star at all.
 #define X_COIN_STAR 100
 
+// Number of red coins to spawn a red coin star.
+// If you remove the define altogether, red coins cannot spawn stars. Star Markers will get removed as well.
+#define MIN_RED_COINS 8
+
+// Number of secrets to spawn a secret star. If you remove the define altogether, secrets do nothing.
+#define MIN_STAR_SECRETS 5
+
 /*
  * Stars don't kick you out of the level (does not play nicely with vanilla)
  * In v2.0 there are numerous issues with this define that can be seen here https://github.com/Reonu/HackerSM64/issues/258

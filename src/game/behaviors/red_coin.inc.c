@@ -45,12 +45,13 @@ void bhv_red_coin_loop(void) {
     // If Mario interacted with the object...
     if (o->oInteractStatus & INT_STATUS_INTERACTED) {
         // ...and there is a red coin star in the level...
+        #ifdef MIN_RED_COINS
         if (o->parentObj != NULL) {
             // ...increment the star's counter.
             o->parentObj->oHiddenStarTriggerCounter++;
 
             // Spawn the orange number counter, as long as it isn't the last coin.
-            if (o->parentObj->oHiddenStarTriggerCounter != 8) {
+            if (o->parentObj->oHiddenStarTriggerCounter < MIN_RED_COINS) {
                 spawn_orange_number(o->parentObj->oHiddenStarTriggerCounter, 0, 0, 0);
             }
 
@@ -59,6 +60,7 @@ void bhv_red_coin_loop(void) {
                        + (((u8) o->parentObj->oHiddenStarTriggerCounter - 1) << 16),
                        gGlobalSoundSource);
         }
+        #endif
 
         coin_collected();
         // Despawn the coin.
