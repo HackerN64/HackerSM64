@@ -348,20 +348,21 @@ enum oActionsMovingYellowCoin {
 
 /* Coin Formation */
 enum CoinFormationFlags {
-    COIN_FORMATION_FLAG_NONE     = 0x0,
-    COIN_FORMATION_FLAG_VERTICAL = BIT(0),
-    COIN_FORMATION_FLAG_RING     = BIT(1),
-    COIN_FORMATION_FLAG_ARROW    = BIT(2),
-    COIN_FORMATION_FLAG_FLYING   = BIT(4),
+    COIN_FORMATION_FLAGS_NONE    = 0x0,
+    COIN_FORMATION_FLAG_VERTICAL = BIT(0), // 0x01
+    COIN_FORMATION_FLAG_RING     = BIT(1), // 0x02
+    COIN_FORMATION_FLAG_ARROW    = BIT(2), // 0x04
+    COIN_FORMATION_FLAG_UNUSED   = BIT(3), // 0x08
+    COIN_FORMATION_FLAG_FLYING   = BIT(4), // 0x10
 };
 enum oBehParams2ndByteCoinFormation {
-    COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE = (COIN_FORMATION_FLAG_NONE),
+    COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE = (COIN_FORMATION_FLAGS_NONE),
     COIN_FORMATION_BP_SHAPE_VERTICAL_LINE   = (COIN_FORMATION_FLAG_VERTICAL),
     COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING = (COIN_FORMATION_FLAG_RING),
     COIN_FORMATION_BP_SHAPE_VERTICAL_RING   = (COIN_FORMATION_FLAG_RING | COIN_FORMATION_FLAG_VERTICAL),
     COIN_FORMATION_BP_SHAPE_ARROW           = (COIN_FORMATION_FLAG_ARROW),
-    COIN_FORMATION_BP_SHAPE_MASK = 0x07,
-    COIN_FORMATION_BP_FLYING     = 0x10,
+    COIN_FORMATION_BP_SHAPE_MASK            = BITMASK(3), // 0x07
+    COIN_FORMATION_BP_FLYING                = COIN_FORMATION_FLAG_FLYING,
 };
 enum oActionsCoinFormation {
     COIN_FORMATION_ACT_INACTIVE,
@@ -516,7 +517,7 @@ enum oBowserStatuses {
     BOWSER_STATUS_DIST_CENTER  = BIT( 4), // 0x00000010
     BOWSER_STATUS_BIG_JUMP     = BIT(16), // 0x00010000
     BOWSER_STATUS_FIRE_SKY     = BIT(17), // 0x00020000
-    BOWSER_STATUS_MASK         = 0xFF,
+    BOWSER_STATUS_MASK         = BITMASK(8), // 0xFF
 };
 enum oBowserGrabbedStatuses {
     BOWSER_GRAB_STATUS_NONE,
@@ -1219,11 +1220,11 @@ enum oBehParams1stByteSlidingPlatform { // collisionDataIndex
     /*0x05*/ SLIDING_PLATFORM_BP1_RR_PYRAMID,
     /*0x06*/ SLIDING_PLATFORM_BP1_NULL,
     /*0x07*/ SLIDING_PLATFORM_BP1_BITDW_SLIDING_PLATFORM,
-    /*0x07*/ SLIDING_PLATFORM_BP1_TYPES_MASK = 0x07,
+    SLIDING_PLATFORM_BP1_TYPES_MASK = BITMASK(3), // 0x07
 };
 enum oBehParams2ndByteSlidingPlatform {
-    SLIDING_PLATFORM_BP2_LENGTH_MASK   = 0x3F,
-    SLIDING_PLATFORM_BP2_FLAG_INVERTED = BIT(6),
+    SLIDING_PLATFORM_BP2_LENGTH_MASK   = BITMASK(6), // 0x3F
+    SLIDING_PLATFORM_BP2_FLAG_INVERTED = BIT(6),     // 0x40
 };
 
 /* BITDW Pyramid Platforms */
@@ -1658,7 +1659,7 @@ enum oAnimStatesPokey {
 /* Pokey Body Part */
 enum oBehParams2ndBytePokeyBodeyPart {
     POKEY_PART_BP_HEAD,
-    POKEY_PART_BP_LOWEST = (POKEY_NUM_SEGMENTS - 0x1),
+    POKEY_PART_BP_LOWEST = (POKEY_NUM_SEGMENTS - 1),
 };
 
 /* Swoop */
@@ -1691,10 +1692,6 @@ enum animIDsFlyGuy {
 };
 
 /* Goomba Triplet Spawner */
-enum oBehParams2ndByteGoombaTripletSpawner {
-    GOOMBA_TRIPLET_SPAWNER_BP_SIZE_MASK          = 0x03,
-    GOOMBA_TRIPLET_SPAWNER_BP_EXTRA_GOOMBAS_MASK = 0xFC,
-};
 enum oActionsGoombaTripletSpawner {
     GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED,
     GOOMBA_TRIPLET_SPAWNER_ACT_LOADED,
@@ -1705,12 +1702,12 @@ enum oBehParams2ndByteGoomba {
     GOOMBA_SIZE_REGULAR,
     GOOMBA_SIZE_HUGE,
     GOOMBA_SIZE_TINY,
-    GOOMBA_BP_SIZE_MASK         = 0x03,
-    GOOMBA_BP_TRIPLET_FLAG_MASK = 0xFC,
+    GOOMBA_BP_SIZE_MASK         = BITMASK(2),        // 0x03
+    GOOMBA_BP_TRIPLET_FLAG_MASK = (BITMASK(6) << 2), // 0xFC
 };
 #if defined(FLOOMBAS) && defined(INTRO_FLOOMBAS)
 enum oBehParams3rdByteGoomba {
-    GOOMBA_BP3_FLOOMBA_MIRRORED_STARTUP_ANIM = BIT(7),
+    GOOMBA_BP3_FLOOMBA_MIRRORED_STARTUP_ANIM = BIT(7), // 0x80
 };
 #endif
 enum oActionsGoomba {
@@ -2056,8 +2053,8 @@ enum oActionsPlatformOnTrack {
 enum oBehParams2ndBytePlatformOnTrack {
     PLATFORM_ON_TRACK_BP_SPAWN_BALLS     = BIT(7), // 0x80
 
-    PLATFORM_ON_TRACK_BP_MASK_TYPE       = 0x70,
-    PLATFORM_ON_TRACK_BP_MASK_PATH       = 0x0F,
+    PLATFORM_ON_TRACK_BP_MASK_PATH       = BITMASK(4),        // 0x0F
+    PLATFORM_ON_TRACK_BP_MASK_TYPE       = (BITMASK(3) << 4), // 0x70
 };
 enum oBehParams1stBytePlatformOnTrack {
     PLATFORM_ON_TRACK_BP_RETURN_TO_START = BIT(0), // 0x1
@@ -2279,7 +2276,8 @@ enum oActionsSnowmansBottom {
 
 /* Water Bomb Cannon */
 enum oBehParams2ndByteWaterBombCannon {
-    WATER_BOMB_CANNON_BP_ACTIVE = 0x0,
+    WATER_BOMB_CANNON_BP_ACTIVE,
+    WATER_BOMB_CANNON_BP_INACTIVE,
 };
 enum oActionsWaterBombCannon {
     WATER_BOMB_CANNON_ACT_HIDDEN,
@@ -2318,12 +2316,13 @@ enum oActionsTTCMovingBar {
 
 /* TTC cog */
 enum oBehParams2ndByteTTCCog {
-    TTC_COG_BP_SHAPE_MASK     = 0x02,
-    TTC_COG_BP_SHAPE_HEXAGON  = (0 << 1),
-    TTC_COG_BP_SHAPE_TRIANGLE = (1 << 1),
-    TTC_COG_BP_DIR_MASK       = 0x01,
-    TTC_COG_BP_DIR_CCW        = (0 << 0), // TODO: Check these
-    TTC_COG_BP_DIR_CW         = (1 << 0),
+    TTC_COG_BP_SHAPE_MASK     = (BITMASK(1) << 1), // 0x02
+    TTC_COG_BP_SHAPE_HEXAGON  = (0 << 1),          // 0x00
+    TTC_COG_BP_SHAPE_TRIANGLE = (1 << 1),          // 0x02
+    // TODO: Check these
+    TTC_COG_BP_DIR_MASK       = BITMASK(1), // 0x01
+    TTC_COG_BP_DIR_CCW        = (0 << 0),   // 0x00
+    TTC_COG_BP_DIR_CW         = (1 << 0),   // 0x01
 };
 
 /* TTC Pit Block */
@@ -2342,8 +2341,7 @@ enum oBehParams2ndByteTTC2DRotator {
 enum oBehParams2ndByteTTCTreadmill {
     TREADMILL_BP_LARGE,
     TREADMILL_BP_SMALL,
-    TREADMILL_BP_SIZE_MASK = 0x1,
-    TREADMILL_BP_UNKNOWN,
+    TREADMILL_BP_SIZE_MASK = BITMASK(1), // 0x1
 };
 
 /* Activated Back-and-Forth Platform */
@@ -2354,8 +2352,8 @@ enum oBehParams1stByteActivatedBackAndForthPlatform { // (bparam1 & 0x03) aka pl
     ACTIVATED_BF_PLAT_TYPES_MASK,
 };
 enum oBehParams2ndByteActivatedBackAndForthPlatform {
-    ACTIVATED_BF_PLAT_DISTANCE_MASK = 0x7F,
-    ACTIVATED_BF_PLAT_FLAG_VERTICAL = BIT(7),
+    ACTIVATED_BF_PLAT_DISTANCE_MASK = BITMASK(7), // 0x7F
+    ACTIVATED_BF_PLAT_FLAG_VERTICAL = BIT(7),     // 0x80
 };
 
 /* Unagi */

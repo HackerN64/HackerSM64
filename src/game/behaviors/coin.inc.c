@@ -188,12 +188,16 @@ void spawn_coin_in_formation(s32 index, s32 shape) {
     switch (shape & COIN_FORMATION_BP_SHAPE_MASK) {
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_LINE:
             pos[2] = 160 * (index - 2);
-            if (index > 4) spawnCoin = FALSE;
+            if (index > 4) {
+                spawnCoin = FALSE;
+            }
             break;
         case COIN_FORMATION_BP_SHAPE_VERTICAL_LINE:
             snapToGround = FALSE;
             pos[1] = index << 7;
-            if (index > 4) spawnCoin = FALSE;
+            if (index > 4) {
+                spawnCoin = FALSE;
+            }
             break;
         case COIN_FORMATION_BP_SHAPE_HORIZONTAL_RING:
             pos[0] = sins(index << 13) * 300.0f;

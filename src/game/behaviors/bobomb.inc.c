@@ -131,7 +131,7 @@ void generic_bobomb_free_loop(void) {
     bobomb_check_interactions();
 
     if (o->oBobombFuseTimer > 150) {
-        o->oAction = 3;
+        o->oAction = BOBOMB_ACT_EXPLODE;
     }
 }
 
@@ -160,7 +160,7 @@ void stationary_bobomb_free_loop(void) {
     bobomb_check_interactions();
 
     if (o->oBobombFuseTimer > 150) {
-        o->oAction = 3;
+        o->oAction = BOBOMB_ACT_EXPLODE;
     }
 }
 

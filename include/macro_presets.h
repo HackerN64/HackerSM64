@@ -19,7 +19,7 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvBlueCoinSliding,                MODEL_BLUE_COIN,                    0}, // macro_sliding_blue_coin - unused
     {bhvRedCoin,                        MODEL_RED_COIN,                     0}, // macro_red_coin
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_5
-    {bhvCoinFormation,                  MODEL_NONE, (                       0                                                            )}, // macro_coin_line_horizontal
+    {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAGS_NONE                                                           )}, // macro_coin_line_horizontal
     {bhvCoinFormation,                  MODEL_NONE, (                             COIN_FORMATION_FLAG_RING                               )}, // macro_coin_ring_horizontal
     {bhvCoinFormation,                  MODEL_NONE, (                             COIN_FORMATION_FLAG_ARROW                              )}, // macro_coin_arrow
     {bhvCoinFormation,                  MODEL_NONE, (COIN_FORMATION_FLAG_FLYING                                                          )}, // macro_coin_line_horizontal_flying
@@ -341,8 +341,8 @@ struct MacroPreset MacroObjectPresets[] = {
     {bhvTTCSpinner,                     MODEL_TTC_SPINNER,                  0}, // macro_ttc_spinner
     {bhvTTC2DRotator,                   MODEL_TTC_SMALL_GEAR,               TTC_2D_ROTATOR_BP_2D_COG}, // macro_ttc_small_gear
     {bhvTTC2DRotator,                   MODEL_TTC_LARGE_GEAR,               TTC_2D_ROTATOR_BP_2D_COG}, // macro_ttc_large_gear
-    {bhvTTCTreadmill,                   MODEL_TTC_LARGE_TREADMILL,          TREADMILL_BP_UNKNOWN | TREADMILL_BP_LARGE}, // macro_ttc_large_treadmill_2
-    {bhvTTCTreadmill,                   MODEL_TTC_SMALL_TREADMILL,          TREADMILL_BP_UNKNOWN | TREADMILL_BP_SMALL}, // macro_ttc_small_treadmill_2
+    {bhvTTCTreadmill,                   MODEL_TTC_LARGE_TREADMILL,          TREADMILL_BP_LARGE}, // macro_ttc_large_treadmill_2
+    {bhvTTCTreadmill,                   MODEL_TTC_SMALL_TREADMILL,          TREADMILL_BP_SMALL}, // macro_ttc_small_treadmill_2
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_330
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_331
     {bhvYellowCoin,                     MODEL_YELLOW_COIN,                  0}, // macro_empty_332
