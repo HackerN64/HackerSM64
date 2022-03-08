@@ -310,7 +310,7 @@ void puppycam_change_setting(s8 toggle) {
     // Forgive me father, for I have sinned. I guess if you wanted a selling point for a 21:9 monitor though, "I can view this line in puppycam's code without scrolling!" can be added to it.
     *gPCOptions[gPCOptionSelected].gPCOptionVar = CLAMP(*gPCOptions[gPCOptionSelected].gPCOptionVar, gPCOptions[gPCOptionSelected].gPCOptionMin, gPCOptions[gPCOptionSelected].gPCOptionMax);
 
-#if defined(VERSION_EU)
+#if MULTILANG
     newcam_set_language();
 #endif
 }

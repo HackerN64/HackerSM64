@@ -5,7 +5,7 @@
 #include "surface_terrains.h"
 #include "types.h"
 
-#ifdef VERSION_EU
+#if MULTILANG
 #include "text_strings.h"
 #endif
 #include "make_const_nonconst.h"
@@ -1255,7 +1255,7 @@ ALIGNED8 static const Texture texture_menu_font_char_jp_exclamation[] = {
 #include "levels/menu/main_menu_seg7.0CCC8.ia8.inc.c"
 };
 
-#else
+#else // !(defined(VERSION_JP) || defined(VERSION_SH))
 
 // 0x0700AC40
 ALIGNED8 static const Texture texture_menu_font_char_0[] = {
@@ -1323,18 +1323,20 @@ ALIGNED8 static const Texture texture_menu_font_char_C[] = {
 };
 
 #ifdef VERSION_EU
+
 // 0x0700AF80
 ALIGNED8 static const Texture texture_menu_font_char_D[] = {
 #include "levels/menu/main_menu_seg7_eu.0AF80.ia8.inc.c"
 };
 
-#else
+#else // !VERSION_EU
 
 // 0x0700AF80
 ALIGNED8 static const Texture texture_menu_font_char_D[] = {
 #include "levels/menu/main_menu_seg7_us.0AF80.ia8.inc.c"
 };
-#endif
+
+#endif // !VERSION_EU
 
 // 0x0700AFC0
 ALIGNED8 static const Texture texture_menu_font_char_E[] = {
@@ -1467,6 +1469,7 @@ ALIGNED8 static const Texture texture_menu_font_char_dash[] = {
 };
 
 #ifdef VERSION_EU
+
 // 0x0700B640
 ALIGNED8 static const Texture texture_menu_font_char_comma[] = {
 #include "levels/menu/main_menu_seg7_eu.0B640.ia8.inc.c"
@@ -1477,7 +1480,7 @@ ALIGNED8 static const Texture texture_menu_font_char_apostrophe[] = {
 #include "levels/menu/main_menu_seg7_eu.0B680.ia8.inc.c"
 };
 
-#else
+#else // !VERSION_EU
 
 // 0x0700B640
 ALIGNED8 static const Texture texture_menu_font_char_comma[] = {
@@ -1488,7 +1491,8 @@ ALIGNED8 static const Texture texture_menu_font_char_comma[] = {
 ALIGNED8 static const Texture texture_menu_font_char_apostrophe[] = {
 #include "levels/menu/main_menu_seg7_us.0B680.ia8.inc.c"
 };
-#endif
+
+#endif // !VERSION_EU
 
 // 0x0700B6C0
 ALIGNED8 static const Texture texture_menu_font_char_exclamation[] = {
@@ -1519,9 +1523,10 @@ ALIGNED8 static const Texture texture_menu_font_char_period[] = {
 ALIGNED8 static const Texture texture_menu_font_char_ampersand[] = {
 #include "levels/menu/main_menu_seg7_us.0B800.ia8.inc.c"
 };
-#endif
+#endif // !(defined(VERSION_JP) || defined(VERSION_SH))
 
-#ifdef VERSION_EU
+#if MULTILANG
+
 // 0x0700B840
 ALIGNED8 static const Texture texture_menu_font_char_umlaut[] = {
 #include "levels/menu/main_menu_seg7_eu.0B840.ia8.inc.c"
@@ -1536,7 +1541,8 @@ ALIGNED8 static const Texture texture_menu_font_char_cedilla_mayus[] = {
 ALIGNED8 static const Texture texture_menu_font_char_colon[] = {
 #include "levels/menu/main_menu_seg7_eu.0B8C0.ia8.inc.c"
 };
-#endif
+
+#endif // MULTILANG
 
 // Menu small font print table
 // 0x0700CD08
@@ -1707,7 +1713,7 @@ const Gfx dl_menu_ia8_text_end[] = {
     gsSPEndDisplayList(),
 };
 
-#ifdef VERSION_EU
+#if MULTILANG
 
 // 0x0700BDA0 - 0x0700CDA0
 ALIGNED8 static const Texture texture_menu_course_upper[] = {
@@ -1792,7 +1798,7 @@ const Gfx dl_menu_rgba16_wood_course_end[] = {
     gsSPEndDisplayList(),
 };
 
-#ifdef VERSION_EU
+#if MULTILANG
 // 0x0700FEF0 - 0x0700FF00
 const Gfx dl_menu_texture_course_upper[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_menu_course_upper),
@@ -1827,7 +1833,7 @@ const Collision main_menu_seg7_collision[] = {
     COL_END(),
 };
 
-#ifdef VERSION_EU
+#if MULTILANG
 
 // Duplicate course name tables; the main menu needs all languages loaded at
 // once since it switches language, so the copies in segment 19 aren't good

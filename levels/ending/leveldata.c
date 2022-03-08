@@ -6,7 +6,7 @@
 
 #include "make_const_nonconst.h"
 
-#ifdef VERSION_EU
+#if MULTILANG
 #include "levels/ending/cake_eu.inc.c"
 
 #ifndef EU_CUSTOM_CAKE_FIX
@@ -252,8 +252,7 @@ const Gfx dl_cake_end_screen_eu_fix[] = {
 };
 #endif
 
-// VERSION_EU
-#else
+#else // !MULTILANG
 
 #include "levels/ending/cake.inc.c"
 

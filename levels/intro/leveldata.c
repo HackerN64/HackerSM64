@@ -3364,19 +3364,19 @@ ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/tm.custom.i4.inc.c"
 };
-#else
+#else // !INTRO_CREDIT
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 // 0x0700B4A0 - 0x0700B4A2
 ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 #include "levels/intro/2_eu_copyright.rgba16.inc.c"
 };
-#else
+#else // !(defined(VERSION_EU) || defined(VERSION_SH))
 // 0x0700B4A0 - 0x0700B4A2
 ALIGNED8 static const Texture intro_seg7_texture_copyright[] = {
 #include "levels/intro/2_copyright.rgba16.inc.c"
 };
-#endif
+#endif // !(defined(VERSION_EU) || defined(VERSION_SH))
 
 #if defined(VERSION_EU)
 // 0x0700C4A0 - 0x0700D4A0
@@ -3387,14 +3387,14 @@ ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/3_sh_tm.rgba16.inc.c"
 };
-#else
+#else // VERSION_JP || VERSION_US
 // 0x0700C4A0 - 0x0700D4A0
 ALIGNED8 static const Texture intro_seg7_texture_trademark[] = {
 #include "levels/intro/3_tm.rgba16.inc.c"
 };
-#endif
+#endif // Trademark
 
-#endif
+#endif // !INTRO_CREDIT
 
 // 0x0700C6A0 - 0x0700C790
 const Gfx intro_seg7_dl_copyright_trademark[] = {
