@@ -4,7 +4,7 @@
 f32 water_ring_calc_mario_dist(void) {
     Vec3f marioDist;
     vec3_diff(marioDist, &o->oPosVec, gMarioObject->header.gfx.pos);
-    marioDist[1] += 80.0f;
+    marioDist[1] += (MARIO_HITBOX_HEIGHT / 2);
     return vec3_dot(marioDist, &o->oWaterRingNormalVec);
 }
 #endif
