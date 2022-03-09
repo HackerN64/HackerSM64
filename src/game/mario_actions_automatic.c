@@ -614,7 +614,7 @@ s32 act_ledge_grab(struct MarioState *m) {
     {
         if (intendedDYaw >= -0x4000 && intendedDYaw <= 0x4000) {
             if (hasSpaceForMario) {
-                return set_mario_action(m, ACT_LEDGE_CLIMB_SLOW_1, 0);
+                return set_mario_action(m, ACT_LEDGE_CLIMB_SLOW, 0);
             }
         } else {
             return let_go_of_ledge(m);
@@ -656,7 +656,7 @@ s32 act_ledge_climb_slow(struct MarioState *m) {
 
     update_ledge_climb_camera(m);
     if (m->marioObj->header.gfx.animInfo.animFrame == 17) {
-        m->action = ACT_LEDGE_CLIMB_SLOW_2;
+        m->action = ACT_LEDGE_CLIMB_SLOW;
     }
 
     return FALSE;
@@ -900,8 +900,7 @@ s32 mario_execute_automatic_action(struct MarioState *m) {
         case ACT_HANGING:                cancel = act_hanging(m);                break;
         case ACT_HANG_MOVING:            cancel = act_hang_moving(m);            break;
         case ACT_LEDGE_GRAB:             cancel = act_ledge_grab(m);             break;
-        case ACT_LEDGE_CLIMB_SLOW_1:     cancel = act_ledge_climb_slow(m);       break;
-        case ACT_LEDGE_CLIMB_SLOW_2:     cancel = act_ledge_climb_slow(m);       break;
+        case ACT_LEDGE_CLIMB_SLOW:       cancel = act_ledge_climb_slow(m);       break;
         case ACT_LEDGE_CLIMB_DOWN:       cancel = act_ledge_climb_down(m);       break;
         case ACT_LEDGE_CLIMB_FAST:       cancel = act_ledge_climb_fast(m);       break;
         case ACT_GRABBED:                cancel = act_grabbed(m);                break;
