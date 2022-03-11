@@ -406,7 +406,16 @@ s32 perform_ground_step(struct MarioState *m) {
     return stepResult;
 }
 
-static s32 update_grabbed_floor(Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
+s32 is_ungrabbable_floor(struct Surface *floor) {
+    return (floor == NULL
+#ifdef LEDGE_GRABS_CHECK_SLOPE_ANGLE
+         || floor->normal.y < COS25 // TODO: Mario should still be able to ledge grab if floor is facing away.
+         // TODO: check if floor is actually slippery.
+#endif
+         || SURFACE_IS_UNSAFE(floor->type));
+}
+
+s32 update_grabbed_floor(Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
     // Get the floor under the ledge grab position.
     ledgePos[1] = find_floor(ledgePos[0], (ledgePos[1] + LEDGE_GRAB_MAX_HEIGHT), ledgePos[2], ledgeFloor);
 
@@ -415,16 +424,12 @@ static s32 update_grabbed_floor(Vec3f nextPos, Vec3f ledgePos, struct Surface **
         return TRUE;
     }
 
-    struct Surface *floor = *ledgeFloor;
+    if (ledgeFloor == NULL) {
+        return TRUE;
+    }
 
-    // Check if the floor's type is 
-    return (ledgeFloor == NULL
-         || floor == NULL
-#ifdef LEDGE_GRABS_CHECK_SLOPE_ANGLE
-         || floor->normal.y < COS25 // TODO: Mario should still be able to ledge grab if floor is facing away.
-         // TODO: check if floor is actually slippery.
-#endif
-         || SURFACE_IS_UNSAFE(floor->type));
+    // Check if the floor's type is grabbable.
+    return (is_ungrabbable_floor(*ledgeFloor));
 }
 
 struct Surface *check_ledge_grab(struct MarioState *m, struct WallCollisionData *wallData, Vec3f intendedPos, Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {

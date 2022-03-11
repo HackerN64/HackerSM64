@@ -107,6 +107,14 @@ void check_ledge_climb_down(struct MarioState *m) {
                 s16 wallAngle = get_surface_yaw(wall);
 
                 if (abs_angle_diff(wallAngle, m->faceAngle[1]) < 0x4000) {
+                    struct Surface *ledgeFloor = NULL;
+
+                    find_floor(m->prevPos[0], m->prevPos[1], m->prevPos[2], &ledgeFloor);
+
+                    if (is_ungrabbable_floor(ledgeFloor)) {
+                        return;
+                    }
+
                     m->pos[0] = wallCols.x - (20.0f * wall->normal.x);
                     m->pos[2] = wallCols.z - (20.0f * wall->normal.z);
 
