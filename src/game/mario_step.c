@@ -409,22 +409,20 @@ s32 perform_ground_step(struct MarioState *m) {
 struct Surface *check_ledge_grab(struct MarioState *m, struct WallCollisionData *wallData, Vec3f intendedPos, Vec3f nextPos, Vec3f ledgePos, struct Surface **ledgeFloor) {
     struct Surface *prevWall = NULL;
     struct Surface *wall = NULL;
-    f32 prevPush = F32_MAX;
-    f32 currPush = F32_MAX;
-    f32 velX = m->vel[0];
-    f32 velZ = m->vel[2];
     f32 nx, nz;
     f32 displacementX = (nextPos[0] - intendedPos[0]);
     f32 displacementZ = (nextPos[2] - intendedPos[2]);
+    s16 wallDYaw = 0x0;
+    s16 oldWallDYaw = 0x0;
 
     // Only ledge grab if the wall displaced Mario in the opposite direction of his velocity.
     // hdot(displacement, vel).
-    if ((displacementX * velX) + (displacementZ * velZ) > 0.0f) {
+    if ((displacementX * m->vel[0]) + (displacementZ * m->vel[2]) > 0.0f) {
         return NULL;
     }
 
-    s32 i;
-    for (i = 0; i < wallData->numWalls; i++) {
+    // Loop through Mario's collided walls and find the wall with the best angle.
+    for (s32 i = 0; i < wallData->numWalls; i++) {
         // Get the current wall.
         wall = wallData->walls[i];
 
@@ -437,14 +435,11 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct WallCollisionData 
         nx = wall->normal.x;
         nz = wall->normal.z;
 
-        // The amount Mario is moving into the wall.
-        // Smaller = better wall angle.
-        // This is similar to abs_angle_diff(wallYaw, moveYaw).
-        // hdot(normal, vel)
-        currPush = (nx * velX) + (nz * velZ);
+        // Get the difference between the wall's yaw' and Mario's yaw.
+        wallDYaw = abs_angle_diff(atan2s(nz, nx), m->faceAngle[1]);
 
-        // Skip the wall if Mario is moving less into it than into a previous wall.
-        if (prevWall != NULL && currPush > prevPush) {
+        // Skip the wall if it is farther from the ideal yaw (opposite Mario's yaw) than a previous wall.
+        if (wallDYaw < oldWallDYaw) {
             continue;
         }
 
@@ -464,7 +459,7 @@ struct Surface *check_ledge_grab(struct MarioState *m, struct WallCollisionData 
 
         // The current wall is a valid ledge grab.
         prevWall = wall;
-        prevPush = currPush;
+        oldWallDYaw = wallDYaw;
     }
 
     return prevWall;
@@ -619,7 +614,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             vec3f_copy(m->pos, ledgePos);
             set_mario_floor(m, floor, ledgePos[1]);
             m->faceAngle[0] = 0x0;
-            m->faceAngle[1] = get_surface_yaw(grabbedWall) + 0x8000;
+            m->faceAngle[1] = (s16)(get_surface_yaw(grabbedWall) + 0x8000);
             stepResult = AIR_STEP_GRABBED_LEDGE;
         } else {
             vec3f_copy(m->pos, nextPos);
