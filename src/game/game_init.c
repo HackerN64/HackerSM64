@@ -102,7 +102,7 @@ struct DemoInput gRecordedDemoInput = { 0 };
  */
 const Gfx init_rdp[] = {
     gsDPPipeSync(),
-    gsDPPipelineMode(G_PM_1PRIMITIVE),
+    gsDPPipelineMode(G_PM_NPRIMITIVE),
 
     gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),

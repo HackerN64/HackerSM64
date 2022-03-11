@@ -851,10 +851,10 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
         cycleadd = 0;
     }
 
-    gDPPipeSync(gDisplayListHead++);
     gDPSetFillColor(gDisplayListHead++, (GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1));
     print_set_envcolour(r, g, b, a);
     gDPFillRectangle(gDisplayListHead++, x1, y1, x2 - cycleadd, y2 - cycleadd);
+    gDPPipeSync(gDisplayListHead++);
 }
 
 extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);

@@ -122,6 +122,7 @@ const Gfx coin_seg3_dl_start[] = {
 // 0x030077D0 - 0x03007800
 const Gfx coin_seg3_dl_end[] = {
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsDPPipeSync(),
     gsSPTexture(0x0001, 0x0001, 0, G_TX_RENDERTILE, G_OFF),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_LIGHTING),
@@ -502,6 +503,7 @@ const Gfx coin_seg3_sub_dl_begin[] = {
 // 0x030077D0 - 0x03007800
 const Gfx coin_seg3_sub_dl_end[] = {
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
+    gsDPPipeSync(),
     gsSPTexture(0x0001, 0x0001, 0, G_TX_RENDERTILE, G_OFF),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPSetGeometryMode(G_LIGHTING),
