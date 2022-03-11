@@ -646,13 +646,8 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
             m->faceAngle[0] = 0x0;
             m->faceAngle[1] = (s16)(get_surface_yaw(grabbedWall) + 0x8000);
 
-            stepResult = AIR_STEP_GRABBED_LEDGE;
-        } else {
-            vec3f_copy(m->pos, nextPos);
-            set_mario_floor(m, floor, floorHeight);
+            return AIR_STEP_GRABBED_LEDGE;
         }
-
-        return stepResult;
     }
 
     // Update Mario's position and floor.
