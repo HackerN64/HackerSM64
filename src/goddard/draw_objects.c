@@ -880,9 +880,9 @@ void draw_bone(struct GdObj *obj) {
 void draw_joint(struct GdObj *obj) {
     struct ObjJoint *joint = (struct ObjJoint *) obj;
     s32 colour;
-    struct ObjShape *boneShape;
+    struct ObjShape *boneShape = joint->shapePtr;
 
-    if ((boneShape = joint->shapePtr) == NULL) {
+    if (boneShape == NULL) {
         return;
     }
 

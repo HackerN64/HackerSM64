@@ -195,10 +195,10 @@ void collision_something_801926A4(struct ObjNet *net) {
 
 /* 2412A0 -> 24142C; not called */
 void func_80192AD0(struct ObjNet *net) {
-    struct ObjGroup *sp60;
+    struct ObjGroup *sp60 = net->unk1C8;
     struct ObjNet *sp18;
 
-    if ((sp60 = net->unk1C8) == NULL) {
+    if (sp60 == NULL) {
         return;
     }
 

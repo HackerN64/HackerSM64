@@ -117,7 +117,9 @@ static void water_bomb_act_drop(void) {
         if (!o->oWaterBombOnGround) {
             o->oWaterBombOnGround = TRUE;
 
-            if ((o->oWaterBombNumBounces += 1.0f) < 3.0f) {
+            o->oWaterBombNumBounces += 1.0f;
+
+            if (o->oWaterBombNumBounces < 3.0f) {
                 cur_obj_play_sound_2(SOUND_OBJ_WATER_BOMB_BOUNCING);
             } else {
                 create_sound_spawner(SOUND_OBJ_DIVING_IN_WATER);

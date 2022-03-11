@@ -68,7 +68,9 @@ void bhv_ttc_rotating_solid_update(void) {
         } else {
             // 2. Move vertically with vel -4.5, -4.0, ... until reached back home
             o->oTTCRotatingSolidVelY += 0.5f;
-            if ((o->oPosY += o->oTTCRotatingSolidVelY) >= o->oHomeY) {
+            o->oPosY += o->oTTCRotatingSolidVelY;
+
+            if (o->oPosY > o->oHomeY) {
                 o->oPosY = o->oHomeY;
                 o->oTTCRotatingSolidSoundTimer = 6;
             }

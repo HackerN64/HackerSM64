@@ -79,8 +79,10 @@ static void swoop_act_move(void) {
             o->oSwoopBonkCountdown = 30;
         }
 
+        o->oSwoopTargetPitch = obj_get_pitch_from_vel();
+
         // Tilt upward when approaching mario
-        if ((o->oSwoopTargetPitch = obj_get_pitch_from_vel()) == 0) {
+        if (o->oSwoopTargetPitch == 0) {
             o->oSwoopTargetPitch += o->oForwardVel * 500;
         }
         obj_move_pitch_approach(o->oSwoopTargetPitch, 140);

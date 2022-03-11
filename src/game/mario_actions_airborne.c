@@ -1684,7 +1684,9 @@ s32 act_shot_from_cannon(struct MarioState *m) {
         set_mario_action(m, ACT_FLYING, 0);
     }
 
-    if ((m->forwardVel -= 0.05f) < 10.0f) {
+    m->forwardVel -= 0.05f;
+
+    if (m->forwardVel < 10.0f) {
         mario_set_forward_vel(m, 10.0f);
     }
 

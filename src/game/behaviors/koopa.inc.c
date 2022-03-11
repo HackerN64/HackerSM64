@@ -69,7 +69,9 @@ static struct KoopaTheQuickProperties sKoopaTheQuickProperties[] = {
  * Initialization function.
  */
 void bhv_koopa_init(void) {
-    if ((o->oKoopaMovementType = o->oBehParams2ndByte) == KOOPA_BP_TINY) {
+    o->oKoopaMovementType = o->oBehParams2ndByte;
+
+    if (o->oKoopaMovementType == KOOPA_BP_TINY) {
         // Tiny koopa in THI
         o->oKoopaMovementType = KOOPA_BP_NORMAL;
         o->oKoopaAgility = 1.6f / 3.0f;

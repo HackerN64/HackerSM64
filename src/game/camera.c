@@ -2141,7 +2141,8 @@ s32 update_default_camera(struct Camera *c) {
     // Make Lakitu fly above the gas
     gasHeight = find_poison_gas_level(cPos[0], cPos[2]);
     if (gasHeight != FLOOR_LOWER_LIMIT) {
-        if ((gasHeight += 130.f) > c->pos[1]) {
+        gasHeight += 130.0f;
+        if (c->pos[1] < gasHeight) {
             c->pos[1] = gasHeight;
         }
     }
@@ -8001,7 +8002,8 @@ void cutscene_suffocation_stay_above_gas(struct Camera *c) {
     f32 gasLevel = find_poison_gas_level(sMarioCamState->pos[0], sMarioCamState->pos[2]);
 
     if (gasLevel != FLOOR_LOWER_LIMIT) {
-        if ((gasLevel += 130.f) > c->pos[1]) {
+        gasLevel += 130.0f;
+        if (c->pos[1] < gasLevel) {
             c->pos[1] = gasLevel;
         }
     }

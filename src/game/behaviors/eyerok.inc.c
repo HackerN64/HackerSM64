@@ -81,7 +81,9 @@ static void eyerok_boss_act_fight(void) {
 
                 if (o->oEyerokBossAttackCountdown != 0 && o->oEyerokBossAttackCountdown != 1) {
                     o->oEyerokBossAttackPhase++;
-                    if ((o->oEyerokBossActiveHand = o->oEyerokBossAttackPhase & 0x1) == 0) {
+                    o->oEyerokBossActiveHand = o->oEyerokBossAttackPhase & 0x1;
+
+                    if (o->oEyerokBossActiveHand == 0) {
                         o->oEyerokBossActiveHand = -1;
                     }
                 }
@@ -105,8 +107,12 @@ static void eyerok_boss_act_fight(void) {
 
                 o->oEyerokBossClampedMarioPosZ = gMarioObject->oPosZ;
                 clamp_f32(&o->oEyerokBossClampedMarioPosZ, o->oPosZ + 400.0f, o->oPosZ + 1600.0f);
-            } else if ((o->oEyerokBossActiveHand = o->oEyerokBossAttackPhase & 0x1) == 0) {
-                o->oEyerokBossActiveHand = -1;
+            } else {
+                o->oEyerokBossActiveHand = o->oEyerokBossAttackPhase & 0x1;
+
+                if (o->oEyerokBossActiveHand == 0) {
+                    o->oEyerokBossActiveHand = -1;
+                }
             }
         }
     }

@@ -8,7 +8,9 @@ void bhv_bubble_cannon_barrel_loop(void) {
         o->oMoveAnglePitch = o->parentObj->oMoveAnglePitch + 0x4000;
         o->oFaceAnglePitch = o->parentObj->oMoveAnglePitch;
 
-        if ((o->oCannonBarrelBubblesForwardVelCheck += o->oForwardVel) > 0.0f) {
+        o->oCannonBarrelBubblesForwardVelCheck += o->oForwardVel;
+
+        if (o->oCannonBarrelBubblesForwardVelCheck > 0.0f) {
             cur_obj_set_pos_via_transform();
             obj_forward_vel_approach(-5.0f, 18.0f);
         } else {

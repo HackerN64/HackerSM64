@@ -175,19 +175,23 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     newFacingDYaw = facingDYaw;
 
     if (newFacingDYaw > 0 && newFacingDYaw <= 0x4000) {
-        if ((newFacingDYaw -= 0x200) < 0) {
+        newFacingDYaw -= 0x200;
+        if (newFacingDYaw < 0) {
             newFacingDYaw = 0;
         }
     } else if (newFacingDYaw >= -0x4000 && newFacingDYaw < 0) {
-        if ((newFacingDYaw += 0x200) > 0) {
+        newFacingDYaw += 0x200;
+        if (newFacingDYaw > 0) {
             newFacingDYaw = 0;
         }
     } else if (newFacingDYaw > 0x4000 && newFacingDYaw < 0x8000) {
-        if ((newFacingDYaw += 0x200) > 0x8000) {
+        newFacingDYaw += 0x200;
+        if (newFacingDYaw > 0x8000) {
             newFacingDYaw = 0x8000;
         }
     } else if (newFacingDYaw > -0x8000 && newFacingDYaw < -0x4000) {
-        if ((newFacingDYaw -= 0x200) < -0x8000) {
+        newFacingDYaw -= 0x200;
+        if (newFacingDYaw < -0x8000) {
             newFacingDYaw = -0x8000;
         }
     }
@@ -409,7 +413,9 @@ s32 apply_slope_decel(struct MarioState *m, f32 decelCoef) {
             break;
     }
 
-    if ((m->forwardVel = approach_f32(m->forwardVel, 0.0f, decel, decel)) == 0.0f) {
+    m->forwardVel = approach_f32(m->forwardVel, 0.0f, decel, decel);
+
+    if (m->forwardVel == 0.0f) {
         stopped = TRUE;
     }
 
@@ -420,7 +426,9 @@ s32 apply_slope_decel(struct MarioState *m, f32 decelCoef) {
 s32 update_decelerating_speed(struct MarioState *m) {
     s32 stopped = FALSE;
 
-    if ((m->forwardVel = approach_f32(m->forwardVel, 0.0f, 1.0f, 1.0f)) == 0.0f) {
+    m->forwardVel = approach_f32(m->forwardVel, 0.0f, 1.0f, 1.0f);
+
+    if (m->forwardVel == 0.0f) {
         stopped = TRUE;
     }
 
@@ -848,7 +856,9 @@ s32 act_move_punching(struct MarioState *m) {
     if (m->forwardVel >= 0.0f) {
         apply_slope_decel(m, 0.5f);
     } else {
-        if ((m->forwardVel += 8.0f) >= 0.0f) {
+        m->forwardVel += 8.0f;
+
+        if (m->forwardVel > 0.0f) {
             m->forwardVel = 0.0f;
         }
         apply_slope_accel(m);

@@ -770,7 +770,8 @@ s32 act_quicksand_death(struct MarioState *m) {
         if (m->quicksandDepth >= 100.0f) {
             play_sound_if_no_flag(m, SOUND_MARIO_WAAAOOOW, MARIO_ACTION_SOUND_PLAYED);
         }
-        if ((m->quicksandDepth += 5.0f) >= 180.0f) {
+        m->quicksandDepth += 5.0f;
+        if (m->quicksandDepth >= 180.0f) {
             level_trigger_warp(m, WARP_OP_DEATH);
             m->actionState = ACT_STATE_QUICKSAND_DEATH_DEAD;
         }
@@ -1532,11 +1533,11 @@ s32 act_shocked(struct MarioState *m) {
 
 s32 act_squished(struct MarioState *m) {
     f32 squishAmount;
-    f32 spaceUnderCeil;
     s16 surfAngle;
     s32 underSteepSurf = FALSE; // seems to be responsible for setting velocity?
+    f32 spaceUnderCeil = m->ceilHeight - m->floorHeight;
 
-    if ((spaceUnderCeil = m->ceilHeight - m->floorHeight) < 0) {
+    if (spaceUnderCeil < 0) {
         spaceUnderCeil = 0;
     }
 
@@ -2144,7 +2145,9 @@ static void end_peach_cutscene_descend_peach(struct MarioState *m) {
         set_mario_animation(m, MARIO_ANIM_CREDITS_RETURN_FROM_LOOK_UP);
     }
 
-    if ((sEndPeachObj->oPosY -= m->actionState / 10) <= 907.0f) {
+    sEndPeachObj->oPosY -= m->actionState / 10;
+
+    if (sEndPeachObj->oPosY <= 907.0f) {
         sEndPeachObj->oPosY = 906.0f;
     }
 
@@ -2165,7 +2168,9 @@ static void end_peach_cutscene_run_to_peach(struct MarioState *m) {
         sEndPeachAnimation = PEACH_ANIM_LOOK_UP_AND_OPEN_EYES;
     }
 
-    if ((m->pos[2] -= 20.0f) <= -1181.0f) {
+    m->pos[2] -= 20.0f;
+
+    if (m->pos[2] <= -1181.0f) {
         m->pos[2] = -1180.0f;
         advance_cutscene_step(m);
     }

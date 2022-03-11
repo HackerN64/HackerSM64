@@ -245,7 +245,8 @@ void init_sample_dma_buffers(UNUSED s32 arg0) {
             gMaxSimultaneousNotes * 4 * sizeof(struct SharedDma) * gAudioBufferParameters.presetUnk4);
 
     for (i = 0; i < gMaxSimultaneousNotes * 3 * gAudioBufferParameters.presetUnk4; i++) {
-        if ((sSampleDmas[gSampleDmaNumListItems].buffer = sound_alloc_uninitialized(&gNotesAndBuffersPool, sDmaBufSize)) == NULL) {
+        sSampleDmas[gSampleDmaNumListItems].buffer = sound_alloc_uninitialized(&gNotesAndBuffersPool, sDmaBufSize);
+        if (sSampleDmas[gSampleDmaNumListItems].buffer == NULL) {
             break;
         }
         sSampleDmas[gSampleDmaNumListItems].bufSize = sDmaBufSize;
@@ -271,7 +272,8 @@ void init_sample_dma_buffers(UNUSED s32 arg0) {
 
     sDmaBufSize = 0x2D0;
     for (i = 0; i < gMaxSimultaneousNotes; i++) {
-        if ((sSampleDmas[gSampleDmaNumListItems].buffer = sound_alloc_uninitialized(&gNotesAndBuffersPool, sDmaBufSize)) == NULL) {
+        sSampleDmas[gSampleDmaNumListItems].buffer = sound_alloc_uninitialized(&gNotesAndBuffersPool, sDmaBufSize);
+        if (sSampleDmas[gSampleDmaNumListItems].buffer == NULL) {
             break;
         }
         sSampleDmas[gSampleDmaNumListItems].bufSize = sDmaBufSize;

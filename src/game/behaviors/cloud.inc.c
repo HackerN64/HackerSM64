@@ -63,8 +63,9 @@ static void cloud_fwoosh_update(void) {
     } else {
         if (o->oCloudBlowing) {
             o->header.gfx.scale[0] += o->oCloudGrowSpeed;
+            o->oCloudGrowSpeed -= 0.005f;
 
-            if ((o->oCloudGrowSpeed -= 0.005f) < -0.16f) {
+            if (o->oCloudGrowSpeed < -0.16f) {
                 // Stop blowing once we are shrinking faster than -0.16
                 o->oCloudBlowing = o->oTimer = 0;
             } else if (o->oCloudGrowSpeed < -0.1f) {

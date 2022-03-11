@@ -29,7 +29,9 @@ void bhv_sl_snowman_wind_loop(void) {
     // Blowing, spawn wind particles (SL_SNOWMAN_WIND_ACT_BLOWING)
     } else if (o->oDistanceToMario < 1500.0f && absf(gMarioObject->oPosY - o->oHomeY) < 500.0f) {
         // Point towards Mario, but only within 0x1500 angle units of the original angle.
-        if ((marioAngleFromWindSource = o->oAngleToMario - o->oSLSnowmanWindOriginalYaw) > 0) {
+        marioAngleFromWindSource = o->oAngleToMario - o->oSLSnowmanWindOriginalYaw;
+
+        if (marioAngleFromWindSource > 0) {
             if (marioAngleFromWindSource < 0x1500) {
                 o->oMoveAngleYaw = o->oAngleToMario;
             } else {

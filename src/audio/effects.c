@@ -204,7 +204,9 @@ f32 get_vibrato_freq_scale(struct VibratoState *vib) {
 
         vib->extentChangeTimer--;
     } else if (vib->seqChannel->vibratoExtentTarget != (s32) vib->extent) {
-        if ((vib->extentChangeTimer = vib->seqChannel->vibratoExtentChangeDelay) == 0) {
+        vib->extentChangeTimer = vib->seqChannel->vibratoExtentChangeDelay;
+
+        if (vib->extentChangeTimer == 0) {
             vib->extent = (s32) vib->seqChannel->vibratoExtentTarget;
         }
     }
@@ -218,7 +220,9 @@ f32 get_vibrato_freq_scale(struct VibratoState *vib) {
 
         vib->rateChangeTimer--;
     } else if (vib->seqChannel->vibratoRateTarget != (s32) vib->rate) {
-        if ((vib->rateChangeTimer = vib->seqChannel->vibratoRateChangeDelay) == 0) {
+        vib->rateChangeTimer = vib->seqChannel->vibratoRateChangeDelay;
+
+        if (vib->rateChangeTimer == 0) {
             vib->rate = (s32) vib->seqChannel->vibratoRateTarget;
         }
     }
@@ -282,13 +286,17 @@ void note_vibrato_init(struct Note *note) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
     vib->curve = gWaveSamples[2];
     vib->seqChannel = note->parentLayer->seqChannel;
-    if ((vib->extentChangeTimer = vib->seqChannel->vibratoExtentChangeDelay) == 0) {
+    vib->extentChangeTimer = vib->seqChannel->vibratoExtentChangeDelay;
+
+    if (vib->extentChangeTimer == 0) {
         vib->extent = FLOAT_CAST(vib->seqChannel->vibratoExtentTarget);
     } else {
         vib->extent = FLOAT_CAST(vib->seqChannel->vibratoExtentStart);
     }
 
-    if ((vib->rateChangeTimer = vib->seqChannel->vibratoRateChangeDelay) == 0) {
+    vib->rateChangeTimer = vib->seqChannel->vibratoRateChangeDelay;
+
+    if (vib->rateChangeTimer == 0) {
         vib->rate = FLOAT_CAST(vib->seqChannel->vibratoRateTarget);
     } else {
         vib->rate = FLOAT_CAST(vib->seqChannel->vibratoRateStart);
@@ -301,13 +309,17 @@ void note_vibrato_init(struct Note *note) {
     vib->seqChannel = note->parentLayer->seqChannel;
     struct SequenceChannel *seqChannel = vib->seqChannel;
 
-    if ((vib->extentChangeTimer = seqChannel->vibratoExtentChangeDelay) == 0) {
+    vib->extentChangeTimer = seqChannel->vibratoExtentChangeDelay;
+
+    if (vib->extentChangeTimer == 0) {
         vib->extent = seqChannel->vibratoExtentTarget;
     } else {
         vib->extent = seqChannel->vibratoExtentStart;
     }
 
-    if ((vib->rateChangeTimer = seqChannel->vibratoRateChangeDelay) == 0) {
+    vib->rateChangeTimer = seqChannel->vibratoRateChangeDelay;
+
+    if (vib->rateChangeTimer == 0) {
         vib->rate = seqChannel->vibratoRateTarget;
     } else {
         vib->rate = seqChannel->vibratoRateStart;

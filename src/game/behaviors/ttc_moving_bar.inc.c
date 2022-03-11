@@ -23,8 +23,10 @@ static s8 sTTCMovingBarRandomDelays[] = { 1, 12, 55, 100 };
  * Init function for bhvTTCMovingBar.
  */
 void bhv_ttc_moving_bar_init(void) {
+    o->oTTCMovingBarDelay = sTTCMovingBarDelays[gTTCSpeedSetting];
+
     // If on still setting, then stick out
-    if ((o->oTTCMovingBarDelay = sTTCMovingBarDelays[gTTCSpeedSetting]) == 0) {
+    if (o->oTTCMovingBarDelay == 0) {
         o->oTTCMovingBarOffset = 250.0f;
     }
 
@@ -67,7 +69,9 @@ static void ttc_moving_bar_act_wait(void) {
  */
 static void ttc_moving_bar_act_pull_back(void) {
     // Started with -8 speed, accelerate back to > 0
-    if ((o->oTTCMovingBarSpeed += 0.73f) > 0.0f) {
+    o->oTTCMovingBarSpeed += 0.73f;
+
+    if (o->oTTCMovingBarSpeed > 0.0f) {
         // Possibly pause after pulling back
         if (o->oTTCMovingBarStoppedTimer != 0) {
             o->oTTCMovingBarStoppedTimer--;

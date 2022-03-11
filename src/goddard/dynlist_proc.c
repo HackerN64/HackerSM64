@@ -719,22 +719,26 @@ void d_attach_to(s32 flag, struct GdObj *obj) {
     // find or generate attachment groups
     switch (obj->type) {
         case OBJ_TYPE_JOINTS:
-            if ((attgrp = ((struct ObjJoint *) obj)->attachedObjsGrp) == NULL) {
+            attgrp = ((struct ObjJoint *) obj)->attachedObjsGrp;
+            if (attgrp == NULL) {
                 attgrp = ((struct ObjJoint *) obj)->attachedObjsGrp = make_group(0);
             }
             break;
         case OBJ_TYPE_NETS:
-            if ((attgrp = ((struct ObjNet *) obj)->attachedObjsGrp) == NULL) {
+            attgrp = ((struct ObjNet *) obj)->attachedObjsGrp;
+            if (attgrp == NULL) {
                 attgrp = ((struct ObjNet *) obj)->attachedObjsGrp = make_group(0);
             }
             break;
         case OBJ_TYPE_PARTICLES:
-            if ((attgrp = ((struct ObjParticle *) obj)->attachedObjsGrp) == NULL) {
+            attgrp = ((struct ObjParticle *) obj)->attachedObjsGrp;
+            if (attgrp == NULL) {
                 attgrp = ((struct ObjParticle *) obj)->attachedObjsGrp = make_group(0);
             }
             break;
         case OBJ_TYPE_ANIMATORS:
-            if ((attgrp = ((struct ObjAnimator *) obj)->attachedObjsGrp) == NULL) {
+            attgrp = ((struct ObjAnimator *) obj)->attachedObjsGrp;
+            if (attgrp == NULL) {
                 attgrp = ((struct ObjAnimator *) obj)->attachedObjsGrp = make_group(0);
             }
             break;
@@ -845,11 +849,15 @@ void alloc_animdata(struct ObjAnimator *animator) {
 
     start_memtracker("animdata");
 
-    if ((animgrp = animator->animdataGrp) == NULL) {
+    animgrp = animator->animdataGrp;
+
+    if (animgrp == NULL) {
         fatal_printf("no anim group");
     }
 
-    if ((curAnimSrc = (struct AnimDataInfo *) animgrp->firstMember->obj) == NULL) {
+    curAnimSrc = (struct AnimDataInfo *) animgrp->firstMember->obj;
+
+    if (curAnimSrc == NULL) {
         fatal_printf("no animation data");
     }
 
@@ -861,7 +869,9 @@ void alloc_animdata(struct ObjAnimator *animator) {
     }
 
     animDst = gd_malloc_perm(animCnt * sizeof(struct AnimDataInfo)); // gd_alloc_perm
-    if ((animDataArr = animDst) == NULL) {
+    animDataArr = animDst;
+
+    if (animDataArr == NULL) {
         fatal_printf("cant allocate animation data");
     }
 

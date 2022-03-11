@@ -111,24 +111,30 @@ static void mr_blizzard_act_rise_from_ground(void) {
     // If the timer is not 0, decrement by 1 until it reaches 0.
     if (o->oMrBlizzardTimer != 0) {
         o->oMrBlizzardTimer--;
-    } else if ((o->oMrBlizzardGraphYOffset += o->oMrBlizzardGraphYVel) > 24.0f) {
-        // Increments GraphYOffset by GraphYVel until it is greater than 24,
-        // moving Mr. Blizzard's graphical position upward each frame.
-        // Then, Mr. Blizzard's Y-position is increased by the value of
-        // GraphYOffset minus 24, GraphYOffset is
-        // set to 24, VelY is set to GraphYVel and action is moved to rotate.
-        o->oPosY += o->oMrBlizzardGraphYOffset - 24.0f;
-        o->oMrBlizzardGraphYOffset = 24.0f;
+    } else {
+        o->oMrBlizzardGraphYOffset += o->oMrBlizzardGraphYVel;
+        if (o->oMrBlizzardGraphYOffset > 24.0f) {
+            // Increments GraphYOffset by GraphYVel until it is greater than 24,
+            // moving Mr. Blizzard's graphical position upward each frame.
+            // Then, Mr. Blizzard's Y-position is increased by the value of
+            // GraphYOffset minus 24, GraphYOffset is
+            // set to 24, VelY is set to GraphYVel and action is moved to rotate.
+            o->oPosY += o->oMrBlizzardGraphYOffset - 24.0f;
+            o->oMrBlizzardGraphYOffset = 24.0f;
 
-        mr_blizzard_spawn_white_particles(8, -20, 20, 15, 10);
+            mr_blizzard_spawn_white_particles(8, -20, 20, 15, 10);
 
-        o->oAction = MR_BLIZZARD_ACT_ROTATE;
-        o->oVelY = o->oMrBlizzardGraphYVel;
-    } else if ((o->oMrBlizzardGraphYVel -= 10.0f) < 0.0f) {
-        // Decrement GraphYOffset until it is less than 0.
-        // When it is less than 0, set it to 47 and set timer to 5.
-        o->oMrBlizzardGraphYVel = 47.0f;
-        o->oMrBlizzardTimer = 5;
+            o->oAction = MR_BLIZZARD_ACT_ROTATE;
+            o->oVelY = o->oMrBlizzardGraphYVel;
+        } else {
+            o->oMrBlizzardGraphYVel -= 10.0f;
+            if (o->oMrBlizzardGraphYVel < 0.0f) {
+                // Decrement GraphYOffset until it is less than 0.
+                // When it is less than 0, set it to 47 and set timer to 5.
+                o->oMrBlizzardGraphYVel = 47.0f;
+                o->oMrBlizzardTimer = 5;
+            }
+        }
     }
 }
 
@@ -235,7 +241,9 @@ static void mr_blizzard_act_death(void) {
         }
 
         if (o->oMrBlizzardScale != 0.0f) {
-            if ((o->oMrBlizzardScale -= 0.03f) <= 0.0f) {
+            o->oMrBlizzardScale -= 0.03f;
+
+            if (o->oMrBlizzardScale <= 0.0f) {
                 o->oMrBlizzardScale = 0.0f;
                 if (!GET_BPARAM3(o->oBehParams)) {
                     obj_spawn_loot_yellow_coins(o, o->oNumLootCoins, 20.0f);

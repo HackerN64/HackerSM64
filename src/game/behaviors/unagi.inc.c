@@ -101,7 +101,9 @@ void unagi_act_3(void) {
     if (o->oUnagiDistFromHome < 0.0f) {
         cur_obj_init_animation_with_sound(UNAGI_ANIM_IDLE_2);
 
-        if ((o->oUnagiDistFromHome += 10.0f) > 0.0f) {
+        o->oUnagiDistFromHome += 10.0f;
+
+        if (o->oUnagiDistFromHome > 0.0f) {
             o->oUnagiDistFromHome = 0.0f;
         }
     } else {
@@ -134,8 +136,11 @@ void unagi_act_3(void) {
 
         approach_f32_ptr(&o->oUnagiNextForwardVel, o->oUnagiTargetNextForwardVel, 4.0f);
 
-        if ((o->oUnagiDistFromHome += o->oUnagiNextForwardVel) < 0.0f) {
-            o->oUnagiDistFromHome = o->oUnagiNextForwardVel = 0.0f;
+        o->oUnagiDistFromHome += o->oUnagiNextForwardVel;
+
+        if (o->oUnagiDistFromHome < 0.0f) {
+            o->oUnagiDistFromHome = 0.0f;
+            o->oUnagiNextForwardVel = 0.0f;
             o->oTimer = 0;
         }
     }

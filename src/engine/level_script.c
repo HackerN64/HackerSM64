@@ -572,7 +572,9 @@ static void level_cmd_3A(void) {
     struct UnusedArea28 *val4;
 
     if (sCurrAreaIndex != -1) {
-        if ((val4 = gAreas[sCurrAreaIndex].unused) == NULL) {
+        val4 = gAreas[sCurrAreaIndex].unused;
+
+        if (val4 == NULL) {
             val4 = gAreas[sCurrAreaIndex].unused =
                 alloc_only_pool_alloc(sLevelPool, sizeof(struct UnusedArea28));
         }
@@ -593,12 +595,14 @@ static void level_cmd_create_whirlpool(void) {
     s32 beatBowser2 =
         (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) != 0;
 
-    if (CMD_GET(u8, 3) == WHIRLPOOL_COND_ALWAYS
-        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_NOT_BEATEN   && !beatBowser2)
-        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_BEATEN       && beatBowser2)
-        || (CMD_GET(u8, 3) == WHIRLPOOL_COND_AT_LEAST_SECOND_STAR && gCurrActNum >= 2)) {
+    if ((CMD_GET(u8, 3) == WHIRLPOOL_COND_ALWAYS)
+     || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_NOT_BEATEN   && !beatBowser2)
+     || (CMD_GET(u8, 3) == WHIRLPOOL_COND_BOWSER2_BEATEN       && beatBowser2)
+     || (CMD_GET(u8, 3) == WHIRLPOOL_COND_AT_LEAST_SECOND_STAR && gCurrActNum >= 2)) {
         if (sCurrAreaIndex != -1 && index < 2) {
-            if ((whirlpool = gAreas[sCurrAreaIndex].whirlpools[index]) == NULL) {
+            whirlpool = gAreas[sCurrAreaIndex].whirlpools[index];
+
+            if (whirlpool == NULL) {
                 whirlpool = alloc_only_pool_alloc(sLevelPool, sizeof(struct Whirlpool));
                 gAreas[sCurrAreaIndex].whirlpools[index] = whirlpool;
             }
@@ -781,7 +785,9 @@ static void level_cmd_get_or_set_var(void) {
 
 static void level_cmd_puppyvolume(void) {
 #ifdef PUPPYCAM
-    if ((sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool, sizeof(struct sPuppyVolume))) == NULL) {
+    sPuppyVolumeStack[gPuppyVolumeCount] = mem_pool_alloc(gPuppyMemoryPool, sizeof(struct sPuppyVolume));
+
+    if (sPuppyVolumeStack[gPuppyVolumeCount] == NULL) {
         sCurrentCmd = CMD_NEXT;
         gPuppyError |= PUPPY_ERROR_POOL_FULL;
 #if PUPPYPRINT_DEBUG

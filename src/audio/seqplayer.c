@@ -609,7 +609,9 @@ void seq_channel_layer_process_script(struct SequenceChannelLayer *layer) {
                     break;
                 }
 
-                if ((layer->instOrWave = get_instrument(seqChannel, cmd, &layer->instrument, &layer->adsr)) == 0) {
+                layer->instOrWave = get_instrument(seqChannel, cmd, &layer->instrument, &layer->adsr);
+
+                if (layer->instOrWave == 0) {
                     eu_stubbed_printf_1("WARNING: NPRG: cannot change %d\n", cmd);
                     layer->instOrWave = 0xff;
                 }
@@ -1085,7 +1087,9 @@ s32 seq_channel_layer_process_script_part2(struct SequenceChannelLayer *layer) {
                     break;
                 }
 
-                if ((layer->instOrWave = get_instrument(seqChannel, cmd, &layer->instrument, &layer->adsr)) == 0) {
+                layer->instOrWave = get_instrument(seqChannel, cmd, &layer->instrument, &layer->adsr);
+
+                if (layer->instOrWave == 0) {
                     eu_stubbed_printf_1("WARNING: NPRG: cannot change %d\n", cmd);
                     layer->instOrWave = 0xff;
                 }

@@ -1363,7 +1363,8 @@ struct GdDisplayList *new_gd_dl(s32 id, s32 gfxs, s32 verts, s32 mtxs, s32 light
     }
     dl->curVtxIdx = 0;
     dl->totalVtx = verts;
-    if ((dl->vtx = gd_malloc_perm(verts * sizeof(Vtx))) == NULL) {
+    dl->vtx = gd_malloc_perm(verts * sizeof(Vtx));
+    if (dl->vtx == NULL) {
         fatal_no_dl_mem();
     }
 
@@ -1372,7 +1373,8 @@ struct GdDisplayList *new_gd_dl(s32 id, s32 gfxs, s32 verts, s32 mtxs, s32 light
     }
     dl->curMtxIdx = 0;
     dl->totalMtx = mtxs;
-    if ((dl->mtx = gd_malloc_perm(mtxs * sizeof(Mtx))) == NULL) {
+    dl->mtx = gd_malloc_perm(mtxs * sizeof(Mtx));
+    if (dl->mtx == NULL) {
         fatal_no_dl_mem();
     }
 
@@ -1381,7 +1383,8 @@ struct GdDisplayList *new_gd_dl(s32 id, s32 gfxs, s32 verts, s32 mtxs, s32 light
     }
     dl->curLightIdx = 0;
     dl->totalLights = lights;
-    if ((dl->light = gd_malloc_perm(lights * sizeof(Lights4))) == NULL) {
+    dl->light = gd_malloc_perm(lights * sizeof(Lights4));
+    if (dl->light == NULL) {
         fatal_no_dl_mem();
     }
 
@@ -1390,7 +1393,8 @@ struct GdDisplayList *new_gd_dl(s32 id, s32 gfxs, s32 verts, s32 mtxs, s32 light
     }
     dl->curGfxIdx = 0;
     dl->totalGfx = gfxs;
-    if ((dl->gfx = gd_malloc_perm(gfxs * sizeof(Gfx))) == NULL) {
+    dl->gfx = gd_malloc_perm(gfxs * sizeof(Gfx));
+    if (dl->gfx == NULL) {
         fatal_no_dl_mem();
     }
 
@@ -1399,7 +1403,8 @@ struct GdDisplayList *new_gd_dl(s32 id, s32 gfxs, s32 verts, s32 mtxs, s32 light
     }
     dl->curVpIdx = 0;
     dl->totalVp = vps;
-    if ((dl->vp = gd_malloc_perm(vps * sizeof(Vp))) == NULL) {
+    dl->vp = gd_malloc_perm(vps * sizeof(Vp));
+    if (dl->vp == NULL) {
         fatal_no_dl_mem();
     }
 
@@ -2967,7 +2972,9 @@ void func_801A520C(void) {
  * Unused
  */
 UNUSED void Unknown801A5344(void) {
-    if ((sActiveView = sScreenView) == NULL) {
+    sActiveView = sScreenView;
+
+    if (sActiveView == NULL) {
         return;
     }
 
@@ -3480,7 +3487,9 @@ static void gd_block_dma(u32 romAddr, void *vAddr, s32 size) {
     s32 blockSize;
 
     do {
-        if ((blockSize = size) > 0x1000) {
+        blockSize = size;
+
+        if (blockSize > 0x1000) {
             blockSize = 0x1000;
         }
 
@@ -3530,8 +3539,9 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
 
     segSize = dynlistSegEnd - dynlistSegStart;
     allocSegSpace = gd_malloc_temp(segSize + PAGE_SIZE);
+    allocPtr = (void *) allocSegSpace;
 
-    if ((allocPtr = (void *) allocSegSpace) == NULL) {
+    if (allocPtr == NULL) {
         fatal_printf("Not enough DRAM for DATA segment \n");
     }
 

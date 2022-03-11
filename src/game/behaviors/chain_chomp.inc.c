@@ -182,7 +182,9 @@ static void chain_chomp_sub_act_lunge(void) {
         }
 
         // // TODO: What is this?
-        // if ((val04 = (900.0f - o->oChainChompDistToPivot)) > 220.0f) {
+        // val04 = (900.0f - o->oChainChompDistToPivot);
+
+        // if (val04 > 220.0f) {
         //     val04 = 220.0f;
         // }
 
@@ -442,14 +444,17 @@ void bhv_wooden_post_update(void) {
     } else if (approach_f32_ptr(&o->oWoodenPostSpeedY, 0.0f, 25.0f)) {
         // Stay still until mario is done ground pounding
         o->oWoodenPostMarioPounding = cur_obj_is_mario_ground_pounding_platform();
-    } else if ((o->oWoodenPostOffsetY += o->oWoodenPostSpeedY) < -190.0f) {
-        // Once pounded, if this is the chain chomp's post, release the chain
-        // chomp
-        o->oWoodenPostOffsetY = -190.0f;
-        if (o->parentObj != o) {
-            play_puzzle_jingle();
-            o->parentObj->oChainChompReleaseStatus = CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE;
-            o->parentObj = o;
+    } else {
+        o->oWoodenPostOffsetY += o->oWoodenPostSpeedY;
+
+        if (o->oWoodenPostOffsetY < -190.0f) {
+            o->oWoodenPostOffsetY = -190.0f;
+            // Once pounded, if this is the chain chomp's post, release the chain chomp
+            if (o->parentObj != o) {
+                play_puzzle_jingle();
+                o->parentObj->oChainChompReleaseStatus = CHAIN_CHOMP_RELEASED_TRIGGER_CUTSCENE;
+                o->parentObj = o;
+            }
         }
     }
 

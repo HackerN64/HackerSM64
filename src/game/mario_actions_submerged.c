@@ -448,7 +448,9 @@ static void reset_bob_variables(struct MarioState *m) {
  */
 static void surface_swim_bob(struct MarioState *m) {
     if (sBobIncrement != 0 && m->pos[1] > m->waterLevel - 85 && m->faceAngle[0] >= 0) {
-        if ((sBobTimer += sBobIncrement) >= 0) {
+        sBobTimer += sBobIncrement;
+
+        if (sBobTimer >= 0) {
             m->marioObj->header.gfx.pos[1] += sBobHeight * sins(sBobTimer);
             return;
         }
@@ -1074,7 +1076,9 @@ static s32 act_caught_in_whirlpool(struct MarioState *m) {
     f32 dz = m->pos[2] - whirlpool->oPosZ;
     f32 distance = sqrtf(sqr(dx) + sqr(dz));
 
-    if ((marioObj->oMarioWhirlpoolPosY += m->vel[1]) < 0.0f) {
+    marioObj->oMarioWhirlpoolPosY += m->vel[1];
+
+    if (marioObj->oMarioWhirlpoolPosY < 0.0f) {
         marioObj->oMarioWhirlpoolPosY = 0.0f;
         if (distance < 16.1f && m->actionTimer++ == 16) {
             level_trigger_warp(m, WARP_OP_DEATH);
@@ -1268,7 +1272,9 @@ static s32 act_metal_water_walking(struct MarioState *m) {
         return set_mario_action(m, ACT_METAL_WATER_STANDING, 0);
     }
 
-    if ((animSpeed = (s32)(m->forwardVel / 4.0f * 0x10000)) < 0x1000) {
+    animSpeed = (s32)(m->forwardVel / 4.0f * 0x10000);
+
+    if (animSpeed < 0x1000) {
         animSpeed = 0x1000;
     }
 
@@ -1309,8 +1315,9 @@ static s32 act_hold_metal_water_walking(struct MarioState *m) {
     }
 
     m->intendedMag *= 0.4f;
+    animSpeed = (s32)(m->forwardVel / 2.0f * 0x10000);
 
-    if ((animSpeed = (s32)(m->forwardVel / 2.0f * 0x10000)) < 0x1000) {
+    if (animSpeed < 0x1000) {
         animSpeed = 0x1000;
     }
 

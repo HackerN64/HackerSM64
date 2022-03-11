@@ -308,8 +308,9 @@ f32 gd_vec3f_magnitude(struct GdVec3f *vec) {
  * Normalizes a vec3f to have a length of 1.
  */
 s32 gd_normalize_vec3f(struct GdVec3f *vec) {
-    f32 mag;
-    if ((mag = SQ(vec->x) + SQ(vec->y) + SQ(vec->z)) == 0.0f) {
+    f32 mag = SQ(vec->x) + SQ(vec->y) + SQ(vec->z);
+
+    if (mag == 0.0f) {
         return FALSE;
     }
 
@@ -559,11 +560,13 @@ void UNUSED gd_broken_quat_to_vec3f(f32 quat[4], struct GdVec3f *vec, f32 zHalf,
     tVec.y = vec->y;
     tVec.z = vec->z;
 
-    if ((j = i + 1) >= 4) {
+    j = i + 1;
+    if (j >= 4) {
         j = 1;
     }
 
-    if ((k = j + 1) >= 4) {
+    k = j + 1;
+    if (k >= 4) {
         k = 1;
     }
 
@@ -586,10 +589,13 @@ void UNUSED gd_quat_rotation(f32 quat[4], UNUSED s32 unused, f32 c, f32 s, s32 i
     s32 j, k;
     f32 quatVal;
 
-    if ((j = i + 1) >= 4) {
+    j = i + 1;
+    if (j >= 4) {
         j = 1;
     }
-    if ((k = j + 1) >= 4) {
+
+    k = j + 1;
+    if (k >= 4) {
         k = 1;
     }
 
@@ -599,7 +605,7 @@ void UNUSED gd_quat_rotation(f32 quat[4], UNUSED s32 unused, f32 c, f32 s, s32 i
 
     quatVal = quat[j];
     quat[j] = (quat[k] * s) + (quatVal * c);
-    quat[k] = (quat[k] * c) - (s * quatVal);
+    quat[k] = (quat[k] * c) - (quatVal * s);
 }
 
 /**
@@ -650,11 +656,13 @@ void UNUSED gd_create_quat_rot_mat(f32 quat[4], UNUSED s32 unused, Mat4f *mtx) {
     }
 
     for (i = 1; i < 4; i++) {
-        if ((j = i + 1) >= 4) {
+        j = i + 1;
+        if (j >= 4) {
             j = 1;
         }
 
-        if ((k = j + 1) >= 4) {
+        k = j + 1;
+        if (k >= 4) {
             k = 1;
         }
 

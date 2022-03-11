@@ -316,14 +316,13 @@ void bhv_goomba_update(void) {
 
     if (obj_update_standard_actions(o->oGoombaScale)) {
         // If this goomba has a spawner and mario moved away from the spawner, unload
-        if (o->parentObj != o) {
-            if (o->parentObj->oAction == GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED) {
-                obj_mark_for_deletion(o);
-            }
+        if (o->parentObj != o && o->parentObj->oAction == GOOMBA_TRIPLET_SPAWNER_ACT_UNLOADED) {
+            obj_mark_for_deletion(o);
         }
 
         cur_obj_scale(o->oGoombaScale);
         obj_update_blinking(&o->oGoombaBlinkTimer, 30, 50, 5);
+
 #ifdef FLOOMBAS
         if (o->oIsFloomba) {
             o->oAnimState += FLOOMBA_ANIM_STATE_EYES_OPEN;
@@ -331,9 +330,15 @@ void bhv_goomba_update(void) {
 #endif
         cur_obj_update_floor_and_walls();
 
-        if (o->oGoombaScale == 0.0f || (animSpeed = (o->oForwardVel / o->oGoombaScale * 0.4f)) < 1.0f) {
+        if (o->oGoombaScale == 0.0f) {
             animSpeed = 1.0f;
+        } else {
+            animSpeed = (o->oForwardVel / o->oGoombaScale * 0.4f);
+            if (animSpeed < 1.0f) {
+                animSpeed = 1.0f;
+            }
         }
+
 #if defined(FLOOMBAS) && defined(INTRO_FLOOMBAS)
         if (o->oAction == FLOOMBA_ACT_STARTUP) {
             animSpeed = (GET_BPARAM1(o->oBehParams) / 16.0f);
