@@ -420,8 +420,10 @@ static s32 update_grabbed_floor(Vec3f nextPos, Vec3f ledgePos, struct Surface **
     // Check if the floor's type is 
     return (ledgeFloor == NULL
          || floor == NULL
+#ifdef LEDGE_GRABS_CHECK_SLOPE_ANGLE
          || floor->normal.y < COS25 // TODO: Mario should still be able to ledge grab if floor is facing away.
          // TODO: check if floor is actually slippery.
+#endif
          || SURFACE_IS_UNSAFE(floor->type));
 }
 
