@@ -93,6 +93,9 @@
 // This is vanilla behavior, disable it to allow ledge grabbing regardless of floor pitch.
 #define LEDGE_GRABS_CHECK_SLOPE_ANGLE
 
+// Enables bonking and wall kicking at the top of walls. This fixes janky vanilla behavior caused by ledge grab mechanics.
+#define WALL_KICK_TOP_OF_WALLS
+
 // Disables BLJs and crushes SimpleFlips's dreams.
 // #define DISABLE_BLJ
 
