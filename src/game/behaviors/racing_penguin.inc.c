@@ -83,7 +83,7 @@ static void racing_penguin_act_race(void) {
         clamp_f32(&targetSpeed, minSpeed, 150.0f);
         obj_forward_vel_approach(targetSpeed, 0.4f);
 
-        cur_obj_init_animation_with_sound(1);
+        cur_obj_init_animation_with_sound(PENGUIN_ANIM_DIVE_SLIDE);
         cur_obj_rotate_yaw_toward(o->oPathedTargetYaw, (s32)(15.0f * o->oForwardVel));
 
         if (cur_obj_check_if_at_animation_end() && (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND)) {
@@ -107,7 +107,7 @@ static void racing_penguin_act_finish_race(void) {
             set_camera_shake_from_point(SHAKE_POS_SMALL, o->oPosX, o->oPosY, o->oPosZ);
             o->oForwardVel = 0.0f;
         }
-    } else if (cur_obj_init_anim_and_check_if_end(2)) {
+    } else if (cur_obj_init_anim_and_check_if_end(PENGUIN_ANIM_STAND_UP)) {
         o->oAction = RACING_PENGUIN_ACT_SHOW_FINAL_TEXT;
     }
 }
@@ -115,7 +115,7 @@ static void racing_penguin_act_finish_race(void) {
 static void racing_penguin_act_show_final_text(void) {
     if (o->oRacingPenguinFinalTextbox == 0) {
         if (cur_obj_rotate_yaw_toward(0, 200)) {
-            cur_obj_init_animation_with_sound(3);
+            cur_obj_init_animation_with_sound(PENGUIN_ANIM_IDLE);
             o->oForwardVel = 0.0f;
 
             if (cur_obj_can_mario_activate_textbox_2(400.0f, 400.0f)) {

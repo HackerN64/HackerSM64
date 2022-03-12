@@ -50,7 +50,7 @@ void flying_bookend_act_0(void) {
 
 void flying_bookend_act_1(void) {
     if (obj_forward_vel_approach(3.0f, 1.0f)) {
-        if (cur_obj_init_anim_and_check_if_end(2)) {
+        if (cur_obj_init_anim_and_check_if_end(FLYING_BOOKEND_ANIM_GROW)) {
             o->oAction = 2;
             o->oForwardVel = 0.0f;
         } else {
@@ -72,7 +72,7 @@ void flying_bookend_act_1(void) {
 }
 
 void flying_bookend_act_2(void) {
-    cur_obj_init_animation_with_sound(1);
+    cur_obj_init_animation_with_sound(FLYING_BOOKEND_ANIM_BITE);
     cur_obj_update_floor_and_walls();
 
     if (o->oForwardVel == 0.0f) {

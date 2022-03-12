@@ -15,7 +15,7 @@ struct SLWalkingPenguinStep sSLWalkingPenguinErraticSteps[] = {
     { 30, PENGUIN_ANIM_IDLE, 0.0f,  1.0f }, // Stop for 1 second
     { 30, PENGUIN_ANIM_WALK, -6.0f, 1.0f }, // Walk backwards for 1 second
     { 30, PENGUIN_ANIM_IDLE, 0.0f,  1.0f }, // Stop for 1 second
-    { -1, 0, 0.0f,  0.0f }, // Repeat
+    { -1, PENGUIN_ANIM_WALK, 0.0f,  0.0f }, // Repeat
 };
 
 static s32 sl_walking_penguin_turn(void) {

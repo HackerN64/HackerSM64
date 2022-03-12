@@ -48,7 +48,7 @@ void heave_ho_act_1(void) {
         }
 
         if (o->oTimer < sHeaveHoTimings[i][0]) {
-            cur_obj_init_animation_with_accel_and_sound(2, sHeaveHoTimings[i][1]);
+            cur_obj_init_animation_with_accel_and_sound(HEAVE_HO_ANIM_WINDING_UP, sHeaveHoTimings[i][1]);
             break;
         }
 
@@ -71,7 +71,7 @@ void heave_ho_act_2(void) {
         o->oHeaveHoTimedSpeed = 1.0f;
     }
 
-    cur_obj_init_animation_with_accel_and_sound(0, o->oHeaveHoTimedSpeed);
+    cur_obj_init_animation_with_accel_and_sound(HEAVE_HO_ANIM_MOVING, o->oHeaveHoTimedSpeed);
 
     o->oForwardVel = o->oHeaveHoTimedSpeed * 10.0f;
     s16 angleVel = o->oHeaveHoTimedSpeed * 0x400;
@@ -86,7 +86,7 @@ void heave_ho_act_3(void) {
     }
 
     if (o->oTimer == 1) {
-        cur_obj_init_animation_with_accel_and_sound(1, 1.0f);
+        cur_obj_init_animation_with_accel_and_sound(HEAVE_HO_ANIM_THROW, 1.0f);
         o->numCollidedObjs = 20;
     }
 
@@ -149,7 +149,7 @@ void bhv_heave_ho_loop(void) {
             heave_ho_move();
             break;
         case HELD_HELD:
-            cur_obj_unrender_set_action_and_anim(0, 0);
+            cur_obj_unrender_set_action_and_anim(HEAVE_HO_ANIM_MOVING, HEAVE_HO_ACT_INACTIVE);
             break;
         case HELD_THROWN:
             cur_obj_get_dropped();

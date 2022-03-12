@@ -214,7 +214,7 @@ static void klepto_act_dive_at_mario(void) {
             cur_obj_play_sound_2(SOUND_GENERAL_WING_FLAP);
         }
 
-        if (cur_obj_set_anim_if_at_end(0)) {
+        if (cur_obj_set_anim_if_at_end(KLEPTO_ANIM_DIVE_0)) {
             if (o->oAnimState != KLEPTO_ANIM_STATE_HOLDING_NOTHING) {
                 o->oAction = KLEPTO_ACT_CIRCLE_TARGET_HOLDING;
                 o->oKleptoTimeUntilTargetChange = 0;

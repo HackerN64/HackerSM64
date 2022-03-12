@@ -93,7 +93,7 @@ void bhv_wiggler_body_part_update(void) {
     segment->pos[1] = o->oPosY;
 
     // Inherit walking animation speed from wiggler
-    cur_obj_init_animation_with_accel_and_sound(0, o->parentObj->oWigglerWalkAnimSpeed);
+    cur_obj_init_animation_with_accel_and_sound(WIGGLER_ANIM_WALK, o->parentObj->oWigglerWalkAnimSpeed);
     if (o->parentObj->oWigglerWalkAnimSpeed == 0.0f) {
         cur_obj_reverse_animation();
     }
@@ -134,7 +134,7 @@ void wiggler_init_segments(void) {
             bodyPart =
                 spawn_object_relative(i, 0, 0, 0, o, MODEL_WIGGLER_BODY, bhvWigglerBody);
             if (bodyPart != NULL) {
-                obj_init_animation_with_sound(bodyPart, wiggler_seg5_anims_0500C874, 0);
+                obj_init_animation_with_sound(bodyPart, wiggler_seg5_anims_0500C874, WIGGLER_ANIM_WALK);
                 bodyPart->header.gfx.animInfo.animFrame = (23 * i) % 26 - 1;
             }
         }
@@ -387,7 +387,7 @@ void bhv_wiggler_update(void) {
             treat_far_home_as_mario(1200.0f);
 
             // Walking animation and sound
-            cur_obj_init_animation_with_accel_and_sound(0, o->oWigglerWalkAnimSpeed);
+            cur_obj_init_animation_with_accel_and_sound(WIGGLER_ANIM_WALK, o->oWigglerWalkAnimSpeed);
             if (o->oWigglerWalkAnimSpeed != 0.0f) {
                 cur_obj_play_sound_at_anim_range(0, 13,
                               o->oHealth >= 4 ? SOUND_OBJ_WIGGLER_LOW_PITCH : SOUND_OBJ_WIGGLER_HIGH_PITCH);

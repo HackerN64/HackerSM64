@@ -160,7 +160,7 @@ void small_penguin_act_walking_away_from_mario(void) {
 }
 
 void small_penguin_act_walking_toward_mario(void) {
-    cur_obj_init_animation_with_sound(0);
+    cur_obj_init_animation_with_sound(PENGUIN_ANIM_WALK);
     o->oForwardVel = (o->oSmallPenguinNextForwardVel + 3.0f);
     cur_obj_rotate_yaw_toward(o->oAngleToMario, o->oSmallPenguinYawIncrement + 0x600);
     if (o->oDistanceToMario < (o->oSmallPenguinRandomDistanceCheck + 300.0f)) {
@@ -177,7 +177,7 @@ void small_penguin_act_dive_sliding(void) {
         if (o->oTimer == 6) {
             cur_obj_play_sound_2(SOUND_OBJ_BABY_PENGUIN_DIVE);
         }
-        cur_obj_init_animation_with_sound(1);
+        cur_obj_init_animation_with_sound(PENGUIN_ANIM_DIVE_SLIDE);
         if (o->oTimer > 25 && !mario_is_dive_sliding()) {
             o->oAction = SMALL_PENGUIN_ACT_DIVE_SLIDING_STOP;
         }
@@ -235,7 +235,7 @@ void small_penguin_act_near_mother(void) {
             cur_obj_rotate_yaw_toward(angleToMother + 0x8000, 0x400);
         }
 
-        cur_obj_init_animation_with_sound(0);
+        cur_obj_init_animation_with_sound(PENGUIN_ANIM_WALK);
     }
 
     small_penguin_dive_with_mario();

@@ -210,7 +210,7 @@ static void eyerok_hand_act_sleep(void) {
 }
 
 static void eyerok_hand_act_idle(void) {
-    cur_obj_init_animation_with_sound(2);
+    cur_obj_init_animation_with_sound(EYEROK_HAND_ANIM_IDLE);
 
     if (o->parentObj->oAction == EYEROK_BOSS_ACT_FIGHT) {
         if (o->parentObj->oEyerokBossAttackCountdown != 0) {
@@ -247,7 +247,7 @@ static void eyerok_hand_act_idle(void) {
 static void eyerok_hand_act_open(void) {
     o->parentObj->oEyerokBossActiveHandId = o->oBehParams2ndByte;
 
-    if (cur_obj_init_anim_and_check_if_end(4)) {
+    if (cur_obj_init_anim_and_check_if_end(EYEROK_HAND_ANIM_OPEN)) {
         o->oAction = EYEROK_HAND_ACT_SHOW_EYE;
         o->oEyerokHandAnimStateIndex = 2;
         o->oEyerokHandEyeShownTimer = 60;
@@ -266,7 +266,7 @@ static void eyerok_hand_act_open(void) {
 }
 
 static void eyerok_hand_act_show_eye(void) {
-    cur_obj_init_animation_with_sound(5);
+    cur_obj_init_animation_with_sound(EYEROK_HAND_ANIM_SHOW_EYE);
     cur_obj_play_sound_at_anim_range(0, 0, SOUND_OBJ_EYEROK_SHOW_EYE);
 
     if (!eyerok_hand_check_attacked()) {
@@ -300,7 +300,7 @@ static void eyerok_hand_act_show_eye(void) {
 }
 
 static void eyerok_hand_act_close(void) {
-    if (cur_obj_init_anim_check_frame(7, 1)) {
+    if (cur_obj_init_anim_check_frame(EYEROK_HAND_ANIM_CLOSE, 1)) {
         o->collisionData = segmented_to_virtual(ssl_seg7_collision_07028274);
 
         if (o->parentObj->oEyerokBossNumHands != 2) {
@@ -314,7 +314,7 @@ static void eyerok_hand_act_close(void) {
 }
 
 static void eyerok_hand_act_attacked(void) {
-    if (cur_obj_init_anim_and_check_if_end(3)) {
+    if (cur_obj_init_anim_and_check_if_end(EYEROK_HAND_ANIM_ATTACKED)) {
         o->oAction = EYEROK_HAND_ACT_RECOVER;
         o->collisionData = segmented_to_virtual(ssl_seg7_collision_07028274);
     }
@@ -325,7 +325,7 @@ static void eyerok_hand_act_attacked(void) {
 }
 
 static void eyerok_hand_act_recover(void) {
-    if (cur_obj_init_anim_and_check_if_end(0)) {
+    if (cur_obj_init_anim_and_check_if_end(EYEROK_HAND_ANIM_RECOVER)) {
         o->oAction = EYEROK_HAND_ACT_BECOME_ACTIVE;
     }
 }
@@ -338,7 +338,7 @@ static void eyerok_hand_act_become_active(void) {
 }
 
 static void eyerok_hand_act_die(void) {
-    if (cur_obj_init_anim_and_check_if_end(1)) {
+    if (cur_obj_init_anim_and_check_if_end(EYEROK_HAND_ANIM_DEATH)) {
         o->parentObj->oEyerokBossActiveHandId = 0;
         obj_explode_and_spawn_coins(150.0f, COIN_TYPE_YELLOW);
         create_sound_spawner(SOUND_OBJ2_EYEROK_SOUND_LONG);

@@ -66,7 +66,7 @@ void bhv_mr_blizzard_init(void) {
 static void mr_blizzard_act_spawn_snowball(void) {
     // If Mr. Blizzard is not holding a snowball, and the animation reaches 5 frames
     // spawn the Mr. Blizzard snowball.
-    if (o->oMrBlizzardHeldObj == NULL && cur_obj_init_anim_check_frame(0, 5)) {
+    if (o->oMrBlizzardHeldObj == NULL && cur_obj_init_anim_check_frame(MR_BLIZZARD_ANIM_SPAWN_SNOWBALL, 5)) {
         o->oMrBlizzardHeldObj =
             spawn_object_relative(0, -70, (s32)(o->oMrBlizzardGraphYOffset + 153.0f), 0, o,
                                   MODEL_WHITE_PARTICLE, bhvMrBlizzardSnowball);
@@ -253,7 +253,7 @@ static void mr_blizzard_act_death(void) {
         }
         // Reset Mr. Blizzard if Mario leaves its radius.
         else if (o->oDistanceToMario > 1000.0f) {
-            cur_obj_init_animation_with_sound(1);
+            cur_obj_init_animation_with_sound(MR_BLIZZARD_ANIM_THROW_SNOWBALL);
 
             o->oAction = MR_BLIZZARD_ACT_SPAWN_SNOWBALL;
             o->oMrBlizzardScale = 1.0f;
@@ -269,7 +269,7 @@ static void mr_blizzard_act_death(void) {
  */
 static void mr_blizzard_act_throw_snowball(void) {
     // Play a sound and set HeldObj to NULL. Then set action to 0.
-    if (cur_obj_init_anim_check_frame(1, 7)) {
+    if (cur_obj_init_anim_check_frame(MR_BLIZZARD_ANIM_STATE_HAS_CAP, 7)) {
         cur_obj_play_sound_2(SOUND_OBJ2_SCUTTLEBUG_ALERT);
         o->prevObj = o->oMrBlizzardHeldObj = NULL;
     } else if (cur_obj_check_if_near_animation_end()) {
@@ -294,7 +294,7 @@ static void mr_blizzard_act_burrow(void) {
     // then move to action 0.
     if (approach_f32_ptr(&o->oMrBlizzardGraphYOffset, -200.0f, 4.0f)) {
         o->oAction = MR_BLIZZARD_ACT_SPAWN_SNOWBALL;
-        cur_obj_init_animation_with_sound(1);
+        cur_obj_init_animation_with_sound(MR_BLIZZARD_ANIM_THROW_SNOWBALL);
     }
 }
 

@@ -240,7 +240,7 @@ static void koopa_shelled_act_lying(void) {
             o->oMoveAngleYaw = cur_obj_reflect_move_angle_off_wall();
         }
 
-        cur_obj_init_anim_extend(5);
+        cur_obj_init_anim_extend(KOOPA_ANIM_SHELLED_LYING);
         koopa_dive_update_speed(0.3f);
     } else if (o->oKoopaCountdown != 0) {
         o->oKoopaCountdown--;
@@ -568,7 +568,7 @@ static s32 koopa_the_quick_detect_bowling_ball(void) {
 static void koopa_the_quick_animate_footsteps(void) {
     //! With high negative speed (using the bowling ball deceleration), we can
     //  index out of the animation's bounds
-    cur_obj_init_animation_with_accel_and_sound(9, o->oForwardVel * 0.09f);
+    cur_obj_init_animation_with_accel_and_sound(KOOPA_ANIM_WALK, o->oForwardVel * 0.09f);
     koopa_play_footstep_sound(2, 17);
 }
 
@@ -664,7 +664,7 @@ static void koopa_the_quick_act_race(void) {
  */
 static void koopa_the_quick_act_decelerate(void) {
     obj_forward_vel_approach(3.0f, 1.0f);
-    cur_obj_init_animation_with_accel_and_sound(9, 0.99f);
+    cur_obj_init_animation_with_accel_and_sound(KOOPA_ANIM_WALK, 0.99f);
 
     if (cur_obj_check_if_near_animation_end()) {
         o->oAction = KOOPA_THE_QUICK_ACT_STOP;

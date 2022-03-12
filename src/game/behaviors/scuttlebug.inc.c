@@ -114,7 +114,7 @@ void bhv_scuttlebug_loop(void) {
 
     f32 animSpeed = (o->oForwardVel < 10.0f) ? 1.0f : 3.0f;
 
-    cur_obj_init_animation_with_accel_and_sound(0, animSpeed);
+    cur_obj_init_animation_with_accel_and_sound(SCUTTLEBUG_ANIM_JUMP, animSpeed);
 
     if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
         set_obj_anim_with_accel_and_sound(1, 23, SOUND_OBJ2_SCUTTLEBUG_WALK);

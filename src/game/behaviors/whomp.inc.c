@@ -17,7 +17,7 @@ void whomp_play_sfx_from_pound_animation(void) {
 }
 
 void whomp_init(void) {
-    cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
+    cur_obj_init_animation_with_accel_and_sound(WHOMP_ANIM_WALK, 1.0f);
     cur_obj_set_pos_to_home();
 
     if (o->oBehParams2ndByte != 0) {
@@ -45,7 +45,7 @@ void whomp_init(void) {
 void whomp_turn(void) {
     if (o->oSubAction == 0) {
         o->oForwardVel = 0.0f;
-        cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
+        cur_obj_init_animation_with_accel_and_sound(WHOMP_ANIM_WALK, 1.0f);
         if (o->oTimer > 31) {
             o->oSubAction++;
         } else {
@@ -70,7 +70,7 @@ void whomp_patrol(void) {
     f32 patrolDist = 700.0f;
 #endif
 
-    cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
+    cur_obj_init_animation_with_accel_and_sound(WHOMP_ANIM_WALK, 1.0f);
     o->oForwardVel = 3.0f;
 
     if (distWalked > patrolDist) {
@@ -78,7 +78,7 @@ void whomp_patrol(void) {
     } else if (marioAngle < 0x2000) {
         if (o->oDistanceToMario < 1500.0f) {
             o->oForwardVel = 9.0f;
-            cur_obj_init_animation_with_accel_and_sound(0, 3.0f);
+            cur_obj_init_animation_with_accel_and_sound(WHOMP_ANIM_WALK, 3.0f);
         }
         if (o->oDistanceToMario < 300.0f) {
             o->oAction = 3;
@@ -89,7 +89,7 @@ void whomp_patrol(void) {
 }
 
 void king_whomp_chase(void) {
-    cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
+    cur_obj_init_animation_with_accel_and_sound(WHOMP_ANIM_WALK, 1.0f);
     o->oForwardVel = 3.0f;
     cur_obj_rotate_yaw_toward(o->oAngleToMario, 0x200);
 
@@ -98,7 +98,7 @@ void king_whomp_chase(void) {
         if (marioAngle < 0x2000) {
             if (o->oDistanceToMario < 1500.0f) {
                 o->oForwardVel = 9.0f;
-                cur_obj_init_animation_with_accel_and_sound(0, 3.0f);
+                cur_obj_init_animation_with_accel_and_sound(WHOMP_ANIM_WALK, 3.0f);
             }
             if (o->oDistanceToMario < 300.0f) {
                 o->oAction = 3;
@@ -116,7 +116,7 @@ void king_whomp_chase(void) {
 
 void whomp_prepare_jump(void) {
     o->oForwardVel = 0.0f;
-    cur_obj_init_animation_with_accel_and_sound(1, 1.0f);
+    cur_obj_init_animation_with_accel_and_sound(WHOMP_ANIM_JUMP, 1.0f);
     if (cur_obj_check_if_near_animation_end()) {
         o->oAction = 4;
     }

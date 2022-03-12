@@ -237,7 +237,7 @@ void king_bobomb_act_been_thrown(void) { // act 4
             cur_obj_play_sound_2(SOUND_OBJ_KING_BOBOMB);
         }
     } else {
-        if (cur_obj_init_animation_and_check_if_near_end(10)) {
+        if (cur_obj_init_animation_and_check_if_near_end(KING_BOBOMB_ANIM_STAND_UP)) {
             o->oAction = KING_BOBOMB_ACT_RETURN_HOME; // Go back to top of hill
         }
 
@@ -364,7 +364,7 @@ void bhv_king_bobomb_loop(void) {
             king_bobomb_move();
             break;
         case HELD_HELD:
-            cur_obj_unrender_set_action_and_anim(6, 1);
+            cur_obj_unrender_set_action_and_anim(KING_BOBOMB_ANIM_HELD, KING_BOBOMB_ACT_ACTIVATE);
             break;
         case HELD_THROWN:
         case HELD_DROPPED:

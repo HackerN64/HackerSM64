@@ -35,14 +35,14 @@ static void skeeter_spawn_waves(void) {
 
 static void skeeter_act_idle(void) {
     if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
-        cur_obj_init_animation_with_sound(3);
+        cur_obj_init_animation_with_sound(SKEETER_ANIM_IDLE);
         o->oForwardVel = 0.0f;
 
         if (o->oTimer > o->oSkeeterWaitTime && cur_obj_check_if_near_animation_end()) {
             o->oAction = SKEETER_ACT_WALK;
         }
     } else {
-        cur_obj_init_animation_with_sound(1);
+        cur_obj_init_animation_with_sound(SKEETER_ANIM_WATER_IDLE);
 
         if (o->oMoveFlags & OBJ_MOVE_AT_WATER_SURFACE) {
             skeeter_spawn_waves();
@@ -66,7 +66,7 @@ static void skeeter_act_lunge(void) {
         o->oAction = SKEETER_ACT_IDLE;
     } else {
         skeeter_spawn_waves();
-        cur_obj_init_animation_with_sound(0);
+        cur_obj_init_animation_with_sound(SKEETER_ANIM_WATER_LUNGE);
 
         if (o->oMoveFlags & OBJ_MOVE_HIT_WALL) {
             o->oMoveAngleYaw = cur_obj_reflect_move_angle_off_wall();
@@ -99,7 +99,7 @@ static void skeeter_act_walk(void) {
         obj_forward_vel_approach(o->oSkeeterTargetForwardVel, 0.4f);
         accel = 0.12f * o->oForwardVel;
 
-        cur_obj_init_animation_with_accel_and_sound(2, accel);
+        cur_obj_init_animation_with_accel_and_sound(SKEETER_ANIM_WALK, accel);
         cur_obj_play_sound_at_anim_range(3, 13, SOUND_OBJ_SKEETER_WALK);
 
         if (o->oSkeeterTurningAwayFromWall) {

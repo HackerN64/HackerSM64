@@ -35,7 +35,7 @@ static void fish_spawner_act_spawn(void) {
         for (i = 0; i < schoolQuantity; i++) {
             fishObject = spawn_object(o, model, bhvFish);
             fishObject->oBehParams2ndByte = o->oBehParams2ndByte;
-            obj_init_animation_with_sound(fishObject, fishAnimation, 0);
+            obj_init_animation_with_sound(fishObject, fishAnimation, FISH_ANIM_DEFAULT);
             obj_translate_xyz_random(fishObject, 700.0f);
         }
         o->oAction = FISH_SPAWNER_ACT_IDLE;
@@ -100,9 +100,9 @@ static void fish_act_roam(void) {
 
     // Alters speed of animation for natural movement.
     if (o->oTimer < 10) {
-        cur_obj_init_animation_with_accel_and_sound(0, 2.0f);
+        cur_obj_init_animation_with_accel_and_sound(FISH_ANIM_DEFAULT, 2.0f);
     } else {
-        cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
+        cur_obj_init_animation_with_accel_and_sound(FISH_ANIM_DEFAULT, 1.0f);
     }
 
     // Initializes some variables when the fish first begins roaming.
@@ -161,9 +161,9 @@ static void fish_act_flee(void) {
 
     // Speed the animation up over time.
     if (o->oTimer < 20) {
-        cur_obj_init_animation_with_accel_and_sound(0, 4.0f);
+        cur_obj_init_animation_with_accel_and_sound(FISH_ANIM_DEFAULT, 4.0f);
     } else {
-        cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
+        cur_obj_init_animation_with_accel_and_sound(FISH_ANIM_DEFAULT, 1.0f);
     }
 
     // Accelerate over time.
@@ -202,7 +202,7 @@ static void fish_act_flee(void) {
  * Animate fish and alter scaling at random for a magnifying effect from the water.
  */
 static void fish_act_init(void) {
-    cur_obj_init_animation_with_accel_and_sound(0, 1.0f);
+    cur_obj_init_animation_with_accel_and_sound(FISH_ANIM_DEFAULT, 1.0f);
     o->header.gfx.animInfo.animFrame = (s16)(random_float() * 28.0f);
     o->oFishDepthDistance = random_float() * 300.0f;
     cur_obj_scale(random_float() * 0.4f + 0.8f);

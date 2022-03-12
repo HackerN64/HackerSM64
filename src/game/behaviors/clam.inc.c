@@ -13,7 +13,7 @@ struct ObjectHitbox sClamShellHitbox = {
 };
 
 void clam_act_0(void) {
-    if (cur_obj_init_anim_check_frame(0, 25)) {
+    if (cur_obj_init_anim_check_frame(CLAM_ANIM_CLOSING, 25)) {
         cur_obj_play_sound_2(SOUND_GENERAL_CLAM_SHELL_CLOSE);
         spawn_mist_from_global();
         cur_obj_become_tangible();
@@ -35,7 +35,7 @@ void clam_act_1(void) {
 
     if (o->oTimer > 150) {
         o->oAction = 0;
-    } else if (obj_is_rendering_enabled() && cur_obj_init_anim_check_frame(1, 8)) {
+    } else if (obj_is_rendering_enabled() && cur_obj_init_anim_check_frame(CLAM_ANIM_OPENING, 8)) {
         for (i = -0x2000; i < 0x2000; i += 0x555) {
             bubblesX = (s16)(100.0f * sins(i));
             bubblesZ = (s16)(100.0f * coss(i));

@@ -94,7 +94,7 @@ void chuckya_act_0(void) {
         o->oChuckyaSubActionTimer++;
     }
 
-    cur_obj_init_animation_with_sound(4);
+    cur_obj_init_animation_with_sound(CHUCKYA_ANIM_IDLE);
 
     if (o->oForwardVel > 1.0f) {
         cur_obj_play_sound_1(SOUND_AIR_CHUCKYA_MOVE);
@@ -105,7 +105,7 @@ void chuckya_act_0(void) {
 
 void chuckya_act_1(void) {
     if (o->oSubAction == 0) {
-        if (cur_obj_init_animation_and_check_if_near_end(0)) {
+        if (cur_obj_init_animation_and_check_if_near_end(CHUCKYA_ANIM_GRAB_MARIO)) {
             o->oSubAction++;
         }
         o->oChuckyaSubActionTimer = random_float() * 30.0f + 10.0f;
@@ -120,7 +120,7 @@ void chuckya_act_1(void) {
                 o->oAction = 3;
                 o->oInteractStatus &= ~INT_STATUS_GRABBED_MARIO;
             } else {
-                cur_obj_init_animation_with_sound(1);
+                cur_obj_init_animation_with_sound(CHUCKYA_ANIM_THROW_1);
                 o->oMoveAngleYaw += INT_STATUS_GRABBED_MARIO;
                 if (o->oChuckyaSubActionTimer-- < 0
                  && (check_if_moving_over_floor(50.0f, 150.0f) || o->oChuckyaSubActionTimer < -16)) {
@@ -128,7 +128,7 @@ void chuckya_act_1(void) {
                 }
             }
         } else {
-            cur_obj_init_animation_with_sound(3);
+            cur_obj_init_animation_with_sound(CHUCKYA_ANIM_THROW_2);
             if (cur_obj_check_anim_frame(18)) {
                 cur_obj_play_sound_2(SOUND_OBJ_RELEASE_MARIO);
                 o->oCommonAnchorAction = 2;
@@ -142,7 +142,7 @@ void chuckya_act_1(void) {
 void chuckya_act_3(void) {
     o->oForwardVel = 0.0f;
     o->oVelY = 0.0f;
-    cur_obj_init_animation_with_sound(4);
+    cur_obj_init_animation_with_sound(CHUCKYA_ANIM_IDLE);
     if (o->oTimer > 100) {
         o->oAction = 0;
     }
@@ -183,7 +183,7 @@ void bhv_chuckya_loop(void) {
             chuckya_move();
             break;
         case HELD_HELD:
-            cur_obj_unrender_set_action_and_anim(2, 0);
+            cur_obj_unrender_set_action_and_anim(CHUCKYA_ANIM_HELD, CHUCKYA_ACT_MOVING);
             break;
         case HELD_THROWN:
         case HELD_DROPPED:

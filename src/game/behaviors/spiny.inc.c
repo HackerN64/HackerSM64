@@ -56,7 +56,7 @@ static void spiny_act_walk(void) {
         cur_obj_update_floor_and_walls();
 
         o->oGraphYOffset = -17.0f;
-        cur_obj_init_animation_with_sound(0);
+        cur_obj_init_animation_with_sound(SPINY_ANIM_DEFAULT);
 
         if (o->oMoveFlags & OBJ_MOVE_MASK_ON_GROUND) {
             // After touching the ground for the first time, stop. From now on,
@@ -116,7 +116,7 @@ static void spiny_act_walk(void) {
  */
 static void spiny_act_held_by_lakitu(void) {
     o->oGraphYOffset = 15.0f;
-    cur_obj_init_animation_with_sound(0);
+    cur_obj_init_animation_with_sound(SPINY_ANIM_DEFAULT);
 
     o->oParentRelativePosX = -50.0f;
     o->oParentRelativePosY = 35.0f;
@@ -145,12 +145,12 @@ static void spiny_act_thrown_by_lakitu(void) {
         o->oGraphYOffset = 15.0f;
         o->oFaceAnglePitch -= 0x2000;
 
-        cur_obj_init_animation_with_sound(0);
+        cur_obj_init_animation_with_sound(SPINY_ANIM_DEFAULT);
 
         if (o->oMoveFlags & OBJ_MOVE_LANDED) {
             cur_obj_play_sound_2(SOUND_OBJ_SPINY_LAND);
             cur_obj_set_model(MODEL_SPINY);
-            obj_init_animation_with_sound(o, spiny_seg5_anims_05016EAC, 0);
+            obj_init_animation_with_sound(o, spiny_seg5_anims_05016EAC, SPINY_ANIM_DEFAULT);
             o->oGraphYOffset = -17.0f;
 
             o->oFaceAnglePitch = 0;
