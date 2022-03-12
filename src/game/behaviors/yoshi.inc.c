@@ -37,7 +37,7 @@ void yoshi_walk_loop(void) {
         o->oAction = YOSHI_ACT_IDLE;
     }
 
-    cur_obj_init_animation(1);
+    cur_obj_init_animation(YOSHI_ANIM_WALK);
 
     if (animFrame == 0 || animFrame == 15) {
         cur_obj_play_sound_2(SOUND_GENERAL_YOSHI_WALK);
@@ -69,7 +69,7 @@ void yoshi_idle_loop(void) {
         o->oAction = YOSHI_ACT_WALK;
     }
 
-    cur_obj_init_animation(0);
+    cur_obj_init_animation(YOSHI_ANIM_IDLE);
 
     if (o->oInteractStatus == INT_STATUS_INTERACTED) {
         o->oAction = YOSHI_ACT_TALK;
@@ -87,7 +87,7 @@ void yoshi_idle_loop(void) {
 
 void yoshi_talk_loop(void) {
     if ((s16) o->oMoveAngleYaw == (s16) o->oAngleToMario) {
-        cur_obj_init_animation(0);
+        cur_obj_init_animation(YOSHI_ANIM_IDLE);
         if (set_mario_npc_dialog(MARIO_DIALOG_LOOK_FRONT) == MARIO_DIALOG_STATUS_SPEAK) {
             o->activeFlags |= ACTIVE_FLAG_INITIATED_TIME_STOP;
             if (cutscene_object_with_dialog(CUTSCENE_DIALOG, o, DIALOG_161) != 0) {
@@ -100,7 +100,7 @@ void yoshi_talk_loop(void) {
             }
         }
     } else {
-        cur_obj_init_animation(1);
+        cur_obj_init_animation(YOSHI_ANIM_WALK);
         play_puzzle_jingle();
         o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oAngleToMario, 0x500);
     }
@@ -111,7 +111,7 @@ void yoshi_walk_and_jump_off_roof_loop(void) {
 
     o->oForwardVel = 10.0f;
     object_step();
-    cur_obj_init_animation(1);
+    cur_obj_init_animation(YOSHI_ANIM_WALK);
 
     if (o->oTimer == 0) {
         cutscene_object(CUTSCENE_STAR_SPAWN, o);
@@ -120,7 +120,7 @@ void yoshi_walk_and_jump_off_roof_loop(void) {
     o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oYoshiTargetYaw, 0x500);
 
     if (is_point_close_to_object(o, o->oHomeX, 3174.0f, o->oHomeZ, 200)) {
-        cur_obj_init_animation(2);
+        cur_obj_init_animation(YOSHI_ANIM_JUMP);
         cur_obj_play_sound_2(SOUND_GENERAL_ENEMY_ALERT1);
         o->oForwardVel = 50.0f;
         o->oVelY = 40.0f;
@@ -197,7 +197,7 @@ void bhv_yoshi_loop(void) {
             break;
 
         case YOSHI_ACT_CREDITS:
-            cur_obj_init_animation(0);
+            cur_obj_init_animation(YOSHI_ANIM_IDLE);
             break;
     }
 

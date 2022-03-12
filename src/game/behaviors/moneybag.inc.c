@@ -28,7 +28,7 @@ void bhv_moneybag_init(void) {
     o->oGravity = 3.0f;
     o->oFriction = 1.0f;
     o->oBuoyancy = 2.0f;
-    cur_obj_init_animation(0);
+    cur_obj_init_animation(MONEYBAG_ANIM_IDLE);
     o->oOpacity = 0;
 }
 
@@ -54,7 +54,7 @@ void moneybag_jump(s16 collisionFlags) {
 
     switch (o->oMoneybagJumpState) {
         case MONEYBAG_JUMP_PREPARE:
-            cur_obj_init_animation(1);
+            cur_obj_init_animation(MONEYBAG_ANIM_PREPARE_JUMP);
             if (animFrame == 5) {
                 o->oForwardVel = 20.0f;
                 o->oVelY = 40.0f;
@@ -67,7 +67,7 @@ void moneybag_jump(s16 collisionFlags) {
             break;
 
         case MONEYBAG_JUMP_JUMP:
-            cur_obj_init_animation(2);
+            cur_obj_init_animation(MONEYBAG_ANIM_JUMP);
 
             if ((collisionFlags & OBJ_COL_FLAG_GROUNDED) == OBJ_COL_FLAG_GROUNDED) {
                 o->oForwardVel = 0;
@@ -77,7 +77,7 @@ void moneybag_jump(s16 collisionFlags) {
             break;
 
         case MONEYBAG_JUMP_JUMP_AND_BOUNCE:
-            cur_obj_init_animation(3);
+            cur_obj_init_animation(MONEYBAG_ANIM_LAND);
 
             if (cur_obj_check_if_near_animation_end()) {
                 o->oMoneybagJumpState = MONEYBAG_JUMP_LANDING;
@@ -85,7 +85,7 @@ void moneybag_jump(s16 collisionFlags) {
             break;
 
         case MONEYBAG_JUMP_WALK_AROUND:
-            cur_obj_init_animation(4);
+            cur_obj_init_animation(MONEYBAG_ANIM_WALK);
             o->oForwardVel = 10.0f;
 
             if (o->oTimer > 60) {
@@ -96,7 +96,7 @@ void moneybag_jump(s16 collisionFlags) {
             break;
 
         case MONEYBAG_JUMP_WALK_HOME:
-            cur_obj_init_animation(4);
+            cur_obj_init_animation(MONEYBAG_ANIM_WALK);
             o->oForwardVel = 5.0f;
             break;
     }
@@ -148,7 +148,7 @@ void moneybag_act_return_home(void) {
     if (is_point_close_to_object(o, o->oHomeX, o->oHomeY, o->oHomeZ, 100)) {
         spawn_object(o, MODEL_YELLOW_COIN, bhvMoneybagHidden);
         cur_obj_play_sound_2(SOUND_GENERAL_VANISH_SFX);
-        cur_obj_init_animation(0);
+        cur_obj_init_animation(MONEYBAG_ANIM_IDLE);
         o->oAction = MONEYBAG_ACT_DISAPPEAR;
         o->oMoneybagJumpState = MONEYBAG_JUMP_LANDING;
     }

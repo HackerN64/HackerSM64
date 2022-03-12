@@ -25,7 +25,7 @@ static struct ObjectHitbox sBigBullyHitbox = {
 };
 
 void bhv_small_bully_init(void) {
-    cur_obj_init_animation(0);
+    cur_obj_init_animation(BULLY_ANIM_WALKING);
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oBehParams2ndByte = BULLY_BP_SIZE_SMALL;
     o->oGravity = 4.0f;
@@ -36,7 +36,7 @@ void bhv_small_bully_init(void) {
 }
 
 void bhv_big_bully_init(void) {
-    cur_obj_init_animation(0);
+    cur_obj_init_animation(BULLY_ANIM_WALKING);
     vec3f_copy(&o->oHomeVec, &o->oPosVec);
     o->oBehParams2ndByte = BULLY_BP_SIZE_BIG;
     o->oGravity = 5.0f;
@@ -57,7 +57,7 @@ void bully_check_mario_collision(void) {
         o->oInteractStatus &= ~INT_STATUS_INTERACTED;
         o->oAction = BULLY_ACT_KNOCKBACK;
         o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
-        cur_obj_init_animation(3);
+        cur_obj_init_animation(BULLY_ANIM_BOAST);
         o->oBullyMarioCollisionAngle = o->oMoveAngleYaw;
     }
 }
@@ -84,7 +84,7 @@ void bully_act_chase_mario(void) {
 
     if (!is_point_within_radius_of_mario(homeX, posY, homeZ, 1000)) {
         o->oAction = BULLY_ACT_PATROL;
-        cur_obj_init_animation(0);
+        cur_obj_init_animation(BULLY_ANIM_WALKING);
     }
 }
 
@@ -102,7 +102,7 @@ void bully_act_knockback(void) {
     if (o->oBullyKBTimerAndMinionKOCounter == 18) {
         o->oAction = BULLY_ACT_CHASE_MARIO;
         o->oBullyKBTimerAndMinionKOCounter = 0;
-        cur_obj_init_animation(1);
+        cur_obj_init_animation(BULLY_ANIM_RUNNING);
     }
 }
 
@@ -224,7 +224,7 @@ void bhv_bully_loop(void) {
 
             if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 800) == TRUE) {
                 o->oAction = BULLY_ACT_CHASE_MARIO;
-                cur_obj_init_animation(1);
+                cur_obj_init_animation(BULLY_ANIM_RUNNING);
             }
 
             bully_step();
@@ -295,7 +295,7 @@ void bhv_big_bully_with_minions_loop(void) {
 
             if (obj_return_home_if_safe(o, o->oHomeX, o->oPosY, o->oHomeZ, 1000) == TRUE) {
                 o->oAction = BULLY_ACT_CHASE_MARIO;
-                cur_obj_init_animation(1);
+                cur_obj_init_animation(BULLY_ANIM_RUNNING);
             }
 
             bully_step();
