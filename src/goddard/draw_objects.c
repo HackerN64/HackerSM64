@@ -413,15 +413,13 @@ void draw_face(struct ObjFace *face) {
     Vtx *gbiVtx;       // 18
 
     imin("draw_face");
-    if (sUseSelectedColor == FALSE && face->mtlId >= 0) { // -1 == colored face
-        if (face->mtl != NULL) {
-            if ((i = face->mtl->gddlNumber) != 0) {
-                if (i != sUpdateViewState.mtlDlNum) {
-                    gd_dl_flush_vertices();
-                    branch_to_gddl(i);
-                    sUpdateViewState.mtlDlNum = i;
-                }
-            }
+    if (sUseSelectedColor == FALSE && face->mtlId >= 0 && face->mtl != NULL) { // -1 == colored face
+        i = face->mtl->gddlNumber;
+
+        if (i != 0 && i != sUpdateViewState.mtlDlNum) {
+            gd_dl_flush_vertices();
+            branch_to_gddl(i);
+            sUpdateViewState.mtlDlNum = i;
         }
     }
 
@@ -495,11 +493,11 @@ void Unknown801792F0(struct GdObj *obj) {
 void draw_label(struct ObjLabel *label) {
     struct GdVec3f position;
     char strbuf[0x100];
-    struct ObjValPtr *valptr;
     union ObjVarVal varval;
     valptrproc_t valfn = label->valfn;
+    struct ObjValPtr *valptr = label->valptr;
 
-    if ((valptr = label->valptr) != NULL) {
+    if (valptr != NULL) {
         if (valptr->flag == 0x40000) {
             // position is offset from object
             set_cur_dynobj(valptr->obj);

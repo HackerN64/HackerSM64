@@ -538,7 +538,9 @@ s32 func_8018FFE8(struct ObjBone **a0, struct ObjJoint **a1, struct ObjJoint *a2
     }
 
     while (link != NULL) {
-        if ((b = (struct ObjBone *) link->obj) != NULL) {
+        b = (struct ObjBone *) link->obj;
+
+        if (b != NULL) {
             bonegrp = b->unk10C;
             bonelink = bonegrp->firstMember;
 

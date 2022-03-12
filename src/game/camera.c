@@ -9459,7 +9459,9 @@ void cutscene_enter_cannon_raise(struct Camera *c) {
     sCutsceneVars[3].point[1] += 2.f;
     c->pos[1] += sCutsceneVars[3].point[1];
 
-    if ((obj = sMarioCamState->usedObj) != NULL) {
+    obj = sMarioCamState->usedObj;
+
+    if (obj != NULL) {
         sCutsceneVars[0].point[1] = obj->oPosY;
         vec3i_to_vec3s(cannonAngle, &obj->oMoveAngleVec);
         vec3f_copy(c->focus, &obj->oPosVec);

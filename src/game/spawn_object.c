@@ -20,9 +20,9 @@
  * freeList is empty.
  */
 struct Object *try_allocate_object(struct ObjectNode *destList, struct ObjectNode *freeList) {
-    struct ObjectNode *nextObj;
+    struct ObjectNode *nextObj = freeList->next;
 
-    if ((nextObj = freeList->next) != NULL) {
+    if (nextObj != NULL) {
         // Remove from free list
         freeList->next = nextObj->next;
 

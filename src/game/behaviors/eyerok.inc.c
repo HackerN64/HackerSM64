@@ -98,8 +98,9 @@ static void eyerok_boss_act_fight(void) {
             } else if (o->oEyerokBossNumHands == 2 && o->oEyerokBossAttackPhase % 6 == 0) {
                 o->oEyerokBossAttackCountdown = 8;
                 o->oEyerokBossOffsetFromHome = 0.0f;
+                o->oEyerokBossAttackPhase = (random_u16() & 0x1);
 
-                if ((o->oEyerokBossAttackPhase = random_u16() & 0x1) != 0) {
+                if (o->oEyerokBossAttackPhase != 0) {
                     o->oEyerokBossFightSideZ = -1.0f;
                 } else {
                     o->oEyerokBossFightSideZ = 1.0f;

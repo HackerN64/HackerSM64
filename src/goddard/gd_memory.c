@@ -113,7 +113,9 @@ struct GMemBlock *make_mem_block(u32 blockType, u8 permFlag) {
     }
 
     newMemBlock = sEmptyBlockListHead;
-    if ((sEmptyBlockListHead = newMemBlock->next) != NULL) {
+    sEmptyBlockListHead = newMemBlock->next;
+
+    if (sEmptyBlockListHead != NULL) {
         newMemBlock->next->prev = NULL;
     }
 

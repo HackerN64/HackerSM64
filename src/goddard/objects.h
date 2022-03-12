@@ -82,7 +82,7 @@ void func_8017E584(struct ObjNet *net, struct GdVec3f *a1, struct GdVec3f *a2);
 void func_8017E838(struct ObjNet *net, struct GdVec3f *a1, struct GdVec3f *a2);
 void func_8017E9EC(struct ObjNet *net);
 s32 gd_plane_point_within(struct GdBoundingBox *box1, struct GdBoundingBox *box2);
-s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj);
+void transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj);
 s32 func_8017F210(struct GdObj *a0, struct GdObj *a1);
 void interpolate_animation_transform(struct GdAnimTransform *t1, struct GdAnimTransform *t2, f32 dt);
 void move_animator(struct ObjAnimator *animObj);

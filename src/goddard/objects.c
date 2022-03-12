@@ -616,8 +616,9 @@ struct ObjView *make_view(const char *name, s32 flags, s32 projectionType, s32 u
 
     newView->flags = (flags | VIEW_UPDATE | VIEW_LIGHT);
     newView->id = sGdViewInfo.count++;
+    newView->components = parts;
 
-    if ((newView->components = parts) != NULL) {
+    if (newView->components != NULL) {
         reset_nets_and_gadgets(parts);
     }
 
@@ -1068,18 +1069,18 @@ void func_8017E838(struct ObjNet *net, struct GdVec3f *a1, struct GdVec3f *a2) {
 
 /* @ 22D1BC for 0xA8 */
 void func_8017E9EC(struct ObjNet *net) {
-    struct GdVec3f sp5C;
-    Mat4f sp1C;
-    f32 sp18;
+    struct GdVec3f torqueVec;
+    Mat4f torqueMtx;
+    f32 mag;
 
-    sp5C.x = net->torque.x;
-    sp5C.y = net->torque.y;
-    sp5C.z = net->torque.z;
+    torqueVec.x = net->torque.x;
+    torqueVec.y = net->torque.y;
+    torqueVec.z = net->torque.z;
 
-    gd_normalize_vec3f(&sp5C);
-    sp18 = gd_vec3f_magnitude(&net->torque);
-    gd_create_rot_mat_angular(&sp1C, &sp5C, -sp18);
-    gd_mult_mat4f(&D_801B9DC8, &sp1C, &D_801B9DC8);
+    gd_normalize_vec3f(&torqueVec);
+    mag = gd_vec3f_magnitude(&net->torque);
+    gd_create_rot_mat_angular(&torqueMtx, &torqueVec, -mag);
+    gd_mult_mat4f(&D_801B9DC8, &torqueMtx, &D_801B9DC8);
 }
 
 /**
@@ -1123,7 +1124,7 @@ s32 gd_plane_point_within(struct GdBoundingBox *box1, struct GdBoundingBox *box2
 }
 
 /* @ 22D824 for 0x1BC */
-s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj) {
+void transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj) {
     struct ListNode *curLink;
     struct ObjGroup *curGroup;
     Mat4f *parentUnkMtx;
@@ -1171,7 +1172,6 @@ s32 transform_child_objects_recursive(struct GdObj *obj, struct GdObj *parentObj
             curLink = curLink->next;
         }
     }
-    return 0;
 }
 
 /* @ 22D9E0 for 0x1BC */
@@ -1594,7 +1594,9 @@ void move_camera(struct ObjCamera *cam) {
     spE0.x = spE0.y = spE0.z = 0.0f;
     spB0.x = spB0.y = spB0.z = 0.0f;
 
-    if ((spEC = cam->unk30) != NULL) {
+    spEC = cam->unk30;
+
+    if (spEC != NULL) {
         set_cur_dynobj(spEC);
         d_get_world_pos(&spE0);
         d_get_matrix(&sp70);
@@ -1746,10 +1748,12 @@ void proc_view_movement(struct ObjView *view) {
     imin("movement");
     sCurrentMoveCamera = view->activeCam;
     sCurrentMoveView = view;
-    if ((sCurrentMoveGrp = view->components) != NULL) {
+    sCurrentMoveGrp = view->components;
+    if (sCurrentMoveGrp != NULL) {
         move_group_members();
     }
-    if ((sCurrentMoveGrp = view->lights) != NULL) {
+    sCurrentMoveGrp = view->lights;
+    if (sCurrentMoveGrp != NULL) {
         move_group_members();
     }
     imout();

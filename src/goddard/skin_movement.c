@@ -47,17 +47,19 @@ void func_801815E0(Mat4f *mtx) {
 /* called with ObjNext->unk1A8 (variable obj ptr?) ->unk20 or ->unk24 ptr*/
 // TODO: figure out the proper object type for a0
 void scale_verts(struct ObjGroup *a0) {
-    register f32 sp1C;
-    register struct ListNode *link;
+    f32 scale;
+    struct ListNode *link;
     struct ObjVertex *vtx;
 
     for (link = a0->firstMember; link != NULL; link = link->next) {
         vtx = (struct ObjVertex *) link->obj;
 
-        if ((sp1C = vtx->scaleFactor) != 0.0f) {
-            vtx->pos.x = vtx->initPos.x * sp1C;
-            vtx->pos.y = vtx->initPos.y * sp1C;
-            vtx->pos.z = vtx->initPos.z * sp1C;
+        scale = vtx->scaleFactor;
+
+        if (scale != 0.0f) {
+            vtx->pos.x = vtx->initPos.x * scale;
+            vtx->pos.y = vtx->initPos.y * scale;
+            vtx->pos.z = vtx->initPos.z * scale;
         } else {
             vtx->pos.x = vtx->pos.y = vtx->pos.z = 0.0f;
         }
@@ -124,15 +126,15 @@ void reset_weight_vtx(struct ObjVertex *vtx) {
 }
 
 void reset_weight(struct ObjWeight *weight) {
-    UNUSED u32 vtxCount;
     struct ObjGroup *skinGroup;
 
     sResetCurWeight = weight;
     sResetWeightVtxNum = 0;
-    if ((skinGroup = gGdSkinNet->skinGrp) != NULL) {
+    skinGroup = gGdSkinNet->skinGrp;
+
+    if (skinGroup != NULL) {
         // Go through every vertex in the skin group, and reset the weight if the vertex is managed by the weight
-        vtxCount =
-            apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) reset_weight_vtx, skinGroup);
+        apply_to_obj_types_in_group(OBJ_TYPE_VERTICES, (applyproc_t) reset_weight_vtx, skinGroup);
     } else {
         fatal_printf("reset_weight(): Skin net has no SkinGroup");
     }
@@ -147,7 +149,9 @@ void reset_joint_weights(struct ObjJoint *joint) {
 
     gd_inverse_mat4f(&joint->matE8, &D_801B9EA8);
     D_801B9EE8 = joint;
-    if ((group = joint->weightGrp) != NULL) {
+    group = joint->weightGrp;
+
+    if (group != NULL) {
         apply_to_obj_types_in_group(OBJ_TYPE_WEIGHTS, (applyproc_t) reset_weight, group);
     }
 }
