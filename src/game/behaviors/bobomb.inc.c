@@ -173,7 +173,7 @@ void bobomb_free_loop(void) {
 }
 
 void bobomb_held_loop(void) {
-    o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+    cur_obj_hide();
     cur_obj_init_animation(BOBOMB_ANIM_HELD);
     cur_obj_set_pos_relative(gMarioObject, 0.0f, 60.0f, 100.0f);
 
@@ -190,7 +190,7 @@ void bobomb_held_loop(void) {
 void bobomb_dropped_loop(void) {
     cur_obj_get_dropped();
 
-    o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+    cur_obj_unhide();
     cur_obj_init_animation(BOBOMB_ANIM_WALKING);
 
     o->oHeldState = HELD_FREE;
@@ -199,8 +199,8 @@ void bobomb_dropped_loop(void) {
 
 void bobomb_thrown_loop(void) {
     cur_obj_enable_rendering();
+    cur_obj_unhide();
 
-    o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
     o->oHeldState = HELD_FREE;
     o->oFlags &= ~OBJ_FLAG_SET_FACE_YAW_TO_MOVE_YAW;
     o->oForwardVel = 25.0f;

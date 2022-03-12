@@ -41,7 +41,7 @@ void bhv_hidden_blue_coin_loop(void) {
             cur_obj_enable_rendering();
             cur_obj_become_tangible();
 #ifdef BLUE_COIN_SWITCH_RETRY
-            o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+            cur_obj_unhide();
 #endif
 
             // Delete the coin once collected

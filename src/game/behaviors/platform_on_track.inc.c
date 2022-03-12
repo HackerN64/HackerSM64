@@ -127,7 +127,7 @@ static void platform_on_track_mario_not_on_platform(void) {
         // Once oTimer reaches 150, blink 40 times
         if (cur_obj_wait_then_blink(150, 40)) {
             platform_on_track_reset();
-            o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+            cur_obj_unhide();
         }
     }
 }
@@ -306,7 +306,7 @@ static void platform_on_track_act_move_along_track(void) {
         platform_on_track_mario_not_on_platform();
     } else {
         o->oTimer = 0;
-        o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+        cur_obj_unhide();
     }
 }
 
@@ -330,7 +330,7 @@ static void platform_on_track_act_fall(void) {
         platform_on_track_mario_not_on_platform();
     } else {
         o->oTimer = 0;
-        o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+        cur_obj_unhide();
     }
 }
 

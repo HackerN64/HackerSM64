@@ -237,11 +237,11 @@ void bhv_1up_hidden_loop(void) {
 
     switch (o->oAction) {
         case MUSHROOM_ACT_INIT:
-            o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+            cur_obj_hide();
             if (o->o1UpHiddenTimesTriggered == o->oBehParams2ndByte) {
                 o->oVelY = 40.0f;
                 o->oAction = MUSHROOM_ACT_LOOP_IN_AIR;
-                o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+                cur_obj_unhide();
                 play_sound(SOUND_GENERAL2_1UP_APPEAR, gGlobalSoundSource);
             }
             break;
@@ -289,11 +289,11 @@ void bhv_1up_hidden_trigger_loop(void) {
 void bhv_1up_hidden_in_pole_loop(void) {
     switch (o->oAction) {
         case MUSHROOM_ACT_INIT:
-            o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+            cur_obj_hide();
             if (o->o1UpHiddenTimesTriggered == o->oBehParams2ndByte) {
                 o->oVelY = 40.0f;
                 o->oAction = MUSHROOM_ACT_LOOP_IN_AIR;
-                o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+                cur_obj_unhide();
                 play_sound(SOUND_GENERAL2_1UP_APPEAR, gGlobalSoundSource);
             }
             break;

@@ -33,7 +33,7 @@ void bhv_homing_amp_init(void) {
     cur_obj_scale(0.1f);
 
     // Hide the amp (until Mario gets near).
-    o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+    cur_obj_hide();
 }
 
 /**
@@ -154,7 +154,7 @@ static void homing_amp_give_up_loop(void) {
     if (o->oTimer > 150) {
         // Hide the amp and reset it back to its inactive state
         cur_obj_set_pos_to_home();
-        o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+        cur_obj_hide();
         o->oAction = HOMING_AMP_ACT_INACTIVE;
         o->oAnimState = 0;
         o->oForwardVel = 0.0f;
@@ -192,7 +192,7 @@ void bhv_homing_amp_loop(void) {
             if (is_point_within_radius_of_mario(o->oHomeX, o->oHomeY, o->oHomeZ, 800) == TRUE) {
                 // Make the amp start to appear, and un-hide it.
                 o->oAction = HOMING_AMP_ACT_APPEAR;
-                o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+                cur_obj_unhide();
             }
             break;
 

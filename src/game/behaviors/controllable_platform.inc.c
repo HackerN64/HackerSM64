@@ -146,7 +146,7 @@ void controllable_platform_tilt_from_mario(void) {
         if (sControllablePlatformDirectionState == 6) {
             sControllablePlatformDirectionState = 0;
             o->oTimer = 0;
-            o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+            cur_obj_unhide();
         }
     }
 }

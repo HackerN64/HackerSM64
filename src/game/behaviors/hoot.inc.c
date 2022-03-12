@@ -4,7 +4,7 @@ void bhv_hoot_init(void) {
     cur_obj_init_animation(HOOT_ANIM_DEFAULT);
     Vec3f homeOffset = { 800.0f, -150.0f, 300.0f };
     vec3f_sum(&o->oHomeVec, &o->oPosVec, homeOffset);
-    o->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
+    cur_obj_hide();
 
     cur_obj_become_intangible();
 }
@@ -221,7 +221,7 @@ void bhv_hoot_loop(void) {
     switch (o->oHootAvailability) {
         case HOOT_AVAIL_ASLEEP_IN_TREE:
             if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 50)) {
-                o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+                cur_obj_unhide();
                 o->oHootAvailability = HOOT_AVAIL_WANTS_TO_TALK;
             }
 #ifdef HOOT_TREE_PARTICLES
