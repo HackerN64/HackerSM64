@@ -172,10 +172,10 @@ void correct_lava_shadow_height(f32 *floorHeight) {
  * Uses environment alpha for shadow solidity.
  */
 static void add_shadow_to_display_list(Gfx *displayListHead, s8 shadowType) {
-    Gfx *shapeDl = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
+    Gfx *dl_shadow = (shadowType == SHADOW_CIRCLE) ? dl_shadow_circle : dl_shadow_square;
     Alpha solidity = s->solidity;
 
-    gSPDisplayList(displayListHead++, shapeDl);
+    gSPDisplayList(displayListHead++, dl_shadow);
     gDPSetEnvColor(displayListHead++, 255, 255, 255, solidity);
     gSPDisplayList(displayListHead++, dl_shadow_end);
     gSPEndDisplayList(displayListHead);
@@ -191,6 +191,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     const f32 floorLowerLimitMisc = construct_float(FLOOR_LOWER_LIMIT_MISC);
 
     struct Object *obj = gCurGraphNodeObjectNode;
+
     // Check if the object exists.
     if (obj == NULL) {
         return NULL;
@@ -203,13 +204,13 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
     f32 x = pos[0];
     f32 y = pos[1];
     f32 z = pos[2];
-    s8 isPlayer   = (obj == gMarioObject);
+    s8 isPlayer = (obj == gMarioObject);
     s8 notHeldObj = (gCurGraphNodeHeldObject == NULL);
 
-    struct MarioState *m;
+    struct MarioState *m = gMarioState;
 
     // Attempt to use existing floors before finding a new one.
-    if (notHeldObj && isPlayer && (m = gMarioState)->floor) {
+    if (notHeldObj && isPlayer && m->floor) {
         // The object is Mario and has a referenced floor.
         floor       = m->floor;
         floorHeight = m->floorHeight;
@@ -269,13 +270,17 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
             // Set the shadow height to the lava height in specific areas.
             correct_lava_shadow_height(&floorHeight);
 #endif
-        } else if (((obj = floor->object) != NULL)
-                && (obj_has_behavior(obj, bhvPlatformOnTrack))
-                && (obj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET)) {
-            // Raise the shadow 5 units so the shadow doesn't clip into the flying carpet.
-            floorHeight += 5;
-            // The flying carpet is transparent.
-            s->isDecal = FALSE;
+        } else {
+            obj = floor->object;
+            // Check if the shadow is on the flying carpet.
+            if ((obj != NULL)
+             && (obj_has_behavior(obj, bhvPlatformOnTrack))
+             && (obj->oPlatformOnTrackType == PLATFORM_ON_TRACK_TYPE_CARPET)) {
+                // Raise the shadow 5 units so the shadow doesn't clip into the flying carpet.
+                floorHeight += 5;
+                // The flying carpet is transparent.
+                s->isDecal = FALSE;
+            }
         }
     }
 
@@ -291,7 +296,7 @@ Gfx *create_shadow_below_xyz(Vec3f pos, s16 shadowScale, u8 shadowSolidity, s8 s
         ny = floor->normal.y;
         nz = floor->normal.z;
 
-        // No shadow if the y-normal is negative (an unexpected result).
+        // No shadow if the y-normal is negative (downward facing surface).
         if (ny <= 0.0f) {
             return NULL;
         }
