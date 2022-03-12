@@ -3275,14 +3275,12 @@ const BehaviorScript bhvWaterDroplet[] = {
 const BehaviorScript bhvWaterDropletSplash[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    SET_INT(oFaceAnglePitch, 0),
-    SET_INT(oFaceAngleYaw, 0),
-    SET_INT(oFaceAngleRoll, 0),
     CALL_NATIVE(bhv_water_droplet_splash_init),
     ADD_FLOAT(oPosY, 5),
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
     BEGIN_REPEAT(6),
         ADD_INT(oAnimState, 1),
+        CALL_NATIVE(bhv_align_to_water),
     END_REPEAT(),
     DEACTIVATE(),
 };
@@ -3291,13 +3289,11 @@ const BehaviorScript bhvWaterDropletSplash[] = {
 const BehaviorScript bhvBubbleSplash[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    SET_INT(oFaceAnglePitch, 0),
-    SET_INT(oFaceAngleYaw, 0),
-    SET_INT(oFaceAngleRoll, 0),
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
     CALL_NATIVE(bhv_bubble_splash_init),
     BEGIN_REPEAT(6),
         ADD_INT(oAnimState, 1),
+        CALL_NATIVE(bhv_align_to_water),
     END_REPEAT(),
     DEACTIVATE(),
 };
@@ -3306,9 +3302,6 @@ const BehaviorScript bhvBubbleSplash[] = {
 const BehaviorScript bhvIdleWaterWave[] = {
     BEGIN(OBJ_LIST_DEFAULT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    SET_INT(oFaceAnglePitch, 0),
-    SET_INT(oFaceAngleYaw, 0),
-    SET_INT(oFaceAngleRoll, 0),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_idle_water_wave_loop),
         ADD_INT(oAnimState, 1),
@@ -3323,12 +3316,10 @@ const BehaviorScript bhvIdleWaterWave[] = {
 const BehaviorScript bhvObjectWaterSplash[] = {
     BEGIN(OBJ_LIST_UNIMPORTANT),
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    SET_INT(oFaceAnglePitch, 0),
-    SET_INT(oFaceAngleYaw, 0),
-    SET_INT(oFaceAngleRoll, 0),
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
     BEGIN_REPEAT(6),
         ADD_INT(oAnimState, 1),
+        CALL_NATIVE(bhv_align_to_water),
     END_REPEAT(),
     DEACTIVATE(),
 };
@@ -3375,9 +3366,6 @@ const BehaviorScript bhvWaveTrail[] = {
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     PARENT_BIT_CLEAR(oActiveParticleFlags, ACTIVE_PARTICLE_WAVE_TRAIL),
     // Wave trail - common:
-    SET_INT(oFaceAnglePitch, 0),
-    SET_INT(oFaceAngleYaw, 0),
-    SET_INT(oFaceAngleRoll, 0),
     SET_INT(oAnimState, OBJ_ANIM_STATE_INIT_ANIM),
     BEGIN_REPEAT(8),
         ADD_INT(oAnimState, 1),

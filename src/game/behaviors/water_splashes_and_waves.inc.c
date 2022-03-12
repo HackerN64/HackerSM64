@@ -45,6 +45,24 @@ struct WaterDropletParams gShallowWaterWaveDropletParams = {
     /* Random size offset, scale */ 0.5f, 1.0f
 };
 
+void bhv_align_to_water(void) {
+    struct Surface *waterSurf = NULL;
+    Vec3f pos;
+
+    vec3_zero(&o->oFaceAngleVec);
+    vec3f_copy(pos, &o->oPosVec);
+
+    find_water_level_and_floor(pos[0], pos[1], pos[2], &waterSurf);
+    if (waterSurf != NULL) {
+        Vec3f normal;
+        surface_normal_to_vec3f(normal, waterSurf);
+
+        if (normal[1] < 1.0f) {
+            mtxf_align_terrain_normal(o->transform, normal, pos, 0x0);
+            o->header.gfx.throwMatrix = &o->transform;
+        }
+    }
+}
 
 void bhv_water_splash_spawn_droplets(void) {
     s32 i;
@@ -63,11 +81,7 @@ void bhv_water_droplet_loop(void) {
     f32 waterLevel = find_water_level(o->oPosX, o->oPosY, o->oPosZ);
 
     if (o->oTimer == 0) {
-        if (cur_obj_has_model(MODEL_FISH)) {
-            o->header.gfx.node.flags &= ~GRAPH_RENDER_BILLBOARD;
-        } else {
-            o->header.gfx.node.flags |= GRAPH_RENDER_BILLBOARD;
-        }
+        COND_BIT(!cur_obj_has_model(MODEL_FISH), o->header.gfx.node.flags, GRAPH_RENDER_BILLBOARD);
         o->oFaceAngleYaw = random_u16();
     }
     // Apply gravity
@@ -91,6 +105,9 @@ void bhv_water_droplet_loop(void) {
 void bhv_idle_water_wave_loop(void) {
     obj_copy_pos(o, gMarioObject);
     o->oPosY = gMarioStates[0].waterLevel + 5;
+
+    bhv_align_to_water();
+
     if (!(gMarioObject->oMarioParticleFlags & ACTIVE_PARTICLE_IDLE_WATER_WAVE)) {
         gMarioObject->oActiveParticleFlags &= (u16) ~ACTIVE_PARTICLE_IDLE_WATER_WAVE;
         obj_mark_for_deletion(o);
@@ -122,6 +139,8 @@ void bhv_wave_trail_shrink(void) {
         return;
     }
     o->oPosY = find_water_level(o->oPosX, o->oPosY, o->oPosZ) + 5.0f;
+
+    bhv_align_to_water();
 
     if (o->oTimer == 0) {
         o->oWaveTrailSize = o->header.gfx.scale[0];

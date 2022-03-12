@@ -241,6 +241,7 @@ void bhv_sparkle_spawn_loop(void);
 void bhv_scuttlebug_loop(void);
 void bhv_scuttlebug_spawn_loop(void);
 void bhv_whomp_loop(void);
+void bhv_align_to_water(void);
 void bhv_water_splash_spawn_droplets(void);
 void bhv_water_droplet_loop(void);
 void bhv_water_droplet_splash_init(void);
