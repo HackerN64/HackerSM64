@@ -168,19 +168,19 @@ u32 determine_interaction(struct MarioState *m, struct Object *obj) {
 
             if (m->flags & MARIO_PUNCHING) {
                 // 120 degrees total, or 60 each way
-                if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
+                if (-DEGREES(60) <= dYawToObject && dYawToObject <= DEGREES(60)) {
                     interaction = INT_PUNCH;
                 }
             }
             if (m->flags & MARIO_KICKING) {
                 // 120 degrees total, or 60 each way
-                if (-0x2AAA <= dYawToObject && dYawToObject <= 0x2AAA) {
+                if (-DEGREES(60) <= dYawToObject && dYawToObject <= DEGREES(60)) {
                     interaction = INT_KICK;
                 }
             }
             if (m->flags & MARIO_TRIPPING) {
                 // 180 degrees total, or 90 each way
-                if (-0x4000 <= dYawToObject && dYawToObject <= 0x4000) {
+                if (-DEGREES(90) <= dYawToObject && dYawToObject <= DEGREES(90)) {
                     interaction = INT_TRIP;
                 }
             }
@@ -414,14 +414,14 @@ u32 mario_check_object_grab(struct MarioState *m) {
 
         if (script == bhvBowser) {
             s16 facingDYaw = m->faceAngle[1] - m->interactObj->oMoveAngleYaw;
-            if (facingDYaw >= -0x5555 && facingDYaw <= 0x5555) {
+            if (facingDYaw >= -DEGREES(120) && facingDYaw <= DEGREES(120)) {
                 m->faceAngle[1] = m->interactObj->oMoveAngleYaw;
                 m->usedObj = m->interactObj;
                 result = set_mario_action(m, ACT_PICKING_UP_BOWSER, 0);
             }
         } else {
             s16 facingDYaw = mario_obj_angle_to_object(m, m->interactObj) - m->faceAngle[1];
-            if (facingDYaw >= -0x2AAA && facingDYaw <= 0x2AAA) {
+            if (facingDYaw >= -DEGREES(60) && facingDYaw <= DEGREES(60)) {
                 m->usedObj = m->interactObj;
 
                 if (!(m->action & ACT_FLAG_AIR)) {
