@@ -29,6 +29,7 @@ This is a fork of the ultrasm64 repo by CrashOveride which includes the followin
 - **CrashOveride**: creating the [ultrasm64](https://github.com/CrashOveride95/ultrasm64) repo
 - **falcobuster**: Original coordinate overflow fix (world scale), ASM version of extended bounds
 - **anonymous_moose**: porting falco's extended bounds to decomp
+- **tuxlovesyou**: `LOAD_MIO0_TEXTURE` macro and moral support
 
 Thanks to Frame#5375 and AloXado320 for also helping with silhouette stuff
 
