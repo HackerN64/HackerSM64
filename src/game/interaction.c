@@ -346,7 +346,7 @@ void mario_blow_off_cap(struct MarioState *m, f32 capSpeed) {
 
         capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
 
-        capObject->oPosY += (m->action & ACT_FLAG_SHORT_HITBOX) ? 120.0f : 180.0f;
+        capObject->oPosY += m->marioObj->hitboxHeight + 20.0f;
         capObject->oForwardVel = capSpeed;
         capObject->oMoveAngleYaw = (s16)(m->faceAngle[1] + 0x400);
 
