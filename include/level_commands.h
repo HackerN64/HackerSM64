@@ -492,7 +492,11 @@ enum GoddardScene {
 
 // behParams
 
-#define BP(a, b, c, d) \
-    (((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
+#define BP1(p) (((p) & 0xFF) << 24)
+#define BP2(p) (((p) & 0xFF) << 16)
+#define BP3(p) (((p) & 0xFF) <<  8)
+#define BP4(p) (((p) & 0xFF) <<  0)
+
+#define BP(a, b, c, d) (BP1(a) | BP2(b) | BP3(c) | BP4(d))
 
 #endif // LEVEL_COMMANDS_H
