@@ -313,10 +313,10 @@ STATIC_ASSERT(ARRAY_COUNT(sBackgroundMusicDefaultVolume) == SEQ_COUNT,
 
 u8 sCurrentBackgroundMusicSeqId = SEQUENCE_NONE;
 u8 sMusicDynamicDelay = 0;
-u8 sSoundBankUsedListBack[SOUND_BANK_COUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-u8 sSoundBankFreeListFront[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-u8 sNumSoundsInBank[SOUND_BANK_COUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // only used for debugging
-u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+u8 sSoundBankUsedListBack[SOUND_BANK_COUNT];
+u8 sSoundBankFreeListFront[SOUND_BANK_COUNT];
+u8 sNumSoundsInBank[SOUND_BANK_COUNT]; // only used for debugging
+u8 sMaxChannelsForSoundBank[SOUND_BANK_COUNT];
 
 // sBackgroundMusicMaxTargetVolume and sBackgroundMusicTargetVolume use the 0x80
 // bit to indicate that they are set, and the rest of the bits for the actual value
@@ -348,7 +348,7 @@ struct UnkStruct80343D00 D_SH_80343D00;
 
 struct Sound sSoundRequests[0x100];
 // Curiously, this has size 3, despite SEQUENCE_PLAYERS == 4 on EU
-struct ChannelVolumeScaleFade D_80360928[3][CHANNELS_MAX];
+struct ChannelVolumeScaleFade D_80360928[SEQUENCE_PLAYERS][CHANNELS_MAX];
 u8 sUsedChannelsForSoundBank[SOUND_BANK_COUNT];
 u8 sCurrentSound[SOUND_BANK_COUNT][MAX_CHANNELS_PER_SOUND_BANK]; // index into sSoundBanks
 
@@ -1347,6 +1347,14 @@ static void update_game_sound(void) {
                         case SOUND_BANK_AIR:
                         case SOUND_BANK_GENERAL2:
                         case SOUND_BANK_OBJ2:
+#ifdef EXTRA_SFX_CHANNEL_BANKS
+                        case SOUND_BANK_CUSTOM_FOREGROUND1:
+                        case SOUND_BANK_CUSTOM_FOREGROUND2:
+                        case SOUND_BANK_CUSTOM_FOREGROUND3:
+                        case SOUND_BANK_CUSTOM_BACKGROUND1:
+                        case SOUND_BANK_CUSTOM_BACKGROUND2:
+                        case SOUND_BANK_CUSTOM_BACKGROUND3:
+#endif
 #if defined(VERSION_EU) || defined(VERSION_SH)
                             func_802ad770(0x05020000 | ((channelIndex & 0xff) << 8),
                                           get_sound_reverb(bank, soundIndex, channelIndex));
@@ -1513,6 +1521,14 @@ static void update_game_sound(void) {
                         case SOUND_BANK_AIR:
                         case SOUND_BANK_GENERAL2:
                         case SOUND_BANK_OBJ2:
+#ifdef EXTRA_SFX_CHANNEL_BANKS
+                        case SOUND_BANK_CUSTOM_FOREGROUND1:
+                        case SOUND_BANK_CUSTOM_FOREGROUND2:
+                        case SOUND_BANK_CUSTOM_FOREGROUND3:
+                        case SOUND_BANK_CUSTOM_BACKGROUND1:
+                        case SOUND_BANK_CUSTOM_BACKGROUND2:
+                        case SOUND_BANK_CUSTOM_BACKGROUND3:
+#endif
 #if defined(VERSION_EU) || defined(VERSION_SH)
                             func_802ad770(0x05020000 | ((channelIndex & 0xff) << 8),
                                           get_sound_reverb(bank, soundIndex, channelIndex));
@@ -1962,8 +1978,9 @@ void sound_init(void) {
         }
 
         sSoundBankUsedListBack[i] = 0;
-        sSoundBankFreeListFront[i] = 1;
+        sSoundBankFreeListFront[i] = 1; // Should this be set to MAX_CHANNELS_PER_SOUND_BANK or just 1? (Probably just 1).
         sNumSoundsInBank[i] = 0;
+        sMaxChannelsForSoundBank[i] = MAX_CHANNELS_PER_SOUND_BANK;
     }
 
     for (i = 0; i < SOUND_BANK_COUNT; i++) {
@@ -1980,7 +1997,7 @@ void sound_init(void) {
         sSoundBanks[i][j].next = 0xff;
     }
 
-    for (j = 0; j < 3; j++) {
+    for (j = 0; j < SEQUENCE_PLAYERS; j++) {
         for (i = 0; i < CHANNELS_MAX; i++) {
             D_80360928[j][i].remainingFrames = 0;
         }
