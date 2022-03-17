@@ -1303,7 +1303,7 @@ s32 anim_spline_poll(Vec3f result) {
 
 /**
  * @brief Checks if a ray intersects a surface using Möller–Trumbore intersection algorithm.
- * 
+ *
  * @param orig is the starting point of the ray.
  * @param dir is the normalized ray direction.
  * @param dir_length is the length of the ray.
@@ -1351,7 +1351,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     f32 u = f * vec3f_dot(s, h);
     // Check if 'u' is within bounds.
     if ((u < 0.0f) || (u > 1.0f)) return FALSE;
-    // Make 'q' the cross product of 's' and edge 1. 
+    // Make 'q' the cross product of 's' and edge 1.
     Vec3f q;
     vec3f_cross(q, s, e1);
     // Make 'v' the cos(angle) between the ray and 'q', divided by 'det'.
@@ -1404,7 +1404,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
         }
     }
 #if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
+    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
 }
 

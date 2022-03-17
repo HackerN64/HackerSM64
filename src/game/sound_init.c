@@ -354,7 +354,8 @@ void thread4_sound(UNUSED void *arg) {
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
 #if PUPPYPRINT_DEBUG
         lastTime = osGetTime();
-        dmaAudioTime[perfIteration] = 0;
+        gPuppyTimers.dmaAudioTime[NUM_PERF_ITERATIONS] -= gPuppyTimers.dmaAudioTime[perfIteration];
+        gPuppyTimers.dmaAudioTime[perfIteration] = 0;
 #endif
         if (gResetTimer < 25) {
             struct SPTask *spTask;
@@ -363,8 +364,8 @@ void thread4_sound(UNUSED void *arg) {
                 dispatch_audio_sptask(spTask);
             }
 #if PUPPYPRINT_DEBUG
-            profiler_update(audioTime, lastTime);
-            audioTime[perfIteration] -= dmaAudioTime[perfIteration];
+        profiler_update(gPuppyTimers.thread4Time, lastTime);
+        profiler_offset(gPuppyTimers.thread4Time, gPuppyTimers.dmaAudioTime[perfIteration]);
 #endif
         }
     }

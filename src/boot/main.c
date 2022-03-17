@@ -186,7 +186,7 @@ void start_gfx_sptask(void) {
      && sCurrentDisplaySPTask != NULL
      && sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED) {
 #if PUPPYPRINT_DEBUG
-        rspDelta = osGetTime();
+        puppyprint_update_rsp(RSP_GFX_START);
 #endif
         start_sptask(M_GFXTASK);
     }
@@ -220,13 +220,16 @@ void handle_vblank(void) {
             } else {
                 pretend_audio_sptask_done();
             }
+#if PUPPYPRINT_DEBUG
+            puppyprint_update_rsp(RSP_AUDIO_START);
+#endif
         }
     } else {
         if (gActiveSPTask == NULL
          && sCurrentDisplaySPTask != NULL
          && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
 #if PUPPYPRINT_DEBUG
-            rspDelta = osGetTime();
+            puppyprint_update_rsp(RSP_GFX_START);
 #endif
             start_sptask(M_GFXTASK);
         }
@@ -254,9 +257,13 @@ void handle_sp_complete(void) {
             // Mark it finished, just like below.
             curSPTask->state = SPTASK_STATE_FINISHED;
 #if PUPPYPRINT_DEBUG
-            profiler_update(rspGenTime, rspDelta);
+            puppyprint_update_rsp(RSP_GFX_FINISHED);
 #endif
         }
+#if PUPPYPRINT_DEBUG
+        else
+            puppyprint_update_rsp(RSP_GFX_PAUSED);
+#endif
 
         // Start the audio task, as expected by handle_vblank.
         if (gAudioEnabled) {
@@ -264,12 +271,23 @@ void handle_sp_complete(void) {
         } else {
             pretend_audio_sptask_done();
         }
+#if PUPPYPRINT_DEBUG
+            puppyprint_update_rsp(RSP_AUDIO_START);
+#endif
     } else {
         curSPTask->state = SPTASK_STATE_FINISHED;
         if (curSPTask->task.t.type == M_AUDTASK) {
+#if PUPPYPRINT_DEBUG
+            puppyprint_update_rsp(RSP_AUDIO_FINISHED);
+#endif
             // After audio tasks come gfx tasks.
-            if ((sCurrentDisplaySPTask != NULL)
-             && (sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED)) {
+            if (sCurrentDisplaySPTask != NULL && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
+#if PUPPYPRINT_DEBUG
+                if (sCurrentDisplaySPTask->state != SPTASK_STATE_INTERRUPTED)
+                    puppyprint_update_rsp(RSP_GFX_RESUME);
+                else
+                    puppyprint_update_rsp(RSP_GFX_START);
+#endif
                 start_sptask(M_GFXTASK);
             }
             sCurrentAudioSPTask = NULL;
@@ -280,8 +298,9 @@ void handle_sp_complete(void) {
             // The SP process is done, but there is still a Display Processor notification
             // that needs to arrive before we can consider the task completely finished and
             // null out sCurrentDisplaySPTask. That happens in handle_dp_complete.
+
 #if PUPPYPRINT_DEBUG
-            profiler_update(rspGenTime, rspDelta);
+            puppyprint_update_rsp(RSP_GFX_FINISHED);
 #endif
         }
     }
@@ -325,10 +344,10 @@ void thread3_main(UNUSED void *arg) {
 
     while (TRUE) {
         OSMesg msg;
+        osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
 #if PUPPYPRINT_DEBUG
         OSTime first = osGetTime();
 #endif
-        osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
         switch ((uintptr_t) msg) {
             case MESG_VI_VBLANK:
                 handle_vblank();
@@ -347,7 +366,7 @@ void thread3_main(UNUSED void *arg) {
                 break;
         }
 #if PUPPYPRINT_DEBUG
-        profiler_update(taskTime, first);
+        profiler_update(gPuppyTimers.thread3Time, first);
 #endif
     }
 }

@@ -276,7 +276,7 @@ void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd) {
         size -= copySize;
     }
 #if PUPPYPRINT_DEBUG
-    dmaTime[perfIteration] += (osGetTime() - first);
+    profiler_add(gPuppyTimers.dmaTime, ((osGetTime() - first)));
 #endif
 }
 

@@ -434,7 +434,7 @@ void thread2_crash_screen(UNUSED void *arg) {
             draw_crash_screen(thread);
         }
 #if PUPPYPRINT_DEBUG
-        profiler_update(faultTime, first);
+        profiler_update(gPuppyTimers.thread2Time, first);
 #endif
     }
 }

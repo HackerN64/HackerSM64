@@ -520,7 +520,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
 #if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
+    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
 }
 
@@ -687,6 +687,6 @@ void load_object_collision_model(void) {
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
 #if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
+    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
 }

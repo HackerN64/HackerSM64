@@ -765,9 +765,12 @@ void thread5_game_loop(UNUSED void *arg) {
         }
 #if PUPPYPRINT_DEBUG
         lastTime = osGetTime();
-        collisionTime[perfIteration] = 0;
-        behaviourTime[perfIteration] = 0;
-        dmaTime[perfIteration] = 0;
+        gPuppyTimers.collisionTime[PERF_AGGREGATE] -= gPuppyTimers.collisionTime[perfIteration];
+        gPuppyTimers.behaviourTime[PERF_AGGREGATE] -= gPuppyTimers.behaviourTime[perfIteration];
+        gPuppyTimers.dmaTime[PERF_AGGREGATE] -= gPuppyTimers.dmaTime[perfIteration];
+        gPuppyTimers.collisionTime[perfIteration] = 0;
+        gPuppyTimers.behaviourTime[perfIteration] = 0;
+        gPuppyTimers.dmaTime[perfIteration] = 0;
 #endif
 
         // If any controllers are plugged in, start read the data for when
@@ -785,7 +788,7 @@ void thread5_game_loop(UNUSED void *arg) {
 #if PUPPYPRINT_DEBUG
         first = osGetTime();
         read_controller_inputs(THREAD_5_GAME_LOOP);
-        profiler_update(controllerTime, first);
+        profiler_update(gPuppyTimers.controllerTime, first);
 #else
         read_controller_inputs(THREAD_5_GAME_LOOP);
 #endif
@@ -794,10 +797,8 @@ void thread5_game_loop(UNUSED void *arg) {
         debug_box_input();
 #endif
 #if PUPPYPRINT_DEBUG
-        profiler_update(scriptTime, lastTime);
-        scriptTime[perfIteration] -= profilerTime[perfIteration];
-        scriptTime[perfIteration] -= profilerTime2[perfIteration];
         puppyprint_profiler_process();
+        profiler_update(gPuppyTimers.thread5Time, lastTime);
 #endif
 
         display_and_vsync();

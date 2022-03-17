@@ -114,7 +114,7 @@ struct RenderModeContainer renderModeTable_1Cycle[2] = { { {
         G_RM_AA_ZB_OPA_SURF,                // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
         G_RM_AA_ZB_TEX_EDGE,                // LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #endif
-        G_RM_AA_ZB_XLU_DECAL,               // LAYER_TRANSPARENT_DECAL
+        G_RM_ZB_OVL_SURF,               // LAYER_TRANSPARENT_DECAL
         G_RM_AA_ZB_XLU_SURF,                // LAYER_TRANSPARENT
         G_RM_AA_ZB_XLU_INTER,               // LAYER_TRANSPARENT_INTER
     } } };
@@ -151,7 +151,7 @@ struct RenderModeContainer renderModeTable_2Cycle[2] = { { {
         G_RM_AA_ZB_OPA_SURF2,               // LAYER_OCCLUDE_SILHOUETTE_OPAQUE
         G_RM_AA_ZB_TEX_EDGE2,               // LAYER_OCCLUDE_SILHOUETTE_ALPHA
 #endif
-        G_RM_AA_ZB_XLU_DECAL2,              // LAYER_TRANSPARENT_DECAL
+        G_RM_ZB_OVL_SURF2,              // LAYER_TRANSPARENT_DECAL
         G_RM_AA_ZB_XLU_SURF2,               // LAYER_TRANSPARENT
         G_RM_AA_ZB_XLU_INTER2,              // LAYER_TRANSPARENT_INTER
     } } };

@@ -223,6 +223,9 @@ static void thread6_rumble_loop(UNUSED void *arg) {
     while (TRUE) {
         // Block until VI
         osRecvMesg(&gRumbleThreadVIMesgQueue, &msg, OS_MESG_BLOCK);
+#if PUPPYPRINT_DEBUG
+        OSTime first = osGetTime();
+#endif
 
         update_rumble_data_queue();
         update_rumble_pak();
@@ -239,6 +242,9 @@ static void thread6_rumble_loop(UNUSED void *arg) {
         if (gRumblePakTimer > 0) {
             gRumblePakTimer--;
         }
+#if PUPPYPRINT_DEBUG
+        profiler_update(gPuppyTimers.thread6Time, first);
+#endif
     }
 }
 

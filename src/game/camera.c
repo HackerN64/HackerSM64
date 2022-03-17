@@ -2873,7 +2873,7 @@ void update_lakitu(struct Camera *c) {
 void update_camera(struct Camera *c) {
 #if PUPPYPRINT_DEBUG
     OSTime first   = osGetTime();
-    OSTime colTime = collisionTime[perfIteration];
+    OSTime colTime = gPuppyTimers.collisionTime[perfIteration];
 #endif
     gCamera = c;
     update_camera_hud_status(c);
@@ -3118,8 +3118,8 @@ void update_camera(struct Camera *c) {
 #endif
     gLakituState.lastFrameAction = sMarioCamState->action;
 #if PUPPYPRINT_DEBUG
-    profiler_update(cameraTime, first);
-    cameraTime[perfIteration] -= collisionTime[perfIteration]-colTime;
+    profiler_update(gPuppyTimers.cameraTime, first);
+    profiler_offset(gPuppyTimers.cameraTime, gPuppyTimers.collisionTime[perfIteration]-colTime);
 #endif
 }
 

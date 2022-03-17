@@ -5,7 +5,8 @@
 // This is how many indexes of timers are saved at once. higher creates a smoother average, but naturally uses more RAM. 15's fine.
 // #define NUM_PERF_ITERATIONS   15
 #define NUM_PERF_ITERATIONS   16
-#define NUM_BENCH_ITERATIONS 150
+#define PERF_AGGREGATE NUM_PERF_ITERATIONS
+#define PERF_TOTAL NUM_PERF_ITERATIONS + 1
 #define LOG_BUFFER_SIZE       16
 
 #ifdef ENABLE_CREDITS_BENCHMARK
@@ -32,6 +33,17 @@ enum PuppyprintTextAlign {
     PRINT_ALL               = -1,
 };
 
+enum rspFlags
+{
+    RSP_NONE,
+    RSP_AUDIO_START,
+    RSP_GFX_START,
+    RSP_AUDIO_FINISHED,
+    RSP_GFX_FINISHED,
+    RSP_GFX_PAUSED,
+    RSP_GFX_RESUME,
+};
+
 #if PUPPYPRINT_DEBUG
 #if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
 #define NUM_AUDIO_POOLS 7
@@ -49,45 +61,44 @@ enum PuppyFont {
 extern u8 sPPDebugPage;
 extern u8 gPuppyFont;
 extern s8 perfIteration;
-extern s16 benchmarkLoop;
-extern s32 benchmarkTimer;
-extern ColorRGBA currEnv;
+extern ColorRGBA gCurrEnvCol;
 extern s32 ramsizeSegment[33];
-extern s8 nameTable;
+extern const s8 nameTable;
 extern s32 mempool;
-extern u8 benchOption;
 extern f32 textSize;
+typedef u32 PPTimer[NUM_PERF_ITERATIONS + 2];
 
-// General
-extern u32 cpuTime;
-extern u32 rspTime;
-extern u32 rdpTime;
-extern u32 ramTime;
-extern u32 loadTime;
-extern u32 rspDelta;
-extern s32     benchMark[NUM_BENCH_ITERATIONS + 2];
+struct PuppyPrintTimers
+{
+    u32 cpuTime; // Sum of multiple CPU timings, and what will be displayed.
+    u32 rspTime; // Sum of multiple RSP timings, and publicly shamed on the street.
+    u32 rdpTime; // Sum of multiple RDP timings, and hung by its entrails for all to see.
+    u32 rspPauseTime; // Buffer that keeps track of the halt time of the Gfx task.
+    u32 rspGfxBufTime; // Buffer that keeps track of the current Gfx task;
+    u32 rspAudioBufTime; // Buffer that keeps track of the current Audio task;
+    u32 threadsTime; // The combined processing time from thread 2, 3 and 6.
+    PPTimer collisionTime; // Collision execution time.
+    PPTimer behaviourTime; // Behaviour script execution time.
+    PPTimer thread2Time; // Fault thread execution time.
+    PPTimer thread3Time; // Task thread execution time.
+    PPTimer thread4Time; // Audio thread execution time.
+    PPTimer thread5Time; // Game thread execution time.
+    PPTimer thread6Time; // Rumble thread execution time.
+    PPTimer graphTime; // Graph Node processing time.
+    PPTimer dmaTime; // thread 5 DMA time.
+    PPTimer dmaAudioTime; // thread 4 DMA time.
+    PPTimer cameraTime; // Camera behaviour.
+    PPTimer profilerTime; // Profiler rendering time.
+    PPTimer profilerTime2; // Profiler processing time.
+    PPTimer controllerTime; // Controller polling time.
+    PPTimer rspAudioTime; // RSP Audio processing time.
+    PPTimer rspGfxTime; // RSP Graphics processing time.
+    PPTimer rdpBufTime; // RDP buffer processing time.
+    PPTimer rdpBusTime; // RDP pipe busy time.
+    PPTimer rdpTmmTime; // RDP texture memory time.
+};
 
-// CPU
-extern u32 collisionTime[NUM_PERF_ITERATIONS + 1];
-extern u32 behaviourTime[NUM_PERF_ITERATIONS + 1];
-extern u32    scriptTime[NUM_PERF_ITERATIONS + 1];
-extern u32     graphTime[NUM_PERF_ITERATIONS + 1];
-extern u32     audioTime[NUM_PERF_ITERATIONS + 1];
-extern u32       dmaTime[NUM_PERF_ITERATIONS + 1];
-extern u32  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
-extern u32     faultTime[NUM_PERF_ITERATIONS + 1];
-extern u32      taskTime[NUM_PERF_ITERATIONS + 1];
-extern u32    cameraTime[NUM_PERF_ITERATIONS + 1];
-extern u32  profilerTime[NUM_PERF_ITERATIONS + 1];
-extern u32 profilerTime2[NUM_PERF_ITERATIONS + 1];
-extern u32 controllerTime[NUM_PERF_ITERATIONS + 1];
-// RSP
-extern u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
-// RDP
-extern u32    bufferTime[NUM_PERF_ITERATIONS + 1];
-extern u32      tmemTime[NUM_PERF_ITERATIONS + 1];
-extern u32       busTime[NUM_PERF_ITERATIONS + 1];
-
+extern struct PuppyPrintTimers gPuppyTimers;
 extern void profiler_update(u32 *time, OSTime time2);
 extern void puppyprint_profiler_process(void);
 extern void puppyprint_render_profiler(void);
@@ -105,4 +116,7 @@ extern void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u
 extern void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a);
 extern void append_puppyprint_log(const char *str, ...);
 extern char consoleLogTable[LOG_BUFFER_SIZE][255];
+extern void profiler_offset(u32 *time, OSTime time2);
+extern void puppyprint_update_rsp(u8 flags);
+extern void profiler_add(u32 *time, OSTime time2);
 extern s32 puppyprint_strlen(const char *str);

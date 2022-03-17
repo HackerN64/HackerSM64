@@ -45,9 +45,12 @@ a modern game engine's developer's console.
 #include "debug_box.h"
 #include "color_presets.h"
 
+#define PUPPYPRINT
+#define PUPPYPRINT_DEBUG 1
+
 #ifdef PUPPYPRINT
 
-ColorRGBA currEnv;
+ColorRGBA gCurrEnvCol;
 #ifdef ENABLE_CREDITS_BENCHMARK
 u8 fDebug = TRUE;
 #else
@@ -55,45 +58,62 @@ u8 fDebug = FALSE;
 #endif
 
 #if PUPPYPRINT_DEBUG
-s8 benchViewer  = FALSE;
-u8 benchOption  = 0;
+struct PuppyPrintTimers gPuppyTimers;
+
+#define GENERAL_PAGE_TEXT_LENGTH 200
+
+/// Add whichever times you wish to read values for.
+/// Make sure there is an equal number of names to values.
+void puppyprint_sprintf_general(char *str)
+{
+    sprintf(str,
+    "Collision: %dus\n"
+    "Graph: %dus\n"
+    "Behaviour: %dus\n"
+    "Audio: %dus\n"
+    "Camera: %dus\n"
+    "DMA: %dus\n"
+    "Controller: %dus\n"
+    ,
+    gPuppyTimers.collisionTime[PERF_TOTAL],
+    gPuppyTimers.graphTime[PERF_TOTAL],
+    gPuppyTimers.behaviourTime[PERF_TOTAL],
+    gPuppyTimers.thread4Time[PERF_TOTAL],
+    gPuppyTimers.cameraTime[PERF_TOTAL],
+    gPuppyTimers.dmaTime[PERF_TOTAL],
+    gPuppyTimers.controllerTime[PERF_TOTAL]
+    );
+}
+
+/// Add whichever times you wish to create aggregates of.
+void puppyprint_calculate_average_times(void)
+{
+    gPuppyTimers.collisionTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.collisionTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.behaviourTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.behaviourTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.thread2Time[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.thread2Time[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.thread3Time[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.thread3Time[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.thread4Time[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.thread4Time[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.thread5Time[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.thread5Time[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.thread6Time[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.thread6Time[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.graphTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.graphTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.dmaTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.dmaTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.dmaAudioTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.dmaAudioTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.cameraTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.cameraTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.profilerTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.profilerTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.profilerTime2[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.profilerTime2[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.controllerTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.controllerTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.rspAudioTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.rspAudioTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.rspGfxTime[PERF_TOTAL] = OS_CYCLES_TO_USEC(gPuppyTimers.rspGfxTime[PERF_AGGREGATE]) / NUM_PERF_ITERATIONS;
+    gPuppyTimers.rdpBufTime[PERF_TOTAL] = (gPuppyTimers.rdpBufTime[PERF_AGGREGATE] * 10) / (625*NUM_PERF_ITERATIONS);
+    gPuppyTimers.rdpBusTime[PERF_TOTAL] = (gPuppyTimers.rdpBusTime[PERF_AGGREGATE] * 10) / (625*NUM_PERF_ITERATIONS);
+}
+
 s8 logViewer    = FALSE;
 u8 sPPDebugPage = 0;
 u8 sDebugMenu   = FALSE;
 u8 sDebugOption = 0;
 // Profiler values
 s8  perfIteration  = 0;
-// General
-u32     cpuTime = 0;
-u32     rspTime = 0;
-u32     rdpTime = 0;
-u32     ramTime = 0;
-u32    loadTime = 0;
-u32 gLastOSTime = 0;
-u32    rspDelta = 0;
-// CPU
-u32 collisionTime[NUM_PERF_ITERATIONS + 1];
-u32 behaviourTime[NUM_PERF_ITERATIONS + 1];
-u32    scriptTime[NUM_PERF_ITERATIONS + 1];
-u32     graphTime[NUM_PERF_ITERATIONS + 1];
-u32     audioTime[NUM_PERF_ITERATIONS + 1];
-u32       dmaTime[NUM_PERF_ITERATIONS + 1];
-u32  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
-u32     faultTime[NUM_PERF_ITERATIONS + 1];
-u32      taskTime[NUM_PERF_ITERATIONS + 1];
-u32  profilerTime[NUM_PERF_ITERATIONS + 1];
-u32 profilerTime2[NUM_PERF_ITERATIONS + 1];
-u32    cameraTime[NUM_PERF_ITERATIONS + 1];
-u32 controllerTime[NUM_PERF_ITERATIONS + 1];
-// RSP
-u32     audioTime[NUM_PERF_ITERATIONS + 1];
-u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
-// RDP
-u32    bufferTime[NUM_PERF_ITERATIONS + 1];
-u32      tmemTime[NUM_PERF_ITERATIONS + 1];
-u32       busTime[NUM_PERF_ITERATIONS + 1];
-// RAM
-s8  ramViewer = FALSE;
 s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
     0, 0, 0,
     0, 0, 0,
@@ -107,7 +127,6 @@ s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
     0, 0, 0,
     0, 0, 0
 };
-s8  audioRamViewer = FALSE;
 s32 mempool;
 
 extern u8 _mainSegmentStart[];
@@ -247,10 +266,9 @@ const char ramNames[8][32] = {
     "Audio Heap",
 };
 
-s8 nameTable = sizeof(ramNames) / NUM_TLB_SEGMENTS;
+const s8 nameTable = sizeof(ramNames) / NUM_TLB_SEGMENTS;
 
 void print_ram_overview(void) {
-    s32 i = 0;
     char textBytes[32];
     s32 x = 80;
     s32 y = 16;
@@ -259,7 +277,7 @@ void print_ram_overview(void) {
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
     finish_blank_box();
 
-    for (i = 0; i <= NUM_TLB_SEGMENTS; i++) {
+    for (u8 i = 0; i <= NUM_TLB_SEGMENTS; i++) {
         if (drawn == 16) {
             x = 240;
             y =  16;
@@ -303,7 +321,6 @@ void print_audio_ram_overview(void) {
     char textBytes[128];
     const s32 x = 16;
     s32 y = 16;
-    s32 i =  0;
     s32 percentage = 0;
     s32 tmpY = y;
     s32 totalMemory[2] = { 0, 0 };
@@ -315,7 +332,7 @@ void print_audio_ram_overview(void) {
     puppyprint_get_allocated_pools(audioPoolSizes[0]);
 
     y += 24;
-    for (i = 0; i < NUM_AUDIO_POOLS; i++) {
+    for (u8 i = 0; i < NUM_AUDIO_POOLS; i++) {
         if (audioPoolSizes[i][0] == 0) {
             percentage = 1000;
         } else {
@@ -369,7 +386,6 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
 }
 
 void append_puppyprint_log(const char *str, ...) {
-    s32 i;
     char textBytes[255];
 
     memset(textBytes, 0, sizeof(textBytes));
@@ -382,7 +398,7 @@ void append_puppyprint_log(const char *str, ...) {
 #ifdef UNF
     osSyncPrintf(textBytes);
 #endif
-    for (i = 0; i < (LOG_BUFFER_SIZE - 1); i++) {
+    for (u8 i = 0; i < (LOG_BUFFER_SIZE - 1); i++) {
         memcpy(consoleLogTable[i], consoleLogTable[i + 1], 255);
     }
     memcpy(consoleLogTable[LOG_BUFFER_SIZE - 1], textBytes, 255);
@@ -391,12 +407,11 @@ void append_puppyprint_log(const char *str, ...) {
 
 #define LINE_HEIGHT (8 + ((LOG_BUFFER_SIZE - 1) * 12))
 void print_console_log(void) {
-    s32 i;
     prepare_blank_box();
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 96);
     finish_blank_box();
 
-    for (i = 0; i < LOG_BUFFER_SIZE; i++) {
+    for (u8 i = 0; i < LOG_BUFFER_SIZE; i++) {
         if (consoleLogTable[i] == NULL) {
             continue;
         }
@@ -414,9 +429,9 @@ extern s16 gVisualSurfaceCount;
 void puppyprint_render_collision(void) {
     char textBytes[200];
 #ifdef PUPPYPRINT_DEBUG_CYCLES
-    sprintf(textBytes, "Collision: <COL_FF7F7FFF>%dc", collisionTime[NUM_PERF_ITERATIONS]);
+    sprintf(textBytes, "Collision: <COL_FF7F7FFF>%dc", gPuppyTimers.collisionTime[NUM_PERF_ITERATIONS]);
 #else
-    sprintf(textBytes, "Collision: <COL_FF7F7FFF>%dus", collisionTime[NUM_PERF_ITERATIONS]);
+    sprintf(textBytes, "Collision: <COL_FF7F7FFF>%dus", gPuppyTimers.collisionTime[NUM_PERF_ITERATIONS]);
 #endif
     print_small_text(304, 48, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
@@ -433,65 +448,33 @@ void puppyprint_render_collision(void) {
         case 2: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
         case 3: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
     }
-    if (gPlayer1Controller->buttonPressed & R_JPAD) viewCycle++;
-    if (gPlayer1Controller->buttonPressed & L_JPAD) viewCycle--;
-
-    if (viewCycle == 4) {
-        viewCycle = 0;
-    }
-    if (viewCycle == 255) {
-        viewCycle = 3;
-    }
 
     hitboxView  = ((viewCycle == 1) || (viewCycle == 3));
     surfaceView = ((viewCycle == 2) || (viewCycle == 3));
 #endif
 }
 
-struct CPUBar {
-    u32 *time;
-    ColorRGB colour;
-    const char str[32];
-};
-
 extern void print_fps(s32 x, s32 y);
-
-struct CPUBar cpu_ordering_table[] = {
-    { collisionTime, COLOR_RGB_RED,     { "Collision: <COL_FF7F7FFF>" }},
-    {     graphTime, COLOR_RGB_BLUE,    {     "Graph: <COL_7F7FFFFF>" }},
-    { behaviourTime, COLOR_RGB_GREEN,   { "Behaviour: <COL_7FFF7FFF>" }},
-    {     audioTime, COLOR_RGB_YELLOW,  {     "Audio: <COL_FFFF7FFF>" }},
-    {    cameraTime, COLOR_RGB_CYAN,    {    "Camera: <COL_7FFFFFFF>" }},
-    {       dmaTime, COLOR_RGB_MAGENTA, {       "DMA: <COL_FF7FFFFF>" }},
-};
-
-#define CPU_TABLE_MAX (sizeof(cpu_ordering_table) / sizeof(struct CPUBar))
-#define ADDTIMES MAX(((collisionTime[MX] + graphTime[MX] + behaviourTime[MX] + audioTime[MX] + cameraTime[MX] + dmaTime[MX] + controllerTime[MX]) / 80), 1)
 
 void print_basic_profiling(void) {
     char textBytes[90];
     print_fps(16, 40);
 #ifdef PUPPYPRINT_DEBUG_CYCLES
     sprintf(textBytes, "CPU: %dc (%d_)#RSP: %dc (%d_)#RDP: %dc (%d_)",
-            cpuTime, (cpuTime / 15625),
-            rspTime, (rspTime / 15625),
-            rdpTime, (rdpTime / 15625));
+            gPuppyTimers.cpuTime, (gPuppyTimers.cpuTime / 15625),
+            gPuppyTimers.rspTime, (gPuppyTimers.rspTime / 15625),
+            gPuppyTimers.rdpTime, (gPuppyTimers.rdpTime / 15625));
 #else
     sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)",
-            cpuTime, (cpuTime / 333),
-            rspTime, (rspTime / 333),
-            rdpTime, (rdpTime / 333));
+            gPuppyTimers.cpuTime, (gPuppyTimers.cpuTime / 333),
+            gPuppyTimers.rspTime, (gPuppyTimers.rspTime / 333),
+            gPuppyTimers.rdpTime, (gPuppyTimers.rdpTime / 333));
 #endif
     print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
 void puppyprint_render_standard(void) {
-    s32 perfPercentage[CPU_TABLE_MAX];
-    s32 graphPos;
-    s32 prevGraph;
-    u32 i;
-    s32 viewedNums;
-    char textBytes[80];
+    char textBytes[GENERAL_PAGE_TEXT_LENGTH];
 
     print_basic_profiling();
 
@@ -500,6 +483,37 @@ void puppyprint_render_standard(void) {
 
 #ifndef ENABLE_CREDITS_BENCHMARK
     // Very little point printing useless info if Mario doesn't even exist.
+    if (gMarioState->marioObj) {
+        sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
+            (s32)(gMarioState->pos[0]),
+            (s32)(gMarioState->pos[1]),
+            (s32)(gMarioState->pos[2]),
+            (u16)(gMarioState->faceAngle[1]),
+            (u32)(gMarioState->action & ACT_ID_MASK));
+        print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    }
+#endif
+
+    puppyprint_sprintf_general(textBytes);
+    print_small_text((SCREEN_WIDTH - 24), 40, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+}
+
+void puppyprint_render_minimal(void) {
+    print_basic_profiling();
+}
+
+void render_coverage_map(void) {
+    gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
+    gDPSetBlendColor(gDisplayListHead++, 0xFF, 0xFF, 0xFF, 0xFF);
+    gDPSetPrimDepth(gDisplayListHead++, 0xFFFF, 0xFFFF);
+    gDPSetDepthSource(gDisplayListHead++, G_ZS_PRIM);
+    gDPSetRenderMode(gDisplayListHead++, G_RM_VISCVG, G_RM_VISCVG2);
+    gDPFillRectangle(gDisplayListHead++, 0,0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1);
+}
+
+void puppycamera_debug_view(void) {
+    char textBytes[80];
+    // Very little point printing useless info if Mayro doesn't even exist.
     if (gMarioState->marioObj) {
         sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
             (s32)(gMarioState->pos[0]),
@@ -518,70 +532,6 @@ void puppyprint_render_standard(void) {
             (u16)(gCamera->yaw));
         print_small_text((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
     }
-#endif
-
-    // Just to keep screen estate a little friendlier.
-#define MX NUM_PERF_ITERATIONS
-    for (i = 0; i < CPU_TABLE_MAX; i++) {
-        perfPercentage[i] = MAX((cpu_ordering_table[i].time[MX] / ADDTIMES), 0);
-    }
-#undef ADDTIMES
-#undef MX
-
-    viewedNums = 0;
-    for (i = 0; i < CPU_TABLE_MAX; i++) {
-        s32 num = cpu_ordering_table[i].time[NUM_PERF_ITERATIONS];
-        if (num != 0) {
-#ifdef PUPPYPRINT_DEBUG_CYCLES
-            sprintf(textBytes, "%s%dc", cpu_ordering_table[i].str, num);
-#else
-            sprintf(textBytes, "%s%dus", cpu_ordering_table[i].str, num);
-#endif
-            print_small_text((SCREEN_WIDTH - 16), (40 + (viewedNums * 12)), textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
-            viewedNums++;
-        }
-    }
-
-    s32 barY = (28 + (viewedNums * 12)) + 16;
-    prepare_blank_box();
-    viewedNums = 0;
-
-    // Render CPU breakdown bar.
-    for (i = 0; i < CPU_TABLE_MAX; i++) {
-        if (perfPercentage[i] == 0
-            && (i != CPU_TABLE_MAX - 1)) {
-            continue;
-        }
-
-        if (viewedNums == 0) {
-            graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
-            render_blank_box((SCREEN_WIDTH - 96), barY, graphPos, (barY + 8),
-                cpu_ordering_table[i].colour[0],
-                cpu_ordering_table[i].colour[1],
-                cpu_ordering_table[i].colour[2], 255);
-        } else if (i == (CPU_TABLE_MAX - 1)) {
-            graphPos = ((SCREEN_WIDTH - 96) + perfPercentage[i]);
-            render_blank_box(prevGraph, barY, (SCREEN_WIDTH - 16), (barY + 8),
-                cpu_ordering_table[i].colour[0],
-                cpu_ordering_table[i].colour[1],
-                cpu_ordering_table[i].colour[2], 255);
-        } else {
-            graphPos += perfPercentage[i];
-            render_blank_box(prevGraph, barY, graphPos, (barY + 8),
-                cpu_ordering_table[i].colour[0],
-                cpu_ordering_table[i].colour[1],
-                cpu_ordering_table[i].colour[2], 255);
-        }
-
-        viewedNums++;
-        prevGraph = graphPos;
-    }
-
-    finish_blank_box();
-}
-
-void puppyprint_render_minimal(void) {
-    print_basic_profiling();
 }
 
 struct PuppyPrintPage ppPages[] = {
@@ -591,6 +541,10 @@ struct PuppyPrintPage ppPages[] = {
     {&print_ram_overview,          "Segments" },
     {&puppyprint_render_collision, "Collision"},
     {&print_console_log,           "Log"      },
+    {&render_coverage_map, "Coverage"},
+#ifdef PUPPYCAM
+    {&puppycamera_debug_view, "Unlock Camera"},
+#endif
 };
 
 #define MENU_BOX_WIDTH 128
@@ -621,13 +575,23 @@ void render_page_menu(void) {
     }
 }
 
+void rdp_profiler_update(u32 *time, OSTime time2) {
+    time[PERF_AGGREGATE] -= time[perfIteration];
+    time[perfIteration] = time2;
+    time[PERF_AGGREGATE] += time[perfIteration];
+}
+
 void puppyprint_render_profiler(void) {
     OSTime first = osGetTime();
+    rdp_profiler_update(gPuppyTimers.rdpBufTime, IO_READ(DPC_BUFBUSY_REG));
+    rdp_profiler_update(gPuppyTimers.rdpTmmTime, IO_READ(DPC_TMEM_REG));
+    rdp_profiler_update(gPuppyTimers.rdpBusTime, IO_READ(DPC_PIPEBUSY_REG));
+    IO_WRITE(DPC_STATUS_REG, DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR);
 
     print_set_envcolour(255, 255, 255, 255);
 
     if (!fDebug) {
-        profiler_update(profilerTime, first);
+        profiler_update(gPuppyTimers.profilerTime, first);
         return;
     }
 
@@ -636,37 +600,54 @@ void puppyprint_render_profiler(void) {
     if (sDebugMenu) {
         render_page_menu();
     }
-    profiler_update(profilerTime, first);
+    profiler_update(gPuppyTimers.profilerTime, first);
 }
 
 void profiler_update(u32 *time, OSTime time2) {
+    time[PERF_AGGREGATE] -= time[perfIteration];
     time[perfIteration] = (osGetTime() - time2);
+    time[PERF_AGGREGATE] += time[perfIteration];
 }
 
-void get_average_perf_time(u32 *time, s32 is_rdp) {
-    // This takes all but the last index of the timer array, and creates an average value, which is written to the last index.
-    s32 i     = 0;
-    s32 total = 0;
-    for (i = 0; i < NUM_PERF_ITERATIONS; i++) {
-        total += time[i];
-    }
+void profiler_offset(u32 *time, OSTime offset) {
+    time[PERF_AGGREGATE] -= offset;
+    time[perfIteration] -= offset;
+}
 
-    total /= NUM_PERF_ITERATIONS;
-    total = MAX(total, 0);
-    if (is_rdp)
-    {
-        time[NUM_PERF_ITERATIONS] = RDP_CYCLE_CONV(total);
-    }
-    else
-    {
-        time[NUM_PERF_ITERATIONS] = CYCLE_CONV(total);
+void profiler_add(u32 *time, OSTime offset) {
+    time[PERF_AGGREGATE] += offset;
+    time[perfIteration] += offset;
+}
+
+void puppyprint_update_rsp(u8 flags) {
+    switch (flags) {
+    case RSP_GFX_START:
+        gPuppyTimers.rspGfxBufTime = (u32)osGetTime();
+        gPuppyTimers.rspPauseTime = 0;
+        break;
+    case RSP_AUDIO_START:
+        gPuppyTimers.rspAudioBufTime = (u32)osGetTime();
+        break;
+    case RSP_GFX_PAUSED:
+        gPuppyTimers.rspPauseTime = (u32)osGetTime();
+        break;
+    case RSP_GFX_RESUME:
+        gPuppyTimers.rspPauseTime = (u32)osGetTime() - gPuppyTimers.rspPauseTime;
+        break;
+    case RSP_GFX_FINISHED:
+        gPuppyTimers.rspGfxTime[PERF_AGGREGATE] -= gPuppyTimers.rspGfxTime[perfIteration];
+        gPuppyTimers.rspGfxTime[perfIteration] = (u32)(osGetTime() - gPuppyTimers.rspGfxBufTime) + gPuppyTimers.rspPauseTime;
+        gPuppyTimers.rspGfxTime[PERF_AGGREGATE] += gPuppyTimers.rspGfxTime[perfIteration];
+        break;
+    case RSP_AUDIO_FINISHED:
+        gPuppyTimers.rspAudioTime[PERF_AGGREGATE] -= gPuppyTimers.rspAudioTime[perfIteration];
+        gPuppyTimers.rspAudioTime[perfIteration] = (u32)osGetTime() - gPuppyTimers.rspAudioBufTime;
+        gPuppyTimers.rspAudioTime[PERF_AGGREGATE] += gPuppyTimers.rspAudioTime[perfIteration];
+        break;
     }
 }
 
 void puppyprint_profiler_process(void) {
-    bufferTime[perfIteration] = (IO_READ(DPC_BUFBUSY_REG));
-      tmemTime[perfIteration] = (IO_READ(DPC_TMEM_REG));
-       busTime[perfIteration] = (IO_READ(DPC_PIPEBUSY_REG));
     OSTime newTime = osGetTime();
 
     if (fDebug && (gPlayer1Controller->buttonPressed & L_TRIG)) {
@@ -684,6 +665,21 @@ void puppyprint_profiler_process(void) {
         sDebugMenu = FALSE;
     }
 
+    // Collision toggles.
+#ifdef VISUAL_DEBUG
+    if (sPPDebugPage == 4)
+    {
+        if (gPlayer1Controller->buttonPressed & R_JPAD)
+            viewCycle++;
+        if (gPlayer1Controller->buttonPressed & L_JPAD)
+            viewCycle--;
+        if (viewCycle == 4)
+            viewCycle = 0;
+        if (viewCycle == 255)
+            viewCycle = 3;
+    }
+#endif
+
     if (sDebugMenu) {
         if (gPlayer1Controller->buttonPressed & U_JPAD) sDebugOption--;
         if (gPlayer1Controller->buttonPressed & D_JPAD) sDebugOption++;
@@ -697,64 +693,41 @@ void puppyprint_profiler_process(void) {
         }
     }
 
-    if (!(gGlobalTimer % NUM_PERF_ITERATIONS)) {
-        get_average_perf_time(    scriptTime, FALSE);
-        get_average_perf_time( behaviourTime, FALSE);
-        get_average_perf_time( collisionTime, FALSE);
-        get_average_perf_time(     graphTime, FALSE);
-        get_average_perf_time(     audioTime, FALSE);
-        get_average_perf_time(       dmaTime, FALSE);
-        get_average_perf_time(  dmaAudioTime, FALSE);
-        get_average_perf_time(     faultTime, FALSE);
-        get_average_perf_time(      taskTime, FALSE);
-        get_average_perf_time(  profilerTime, FALSE);
-        get_average_perf_time( profilerTime2, FALSE);
-        get_average_perf_time(    cameraTime, FALSE);
-        get_average_perf_time(controllerTime, FALSE);
-
-        // Performed twice a frame without fail, so doubled to have a more representative value.
-           audioTime[NUM_PERF_ITERATIONS] *= 2;
-        dmaAudioTime[NUM_PERF_ITERATIONS] *= 2;
-             dmaTime[NUM_PERF_ITERATIONS] += dmaAudioTime[NUM_PERF_ITERATIONS];
-
-        get_average_perf_time(rspGenTime, FALSE);
-
-        get_average_perf_time(bufferTime, TRUE);
-        get_average_perf_time(  tmemTime, TRUE);
-        get_average_perf_time(   busTime, TRUE);
-
-        rdpTime = bufferTime[NUM_PERF_ITERATIONS];
-        rdpTime = MAX(rdpTime, tmemTime[NUM_PERF_ITERATIONS]);
-        rdpTime = MAX(rdpTime,  busTime[NUM_PERF_ITERATIONS]);
-#if BBPLAYER == 1 // iQue RDP registers need to be halved to be correct.
-        rdpTime /= 2;
+    if ((gGlobalTimer % 2) == 0) {
+        if (gGlobalTimer < 2) // Nuke the timers at the beginning of the game.
+            bzero(&gPuppyTimers, sizeof(struct PuppyPrintTimers));
+        // Convert all total timers to microseconds, and divide by iterations.
+        puppyprint_calculate_average_times();
+        // Since audio runs twice a frame without fail, audio timers are doubled to compensate.
+        gPuppyTimers.thread4Time[PERF_TOTAL] *= 2;
+        gPuppyTimers.dmaAudioTime[PERF_TOTAL] *= 2;
+        gPuppyTimers.dmaTime[PERF_TOTAL] += gPuppyTimers.dmaAudioTime[PERF_TOTAL];
+        gPuppyTimers.cpuTime = gPuppyTimers.thread2Time[PERF_TOTAL] + gPuppyTimers.thread3Time[PERF_TOTAL] + gPuppyTimers.thread4Time[PERF_TOTAL] + gPuppyTimers.thread5Time[PERF_TOTAL] +
+        gPuppyTimers.thread6Time[PERF_TOTAL]; //Thread timers are all added together to get the total CPU time.
+        gPuppyTimers.threadsTime = gPuppyTimers.thread2Time[PERF_TOTAL] + gPuppyTimers.thread3Time[PERF_TOTAL] + gPuppyTimers.thread6Time[PERF_TOTAL];
+        gPuppyTimers.rspTime = gPuppyTimers.rspAudioTime[PERF_TOTAL] + gPuppyTimers.rspGfxTime[PERF_TOTAL];
+        gPuppyTimers.rdpTime = MAX(gPuppyTimers.rdpBufTime[PERF_TOTAL], gPuppyTimers.rdpTmmTime[PERF_TOTAL]);
+        gPuppyTimers.rdpTime = MAX(gPuppyTimers.rdpBusTime[PERF_TOTAL], gPuppyTimers.rdpTime);
+        // The iQue Player's RDP registers are halved to appear correct.
+#if BBPLAYER == 1
+            gPuppyTimers.rdpTime /= 2;
 #endif
-        cpuTime = (scriptTime[NUM_PERF_ITERATIONS]
-                 +   taskTime[NUM_PERF_ITERATIONS]
-                 +  faultTime[NUM_PERF_ITERATIONS]
-                 +  audioTime[NUM_PERF_ITERATIONS]);
-        rspTime =  rspGenTime[NUM_PERF_ITERATIONS];
-        puppyprint_calculate_ram_usage();
     }
 
-    gLastOSTime = newTime;
-    if (gGlobalTimer > 5) {
-        IO_WRITE(DPC_STATUS_REG, (DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR));
-    }
     if (perfIteration++ == (NUM_PERF_ITERATIONS - 1)) {
         perfIteration = 0;
     }
-    profiler_update(profilerTime2, newTime);
+    profiler_update(gPuppyTimers.profilerTime2, newTime);
 }
 #endif
 
 void print_set_envcolour(u8 r, u8 g, u8 b, u8 a) {
-    if ((r != currEnv[0])
-        || (g != currEnv[1])
-        || (b != currEnv[2])
-        || (a != currEnv[3])) {
+    if ((r != gCurrEnvCol[0])
+        || (g != gCurrEnvCol[1])
+        || (b != gCurrEnvCol[2])
+        || (a != gCurrEnvCol[3])) {
         gDPSetEnvColor(gDisplayListHead++, (Color)r, (Color)g, (Color)b, (Color)a);
-        vec4_set(currEnv, r, g, b, a);
+        vec4_set(gCurrEnvCol, r, g, b, a);
     }
 }
 
@@ -776,8 +749,8 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
 
     if (x1 < 0) x1 = 0;
     if (y1 < 0) y1 = 0;
-    if (x2 > gScreenWidth) x2 = gScreenWidth;
-    if (y2 > gScreenHeight) y2 = gScreenHeight;
+    if (x2 > SCREEN_WIDTH) x2 = SCREEN_WIDTH;
+    if (y2 > SCREEN_HEIGHT) y2 = SCREEN_HEIGHT;
     if (x2 < x1)
     {
         u32 temp = x2;
@@ -800,7 +773,7 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
         if (a == 255) {
             gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
         } else {
-            gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+            gDPSetRenderMode(gDisplayListHead++, G_RM_CLD_SURF, G_RM_CLD_SURF2);
         }
         cycleadd = 0;
     }
@@ -816,8 +789,8 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
 void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
     if (x1 < 0) x1 = 0;
     if (y1 < 0) y1 = 0;
-    if (x2 > gScreenWidth) x2 = gScreenWidth;
-    if (y2 > gScreenHeight) y2 = gScreenHeight;
+    if (x2 > SCREEN_WIDTH) x2 = SCREEN_WIDTH;
+    if (y2 > SCREEN_HEIGHT) y2 = SCREEN_HEIGHT;
     if (x2 < x1)
     {
         u32 temp = x2;
@@ -835,7 +808,7 @@ void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, 
     if (a == 255) {
         gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
     } else {
-        gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+        gDPSetRenderMode(gDisplayListHead++, G_RM_CLD_SURF, G_RM_CLD_SURF2);
     }
     gDPSetFillColor(gDisplayListHead++, GPACK_RGBA5551(r, g, b, 1) << 16 | GPACK_RGBA5551(r, g, b, 1));
     print_set_envcolour(r, g, b, a);
@@ -959,8 +932,6 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     s32 textX = 0;
     s32 textY = 0;
     s8 offsetY = 0;
-    s32 i = 0;
-    s32 j = 0;
     s32 textPos[2] = { 0, 0 };
     u8 spaceX = 0;
     s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -969,7 +940,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     s8 shakePos[2];
     f32 wavePos;
     u8 lines = 0;
-    u8 xlu = currEnv[3];
+    u8 xlu = gCurrEnvCol[3];
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
     s32 strLen = puppyprint_strlen(str);
     s32 commandOffset;
@@ -987,8 +958,8 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     }
 
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
-    if (align == PRINT_TEXT_ALIGN_CENTRE) {
-        for (i = 0; i < strLen; i++) {
+    if (align == PRINT_TEXT_ALIGN_CENTRE || align == PRINT_TEXT_ALIGN_RIGHT) {
+        for (s32 i = 0; i < strLen; i++) {
             if (str[i] == '#' || str[i] == 0x0A) {
                 textPos[0] = 0;
                 lines++;
@@ -1012,41 +983,17 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
             wideX[lines] = MAX(textPos[0], wideX[lines]);
         }
 
-        textPos[0] = -(wideX[0] / 2);
-    } else if (align == PRINT_TEXT_ALIGN_RIGHT) {
-        for (i = 0; i < strLen; i++) {
-            if (str[i] == '#' || str[i] == 0x0A) {
-                textPos[0] = 0;
-                lines++;
-                wideX[lines] = 0;
-                continue;
-            }
-
-            while (i < strLen && str[i] == '<') {
-                commandOffset = text_iterate_command(str, i, FALSE);
-                if (commandOffset == 0)
-                    break;
-
-                i += commandOffset;
-                tx2 += commandOffset;
-            }
-
-            if (i >= strLen)
-                break;
-
-            textPos[0] += (spaceX + 1) * textSizeTotal;
-
-            get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
-
-            wideX[lines] = MAX(textPos[0], wideX[lines]);
+        if (align == PRINT_TEXT_ALIGN_CENTRE) {
+            textPos[0] = -(wideX[0] / 2);
+        } else {
+            textPos[0] = -(wideX[0]);
         }
-        textPos[0] = -wideX[0];
     }
 
     lines = 0;
     tx2 = tx;
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
-    for (i = j = 0; i < tx2; i++, j++) {
+    for (s32 i = 0, j = 0; i < tx2; i++, j++) {
         if (str[i] == '#' || str[i] == 0x0A) {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
@@ -1104,9 +1051,9 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
-    // Color reverted to pure white in dl_rgba16_text_end, so carry it over to currEnv!
-    // NOTE: if this behavior is ever removed, make sure currEnv gets enforced here if the text color is ever altered in the text_iterate_command function.
-    currEnv[0] = 255; currEnv[1] = 255; currEnv[2] = 255; currEnv[3] = 255;
+    // Color reverted to pure white in dl_rgba16_text_end, so carry it over to gCurrEnvCol!
+    // NOTE: if this behavior is ever removed, make sure gCurrEnvCol gets enforced here if the text color is ever altered in the text_iterate_command function.
+    gCurrEnvCol[0] = 255; gCurrEnvCol[1] = 255; gCurrEnvCol[2] = 255; gCurrEnvCol[3] = 255;
 }
 
 // Return color hex nibble
@@ -1124,8 +1071,8 @@ s32 get_hex_value_at_offset(const char *str, s32 primaryOffset, u32 nibbleOffset
     if (val >= '0' && val <= '9')
         return (val - '0') << shiftVal;
 
-    if (garbageReturnsEnv) // Return currEnv color value
-        return currEnv[nibbleOffset / 2] & (0x0F << shiftVal);
+    if (garbageReturnsEnv) // Return gCurrEnvCol color value
+        return gCurrEnvCol[nibbleOffset / 2] & (0x0F << shiftVal);
 
     // Just return 0 otherwise
     return 0;
@@ -1194,9 +1141,9 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
             s32 r = (coss( gGlobalTimer * 600         ) + 1) * 127;
             s32 g = (coss((gGlobalTimer * 600) + 21845) + 1) * 127;
             s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
-            gDPSetEnvColor(gDisplayListHead++, (Color) r, (Color) g, (Color) b, (Color) currEnv[3]); // Don't use print_set_envcolour here, also opt to use alpha value from currEnv
+            gDPSetEnvColor(gDisplayListHead++, (Color) r, (Color) g, (Color) b, (Color) gCurrEnvCol[3]); // Don't use print_set_envcolour here, also opt to use alpha value from gCurrEnvCol
         } else {
-            gDPSetEnvColor(gDisplayListHead++, (Color) currEnv[0], (Color) currEnv[1], (Color) currEnv[2], (Color) currEnv[3]); // Reset text to envcolor
+            gDPSetEnvColor(gDisplayListHead++, (Color) gCurrEnvCol[0], (Color) gCurrEnvCol[1], (Color) gCurrEnvCol[2], (Color) gCurrEnvCol[3]); // Reset text to envcolor
         }
     } else if (strncmp((newStr), "<SHAKE>", 7) == 0) { // Toggles text that shakes on the spot. Do it again to disable it.
         if (!runCMD)
