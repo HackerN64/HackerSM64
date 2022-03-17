@@ -212,16 +212,16 @@ extern f32 gSineTable[];
 }
 
 #define vec2_copy_roundf(dst, src) {    \
-    (dst)[0] = roundf((src)[0]);        \
-    (dst)[1] = roundf((src)[1]);        \
+    (dst)[0] = lroundf((src)[0]);        \
+    (dst)[1] = lroundf((src)[1]);        \
 }
 #define vec3_copy_roundf(dst, src) {    \
     vec2_copy_roundf((dst), (src));     \
-    (dst)[2] = roundf((src)[2]);        \
+    (dst)[2] = lroundf((src)[2]);        \
 }
 #define vec4_copy_roundf(dst, src) {    \
     vec3_copy_roundf((dst), (src));     \
-    (dst)[3] = roundf((src)[3]);        \
+    (dst)[3] = lroundf((src)[3]);        \
 }
 
 #define vec2_copy_inverse(dst, src) {   \
@@ -451,23 +451,32 @@ extern f32 gSineTable[];
 
 #define ABS(x)  (((x) > 0) ? (x) : -(x))
 
-/// From Wiseguy
-ALWAYS_INLINE s32 roundf(f32 in) {
+#ifdef TARGET_N64
+ALWAYS_INLINE s32 lroundf(f32 in) {
     f32 tmp;
     s32 out;
     __asm__("round.w.s %0,%1" : "=f" (tmp) : "f" (in ));
     __asm__("mfc1      %0,%1" : "=r" (out) : "f" (tmp));
     return out;
 }
+#else
+long lroundf(f32 in);
+#endif
 // backwards compatibility
-#define round_float(in) roundf(in)
+#define round_float(in) lroundf(in)
 
+#ifdef TARGET_N64
 /// Absolute value
 ALWAYS_INLINE f32 absf(f32 in) {
     f32 out;
     __asm__("abs.s %0,%1" : "=f" (out) : "f" (in));
     return out;
 }
+#else
+ALWAYS_INLINE f32 absf(f32 in) {
+    return in > 0 ? in : -in;
+}
+#endif
 ALWAYS_INLINE s32 absi(s32 in) {
     return ABS(in);
 }

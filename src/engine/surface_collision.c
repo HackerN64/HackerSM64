@@ -914,3 +914,200 @@ s32 unused_resolve_floor_or_ceil_collisions(s32 checkCeil, f32 *px, f32 *py, f32
 
     return 0;
 }
+
+/**************************************************
+ *                    RAYCASTING                  *
+ **************************************************/
+
+#define RAY_OFFSET 30.0f /* How many units to extrapolate surfaces when testing for a raycast */
+#define RAY_STEPS      4 /* How many steps to do when casting rays, default to quartersteps.  */
+
+/**
+ * @brief Checks if a ray intersects a surface using Möller–Trumbore intersection algorithm.
+ * 
+ * @param orig is the starting point of the ray.
+ * @param dir is the normalized ray direction.
+ * @param dir_length is the length of the ray.
+ * @param surface is the surface to check.
+ * @param hit_pos returns the position on the surface where the ray intersects it.
+ * @param length returns the distance from the starting point to the hit position.
+ * @return s32 TRUE if the ray intersects a surface.
+ */
+s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface *surface, Vec3f hit_pos, f32 *length) {
+    // Ignore certain surface types.
+    if ((surface->type == SURFACE_INTANGIBLE) || (surface->flags & SURFACE_FLAG_NO_CAM_COLLISION)) return FALSE;
+    // Convert the vertices to Vec3f.
+    Vec3f v0, v1, v2;
+    vec3s_to_vec3f(v0, surface->vertex1);
+    vec3s_to_vec3f(v1, surface->vertex2);
+    vec3s_to_vec3f(v2, surface->vertex3);
+    // Get surface normal and extend it by RAY_OFFSET.
+    Vec3f norm;
+    surface_normal_to_vec3f(norm, surface);
+    vec3_mul_val(norm, RAY_OFFSET);
+    // Move the face forward by RAY_OFFSET.
+    vec3f_add(v0, norm);
+    vec3f_add(v1, norm);
+    vec3f_add(v2, norm);
+    // Make 'e1' (edge 1) the vector from vertex 0 to vertex 1.
+    Vec3f e1;
+    vec3f_diff(e1, v1, v0);
+    // Make 'e2' (edge 2) the vector from vertex 0 to vertex 2.
+    Vec3f e2;
+    vec3f_diff(e2, v2, v0);
+    // Make 'h' the cross product of 'dir' and edge 2.
+    Vec3f h;
+    vec3f_cross(h, dir, e2);
+    // Determine the cos(angle) difference between ray and surface normals.
+    f32 det = vec3f_dot(e1, h);
+    // Check if we're perpendicular from the surface.
+    if ((det > -NEAR_ZERO) && (det < NEAR_ZERO)) return FALSE;
+    // Check if we're making contact with the surface.
+    // Make f the inverse of the cos(angle) between ray and surface normals.
+    f32 f = 1.0f / det; // invDet
+    // Make 's' the vector from vertex 0 to 'orig'.
+    Vec3f s;
+    vec3f_diff(s, orig, v0);
+    // Make 'u' the cos(angle) between vectors 's' and normals, divided by 'det'.
+    f32 u = f * vec3f_dot(s, h);
+    // Check if 'u' is within bounds.
+    if ((u < 0.0f) || (u > 1.0f)) return FALSE;
+    // Make 'q' the cross product of 's' and edge 1. 
+    Vec3f q;
+    vec3f_cross(q, s, e1);
+    // Make 'v' the cos(angle) between the ray and 'q', divided by 'det'.
+    f32 v = f * vec3f_dot(dir, q);
+    // Check if 'v' is within bounds.
+    if ((v < 0.0f) || ((u + v) > 1.0f)) return FALSE;
+    // Get the length between our origin and the surface contact point.
+    // Make '*length' the cos(angle) betqwwn edge 2 and 'q', divided by 'det'.
+    *length = f * vec3f_dot(e2, q);
+    // Check if the length to the hit point is shorter than the ray length.
+    if ((*length <= NEAR_ZERO) || (*length > dir_length)) return FALSE;
+    // Successful contact.
+    // Make 'add_dir' into 'dir' scaled by 'length'.
+    Vec3f add_dir;
+    vec3_prod_val(add_dir, dir, *length);
+    // Make 'hit_pos' into the sum of 'orig' and 'add_dir'.
+    vec3f_sum(hit_pos, orig, add_dir);
+    return TRUE;
+}
+
+void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length) {
+    s32 hit;
+    f32 length;
+    Vec3f chk_hit_pos;
+    f32 top, bottom;
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+#endif
+    // Get upper and lower bounds of ray
+    if (dir[1] >= 0.0f) {
+        // Ray is upwards.
+        top    = orig[1] + (dir[1] * dir_length);
+        bottom = orig[1];
+    } else {
+        // Ray is downwards.
+        top    = orig[1];
+        bottom = orig[1] + (dir[1] * dir_length);
+    }
+
+    // Iterate through every surface of the list
+    for (; list != NULL; list = list->next) {
+        // Reject surface if out of vertical bounds
+        if ((list->surface->lowerY > top) || (list->surface->upperY < bottom)) continue;
+        // Check intersection between the ray and this surface
+        hit = ray_surface_intersect(orig, dir, dir_length, list->surface, chk_hit_pos, &length);
+        if (hit && (length <= *max_length)) {
+            *hit_surface = list->surface;
+            vec3f_copy(hit_pos, chk_hit_pos);
+            *max_length = length;
+        }
+    }
+#if PUPPYPRINT_DEBUG
+    collisionTime[perfIteration] += osGetTime() - first;
+#endif
+}
+
+void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
+    // Skip if OOB
+    if ((cellX >= 0) && (cellX <= (NUM_CELLS - 1)) && (cellZ >= 0) && (cellZ <= (NUM_CELLS - 1))) {
+        // Iterate through each surface in this partition
+        if ((normalized_dir[1] > -NEAR_ONE) && (flags & RAYCAST_FIND_CEIL)) {
+            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_CEILS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+        }
+        if ((normalized_dir[1] <  NEAR_ONE) && (flags & RAYCAST_FIND_FLOOR)) {
+            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_FLOORS].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+        }
+        if (flags & RAYCAST_FIND_WALL) {
+            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WALLS ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+        }
+        if (flags & RAYCAST_FIND_WATER) {
+            find_surface_on_ray_list( gStaticSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+            find_surface_on_ray_list(gDynamicSurfacePartition[cellZ][cellX][SPATIAL_PARTITION_WATER ].next, orig, normalized_dir, dir_length, hit_surface, hit_pos, max_length);
+        }
+    }
+}
+
+void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Vec3f hit_pos, s32 flags) {
+    Vec3f normalized_dir;
+    f32 step;
+    s32 i;
+    const f32 invcell = 1.0f / CELL_SIZE;
+
+    // Set that no surface has been hit
+    *hit_surface = NULL;
+    vec3f_sum(hit_pos, orig, dir);
+
+    // Get normalized direction
+    f32 dir_length = vec3_mag(dir);
+    f32 max_length = dir_length;
+    vec3f_copy(normalized_dir, dir);
+    vec3f_normalize(normalized_dir);
+
+    // Get our cell coordinate
+    f32 fCellX    = (orig[0] + LEVEL_BOUNDARY_MAX) * invcell;
+    f32 fCellZ    = (orig[2] + LEVEL_BOUNDARY_MAX) * invcell;
+    s32 cellX     = fCellX;
+    s32 cellZ     = fCellZ;
+    s32 cellPrevX = cellX;
+    s32 cellPrevZ = cellZ;
+
+    // Don't do DDA if straight down
+    if ((normalized_dir[1] >= NEAR_ONE) || (normalized_dir[1] <= -NEAR_ONE)) {
+        find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        return;
+    }
+
+    // Get cells we cross using DDA
+    f32 absDir0 = absf(dir[0]);
+    f32 absDir2 = absf(dir[2]);
+    if (absDir0 >= absDir2) {
+        step = (RAY_STEPS * absDir0) * invcell;
+    } else {
+        step = (RAY_STEPS * absDir2) * invcell;
+    }
+
+    f32 dx = (dir[0] / step) * invcell;
+    f32 dz = (dir[2] / step) * invcell;
+
+    for (i = 0; i < step && *hit_surface == NULL; i++) {
+        find_surface_on_ray_cell(cellX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+
+        // Move cell coordinate
+        fCellX   += dx;
+        fCellZ   += dz;
+        cellPrevX = cellX;
+        cellPrevZ = cellZ;
+        cellX     = fCellX;
+        cellZ     = fCellZ;
+
+        if ((cellPrevX != cellX) && (cellPrevZ != cellZ)) {
+            find_surface_on_ray_cell(cellX, cellPrevZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+            find_surface_on_ray_cell(cellPrevX, cellZ, orig, normalized_dir, dir_length, hit_surface, hit_pos, &max_length, flags);
+        }
+    }
+}
