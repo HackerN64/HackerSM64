@@ -732,6 +732,8 @@ void setup_game_memory(void) {
     load_segment_decompress(SEGMENT_SEGMENT2, _segment2_mio0SegmentRomStart, _segment2_mio0SegmentRomEnd);
 }
 
+void setup_global_light();
+
 /**
  * Main game loop thread. Runs forever as long as the game continues.
  */
@@ -795,6 +797,7 @@ void thread5_game_loop(UNUSED void *arg) {
 
         audio_game_loop_tick();
         select_gfx_pool();
+        setup_global_light();
         read_controller_inputs(THREAD_5_GAME_LOOP);
         fast_profiler_update(PROFILER_TIME_CONTROLLERS);
 
