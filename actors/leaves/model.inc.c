@@ -23,8 +23,8 @@ const Gfx leaves_seg3_dl_0301CDE0[] = {
     gsSPVertex(leaves_seg3_vertex_0301CBA0, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
-    gsDPPipeSync(),
     gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK),
+    gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPEndDisplayList(),
 };
