@@ -1239,10 +1239,10 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     // Compare the cursor position and the string length, plus 11 (header size) and return if it overflows.
     if (sPuppyprintTextBufferPos + strLen + 11 > sizeof(sPuppyprintTextBuffer))
         return;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos] = (x >> 8) & 0xFF;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 1] = x & 0xFF;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 2] = (y >> 8) & 0xFF;
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 3] = y & 0xFF;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos] = ((x + 0x4000) >> 8) & 0xFF;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 1] = ((x + 0x40) & 0xFF);
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 2] = ((y + 0x4000) >> 8) & 0xFF;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 3] = ((y + 0x40) & 0xFF);
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 4] = gCurrEnvCol[0];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 5] = gCurrEnvCol[1];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 6] = gCurrEnvCol[2];
@@ -1258,6 +1258,7 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
 void puppyprint_print_deferred(void) {
     if (sPuppyprintTextBufferPos == 0)
         return;
+    bzero(&gCurrEnvCol, sizeof(ColorRGBA));
     print_set_envcolour(255, 255, 255, 255);
     for (u32 i = 0; i < sPuppyprintTextBufferPos;)
     {
@@ -1267,10 +1268,10 @@ void puppyprint_print_deferred(void) {
             print_small_text(160, 80, "gEffectsMemoryPool is full.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
             return;
         }
-        s32 x = (sPuppyprintTextBuffer[i] << 8) & 0xFF;
-        x += sPuppyprintTextBuffer[i + 1] & 0xFF;
-        s32 y = (sPuppyprintTextBuffer[i + 2] << 8) & 0xFF;
-        y += sPuppyprintTextBuffer[i + 3] & 0xFF;
+        s32 x = ((sPuppyprintTextBuffer[i] << 8) & 0xFF) - 0x4000;
+        x += (sPuppyprintTextBuffer[i + 1] & 0xFF) - 0x40;
+        s32 y = ((sPuppyprintTextBuffer[i + 2] << 8) & 0xFF) - 0x4000;
+        y += (sPuppyprintTextBuffer[i + 3] & 0xFF) - 0x40;
         ColorRGBA originalEnvCol = {gCurrEnvCol[0], gCurrEnvCol[1], gCurrEnvCol[2], gCurrEnvCol[3]};
         print_set_envcolour(sPuppyprintTextBuffer[i + 4], sPuppyprintTextBuffer[i + 5], sPuppyprintTextBuffer[i + 6], sPuppyprintTextBuffer[i + 7]);
         u8 alignment = sPuppyprintTextBuffer[i + 9];

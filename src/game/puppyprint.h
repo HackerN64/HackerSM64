@@ -30,6 +30,7 @@ enum Benchmark {
 enum PuppyprintTextAlign {
     PRINT_TEXT_ALIGN_LEFT   =  0,
     PRINT_TEXT_ALIGN_CENTRE =  1,
+    PRINT_TEXT_ALIGN_CENTER =  1,
     PRINT_TEXT_ALIGN_RIGHT  =  2,
     PRINT_ALL               = -1,
 };
