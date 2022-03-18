@@ -8,6 +8,7 @@
 #define PERF_AGGREGATE NUM_PERF_ITERATIONS
 #define PERF_TOTAL NUM_PERF_ITERATIONS + 1
 #define LOG_BUFFER_SIZE       16
+#define PUPPYPRINT_DEFERRED_BUFFER_SIZE 0x1000
 
 #ifdef ENABLE_CREDITS_BENCHMARK
 #undef NUM_PERF_ITERATIONS
@@ -119,4 +120,6 @@ extern char consoleLogTable[LOG_BUFFER_SIZE][255];
 extern void profiler_offset(u32 *time, OSTime time2);
 extern void puppyprint_update_rsp(u8 flags);
 extern void profiler_add(u32 *time, OSTime time2);
+extern void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
+extern void puppyprint_print_deferred(void);
 extern s32 puppyprint_strlen(const char *str);

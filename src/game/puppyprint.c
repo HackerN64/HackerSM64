@@ -112,6 +112,8 @@ s8 logViewer    = FALSE;
 u8 sPPDebugPage = 0;
 u8 sDebugMenu   = FALSE;
 u8 sDebugOption = 0;
+u8 sPuppyprintTextBuffer[PUPPYPRINT_DEFERRED_BUFFER_SIZE];
+u32 sPuppyprintTextBufferPos; // Location in the buffer of puppyprint deferred text.
 // Profiler values
 s8  perfIteration  = 0;
 s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
@@ -1225,6 +1227,62 @@ void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, u8 *spaceX, s8 *offse
         case 'p': if (font == FONT_DEFAULT) *offsetY = 3; break;
         case 'y': if (font == FONT_DEFAULT) *offsetY = 1; break;
     }
+}
+// This is where the deferred printing will be stored. When text is made, it will store text with an 12 byte header, then the rest will be the text data itself.
+// The first 4 bytes of the header will be the X and Y pos
+// The next 4 bytes will be the current envcolour set by print_set_envcolour
+// Then the string length, text alignment, amount and font each get a byte.
+// The data afterwards is the text data itself, using the string length byte to know when to stop.
+void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
+    u8 strLen = MIN((signed)strlen(str), 255);
+    // Compare the cursor position and the string length, plus 11 (header size) and return if it overflows.
+    if (sPuppyprintTextBufferPos + strLen + 11 > sizeof(sPuppyprintTextBuffer))
+        return;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos] = (x >> 8) & 0xFF;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 1] = x & 0xFF;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 2] = (y >> 8) & 0xFF;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 3] = y & 0xFF;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 4] = gCurrEnvCol[0];
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 5] = gCurrEnvCol[1];
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 6] = gCurrEnvCol[2];
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 7] = gCurrEnvCol[3];
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 8] = strLen;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 9] = align;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 10] = (amount == -1) ? 255 : amount;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 11] = font;
+    bcopy(str, &sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 12], strLen);
+    sPuppyprintTextBufferPos += strLen + 12;
+}
+
+void puppyprint_print_deferred(void) {
+    if (sPuppyprintTextBufferPos == 0)
+        return;
+    print_set_envcolour(255, 255, 255, 255);
+    for (u32 i = 0; i < sPuppyprintTextBufferPos;)
+    {
+        u8 length = sPuppyprintTextBuffer[i + 8];
+        char *text = mem_pool_alloc(gEffectsMemoryPool, length);
+        if (text == NULL) {
+            print_small_text(160, 80, "gEffectsMemoryPool is full.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+            return;
+        }
+        s32 x = (sPuppyprintTextBuffer[i] << 8) & 0xFF;
+        x += sPuppyprintTextBuffer[i + 1] & 0xFF;
+        s32 y = (sPuppyprintTextBuffer[i + 2] << 8) & 0xFF;
+        y += sPuppyprintTextBuffer[i + 3] & 0xFF;
+        ColorRGBA originalEnvCol = {gCurrEnvCol[0], gCurrEnvCol[1], gCurrEnvCol[2], gCurrEnvCol[3]};
+        print_set_envcolour(sPuppyprintTextBuffer[i + 4], sPuppyprintTextBuffer[i + 5], sPuppyprintTextBuffer[i + 6], sPuppyprintTextBuffer[i + 7]);
+        u8 alignment = sPuppyprintTextBuffer[i + 9];
+        u8 amount = (sPuppyprintTextBuffer[i + 10] == 255 ? -1 : amount);
+        u8 font = sPuppyprintTextBuffer[i + 11];
+        bcopy(&sPuppyprintTextBuffer[i + 12], text, length);
+        print_small_text(x, y, text, alignment, amount, font);
+        mem_pool_free(gEffectsMemoryPool, text);
+        print_set_envcolour(originalEnvCol[0], originalEnvCol[1], originalEnvCol[2], originalEnvCol[3]);
+        i+=length + 12;
+    }
+    //Reset the position back to zero, effectively clearing the buffer.
+    sPuppyprintTextBufferPos = 0;
 }
 
 void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNUSED s32 scaleX, UNUSED s32 scaleY, s32 mode) {
