@@ -153,6 +153,11 @@ enum MenuOption {
     MENU_OPT_EXIT_COURSE = MENU_OPT_2,
     MENU_OPT_CAMERA_ANGLE_R = MENU_OPT_3,
 
+    //Confirm Exit Course Menu
+    MENU_OPT_YES = MENU_OPT_1,
+    MENU_OPT_NO = MENU_OPT_2,
+    
+
     // Save Menu
     MENU_OPT_SAVE_AND_CONTINUE = MENU_OPT_1,
     MENU_OPT_SAVE_AND_QUIT = MENU_OPT_2,

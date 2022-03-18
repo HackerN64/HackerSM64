@@ -1688,6 +1688,62 @@ void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     }
 }
 
+#ifdef BETTER_PAUSE_MENU
+s32 render_confirm_exit_course(s16 x, s16 y, s8 *index, s16 yIndex) {
+    s16 gMenuOptSelectIndex;
+
+    u8 textSure[] = { TEXT_SURE };
+    u8 textNo[] = { TEXT_NO };
+    u8 textYes[] = { TEXT_YES };
+
+    shade_screen();
+    render_pause_my_score_coins();
+    render_pause_red_coins();
+
+    handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 2);
+
+    gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+
+    print_generic_string(x + 10, y - 2, LANGUAGE_ARRAY(textSure));
+    print_generic_string(x + 10, y - 17, LANGUAGE_ARRAY(textYes));
+    print_generic_string(x + 10, y - 33, LANGUAGE_ARRAY(textNo));
+
+    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
+
+    create_dl_translation_matrix(MENU_MTX_PUSH, x - X_VAL8, (y - ((*index) * yIndex)) - Y_VAL8, 0);
+
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
+    gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
+    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+
+    if (gPlayer3Controller->buttonPressed & A_BUTTON) {
+        level_set_transition(0, NULL);
+        play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
+        gDialogBoxState = DIALOG_STATE_OPENING;
+        gMenuMode = MENU_MODE_NONE;
+
+        if (gDialogLineNum == MENU_OPT_YES) {
+            gMenuOptSelectIndex = MENU_OPT_3;
+        } else {
+            gMenuOptSelectIndex = MENU_OPT_NONE;
+        }
+
+        return gMenuOptSelectIndex;
+    }
+
+    if (gPlayer3Controller->buttonPressed & START_BUTTON) {
+                level_set_transition(0, NULL);
+                play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
+                gDialogBoxState = DIALOG_STATE_OPENING;
+                gMenuMode = MENU_MODE_NONE;
+                return MENU_OPT_DEFAULT;
+    }
+
+    return MENU_OPT_NONE;
+}
+#endif //BETTER_PAUSE_MENU
+
 void render_pause_castle_menu_box(s16 x, s16 y) {
     create_dl_translation_matrix(MENU_MTX_PUSH, x - 78, y - 32, 0);
     create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.2f, 0.8f, 1.0f);
@@ -1883,20 +1939,45 @@ s32 render_pause_courses_and_castle(void) {
             }
 #endif
 
+#ifdef BETTER_PAUSE_MENU
+            if (gPlayer3Controller->buttonPressed & A_BUTTON) {
+#else
             if (gPlayer3Controller->buttonPressed & (A_BUTTON | START_BUTTON)) {
+#endif //BETTER_PAUSE_MENU
                 level_set_transition(0, NULL);
                 play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
                 gDialogBoxState = DIALOG_STATE_OPENING;
                 gMenuMode = MENU_MODE_NONE;
 
                 if (gDialogLineNum == MENU_OPT_EXIT_COURSE) {
+#ifdef BETTER_PAUSE_MENU
+                    gMenuMode = MENU_MODE_UNUSED_0;
+                    index = MENU_OPT_NONE;
+#else
                     index = gDialogLineNum;
+#endif // BETTER_PAUSE_MENU
+                    
                 } else { // MENU_OPT_CONTINUE or MENU_OPT_CAMERA_ANGLE_R
+#ifdef BETTER_PAUSE_MENU
+                    gMenuMode = MENU_MODE_NONE;
+#endif // BETTER_PAUSE_MENU
                     index = MENU_OPT_DEFAULT;
                 }
 
                 return index;
             }
+
+#ifdef BETTER_PAUSE_MENU
+            if (gPlayer3Controller->buttonPressed & START_BUTTON) {
+                level_set_transition(0, NULL);
+                play_sound(SOUND_MENU_PAUSE_CLOSE, gGlobalSoundSource);
+                gDialogBoxState = DIALOG_STATE_OPENING;
+                gMenuMode = MENU_MODE_NONE;
+                index = MENU_OPT_DEFAULT;
+                return index;
+            }
+#endif // BETTER_PAUSE_MENU
+
             break;
 
         case DIALOG_STATE_HORIZONTAL:
@@ -2179,7 +2260,11 @@ s32 render_menus_and_dialogs(void) {
     if (gMenuMode != MENU_MODE_NONE) {
         switch (gMenuMode) {
             case MENU_MODE_UNUSED_0:
+#ifdef BETTER_PAUSE_MENU
+                mode = render_confirm_exit_course(99, 93, &gDialogLineNum, 15);
+#else
                 mode = render_pause_courses_and_castle();
+#endif //BETTER_PAUSE_MENU
                 break;
             case MENU_MODE_RENDER_PAUSE_SCREEN:
                 mode = render_pause_courses_and_castle();

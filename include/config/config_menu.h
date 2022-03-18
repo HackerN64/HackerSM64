@@ -6,6 +6,9 @@
 
 // -- EXIT COURSE SETTINGS --
 
+// Better Course Pause Menu with Exit Course Confirmation
+#define BETTER_PAUSE_MENU
+
 // Disable exit course
 //#define DISABLE_EXIT_COURSE
 
