@@ -1180,6 +1180,32 @@ void geo_try_process_children(struct GraphNode *node) {
     }
 }
 
+void (*geoFunctionTable[])() = {
+    geo_process_ortho_projection, // GRAPH_NODE_TYPE_ORTHO_PROJECTION,
+    geo_process_perspective, // GRAPH_NODE_TYPE_PERSPECTIVE,
+    geo_process_master_list, // GRAPH_NODE_TYPE_MASTER_LIST,
+    geo_process_level_of_detail, // GRAPH_NODE_TYPE_LEVEL_OF_DETAIL,
+    geo_process_switch, // GRAPH_NODE_TYPE_SWITCH_CASE,
+    geo_process_camera, // GRAPH_NODE_TYPE_CAMERA,
+    geo_process_translation_rotation, // GRAPH_NODE_TYPE_TRANSLATION_ROTATION,
+    geo_process_translation, // GRAPH_NODE_TYPE_TRANSLATION,
+    geo_process_rotation, // GRAPH_NODE_TYPE_ROTATION,
+    geo_process_object, // GRAPH_NODE_TYPE_OBJECT,
+    geo_process_animated_part, // GRAPH_NODE_TYPE_ANIMATED_PART,
+    geo_process_bone, // GRAPH_NODE_TYPE_BONE,
+    geo_process_billboard, // GRAPH_NODE_TYPE_BILLBOARD,
+    geo_process_display_list, // GRAPH_NODE_TYPE_DISPLAY_LIST,
+    geo_process_scale, // GRAPH_NODE_TYPE_SCALE,
+    geo_process_shadow, // GRAPH_NODE_TYPE_SHADOW,
+    geo_process_object_parent, // GRAPH_NODE_TYPE_OBJECT_PARENT,
+    geo_process_generated_list, // GRAPH_NODE_TYPE_GENERATED_LIST,
+    geo_process_background, // GRAPH_NODE_TYPE_BACKGROUND,
+    geo_process_held_object, // GRAPH_NODE_TYPE_HELD_OBJ,
+    geo_try_process_children, // GRAPH_NODE_TYPE_CULLING_RADIUS,
+    geo_try_process_children, // GRAPH_NODE_TYPE_ROOT,
+    geo_try_process_children // GRAPH_NODE_TYPE_START,
+};
+
 /**
  * Process a generic geo node and its siblings.
  * The first argument is the start node, and all its siblings will
@@ -1201,6 +1227,14 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
             if (curGraphNode->flags & GRAPH_RENDER_CHILDREN_FIRST) {
                 geo_try_process_children(curGraphNode);
             } else {
+#ifdef DISABLE_GRAPH_NODE_TYPE_FUNCTIONAL
+                u32 curGraphNodeType = curGraphNode->type;
+                if (curGraphNodeType < ARRAY_COUNT(geoFunctionTable)) {
+                    geoFunctionTable[curGraphNodeType](curGraphNode);
+                } else {
+                    geo_try_process_children(curGraphNode);
+                }
+#else
                 switch (curGraphNode->type) {
                     case GRAPH_NODE_TYPE_ORTHO_PROJECTION:     geo_process_ortho_projection    ((struct GraphNodeOrthoProjection     *) curGraphNode); break;
                     case GRAPH_NODE_TYPE_PERSPECTIVE:          geo_process_perspective         ((struct GraphNodePerspective         *) curGraphNode); break;
@@ -1224,6 +1258,7 @@ void geo_process_node_and_siblings(struct GraphNode *firstNode) {
                     case GRAPH_NODE_TYPE_BONE:                 geo_process_bone                ((struct GraphNodeBone                *) curGraphNode); break;
                     default:                                   geo_try_process_children        ((struct GraphNode                    *) curGraphNode); break;
                 }
+#endif
             }
         } else {
             if (curGraphNode->type == GRAPH_NODE_TYPE_OBJECT) {
