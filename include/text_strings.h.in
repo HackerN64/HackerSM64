@@ -92,6 +92,15 @@
 #define TEXT_HUD_PRESS_L _("PRESS L TO SWITCH")
 #endif
 
+//Reonucam
+#ifdef REONUCAM
+#define TEXT_CAM_INFO_SLOWEST _("CAM SPEED: SLOWEST")
+#define TEXT_CAM_INFO_SLOW _("CAM SPEED: SLOW")
+#define TEXT_CAM_INFO_MEDIUM _("CAM SPEED: MEDIUM")
+#define TEXT_CAM_INFO_FAST _("CAM SPEED: FAST")
+#define TEXT_CAM_INFO_FASTEST _("CAM SPEED: FASTEST")
+#endif
+
 #if defined(VERSION_JP) || defined(VERSION_SH)
 
 /**
