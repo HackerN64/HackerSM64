@@ -46,8 +46,8 @@ const Gfx sparkles_animation_seg4_dl_04035288[] = {
     gsSPVertex(sparkles_animation_seg4_vertex_04032A48, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
-    gsDPPipeSync(),
     gsSPSetGeometryMode(G_LIGHTING),
+    gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPEndDisplayList(),
 };
