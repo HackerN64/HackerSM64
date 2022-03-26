@@ -2,6 +2,7 @@
 
 #include "vc_bin.h"
 
+#ifdef EEP
 // These functions are real implementations of libultra functions
 // with an exception that some VC useless code was dropped from them
 // for the cleaner understanding purposes.
@@ -64,3 +65,4 @@ s32 osEepromLongWriteVC(OSMesgQueue *mq, u8 address, u8 *buffer, int length)
     }
     return ret;
 }
+#endif

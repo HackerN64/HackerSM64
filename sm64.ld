@@ -159,6 +159,7 @@ SECTIONS
    {
       KEEP(BUILD_DIR/asm/entry.o(.text*));
       KEEP(BUILD_DIR/asm/n64_assert.o(.text*));
+      KEEP(BUILD_DIR/asm/vc_bin.o(.text*));
 
       BUILD_DIR/src/boot*.o(.text*);
       BUILD_DIR/src/hvqm*.o(.text*);
