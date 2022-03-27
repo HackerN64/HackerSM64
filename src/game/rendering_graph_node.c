@@ -265,6 +265,21 @@ void switch_ucode(s32 ucode) {
 }
 #endif
 
+#define UPPER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) >> 16))
+#define LOWER_FIXED(x) ((int)((unsigned int)((x) * 0x10000) & 0xFFFF))
+
+// Fixed-point identity matrix with the inverse of world scale
+Mtx identityMatrixWorldScale = {{
+    {UPPER_FIXED(1.0f / WORLD_SCALE) << 16, 0x00000000,
+     UPPER_FIXED(1.0f / WORLD_SCALE) <<  0, 0x00000000},
+    {0x00000000,                            UPPER_FIXED(1.0f / WORLD_SCALE) << 16,
+     0x00000000,                            UPPER_FIXED(1.0f)               <<  0},
+    {LOWER_FIXED(1.0f / WORLD_SCALE) << 16, 0x00000000,
+     LOWER_FIXED(1.0f / WORLD_SCALE) <<  0, 0x00000000},
+    {0x00000000,                            LOWER_FIXED(1.0f / WORLD_SCALE) << 16,
+     0x00000000,                            LOWER_FIXED(1.0f)               <<  0}
+}};
+
 /**
  * Process a master list node. This has been modified, so now it runs twice, for each microcode.
  * It iterates through the first 5 layers of if the first index using F3DLX2.Rej, then it switches
@@ -359,6 +374,8 @@ void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
 #endif
 #ifdef VISUAL_DEBUG
     if ( hitboxView) render_debug_boxes(DEBUG_UCODE_DEFAULT | DEBUG_BOX_CLEAR);
+    // Load the world scale identity matrix
+    gSPMatrix(gDisplayListHead++, &identityMatrixWorldScale, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     if (surfaceView) visual_surface_loop();
 #endif
 }
