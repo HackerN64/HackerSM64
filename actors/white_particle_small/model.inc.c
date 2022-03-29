@@ -23,7 +23,8 @@ ALIGNED8 static const Texture white_particle_small_texture[] = {
 
 // 0x04032980 - 0x040329E0
 const Gfx white_particle_small_dl_begin[] = {
-    gsDPPipeSync(),    gsDPSetCombineMode(G_CC_MODULATEIA, G_CC_MODULATEIA),
+    gsDPPipeSync(),
+    gsDPSetCombineMode(G_CC_MODULATEIA, G_CC_MODULATEIA),
     gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
     gsDPLoadTextureBlock(white_particle_small_texture, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
     gsSPEndDisplayList(),
