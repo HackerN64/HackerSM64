@@ -61,7 +61,7 @@ struct Skybox {
 
 struct Skybox sSkyBoxInfo[2];
 
-typedef const Texture *const SkyboxTexture[80 * SKYBOX_SIZE];
+typedef const Texture *const SkyboxTexture[80 * sqr(SKYBOX_SIZE)];
 
 extern SkyboxTexture bbh_skybox_ptrlist;
 extern SkyboxTexture bidw_skybox_ptrlist;
