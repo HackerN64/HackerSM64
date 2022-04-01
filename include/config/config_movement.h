@@ -4,25 +4,6 @@
  * MOVEMENT SETTINGS *
  *********************/
 
-
-// Gives Mario the spinning triple jump found in the beta versions.
-// Most important setting in the file by far
-#define BETA_TRIPLE_JUMP
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Changes Mario's ground turn radius by making it dependent on the analog stick magnitude and speed.
 // #define VELOCITY_BASED_TURN_SPEED
 
