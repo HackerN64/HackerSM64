@@ -622,13 +622,11 @@ void geo_process_camera(struct GraphNodeCamera *node) {
  #endif
 #endif // F3DEX_GBI_2
 
-    // Make a copy of the view matrix and scale it based on WORLD_SCALE
+    // Make a copy of the view matrix and scale its translation based on WORLD_SCALE
     Mat4 scaledCamera;
     mtxf_copy(scaledCamera, gCameraTransform);
     for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            scaledCamera[i][j] *= WORLD_SCALE;
-        }
+        scaledCamera[3][i] /= WORLD_SCALE;
     }
     
     // Convert the scaled matrix to fixed-point and integrate it into the projection matrix stack
