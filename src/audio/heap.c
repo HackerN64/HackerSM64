@@ -409,6 +409,8 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
 #endif
 
 #ifdef VERSION_SH
+    arg0 = NULL;
+
     switch (poolIdx) {
         case 0:
             arg0 = &gSeqLoadedPool;
@@ -421,7 +423,6 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
             break;
 
         case 2:
-        default:
             arg0 = &gUnusedLoadedPool;
             table = gUnkLoadStatus;
             break;
@@ -759,7 +760,7 @@ void *get_bank_or_seq(s32 poolIdx, s32 arg1, s32 id) {
 }
 void *get_bank_or_seq_inner(s32 poolIdx, s32 arg1, s32 bankId) {
     u32 i;
-    struct SoundMultiPool* loadedPool;
+    struct SoundMultiPool* loadedPool = NULL;
     struct TemporaryPool* temporary;
     struct PersistentPool* persistent;
 
@@ -771,7 +772,6 @@ void *get_bank_or_seq_inner(s32 poolIdx, s32 arg1, s32 bankId) {
             loadedPool = &gBankLoadedPool;
             break;
         case 2:
-        default:
             loadedPool = &gUnusedLoadedPool;
             break;
     }
