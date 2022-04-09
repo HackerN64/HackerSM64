@@ -380,7 +380,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
     // arg3 = 0, 1 or 2?
 
 #ifdef VERSION_SH
-    struct SoundMultiPool *arg0;
+    struct SoundMultiPool *arg0 = NULL;
 #define isSound poolIdx
 #endif
     struct TemporaryPool *tp;
@@ -409,8 +409,6 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
 #endif
 
 #ifdef VERSION_SH
-    arg0 = NULL;
-
     switch (poolIdx) {
         case 0:
             arg0 = &gSeqLoadedPool;
