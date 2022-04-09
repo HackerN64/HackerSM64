@@ -295,6 +295,9 @@ static const Vtx bully_seg5_vertex_05003608[] = {
 // 0x05003708 - 0x050037A0
 const Gfx bully_seg5_dl_05003708[] = {
     gsSPVertex(bully_seg5_vertex_05002C68, 14, 0),
+    gsDPPipeSync(),
+    gsDPSetPrimColor(0, 0, 0, 227, 00, 255),
+    gsDPSetCombineLERP(PRIMITIVE, 0, SHADE, 0, 0, 0, 0, 1, PRIMITIVE, 0, SHADE, 0, 0, 0, 0, 1),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  1,  3, 0x0),
     gsSP2Triangles( 2,  3,  4, 0x0,  1,  5,  6, 0x0),
     gsSP2Triangles( 1,  6,  7, 0x0,  0,  5,  1, 0x0),
