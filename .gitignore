@@ -52,6 +52,7 @@ build/*
 .assets-local.txt
 
 # Vanilla Assets.
+# You can allow an asset to be committed by deleting one of these lines.
 actors/amp/amp_body.rgba16.png
 actors/amp/amp_electricity.rgba16.png
 actors/amp/amp_eyes.rgba16.png
