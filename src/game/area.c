@@ -432,9 +432,8 @@ void render_game(void) {
     gViewportOverride = NULL;
     gViewportClip     = NULL;
     
-    fast_profiler_update(PROFILER_TIME_GFX);
-    // TODO wiseguy move this to puppyprint if puppyprint is enabled
-    fast_profiler_print_times();
+    profiler_update(PROFILER_TIME_GFX);
+    profiler_print_times();
 #if PUPPYPRINT_DEBUG
     puppyprint_render_profiler();
 #endif

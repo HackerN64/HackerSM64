@@ -484,13 +484,13 @@ void puppyprint_render_collision(void) {
 
 extern void print_fps(s32 x, s32 y);
 
-u32 fast_profiler_get_cpu_cycles();
-u32 fast_profiler_get_rsp_cycles();
-u32 fast_profiler_get_rdp_cycles();
+u32 profiler_get_cpu_cycles();
+u32 profiler_get_rsp_cycles();
+u32 profiler_get_rdp_cycles();
 
-u32 fast_profiler_get_cpu_microseconds();
-u32 fast_profiler_get_rsp_microseconds();
-u32 fast_profiler_get_rdp_microseconds();
+u32 profiler_get_cpu_microseconds();
+u32 profiler_get_rsp_microseconds();
+u32 profiler_get_rdp_microseconds();
 
 void print_basic_profiling(void) {
     u32 cpuTime;
@@ -499,17 +499,17 @@ void print_basic_profiling(void) {
     char textBytes[90];
     print_fps(16, 16);
 #ifdef PUPPYPRINT_DEBUG_CYCLES
-    cpuTime = fast_profiler_get_cpu_cycles();
-    rspTime = fast_profiler_get_rsp_cycles();
-    rdpTime = fast_profiler_get_rdp_cycles();
+    cpuTime = profiler_get_cpu_cycles();
+    rspTime = profiler_get_rsp_cycles();
+    rdpTime = profiler_get_rdp_cycles();
     sprintf(textBytes, "CPU: %dc (%d_)#RSP: %dc (%d_)#RDP: %dc (%d_)",
             cpuTime, (cpuTime / 15625),
             rspTime, (rspTime / 15625),
             rdpTime, (rdpTime / 15625));
 #else
-    cpuTime = fast_profiler_get_cpu_microseconds();
-    rspTime = fast_profiler_get_rsp_microseconds();
-    rdpTime = fast_profiler_get_rdp_microseconds();
+    cpuTime = profiler_get_cpu_microseconds();
+    rspTime = profiler_get_rsp_microseconds();
+    rdpTime = profiler_get_rdp_microseconds();
     sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)",
             cpuTime, (cpuTime / 333),
             rspTime, (rspTime / 333),

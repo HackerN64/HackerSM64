@@ -53,7 +53,7 @@ u8 curFrameTimeIndex = 0;
 #include "PR/os_convert.h"
 
 #ifdef USE_PROFILER
-float fast_profiler_get_fps();
+float profiler_get_fps();
 #else
 // Call once per frame
 f32 calculate_and_update_fps() {
@@ -71,7 +71,7 @@ f32 calculate_and_update_fps() {
 
 void print_fps(s32 x, s32 y) {
 #ifdef USE_PROFILER
-    f32 fps = fast_profiler_get_fps();
+    f32 fps = profiler_get_fps();
 #else
     f32 fps = calculate_and_update_fps();
 #endif

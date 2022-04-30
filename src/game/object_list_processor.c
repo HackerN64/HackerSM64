@@ -548,10 +548,10 @@ void clear_objects(void) {
  */
 void update_terrain_objects(void) {
     gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
-    fast_profiler_update(PROFILER_TIME_SPAWNER);
+    profiler_update(PROFILER_TIME_SPAWNER);
 
     gObjectCounter += update_objects_in_list(&gObjectLists[OBJ_LIST_SURFACE]);
-    fast_profiler_update(PROFILER_TIME_DYNAMIC);
+    profiler_update(PROFILER_TIME_DYNAMIC);
 }
 
 /**
@@ -564,11 +564,11 @@ void update_non_terrain_objects(void) {
     s32 i = 2;
     while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
         if (listIndex == OBJ_LIST_PLAYER) {
-            fast_profiler_update(PROFILER_TIME_BEHAVIOR1);
+            profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO);
         }
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
         if (listIndex == OBJ_LIST_PLAYER) {
-            fast_profiler_update(PROFILER_TIME_MARIO);
+            profiler_update(PROFILER_TIME_MARIO);
         }
         i++;
     }
@@ -664,5 +664,5 @@ void update_objects(UNUSED s32 unused) {
 
     gPrevFrameObjectCount = gObjectCounter;
     
-    fast_profiler_update(PROFILER_TIME_BEHAVIOR2);
+    profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO);
 }
