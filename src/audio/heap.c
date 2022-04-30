@@ -1059,7 +1059,6 @@ void init_reverb_us(s32 presetId) {
     s32 i;
 #ifdef BETTER_REVERB
     s8 reverbConsole;
-    s32 bufOffset = 0;
 #endif
 
     s32 reverbWindowSize = gReverbSettings[presetId].windowSize;
@@ -1112,9 +1111,7 @@ void init_reverb_us(s32 presetId) {
                 gSynthesisReverb.items[1][i].toDownsampleRight = (mem + (DEFAULT_LEN_1CH / sizeof(s16)));
             }
 #ifdef BETTER_REVERB
-            delayBufsL = (s32**) soundAlloc(&gBetterReverbPool, BETTER_REVERB_PTR_SIZE);
-            delayBufsR = &delayBufsL[NUM_ALLPASS];
-            delayBufsL[0] = (s32*) soundAlloc(&gBetterReverbPool, BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE);
+            initialize_better_reverb_buffers();
 #endif
         } else {
             bzero(gSynthesisReverb.ringBuffer.left, (REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16)));
@@ -1146,17 +1143,10 @@ void init_reverb_us(s32 presetId) {
 #ifdef BETTER_REVERB
         if (toggleBetterReverb) {
             if (sAudioIsInitialized) {
-                bzero(delayBufsL[0], (BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE));
-            }            
-
-            for (i = 0; i < NUM_ALLPASS; ++i) {
-                delaysL[i] = (delaysBaselineL[i] / gReverbDownsampleRate);
-                delaysR[i] = (delaysBaselineR[i] / gReverbDownsampleRate);
-                delayBufsL[i] = (s32*) &delayBufsL[0][bufOffset];
-                bufOffset += delaysL[i];
-                delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interpolated adjacently in memory; not a bug
-                bufOffset += delaysR[i];
+                clear_better_reverb_buffers();
             }
+
+            set_better_reverb_buffers();
         }
 #endif
     }

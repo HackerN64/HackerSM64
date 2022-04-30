@@ -90,12 +90,12 @@ u32 reverbFilterCountConsole = (NUM_ALLPASS - 6);
 // This can be changed at any time, but is best set immediately before calling audio_reset_session.
 u32 reverbFilterCountEmulator = NUM_ALLPASS;
 
-// Set this to TRUE to use mono over stereo for reverb. This should increase performance, but at the cost of a less fullfilling reverb experience.
+// Set this to TRUE to use mono over stereo for reverb. This should increase performance, but at the cost of a less fulfilling reverb experience.
 // If performance is desirable, it is recommended to change reverbFilterCountConsole or betterReverbDownsampleConsole first.
 // This can be changed at any time, but is best set immediately before calling audio_reset_session.
 u8 monoReverbConsole = FALSE;
 
-// Set this to TRUE to use mono over stereo for reverb. This should increase performance, but at the cost of a less fullfilling reverb experience.
+// Set this to TRUE to use mono over stereo for reverb. This should increase performance, but at the cost of a less fulfilling reverb experience.
 // If performance is desirable, it is recommended to change reverbFilterCountEmulator or betterReverbDownsampleEmulator first.
 // This can be changed at any time, but is best set immediately before calling audio_reset_session.
 u8 monoReverbEmulator = FALSE;
@@ -137,25 +137,25 @@ s32 delaysBaselineR[NUM_ALLPASS] = {
 };
 
 // These values affect reverb decay depending on the filter index; can be messed with at any time
-s32 reverbMultsL[NUM_ALLPASS / 3] = {0xD7, 0x6F, 0x36, 0x22};
-s32 reverbMultsR[NUM_ALLPASS / 3] = {0xCF, 0x73, 0x38, 0x1F};
+static s32 reverbMultsL[NUM_ALLPASS / 3] = {0xD7, 0x6F, 0x36, 0x22};
+static s32 reverbMultsR[NUM_ALLPASS / 3] = {0xCF, 0x73, 0x38, 0x1F};
 
 
 /* -----------------------------------------------------------------------END REVERB PARAMETERS----------------------------------------------------------------------- */
 
 // Do not touch these values manually, unless you want potential for problems.
-s32 reverbFilterCount   =  NUM_ALLPASS;
-s32 reverbFilterCountm1 = (NUM_ALLPASS - 1);
-u8 monoReverb = FALSE;
 u8 toggleBetterReverb = TRUE;
-s32 allpassIdxL[NUM_ALLPASS] = {0};
-s32 allpassIdxR[NUM_ALLPASS] = {0};
-s32     tmpBufL[NUM_ALLPASS] = {0};
-s32     tmpBufR[NUM_ALLPASS] = {0};
-s32     delaysL[NUM_ALLPASS] = {0};
-s32     delaysR[NUM_ALLPASS] = {0};
-s32 **delayBufsL;
-s32 **delayBufsR;
+static u8 monoReverb = FALSE;
+static s32 reverbFilterCount   =  NUM_ALLPASS;
+static s32 reverbFilterCountm1 = (NUM_ALLPASS - 1);
+static s32 allpassIdxL[NUM_ALLPASS] = {0};
+static s32 allpassIdxR[NUM_ALLPASS] = {0};
+static s32     tmpBufL[NUM_ALLPASS] = {0};
+static s32     tmpBufR[NUM_ALLPASS] = {0};
+static s32     delaysL[NUM_ALLPASS] = {0};
+static s32     delaysR[NUM_ALLPASS] = {0};
+static s32 **delayBufsL;
+static s32 **delayBufsR;
 #endif
 
 
@@ -258,6 +258,36 @@ static inline void reverb_mono_sample(s16 *outSample, s32 inSample) {
     }
     s32 outUnclamped = ((outTmp * REVERB_WET_SIGNAL/* + inSample * REVERB_DRY_SIGNAL*/) / 256);
     *outSample = CLAMP_S16(outUnclamped);
+}
+
+void initialize_better_reverb_buffers(void) {
+    delayBufsL = (s32**) soundAlloc(&gBetterReverbPool, BETTER_REVERB_PTR_SIZE);
+    delayBufsR = &delayBufsL[NUM_ALLPASS];
+    delayBufsL[0] = (s32*) soundAlloc(&gBetterReverbPool, BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE);
+}
+
+void clear_better_reverb_buffers(void) {
+    bzero(delayBufsL[0], (BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE));
+
+    bzero(allpassIdxL, sizeof(allpassIdxL));
+    bzero(allpassIdxR, sizeof(allpassIdxR));
+    bzero(tmpBufL, sizeof(tmpBufL));
+    bzero(tmpBufR, sizeof(tmpBufR));
+    // bzero(delaysL, sizeof(delaysL));
+    // bzero(delaysR, sizeof(delaysR));
+}
+
+void set_better_reverb_buffers(void) {
+    s32 bufOffset = 0;
+
+    for (s32 i = 0; i < NUM_ALLPASS; ++i) {
+        delaysL[i] = (delaysBaselineL[i] / gReverbDownsampleRate);
+        delaysR[i] = (delaysBaselineR[i] / gReverbDownsampleRate);
+        delayBufsL[i] = (s32*) &delayBufsL[0][bufOffset];
+        bufOffset += delaysL[i];
+        delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interpolated adjacently in memory; not a bug
+        bufOffset += delaysR[i];
+    }
 }
 #endif
 
