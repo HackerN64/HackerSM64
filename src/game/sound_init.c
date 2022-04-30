@@ -342,10 +342,6 @@ void thread4_sound(UNUSED void *arg) {
     audio_init();
     sound_init();
 
-#if PUPPYPRINT_DEBUG
-    OSTime lastTime;
-#endif
-
     osCreateMesgQueue(&sSoundMesgQueue, sSoundMesgBuf, ARRAY_COUNT(sSoundMesgBuf));
     set_vblank_handler(1, &sSoundVblankHandler, &sSoundMesgQueue, (OSMesg) 512);
 
@@ -354,35 +350,13 @@ void thread4_sound(UNUSED void *arg) {
 
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
         fast_profiler_audio_started();
-#if PUPPYPRINT_DEBUG
-        while (TRUE) {
-            lastTime = osGetTime();
-            dmaAudioTime[perfIteration] = 0;
-#endif
-            if (gResetTimer < 25) {
-                struct SPTask *spTask;
-                spTask = create_next_audio_frame_task();
-                if (spTask != NULL) {
-                    dispatch_audio_sptask(spTask);
-                }
-#if PUPPYPRINT_DEBUG
-                profiler_update(audioTime, lastTime);
-                audioTime[perfIteration] -= dmaAudioTime[perfIteration];
-                if (benchmarkLoop > 0 && benchOption == 1) {
-                    benchmarkLoop--;
-                    benchMark[benchmarkLoop] = osGetTime() - lastTime;
-                    if (benchmarkLoop == 0) {
-                        puppyprint_profiler_finished();
-                        break;
-                    }
-                } else {
-                    break;
-                }
-#endif
+        if (gResetTimer < 25) {
+            struct SPTask *spTask;
+            spTask = create_next_audio_frame_task();
+            if (spTask != NULL) {
+                dispatch_audio_sptask(spTask);
             }
-#if PUPPYPRINT_DEBUG
         }
-#endif
         fast_profiler_audio_completed();
     }
 }

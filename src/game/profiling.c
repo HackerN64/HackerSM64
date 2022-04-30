@@ -131,6 +131,59 @@ static void update_rdp_timers() {
     buffer_update(&all_profiling_data[PROFILER_TIME_PIPE], pipe, profile_buffer_index);
 }
 
+#ifdef PUPPYPRINT_DEBUG
+extern u8 sPPDebugPage;
+extern u8 fDebug;
+#endif
+
+float fast_profiler_get_fps() {
+    return (1000000.0f * PROFILING_BUFFER_SIZE) / (OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_FPS].total));
+}
+
+u32 fast_profiler_get_cpu_cycles() {
+    u32 cpu_normal_time = all_profiling_data[PROFILER_TIME_TOTAL].total / PROFILING_BUFFER_SIZE;
+    u32 cpu_audio_time = all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE;
+    return cpu_normal_time + cpu_audio_time * 2;
+}
+
+u32 fast_profiler_get_rsp_cycles() {
+    u32 rsp_graphics_time = all_profiling_data[PROFILER_TIME_RSP_GFX].total / PROFILING_BUFFER_SIZE;
+    u32 rsp_audio_time = all_profiling_data[PROFILER_TIME_RSP_AUDIO].total / PROFILING_BUFFER_SIZE;
+    return rsp_graphics_time + rsp_audio_time;
+}
+
+u32 fast_profiler_get_rdp_cycles() {
+    u32 rdp_pipe_cycles = all_profiling_data[PROFILER_TIME_PIPE].total;
+    u32 rdp_tmem_cycles = all_profiling_data[PROFILER_TIME_TMEM].total;
+    u32 rdp_cmd_cycles = all_profiling_data[PROFILER_TIME_CMD].total;
+
+    u32 rdp_max_cycles = MAX(MAX(rdp_pipe_cycles, rdp_tmem_cycles), rdp_cmd_cycles);
+
+    return rdp_max_cycles / PROFILING_BUFFER_SIZE;
+}
+
+u32 fast_profiler_get_cpu_microseconds() {
+    u32 cpu_normal_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_TOTAL].total / PROFILING_BUFFER_SIZE);
+    u32 cpu_audio_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_AUDIO].total / PROFILING_BUFFER_SIZE);
+    return cpu_normal_time + cpu_audio_time * 2;
+}
+
+u32 fast_profiler_get_rsp_microseconds() {
+    u32 rsp_graphics_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_RSP_GFX].total / PROFILING_BUFFER_SIZE);
+    u32 rsp_audio_time = OS_CYCLES_TO_USEC(all_profiling_data[PROFILER_TIME_RSP_AUDIO].total / PROFILING_BUFFER_SIZE);
+    return rsp_graphics_time + rsp_audio_time;
+}
+
+u32 fast_profiler_get_rdp_microseconds() {
+    u32 rdp_pipe_cycles = all_profiling_data[PROFILER_TIME_PIPE].total;
+    u32 rdp_tmem_cycles = all_profiling_data[PROFILER_TIME_TMEM].total;
+    u32 rdp_cmd_cycles = all_profiling_data[PROFILER_TIME_CMD].total;
+
+    u32 rdp_max_cycles = MAX(MAX(rdp_pipe_cycles, rdp_tmem_cycles), rdp_cmd_cycles);
+
+    return RDP_CYCLE_CONV(rdp_max_cycles / PROFILING_BUFFER_SIZE);
+}
+
 void fast_profiler_print_times() {
     u32 microseconds[PROFILER_TIME_COUNT];
     char text_buffer[196];
@@ -139,57 +192,77 @@ void fast_profiler_print_times() {
     update_total_timer();
     update_rdp_timers();
 
-    for (int i = 0; i < PROFILER_TIME_COUNT; i++) {
-        if (i < PROFILER_TIME_TMEM) {
-            microseconds[i] = OS_CYCLES_TO_USEC(all_profiling_data[i].total / PROFILING_BUFFER_SIZE);
-        } else {
-            microseconds[i] = RDP_CYCLE_CONV(all_profiling_data[i].total / PROFILING_BUFFER_SIZE);
-        }
+#ifndef PUPPYPRINT_DEBUG
+    static u8 show_profiler = 0;
+    if (gPlayer1Controller->buttonPressed & L_TRIG) {
+        show_profiler ^= 1;
     }
+#endif
 
-    sprintf(text_buffer,
-        "FPS:    %5.2f\n"
-        "CPU\n"
-        "CONT: %7d\n"
-        "LEVEL:%7d\n"
-        "OBJ1: %7d\n"
-        "OBJ2: %7d\n"
-        "GFX:  %7d\n"
-        "AUDIO:%7d\n"
-        "TOTAL:%7d\n"
-        "RDP\n"
-        "TMEM: %7d\n"
-        "CMD:  %7d\n"
-        "PIPE: %7d\n"
-        "RSP\n"
-        "GFX:  %7d\n"
-        "AUDIO:%7d\n"
-        "TOTAL:%7d",
-        1000000.0f / microseconds[PROFILER_TIME_FPS],
-        microseconds[PROFILER_TIME_CONTROLLERS],
-        microseconds[PROFILER_TIME_LEVEL_SCRIPT],
-        microseconds[PROFILER_TIME_OBJECTS1],
-        microseconds[PROFILER_TIME_OBJECTS2],
-        microseconds[PROFILER_TIME_GFX],
-        microseconds[PROFILER_TIME_AUDIO] * 2, // audio is 60Hz, so double the average
-        microseconds[PROFILER_TIME_TOTAL] + microseconds[PROFILER_TIME_AUDIO] * 2, // audio time is removed from the main thread profiling, so add it back here
-        microseconds[PROFILER_TIME_TMEM],
-        microseconds[PROFILER_TIME_CMD],
-        microseconds[PROFILER_TIME_PIPE],
-        microseconds[PROFILER_TIME_RSP_GFX],
-        microseconds[PROFILER_TIME_RSP_AUDIO],
-        microseconds[PROFILER_TIME_RSP_GFX] + microseconds[PROFILER_TIME_RSP_AUDIO]
-    );
+#ifdef PUPPYPRINT_DEBUG
+    if (fDebug && sPPDebugPage == 0) {
+#else
+    if (show_profiler) {
+#endif
+        for (int i = 0; i < PROFILER_TIME_COUNT; i++) {
+            if (i < PROFILER_TIME_TMEM) {
+                microseconds[i] = OS_CYCLES_TO_USEC(all_profiling_data[i].total / PROFILING_BUFFER_SIZE);
+            } else {
+                microseconds[i] = RDP_CYCLE_CONV(all_profiling_data[i].total / PROFILING_BUFFER_SIZE);
+            }
+        }
 
-    Gfx* dlHead = gDisplayListHead;
-    gDPPipeSync(dlHead++);
-    gDPSetCycleType(dlHead++, G_CYC_1CYCLE);
-    gDPSetRenderMode(dlHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
-    gDPSetTexturePersp(dlHead++, G_TP_NONE);
-    gDPSetTextureFilter(dlHead++, G_TF_POINT);
-    gDPSetTextureLUT(dlHead++, G_TT_NONE);
-    drawSmallStringCol(&dlHead, 10, 10, text_buffer, 0, 0, 0);
-    gDisplayListHead = dlHead;
+        // audio time is removed from the main thread profiling, so add it back here
+        u32 total_cpu = microseconds[PROFILER_TIME_TOTAL] + microseconds[PROFILER_TIME_AUDIO] * 2;
+        u32 total_rsp = microseconds[PROFILER_TIME_RSP_GFX] + microseconds[PROFILER_TIME_RSP_AUDIO];
+        u32 max_rdp = MAX(MAX(microseconds[PROFILER_TIME_TMEM], microseconds[PROFILER_TIME_CMD]), microseconds[PROFILER_TIME_PIPE]);
+
+        sprintf(text_buffer,
+            "FPS: %5.2f\n"
+            "\n"
+            "CPU\t\t%d (%d%%)\n"
+            " Input\t\t%d\n"
+            " Dynamic\t\t%d\n"
+            " Mario\t\t\t%d\n"
+            " Behavior\t\t%d\n"
+            " Graph\t\t%d\n"
+            " Audio\t\t\t%d\n"
+            "\n"
+            "RDP\t\t%d (%d%%)\n"
+            " Tmem\t\t\t%d\n"
+            " Cmd\t\t\t%d\n"
+            " Pipe\t\t\t%d\n"
+            "\n"
+            "RSP\t\t%d (%d%%)\n"
+            " Gfx\t\t\t%d\n"
+            " Audio\t\t\t%d\n",
+            1000000.0f / microseconds[PROFILER_TIME_FPS],
+            total_cpu, total_cpu / 333, 
+            microseconds[PROFILER_TIME_CONTROLLERS],
+            microseconds[PROFILER_TIME_DYNAMIC],
+            microseconds[PROFILER_TIME_MARIO],
+            microseconds[PROFILER_TIME_BEHAVIOR1] + microseconds[PROFILER_TIME_BEHAVIOR2],
+            microseconds[PROFILER_TIME_GFX],
+            microseconds[PROFILER_TIME_AUDIO] * 2, // audio is 60Hz, so double the average
+            max_rdp, max_rdp / 333,
+            microseconds[PROFILER_TIME_TMEM],
+            microseconds[PROFILER_TIME_CMD],
+            microseconds[PROFILER_TIME_PIPE],
+            total_rsp, total_rsp / 333,
+            microseconds[PROFILER_TIME_RSP_GFX],
+            microseconds[PROFILER_TIME_RSP_AUDIO]
+        );
+
+        Gfx* dlHead = gDisplayListHead;
+        gDPPipeSync(dlHead++);
+        gDPSetCycleType(dlHead++, G_CYC_1CYCLE);
+        gDPSetRenderMode(dlHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
+        gDPSetTexturePersp(dlHead++, G_TP_NONE);
+        gDPSetTextureFilter(dlHead++, G_TF_POINT);
+        gDPSetTextureLUT(dlHead++, G_TT_NONE);
+        drawSmallStringCol(&dlHead, 10, 10, text_buffer, 0, 0, 0);
+        gDisplayListHead = dlHead;
+    }
 }
 
 void fast_profiler_frame_setup() {

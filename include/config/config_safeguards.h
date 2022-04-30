@@ -75,6 +75,8 @@
 #ifdef PUPPYPRINT_DEBUG
     #undef PUPPYPRINT
     #define PUPPYPRINT
+    #undef USE_PROFILER
+    #define USE_PROFILER
 #endif // PUPPYPRINT_DEBUG
 
 #ifdef COMPLETE_SAVE_FILE

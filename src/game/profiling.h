@@ -3,25 +3,27 @@
 
 #include <ultra64.h>
 #include "macros.h"
-#include "config_debug.h"
-#include "config_safeguards.h"
+#include "config/config_debug.h"
+#include "config/config_safeguards.h"
 
 #define PROFILING_BUFFER_SIZE 64
 
 enum ProfilerTime {
     PROFILER_TIME_FPS,
     PROFILER_TIME_CONTROLLERS,
-    PROFILER_TIME_LEVEL_SCRIPT,
-    PROFILER_TIME_OBJECTS1,
-    PROFILER_TIME_OBJECTS2,
+    PROFILER_TIME_SPAWNER,
+    PROFILER_TIME_DYNAMIC,
+    PROFILER_TIME_BEHAVIOR1,
+    PROFILER_TIME_MARIO,
+    PROFILER_TIME_BEHAVIOR2,
     PROFILER_TIME_GFX,
     PROFILER_TIME_AUDIO,
     PROFILER_TIME_TOTAL,
+    PROFILER_TIME_RSP_GFX,
+    PROFILER_TIME_RSP_AUDIO,
     PROFILER_TIME_TMEM,
     PROFILER_TIME_PIPE,
     PROFILER_TIME_CMD,
-    PROFILER_TIME_RSP_GFX,
-    PROFILER_TIME_RSP_AUDIO,
     PROFILER_TIME_COUNT,
 };
 

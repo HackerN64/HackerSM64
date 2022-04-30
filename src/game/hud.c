@@ -52,6 +52,9 @@ u8 curFrameTimeIndex = 0;
 
 #include "PR/os_convert.h"
 
+#ifdef USE_PROFILER
+float fast_profiler_get_fps();
+#else
 // Call once per frame
 f32 calculate_and_update_fps() {
     OSTime newTime = osGetTime();
@@ -64,9 +67,14 @@ f32 calculate_and_update_fps() {
     }
     return ((f32)FRAMETIME_COUNT * 1000000.0f) / (s32)OS_CYCLES_TO_USEC(newTime - oldTime);
 }
+#endif
 
 void print_fps(s32 x, s32 y) {
+#ifdef USE_PROFILER
+    f32 fps = fast_profiler_get_fps();
+#else
     f32 fps = calculate_and_update_fps();
+#endif
     char text[14];
 
     sprintf(text, "FPS %2.2f", fps);
@@ -75,7 +83,6 @@ void print_fps(s32 x, s32 y) {
 #else
     print_text(x, y, text);
 #endif
-
 }
 
 // ------------ END OF FPS COUNER -----------------

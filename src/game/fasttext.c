@@ -4,6 +4,7 @@
 #include <ultra64.h>
 
 #define TEX_ASCII_START '!'
+#define TAB_WIDTH 16
 
 #define G_CC_TEXT PRIMITIVE, 0, TEXEL0, 0, 0, 0, 0, TEXEL0
 
@@ -41,6 +42,15 @@ int computeS(unsigned char letter) {
   return (idx - TEX_ASCII_START) * 8;
 }
 
+static const u8 fasttest_font_kerning[] = {
+    /* */ 2, /*!*/ 4, /*"*/ 5, /*#*/ 0, /*$*/ 0, /*%*/ 7, /*&*/ 7, /*'*/ 2, /*(*/ 5, /*)*/ 5, /***/ 0, /*+*/ 7, /*,*/ 3, /*-*/ 7, /*.*/ 3, /*/*/ 7,
+    /*0*/ 7, /*1*/ 7, /*2*/ 7, /*3*/ 7, /*4*/ 7, /*5*/ 7, /*6*/ 7, /*7*/ 7, /*8*/ 7, /*9*/ 7, /*:*/ 3, /*;*/ 3, /*<*/ 0, /*=*/ 0, /*>*/ 0, /*?*/ 7,
+    /*@*/ 0, /*A*/ 7, /*B*/ 7, /*C*/ 7, /*D*/ 7, /*E*/ 7, /*F*/ 7, /*G*/ 7, /*H*/ 7, /*I*/ 6, /*J*/ 5, /*K*/ 7, /*L*/ 7, /*M*/ 7, /*N*/ 7, /*O*/ 7,
+    /*P*/ 7, /*Q*/ 7, /*R*/ 7, /*S*/ 7, /*T*/ 7, /*U*/ 7, /*V*/ 7, /*W*/ 7, /*X*/ 7, /*Y*/ 7, /*Z*/ 7, /*[*/ 0, /*\*/ 0, /*]*/ 0, /*^*/ 6, /*_*/ 0,
+    /*`*/ 0, /*a*/ 6, /*b*/ 6, /*c*/ 6, /*d*/ 6, /*e*/ 6, /*f*/ 6, /*g*/ 6, /*h*/ 6, /*i*/ 2, /*j*/ 6, /*k*/ 5, /*l*/ 3, /*m*/ 6, /*n*/ 6, /*o*/ 6,
+    /*p*/ 6, /*q*/ 6, /*r*/ 6, /*s*/ 6, /*t*/ 6, /*u*/ 6, /*v*/ 6, /*w*/ 6, /*x*/ 6, /*y*/ 6, /*z*/ 6, /*{*/ 0, /*|*/ 0, /*}*/ 0, /*~*/ 7,     
+};
+
 void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int g, int b) {
   int i = 0;
   int xPos = x;
@@ -54,19 +64,26 @@ void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int
   gDPSetCombineMode(dlHead++, G_CC_TEXT, G_CC_TEXT);
   gDPPipeSync(dlHead++);
   while (string[i] != '\0') {
-    if (string[i] == '\n') {
+    unsigned int cur_char = string[i];
+    if (cur_char == '\n') {
       xPos = x;
       yPos += 12;
       i++;
       continue;
     }
 
-    if (string[i] != ' ') {
-      s = computeS(string[i]);
-      gSPTextureRectangle(dlHead++, (xPos + 0) << 2, (yPos + 0) << 2, (xPos + 8) << 2, (yPos + 12) << 2, 0, s << 5, 0, 1 << 10, 1 << 10);
+    if (cur_char == '\t') {
+      int xDist = xPos - x + 1;
+      int tabCount = (xDist + TAB_WIDTH - 1) / TAB_WIDTH;
+      xPos = tabCount * TAB_WIDTH + x;
+    } else {
+      if (cur_char != ' ') {
+        s = computeS(cur_char);
+        gSPTextureRectangle(dlHead++, (xPos + 0) << 2, (yPos + 0) << 2, (xPos + 8) << 2, (yPos + 12) << 2, 0, s << 5, 0, 1 << 10, 1 << 10);
+      }
+      xPos += fasttest_font_kerning[cur_char - ' '];
     }
 
-    xPos += 8;
     i++;
   }
   gDPSetPrimColor(dlHead++, 0, 0, 255, 255, 255, 255);

@@ -730,10 +730,6 @@ void setup_game_memory(void) {
  * Main game loop thread. Runs forever as long as the game continues.
  */
 void thread5_game_loop(UNUSED void *arg) {
-#if PUPPYPRINT_DEBUG
-    OSTime lastTime = 0;
-#endif
-
     setup_game_memory();
 #if ENABLE_RUMBLE
     init_rumble_pak_scheduler_queue();
@@ -769,14 +765,6 @@ void thread5_game_loop(UNUSED void *arg) {
             draw_reset_bars();
             continue;
         }
-#if PUPPYPRINT_DEBUG
-        while (TRUE) {
-            lastTime = osGetTime();
-            collisionTime[perfIteration] = 0;
-                // graphTime[perfIteration] = 0;
-            behaviourTime[perfIteration] = 0;
-                  dmaTime[perfIteration] = 0;
-#endif
 
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
@@ -796,20 +784,6 @@ void thread5_game_loop(UNUSED void *arg) {
         debug_box_input();
 #endif
 #if PUPPYPRINT_DEBUG
-        profiler_update(scriptTime, lastTime);
-        scriptTime[perfIteration] -= profilerTime[perfIteration];
-        scriptTime[perfIteration] -= profilerTime2[perfIteration];
-            if (benchmarkLoop > 0 && benchOption == 0) {
-                benchmarkLoop--;
-                benchMark[benchmarkLoop] = (osGetTime() - lastTime);
-                if (benchmarkLoop == 0) {
-                    puppyprint_profiler_finished();
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
         puppyprint_profiler_process();
 #endif
 
