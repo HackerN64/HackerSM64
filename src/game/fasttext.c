@@ -10,13 +10,13 @@
 
 __asm__(
  ".section \".rodata\", \"a\", @progbits\n"
- ".global fastfont\n"
- "fastfont:\n"
+ ".global fast_font\n"
+ "fast_font:\n"
  ".incbin \"src/game/newfont2_swapped.bin\"\n"
  ".previous\n"
 );
 
-extern u8 fastfont[];
+extern u8 fast_font[];
 
 // Naive strlen copied from
 // https://stackoverflow.com/questions/22520413/c-strlen-implementation-in-one-line-of-code
@@ -42,7 +42,7 @@ int computeS(unsigned char letter) {
   return (idx - TEX_ASCII_START) * 8;
 }
 
-static const u8 fasttest_font_kerning[] = {
+static const u8 fast_text_font_kerning[] = {
     /* */ 2, /*!*/ 4, /*"*/ 5, /*#*/ 0, /*$*/ 0, /*%*/ 7, /*&*/ 7, /*'*/ 2, /*(*/ 5, /*)*/ 5, /***/ 0, /*+*/ 7, /*,*/ 3, /*-*/ 7, /*.*/ 3, /*/*/ 7,
     /*0*/ 7, /*1*/ 7, /*2*/ 7, /*3*/ 7, /*4*/ 7, /*5*/ 7, /*6*/ 7, /*7*/ 7, /*8*/ 7, /*9*/ 7, /*:*/ 3, /*;*/ 3, /*<*/ 0, /*=*/ 0, /*>*/ 0, /*?*/ 7,
     /*@*/ 0, /*A*/ 7, /*B*/ 7, /*C*/ 7, /*D*/ 7, /*E*/ 7, /*F*/ 7, /*G*/ 7, /*H*/ 7, /*I*/ 6, /*J*/ 5, /*K*/ 7, /*L*/ 7, /*M*/ 7, /*N*/ 7, /*O*/ 7,
@@ -59,7 +59,7 @@ void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int
   Gfx *dlHead = *dl;
 
   r = g = b = 255;
-  gDPLoadTextureBlock_4bS(dlHead++, fastfont, G_IM_FMT_IA, 672, 12, 0, G_TX_MIRROR | G_TX_WRAP, G_TX_MIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+  gDPLoadTextureBlock_4bS(dlHead++, fast_font, G_IM_FMT_IA, 672, 12, 0, G_TX_MIRROR | G_TX_WRAP, G_TX_MIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
   gDPSetPrimColor(dlHead++, 0, 0, r, g, b, 255);
   gDPSetCombineMode(dlHead++, G_CC_TEXT, G_CC_TEXT);
   gDPPipeSync(dlHead++);
@@ -81,7 +81,7 @@ void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int
         s = computeS(cur_char);
         gSPTextureRectangle(dlHead++, (xPos + 0) << 2, (yPos + 0) << 2, (xPos + 8) << 2, (yPos + 12) << 2, 0, s << 5, 0, 1 << 10, 1 << 10);
       }
-      xPos += fasttest_font_kerning[cur_char - ' '];
+      xPos += fast_text_font_kerning[cur_char - ' '];
     }
 
     i++;
