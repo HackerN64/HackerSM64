@@ -260,7 +260,7 @@ void profiler_print_times() {
         gDPSetTexturePersp(dlHead++, G_TP_NONE);
         gDPSetTextureFilter(dlHead++, G_TF_POINT);
         gDPSetTextureLUT(dlHead++, G_TT_NONE);
-        drawSmallStringCol(&dlHead, 10, 10, text_buffer, 0, 0, 0);
+        drawSmallStringCol(&dlHead, 10, 10, text_buffer, 255, 255, 255);
         gDisplayListHead = dlHead;
     }
 }

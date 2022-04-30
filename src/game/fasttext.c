@@ -18,28 +18,21 @@ __asm__(
 
 extern u8 fast_font[];
 
-// Naive strlen copied from
-// https://stackoverflow.com/questions/22520413/c-strlen-implementation-in-one-line-of-code
-void my_strlen(const char *str, u32 *len)
-{
-    for (*len = 0; str[*len]; (*len)++);
-}
-
 int computeS(unsigned char letter) {
-  int idx = letter;  
-  if (letter > 'z') {
-    idx -= (3 + 2 + 3 + 1 + 3);
-  } else if (letter > '^') {
-    idx -= (2 + 3 + 1 + 3);
-  } else if (letter > 'Z') {
-    idx -= (3 + 1 + 3);
-  } else if (letter > '?') {
-    idx -= (1 + 3);
-  } else if (letter > ';') {
-    idx -= (3);
-  }
+    int idx = letter;  
+    if (letter > 'z') {
+        idx -= (3 + 2 + 3 + 1 + 3);
+    } else if (letter > '^') {
+        idx -= (2 + 3 + 1 + 3);
+    } else if (letter > 'Z') {
+        idx -= (3 + 1 + 3);
+    } else if (letter > '?') {
+        idx -= (1 + 3);
+    } else if (letter > ';') {
+        idx -= (3);
+    }
 
-  return (idx - TEX_ASCII_START) * 8;
+    return (idx - TEX_ASCII_START) * 8;
 }
 
 static const u8 fast_text_font_kerning[] = {
@@ -52,42 +45,43 @@ static const u8 fast_text_font_kerning[] = {
 };
 
 void drawSmallString_impl(Gfx **dl, int x, int y, const char* string, int r, int g, int b) {
-  int i = 0;
-  int xPos = x;
-  int yPos = y;
-  int s = 0;
-  Gfx *dlHead = *dl;
+    int i = 0;
+    int xPos = x;
+    int yPos = y;
+    int s = 0;
+    Gfx *dlHead = *dl;
 
-  r = g = b = 255;
-  gDPLoadTextureBlock_4bS(dlHead++, fast_font, G_IM_FMT_IA, 672, 12, 0, G_TX_MIRROR | G_TX_WRAP, G_TX_MIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-  gDPSetPrimColor(dlHead++, 0, 0, r, g, b, 255);
-  gDPSetCombineMode(dlHead++, G_CC_TEXT, G_CC_TEXT);
-  gDPPipeSync(dlHead++);
-  while (string[i] != '\0') {
-    unsigned int cur_char = string[i];
-    if (cur_char == '\n') {
-      xPos = x;
-      yPos += 12;
-      i++;
-      continue;
+    gDPLoadTextureBlock_4bS(dlHead++, fast_font, G_IM_FMT_IA, 672, 12, 0, G_TX_MIRROR | G_TX_WRAP, G_TX_MIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    gDPSetPrimColor(dlHead++, 0, 0, r, g, b, 255);
+    gDPSetCombineMode(dlHead++, G_CC_TEXT, G_CC_TEXT);
+    gDPPipeSync(dlHead++);
+
+    while (string[i] != '\0') {
+        unsigned int cur_char = string[i];
+
+        if (cur_char == '\n') {
+            xPos = x;
+            yPos += 12;
+            i++;
+            continue;
+        }
+
+        if (cur_char == '\t') {
+            int xDist = xPos - x + 1;
+            int tabCount = (xDist + TAB_WIDTH - 1) / TAB_WIDTH;
+            xPos = tabCount * TAB_WIDTH + x;
+        } else {
+            if (cur_char != ' ') {
+            s = computeS(cur_char);
+            gSPTextureRectangle(dlHead++, (xPos + 0) << 2, (yPos + 0) << 2, (xPos + 8) << 2, (yPos + 12) << 2, 0, s << 5, 0, 1 << 10, 1 << 10);
+            }
+            xPos += fast_text_font_kerning[cur_char - ' '];
+        }
+
+        i++;
     }
+    gDPSetPrimColor(dlHead++, 0, 0, 255, 255, 255, 255);
+    gDPPipeSync(dlHead++);
 
-    if (cur_char == '\t') {
-      int xDist = xPos - x + 1;
-      int tabCount = (xDist + TAB_WIDTH - 1) / TAB_WIDTH;
-      xPos = tabCount * TAB_WIDTH + x;
-    } else {
-      if (cur_char != ' ') {
-        s = computeS(cur_char);
-        gSPTextureRectangle(dlHead++, (xPos + 0) << 2, (yPos + 0) << 2, (xPos + 8) << 2, (yPos + 12) << 2, 0, s << 5, 0, 1 << 10, 1 << 10);
-      }
-      xPos += fast_text_font_kerning[cur_char - ' '];
-    }
-
-    i++;
-  }
-  gDPSetPrimColor(dlHead++, 0, 0, 255, 255, 255, 255);
-  gDPPipeSync(dlHead++);
-
-  *dl = dlHead;
+    *dl = dlHead;
 }
