@@ -10,6 +10,9 @@
 // Disables all debug options (except PUPPYPRINT).
 #define DISABLE_ALL
 
+// Enables a comprehensive standalone profiler
+#define USE_PROFILER
+
 // TEST LEVEL
 // Uncomment this define and set a test level in order to boot straight into said level.
 // This allows you to quickly test the level you're working on.

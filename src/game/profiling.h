@@ -3,6 +3,8 @@
 
 #include <ultra64.h>
 #include "macros.h"
+#include "config_debug.h"
+#include "config_safeguards.h"
 
 #define PROFILING_BUFFER_SIZE 64
 
