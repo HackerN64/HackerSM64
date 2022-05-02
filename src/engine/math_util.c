@@ -1506,14 +1506,14 @@ static ALWAYS_INLINE float construct_float(const float f)
                                 : "=r"(r)
                                 : "K"(upper));
     } else if ((i & 0xFFFF0000) == 0) {
-        __asm__ ("addiu %0, $0, %1"
+        __asm__ ("ori %0, $0, %1"
                                 : "+r"(r)
                                 : "K"(lower));
     } else {
         __asm__ ("lui %0, %1"
                                 : "=r"(r)
                                 : "K"(upper));
-        __asm__ ("addiu %0, %0, %1"
+        __asm__ ("ori %0, %0, %1"
                                 : "+r"(r)
                                 : "K"(lower));
     }
