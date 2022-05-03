@@ -7,13 +7,13 @@
 /***********************************************************************
  * Timekeeper thread
  ***********************************************************************/
-static OSThread  tkThread;
+OSThread  tkThread;
 static u64  tkStack[STACKSIZE/sizeof(u64)];
 
 /***********************************************************************
  * Audio DA counter thread
  ***********************************************************************/
-static OSThread  daCounterThread;
+OSThread  daCounterThread;
 static u64  daCounterStack[STACKSIZE/sizeof(u64)];
 
 /***********************************************************************

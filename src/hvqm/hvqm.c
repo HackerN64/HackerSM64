@@ -5,6 +5,8 @@
 #include <hvqm2dec.h>
 #include <adpcmdec.h>
 #include "hvqm.h"
+#include "game/main.h"
+#include "audio/data.h"
 
 #define AUDIO_DMA_MSG_SIZE 1
 static OSIoMesg     audioDmaMesgBlock;
@@ -138,7 +140,7 @@ void hvqm_main_proc() {
     
     for ( ; ; ) {
 
-        //while ( video_remain > 0 ) {
+        while ( video_remain > 0 ) {
             u8 header_buffer[sizeof(HVQM2Record)+16];
             HVQM2Record *record_header;
             u16 frame_format;
@@ -209,7 +211,7 @@ void hvqm_main_proc() {
                     osSpTaskStart( &hvqtask );
                     osRecvMesg( &spMesgQ, NULL, OS_MESG_BLOCK );
                 }
-            }
+        }
         
         keep_cfb( bufno );
         
@@ -221,12 +223,13 @@ void hvqm_main_proc() {
         prev_bufno = bufno;
         disptime += usec_per_frame;
         --video_remain;
-        
-        //if (1) {
-            //osAiSetFrequency(gAudioSessionPresets[0].frequency);
-            //osSendMesg(&gDmaMesgQueue, 0, OS_MESG_BLOCK);
-            //osDestroyThread(&hvqmMesgQ);
-        //}
+      }
+      if (1) {
+            osAiSetFrequency(gAudioSessionPresets[0].frequency);
+            osDestroyThread(&tkThread);
+            osDestroyThread(&daCounterThread);
+            osSendMesg(&gDmaMesgQueue, 0, OS_MESG_BLOCK);
+      }
     }
 }
 

@@ -819,10 +819,15 @@ void thread5_game_loop(UNUSED void *arg) {
             print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
         }
 #endif
-#if 0
+#ifdef HVQM
         if (gPlayer1Controller->buttonPressed & L_TRIG) {
             osStartThread(&hvqmThread);
+
             osRecvMesg(&gDmaMesgQueue, NULL, OS_MESG_BLOCK);
+
+            osDestroyThread(&hvqmThread);
+            osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
+            osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
         }
 #endif
     }

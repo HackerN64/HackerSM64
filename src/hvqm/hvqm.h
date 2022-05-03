@@ -83,6 +83,8 @@
 typedef u32 (*tkAudioProc)(void *pcmbuf);
 typedef tkAudioProc (*tkRewindProc)(void);
 
+extern OSThread tkThread, daCounterThread;
+
 void createTimekeeper();
 void tkStart(tkRewindProc rewind, u32 samples_per_sec);
 void tkPushVideoframe(void *vaddr, u32 *statP, u64 disptime);
