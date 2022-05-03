@@ -35,12 +35,14 @@ extern s8 betterReverbDownsampleConsole;
 extern s8 betterReverbDownsampleEmulator;
 extern u8 monoReverbConsole;
 extern u8 monoReverbEmulator;
-extern u32 reverbFilterCountConsole;
-extern u32 reverbFilterCountEmulator;
+extern s32 reverbFilterCountConsole;
+extern s32 reverbFilterCountEmulator;
 extern s32 betterReverbWindowsSize;
 
 extern s32 delaysBaselineL[NUM_ALLPASS];
 extern s32 delaysBaselineR[NUM_ALLPASS];
+extern s32 gReverbMultsL[NUM_ALLPASS / 3];
+extern s32 gReverbMultsR[NUM_ALLPASS / 3];
 
 extern u8 toggleBetterReverb;
 #define REVERB_WINDOW_SIZE_MAX 0x2000
