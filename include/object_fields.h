@@ -1047,7 +1047,6 @@
 #define /*0x0F4*/ oTiltingPyramidNormalX         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_X_INDEX)
 #define /*0x0F8*/ oTiltingPyramidNormalY         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_Y_INDEX)
 #define /*0x0FC*/ oTiltingPyramidNormalZ         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_Z_INDEX)
-#define /*0x10C*/ oTiltingPyramidMarioOnPlatform OBJECT_FIELD_S32(0x21)
 
 /* Toad Message */
 #define /*0x108*/ oToadMessageDialogId       OBJECT_FIELD_U32(0x20)
