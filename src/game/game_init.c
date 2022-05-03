@@ -56,6 +56,12 @@ s8 gSramProbe;
 #endif
 OSMesgQueue gGameVblankQueue;
 OSMesgQueue gGfxVblankQueue;
+
+#ifdef HVQM
+OSMesgQueue gHVQM_SyncQueue;
+OSMesg gHVQM_SyncMesg;
+#endif
+
 OSMesg gGameMesgBuf[1];
 OSMesg gGfxMesgBuf[1];
 
@@ -743,6 +749,7 @@ void thread5_game_loop(UNUSED void *arg) {
 #endif
 #ifdef HVQM
     createHvqmThread();
+    osCreateMesgQueue(&gHVQM_SyncQueue, &gHVQM_SyncMesg, 1);
 #endif
     save_file_load_all();
 #ifdef PUPPYCAM
@@ -823,9 +830,10 @@ void thread5_game_loop(UNUSED void *arg) {
         if (gPlayer1Controller->buttonPressed & L_TRIG) {
             osStartThread(&hvqmThread);
 
-            osRecvMesg(&gDmaMesgQueue, NULL, OS_MESG_BLOCK);
+            osRecvMesg(&gHVQM_SyncQueue, NULL, OS_MESG_BLOCK);
 
             osDestroyThread(&hvqmThread);
+            createHvqmThread();
             osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
             osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
         }

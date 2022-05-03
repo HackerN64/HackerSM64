@@ -5,6 +5,7 @@
 #include <hvqm2dec.h>
 #include <adpcmdec.h>
 #include "hvqm.h"
+#include "game/game_init.h"
 #include "game/main.h"
 #include "audio/data.h"
 
@@ -154,7 +155,7 @@ void hvqm_main_proc() {
                 if (tkGetTime() < (disptime - (usec_per_frame * 2))) {
                     tkPushVideoframe(gFramebuffers[prev_bufno], &cfb_status[prev_bufno], disptime);
                     continue;
-                    // if ( video_remain == 0 ) break;
+                    if ( video_remain == 0 ) break;
                 }
             }
 
@@ -231,7 +232,7 @@ void hvqm_main_proc() {
             osAiSetFrequency(gAudioSessionPresets[0].frequency);
             osDestroyThread(&tkThread);
             osDestroyThread(&daCounterThread);
-            osSendMesg(&gDmaMesgQueue, 0, OS_MESG_BLOCK);
+            osSendMesg(&gHVQM_SyncQueue, 0, OS_MESG_BLOCK);
         }
     }
 }
