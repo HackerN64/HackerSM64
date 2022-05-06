@@ -6,6 +6,7 @@
 #include "external.h"
 #include "heap.h"
 #include "load.h"
+#include "game/debug.h"
 #include "seqplayer.h"
 #include "game/puppyprint.h"
 
@@ -856,6 +857,20 @@ void load_sequence_internal(u32 player, u32 seqId, s32 loadAsync) {
     seqPlayer->enabled = TRUE;
     seqPlayer->seqData = sequenceData;
     seqPlayer->scriptState.pc = sequenceData;
+}
+
+void seqheader_init(void) {
+    u8 buf[0x10];
+    void *data;
+    u32 size;
+
+    data = gMusicData;
+    audio_dma_copy_immediate((uintptr_t) data, gSeqFileHeader, 0x10);
+    gSequenceCount = gSeqFileHeader->seqCount;
+    size = gSequenceCount * sizeof(ALSeqData) + 4;
+    size = ALIGN16(size);
+    audio_dma_copy_immediate((uintptr_t) data, gSeqFileHeader, size);
+    alSeqFileNew(gSeqFileHeader, data);
 }
 
 // (void) must be omitted from parameters to fix stack with -framepointer

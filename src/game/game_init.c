@@ -829,13 +829,15 @@ void thread5_game_loop(UNUSED void *arg) {
 #ifdef HVQM
         if (gPlayer1Controller->buttonPressed & L_TRIG) {
             osStartThread(&hvqmThread);
-
             osRecvMesg(&gHVQM_SyncQueue, NULL, OS_MESG_BLOCK);
 
-            osDestroyThread(&hvqmThread);
             createHvqmThread();
+            
+            osStopThread(&hvqmThread);
             osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
             osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
+
+            seqheader_init();
         }
 #endif
     }
