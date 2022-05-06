@@ -94,7 +94,7 @@ void tkStart(tkRewindProc rewind, u32 samples_per_sec);
 void tkPushVideoframe(void *vaddr, u32 *statP, u64 disptime);
 u64 tkGetTime(void);
 void tkStop(void);
-void createHvqmThread(void);
+void createHvqmThread(uintptr_t vidPtr);
 
 /*
  * in system.c

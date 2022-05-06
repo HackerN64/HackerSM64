@@ -338,7 +338,7 @@ void audio_game_loop_tick(void) {
  * Sound processing thread. Runs at 60 FPS.
  */
 void thread4_sound(UNUSED void *arg) {
-    audio_init();
+    audio_init(AUD_INIT);
     sound_init();
 
 #if PUPPYPRINT_DEBUG

@@ -33,6 +33,7 @@ static OSMesg spMesgBuf;
 /***********************************************************************
  * RSP task data and parameter for the HVQM2 microcode
  ***********************************************************************/
+void *gHVQM_VideoPointer;       /* pointer to video data */
 OSTask hvqtask;     /* RSP task data */
 HVQM2Arg hvq_sparg; /* Parameter for the HVQM2 microcode */
 
@@ -51,6 +52,34 @@ static u32 audio_remain;        /* Counter for remaining number of audio records
 static u32 video_remain;        /* Counter for remaining number of video records to read */
 static u64 disptime;            /* Counter for scheduled display time of next video frame */
 static ADPCMstate adpcm_state;  /* Buffer for state information passed to the ADPCM decoder */
+
+void hvqm_reset_bss(void) {
+    total_frames = 0;
+    total_audio_records = 0;
+    video_streamP = NULL;
+    audio_streamP = NULL;
+    audio_remain = 0;
+    video_remain = 0;
+    disptime = 0;
+
+    bzero(hvqm_headerBuf, sizeof(hvqm_headerBuf));
+    bzero(&adpcm_state, sizeof(ADPCMstate));
+
+    bzero(&audioDmaMesgBlock, sizeof(OSIoMesg));
+    bzero(&audioDmaMessageQ, sizeof(OSMesgQueue));
+    bzero(audioDmaMessages, sizeof(OSMesg));
+
+    bzero(&videoDmaMesgBlock, sizeof(OSIoMesg));
+    bzero(&videoDmaMessageQ, sizeof(OSMesgQueue));
+    bzero(videoDmaMessages, sizeof(OSMesg));
+
+    bzero(&spMesgQ, sizeof(OSMesgQueue));
+    bzero(&spMesgBuf, sizeof(OSMesg));
+    gHVQM_VideoPointer = NULL;
+    bzero(&hvqtask, sizeof(OSTask));
+    bzero(&hvq_sparg, sizeof(HVQM2Arg));
+}
+
 
 /*
  * Macro for loading multi-byte data from buffer holding data from stream
@@ -84,7 +113,7 @@ static u32 next_audio_record(void *pcmbuf) {
 }
 
 static tkAudioProc rewind(void) {
-    video_streamP = audio_streamP = (u32) _capcomSegmentRomStart + sizeof(HVQM2Header);
+    video_streamP = audio_streamP = (u32) gHVQM_VideoPointer + sizeof(HVQM2Header);
     audio_remain = total_audio_records;
     video_remain = total_frames;
     disptime = 0;
@@ -93,17 +122,19 @@ static tkAudioProc rewind(void) {
 
 HVQM2Header *hvqm_header;
 
-static OSMesgQueue hvqmMesgQ;
-static OSMesg hvqmMesgBuf;
+// static OSMesgQueue hvqmMesgQ;
+// static OSMesg hvqmMesgBuf;
 
 OSThread hvqmThread;
 static u64 hvqmStack[STACKSIZE / sizeof(u64)];
 
-void hvqm_main_proc() {
+void hvqm_main_proc(uintptr_t vidPtr) {
     int h_offset, v_offset; /* Position of image display */
     int screen_offset;      /* Number of pixels from start of frame buffer to display position */
     u32 usec_per_frame;
     int prev_bufno = -1;
+
+    gHVQM_VideoPointer = vidPtr;
 
     hvqm_header = OS_DCACHE_ROUNDUP_ADDR(hvqm_headerBuf);
 
@@ -130,7 +161,7 @@ void hvqm_main_proc() {
     init_cfb();
     osViSwapBuffer(gFramebuffers[NUM_CFBs - 1]);
 
-    romcpy(hvqm_header, (void *) _capcomSegmentRomStart, sizeof(HVQM2Header), OS_MESG_PRI_NORMAL,
+    romcpy(hvqm_header, (void *) vidPtr, sizeof(HVQM2Header), OS_MESG_PRI_NORMAL,
            &videoDmaMesgBlock, &videoDmaMessageQ);
 
     total_frames = load32(hvqm_header->total_frames);
@@ -237,8 +268,8 @@ void hvqm_main_proc() {
     }
 }
 
-void createHvqmThread(void) {
-    osCreateMesgQueue(&hvqmMesgQ, &hvqmMesgBuf, 1);
-    osCreateThread(&hvqmThread, HVQM_THREAD_ID, hvqm_main_proc, NULL,
+void createHvqmThread(uintptr_t vidPtr) {
+    // osCreateMesgQueue(&hvqmMesgQ, &hvqmMesgBuf, 1);
+    osCreateThread(&hvqmThread, HVQM_THREAD_ID, hvqm_main_proc, vidPtr,
                    hvqmStack + (STACKSIZE / sizeof(u64)), (OSPri) HVQM_PRIORITY);
 }

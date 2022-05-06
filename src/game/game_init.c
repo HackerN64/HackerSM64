@@ -748,7 +748,6 @@ void thread5_game_loop(UNUSED void *arg) {
     create_thread_6();
 #endif
 #ifdef HVQM
-    createHvqmThread();
     osCreateMesgQueue(&gHVQM_SyncQueue, &gHVQM_SyncMesg, 1);
 #endif
     save_file_load_all();
@@ -824,20 +823,6 @@ void thread5_game_loop(UNUSED void *arg) {
             // subtract the end of the gfx pool with the display list to obtain the
             // amount of free space remaining.
             print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
-        }
-#endif
-#ifdef HVQM
-        if (gPlayer1Controller->buttonPressed & L_TRIG) {
-            osStartThread(&hvqmThread);
-            osRecvMesg(&gHVQM_SyncQueue, NULL, OS_MESG_BLOCK);
-
-            createHvqmThread();
-            
-            osStopThread(&hvqmThread);
-            osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
-            osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
-
-            seqheader_init();
         }
 #endif
     }
