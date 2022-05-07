@@ -19,7 +19,7 @@
 
 #define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+#ifdef BETTER_REVERB
 
 #define NUM_ALLPASS 12 // Number of delay filters to use with better reverb; do not change this value if you don't know what you're doing.
 #define BETTER_REVERB_PTR_SIZE ALIGN16(NUM_ALLPASS * sizeof(s32*) * 2) // Allocation space consumed by dynamically allocated pointers
@@ -39,8 +39,8 @@ extern u8 monoReverbConsole;
 extern u8 monoReverbEmulator;
 extern s32 betterReverbWindowsSize;
 
-extern const s32 delaysBaselineL[NUM_ALLPASS];
-extern const s32 delaysBaselineR[NUM_ALLPASS];
+extern s32 delaysBaselineL[NUM_ALLPASS];
+extern s32 delaysBaselineR[NUM_ALLPASS];
 extern s32 delaysL[NUM_ALLPASS];
 extern s32 delaysR[NUM_ALLPASS];
 extern s32 reverbMultsL[NUM_ALLPASS / 3];
@@ -50,6 +50,8 @@ extern s32 **delayBufsR;
 
 extern u8 toggleBetterReverb;
 #define REVERB_WINDOW_SIZE_MAX 0x2000
+
+STATIC_ASSERT(NUM_ALLPASS % 3 == 0, "NUM_ALLPASS must be a multiple of 3!");
 
 #else
 
@@ -63,7 +65,22 @@ extern u8 toggleBetterReverb;
 
 #endif
 
-#define REVERB_WINDOW_HEAP_SIZE (REVERB_WINDOW_SIZE_MAX * sizeof(s16) * 2)
+#if defined(VERSION_JP) || defined(VERSION_US)
+#define REVERB_WINDOW_HEAP_SIZE \
+( \
+    (REVERB_WINDOW_SIZE_MAX * sizeof(s16) * 2) \
+    + (4 * (16 * sizeof(s16))) \
+    + (4 /* gAudioUpdatesPerFrame */ * (2 * DEFAULT_LEN_2CH)) \
+)
+#else
+#define REVERB_WINDOW_HEAP_SIZE \
+( \
+    ((REVERB_WINDOW_SIZE_MAX * sizeof(s16) * 2) \
+    + (4 * (16 * sizeof(s16))) \
+    + (4 /* gAudioUpdatesPerFrame */ * (2 * DEFAULT_LEN_2CH))) \
+    * 4 /* gNumSynthesisReverbs */ \
+)
+#endif
 
 struct ReverbRingBufferItem {
     s16 numSamplesAfterDownsampling;

@@ -2493,6 +2493,10 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 #else
                     case 0xdb: // seq_setvol
                         cmd = m64_read_u8(state);
+                        seqPlayer->volumeDefault = FLOAT_CAST(cmd) / 127.0f;
+                        if (seqPlayer->volumeDefault >= 1.0f)
+                            seqPlayer->volumeDefault = 1.0f;
+
                         switch (seqPlayer->state) {
                             case SEQUENCE_PLAYER_STATE_2:
                                 if (seqPlayer->fadeRemainingFrames != 0) {
@@ -2514,8 +2518,13 @@ void sequence_player_process_sequence(struct SequencePlayer *seqPlayer) {
 
                     case 0xda: // seq_changevol
                         temp = m64_read_u8(state);
-                        seqPlayer->fadeVolume =
-                            seqPlayer->fadeVolume + (f32)(s8) temp / 127.0f;
+                        seqPlayer->fadeVolume += (f32)(s8) temp / 127.0f;
+                        
+                        seqPlayer->volumeDefault += (f32)(s8) temp / 127.0f;
+                        if (seqPlayer->volumeDefault > 1.0f)
+                            seqPlayer->volumeDefault = 1.0f;
+                        else if (seqPlayer->volumeDefault < 0.0f)
+                            seqPlayer->volumeDefault = 0.0f;
                         break;
 #endif
 
@@ -2707,6 +2716,7 @@ void init_sequence_player(u32 player) {
     seqPlayer->state = 1;
 #else
     seqPlayer->state = SEQUENCE_PLAYER_STATE_0;
+    seqPlayer->volumeDefault = 1.0f;
 #endif
     seqPlayer->fadeRemainingFrames = 0;
 #if defined(VERSION_EU) || defined(VERSION_SH)

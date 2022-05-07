@@ -29,6 +29,7 @@
 #include "puppycam2.h"
 #include "debug_box.h"
 #include "vc_check.h"
+#include "vc_ultra.h"
 
 // First 3 controller slots
 struct Controller gControllers[3];
@@ -108,7 +109,7 @@ struct DemoInput gRecordedDemoInput = { 0 };
  */
 const Gfx init_rdp[] = {
     gsDPPipeSync(),
-    gsDPPipelineMode(G_PM_1PRIMITIVE),
+    gsDPPipelineMode(G_PM_NPRIMITIVE),
 
     gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
@@ -402,15 +403,6 @@ void render_init(void) {
 #ifdef DEBUG_FORCE_CRASH_ON_BOOT
     FORCE_CRASH
 #endif
-    if (IO_READ(DPC_PIPEBUSY_REG) == 0) {
-        gIsConsole = FALSE;
-        gBorderHeight = BORDER_HEIGHT_EMULATOR;
-        gIsVC = IS_VC();
-    } else {
-        gIsConsole = TRUE;
-        gBorderHeight = BORDER_HEIGHT_CONSOLE;
-    }
-
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
@@ -673,7 +665,9 @@ void init_controllers(void) {
 #ifdef EEP
     // strangely enough, the EEPROM probe for save data is done in this function.
     // save pak detection?
-    gEepromProbe = osEepromProbe(&gSIEventMesgQueue);
+    gEepromProbe = gIsVC
+                 ? osEepromProbeVC(&gSIEventMesgQueue)
+                 : osEepromProbe  (&gSIEventMesgQueue);
 #endif
 #ifdef SRAM
     gSramProbe = nuPiInitSram();

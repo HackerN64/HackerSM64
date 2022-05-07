@@ -1697,6 +1697,7 @@ void render_pause_castle_menu_box(s16 x, s16 y) {
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x + 6, y - 28, 0);
     create_dl_rotation_matrix(MENU_MTX_NOPUSH, DEFAULT_DIALOG_BOX_ANGLE, 0, 0, 1.0f);
+    gDPPipeSync(gDisplayListHead++);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);

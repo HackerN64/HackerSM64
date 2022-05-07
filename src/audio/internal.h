@@ -300,7 +300,7 @@ struct SequencePlayer {
     /*     , 0x028, 0x02C*/ f32 fadeVolumeScale;
     /*     , 0x02C*/ f32 appliedFadeVolume;
 #else
-    /*            */ u8 pad2[4];
+    /*0x028,      */ f32 volumeDefault;
 #endif
     /*0x02C, 0x030, 0x034*/ struct SequenceChannel *channels[CHANNELS_MAX];
     /*0x06C, 0x070*/ struct M64ScriptState scriptState;
@@ -680,6 +680,7 @@ struct Note {
     /*0x18, 0x38*/ f32 portamentoFreqScale;
     /*0x1C, 0x3C*/ f32 vibratoFreqScale;
     /*0x20*/ u16 samplePosFrac;
+    /*    */ u8 pad2[2];
     /*0x24*/ struct AudioBankSound *sound;
     /*0x28, 0x40*/ struct SequenceChannelLayer *prevParentLayer;
     /*0x2C, 0x44*/ struct SequenceChannelLayer *parentLayer;
@@ -690,6 +691,7 @@ struct Note {
     /*0x3E*/ u16 targetVolRight; // Q1.15, but will always be non-negative
     /*0x40*/ u8 reverbVol; // Q1.7
     /*0x41*/ u8 unused1; // never read, set to 0x3f
+    /*    */ u8 pad3[2];
     /*0x44*/ struct NoteAttributes attributes;
     /*0x54, 0x58*/ struct AdsrState adsr;
     /*0x74, 0x7C*/ struct Portamento portamento;
@@ -699,7 +701,7 @@ struct Note {
     /*0xA0*/ s16 reverbVolShifted; // Q1.15
     /*0xA2*/ s16 unused2; // never read, set to 0
     /*0xA4, 0x00*/ struct AudioListItem listItem;
-    /*          */ u8 pad2[0xc];
+    /*          */ u8 pad4[0xc];
 }; // size = 0xC0
 #endif
 

@@ -32,7 +32,7 @@ struct SoundAllocPool gAudioSessionPool;
 struct SoundAllocPool gAudioInitPool;
 struct SoundAllocPool gNotesAndBuffersPool;
 u8 sAudioHeapPad[0x20]; // probably two unused pools
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+#ifdef BETTER_REVERB
 struct SoundAllocPool gBetterReverbPool;
 #endif
 struct SoundAllocPool gSeqAndBankPool;
@@ -307,10 +307,10 @@ void puppyprint_get_allocated_pools(s32 *audioPoolList) {
         &gAudioInitPool,
         &gNotesAndBuffersPool,
         &gSeqLoadedPool.persistent.pool,
-        &gSeqLoadedPool.temporary.pool,
         &gBankLoadedPool.persistent.pool,
+        &gSeqLoadedPool.temporary.pool,
         &gBankLoadedPool.temporary.pool,
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+#ifdef BETTER_REVERB
         &gBetterReverbPool,
 #endif
     };
@@ -332,7 +332,7 @@ void session_pools_init(struct PoolSplit *a) {
     gAudioSessionPool.cur = gAudioSessionPool.start;
     sound_alloc_pool_init(&gNotesAndBuffersPool, SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantSeq        ), a->wantSeq        );
     sound_alloc_pool_init(&gSeqAndBankPool,      SOUND_ALLOC_FUNC(&gAudioSessionPool, a->wantCustom     ), a->wantCustom     );
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+#ifdef BETTER_REVERB
     sound_alloc_pool_init(&gBetterReverbPool,    SOUND_ALLOC_FUNC(&gAudioSessionPool, BETTER_REVERB_SIZE), BETTER_REVERB_SIZE);
 #endif
 }
@@ -985,7 +985,7 @@ void wait_for_audio_frames(s32 frames) {
 }
 #endif
 
-u8 sAudioFirstBoot = 0;
+u8 sAudioIsInitialized = FALSE;
 // Separate the reverb settings into their own func. Bit unstable currently, so still only runs at boot.
 #if defined(VERSION_EU) || defined(VERSION_SH)
 void init_reverb_eu(void) {
@@ -1000,7 +1000,7 @@ void init_reverb_eu(void) {
         gSynthesisReverbs[j].useReverb = 0;
 
         // Both left and right channels are allocated/cleared together, then separated based on the reverb window size
-        if (!sAudioFirstBoot) {
+        if (!sAudioIsInitialized) {
             gSynthesisReverbs[j].ringBuffer.left = soundAlloc(&gNotesAndBuffersPool, REVERB_WINDOW_SIZE_MAX * 4);
         }
     }
@@ -1015,7 +1015,7 @@ void init_reverb_eu(void) {
         if (reverb->windowSize > REVERB_WINDOW_SIZE_MAX) {
             reverb->windowSize = REVERB_WINDOW_SIZE_MAX;
         }
-        if (sAudioFirstBoot) {
+        if (sAudioIsInitialized) {
             bzero(reverb->ringBuffer.left, (REVERB_WINDOW_SIZE_MAX * 4));
         } else {
             reverb->resampleRate = (0x8000 / reverb->downsampleRate);
@@ -1041,7 +1041,7 @@ void init_reverb_eu(void) {
         reverb->framesLeftToIgnore = 2;
         if (reverb->downsampleRate != 1) {
             reverb->resampleRate = (0x8000 / reverb->downsampleRate);
-            if (sAudioFirstBoot) {
+            if (sAudioIsInitialized) {
                 bzero(reverb->resampleStateLeft,  (16 * sizeof(s16)));
                 bzero(reverb->resampleStateRight, (16 * sizeof(s16)));
                 bzero(reverb->unk24, (16 * sizeof(s16)));
@@ -1096,7 +1096,7 @@ void init_reverb_us(s32 presetId) {
             reverbWindowSize = REVERB_WINDOW_SIZE_MAX;
         }
         // Both left and right channels are allocated/cleared together, then separated based on the reverb window size
-        if (!sAudioFirstBoot) {
+        if (!sAudioIsInitialized) {
             gSynthesisReverb.ringBuffer.left    = soundAlloc(&gNotesAndBuffersPool, REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16));
 
             gSynthesisReverb.resampleStateLeft  = soundAlloc(&gNotesAndBuffersPool, (16 * sizeof(s16)));
@@ -1130,7 +1130,7 @@ void init_reverb_us(s32 presetId) {
         if (gReverbDownsampleRate != 1) {
             gSynthesisReverb.resampleFlags = A_INIT;
             gSynthesisReverb.resampleRate = (0x8000 / gReverbDownsampleRate);
-            if (sAudioFirstBoot) {
+            if (sAudioIsInitialized) {
                 bzero(gSynthesisReverb.resampleStateLeft,  (16 * sizeof(s16)));
                 bzero(gSynthesisReverb.resampleStateRight, (16 * sizeof(s16)));
                 bzero(gSynthesisReverb.unk24, (16 * sizeof(s16)));
@@ -1145,7 +1145,7 @@ void init_reverb_us(s32 presetId) {
         // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
 #ifdef BETTER_REVERB
         if (toggleBetterReverb) {
-            if (sAudioFirstBoot) {
+            if (sAudioIsInitialized) {
                 bzero(delayBufsL[0], (BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE));
             }            
 
@@ -1166,7 +1166,7 @@ void init_reverb_us(s32 presetId) {
 
 #if defined(VERSION_JP) || defined(VERSION_US)
 void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
-    if (sAudioFirstBoot) {
+    if (sAudioIsInitialized) {
         bzero(&gAiBuffers[0][0], (AIBUFFER_LEN * NUMAIBUFFERS));
         persistent_pool_clear(&gSeqLoadedPool.persistent);
         persistent_pool_clear(&gBankLoadedPool.persistent);
@@ -1187,7 +1187,7 @@ void audio_reset_session(struct AudioSessionSettings *preset, s32 presetId) {
     }
 #else
 void audio_reset_session(void) {
-    if (sAudioFirstBoot) {
+    if (sAudioIsInitialized) {
         persistent_pool_clear(&gSeqLoadedPool.persistent);
         persistent_pool_clear(&gBankLoadedPool.persistent);
         temporary_pool_clear(&gSeqLoadedPool.temporary);
@@ -1313,6 +1313,16 @@ void audio_reset_session(void) {
     gAudioBufferParameters.minAiBufferLength *= gAudioBufferParameters.presetUnk4;
     gAudioBufferParameters.updatesPerFrame *= gAudioBufferParameters.presetUnk4;
 
+    if (gIsConsole)
+        gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_CONSOLE;
+    else
+        gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_EMULATOR;
+    
+    if (gMaxSimultaneousNotes > MAX_SIMULTANEOUS_NOTES)
+        gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES;
+    else if (gMaxSimultaneousNotes < 0)
+        gMaxSimultaneousNotes = 0;
+
 #ifdef VERSION_SH
     if (gAudioBufferParameters.presetUnk4 >= 2) {
         gAudioBufferParameters.maxAiBufferLength -= 0x10;
@@ -1330,6 +1340,16 @@ void audio_reset_session(void) {
     gMinAiBufferLength = gSamplesPerFrameTarget - 0x10;
     gAudioUpdatesPerFrame = updatesPerFrame = gSamplesPerFrameTarget / 160 + 1;
 
+    if (gIsConsole)
+        gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_CONSOLE;
+    else
+        gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES_EMULATOR;
+    
+    if (gMaxSimultaneousNotes > MAX_SIMULTANEOUS_NOTES)
+        gMaxSimultaneousNotes = MAX_SIMULTANEOUS_NOTES;
+    else if (gMaxSimultaneousNotes < 0)
+        gMaxSimultaneousNotes = 0;
+
     // Compute conversion ratio from the internal unit tatums/tick to the
     // external beats/minute (JP) or tatums/minute (US). In practice this is
     // 300 on JP and 14360 on US.
@@ -1344,12 +1364,9 @@ void audio_reset_session(void) {
 #if defined(VERSION_SH)
     persistentMem = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem + preset->persistentBankMem + preset->unk18 + preset->unkMem28 + 0x10);
     temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem + preset->temporaryBankMem + preset->unk24 + preset->unkMem2C + 0x10);
-#elif defined(VERSION_EU)
+#else
     persistentMem = DOUBLE_SIZE_ON_64_BIT(preset->persistentSeqMem + preset->persistentBankMem);
     temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporarySeqMem + preset->temporaryBankMem);
-#else
-    persistentMem = DOUBLE_SIZE_ON_64_BIT(preset->persistentBankMem + preset->persistentSeqMem);
-    temporaryMem = DOUBLE_SIZE_ON_64_BIT(preset->temporaryBankMem + preset->temporarySeqMem);
 #endif
     totalMem = persistentMem + temporaryMem;
     wantMisc = gAudioSessionPool.size - totalMem - BETTER_REVERB_SIZE;
@@ -1382,19 +1399,20 @@ void audio_reset_session(void) {
 
 #if defined(VERSION_JP) || defined(VERSION_US)
     for (j = 0; j < 2; j++) {
-        gAudioCmdBuffers[j] = soundAlloc(&gNotesAndBuffersPool, gMaxAudioCmds * sizeof(u64));
+        gAudioCmdBuffers[j] = soundAlloc(&gNotesAndBuffersPool, ALIGN16(gMaxAudioCmds * sizeof(u64)));
     }
 #endif
 
-    gNotes = soundAlloc(&gNotesAndBuffersPool, gMaxSimultaneousNotes * sizeof(struct Note));
+    gNotes = soundAlloc(&gNotesAndBuffersPool, ALIGN16(gMaxSimultaneousNotes * sizeof(struct Note)));
     note_init_all();
     init_note_free_list();
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
-    gNoteSubsEu = soundAlloc(&gNotesAndBuffersPool, (gAudioBufferParameters.updatesPerFrame * gMaxSimultaneousNotes) * sizeof(struct NoteSubEu));
+    // NOTE: Cannot be computed automatically in the audio heap define; approximation to be used instead
+    gNoteSubsEu = soundAlloc(&gNotesAndBuffersPool, ALIGN16((gAudioBufferParameters.updatesPerFrame * gMaxSimultaneousNotes) * sizeof(struct NoteSubEu)));
 
     for (j = 0; j != 2; j++) {
-        gAudioCmdBuffers[j] = soundAlloc(&gNotesAndBuffersPool, gMaxAudioCmds * sizeof(u64));
+        gAudioCmdBuffers[j] = soundAlloc(&gNotesAndBuffersPool, ALIGN16(gMaxAudioCmds * sizeof(u64)));
     }
 
     init_reverb_eu();
@@ -1427,7 +1445,8 @@ void audio_reset_session(void) {
     append_puppyprint_log("Audio Initialised in %dus.", (s32)OS_CYCLES_TO_USEC(osGetTime() - first));
 #endif
 #endif
-    sAudioFirstBoot = 1;
+
+    sAudioIsInitialized = TRUE;
 }
 
 #ifdef VERSION_SH

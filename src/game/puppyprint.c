@@ -310,14 +310,14 @@ void print_ram_overview(void) {
 }
 
 const char *audioPoolNames[NUM_AUDIO_POOLS] = {
-    "gAudioInitPool",
-    "gNotesAndBuffersPool",
-    "gSeqLoadedPool.persistent.pool",
-    "gSeqLoadedPool.temporary.pool",
-    "gBankLoadedPool.persistent.pool",
-    "gBankLoadedPool.temporary.pool",
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
-    "gBetterReverbPool",
+    "Audio Init Pool",
+    "Notes And Buffers Pool",
+    "Persistent Sequence Pool",
+    "Persistent Bank Pool",
+    "Temporary Sequence Pool",
+    "Temporary Bank Pool",
+#ifdef BETTER_REVERB
+    "Better Reverb Pool",
 #endif
 };
 
@@ -828,6 +828,7 @@ void prepare_blank_box(void) {
 }
 
 void finish_blank_box(void) {
+    gDPPipeSync(gDisplayListHead++);
     print_set_envcolour(255, 255, 255, 255);
     gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
 }
@@ -837,6 +838,7 @@ void finish_blank_box(void) {
 // Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
 void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a) {
     s32 cycleadd = 0;
+    gDPPipeSync(gDisplayListHead++);
     if (((absi(x1 - x2) % 4) == 0) && (a == 255)) {
         gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP);
@@ -851,7 +853,6 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, s32 r, s32 g, s32 b, s32 a
         cycleadd = 0;
     }
 
-    gDPPipeSync(gDisplayListHead++);
     gDPSetFillColor(gDisplayListHead++, (GPACK_RGBA5551(r, g, b, 1) << 16) | GPACK_RGBA5551(r, g, b, 1));
     print_set_envcolour(r, g, b, a);
     gDPFillRectangle(gDisplayListHead++, x1, y1, x2 - cycleadd, y2 - cycleadd);
