@@ -174,8 +174,6 @@ void hvqm_main_proc(uintptr_t vidPtr) {
     tkStart(&rewind, load32(hvqm_header->samples_per_sec));
 
     for (;;) {
-        append_puppyprint_log("VIDEOREMAIN: %d", video_remain);
-
         while (video_remain > 0) {
             u8 header_buffer[sizeof(HVQM2Record) + 16];
             HVQM2Record *record_header;
