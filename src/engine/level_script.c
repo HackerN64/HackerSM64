@@ -884,17 +884,22 @@ static void level_cmd_play_hvqm(void) {
 #ifdef HVQM
     uintptr_t addr = CMD_GET(uintptr_t, 4);
 
+    extern u8 _hvqmworkSegmentBssStart[];
+    extern u8 _hvqbufSegmentBssEnd[];
+
+    bzero(_hvqmworkSegmentBssStart, (u32)_hvqbufSegmentBssEnd - (u32)_hvqmworkSegmentBssStart);
+
     hvqm_reset_bss();
+    timekeeper_reset_bss();
 
     createHvqmThread(addr);
-    
     osStartThread(&hvqmThread);
     osRecvMesg(&gHVQM_SyncQueue, NULL, OS_MESG_BLOCK);
 
-    
-    osStopThread(&hvqmThread);
     osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
     osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
+
+    osDestroyThread(&hvqmThread);
 
     audio_init(AUD_REINIT);
 #endif

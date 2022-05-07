@@ -53,6 +53,11 @@ static u32 video_remain;        /* Counter for remaining number of video records
 static u64 disptime;            /* Counter for scheduled display time of next video frame */
 static ADPCMstate adpcm_state;  /* Buffer for state information passed to the ADPCM decoder */
 
+OSThread hvqmThread;
+static u64 hvqmStack[STACKSIZE / sizeof(u64)];
+
+HVQM2Header *hvqm_header;
+
 void hvqm_reset_bss(void) {
     total_frames = 0;
     total_audio_records = 0;
@@ -61,6 +66,7 @@ void hvqm_reset_bss(void) {
     audio_remain = 0;
     video_remain = 0;
     disptime = 0;
+    hvqm_header = 0;
 
     bzero(hvqm_headerBuf, sizeof(hvqm_headerBuf));
     bzero(&adpcm_state, sizeof(ADPCMstate));
@@ -78,6 +84,8 @@ void hvqm_reset_bss(void) {
     gHVQM_VideoPointer = NULL;
     bzero(&hvqtask, sizeof(OSTask));
     bzero(&hvq_sparg, sizeof(HVQM2Arg));
+
+    bzero(hvqmStack, sizeof(hvqmStack));
 }
 
 
@@ -86,9 +94,6 @@ void hvqm_reset_bss(void) {
  */
 #define load32(from) (*(u32 *) &(from))
 #define load16(from) (*(u16 *) &(from))
-
-extern u8 _capcomSegmentRomStart[];
-extern u8 _seinSegmentRomStart[];
 
 static u32 next_audio_record(void *pcmbuf) {
     ALIGNED16 u8 header_buffer[sizeof(HVQM2Record) + 16];
@@ -120,13 +125,8 @@ static tkAudioProc rewind(void) {
     return &next_audio_record;
 }
 
-HVQM2Header *hvqm_header;
-
 // static OSMesgQueue hvqmMesgQ;
 // static OSMesg hvqmMesgBuf;
-
-OSThread hvqmThread;
-static u64 hvqmStack[STACKSIZE / sizeof(u64)];
 
 void hvqm_main_proc(uintptr_t vidPtr) {
     int h_offset, v_offset; /* Position of image display */
@@ -174,6 +174,7 @@ void hvqm_main_proc(uintptr_t vidPtr) {
     tkStart(&rewind, load32(hvqm_header->samples_per_sec));
 
     for (;;) {
+        append_puppyprint_log("VIDEOREMAIN: %d", video_remain);
 
         while (video_remain > 0) {
             u8 header_buffer[sizeof(HVQM2Record) + 16];
@@ -259,8 +260,9 @@ void hvqm_main_proc(uintptr_t vidPtr) {
             disptime += usec_per_frame;
             --video_remain;
         }
-        if (1) {
+        if (video_remain == 0) {
             osAiSetFrequency(gAudioSessionPresets[0].frequency);
+            osSetEventMesg(OS_EVENT_AI, NULL, 0);
             osDestroyThread(&tkThread);
             osDestroyThread(&daCounterThread);
             osSendMesg(&gHVQM_SyncQueue, 0, OS_MESG_BLOCK);
