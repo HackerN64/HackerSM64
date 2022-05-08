@@ -11,6 +11,15 @@
 #include <ultra64.h>
 #include <types.h>
 
+typedef u32 uint;
+#define true TRUE
+#define false FALSE
+#define SEEK_SET 0
+#define SEEK_END 0
+#define lenof(d) ARRAY_COUNT((d))
+extern OSMesgQueue umpg_syncqueue;
+extern u8 umpg_enabled;
+
 extern struct umpg_t *umpg_init(
     int x, int y, uint w, uint h, const void *start, const void *end
 );

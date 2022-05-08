@@ -9,6 +9,8 @@
 #include <types.h>
 
 #include "mem.h"
+#include "umpg.h"
+#include "game/debug.h"
 
 #define HEAP_SIG 0x4D4B
 
@@ -49,6 +51,17 @@ void *malloc(size_t size)
         heap = heap->next;
     }
     return NULL;
+}
+
+void *realloc(void *ptr, size_t size)
+{
+    void *dst = malloc(size);
+    if (dst != NULL)
+    {
+        memcpy(dst, ptr, size);
+    }
+    free(ptr);
+    return dst;
 }
 
 void free(void *ptr)

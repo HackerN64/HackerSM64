@@ -14,9 +14,12 @@
 #include <ultra64.h>
 #include <types.h>
 
+#include "umpg.h"
+#include "game/debug.h"
+
 #ifdef _UMPG_PL_MPEG
 #define PL_MPEG_IMPLEMENTATION
-#include <pl_mpeg.h>
+#include "pl_mpeg.h"
 #endif
 
 #ifdef _UMPG_LIBMPEG2
@@ -315,7 +318,7 @@ static void umpg_uyvy(
 }
 
 static void umpg_video_decode_callback(
-    unused plm_t *plm, plm_frame_t *frame, void *user
+    UNUSED plm_t *plm, plm_frame_t *frame, void *user
 )
 {
     struct umpg_t *umpg = user;
@@ -330,7 +333,7 @@ static void umpg_video_decode_callback(
 }
 
 static void umpg_audio_decode_callback(
-    unused plm_t *plm, plm_samples_t *samples, void *user
+    UNUSED plm_t *plm, plm_samples_t *samples, void *user
 )
 {
     struct umpg_t *umpg = user;
@@ -372,7 +375,10 @@ struct umpg_t *umpg_init(
     int x, int y, uint w, uint h, const void *start, const void *end
 )
 {
-    struct umpg_t *umpg = malloc(sizeof(*umpg));
+    struct umpg_t *umpg = NULL;
+
+    umpg = malloc(sizeof(*umpg));
+
     umpg->x              = x;
     umpg->y              = y;
     umpg->w              = w;
