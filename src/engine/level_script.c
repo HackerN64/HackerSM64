@@ -10,6 +10,7 @@
 #include "game/area.h"
 #include "game/game_init.h"
 #include "game/mario.h"
+#include "game/debug.h"
 #include "game/memory.h"
 #include "game/object_helpers.h"
 #include "game/object_list_processor.h"
@@ -878,6 +879,39 @@ static void level_cmd_puppylight_node(void) {
 #endif
     sCurrentCmd = CMD_NEXT;
 }
+#include "game/main.h"
+#include "ultra_mpeg/umpg.h"
+
+static void level_cmd_play_mpeg(void) {
+    static u32 debugCtr = 0;
+    u16 ulx = CMD_GET(u16, 4);
+    u16 uly = CMD_GET(u16, 6);
+
+    u16 wd = CMD_GET(u16, 8);
+    u16 ht = CMD_GET(u16, 10);
+
+    uintptr_t vstart = CMD_GET(uintptr_t, 12);
+    uintptr_t vend = CMD_GET(uintptr_t, 16);
+
+    append_puppyprint_log("%d %d %d %d %x %x",
+        ulx, uly, wd, ht,
+        vstart, vend
+        );
+
+    umpg_create_thread(ulx, uly, wd, ht, vstart, vend);
+    debugCtr++;
+    assert(debugCtr < 5, "too much");
+
+
+    osRecvMesg(&umpg_syncqueue, 0, OS_MESG_BLOCK);
+    assert(0, "made ehre");
+
+    osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
+    osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
+    // audio_init(AUD_REINIT);
+
+    sCurrentCmd = CMD_NEXT;
+}
 
 static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_LOAD_AND_EXECUTE            */ level_cmd_load_and_execute,
@@ -945,6 +979,7 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_CHANGE_AREA_SKYBOX          */ level_cmd_change_area_skybox,
     /*LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT      */ level_cmd_puppylight_environment,
     /*LEVEL_CMD_PUPPYLIGHT_NODE             */ level_cmd_puppylight_node,
+    /*LEVEL_CMD_PLAY_MPEG                   */ level_cmd_play_mpeg,
 };
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {

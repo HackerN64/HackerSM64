@@ -73,6 +73,7 @@ enum LevelCommands {
     /*0x3E*/ LEVEL_CMD_CHANGE_AREA_SKYBOX,
     /*0x3F*/ LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT,
     /*0x40*/ LEVEL_CMD_PUPPYLIGHT_NODE,
+    /*0x41*/ LEVEL_CMD_PLAY_MPEG,
 };
 
 enum LevelActs {
@@ -388,6 +389,13 @@ enum GoddardScene {
     CMD_BBBB(LEVEL_CMD_SET_MARIO_START_POS, 0x0C, area, 0x00), \
     CMD_HH(yaw, posX), \
     CMD_HH(posY, posZ)
+
+#define PLAY_MPEG(ulx, uly, wd, ht, vstart, vend) \
+    CMD_BBH(LEVEL_CMD_PLAY_MPEG, 20, 0), \
+    CMD_HH(ulx, uly), \
+    CMD_HH(wd, ht), \
+    CMD_PTR(vstart), \
+    CMD_PTR(vend)
 
 // unused
 #define UNLOAD_MARIO_AREA() \
