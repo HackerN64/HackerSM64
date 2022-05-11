@@ -193,10 +193,10 @@ u8 sAudioSynthesisPad[0x20];
 
 #ifdef BETTER_REVERB
 static void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 inSampleR) {
-    s32 *curDelayBufL;
-    s32 *curDelayBufR;
-    s32 tmpBufL;
-    s32 tmpBufR;
+    s32 *curDelaySampleL;
+    s32 *curDelaySampleR;
+    s32 historySampleL;
+    s32 historySampleR;
     s32 i = 0;
     s32 j = 0;
     s32 k = 0;
@@ -206,26 +206,26 @@ static void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 
     s32 tmpCarryoverR = (((delayBufsR[reverbFilterCount][allpassIdxR[reverbFilterCount]] * REVERB_REV_INDEX) >> 8) + inSampleR);
 
     for (; i <= reverbFilterCount; ++i, ++j) {
-        curDelayBufL = &delayBufsL[i][allpassIdxL[i]];
-        curDelayBufR = &delayBufsR[i][allpassIdxR[i]];
-        tmpBufL = *curDelayBufL;
-        tmpBufR = *curDelayBufR;
+        curDelaySampleL = &delayBufsL[i][allpassIdxL[i]];
+        curDelaySampleR = &delayBufsR[i][allpassIdxR[i]];
+        historySampleL = *curDelaySampleL;
+        historySampleR = *curDelaySampleR;
 
         if (j == 2) {
             j = -1;
-            outTmpL += ((tmpBufL * reverbMultsL[k  ]) >> 8);
-            outTmpR += ((tmpBufR * reverbMultsR[k++]) >> 8);
-            *curDelayBufL = tmpCarryoverL;
-            *curDelayBufR = tmpCarryoverR;
+            outTmpL += ((historySampleL * reverbMultsL[k  ]) >> 8);
+            outTmpR += ((historySampleR * reverbMultsR[k++]) >> 8);
+            *curDelaySampleL = tmpCarryoverL;
+            *curDelaySampleR = tmpCarryoverR;
             if (i != reverbFilterCount) {
-                tmpCarryoverL = ((tmpBufL * REVERB_REV_INDEX) >> 8);
-                tmpCarryoverR = ((tmpBufR * REVERB_REV_INDEX) >> 8);
+                tmpCarryoverL = ((historySampleL * REVERB_REV_INDEX) >> 8);
+                tmpCarryoverR = ((historySampleR * REVERB_REV_INDEX) >> 8);
             }
         } else {
-            *curDelayBufL = (((tmpBufL * (-REVERB_GAIN_INDEX)) >> 8) + tmpCarryoverL);
-            *curDelayBufR = (((tmpBufR * (-REVERB_GAIN_INDEX)) >> 8) + tmpCarryoverR);
-            tmpCarryoverL = (((*curDelayBufL * REVERB_GAIN_INDEX) >> 8) + tmpBufL);
-            tmpCarryoverR = (((*curDelayBufR * REVERB_GAIN_INDEX) >> 8) + tmpBufR);
+            *curDelaySampleL = (((historySampleL * (-REVERB_GAIN_INDEX)) >> 8) + tmpCarryoverL);
+            *curDelaySampleR = (((historySampleR * (-REVERB_GAIN_INDEX)) >> 8) + tmpCarryoverR);
+            tmpCarryoverL = (((*curDelaySampleL * REVERB_GAIN_INDEX) >> 8) + historySampleL);
+            tmpCarryoverR = (((*curDelaySampleR * REVERB_GAIN_INDEX) >> 8) + historySampleR);
         }
 
         if (++allpassIdxL[i] == delaysL[i]) allpassIdxL[i] = 0;
@@ -239,8 +239,8 @@ static void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 
 }
 
 static void reverb_mono_sample(s16 *outSample, s32 inSample) {
-    s32 *curDelayBuf;
-    s32 tmpBuf;
+    s32 *curDelaySample;
+    s32 historySample;
     s32 i = 0;
     s32 j = 0;
     s32 k = 0;
@@ -248,18 +248,18 @@ static void reverb_mono_sample(s16 *outSample, s32 inSample) {
     s32 tmpCarryover = (((delayBufsL[reverbFilterCount][allpassIdxL[reverbFilterCount]] * REVERB_REV_INDEX) >> 8) + inSample);
 
     for (; i <= reverbFilterCount; ++i, ++j) {
-        curDelayBuf = &delayBufsL[i][allpassIdxL[i]];
-        tmpBuf = *curDelayBuf;
+        curDelaySample = &delayBufsL[i][allpassIdxL[i]];
+        historySample = *curDelaySample;
 
         if (j == 2) {
             j = -1;
-            outTmp += ((tmpBuf * reverbMultsL[k++]) >> 8);
-            *curDelayBuf = tmpCarryover;
+            outTmp += ((historySample * reverbMultsL[k++]) >> 8);
+            *curDelaySample = tmpCarryover;
             if (i != reverbFilterCount)
-                tmpCarryover = ((tmpBuf * REVERB_REV_INDEX) >> 8);
+                tmpCarryover = ((historySample * REVERB_REV_INDEX) >> 8);
         } else {
-            *curDelayBuf = (((tmpBuf * (-REVERB_GAIN_INDEX)) >> 8) + tmpCarryover);
-            tmpCarryover = (((*curDelayBuf * REVERB_GAIN_INDEX) >> 8) + tmpBuf);
+            *curDelaySample = (((historySample * (-REVERB_GAIN_INDEX)) >> 8) + tmpCarryover);
+            tmpCarryover = (((*curDelaySample * REVERB_GAIN_INDEX) >> 8) + historySample);
         }
 
         if (++allpassIdxL[i] == delaysL[i]) allpassIdxL[i] = 0;
