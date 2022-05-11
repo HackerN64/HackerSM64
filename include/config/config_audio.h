@@ -10,6 +10,11 @@
 #define CASTLE_MUSIC_FIX
 
 /**
+ *  Do not restart the music on cap grabs
+ */
+#define PERSISTENT_CAP_MUSIC
+
+/**
  * Increase audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).
  */
 #define EXPAND_AUDIO_HEAP
@@ -28,8 +33,3 @@
  * Reverb parameters can be configured in audio/synthesis.c to meet desired aesthetic/performance needs. Currently US/JP only. Hurts emulator and console performance.
  */
 // #define BETTER_REVERB
-
-/**
- *  Do not restart the music on cap grabs
- */
-#define PERSISTENT_CAP_MUSIC
