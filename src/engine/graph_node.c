@@ -430,7 +430,7 @@ struct GraphNodeShadow *init_graph_node_shadow(struct AllocOnlyPool *pool,
 
     if (graphNode != NULL) {
 #ifdef LEGACY_SHADOW_IDS
-        if (shadowType == 1 || shadowType == 2 || shadowType == 99) {
+        if (shadowType == 0 || shadowType == 1 || shadowType == 2 || shadowType == 99) {
             shadowType = SHADOW_CIRCLE;
         } else if (shadowType == 11 || shadowType == 12) {
             shadowType = SHADOW_SQUARE;
