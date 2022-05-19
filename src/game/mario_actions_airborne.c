@@ -28,7 +28,7 @@ void play_far_fall_sound(struct MarioState *m) {
     u32 action = m->action;
     if (!(action & ACT_FLAG_INVULNERABLE) && action != ACT_TWIRLING && action != ACT_FLYING
         && !(m->flags & MARIO_FALL_SOUND_PLAYED)) {
-        if (m->peakHeight - m->pos[1] > 1150.0f) {
+        if (m->peakHeight - m->pos[1] > FALL_DAMAGE_HEIGHT_SMALL) {
             play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
             m->flags |= MARIO_FALL_SOUND_PLAYED;
         }
