@@ -43,7 +43,7 @@ struct GfxPool *gGfxPool;
 
 // OS Controllers
 OSContStatus gControllerStatuses[4];
-OSContPad gControllerPads[4];
+OSContPadEx gControllerPads[4];
 u8 gControllerBits;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
@@ -602,7 +602,7 @@ void read_controller_inputs(s32 threadID) {
         if (threadID == THREAD_5_GAME_LOOP) {
             osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
         }
-        osContGetReadData(&gControllerPads[0]);
+        osContGetReadDataEx(&gControllerPads[0]);
 #if ENABLE_RUMBLE
         release_rumble_pak_control();
 #endif
@@ -769,7 +769,7 @@ void thread5_game_loop(UNUSED void *arg) {
 #if ENABLE_RUMBLE
             block_until_rumble_pak_free();
 #endif
-            osContStartReadData(&gSIEventMesgQueue);
+            osContStartReadDataEx(&gSIEventMesgQueue);
         }
 
         audio_game_loop_tick();

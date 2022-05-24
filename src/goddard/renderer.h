@@ -61,7 +61,7 @@ void gdm_init(void *blockpool, u32 size);
 void gdm_setup(void);
 void gdm_maketestdl(s32 id);
 void gd_vblank(void);
-void gd_copy_p1_contpad(OSContPad *p1cont);
+void gd_copy_p1_contpad(OSContPadEx *p1cont);
 s32 gd_sfx_to_play(void);
 Gfx *gdm_gettestdl(s32 id);
 void gd_draw_rect(f32 ulx, f32 uly, f32 lrx, f32 lry);
