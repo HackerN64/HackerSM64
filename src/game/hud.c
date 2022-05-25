@@ -31,6 +31,13 @@
 #define HUD_POWER_METER_Y            200
 #define HUD_POWER_METER_HIDDEN_Y     300
 
+#define HUD_TOP_Y 209
+#define HUD_BOTTOM_Y 19 // Same height as the Lakitu icon
+
+#define HUD_COINS_X 168
+#define HUD_STARS_X 78 // This starts counting from the right edge
+#define HUD_CAMERA_X 54 // This starts counting from the right edge
+
 #ifdef BREATH_METER
 // #ifdef DISABLE_LIVES
 // #define HUD_BREATH_METER_X         64
@@ -388,7 +395,6 @@ void render_hud_breath_meter(void) {
 }
 #endif
 
-#define HUD_TOP_Y 209
 
 /**
  * Renders the amount of lives Mario has.
@@ -415,12 +421,10 @@ void render_debug_mode(void) {
  * Renders the amount of coins collected.
  */
 void render_hud_coins(void) {
-    print_text(168, HUD_TOP_Y, "$"); // 'Coin' glyph
-    print_text(184, HUD_TOP_Y, "*"); // 'X' glyph
-    print_text_fmt_int(198, HUD_TOP_Y, "%d", gHudDisplay.coins);
+    print_text(HUD_COINS_X, HUD_TOP_Y, "$"); // 'Coin' glyph
+    print_text((HUD_COINS_X + 16), HUD_TOP_Y, "*"); // 'X' glyph
+    print_text_fmt_int((HUD_COINS_X + 30), HUD_TOP_Y, "%d", gHudDisplay.coins);
 }
-
-#define HUD_STARS_X 78
 
 /**
  * Renders the amount of stars collected.
@@ -491,7 +495,7 @@ void set_hud_camera_status(s16 status) {
  */
 void render_hud_camera_status(void) {
     Texture *(*cameraLUT)[6] = segmented_to_virtual(&main_hud_camera_lut);
-    s32 x = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(54);
+    s32 x = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(HUD_CAMERA_X);
     s32 y = 205;
 
     if (sCameraHUD.status == CAM_STATUS_NONE) {
