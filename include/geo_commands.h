@@ -489,7 +489,7 @@ enum GeoLayoutCommands {
 /**
  * Advanced lighting engine
  * GEO_CMD_SCENE_LIGHT: Create a scene light node. Can be a regular light, point light, or ambient light.
- *   0x01: u8 lightType (0 is regular, 1 is ambient, 2 is point, 3 is occluded point)
+ *   0x01: u8 lightType (0 is ambient, 1 is directional, 2 is point, 3 is occluded point)
  *   0x02: u8 red
  *   0x03: u8 green
  *   0x04: u8 blue
