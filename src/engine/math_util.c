@@ -29,7 +29,7 @@ static u16 gRandomSeed16;
 
 // Generate a pseudorandom integer from 0 to 255.
 u8 random_u8(void) {
-    return random_u16() % 0xFF;
+    return random_u16() & 0xFF;
 }
 
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
@@ -60,8 +60,7 @@ u32 random_u16(void) {
 
 // Generate a pseudorandom integer from -32768 to 32767.
 s16 random_s16(void) {
-    u16 randomUnsignedValue = random_u16();
-    return *((s16*) &randomUnsignedValue);
+    return (s16) random_u16();
 }
 
 // Generate a pseudorandom integer in the specified range.
@@ -76,7 +75,7 @@ f32 random_float(void) {
 
 // Return either -1 or 1 with a 50:50 chance.
 s32 random_sign(void) {
-    return ((random_u16() >= 0x7FFF) ? 1 : -1);
+    return (random_u16() & 2) -1;
 }
 
 /// Returns the lowest of three values.
