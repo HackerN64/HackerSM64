@@ -1893,6 +1893,11 @@ void bhv_init_room(void) {
     o->oRoom = -1;
 }
 
+
+#ifdef SKIP_OBJECTS_OUTSIDE_ROOM
+s32 gObjectInRoomCheck = 0;
+#endif
+
 void cur_obj_enable_rendering_if_mario_in_room(void) {
     if (o->oRoom != -1 && gMarioCurrentRoom != 0) {
         register s32 marioInRoom = (
@@ -1910,6 +1915,9 @@ void cur_obj_enable_rendering_if_mario_in_room(void) {
             o->activeFlags |= ACTIVE_FLAG_IN_DIFFERENT_ROOM;
             gNumRoomedObjectsNotInMarioRoom++;
         }
+#ifdef SKIP_OBJECTS_OUTSIDE_ROOM
+        gObjectInRoomCheck = marioInRoom;
+#endif
     }
 }
 

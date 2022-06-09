@@ -73,3 +73,9 @@
 
 // The level that the game starts in after file select. The levelscript needs to have a MARIO_POS command for this to work.
 #define START_LEVEL LEVEL_CASTLE_GROUNDS
+
+// Skips running object code if an object is outside of the current room.
+// Use OBJ_FLAG_PROCESS_OUTSIDE_ROOM in a behavior's OR_LONG command to exclude that behavior from the effects of this define.
+#ifndef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    #define SKIP_OBJECTS_OUTSIDE_ROOM
+#endif

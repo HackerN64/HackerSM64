@@ -813,6 +813,10 @@ static BhvCommandProc BehaviorCmdTable[] = {
     /*BHV_CMD_SPAWN_WATER_DROPLET   */ bhv_cmd_spawn_water_droplet,
 };
 
+#ifdef SKIP_OBJECTS_OUTSIDE_ROOM
+extern s32 gObjectInRoomCheck;
+#endif
+
 // Execute the behavior script of the current object, process the object flags, and other miscellaneous code for updating objects.
 void cur_obj_update(void) {
     u32 objFlags = o->oFlags;
@@ -820,6 +824,10 @@ void cur_obj_update(void) {
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
 
+#ifdef SKIP_OBJECTS_OUTSIDE_ROOM
+    cur_obj_enable_rendering_if_mario_in_room();
+    if (o->oRoom == -1 || gObjectInRoomCheck || objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM) {
+#endif
     // Calculate the distance from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
         o->oDistanceToMario = dist_between_objects(o, gMarioObject);
@@ -923,6 +931,7 @@ void cur_obj_update(void) {
     puppylights_object_emit(o);
 #endif
 
+#ifndef SKIP_OBJECTS_OUTSIDE_ROOM
     // Handle visibility of object
     if (o->oRoom != -1) {
         // If the object is in a room, only show it when Mario is in the room.
@@ -931,7 +940,16 @@ void cur_obj_update(void) {
         o->collisionData == NULL
         &&  (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO)
         && !(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
-    ) {
+    )
+#else 
+    } else if (
+        o->oRoom == -1
+        && o->collisionData == NULL
+        &&  (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO)
+        && !(objFlags & OBJ_FLAG_ACTIVE_FROM_AFAR)
+    )
+#endif
+    {
         // If the object has a render distance, check if it should be shown.
         if (distanceFromMario > o->oDrawingDistance) {
             // Out of render distance, hide the object.
@@ -943,4 +961,6 @@ void cur_obj_update(void) {
             o->activeFlags &= ~ACTIVE_FLAG_FAR_AWAY;
         }
     }
+
+
 }
