@@ -1339,7 +1339,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     vec3f_cross(h, dir, e2);
     // Determine the cos(angle) difference between ray and surface normals.
     f32 det = vec3f_dot(e1, h);
-    // Check if we're perpendicular from the surface.
+    // Check if we're perpendicular or pointing away from the surface.
     if ((det < NEAR_ZERO)) return FALSE;
     // Check if we're making contact with the surface.
     // Make f the inverse of the cos(angle) between ray and surface normals.
