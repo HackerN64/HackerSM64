@@ -48,11 +48,7 @@ a modern game engine's developer's console.
 #ifdef PUPPYPRINT
 
 ColorRGBA currEnv;
-#ifdef ENABLE_CREDITS_BENCHMARK
-u8 fDebug = TRUE;
-#else
 u8 fDebug = FALSE;
-#endif
 
 #if PUPPYPRINT_DEBUG
 s8 benchViewer  = FALSE;

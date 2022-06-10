@@ -6,7 +6,6 @@
  */
 
 #include "config/config_audio.h"
-#include "config/config_benchmark.h"
 #include "config/config_camera.h"
 #include "config/config_collision.h"
 #include "config/config_cutscenes.h"
@@ -19,6 +18,7 @@
 #include "config/config_movement.h"
 #include "config/config_objects.h"
 #include "config/config_rom.h"
+#include "config/config_benchmark.h"
 
 
 /* WARNING: Compatibility safeguards - don't remove this file unless you know what you're doing */

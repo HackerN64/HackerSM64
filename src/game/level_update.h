@@ -28,7 +28,8 @@ enum WarpOperation {
     WARP_OP_DEMO_NEXT,
     WARP_OP_CREDITS_START,
     WARP_OP_CREDITS_NEXT,
-    WARP_OP_DEMO_END
+    WARP_OP_DEMO_END,
+    WARP_OP_CREDITS_SAME
 };
 
 enum SpecialWarpDestinations {

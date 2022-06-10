@@ -27,6 +27,11 @@
 
 const LevelScript level_intro_splash_screen[] = {
     INIT_LEVEL(),
+#ifdef ENABLE_CREDITS_BENCHMARK
+    SET_REG(LEVEL_CASTLE_GROUNDS),
+    JUMP_IF(/*op*/ OP_EQ, /*arg*/ 100, script_intro_main_level_entry),
+    EXIT_AND_EXECUTE(/*seg*/ 0x15, _scriptsSegmentRomStart, _scriptsSegmentRomEnd, level_main_scripts_entry),
+#endif
 #ifdef SKIP_TITLE_SCREEN
     EXIT_AND_EXECUTE_WITH_CODE(/*seg*/ SEGMENT_MENU_INTRO, _introSegmentRomStart, _introSegmentRomEnd, level_intro_mario_head_regular, _introSegmentBssStart, _introSegmentBssEnd),
 #endif

@@ -56,5 +56,9 @@ extern void __n64Assert(char *fileName, u32 lineNum, char *message);
 #define assert(cond, message)
 #endif
 
+void iterate_credits_benchmark(void);
+void benchmark_scene_swap(void);
+void init_credits_benchmark(void);
+
 
 #endif // DEBUG_H

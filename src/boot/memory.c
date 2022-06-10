@@ -405,7 +405,9 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         dest = main_pool_alloc(*size, MEMORY_POOL_LEFT);
 #endif
         if (dest != NULL) {
+#ifndef ENABLE_CREDITS_BENCHMARK
             osSyncPrintf("start decompress\n");
+#endif
 #ifdef GZIP
             expand_gzip(compressed, dest, compSize, (u32)size);
 #elif RNC1
@@ -417,7 +419,9 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
 #elif MIO0
             decompress(compressed, dest);
 #endif
+#ifndef ENABLE_CREDITS_BENCHMARK
             osSyncPrintf("end decompress\n");
+#endif
             set_segment_base_addr(segment, dest);
             main_pool_free(compressed);
         }
