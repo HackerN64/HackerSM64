@@ -122,9 +122,9 @@ struct sPuppyAngles
 //Structurally, it's exactly the same as CutsceneSplinePoint
 struct sPuppySpline
 {
-    Vec3s pos; // The vector pos of the spline index itself.
     s8 index;  // The index of the spline. Ends with -1
     u8 speed;  // The amount of frames it takes to get through this index.
+    Vec3s pos; // The vector pos of the spline index itself.
 };
 
 //A bounding volume for activating puppycamera scripts and angles.
