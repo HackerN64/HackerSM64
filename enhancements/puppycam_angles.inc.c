@@ -4,11 +4,14 @@
 ///The camera position fields accept "32767" as an ignore flag.
 ///The script supports anything that does not take an argument. It's reccomended to keep the scripts in puppycam_scripts.inc.c for the sake of cleanliness.
 ///If you do not wish to use a script in the angle, then just leave the field as 0.
+
+// #define PUPPYCAM_SAMPLES
+
 struct newcam_hardpos newcam_fixedcam[] =
 {
 
+#ifdef PUPPYCAM_SAMPLES
 // Example Scripts
-
 {/*Level ID*/ 16,/*Area ID*/ 1,/*Permaswap*/ 0,/*Mode*/ NC_MODE_FIXED_NOMOVE,/*Script*/ 0, //Standard params.
 /*X begin*/ -540,/*Y begin*/ 800,/*Z begin*/ -3500, //Where the activation box begins
 /*X end*/ 540,/*Y end*/ 2000,/*Z end*/ -1500, //Where the activation box ends.
@@ -21,8 +24,6 @@ struct newcam_hardpos newcam_fixedcam[] =
 /*X end*/ 6908,/*Y end*/ 1000,/*Z end*/ 62, //Where the activation box ends.
 /*Cam X*/ 32767,/*Cam Y*/ 32767,/*Cam Z*/ 32767, //The position the camera gets placed for NC_MODE_FIXED and NC_MODE_FIXED_NOMOVE
 /*Look X*/ 32767,/*Look Y*/ 32767,/*Look Z*/ 32767}, //The position the camera looks at for NC_MODE_FIXED_NOMOVE
-
-
-	{LEVEL_BOB, 1, 0, NC_MODE_NORMAL, 0, 1233, 681, 5323, 1951, 1142, 6040, 1818, 1037, 5666, -1507, 490, 5824},
+#endif
 
 };

@@ -617,9 +617,9 @@ void puppycam_input_centre(void) {
     }
     s32 inputDefault;
     if (gPuppyCam.options.inputType != 2) {
-        inputDefault = gPlayer1Controller->buttonPressed & R_TRIG;
+        inputDefault = gPlayer1Controller->buttonPressed & L_TRIG || gPlayer1Controller->buttonPressed & R_TRIG;
     } else {
-        inputDefault = gPlayer1Controller->buttonPressed & R_TRIG | L_TRIG;
+        inputDefault = gPlayer1Controller->buttonPressed & R_TRIG;
     }
     // Handles L button centering.
     if (inputDefault && gPuppyCam.flags & PUPPYCAM_BEHAVIOUR_YAW_ROTATION &&
