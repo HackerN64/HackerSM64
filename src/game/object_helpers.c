@@ -131,10 +131,11 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
             switchCase->selectedCase = 0;
         } else {
             #ifdef VERTICAL_ROOMS
-                // In BBH, check for a floor manually, since there is an intangible floor. In custom hacks this can be removed.
+                // Checks for a floor manually, including intangible ones. This allows one to have vertical rooms.
                 find_room_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &floor);
             #else
-                // Since no intangible floors are nearby, use Mario's floor instead.
+                // Use Mario's floor to determine the room. 
+                // This saves processing time, but does not allow vertical rooms, since intangible floors will be skipped.
                 floor = gMarioState->floor;
             #endif
             }
