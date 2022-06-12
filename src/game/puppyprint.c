@@ -931,6 +931,9 @@ s8 rainbowToggle = 0;
 f32 textSize = 1.0f; // The value that's used as a baseline multiplier before applying text size modifiers. Make sure to set it back when you're done.
 f32 textSizeTotal = 1.0f; // The value that's read to set the text size. Do not mess with this.
 f32 textSizeTemp = 1.0f; // The value that's set when modifying text size mid draw. Also do not mess with this.
+u16 textTempScale = 1024; // A fixed point means of referring to scale.
+u8 textOffsets[2]; // Represents the dimensions of the text (12 x 8), and written to when size is modified.
+u8 topLineHeight; // Represents the peak line height of the current line. Prevents vertical overlapping.
 
 s32 get_text_width(const char *str, s32 font) {
     s32 i       = 0;
@@ -976,11 +979,13 @@ s32 get_text_height(const char *str) {
 
     textSizeTemp = 1.0f;
     textSizeTotal = textSizeTemp * textSize;
-    textPos = 12 * textSizeTotal;
+    topLineHeight = 12 * textSizeTotal;
+    textPos = topLineHeight;
 
     for (i = 0; i < strLen; i++) {
         if (str[i] == '#' || str[i] == 0x0A) {
-            textPos += 12 * textSizeTotal;
+            textPos += topLineHeight;
+            topLineHeight = 12 * textSizeTotal;
             continue;
         }
         while (i < strLen && str[i] == '<') {
@@ -1023,35 +1028,42 @@ const Gfx dl_small_text_begin[] = {
     gsSPEndDisplayList(),
 };
 
+void set_text_size_params(void) {
+    textSizeTotal = textSizeTemp * textSize;
+    textTempScale = 1024/textSizeTotal;
+    textOffsets[0] = 8 * textSizeTotal;
+    textOffsets[1] = 12 * textSizeTotal;
+    topLineHeight = MAX(12.0f * textSizeTotal, topLineHeight);
+}
+
 void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
     s32 textX = 0;
     s32 textY = 0;
-    s8 offsetY = 0;
     s32 textPos[2] = { 0, 0 };
-    u8 spaceX = 0;
     s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    s32 tx = amount;
-    s32 tx2 = tx;
-    s8 shakePos[2];
-    f32 wavePos;
-    u8 lines = 0;
-    u8 xlu = gCurrEnvCol[3];
+    s32 textLength = amount;
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
     s32 strLen = puppyprint_strlen(str);
     s32 commandOffset;
+    f32 wavePos;
     Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
+    s8 offsetY = 0;
+    u8 spaceX = 0;
+    s8 shakePos[2];
+    u8 lines = 0;
+    u8 xlu = gCurrEnvCol[3];
 
     shakeToggle = 0;
     waveToggle = 0;
     rainbowToggle = 0;
     textSizeTemp = 1.0f;
-    textSizeTotal = textSizeTemp * textSize;
+    set_text_size_params();
 
     if (amount == PRINT_ALL || amount > strLen) {
-        tx = strLen;
-        tx2 = tx;
+        textLength = strLen;
     }
 
+    // Calculate the text width for centre and right aligned text.
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
     if (align == PRINT_TEXT_ALIGN_CENTRE || align == PRINT_TEXT_ALIGN_RIGHT) {
         for (s32 i = 0; i < strLen; i++) {
@@ -1067,7 +1079,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                     break;
 
                 i += commandOffset;
-                tx2 += commandOffset;
+                textLength += commandOffset;
             }
 
             if (i >= strLen)
@@ -1086,42 +1098,43 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     }
 
     lines = 0;
-    tx2 = tx;
+    textLength = strLen;
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
-    for (s32 i = 0, j = 0; i < tx2; i++, j++) {
+    for (s32 i = 0, j = 0; i < textLength; i++, j++) {
         if (str[i] == '#' || str[i] == 0x0A) {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
-                textPos[0] = -(wideX[lines]    );
+                textPos[0] = -(wideX[lines]);
             } else {
                 textPos[0] = -(wideX[lines] / 2);
             }
-            textPos[1] += 12 * textSizeTotal;
+            textPos[1] += topLineHeight;
+            topLineHeight = 12.0f * textSizeTotal;
             continue;
         }
 
-        while (i < tx2 && str[i] == '<') {
+        while (i < textLength && str[i] == '<') {
             commandOffset = text_iterate_command(str, i, TRUE);
             if (commandOffset == 0)
                 break;
 
             i += commandOffset;
-            tx2 += commandOffset;
+            textLength += commandOffset;
         }
 
-        if (i >= tx2)
+        if (i >= textLength)
             break;
 
         if (shakeToggle) {
-            shakePos[0] = (-1 + (random_u16() & 0x1));
-            shakePos[1] = (-1 + (random_u16() & 0x1));
+            shakePos[0] = (-1 + (random_u16() & 0x1)) * textSizeTotal;
+            shakePos[1] = (-1 + (random_u16() & 0x1)) * textSizeTotal;
         } else {
             shakePos[0] = 0;
             shakePos[1] = 0;
         }
 
         if (waveToggle) {
-            wavePos = ((sins((gGlobalTimer * 3000) + (j * 10000))) * 2);
+            wavePos = ((sins((gGlobalTimer * 3000) + (j * 10000))) * 2) * textSizeTotal;
         } else {
             wavePos = 0;
         }
@@ -1136,11 +1149,11 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
             }
         }
 
-        gSPScisTextureRectangle(gDisplayListHead++, (x + textPos[0] + (s16)(shakePos[0] * textSizeTotal)) << 2,
-                                                    (y + textPos[1] + (s16)((shakePos[1] + offsetY + wavePos) * textSizeTotal)) << 2,
-                                                    (x + textPos[0] + (s16)((shakePos[0] + 8) * textSizeTotal)) << 2,
-                                                    (y + textPos[1] + (s16)((wavePos + offsetY + shakePos[1] + 12) * textSizeTotal)) << 2,
-                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), 1024/textSizeTotal, 1024/textSizeTotal);
+        gSPScisTextureRectangle(gDisplayListHead++, (x + textPos[0] + (s16)(shakePos[0])) << 2,
+                                                    (y + textPos[1] + (s16)((shakePos[1] + offsetY + wavePos))) << 2,
+                                                    (x + textPos[0] + (s16)((shakePos[0] + textOffsets[0]))) << 2,
+                                                    (y + textPos[1] + (s16)((wavePos + offsetY + shakePos[1] + textOffsets[1]))) << 2,
+                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), textTempScale, textTempScale);
         textPos[0] += (spaceX + 1) * textSizeTotal;
     }
 
@@ -1191,7 +1204,7 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
         textSizeTemp += (newStr[7] - '0')/10.0f;
         textSizeTemp += (newStr[8] - '0')/100.0f;
         textSizeTemp = CLAMP(textSizeTemp, 0.01f, 10.0f);
-        textSizeTotal = textSizeTemp * textSize;
+        set_text_size_params();
     } else if (strncmp((newStr), "<COL_xxxxxxxx>", 5) == 0 && len == 14) { // Simple text colour effect. goes up to FF for each, so FF0000FF is red.
         // Each value is taken from the string. The first is shifted left 4 bits, because it's a larger significant value, then it adds the next digit onto it.
         // Reverting to envcoluor can be achieved by passing something like <COL_-------->, or it could be combined with real colors for just partial reversion like <COL_FF00FF--> for instance.
@@ -1315,10 +1328,10 @@ void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, u8 *spaceX, s8 *offse
         case '&': *textX = 60; *textY = 24; *spaceX = textLen[79]; break; // Ampersand
 
         // This is for the letters that sit differently on the line. It just moves them down a bit.
-        case 'g': *offsetY = 1; break;
-        case 'q': *offsetY = 1; break;
-        case 'p': if (font == FONT_DEFAULT) *offsetY = 3; break;
-        case 'y': if (font == FONT_DEFAULT) *offsetY = 1; break;
+        case 'g': if (font == FONT_DEFAULT) *offsetY = 1 * textSizeTotal; break;
+        case 'q': if (font == FONT_DEFAULT) *offsetY = 1 * textSizeTotal; break;
+        case 'p': if (font == FONT_DEFAULT) *offsetY = 3 * textSizeTotal; break;
+        case 'y': if (font == FONT_DEFAULT) *offsetY = 1 * textSizeTotal; break;
     }
 }
 // This is where the deferred printing will be stored. When text is made, it will store text with an 12 byte header, then the rest will be the text data itself.
