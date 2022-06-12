@@ -130,15 +130,14 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
         if (gMarioObject == NULL) {
             switchCase->selectedCase = 0;
         } else {
-            #ifdef VERTICAL_ROOMS
+#ifdef VERTICAL_ROOMS
                 // Checks for a floor manually, including intangible ones. This allows one to have vertical rooms.
                 find_room_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &floor);
-            #else
+#else
                 // Use Mario's floor to determine the room. 
                 // This saves processing time, but does not allow vertical rooms, since intangible floors will be skipped.
                 floor = gMarioState->floor;
-            #endif
-            }
+#endif
             if (floor) {
                 gMarioCurrentRoom = floor->room;
                 s16 roomCase = floor->room - 1;
