@@ -68,6 +68,8 @@ extern s32 ramsizeSegment[33];
 extern const s8 nameTable;
 extern s32 mempool;
 extern f32 textSize;
+extern u32 gPoolMem;
+extern u32 gMiscMem;
 typedef u32 PPTimer[NUM_PERF_ITERATIONS + 2];
 
 struct PuppyPrintTimers
@@ -124,3 +126,4 @@ extern void profiler_add(u32 *time, OSTime time2);
 extern void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
 extern void puppyprint_print_deferred(void);
 extern s32 puppyprint_strlen(const char *str);
+extern void set_segment_memory_printout(u32 segment, u32 amount);

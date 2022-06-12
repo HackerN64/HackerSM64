@@ -44,6 +44,7 @@ a modern game engine's developer's console.
 #include "hud.h"
 #include "debug_box.h"
 #include "color_presets.h"
+#include "buffers/buffers.h"
 
 #define PUPPYPRINT
 #define PUPPYPRINT_DEBUG 1
@@ -130,6 +131,9 @@ s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
     0, 0, 0
 };
 s32 mempool;
+u32 gPoolMem;
+u32 gPPSegScroll = 0;
+u32 gMiscMem = 0;
 
 extern u8 _mainSegmentStart[];
 extern u8 _mainSegmentEnd[];
@@ -137,40 +141,25 @@ extern u8 _engineSegmentStart[];
 extern u8 _engineSegmentEnd[];
 extern u8 _framebuffersSegmentBssStart[];
 extern u8 _framebuffersSegmentBssEnd[];
+extern u8 _zbufferSegmentBssStart[];
+extern u8 _zbufferSegmentBssEnd[];
 extern u8 _buffersSegmentBssStart[];
 extern u8 _buffersSegmentBssEnd[];
 extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentEnd[];
 
-// Here is stored the rom addresses of the global code segments. If you get rid of any, it's best to just write them as NULL.
-u32 ramP[5][2] = {
-    {(u32)_buffersSegmentBssStart,      (u32)_buffersSegmentBssEnd},
-    {(u32)_mainSegmentStart,            (u32)_mainSegmentEnd},
-    {(u32)_engineSegmentStart,          (u32)_engineSegmentEnd},
-    {(u32)_framebuffersSegmentBssStart, (u32)_framebuffersSegmentBssEnd},
-    {(u32)_goddardSegmentStart,         (u32)_goddardSegmentEnd},
-};
-
 void puppyprint_calculate_ram_usage(void) {
-    u32 temp[2];
-    s32 i = 0;
-
-    for (i = 0; i < 5; i++) {
-        if (!ramP[i][0] || !ramP[i][1]) {
-            continue;
-        }
-        temp[0] = ramP[i][0];
-        temp[1] = ramP[i][1];
-        ramsizeSegment[i] = temp[1] - temp[0];
-    }
-
-    // These are a bit hacky, but what can ye do eh?
-    // gEffectsMemoryPool is 0x4000, gObjectMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
-    ramsizeSegment[5] = (EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL
-                       + EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL);
-    ramsizeSegment[6] = ((SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode))
-                       + (     SURFACE_POOL_SIZE * sizeof(struct Surface    )));
-    ramsizeSegment[7] = gAudioHeapSize;
+    ramsizeSegment[0] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - sizeof(gAudioHeap);
+    ramsizeSegment[1] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
+    ramsizeSegment[2] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
+    ramsizeSegment[3] = (u32)&_framebuffersSegmentBssEnd - (u32)&_framebuffersSegmentBssStart;
+    ramsizeSegment[4] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
+    ramsizeSegment[5] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
+    ramsizeSegment[6] = gPoolMem;
+    ramsizeSegment[7] = ALIGN16(SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + 16 + ALIGN16(SURFACE_POOL_SIZE * sizeof(struct Surface)) + 16;
+    ramsizeSegment[8] = gMiscMem;
+    ramsizeSegment[9] = sizeof(gAudioHeap);
+    ramsizeSegment[10] = gAudioHeapSize + gAudioInitPoolSize;
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -257,54 +246,152 @@ void print_ram_bar(void) {
 }
 
 // Another epic lookup table, for text this time.
-const char ramNames[8][32] = {
+const char ramNames[][32] = {
     "Buffers",
     "Main",
     "Engine",
     "Framebuffers",
+    "ZBuffer",
     "Goddard",
     "Pools",
     "Collision",
+    "Misc",
     "Audio Heap",
+    "Audio Pools",
 };
 
-const s8 nameTable = sizeof(ramNames) / NUM_TLB_SEGMENTS;
+const char segNames[][32] = {
+    "HUD",
+    "Common1 GFX",
+    "Group0 GFX",
+    "GroupA GFX",
+    "GroupB GFX",
+    "Level GFX",
+    "Common0 GFX",
+    "Textures",
+    "Skybox",
+    "Effects",
+    "GroupA Geo",
+    "GroupB Geo",
+    "Level Geo",
+    "Common0 Geo",
+    "Entry",
+    "Mario Anims",
+    "Demos",
+    "Bhv Scripts",
+    "Menu",
+    "Level Scripts",
+    "Common1 Geo",
+    "Group0 Geo",
+    "",
+    "Languages"
+};
+
+const s8 nameTable = sizeof(ramNames) / 32;
+
+void swap(int* xp, int* yp)
+{
+    int temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+void swapu(u8* xp, u8* yp)
+{
+    u8 temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+void sort_numbers(s32 *values, u8 *values2)
+{
+    int i, j, min_idx;
+
+    // One by one move boundary of unsorted subarray
+    for (i = 0; i < 32; i++) {
+
+        if (values[i] == 0)
+            continue;
+        // Find the minimum element in unsorted array
+        min_idx = i;
+        for (j = i + 1; j < 32; j++)
+            if (values[j] > values[min_idx])
+                min_idx = j;
+
+        // Swap the found minimum element
+        // with the first element
+        swap(&values[min_idx], &values[i]);
+        swapu(&values2[min_idx], &values2[i]);
+    }
+}
+
+void set_segment_memory_printout(u32 segment, u32 amount) {
+    ramsizeSegment[segment + nameTable - 2] = amount;
+}
 
 void print_ram_overview(void) {
-    char textBytes[32];
-    s32 x = 80;
-    s32 y = 16;
-    s32 drawn = 0;
+    char textBytes[64];
+    s32 y = 56;
+    f32 ramSize = RAM_END - 0x80000000;
+    u32 tempNums[32];
+    u8 tempPos[32] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31};
     prepare_blank_box();
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
     finish_blank_box();
 
-    for (u8 i = 0; i <= NUM_TLB_SEGMENTS; i++) {
-        if (drawn == 16) {
-            x = 240;
-            y =  16;
-        }
+    //f32 total = 0;
+    //u32 total2 = 0;
 
-        if (ramsizeSegment[i] == 0) {
+    memcpy(&tempNums, &ramsizeSegment, 32 * 4);
+
+    sort_numbers(&tempNums, &tempPos);
+
+    print_set_envcolour(255, 255, 255, 255);
+    sprintf(textBytes, "Total:");
+    print_small_text(24, 16- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "%06X",RAM_END - 0x80000000);
+    print_small_text(SCREEN_WIDTH/2, 16 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "%X", mempool);
+    print_small_text(SCREEN_WIDTH - 24, 16 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "Used:");
+    print_small_text(24, 28- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "%06X", (RAM_END - 0x80000000) - (main_pool_available() - 0x400));
+    print_small_text(SCREEN_WIDTH/2, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "(%2.3f_)", 100.0f - (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
+    print_small_text(SCREEN_WIDTH - 24, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "Free:");
+    print_small_text(24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "%X", (main_pool_available() - 0x400));
+    print_small_text(SCREEN_WIDTH/2, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    sprintf(textBytes, "(%2.3f_)", (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
+    print_small_text(SCREEN_WIDTH - 24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+    for (u8 i = 0; i < 32; i++) {
+        if (tempNums[i] == 0) {
             continue;
         }
-
-        if (i < 8) {
-            sprintf(textBytes, "%s: %X", ramNames[i], ramsizeSegment[i]);
-        } else {
-            sprintf(textBytes, "Segment %02X: %X", ((i - nameTable) + 2), ramsizeSegment[i]);
+        //total += ((f32)tempNums[i] / ramSize) * 100.0f;
+        //total2 += tempNums[i];
+        if (y - gPPSegScroll > 0 && y - gPPSegScroll < SCREEN_HEIGHT) {
+            if (tempPos[i] < nameTable) {
+                sprintf(textBytes, "%s:", ramNames[tempPos[i]]);
+            } else {
+                sprintf(textBytes, "%s:", segNames[tempPos[i] - nameTable]);
+            }
+            //print_set_envcolour(colourChart[tempPos[i]][0], colourChart[tempPos[i]][1], colourChart[tempPos[i]][2], 255);
+            print_small_text(24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+            sprintf(textBytes, "%X", tempNums[i]);
+            print_small_text(SCREEN_WIDTH/2, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+            sprintf(textBytes, "(%2.3f_)", ((f32)tempNums[i] / ramSize) * 100.0f);
+            print_small_text(SCREEN_WIDTH - 24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
         }
-
-        print_set_envcolour(colourChart[i][0], colourChart[i][1], colourChart[i][2], 255);
-        print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
         y += 12;
-        drawn++;
     }
-
-    sprintf(textBytes, "RAM: %06X/%06X (%d_)", main_pool_available(), mempool, (s32)(((f32)main_pool_available() / (f32)mempool) * 100));
-    print_small_text(SCREEN_CENTER_X, (SCREEN_HEIGHT - 16), textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
-
-    print_ram_bar();
+    /*sprintf(textBytes, "%2.2f", total);
+    print_small_text(32, 32, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    sprintf(textBytes, "%X", total2);
+    print_small_text(32, 48, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    sprintf(textBytes, "%X", (RAM_END - 0x80000000) - total2);
+    print_small_text(32, 64, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);*/
 }
 
 const char *audioPoolNames[NUM_AUDIO_POOLS] = {
@@ -683,6 +770,14 @@ void puppyprint_profiler_process(void) {
     }
 #endif
 
+    if (sPPDebugPage == 3) {
+        if (gPlayer1Controller->buttonDown & U_JPAD && gPPSegScroll > 0)  {
+            gPPSegScroll -= 4;
+        } else if (gPlayer1Controller->buttonDown & D_JPAD && gPPSegScroll < (12 * 32)){
+            gPPSegScroll += 4;
+        }
+    }
+
     if (sDebugMenu) {
         if (gPlayer1Controller->buttonPressed & U_JPAD) sDebugOption--;
         if (gPlayer1Controller->buttonPressed & D_JPAD) sDebugOption++;
@@ -701,6 +796,7 @@ void puppyprint_profiler_process(void) {
             bzero(&gPuppyTimers, sizeof(struct PuppyPrintTimers));
         // Convert all total timers to microseconds, and divide by iterations.
         puppyprint_calculate_average_times();
+        puppyprint_calculate_ram_usage();
         // Since audio runs twice a frame without fail, audio timers are doubled to compensate.
         gPuppyTimers.thread4Time[PERF_TOTAL] *= 2;
         gPuppyTimers.dmaAudioTime[PERF_TOTAL] *= 2;

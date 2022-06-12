@@ -346,7 +346,8 @@ void *load_segment(s32 segment, u8 *srcStart, u8 *srcEnd, u32 side, u8 *bssStart
         }
     }
 #if PUPPYPRINT_DEBUG
-    ramsizeSegment[(segment + nameTable) - 2] = ((s32)srcEnd - (s32)srcStart);
+    u32 ppSize = ALIGN16(srcEnd - srcStart) + 16;
+    set_segment_memory_printout(segment, ppSize);
 #endif
     return addr;
 }
@@ -423,7 +424,8 @@ void *load_segment_decompress(s32 segment, u8 *srcStart, u8 *srcEnd) {
         }
     }
 #if PUPPYPRINT_DEBUG
-    ramsizeSegment[(segment + nameTable) - 2] = (s32)srcEnd - (s32)srcStart;
+    u32 ppSize = ALIGN16((u32)*size) + 16;
+    set_segment_memory_printout(segment, ppSize);
 #endif
     return dest;
 }
@@ -554,6 +556,9 @@ struct MemoryPool *mem_pool_init(u32 size, u32 side) {
         block->next = NULL;
         block->size = pool->totalSpace;
     }
+#if PUPPYPRINT_DEBUG
+    gPoolMem += ALIGN16(size) + 16;
+#endif
     return pool;
 }
 
