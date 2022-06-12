@@ -346,7 +346,9 @@ void unmap_tlbs(void) {
                     osUnmapTLB(gTlbEntries);
                     gTlbSegments[i]--;
                     gTlbEntries--;
+#if PUPPYPRINT_DEBUG
                     set_segment_memory_printout(i, 0);
+#endif
                 }
             } else {
                 gTlbEntries -= gTlbSegments[i];

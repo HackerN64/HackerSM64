@@ -47,16 +47,16 @@ a modern game engine's developer's console.
 #include "buffers/buffers.h"
 
 #define PUPPYPRINT
-#define PUPPYPRINT_DEBUG 1
-
 #ifdef PUPPYPRINT
 
-ColorRGBA gCurrEnvCol;
 #ifdef ENABLE_CREDITS_BENCHMARK
 u8 fDebug = TRUE;
 #else
 u8 fDebug = FALSE;
 #endif
+u8 sPuppyprintTextBuffer[PUPPYPRINT_DEFERRED_BUFFER_SIZE];
+u32 sPuppyprintTextBufferPos; // Location in the buffer of puppyprint deferred text.
+ColorRGBA gCurrEnvCol;
 
 #if PUPPYPRINT_DEBUG
 struct PuppyPrintTimers gPuppyTimers;
@@ -113,8 +113,6 @@ s8 logViewer    = FALSE;
 u8 sPPDebugPage = 0;
 u8 sDebugMenu   = FALSE;
 u8 sDebugOption = 0;
-u8 sPuppyprintTextBuffer[PUPPYPRINT_DEFERRED_BUFFER_SIZE];
-u32 sPuppyprintTextBufferPos; // Location in the buffer of puppyprint deferred text.
 // Profiler values
 s8  perfIteration  = 0;
 s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
@@ -158,8 +156,7 @@ void puppyprint_calculate_ram_usage(void) {
     ramsizeSegment[6] = gPoolMem;
     ramsizeSegment[7] = ALIGN16(SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + 16 + ALIGN16(SURFACE_POOL_SIZE * sizeof(struct Surface)) + 16;
     ramsizeSegment[8] = gMiscMem;
-    ramsizeSegment[9] = sizeof(gAudioHeap);
-    ramsizeSegment[10] = gAudioHeapSize + gAudioInitPoolSize;
+    ramsizeSegment[9] = gAudioHeapSize + gAudioInitPoolSize;
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -256,8 +253,7 @@ const char ramNames[][32] = {
     "Pools",
     "Collision",
     "Misc",
-    "Audio Heap",
-    "Audio Pools",
+    "Audio Heap"
 };
 
 const char segNames[][32] = {
