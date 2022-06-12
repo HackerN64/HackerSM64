@@ -130,7 +130,6 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
         if (gMarioObject == NULL) {
             switchCase->selectedCase = 0;
         } else {
-#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
             if (gCurrLevelNum == LEVEL_BBH) {
                 // In BBH, check for a floor manually, since there is an intangible floor. In custom hacks this can be removed.
                 find_room_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &floor);
@@ -138,9 +137,6 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
                 // Since no intangible floors are nearby, use Mario's floor instead.
                 floor = gMarioState->floor;
             }
-#else
-            floor = gMarioState->floor;
-#endif
             if (floor) {
                 gMarioCurrentRoom = floor->room;
                 s16 roomCase = floor->room - 1;
