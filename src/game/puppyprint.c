@@ -344,23 +344,23 @@ void print_ram_overview(void) {
 
     print_set_envcolour(255, 255, 255, 255);
     sprintf(textBytes, "Total:");
-    print_small_text(24, 16- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(24, 16- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "%06X",RAM_END - 0x80000000);
-    print_small_text(SCREEN_WIDTH/2, 16 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(SCREEN_WIDTH/2, 16 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "%X", mempool);
-    print_small_text(SCREEN_WIDTH - 24, 16 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(SCREEN_WIDTH - 24, 16 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "Used:");
-    print_small_text(24, 28- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(24, 28- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "%06X", (RAM_END - 0x80000000) - (main_pool_available() - 0x400));
-    print_small_text(SCREEN_WIDTH/2, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(SCREEN_WIDTH/2, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "(%2.3f_)", 100.0f - (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
-    print_small_text(SCREEN_WIDTH - 24, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(SCREEN_WIDTH - 24, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "Free:");
-    print_small_text(24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "%X", (main_pool_available() - 0x400));
-    print_small_text(SCREEN_WIDTH/2, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(SCREEN_WIDTH/2, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "(%2.3f_)", (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
-    print_small_text(SCREEN_WIDTH - 24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(SCREEN_WIDTH - 24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     for (u8 i = 0; i < 32; i++) {
         if (tempNums[i] == 0) {
             continue;
@@ -374,20 +374,20 @@ void print_ram_overview(void) {
                 sprintf(textBytes, "%s:", segNames[tempPos[i] - nameTable]);
             }
             //print_set_envcolour(colourChart[tempPos[i]][0], colourChart[tempPos[i]][1], colourChart[tempPos[i]][2], 255);
-            print_small_text(24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+            print_small_text_light(24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
             sprintf(textBytes, "%X", tempNums[i]);
-            print_small_text(SCREEN_WIDTH/2, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+            print_small_text_light(SCREEN_WIDTH/2, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
             sprintf(textBytes, "(%2.3f_)", ((f32)tempNums[i] / ramSize) * 100.0f);
-            print_small_text(SCREEN_WIDTH - 24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
+            print_small_text_light(SCREEN_WIDTH - 24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
         }
         y += 12;
     }
     /*sprintf(textBytes, "%2.2f", total);
-    print_small_text(32, 32, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    print_small_text_light(32, 32, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
     sprintf(textBytes, "%X", total2);
-    print_small_text(32, 48, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    print_small_text_light(32, 48, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
     sprintf(textBytes, "%X", (RAM_END - 0x80000000) - total2);
-    print_small_text(32, 64, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);*/
+    print_small_text_light(32, 64, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);*/
 }
 
 const char *audioPoolNames[NUM_AUDIO_POOLS] = {
@@ -433,7 +433,7 @@ void print_audio_ram_overview(void) {
         print_set_envcolour(colourChart[i][0],
                             colourChart[i][1],
                             colourChart[i][2], 255);
-        print_small_text(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+        print_small_text_light(x, y, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
         y += 12;
 
@@ -461,7 +461,7 @@ void print_audio_ram_overview(void) {
     print_set_envcolour(colourChart[30][0],
                         colourChart[30][1],
                         colourChart[30][2], 255);
-    print_small_text(x, tmpY, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    print_small_text_light(x, tmpY, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
 char consoleLogTable[LOG_BUFFER_SIZE][255];
@@ -500,7 +500,7 @@ void print_console_log(void) {
         if (consoleLogTable[i] == NULL) {
             continue;
         }
-        print_small_text(16, (LINE_HEIGHT - (i * 12)), consoleLogTable[i], PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
+        print_small_text_light(16, (LINE_HEIGHT - (i * 12)), consoleLogTable[i], PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
     }
 }
 #undef LINE_HEIGHT
@@ -522,16 +522,16 @@ void puppyprint_render_collision(void) {
 
     sprintf(textBytes, "Pool Size: %X#Node Size: %X#Surfaces Allocated: %d#Nodes Allocated: %d#Current Cell: %d", (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)), (SURFACE_POOL_SIZE * sizeof(struct Surface)),
             gSurfacesAllocated, gSurfaceNodesAllocated, gVisualSurfaceCount);
-    print_small_text(304, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
+    print_small_text_light(304, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
 
 #ifdef VISUAL_DEBUG
-    print_small_text(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
+    print_small_text_light(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
     switch (viewCycle) {
-        case 0: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 1: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 2: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 3: print_small_text(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 0: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 1: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 2: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 3: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
     }
 
     hitboxView  = ((viewCycle == 1) || (viewCycle == 3));
@@ -555,7 +555,7 @@ void print_basic_profiling(void) {
             gPuppyTimers.rspTime, (gPuppyTimers.rspTime / 333),
             gPuppyTimers.rdpTime, (gPuppyTimers.rdpTime / 333));
 #endif
-    print_small_text(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    print_small_text_light(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
 void puppyprint_render_standard(void) {
@@ -564,7 +564,7 @@ void puppyprint_render_standard(void) {
     print_basic_profiling();
 
     sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
-    print_small_text(16, 124, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+    print_small_text_light(16, 124, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 
 #ifndef ENABLE_CREDITS_BENCHMARK
     // Very little point printing useless info if Mario doesn't even exist.
@@ -575,12 +575,12 @@ void puppyprint_render_standard(void) {
             (s32)(gMarioState->pos[2]),
             (u16)(gMarioState->faceAngle[1]),
             (u32)(gMarioState->action & ACT_ID_MASK));
-        print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+        print_small_text_light(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
     }
 #endif
 
     puppyprint_sprintf_general(textBytes);
-    print_small_text((SCREEN_WIDTH - 24), 40, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+    print_small_text_light((SCREEN_WIDTH - 24), 40, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
 }
 
 void puppyprint_render_minimal(void) {
@@ -606,7 +606,7 @@ void puppycamera_debug_view(void) {
             (s32)(gMarioState->pos[2]),
             (u16)(gMarioState->faceAngle[1]),
             (u32)(gMarioState->action & ACT_ID_MASK));
-        print_small_text(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+        print_small_text_light(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
     }
     // Same for the camera, especially so because this will crash otherwise.
     if (gCamera) {
@@ -615,7 +615,7 @@ void puppycamera_debug_view(void) {
             (s32)(gCamera->pos[1]),
             (s32)(gCamera->pos[2]),
             (u16)(gCamera->yaw));
-        print_small_text((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+        print_small_text_light((SCREEN_WIDTH - 16), 140, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
     }
 }
 
@@ -655,7 +655,7 @@ void render_page_menu(void) {
                 print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
             }
 
-            print_small_text((28 + (MENU_BOX_WIDTH / 2)), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
+            print_small_text_light((28 + (MENU_BOX_WIDTH / 2)), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
         }
     }
 }
