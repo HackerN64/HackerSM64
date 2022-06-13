@@ -1165,6 +1165,91 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     gCurrEnvCol[0] = 255; gCurrEnvCol[1] = 255; gCurrEnvCol[2] = 255; gCurrEnvCol[3] = 255;
 }
 
+// A more lightweight version of print_small_text.
+// Strips all text modifiers so that only standard text remains.
+// Can still support external colouring.
+// Around 30% faster than regular printing.
+void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
+    s32 textX = 0;
+    s32 textY = 0;
+    s32 textPos[2] = { 0, 0 };
+    s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    s32 textLength = amount;
+    s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
+    s32 strLen = strlen(str);
+    Texture *(*fontTex)[] = segmented_to_virtual(&puppyprint_font_lut);
+    s8 offsetY = 0;
+    u8 spaceX = 0;
+    u8 lines = 0;
+    u8 xlu = gCurrEnvCol[3];
+
+    if (amount == PRINT_ALL || amount > strLen) {
+        textLength = strLen;
+    }
+
+    // Calculate the text width for centre and right aligned text.
+    gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
+    if (align == PRINT_TEXT_ALIGN_CENTRE || align == PRINT_TEXT_ALIGN_RIGHT) {
+        for (s32 i = 0; i < strLen; i++) {
+            if (str[i] == '#' || str[i] == 0x0A) {
+                textPos[0] = 0;
+                lines++;
+                wideX[lines] = 0;
+                continue;
+            }
+
+            get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+            textPos[0] += (spaceX + 1) * textSizeTotal;
+            wideX[lines] = MAX(textPos[0], wideX[lines]);
+        }
+
+        if (align == PRINT_TEXT_ALIGN_CENTRE) {
+            textPos[0] = -(wideX[0] / 2);
+        } else {
+            textPos[0] = -(wideX[0]);
+        }
+    }
+
+    lines = 0;
+    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    
+    for (s32 i = 0, j = 0; i < textLength; i++, j++) {
+        if (str[i] == '#' || str[i] == 0x0A) {
+            lines++;
+            if (align == PRINT_TEXT_ALIGN_RIGHT) {
+                textPos[0] = -(wideX[lines]);
+            } else {
+                textPos[0] = -(wideX[lines] / 2);
+            }
+            textPos[1] += 12;
+            continue;
+        }
+
+        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+        if (xlu != prevxlu) {
+            prevxlu = xlu;
+            if (xlu > 250) {
+                gDPSetRenderMode(gDisplayListHead++, G_RM_TEX_EDGE, G_RM_TEX_EDGE2);
+            } else {
+                gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF);
+            }
+        }
+
+        gSPScisTextureRectangle(gDisplayListHead++, (x + textPos[0]) << 2,
+                                                    (y + textPos[1] + offsetY) << 2,
+                                                    (x + textPos[0] + 8) << 2,
+                                                    (y + textPos[1] + offsetY + 12) << 2,
+                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), 1024, 1024);
+        textPos[0] += (spaceX + 1);
+    }
+
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
+
+    // Color reverted to pure white in dl_rgba16_text_end, so carry it over to gCurrEnvCol!
+    // NOTE: if this behavior is ever removed, make sure gCurrEnvCol gets enforced here if the text color is ever altered in the text_iterate_command function.
+    gCurrEnvCol[0] = 255; gCurrEnvCol[1] = 255; gCurrEnvCol[2] = 255; gCurrEnvCol[3] = 255;
+}
+
 // Return color hex nibble
 s32 get_hex_value_at_offset(const char *str, s32 primaryOffset, u32 nibbleOffset, u32 garbageReturnsEnv) {
     s32 val = str[primaryOffset + nibbleOffset];
@@ -1336,15 +1421,19 @@ void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, u8 *spaceX, s8 *offse
         case 'y': if (font == FONT_DEFAULT) *offsetY = 1 * textSizeTotal; break;
     }
 }
+
+u8 gIsLightText = FALSE;
+
 // This is where the deferred printing will be stored. When text is made, it will store text with an 12 byte header, then the rest will be the text data itself.
 // The first 4 bytes of the header will be the X and Y pos
 // The next 4 bytes will be the current envcolour set by print_set_envcolour
 // Then the string length, text alignment, amount and font each get a byte.
 // The data afterwards is the text data itself, using the string length byte to know when to stop.
+#define HEADERSIZE 13
 void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
     u8 strLen = MIN((signed)strlen(str), 255);
     // Compare the cursor position and the string length, plus 12 (header size) and return if it overflows.
-    if (sPuppyprintTextBufferPos + strLen + 12 > sizeof(sPuppyprintTextBuffer))
+    if (sPuppyprintTextBufferPos + strLen + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
         return;
     x += 2048;
     y += 2048;
@@ -1360,8 +1449,15 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 9] = align;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 10] = (amount == -1) ? 255 : amount;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 11] = font;
-    bcopy(str, &sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 12], strLen);
-    sPuppyprintTextBufferPos += strLen + 12;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 12] = gIsLightText;
+    bcopy(str, &sPuppyprintTextBuffer[sPuppyprintTextBufferPos + HEADERSIZE], strLen);
+    sPuppyprintTextBufferPos += strLen + HEADERSIZE;
+}
+
+void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
+    gIsLightText = TRUE;
+    print_small_text_buffered(x, y, str, align, amount, font);
+    gIsLightText = FALSE;
 }
 
 void puppyprint_print_deferred(void) {
@@ -1374,7 +1470,7 @@ void puppyprint_print_deferred(void) {
         u8 length = sPuppyprintTextBuffer[i + 8];
         char *text = mem_pool_alloc(gEffectsMemoryPool, length);
         if (text == NULL) {
-            print_small_text(160, 80, "gEffectsMemoryPool is full.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+            print_small_text_light(160, 80, "gEffectsMemoryPool is full.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
             return;
         }
         s32 x = ((sPuppyprintTextBuffer[i] & 0xFF) << 8);
@@ -1388,15 +1484,21 @@ void puppyprint_print_deferred(void) {
         u8 alignment = sPuppyprintTextBuffer[i + 9];
         u8 amount = (sPuppyprintTextBuffer[i + 10] == 255 ? -1 : amount);
         u8 font = sPuppyprintTextBuffer[i + 11];
-        bcopy(&sPuppyprintTextBuffer[i + 12], text, length);
-        print_small_text(x, y, text, alignment, amount, font);
+        bcopy(&sPuppyprintTextBuffer[i + HEADERSIZE], text, length);
+        if (sPuppyprintTextBuffer[i + 12]) {
+            print_small_text_light(x, y, text, alignment, amount, font);
+        } else {
+            print_small_text(x, y, text, alignment, amount, font);
+        }
         mem_pool_free(gEffectsMemoryPool, text);
         print_set_envcolour(originalEnvCol[0], originalEnvCol[1], originalEnvCol[2], originalEnvCol[3]);
-        i+=length + 12;
+        i+=length + HEADERSIZE;
     }
     //Reset the position back to zero, effectively clearing the buffer.
     sPuppyprintTextBufferPos = 0;
 }
+
+
 
 void render_multi_image(Texture *image, s32 x, s32 y, s32 width, s32 height, UNUSED s32 scaleX, UNUSED s32 scaleY, s32 mode) {
     s32 posW, posH, imW, imH, modeSC, mOne;

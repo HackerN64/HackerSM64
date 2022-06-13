@@ -127,3 +127,5 @@ extern void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s
 extern void puppyprint_print_deferred(void);
 extern s32 puppyprint_strlen(const char *str);
 extern void set_segment_memory_printout(u32 segment, u32 amount);
+extern void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font);
+extern void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
