@@ -832,9 +832,9 @@ void setup_global_light() {
 
 void set_global_light_direction() {
     // Set the light direction
-    gCurDirectionalLight->l->l.dir[0] = -(s8)(gLightDir[0]);
-    gCurDirectionalLight->l->l.dir[1] = -(s8)(gLightDir[1]);
-    gCurDirectionalLight->l->l.dir[2] = -(s8)(gLightDir[2]);
+    gCurDirectionalLight->l->l.dir[0] = gLightDir[0];
+    gCurDirectionalLight->l->l.dir[1] = gLightDir[1];
+    gCurDirectionalLight->l->l.dir[2] = gLightDir[2];
 }
 
 /**
