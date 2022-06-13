@@ -332,7 +332,7 @@ void print_ram_overview(void) {
     u32 tempNums[32];
     u8 tempPos[32] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31};
     prepare_blank_box();
-    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
+    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 168);
     finish_blank_box();
 
     //f32 total = 0;
@@ -411,7 +411,7 @@ void print_audio_ram_overview(void) {
     s32 totalMemory[2] = { 0, 0 };
     s32 audioPoolSizes[NUM_AUDIO_POOLS][2];
     prepare_blank_box();
-    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 192);
+    render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 64, 64, 64, 168);
     finish_blank_box();
 
     puppyprint_get_allocated_pools(audioPoolSizes[0]);
