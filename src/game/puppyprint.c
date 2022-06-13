@@ -1465,6 +1465,7 @@ void puppyprint_print_deferred(void) {
         return;
     bzero(&gCurrEnvCol, sizeof(ColorRGBA));
     print_set_envcolour(255, 255, 255, 255);
+    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
     for (u32 i = 0; i < sPuppyprintTextBufferPos;)
     {
         u8 length = sPuppyprintTextBuffer[i + 8];
