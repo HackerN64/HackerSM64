@@ -567,7 +567,6 @@ extern struct MarioState *gMarioState;
 
 struct SceneLight gPointLights[MAX_POINT_LIGHTS];
 s8 gLightDir[3] = {0x28, 0x28, 0x28};
-u8 gCoherentLightDirEnabled = 0;
 u8 gOverrideDirectionalLight = FALSE;
 u8 gOverrideAmbientLight = FALSE;
 u8 gPointLightCount = 0;
@@ -791,7 +790,6 @@ void set_directional_light(Vec3f direction, s32 red, s32 green, s32 blue)
     gCurDirectionalLight->l[0].l.colc[0] = gCurDirectionalLight->l[0].l.col[0] = red;
     gCurDirectionalLight->l[0].l.colc[1] = gCurDirectionalLight->l[0].l.col[1] = green;
     gCurDirectionalLight->l[0].l.colc[2] = gCurDirectionalLight->l[0].l.col[2] = blue;
-    gCoherentLightDirEnabled = TRUE;
     gOverrideDirectionalLight = TRUE;
 }
 
@@ -833,24 +831,10 @@ void setup_global_light() {
 }
 
 void set_global_light_direction() {
-    if (gCoherentLightDirEnabled)
-    {
-        // Set the light direction in world space
-        gCurDirectionalLight->l->l.dir[0] = -(s8)(gLightDir[0]);
-        gCurDirectionalLight->l->l.dir[1] = -(s8)(gLightDir[1]);
-        gCurDirectionalLight->l->l.dir[2] = -(s8)(gLightDir[2]);
-    }
-    else
-    {
-        // Transform the directional light into view space if not enabled
-        Vec3f transformedLightDirection;
-
-        linear_mtxf_transpose_mul_vec3f(gCameraTransform, transformedLightDirection, globalLightDirection);
-
-        gCurDirectionalLight->l->l.dir[0] = (s8)(transformedLightDirection[0]);
-        gCurDirectionalLight->l->l.dir[1] = (s8)(transformedLightDirection[1]);
-        gCurDirectionalLight->l->l.dir[2] = (s8)(transformedLightDirection[2]);
-    }
+    // Set the light direction
+    gCurDirectionalLight->l->l.dir[0] = -(s8)(gLightDir[0]);
+    gCurDirectionalLight->l->l.dir[1] = -(s8)(gLightDir[1]);
+    gCurDirectionalLight->l->l.dir[2] = -(s8)(gLightDir[2]);
 }
 
 /**

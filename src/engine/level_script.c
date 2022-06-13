@@ -397,7 +397,6 @@ static void level_cmd_begin_area(void) {
     void *geoLayoutAddr = CMD_GET(void *, 4);
 
     gAreaPointLightCount = 0;
-    gCoherentLightDirEnabled = 0;
 
     if (areaIndex < AREA_COUNT) {
         struct GraphNodeRoot *screenArea =
