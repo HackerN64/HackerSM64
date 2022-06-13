@@ -391,14 +391,14 @@ void print_ram_overview(void) {
 }
 
 const char *audioPoolNames[NUM_AUDIO_POOLS] = {
-    "gAudioInitPool",
-    "gNotesAndBuffersPool",
-    "gSeqLoadedPool.persistent.pool",
-    "gSeqLoadedPool.temporary.pool",
-    "gBankLoadedPool.persistent.pool",
-    "gBankLoadedPool.temporary.pool",
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
-    "gBetterReverbPool",
+    "Audio Init Pool",
+    "Notes And Buffers Pool",
+    "Persistent Sequence Pool",
+    "Persistent Bank Pool",
+    "Temporary Sequence Pool",
+    "Temporary Bank Pool",
+#ifdef BETTER_REVERB
+    "Better Reverb Pool",
 #endif
 };
 

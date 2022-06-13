@@ -39,7 +39,7 @@
 
 #define AUDIO_ALIGN(val, amnt) (((val) + (1 << amnt) - 1) & ~((1 << amnt) - 1))
 
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+#ifdef BETTER_REVERB
 /* ----------------------------------------------------------------------BEGIN REVERB PARAMETERS---------------------------------------------------------------------- */
 
 
@@ -61,6 +61,7 @@
  * 
  * This is also known to cause severe lag on emulators that have counter factor set to 2 or greater.
  * Be sure either you alert the user in advance, or check for and set betterReverbDownsampleEmulator to -1 if it's detected the user isn't using good settings.
+ * Reducing performance heavy parameters or using RCVI hack may be another working solution to this problem.
  */
 
 
@@ -80,28 +81,28 @@ s8 betterReverbDownsampleEmulator = 2;
 // This value represents the number of filters to use with the reverb. This can be decreased to improve performance, but at the cost of a lesser presence of reverb in the final audio.
 // Filter count should always be a multiple of 3. Never ever set this value to be greater than NUM_ALLPASS.
 // Setting it to anything less than 3 will disable reverb outright.
-// This can be changed at any time, but is best set when calling audio_reset_session.
+// This can be changed at any time, but is best set immediately before calling audio_reset_session.
 u32 reverbFilterCountConsole = (NUM_ALLPASS - 6);
 
 // This value represents the number of filters to use with the reverb. This can be decreased to improve performance, but at the cost of a lesser presence of reverb in the final audio.
 // Filter count should always be a multiple of 3. Never ever set this value to be greater than NUM_ALLPASS.
 // Setting it to anything less than 3 will disable reverb outright.
-// This can be changed at any time, but is best set when calling audio_reset_session.
+// This can be changed at any time, but is best set immediately before calling audio_reset_session.
 u32 reverbFilterCountEmulator = NUM_ALLPASS;
 
 // Set this to TRUE to use mono over stereo for reverb. This should increase performance, but at the cost of a less fullfilling reverb experience.
 // If performance is desirable, it is recommended to change reverbFilterCountConsole or betterReverbDownsampleConsole first.
-// This can be changed at any time, but is best set when calling audio_reset_session.
+// This can be changed at any time, but is best set immediately before calling audio_reset_session.
 u8 monoReverbConsole = FALSE;
 
 // Set this to TRUE to use mono over stereo for reverb. This should increase performance, but at the cost of a less fullfilling reverb experience.
 // If performance is desirable, it is recommended to change reverbFilterCountEmulator or betterReverbDownsampleEmulator first.
-// This can be changed at any time, but is best set when calling audio_reset_session.
+// This can be changed at any time, but is best set immediately before calling audio_reset_session.
 u8 monoReverbEmulator = FALSE;
 
 // This value controls the size of the reverb buffer. It affects the global reverb delay time. This variable is one of the easiest to control.
-// It is not recommended setting this to values greater than 0x1000 * 2^(downsample factor - 1), as you run the risk of running into a memory issue (though this is far from a guarantee).
 // Setting the value lower than the downsample buffer size will destroy the game audio. This is taken into account automatically, but also means the value set here isn't what always gets used.
+// Similarly, this value maxes out at (REVERB_WINDOW_SIZE_MAX * 2^(downsample factor - 1)).
 // If this value is changed, it will go into effect the next time audio_reset_session is called.
 // Set to -1 to use a default preset instead. Higher values represent more audio delay (usually better for echoey spaces).
 s32 betterReverbWindowsSize = -1;
@@ -120,32 +121,15 @@ s32 betterReverbWindowsSize = -1;
 
 // These values affect filter delays. Bigger values will result in fatter echo (and more memory); must be cumulatively smaller than BETTER_REVERB_SIZE/2.
 // If setting a reverb downsample value to 1, these must be cumulatively smaller than BETTER_REVERB_SIZE/4.
-// These values should never be changed unless in this declaration or during a call to audio_reset_session, as it could otherwise lead to a major memory leak or garbage audio.
-// None of the delay values should ever be smaller than 1 either; these are s32s purely to avoid typecasts.
-// These values are currently set by using delaysBaseline in the audio_reset_session function, so its behavior must be overridden to use dynamically (or at all).
-s32 delaysL[NUM_ALLPASS] = {
+// None of the delay values should ever be smaller than 1; these are s32s purely to avoid typecasts.
+// These values are applied any time audio_reset_session is called, and as such can be changed at any time without issues.
+s32 delaysBaselineL[NUM_ALLPASS] = {
     1080, 1352, 1200,
     1200, 1232, 1432,
     1384, 1048, 1352,
      928, 1504, 1512
 };
-s32 delaysR[NUM_ALLPASS] = {
-    1384, 1352, 1048,
-     928, 1512, 1504,
-    1080, 1200, 1352,
-    1200, 1432, 1232
-};
-
-// Like the delays array, but represents default max values that don't change (also probably somewhat redundant)
-// Change this array rather than the delays array to customize reverb delay times globally.
-// Similarly to delaysL/R, these should be kept within the memory constraints defined by BETTER_REVERB_SIZE.
-const s32 delaysBaselineL[NUM_ALLPASS] = {
-    1080, 1352, 1200,
-    1200, 1232, 1432,
-    1384, 1048, 1352,
-     928, 1504, 1512
-};
-const s32 delaysBaselineR[NUM_ALLPASS] = {
+s32 delaysBaselineR[NUM_ALLPASS] = {
     1384, 1352, 1048,
      928, 1512, 1504,
     1080, 1200, 1352,
@@ -164,10 +148,12 @@ s32 reverbFilterCount   =  NUM_ALLPASS;
 s32 reverbFilterCountm1 = (NUM_ALLPASS - 1);
 u8 monoReverb = FALSE;
 u8 toggleBetterReverb = TRUE;
-s32 allpassIdxL[NUM_ALLPASS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-s32 allpassIdxR[NUM_ALLPASS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-s32     tmpBufL[NUM_ALLPASS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-s32     tmpBufR[NUM_ALLPASS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+s32 allpassIdxL[NUM_ALLPASS] = {0};
+s32 allpassIdxR[NUM_ALLPASS] = {0};
+s32     tmpBufL[NUM_ALLPASS] = {0};
+s32     tmpBufR[NUM_ALLPASS] = {0};
+s32     delaysL[NUM_ALLPASS] = {0};
+s32     delaysR[NUM_ALLPASS] = {0};
 s32 **delayBufsL;
 s32 **delayBufsR;
 #endif
@@ -206,7 +192,7 @@ struct SynthesisReverb gSynthesisReverb;
 u8 sAudioSynthesisPad[0x20];
 #endif
 
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+#ifdef BETTER_REVERB
 static inline void reverb_samples(s16 *outSampleL, s16 *outSampleR, s32 inSampleL, s32 inSampleR) {
     s32 i = 0;
     s32 j = 0;

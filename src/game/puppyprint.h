@@ -47,7 +47,7 @@ enum rspFlags
 };
 
 #if PUPPYPRINT_DEBUG
-#if defined(BETTER_REVERB) && (defined(VERSION_US) || defined(VERSION_JP))
+#ifdef BETTER_REVERB
 #define NUM_AUDIO_POOLS 7
 #else
 #define NUM_AUDIO_POOLS 6
