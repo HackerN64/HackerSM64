@@ -371,7 +371,10 @@ void __osContGetInitDataEx(u8* pattern, OSContStatus* data) {
         if (data->error == 0) {
             data->type = requestHeader.typel << 8 | requestHeader.typeh;
             
-            if (data->type & CONT_GCN) {
+            // Check if the input type is a gamecube controller
+            // Some mupen cores seem to send back a controller type of 0xFFFF if the core doesn't initialize the input plugin quickly enough,
+            //   so check for that and set the input type as N64 controller if so.
+            if ((data->type & CONT_GCN) && (s16)data->type != -1) {
                 __osControllerTypes[i] = CONT_TYPE_GCN;
             } else {
                 __osControllerTypes[i] = CONT_TYPE_N64;
