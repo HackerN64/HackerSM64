@@ -609,11 +609,10 @@ void read_controller_inputs(s32 threadID) {
 
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
-            s32 changedButtons = controller->controllerData->button ^ controller->buttonDown;
             controller->rawStickX = controller->controllerData->stick_x;
             controller->rawStickY = controller->controllerData->stick_y;
-            controller->buttonPressed = controller->controllerData->button & changedButtons;
-            controller->buttonReleased = controller->buttonDown & changedButtons;
+            controller->buttonPressed = ~controller->buttonDown & controller->controllerData->button;
+            controller->buttonReleased = ~controller->controllerData->button & controller->buttonDown;
             // 0.5x A presses are a good meme
             controller->buttonDown = controller->controllerData->button;
             adjust_analog_stick(controller);
