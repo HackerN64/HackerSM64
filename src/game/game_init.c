@@ -609,7 +609,7 @@ void read_controller_inputs(s32 threadID) {
 
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
-            u16 changedButtons = controller->controllerData->button ^ controller->buttonDown;
+            s32 changedButtons = controller->controllerData->button ^ controller->buttonDown;
             controller->rawStickX = controller->controllerData->stick_x;
             controller->rawStickY = controller->controllerData->stick_y;
             controller->buttonPressed = controller->controllerData->button & changedButtons;
