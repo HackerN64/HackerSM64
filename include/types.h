@@ -44,7 +44,7 @@ struct Controller {
   /*0x18*/ OSContStatus *statusData;
   /*0x1C*/ OSContPad *controllerData;
 #if ENABLE_RUMBLE
-  /*0x1C*/ s32 port;
+  /*0x1E*/ s32 port;
 #endif
 };
 
