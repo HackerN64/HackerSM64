@@ -14,6 +14,7 @@
 #include "print.h"
 #include "sm64.h"
 #include "types.h"
+#include "puppyprint.h"
 
 #ifdef VANILLA_DEBUG
 
@@ -514,4 +515,134 @@ void debug_enemy_unknown(s16 *enemyArr) {
     enemyArr[7] = gDebugInfo[DEBUG_PAGE_ENEMYINFO][4];
 }
 
+#endif
+
+#ifdef ENABLE_CREDITS_BENCHMARK
+#define BENCHMARK_ITERATIONS 10 * 30
+struct BenchMark {
+    u32 graph[BENCHMARK_ITERATIONS];
+    u32 behaviour[BENCHMARK_ITERATIONS];
+    u32 audio[BENCHMARK_ITERATIONS];
+    u32 cpu[BENCHMARK_ITERATIONS];
+    u32 rsp[BENCHMARK_ITERATIONS];
+    u32 rdp[BENCHMARK_ITERATIONS];
+    u32 fps[BENCHMARK_ITERATIONS];
+};
+
+struct BenchMark gBenchMark;
+u8 benchIndex = 0;
+u32 benchFrames = 0;
+u8 benchIteration = 0;
+
+void init_credits_benchmark(void) {
+    bzero(&gBenchMark, sizeof(struct BenchMark));
+#ifdef DISABLE_AA
+    append_puppyprint_log("Antialiasing Disabled.\n");
+#else
+    append_puppyprint_log("Antialiasing Enabled.\n");
+#endif
+#ifdef HD_SHADOWS
+    append_puppyprint_log("HD Shadows Enabled.\n");
+#else
+    append_puppyprint_log("HD Shadows Disabled.\n");
+#endif
+#if defined(IA8_COINS)
+    append_puppyprint_log("Using HD Coins.\n");
+#elif defined(IA_COINS_30FPS)
+    append_puppyprint_log("Using HD 30FPS Coins.\n");
+#else
+    append_puppyprint_log("Using Original Coins.\n");
+#endif
+    append_puppyprint_log("Skybox size is set to %dx\n", SKYBOX_SIZE);
+}
+
+extern f32 calculate_and_update_fps();
+
+void iterate_credits_benchmark(void) {
+    gBenchMark.cpu[benchFrames] = cpuTime;
+    gBenchMark.graph[benchFrames] = graphTime[perfIteration];
+    gBenchMark.behaviour[benchFrames] = behaviourTime[perfIteration];
+    gBenchMark.audio[benchFrames] = audioTime[perfIteration];
+    gBenchMark.rsp[benchFrames] = rspTime;
+    gBenchMark.rdp[benchFrames] = rdpTime;
+    gBenchMark.fps[benchFrames] = (s32)((f32) (calculate_and_update_fps() * 10.0f));
+    benchFrames = MIN(benchFrames + 1, BENCHMARK_ITERATIONS - 1);
+}
+
+void swap(int* xp, int* yp)
+{
+    int temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+void sort_numbers(s32 *values)
+{
+    int i, j, min_idx;
+ 
+    // One by one move boundary of unsorted subarray
+    for (i = 0; i < benchFrames - 1; i++) {
+ 
+        // Find the minimum element in unsorted array
+        min_idx = i;
+        for (j = i + 1; j < benchFrames; j++)
+            if (values[j] < values[min_idx])
+                min_idx = j;
+ 
+        // Swap the found minimum element
+        // with the first element
+        swap(&values[min_idx], &values[i]);
+    }
+}
+
+u32 calculate_credits_average(u32 *values) {
+    u64 total = 0;
+    // Skip the first few frames because it'll dilute the results.
+    for (u32 i = 2; i < benchFrames; i++) {
+        total += values[i];
+    }
+    sort_numbers(values);
+    return total / benchFrames;
+}
+
+void benchmark_scene_swap(void) {
+    s32 average;
+    // Low and high is the low 5% and high 5% of data.
+    // I wanted 1%, but it wasn't good enough for graph.
+    s32 low = benchFrames * 0.05f;;
+    s32 high = MIN(benchFrames - (benchFrames * 0.05f), benchFrames - 1);
+    if (!benchIteration) {
+        benchIteration++;
+    }
+    else {
+        benchIndex++;
+        // Since entering the game and initiating the credits both have this function run, we just skip printing the first
+        // two times to not clutter the output with useless data.
+        if (benchIndex < 3) {
+            benchFrames = 0;
+            if (benchIndex == 2) {
+                append_puppyprint_log("Benchmark Start\n");
+                init_credits_benchmark();
+            }
+            return;
+        }
+        append_puppyprint_log("Level %d results:\n", gCurrLevelNum);
+        average = calculate_credits_average(gBenchMark.fps);
+        append_puppyprint_log("FPS: (Average: %2.2f) (Low: %2.2f) (High: %2.2f)\n", (f32) (average / 10.0f), (f32) (gBenchMark.fps[low] / 10.0f), (f32) (gBenchMark.fps[high] / 10.0f));
+        average = calculate_credits_average(gBenchMark.behaviour);
+        append_puppyprint_log("Behaviour: (Average: %dus) (Low: %dus) (High: %dus)\n", (u32)OS_CYCLES_TO_USEC(average), (u32)OS_CYCLES_TO_USEC(gBenchMark.behaviour[low]), (u32)OS_CYCLES_TO_USEC(gBenchMark.behaviour[high]));
+        average = calculate_credits_average(gBenchMark.graph);
+        append_puppyprint_log("Graph: (Average: %dus) (Low: %dus) (High: %dus)\n", (u32)OS_CYCLES_TO_USEC(average), (u32)OS_CYCLES_TO_USEC(gBenchMark.graph[low]), (u32)OS_CYCLES_TO_USEC(gBenchMark.graph[high]));
+        average = calculate_credits_average(gBenchMark.audio);
+        append_puppyprint_log("Audio: (Average: %dus) (Low: %dus) (High: %dus)\n", (u32)OS_CYCLES_TO_USEC(average), (u32)OS_CYCLES_TO_USEC(gBenchMark.audio[low]), (u32)OS_CYCLES_TO_USEC(gBenchMark.audio[high]));
+        average = calculate_credits_average(gBenchMark.cpu);
+        append_puppyprint_log("CPU Overall: (Average: %dus) (Low: %dus) (High: %dus)\n", (u32)(average), (u32)(gBenchMark.cpu[low]), (u32)(gBenchMark.cpu[high]));
+        average = calculate_credits_average(gBenchMark.rsp);
+        append_puppyprint_log("RSP Overall: (Average: %dus) (Low: %dus) (High: %dus)\n", (u32)(average), (u32)(gBenchMark.rsp[low]), (u32)(gBenchMark.rsp[high]));
+        average = calculate_credits_average(gBenchMark.rdp);
+        //append_puppyprint_log("RDP Overall: (Average: %dus) (Low: %dus) (High: %dus)\n", (s32)((average * 10) / 62.5f), (s32)((gBenchMark.rdp[low] * 10) / 62.5f), (s32)((gBenchMark.rdp[high] * 10) / 62.5f));
+        append_puppyprint_log("RDP Overall: (Average: %dus) (Low: %dus) (High: %dus)\n", average, gBenchMark.rdp[low], gBenchMark.rdp[high]);
+        benchFrames = 0;
+    }
+}
 #endif

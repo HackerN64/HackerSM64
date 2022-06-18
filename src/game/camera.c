@@ -27,6 +27,7 @@
 #include "level_table.h"
 #include "config.h"
 #include "puppyprint.h"
+#include "debug.h"
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
@@ -3121,6 +3122,9 @@ void update_camera(struct Camera *c) {
     profiler_update(cameraTime, first);
     cameraTime[perfIteration] -= collisionTime[perfIteration]-colTime;
 #endif
+#ifdef ENABLE_CREDITS_BENCHMARK
+    iterate_credits_benchmark();
+#endif
 }
 
 /**
@@ -3342,6 +3346,9 @@ void init_camera(struct Camera *c) {
     c->nextYaw = gLakituState.yaw;
 #ifdef PUPPYCAM
     puppycam_init();
+#endif
+#ifdef ENABLE_CREDITS_BENCHMARK
+    benchmark_scene_swap();
 #endif
 }
 

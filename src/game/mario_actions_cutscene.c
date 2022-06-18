@@ -2470,6 +2470,11 @@ enum {
 };
 
 static s32 act_end_peach_cutscene(struct MarioState *m) {
+#ifdef ENABLE_CREDITS_BENCHMARK
+play_cutscene_music(SEQUENCE_ARGS(15, SEQ_LEVEL_WATER));
+level_trigger_warp(m, WARP_OP_CREDITS_NEXT);
+return 0;
+#endif
     switch (m->actionArg) {
         case END_PEACH_CUTSCENE_MARIO_FALLING:
             end_peach_cutscene_mario_falling(m);
@@ -2546,6 +2551,7 @@ static s32 act_credits_cutscene(struct MarioState *m) {
         }
     }
 
+#ifndef ENABLE_CREDITS_BENCHMARK
     if (m->actionTimer >= TIMER_CREDITS_SHOW) {
         if (m->actionState < 40) {
             m->actionState += 2;
@@ -2563,6 +2569,7 @@ static s32 act_credits_cutscene(struct MarioState *m) {
 
         override_viewport_and_clip(&sEndCutsceneVp, 0, 0, 0, 0);
     }
+#endif
 
     if (m->actionTimer == TIMER_CREDITS_PROGRESS) {
         reset_cutscene_msg_fade();
@@ -2573,7 +2580,17 @@ static s32 act_credits_cutscene(struct MarioState *m) {
     }
 
     if (m->actionTimer++ == TIMER_CREDITS_WARP) {
+/*#ifndef ENABLE_CREDITS_BENCHMARK
+        if (benchIteration == 0) {
+            benchIteration = 1;
+            level_trigger_warp(m, WARP_OP_CREDITS_SAME)
+        } else {
+            benchIteration = 0;
+            level_trigger_warp(m, WARP_OP_CREDITS_NEXT);
+        }
+#else*/
         level_trigger_warp(m, WARP_OP_CREDITS_NEXT);
+//#endif
     }
 
     m->marioObj->header.gfx.angle[1] += (gCurrCreditsEntry->actNum & 0xC0) << 8;

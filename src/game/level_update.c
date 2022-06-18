@@ -794,6 +794,11 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
                 }
                 fadeMusic = FALSE;
                 break;
+            case WARP_OP_CREDITS_SAME:
+                sDelayedWarpTimer = 20;
+                play_transition(WARP_TRANSITION_FADE_INTO_COLOR, sDelayedWarpTimer, 0x00, 0x00, 0x00);
+                fadeMusic = FALSE;
+                break;
         }
 
         if (fadeMusic && gCurrDemoInput == NULL) {
@@ -1237,9 +1242,9 @@ s32 init_level(void) {
 
 #if PUPPYPRINT_DEBUG
 #ifdef PUPPYPRINT_DEBUG_CYCLES
-    append_puppyprint_log("Level loaded in %dc", (s32)(osGetTime() - first));
+    append_puppyprint_log("Level %d loaded in %dc\n", gCurrLevelNum, (s32)(osGetTime() - first));
 #else
-    append_puppyprint_log("Level loaded in %dus", (s32)(OS_CYCLES_TO_USEC(osGetTime() - first)));
+    append_puppyprint_log("Level %d loaded in %dus\n",gCurrLevelNum, (s32)(OS_CYCLES_TO_USEC(osGetTime() - first)));
 #endif
 #endif
     return TRUE;
@@ -1329,6 +1334,20 @@ s32 lvl_set_current_level(UNUSED s16 initOrUpdate, s32 levelNum) {
  * Play the "thank you so much for to playing my game" sound.
  */
 s32 lvl_play_the_end_screen_sound(UNUSED s16 initOrUpdate, UNUSED s32 levelNum) {
+#ifdef ENABLE_CREDITS_BENCHMARK
+    append_puppyprint_log("Benchmark End\n");
+    /*append_puppyprint_log("░░░░░░░░░░░░░░░░░░░░\n");
+    append_puppyprint_log("░▄▀▄▀▀▀▀▄▀▄░░░░░░░░░\n");
+    append_puppyprint_log("░█░░░░░░░░▀▄░░░░░░▄░\n");
+    append_puppyprint_log("█░░▀░░▀░░░░░▀▄▄░░█░█\n");
+    append_puppyprint_log("█░▄░█▀░▄░░░░░░░▀▀░░█\n");
+    append_puppyprint_log("█░░▀▀▀▀░░░░░░░░░░░░█\n");
+    append_puppyprint_log("█░░░░░░░░░░░░░░░░░░█\n");
+    append_puppyprint_log("█░░░░░░░░░░░░░░░░░░█\n");
+    append_puppyprint_log("░█░░▄▄░░▄▄▄▄░░▄▄░░█░\n");
+    append_puppyprint_log("░█░▄▀█░▄▀░░█░▄▀█░▄▀░\n");
+    append_puppyprint_log("░░▀░░░▀░░░░░▀░░░▀░░░\n");*/
+#endif
     play_sound(SOUND_MENU_THANK_YOU_PLAYING_MY_GAME, gGlobalSoundSource);
     return TRUE;
 }
