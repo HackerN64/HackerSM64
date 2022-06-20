@@ -47,11 +47,9 @@ struct gPuppyOptions
 {
     s16 analogue;
     s16 sensitivityX;
-    s16 sensitivityY;
     s16 invertX;
-    s16 invertY;
-    s16 turnAggression;
     s16 inputType;
+    s16 turnHelper;
 };
 
 struct gPuppyStruct
