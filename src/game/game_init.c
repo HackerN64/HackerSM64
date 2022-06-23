@@ -681,6 +681,11 @@ void init_controllers(void) {
             gControllers[cont++].controllerData = &gControllerPads[port];
         }
     }
+    if (__osControllerTypes[1] == CONT_TYPE_GCN) {
+        gPlayer1Controller = &gControllers[1];
+    } else {
+        gPlayer1Controller = &gControllers[0];
+    }
 }
 
 // Game thread core
