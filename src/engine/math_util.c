@@ -27,6 +27,14 @@ Vec3s gVec3sOne  = {     1,     1,     1 };
 
 static u16 gRandomSeed16;
 
+<<<<<<< Updated upstream
+=======
+// Generate a pseudorandom integer from 0 to 255.
+u8 random_u8(void) {
+    return random_u16() & 0xFF;
+}
+
+>>>>>>> Stashed changes
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
 u32 random_u16(void) {
     if (gRandomSeed16 == 22026) {
@@ -53,6 +61,14 @@ u32 random_u16(void) {
     return gRandomSeed16;
 }
 
+<<<<<<< Updated upstream
+=======
+// Generate a pseudorandom integer in the specified range.
+s16 random_range(s16 min, s16 max) {
+    return min + (random_u16() % (max - min));
+}
+
+>>>>>>> Stashed changes
 // Generate a pseudorandom float in the range [0, 1).
 f32 random_float(void) {
     return ((f32) random_u16() / (f32) 0x10000);
@@ -60,7 +76,7 @@ f32 random_float(void) {
 
 // Return either -1 or 1 with a 50:50 chance.
 s32 random_sign(void) {
-    return ((random_u16() >= 0x7FFF) ? 1 : -1);
+    return (random_u16() & 2) -1;
 }
 
 /// Returns the lowest of three values.
