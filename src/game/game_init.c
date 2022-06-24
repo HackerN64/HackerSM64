@@ -613,7 +613,7 @@ void read_controller_inputs(s32 threadID) {
             if (oldButton & Z_TRIG) {
                 newButton |= L_TRIG;
             }
-            if (controller->controllerData->l_trig > 64) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
+            if (controller->controllerData->l_trig > 85) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
                 newButton |= Z_TRIG;
             }
             controller->controllerData->button = newButton;
