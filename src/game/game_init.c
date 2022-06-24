@@ -606,7 +606,18 @@ void read_controller_inputs(s32 threadID) {
 
     for (i = 0; i < 2; i++) {
         struct Controller *controller = &gControllers[i];
-
+        // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
+        u32 oldButton = controller->controllerData->button;
+        if (gIsConsole && __osControllerTypes[i] == CONT_TYPE_GCN) {
+            u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
+            if (oldButton & Z_TRIG) {
+                newButton |= L_TRIG;
+            }
+            if (controller->controllerData->l_trig > 64) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
+                newButton |= Z_TRIG;
+            }
+            controller->controllerData->button = newButton;
+        }
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             controller->rawStickX = controller->controllerData->stick_x;
