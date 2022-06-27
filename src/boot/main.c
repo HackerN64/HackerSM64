@@ -334,7 +334,9 @@ void check_cache_emulation() {
 }
 
 extern void crash_screen_init(void);
-
+#ifdef RCVI_HACK
+extern OSViMode VI;
+#endif
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
@@ -365,6 +367,13 @@ void thread3_main(UNUSED void *arg) {
         } else {
             gCacheEmulated = FALSE;
         }
+#ifdef RCVI_HACK
+        VI.comRegs.vSync = 525*4;   
+        change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
+        osViSetMode(&VI);
+        osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
+        osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
+#endif
     } else {
         gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
