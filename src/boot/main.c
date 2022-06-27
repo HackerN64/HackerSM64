@@ -368,7 +368,7 @@ void thread3_main(UNUSED void *arg) {
             gCacheEmulated = FALSE;
         }
 #ifdef RCVI_HACK
-        VI.comRegs.vSync = 525*4;   
+        VI.comRegs.vSync = 525*20;   
         change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
         osViSetMode(&VI);
         osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
