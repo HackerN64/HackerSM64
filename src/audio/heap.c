@@ -169,7 +169,7 @@ void reset_bank_and_seq_load_status(void) {
 #ifdef VERSION_SH
     bzero(&gBankLoadStatus, sizeof(gBankLoadStatus));
     bzero(&gUnkLoadStatus,  sizeof(gUnkLoadStatus));
-    bzero(&gSeqLoadStatus,  sizeof(gBankLoadStatus));
+    bzero(&gSeqLoadStatus,  sizeof(gSeqLoadStatus));
 #else
     bzero(&gBankLoadStatus, sizeof(gBankLoadStatus)); // Setting this array to zero is equivilent to SOUND_LOAD_STATUS_NOT_LOADED
     bzero(&gSeqLoadStatus,  sizeof(gSeqLoadStatus));  // Same dealio
