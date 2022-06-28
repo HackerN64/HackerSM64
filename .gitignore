@@ -2145,4 +2145,4 @@ lib/libs2d_engine.a
 *.orig
 
 # :Zone_Identifier files
-**/*Zone.Identifier
+*Zone.Identifier
