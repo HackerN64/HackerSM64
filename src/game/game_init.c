@@ -609,7 +609,7 @@ void read_controller_inputs(s32 threadID) {
         struct Controller *controller = &gControllers[i];
         // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
         u32 oldButton = controller->controllerData->button;
-        if (gIsConsole && gGamecubeControllerPort) {
+        if (gIsConsole && (gGamecubeControllerPort >= 0)) {
             u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
             if (oldButton & Z_TRIG) {
                 newButton |= L_TRIG;
