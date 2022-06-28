@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <PR/os_internal_reg.h>
 
 #include "sm64.h"
 #include "gfx_dimensions.h"
@@ -45,6 +46,7 @@ OSContStatus gControllerStatuses[4];
 OSContPad gControllerPads[4];
 u8 gControllerBits;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
+u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 u8 gCustomDebugMode;
@@ -390,6 +392,21 @@ void draw_reset_bars(void) {
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 }
 
+void check_cache_emulation() {
+    // Disable interrupts to ensure that nothing evicts the variable from cache while we're using it.
+    u32 saved = __osDisableInt();
+    // Create a variable with an initial value of 1. This value will remain cached.
+    volatile u8 sCachedValue = 1;
+    // Overwrite the variable directly in RDRAM without going through cache.
+    // This should preserve its value of 1 in dcache if dcache is emulated correctly.
+    *(u8*)(K0_TO_K1(&sCachedValue)) = 0;
+    // Read the variable back from dcache, if it's still 1 then cache is emulated correctly.
+    // If it's zero, then dcache is not emulated correctly.
+    gCacheEmulated = sCachedValue;
+    // Restore interrupts
+    __osRestoreInt(saved);
+}
+
 /**
  * Initial settings for the first rendered frame.
  */
@@ -401,6 +418,7 @@ void render_init(void) {
         gIsConsole = FALSE;
         gBorderHeight = BORDER_HEIGHT_EMULATOR;
         gIsVC = IS_VC();
+        check_cache_emulation();
     } else {
         gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
@@ -418,7 +436,8 @@ void render_init(void) {
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
+    // Currently, Ares passes the cache emulation test and has issues with single buffering so disable it there as well.
+    if (gIsConsole || gIsVC || gCacheEmulated) {
         sRenderingFramebuffer++;
     }
     gGlobalTimer++;
@@ -456,8 +475,8 @@ void display_and_vsync(void) {
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
-    // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
-    if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
+    // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
+    if (gIsConsole || gIsVC || gCacheEmulated) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }
