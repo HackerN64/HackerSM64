@@ -45,6 +45,7 @@ struct GfxPool *gGfxPool;
 OSContStatus gControllerStatuses[4];
 OSContPadEx gControllerPads[4];
 u8 gControllerBits;
+s8 gGamecubeControllerPort = -1; // HackerSM64: This is set to -1 if there's no GC controller, 0 if there's one in the first port and 1 if there's one in the second port.
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
@@ -615,7 +616,7 @@ void read_controller_inputs(s32 threadID) {
         struct Controller *controller = &gControllers[i];
         // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
         u32 oldButton = controller->controllerData->button;
-        if (gIsConsole && __osControllerTypes[i] == CONT_TYPE_GCN) {
+        if (gIsConsole && gGamecubeControllerPort) {
             u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
             if (oldButton & Z_TRIG) {
                 newButton |= L_TRIG;
@@ -702,8 +703,12 @@ void init_controllers(void) {
         }
     }
     if (__osControllerTypes[1] == CONT_TYPE_GCN) {
+        gGamecubeControllerPort = 1;
         gPlayer1Controller = &gControllers[1];
     } else {
+        if (__osControllerTypes[0] == CONT_TYPE_GCN) {
+            gGamecubeControllerPort = 0;
+        }
         gPlayer1Controller = &gControllers[0];
     }
 }
