@@ -11,14 +11,8 @@
 */
 // #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
-// Disable lives and hide the lives counter
-#define DISABLE_LIVES
-
-// Save number of lives to the save file (Does nothing if DISABLE_LIVES is enabled)
-#define SAVE_NUM_LIVES
-
-// The number of lives Mario starts with after a game over or starting the game for the first time (must be lower than 127)
-#define DEFAULT_NUM_LIVES 4
+// Enable lives and the lives counter. The number next to the define is the number of lives you start with. 
+// #define ENABLE_LIVES 4
 
 // This can be 0..127
 #define MAX_NUM_LIVES   100
