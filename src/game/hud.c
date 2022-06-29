@@ -27,7 +27,7 @@
  **/
 
 #ifdef BREATH_METER
-// #ifdef DISABLE_LIVES
+// #ifndef ENABLE_LIVES
 // #define HUD_BREATH_METER_X         64
 // #define HUD_BREATH_METER_Y        200
 // #define HUD_BREATH_METER_HIDDEN_Y 300
@@ -562,7 +562,7 @@ void render_hud(void) {
             render_hud_cannon_reticle();
         }
 
-#ifndef DISABLE_LIVES
+#ifdef ENABLE_LIVES
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_LIVES) {
             render_hud_mario_lives();
         }
