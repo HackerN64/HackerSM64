@@ -60,7 +60,7 @@
  * Generally speaking, a sound that doesn't seem to be fading at a natural rate is a parameter red flag (also known as feedback).
  * 
  * This is also known to cause severe lag on emulators that have counter factor set to 2 or greater.
- * If this is an issue, it is recommended you enable RCVI hack in the ROM's configuration. Alternatively, you can reduce the reverb parameters here to compensate.
+ * If this is an issue, it is recommended you enable RCVI hack in the config files. Alternatively, you can reduce the reverb parameters here to compensate.
  */
 
 
