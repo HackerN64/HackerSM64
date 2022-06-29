@@ -27,15 +27,9 @@
  **/
 
 #ifdef BREATH_METER
-// #ifndef ENABLE_LIVES
-// #define HUD_BREATH_METER_X         64
-// #define HUD_BREATH_METER_Y        200
-// #define HUD_BREATH_METER_HIDDEN_Y 300
-// #else
 #define HUD_BREATH_METER_X         40
 #define HUD_BREATH_METER_Y         32
 #define HUD_BREATH_METER_HIDDEN_Y -20
-// #endif
 #endif
 
 // ------------- FPS COUNTER ---------------
