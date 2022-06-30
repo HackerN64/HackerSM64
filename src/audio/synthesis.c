@@ -60,22 +60,23 @@
  * Generally speaking, a sound that doesn't seem to be fading at a natural rate is a parameter red flag (also known as feedback).
  * 
  * This is also known to cause severe lag on emulators that have counter factor set to 2 or greater.
- * Be sure either you alert the user in advance, or check for and set betterReverbDownsampleEmulator to -1 if it's detected the user isn't using good settings.
- * Reducing performance heavy parameters or using RCVI hack may be another working solution to this problem.
+ * If this is an issue, it is recommended you enable RCVI hack in the config files. Alternatively, you can reduce the reverb parameters here to compensate.
  */
 
 
+// Larger values downsample the reverb exponentially by multiples of 2. A value of 1 doesn't downsample at all. This can substantially increase performance at the cost of resolution.
 // Setting this to 4 corrupts the game, so set this value to -1 to use vanilla reverb if this is too slow, or if it just doesn't fit the desired aesthetic of a level.
 // You can change this value before audio_reset_session gets called if different levels can tolerate the demand better than others or just have different reverb goals.
-// A higher downsample value hits the game's frequency limit sooner, which can cause the reverb sometimes to be off pitch. This is a vanilla level issue (and also counter intuitive).
-// Higher downsample values also result in slightly shorter reverb decay times.
+// A higher downsample value hits the game's frequency limit sooner, which can cause the reverb sometimes to be off pitch. This is a vanilla quirk (and also counter intuitive).
+// Higher downsample values also result in slightly shorter reverb decay times, so keep this in mind if balancing reverb presence with emulator, or maybe consider adjusting REVERB_REV_INDEX with a console check.
 s8 betterReverbDownsampleConsole = 2;
 
-// Most emulators can handle a default value of 2, but 3 may be advisable in some cases if targeting older emulators (e.g. PJ64 1.6). Setting this to -1 also uses vanilla reverb.
-// Using a value of 1 is not recommended on emulator unless reducing other parameters to compensate. If you do decide to use 1 here, you must adjust BETTER_REVERB_SIZE appropriately.
+// Larger values downsample the reverb exponentially by multiples of 2. A value of 1 doesn't downsample at all. This can substantially increase performance at the cost of resolution.
+// Most emulators can handle a default value of 2, but 3 may be advisable as a failsafe against a counter factor of 2 (if RCVI hack is disabled). Setting this to -1 also uses vanilla reverb.
+// Using a value of 1 is not recommended on emulator unless RCVI hack is enabled or other parameters are reduced to compensate. If you do decide to use 1 here, you must adjust BETTER_REVERB_SIZE appropriately.
 // You can change this value before audio_reset_session gets called if different levels can tolerate the demand better than others or just have different reverb goals.
-// A higher downsample value hits the game's frequency limit sooner, which can cause the reverb sometimes to be off pitch. This is a vanilla level issue (and also counter intuitive).
-// Higher downsample values also result in slightly shorter reverb decay times.
+// A higher downsample value hits the game's frequency limit sooner, which can cause the reverb sometimes to be off pitch. This is a vanilla quirk (and also counter intuitive).
+// Higher downsample values also result in slightly shorter reverb decay times, so keep this in mind if balancing reverb presence with console, or maybe consider adjusting REVERB_REV_INDEX with a console check.
 s8 betterReverbDownsampleEmulator = 2;
 
 // This value represents the number of filters to use with the reverb. This can be decreased to improve performance, but at the cost of a lesser presence of reverb in the final audio.
@@ -291,7 +292,7 @@ void set_better_reverb_buffers(void) {
         delaysR[i] = (delaysBaselineR[i] / gReverbDownsampleRate);
         delayBufsL[i] = (s32*) &delayBufsL[0][bufOffset];
         bufOffset += delaysL[i];
-        delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interpolated adjacently in memory; not a bug
+        delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interleaved adjacently in memory; not a bug
         bufOffset += delaysR[i];
     }
 }
@@ -410,7 +411,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                     reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) item->toDownsampleLeft[srcPos] + (s32) item->toDownsampleRight[srcPos]) / 2);
                     gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
                 }
-            } else { // Too slow for practical use, not recommended most of the time.
+            } else {
                 for (dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); dstPos++) {
                     reverb_mono_sample(&gSynthesisReverb.ringBuffer.left[dstPos], ((s32) gSynthesisReverb.ringBuffer.left[dstPos] + (s32) gSynthesisReverb.ringBuffer.right[dstPos]) / 2);
                     gSynthesisReverb.ringBuffer.right[dstPos] = gSynthesisReverb.ringBuffer.left[dstPos];
@@ -427,7 +428,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex) {
                     reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
                 for (dstPos = 0; dstPos < (item->lengthB / 2); srcPos += gReverbDownsampleRate, dstPos++)
                     reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], item->toDownsampleLeft[srcPos], item->toDownsampleRight[srcPos]);
-            } else { // Too slow for practical use, not recommended most of the time.
+            } else {
                 for (dstPos = item->startPos; dstPos < ((item->lengthA / 2) + item->startPos); dstPos++)
                     reverb_samples(&gSynthesisReverb.ringBuffer.left[dstPos], &gSynthesisReverb.ringBuffer.right[dstPos], gSynthesisReverb.ringBuffer.left[dstPos], gSynthesisReverb.ringBuffer.right[dstPos]);
                 for (dstPos = 0; dstPos < (item->lengthB / 2); dstPos++)
