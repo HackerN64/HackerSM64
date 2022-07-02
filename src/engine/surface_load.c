@@ -275,7 +275,7 @@ static struct Surface *read_surface_data(TerrainData *vertexData, TerrainData **
  * Returns whether a surface has exertion/moves Mario
  * based on the surface type.
  */
-static s32 surface_has_force(s32 surfaceType) {
+s32 surface_has_force(s32 surfaceType) {
     s32 hasForce = FALSE;
 
     switch (surfaceType) {
@@ -395,15 +395,66 @@ static void load_environmental_regions(TerrainData **data) {
     }
 }
 
-/**
- * Allocate some of the main pool for surfaces (2300 surf) and for surface nodes (7000 nodes).
- */
-void alloc_surface_pools(void) {
-    sSurfaceNodePool = main_pool_alloc(sSurfaceNodePoolSize * sizeof(struct SurfaceNode), MEMORY_POOL_LEFT);
-    sSurfacePool = main_pool_alloc(sSurfacePoolSize * sizeof(struct Surface), MEMORY_POOL_LEFT);
+static void find_and_allocate_surfaces(s16 **data) {
+    s16 *dataStart = (*data);
+    s32 cursor;
 
+    // Set currently allocated surfaces to 0.
+    sSurfaceNodePoolSize = 0;
+    sSurfacePoolSize = 0;
     gCCMEnteredSlide = FALSE;
     reset_red_coins_collected();
+
+    // Index 1 is the number of vertices. Also the starting point.
+    cursor = dataStart[1];
+    cursor = (cursor * 3) + 3;
+
+    while (dataStart[cursor] != TERRAIN_LOAD_END && dataStart[cursor] != TERRAIN_LOAD_OBJECTS && dataStart[cursor] != TERRAIN_LOAD_ENVIRONMENT ) {
+        u32 fixedPoint = cursor;
+#ifndef ALL_SURFACES_HAVE_FORCE
+        u32 hasForce = surface_has_force(dataStart[fixedPoint - 1]);
+#endif
+        sSurfacePoolSize += dataStart[fixedPoint];
+        for (s32 i = 0; i < dataStart[fixedPoint]; i++) {
+            s32 pos[3][2], minCellX, minCellZ, maxCellX, maxCellZ;
+            s32 minX, maxX, minZ, maxZ;
+            for (u32 j = 0; j < 3; j++) {
+                pos[j][0] = dataStart[2 + (dataStart[cursor + 1 + j]) * 3];
+                pos[j][1] = dataStart[2 + ((dataStart[cursor + 1 + j]) * 3) + 2];
+            }
+
+            min_max_3i(pos[0][0], pos[1][0], pos[2][0], &minX, &maxX);
+            min_max_3i(pos[0][1], pos[1][1], pos[2][1], &minZ, &maxZ);
+            minCellX = lower_cell_index(minX);
+            maxCellX = upper_cell_index(maxX);
+            minCellZ = lower_cell_index(minZ);
+            maxCellZ = upper_cell_index(maxZ);
+
+            for (s32 i = minCellZ; i <= maxCellZ; i++) {
+                for (s32 j = minCellX; j <= maxCellX; j++) {
+                    sSurfaceNodePoolSize++;
+                }
+            }
+#ifdef ALL_SURFACES_HAVE_FORCE
+        cursor += 4;
+#else
+        if (hasForce) {
+            cursor += 4;
+        } else {
+            cursor += 3;
+        }
+#endif
+        }
+        // Offset by two, as to get the amount of the next surface.
+        cursor += 2;
+    }
+    append_puppyprint_log("%d", dataStart[cursor]);
+
+    sSurfacePoolSize += NUM_EXTRA_SURFACES;
+    sSurfaceNodePoolSize += NUM_EXTRA_NODES;
+
+    sSurfacePool = main_pool_alloc(sSurfacePoolSize * sizeof(struct Surface), MEMORY_POOL_LEFT);
+    sSurfaceNodePool = main_pool_alloc(sSurfaceNodePoolSize * sizeof(struct SurfaceNode), MEMORY_POOL_LEFT);
 }
 
 #ifdef NO_SEGMENTED_MEMORY
@@ -476,6 +527,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gSurfaceNodesAllocated = 0;
     gSurfacesAllocated = 0;
 
+    find_and_allocate_surfaces(&data);
     clear_static_surfaces();
 
     // A while loop iterating through each section of the level data. Sections of data

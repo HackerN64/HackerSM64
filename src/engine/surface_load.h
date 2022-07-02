@@ -35,7 +35,6 @@ extern struct Surface *sSurfacePool;
 extern s32 sSurfaceNodePoolSize;
 extern s32 sSurfacePoolSize;
 
-void alloc_surface_pools(void);
 #ifdef NO_SEGMENTED_MEMORY
 u32 get_area_terrain_size(TerrainData *data);
 #endif
