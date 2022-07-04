@@ -1204,6 +1204,8 @@ static void puppycam_script(void) {
                     gPuppyCam.yaw       = volume.angles->yaw;
 
                     gPuppyCam.flags &= ~PUPPYCAM_BEHAVIOUR_YAW_ROTATION;
+                } else {
+                    gPuppyCam.yaw = atan2s(gPuppyCam.pos[2] - gPuppyCam.focus[2], gPuppyCam.pos[0] - gPuppyCam.focus[0]);
                 }
 
                 if (volume.angles->pitch != PUPPY_NULL) {
