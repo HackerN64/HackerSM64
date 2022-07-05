@@ -888,9 +888,9 @@ const BehaviorScript bhvWarpPipe[] = {
     SET_FLOAT(oDrawingDistance, 16000),
     SET_INT(oIntangibleTimer, 0),
     SET_HITBOX(/*Radius*/ 70, /*Height*/ 50),
+    CALL_NATIVE(load_object_static_model),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_warp_loop),
-        CALL_NATIVE(load_object_collision_model),
     END_LOOP(),
 };
 
