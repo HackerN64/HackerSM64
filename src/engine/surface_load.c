@@ -47,7 +47,7 @@ u32 gTotalStaticSurfaceData;
  * Allocate the part of the surface node pool to contain a surface node.
  */
 static struct SurfaceNode *alloc_surface_node(u32 dynamic) {
-    struct SurfaceNode **poolEnd = dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd;
+    struct SurfaceNode **poolEnd = (struct SurfaceNode **)(dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd);
 
     struct SurfaceNode *node = *poolEnd;
     (*poolEnd)++;
@@ -63,7 +63,7 @@ static struct SurfaceNode *alloc_surface_node(u32 dynamic) {
  * initialize the surface.
  */
 static struct Surface *alloc_surface(u32 dynamic) {
-    struct Surface **poolEnd = dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd;
+    struct Surface **poolEnd = (struct Surface **)(dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd);
     
     struct Surface *surface = *poolEnd;
     (*poolEnd)++;
@@ -579,7 +579,7 @@ void transform_object_vertices(TerrainData **data, TerrainData *vertexData) {
 /**
  * Load in the surfaces for the o. This includes setting the flags, exertion, and room.
  */
-void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
+void load_object_surfaces(TerrainData **data, TerrainData *vertexData, u32 dynamic) {
     s32 i;
 
     s32 surfaceType = *(*data)++;
@@ -589,14 +589,14 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
     TerrainData hasForce = surface_has_force(surfaceType);
 #endif
 
-    s32 flags = surf_has_no_cam_collision(surfaceType) | SURFACE_FLAG_DYNAMIC;
+    s32 flags = surf_has_no_cam_collision(surfaceType) | (dynamic ? SURFACE_FLAG_DYNAMIC : 0);
 
     // The DDD warp is initially loaded at the origin and moved to the proper
     // position in paintings.c and doesn't update its room, so set it here.
     RoomData room = (o->behavior == segmented_to_virtual(bhvDddWarp)) ? 5 : 0;
 
     for (i = 0; i < numSurfaces; i++) {
-        struct Surface *surface = read_surface_data(vertexData, data, TRUE);
+        struct Surface *surface = read_surface_data(vertexData, data, dynamic);
 
         if (surface != NULL) {
             surface->object = o;
@@ -614,7 +614,7 @@ void load_object_surfaces(TerrainData **data, TerrainData *vertexData) {
 
             surface->flags |= flags;
             surface->room = room;
-            add_surface(surface, TRUE);
+            add_surface(surface, dynamic);
         }
 
 #ifdef ALL_SURFACES_HAVE_FORCE
@@ -686,8 +686,38 @@ void load_object_collision_model(void) {
 
         // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
         while (*collisionData != TERRAIN_LOAD_CONTINUE) {
-            load_object_surfaces(&collisionData, vertexData);
+            load_object_surfaces(&collisionData, vertexData, TRUE);
         }
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
+}
+
+/**
+ * Transform an object's vertices and add them to the static surface pool.
+ */
+void load_object_static_model(void) {
+    TerrainData vertexData[600];
+    TerrainData *collisionData = o->collisionData;
+    u32 surfacePoolData;
+
+    // Initialise a new surface pool for this block of surface data
+    gCurrStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);
+    gCurrStaticSurfacePoolEnd = gCurrStaticSurfacePool;
+    gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
+    gSurfacesAllocated = gNumStaticSurfaces;
+
+    collisionData++;
+    transform_object_vertices(&collisionData, vertexData);
+
+    // TERRAIN_LOAD_CONTINUE acts as an "end" to the terrain data.
+    while (*collisionData != TERRAIN_LOAD_CONTINUE) {
+        load_object_surfaces(&collisionData, vertexData, FALSE);
+    }
+
+    surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
+    gTotalStaticSurfaceData += surfacePoolData;
+    main_pool_realloc(gCurrStaticSurfacePool, surfacePoolData);
+
+    gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
+    gNumStaticSurfaces = gSurfacesAllocated;
 }
