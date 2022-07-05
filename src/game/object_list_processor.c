@@ -21,6 +21,7 @@
 #include "spawn_object.h"
 #include "puppyprint.h"
 #include "puppylights.h"
+#include "profiling.h"
 
 
 /**
@@ -547,7 +548,10 @@ void clear_objects(void) {
  */
 void update_terrain_objects(void) {
     gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
+    profiler_update(PROFILER_TIME_SPAWNER);
+
     gObjectCounter += update_objects_in_list(&gObjectLists[OBJ_LIST_SURFACE]);
+    profiler_update(PROFILER_TIME_DYNAMIC);
 }
 
 /**
@@ -559,7 +563,13 @@ void update_non_terrain_objects(void) {
 
     s32 i = 2;
     while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
+        if (listIndex == OBJ_LIST_PLAYER) {
+            profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO);
+        }
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
+        if (listIndex == OBJ_LIST_PLAYER) {
+            profiler_update(PROFILER_TIME_MARIO);
+        }
         i++;
     }
 }
@@ -606,13 +616,6 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  * and object surface management.
  */
 void update_objects(UNUSED s32 unused) {
-    //s64 cycleCounts[30];
-#if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-    OSTime colTime = collisionTime[perfIteration];
-#endif
-
-    // cycleCounts[0] = get_current_clock();
 
     gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
 
@@ -626,11 +629,9 @@ void update_objects(UNUSED s32 unused) {
     gObjectLists = gObjectListArray;
 
     // If time stop is not active, unload object surfaces
-    // cycleCounts[1] = get_clock_difference(cycleCounts[0]);
     clear_dynamic_surfaces();
 
     // Update spawners and objects with surfaces
-    // cycleCounts[2] = get_clock_difference(cycleCounts[0]);
     update_terrain_objects();
 
     // If Mario was touching a moving platform at the end of last frame, apply
@@ -640,24 +641,17 @@ void update_objects(UNUSED s32 unused) {
     apply_mario_platform_displacement();
 
     // Detect which objects are intersecting
-    // cycleCounts[3] = get_clock_difference(cycleCounts[0]);
     detect_object_collisions();
 
     // Update all other objects that haven't been updated yet
-    // cycleCounts[4] = get_clock_difference(cycleCounts[0]);
     update_non_terrain_objects();
 
     // Unload any objects that have been deactivated
-    // cycleCounts[5] = get_clock_difference(cycleCounts[0]);
     unload_deactivated_objects();
 
     // Check if Mario is on a platform object and save this object
-    // cycleCounts[6] = get_clock_difference(cycleCounts[0]);
     update_mario_platform();
 
-    // cycleCounts[7] = get_clock_difference(cycleCounts[0]);
-
-    // cycleCounts[0] = 0;
     try_print_debug_mario_object_info();
 
     // If time stop was enabled this frame, activate it now so that it will
@@ -669,8 +663,6 @@ void update_objects(UNUSED s32 unused) {
     }
 
     gPrevFrameObjectCount = gObjectCounter;
-#if PUPPYPRINT_DEBUG
-    profiler_update(behaviourTime, first);
-    behaviourTime[perfIteration] -= collisionTime[perfIteration] - colTime;
-#endif
+
+    profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO);
 }

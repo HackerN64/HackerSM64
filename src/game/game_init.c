@@ -30,6 +30,7 @@
 #include "debug_box.h"
 #include "vc_check.h"
 #include "vc_ultra.h"
+#include "profiling.h"
 
 // First 3 controller slots
 struct Controller gControllers[3];
@@ -45,6 +46,7 @@ OSContStatus gControllerStatuses[4];
 OSContPad gControllerPads[4];
 u8 gControllerBits;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
+u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 u8 gCustomDebugMode;
@@ -294,6 +296,11 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.ucode_data = gspF3DZEX2_PosLight_fifoDataStart;
     gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DZEX2_PosLight_fifoTextEnd - (u8 *) gspF3DZEX2_PosLight_fifoTextStart);
     gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DZEX2_PosLight_fifoDataEnd - (u8 *) gspF3DZEX2_PosLight_fifoDataStart);
+#elif  F3DZEX_NON_GBI_2
+    gGfxSPTask->task.t.ucode = gspF3DZEX2_NoN_PosLight_fifoTextStart;
+    gGfxSPTask->task.t.ucode_data = gspF3DZEX2_NoN_PosLight_fifoDataStart;
+    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DZEX2_NoN_PosLight_fifoTextEnd - (u8 *) gspF3DZEX2_NoN_PosLight_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DZEX2_NoN_PosLight_fifoDataEnd - (u8 *) gspF3DZEX2_NoN_PosLight_fifoDataStart);
 #elif   F3DEX2PL_GBI
     gGfxSPTask->task.t.ucode = gspF3DEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_PosLight_fifoDataStart;
@@ -404,7 +411,8 @@ void render_init(void) {
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
+    // Currently, Ares passes the cache emulation test and has issues with single buffering so disable it there as well.
+    if (gIsConsole || gIsVC || gCacheEmulated) {
         sRenderingFramebuffer++;
     }
     gGlobalTimer++;
@@ -442,8 +450,8 @@ void display_and_vsync(void) {
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
-    // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
-    if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
+    // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
+    if (gIsConsole || gIsVC || gCacheEmulated) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }
@@ -611,8 +619,8 @@ void read_controller_inputs(s32 threadID) {
         if (controller->controllerData != NULL) {
             controller->rawStickX = controller->controllerData->stick_x;
             controller->rawStickY = controller->controllerData->stick_y;
-            controller->buttonPressed = controller->controllerData->button
-                                        & (controller->controllerData->button ^ controller->buttonDown);
+            controller->buttonPressed = ~controller->buttonDown & controller->controllerData->button;
+            controller->buttonReleased = ~controller->controllerData->button & controller->buttonDown;
             // 0.5x A presses are a good meme
             controller->buttonDown = controller->controllerData->button;
             adjust_analog_stick(controller);
@@ -620,6 +628,7 @@ void read_controller_inputs(s32 threadID) {
             controller->rawStickX = 0;
             controller->rawStickY = 0;
             controller->buttonPressed = 0;
+            controller->buttonReleased = 0;
             controller->buttonDown = 0;
             controller->stickX = 0;
             controller->stickY = 0;
@@ -636,6 +645,7 @@ void read_controller_inputs(s32 threadID) {
     gPlayer3Controller->stickY = gPlayer1Controller->stickY;
     gPlayer3Controller->stickMag = gPlayer1Controller->stickMag;
     gPlayer3Controller->buttonPressed = gPlayer1Controller->buttonPressed;
+    gPlayer3Controller->buttonReleased = gPlayer1Controller->buttonReleased;
     gPlayer3Controller->buttonDown = gPlayer1Controller->buttonDown;
 }
 
@@ -718,10 +728,6 @@ void setup_game_memory(void) {
  * Main game loop thread. Runs forever as long as the game continues.
  */
 void thread5_game_loop(UNUSED void *arg) {
-#if PUPPYPRINT_DEBUG
-    OSTime lastTime = 0;
-#endif
-
     setup_game_memory();
 #if ENABLE_RUMBLE
     init_rumble_pak_scheduler_queue();
@@ -751,19 +757,12 @@ void thread5_game_loop(UNUSED void *arg) {
     render_init();
 
     while (TRUE) {
+        profiler_frame_setup();
         // If the reset timer is active, run the process to reset the game.
         if (gResetTimer != 0) {
             draw_reset_bars();
             continue;
         }
-#if PUPPYPRINT_DEBUG
-        while (TRUE) {
-            lastTime = osGetTime();
-            collisionTime[perfIteration] = 0;
-                // graphTime[perfIteration] = 0;
-            behaviourTime[perfIteration] = 0;
-                  dmaTime[perfIteration] = 0;
-#endif
 
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
@@ -777,25 +776,12 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
         read_controller_inputs(THREAD_5_GAME_LOOP);
+        profiler_update(PROFILER_TIME_CONTROLLERS);
         addr = level_script_execute(addr);
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();
 #endif
 #if PUPPYPRINT_DEBUG
-        profiler_update(scriptTime, lastTime);
-        scriptTime[perfIteration] -= profilerTime[perfIteration];
-        scriptTime[perfIteration] -= profilerTime2[perfIteration];
-            if (benchmarkLoop > 0 && benchOption == 0) {
-                benchmarkLoop--;
-                benchMark[benchmarkLoop] = (osGetTime() - lastTime);
-                if (benchmarkLoop == 0) {
-                    puppyprint_profiler_finished();
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
         puppyprint_profiler_process();
 #endif
 

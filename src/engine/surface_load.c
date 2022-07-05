@@ -478,9 +478,6 @@ u32 get_area_terrain_size(TerrainData *data) {
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
-#if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-#endif
 
     // Initialize the data for this.
     gEnvironmentRegions = NULL;
@@ -532,9 +529,6 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
-#if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
-#endif
 }
 
 /**
@@ -661,9 +655,6 @@ static void get_optimal_coll_dist(struct Object *obj) {
  */
 void load_object_collision_model(void) {
     TerrainData vertexData[600];
-#if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-#endif
 
     TerrainData *collisionData = o->collisionData;
     f32 marioDist = o->oDistanceToMario;
@@ -701,7 +692,4 @@ void load_object_collision_model(void) {
         }
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
-#if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
-#endif
 }

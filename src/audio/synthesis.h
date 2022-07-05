@@ -33,20 +33,16 @@
 
 extern s8 betterReverbDownsampleConsole;
 extern s8 betterReverbDownsampleEmulator;
-extern u32 reverbFilterCountConsole;
-extern u32 reverbFilterCountEmulator;
 extern u8 monoReverbConsole;
 extern u8 monoReverbEmulator;
+extern s32 reverbFilterCountConsole;
+extern s32 reverbFilterCountEmulator;
 extern s32 betterReverbWindowsSize;
 
 extern s32 delaysBaselineL[NUM_ALLPASS];
 extern s32 delaysBaselineR[NUM_ALLPASS];
-extern s32 delaysL[NUM_ALLPASS];
-extern s32 delaysR[NUM_ALLPASS];
-extern s32 reverbMultsL[NUM_ALLPASS / 3];
-extern s32 reverbMultsR[NUM_ALLPASS / 3];
-extern s32 **delayBufsL;
-extern s32 **delayBufsR;
+extern s32 gReverbMultsL[NUM_ALLPASS / 3];
+extern s32 gReverbMultsR[NUM_ALLPASS / 3];
 
 extern u8 toggleBetterReverb;
 #define REVERB_WINDOW_SIZE_MAX 0x2000
@@ -147,6 +143,12 @@ extern struct SynthesisReverb gSynthesisReverb;
 
 #ifdef VERSION_SH
 extern s16 D_SH_803479B4;
+#endif
+
+#ifdef BETTER_REVERB
+void initialize_better_reverb_buffers(void);
+void clear_better_reverb_buffers(void);
+void set_better_reverb_buffers(void);
 #endif
 
 u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen);
