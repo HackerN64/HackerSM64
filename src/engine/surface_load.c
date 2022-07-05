@@ -327,7 +327,6 @@ static s32 surf_has_no_cam_collision(s32 surfaceType) {
 static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s32 surfaceType, RoomData **surfaceRooms) {
     s32 i;
     struct Surface *surface;
-    u32 surfacePoolData;
     RoomData room = 0;
 #ifndef ALL_SURFACES_HAVE_FORCE
     s16 hasForce = surface_has_force(surfaceType);
@@ -335,10 +334,6 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
     s32 flags = surf_has_no_cam_collision(surfaceType);
 
     s32 numSurfaces = *(*data)++;
-
-    // Initialise a new surface pool for this block of static surface data
-    gCurrStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);
-    gCurrStaticSurfacePoolEnd = gCurrStaticSurfacePool;
 
     for (i = 0; i < numSurfaces; i++) {
         if (*surfaceRooms != NULL) {
@@ -373,10 +368,6 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
         }
 #endif
     }
-
-    surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
-    gTotalStaticSurfaceData += surfacePoolData;
-    main_pool_realloc(gCurrStaticSurfacePool, surfacePoolData);
 }
 
 /**
@@ -481,6 +472,7 @@ u32 get_area_terrain_size(TerrainData *data) {
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
+    u32 surfacePoolData;
 
     // Initialize the data for this.
     gEnvironmentRegions = NULL;
@@ -488,6 +480,10 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gSurfacesAllocated = 0;
 
     clear_static_surfaces();
+
+    // Initialise a new surface pool for this block of static surface data
+    gCurrStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);
+    gCurrStaticSurfacePoolEnd = gCurrStaticSurfacePool;
 
     // A while loop iterating through each section of the level data. Sections of data
     // are prefixed by a terrain "type." This type is reused for surfaces as the surface
@@ -524,6 +520,10 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
             spawn_macro_objects(index, macroObjects);
         }
     }
+
+    surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
+    gTotalStaticSurfaceData += surfacePoolData;
+    main_pool_realloc(gCurrStaticSurfacePool, surfacePoolData);
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
