@@ -33,10 +33,11 @@ typedef struct SurfaceNode SpatialPartitionCell[NUM_SPATIAL_PARTITIONS];
 
 extern SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 extern SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
-extern void *gStaticSurfacePool;
+extern void *gCurrStaticSurfacePool;
 extern void *gDynamicSurfacePool;
-extern void *gStaticSurfacePoolEnd;
+extern void *gCurrStaticSurfacePoolEnd;
 extern void *gDynamicSurfacePoolEnd;
+extern u32 gTotalStaticSurfaceData;
 
 void alloc_surface_pools(void);
 #ifdef NO_SEGMENTED_MEMORY

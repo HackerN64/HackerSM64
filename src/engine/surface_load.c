@@ -29,29 +29,28 @@ SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
  * The static surface pool is resized to be exactly the amount of memory needed for the level geometry.
  * The dynamic surface pool is set at a fixed length and cleared every frame.
  */
-void *gStaticSurfacePool;
+void *gCurrStaticSurfacePool;
 void *gDynamicSurfacePool;
 
 /**
  * The end of the data currently allocated to the surface pools.
  */
-void *gStaticSurfacePoolEnd;
+void *gCurrStaticSurfacePoolEnd;
 void *gDynamicSurfacePoolEnd;
+
+/**
+ * The amount of data currently allocated to static surfaces.
+ */
+u32 gTotalStaticSurfaceData;
 
 /**
  * Allocate the part of the surface node pool to contain a surface node.
  */
 static struct SurfaceNode *alloc_surface_node(u32 dynamic) {
-    struct SurfaceNode *node;
+    struct SurfaceNode **poolEnd = dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd;
 
-    if (dynamic) {
-        node = (struct SurfaceNode *)gDynamicSurfacePoolEnd;
-        gDynamicSurfacePoolEnd = (void *)((uintptr_t)gDynamicSurfacePoolEnd + sizeof(struct SurfaceNode));
-    } else {
-        node = (struct SurfaceNode *)gStaticSurfacePoolEnd;
-        gStaticSurfacePoolEnd = (void *)((uintptr_t)gStaticSurfacePoolEnd + sizeof(struct SurfaceNode));
-    }
-
+    struct SurfaceNode *node = *poolEnd;
+    (*poolEnd)++;
     gSurfaceNodesAllocated++;
 
     node->next = NULL;
@@ -64,16 +63,10 @@ static struct SurfaceNode *alloc_surface_node(u32 dynamic) {
  * initialize the surface.
  */
 static struct Surface *alloc_surface(u32 dynamic) {
-    struct Surface *surface;
-
-    if (dynamic) {
-        surface = (struct Surface *)gDynamicSurfacePoolEnd;
-        gDynamicSurfacePoolEnd = (void *)((uintptr_t)gDynamicSurfacePoolEnd + sizeof(struct Surface));
-    } else {
-        surface = (struct Surface *)gStaticSurfacePoolEnd;
-        gStaticSurfacePoolEnd = (void *)((uintptr_t)gStaticSurfacePoolEnd + sizeof(struct Surface));
-    }
-
+    struct Surface **poolEnd = dynamic ? &gDynamicSurfacePoolEnd : &gCurrStaticSurfacePoolEnd;
+    
+    struct Surface *surface = *poolEnd;
+    (*poolEnd)++;
     gSurfacesAllocated++;
 
     surface->type = SURFACE_DEFAULT;
@@ -105,6 +98,7 @@ static void clear_spatial_partition(SpatialPartitionCell *cells) {
  * Clears the static (level) surface partitions for new use.
  */
 static void clear_static_surfaces(void) {
+    gTotalStaticSurfaceData = 0;
     clear_spatial_partition(&gStaticSurfacePartition[0][0]);
 }
 
@@ -333,6 +327,7 @@ static s32 surf_has_no_cam_collision(s32 surfaceType) {
 static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s32 surfaceType, RoomData **surfaceRooms) {
     s32 i;
     struct Surface *surface;
+    u32 surfacePoolData;
     RoomData room = 0;
 #ifndef ALL_SURFACES_HAVE_FORCE
     s16 hasForce = surface_has_force(surfaceType);
@@ -340,6 +335,10 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
     s32 flags = surf_has_no_cam_collision(surfaceType);
 
     s32 numSurfaces = *(*data)++;
+
+    // Initialise a new surface pool for this block of static surface data
+    gCurrStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);
+    gCurrStaticSurfacePoolEnd = gCurrStaticSurfacePool;
 
     for (i = 0; i < numSurfaces; i++) {
         if (*surfaceRooms != NULL) {
@@ -374,6 +373,10 @@ static void load_static_surfaces(TerrainData **data, TerrainData *vertexData, s3
         }
 #endif
     }
+
+    surfacePoolData = (uintptr_t)gCurrStaticSurfacePoolEnd - (uintptr_t)gCurrStaticSurfacePool;
+    gTotalStaticSurfaceData += surfacePoolData;
+    main_pool_realloc(gCurrStaticSurfacePool, surfacePoolData);
 }
 
 /**
@@ -486,9 +489,6 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
 
     clear_static_surfaces();
 
-    gStaticSurfacePool = main_pool_alloc(main_pool_available() - 0x10, MEMORY_POOL_LEFT);
-    gStaticSurfacePoolEnd = gStaticSurfacePool;
-
     // A while loop iterating through each section of the level data. Sections of data
     // are prefixed by a terrain "type." This type is reused for surfaces as the surface
     // type.
@@ -512,8 +512,6 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
             continue;
         }
     }
-
-    main_pool_realloc(gStaticSurfacePool, (uintptr_t)gStaticSurfacePoolEnd - (uintptr_t)gStaticSurfacePool);
 
     if (macroObjects != NULL && *macroObjects != -1) {
         // If the first macro object presetID is within the range [0, 29].

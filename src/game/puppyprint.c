@@ -126,7 +126,7 @@ void puppyprint_calculate_ram_usage(void) {
     // gEffectsMemoryPool is 0x4000, gObjectMemoryPool is 0x800. Epic C limitations mean I can't just sizeof their values :)
     ramsizeSegment[5] = (EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL
                        + EFFECTS_MEMORY_POOL + OBJECT_MEMORY_POOL);
-    ramsizeSegment[6] = (uintptr_t)gStaticSurfacePoolEnd - (uintptr_t)gStaticSurfacePool + DYNAMIC_SURFACE_POOL_SIZE;
+    ramsizeSegment[6] = gTotalStaticSurfaceData + DYNAMIC_SURFACE_POOL_SIZE;
     ramsizeSegment[7] = gAudioHeapSize;
 }
 
@@ -453,7 +453,7 @@ extern s16 gVisualSurfaceCount;
 void puppyprint_render_collision(void) {
     char textBytes[200];
 
-    sprintf(textBytes, "Static Pool Size: 0x%X#Dynamic Pool Size: 0x%X#Dynamic Pool Used: 0x%X#Surfaces Allocated: %d#Nodes Allocated: %d", (uintptr_t)gStaticSurfacePoolEnd - (uintptr_t)gStaticSurfacePool, DYNAMIC_SURFACE_POOL_SIZE,(uintptr_t)gDynamicSurfacePoolEnd - (uintptr_t)gDynamicSurfacePool,
+    sprintf(textBytes, "Static Pool Size: 0x%X#Dynamic Pool Size: 0x%X#Dynamic Pool Used: 0x%X#Surfaces Allocated: %d#Nodes Allocated: %d", gTotalStaticSurfaceData, DYNAMIC_SURFACE_POOL_SIZE,(uintptr_t)gDynamicSurfacePoolEnd - (uintptr_t)gDynamicSurfacePool,
             gSurfacesAllocated, gSurfaceNodesAllocated);
     print_small_text(304, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
