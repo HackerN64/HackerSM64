@@ -183,7 +183,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
 
     if (is_outside_level_bounds(x, z)) {
 #if PUPPYPRINT_DEBUG
-        profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+        puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
         return numCollisions;
     }
@@ -208,7 +208,7 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     gNumCalls.wall++;
 #endif
 #if PUPPYPRINT_DEBUG
-    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
 
     return numCollisions;
@@ -336,7 +336,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
 
     if (is_outside_level_bounds(x, z)) {
 #if PUPPYPRINT_DEBUG
-        profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+        puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
         return height;
     }
@@ -380,7 +380,7 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     gNumCalls.ceil++;
 #endif
 #if PUPPYPRINT_DEBUG
-    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
 
     return height;
@@ -581,7 +581,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
 
     if (is_outside_level_bounds(x, z)) {
 #if PUPPYPRINT_DEBUG
-        profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+        puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
         return height;
     }
@@ -628,7 +628,7 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     gNumCalls.floor++;
 #endif
 #if PUPPYPRINT_DEBUG
-    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
     return height;
 }
@@ -711,7 +711,7 @@ s32 find_water_level_and_floor(s32 x, s32 y, s32 z, struct Surface **pfloor) {
     }
 
 #if PUPPYPRINT_DEBUG
-    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
     return waterLevel;
 }
@@ -751,7 +751,7 @@ s32 find_water_level(s32 x, s32 z) { // TODO: Allow y pos
     }
 
 #if PUPPYPRINT_DEBUG
-    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
 
     return waterLevel;
@@ -795,7 +795,7 @@ s32 find_poison_gas_level(s32 x, s32 z) {
     }
 
 #if PUPPYPRINT_DEBUG
-    profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
 #endif
 
     return gasLevel;

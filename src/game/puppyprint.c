@@ -46,7 +46,6 @@ a modern game engine's developer's console.
 #include "color_presets.h"
 #include "buffers/buffers.h"
 
-#define PUPPYPRINT
 #ifdef PUPPYPRINT
 
 #ifdef ENABLE_CREDITS_BENCHMARK
@@ -154,7 +153,7 @@ void puppyprint_calculate_ram_usage(void) {
     ramsizeSegment[4] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
     ramsizeSegment[5] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
     ramsizeSegment[6] = gPoolMem;
-    ramsizeSegment[7] = ALIGN16(SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)) + 16 + ALIGN16(SURFACE_POOL_SIZE * sizeof(struct Surface)) + 16;
+    ramsizeSegment[7] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
     ramsizeSegment[8] = gMiscMem;
     ramsizeSegment[9] = gAudioHeapSize + gAudioInitPoolSize;
 }
@@ -329,18 +328,15 @@ void print_ram_overview(void) {
     char textBytes[64];
     s32 y = 56;
     f32 ramSize = RAM_END - 0x80000000;
-    u32 tempNums[32];
+    s32 tempNums[32];
     u8 tempPos[32] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31};
     prepare_blank_box();
     render_blank_box(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, 168);
     finish_blank_box();
 
-    //f32 total = 0;
-    //u32 total2 = 0;
+    memcpy(tempNums, &ramsizeSegment, 32 * 4);
 
-    memcpy(&tempNums, &ramsizeSegment, 32 * 4);
-
-    sort_numbers(&tempNums, &tempPos);
+    sort_numbers(tempNums, tempPos);
 
     print_set_envcolour(255, 255, 255, 255);
     sprintf(textBytes, "Total:");
@@ -365,15 +361,12 @@ void print_ram_overview(void) {
         if (tempNums[i] == 0) {
             continue;
         }
-        //total += ((f32)tempNums[i] / ramSize) * 100.0f;
-        //total2 += tempNums[i];
         if (y - gPPSegScroll > 0 && y - gPPSegScroll < SCREEN_HEIGHT) {
             if (tempPos[i] < nameTable) {
                 sprintf(textBytes, "%s:", ramNames[tempPos[i]]);
             } else {
                 sprintf(textBytes, "%s:", segNames[tempPos[i] - nameTable]);
             }
-            //print_set_envcolour(colourChart[tempPos[i]][0], colourChart[tempPos[i]][1], colourChart[tempPos[i]][2], 255);
             print_small_text_light(24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
             sprintf(textBytes, "%X", tempNums[i]);
             print_small_text_light(SCREEN_WIDTH/2, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
@@ -382,12 +375,6 @@ void print_ram_overview(void) {
         }
         y += 12;
     }
-    /*sprintf(textBytes, "%2.2f", total);
-    print_small_text_light(32, 32, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
-    sprintf(textBytes, "%X", total2);
-    print_small_text_light(32, 48, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
-    sprintf(textBytes, "%X", (RAM_END - 0x80000000) - total2);
-    print_small_text_light(32, 64, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);*/
 }
 
 const char *audioPoolNames[NUM_AUDIO_POOLS] = {
@@ -512,18 +499,7 @@ extern s16 gVisualSurfaceCount;
 #endif
 
 void puppyprint_render_collision(void) {
-    char textBytes[200];
-#ifdef PUPPYPRINT_DEBUG_CYCLES
-    sprintf(textBytes, "Collision: <COL_FF7F7FFF>%dc", gPuppyTimers.collisionTime[NUM_PERF_ITERATIONS]);
-#else
-    sprintf(textBytes, "Collision: <COL_FF7F7FFF>%dus", gPuppyTimers.collisionTime[NUM_PERF_ITERATIONS]);
-#endif
-    print_small_text(304, 48, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
-
-    sprintf(textBytes, "Pool Size: %X#Node Size: %X#Surfaces Allocated: %d#Nodes Allocated: %d#Current Cell: %d", (SURFACE_NODE_POOL_SIZE * sizeof(struct SurfaceNode)), (SURFACE_POOL_SIZE * sizeof(struct Surface)),
-            gSurfacesAllocated, gSurfaceNodesAllocated, gVisualSurfaceCount);
-    print_small_text_light(304, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
-
+    // Stubbed out collision render for now, knowing Arthur's got plans.
 
 #ifdef VISUAL_DEBUG
     print_small_text_light(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
@@ -622,6 +598,9 @@ void puppycamera_debug_view(void) {
 struct PuppyPrintPage ppPages[] = {
     {&puppyprint_render_standard,  "Standard" },
     {&puppyprint_render_minimal,   "Minimal"  },
+#ifdef USE_PROFILER
+    {NULL,   "Wise Profiler"  }, // Use Wiseguy's lightweight profiler instead.
+#endif
     {&print_audio_ram_overview,    "Audio"    },
     {&print_ram_overview,          "Segments" },
     {&puppyprint_render_collision, "Collision"},
@@ -629,6 +608,21 @@ struct PuppyPrintPage ppPages[] = {
     {&render_coverage_map, "Coverage"},
 #ifdef PUPPYCAM
     {&puppycamera_debug_view, "Unlock Camera"},
+#endif
+};
+
+enum PPPages {
+    PUPPYPRINT_PAGE_STANDARD,
+    PUPPYPRINT_PAGE_MINIMAL,
+#ifdef USE_PROFILER
+    PUPPYPRINT_PAGE_WISEGUY,
+#endif
+    PUPPYPRINT_PAGE_AUDIO,
+    PUPPYPRINT_PAGE_RAM,
+    PUPPYPRINT_PAGE_COLLISION,
+    PUPPYPRINT_PAGE_LOG,
+#ifdef PUPPYCAM
+    PUPPYPRINT_PAGE_CAMERA
 #endif
 };
 
@@ -641,8 +635,8 @@ void render_page_menu(void) {
     s32 scrollY = (36 / (MAX_DEBUG_OPTIONS - 1));
 
     prepare_blank_box();
-    render_blank_box(32, 32, (32 + MENU_BOX_WIDTH), (32 + 72), 0x00, 0x00, 0x00, 0xC0);
-    render_blank_box(((32 + MENU_BOX_WIDTH) - 8), (32 + (scrollY * sDebugOption)), (32 + MENU_BOX_WIDTH), (32 + (scrollY * sDebugOption) + 36), 0xFF, 0xFF, 0xFF, 0xFF);
+    render_blank_box_rounded(32, 32, (32 + MENU_BOX_WIDTH), (32 + 72), 0x00, 0x00, 0x00, 0xC0);
+    render_blank_box_rounded(((32 + MENU_BOX_WIDTH) - 8), (32 + (scrollY * sDebugOption)), (32 + MENU_BOX_WIDTH), (32 + (scrollY * sDebugOption) + 36), 0xFF, 0xFF, 0xFF, 0xFF);
     finish_blank_box();
 
     for (i = 0; i < (s32)MAX_DEBUG_OPTIONS; i++) {
@@ -660,7 +654,7 @@ void render_page_menu(void) {
     }
 }
 
-void rdp_profiler_update(u32 *time, OSTime time2) {
+void puppyprint_rdp_profiler_update(u32 *time, OSTime time2) {
     time[PERF_AGGREGATE] -= time[perfIteration];
     time[perfIteration] = time2;
     time[PERF_AGGREGATE] += time[perfIteration];
@@ -668,39 +662,40 @@ void rdp_profiler_update(u32 *time, OSTime time2) {
 
 void puppyprint_render_profiler(void) {
     OSTime first = osGetTime();
-    rdp_profiler_update(gPuppyTimers.rdpBufTime, IO_READ(DPC_BUFBUSY_REG));
-    rdp_profiler_update(gPuppyTimers.rdpTmmTime, IO_READ(DPC_TMEM_REG));
-    rdp_profiler_update(gPuppyTimers.rdpBusTime, IO_READ(DPC_PIPEBUSY_REG));
+    puppyprint_rdp_profiler_update(gPuppyTimers.rdpBufTime, IO_READ(DPC_BUFBUSY_REG));
+    puppyprint_rdp_profiler_update(gPuppyTimers.rdpTmmTime, IO_READ(DPC_TMEM_REG));
+    puppyprint_rdp_profiler_update(gPuppyTimers.rdpBusTime, IO_READ(DPC_PIPEBUSY_REG));
     IO_WRITE(DPC_STATUS_REG, DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR);
 
     bzero(&gCurrEnvCol, sizeof(ColorRGBA));
     print_set_envcolour(255, 255, 255, 255);
 
     if (!fDebug) {
-        profiler_update(gPuppyTimers.profilerTime, first);
+        puppyprint_profiler_update(gPuppyTimers.profilerTime, first);
         return;
     }
-
-    (ppPages[sPPDebugPage].func)();
+    if (ppPages[sPPDebugPage].func != NULL) {
+        (ppPages[sPPDebugPage].func)();
+    }
 
     if (sDebugMenu) {
         render_page_menu();
     }
-    profiler_update(gPuppyTimers.profilerTime, first);
+    puppyprint_profiler_update(gPuppyTimers.profilerTime, first);
 }
 
-void profiler_update(u32 *time, OSTime time2) {
+void puppyprint_profiler_update(u32 *time, OSTime time2) {
     time[PERF_AGGREGATE] -= time[perfIteration];
     time[perfIteration] = (osGetTime() - time2);
     time[PERF_AGGREGATE] += time[perfIteration];
 }
 
-void profiler_offset(u32 *time, OSTime offset) {
+void puppyprint_profiler_offset(u32 *time, OSTime offset) {
     time[PERF_AGGREGATE] -= offset;
     time[perfIteration] -= offset;
 }
 
-void profiler_add(u32 *time, OSTime offset) {
+void puppyprint_profiler_add(u32 *time, OSTime offset) {
     time[PERF_AGGREGATE] += offset;
     time[perfIteration] += offset;
 }
@@ -753,7 +748,7 @@ void puppyprint_profiler_process(void) {
 
     // Collision toggles.
 #ifdef VISUAL_DEBUG
-    if (sPPDebugPage == 4)
+    if (sPPDebugPage == PUPPYPRINT_PAGE_COLLISION)
     {
         if (gPlayer1Controller->buttonPressed & R_JPAD)
             viewCycle++;
@@ -766,7 +761,7 @@ void puppyprint_profiler_process(void) {
     }
 #endif
 
-    if (sPPDebugPage == 3) {
+    if (sPPDebugPage == PUPPYPRINT_PAGE_RAM) {
         if (gPlayer1Controller->buttonDown & U_JPAD && gPPSegScroll > 0)  {
             gPPSegScroll -= 4;
         } else if (gPlayer1Controller->buttonDown & D_JPAD && gPPSegScroll < (12 * 32)){
@@ -812,7 +807,7 @@ void puppyprint_profiler_process(void) {
     if (perfIteration++ == (NUM_PERF_ITERATIONS - 1)) {
         perfIteration = 0;
     }
-    profiler_update(gPuppyTimers.profilerTime2, newTime);
+    puppyprint_profiler_update(gPuppyTimers.profilerTime2, newTime);
 }
 #endif
 
@@ -833,6 +828,7 @@ void prepare_blank_box(void) {
 }
 
 void finish_blank_box(void) {
+    gDPPipeSync(gDisplayListHead++);
     print_set_envcolour(255, 255, 255, 255);
     gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
 }
@@ -859,6 +855,7 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
         y1 = temp;
     }
     s32 cycleadd = 0;
+    gDPPipeSync(gDisplayListHead++);
     if (((absi(x1 - x2) % 4) == 0) && (a == 255)) {
         gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP);

@@ -15,6 +15,9 @@
 #include "sound_init.h"
 #include "rumble_init.h"
 #include "puppyprint.h"
+#include "profiling.h"
+
+#include "config/config_audio.h"
 
 #define MUSIC_NONE 0xFFFF
 
@@ -293,7 +296,20 @@ void stop_shell_music(void) {
 /**
  * Called from threads: thread5_game_loop
  */
+
+#ifdef PERSISTENT_CAP_MUSIC
+static s8 sDoResetMusic = FALSE;
+extern void stop_cap_music(void);
+#endif
+
 void play_cap_music(u16 seqArgs) {
+#ifdef PERSISTENT_CAP_MUSIC
+    if (sDoResetMusic) {
+        sDoResetMusic = FALSE;
+        stop_cap_music();
+    }
+#endif
+
     play_music(SEQ_PLAYER_LEVEL, seqArgs, 0);
     if (sCurrentCapMusic != MUSIC_NONE && sCurrentCapMusic != seqArgs) {
         stop_background_music(sCurrentCapMusic);
@@ -307,6 +323,9 @@ void play_cap_music(u16 seqArgs) {
 void fadeout_cap_music(void) {
     if (sCurrentCapMusic != MUSIC_NONE) {
         fadeout_background_music(sCurrentCapMusic, 600);
+#ifdef PERSISTENT_CAP_MUSIC
+        sDoResetMusic = TRUE;
+#endif
     }
 }
 
@@ -357,6 +376,7 @@ void thread4_sound(UNUSED void *arg) {
         gPuppyTimers.dmaAudioTime[NUM_PERF_ITERATIONS] -= gPuppyTimers.dmaAudioTime[perfIteration];
         gPuppyTimers.dmaAudioTime[perfIteration] = 0;
 #endif
+        profiler_audio_started();
         if (gResetTimer < 25) {
             struct SPTask *spTask;
             spTask = create_next_audio_frame_task();
@@ -364,9 +384,10 @@ void thread4_sound(UNUSED void *arg) {
                 dispatch_audio_sptask(spTask);
             }
 #if PUPPYPRINT_DEBUG
-        profiler_update(gPuppyTimers.thread4Time, lastTime);
-        profiler_offset(gPuppyTimers.thread4Time, gPuppyTimers.dmaAudioTime[perfIteration]);
+        puppyprint_profiler_update(gPuppyTimers.thread4Time, lastTime);
+        puppyprint_profiler_offset(gPuppyTimers.thread4Time, gPuppyTimers.dmaAudioTime[perfIteration]);
 #endif
         }
+        profiler_audio_completed();
     }
 }

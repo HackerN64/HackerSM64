@@ -93,6 +93,9 @@ extern struct SoundAllocPool gAudioInitPool;
 extern struct SoundAllocPool gNotesAndBuffersPool;
 extern struct SoundAllocPool gPersistentCommonPool;
 extern struct SoundAllocPool gTemporaryCommonPool;
+#ifdef BETTER_REVERB
+extern struct SoundAllocPool gBetterReverbPool;
+#endif
 extern struct SoundMultiPool gSeqLoadedPool;
 extern struct SoundMultiPool gBankLoadedPool;
 #ifdef VERSION_SH

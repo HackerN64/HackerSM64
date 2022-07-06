@@ -3118,8 +3118,8 @@ void update_camera(struct Camera *c) {
 #endif
     gLakituState.lastFrameAction = sMarioCamState->action;
 #if PUPPYPRINT_DEBUG
-    profiler_update(gPuppyTimers.cameraTime, first);
-    profiler_offset(gPuppyTimers.cameraTime, gPuppyTimers.collisionTime[perfIteration]-colTime);
+    puppyprint_profiler_update(gPuppyTimers.cameraTime, first);
+    puppyprint_profiler_offset(gPuppyTimers.cameraTime, gPuppyTimers.collisionTime[perfIteration]-colTime);
 #endif
 }
 

@@ -323,11 +323,25 @@ ifeq ($(filter clean distclean print-%,$(MAKECMDGOALS)),)
   ifeq ($(NOEXTRACT),0)
     DUMMY != $(PYTHON) extract_assets.py $(VERSION) >&2 || echo FAIL
     ifeq ($(DUMMY),FAIL)
-      $(error Failed to extract assets)
+      $(error Failed to extract assets from US ROM)
     endif
-    DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
-    ifeq ($(DUMMY),FAIL)
-      $(error Failed to extract assets)
+    ifneq (,$(wildcard baserom.jp.z64))
+      DUMMY != $(PYTHON) extract_assets.py jp >&2 || echo FAIL
+      ifeq ($(DUMMY),FAIL)
+        $(error Failed to extract assets from JP ROM)
+      endif
+    endif
+    ifneq (,$(wildcard baserom.eu.z64))
+      DUMMY != $(PYTHON) extract_assets.py eu >&2 || echo FAIL
+      ifeq ($(DUMMY),FAIL)
+        $(error Failed to extract assets from EU ROM)
+      endif
+    endif
+    ifneq (,$(wildcard baserom.sh.z64))
+      DUMMY != $(PYTHON) extract_assets.py sh >&2 || echo FAIL
+      ifeq ($(DUMMY),FAIL)
+        $(error Failed to extract assets from SH ROM)
+      endif
     endif
   endif
 
@@ -616,7 +630,8 @@ $(BUILD_DIR)/src/usb/usb.o: CFLAGS += -Wno-unused-variable -Wno-sign-compare -Wn
 $(BUILD_DIR)/src/usb/debug.o: OPT_FLAGS := -O0
 $(BUILD_DIR)/src/usb/debug.o: CFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
 # File specific opt flags
-$(BUILD_DIR)/src/audio/*.o:                   OPT_FLAGS := -Os -fno-jump-tables
+$(BUILD_DIR)/src/audio/heap.o:          OPT_FLAGS := -Os -fno-jump-tables
+$(BUILD_DIR)/src/audio/synthesis.o:     OPT_FLAGS := -Os -fno-jump-tables
 
 $(BUILD_DIR)/src/engine/surface_collision.o:  OPT_FLAGS := $(COLLISION_OPT_FLAGS)
 $(BUILD_DIR)/src/engine/math_util.o:          OPT_FLAGS := $(MATH_UTIL_OPT_FLAGS)

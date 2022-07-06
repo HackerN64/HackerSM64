@@ -15,6 +15,8 @@
 #include "seq_ids.h"
 #include "dialog_ids.h"
 
+#include "config/config_audio.h"
+
 // N.B. sound banks are different from the audio banks referred to in other
 // files. We should really fix our naming to be less ambiguous...
 #define MAX_BACKGROUND_MUSIC_QUEUE_SIZE 6
@@ -1269,7 +1271,7 @@ static void update_game_sound(void) {
 #endif
                                 } else {
 #if defined(VERSION_EU) || defined(VERSION_SH)
-                                    func_802ad728((x04020000 | ((channelIndex & 0xff) << 8),
+                                    func_802ad728(0x04020000 | ((channelIndex & 0xff) << 8),
                                         get_sound_freq_scale(bank, soundIndex) + ((f32) sSoundMovingSpeed[bank] / 400.0f));
 #else
                                     value = get_sound_freq_scale(bank, soundIndex);
@@ -2195,7 +2197,9 @@ void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
     for (i = 0; i < sBackgroundMusicQueueSize; i++) {
         if (sBackgroundMusicQueue[i].seqId == seqId) {
             if (i == 0) {
+#ifndef PERSISTENT_CAP_MUSIC
                 seq_player_play_sequence(SEQ_PLAYER_LEVEL, seqId, fadeTimer);
+#endif
             } else if (!gSequencePlayers[SEQ_PLAYER_LEVEL].enabled) {
                 stop_background_music(sBackgroundMusicQueue[0].seqId);
             }
@@ -2407,8 +2411,12 @@ void func_803210D4(u16 fadeDuration) {
 /**
  * Called from threads: thread5_game_loop
  */
-void play_course_clear(void) {
-    seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_CUTSCENE_COLLECT_STAR, 0);
+void play_course_clear(s32 isKey) {
+    if (isKey) {
+        seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_CUTSCENE_COLLECT_KEY, 0);
+    } else {
+        seq_player_play_sequence(SEQ_PLAYER_ENV, SEQ_EVENT_CUTSCENE_COLLECT_STAR, 0);
+    }
     sBackgroundMusicMaxTargetVolume = TARGET_VOLUME_IS_PRESENT_FLAG | 0;
 #if defined(VERSION_EU) || defined(VERSION_SH)
     D_EU_80300558 = 2;
