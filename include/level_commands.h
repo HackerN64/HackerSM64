@@ -310,6 +310,9 @@ enum GoddardScene {
     CMD_PTR(romEnd)
 #endif
 
+#undef LOAD_MIO0_TEXTURE
+#define LOAD_MIO0_TEXTURE(a,b,c) LOAD_YAY0_TEXTURE(a,b,c)
+
 #define CHANGE_AREA_SKYBOX(area, segStart, segEnd) \
     CMD_BBH(LEVEL_CMD_CHANGE_AREA_SKYBOX, 0x0C, area), \
     CMD_PTR(segStart), \
