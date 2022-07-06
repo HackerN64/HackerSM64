@@ -11,7 +11,10 @@
 #define NORMAL_FLOOR_THRESHOLD 0.01f
 #define NORMAL_CEIL_THRESHOLD -NORMAL_FLOOR_THRESHOLD
 
-extern u8 gSurfacePoolError;
+/**
+ * The size of the dynamic surface pool, in bytes.
+ */
+#define DYNAMIC_SURFACE_POOL_SIZE 0x8000
 
 struct SurfaceNode {
     struct SurfaceNode *next;
@@ -30,10 +33,11 @@ typedef struct SurfaceNode SpatialPartitionCell[NUM_SPATIAL_PARTITIONS];
 
 extern SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 extern SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
-extern struct SurfaceNode *sSurfaceNodePool;
-extern struct Surface *sSurfacePool;
-extern s32 sSurfaceNodePoolSize;
-extern s32 sSurfacePoolSize;
+extern void *gCurrStaticSurfacePool;
+extern void *gDynamicSurfacePool;
+extern void *gCurrStaticSurfacePoolEnd;
+extern void *gDynamicSurfacePoolEnd;
+extern u32 gTotalStaticSurfaceData;
 
 void alloc_surface_pools(void);
 #ifdef NO_SEGMENTED_MEMORY
@@ -42,5 +46,6 @@ u32 get_area_terrain_size(TerrainData *data);
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, MacroObject *macroObjects);
 void clear_dynamic_surfaces(void);
 void load_object_collision_model(void);
+void load_object_static_model(void);
 
 #endif // SURFACE_LOAD_H
