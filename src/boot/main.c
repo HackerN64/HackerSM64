@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <PR/os_internal_reg.h>
 #include <PR/os_system.h>
 #include <PR/os_vi.h>
 #include <stdio.h>
@@ -13,6 +14,7 @@
 #include "game/main.h"
 #include "game/rumble_init.h"
 #include "game/version.h"
+#include "game/vc_check.h"
 #ifdef UNF
 #include "usb/usb.h"
 #include "usb/debug.h"
@@ -20,6 +22,8 @@
 #include "game/puppyprint.h"
 #include "game/puppylights.h"
 #include "game/profiling.h"
+
+#include "game/vc_check.h"
 
 // Message IDs
 enum MessageIDs {
@@ -298,12 +302,14 @@ void handle_dp_complete(void) {
     sCurrentDisplaySPTask->state = SPTASK_STATE_FINISHED_DP;
     sCurrentDisplaySPTask = NULL;
 }
+
 extern void crash_screen_init(void);
 
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
     load_engine_code_segment();
+    gIsVC = IS_VC();
 #ifndef UNF
     crash_screen_init();
 #endif
@@ -320,6 +326,16 @@ void thread3_main(UNUSED void *arg) {
     osSyncPrintf("Compiler: %s\n", __compiler__);
     osSyncPrintf("Linker  : %s\n", __linker__);
 #endif
+
+    if (IO_READ(DPC_CLOCK_REG) == 0) {
+        gIsConsole = FALSE;
+        gBorderHeight = BORDER_HEIGHT_EMULATOR;
+        gIsVC = IS_VC();
+        check_cache_emulation();
+    } else {
+        gIsConsole = TRUE;
+        gBorderHeight = BORDER_HEIGHT_CONSOLE;
+    }
 
     create_thread(&gSoundThread, THREAD_4_SOUND, thread4_sound, NULL, gThread4Stack + 0x2000, 20);
     osStartThread(&gSoundThread);
