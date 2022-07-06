@@ -595,16 +595,67 @@ void puppycamera_debug_view(void) {
     }
 }
 
+#define STUB_LEVEL(textname, _1, _2, _3, _4, _5, _6, _7, _8) textname,
+#define DEFINE_LEVEL(textname, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10) textname,
+
+static char sLevelNames[][32] = {
+    #include "levels/level_defines.h"
+};
+#undef STUB_LEVEL
+#undef DEFINE_LEVEL
+
+static u8 sLevelSelectOption = 0;
+static u8 sLevelSelectOptionArea = 0;
+u8 gPuppyWarp = 0;
+u8 gPuppyWarpArea = 0;
+
+void puppyprint_level_select_menu(void) {
+    s32 posY;
+    s32 renderedText = 0;
+    char textBytes[32];
+    prepare_blank_box();
+    render_blank_box_rounded((SCREEN_WIDTH/2) - 80, (SCREEN_HEIGHT/2) - 60, (SCREEN_WIDTH/2) + 80, (SCREEN_HEIGHT/2) + 60, 0, 0, 0, 160);
+    finish_blank_box();
+    print_small_text_light(SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) - 58, "Pick a level", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    print_small_text_light(SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) + 64, "(Area must have warp node of 0x0A)\nDpad Left: Warp / Dpad Right: Area\nYellow is current level.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+    for (u32 i = 0; i < sizeof(sLevelNames) / 32; i++) {
+        s32 yOffset = sLevelSelectOption > 8 ? sLevelSelectOption-8 : 0;
+        posY = ((renderedText-yOffset) * 10);
+        if (sLevelNames[i][0] == 0) {
+            continue;
+        }
+        renderedText++;
+        if (posY < 0 || posY > 84) {
+            continue;
+        }
+        if (sLevelSelectOption == i) {
+            sprintf(textBytes, "%s - %d", sLevelNames[i], sLevelSelectOptionArea + 1);
+            print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
+        }
+        else
+        if ((u32) gCurrLevelNum-1 == i) {
+            sprintf(textBytes, "%s", sLevelNames[i]);
+            print_set_envcolour(0xFF, 0xFF, 0x40, 0xFF);
+        }
+        else{
+            sprintf(textBytes, "%s", sLevelNames[i]);
+            print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
+        }
+        print_small_text_light(SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) - 40 + posY, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
+    }
+}
+
 struct PuppyPrintPage ppPages[] = {
-    {&puppyprint_render_standard,  "Standard" },
-    {&puppyprint_render_minimal,   "Minimal"  },
+    {&puppyprint_render_standard, "Standard"},
+    {&puppyprint_render_minimal, "Minimal"},
 #ifdef USE_PROFILER
-    {NULL,   "Wise Profiler"  }, // Use Wiseguy's lightweight profiler instead.
+    {NULL, "Wise Profiler"}, // Use Wiseguy's lightweight profiler instead.
 #endif
-    {&print_audio_ram_overview,    "Audio"    },
-    {&print_ram_overview,          "Segments" },
+    {&print_audio_ram_overview, "Audio"},
+    {&print_ram_overview, "Segments"},
     {&puppyprint_render_collision, "Collision"},
-    {&print_console_log,           "Log"      },
+    {&print_console_log, "Log"},
+    {&puppyprint_level_select_menu, "Level Select"      },
     {&render_coverage_map, "Coverage"},
 #ifdef PUPPYCAM
     {&puppycamera_debug_view, "Unlock Camera"},
@@ -621,6 +672,7 @@ enum PPPages {
     PUPPYPRINT_PAGE_RAM,
     PUPPYPRINT_PAGE_COLLISION,
     PUPPYPRINT_PAGE_LOG,
+    PUPPYPRINT_PAGE_LEVEL_SELECT,
 #ifdef PUPPYCAM
     PUPPYPRINT_PAGE_CAMERA
 #endif
@@ -746,29 +798,6 @@ void puppyprint_profiler_process(void) {
         sDebugMenu = FALSE;
     }
 
-    // Collision toggles.
-#ifdef VISUAL_DEBUG
-    if (sPPDebugPage == PUPPYPRINT_PAGE_COLLISION)
-    {
-        if (gPlayer1Controller->buttonPressed & R_JPAD)
-            viewCycle++;
-        if (gPlayer1Controller->buttonPressed & L_JPAD)
-            viewCycle--;
-        if (viewCycle == 4)
-            viewCycle = 0;
-        if (viewCycle == 255)
-            viewCycle = 3;
-    }
-#endif
-
-    if (sPPDebugPage == PUPPYPRINT_PAGE_RAM) {
-        if (gPlayer1Controller->buttonDown & U_JPAD && gPPSegScroll > 0)  {
-            gPPSegScroll -= 4;
-        } else if (gPlayer1Controller->buttonDown & D_JPAD && gPPSegScroll < (12 * 32)){
-            gPPSegScroll += 4;
-        }
-    }
-
     if (sDebugMenu) {
         if (gPlayer1Controller->buttonPressed & U_JPAD) sDebugOption--;
         if (gPlayer1Controller->buttonPressed & D_JPAD) sDebugOption++;
@@ -779,6 +808,72 @@ void puppyprint_profiler_process(void) {
 
         if (sDebugOption >= (sizeof(ppPages) / sizeof(struct PuppyPrintPage))) {
             sDebugOption = 0;
+        }
+    } else {
+        if (sPPDebugPage == PUPPYPRINT_PAGE_LEVEL_SELECT)
+        {
+            if (gPlayer1Controller->buttonPressed & U_JPAD) {
+                sLevelSelectOption--;
+                while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
+                    sLevelSelectOption--;
+                }
+            }
+            if (gPlayer1Controller->buttonPressed & D_JPAD) {
+                sLevelSelectOption++;
+                while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
+                    sLevelSelectOption++;
+                }
+            }
+            if (sLevelSelectOption == 255) {
+                sLevelSelectOption = (sizeof(sLevelNames)/32)-1;
+                while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
+                    sLevelSelectOption--;
+                }
+            }
+            if (sLevelSelectOption >= (sizeof(sLevelNames)/32)) {
+                while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
+                    sLevelSelectOption++;
+                }
+                sLevelSelectOption = 0;
+            }
+            if (gPlayer1Controller->buttonPressed & R_JPAD) {
+                sLevelSelectOptionArea++;
+                if (sLevelSelectOptionArea > 7) {
+                    sLevelSelectOptionArea = 0;
+                }
+            }
+            if (gPlayer1Controller->buttonPressed & L_JPAD) {
+                sPPDebugPage = 0;
+                gPuppyWarp = sLevelSelectOption + 1;
+                gPuppyWarpArea = sLevelSelectOptionArea + 1;
+            }
+        } else {
+            if (gCurrLevelNum > 3) {
+                sLevelSelectOption = gCurrLevelNum;
+            } else {
+                sLevelSelectOption = LEVEL_CASTLE_GROUNDS;
+            }
+        }
+        // Collision toggles.
+#ifdef VISUAL_DEBUG
+        if (sPPDebugPage == PUPPYPRINT_PAGE_COLLISION)
+        {
+            if (gPlayer1Controller->buttonPressed & R_JPAD)
+                viewCycle++;
+            if (gPlayer1Controller->buttonPressed & L_JPAD)
+                viewCycle--;
+            if (viewCycle == 4)
+                viewCycle = 0;
+            if (viewCycle == 255)
+                viewCycle = 3;
+        }
+#endif
+        if (sPPDebugPage == PUPPYPRINT_PAGE_RAM) {
+            if (gPlayer1Controller->buttonDown & U_JPAD && gPPSegScroll > 0)  {
+                gPPSegScroll -= 4;
+            } else if (gPlayer1Controller->buttonDown & D_JPAD && gPPSegScroll < (12 * 32)){
+                gPPSegScroll += 4;
+            }
         }
     }
 

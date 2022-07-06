@@ -422,6 +422,10 @@ void init_mario_after_warp(void) {
         }
 #endif
     }
+#if PUPPYPRINT_DEBUG
+    gPuppyWarp = 0;
+    gPuppyWarpArea = 0;
+#endif
 }
 
 // used for warps inside one level
@@ -822,6 +826,12 @@ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
 void initiate_delayed_warp(void) {
     struct ObjectWarpNode *warpNode;
     s32 destWarpNode;
+
+#if PUPPYPRINT_DEBUG
+    if (gPuppyWarp) {
+        initiate_warp(gPuppyWarp, gPuppyWarpArea, 0x0A, 0);
+    }
+#endif
 
     if (sDelayedWarpOp != WARP_OP_NONE && --sDelayedWarpTimer == 0) {
         reset_dialog_render_state();

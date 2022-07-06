@@ -66,6 +66,8 @@ extern f32 textSize;
 extern u32 gPoolMem;
 extern u32 gMiscMem;
 typedef u32 PPTimer[NUM_PERF_ITERATIONS + 2];
+extern u8 gPuppyWarp;
+extern u8 gPuppyWarpArea;
 
 struct PuppyPrintTimers
 {
