@@ -25,7 +25,7 @@
                 "TARGET_N64=1",
                 "VERSION_US=1",
                 "F3DEX_GBI_2=1",
-                "F3DZEX_GBI_2=1",
+                "F3DZEX_NON_GBI_2=1",
                 "F3DEX_GBI_SHARED=1",
                 "NON_MATCHING=1",
                 "AVOID_UB=1"
