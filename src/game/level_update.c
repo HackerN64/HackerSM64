@@ -31,6 +31,8 @@
 #include "puppyprint.h"
 #include "puppylights.h"
 #include "level_commands.h"
+#include "behavior_data.h"
+#include "paintings.h"
 
 #include "config.h"
 
@@ -620,36 +622,17 @@ void initiate_warp(s16 destLevel, s16 destArea, s16 destWarpNode, s32 warpFlags)
 #endif
 }
 
-// From Surface 0xD3 to 0xFC
-#define PAINTING_WARP_INDEX_START 0x00 // Value greater than or equal to Surface 0xD3
-#define PAINTING_WARP_INDEX_FA 0x2A    // THI Huge Painting index left
-#define PAINTING_WARP_INDEX_END 0x2D   // Value less than Surface 0xFD
-
-/**
- * Check if Mario is above and close to a painting warp floor, and return the
- * corresponding warp node.
- */
-struct WarpNode *get_painting_warp_node(void) {
-    struct WarpNode *warpNode = NULL;
-    s32 paintingIndex = gMarioState->floor->type - SURFACE_PAINTING_WARP_D3;
-
-    if (paintingIndex >= PAINTING_WARP_INDEX_START && paintingIndex < PAINTING_WARP_INDEX_END) {
-        if (paintingIndex < PAINTING_WARP_INDEX_FA
-            || gMarioState->pos[1] - gMarioState->floorHeight < 80.0f) {
-            warpNode = &gCurrentArea->paintingWarpNodes[paintingIndex];
-        }
-    }
-
-    return warpNode;
-}
-
 /**
  * Check is Mario has entered a painting, and if so, initiate a warp.
  */
 void initiate_painting_warp(void) {
-    if (gCurrentArea->paintingWarpNodes != NULL && gMarioState->floor != NULL) {
-        struct WarpNode warpNode;
-        struct WarpNode *pWarpNode = get_painting_warp_node();
+    struct WarpNode warpNode;
+    struct WarpNode *pWarpNode = NULL;
+
+    if (gCurrentArea->paintingWarpNodes == NULL) {
+        gEnteredPainting = NULL;
+    } else if (gEnteredPainting != NULL) {
+        pWarpNode = &gCurrentArea->paintingWarpNodes[gEnteredPainting->oPaintingId];
 
         if (pWarpNode != NULL) {
             if (gMarioState->action & ACT_FLAG_INTANGIBLE) {
@@ -661,7 +644,7 @@ void initiate_painting_warp(void) {
                     sWarpCheckpointActive = check_warp_checkpoint(&warpNode);
                 }
 
-                initiate_warp(warpNode.destLevel & 0x7F, warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
+                initiate_warp((warpNode.destLevel & WARP_DEST_LEVEL_NUM_MASK), warpNode.destArea, warpNode.destNode, WARP_FLAGS_NONE);
                 check_if_should_set_warp_checkpoint(&warpNode);
 
                 play_transition_after_delay(WARP_TRANSITION_FADE_INTO_COLOR, 30, 255, 255, 255, 45);
@@ -677,8 +660,11 @@ void initiate_painting_warp(void) {
                 queue_rumble_data(80, 70);
                 queue_rumble_decay(1);
 #endif
+                cutscene_object(CUTSCENE_ENTER_PAINTING, gEnteredPainting);
             }
         }
+    } else {
+        sPaintingEjectSoundPlayed = FALSE;
     }
 }
 

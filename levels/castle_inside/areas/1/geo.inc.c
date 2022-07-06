@@ -48,8 +48,6 @@ const GeoLayout castle_geo_000FD0[] = {
    GEO_OPEN_NODE(),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07032FC0),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07033158),
-      GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(0, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -61,8 +59,6 @@ const GeoLayout castle_geo_001000[] = {
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07034D88),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07035178),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07035288),
-      GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(2, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -77,8 +73,6 @@ const GeoLayout castle_geo_001038[] = {
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, inside_castle_seg7_dl_07037DE8),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, dl_castle_aquarium_light),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07038350),
-      GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(3, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -89,10 +83,8 @@ const GeoLayout castle_geo_001088[] = {
    GEO_OPEN_NODE(),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_0703A6C8),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_0703A808),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_070234C0),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07023520),
-      GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(1, 1), geo_painting_draw),
+      GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_ccm_fake_painting_1),
+      GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_ccm_fake_painting_2),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -172,8 +164,6 @@ const GeoLayout castle_geo_001200[] = {
       GEO_ASM(  0, geo_exec_inside_castle_light),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07032FC0),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07033158),
-      GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(0, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -191,8 +181,6 @@ const GeoLayout castle_geo_001260[] = {
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07034D88),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07035178),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07035288),
-      GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(2, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -213,8 +201,6 @@ const GeoLayout castle_geo_0012C8[] = {
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, inside_castle_seg7_dl_07037DE8),
       GEO_DISPLAY_LIST(LAYER_TRANSPARENT, dl_castle_aquarium_light),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_07038350),
-      GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(3, 1), geo_painting_draw),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };
@@ -231,10 +217,8 @@ const GeoLayout castle_geo_001348[] = {
       GEO_ASM(  0, geo_exec_inside_castle_light),
       GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_0703A6C8),
       GEO_DISPLAY_LIST(LAYER_ALPHA, inside_castle_seg7_dl_0703A808),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_070234C0),
-      GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_07023520),
-      GEO_ASM(  0, geo_painting_update),
-      GEO_ASM(PAINTING_ID(1, 1), geo_painting_draw),
+      GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_ccm_fake_painting_1),
+      GEO_DISPLAY_LIST(LAYER_OPAQUE, inside_castle_seg7_dl_ccm_fake_painting_2),
    GEO_CLOSE_NODE(),
    GEO_RETURN(),
 };

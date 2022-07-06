@@ -8,6 +8,7 @@
 #include "game/behavior_actions.h"
 #include "game/mario_actions_cutscene.h"
 #include "game/mario_misc.h"
+#include "game/paintings.h"
 #include "game/object_helpers.h"
 #include "game/debug.h"
 #include "menu/file_select.h"
@@ -2232,16 +2233,6 @@ const BehaviorScript bhvWaterLevelPillar[] = {
     END_LOOP(),
 };
 
-const BehaviorScript bhvDddWarp[] = {
-    BEGIN(OBJ_LIST_SURFACE),
-    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
-    SET_FLOAT(oCollisionDistance, 30000),
-    BEGIN_LOOP(),
-        CALL_NATIVE(bhv_ddd_warp_loop),
-        CALL_NATIVE(load_object_collision_model),
-    END_LOOP(),
-};
-
 const BehaviorScript bhvMoatGrills[] = {
     BEGIN(OBJ_LIST_SURFACE),
 #ifdef UNLOCK_ALL
@@ -3501,6 +3492,15 @@ const BehaviorScript bhvUnlockDoorStar[] = {
     CALL_NATIVE(bhv_unlock_door_star_init),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_unlock_door_star_loop),
+    END_LOOP(),
+};
+
+const BehaviorScript bhvPainting[] = {
+    BEGIN(OBJ_LIST_LEVEL),
+    OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
+    CALL_NATIVE(bhv_painting_init),
+    BEGIN_LOOP(),
+        CALL_NATIVE(bhv_painting_loop),
     END_LOOP(),
 };
 

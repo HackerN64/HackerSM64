@@ -28,8 +28,6 @@
 #include "spawn_sound.h"
 #include "puppylights.h"
 
-static s8 sLevelsWithRooms[] = { LEVEL_BBH, LEVEL_CASTLE, LEVEL_HMC, -1 };
-
 static s32 clear_move_flag(u32 *bitSet, s32 flag);
 
 Gfx *geo_update_projectile_pos_from_parent(s32 callContext, UNUSED struct GraphNode *node, Mat4 mtx) {
@@ -123,8 +121,8 @@ Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void 
 }
 
 Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *context) {
-    struct Surface *floor;
     struct GraphNodeSwitchCase *switchCase = (struct GraphNodeSwitchCase *) node;
+    RoomData room = -1;
 
     if (callContext == GEO_CONTEXT_RENDER) {
         if (gMarioObject == NULL) {
@@ -133,21 +131,23 @@ Gfx *geo_switch_area(s32 callContext, struct GraphNode *node, UNUSED void *conte
 #ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
             if (gCurrLevelNum == LEVEL_BBH) {
                 // In BBH, check for a floor manually, since there is an intangible floor. In custom hacks this can be removed.
-                find_room_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &floor);
-            } else {
+                room = get_room_at_pos(gMarioObject->oPosX,
+                                       gMarioObject->oPosY,
+                                       gMarioObject->oPosZ);
+            } else if (gMarioState->floor) {
                 // Since no intangible floors are nearby, use Mario's floor instead.
-                floor = gMarioState->floor;
+                room = gMarioState->floor->room;
             }
+            if (room != -1) {
 #else
-            floor = gMarioState->floor;
+            if (gMarioState->floor) {
+                room = gMarioState->floor->room;
 #endif
-            if (floor) {
-                gMarioCurrentRoom = floor->room;
-                s16 roomCase = floor->room - 1;
-                print_debug_top_down_objectinfo("areainfo %d", floor->room);
+                gMarioCurrentRoom = room;
+                print_debug_top_down_objectinfo("areainfo %d", room);
 
-                if (roomCase >= 0) {
-                    switchCase->selectedCase = roomCase;
+                if (room > 0) {
+                    switchCase->selectedCase = room - 1;
                 }
             }
         }
@@ -1881,27 +1881,16 @@ s32 is_item_in_array(s8 item, s8 *array) {
 }
 
 void bhv_init_room(void) {
-    struct Surface *floor = NULL;
-    if (is_item_in_array(gCurrLevelNum, sLevelsWithRooms)) {
-        find_room_floor(o->oPosX, o->oPosY, o->oPosZ, &floor);
-
-        if (floor != NULL) {
-            o->oRoom = floor->room;
-            return;
-        }
-    }
-    o->oRoom = -1;
+    o->oRoom = get_room_at_pos(o->oPosX, o->oPosY, o->oPosZ);
 }
 
 void cur_obj_enable_rendering_if_mario_in_room(void) {
     if (o->oRoom != -1 && gMarioCurrentRoom != 0) {
-        register s32 marioInRoom = (
+        if (
             gMarioCurrentRoom == o->oRoom
             || gDoorAdjacentRooms[gMarioCurrentRoom][0] == o->oRoom
             || gDoorAdjacentRooms[gMarioCurrentRoom][1] == o->oRoom
-        );
-
-        if (marioInRoom) {
+        ) {
             cur_obj_enable_rendering();
             o->activeFlags &= ~ACTIVE_FLAG_IN_DIFFERENT_ROOM;
             gNumRoomedObjectsInMarioRoom++;

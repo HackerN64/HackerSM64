@@ -4855,9 +4855,6 @@ u8 get_cutscene_from_mario_status(struct Camera *c) {
         if (sMarioCamState->cameraEvent == CAM_EVENT_CANNON) {
             cutscene = CUTSCENE_ENTER_CANNON;
         }
-        if (SURFACE_IS_PAINTING_WARP(sMarioGeometry.currFloorType)) {
-            cutscene = CUTSCENE_ENTER_PAINTING;
-        }
         switch (sMarioCamState->action) {
             case ACT_DEATH_EXIT:
                 cutscene = CUTSCENE_DEATH_EXIT;
@@ -6591,14 +6588,14 @@ s16 cutscene_object_without_dialog(u8 cutscene, struct Object *obj) {
  * @return 0 if not started, 1 if started, and -1 if finished
  */
 s16 cutscene_object(u8 cutscene, struct Object *obj) {
-    s16 status = 0;
+    s16 status = CUTSCENE_OBJ_STATUS_NOT_STARTED;
 
-    if ((gCamera->cutscene == 0) && (sObjectCutscene == 0)) {
+    if ((gCamera->cutscene == CUTSCENE_NONE) && (sObjectCutscene == CUTSCENE_NONE)) {
         if (gRecentCutscene != cutscene) {
             start_object_cutscene(cutscene, obj);
-            status = 1;
+            status = CUTSCENE_OBJ_STATUS_STARTED;
         } else {
-            status = -1;
+            status = CUTSCENE_OBJ_STATUS_FINISHED;
         }
     }
     return status;
@@ -9570,40 +9567,35 @@ void cutscene_double_doors_end(struct Camera *c) {
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
 }
 
-void cutscene_enter_painting_stub(UNUSED struct Camera *c) {
-}
-
 /**
  * Plays when Mario enters a painting. The camera flies up to the painting's center, then it slowly
  * zooms in until the star select screen appears.
  */
 void cutscene_enter_painting(struct Camera *c) {
-    struct Surface *floor, *highFloor;
+    struct Surface *highFloor;
     Vec3f paintingPos, focus, focusOffset;
     Vec3s paintingAngle;
-    f32 floorHeight;
+    f32 floorHeight, size;
 
-    cutscene_event(cutscene_enter_painting_stub, c, 0, 0);
     // Zoom in
     set_fov_function(CAM_FOV_APP_20);
     sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
 
-    if (gRipplingPainting != NULL) {
-        paintingAngle[0] = 0;
-        paintingAngle[1] = (s32)((gRipplingPainting->yaw / 360.f) * 65536.f); // convert degrees to IAU
-        paintingAngle[2] = 0;
+    struct Object *ripplingPainting = gCutsceneFocus;
 
-        focusOffset[0] = gRipplingPainting->size / 2;
+    if (ripplingPainting != NULL) {
+        vec3i_to_vec3s(paintingAngle, &ripplingPainting->oFaceAngleVec);
+
+        size = ((ripplingPainting->oPaintingPtr->sizeX + ripplingPainting->oPaintingPtr->sizeY) / 2.0f);
+        focusOffset[0] = (size * 0.5f);
         focusOffset[1] = focusOffset[0];
         focusOffset[2] = 0;
 
-        paintingPos[0] = gRipplingPainting->posX;
-        paintingPos[1] = gRipplingPainting->posY;
-        paintingPos[2] = gRipplingPainting->posZ;
+        vec3f_copy(paintingPos, &ripplingPainting->oPosVec);
 
         offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
         approach_vec3f_asymptotic(c->focus, focus, 0.1f, 0.1f, 0.1f);
-        focusOffset[2] = -(((gRipplingPainting->size * 1000.f) / 2) / 307.f);
+        focusOffset[2] = -(((size * 1000.f) / 2) / 307.f);
         offset_rotated(focus, paintingPos, focusOffset, paintingAngle);
         floorHeight = find_floor(focus[0], focus[1] + 500.f, focus[2], &highFloor) + 125.f;
 
@@ -9616,15 +9608,12 @@ void cutscene_enter_painting(struct Camera *c) {
         } else {
             approach_vec3f_asymptotic(c->pos, focus, 0.9f, 0.9f, 0.9f);
         }
-
-        find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 50.f, sMarioCamState->pos[2], &floor);
-
-        if ((floor->type < SURFACE_PAINTING_WOBBLE_A6) || (floor->type > SURFACE_PAINTING_WARP_F9)) {
-            c->cutscene = 0;
-            gCutsceneTimer = CUTSCENE_STOP;
-            sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
-        }
+    } else {
+        c->cutscene = CUTSCENE_NONE;
+        gCutsceneTimer = CUTSCENE_STOP;
+        sStatusFlags |= CAM_FLAG_SMOOTH_MOVEMENT;
     }
+
     c->mode = CAMERA_MODE_CLOSE;
 }
 
@@ -9644,10 +9633,12 @@ void cutscene_exit_painting_start(struct Camera *c) {
     vec3f_set(sCutsceneVars[2].point, 258.f, -352.f, 1189.f);
     vec3f_set(sCutsceneVars[1].point, 65.f, -155.f, 444.f);
 
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     if (gPrevLevel == LEVEL_TTM) {
         sCutsceneVars[1].point[1] = 0.f;
         sCutsceneVars[1].point[2] = 0.f;
     }
+#endif
     vec3f_copy(sCutsceneVars[0].point, sMarioCamState->pos);
     sCutsceneVars[0].angle[0] = 0;
     sCutsceneVars[0].angle[1] = sMarioCamState->faceAngle[1];
@@ -9657,7 +9648,8 @@ void cutscene_exit_painting_start(struct Camera *c) {
     floorHeight = find_floor(c->pos[0], c->pos[1] + 10.f, c->pos[2], &floor);
 
     if (floorHeight != FLOOR_LOWER_LIMIT) {
-        if (c->pos[1] < (floorHeight += 60.f)) {
+        floorHeight += 60.0f;
+        if (c->pos[1] < floorHeight) {
             c->pos[1] = floorHeight;
         }
     }
@@ -9690,10 +9682,10 @@ void cutscene_exit_painting_move_to_floor(struct Camera *c) {
     Vec3f floorHeight;
 
     vec3f_copy(floorHeight, sMarioCamState->pos);
-    floorHeight[1] = find_floor(sMarioCamState->pos[0], sMarioCamState->pos[1] + 10.f, sMarioCamState->pos[2], &floor);
+    floorHeight[1] = find_floor(sMarioCamState->pos[0], (sMarioCamState->pos[1] + 10.0f), sMarioCamState->pos[2], &floor);
 
     if (floor != NULL) {
-        floorHeight[1] = floorHeight[1] + (sMarioCamState->pos[1] - floorHeight[1]) * 0.7f + 125.f;
+        floorHeight[1] = (floorHeight[1] + ((sMarioCamState->pos[1] - floorHeight[1]) * 0.7f) + 125.0f);
         approach_vec3f_asymptotic(c->focus, floorHeight, 0.2f, 0.2f, 0.2f);
 
         if (floorHeight[1] < c->pos[1]) {
@@ -9706,14 +9698,16 @@ void cutscene_exit_painting_move_to_floor(struct Camera *c) {
  * Cutscene played when Mario leaves a painting, either due to death or collecting a star.
  */
 void cutscene_exit_painting(struct Camera *c) {
-    cutscene_event(cutscene_exit_painting_start, c, 0, 0);
+    cutscene_event(cutscene_exit_painting_start,         c, 0,  0);
     cutscene_event(cutscene_exit_painting_move_to_mario, c, 5, -1);
     cutscene_event(cutscene_exit_painting_move_to_floor, c, 5, -1);
 
+#ifdef ENABLE_VANILLA_CAM_PROCESSING
     //! Hardcoded position. TTM's painting is close to an opposite wall, so just fix the pos.
     if (gPrevLevel == LEVEL_TTM) {
-        vec3f_set(c->pos, -296.f, 1261.f, 3521.f);
+        vec3f_set(c->pos, -296.0f, 1261.0f, 3521.0f);
     }
+#endif
 
     update_camera_yaw(c);
 }

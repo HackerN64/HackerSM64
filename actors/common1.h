@@ -226,6 +226,9 @@ extern const Gfx mushroom_1up_seg3_dl_0302A660[];
 // number
 extern const GeoLayout number_geo[];
 
+// painting
+extern const GeoLayout painting_geo[];
+
 // pebble
 extern const Gfx pebble_seg3_dl_0301CB00[];
 
