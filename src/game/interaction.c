@@ -764,10 +764,14 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
     u32 starIndex;
     u32 starGrabAction = ACT_STAR_DANCE_EXIT;
 #ifdef NON_STOP_STARS
+ #ifdef KEYS_EXIT_LEVEL
+    u32 noExit = !obj_has_model(obj, MODEL_BOWSER_KEY);
+ #else
     u32 noExit = TRUE;
-#else
+ #endif
+#else // !NON_STOP_STARS
     u32 noExit = (obj->oInteractionSubtype & INT_SUBTYPE_NO_EXIT) != 0;
-#endif
+#endif // !NON_STOP_STARS
     u32 grandStar = (obj->oInteractionSubtype & INT_SUBTYPE_GRAND_STAR) != 0;
 
     if (m->health >= 0x100) {

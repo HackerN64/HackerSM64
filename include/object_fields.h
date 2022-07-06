@@ -973,11 +973,7 @@
 #define /*0x104*/ oSnufitBodyScalePeriod OBJECT_FIELD_S32(0x1F)
 #define /*0x108*/ oSnufitBodyBaseScale   OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oSnufitBullets         OBJECT_FIELD_S32(0x21)
-#define /*0x1AC*/ oSnufitOffsetVec       OBJECT_FIELD_S16(0x49, 0) // start pos of s16 vec
-#define /*0x1AC*/ oSnufitXOffset         OBJECT_FIELD_S16(0x49, 0)
-#define /*0x1AE*/ oSnufitYOffset         OBJECT_FIELD_S16(0x49, 1)
-#define /*0x1B0*/ oSnufitZOffset         OBJECT_FIELD_S16(0x4A, 0)
-#define /*0x1B2*/ oSnufitBodyScale       OBJECT_FIELD_S16(0x4A, 1)
+#define /*0x1AC*/ oSnufitBodyScale       OBJECT_FIELD_S16(0x49, 0)
 
 /* Spindel */
 #define /*0x0F4*/ oSpindelMoveTimer     OBJECT_FIELD_S32(0x1B)
@@ -1047,7 +1043,6 @@
 #define /*0x0F4*/ oTiltingPyramidNormalX         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_X_INDEX)
 #define /*0x0F8*/ oTiltingPyramidNormalY         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_Y_INDEX)
 #define /*0x0FC*/ oTiltingPyramidNormalZ         OBJECT_FIELD_F32(O_TILTING_PYRAMID_NORMAL_Z_INDEX)
-#define /*0x10C*/ oTiltingPyramidMarioOnPlatform OBJECT_FIELD_S32(0x21)
 
 /* Toad Message */
 #define /*0x108*/ oToadMessageDialogId       OBJECT_FIELD_U32(0x20)

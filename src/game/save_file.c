@@ -52,6 +52,9 @@ s8 gLevelToCourseNumTable[] = {
 STATIC_ASSERT(ARRAY_COUNT(gLevelToCourseNumTable) == LEVEL_COUNT - 1,
               "change this array if you are adding levels");
 #ifdef EEP
+#include "vc_check.h"
+#include "vc_ultra.h"
+
 /**
  * Read from EEPROM to a given address.
  * The EEPROM address is computed using the offset of the destination address from gSaveBuffer.
@@ -70,7 +73,9 @@ static s32 read_eeprom_data(void *buffer, s32 size) {
             block_until_rumble_pak_free();
 #endif
             triesLeft--;
-            status = osEepromLongRead(&gSIEventMesgQueue, offset, buffer, size);
+            status = gIsVC
+                   ? osEepromLongReadVC(&gSIEventMesgQueue, offset, buffer, size)
+                   : osEepromLongRead  (&gSIEventMesgQueue, offset, buffer, size);
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
@@ -98,7 +103,9 @@ static s32 write_eeprom_data(void *buffer, s32 size) {
             block_until_rumble_pak_free();
 #endif
             triesLeft--;
-            status = osEepromLongWrite(&gSIEventMesgQueue, offset, buffer, size);
+            status = gIsVC
+                   ? osEepromLongWriteVC(&gSIEventMesgQueue, offset, buffer, size)
+                   : osEepromLongWrite  (&gSIEventMesgQueue, offset, buffer, size);
 #if ENABLE_RUMBLE
             release_rumble_pak_control();
 #endif
@@ -361,16 +368,6 @@ void save_file_load_all(void) {
 }
 
 #ifdef PUPPYCAM
-void puppycam_check_save(void) {
-    if (gSaveBuffer.menuData.firstBoot != 4
-        || gSaveBuffer.menuData.saveOptions.sensitivityX < 5
-        || gSaveBuffer.menuData.saveOptions.sensitivityY < 5) {
-        wipe_main_menu_data();
-        gSaveBuffer.menuData.firstBoot = 4;
-        puppycam_default_config();
-    }
-}
-
 void puppycam_get_save(void) {
     gPuppyCam.options = gSaveBuffer.menuData.saveOptions;
 
@@ -393,6 +390,15 @@ void puppycam_set_save(void) {
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
+}
+
+void puppycam_check_save(void) {
+    if (gSaveBuffer.menuData.firstBoot != 4) {
+        wipe_main_menu_data();
+        gSaveBuffer.menuData.firstBoot = 4;
+        puppycam_default_config();
+        puppycam_set_save();
+    }
 }
 #endif
 

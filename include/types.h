@@ -40,10 +40,11 @@ struct Controller {
   /*0x0C*/ f32 stickMag;        // distance from center [0, 64]
   /*0x10*/ u16 buttonDown;
   /*0x12*/ u16 buttonPressed;
-  /*0x14*/ OSContStatus *statusData;
-  /*0x18*/ OSContPad *controllerData;
+  /*0x14*/ u16 buttonReleased;
+  /*0x18*/ OSContStatus *statusData;
+  /*0x1C*/ OSContPad *controllerData;
 #if ENABLE_RUMBLE
-  /*0x1C*/ s32 port;
+  /*0x20*/ s32 port;
 #endif
 };
 

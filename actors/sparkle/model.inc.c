@@ -50,6 +50,7 @@ const Gfx sparkles_seg4_dl_0402A490[] = {
     gsSPVertex(sparkles_seg4_vertex_04027450, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPTexture(0x0001, 0x0001, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPEndDisplayList(),
 };

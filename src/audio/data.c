@@ -10,7 +10,7 @@ extern struct OSMesgQueue OSMesgQueue3;
 
 // Since the audio session is just one now, the reverb settings are duplicated to match the original audio setting scenario.
 // It's a bit hacky but whatever lol. Index range must be defined, since it's needed by the compiler.
-// To increase reverb window sizes beyond 64, please increase the REVERB_WINDOW_SIZE_MAX in heap.c by a factor of 0x40 and update AUDIO_HEAP_SIZE by 4x the same amount.
+// To increase reverb window sizes beyond 64, please increase the REVERB_WINDOW_SIZE_MAX in heap.c by a factor of 0x40.
 #ifdef VERSION_EU
 struct ReverbSettingsEU sReverbSettings[8] = {
     { /*Downsample Rate*/ 1, /*Window Size*/ 64, /*Gain*/ 0x2FFF },
@@ -37,11 +37,7 @@ struct ReverbSettingsEU sReverbSettings[8] = {
 */
 
 struct AudioSessionSettingsEU gAudioSessionPresets[] = {
-#ifdef EXPAND_AUDIO_HEAP
-    { /*1*/ 32000,/*2*/ 1,/*3*/ 40,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ 0x8200,/*9*/ 0xDC00,/*10*/ 0xE800,/*11*/ 0x5500 },
-#else
-    { /*1*/ 32000,/*2*/ 1,/*3*/ 20,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ 0x4100,/*9*/ 0x6E00,/*10*/ 0x7400,/*11*/ 0x2A80 },
-#endif
+    { /*1*/ 32000,/*2*/ 1,/*3*/ MAX_SIMULTANEOUS_NOTES,/*4*/ 1,/*5*/ 0, &sReverbSettings[0],/*6*/ 0x7FFF,/*7*/ 0,/*8*/ PERSISTENT_SEQ_MEM,/*9*/ PERSISTENT_BANK_MEM,/*10*/ TEMPORARY_SEQ_MEM,/*11*/ TEMPORARY_BANK_MEM },
 };
 #endif
 
@@ -57,7 +53,7 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 // - memory used for temporary sequences
 // - memory used for temporary banks
 
-// To increase reverb window sizes beyond 0x1000, please increase the REVERB_WINDOW_SIZE_MAX in heap.c and update AUDIO_HEAP_SIZE by the same amount.
+// To increase reverb window sizes beyond 0x1000, please increase the REVERB_WINDOW_SIZE_MAX in heap.c.
 #if defined(VERSION_JP) || defined(VERSION_US)
 struct ReverbSettingsUS gReverbSettings[18] = {
     { 1, 0x0C00, 0x2FFF },
@@ -80,16 +76,9 @@ struct ReverbSettingsUS gReverbSettings[18] = {
     { 1, 0x0800, 0x2FFF },
 };
 
-// TODO: Does using 40/20 instead of 32/16 for gMaxSimultaneousNotes cause memory problems at high capacities or is it good as is?
-#ifdef EXPAND_AUDIO_HEAP
 struct AudioSessionSettings gAudioSessionPresets[1] = {
-    { 32000, 40, 1, 0x1000, 0x2FFF, 0x7FFF, 0x8200, 0xDC00, 0xE800, 0x5500 },
+    { 32000, MAX_SIMULTANEOUS_NOTES, 1, 0x1000, 0x2FFF, 0x7FFF, PERSISTENT_SEQ_MEM, PERSISTENT_BANK_MEM, TEMPORARY_SEQ_MEM, TEMPORARY_BANK_MEM },
 };
-#else
-struct AudioSessionSettings gAudioSessionPresets[1] = {
-    { 32000, 20, 1, 0x1000, 0x2FFF, 0x7FFF, 0x4100, 0x6E00, 0x7400, 0x2A80 },
-};
-#endif
 #endif
 // gAudioCosineTable[k] = round((2**15 - 1) * cos(pi/2 * k / 127)). Unused.
 #if defined(VERSION_JP) || defined(VERSION_US)

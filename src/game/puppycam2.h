@@ -34,13 +34,13 @@
 #include "include/command_macros_base.h"
 
 #define PUPPYVOLUME(x, y, z, length, height, width, yaw, functionptr, anglesptr, addflags, removeflags, flagpersistance, room, shape, fov) \
-    CMD_BBH(0x3D, 0x24, x), \
+    CMD_BBH(0x3D, 0x28, x), \
     CMD_HHHHHH(y, z, length, height, width, yaw), \
     CMD_PTR(functionptr), \
     CMD_PTR(anglesptr), \
     CMD_W(addflags), \
     CMD_W(removeflags), \
-    CMD_BBH(flagpersistance, shape, room) \
+    CMD_BBH(flagpersistance, shape, room), \
     CMD_BBH(fov, 0x0, 0x0)
 
 struct gPuppyOptions

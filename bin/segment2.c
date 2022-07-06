@@ -2328,6 +2328,7 @@ const Gfx dl_draw_triangle[] = {
     gsSPVertex(vertex_triangle, 3, 0),
     gsSP1Triangle( 0,  1,  2, 0x0),
     gsSPSetGeometryMode(G_LIGHTING),
+    gsDPPipeSync(),
     gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsSPEndDisplayList(),

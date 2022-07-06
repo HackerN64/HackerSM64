@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <PR/os_internal_reg.h>
 
 #include "sm64.h"
 #include "gfx_dimensions.h"
@@ -36,6 +37,7 @@ struct Controller gControllers[3];
 #include "puppycam2.h"
 #include "debug_box.h"
 #include "vc_check.h"
+#include "vc_ultra.h"
 #include "profiling.h"
 
 // First 3 controller slots
@@ -52,6 +54,7 @@ OSContStatus gControllerStatuses[4];
 OSContPad gControllerPads[4];
 u8 gControllerBits;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
+u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 u8 gCustomDebugMode;
@@ -110,7 +113,7 @@ struct DemoInput gRecordedDemoInput = { 0 };
  */
 const Gfx init_rdp[] = {
     gsDPPipeSync(),
-    gsDPPipelineMode(G_PM_1PRIMITIVE),
+    gsDPPipelineMode(G_PM_NPRIMITIVE),
 
     gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
@@ -396,6 +399,21 @@ void draw_reset_bars(void) {
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 }
 
+void check_cache_emulation() {
+    // Disable interrupts to ensure that nothing evicts the variable from cache while we're using it.
+    u32 saved = __osDisableInt();
+    // Create a variable with an initial value of 1. This value will remain cached.
+    volatile u8 sCachedValue = 1;
+    // Overwrite the variable directly in RDRAM without going through cache.
+    // This should preserve its value of 1 in dcache if dcache is emulated correctly.
+    *(u8*)(K0_TO_K1(&sCachedValue)) = 0;
+    // Read the variable back from dcache, if it's still 1 then cache is emulated correctly.
+    // If it's zero, then dcache is not emulated correctly.
+    gCacheEmulated = sCachedValue;
+    // Restore interrupts
+    __osRestoreInt(saved);
+}
+
 /**
  * Initial settings for the first rendered frame.
  */
@@ -403,15 +421,6 @@ void render_init(void) {
 #ifdef DEBUG_FORCE_CRASH_ON_BOOT
     FORCE_CRASH
 #endif
-    if (IO_READ(DPC_PIPEBUSY_REG) == 0) {
-        gIsConsole = FALSE;
-        gBorderHeight = BORDER_HEIGHT_EMULATOR;
-        gIsVC = IS_VC();
-    } else {
-        gIsConsole = TRUE;
-        gBorderHeight = BORDER_HEIGHT_CONSOLE;
-    }
-
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
@@ -424,7 +433,8 @@ void render_init(void) {
 
     // Skip incrementing the initial framebuffer index on emulators so that they display immediately as the Gfx task finishes
     // VC probably emulates osViSwapBuffer accurately so instant patch breaks VC compatibility
-    if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
+    // Currently, Ares passes the cache emulation test and has issues with single buffering so disable it there as well.
+    if (gIsConsole || gIsVC || gCacheEmulated) {
         sRenderingFramebuffer++;
     }
     gGlobalTimer++;
@@ -462,8 +472,8 @@ void display_and_vsync(void) {
 #ifndef UNLOCK_FPS
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
 #endif
-    // Skip swapping buffers on emulator so that they display immediately as the Gfx task finishes
-    if (gIsConsole || gIsVC) { // Read RDP Clock Register, has a value of zero on emulators
+    // Skip swapping buffers on inaccurate emulators other than VC so that they display immediately as the Gfx task finishes
+    if (gIsConsole || gIsVC || gCacheEmulated) {
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
         }
@@ -631,8 +641,8 @@ void read_controller_inputs(s32 threadID) {
         if (controller->controllerData != NULL) {
             controller->rawStickX = controller->controllerData->stick_x;
             controller->rawStickY = controller->controllerData->stick_y;
-            controller->buttonPressed = controller->controllerData->button
-                                        & (controller->controllerData->button ^ controller->buttonDown);
+            controller->buttonPressed = ~controller->buttonDown & controller->controllerData->button;
+            controller->buttonReleased = ~controller->controllerData->button & controller->buttonDown;
             // 0.5x A presses are a good meme
             controller->buttonDown = controller->controllerData->button;
             adjust_analog_stick(controller);
@@ -640,6 +650,7 @@ void read_controller_inputs(s32 threadID) {
             controller->rawStickX = 0;
             controller->rawStickY = 0;
             controller->buttonPressed = 0;
+            controller->buttonReleased = 0;
             controller->buttonDown = 0;
             controller->stickX = 0;
             controller->stickY = 0;
@@ -656,6 +667,7 @@ void read_controller_inputs(s32 threadID) {
     gPlayer3Controller->stickY = gPlayer1Controller->stickY;
     gPlayer3Controller->stickMag = gPlayer1Controller->stickMag;
     gPlayer3Controller->buttonPressed = gPlayer1Controller->buttonPressed;
+    gPlayer3Controller->buttonReleased = gPlayer1Controller->buttonReleased;
     gPlayer3Controller->buttonDown = gPlayer1Controller->buttonDown;
 }
 
@@ -674,7 +686,9 @@ void init_controllers(void) {
 #ifdef EEP
     // strangely enough, the EEPROM probe for save data is done in this function.
     // save pak detection?
-    gEepromProbe = osEepromProbe(&gSIEventMesgQueue);
+    gEepromProbe = gIsVC
+                 ? osEepromProbeVC(&gSIEventMesgQueue)
+                 : osEepromProbe  (&gSIEventMesgQueue);
 #endif
 #ifdef SRAM
     gSramProbe = nuPiInitSram();
@@ -738,10 +752,6 @@ void setup_global_light();
  * Main game loop thread. Runs forever as long as the game continues.
  */
 void thread5_game_loop(UNUSED void *arg) {
-#if PUPPYPRINT_DEBUG
-    OSTime lastTime = 0;
-#endif
-
     setup_game_memory();
 #if ENABLE_RUMBLE
     init_rumble_pak_scheduler_queue();
@@ -771,20 +781,12 @@ void thread5_game_loop(UNUSED void *arg) {
     render_init();
 
     while (TRUE) {
-        fast_profiler_frame_setup();
+        profiler_frame_setup();
         // If the reset timer is active, run the process to reset the game.
         if (gResetTimer != 0) {
             draw_reset_bars();
             continue;
         }
-#if PUPPYPRINT_DEBUG
-        while (TRUE) {
-            lastTime = osGetTime();
-            collisionTime[perfIteration] = 0;
-                // graphTime[perfIteration] = 0;
-            behaviourTime[perfIteration] = 0;
-                  dmaTime[perfIteration] = 0;
-#endif
 
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
@@ -799,7 +801,7 @@ void thread5_game_loop(UNUSED void *arg) {
         select_gfx_pool();
         setup_global_light();
         read_controller_inputs(THREAD_5_GAME_LOOP);
-        fast_profiler_update(PROFILER_TIME_CONTROLLERS);
+        profiler_update(PROFILER_TIME_CONTROLLERS);
 
         // Reset the point light count before running the level script
         // This is because the level script is responsible for calling the function
@@ -810,20 +812,6 @@ void thread5_game_loop(UNUSED void *arg) {
         debug_box_input();
 #endif
 #if PUPPYPRINT_DEBUG
-        profiler_update(scriptTime, lastTime);
-        scriptTime[perfIteration] -= profilerTime[perfIteration];
-        scriptTime[perfIteration] -= profilerTime2[perfIteration];
-            if (benchmarkLoop > 0 && benchOption == 0) {
-                benchmarkLoop--;
-                benchMark[benchmarkLoop] = (osGetTime() - lastTime);
-                if (benchmarkLoop == 0) {
-                    puppyprint_profiler_finished();
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
         puppyprint_profiler_process();
 #endif
 

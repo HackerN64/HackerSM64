@@ -315,7 +315,7 @@ struct AudioBank *load_banks_immediate(s32 seqId, s32 *outDefaultBank) {
     u8 bank;
     s32 offset;
     s32 i;
-    void *ret;
+    void *ret = NULL;
 
     offset = ((u16 *)gAlBankSets)[canonicalize_index(0, seqId)];
     bank = 0xFF;
@@ -471,7 +471,6 @@ void load_sequence_internal(s32 player, s32 seqId, UNUSED s32 loadAsync) {
     u32 s0;
     s32 count;
     u8 bank;
-    s32 i;
 
     seqPlayer = &gSequencePlayers[player];
 
@@ -569,7 +568,7 @@ void *func_sh_802f3688(s32 bankId) {
         patchInfo.baseAddr2 = NULL;
     }
 
-    ret = func_sh_802f3764(1, bankId, &sp38)
+    ret = func_sh_802f3764(1, bankId, &sp38);
 
     if (ret != NULL && sp38 == 1) {
         func_sh_802f5310(bankId, ret, &patchInfo, 0);
@@ -796,8 +795,7 @@ void func_sh_802f3c38(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 medium)
     }
 }
 
-void func_sh_802f3d78(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 arg3) {
-    uintptr_t sp1C = devAddr;
+void func_sh_802f3d78(UNUSED uintptr_t devAddr, void *vAddr, size_t nbytes, UNUSED s32 arg3) {
     osInvalDCache(vAddr, nbytes);
 }
 
@@ -1168,8 +1166,7 @@ void func_sh_802f4bd8(struct PendingDmaSample *arg0, s32 len) { // len must be s
     func_sh_802f3dd0(&arg0->ioMesg, 0, 0, arg0->devAddr, arg0->vAddr, len, &arg0->queue, arg0->medium, shindouDebugPrint102);
 }
 
-void func_sh_802f4c5c(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 arg3) {
-    uintptr_t sp1C = devAddr;
+void func_sh_802f4c5c(UNUSED uintptr_t devAddr, void *vAddr, size_t nbytes, UNUSED s32 arg3) {
     osInvalDCache(vAddr, nbytes);
 }
 
@@ -1319,8 +1316,7 @@ void func_sh_802f50ec(struct PendingDmaAudioBank *arg0, size_t len) {
 }
 
 
-void func_sh_802f517c(uintptr_t devAddr, void *vAddr, size_t nbytes, s32 arg3) {
-    uintptr_t sp1C = devAddr;
+void func_sh_802f517c(UNUSED uintptr_t devAddr, void *vAddr, size_t nbytes, UNUSED s32 arg3) {
     osInvalDCache(vAddr, nbytes);
 }
 
@@ -1359,7 +1355,7 @@ void patch_sound(struct AudioBankSound *sound, struct AudioBank *memBase, struct
 }
 
 void func_sh_802f5310(s32 bankId, struct AudioBank *mem, struct PatchStruct *patchInfo, s32 arg3) {
-    u8 *addr;
+    u8 *addr = NULL;
     s32 sp4C;
     struct AudioBankSample *temp_s0;
     s32 i;

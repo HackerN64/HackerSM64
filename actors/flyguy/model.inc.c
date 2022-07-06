@@ -10,7 +10,7 @@ ALIGNED8 static const Texture flyguy_seg8_texture_0800E088[] = {
 
 // 0x0800F088
 ALIGNED8 static const Texture flyguy_seg8_texture_0800F088[] = {
-#include "actors/flyguy/flyguy_face.rgba16.inc.c"
+#include "actors/flyguy/flyguy_face.custom.rgba16.inc.c"
 };
 
 // 0x0800F888

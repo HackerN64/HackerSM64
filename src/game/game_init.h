@@ -48,6 +48,7 @@ extern u8 *gGfxPoolEnd;
 extern struct GfxPool *gGfxPool;
 extern u8 gControllerBits;
 extern u8 gIsConsole;
+extern u8 gCacheEmulated;
 extern u8 gBorderHeight;
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 extern u8 gCustomDebugMode;
@@ -90,5 +91,6 @@ void end_master_display_list(void);
 void render_init(void);
 void select_gfx_pool(void);
 void display_and_vsync(void);
+void check_cache_emulation(void);
 
 #endif // GAME_INIT_H

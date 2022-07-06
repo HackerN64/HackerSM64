@@ -147,8 +147,6 @@ SECTIONS
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
 #ifndef DEBUG_MAP_STACKTRACE
-      parse_map               = MAP_PARSER_ADDRESS;
-      find_function_in_stack  = MAP_PARSER_ADDRESS;
       _mapDataSegmentRomStart = 0;
       gMapEntries   = 0;
       gMapEntrySize = 0;
@@ -159,6 +157,9 @@ SECTIONS
    {
       KEEP(BUILD_DIR/asm/entry.o(.text*));
       KEEP(BUILD_DIR/asm/n64_assert.o(.text*));
+#ifdef EEP
+      KEEP(BUILD_DIR/asm/vc_bin.o(.text*));
+#endif
 
       BUILD_DIR/src/boot*.o(.text*);
       BUILD_DIR/src/hvqm*.o(.text*);
