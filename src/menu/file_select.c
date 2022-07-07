@@ -1045,8 +1045,6 @@ void bhv_menu_button_manager_init(void) {
     sTextBaseAlpha = 0;
 }
 
-#define SAVE_FILE_SOUND SOUND_MENU_STAR_SOUND_OKEY_DOKEY
-
 /**
  * In the main menu, check if a button was clicked to play it's button growing state.
  * Also play a sound and/or render buttons depending of the button ID selected.
@@ -1081,7 +1079,7 @@ void check_main_menu_clicked_buttons(void) {
         case MENU_BUTTON_PLAY_FILE_B:
         case MENU_BUTTON_PLAY_FILE_C:
         case MENU_BUTTON_PLAY_FILE_D:
-            play_sound(SAVE_FILE_SOUND, gGlobalSoundSource);
+            play_sound(SOUND_MENU_STAR_SOUND_OKEY_DOKEY, gGlobalSoundSource);
 #if ENABLE_RUMBLE
             queue_rumble_data(60, 70);
             queue_rumble_decay(1);
@@ -1106,8 +1104,6 @@ void check_main_menu_clicked_buttons(void) {
             break;
     }
 }
-
-#undef SAVE_FILE_SOUND
 
 /**
  * Menu Buttons Menu Manager Loop Action
@@ -1329,15 +1325,6 @@ void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
     }
 }
 
-#define SELECT_FILE_X 93
-#define SCORE_X       52
-#define COPY_X       117
-#define ERASE_X      177
-#define SAVEFILE_X1   92
-#define SAVEFILE_X2  209
-#define MARIOTEXT_X1  92
-#define MARIOTEXT_X2 207
-
 /**
  * Prints main menu strings that shows on the yellow background menu screen.
  *
@@ -1349,35 +1336,31 @@ void print_main_menu_strings(void) {
     // Print "SELECT FILE" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_hud_lut_string(HUD_LUT_DIFF, SELECT_FILE_X, 35, textSelectFile);
+    print_hud_lut_string(HUD_LUT_DIFF, 93, 35, textSelectFile);
     // Print file star counts
-    print_save_file_star_count(SAVE_FILE_A, SAVEFILE_X1, 78);
-    print_save_file_star_count(SAVE_FILE_B, SAVEFILE_X2, 78);
-    print_save_file_star_count(SAVE_FILE_C, SAVEFILE_X1, 118);
-    print_save_file_star_count(SAVE_FILE_D, SAVEFILE_X2, 118);
+    print_save_file_star_count(SAVE_FILE_A, 92, 78);
+    print_save_file_star_count(SAVE_FILE_B, 209, 78);
+    print_save_file_star_count(SAVE_FILE_C, 92, 118);
+    print_save_file_star_count(SAVE_FILE_D, 209, 118);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string(SCORE_X, 39, textScore);
-    print_generic_string(COPY_X, 39, textCopy);
-    print_generic_string(ERASE_X, 39, textErase);
+    print_generic_string(52, 39, textScore);
+    print_generic_string(117, 39, textCopy);
+    print_generic_string(177, 39, textErase);
     sSoundTextX = get_str_x_pos_from_center(254, textSoundModes[sSoundMode], 10.0f);
     print_generic_string(sSoundTextX, 39, textSoundModes[sSoundMode]);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(MARIOTEXT_X1, 65, textMarioA);
-    print_menu_generic_string(MARIOTEXT_X2, 65, textMarioB);
-    print_menu_generic_string(MARIOTEXT_X1, 105, textMarioC);
-    print_menu_generic_string(MARIOTEXT_X2, 105, textMarioD);
+    print_menu_generic_string(92, 65, textMarioA);
+    print_menu_generic_string(207, 65, textMarioB);
+    print_menu_generic_string(92, 105, textMarioC);
+    print_menu_generic_string(207, 105, textMarioD);
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
-
-
-#define CHECK_FILE_X   95
-#define NOSAVE_DATA_X1 99
 
 /**
  * Defines IDs for the top message of the score menu and displays it if the ID is called in messageID.
@@ -1386,17 +1369,13 @@ void score_menu_display_message(s8 messageID) {
 
     switch (messageID) {
         case SCORE_MSG_CHECK_FILE:
-            print_hud_lut_string_fade(HUD_LUT_DIFF, CHECK_FILE_X, 35, LANGUAGE_ARRAY(textCheckFile));
+            print_hud_lut_string_fade(HUD_LUT_DIFF, 95, 35, LANGUAGE_ARRAY(textCheckFile));
             break;
         case SCORE_MSG_NOSAVE_DATA:
-            print_generic_string_fade(NOSAVE_DATA_X1, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
+            print_generic_string_fade(99, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
             break;
     }
 }
-
-#define RETURN_X      44
-#define COPYFILE_X1  135
-#define ERASEFILE_X1 231
 
 #define FADEOUT_TIMER 20
 
@@ -1431,9 +1410,9 @@ void print_score_menu_strings(void) {
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string(RETURN_X, 35, LANGUAGE_ARRAY(textReturn));
-    print_generic_string(COPYFILE_X1, 35, LANGUAGE_ARRAY(textCopyFileButton));
-    print_generic_string(ERASEFILE_X1, 35, LANGUAGE_ARRAY(textEraseFileButton));
+    print_generic_string(44, 35, LANGUAGE_ARRAY(textReturn));
+    print_generic_string(135, 35, LANGUAGE_ARRAY(textCopyFileButton));
+    print_generic_string(231, 35, LANGUAGE_ARRAY(textEraseFileButton));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     // Print file names
@@ -1446,13 +1425,6 @@ void print_score_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
-#define NOFILE_COPY_X  119
-#define COPY_FILE_X    104
-#define COPYIT_WHERE_X 109
-#define NOSAVE_DATA_X2 101
-#define COPYCOMPLETE_X 110
-#define SAVE_EXISTS_X1 110
-
 /**
  * Defines IDs for the top message of the copy menu and displays it if the ID is called in messageID.
  */
@@ -1461,22 +1433,22 @@ void copy_menu_display_message(s8 messageID) {
     switch (messageID) {
         case COPY_MSG_MAIN_TEXT:
             if (sAllFilesExist) {
-                print_generic_string_fade(NOFILE_COPY_X, 190, LANGUAGE_ARRAY(textNoFileToCopyFrom));
+                print_generic_string_fade(119, 190, LANGUAGE_ARRAY(textNoFileToCopyFrom));
             } else {
-                print_hud_lut_string_fade(HUD_LUT_DIFF, COPY_FILE_X, 35, LANGUAGE_ARRAY(textCopyFile));
+                print_hud_lut_string_fade(HUD_LUT_DIFF, 104, 35, LANGUAGE_ARRAY(textCopyFile));
             }
             break;
         case COPY_MSG_COPY_WHERE:
-            print_generic_string_fade(COPYIT_WHERE_X, 190, LANGUAGE_ARRAY(textCopyItToWhere));
+            print_generic_string_fade(109, 190, LANGUAGE_ARRAY(textCopyItToWhere));
             break;
         case COPY_MSG_NOSAVE_EXISTS:
-            print_generic_string_fade(NOSAVE_DATA_X2, 190, textNoSavedDataExistsCopy);
+            print_generic_string_fade(101, 190, textNoSavedDataExistsCopy);
             break;
         case COPY_MSG_COPY_COMPLETE:
-            print_generic_string_fade(COPYCOMPLETE_X, 190, LANGUAGE_ARRAY(textCopyCompleted));
+            print_generic_string_fade(110, 190, LANGUAGE_ARRAY(textCopyCompleted));
             break;
         case COPY_MSG_SAVE_EXISTS:
-            print_generic_string_fade(SAVE_EXISTS_X1, 190, LANGUAGE_ARRAY(textSavedDataExists));
+            print_generic_string_fade(110, 190, LANGUAGE_ARRAY(textSavedDataExists));
             break;
     }
 }
@@ -1526,9 +1498,6 @@ void copy_menu_update_message(void) {
     }
 }
 
-#define VIEWSCORE_X1 128
-#define ERASEFILE_X2 230
-
 /**
  * Prints copy menu strings that shows on the blue background menu screen.
  */
@@ -1549,9 +1518,9 @@ void print_copy_menu_strings(void) {
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string(RETURN_X, 35, LANGUAGE_ARRAY(textReturn));
-    print_generic_string(VIEWSCORE_X1, 35, LANGUAGE_ARRAY(textViewScore));
-    print_generic_string(ERASEFILE_X2, 35, LANGUAGE_ARRAY(textEraseFileButton));
+    print_generic_string(44, 35, LANGUAGE_ARRAY(textReturn));
+    print_generic_string(128, 35, LANGUAGE_ARRAY(textViewScore));
+    print_generic_string(230, 35, LANGUAGE_ARRAY(textEraseFileButton));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
@@ -1563,32 +1532,23 @@ void print_copy_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
-#define CURSOR_X (x + 70)
-#define MENU_ERASE_YES_MIN_X 140
-#define MENU_ERASE_YES_MAX_X 169
-
-#define MENU_ERASE_YES_NO_MIN_Y 191
-#define MENU_ERASE_YES_NO_MAX_Y 210
-    #define MENU_ERASE_NO_MIN_X 189
-    #define MENU_ERASE_NO_MAX_X 218
-
 /**
  * Prints the "YES NO" prompt and checks if one of the prompts are hovered to do it's functions.
  */
 void print_erase_menu_prompt(s16 x, s16 y) {
     s16 colorFade = gGlobalTimer << 12;
 
-    s16 cursorX = sCursorPos[0] + CURSOR_X;
-    s16 cursorY = sCursorPos[1] + 120.0f;
+    s16 cursorX = sCursorPos[0] + x + 70;
+    s16 cursorY = sCursorPos[1] + 120;
 
-    if (cursorX < MENU_ERASE_YES_MAX_X && cursorX >= MENU_ERASE_YES_MIN_X &&
-        cursorY < MENU_ERASE_YES_NO_MAX_Y && cursorY >= MENU_ERASE_YES_NO_MIN_Y) {
+    if (cursorX < 169 && cursorX >= 140 &&
+        cursorY < 210 && cursorY >= 191) {
         // Fade "YES" string color but keep "NO" gray
         sYesNoColor[0] = sins(colorFade) * 50.0f + 205.0f;
         sYesNoColor[1] = 150;
         sEraseYesNoHoverState = MENU_ERASE_HOVER_YES;
-    } else if (cursorX < MENU_ERASE_NO_MAX_X && cursorX >= MENU_ERASE_NO_MIN_X
-        && cursorY < MENU_ERASE_YES_NO_MAX_Y && cursorY >= MENU_ERASE_YES_NO_MIN_Y) {
+    } else if (cursorX < 218 && cursorX >= 189
+        && cursorY < 210 && cursorY >= 191) {
         // Fade "NO" string color but keep "YES" gray
         sYesNoColor[0] = 150;
         sYesNoColor[1] = sins(colorFade) * 50.0f + 205.0f;
@@ -1644,11 +1604,7 @@ void print_erase_menu_prompt(s16 x, s16 y) {
 //   US and EU   ---    JP
 // M a r i o   A --- マ リ オ Ａ
 // 0 1 2 3 4 5 6 --- 0 1 2 3
-#define ERASE_FILE_X      98
-#define NOSAVE_DATA_X3   100
 #define MARIO_ERASED_VAR   6
-#define MARIO_ERASED_X   100
-#define SAVE_EXISTS_X2   100
 
 /**
  * Defines IDs for the top message of the erase menu and displays it if the ID is called in messageID.
@@ -1662,21 +1618,21 @@ void erase_menu_display_message(s8 messageID) {
 
     switch (messageID) {
         case ERASE_MSG_MAIN_TEXT:
-            print_hud_lut_string_fade(HUD_LUT_DIFF, ERASE_FILE_X, 35, LANGUAGE_ARRAY(textEraseFile));
+            print_hud_lut_string_fade(HUD_LUT_DIFF, 98, 35, LANGUAGE_ARRAY(textEraseFile));
             break;
         case ERASE_MSG_PROMPT:
             print_generic_string_fade(90, 190, LANGUAGE_ARRAY(textSure));
             print_erase_menu_prompt(90, 190); // YES NO, has functions for it too
             break;
         case ERASE_MSG_NOSAVE_EXISTS:
-            print_generic_string_fade(NOSAVE_DATA_X3, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
+            print_generic_string_fade(100, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
             break;
         case ERASE_MSG_MARIO_ERASED:
             LANGUAGE_ARRAY(textMarioAJustErased)[MARIO_ERASED_VAR] = sSelectedFileIndex + 10;
-            print_generic_string_fade(MARIO_ERASED_X, 190, LANGUAGE_ARRAY(textMarioAJustErased));
+            print_generic_string_fade(100, 190, LANGUAGE_ARRAY(textMarioAJustErased));
             break;
         case ERASE_MSG_SAVE_EXISTS: // unused
-            print_generic_string_fade(SAVE_EXISTS_X2, 190, LANGUAGE_ARRAY(textSavedDataExists));
+            print_generic_string_fade(100, 190, LANGUAGE_ARRAY(textSavedDataExists));
             break;
     }
 }
@@ -1723,9 +1679,6 @@ void erase_menu_update_message(void) {
     }
 }
 
-#define VIEWSCORE_X2 127
-#define COPYFILE_X2  233
-
 /**
  * Prints erase menu strings that shows on the red background menu screen.
  */
@@ -1750,9 +1703,9 @@ void print_erase_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
-    print_generic_string(RETURN_X, 35, textReturn);
-    print_generic_string(VIEWSCORE_X2, 35, textViewScore);
-    print_generic_string(COPYFILE_X2, 35, textCopyFileButton);
+    print_generic_string(44, 35, textReturn);
+    print_generic_string(127, 35, textViewScore);
+    print_generic_string(233, 35, textCopyFileButton);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     // Print file names
@@ -1844,10 +1797,6 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     print_menu_generic_string(x + 16, y, secretStarsText);
 }
 
-#define HISCORE_COIN_ICON_X  18
-#define HISCORE_COIN_TEXT_X  34
-#define HISCORE_COIN_NAMES_X 60
-
 /**
  * Prints course coins collected in a score menu save file.
  */
@@ -1856,12 +1805,10 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
     unsigned char textCoinX[] = { TEXT_COIN_X };
     unsigned char textStar[] = { TEXT_STAR };
-#define LENGTH 8
-    unsigned char fileNames[][LENGTH] = {
+    unsigned char fileNames[][8] = {
         { TEXT_4DASHES }, // huh?
         { TEXT_SCORE_MARIO_A }, { TEXT_SCORE_MARIO_B }, { TEXT_SCORE_MARIO_C }, { TEXT_SCORE_MARIO_D },
     };
-#undef LENGTH
     // MYSCORE
     if (sScoreFileCoinScoreMode == 0) {
         // Print "[coin] x"
@@ -1877,12 +1824,12 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
     // HISCORE
     else {
         // Print "[coin] x"
-        print_menu_generic_string(x + HISCORE_COIN_ICON_X, y, textCoinX);
+        print_menu_generic_string(x + 18, y, textCoinX);
         // Print coin highscore
         int_to_str((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF, coinScoreText);
-        print_menu_generic_string(x + HISCORE_COIN_TEXT_X, y, coinScoreText);
+        print_menu_generic_string(x + 34, y, coinScoreText);
         // Print coin highscore file
-        print_menu_generic_string(x + HISCORE_COIN_NAMES_X, y,
+        print_menu_generic_string(x + 60, y,
                          fileNames[(save_file_get_max_coin_score(courseIndex) >> 16) & 0xFFFF]);
     }
 }
@@ -1908,15 +1855,6 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     print_menu_generic_string(x, y, starScoreText);
 }
 
-#define MARIO_X         25
-#define FILE_LETTER_X   95
-#define LEVEL_NUM_PAD    3
-#define SECRET_STARS_PAD 6
-#define LEVEL_NAME_X    23
-#define STAR_SCORE_X   171
-#define MYSCORE_X      238
-#define HISCORE_X      231
-
 /**
  * Prints save file score strings that shows when a save file is chosen inside the score menu.
  */
@@ -1933,8 +1871,8 @@ void print_save_file_scores(s8 fileIndex) {
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_hud_lut_string(HUD_LUT_DIFF, MARIO_X, 15, textMario);
-    print_hud_lut_string(HUD_LUT_GLOBAL, FILE_LETTER_X, 15, textFileLetter);
+    print_hud_lut_string(HUD_LUT_DIFF, 25, 15, textMario);
+    print_hud_lut_string(HUD_LUT_GLOBAL, 95, 15, textFileLetter);
 
     // Print save file star count at top
     print_save_file_star_count(fileIndex, 124, 15);
@@ -1944,22 +1882,21 @@ void print_save_file_scores(s8 fileIndex) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
     for ((i = 0); (i < COURSE_STAGES_MAX); (i++)) {
-        print_menu_generic_string((LEVEL_NAME_X + ((i < 9) * LEVEL_NUM_PAD)), (23 + (12 * (i + 1))), segmented_to_virtual(levelNameTable[i]));
-        print_score_file_star_score(              fileIndex, i, STAR_SCORE_X, (23 + (12 * (i + 1))));
-        print_score_file_course_coin_score(       fileIndex, i,          213, (23 + (12 * (i + 1))));
+        print_menu_generic_string((23 + ((i < 9) * 3)),       (23 + (12 * (i + 1))), segmented_to_virtual(levelNameTable[i]));
+        print_score_file_star_score(       fileIndex, i, 171, (23 + (12 * (i + 1))));
+        print_score_file_course_coin_score(fileIndex, i, 213, (23 + (12 * (i + 1))));
     }
 
     // Print castle secret stars text
-    print_menu_generic_string(LEVEL_NAME_X + SECRET_STARS_PAD, 23 + 12 * 16,
-                              segmented_to_virtual(levelNameTable[25]));
+    print_menu_generic_string(23 + 6, 23 + 12 * 16, segmented_to_virtual(levelNameTable[25]));
     // Print castle secret stars score
-    print_score_file_castle_secret_stars(fileIndex, STAR_SCORE_X, 23 + 12 * 16);
+    print_score_file_castle_secret_stars(fileIndex, 171, 23 + 12 * 16);
 
     // Print current coin score mode
     if (sScoreFileCoinScoreMode == 0) {
-        print_menu_generic_string(MYSCORE_X, 24, LANGUAGE_ARRAY(textMyScore));
+        print_menu_generic_string(238, 24, LANGUAGE_ARRAY(textMyScore));
     } else {
-        print_menu_generic_string(HISCORE_X, 24, LANGUAGE_ARRAY(textHiScore));
+        print_menu_generic_string(231, 24, LANGUAGE_ARRAY(textHiScore));
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);

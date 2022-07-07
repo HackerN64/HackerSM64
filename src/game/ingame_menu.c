@@ -809,9 +809,6 @@ void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum, u8 *cust
     }
 }
 
-#define X_VAL3 0.0f
-#define Y_VAL3 16
-
 void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s8 *xMatrix, s16 *linePos) {
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
@@ -904,7 +901,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
         create_dl_translation_matrix(MENU_MTX_NOPUSH, 0, (f32) gDialogScrollOffsetY, 0);
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL3, 2 - lineNum * Y_VAL3, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, 0.0f, 2 - lineNum * 16, 0);
 
     while (pageState == DIALOG_PAGE_STATE_NONE) {
         if (customColor == 1) {
@@ -1007,17 +1004,12 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     gLastDialogLineNum = lineNum;
 }
 
-#define X_VAL4_1 56
-#define X_VAL4_2 47
-#define Y_VAL4_1  2
-#define Y_VAL4_2 16
-
 void render_dialog_triangle_choice(void) {
     if (gDialogBoxState == DIALOG_STATE_VERTICAL) {
         handle_menu_scrolling(MENU_SCROLL_HORIZONTAL, &gDialogLineNum, 1, 2);
     }
 
-    create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogLineNum * X_VAL4_1) - X_VAL4_2, Y_VAL4_1 - (gLastDialogLineNum * Y_VAL4_2), 0);
+    create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogLineNum * 56) - 47, 2 - (gLastDialogLineNum * 16), 0);
 
     if (gDialogBoxType == DIALOG_TYPE_ROTATE) {
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
@@ -1028,11 +1020,6 @@ void render_dialog_triangle_choice(void) {
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
 }
 
-#define X_VAL5 118.0f
-#define Y_VAL5_1 -16
-#define Y_VAL5_2 5
-#define X_Y_VAL6 0.8f
-
 void render_dialog_triangle_next(s8 linesPerBox) {
     s32 globalTimer = gGlobalTimer;
 
@@ -1040,8 +1027,8 @@ void render_dialog_triangle_next(s8 linesPerBox) {
         return;
     }
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL5, (linesPerBox * Y_VAL5_1) + Y_VAL5_2, 0);
-    create_dl_scale_matrix(MENU_MTX_NOPUSH, X_Y_VAL6, X_Y_VAL6, 1.0f);
+    create_dl_translation_matrix(MENU_MTX_PUSH, 118.0f, (linesPerBox * -16) + 5, 0);
+    create_dl_scale_matrix(MENU_MTX_NOPUSH, 0.8f, 0.8f, 1.0f);
     create_dl_rotation_matrix(MENU_MTX_NOPUSH, -DEFAULT_DIALOG_BOX_ANGLE, 0, 0, 1.0f);
 
     if (gDialogBoxType == DIALOG_TYPE_ROTATE) { // White Text
@@ -1133,11 +1120,6 @@ s16 gCutsceneMsgTimer       =  0;
 s8  gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
 s8  gDialogCourseActNum     =  1;
 
-#define DIAG_VAL1  16
-#define DIAG_VAL3 132 // US & EU
-#define DIAG_VAL4   5
-#define DIAG_VAL2 240 // JP & US
-
 void render_dialog_entries(void) {
     s8 lowerBound = 0;
     void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
@@ -1188,12 +1170,12 @@ void render_dialog_entries(void) {
         case DIALOG_STATE_HORIZONTAL: // scrolling
             gDialogScrollOffsetY += (dialog->linesPerBox * 2);
 
-            if (gDialogScrollOffsetY >= dialog->linesPerBox * DIAG_VAL1) {
+            if (gDialogScrollOffsetY >= dialog->linesPerBox * 16) {
                 gDialogTextPos = gLastDialogPageStrPos;
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 gDialogScrollOffsetY = 0;
             }
-            lowerBound = (gDialogScrollOffsetY / DIAG_VAL1) + 1;
+            lowerBound = (gDialogScrollOffsetY / 16) + 1;
             break;
 
         case DIALOG_STATE_CLOSING:
@@ -1228,13 +1210,13 @@ void render_dialog_entries(void) {
 #else
                   ensure_nonnegative(dialog->leftOffset),
 #endif
-                  ensure_nonnegative(DIAG_VAL2 - dialog->width),
+                  ensure_nonnegative(240 - dialog->width),
 #ifdef WIDESCREEN
                   SCREEN_WIDTH,
 #else
-                  ensure_nonnegative(DIAG_VAL3 + dialog->leftOffset),
+                  ensure_nonnegative(132 + dialog->leftOffset),
 #endif
-                  ensure_nonnegative(240 + ((dialog->linesPerBox * 80) / DIAG_VAL4) - dialog->width));
+                  ensure_nonnegative(240 + ((dialog->linesPerBox * 80) / 5) - dialog->width));
     handle_dialog_text_and_pages(0, dialog, lowerBound);
 
     if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {
@@ -1356,11 +1338,6 @@ void do_cutscene_handler(void) {
     gCutsceneMsgTimer++;
 }
 
-#define PEACH_MESSAGE_TIMER 250
-
-#define STR_X  38
-#define STR_Y 142
-
 // "Dear Mario" message handler
 void print_peach_letter_message(void) {
 #ifdef VERSION_EU
@@ -1386,7 +1363,7 @@ void print_peach_letter_message(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 20, 20, 20, gCutsceneMsgFade);
 
-    print_generic_string(STR_X, STR_Y, str);
+    print_generic_string(38, 142, str);
 #ifdef VERSION_JP
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
@@ -1407,14 +1384,14 @@ void print_peach_letter_message(void) {
         gCutsceneMsgFade += 10;
     }
 
-    // we're after PEACH_MESSAGE_TIMER increments, so decrease the fade.
-    if (gCutsceneMsgTimer > PEACH_MESSAGE_TIMER) {
+    // we're after 250 increments, so decrease the fade.
+    if (gCutsceneMsgTimer > 250) {
         gCutsceneMsgFade -= 10;
     }
 
     // 20 increments after the start of the decrease, we're
     // back where we are, so reset everything at the end.
-    if (gCutsceneMsgTimer > (PEACH_MESSAGE_TIMER + 20)) {
+    if (gCutsceneMsgTimer > 270) {
         gCutsceneMsgIndex = -1;
         gCutsceneMsgFade = 0; //! uselessly reset since the next execution will just set it to 0 again.
         gDialogID = DIALOG_NONE;
@@ -1544,30 +1521,6 @@ void render_widescreen_setting(void) {
 }
 #endif
 
-#if defined(VERSION_JP) || defined(VERSION_SH)
-    #define CRS_NUM_X1 93
-#elif defined(VERSION_US)
-    #define CRS_NUM_X1 100
-#elif defined(VERSION_EU)
-    #define CRS_NUM_X1 get_string_width(LANGUAGE_ARRAY(textCourse)) + 51
-#endif
-
-#ifdef VERSION_EU
-    #define TXT_COURSE_X      48
-    #define TXT_STAR_X        89
-    #define ACT_NAME_X        107
-    #define LVL_NAME_X        108
-    #define SECRET_LVL_NAME_X get_str_x_pos_from_center(159, &courseName[3], 10.0f)
-    #define MYSCORE_X         48
-#else
-    #define TXT_COURSE_X      63
-    #define TXT_STAR_X        98
-    #define ACT_NAME_X        116
-    #define LVL_NAME_X        117
-    #define SECRET_LVL_NAME_X 94
-    #define MYSCORE_X         62
-#endif
-
 void render_pause_my_score_coins(void) {
     u8 textCourse[] = { TEXT_COURSE };
     u8 textMyScore[] = { TEXT_MY_SCORE };
@@ -1597,36 +1550,32 @@ void render_pause_my_score_coins(void) {
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)
         && (save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0)) {
-        print_generic_string(MYSCORE_X, 121, LANGUAGE_ARRAY(textMyScore));
+        print_generic_string(62, 121, LANGUAGE_ARRAY(textMyScore));
     }
 
     u8 *courseName = segmented_to_virtual(courseNameTbl[courseIndex]);
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
-        print_generic_string(TXT_COURSE_X, 157, LANGUAGE_ARRAY(textCourse));
+        print_generic_string(63, 157, LANGUAGE_ARRAY(textCourse));
         int_to_str(gCurrCourseNum, strCourseNum);
-        print_generic_string(CRS_NUM_X1, 157, strCourseNum);
+        print_generic_string(100, 157, strCourseNum);
 
         u8 *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
 
         if (starFlags & (1 << (gDialogCourseActNum - 1))) {
-            print_generic_string(TXT_STAR_X, 140, textStar);
+            print_generic_string(98, 140, textStar);
         } else {
-            print_generic_string(TXT_STAR_X, 140, textUnfilledStar);
+            print_generic_string(98, 140, textUnfilledStar);
         }
 
-        print_generic_string(ACT_NAME_X, 140, actName);
-        print_generic_string(LVL_NAME_X, 157, &courseName[3]);
+        print_generic_string(116, 140, actName);
+        print_generic_string(117, 157, &courseName[3]);
     } else {
-        print_generic_string(SECRET_LVL_NAME_X, 157, &courseName[3]);
+        print_generic_string(94, 157, &courseName[3]);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
-
-#define TXT1_X 3
-#define TXT2_X 119
-#define Y_VAL7 2
 
 void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     u8 textLakituMario[] = { TEXT_LAKITU_MARIO };
@@ -1639,13 +1588,13 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(x +     14, y +  2, textLakituMario);
-    print_generic_string(x + TXT1_X, y - 13, LANGUAGE_ARRAY(textNormalUpClose));
-    print_generic_string(x +    124, y +  2, textLakituStop);
-    print_generic_string(x + TXT2_X, y - 13, LANGUAGE_ARRAY(textNormalFixed));
+    print_generic_string(x +  14, y +  2, textLakituMario);
+    print_generic_string(x +   3, y - 13, LANGUAGE_ARRAY(textNormalUpClose));
+    print_generic_string(x + 124, y +  2, textLakituStop);
+    print_generic_string(x + 119, y - 13, LANGUAGE_ARRAY(textNormalFixed));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-    create_dl_translation_matrix(MENU_MTX_PUSH, ((*index - 1) * xIndex) + x, y + Y_VAL7, 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, ((*index - 1) * xIndex) + x, y + 2, 0);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
@@ -1659,9 +1608,6 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
             break;
     }
 }
-
-#define X_VAL8 4
-#define Y_VAL8 2
 
 void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     u8 textContinue[] = { TEXT_CONTINUE };
@@ -1680,7 +1626,7 @@ void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
         print_generic_string(x + 10, y - 33, LANGUAGE_ARRAY(textCameraAngleR));
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
-        create_dl_translation_matrix(MENU_MTX_PUSH, x - X_VAL8, (y - ((*index - 1) * yIndex)) - Y_VAL8, 0);
+        create_dl_translation_matrix(MENU_MTX_PUSH, x - 4, (y - ((*index - 1) * yIndex)) - 2, 0);
 
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
         gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
@@ -1937,11 +1883,6 @@ s32 render_pause_courses_and_castle(void) {
     return MENU_OPT_NONE;
 }
 
-#define TXT_HISCORE_X 109
-#define TXT_HISCORE_Y  36
-#define TXT_CONGRATS_X 70
-#define TXT_CONGRATS_Y 67
-
 enum HUDCourseCompleteStringIDs {
     HUD_PRINT_HISCORE,
     HUD_PRINT_CONGRATULATIONS
@@ -1957,9 +1898,9 @@ void print_hud_course_complete_string(s8 str) {
     gDPSetEnvColor(gDisplayListHead++, colorFade, colorFade, colorFade, 255);
 
     if (str == HUD_PRINT_HISCORE) {
-        print_hud_lut_string(HUD_LUT_GLOBAL, TXT_HISCORE_X,  TXT_HISCORE_Y,  LANGUAGE_ARRAY(textHiScore));
+        print_hud_lut_string(HUD_LUT_GLOBAL, 109, 36, LANGUAGE_ARRAY(textHiScore));
     } else { // HUD_PRINT_CONGRATULATIONS
-        print_hud_lut_string(HUD_LUT_GLOBAL, TXT_CONGRATS_X, TXT_CONGRATS_Y, LANGUAGE_ARRAY(textCongratulations));
+        print_hud_lut_string(HUD_LUT_GLOBAL, 70, 67, LANGUAGE_ARRAY(textCongratulations));
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -2014,13 +1955,6 @@ void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
     }
 }
 
-#define TXT_NAME_X1 71
-#define TXT_NAME_X2 TXT_NAME_X1 - 2
-#define CRS_NUM_X2 104
-#define CRS_NUM_X3 CRS_NUM_X2 - 2
-#define TXT_CLEAR_X1 get_string_width(name) + 81
-#define TXT_CLEAR_X2 TXT_CLEAR_X1 - 2
-
 void render_course_complete_lvl_info_and_hud_str(void) {
     u8 textCourse[] = { TEXT_COURSE };
     u8 textClear[] = { TEXT_CLEAR };
@@ -2050,11 +1984,11 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
         print_generic_string(65, 165, LANGUAGE_ARRAY(textCourse));
-        print_generic_string(CRS_NUM_X2, 165, strCourseNum);
+        print_generic_string(104, 165, strCourseNum);
 
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
         print_generic_string(63, 167, LANGUAGE_ARRAY(textCourse));
-        print_generic_string(CRS_NUM_X3, 167, strCourseNum);
+        print_generic_string(102, 167, strCourseNum);
 
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     } else if (gLastCompletedCourseNum == COURSE_BITDW || gLastCompletedCourseNum == COURSE_BITFS) { // Bowser courses
@@ -2064,11 +1998,11 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
-        print_generic_string(TXT_NAME_X1, 130, name);
-        print_generic_string(TXT_CLEAR_X1, 130, textClear);
+        print_generic_string(71, 130, name);
+        print_generic_string(get_string_width(name) + 81, 130, textClear);
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-        print_generic_string(TXT_NAME_X2, 132, name);
-        print_generic_string(TXT_CLEAR_X2, 132, textClear);
+        print_generic_string(69, 132, name);
+        print_generic_string(get_string_width(name) + 79, 132, textClear);
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
         print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
@@ -2102,12 +2036,6 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-#define X_VAL9 x
-#define TXT_SAVEOPTIONS_X x + 12
-#define TXT_SAVECONT_Y 0
-#define TXT_SAVEQUIT_Y 20
-#define TXT_CONTNOSAVE_Y 40
-
 void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     u8 textSaveAndContinue[] = { TEXT_SAVE_AND_CONTINUE };
     u8 textSaveAndQuit[] = { TEXT_SAVE_AND_QUIT };
@@ -2118,13 +2046,13 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_generic_string(TXT_SAVEOPTIONS_X, y + TXT_SAVECONT_Y, LANGUAGE_ARRAY(textSaveAndContinue));
-    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVEQUIT_Y, LANGUAGE_ARRAY(textSaveAndQuit));
-    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_CONTNOSAVE_Y, LANGUAGE_ARRAY(textContinueWithoutSave));
+    print_generic_string(x + 12, y, LANGUAGE_ARRAY(textSaveAndContinue));
+    print_generic_string(x + 12, y - 20, LANGUAGE_ARRAY(textSaveAndQuit));
+    print_generic_string(x + 12, y - 40, LANGUAGE_ARRAY(textContinueWithoutSave));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
-    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL9, y - ((*index - 1) * yPos), 0);
+    create_dl_translation_matrix(MENU_MTX_PUSH, x, y - ((*index - 1) * yPos), 0);
 
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
