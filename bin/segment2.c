@@ -1955,19 +1955,19 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {NULL, 5}, // 32 " "
     {texture_font_char_us_exclamation, 5}, // 33 "!"
     {NULL, 0}, // 34 "\"" (come back to this)
-    {NULL, 0}, // 35 "#"
-    {NULL, 0}, // 36 "$"
+    {NULL, 0}, // 35 "#" (Unimplemented)
+    {NULL, 0}, // 36 "$" (Unimplemented)
     {texture_font_char_us_percent, 7}, // 37 "%"
     {texture_font_char_us_ampersand, 8}, // 38 "&"
     {texture_font_char_us_apostrophe, 4}, // 39 "'"
     {texture_font_char_us_open_parentheses, 5}, // 40 "("
     {texture_font_char_us_close_parentheses, 5}, // 41 ")"
-    {NULL, 0}, // 42 "*"
-    {NULL, 0}, // 43 "+"
+    {texture_font_char_us_multiply, 6}, // 42 "*"
+    {NULL, 0}, // 43 "+" (Unimplemented)
     {texture_font_char_us_comma, 4}, // 44 ","
-    {NULL, 0}, // 45 "-"
+    {texture_font_char_us_slash, 6}, // 45 "-" (For some reason, the hyphen is called a slash)
     {texture_font_char_us_period, 4}, // 46 "."
-    {NULL, 0}, // 47 "/"
+    {NULL, 0}, // 47 "/" (Unimplemented)
     {texture_font_char_us_0, 7}, // 48 "0"
     {texture_font_char_us_1, 7}, // 49 "1"
     {texture_font_char_us_2, 7}, // 50 "2"
@@ -1978,13 +1978,13 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_7, 7}, // 55 "7"
     {texture_font_char_us_8, 7}, // 56 "8"
     {texture_font_char_us_9, 7}, // 57 "9"
-    {NULL, 0}, // 58 ":"
-    {NULL, 0}, // 59 ";"
-    {NULL, 0}, // 60 "<"
-    {NULL, 0}, // 61 "="
-    {NULL, 0}, // 62 ">"
+    {texture_font_char_us_ellipsis, 4}, // 58 ":" (The colon is also called an ellipsis)
+    {NULL, 0}, // 59 ";" (Unimplemented)
+    {NULL, 0}, // 60 "<" (Unimplemented)
+    {NULL, 0}, // 61 "=" (Unimplemented)
+    {NULL, 0}, // 62 ">" (Unimplemented)
     {texture_font_char_us_question, 7}, // 63 "?"
-    {NULL, 0}, // 64 "@"
+    {NULL, 0}, // 64 "@" (Color code control character)
     {texture_font_char_us_A, 6}, // 65 "A"
     {texture_font_char_us_B, 6}, // 66 "B"
     {texture_font_char_us_C, 6}, // 67 "C"
@@ -2011,12 +2011,12 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_X, 7}, // 88 "X"
     {texture_font_char_us_Y, 6}, // 89 "Y"
     {texture_font_char_us_Z, 6}, // 90 "Z"
-    {NULL, 0}, // 91 "["
-    {NULL, 0}, // 92 "\\"
-    {NULL, 0}, // 93 "]"
-    {NULL, 0}, // 94 "^"
-    {NULL, 0}, // 95 "_"
-    {NULL, 0}, // 96 "`"
+    {NULL, 0}, // 91 "[" (Unimplemented)
+    {NULL, 0}, // 92 "\\" (Unimplemented)
+    {NULL, 0}, // 93 "]" (Unimplemented)
+    {NULL, 0}, // 94 "^" (Unimplemented)
+    {NULL, 0}, // 95 "_" (Unimplemented)
+    {NULL, 0}, // 96 "`" (Unimplemented)
     {texture_font_char_us_a, 6}, // 97 "a"
     {texture_font_char_us_b, 5}, // 98 "b"
     {texture_font_char_us_c, 5}, // 99 "c"
@@ -2043,10 +2043,10 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_x, 7}, // 120 "x"
     {texture_font_char_us_y, 5}, // 121 "y"
     {texture_font_char_us_z, 5}, // 122 "z"
-    {NULL, 0}, // 123 "{"
-    {NULL, 0}, // 124 "|"
-    {NULL, 0}, // 125 "}"
-    {NULL, 0}, // 126 "~"
+    {NULL, 0}, // 123 "{" (Unimplemented)
+    {NULL, 0}, // 124 "|" (Unimplemented)
+    {NULL, 0}, // 125 "}" (Unimplemented)
+    {texture_font_char_us_tilde, 8}, // 126 "~"
 };
 /**
 
