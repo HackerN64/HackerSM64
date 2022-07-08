@@ -404,7 +404,7 @@ void print_credits_string(s16 x, s16 y, const u8 *str) {
                 break;
             default:
                 gDPPipeSync(gDisplayListHead++);
-                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos]]);
+                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos] - ' ']);
                 gDPLoadSync(gDisplayListHead++);
                 gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
                 gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,

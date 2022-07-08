@@ -2350,19 +2350,118 @@ const Texture *const main_font_lut[] = {
 #endif
 };
 **/
-// credits font LUT 0x02008738-0x020087CB
+
 const Texture *const main_credits_font_lut[] = {
-                       0x0,                    0x0,                    0x0, texture_credits_char_3,
-    texture_credits_char_4,                    0x0, texture_credits_char_6,                    0x0,
-                       0x0,                    0x0, texture_credits_char_A, texture_credits_char_B,
-    texture_credits_char_C, texture_credits_char_D, texture_credits_char_E, texture_credits_char_F,
-    texture_credits_char_G, texture_credits_char_H, texture_credits_char_I, texture_credits_char_J,
-    texture_credits_char_K, texture_credits_char_L, texture_credits_char_M, texture_credits_char_N,
-    texture_credits_char_O, texture_credits_char_P, texture_credits_char_Q, texture_credits_char_R,
-    texture_credits_char_S, texture_credits_char_T, texture_credits_char_U, texture_credits_char_V,
-    texture_credits_char_W, texture_credits_char_X, texture_credits_char_Y, texture_credits_char_Z,
-    texture_credits_char_period,
+    NULL, // 32 " "
+    NULL, // 33 "!" (Unimplemented)
+    NULL, // 34 "\"" (Unimplemented)
+    NULL, // 35 "#" (Unimplemented)
+    NULL, // 36 "$" (Unimplemented)
+    NULL, // 37 "%" (Unimplemented)
+    NULL, // 38 "&" (Unimplemented)
+    NULL, // 39 "'" (Unimplemented)
+    NULL, // 40 "(" (Unimplemented)
+    NULL, // 41 ")" (Unimplemented)
+    NULL, // 42 "*" (Unimplemented)
+    NULL, // 43 "+" (Unimplemented)
+    NULL, // 44 "," (Unimplemented)
+    NULL, // 45 "-" (Unimplemented)
+    texture_credits_char_period, // 46 "."
+    NULL, // 47 "/" (Unimplemented)
+    NULL, // 48 "0" (Unimplemented)
+    NULL, // 49 "1" (Unimplemented)
+    NULL, // 50 "2" (Unimplemented)
+    texture_credits_char_3, // 51 "3"
+    texture_credits_char_4, // 52 "4"
+    NULL, // 53 "5" (Unimplemented)
+    texture_credits_char_6, // 54 "6"
+    NULL, // 55 "7" (Unimplemented)
+    NULL, // 56 "8" (Unimplemented)
+    NULL, // 57 "9" (Unimplemented)
+    NULL, // 58 ":" (Unimplemented)
+    NULL, // 59 ";" (Unimplemented)
+    NULL, // 60 "<" (Unimplemented)
+    NULL, // 61 "=" (Unimplemented)
+    NULL, // 62 ">" (Unimplemented)
+    NULL, // 63 "?" (Unimplemented)
+    NULL, // 64 "@" (Unimplemented)
+    texture_credits_char_A, // 65 "A"
+    texture_credits_char_B, // 66 "B"
+    texture_credits_char_C, // 67 "C"
+    texture_credits_char_D, // 68 "D"
+    texture_credits_char_E, // 69 "E"
+    texture_credits_char_F, // 70 "F"
+    texture_credits_char_G, // 71 "G"
+    texture_credits_char_H, // 72 "H"
+    texture_credits_char_I, // 73 "I"
+    texture_credits_char_J, // 74 "J"
+    texture_credits_char_K, // 75 "K"
+    texture_credits_char_L, // 76 "L"
+    texture_credits_char_M, // 77 "M"
+    texture_credits_char_N, // 78 "N"
+    texture_credits_char_O, // 79 "O"
+    texture_credits_char_P, // 80 "P"
+    texture_credits_char_Q, // 81 "Q"
+    texture_credits_char_R, // 82 "R"
+    texture_credits_char_S, // 83 "S"
+    texture_credits_char_T, // 84 "T"
+    texture_credits_char_U, // 85 "U"
+    texture_credits_char_V, // 86 "V"
+    texture_credits_char_W, // 87 "W"
+    texture_credits_char_X, // 88 "X"
+    texture_credits_char_Y, // 89 "Y"
+    texture_credits_char_Z, // 90 "Z"
+    NULL, // 91 "[" (Unimplemented)
+    NULL, // 92 "\\" (Unimplemented)
+    NULL, // 93 "]" (Unimplemented)
+    NULL, // 94 "^" (Unimplemented)
+    NULL, // 95 "_" (Unimplemented)
+    NULL, // 96 "`" (Unimplemented)
+    texture_credits_char_A, // 97 "a"
+    texture_credits_char_B, // 98 "b"
+    texture_credits_char_C, // 99 "c"
+    texture_credits_char_D, // 100 "d"
+    texture_credits_char_E, // 101 "e"
+    texture_credits_char_F, // 102 "f"
+    texture_credits_char_G, // 103 "g"
+    texture_credits_char_H, // 104 "h"
+    texture_credits_char_I, // 105 "i"
+    texture_credits_char_J, // 106 "j"
+    texture_credits_char_K, // 107 "k"
+    texture_credits_char_L, // 108 "l"
+    texture_credits_char_M, // 109 "m"
+    texture_credits_char_N, // 110 "n"
+    texture_credits_char_O, // 111 "o"
+    texture_credits_char_P, // 112 "p"
+    texture_credits_char_Q, // 113 "q"
+    texture_credits_char_R, // 114 "r"
+    texture_credits_char_S, // 115 "s"
+    texture_credits_char_T, // 116 "t"
+    texture_credits_char_U, // 117 "u"
+    texture_credits_char_V, // 118 "v"
+    texture_credits_char_W, // 119 "w"
+    texture_credits_char_X, // 120 "x"
+    texture_credits_char_Y, // 121 "y"
+    texture_credits_char_Z, // 122 "z"
+    NULL, // 123 "{" (Unimplemented)
+    NULL, // 124 "|" (Unimplemented)
+    NULL, // 125 "}" (Unimplemented)
+    NULL, // 126 "~" (Unimplemented)
 };
+
+// credits font LUT 0x02008738-0x020087CB
+// const Texture *const main_credits_font_lut[] = {
+//                        0x0,                    0x0,                    0x0, texture_credits_char_3,
+//     texture_credits_char_4,                    0x0, texture_credits_char_6,                    0x0,
+//                        0x0,                    0x0, texture_credits_char_A, texture_credits_char_B,
+//     texture_credits_char_C, texture_credits_char_D, texture_credits_char_E, texture_credits_char_F,
+//     texture_credits_char_G, texture_credits_char_H, texture_credits_char_I, texture_credits_char_J,
+//     texture_credits_char_K, texture_credits_char_L, texture_credits_char_M, texture_credits_char_N,
+//     texture_credits_char_O, texture_credits_char_P, texture_credits_char_Q, texture_credits_char_R,
+//     texture_credits_char_S, texture_credits_char_T, texture_credits_char_U, texture_credits_char_V,
+//     texture_credits_char_W, texture_credits_char_X, texture_credits_char_Y, texture_credits_char_Z,
+//     texture_credits_char_period,
+// };
 
 // HUD camera table 0x020087CC-0x020087E3
 const Texture *const main_hud_camera_lut[] = {
