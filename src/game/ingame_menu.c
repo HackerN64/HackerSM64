@@ -1044,25 +1044,13 @@ void dl_rgba16_stop_cutscene_msg_fade(void) {
     }
 }
 
-u32 ascii_to_credits_char(u8 c) {
-    if (c >= 'A' && c <= 'Z') return (c - ('A' - 0xA));
-    if (c >= 'a' && c <= 'z') return (c - ('a' - 0xA)); // remap lower to upper case
-    if (c == ' ') return GLOBAL_CHAR_SPACE;
-    if (c == '.') return 0x24;
-    if (c == '3') return ASCII_TO_DIALOG('3');
-    if (c == '4') return ASCII_TO_DIALOG('4');
-    if (c == '6') return ASCII_TO_DIALOG('6');
-
-    return GLOBAL_CHAR_SPACE;
-}
-
 void print_credits_str_ascii(s16 x, s16 y, const char *str) {
     s32 pos = 0;
     u8 c = str[pos];
     u8 creditStr[100];
 
     while (c != 0) {
-        creditStr[pos++] = ascii_to_credits_char(c);
+        creditStr[pos++] = c;
         c = str[pos];
     }
 

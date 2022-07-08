@@ -1927,7 +1927,7 @@ void print_save_file_scores(s8 fileIndex) {
     unsigned char textFileLetter[] = { TEXT_ZERO };
     void **levelNameTable = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
-    textFileLetter[0] = fileIndex + ASCII_TO_DIALOG('A'); // get letter of file selected
+    textFileLetter[0] = fileIndex + 'A'; // get letter of file selected
 
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
