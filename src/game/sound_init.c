@@ -360,10 +360,6 @@ void thread4_sound(UNUSED void *arg) {
     audio_init();
     sound_init();
 
-#if PUPPYPRINT_DEBUG
-    OSTime lastTime;
-#endif
-
     osCreateMesgQueue(&sSoundMesgQueue, sSoundMesgBuf, ARRAY_COUNT(sSoundMesgBuf));
     set_vblank_handler(1, &sSoundVblankHandler, &sSoundMesgQueue, (OSMesg) 512);
 
@@ -371,11 +367,6 @@ void thread4_sound(UNUSED void *arg) {
         OSMesg msg;
 
         osRecvMesg(&sSoundMesgQueue, &msg, OS_MESG_BLOCK);
-#if PUPPYPRINT_DEBUG
-        lastTime = osGetTime();
-        gPuppyTimers.dmaAudioTime[NUM_PERF_ITERATIONS] -= gPuppyTimers.dmaAudioTime[perfIteration];
-        gPuppyTimers.dmaAudioTime[perfIteration] = 0;
-#endif
         profiler_audio_started();
         if (gResetTimer < 25) {
             struct SPTask *spTask;
@@ -383,10 +374,6 @@ void thread4_sound(UNUSED void *arg) {
             if (spTask != NULL) {
                 dispatch_audio_sptask(spTask);
             }
-#if PUPPYPRINT_DEBUG
-        puppyprint_profiler_update(gPuppyTimers.thread4Time, lastTime);
-        puppyprint_profiler_offset(gPuppyTimers.thread4Time, gPuppyTimers.dmaAudioTime[perfIteration]);
-#endif
         }
         profiler_audio_completed();
     }

@@ -732,11 +732,6 @@ void setup_game_memory(void) {
  * Main game loop thread. Runs forever as long as the game continues.
  */
 void thread5_game_loop(UNUSED void *arg) {
-#if PUPPYPRINT_DEBUG
-    OSTime lastTime = 0;
-    OSTime first = 0;
-#endif
-
     setup_game_memory();
 #if ENABLE_RUMBLE
     init_rumble_pak_scheduler_queue();
@@ -772,15 +767,6 @@ void thread5_game_loop(UNUSED void *arg) {
             draw_reset_bars();
             continue;
         }
-#if PUPPYPRINT_DEBUG
-        lastTime = osGetTime();
-        gPuppyTimers.collisionTime[PERF_AGGREGATE] -= gPuppyTimers.collisionTime[perfIteration];
-        gPuppyTimers.behaviourTime[PERF_AGGREGATE] -= gPuppyTimers.behaviourTime[perfIteration];
-        gPuppyTimers.dmaTime[PERF_AGGREGATE] -= gPuppyTimers.dmaTime[perfIteration];
-        gPuppyTimers.collisionTime[perfIteration] = 0;
-        gPuppyTimers.behaviourTime[perfIteration] = 0;
-        gPuppyTimers.dmaTime[perfIteration] = 0;
-#endif
 
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
@@ -794,21 +780,16 @@ void thread5_game_loop(UNUSED void *arg) {
 
         audio_game_loop_tick();
         select_gfx_pool();
-#if PUPPYPRINT_DEBUG
-        first = osGetTime();
         read_controller_inputs(THREAD_5_GAME_LOOP);
-        puppyprint_profiler_update(gPuppyTimers.controllerTime, first);
-#else
-        read_controller_inputs(THREAD_5_GAME_LOOP);
-#endif
         profiler_update(PROFILER_TIME_CONTROLLERS);
+        profiler_collision_reset();
         addr = level_script_execute(addr);
+        profiler_collision_completed();
 #if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
         debug_box_input();
 #endif
 #if PUPPYPRINT_DEBUG
         puppyprint_profiler_process();
-        puppyprint_profiler_update(gPuppyTimers.thread5Time, lastTime);
 #endif
 
         display_and_vsync();

@@ -2865,16 +2865,14 @@ void update_lakitu(struct Camera *c) {
     gLakituState.defMode = c->defMode;
 }
 
+extern u32 collision_time;
 
 /**
  * The main camera update function.
  * Gets controller input, checks for cutscenes, handles mode changes, and moves the camera
  */
 void update_camera(struct Camera *c) {
-#if PUPPYPRINT_DEBUG
-    OSTime first   = osGetTime();
-    OSTime colTime = gPuppyTimers.collisionTime[perfIteration];
-#endif
+    u32 colFirst = profiler_get_delta(PROFILER_DELTA_COLLISION);
     gCamera = c;
     update_camera_hud_status(c);
     if (c->cutscene == CUTSCENE_NONE
@@ -3117,10 +3115,8 @@ void update_camera(struct Camera *c) {
     }
 #endif
     gLakituState.lastFrameAction = sMarioCamState->action;
-#if PUPPYPRINT_DEBUG
-    puppyprint_profiler_update(gPuppyTimers.cameraTime, first);
-    puppyprint_profiler_offset(gPuppyTimers.cameraTime, gPuppyTimers.collisionTime[perfIteration]-colTime);
-#endif
+    profiler_update(PROFILER_TIME_CAMERA);
+    profiler_update_delta(PROFILER_DELTA_COLLISION_CAMERA, profiler_get_delta(PROFILER_DELTA_COLLISION) - colFirst);
 }
 
 /**

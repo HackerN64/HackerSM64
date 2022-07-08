@@ -998,15 +998,25 @@ s32 play_mode_normal(void) {
     if (sTimerRunning && gHudDisplay.timer < 17999) {
         gHudDisplay.timer++;
     }
-
+#if PUPPYPRINT_DEBUG
+    if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+        area_update_objects();
+    }
+#else
     area_update_objects();
+#endif
     update_hud_values();
 #ifdef PUPPYLIGHTS
     delete_lights();
 #endif
-
     if (gCurrentArea != NULL) {
+#if PUPPYPRINT_DEBUG
+        if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+            update_camera(gCurrentArea->camera);
+        }
+#else
         update_camera(gCurrentArea->camera);
+#endif
     }
 
     initiate_painting_warp();
@@ -1028,7 +1038,6 @@ s32 play_mode_normal(void) {
             set_play_mode(PLAY_MODE_PAUSED);
         }
     }
-
     return FALSE;
 }
 

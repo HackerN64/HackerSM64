@@ -471,7 +471,7 @@ u32 get_area_terrain_size(TerrainData *data) {
  */
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
 #if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
+    u32 first = osGetCount();
 #endif
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
@@ -531,7 +531,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
 #if PUPPYPRINT_DEBUG
-    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    profiler_collision_update(first);
 #endif
 }
 
@@ -539,6 +539,9 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
  * If not in time stop, clear the surface partitions.
  */
 void clear_dynamic_surfaces(void) {
+#if PUPPYPRINT_DEBUG
+    u32 first = osGetCount();
+#endif
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
@@ -547,6 +550,9 @@ void clear_dynamic_surfaces(void) {
 
         clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
     }
+#if PUPPYPRINT_DEBUG
+    profiler_collision_update(first);
+#endif
 }
 
 /**
@@ -659,7 +665,7 @@ static void get_optimal_coll_dist(struct Object *obj) {
  */
 void load_object_collision_model(void) {
 #if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
+    u32 first = osGetCount();
 #endif
     TerrainData vertexData[600];
 
@@ -700,7 +706,7 @@ void load_object_collision_model(void) {
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
 #if PUPPYPRINT_DEBUG
-    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    profiler_collision_update(first);
 #endif
 }
 
@@ -736,6 +742,6 @@ void load_object_static_model(void) {
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
 #if PUPPYPRINT_DEBUG
-    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    profiler_collision_update(first);
 #endif
 }

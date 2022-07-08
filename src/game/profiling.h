@@ -17,6 +17,12 @@ enum ProfilerTime {
     PROFILER_TIME_MARIO,
     PROFILER_TIME_BEHAVIOR_AFTER_MARIO,
     PROFILER_TIME_GFX,
+    PROFILER_TIME_COLLISION,
+    PROFILER_TIME_CAMERA,
+#if PUPPYPRINT_DEBUG
+    PROFILER_TIME_PUPPYPRINT1,
+    PROFILER_TIME_PUPPYPRINT2,
+#endif
     PROFILER_TIME_AUDIO,
     PROFILER_TIME_TOTAL,
     PROFILER_TIME_RSP_GFX,
@@ -33,6 +39,23 @@ enum ProfilerRSPTime {
     PROFILER_RSP_COUNT
 };
 
+enum ProfilerDeltaTime {
+    PROFILER_DELTA_COLLISION_CAMERA,
+    PROFILER_DELTA_COLLISION_GFX,
+    PROFILER_DELTA_COLLISION_BHV,
+#if PUPPYPRINT_DEBUG
+    PROFILER_DELTA_PUPPYPRINT_DEBUG1,
+    PROFILER_DELTA_PUPPYPRINT_DEBUG2,
+#endif
+    DELTA_TIME_COUNT,
+
+    PROFILER_DELTA_COLLISION,
+#if PUPPYPRINT_DEBUG
+    PROFILER_DELTA_PUPPYPRINT1,
+    PROFILER_DELTA_PUPPYPRINT2
+#endif
+};
+
 #ifdef USE_PROFILER
 void profiler_update(enum ProfilerTime which);
 void profiler_print_times();
@@ -42,6 +65,11 @@ void profiler_rsp_completed(enum ProfilerRSPTime which);
 void profiler_rsp_resumed();
 void profiler_audio_started();
 void profiler_audio_completed();
+void profiler_collision_reset();
+void profiler_collision_completed();
+void profiler_collision_update(u32 time);
+void profiler_update_delta(enum ProfilerDeltaTime which, u32 time);
+u32 profiler_get_delta(enum ProfilerDeltaTime which);
 // See profiling.c to see why profiler_rsp_yielded isn't its own function
 static ALWAYS_INLINE void profiler_rsp_yielded() {
     profiler_rsp_resumed();
@@ -56,6 +84,11 @@ static ALWAYS_INLINE void profiler_rsp_yielded() {
 #define profiler_audio_started()
 #define profiler_audio_completed()
 #define profiler_rsp_yielded()
+#define profiler_collision_reset();
+#define profiler_collision_completed();
+#define profiler_collision_update(time);
+#define profiler_update_delta(which, time);
+#define profiler_get_delta(which)
 #endif
 
 #endif

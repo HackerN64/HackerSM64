@@ -1378,7 +1378,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     Vec3f chk_hit_pos;
     f32 top, bottom;
 #if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
+    u32 first = osGetCount();
 #endif
     // Get upper and lower bounds of ray
     if (dir[1] >= 0.0f) {
@@ -1404,7 +1404,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
         }
     }
 #if PUPPYPRINT_DEBUG
-    puppyprint_profiler_add(gPuppyTimers.collisionTime, ((osGetTime() - first)));
+    profiler_collision_update(first);
 #endif
 }
 

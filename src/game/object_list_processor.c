@@ -620,10 +620,7 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  */
 void update_objects(UNUSED s32 unused) {
     //s64 cycleCounts[30];
-#if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-    OSTime colTime = gPuppyTimers.collisionTime[perfIteration];
-#endif
+    u32 colFirst = profiler_get_delta(PROFILER_DELTA_COLLISION);
 
     // cycleCounts[0] = get_current_clock();
 
@@ -673,9 +670,6 @@ void update_objects(UNUSED s32 unused) {
     }
 
     gPrevFrameObjectCount = gObjectCounter;
-#if PUPPYPRINT_DEBUG
-    puppyprint_profiler_update(gPuppyTimers.behaviourTime, first);
-    puppyprint_profiler_offset(gPuppyTimers.behaviourTime, gPuppyTimers.collisionTime[perfIteration] - colTime);
-#endif
     profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO);
+    profiler_update_delta(PROFILER_DELTA_COLLISION_BHV, colFirst);
 }
