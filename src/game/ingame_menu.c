@@ -87,37 +87,6 @@ enum DialogBoxType {
 #define DEFAULT_DIALOG_BOX_ANGLE 90.0f
 #define DEFAULT_DIALOG_BOX_SCALE 19.0f
 
-u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
-    7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  6,  6,  6,  6,  6,  6,
-    6,  6,  5,  6,  6,  5,  8,  8,  6,  6,  6,  6,  6,  5,  6,  6,
-    8,  7,  6,  6,  6,  5,  5,  6,  5,  5,  6,  5,  4,  5,  5,  3,
-    7,  5,  5,  5,  6,  5,  5,  5,  5,  5,  7,  7,  5,  5,  4,  4,
-    8,  6,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    8,  8,  8,  8,  7,  7,  6,  7,  7,  0,  0,  0,  0,  0,  0,  0,
-#ifdef VERSION_EU
-    6,  6,  6,  0,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,  4,
-    5,  5,  5,  5,  6,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,
-    5,  5,  5,  0,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  5,  5,  0,  0,  6,  6,  0,  0,  0,  0,  0,  0,  0,  5,  6,
-    0,  4,  4,  0,  0,  5,  5,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-#else
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  4,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  5,  6,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-#endif
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-#ifdef VERSION_EU
-    7,  5, 10,  5,  9,  8,  4,  0,  0,  0,  0,  5,  5,  6,  5,  0,
-#else
-    7,  5, 10,  5,  9,  8,  4,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-#endif
-    0,  0,  5,  7,  7,  6,  6,  8,  0,  8, 10,  6,  4, 10,  0,  0
-};
-
 s8 gDialogBoxState = DIALOG_STATE_OPENING;
 f32 gDialogBoxOpenTimer = DEFAULT_DIALOG_BOX_ANGLE;
 f32 gDialogBoxScale = DEFAULT_DIALOG_BOX_SCALE;
@@ -224,61 +193,6 @@ void create_dl_ortho_matrix(void) {
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
 }
 
-// Unused
-#if FALSE
-static u8 *alloc_ia8_text_from_i1(u16 *in, s16 width, s16 height) {
-    s32 inPos;
-    u16 bitMask;
-    u8 *out;
-    s16 outPos = 0;
-
-    out = (u8 *) alloc_display_list((u32) width * (u32) height);
-
-    if (out == NULL) {
-        return NULL;
-    }
-
-    for (inPos = 0; inPos < (width * height) / 16; inPos++) {
-        bitMask = 0x8000;
-
-        while (bitMask != 0) {
-            if (in[inPos] & bitMask) {
-                out[outPos] = 0xFF;
-            } else {
-                out[outPos] = 0x00;
-            }
-
-            bitMask /= 2;
-            outPos++;
-        }
-    }
-
-    return out;
-}
-
-void render_generic_char(u8 c) {
-    void **fontLUT = segmented_to_virtual(main_font_lut);
-    void *packedTexture = segmented_to_virtual(fontLUT[c]);
-#if defined(VERSION_JP) || defined(VERSION_SH)
-    void *unpackedTexture = alloc_ia8_text_from_i1(packedTexture, 8, 16);
-#endif
-
-#ifndef VERSION_EU
-    gDPPipeSync(gDisplayListHead++);
-#endif
-#if defined(VERSION_JP) || defined(VERSION_SH)
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));
-#else
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(packedTexture));
-#endif
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
-#ifdef VERSION_EU
-    gSPTextureRectangleFlip(gDisplayListHead++, gDialogX << 2, (gDialogY - 16) << 2,
-                            (gDialogX + 8) << 2, gDialogY << 2, G_TX_RENDERTILE, 8 << 6, 4 << 6, 1 << 10, 1 << 10);
-#endif
-}
-#endif
-
 Texture32 *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     u32 size = (u32) width * (u32) height;
     s32 inPos;
@@ -306,54 +220,18 @@ Texture32 *alloc_ia4_tex_from_i1(Texture *in, s16 width, s16 height) {
     return (Texture32 *)out;
 }
 
-void render_generic_char(u8 c) {
-    void **fontLUT = segmented_to_virtual(main_font_lut);
-    void *packedTexture = segmented_to_virtual(fontLUT[c]);
-#if MULTILANG
-    void *unpackedTexture = alloc_ia4_tex_from_i1(packedTexture, 8, 8);
+u8 render_generic_char(char c) {
+    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
+    void *texture = segmented_to_virtual(fontLUT[c - ' '].texture);
 
     gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(unpackedTexture));
-#else
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(packedTexture));
-#endif
-
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(texture));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
-}
 
-
-struct MultiTextEntry {
-    u8 length;
-    u8 str[4];
-};
-
-#define TEXT_THE_RAW ASCII_TO_DIALOG('t'), ASCII_TO_DIALOG('h'), ASCII_TO_DIALOG('e'), 0x00
-#define TEXT_YOU_RAW ASCII_TO_DIALOG('y'), ASCII_TO_DIALOG('o'), ASCII_TO_DIALOG('u'), 0x00
-
-enum MultiStringIDs { STRING_THE, STRING_YOU };
-
-/*
- * Place the multi-text string according to the ID passed. (US, EU)
- * 0: 'the'
- * 1: 'you'
- */
-void render_multi_text_string(s8 multiTextID) {
-    s8 i;
-    struct MultiTextEntry textLengths[2] = {
-        { 3, { TEXT_THE_RAW } },
-        { 3, { TEXT_YOU_RAW } },
-    };
-
-    for (i = 0; i < textLengths[multiTextID].length; i++) {
-        render_generic_char(textLengths[multiTextID].str[i]);
-        create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[textLengths[multiTextID].str[i]]), 0.0f, 0.0f);
-    }
+    return fontLUT[c - ' '].kerning;
 }
 
 #define MAX_STRING_WIDTH 16
-#define CHAR_WIDTH_SPACE (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE])
-#define CHAR_WIDTH_DEFAULT (f32)(gDialogCharWidths[str[strPos]])
 
 /**
  * Prints a generic white string.
@@ -368,12 +246,13 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
     ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
     u8 customColor = 0;
     u8 diffTmp     = 0;
+    u8 kerning     = 0;
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
-    while (str[strPos] != DIALOG_CHAR_TERMINATOR) {
+    while (str[strPos] != 0x00 && str[strPos] != 0xFF) {
         switch (str[strPos]) {
-            case DIALOG_CHAR_COLOR:
+            /**case DIALOG_CHAR_COLOR:
                 customColor = 1;
                 strPos++;
                 for (colorLoop = (strPos + 8); strPos < colorLoop; ++strPos) {
@@ -410,46 +289,21 @@ void print_generic_string(s16 x, s16 y, const u8 *str) {
                     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255); // TODO: Is it possible to retrieve the original color that was set before print_generic_string was called?
                     customColor = 0;
                 }
-                break;
-            case DIALOG_CHAR_DAKUTEN:
-                mark = DIALOG_MARK_DAKUTEN;
-                break;
-            case DIALOG_CHAR_PERIOD_OR_HANDAKUTEN:
-                mark = DIALOG_MARK_HANDAKUTEN;
-                break;
-            case DIALOG_CHAR_NEWLINE:
+                break;**/
+            case '\n':
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
                 create_dl_translation_matrix(MENU_MTX_PUSH, x, y - (lineNum * MAX_STRING_WIDTH), 0.0f);
                 lineNum++;
                 break;
-            case DIALOG_CHAR_PERIOD:
-                create_dl_translation_matrix(MENU_MTX_PUSH, -2.0f, -5.0f, 0.0f);
-                render_generic_char(DIALOG_CHAR_PERIOD_OR_HANDAKUTEN);
-                gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+            case '/':
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, 5 * 2, 0.0f, 0.0f);
                 break;
-            case DIALOG_CHAR_SLASH:
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * 2), 0.0f, 0.0f);
-                break;
-            case DIALOG_CHAR_MULTI_THE:
-                render_multi_text_string(STRING_THE);
-                break;
-            case DIALOG_CHAR_MULTI_YOU:
-                render_multi_text_string(STRING_YOU);
-                break;
-            case DIALOG_CHAR_SPACE:
-                // create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE]), 0.0f, 0.0f);
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, CHAR_WIDTH_SPACE, 0.0f, 0.0f);
+            case ' ':
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, 5, 0.0f, 0.0f);
                 break;
             default:
-                render_generic_char(str[strPos]);
-                if (mark != DIALOG_MARK_NONE) {
-                    create_dl_translation_matrix(MENU_MTX_PUSH, 5.0f, 5.0f, 0.0f);
-                    render_generic_char(DIALOG_CHAR_MARK_START + mark);
-                    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
-                    mark = DIALOG_MARK_NONE;
-                }
-
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, CHAR_WIDTH_DEFAULT, 0.0f, 0.0f);
+                kerning = render_generic_char(str[strPos]);
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
                 break;
         }
 
@@ -478,7 +332,7 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, const u8 *str) {
         xStride = 12; //? Shindou uses this.
     }
 
-    while (str[strPos] != GLOBAR_CHAR_TERMINATOR) {
+    while (str[strPos] != GLOBAR_CHAR_TERMINATOR && str[strPos] != 0x00) {
         switch (str[strPos]) {
             case GLOBAL_CHAR_SPACE:
                 curX += 8;
@@ -510,36 +364,21 @@ void print_menu_generic_string(s16 x, s16 y, const u8 *str) {
     s32 strPos = 0;
     u32 curX = x;
     u32 curY = y;
-    void **fontLUT = segmented_to_virtual(menu_font_lut);
+    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
 
-    while (str[strPos] != DIALOG_CHAR_TERMINATOR) {
+    while (str[strPos] != DIALOG_CHAR_TERMINATOR && str[strPos] != 0x00) {
         switch (str[strPos]) {
-            case DIALOG_CHAR_DAKUTEN:
-                mark = DIALOG_MARK_DAKUTEN;
-                break;
-            case DIALOG_CHAR_PERIOD_OR_HANDAKUTEN:
-                mark = DIALOG_MARK_HANDAKUTEN;
-                break;
-            case DIALOG_CHAR_SPACE:
+            case ' ':
                 curX += 4;
                 break;
             default:
-                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[str[strPos]]);
+                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[str[strPos] - ' '].texture);
                 gDPLoadSync(gDisplayListHead++);
                 gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
                 gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
                                     (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
-                if (mark != DIALOG_MARK_NONE) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[DIALOG_CHAR_MARK_START + mark]);
-                    gDPLoadSync(gDisplayListHead++);
-                    gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
-                    gSPTextureRectangle(gDisplayListHead++, (curX + 6) << 2, (curY - 7) << 2,
-                                        (curX + 6 + 8) << 2, (curY - 7 + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-
-                    mark = DIALOG_MARK_NONE;
-                }
-                curX += gDialogCharWidths[str[strPos]];
+                curX += fontLUT[str[strPos] - ' '].kerning;
         }
         strPos++;
     }
@@ -558,7 +397,7 @@ void print_credits_string(s16 x, s16 y, const u8 *str) {
                 G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
     gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
 
-    while (str[strPos] != GLOBAR_CHAR_TERMINATOR) {
+    while (str[strPos] != GLOBAR_CHAR_TERMINATOR && str[strPos] != 0x00) {
         switch (str[strPos]) {
             case GLOBAL_CHAR_SPACE:
                 curX += 4;
@@ -615,29 +454,20 @@ void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8
     }
 }
 
-s32 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
-    s16 strPos = 0;
-    f32 spacesWidth = 0.0f;
-
-    while (str[strPos] != DIALOG_CHAR_TERMINATOR) {
-        spacesWidth += gDialogCharWidths[str[strPos]];
-        strPos++;
-    }
-    // return the x position of where the string starts as half the string's
-    // length from the position of the provided center.
-    return (s16)(centerPos - (s16)(spacesWidth / 2.0f));
-}
-
-
 s32 get_string_width(u8 *str) {
     s16 strPos = 0;
     s16 width = 0;
+    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
 
-    while (str[strPos] != DIALOG_CHAR_TERMINATOR) {
-        width += gDialogCharWidths[str[strPos]];
+    while (str[strPos] != DIALOG_CHAR_TERMINATOR && str[strPos] != 0x00) {
+        width += fontLUT[str[strPos] - ' '].kerning;
         strPos++;
     }
     return width;
+}
+
+s32 get_str_x_pos_from_center(s16 centerPos, u8 *str, UNUSED f32 scale) {
+    return (s16)(centerPos - (s16)(get_string_width(str) / 2.0f));
 }
 
 u8 gHudSymCoin[] = { GLYPH_COIN, GLYPH_SPACE };
@@ -683,7 +513,7 @@ void int_to_str(s32 num, u8 *dst) {
 
     if (num > 999) {
         dst[0] = 0x00;
-        dst[1] = DIALOG_CHAR_TERMINATOR;
+        dst[1] = '\0';
         return;
     }
 
@@ -701,7 +531,7 @@ void int_to_str(s32 num, u8 *dst) {
     }
 
     dst[pos++] = digit[2];
-    dst[pos] = DIALOG_CHAR_TERMINATOR;
+    dst[pos] = '\0';
 }
 
 s32 get_dialog_id(void) {
@@ -828,45 +658,27 @@ void handle_dialog_scroll_page_state(s8 lineNum, s8 totalLines, s8 *pageState, s
 void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos) {
     s8 tensDigit = gDialogVariable / 10;
     s8 onesDigit = gDialogVariable - (tensDigit * 10); // remainder
+    u8 kerning;
 
     if (tensDigit != 0) {
         if (*xMatrix != 1) {
-            create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * *xMatrix), 0, 0);
+            create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(5 * *xMatrix), 0, 0);
         }
 
-        render_generic_char(tensDigit);
-        create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32) gDialogCharWidths[tensDigit], 0, 0);
+        kerning = render_generic_char(tensDigit);
+        create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
         *xMatrix = 1;
         (*linePos)++;
     }
 
     if (*xMatrix != 1) {
-        create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * (*xMatrix - 1)), 0, 0);
+        create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)5 * (*xMatrix - 1), 0, 0);
     }
 
-    render_generic_char(onesDigit);
-    create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32) gDialogCharWidths[onesDigit], 0, 0);
+    kerning = render_generic_char(onesDigit);
+    create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
     (*linePos)++;
     *xMatrix = 1;
-}
-
-void render_multi_text_string_lines(s8 multiTextId, s8 lineNum, s16 *linePos, s8 linesPerBox, s8 xMatrix, s8 lowerBound) {
-    s8 i;
-    struct MultiTextEntry textLengths[2] = {
-        { 3, { TEXT_THE_RAW } },
-        { 3, { TEXT_YOU_RAW } },
-    };
-
-    if (lineNum >= lowerBound && lineNum <= (lowerBound + linesPerBox)) {
-        if (*linePos != 0 || xMatrix != 1) {
-            create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogCharWidths[DIALOG_CHAR_SPACE] * (xMatrix - 1)), 0, 0);
-        }
-        for (i = 0; i < textLengths[multiTextId].length; i++) {
-            render_generic_char(textLengths[multiTextId].str[i]);
-            create_dl_translation_matrix(MENU_MTX_NOPUSH, (gDialogCharWidths[textLengths[multiTextId].str[i]]), 0, 0);
-        }
-    }
-    linePos += textLengths[multiTextId].length;
 }
 
 u32 ensure_nonnegative(s16 value) {
@@ -888,6 +700,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     s8 linesPerBox = dialog->linesPerBox;
     s16 strIdx;
     s16 linePos = 0;
+    u8 kerning;
 
     if (gDialogBoxState == DIALOG_STATE_HORIZONTAL) {
         // If scrolling, consider the number of lines for both
@@ -916,10 +729,11 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
 
         switch (strChar) {
             case DIALOG_CHAR_TERMINATOR:
+            case 0:
                 pageState = DIALOG_PAGE_STATE_END;
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
                 break;
-            case DIALOG_CHAR_COLOR:
+            /**case DIALOG_CHAR_COLOR:
                 customColor = 1;
                 strIdx++;
                 for (colorLoop = (strIdx + 8); strIdx < colorLoop; ++strIdx) {
@@ -946,45 +760,31 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                     }
                 }
                 strIdx--;
-                break;
-            case DIALOG_CHAR_NEWLINE:
+                break;**/
+            case '\n':
                 lineNum++;
                 handle_dialog_scroll_page_state(lineNum, totalLines, &pageState, &xMatrix, &linePos);
                 break;
-            case DIALOG_CHAR_DAKUTEN:
-                mark = DIALOG_MARK_DAKUTEN;
-                break;
-            case DIALOG_CHAR_PERIOD_OR_HANDAKUTEN:
-                mark = DIALOG_MARK_HANDAKUTEN;
-                break;
-            case DIALOG_CHAR_SPACE:
+            case ' ':
                 xMatrix++;
                 linePos++;
                 break;
-            case DIALOG_CHAR_SLASH:
+            case '/':
                 xMatrix += 2;
                 linePos += 2;
                 break;
-            case DIALOG_CHAR_MULTI_THE:
-                render_multi_text_string_lines(STRING_THE, lineNum, &linePos, linesPerBox, xMatrix, lowerBound);
-                xMatrix = 1;
-                break;
-            case DIALOG_CHAR_MULTI_YOU:
-                render_multi_text_string_lines(STRING_YOU, lineNum, &linePos, linesPerBox, xMatrix, lowerBound);
-                xMatrix = 1;
-                break;
-            case DIALOG_CHAR_STAR_COUNT:
+            case 0x100: // come back to this
                 render_star_count_dialog_text(&xMatrix, &linePos);
                 break;
             default: // any other character
                 if ((lineNum >= lowerBound) && (lineNum <= (lowerBound + linesPerBox))) {
                     if (linePos || xMatrix != 1) {
                         create_dl_translation_matrix(
-                            MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[DIALOG_CHAR_SPACE] * (xMatrix - 1)), 0, 0);
+                            MENU_MTX_NOPUSH, (f32)(5 * (xMatrix - 1)), 0, 0);
                     }
 
-                    render_generic_char(strChar);
-                    create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(gDialogCharWidths[strChar]), 0, 0);
+                    kerning = render_generic_char(strChar);
+                    create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
                     xMatrix = 1;
                     linePos++;
                 }
@@ -1294,7 +1094,7 @@ void print_credits_str_ascii(s16 x, s16 y, const char *str) {
         c = str[pos];
     }
 
-    creditStr[pos] = GLOBAR_CHAR_TERMINATOR;
+    creditStr[pos] = '\0';
 
     print_credits_string(x, y, creditStr);
 }

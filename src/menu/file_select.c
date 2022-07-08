@@ -1904,7 +1904,7 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
         starScoreText[i] = DIALOG_CHAR_STAR_FILLED;
     }
     // Terminating byte
-    starScoreText[i] = DIALOG_CHAR_TERMINATOR;
+    starScoreText[i] = '\0';
     print_menu_generic_string(x, y, starScoreText);
 }
 

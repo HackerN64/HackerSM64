@@ -54,6 +54,11 @@ extern s8 gHudFlash;
 extern s8 gDialogCourseActNum;
 extern s16 gInGameLanguage;
 
+struct AsciiCharLUTEntry {
+    const Texture *texture;
+    const u8 kerning;
+};
+
 struct DialogEntry {
     /*0x00*/ u32 unused;
     /*0x04*/ s8 linesPerBox;

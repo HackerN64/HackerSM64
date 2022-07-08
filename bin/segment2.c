@@ -1919,6 +1919,137 @@ const Texture *const main_hud_lut[] = {
     texture_hud_char_apostrophe, texture_hud_char_double_quote, texture_hud_char_umlaut,
 };
 
+/**
+u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
+    7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  6,  6,  6,  6,  6,  6,
+    6,  6,  5,  6,  6,  5,  8,  8,  6,  6,  6,  6,  6,  5,  6,  6,
+    8,  7,  6,  6,  6,  5,  5,  6,  5,  5,  6,  5,  4,  5,  5,  3,
+    7,  5,  5,  5,  6,  5,  5,  5,  5,  5,  7,  7,  5,  5,  4,  4,
+    8,  6,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    8,  8,  8,  8,  7,  7,  6,  7,  7,  0,  0,  0,  0,  0,  0,  0,
+#ifdef VERSION_EU
+    6,  6,  6,  0,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,  4,
+    5,  5,  5,  5,  6,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,
+    5,  5,  5,  0,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  5,  5,  0,  0,  6,  6,  0,  0,  0,  0,  0,  0,  0,  5,  6,
+    0,  4,  4,  0,  0,  5,  5,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+#else
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  4,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  5,  6,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+#endif
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+#ifdef VERSION_EU
+    7,  5, 10,  5,  9,  8,  4,  0,  0,  0,  0,  5,  5,  6,  5,  0,
+#else
+    7,  5, 10,  5,  9,  8,  4,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+#endif
+    0,  0,  5,  7,  7,  6,  6,  8,  0,  8, 10,  6,  4, 10,  0,  0
+};**/
+
+const struct AsciiCharLUTEntry main_font_lut[] = {
+    {NULL, 5}, // 32 " "
+    {texture_font_char_us_exclamation, 5}, // 33 "!"
+    {NULL, 0}, // 34 "\"" (come back to this)
+    {NULL, 0}, // 35 "#"
+    {NULL, 0}, // 36 "$"
+    {texture_font_char_us_percent, 7}, // 37 "%"
+    {texture_font_char_us_ampersand, 8}, // 38 "&"
+    {texture_font_char_us_apostrophe, 4}, // 39 "'"
+    {texture_font_char_us_open_parentheses, 5}, // 40 "("
+    {texture_font_char_us_close_parentheses, 5}, // 41 ")"
+    {NULL, 0}, // 42 "*"
+    {NULL, 0}, // 43 "+"
+    {texture_font_char_us_comma, 4}, // 44 ","
+    {NULL, 0}, // 45 "-"
+    {texture_font_char_us_period, 4}, // 46 "."
+    {NULL, 0}, // 47 "/"
+    {texture_font_char_us_0, 7}, // 48 "0"
+    {texture_font_char_us_1, 7}, // 49 "1"
+    {texture_font_char_us_2, 7}, // 50 "2"
+    {texture_font_char_us_3, 7}, // 51 "3"
+    {texture_font_char_us_4, 7}, // 52 "4"
+    {texture_font_char_us_5, 7}, // 53 "5"
+    {texture_font_char_us_6, 7}, // 54 "6"
+    {texture_font_char_us_7, 7}, // 55 "7"
+    {texture_font_char_us_8, 7}, // 56 "8"
+    {texture_font_char_us_9, 7}, // 57 "9"
+    {NULL, 0}, // 58 ":"
+    {NULL, 0}, // 59 ";"
+    {NULL, 0}, // 60 "<"
+    {NULL, 0}, // 61 "="
+    {NULL, 0}, // 62 ">"
+    {texture_font_char_us_question, 7}, // 63 "?"
+    {NULL, 0}, // 64 "@"
+    {texture_font_char_us_A, 6}, // 65 "A"
+    {texture_font_char_us_B, 6}, // 66 "B"
+    {texture_font_char_us_C, 6}, // 67 "C"
+    {texture_font_char_us_D, 6}, // 68 "D"
+    {texture_font_char_us_E, 6}, // 69 "E"
+    {texture_font_char_us_F, 6}, // 70 "F"
+    {texture_font_char_us_G, 6}, // 71 "G"
+    {texture_font_char_us_H, 6}, // 72 "H"
+    {texture_font_char_us_I, 5}, // 73 "I"
+    {texture_font_char_us_J, 6}, // 74 "J"
+    {texture_font_char_us_K, 6}, // 75 "K"
+    {texture_font_char_us_L, 5}, // 76 "L"
+    {texture_font_char_us_M, 8}, // 77 "M"
+    {texture_font_char_us_N, 8}, // 78 "N"
+    {texture_font_char_us_O, 6}, // 79 "O"
+    {texture_font_char_us_P, 6}, // 80 "P"
+    {texture_font_char_us_Q, 6}, // 81 "Q"
+    {texture_font_char_us_R, 6}, // 82 "R"
+    {texture_font_char_us_S, 6}, // 83 "S"
+    {texture_font_char_us_T, 5}, // 84 "T"
+    {texture_font_char_us_U, 6}, // 85 "U"
+    {texture_font_char_us_V, 6}, // 86 "V"
+    {texture_font_char_us_W, 8}, // 87 "W"
+    {texture_font_char_us_X, 7}, // 88 "X"
+    {texture_font_char_us_Y, 6}, // 89 "Y"
+    {texture_font_char_us_Z, 6}, // 90 "Z"
+    {NULL, 0}, // 91 "["
+    {NULL, 0}, // 92 "\\"
+    {NULL, 0}, // 93 "]"
+    {NULL, 0}, // 94 "^"
+    {NULL, 0}, // 95 "_"
+    {NULL, 0}, // 96 "`"
+    {texture_font_char_us_a, 6}, // 97 "a"
+    {texture_font_char_us_b, 5}, // 98 "b"
+    {texture_font_char_us_c, 5}, // 99 "c"
+    {texture_font_char_us_d, 6}, // 100 "d"
+    {texture_font_char_us_e, 5}, // 101 "e"
+    {texture_font_char_us_f, 5}, // 102 "f"
+    {texture_font_char_us_g, 6}, // 103 "g"
+    {texture_font_char_us_h, 5}, // 104 "h"
+    {texture_font_char_us_i, 4}, // 105 "i"
+    {texture_font_char_us_j, 5}, // 106 "j"
+    {texture_font_char_us_k, 5}, // 107 "k"
+    {texture_font_char_us_l, 3}, // 108 "l"
+    {texture_font_char_us_m, 7}, // 109 "m"
+    {texture_font_char_us_n, 5}, // 110 "n"
+    {texture_font_char_us_o, 5}, // 111 "o"
+    {texture_font_char_us_p, 5}, // 112 "p"
+    {texture_font_char_us_q, 6}, // 113 "q"
+    {texture_font_char_us_r, 5}, // 114 "r"
+    {texture_font_char_us_s, 5}, // 115 "s"
+    {texture_font_char_us_t, 5}, // 116 "t"
+    {texture_font_char_us_u, 5}, // 117 "u"
+    {texture_font_char_us_v, 5}, // 118 "v"
+    {texture_font_char_us_w, 7}, // 119 "w"
+    {texture_font_char_us_x, 7}, // 120 "x"
+    {texture_font_char_us_y, 5}, // 121 "y"
+    {texture_font_char_us_z, 5}, // 122 "z"
+    {NULL, 0}, // 123 "{"
+    {NULL, 0}, // 124 "|"
+    {NULL, 0}, // 125 "}"
+    {NULL, 0}, // 126 "~"
+};
+/**
+
 // Main small font print table 0x02008338-0x02008737
 const Texture *const main_font_lut[] = {
 #ifdef VERSION_EU // EU Font Table
@@ -2120,7 +2251,7 @@ const Texture *const main_font_lut[] = {
     texture_font_char_jp_interpunct, texture_font_char_jp_star_hollow,                   0x0,                   0x0,
 #endif
 };
-
+**/
 // credits font LUT 0x02008738-0x020087CB
 const Texture *const main_credits_font_lut[] = {
                        0x0,                    0x0,                    0x0, texture_credits_char_3,
@@ -2141,14 +2272,17 @@ const Texture *const main_hud_camera_lut[] = {
     texture_hud_char_arrow_up, texture_hud_char_arrow_down,
 };
 
+#define _(x) x
 // If you change the language here, the following Makefile rule also needs to
 // change, to generate the right version of define_text.inc.c:
 // $(BUILD_DIR)/bin/segment2.o: $(BUILD_DIR)/text/$(VERSION)/define_text.inc.c
 #if defined(VERSION_JP) || defined(VERSION_SH)
-#include "text/jp/define_text.inc.c"
+#include "text/define_text.inc.c"
 #elif defined(VERSION_US)
-#include "text/us/define_text.inc.c"
+#include "text/define_text.inc.c"
 #endif
+
+#undef _
 
 // 0x0200EC60 - 0x0200EC98
 const Gfx dl_hud_img_begin[] = {

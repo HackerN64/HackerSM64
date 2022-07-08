@@ -1,5 +1,8 @@
+#define _(x) x
+
 #ifndef TEXT_STRINGS_H
 #define TEXT_STRINGS_H
+
 
 #include "text_menu_strings.h"
 
@@ -66,30 +69,31 @@
 /**
  * Global Symbols
  */
-#define TEXT_ZERO _("0")
-#define TEXT_COIN _("$")
-#define TEXT_STAR _("★")
-#define TEXT_COIN_X _("$×")
-#define TEXT_STAR_X _("★×")
-#define TEXT_VARIABLE_X _("×")
-#define TEXT_UNFILLED_STAR _("☆")
+
+#define TEXT_ZERO "0"
+#define TEXT_COIN "$"
+#define TEXT_STAR "★"
+#define TEXT_COIN_X "$×"
+#define TEXT_STAR_X "★×"
+#define TEXT_VARIABLE_X "×"
+#define TEXT_UNFILLED_STAR "☆"
 
 /**
  * Global Text
  */
 // File Select
-#define TEXT_NEW _("NEW") // New File Text
-#define TEXT_4DASHES _("----") // Used in Score File Menu
+#define TEXT_NEW "NEW" // New File Text
+#define TEXT_4DASHES "----" // Used in Score File Menu
 
 // Ingame Menu
-#define TEXT_PAUSE _("PAUSE") // Pause text, Castle Courses
-#define TEXT_HUD_CONGRATULATIONS _("CONGRATULATIONS") // Course Complete Text, Bowser Courses
+#define TEXT_PAUSE "PAUSE" // Pause text, Castle Courses
+#define TEXT_HUD_CONGRATULATIONS "CONGRATULATIONS" // Course Complete Text, Bowser Courses
 
 //Widescreen stuff
 #if defined(WIDE) && !defined(PUPPYCAM)
-#define TEXT_HUD_CURRENT_RATIO_43 _("ASPECT RATIO: 4:3")
-#define TEXT_HUD_CURRENT_RATIO_169 _("ASPECT RATIO: 16:9")
-#define TEXT_HUD_PRESS_L _("PRESS L TO SWITCH")
+#define TEXT_HUD_CURRENT_RATIO_43 "ASPECT RATIO: 4:3"
+#define TEXT_HUD_CURRENT_RATIO_169 "ASPECT RATIO: 16:9"
+#define TEXT_HUD_PRESS_L "PRESS L TO SWITCH"
 #endif
 
 #if defined(VERSION_JP) || defined(VERSION_SH)
@@ -197,104 +201,104 @@
  * File Select Text
  */
 // Main Screens
-#define TEXT_MARIO _("MARIO") // View Score Menu
-#define TEXT_SELECT_FILE _("SELECT FILE")
-#define TEXT_CHECK_FILE _("CHECK FILE")
-#define TEXT_COPY_FILE _("COPY FILE")
-#define TEXT_ERASE_FILE _("ERASE FILE")
-#define TEXT_SOUND_SELECT _("SOUND SELECT")
-#define TEXT_FILE_MARIO_A _("MARIO A")
-#define TEXT_FILE_MARIO_B _("MARIO B")
-#define TEXT_FILE_MARIO_C _("MARIO C")
-#define TEXT_FILE_MARIO_D _("MARIO D")
+#define TEXT_MARIO "MARIO" // View Score Menu
+#define TEXT_SELECT_FILE "SELECT FILE"
+#define TEXT_CHECK_FILE "CHECK FILE"
+#define TEXT_COPY_FILE "COPY FILE"
+#define TEXT_ERASE_FILE "ERASE FILE"
+#define TEXT_SOUND_SELECT "SOUND SELECT"
+#define TEXT_FILE_MARIO_A "MARIO A"
+#define TEXT_FILE_MARIO_B "MARIO B"
+#define TEXT_FILE_MARIO_C "MARIO C"
+#define TEXT_FILE_MARIO_D "MARIO D"
 
 // Menu Options
-#define TEXT_SCORE _("SCORE")
-#define TEXT_COPY _("COPY")
-#define TEXT_ERASE _("ERASE")
+#define TEXT_SCORE "SCORE"
+#define TEXT_COPY "COPY"
+#define TEXT_ERASE "ERASE"
 
 // Sound Options
-#define TEXT_STEREO _("STEREO")
-#define TEXT_MONO _("MONO")
-#define TEXT_HEADSET _("HEADSET")
+#define TEXT_STEREO "STEREO"
+#define TEXT_MONO "MONO"
+#define TEXT_HEADSET "HEADSET"
 
 // Misc Menu Text
-#define TEXT_SAVED_DATA_EXISTS _("SAVED DATA EXITS") // Misspell
-#define TEXT_NO_SAVED_DATA_EXISTS _("NO SAVED DATA EXISTS")
+#define TEXT_SAVED_DATA_EXISTS "SAVED DATA EXISTS"
+#define TEXT_NO_SAVED_DATA_EXISTS "NO SAVED DATA EXISTS"
 
 // Inside a Menu
-#define TEXT_RETURN _("RETURN")
-#define TEXT_CHECK_SCORE _("CHECK SCORE")
-#define TEXT_COPY_FILE_BUTTON _("COPY FILE")
-#define TEXT_ERASE_FILE_BUTTON _("ERASE FILE")
+#define TEXT_RETURN "RETURN"
+#define TEXT_CHECK_SCORE "CHECK SCORE"
+#define TEXT_COPY_FILE_BUTTON "COPY FILE"
+#define TEXT_ERASE_FILE_BUTTON "ERASE FILE"
 
 // Score Menu
-#define TEXT_HI_SCORE _("HI SCORE")
-#define TEXT_MY_SCORE _("MY SCORE")
+#define TEXT_HI_SCORE "HI SCORE"
+#define TEXT_MY_SCORE "MY SCORE"
 // Score Mario Text ("☺" is the Mario face defined in the US/EU menu char table)
-#define TEXT_SCORE_MARIO_A _("☺A")
-#define TEXT_SCORE_MARIO_B _("☺B")
-#define TEXT_SCORE_MARIO_C _("☺C")
-#define TEXT_SCORE_MARIO_D _("☺D")
+#define TEXT_SCORE_MARIO_A "☺A"
+#define TEXT_SCORE_MARIO_B "☺B"
+#define TEXT_SCORE_MARIO_C "☺C"
+#define TEXT_SCORE_MARIO_D "☺D"
 
 // Copy Menu
-#define TEXT_COPY_IT_TO_WHERE _("COPY IT TO WHERE?")
-#define TEXT_COPYING_COMPLETED _("COPYING COMPLETED")
-#define TEXT_NO_FILE_TO_COPY_FROM _("NO EMPTY FILE")
+#define TEXT_COPY_IT_TO_WHERE "COPY IT TO WHERE?"
+#define TEXT_COPYING_COMPLETED "COPYING COMPLETED"
+#define TEXT_NO_FILE_TO_COPY_FROM "NO EMPTY FILE"
 
 // Erase Menu
-#define TEXT_SURE _("SURE?")
-#define TEXT_YES _("YES")
-#define TEXT_NO _("NO")
-#define TEXT_FILE_MARIO_A_JUST_ERASED _("MARIO A JUST ERASED")
+#define TEXT_SURE "SURE?"
+#define TEXT_YES "YES"
+#define TEXT_NO "NO"
+#define TEXT_FILE_MARIO_A_JUST_ERASED "MARIO A JUST ERASED"
 
 /**
  * Menus Text (Pause, Course Completed)
  */
 // Main Courses
-#define TEXT_COURSE _("COURSE")
-#define TEXT_MYSCORE _("MYSCORE")
-#define TEXT_CONTINUE _("CONTINUE")
-#define TEXT_EXIT_COURSE _("EXIT COURSE")
+#define TEXT_COURSE "COURSE"
+#define TEXT_MYSCORE "MYSCORE"
+#define TEXT_CONTINUE "CONTINUE"
+#define TEXT_EXIT_COURSE "EXIT COURSE"
 #ifndef VERSION_EU // "R" text is different in EU
-#define TEXT_CAMERA_ANGLE_R _("SET CAMERA ANGLE WITH R")
+#define TEXT_CAMERA_ANGLE_R "SET CAMERA ANGLE WITH R"
 #endif
 
 // Camera Options
-#define TEXT_LAKITU_MARIO _("LAKITU + MARIO")
-#define TEXT_LAKITU_STOP _("LAKITU + STOP")
-#define TEXT_NORMAL_UPCLOSE __("(NORMAL)(UP-CLOSE)")
-#define TEXT_NORMAL_FIXED __("(NORMAL)(FIXED)")
+#define TEXT_LAKITU_MARIO "LAKITU + MARIO"
+#define TEXT_LAKITU_STOP "LAKITU + STOP"
+#define TEXT_NORMAL_UPCLOSE "(NORMAL)(UP-CLOSE)"
+#define TEXT_NORMAL_FIXED "(NORMAL)(FIXED)"
 
 // Course Completed Misc Text
-#define TEXT_CATCH _("CATCH")
-#define TEXT_CLEAR _("CLEAR")
-#define TEXT_HUD_HI_SCORE _("HI SCORE")
+#define TEXT_CATCH "CATCH"
+#define TEXT_CLEAR "CLEAR"
+#define TEXT_HUD_HI_SCORE "HI SCORE"
 
 // Save Options
-#define TEXT_SAVE_AND_CONTINUE _("SAVE & CONTINUE")
-#define TEXT_SAVE_AND_QUIT _("SAVE & QUIT")
-#define TEXT_CONTINUE_WITHOUT_SAVING _("CONTINUE, DON'T SAVE")
+#define TEXT_SAVE_AND_CONTINUE "SAVE & CONTINUE"
+#define TEXT_SAVE_AND_QUIT "SAVE & QUIT"
+#define TEXT_CONTINUE_WITHOUT_SAVING "CONTINUE, DON'T SAVE"
 
 /**
  * Ending Peach cutscene text.
  */
-#define TEXT_FILE_MARIO_EXCLAMATION _("Mario!")
-#define TEXT_POWER_STARS_RESTORED __("The power of the Stars is restored to the castle...")
-#define TEXT_THANKS_TO_YOU __("...and it's all thanks to you!")
-#define TEXT_THANK_YOU_MARIO __("Thank you, Mario!")
-#define TEXT_SOMETHING_SPECIAL __("We have to do something special for you...")
-#define TEXT_LISTEN_EVERYBODY _("Listen, everybody,")
-#define TEXT_LETS_HAVE_CAKE _("let's bake a delicious cake...")
-#define TEXT_FOR_MARIO _("...for Mario...")
-#define TEXT_FILE_MARIO_QUESTION _("Mario!")
+#define TEXT_FILE_MARIO_EXCLAMATION "Mario!"
+#define TEXT_POWER_STARS_RESTORED "The power of the Stars is restored to the castle..."
+#define TEXT_THANKS_TO_YOU "...and it's all thanks to you!"
+#define TEXT_THANK_YOU_MARIO "Thank you, Mario!"
+#define TEXT_SOMETHING_SPECIAL "We have to do something special for you..."
+#define TEXT_LISTEN_EVERYBODY "Listen, everybody,"
+#define TEXT_LETS_HAVE_CAKE "let's bake a delicious cake..."
+#define TEXT_FOR_MARIO "...for Mario..."
+#define TEXT_FILE_MARIO_QUESTION "Mario!"
 
 #endif
 
 
-#define TEXT_ENGLISH _("ENGLISH")
-#define TEXT_FRENCH _("FRANÇAIS")
-#define TEXT_GERMAN _("DEUTSCH")
+#define TEXT_ENGLISH "ENGLISH"
+#define TEXT_FRENCH "FRANÇAIS"
+#define TEXT_GERMAN "DEUTSCH"
 
 #if MULTILANG
 
@@ -539,5 +543,7 @@
 #define TEXT_MENU_NONE_DE _("")
 #define TEXT_MENU_STARS_DE _("   GEHEIME STERNE")
 #endif // VERSION_EU
+
+#undef _
 
 #endif // TEXT_STRINGS_H
