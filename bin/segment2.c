@@ -1831,11 +1831,11 @@ ALIGNED8 static const Texture texture_font_char_us_double_quote_close[] = {
 #include "textures/segment2/font_graphics.06CC0.ia4.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_us_ellipsis[] = {
+ALIGNED8 static const Texture texture_font_char_us_colon[] = {
 #include "textures/segment2/font_graphics.06D00.ia4.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_us_slash[] = {
+ALIGNED8 static const Texture texture_font_char_us_hyphen[] = {
 #include "textures/segment2/font_graphics.06D40.ia4.inc.c"
 };
 
@@ -1965,7 +1965,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_multiply, 6}, // 42 "*"
     {NULL, 0}, // 43 "+" (Unimplemented)
     {texture_font_char_us_comma, 4}, // 44 ","
-    {texture_font_char_us_slash, 6}, // 45 "-" (For some reason, the hyphen is called a slash)
+    {texture_font_char_us_hyphen, 6}, // 45 "-" (For some reason, the hyphen is called a slash)
     {texture_font_char_us_period, 4}, // 46 "."
     {NULL, 0}, // 47 "/" (Unimplemented)
     {texture_font_char_us_0, 7}, // 48 "0"
@@ -1978,7 +1978,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_7, 7}, // 55 "7"
     {texture_font_char_us_8, 7}, // 56 "8"
     {texture_font_char_us_9, 7}, // 57 "9"
-    {texture_font_char_us_ellipsis, 4}, // 58 ":" (The colon is also called an ellipsis)
+    {texture_font_char_us_colon, 4}, // 58 ":"
     {NULL, 0}, // 59 ";" (Unimplemented)
     {NULL, 0}, // 60 "<" (Unimplemented)
     {NULL, 0}, // 61 "=" (Unimplemented)
@@ -2159,7 +2159,7 @@ const Texture *const main_font_lut[] = {
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0, texture_font_char_us_slash,
+                  0x0,               0x0,               0x0, texture_font_char_us_hyphen,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
@@ -2177,7 +2177,7 @@ const Texture *const main_font_lut[] = {
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0, texture_font_char_us_open_parentheses, texture_font_char_us_close_open_parentheses, texture_font_char_us_close_parentheses,
-    texture_font_char_us_left_right_arrow, texture_font_char_us_ampersand, texture_font_char_us_ellipsis,               0x0,
+    texture_font_char_us_left_right_arrow, texture_font_char_us_ampersand, texture_font_char_us_colon,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0, texture_font_char_us_exclamation, texture_font_char_us_percent,
