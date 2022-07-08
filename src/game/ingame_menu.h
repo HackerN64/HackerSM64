@@ -54,6 +54,13 @@ struct AsciiCharLUTEntry {
     const u8 kerning;
 };
 
+struct UnicodeCharLUTEntry {
+    const u16 codepoint;
+    const u8 kerning;
+    const u8 flag;
+    const Texture *texture;
+};
+
 struct DialogEntry {
     /*0x00*/ u32 unused;
     /*0x04*/ s8 linesPerBox;
@@ -139,6 +146,9 @@ enum DialogResponseDefines {
     DIALOG_RESPONSE_MAXIMUM = 32
 };
 
+// Macro to create an array of all 4 languages' versions of a string.
+#define LANGUAGE_TEXT(english, french, german, japanese) german
+
 extern s32 gDialogResponse;
 extern u16 gDialogColorFadeTimer;
 extern s8  gLastDialogLineNum;
@@ -152,11 +162,11 @@ void create_dl_identity_matrix(void);
 void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 void create_dl_ortho_matrix(void);
 void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z);
-void print_generic_string(s16 x, s16 y, const u8 *str);
-void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, const u8 *str);
-void print_menu_generic_string(s16 x, s16 y, const u8 *str);
+void print_generic_string(s16 x, s16 y, char *str);
+void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, char *str);
+void print_menu_generic_string(s16 x, s16 y, char *str);
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex);
-s32 get_str_x_pos_from_center(s16 centerPos, u8 *str, f32 scale);
+s32 get_str_x_pos_from_center(s16 centerPos, char *str, f32 scale);
 void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseIndex, s16 x, s16 y);
 s32 get_dialog_id(void);
 void create_dialog_box(s16 dialog);

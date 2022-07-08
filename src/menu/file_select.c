@@ -111,60 +111,47 @@ s8 sScoreFileCoinScoreMode = 0;
 
 // In EU, if no save file exists, open the language menu so the user can find it.
 
-unsigned char textReturn[] = { TEXT_RETURN };
+char textReturn[] = { TEXT_RETURN };
 
-unsigned char textViewScore[] = { TEXT_CHECK_SCORE };
+char textViewScore[] = { TEXT_CHECK_SCORE };
 
-unsigned char textCopyFileButton[] = { TEXT_COPY_FILE_BUTTON };
+char textCopyFileButton[] = { TEXT_COPY_FILE_BUTTON };
 
-unsigned char textEraseFileButton[] = { TEXT_ERASE_FILE_BUTTON };
+char textEraseFileButton[] = { TEXT_ERASE_FILE_BUTTON };
 
-unsigned char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO }, { TEXT_HEADSET } };
+char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO }, { TEXT_HEADSET } };
 
-#if MULTILANG
-unsigned char textLanguageSelect[][17] = { { TEXT_LANGUAGE_SELECT } };
-#endif
+char textMarioA[] = { TEXT_FILE_MARIO_A };
+char textMarioB[] = { TEXT_FILE_MARIO_B };
+char textMarioC[] = { TEXT_FILE_MARIO_C };
+char textMarioD[] = { TEXT_FILE_MARIO_D };
 
-unsigned char textSoundSelect[] = { TEXT_SOUND_SELECT };
+char starIcon[] = { GLYPH_STAR, GLYPH_SPACE };
+char xIcon[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
 
-unsigned char textMarioA[] = { TEXT_FILE_MARIO_A };
-unsigned char textMarioB[] = { TEXT_FILE_MARIO_B };
-unsigned char textMarioC[] = { TEXT_FILE_MARIO_C };
-unsigned char textMarioD[] = { TEXT_FILE_MARIO_D };
+char textScore[] = { TEXT_SCORE };
 
-unsigned char textNew[] = { TEXT_NEW };
-unsigned char starIcon[] = { GLYPH_STAR, GLYPH_SPACE };
-unsigned char xIcon[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
+char textCopy[] = { TEXT_COPY };
 
-unsigned char textSelectFile[] = { TEXT_SELECT_FILE };
+char textErase[] = { TEXT_ERASE };
 
-unsigned char textScore[] = { TEXT_SCORE };
+char textLanguage[][9] = {{ TEXT_ENGLISH }, { TEXT_FRENCH }, { TEXT_GERMAN }};
 
-unsigned char textCopy[] = { TEXT_COPY };
+char textNoSavedDataExists[] = { TEXT_NO_SAVED_DATA_EXISTS };
 
-unsigned char textErase[] = { TEXT_ERASE };
+char textCopyItToWhere[] = { TEXT_COPY_IT_TO_WHERE };
 
-unsigned char textLanguage[][9] = {{ TEXT_ENGLISH }, { TEXT_FRENCH }, { TEXT_GERMAN }};
+char textNoSavedDataExistsCopy[] = { TEXT_NO_SAVED_DATA_EXISTS };
 
-unsigned char textCheckFile[] = { TEXT_CHECK_FILE };
+char textCopyCompleted[] = { TEXT_COPYING_COMPLETED };
 
-unsigned char textNoSavedDataExists[] = { TEXT_NO_SAVED_DATA_EXISTS };
+char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
 
-unsigned char textCopyFile[] = { TEXT_COPY_FILE };
+char textNoFileToCopyFrom[] = { TEXT_NO_FILE_TO_COPY_FROM };
 
-unsigned char textCopyItToWhere[] = { TEXT_COPY_IT_TO_WHERE };
+char textYes[] = { TEXT_YES };
 
-unsigned char textNoSavedDataExistsCopy[] = { TEXT_NO_SAVED_DATA_EXISTS };
-
-unsigned char textCopyCompleted[] = { TEXT_COPYING_COMPLETED };
-
-unsigned char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
-
-unsigned char textNoFileToCopyFrom[] = { TEXT_NO_FILE_TO_COPY_FROM };
-
-unsigned char textYes[] = { TEXT_YES };
-
-unsigned char textNo[] = { TEXT_NO };
+char textNo[] = { TEXT_NO };
 
 
 /**
@@ -1265,7 +1252,7 @@ void print_menu_cursor(void) {
 /**
  * Prints a hud string depending of the hud table list defined with text fade properties.
  */
-void print_hud_lut_string_fade(s8 hudLUT, s16 x, s16 y, const unsigned char *text) {
+void print_hud_lut_string_fade(s8 hudLUT, s16 x, s16 y, char *text) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha - sTextFadeAlpha);
     print_hud_lut_string(hudLUT, x, y, text);
@@ -1275,7 +1262,7 @@ void print_hud_lut_string_fade(s8 hudLUT, s16 x, s16 y, const unsigned char *tex
 /**
  * Prints a generic white string with text fade properties.
  */
-void print_generic_string_fade(s16 x, s16 y, const unsigned char *text) {
+void print_generic_string_fade(s16 x, s16 y, char *text) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha - sTextFadeAlpha);
     print_generic_string(x, y, text);
@@ -1304,25 +1291,27 @@ s32 update_text_fade_out(void) {
  * Prints the amount of stars of a save file.
  * If a save doesn't exist, print "NEW" instead.
  */
+char *textNew = LANGUAGE_TEXT(
+    "NEW",
+    "VIDE",
+    "FREI",
+    "NEW");
+
 void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
-    u8 starCountText[4];
+    u8 starCountText[10];
     s8 offset = 0;
 
     if (save_file_exists(fileIndex)) {
         s16 starCount = save_file_get_total_star_count(fileIndex,
                                                        COURSE_NUM_TO_INDEX(COURSE_MIN),
                                                        COURSE_NUM_TO_INDEX(COURSE_MAX));
-        // Print star icon
-        print_hud_lut_string(HUD_LUT_GLOBAL, x, y, starIcon);
-        // If star count is less than 100, print x icon and move
-        // the star count text one digit to the right.
+
         if (starCount < 100) {
-            print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, xIcon);
-            offset = 16;
+            sprintf(starCountText, "★×%d", starCount);
+        } else {
+            sprintf(starCountText, "★%d", starCount);
         }
-        // Print star count
-        sprintf(starCountText, "%d", starCount);
-        print_hud_lut_string(HUD_LUT_GLOBAL, x + offset + 16, y, starCountText);
+        print_hud_lut_string(HUD_LUT_GLOBAL, x, y, starCountText);
     } else {
         // Print "new" text
         print_hud_lut_string(HUD_LUT_GLOBAL, x, y, LANGUAGE_ARRAY(textNew));
@@ -1337,6 +1326,12 @@ void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
 #define SAVEFILE_X2  209
 #define MARIOTEXT_X1  92
 #define MARIOTEXT_X2 207
+
+char *textSelectFile = LANGUAGE_TEXT(
+    "SELECT FILE",
+    "CHOISIR  FICHIER",
+    "WwHLE SPIEL",
+    "ファイルセレクト");
 
 /**
  * Prints main menu strings that shows on the yellow background menu screen.
@@ -1378,6 +1373,12 @@ void print_main_menu_strings(void) {
 
 #define CHECK_FILE_X   95
 #define NOSAVE_DATA_X1 99
+
+char *textCheckFile = LANGUAGE_TEXT(
+    "CHECK FILE",
+    "VOIR  SCORE",
+    "VON WELCHEM SPIEL",
+    "どのスコアをみる？");
 
 /**
  * Defines IDs for the top message of the score menu and displays it if the ID is called in messageID.
@@ -1452,6 +1453,12 @@ void print_score_menu_strings(void) {
 #define NOSAVE_DATA_X2 101
 #define COPYCOMPLETE_X 110
 #define SAVE_EXISTS_X1 110
+
+char *textCopyFile = LANGUAGE_TEXT(
+    "COPY FILE",
+    "COPIER",
+    "KOPIEREN",
+    "ファイルコピーする");
 
 /**
  * Defines IDs for the top message of the copy menu and displays it if the ID is called in messageID.
@@ -1650,15 +1657,20 @@ void print_erase_menu_prompt(s16 x, s16 y) {
 #define MARIO_ERASED_X   100
 #define SAVE_EXISTS_X2   100
 
+char *textEraseFile = LANGUAGE_TEXT(
+    "ERASE FILE",
+    "EFFACER",
+    "LÖSCHEN",
+    "ファイルけす");
+
 /**
  * Defines IDs for the top message of the erase menu and displays it if the ID is called in messageID.
  */
 void erase_menu_display_message(s8 messageID) {
-    unsigned char textEraseFile[] = { TEXT_ERASE_FILE };
-    unsigned char textSure[] = { TEXT_SURE };
-    unsigned char textNoSavedDataExists[] = { TEXT_NO_SAVED_DATA_EXISTS };
-    unsigned char textMarioAJustErased[] = { TEXT_FILE_MARIO_A_JUST_ERASED };
-    unsigned char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
+    char textSure[] = { TEXT_SURE };
+    char textNoSavedDataExists[] = { TEXT_NO_SAVED_DATA_EXISTS };
+    char textMarioAJustErased[] = { TEXT_FILE_MARIO_A_JUST_ERASED };
+    char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
 
     switch (messageID) {
         case ERASE_MSG_MAIN_TEXT:
@@ -1773,6 +1785,20 @@ void print_erase_menu_strings(void) {
     #define SOUND_HUD_Y 87
 #endif
 
+char textSoundSelect[] = LANGUAGE_TEXT(
+    "SOUND SELECT",
+    "SON",
+    "SOUND",
+    "サウンドセレクト");
+
+#if MULTILANG
+char *textLanguageSelect = LANGUAGE_TEXT(
+    "LANGUAGE SELECT",
+    "SELECTION LANGUE",
+    "WwHLE SPRACHE",
+    ""); // no japanese translation
+#endif
+
 /**
  * Prints sound mode menu strings that shows on the purple background menu screen.
  *
@@ -1788,7 +1814,7 @@ void print_sound_mode_menu_strings(void) {
 
     print_hud_lut_string(HUD_LUT_DIFF, SOUND_HUD_X, 32, LANGUAGE_ARRAY(textSoundSelect));
 #if MULTILANG
-    print_hud_lut_string(HUD_LUT_DIFF, 47, 101, LANGUAGE_ARRAY(textLanguageSelect[0]));
+    print_hud_lut_string(HUD_LUT_DIFF, 47, 101, LANGUAGE_ARRAY(textLanguageSelect));
 #endif
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1827,13 +1853,13 @@ void print_sound_mode_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-unsigned char textStarX[] = { TEXT_STAR_X };
+char textStarX[] = { TEXT_STAR_X };
 
 /**
  * Prints castle secret stars collected in a score menu save file.
  */
 void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
-    unsigned char secretStarsText[20];
+    char secretStarsText[20];
     // Print "[star] x"
     print_menu_generic_string(x, y, textStarX);
     // Print number of castle secret stars
@@ -1851,12 +1877,11 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
  * Prints course coins collected in a score menu save file.
  */
 void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
-    unsigned char coinScoreText[20];
+    char coinScoreText[20];
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
-    unsigned char textCoinX[] = { TEXT_COIN_X };
-    unsigned char textStar[] = { TEXT_STAR };
+    char textCoinX[] = { TEXT_COIN_X };
 #define LENGTH 8
-    unsigned char fileNames[][LENGTH] = {
+    char fileNames[][LENGTH] = {
         { TEXT_4DASHES }, // huh?
         { TEXT_SCORE_MARIO_A }, { TEXT_SCORE_MARIO_B }, { TEXT_SCORE_MARIO_C }, { TEXT_SCORE_MARIO_D },
     };
@@ -1864,13 +1889,13 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
     // MYSCORE
     if (sScoreFileCoinScoreMode == 0) {
         // Print "[coin] x"
-        print_menu_generic_string(x + 25, y, textCoinX);
+        print_menu_generic_string(x + 25, y, "✪×");
         // Print coin score
         sprintf(coinScoreText, "%d", save_file_get_course_coin_score(fileIndex, courseIndex));
         print_menu_generic_string(x + 41, y, coinScoreText);
         // If collected, print 100 coin star
         if (stars & STAR_FLAG_ACT_100_COINS) {
-            print_menu_generic_string(x + 70, y, textStar);
+            print_menu_generic_string(x + 70, y, "★");
         }
     }
     // HISCORE
@@ -1891,7 +1916,7 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
  */
 void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     s16 i = 0;
-    unsigned char starScoreText[19];
+    char starScoreText[19];
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
     s8 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
     // Don't count 100 coin star
@@ -1916,15 +1941,30 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
 #define MYSCORE_X      238
 #define HISCORE_X      231
 
+char *textMario = LANGUAGE_TEXT(
+    "MARIO",
+    "MARIO",
+    "MARIO",
+    "マリオ");
+
+char *textHiScore = LANGUAGE_TEXT(
+    "HI SCORE",
+    "MEILLEUR SCORE",
+    "BESTLEISTUNG",
+    "ハイスコア");
+
+char *textMyScore = LANGUAGE_TEXT(
+    "MY SCORE",
+    "MON SCORE",
+    "LEISTUNG",
+    "マイスコア");
+
 /**
  * Prints save file score strings that shows when a save file is chosen inside the score menu.
  */
 void print_save_file_scores(s8 fileIndex) {
     u32 i;
-    unsigned char textMario[] = { TEXT_MARIO };
-    unsigned char textHiScore[] = { TEXT_HI_SCORE };
-    unsigned char textMyScore[] = { TEXT_MY_SCORE };
-    unsigned char textFileLetter[] = { TEXT_ZERO };
+    char textFileLetter[2] = "A";
     void **levelNameTable = segmented_to_virtual(languageTable[gInGameLanguage][1]);
 
     textFileLetter[0] = fileIndex + 'A'; // get letter of file selected
