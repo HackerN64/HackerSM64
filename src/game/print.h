@@ -9,24 +9,24 @@
 #define TEXRECT_MAX_Y 220
 
 enum PrintfGlyphs {
-    GLYPH_SPACE           = 0x20,
-    GLYPH_U               = 0x55,
-    GLYPH_EXCLAMATION_PNT = 0x21,
+    GLYPH_SPACE           = ' ',
+    GLYPH_U               = 'U',
+    GLYPH_EXCLAMATION_PNT = '!',
     GLYPH_TWO_EXCLAMATION = 0x0, // UTF-8
-    GLYPH_QUESTION_MARK   = 0x3F,
-    GLYPH_AMPERSAND       = 0x26,
-    GLYPH_PERCENT         = 0x25,
-    GLYPH_MINUS           = 0x2D,
+    GLYPH_QUESTION_MARK   = '?',
+    GLYPH_AMPERSAND       = '&',
+    GLYPH_PERCENT         = '%',
+    GLYPH_MINUS           = '-',
     GLYPH_MULTIPLY        = 0x0, // UTF-8
     GLYPH_COIN            = 0x0, // UTF-8
     GLYPH_RED_COIN        = 0x0, // UTF-8
     GLYPH_SILVER_COIN     = 0x0, // UTF-8
     GLYPH_MARIO_HEAD      = 0x0, // UTF-8
     GLYPH_STAR            = 0x0, // UTF-8
-    GLYPH_PERIOD          = 0x2E,
+    GLYPH_PERIOD          = '.',
     GLYPH_BETA_KEY        = 0x0, // UTF-8
-    GLYPH_APOSTROPHE      = 0x27,
-    GLYPH_DOUBLE_QUOTE    = 0x22,
+    GLYPH_APOSTROPHE      = '\'',
+    GLYPH_DOUBLE_QUOTE    = '"',
     GLYPH_UMLAUT          = 0x0, // UTF-8
 };
 
