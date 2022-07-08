@@ -266,7 +266,7 @@ void print_course_number(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
 
-    int_to_str(gCurrCourseNum, courseNum);
+    sprintf(courseNum, "%d", gCurrCourseNum);
 
     if (gCurrCourseNum < 10) { // 1 digit number
         print_hud_lut_string(HUD_LUT_GLOBAL, 152, 158, courseNum);

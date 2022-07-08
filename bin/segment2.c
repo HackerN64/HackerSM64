@@ -1900,24 +1900,122 @@ ALIGNED8 static const Texture texture_hud_char_arrow_down[] = {
 #include "textures/segment2/segment2.081D0.rgba16.inc.c"
 };
 
-// Main HUD print table 0x02008250-0x02008337
 const Texture *const main_hud_lut[] = {
-    texture_hud_char_0, texture_hud_char_1, texture_hud_char_2, texture_hud_char_3,
-    texture_hud_char_4, texture_hud_char_5, texture_hud_char_6, texture_hud_char_7,
-    texture_hud_char_8, texture_hud_char_9, texture_hud_char_A, texture_hud_char_B,
-    texture_hud_char_C, texture_hud_char_D, texture_hud_char_E, texture_hud_char_F,
-    texture_hud_char_G, texture_hud_char_H, texture_hud_char_I, texture_hud_char_J,
-    texture_hud_char_K, texture_hud_char_L, texture_hud_char_M, texture_hud_char_N,
-    texture_hud_char_O, texture_hud_char_P, texture_hud_char_Q, texture_hud_char_R,
-    texture_hud_char_S, texture_hud_char_T, texture_hud_char_U, texture_hud_char_V,
-    texture_hud_char_W, texture_hud_char_X, texture_hud_char_Y, texture_hud_char_Z,
-    texture_hud_char_exclamation, texture_hud_char_double_exclamation, texture_hud_char_question, texture_hud_char_ampersand,
-    texture_hud_char_percent,                0x0,                0x0,                0x0,
-                   0x0,                0x0,                0x0, texture_hud_char_minus,
-    texture_hud_char_multiply, texture_hud_char_coin, texture_hud_char_red_coin, texture_hud_char_silver_coin,
-    texture_hud_char_mario_head, texture_hud_char_star, texture_hud_char_decimal_point, texture_hud_char_beta_key,
-    texture_hud_char_apostrophe, texture_hud_char_double_quote, texture_hud_char_umlaut,
+    NULL, // 32 " "
+    texture_hud_char_exclamation, // 33 "!"
+    texture_hud_char_double_quote, // 34 "\""
+    NULL, // 35 "#" (Unimplemented)
+    NULL, // 36 "$" (Unimplemented)
+    texture_hud_char_percent, // 37 "%"
+    texture_hud_char_ampersand, // 38 "&"
+    texture_hud_char_apostrophe, // 39 "'"
+    NULL, // 40 "(" (Unimplemented)
+    NULL, // 41 ")" (Unimplemented)
+    NULL, // 42 "*" (Unimplemented)
+    NULL, // 43 "+" (Unimplemented)
+    NULL, // 44 "," (Unimplemented)
+    NULL, // 45 "-" (Unimplemented)
+    texture_hud_char_decimal_point, // 46 "."
+    NULL, // 47 "/" (Unimplemented)
+    texture_hud_char_0, // 48 "0"
+    texture_hud_char_1, // 49 "1"
+    texture_hud_char_2, // 50 "2"
+    texture_hud_char_3, // 51 "3"
+    texture_hud_char_4, // 52 "4"
+    texture_hud_char_5, // 53 "5"
+    texture_hud_char_6, // 54 "6"
+    texture_hud_char_7, // 55 "7"
+    texture_hud_char_8, // 56 "8"
+    texture_hud_char_9, // 57 "9"
+    NULL, // 58 ":" (Unimplemented)
+    NULL, // 59 ";" (Unimplemented)
+    NULL, // 60 "<" (Unimplemented)
+    NULL, // 61 "=" (Unimplemented)
+    NULL, // 62 ">" (Unimplemented)
+    texture_hud_char_question, // 63 "?"
+    NULL, // 64 "@" (Unimplemented)
+    texture_hud_char_A, // 65 "A"
+    texture_hud_char_B, // 66 "B"
+    texture_hud_char_C, // 67 "C"
+    texture_hud_char_D, // 68 "D"
+    texture_hud_char_E, // 69 "E"
+    texture_hud_char_F, // 70 "F"
+    texture_hud_char_G, // 71 "G"
+    texture_hud_char_H, // 72 "H"
+    texture_hud_char_I, // 73 "I"
+    texture_hud_char_J, // 74 "J"
+    texture_hud_char_K, // 75 "K"
+    texture_hud_char_L, // 76 "L"
+    texture_hud_char_M, // 77 "M"
+    texture_hud_char_N, // 78 "N"
+    texture_hud_char_O, // 79 "O"
+    texture_hud_char_P, // 80 "P"
+    texture_hud_char_Q, // 81 "Q"
+    texture_hud_char_R, // 82 "R"
+    texture_hud_char_S, // 83 "S"
+    texture_hud_char_T, // 84 "T"
+    texture_hud_char_U, // 85 "U"
+    texture_hud_char_V, // 86 "V"
+    texture_hud_char_W, // 87 "W"
+    texture_hud_char_X, // 88 "X"
+    texture_hud_char_Y, // 89 "Y"
+    texture_hud_char_Z, // 90 "Z"
+    NULL, // 91 "[" (Unimplemented)
+    NULL, // 92 "\\" (Unimplemented)
+    NULL, // 93 "]" (Unimplemented)
+    NULL, // 94 "^" (Unimplemented)
+    NULL, // 95 "_" (Unimplemented)
+    NULL, // 96 "`" (Unimplemented)
+    texture_hud_char_A, // 97 "a"
+    texture_hud_char_B, // 98 "b"
+    texture_hud_char_C, // 99 "c"
+    texture_hud_char_D, // 100 "d"
+    texture_hud_char_E, // 101 "e"
+    texture_hud_char_F, // 102 "f"
+    texture_hud_char_G, // 103 "g"
+    texture_hud_char_H, // 104 "h"
+    texture_hud_char_I, // 105 "i"
+    texture_hud_char_J, // 106 "j"
+    texture_hud_char_K, // 107 "k"
+    texture_hud_char_L, // 108 "l"
+    texture_hud_char_M, // 109 "m"
+    texture_hud_char_N, // 110 "n"
+    texture_hud_char_O, // 111 "o"
+    texture_hud_char_P, // 112 "p"
+    texture_hud_char_Q, // 113 "q"
+    texture_hud_char_R, // 114 "r"
+    texture_hud_char_S, // 115 "s"
+    texture_hud_char_T, // 116 "t"
+    texture_hud_char_U, // 117 "u"
+    texture_hud_char_V, // 118 "v"
+    texture_hud_char_W, // 119 "w"
+    texture_hud_char_X, // 120 "x"
+    texture_hud_char_Y, // 121 "y"
+    texture_hud_char_Z, // 122 "z"
+    NULL, // 123 "{" (Unimplemented)
+    NULL, // 124 "|" (Unimplemented)
+    NULL, // 125 "}" (Unimplemented)
+    NULL, // 126 "~" (Unimplemented)
 };
+
+// Main HUD print table 0x02008250-0x02008337
+// const Texture *const main_hud_lut[] = {
+//     texture_hud_char_0, texture_hud_char_1, texture_hud_char_2, texture_hud_char_3,
+//     texture_hud_char_4, texture_hud_char_5, texture_hud_char_6, texture_hud_char_7,
+//     texture_hud_char_8, texture_hud_char_9, texture_hud_char_A, texture_hud_char_B,
+//     texture_hud_char_C, texture_hud_char_D, texture_hud_char_E, texture_hud_char_F,
+//     texture_hud_char_G, texture_hud_char_H, texture_hud_char_I, texture_hud_char_J,
+//     texture_hud_char_K, texture_hud_char_L, texture_hud_char_M, texture_hud_char_N,
+//     texture_hud_char_O, texture_hud_char_P, texture_hud_char_Q, texture_hud_char_R,
+//     texture_hud_char_S, texture_hud_char_T, texture_hud_char_U, texture_hud_char_V,
+//     texture_hud_char_W, texture_hud_char_X, texture_hud_char_Y, texture_hud_char_Z,
+//     texture_hud_char_exclamation, texture_hud_char_double_exclamation, texture_hud_char_question, texture_hud_char_ampersand,
+//     texture_hud_char_percent,                0x0,                0x0,                0x0,
+//                    0x0,                0x0,                0x0, texture_hud_char_minus,
+//     texture_hud_char_multiply, texture_hud_char_coin, texture_hud_char_red_coin, texture_hud_char_silver_coin,
+//     texture_hud_char_mario_head, texture_hud_char_star, texture_hud_char_decimal_point, texture_hud_char_beta_key,
+//     texture_hud_char_apostrophe, texture_hud_char_double_quote, texture_hud_char_umlaut,
+// };
 
 /**
 u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
@@ -1962,7 +2060,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_apostrophe, 4}, // 39 "'"
     {texture_font_char_us_open_parentheses, 5}, // 40 "("
     {texture_font_char_us_close_parentheses, 5}, // 41 ")"
-    {texture_font_char_us_multiply, 6}, // 42 "*"
+    {texture_font_char_us_multiply, 6}, // 42 "*" (TODO: Move to UTF-8 to free space for a true asterisk)
     {NULL, 0}, // 43 "+" (Unimplemented)
     {texture_font_char_us_comma, 4}, // 44 ","
     {texture_font_char_us_hyphen, 6}, // 45 "-"

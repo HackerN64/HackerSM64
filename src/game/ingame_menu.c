@@ -341,11 +341,11 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, const u8 *str) {
                 gDPPipeSync(gDisplayListHead++);
 
                 if (hudLUT == HUD_LUT_JPMENU) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT1[str[strPos]]);
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT1[str[strPos] - ' ']);
                 }
 
                 if (hudLUT == HUD_LUT_GLOBAL) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos]]);
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos] - ' ']);
                 }
 
                 gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
@@ -486,7 +486,7 @@ void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseInd
     if (numCoins != 0) {
         print_hud_lut_string(HUD_LUT_GLOBAL, x +  0, y, gHudSymCoin);
         print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, gHudSymX);
-        int_to_str(numCoins, strNumCoins);
+        sprintf(strNumCoins, "%d", numCoins);
         print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, strNumCoins);
     }
 }
@@ -501,37 +501,9 @@ void print_hud_my_score_stars(s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
     if (starCount != 0) {
         print_hud_lut_string(HUD_LUT_GLOBAL, x +  0, y, textSymStar);
         print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, textSymX);
-        int_to_str(starCount, strStarCount);
+        sprintf(strStarCount, "%d", starCount);
         print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, strStarCount);
     }
-}
-
-void int_to_str(s32 num, u8 *dst) {
-    s32 digit[3];
-
-    s8 pos = 0;
-
-    if (num > 999) {
-        dst[0] = 0x00;
-        dst[1] = '\0';
-        return;
-    }
-
-    digit[0] = (num / 100);
-    digit[1] = ((num - (digit[0] * 100)) / 10);
-    digit[2] = ((num - (digit[0] * 100)) - (digit[1] * 10));
-
-    if (digit[0] != 0) {
-        dst[pos++] = digit[0];
-    }
-
-    if ((digit[1] != 0)
-     || (digit[0] != 0)) {
-        dst[pos++] = digit[1];
-    }
-
-    dst[pos++] = digit[2];
-    dst[pos] = '\0';
 }
 
 s32 get_dialog_id(void) {
@@ -1404,7 +1376,7 @@ void render_pause_my_score_coins(void) {
 
     if (courseIndex <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) {
         print_generic_string(TXT_COURSE_X, 157, LANGUAGE_ARRAY(textCourse));
-        int_to_str(gCurrCourseNum, strCourseNum);
+        sprintf(strCourseNum, "%d", gCurrCourseNum);
         print_generic_string(CRS_NUM_X1, 157, strCourseNum);
 
         u8 *actName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + gDialogCourseActNum - 1]);
@@ -1626,16 +1598,15 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
         render_pause_castle_course_stars(x, y, gCurrSaveFileNum - 1, gDialogLineNum);
         print_generic_string(x + 34, y - 5, textCoin);
-        int_to_str(save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum), strVal);
+        sprintf(strVal, "%d", save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
         print_generic_string(x + 54, y - 5, strVal);
     } else { // Castle secret stars
         u8 textStarX[] = { TEXT_STAR_X };
         courseName = segmented_to_virtual(courseNameTbl[COURSE_MAX]);
         print_generic_string(x + 40, y + 13, textStarX);
-        int_to_str(save_file_get_total_star_count(gCurrSaveFileNum - 1,
-                                                  COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
-                                                  COURSE_NUM_TO_INDEX(COURSE_MAX)),
-                                                  strVal);
+        sprintf(strVal, "%d", save_file_get_total_star_count(gCurrSaveFileNum - 1,
+                                                             COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
+                                                             COURSE_NUM_TO_INDEX(COURSE_MAX)));
         print_generic_string(x + 60, y + 13, strVal);
     }
 
@@ -1776,7 +1747,7 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
     print_hud_lut_string(HUD_LUT_GLOBAL, x +  0, y, hudTextSymCoin);
     print_hud_lut_string(HUD_LUT_GLOBAL, x + 16, y, hudTextSymX);
 
-    int_to_str(gCourseCompleteCoins, courseCompleteCoinsStr);
+    sprintf(courseCompleteCoinsStr, "%d", gCourseCompleteCoins);
     print_hud_lut_string(HUD_LUT_GLOBAL, x + 32, y, courseCompleteCoinsStr);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1846,7 +1817,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
         // Print course number
         gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
-        int_to_str(gLastCompletedCourseNum, strCourseNum);
+        sprintf(strCourseNum, "%d", gLastCompletedCourseNum);
 
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
         print_generic_string(65, 165, LANGUAGE_ARRAY(textCourse));

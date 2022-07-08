@@ -372,7 +372,7 @@ void puppycam_display_options() {
                     puppycam_print_text(160, scroll - 12, (*gPCFlagStringsPtr)[var], gPCOptionSelected - i);
                 }
             } else {
-                int_to_str(*gPCOptions[i].gPCOptionVar,newstring);
+                sprintf(newstring, "%d", *gPCOptions[i].gPCOptionVar);
                 puppycam_print_text(160,scroll-12,newstring,gPCOptionSelected-i);
                 puppycam_display_box(96, 111 + (32 * i) - (gPCOptionScroll * 32), 224, 117 + (32 * i) - (gPCOptionScroll * 32), 0x80, 0x80, 0x80, 0xFF);
                 maxvar = gPCOptions[i].gPCOptionMax - gPCOptions[i].gPCOptionMin;

@@ -1321,7 +1321,7 @@ void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
             offset = 16;
         }
         // Print star count
-        int_to_str(starCount, starCountText);
+        sprintf(starCountText, "%d", starCount);
         print_hud_lut_string(HUD_LUT_GLOBAL, x + offset + 16, y, starCountText);
     } else {
         // Print "new" text
@@ -1837,10 +1837,9 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     // Print "[star] x"
     print_menu_generic_string(x, y, textStarX);
     // Print number of castle secret stars
-    int_to_str(save_file_get_total_star_count(fileIndex,
-                                              COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
-                                              COURSE_NUM_TO_INDEX(COURSE_MAX)),
-                                              secretStarsText);
+    sprintf(secretStarsText, "%d", save_file_get_total_star_count(fileIndex,
+                                                                  COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
+                                                                  COURSE_NUM_TO_INDEX(COURSE_MAX)));
     print_menu_generic_string(x + 16, y, secretStarsText);
 }
 
@@ -1867,7 +1866,7 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
         // Print "[coin] x"
         print_menu_generic_string(x + 25, y, textCoinX);
         // Print coin score
-        int_to_str(save_file_get_course_coin_score(fileIndex, courseIndex), coinScoreText);
+        sprintf(coinScoreText, "%d", save_file_get_course_coin_score(fileIndex, courseIndex));
         print_menu_generic_string(x + 41, y, coinScoreText);
         // If collected, print 100 coin star
         if (stars & STAR_FLAG_ACT_100_COINS) {
@@ -1879,7 +1878,7 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
         // Print "[coin] x"
         print_menu_generic_string(x + HISCORE_COIN_ICON_X, y, textCoinX);
         // Print coin highscore
-        int_to_str((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF, coinScoreText);
+        sprintf(coinScoreText, "%d", (u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
         print_menu_generic_string(x + HISCORE_COIN_TEXT_X, y, coinScoreText);
         // Print coin highscore file
         print_menu_generic_string(x + HISCORE_COIN_NAMES_X, y,
