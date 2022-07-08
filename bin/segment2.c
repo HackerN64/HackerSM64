@@ -1965,7 +1965,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_multiply, 6}, // 42 "*"
     {NULL, 0}, // 43 "+" (Unimplemented)
     {texture_font_char_us_comma, 4}, // 44 ","
-    {texture_font_char_us_hyphen, 6}, // 45 "-" (For some reason, the hyphen is called a slash)
+    {texture_font_char_us_hyphen, 6}, // 45 "-"
     {texture_font_char_us_period, 4}, // 46 "."
     {NULL, 0}, // 47 "/" (Unimplemented)
     {texture_font_char_us_0, 7}, // 48 "0"
