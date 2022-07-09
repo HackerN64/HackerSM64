@@ -147,7 +147,7 @@ enum DialogResponseDefines {
 };
 
 // Macro to create an array of all 4 languages' versions of a string.
-#define LANGUAGE_TEXT(english, french, german, japanese) german
+#define LANGUAGE_TEXT(english, french, german, japanese) english
 
 extern s32 gDialogResponse;
 extern u16 gDialogColorFadeTimer;
