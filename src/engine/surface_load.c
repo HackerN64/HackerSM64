@@ -141,7 +141,7 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
 
     if (dynamic) {
         list = &gDynamicSurfacePartition[cellZ][cellX][listIndex];
-        if (sNumCellsUsed > sizeof(sCellsUsed) / sizeof(struct CellCoords)) {
+        if (sNumCellsUsed >= sizeof(sCellsUsed) / sizeof(struct CellCoords)) {
             sClearAllCells = TRUE;
         } else {
             u32 addNew = FALSE;
