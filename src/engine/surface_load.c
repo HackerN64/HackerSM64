@@ -147,8 +147,8 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
             u32 addNew = TRUE;
             for (u32 i = 0; i < NUM_SPATIAL_PARTITIONS; i++) {
                 if (gDynamicSurfacePartition[cellZ][cellX][i].next != NULL) {
-                addNew = FALSE;
-                break;
+                    addNew = FALSE;
+                    break;
                 }
             }
             if (addNew) {
@@ -563,14 +563,14 @@ void clear_dynamic_surfaces(void) {
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
         gDynamicSurfacePoolEnd = gDynamicSurfacePool;
-        if (sClearAllCells == FALSE) {
+        if (sClearAllCells) {
+            clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
+        } else {
             for (u32 i = 0; i < sNumCellsUsed; i++) {
                 for (u32 j = 0; j < NUM_SPATIAL_PARTITIONS; j++) {
                     gDynamicSurfacePartition[sCellsUsed[i].z][sCellsUsed[i].x][j].next = NULL;
                 }
             }
-        } else {
-            clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
         }
         sNumCellsUsed = 0;
         sClearAllCells = FALSE;
