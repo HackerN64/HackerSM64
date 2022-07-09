@@ -144,11 +144,11 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
         if (sNumCellsUsed >= sizeof(sCellsUsed) / sizeof(struct CellCoords)) {
             sClearAllCells = TRUE;
         } else {
-            u32 addNew = FALSE;
+            u32 addNew = TRUE;
             for (u32 i = 0; i < NUM_SPATIAL_PARTITIONS; i++) {
-                addNew = gDynamicSurfacePartition[cellZ][cellX][i].next == NULL;
-                if (addNew) {
-                    break;
+                if (gDynamicSurfacePartition[cellZ][cellX][i].next != NULL) {
+                addNew = FALSE;
+                break;
                 }
             }
             if (addNew) {
