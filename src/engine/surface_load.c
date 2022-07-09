@@ -23,8 +23,13 @@
  */
 SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
-u8 sCellsUsed[NUM_CELLS][NUM_CELLS];
+struct CellCoords {
+    u8 z;
+    u8 x;
+};
+struct CellCoords sCellsUsed[NUM_CELLS];
 u16 sNumCellsUsed;
+u8 sClearAllCells;
 
 /**
  * Pools of data that can contain either surface nodes or surfaces.
@@ -136,9 +141,22 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
 
     if (dynamic) {
         list = &gDynamicSurfacePartition[cellZ][cellX][listIndex];
-        sCellsUsed[sNumCellsUsed][1] = cellX;
-        sCellsUsed[sNumCellsUsed][0] = cellZ;
-        sNumCellsUsed++;
+        if (sNumCellsUsed > sizeof(sCellsUsed) / sizeof(struct CellCoords)) {
+            sClearAllCells = TRUE;
+        } else {
+            u32 addNew = FALSE;
+            for (u32 i = 0; i < NUM_SPATIAL_PARTITIONS; i++) {
+                addNew = gDynamicSurfacePartition[cellZ][cellX][i].next == NULL;
+                if (addNew) {
+                    break;
+                }
+            }
+            if (addNew) {
+                sCellsUsed[sNumCellsUsed].x = cellX;
+                sCellsUsed[sNumCellsUsed].z = cellZ;
+                sNumCellsUsed++;
+            }
+        }
     } else {
         list = &gStaticSurfacePartition[cellZ][cellX][listIndex];
     }
@@ -485,6 +503,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gSurfacesAllocated = 0;
     bzero(&sCellsUsed, sizeof(sCellsUsed));
     sNumCellsUsed = 0;
+    sClearAllCells = FALSE;
 
     clear_static_surfaces();
 
@@ -543,18 +562,18 @@ void clear_dynamic_surfaces(void) {
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
-
         gDynamicSurfacePoolEnd = gDynamicSurfacePool;
-
-        for (u32 i = 0; i < sNumCellsUsed; i++) {
-            gDynamicSurfacePartition[sCellsUsed[i][0]][sCellsUsed[i][1]][0].next = NULL;
-            gDynamicSurfacePartition[sCellsUsed[i][0]][sCellsUsed[i][1]][1].next = NULL;
-            gDynamicSurfacePartition[sCellsUsed[i][0]][sCellsUsed[i][1]][2].next = NULL;
-            gDynamicSurfacePartition[sCellsUsed[i][0]][sCellsUsed[i][1]][3].next = NULL;
+        if (sClearAllCells == FALSE) {
+            for (u32 i = 0; i < sNumCellsUsed; i++) {
+                for (u32 j = 0; j < NUM_SPATIAL_PARTITIONS; j++) {
+                    gDynamicSurfacePartition[sCellsUsed[i].z][sCellsUsed[i].x][j].next = NULL;
+                }
+            }
+        } else {
+            clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
         }
         sNumCellsUsed = 0;
-
-        //clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
+        sClearAllCells = FALSE;
     }
 }
 
