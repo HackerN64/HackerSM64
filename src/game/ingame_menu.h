@@ -62,7 +62,7 @@ struct UnicodeCharLUTEntry {
 };
 
 struct DialogEntry {
-    /*0x00*/ u32 unused;
+    /*0x00*/ s32 voice;
     /*0x04*/ s8 linesPerBox;
     /*0x06*/ s16 leftOffset;
     /*0x08*/ s16 width;
