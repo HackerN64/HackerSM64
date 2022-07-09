@@ -23,6 +23,8 @@
  */
 SpatialPartitionCell gStaticSurfacePartition[NUM_CELLS][NUM_CELLS];
 SpatialPartitionCell gDynamicSurfacePartition[NUM_CELLS][NUM_CELLS];
+u8 sCellsUsed[NUM_CELLS][NUM_CELLS];
+u16 sNumCellsUsed;
 
 /**
  * Pools of data that can contain either surface nodes or surfaces.
@@ -134,6 +136,9 @@ static void add_surface_to_cell(s32 dynamic, s32 cellX, s32 cellZ, struct Surfac
 
     if (dynamic) {
         list = &gDynamicSurfacePartition[cellZ][cellX][listIndex];
+        sCellsUsed[sNumCellsUsed][1] = cellX;
+        sCellsUsed[sNumCellsUsed][0] = cellZ;
+        sNumCellsUsed++;
     } else {
         list = &gStaticSurfacePartition[cellZ][cellX][listIndex];
     }
@@ -478,6 +483,8 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gEnvironmentRegions = NULL;
     gSurfaceNodesAllocated = 0;
     gSurfacesAllocated = 0;
+    bzero(&sCellsUsed, sizeof(sCellsUsed));
+    sNumCellsUsed = 0;
 
     clear_static_surfaces();
 
@@ -539,7 +546,15 @@ void clear_dynamic_surfaces(void) {
 
         gDynamicSurfacePoolEnd = gDynamicSurfacePool;
 
-        clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
+        for (u32 i = 0; i < sNumCellsUsed; i++) {
+            gDynamicSurfacePartition[sCellsUsed[i][0]][sCellsUsed[i][1]][0].next = NULL;
+            gDynamicSurfacePartition[sCellsUsed[i][0]][sCellsUsed[i][1]][1].next = NULL;
+            gDynamicSurfacePartition[sCellsUsed[i][0]][sCellsUsed[i][1]][2].next = NULL;
+            gDynamicSurfacePartition[sCellsUsed[i][0]][sCellsUsed[i][1]][3].next = NULL;
+        }
+        sNumCellsUsed = 0;
+
+        //clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
     }
 }
 
