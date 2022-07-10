@@ -61,6 +61,13 @@ struct UnicodeCharLUTEntry {
     const Texture *texture;
 };
 
+struct UnicodeLUT {
+    const struct UnicodeCharLUTEntry *lut2Bytes;
+    const struct UnicodeCharLUTEntry *lut3Bytes;
+    const u16 length2Bytes;
+    const u16 length3Bytes;
+};
+
 struct DialogEntry {
     /*0x00*/ u32 unused;
     /*0x04*/ s8 linesPerBox;

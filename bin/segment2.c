@@ -2008,6 +2008,13 @@ const struct UnicodeCharLUTEntry main_hud_utf8_3byte_lut[3] = {
     {0x272A, 16, 0, texture_hud_char_coin}, // ✪
 };
 
+const struct UnicodeLUT main_hud_utf8_lut = {
+    &main_hud_utf8_2byte_lut,
+    &main_hud_utf8_3byte_lut,
+    ARRAY_COUNT(main_hud_utf8_2byte_lut),
+    ARRAY_COUNT(main_hud_utf8_3byte_lut),
+};
+
 // Main HUD print table 0x02008250-0x02008337
 // const Texture *const main_hud_lut[] = {
 //     texture_hud_char_0, texture_hud_char_1, texture_hud_char_2, texture_hud_char_3,
@@ -2158,14 +2165,24 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
 };
 
 const struct UnicodeCharLUTEntry main_font_utf8_2byte_lut[1] = {
-
+    {0x00D7, 6, 0, texture_font_char_us_multiply}, // ×
 };
 
 const struct UnicodeCharLUTEntry main_font_utf8_3byte_lut[1] = {
+    {0x2605, 10, 0, texture_font_char_us_star_filled}, // ★
+};
 
+const struct UnicodeLUT main_font_utf8_lut = {
+    &main_font_utf8_2byte_lut,
+    &main_font_utf8_3byte_lut,
+    ARRAY_COUNT(main_font_utf8_2byte_lut),
+    ARRAY_COUNT(main_font_utf8_3byte_lut),
 };
 
 /**
+texture_font_char_us_star_hollow
+texture_font_char_us_coin
+
 
 // Main small font print table 0x02008338-0x02008737
 const Texture *const main_font_lut[] = {

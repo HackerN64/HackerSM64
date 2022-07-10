@@ -188,18 +188,36 @@ void create_dl_ortho_matrix(void) {
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(matrix), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
 }
 
-// Perform a binary search on a codepoint
-struct UnicodeCharLUTEntry *do_utf8_binary_search(struct UnicodeCharLUTEntry lut[], u32 length, u32 codepoint) {
+// Determine the UTF8 character to render, given a string and the current position in the string.
+// Return the struct of the relevant character, and increment the position in the string by either 1 or 2.
+struct UnicodeCharLUTEntry *utf8_lookup(struct UnicodeLUT *lut, char *str, s32 *strPos) {
+    u16 codepoint;
+    struct UnicodeCharLUTEntry *usedLUT;
+    u32 length;
+
+    lut = segmented_to_virtual(lut);
+    if (str[*strPos] & 0x20) {
+        codepoint = ((str[*strPos] & 0xF) << 12) | ((str[++(*strPos)] & 0x3F) << 6) | (str[++(*strPos)] & 0x3F);
+        usedLUT = segmented_to_virtual(lut->lut3Bytes);
+        length = lut->length3Bytes;
+    } else {
+        codepoint = ((str[*strPos] & 0x1F) << 6) | (str[++(*strPos)] & 0x3F);
+        usedLUT = segmented_to_virtual(lut->lut2Bytes);
+        length = lut->length2Bytes;
+    }
+
     u32 start = 0;
     u32 end = length - 1;
     u32 mid = (start + end) / 2;
 
+    print_text_fmt_int(20,20,"%x", codepoint);
+
     while (start <= end) {
-        if (lut[mid].codepoint == codepoint) {
-            return &lut[mid];
+        if (usedLUT[mid].codepoint == codepoint) {
+            return &usedLUT[mid];
         }
 
-        if (lut[mid].codepoint > codepoint) {
+        if (usedLUT[mid].codepoint > codepoint) {
             end = mid - 1;
         } else {
             start = mid + 1;
@@ -222,20 +240,8 @@ u8 render_generic_char(char c) {
     return fontLUT[c - ' '].kerning;
 }
 
-u8 render_generic_unicode_char(u32 codepoint) {
-    struct UnicodeCharLUTEntry *utf8Entry;
-    struct UnicodeCharLUTEntry *utf8LUT;
-    u32 size;
-
-    if (codepoint > 0x800) {
-        utf8LUT = segmented_to_virtual(main_font_utf8_3byte_lut);
-        size = ARRAY_COUNT(main_font_utf8_3byte_lut);
-    } else {
-        utf8LUT = segmented_to_virtual(main_font_utf8_2byte_lut);
-        size = ARRAY_COUNT(main_font_utf8_2byte_lut);
-    }
-
-    utf8Entry = do_utf8_binary_search(utf8LUT, size, codepoint);
+u8 render_generic_unicode_char(char *str, s32 *strPos) {
+    struct UnicodeCharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
 
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(segmented_to_virtual(utf8Entry->texture)));
@@ -362,13 +368,7 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, char *str) {
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos] - ' ']);
                     xStride = 12;
                 } else {
-                    if (str[strPos] & 0x20) {
-                        codepoint = ((str[strPos] & 0xF) << 12) | ((str[++strPos] & 0x3F) << 6) | (str[++strPos] & 0x3F);
-                        utf8Entry = do_utf8_binary_search(segmented_to_virtual(main_hud_utf8_3byte_lut), ARRAY_COUNT(main_hud_utf8_3byte_lut), codepoint);
-                    } else {
-                        codepoint = ((str[strPos] & 0x1F) << 6) | (str[++strPos] & 0x3F);
-                        utf8Entry = do_utf8_binary_search(segmented_to_virtual(main_hud_utf8_2byte_lut), ARRAY_COUNT(main_hud_utf8_2byte_lut), codepoint);
-                    }
+                    utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, segmented_to_virtual(utf8Entry->texture));
                     xStride = utf8Entry->kerning;
                 }
