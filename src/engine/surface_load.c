@@ -503,7 +503,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
     gSurfacesAllocated = 0;
     bzero(&sCellsUsed, sizeof(sCellsUsed));
     sNumCellsUsed = 0;
-    sClearAllCells = FALSE;
+    sClearAllCells = TRUE;
 
     clear_static_surfaces();
 
