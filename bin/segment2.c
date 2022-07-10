@@ -2000,11 +2000,11 @@ const Texture *const main_hud_lut[] = {
     NULL, // 126 "~" (Unimplemented)
 };
 
-const struct UnicodeCharLUTEntry main_hud_utf8_2byte_lut[1] = {
+const struct UnicodeCharLUTEntry main_hud_utf8_2byte_lut[] = {
     {0x00D7, 16, 0, texture_hud_char_multiply}, // ×
 };
 
-const struct UnicodeCharLUTEntry main_hud_utf8_3byte_lut[3] = {
+const struct UnicodeCharLUTEntry main_hud_utf8_3byte_lut[] = {
     {0x2605, 16, 0, texture_hud_char_star}, // ★
     {0x263A, 16, 0, texture_hud_char_mario_head}, // ☺
     {0x272A, 16, 0, texture_hud_char_coin}, // ✪
@@ -2166,16 +2166,16 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_tilde, 8}, // 126 "~"
 };
 
-const struct UnicodeCharLUTEntry main_font_utf8_2byte_lut[1] = {
+const struct UnicodeCharLUTEntry main_font_utf8_2byte_lut[] = {
     {0x00D7, 6, 0, texture_font_char_us_multiply}, // ×
 };
 
-const struct UnicodeCharLUTEntry main_font_utf8_3byte_lut[3] = {
+const struct UnicodeCharLUTEntry main_font_utf8_3byte_lut[] = {
+    {0x2194, 9, 0, texture_font_char_us_left_right_arrow}, // ↔
     {0x2605, 10, 0, texture_font_char_us_star_filled}, // ★
     {0x2606, 10, 0, texture_font_char_us_star_hollow}, // ☆
     {0x272A, 8, 0, texture_font_char_us_coin}, // ✪
 };
-
 const struct UnicodeLUT main_font_utf8_lut = {
     &main_font_utf8_2byte_lut,
     &main_font_utf8_3byte_lut,
