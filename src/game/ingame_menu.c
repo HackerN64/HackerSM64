@@ -210,8 +210,6 @@ struct UnicodeCharLUTEntry *utf8_lookup(struct UnicodeLUT *lut, char *str, s32 *
     u32 end = length - 1;
     u32 mid = (start + end) / 2;
 
-    print_text_fmt_int(20,20,"%x", codepoint);
-
     while (start <= end) {
         if (usedLUT[mid].codepoint == codepoint) {
             return &usedLUT[mid];
@@ -242,6 +240,7 @@ u8 render_generic_char(char c) {
 
 u8 render_generic_unicode_char(char *str, s32 *strPos) {
     struct UnicodeCharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
+    if (utf8Entry == NULL) return 0;
 
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(segmented_to_virtual(utf8Entry->texture)));
@@ -321,7 +320,11 @@ void print_generic_string(s16 x, s16 y, char *str) {
                 create_dl_translation_matrix(MENU_MTX_NOPUSH, 5, 0.0f, 0.0f);
                 break;
             default:
-                kerning = render_generic_char(str[strPos]);
+                if (!(str[strPos] & 0x80)) {
+                    kerning = render_generic_char(str[strPos]);
+                } else {
+                    kerning = render_generic_unicode_char(str, &strPos);
+                }
                 create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0.0f, 0.0f);
                 break;
         }
@@ -1461,11 +1464,25 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
 #define X_VAL8 4
 #define Y_VAL8 2
 
-void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
-    char textContinue[] = { TEXT_CONTINUE };
-    char textExitCourse[] = { TEXT_EXIT_COURSE };
-    char textCameraAngleR[] = { TEXT_CAMERA_ANGLE_R };
+char *textContinue = LANGUAGE_TEXT(
+    "CONTINUE",
+    "CONTINUER",
+    "WEITER",
+    "つづけて　マリオする？");
 
+char *textExitCourse = LANGUAGE_TEXT(
+    "EXIT COURSE",
+    "QUITTER NIVEAU",
+    "KURS VERLASSEN",
+    "コースからでる？");
+
+char *textCameraAngleR = LANGUAGE_TEXT(
+    "SET CAMERA ANGLE WITH [R]",
+    "RÉGLAGE CAMÉRA AVEC [R]",
+    "KAMERA MIT [R] VERSTELLEN",
+    "Ｒボタンのカメラきりかえ");
+
+void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
@@ -1538,7 +1555,8 @@ void print_hud_pause_colorful_str(void) {
 void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseIndex) {
     s16 hasStar = 0;
 
-    char str[COURSE_STAGES_COUNT * 2];
+    char str[30];
+    char *entries[6];
 
     u8 starFlags = save_file_get_star_flags(fileIndex, courseIndex);
     u16 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
@@ -1552,31 +1570,29 @@ void render_pause_castle_course_stars(s16 x, s16 y, s16 fileIndex, s16 courseInd
 
     while (hasStar != starCount) {
         if (starFlags & (1 << nextStar)) {
-            str[nextStar * 2] = DIALOG_CHAR_STAR_FILLED;
+            entries[nextStar] = "★";
             hasStar++;
         } else {
-            str[nextStar * 2] = DIALOG_CHAR_STAR_OPEN;
+            entries[nextStar] = "☆";
         }
-
-        str[nextStar * 2 + 1] = DIALOG_CHAR_SPACE;
         nextStar++;
     }
 
     if (starCount == nextStar && starCount != 6) {
-        str[nextStar * 2] = DIALOG_CHAR_STAR_OPEN;
-        str[nextStar * 2 + 1] = DIALOG_CHAR_SPACE;
+        entries[nextStar] = "☆";
+        nextStar++;
+    }
+    while (nextStar < 6) {
+        entries[nextStar] = "";
         nextStar++;
     }
 
-    str[nextStar * 2] = DIALOG_CHAR_TERMINATOR;
-
+    sprintf(str, "%s %s %s %s %s %s", entries[0], entries[1], entries[2], entries[3], entries[4], entries[5]);
     print_generic_string(x + 14, y + 13, str);
 }
 
 void render_pause_castle_main_strings(s16 x, s16 y) {
     void **courseNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
-
-    char textCoin[] = { TEXT_COIN_X };
 
     void *courseName;
 
@@ -1619,17 +1635,14 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     if (gDialogLineNum <= COURSE_NUM_TO_INDEX(COURSE_STAGES_MAX)) { // Main courses
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
         render_pause_castle_course_stars(x, y, gCurrSaveFileNum - 1, gDialogLineNum);
-        print_generic_string(x + 34, y - 5, textCoin);
-        sprintf(strVal, "%d", save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
-        print_generic_string(x + 54, y - 5, strVal);
+        sprintf(strVal, "✪× %d", save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum));
+        print_generic_string(x + 34, y - 5, strVal);
     } else { // Castle secret stars
-        char textStarX[] = { TEXT_STAR_X };
         courseName = segmented_to_virtual(courseNameTbl[COURSE_MAX]);
-        print_generic_string(x + 40, y + 13, textStarX);
-        sprintf(strVal, "%d", save_file_get_total_star_count(gCurrSaveFileNum - 1,
+        sprintf(strVal, "★× %d", save_file_get_total_star_count(gCurrSaveFileNum - 1,
                                                              COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                              COURSE_NUM_TO_INDEX(COURSE_MAX)));
-        print_generic_string(x + 60, y + 13, strVal);
+        print_generic_string(x + 40, y + 13, strVal);
     }
 
     print_generic_string(x - 9, y + 30, courseName);

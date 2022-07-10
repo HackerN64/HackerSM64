@@ -2170,8 +2170,10 @@ const struct UnicodeCharLUTEntry main_font_utf8_2byte_lut[1] = {
     {0x00D7, 6, 0, texture_font_char_us_multiply}, // ×
 };
 
-const struct UnicodeCharLUTEntry main_font_utf8_3byte_lut[1] = {
+const struct UnicodeCharLUTEntry main_font_utf8_3byte_lut[3] = {
     {0x2605, 10, 0, texture_font_char_us_star_filled}, // ★
+    {0x2606, 10, 0, texture_font_char_us_star_hollow}, // ☆
+    {0x272A, 8, 0, texture_font_char_us_coin}, // ✪
 };
 
 const struct UnicodeLUT main_font_utf8_lut = {

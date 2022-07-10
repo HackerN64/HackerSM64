@@ -141,9 +141,6 @@
 // Main Courses
 #define TEXT_COURSE _("コース")
 #define TEXT_MYSCORE _("マイスコア")
-#define TEXT_CONTINUE _("つづけて　マリオする？")
-#define TEXT_EXIT_COURSE _("コースからでる？")
-#define TEXT_CAMERA_ANGLE_R _("Ｒボタンのカメラきりかえ")
 
 // Camera Options
 #define TEXT_LAKITU_MARIO _("ジュゲム↔マリオ")
@@ -230,11 +227,6 @@
  */
 // Main Courses
 #define TEXT_MYSCORE "MYSCORE"
-#define TEXT_CONTINUE "CONTINUE"
-#define TEXT_EXIT_COURSE "EXIT COURSE"
-#ifndef VERSION_EU // "R" text is different in EU
-#define TEXT_CAMERA_ANGLE_R "SET CAMERA ANGLE WITH R"
-#endif
 
 // Course Completed Misc Text
 #define TEXT_CATCH "CATCH"
@@ -345,15 +337,6 @@
  */
 // Main Courses
 // English, "R" text is different
-#define TEXT_CAMERA_ANGLE_R             _("SET CAMERA ANGLE WITH [R]")
-// French
-#define TEXT_CONTINUE_FR                _("CONTINUER")
-#define TEXT_EXIT_COURSE_FR             _("QUITTER NIVEAU")
-#define TEXT_CAMERA_ANGLE_R_FR          _("RÉGLAGE CAMÉRA AVEC [R]")
-// German
-#define TEXT_CONTINUE_DE                _("WEITER")
-#define TEXT_EXIT_COURSE_DE             _("KURS VERLASSEN")
-#define TEXT_CAMERA_ANGLE_R_DE          _("KAMERA MIT [R] VERSTELLEN")
 
 // Save Options
 // French
