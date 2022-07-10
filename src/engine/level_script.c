@@ -360,6 +360,7 @@ static void level_cmd_clear_level(void) {
     clear_area_graph_nodes();
     clear_areas();
     main_pool_pop_state();
+    main_pool_pop_state();
     unmap_tlbs();
 
     sCurrentCmd = CMD_NEXT;
@@ -386,6 +387,7 @@ static void level_cmd_free_level_pool(void) {
             break;
         }
     }
+    main_pool_push_state();
 
     sCurrentCmd = CMD_NEXT;
 }
