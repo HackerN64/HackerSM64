@@ -7,9 +7,9 @@
 #include "dialogs.h"
 
 #undef DEFINE_DIALOG
-#define DEFINE_DIALOG(id, unused, linesPerBox, leftOffset, width, _) \
+#define DEFINE_DIALOG(id, voice, linesPerBox, leftOffset, width, _) \
     static const struct DialogEntry dialog_entry_ ## id = { \
-        unused, linesPerBox, leftOffset, width, dialog_text_ ## id \
+        voice, linesPerBox, leftOffset, width, dialog_text_ ## id \
     };
 
 #include "dialogs.h"

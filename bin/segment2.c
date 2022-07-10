@@ -5,6 +5,8 @@
 #include "macros.h"
 #include "types.h"
 #include "game/ingame_menu.h"
+#include "sounds.h"
+#include "seq_ids.h"
 
 #include "make_const_nonconst.h"
 
