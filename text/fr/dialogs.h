@@ -15,14 +15,14 @@ Bowser a dérobées...\n\
 \n\
 Tout d'abord, parlez au\n\
 gentil Bob-omb (appuyez\n\
-sur [B] pour parler). Il\n\
+sur Ⓑ pour parler). Il\n\
 vous aidera sûrement,\n\
 ainsi que ses camarades\n\
 dans d'autres niveaux...\n\
 Pour lire une pancarte:\n\
 arrêtez-vous, faites face\n\
 au panneau et appuyez sur\n\
-[B]. Appuyez sur [A] ou [B]\n\
+Ⓑ. Appuyez sur Ⓐ ou Ⓑ\n\
 pour lire la suite du\n\
 texte."))
 
@@ -159,7 +159,7 @@ DEFINE_DIALOG(DIALOG_008, NO_SOUND, 5, 30, 200, _("\
 ATTENTION AU CHOMP\n\
 ENCHAINE!!!\n\
 Danger! Approchez-vous\n\
-et appuyez sur [C]^ pour\n\
+et appuyez sur Ⓒ^ pour\n\
 jeter un oeil.\n\
 Impressionnant, non?\n\
 Avez-vous remarqué la\n\
@@ -267,15 +267,15 @@ Voulez-vous sauvegarder?\n\
 DEFINE_DIALOG(DIALOG_015, NO_SOUND, 6, 30, 200, _("\
 Vous pouvez frapper vos\n\
 ennemis et les assommer.\n\
-Appuyez sur [A] pour sauter\n\
-et sur [B] pour donner un\n\
+Appuyez sur Ⓐ pour sauter\n\
+et sur Ⓑ pour donner un\n\
 coup de poing. Appuyez sur\n\
-[A] et sur [B] pour donner un\n\
-coup de pied, et sur [B]\n\
+Ⓐ et sur Ⓑ pour donner un\n\
+coup de pied, et sur Ⓑ\n\
 pour ramasser quelque\n\
 chose. Pour lancer ce que\n\
 vous portez, appuyez sur\n\
-[B] à nouveau."))
+Ⓑ à nouveau."))
 
 DEFINE_DIALOG(DIALOG_016, SOUND_OBJ_KING_BOBOMB_TALK, 4, 30, 200, _("\
 Si vous sautez sur une\n\
@@ -378,8 +378,8 @@ pour ne pas faire de bruit\n\
 et ainsi surprendre vos\n\
 ennemis.\n\
 Vous pouvez déplacer ma\n\
-caméra avec [C]> et [C]<.\n\
-Appuyez sur [C]| pour voir\n\
+caméra avec Ⓒ> et Ⓒ<.\n\
+Appuyez sur Ⓒ| pour voir\n\
 de loin.\n\
 Lorsque ma caméra ne\n\
 peut plus se déplacer,\n\
@@ -407,10 +407,10 @@ haut si vous êtes propulsé\n\
 par un canon!\n\
 \n\
 \n\
-Utilisez les boutons [C] pour\n\
+Utilisez les boutons Ⓒ pour\n\
 regarder autour de vous\n\
 en plein vol, et appuyez\n\
-sur [Z] pour atterrir."))
+sur Ⓩ pour atterrir."))
 
 DEFINE_DIALOG(DIALOG_033, NO_SOUND, 5, 30, 200, _("\
 Ciao bello!\n\
@@ -419,9 +419,9 @@ château de la Princesse\n\
 grâce à un tuyau de\n\
 téléportation.\n\
 Contrôler Mario est très\n\
-facile: appuyez sur [A]\n\
-pour sauter et sur [B] pour\n\
-attaquer. Appuyez sur [B]\n\
+facile: appuyez sur Ⓐ\n\
+pour sauter et sur Ⓑ pour\n\
+attaquer. Appuyez sur Ⓑ\n\
 pour lire les pancartes.\n\
 Utilisez le stick multi-\n\
 directionnel pour déplacer\n\
@@ -438,17 +438,17 @@ long de son périple.\n\
 \n\
 Vous pourrez choisir\n\
 l'angle de prise de vue\n\
-grâce aux boutons [C]. S'il\n\
+grâce aux boutons Ⓒ. S'il\n\
 est impossible de bouger\n\
 la caméra, un signal\n\
 sonore retentira.\n\
 Pour jeter un oeil autour\n\
 de Mario, arrêtez-vous\n\
-et appuyez sur [C]^.\n\
-Appuyez sur le bouton [A]\n\
+et appuyez sur Ⓒ^.\n\
+Appuyez sur le bouton Ⓐ\n\
 pour revenir au jeu.\n\
 \n\
-Appuyez sur [R] pour\n\
+Appuyez sur Ⓡ pour\n\
 changer de mode de vue.\n\
 Lisez les pancartes que\n\
 vous croiserez pour en\n\
@@ -461,7 +461,7 @@ meilleures images..."))
 
 DEFINE_DIALOG(DIALOG_035, NO_SOUND, 6, 30, 200, _("\
 Il existe quatre boutons\n\
-[C]. En appuyant sur [C]^ et\n\
+Ⓒ. En appuyant sur Ⓒ^ et\n\
 en bougeant le stick\n\
 multidirectionnel, vous\n\
 pourrez jeter un oeil aux\n\
@@ -470,31 +470,31 @@ L'angle de vue normal est\n\
 celui de la caméra de\n\
 Lakitu, mais vous pouvez\n\
 le modifier en appuyant\n\
-sur [R] et ainsi utiliser\n\
+sur Ⓡ et ainsi utiliser\n\
 la 『caméra-Mario』.\n\
-Appuyez sur [R] à nouveau\n\
+Appuyez sur Ⓡ à nouveau\n\
 pour utiliser la caméra de\n\
-Lakitu. Appuyez sur [C]|\n\
+Lakitu. Appuyez sur Ⓒ|\n\
 pour voir Mario de loin,\n\
 quelque soit le mode de\n\
 vue que vous utilisez."))
 
 DEFINE_DIALOG(DIALOG_036, NO_SOUND, 4, 30, 200, _("\
 --PANORAMA--\n\
-Appuyez sur [C]^ pour jeter\n\
+Appuyez sur Ⓒ^ pour jeter\n\
 un coup d'oeil. Profitez\n\
 de la vue!\n\
-Appuyez sur [R] pour\n\
+Appuyez sur Ⓡ pour\n\
 utiliser la caméra-Mario\n\
 qui suivra toujours de\n\
 près notre petit ami.\n\
-Appuyez à nouveau sur [R]\n\
+Appuyez à nouveau sur Ⓡ\n\
 pour revenir à la caméra\n\
 de Lakitu.\n\
 \n\
 Mettez le jeu en pause et\n\
 choisissez le mode 『Fixe』\n\
-puis maintenez [R] pour que\n\
+puis maintenez Ⓡ pour que\n\
 la caméra reste en place."))
 
 DEFINE_DIALOG(DIALOG_037, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, _("\
@@ -559,7 +559,7 @@ suspendre en vous\n\
 déplaçant lentement près\n\
 du vide...\n\
 Si vous voulez lâcher\n\
-prise, appuyez sur [Z] ou\n\
+prise, appuyez sur Ⓩ ou\n\
 vers le bas sur le stick\n\
 multidirectionnel.\n\
 \n\
@@ -567,12 +567,12 @@ multidirectionnel.\n\
 Pour vous hisser, appuyez\n\
 vers le haut sur le stick\n\
 multidirectionnel ou sur le\n\
-bouton [A] pour aller plus\n\
+bouton Ⓐ pour aller plus\n\
 vite."))
 
 DEFINE_DIALOG(DIALOG_043, NO_SOUND, 5, 30, 200, _("\
 Si vous sautez en\n\
-maintenant le bouton [A],\n\
+maintenant le bouton Ⓐ,\n\
 vous pourrez vous\n\
 accrocher à des objets\n\
 au-dessus de vous...\n\
@@ -588,7 +588,7 @@ Maintenant que je suis\n\
 réveillé, ça te dirait de\n\
 faire un petit tour avec\n\
 moi?\n\
-Maintiens le bouton [A]\n\
+Maintiens le bouton Ⓐ\n\
 pour t'accrocher et\n\
 lâche-le pour te laisser\n\
 tomber.\n\
@@ -605,7 +605,7 @@ Tu devrais peut-être\n\
 arrêter les pâtes aux\n\
 oeufs...\n\
 Allez, ciao Mario!\n\
-Lâche le bouton [A] sinon\n\
+Lâche le bouton Ⓐ sinon\n\
 j'te balance dans le vide\n\
 mon gros..."))
 
@@ -628,15 +628,15 @@ devrez effectuer le Saut\n\
 en Longueur:\n\
 \n\
 \n\
-Courez, appuyez sur [Z] pour\n\
+Courez, appuyez sur Ⓩ pour\n\
 vous accroupir, puis\n\
-appuyez sur [A] pour\n\
+appuyez sur Ⓐ pour\n\
 sauter...\n\
 \n\
 \n\
 Enfin, pour créer une\n\
 『Impulsion』, appuyez sur\n\
-[A] vers un mur puis sautez\n\
+Ⓐ vers un mur puis sautez\n\
 à nouveau lorsque vous\n\
 touchez la paroi...\n\
 \n\
@@ -671,17 +671,17 @@ Entraînez-vous encore et\n\
 encore et encore et...?"))
 
 DEFINE_DIALOG(DIALOG_050, NO_SOUND, 4, 30, 200, _("\
-Maintenez le bouton [Z] pour\n\
+Maintenez le bouton Ⓩ pour\n\
 vous accroupir et ainsi\n\
 glisser le long d'une\n\
 pente...\n\
-Appuyez sur [Z] pendant un\n\
+Appuyez sur Ⓩ pendant un\n\
 saut pour faire l'Attaque\n\
 Rodéo!\n\
 \n\
 A l'arrêt, si vous appuyez\n\
-sur [Z] pour vous accroupir,\n\
-puis sur [A], vous ferez un\n\
+sur Ⓩ pour vous accroupir,\n\
+puis sur Ⓐ, vous ferez un\n\
 Saut Périlleux!\n\
 C'est compris? Mais il\n\
 existe encore d'autres\n\
@@ -692,7 +692,7 @@ accroupir puis faire un\n\
 Saut en Longueur...\n\
 \n\
 Vous pouvez aussi marcher\n\
-en maintenant le bouton [Z].\n\
+en maintenant le bouton Ⓩ.\n\
 Mais c'est une autre\n\
 histoire..."))
 
@@ -703,8 +703,8 @@ et aux poteaux...\n\
 \n\
 \n\
 \n\
-Appuyez sur [Z] pour lâcher\n\
-prise, sur [A] pour sauter\n\
+Appuyez sur Ⓩ pour lâcher\n\
+prise, sur Ⓐ pour sauter\n\
 en arrière ou sur le stick\n\
 multidirectionnel pour\n\
 descendre doucement.\n\
@@ -715,15 +715,15 @@ vers la gauche sur le\n\
 stick multidirectionnel\n\
 pour pivoter, ou vers le\n\
 haut pour faire le poirier.\n\
-Appuyez alors sur [A] pour\n\
+Appuyez alors sur Ⓐ pour\n\
 faire un méga-saut vers\n\
 l'arrière, digne des plus\n\
 grands athlètes!"))
 
 DEFINE_DIALOG(DIALOG_052, NO_SOUND, 5, 30, 200, _("\
 Arrêtez-vous et appuyez\n\
-sur [Z] pour vous accroupir,\n\
-puis appuyez sur [A] pour\n\
+sur Ⓩ pour vous accroupir,\n\
+puis appuyez sur Ⓐ pour\n\
 faire un Saut Périlleux\n\
 en arrière!\n\
 Pour faire un Saut\n\
@@ -818,23 +818,23 @@ ou récupérer des pièces\n\
 vous fera regagner de\n\
 l'oxygène.\n\
 \n\
-Appuyez sur [A] pour nager.\n\
-Maintenez le bouton [A]\n\
+Appuyez sur Ⓐ pour nager.\n\
+Maintenez le bouton Ⓐ\n\
 pour battre des pieds.\n\
 Appuyez régulièrement sur\n\
-[A] pour gagner de la\n\
+Ⓐ pour gagner de la\n\
 vitesse.\n\
 Appuyez vers le haut sur\n\
 le stick multidirectionnel\n\
 pour plonger.\n\
 Appuyez vers le bas et sur\n\
-[A] pour remonter à la\n\
+Ⓐ pour remonter à la\n\
 surface.\n\
 Lorsque vous êtes à la\n\
 surface, maintenez la\n\
 flèche vers le bas sur le\n\
 stick multidirectionnel et\n\
-appuyez sur [A] pour sortir\n\
+appuyez sur Ⓐ pour sortir\n\
 de l'eau."))
 
 DEFINE_DIALOG(DIALOG_061, NO_SOUND, 4, 30, 200, _("\
@@ -883,17 +883,17 @@ Mario. Appuyez vers le\n\
 bas pour prendre de\n\
 l'altitude, et vers le haut\n\
 pour piquer du nez.\n\
-Et enfin, appuyez sur [Z]\n\
+Et enfin, appuyez sur Ⓩ\n\
 pour atterrir."))
 
 DEFINE_DIALOG(DIALOG_065, NO_SOUND, 6, 30, 200, _("\
 Leçons de natation...\n\
-Appuyez sur [A] pour nager\n\
+Appuyez sur Ⓐ pour nager\n\
 la brasse. Si votre\n\
 synchronisation est bonne,\n\
 vous pourrez nager très\n\
 vite.\n\
-Maintenez le bouton [A]\n\
+Maintenez le bouton Ⓐ\n\
 pour battre des pieds\n\
 d'une façon régulière.\n\
 \n\
@@ -908,7 +908,7 @@ surface.\n\
 Pour sortir de l'eau,\n\
 appuyez vers le bas sur\n\
 le stick multidirectionnel\n\
-et appuyez sur [A]. Ensuite,\n\
+et appuyez sur Ⓐ. Ensuite,\n\
 relâcher le stick pour ne\n\
 pas retomber dans l'eau.\n\
 Attention: Mario ne peut\n\
@@ -931,7 +931,7 @@ son souffle de feu!\n\
 \n\
 Tourne autour de lui et\n\
 attrape sa queue en\n\
-appuyant sur [B]. Une fois\n\
+appuyant sur Ⓑ. Une fois\n\
 que tu l'as attrapé,\n\
 fais-le tourner autour\n\
 de toi.\n\
@@ -947,13 +947,13 @@ très loin.\n\
 \n\
 \n\
 \n\
-Utilise les boutons [C] pour\n\
+Utilise les boutons Ⓒ pour\n\
 regarder autour de toi.\n\
 Tu dois jeter Bowser sur\n\
 une des bombes...\n\
 \n\
 \n\
-Vise bien! Appuie sur [B]\n\
+Vise bien! Appuie sur Ⓑ\n\
 pour lancer Bowser.\n\
 Bonne chance, Mario!\n\
 Tu en auras besoin...\n\
@@ -1071,12 +1071,12 @@ falaise.\n\
 Pour lâcher prise, appuyez\n\
 vers le bas sur le stick\n\
 multidirectionnel ou sur le\n\
-bouton [Z].\n\
+bouton Ⓩ.\n\
 \n\
 Pour vous hisser, appuyez\n\
 vers le haut sur le stick\n\
 multidirectionnel ou sur le\n\
-bouton [A] pour monter plus\n\
+bouton Ⓐ pour monter plus\n\
 vite."))
 
 DEFINE_DIALOG(DIALOG_075, NO_SOUND, 5, 30, 200, _("\
@@ -1146,7 +1146,7 @@ DEFINE_DIALOG(DIALOG_078, NO_SOUND, 4, 30, 200, _("\
 Enfoncez le bloc des\n\
 pièces bleues grâce à\n\
 l'Attaque Rodéo, en\n\
-appuyant sur [Z].\n\
+appuyant sur Ⓩ.\n\
 Une pièce bleue vaut 5\n\
 pièces jaunes.\n\
 \n\
@@ -1321,13 +1321,13 @@ Pourquoi ne pas escalader\n\
 cette pente en courant?\n\
 Petit rappel: pour faire\n\
 un Saut en Longueur,\n\
-courir, appuyer sur [Z],\n\
+courir, appuyer sur Ⓩ,\n\
 puis sauter..."))
 
 DEFINE_DIALOG(DIALOG_095, NO_SOUND, 5, 30, 200, _("\
 Pour lire une pancarte,\n\
 il faut se tenir devant\n\
-l'écriteau et appuyer [B].\n\
+l'écriteau et appuyer Ⓑ.\n\
 Vous le saviez déjà?\n\
 Ah bon... Désolé.\n\
 Pour parler à une tortue\n\
@@ -1425,7 +1425,7 @@ utilisant les quatre\n\
 canons.\n\
 Utilise le stick multi-\n\
 directionnel pour viser et\n\
-appuie sur [A] pour tirer.\n\
+appuie sur Ⓐ pour tirer.\n\
 Si tu es habile, sers-toi\n\
 des arbres et des poteaux\n\
 pour atterrir..."))
@@ -1727,7 +1727,7 @@ Lorsque vous êtes en\n\
 possession de la casquette\n\
 ailée, faites un Triple\n\
 Saut pour vous envoler et\n\
-appuyez sur [Z] pour\n\
+appuyez sur Ⓩ pour\n\
 atterrir.\n\
 Appuyez vers le bas sur le\n\
 stick multidirectionnel\n\
@@ -2161,20 +2161,20 @@ des lieux en hauteur."))
 
 DEFINE_DIALOG(DIALOG_159, NO_SOUND, 4, 30, 200, _("\
 3. En vous arrêtant, en\n\
-appuyant sur [Z] et en\n\
+appuyant sur Ⓩ et en\n\
 sautant, vous ferez un\n\
 Saut Périlleux en arrière.\n\
 Pour faire un Saut en\n\
 Longueur, courez, appuyez\n\
-sur [Z], puis sautez."))
+sur Ⓩ, puis sautez."))
 
 DEFINE_DIALOG(DIALOG_160, NO_SOUND, 3, 30, 200, _("\
-Appuyez sur [B] lorsque\n\
+Appuyez sur Ⓑ lorsque\n\
 vous courez pour faire\n\
 une attaque en glissade.\n\
 Pour vous remettre\n\
-debout, appuyez sur [A] ou\n\
-sur [B]."))
+debout, appuyez sur Ⓐ ou\n\
+sur Ⓑ."))
 
 DEFINE_DIALOG(DIALOG_161, SOUND_GENERAL_YOSHI_TALK, 4, 30, 200, _("\
 Mario!?!?!\n\
@@ -2277,13 +2277,13 @@ Je reviens plus tard...\n\
 DEFINE_DIALOG(DIALOG_167, NO_SOUND, 5, 30, 200, _("\
 En route vers le château!\n\
 \n\
-Appuyez sur [A] pour sauter\n\
-et sur [Z] pour vous\n\
+Appuyez sur Ⓐ pour sauter\n\
+et sur Ⓩ pour vous\n\
 accroupir.\n\
-Appuyez sur [B] pour\n\
+Appuyez sur Ⓑ pour\n\
 attaquer ou pour attraper\n\
 quelque chose. Appuyez à\n\
-nouveau sur [B] pour lancer\n\
+nouveau sur Ⓑ pour lancer\n\
 ce que vous portez."))
 
 DEFINE_DIALOG(DIALOG_168, SOUND_OBJ_WIGGLER_TALK, 6, 30, 200, _("\

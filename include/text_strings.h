@@ -23,8 +23,8 @@
 #define NC_WIDE_EN	 			_("Widescreen")
 #define NC_HIGHLIGHT_L 			_(">")
 #define NC_HIGHLIGHT_R 			_("<")
-#define NC_BUTTON_EN 			_("[R]: Options")
-#define NC_BUTTON2_EN 			_("[R]: Return")
+#define NC_BUTTON_EN 			_("Ⓡ: Options")
+#define NC_BUTTON2_EN 			_("Ⓡ: Return")
 #define NC_OPTION_EN 			_("OPTIONS")
 
 #if MULTILANG
@@ -42,8 +42,8 @@
 #define OPTION_SCHEME3_FR 		_("Classic")
 #define OPTION_LANGUAGE_FR 		_("Language")
 #define NC_WIDE_FR	 			_("Widescreen")
-#define NC_BUTTON_FR 			_("[R]: Options")
-#define NC_BUTTON2_FR 			_("[R]: Retournez")
+#define NC_BUTTON_FR 			_("Ⓡ: Options")
+#define NC_BUTTON2_FR 			_("Ⓡ: Retournez")
 #define NC_OPTION_FR 			_("OPTIONS")
 
 #define NC_CAMX_DE 				_("Camera X Sensitivity")
@@ -60,8 +60,8 @@
 #define OPTION_SCHEME3_DE 		_("Classic")
 #define OPTION_LANGUAGE_DE 		_("Language")
 #define NC_WIDE_DE	 			_("Widescreen")
-#define NC_BUTTON_DE 			_("[R]: Options")
-#define NC_BUTTON2_DE 			_("[R]: Return")
+#define NC_BUTTON_DE 			_("Ⓡ: Options")
+#define NC_BUTTON2_DE 			_("Ⓡ: Return")
 #define NC_OPTION_DE 			_("OPTIONS")
 #endif
 #endif

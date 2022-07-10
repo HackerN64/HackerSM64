@@ -20,17 +20,17 @@ Stars that Bowser stole\n\
 inside the painting\n\
 worlds.\n\
 First, talk to the\n\
-Bob-omb Buddy. (Press [B]\n\
+Bob-omb Buddy. (Press Ⓑ\n\
 to talk.) He'll certainly\n\
 help you out, and so will\n\
 his " COMRADES " in other\n\
 areas.\n\
 To read signs, stop, face\n\
-them and press [B]. Press [A]\n\
-or [B] to scroll ahead. You\n\
+them and press Ⓑ. Press Ⓐ\n\
+or Ⓑ to scroll ahead. You\n\
 can talk to some other\n\
 characters by facing them\n\
-and pressing [B]."))
+and pressing Ⓑ."))
 
 DEFINE_DIALOG(DIALOG_001, SOUND_OBJ_BOBOMB_BUDDY_TALK, 4, 95, 200, _("\
 Watch out! If you wander\n\
@@ -136,7 +136,7 @@ it, fair and square!"))
 DEFINE_DIALOG(DIALOG_008, NO_SOUND, 4, 30, 200, _("\
 BEWARE OF CHAIN CHOMP\n\
 Extreme Danger!\n\
-Get close and press [C]^\n\
+Get close and press Ⓒ^\n\
 for a better look.\n\
 Scary, huh?\n\
 See the Red Coin on top\n\
@@ -226,13 +226,13 @@ Do you want to Save?\n\
 
 DEFINE_DIALOG(DIALOG_015, NO_SOUND, 4, 30, 200, _("\
 You can punch enemies to\n\
-knock them down. Press [A]\n\
-to jump, [B] to punch.\n\
-Press [A] then [B] to Kick.\n\
+knock them down. Press Ⓐ\n\
+to jump, Ⓑ to punch.\n\
+Press Ⓐ then Ⓑ to Kick.\n\
 To pick something up,\n\
-press [B], too. To throw\n\
+press Ⓑ, too. To throw\n\
 something you're holding,\n\
-press [B] again."))
+press Ⓑ again."))
 
 DEFINE_DIALOG(DIALOG_016, NO_SOUND, 3, 30, 200, _("\
 Hop on the shiny shell and\n\
@@ -353,8 +353,8 @@ order to walk quietly.\n\
 And wrapping up filming\n\
 techniques reported on\n\
 earlier, you can take a\n\
-look around using [C]> and\n\
-[C]<. Press [C]| to view the\n\
+look around using Ⓒ> and\n\
+Ⓒ<. Press Ⓒ| to view the\n\
 action from a distance.\n\
 When you can't move the\n\
 camera any farther, the\n\
@@ -384,18 +384,18 @@ if you blast out of a\n\
 cannon wearing the\n\
 Wing Cap!\n\
 \n\
-Use the [C] Buttons to look\n\
+Use the Ⓒ Buttons to look\n\
 around while flying, and\n\
-press [Z] to land."))
+press Ⓩ to land."))
 
 DEFINE_DIALOG(DIALOG_033, NO_SOUND, 6, 30, 200, _("\
 Ciao! You've reached\n\
 Princess Toadstool's\n\
 castle via a warp pipe.\n\
 Using the controller is a\n\
-piece of cake. Press [A] to\n\
-jump and [B] to attack.\n\
-Press [B] to read signs,\n\
+piece of cake. Press Ⓐ to\n\
+jump and Ⓑ to attack.\n\
+Press Ⓑ to read signs,\n\
 too. Use the Control Stick\n\
 in the center of the\n\
 controller to move Mario\n\
@@ -420,16 +420,16 @@ we'll be shooting from the\n\
 recommended angle, but\n\
 you can change the\n\
 camera angle by pressing\n\
-the [C] Buttons.\n\
+the Ⓒ Buttons.\n\
 If we can't adjust the\n\
 view any further, we'll\n\
 buzz. To take a look at\n\
 the surroundings, stop\n\
-and press [C]^.\n\
+and press Ⓒ^.\n\
 \n\
-Press [A] to resume play.\n\
+Press Ⓐ to resume play.\n\
 Switch camera modes with\n\
-the [R] Button. Signs along\n\
+the Ⓡ Button. Signs along\n\
 the way will review these\n\
 instructions.\n\
 \n\
@@ -439,7 +439,7 @@ Lakitu Bros."))
 
 DEFINE_DIALOG(DIALOG_035, NO_SOUND, 5, 30, 200, _("\
 There are four camera, or\n\
-『[C],』 Buttons. Press [C]^\n\
+『Ⓒ,』 Buttons. Press Ⓒ^\n\
 to look around using the\n\
 Control Stick.\n\
 \n\
@@ -449,31 +449,31 @@ It is the camera\n\
 recommended for normal\n\
 play.\n\
 You can change angles by\n\
-pressing [C]>. If you press\n\
-[R], the view switches to\n\
+pressing Ⓒ>. If you press\n\
+Ⓡ, the view switches to\n\
 Mario's camera, which\n\
 is directly behind him.\n\
-Press [R] again to return\n\
+Press Ⓡ again to return\n\
 to Lakitu's camera. Press\n\
-[C]| to see Mario from\n\
+Ⓒ| to see Mario from\n\
 afar, using either\n\
 Lakitu's or Mario's view."))
 
 DEFINE_DIALOG(DIALOG_036, NO_SOUND, 5, 30, 200, _("\
 OBSERVATION PLATFORM\n\
-Press [C]^ to take a look\n\
+Press Ⓒ^ to take a look\n\
 around. Don't miss\n\
 anything!\n\
 \n\
-Press [R] to switch to\n\
+Press Ⓡ to switch to\n\
 Mario's camera. It\n\
 always follows Mario.\n\
-Press [R] again to switch\n\
+Press Ⓡ again to switch\n\
 to Lakitu's camera.\n\
 Pause the game and\n\
 switch the mode to 『fix』\n\
 the camera in place while\n\
-holding [R]. Give it a try!"))
+holding Ⓡ. Give it a try!"))
 
 DEFINE_DIALOG(DIALOG_037, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, _("\
 I win! You lose!\n\
@@ -533,17 +533,17 @@ of the cliff and hang on,\n\
 and you can climb off the\n\
 edge if you move slowly.\n\
 When you want to let go,\n\
-either press [Z] or press\n\
+either press Ⓩ or press\n\
 the Control Stick in the\n\
 direction of Mario's back.\n\
 To climb up, press Up on\n\
 the Control Stick. To\n\
 scurry up quickly, press\n\
-the [A] Button."))
+the Ⓐ Button."))
 
 DEFINE_DIALOG(DIALOG_043, NO_SOUND, 5, 30, 200, _("\
 If you jump and hold the\n\
-[A] Button, you can hang on\n\
+Ⓐ Button, you can hang on\n\
 to some objects overhead.\n\
 It's the same as grabbing\n\
 a flying bird!"))
@@ -557,8 +557,8 @@ sleeping!\n\
 Hey, as long as I'm\n\
 awake, why not take a\n\
 short flight with me?\n\
-Press and hold [A] to grab\n\
-on. Release [A] to let go.\n\
+Press and hold Ⓐ to grab\n\
+on. Release Ⓐ to let go.\n\
 I'll take you wherever\n\
 you want to go, as long\n\
 as my wings hold out.\n\
@@ -570,7 +570,7 @@ Whew! I'm just about\n\
 flapped out. You should\n\
 lay off the pasta, Mario!\n\
 That's it for now. Press\n\
-[A] to let go. Okay,\n\
+Ⓐ to let go. Okay,\n\
 bye byyyyyyeeee!"))
 
 DEFINE_DIALOG(DIALOG_046, NO_SOUND, 5, 30, 200, _("\
@@ -586,11 +586,11 @@ right, you'll hop, skip,\n\
 then jump really high.\n\
 Next, go for distance\n\
 with the Long Jump. Run,\n\
-press [Z] to crouch then [A]\n\
+press Ⓩ to crouch then Ⓐ\n\
 to jump really far.\n\
 \n\
 To do the Wall Kick, press\n\
-[A] to jump at a wall, then\n\
+Ⓐ to jump at a wall, then\n\
 jump again when you hit\n\
 the wall.\n\
 \n\
@@ -624,9 +624,9 @@ bounce to gain momentum.\n\
 Practice makes perfect!"))
 
 DEFINE_DIALOG(DIALOG_050, NO_SOUND, 4, 30, 200, _("\
-Hold [Z] to crouch and\n\
+Hold Ⓩ to crouch and\n\
 slide down a slope.\n\
-Or press [Z] while in the\n\
+Or press Ⓩ while in the\n\
 air to Pound the Ground!\n\
 If you stop, crouch, then\n\
 jump, you'll do a\n\
@@ -641,7 +641,7 @@ DEFINE_DIALOG(DIALOG_051, NO_SOUND, 6, 30, 200, _("\
 Climbing's easy! When you\n\
 jump at trees, poles or\n\
 pillars, you'll grab them\n\
-automatically. Press [A] to\n\
+automatically. Press Ⓐ to\n\
 jump off backward.\n\
 \n\
 To rotate around the\n\
@@ -655,8 +655,8 @@ handstand for a high,\n\
 stylin' dismount."))
 
 DEFINE_DIALOG(DIALOG_052, NO_SOUND, 5, 30, 200, _("\
-Stop and press [Z] to\n\
-crouch, then press [A]\n\
+Stop and press Ⓩ to\n\
+crouch, then press Ⓐ\n\
 to do a high, Backward\n\
 Somersault!\n\
 \n\
@@ -752,19 +752,19 @@ Return to the surface for\n\
 air or find an air bubble\n\
 or coins to breathe while\n\
 underwater.\n\
-Press [A] to swim. Hold [A]\n\
+Press Ⓐ to swim. Hold Ⓐ\n\
 to swim slow and steady.\n\
-Tap [A] with smooth timing\n\
+Tap Ⓐ with smooth timing\n\
 to gain speed.\n\
 Press Up on the\n\
-Control Stick and press [A]\n\
+Control Stick and press Ⓐ\n\
 to dive.\n\
 \n\
 Press Down on the Control\n\
-Stick and press [A] to\n\
+Stick and press Ⓐ to\n\
 return to the surface.\n\
 \n\
-Hold Down and press [A]\n\
+Hold Down and press Ⓐ\n\
 while on the surface near\n\
 the edge of the water to\n\
 jump out."))
@@ -808,17 +808,17 @@ the sky.\n\
 Use the Control Stick to\n\
 guide Mario. Pull back to\n\
 to fly up, press forward\n\
-to nose down, and press [Z]\n\
+to nose down, and press Ⓩ\n\
 to land."))
 
 DEFINE_DIALOG(DIALOG_065, NO_SOUND, 6, 30, 200, _("\
 Swimming Lessons!\n\
-Tap [A] to do the breast\n\
+Tap Ⓐ to do the breast\n\
 stroke. If you time the\n\
 taps right, you'll swim\n\
 fast.\n\
 \n\
-Press and hold [A] to do a\n\
+Press and hold Ⓐ to do a\n\
 slow, steady flutter kick.\n\
 Press Up on the Control\n\
 Stick to dive, and pull\n\
@@ -826,7 +826,7 @@ back on the stick to head\n\
 for the surface.\n\
 To jump out of the water,\n\
 hold Down on the Control\n\
-Stick, then press [A].\n\
+Stick, then press Ⓐ.\n\
 Easy as pie, right?\n\
 \n\
 \n\
@@ -848,7 +848,7 @@ to burn you with his\n\
 horrible flame breath.\n\
 Run around behind and\n\
 grab him by the tail with\n\
-the [B] Button. Once you\n\
+the Ⓑ Button. Once you\n\
 grab hold, swing him\n\
 around in great circles.\n\
 Rotate the Control Stick\n\
@@ -856,12 +856,12 @@ to go faster and faster.\n\
 The faster you swing him,\n\
 the farther he'll fly.\n\
 \n\
-Use the [C] Buttons to look\n\
+Use the Ⓒ Buttons to look\n\
 around, Mario. You have\n\
 to throw Bowser into one\n\
 of the bombs in the four\n\
 corners.\n\
-Aim well, then press [B]\n\
+Aim well, then press Ⓑ\n\
 again to launch Bowser.\n\
 Good luck, Mario! Our\n\
 fate is in your hands."))
@@ -971,10 +971,10 @@ To drop from the edge,\n\
 either press the Control\n\
 Stick in the direction of\n\
 Mario's back or press the\n\
-[Z] Button.\n\
+Ⓩ Button.\n\
 To get up onto the ledge,\n\
 either press Up on the\n\
-Control Stick or press [A]\n\
+Control Stick or press Ⓐ\n\
 as soon as you grab the\n\
 ledge to climb up quickly."))
 
@@ -1036,7 +1036,7 @@ shall pound the pillars."))
 DEFINE_DIALOG(DIALOG_078, NO_SOUND, 5, 30, 200, _("\
 Break open the Blue Coin\n\
 Block by Pounding the\n\
-Ground with the [Z] Button.\n\
+Ground with the Ⓩ Button.\n\
 One Blue Coin is worth\n\
 five Yellow Coins.\n\
 But you have to hurry!\n\
@@ -1196,11 +1196,11 @@ DEFINE_DIALOG(DIALOG_094, NO_SOUND, 4, 30, 200, _("\
 Get a good run up the\n\
 slope! Do you remember\n\
 the Long Jump? Run, press\n\
-[Z], then jump!"))
+Ⓩ, then jump!"))
 
 DEFINE_DIALOG(DIALOG_095, NO_SOUND, 4, 30, 200, _("\
 To read a sign, stand in\n\
-front of it and press [B],\n\
+front of it and press Ⓑ,\n\
 like you did just now.\n\
 \n\
 When you want to talk to\n\
@@ -1290,7 +1290,7 @@ You can reach the Star on\n\
 the floating island by\n\
 using the four cannons.\n\
 Use the Control Stick to\n\
-aim, then press [A] to fire.\n\
+aim, then press Ⓐ to fire.\n\
 \n\
 If you're handy, you can\n\
 grab on to trees or poles\n\
@@ -1557,7 +1557,7 @@ become solid.\n\
 \n\
 Try out the Wing Cap! Do\n\
 the Triple Jump to take\n\
-off and press [Z] to land.\n\
+off and press Ⓩ to land.\n\
 \n\
 \n\
 Pull back on the Control\n\
@@ -1958,18 +1958,18 @@ bounce to a higher level\n\
 using this Wall Kick."))
 
 DEFINE_DIALOG(DIALOG_159, NO_SOUND, 6, 30, 200, _("\
-3. If you stop, press [Z]\n\
+3. If you stop, press Ⓩ\n\
 to crouch, then jump, you\n\
 can perform a Backward\n\
 Somersault. To do a Long\n\
-Jump, run fast, press [Z],\n\
+Jump, run fast, press Ⓩ,\n\
 then jump."))
 
 DEFINE_DIALOG(DIALOG_160, NO_SOUND, 4, 30, 200, _("\
-Press [B] while running\n\
+Press Ⓑ while running\n\
 fast to do a Body Slide\n\
 attack. To stand while\n\
-sliding, press [A] or [B]."))
+sliding, press Ⓐ or Ⓑ."))
 
 #ifdef VERSION_EU
 #define KEEP_ON_PLAYING ".."
@@ -2080,11 +2080,11 @@ Princess Toadstool's\n\
 castle is just ahead.\n\
 \n\
 \n\
-Press [A] to jump, [Z] to\n\
-crouch, and [B] to punch,\n\
+Press Ⓐ to jump, Ⓩ to\n\
+crouch, and Ⓑ to punch,\n\
 read a sign, or grab\n\
 something.\n\
-Press [B] again to throw\n\
+Press Ⓑ again to throw\n\
 something you're holding."))
 
 DEFINE_DIALOG(DIALOG_168, SOUND_OBJ_WIGGLER_TALK, 5, 30, 200, _("\

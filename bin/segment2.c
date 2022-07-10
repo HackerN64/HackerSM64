@@ -2172,10 +2172,18 @@ const struct UnicodeCharLUTEntry main_font_utf8_2byte_lut[] = {
 
 const struct UnicodeCharLUTEntry main_font_utf8_3byte_lut[] = {
     {0x2194, 9, 0, texture_font_char_us_left_right_arrow}, // ↔
+
+    {0x24B6, 7, 0, texture_font_char_us_button_A}, // Ⓐ
+    {0x24B7, 7, 0, texture_font_char_us_button_B}, // Ⓑ
+    {0x24B8, 6, 0, texture_font_char_us_button_C}, // Ⓒ
+    {0x24C7, 7, 0, texture_font_char_us_button_R}, // Ⓡ
+    {0x24CF, 7, 0, texture_font_char_us_button_Z}, // Ⓩ
+
     {0x2605, 10, 0, texture_font_char_us_star_filled}, // ★
     {0x2606, 10, 0, texture_font_char_us_star_hollow}, // ☆
     {0x272A, 8, 0, texture_font_char_us_coin}, // ✪
 };
+
 const struct UnicodeLUT main_font_utf8_lut = {
     &main_font_utf8_2byte_lut,
     &main_font_utf8_3byte_lut,

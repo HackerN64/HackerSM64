@@ -691,7 +691,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     UNUSED s8 mark = DIALOG_MARK_NONE; // unused in US and EU
     s8 xMatrix = 1;
     s8 linesPerBox = dialog->linesPerBox;
-    s16 strIdx;
+    s32 strIdx;
     s16 linePos = 0;
     u8 kerning;
 
@@ -776,7 +776,11 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                             MENU_MTX_NOPUSH, (f32)(5 * (xMatrix - 1)), 0, 0);
                     }
 
-                    kerning = render_generic_char(strChar);
+                    if (!(strChar & 0x80)) {
+                        kerning = render_generic_char(strChar);
+                    } else {
+                        kerning = render_generic_unicode_char(str, &strIdx);
+                    }
                     create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
                     xMatrix = 1;
                     linePos++;
@@ -1477,9 +1481,9 @@ char *textExitCourse = LANGUAGE_TEXT(
     "コースからでる？");
 
 char *textCameraAngleR = LANGUAGE_TEXT(
-    "SET CAMERA ANGLE WITH [R]",
-    "RÉGLAGE CAMÉRA AVEC [R]",
-    "KAMERA MIT [R] VERSTELLEN",
+    "SET CAMERA ANGLE WITH Ⓡ",
+    "RÉGLAGE CAMÉRA AVEC Ⓡ",
+    "KAMERA MIT Ⓡ VERSTELLEN",
     "Ｒボタンのカメラきりかえ");
 
 void render_pause_course_options(s16 x, s16 y, s8 *index, s16 yIndex) {

@@ -9,12 +9,12 @@ Power-Sterne findest Du\n\
 in den Wandgemälden.\n\
 Sprich zuerst mit Buddy,\n\
 der rosa Bombe.\n\
-Drücke [B], um Dich mit ihr\n\
+Drücke Ⓑ, um Dich mit ihr\n\
 zu unterhalten. Sie und\n\
 ihre Kolleginnen werden\n\
 Dich sicher unterstützen.\n\
-Drücke [B], um Schilder\n\
-zu lesen. Mit [A] oder [B]\n\
+Drücke Ⓑ, um Schilder\n\
+zu lesen. Mit Ⓐ oder Ⓑ\n\
 kannst Du die Nachrichten\n\
 umblättern. In anderen\n\
 Kursen triffst Du weitere\n\
@@ -128,7 +128,7 @@ ihn Dir verdient!"))
 DEFINE_DIALOG(DIALOG_008, NO_SOUND, 5, 30, 200, _("\
 BISSIGER KETTENHUND!\n\
 Nähere Dich ihm langsam,\n\
-und benutze die [C]-Knöpfe,\n\
+und benutze die Ⓒ-Knöpfe,\n\
 um den Blickwinkel zu\n\
 ändern. Gefährlich, oder?\n\
 Siehst Du die rote Münze\n\
@@ -220,12 +220,12 @@ Spielstand speichern?\n\
 DEFINE_DIALOG(DIALOG_015, NO_SOUND, 4, 30, 200, _("\
 Setze Deine Fäuste ein,\n\
 um Dich zu verteidigen.\n\
-Drücke [A] zum Springen\n\
-und [B] zum Schlagen.\n\
-Drücke [A] und [B], um einen\n\
+Drücke Ⓐ zum Springen\n\
+und Ⓑ zum Schlagen.\n\
+Drücke Ⓐ und Ⓑ, um einen\n\
 Tritt auszuführen.\n\
 Gegenstände kannst Du\n\
-mit [B] nehmen und werfen."))
+mit Ⓑ nehmen und werfen."))
 
 DEFINE_DIALOG(DIALOG_016, NO_SOUND, 4, 30, 200, _("\
 Springe auf den\n\
@@ -335,11 +335,11 @@ unachtsam, wenn Du Dich\n\
 leise, also langsam,\n\
 bewegst.\n\
 Die Kameraposition kannst\n\
-Du durch [C]> und [C]<\n\
+Du durch Ⓒ> und Ⓒ<\n\
 verändern, um einen\n\
 Überblick zu erhalten.\n\
 Das Weitwinkelobjektiv\n\
-wird mit [C]| eingesetzt.\n\
+wird mit Ⓒ| eingesetzt.\n\
 Details der Umgebung\n\
 werden so sichtbar!\n\
 Ein Warnton erklingt,\n\
@@ -372,7 +372,7 @@ Benutzt Du zum Starten\n\
 des Fluges eine Kanone,\n\
 kannst Du die Flughöhe\n\
 enorm steigern. Mit dem\n\
-[Z]-Knopf kannst Du landen."))
+Ⓩ-Knopf kannst Du landen."))
 
 DEFINE_DIALOG(DIALOG_033, NO_SOUND, 4, 30, 200, _("\
 Herzlich willkommen! Durch\n\
@@ -380,13 +380,13 @@ eine Warpröhre bist Du\n\
 direkt zum Schloss der\n\
 Prinzessin gelangt.\n\
 Die Steuerung ist einfach:\n\
-Benutze den [A]-Knopf zum\n\
-Springen und den [B]-Knopf\n\
+Benutze den Ⓐ-Knopf zum\n\
+Springen und den Ⓑ-Knopf\n\
 zum Schlagen.\n\
 Hinweisschilder kannst\n\
 Du lesen, wenn Du Dich\n\
 davor stellst und den\n\
-[B]-Knopf betätigst.\n\
+Ⓑ-Knopf betätigst.\n\
 Der Analog-Stick dient\n\
 der Steuerung. Doch jetzt\n\
 genug der vielen Worte:\n\
@@ -406,7 +406,7 @@ nach den Power-Sternen.\n\
 Unser wagemutiger Kollege\n\
 wird ihn auf dieser\n\
 heiklen Mission begleiten.\n\
-Die [C]-Knöpfe dienen\n\
+Die Ⓒ-Knöpfe dienen\n\
 seiner Steuerung.\n\
 Du kannst die Perspektiven\n\
 beliebig verändern. Sollte\n\
@@ -420,7 +420,7 @@ mitteilen. Damit zurück\n\
 zum Hauptfilm!"))
 
 DEFINE_DIALOG(DIALOG_035, NO_SOUND, 5, 30, 200, _("\
-Die [C]-Knöpfe dienen der\n\
+Die Ⓒ-Knöpfe dienen der\n\
 Steuerung der Kamera.\n\
 Benutze den ^-Knopf, um\n\
 die Kamera mit dem\n\
@@ -431,8 +431,8 @@ AG dafür, daß Du Mario\n\
 siehst. Das ist die\n\
 Standardeinstellung.\n\
 Diese Kamera steuerst Du\n\
-mit den [C]-Knöpfen.\n\
-Drückst Du die [R]-Taste,\n\
+mit den Ⓒ-Knöpfen.\n\
+Drückst Du die Ⓡ-Taste,\n\
 wechselst Du zwischen\n\
 Lakitus und Marios\n\
 Sicht hin und her. Drücke\n\
@@ -452,7 +452,7 @@ Drücke ^ und genieße die\n\
 Aussicht. Vielleicht\n\
 entdeckst Du Geheimnisse\n\
 Deiner Umgebung.\n\
-Drücke [R], um zu Marios\n\
+Drücke Ⓡ, um zu Marios\n\
 Kamera zu wechseln. Sie\n\
 bleibt ständig hinter ihm.\n\
 Mit dieser Taste schaltest\n\
@@ -460,7 +460,7 @@ Du auch zurück auf Lakitu.\n\
 Im Pausenmodus kannst Du\n\
 weitere Einstellungen\n\
 vornehmen. Wähle „Stativ』\n\
-und halte die [R]-Taste\n\
+und halte die Ⓡ-Taste\n\
 gedrückt!"))
 
 DEFINE_DIALOG(DIALOG_037, SOUND_OBJ_BIG_PENGUIN_YELL, 3, 30, 200, _("\
@@ -525,15 +525,15 @@ Marios Blickrichtung.\n\
 Mario läßt die Kante los,\n\
 wenn Du den Analog-Stick\n\
 in Richtung seines Rückens\n\
-bewegst oder [Z] drückst.\n\
+bewegst oder Ⓩ drückst.\n\
 Bist Du in Eile, kannst\n\
 Du auch durch einen\n\
 beherzten Sprung mit dem\n\
-[A]-Knopf hinauf gelangen."))
+Ⓐ-Knopf hinauf gelangen."))
 
 DEFINE_DIALOG(DIALOG_043, NO_SOUND, 4, 30, 200, _("\
 Wenn Du springst und den\n\
-[A]-Knopf gedrückt hältst,\n\
+Ⓐ-Knopf gedrückt hältst,\n\
 klammert sich Mario an\n\
 Objekte über ihm.\n\
 Auf diese Weise kannst\n\
@@ -585,8 +585,8 @@ wird jeder Sprung höher\n\
 als der vorherige sein.\n\
 Weiter zum Weitsprung!\n\
 Während Du rennst, mußt\n\
-Du den [Z]-Knopf und dann\n\
-den [A]-Knopf drücken.\n\
+Du den Ⓩ-Knopf und dann\n\
+den Ⓐ-Knopf drücken.\n\
 Und nun der Wandsprung!\n\
 Springe gegen eine Wand.\n\
 Sobald Du die Wand\n\
@@ -628,17 +628,17 @@ Sie kommt hier voll zum\n\
 Tragen!!!"))
 
 DEFINE_DIALOG(DIALOG_050, NO_SOUND, 4, 30, 200, _("\
-Drücke den [Z]-Knopf, um\n\
+Drücke den Ⓩ-Knopf, um\n\
 in die Hocke zu gehen und\n\
 einen Hang nach unten zu\n\
 rutschen.\n\
-Betätigst Du den [Z]-Knopf\n\
+Betätigst Du den Ⓩ-Knopf\n\
 während eines Sprungs,\n\
 führst Du eine\n\
 Stampfattacke aus.\n\
 Du machst einen\n\
 Rückwärtssalto, wenn\n\
-Du stehend den [Z]-Knopf\n\
+Du stehend den Ⓩ-Knopf\n\
 drückst und springst.\n\
 Es gibt weitere Varianten\n\
 zu entdecken. Nimm Dir\n\
@@ -651,7 +651,7 @@ Stangen klettern, wenn\n\
 Du gegen sie springst und\n\
 den Analog-Stick nach\n\
 oben drückst.\n\
-Mit dem [A]-Knopf kannst\n\
+Mit dem Ⓐ-Knopf kannst\n\
 Du nach HINTEN wieder\n\
 abspringen. Du kannst\n\
 sogar auf der Spitze\n\
@@ -665,9 +665,9 @@ Sprung."))
 DEFINE_DIALOG(DIALOG_052, NO_SOUND, 5, 30, 200, _("\
 Du machst einen\n\
 Rückwärtssalto, wenn\n\
-Du stehend den [Z]-Knopf\n\
+Du stehend den Ⓩ-Knopf\n\
 gedrückt hältst und dann\n\
-den [A]-Knopf betätigst.\n\
+den Ⓐ-Knopf betätigst.\n\
 Seitwärtssaltos führst\n\
 Du aus, indem Du den\n\
 Analog-Stick entgegen\n\
@@ -772,7 +772,7 @@ Schwimme zur Oberfläche\n\
 oder sammle Münzen und\n\
 Luftblasen, um wieder\n\
 Sauerstoff zu tanken.\n\
-Drücke den [A]-Knopf, um\n\
+Drücke den Ⓐ-Knopf, um\n\
 zu schwimmen. Halte ihn\n\
 gedrückt, um mit den\n\
 Füßen zu paddeln.\n\
@@ -831,17 +831,17 @@ an Höhe zu gewinnen.\n\
 Drücke den Analog-Stick\n\
 nach oben, um im Flug\n\
 an Höhe zu verlieren.\n\
-Betätige den [Z]-Knopf,\n\
+Betätige den Ⓩ-Knopf,\n\
 um den Flug zu beenden\n\
 und sicher zu landen."))
 
 DEFINE_DIALOG(DIALOG_065, NO_SOUND, 5, 30, 200, _("\
 Schwimmen für Anfänger!\n\
-Drücke den [A]-Knopf für\n\
+Drücke den Ⓐ-Knopf für\n\
 einen Schwimmzug. Bei\n\
 richtigem Timing kannst\n\
 Du sehr schnell schwimmen.\n\
-Halte den [A]-Knopf\n\
+Halte den Ⓐ-Knopf\n\
 gedrückt, um mit den\n\
 Füßen zu paddeln. Mit\n\
 dieser Technik bewegst Du\n\
@@ -875,7 +875,7 @@ Dich mit seinem Feueratem\n\
 zu versengen.\n\
 Renne hinter ihn!\n\
 Versuche mit dem\n\
-[B]-Knopf Bowsers\n\
+Ⓑ-Knopf Bowsers\n\
 Schwanz zu packen und\n\
 ihn herumzuschleudern.\n\
 Bewege den Analog-Stick\n\
@@ -883,12 +883,12 @@ im Kreis, um Dich zu\n\
 drehen. Je schneller\n\
 Du Dich drehst, desto\n\
 weiter wird Dein Wurf.\n\
-Benutze die [C]-Knöpfe, um\n\
+Benutze die Ⓒ-Knöpfe, um\n\
 Dich zu orientieren. Du\n\
 mußt Bowser gegen eine\n\
 der Bomben am Rand der\n\
 Plattform werfen.\n\
-Drücke den [B]-Knopf, um\n\
+Drücke den Ⓑ-Knopf, um\n\
 Bowser loszulassen und\n\
 in Richtung der Bombe\n\
 zu schleudern.\n\
@@ -1224,8 +1224,8 @@ des Schlosses!!!"))
 DEFINE_DIALOG(DIALOG_094, NO_SOUND, 4, 30, 200, _("\
 Erinnerst Du Dich noch an\n\
 den Weitsprung? Renne,\n\
-drücke den [Z]-Knopf und\n\
-dann den [A]-Knopf!"))
+drücke den Ⓩ-Knopf und\n\
+dann den Ⓐ-Knopf!"))
 
 DEFINE_DIALOG(DIALOG_095, NO_SOUND, 3, 30, 200, _("\
 Wie man Schilder liest,\n\
@@ -1302,7 +1302,7 @@ die schwebende Insel\n\
 erreichen!\n\
 Benutze den Analog-Stick\n\
 zum Zielen und feuere die\n\
-Kanone mit dem [A]-Knopf\n\
+Kanone mit dem Ⓐ-Knopf\n\
 ab. Akrobaten bevorzugen\n\
 Bäume zur Landung!"))
 
@@ -1917,14 +1917,14 @@ kannst Du einen\n\
 Rückwärtssalto ausführen.\n\
 Du machst einen\n\
 Weitsprung, wenn Du im\n\
-Rennen den [Z]-Knopf\n\
+Rennen den Ⓩ-Knopf\n\
 drückst und springst."))
 
 DEFINE_DIALOG(DIALOG_160, NO_SOUND, 6, 30, 200, _("\
 Drücke im Rennen den\n\
-[B]-Knopf, um einen\n\
+Ⓑ-Knopf, um einen\n\
 Hechtsprung zu machen.\n\
-Mit dem [A]- oder [B]-Knopf\n\
+Mit dem Ⓐ- oder Ⓑ-Knopf\n\
 kommt Mario auf die Füße\n\
 zurück."))
 
@@ -2035,14 +2035,14 @@ Sieh Dich zunächst hier\n\
 im Schlossgarten um.\n\
 Die Steuerung ist ganz\n\
 einfach:\n\
-Drücke den [A]-Knopf, um\n\
+Drücke den Ⓐ-Knopf, um\n\
 zu springen.\n\
 Schläge kannst Du mit\n\
-dem [B]-Knopf ausführen.\n\
-Drückst Du den [Z]-Knopf,\n\
+dem Ⓑ-Knopf ausführen.\n\
+Drückst Du den Ⓩ-Knopf,\n\
 duckt sich Mario.\n\
 Schilder kannst Du mit\n\
-dem [A]- oder [B]-Knopf\n\
+dem Ⓐ- oder Ⓑ-Knopf\n\
 lesen, wenn Du direkt\n\
 davor stehst."))
 
