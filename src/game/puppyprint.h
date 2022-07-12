@@ -78,7 +78,8 @@ enum PPPages {
 enum PuppyFont {
     FONT_DEFAULT,
     FONT_OUTLINE,
-    FONT_NUM,
+    FONT_PLAIN,
+    FONT_NUM
 };
 
 extern u8 sPPDebugPage;

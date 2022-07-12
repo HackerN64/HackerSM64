@@ -1342,6 +1342,29 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     return len;
 }
 
+void font_offsets(s8 *offsetY, s32 font, u8 letter) {
+    switch (font) {
+        case FONT_DEFAULT:
+            switch (letter) {
+                // This is for the letters that sit differently on the line. It just moves them down a bit.
+                case 'g': *offsetY = 1 * textSizeTotal; break;
+                case 'q': *offsetY = 1 * textSizeTotal; break;
+                case 'p': *offsetY = 1 * textSizeTotal; break;
+                case 'y': *offsetY = 1 * textSizeTotal; break;
+            }
+        break;
+        case FONT_PLAIN:
+            switch (letter) {
+                // This is for the letters that sit differently on the line. It just moves them down a bit.
+                case 'g': *offsetY = 3 * textSizeTotal; break;
+                case 'q': *offsetY = 3 * textSizeTotal; break;
+                case 'p': *offsetY = 3 * textSizeTotal; break;
+                case 'y': *offsetY = 2 * textSizeTotal; break;
+            }
+        break;
+    }
+}
+
 void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font) {
     *offsetY = 0;
     u32 let = letter - '!';
@@ -1364,14 +1387,8 @@ void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font)
         *textX = (let) * 4;
         *spaceX = textLen[let];
 
-        if (font == FONT_DEFAULT) {
-            switch (letter) {
-                // This is for the letters that sit differently on the line. It just moves them down a bit.
-                case 'g': *offsetY = 1 * textSizeTotal; break;
-                case 'q': *offsetY = 1 * textSizeTotal; break;
-                case 'p': *offsetY = 1 * textSizeTotal; break;
-                case 'y': *offsetY = 1 * textSizeTotal; break;
-            }
+        if (font != FONT_OUTLINE) {
+            font_offsets(offsetY, font, letter);
         }
     } else {
         *textX = -12;

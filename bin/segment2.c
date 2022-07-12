@@ -16,9 +16,13 @@ ALIGNED8 static const Texture small_font_1[] = {
 ALIGNED8 static const Texture small_font_2[] = {
 #include "textures/segment2/custom_text2.i4.inc.c"
 };
+ALIGNED8 static const Texture small_font_3[] = {
+#include "textures/segment2/custom_text3.i4.inc.c"
+};
 
-const Texture *const puppyprint_font_lut[2] = {
-    small_font_1, small_font_2
+
+const Texture *const puppyprint_font_lut[] = {
+    small_font_1, small_font_2, small_font_3
 };
 
 static const u8 small_font_kerning_1[82] = {
@@ -39,8 +43,17 @@ static const u8 small_font_kerning_2[82] = {
     /*z*/ 5, /*~*/ 6,   
 };
 
-const u8 *const puppyprint_kerning_lut[2][82] = {
-    small_font_kerning_1, small_font_kerning_2
+static const u8 small_font_kerning_3[82] = {
+    /*!*/ 5, /*"*/ 4, /*#*/ 0, /*$*/ 0, /*%*/ 6, /*&*/ 7, /*'*/ 2, /*(*/ 4, /*)*/ 4, /***/ 0, /*+*/ 6, /*,*/ 2, /*-*/ 6, /*.*/ 2, /*/*/ 6, /*0*/ 6,
+    /*1*/ 5, /*2*/ 5, /*3*/ 5, /*4*/ 5, /*5*/ 5, /*6*/ 5, /*7*/ 5, /*8*/ 5, /*9*/ 5, /*:*/ 3, /*;*/ 3, /*?*/ 6, /*A*/ 6, /*B*/ 6, /*C*/ 6, /*D*/ 6,
+    /*E*/ 6, /*F*/ 6, /*G*/ 6, /*H*/ 6, /*I*/ 4, /*J*/ 6, /*K*/ 6, /*L*/ 6, /*M*/ 7, /*N*/ 7, /*O*/ 6, /*P*/ 6, /*Q*/ 6, /*R*/ 6, /*S*/ 6, /*T*/ 6,
+    /*U*/ 6, /*V*/ 6, /*W*/ 7, /*X*/ 6, /*Y*/ 6, /*Z*/ 6, /*^*/ 7, /*a*/ 6, /*b*/ 6, /*c*/ 6, /*d*/ 6, /*e*/ 6, /*f*/ 6, /*g*/ 6, /*h*/ 6, /*i*/ 3,
+    /*j*/ 4, /*k*/ 6, /*l*/ 5, /*m*/ 7, /*n*/ 6, /*o*/ 6, /*p*/ 6, /*q*/ 6, /*r*/ 6, /*s*/ 6, /*t*/ 6, /*u*/ 6, /*v*/ 6, /*w*/ 7, /*x*/ 6, /*y*/ 6, 
+    /*z*/ 6, /*~*/ 7,   
+};
+
+const u8 *const puppyprint_kerning_lut[][82] = {
+    small_font_kerning_1, small_font_kerning_2, small_font_kerning_3
 };
 
 #endif
