@@ -27,8 +27,7 @@ u32 prev_time;
 u32 audio_start;
 u32 audio_buffer_index;
 u32 preempted_time;
-u32 collision_time;
-u32 delta_time[DELTA_TIME_COUNT];
+u32 collision_time = 0;
 
 static void buffer_update(ProfileTimeData* data, u32 new, int buffer_index) {
     u32 old = data->counts[buffer_index];
@@ -37,12 +36,12 @@ static void buffer_update(ProfileTimeData* data, u32 new, int buffer_index) {
     data->counts[buffer_index] = new;
 }
 
-void profiler_update(enum ProfilerTime which) {
+void profiler_update(enum ProfilerTime which, u32 delta) {
     u32 cur_time = osGetCount();
     u32 diff;
     ProfileTimeData* cur_data = &all_profiling_data[which];
 
-    diff = cur_time - prev_time;
+    diff = cur_time - prev_time - delta;
 
     u32 saved = __osDisableInt();
     u32 cur_preempted_time = preempted_time;
@@ -96,10 +95,6 @@ void profiler_collision_update(u32 time) {
     collision_time += osGetCount() - time;
 }
 
-void profiler_update_delta(enum ProfilerDeltaTime which, u32 time) {
-    delta_time[which] = time;
-}
-
 void profiler_collision_completed() {
     ProfileTimeData* cur_data = &all_profiling_data[PROFILER_TIME_COLLISION];
     buffer_update(cur_data, collision_time, profile_buffer_index);
@@ -109,12 +104,6 @@ u32 profiler_get_delta(enum ProfilerDeltaTime which) {
     switch (which) {
         case PROFILER_DELTA_COLLISION:
             return collision_time;
-#if PUPPYPRINT_DEBUG
-        case PROFILER_DELTA_PUPPYPRINT1:
-            return all_profiling_data[PROFILER_TIME_PUPPYPRINT1].counts[profile_buffer_index];
-        case PROFILER_DELTA_PUPPYPRINT2:
-            return all_profiling_data[PROFILER_TIME_PUPPYPRINT2].counts[profile_buffer_index];
-#endif
         default:
         return 0;
     }
@@ -149,7 +138,7 @@ static void update_total_timer() {
     __osRestoreInt(saved);
 
     prev_time = start + cur_preempted_time;
-    profiler_update(PROFILER_TIME_TOTAL);
+    profiler_update(PROFILER_TIME_TOTAL, PROFILER_TIME_PUPPYPRINT1 + PROFILER_DELTA_PUPPYPRINT2);
 }
 
 #ifdef PUPPYPRINT_DEBUG
@@ -228,17 +217,15 @@ void profiler_print_times() {
     update_total_timer();
     update_rdp_timers();
 
-#ifndef PUPPYPRINT_DEBUG
+#if PUPPYPRINT_DEBUG == 0
     static u8 show_profiler = 0;
     if (gPlayer1Controller->buttonPressed & L_TRIG) {
         show_profiler ^= 1;
     }
 #endif
-    all_profiling_data[PROFILER_TIME_GFX].counts[profile_buffer_index] -= delta_time[PROFILER_DELTA_COLLISION_GFX];
-    //all_profiling_data[PROFILER_TIME_CAMERA].counts[profile_buffer_index] -= delta_time[PROFILER_DELTA_COLLISION_CAMERA];
 
-#ifdef PUPPYPRINT_DEBUG
-    if (fDebug && sPPDebugPage == PUPPYPRINT_PAGE_STANDARD) {
+#if PUPPYPRINT_DEBUG
+    if (fDebug && sPPDebugPage == PUPPYPRINT_PAGE_PROFILER) {
 #else
     if (show_profiler) {
 #endif
@@ -259,13 +246,18 @@ void profiler_print_times() {
             "FPS: %5.2f\n"
             "\n"
             "CPU\t\t%d (%d%%)\n"
-#if PUPPYPRINT_DEBUG == 0
             " Input\t\t%d\n"
+#if PUPPYPRINT_DEBUG
+            " Collision\t\t%d\n"
+#else
             " Dynamic\t\t%d\n"
+#endif
             " Mario\t\t\t%d\n"
             " Behavior\t\t%d\n"
             " Graph\t\t%d\n"
             " Audio\t\t\t%d\n"
+#if PUPPYPRINT_DEBUG
+            " Camera\t\t%d\n"
 #endif
             "\n"
             "RDP\t\t%d (%d%%)\n"
@@ -278,13 +270,18 @@ void profiler_print_times() {
             " Audio\t\t\t%d\n",
             1000000.0f / microseconds[PROFILER_TIME_FPS],
             total_cpu, total_cpu / 333, 
-#if PUPPYPRINT_DEBUG == 0
             microseconds[PROFILER_TIME_CONTROLLERS],
+#if PUPPYPRINT_DEBUG
+            microseconds[PROFILER_TIME_COLLISION],
+#else
             microseconds[PROFILER_TIME_DYNAMIC],
+#endif
             microseconds[PROFILER_TIME_MARIO],
             microseconds[PROFILER_TIME_BEHAVIOR_BEFORE_MARIO] + microseconds[PROFILER_TIME_BEHAVIOR_AFTER_MARIO],
             microseconds[PROFILER_TIME_GFX],
             microseconds[PROFILER_TIME_AUDIO] * 2, // audio is 60Hz, so double the average
+#if PUPPYPRINT_DEBUG
+            microseconds[PROFILER_TIME_CAMERA],
 #endif
             max_rdp, max_rdp / 333,
             microseconds[PROFILER_TIME_TMEM],
@@ -294,23 +291,6 @@ void profiler_print_times() {
             microseconds[PROFILER_TIME_RSP_GFX],
             microseconds[PROFILER_TIME_RSP_AUDIO]
         );
-#if PUPPYPRINT_DEBUG
-        sprintf(gStandardProfilerInfo, "Collision: %dus\n"
-                        "Graph: %dus\n"
-                        "Behaviour: %dus\n"
-                        "Mario: %dus\n"
-                        "Audio: %dus\n"
-                        "Camera: %dus\n"
-                        "Controller: %dus\n",
-                        microseconds[PROFILER_TIME_COLLISION],
-                        microseconds[PROFILER_TIME_GFX],
-                        microseconds[PROFILER_TIME_BEHAVIOR_BEFORE_MARIO] + microseconds[PROFILER_TIME_BEHAVIOR_AFTER_MARIO],
-                        microseconds[PROFILER_TIME_MARIO],
-                        microseconds[PROFILER_TIME_AUDIO] * 2,
-                        microseconds[PROFILER_TIME_CAMERA],
-                        microseconds[PROFILER_TIME_CONTROLLERS]
-                        );
-#endif
 
         Gfx* dlHead = gDisplayListHead;
         gDPPipeSync(dlHead++);
@@ -319,7 +299,7 @@ void profiler_print_times() {
         gDPSetTexturePersp(dlHead++, G_TP_NONE);
         gDPSetTextureFilter(dlHead++, G_TF_POINT);
         gDPSetTextureLUT(dlHead++, G_TT_NONE);
-        drawSmallStringCol(&dlHead, 10, 10, text_buffer, 255, 255, 255);
+        drawSmallStringCol(&dlHead, 10, 8, text_buffer, 255, 255, 255);
         gDisplayListHead = dlHead;
     }
 }

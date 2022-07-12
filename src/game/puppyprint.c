@@ -45,6 +45,7 @@ a modern game engine's developer's console.
 #include "debug_box.h"
 #include "color_presets.h"
 #include "buffers/buffers.h"
+#include "profiling.h"
 
 #ifdef PUPPYPRINT
 
@@ -82,6 +83,7 @@ s32 mempool;
 u32 gPoolMem;
 u32 gPPSegScroll = 0;
 u32 gMiscMem = 0;
+struct CallCounter gPuppyCallCounter;
 
 extern u8 _mainSegmentStart[];
 extern u8 _mainSegmentEnd[];
@@ -292,21 +294,21 @@ void print_ram_overview(void) {
     print_set_envcolour(255, 255, 255, 255);
     sprintf(textBytes, "Total:");
     print_small_text_light(24, 16- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "%06X",RAM_END - 0x80000000);
+    sprintf(textBytes, "0x%06X",RAM_END - 0x80000000);
     print_small_text_light(SCREEN_WIDTH/2, 16 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "%X", mempool);
+    sprintf(textBytes, "0x%X", mempool);
     print_small_text_light(SCREEN_WIDTH - 24, 16 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "Used:");
     print_small_text_light(24, 28- gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "%06X", (RAM_END - 0x80000000) - (main_pool_available() - 0x400));
+    sprintf(textBytes, "0x%06X", (RAM_END - 0x80000000) - (main_pool_available() - 0x400));
     print_small_text_light(SCREEN_WIDTH/2, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "(%2.3f_)", 100.0f - (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
+    sprintf(textBytes, "(%2.3f%%)", 100.0f - (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
     print_small_text_light(SCREEN_WIDTH - 24, 28 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "Free:");
     print_small_text_light(24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "%X", (main_pool_available() - 0x400));
+    sprintf(textBytes, "0x%X", (main_pool_available() - 0x400));
     print_small_text_light(SCREEN_WIDTH/2, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-    sprintf(textBytes, "(%2.3f_)", (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
+    sprintf(textBytes, "(%2.3f%%)", (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
     print_small_text_light(SCREEN_WIDTH - 24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
     for (u8 i = 0; i < 32; i++) {
         if (tempNums[i] == 0) {
@@ -319,9 +321,9 @@ void print_ram_overview(void) {
                 sprintf(textBytes, "%s:", segNames[tempPos[i] - nameTable]);
             }
             print_small_text_light(24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_DEFAULT);
-            sprintf(textBytes, "%X", tempNums[i]);
+            sprintf(textBytes, "0x%X", tempNums[i]);
             print_small_text_light(SCREEN_WIDTH/2, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-            sprintf(textBytes, "(%2.3f_)", ((f32)tempNums[i] / ramSize) * 100.0f);
+            sprintf(textBytes, "(%2.3f%%)", ((f32)tempNums[i] / ramSize) * 100.0f);
             print_small_text_light(SCREEN_WIDTH - 24, y - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
         }
         y += 12;
@@ -362,7 +364,7 @@ void print_audio_ram_overview(void) {
             percentage = (((s64) audioPoolSizes[i][1] * 1000) / audioPoolSizes[i][0]);
         }
 
-        sprintf(textBytes, "%s: %X / %X (%d.%d_)", audioPoolNames[i],
+        sprintf(textBytes, "%s: %X / %X (%d.%d%%)", audioPoolNames[i],
                 audioPoolSizes[i][1],
                 audioPoolSizes[i][0],
                 percentage / 10,
@@ -385,7 +387,7 @@ void print_audio_ram_overview(void) {
         percentage = (((s64) totalMemory[1] * 1000) / totalMemory[0]);
     }
     if (totalMemory[0] == gAudioHeapSize) {
-        sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d_)",
+        sprintf(textBytes, "TOTAL AUDIO MEMORY: %X / %X (%d.%d%%)",
                 totalMemory[1],
                 totalMemory[0],
                 percentage / 10,
@@ -474,35 +476,25 @@ void print_basic_profiling(void) {
     u32 rspTime = profiler_get_rsp_microseconds();
     u32 rdpTime = profiler_get_rdp_microseconds();
     print_fps(16, 40);
-    sprintf(textBytes, "CPU: %dus (%d_)#RSP: %dus (%d_)#RDP: %dus (%d_)",
+    sprintf(textBytes, "CPU: %dus (%d%%)#RSP: %dus (%d%%)#RDP: %dus (%d%%)",
             cpuTime, (cpuTime / 333),
             rspTime, (rspTime / 333),
             rdpTime, (rdpTime / 333));
     print_small_text_light(16, 52, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
 }
 
-char gStandardProfilerInfo[90];
-
 void puppyprint_render_standard(void) {
-    char textBytes[GENERAL_PAGE_TEXT_LENGTH];
+    char textBytes[128];
 
-    sprintf(textBytes, "OBJ: %d/%d", gObjectCounter, OBJECT_POOL_CAPACITY);
-    print_small_text_light(16, 124, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
-
-#ifndef ENABLE_CREDITS_BENCHMARK
-    // Very little point printing useless info if Mario doesn't even exist.
-    if (gMarioState->marioObj) {
-        sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
-            (s32)(gMarioState->pos[0]),
-            (s32)(gMarioState->pos[1]),
-            (s32)(gMarioState->pos[2]),
-            (u16)(gMarioState->faceAngle[1]),
-            (u32)(gMarioState->action & ACT_ID_MASK));
-        print_small_text_light(16, 140, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
-    }
-#endif
-
-    print_small_text_light((SCREEN_WIDTH - 24), 40, gStandardProfilerInfo, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+    sprintf(textBytes, "Matrix Muls: %d\n\nCollision Checks\nFloors: %d\nWalls: %d\nCeilings: %d\n Water: %d\nRaycasts: %d",
+    gPuppyCallCounter.matrix,
+    gPuppyCallCounter.collision_floor,
+    gPuppyCallCounter.collision_wall,
+    gPuppyCallCounter.collision_ceil,
+    gPuppyCallCounter.collision_water,
+    gPuppyCallCounter.collision_raycast
+    );
+    print_small_text_light(SCREEN_WIDTH-16, 32, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
 }
 
 void puppyprint_render_minimal(void) {
@@ -591,12 +583,61 @@ void puppyprint_level_select_menu(void) {
     }
 }
 
-struct PuppyPrintPage ppPages[] = {
-    {&puppyprint_render_standard, "Standard"},
-    {&puppyprint_render_minimal, "Minimal"},
-#ifdef USE_PROFILER
-    {NULL, "Wise Profiler"}, // Use Wiseguy's lightweight profiler instead.
+u8 gLastWarpID = 0;
+
+void puppyprint_render_general_vars(void) {
+    
+    char textBytes[200];
+    u32 floorType = 0;
+    u32 objParams = 0;
+    if (gMarioState->floor) {
+        floorType = gMarioState->floor->type;
+    }
+    if (gMarioState->interactObj) {
+        objParams = gMarioState->interactObj->oBehParams;
+    }
+
+
+    sprintf(textBytes, "World\n\nObjects: %d/%d\n\nLevel ID: %d\nCourse ID: %d\nArea ID: %d\nRoom ID: %d\n\nInteract:   \n0x%08X\nWarp: 0x%02X", 
+    gObjectCounter, 
+    OBJECT_POOL_CAPACITY,
+    gCurrLevelNum,
+    gCurrCourseNum,
+    gCurrAreaIndex,
+    gMarioCurrentRoom,
+    objParams,
+    gLastWarpID
+    );
+    print_small_text_light(SCREEN_WIDTH - 16, 36, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
+
+#ifndef ENABLE_CREDITS_BENCHMARK
+    // Very little point printing useless info if Mario doesn't even exist.
+    if (gMarioState->marioObj) {
+        sprintf(textBytes, "Mario\n\nX: %d\nY: %d\nZ: %d\nYaw: 0x%04X\n\nfVel: %1.1f\nyVel: %1.1f\n\nHealth: %03X\nAction: 0x%02X\nFloor Type: 0x%02X\nWater Height: %d",
+            (s32)(gMarioState->pos[0]),
+            (s32)(gMarioState->pos[1]),
+            (s32)(gMarioState->pos[2]),
+            (u16)(gMarioState->faceAngle[1]),
+            (f32)(gMarioState->forwardVel),
+            (f32)(gMarioState->vel[1]),
+            (s32)(gMarioState->health),
+            (u32)(gMarioState->action & ACT_ID_MASK),
+            (u32)(floorType),
+            (s32)(gMarioState->waterLevel)
+            );
+        print_small_text_light(16, 36, textBytes, PRINT_TEXT_ALIGN_LEFT, PRINT_ALL, FONT_OUTLINE);
+        sprintf(textBytes, "Gfx Pool: %d / %d", ((u32)gDisplayListHead - ((u32)gGfxPool->buffer)) / 4, GFX_POOL_SIZE);
+        print_small_text_light(SCREEN_WIDTH/2, SCREEN_HEIGHT-16, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+    }
 #endif
+}
+
+struct PuppyPrintPage ppPages[] = {
+#ifdef USE_PROFILER
+    {&puppyprint_render_standard, "Profiler"},
+    {&puppyprint_render_minimal, "Minimal"},
+#endif
+    {&puppyprint_render_general_vars, "General"},
     {&print_audio_ram_overview, "Audio"},
     {&print_ram_overview, "Segments"},
     {&puppyprint_render_collision, "Collision"},
@@ -643,7 +684,7 @@ void puppyprint_render_profiler(void) {
     print_set_envcolour(255, 255, 255, 255);
 
     if (!fDebug) {
-        //puppyprint_profiler_update(gPuppyTimers.profilerTime, first);
+        profiler_update(PROFILER_TIME_PUPPYPRINT1, osGetCount() - first);
         return;
     }
     if (ppPages[sPPDebugPage].func != NULL) {
@@ -653,11 +694,11 @@ void puppyprint_render_profiler(void) {
     if (sDebugMenu) {
         render_page_menu();
     }
-    profiler_update(PROFILER_TIME_PUPPYPRINT1);
+    profiler_update(PROFILER_TIME_PUPPYPRINT1, osGetCount() - first);
 }
 
 void puppyprint_profiler_process(void) {
-    u32 newTime = osGetCount();
+    u32 first = osGetCount();
 
     if (fDebug && (gPlayer1Controller->buttonPressed & L_TRIG)) {
         sDebugMenu ^= TRUE;
@@ -752,7 +793,7 @@ void puppyprint_profiler_process(void) {
             }
         }
     }
-    profiler_update(PROFILER_TIME_PUPPYPRINT2);
+    profiler_update(PROFILER_TIME_PUPPYPRINT2, osGetCount() - first);
 }
 #endif
 
@@ -810,7 +851,7 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
         if (a == 255) {
             gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
         } else {
-            gDPSetRenderMode(gDisplayListHead++, G_RM_CLD_SURF, G_RM_CLD_SURF2);
+            gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         }
         cycleadd = 0;
     }
@@ -845,7 +886,7 @@ void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, 
     if (a == 255) {
         gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
     } else {
-        gDPSetRenderMode(gDisplayListHead++, G_RM_CLD_SURF, G_RM_CLD_SURF2);
+        gDPSetRenderMode(gDisplayListHead++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
     }
     gDPSetFillColor(gDisplayListHead++, GPACK_RGBA5551(r, g, b, 1) << 16 | GPACK_RGBA5551(r, g, b, 1));
     print_set_envcolour(r, g, b, a);
@@ -971,7 +1012,7 @@ static s8 sTextShakeTable[] = {
 void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
     s32 textX = 0;
     s32 textPos[2] = { 0, 0 };
-    s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    u16 wideX[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     s32 textLength = amount;
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
     s32 strLen = strlen(str);
@@ -1112,7 +1153,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
 void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
     s32 textX = 0;
     s32 textPos[2] = { 0, 0 };
-    s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    u16 wideX[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     s32 textLength = amount;
     s32 prevxlu = 256; // Set out of bounds, so it will *always* be different at first.
     s32 strLen = strlen(str);
@@ -1322,7 +1363,7 @@ void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font)
                 // This is for the letters that sit differently on the line. It just moves them down a bit.
                 case 'g': *offsetY = 1 * textSizeTotal; break;
                 case 'q': *offsetY = 1 * textSizeTotal; break;
-                case 'p': *offsetY = 3 * textSizeTotal; break;
+                case 'p': *offsetY = 1 * textSizeTotal; break;
                 case 'y': *offsetY = 1 * textSizeTotal; break;
             }
         }

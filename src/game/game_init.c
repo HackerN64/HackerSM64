@@ -767,7 +767,9 @@ void thread5_game_loop(UNUSED void *arg) {
             draw_reset_bars();
             continue;
         }
-
+#if PUPPYPRINT_DEBUG
+    bzero(&gPuppyCallCounter, sizeof(gPuppyCallCounter));
+#endif
         // If any controllers are plugged in, start read the data for when
         // read_controller_inputs is called later.
         if (gControllerBits) {
@@ -781,7 +783,7 @@ void thread5_game_loop(UNUSED void *arg) {
         audio_game_loop_tick();
         select_gfx_pool();
         read_controller_inputs(THREAD_5_GAME_LOOP);
-        profiler_update(PROFILER_TIME_CONTROLLERS);
+        profiler_update(PROFILER_TIME_CONTROLLERS, 0);
         profiler_collision_reset();
         addr = level_script_execute(addr);
         profiler_collision_completed();

@@ -424,6 +424,7 @@ void init_mario_after_warp(void) {
     }
 #if PUPPYPRINT_DEBUG
     gPuppyWarp = 0;
+    gLastWarpID = sWarpDest.nodeId;
     gPuppyWarpArea = 0;
 #endif
 }

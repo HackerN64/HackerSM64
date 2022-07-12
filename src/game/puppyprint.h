@@ -11,6 +11,15 @@
 #define LOG_BUFFER_SIZE       16
 #define PUPPYPRINT_DEFERRED_BUFFER_SIZE 0x1000
 
+struct CallCounter {
+    u16 collision_floor;
+    u16 collision_wall;
+    u16 collision_ceil;
+    u16 collision_water;
+    u16 collision_raycast;
+    u16 matrix;
+};
+
 struct PuppyPrintPage{
     void (*func)();
     char name[32];
@@ -43,11 +52,11 @@ enum rspFlags
 };
 
 enum PPPages {
-    PUPPYPRINT_PAGE_STANDARD,
-    PUPPYPRINT_PAGE_MINIMAL,
 #ifdef USE_PROFILER
-    PUPPYPRINT_PAGE_WISEGUY,
+    PUPPYPRINT_PAGE_PROFILER,
+    PUPPYPRINT_PAGE_MINIMAL,
 #endif
+    PUPPYPRINT_PAGE_GENERAL,
     PUPPYPRINT_PAGE_AUDIO,
     PUPPYPRINT_PAGE_RAM,
     PUPPYPRINT_PAGE_COLLISION,
@@ -83,7 +92,8 @@ extern u32 gPoolMem;
 extern u32 gMiscMem;
 extern u8 gPuppyWarp;
 extern u8 gPuppyWarpArea;
-extern char gStandardProfilerInfo[90];
+extern u8 gLastWarpID;
+extern struct CallCounter gPuppyCallCounter;
 
 extern void puppyprint_render_profiler(void);
 extern void print_set_envcolour(u8 r, u8 g, u8 b, u8 a);
@@ -105,3 +115,4 @@ extern s32 puppyprint_strlen(const char *str);
 extern void set_segment_memory_printout(u32 segment, u32 amount);
 extern void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font);
 extern void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
+void puppyprint_profiler_process(void);

@@ -547,11 +547,13 @@ void clear_objects(void) {
  * Update spawner and surface objects.
  */
 void update_terrain_objects(void) {
+    u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
     gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
-    profiler_update(PROFILER_TIME_SPAWNER);
+    profiler_update(PROFILER_TIME_SPAWNER, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
 
+    first = profiler_get_delta(PROFILER_DELTA_COLLISION);
     gObjectCounter += update_objects_in_list(&gObjectLists[OBJ_LIST_SURFACE]);
-    profiler_update(PROFILER_TIME_DYNAMIC);
+    profiler_update(PROFILER_TIME_DYNAMIC, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
 
     // If the dynamic surface pool has overflowed, throw an error.
     assert((uintptr_t)gDynamicSurfacePoolEnd <= (uintptr_t)gDynamicSurfacePool + DYNAMIC_SURFACE_POOL_SIZE, "Dynamic surface pool size exceeded");
@@ -567,11 +569,13 @@ void update_non_terrain_objects(void) {
     s32 i = 2;
     while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
         if (listIndex == OBJ_LIST_PLAYER) {
-            profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO);
+            u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
+            profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
         }
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
         if (listIndex == OBJ_LIST_PLAYER) {
-            profiler_update(PROFILER_TIME_MARIO);
+            u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
+            profiler_update(PROFILER_TIME_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
         }
         i++;
     }
@@ -620,7 +624,6 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  */
 void update_objects(UNUSED s32 unused) {
     //s64 cycleCounts[30];
-    u32 colFirst = profiler_get_delta(PROFILER_DELTA_COLLISION);
 
     // cycleCounts[0] = get_current_clock();
 
@@ -652,6 +655,8 @@ void update_objects(UNUSED s32 unused) {
 
     // Update all other objects that haven't been updated yet
     update_non_terrain_objects();
+    
+    u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
 
     // Unload any objects that have been deactivated
     unload_deactivated_objects();
@@ -670,6 +675,5 @@ void update_objects(UNUSED s32 unused) {
     }
 
     gPrevFrameObjectCount = gObjectCounter;
-    profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO);
-    profiler_update_delta(PROFILER_DELTA_COLLISION_BHV, colFirst);
+    profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
 }
