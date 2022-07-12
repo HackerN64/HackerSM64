@@ -865,7 +865,7 @@ void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, 
 }
 
 extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
-extern void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, u8 *spaceX, s8 *offsetY, u8 font);
+extern void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font);
 
 s8 shakeToggle = 0;
 s8 waveToggle = 0;
@@ -881,7 +881,7 @@ s32 get_text_width(const char *str, s32 font) {
     s32 i       = 0;
     s32 textPos = 0;
     s32 wideX   = 0;
-    s32 textX, textY;
+    s32 textX;
     s8 offsetY;
     u8 spaceX;
     s32 strLen = (signed)strlen(str);
@@ -906,7 +906,7 @@ s32 get_text_width(const char *str, s32 font) {
         if (i >= strLen)
             break;
 
-        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+        get_char_from_byte(str[i], &textX, &spaceX, &offsetY, font);
         textPos += (spaceX + 1) * textSizeTotal;
         wideX = MAX(textPos, wideX);
     }
@@ -970,7 +970,6 @@ static s8 sTextShakeTable[] = {
 
 void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
     s32 textX = 0;
-    s32 textY = 0;
     s32 textPos[2] = { 0, 0 };
     s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     s32 textLength = amount;
@@ -1017,7 +1016,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
             if (i >= strLen)
                 break;
 
-            get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+            get_char_from_byte(str[i], &textX, &spaceX, &offsetY, font);
             textPos[0] += (spaceX + 1) * textSizeTotal;
             wideX[lines] = MAX(textPos[0], wideX[lines]);
         }
@@ -1036,7 +1035,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     lines = 0;
     
     shakeTablePos = gGlobalTimer % sizeof(sTextShakeTable);
-    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 672, 12, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
         if (str[i] == '#' || str[i] == 0x0A) {
@@ -1081,7 +1080,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
             wavePos = 0;
         }
 
-        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+        get_char_from_byte(str[i], &textX, &spaceX, &offsetY, font);
         if (xlu != prevxlu) {
             prevxlu = xlu;
             if (xlu > 250) {
@@ -1095,7 +1094,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                                                     (y + textPos[1] + (s16)((shakePos[1] + offsetY + wavePos))) << 2,
                                                     (x + textPos[0] + (s16)((shakePos[0] + textOffsets[0]))) << 2,
                                                     (y + textPos[1] + (s16)((wavePos + offsetY + shakePos[1] + textOffsets[1]))) << 2,
-                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), textTempScale, textTempScale);
+                                                    G_TX_RENDERTILE, (textX << 6), (12 << 6), textTempScale, textTempScale);
         textPos[0] += (spaceX + 1) * textSizeTotal;
     }
 
@@ -1112,7 +1111,6 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
 // Around 30% faster than regular printing.
 void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font) {
     s32 textX = 0;
-    s32 textY = 0;
     s32 textPos[2] = { 0, 0 };
     s32 wideX[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     s32 textLength = amount;
@@ -1139,7 +1137,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
                 continue;
             }
 
-            get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+            get_char_from_byte(str[i], &textX, &spaceX, &offsetY, font);
             textPos[0] += (spaceX + 1) * textSizeTotal;
             wideX[lines] = MAX(textPos[0], wideX[lines]);
         }
@@ -1152,7 +1150,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
     }
 
     lines = 0;
-    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 128, 60, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 672, 12, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
         if (str[i] == '#' || str[i] == 0x0A) {
@@ -1166,7 +1164,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
             continue;
         }
 
-        get_char_from_byte(str[i], &textX, &textY, &spaceX, &offsetY, font);
+        get_char_from_byte(str[i], &textX, &spaceX, &offsetY, font);
         if (xlu != prevxlu) {
             prevxlu = xlu;
             if (xlu > 250) {
@@ -1180,7 +1178,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
                                                     (y + textPos[1] + offsetY) << 2,
                                                     (x + textPos[0] + 8) << 2,
                                                     (y + textPos[1] + offsetY + 12) << 2,
-                                                    G_TX_RENDERTILE, (textX << 6), (textY << 6), 1024, 1024);
+                                                    G_TX_RENDERTILE, (textX << 6), 0, 1024, 1024);
         textPos[0] += (spaceX + 1);
     }
 
@@ -1297,69 +1295,40 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     return len;
 }
 
-void get_char_from_byte(u8 letter, s32 *textX, s32 *textY, u8 *spaceX, s8 *offsetY, u8 font) {
+void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font) {
     *offsetY = 0;
+    u32 let = letter - '!';
     u8 **textKern = segmented_to_virtual(puppyprint_kerning_lut);
     u8 *textLen = segmented_to_virtual(textKern[font]);
 
-    if (letter >= '0' && letter <= '9') { // Line 1
-        *textX = ((letter - '0') * 4);
-        *textY = 0;
-        *spaceX = textLen[(letter - '0') +  0];
-    } else if (letter >= 'A' && letter <= 'P') { // Line 2
-        *textX = ((letter - 'A') * 4);
-        *textY = 6;
-        *spaceX = textLen[(letter - 'A') + 16];
-    } else if (letter >= 'Q' && letter <= 'Z') { // Line 3
-        *textX = ((letter - 'Q') * 4);
-        *textY = 12;
-        *spaceX = textLen[(letter - 'Q') + 32];
-    } else if (letter >= 'a' && letter <= 'p') { // Line 4
-        *textX = ((letter - 'a') * 4);
-        *textY = 18;
-        *spaceX = textLen[(letter - 'a') + 48];
-    } else if (letter >= 'q' && letter <= 'z') { // Line 5
-        *textX = ((letter - 'q') * 4);
-        *textY = 24;
-        *spaceX = textLen[(letter - 'q') + 64];
-    } else if (letter == '<' || letter == '>') {
-        *textX  = 128;
-        *textY  =  12;
-        *spaceX =   0;
-    }else { // Space, the final frontier.
-        *textX  = 128;
-        *textY  =  12;
-        *spaceX =   2;
-    }
+    if (letter != ' ') {
+        if (letter > 'z') {
+            let -= (3 + 2 + 3 + 1 + 3);
+        } else if (letter > '^') {
+            let -= (2 + 3 + 1 + 3);
+        } else if (letter > 'Z') {
+            let -= (3 + 1 + 3);
+        } else if (letter > '?') {
+            let -= (1 + 3);
+        } else if (letter > ';') {
+            let -= (3);
+        }
 
-    switch (letter) {
-        case '-': *textX = 40; *textY =  0; *spaceX = textLen[10]; break; // Hyphen
-        case '+': *textX = 44; *textY =  0; *spaceX = textLen[11]; break; // Plus
-        case '(': *textX = 48; *textY =  0; *spaceX = textLen[12]; break; // Open Bracket
-        case ')': *textX = 52; *textY =  0; *spaceX = textLen[13]; break; // Close Bracket
-        case '!': *textX = 56; *textY =  0; *spaceX = textLen[14]; break; // Exclamation mark
-        case '?': *textX = 60; *textY =  0; *spaceX = textLen[15]; break; // Question mark
+        *textX = (let) * 4;
+        *spaceX = textLen[let];
 
-        case '"': *textX = 40; *textY = 12; *spaceX = textLen[42]; break; // Speech mark
-        case'\'': *textX = 44; *textY = 12; *spaceX = textLen[43]; break; // Apostrophe
-        case ':': *textX = 48; *textY = 12; *spaceX = textLen[44]; break; // Colon
-        case ';': *textX = 52; *textY = 12; *spaceX = textLen[45]; break; // Semicolon
-        case '.': *textX = 56; *textY = 12; *spaceX = textLen[46]; break; // Full stop
-        case ',': *textX = 60; *textY = 12; *spaceX = textLen[47]; break; // Comma
-
-        case '~': *textX = 40; *textY = 24; *spaceX = textLen[74]; break; // Tilde
-        case '@': *textX = 44; *textY = 24; *spaceX = textLen[75]; break; // Umlaut
-        case '^': *textX = 48; *textY = 24; *spaceX = textLen[76]; break; // Caret
-        case '/': *textX = 52; *textY = 24; *spaceX = textLen[77]; break; // Slash
-        case '_': *textX = 56; *textY = 24; *spaceX = textLen[78]; break; // Percent
-        case '%': *textX = 56; *textY = 24; *spaceX = textLen[78]; break; // Percent
-        case '&': *textX = 60; *textY = 24; *spaceX = textLen[79]; break; // Ampersand
-
-        // This is for the letters that sit differently on the line. It just moves them down a bit.
-        case 'g': if (font == FONT_DEFAULT) *offsetY = 1 * textSizeTotal; break;
-        case 'q': if (font == FONT_DEFAULT) *offsetY = 1 * textSizeTotal; break;
-        case 'p': if (font == FONT_DEFAULT) *offsetY = 3 * textSizeTotal; break;
-        case 'y': if (font == FONT_DEFAULT) *offsetY = 1 * textSizeTotal; break;
+        if (font == FONT_DEFAULT) {
+            switch (letter) {
+                // This is for the letters that sit differently on the line. It just moves them down a bit.
+                case 'g': *offsetY = 1 * textSizeTotal; break;
+                case 'q': *offsetY = 1 * textSizeTotal; break;
+                case 'p': *offsetY = 3 * textSizeTotal; break;
+                case 'y': *offsetY = 1 * textSizeTotal; break;
+            }
+        }
+    } else {
+        *textX = -12;
+        *spaceX = 2;
     }
 }
 
