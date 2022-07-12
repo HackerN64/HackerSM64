@@ -452,7 +452,13 @@ extern s16 gVisualSurfaceCount;
 #endif
 
 void puppyprint_render_collision(void) {
-    // Stubbed out collision render for now, knowing Arthur's got plans.
+    char textBytes[128];
+    sprintf(textBytes, "Static Pool Size: 0x%X#Dynamic Pool Size: 0x%X#Dynamic Pool Used: 0x%X#Surfaces Allocated: %d#Nodes Allocated: %d", 
+    gTotalStaticSurfaceData,
+    DYNAMIC_SURFACE_POOL_SIZE,
+    (uintptr_t)gDynamicSurfacePoolEnd - (uintptr_t)gDynamicSurfacePool,
+    gSurfacesAllocated, gSurfaceNodesAllocated);
+    print_small_text_light(SCREEN_WIDTH-16, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
 #ifdef VISUAL_DEBUG
     print_small_text_light(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
@@ -1135,7 +1141,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                                                     (y + textPos[1] + (s16)((shakePos[1] + offsetY + wavePos))) << 2,
                                                     (x + textPos[0] + (s16)((shakePos[0] + textOffsets[0]))) << 2,
                                                     (y + textPos[1] + (s16)((wavePos + offsetY + shakePos[1] + textOffsets[1]))) << 2,
-                                                    G_TX_RENDERTILE, (textX << 6), (12 << 6), textTempScale, textTempScale);
+                                                    G_TX_RENDERTILE, (textX << 6), 0, textTempScale, textTempScale);
         textPos[0] += (spaceX + 1) * textSizeTotal;
     }
 
