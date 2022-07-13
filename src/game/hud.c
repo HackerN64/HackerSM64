@@ -605,9 +605,4 @@ void render_hud(void) {
         }
 #endif
     }
-
-    prepare_blank_box();
-    render_blank_box(0, 0, 320, 120, 0, 0, 0, 255);
-    finish_blank_box();
-    print_small_text_light(16,32,"Shadow the hedgehog is a bitch-ass motherfucker.", 0, -1, FONT_VANILLA);
 }
