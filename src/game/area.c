@@ -431,7 +431,7 @@ void render_game(void) {
 
     gViewportOverride = NULL;
     gViewportClip     = NULL;
-    
+
     profiler_update(PROFILER_TIME_GFX);
     profiler_print_times();
 #if PUPPYPRINT_DEBUG

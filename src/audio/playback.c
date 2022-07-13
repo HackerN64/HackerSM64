@@ -1443,9 +1443,9 @@ void note_init_all(void) {
 #if defined(VERSION_SH)
         note->synthesisState.synthesisBuffers = sound_alloc_uninitialized(&gNotesAndBuffersPool, sizeof(struct NoteSynthesisBuffers));
 #elif defined(VERSION_EU)
-        note->synthesisState.synthesisBuffers = soundAlloc(&gNotesAndBuffersPool, sizeof(struct NoteSynthesisBuffers));
+        note->synthesisState.synthesisBuffers = soundAlloc(&gNotesAndBuffersPool, ALIGN16(sizeof(struct NoteSynthesisBuffers)));
 #else
-        note->synthesisBuffers = soundAlloc(&gNotesAndBuffersPool, sizeof(struct NoteSynthesisBuffers));
+        note->synthesisBuffers = soundAlloc(&gNotesAndBuffersPool, ALIGN16(sizeof(struct NoteSynthesisBuffers)));
 #endif
     }
 }
