@@ -1362,6 +1362,15 @@ void font_offsets(s8 *offsetY, s32 font, u8 letter) {
                 case 'y': *offsetY = 2 * textSizeTotal; break;
             }
         break;
+        case FONT_VANILLA:
+            switch (letter) {
+                // This is for the letters that sit differently on the line. It just moves them down a bit.
+                case 'g': *offsetY = 2 * textSizeTotal; break;
+                case 'q': *offsetY = 2 * textSizeTotal; break;
+                case 'p': *offsetY = 2 * textSizeTotal; break;
+                case 'y': *offsetY = 1 * textSizeTotal; break;
+            }
+        break;
     }
 }
 
