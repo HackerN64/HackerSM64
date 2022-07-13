@@ -232,7 +232,7 @@ u8 render_generic_char(char c) {
     void *texture = segmented_to_virtual(fontLUT[c - ' '].texture);
 
     gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(texture));
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
 
     return fontLUT[c - ' '].kerning;
@@ -243,7 +243,7 @@ u8 render_generic_unicode_char(char *str, s32 *strPos) {
     if (utf8Entry == NULL) return 0;
 
     gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, VIRTUAL_TO_PHYSICAL(segmented_to_virtual(utf8Entry->texture)));
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, utf8Entry->texture);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
 
     return utf8Entry->kerning;
@@ -342,7 +342,7 @@ void print_generic_string(s16 x, s16 y, char *str) {
 void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, char *str) {
     s32 strPos = 0;
     void **hudLUT1 = segmented_to_virtual(menu_hud_lut); // Japanese Menu HUD Color font
-    void **hudLUT2 = segmented_to_virtual(main_hud_lut); // 0-9 A-Z HUD Color Font
+    struct AsciiCharLUTEntry *hudLUT2 = segmented_to_virtual(main_hud_lut); // 0-9 A-Z HUD Color Font
     u32 curX = x;
     u32 curY = y;
     u32 codepoint;
@@ -368,11 +368,11 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, char *str) {
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT1[str[strPos] - ' ']);
                 }**/
                 if (!(str[strPos] & 0x80)) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos] - ' ']);
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos] - ' '].texture);
                     xStride = 12;
                 } else {
                     utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, segmented_to_virtual(utf8Entry->texture));
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
                     xStride = utf8Entry->kerning;
                 }
 

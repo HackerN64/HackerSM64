@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "print.h"
 #include "segment2.h"
+#include "ingame_menu.h"
 
 /**
  * This file handles printing and formatting the colorful text that
@@ -14,7 +15,6 @@
 struct TextLabel {
     u32 x;
     u32 y;
-    s16 length;
     char buffer[50];
 };
 
@@ -26,197 +26,13 @@ struct TextLabel *sTextLabels[52];
 s16 sTextLabelsCount = 0;
 
 /**
- * Returns n to the exponent power, only for non-negative powers.
- */
-s32 int_pow(s32 n, s32 exponent) {
-    s32 result = 1;
-    s32 i;
-
-    for (i = 0; i < exponent; i++) {
-        result = n * result;
-    }
-
-    return result;
-}
-
-/**
- * Formats an integer n for print by fitting it to width, prefixing with a negative,
- * and converting the base.
- */
-void format_integer(s32 n, s32 base, char *dest, s32 *totalLength, u8 width, s8 zeroPad) {
-    u32 powBase;
-    s32 numDigits = 0;
-    s32 i;
-    s32 len = 0;
-    s8 digit;
-    s8 negative = FALSE;
-    char pad;
-
-    if (zeroPad) {
-        pad = '0';
-    } else {
-        pad = -1;
-    }
-
-    if (n != 0) {
-        // Formats a negative number for negative prefix.
-        if (n < 0) {
-            n = -n;
-            negative = TRUE;
-        }
-
-        // Increments the number of digits until length is long enough.
-        while (TRUE) {
-            powBase = int_pow(base, numDigits);
-
-            if (powBase > (u32) n) {
-                break;
-            }
-
-            numDigits++;
-        }
-
-        // Add leading pad to fit width.
-        if (width > numDigits) {
-            for (len = 0; len < width - numDigits; len++) dest[len] = pad;
-
-            // Needs 1 length to print negative prefix.
-            if (negative == TRUE) {
-                len--;
-            }
-        }
-
-        // Use 'M' prefix to indicate negative numbers.
-        if (negative == TRUE) {
-            dest[len] = 'M';
-            len++;
-        }
-
-        // Transfer the digits into the proper base.
-        for (i = numDigits - 1; i >= 0; i--) {
-            powBase = int_pow(base, i);
-            digit = n / powBase;
-
-            // FIXME: Why doesn't [] match?
-            if (digit < 10) {
-                *(dest + len + numDigits - 1 - i) = digit + '0';
-            } else {
-                *(dest + len + numDigits - 1 - i) = digit + '7';
-            }
-
-            n -= digit * powBase;
-        }
-    } else { // n is zero.
-        numDigits = 1;
-        if (width > numDigits) {
-            for (len = 0; len < width - numDigits; len++) dest[len] = pad;
-        }
-        dest[len] = '0';
-    }
-
-    *totalLength += numDigits + len;
-}
-
-/**
- * Determines the width of the number for printing, writing to 'width'.
- * Additionally, this determines if a number should be zero-padded,
- * writing to 'zeroPad'.
- */
-void parse_width_field(const char *str, s32 *srcIndex, u8 *width, s8 *zeroPad) {
-    s8 digits[12]; // unknown length
-    s8 digitsLen = 0;
-    s16 i;
-
-    // If first character is 0, then the string should be zero padded.
-    if (str[*srcIndex] == '0') {
-        *zeroPad = TRUE;
-    }
-
-    // Read width digits up until the 'd' or 'x' format specifier.
-    while (str[*srcIndex] != 'b'
-        && str[*srcIndex] != 'o'
-        && str[*srcIndex] != 'd'
-        && str[*srcIndex] != 'x') {
-        digits[digitsLen] = str[*srcIndex] - '0';
-
-        if (digits[digitsLen] < 0 || digits[digitsLen] >= 10) { // not a valid digit
-            *width = 0;
-            return;
-        }
-
-        digitsLen++;
-        (*srcIndex)++;
-    }
-
-    // No digits
-    if (digitsLen == 0) {
-        return;
-    }
-
-    // Sum the digits to calculate the total width.
-    for (i = 0; i < digitsLen - 1; i++) {
-        *width = *width + digits[i] * ((digitsLen - i - 1) * 10);
-    }
-
-    *width = *width + digits[digitsLen - 1];
-}
-
-/**
- * Takes a number, finds the intended base, formats the number, and prints it
+ * Takes a number, formats the number, and prints it
  * at the given X & Y coordinates.
- *
- * Warning: this fails on too large numbers, because format_integer has bugs
- * related to overflow. For romhacks, prefer sprintf + print_text.
  */
 void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
-    char c = 0;
-    s8 zeroPad = FALSE;
-    u8 width = 0;
-    s32 base = 0;
-    s32 len = 0;
-    s32 srcIndex = 0;
-
-    // Don't continue if there is no memory to do so.
-    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
-                                                        sizeof(struct TextLabel))) == NULL) {
-        return;
-    }
-
-    sTextLabels[sTextLabelsCount]->x = x;
-    sTextLabels[sTextLabelsCount]->y = y;
-
-    c = str[srcIndex];
-
-    while (c != 0) {
-        if (c == '%') {
-            srcIndex++;
-
-            parse_width_field(str, &srcIndex, &width, &zeroPad);
-
-            if (str[srcIndex] != 'b'
-                && str[srcIndex] != 'o'
-                && str[srcIndex] != 'd'
-                && str[srcIndex] != 'x') {
-                break;
-            }
-            if (str[srcIndex] == 'b') base =  2;
-            if (str[srcIndex] == 'o') base =  8;
-            if (str[srcIndex] == 'd') base = 10;
-            if (str[srcIndex] == 'x') base = 16;
-
-            srcIndex++;
-
-            format_integer(n, base, sTextLabels[sTextLabelsCount]->buffer + len, &len, width, zeroPad);
-        } else { // straight copy
-            sTextLabels[sTextLabelsCount]->buffer[len] = c;
-            len++;
-            srcIndex++;
-        }
-        c = str[srcIndex];
-    }
-
-    sTextLabels[sTextLabelsCount]->length = len;
-    sTextLabelsCount++;
+    char buffer[50];
+    sprintf(buffer, str, n);
+    print_text(x, y, str);
 }
 
 /**
@@ -236,17 +52,8 @@ void print_text(s32 x, s32 y, const char *str) {
     sTextLabels[sTextLabelsCount]->x = x;
     sTextLabels[sTextLabelsCount]->y = y;
 
-    c = str[srcIndex];
+    strcpy(sTextLabels[sTextLabelsCount]->buffer, str);
 
-    // Set the array with the text to print while finding length.
-    while (c != 0) {
-        sTextLabels[sTextLabelsCount]->buffer[length] = c;
-        length++;
-        srcIndex++;
-        c = str[srcIndex];
-    }
-
-    sTextLabels[sTextLabelsCount]->length = length;
     sTextLabelsCount++;
 }
 
@@ -254,41 +61,27 @@ void print_text(s32 x, s32 y, const char *str) {
  * Prints text in the colorful lettering centered at given X, Y coordinates.
  */
 void print_text_centered(s32 x, s32 y, const char *str) {
-    char c = 0;
-    s32 length = 0;
-    s32 srcIndex = 0;
-
-    // Don't continue if there is no memory to do so.
-    if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
-                                                        sizeof(struct TextLabel))) == NULL) {
-        return;
-    }
-
-    c = str[srcIndex];
-
-    // Set the array with the text to print while finding length.
-    while (c != 0) {
-        sTextLabels[sTextLabelsCount]->buffer[length] = c;
-        length++;
-        srcIndex++;
-        c = str[srcIndex];
-    }
-
-    sTextLabels[sTextLabelsCount]->length = length;
-    sTextLabels[sTextLabelsCount]->x = x - length * 6; // * 12 / 2;
-    sTextLabels[sTextLabelsCount]->y = y;
-    sTextLabelsCount++;
+    print_text(x - strlen(str) * 6, y, str);
 }
 
 /**
  * Adds an individual glyph to be rendered.
  */
-void add_glyph_texture(s8 glyphIndex) {
-    const Texture *const *glyphs = segmented_to_virtual(main_hud_lut);
+u8 add_glyph_texture(s8 glyphIndex) {
+    const struct AsciiCharLUTEntry *glyphs = segmented_to_virtual(main_hud_lut);
 
     gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, glyphs[glyphIndex]);
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, glyphs[glyphIndex].texture);
     gSPDisplayList(gDisplayListHead++, dl_hud_img_load_tex_block);
+
+    return glyphs[glyphIndex].kerning;
+}
+
+u8 add_utf8_glyph_texture(struct UnicodeCharLUTEntry *utf8Entry) {
+    gDPPipeSync(gDisplayListHead++);
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
+    gSPDisplayList(gDisplayListHead++, dl_hud_img_load_tex_block);
+    return utf8Entry->kerning;
 }
 
 #ifndef WIDESCREEN
@@ -317,8 +110,8 @@ void clip_to_bounds(s32 *x, s32 *y) {
 /**
  * Renders the glyph that's set at the given position.
  */
-void render_textrect(s32 x, s32 y, s32 pos) {
-    s32 rectBaseX = x + pos * 12;
+void render_textrect(s32 x, s32 y) {
+    s32 rectBaseX = x;
     s32 rectBaseY = 224 - y;
     s32 rectX;
     s32 rectY;
@@ -342,6 +135,8 @@ void render_text_labels(void) {
     s32 j;
     s8 glyphIndex;
     Mtx *mtx;
+    u8 curOffset;
+    u8 kerning;
 
     if (sTextLabelsCount == 0) {
         return;
@@ -360,10 +155,10 @@ void render_text_labels(void) {
     gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
 
     for (i = 0; i < sTextLabelsCount; i++) {
-        for (j = 0; j < sTextLabels[i]->length; j++) {
-            glyphIndex = sTextLabels[i]->buffer[j] - ' ';
-
-            if (glyphIndex != GLYPH_SPACE) {
+        j = 0;
+        curOffset = 0;
+        while (sTextLabels[i]->buffer[j] != 0) {
+            if (sTextLabels[i]->buffer[j] != ' ') {
 #ifdef VERSION_EU
                 // Beta Key was removed by EU, so glyph slot reused.
                 // This produces a colorful Ü.
@@ -378,10 +173,27 @@ void render_text_labels(void) {
                     render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);
                 }
 #else
-                add_glyph_texture(glyphIndex);
-                render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);
-#endif
+                // Lookup correct glyph
+                if (!(sTextLabels[i]->buffer[j] & 0x80)) {
+                    kerning = add_glyph_texture(sTextLabels[i]->buffer[j] - ' ');
+                } else {
+                    struct UnicodeCharLUTEntry *utf8Entry = utf8_lookup(&main_hud_utf8_lut, sTextLabels[i]->buffer, &j);
+                    kerning = add_utf8_glyph_texture(utf8Entry);
+                }
+                // Handle custom offsets for ' and " glyphs
+                if (sTextLabels[i]->buffer[j] == '\'') {
+                    render_textrect(sTextLabels[i]->x + curOffset - 2, sTextLabels[i]->y + 7);
+                } else if (sTextLabels[i]->buffer[j] == '"') {
+                    render_textrect(sTextLabels[i]->x + curOffset + 1, sTextLabels[i]->y + 7);
+                } else {
+                    render_textrect(sTextLabels[i]->x + curOffset, sTextLabels[i]->y);
+                }
+                curOffset += kerning;
+#endif          
+            } else {
+                curOffset += 12;
             }
+            j++;
         }
 
         mem_pool_free(gEffectsMemoryPool, sTextLabels[i]);
