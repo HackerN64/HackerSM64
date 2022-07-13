@@ -443,7 +443,9 @@ AS        := $(CROSS)as
 ifeq ($(COMPILER),gcc)
   CC      := $(CROSS)gcc
   $(BUILD_DIR)/actors/%.o:           OPT_FLAGS := -Ofast -mlong-calls
+  $(BUILD_DIR)/levels/%.o:           CFLAGS += -G 0
   $(BUILD_DIR)/levels/%.o:           OPT_FLAGS := -Ofast -mlong-calls
+  $(BUILD_DIR)/levels/%.o:           CFLAGS += -G 0
 else ifeq ($(COMPILER),clang)
   CC      := clang
 endif
