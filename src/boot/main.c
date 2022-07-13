@@ -186,11 +186,8 @@ void start_gfx_sptask(void) {
     if (gActiveSPTask == NULL
      && sCurrentDisplaySPTask != NULL
      && sCurrentDisplaySPTask->state == SPTASK_STATE_NOT_STARTED) {
-#if PUPPYPRINT_DEBUG
-        rspDelta = osGetTime();
-#endif
         start_sptask(M_GFXTASK);
-        fast_profiler_rsp_started(PROFILER_RSP_GFX);
+        profiler_rsp_started(PROFILER_RSP_GFX);
     }
 }
 
@@ -222,17 +219,14 @@ void handle_vblank(void) {
             } else {
                 pretend_audio_sptask_done();
             }
-            fast_profiler_rsp_started(PROFILER_RSP_AUDIO);
+            profiler_rsp_started(PROFILER_RSP_AUDIO);
         }
     } else {
         if (gActiveSPTask == NULL
          && sCurrentDisplaySPTask != NULL
          && sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED) {
-#if PUPPYPRINT_DEBUG
-            rspDelta = osGetTime();
-#endif
             start_sptask(M_GFXTASK);
-            fast_profiler_rsp_started(PROFILER_RSP_GFX);
+            profiler_rsp_started(PROFILER_RSP_GFX);
         }
     }
 #if ENABLE_RUMBLE
@@ -257,12 +251,9 @@ void handle_sp_complete(void) {
             // The gfx task completed before we had time to interrupt it.
             // Mark it finished, just like below.
             curSPTask->state = SPTASK_STATE_FINISHED;
-#if PUPPYPRINT_DEBUG
-            profiler_update(rspGenTime, rspDelta);
-#endif
-            fast_profiler_rsp_completed(PROFILER_RSP_GFX);
+            profiler_rsp_completed(PROFILER_RSP_GFX);
         } else {
-            fast_profiler_rsp_yielded();
+            profiler_rsp_yielded();
         }
 
         // Start the audio task, as expected by handle_vblank.
@@ -271,18 +262,18 @@ void handle_sp_complete(void) {
         } else {
             pretend_audio_sptask_done();
         }
-        fast_profiler_rsp_started(PROFILER_RSP_AUDIO);
+        profiler_rsp_started(PROFILER_RSP_AUDIO);
     } else {
         curSPTask->state = SPTASK_STATE_FINISHED;
         if (curSPTask->task.t.type == M_AUDTASK) {
-            fast_profiler_rsp_completed(PROFILER_RSP_AUDIO);
+            profiler_rsp_completed(PROFILER_RSP_AUDIO);
             // After audio tasks come gfx tasks.
             if ((sCurrentDisplaySPTask != NULL)
              && (sCurrentDisplaySPTask->state != SPTASK_STATE_FINISHED)) {
                 if (sCurrentDisplaySPTask->state == SPTASK_STATE_INTERRUPTED) {
-                    fast_profiler_rsp_resumed();
+                    profiler_rsp_resumed();
                 } else {
-                    fast_profiler_rsp_started(PROFILER_RSP_GFX);
+                    profiler_rsp_started(PROFILER_RSP_GFX);
                 }
                 start_sptask(M_GFXTASK);
             }
@@ -294,10 +285,7 @@ void handle_sp_complete(void) {
             // The SP process is done, but there is still a Display Processor notification
             // that needs to arrive before we can consider the task completely finished and
             // null out sCurrentDisplaySPTask. That happens in handle_dp_complete.
-#if PUPPYPRINT_DEBUG
-            profiler_update(rspGenTime, rspDelta);
-#endif
-            fast_profiler_rsp_completed(PROFILER_RSP_GFX);
+            profiler_rsp_completed(PROFILER_RSP_GFX);
         }
     }
 }
@@ -330,8 +318,9 @@ void thread3_main(UNUSED void *arg) {
 
 #ifdef DEBUG
     osSyncPrintf("Super Mario 64\n");
+#if 0 // if your PC username isn't your real name feel free to uncomment
     osSyncPrintf("Built by: %s\n", __username__);
-    osSyncPrintf("Date    : %s\n", __datetime__);
+#endif
     osSyncPrintf("Compiler: %s\n", __compiler__);
     osSyncPrintf("Linker  : %s\n", __linker__);
 #endif
@@ -344,9 +333,6 @@ void thread3_main(UNUSED void *arg) {
 
     while (TRUE) {
         OSMesg msg;
-#if PUPPYPRINT_DEBUG
-        OSTime first = osGetTime();
-#endif
         osRecvMesg(&gIntrMesgQueue, &msg, OS_MESG_BLOCK);
         switch ((uintptr_t) msg) {
             case MESG_VI_VBLANK:
@@ -365,9 +351,6 @@ void thread3_main(UNUSED void *arg) {
                 handle_nmi_request();
                 break;
         }
-#if PUPPYPRINT_DEBUG
-        profiler_update(taskTime, first);
-#endif
     }
 }
 

@@ -11,7 +11,7 @@
 
 
 /*****************
- * config_graphics
+ * config_graphics.h
  */
 
 #ifndef F3DEX_GBI_2
@@ -23,25 +23,31 @@
 #endif // !F3DEX_GBI_SHARED
 
 #ifdef OBJECTS_REJ
-// Enable required ucodes.
+    // Enable required ucodes.
     #define F3DEX2_REJ_GBI
     #define F3DLX2_REJ_GBI
 #endif // OBJECTS_REJ
 
 
 /*****************
- * config_debug
+ * config_debug.h
  */
 
-#ifdef PUPPYPRINT_DEBUG
-    #undef PUPPYPRINT
-    #define PUPPYPRINT
-#endif
-
-#ifdef COMPLETE_SAVE_FILE
+#ifdef DISABLE_ALL
+    #undef DEBUG_ALL
+    #undef TEST_LEVEL
+    #undef DEBUG_LEVEL_SELECT
+    #undef ENABLE_DEBUG_FREE_MOVE
+    #undef VANILLA_DEBUG
+    #undef VANILLA_STYLE_CUSTOM_DEBUG
+    #undef PUPPYPRINT_DEBUG
+    #undef PUPPYPRINT_DEBUG_CYCLES
+    #undef VISUAL_DEBUG
     #undef UNLOCK_ALL
-    #define UNLOCK_ALL
-#endif // COMPLETE_SAVE_FILE
+    #undef COMPLETE_SAVE_FILE
+    #undef DEBUG_FORCE_CRASH_ON_BOOT
+    #undef USE_PROFILER
+#endif // DISABLE_ALL
 
 #ifdef DEBUG_ALL
     #undef DEBUG_LEVEL_SELECT
@@ -66,46 +72,43 @@
     #define COMPLETE_SAVE_FILE
 #endif // DEBUG_ALL
 
-#ifdef DISABLE_ALL
-    #undef DEBUG_ALL
-    #undef TEST_LEVEL
-    #undef DEBUG_LEVEL_SELECT
-    #undef ENABLE_DEBUG_FREE_MOVE
-    #undef VANILLA_DEBUG
-    #undef VANILLA_STYLE_CUSTOM_DEBUG
-    #undef PUPPYPRINT_DEBUG
-    #undef PUPPYPRINT_DEBUG_CYCLES
-    #undef VISUAL_DEBUG
+#ifdef PUPPYPRINT_DEBUG
+    #undef PUPPYPRINT
+    #define PUPPYPRINT
+    #undef USE_PROFILER
+    #define USE_PROFILER
+#endif // PUPPYPRINT_DEBUG
+
+#ifdef COMPLETE_SAVE_FILE
     #undef UNLOCK_ALL
-    #undef COMPLETE_SAVE_FILE
-    #undef DEBUG_FORCE_CRASH_ON_BOOT
-#endif // DISABLE_ALL
+    #define UNLOCK_ALL
+#endif // COMPLETE_SAVE_FILE
 
 
 /*****************
- * config_camera
+ * config_camera.h
  */
 
 #ifdef FORCED_CAMERA_MODE
     #undef USE_COURSE_DEFAULT_MODE
-    #define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode
-#endif
+    #define USE_COURSE_DEFAULT_MODE // Forced camera mode overwrites the default mode.
+#endif // FORCED_CAMERA_MODE
 
 #ifndef WATER_SURFACE_CAMERA_MODE
     #define WATER_SURFACE_CAMERA_MODE CAMERA_MODE_WATER_SURFACE
-#endif
+#endif // !WATER_SURFACE_CAMERA_MODE
 
 #ifndef DEEP_WATER_CAMERA_MODE
     #define DEEP_WATER_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
-#endif
+#endif // !DEEP_WATER_CAMERA_MODE
 
 #ifndef FLYING_CAMERA_MODE
     #define FLYING_CAMERA_MODE CAMERA_MODE_BEHIND_MARIO
-#endif
+#endif // !FLYING_CAMERA_MODE
 
 
 /*****************
- * config_game
+ * config_game.h
  */
 
 #ifdef DISABLE_LIVES
@@ -114,11 +117,11 @@
 
 #ifndef START_LEVEL
     #define START_LEVEL LEVEL_CASTLE_GROUNDS
-#endif
+#endif // !START_LEVEL
 
 
 /*****************
- * config_goddard
+ * config_goddard.h
  */
 
 #ifndef KEEP_MARIO_HEAD
@@ -128,8 +131,9 @@
     #define DISABLE_DEMO
 #endif // !KEEP_MARIO_HEAD
 
+
 /*****************
- * config_menu
+ * config_menu.h
  */
 
 #ifdef DISABLE_EXIT_COURSE
@@ -141,10 +145,10 @@
 
 
 /*****************
- * config_objects
+ * config_objects.h
  */
 
-// Enable floombas if the intro floombas are enabled
+// Enable floombas if the intro floombas are enabled.
 #ifdef INTRO_FLOOMBAS
     #undef FLOOMBAS
     #define FLOOMBAS
@@ -152,7 +156,7 @@
 
 
 /*****************
- * config_rom
+ * config_rom.h
  */
 
 #ifndef TARGET_N64

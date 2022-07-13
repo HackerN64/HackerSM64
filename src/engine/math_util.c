@@ -100,7 +100,7 @@ void min_max_3f(f32 a, f32 b, f32 c, f32 *min, f32 *max) { min_max_3_func(a, b, 
 void min_max_3i(s32 a, s32 b, s32 c, s32 *min, s32 *max) { min_max_3_func(a, b, c, min, max); }
 void min_max_3s(s16 a, s16 b, s16 c, s16 *min, s16 *max) { min_max_3_func(a, b, c, min, max); }
 
-/// Copy vector 'src' to 'dest'
+/// Perform a bitwise copy from vector 'src' to 'dest'
 #define vec3_copy_bits(destFmt, dest, srcFmt, src) { \
     register destFmt x = ((srcFmt *) src)[0];        \
     register destFmt y = ((srcFmt *) src)[1];        \
@@ -255,7 +255,7 @@ void vec3s_prod(Vec3s dest, const Vec3s a, const Vec3s b) { vec3_prod_func(s16, 
 #undef vec3_prod_func
 
 
-/// Add vector 'a' to 'dest'
+/// Performs element-wise division of two 3-vectors
 #define vec3_div_func(fmt, dest, a) {   \
     register fmt x = ((fmt *) a)[0];    \
     register fmt y = ((fmt *) a)[1];    \
@@ -269,7 +269,7 @@ void vec3i_div(Vec3i dest, const Vec3i a) { vec3_div_func(s32, dest, a); }
 void vec3s_div(Vec3s dest, const Vec3s a) { vec3_div_func(s16, dest, a); }
 #undef vec3_div_func
 
-/// Make 'dest' the sum of vectors a and b.
+/// Make 'dest' the quotient of vectors a and b.
 #define vec3_quot_func(fmt, dest, a, b) {   \
     register fmt x1 = ((fmt *) a)[0];       \
     register fmt y1 = ((fmt *) a)[1];       \
@@ -1339,8 +1339,8 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     vec3f_cross(h, dir, e2);
     // Determine the cos(angle) difference between ray and surface normals.
     f32 det = vec3f_dot(e1, h);
-    // Check if we're perpendicular from the surface.
-    if ((det > -NEAR_ZERO) && (det < NEAR_ZERO)) return FALSE;
+    // Check if we're perpendicular or pointing away from the surface.
+    if (det < NEAR_ZERO) return FALSE;
     // Check if we're making contact with the surface.
     // Make f the inverse of the cos(angle) between ray and surface normals.
     f32 f = 1.0f / det; // invDet
@@ -1377,9 +1377,6 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     f32 length;
     Vec3f chk_hit_pos;
     f32 top, bottom;
-#if PUPPYPRINT_DEBUG
-    OSTime first = osGetTime();
-#endif
     // Get upper and lower bounds of ray
     if (dir[1] >= 0.0f) {
         // Ray is upwards.
@@ -1403,9 +1400,6 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
             *max_length = length;
         }
     }
-#if PUPPYPRINT_DEBUG
-    collisionTime[perfIteration] += osGetTime() - first;
-#endif
 }
 
 void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
@@ -1512,14 +1506,14 @@ static ALWAYS_INLINE float construct_float(const float f)
                                 : "=r"(r)
                                 : "K"(upper));
     } else if ((i & 0xFFFF0000) == 0) {
-        __asm__ ("addiu %0, $0, %1"
+        __asm__ ("ori %0, $0, %1"
                                 : "+r"(r)
                                 : "K"(lower));
     } else {
         __asm__ ("lui %0, %1"
                                 : "=r"(r)
                                 : "K"(upper));
-        __asm__ ("addiu %0, %0, %1"
+        __asm__ ("ori %0, %0, %1"
                                 : "+r"(r)
                                 : "K"(lower));
     }

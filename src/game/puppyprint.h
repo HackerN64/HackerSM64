@@ -2,16 +2,8 @@
 
 #include "segment2.h"
 
-// This is how many indexes of timers are saved at once. higher creates a smoother average, but naturally uses more RAM. 15's fine.
-// #define NUM_PERF_ITERATIONS   15
-#define NUM_PERF_ITERATIONS   16
 #define NUM_BENCH_ITERATIONS 150
 #define LOG_BUFFER_SIZE       16
-
-#ifdef ENABLE_CREDITS_BENCHMARK
-#undef NUM_PERF_ITERATIONS
-#define NUM_PERF_ITERATIONS   60
-#endif
 
 struct PuppyPrintPage{
     void (*func)();
@@ -58,35 +50,8 @@ extern s32 mempool;
 extern u8 benchOption;
 
 // General
-extern u32 cpuTime;
-extern u32 rspTime;
-extern u32 rdpTime;
-extern u32 ramTime;
-extern u32 loadTime;
-extern u32 rspDelta;
-extern s32     benchMark[NUM_BENCH_ITERATIONS + 2];
+extern s32 benchMark[NUM_BENCH_ITERATIONS + 2];
 
-// CPU
-extern u32 collisionTime[NUM_PERF_ITERATIONS + 1];
-extern u32 behaviourTime[NUM_PERF_ITERATIONS + 1];
-extern u32    scriptTime[NUM_PERF_ITERATIONS + 1];
-extern u32     graphTime[NUM_PERF_ITERATIONS + 1];
-extern u32     audioTime[NUM_PERF_ITERATIONS + 1];
-extern u32       dmaTime[NUM_PERF_ITERATIONS + 1];
-extern u32  dmaAudioTime[NUM_PERF_ITERATIONS + 1];
-extern u32     faultTime[NUM_PERF_ITERATIONS + 1];
-extern u32      taskTime[NUM_PERF_ITERATIONS + 1];
-extern u32    cameraTime[NUM_PERF_ITERATIONS + 1];
-extern u32  profilerTime[NUM_PERF_ITERATIONS + 1];
-extern u32 profilerTime2[NUM_PERF_ITERATIONS + 1];
-// RSP
-extern u32    rspGenTime[NUM_PERF_ITERATIONS + 1];
-// RDP
-extern u32    bufferTime[NUM_PERF_ITERATIONS + 1];
-extern u32      tmemTime[NUM_PERF_ITERATIONS + 1];
-extern u32       busTime[NUM_PERF_ITERATIONS + 1];
-
-extern void profiler_update(u32 *time, OSTime time2);
 extern void puppyprint_profiler_process(void);
 extern void puppyprint_render_profiler(void);
 extern void puppyprint_profiler_finished(void);
