@@ -88,9 +88,9 @@ u16 sRenderingFramebuffer = 0;
 void (*gGoddardVblankCallback)(void) = NULL;
 
 // Defined controller slots
-struct Controller* gPlayer1Controller = &gControllers[0];
-struct Controller* gPlayer2Controller = &gControllers[1];
-struct Controller* gPlayer3Controller = &gControllers[2]; // Probably debug only, see note below
+struct Controller *gPlayer1Controller = &gControllers[0];
+struct Controller *gPlayer2Controller = &gControllers[1];
+struct Controller *gPlayer3Controller = &gControllers[2]; // Probably debug only, see note below
 
 // Title Screen Demo Handler
 struct DemoInput *gCurrDemoInput = NULL;
