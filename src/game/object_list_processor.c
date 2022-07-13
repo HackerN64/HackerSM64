@@ -633,8 +633,6 @@ void update_objects(UNUSED s32 unused) {
 
     // Update spawners and objects with surfaces
     update_terrain_objects();
-    
-    fast_profiler_update(PROFILER_TIME_OBJECTS1);
 
     // If Mario was touching a moving platform at the end of last frame, apply
     // displacement now
