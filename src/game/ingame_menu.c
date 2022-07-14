@@ -1835,9 +1835,13 @@ void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
 #define TXT_CLEAR_X1 get_string_width(name) + 81
 #define TXT_CLEAR_X2 TXT_CLEAR_X1 - 2
 
-void render_course_complete_lvl_info_and_hud_str(void) {
-    char textClear[] = { TEXT_CLEAR };
+char *textClear = LANGUAGE_TEXT(
+    "CLEAR",
+    "CLEAR",
+    "CLEAR",
+    "クリア！");
 
+void render_course_complete_lvl_info_and_hud_str(void) {
     char *name;
 
     char strCourseNum[4];
