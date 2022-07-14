@@ -117,13 +117,6 @@
 #define TEXT_COPY_FILE_BUTTON _("ファイルコピー")
 #define TEXT_ERASE_FILE_BUTTON _("ファイルけす")
 
-// Score Menu
-#define TEXT_HI_SCORE _("ハイスコア")
-#define TEXT_SCORE_MARIO_A _("マリオＡ")
-#define TEXT_SCORE_MARIO_B _("マリオＢ")
-#define TEXT_SCORE_MARIO_C _("マリオＣ")
-#define TEXT_SCORE_MARIO_D _("マリオＤ")
-
 // Copy Menu
 #define TEXT_COPY_IT_TO_WHERE _("どこにコピーしますか？")
 #define TEXT_COPYING_COMPLETED _("コピーおわりました")
@@ -138,19 +131,12 @@
 /**
  * Menus Text (Pause, Course Completed)
  */
-// Main Courses
-#define TEXT_COURSE _("コース")
-#define TEXT_MYSCORE _("マイスコア")
 
 // Camera Options
 #define TEXT_LAKITU_MARIO _("ジュゲム↔マリオ")
 #define TEXT_LAKITU_STOP _("ジュゲム↔ストップ")
 #define TEXT_NORMAL_UPCLOSE _("（おすすめ）（リアル）")
 #define TEXT_NORMAL_FIXED _("（おすすめ）（とまる）")
-
-// Course Completed Misc Text
-#define TEXT_CATCH _("キャッチ！")
-#define TEXT_CLEAR _("クリア！")
 
 // Save Options
 #define TEXT_SAVE_AND_CONTINUE _("セーブしてつづける？")
@@ -204,13 +190,6 @@
 #define TEXT_COPY_FILE_BUTTON "COPY FILE"
 #define TEXT_ERASE_FILE_BUTTON "ERASE FILE"
 
-// Score Menu
-// Score Mario Text ("☺" is the Mario face defined in the US/EU menu char table)
-#define TEXT_SCORE_MARIO_A "☺A"
-#define TEXT_SCORE_MARIO_B "☺B"
-#define TEXT_SCORE_MARIO_C "☺C"
-#define TEXT_SCORE_MARIO_D "☺D"
-
 // Copy Menu
 #define TEXT_COPY_IT_TO_WHERE "COPY IT TO WHERE?"
 #define TEXT_COPYING_COMPLETED "COPYING COMPLETED"
@@ -225,12 +204,6 @@
 /**
  * Menus Text (Pause, Course Completed)
  */
-// Main Courses
-#define TEXT_MYSCORE "MYSCORE"
-
-// Course Completed Misc Text
-#define TEXT_CATCH "CATCH"
-#define TEXT_CLEAR "CLEAR"
 
 // Save Options
 #define TEXT_SAVE_AND_CONTINUE "SAVE & CONTINUE"
@@ -327,9 +300,6 @@
 #define TEXT_STEREO_DE _("STEREO")
 #define TEXT_MONO_DE _("MONO")
 #define TEXT_HEADSET_DE _("PHONES")
-
-#define TEXT_HI_SCORE_FR _("MEILLEUR SCORE")
-#define TEXT_HI_SCORE_DE _("BESTLEISTUNG")
 
 
 /**

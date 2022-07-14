@@ -190,9 +190,9 @@ void create_dl_ortho_matrix(void) {
 
 // Determine the UTF8 character to render, given a string and the current position in the string.
 // Return the struct of the relevant character, and increment the position in the string by either 1 or 2.
-struct UnicodeCharLUTEntry *utf8_lookup(struct UnicodeLUT *lut, char *str, s32 *strPos) {
+struct Utf8CharLUTEntry *utf8_lookup(struct UnicodeLUT *lut, char *str, s32 *strPos) {
     u16 codepoint;
-    struct UnicodeCharLUTEntry *usedLUT;
+    struct Utf8CharLUTEntry *usedLUT;
     u32 length;
 
     lut = segmented_to_virtual(lut);
@@ -239,7 +239,7 @@ u8 render_generic_char(char c) {
 }
 
 u8 render_generic_unicode_char(char *str, s32 *strPos) {
-    struct UnicodeCharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
+    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
     if (utf8Entry == NULL) return 0;
 
     gDPPipeSync(gDisplayListHead++);
@@ -346,7 +346,7 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, char *str) {
     u32 curX = x;
     u32 curY = y;
     u32 codepoint;
-    struct UnicodeCharLUTEntry *utf8Entry;
+    struct Utf8CharLUTEntry *utf8Entry;
 
     u32 xStride; // X separation
 

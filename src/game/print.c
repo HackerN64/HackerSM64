@@ -77,7 +77,7 @@ u8 add_glyph_texture(s8 glyphIndex) {
     return glyphs[glyphIndex].kerning;
 }
 
-u8 add_utf8_glyph_texture(struct UnicodeCharLUTEntry *utf8Entry) {
+u8 add_utf8_glyph_texture(struct Utf8CharLUTEntry *utf8Entry) {
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
     gSPDisplayList(gDisplayListHead++, dl_hud_img_load_tex_block);
@@ -177,7 +177,7 @@ void render_text_labels(void) {
                 if (!(sTextLabels[i]->buffer[j] & 0x80)) {
                     kerning = add_glyph_texture(sTextLabels[i]->buffer[j] - ' ');
                 } else {
-                    struct UnicodeCharLUTEntry *utf8Entry = utf8_lookup(&main_hud_utf8_lut, sTextLabels[i]->buffer, &j);
+                    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_hud_utf8_lut, sTextLabels[i]->buffer, &j);
                     kerning = add_utf8_glyph_texture(utf8Entry);
                 }
                 // Handle custom offsets for ' and " glyphs

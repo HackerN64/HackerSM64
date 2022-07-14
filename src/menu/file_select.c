@@ -1879,13 +1879,9 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
 void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     char coinScoreText[20];
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
-    char textCoinX[] = { TEXT_COIN_X };
-#define LENGTH 8
-    char fileNames[][LENGTH] = {
-        { TEXT_4DASHES }, // huh?
-        { TEXT_SCORE_MARIO_A }, { TEXT_SCORE_MARIO_B }, { TEXT_SCORE_MARIO_C }, { TEXT_SCORE_MARIO_D },
-    };
-#undef LENGTH
+    char fileNames[][10] = {"----", "☺A", "☺B", "☺C", "☺D"};
+    // come back to when doing JP
+    //char fileNamesJP[][10] = {"----", "マリオＡ", "マリオＢ", "マリオＣ", "マリオＤ"};
     // MYSCORE
     if (sScoreFileCoinScoreMode == 0) {
         // Print "[coin] x"
@@ -1901,7 +1897,7 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
     // HISCORE
     else {
         // Print "[coin] x"
-        print_menu_generic_string(x + HISCORE_COIN_ICON_X, y, textCoinX);
+        print_menu_generic_string(x + HISCORE_COIN_ICON_X, y, "✪×");
         // Print coin highscore
         sprintf(coinScoreText, "%d", (u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
         print_menu_generic_string(x + HISCORE_COIN_TEXT_X, y, coinScoreText);

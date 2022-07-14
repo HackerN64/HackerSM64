@@ -54,7 +54,7 @@ struct AsciiCharLUTEntry {
     const u8 kerning;
 };
 
-struct UnicodeCharLUTEntry {
+struct Utf8CharLUTEntry {
     const u16 codepoint;
     const u8 kerning;
     const u8 flag;
@@ -62,8 +62,8 @@ struct UnicodeCharLUTEntry {
 };
 
 struct UnicodeLUT {
-    const struct UnicodeCharLUTEntry *lut2Bytes;
-    const struct UnicodeCharLUTEntry *lut3Bytes;
+    const struct Utf8CharLUTEntry *lut2Bytes;
+    const struct Utf8CharLUTEntry *lut3Bytes;
     const u16 length2Bytes;
     const u16 length3Bytes;
 };

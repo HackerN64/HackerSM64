@@ -53,6 +53,12 @@ static s8 sSelectableStarIndex = 0;
 // Act Selector menu timer that keeps counting until you choose an act.
 static s32 sActSelectorMenuTimer = 0;
 
+#ifdef WIDE
+#define ACT_SELECT_WIDESCREEN_SCALE (4.f / 3)
+#else
+#define ACT_SELECT_WIDESCREEN_SCALE 1.f
+#endif
+
 /**
  * Act Selector Star Type Loop Action
  * Defines a select type for a star in the act selector.
@@ -92,18 +98,8 @@ void bhv_act_selector_star_type_loop(void) {
 void render_100_coin_star(u8 stars) {
     if (stars & STAR_FLAG_ACT_100_COINS) {
         // If the 100 coin star has been collected, create a new star selector next to the coin score.
-    #ifdef WIDE
-        if (gConfig.widescreen) {
-            sStarSelectorModels[6] = spawn_object_abs_with_rot(o, 0, MODEL_STAR,
-                                                            bhvActSelectorStarType, (370 * 4.0f) / 3, 24, -300, 0, 0, 0);
-        } else {
-            sStarSelectorModels[6] = spawn_object_abs_with_rot(o, 0, MODEL_STAR,
-                                                            bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
-        }
-    #else
         sStarSelectorModels[6] = spawn_object_abs_with_rot(o, 0, MODEL_STAR,
-                                                        bhvActSelectorStarType, 370, 24, -300, 0, 0, 0);
-    #endif
+                                                        bhvActSelectorStarType, 370 * ACT_SELECT_WIDESCREEN_SCALE, 24, -300, 0, 0, 0);
 
         sStarSelectorModels[6]->oStarSelectorSize = 0.8f;
         sStarSelectorModels[6]->oStarSelectorType = STAR_SELECTOR_100_COINS;
@@ -158,30 +154,12 @@ void bhv_act_selector_init(void) {
     }
 
     // Render star selector objects
-#ifdef WIDE
-    if (gConfig.widescreen) {
-        for (i = 0; i < sVisibleStars; i++) {
-            sStarSelectorModels[i] =
-                spawn_object_abs_with_rot(o, 0, selectorModelIDs[i], bhvActSelectorStarType,
-                                        ((75 + (sVisibleStars * -75) + (i * 152)) * 4.0f) / 3, 248, -300, 0, 0, 0);
-            sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
-        }
-    } else {
-        for (i = 0; i < sVisibleStars; i++) {
-            sStarSelectorModels[i] =
-                spawn_object_abs_with_rot(o, 0, selectorModelIDs[i], bhvActSelectorStarType,
-                                        (75 + (sVisibleStars * -75) + (i * 152)), 248, -300, 0, 0, 0);
-            sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
-        }
-    }
-#else
     for (i = 0; i < sVisibleStars; i++) {
         sStarSelectorModels[i] =
             spawn_object_abs_with_rot(o, 0, selectorModelIDs[i], bhvActSelectorStarType,
-                                    (75 + (sVisibleStars * -75) + (i * 152)), 248, -300, 0, 0, 0);
+                                    (75 + (sVisibleStars * -75) + (i * 152)) * ACT_SELECT_WIDESCREEN_SCALE, 248, -300, 0, 0, 0);
         sStarSelectorModels[i]->oStarSelectorSize = 1.0f;
     }
-#endif
 
     render_100_coin_star(stars);
 }
@@ -233,11 +211,8 @@ void bhv_act_selector_loop(void) {
 /**
  * Print the course number selected with the wood rgba16 course texture.
  */
-#if MULTILANG
-void print_course_number(s16 language) {
-#else
+
 void print_course_number(void) {
-#endif
     u8 courseNum[4];
 
     create_dl_translation_matrix(MENU_MTX_PUSH, 158.0f, 81.0f, 0.0f);
@@ -247,7 +222,7 @@ void print_course_number(void) {
 
 #if MULTILANG
     // Change upper part of the wood texture depending of the language defined
-    switch (language) {
+    switch (eu_get_language()) {
         case LANGUAGE_ENGLISH:
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_course_upper);
             break;
@@ -277,58 +252,26 @@ void print_course_number(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
-#define ACT_NAME_X 163
-
+char *textActMyScore = LANGUAGE_TEXT(
+    "MYSCORE",
+    "MON SCORE",
+    "LEISTUNG",
+    "マイスコア");
 /**
  * Print act selector strings, some with special checks.
  */
 void print_act_selector_strings(void) {
-#if MULTILANG
-    unsigned char myScore[][10] = { {TEXT_MYSCORE}, {TEXT_MY_SCORE_FR}, {TEXT_MY_SCORE_DE} };
-#else
-    unsigned char myScore[] = { TEXT_MYSCORE };
-#endif
     unsigned char starNumbers[] = { TEXT_ZERO };
 
-#if MULTILANG
-    u8 **levelNameTbl;
-    u8 *currLevelName;
-    u8 **actNameTbl;
-#else
     u8 **levelNameTbl = segmented_to_virtual(seg2_course_name_table);
     u8 *currLevelName = segmented_to_virtual(levelNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum)]);
     u8 **actNameTbl = segmented_to_virtual(seg2_act_name_table);
-#endif
     u8 *selectedActName;
-#if !MULTILANG
     s16 lvlNameX;
     s16 actNameX;
-#endif
     s8 i;
-#if MULTILANG
-    s16 language = eu_get_language();
-#endif
 
     create_dl_ortho_matrix();
-
-#if MULTILANG
-    switch (language) {
-        default:
-        case LANGUAGE_ENGLISH:
-            actNameTbl = segmented_to_virtual(act_name_table_eu_en);
-            levelNameTbl = segmented_to_virtual(course_name_table_eu_en);
-            break;
-        case LANGUAGE_FRENCH:
-            actNameTbl = segmented_to_virtual(act_name_table_eu_fr);
-            levelNameTbl = segmented_to_virtual(course_name_table_eu_fr);
-            break;
-        case LANGUAGE_GERMAN:
-            actNameTbl = segmented_to_virtual(act_name_table_eu_de);
-            levelNameTbl = segmented_to_virtual(course_name_table_eu_de);
-            break;
-    }
-    currLevelName = segmented_to_virtual(levelNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum)]);
-#endif
 
     // Print the coin highscore.
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
@@ -340,27 +283,15 @@ void print_act_selector_strings(void) {
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
     // Print the "MY SCORE" text if the coin score is more than 0
     if (save_file_get_course_coin_score(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum)) != 0) {
-#if MULTILANG
-        print_generic_string(95, 118, myScore[language]);
-#else
-        print_generic_string(102, 118, myScore);
-#endif
+        print_generic_string(102, 118, LANGUAGE_ARRAY(textActMyScore));
     }
 
-#if MULTILANG
-    print_generic_string(get_str_x_pos_from_center(160, (currLevelName + 3), 10.0f), 33, currLevelName + 3);
-#else
     lvlNameX = get_str_x_pos_from_center(160, currLevelName + 3, 10.0f);
     print_generic_string(lvlNameX, 33, currLevelName + 3);
-#endif
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
-#if MULTILANG
-    print_course_number(language);
-#else
     print_course_number();
-#endif
 
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
@@ -368,22 +299,14 @@ void print_act_selector_strings(void) {
     if (sVisibleStars != 0) {
         selectedActName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + sSelectedActIndex]);
 
-#if MULTILANG
-        print_menu_generic_string(get_str_x_pos_from_center(ACT_NAME_X, selectedActName, 8.0f), 81, selectedActName);
-#else
-        actNameX = get_str_x_pos_from_center(ACT_NAME_X, selectedActName, 8.0f);
+        actNameX = get_str_x_pos_from_center(163, selectedActName, 8.0f);
         print_menu_generic_string(actNameX, 81, selectedActName);
-#endif
     }
 
     // Print the numbers above each star.
     for (i = 1; i <= sVisibleStars; i++) {
         starNumbers[0] = i;
-#if MULTILANG
-        print_menu_generic_string(143 - sVisibleStars * 15 + i * 30, 38, starNumbers);
-#else
         print_menu_generic_string(139 - sVisibleStars * 17 + i * 34, 38, starNumbers);
-#endif
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
