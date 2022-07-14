@@ -59,6 +59,12 @@ s8 gSramProbe;
 #endif
 OSMesgQueue gGameVblankQueue;
 OSMesgQueue gGfxVblankQueue;
+
+#ifdef HVQM
+OSMesgQueue gHVQM_SyncQueue;
+OSMesg gHVQM_SyncMesg;
+#endif
+
 OSMesg gGameMesgBuf[1];
 OSMesg gGfxMesgBuf[1];
 
@@ -737,7 +743,7 @@ void thread5_game_loop(UNUSED void *arg) {
     create_thread_6();
 #endif
 #ifdef HVQM
-    createHvqmThread();
+    osCreateMesgQueue(&gHVQM_SyncQueue, &gHVQM_SyncMesg, 1);
 #endif
     save_file_load_all();
 #ifdef PUPPYCAM
@@ -792,12 +798,6 @@ void thread5_game_loop(UNUSED void *arg) {
             // subtract the end of the gfx pool with the display list to obtain the
             // amount of free space remaining.
             print_text_fmt_int(180, 20, "BUF %d", gGfxPoolEnd - (u8 *) gDisplayListHead);
-        }
-#endif
-#if 0
-        if (gPlayer1Controller->buttonPressed & L_TRIG) {
-            osStartThread(&hvqmThread);
-            osRecvMesg(&gDmaMesgQueue, NULL, OS_MESG_BLOCK);
         }
 #endif
     }

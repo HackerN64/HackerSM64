@@ -34,6 +34,15 @@ struct RumbleSettings {
     s16 decay;
 };
 
+// Message IDs
+enum MessageIDs {
+    MESG_SP_COMPLETE = 100,
+    MESG_DP_COMPLETE,
+    MESG_VI_VBLANK,
+    MESG_START_GFX_SPTASK,
+    MESG_NMI_REQUEST,
+};
+
 extern struct Config gConfig;
 
 // extern OSThread gUnkThread;

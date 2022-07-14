@@ -10,6 +10,12 @@
 // bit which may be read by the sequence script.
 #define SEQUENCE_ARGS(priority, seqId) (((priority) << 8) | (seqId))
 
+// for audio_init
+enum AudioInitType {
+    AUD_INIT,
+    AUD_REINIT,
+};
+
 enum SoundModes {
     SOUND_MODE_STEREO,
     SOUND_MODE_HEADSET,
@@ -69,6 +75,6 @@ void play_toads_jingle(void);
 void sound_reset(u8 presetId);
 void audio_set_sound_mode(u8 soundMode);
 
-void audio_init(void); // in load.c
+void audio_init(enum AudioInitType); // in load.c
 
 #endif // AUDIO_EXTERNAL_H

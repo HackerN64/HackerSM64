@@ -10,6 +10,7 @@
 #include "game/area.h"
 #include "game/game_init.h"
 #include "game/mario.h"
+#include "game/main.h"
 #include "game/memory.h"
 #include "game/object_helpers.h"
 #include "game/object_list_processor.h"
@@ -879,6 +880,32 @@ static void level_cmd_puppylight_node(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
+static void level_cmd_play_hvqm(void) {
+#ifdef HVQM
+    uintptr_t addr = CMD_GET(uintptr_t, 4);
+
+    extern u8 _hvqmworkSegmentBssStart[];
+    extern u8 _hvqbufSegmentBssEnd[];
+
+    bzero(_hvqmworkSegmentBssStart, (u32)_hvqbufSegmentBssEnd - (u32)_hvqmworkSegmentBssStart);
+
+    hvqm_reset_bss();
+    timekeeper_reset_bss();
+
+    createHvqmThread(addr);
+    osStartThread(&hvqmThread);
+    osRecvMesg(&gHVQM_SyncQueue, NULL, OS_MESG_BLOCK);
+
+    osSetEventMesg(OS_EVENT_SP, &gIntrMesgQueue, (OSMesg) MESG_SP_COMPLETE);
+    osViSetEvent(&gIntrMesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
+
+    osDestroyThread(&hvqmThread);
+
+    audio_init(AUD_REINIT);
+#endif
+    sCurrentCmd = CMD_NEXT;
+}
+
 static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_LOAD_AND_EXECUTE            */ level_cmd_load_and_execute,
     /*LEVEL_CMD_EXIT_AND_EXECUTE            */ level_cmd_exit_and_execute,
@@ -945,6 +972,7 @@ static void (*LevelScriptJumpTable[])(void) = {
     /*LEVEL_CMD_CHANGE_AREA_SKYBOX          */ level_cmd_change_area_skybox,
     /*LEVEL_CMD_PUPPYLIGHT_ENVIRONMENT      */ level_cmd_puppylight_environment,
     /*LEVEL_CMD_PUPPYLIGHT_NODE             */ level_cmd_puppylight_node,
+    /*LEVEL_CMD_PLAY_HVQM                   */ level_cmd_play_hvqm,
 };
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {

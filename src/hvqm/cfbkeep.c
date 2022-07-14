@@ -1,10 +1,10 @@
-/* 
+/*
  *  N64-HVQM2 library  Sample program
- * 
+ *
  *  FILE : cfbkeep.c (frame buffer management)
- * 
+ *
  *  Copyright (C) 1998,1999 NINTENDO Co.,Ltd.
- * 
+ *
  */
 
 /* 1998-12-16 */
@@ -29,12 +29,13 @@ u32 cfb_status[NUM_CFBs];
  *
  ***********************************************************************/
 void init_cfb(void) {
-  int i, j;
+    int i, j;
 
-  for ( i = 0; i < NUM_CFBs; i++ ) {
-    for ( j = 0; j < SCREEN_WD*SCREEN_HT; j++ ) gFramebuffers[i][j] = 0;
-    cfb_status[i] = CFB_FREE;
-  }
+    for (i = 0; i < NUM_CFBs; i++) {
+        for (j = 0; j < SCREEN_WD * SCREEN_HT; j++)
+            gFramebuffers[i][j] = 0;
+        cfb_status[i] = CFB_FREE;
+    }
 }
 
 /***********************************************************************
@@ -46,10 +47,8 @@ void init_cfb(void) {
  *  being made unavailable.
  *
  ***********************************************************************/
-void
-keep_cfb( int cfbno )
-{
-  cfb_status[cfbno] |= CFB_PRECIOUS;
+void keep_cfb(int cfbno) {
+    cfb_status[cfbno] |= CFB_PRECIOUS;
 }
 
 /***********************************************************************
@@ -61,10 +60,9 @@ keep_cfb( int cfbno )
  * from protection.
  *
  ***********************************************************************/
-void
-release_cfb( int bufno )
-{
-  if ( bufno >= 0 ) cfb_status[bufno] &= ~CFB_PRECIOUS;
+void release_cfb(int bufno) {
+    if (bufno >= 0)
+        cfb_status[bufno] &= ~CFB_PRECIOUS;
 }
 
 /***********************************************************************
@@ -75,11 +73,10 @@ release_cfb( int bufno )
  *    All frame buffers are released from protection.
  *
  ***********************************************************************/
-void
-release_all_cfb(void)
-{
-  int i;
-  for ( i = 0; i < NUM_CFBs; i++ ) cfb_status[i] &= ~CFB_PRECIOUS;
+void release_all_cfb(void) {
+    int i;
+    for (i = 0; i < NUM_CFBs; i++)
+        cfb_status[i] &= ~CFB_PRECIOUS;
 }
 
 /***********************************************************************
@@ -94,17 +91,15 @@ release_all_cfb(void)
  *     The index of the available frame buffer.
  *
  ***********************************************************************/
-int
-get_cfb()
-{
-  int cfbno;
+int get_cfb() {
+    int cfbno;
 
-  for ( ; ; ) {
-    for ( cfbno = 0; cfbno < NUM_CFBs; cfbno++ )
-      if ( cfb_status[cfbno] == 0 )
-	return cfbno;
-    osYieldThread();
-  }
+    for (;;) {
+        for (cfbno = 0; cfbno < NUM_CFBs; cfbno++)
+            if (cfb_status[cfbno] == 0)
+                return cfbno;
+        osYieldThread();
+    }
 }
 
 /* end */

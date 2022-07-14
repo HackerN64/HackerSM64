@@ -35,6 +35,10 @@ extern OSContStatus gControllerStatuses[4];
 extern OSContPad gControllerPads[4];
 extern OSMesgQueue gGameVblankQueue;
 extern OSMesgQueue gGfxVblankQueue;
+#ifdef HVQM
+extern OSMesgQueue gHVQM_SyncQueue;
+extern OSMesg gHVQM_SyncMesg;
+#endif
 extern OSMesg gGameMesgBuf[1];
 extern OSMesg gGfxMesgBuf[1];
 extern struct VblankHandler gGameVblankHandler;
