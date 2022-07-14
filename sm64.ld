@@ -116,6 +116,7 @@ SECTIONS
       BUILD_DIR/src/audio/synthesis.o(.bss*);
       BUILD_DIR/src/audio/heap.o(.bss*);
       BUILD_DIR/src/audio/load.o(.bss*);
+      . +=  0x1D530;
       BUILD_DIR/src/audio/data.o(.bss*);
       BUILD_DIR/src/audio*.o(.bss*);
       . = ALIGN(0x10);
@@ -124,6 +125,7 @@ SECTIONS
    END_NOLOAD(buffers)
 
    . = _buffersSegmentBssEnd;
+   . += 0x2500;
 
 #ifdef HVQM
    BEGIN_NOLOAD(hvqmwork)

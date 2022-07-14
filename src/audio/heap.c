@@ -223,6 +223,8 @@ void discard_sequence(s32 seqId) {
     }
 }
 
+extern u32 crashdata[16*18];
+extern u32 ptrdumb;
 void *soundAlloc(struct SoundAllocPool *pool, u32 size) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
     u8 *start;
@@ -240,6 +242,7 @@ void *soundAlloc(struct SoundAllocPool *pool, u32 size) {
     return start;
 #else
     u32 alignedSize = ALIGN16(size);
+    crashdata[ptrdumb++] = alignedSize;
 
     u8 *start = pool->cur;
     if ((start + alignedSize <= pool->size + pool->start)) {

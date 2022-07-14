@@ -246,10 +246,42 @@ void draw_crash_log(void) {
 }
 #endif
 
-
+extern ALSeqFile *gAlTbl;
+u32 crashdata[16*18];
+u32 ptrdumb;
+u8* addrdebug = (u8*) crashdata;
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void draw_stacktrace(OSThread *thread, UNUSED s32 cause) {
+    if (gPlayer1Controller->stickY < -34.0f) {
+        addrdebug += 0x80;
+    }
+    if (gPlayer1Controller->stickY > 34.0f) {
+        addrdebug -= 0x80;
+    }
+
+    char str[16*3];
+    u8 *ptr = (/*(u8*) 0x800BE3C0*/ (u8*) addrdebug - 0x00);
+
+    crash_screen_draw_rect(0, 0, 320, 240);
+    for (int i = 0; i < 18; i++) {
+        for (int j = 0; j < 16; j++, ptr++) {
+            str[3*j] = ((*ptr >> 4) & 0x0F) + '0';
+            if (str[3*j] > '9') {
+                str[3*j] += 'A' - '9' - 1;
+            }
+            str[3*j+1] = (*ptr & 0x0F) + '0';
+            if (str[3*j+1] > '9') {
+                str[3*j+1] += 'A' - '9' - 1;
+            }
+            str[3*j+2] = ' ';
+        }
+
+        str[16*3-1] = '\0';
+        crash_screen_print(15, (15 + (i * 12)), str);
+    }
+
+    return;
     __OSThreadContext *tc = &thread->context;
     u32 temp_sp = (tc->sp + 0x14);
 
@@ -322,6 +354,7 @@ void draw_assert(UNUSED OSThread *thread) {
     osWritebackDCacheAll();
 }
 
+u8 stickThres = FALSE;
 void draw_crash_screen(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
@@ -347,6 +380,13 @@ void draw_crash_screen(OSThread *thread) {
     }
     if (gPlayer1Controller->buttonDown & U_CBUTTONS) {
         sProgramPosition -= 4;
+        updateBuffer = TRUE;
+    }
+    if (stickThres == TRUE && gPlayer1Controller->stickY < 30.0f && gPlayer1Controller->stickY > -30.0f) {
+        stickThres = FALSE;
+    }
+    if (stickThres == FALSE && (gPlayer1Controller->stickY > 34.0f || gPlayer1Controller->stickY < -34.0f)) {
+        stickThres = TRUE;
         updateBuffer = TRUE;
     }
 

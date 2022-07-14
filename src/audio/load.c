@@ -9,6 +9,7 @@
 #include "seqplayer.h"
 #include "game/puppyprint.h"
 
+extern u8* addrdebug;
 #define ALIGN16(val) (((val) + 0xF) & ~0xF)
 
 struct SharedDma {
@@ -507,6 +508,10 @@ void patch_audio_bank(struct AudioBank *mem, u8 *offset, u32 numInstruments, u32
     u32 numDrums2 = numDrums;
     if (drums != NULL && numDrums2 > 0) {
         mem->drums = PATCH(drums, mem);
+        if (numInstruments != 12) {
+            // addrdebug = (u8*) &mem; // 0x80 0B E7 90
+            // FORCE_CRASH
+        }
         for (i = 0; i < numDrums2; i++) {
             patched = mem->drums[i];
             if (patched != NULL) {
@@ -548,6 +553,49 @@ void patch_audio_bank(struct AudioBank *mem, u8 *offset, u32 numInstruments, u32
             itInstrs++;
         } while (end != itInstrs);
     }
+
+    volatile int xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+    xxx = 0;
+
 #undef PATCH_MEM
 #undef PATCH
 #undef BASE_OFFSET_REAL
@@ -583,20 +631,20 @@ struct AudioBank *bank_load_immediate(s32 bankId, s32 arg1) {
 }
 
 struct AudioBank *bank_load_async(s32 bankId, s32 arg1, struct SequencePlayer *seqPlayer) {
-    u32 buf[4];
+    // u32 buf[4];
 
     size_t alloc = gAlCtlHeader->seqArray[bankId].len + 0xf;
-    alloc = ALIGN16(alloc);
-    alloc -= 0x10;
-    u8 *ctlData = gAlCtlHeader->seqArray[bankId].offset;
+    // alloc = ALIGN16(alloc);
+    // alloc -= 0x10;
+    // u8 *ctlData = gAlCtlHeader->seqArray[bankId].offset;
     struct AudioBank *ret = alloc_bank_or_seq(&gBankLoadedPool, 1, alloc, arg1, bankId);
-    if (ret == NULL) {
-        return NULL;
-    }
+    // if (ret == NULL) {
+    //     return NULL;
+    // }
 
-    audio_dma_copy_immediate((uintptr_t) ctlData, buf, 0x10);
-    u32 numInstruments = buf[0];
-    u32 numDrums = buf[1];
+    // audio_dma_copy_immediate((uintptr_t) ctlData, buf, 0x10);
+    // u32 numInstruments = buf[0];
+    // u32 numDrums = buf[1];
     seqPlayer->loadingBankId = (u8) bankId;
 #if defined(VERSION_EU)
     gCtlEntries[bankId].numInstruments = numInstruments;
@@ -607,22 +655,22 @@ struct AudioBank *bank_load_async(s32 bankId, s32 arg1, struct SequencePlayer *s
     seqPlayer->bankDmaCurrDevAddr = (uintptr_t)(ctlData + 0x10);
     seqPlayer->bankDmaRemaining = alloc;
 #else
-    seqPlayer->loadingBankNumInstruments = numInstruments;
-    seqPlayer->loadingBankNumDrums = numDrums;
-    seqPlayer->bankDmaCurrMemAddr = (u8 *) ret;
-    seqPlayer->loadingBank = ret;
-    seqPlayer->bankDmaCurrDevAddr = (uintptr_t)(ctlData + 0x10);
-    seqPlayer->bankDmaRemaining = alloc;
+    // seqPlayer->loadingBankNumInstruments = numInstruments;
+    // seqPlayer->loadingBankNumDrums = numDrums;
+    // seqPlayer->bankDmaCurrMemAddr = (u8 *) ret;
+    // seqPlayer->loadingBank = ret;
+    // seqPlayer->bankDmaCurrDevAddr = (uintptr_t)(ctlData + 0x10);
+    // seqPlayer->bankDmaRemaining = alloc;
 #endif
-    OSMesgQueue *mesgQueue = &seqPlayer->bankDmaMesgQueue;
-    osCreateMesgQueue(mesgQueue, &seqPlayer->bankDmaMesg, 1);
-#if defined(VERSION_JP) || defined(VERSION_US)
-    seqPlayer->bankDmaMesg = NULL;
-#endif
-    seqPlayer->bankDmaInProgress = TRUE;
-    audio_dma_partial_copy_async(&seqPlayer->bankDmaCurrDevAddr, &seqPlayer->bankDmaCurrMemAddr,
-                                 &seqPlayer->bankDmaRemaining, mesgQueue, &seqPlayer->bankDmaIoMesg);
-    gBankLoadStatus[bankId] = SOUND_LOAD_STATUS_IN_PROGRESS;
+    // OSMesgQueue *mesgQueue = &seqPlayer->bankDmaMesgQueue;
+    // osCreateMesgQueue(mesgQueue, &seqPlayer->bankDmaMesg, 1);
+// #if defined(VERSION_JP) || defined(VERSION_US)
+//     seqPlayer->bankDmaMesg = NULL;
+// #endif
+//     seqPlayer->bankDmaInProgress = TRUE;
+//     audio_dma_partial_copy_async(&seqPlayer->bankDmaCurrDevAddr, &seqPlayer->bankDmaCurrMemAddr,
+//                                  &seqPlayer->bankDmaRemaining, mesgQueue, &seqPlayer->bankDmaIoMesg);
+//     gBankLoadStatus[bankId] = SOUND_LOAD_STATUS_IN_PROGRESS;
     return ret;
 }
 
@@ -858,20 +906,29 @@ void load_sequence_internal(u32 player, u32 seqId, s32 loadAsync) {
     seqPlayer->scriptState.pc = sequenceData;
 }
 
+extern u32 crashdata[16*18];
+extern u32 ptrdumb;
 // (void) must be omitted from parameters to fix stack with -framepointer
 void audio_init() {
 #if defined(VERSION_JP) || defined(VERSION_US) || defined(VERSION_EU)
-    u8 buf[0x10];
+    volatile int dumbp = 0;
 #endif
     s32 i, /*j,*/ k;
-    UNUSED u32 size;
+    /*ALIGNED16*/ u8 buf[0x10];
+    u32 *size = &crashdata[0x100];
     void *data;
 
     gAudioLoadLock = AUDIO_LOCK_UNINITIALIZED;
 
+    dumbp = 0;
+    dumbp = 0;
+    dumbp = 0;
+    dumbp = 0;
+    dumbp = 0;
+    dumbp = 0;
+
 #if defined(VERSION_JP) || defined(VERSION_US)
-    s32 lim2 = gAudioHeapSize;
-    for (i = 0; i <= lim2 / 8 - 1; i++) {
+    for (i = 0; i < gAudioHeapSize / 8; i++) {
         ((u64 *) gAudioHeap)[i] = 0;
     }
 
@@ -963,30 +1020,34 @@ void audio_init() {
     data = gMusicData;
     audio_dma_copy_immediate((uintptr_t) data, gSeqFileHeader, 0x10);
     gSequenceCount = gSeqFileHeader->seqCount;
-    size = gSequenceCount * sizeof(ALSeqData) + 4;
-    size = ALIGN16(size);
-    gSeqFileHeader = soundAlloc(&gAudioInitPool, size);
-    audio_dma_copy_immediate((uintptr_t) data, gSeqFileHeader, size);
+    *size = gSequenceCount * sizeof(ALSeqData) + 4;
+    *size = ALIGN16(*size);
+    gSeqFileHeader = soundAlloc(&gAudioInitPool, *size);
+    audio_dma_copy_immediate((uintptr_t) data, gSeqFileHeader, *size);
     alSeqFileNew(gSeqFileHeader, data);
+    size++;
 
     // Load header for CTL (instrument metadata)
     gAlCtlHeader = (ALSeqFile *) buf;
     data = gSoundDataADSR;
     audio_dma_copy_immediate((uintptr_t) data, gAlCtlHeader, 0x10);
-    size = gAlCtlHeader->seqCount * sizeof(ALSeqData) + 4;
-    size = ALIGN16(size);
+    *size = gAlCtlHeader->seqCount * sizeof(ALSeqData) + 4;
+    size[7] = (u32)gAlCtlHeader;
+    *size = ALIGN16(*size);
     gCtlEntries = soundAlloc(&gAudioInitPool, gAlCtlHeader->seqCount * sizeof(struct CtlEntry));
-    gAlCtlHeader = soundAlloc(&gAudioInitPool, size);
-    audio_dma_copy_immediate((uintptr_t) data, gAlCtlHeader, size);
+    gAlCtlHeader = soundAlloc(&gAudioInitPool, *size);
+    audio_dma_copy_immediate((uintptr_t) data, gAlCtlHeader, *size);
     alSeqFileNew(gAlCtlHeader, data);
+    size++;
 
     // Load header for TBL (raw sound data)
     gAlTbl = (ALSeqFile *) buf;
     audio_dma_copy_immediate((uintptr_t) data, gAlTbl, 0x10);
-    size = gAlTbl->seqCount * sizeof(ALSeqData) + 4;
-    size = ALIGN16(size);
-    gAlTbl = soundAlloc(&gAudioInitPool, size);
-    audio_dma_copy_immediate((uintptr_t) gSoundDataRaw, gAlTbl, size);
+    *size = gAlTbl->seqCount * sizeof(ALSeqData) + 4;
+    *size = ALIGN16(*size);
+    crashdata[ptrdumb++] = *size;
+    gAlTbl = soundAlloc(&gAudioInitPool, *size);
+    audio_dma_copy_immediate((uintptr_t) gSoundDataRaw, gAlTbl, *size);
     alSeqFileNew(gAlTbl, gSoundDataRaw);
 
     // Load bank sets for each sequence
@@ -998,18 +1059,24 @@ void audio_init() {
     audio_dma_copy_immediate((uintptr_t) gBankSetsData, gAlBankSets, 0x100);
 #endif
 
+    dumbp = 0;
+    dumbp = 0;
+    dumbp = 0;
+    dumbp = 0;
+    dumbp = 0;
+
     init_sequence_players();
     gAudioLoadLock = AUDIO_LOCK_NOT_LOADING;
     // Should probably contain the sizes of the data banks, but those aren't
     // easily accessible from here.
-    osSyncPrintf("---------- Init Completed. ------------\n");
-    osSyncPrintf(" Syndrv    :[%6d]\n", gSoundDataRaw - gSoundDataADSR); // gSoundDataADSR
-#ifndef VERSION_SH
-    osSyncPrintf(" Seqdrv    :[%6d]\n", gBankSetsData - gMusicData); // gMusicData
-#else
-    osSyncPrintf(" Seqdrv    :[%6d]\n", _assetsSegmentRomEnd - gMusicData); // gMusicData
-#endif
-    osSyncPrintf(" audiodata :[%6d]\n", gMusicData - gSoundDataRaw); // gSoundDataRaw
-    osSyncPrintf("---------------------------------------\n");
+//     osSyncPrintf("---------- Init Completed. ------------\n");
+//     osSyncPrintf(" Syndrv    :[%6d]\n", gSoundDataRaw - gSoundDataADSR); // gSoundDataADSR
+// #ifndef VERSION_SH
+//     osSyncPrintf(" Seqdrv    :[%6d]\n", gBankSetsData - gMusicData); // gMusicData
+// #else
+//     osSyncPrintf(" Seqdrv    :[%6d]\n", _assetsSegmentRomEnd - gMusicData); // gMusicData
+// #endif
+//     osSyncPrintf(" audiodata :[%6d]\n", gMusicData - gSoundDataRaw); // gSoundDataRaw
+//     osSyncPrintf("---------------------------------------\n");
 }
 #endif

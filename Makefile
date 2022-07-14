@@ -529,10 +529,10 @@ else
   RSPASM              := $(TOOLS_DIR)/armips
 endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
-EMULATOR = mupen64plus
+EMULATOR = wslview
 EMU_FLAGS =
-LOADER = loader64
-LOADER_FLAGS = -vwf
+LOADER = UNFLoader.exe
+LOADER_FLAGS = -r
 SHA1SUM = sha1sum
 PRINT = printf
 
