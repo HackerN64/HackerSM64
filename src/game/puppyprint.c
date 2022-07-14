@@ -46,6 +46,7 @@ a modern game engine's developer's console.
 #include "color_presets.h"
 #include "buffers/buffers.h"
 #include "profiling.h"
+#include "segment_symbols.h"
 
 #ifdef PUPPYPRINT
 
@@ -85,30 +86,73 @@ u32 gPPSegScroll = 0;
 u32 gMiscMem = 0;
 struct CallCounter gPuppyCallCounter;
 
-extern u8 _mainSegmentStart[];
-extern u8 _mainSegmentEnd[];
-extern u8 _engineSegmentStart[];
-extern u8 _engineSegmentEnd[];
-extern u8 _framebuffersSegmentBssStart[];
-extern u8 _framebuffersSegmentBssEnd[];
-extern u8 _zbufferSegmentBssStart[];
-extern u8 _zbufferSegmentBssEnd[];
-extern u8 _buffersSegmentBssStart[];
-extern u8 _buffersSegmentBssEnd[];
-extern u8 _goddardSegmentStart[];
-extern u8 _goddardSegmentEnd[];
+// Another epic lookup table, for text this time.
+const char ramNames[][32] = {
+    "Buffers",
+    "Main",
+    "Engine",
+    "Framebuffers",
+    "ZBuffer",
+    "Goddard",
+    "Pools",
+    "Collision",
+    "Misc",
+    "Audio Heap"
+};
+
+enum RamNames {
+    RAM_BUFFERS,
+    RAM_MAIN,
+    RAM_ENGINE,
+    RAM_FRAMEBUFFERS,
+    RAM_ZBUFFER,
+    RAM_GODDARD,
+    RAM_POOLS,
+    RAM_COLLISION,
+    RAM_MISC,
+    RAM_AUDIO
+};
+
+const char segNames[][32] = {
+    "HUD",
+    "Common1 GFX",
+    "Group0 GFX",
+    "GroupA GFX",
+    "GroupB GFX",
+    "Level GFX",
+    "Common0 GFX",
+    "Textures",
+    "Skybox",
+    "Effects",
+    "GroupA Geo",
+    "GroupB Geo",
+    "Level Geo",
+    "Common0 Geo",
+    "Entry",
+    "Mario Anims",
+    "Demos",
+    "Bhv Scripts",
+    "Menu",
+    "Level Scripts",
+    "Common1 Geo",
+    "Group0 Geo",
+    "",
+    "Languages"
+};
+
+const s8 nameTable = sizeof(ramNames) / 32;
 
 void puppyprint_calculate_ram_usage(void) {
-    ramsizeSegment[0] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - sizeof(gAudioHeap);
-    ramsizeSegment[1] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
-    ramsizeSegment[2] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
-    ramsizeSegment[3] = (u32)&_framebuffersSegmentBssEnd - (u32)&_framebuffersSegmentBssStart;
-    ramsizeSegment[4] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
-    ramsizeSegment[5] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
-    ramsizeSegment[6] = gPoolMem;
-    ramsizeSegment[7] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
-    ramsizeSegment[8] = gMiscMem;
-    ramsizeSegment[9] = gAudioHeapSize + gAudioInitPoolSize;
+    ramsizeSegment[RAM_BUFFERS] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - sizeof(gAudioHeap);
+    ramsizeSegment[RAM_MAIN] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
+    ramsizeSegment[RAM_ENGINE] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
+    ramsizeSegment[RAM_FRAMEBUFFERS] = (u32)&_framebuffersSegmentBssEnd - (u32)&_framebuffersSegmentBssStart;
+    ramsizeSegment[RAM_ZBUFFER] = (u32)&_zbufferSegmentBssEnd - (u32)&_zbufferSegmentBssStart;
+    ramsizeSegment[RAM_GODDARD] = (u32)&_goddardSegmentEnd - (u32)&_goddardSegmentStart;
+    ramsizeSegment[RAM_POOLS] = gPoolMem;
+    ramsizeSegment[RAM_COLLISION] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
+    ramsizeSegment[RAM_MISC] = gMiscMem;
+    ramsizeSegment[RAM_AUDIO] = gAudioHeapSize + gAudioInitPoolSize;
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -153,89 +197,6 @@ ColorRGB colourChart[NUM_TLB_SEGMENTS + 1] = {
     { 176, 196, 222 },
     { 255, 255, 255 }
 };
-
-// Change this to alter the width of the bar at the bottom.
-#define RAM_BAR_LENGTH 200
-#define RAM_BAR_MIN    (SCREEN_CENTER_X - (RAM_BAR_LENGTH / 2))
-#define RAM_BAR_MAX    (SCREEN_CENTER_X + (RAM_BAR_LENGTH / 2))
-#define RAM_BAR_TOP    (SCREEN_HEIGHT - 30)
-#define RAM_BAR_BOTTOM (SCREEN_HEIGHT - 22)
-
-void print_ram_bar(void) {
-    s32 i = 0;
-    f32 perfPercentage;
-    s32 graphPos = 0;
-    s32 prevGraph = RAM_BAR_MIN;
-    s32 ramsize = osGetMemSize();
-
-    prepare_blank_box();
-
-    for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
-        if (ramsizeSegment[i] == 0) {
-            continue;
-        }
-
-        perfPercentage = (RAM_BAR_LENGTH * ((f32)ramsizeSegment[i] / ramsize));
-        graphPos = (prevGraph + CLAMP(perfPercentage, 1, RAM_BAR_MAX));
-        render_blank_box(prevGraph, RAM_BAR_TOP, graphPos, RAM_BAR_BOTTOM,
-            colourChart[i][0],
-            colourChart[i][1],
-            colourChart[i][2], 255);
-        prevGraph = graphPos;
-    }
-
-    perfPercentage = (RAM_BAR_LENGTH * ((f32)ramsizeSegment[NUM_TLB_SEGMENTS] / ramsize));
-    graphPos = (prevGraph + CLAMP(perfPercentage, 1, RAM_BAR_MAX));
-    render_blank_box(prevGraph, RAM_BAR_TOP, graphPos, RAM_BAR_BOTTOM, 255, 255, 255, 255);
-    prevGraph = graphPos;
-
-    render_blank_box(prevGraph, RAM_BAR_TOP, RAM_BAR_MAX, RAM_BAR_BOTTOM, 0, 0, 0, 255);
-
-    finish_blank_box();
-}
-
-// Another epic lookup table, for text this time.
-const char ramNames[][32] = {
-    "Buffers",
-    "Main",
-    "Engine",
-    "Framebuffers",
-    "ZBuffer",
-    "Goddard",
-    "Pools",
-    "Collision",
-    "Misc",
-    "Audio Heap"
-};
-
-const char segNames[][32] = {
-    "HUD",
-    "Common1 GFX",
-    "Group0 GFX",
-    "GroupA GFX",
-    "GroupB GFX",
-    "Level GFX",
-    "Common0 GFX",
-    "Textures",
-    "Skybox",
-    "Effects",
-    "GroupA Geo",
-    "GroupB Geo",
-    "Level Geo",
-    "Common0 Geo",
-    "Entry",
-    "Mario Anims",
-    "Demos",
-    "Bhv Scripts",
-    "Menu",
-    "Level Scripts",
-    "Common1 Geo",
-    "Group0 Geo",
-    "",
-    "Languages"
-};
-
-const s8 nameTable = sizeof(ramNames) / 32;
 
 void swap(int* xp, int* yp)
 {
@@ -493,12 +454,12 @@ void puppyprint_render_standard(void) {
     char textBytes[128];
 
     sprintf(textBytes, "Matrix Muls: %d\n\nCollision Checks\nFloors: %d\nWalls: %d\nCeilings: %d\n Water: %d\nRaycasts: %d",
-    gPuppyCallCounter.matrix,
-    gPuppyCallCounter.collision_floor,
-    gPuppyCallCounter.collision_wall,
-    gPuppyCallCounter.collision_ceil,
-    gPuppyCallCounter.collision_water,
-    gPuppyCallCounter.collision_raycast
+            gPuppyCallCounter.matrix,
+            gPuppyCallCounter.collision_floor,
+            gPuppyCallCounter.collision_wall,
+            gPuppyCallCounter.collision_ceil,
+            gPuppyCallCounter.collision_water,
+            gPuppyCallCounter.collision_raycast
     );
     print_small_text_light(SCREEN_WIDTH-16, 32, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
 }
@@ -605,14 +566,14 @@ void puppyprint_render_general_vars(void) {
 
 
     sprintf(textBytes, "World\n\nObjects: %d/%d\n\nLevel ID: %d\nCourse ID: %d\nArea ID: %d\nRoom ID: %d\n\nInteract:   \n0x%08X\nWarp: 0x%02X", 
-    gObjectCounter, 
-    OBJECT_POOL_CAPACITY,
-    gCurrLevelNum,
-    gCurrCourseNum,
-    gCurrAreaIndex,
-    gMarioCurrentRoom,
-    objParams,
-    gLastWarpID
+            gObjectCounter, 
+            OBJECT_POOL_CAPACITY,
+            gCurrLevelNum,
+            gCurrCourseNum,
+            gCurrAreaIndex,
+            gMarioCurrentRoom,
+            objParams,
+            gLastWarpID
     );
     print_small_text_light(SCREEN_WIDTH - 16, 36, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_OUTLINE);
 
@@ -761,7 +722,7 @@ void puppyprint_profiler_process(void) {
             }
             if (gPlayer1Controller->buttonPressed & R_JPAD) {
                 sLevelSelectOptionArea++;
-                if (sLevelSelectOptionArea > 7) {
+                if (sLevelSelectOptionArea > AREA_COUNT - 1) {
                     sLevelSelectOptionArea = 0;
                 }
             }

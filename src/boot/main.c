@@ -260,7 +260,6 @@ void handle_sp_complete(void) {
             profiler_rsp_yielded();
         }
 
-
         // Start the audio task, as expected by handle_vblank.
         if (gAudioEnabled) {
             start_sptask(M_AUDTASK);
