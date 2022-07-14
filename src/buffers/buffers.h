@@ -7,10 +7,11 @@
 #include "game/save_file.h"
 #include "game/game_init.h"
 #include "config.h"
+#include "audio/data.h"
 
 extern u8 gDecompressionHeap[];
 
-extern u8 gAudioHeap[];
+extern u8 gAudioHeap[DOUBLE_SIZE_ON_64_BIT(AUDIO_HEAP_SIZE)];
 
 extern u8 gIdleThreadStack[];
 extern u8 gThread3Stack[];

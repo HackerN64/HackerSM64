@@ -470,6 +470,9 @@ u32 get_area_terrain_size(TerrainData *data) {
  * boxes (water, gas, JRB fog).
  */
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
+#if PUPPYPRINT_DEBUG
+    u32 first = osGetCount();
+#endif
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
     u32 surfacePoolData;
@@ -527,12 +530,18 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+#if PUPPYPRINT_DEBUG
+    profiler_collision_update(first);
+#endif
 }
 
 /**
  * If not in time stop, clear the surface partitions.
  */
 void clear_dynamic_surfaces(void) {
+#if PUPPYPRINT_DEBUG
+    u32 first = osGetCount();
+#endif
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
@@ -541,6 +550,9 @@ void clear_dynamic_surfaces(void) {
 
         clear_spatial_partition(&gDynamicSurfacePartition[0][0]);
     }
+#if PUPPYPRINT_DEBUG
+    profiler_collision_update(first);
+#endif
 }
 
 /**
@@ -652,6 +664,9 @@ static void get_optimal_coll_dist(struct Object *obj) {
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
+#if PUPPYPRINT_DEBUG
+    u32 first = osGetCount();
+#endif
     TerrainData vertexData[600];
 
     TerrainData *collisionData = o->collisionData;
@@ -690,12 +705,18 @@ void load_object_collision_model(void) {
         }
     }
     COND_BIT((marioDist < o->oDrawingDistance), o->header.gfx.node.flags, GRAPH_RENDER_ACTIVE);
+#if PUPPYPRINT_DEBUG
+    profiler_collision_update(first);
+#endif
 }
 
 /**
  * Transform an object's vertices and add them to the static surface pool.
  */
 void load_object_static_model(void) {
+#if PUPPYPRINT_DEBUG
+    OSTime first = osGetTime();
+#endif
     TerrainData vertexData[600];
     TerrainData *collisionData = o->collisionData;
     u32 surfacePoolData;
@@ -720,4 +741,7 @@ void load_object_static_model(void) {
 
     gNumStaticSurfaceNodes = gSurfaceNodesAllocated;
     gNumStaticSurfaces = gSurfacesAllocated;
+#if PUPPYPRINT_DEBUG
+    profiler_collision_update(first);
+#endif
 }

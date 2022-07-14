@@ -322,6 +322,9 @@ void mtxf_copy(register Mat4 dest, register Mat4 src) {
 
 /// Set mtx to the identity matrix.
 void mtxf_identity(register Mat4 mtx) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     s32 i;
     f32 *dest;
     for (dest = ((f32 *) mtx + 1), i = 0; i < 14; dest++, i++) {
@@ -334,6 +337,9 @@ void mtxf_identity(register Mat4 mtx) {
 
 /// Set dest to a translation matrix of vector b.
 void mtxf_translate(Mat4 dest, Vec3f b) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register s32 i;
     register f32 *pen;
     for (pen = ((f32 *) dest + 1), i = 0; i < 12; pen++, i++) {
@@ -354,6 +360,9 @@ void mtxf_translate(Mat4 dest, Vec3f b) {
  * i.e. a matrix representing a linear transformation over 3 space.
  */
 void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     s32 i;
     for (i = 0; i < 3; i++) {
         dst[i] = ((m[0][i] * v[0])
@@ -363,6 +372,9 @@ void linear_mtxf_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
 }
 
 void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     s32 i;
     for (i = 0; i < 3; i++) {
         dst[i] = ((m[0][i] * v[0])
@@ -381,6 +393,9 @@ void linear_mtxf_mul_vec3f_and_translate(Mat4 m, Vec3f dst, Vec3f v) {
  * i.e. a matrix representing a linear transformation over 3 space.
  */
 void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     s32 i;
     for (i = 0; i < 3; i++) {
         dst[i] = vec3_dot(m[i], v);
@@ -389,6 +404,9 @@ void linear_mtxf_transpose_mul_vec3f(Mat4 m, Vec3f dst, Vec3f v) {
 
 /// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates.
 void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register f32 sx   = sins(rot[0]);
     register f32 cx   = coss(rot[0]);
     register f32 sy   = sins(rot[1]);
@@ -414,6 +432,9 @@ void mtxf_rotate_zxy_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
 
 /// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates.
 UNUSED void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register f32 sx   = sins(rot[0]);
     register f32 cx   = coss(rot[0]);
     register f32 sy   = sins(rot[1]);
@@ -439,6 +460,9 @@ UNUSED void mtxf_rotate_xyz_and_translate(Mat4 dest, Vec3f trans, Vec3s rot) {
 
 /// Build a matrix that rotates around the z axis, then the x axis, then the y axis, and then translates and multiplies.
 void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register f32 sx = sins(rot[0]);
     register f32 cx = coss(rot[0]);
     register f32 sy = sins(rot[1]);
@@ -469,6 +493,9 @@ void mtxf_rotate_zxy_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
 
 /// Build a matrix that rotates around the x axis, then the y axis, then the z axis, and then translates and multiplies.
 void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Mat4 src) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register f32 sx = sins(rot[0]);
     register f32 cx = coss(rot[0]);
     register f32 sy = sins(rot[1]);
@@ -504,6 +531,9 @@ void mtxf_rotate_xyz_and_translate_and_mul(Vec3s rot, Vec3f trans, Mat4 dest, Ma
  * angle allows a bank rotation of the camera.
  */
 void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     Vec3f colX, colY, colZ;
     register f32 dx = (to[0] - from[0]);
     register f32 dz = (to[2] - from[2]);
@@ -544,6 +574,9 @@ void mtxf_lookat(Mat4 mtx, Vec3f from, Vec3f to, s32 roll) {
  * 'angle' rotates the object while still facing the camera.
  */
 void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register s32 i;
     register f32 sx = scale[0];
     register f32 sy = scale[1];
@@ -593,6 +626,9 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle)
  * 'yaw' is the angle which it should face
  */
 void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
@@ -622,6 +658,9 @@ void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 y
  * 'pos' is the object's position in the world
  */
 void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
@@ -647,6 +686,9 @@ void mtxf_align_terrain_normal(Mat4 dest, Vec3f upDir, Vec3f pos, s32 yaw) {
  * 'radius' is the distance from each triangle vertex to the center
  */
 void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     struct Surface *floor;
     Vec3f point0, point1, point2;
     Vec3f forward;
@@ -697,6 +739,9 @@ void mtxf_align_terrain_triangle(Mat4 mtx, Vec3f pos, s32 yaw, f32 radius) {
  * then a.
  */
 void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     Vec3f entry;
     register f32 *temp  = (f32 *)a;
     register f32 *temp2 = (f32 *)dest;
@@ -723,6 +768,9 @@ void mtxf_mul(Mat4 dest, Mat4 a, Mat4 b) {
  * Set matrix 'dest' to 'mtx' scaled by vector s
  */
 void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register f32 *temp  = (f32 *)dest;
     register f32 *temp2 = (f32 *)mtx;
     register s32 i;
@@ -743,6 +791,9 @@ void mtxf_scale_vec3f(Mat4 dest, Mat4 mtx, register Vec3f s) {
  * true for transformation matrices if the translation has a w component of 1.
  */
 UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register f32 x = b[0];
     register f32 y = b[1];
     register f32 z = b[2];
@@ -766,6 +817,9 @@ UNUSED void mtxf_mul_vec3s(Mat4 mtx, Vec3s b) {
     ((s16 *) mtx)[a     ] = (((s32) b) >> 16);  \
     ((s16 *) mtx)[a + 16] = (((s32) b) & 0xFFFF);
 void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register s32 i = (coss(angle) * 0x10000);
     register s32 j = (sins(angle) * 0x10000);
     register f32 *temp = (f32 *)mtx;
@@ -791,6 +845,9 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
  * the camera position.
  */
 void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     register s32 i;
     register f32 *temp1 = (f32 *)dest;
     register f32 *temp2 = (f32 *)camMtx;
@@ -1303,7 +1360,7 @@ s32 anim_spline_poll(Vec3f result) {
 
 /**
  * @brief Checks if a ray intersects a surface using Möller–Trumbore intersection algorithm.
- * 
+ *
  * @param orig is the starting point of the ray.
  * @param dir is the normalized ray direction.
  * @param dir_length is the length of the ray.
@@ -1351,7 +1408,7 @@ s32 ray_surface_intersect(Vec3f orig, Vec3f dir, f32 dir_length, struct Surface 
     f32 u = f * vec3f_dot(s, h);
     // Check if 'u' is within bounds.
     if ((u < 0.0f) || (u > 1.0f)) return FALSE;
-    // Make 'q' the cross product of 's' and edge 1. 
+    // Make 'q' the cross product of 's' and edge 1.
     Vec3f q;
     vec3f_cross(q, s, e1);
     // Make 'v' the cos(angle) between the ray and 'q', divided by 'det'.
@@ -1377,6 +1434,9 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     f32 length;
     Vec3f chk_hit_pos;
     f32 top, bottom;
+#if PUPPYPRINT_DEBUG
+    u32 first = osGetCount();
+#endif
     // Get upper and lower bounds of ray
     if (dir[1] >= 0.0f) {
         // Ray is upwards.
@@ -1400,6 +1460,9 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
             *max_length = length;
         }
     }
+#if PUPPYPRINT_DEBUG
+    profiler_collision_update(first);
+#endif
 }
 
 void find_surface_on_ray_cell(s32 cellX, s32 cellZ, Vec3f orig, Vec3f normalized_dir, f32 dir_length, struct Surface **hit_surface, Vec3f hit_pos, f32 *max_length, s32 flags) {
@@ -1430,6 +1493,9 @@ void find_surface_on_ray(Vec3f orig, Vec3f dir, struct Surface **hit_surface, Ve
     f32 step;
     s32 i;
     const f32 invcell = 1.0f / CELL_SIZE;
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.collision_raycast++;
+#endif
 
     // Set that no surface has been hit
     *hit_surface = NULL;
@@ -1529,6 +1595,9 @@ static ALWAYS_INLINE float construct_float(const float f)
 __attribute__((optimize("Os")))
 void mtxf_to_mtx_fast(s16* dst, float* src)
 {
+#if PUPPYPRINT_DEBUG
+    gPuppyCallCounter.matrix++;
+#endif
     float scale = construct_float(65536.0f / WORLD_SCALE);
     // Iterate over pairs of values in the input matrix
     for (int i = 0; i < 8; i++)
