@@ -2001,7 +2001,7 @@ const struct AsciiCharLUTEntry main_hud_lut[] = {
 };
 
 const struct Utf8CharLUTEntry main_hud_utf8_2byte_lut[] = {
-    {0x00D7, 16, 0, texture_hud_char_multiply}, // ×
+    {0x00D7, 14, 0, texture_hud_char_multiply}, // ×
 };
 
 const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {

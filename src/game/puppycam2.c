@@ -351,7 +351,7 @@ void puppycam_display_options() {
     puppycam_display_box(48,84,272,218,0x0,0x0,0x0, 0x50);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-    print_hud_lut_string(HUD_LUT_GLOBAL, 112, 40, (*gPCToggleStringsPtr)[2]);
+    print_hud_lut_string(112, 40, (*gPCToggleStringsPtr)[2]);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     if (gPCOptionCap > 4) {

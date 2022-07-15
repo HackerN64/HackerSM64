@@ -337,24 +337,24 @@ void print_generic_string(s16 x, s16 y, char *str) {
 
 
 /**
- * Prints a hud string depending of the hud table list defined.
+ * Prints a hud string.
  */
-void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, char *str) {
+void print_hud_lut_string(s16 x, s16 y, char *str) {
     s32 strPos = 0;
-    void **hudLUT1 = segmented_to_virtual(menu_hud_lut); // Japanese Menu HUD Color font
-    struct AsciiCharLUTEntry *hudLUT2 = segmented_to_virtual(main_hud_lut); // 0-9 A-Z HUD Color Font
+    struct AsciiCharLUTEntry *hudLUT = segmented_to_virtual(main_hud_lut); // 0-9 A-Z HUD Color Font
     u32 curX = x;
     u32 curY = y;
+    u32 renderX, renderY;
     u32 codepoint;
     struct Utf8CharLUTEntry *utf8Entry;
 
     u32 xStride; // X separation
 
-    if (hudLUT == HUD_LUT_JPMENU) {
+    /**if (hudLUT == HUD_TEXT_MODE_1CYCLE) {
         xStride = 16;
-    } else { // HUD_LUT_GLOBAL
+    } else { // HUD_TEXT_MODE_1CYCLE
         xStride = 12; //? Shindou uses this.
-    }
+    }**/
 
     while (str[strPos] != 0x00) {
         switch (str[strPos]) {
@@ -364,21 +364,28 @@ void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, char *str) {
             default:
                 gDPPipeSync(gDisplayListHead++);
 
-                /**if (hudLUT == HUD_LUT_JPMENU) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT1[str[strPos] - ' ']);
-                }**/
                 if (!(str[strPos] & 0x80)) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT2[str[strPos] - ' '].texture);
-                    xStride = 12;
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT[str[strPos] - ' '].texture);
+                    xStride = hudLUT[str[strPos] - ' '].kerning;
                 } else {
                     utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
                     xStride = utf8Entry->kerning;
                 }
 
+                renderX = curX;
+                renderY = curY;
+                if (str[strPos] == '\'') {
+                    renderX -= 2;
+                    renderY -= 7;
+                } else if (str[strPos] == '"') {
+                    renderX += 1;
+                    renderY -= 7;
+                }
+
                 gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
-                gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 16) << 2,
-                                    (curY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                gSPTextureRectangle(gDisplayListHead++, renderX << 2, renderY << 2, (renderX + 16) << 2,
+                                    (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
                 curX += xStride;
         }
@@ -498,9 +505,6 @@ s32 get_str_x_pos_from_center(s16 centerPos, char *str, UNUSED f32 scale) {
     return (s16)(centerPos - (s16)(get_string_width(str) / 2.0f));
 }
 
-u8 gHudSymCoin[] = { GLYPH_COIN, GLYPH_SPACE };
-u8 gHudSymX[] = { GLYPH_MULTIPLY, GLYPH_SPACE };
-
 void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
     char strNumCoins[10];
     s16 numCoins;
@@ -513,7 +517,7 @@ void print_hud_my_score_coins(s32 useCourseCoinScore, s8 fileIndex, s8 courseInd
 
     if (numCoins != 0) {
         sprintf(strNumCoins, "✪×%d", numCoins);
-        print_hud_lut_string(HUD_LUT_GLOBAL, x, y, strNumCoins);
+        print_hud_lut_string(x, y, strNumCoins);
     }
 }
 
@@ -523,7 +527,7 @@ void print_hud_my_score_stars(s8 fileIndex, s8 courseIndex, s16 x, s16 y) {
 
     if (starCount != 0) {
         sprintf(strStarCount, "★×%d", starCount);
-        print_hud_lut_string(HUD_LUT_GLOBAL, x, y, strStarCount);
+        print_hud_lut_string(x, y, strStarCount);
     }
 }
 
@@ -1551,7 +1555,7 @@ void print_hud_pause_colorful_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_hud_lut_string(HUD_LUT_GLOBAL, 123, 81, "PAUSE");
+    print_hud_lut_string(123, 81, "PAUSE");
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
@@ -1776,9 +1780,9 @@ void print_hud_course_complete_string(s8 str) {
     gDPSetEnvColor(gDisplayListHead++, colorFade, colorFade, colorFade, 255);
 
     if (str == HUD_PRINT_HISCORE) {
-        print_hud_lut_string(HUD_LUT_GLOBAL, TXT_HISCORE_X,  TXT_HISCORE_Y,  LANGUAGE_ARRAY(textHudHiScore));
+        print_hud_lut_string(TXT_HISCORE_X,  TXT_HISCORE_Y,  LANGUAGE_ARRAY(textHudHiScore));
     } else { // HUD_PRINT_CONGRATULATIONS
-        print_hud_lut_string(HUD_LUT_GLOBAL, TXT_CONGRATS_X, TXT_CONGRATS_Y, LANGUAGE_ARRAY(textCongratulations));
+        print_hud_lut_string(TXT_CONGRATS_X, TXT_CONGRATS_Y, LANGUAGE_ARRAY(textCongratulations));
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
@@ -1791,7 +1795,7 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
 
     sprintf(courseCompleteCoinsStr, "✪×%d", gCourseCompleteCoins);
-    print_hud_lut_string(HUD_LUT_GLOBAL, x, y, courseCompleteCoinsStr);
+    print_hud_lut_string(x, y, courseCompleteCoinsStr);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
@@ -1902,7 +1906,7 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
 
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
-    print_hud_lut_string(HUD_LUT_GLOBAL, 55, 77, "★");
+    print_hud_lut_string(55, 77, "★");
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 

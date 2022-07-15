@@ -15,20 +15,12 @@ enum MenuScrollAxis {
     MENU_SCROLL_HORIZONTAL,
 };
 
-// Japanese File Select uses an unique table
-// to print specific Japanese HUD chars
-enum HUDLUTs {
-    HUD_LUT_NONE,
-    HUD_LUT_JPMENU,
-    HUD_LUT_GLOBAL,
+// Whether to render the HUD text in 1-cycle mode
+// or copy mode.
+enum HUDTextRenderModes {
+    HUD_TEXT_MODE_COPY,
+    HUD_TEXT_MODE_1CYCLE,
 };
-
-// For file select JP HUD difference
-#if defined(VERSION_JP) || defined(VERSION_SH)
-#define HUD_LUT_DIFF HUD_LUT_JPMENU
-#else
-#define HUD_LUT_DIFF HUD_LUT_GLOBAL
-#endif
 
 enum MenuMode {
     MENU_MODE_NONE = -1,
@@ -170,7 +162,7 @@ void create_dl_translation_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 void create_dl_ortho_matrix(void);
 void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 void print_generic_string(s16 x, s16 y, char *str);
-void print_hud_lut_string(s8 hudLUT, s16 x, s16 y, char *str);
+void print_hud_lut_string(s16 x, s16 y, char *str);
 void print_menu_generic_string(s16 x, s16 y, char *str);
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex);
 s32 get_str_x_pos_from_center(s16 centerPos, char *str, f32 scale);

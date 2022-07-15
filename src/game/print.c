@@ -65,68 +65,6 @@ void print_text_centered(s32 x, s32 y, const char *str) {
 }
 
 /**
- * Adds an individual glyph to be rendered.
- */
-u8 add_glyph_texture(s8 glyphIndex) {
-    const struct AsciiCharLUTEntry *glyphs = segmented_to_virtual(main_hud_lut);
-
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, glyphs[glyphIndex].texture);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_load_tex_block);
-
-    return glyphs[glyphIndex].kerning;
-}
-
-u8 add_utf8_glyph_texture(struct Utf8CharLUTEntry *utf8Entry) {
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_load_tex_block);
-    return utf8Entry->kerning;
-}
-
-#ifndef WIDESCREEN
-/**
- * Clips textrect into the boundaries defined.
- */
-void clip_to_bounds(s32 *x, s32 *y) {
-    if (*x < TEXRECT_MIN_X) {
-        *x = TEXRECT_MIN_X;
-    }
-
-    if (*x > TEXRECT_MAX_X) {
-        *x = TEXRECT_MAX_X;
-    }
-
-    if (*y < TEXRECT_MIN_Y) {
-        *y = TEXRECT_MIN_Y;
-    }
-
-    if (*y > TEXRECT_MAX_Y) {
-        *y = TEXRECT_MAX_Y;
-    }
-}
-#endif
-
-/**
- * Renders the glyph that's set at the given position.
- */
-void render_textrect(s32 x, s32 y) {
-    s32 rectBaseX = x;
-    s32 rectBaseY = 224 - y;
-    s32 rectX;
-    s32 rectY;
-
-#ifndef WIDESCREEN
-    // For widescreen we must allow drawing outside the usual area
-    clip_to_bounds(&rectBaseX, &rectBaseY);
-#endif
-    rectX = rectBaseX;
-    rectY = rectBaseY;
-    gSPTextureRectangle(gDisplayListHead++, rectX << 2, rectY << 2, (rectX + 15) << 2,
-                        (rectY + 15) << 2, G_TX_RENDERTILE, 0, 0, 4 << 10, 1 << 10);
-}
-
-/**
  * Renders the text in sTextLabels on screen at the proper locations by iterating
  * a for loop.
  */
@@ -152,54 +90,14 @@ void render_text_labels(void) {
     guOrtho(mtx, 0.0f, SCREEN_WIDTH, 0.0f, SCREEN_HEIGHT, -10.0f, 10.0f, 1.0f);
     gSPPerspNormalize((Gfx *) (gDisplayListHead++), 0xFFFF);
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(mtx), G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
 
     for (i = 0; i < sTextLabelsCount; i++) {
-        j = 0;
-        curOffset = 0;
-        while (sTextLabels[i]->buffer[j] != 0) {
-            if (sTextLabels[i]->buffer[j] != ' ') {
-#ifdef VERSION_EU
-                // Beta Key was removed by EU, so glyph slot reused.
-                // This produces a colorful Ü.
-                if (glyphIndex == GLYPH_BETA_KEY) {
-                    add_glyph_texture(GLYPH_U);
-                    render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);
-
-                    add_glyph_texture(GLYPH_UMLAUT);
-                    render_textrect(sTextLabels[i]->x, sTextLabels[i]->y + 3, j);
-                } else {
-                    add_glyph_texture(glyphIndex);
-                    render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);
-                }
-#else
-                // Lookup correct glyph
-                if (!(sTextLabels[i]->buffer[j] & 0x80)) {
-                    kerning = add_glyph_texture(sTextLabels[i]->buffer[j] - ' ');
-                } else {
-                    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_hud_utf8_lut, sTextLabels[i]->buffer, &j);
-                    kerning = add_utf8_glyph_texture(utf8Entry);
-                }
-                // Handle custom offsets for ' and " glyphs
-                if (sTextLabels[i]->buffer[j] == '\'') {
-                    render_textrect(sTextLabels[i]->x + curOffset - 2, sTextLabels[i]->y + 7);
-                } else if (sTextLabels[i]->buffer[j] == '"') {
-                    render_textrect(sTextLabels[i]->x + curOffset + 1, sTextLabels[i]->y + 7);
-                } else {
-                    render_textrect(sTextLabels[i]->x + curOffset, sTextLabels[i]->y);
-                }
-                curOffset += kerning;
-#endif          
-            } else {
-                curOffset += 12;
-            }
-            j++;
-        }
-
+        print_hud_lut_string(sTextLabels[i]->x, 224 - sTextLabels[i]->y, sTextLabels[i]->buffer);
         mem_pool_free(gEffectsMemoryPool, sTextLabels[i]);
     }
 
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
+    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
     sTextLabelsCount = 0;
 }
