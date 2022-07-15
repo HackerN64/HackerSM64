@@ -15,13 +15,6 @@ enum MenuScrollAxis {
     MENU_SCROLL_HORIZONTAL,
 };
 
-// Whether to render the HUD text in 1-cycle mode
-// or copy mode.
-enum HUDTextRenderModes {
-    HUD_TEXT_MODE_COPY,
-    HUD_TEXT_MODE_1CYCLE,
-};
-
 enum MenuMode {
     MENU_MODE_NONE = -1,
     MENU_MODE_UNUSED_0,
