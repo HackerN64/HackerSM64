@@ -133,7 +133,7 @@ course jusqu'au sommet\n\
 de la montagne, là où\n\
 était le Roi Bob-omb?\n\
 Alors, qu'en dis-tu?\n\
-Lorsque je dis 『partez』,\n\
+Lorsque je dis “partez”,\n\
 la course commence...\n\
 Prêt...\n\
 \n\
@@ -159,7 +159,7 @@ DEFINE_DIALOG(DIALOG_008, NO_SOUND, 5, 30, 200, _("\
 ATTENTION AU CHOMP\n\
 ENCHAINE!!!\n\
 Danger! Approchez-vous\n\
-et appuyez sur Ⓒ^ pour\n\
+et appuyez sur Ⓒ▲ pour\n\
 jeter un oeil.\n\
 Impressionnant, non?\n\
 Avez-vous remarqué la\n\
@@ -363,8 +363,8 @@ encore [%] étoile(s)."))
 DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 6, 95, 200, _("\
 Vous avez besoin de 70\n\
 étoiles pour arriver en\n\
-haut de 『l'escalier sans\n\
-fin』... Il vous manque\n\
+haut de “l'escalier sans\n\
+fin”... Il vous manque\n\
 encore [%] étoile(s).\n\
 GWA HA HA HA HA HA!!!"))
 
@@ -378,8 +378,8 @@ pour ne pas faire de bruit\n\
 et ainsi surprendre vos\n\
 ennemis.\n\
 Vous pouvez déplacer ma\n\
-caméra avec Ⓒ> et Ⓒ<.\n\
-Appuyez sur Ⓒ| pour voir\n\
+caméra avec Ⓒ▶ et Ⓒ◀.\n\
+Appuyez sur Ⓒ▼ pour voir\n\
 de loin.\n\
 Lorsque ma caméra ne\n\
 peut plus se déplacer,\n\
@@ -444,7 +444,7 @@ la caméra, un signal\n\
 sonore retentira.\n\
 Pour jeter un oeil autour\n\
 de Mario, arrêtez-vous\n\
-et appuyez sur Ⓒ^.\n\
+et appuyez sur Ⓒ▲.\n\
 Appuyez sur le bouton Ⓐ\n\
 pour revenir au jeu.\n\
 \n\
@@ -461,7 +461,7 @@ meilleures images..."))
 
 DEFINE_DIALOG(DIALOG_035, NO_SOUND, 6, 30, 200, _("\
 Il existe quatre boutons\n\
-Ⓒ. En appuyant sur Ⓒ^ et\n\
+Ⓒ. En appuyant sur Ⓒ▲ et\n\
 en bougeant le stick\n\
 multidirectionnel, vous\n\
 pourrez jeter un oeil aux\n\
@@ -471,17 +471,17 @@ celui de la caméra de\n\
 Lakitu, mais vous pouvez\n\
 le modifier en appuyant\n\
 sur Ⓡ et ainsi utiliser\n\
-la 『caméra-Mario』.\n\
+la “caméra-Mario”.\n\
 Appuyez sur Ⓡ à nouveau\n\
 pour utiliser la caméra de\n\
-Lakitu. Appuyez sur Ⓒ|\n\
+Lakitu. Appuyez sur Ⓒ▼\n\
 pour voir Mario de loin,\n\
 quelque soit le mode de\n\
 vue que vous utilisez."))
 
 DEFINE_DIALOG(DIALOG_036, NO_SOUND, 4, 30, 200, _("\
 --PANORAMA--\n\
-Appuyez sur Ⓒ^ pour jeter\n\
+Appuyez sur Ⓒ▲ pour jeter\n\
 un coup d'oeil. Profitez\n\
 de la vue!\n\
 Appuyez sur Ⓡ pour\n\
@@ -493,7 +493,7 @@ pour revenir à la caméra\n\
 de Lakitu.\n\
 \n\
 Mettez le jeu en pause et\n\
-choisissez le mode 『Fixe』\n\
+choisissez le mode “Fixe”\n\
 puis maintenez Ⓡ pour que\n\
 la caméra reste en place."))
 
@@ -635,7 +635,7 @@ sauter...\n\
 \n\
 \n\
 Enfin, pour créer une\n\
-『Impulsion』, appuyez sur\n\
+“Impulsion”, appuyez sur\n\
 Ⓐ vers un mur puis sautez\n\
 à nouveau lorsque vous\n\
 touchez la paroi...\n\
@@ -1006,7 +1006,7 @@ Vous devez vous arrêter,\n\
 appuyer sur Start pour\n\
 mettre le jeu en pause,\n\
 puis choisir l'option\n\
-『Quitter Niveau』.\n\
+“Quitter Niveau”.\n\
 \n\
 Vous n'avez pas besoin de\n\
 récupérer toutes les\n\
@@ -1130,7 +1130,7 @@ Prends garde à tout ce\n\
 qui n'a pas de reflet...\n\
 \n\
 Connais-tu le monde\n\
-『Trempé-Séché』?\n\
+“Trempé-Séché”?\n\
 \n\
 Rentre dans ce niveau en\n\
 sautant très haut...\n\
@@ -1170,7 +1170,7 @@ Gnii hi hi hi hi hi!!!"))
 
 DEFINE_DIALOG(DIALOG_081, NO_SOUND, 3, 30, 200, _("\
 Bienvenue dans le monde\n\
-『Trempé-Séché』...\n\
+“Trempé-Séché”...\n\
 \n\
 Ici, il est dit qu'un saut\n\
 altère le niveau d'eau...\n\
@@ -1409,7 +1409,7 @@ enfin jaillir..."))
 DEFINE_DIALOG(DIALOG_104, NO_SOUND, 4, 30, 200, _("\
 L'ombre de l'étoile en\n\
 face de vous est un\n\
-『Marqueur d'étoile』.\n\
+“Marqueur d'étoile”.\n\
 \n\
 Lorsque vous récupérerez\n\
 8 pièces rouges, une\n\
@@ -1920,7 +1920,7 @@ Vous avez récupéré trois\n\
 étoiles de puissance!\n\
 Désormais, vous pouvez\n\
 ouvrir les portes marquées\n\
-d'un 『3』.\n\
+d'un “3”.\n\
 Vous pouvez aller et venir\n\
 dans les niveaux comme\n\
 bon vous semble...\n\
@@ -1941,7 +1941,7 @@ La Princesse est juste de\n\
 l'autre côté...\n\
 Pouvez-vous l'entendre\n\
 crier votre nom?\n\
-『Marioooooo!』"))
+“Marioooooo!”"))
 
 DEFINE_DIALOG(DIALOG_144, NO_SOUND, 5, 150, 200, _("\
 Vous avez récupéré 30\n\
@@ -1991,7 +1991,7 @@ Vous avez récupéré 70\n\
 étoiles de puissance!\n\
 Désormais, vous pouvez\n\
 accéder en haut de\n\
-『l'escalier sans fin』...\n\
+“l'escalier sans fin”...\n\
 Le terrible Bowser vous y\n\
 attend...\n\
 Etes-vous prêt à\n\
@@ -2197,7 +2197,7 @@ Tiens...\n\
 J'ai une lettre pour toi...\n\
 C'est peut-être une\n\
 admiratrice, qui sait?\n\
-『Merci d'avoir joué au\n\
+“Merci d'avoir joué au\n\
 plus beau jeu de toute la\n\
 galaxie:\n\
 MARIO 64!!!\n\

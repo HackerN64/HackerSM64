@@ -1853,9 +1853,9 @@ const struct AsciiCharLUTEntry main_hud_lut[] = {
     {NULL, 12}, // 41 ")" (Unimplemented)
     {NULL, 12}, // 42 "*" (Unimplemented)
     {NULL, 12}, // 43 "+" (Unimplemented)
-    {NULL, 12}, // 44 "," (Unimplemented)
+    {texture_hud_char_apostrophe, 8}, // 44 ","
     {texture_hud_char_minus, 16}, // 45 "-"
-    {texture_hud_char_decimal_point, 12}, // 46 "."
+    {texture_hud_char_decimal_point, 8}, // 46 "."
     {NULL, 12}, // 47 "/" (Unimplemented)
     {texture_hud_char_0, 12}, // 48 "0"
     {texture_hud_char_1, 12}, // 49 "1"
@@ -1955,24 +1955,9 @@ const struct UnicodeLUT main_hud_utf8_lut = {
     ARRAY_COUNT(main_hud_utf8_3byte_lut),
 };
 
-// Main HUD print table 0x02008250-0x02008337
-// const Texture *const main_hud_lut[] = {
-//     texture_hud_char_0, texture_hud_char_1, texture_hud_char_2, texture_hud_char_3,
-//     texture_hud_char_4, texture_hud_char_5, texture_hud_char_6, texture_hud_char_7,
-//     texture_hud_char_8, texture_hud_char_9, texture_hud_char_A, texture_hud_char_B,
-//     texture_hud_char_C, texture_hud_char_D, texture_hud_char_E, texture_hud_char_F,
-//     texture_hud_char_G, texture_hud_char_H, texture_hud_char_I, texture_hud_char_J,
-//     texture_hud_char_K, texture_hud_char_L, texture_hud_char_M, texture_hud_char_N,
-//     texture_hud_char_O, texture_hud_char_P, texture_hud_char_Q, texture_hud_char_R,
-//     texture_hud_char_S, texture_hud_char_T, texture_hud_char_U, texture_hud_char_V,
-//     texture_hud_char_W, texture_hud_char_X, texture_hud_char_Y, texture_hud_char_Z,
-//     texture_hud_char_exclamation, texture_hud_char_double_exclamation, texture_hud_char_question, texture_hud_char_ampersand,
-//     texture_hud_char_percent,                0x0,                0x0,                0x0,
-//                    0x0,                0x0,                0x0, texture_hud_char_minus,
-//     texture_hud_char_multiply, texture_hud_char_coin, texture_hud_char_red_coin, texture_hud_char_silver_coin,
-//     texture_hud_char_mario_head, texture_hud_char_star, texture_hud_char_decimal_point, texture_hud_char_beta_key,
-//     texture_hud_char_apostrophe, texture_hud_char_double_quote, texture_hud_char_umlaut,
-// };
+//texture_hud_char_double_exclamation
+//texture_hud_char_beta_key
+//texture_hud_char_umlaut
 
 /**
 u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
@@ -2105,10 +2090,13 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
 };
 
 const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
+    {0x00B7, 4, 0, texture_font_char_us_interpunct}, // ·
     {0x00D7, 6, 0, texture_font_char_us_multiply}, // ×
 };
 
 const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
+    {0x201C, 6, 0, texture_font_char_us_double_quote_open}, // “
+    {0x201D, 6, 0, texture_font_char_us_double_quote_close}, // ”
     {0x2194, 9, 0, texture_font_char_us_left_right_arrow}, // ↔
 
     {0x24B6, 7, 0, texture_font_char_us_button_A}, // Ⓐ
@@ -2116,6 +2104,10 @@ const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
     {0x24B8, 6, 0, texture_font_char_us_button_C}, // Ⓒ
     {0x24C7, 7, 0, texture_font_char_us_button_R}, // Ⓡ
     {0x24CF, 7, 0, texture_font_char_us_button_Z}, // Ⓩ
+    {0x25B2, 8, 0, texture_font_char_us_button_C_up}, // ▲
+    {0x25B6, 8, 0, texture_font_char_us_button_C_right}, // ▶
+    {0x25BC, 8, 0, texture_font_char_us_button_C_down}, // ▼
+    {0x25C0, 8, 0, texture_font_char_us_button_C_left}, // ◀
 
     {0x2605, 10, 0, texture_font_char_us_star_filled}, // ★
     {0x2606, 10, 0, texture_font_char_us_star_hollow}, // ☆
@@ -2129,10 +2121,9 @@ const struct UnicodeLUT main_font_utf8_lut = {
     ARRAY_COUNT(main_font_utf8_3byte_lut),
 };
 
-/**
-texture_font_char_us_star_hollow
-texture_font_char_us_coin
 
+/**
+// „ - add this and figure out wtf it actually is
 
 // Main small font print table 0x02008338-0x02008737
 const Texture *const main_font_lut[] = {

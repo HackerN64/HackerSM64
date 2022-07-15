@@ -112,7 +112,7 @@ How about a race to the\n\
 mountaintop, where the\n\
 Big Bob-omb was?\n\
 Whaddya say? When I say\n\
-『Go,』 let the race begin!\n\
+“Go,” let the race begin!\n\
 \n\
 Ready....\n\
 \n\
@@ -136,7 +136,7 @@ it, fair and square!"))
 DEFINE_DIALOG(DIALOG_008, NO_SOUND, 4, 30, 200, _("\
 BEWARE OF CHAIN CHOMP\n\
 Extreme Danger!\n\
-Get close and press Ⓒ^\n\
+Get close and press Ⓒ▲\n\
 for a better look.\n\
 Scary, huh?\n\
 See the Red Coin on top\n\
@@ -332,7 +332,7 @@ Stars."))
 
 DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 5, 95, 200, _("\
 To open the door that\n\
-leads to the 『endless』\n\
+leads to the “endless”\n\
 stairs, you need 70\n\
 Stars.\n\
 Bwa ha ha!"))
@@ -353,8 +353,8 @@ order to walk quietly.\n\
 And wrapping up filming\n\
 techniques reported on\n\
 earlier, you can take a\n\
-look around using Ⓒ> and\n\
-Ⓒ<. Press Ⓒ| to view the\n\
+look around using Ⓒ▶ and\n\
+Ⓒ◀. Press Ⓒ▼ to view the\n\
 action from a distance.\n\
 When you can't move the\n\
 camera any farther, the\n\
@@ -425,7 +425,7 @@ If we can't adjust the\n\
 view any further, we'll\n\
 buzz. To take a look at\n\
 the surroundings, stop\n\
-and press Ⓒ^.\n\
+and press Ⓒ▲.\n\
 \n\
 Press Ⓐ to resume play.\n\
 Switch camera modes with\n\
@@ -439,7 +439,7 @@ Lakitu Bros."))
 
 DEFINE_DIALOG(DIALOG_035, NO_SOUND, 5, 30, 200, _("\
 There are four camera, or\n\
-『Ⓒ,』 Buttons. Press Ⓒ^\n\
+“Ⓒ,” Buttons. Press Ⓒ▲\n\
 to look around using the\n\
 Control Stick.\n\
 \n\
@@ -449,19 +449,19 @@ It is the camera\n\
 recommended for normal\n\
 play.\n\
 You can change angles by\n\
-pressing Ⓒ>. If you press\n\
+pressing Ⓒ▶. If you press\n\
 Ⓡ, the view switches to\n\
 Mario's camera, which\n\
 is directly behind him.\n\
 Press Ⓡ again to return\n\
 to Lakitu's camera. Press\n\
-Ⓒ| to see Mario from\n\
+Ⓒ▼ to see Mario from\n\
 afar, using either\n\
 Lakitu's or Mario's view."))
 
 DEFINE_DIALOG(DIALOG_036, NO_SOUND, 5, 30, 200, _("\
 OBSERVATION PLATFORM\n\
-Press Ⓒ^ to take a look\n\
+Press Ⓒ▲ to take a look\n\
 around. Don't miss\n\
 anything!\n\
 \n\
@@ -471,7 +471,7 @@ always follows Mario.\n\
 Press Ⓡ again to switch\n\
 to Lakitu's camera.\n\
 Pause the game and\n\
-switch the mode to 『fix』\n\
+switch the mode to “fix”\n\
 the camera in place while\n\
 holding Ⓡ. Give it a try!"))
 
@@ -904,7 +904,7 @@ live.\n\
 Just stop, stand still,\n\
 press Start to pause the\n\
 game, then select\n\
-『Exit Course.』\n\
+“Exit Course.”\n\
 \n\
 You don't have to collect\n\
 all Power Stars in one\n\
@@ -1158,7 +1158,7 @@ Bwa ha ha ha!\n\
 You've stepped right into\n\
 my trap, just as I knew\n\
 you would! I warn you,\n\
-『Friend,』 watch your\n\
+“Friend,” watch your\n\
 step!"))
 
 DEFINE_DIALOG(DIALOG_091, NO_SOUND, 2, 30, 200, _("\
@@ -1277,8 +1277,8 @@ shall shine the light..."))
 
 DEFINE_DIALOG(DIALOG_104, NO_SOUND, 5, 30, 200, _("\
 The shadowy star in front\n\
-of you is a 『Star\n\
-Marker.』 When you collect\n\
+of you is a “Star\n\
+Marker.” When you collect\n\
 all 8 Red Coins, the Star\n\
 will appear here."))
 
@@ -1655,7 +1655,7 @@ of here in no time!\n\
 \n\
 Be careful, though.\n\
 Bowser and his band\n\
-wrote the book on 『bad.』\n\
+wrote the book on “bad.”\n\
 Take my advice: When you\n\
 need to recover from\n\
 injuries, collect coins.\n\
@@ -1999,11 +1999,11 @@ And saved the Princess?\n\
 I knew you could do it!\n\
 Now I have a very special\n\
 message for you.\n\
-『Thanks for playing Super\n\
+“Thanks for playing Super\n\
 Mario 64! This is the\n\
 end of the game, but not\n\
 the end of the fun." \
-KEEP_ON_PLAYING "』\n\
+KEEP_ON_PLAYING "”\n\
 \n\
 The Super Mario 64 Team"))
 

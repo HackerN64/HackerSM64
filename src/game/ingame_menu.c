@@ -381,6 +381,12 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
                 } else if (str[strPos] == '"') {
                     renderX += 1;
                     renderY -= 7;
+                } else if (str[strPos] == ',') {
+                    renderX -= 4;
+                    renderY += 7;
+                } else if (str[strPos] == '.') {
+                    renderX -= 2;
+                    renderY += 1;
                 }
 
                 gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
