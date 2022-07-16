@@ -1432,6 +1432,10 @@ ALIGNED8 static const Texture texture_font_char_us_i_no_dot[] = {
 };
 #endif
 
+ALIGNED8 static const Texture texture_font_char_amogus[] = {
+#include "textures/segment2/font_graphics.custom_amogus.ia4.inc.c"
+};
+
 ALIGNED8 static const Texture texture_hud_char_camera[] = {
 #include "textures/segment2/segment2.07B50.rgba16.inc.c"
 };
@@ -1730,6 +1734,7 @@ const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
 };
 
 const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
+    {0x0D9E, 8, 0, texture_font_char_amogus}, // ඞ
     {0x201C, 6, 0, texture_font_char_us_double_quote_open}, // “
     {0x201D, 6, 0, texture_font_char_us_double_quote_close}, // ”
     {0x201E, 6, 0, texture_font_char_us_double_low_quote}, // „
