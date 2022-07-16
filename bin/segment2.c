@@ -1943,6 +1943,7 @@ const struct Utf8CharLUTEntry main_hud_utf8_2byte_lut[] = {
 };
 
 const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {
+    {0x203C, 12, 0, texture_hud_char_double_exclamation}, // ‼
     {0x2605, 16, 0, texture_hud_char_star}, // ★
     {0x263A, 16, 0, texture_hud_char_mario_head}, // ☺
     {0x272A, 16, 0, texture_hud_char_coin}, // ✪
@@ -1955,7 +1956,6 @@ const struct UnicodeLUT main_hud_utf8_lut = {
     ARRAY_COUNT(main_hud_utf8_3byte_lut),
 };
 
-//texture_hud_char_double_exclamation
 //texture_hud_char_beta_key
 //texture_hud_char_umlaut
 
@@ -2098,12 +2098,13 @@ const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
     {0x201C, 6, 0, texture_font_char_us_double_quote_open}, // “
     {0x201D, 6, 0, texture_font_char_us_double_quote_close}, // ”
     {0x2194, 9, 0, texture_font_char_us_left_right_arrow}, // ↔
-
+    
     {0x24B6, 7, 0, texture_font_char_us_button_A}, // Ⓐ
     {0x24B7, 7, 0, texture_font_char_us_button_B}, // Ⓑ
     {0x24B8, 6, 0, texture_font_char_us_button_C}, // Ⓒ
     {0x24C7, 7, 0, texture_font_char_us_button_R}, // Ⓡ
     {0x24CF, 7, 0, texture_font_char_us_button_Z}, // Ⓩ
+
     {0x25B2, 8, 0, texture_font_char_us_button_C_up}, // ▲
     {0x25B6, 8, 0, texture_font_char_us_button_C_right}, // ▶
     {0x25BC, 8, 0, texture_font_char_us_button_C_down}, // ▼
