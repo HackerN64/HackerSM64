@@ -1565,11 +1565,20 @@ const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {
     {0x272A, 16, 0, texture_hud_char_coin}, // ✪
 };
 
+const struct Utf8CharLUTEntry main_hud_utf8_4byte_lut[] = {
+
+};
+
+const struct Utf8CharLUTEntry main_hud_utf8_missing_char = {0, 16, 0, texture_hud_char_question};
+
 const struct Utf8LUT main_hud_utf8_lut = {
     main_hud_utf8_2byte_lut,
     main_hud_utf8_3byte_lut,
+    main_hud_utf8_4byte_lut,
     ARRAY_COUNT(main_hud_utf8_2byte_lut),
     ARRAY_COUNT(main_hud_utf8_3byte_lut),
+    ARRAY_COUNT(main_hud_utf8_4byte_lut),
+    &main_hud_utf8_missing_char,
 };
 
 //texture_hud_char_beta_key
@@ -1623,7 +1632,7 @@ const struct DiacriticLUTEntry main_font_diacritic_lut[] = {
 const struct AsciiCharLUTEntry main_font_lut[] = {
     {NULL, 5}, // 32 " "
     {texture_font_char_us_exclamation, 5}, // 33 "!"
-    {NULL, 0}, // 34 "\"" (come back to this)
+    {texture_font_char_us_double_quote_open, 6}, // 34 "\""
     {NULL, 0}, // 35 "#" (Unimplemented)
     {NULL, 0}, // 36 "$" (Unimplemented)
     {texture_font_char_us_percent, 7}, // 37 "%"
@@ -1631,7 +1640,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {texture_font_char_us_apostrophe, 4}, // 39 "'"
     {texture_font_char_us_open_parentheses, 5}, // 40 "("
     {texture_font_char_us_close_parentheses, 5}, // 41 ")"
-    {texture_font_char_us_multiply, 6}, // 42 "*" (TODO: Move to UTF-8 to free space for a true asterisk)
+    {NULL, 0}, // 42 "*" (Unimplemented)
     {NULL, 0}, // 43 "+" (Unimplemented)
     {texture_font_char_us_comma, 4}, // 44 ","
     {texture_font_char_us_hyphen, 6}, // 45 "-"
@@ -1653,7 +1662,7 @@ const struct AsciiCharLUTEntry main_font_lut[] = {
     {NULL, 0}, // 61 "=" (Unimplemented)
     {NULL, 0}, // 62 ">" (Unimplemented)
     {texture_font_char_us_question, 7}, // 63 "?"
-    {NULL, 0}, // 64 "@" (Color code control character)
+    {NULL, 0}, // 64 "@" (Unimplemented)
     {texture_font_char_us_A, 6}, // 65 "A"
     {texture_font_char_us_B, 6}, // 66 "B"
     {texture_font_char_us_C, 6}, // 67 "C"
@@ -1756,11 +1765,20 @@ const struct Utf8CharLUTEntry main_font_utf8_3byte_lut[] = {
     {0x272A, 8, 0, texture_font_char_us_coin}, // ✪
 };
 
+const struct Utf8CharLUTEntry main_font_utf8_4byte_lut[] = {
+
+};
+
+const struct Utf8CharLUTEntry main_font_utf8_missing_char = {0, 7, 0, texture_font_char_us_question};
+
 const struct Utf8LUT main_font_utf8_lut = {
     main_font_utf8_2byte_lut,
     main_font_utf8_3byte_lut,
+    main_font_utf8_4byte_lut,
     ARRAY_COUNT(main_font_utf8_2byte_lut),
     ARRAY_COUNT(main_font_utf8_3byte_lut),
+    ARRAY_COUNT(main_font_utf8_4byte_lut),
+    &main_font_utf8_missing_char,
 };
 /**
 // Main small font print table 0x02008338-0x02008737

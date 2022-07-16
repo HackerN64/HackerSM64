@@ -191,24 +191,28 @@ void create_dl_ortho_matrix(void) {
 // Determine the UTF8 character to render, given a string and the current position in the string.
 // Return the struct of the relevant character, and increment the position in the string by either 1 or 2.
 struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos) {
-    u16 codepoint;
+    u32 codepoint;
     struct Utf8CharLUTEntry *usedLUT;
     u32 length;
 
     lut = segmented_to_virtual(lut);
-    if (str[*strPos] & 0x20) {
+    if (!(str[*strPos] & 0x20)) {
+        codepoint = ((str[*strPos] & 0x1F) << 6) | (str[++(*strPos)] & 0x3F);
+        usedLUT = segmented_to_virtual(lut->lut2Bytes);
+        length = lut->length2Bytes;
+    } else if (!(str[*strPos] & 0x10)) {
         codepoint = ((str[*strPos] & 0xF) << 12) | ((str[++(*strPos)] & 0x3F) << 6) | (str[++(*strPos)] & 0x3F);
         usedLUT = segmented_to_virtual(lut->lut3Bytes);
         length = lut->length3Bytes;
     } else {
-        codepoint = ((str[*strPos] & 0x1F) << 6) | (str[++(*strPos)] & 0x3F);
-        usedLUT = segmented_to_virtual(lut->lut2Bytes);
-        length = lut->length2Bytes;
+        codepoint = ((str[*strPos] & 0x7) << 18) | ((str[++(*strPos)] & 0x3F) << 12) | ((str[++(*strPos)] & 0x3F) << 6) | (str[++(*strPos)] & 0x3F);
+        usedLUT = segmented_to_virtual(lut->lut4Bytes);
+        length = lut->length4Bytes;
     }
 
-    u32 start = 0;
-    u32 end = length - 1;
-    u32 mid = (start + end) / 2;
+    s32 start = 0;
+    s32 end = length - 1;
+    s32 mid = (start + end) / 2;
 
     while (start <= end) {
         if (usedLUT[mid].codepoint == codepoint) {
@@ -223,25 +227,10 @@ struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos
 
         mid = (start + end) / 2;
     }
-    return NULL;
+    return segmented_to_virtual(lut->missingChar);
 }
 
-
-u8 render_generic_char(char c) {
-    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
-    void *texture = segmented_to_virtual(fontLUT[c - ' '].texture);
-
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture);
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
-
-    return fontLUT[c - ' '].kerning;
-}
-
-u8 render_generic_unicode_char(char *str, s32 *strPos) {
-    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
-    if (utf8Entry == NULL) return 0;
-
+u8 render_generic_unicode_char_from_entry(struct Utf8CharLUTEntry *utf8Entry) {
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, utf8Entry->texture);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
@@ -264,6 +253,28 @@ u8 render_generic_unicode_char(char *str, s32 *strPos) {
     }
 
     return utf8Entry->kerning;
+}
+
+u8 render_generic_ascii_char(char c) {
+    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
+    void *texture = fontLUT[c - ' '].texture;
+
+    if (texture == NULL) {
+        struct Utf8CharLUTEntry *utf8Entry = segmented_to_virtual(((struct Utf8LUT *)segmented_to_virtual(&main_font_utf8_lut))->missingChar);
+
+        return render_generic_unicode_char_from_entry(utf8Entry);
+    }
+
+    gDPPipeSync(gDisplayListHead++);
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture);
+    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
+
+    return fontLUT[c - ' '].kerning;
+}
+
+u8 render_generic_unicode_char(char *str, s32 *strPos) {
+    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
+    return render_generic_unicode_char_from_entry(utf8Entry);    
 }
 
 #define MAX_STRING_WIDTH 16
@@ -337,7 +348,7 @@ void print_generic_string(s16 x, s16 y, char *str) {
                 break;
             default:
                 if (!(str[strPos] & 0x80)) {
-                    kerning = render_generic_char(str[strPos]);
+                    kerning = render_generic_ascii_char(str[strPos]);
                 } else {
                     kerning = render_generic_unicode_char(str, &strPos);
                 }
@@ -380,11 +391,20 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
             default:
                 gDPPipeSync(gDisplayListHead++);
 
+                utf8Entry = NULL;
                 if (!(str[strPos] & 0x80)) {
-                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, hudLUT[str[strPos] - ' '].texture);
-                    xStride = hudLUT[str[strPos] - ' '].kerning;
+                    Texture *tex = hudLUT[str[strPos] - ' '].texture;
+                    if (tex != NULL) {
+                        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, tex);
+                        xStride = hudLUT[str[strPos] - ' '].kerning;
+                    } else {
+                        utf8Entry = segmented_to_virtual(((struct Utf8LUT *)segmented_to_virtual(&main_hud_utf8_lut))->missingChar);
+                    }
                 } else {
                     utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
+                }
+
+                if (utf8Entry != NULL) {
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
                     xStride = utf8Entry->kerning;
                 }
@@ -683,7 +703,7 @@ void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos) {
             create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)(5 * *xMatrix), 0, 0);
         }
 
-        kerning = render_generic_char(tensDigit);
+        kerning = render_generic_ascii_char(tensDigit);
         create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
         *xMatrix = 1;
         (*linePos)++;
@@ -693,7 +713,7 @@ void render_star_count_dialog_text(s8 *xMatrix, s16 *linePos) {
         create_dl_translation_matrix(MENU_MTX_NOPUSH, (f32)5 * (*xMatrix - 1), 0, 0);
     }
 
-    kerning = render_generic_char(onesDigit);
+    kerning = render_generic_ascii_char(onesDigit);
     create_dl_translation_matrix(MENU_MTX_NOPUSH, kerning, 0, 0);
     (*linePos)++;
     *xMatrix = 1;
@@ -800,7 +820,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
                     }
 
                     if (!(strChar & 0x80)) {
-                        kerning = render_generic_char(strChar);
+                        kerning = render_generic_ascii_char(strChar);
                     } else {
                         kerning = render_generic_unicode_char(str, &strIdx);
                     }

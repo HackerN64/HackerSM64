@@ -40,17 +40,20 @@ struct AsciiCharLUTEntry {
 };
 
 struct Utf8CharLUTEntry {
-    const u16 codepoint;
+    const u32 codepoint;
     const s8 kerning;
-    const u8 flags; // used for diacritics and packed textures
+    const u16 flags; // used for diacritics and packed textures
     const Texture *texture;
 };
 
 struct Utf8LUT {
     const struct Utf8CharLUTEntry *lut2Bytes;
     const struct Utf8CharLUTEntry *lut3Bytes;
+    const struct Utf8CharLUTEntry *lut4Bytes;
     const u16 length2Bytes;
     const u16 length3Bytes;
+    const u16 length4Bytes;
+    const struct Utf8CharLUTEntry *missingChar;
 };
 
 struct DiacriticLUTEntry {
@@ -73,8 +76,8 @@ enum GenericTextDiacriticMarks {
     TEXT_DIACRITIC_UMLAUT_UPPERCASE,
 };
 
-#define GENERIC_TEXT_PACKED 0x80
-#define GENERIC_TEXT_DIACRITIC_MASK 0x7F
+#define GENERIC_TEXT_PACKED 0x8000
+#define GENERIC_TEXT_DIACRITIC_MASK 0x7FFF
 
 struct DialogEntry {
     /*0x00*/ s32 voice;
