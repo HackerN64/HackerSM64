@@ -1433,7 +1433,7 @@ ALIGNED8 static const Texture texture_font_char_us_i_no_dot[] = {
 #endif
 
 ALIGNED8 static const Texture texture_font_char_amogus[] = {
-#include "textures/segment2/font_graphics.custom_amogus.ia4.inc.c"
+#include "textures/segment2/font_graphics.amogus.ia4.inc.c"
 };
 
 ALIGNED8 static const Texture texture_hud_char_camera[] = {
