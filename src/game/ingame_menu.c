@@ -190,7 +190,7 @@ void create_dl_ortho_matrix(void) {
 
 // Determine the UTF8 character to render, given a string and the current position in the string.
 // Return the struct of the relevant character, and increment the position in the string by either 1 or 2.
-struct Utf8CharLUTEntry *utf8_lookup(struct UnicodeLUT *lut, char *str, s32 *strPos) {
+struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos) {
     u16 codepoint;
     struct Utf8CharLUTEntry *usedLUT;
     u32 length;
@@ -246,6 +246,23 @@ u8 render_generic_unicode_char(char *str, s32 *strPos) {
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, utf8Entry->texture);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
 
+    if (utf8Entry->flags & GENERIC_TEXT_DIACRITIC_MASK) {
+        struct DiacriticLUTEntry *diacriticLUT = segmented_to_virtual(&main_font_diacritic_lut);
+        struct DiacriticLUTEntry *diacritic = &diacriticLUT[(utf8Entry->flags & GENERIC_TEXT_DIACRITIC_MASK) - 1];
+        
+        if (diacritic->xOffset | diacritic->yOffset) {
+            create_dl_translation_matrix(MENU_MTX_PUSH, diacritic->xOffset, diacritic->yOffset, 0.0f);
+        }
+
+        gDPPipeSync(gDisplayListHead++);
+        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, diacritic->texture);
+        gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
+
+        if (diacritic->xOffset | diacritic->yOffset) {
+            gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+        }
+    }
+
     return utf8Entry->kerning;
 }
 
@@ -256,7 +273,6 @@ u8 render_generic_unicode_char(char *str, s32 *strPos) {
  * In JP/EU a IA1 texture is used but in US a IA4 texture is used.
  */
 void print_generic_string(s16 x, s16 y, char *str) {
-    s8 mark = DIALOG_MARK_NONE; // unused in EU
     s32 strPos = 0;
     u8 lineNum = 1;
 
@@ -401,13 +417,12 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
 
 
 void print_menu_generic_string(s16 x, s16 y, char *str) {
-    UNUSED s8 mark = DIALOG_MARK_NONE; // unused in EU
     s32 strPos = 0;
     u32 curX = x;
     u32 curY = y;
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
 
-    while (str[strPos] != DIALOG_CHAR_TERMINATOR && str[strPos] != 0x00) {
+    while (str[strPos] != '\0') {
         switch (str[strPos]) {
             case ' ':
                 curX += 4;
@@ -438,9 +453,9 @@ void print_credits_string(s16 x, s16 y, const u8 *str) {
                 G_TX_CLAMP, 3, G_TX_NOLOD, G_TX_CLAMP, 3, G_TX_NOLOD);
     gDPSetTileSize(gDisplayListHead++, G_TX_RENDERTILE, 0, 0, (8 - 1) << G_TEXTURE_IMAGE_FRAC, (8 - 1) << G_TEXTURE_IMAGE_FRAC);
 
-    while (str[strPos] != GLOBAR_CHAR_TERMINATOR && str[strPos] != 0x00) {
+    while (str[strPos] != '\0') {
         switch (str[strPos]) {
-            case GLOBAL_CHAR_SPACE:
+            case ' ':
                 curX += 4;
                 break;
             default:
@@ -500,7 +515,7 @@ s32 get_string_width(char *str) {
     s16 width = 0;
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
 
-    while (str[strPos] != DIALOG_CHAR_TERMINATOR && str[strPos] != 0x00) {
+    while (str[strPos] != '\0') {
         width += fontLUT[str[strPos] - ' '].kerning;
         strPos++;
     }
@@ -698,7 +713,6 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     s8 lineNum = 1;
     s8 totalLines;
     s8 pageState = DIALOG_PAGE_STATE_NONE;
-    UNUSED s8 mark = DIALOG_MARK_NONE; // unused in US and EU
     s8 xMatrix = 1;
     s8 linesPerBox = dialog->linesPerBox;
     s32 strIdx;
@@ -731,8 +745,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
         strChar = str[strIdx];
 
         switch (strChar) {
-            case DIALOG_CHAR_TERMINATOR:
-            case 0:
+            case '\0':
                 pageState = DIALOG_PAGE_STATE_END;
                 gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
                 break;
@@ -941,9 +954,7 @@ s8  gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
 s8  gDialogCourseActNum     =  1;
 
 #define DIAG_VAL1  16
-#define DIAG_VAL3 132 // US & EU
 #define DIAG_VAL4   5
-#define DIAG_VAL2 240 // JP & US
 
 void render_dialog_entries(void) {
     s8 lowerBound = 0;
@@ -1030,18 +1041,10 @@ void render_dialog_entries(void) {
 
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE,
                   // Horizontal scissoring isn't really required and can potentially mess up widescreen enhancements.
-#ifdef WIDESCREEN
                   0,
-#else
-                  ensure_nonnegative(dialog->leftOffset),
-#endif
-                  ensure_nonnegative(DIAG_VAL2 - dialog->width),
-#ifdef WIDESCREEN
+                  ensure_nonnegative(SCREEN_HEIGHT - dialog->width - 3),
                   SCREEN_WIDTH,
-#else
-                  ensure_nonnegative(DIAG_VAL3 + dialog->leftOffset),
-#endif
-                  ensure_nonnegative(240 + ((dialog->linesPerBox * 80) / DIAG_VAL4) - dialog->width));
+                  ensure_nonnegative(SCREEN_HEIGHT + (dialog->linesPerBox * DIAG_VAL1) - dialog->width));
     handle_dialog_text_and_pages(0, dialog, lowerBound);
 
     if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {

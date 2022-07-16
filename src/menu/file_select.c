@@ -1918,7 +1918,7 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     }
     // Add 1 star character for every star collected
     for (i = 0; i < starCount; i++) {
-        starScoreText[i] = DIALOG_CHAR_STAR_FILLED;
+        starScoreText[i] = '★';
     }
     // Terminating byte
     starScoreText[i] = '\0';
