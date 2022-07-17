@@ -230,7 +230,24 @@ struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos
     return segmented_to_virtual(lut->missingChar);
 }
 
-u8 render_generic_unicode_char_from_entry(struct Utf8CharLUTEntry *utf8Entry) {
+u8 render_generic_ascii_char(char c) {
+    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
+    void *texture = fontLUT[c - ' '].texture;
+
+    if (texture == NULL) {
+        return 0;
+    }
+
+    gDPPipeSync(gDisplayListHead++);
+    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture);
+    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
+
+    return fontLUT[c - ' '].kerning;
+}
+
+u8 render_generic_unicode_char(char *str, s32 *strPos) {
+    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
+
     gDPPipeSync(gDisplayListHead++);
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, utf8Entry->texture);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
@@ -252,29 +269,7 @@ u8 render_generic_unicode_char_from_entry(struct Utf8CharLUTEntry *utf8Entry) {
         }
     }
 
-    return utf8Entry->kerning;
-}
-
-u8 render_generic_ascii_char(char c) {
-    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
-    void *texture = fontLUT[c - ' '].texture;
-
-    if (texture == NULL) {
-        struct Utf8CharLUTEntry *utf8Entry = segmented_to_virtual(((struct Utf8LUT *)segmented_to_virtual(&main_font_utf8_lut))->missingChar);
-
-        return render_generic_unicode_char_from_entry(utf8Entry);
-    }
-
-    gDPPipeSync(gDisplayListHead++);
-    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, texture);
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
-
-    return fontLUT[c - ' '].kerning;
-}
-
-u8 render_generic_unicode_char(char *str, s32 *strPos) {
-    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&main_font_utf8_lut, str, strPos);
-    return render_generic_unicode_char_from_entry(utf8Entry);    
+    return utf8Entry->kerning;  
 }
 
 #define MAX_STRING_WIDTH 16
@@ -391,20 +386,12 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
             default:
                 gDPPipeSync(gDisplayListHead++);
 
-                utf8Entry = NULL;
                 if (!(str[strPos] & 0x80)) {
                     Texture *tex = hudLUT[str[strPos] - ' '].texture;
-                    if (tex != NULL) {
-                        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, tex);
-                        xStride = hudLUT[str[strPos] - ' '].kerning;
-                    } else {
-                        utf8Entry = segmented_to_virtual(((struct Utf8LUT *)segmented_to_virtual(&main_hud_utf8_lut))->missingChar);
-                    }
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, tex);
+                    xStride = hudLUT[str[strPos] - ' '].kerning;
                 } else {
                     utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
-                }
-
-                if (utf8Entry != NULL) {
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
                     xStride = utf8Entry->kerning;
                 }

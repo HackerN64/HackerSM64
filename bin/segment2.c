@@ -256,6 +256,10 @@ ALIGNED8 static const Texture texture_hud_char_beta_key[] = {
 #include "textures/segment2/segment2.beta_key.rgba16.inc.c"
 };
 
+ALIGNED8 static const Texture texture_hud_char_floomba[] = {
+#include "textures/segment2/segment2.floomba.rgba16.inc.c"
+};
+
 ALIGNED8 static const Texture texture_credits_char_3[] = {
 #include "textures/segment2/segment2.06200.rgba16.inc.c"
 };
@@ -1566,7 +1570,7 @@ const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {
 };
 
 const struct Utf8CharLUTEntry main_hud_utf8_4byte_lut[] = {
-
+    {0x1F633, 16, 0, texture_hud_char_floomba}, // 😳
 };
 
 const struct Utf8CharLUTEntry main_hud_utf8_missing_char = {0, 16, 0, texture_hud_char_question};
