@@ -532,6 +532,15 @@ SECTIONS
 	END_SEG(capcom)
 #endif
 
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+   . = ALIGN(0x40);
+   BEGIN_SEG(crash_screen_crash_screen, __romPos)
+   {
+      KEEP(BUILD_DIR/src/images/crash_screen_crashed.o(.rodata*));
+   }
+   END_SEG(crash_screen_crash_screen)
+#endif
+
 #ifdef DEBUG_MAP_STACKTRACE
    BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
       KEEP(BUILD_DIR/asm/debug/map.o(.data*));

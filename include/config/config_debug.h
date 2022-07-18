@@ -55,3 +55,14 @@
 
 // Forces a crash when the game starts. Useful for debugging the crash screen.
 // #define DEBUG_FORCE_CRASH_ON_BOOT
+
+// Forces a crash when the player presses L in-game.
+// #define DEBUG_FORCE_CRASH_ON_L
+
+// Includes an image which displays when the crash screen crashes.
+// REQUIRES 'make clean'.
+// Uses 38.4 KB of rom space.
+#define CRASH_SCREEN_CRASH_SCREEN
+
+// Plays a Mario "WAAAOOOW" sound effect when the game crashes.
+// #define FUNNY_CRASH_SOUND
