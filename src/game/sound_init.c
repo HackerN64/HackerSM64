@@ -76,7 +76,7 @@ static u32 sMenuSoundsExtra[] = {
     SOUND_ENV_ELEVATOR4,
 };
 
-s8 sPaintingEjectSoundPlayed = FALSE;
+s8 gPaintingEjectSoundPlayed = FALSE;
 
 void play_menu_sounds_extra(s32 a, void *b);
 
@@ -190,13 +190,13 @@ void play_menu_sounds(s16 soundMenuFlags) {
 void play_painting_eject_sound(void) {
     if (gRipplingPainting != NULL && gRipplingPainting->oPaintingState == PAINTING_ENTERED) {
         // ripple when Mario enters painting
-        if (!sPaintingEjectSoundPlayed) {
+        if (!gPaintingEjectSoundPlayed) {
             play_sound(SOUND_GENERAL_PAINTING_EJECT,
                        gMarioStates[0].marioObj->header.gfx.cameraToObject);
         }
-        sPaintingEjectSoundPlayed = TRUE;
+        gPaintingEjectSoundPlayed = TRUE;
     } else {
-        sPaintingEjectSoundPlayed = FALSE;
+        gPaintingEjectSoundPlayed = FALSE;
     }
 }
 

@@ -664,7 +664,7 @@ void initiate_painting_warp(void) {
             }
         }
     } else {
-        sPaintingEjectSoundPlayed = FALSE;
+        gPaintingEjectSoundPlayed = FALSE;
     }
 }
 
