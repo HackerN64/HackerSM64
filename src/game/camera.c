@@ -9705,7 +9705,7 @@ void cutscene_exit_painting(struct Camera *c) {
 #ifdef ENABLE_VANILLA_CAM_PROCESSING
     //! Hardcoded position. TTM's painting is close to an opposite wall, so just fix the pos.
     if (gPrevLevel == LEVEL_TTM) {
-        vec3f_set(c->pos, -296.0f, 1261.0f, 3521.0f);
+        vec3f_set(c->pos, -296.f, 1261.f, 3521.f);
     }
 #endif
 
