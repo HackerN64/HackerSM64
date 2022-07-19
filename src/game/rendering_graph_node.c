@@ -628,7 +628,7 @@ void geo_process_camera(struct GraphNodeCamera *node) {
     for (int i = 0; i < 3; i++) {
         scaledCamera[3][i] /= WORLD_SCALE;
     }
-    
+
     // Convert the scaled matrix to fixed-point and integrate it into the projection matrix stack
     guMtxF2L(scaledCamera, viewMtx);
     gSPMatrix(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(viewMtx), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
@@ -1308,8 +1308,7 @@ void geo_process_root(struct GraphNodeRoot *node, Vp *b, Vp *c, s32 clearColor) 
         initialMatrix = alloc_display_list(sizeof(*initialMatrix));
         gCurLookAt = (LookAt*)alloc_display_list(sizeof(LookAt));
         bzero(gCurLookAt, sizeof(LookAt));
-        gCurLookAt->l[1].l.col[1] = 0x80;
-        gCurLookAt->l[1].l.colc[1] = 0x80;
+
         gMatStackIndex = 0;
         gCurrAnimType = ANIM_TYPE_NONE;
         vec3s_set(viewport->vp.vtrans, node->x * 4, node->y * 4, 511);

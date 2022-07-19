@@ -102,8 +102,8 @@ Gfx dl_debug_cylinder_verts[] = {
 	gsSPEndDisplayList(),
 };
 
-u8 hitboxView  = TRUE;
-u8 surfaceView = TRUE;
+u8 hitboxView  = FALSE;
+u8 surfaceView = FALSE;
 
 /**
  * Internal struct containing box info
@@ -475,7 +475,7 @@ static void render_box(int index) {
 
     // Convert the matrix from floating-point to fixed-point
     mtxf_to_mtx(mtx, mtxFloat);
-    
+
     // Load the calculated matrix
     gSPMatrix(gDisplayListHead++, mtx, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
 
