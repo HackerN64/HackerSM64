@@ -391,11 +391,11 @@ void painting_calculate_triangle_normals(PaintingData *mesh, PaintingData numVtx
  * Rounds a floating-point component of a normal vector to an s8 by multiplying it by 127 or 128 and
  * rounding away from 0.
  */
-s32 normalize_component(f32 comp) {
+s8 normalize_component(f32 comp) {
     if (comp > 0.0f) {
-        return (s8)((comp * 127.0f) + 0.5f); // round up
+        return ((comp * 127.0f) + 0.5f); // round up
     } else if (comp < 0.0f) {
-        return (s8)((comp * 128.0f) - 0.5f); // round down
+        return ((comp * 128.0f) - 0.5f); // round down
     } else {
         return 0; // don't round 0
     }
