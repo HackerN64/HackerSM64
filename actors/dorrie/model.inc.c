@@ -16,10 +16,6 @@ ALIGNED8 static const Texture dorrie_seg6_texture_0600ADA0[] = {
 };
 
 // 0x0600B5A0
-static const Lights1 dorrie_seg6_lights_0600B5A0 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600B5B8
 static const Vtx dorrie_seg6_vertex_0600B5B8[] = {
@@ -93,8 +89,8 @@ const Gfx dorrie_seg6_dl_0600B8E8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_0600ADA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600B5A0.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600B5A0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600B5B8, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 1,  4,  5, 0x0,  1,  3,  4, 0x0),
@@ -167,10 +163,6 @@ const Gfx dorrie_seg6_dl_0600BAF8[] = {
 };
 
 // 0x0600BBC0
-static const Lights1 dorrie_seg6_lights_0600BBC0 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600BBD8
 static const Vtx dorrie_seg6_vertex_0600BBD8[] = {
@@ -230,8 +222,8 @@ const Gfx dorrie_seg6_dl_0600BE68[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_0600ADA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600BBC0.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600BBC0.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600BBD8, 12, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSP2Triangles( 4,  0,  3, 0x0,  0,  5,  1, 0x0),
@@ -298,10 +290,6 @@ const Gfx dorrie_seg6_dl_0600C030[] = {
 };
 
 // 0x0600C0F8
-static const Lights1 dorrie_seg6_lights_0600C0F8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600C110
 static const Vtx dorrie_seg6_vertex_0600C110[] = {
@@ -348,8 +336,8 @@ const Gfx dorrie_seg6_dl_0600C310[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600C0F8.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600C0F8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600C110, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  4,  7, 0x0,  4,  8,  7, 0x0),
@@ -399,10 +387,6 @@ const Gfx dorrie_seg6_dl_0600C468[] = {
 };
 
 // 0x0600C510
-static const Lights1 dorrie_seg6_lights_0600C510 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600C528
 static const Vtx dorrie_seg6_vertex_0600C528[] = {
@@ -456,8 +440,8 @@ const Gfx dorrie_seg6_dl_0600C758[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600C510.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600C510.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600C528, 16, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  6,  7, 0x0,  5,  4,  6, 0x0),
@@ -508,10 +492,6 @@ const Gfx dorrie_seg6_dl_0600C8B8[] = {
 };
 
 // 0x0600C960
-static const Lights1 dorrie_seg6_lights_0600C960 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600C978
 static const Vtx dorrie_seg6_vertex_0600C978[] = {
@@ -609,8 +589,8 @@ const Gfx dorrie_seg6_dl_0600CDE8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600C960.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600C960.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600C978, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  1,  3,  2, 0x0),
     gsSP2Triangles( 2,  4,  5, 0x0,  2,  5,  0, 0x0),
@@ -671,10 +651,6 @@ const Gfx dorrie_seg6_dl_0600CFD0[] = {
 };
 
 // 0x0600D078
-static const Lights1 dorrie_seg6_lights_0600D078 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600D090
 static const Vtx dorrie_seg6_vertex_0600D090[] = {
@@ -732,8 +708,8 @@ const Gfx dorrie_seg6_dl_0600D300[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600D078.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600D078.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600D090, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  2,  1, 0x0),
     gsSP2Triangles( 2,  4,  5, 0x0,  2,  5,  0, 0x0),
@@ -782,10 +758,6 @@ const Gfx dorrie_seg6_dl_0600D440[] = {
 };
 
 // 0x0600D4E8
-static const Lights1 dorrie_seg6_lights_0600D4E8 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600D500
 static const Vtx dorrie_seg6_vertex_0600D500[] = {
@@ -818,8 +790,8 @@ const Gfx dorrie_seg6_dl_0600D620[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600D4E8.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600D4E8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600D500, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 1,  4,  5, 0x0,  3,  4,  1, 0x0),
@@ -859,10 +831,6 @@ const Gfx dorrie_seg6_dl_0600D6D8[] = {
 };
 
 // 0x0600D780
-static const Lights1 dorrie_seg6_lights_0600D780 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600D798
 static const Vtx dorrie_seg6_vertex_0600D798[] = {
@@ -881,8 +849,8 @@ const Gfx dorrie_seg6_dl_0600D818[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600D780.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600D780.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600D798, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  2, 0x0),
     gsSP2Triangles( 2,  1,  5, 0x0,  2,  6,  3, 0x0),
@@ -919,10 +887,6 @@ const Gfx dorrie_seg6_dl_0600D8B0[] = {
 };
 
 // 0x0600D958
-static const Lights1 dorrie_seg6_lights_0600D958 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600D970
 static const Vtx dorrie_seg6_vertex_0600D970[] = {
@@ -941,8 +905,8 @@ const Gfx dorrie_seg6_dl_0600D9F0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600D958.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600D958.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600D970, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  1, 0x0),
     gsSP2Triangles( 1,  5,  3, 0x0,  2,  1,  4, 0x0),
@@ -979,10 +943,6 @@ const Gfx dorrie_seg6_dl_0600DA88[] = {
 };
 
 // 0x0600DB30
-static const Lights1 dorrie_seg6_lights_0600DB30 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600DB48
 static const Vtx dorrie_seg6_vertex_0600DB48[] = {
@@ -1001,8 +961,8 @@ const Gfx dorrie_seg6_dl_0600DBC8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600DB30.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600DB30.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600DB48, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  1,  0, 0x0),
     gsSP2Triangles( 4,  2,  1, 0x0,  1,  3,  4, 0x0),
@@ -1039,10 +999,6 @@ const Gfx dorrie_seg6_dl_0600DC60[] = {
 };
 
 // 0x0600DD08
-static const Lights1 dorrie_seg6_lights_0600DD08 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0600DD20
 static const Vtx dorrie_seg6_vertex_0600DD20[] = {
@@ -1061,8 +1017,8 @@ const Gfx dorrie_seg6_dl_0600DDA0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dorrie_seg6_texture_06009DA0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&dorrie_seg6_lights_0600DD08.l, 1),
-    gsSPLight(&dorrie_seg6_lights_0600DD08.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(dorrie_seg6_vertex_0600DD20, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  1,  0, 0x0),
     gsSP2Triangles( 0,  4,  5, 0x0,  0,  6,  3, 0x0),

@@ -33,6 +33,7 @@
     aSetBuffer(pkt, 0, 0, c + DMEM_ADDR_WET_RIGHT_CH, d);                                              \
     aSaveBuffer(pkt, VIRTUAL_TO_PHYSICAL2(gSynthesisReverb.ringBuffer.right + (off)));
 
+#undef ALIGN
 #define ALIGN(val, amnt) (((val) + (1 << amnt) - 1) & ~((1 << amnt) - 1))
 
 struct VolumeChange {
@@ -62,6 +63,7 @@ struct NoteSubEu *gNoteSubsEu;
 // just that the reverb structure is chosen from an array with index
 // Identical in EU.
 void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex, s32 reverbIndex) {
+    struct ReverbRingBufferItem *item;
     struct SynthesisReverb *reverb = &gSynthesisReverbs[reverbIndex];
     s32 srcPos, dstPos;
     if (reverb->downsampleRate != 1) {
@@ -85,7 +87,7 @@ void prepare_reverb_ring_buffer(s32 chunkLen, u32 updateIndex, s32 reverbIndex) 
         }
     }
 
-    struct ReverbRingBufferItem *item = &reverb->items[reverb->curFrame][updateIndex];
+    item = &reverb->items[reverb->curFrame][updateIndex];
     s32 nSamples = chunkLen / reverb->downsampleRate;
     s32 excessiveSamples = (nSamples + reverb->nextRingBufferPos) - reverb->bufSizePerChannel;
     if (excessiveSamples < 0) {
@@ -374,7 +376,7 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
     s32 flags; // sp148, sp11C, t8
     u16 resamplingRateFixedPoint; // sp5c, sp11A
     s32 nSamplesToLoad; //s0, Ec
-    s32 sp130; //sp128, sp104
+    s32 sp130 = 0; //sp128, sp104
     UNUSED s32 tempBufLen;
     s32 t0;
     u8 *sampleAddr; // sp120, spF4
@@ -394,7 +396,7 @@ u64 *synthesis_process_note(s32 noteIndex, struct NoteSubEu *noteSubEu, struct N
     s32 nSamplesInThisIteration; // v1_2
     u32 a3;
     u8 *v0_2;
-    s32 unk_s6; // sp90
+    s32 unk_s6 = 0; // sp90
     s32 s5Aligned;
     s32 sp88;
     s32 sp84;
