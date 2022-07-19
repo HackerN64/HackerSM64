@@ -814,6 +814,28 @@ void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
     }
 }
 
+/**
+ * Makes 'destWorldPos' the world space equivalent of 'srcLocalPos'.
+ */
+void vec3f_local_pos_to_world_pos(Vec3f destWorldPos, Vec3f srcLocalPos, Vec3f originPos, Vec3s rotation) {
+    Mat4 mtx;
+
+    mtxf_rotate_zxy_and_translate(mtx, srcLocalPos, rotation);
+    linear_mtxf_mul_vec3f(mtx, destWorldPos, srcLocalPos);
+    vec3f_add(destWorldPos, originPos);
+}
+
+/**
+ * Makes 'destLocalPos' the local space equivalent of 'srcWorldPos'.
+ */
+void vec3f_world_pos_to_local_pos(Vec3f destLocalPos, Vec3f srcWorldPos, Vec3f originPos, Vec3s rotation) {
+    Mat4 mtx;
+    Vec3f relativePos;
+
+    vec3f_diff(relativePos, srcWorldPos, originPos);
+    mtxf_rotate_zxy_and_translate(mtx, originPos, rotation);
+    linear_mtxf_transpose_mul_vec3f(mtx, destLocalPos, relativePos);
+}
 
 /**
  * Take the vector starting at 'from' pointed at 'to' an retrieve the length

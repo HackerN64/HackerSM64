@@ -315,6 +315,7 @@ struct Object {
         struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
         struct Object *asObject[MAX_OBJECT_FIELDS];
         struct Surface *asSurface[MAX_OBJECT_FIELDS];
+        struct Painting *asPainting[MAX_OBJECT_FIELDS];
         void *asVoidPtr[MAX_OBJECT_FIELDS];
         const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
 #endif
@@ -328,6 +329,7 @@ struct Object {
         struct ChainSegment *asChainSegment[MAX_OBJECT_FIELDS];
         struct Object *asObject[MAX_OBJECT_FIELDS];
         struct Surface *asSurface[MAX_OBJECT_FIELDS];
+        struct Painting *asPainting[MAX_OBJECT_FIELDS];
         void *asVoidPtr[MAX_OBJECT_FIELDS];
         const void *asConstVoidPtr[MAX_OBJECT_FIELDS];
     } ptrData;

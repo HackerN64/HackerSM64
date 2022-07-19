@@ -353,6 +353,12 @@ enum AvoidStatus {
     AVOID_STATUS_WALL_COVERING_MARIO,
 };
 
+enum CutsceneObjectStatus {
+    CUTSCENE_OBJ_STATUS_FINISHED = -1,
+    CUTSCENE_OBJ_STATUS_NOT_STARTED,
+    CUTSCENE_OBJ_STATUS_STARTED,
+};
+
 /**
  * A copy of player information that is relevant to the camera.
  */

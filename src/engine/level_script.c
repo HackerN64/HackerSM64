@@ -31,7 +31,7 @@
 
 #include "config.h"
 
-#define NUM_PAINTINGS 45
+#define NUM_PAINTING_WARP_NODES 45
 
 #define CMD_GET(type, offset) (*(type *) (CMD_PROCESS_OFFSET(offset) + (u8 *) sCurrentCmd))
 
@@ -563,9 +563,9 @@ static void level_cmd_create_painting_warp_node(void) {
     if (sCurrAreaIndex != -1) {
         if (gAreas[sCurrAreaIndex].paintingWarpNodes == NULL) {
             gAreas[sCurrAreaIndex].paintingWarpNodes =
-                alloc_only_pool_alloc(sLevelPool, NUM_PAINTINGS * sizeof(struct WarpNode));
+                alloc_only_pool_alloc(sLevelPool, NUM_PAINTING_WARP_NODES * sizeof(struct WarpNode));
 
-            for (i = 0; i < NUM_PAINTINGS; i++) {
+            for (i = 0; i < NUM_PAINTING_WARP_NODES; i++) {
                 gAreas[sCurrAreaIndex].paintingWarpNodes[i].id = 0;
             }
         }

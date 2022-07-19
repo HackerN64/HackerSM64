@@ -174,7 +174,6 @@ void spawn_sparkle_particles(s32 n, s32 radius, s32 height, s32 r) {
 #include "behaviors/bowser_flame.inc.c"
 #include "behaviors/blue_fish.inc.c"
 #include "behaviors/checkerboard_platform.inc.c"
-#include "behaviors/ddd_warp.inc.c"
 #include "behaviors/water_pillar.inc.c"
 #include "behaviors/moat_drainer.inc.c"
 #include "behaviors/bowser_key_cutscene.inc.c"
