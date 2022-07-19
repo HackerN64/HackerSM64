@@ -320,8 +320,12 @@ void check_cache_emulation() {
 
 extern void crash_screen_init(void);
 
+void load_sdata(void);
+
 void thread3_main(UNUSED void *arg) {
+    setgp();
     setup_mesg_queues();
+    load_sdata();
     alloc_pool();
     load_engine_code_segment();
     gIsVC = IS_VC();
@@ -471,6 +475,7 @@ void get_audio_frequency(void) {
  * Initialize hardware, start main thread, then idle.
  */
 void thread1_idle(UNUSED void *arg) {
+    setgp();
     osCreateViManager(OS_PRIORITY_VIMGR);
     switch (osTvType) {
         case OS_TV_NTSC:
@@ -529,6 +534,7 @@ void osInitialize_fakeisv() {
 #endif
 
 void main_func(void) {
+    setgp();
     ClearRAM();
     __osInitialize_common();
 #ifdef ISVPRINT

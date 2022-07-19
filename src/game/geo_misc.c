@@ -28,7 +28,7 @@
  */
 
 #define NUM_FLYING_CARPET_VERTICES 21
-extern const s16 flying_carpet_static_vertex_data[NUM_FLYING_CARPET_VERTICES];
+extern const s16 flying_carpet_static_vertex_data[NUM_FLYING_CARPET_VERTICES] __attribute__((section(".data")));
 
 static s16 sCurAreaTimer = 1;
 static s16 sPrevAreaTimer = 0;

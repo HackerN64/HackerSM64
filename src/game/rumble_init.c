@@ -213,6 +213,7 @@ void queue_rumble_submerged(void) {
 
 static void thread6_rumble_loop(UNUSED void *arg) {
     OSMesg msg;
+    setgp();
 
 	osSyncPrintf("start motor thread\n");
     cancel_rumble();
