@@ -147,8 +147,6 @@ SECTIONS
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
 #ifndef DEBUG_MAP_STACKTRACE
-      parse_map               = MAP_PARSER_ADDRESS;
-      find_function_in_stack  = MAP_PARSER_ADDRESS;
       _mapDataSegmentRomStart = 0;
       gMapEntries   = 0;
       gMapEntrySize = 0;

@@ -6,8 +6,8 @@
 
 // -- CUTSCENE SKIPS --
 
-// Skip peach letter cutscene
+// Skips the peach letter cutscene.
 #define PEACH_SKIP
 
-// Uncomment this if you want to skip the title screen (Super Mario 64 logo)
-//#define SKIP_TITLE_SCREEN
+// Skips the title/splash screen (Super Mario 64 logo).
+// #define SKIP_TITLE_SCREEN

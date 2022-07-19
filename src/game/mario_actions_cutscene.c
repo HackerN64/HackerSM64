@@ -582,15 +582,27 @@ s32 act_debug_free_move(struct MarioState *m) {
 }
 
 void general_star_dance_handler(struct MarioState *m, s32 isInWater) {
+    struct Object *celebStar = NULL;
+
     if (m->actionState == ACT_STATE_STAR_DANCE_CUTSCENE) {
         switch (++m->actionTimer) {
             case 1:
-                spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
+                celebStar = spawn_object(m->marioObj, MODEL_STAR, bhvCelebrationStar);
+#ifdef STAR_DANCE_USES_STARS_MODEL
+                celebStar->header.gfx.sharedChild = m->interactObj->header.gfx.sharedChild;
+#else
+                if (obj_has_model(m->interactObj, MODEL_BOWSER_KEY)) {
+                    obj_set_model(celebStar, MODEL_BOWSER_KEY);
+                }
+#endif
                 disable_background_sound();
+                //! TODO: Is this check necessary? Both seem to do the exact same thing.
                 if (m->actionArg & 1) {
-                    play_course_clear();
+                    // No exit
+                    play_course_clear(obj_has_model(celebStar, MODEL_BOWSER_KEY));
                 } else {
-                    if (gCurrLevelNum == LEVEL_BOWSER_1 || gCurrLevelNum == LEVEL_BOWSER_2) {
+                    // Exit
+                    if (obj_has_model(celebStar, MODEL_BOWSER_KEY)) {
                         play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_KEY), 0);
                     } else {
                         play_music(SEQ_PLAYER_ENV, SEQUENCE_ARGS(15, SEQ_EVENT_CUTSCENE_COLLECT_STAR), 0);

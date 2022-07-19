@@ -6,10 +6,6 @@ ALIGNED8 static const Texture tornado_seg5_texture_05013128[] = {
 };
 
 // 0x05014128
-static const Lights1 tornado_seg5_lights_05014128 = gdSPDefLights1(
-    0x3b, 0x34, 0x23,
-    0xee, 0xd0, 0x8d, 0x28, 0x28, 0x28
-);
 
 // 0x05014140
 static const Vtx tornado_seg5_vertex_05014140[] = {
@@ -81,8 +77,8 @@ const Gfx tornado_seg5_dl_05014450[] = {
     gsDPSetTextureImage(G_IM_FMT_IA, G_IM_SIZ_16b, 1, tornado_seg5_texture_05013128),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&tornado_seg5_lights_05014128.l, 1),
-    gsSPLight(&tornado_seg5_lights_05014128.a, 2),
+    gsSPLightColor(LIGHT_1, 0xeed08dff),
+    gsSPLightColor(LIGHT_2, 0x3b3423ff),
     gsSPVertex(tornado_seg5_vertex_05014140, 14, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  4, 0x0),
     gsSP2Triangles( 0,  5,  6, 0x0,  0,  6,  1, 0x0),
