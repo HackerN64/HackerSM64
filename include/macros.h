@@ -45,6 +45,13 @@
 #define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #endif
 
+// Align to 0-byte boundary for PC Port requirements
+#ifdef __GNUC__
+#define ALIGNED0 __attribute__((aligned(0)))
+#else
+#define ALIGNED0
+#endif
+
 // Align to 8-byte boundary for DMA requirements
 #ifdef __GNUC__
 #define ALIGNED8 __attribute__((aligned(8)))
