@@ -166,3 +166,13 @@
     #undef BORDER_HEIGHT_EMULATOR
     #define BORDER_HEIGHT_EMULATOR 0
 #endif // !TARGET_N64
+
+
+/*****************
+ * config_pc_port.inc.h
+ */
+
+#ifndef ENABLE_PC_PORT
+    #undef F3DEX_GBI_2E
+    #define F3DEX_GBI_2E
+#endif // ENABLE_PC_PORT

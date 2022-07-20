@@ -48,6 +48,9 @@ u8 gControllerBits;
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
+#ifdef ENABLE_PC_PORT
+UNUSED ALIGNED0 u8 gIsPCPort = TRUE; // PC Port
+#endif
 #ifdef VANILLA_STYLE_CUSTOM_DEBUG
 u8 gCustomDebugMode;
 #endif
