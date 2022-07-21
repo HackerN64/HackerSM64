@@ -313,6 +313,7 @@ void print_act_selector_strings(void) {
 
 #if MULTILANG
     switch (language) {
+        default:
         case LANGUAGE_ENGLISH:
             actNameTbl = segmented_to_virtual(act_name_table_eu_en);
             levelNameTbl = segmented_to_virtual(course_name_table_eu_en);
