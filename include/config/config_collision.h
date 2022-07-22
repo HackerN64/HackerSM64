@@ -17,6 +17,9 @@
 // Number of walls that can push Mario at once. Vanilla is 4.
 #define MAX_REFERENCED_WALLS 4
 
+// Allow vertical rooms to be a thing by using the SURFACE_INTANGIBLE floor type to separate the rooms. Note that this will add an extra floor check every frame.
+// #define VERTICAL_ROOMS
+
 // Collision data is the type that the collision system uses. All data by default is stored as an s16, but you may change it to s32.
 // Naturally, that would double the size of all collision data, but would allow you to use 32 bit values instead of 16.
 // Rooms are s8 in vanilla, but if you somehow have more than 255 rooms, you may raise this number.
