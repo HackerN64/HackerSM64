@@ -19,7 +19,7 @@ I_DIRS = src include/n64/PR include/n64 include/libc include .
 FULL_I_DIRS = $(addprefix $(INCLUDE_BASE),$(I_DIRS))
 I_FLAGS = $(foreach i,$(FULL_I_DIRS),-I$(i))
 
-TARGET_CFLAGS = -nostdinc -I include/libc -DTARGET_N64 -DF3DEX_GBI_2 -DNON_MATCHING -DAVOID_UB
+TARGET_CFLAGS = -nostdinc -I include/libc -DTARGET_N64 -DF3DEX_GBI_2
 CFLAGS := -Wall $(TARGET_CFLAGS) $(I_FLAGS) -fno-stack-protector -march=vr4300 -mtune=vr4300 -mfix4300 -mabi=32 -mno-shared -G 0 -fno-PIC -mno-abicalls -fno-zero-initialized-in-bss -fno-toplevel-reorder -Wno-missing-braces
 
 

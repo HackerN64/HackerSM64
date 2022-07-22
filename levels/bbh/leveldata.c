@@ -62,7 +62,6 @@
 #include "levels/bbh/areas/1/macro.inc.c"
 #include "levels/bbh/staircase_step/collision.inc.c"
 #include "levels/bbh/tilting_trap_platform/collision.inc.c"
-#include "levels/bbh/tumbling_platform_far/collision.inc.c"
 #include "levels/bbh/tumbling_platform_near/collision.inc.c"
 #include "levels/bbh/moving_bookshelf/collision.inc.c"
 #include "levels/bbh/mesh_elevator/collision.inc.c"

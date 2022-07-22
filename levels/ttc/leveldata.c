@@ -42,7 +42,5 @@
 #include "levels/ttc/elevator_platform/collision.inc.c"
 #include "levels/ttc/clock_hand/collision.inc.c"
 #include "levels/ttc/spinner/collision.inc.c"
-#include "levels/ttc/small_gear/collision.inc.c"
-#include "levels/ttc/large_gear/collision.inc.c"
 #include "levels/ttc/areas/1/macro.inc.c"
 #include "levels/ttc/areas/1/movtext.inc.c"
