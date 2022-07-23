@@ -7,6 +7,7 @@
 #include "external.h"
 #include "playback.h"
 #include "synthesis.h"
+#include "game/debug.h"
 #include "game/main.h"
 #include "game/level_update.h"
 #include "game/object_list_processor.h"
@@ -1208,6 +1209,8 @@ static void update_game_sound(void) {
                 && sSoundBanks[bank][soundIndex].soundStatus != SOUND_STATUS_STOPPED) {
                 soundStatus = sSoundBanks[bank][soundIndex].soundBits & SOUNDARGS_MASK_STATUS;
                 soundId = (sSoundBanks[bank][soundIndex].soundBits >> SOUNDARGS_SHIFT_SOUNDID);
+
+                assert(soundId < 0xFE, "Each sfx table only supports up to 254 unique total sounds!");
 
                 sSoundBanks[bank][soundIndex].soundStatus = soundStatus;
 
