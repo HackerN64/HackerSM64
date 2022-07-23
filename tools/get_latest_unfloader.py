@@ -14,8 +14,8 @@ def get_latest_build_artifacts_url():
 
 def main():
     destpath = sys.argv[1] if len(sys.argv) > 1 else './'
-    is_wsl = 'wsl' in str(platform.uname()).lower()
-    UNF_FN = 'UNFLoader.exe' if is_wsl else 'UNFLoader'
+    is_wsl = 'microsoft-standard' in str(platform.uname()).lower()
+    unf_fn = 'UNFLoader.exe' if is_wsl else 'UNFLoader'
     artifact_url = get_latest_build_artifacts_url()
 
     # get all artifacts from most recent build
@@ -42,12 +42,12 @@ def main():
             if not zipinfo.is_dir():
                 unfpath = zip_ref.extract(zipinfo)
 
-    unf_bin_path = os.path.join(destpath, UNF_FN)
+    unf_bin_path = os.path.join(destpath, unf_fn)
     # file gets extracted to ./unfloader-{platform}/UNFLoader[.exe],
     # so move binary to ./UNFLoader[.exe]
     os.rename(unfpath, unf_bin_path)
     # remove ./unfloader-{platform}/ directory
-    os.rmdir(unfpath.rstrip(UNF_FN))
+    os.rmdir(unfpath.rstrip(unf_fn))
     # remove UNFLoader.zip
     os.remove('UNFLoader.zip')
     
