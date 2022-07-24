@@ -330,13 +330,18 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
 
     RGBA16 color = COLOR_RGBA16_WHITE;
 
+    s8 escape = FALSE;
+
     if (size > 0) {
         char *ptr = buf;
 
         while (*ptr) {
             glyph = (*ptr & 0x7f);
 
-            if (glyph == '@') {
+            if (glyph == '\\' && *(ptr + 1) && (*(ptr + 1) & 0x7f) == '@') { // use '\\@' to print '@'
+                ptr++;
+                escape = TRUE;
+            } else if (glyph == '@' && !escape) {
                 ptr++;
                 if (!*ptr) {
                     break;
@@ -360,6 +365,8 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
 
                 color = GPACK_RGBA5551(rgba[0], rgba[1], rgba[2], rgba[3]);
             } else {
+                escape = FALSE;
+
                 if (glyph != 0xff) {
                     crash_screen_draw_glyph(x, y, glyph, color);
                 }
