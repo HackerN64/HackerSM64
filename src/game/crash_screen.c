@@ -19,23 +19,28 @@
 
 enum CrashPages {
     PAGE_CONTEXT,
+    PAGE_ASSERTS,
 #ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
 #endif
     PAGE_STACKTRACE,
+    PAGE_RAM_VIEWER,
     PAGE_DISASM,
-    PAGE_ASSERTS,
     PAGE_CONTROLS,
     PAGE_COUNT,
     PAGES_MAX = 255,
 };
 
-enum AnalogFlags {
-    ANALOG_FLAGS_NONE = 0x0,
-    ANALOG_FLAG_LEFT  = BIT(0),
-    ANALOG_FLAG_RIGHT = BIT(1),
-    ANALOG_FLAG_UP    = BIT(2),
-    ANALOG_FLAG_DOWN  = BIT(3),
+enum CrashScreenDirectionFlags {
+    CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE         = 0x0,
+    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP       = BIT(0),
+    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN     = BIT(1),
+    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT     = BIT(2),
+    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT    = BIT(3),
+    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP    = BIT(4),
+    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN  = BIT(5),
+    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT  = BIT(6),
+    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT = BIT(7),
 };
 
 // Crash screen font properties.
@@ -77,7 +82,7 @@ enum AnalogFlags {
 #define CRASH_SCREEN_Y2 (CRASH_SCREEN_Y1 + CRASH_SCREEN_H) // 230
 
 // Top left corner of the text grid.
-#define CRASH_SCREEN_TEXT_X1 (CRASH_SCREEN_X1 + CRASH_SCREEN_TEXT_MARGIN_X + 1) // 28
+#define CRASH_SCREEN_TEXT_X1 (CRASH_SCREEN_X1 + CRASH_SCREEN_TEXT_MARGIN_X + 0) // 28
 #define CRASH_SCREEN_TEXT_Y1 (CRASH_SCREEN_Y1 + CRASH_SCREEN_TEXT_MARGIN_Y + 1) // 10
 
 // Bottom right corner of the text grid.
@@ -108,16 +113,26 @@ struct FunctionInStack {
     char *name;
 };
 
+struct CrashScreenPage {
+    void (*drawFunc)(OSThread *thread);
+    void (*inputFunc)(void);
+};
+
 struct FunctionInStack sAllFunctionStack[STACK_SIZE];
 struct FunctionInStack sKnownFunctionStack[STACK_SIZE];
 static s32 sNumKnownFunctions = 0;
 static s32 sNumShownFunctions = STACK_SIZE;
 
-static s8 sAnalogFlags = ANALOG_FLAGS_NONE;
+static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
+
 static s8 sDrawCrashScreen = TRUE;
 static s8 sDrawFrameBuffer = TRUE;
 static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
+static s8 sAddressSelectMenuOpen = FALSE;
+static s8 sAddressSelecCharIndex = 0;
+static s8 sRamViewerShowAscii = FALSE;
+static u32 sAddressSelect = 0;
 static u32 sProgramPosition = 0;
 static s32 sStackTraceIndex = 0;
 
@@ -191,17 +206,17 @@ extern u16 sRenderingFramebuffer;
 u16 sScreenshotFrameBuffer;
 
 
-RGBA16 *crash_screen_get_frame_buffer_pixel_ptr(s32 x, s32 y) {
+RGBA16 *crash_screen_get_framebuffer_pixel_ptr(s32 x, s32 y) {
     return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
 }
 
-void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h, RGBA16 color, s32 isTransparent) {
-    s32 i, j;
+void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA16 color, s32 isTransparent) {
+    s32 x, y;
 
-    RGBA16 *ptr = crash_screen_get_frame_buffer_pixel_ptr(x, y);
+    RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
-    for (i = 0; i < h; i++) {
-        for (j = 0; j < w; j++) {
+    for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
             if (isTransparent) {
                 *ptr = (((*ptr & color) >> 2) | 0x1);
             } else {
@@ -214,24 +229,48 @@ void crash_screen_draw_rect(s32 x, s32 y, s32 w, s32 h, RGBA16 color, s32 isTran
     }
 }
 
+void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA16 color, s8 flip) {
+    const f32 t = ((f32) w / 2.0f) / (f32) h;
+    f32 d = flip ? (w / 2.0f) - t : 0.0f;
+    s32 x, y;
+
+    RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
+
+    for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+            if (absf((w / 2.0f) - x) < d) {
+                *ptr = color;
+            }
+            ptr++;
+        }
+
+        d += flip ? -t : t;
+        ptr += (SCREEN_WIDTH - w);
+    }
+}
+
 void crash_screen_draw_divider(s32 y) {
     crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA16_LIGHT_GRAY, FALSE);
 }
 
-void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph, RGBA16 color) {
+void crash_screen_draw_glyph(s32 startX, s32 startY, s32 glyph, RGBA16 color) {
     u32 bit;
     u32 rowMask;
-    s32 i, j;
+    s32 x, y;
+
+    if (glyph == 0) {
+        color = COLOR_RGBA16_GRAY;
+    }
 
     u32 *data = &gCrashScreenFont[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
 
-    RGBA16 *ptr = crash_screen_get_frame_buffer_pixel_ptr(x, y);
+    RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
-    for (i = 0; i < CRASH_SCREEN_FONT_CHAR_HEIGHT; i++) {
+    for (y = 0; y < CRASH_SCREEN_FONT_CHAR_HEIGHT; y++) {
         bit = (0x80000000U >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
         rowMask = *data++;
 
-        for (j = 0; j < CRASH_SCREEN_FONT_CHAR_WIDTH; j++) {
+        for (x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
             if (bit & rowMask) {
                 *ptr = color;
             }
@@ -241,6 +280,25 @@ void crash_screen_draw_glyph(s32 x, s32 y, s32 glyph, RGBA16 color) {
 
         ptr += (SCREEN_WIDTH - CRASH_SCREEN_FONT_CHAR_WIDTH);
     }
+}
+
+void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA16 color) {
+    // Start on the pixel below the divider.
+    topY++;
+
+    // Determine size of the scroll bar.
+    u32 totalHeight = (bottomY - topY);
+
+    u32 scrollBarHeight = (numVisibleEntries * ((f32) totalHeight / (f32) numTotalEntries));
+    scrollBarHeight = CLAMP(scrollBarHeight, minScrollBarHeight, totalHeight);
+
+    // Determine position of the scroll bar.
+    f32 scrollableHeight = (totalHeight - scrollBarHeight);
+    f32 numScrollableEntries = (numTotalEntries - numVisibleEntries);
+    u32 scrollPos = (currEntry * (scrollableHeight / numScrollableEntries));
+
+    // Draw the scroll bar rectangle.
+    crash_screen_draw_rect((CRASH_SCREEN_X2 - 1), (topY + scrollPos), 1, scrollBarHeight, color, FALSE);
 }
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
@@ -424,6 +482,22 @@ void draw_crash_context(OSThread *thread) {
     crash_screen_print_float_registers(tc);
 }
 
+void draw_assert(UNUSED OSThread *thread) {
+    crash_screen_print(TEXT_X(0), TEXT_Y(1), "ASSERT PAGE");
+
+    crash_screen_draw_divider(DIVIDER_Y(2));
+
+    if (__n64Assert_Filename != NULL) {
+        crash_screen_print(TEXT_X(0), TEXT_Y(2), "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
+        crash_screen_print(TEXT_X(0), TEXT_Y(4), "MESSAGE:");
+        crash_screen_print(TEXT_X(0), (TEXT_Y(5) + 5), " %s", __n64Assert_Message);
+    } else {
+        crash_screen_print(TEXT_X(0), TEXT_Y(2), "no failed assert to report.");
+    }
+
+    osWritebackDCacheAll();
+}
+
 #ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(UNUSED OSThread *thread) {
     s32 i;
@@ -433,25 +507,6 @@ void draw_crash_log(UNUSED OSThread *thread) {
     }
 }
 #endif
-
-void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA16 color) {
-    // Start on the pixel below the divider.
-    topY++;
-
-    // Determine size of the scroll bar.
-    u32 totalHeight = (bottomY - topY);
-
-    u32 scrollBarHeight = (numVisibleEntries * ((f32) totalHeight / (f32) numTotalEntries));
-    scrollBarHeight = CLAMP(scrollBarHeight, minScrollBarHeight, totalHeight);
-
-    // Determine position of the scroll bar.
-    f32 scrollableHeight = (totalHeight - scrollBarHeight);
-    f32 numScrollableEntries = (numTotalEntries - numVisibleEntries);
-    u32 scrollPos = (currEntry * (scrollableHeight / numScrollableEntries));
-
-    // Draw the scroll bar rectangle.
-    crash_screen_draw_rect((CRASH_SCREEN_X2 - 1), (topY + scrollPos), 1, scrollBarHeight, color, FALSE);
-}
 
 #define STACK_TRACE_NUM_ROWS 18
 
@@ -525,6 +580,102 @@ void draw_stacktrace(OSThread *thread) {
     osWritebackDCacheAll();
 }
 
+#define JUMP_MENU_W (TEXT_WIDTH(8))
+#define JUMP_MENU_H (TEXT_HEIGHT(1))
+
+#define JUMP_MENU_X (SCREEN_CENTER_X - (JUMP_MENU_W / 2))
+#define JUMP_MENU_Y (SCREEN_CENTER_Y - (JUMP_MENU_H / 2))
+
+void draw_address_select(void) {
+    crash_screen_draw_rect(JUMP_MENU_X -  5, JUMP_MENU_Y - TEXT_HEIGHT(2) -  5,
+                           JUMP_MENU_W + 10, JUMP_MENU_H + TEXT_HEIGHT(2) + 10,
+                           COLOR_RGBA16_CRASH_BACKGROUND, TRUE);
+
+    crash_screen_print(JUMP_MENU_X + TEXT_WIDTH(1), JUMP_MENU_Y - TEXT_HEIGHT(2), "GO TO:");
+
+    crash_screen_draw_triangle(JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)), JUMP_MENU_Y - TEXT_HEIGHT(1),
+                               TEXT_WIDTH(1), TEXT_WIDTH(1),
+                               COLOR_RGBA16_CRASH_CURRFUNC, FALSE);
+    crash_screen_draw_triangle(JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)), JUMP_MENU_Y + TEXT_HEIGHT(1),
+                               TEXT_WIDTH(1), TEXT_WIDTH(1),
+                               COLOR_RGBA16_CRASH_CURRFUNC, TRUE);
+    crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelect);
+}
+
+#define RAM_VIEWER_NUM_ROWS 18
+#define RAM_VIEWER_SHOWN_SECTION (RAM_VIEWER_NUM_ROWS * 0x10)
+
+#define RAM_VIEWER_SCROLL_MIN RAM_START
+#define RAM_VIEWER_SCROLL_MAX (RAM_END - RAM_VIEWER_SHOWN_SECTION)
+
+void draw_ram_viewer(OSThread *thread) {
+    __OSThreadContext *tc = &thread->context;
+
+    if (sProgramPosition == 0) {
+        sProgramPosition = (tc->pc & ~0xF);
+    }
+
+    u32 addr = sProgramPosition;
+    u32 currAddr = addr;
+
+    s32 charX, charY;
+
+    crash_screen_print(TEXT_X( 0), TEXT_Y(1), "@FF7F00FFSELECTED ADDRESS:");
+    crash_screen_print(TEXT_X(17), TEXT_Y(1), "%08X", addr);
+    crash_screen_draw_divider(DIVIDER_Y(2));
+    crash_screen_print(TEXT_X( 1), TEXT_Y(2), "MEMORY");
+
+    charX = TEXT_X(8) + 3;
+
+    for (s32 i = 0; i < 16; i++) {
+        if ((i % 4) == 0) {
+            charX += 2;
+        }
+        crash_screen_print(charX, TEXT_Y(2), ((i & 0x1) ? "@00B7FFFF%02X" : "@0087FFFF%02X"), i);
+        charX += TEXT_WIDTH(2) + 1;
+    }
+    crash_screen_draw_divider(DIVIDER_Y(3));
+
+    crash_screen_draw_rect(TEXT_X(8) + 2, DIVIDER_Y(2), 1, TEXT_HEIGHT(19), COLOR_RGBA16_LIGHT_GRAY, FALSE);
+
+    charX = TEXT_X(8) + 3;
+    charY = TEXT_Y(3);
+
+    for (s32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
+        currAddr = addr + (y * 0x10);
+        crash_screen_print(TEXT_X(0), TEXT_Y(3 + y), ((y & 0x1) ? "@5FDF5FFF%08X" : "@1F9F1FFF%08X"), currAddr);
+
+        charX = TEXT_X(8) + 3;
+        charY = TEXT_Y(3 + y);
+        for (s32 x = 0; x < 16; x++) {
+            u8 value = *((u8 *)currAddr + x);
+            if ((x % 4) == 0) {
+                charX += 2;
+            }
+            if (sRamViewerShowAscii) {
+                crash_screen_draw_glyph(charX, charY, value, COLOR_RGBA16_CRASH_WHITE);
+            } else {
+                crash_screen_print(charX, charY, ((x & 0x1) ? "@FFFFFFFF%02X" : "@BFBFBFFF%02X"), value);
+            }
+            charX += TEXT_WIDTH(2) + 1;
+        }
+    }
+
+    crash_screen_draw_divider(DIVIDER_Y(21));
+    crash_screen_print(TEXT_X(0), TEXT_Y(21), "@C0C0C0FFup/down:scroll        a:jump  b:toggle ascii");
+
+    // Scroll bar
+    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(21), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA16_LIGHT_GRAY);
+
+    osWritebackDCacheAll();
+
+    if (sAddressSelectMenuOpen) {
+        draw_address_select();
+    }
+
+    osWritebackDCacheAll();
+}
+
 #define DISASM_NUM_ROWS 19
 #define DISASM_SHOWN_SECTION (DISASM_NUM_ROWS * 4)
 
@@ -561,22 +712,6 @@ void draw_disasm(OSThread *thread) {
 
     // Scroll bar crash position marker
     crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(21), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA16_CRASH_CURRFUNC);
-
-    osWritebackDCacheAll();
-}
-
-void draw_assert(UNUSED OSThread *thread) {
-    crash_screen_print(TEXT_X(0), TEXT_Y(1), "ASSERT PAGE");
-
-    crash_screen_draw_divider(DIVIDER_Y(2));
-
-    if (__n64Assert_Filename != NULL) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(2), "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
-        crash_screen_print(TEXT_X(0), TEXT_Y(4), "MESSAGE:");
-        crash_screen_print(TEXT_X(0), (TEXT_Y(5) + 5), " %s", __n64Assert_Message);
-    } else {
-        crash_screen_print(TEXT_X(0), TEXT_Y(2), "no failed assert to report.");
-    }
 
     osWritebackDCacheAll();
 }
@@ -623,6 +758,170 @@ void update_crash_screen_framebuffer(void) {
     memcpy(gFramebuffers[sRenderedFramebuffer], gFramebuffers[sRenderingFramebuffer], FRAMEBUFFER_SIZE);
 }
 
+void update_crash_screen_direction_input(void) {
+    u8 prevHeld = (sCrashScreenDirectionFlags & 0xF);
+    u8 currHeld = 0x0;
+    // Up
+    COND_BIT(((gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))
+     || (gPlayer1Controller->rawStickY > 60)),
+     currHeld, CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP);
+    // Down
+    COND_BIT(((gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))
+     || (gPlayer1Controller->rawStickY < -60)),
+     currHeld, CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN);
+    // Left
+    COND_BIT(((gPlayer1Controller->buttonDown & (L_CBUTTONS | L_JPAD))
+     || (gPlayer1Controller->rawStickX < -60)),
+     currHeld, CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT);
+    // Right
+    COND_BIT(((gPlayer1Controller->buttonDown & (R_CBUTTONS | R_JPAD))
+     || (gPlayer1Controller->rawStickX >  60)),
+     currHeld, CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT);
+    u8 pressed = (~prevHeld & currHeld);
+    sCrashScreenDirectionFlags = ((pressed << 4) | currHeld);
+}
+
+void update_crash_screen_page(void) {
+    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT) {
+        sCrashPage++;
+        sUpdateBuffer = TRUE;
+    }
+    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
+        sCrashPage--;
+        sUpdateBuffer = TRUE;
+    }
+}
+
+void crash_screen_input_stacktrace(void) {
+    update_crash_screen_page();
+
+    if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+        sStackTraceShowNames ^= TRUE;
+        sUpdateBuffer = TRUE;
+    }
+
+    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+        sStackTraceSkipUnknowns ^= TRUE;
+        sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_SIZE);
+        sStackTraceIndex = 0;
+        sUpdateBuffer = TRUE;
+    }
+
+    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+        if (sStackTraceIndex > 0) {
+            sStackTraceIndex--;
+        }
+        sUpdateBuffer = TRUE;
+    }
+    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+        if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
+            sStackTraceIndex++;
+        }
+        sUpdateBuffer = TRUE;
+    }
+}
+
+void crash_screen_input_ram_viewer(void) {
+    if (sAddressSelectMenuOpen) {
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
+            sAddressSelecCharIndex = ((sAddressSelecCharIndex - 1) & 0x7);
+            sUpdateBuffer = TRUE;
+        }
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT) {
+            sAddressSelecCharIndex = ((sAddressSelecCharIndex + 1) & 0x7);
+            sUpdateBuffer = TRUE;
+        }
+
+        u32 nextSelectedAddress = sAddressSelect;
+
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP) {
+            s32 shift = 28 - (sAddressSelecCharIndex * 4);
+            u8 new = ((sAddressSelect >> shift) & 0xF);
+            new = ((new + 1) & 0xF);
+            nextSelectedAddress = ((sAddressSelect & ~(0xF << shift)) | (new << shift));
+
+            if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
+                sAddressSelect = (nextSelectedAddress & ~0xF);
+                sUpdateBuffer = TRUE;
+            }
+        }
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN) {
+            s32 shift = 28 - (sAddressSelecCharIndex * 4);
+            u8 new = ((sAddressSelect >> shift) & 0xF);
+            new = ((new - 1) & 0xF);
+            nextSelectedAddress = ((sAddressSelect & ~(0xF << shift)) | (new << shift));
+
+            if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
+                sAddressSelect = (nextSelectedAddress & ~0xF);
+                sUpdateBuffer = TRUE;
+            }
+        }
+
+        if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+            sAddressSelectMenuOpen = FALSE;
+            sProgramPosition = sAddressSelect;
+            sUpdateBuffer = TRUE;
+        }
+    } else {
+        update_crash_screen_page();
+
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+            sProgramPosition -= 0x10;
+            if (sProgramPosition < RAM_VIEWER_SCROLL_MIN) {
+                sProgramPosition = RAM_VIEWER_SCROLL_MIN;
+            }
+            sUpdateBuffer = TRUE;
+        }
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+            sProgramPosition += 0x10;
+            if (sProgramPosition > RAM_VIEWER_SCROLL_MAX) {
+                sProgramPosition = RAM_VIEWER_SCROLL_MAX;
+            }
+            sUpdateBuffer = TRUE;
+        }
+        if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+            sAddressSelectMenuOpen = TRUE;
+            sAddressSelect = sProgramPosition;
+            sUpdateBuffer = TRUE;
+        }
+        if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+            sRamViewerShowAscii ^= TRUE;
+            sUpdateBuffer = TRUE;
+        }
+    }
+}
+
+void crash_screen_input_disasm(void) {
+    update_crash_screen_page();
+
+    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+        sProgramPosition -= 4;
+        if (sProgramPosition < DISASM_SCROLL_MIN) {
+            sProgramPosition = DISASM_SCROLL_MIN;
+        }
+        sUpdateBuffer = TRUE;
+    }
+    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+        sProgramPosition += 4;
+        if (sProgramPosition > DISASM_SCROLL_MAX) {
+            sProgramPosition = DISASM_SCROLL_MAX;
+        }
+        sUpdateBuffer = TRUE;
+    }
+}
+
+struct CrashScreenPage sCrashScreenPages[] = {
+    /*PAGE_CONTEXT   */ {draw_crash_context, update_crash_screen_page},
+    /*PAGE_ASSERTS   */ {draw_assert,        update_crash_screen_page},
+#ifdef PUPPYPRINT_DEBUG
+    /*PAGE_LOG       */ {draw_crash_log,    update_crash_screen_page},
+#endif
+    /*PAGE_STACKTRACE*/ {draw_stacktrace,   crash_screen_input_stacktrace},
+    /*PAGE_RAM_VIEWER*/ {draw_ram_viewer,   crash_screen_input_ram_viewer},
+    /*PAGE_DISASM    */ {draw_disasm,       crash_screen_input_disasm},
+    /*PAGE_CONTROLS  */ {draw_controls,     crash_screen_input_disasm},
+};
+
 void update_crash_screen_input(void) {
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
         sDrawCrashScreen ^= TRUE;
@@ -639,81 +938,10 @@ void update_crash_screen_input(void) {
     }
 
     if (sDrawCrashScreen) {
-        if (gPlayer1Controller->buttonPressed & (R_CBUTTONS | R_JPAD)) {
-            sCrashPage++;
-            sUpdateBuffer = TRUE;
-        }
-        if (gPlayer1Controller->buttonPressed & (L_CBUTTONS | L_JPAD)) {
-            sCrashPage--;
-            sUpdateBuffer = TRUE;
-        }
-
-        if (gPlayer1Controller->rawStickX > 60 && !(sAnalogFlags & ANALOG_FLAG_RIGHT)) {
-            sCrashPage++;
-            sUpdateBuffer = TRUE;
-            sAnalogFlags |= ANALOG_FLAG_RIGHT;
-        } else if (gPlayer1Controller->rawStickX < 10) {
-            sAnalogFlags &= ~ANALOG_FLAG_RIGHT;
-        }
-
-        if (gPlayer1Controller->rawStickX < -60 && !(sAnalogFlags & ANALOG_FLAG_LEFT)) {
-            sCrashPage--;
-            sUpdateBuffer = TRUE;
-            sAnalogFlags |= ANALOG_FLAG_LEFT;
-        } else if (gPlayer1Controller->rawStickX > -10) {
-            sAnalogFlags &= ~ANALOG_FLAG_LEFT;
-        }
-
-        s32 scrollDown = ((gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))
-                       || (gPlayer1Controller->rawStickY < -60));
-        s32 scrollUp   = ((gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))
-                       || (gPlayer1Controller->rawStickY > 60));
+        update_crash_screen_direction_input();
 
         // Page-specific inputs.
-        switch (sCrashPage) {
-            case PAGE_STACKTRACE:
-                if (gPlayer1Controller->buttonPressed & A_BUTTON) {
-                    sStackTraceShowNames ^= TRUE;
-                    sUpdateBuffer = TRUE;
-                }
-
-                if (gPlayer1Controller->buttonPressed & B_BUTTON) {
-                    sStackTraceSkipUnknowns ^= TRUE;
-                    sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_SIZE);
-                    sStackTraceIndex = 0;
-                    sUpdateBuffer = TRUE;
-                }
-
-                if (scrollUp) {
-                    if (sStackTraceIndex > 0) {
-                        sStackTraceIndex--;
-                    }
-                    sUpdateBuffer = TRUE;
-                }
-                if (scrollDown) {
-                    if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
-                        sStackTraceIndex++;
-                    }
-                    sUpdateBuffer = TRUE;
-                }
-                break;
-            case PAGE_DISASM:
-                if (scrollUp) {
-                    sProgramPosition -= 4;
-                    if (sProgramPosition < DISASM_SCROLL_MIN) {
-                        sProgramPosition = DISASM_SCROLL_MIN;
-                    }
-                    sUpdateBuffer = TRUE;
-                }
-                if (scrollDown) {
-                    sProgramPosition += 4;
-                    if (sProgramPosition > DISASM_SCROLL_MAX) {
-                        sProgramPosition = DISASM_SCROLL_MAX;
-                    }
-                    sUpdateBuffer = TRUE;
-                }
-                break;
-        }
+        sCrashScreenPages[sCrashPage].inputFunc();
 
         if ((sCrashPage >= PAGE_COUNT) && (sCrashPage != PAGES_MAX)) {
             sCrashPage = PAGE_CONTEXT;
@@ -723,19 +951,6 @@ void update_crash_screen_input(void) {
         }
     }
 }
-
-typedef void (*CrashScrenPageFunc)(OSThread *thread);
-
-CrashScrenPageFunc CrashScreenPageJumpTable[] = {
-    /*PAGE_CONTEXT   */ draw_crash_context,
-#ifdef PUPPYPRINT_DEBUG
-    /*PAGE_LOG       */ draw_crash_log,
-#endif
-    /*PAGE_STACKTRACE*/ draw_stacktrace,
-    /*PAGE_DISASM    */ draw_disasm,
-    /*PAGE_ASSERTS   */ draw_assert,
-    /*PAGE_CONTROLS  */ draw_controls,
-};
 
 void draw_crash_screen(OSThread *thread) {
     u8 prevPage = sCrashPage;
@@ -757,7 +972,7 @@ void draw_crash_screen(OSThread *thread) {
             crash_screen_print(TEXT_X( 0), TEXT_Y(0), "@C0C0C0FFHackerSM64 v%s", HACKERSM64_VERSION);
             crash_screen_print(TEXT_X(35), TEXT_Y(0), "@C0C0C0FF<Page:%02d>", sCrashPage);
             crash_screen_draw_divider(DIVIDER_Y(1));
-            CrashScreenPageJumpTable[sCrashPage](thread);
+            sCrashScreenPages[sCrashPage].drawFunc(thread);
         }
 
         update_crash_screen_framebuffer();
