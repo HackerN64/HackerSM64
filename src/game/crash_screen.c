@@ -50,12 +50,12 @@ enum CrashScreenDirectionFlags {
 #define CRASH_SCREEN_FONT_NUM_ROWS      43
 
 // Spacing between chars.
-#define CRASH_SCREEN_SPACING_HORIZONTAL  1
-#define CRASH_SCREEN_SPACING_VERTICAL    3
+#define CRASH_SCREEN_CHAR_SPACING_X      1
+#define CRASH_SCREEN_CHAR_SPACING_Y      3
 
 // The amount of space each char uses.
-#define CRASH_SCREEN_LETTER_WIDTH       (CRASH_SCREEN_FONT_CHAR_WIDTH + CRASH_SCREEN_SPACING_HORIZONTAL) //  6
-#define CRASH_SCREEN_ROW_HEIGHT         (CRASH_SCREEN_FONT_CHAR_HEIGHT + CRASH_SCREEN_SPACING_VERTICAL)  // 10
+#define CRASH_SCREEN_LETTER_WIDTH       (CRASH_SCREEN_FONT_CHAR_WIDTH  + CRASH_SCREEN_CHAR_SPACING_X) //  6
+#define CRASH_SCREEN_ROW_HEIGHT         (CRASH_SCREEN_FONT_CHAR_HEIGHT + CRASH_SCREEN_CHAR_SPACING_Y) // 10
 
 // Width and height of crash screen.
 #define CRASH_SCREEN_W 270
@@ -130,7 +130,7 @@ static s8 sDrawFrameBuffer = TRUE;
 static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
-static s8 sAddressSelecCharIndex = 0;
+static s8 sAddressSelecCharIndex = 2;
 static s8 sRamViewerShowAscii = FALSE;
 static u32 sAddressSelect = 0;
 static u32 sProgramPosition = 0;
@@ -593,20 +593,25 @@ void draw_stacktrace(OSThread *thread) {
 #define JUMP_MENU_X (SCREEN_CENTER_X - (JUMP_MENU_W / 2))
 #define JUMP_MENU_Y (SCREEN_CENTER_Y - (JUMP_MENU_H / 2))
 
+#define JUMP_MENU_MARGIN_X 10
+#define JUMP_MENU_MARGIN_Y 10
+
 void draw_address_select(void) {
-    crash_screen_draw_rect(JUMP_MENU_X -  5, JUMP_MENU_Y - TEXT_HEIGHT(2) -  5,
-                           JUMP_MENU_W + 10, JUMP_MENU_H + TEXT_HEIGHT(2) + 10,
+    crash_screen_draw_rect((JUMP_MENU_X -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y - TEXT_HEIGHT(2) -  JUMP_MENU_MARGIN_X     ),
+                           (JUMP_MENU_W + (JUMP_MENU_MARGIN_Y * 2)), (JUMP_MENU_H + TEXT_HEIGHT(2) + (JUMP_MENU_MARGIN_Y * 2)),
                            COLOR_RGBA16_CRASH_BACKGROUND, TRUE);
 
     crash_screen_print(JUMP_MENU_X + TEXT_WIDTH(1), JUMP_MENU_Y - TEXT_HEIGHT(2), "GO TO:");
 
-    crash_screen_draw_triangle(JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)), JUMP_MENU_Y - TEXT_HEIGHT(1),
+    crash_screen_draw_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y - TEXT_HEIGHT(1) + CRASH_SCREEN_CHAR_SPACING_Y),
                                TEXT_WIDTH(1), TEXT_WIDTH(1),
-                               COLOR_RGBA16_CRASH_CURRFUNC, FALSE);
-    crash_screen_draw_triangle(JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)), JUMP_MENU_Y + TEXT_HEIGHT(1),
+                               COLOR_RGBA16_CRASH_SELECT, FALSE);
+    crash_screen_draw_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y + TEXT_HEIGHT(1) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
                                TEXT_WIDTH(1), TEXT_WIDTH(1),
-                               COLOR_RGBA16_CRASH_CURRFUNC, TRUE);
+                               COLOR_RGBA16_CRASH_SELECT, TRUE);
     crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelect);
+
+    osWritebackDCacheAll();
 }
 
 #define RAM_VIEWER_NUM_ROWS 18
@@ -888,6 +893,7 @@ void crash_screen_input_ram_viewer(void) {
         }
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             sAddressSelectMenuOpen = TRUE;
+            sAddressSelecCharIndex = 2;
             sAddressSelect = sProgramPosition;
             sUpdateBuffer = TRUE;
         }
