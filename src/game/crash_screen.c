@@ -794,6 +794,8 @@ void update_crash_screen_direction_input(void) {
 }
 
 void update_crash_screen_page(void) {
+    u8 prevPage = sCrashPage;
+
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT) {
         sCrashPage++;
         sUpdateBuffer = TRUE;
@@ -801,6 +803,19 @@ void update_crash_screen_page(void) {
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
         sCrashPage--;
         sUpdateBuffer = TRUE;
+    }
+
+    if ((sCrashPage >= PAGE_COUNT) && (sCrashPage != PAGES_MAX)) {
+        sCrashPage = PAGE_CONTEXT;
+    }
+    if (sCrashPage == PAGES_MAX) {
+        sCrashPage = (PAGE_COUNT - 1);
+    }
+
+    if (sCrashPage != prevPage) {
+        sStackTraceIndex = 0;
+        sProgramPosition = 0;
+        sAddressSelecCharIndex = 2;
     }
 }
 
@@ -893,7 +908,6 @@ void crash_screen_input_ram_viewer(void) {
         }
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             sAddressSelectMenuOpen = TRUE;
-            sAddressSelecCharIndex = 2;
             sAddressSelect = sProgramPosition;
             sUpdateBuffer = TRUE;
         }
@@ -927,12 +941,12 @@ struct CrashScreenPage sCrashScreenPages[] = {
     /*PAGE_CONTEXT   */ {draw_crash_context, update_crash_screen_page},
     /*PAGE_ASSERTS   */ {draw_assert,        update_crash_screen_page},
 #ifdef PUPPYPRINT_DEBUG
-    /*PAGE_LOG       */ {draw_crash_log,    update_crash_screen_page},
+    /*PAGE_LOG       */ {draw_crash_log,     update_crash_screen_page},
 #endif
-    /*PAGE_STACKTRACE*/ {draw_stacktrace,   crash_screen_input_stacktrace},
-    /*PAGE_RAM_VIEWER*/ {draw_ram_viewer,   crash_screen_input_ram_viewer},
-    /*PAGE_DISASM    */ {draw_disasm,       crash_screen_input_disasm},
-    /*PAGE_CONTROLS  */ {draw_controls,     crash_screen_input_disasm},
+    /*PAGE_STACKTRACE*/ {draw_stacktrace,    crash_screen_input_stacktrace},
+    /*PAGE_RAM_VIEWER*/ {draw_ram_viewer,    crash_screen_input_ram_viewer},
+    /*PAGE_DISASM    */ {draw_disasm,        crash_screen_input_disasm},
+    /*PAGE_CONTROLS  */ {draw_controls,      crash_screen_input_disasm},
 };
 
 void update_crash_screen_input(void) {
@@ -955,27 +969,13 @@ void update_crash_screen_input(void) {
 
         // Page-specific inputs.
         sCrashScreenPages[sCrashPage].inputFunc();
-
-        if ((sCrashPage >= PAGE_COUNT) && (sCrashPage != PAGES_MAX)) {
-            sCrashPage = PAGE_CONTEXT;
-        }
-        if (sCrashPage == PAGES_MAX) {
-            sCrashPage = (PAGE_COUNT - 1);
-        }
     }
 }
 
 void draw_crash_screen(OSThread *thread) {
-    u8 prevPage = sCrashPage;
-
     update_crash_screen_input();
 
     if (sUpdateBuffer) {
-        if (sCrashPage != prevPage) {
-            sProgramPosition = 0;
-            sStackTraceIndex = 0;
-        }
-
         reset_crash_screen_framebuffer();
 
         if (sDrawCrashScreen) {
