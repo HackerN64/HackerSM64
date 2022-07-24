@@ -47,7 +47,7 @@ enum CrashScreenDirectionFlags {
 #define CRASH_SCREEN_FONT_CHAR_WIDTH     5
 #define CRASH_SCREEN_FONT_CHAR_HEIGHT    7
 #define CRASH_SCREEN_FONT_CHARS_PER_ROW  6
-#define CRASH_SCREEN_FONT_NUM_ROWS      22
+#define CRASH_SCREEN_FONT_NUM_ROWS      43
 
 // Spacing between chars.
 #define CRASH_SCREEN_SPACING_HORIZONTAL  1
@@ -65,9 +65,13 @@ enum CrashScreenDirectionFlags {
 #define CRASH_SCREEN_NUM_CHARS_X ((CRASH_SCREEN_W - 1) / CRASH_SCREEN_LETTER_WIDTH) // 44
 #define CRASH_SCREEN_NUM_CHARS_Y ((CRASH_SCREEN_H - 1) / CRASH_SCREEN_ROW_HEIGHT)   // 22
 
+// Macros for string size.
+#define TEXT_WIDTH(numChars)  ((numChars) * CRASH_SCREEN_LETTER_WIDTH) // n *  6
+#define TEXT_HEIGHT(numChars) ((numChars) * CRASH_SCREEN_ROW_HEIGHT  ) // n * 10
+
 // Width and height of the text grid.
-#define CRASH_SCREEN_TEXT_W (CRASH_SCREEN_NUM_CHARS_X * CRASH_SCREEN_LETTER_WIDTH) // 264
-#define CRASH_SCREEN_TEXT_H (CRASH_SCREEN_NUM_CHARS_Y * CRASH_SCREEN_ROW_HEIGHT)   // 220
+#define CRASH_SCREEN_TEXT_W TEXT_WIDTH( CRASH_SCREEN_NUM_CHARS_X) // 264
+#define CRASH_SCREEN_TEXT_H TEXT_HEIGHT(CRASH_SCREEN_NUM_CHARS_Y) // 220
 
 // Number of pixels between the text and the edge of the crash screen.
 #define CRASH_SCREEN_TEXT_MARGIN_X ((CRASH_SCREEN_W - CRASH_SCREEN_TEXT_W) / 2) // 3
@@ -88,10 +92,6 @@ enum CrashScreenDirectionFlags {
 // Bottom right corner of the text grid.
 #define CRASH_SCREEN_TEXT_X2 (CRASH_SCREEN_TEXT_X1 + CRASH_SCREEN_TEXT_W) // 292
 #define CRASH_SCREEN_TEXT_Y2 (CRASH_SCREEN_TEXT_Y1 + CRASH_SCREEN_TEXT_H) // 230
-
-// Macros for string size.
-#define TEXT_WIDTH(numChars)  ((numChars) * CRASH_SCREEN_LETTER_WIDTH) // n *  6
-#define TEXT_HEIGHT(numChars) ((numChars) * CRASH_SCREEN_ROW_HEIGHT  ) // n * 10
 
 // Macros to convert a position on the text grid to screen coords.
 #define TEXT_X(numChars) (CRASH_SCREEN_TEXT_X1 + TEXT_WIDTH(numChars) ) // 28 + (n *  6)
@@ -372,7 +372,7 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
                 }
 
                 ptr++;
-                x += CRASH_SCREEN_LETTER_WIDTH;
+                x += TEXT_WIDTH(1);
             }
         }
     }
@@ -660,7 +660,7 @@ void draw_ram_viewer(OSThread *thread) {
                 charX += 2;
             }
             if (sRamViewerShowAscii) {
-                crash_screen_draw_glyph(charX, charY, value, COLOR_RGBA16_CRASH_WHITE);
+                crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, value, COLOR_RGBA16_CRASH_WHITE);
             } else {
                 crash_screen_print(charX, charY, ((x & 0x1) ? "@FFFFFFFF%02X" : "@BFBFBFFF%02X"), value);
             }
