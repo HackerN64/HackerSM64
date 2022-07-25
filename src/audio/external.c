@@ -697,6 +697,7 @@ struct SPTask *create_next_audio_frame_task(void) {
  * Called from threads: thread5_game_loop
  */
 void play_sound(s32 soundBits, f32 *pos) {
+    assert(((soundBits & SOUNDARGS_MASK_SOUNDID) >> SOUNDARGS_SHIFT_SOUNDID) != 0xff, "Sfx tables do not support a sound id of 0xff!");
     sSoundRequests[sSoundRequestCount].soundBits = soundBits;
     sSoundRequests[sSoundRequestCount].position = pos;
     sSoundRequestCount++;
@@ -1209,8 +1210,6 @@ static void update_game_sound(void) {
                 && sSoundBanks[bank][soundIndex].soundStatus != SOUND_STATUS_STOPPED) {
                 soundStatus = sSoundBanks[bank][soundIndex].soundBits & SOUNDARGS_MASK_STATUS;
                 soundId = (sSoundBanks[bank][soundIndex].soundBits >> SOUNDARGS_SHIFT_SOUNDID);
-
-                assert(soundId < 0xFE, "Each sfx table only supports up to 254 unique total sounds!");
 
                 sSoundBanks[bank][soundIndex].soundStatus = soundStatus;
 
