@@ -141,33 +141,33 @@ u8 sUpdateBuffer = TRUE;
 
 
 char *gCauseDesc[18] = {
-    "Interrupt",
-    "TLB modification",
-    "TLB exception on load or inst.",
-    "TLB exception on store",
-    "Address error on load or inst.",
-    "Address error on store",
-    "Bus error on inst.",
-    "Bus error on data",
-    "Failed Assert: See Assert Page",
-    "Breakpoint exception",
-    "Reserved instruction",
-    "Coprocessor unusable",
-    "Arithmetic overflow",
-    "Trap exception",
-    "Virtual coherency on inst.",
-    "Floating point exception",
-    "Watchpoint exception",
-    "Virtual coherency on data",
+    /*EXC_INT    */ "Interrupt",
+    /*EXC_MOD    */ "TLB modification",
+    /*EXC_RMISS  */ "TLB exception on load or inst.",
+    /*EXC_WMISS  */ "TLB exception on store",
+    /*EXC_RADE   */ "Address error on load or inst.",
+    /*EXC_WADE   */ "Address error on store",
+    /*EXC_IBE    */ "Bus error on inst.",
+    /*EXC_DBE    */ "Bus error on data",
+    /*EXC_SYSCALL*/ "Failed Assert: See Assert Page",
+    /*EXC_BREAK  */ "Breakpoint exception",
+    /*EXC_II     */ "Reserved instruction",
+    /*EXC_CPU    */ "Coprocessor unusable",
+    /*EXC_OV     */ "Arithmetic overflow",
+    /*EXC_TRAP   */ "Trap exception",
+    /*EXC_VCEI   */ "Virtual coherency on inst.",
+    /*EXC_FPE    */ "Floating point exception",
+    /*EXC_WATCH  */ "Watchpoint exception",
+    /*EXC_VCED   */ "Virtual coherency on data",
 };
 
 char *gFpcsrDesc[6] = {
-    "Unimplemented operation",
-    "Invalid operation",
-    "Division by zero",
-    "Overflow",
-    "Underflow",
-    "Inexact operation",
+    /*FPCSR_CE*/ "Unimplemented operation",
+    /*FPCSR_CV*/ "Invalid operation",
+    /*FPCSR_CZ*/ "Division by zero",
+    /*FPCSR_CO*/ "Overflow",
+    /*FPCSR_CU*/ "Underflow",
+    /*FPCSR_CI*/ "Inexact operation",
 };
 
 char *gRegNames[29] = {
@@ -317,7 +317,7 @@ u32 index_to_hex(u32 glyph) {
     return (ret & 0xF);
 }
 
-void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
+void crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
     u32 glyph;
     char buf[0x100];
 
@@ -332,16 +332,23 @@ void crash_screen_print(s32 x, s32 y, const char *fmt, ...) {
 
     s8 escape = FALSE;
 
+    s32 x = startX;
+    s32 y = startY;
+
     if (size > 0) {
         char *ptr = buf;
 
         while (*ptr) {
             glyph = (*ptr & 0x7f);
 
-            if (glyph == '\\' && *(ptr + 1) && (*(ptr + 1) & 0x7f) == '@') { // use '\\@' to print '@'
+            if  (glyph == 10) { // '\n' (new line)
+                ptr++;
+                x = startX;
+                y += TEXT_HEIGHT(1);
+            } else if (glyph == '\\' && *(ptr + 1) && (*(ptr + 1) & 0x7f) == '@') { // use '\\@' to print '@'
                 ptr++;
                 escape = TRUE;
-            } else if (glyph == '@' && !escape) {
+            } else if (glyph == '@' && !escape) { // RRGGBBAA color prefix
                 ptr++;
                 if (!*ptr) {
                     break;
@@ -496,8 +503,9 @@ void draw_assert(UNUSED OSThread *thread) {
 
     if (__n64Assert_Filename != NULL) {
         crash_screen_print(TEXT_X(0), TEXT_Y(2), "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
-        crash_screen_print(TEXT_X(0), TEXT_Y(4), "MESSAGE:");
-        crash_screen_print(TEXT_X(0), (TEXT_Y(5) + 5), " %s", __n64Assert_Message);
+        crash_screen_draw_divider(DIVIDER_Y(3));
+        crash_screen_print(TEXT_X(0), TEXT_Y(3), "MESSAGE:");
+        crash_screen_print(TEXT_X(0), (TEXT_Y(4) + 5), "%s", __n64Assert_Message);
     } else {
         crash_screen_print(TEXT_X(0), TEXT_Y(2), "no failed assert to report.");
     }
@@ -983,7 +991,7 @@ void draw_crash_screen(OSThread *thread) {
                 crash_screen_draw_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, COLOR_RGBA16_CRASH_BACKGROUND, TRUE);
             }
             crash_screen_print(TEXT_X( 0), TEXT_Y(0), "@C0C0C0FFHackerSM64 v%s", HACKERSM64_VERSION);
-            crash_screen_print(TEXT_X(35), TEXT_Y(0), "@C0C0C0FF<Page:%02d>", sCrashPage);
+            crash_screen_print(TEXT_X(35), TEXT_Y(0), "@C0C0C0FF<Page:%02d>", (sCrashPage + 1));
             crash_screen_draw_divider(DIVIDER_Y(1));
             sCrashScreenPages[sCrashPage].drawFunc(thread);
         }
@@ -1144,6 +1152,12 @@ void thread2_crash_screen(UNUSED void *arg) {
                     map_data_init();
                 }
                 fill_function_stack_trace(thread);
+
+                // Default to the assert page if the crash was caused by an assert.
+                if (thread->context.cause == EXC_SYSCALL) {
+                    sCrashPage = PAGE_ASSERTS;
+                }
+
 #ifdef FUNNY_CRASH_SOUND
                 gCrashScreen.thread.priority = 15;
                 stop_sounds_in_continuous_banks();
