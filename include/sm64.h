@@ -15,11 +15,21 @@
 #include "macros.h"
 #include "segments.h"
 
-// Crash handler enhancement
-#ifdef CRASH_SCREEN_INCLUDED
-#define DEBUG_ASSERT(exp) do { if (!(exp)) _n64_assert(__FILE__, __LINE__, #exp, 1); } while (0)
+extern char *__n64Assert_Filename;
+extern u32   __n64Assert_LineNum;
+extern char *__n64Assert_Message;
+extern void __n64Assert(char *fileName, u32 lineNum, char *message);
+
+#define ASSERT(cond, message) do {\
+    if (!(cond)) { \
+        __n64Assert(__FILE__, __LINE__, (message)); \
+    } \
+} while (0);
+
+#ifdef ENABLE_DEBUG_ASSERTS
+#define DEBUG_ASSERT(cond, message) ASSERT(cond, message)
 #else
-#define DEBUG_ASSERT(exp)
+#define DEBUG_ASSERT(cond, message)
 #endif
 
 // Pointer casting is technically UB, and avoiding it gets rid of endian issues as well as a nice side effect.

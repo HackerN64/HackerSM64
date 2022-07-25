@@ -554,7 +554,7 @@ void update_terrain_objects(void) {
     profiler_update(PROFILER_TIME_DYNAMIC);
 
     // If the dynamic surface pool has overflowed, throw an error.
-    assert((uintptr_t)gDynamicSurfacePoolEnd <= (uintptr_t)gDynamicSurfacePool + DYNAMIC_SURFACE_POOL_SIZE, "Dynamic surface pool size exceeded");
+    ASSERT((uintptr_t)gDynamicSurfacePoolEnd <= (uintptr_t)gDynamicSurfacePool + DYNAMIC_SURFACE_POOL_SIZE, "Dynamic surface pool size exceeded");
 }
 
 /**

@@ -40,21 +40,4 @@ void try_print_debug_mario_level_info(void);
 #define try_print_debug_mario_level_info()
 #endif
 
-extern char *__n64Assert_Filename;
-extern u32   __n64Assert_LineNum;
-extern char *__n64Assert_Message;
-extern void __n64Assert(char *fileName, u32 lineNum, char *message);
-
-
-#ifdef DEBUG
-#define assert(cond, message) do {\
-    if ((cond) == FALSE) { \
-        __n64Assert(__FILE__, __LINE__, (message)); \
-    } \
-} while (0);
-#else
-#define assert(cond, message)
-#endif
-
-
 #endif // DEBUG_H

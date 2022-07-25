@@ -75,6 +75,7 @@
 
 #ifdef DISABLE_ALL
     #undef DEBUG_ALL
+    #undef USE_PROFILER
     #undef TEST_LEVEL
     #undef DEBUG_LEVEL_SELECT
     #undef ENABLE_DEBUG_FREE_MOVE
@@ -86,7 +87,8 @@
     #undef UNLOCK_ALL
     #undef COMPLETE_SAVE_FILE
     #undef DEBUG_FORCE_CRASH_ON_BOOT
-    #undef USE_PROFILER
+    #undef DEBUG_FORCE_CRASH_ON_L
+    #undef ENABLE_DEBUG_ASSERTS
 #endif // DISABLE_ALL
 
 #ifdef DEBUG_ALL
