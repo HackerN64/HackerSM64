@@ -132,24 +132,6 @@ void create_thread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, 
 extern void func_sh_802f69cc(void);
 #endif
 
-void change_vi(OSViMode *mode, int width, int height){
-    mode->comRegs.width  = width;
-    mode->comRegs.xScale = ((width * 512) / 320);
-    if (height > 240) {
-        mode->comRegs.ctrl     |= 0x40;
-        mode->fldRegs[0].origin = (width * 2);
-        mode->fldRegs[1].origin = (width * 4);
-        mode->fldRegs[0].yScale = (0x2000000 | ((height * 1024) / 240));
-        mode->fldRegs[1].yScale = (0x2000000 | ((height * 1024) / 240));
-        mode->fldRegs[0].vStart = (mode->fldRegs[1].vStart - 0x20002);
-    } else {
-        mode->fldRegs[0].origin = (width * 2);
-        mode->fldRegs[1].origin = (width * 4);
-        mode->fldRegs[0].yScale = ((height * 1024) / 240);
-        mode->fldRegs[1].yScale = ((height * 1024) / 240);
-    }
-}
-
 void handle_nmi_request(void) {
     gResetTimer = 1;
     gNmiResetBarsTimer = 0;
@@ -352,9 +334,7 @@ void check_cache_emulation() {
 }
 
 extern void crash_screen_init(void);
-#ifdef RCVI_HACK
 extern OSViMode VI;
-#endif
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
@@ -482,6 +462,24 @@ void turn_off_audio(void) {
     gAudioEnabled = FALSE;
     while (sCurrentAudioSPTask != NULL) {
         ;
+    }
+}
+
+void change_vi(OSViMode *mode, int width, int height) {
+    mode->comRegs.width  = width;
+    mode->comRegs.xScale = ((width * 512) / 320);
+    if (height > 240) {
+        mode->comRegs.ctrl     |= 0x40;
+        mode->fldRegs[0].origin = (width * 2);
+        mode->fldRegs[1].origin = (width * 4);
+        mode->fldRegs[0].yScale = (0x2000000 | ((height * 1024) / 240));
+        mode->fldRegs[1].yScale = (0x2000000 | ((height * 1024) / 240));
+        mode->fldRegs[0].vStart = (mode->fldRegs[1].vStart - 0x20002);
+    } else {
+        mode->fldRegs[0].origin = (width * 2);
+        mode->fldRegs[1].origin = (width * 4);
+        mode->fldRegs[0].yScale = ((height * 1024) / 240);
+        mode->fldRegs[1].yScale = ((height * 1024) / 240);
     }
 }
 
