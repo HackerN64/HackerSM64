@@ -305,21 +305,113 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return (char *) memcpy(buffer, data, size) + size;
 }
 
-u32 index_to_hex(u32 glyph) {
-    u32 ret = 0;
+u32 glyph_to_hex(u8 *dest, u32 glyph) {
     if (glyph >= '0' && glyph <= '9') {
-        ret = (glyph - '0');
+        *dest = ((glyph - '0') & 0xF);
     } else if (glyph >= 'A' && glyph <= 'F') {
-        ret = (glyph - 'A') + 10;
+        *dest = (((glyph - 'A') + 10) & 0xF);
     } else if (glyph >= 'a' && glyph <= 'f') {
-        ret = (glyph - 'a') + 10;
+        *dest = (((glyph - 'a') + 10) & 0xF);
+    } else {
+        return FALSE;
     }
-    return (ret & 0xF);
+
+    return TRUE;
 }
 
-void crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
-    u32 glyph;
-    char buf[0x100];
+u32 crash_screen_text_to_color(RGBA16 *color, char *ptr, s32 index) {
+    s32 i, j;
+    char glyph;
+    u8 hex = 0;
+    Color component = 0;
+    ColorRGBA rgba = { 0, 0, 0, 0 };
+    *color = COLOR_RGBA16_CRASH_WHITE;
+
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 2; j++) {
+            glyph = (ptr[index] & 0xFF);
+            if (!glyph_to_hex(&hex, glyph)) {
+                return FALSE;
+            }
+            component |= (hex << ((1 - j) * 4));
+
+            index++;
+            if (!ptr[index]) {
+                return FALSE;
+            }
+        }
+        if (!ptr[index]) {
+            return FALSE;
+        }
+        rgba[i] = component;
+        component = 0;
+    }
+
+    *color = GPACK_RGBA5551(rgba[0], rgba[1], rgba[2], rgba[3]);
+
+    return TRUE;
+}
+
+// Returns how many chars to skip.
+s32 crash_screen_process_formatting_char(char *ptr, s32 index, s32 size, char glyph, RGBA16 *color) {
+    static s8 escape = FALSE;
+    s32 skip = 0;
+
+    if (index + (1 + 8) > size) {
+        return 0;
+    }
+
+    if (glyph == '\\' && ptr[index + 1] && (ptr[index + 1] & 0xFF) == '@') { // Use '\\@' to print '@'
+        escape = TRUE;
+        skip = 1;
+    } else if (glyph == '@' && !escape) { // RRGGBBAA color prefix
+        if (crash_screen_text_to_color(color, ptr, index + 1)) {
+            skip = 8;
+        }
+    }
+
+    if (skip <= 0) {
+        escape = FALSE;
+    }
+
+    return skip;
+}
+
+// Returns whether to wrap or not.
+s32 crash_screen_process_space(char *ptr, s32 index, s32 x, s32 size) {
+    s32 ci = index + 1;
+    s32 checkX = x + TEXT_WIDTH(1);
+    char glyph = (ptr[ci] & 0xFF);
+    RGBA16 color;
+    s32 skip = 0;
+
+    while (ptr[ci] && glyph != ' ' && ci < size) { // check the next word after the space
+        skip = crash_screen_process_formatting_char(ptr, ci, size, glyph, &color);
+
+        // New line if the next word is larger than the writable space.
+        if (checkX >= CRASH_SCREEN_TEXT_X2) {
+            return TRUE;
+        }
+
+        ci += 1 + skip;
+        glyph = (ptr[ci] & 0xFF);
+        checkX += TEXT_WIDTH(1);
+    }
+
+    return FALSE;
+}
+
+enum CrashScreenPrintOp {
+    CRASH_SCREEN_PRINT_OP_SPACE,
+    CRASH_SCREEN_PRINT_OP_SKIP,
+    CRASH_SCREEN_PRINT_OP_NEWLINE,
+};
+
+#define CHAR_BUFFER_SIZE 0x100
+
+s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
+    char glyph;
+    char buf[CHAR_BUFFER_SIZE];
 
     bzero(&buf, sizeof(buf));
 
@@ -328,63 +420,55 @@ void crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
 
     s32 size = _Printf(write_to_buf, buf, fmt, args);
 
-    RGBA16 color = COLOR_RGBA16_WHITE;
-
-    s8 escape = FALSE;
+    RGBA16 color = COLOR_RGBA16_CRASH_WHITE;
 
     s32 x = startX;
     s32 y = startY;
 
+    s8 printOp = CRASH_SCREEN_PRINT_OP_SPACE;
+    s32 skip = 0;
+    s32 numLines = 1;
+
     if (size > 0) {
-        char *ptr = buf;
+        for (s32 i = 0; i < size && buf[i]; i += (1 + skip)) {
+            glyph = (buf[i] & 0xFF);
+            printOp = CRASH_SCREEN_PRINT_OP_SPACE;
+            skip = 0;
 
-        while (*ptr) {
-            glyph = (*ptr & 0x7f);
+            if (glyph == ' ') { // space
+                if (crash_screen_process_space(buf, i, x, size)) {
+                    printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
+                }
+            } else if (glyph == 10) { // '\n' (new line)
+                printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
+            } else {
+                // Check for formatting codes
+                skip = crash_screen_process_formatting_char(buf, i, size, glyph, &color);
 
-            if  (glyph == 10) { // '\n' (new line)
-                ptr++;
+                if (skip > 0) {
+                    printOp = CRASH_SCREEN_PRINT_OP_SKIP;
+                } else { // normal char
+                    crash_screen_draw_glyph(x, y, glyph, color);
+
+                    if (x + TEXT_WIDTH(1) >= CRASH_SCREEN_TEXT_X2) {
+                        printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
+                    }
+                }
+            }
+
+            if (printOp == CRASH_SCREEN_PRINT_OP_SPACE) {
+                x += TEXT_WIDTH(1);
+            } else if (printOp == CRASH_SCREEN_PRINT_OP_NEWLINE) {
                 x = startX;
                 y += TEXT_HEIGHT(1);
-            } else if (glyph == '\\' && *(ptr + 1) && (*(ptr + 1) & 0x7f) == '@') { // use '\\@' to print '@'
-                ptr++;
-                escape = TRUE;
-            } else if (glyph == '@' && !escape) { // RRGGBBAA color prefix
-                ptr++;
-                if (!*ptr) {
-                    break;
-                }
-                s32 i, j;
-                Color component = 0;
-                ColorRGBA rgba = { 0, 0, 0, 0 };
-                color = 0;
-                for (i = 0; i < 4; i++) {
-                    for (j = 0; j < 2; j++) {
-                        if (!*ptr) {
-                            break;
-                        }
-                        glyph = (*ptr & 0x7f);
-                        component |= (index_to_hex(glyph) << ((1 - j) * 4));
-                        ptr++;
-                    }
-                    rgba[i] = component;
-                    component = 0;
-                }
-
-                color = GPACK_RGBA5551(rgba[0], rgba[1], rgba[2], rgba[3]);
-            } else {
-                escape = FALSE;
-
-                if (glyph != 0xff) {
-                    crash_screen_draw_glyph(x, y, glyph, color);
-                }
-
-                ptr++;
-                x += TEXT_WIDTH(1);
+                numLines++;
             }
         }
     }
 
     va_end(args);
+
+    return numLines;
 }
 
 void crash_screen_sleep(s32 ms) {
@@ -470,22 +554,25 @@ void crash_screen_print_float_registers(__OSThreadContext *tc) {
 void draw_crash_context(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
+    // Make the last two cause cases sequential.
     s32 cause = ((tc->cause >> 2) & 0x1F);
     if (cause == (EXC_WATCH >> 2)) cause = 16;
     if (cause == (EXC_VCED  >> 2)) cause = 17;
 
-    crash_screen_print(TEXT_X( 0), TEXT_Y(1), "@7F7FFFFFTHREAD:%d", thread->id);
-    crash_screen_print(TEXT_X(10), TEXT_Y(1), "@FF3F00FF(%s)", gCauseDesc[cause]);
+    s32 line = 1;
+
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@7F7FFFFFTHREAD:%d", thread->id);
+    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), "@FF3F00FF(%s)", gCauseDesc[cause]);
 
     osWritebackDCacheAll();
 
     if ((u32) parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
-        crash_screen_print(TEXT_X(0), TEXT_Y(2), "@FF7F7FFFCRASH AT:");
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F7FFFCRASH AT:");
         if (fname == NULL) {
-            crash_screen_print(TEXT_X(10), TEXT_Y(2), "@7F7F7FFF%s", "UNKNOWN");
+            crash_screen_print(TEXT_X(10), TEXT_Y(line), "@7F7F7FFF%s", "UNKNOWN");
         } else {
-            crash_screen_print(TEXT_X(10), TEXT_Y(2), "@FFFF7FFF%s", fname);
+            crash_screen_print(TEXT_X(10), TEXT_Y(line), "@FFFF7FFF%s", fname);
         }
     }
 
@@ -497,17 +584,19 @@ void draw_crash_context(OSThread *thread) {
 }
 
 void draw_assert(UNUSED OSThread *thread) {
-    crash_screen_print(TEXT_X(0), TEXT_Y(1), "ASSERT PAGE");
+    s32 line = 1;
 
-    crash_screen_draw_divider(DIVIDER_Y(2));
+    line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "ASSERT PAGE");
+
+    crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (__n64Assert_Filename != NULL) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(2), "FILE: %s LINE %d", __n64Assert_Filename, __n64Assert_LineNum);
-        crash_screen_draw_divider(DIVIDER_Y(3));
-        crash_screen_print(TEXT_X(0), TEXT_Y(3), "MESSAGE:");
-        crash_screen_print(TEXT_X(0), (TEXT_Y(4) + 5), "%s", __n64Assert_Message);
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "\\\\@007FFFFFFILE: %s @FF7F7FFFLINE %d", __n64Assert_Filename, __n64Assert_LineNum);
+        crash_screen_draw_divider(DIVIDER_Y(line));
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@C0C0C0FFMESSAGE:");
+        line += crash_screen_print(TEXT_X(0), (TEXT_Y(line) + 5), "%s", __n64Assert_Message);
     } else {
-        crash_screen_print(TEXT_X(0), TEXT_Y(2), "no failed assert to report.");
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), "no failed assert to report.");
     }
 
     osWritebackDCacheAll();
@@ -536,20 +625,25 @@ void draw_stacktrace(OSThread *thread) {
     struct FunctionInStack *functionList = (sStackTraceSkipUnknowns ? sKnownFunctionStack : sAllFunctionStack);
     struct FunctionInStack *function = NULL;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(1), "STACK TRACE FROM %08X:", temp_sp);
-    crash_screen_print(TEXT_X(0), TEXT_Y(2), "@FF7F7FFFCURRFUNC:");
+    s32 line = 1;
+
+    line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "STACK TRACE FROM %08X:", temp_sp);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F7FFFCURRFUNC:");
+    crash_screen_draw_divider(DIVIDER_Y(line));
 
     if ((u32) parse_map == MAP_PARSER_ADDRESS) {
-        crash_screen_print(TEXT_X(9), TEXT_Y(2), "NONE");
+        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "NONE");
     } else {
-        crash_screen_print(TEXT_X(9), TEXT_Y(2), "@FFFF7FFF%s", parse_map(tc->pc));
+        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@FFFF7FFF%s", parse_map(tc->pc));
     }
+
+    crash_screen_draw_divider(DIVIDER_Y(line));
 
     osWritebackDCacheAll();
 
     // Print
     for (s32 j = 0; j < STACK_TRACE_NUM_ROWS; j++) {
-        s32 y = TEXT_Y(3 + j);
+        s32 y = TEXT_Y(line + j);
 
         if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
             crash_screen_print(TEXT_X(0), y, "STACK TRACE DISABLED");
@@ -584,13 +678,11 @@ void draw_stacktrace(OSThread *thread) {
 
     osWritebackDCacheAll();
 
-    crash_screen_draw_divider(DIVIDER_Y( 2));
-    crash_screen_draw_divider(DIVIDER_Y( 3));
-    crash_screen_draw_divider(DIVIDER_Y(21));
-    crash_screen_print(TEXT_X(0), TEXT_Y(21), "@C0C0C0FFup/down:scroll    toggle: a:names b:unknowns");
+    crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
+    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@C0C0C0FFup/down:scroll    toggle: a:names b:unknowns");
 
     // Scroll Bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(21), STACK_TRACE_NUM_ROWS, sNumShownFunctions, sStackTraceIndex, 4, COLOR_RGBA16_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), STACK_TRACE_NUM_ROWS, sNumShownFunctions, sStackTraceIndex, 4, COLOR_RGBA16_LIGHT_GRAY);
 
     osWritebackDCacheAll();
 }
@@ -640,36 +732,39 @@ void draw_ram_viewer(OSThread *thread) {
 
     s32 charX, charY;
 
-    crash_screen_print(TEXT_X( 0), TEXT_Y(1), "@FF7F00FFSELECTED ADDRESS:");
-    crash_screen_print(TEXT_X(17), TEXT_Y(1), "%08X", addr);
-    crash_screen_draw_divider(DIVIDER_Y(2));
-    crash_screen_print(TEXT_X( 1), TEXT_Y(2), "MEMORY");
+    s32 line = 1;
+
+    crash_screen_print(TEXT_X( 0), TEXT_Y(line), "@FF7F00FFSELECTED ADDRESS:");
+    line += crash_screen_print(TEXT_X(17), TEXT_Y(line), "%08X", addr);
+    crash_screen_draw_divider(DIVIDER_Y(line));
 
     charX = TEXT_X(8) + 3;
 
     for (s32 i = 0; i < 16; i++) {
-        if ((i % 4) == 0) {
+        if ((i & 0x3) == 0) {
             charX += 2;
         }
-        crash_screen_print(charX, TEXT_Y(2), ((i & 0x1) ? "@00B7FFFF%02X" : "@0087FFFF%02X"), i);
+        crash_screen_print(charX, TEXT_Y(line), ((i & 0x1) ? "@00B7FFFF%02X" : "@0087FFFF%02X"), i);
         charX += TEXT_WIDTH(2) + 1;
     }
     crash_screen_draw_divider(DIVIDER_Y(3));
 
-    crash_screen_draw_rect(TEXT_X(8) + 2, DIVIDER_Y(2), 1, TEXT_HEIGHT(19), COLOR_RGBA16_LIGHT_GRAY, FALSE);
+    crash_screen_draw_rect(TEXT_X(8) + 2, DIVIDER_Y(line), 1, TEXT_HEIGHT(19), COLOR_RGBA16_LIGHT_GRAY, FALSE);
+
+    line += crash_screen_print(TEXT_X( 1), TEXT_Y(line), "MEMORY");
 
     charX = TEXT_X(8) + 3;
-    charY = TEXT_Y(3);
+    charY = TEXT_Y(line);
 
     for (s32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
         currAddr = addr + (y * 0x10);
-        crash_screen_print(TEXT_X(0), TEXT_Y(3 + y), ((y & 0x1) ? "@5FDF5FFF%08X" : "@1F9F1FFF%08X"), currAddr);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), ((y & 0x1) ? "@5FDF5FFF%08X" : "@1F9F1FFF%08X"), currAddr);
 
         charX = TEXT_X(8) + 3;
-        charY = TEXT_Y(3 + y);
+        charY = TEXT_Y(line + y);
         for (s32 x = 0; x < 16; x++) {
             u8 value = *((u8 *)currAddr + x);
-            if ((x % 4) == 0) {
+            if ((x & 0x3) == 0) {
                 charX += 2;
             }
             if (sRamViewerShowAscii) {
@@ -681,11 +776,11 @@ void draw_ram_viewer(OSThread *thread) {
         }
     }
 
-    crash_screen_draw_divider(DIVIDER_Y(21));
-    crash_screen_print(TEXT_X(0), TEXT_Y(21), "@C0C0C0FFup/down:scroll        a:jump  b:toggle ascii");
+    crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
+    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@C0C0C0FFup/down:scroll        a:jump  b:toggle ascii");
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(21), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA16_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA16_LIGHT_GRAY);
 
     osWritebackDCacheAll();
 
@@ -724,29 +819,37 @@ void draw_disasm(OSThread *thread) {
     osWritebackDCacheAll();
 
     crash_screen_draw_divider(DIVIDER_Y( 2));
-    crash_screen_draw_divider(DIVIDER_Y(21));
-    crash_screen_print(TEXT_X(0), TEXT_Y(21), "@C0C0C0FFup/down:scroll");
+    crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
+    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@C0C0C0FFup/down:scroll");
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(21), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - DISASM_SCROLL_MIN), 4, COLOR_RGBA16_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - DISASM_SCROLL_MIN), 4, COLOR_RGBA16_LIGHT_GRAY);
 
     // Scroll bar crash position marker
-    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(21), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA16_CRASH_CURRFUNC);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA16_CRASH_CURRFUNC);
 
     osWritebackDCacheAll();
 }
 
 void draw_controls(UNUSED OSThread *thread) {
-    crash_screen_print(TEXT_X(1), TEXT_Y( 2), "CRASH SCREEN CONTROLS");
-    crash_screen_print(TEXT_X(2), TEXT_Y( 4), "START:");
-    crash_screen_print(TEXT_X(2), TEXT_Y( 5), "@C0C0C0FFtoggle framebuffer background");
-    crash_screen_print(TEXT_X(2), TEXT_Y( 7), "Z:");
-    crash_screen_print(TEXT_X(2), TEXT_Y( 8), "@C0C0C0FFtoggle framebuffer only view");
-    crash_screen_print(TEXT_X(2), TEXT_Y(10), "ANALOG STICK, D-PAD, OR C BUTTONS:");
-    crash_screen_print(TEXT_X(3), TEXT_Y(12), "LEFT/RIGHT:");
-    crash_screen_print(TEXT_X(3), TEXT_Y(13), "@C0C0C0FFswitch page");
-    crash_screen_print(TEXT_X(3), TEXT_Y(15), "UP/DOWN:");
-    crash_screen_print(TEXT_X(3), TEXT_Y(16), "@C0C0C0FFscroll page");
+    s32 line = 1;
+
+    line++;
+    line += crash_screen_print(TEXT_X(1), TEXT_Y(line), "CRASH SCREEN CONTROLS");
+    line++;
+    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "START:");
+    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@C0C0C0FFtoggle framebuffer background");
+    line++;
+    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "Z:");
+    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@C0C0C0FFtoggle framebuffer only view");
+    line++;
+    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "ANALOG STICK, D-PAD, OR C BUTTONS:");
+    line++;
+    line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "LEFT/RIGHT:");
+    line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@C0C0C0FFswitch page");
+    line++;
+    line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "UP/DOWN:");
+    line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@C0C0C0FFscroll page");
 
     osWritebackDCacheAll();
 }
@@ -990,9 +1093,10 @@ void draw_crash_screen(OSThread *thread) {
             if (sDrawFrameBuffer) {
                 crash_screen_draw_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, COLOR_RGBA16_CRASH_BACKGROUND, TRUE);
             }
-            crash_screen_print(TEXT_X( 0), TEXT_Y(0), "@C0C0C0FFHackerSM64 v%s", HACKERSM64_VERSION);
-            crash_screen_print(TEXT_X(35), TEXT_Y(0), "@C0C0C0FF<Page:%02d>", (sCrashPage + 1));
-            crash_screen_draw_divider(DIVIDER_Y(1));
+            s32 line = 0;
+            crash_screen_print(TEXT_X(0), TEXT_Y(line), "@C0C0C0FFHackerSM64 v%s", HACKERSM64_VERSION);
+            line += crash_screen_print(TEXT_X(35), TEXT_Y(line), "@C0C0C0FF<Page:%02d>", (sCrashPage + 1));
+            crash_screen_draw_divider(DIVIDER_Y(line));
             sCrashScreenPages[sCrashPage].drawFunc(thread);
         }
 
@@ -1009,9 +1113,9 @@ OSThread *get_crashed_thread(void) {
     OSThread *thread = __osGetCurrFaultedThread();
 
     while (thread->priority != -1) {
-        if (thread->priority > OS_PRIORITY_IDLE
+        if (thread->priority >  OS_PRIORITY_IDLE
          && thread->priority <= OS_PRIORITY_APPMAX
-         && ((thread->flags & (BIT(0) | BIT(1))) != 0)) {
+         && (thread->flags & (BIT(0) | BIT(1)))) {
             return thread;
         }
         thread = thread->tlnext;
