@@ -387,7 +387,7 @@ s32 crash_screen_process_space(char *ptr, s32 index, s32 x, s32 size) {
 
     while (ptr[ci] && glyph != ' ' && ci < size) { // check the next word after the space
         // New line if the next word is larger than the writable space.
-        if (ci + 1 < size && checkX > CRASH_SCREEN_TEXT_X2) {
+        if (ci + 1 < size && checkX >= CRASH_SCREEN_TEXT_X2) {
             return TRUE;
         }
 
@@ -448,7 +448,7 @@ s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
                 } else { // normal char
                     crash_screen_draw_glyph(x, y, glyph, color);
 
-                    if (i + 1 < size && x + TEXT_WIDTH(2) > CRASH_SCREEN_TEXT_X2) {
+                    if (i + 1 < size && x + TEXT_WIDTH(1) >= CRASH_SCREEN_TEXT_X2) {
                         printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
                     }
                 }
