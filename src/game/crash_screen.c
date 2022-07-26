@@ -902,7 +902,7 @@ void update_crash_screen_direction_input(void) {
     sCrashScreenDirectionFlags = ((pressed << 4) | currHeld);
 }
 
-void update_crash_screen_page(void) {
+s32 update_crash_screen_page(void) {
     u8 prevPage = sCrashPage;
 
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT) {
@@ -925,35 +925,42 @@ void update_crash_screen_page(void) {
         sStackTraceIndex = 0;
         sProgramPosition = 0;
         sAddressSelecCharIndex = 2;
+        return TRUE;
     }
+
+    return FALSE;
+}
+
+void crash_screen_input_default(void) {
+    update_crash_screen_page();
 }
 
 void crash_screen_input_stacktrace(void) {
-    update_crash_screen_page();
-
-    if (gPlayer1Controller->buttonPressed & A_BUTTON) {
-        sStackTraceShowNames ^= TRUE;
-        sUpdateBuffer = TRUE;
-    }
-
-    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
-        sStackTraceSkipUnknowns ^= TRUE;
-        sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_SIZE);
-        sStackTraceIndex = 0;
-        sUpdateBuffer = TRUE;
-    }
-
-    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
-        if (sStackTraceIndex > 0) {
-            sStackTraceIndex--;
+    if (!update_crash_screen_page()) {
+        if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+            sStackTraceShowNames ^= TRUE;
+            sUpdateBuffer = TRUE;
         }
-        sUpdateBuffer = TRUE;
-    }
-    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
-        if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
-            sStackTraceIndex++;
+
+        if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+            sStackTraceSkipUnknowns ^= TRUE;
+            sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_SIZE);
+            sStackTraceIndex = 0;
+            sUpdateBuffer = TRUE;
         }
-        sUpdateBuffer = TRUE;
+
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+            if (sStackTraceIndex > 0) {
+                sStackTraceIndex--;
+            }
+            sUpdateBuffer = TRUE;
+        }
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+            if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
+                sStackTraceIndex++;
+            }
+            sUpdateBuffer = TRUE;
+        }
     }
 }
 
@@ -999,63 +1006,63 @@ void crash_screen_input_ram_viewer(void) {
             sUpdateBuffer = TRUE;
         }
     } else {
-        update_crash_screen_page();
-
-        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
-            sProgramPosition -= 0x10;
-            if (sProgramPosition < RAM_VIEWER_SCROLL_MIN) {
-                sProgramPosition = RAM_VIEWER_SCROLL_MIN;
+        if (!update_crash_screen_page()) {
+            if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+                sProgramPosition -= 0x10;
+                if (sProgramPosition < RAM_VIEWER_SCROLL_MIN) {
+                    sProgramPosition = RAM_VIEWER_SCROLL_MIN;
+                }
+                sUpdateBuffer = TRUE;
             }
-            sUpdateBuffer = TRUE;
-        }
-        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
-            sProgramPosition += 0x10;
-            if (sProgramPosition > RAM_VIEWER_SCROLL_MAX) {
-                sProgramPosition = RAM_VIEWER_SCROLL_MAX;
+            if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+                sProgramPosition += 0x10;
+                if (sProgramPosition > RAM_VIEWER_SCROLL_MAX) {
+                    sProgramPosition = RAM_VIEWER_SCROLL_MAX;
+                }
+                sUpdateBuffer = TRUE;
             }
-            sUpdateBuffer = TRUE;
-        }
-        if (gPlayer1Controller->buttonPressed & A_BUTTON) {
-            sAddressSelectMenuOpen = TRUE;
-            sAddressSelect = sProgramPosition;
-            sUpdateBuffer = TRUE;
-        }
-        if (gPlayer1Controller->buttonPressed & B_BUTTON) {
-            sRamViewerShowAscii ^= TRUE;
-            sUpdateBuffer = TRUE;
+            if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+                sAddressSelectMenuOpen = TRUE;
+                sAddressSelect = sProgramPosition;
+                sUpdateBuffer = TRUE;
+            }
+            if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+                sRamViewerShowAscii ^= TRUE;
+                sUpdateBuffer = TRUE;
+            }
         }
     }
 }
 
 void crash_screen_input_disasm(void) {
-    update_crash_screen_page();
-
-    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
-        sProgramPosition -= 4;
-        if (sProgramPosition < DISASM_SCROLL_MIN) {
-            sProgramPosition = DISASM_SCROLL_MIN;
+    if (!update_crash_screen_page()) {
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+            sProgramPosition -= 4;
+            if (sProgramPosition < DISASM_SCROLL_MIN) {
+                sProgramPosition = DISASM_SCROLL_MIN;
+            }
+            sUpdateBuffer = TRUE;
         }
-        sUpdateBuffer = TRUE;
-    }
-    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
-        sProgramPosition += 4;
-        if (sProgramPosition > DISASM_SCROLL_MAX) {
-            sProgramPosition = DISASM_SCROLL_MAX;
+        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+            sProgramPosition += 4;
+            if (sProgramPosition > DISASM_SCROLL_MAX) {
+                sProgramPosition = DISASM_SCROLL_MAX;
+            }
+            sUpdateBuffer = TRUE;
         }
-        sUpdateBuffer = TRUE;
     }
 }
 
 struct CrashScreenPage sCrashScreenPages[] = {
-    /*PAGE_CONTEXT   */ {draw_crash_context, update_crash_screen_page},
-    /*PAGE_ASSERTS   */ {draw_assert,        update_crash_screen_page},
+    /*PAGE_CONTEXT   */ {draw_crash_context, crash_screen_input_default},
+    /*PAGE_ASSERTS   */ {draw_assert,        crash_screen_input_default},
 #ifdef PUPPYPRINT_DEBUG
-    /*PAGE_LOG       */ {draw_crash_log,     update_crash_screen_page},
+    /*PAGE_LOG       */ {draw_crash_log,     crash_screen_input_default},
 #endif
     /*PAGE_STACKTRACE*/ {draw_stacktrace,    crash_screen_input_stacktrace},
     /*PAGE_RAM_VIEWER*/ {draw_ram_viewer,    crash_screen_input_ram_viewer},
     /*PAGE_DISASM    */ {draw_disasm,        crash_screen_input_disasm},
-    /*PAGE_CONTROLS  */ {draw_controls,      crash_screen_input_disasm},
+    /*PAGE_CONTROLS  */ {draw_controls,      crash_screen_input_default},
 };
 
 void update_crash_screen_input(void) {
