@@ -437,7 +437,7 @@ s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
                 if (crash_screen_process_space(buf, i, x, size)) {
                     printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
                 }
-            } else if (glyph == 10) { // '\n' (new line)
+            } else if (glyph == '\r' || glyph == '\n') { // new line
                 printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
             } else {
                 // Check for formatting codes
