@@ -19,7 +19,7 @@ enum ParamTypes {
     PARAM_LUI,
 };
 
-extern far char *parse_map(u32 pc);
+extern far char *parse_map(uintptr_t pc);
 static char insn_as_string[100];
 
 typedef struct __attribute__((packed)) {
@@ -96,7 +96,7 @@ char registerMaps[][4] = {
 char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
     s32 successful_print = FALSE;
-    u32 target;
+    uintptr_t target;
 
     if (insn.d == 0) { // trivial case
         if (isPC) {
@@ -106,11 +106,11 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         }
     }
 
-    for (int i = 0; i < ARRAY_COUNT(insn_as_string); i++) {
+    for (s32 i = 0; i < ARRAY_COUNT(insn_as_string); i++) {
         insn_as_string[i] = 0;
     }
 
-    for (int i = 0; i < ARRAY_COUNT(insn_db); i++) {
+    for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
         if (insn.i.opcode != 0 && insn.i.opcode == insn_db[i].opcode) {
             switch (insn_db[i].arbitraryParam) {
                 case PARAM_SWAP_RS_IMM:
@@ -128,7 +128,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     break;
                 case PARAM_JAL:
                     target = (0x80000000 | ((insn.d & 0x1FFFFFF) * 4));
-                    if ((u32)parse_map != MAP_PARSER_ADDRESS) {
+                    if ((uintptr_t)parse_map != MAP_PARSER_ADDRESS) {
                         strp += sprintf(strp, "@FFFFC0FF%-6s @FFFF7FFF%s", insn_db[i].name,
                                     parse_map(target)
                         );

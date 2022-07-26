@@ -7,18 +7,18 @@
 #define STACK_TRAVERSAL_LIMIT 100
 
 struct MapEntry {
-    u32 addr;
-    u32 nm_offset;
-    u32 nm_len;
-    u32 pad;
+    uintptr_t addr;
+    size_t nm_offset;
+    size_t nm_len;
+    size_t pad;
 };
 
 extern u8 gMapStrings[];
 extern struct MapEntry gMapEntries[];
-extern u32 gMapEntrySize;
+extern size_t gMapEntrySize;
 extern u8 _mapDataSegmentRomStart[];
 
-static void headless_dma(u32 devAddr, void *dramAddr, u32 size) {
+static void headless_dma(uintptr_t devAddr, void *dramAddr, size_t size) {
     u32 stat = IO_READ(PI_STATUS_REG);
 
     while (stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY)) {
@@ -26,7 +26,7 @@ static void headless_dma(u32 devAddr, void *dramAddr, u32 size) {
     }
 
     IO_WRITE(PI_DRAM_ADDR_REG, K0_TO_PHYS(dramAddr));
-    IO_WRITE(PI_CART_ADDR_REG, K1_TO_PHYS((u32)osRomBase | devAddr));
+    IO_WRITE(PI_CART_ADDR_REG, K1_TO_PHYS((uintptr_t)osRomBase | devAddr));
     IO_WRITE(PI_WR_LEN_REG, size - 1);
 }
 
@@ -35,11 +35,11 @@ static u32 headless_pi_status(void) {
 }
 
 void map_data_init(void) {
-    headless_dma((u32)_mapDataSegmentRomStart, (u32*)(RAM_END - 0x100000), 0x100000);
+    headless_dma((uintptr_t)_mapDataSegmentRomStart, (size_t*)(RAM_END - 0x100000), 0x100000);
     while (headless_pi_status() & (PI_STATUS_DMA_BUSY | PI_STATUS_ERROR));
 }
 
-char *parse_map(u32 pc) {
+char *parse_map(uintptr_t pc) {
     u32 i;
 
     for (i = 0; i < gMapEntrySize; i++) {
@@ -51,7 +51,7 @@ char *parse_map(u32 pc) {
     if (i == gMapEntrySize - 1) {
         return NULL;
     } else {
-        return (char*) ((u32)gMapStrings + gMapEntries[i - 1].nm_offset);
+        return (char*) ((uintptr_t)gMapStrings + gMapEntries[i - 1].nm_offset);
     }
 }
 
@@ -62,13 +62,13 @@ extern u8 _engineSegmentTextEnd[];
 extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
-char *find_function_in_stack(u32 **sp) {
+char *find_function_in_stack(uintptr_t **sp) {
     for (int i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
-        u32 val = *(*sp)++;
+        uintptr_t val = *(*sp)++;
 
-        if (((val >= (u32)_mainSegmentStart   ) && (val <= (u32)_mainSegmentTextEnd   ))
-         || ((val >= (u32)_engineSegmentStart ) && (val <= (u32)_engineSegmentTextEnd ))
-         || ((val >= (u32)_goddardSegmentStart) && (val <= (u32)_goddardSegmentTextEnd))) {
+        if (((val >= (uintptr_t)_mainSegmentStart   ) && (val <= (uintptr_t)_mainSegmentTextEnd   ))
+         || ((val >= (uintptr_t)_engineSegmentStart ) && (val <= (uintptr_t)_engineSegmentTextEnd ))
+         || ((val >= (uintptr_t)_goddardSegmentStart) && (val <= (uintptr_t)_goddardSegmentTextEnd))) {
             return parse_map(val);
         }
     }

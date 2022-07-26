@@ -99,9 +99,10 @@ enum CrashScreenDirectionFlags {
 
 #define DIVIDER_Y(numChars) (TEXT_Y(numChars) - 2)
 
+typedef u32 CrashScreenFontRow;
 
 // Crash screen font. Each row of the image fits in one u32 pointer.
-ALIGNED32 u32 gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS] = {
+ALIGNED32 CrashScreenFontRow gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
@@ -109,7 +110,7 @@ ALIGNED32 u32 gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT
 #define STACK_SIZE 256 // (s32)(0x800 / sizeof(u64))
 
 struct FunctionInStack {
-    u32 addr;
+    uintptr_t addr;
     char *name;
 };
 
@@ -132,8 +133,8 @@ static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
 static s8 sAddressSelecCharIndex = 2;
 static s8 sRamViewerShowAscii = FALSE;
-static u32 sAddressSelect = 0;
-static u32 sProgramPosition = 0;
+static uintptr_t sAddressSelect = 0;
+static uintptr_t sProgramPosition = 0;
 static s32 sStackTraceIndex = 0;
 
 u8 sCrashPage = PAGE_CONTEXT;
@@ -185,16 +186,16 @@ char *gRegNames[29] = {
 
 
 extern u64 osClockRate;
-extern far char *parse_map(u32 pc);
+extern far char *parse_map(uintptr_t pc);
 extern far void map_data_init(void);
-extern far char *find_function_in_stack(u32 *sp);
+extern far char *find_function_in_stack(uintptr_t *sp);
 
 struct CrashScreen {
-    OSThread thread;
-    u64 stack[0x800 / sizeof(u64)];
-    OSMesgQueue mesgQueue;
-    OSMesg mesg;
-};
+    /*0x000*/ OSThread thread;
+    /*0x1B0*/ u64 stack[0x800 / sizeof(u64)];
+    /*0x9B0*/ OSMesgQueue mesgQueue;
+    /*0x9C8*/ OSMesg mesg;
+}; /*0x9CC*/
 
 struct CrashScreen gCrashScreen;
 #ifdef CRASH_SCREEN_CRASH_SCREEN
@@ -254,20 +255,20 @@ void crash_screen_draw_divider(s32 y) {
 }
 
 void crash_screen_draw_glyph(s32 startX, s32 startY, s32 glyph, RGBA16 color) {
-    u32 bit;
-    u32 rowMask;
+    CrashScreenFontRow bit;
+    CrashScreenFontRow rowMask;
     s32 x, y;
 
     if (glyph == 0) {
         color = COLOR_RGBA16_GRAY;
     }
 
-    u32 *data = &gCrashScreenFont[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
+    CrashScreenFontRow *data = &gCrashScreenFont[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
 
     RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
     for (y = 0; y < CRASH_SCREEN_FONT_CHAR_HEIGHT; y++) {
-        bit = (0x80000000U >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
+        bit = ((CrashScreenFontRow)BIT(31) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
         rowMask = *data++;
 
         for (x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
@@ -305,7 +306,7 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return (char *) memcpy(buffer, data, size) + size;
 }
 
-u32 glyph_to_hex(u8 *dest, u32 glyph) {
+u32 glyph_to_hex(u8 *dest, char glyph) {
     if (glyph >= '0' && glyph <= '9') {
         *dest = ((glyph - '0') & 0xF);
     } else if (glyph >= 'A' && glyph <= 'F') {
@@ -383,17 +384,14 @@ s32 crash_screen_process_space(char *ptr, s32 index, s32 x, s32 size) {
     s32 checkX = x + TEXT_WIDTH(1);
     char glyph = (ptr[ci] & 0xFF);
     RGBA16 color;
-    s32 skip = 0;
 
     while (ptr[ci] && glyph != ' ' && ci < size) { // check the next word after the space
-        skip = crash_screen_process_formatting_char(ptr, ci, size, glyph, &color);
-
         // New line if the next word is larger than the writable space.
-        if (checkX >= CRASH_SCREEN_TEXT_X2) {
+        if (ci + 1 < size && checkX > CRASH_SCREEN_TEXT_X2) {
             return TRUE;
         }
 
-        ci += 1 + skip;
+        ci += 1 + crash_screen_process_formatting_char(ptr, ci, size, glyph, &color);
         glyph = (ptr[ci] & 0xFF);
         checkX += TEXT_WIDTH(1);
     }
@@ -450,7 +448,7 @@ s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
                 } else { // normal char
                     crash_screen_draw_glyph(x, y, glyph, color);
 
-                    if (x + TEXT_WIDTH(1) >= CRASH_SCREEN_TEXT_X2) {
+                    if (i + 1 < size && x + TEXT_WIDTH(2) > CRASH_SCREEN_TEXT_X2) {
                         printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
                     }
                 }
@@ -478,7 +476,7 @@ void crash_screen_sleep(s32 ms) {
 }
 
 void crash_screen_print_float_reg(s32 x, s32 y, s32 regNum, void *addr) {
-    u32 bits = *(u32*) addr;
+    uintptr_t bits = *(uintptr_t*) addr;
     s32 exponent = (((bits & 0x7f800000U) >> 0x17) - 0x7F);
 
     if ((exponent >= -0x7E && exponent <= 0x7F) || (bits == 0x0)) {
@@ -489,9 +487,9 @@ void crash_screen_print_float_reg(s32 x, s32 y, s32 regNum, void *addr) {
     }
 }
 
-void crash_screen_print_fpcsr(u32 fpcsr) {
+void crash_screen_print_fpcsr(uintptr_t fpcsr) {
     s32 i;
-    u32 bit = BIT(17);
+    uintptr_t bit = BIT(17);
 
     crash_screen_print(TEXT_X(0), (TEXT_Y(14) + 5), "@3FC07FFF%s:@FFFFFFFF%08X", "FPCSR", fpcsr);
 
@@ -508,17 +506,17 @@ void crash_screen_print_registers(__OSThreadContext *tc) {
     s32 regNum = 0;
     u64 *reg = &tc->at;
 
-    crash_screen_print(TEXT_X(0 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "PC", (u32) tc->pc);
-    crash_screen_print(TEXT_X(1 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "SR", (u32) tc->sr);
-    crash_screen_print(TEXT_X(2 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "VA", (u32) tc->badvaddr);
+    crash_screen_print(TEXT_X(0 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "PC", (uintptr_t) tc->pc);
+    crash_screen_print(TEXT_X(1 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "SR", (uintptr_t) tc->sr);
+    crash_screen_print(TEXT_X(2 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "VA", (uintptr_t) tc->badvaddr);
 
-    crash_screen_print(TEXT_X(2 * 15), TEXT_Y(13), "@3FC07FFF%s:@FFFFFFFF%08X", "MM", *(u32*)tc->pc);
+    crash_screen_print(TEXT_X(2 * 15), TEXT_Y(13), "@3FC07FFF%s:@FFFFFFFF%08X", "MM", *(uintptr_t*)tc->pc);
 
     osWritebackDCacheAll();
 
     for (s32 y = 0; y < 10; y++) {
         for (s32 x = 0; x < 3; x++) {
-            crash_screen_print(TEXT_X(x * 15), TEXT_Y(4 + y), "@3FC07FFF%s:@FFFFFFFF%08X", gRegNames[regNum], (u32) *(reg + regNum));
+            crash_screen_print(TEXT_X(x * 15), TEXT_Y(4 + y), "@3FC07FFF%s:@FFFFFFFF%08X", gRegNames[regNum], (uintptr_t) *(reg + regNum));
 
             regNum++;
 
@@ -566,7 +564,7 @@ void draw_crash_context(OSThread *thread) {
 
     osWritebackDCacheAll();
 
-    if ((u32) parse_map != MAP_PARSER_ADDRESS) {
+    if ((uintptr_t) parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F7FFFCRASH AT:");
         if (fname == NULL) {
@@ -591,7 +589,7 @@ void draw_assert(UNUSED OSThread *thread) {
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (__n64Assert_Filename != NULL) {
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "\\\\@007FFFFFFILE: %s @FF7F7FFFLINE %d", __n64Assert_Filename, __n64Assert_LineNum);
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@007FFFFFFILE: %s @FF7F7FFFLINE %d", __n64Assert_Filename, __n64Assert_LineNum);
         crash_screen_draw_divider(DIVIDER_Y(line));
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@C0C0C0FFMESSAGE:");
         line += crash_screen_print(TEXT_X(0), (TEXT_Y(line) + 5), "%s", __n64Assert_Message);
@@ -618,9 +616,9 @@ void draw_crash_log(UNUSED OSThread *thread) {
 // SP address: function name
 void draw_stacktrace(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-    u32 temp_sp = (tc->sp + 0x14);
+    uintptr_t temp_sp = (tc->sp + 0x14);
     s32 currIndex;
-    u32 faddr;
+    uintptr_t faddr;
     char *fname;
     struct FunctionInStack *functionList = (sStackTraceSkipUnknowns ? sKnownFunctionStack : sAllFunctionStack);
     struct FunctionInStack *function = NULL;
@@ -631,7 +629,7 @@ void draw_stacktrace(OSThread *thread) {
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F7FFFCURRFUNC:");
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    if ((u32) parse_map == MAP_PARSER_ADDRESS) {
+    if ((uintptr_t) parse_map == MAP_PARSER_ADDRESS) {
         line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "NONE");
     } else {
         line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@FFFF7FFF%s", parse_map(tc->pc));
@@ -645,7 +643,7 @@ void draw_stacktrace(OSThread *thread) {
     for (s32 j = 0; j < STACK_TRACE_NUM_ROWS; j++) {
         s32 y = TEXT_Y(line + j);
 
-        if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
+        if ((uintptr_t) find_function_in_stack == MAP_PARSER_ADDRESS) {
             crash_screen_print(TEXT_X(0), y, "STACK TRACE DISABLED");
             break;
         }
@@ -663,15 +661,15 @@ void draw_stacktrace(OSThread *thread) {
 
         crash_screen_print(TEXT_X(0), y, "%08X:", faddr);
 
-        if (!sStackTraceSkipUnknowns && ((fname == NULL) || ((*(u32*)faddr & 0x80000000) == 0))) {
+        if (!sStackTraceSkipUnknowns && ((fname == NULL) || ((*(uintptr_t*)faddr & 0x80000000) == 0))) {
             // Print unknown function
-            crash_screen_print(TEXT_X(9), y, "@C0C0C0FF%08X", *(u32*)faddr);
+            crash_screen_print(TEXT_X(9), y, "@C0C0C0FF%08X", *(uintptr_t*)faddr);
         } else {
             // Print known function
             if (sStackTraceShowNames) {
                 crash_screen_print(TEXT_X(9), y, "@FFFFC0FF%s", fname);
             } else {
-                crash_screen_print(TEXT_X(9), y, "@FFFFC0FF%08X", *(u32*)faddr);
+                crash_screen_print(TEXT_X(9), y, "@FFFFC0FF%08X", *(uintptr_t*)faddr);
             }
         }
     }
@@ -727,8 +725,8 @@ void draw_ram_viewer(OSThread *thread) {
         sProgramPosition = (tc->pc & ~0xF);
     }
 
-    u32 addr = sProgramPosition;
-    u32 currAddr = addr;
+    uintptr_t addr = sProgramPosition;
+    uintptr_t currAddr = addr;
 
     s32 charX, charY;
 
@@ -810,8 +808,8 @@ void draw_disasm(OSThread *thread) {
     osWritebackDCacheAll();
 
     for (int i = 0; i < DISASM_NUM_ROWS; i++) {
-        u32 addr = (sProgramPosition + (i * 4));
-        u32 toDisasm = *(u32*)(addr);
+        uintptr_t addr = (sProgramPosition + (i * 4));
+        uintptr_t toDisasm = *(uintptr_t*)(addr);
 
         crash_screen_print(TEXT_X(0), TEXT_Y(2 + i), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
     }
@@ -970,7 +968,7 @@ void crash_screen_input_ram_viewer(void) {
             sUpdateBuffer = TRUE;
         }
 
-        u32 nextSelectedAddress = sAddressSelect;
+        uintptr_t nextSelectedAddress = sAddressSelect;
 
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP) {
             s32 shift = 28 - (sAddressSelecCharIndex * 4);
@@ -1125,11 +1123,11 @@ OSThread *get_crashed_thread(void) {
 
 void fill_function_stack_trace(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-    u32 temp_sp = (tc->sp + 0x14);
+    uintptr_t temp_sp = (tc->sp + 0x14);
     struct FunctionInStack *function = NULL;
     char *fname;
 
-    if ((u32) find_function_in_stack == MAP_PARSER_ADDRESS) {
+    if ((uintptr_t) find_function_in_stack == MAP_PARSER_ADDRESS) {
         return;
     }
 
@@ -1141,7 +1139,7 @@ void fill_function_stack_trace(OSThread *thread) {
         function->addr = temp_sp;
         function->name = fname;
 
-        if (!((fname == NULL) || ((*(u32*)temp_sp & 0x80000000) == 0))) {
+        if (!((fname == NULL) || ((*(uintptr_t*)temp_sp & 0x80000000) == 0))) {
             function = &sKnownFunctionStack[sNumKnownFunctions++];
             function->addr = temp_sp;
             function->name = fname;
@@ -1170,8 +1168,8 @@ void draw_crashed_image_i4(void) {
 
     u8 *segStart = _crash_screen_crash_screenSegmentRomStart;
     u8 *segEnd = _crash_screen_crash_screenSegmentRomEnd;
-    u32 size = (u32) (segEnd - segStart);
-    u8 *fb_u8 = (u8*) ((u32) fb_u16 + (SCREEN_SIZE * sizeof(RGBA16*)) - size);
+    size_t size = (uintptr_t) (segEnd - segStart);
+    u8 *fb_u8 = (u8*) ((uintptr_t) fb_u16 + (SCREEN_SIZE * sizeof(RGBA16*)) - size);
 
     // Make sure the source image is the correct size.
     if (size != SRC_IMG_SIZE) {
@@ -1252,7 +1250,7 @@ void thread2_crash_screen(UNUSED void *arg) {
             crash_screen_take_screenshot();
             thread = get_crashed_thread();
             if (thread) {
-                if ((u32) map_data_init != MAP_PARSER_ADDRESS) {
+                if ((uintptr_t) map_data_init != MAP_PARSER_ADDRESS) {
                     map_data_init();
                 }
                 fill_function_stack_trace(thread);
