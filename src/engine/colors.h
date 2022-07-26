@@ -131,6 +131,8 @@
 
 #include "color_presets.h"
 
+void rgba16_blend(RGBA16 *dst, RGBA16 src, Alpha fac);
+
 Bool32 colorRGBA_average_2(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2);
 Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA c3);
 

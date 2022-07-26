@@ -5,6 +5,19 @@
 #include "math_util.h"
 #include "colors.h"
 
+// RGBA16
+
+ALWAYS_INLINE u16 lerp_u16(u16 a, u16 b, Alpha fac) {
+    return (((fac * (b - a)) >> 8) + a);
+}
+
+void rgba16_blend(RGBA16 *dst, RGBA16 src, Alpha fac) {
+    RGBA16Component r = lerp_u16(RGBA16_R(*dst), RGBA16_R(src), fac);
+    RGBA16Component g = lerp_u16(RGBA16_G(*dst), RGBA16_G(src), fac);
+    RGBA16Component b = lerp_u16(RGBA16_B(*dst), RGBA16_B(src), fac);
+    *dst = RGBA16_COMPOSITE(r, g, b, 1);
+}
+
 // ColorRGB
 
 void rgba16_to_colorRGB(ColorRGB dst, RGBA16 src) {
