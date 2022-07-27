@@ -7,17 +7,13 @@
 
 // RGBA16
 
-ALWAYS_INLINE u16 lerp_u16(u16 a, u16 b, Alpha fac) {
-    return (((fac * (b - a)) >> 8) + a);
-}
-
 RGBA16 rgba16_blend(RGBA16 a, RGBA16 b, Alpha fac) {
     RGBA16 ds, d = MSK_RGBA16_A;
-    u16 s = (MSK_RGBA16_C << 1);
+    RGBA16 s = (MSK_RGBA16_C << SIZ_RGBA16_A);
     for (s32 i = 0; i < 3; i++) {
         ds = (a & s);
         d |= ((((fac * ((b & s) - ds)) >> 8) + ds) & s);
-        s <<= 5;
+        s <<= SIZ_RGBA16_C;
     }
 
     return d;
