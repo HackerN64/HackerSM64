@@ -131,8 +131,8 @@ static s8 sDrawFrameBuffer = TRUE;
 static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
-static s8 sAddressSelecCharIndex = 2;
 static s8 sRamViewerShowAscii = FALSE;
+static s8 sAddressSelecCharIndex = 2;
 static uintptr_t sAddressSelect = 0;
 static uintptr_t sProgramPosition = 0;
 static s32 sStackTraceIndex = 0;
@@ -256,7 +256,7 @@ void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA16 col
 }
 
 void crash_screen_draw_divider(s32 y) {
-    crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA16_LIGHT_GRAY, 0xFF);
+    crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, RGBA32_TO_RGBA16(COLOR_RGBA32_LIGHT_GRAY), 0xFF);
 }
 
 void crash_screen_draw_glyph(s32 startX, s32 startY, s32 glyph, RGBA16 color, Alpha alpha) {
@@ -265,7 +265,7 @@ void crash_screen_draw_glyph(s32 startX, s32 startY, s32 glyph, RGBA16 color, Al
     s32 x, y;
 
     if (glyph == 0) {
-        color = COLOR_RGBA16_GRAY;
+        color = RGBA32_TO_RGBA16(COLOR_RGBA32_GRAY);
     }
 
     CrashScreenFontRow *data = &gCrashScreenFont[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
@@ -315,7 +315,7 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return (char *) memcpy(buffer, data, size) + size;
 }
 
-u32 glyph_to_hex(u8 *dest, char glyph) {
+u32 glyph_to_hex(char *dest, char glyph) {
     if (glyph >= '0' && glyph <= '9') {
         *dest = ((glyph - '0') & 0xF);
     } else if (glyph >= 'A' && glyph <= 'F') {
@@ -332,10 +332,10 @@ u32 glyph_to_hex(u8 *dest, char glyph) {
 u32 crash_screen_text_to_color(RGBA16 *color, char *ptr, s32 index) {
     s32 i, j;
     char glyph;
-    u8 hex = 0;
+    char hex = 0;
     Color component = 0;
     ColorRGBA rgba = { 0, 0, 0, 0 };
-    *color = COLOR_RGBA16_CRASH_WHITE;
+    *color = RGBA32_TO_RGBA16(COLOR_RGBA32_WHITE);
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 2; j++) {
@@ -362,19 +362,20 @@ u32 crash_screen_text_to_color(RGBA16 *color, char *ptr, s32 index) {
     return TRUE;
 }
 
-// Returns how many chars to skip.
+// Returns the number of chars to skip.
 s32 crash_screen_process_formatting_char(char *ptr, s32 index, s32 size, char glyph, RGBA16 *color) {
-    static s8 escape = FALSE;
+    static u8 escape = FALSE;
     s32 skip = 0;
 
     if (index + (1 + 8) > size) {
         return 0;
     }
 
-    if (glyph == '\\' && ptr[index + 1] && (ptr[index + 1] & 0xFF) == '@') { // Use '\\@' to print '@'
+    // Use '\\@' to print '@' and its color code instead of trying to parse it.
+    if (glyph == '\\' && ptr[index + 1] && (ptr[index + 1] & 0xFF) == '@') {
         escape = TRUE;
         skip = 1;
-    } else if (glyph == '@' && !escape) { // RRGGBBAA color prefix
+    } else if (glyph == '@' && !escape) { // @RRGGBBAA color prefix
         if (crash_screen_text_to_color(color, ptr, index + 1)) {
             skip = 8;
         }
@@ -427,7 +428,7 @@ s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
 
     s32 size = _Printf(write_to_buf, buf, fmt, args);
 
-    RGBA16 color = COLOR_RGBA16_CRASH_WHITE;
+    RGBA16 color = RGBA32_TO_RGBA16(COLOR_RGBA32_WHITE);
 
     s32 x = startX;
     s32 y = startY;
@@ -486,13 +487,15 @@ void crash_screen_sleep(s32 ms) {
 
 void crash_screen_print_float_reg(s32 x, s32 y, s32 regNum, void *addr) {
     uintptr_t bits = *(uintptr_t*) addr;
-    s32 exponent = (((bits & 0x7f800000U) >> 0x17) - 0x7F);
+    s32 exponent = (((bits & (uintptr_t)(BITMASK(8) << 23)) >> 23) - 0x7F);
+
+    crash_screen_print(x, y, "@%08XF%02d:", COLOR_RGBA32_CRASH_REGISTER, regNum);
 
     if ((exponent >= -0x7E && exponent <= 0x7F) || (bits == 0x0)) {
         f32 val = *(f32*) addr;
-        crash_screen_print(x, y, "@3FC07FFFF%02d:%s@FFFFFFFF%.3e", regNum, ((val < 0) ? "" : " "), val);
+        crash_screen_print(x + TEXT_WIDTH(4), y, "%s%.3e", ((val < 0) ? "" : " "), val);
     } else {
-        crash_screen_print(x, y, "@3FC07FFFF%02d:@FFFFFFFF%08XD", regNum, bits);
+        crash_screen_print(x + TEXT_WIDTH(4), y, "%08XD", bits);
     }
 }
 
@@ -500,32 +503,38 @@ void crash_screen_print_fpcsr(uintptr_t fpcsr) {
     s32 i;
     uintptr_t bit = BIT(17);
 
-    crash_screen_print(TEXT_X(0), (TEXT_Y(14) + 5), "@3FC07FFF%s:@FFFFFFFF%08X", "FPCSR", fpcsr);
+    crash_screen_print(TEXT_X(0), (TEXT_Y(14) + 5), "@%08X%s:", COLOR_RGBA32_CRASH_REGISTER, "FPCSR");
+    crash_screen_print(TEXT_X(6), (TEXT_Y(14) + 5), "%08X", fpcsr);
 
     for (i = 0; i < 6; i++) {
         if (fpcsr & bit) {
-            crash_screen_print(TEXT_X(16), (TEXT_Y(14) + 5), "@FF3F00FF(%s)", gFpcsrDesc[i]);
+            crash_screen_print(TEXT_X(16), (TEXT_Y(14) + 5), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, gFpcsrDesc[i]);
             return;
         }
         bit >>= 1;
     }
 }
 
+void crash_screen_print_reg(s32 x, s32 y, char *name, uintptr_t addr) {
+    crash_screen_print(x, y, "@%08X%s:", COLOR_RGBA32_CRASH_REGISTER, name);
+    crash_screen_print(x + TEXT_WIDTH(3), y, "%08X", addr);
+}
+
 void crash_screen_print_registers(__OSThreadContext *tc) {
     s32 regNum = 0;
     u64 *reg = &tc->at;
 
-    crash_screen_print(TEXT_X(0 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "PC", (uintptr_t) tc->pc);
-    crash_screen_print(TEXT_X(1 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "SR", (uintptr_t) tc->sr);
-    crash_screen_print(TEXT_X(2 * 15), TEXT_Y( 3), "@3FC07FFF%s:@FFFFFFFF%08X", "VA", (uintptr_t) tc->badvaddr);
+    crash_screen_print_reg(TEXT_X(0 * 15), TEXT_Y( 3), "PC", tc->pc);
+    crash_screen_print_reg(TEXT_X(1 * 15), TEXT_Y( 3), "SR", tc->sr);
+    crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y( 3), "VA", tc->badvaddr);
 
-    crash_screen_print(TEXT_X(2 * 15), TEXT_Y(13), "@3FC07FFF%s:@FFFFFFFF%08X", "MM", *(uintptr_t*)tc->pc);
+    crash_screen_print_reg(TEXT_X(2 * 15), TEXT_Y(13), "MM", *(uintptr_t*)tc->pc);
 
     osWritebackDCacheAll();
 
     for (s32 y = 0; y < 10; y++) {
         for (s32 x = 0; x < 3; x++) {
-            crash_screen_print(TEXT_X(x * 15), TEXT_Y(4 + y), "@3FC07FFF%s:@FFFFFFFF%08X", gRegNames[regNum], (uintptr_t) *(reg + regNum));
+            crash_screen_print_reg(TEXT_X(x * 15), TEXT_Y(4 + y), gRegNames[regNum], *(reg + regNum));
 
             regNum++;
 
@@ -568,18 +577,18 @@ void draw_crash_context(OSThread *thread) {
 
     s32 line = 1;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@7F7FFFFFTHREAD:%d", thread->id);
-    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), "@FF3F00FF(%s)", gCauseDesc[cause]);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XTHREAD:%d", COLOR_RGBA32_CRASH_THREAD, thread->id);
+    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, gCauseDesc[cause]);
 
     osWritebackDCacheAll();
 
     if ((uintptr_t) parse_map != MAP_PARSER_ADDRESS) {
         char *fname = parse_map(tc->pc);
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F7FFFCRASH AT:");
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCRASH AT:", COLOR_RGBA32_CRASH_AT);
         if (fname == NULL) {
-            crash_screen_print(TEXT_X(10), TEXT_Y(line), "@7F7F7FFF%s", "UNKNOWN");
+            crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
         } else {
-            crash_screen_print(TEXT_X(10), TEXT_Y(line), "@FFFF7FFF%s", fname);
+            crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUMCTION_NAME, fname);
         }
     }
 
@@ -593,14 +602,16 @@ void draw_crash_context(OSThread *thread) {
 void draw_assert(UNUSED OSThread *thread) {
     s32 line = 1;
 
-    line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F00FFASSERT");
+    line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XASSERT", COLOR_RGBA32_CRASH_PAGE_NAME);
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (__n64Assert_Filename != NULL) {
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@007FFFFFFILE: %s @FF7F7FFFLINE %d", __n64Assert_Filename, __n64Assert_LineNum);
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XFILE:%s", COLOR_RGBA32_CRASH_FILE_NAME, __n64Assert_Filename);
         crash_screen_draw_divider(DIVIDER_Y(line));
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@C0C0C0FFMESSAGE:");
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XLINE:%d", COLOR_RGBA32_CRASH_AT, __n64Assert_LineNum);
+        crash_screen_draw_divider(DIVIDER_Y(line));
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XMESSAGE:", COLOR_RGBA32_CRASH_HEADER);
         line += crash_screen_print(TEXT_X(0), (TEXT_Y(line) + 5), "%s", __n64Assert_Message);
     } else {
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "no failed assert to report.");
@@ -634,14 +645,15 @@ void draw_stacktrace(OSThread *thread) {
 
     s32 line = 1;
 
-    line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F00FFSTACK TRACE @FFFFFFFFFROM %08X", temp_sp);
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F7FFFCURRFUNC:");
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XSTACK TRACE", COLOR_RGBA32_CRASH_PAGE_NAME);
+    line += crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM %08X", temp_sp);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     if ((uintptr_t) parse_map == MAP_PARSER_ADDRESS) {
         line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "NONE");
     } else {
-        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@FFFF7FFF%s", parse_map(tc->pc));
+        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUMCTION_NAME, parse_map(tc->pc));
     }
 
     crash_screen_draw_divider(DIVIDER_Y(line));
@@ -672,13 +684,13 @@ void draw_stacktrace(OSThread *thread) {
 
         if (!sStackTraceSkipUnknowns && ((fname == NULL) || ((*(uintptr_t*)faddr & 0x80000000) == 0))) {
             // Print unknown function
-            crash_screen_print(TEXT_X(9), y, "@C0C0C0FF%08X", *(uintptr_t*)faddr);
+            crash_screen_print(TEXT_X(9), y, "@%08X%08X", COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
         } else {
             // Print known function
             if (sStackTraceShowNames) {
-                crash_screen_print(TEXT_X(9), y, "@FFFFC0FF%s", fname);
+                crash_screen_print(TEXT_X(9), y, "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
             } else {
-                crash_screen_print(TEXT_X(9), y, "@FFFFC0FF%08X", *(uintptr_t*)faddr);
+                crash_screen_print(TEXT_X(9), y, "@%08x%08X", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
             }
         }
     }
@@ -686,10 +698,10 @@ void draw_stacktrace(OSThread *thread) {
     osWritebackDCacheAll();
 
     crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
-    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@C0C0C0FFup/down:scroll    toggle: a:names b:unknowns");
+    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@%08Xup/down:scroll    toggle: a:names b:unknowns", COLOR_RGBA32_CRASH_CONTROLS);
 
     // Scroll Bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), STACK_TRACE_NUM_ROWS, sNumShownFunctions, sStackTraceIndex, 4, COLOR_RGBA16_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), STACK_TRACE_NUM_ROWS, sNumShownFunctions, sStackTraceIndex, 4, RGBA32_TO_RGBA16(COLOR_RGBA32_LIGHT_GRAY));
 
     osWritebackDCacheAll();
 }
@@ -706,16 +718,16 @@ void draw_stacktrace(OSThread *thread) {
 void draw_address_select(void) {
     crash_screen_draw_rect((JUMP_MENU_X -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y - TEXT_HEIGHT(2) -  JUMP_MENU_MARGIN_X     ),
                            (JUMP_MENU_W + (JUMP_MENU_MARGIN_Y * 2)), (JUMP_MENU_H + TEXT_HEIGHT(2) + (JUMP_MENU_MARGIN_Y * 2)),
-                           COLOR_RGBA16_BLACK, CRASH_SCREEN_BACKGROUND_ALPHA);
+                           RGBA32_TO_RGBA16(COLOR_RGBA32_BLACK), CRASH_SCREEN_BACKGROUND_ALPHA);
 
     crash_screen_print(JUMP_MENU_X + TEXT_WIDTH(1), JUMP_MENU_Y - TEXT_HEIGHT(2), "GO TO:");
 
     crash_screen_draw_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y - TEXT_HEIGHT(1) + CRASH_SCREEN_CHAR_SPACING_Y),
                                TEXT_WIDTH(1), TEXT_WIDTH(1),
-                               COLOR_RGBA16_CRASH_SELECT, 0xFF, FALSE);
+                               RGBA32_TO_RGBA16(COLOR_RGBA32_CRASH_SELECT), 0xFF, FALSE);
     crash_screen_draw_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y + TEXT_HEIGHT(1) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
                                TEXT_WIDTH(1), TEXT_WIDTH(1),
-                               COLOR_RGBA16_CRASH_SELECT, 0xFF, TRUE);
+                               RGBA32_TO_RGBA16(COLOR_RGBA32_CRASH_SELECT), 0xFF, TRUE);
     crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelect);
 
     osWritebackDCacheAll();
@@ -741,7 +753,7 @@ void draw_ram_viewer(OSThread *thread) {
 
     s32 line = 1;
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@FF7F00FFRAM VIEW");
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XRAM VIEW", COLOR_RGBA32_CRASH_PAGE_NAME);
     line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "%08X-%08X", addr, (addr + RAM_VIEWER_SHOWN_SECTION));
     crash_screen_draw_divider(DIVIDER_Y(line));
 
@@ -751,12 +763,12 @@ void draw_ram_viewer(OSThread *thread) {
         if ((i & 0x3) == 0) {
             charX += 2;
         }
-        crash_screen_print(charX, TEXT_Y(line), ((i & 0x1) ? "@00B7FFFF%02X" : "@0087FFFF%02X"), i);
+        crash_screen_print(charX, TEXT_Y(line), "@%08X%02X", ((i & 0x1) ? COLOR_RGBA32_CRASH_RAM_VIEW_H1 : COLOR_RGBA32_CRASH_RAM_VIEW_H2), i);
         charX += TEXT_WIDTH(2) + 1;
     }
     crash_screen_draw_divider(DIVIDER_Y(3));
 
-    crash_screen_draw_rect(TEXT_X(8) + 2, DIVIDER_Y(line), 1, TEXT_HEIGHT(19), COLOR_RGBA16_LIGHT_GRAY, 0xFF);
+    crash_screen_draw_rect(TEXT_X(8) + 2, DIVIDER_Y(line), 1, TEXT_HEIGHT(19), RGBA32_TO_RGBA16(COLOR_RGBA32_LIGHT_GRAY), 0xFF);
 
     line += crash_screen_print(TEXT_X( 1), TEXT_Y(line), "MEMORY");
 
@@ -765,7 +777,7 @@ void draw_ram_viewer(OSThread *thread) {
 
     for (s32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
         currAddr = addr + (y * 0x10);
-        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), ((y & 0x1) ? "@5FDF5FFF%08X" : "@1F9F1FFF%08X"), currAddr);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), "@%08X%08X", ((y & 0x1) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), currAddr);
 
         charX = TEXT_X(8) + 3;
         charY = TEXT_Y(line + y);
@@ -775,19 +787,19 @@ void draw_ram_viewer(OSThread *thread) {
                 charX += 2;
             }
             if (sRamViewerShowAscii) {
-                crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, value, COLOR_RGBA16_CRASH_WHITE, 0xFF);
+                crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, value, RGBA32_TO_RGBA16(COLOR_RGBA32_WHITE), 0xFF);
             } else {
-                crash_screen_print(charX, charY, ((x & 0x1) ? "@FFFFFFFF%02X" : "@BFBFBFFF%02X"), value);
+                crash_screen_print(charX, charY, "@%08X%02X", ((x & 0x1) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY), value);
             }
             charX += TEXT_WIDTH(2) + 1;
         }
     }
 
     crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
-    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@C0C0C0FFup/down:scroll        a:jump  b:toggle ascii");
+    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@%08Xup/down:scroll        a:jump  b:toggle ascii", COLOR_RGBA32_CRASH_CONTROLS);
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA16_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - RAM_VIEWER_SCROLL_MIN), 4, RGBA32_TO_RGBA16(COLOR_RGBA32_LIGHT_GRAY));
 
     osWritebackDCacheAll();
 
@@ -812,7 +824,7 @@ void draw_disasm(OSThread *thread) {
         sProgramPosition = (tc->pc - ((DISASM_NUM_ROWS / 2) * 4));
     }
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(1), "@FF7F00FFDISASM");
+    crash_screen_print(TEXT_X(0), TEXT_Y(1), "@%08XDISASM", COLOR_RGBA32_CRASH_PAGE_NAME);
     crash_screen_print(TEXT_X(7), TEXT_Y(1), "%08X-%08X", sProgramPosition, (sProgramPosition + DISASM_SHOWN_SECTION));
 
     osWritebackDCacheAll();
@@ -828,13 +840,13 @@ void draw_disasm(OSThread *thread) {
 
     crash_screen_draw_divider(DIVIDER_Y( 2));
     crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
-    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@C0C0C0FFup/down:scroll                        a:jump");
+    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@%08Xup/down:scroll                        a:jump", COLOR_RGBA32_CRASH_CONTROLS);
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - DISASM_SCROLL_MIN), 4, COLOR_RGBA16_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - DISASM_SCROLL_MIN), 4, RGBA32_TO_RGBA16(COLOR_RGBA32_LIGHT_GRAY));
 
     // Scroll bar crash position marker
-    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA16_CRASH_CURRFUNC);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, RGBA32_TO_RGBA16(COLOR_RGBA32_CRASH_AT));
 
     osWritebackDCacheAll();
 
@@ -852,18 +864,18 @@ void draw_controls(UNUSED OSThread *thread) {
     line += crash_screen_print(TEXT_X(1), TEXT_Y(line), "CRASH SCREEN CONTROLS");
     line++;
     line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "START:");
-    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@C0C0C0FFtoggle framebuffer background");
+    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@%08Xtoggle framebuffer background", COLOR_RGBA32_CRASH_CONTROLS);
     line++;
     line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "Z:");
-    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@C0C0C0FFtoggle framebuffer only view");
+    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@%08Xtoggle framebuffer only view", COLOR_RGBA32_CRASH_CONTROLS);
     line++;
     line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "ANALOG STICK, D-PAD, OR C BUTTONS:");
     line++;
     line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "LEFT/RIGHT:");
-    line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@C0C0C0FFswitch page");
+    line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@%08Xswitch page", COLOR_RGBA32_CRASH_CONTROLS);
     line++;
     line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "UP/DOWN:");
-    line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@C0C0C0FFscroll page");
+    line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@%08Xscroll page", COLOR_RGBA32_CRASH_CONTROLS);
 
     osWritebackDCacheAll();
 }
@@ -887,7 +899,7 @@ void reset_crash_screen_framebuffer(void) {
     if (sDrawFrameBuffer) {
         memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], FRAMEBUFFER_SIZE);
     } else {
-        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA16_BLACK, 0xFF);
+        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, RGBA32_TO_RGBA16(COLOR_RGBA32_BLACK), 0xFF);
     }
 }
 
@@ -1121,11 +1133,11 @@ void draw_crash_screen(OSThread *thread) {
 
         if (sDrawCrashScreen) {
             if (sDrawFrameBuffer) {
-                crash_screen_draw_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, COLOR_RGBA16_BLACK, CRASH_SCREEN_BACKGROUND_ALPHA);
+                crash_screen_draw_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, RGBA32_TO_RGBA16(COLOR_RGBA32_BLACK), CRASH_SCREEN_BACKGROUND_ALPHA);
             }
             s32 line = 0;
-            crash_screen_print(TEXT_X(0), TEXT_Y(line), "@C0C0C0FFHackerSM64 v%s", HACKERSM64_VERSION);
-            line += crash_screen_print(TEXT_X(35), TEXT_Y(line), "@C0C0C0FF<Page:%02d>", (sCrashPage + 1));
+            crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XHackerSM64 v%s", COLOR_RGBA32_CRASH_HEADER, HACKERSM64_VERSION);
+            line += crash_screen_print(TEXT_X(35), TEXT_Y(line), "@%08X<Page:%02d>", COLOR_RGBA32_CRASH_HEADER, (sCrashPage + 1));
             crash_screen_draw_divider(DIVIDER_Y(line));
             sCrashScreenPages[sCrashPage].drawFunc(thread);
         }

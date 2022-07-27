@@ -4,6 +4,7 @@
 #include "sm64.h"
 #include "macros.h"
 #include "farcall.h"
+#include "color_presets.h"
 
 enum InsnTypes {
     R_TYPE,
@@ -23,36 +24,36 @@ extern far char *parse_map(uintptr_t pc);
 static char insn_as_string[100];
 
 typedef struct __attribute__((packed)) {
-    u16 rd        : 5;
-    u16 shift_amt : 5;
-    u16 function  : 6;
-} RTypeData;
+    /*0x00*/ u16 rd        : 5;
+    /*0x00*/ u16 shift_amt : 5;
+    /*0x01*/ u16 function  : 6;
+} RTypeData; /*0x02*/
 
 typedef struct __attribute__((packed)) {
-    u16 opcode : 6;
-    u16 rs     : 5;
-    u16 rt     : 5;
-    union {
-        RTypeData rdata;
-        u16 immediate;
-    };
-} Insn;
+    /*0x00*/ u16 opcode : 6;
+    /*0x00*/ u16 rs     : 5;
+    /*0x01*/ u16 rt     : 5;
+    /*0x02*/ union {
+                 RTypeData rdata;
+                 u16 immediate;
+             };
+} Insn; /*0x04*/
 
 typedef union {
     Insn i;
     u32  d;
-} InsnData;
+} InsnData; /*0x04*/
 
 typedef struct __attribute__((packed)) {
-    u32 type;
-    u32 arbitraryParam;
-    u16 opcode   : 6;
-    u16 function : 6;
-    u8 name[10];
-} InsnTemplate;
+    /*0x00*/ u32 type;
+    /*0x04*/ u32 arbitraryParam;
+    /*0x08*/ u16 opcode   : 6;
+    /*0x08*/ u16 function : 6;
+    /*0x09*/ char name[5];
+} InsnTemplate; /*0x0E*/
 
 
-InsnTemplate insn_db[] = {
+const InsnTemplate insn_db[] = {
     {R_TYPE, PARAM_NONE,               0, 0b100000, "ADD"},
     {R_TYPE, PARAM_NONE,               0, 0b100001, "ADDU"},
     {I_TYPE, PARAM_SWAP_RS_IMM, 0b001001,        0, "ADDIU"},
@@ -82,16 +83,17 @@ InsnTemplate insn_db[] = {
 };
 
 
-char registerMaps[][4] = {
-    "$R0",
-    "$AT",
-    "$V0", "$V1",
-    "$A0", "$A1", "$A2", "$A3",
-    "$T0", "$T1", "$T2", "$T3", "$T4", "$T5", "$T6", "$T7",
-    "$S0", "$S1", "$S2", "$S3", "$S4", "$S5", "$S6", "$S7", "$T8", "$T9",
-    "$K0", "$K1",
-    "$GP", "$SP", "$FP", "$RA",
+const char registerMaps[][3] = {
+    "R0",
+    "AT",
+    "V0", "V1",
+    "A0", "A1", "A2", "A3",
+    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7",
+    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "T8", "T9",
+    "K0", "K1",
+    "GP", "SP", "FP", "RA",
 };
+
 
 char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
@@ -100,10 +102,18 @@ char *insn_disasm(InsnData insn, u32 isPC) {
 
     if (insn.d == 0) { // trivial case
         if (isPC) {
-            return "@C0C0C0FFNOP @FF7F7FFF<-- CRASH";
+            strp += sprintf(strp, "@%08XNOP @%08X<-- CRASH",
+                COLOR_RGBA32_CRASH_DISASM_NOP,
+                COLOR_RGBA32_CRASH_AT
+            );
         } else {
-            return "@C0C0C0FFNOP";
+            strp += sprintf(strp, "@%08XNOP",
+                COLOR_RGBA32_CRASH_DISASM_NOP
+            );
         }
+
+
+        return insn_as_string;
     }
 
     for (s32 i = 0; i < ARRAY_COUNT(insn_as_string); i++) {
@@ -114,35 +124,40 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         if (insn.i.opcode != 0 && insn.i.opcode == insn_db[i].opcode) {
             switch (insn_db[i].arbitraryParam) {
                 case PARAM_SWAP_RS_IMM:
-                    strp += sprintf(strp, "@FFFFC0FF%-6s @7FC0FFFF%s %s @7FFF7FFF0x%04X", insn_db[i].name,
-                                registerMaps[insn.i.rt],
-                                registerMaps[insn.i.rs],
-                                insn.i.immediate
+                    strp += sprintf(strp, "@%08X%-6s @%08X$%s $%s @%08X0x%04X",
+                        COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
+                        COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rt],
+                                                        registerMaps[insn.i.rs],
+                        COLOR_RGBA32_CRASH_IMMEDIATE,   insn.i.immediate
                     );
                     break;
                 case PARAM_LUI:
-                    strp += sprintf(strp, "@FFFFC0FF%-6s @7FC0FFFF%s @7FFF7FFF0x%04X", insn_db[i].name,
-                                registerMaps[insn.i.rt],
-                                insn.i.immediate
+                    strp += sprintf(strp, "@%08X%-6s @%08X$%s @%08X0x%04X",
+                        COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
+                        COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rt],
+                        COLOR_RGBA32_CRASH_IMMEDIATE,   insn.i.immediate
                     );
                     break;
                 case PARAM_JAL:
                     target = (0x80000000 | ((insn.d & 0x1FFFFFF) * 4));
                     if ((uintptr_t)parse_map != MAP_PARSER_ADDRESS) {
-                        strp += sprintf(strp, "@FFFFC0FF%-6s @FFFF7FFF%s", insn_db[i].name,
-                                    parse_map(target)
+                        strp += sprintf(strp, "@%08X%-6s @%08X%s",
+                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
+                            COLOR_RGBA32_CRASH_FUMCTION_NAME, parse_map(target)
                         );
                     } else {
-                        strp += sprintf(strp, "@FFFFC0FF%-8s @7FC0FFFF%08X", insn_db[i].name,
-                                    target
+                        strp += sprintf(strp, "@%08X%-8s @%08X%08X",
+                            COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
+                            COLOR_RGBA32_CRASH_DISASM_REG,    target
                         );
                     }
                     break;
                 case PARAM_NONE:
-                    strp += sprintf(strp, "@FFFFC0FF%-6s @7FC0FFFF%s @7FFF7FFF0x%04X @c7FFFFFF(%s)", insn_db[i].name,
-                                registerMaps[insn.i.rt],
-                                insn.i.immediate,
-                                registerMaps[insn.i.rs]
+                    strp += sprintf(strp, "@%08X%-6s @%08X$%s @%08X0x%04X @%08X($%s)",
+                        COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
+                        COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rt],
+                        COLOR_RGBA32_CRASH_IMMEDIATE,   insn.i.immediate,
+                        COLOR_RGBA32_CRASH_DISASM_REG_2,  registerMaps[insn.i.rs]
                     );
                     break;
 
@@ -150,11 +165,12 @@ char *insn_disasm(InsnData insn, u32 isPC) {
             successful_print = TRUE;
             break;
         } else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
-                strp += sprintf(strp, "@FFFFC0FF%-6s @7FC0FFFF%s %s %s", insn_db[i].name,
-                            registerMaps[insn.i.rdata.rd],
-                            registerMaps[insn.i.rs],
-                            registerMaps[insn.i.rt]
-                        );
+                strp += sprintf(strp, "@%08X%-6s @%08X$%s $%s $%s",
+                    COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
+                    COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rdata.rd],
+                                                    registerMaps[insn.i.rs],
+                                                    registerMaps[insn.i.rt]
+                );
                 successful_print = TRUE;
                 break;
         }
@@ -165,7 +181,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
     }
 
     if (isPC) {
-        sprintf(strp, " @FF7F7FFF<-- CRASH");
+        sprintf(strp, " @%08X<-- CRASH", COLOR_RGBA32_CRASH_AT);
     }
 
     return insn_as_string;

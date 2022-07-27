@@ -15,7 +15,7 @@ void rgba16_blend(RGBA16 *dst, RGBA16 src, Alpha fac) {
     RGBA16Component r = lerp_u16(RGBA16_R(*dst), RGBA16_R(src), fac);
     RGBA16Component g = lerp_u16(RGBA16_G(*dst), RGBA16_G(src), fac);
     RGBA16Component b = lerp_u16(RGBA16_B(*dst), RGBA16_B(src), fac);
-    *dst = RGBA16_COMPOSITE(r, g, b, 1);
+    *dst = RGBA16_COMPOSITE(r, g, b, MSK_RGBA16_A);
 }
 
 // ColorRGB
@@ -126,24 +126,30 @@ RGBA32 colorRGBAf_to_rgba32(ColorRGBAf src) {
 }
 
 Bool32 colorRGBA_average_2(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2) {
-    if ((dst[3] = (c1[3] + c2[3])) > 0) {
-        s32 i;
-        for (i = 0; i < 3; i++) {
+    dst[3] = (c1[3] + c2[3]);
+
+    if (dst[3] > 0) {
+        for (s32 i = 0; i < 3; i++) {
             dst[i] = (((c1[i] * c1[3]) + (c2[i] * c2[3])) / dst[3]);
         }
+
         return TRUE;
     }
+
     return FALSE;
 }
 
 Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA c3) {
-    if ((dst[3] = (c1[3] + c2[3] + c3[3])) > 0) {
-        s32 i;
-        for (i = 0; i < 3; i++) {
+    dst[3] = (c1[3] + c2[3] + c3[3]);
+
+    if (dst[3] > 0) {
+        for (s32 i = 0; i < 3; i++) {
             dst[i] = (((c1[i] * c1[3]) + (c2[i] * c2[3]) + (c3[i] * c3[3])) / dst[3]);
         }
+
         return TRUE;
     }
+
     return FALSE;
 }
 

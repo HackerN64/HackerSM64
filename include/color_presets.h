@@ -1,78 +1,168 @@
 #pragma once
 
-// Texture formats:
+#include "PR/gbi.h"
+
+
+// -- Texture/Color format constants --
+
 // NOTE: IA4 and RGBA16 formats are tricky, because while their
 // composite values are 4bit aligned, their components are not.
 
-// i4
+
+// I4
 // A 0000 0000 0000 0000 0000 0000 0000 1111 >> 0x0  & 0xF  = 0-15 * (255/15 = 17)              = 0..255
+#define SIZ_I4      0x4
+#define MSK_I4      BITMASK(SIZ_I4)
 
-// i8
+// I8
 // A 0000 0000 0000 0000 0000 0000 1111 1111 >> 0x0  & 0xFF                                     = 0..255
+#define SIZ_I8      0x8
+#define MSK_I8      BITMASK(SIZ_I8)
 
-// ia4
+// IA4
 // I 0000 0000 0000 0000 0000 0000 0000 1110 >> 0x1  & 0x7  = 0-7 * (255/7 = 36.4285714286)     = 0..255
 // A 0000 0000 0000 0000 0000 0000 0000 0001 >> 0x0  & 0x1  = 0-255
+#define SIZ_IA4_I   0x3
+#define MSK_IA4_I   BITMASK(SIZ_IA4_I)
+#define IDX_IA4_I   ((SIZ_IA4_I * 0) + 1)
+#define IA4_I(c)    (((c) >> IDX_IA4_I) & MSK_IA4_I)
+#define I_IA4(c)    (((c) & MSK_IA4_I) << IDX_IA4_I)
+#define SIZ_IA4_A   0x1
+#define MSK_IA4_A   BITMASK(SIZ_IA4_A)
+#define IDX_IA4_A   ((SIZ_IA4_A * 0) + 0)
+#define IA4_A(c)    (((c) >> IDX_IA4_A) & MSK_IA4_A)
+#define A_IA4(c)    (((c) & MSK_IA4_A) << IDX_IA4_A)
 
-// ia8
+// IA8
 // I 0000 0000 0000 0000 0000 0000 1111 0000 >> 0x4  & 0xF  = 0-15 * (255/15 = 17)              = 0..255
 // A 0000 0000 0000 0000 0000 0000 0000 1111 >> 0x0  & 0xF  = 0-15 * (255/15 = 17)              = 0..255
+#define SIZ_IA8_C   0x4
+#define MSK_IA8_C   BITMASK(SIZ_IA8_C)
+#define IDX_IA8_I   ((SIZ_IA8_C * 1) + 0)
+#define IDX_IA8_A   ((SIZ_IA8_C * 0) + 0)
+#define IA8_I(c)    (((c) >> IDX_IA8_I) & MSK_IA8_C)
+#define IA8_A(c)    (((c) >> IDX_IA8_A) & MSK_IA8_C)
+#define I_IA8(c)    (((c) & MSK_IA8_C) << IDX_IA8_I)
+#define A_IA8(c)    (((c) & MSK_IA8_C) << IDX_IA8_A)
 
-// ia16
+// IA16
 // I 0000 0000 0000 0000 1111 1111 0000 0000 >> 0x8  & 0xFF                                     = 0..255
 // A 0000 0000 0000 0000 0000 0000 1111 1111 >> 0x0  & 0xFF                                     = 0..255
+#define SIZ_IA16_C  0x8
+#define MSK_IA16_C  BITMASK(SIZ_IA16_C)
+#define IDX_IA16_I  ((SIZ_IA16_C * 1) + 0)
+#define IDX_IA16_A  ((SIZ_IA16_C * 0) + 0)
+#define IA16_I(c)   (((c) >> IDX_IA16_I) & MSK_IA16_C)
+#define IA16_A(c)   (((c) >> IDX_IA16_A) & MSK_IA16_C)
+#define I_IA16(c)   (((c) & MSK_IA16_C) << IDX_IA16_I)
+#define A_IA16(c)   (((c) & MSK_IA16_C) << IDX_IA16_A)
 
-// rgba16
+// RGBA16
 //   0000 0000 0000 0000 0000 0000 0001 1111
 // R 0000 0000 0000 0000 1111 1000 0000 0000 >> 0xB  & 0x1F = 0-31 * (255/31 = 8.22580645161)   = 0..255
 // G 0000 0000 0000 0000 0000 0111 1100 0000 >> 0x6  & 0x1F = 0-31 * (255/31 = 8.22580645161)   = 0..255
 // B 0000 0000 0000 0000 0000 0000 0011 1110 >> 0x1  & 0x1F = 0-31 * (255/31 = 8.22580645161)   = 0..255
 // A 0000 0000 0000 0000 0000 0000 0000 0001 >> 0x0  & 0x1  = 0-1
+#define SIZ_RGBA16_C 0x5
+#define MSK_RGBA16_C BITMASK(SIZ_RGBA16_C)
+#define IDX_RGBA16_R ((SIZ_RGBA16_C * 2) + 1)
+#define IDX_RGBA16_G ((SIZ_RGBA16_C * 1) + 1)
+#define IDX_RGBA16_B ((SIZ_RGBA16_C * 0) + 1)
+#define RGBA16_R(c)  (((c) >> IDX_RGBA16_R) & MSK_RGBA16_C)
+#define RGBA16_G(c)  (((c) >> IDX_RGBA16_G) & MSK_RGBA16_C)
+#define RGBA16_B(c)  (((c) >> IDX_RGBA16_B) & MSK_RGBA16_C)
+#define R_RGBA16(c)  (((c) & MSK_RGBA16_C) << IDX_RGBA16_R)
+#define G_RGBA16(c)  (((c) & MSK_RGBA16_C) << IDX_RGBA16_G)
+#define B_RGBA16(c)  (((c) & MSK_RGBA16_C) << IDX_RGBA16_B)
+#define SIZ_RGBA16_A 0x1
+#define MSK_RGBA16_A BITMASK(SIZ_RGBA16_A)
+#define IDX_RGBA16_A ((SIZ_RGBA16_A * 0) + 0)
+#define RGBA16_A(c)  (((c) >> IDX_RGBA16_A) & MSK_RGBA16_A)
+#define A_RGBA16(c)  (((c) & MSK_RGBA16_A) << IDX_RGBA16_A)
 
-// rgba32
+// RGBA32
 // R 1111 1111 0000 0000 0000 0000 0000 0000 >> 0x20 & 0xFF                                     = 0..255
 // G 0000 0000 1111 1111 0000 0000 0000 0000 >> 0x10 & 0xFF                                     = 0..255
 // B 0000 0000 0000 0000 1111 1111 0000 0000 >> 0x8  & 0xFF                                     = 0..255
 // A 0000 0000 0000 0000 0000 0000 1111 1111 >> 0x0  & 0xFF                                     = 0..255
+#define SIZ_RGBA32_C 0x8
+#define MSK_RGBA32_C BITMASK(SIZ_RGBA32_C)
+#define IDX_RGBA32_R ((SIZ_RGBA32_C * 3) + 0)
+#define IDX_RGBA32_G ((SIZ_RGBA32_C * 2) + 0)
+#define IDX_RGBA32_B ((SIZ_RGBA32_C * 1) + 0)
+#define IDX_RGBA32_A ((SIZ_RGBA32_C * 0) + 0)
+#define RGBA32_R(c)  (((c) >> IDX_RGBA32_R) & MSK_RGBA32_C)
+#define RGBA32_G(c)  (((c) >> IDX_RGBA32_G) & MSK_RGBA32_C)
+#define RGBA32_B(c)  (((c) >> IDX_RGBA32_B) & MSK_RGBA32_C)
+#define RGBA32_A(c)  (((c) >> IDX_RGBA32_A) & MSK_RGBA32_C)
+#define R_RGBA32(c)  (((c) & MSK_RGBA32_C) << IDX_RGBA32_R)
+#define G_RGBA32(c)  (((c) & MSK_RGBA32_C) << IDX_RGBA32_G)
+#define B_RGBA32(c)  (((c) & MSK_RGBA32_C) << IDX_RGBA32_B)
+#define A_RGBA32(c)  (((c) & MSK_RGBA32_A) << IDX_RGBA32_A)
+#define SIZ_RGBA32_A SIZ_RGBA32_C
+#define MSK_RGBA32_A MSK_RGBA32_C
 
-// ci4
+// CI4
 // P 0000 0000 0000 0000 0000 0000 0000 1111 >> 0x0  & 0xF  = 0-15 * (255/15 = 17)              = 0..255
-// RGBA16
+#define SIZ_CI4 0x4
+#define MSK_CI4 BITMASK(SIZ_CI4)
 
-// ci8
+// CI8
 // P 0000 0000 0000 0000 0000 0000 1111 1111 >> 0x0  & 0xFF                                     = 0-255
-// RGBA16
+#define SIZ_CI8 0x8
+#define MSK_CI8 BITMASK(SIZ_CI8)
 
-#include "PR/gbi.h"
+
+// -- Direct format conversion macros --
+
+
+#define I4_TO_RGBA16_C(c)                               (((c) << (SIZ_RGBA16_C - SIZ_I4)) & MSK_RGBA16_C)
+#define I8_TO_RGBA16_C(c)                               (((c) >> (SIZ_I8 - SIZ_RGBA16_C)) & MSK_RGBA16_C)
+
+#define RGBA16_COMPOSITE(r, g, b, a)                    (R_RGBA16(r) | G_RGBA16(g) | B_RGBA16(b) | A_RGBA16(a))
+#define RGBA16_COMPOSITE_GRAYSCALE(val, alpha)          RGBA16_COMPOSITE((val), (val), (val), (alpha))
+
+#define COMPOSITE_TO_COLOR(src, bitmask, index)         (((((src) >> (index)) & (bitmask)) * 255.0f) / (bitmask))
+#define COLOR_TO_COMPOSITE(src, bitmask, index)         (((CompositeColor)(((src) * (bitmask)) / 255.0f) & (bitmask)) << (index))
+
+#define COMPOSITE_TO_COLORF(src, bitmask, index)        ((ColorF)(((src) >> (index)) & (bitmask)) / (bitmask))
+#define COLORF_TO_COMPOSITE(src, bitmask, index)        (((CompositeColor)((src) * (bitmask)) & (bitmask)) << (index))
+
+#define COLORRGB0_TO_RGBA32(src)                        (R_RGBA32((src)[0]) | G_RGBA32((src)[1]) | B_RGBA32((src)[2]))
+#define COLORRGB1_TO_RGBA32(src)                        (R_RGBA32((src)[0]) | G_RGBA32((src)[1]) | B_RGBA32((src)[2]) | MSK_RGBA32_A)
+#define COLORRGBA_TO_RGBA32(src)                        (R_RGBA32((src)[0]) | G_RGBA32((src)[1]) | B_RGBA32((src)[2]) | A_RGBA32((src)[3]))
+
+#define COLORRGBA_TO_RGBA16(src)                        GPACK_RGBA5551((src)[0], (src)[1], (src)[2], (src)[3])
+#define RGBA32_TO_RGBA16(src)                           GPACK_RGBA5551(RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src))
 
 
 // -- Presets --
 
 
-// I4 (I[0..15])                                     IIII
-#define COLOR_I4_BLACK                             0b0000 // 0000 | 0x0 |  0
-#define COLOR_I4_GRAY                              0b0111 // 0111 | 0x7 |  7
-#define COLOR_I4_WHITE                             0b1111 // 1111 | 0xF | 15
+// I4 (I[0..15])                                              IIII
+#define COLOR_I4_BLACK                                      0b0000 // 0000 | 0x0 |  0
+#define COLOR_I4_GRAY                                       0b0111 // 0111 | 0x7 |  7
+#define COLOR_I4_WHITE                                      0b1111 // 1111 | 0xF | 15
 
 
-// I8 (I[0..255])                                    IIIIIIII
-#define COLOR_I8_BLACK                             0b00000000 // 0x00 // 0000 0000 |   0
-#define COLOR_I8_GRAY                              0b01111111 // 0x7F // 0111 1111 | 127
-#define COLOR_I8_WHITE                             0b11111111 // 0xFF // 1111 1111 | 255
+// I8 (I[0..255])                                         IIIIIIII
+#define COLOR_I8_BLACK                                  0b00000000 // 0x00 // 0000 0000 |   0
+#define COLOR_I8_GRAY                                   0b01111111 // 0x7F // 0111 1111 | 127
+#define COLOR_I8_WHITE                                  0b11111111 // 0xFF // 1111 1111 | 255
 
 
-// IA4 (I[0..7], A[0..1])                            IIIA
-#define COLOR_IA4_NONE                             0b0000 // | 000 0 | 0x00 | 0 0
-#define COLOR_IA4_BLACK                            0b0000 // | 000 1 | 0x0F | 0 1
-#define COLOR_IA4_GRAY                             0b0000 // | 011 1 | 0x7F | 3 1
-#define COLOR_IA4_WHITE                            0b0000 // | 111 1 | 0xFF | 7 1
+// IA4 (I[0..7], A[0..1])                                     IIIA
+#define COLOR_IA4_NONE                                      0b0000 // | 000 0 | 0x00 | 0 0
+#define COLOR_IA4_BLACK                                     0b0000 // | 000 1 | 0x0F | 0 1
+#define COLOR_IA4_GRAY                                      0b0000 // | 011 1 | 0x7F | 3 1
+#define COLOR_IA4_WHITE                                     0b0000 // | 111 1 | 0xFF | 7 1
 
 
-// IA8 (I[0..15], A[0..15])                         IIIIAAAA
-#define COLOR_IA8_NONE                            0b00000000 // 0000 0000 | 0x00 |  0  0
-#define COLOR_IA8_BLACK                           0b00001111 // 0000 1111 | 0x0F |  0 15
-#define COLOR_IA8_GRAY                            0b01111111 // 0111 1111 | 0x7F |  7 15
-#define COLOR_IA8_WHITE                           0b11111111 // 1111 1111 | 0xFF | 15 15
+// IA8 (I[0..15], A[0..15])                               IIIIAAAA
+#define COLOR_IA8_NONE                                  0b00000000 // 0000 0000 | 0x00 |  0  0
+#define COLOR_IA8_BLACK                                 0b00001111 // 0000 1111 | 0x0F |  0 15
+#define COLOR_IA8_GRAY                                  0b01111111 // 0111 1111 | 0x7F |  7 15
+#define COLOR_IA8_WHITE                                 0b11111111 // 1111 1111 | 0xFF | 15 15
 
 
 // IA16 (I[0..255], A[0..255])                    IIIIIIIIAAAAAAAA
@@ -82,188 +172,268 @@
 #define COLOR_IA16_WHITE                        0b1111111111111111 // 1111 1111 1111 1111 | 0xFFFF | 255 255
 
 
-// RGBA16 (RGB[0..31], A[0..1])
+// Color RGB(A) Arrays:
 
-// Grayscale Colors
-//                                                                                     RRRRRGGGGGBBBBBA | RRRR RGGG GGBB BBBA | RRRRR GGGGG BBBBB A | 0x0000 |  R  G  B  A
-#define COLOR_RGBA16_NONE                       RGBA16_COMPOSITE_GRAYSCALE( 0, 0) // 0b0000000000000000 | 0000 0000 0000 0000 | 00000 00000 00000 0 | 0x0000 |  0  0  0  0
-#define COLOR_RGBA16_BLACK                      RGBA16_COMPOSITE_GRAYSCALE( 0, 1) // 0b0000000000000001 | 0000 0000 0000 0001 | 00000 00000 00000 1 | 0x0001 |  0  0  0  1
-#define COLOR_RGBA16_DARK_GRAY                  RGBA16_COMPOSITE_GRAYSCALE( 7, 1) // 0b0011100111001111 | 0011 1001 1100 1111 | 00111 00111 00111 1 | 0x39CF |  7  7  7  1
-#define COLOR_RGBA16_GRAY                       RGBA16_COMPOSITE_GRAYSCALE(15, 1) // 0b0111101111011111 | 0111 1011 1101 1111 | 01111 01111 01111 1 | 0x7BDF | 15 15 15  1
-#define COLOR_RGBA16_LIGHT_GRAY                 RGBA16_COMPOSITE_GRAYSCALE(23, 1) // 0b1011110111101111 | 1011 1101 1110 1111 | 10111 10111 10111 1 | 0xBDEF | 23 23 23  1
-#define COLOR_RGBA16_WHITE                      RGBA16_COMPOSITE_GRAYSCALE(31, 1) // 0b1111111111111111 | 1111 1111 1111 1111 | 11111 11111 11111 1 | 0xFFFF | 31 31 31  1
+
+// RGBA [0..255]
+#define COLOR_RGBA_NONE                         { 0x00, 0x00, 0x00, 0x00 } //   0   0   0   0
+#define COLOR_RGBA_BLACK                        { 0x00, 0x00, 0x00, 0xFF } //   0   0   0 255
+#define COLOR_RGBA_DARK_GRAY                    { 0x3F, 0x3F, 0x3F, 0xFF } //  63  63  63 255
+#define COLOR_RGBA_GRAY                         { 0x7F, 0x7F, 0x7F, 0xFF } // 127 127 127 255
+#define COLOR_RGBA_LIGHT_GRAY                   { 0xBF, 0xBF, 0xBF, 0xFF } // 191 191 191 255
+#define COLOR_RGBA_WHITE                        { 0xFF, 0xFF, 0xFF, 0xFF } // 255 255 255 255
+
+// Primary/secondary/tertiary
+#define COLOR_RGBA_RED                          { 0xFF, 0x00, 0x00, 0xFF } // 255   0   0 255
+#define COLOR_RGBA_ORANGE                       { 0xFF, 0x7F, 0x00, 0xFF } // 255 127   0 255
+#define COLOR_RGBA_YELLOW                       { 0xFF, 0xFF, 0x00, 0xFF } // 255 255   0 255
+#define COLOR_RGBA_LIME                         { 0x7F, 0xFF, 0x00, 0xFF } // 127 255   0 255
+#define COLOR_RGBA_GREEN                        { 0x00, 0xFF, 0x00, 0xFF } //   0 255   0 255
+#define COLOR_RGBA_SPRING                       { 0x00, 0xFF, 0x7F, 0xFF } //   0 255 127 255
+#define COLOR_RGBA_CYAN                         { 0x00, 0xFF, 0xFF, 0xFF } //   0 255 255 255
+#define COLOR_RGBA_SKY                          { 0x00, 0x7F, 0xFF, 0xFF } //   0 127 255 255
+#define COLOR_RGBA_BLUE                         { 0x00, 0x00, 0xFF, 0xFF } //   0   0 255 255
+#define COLOR_RGBA_PURPLE                       { 0x7F, 0x00, 0xFF, 0xFF } // 127   0 255 255
+#define COLOR_RGBA_MAGENTA                      { 0xFF, 0x00, 0xFF, 0xFF } // 255   0 255 255
+#define COLOR_RGBA_PINK                         { 0xFF, 0x00, 0x7F, 0xFF } // 255   0 127 255
+
+// Shades
+#define COLOR_RGBA_LIGHT_RED                    { 0xFF, 0x7F, 0x7F, 0xFF } // 255 127 127 255
+#define COLOR_RGBA_LIGHT_YELLOW                 { 0xFF, 0xFF, 0x7F, 0xFF } // 255 255 127 255
+#define COLOR_RGBA_VERY_LIGHT_YELLOW            { 0xFF, 0xFF, 0xBF, 0xFF } // 255 255 191 255
+#define COLOR_RGBA_LIGHT_GREEN                  { 0x7F, 0xFF, 0x7F, 0xFF } // 127 255 127 255
+#define COLOR_RGBA_VERY_LIGHT_CYAN              { 0xBF, 0xFF, 0xFF, 0xFF } // 191 255 255 255
+#define COLOR_RGBA_LIGHT_SKY                    { 0x7F, 0xBF, 0xFF, 0xFF } // 127 191 255 255
+#define COLOR_RGBA_LIGHT_BLUE                   { 0x7F, 0x7F, 0xFF, 0xFF } // 127 127 255 255
+#define COLOR_RGBA_VERY_LIGHT_BLUE              { 0xBF, 0xBF, 0xFF, 0xFF } // 191 191 255 255
+
+// Elemental
+#define COLOR_RGBA_JRB_SKY                      { 0x50, 0x64, 0x5A, 0xFF } //  80 100  90 255
+#define COLOR_RGBA_WATER                        { 0x05, 0x50, 0x96, 0xFF } //   5  80 150 255
+#define COLOR_RGBA_ICE                          { 0x7D, 0x9A, 0xD0, 0xFF } // 125 154 208 255
+#define COLOR_RGBA_LAVA                         { 0x8F, 0x06, 0x00, 0xFF } // 143   6   0 255
+#define COLOR_RGBA_SAND                         { 0xDC, 0xA9, 0x73, 0xFF } // 220 169 115 255
+#define COLOR_RGBA_ELECTRIC                     { 0xFF, 0xEE, 0x00, 0xFF } // 255 238   0 255
+
+// Lights
+#define COLOR_RGBA_AMP_LIGHT                    COLOR_RGBA_ELECTRIC
+#define COLOR_RGBA_STAR_LIGHT                   { 0xFF, 0xF0, 0x00, 0xFF } // 255 240   0 255
+#define COLOR_RGBA_TRANSPARENT_STAR_LIGHT       { 0x0F, 0x19, 0x73, 0xFF } //  15  25 115 255 // 0x1E32E6FF //  30  50 230 255
+#define COLOR_RGBA_RED_FLAME_LIGHT              { 0xFF, 0x32, 0x00, 0xC8 } // 255  50   0 200
+#define COLOR_RGBA_BLUE_FLAME_LIGHT             { 0x64, 0x64, 0xFF, 0xFF } // 100 100 255 255
+#define COLOR_RGBA_EXPLOSION_LIGHT              COLOR_RGBA_LIGHT_YELLOW
+
+// Coins
+#define COLOR_RGBA_COIN_YELLOW                  COLOR_RGBA_YELLOW
+#define COLOR_RGBA_COIN_BLUE                    { 0x80, 0x80, 0xFF, 0xFF } // 128 128 255 255
+#define COLOR_RGBA_COIN_RED                     COLOR_RGBA_RED
+
+// Mario body lights - these should match the light groups in actors/mario/model.inc.c
+#define COLOR_RGBA_MARIO_LIGHTS_BLUE            { 0x00, 0x00, 0xFF, 0x00 } //   0   0 255   0
+#define COLOR_RGBA_MARIO_LIGHTS_RED             { 0xFF, 0x00, 0x00, 0x00 } // 255   0   0   0
+#define COLOR_RGBA_MARIO_LIGHTS_WHITE           { 0xFF, 0xFF, 0xFF, 0x00 } // 255 255 255   0
+#define COLOR_RGBA_MARIO_LIGHTS_BROWN1          { 0x72, 0x1C, 0x0E, 0x00 } // 114  28  14   0
+#define COLOR_RGBA_MARIO_LIGHTS_BEIGE           { 0xFE, 0xC1, 0x79, 0x00 } // 254 193 121   0
+#define COLOR_RGBA_MARIO_LIGHTS_BROWN2          { 0x73, 0x06, 0x00, 0x00 } // 115   6   0   0
+
+// Debug box
+#define COLOR_RGBA_DEBUG_DEFAULT                { 0x00, 0xFF, 0x00, 0x00 } //   0 255   0   0
+#define COLOR_RGBA_DEBUG_ALPHA                  { 0x00, 0x00, 0x00, 0x7F } //   0   0   0 127
+#define COLOR_RGBA_DEBUG_POSITION               { 0xFF, 0xFF, 0xFF, 0x80 } // 255 255 255 128
+#define COLOR_RGBA_DEBUG_HITBOX                 { 0x00, 0x00, 0xFF, 0x80 } //   0   0 255 128
+#define COLOR_RGBA_DEBUG_HURTBOX                { 0xF0, 0x00, 0x00, 0x8F } // 240   0   0 143
+#define COLOR_RGBA_DEBUG_WARP                   { 0xFF, 0xA5, 0x00, 0x80 } // 255 165   0 128
+#define COLOR_RGBA_DEBUG_PUPPYVOLUME            { 0x00, 0xFF, 0x00, 0x00 } //   0 255   0   0
+#define COLOR_RGBA_DEBUG_LIGHT                  { 0xFF, 0x00, 0xFF, 0x08 } // 255   0 255   8
 
 // Crash screen
-//                                                                                   RRRRRGGGGGBBBBBA | RRRR RGGG GGBB BBBA | RRRRR GGGGG BBBBB A | 0x0000 |  R  G  B  A
-#define COLOR_RGBA16_CRASH_ERROR                RGBA16_COMPOSITE(12,  9,  9, 1) // 0b0110001001010011 | 0110 0010 0101 0011 | 01100 01001 01001 1 | 0x6253 | 12  9  9  1
-#define COLOR_RGBA16_CRASH_ASSERT               RGBA16_COMPOSITE(10,  9, 21, 1) // 0b0101001001100011 | 0101 0010 0110 0011 | 01010 01001 10001 1 | 0x5263 | 10  9 21  1
-#define COLOR_RGBA16_CRASH_THREAD               RGBA16_COMPOSITE(15, 15, 31, 1) // 0b0111101111111111 | 0111 1011 1111 1111 | 01111 01111 11111 1 | 0x7BFF | 15 15 31  1
-#define COLOR_RGBA16_CRASH_SELECT               RGBA16_COMPOSITE(31, 15,  0, 1) // 0b1111101111000001 | 1111 1011 1100 0001 | 11111 01111 00000 1 | 0xFBC1 | 31 15  0  1
-#define COLOR_RGBA16_CRASH_CURRFUNC             RGBA16_COMPOSITE(31, 15, 15, 1) // 0b1111101111011111 | 1111 1011 1101 1111 | 11111 01111 01111 1 | 0xFBDF | 31 15 15  1
-#define COLOR_RGBA16_CRASH_FUNCTION             RGBA16_COMPOSITE(31, 31, 15, 1) // 0b1111111111011111 | 1111 1111 1101 1111 | 11111 11111 01111 1 | 0xFFDF | 31 31 15  1
-#define COLOR_RGBA16_CRASH_FUNCTION_2           RGBA16_COMPOSITE(31, 31, 24, 1) // 0b1111111111110001 | 1111 1111 1111 0001 | 11111 11111 11000 1 | 0xFFF1 | 31 31 24  1
-#define COLOR_RGBA16_CRASH_REGISTER             RGBA16_COMPOSITE(24, 24, 31, 1) // 0b1100011000111111 | 1100 0110 0011 1111 | 11000 11000 11111 1 | 0xC63F | 24 24 31  1
-#define COLOR_RGBA16_CRASH_BACKGROUND           RGBA16_COMPOSITE(28, 28, 28, 0) // 0b1110011100111000 | 1110 0111 0011 1000 | 11100 11100 11100 0 | 0xE738 | 28 28 28  0
-#define COLOR_RGBA16_CRASH_BLACK                COLOR_RGBA16_BLACK
-#define COLOR_RGBA16_CRASH_WHITE                COLOR_RGBA16_WHITE
+#define COLOR_RGBA_CRASH_DISASM_INST            COLOR_RGBA_VERY_LIGHT_YELLOW
+#define COLOR_RGBA_CRASH_DISASM_NOP             COLOR_RGBA_LIGHT_GRAY
+#define COLOR_RGBA_CRASH_UNKNOWN                COLOR_RGBA_LIGHT_GRAY
+#define COLOR_RGBA_CRASH_IMMEDIATE              COLOR_RGBA_LIGHT_GREEN
+#define COLOR_RGBA_CRASH_DISASM_REG             COLOR_RGBA_LIGHT_SKY
+#define COLOR_RGBA_CRASH_DISASM_REG_2           COLOR_RGBA_VERY_LIGHT_CYAN
+#define COLOR_RGBA_CRASH_FUMCTION_NAME          COLOR_RGBA_LIGHT_YELLOW
+#define COLOR_RGBA_CRASH_FUNCTION_NAME_2        COLOR_RGBA_VERY_LIGHT_YELLOW
+#define COLOR_RGBA_CRASH_REGISTER               { 0x3F, 0xBF, 0x7F, 0xFF } //  63 191 127 255
+#define COLOR_RGBA_CRASH_DESCRIPTION            { 0xFF, 0x3F, 0x00, 0xFF } // 255  63   0 255
+#define COLOR_RGBA_CRASH_THREAD                 COLOR_RGBA_LIGHT_BLUE
+#define COLOR_RGBA_CRASH_AT                     COLOR_RGBA_LIGHT_RED
+#define COLOR_RGBA_CRASH_CONTROLS               COLOR_RGBA_LIGHT_GRAY
+#define COLOR_RGBA_CRASH_HEADER                 COLOR_RGBA_LIGHT_GRAY
+#define COLOR_RGBA_CRASH_DIVIDER                COLOR_RGBA_LIGHT_GRAY
+#define COLOR_RGBA_CRASH_PAGE_NAME              COLOR_RGBA_ORANGE
+#define COLOR_RGBA_CRASH_FILE_NAME              COLOR_RGBA_SKY
+#define COLOR_RGBA_CRASH_RAM_VIEW_H1            { 0x00, 0xB7, 0xFF, 0xFF } //   0 191 255 255
+#define COLOR_RGBA_CRASH_RAM_VIEW_H2            { 0x00, 0x87, 0xFF, 0xFF } //   0 135 255 255
+#define COLOR_RGBA_CRASH_RAM_VIEW_B1            { 0x5F, 0xDF, 0x5F, 0xFF } //  95 223  95 255
+#define COLOR_RGBA_CRASH_RAM_VIEW_B2            { 0x1F, 0x9F, 0x1F, 0xFF } //  31 159  31 255
+#define COLOR_RGBA_CRASH_SELECT                 COLOR_RGBA_ORANGE
+#define COLOR_RGBA_CRASH_ERROR                  { 0x5F, 0x47, 0x47, 0xFF } //  95  71  71 255
+#define COLOR_RGBA_CRASH_BACKGROUND             { 0x00, 0x00, 0x00, 0xBF } //   0   0   0 191
+
+
+// RGB [0..255]
+
+// Grayscale    
+#define COLOR_RGB_BLACK                         { 0x00, 0x00, 0x00 } //   0   0   0
+#define COLOR_RGB_DARK_GRAY                     { 0x3F, 0x3F, 0x3F } //  63  63  63
+#define COLOR_RGB_GRAY                          { 0x7F, 0x7F, 0x7F } // 127 127 127
+#define COLOR_RGB_LIGHT                         { 0xBF, 0xBF, 0xBF } // 191 191 191
+#define COLOR_RGB_WHITE                         { 0xFF, 0xFF, 0xFF } // 255 255 255
+
+// Primary/secondary/tertiary
+#define COLOR_RGB_RED                           { 0xFF, 0x00, 0x00 } // 255   0   0
+#define COLOR_RGB_ORANGE                        { 0xFF, 0x7F, 0x00 } // 255 127   0
+#define COLOR_RGB_YELLOW                        { 0xFF, 0xFF, 0x00 } // 255 255   0
+#define COLOR_RGB_LIME                          { 0x7F, 0xFF, 0x00 } // 127 255   0
+#define COLOR_RGB_GREEN                         { 0x00, 0xFF, 0x00 } //   0 255   0
+#define COLOR_RGB_SPRING                        { 0x00, 0xFF, 0x7F } //   0 255 127
+#define COLOR_RGB_CYAN                          { 0x00, 0xFF, 0xFF } //   0 255 255
+#define COLOR_RGB_SKY                           { 0x00, 0x7F, 0xFF } //   0 127 255
+#define COLOR_RGB_BLUE                          { 0x00, 0x00, 0xFF } //   0   0 255
+#define COLOR_RGB_PURPLE                        { 0x7F, 0x00, 0xFF } // 127   0 255
+#define COLOR_RGB_MAGENTA                       { 0xFF, 0x00, 0xFF } // 255   0 255
+#define COLOR_RGB_PINK                          { 0xFF, 0x00, 0x7F } // 255   0 127
+
+// Elemental
+#define COLOR_RGB_JRB_SKY                       { 0x50, 0x64, 0x5A } //  80 100  90
+#define COLOR_RGB_WATER                         { 0x05, 0x50, 0x96 } //   5  80 150
+#define COLOR_RGB_ICE                           { 0x7D, 0x9A, 0xD0 } // 125 154 208
+#define COLOR_RGB_LAVA                          { 0x8F, 0x06, 0x00 } // 143   6   0
+#define COLOR_RGB_SAND                          { 0xDC, 0xA9, 0x73 } // 220 169 115
+#define COLOR_RGB_ELECTRIC                      { 0xFF, 0xEE, 0x00 } // 255 238   0
+
+#define COLOR_RGB_COIN_YELLOW                   COLOR_RGB_YELLOW
+#define COLOR_RGB_COIN_BLUE                     { 0x80, 0x80, 0xFF } // 128 128 255
+#define COLOR_RGB_COIN_RED                      COLOR_RGB_RED
+
+// Other:
+
+// Lights defaults
+#define DEFAULT_LIGHT_AMB                       0x7F
+#define DEFAULT_LIGHT_COL                       0xFE
+#define DEFAULT_LIGHT_DIR                       0x28
+
+// RGBF [0..1]
+#define COLOR_RGBF_WHITE                        { 1.0f, 1.0f, 1.0f } // 0xFF 0xFF 0xFF | 255 255 255
+#define COLOR_RGBF_RED                          { 1.0f, 0.0f, 0.0f } // 0xFF 0x00 0x00 | 255   0   0
+#define COLOR_RGBF_GREEN                        { 0.0f, 1.0f, 0.0f } // 0x00 0xFF 0x00 |   0 255   0
+#define COLOR_RGBF_BLUE                         { 0.0f, 0.0f, 1.0f } // 0x00 0x00 0xFF |   0   0 255
+#define COLOR_RGBF_ERR_DARK_BLUE                { 0.0f, 0.0f, 6.0f } // 0x00 0x00 0x5FF? |   0   0 1535?
+#define COLOR_RGBF_PINK                         { 1.0f, 0.0f, 1.0f } // 0xFF 0x00 0xFF | 255   0 255
+#define COLOR_RGBF_BLACK                        { 0.0f, 0.0f, 0.0f } // 0x00 0x00 0x00 |   0   0   0
+#define COLOR_RGBF_GREY                         { 0.6f, 0.6f, 0.6f } // 0x99 0x99 0x99 | 153 153 153
+#define COLOR_RGBF_DARK_GREY                    { 0.4f, 0.4f, 0.4f } // 0x66 0x66 0x66 | 102 102 102
+#define COLOR_RGBF_YELLOW                       { 1.0f, 1.0f, 1.0f } // 0xFF 0xFF 0xFF | 255 255 255
 
 
 // RGBA32 (RGB[0..255], A[0..255])
 
 // Grayscale
-#define COLOR_RGBA32_NONE                   0x00000000 //   0   0   0   0
-#define COLOR_RGBA32_BLACK                  0x000000FF //   0   0   0 255
-#define COLOR_RGBA32_DARK_GRAY              0x3F3F3FFF //  63  63  63 255
-#define COLOR_RGBA32_GRAY                   0x7F7F7FFF // 127 127 127 255
-#define COLOR_RGBA32_LIGHT_GRAY             0xBFBFBFFF // 191 191 191 255
-#define COLOR_RGBA32_WHITE                  0xFFFFFFFF // 255 255 255 255
+#define COLOR_RGBA32_NONE                       COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_NONE)
+#define COLOR_RGBA32_BLACK                      COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_BLACK)
+#define COLOR_RGBA32_DARK_GRAY                  COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DARK_GRAY)
+#define COLOR_RGBA32_GRAY                       COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_GRAY)
+#define COLOR_RGBA32_LIGHT_GRAY                 COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_LIGHT_GRAY)
+#define COLOR_RGBA32_WHITE                      COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_WHITE)
 
 // Primary/secondary/tertiary
-#define COLOR_RGBA32_RED                    0xFF0000FF // 255   0   0 255
-#define COLOR_RGBA32_ORANGE                 0xFF7F00FF // 255 127   0 255
-#define COLOR_RGBA32_YELLOW                 0xFFFF00FF // 255 255   0 255
-#define COLOR_RGBA32_LIME                   0x7FFF00FF // 127 255   0 255
-#define COLOR_RGBA32_GREEN                  0x00FF00FF //   0 255   0 255
-#define COLOR_RGBA32_SPRING                 0x00FF7FFF //   0 255 127 255
-#define COLOR_RGBA32_CYAN                   0x00FFFFFF //   0 255 255 255
-#define COLOR_RGBA32_SKY                    0x007FFFFF //   0 127 255 255
-#define COLOR_RGBA32_BLUE                   0x0000FFFF //   0   0 255 255
-#define COLOR_RGBA32_PURPLE                 0x7F00FFFF // 127   0 255 255
-#define COLOR_RGBA32_MAGENTA                0xFF00FFFF // 255   0 255 255
-#define COLOR_RGBA32_PINK                   0xFF007FFF // 255   0 127 255
+#define COLOR_RGBA32_RED                        COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_RED)
+#define COLOR_RGBA32_ORANGE                     COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_ORANGE)
+#define COLOR_RGBA32_YELLOW                     COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_YELLOW)
+#define COLOR_RGBA32_LIME                       COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_LIME)
+#define COLOR_RGBA32_GREEN                      COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_GREEN)
+#define COLOR_RGBA32_SPRING                     COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_SPRING)
+#define COLOR_RGBA32_CYAN                       COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CYAN)
+#define COLOR_RGBA32_SKY                        COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_SKY)
+#define COLOR_RGBA32_BLUE                       COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_BLUE)
+#define COLOR_RGBA32_PURPLE                     COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_PURPLE)
+#define COLOR_RGBA32_MAGENTA                    COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_MAGENTA)
+#define COLOR_RGBA32_PINK                       COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_PINK)
+
+// Shades
+#define COLOR_RGBA32_LIGHT_RED                  COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_LIGHT_RED)
+#define COLOR_RGBA32_LIGHT_YELLOW               COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_LIGHT_YELLOW)
+#define COLOR_RGBA32_VERY_LIGHT_YELLOW          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_VERY_LIGHT_YELLOW)
+#define COLOR_RGBA32_LIGHT_GREEN                COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_LIGHT_GREEN)
+#define COLOR_RGBA32_VERY_LIGHT_CYAN            COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_VERY_LIGHT_CYAN)
+#define COLOR_RGBA32_LIGHT_SKY                  COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_LIGHT_SKY)
+#define COLOR_RGBA32_LIGHT_BLUE                 COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_LIGHT_BLUE)
+#define COLOR_RGBA32_VERY_LIGHT_BLUE            COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_VERY_LIGHT_BLUE)
 
 // Elemental
-#define COLOR_RGBA32_JRB_SKY                0x50645AFF //  80 100  90 255
-#define COLOR_RGBA32_WATER                  0x055096FF //   5  80 150 255
-#define COLOR_RGBA32_ICE                    0x7D9AD0FF // 125 154 208 255
-#define COLOR_RGBA32_LAVA                   0x8F0600FF // 143   6   0 255
-#define COLOR_RGBA32_SAND                   0xDCA973FF // 220 169 115 255
-#define COLOR_RGBA32_ELECTRIC               0xFFEE00FF // 255 238   0 255
+#define COLOR_RGBA32_JRB_SKY                    COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_JRB_SKY)
+#define COLOR_RGBA32_WATER                      COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_WATER)
+#define COLOR_RGBA32_ICE                        COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_ICE)
+#define COLOR_RGBA32_LAVA                       COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_LAVA)
+#define COLOR_RGBA32_SAND                       COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_SAND)
+#define COLOR_RGBA32_ELECTRIC                   COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_ELECTRIC)
 
 // Lights
-#define COLOR_RGBA32_AMP_LIGHT              COLOR_RGBA32_ELECTRIC
-#define COLOR_RGBA32_STAR_LIGHT             0xFFF000FF // 255 240   0 255
-#define COLOR_RGBA32_TRANSPARENT_STAR_LIGHT 0x0F1973FF //  15  25 115 255 // 0x1E32E6FF //  30  50 230 255
-#define COLOR_RGBA32_RED_FLAME_LIGHT        0xFF3200C8 // 255  50   0 200
-#define COLOR_RGBA32_BLUE_FLAME_LIGHT       0x6464FFFF // 100 100 255 255
-#define COLOR_RGBA32_EXPLOSION_LIGHT        0xFFFF7FFF // 255 255 127 255
+#define COLOR_RGBA32_AMP_LIGHT                  COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA32_AMP_LIGHT)
+#define COLOR_RGBA32_STAR_LIGHT                 COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_STAR_LIGHT)
+#define COLOR_RGBA32_TRANSPARENT_STAR_LIGHT     COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_TRANSPARENT_STAR_LIGHT)
+#define COLOR_RGBA32_RED_FLAME_LIGHT            COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_RED_FLAME_LIGHT)
+#define COLOR_RGBA32_BLUE_FLAME_LIGHT           COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_BLUE_FLAME_LIGHT)
+#define COLOR_RGBA32_EXPLOSION_LIGHT            COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_EXPLOSION_LIGHT)
 
 // Coins
-#define COLOR_RGBA32_COIN_YELLOW_LIGHT      0x7F7F007F // 127 127   0 127
-#define COLOR_RGBA32_COIN_BLUE_LIGHT        0x40407F7F //  64  64 127 127
-#define COLOR_RGBA32_COIN_RED_LIGHT         0x7F00007F // 127   0   0 127
+#define COLOR_RGBA32_COIN_YELLOW_LIGHT          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_COIN_YELLOW_LIGHT)
+#define COLOR_RGBA32_COIN_BLUE_LIGHT            COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_COIN_BLUE_LIGHT)
+#define COLOR_RGBA32_COIN_RED_LIGHT             COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_COIN_RED_LIGHT)
 
 // Mario body lights - these should match the light groups in actors/mario/model.inc.c
-#define COLOR_RGBA32_MARIO_LIGHTS_BLUE      0x0000FF00 //   0   0 255   0
-#define COLOR_RGBA32_MARIO_LIGHTS_RED       0xFF000000 // 255   0   0   0
-#define COLOR_RGBA32_MARIO_LIGHTS_WHITE     0xFFFFFF00 // 255 255 255   0
-#define COLOR_RGBA32_MARIO_LIGHTS_BROWN1    0x721C0E00 // 114  28  14   0
-#define COLOR_RGBA32_MARIO_LIGHTS_BEIGE     0xFEC17900 // 254 193 121   0
-#define COLOR_RGBA32_MARIO_LIGHTS_BROWN2    0x73060000 // 115   6   0   0
+#define COLOR_RGBA32_MARIO_LIGHTS_BLUE          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_MARIO_LIGHTS_BLUE)
+#define COLOR_RGBA32_MARIO_LIGHTS_RED           COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_MARIO_LIGHTS_RED)
+#define COLOR_RGBA32_MARIO_LIGHTS_WHITE         COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_MARIO_LIGHTS_WHITE)
+#define COLOR_RGBA32_MARIO_LIGHTS_BROWN1        COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_MARIO_LIGHTS_BROWN1)
+#define COLOR_RGBA32_MARIO_LIGHTS_BEIGE         COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_MARIO_LIGHTS_BEIGE)
+#define COLOR_RGBA32_MARIO_LIGHTS_BROWN2        COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_MARIO_LIGHTS_BROWN2)
 
 // Debug box
-#define COLOR_RGBA32_DEBUG_DEFAULT          0x00FF0000 //   0 255   0   0
-#define COLOR_RGBA32_DEBUG_ALPHA            0x0000007F //   0   0   0 127
-#define COLOR_RGBA32_DEBUG_POSITION         0x80FFFFFF // 128 255 255 255
-#define COLOR_RGBA32_DEBUG_HITBOX           0x800000FF // 128   0   0 255
-#define COLOR_RGBA32_DEBUG_HURTBOX          0x8FF00000 // 143 240   0   0
-#define COLOR_RGBA32_DEBUG_WARP             0x80FFA500 // 128 255 165   0
-#define COLOR_RGBA32_DEBUG_PUPPYVOLUME      0x0000FF00 //   0   0 255   0
-#define COLOR_RGBA32_DEBUG_LIGHT            0x08FF00FF //   8 255   0 255
+#define COLOR_RGBA32_DEBUG_DEFAULT              COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DEBUG_DEFAULT)
+#define COLOR_RGBA32_DEBUG_ALPHA                COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DEBUG_ALPHA)
+#define COLOR_RGBA32_DEBUG_POSITION             COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DEBUG_POSITION)
+#define COLOR_RGBA32_DEBUG_HITBOX               COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DEBUG_HITBOX)
+#define COLOR_RGBA32_DEBUG_HURTBOX              COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DEBUG_HURTBOX)
+#define COLOR_RGBA32_DEBUG_WARP                 COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DEBUG_WARP)
+#define COLOR_RGBA32_DEBUG_PUPPYVOLUME          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DEBUG_PUPPYVOLUME)
+#define COLOR_RGBA32_DEBUG_LIGHT                COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_DEBUG_LIGHT)
+
+// Crash screen
+#define COLOR_RGBA32_CRASH_DISASM_INST          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_DISASM_INST)
+#define COLOR_RGBA32_CRASH_DISASM_NOP           COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_DISASM_NOP)
+#define COLOR_RGBA32_CRASH_UNKNOWN              COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_UNKNOWN)
+#define COLOR_RGBA32_CRASH_IMMEDIATE            COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_IMMEDIATE)
+#define COLOR_RGBA32_CRASH_DISASM_REG           COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_DISASM_REG)
+#define COLOR_RGBA32_CRASH_DISASM_REG_2         COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_DISASM_REG_2)
+#define COLOR_RGBA32_CRASH_FUMCTION_NAME        COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_FUMCTION_NAME)
+#define COLOR_RGBA32_CRASH_FUNCTION_NAME_2      COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_FUNCTION_NAME_2)
+#define COLOR_RGBA32_CRASH_REGISTER             COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_REGISTER)
+#define COLOR_RGBA32_CRASH_DESCRIPTION          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_DESCRIPTION)
+#define COLOR_RGBA32_CRASH_THREAD               COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_THREAD)
+#define COLOR_RGBA32_CRASH_AT                   COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_AT)
+#define COLOR_RGBA32_CRASH_CONTROLS             COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_CONTROLS)
+#define COLOR_RGBA32_CRASH_HEADER               COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_HEADER)
+#define COLOR_RGBA32_CRASH_DIVIDER              COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_DIVIDER)
+#define COLOR_RGBA32_CRASH_PAGE_NAME            COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_PAGE_NAME)
+#define COLOR_RGBA32_CRASH_FILE_NAME            COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_FILE_NAME)
+#define COLOR_RGBA32_CRASH_RAM_VIEW_H1          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_RAM_VIEW_H1)
+#define COLOR_RGBA32_CRASH_RAM_VIEW_H2          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_RAM_VIEW_H2)
+#define COLOR_RGBA32_CRASH_RAM_VIEW_B1          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_RAM_VIEW_B1)
+#define COLOR_RGBA32_CRASH_RAM_VIEW_B2          COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_RAM_VIEW_B2)
+#define COLOR_RGBA32_CRASH_SELECT               COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_SELECT)
+#define COLOR_RGBA32_CRASH_BACKGROUND           COLORRGBA_TO_RGBA32((ColorRGBA)COLOR_RGBA_CRASH_BACKGROUND)
 
 
-// Color RGB(A) Arrays:
+// RGBA16 (RGB[0..31], A[0..1])
 
-// RGBA [0..255]
-#define COLOR_RGBA_NONE                     { 0x00, 0x00, 0x00, 0x00 } //   0   0   0   0
-#define COLOR_RGBA_BLACK                    { 0x00, 0x00, 0x00, 0xFF } //   0   0   0 255
-#define COLOR_RGBA_DARK                     { 0x3F, 0x3F, 0x3F, 0xFF } //  63  63  63 255
-#define COLOR_RGBA_GRAY                     { 0x7F, 0x7F, 0x7F, 0xFF } // 127 127 127 255
-#define COLOR_RGBA_LIGHT                    { 0xBF, 0xBF, 0xBF, 0xFF } // 191 191 191 255
-#define COLOR_RGBA_WHITE                    { 0xFF, 0xFF, 0xFF, 0xFF } // 255 255 255 255
-
-// Primary/secondary/tertiary
-#define COLOR_RGBA_RED                      { 0xFF, 0x00, 0x00, 0xFF } // 255   0   0 255
-#define COLOR_RGBA_ORANGE                   { 0xFF, 0x7F, 0x00, 0xFF } // 255 127   0 255
-#define COLOR_RGBA_YELLOW                   { 0xFF, 0xFF, 0x00, 0xFF } // 255 255   0 255
-#define COLOR_RGBA_LIME                     { 0x7F, 0xFF, 0x00, 0xFF } // 127 255   0 255
-#define COLOR_RGBA_GREEN                    { 0x00, 0xFF, 0x00, 0xFF } //   0 255   0 255
-#define COLOR_RGBA_SPRING                   { 0x00, 0xFF, 0x7F, 0xFF } //   0 255 127 255
-#define COLOR_RGBA_CYAN                     { 0x00, 0xFF, 0xFF, 0xFF } //   0 255 255 255
-#define COLOR_RGBA_SKY                      { 0x00, 0x7F, 0xFF, 0xFF } //   0 127 255 255
-#define COLOR_RGBA_BLUE                     { 0x00, 0x00, 0xFF, 0xFF } //   0   0 255 255
-#define COLOR_RGBA_PURPLE                   { 0x7F, 0x00, 0xFF, 0xFF } // 127   0 255 255
-#define COLOR_RGBA_MAGENTA                  { 0xFF, 0x00, 0xFF, 0xFF } // 255   0 255 255
-#define COLOR_RGBA_PINK                     { 0xFF, 0x00, 0x7F, 0xFF } // 255   0 127 255
-
-// Elemental
-#define COLOR_RGBA_JRB_SKY                  { 0x50, 0x64, 0x5A, 0xFF } //  80 100  90 255
-#define COLOR_RGBA_WATER                    { 0x05, 0x50, 0x96, 0xFF } //   5  80 150 255
-#define COLOR_RGBA_ICE                      { 0x7D, 0x9A, 0xD0, 0xFF } // 125 154 208 255
-#define COLOR_RGBA_LAVA                     { 0x8F, 0x06, 0x00, 0xFF } // 143   6   0 255
-#define COLOR_RGBA_SAND                     { 0xDC, 0xA9, 0x73, 0xFF } // 220 169 115 255
-#define COLOR_RGBA_ELECTRIC                 { 0xFF, 0xEE, 0x00, 0xFF } // 255 238   0 255
-
-// Lights
-#define COLOR_RGBA_AMP_LIGHT                COLOR_RGBA_ELECTRIC
-#define COLOR_RGBA_STAR_LIGHT               { 0xFF, 0xF0, 0x00, 0xFF } // 255 240   0 255
-#define COLOR_RGBA_TRANSPARENT_STAR_LIGHT   { 0x0F, 0x19, 0x73, 0xFF } //  15  25 115 255 // 0x1E32E6FF //  30  50 230 255
-#define COLOR_RGBA_RED_FLAME_LIGHT          { 0xFF, 0x32, 0x00, 0xC8 } // 255  50   0 200
-#define COLOR_RGBA_BLUE_FLAME_LIGHT         { 0x64, 0x64, 0xFF, 0xFF } // 100 100 255 255
-#define COLOR_RGBA_EXPLOSION_LIGHT          { 0xFF, 0xFF, 0x7F, 0xFF } // 255 255 127 255
-
-#define COLOR_RGBA_COIN_YELLOW              COLOR_RGBA_YELLOW
-#define COLOR_RGBA_COIN_BLUE                { 0x80, 0x80, 0xFF, 0xFF } // 128 128 255 255
-#define COLOR_RGBA_COIN_RED                 COLOR_RGBA_RED
-
-// RGB [0..255]
-
-// Grayscale
-#define COLOR_RGB_BLACK                     { 0x00, 0x00, 0x00 } //   0   0   0
-#define COLOR_RGB_DARK                      { 0x3F, 0x3F, 0x3F } //  63  63  63
-#define COLOR_RGB_GRAY                      { 0x7F, 0x7F, 0x7F } // 127 127 127
-#define COLOR_RGB_LIGHT                     { 0xBF, 0xBF, 0xBF } // 191 191 191
-#define COLOR_RGB_WHITE                     { 0xFF, 0xFF, 0xFF } // 255 255 255
-
-// Primary/secondary/tertiary
-#define COLOR_RGB_RED                       { 0xFF, 0x00, 0x00 } // 255   0   0
-#define COLOR_RGB_ORANGE                    { 0xFF, 0x7F, 0x00 } // 255 127   0
-#define COLOR_RGB_YELLOW                    { 0xFF, 0xFF, 0x00 } // 255 255   0
-#define COLOR_RGB_LIME                      { 0x7F, 0xFF, 0x00 } // 127 255   0
-#define COLOR_RGB_GREEN                     { 0x00, 0xFF, 0x00 } //   0 255   0
-#define COLOR_RGB_SPRING                    { 0x00, 0xFF, 0x7F } //   0 255 127
-#define COLOR_RGB_CYAN                      { 0x00, 0xFF, 0xFF } //   0 255 255
-#define COLOR_RGB_SKY                       { 0x00, 0x7F, 0xFF } //   0 127 255
-#define COLOR_RGB_BLUE                      { 0x00, 0x00, 0xFF } //   0   0 255
-#define COLOR_RGB_PURPLE                    { 0x7F, 0x00, 0xFF } // 127   0 255
-#define COLOR_RGB_MAGENTA                   { 0xFF, 0x00, 0xFF } // 255   0 255
-#define COLOR_RGB_PINK                      { 0xFF, 0x00, 0x7F } // 255   0 127
-
-// Elemental
-#define COLOR_RGB_JRB_SKY                   { 0x50, 0x64, 0x5A } //  80 100  90
-#define COLOR_RGB_WATER                     { 0x05, 0x50, 0x96 } //   5  80 150
-#define COLOR_RGB_ICE                       { 0x7D, 0x9A, 0xD0 } // 125 154 208
-#define COLOR_RGB_LAVA                      { 0x8F, 0x06, 0x00 } // 143   6   0
-#define COLOR_RGB_SAND                      { 0xDC, 0xA9, 0x73 } // 220 169 115
-#define COLOR_RGB_ELECTRIC                  { 0xFF, 0xEE, 0x00 } // 255 238   0
-
-#define COLOR_RGB_COIN_YELLOW               COLOR_RGB_YELLOW
-#define COLOR_RGB_COIN_BLUE                 { 0x80, 0x80, 0xFF } // 128 128 255
-#define COLOR_RGB_COIN_RED                  COLOR_RGB_RED
-
-// Lights
-#define DEFAULT_LIGHT_AMB                   0x7F
-#define DEFAULT_LIGHT_COL                   0xFE
-#define DEFAULT_LIGHT_DIR                   0x28
-
-// RGBF [0..1]
-#define COLOR_RGBF_WHITE                    { 1.0f, 1.0f, 1.0f } // 0xFF 0xFF 0xFF | 255 255 255
-#define COLOR_RGBF_RED                      { 1.0f, 0.0f, 0.0f } // 0xFF 0x00 0x00 | 255   0   0
-#define COLOR_RGBF_GREEN                    { 0.0f, 1.0f, 0.0f } // 0x00 0xFF 0x00 |   0 255   0
-#define COLOR_RGBF_BLUE                     { 0.0f, 0.0f, 1.0f } // 0x00 0x00 0xFF |   0   0 255
-#define COLOR_RGBF_ERR_DARK_BLUE            { 0.0f, 0.0f, 6.0f } // 0x00 0x00 0x5FF? |   0   0 1535?
-#define COLOR_RGBF_PINK                     { 1.0f, 0.0f, 1.0f } // 0xFF 0x00 0xFF | 255   0 255
-#define COLOR_RGBF_BLACK                    { 0.0f, 0.0f, 0.0f } // 0x00 0x00 0x00 |   0   0   0
-#define COLOR_RGBF_GREY                     { 0.6f, 0.6f, 0.6f } // 0x99 0x99 0x99 | 153 153 153
-#define COLOR_RGBF_DARK_GREY                { 0.4f, 0.4f, 0.4f } // 0x66 0x66 0x66 | 102 102 102
-#define COLOR_RGBF_YELLOW                   { 1.0f, 1.0f, 1.0f } // 0xFF 0xFF 0xFF | 255 255 255
+// Grayscale Colors
+//                                                                                                         RRRRRGGGGGBBBBBA | RRRR RGGG GGBB BBBA | RRRRR GGGGG BBBBB A | 0x0000 |  R  G  B  A
+#define COLOR_RGBA16_NONE                       COLORRGBA_TO_RGBA16((ColorRGBA)COLOR_RGBA_NONE      ) // 0b0000000000000000 | 0000 0000 0000 0000 | 00000 00000 00000 0 | 0x0000 |  0  0  0  0
+#define COLOR_RGBA16_BLACK                      COLORRGBA_TO_RGBA16((ColorRGBA)COLOR_RGBA_BLACK     ) // 0b0000000000000001 | 0000 0000 0000 0001 | 00000 00000 00000 1 | 0x0001 |  0  0  0  1
+#define COLOR_RGBA16_DARK_GRAY                  COLORRGBA_TO_RGBA16((ColorRGBA)COLOR_RGBA_DARK_GRAY ) // 0b0011100111001111 | 0011 1001 1100 1111 | 00111 00111 00111 1 | 0x39CF |  7  7  7  1
+#define COLOR_RGBA16_GRAY                       COLORRGBA_TO_RGBA16((ColorRGBA)COLOR_RGBA_GRAY      ) // 0b0111101111011111 | 0111 1011 1101 1111 | 01111 01111 01111 1 | 0x7BDF | 15 15 15  1
+#define COLOR_RGBA16_LIGHT_GRAY                 COLORRGBA_TO_RGBA16((ColorRGBA)COLOR_RGBA_LIGHT_GRAY) // 0b1011110111101111 | 1011 1101 1110 1111 | 10111 10111 10111 1 | 0xBDEF | 23 23 23  1
+#define COLOR_RGBA16_WHITE                      COLORRGBA_TO_RGBA16((ColorRGBA)COLOR_RGBA_WHITE     ) // 0b1111111111111111 | 1111 1111 1111 1111 | 11111 11111 11111 1 | 0xFFFF | 31 31 31  1
