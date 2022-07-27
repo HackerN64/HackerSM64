@@ -352,7 +352,7 @@ void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, 
 }
 
 static char *write_to_buf(char *buffer, const char *data, size_t size) {
-    return (char *) memcpy(buffer, data, size) + size;
+    return ((char *) memcpy(buffer, data, size) + size);
 }
 
 s32 glyph_to_hex(char *dest, char glyph) {
@@ -924,8 +924,16 @@ void draw_controls(UNUSED OSThread *thread) {
 
 #define FRAMEBUFFER_SIZE (SCREEN_SIZE * sizeof(RGBA16))
 
-ALWAYS_INLINE void copy_framebuffer(u16 dst, u16 src) {
-    memcpy(gFramebuffers[dst], gFramebuffers[src], FRAMEBUFFER_SIZE);
+void copy_framebuffer(u16 dstIndex, u16 srcIndex) {
+    if (dstIndex == srcIndex) {
+        return;
+    }
+
+    u32 *src = (u32 *)gFramebuffers[srcIndex];
+    u32 *dst = (u32 *)gFramebuffers[dstIndex];
+    for (u32 i = 0; i < (FRAMEBUFFER_SIZE / sizeof(u32)); i++) {
+        *dst++ = *src++;
+    }
 }
 
 void crash_screen_take_screenshot(void) {
@@ -1133,15 +1141,15 @@ void crash_screen_input_disasm(void) {
 }
 
 struct CrashScreenPage sCrashScreenPages[] = {
-    /*PAGE_CONTEXT   */ {draw_crash_context, crash_screen_input_default},
-    /*PAGE_ASSERTS   */ {draw_assert,        crash_screen_input_default},
+    /*PAGE_CONTEXT   */ {draw_crash_context, crash_screen_input_default   },
+    /*PAGE_ASSERTS   */ {draw_assert,        crash_screen_input_default   },
 #ifdef PUPPYPRINT_DEBUG
-    /*PAGE_LOG       */ {draw_crash_log,     crash_screen_input_default},
+    /*PAGE_LOG       */ {draw_crash_log,     crash_screen_input_default   },
 #endif
     /*PAGE_STACKTRACE*/ {draw_stacktrace,    crash_screen_input_stacktrace},
     /*PAGE_RAM_VIEWER*/ {draw_ram_viewer,    crash_screen_input_ram_viewer},
-    /*PAGE_DISASM    */ {draw_disasm,        crash_screen_input_disasm},
-    /*PAGE_CONTROLS  */ {draw_controls,      crash_screen_input_default},
+    /*PAGE_DISASM    */ {draw_disasm,        crash_screen_input_disasm    },
+    /*PAGE_CONTROLS  */ {draw_controls,      crash_screen_input_default   },
 };
 
 void update_crash_screen_input(void) {
@@ -1300,7 +1308,7 @@ void thread20_crash_screen_crash_screen(UNUSED void *arg) {
  #endif
                 draw_crashed_image_i4();
 
-                memcpy(gFramebuffers[sRenderedFramebuffer], gFramebuffers[sRenderingFramebuffer], FRAMEBUFFER_SIZE);
+                copy_framebuffer(sRenderedFramebuffer, sRenderingFramebuffer);
 
                 osWritebackDCacheAll();
                 osViBlack(FALSE);
