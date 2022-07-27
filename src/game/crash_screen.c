@@ -211,8 +211,38 @@ ALWAYS_INLINE RGBA16 *crash_screen_get_framebuffer_pixel_ptr(s32 x, s32 y) {
     return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
 }
 
-void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) {
-    s32 x, y;
+// Darkens a rectangular area. This is faster than the color blending done by
+// crash_screen_draw_rect, so it's used for the large background rectangle.
+// 0  - does nothing
+// 1  - darken by 1/2
+// 2  - darken by 3/4
+// 3  - darken by 7/8
+// 4  - darken by 15/16
+// 5+ - darken to black
+void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darken) {
+    u32 x, y;
+
+    RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
+
+    const RGBA16Component componentMask = (MSK_RGBA16_C & ~BITMASK(darken));
+    RGBA16 mask = 0;
+    for (s32 i = SIZ_RGBA16_A; i < (SIZ_RGBA16_C * 3); i += SIZ_RGBA16_C) {
+        mask |= (componentMask << i);
+    }
+
+    for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+            *ptr = (((*ptr & mask) >> darken) | MSK_RGBA16_A);
+            ptr++;
+        }
+
+        ptr += (SCREEN_WIDTH - w);
+    }
+}
+
+// Draws a rectangle.
+void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) {
+    u32 x, y;
 
     RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
@@ -234,11 +264,12 @@ void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) 
     }
 }
 
-void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, s8 flip) {
+// Draws a triangle pointing upwards or downwards.
+void crash_screen_draw_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, s8 flip) {
     const f32 middle = (w / 2.0f);
     const f32 t = (middle / (f32) h);
     f32 d = (flip ? (middle - t) : 0.0f);
-    s32 x, y;
+    u32 x, y;
 
     RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
@@ -263,7 +294,8 @@ void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 col
     }
 }
 
-void crash_screen_draw_line(s32 x1, s32 y1, s32 x2, s32 y2, RGBA32 color) {
+// Draws a line from one point on the screen to another.
+void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     if (x1 > x2) SWAP(x1, x2);
     if (y1 > y2) SWAP(y1, y2);
 
@@ -293,10 +325,10 @@ ALWAYS_INLINE void crash_screen_draw_divider(s32 y) {
     crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_LIGHT_GRAY);
 }
 
-void crash_screen_draw_glyph(s32 startX, s32 startY, s32 glyph, RGBA32 color) {
+void crash_screen_draw_glyph(u32 startX, u32 startY, u32 glyph, RGBA32 color) {
     CrashScreenFontRow bit;
     CrashScreenFontRow rowMask;
-    s32 x, y;
+    u32 x, y;
 
     if (glyph == 0) {
         color = COLOR_RGBA32_GRAY;
@@ -1183,7 +1215,7 @@ void draw_crash_screen(OSThread *thread) {
 
         if (sDrawCrashScreen) {
             if (sDrawFrameBuffer) {
-                crash_screen_draw_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, COLOR_RGBA32_CRASH_BACKGROUND);
+                crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, 2);
             }
             s32 line = 0;
             crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XHackerSM64 v%s", COLOR_RGBA32_CRASH_HEADER, HACKERSM64_VERSION);
