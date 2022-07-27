@@ -206,7 +206,6 @@ extern u16 sRenderedFramebuffer;
 extern u16 sRenderingFramebuffer;
 u16 sScreenshotFrameBuffer;
 
-#define CRASH_SCREEN_BACKGROUND_ALPHA 0xBF
 
 ALWAYS_INLINE RGBA16 *crash_screen_get_framebuffer_pixel_ptr(s32 x, s32 y) {
     return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
@@ -217,15 +216,16 @@ void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) 
 
     RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
-    RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    Alpha alpha = (color & 0xFF);
+    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    const Alpha alpha = (color & 0xFF);
+    const s8 opaque = (alpha == 0xFF);
 
     for (y = 0; y < h; y++) {
         for (x = 0; x < w; x++) {
-            if (alpha != 0xFF) {
-                rgba16_blend(ptr, newColor, alpha);
-            } else {
+            if (opaque) {
                 *ptr = newColor;
+            } else {
+                *ptr = rgba16_blend(*ptr, newColor, alpha);
             }
             ptr++;
         }
@@ -235,28 +235,30 @@ void crash_screen_draw_rect(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color) 
 }
 
 void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 color, s8 flip) {
-    const f32 t = ((f32) w / 2.0f) / (f32) h;
-    f32 d = flip ? (w / 2.0f) - t : 0.0f;
+    const f32 middle = (w / 2.0f);
+    const f32 t = (middle / (f32) h);
+    f32 d = (flip ? (middle - t) : 0.0f);
     s32 x, y;
 
     RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
-    RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    Alpha alpha = (color & 0xFF);
+    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    const Alpha alpha = (color & 0xFF);
+    const s8 opaque = (alpha == 0xFF);
 
     for (y = 0; y < h; y++) {
         for (x = 0; x < w; x++) {
-            if (absf((w / 2.0f) - x) < d) {
-                if (alpha != 0xFF) {
-                    rgba16_blend(ptr, newColor, alpha);
-                } else {
+            if (absf(middle - x) < d) {
+                if (opaque) {
                     *ptr = newColor;
+                } else {
+                    *ptr = rgba16_blend(*ptr, newColor, alpha);
                 }
             }
             ptr++;
         }
 
-        d += flip ? -t : t;
+        d += (flip ? -t : t);
         ptr += (SCREEN_WIDTH - w);
     }
 }
@@ -267,8 +269,9 @@ void crash_screen_draw_line(s32 x1, s32 y1, s32 x2, s32 y2, RGBA32 color) {
 
     RGBA16 *ptr;
 
-    RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    Alpha alpha = (color & 0xFF);
+    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    const Alpha alpha = (color & 0xFF);
+    const s8 opaque = (alpha == 0xFF);
 
     const f32 slope = (f32)(y2 - y1) / (x2 - x1);
 
@@ -277,16 +280,16 @@ void crash_screen_draw_line(s32 x1, s32 y1, s32 x2, s32 y2, RGBA32 color) {
     while (x <= x2) {
         y = ((slope * (x - x1)) + y1);
         ptr = crash_screen_get_framebuffer_pixel_ptr(x, y);
-        if (alpha != 0xFF) {
-            rgba16_blend(ptr, newColor, alpha);
-        } else {
+        if (opaque) {
             *ptr = newColor;
+        } else {
+            *ptr = rgba16_blend(*ptr, newColor, alpha);
         }
         x++;
     }
 }
 
-void crash_screen_draw_divider(s32 y) {
+ALWAYS_INLINE void crash_screen_draw_divider(s32 y) {
     crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_LIGHT_GRAY);
 }
 
@@ -303,19 +306,22 @@ void crash_screen_draw_glyph(s32 startX, s32 startY, s32 glyph, RGBA32 color) {
 
     RGBA16 *ptr = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
-    RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    Alpha alpha = (color & 0xFF);
+    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    const Alpha alpha = (color & 0xFF);
+    const s8 opaque = (alpha == 0xFF);
+    const CrashScreenFontRow startBit = ((CrashScreenFontRow)BIT(31) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
+
 
     for (y = 0; y < CRASH_SCREEN_FONT_CHAR_HEIGHT; y++) {
-        bit = ((CrashScreenFontRow)BIT(31) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
+        bit = startBit;
         rowMask = *data++;
 
         for (x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
             if (bit & rowMask) {
-                if (alpha != 0xFF) {
-                    rgba16_blend(ptr, newColor, alpha);
-                } else {
+                if (opaque) {
                     *ptr = newColor;
+                } else {
+                    *ptr = rgba16_blend(*ptr, newColor, alpha);
                 }
             }
             ptr++;
@@ -349,7 +355,7 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return (char *) memcpy(buffer, data, size) + size;
 }
 
-u32 glyph_to_hex(char *dest, char glyph) {
+s32 glyph_to_hex(char *dest, char glyph) {
     if (glyph >= '0' && glyph <= '9') {
         *dest = ((glyph - '0') & 0xF);
     } else if (glyph >= 'A' && glyph <= 'F') {
@@ -363,7 +369,7 @@ u32 glyph_to_hex(char *dest, char glyph) {
     return TRUE;
 }
 
-u32 crash_screen_text_to_color(RGBA32 *color, char *ptr, s32 index) {
+s32 crash_screen_text_to_color(RGBA32 *color, char *ptr, s32 index) {
     s32 i, j;
     char glyph;
     char hex = 0;
@@ -401,7 +407,7 @@ s32 crash_screen_process_formatting_char(char *ptr, s32 index, s32 size, char gl
     static u8 escape = FALSE;
     s32 skip = 0;
 
-    if (index + (1 + 8) > size) {
+    if ((index + (1 + 8)) > size) {
         return 0;
     }
 
@@ -410,7 +416,7 @@ s32 crash_screen_process_formatting_char(char *ptr, s32 index, s32 size, char gl
         escape = TRUE;
         skip = 1;
     } else if (glyph == '@' && !escape) { // @RRGGBBAA color prefix
-        if (crash_screen_text_to_color(color, ptr, index + 1)) {
+        if (crash_screen_text_to_color(color, ptr, (index + 1))) {
             skip = 8;
         }
     }
@@ -423,7 +429,7 @@ s32 crash_screen_process_formatting_char(char *ptr, s32 index, s32 size, char gl
 }
 
 // Returns whether to wrap or not.
-s32 crash_screen_process_space(char *ptr, s32 index, s32 x, s32 size) {
+s32 crash_screen_process_space(char *ptr, s32 index, s32 size, s32 x) {
     s32 ci = index + 1;
     s32 checkX = x + TEXT_WIDTH(1);
     char glyph = (ptr[ci] & 0xFF);
@@ -431,11 +437,11 @@ s32 crash_screen_process_space(char *ptr, s32 index, s32 x, s32 size) {
 
     while (ptr[ci] && glyph != ' ' && ci < size) { // check the next word after the space
         // New line if the next word is larger than the writable space.
-        if (ci + 1 < size && checkX >= CRASH_SCREEN_TEXT_X2) {
+        if ((ci + 1) < size && checkX >= CRASH_SCREEN_TEXT_X2) {
             return TRUE;
         }
 
-        ci += 1 + crash_screen_process_formatting_char(ptr, ci, size, glyph, &color);
+        ci += (1 + crash_screen_process_formatting_char(ptr, ci, size, glyph, &color));
         glyph = (ptr[ci] & 0xFF);
         checkX += TEXT_WIDTH(1);
     }
@@ -478,7 +484,7 @@ s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
             skip = 0;
 
             if (glyph == ' ') { // space
-                if (crash_screen_process_space(buf, i, x, size)) {
+                if (crash_screen_process_space(buf, i, size, x)) {
                     printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
                 }
             } else if (glyph == '\r' || glyph == '\n') { // new line
@@ -492,7 +498,7 @@ s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
                 } else { // normal char
                     crash_screen_draw_glyph(x, y, glyph, color);
 
-                    if (i + 1 < size && x + TEXT_WIDTH(1) >= CRASH_SCREEN_TEXT_X2) {
+                    if ((i + 1) < size && (x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2) {
                         printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
                     }
                 }
@@ -521,7 +527,7 @@ void crash_screen_sleep(s32 ms) {
 
 void crash_screen_print_float_reg(s32 x, s32 y, s32 regNum, void *addr) {
     uintptr_t bits = *(uintptr_t*) addr;
-    s32 exponent = (((bits & (uintptr_t)(BITMASK(8) << 23)) >> 23) - 0x7F);
+    s32 exponent = (((bits >> 23) & (uintptr_t)BITMASK(8)) - 0x7F);
 
     crash_screen_print(x, y, "@%08XF%02d:", COLOR_RGBA32_CRASH_REGISTER, regNum);
 
@@ -874,7 +880,7 @@ void draw_disasm(OSThread *thread) {
 
     osWritebackDCacheAll();
 
-    crash_screen_draw_divider(DIVIDER_Y( 2));
+    crash_screen_draw_divider(DIVIDER_Y(2));
     crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
     crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@%08Xup/down:scroll                        a:jump", COLOR_RGBA32_CRASH_CONTROLS);
 
@@ -918,50 +924,50 @@ void draw_controls(UNUSED OSThread *thread) {
 
 #define FRAMEBUFFER_SIZE (SCREEN_SIZE * sizeof(RGBA16))
 
+ALWAYS_INLINE void copy_framebuffer(u16 dst, u16 src) {
+    memcpy(gFramebuffers[dst], gFramebuffers[src], FRAMEBUFFER_SIZE);
+}
+
 void crash_screen_take_screenshot(void) {
-    if (gIsConsole) {
+    sScreenshotFrameBuffer = 2;
+    if (sScreenshotFrameBuffer != sRenderingFramebuffer) {
         // Save a screenshot of the game to a framebuffer that's not sRenderedFramebuffer or sRenderingFramebuffer.
-        sScreenshotFrameBuffer = ((sRenderingFramebuffer + 1) % 3);
-        memcpy(gFramebuffers[sScreenshotFrameBuffer], gFramebuffers[sRenderingFramebuffer], FRAMEBUFFER_SIZE);
-    } else {
-        sScreenshotFrameBuffer = sRenderedFramebuffer;
-        sRenderedFramebuffer = ((sScreenshotFrameBuffer + 1) % 3);
-        sRenderingFramebuffer = ((sRenderedFramebuffer + 1) % 3);
-        memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], FRAMEBUFFER_SIZE);
+        copy_framebuffer(sScreenshotFrameBuffer, sRenderingFramebuffer);
     }
+    sRenderedFramebuffer = 0;
+    sRenderingFramebuffer = 1;
 }
 
 void reset_crash_screen_framebuffer(void) {
     if (sDrawFrameBuffer) {
-        memcpy(gFramebuffers[sRenderingFramebuffer], gFramebuffers[sScreenshotFrameBuffer], FRAMEBUFFER_SIZE);
+        copy_framebuffer(sRenderingFramebuffer, sScreenshotFrameBuffer);
     } else {
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA32_BLACK);
     }
 }
 
 void update_crash_screen_framebuffer(void) {
-    memcpy(gFramebuffers[sRenderedFramebuffer], gFramebuffers[sRenderingFramebuffer], FRAMEBUFFER_SIZE);
+    copy_framebuffer(sRenderedFramebuffer, sRenderingFramebuffer);
+
+    osWritebackDCacheAll();
+    osViBlack(FALSE);
+    osViSwapBuffer(gFramebuffers[sRenderedFramebuffer]);
+
 }
 
 void update_crash_screen_direction_input(void) {
     u8 prevHeld = (sCrashScreenDirectionFlags & 0xF);
-    u8 currHeld = 0x0;
-    // Up
-    COND_BIT(((gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))
-     || (gPlayer1Controller->rawStickY > 60)),
-     currHeld, CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP);
-    // Down
-    COND_BIT(((gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))
-     || (gPlayer1Controller->rawStickY < -60)),
-     currHeld, CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN);
-    // Left
-    COND_BIT(((gPlayer1Controller->buttonDown & (L_CBUTTONS | L_JPAD))
-     || (gPlayer1Controller->rawStickX < -60)),
-     currHeld, CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT);
-    // Right
-    COND_BIT(((gPlayer1Controller->buttonDown & (R_CBUTTONS | R_JPAD))
-     || (gPlayer1Controller->rawStickX >  60)),
-     currHeld, CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT);
+    u8 currHeld = (
+        (((gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))
+         || (gPlayer1Controller->rawStickY >  60)) << 0) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP
+      | (((gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))
+         || (gPlayer1Controller->rawStickY < -60)) << 1) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN
+      | (((gPlayer1Controller->buttonDown & (L_CBUTTONS | L_JPAD))
+         || (gPlayer1Controller->rawStickX < -60)) << 2) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT
+      | (((gPlayer1Controller->buttonDown & (R_CBUTTONS | R_JPAD))
+         || (gPlayer1Controller->rawStickX >  60)) << 3) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT
+    );
+
     u8 pressed = (~prevHeld & currHeld);
     sCrashScreenDirectionFlags = ((pressed << 4) | currHeld);
 }
@@ -1041,7 +1047,7 @@ void crash_screen_jump_to_address(void) {
     uintptr_t nextSelectedAddress = sAddressSelect;
 
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP) {
-        s32 shift = 28 - (sAddressSelecCharIndex * 4);
+        s32 shift = (28 - (sAddressSelecCharIndex * 4));
         u8 new = ((sAddressSelect >> shift) & 0xF);
         new = ((new + 1) & 0xF);
         nextSelectedAddress = ((sAddressSelect & ~(0xF << shift)) | (new << shift));
@@ -1052,7 +1058,7 @@ void crash_screen_jump_to_address(void) {
         }
     }
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN) {
-        s32 shift = 28 - (sAddressSelecCharIndex * 4);
+        s32 shift = (28 - (sAddressSelecCharIndex * 4));
         u8 new = ((sAddressSelect >> shift) & 0xF);
         new = ((new - 1) & 0xF);
         nextSelectedAddress = ((sAddressSelect & ~(0xF << shift)) | (new << shift));
@@ -1179,10 +1185,6 @@ void draw_crash_screen(OSThread *thread) {
         }
 
         update_crash_screen_framebuffer();
-
-        osWritebackDCacheAll();
-        osViBlack(FALSE);
-        osViSwapBuffer(gFramebuffers[sRenderedFramebuffer]);
         sUpdateBuffer = FALSE;
     }
 }

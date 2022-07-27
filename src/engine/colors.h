@@ -32,7 +32,7 @@
     (dst)[3] = RGBA32_A(src);           \
 }
 
-void rgba16_blend(RGBA16 *dst, RGBA16 src, Alpha fac);
+RGBA16 rgba16_blend(RGBA16 a, RGBA16 b, Alpha fac);
 
 Bool32 colorRGBA_average_2(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2);
 Bool32 colorRGBA_average_3(ColorRGBA dst, ColorRGBA c1, ColorRGBA c2, ColorRGBA c3);
