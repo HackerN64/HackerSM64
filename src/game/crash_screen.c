@@ -208,7 +208,7 @@ u16 sScreenshotFrameBuffer;
 
 #define CRASH_SCREEN_BACKGROUND_ALPHA 0xBF
 
-RGBA16 *crash_screen_get_framebuffer_pixel_ptr(s32 x, s32 y) {
+ALWAYS_INLINE RGBA16 *crash_screen_get_framebuffer_pixel_ptr(s32 x, s32 y) {
     return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
 }
 
@@ -258,6 +258,31 @@ void crash_screen_draw_triangle(s32 startX, s32 startY, s32 w, s32 h, RGBA32 col
 
         d += flip ? -t : t;
         ptr += (SCREEN_WIDTH - w);
+    }
+}
+
+void crash_screen_draw_line(s32 x1, s32 y1, s32 x2, s32 y2, RGBA32 color) {
+    if (x1 > x2) SWAP(x1, x2);
+    if (y1 > y2) SWAP(y1, y2);
+
+    RGBA16 *ptr;
+
+    RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    Alpha alpha = (color & 0xFF);
+
+    const f32 slope = (f32)(y2 - y1) / (x2 - x1);
+
+    f32 x = x1;
+    f32 y;
+    while (x <= x2) {
+        y = ((slope * (x - x1)) + y1);
+        ptr = crash_screen_get_framebuffer_pixel_ptr(x, y);
+        if (alpha != 0xFF) {
+            rgba16_blend(ptr, newColor, alpha);
+        } else {
+            *ptr = newColor;
+        }
+        x++;
     }
 }
 
@@ -632,9 +657,11 @@ void draw_assert(UNUSED OSThread *thread) {
 #ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(UNUSED OSThread *thread) {
     s32 i;
+    crash_screen_print(TEXT_X(0), TEXT_Y(1), "@%08XLOG", COLOR_RGBA32_CRASH_PAGE_NAME);
+    crash_screen_draw_divider(DIVIDER_Y(2));
     osWritebackDCacheAll();
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
-        crash_screen_print(TEXT_X(0), TEXT_Y(LOG_BUFFER_SIZE - i), consoleLogTable[i]);
+        crash_screen_print(TEXT_X(0), TEXT_Y(1 + LOG_BUFFER_SIZE - i), consoleLogTable[i]);
     }
 }
 #endif
