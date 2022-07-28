@@ -961,11 +961,7 @@ void copy_framebuffer(u16 dstIndex, u16 srcIndex) {
         return;
     }
 
-    u32 *src = (u32 *)gFramebuffers[srcIndex];
-    u32 *dst = (u32 *)gFramebuffers[dstIndex];
-    for (u32 i = 0; i < (FRAMEBUFFER_SIZE / sizeof(u32)); i++) {
-        *dst++ = *src++;
-    }
+    bcopy(gFramebuffers[srcIndex], gFramebuffers[dstIndex], FRAMEBUFFER_SIZE);
 }
 
 void crash_screen_take_screenshot(void) {
