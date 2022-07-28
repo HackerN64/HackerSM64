@@ -25,13 +25,6 @@
 #define UNUSED
 #endif
 
-// Fall through a switch case
-#ifdef __GNUC__
-#define FALL_THROUGH __attribute__((fallthrough))
-#else
-#define FALL_THROUGH
-#endif
-
 // Avoid undefined behaviour for non-returning functions
 #ifdef __GNUC__
 #define NORETURN __attribute__((noreturn))
@@ -39,11 +32,18 @@
 #define NORETURN
 #endif
 
-// Static assertions
+// Always inline a function
 #ifdef __GNUC__
-#define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+#define ALWAYS_INLINE inline __attribute__((always_inline))
 #else
-#define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
+#define ALWAYS_INLINE inline
+#endif
+
+// Fall through a switch case
+#ifdef __GNUC__
+#define FALL_THROUGH __attribute__((fallthrough))
+#else
+#define FALL_THROUGH
 #endif
 
 // Align to 8-byte boundary (for DMA requirements)
@@ -74,11 +74,11 @@
 #define ALIGNED64
 #endif
 
-// Always inline a function
+// Static assertions
 #ifdef __GNUC__
-#define ALWAYS_INLINE inline __attribute__((always_inline))
+#define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
 #else
-#define ALWAYS_INLINE inline
+#define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #endif
 
 #ifndef NO_SEGMENTED_MEMORY
