@@ -127,7 +127,7 @@ static s32 sNumShownFunctions = STACK_SIZE;
 static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
 
 static s8 sDrawCrashScreen = TRUE;
-static s8 sDrawFrameBuffer = TRUE;
+static s8 sHideCrashScreen = TRUE;
 static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
@@ -975,7 +975,7 @@ void crash_screen_take_screenshot(void) {
 }
 
 void reset_crash_screen_framebuffer(void) {
-    if (sDrawFrameBuffer) {
+    if (sHideCrashScreen) {
         copy_framebuffer(sRenderingFramebuffer, sScreenshotFrameBuffer);
     } else {
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA32_BLACK);
@@ -1187,11 +1187,11 @@ void update_crash_screen_input(void) {
     }
 
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
-        sDrawFrameBuffer ^= TRUE;
+        sHideCrashScreen ^= TRUE;
         sUpdateBuffer = TRUE;
     }
 
-    if (!sDrawCrashScreen && !sDrawFrameBuffer) {
+    if (!sDrawCrashScreen && !sHideCrashScreen) {
         sDrawCrashScreen = TRUE;
     }
 
@@ -1210,7 +1210,7 @@ void draw_crash_screen(OSThread *thread) {
         reset_crash_screen_framebuffer();
 
         if (sDrawCrashScreen) {
-            if (sDrawFrameBuffer) {
+            if (sHideCrashScreen) {
                 crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, 2);
             }
             s32 line = 0;
