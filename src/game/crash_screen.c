@@ -137,6 +137,7 @@ static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
 
 static s8 sDrawCrashScreen = TRUE;
 static s8 sHideCrashScreen = TRUE;
+static s8 sCrashScreenWordWrap = TRUE;
 static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
@@ -532,6 +533,8 @@ u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
     u32 skip = 0;
     u32 numLines = 1;
 
+    s8 wrap = sCrashScreenWordWrap;
+
     if (size > 0) {
         for (u32 index = 0; index < size && buf[index]; index += (1 + skip)) {
             glyph = CHAR_TO_GLYPH(buf[index]);
@@ -539,7 +542,7 @@ u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
             skip = 0;
 
             if (glyph == ' ') { // space
-                if (crash_screen_parse_space(buf, index, size, x)) {
+                if (wrap && crash_screen_parse_space(buf, index, size, x)) {
                     printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
                 }
             } else if (glyph == '\r' || glyph == '\n') { // new line
@@ -553,7 +556,7 @@ u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
                 } else { // normal char
                     crash_screen_draw_glyph(x, y, glyph, color);
 
-                    if ((index + 1) < size && (x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2) {
+                    if (wrap && (index + 1) < size && (x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2) {
                         printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
                     }
                 }
@@ -938,12 +941,16 @@ void draw_disasm(OSThread *thread) {
 
     osWritebackDCacheAll();
 
+    sCrashScreenWordWrap = FALSE;
+
     for (u32 i = 0; i < DISASM_NUM_ROWS; i++) {
         uintptr_t addr = (sProgramPosition + (i * DISASM_STEP));
         uintptr_t toDisasm = *(uintptr_t*)(addr);
 
         crash_screen_print(TEXT_X(0), TEXT_Y(2 + i), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
     }
+
+    sCrashScreenWordWrap = TRUE;
 
     osWritebackDCacheAll();
 
