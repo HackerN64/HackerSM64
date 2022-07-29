@@ -146,11 +146,11 @@ SECTIONS
 #endif
 
 /* hardcoded symbols to satisfy preliminary link for map parser */
-#ifndef DEBUG_MAP_STACKTRACE
-      _mapDataSegmentRomStart = 0;
-      gMapEntries   = 0;
-      gMapEntrySize = 0;
-      gMapStrings   = 0;
+#if defined(INCLUDE_DEBUG_MAP) && defined(PRELIMINARY)
+   _mapDataSegmentRomStart = 0;
+   gMapEntries   = 0;
+   gMapEntrySize = 0;
+   gMapStrings   = 0;
 #endif
 
    BEGIN_SEG(main, .) SUBALIGN(16)
@@ -541,8 +541,8 @@ SECTIONS
    END_SEG(crash_screen_crash_screen)
 #endif
 
-#ifdef DEBUG_MAP_STACKTRACE
-   BEGIN_SEG(mapData, (RAM_END - 0x00100000)) {
+#if defined(INCLUDE_DEBUG_MAP) && !defined(PRELIMINARY)
+   BEGIN_SEG(mapData, (RAM_END - RAM_1MB)) {
       KEEP(BUILD_DIR/asm/debug/map.o(.data*));
    }
    END_SEG(mapData)

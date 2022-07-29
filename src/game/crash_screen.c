@@ -315,7 +315,7 @@ void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
     }
     const s8 opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    
+
     RGBA16 *dst;
 
     if (x1 > x2) SWAP(x1, x2);
@@ -668,8 +668,8 @@ void crash_screen_print_float_registers(__OSThreadContext *tc) {
 void draw_crash_context(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
-    // Make the last two cause cases sequential.
     s32 cause = ((tc->cause >> 2) & 0x1F);
+    // Make the last two cause case indexes sequential for array access.
     if (cause == (EXC_WATCH >> 2)) cause = 16;
     if (cause == (EXC_VCED  >> 2)) cause = 17;
 
@@ -680,15 +680,15 @@ void draw_crash_context(OSThread *thread) {
 
     osWritebackDCacheAll();
 
-    if ((uintptr_t) parse_map != MAP_PARSER_ADDRESS) {
-        char *fname = parse_map(tc->pc);
-        crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCRASH AT:", COLOR_RGBA32_CRASH_AT);
-        if (fname == NULL) {
-            crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
-        } else {
-            crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUMCTION_NAME, fname);
-        }
+#ifdef INCLUDE_DEBUG_MAP
+    char *fname = parse_map(tc->pc);
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCRASH AT:", COLOR_RGBA32_CRASH_AT);
+    if (fname == NULL) {
+        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
+    } else {
+        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUMCTION_NAME, fname);
     }
+#endif
 
     crash_screen_print_registers(tc);
 
@@ -740,39 +740,29 @@ void draw_crash_log(UNUSED OSThread *thread) {
 void draw_stacktrace(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
     uintptr_t temp_sp = (tc->sp + 0x14);
-    u32 currIndex;
-    uintptr_t faddr;
-    char *fname;
-    struct FunctionInStack *functionList = (sStackTraceSkipUnknowns ? sKnownFunctionStack : sAllFunctionStack);
-    struct FunctionInStack *function = NULL;
 
     u32 line = 1;
 
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XSTACK TRACE", COLOR_RGBA32_CRASH_PAGE_NAME);
     line += crash_screen_print(TEXT_X(12), TEXT_Y(line), "FROM %08X", temp_sp);
-    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    if ((uintptr_t) parse_map == MAP_PARSER_ADDRESS) {
-        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "NONE");
-    } else {
-        line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUMCTION_NAME, parse_map(tc->pc));
-    }
+#ifdef INCLUDE_DEBUG_MAP
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
+    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUMCTION_NAME, parse_map(tc->pc));
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     osWritebackDCacheAll();
 
+    struct FunctionInStack *functionList = (sStackTraceSkipUnknowns ? sKnownFunctionStack : sAllFunctionStack);
+    struct FunctionInStack *function = NULL;
+
     // Print
     for (u32 j = 0; j < STACK_TRACE_NUM_ROWS; j++) {
         u32 y = TEXT_Y(line + j);
 
-        if ((uintptr_t) find_function_in_stack == MAP_PARSER_ADDRESS) {
-            crash_screen_print(TEXT_X(0), y, "STACK TRACE DISABLED");
-            break;
-        }
-
-        currIndex = (sStackTraceIndex + j);
+        u32 currIndex = (sStackTraceIndex + j);
 
         if (currIndex >= sNumShownFunctions) {
             break;
@@ -780,20 +770,22 @@ void draw_stacktrace(OSThread *thread) {
 
         function = &functionList[currIndex];
 
-        faddr = function->addr;
-        fname = function->name;
+        if (function != NULL) {
+            uintptr_t faddr = function->addr;
+            char *fname = function->name;
 
-        crash_screen_print(TEXT_X(0), y, "%08X:", faddr);
+            crash_screen_print(TEXT_X(0), y, "%08X:", faddr);
 
-        if (!sStackTraceSkipUnknowns && ((fname == NULL) || ((*(uintptr_t*)faddr & 0x80000000) == 0))) {
-            // Print unknown function
-            crash_screen_print(TEXT_X(9), y, "@%08X%08X", COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
-        } else {
-            // Print known function
-            if (sStackTraceShowNames) {
-                crash_screen_print(TEXT_X(9), y, "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
+            if (!sStackTraceSkipUnknowns && ((fname == NULL) || ((*(uintptr_t*)faddr & 0x80000000) == 0))) {
+                // Print unknown function
+                crash_screen_print(TEXT_X(9), y, "@%08X%08X", COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
             } else {
-                crash_screen_print(TEXT_X(9), y, "@%08x%08X", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
+                // Print known function
+                if (sStackTraceShowNames) {
+                    crash_screen_print(TEXT_X(9), y, "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
+                } else {
+                    crash_screen_print(TEXT_X(9), y, "@%08x%08X", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
+                }
             }
         }
     }
@@ -805,6 +797,11 @@ void draw_stacktrace(OSThread *thread) {
 
     // Scroll Bar
     crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), STACK_TRACE_NUM_ROWS, sNumShownFunctions, sStackTraceIndex, 4, COLOR_RGBA32_LIGHT_GRAY);
+#else
+    osWritebackDCacheAll();
+
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "STACK TRACE DISABLED");
+#endif
 
     osWritebackDCacheAll();
 }
@@ -1294,15 +1291,12 @@ OSThread *get_crashed_thread(void) {
     return NULL;
 }
 
+#ifdef INCLUDE_DEBUG_MAP
 void fill_function_stack_trace(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
     uintptr_t temp_sp = (tc->sp + 0x14);
     struct FunctionInStack *function = NULL;
     char *fname;
-
-    if ((uintptr_t) find_function_in_stack == MAP_PARSER_ADDRESS) {
-        return;
-    }
 
     // Fill the stack buffer.
     for (u32 i = 0; i < STACK_SIZE; i++) {
@@ -1319,6 +1313,7 @@ void fill_function_stack_trace(OSThread *thread) {
         }
     }
 }
+#endif
 
 #ifdef FUNNY_CRASH_SOUND
 extern void audio_signal_game_loop_tick(void);
@@ -1424,10 +1419,10 @@ void thread2_crash_screen(UNUSED void *arg) {
 
             thread = get_crashed_thread();
             if (thread) {
-                if ((uintptr_t) map_data_init != MAP_PARSER_ADDRESS) {
-                    map_data_init();
-                }
+#ifdef INCLUDE_DEBUG_MAP
+                map_data_init();
                 fill_function_stack_trace(thread);
+#endif
 
                 // Default to the assert page if the crash was caused by an assert.
                 if (thread->context.cause == EXC_SYSCALL) {

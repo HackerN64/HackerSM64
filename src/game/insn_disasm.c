@@ -21,7 +21,7 @@ enum ParamTypes {
 };
 
 extern far char *parse_map(uintptr_t pc);
-static char insn_as_string[100];
+static char insn_as_string[0x100];
 
 typedef struct __attribute__((packed)) {
     /*0x00*/ u16 rd        : 5;
@@ -126,7 +126,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                 case PARAM_SWAP_RS_IMM:
                     strp += sprintf(strp, "@%08X%-6s @%08X$%s $%s @%08X0x%04X",
                         COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
-                        COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rt],
+                        COLOR_RGBA32_CRASH_DISASM_REG,  registerMaps[insn.i.rt],
                                                         registerMaps[insn.i.rs],
                         COLOR_RGBA32_CRASH_IMMEDIATE,   insn.i.immediate
                     );
@@ -134,30 +134,30 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                 case PARAM_LUI:
                     strp += sprintf(strp, "@%08X%-6s @%08X$%s @%08X0x%04X",
                         COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
-                        COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rt],
+                        COLOR_RGBA32_CRASH_DISASM_REG,  registerMaps[insn.i.rt],
                         COLOR_RGBA32_CRASH_IMMEDIATE,   insn.i.immediate
                     );
                     break;
                 case PARAM_JAL:
                     target = (0x80000000 | ((insn.d & 0x1FFFFFF) * 4));
-                    if ((uintptr_t)parse_map != MAP_PARSER_ADDRESS) {
-                        strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_FUMCTION_NAME, parse_map(target)
-                        );
-                    } else {
-                        strp += sprintf(strp, "@%08X%-8s @%08X%08X",
-                            COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
-                            COLOR_RGBA32_CRASH_DISASM_REG,    target
-                        );
-                    }
+#ifdef INCLUDE_DEBUG_MAP
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s",
+                        COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
+                        COLOR_RGBA32_CRASH_FUMCTION_NAME, parse_map(target)
+                    );
+#else
+                    strp += sprintf(strp, "@%08X%-6s @%08X%08X",
+                        COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
+                        COLOR_RGBA32_CRASH_FUMCTION_NAME, target
+                    );
+#endif
                     break;
                 case PARAM_NONE:
                     strp += sprintf(strp, "@%08X%-6s @%08X$%s @%08X0x%04X @%08X($%s)",
-                        COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
-                        COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rt],
-                        COLOR_RGBA32_CRASH_IMMEDIATE,   insn.i.immediate,
-                        COLOR_RGBA32_CRASH_DISASM_REG_2,  registerMaps[insn.i.rs]
+                        COLOR_RGBA32_CRASH_DISASM_INST,  insn_db[i].name,
+                        COLOR_RGBA32_CRASH_DISASM_REG,   registerMaps[insn.i.rt],
+                        COLOR_RGBA32_CRASH_IMMEDIATE,    insn.i.immediate,
+                        COLOR_RGBA32_CRASH_DISASM_REG_2, registerMaps[insn.i.rs]
                     );
                     break;
 
@@ -167,7 +167,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         } else if (insn.i.rdata.function != 0 && insn.i.rdata.function == insn_db[i].function) {
                 strp += sprintf(strp, "@%08X%-6s @%08X$%s $%s $%s",
                     COLOR_RGBA32_CRASH_DISASM_INST, insn_db[i].name,
-                    COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rdata.rd],
+                    COLOR_RGBA32_CRASH_DISASM_REG,  registerMaps[insn.i.rdata.rd],
                                                     registerMaps[insn.i.rs],
                                                     registerMaps[insn.i.rt]
                 );

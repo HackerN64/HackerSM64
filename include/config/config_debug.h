@@ -62,6 +62,9 @@
 // Enables the DEBUG_ASSERT macro.
 #define ENABLE_DEBUG_ASSERTS
 
+// Includes function map data in the ROM.
+#define INCLUDE_DEBUG_MAP
+
 // Includes an image which displays when the crash screen crashes.
 // REQUIRES 'make clean'.
 // Uses 38.4 KB of rom space.
