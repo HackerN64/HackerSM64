@@ -66,7 +66,6 @@
 #define INCLUDE_DEBUG_MAP
 
 // Includes an image which displays when the crash screen crashes.
-// REQUIRES 'make clean'.
 // Uses 38.4 KB of rom space.
 #define CRASH_SCREEN_CRASH_SCREEN
 
