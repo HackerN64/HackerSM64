@@ -406,7 +406,7 @@ s32 glyph_to_hex(char *dest, char glyph) {
     return TRUE;
 }
 
-s32 crash_screen_text_to_color(RGBA32 *color, char *ptr, s32 index) {
+s32 crash_screen_parse_text_color(RGBA32 *color, char *ptr, s32 index, s32 size) {
     s32 i, j;
     char glyph;
     char hex = 0;
@@ -416,6 +416,9 @@ s32 crash_screen_text_to_color(RGBA32 *color, char *ptr, s32 index) {
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 2; j++) {
+            if (index > size) {
+                return FALSE;
+            }
             glyph = (ptr[index] & 0xFF);
             if (!glyph_to_hex(&hex, glyph)) {
                 return FALSE;
@@ -440,7 +443,7 @@ s32 crash_screen_text_to_color(RGBA32 *color, char *ptr, s32 index) {
 }
 
 // Returns the number of chars to skip.
-s32 crash_screen_process_formatting_char(char *ptr, s32 index, s32 size, char glyph, RGBA32 *color) {
+s32 crash_screen_parse_formatting_chars(char *ptr, s32 index, s32 size, char glyph, RGBA32 *color) {
     static u8 escape = FALSE;
     s32 skip = 0;
 
@@ -453,7 +456,7 @@ s32 crash_screen_process_formatting_char(char *ptr, s32 index, s32 size, char gl
         escape = TRUE;
         skip = 1;
     } else if (glyph == '@' && !escape) { // @RRGGBBAA color prefix
-        if (crash_screen_text_to_color(color, ptr, (index + 1))) {
+        if (crash_screen_parse_text_color(color, ptr, (index + 1), size)) {
             skip = 8;
         }
     }
@@ -466,7 +469,7 @@ s32 crash_screen_process_formatting_char(char *ptr, s32 index, s32 size, char gl
 }
 
 // Returns whether to wrap or not.
-s32 crash_screen_process_space(char *ptr, s32 index, s32 size, s32 x) {
+s32 crash_screen_parse_space(char *ptr, s32 index, s32 size, s32 x) {
     s32 ci = index + 1;
     s32 checkX = x + TEXT_WIDTH(1);
     char glyph = (ptr[ci] & 0xFF);
@@ -478,7 +481,7 @@ s32 crash_screen_process_space(char *ptr, s32 index, s32 size, s32 x) {
             return TRUE;
         }
 
-        ci += (1 + crash_screen_process_formatting_char(ptr, ci, size, glyph, &color));
+        ci += (1 + crash_screen_parse_formatting_chars(ptr, ci, size, glyph, &color));
         glyph = (ptr[ci] & 0xFF);
         checkX += TEXT_WIDTH(1);
     }
@@ -521,14 +524,14 @@ s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
             skip = 0;
 
             if (glyph == ' ') { // space
-                if (crash_screen_process_space(buf, i, size, x)) {
+                if (crash_screen_parse_space(buf, i, size, x)) {
                     printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
                 }
             } else if (glyph == '\r' || glyph == '\n') { // new line
                 printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
             } else {
                 // Check for formatting codes
-                skip = crash_screen_process_formatting_char(buf, i, size, glyph, &color);
+                skip = crash_screen_parse_formatting_chars(buf, i, size, glyph, &color);
 
                 if (skip > 0) {
                     printOp = CRASH_SCREEN_PRINT_OP_SKIP;
@@ -552,6 +555,8 @@ s32 crash_screen_print(s32 startX, s32 startY, const char *fmt, ...) {
     }
 
     va_end(args);
+
+    // osWritebackDCacheAll();
 
     return numLines;
 }
@@ -700,9 +705,12 @@ void draw_assert(UNUSED OSThread *thread) {
 #ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(UNUSED OSThread *thread) {
     s32 i;
+
     crash_screen_print(TEXT_X(0), TEXT_Y(1), "@%08XLOG", COLOR_RGBA32_CRASH_PAGE_NAME);
     crash_screen_draw_divider(DIVIDER_Y(2));
+
     osWritebackDCacheAll();
+
     for (i = 0; i < LOG_BUFFER_SIZE; i++) {
         crash_screen_print(TEXT_X(0), TEXT_Y(1 + LOG_BUFFER_SIZE - i), consoleLogTable[i]);
     }
@@ -1005,14 +1013,17 @@ s32 update_crash_screen_page(void) {
     u8 prevPage = sCrashPage;
 
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT) {
+        // Next page.
         sCrashPage++;
         sUpdateBuffer = TRUE;
     }
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
+        // Previous Page.
         sCrashPage--;
         sUpdateBuffer = TRUE;
     }
 
+    // Wrap pages.
     if ((sCrashPage >= PAGE_COUNT) && (sCrashPage != PAGES_MAX)) {
         sCrashPage = PAGE_CONTEXT;
     }
@@ -1021,6 +1032,7 @@ s32 update_crash_screen_page(void) {
     }
 
     if (sCrashPage != prevPage) {
+        // Reset certain values when the page is changed.
         sStackTraceIndex = 0;
         sProgramPosition = 0;
         sAddressSelecCharIndex = 2;
@@ -1037,11 +1049,13 @@ void crash_screen_input_default(void) {
 void crash_screen_input_stacktrace(void) {
     if (!update_crash_screen_page()) {
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+            // Toggle whether to display function names.
             sStackTraceShowNames ^= TRUE;
             sUpdateBuffer = TRUE;
         }
 
         if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+            // Toggle whether entries without a name are skipped.
             sStackTraceSkipUnknowns ^= TRUE;
             sNumShownFunctions = (sStackTraceSkipUnknowns ? sNumKnownFunctions : STACK_SIZE);
             sStackTraceIndex = 0;
@@ -1049,12 +1063,14 @@ void crash_screen_input_stacktrace(void) {
         }
 
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+            // Scroll up.
             if (sStackTraceIndex > 0) {
                 sStackTraceIndex--;
             }
             sUpdateBuffer = TRUE;
         }
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+            // Scroll down.
             if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
                 sStackTraceIndex++;
             }
@@ -1076,6 +1092,7 @@ void crash_screen_jump_to_address(void) {
     uintptr_t nextSelectedAddress = sAddressSelect;
 
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP) {
+        // Increment the selected digit.
         s32 shift = (28 - (sAddressSelecCharIndex * 4));
         u8 new = ((sAddressSelect >> shift) & 0xF);
         new = ((new + 1) & 0xF);
@@ -1087,6 +1104,7 @@ void crash_screen_jump_to_address(void) {
         }
     }
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN) {
+        // Decrement the selected digit.
         s32 shift = (28 - (sAddressSelecCharIndex * 4));
         u8 new = ((sAddressSelect >> shift) & 0xF);
         new = ((new - 1) & 0xF);
@@ -1099,6 +1117,7 @@ void crash_screen_jump_to_address(void) {
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+        // Open the jump to address popup.
         sAddressSelectMenuOpen = FALSE;
         sProgramPosition = sAddressSelect;
         sUpdateBuffer = TRUE;
@@ -1110,6 +1129,7 @@ void crash_screen_input_ram_viewer(void) {
         crash_screen_jump_to_address();
     } else if (!update_crash_screen_page()) {
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+            // Scroll up.
             sProgramPosition -= 0x10;
             if (sProgramPosition < RAM_VIEWER_SCROLL_MIN) {
                 sProgramPosition = RAM_VIEWER_SCROLL_MIN;
@@ -1117,6 +1137,7 @@ void crash_screen_input_ram_viewer(void) {
             sUpdateBuffer = TRUE;
         }
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+            // Scroll down.
             sProgramPosition += 0x10;
             if (sProgramPosition > RAM_VIEWER_SCROLL_MAX) {
                 sProgramPosition = RAM_VIEWER_SCROLL_MAX;
@@ -1124,11 +1145,13 @@ void crash_screen_input_ram_viewer(void) {
             sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+            // Open the jump to address popup.
             sAddressSelectMenuOpen = TRUE;
             sAddressSelect = sProgramPosition;
             sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+            // Toggle whether the memory is printed as hex values or as ASCII chars.
             sRamViewerShowAscii ^= TRUE;
             sUpdateBuffer = TRUE;
         }
@@ -1140,6 +1163,7 @@ void crash_screen_input_disasm(void) {
         crash_screen_jump_to_address();
     } else if (!update_crash_screen_page()) {
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+            // Scroll up.
             sProgramPosition -= 4;
             if (sProgramPosition < DISASM_SCROLL_MIN) {
                 sProgramPosition = DISASM_SCROLL_MIN;
@@ -1147,6 +1171,7 @@ void crash_screen_input_disasm(void) {
             sUpdateBuffer = TRUE;
         }
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+            // Scroll down.
             sProgramPosition += 4;
             if (sProgramPosition > DISASM_SCROLL_MAX) {
                 sProgramPosition = DISASM_SCROLL_MAX;
@@ -1154,6 +1179,7 @@ void crash_screen_input_disasm(void) {
             sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+            // Open the jump to address box.
             sAddressSelectMenuOpen = TRUE;
             sAddressSelect = sProgramPosition;
             sUpdateBuffer = TRUE;
@@ -1174,6 +1200,7 @@ struct CrashScreenPage sCrashScreenPages[] = {
 };
 
 void update_crash_screen_input(void) {
+    // Global controls.
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
         sDrawCrashScreen ^= TRUE;
         sUpdateBuffer = TRUE;
@@ -1191,7 +1218,7 @@ void update_crash_screen_input(void) {
     if (sDrawCrashScreen) {
         update_crash_screen_direction_input();
 
-        // Page-specific inputs.
+        // Run the page-specific input function.
         sCrashScreenPages[sCrashPage].inputFunc();
     }
 }
@@ -1204,12 +1231,17 @@ void draw_crash_screen(OSThread *thread) {
 
         if (sDrawCrashScreen) {
             if (sHideCrashScreen) {
+                // Draw the transparent background.
                 crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, 2);
             }
+
+            // Draw the header.
             s32 line = 0;
             crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XHackerSM64 v%s", COLOR_RGBA32_CRASH_HEADER, HACKERSM64_VERSION);
             line += crash_screen_print(TEXT_X(35), TEXT_Y(line), "@%08X<Page:%02d>", COLOR_RGBA32_CRASH_HEADER, (sCrashPage + 1));
             crash_screen_draw_divider(DIVIDER_Y(line));
+
+            // Run the page-specific draw function.
             sCrashScreenPages[sCrashPage].drawFunc(thread);
         }
 
