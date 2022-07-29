@@ -194,9 +194,9 @@ static const Gfx dl_silhouette_end[] = {
 struct RenderPhase {
     u8 startLayer;
     u8 endLayer;
-// #ifdef OBJECTS_REJ
+#ifdef OBJECTS_REJ
     u8 ucode;
-// #endif
+#endif
 };
 
 static struct RenderPhase sRenderPhases[] = {
@@ -299,7 +299,6 @@ static struct RenderPhase sRenderPhases[] = {
     [RENDER_PHASE_ZEX_ALL]                 = {
         .startLayer = LAYER_FIRST,
         .endLayer   = LAYER_LAST,
-        .ucode      = GRAPH_NODE_UCODE_DEFAULT,
     },
 
  #endif
