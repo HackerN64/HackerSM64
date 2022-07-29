@@ -2,20 +2,29 @@
 #include <PR/os_internal_error.h>
 #include <stdarg.h>
 #include <string.h>
-#include "buffers/framebuffers.h"
 #include "types.h"
-#include "puppyprint.h"
 #include "audio/external.h"
+#include "buffers/framebuffers.h"
+#include "buffers/zbuffer.h"
+#include "engine/colors.h"
+#include "debug.h"
 #include "farcall.h"
 #include "game_init.h"
 #include "main.h"
-#include "debug.h"
+#include "puppyprint.h"
 #include "rumble_init.h"
-#include "engine/colors.h"
+#include "vc_check.h"
 
 #include "sm64.h"
 
 #include "printf.h"
+
+enum MessageIDs {
+    MSG_NONE,
+    MSG_CPU_BREAK,
+    MSG_FAULT,
+    MESG_VI_VBLANK,
+};
 
 enum CrashPages {
     PAGE_CONTEXT,
@@ -201,10 +210,6 @@ struct CrashScreen gCrashScreen;
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 struct CrashScreen gCrashScreen2;
 #endif
-
-extern u16 sRenderedFramebuffer;
-extern u16 sRenderingFramebuffer;
-u16 sScreenshotFrameBuffer;
 
 
 ALWAYS_INLINE RGBA16 *crash_screen_get_framebuffer_pixel_ptr(s32 x, s32 y) {
@@ -954,41 +959,29 @@ void draw_controls(UNUSED OSThread *thread) {
     osWritebackDCacheAll();
 }
 
-#define FRAMEBUFFER_SIZE (SCREEN_SIZE * sizeof(RGBA16))
-
-void copy_framebuffer(u16 dstIndex, u16 srcIndex) {
-    if (dstIndex == srcIndex) {
-        return;
-    }
-
-    bcopy(gFramebuffers[srcIndex], gFramebuffers[dstIndex], FRAMEBUFFER_SIZE);
-}
-
-void crash_screen_take_screenshot(void) {
-    sScreenshotFrameBuffer = 2;
-    if (sScreenshotFrameBuffer != sRenderingFramebuffer) {
-        // Save a screenshot of the game to a framebuffer that's not sRenderedFramebuffer or sRenderingFramebuffer.
-        copy_framebuffer(sScreenshotFrameBuffer, sRenderingFramebuffer);
-    }
-    sRenderedFramebuffer = 0;
-    sRenderingFramebuffer = 1;
-}
-
 void reset_crash_screen_framebuffer(void) {
     if (sHideCrashScreen) {
-        copy_framebuffer(sRenderingFramebuffer, sScreenshotFrameBuffer);
+        bcopy(gZBuffer, (void *) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]), FRAMEBUFFER_SIZE);
     } else {
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA32_BLACK);
     }
+
+    osWritebackDCacheAll();
 }
 
 void update_crash_screen_framebuffer(void) {
-    copy_framebuffer(sRenderedFramebuffer, sRenderingFramebuffer);
+    osWritebackDCacheAll();
+
+    osViBlack(FALSE);
+    osRecvMesg(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, OS_MESG_BLOCK);
+    osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
+    osRecvMesg(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, OS_MESG_BLOCK);
+
+    if (++sRenderingFramebuffer == 3) {
+        sRenderingFramebuffer = 0;
+    }
 
     osWritebackDCacheAll();
-    osViBlack(FALSE);
-    osViSwapBuffer(gFramebuffers[sRenderedFramebuffer]);
-
 }
 
 void update_crash_screen_direction_input(void) {
@@ -1228,7 +1221,7 @@ void draw_crash_screen(OSThread *thread) {
 OSThread *get_crashed_thread(void) {
     OSThread *thread = __osGetCurrFaultedThread();
 
-    while (thread->priority != -1) {
+    while (thread && thread->priority != -1) {
         if (thread->priority >  OS_PRIORITY_IDLE
          && thread->priority <= OS_PRIORITY_APPMAX
          && (thread->flags & (BIT(0) | BIT(1)))) {
@@ -1309,9 +1302,6 @@ void draw_crashed_image_i4(void) {
     }
 }
 
-#define MSG_CPU_BREAK 1
-#define MSG_FAULT     2
-
 void thread20_crash_screen_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
@@ -1336,11 +1326,9 @@ void thread20_crash_screen_crash_screen(UNUSED void *arg) {
  #endif
                 draw_crashed_image_i4();
 
-                copy_framebuffer(sRenderedFramebuffer, sRenderingFramebuffer);
-
                 osWritebackDCacheAll();
                 osViBlack(FALSE);
-                osViSwapBuffer(gFramebuffers[sRenderedFramebuffer]);
+                osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
             }
         }
     }
@@ -1365,7 +1353,12 @@ void thread2_crash_screen(UNUSED void *arg) {
     while (TRUE) {
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
-            crash_screen_take_screenshot();
+
+            osViSetEvent(&gCrashScreen.mesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
+
+            // Save a screenshot of the game to the Z buffer's memory space.
+            bcopy(gFramebuffers[sRenderingFramebuffer], gZBuffer, FRAMEBUFFER_SIZE);
+
             thread = get_crashed_thread();
             if (thread) {
                 if ((uintptr_t) map_data_init != MAP_PARSER_ADDRESS) {
@@ -1378,6 +1371,9 @@ void thread2_crash_screen(UNUSED void *arg) {
                     sCrashPage = PAGE_ASSERTS;
                 }
 
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+                crash_screen_crash_screen_init();
+#endif
 #ifdef FUNNY_CRASH_SOUND
                 gCrashScreen.thread.priority = 15;
                 stop_sounds_in_continuous_banks();
@@ -1387,9 +1383,6 @@ void thread2_crash_screen(UNUSED void *arg) {
                 play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
                 audio_signal_game_loop_tick();
                 crash_screen_sleep(200);
-#endif
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-                crash_screen_crash_screen_init();
 #endif
             }
         } else {
