@@ -925,7 +925,7 @@ void draw_ram_viewer(OSThread *thread) {
 #define DISASM_SCROLL_MIN RAM_START
 #define DISASM_SCROLL_MAX (RAM_END - DISASM_SHOWN_SECTION)
 
-extern char *insn_disasm(u32 insn, u32 isPC);
+extern char *insn_disasm(u32 insn, uintptr_t addr, u32 isPC);
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
@@ -944,7 +944,7 @@ void draw_disasm(OSThread *thread) {
         uintptr_t addr = (sProgramPosition + (i * DISASM_STEP));
         uintptr_t toDisasm = *(uintptr_t*)(addr);
 
-        crash_screen_print(TEXT_X(0), TEXT_Y(2 + i), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
+        crash_screen_print(TEXT_X(0), TEXT_Y(2 + i), "%s", insn_disasm(toDisasm, addr, (addr == tc->pc)));
     }
 
     sCrashScreenWordWrap = TRUE;
@@ -1106,7 +1106,7 @@ void crash_screen_input_stacktrace(void) {
     }
 }
 
-void crash_screen_jump_to_address(void) {
+void crash_screen_select_address(size_t step) {
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
         sAddressSelecCharIndex = ((sAddressSelecCharIndex - 1) & 0x7);
         sUpdateBuffer = TRUE;
@@ -1126,7 +1126,7 @@ void crash_screen_jump_to_address(void) {
         nextSelectedAddress = ((sAddressSelect & ~(0xF << shift)) | (new << shift));
 
         if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
-            sAddressSelect = (nextSelectedAddress & ~0xF);
+            sAddressSelect = ALIGN(nextSelectedAddress, step);
             sUpdateBuffer = TRUE;
         }
     }
@@ -1138,7 +1138,7 @@ void crash_screen_jump_to_address(void) {
         nextSelectedAddress = ((sAddressSelect & ~(0xF << shift)) | (new << shift));
 
         if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
-            sAddressSelect = (nextSelectedAddress & ~0xF);
+            sAddressSelect = ALIGN(nextSelectedAddress, step);
             sUpdateBuffer = TRUE;
         }
     }
@@ -1153,7 +1153,7 @@ void crash_screen_jump_to_address(void) {
 
 void crash_screen_input_ram_viewer(void) {
     if (sAddressSelectMenuOpen) {
-        crash_screen_jump_to_address();
+        crash_screen_select_address(RAM_VIEWER_STEP);
     } else if (!update_crash_screen_page()) {
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
             // Scroll up.
@@ -1187,7 +1187,7 @@ void crash_screen_input_ram_viewer(void) {
 
 void crash_screen_input_disasm(void) {
     if (sAddressSelectMenuOpen) {
-        crash_screen_jump_to_address();
+        crash_screen_select_address(DISASM_STEP);
     } else if (!update_crash_screen_page()) {
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
             // Scroll up.
