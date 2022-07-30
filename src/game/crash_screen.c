@@ -686,7 +686,7 @@ void draw_crash_context(OSThread *thread) {
     if (fname == NULL) {
         crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
     } else {
-        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUMCTION_NAME, fname);
+        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
 #endif
 
@@ -749,7 +749,7 @@ void draw_stacktrace(OSThread *thread) {
 
 #ifdef INCLUDE_DEBUG_MAP
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
-    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUMCTION_NAME, parse_map(tc->pc));
+    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, parse_map(tc->pc));
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 

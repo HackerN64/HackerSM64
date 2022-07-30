@@ -143,12 +143,12 @@ char *insn_disasm(InsnData insn, u32 isPC) {
 #ifdef INCLUDE_DEBUG_MAP
                     strp += sprintf(strp, "@%08X%-6s @%08X%s",
                         COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                        COLOR_RGBA32_CRASH_FUMCTION_NAME, parse_map(target)
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, parse_map(target)
                     );
 #else
                     strp += sprintf(strp, "@%08X%-6s @%08X%08X",
                         COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                        COLOR_RGBA32_CRASH_FUMCTION_NAME, target
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
                     );
 #endif
                     break;
