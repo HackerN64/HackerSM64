@@ -79,7 +79,7 @@ typedef struct __attribute__((packed)) {
 } InsnTemplate; /*0x10*/
 
 
-#define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (offset)))
+#define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (s16)(offset)))
 
 
 // MIPS III Instructions
@@ -499,61 +499,28 @@ char *insn_disasm(InsnData insn, uintptr_t addr, u32 isPC) {
                     break;
                 case PARAM_SO:
                     target = INSN_OFFSET(addr, (1 + insn.i.immediate));
-#ifdef INCLUDE_DEBUG_MAP
-                    fname = parse_map(target);
-#endif
-                    if (((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
-                        strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, target
-                        );
-                    } else {
-                        strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X%s",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
-                        );
-                    }
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
+                        COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
+                        COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
+                    );
                     break;
                 case PARAM_STO:
                     target = INSN_OFFSET(addr, (1 + insn.i.immediate));
-#ifdef INCLUDE_DEBUG_MAP
-                    fname = parse_map(target);
-#endif
-                    if (((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
-                        strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
-                                                              registerMaps[insn.i.rt],
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, target
-                        );
-                    } else {
-                        strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X%s",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
-                                                              registerMaps[insn.i.rt],
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
-                        );
-                    }
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
+                        COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
+                        COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
+                                                          registerMaps[insn.i.rt],
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
+                    );
                     break;
                 case PARAM_B:
                 case PARAM_BC1:
                     target = INSN_OFFSET(addr, (1 + insn.i.immediate));
-#ifdef INCLUDE_DEBUG_MAP
-                    fname = parse_map(target);
-#endif
-                    if (((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
-                        strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, target
-                        );
-                    } else {
-                        strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
-                        );
-                    }
+                    strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
+                        COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
+                    );
                     break;
                 case PARAM_J:
                     target = (0x80000000 | ((insn.d & 0x1FFFFFF) * sizeof(InsnData)));
