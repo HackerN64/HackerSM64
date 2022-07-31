@@ -74,7 +74,7 @@ typedef union {
 
 typedef struct __attribute__((packed)) {
     /*0x00*/ InsnData i;
-    /*0x04*/ u16 arbitraryParam;
+    /*0x04*/ u16 paramType;
     /*0x06*/ char name[10];
 } InsnTemplate; /*0x10*/
 
@@ -372,8 +372,8 @@ char *insn_disasm(InsnData insn, uintptr_t addr, u32 isPC) {
     }
 
     for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
-        if ((insn.d & insn_masks[insn_db[i].arbitraryParam].d) == insn_db[i].i.d) {
-            switch (insn_db[i].arbitraryParam) {
+        if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
+            switch (insn_db[i].paramType) {
                 case PARAM_SYS:
                 case PARAM_SYN:
                 case PARAM_N:
