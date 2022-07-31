@@ -11,6 +11,7 @@
 #include "game/sound_init.h"
 #include "buffers/buffers.h"
 #include "segments.h"
+#include "crash_screen/crash_screen.h"
 #include "game/main.h"
 #include "game/rumble_init.h"
 #include "game/version.h"
@@ -317,8 +318,6 @@ void check_cache_emulation() {
     // Restore interrupts
     __osRestoreInt(saved);
 }
-
-extern void crash_screen_init(void);
 
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();

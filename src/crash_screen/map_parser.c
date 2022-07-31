@@ -3,15 +3,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include "segments.h"
+#include "map_parser.h"
 
 #define STACK_TRAVERSAL_LIMIT 100
-
-struct MapEntry {
-    uintptr_t addr;
-    size_t nm_offset;
-    size_t nm_len;
-    size_t pad;
-};
 
 extern u8 gMapStrings[];
 extern struct MapEntry gMapEntries[];
@@ -94,9 +88,9 @@ char *parse_map_exact(uintptr_t addr) {
     return NULL;
 }
 
-char *find_function_in_stack(uintptr_t **sp) {
+char *find_function_in_stack(uintptr_t *sp) {
     for (s32 i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
-        uintptr_t val = *(*sp)++;
+        uintptr_t val = *(uintptr_t *)sp++;
 
         if (is_in_code_segment(val)) {
             return parse_map(val);

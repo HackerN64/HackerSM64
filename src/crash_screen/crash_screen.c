@@ -5,6 +5,9 @@
 #include "types.h"
 #include "sm64.h"
 #include "farcall.h"
+#include "crash_screen.h"
+#include "insn_disasm.h"
+#include "map_parser.h"
 #include "audio/external.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
@@ -17,125 +20,12 @@
 #include "game/rumble_init.h"
 #include "game/vc_check.h"
 
-enum MessageIDs {
-    MSG_NONE,
-    MSG_CPU_BREAK,
-    MSG_FAULT,
-    MESG_VI_VBLANK,
-};
-
-enum CrashPages {
-    PAGE_CONTEXT,
-    PAGE_ASSERTS,
-#ifdef PUPPYPRINT_DEBUG
-    PAGE_LOG,
-#endif
-    PAGE_STACKTRACE,
-    PAGE_RAM_VIEWER,
-    PAGE_DISASM,
-    PAGE_CONTROLS,
-    PAGE_COUNT,
-    PAGES_MAX = 255,
-};
-
-enum CrashScreenDirectionFlags {
-    CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE         = 0x0,
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP       = BIT(0),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN     = BIT(1),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT     = BIT(2),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT    = BIT(3),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP    = BIT(4),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN  = BIT(5),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT  = BIT(6),
-    CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT = BIT(7),
-};
-
-// Crash screen font properties.
-#define CRASH_SCREEN_FONT_CHAR_WIDTH     5
-#define CRASH_SCREEN_FONT_CHAR_HEIGHT    7
-#define CRASH_SCREEN_FONT_CHARS_PER_ROW  6
-#define CRASH_SCREEN_FONT_NUM_ROWS      43
-
-// Spacing between chars.
-#define CRASH_SCREEN_CHAR_SPACING_X      1
-#define CRASH_SCREEN_CHAR_SPACING_Y      3
-
-// The amount of space each char uses.
-#define CRASH_SCREEN_LETTER_WIDTH       (CRASH_SCREEN_FONT_CHAR_WIDTH  + CRASH_SCREEN_CHAR_SPACING_X) //  6
-#define CRASH_SCREEN_ROW_HEIGHT         (CRASH_SCREEN_FONT_CHAR_HEIGHT + CRASH_SCREEN_CHAR_SPACING_Y) // 10
-
-// Width and height of crash screen.
-#define CRASH_SCREEN_W 270
-#define CRASH_SCREEN_H 222
-
-// Number of chars that can fit in the crash screen.
-#define CRASH_SCREEN_NUM_CHARS_X ((CRASH_SCREEN_W - 1) / CRASH_SCREEN_LETTER_WIDTH) // 44
-#define CRASH_SCREEN_NUM_CHARS_Y ((CRASH_SCREEN_H - 1) / CRASH_SCREEN_ROW_HEIGHT)   // 22
-
-// Macros for string size.
-#define TEXT_WIDTH(numChars)  ((numChars) * CRASH_SCREEN_LETTER_WIDTH) // n *  6
-#define TEXT_HEIGHT(numChars) ((numChars) * CRASH_SCREEN_ROW_HEIGHT  ) // n * 10
-
-// Width and height of the text grid.
-#define CRASH_SCREEN_TEXT_W TEXT_WIDTH( CRASH_SCREEN_NUM_CHARS_X) // 264
-#define CRASH_SCREEN_TEXT_H TEXT_HEIGHT(CRASH_SCREEN_NUM_CHARS_Y) // 220
-
-// Number of pixels between the text and the edge of the crash screen.
-#define CRASH_SCREEN_TEXT_MARGIN_X ((CRASH_SCREEN_W - CRASH_SCREEN_TEXT_W) / 2) // 3
-#define CRASH_SCREEN_TEXT_MARGIN_Y ((CRASH_SCREEN_H - CRASH_SCREEN_TEXT_H) / 2) // 1
-
-// Top left corner of crash screen (round up).
-#define CRASH_SCREEN_X1 (((SCREEN_WIDTH  - CRASH_SCREEN_W) / 2) - 0) // 25
-#define CRASH_SCREEN_Y1 (((SCREEN_HEIGHT - CRASH_SCREEN_H) / 2) - 1) //  8
-
-// Bottom right corner of crash screen.
-#define CRASH_SCREEN_X2 (CRASH_SCREEN_X1 + CRASH_SCREEN_W) // 295
-#define CRASH_SCREEN_Y2 (CRASH_SCREEN_Y1 + CRASH_SCREEN_H) // 230
-
-// Top left corner of the text grid.
-#define CRASH_SCREEN_TEXT_X1 (CRASH_SCREEN_X1 + CRASH_SCREEN_TEXT_MARGIN_X + 0) // 28
-#define CRASH_SCREEN_TEXT_Y1 (CRASH_SCREEN_Y1 + CRASH_SCREEN_TEXT_MARGIN_Y + 1) // 10
-
-// Bottom right corner of the text grid.
-#define CRASH_SCREEN_TEXT_X2 (CRASH_SCREEN_TEXT_X1 + CRASH_SCREEN_TEXT_W) // 292
-#define CRASH_SCREEN_TEXT_Y2 (CRASH_SCREEN_TEXT_Y1 + CRASH_SCREEN_TEXT_H) // 230
-
-// Macros to convert a position on the text grid to screen coords.
-#define TEXT_X(numChars) (CRASH_SCREEN_TEXT_X1 + TEXT_WIDTH(numChars) ) // 28 + (n *  6)
-#define TEXT_Y(numChars) (CRASH_SCREEN_TEXT_Y1 + TEXT_HEIGHT(numChars)) // 10 + (n * 10)
-
-#define DIVIDER_Y(numChars) (TEXT_Y(numChars) - 2)
-
-typedef u32 FontRow;
-
 // Crash screen font. Each row of the image fits in one u32 pointer.
 ALIGNED32 FontRow gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS] = {
     #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
 };
 
-
-#define STACK_SIZE 256 // (s32)(0x800 / sizeof(u64))
-
-#define DISASM_BRANCH_BUFFER_SIZE 0x100
-
-struct FunctionInStack {
-    uintptr_t addr;
-    char *name;
-};
-
-struct CrashScreenPage {
-    void (*drawFunc)(OSThread *thread);
-    void (*inputFunc)(void);
-};
-
 #ifdef INCLUDE_DEBUG_MAP
-struct BranchArrow {
-    uintptr_t startLine;
-    s16 branchOffset;
-    s32 colorIndex;
-    s32 xPos;
-};
-
 struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
 static s32 sNumBranchArrows = 0;
 #endif
@@ -219,24 +109,11 @@ static const RGBA32 sBranchColors[] = {
 #endif
 
 extern u64 osClockRate;
-extern far s32 is_in_code_segment(uintptr_t addr);
-extern far char *parse_map(uintptr_t addr);
-extern far char *parse_map_return(uintptr_t *addr);
-extern far void map_data_init(void);
-extern far char *find_function_in_stack(uintptr_t *sp);
-
-struct CrashScreen {
-    /*0x000*/ OSThread thread;
-    /*0x1B0*/ u64 stack[0x800 / sizeof(u64)];
-    /*0x9B0*/ OSMesgQueue mesgQueue;
-    /*0x9C8*/ OSMesg mesg;
-}; /*0x9CC*/
 
 struct CrashScreen gCrashScreen;
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 struct CrashScreen gCrashScreen2;
 #endif
-
 
 static ALWAYS_INLINE RGBA16 *crash_screen_get_framebuffer_pixel_ptr(u32 x, u32 y) {
     return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
@@ -475,8 +352,6 @@ static s32 glyph_to_hex(char *dest, char glyph) {
     return TRUE;
 }
 
-#define CHAR_TO_GLYPH(c) ((c) & 0xFF)
-
 s32 crash_screen_parse_text_color(RGBA32 *color, char *buf, u32 index, u32 size) {
     u32 byteIndex, digit;
     char glyph;
@@ -571,12 +446,9 @@ enum CrashScreenPrintOp {
     CRASH_SCREEN_PRINT_OP_NEWLINE,
 };
 
-#define CHAR_BUFFER_SIZE 0x100
-
 u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
     char glyph;
     char buf[CHAR_BUFFER_SIZE];
-
     bzero(&buf, sizeof(buf));
 
     va_list args;
@@ -793,8 +665,6 @@ void draw_crash_log(UNUSED OSThread *thread) {
 }
 #endif
 
-#define STACK_TRACE_NUM_ROWS 18
-
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void draw_stacktrace(OSThread *thread) {
@@ -866,15 +736,6 @@ void draw_stacktrace(OSThread *thread) {
     osWritebackDCacheAll();
 }
 
-#define JUMP_MENU_W (TEXT_WIDTH(8))
-#define JUMP_MENU_H (TEXT_HEIGHT(1))
-
-#define JUMP_MENU_X (SCREEN_CENTER_X - (JUMP_MENU_W / 2))
-#define JUMP_MENU_Y (SCREEN_CENTER_Y - (JUMP_MENU_H / 2))
-
-#define JUMP_MENU_MARGIN_X 10
-#define JUMP_MENU_MARGIN_Y 10
-
 void draw_address_select(void) {
     crash_screen_draw_rect((JUMP_MENU_X -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y - TEXT_HEIGHT(2) -  JUMP_MENU_MARGIN_X     ),
                            (JUMP_MENU_W + (JUMP_MENU_MARGIN_Y * 2)), (JUMP_MENU_H + TEXT_HEIGHT(2) + (JUMP_MENU_MARGIN_Y * 2)),
@@ -892,14 +753,6 @@ void draw_address_select(void) {
 
     osWritebackDCacheAll();
 }
-
-#define RAM_VIEWER_STEP 0x10
-
-#define RAM_VIEWER_NUM_ROWS 18
-#define RAM_VIEWER_SHOWN_SECTION ((RAM_VIEWER_NUM_ROWS - 1) * RAM_VIEWER_STEP)
-
-#define RAM_VIEWER_SCROLL_MIN RAM_START
-#define RAM_VIEWER_SCROLL_MAX (RAM_END - RAM_VIEWER_SHOWN_SECTION)
 
 void draw_ram_viewer(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
@@ -979,20 +832,7 @@ void draw_ram_viewer(OSThread *thread) {
     osWritebackDCacheAll();
 }
 
-#define DISASM_STEP 0x4
-
-#define DISASM_NUM_ROWS 18
-#define DISASM_SHOWN_SECTION ((DISASM_NUM_ROWS - 1) * DISASM_STEP)
-
-#define DISASM_SCROLL_MIN RAM_START
-#define DISASM_SCROLL_MAX (RAM_END - DISASM_SHOWN_SECTION)
-
-#define DISASM_BRANCH_ARROW_START_X TEXT_X(23)
-#define DISASM_BRANCH_ARROW_SPACING (TEXT_WIDTH(1) / 2)
-#define DISASM_FUNCTION_SEARCH_MAX_OFFSET (1024 * DISASM_STEP)
-
 #ifdef INCLUDE_DEBUG_MAP
-extern s32 is_branch(u32 insn);
 void crash_screen_fill_branch_buffer(char *fname, const uintptr_t funcAddr) {
     u32 offsetInFunc = 0;
     u32 curBranchDist = 10;
@@ -1011,7 +851,8 @@ void crash_screen_fill_branch_buffer(char *fname, const uintptr_t funcAddr) {
     if (fname != NULL) {
         while (offsetInFunc < DISASM_FUNCTION_SEARCH_MAX_OFFSET && fname == parse_map(funcAddr + offsetInFunc)) {
             uintptr_t addr = (funcAddr + offsetInFunc);
-            uintptr_t toDisasm = *(uintptr_t*)addr;
+            InsnData toDisasm;
+            toDisasm.d = *(uintptr_t*)addr;
 
             branchOffset = is_branch(toDisasm);
 
@@ -1059,7 +900,6 @@ void draw_disasm_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color
 }
 #endif
 
-extern char *insn_disasm(u32 insn, u32 isPC);
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 #ifdef INCLUDE_DEBUG_MAP
@@ -1114,7 +954,8 @@ void draw_disasm(OSThread *thread) {
 
     for (u32 i = 0; i < DISASM_NUM_ROWS; i++) {
         uintptr_t addr = (sProgramPosition + (i * DISASM_STEP));
-        uintptr_t toDisasm = *(uintptr_t*)(addr);
+        InsnData toDisasm;
+        toDisasm.d = *(uintptr_t*)(addr);
 
         if (is_in_code_segment(addr)) {
             crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
@@ -1123,12 +964,12 @@ void draw_disasm(OSThread *thread) {
             bzero(asText, sizeof(asText));
 
             for (u32 j = 0; j < 4; j++) {
-                asText[j] = (char)(toDisasm >> (24 - (8 * j)));
+                asText[j] = (char)(toDisasm.d >> (24 - (8 * j)));
             }
 
             crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", asText);
         } else {
-            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%08X", toDisasm);
+            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%08X", toDisasm.d);
         }
     }
 
@@ -1533,8 +1374,6 @@ extern u8 _crash_screen_crash_screenSegmentRomStart[];
 extern u8 _crash_screen_crash_screenSegmentRomEnd[];
 extern void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd);
 
-#define SRC_IMG_SIZE (SCREEN_SIZE / 2)
-
 void draw_crashed_image_i4(void) {
     u8 srcColor;
     Color color;
@@ -1569,8 +1408,8 @@ void thread20_crash_screen_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
 
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen2.mesgQueue, (OSMesg)MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen2.mesgQueue, (OSMesg)MSG_FAULT);
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen2.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen2.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
 
     while (TRUE) {
         if (thread == NULL) {
@@ -1611,14 +1450,14 @@ void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
 
-    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg)MSG_CPU_BREAK);
-    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg)MSG_FAULT);
+    osSetEventMesg(OS_EVENT_CPU_BREAK, &gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_CPU_BREAK);
+    osSetEventMesg(OS_EVENT_FAULT,     &gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_FAULT);
 
     while (TRUE) {
         if (thread == NULL) {
             osRecvMesg(&gCrashScreen.mesgQueue, &mesg, OS_MESG_BLOCK);
 
-            osViSetEvent(&gCrashScreen.mesgQueue, (OSMesg) MESG_VI_VBLANK, 1);
+            osViSetEvent(&gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
 
             // Save a screenshot of the game to the Z buffer's memory space.
             bcopy(gFramebuffers[sRenderingFramebuffer], gZBuffer, FRAMEBUFFER_SIZE);
@@ -1629,12 +1468,10 @@ void thread2_crash_screen(UNUSED void *arg) {
                 map_data_init();
                 fill_function_stack_trace(thread);
 #endif
-
                 // Default to the assert page if the crash was caused by an assert.
                 if (thread->context.cause == EXC_SYSCALL) {
                     sCrashPage = PAGE_ASSERTS;
                 }
-
 #ifdef CRASH_SCREEN_CRASH_SCREEN
                 crash_screen_crash_screen_init();
 #endif
