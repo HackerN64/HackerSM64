@@ -141,14 +141,14 @@ static s8 sCrashScreenWordWrap = TRUE;
 static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
-static s8 sRamViewerShowAscii = FALSE;
+static s8 sShowRamAsAscii = FALSE;
 static s8 sAddressSelecCharIndex = 2;
 static uintptr_t sAddressSelect = 0;
 static uintptr_t sProgramPosition = 0;
 static u32 sStackTraceIndex = 0;
 
-u8 sCrashPage = PAGE_CONTEXT;
-u8 sUpdateBuffer = TRUE;
+static u8 sCrashPage = PAGE_CONTEXT;
+static u8 sUpdateBuffer = TRUE;
 
 
 char *gCauseDesc[18] = {
@@ -196,7 +196,8 @@ char *gRegNames[29] = {
 
 
 extern u64 osClockRate;
-extern far char *parse_map(uintptr_t pc);
+extern far s32 is_in_code_segment(uintptr_t addr);
+extern far char *parse_map(uintptr_t addr);
 extern far void map_data_init(void);
 extern far char *find_function_in_stack(uintptr_t *sp);
 
@@ -872,9 +873,9 @@ void draw_ram_viewer(OSThread *thread) {
     }
     crash_screen_draw_divider(DIVIDER_Y(3));
 
-    crash_screen_draw_rect(TEXT_X(8) + 2, DIVIDER_Y(line), 1, TEXT_HEIGHT(19), COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_rect((TEXT_X(8) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(19), COLOR_RGBA32_LIGHT_GRAY);
 
-    line += crash_screen_print(TEXT_X( 1), TEXT_Y(line), "MEMORY");
+    line += crash_screen_print(TEXT_X(1), TEXT_Y(line), "MEMORY");
 
     charX = (TEXT_X(8) + 3);
     charY = TEXT_Y(line);
@@ -892,7 +893,7 @@ void draw_ram_viewer(OSThread *thread) {
                 charX += 2;
             }
 
-            if (sRamViewerShowAscii) {
+            if (sShowRamAsAscii) {
                 crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, value, COLOR_RGBA32_WHITE);
             } else {
                 crash_screen_print(charX, charY, "@%08X%02X", ((x & 0x1) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY), value);
@@ -902,11 +903,13 @@ void draw_ram_viewer(OSThread *thread) {
         }
     }
 
-    crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
-    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@%08Xup/down:scroll        a:jump  b:toggle ascii", COLOR_RGBA32_CRASH_CONTROLS);
+    u32 line2 = (line + RAM_VIEWER_NUM_ROWS);
+
+    crash_screen_draw_divider(DIVIDER_Y(line2));
+    crash_screen_print(TEXT_X(0), TEXT_Y(line2), "@%08Xup/down:scroll        a:jump  b:toggle ascii", COLOR_RGBA32_CRASH_CONTROLS);
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(3), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     osWritebackDCacheAll();
 
@@ -919,7 +922,7 @@ void draw_ram_viewer(OSThread *thread) {
 
 #define DISASM_STEP 0x4
 
-#define DISASM_NUM_ROWS 19
+#define DISASM_NUM_ROWS 18
 #define DISASM_SHOWN_SECTION ((DISASM_NUM_ROWS - 1) * DISASM_STEP)
 
 #define DISASM_SCROLL_MIN RAM_START
@@ -933,8 +936,21 @@ void draw_disasm(OSThread *thread) {
         sProgramPosition = (tc->pc - ((DISASM_NUM_ROWS / 2) * DISASM_STEP));
     }
 
-    crash_screen_print(TEXT_X(0), TEXT_Y(1), "@%08XDISASM", COLOR_RGBA32_CRASH_PAGE_NAME);
-    crash_screen_print(TEXT_X(7), TEXT_Y(1), "%08X-%08X", sProgramPosition, (sProgramPosition + DISASM_SHOWN_SECTION));
+    u32 line = 1;
+    char *fname = NULL;
+
+    crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XDISASM", COLOR_RGBA32_CRASH_PAGE_NAME);
+    line += crash_screen_print(TEXT_X(7), TEXT_Y(line), "%08X-%08X", sProgramPosition, (sProgramPosition + DISASM_SHOWN_SECTION));
+    crash_screen_draw_divider(DIVIDER_Y(line));
+#ifdef INCLUDE_DEBUG_MAP
+    fname = parse_map(sProgramPosition);
+#endif
+    if (((fname == NULL)/* || ((*(uintptr_t*)sProgramPosition & 0x80000000) == 0)*/)) {
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
+    } else {
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN: @%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
+    }
+    crash_screen_draw_divider(DIVIDER_Y(line));
 
     osWritebackDCacheAll();
 
@@ -944,22 +960,36 @@ void draw_disasm(OSThread *thread) {
         uintptr_t addr = (sProgramPosition + (i * DISASM_STEP));
         uintptr_t toDisasm = *(uintptr_t*)(addr);
 
-        crash_screen_print(TEXT_X(0), TEXT_Y(2 + i), "%s", insn_disasm(toDisasm, addr, (addr == tc->pc)));
+        if (is_in_code_segment(addr)) {
+            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", insn_disasm(toDisasm, addr, (addr == tc->pc)));
+        } else if (sShowRamAsAscii) {
+            char asText[8];
+            bzero(asText, sizeof(asText));
+
+            for (s32 j = 0; j < 4; j++) {
+                asText[j] = (char)(toDisasm >> (24 - (8 * j)));
+            }
+
+            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", asText);
+        } else {
+            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%08X", toDisasm);
+        }
     }
 
     sCrashScreenWordWrap = TRUE;
 
     osWritebackDCacheAll();
 
-    crash_screen_draw_divider(DIVIDER_Y(2));
-    crash_screen_draw_divider(DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1));
-    crash_screen_print(TEXT_X(0), TEXT_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), "@%08Xup/down:scroll                        a:jump", COLOR_RGBA32_CRASH_CONTROLS);
+    u32 line2 = (line + DISASM_NUM_ROWS);
+
+    crash_screen_draw_divider(DIVIDER_Y(line2));
+    crash_screen_print(TEXT_X(0), TEXT_Y(line2), "@%08Xup/down:scroll        a:jump  b:toggle ascii", COLOR_RGBA32_CRASH_CONTROLS);
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     // Scroll bar crash position marker
-    crash_screen_draw_scroll_bar(DIVIDER_Y(2), DIVIDER_Y(CRASH_SCREEN_NUM_CHARS_Y - 1), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA32_CRASH_AT);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA32_CRASH_AT);
 
     osWritebackDCacheAll();
 
@@ -1179,7 +1209,7 @@ void crash_screen_input_ram_viewer(void) {
         }
         if (gPlayer1Controller->buttonPressed & B_BUTTON) {
             // Toggle whether the memory is printed as hex values or as ASCII chars.
-            sRamViewerShowAscii ^= TRUE;
+            sShowRamAsAscii ^= TRUE;
             sUpdateBuffer = TRUE;
         }
     }
@@ -1209,6 +1239,11 @@ void crash_screen_input_disasm(void) {
             // Open the jump to address box.
             sAddressSelectMenuOpen = TRUE;
             sAddressSelect = sProgramPosition;
+            sUpdateBuffer = TRUE;
+        }
+        if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+            // Toggle whether the memory is printed as hex values or as ASCII chars.
+            sShowRamAsAscii ^= TRUE;
             sUpdateBuffer = TRUE;
         }
     }

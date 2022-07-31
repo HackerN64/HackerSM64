@@ -48,7 +48,7 @@ enum ParamTypes {
     PARAM_UNK, // unimpl
 };
 
-extern far char *parse_map(uintptr_t pc);
+extern far char *parse_map_exact(uintptr_t pc);
 static char insn_as_string[0x100];
 
 typedef struct __attribute__((packed)) {
@@ -93,11 +93,11 @@ static const InsnTemplate insn_db[] = {
     {{.i={0b010001, 0b01000, 0b00011,       0,       0,        0}}, PARAM_BC1, "BC1TL"  },
     // memory access
     {{.i={0b010001, 0b00000,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "MFC1"   },
-    {{.i={0b010001, 0b00001,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "DMFC1"  },
+    // {{.i={0b010001, 0b00001,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "DMFC1"  },
     {{.i={0b010001, 0b00100,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "MTC1"   },
-    {{.i={0b010001, 0b00101,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "DMTC1"  },
-    {{.i={0b010001, 0b00010,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CFC1"   },
-    {{.i={0b010001, 0b00110,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CTC1"   },
+    // {{.i={0b010001, 0b00101,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "DMTC1"  },
+    // {{.i={0b010001, 0b00010,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CFC1"   },
+    // {{.i={0b010001, 0b00110,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CTC1"   },
     // arithmetic
     {{.i={0b010001,       0, 0b00000,       0,       0, 0b000101}}, PARAM_FF,  "ABS"    },
     {{.i={0b010001,       0,       0,       0,       0, 0b000000}}, PARAM_FFF, "ADD"    },
@@ -124,9 +124,9 @@ static const InsnTemplate insn_db[] = {
 //          opcode,      rs,      rt,      rd,      sa,  function
     // Arithmetic
     // add
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100000}}, PARAM_DST, "ADD"    },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b100000}}, PARAM_DST, "ADD"    },
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100001}}, PARAM_DST, "ADDU"   },
-    {{.i={0b001000,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDI"   },
+    // {{.i={0b001000,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDI"   },
     {{.i={0b001001,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDIU"  },
     // sub
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100010}}, PARAM_DST, "SUB"    },
@@ -148,13 +148,13 @@ static const InsnTemplate insn_db[] = {
     {{.i={0b001010,       0,       0,       0,       0,        0}}, PARAM_TSI, "SLTI"   },
     {{.i={0b001011,       0,       0,       0,       0,        0}}, PARAM_TSI, "SLTIU"  },
     // doubleword add
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b101100}}, PARAM_DST, "DADD"   },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b101101}}, PARAM_DST, "DADDU"  },
-    {{.i={0b011000,       0,       0,       0,       0,        0}}, PARAM_TSI, "DADDI"  },
-    {{.i={0b011001,       0,       0,       0,       0,        0}}, PARAM_TSI, "DADDIU" },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101100}}, PARAM_DST, "DADD"   },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101101}}, PARAM_DST, "DADDU"  },
+    // {{.i={0b011000,       0,       0,       0,       0,        0}}, PARAM_TSI, "DADDI"  },
+    // {{.i={0b011001,       0,       0,       0,       0,        0}}, PARAM_TSI, "DADDIU" },
     // dooubleword sub
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b101110}}, PARAM_DST, "DSUB"   },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b101111}}, PARAM_DST, "DSUBU"  },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101110}}, PARAM_DST, "DSUB"   },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101111}}, PARAM_DST, "DSUBU"  },
 
     // Shifter
     {{.i={0b000000, 0b00000,       0,       0,       0, 0b000000}}, PARAM_DTA, "SLL"    },
@@ -164,15 +164,15 @@ static const InsnTemplate insn_db[] = {
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b000110}}, PARAM_DTS, "SRLV"   },
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b000111}}, PARAM_DTS, "SRAV"   },
     // doubleword
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b111000}}, PARAM_DTA, "DSLL"   },
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b111010}}, PARAM_DTA, "DSRL"   },
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b111011}}, PARAM_DTA, "DSRA"   },
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b111100}}, PARAM_DTA, "DSLL32" },
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b111110}}, PARAM_DTA, "DSRL32" },
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b111111}}, PARAM_DTA, "DSRA32" },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b010100}}, PARAM_DTS, "DSLLV"  },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b010110}}, PARAM_DTS, "DSRLV"  },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b010111}}, PARAM_DTS, "DSRAV"  },
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111000}}, PARAM_DTA, "DSLL"   },
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111010}}, PARAM_DTA, "DSRL"   },
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111011}}, PARAM_DTA, "DSRA"   },
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111100}}, PARAM_DTA, "DSLL32" },
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111110}}, PARAM_DTA, "DSRL32" },
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111111}}, PARAM_DTA, "DSRA32" },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010100}}, PARAM_DTS, "DSLLV"  },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010110}}, PARAM_DTS, "DSRLV"  },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010111}}, PARAM_DTS, "DSRAV"  },
 
     // Multiply
     // move hi
@@ -188,20 +188,20 @@ static const InsnTemplate insn_db[] = {
     {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011010}}, PARAM_ST,  "DIV"    },
     {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011011}}, PARAM_ST,  "DIVU"   },
     // doubleword mult
-    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011100}}, PARAM_ST,  "DMULT"  },
-    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011101}}, PARAM_ST,  "DMULTU" },
-    // doubleword div
-    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011110}}, PARAM_ST,  "DDIV"   },
-    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011111}}, PARAM_ST,  "DDIVU"  },
+    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011100}}, PARAM_ST,  "DMULT"  },
+    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011101}}, PARAM_ST,  "DMULTU" },
+    // // doubleword div
+    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011110}}, PARAM_ST,  "DDIV"   },
+    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011111}}, PARAM_ST,  "DDIVU"  },
 
     // Branch
     {{.i={0b000001,       0, 0b00001,       0,       0,        0}}, PARAM_SO,  "BGEZ"   },
     {{.i={0b000001,       0, 0b00010,       0,       0,        0}}, PARAM_SO,  "BLTZL"  },
     {{.i={0b000001,       0, 0b00011,       0,       0,        0}}, PARAM_SO,  "BGEZL"  },
-    {{.i={0b000001,       0, 0b10000,       0,       0,        0}}, PARAM_SO,  "BLTZAL" },
-    {{.i={0b000001,       0, 0b10001,       0,       0,        0}}, PARAM_SO,  "BGEZAL" },
-    {{.i={0b000001,       0, 0b10010,       0,       0,        0}}, PARAM_SO,  "BLTZALL"},
-    {{.i={0b000001,       0, 0b10011,       0,       0,        0}}, PARAM_SO,  "BGEZALL"},
+    // {{.i={0b000001,       0, 0b10000,       0,       0,        0}}, PARAM_SO,  "BLTZAL" },
+    // {{.i={0b000001,       0, 0b10001,       0,       0,        0}}, PARAM_SO,  "BGEZAL" },
+    // {{.i={0b000001,       0, 0b10010,       0,       0,        0}}, PARAM_SO,  "BLTZALL"},
+    // {{.i={0b000001,       0, 0b10011,       0,       0,        0}}, PARAM_SO,  "BGEZALL"},
     {{.i={0b000111,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BGTZ"   },
     {{.i={0b010111,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BGTZL"  },
     {{.i={0b000110,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BLEZ"   },
@@ -217,37 +217,37 @@ static const InsnTemplate insn_db[] = {
     {{.i={0b000011,       0,       0,       0,       0,        0}}, PARAM_J,   "JAL"    },
     {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b001000}}, PARAM_S,   "JR"     },
     {{.i={0b000000,       0, 0b00000,       0, 0b00000, 0b001001}}, PARAM_DS,  "JALR"   },
-    {{.i={0b000000,       0,       0,       0,       0, 0b001101}}, PARAM_N,   "BREAK"  },
+    // {{.i={0b000000,       0,       0,       0,       0, 0b001101}}, PARAM_N,   "BREAK"  },
     // move
-    {{.i={0b010000, 0b00000,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MFC0"   },
-    {{.i={0b010000, 0b00100,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MTC0"   },
+    // {{.i={0b010000, 0b00000,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MFC0"   },
+    // {{.i={0b010000, 0b00100,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MTC0"   },
     // system call
-    {{.i={0b000000, 0b00000, 0b00000, 0b00000, 0b00000, 0b001100}}, PARAM_SYS, "SYSCALL"},
+    // {{.i={0b000000, 0b00000, 0b00000, 0b00000, 0b00000, 0b001100}}, PARAM_SYS, "SYSCALL"},
     // sync
-    {{.i={0b000000, 0b00000, 0b00000, 0b00000,       0, 0b001111}}, PARAM_SYN, "SYNC"   },
+    // {{.i={0b000000, 0b00000, 0b00000, 0b00000,       0, 0b001111}}, PARAM_SYN, "SYNC"   },
     // trap
-    {{.i={0b000000,       0,       0,       0,       0, 0b110000}}, PARAM_ST2, "TGE"    },
-    {{.i={0b000000,       0,       0,       0,       0, 0b110001}}, PARAM_ST2, "TGEU"   },
-    {{.i={0b000000,       0,       0,       0,       0, 0b110010}}, PARAM_ST2, "TLT"    },
-    {{.i={0b000000,       0,       0,       0,       0, 0b110011}}, PARAM_ST2, "TLTU"   },
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110000}}, PARAM_ST2, "TGE"    },
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110001}}, PARAM_ST2, "TGEU"   },
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110010}}, PARAM_ST2, "TLT"    },
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110011}}, PARAM_ST2, "TLTU"   },
     {{.i={0b000000,       0,       0,       0,       0, 0b110100}}, PARAM_ST2, "TEQ"    },
-    {{.i={0b000000,       0,       0,       0,       0, 0b110110}}, PARAM_ST2, "TNE"    },
-    {{.i={0b000001,       0, 0b01000,       0,       0,        0}}, PARAM_SI,  "TGEI"   },
-    {{.i={0b000001,       0, 0b01001,       0,       0,        0}}, PARAM_SI,  "TGEIU"  },
-    {{.i={0b000001,       0, 0b01010,       0,       0,        0}}, PARAM_SI,  "TLTI"   },
-    {{.i={0b000001,       0, 0b01011,       0,       0,        0}}, PARAM_SI,  "TLTIU"  },
-    {{.i={0b000001,       0, 0b01100,       0,       0,        0}}, PARAM_SI,  "TEQI"   },
-    {{.i={0b000001,       0, 0b01110,       0,       0,        0}}, PARAM_SI,  "TNEI"   },
-    
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110110}}, PARAM_ST2, "TNE"    },
+    // {{.i={0b000001,       0, 0b01000,       0,       0,        0}}, PARAM_SI,  "TGEI"   },
+    // {{.i={0b000001,       0, 0b01001,       0,       0,        0}}, PARAM_SI,  "TGEIU"  },
+    // {{.i={0b000001,       0, 0b01010,       0,       0,        0}}, PARAM_SI,  "TLTI"   },
+    // {{.i={0b000001,       0, 0b01011,       0,       0,        0}}, PARAM_SI,  "TLTIU"  },
+    // {{.i={0b000001,       0, 0b01100,       0,       0,        0}}, PARAM_SI,  "TEQI"   },
+    // {{.i={0b000001,       0, 0b01110,       0,       0,        0}}, PARAM_SI,  "TNEI"   },
+
     // Memory Access
     // coprocessor
-    {{.i={0b010000,       0,       0,       0,       0,        0}}, PARAM_N,   "COP0"   },
-    {{.i={0b010001,       0,       0,       0,       0,        0}}, PARAM_N,   "COP1"   },
-    {{.i={0b010010,       0,       0,       0,       0,        0}}, PARAM_N,   "COP2"   },
-    {{.i={0b010011,       0,       0,       0,       0,        0}}, PARAM_N,   "COP3"   },
+    // {{.i={0b010000,       0,       0,       0,       0,        0}}, PARAM_N,   "COP0"   },
+    // {{.i={0b010001,       0,       0,       0,       0,        0}}, PARAM_N,   "COP1"   },
+    // {{.i={0b010010,       0,       0,       0,       0,        0}}, PARAM_N,   "COP2"   },
+    // {{.i={0b010011,       0,       0,       0,       0,        0}}, PARAM_N,   "COP3"   },
     // load
-    {{.i={0b011010,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDL"    },
-    {{.i={0b011011,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDR"    },
+    // {{.i={0b011010,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDL"    },
+    // {{.i={0b011011,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDR"    },
     {{.i={0b100000,       0,       0,       0,       0,        0}}, PARAM_TIS, "LB"     },
     {{.i={0b100001,       0,       0,       0,       0,        0}}, PARAM_TIS, "LH"     },
     {{.i={0b100010,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWL"    },
@@ -255,34 +255,34 @@ static const InsnTemplate insn_db[] = {
     {{.i={0b100100,       0,       0,       0,       0,        0}}, PARAM_TIS, "LBU"    },
     {{.i={0b100101,       0,       0,       0,       0,        0}}, PARAM_TIS, "LHU"    },
     {{.i={0b100110,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWR"    },
-    {{.i={0b100111,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWU"    },
+    // {{.i={0b100111,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWU"    },
     // save
     {{.i={0b101000,       0,       0,       0,       0,        0}}, PARAM_TIS, "SB"     },
     {{.i={0b101001,       0,       0,       0,       0,        0}}, PARAM_TIS, "SH"     },
-    {{.i={0b101010,       0,       0,       0,       0,        0}}, PARAM_TIS, "SWL"    },
+    // {{.i={0b101010,       0,       0,       0,       0,        0}}, PARAM_TIS, "SWL"    },
     {{.i={0b101011,       0,       0,       0,       0,        0}}, PARAM_TIS, "SW"     },
-    {{.i={0b101100,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDL"    },
-    {{.i={0b101101,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDR"    },
-    {{.i={0b101110,       0,       0,       0,       0,        0}}, PARAM_TIS, "SWR"    },
-    {{.i={0b110000,       0,       0,       0,       0,        0}}, PARAM_TIS, "LL"     },
+    // {{.i={0b101100,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDL"    },
+    // {{.i={0b101101,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDR"    },
+    // {{.i={0b101110,       0,       0,       0,       0,        0}}, PARAM_TIS, "SWR"    },
+    // {{.i={0b110000,       0,       0,       0,       0,        0}}, PARAM_TIS, "LL"     },
     {{.i={0b110001,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC1"   },
-    {{.i={0b110010,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC2"   },
-    {{.i={0b110011,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC3"   },
-    {{.i={0b110100,       0,       0,       0,       0,        0}}, PARAM_TIS, "LLD"    },
+    // {{.i={0b110010,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC2"   },
+    // {{.i={0b110011,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC3"   },
+    // {{.i={0b110100,       0,       0,       0,       0,        0}}, PARAM_TIS, "LLD"    },
     {{.i={0b110101,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDC1"   },
-    {{.i={0b110110,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDC2"   },
-    {{.i={0b110111,       0,       0,       0,       0,        0}}, PARAM_TIS, "LD"     },
-    {{.i={0b111000,       0,       0,       0,       0,        0}}, PARAM_TIS, "SC"     },
+    // {{.i={0b110110,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDC2"   },
+    // {{.i={0b110111,       0,       0,       0,       0,        0}}, PARAM_TIS, "LD"     },
+    // {{.i={0b111000,       0,       0,       0,       0,        0}}, PARAM_TIS, "SC"     },
     {{.i={0b111001,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC1"   },
-    {{.i={0b111010,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC2"   },
-    {{.i={0b111011,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC3"   },
-    {{.i={0b111100,       0,       0,       0,       0,        0}}, PARAM_TIS, "SCD"    },
+    // {{.i={0b111010,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC2"   },
+    // {{.i={0b111011,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC3"   },
+    // {{.i={0b111100,       0,       0,       0,       0,        0}}, PARAM_TIS, "SCD"    },
     {{.i={0b111101,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDC1"   },
-    {{.i={0b111110,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDC2"   },
-    {{.i={0b111111,       0,       0,       0,       0,        0}}, PARAM_TIS, "SD"     },
+    // {{.i={0b111110,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDC2"   },
+    // {{.i={0b111111,       0,       0,       0,       0,        0}}, PARAM_TIS, "SD"     },
 };
 
-InsnData insn_masks[] = {
+static const InsnData insn_masks[] = {
 //                       opcode,      rs,      rt,      rd,      sa, function
     /*PARAM_N  */ {.i={0b111111, 0b11111, 0b11111, 0b11111,       0, 0b111111}},
     /*PARAM_SYS*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}},
@@ -334,7 +334,7 @@ const char conditions[][5] = {
 };
 
 
-char fmt_to_char(InsnData insn) {
+static char fmt_to_char(InsnData insn) {
     u16 fmt = insn.i.rs;
     char ret = 'X';
     switch (fmt) {
@@ -353,6 +353,9 @@ char *insn_disasm(InsnData insn, uintptr_t addr, u32 isPC) {
     char *fname = NULL;
     char insn_name[10];
 
+    bzero(insn_as_string, sizeof(insn_as_string));
+    bzero(insn_name, sizeof(insn_name));
+
     if (insn.d == 0) { // trivial case
         if (isPC) {
             strp += sprintf(strp, "@%08XNOP @%08X<-- CRASH",
@@ -367,8 +370,6 @@ char *insn_disasm(InsnData insn, uintptr_t addr, u32 isPC) {
 
         return insn_as_string;
     }
-
-    bzero(insn_as_string, ARRAY_COUNT(insn_as_string));
 
     for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
         if ((insn.d & insn_masks[insn_db[i].arbitraryParam].d) == insn_db[i].i.d) {
@@ -524,20 +525,16 @@ char *insn_disasm(InsnData insn, uintptr_t addr, u32 isPC) {
                     break;
                 case PARAM_J:
                     target = (0x80000000 | ((insn.d & 0x1FFFFFF) * sizeof(InsnData)));
+                    strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
+                        COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
+                    );
 #ifdef INCLUDE_DEBUG_MAP
-                    fname = parse_map(target);
-#endif
-                    if (((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
-                        strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, target
-                        );
-                    } else {
-                        strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
-                        );
+                    fname = parse_map_exact(target);
+                    if (!((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
+                        strp += sprintf(strp, " (%s)", fname);
                     }
+#endif
                     break;
                 case PARAM_FIS:
                     strp += sprintf(strp, "@%08X%-6s @%08XF%d, @%08X0x%04X@%08X(%s)",
