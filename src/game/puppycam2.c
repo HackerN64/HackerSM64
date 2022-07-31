@@ -1346,7 +1346,7 @@ void puppycam_loop(void) {
     if (!gPuppyCam.cutscene && sDelayedWarpOp == 0) {
         // Sets this before going through any possible modifications.
         gPuppyCam.flags = gPuppyCam.intendedFlags;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
         if (sPPDebugPage == 7)
             gPuppyCam.flags |= PUPPYCAM_BEHAVIOUR_FREE | PUPPYCAM_BEHAVIOUR_PITCH_ROTATION | PUPPYCAM_BEHAVIOUR_YAW_ROTATION;
 #endif

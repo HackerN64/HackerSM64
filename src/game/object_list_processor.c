@@ -568,13 +568,12 @@ void update_non_terrain_objects(void) {
 
     s32 i = 2;
     while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
+        u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
         if (listIndex == OBJ_LIST_PLAYER) {
-            u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
             profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
         }
         gObjectCounter += update_objects_in_list(&gObjectLists[listIndex]);
         if (listIndex == OBJ_LIST_PLAYER) {
-            u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
             profiler_update(PROFILER_TIME_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
         }
         i++;

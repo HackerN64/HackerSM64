@@ -59,7 +59,7 @@ u8 sPuppyprintTextBuffer[PUPPYPRINT_DEFERRED_BUFFER_SIZE];
 u32 sPuppyprintTextBufferPos; // Location in the buffer of puppyprint deferred text.
 ColorRGBA gCurrEnvCol;
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 
 #define GENERAL_PAGE_TEXT_LENGTH 200
 
@@ -1366,7 +1366,7 @@ void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font)
     }
 }
 
-u8 gIsLightText = FALSE;
+static u8 gIsLightText = FALSE;
 
 // This is where the deferred printing will be stored. When text is made, it will store text with an 12 byte header, then the rest will be the text data itself.
 // The first 4 bytes of the header will be the X and Y pos
@@ -1379,8 +1379,8 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     // Compare the cursor position and the string length, plus 12 (header size) and return if it overflows.
     if (sPuppyprintTextBufferPos + strLen + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
         return;
-    x += 2048;
-    y += 2048;
+    x += 0x8000;
+    y += 0x8000;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 0] = (x >> 8) & 0xFF;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 1] = (x & 0xFF);
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 2] = (y >> 8) & 0xFF;
@@ -1422,8 +1422,8 @@ void puppyprint_print_deferred(void) {
         x += (sPuppyprintTextBuffer[i + 1] & 0xFF);
         s32 y = ((sPuppyprintTextBuffer[i + 2] & 0xFF) <<  8);
         y += (sPuppyprintTextBuffer[i + 3] & 0xFF);
-        x -= 2048;
-        y -= 2048;
+        x -= 0x8000;
+        y -= 0x8000;
         ColorRGBA originalEnvCol = {gCurrEnvCol[0], gCurrEnvCol[1], gCurrEnvCol[2], gCurrEnvCol[3]};
         print_set_envcolour(sPuppyprintTextBuffer[i + 4], sPuppyprintTextBuffer[i + 5], sPuppyprintTextBuffer[i + 6], sPuppyprintTextBuffer[i + 7]);
         u8 alignment = sPuppyprintTextBuffer[i + 9];

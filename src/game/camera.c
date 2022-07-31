@@ -27,6 +27,7 @@
 #include "level_table.h"
 #include "config.h"
 #include "puppyprint.h"
+#include "profiling.h"
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
@@ -2864,8 +2865,6 @@ void update_lakitu(struct Camera *c) {
     gLakituState.mode = c->mode;
     gLakituState.defMode = c->defMode;
 }
-
-extern u32 collision_time;
 
 /**
  * The main camera update function.

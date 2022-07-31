@@ -18,7 +18,7 @@
 
 enum crashPages {
     PAGE_CONTEXT,
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
 #endif
     PAGE_STACKTRACE,
@@ -233,7 +233,7 @@ void draw_crash_context(OSThread *thread, s32 cause) {
 }
 
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 void draw_crash_log(void) {
     s32 i;
     crash_screen_draw_rect(25, 20, 270, 210);
@@ -361,7 +361,7 @@ void draw_crash_screen(OSThread *thread) {
         crash_screen_print(30, 10, "Page:%02d                L/Z: Left   R: Right", crashPage);
         switch (crashPage) {
             case PAGE_CONTEXT:    draw_crash_context(thread, cause); break;
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
             case PAGE_LOG: 		  draw_crash_log(); break;
 #endif
             case PAGE_STACKTRACE: draw_stacktrace(thread, cause); break;

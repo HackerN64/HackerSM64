@@ -714,7 +714,7 @@ void setup_game_memory(void) {
     gMarioAnimsMemAlloc = main_pool_alloc(MARIO_ANIMS_POOL_SIZE, MEMORY_POOL_LEFT);
     set_segment_base_addr(SEGMENT_MARIO_ANIMS, (void *) gMarioAnimsMemAlloc);
     setup_dma_table_list(&gMarioAnimsBuf, gMarioAnims, gMarioAnimsMemAlloc);
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     set_segment_memory_printout(SEGMENT_MARIO_ANIMS, MARIO_ANIMS_POOL_SIZE);
     set_segment_memory_printout(SEGMENT_DEMO_INPUTS, DEMO_INPUTS_POOL_SIZE);
 #endif
@@ -767,7 +767,7 @@ void thread5_game_loop(UNUSED void *arg) {
             draw_reset_bars();
             continue;
         }
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     bzero(&gPuppyCallCounter, sizeof(gPuppyCallCounter));
 #endif
         // If any controllers are plugged in, start read the data for when
@@ -787,10 +787,10 @@ void thread5_game_loop(UNUSED void *arg) {
         profiler_collision_reset();
         addr = level_script_execute(addr);
         profiler_collision_completed();
-#if !PUPPYPRINT_DEBUG && defined(VISUAL_DEBUG)
+#if !defined(PUPPYPRINT_DEBUG) && defined(VISUAL_DEBUG)
         debug_box_input();
 #endif
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
         puppyprint_profiler_process();
 #endif
 

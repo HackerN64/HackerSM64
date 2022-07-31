@@ -393,7 +393,7 @@ void render_game(void) {
 
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         render_text_labels();
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
         puppyprint_print_deferred();
 #endif
         do_cutscene_handler();
@@ -429,7 +429,7 @@ void render_game(void) {
         }
     } else {
         render_text_labels();
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
         puppyprint_print_deferred();
 #endif
         if (gViewportClip != NULL) {
@@ -444,7 +444,7 @@ void render_game(void) {
 
     profiler_update(PROFILER_TIME_GFX, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
     profiler_print_times();
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     puppyprint_render_profiler();
 #endif
 }

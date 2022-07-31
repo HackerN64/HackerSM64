@@ -67,7 +67,7 @@ enum PPPages {
 #endif
 };
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
 #ifdef BETTER_REVERB
 #define NUM_AUDIO_POOLS 7
 #else

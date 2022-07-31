@@ -217,14 +217,14 @@ void profiler_print_times() {
     update_total_timer();
     update_rdp_timers();
 
-#if PUPPYPRINT_DEBUG == 0
+#ifdef PUPPYPRINT_DEBUG
     static u8 show_profiler = 0;
     if (gPlayer1Controller->buttonPressed & L_TRIG) {
         show_profiler ^= 1;
     }
 #endif
 
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
     if (fDebug && sPPDebugPage == PUPPYPRINT_PAGE_PROFILER) {
 #else
     if (show_profiler) {
@@ -247,7 +247,7 @@ void profiler_print_times() {
             "\n"
             "CPU\t\t%d (%d%%)\n"
             " Input\t\t%d\n"
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
             " Collision\t\t%d\n"
 #else
             " Dynamic\t\t%d\n"
@@ -256,7 +256,7 @@ void profiler_print_times() {
             " Behavior\t\t%d\n"
             " Graph\t\t%d\n"
             " Audio\t\t\t%d\n"
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
             " Camera\t\t%d\n"
 #endif
             "\n"
@@ -271,7 +271,7 @@ void profiler_print_times() {
             1000000.0f / microseconds[PROFILER_TIME_FPS],
             total_cpu, total_cpu / 333, 
             microseconds[PROFILER_TIME_CONTROLLERS],
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
             microseconds[PROFILER_TIME_COLLISION],
 #else
             microseconds[PROFILER_TIME_DYNAMIC],
@@ -280,7 +280,7 @@ void profiler_print_times() {
             microseconds[PROFILER_TIME_BEHAVIOR_BEFORE_MARIO] + microseconds[PROFILER_TIME_BEHAVIOR_AFTER_MARIO],
             microseconds[PROFILER_TIME_GFX],
             microseconds[PROFILER_TIME_AUDIO] * 2, // audio is 60Hz, so double the average
-#if PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT_DEBUG
             microseconds[PROFILER_TIME_CAMERA],
 #endif
             max_rdp, max_rdp / 333,
