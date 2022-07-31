@@ -121,7 +121,13 @@ static const InsnTemplate insn_db[] = {
     // add
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100001}}, PARAM_DST, "ADDU"   },
     {{.i={0b001001,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDIU"  },
+    // sub
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100010}}, PARAM_DST, "SUB"    },
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100011}}, PARAM_DST, "SUBU"   },
+    // and
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100100}}, PARAM_DST, "AND"    },
+    {{.i={0b001100,       0,       0,       0,       0,        0}}, PARAM_TSI, "ANDI"   },
+    // or
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100101}}, PARAM_DST, "OR"     },
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100110}}, PARAM_DST, "XOR"    },
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100111}}, PARAM_DST, "NOR"    },
