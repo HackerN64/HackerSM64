@@ -49,7 +49,7 @@ enum ParamTypes {
     PARAM_UNK, // unimpl
 };
 
-extern far char *parse_map(uintptr_t pc);
+extern far char *parse_map_exact(uintptr_t pc);
 static char insn_as_string[0x100];
 
 typedef struct __attribute__((packed)) {
@@ -75,7 +75,7 @@ typedef union {
 
 typedef struct __attribute__((packed)) {
     /*0x00*/ InsnData i;
-    /*0x04*/ u16 arbitraryParam;
+    /*0x04*/ u16 paramType;
     /*0x06*/ char name[10];
 } InsnTemplate; /*0x10*/
 
@@ -121,13 +121,7 @@ static const InsnTemplate insn_db[] = {
     // add
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100001}}, PARAM_DST, "ADDU"   },
     {{.i={0b001001,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDIU"  },
-    // sub
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100010}}, PARAM_DST, "SUB"    },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100011}}, PARAM_DST, "SUBU"   },
-    // and
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100100}}, PARAM_DST, "AND"    },
-    {{.i={0b001100,       0,       0,       0,       0,        0}}, PARAM_TSI, "ANDI"   },
-    // or
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100101}}, PARAM_DST, "OR"     },
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100110}}, PARAM_DST, "XOR"    },
     {{.i={0b000000,       0,       0,       0, 0b00000, 0b100111}}, PARAM_DST, "NOR"    },
@@ -206,6 +200,8 @@ static const InsnTemplate insn_db[] = {
     
     // Memory Access
     // load
+    // {{.i={0b011010,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDL"    },
+    // {{.i={0b011011,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDR"    },
     {{.i={0b100000,       0,       0,       0,       0,        0}}, PARAM_TIS, "LB"     },
     {{.i={0b100001,       0,       0,       0,       0,        0}}, PARAM_TIS, "LH"     },
     {{.i={0b100010,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWL"    },
@@ -213,19 +209,24 @@ static const InsnTemplate insn_db[] = {
     {{.i={0b100100,       0,       0,       0,       0,        0}}, PARAM_TIS, "LBU"    },
     {{.i={0b100101,       0,       0,       0,       0,        0}}, PARAM_TIS, "LHU"    },
     {{.i={0b100110,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWR"    },
+    // {{.i={0b100111,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWU"    },
     // save
     {{.i={0b101000,       0,       0,       0,       0,        0}}, PARAM_TIS, "SB"     },
     {{.i={0b101001,       0,       0,       0,       0,        0}}, PARAM_TIS, "SH"     },
     {{.i={0b101010,       0,       0,       0,       0,        0}}, PARAM_TIS, "SWL"    },
     {{.i={0b101011,       0,       0,       0,       0,        0}}, PARAM_TIS, "SW"     },
+    // {{.i={0b101100,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDL"    },
+    // {{.i={0b101101,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDR"    },
     {{.i={0b101110,       0,       0,       0,       0,        0}}, PARAM_TIS, "SWR"    },
     {{.i={0b110001,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC1"   },
     {{.i={0b110101,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDC1"   },
+    // {{.i={0b110111,       0,       0,       0,       0,        0}}, PARAM_TIS, "LD"     },
     {{.i={0b111001,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC1"   },
     {{.i={0b111101,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDC1"   },
+    // {{.i={0b111111,       0,       0,       0,       0,        0}}, PARAM_TIS, "SD"     },
 };
 
-InsnData insn_masks[] = {
+static const InsnData insn_masks[] = {
 //                       opcode,      rs,      rt,      rd,      sa, function
     /*PARAM_N  */ {.i={0b111111, 0b11111, 0b11111, 0b11111,       0, 0b111111}},
     /*PARAM_SYS*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}},
@@ -277,7 +278,7 @@ const char conditions[][5] = {
 };
 
 
-char fmt_to_char(InsnData insn) {
+static char fmt_to_char(InsnData insn) {
     u16 fmt = insn.i.rs;
     char ret = 'X';
     switch (fmt) {
@@ -291,8 +292,8 @@ char fmt_to_char(InsnData insn) {
 
 s16 is_branch(InsnData insn) {
     for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
-        if ((insn.d & insn_masks[insn_db[i].arbitraryParam].d) == insn_db[i].i.d) {
-            switch (insn_db[i].arbitraryParam) {
+        if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
+            switch (insn_db[i].paramType) {
                 case PARAM_SO:
                 case PARAM_STO:
                 case PARAM_B:
@@ -313,6 +314,9 @@ char *insn_disasm(InsnData insn, u32 isPC) {
     char *fname = NULL;
     char insn_name[10];
 
+    bzero(insn_as_string, sizeof(insn_as_string));
+    bzero(insn_name, sizeof(insn_name));
+
     if (insn.d == 0) { // trivial case
         if (isPC) {
             strp += sprintf(strp, "@%08XNOP @%08X<-- CRASH",
@@ -328,11 +332,9 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         return insn_as_string;
     }
 
-    bzero(insn_as_string, ARRAY_COUNT(insn_as_string));
-
     for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
-        if ((insn.d & insn_masks[insn_db[i].arbitraryParam].d) == insn_db[i].i.d) {
-            switch (insn_db[i].arbitraryParam) {
+        if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
+            switch (insn_db[i].paramType) {
                 case PARAM_SYS:
                 case PARAM_SYN:
                 case PARAM_N:
@@ -484,20 +486,16 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     break;
                 case PARAM_J:
                     target = (0x80000000 | ((insn.d & 0x1FFFFFF) * sizeof(InsnData)));
+                    strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
+                        COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, target
+                    );
 #ifdef INCLUDE_DEBUG_MAP
-                    fname = parse_map(target);
-#endif
-                    if (((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
-                        strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, target
-                        );
-                    } else {
-                        strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                            COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                            COLOR_RGBA32_CRASH_FUNCTION_NAME, fname
-                        );
+                    fname = parse_map_exact(target);
+                    if (!((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
+                        strp += sprintf(strp, " (%s)", fname);
                     }
+#endif
                     break;
                 case PARAM_FIS:
                     strp += sprintf(strp, "@%08X%-6s @%08XF%d, @%08X0x%04X@%08X(%s)",
