@@ -20,12 +20,12 @@
 #define colorRGB_to_vec3(dst, src    ) vec3_copy((dst), (src)        )
 #define vec3_to_colorRGB(dst, src    ) vec3_copy((dst), (src)        )
 
-#define RGBA32_TO_COLORRGB(dst, src) {  \
+#define COPY_RGBA32_TO_COLORRGB(dst, src) {  \
     (dst)[0] = RGBA32_R(src);           \
     (dst)[1] = RGBA32_G(src);           \
     (dst)[2] = RGBA32_B(src);           \
 }
-#define RGBA32_TO_COLORRGBA(dst, src) { \
+#define COPY_RGBA32_TO_COLORRGBA(dst, src) { \
     (dst)[0] = RGBA32_R(src);           \
     (dst)[1] = RGBA32_G(src);           \
     (dst)[2] = RGBA32_B(src);           \
