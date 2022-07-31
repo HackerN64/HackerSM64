@@ -4,13 +4,13 @@
  * AUDIO SETTINGS *
  ******************/
 
-// Fixes the castle music sometimes triggering after getting a dialog.
-#define CASTLE_MUSIC_FIX
-
 // Do not restart the music on cap grabs.
 #define PERSISTENT_CAP_MUSIC
 
-// Increases the audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).
+/**
+ * Increase audio heap size to allow for larger/more custom sequences/banks/sfx to be imported without causing issues (not supported for SH).
+ * Note that this is REQUIRED in order to use the extended 0C audio bank. Do not disable this if you're planning on using it. 
+ */
 #define EXPAND_AUDIO_HEAP
 
 /**

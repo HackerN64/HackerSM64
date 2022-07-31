@@ -82,3 +82,12 @@
 
 // Re-enables upwarping when entering water. Forces you to only enter water from the top.
 // #define WATER_PLUNGE_UPWARP
+
+/** 
+ * This bug allows mario to move when initiating a dialog,
+ * just as long as mario doesn't enter an action that can
+ * be interrupted with text
+ * Uncomment this to fix this bug, and frustrate speedrunners
+ */
+// #define BUGFIX_DIALOG_TIME_STOP
+

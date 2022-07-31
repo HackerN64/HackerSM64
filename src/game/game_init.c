@@ -136,7 +136,6 @@ const Gfx init_rsp[] = {
     gsDPPipeSync(),
     gsSPClearGeometryMode(G_CULL_FRONT | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD),
     gsSPSetGeometryMode(G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING),
-    gsSPNumLights(NUMLIGHTS_1),
     gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF),
     // @bug Failing to set the clip ratio will result in warped triangles in F3DEX2
     // without this change: https://jrra.zone/n64/doc/n64man/gsp/gSPClipRatio.htm

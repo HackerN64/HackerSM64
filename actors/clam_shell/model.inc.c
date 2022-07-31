@@ -1,16 +1,8 @@
 // Clam Shell
 
 // Unreferenced light group
-UNUSED static const Lights1 clam_shell_lights_unused1 = gdSPDefLights1(
-    0x1b, 0x23, 0x30,
-    0x6d, 0x8f, 0xc3, 0x28, 0x28, 0x28
-);
 
 // Unreferenced light group
-UNUSED static const Lights1 clam_shell_lights_unused2 = gdSPDefLights1(
-    0x18, 0x28, 0x38,
-    0x60, 0xa2, 0xe2, 0x28, 0x28, 0x28
-);
 
 // 0x05000030
 ALIGNED8 static const Texture clam_shell_seg5_texture_05000030[] = {
@@ -23,10 +15,6 @@ ALIGNED8 static const Texture clam_shell_seg5_texture_05000830[] = {
 };
 
 // 0x05001030
-static const Lights1 clam_shell_seg5_lights_05001030 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x05001048
 static const Vtx clam_shell_seg5_vertex_05001048[] = {
@@ -63,8 +51,8 @@ const Gfx clam_shell_seg5_dl_050011A8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, clam_shell_seg5_texture_05000030),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&clam_shell_seg5_lights_05001030.l, 1),
-    gsSPLight(&clam_shell_seg5_lights_05001030.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(clam_shell_seg5_vertex_05001048, 11, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  4, 0x0),
     gsSP2Triangles( 4,  5,  3, 0x0,  4,  0,  6, 0x0),
@@ -108,10 +96,6 @@ const Gfx clam_shell_seg5_dl_050012B8[] = {
 };
 
 // 0x05001320
-static const Lights1 clam_shell_seg5_lights_05001320 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x05001338
 static const Vtx clam_shell_seg5_vertex_05001338[] = {
@@ -146,8 +130,8 @@ const Gfx clam_shell_seg5_dl_05001478[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, clam_shell_seg5_texture_05000030),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&clam_shell_seg5_lights_05001320.l, 1),
-    gsSPLight(&clam_shell_seg5_lights_05001320.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(clam_shell_seg5_vertex_05001338, 10, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  0, 0x0),
     gsSP2Triangles( 4,  5,  0, 0x0,  0,  5,  6, 0x0),
