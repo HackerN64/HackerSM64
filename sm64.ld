@@ -162,6 +162,7 @@ SECTIONS
 #endif
 
       BUILD_DIR/src/boot*.o(.text*);
+      BUILD_DIR/src/crash_screen*.o(.text*);
       BUILD_DIR/src/hvqm*.o(.text*);
       BUILD_DIR/src/usb*.o(.text*);
       BUILD_DIR/src/audio*.o(.text*);
@@ -188,6 +189,7 @@ SECTIONS
       /* data */
       BUILD_DIR/asm/n64_assert.o(.*data*);
       BUILD_DIR/src/boot*.o(.*data*);
+      BUILD_DIR/src/crash_screen*.o(.*data*);
       BUILD_DIR/src/audio*.o(.*data*);
 #ifdef S2DEX_TEXT_ENGINE
       lib/libs2d_engine.a:*(.*data*);
@@ -207,6 +209,7 @@ SECTIONS
 
       /* rodata */
       BUILD_DIR/src/boot*.o(.rodata*);
+      BUILD_DIR/src/crash_screen*.o(.rodata*);
       BUILD_DIR/src/usb*.o(.rodata*);
       BUILD_DIR/src/audio*.o(.rodata*);
 #ifdef S2DEX_TEXT_ENGINE
@@ -227,6 +230,7 @@ SECTIONS
    BEGIN_NOLOAD(main)
    {
       BUILD_DIR/src/boot*.o(.*bss*);
+      BUILD_DIR/src/crash_screen*.o(.*bss*);
       BUILD_DIR/src/hvqm*.o(.*bss*);
       BUILD_DIR/src/usb*.o(.*bss*);
       BUILD_DIR/src/audio*.o(.*bss*);

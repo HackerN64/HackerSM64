@@ -3,21 +3,19 @@
 #include <stdarg.h>
 #include <string.h>
 #include "types.h"
+#include "sm64.h"
+#include "farcall.h"
 #include "audio/external.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "engine/colors.h"
-#include "debug.h"
-#include "farcall.h"
-#include "game_init.h"
-#include "main.h"
-#include "puppyprint.h"
-#include "rumble_init.h"
-#include "vc_check.h"
-
-#include "sm64.h"
-
-#include "printf.h"
+#include "game/debug.h"
+#include "game/game_init.h"
+#include "game/main.h"
+#include "game/printf.h"
+#include "game/puppyprint.h"
+#include "game/rumble_init.h"
+#include "game/vc_check.h"
 
 enum MessageIDs {
     MSG_NONE,
