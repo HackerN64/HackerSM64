@@ -975,56 +975,37 @@ const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_LIGHT_GRAY
 };
 
-void draw_disasm_branch_arrow(s32 line, s32 endLine, u32 dist, RGBA32 color, s32 printLine) {
-    u32 arrowStartHeight = (TEXT_Y(printLine + line) + 3);
-    u32 arrowEndHeight = (TEXT_Y(printLine + endLine) + 3);
-    u32 startOffscreen = FALSE;
-    u32 endOffscreen = FALSE;
+void draw_disasm_branch_arrow(s32 startLine, s32 endLine, u32 dist, RGBA32 color, s32 printLine) {
+    s32 arrowStartHeight = (TEXT_Y(printLine + startLine) + 3);
+    s32 arrowEndHeight   = (TEXT_Y(printLine +   endLine) + 3);
 
-    if (line < 0) {
+    if (startLine < 0) {
         arrowStartHeight = TEXT_Y(printLine);
-        startOffscreen = TRUE;
-    } else if (line >= DISASM_NUM_ROWS) {
+    } else if (startLine >= DISASM_NUM_ROWS) {
         arrowStartHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 3);
-        startOffscreen = TRUE;
+    } else {
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 1), arrowStartHeight, dist, 1, color);
     }
 
     if (endLine < 0) {
         arrowEndHeight = TEXT_Y(printLine);
-        endOffscreen = TRUE;
     } else if (endLine >= DISASM_NUM_ROWS) {
         arrowEndHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 3);
-        endOffscreen = TRUE;
-    }
-
-    // Beginning of arrow
-    if (!startOffscreen) {
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 1), arrowStartHeight, dist, 1, color);
-    }
-
-    // Middle of arrow
-    if (arrowEndHeight > arrowStartHeight) {
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), arrowStartHeight, 1, (arrowEndHeight - arrowStartHeight), color);
     } else {
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), arrowEndHeight, 1, (arrowStartHeight - arrowEndHeight), color);
-    }
-
-    // End of arrow
-    if (!endOffscreen) {
-        crash_screen_draw_rect(DISASM_BRANCH_ARROW_START_X, arrowEndHeight, (dist + 1), 1, color);
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 0), arrowEndHeight, (dist + 1), 1, color);
         // Arrow head
         crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 1), (arrowEndHeight - 1), 1, 3, color);
         crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 2), (arrowEndHeight - 2), 1, 5, color);
     }
+
+    // Middle of arrow
+    crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), MIN(arrowStartHeight, arrowEndHeight), 1, abss(arrowEndHeight - arrowStartHeight), color);
 }
 
 extern char *insn_disasm(u32 insn, u32 isPC);
 extern s32 is_branch(u32 insn);
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-    u32 curBranchDist = 10;
-    u32 curBranchColor = 0;
-    s16 branchOffset;
 
     if (sProgramPosition == 0) {
         sProgramPosition = (tc->pc - ((DISASM_NUM_ROWS / 2) * DISASM_STEP));
@@ -1051,6 +1032,9 @@ void draw_disasm(OSThread *thread) {
 
     osWritebackDCacheAll();
 
+    u32 curBranchDist = 10;
+    u32 curBranchColor = 0;
+    s16 branchOffset;
     u32 offsetInFunc = 0;
     if (fname != NULL) {
         while (offsetInFunc < DISASM_FUNCTION_SEARCH_MAX_OFFSET && fname == parse_map(funcAddr + offsetInFunc)) {
@@ -1059,10 +1043,13 @@ void draw_disasm(OSThread *thread) {
 
             branchOffset = is_branch(toDisasm);
             if (branchOffset != 0) {
-                s32 startLine = ((addr - sProgramPosition) / DISASM_STEP);
+                s32 startLine = (((s32)addr - (s32)sProgramPosition) / DISASM_STEP);
                 s32 endLine = (startLine + branchOffset + 1);
                 curBranchDist += 3;
-                draw_disasm_branch_arrow(startLine, endLine, curBranchDist, sBranchColors[curBranchColor], line);
+                if (((startLine >= 0)              || (endLine >= 0))
+                 && ((startLine < DISASM_NUM_ROWS) || (endLine < DISASM_NUM_ROWS))) {
+                    draw_disasm_branch_arrow(startLine, endLine, curBranchDist, sBranchColors[curBranchColor], line);
+                }
                 curBranchColor = ((curBranchColor + 1) % ARRAY_COUNT(sBranchColors));
             }
 
