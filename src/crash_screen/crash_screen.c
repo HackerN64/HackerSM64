@@ -196,6 +196,7 @@ char *gRegNames[29] = {
 extern u64 osClockRate;
 extern far s32 is_in_code_segment(uintptr_t addr);
 extern far char *parse_map(uintptr_t addr);
+extern far char *parse_map_return(uintptr_t *addr);
 extern far void map_data_init(void);
 extern far char *find_function_in_stack(uintptr_t *sp);
 
@@ -962,7 +963,7 @@ void draw_ram_viewer(OSThread *thread) {
 #define DISASM_SCROLL_MAX (RAM_END - DISASM_SHOWN_SECTION)
 
 #define DISASM_BRANCH_ARROW_START_X TEXT_X(23)
-#define DISASM_BRANCH_OVERSCAN 10
+#define DISASM_FUNCTION_SEARCH_MAX_OFFSET (1024 * DISASM_STEP)
 
 const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_ORANGE,
@@ -974,9 +975,9 @@ const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_LIGHT_GRAY
 };
 
-void draw_disasm_branch_arrow(s32 line, s32 endLine, u32 dist, u32 color, s32 printLine) {
-    u32 arrowStartHeight = (TEXT_Y(printLine+line) + 3);
-    u32 arrowEndHeight = (TEXT_Y(printLine+endLine) + 3);
+void draw_disasm_branch_arrow(s32 line, s32 endLine, u32 dist, RGBA32 color, s32 printLine) {
+    u32 arrowStartHeight = (TEXT_Y(printLine + line) + 3);
+    u32 arrowEndHeight = (TEXT_Y(printLine + endLine) + 3);
     u32 startOffscreen = FALSE;
     u32 endOffscreen = FALSE;
 
@@ -1035,44 +1036,54 @@ void draw_disasm(OSThread *thread) {
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XDISASM", COLOR_RGBA32_CRASH_PAGE_NAME);
     line += crash_screen_print(TEXT_X(7), TEXT_Y(line), "%08X-%08X", sProgramPosition, (sProgramPosition + DISASM_SHOWN_SECTION));
     crash_screen_draw_divider(DIVIDER_Y(line));
+
+    uintptr_t funcAddr = sProgramPosition;
 #ifdef INCLUDE_DEBUG_MAP
-    fname = parse_map(sProgramPosition);
+    fname = parse_map_return(&funcAddr);
 #endif
-    if (((fname == NULL)/* || ((*(uintptr_t*)sProgramPosition & 0x80000000) == 0)*/)) {
+    if (((fname == NULL)/* || ((*(uintptr_t*)funcAddr & 0x80000000) == 0)*/)) {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN: @%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN: @%08X%s %08X", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname, funcAddr);
     }
+
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     osWritebackDCacheAll();
 
+    u32 offsetInFunc = 0;
+    if (fname != NULL) {
+        while (offsetInFunc < DISASM_FUNCTION_SEARCH_MAX_OFFSET && fname == parse_map(funcAddr + offsetInFunc)) {
+            uintptr_t addr = (funcAddr + offsetInFunc);
+            uintptr_t toDisasm = *(uintptr_t*)(addr);
+
+            branchOffset = is_branch(toDisasm);
+            if (branchOffset != 0) {
+                s32 startLine = ((addr - sProgramPosition) / DISASM_STEP);
+                s32 endLine = (startLine + branchOffset + 1);
+                curBranchDist += 3;
+                draw_disasm_branch_arrow(startLine, endLine, curBranchDist, sBranchColors[curBranchColor], line);
+                curBranchColor = ((curBranchColor + 1) % ARRAY_COUNT(sBranchColors));
+            }
+
+            offsetInFunc += DISASM_STEP;
+        }
+    }
+
     sCrashScreenWordWrap = FALSE;
 
-    for (s32 i = -DISASM_BRANCH_OVERSCAN; i < (DISASM_NUM_ROWS + DISASM_BRANCH_OVERSCAN); i++) {
+
+    for (u32 i = 0; i < DISASM_NUM_ROWS; i++) {
         uintptr_t addr = (sProgramPosition + (i * DISASM_STEP));
         uintptr_t toDisasm = *(uintptr_t*)(addr);
 
         if (is_in_code_segment(addr)) {
-            branchOffset = is_branch(toDisasm);
-            if (branchOffset != 0) {
-                // Check to see if arrow is fully away from the screen
-                if (((i >= 0)              || ((i + branchOffset + 1) >= 0))
-                 && ((i < DISASM_NUM_ROWS) || ((i + branchOffset + 1) < DISASM_NUM_ROWS))) {
-                    curBranchDist += 3;
-                    draw_disasm_branch_arrow(i, (i + branchOffset + 1), curBranchDist, sBranchColors[curBranchColor], line);
-                    curBranchColor = ((curBranchColor + 1) % ARRAY_COUNT(sBranchColors));
-                }
-            }
-
-            if (i >= 0 && i < DISASM_NUM_ROWS) {
-                crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
-            }
+            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
         } else if (sShowRamAsAscii) {
             char asText[8];
             bzero(asText, sizeof(asText));
 
-            for (s32 j = 0; j < 4; j++) {
+            for (u32 j = 0; j < 4; j++) {
                 asText[j] = (char)(toDisasm >> (24 - (8 * j)));
             }
 

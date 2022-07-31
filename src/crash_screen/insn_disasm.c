@@ -523,7 +523,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X%s0x%04X",
                         COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
                         COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
-                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : ""), ABS(branchOffset)
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : " "), ABS(branchOffset)
                     );
                     break;
                 case PARAM_STO:
@@ -532,7 +532,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                         COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
                         COLOR_RGBA32_CRASH_DISASM_REG,    registerMaps[insn.i.rs],
                                                           registerMaps[insn.i.rt],
-                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : ""), ABS(branchOffset)
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : " "), ABS(branchOffset)
                     );
                     break;
                 case PARAM_B:
@@ -540,7 +540,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     branchOffset = (1 + insn.i.immediate);
                     strp += sprintf(strp, "@%08X%-6s @%08X%s0x%04X",
                         COLOR_RGBA32_CRASH_DISASM_INST,   insn_db[i].name,
-                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : ""), ABS(branchOffset)
+                        COLOR_RGBA32_CRASH_FUNCTION_NAME, ((branchOffset < 0) ? "-" : " "), ABS(branchOffset)
                     );
                     break;
                 case PARAM_J:

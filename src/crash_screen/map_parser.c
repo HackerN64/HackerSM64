@@ -66,6 +66,22 @@ char *parse_map(uintptr_t addr) {
     return NULL;
 }
 
+char *parse_map_return(uintptr_t *addr) {
+    if (is_in_code_segment(*addr)) {
+        for (u32 i = 0; i < gMapEntrySize; i++) {
+            if (gMapEntries[i].addr >= *addr) {
+                if (gMapEntries[i].addr > *addr) {
+                    i--;
+                }
+                *addr = gMapEntries[i].addr;
+                return (char*) ((uintptr_t)gMapStrings + gMapEntries[i].nm_offset);
+            }
+        }
+    }
+
+    return NULL;
+}
+
 char *parse_map_exact(uintptr_t addr) {
     if (is_in_code_segment(addr)) {
         for (u32 i = 0; i < gMapEntrySize; i++) {
