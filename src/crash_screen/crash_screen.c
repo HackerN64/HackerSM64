@@ -275,7 +275,7 @@ void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) 
 }
 
 // Draws a triangle pointing upwards or downwards.
-void crash_screen_draw_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, s8 flip) {
+void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, s8 flip) {
     const Alpha alpha = RGBA32_A(color);
     if (alpha == 0x00) {
         return;
@@ -283,14 +283,17 @@ void crash_screen_draw_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 col
     const s8 opaque = (alpha == MSK_RGBA32_A);
     const RGBA16 newColor = RGBA32_TO_RGBA16(color);
     const f32 middle = (w / 2.0f);
-    const f32 t = (middle / (f32) h);
-    f32 d = (flip ? (middle - t) : 0.0f);
-    u32 x, y;
+    f32 d = 0.0f;
+    f32 t = (middle / (f32) h);
+    if (flip) {
+        d = (middle - t);
+        t = -t;
+    }
 
     RGBA16 *dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
 
-    for (y = 0; y < h; y++) {
-        for (x = 0; x < w; x++) {
+    for (u32 y = 0; y < h; y++) {
+        for (u32 x = 0; x < w; x++) {
             if (absf(middle - x) < d) {
                 if (opaque) {
                     *dst = newColor;
@@ -301,8 +304,40 @@ void crash_screen_draw_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 col
             dst++;
         }
 
-        d += (flip ? -t : t);
+        d += t;
         dst += (SCREEN_WIDTH - w);
+    }
+}
+
+// Draws a triangle pointing left or right.
+void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, s8 flip) {
+    const Alpha alpha = RGBA32_A(color);
+    if (alpha == 0x00) {
+        return;
+    }
+    const s8 opaque = (alpha == MSK_RGBA32_A);
+    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
+    const f32 middle = (h / 2.0f);
+    const f32 t = ((f32) w / middle);
+    f32 x1 = w;
+
+    RGBA16 *dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
+    RGBA16 *start = dst;
+
+    for (u32 y = 0; y < h; y++) {
+        for (u32 x = x1; x < w; x++) {
+            if (opaque) {
+                *dst = newColor;
+            } else {
+                *dst = rgba16_blend(*dst, newColor, alpha);
+            }
+            dst++;
+        }
+        x1 -= (y < middle) ? t : -t;
+        dst = start + (SCREEN_WIDTH * y);
+        if (flip) {
+            dst += (u32)x1;
+        }
     }
 }
 
@@ -821,12 +856,12 @@ void draw_address_select(void) {
 
     crash_screen_print(JUMP_MENU_X + TEXT_WIDTH(1), JUMP_MENU_Y - TEXT_HEIGHT(2), "GO TO:");
 
-    crash_screen_draw_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y - TEXT_HEIGHT(1) + CRASH_SCREEN_CHAR_SPACING_Y),
-                               TEXT_WIDTH(1), TEXT_WIDTH(1),
-                               COLOR_RGBA32_CRASH_SELECT, FALSE);
-    crash_screen_draw_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y + TEXT_HEIGHT(1) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
-                               TEXT_WIDTH(1), TEXT_WIDTH(1),
-                               COLOR_RGBA32_CRASH_SELECT, TRUE);
+    crash_screen_draw_vertical_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y - TEXT_HEIGHT(1) + CRASH_SCREEN_CHAR_SPACING_Y),
+                                        TEXT_WIDTH(1), TEXT_WIDTH(1),
+                                        COLOR_RGBA32_CRASH_SELECT, FALSE);
+    crash_screen_draw_vertical_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y + TEXT_HEIGHT(1) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
+                                        TEXT_WIDTH(1), TEXT_WIDTH(1),
+                                        COLOR_RGBA32_CRASH_SELECT, TRUE);
     crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelect);
 
     osWritebackDCacheAll();
