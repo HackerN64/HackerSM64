@@ -928,22 +928,22 @@ void draw_ram_viewer(OSThread *thread) {
 #define DISASM_SCROLL_MIN RAM_START
 #define DISASM_SCROLL_MAX (RAM_END - DISASM_SHOWN_SECTION)
 
-#define DISASM_BRANCH_ARROW_START_X (TEXT_X(23))
+#define DISASM_BRANCH_ARROW_START_X TEXT_X(23)
 #define DISASM_BRANCH_OVERSCAN 10
 
-u32 sBranchColors[][4] = {
-    COLOR_RGBA_ORANGE,
-    COLOR_RGBA_LIME,
-    COLOR_RGBA_CYAN,
-    COLOR_RGBA_MAGENTA,
-    COLOR_RGBA_YELLOW,
-    COLOR_RGBA_PINK,
-    COLOR_RGBA_LIGHT_GRAY
+const RGBA32 sBranchColors[] = {
+    COLOR_RGBA32_ORANGE,
+    COLOR_RGBA32_LIME,
+    COLOR_RGBA32_CYAN,
+    COLOR_RGBA32_MAGENTA,
+    COLOR_RGBA32_YELLOW,
+    COLOR_RGBA32_PINK,
+    COLOR_RGBA32_LIGHT_GRAY
 };
 
 void draw_disasm_branch_arrow(s32 line, s32 endLine, u32 dist, u32 color, s32 printLine) {
-    u32 arrowStartHeight = TEXT_Y(printLine+line) + 3;
-    u32 arrowEndHeight = TEXT_Y(printLine+endLine) + 3;
+    u32 arrowStartHeight = (TEXT_Y(printLine+line) + 3);
+    u32 arrowEndHeight = (TEXT_Y(printLine+endLine) + 3);
     u32 startOffscreen = FALSE;
     u32 endOffscreen = FALSE;
 
@@ -951,7 +951,7 @@ void draw_disasm_branch_arrow(s32 line, s32 endLine, u32 dist, u32 color, s32 pr
         arrowStartHeight = TEXT_Y(printLine);
         startOffscreen = TRUE;
     } else if (line >= DISASM_NUM_ROWS) {
-        arrowStartHeight = TEXT_Y(printLine + DISASM_NUM_ROWS) - 3;
+        arrowStartHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 3);
         startOffscreen = TRUE;
     }
 
@@ -959,33 +959,33 @@ void draw_disasm_branch_arrow(s32 line, s32 endLine, u32 dist, u32 color, s32 pr
         arrowEndHeight = TEXT_Y(printLine);
         endOffscreen = TRUE;
     } else if (endLine >= DISASM_NUM_ROWS) {
-        arrowEndHeight = TEXT_Y(printLine + DISASM_NUM_ROWS) - 3;
+        arrowEndHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 3);
         endOffscreen = TRUE;
     }
 
     // Beginning of arrow
     if (!startOffscreen) {
-        crash_screen_draw_rect(DISASM_BRANCH_ARROW_START_X + 1, arrowStartHeight, dist, 1, color);
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 1), arrowStartHeight, dist, 1, color);
     }
 
     // Middle of arrow
     if (arrowEndHeight > arrowStartHeight) {
-        crash_screen_draw_rect(DISASM_BRANCH_ARROW_START_X + dist, arrowStartHeight, 1, arrowEndHeight - arrowStartHeight, color);
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), arrowStartHeight, 1, (arrowEndHeight - arrowStartHeight), color);
     } else {
-        crash_screen_draw_rect(DISASM_BRANCH_ARROW_START_X + dist, arrowEndHeight, 1, arrowStartHeight - arrowEndHeight, color);
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), arrowEndHeight, 1, (arrowStartHeight - arrowEndHeight), color);
     }
 
     // End of arrow
     if (!endOffscreen) {
-        crash_screen_draw_rect(DISASM_BRANCH_ARROW_START_X,   arrowEndHeight, dist + 1, 1, color);
+        crash_screen_draw_rect(DISASM_BRANCH_ARROW_START_X, arrowEndHeight, (dist + 1), 1, color);
         // Arrow head
-        crash_screen_draw_rect(DISASM_BRANCH_ARROW_START_X+1, arrowEndHeight - 1, 1, 3, color);
-        crash_screen_draw_rect(DISASM_BRANCH_ARROW_START_X+2, arrowEndHeight - 2, 1, 5, color);
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 1), (arrowEndHeight - 1), 1, 3, color);
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 2), (arrowEndHeight - 2), 1, 5, color);
     }
 }
 
 extern char *insn_disasm(u32 insn, u32 isPC);
-extern int is_branch(u32 insn);
+extern s32 is_branch(u32 insn);
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
     u32 curBranchDist = 10;
@@ -1016,7 +1016,7 @@ void draw_disasm(OSThread *thread) {
 
     sCrashScreenWordWrap = FALSE;
 
-    for (s32 i = -DISASM_BRANCH_OVERSCAN; i < DISASM_NUM_ROWS + DISASM_BRANCH_OVERSCAN; i++) {
+    for (s32 i = -DISASM_BRANCH_OVERSCAN; i < (DISASM_NUM_ROWS + DISASM_BRANCH_OVERSCAN); i++) {
         uintptr_t addr = (sProgramPosition + (i * DISASM_STEP));
         uintptr_t toDisasm = *(uintptr_t*)(addr);
 
@@ -1024,10 +1024,11 @@ void draw_disasm(OSThread *thread) {
             branchOffset = is_branch(toDisasm);
             if (branchOffset != 0) {
                 // Check to see if arrow is fully away from the screen
-                if (((i >= 0)              || ((i + branchOffset + 1) >= 0)) &&
-                    ((i < DISASM_NUM_ROWS) || ((i + branchOffset + 1) < DISASM_NUM_ROWS))) {
-                    draw_disasm_branch_arrow(i, i + branchOffset + 1, curBranchDist += 3, COLORRGBA_TO_RGBA32(sBranchColors[curBranchColor]), line);
-                    curBranchColor = (curBranchColor + 1) % ARRAY_COUNT(sBranchColors);
+                if (((i >= 0)              || ((i + branchOffset + 1) >= 0))
+                 && ((i < DISASM_NUM_ROWS) || ((i + branchOffset + 1) < DISASM_NUM_ROWS))) {
+                    curBranchDist += 3;
+                    draw_disasm_branch_arrow(i, (i + branchOffset + 1), curBranchDist, sBranchColors[curBranchColor], line);
+                    curBranchColor = ((curBranchColor + 1) % ARRAY_COUNT(sBranchColors));
                 }
             }
 
