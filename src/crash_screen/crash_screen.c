@@ -44,7 +44,7 @@ static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
 static s8 sShowRamAsAscii = FALSE;
 static s8 sAddressSelecCharIndex = 2;
-static uintptr_t sAddressSelect = 0;
+static uintptr_t sAddressSelectTarget = 0;
 static uintptr_t sProgramPosition = 0;
 static u32 sStackTraceIndex = 0;
 
@@ -745,7 +745,7 @@ void draw_address_select(void) {
     crash_screen_draw_vertical_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y + TEXT_HEIGHT(1) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
                                         TEXT_WIDTH(1), TEXT_WIDTH(1),
                                         COLOR_RGBA32_CRASH_SELECT, TRUE);
-    crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelect);
+    crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelectTarget);
 
     osWritebackDCacheAll();
 }
@@ -1142,29 +1142,29 @@ void crash_screen_select_address(size_t step) {
         sUpdateBuffer = TRUE;
     }
 
-    uintptr_t nextSelectedAddress = sAddressSelect;
+    uintptr_t nextSelectedAddress = sAddressSelectTarget;
 
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP) {
         // Increment the selected digit.
         u32 shift = (28 - (sAddressSelecCharIndex * 4));
-        u8 new = ((sAddressSelect >> shift) & 0xF);
+        u8 new = ((sAddressSelectTarget >> shift) & 0xF);
         new = ((new + 1) & 0xF);
-        nextSelectedAddress = ((sAddressSelect & ~(0xF << shift)) | (new << shift));
+        nextSelectedAddress = ((sAddressSelectTarget & ~(0xF << shift)) | (new << shift));
 
         if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
-            sAddressSelect = ALIGN(nextSelectedAddress, step);
+            sAddressSelectTarget = ALIGN(nextSelectedAddress, step);
             sUpdateBuffer = TRUE;
         }
     }
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN) {
         // Decrement the selected digit.
         u32 shift = (28 - (sAddressSelecCharIndex * 4));
-        u8 new = ((sAddressSelect >> shift) & 0xF);
+        u8 new = ((sAddressSelectTarget >> shift) & 0xF);
         new = ((new - 1) & 0xF);
-        nextSelectedAddress = ((sAddressSelect & ~(0xF << shift)) | (new << shift));
+        nextSelectedAddress = ((sAddressSelectTarget & ~(0xF << shift)) | (new << shift));
 
         if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
-            sAddressSelect = ALIGN(nextSelectedAddress, step);
+            sAddressSelectTarget = ALIGN(nextSelectedAddress, step);
             sUpdateBuffer = TRUE;
         }
     }
@@ -1172,7 +1172,7 @@ void crash_screen_select_address(size_t step) {
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
         // Open the jump to address popup.
         sAddressSelectMenuOpen = FALSE;
-        sProgramPosition = sAddressSelect;
+        sProgramPosition = sAddressSelectTarget;
 #ifdef INCLUDE_DEBUG_MAP
         uintptr_t funcAddr = sProgramPosition;
         char *fname = parse_map_return(&funcAddr);
@@ -1205,7 +1205,7 @@ void crash_screen_input_ram_viewer(void) {
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             // Open the jump to address popup.
             sAddressSelectMenuOpen = TRUE;
-            sAddressSelect = sProgramPosition;
+            sAddressSelectTarget = sProgramPosition;
             sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & B_BUTTON) {
@@ -1242,7 +1242,7 @@ void crash_screen_input_disasm(void) {
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             // Open the jump to address box.
             sAddressSelectMenuOpen = TRUE;
-            sAddressSelect = sProgramPosition;
+            sAddressSelectTarget = sProgramPosition;
             sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & B_BUTTON) {
