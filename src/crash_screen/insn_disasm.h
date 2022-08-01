@@ -4,13 +4,6 @@
 
 #include "types.h"
 
-//! TODO:
-// Toggle showing function names (like stack trace)
-// Show addresses for each row?
-// Individual address/instruction select
-// Jump to address through branch/jal/etc.
-// Pseudo-instructions: LA, LI, MOVE, BEQZ, BNEZ, BEQZL, BNEZL, etc.
-// Verify insn_db ordering
 
 enum ParamTypes {
     PARAM_N,
@@ -46,12 +39,14 @@ enum ParamTypes {
     PARAM_UNK, // unimpl
 };
 
+// Lower 16 bits of instruction
 typedef struct __attribute__((packed)) {
     /*0x00*/ u16 rd        : 5; // fs
     /*0x00*/ u16 sa        : 5; // fd
     /*0x01*/ u16 function  : 6;
 } RTypeData; /*0x02*/
 
+// Instruction struct
 typedef struct __attribute__((packed)) {
     /*0x00*/ u16 opcode : 6;
     /*0x00*/ u16 rs     : 5; // fr
@@ -62,16 +57,29 @@ typedef struct __attribute__((packed)) {
              };
 } Insn; /*0x04*/
 
+// Instruction data
 typedef union {
     Insn i;
     u32  d;
 } InsnData; /*0x04*/
 
+// Instruction database format
 typedef struct __attribute__((packed)) {
     /*0x00*/ InsnData i;
     /*0x04*/ u16 paramType;
     /*0x06*/ char name[10];
 } InsnTemplate; /*0x10*/
+
+// sDisasmColors
+enum DisasmColors {
+    DISASM_COLOR_NOP,
+    DISASM_COLOR_INSN,
+    DISASM_COLOR_REG,
+    DISASM_COLOR_REG_2,
+    DISASM_COLOR_IMMEDIATE,
+    DISASM_COLOR_ADDRESS,
+    DISASM_COLOR_OFFSET,
+};
 
 
 #define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (s16)(offset)))
