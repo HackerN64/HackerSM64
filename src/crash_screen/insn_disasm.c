@@ -292,17 +292,28 @@ static char fmt_to_char(InsnData insn) {
     return 'X';
 }
 
-s32 get_branch_offset(InsnData insn) {
-    for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
-        if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
-            switch (insn_db[i].paramType) {
-                case PARAM_SO:
-                case PARAM_STO:
-                case PARAM_B:
-                case PARAM_BC1:
-                    return insn.i.immediate;
+const InsnTemplate *get_insn_type(InsnData insn) {
+    if (insn.d) {
+        for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
+            if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
+                return &insn_db[i];
             }
-            break;
+        }
+    }
+
+    return NULL;
+}
+
+s32 get_branch_offset(InsnData insn) {
+    const InsnTemplate *type = get_insn_type(insn);
+
+    if (type) {
+        switch (type->paramType) {
+            case PARAM_SO:
+            case PARAM_STO:
+            case PARAM_B:
+            case PARAM_BC1:
+                return insn.i.immediate;
         }
     }
 
@@ -311,7 +322,6 @@ s32 get_branch_offset(InsnData insn) {
 
 char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
-    s32 successful_print = FALSE;
     uintptr_t target;
     s16 branchOffset;
     char *fname = NULL;
@@ -335,221 +345,218 @@ char *insn_disasm(InsnData insn, u32 isPC) {
         return insn_as_string;
     }
 
-    for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
-        if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
-            switch (insn_db[i].paramType) {
-                case PARAM_SYS:
-                case PARAM_SYN:
-                case PARAM_N:
-                    strp += sprintf(strp, "@%08X%-6s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name
-                    );
-                    break;
-                case PARAM_S:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs]
-                    );
-                    break;
-                case PARAM_T:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt]
-                    );
-                    break;
-                case PARAM_D:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd]
-                    );
-                    break;
-                case PARAM_ST:
-                case PARAM_ST2:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
-                                                          registerMaps[insn.i.rt]
-                    );
-                    break;
-                case PARAM_DS:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
-                                                          registerMaps[insn.i.rs]
-                    );
-                    break;
-                case PARAM_TD:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt],
-                                                          registerMaps[insn.i.rdata.rd]
-                    );
-                    break;
-                case PARAM_SD:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
-                                                          registerMaps[insn.i.rdata.rd]
-                    );
-                    break;
-                case PARAM_STD:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
-                                                          registerMaps[insn.i.rt],
-                                                          registerMaps[insn.i.rdata.rd]
-                    );
-                    break;
-                case PARAM_DST:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
-                                                          registerMaps[insn.i.rs],
-                                                          registerMaps[insn.i.rt]
-                    );
-                    break;
-                case PARAM_DTS:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
-                                                          registerMaps[insn.i.rt],
-                                                          registerMaps[insn.i.rs]
-                    );
-                    break;
-                case PARAM_DTA:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
-                        sDisasmColors[DISASM_COLOR_INSN     ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rdata.rd],
-                                                               registerMaps[insn.i.rt],
-                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.rdata.sa
-                    );
-                    break;
-                case PARAM_SI:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
-                        sDisasmColors[DISASM_COLOR_INSN     ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rs],
-                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
-                    );
-                    break;
-                case PARAM_TI:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
-                        sDisasmColors[DISASM_COLOR_INSN     ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
-                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
-                    );
-                    break;
-                case PARAM_STI:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
-                        sDisasmColors[DISASM_COLOR_INSN     ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rs],
-                                                               registerMaps[insn.i.rt],
-                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
-                    );
-                    break;
-                case PARAM_TSI:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
-                        sDisasmColors[DISASM_COLOR_INSN     ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
-                                                               registerMaps[insn.i.rs],
-                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
-                    );
-                    break;
-                case PARAM_TIS:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X@%08X(%s)",
-                        sDisasmColors[DISASM_COLOR_INSN     ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
-                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate,
-                        sDisasmColors[DISASM_COLOR_REG_2    ], registerMaps[insn.i.rs]
-                    );
-                    break;
-                case PARAM_SO:
-                    branchOffset = (1 + insn.i.immediate);
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X%s0x%04X",
-                        sDisasmColors[DISASM_COLOR_INSN  ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG   ], registerMaps[insn.i.rs],
-                        sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
-                    );
-                    break;
-                case PARAM_STO:
-                    branchOffset = (1 + insn.i.immediate);
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X%s0x%04X",
-                        sDisasmColors[DISASM_COLOR_INSN  ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG   ], registerMaps[insn.i.rs],
-                                                            registerMaps[insn.i.rt],
-                        sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
-                    );
-                    break;
-                case PARAM_B:
-                case PARAM_BC1:
-                    branchOffset = (1 + insn.i.immediate);
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s0x%04X",
-                        sDisasmColors[DISASM_COLOR_INSN  ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
-                    );
-                    break;
-                case PARAM_J:
-                    target = (0x80000000 | ((insn.d & 0x1FFFFFF) * sizeof(InsnData)));
-                    strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
-                        sDisasmColors[DISASM_COLOR_INSN   ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_ADDRESS], target
-                    );
-#ifdef INCLUDE_DEBUG_MAP
-                    fname = parse_map_exact(target);
-                    if (!((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
-                        strp += sprintf(strp, " (%s)", fname);
-                    }
-#endif
-                    break;
-                case PARAM_FIS:
-                    strp += sprintf(strp, "@%08X%-6s @%08XF%d, @%08X0x%04X@%08X(%s)",
-                        sDisasmColors[DISASM_COLOR_INSN     ], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG      ], insn.i.rt,
-                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate,
-                        sDisasmColors[DISASM_COLOR_REG_2    ], registerMaps[insn.i.rs]
-                    );
-                    break;
-                case PARAM_TFS:
-                    strp += sprintf(strp, "@%08X%-6s @%08X%s, F%d",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_db[i].name,
-                        sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt],
-                                                          insn.i.rdata.rd // fs
-                    );
-                    break;
-                case PARAM_FF:
-                    sprintf(insn_name, "%s.%c", insn_db[i].name, fmt_to_char(insn));
-                    strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_name,
-                        sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
-                                                          insn.i.rdata.rd  // fs
-                    );
-                    break;
-                case PARAM_FFF:
-                    sprintf(insn_name, "%s.%c", insn_db[i].name, fmt_to_char(insn));
-                    strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d, F%d",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_name,
-                        sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
-                                                          insn.i.rdata.rd, // fs
-                                                          insn.i.rt        // ft
-                    );
-                    break;
-                case PARAM_CON:
-                    sprintf(insn_name, "%s.%s.%c", insn_db[i].name, conditions[insn.i.rdata.function & BITMASK(4)], fmt_to_char(insn));
-                    strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d",
-                        sDisasmColors[DISASM_COLOR_INSN], insn_name,
-                        sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.rd, // fd
-                                                          insn.i.rt        // ft
-                    );
-                    break;
-                case PARAM_UNK:
-                    strp += sprintf(strp, "unimpl 0x%08X", insn.d);
-                    break;
-            }
-            successful_print = TRUE;
-            break;
-        }
-    }
+    const InsnTemplate *type = get_insn_type(insn);
 
-    if (!successful_print) {
+    if (type) {
+        switch (type->paramType) {
+            case PARAM_SYS:
+            case PARAM_SYN:
+            case PARAM_N:
+                strp += sprintf(strp, "@%08X%-6s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name
+                );
+                break;
+            case PARAM_S:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs]
+                );
+                break;
+            case PARAM_T:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt]
+                );
+                break;
+            case PARAM_D:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd]
+                );
+                break;
+            case PARAM_ST:
+            case PARAM_ST2:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
+                                                      registerMaps[insn.i.rt]
+                );
+                break;
+            case PARAM_DS:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
+                                                      registerMaps[insn.i.rs]
+                );
+                break;
+            case PARAM_TD:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt],
+                                                      registerMaps[insn.i.rdata.rd]
+                );
+                break;
+            case PARAM_SD:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
+                                                      registerMaps[insn.i.rdata.rd]
+                );
+                break;
+            case PARAM_STD:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
+                                                      registerMaps[insn.i.rt],
+                                                      registerMaps[insn.i.rdata.rd]
+                );
+                break;
+            case PARAM_DST:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
+                                                      registerMaps[insn.i.rs],
+                                                      registerMaps[insn.i.rt]
+                );
+                break;
+            case PARAM_DTS:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
+                                                      registerMaps[insn.i.rt],
+                                                      registerMaps[insn.i.rs]
+                );
+                break;
+            case PARAM_DTA:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
+                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rdata.rd],
+                                                           registerMaps[insn.i.rt],
+                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.rdata.sa
+                );
+                break;
+            case PARAM_SI:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
+                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rs],
+                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
+                );
+                break;
+            case PARAM_TI:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
+                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
+                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
+                );
+                break;
+            case PARAM_STI:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
+                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rs],
+                                                           registerMaps[insn.i.rt],
+                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
+                );
+                break;
+            case PARAM_TSI:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
+                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
+                                                           registerMaps[insn.i.rs],
+                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
+                );
+                break;
+            case PARAM_TIS:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X@%08X(%s)",
+                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
+                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate,
+                    sDisasmColors[DISASM_COLOR_REG_2    ], registerMaps[insn.i.rs]
+                );
+                break;
+            case PARAM_SO:
+                branchOffset = (1 + insn.i.immediate);
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X%s0x%04X",
+                    sDisasmColors[DISASM_COLOR_INSN  ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG   ], registerMaps[insn.i.rs],
+                    sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
+                );
+                break;
+            case PARAM_STO:
+                branchOffset = (1 + insn.i.immediate);
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X%s0x%04X",
+                    sDisasmColors[DISASM_COLOR_INSN  ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG   ], registerMaps[insn.i.rs],
+                                                        registerMaps[insn.i.rt],
+                    sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
+                );
+                break;
+            case PARAM_B:
+            case PARAM_BC1:
+                branchOffset = (1 + insn.i.immediate);
+                strp += sprintf(strp, "@%08X%-6s @%08X%s0x%04X",
+                    sDisasmColors[DISASM_COLOR_INSN  ], type->name,
+                    sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
+                );
+                break;
+            case PARAM_J:
+                target = (0x80000000 | ((insn.d & 0x1FFFFFF) * sizeof(InsnData)));
+                strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
+                    sDisasmColors[DISASM_COLOR_INSN   ], type->name,
+                    sDisasmColors[DISASM_COLOR_ADDRESS], target
+                );
+#ifdef INCLUDE_DEBUG_MAP
+                fname = parse_map_exact(target);
+                if (!((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
+                    strp += sprintf(strp, " (%s)", fname);
+                }
+#endif
+                break;
+            case PARAM_FIS:
+                strp += sprintf(strp, "@%08X%-6s @%08XF%d, @%08X0x%04X@%08X(%s)",
+                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                    sDisasmColors[DISASM_COLOR_REG      ], insn.i.rt,
+                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate,
+                    sDisasmColors[DISASM_COLOR_REG_2    ], registerMaps[insn.i.rs]
+                );
+                break;
+            case PARAM_TFS:
+                strp += sprintf(strp, "@%08X%-6s @%08X%s, F%d",
+                    sDisasmColors[DISASM_COLOR_INSN], type->name,
+                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt],
+                                                      insn.i.rdata.rd // fs
+                );
+                break;
+            case PARAM_FF:
+                sprintf(insn_name, "%s.%c", type->name, fmt_to_char(insn));
+                strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d",
+                    sDisasmColors[DISASM_COLOR_INSN], insn_name,
+                    sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
+                                                      insn.i.rdata.rd  // fs
+                );
+                break;
+            case PARAM_FFF:
+                sprintf(insn_name, "%s.%c", type->name, fmt_to_char(insn));
+                strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d, F%d",
+                    sDisasmColors[DISASM_COLOR_INSN], insn_name,
+                    sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
+                                                      insn.i.rdata.rd, // fs
+                                                      insn.i.rt        // ft
+                );
+                break;
+            case PARAM_CON:
+                sprintf(insn_name, "%s.%s.%c", type->name, conditions[insn.i.rdata.function & BITMASK(4)], fmt_to_char(insn));
+                strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d",
+                    sDisasmColors[DISASM_COLOR_INSN], insn_name,
+                    sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.rd, // fd
+                                                      insn.i.rt        // ft
+                );
+                break;
+            case PARAM_UNK:
+            default:
+                strp += sprintf(strp, "unimpl 0x%08X", insn.d);
+                break;
+        }
+    } else {
         strp += sprintf(strp, "unimpl 0x%08X", insn.d);
     }
 
