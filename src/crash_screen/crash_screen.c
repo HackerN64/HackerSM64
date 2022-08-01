@@ -543,7 +543,7 @@ void crash_screen_print_fpcsr(uintptr_t fpcsr) {
 
 void crash_screen_print_reg(u32 x, u32 y, char *name, uintptr_t addr) {
     crash_screen_print(x, y, "@%08X%s:", COLOR_RGBA32_CRASH_REGISTER, name);
-    crash_screen_print(x + TEXT_WIDTH(3), y, "%08X", addr);
+    crash_screen_print((x + TEXT_WIDTH(3)), y, "%08X", addr);
 }
 
 void crash_screen_print_registers(__OSThreadContext *tc) {
@@ -831,9 +831,9 @@ void draw_ram_viewer(OSThread *thread) {
 #ifdef INCLUDE_DEBUG_MAP
 void crash_screen_fill_branch_buffer(char *fname, const uintptr_t funcAddr) {
     u32 offsetInFunc = 0;
-    u32 curBranchDist = 10;
-    u32 curBranchColor = 0;
+    u32 curBranchX = 10;
     s16 branchOffset;
+    s16 curBranchColorIndex = 0;
     struct BranchArrow *currArrow = NULL;
 
     if (fname == NULL) {
@@ -853,14 +853,14 @@ void crash_screen_fill_branch_buffer(char *fname, const uintptr_t funcAddr) {
             branchOffset = is_branch(toDisasm);
 
             if (branchOffset != 0) {
-                curBranchDist += DISASM_BRANCH_ARROW_SPACING;
+                curBranchX += DISASM_BRANCH_ARROW_SPACING;
                 currArrow = &sBranchArrows[sNumBranchArrows++];
-                currArrow->startLine = addr;
+                currArrow->startAddr = addr;
                 currArrow->branchOffset = branchOffset;
-                currArrow->colorIndex = curBranchColor;
-                currArrow->xPos = curBranchDist;
+                currArrow->colorIndex = curBranchColorIndex;
+                currArrow->xPos = curBranchX;
 
-                curBranchColor = ((curBranchColor + 1) % ARRAY_COUNT(sBranchColors));
+                curBranchColorIndex = ((curBranchColorIndex + 1) % ARRAY_COUNT(sBranchColors));
             }
 
             offsetInFunc += DISASM_STEP;
@@ -885,14 +885,16 @@ void draw_disasm_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color
     } else if (endLine >= DISASM_NUM_ROWS) {
         arrowEndHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 3);
     } else {
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 0), arrowEndHeight, (dist + 1), 1, color);
+        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 0), (arrowEndHeight - 0), (dist + 1), 1, color);
         // Arrow head
         crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 1), (arrowEndHeight - 1), 1, 3, color);
         crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 2), (arrowEndHeight - 2), 1, 5, color);
     }
 
+    s32 height = abss(arrowEndHeight - arrowStartHeight);
+
     // Middle of arrow
-    crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), MIN(arrowStartHeight, arrowEndHeight), 1, abss(arrowEndHeight - arrowStartHeight), color);
+    crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + dist), MIN(arrowStartHeight, arrowEndHeight), 1, height, color);
 }
 #endif
 
@@ -935,10 +937,10 @@ void draw_disasm(OSThread *thread) {
     struct BranchArrow *currArrow = NULL;
     for (s32 j = 0; j < sNumBranchArrows; j++) {
         currArrow = &sBranchArrows[j];
-        s32 startLine = (((s32)currArrow->startLine - (s32)sProgramPosition) / DISASM_STEP);
-        s32 endLine   = (startLine + currArrow->branchOffset + 1);
-        if (((startLine > 0)               || (endLine > 0))
-         && ((startLine < DISASM_NUM_ROWS) || (endLine < DISASM_NUM_ROWS))) {
+        s32 startLine = (((s32)currArrow->startAddr - (s32)sProgramPosition) / DISASM_STEP);
+        s32 endLine = (startLine + currArrow->branchOffset + 1);
+        if (((startLine >= 0)               || (endLine >= 0))
+         && ((startLine <  DISASM_NUM_ROWS) || (endLine <  DISASM_NUM_ROWS))) {
             draw_disasm_branch_arrow(startLine, endLine, currArrow->xPos, sBranchColors[currArrow->colorIndex], line);
         }
     }

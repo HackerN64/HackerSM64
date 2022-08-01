@@ -3,6 +3,7 @@
 #include <ultra64.h>
 
 #include "types.h"
+#include "insn_disasm.h"
 
 enum CrashScreenMessageIDs {
     CRASH_SCREEN_MSG_NONE,
@@ -117,7 +118,7 @@ struct CrashScreenPage {
 }; /*0x08*/
 
 struct BranchArrow {
-    /*0x00*/ uintptr_t startLine;
+    /*0x00*/ uintptr_t startAddr;
     /*0x02*/ s16 branchOffset;
     /*0x04*/ s16 colorIndex;
     /*0x08*/ s32 xPos;
@@ -147,7 +148,7 @@ struct CrashScreen {
 #define JUMP_MENU_MARGIN_Y 10
 
 // RAM Viewer constants
-#define RAM_VIEWER_STEP (sizeof(uintptr_t) * 4)
+#define RAM_VIEWER_STEP (s32)(sizeof(uintptr_t) * 4)
 
 #define RAM_VIEWER_NUM_ROWS 18
 #define RAM_VIEWER_SHOWN_SECTION ((RAM_VIEWER_NUM_ROWS - 1) * RAM_VIEWER_STEP)
@@ -156,7 +157,7 @@ struct CrashScreen {
 #define RAM_VIEWER_SCROLL_MAX (RAM_END - RAM_VIEWER_SHOWN_SECTION)
 
 // Disasm constants
-#define DISASM_STEP sizeof(uintptr_t)
+#define DISASM_STEP (s32)sizeof(InsnData)
 
 #define DISASM_NUM_ROWS 18
 #define DISASM_SHOWN_SECTION ((DISASM_NUM_ROWS - 1) * DISASM_STEP)
