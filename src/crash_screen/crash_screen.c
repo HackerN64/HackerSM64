@@ -885,10 +885,12 @@ void draw_disasm_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color
     } else if (endLine >= DISASM_NUM_ROWS) {
         arrowEndHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 3);
     } else {
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 0), (arrowEndHeight - 0), (dist + 1), 1, color);
+        const s32 offset = TEXT_WIDTH(1);
+        s32 x = ((DISASM_BRANCH_ARROW_START_X + dist) - offset);
+        crash_screen_draw_rect((x + 0), (arrowEndHeight - 0), (offset + 1), 1, color);
         // Arrow head
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 1), (arrowEndHeight - 1), 1, 3, color);
-        crash_screen_draw_rect((DISASM_BRANCH_ARROW_START_X + 2), (arrowEndHeight - 2), 1, 5, color);
+        crash_screen_draw_rect((x + 1), (arrowEndHeight - 1), 1, 3, color);
+        crash_screen_draw_rect((x + 2), (arrowEndHeight - 2), 1, 5, color);
     }
 
     s32 height = abss(arrowEndHeight - arrowStartHeight);
