@@ -596,7 +596,7 @@ void crash_screen_print_float_registers(__OSThreadContext *tc) {
 void draw_crash_context(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
-    s32 cause = ((tc->cause >> 2) & 0x1F);
+    s32 cause = ((tc->cause >> 2) & BITMASK(5));
     // Make the last two cause case indexes sequential for array access.
     if (cause == (EXC_WATCH >> 2)) cause = 16;
     if (cause == (EXC_VCED  >> 2)) cause = 17;
@@ -859,7 +859,7 @@ void crash_screen_fill_branch_buffer(char *fname, const uintptr_t funcAddr) {
             } 
             toDisasm.d = *(uintptr_t*)addr;
 
-            branchOffset = is_branch(toDisasm);
+            branchOffset = get_branch_offset(toDisasm);
 
             if (branchOffset != 0) {
                 currArrow = &sBranchArrows[sNumBranchArrows++];
@@ -1056,7 +1056,7 @@ void update_crash_screen_framebuffer(void) {
 }
 
 void update_crash_screen_direction_input(void) {
-    u8 prevHeld = (sCrashScreenDirectionFlags & 0xF);
+    u8 prevHeld = (sCrashScreenDirectionFlags & BITMASK(4));
     u8 currHeld = (
         (((gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))
          || (gPlayer1Controller->rawStickY >  60)) << 0) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP
@@ -1157,9 +1157,9 @@ void crash_screen_select_address(size_t step) {
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP) {
         // Increment the selected digit.
         u32 shift = (28 - (sAddressSelecCharIndex * 4));
-        u8 new = ((sAddressSelectTarget >> shift) & 0xF);
-        new = ((new + 1) & 0xF);
-        nextSelectedAddress = ((sAddressSelectTarget & ~(0xF << shift)) | (new << shift));
+        u8 new = ((sAddressSelectTarget >> shift) & BITMASK(4));
+        new = ((new + 1) & BITMASK(4));
+        nextSelectedAddress = ((sAddressSelectTarget & ~(BITMASK(4) << shift)) | (new << shift));
 
         if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
             sAddressSelectTarget = ALIGN(nextSelectedAddress, step);
@@ -1169,9 +1169,9 @@ void crash_screen_select_address(size_t step) {
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN) {
         // Decrement the selected digit.
         u32 shift = (28 - (sAddressSelecCharIndex * 4));
-        u8 new = ((sAddressSelectTarget >> shift) & 0xF);
-        new = ((new - 1) & 0xF);
-        nextSelectedAddress = ((sAddressSelectTarget & ~(0xF << shift)) | (new << shift));
+        u8 new = ((sAddressSelectTarget >> shift) & BITMASK(4));
+        new = ((new - 1) & BITMASK(4));
+        nextSelectedAddress = ((sAddressSelectTarget & ~(BITMASK(4) << shift)) | (new << shift));
 
         if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
             sAddressSelectTarget = ALIGN(nextSelectedAddress, step);
@@ -1408,10 +1408,10 @@ void draw_crashed_image_i4(void) {
     for (u32 i = 0; i < SRC_IMG_SIZE; i++) {
         srcColor = *fb_u8++;
 
-        color = (srcColor & 0xF0);
+        color = (srcColor & (BITMASK(4) << 4));
         *fb_u16++ = ((color <<  8) | (color << 3) | (color >> 2) | 0x1); // GPACK_RGBA5551
 
-        color = (srcColor & 0x0F);
+        color = (srcColor & (BITMASK(4) << 0));
         *fb_u16++ = ((color << 12) | (color << 7) | (color << 2) | 0x1); // GPACK_RGBA5551
     }
 }

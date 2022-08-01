@@ -27,27 +27,26 @@ static const InsnTemplate insn_db[] = {
     // {{.i={0b010001, 0b00010,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CFC1"   },
     // {{.i={0b010001, 0b00110,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CTC1"   },
     // arithmetic
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000101}}, PARAM_FF,  "ABS"    },
     {{.i={0b010001,       0,       0,       0,       0, 0b000000}}, PARAM_FFF, "ADD"    },
     {{.i={0b010001,       0,       0,       0,       0, 0b000001}}, PARAM_FFF, "SUB"    },
     {{.i={0b010001,       0,       0,       0,       0, 0b000010}}, PARAM_FFF, "MUL"    },
     {{.i={0b010001,       0,       0,       0,       0, 0b000011}}, PARAM_FFF, "DIV"    },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000111}}, PARAM_FF,  "NEG"    },
     {{.i={0b010001,       0, 0b00000,       0,       0, 0b000100}}, PARAM_FF,  "SQRT"   },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001010}}, PARAM_FF,  "CEIL.L" },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001110}}, PARAM_FF,  "CEIL.W" },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100001}}, PARAM_FF,  "CVT.D"  },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100101}}, PARAM_FF,  "CVT.L"  },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100000}}, PARAM_FF,  "CVT.S"  },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100100}}, PARAM_FF,  "CVT.W"  },
-    {{.i={0b010001,       0,       0,       0,       0, 0b000011}}, PARAM_FFF, "DIV"    },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001011}}, PARAM_FF,  "FLOOR.L"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001111}}, PARAM_FF,  "FLOOR.W"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001000}}, PARAM_FF,  "ROUND.L"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001100}}, PARAM_FF,  "ROUND.W"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001001}}, PARAM_FF,  "TRUNC.L"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001101}}, PARAM_FF,  "TRUNC.W"},
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000101}}, PARAM_FF,  "ABS"    },
     {{.i={0b010001,       0, 0b00000,       0,       0, 0b000110}}, PARAM_FF,  "MOV"    },
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000111}}, PARAM_FF,  "NEG"    },
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001000}}, PARAM_FF,  "ROUND.L"},
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001001}}, PARAM_FF,  "TRUNC.L"},
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001010}}, PARAM_FF,  "CEIL.L" },
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001011}}, PARAM_FF,  "FLOOR.L"},
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001100}}, PARAM_FF,  "ROUND.W"},
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001101}}, PARAM_FF,  "TRUNC.W"},
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001110}}, PARAM_FF,  "CEIL.W" },
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001111}}, PARAM_FF,  "FLOOR.W"},
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100000}}, PARAM_FF,  "CVT.S"  },
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100001}}, PARAM_FF,  "CVT.D"  },
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100100}}, PARAM_FF,  "CVT.W"  },
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100101}}, PARAM_FF,  "CVT.L"  },
     {{.i={0b010001,       0,       0,       0, 0b00000, 0b110000}}, PARAM_CON, "C"      },
 //          opcode,      rs,      rt,      rd,      sa,  function
     // Arithmetic
@@ -245,15 +244,25 @@ static const InsnData insn_masks[] = {
 };
 
 static const char registerMaps[][3] = {
-    "R0",
-    "AT",
-    "V0", "V1",
-    "A0", "A1", "A2", "A3",
-    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7",
-    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "T8", "T9",
-    "K0", "K1",
-    "GP", "SP", "FP", "RA",
+    "R0",                                           // $zero
+    "AT",                                           // Assembler temporary value
+    "V0", "V1",                                     // Subroutine return value
+    "A0", "A1", "A2", "A3",                         // Subroutine arguments
+    "T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", // Temporary values
+    "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", // Saved values
+    "T8", "T9",                                     // Temporary values
+    "K0", "K1",                                     // Reserved by kernel
+    "GP",                                           // Global pointer
+    "SP",                                           // Stack pointer
+    "FP",                                           // Saved value or frame pointer
+    "RA",                                           // Return address
 };
+
+    // "F0", "F2",                                     // Subroutine return value
+    // "F4", "F6", "F8", "F10"                         // Temporary values
+    // "F12", "F14",                                   // Subroutine arguments
+    // "F16", "F18",                                   // Temporary values
+    // "F20", "F22", "F24", "F26", "F28", "F30",       // Saved Values
 
 static const char conditions[][5] = {
     "F",  "UN",   "EQ",  "UEQ", "OLT", "ULT", "OLE", "ULE",
@@ -273,20 +282,17 @@ static const RGBA32 sDisasmColors[] = {
 static char insn_as_string[CHAR_BUFFER_SIZE];
 
 static char fmt_to_char(InsnData insn) {
-    u16 fmt = insn.i.rs;
-    char ret = 'X';
-
-    switch (fmt) {
-        case 16: ret = 'S'; break;
-        case 17: ret = 'D'; break;
-        case 20: ret = 'W'; break;
-        case 21: ret = 'L'; break;
+    switch (insn.i.rs) {
+        case 16: return 'S';
+        case 17: return 'D';
+        case 20: return 'W';
+        case 21: return 'L';
     }
 
-    return ret;
+    return 'X';
 }
 
-s32 is_branch(InsnData insn) {
+s32 get_branch_offset(InsnData insn) {
     for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
         if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
             switch (insn_db[i].paramType) {
@@ -514,7 +520,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d",
                         sDisasmColors[DISASM_COLOR_INSN], insn_name,
                         sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
-                                                          insn.i.rdata.rd // fs
+                                                          insn.i.rdata.rd  // fs
                     );
                     break;
                 case PARAM_FFF:
@@ -523,15 +529,15 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                         sDisasmColors[DISASM_COLOR_INSN], insn_name,
                         sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
                                                           insn.i.rdata.rd, // fs
-                                                          insn.i.rt // ft
+                                                          insn.i.rt        // ft
                     );
                     break;
                 case PARAM_CON:
-                    sprintf(insn_name, "%s.%s.%c", insn_db[i].name, conditions[insn.i.rdata.function & 0b001111], fmt_to_char(insn));
+                    sprintf(insn_name, "%s.%s.%c", insn_db[i].name, conditions[insn.i.rdata.function & BITMASK(4)], fmt_to_char(insn));
                     strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d",
                         sDisasmColors[DISASM_COLOR_INSN], insn_name,
                         sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.rd, // fd
-                                                          insn.i.rt // ft
+                                                          insn.i.rt        // ft
                     );
                     break;
                 case PARAM_UNK:

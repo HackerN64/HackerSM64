@@ -132,7 +132,7 @@ struct CrashScreen {
     /*0x9C8*/ OSMesg mesg;
 }; /*0x9CC*/
 
-// Maximum number of chars 
+// Maximum number of chars
 #define CHAR_BUFFER_SIZE 0x100
 
 // Stack Trace constants
@@ -166,9 +166,9 @@ struct CrashScreen {
 #define DISASM_SCROLL_MIN RAM_START
 #define DISASM_SCROLL_MAX (RAM_END - DISASM_SHOWN_SECTION)
 
-#define DISASM_BRANCH_ARROW_START_X TEXT_X(22)
-#define DISASM_BRANCH_ARROW_OFFSET TEXT_WIDTH(1)
-#define DISASM_BRANCH_ARROW_SPACING (TEXT_WIDTH(1) / 2)
+#define DISASM_BRANCH_ARROW_START_X       TEXT_X(23)
+#define DISASM_BRANCH_ARROW_OFFSET        TEXT_WIDTH(1)
+#define DISASM_BRANCH_ARROW_SPACING       (TEXT_WIDTH(1) / 2)
 #define DISASM_FUNCTION_SEARCH_MAX_OFFSET (1024 * DISASM_STEP)
 
 

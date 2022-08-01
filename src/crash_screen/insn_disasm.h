@@ -85,5 +85,5 @@ enum DisasmColors {
 #define INSN_OFFSET(addr, offset) ((addr) + (sizeof(InsnData) * (s16)(offset)))
 
 
-s32 is_branch(InsnData insn);
+s32 get_branch_offset(InsnData insn);
 char *insn_disasm(InsnData insn, u32 isPC);
