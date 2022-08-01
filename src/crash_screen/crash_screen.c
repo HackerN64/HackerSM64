@@ -277,7 +277,7 @@ ALWAYS_INLINE void crash_screen_draw_divider(u32 y) {
     crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_LIGHT_GRAY);
 }
 
-void crash_screen_draw_glyph(u32 startX, u32 startY, char glyph, RGBA32 color) {
+void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32 color) {
     if (glyph == 0) {
         color = COLOR_RGBA32_GRAY;
     }
@@ -338,7 +338,7 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
     return ((char *) memcpy(buffer, data, size) + size);
 }
 
-static s32 glyph_to_hex(char *dest, char glyph) {
+static s32 glyph_to_hex(char *dest, unsigned char glyph) {
     if (glyph >= '0' && glyph <= '9') {
         *dest = ((glyph - '0') & 0xF);
     } else if (glyph >= 'A' && glyph <= 'F') {
@@ -354,7 +354,6 @@ static s32 glyph_to_hex(char *dest, char glyph) {
 
 s32 crash_screen_parse_text_color(RGBA32 *color, char *buf, u32 index, u32 size) {
     u32 byteIndex, digit;
-    char glyph;
     char hex = 0;
     Color component = 0;
     ColorRGBA rgba = { 0, 0, 0, 0 };
@@ -366,9 +365,7 @@ s32 crash_screen_parse_text_color(RGBA32 *color, char *buf, u32 index, u32 size)
                 return FALSE;
             }
 
-            glyph = CHAR_TO_GLYPH(buf[index]);
-
-            if (!glyph_to_hex(&hex, glyph)) {
+            if (!glyph_to_hex(&hex, buf[index])) {
                 return FALSE;
             }
 
@@ -395,7 +392,7 @@ s32 crash_screen_parse_text_color(RGBA32 *color, char *buf, u32 index, u32 size)
 }
 
 // Returns the number of chars to skip.
-u32 crash_screen_parse_formatting_chars(char *buf, u32 index, u32 size, char glyph, RGBA32 *color) {
+u32 crash_screen_parse_formatting_chars(char *buf, u32 index, u32 size, unsigned char glyph, RGBA32 *color) {
     static u8 escape = FALSE;
     u32 skip = 0;
 
@@ -404,7 +401,7 @@ u32 crash_screen_parse_formatting_chars(char *buf, u32 index, u32 size, char gly
     }
 
     // Use '\\@' to print '@' and its color code instead of trying to parse it.
-    if (glyph == '\\' && buf[index + 1] && CHAR_TO_GLYPH(buf[index + 1]) == '@') {
+    if (glyph == '\\' && buf[index + 1] && buf[index + 1] == '@') {
         escape = TRUE;
         skip = 1;
     } else if (glyph == '@' && !escape) { // @RRGGBBAA color prefix
@@ -422,7 +419,7 @@ u32 crash_screen_parse_formatting_chars(char *buf, u32 index, u32 size, char gly
 
 // Returns whether to wrap or not.
 s32 crash_screen_parse_space(char *buf, u32 index, u32 size, u32 x) {
-    char glyph = CHAR_TO_GLYPH(buf[++index]);
+    unsigned char glyph = buf[++index];
     u32 checkX = x + TEXT_WIDTH(1);
     UNUSED RGBA32 color;
 
@@ -433,7 +430,7 @@ s32 crash_screen_parse_space(char *buf, u32 index, u32 size, u32 x) {
         }
 
         index += (1 + crash_screen_parse_formatting_chars(buf, index, size, glyph, &color));
-        glyph = CHAR_TO_GLYPH(buf[index]);
+        glyph = buf[index];
         checkX += TEXT_WIDTH(1);
     }
 
@@ -447,7 +444,7 @@ enum CrashScreenPrintOp {
 };
 
 u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
-    char glyph;
+    unsigned char glyph;
     char buf[CHAR_BUFFER_SIZE];
     bzero(&buf, sizeof(buf));
 
@@ -469,7 +466,7 @@ u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
 
     if (size > 0) {
         for (u32 index = 0; index < size && buf[index]; index += (1 + skip)) {
-            glyph = CHAR_TO_GLYPH(buf[index]);
+            glyph = buf[index];
             printOp = CRASH_SCREEN_PRINT_OP_SPACE;
             skip = 0;
 
@@ -1333,8 +1330,10 @@ OSThread *get_crashed_thread(void) {
          && (thread->flags & (BIT(0) | BIT(1)))) {
             return thread;
         }
+    
         thread = thread->tlnext;
     }
+
     return NULL;
 }
 

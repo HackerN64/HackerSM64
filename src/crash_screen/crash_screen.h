@@ -94,9 +94,6 @@ enum CrashScreenDirectionFlags {
 // Returns the Y coordinate between the Y position on the text grid, and the space above it.
 #define DIVIDER_Y(numChars) (TEXT_Y(numChars) - 2)
 
-// Turns a char value into a glyph index.
-#define CHAR_TO_GLYPH(c) ((c) & 0xFF)
-
 // The size of one row of the font image.
 typedef u32 FontRow;
 
