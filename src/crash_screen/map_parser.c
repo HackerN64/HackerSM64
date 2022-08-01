@@ -40,7 +40,7 @@ extern u8 _engineSegmentTextEnd[];
 extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
-#define IS_IN_SEGMENT(addr, segment) ((addr >= (uintptr_t)_##segment##SegmentStart) && (addr <= (uintptr_t)_##segment##SegmentTextEnd))
+#define IS_IN_SEGMENT(addr, segment) (((addr) >= (uintptr_t)_##segment##SegmentStart) && ((addr) <= (uintptr_t)_##segment##SegmentTextEnd))
 
 s32 is_in_code_segment(uintptr_t addr) {
     return (IS_IN_SEGMENT(addr, main)
@@ -48,19 +48,7 @@ s32 is_in_code_segment(uintptr_t addr) {
          || IS_IN_SEGMENT(addr, goddard));
 }
 
-char *parse_map(uintptr_t addr) {
-    if (is_in_code_segment(addr)) {
-        for (u32 i = 0; i < gMapEntrySize; i++) {
-            if (gMapEntries[i].addr >= addr) {
-                return (char*) ((uintptr_t)gMapStrings + gMapEntries[(gMapEntries[i].addr == addr) ? i : (i - 1)].nm_offset);
-            }
-        }
-    }
-
-    return NULL;
-}
-
-char *parse_map_return(uintptr_t *addr) {
+char *parse_map(uintptr_t *addr) {
     if (is_in_code_segment(*addr)) {
         for (u32 i = 0; i < gMapEntrySize; i++) {
             if (gMapEntries[i].addr >= *addr) {
@@ -94,7 +82,7 @@ char *find_function_in_stack(uintptr_t *sp) {
         *sp += sizeof(uintptr_t);
 
         if (is_in_code_segment(val)) {
-            return parse_map(val);
+            return parse_map(&val);
         }
     }
 

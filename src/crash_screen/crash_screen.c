@@ -609,7 +609,8 @@ void draw_crash_context(OSThread *thread) {
     osWritebackDCacheAll();
 
 #ifdef INCLUDE_DEBUG_MAP
-    char *fname = parse_map(tc->pc);
+    uintptr_t pc = tc->pc;
+    char *fname = parse_map(&pc);
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCRASH AT:", COLOR_RGBA32_CRASH_AT);
     if (fname == NULL) {
         crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
@@ -675,7 +676,8 @@ void draw_stacktrace(OSThread *thread) {
 
 #ifdef INCLUDE_DEBUG_MAP
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
-    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, parse_map(tc->pc));
+    uintptr_t pc = tc->pc;
+    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, parse_map(&pc));
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
@@ -833,11 +835,12 @@ void draw_ram_viewer(OSThread *thread) {
 
 #ifdef INCLUDE_DEBUG_MAP
 void crash_screen_fill_branch_buffer(char *fname, const uintptr_t funcAddr) {
-    u32 offsetInFunc = 0;
-    u32 curBranchX = 10;
+    struct BranchArrow *currArrow = NULL;
+    uintptr_t addr, checkAddr;
+    InsnData toDisasm;
+    u32 curBranchX = DISASM_BRANCH_ARROW_OFFSET;
     s16 branchOffset;
     s16 curBranchColorIndex = 0;
-    struct BranchArrow *currArrow = NULL;
 
     if (fname == NULL) {
         return;
@@ -848,25 +851,30 @@ void crash_screen_fill_branch_buffer(char *fname, const uintptr_t funcAddr) {
     sNumBranchArrows = 0;
 
     if (fname != NULL) {
-        while (offsetInFunc < DISASM_FUNCTION_SEARCH_MAX_OFFSET && fname == parse_map(funcAddr + offsetInFunc)) {
-            uintptr_t addr = (funcAddr + offsetInFunc);
-            InsnData toDisasm;
+        for (u32 i = 0; i < DISASM_FUNCTION_SEARCH_MAX_OFFSET; i += DISASM_STEP) {
+            addr = (funcAddr + i);
+            checkAddr = addr;
+            if (fname != parse_map(&checkAddr)) {
+                break;
+            } 
             toDisasm.d = *(uintptr_t*)addr;
 
             branchOffset = is_branch(toDisasm);
 
             if (branchOffset != 0) {
-                curBranchX += DISASM_BRANCH_ARROW_SPACING;
                 currArrow = &sBranchArrows[sNumBranchArrows++];
                 currArrow->startAddr = addr;
                 currArrow->branchOffset = branchOffset;
                 currArrow->colorIndex = curBranchColorIndex;
                 currArrow->xPos = curBranchX;
 
+                curBranchX += DISASM_BRANCH_ARROW_SPACING;
                 curBranchColorIndex = ((curBranchColorIndex + 1) % ARRAY_COUNT(sBranchColors));
-            }
 
-            offsetInFunc += DISASM_STEP;
+                if (DISASM_BRANCH_ARROW_START_X + curBranchX > CRASH_SCREEN_TEXT_X2) {
+                    curBranchX = DISASM_BRANCH_ARROW_OFFSET;
+                }
+            }
         }
     }
 }
@@ -888,9 +896,8 @@ void draw_disasm_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color
     } else if (endLine >= DISASM_NUM_ROWS) {
         arrowEndHeight = (TEXT_Y(printLine + DISASM_NUM_ROWS) - 3);
     } else {
-        const s32 offset = TEXT_WIDTH(1);
-        s32 x = ((DISASM_BRANCH_ARROW_START_X + dist) - offset);
-        crash_screen_draw_rect((x + 0), (arrowEndHeight - 0), (offset + 1), 1, color);
+        s32 x = ((DISASM_BRANCH_ARROW_START_X + dist) - DISASM_BRANCH_ARROW_OFFSET);
+        crash_screen_draw_rect((x + 0), (arrowEndHeight - 0), (DISASM_BRANCH_ARROW_OFFSET + 1), 1, color);
         // Arrow head
         crash_screen_draw_rect((x + 1), (arrowEndHeight - 1), 1, 3, color);
         crash_screen_draw_rect((x + 2), (arrowEndHeight - 2), 1, 5, color);
@@ -914,10 +921,10 @@ void draw_disasm(OSThread *thread) {
         sProgramPosition = (tc->pc - ((DISASM_NUM_ROWS / 2) * DISASM_STEP));
 #ifdef INCLUDE_DEBUG_MAP
         funcAddr = sProgramPosition;
-        fname = parse_map_return(&funcAddr);
+        fname = parse_map(&funcAddr);
         crash_screen_fill_branch_buffer(fname, funcAddr);
     } else {
-        fname = parse_map_return(&funcAddr);
+        fname = parse_map(&funcAddr);
 #endif
     }
 
@@ -1178,7 +1185,7 @@ void crash_screen_select_address(size_t step) {
         sProgramPosition = sAddressSelectTarget;
 #ifdef INCLUDE_DEBUG_MAP
         uintptr_t funcAddr = sProgramPosition;
-        char *fname = parse_map_return(&funcAddr);
+        char *fname = parse_map(&funcAddr);
         crash_screen_fill_branch_buffer(fname, funcAddr);
 #endif
         sUpdateBuffer = TRUE;
@@ -1256,8 +1263,8 @@ void crash_screen_input_disasm(void) {
 #ifdef INCLUDE_DEBUG_MAP
         if (oldPos != sProgramPosition) {
             uintptr_t newFunc = sProgramPosition;
-            parse_map_return(&oldPos);
-            char *fname = parse_map_return(&newFunc);
+            parse_map(&oldPos);
+            char *fname = parse_map(&newFunc);
             if (oldPos != newFunc) {
                 crash_screen_fill_branch_buffer(fname, newFunc);
             }
