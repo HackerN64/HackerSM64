@@ -795,6 +795,9 @@ void draw_ram_viewer(OSThread *thread) {
         charX = (TEXT_X(8) + 3);
         charY = TEXT_Y(line + y);
         for (u32 x = 0; x < 16; x++) {
+            if ((currAddr + x) == tc->pc) {
+                crash_screen_draw_rect(charX + 1, charY - 1, TEXT_WIDTH(2) + 1, TEXT_WIDTH(1) + 3, COLOR_RGBA32_RED);
+            }
             u8 value = *((u8 *)currAddr + x);
 
             if ((x & 0x3) == 0) {
