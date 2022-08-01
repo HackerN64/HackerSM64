@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PR/ultratypes.h>
+#include <ultra64.h>
 
 #include "types.h"
 
@@ -45,8 +45,6 @@ enum ParamTypes {
     PARAM_BC1, // offset
     PARAM_UNK, // unimpl
 };
-
-extern far char *parse_map_exact(uintptr_t pc);
 
 typedef struct __attribute__((packed)) {
     /*0x00*/ u16 rd        : 5; // fs

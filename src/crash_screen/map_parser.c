@@ -90,7 +90,8 @@ char *parse_map_exact(uintptr_t addr) {
 
 char *find_function_in_stack(uintptr_t *sp) {
     for (s32 i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
-        uintptr_t val = *(uintptr_t *)sp++;
+        uintptr_t val = *(uintptr_t *)*sp;
+        *sp += sizeof(uintptr_t);
 
         if (is_in_code_segment(val)) {
             return parse_map(val);

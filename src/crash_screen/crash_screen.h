@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PR/ultratypes.h>
+#include <ultra64.h>
 
 #include "types.h"
 

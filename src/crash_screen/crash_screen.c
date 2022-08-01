@@ -4,7 +4,6 @@
 #include <string.h>
 #include "types.h"
 #include "sm64.h"
-#include "farcall.h"
 #include "crash_screen.h"
 #include "insn_disasm.h"
 #include "map_parser.h"
@@ -961,7 +960,7 @@ void draw_disasm(OSThread *thread) {
             bzero(asText, sizeof(asText));
 
             for (u32 j = 0; j < 4; j++) {
-                asText[j] = (char)(toDisasm.d >> (24 - (8 * j)));
+                asText[j] = (unsigned char)(toDisasm.d >> (24 - (8 * j)));
             }
 
             crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", asText);

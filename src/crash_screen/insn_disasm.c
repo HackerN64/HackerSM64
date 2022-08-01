@@ -6,6 +6,7 @@
 #include "farcall.h"
 #include "color_presets.h"
 #include "insn_disasm.h"
+#include "map_parser.h"
 #include "engine/math_util.h"
 
 // MIPS III Instructions
