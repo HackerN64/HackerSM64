@@ -26,7 +26,7 @@ ALIGNED32 static const FontRow gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * 
 
 #ifdef INCLUDE_DEBUG_MAP
 static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
-static s32 sNumBranchArrows = 0;
+static u32 sNumBranchArrows = 0;
 #endif
 
 static struct FunctionInStack sAllFunctionStack[STACK_SIZE];
@@ -37,7 +37,7 @@ static u32 sNumShownFunctions = STACK_SIZE;
 static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
 
 static s8 sDrawCrashScreen = TRUE;
-static s8 sHideCrashScreen = TRUE;
+static s8 sDrawBackground = TRUE;
 static s8 sCrashScreenWordWrap = TRUE;
 static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
@@ -772,6 +772,7 @@ void draw_ram_viewer(OSThread *thread) {
 
         charX += (TEXT_WIDTH(2) + 1);
     }
+
     crash_screen_draw_divider(DIVIDER_Y(3));
 
     crash_screen_draw_rect((TEXT_X(8) + 2), DIVIDER_Y(line), 1, TEXT_HEIGHT(19), COLOR_RGBA32_LIGHT_GRAY);
@@ -931,15 +932,13 @@ void draw_disasm(OSThread *thread) {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN: @%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
 
-    crash_screen_draw_divider(DIVIDER_Y(line));
-
     osWritebackDCacheAll();
 
 #ifdef INCLUDE_DEBUG_MAP
     // Draw branch arrows from the buffer.
     struct BranchArrow *currArrow = NULL;
-    for (s32 j = 0; j < sNumBranchArrows; j++) {
-        currArrow = &sBranchArrows[j];
+    for (u32 b = 0; b < sNumBranchArrows; b++) {
+        currArrow = &sBranchArrows[b];
         s32 startLine = (((s32)currArrow->startAddr - (s32)sProgramPosition) / DISASM_STEP);
         s32 endLine = (startLine + currArrow->branchOffset + 1);
         if (((startLine >= 0)               || (endLine >= 0))
@@ -953,30 +952,37 @@ void draw_disasm(OSThread *thread) {
 
     sCrashScreenWordWrap = FALSE;
 
-    for (u32 i = 0; i < DISASM_NUM_ROWS; i++) {
-        uintptr_t addr = (sProgramPosition + (i * DISASM_STEP));
+    u32 charX = TEXT_X(0);
+    u32 charY = TEXT_Y(line);
+
+    for (u32 y = 0; y < DISASM_NUM_ROWS; y++) {
+        uintptr_t addr = (sProgramPosition + (y * DISASM_STEP));
         InsnData toDisasm;
         toDisasm.d = *(uintptr_t*)(addr);
 
+        charY = TEXT_Y(line + y);
+
         if (is_in_code_segment(addr)) {
-            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", insn_disasm(toDisasm, (addr == tc->pc)));
+            crash_screen_print(charX, charY, "%s", insn_disasm(toDisasm, (addr == tc->pc)));
         } else if (sShowRamAsAscii) {
             char asText[8];
             bzero(asText, sizeof(asText));
 
-            for (u32 j = 0; j < 4; j++) {
-                asText[j] = (unsigned char)(toDisasm.d >> (24 - (8 * j)));
+            for (u32 c = 0; c < 4; c++) {
+                asText[c] = (unsigned char)(toDisasm.d >> (24 - (8 * c)));
             }
 
-            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%s", asText);
+            crash_screen_print(charX, charY, "%s", asText);
         } else {
-            crash_screen_print(TEXT_X(0), TEXT_Y(line + i), "%08X", toDisasm.d);
+            crash_screen_print(charX, charY, "%08X", toDisasm.d);
         }
     }
 
     sCrashScreenWordWrap = TRUE;
 
     osWritebackDCacheAll();
+
+    crash_screen_draw_divider(DIVIDER_Y(line));
 
     u32 line2 = (line + DISASM_NUM_ROWS);
 
@@ -1022,7 +1028,7 @@ void draw_controls(UNUSED OSThread *thread) {
 }
 
 void reset_crash_screen_framebuffer(void) {
-    if (sHideCrashScreen) {
+    if (sDrawBackground) {
         bcopy(gZBuffer, (void *) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]), FRAMEBUFFER_SIZE);
     } else {
         crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA32_BLACK);
@@ -1284,11 +1290,11 @@ void update_crash_screen_input(void) {
     }
 
     if (gPlayer1Controller->buttonPressed & START_BUTTON) {
-        sHideCrashScreen ^= TRUE;
+        sDrawBackground ^= TRUE;
         sUpdateBuffer = TRUE;
     }
 
-    if (!sDrawCrashScreen && !sHideCrashScreen) {
+    if (!sDrawCrashScreen && !sDrawBackground) {
         sDrawCrashScreen = TRUE;
     }
 
@@ -1305,7 +1311,7 @@ void draw_crash_screen(OSThread *thread) {
         reset_crash_screen_framebuffer();
 
         if (sDrawCrashScreen) {
-            if (sHideCrashScreen) {
+            if (sDrawBackground) {
                 // Draw the transparent background.
                 crash_screen_draw_dark_rect(CRASH_SCREEN_X1, CRASH_SCREEN_Y1, CRASH_SCREEN_W, CRASH_SCREEN_H, 2);
             }
