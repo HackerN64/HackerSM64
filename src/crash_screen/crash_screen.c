@@ -1207,7 +1207,7 @@ void crash_screen_select_address(size_t step) {
     }
 
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
-        // Open the jump to address popup.
+        // Jump to the address and close the popup.
         sAddressSelectMenuOpen = FALSE;
         sSelectedAddress = sAddressSelectTarget;
 #ifdef INCLUDE_DEBUG_MAP
@@ -1215,6 +1215,12 @@ void crash_screen_select_address(size_t step) {
         char *fname = parse_map(&funcAddr);
         crash_screen_fill_branch_buffer(fname, funcAddr);
 #endif
+        sUpdateBuffer = TRUE;
+    }
+
+    if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+        // Close the popup without jumping.
+        sAddressSelectMenuOpen = FALSE;
         sUpdateBuffer = TRUE;
     }
 }
