@@ -38,6 +38,7 @@ static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
 
 static s8 sDrawCrashScreen = TRUE;
 static s8 sDrawBackground = TRUE;
+static s8 sCrashScreenSwitchedPage = FALSE;
 static s8 sCrashScreenWordWrap = TRUE;
 static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
@@ -45,7 +46,8 @@ static s8 sAddressSelectMenuOpen = FALSE;
 static s8 sShowRamAsAscii = FALSE;
 static s8 sAddressSelecCharIndex = 2;
 static uintptr_t sAddressSelectTarget = 0;
-static uintptr_t sProgramPosition = 0;
+static uintptr_t sSelectedAddress = 0;
+static uintptr_t sScrollAddress = 0;
 static u32 sStackTraceIndex = 0;
 
 static u8 sCrashPage = PAGE_CONTEXT;
@@ -734,31 +736,42 @@ void draw_address_select(void) {
 
     crash_screen_draw_vertical_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y - TEXT_HEIGHT(1) + CRASH_SCREEN_CHAR_SPACING_Y),
                                         TEXT_WIDTH(1), TEXT_WIDTH(1),
-                                        COLOR_RGBA32_CRASH_SELECT, FALSE);
+                                        COLOR_RGBA32_CRASH_SELECT_ARROWS, FALSE);
     crash_screen_draw_vertical_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y + TEXT_HEIGHT(1) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
                                         TEXT_WIDTH(1), TEXT_WIDTH(1),
-                                        COLOR_RGBA32_CRASH_SELECT, TRUE);
+                                        COLOR_RGBA32_CRASH_SELECT_ARROWS, TRUE);
     crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelectTarget);
 
     osWritebackDCacheAll();
 }
 
+void clamp_view_to_selection(const u32 numRows, const u32 step) {
+    size_t size = (step * numRows);
+    if (sSelectedAddress < sScrollAddress + (step - 1)) {
+        sScrollAddress = sSelectedAddress - (step - 1);
+    }
+    if (sSelectedAddress > sScrollAddress + (size - 1)) {
+        sScrollAddress = sSelectedAddress - (size - 1);
+    }
+
+    sScrollAddress = CLAMP(sScrollAddress, RAM_START, (RAM_END - size));
+
+    sScrollAddress = ALIGN(sScrollAddress, step);
+}
+
 void draw_ram_viewer(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
 
-    if (sProgramPosition == 0) {
-        sProgramPosition = ALIGN(tc->pc, 0x10);
-    }
+    clamp_view_to_selection(RAM_VIEWER_NUM_ROWS, RAM_VIEWER_STEP);
 
-    uintptr_t addr = sProgramPosition;
-    uintptr_t currAddr = addr;
+    uintptr_t startAddr = sScrollAddress;
 
     u32 charX, charY;
 
     u32 line = 1;
 
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XRAM VIEW", COLOR_RGBA32_CRASH_PAGE_NAME);
-    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "%08X-%08X", addr, (addr + RAM_VIEWER_SHOWN_SECTION));
+    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "%08X in %08X-%08X", sSelectedAddress, startAddr, (startAddr + RAM_VIEWER_SHOWN_SECTION));
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     charX = (TEXT_X(8) + 3);
@@ -782,26 +795,36 @@ void draw_ram_viewer(OSThread *thread) {
     charX = (TEXT_X(8) + 3);
     charY = TEXT_Y(line);
 
+    RGBA32 color;
+
     for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
-        currAddr = addr + (y * RAM_VIEWER_STEP);
-        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), "@%08X%08X", ((y & 0x1) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), currAddr);
+        uintptr_t rowAddr = startAddr + (y * RAM_VIEWER_STEP);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line + y), "@%08X%08X", ((y & 0x1) ? COLOR_RGBA32_CRASH_RAM_VIEW_B1 : COLOR_RGBA32_CRASH_RAM_VIEW_B2), rowAddr);
 
         charX = (TEXT_X(8) + 3);
         charY = TEXT_Y(line + y);
         for (u32 x = 0; x < 16; x++) {
-            if ((currAddr + x) == tc->pc) {
-                crash_screen_draw_rect(charX + 1, charY - 1, TEXT_WIDTH(2) + 1, TEXT_WIDTH(1) + 3, COLOR_RGBA32_RED);
-            }
-            u8 value = *((u8 *)currAddr + x);
+            uintptr_t currAddr = (rowAddr + x);
+            u8 value = *((u8 *)currAddr);
 
             if ((x & 0x3) == 0) {
                 charX += 2;
             }
 
+            color = ((x & 0x1) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
+            
+            if (currAddr == tc->pc) {
+                crash_screen_draw_rect(charX - 1, charY - 1, TEXT_WIDTH(2) + 1, TEXT_WIDTH(1) + 3, COLOR_RGBA32_RED);
+            }
+            if (currAddr == sSelectedAddress) {
+                crash_screen_draw_rect(charX - 1, charY - 1, TEXT_WIDTH(2) + 1, TEXT_WIDTH(1) + 3, COLOR_RGBA32_WHITE);
+                color = COLOR_RGBA32_BLACK;
+            }
+
             if (sShowRamAsAscii) {
                 crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, value, COLOR_RGBA32_WHITE);
             } else {
-                crash_screen_print(charX, charY, "@%08X%02X", ((x & 0x1) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY), value);
+                crash_screen_print(charX, charY, "@%08X%02X", color, value);
             }
 
             charX += (TEXT_WIDTH(2) + 1);
@@ -814,7 +837,7 @@ void draw_ram_viewer(OSThread *thread) {
     crash_screen_print(TEXT_X(0), TEXT_Y(line2), "@%08Xup/down:scroll        a:jump  b:toggle ascii", COLOR_RGBA32_CRASH_CONTROLS);
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), RAM_VIEWER_SHOWN_SECTION, TOTAL_RAM_SIZE, (sScrollAddress - RAM_VIEWER_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     osWritebackDCacheAll();
 
@@ -904,26 +927,24 @@ void draw_disasm_branch_arrow(s32 startLine, s32 endLine, s32 dist, RGBA32 color
 
 void draw_disasm(OSThread *thread) {
     __OSThreadContext *tc = &thread->context;
-#ifdef INCLUDE_DEBUG_MAP
-    uintptr_t funcAddr = sProgramPosition;
-#endif
     char *fname = NULL;
+    uintptr_t alignedSelectedAddr = sSelectedAddress & ~(DISASM_STEP - 1);
 
-    if (sProgramPosition == 0) {
-        sProgramPosition = (tc->pc - ((DISASM_NUM_ROWS / 2) * DISASM_STEP));
 #ifdef INCLUDE_DEBUG_MAP
-        funcAddr = sProgramPosition;
-        fname = parse_map(&funcAddr);
+    uintptr_t funcAddr = alignedSelectedAddr;
+    fname = parse_map(&funcAddr);
+
+    if (sCrashScreenSwitchedPage) {
         crash_screen_fill_branch_buffer(fname, funcAddr);
-    } else {
-        fname = parse_map(&funcAddr);
-#endif
     }
+#endif
+
+    clamp_view_to_selection(DISASM_NUM_ROWS, DISASM_STEP);
 
     u32 line = 1;
 
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XDISASM", COLOR_RGBA32_CRASH_PAGE_NAME);
-    line += crash_screen_print(TEXT_X(7), TEXT_Y(line), "%08X-%08X", sProgramPosition, (sProgramPosition + DISASM_SHOWN_SECTION));
+    line += crash_screen_print(TEXT_X(7), TEXT_Y(line), "%08X in %08X-%08X", alignedSelectedAddr, sScrollAddress, (sScrollAddress + DISASM_SHOWN_SECTION));
     crash_screen_draw_divider(DIVIDER_Y(line));
 
     if (((fname == NULL)/* || ((*(uintptr_t*)funcAddr & 0x80000000) == 0)*/)) {
@@ -939,7 +960,7 @@ void draw_disasm(OSThread *thread) {
     struct BranchArrow *currArrow = NULL;
     for (u32 b = 0; b < sNumBranchArrows; b++) {
         currArrow = &sBranchArrows[b];
-        s32 startLine = (((s32)currArrow->startAddr - (s32)sProgramPosition) / DISASM_STEP);
+        s32 startLine = (((s32)currArrow->startAddr - (s32)sScrollAddress) / DISASM_STEP);
         s32 endLine = (startLine + currArrow->branchOffset + 1);
         if (((startLine >= 0)               || (endLine >= 0))
          && ((startLine <  DISASM_NUM_ROWS) || (endLine <  DISASM_NUM_ROWS))) {
@@ -956,11 +977,18 @@ void draw_disasm(OSThread *thread) {
     u32 charY = TEXT_Y(line);
 
     for (u32 y = 0; y < DISASM_NUM_ROWS; y++) {
-        uintptr_t addr = (sProgramPosition + (y * DISASM_STEP));
+        uintptr_t addr = (sScrollAddress + (y * DISASM_STEP));
         InsnData toDisasm;
         toDisasm.d = *(uintptr_t*)(addr);
 
         charY = TEXT_Y(line + y);
+
+        if (addr == tc->pc) {
+            crash_screen_draw_rect(charX - 1, charY - 2, CRASH_SCREEN_TEXT_W + 1, TEXT_HEIGHT(1) + 1, COLOR_RGBA32_CRASH_PC);
+        }
+        if (addr == alignedSelectedAddr) {
+            crash_screen_draw_rect(charX - 1, charY - 2, CRASH_SCREEN_TEXT_W + 1, TEXT_HEIGHT(1) + 1, COLOR_RGBA32_CRASH_SELECT);
+        }
 
         if (is_in_code_segment(addr)) {
             crash_screen_print(charX, charY, "%s", insn_disasm(toDisasm, (addr == tc->pc)));
@@ -990,7 +1018,7 @@ void draw_disasm(OSThread *thread) {
     crash_screen_print(TEXT_X(0), TEXT_Y(line2), "@%08Xup/down:scroll        a:jump  b:toggle ascii", COLOR_RGBA32_CRASH_CONTROLS);
 
     // Scroll bar
-    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (sProgramPosition - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
+    crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (sScrollAddress - DISASM_SCROLL_MIN), 4, COLOR_RGBA32_LIGHT_GRAY);
 
     // Scroll bar crash position marker
     crash_screen_draw_scroll_bar(DIVIDER_Y(line), DIVIDER_Y(line2), DISASM_SHOWN_SECTION, TOTAL_RAM_SIZE, (tc->pc - DISASM_SCROLL_MIN), 1, COLOR_RGBA32_CRASH_AT);
@@ -1072,29 +1100,31 @@ void update_crash_screen_direction_input(void) {
 s32 update_crash_screen_page(void) {
     u8 prevPage = sCrashPage;
 
-    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT) {
+    // if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT) {
+    if (gPlayer1Controller->buttonPressed & R_TRIG) {
         // Next page.
         sCrashPage++;
         sUpdateBuffer = TRUE;
     }
-    if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
+    // if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
+    if (gPlayer1Controller->buttonPressed & L_TRIG) {
         // Previous Page.
         sCrashPage--;
         sUpdateBuffer = TRUE;
     }
 
-    // Wrap pages.
-    if ((sCrashPage >= PAGE_COUNT) && (sCrashPage != PAGES_MAX)) {
-        sCrashPage = PAGE_CONTEXT;
-    }
-    if (sCrashPage == PAGES_MAX) {
-        sCrashPage = (PAGE_COUNT - 1);
-    }
-
     if (sCrashPage != prevPage) {
+        // Wrap pages.
+        if ((sCrashPage >= PAGE_COUNT) && (sCrashPage != PAGES_MAX)) {
+            sCrashPage = PAGE_CONTEXT;
+        }
+        if (sCrashPage == PAGES_MAX) {
+            sCrashPage = (PAGE_COUNT - 1);
+        }
+
         // Reset certain values when the page is changed.
         sStackTraceIndex = 0;
-        sProgramPosition = ALIGN(sProgramPosition, 0x10);
+        sCrashScreenSwitchedPage = TRUE;
 
         return TRUE;
     }
@@ -1126,15 +1156,15 @@ void crash_screen_input_stacktrace(void) {
             // Scroll up.
             if (sStackTraceIndex > 0) {
                 sStackTraceIndex--;
+                sUpdateBuffer = TRUE;
             }
-            sUpdateBuffer = TRUE;
         }
         if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
             // Scroll down.
             if (sStackTraceIndex < (sNumShownFunctions - STACK_TRACE_NUM_ROWS)) {
                 sStackTraceIndex++;
+                sUpdateBuffer = TRUE;
             }
-            sUpdateBuffer = TRUE;
         }
     }
 }
@@ -1179,9 +1209,9 @@ void crash_screen_select_address(size_t step) {
     if (gPlayer1Controller->buttonPressed & A_BUTTON) {
         // Open the jump to address popup.
         sAddressSelectMenuOpen = FALSE;
-        sProgramPosition = sAddressSelectTarget;
+        sSelectedAddress = sAddressSelectTarget;
 #ifdef INCLUDE_DEBUG_MAP
-        uintptr_t funcAddr = sProgramPosition;
+        uintptr_t funcAddr = sSelectedAddress;
         char *fname = parse_map(&funcAddr);
         crash_screen_fill_branch_buffer(fname, funcAddr);
 #endif
@@ -1191,34 +1221,40 @@ void crash_screen_select_address(size_t step) {
 
 void crash_screen_input_ram_viewer(void) {
     if (sAddressSelectMenuOpen) {
-        crash_screen_select_address(RAM_VIEWER_STEP);
-    } else if (!update_crash_screen_page()) {
-        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
-            // Scroll up.
-            sProgramPosition -= RAM_VIEWER_STEP;
-            if (sProgramPosition < RAM_VIEWER_SCROLL_MIN) {
-                sProgramPosition = RAM_VIEWER_SCROLL_MIN;
+        crash_screen_select_address(1);
+    } else {
+        if (!update_crash_screen_page()) {
+            if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP)
+             && ((sSelectedAddress - RAM_VIEWER_STEP) >= RAM_START)) {
+                sSelectedAddress -= RAM_VIEWER_STEP;
+                sUpdateBuffer = TRUE;
             }
-            sUpdateBuffer = TRUE;
-        }
-        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
-            // Scroll down.
-            sProgramPosition += RAM_VIEWER_STEP;
-            if (sProgramPosition > RAM_VIEWER_SCROLL_MAX) {
-                sProgramPosition = RAM_VIEWER_SCROLL_MAX;
+            if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN)
+             && ((sSelectedAddress + RAM_VIEWER_STEP) < RAM_END)) {
+                sSelectedAddress += RAM_VIEWER_STEP;
+                sUpdateBuffer = TRUE;
             }
-            sUpdateBuffer = TRUE;
-        }
-        if (gPlayer1Controller->buttonPressed & A_BUTTON) {
-            // Open the jump to address popup.
-            sAddressSelectMenuOpen = TRUE;
-            sAddressSelectTarget = sProgramPosition;
-            sUpdateBuffer = TRUE;
-        }
-        if (gPlayer1Controller->buttonPressed & B_BUTTON) {
-            // Toggle whether the memory is printed as hex values or as ASCII chars.
-            sShowRamAsAscii ^= TRUE;
-            sUpdateBuffer = TRUE;
+            if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT)
+             && (((sSelectedAddress - 1) & 0xF) != 0xF)) {
+                sSelectedAddress--;
+                sUpdateBuffer = TRUE;
+            }
+            if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT)
+             && (((sSelectedAddress + 1) & 0xF) != 0x0)) {
+                sSelectedAddress++;
+                sUpdateBuffer = TRUE;
+            }
+            if (gPlayer1Controller->buttonPressed & A_BUTTON) {
+                // Open the jump to address popup.
+                sAddressSelectMenuOpen = TRUE;
+                sAddressSelectTarget = sSelectedAddress;
+                sUpdateBuffer = TRUE;
+            }
+            if (gPlayer1Controller->buttonPressed & B_BUTTON) {
+                // Toggle whether the memory is printed as hex values or as ASCII chars.
+                sShowRamAsAscii ^= TRUE;
+                sUpdateBuffer = TRUE;
+            }
         }
     }
 }
@@ -1228,28 +1264,25 @@ void crash_screen_input_disasm(void) {
         crash_screen_select_address(DISASM_STEP);
     } else if (!update_crash_screen_page()) {
 #ifdef INCLUDE_DEBUG_MAP
-        uintptr_t oldPos = sProgramPosition;
+        uintptr_t oldPos = sSelectedAddress;
 #endif
-        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP) {
+        // sSelectedAddress = ALIGN(sSelectedAddress, DISASM_STEP);
+        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP)
+         && ((sSelectedAddress - DISASM_STEP) >= RAM_START)) {
             // Scroll up.
-            sProgramPosition -= DISASM_STEP;
-            if (sProgramPosition < DISASM_SCROLL_MIN) {
-                sProgramPosition = DISASM_SCROLL_MIN;
-            }
+            sSelectedAddress -= DISASM_STEP;
             sUpdateBuffer = TRUE;
         }
-        if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN) {
+        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN)
+         && ((sSelectedAddress + DISASM_STEP) < RAM_END)) {
             // Scroll down.
-            sProgramPosition += DISASM_STEP;
-            if (sProgramPosition > DISASM_SCROLL_MAX) {
-                sProgramPosition = DISASM_SCROLL_MAX;
-            }
+            sSelectedAddress += DISASM_STEP;
             sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             // Open the jump to address box.
             sAddressSelectMenuOpen = TRUE;
-            sAddressSelectTarget = sProgramPosition;
+            sAddressSelectTarget = sSelectedAddress;
             sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & B_BUTTON) {
@@ -1258,8 +1291,9 @@ void crash_screen_input_disasm(void) {
             sUpdateBuffer = TRUE;
         }
 #ifdef INCLUDE_DEBUG_MAP
-        if (oldPos != sProgramPosition) {
-            uintptr_t newFunc = sProgramPosition;
+        if (oldPos != sSelectedAddress) {
+            sSelectedAddress &= ~(DISASM_STEP - 1);
+            uintptr_t newFunc = sSelectedAddress;
             parse_map(&oldPos);
             char *fname = parse_map(&newFunc);
             if (oldPos != newFunc) {
@@ -1481,6 +1515,7 @@ void thread2_crash_screen(UNUSED void *arg) {
                 if (thread->context.cause == EXC_SYSCALL) {
                     sCrashPage = PAGE_ASSERTS;
                 }
+                sSelectedAddress = thread->context.pc;
 #ifdef CRASH_SCREEN_CRASH_SCREEN
                 crash_screen_crash_screen_init();
 #endif
@@ -1505,6 +1540,7 @@ void thread2_crash_screen(UNUSED void *arg) {
             read_controller_inputs(THREAD_2_CRASH_SCREEN);
             update_crash_screen_input();
             draw_crash_screen(thread);
+            sCrashScreenSwitchedPage = FALSE;
         }
     }
 }
