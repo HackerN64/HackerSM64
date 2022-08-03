@@ -1046,12 +1046,12 @@ void draw_controls(UNUSED OSThread *thread) {
 
     line++;
     line += crash_screen_print(TEXT_X(1), TEXT_Y(line), "CRASH SCREEN CONTROLS");
-    line++;
-    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "START:");
-    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@%08Xtoggle framebuffer background", COLOR_RGBA32_CRASH_CONTROLS);
+    // line++;
+    // line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "START:");
+    // line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@%08Xshow page controls", COLOR_RGBA32_CRASH_CONTROLS);
     line++;
     line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "Z:");
-    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@%08Xtoggle framebuffer only view", COLOR_RGBA32_CRASH_CONTROLS);
+    line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "@%08Xcycle drawing overlay and background", COLOR_RGBA32_CRASH_CONTROLS);
     line++;
     line += crash_screen_print(TEXT_X(2), TEXT_Y(line), "ANALOG STICK, D-PAD, OR C BUTTONS:");
     line++;
@@ -1335,16 +1335,13 @@ void update_crash_screen_input(void) {
     // Global controls.
     if (gPlayer1Controller->buttonPressed & Z_TRIG) {
         sDrawCrashScreen ^= TRUE;
+        if (sDrawCrashScreen) {
+            sDrawBackground ^= TRUE;
+        } else if (!sDrawBackground) {
+            sDrawCrashScreen = TRUE;
+            sDrawBackground = TRUE;
+        }
         sUpdateBuffer = TRUE;
-    }
-
-    if (gPlayer1Controller->buttonPressed & START_BUTTON) {
-        sDrawBackground ^= TRUE;
-        sUpdateBuffer = TRUE;
-    }
-
-    if (!sDrawCrashScreen && !sDrawBackground) {
-        sDrawCrashScreen = TRUE;
     }
 
     if (sDrawCrashScreen) {
