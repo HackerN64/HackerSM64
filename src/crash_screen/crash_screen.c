@@ -796,6 +796,8 @@ void draw_ram_viewer(OSThread *thread) {
     charY = TEXT_Y(line);
 
     RGBA32 color;
+    uintptr_t currAddr;
+    u8 byte;
 
     for (u32 y = 0; y < RAM_VIEWER_NUM_ROWS; y++) {
         uintptr_t rowAddr = startAddr + (y * RAM_VIEWER_STEP);
@@ -804,15 +806,15 @@ void draw_ram_viewer(OSThread *thread) {
         charX = (TEXT_X(8) + 3);
         charY = TEXT_Y(line + y);
         for (u32 x = 0; x < 16; x++) {
-            uintptr_t currAddr = (rowAddr + x);
-            u8 value = *((u8 *)currAddr);
+            currAddr = (rowAddr + x);
+            byte = *((u8 *)currAddr);
 
             if ((x & 0x3) == 0) {
                 charX += 2;
             }
 
             color = ((x & 0x1) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
-            
+
             if (currAddr == tc->pc) {
                 crash_screen_draw_rect(charX - 1, charY - 1, TEXT_WIDTH(2) + 1, TEXT_WIDTH(1) + 3, COLOR_RGBA32_RED);
             }
@@ -822,9 +824,9 @@ void draw_ram_viewer(OSThread *thread) {
             }
 
             if (sShowRamAsAscii) {
-                crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, value, COLOR_RGBA32_WHITE);
+                crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, byte, COLOR_RGBA32_WHITE);
             } else {
-                crash_screen_print(charX, charY, "@%08X%02X", color, value);
+                crash_screen_print(charX, charY, "@%08X%02X", color, byte);
             }
 
             charX += (TEXT_WIDTH(2) + 1);
@@ -950,7 +952,7 @@ void draw_disasm(OSThread *thread) {
     if (((fname == NULL)/* || ((*(uintptr_t*)funcAddr & 0x80000000) == 0)*/)) {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN: @%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
+        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
     }
 
     osWritebackDCacheAll();
@@ -1288,7 +1290,7 @@ void crash_screen_input_disasm(void) {
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             // Open the jump to address box.
             sAddressSelectMenuOpen = TRUE;
-            sAddressSelectTarget = sSelectedAddress;
+            sAddressSelectTarget = get_branch_target_from_addr(sSelectedAddress);
             sUpdateBuffer = TRUE;
         }
         if (gPlayer1Controller->buttonPressed & B_BUTTON) {

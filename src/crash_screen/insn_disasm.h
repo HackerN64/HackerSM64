@@ -87,4 +87,5 @@ enum DisasmColors {
 
 
 s32 get_branch_offset(InsnData insn);
+uintptr_t get_branch_target_from_addr(uintptr_t addr);
 char *insn_disasm(InsnData insn, u32 isPC);

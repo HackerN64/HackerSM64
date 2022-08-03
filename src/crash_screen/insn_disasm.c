@@ -354,11 +354,32 @@ s32 get_branch_offset(InsnData insn) {
             case PARAM_STO:
             case PARAM_O:
             case PARAM_BC1:
-                return insn.i.immediate;
+                return (s16)insn.i.immediate;
         }
     }
 
     return 0;
+}
+
+uintptr_t get_branch_target_from_addr(uintptr_t addr) {
+    InsnData insn;
+    insn.d = *(uintptr_t *)addr;
+    const InsnTemplate *type = get_insn_type(insn);
+
+    if (type) {
+        switch (type->paramType) {
+            case PARAM_SO:
+            case PARAM_STO:
+            case PARAM_O:
+            case PARAM_BC1:
+                addr = (addr + (((s16)insn.i.immediate + 1) * DISASM_STEP));
+                break;
+            case PARAM_J:
+                addr = (0x80000000 | ((insn.d & BITMASK(25)) * DISASM_STEP));
+        }
+    }
+
+    return addr;
 }
 
 char *insn_disasm(InsnData insn, u32 isPC) {
@@ -528,7 +549,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     );
                     break;
                 case PARAM_J:
-                    target = (0x80000000 | ((insn.d & 0x1FFFFFF) * sizeof(InsnData)));
+                    target = (0x80000000 | ((insn.d & BITMASK(25)) * DISASM_STEP));
                     strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
                         sDisasmColors[DISASM_COLOR_INSN   ], type->name,
                         sDisasmColors[DISASM_COLOR_ADDRESS], target
