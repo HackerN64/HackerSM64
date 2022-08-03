@@ -19,11 +19,10 @@ enum CrashPages {
 #ifdef PUPPYPRINT_DEBUG
     PAGE_LOG,
 #endif
-    PAGE_STACKTRACE,
+    PAGE_STACK_TRACE,
     PAGE_RAM_VIEWER,
     PAGE_DISASM,
-    PAGE_CONTROLS,
-    PAGE_COUNT,
+    NUM_PAGES,
     PAGES_MAX = 255,
 };
 
@@ -37,6 +36,22 @@ enum CrashScreenDirectionFlags {
     CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN  = BIT(5),
     CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT  = BIT(6),
     CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT = BIT(7),
+};
+
+enum ControlTypes {
+    CONT_DESC_LIST_END = -1,
+    CONT_DESC_SWITCH_PAGE,
+    CONT_DESC_SHOW_CONTROLS,
+    CONT_DESC_CYCLE_DRAW,
+    CONT_DESC_SCROLL_LIST,
+    CONT_DESC_CURSOR,
+    CONT_DESC_CURSOR_VERTICAL,
+    CONT_DESC_CURSOR_HORIZONTAL,
+    CONT_DESC_JUMP_TO_ADDRESS,
+    CONT_DESC_TOGGLE_ASCII,
+    CONT_DESC_TOGGLE_FUNCTIONS,
+    CONT_DESC_TOGGLE_UNKNOWNS,
+    NUM_CONT_DESC,
 };
 
 // Crash screen font properties.
@@ -116,6 +131,12 @@ struct FunctionInStack {
 struct CrashScreenPage {
     /*0x00*/ void (*drawFunc)(OSThread *thread);
     /*0x04*/ void (*inputFunc)(void);
+    /*0x08*/ const enum ControlTypes *pageControlsList;//void (*controlsDrawFunc)(void);
+}; /*0x10*/
+
+struct ControlType {
+    /*0x00*/ char *control;
+    /*0x04*/ char *description;
 }; /*0x08*/
 
 struct BranchArrow {
@@ -136,7 +157,7 @@ struct CrashScreen {
 #define CHAR_BUFFER_SIZE 0x100
 
 // Stack Trace constants
-#define STACK_TRACE_NUM_ROWS 18
+#define STACK_TRACE_NUM_ROWS 19
 
 // Address Select constants
 #define JUMP_MENU_W (TEXT_WIDTH(8))
@@ -151,7 +172,7 @@ struct CrashScreen {
 // RAM Viewer constants
 #define RAM_VIEWER_STEP (s32)(sizeof(uintptr_t) * 4)
 
-#define RAM_VIEWER_NUM_ROWS 18
+#define RAM_VIEWER_NUM_ROWS 19
 #define RAM_VIEWER_SHOWN_SECTION ((RAM_VIEWER_NUM_ROWS - 1) * RAM_VIEWER_STEP)
 
 #define RAM_VIEWER_SCROLL_MIN RAM_START
@@ -160,7 +181,7 @@ struct CrashScreen {
 // Disasm constants
 #define DISASM_STEP (s32)sizeof(InsnData)
 
-#define DISASM_NUM_ROWS 18
+#define DISASM_NUM_ROWS 19
 #define DISASM_SHOWN_SECTION ((DISASM_NUM_ROWS - 1) * DISASM_STEP)
 
 #define DISASM_SCROLL_MIN RAM_START
