@@ -105,7 +105,8 @@ static const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_MAGENTA,
     COLOR_RGBA32_YELLOW,
     COLOR_RGBA32_PINK,
-    COLOR_RGBA32_LIGHT_GRAY
+    COLOR_RGBA32_LIGHT_GRAY,
+    COLOR_RGBA32_LIGHT_BLUE,
 };
 #endif
 
@@ -855,9 +856,9 @@ void crash_screen_fill_branch_buffer(const char *fname, const uintptr_t funcAddr
     struct BranchArrow *currArrow = NULL;
     uintptr_t addr, checkAddr;
     InsnData toDisasm;
-    u32 curBranchX = DISASM_BRANCH_ARROW_OFFSET;
     s16 branchOffset;
     s16 curBranchColorIndex = 0;
+    s32 curBranchX = DISASM_BRANCH_ARROW_OFFSET;
 
     if (fname == NULL) {
         return;
@@ -868,8 +869,10 @@ void crash_screen_fill_branch_buffer(const char *fname, const uintptr_t funcAddr
     sNumBranchArrows = 0;
 
     if (fname != NULL) {
-        for (u32 i = 0; i < DISASM_FUNCTION_SEARCH_MAX_OFFSET; i += DISASM_STEP) {
-            addr = (funcAddr + i);
+        s32 numBranchArrows = sNumBranchArrows;
+        currArrow = sBranchArrows;
+
+        for (addr = funcAddr; addr < (funcAddr + DISASM_FUNCTION_SEARCH_MAX_OFFSET); addr += DISASM_STEP) {
             checkAddr = addr;
             if (fname != parse_map(&checkAddr)) {
                 break;
@@ -879,7 +882,6 @@ void crash_screen_fill_branch_buffer(const char *fname, const uintptr_t funcAddr
             branchOffset = get_branch_offset(toDisasm);
 
             if (branchOffset != 0) {
-                currArrow = &sBranchArrows[sNumBranchArrows++];
                 currArrow->startAddr = addr;
                 currArrow->branchOffset = branchOffset;
                 currArrow->colorIndex = curBranchColorIndex;
@@ -888,11 +890,16 @@ void crash_screen_fill_branch_buffer(const char *fname, const uintptr_t funcAddr
                 curBranchX += DISASM_BRANCH_ARROW_SPACING;
                 curBranchColorIndex = ((curBranchColorIndex + 1) % ARRAY_COUNT(sBranchColors));
 
-                if (DISASM_BRANCH_ARROW_START_X + curBranchX > CRASH_SCREEN_TEXT_X2) {
+                if ((DISASM_BRANCH_ARROW_START_X + curBranchX) > CRASH_SCREEN_TEXT_X2) {
                     curBranchX = DISASM_BRANCH_ARROW_OFFSET;
                 }
+
+                currArrow++;
+                numBranchArrows++;
             }
         }
+
+        sNumBranchArrows = numBranchArrows;
     }
 }
 
