@@ -12,6 +12,10 @@ struct MapEntry {
     /*0x0C*/ size_t pad;
 }; /*0x10*/
 
+#define ADDR_IS_KNOWN(addr) ((*(uintptr_t*)(addr) & 0x80000000) != 0)
+
+#define IS_IN_SEGMENT(addr, segment) (((addr) >= (uintptr_t)_##segment##SegmentStart) && ((addr) <= (uintptr_t)_##segment##SegmentTextEnd))
+
 void map_data_init(void);
 s32 is_in_code_segment(uintptr_t addr);
 char *parse_map(uintptr_t *addr);

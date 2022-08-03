@@ -698,7 +698,7 @@ void draw_stacktrace(OSThread *thread) {
 
             crash_screen_print(TEXT_X(0), y, "%08X:", faddr);
 
-            if (!sStackTraceSkipUnknowns && ((fname == NULL) || ((*(uintptr_t*)faddr & 0x80000000) == 0))) {
+            if (!sStackTraceSkipUnknowns && ((fname == NULL) || !ADDR_IS_KNOWN(faddr))) {
                 // Print unknown function
                 crash_screen_print(TEXT_X(9), y, "@%08X%08X", COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
             } else {
@@ -956,7 +956,7 @@ void draw_disasm(OSThread *thread) {
     line += crash_screen_print(TEXT_X(7), TEXT_Y(line), "%08X in %08X-%08X", alignedSelectedAddr, sScrollAddress, (sScrollAddress + DISASM_SHOWN_SECTION));
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    if (((fname == NULL)/* || ((*(uintptr_t*)funcAddr & 0x80000000) == 0)*/)) {
+    if (((fname == NULL)/* || !ADDR_IS_KNOWN(funcAddr)*/)) {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
@@ -1411,7 +1411,7 @@ void fill_function_stack_trace(OSThread *thread) {
         function->addr = temp_sp;
         function->name = fname;
 
-        if (!((fname == NULL) || ((*(uintptr_t*)temp_sp & 0x80000000) == 0))) {
+        if (!((fname == NULL) || !ADDR_IS_KNOWN(temp_sp))) {
             function = &sKnownFunctionStack[sNumKnownFunctions++];
             function->addr = temp_sp;
             function->name = fname;
@@ -1498,7 +1498,7 @@ void thread20_crash_screen_crash_screen(UNUSED void *arg) {
 void crash_screen_crash_screen_init(void) {
     osCreateMesgQueue(&gCrashScreen2.mesgQueue, &gCrashScreen2.mesg, 1);
     osCreateThread(&gCrashScreen2.thread, THREAD_20_CRASH_SCREEN_CRASH_SCREEN, thread20_crash_screen_crash_screen, NULL,
-                (u8 *) gCrashScreen2.stack + sizeof(gCrashScreen2.stack),
+                ((u8 *) gCrashScreen2.stack + sizeof(gCrashScreen2.stack)),
                 OS_PRIORITY_APPMAX);
     osStartThread(&gCrashScreen2.thread);
 }
@@ -1563,7 +1563,7 @@ void thread2_crash_screen(UNUSED void *arg) {
 void crash_screen_init(void) {
     osCreateMesgQueue(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, 1);
     osCreateThread(&gCrashScreen.thread, THREAD_2_CRASH_SCREEN, thread2_crash_screen, NULL,
-                   (u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack),
+                   ((u8 *) gCrashScreen.stack + sizeof(gCrashScreen.stack)),
                    OS_PRIORITY_APPMAX);
     osStartThread(&gCrashScreen.thread);
 }

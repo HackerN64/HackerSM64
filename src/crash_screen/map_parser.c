@@ -40,8 +40,6 @@ extern u8 _engineSegmentTextEnd[];
 extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
-#define IS_IN_SEGMENT(addr, segment) (((addr) >= (uintptr_t)_##segment##SegmentStart) && ((addr) <= (uintptr_t)_##segment##SegmentTextEnd))
-
 s32 is_in_code_segment(uintptr_t addr) {
     return (IS_IN_SEGMENT(addr, main)
          || IS_IN_SEGMENT(addr, engine)

@@ -556,7 +556,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     );
     #ifdef INCLUDE_DEBUG_MAP
                     fname = parse_map_exact(target);
-                    if (!((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
+                    if (!((fname == NULL) || !ADDR_IS_KNOWN(target))) {
                         strp += sprintf(strp, " (%s)", fname);
                     }
     #endif
