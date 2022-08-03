@@ -10,240 +10,282 @@
 #include "map_parser.h"
 #include "engine/math_util.h"
 
+
 // MIPS III Instructions
 static const InsnTemplate insn_db[] = {
+    {{.i={0b000000, 0b00000, 0b00000, 0b00000, 0b00000, 0b000000}}, PARAM_NOP, "NOP"    }, // NOP
 //            COP1,    fmt,       rt,      fs,      fd,      MOV
     // Floating point
     // branch
-    {{.i={0b010001, 0b01000, 0b00000,       0,       0,        0}}, PARAM_BC1, "BC1F"   },
-    {{.i={0b010001, 0b01000, 0b00001,       0,       0,        0}}, PARAM_BC1, "BC1T"   },
-    {{.i={0b010001, 0b01000, 0b00010,       0,       0,        0}}, PARAM_BC1, "BC1FL"  },
-    {{.i={0b010001, 0b01000, 0b00011,       0,       0,        0}}, PARAM_BC1, "BC1TL"  },
+    {{.i={0b010001, 0b01000, 0b00000,       0,       0,        0}}, PARAM_BC1, "BC1F"   }, // Branch on FP False
+    {{.i={0b010001, 0b01000, 0b00001,       0,       0,        0}}, PARAM_BC1, "BC1T"   }, // Branch on FP True
+    {{.i={0b010001, 0b01000, 0b00010,       0,       0,        0}}, PARAM_BC1, "BC1FL"  }, // Branch on FP False Likely
+    {{.i={0b010001, 0b01000, 0b00011,       0,       0,        0}}, PARAM_BC1, "BC1TL"  }, // Branch on FP True Likely
     // memory access
-    {{.i={0b010001, 0b00000,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "MFC1"   },
-    // {{.i={0b010001, 0b00001,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "DMFC1"  },
-    {{.i={0b010001, 0b00100,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "MTC1"   },
-    // {{.i={0b010001, 0b00101,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "DMTC1"  },
-    // {{.i={0b010001, 0b00010,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CFC1"   },
-    // {{.i={0b010001, 0b00110,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CTC1"   },
+    {{.i={0b010001, 0b00000,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "MFC1"   }, // Move Word From Floating-Point
+    // {{.i={0b010001, 0b00001,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "DMFC1"  }, // Doubleword Move From Floating-Point
+    {{.i={0b010001, 0b00100,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "MTC1"   }, // Move Word To Floating-Point
+    // {{.i={0b010001, 0b00101,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "DMTC1"  }, // Doubleword Move To Floating-Point
+    // {{.i={0b010001, 0b00010,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CFC1"   }, // Move Control Word From Floating-Point
+    // {{.i={0b010001, 0b00110,       0,       0, 0b00000, 0b000000}}, PARAM_TFS, "CTC1"   }, // Move Control Word To Floating-Point
     // arithmetic
-    {{.i={0b010001,       0,       0,       0,       0, 0b000000}}, PARAM_FFF, "ADD"    },
-    {{.i={0b010001,       0,       0,       0,       0, 0b000001}}, PARAM_FFF, "SUB"    },
-    {{.i={0b010001,       0,       0,       0,       0, 0b000010}}, PARAM_FFF, "MUL"    },
-    {{.i={0b010001,       0,       0,       0,       0, 0b000011}}, PARAM_FFF, "DIV"    },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000100}}, PARAM_FF,  "SQRT"   },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000101}}, PARAM_FF,  "ABS"    },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000110}}, PARAM_FF,  "MOV"    },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000111}}, PARAM_FF,  "NEG"    },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001000}}, PARAM_FF,  "ROUND.L"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001001}}, PARAM_FF,  "TRUNC.L"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001010}}, PARAM_FF,  "CEIL.L" },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001011}}, PARAM_FF,  "FLOOR.L"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001100}}, PARAM_FF,  "ROUND.W"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001101}}, PARAM_FF,  "TRUNC.W"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001110}}, PARAM_FF,  "CEIL.W" },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001111}}, PARAM_FF,  "FLOOR.W"},
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100000}}, PARAM_FF,  "CVT.S"  },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100001}}, PARAM_FF,  "CVT.D"  },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100100}}, PARAM_FF,  "CVT.W"  },
-    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100101}}, PARAM_FF,  "CVT.L"  },
-    {{.i={0b010001,       0,       0,       0, 0b00000, 0b110000}}, PARAM_CON, "C"      },
+    {{.i={0b010001,       0,       0,       0,       0, 0b000000}}, PARAM_FFF, "ADD"    }, // ADD.fmt Floating-Point Add
+    {{.i={0b010001,       0,       0,       0,       0, 0b000001}}, PARAM_FFF, "SUB"    }, // SUB.fmt Floating-Point Subtract
+    {{.i={0b010001,       0,       0,       0,       0, 0b000010}}, PARAM_FFF, "MUL"    }, // MUL.fmt Floating-Point Multiply
+    {{.i={0b010001,       0,       0,       0,       0, 0b000011}}, PARAM_FFF, "DIV"    }, // DIV.fmt Floating-Point Divide
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000100}}, PARAM_FF,  "SQRT"   }, // SQRT.fmt Floating-Point Square Root
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000101}}, PARAM_FF,  "ABS"    }, // ABS.fmt Floating-Point Absolute Value
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000110}}, PARAM_FF,  "MOV"    }, // MOV.fmt Floating-Point Move
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b000111}}, PARAM_FF,  "NEG"    }, // NEG.fmt Floating-Point Negate
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001000}}, PARAM_FF,  "ROUND.L"}, // ROUND.L.fmt Floating-Point Round to Long Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001001}}, PARAM_FF,  "TRUNC.L"}, // TRUNC.L.fmt Floating-Point Truncate to Long Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001010}}, PARAM_FF,  "CEIL.L" }, // CEIL.L.fmt Floating-Point Ceiling to Long Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001011}}, PARAM_FF,  "FLOOR.L"}, // FLOOR.L.fmt Floating-Point Floor to Long Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001100}}, PARAM_FF,  "ROUND.W"}, // ROUND.W.fmt Floating-Point Round to Word Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001101}}, PARAM_FF,  "TRUNC.W"}, // TRUNC.W.fmt Floating-Point Truncate to Word Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001110}}, PARAM_FF,  "CEIL.W" }, // CEIL.W.fmt Floating-Point Ceiling to Word Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b001111}}, PARAM_FF,  "FLOOR.W"}, // FLOOR.W.fmt Floating-Point Floor to Word Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100000}}, PARAM_FF,  "CVT.S"  }, // CVT.S.fmt Floating-Point Convert to Single Floating-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100001}}, PARAM_FF,  "CVT.D"  }, // CVT.D.fmt Floating-Point Convert to Double Floating-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100100}}, PARAM_FF,  "CVT.W"  }, // CVT.W.fmt Floating-Point Convert to Word Fixed-Point
+    {{.i={0b010001,       0, 0b00000,       0,       0, 0b100101}}, PARAM_FF,  "CVT.L"  }, // CVT.L.fmt Floating-Point Convert to Long Fixed-Point
+    {{.i={0b010001,       0,       0,       0, 0b00000, 0b110000}}, PARAM_CON, "C"      }, // C.cond.fmt Floating-Point Compare
 //          opcode,      rs,      rt,      rd,      sa,  function
     // Arithmetic
     // add
-    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b100000}}, PARAM_DST, "ADD"    },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100001}}, PARAM_DST, "ADDU"   },
-    // {{.i={0b001000,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDI"   },
-    {{.i={0b001001,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDIU"  },
+    // {{.i={0b000000, 0b00000,       0,       0, 0b00000, 0b100000}}, PARAM_TD,  "MOVE"   }, // Move (pseudo of ADD)
+    // {{.i={0b000000,       0, 0b00000,       0, 0b00000, 0b100000}}, PARAM_SD,  "MOVE"   }, // Move (pseudo of ADD)
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b100000}}, PARAM_DST, "ADD"    }, // Add Word
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100001}}, PARAM_DST, "ADDU"   }, // Add Unsigned Word
+    // {{.i={0b001000,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDI"   }, // Add Immediate Word
+    {{.i={0b001001,       0,       0,       0,       0,        0}}, PARAM_TSI, "ADDIU"  }, // Add Immediate Unsigned Word
     // sub
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100010}}, PARAM_DST, "SUB"    },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100011}}, PARAM_DST, "SUBU"   },
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100010}}, PARAM_DST, "SUB"    }, // Subtract Word
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100011}}, PARAM_DST, "SUBU"   }, // Subtract Unsigned Word
     // and
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100100}}, PARAM_DST, "AND"    },
-    {{.i={0b001100,       0,       0,       0,       0,        0}}, PARAM_TSI, "ANDI"   },
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100100}}, PARAM_DST, "AND"    }, // And
+    {{.i={0b001100,       0,       0,       0,       0,        0}}, PARAM_TSI, "ANDI"   }, // And Immediate
     // or
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100101}}, PARAM_DST, "OR"     },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100110}}, PARAM_DST, "XOR"    },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100111}}, PARAM_DST, "NOR"    },
-    {{.i={0b001101,       0,       0,       0,       0,        0}}, PARAM_TSI, "ORI"    },
-    {{.i={0b001110,       0,       0,       0,       0,        0}}, PARAM_TSI, "XORI"   },
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100101}}, PARAM_DST, "OR"     }, // Or
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100110}}, PARAM_DST, "XOR"    }, // Exclusive Or
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b100111}}, PARAM_DST, "NOR"    }, // Nor
+    {{.i={0b001101,       0,       0,       0,       0,        0}}, PARAM_TSI, "ORI"    }, // Or Immediate
+    {{.i={0b001110,       0,       0,       0,       0,        0}}, PARAM_TSI, "XORI"   }, // Exclusive Or Immediate
     // lui
-    {{.i={0b001111,       0,       0,       0,       0,        0}}, PARAM_TI,  "LUI"    },
+    {{.i={0b001111,       0,       0,       0,       0,        0}}, PARAM_TI,  "LUI"    }, // Load Upper Immediate
     // set
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b101010}}, PARAM_DST, "SLT"    },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b101011}}, PARAM_DST, "SLTU"   },
-    {{.i={0b001010,       0,       0,       0,       0,        0}}, PARAM_TSI, "SLTI"   },
-    {{.i={0b001011,       0,       0,       0,       0,        0}}, PARAM_TSI, "SLTIU"  },
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b101010}}, PARAM_DST, "SLT"    }, // Set on Less Than
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b101011}}, PARAM_DST, "SLTU"   }, // Set on Less Than Unsigned
+    {{.i={0b001010,       0,       0,       0,       0,        0}}, PARAM_TSI, "SLTI"   }, // Set on Less Than Immediate
+    {{.i={0b001011,       0,       0,       0,       0,        0}}, PARAM_TSI, "SLTIU"  }, // Set on Less Than Immediate Unsigned
     // doubleword add
-    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101100}}, PARAM_DST, "DADD"   },
-    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101101}}, PARAM_DST, "DADDU"  },
-    // {{.i={0b011000,       0,       0,       0,       0,        0}}, PARAM_TSI, "DADDI"  },
-    // {{.i={0b011001,       0,       0,       0,       0,        0}}, PARAM_TSI, "DADDIU" },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101100}}, PARAM_DST, "DADD"   }, // Doubleword Add
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101101}}, PARAM_DST, "DADDU"  }, // Doubleword Add Unsigned
+    // {{.i={0b011000,       0,       0,       0,       0,        0}}, PARAM_TSI, "DADDI"  }, // Doubleword Add Immediate
+    // {{.i={0b011001,       0,       0,       0,       0,        0}}, PARAM_TSI, "DADDIU" }, // Doubleword Add Immediate Unsigned
     // dooubleword sub
-    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101110}}, PARAM_DST, "DSUB"   },
-    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101111}}, PARAM_DST, "DSUBU"  },
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101110}}, PARAM_DST, "DSUB"   }, // Doubleword Subtract
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b101111}}, PARAM_DST, "DSUBU"  }, // Doubleword Subtract Unsigned
 
     // Shifter
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b000000}}, PARAM_DTA, "SLL"    },
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b000010}}, PARAM_DTA, "SRL"    },
-    {{.i={0b000000, 0b00000,       0,       0,       0, 0b000011}}, PARAM_DTA, "SRA"    },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b000100}}, PARAM_DTS, "SLLV"   },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b000110}}, PARAM_DTS, "SRLV"   },
-    {{.i={0b000000,       0,       0,       0, 0b00000, 0b000111}}, PARAM_DTS, "SRAV"   },
+    {{.i={0b000000, 0b00000,       0,       0,       0, 0b000000}}, PARAM_DTA, "SLL"    }, // Shift Word Left Logical
+    {{.i={0b000000, 0b00000,       0,       0,       0, 0b000010}}, PARAM_DTA, "SRL"    }, // Shift Word Right Logical
+    {{.i={0b000000, 0b00000,       0,       0,       0, 0b000011}}, PARAM_DTA, "SRA"    }, // Shift Word Right Arithmetic
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b000100}}, PARAM_DTS, "SLLV"   }, // Shift Word Left Logical Variable
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b000110}}, PARAM_DTS, "SRLV"   }, // Shift Word Right Logical Variable
+    {{.i={0b000000,       0,       0,       0, 0b00000, 0b000111}}, PARAM_DTS, "SRAV"   }, // Shift Word Right Arithmetic Variable
     // doubleword
-    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111000}}, PARAM_DTA, "DSLL"   },
-    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111010}}, PARAM_DTA, "DSRL"   },
-    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111011}}, PARAM_DTA, "DSRA"   },
-    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111100}}, PARAM_DTA, "DSLL32" },
-    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111110}}, PARAM_DTA, "DSRL32" },
-    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111111}}, PARAM_DTA, "DSRA32" },
-    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010100}}, PARAM_DTS, "DSLLV"  },
-    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010110}}, PARAM_DTS, "DSRLV"  },
-    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010111}}, PARAM_DTS, "DSRAV"  },
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111000}}, PARAM_DTA, "DSLL"   }, // Doubleword Shift Left Logical
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111010}}, PARAM_DTA, "DSRL"   }, // Doubleword Shift Right Logical
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111011}}, PARAM_DTA, "DSRA"   }, // Doubleword Shift Right Arithmetic
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111100}}, PARAM_DTA, "DSLL32" }, // Doubleword Shift Left Logical + 32
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111110}}, PARAM_DTA, "DSRL32" }, // Doubleword Shift Right Logical + 32
+    // {{.i={0b000000, 0b00000,       0,       0,       0, 0b111111}}, PARAM_DTA, "DSRA32" }, // Doubleword Shift Right Arithmetic + 32
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010100}}, PARAM_DTS, "DSLLV"  }, // Doubleword Shift Left Logical Variable
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010110}}, PARAM_DTS, "DSRLV"  }, // Doubleword Shift Right Logical Variable
+    // {{.i={0b000000,       0,       0,       0, 0b00000, 0b010111}}, PARAM_DTS, "DSRAV"  }, // Doubleword Shift Right Arithmetic Variable
 
     // Multiply
     // move hi/lo
-    {{.i={0b000000, 0b00000, 0b00000,       0, 0b00000, 0b010000}}, PARAM_D,   "MFHI"   },
-    {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b010001}}, PARAM_S,   "MTHI"   },
-    {{.i={0b000000, 0b00000, 0b00000,       0, 0b00000, 0b010010}}, PARAM_D,   "MFLO"   },
-    {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b010011}}, PARAM_S,   "MTLO"   },
+    {{.i={0b000000, 0b00000, 0b00000,       0, 0b00000, 0b010000}}, PARAM_D,   "MFHI"   }, // Move From HI
+    {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b010001}}, PARAM_S,   "MTHI"   }, // Move To HI
+    {{.i={0b000000, 0b00000, 0b00000,       0, 0b00000, 0b010010}}, PARAM_D,   "MFLO"   }, // Move From LO
+    {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b010011}}, PARAM_S,   "MTLO"   }, // Move To LO
     // mult
-    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011000}}, PARAM_ST,  "MULT"   },
-    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011001}}, PARAM_ST,  "MULTU"  },
+    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011000}}, PARAM_ST,  "MULT"   }, // Multiply Word
+    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011001}}, PARAM_ST,  "MULTU"  }, // Multiply Unsigned Word
     // div
-    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011010}}, PARAM_ST,  "DIV"    },
-    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011011}}, PARAM_ST,  "DIVU"   },
+    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011010}}, PARAM_ST,  "DIV"    }, // Divide Word
+    {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011011}}, PARAM_ST,  "DIVU"   }, // Divide Unsigned Word
     // doubleword mult
-    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011100}}, PARAM_ST,  "DMULT"  },
-    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011101}}, PARAM_ST,  "DMULTU" },
+    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011100}}, PARAM_ST,  "DMULT"  }, // Doubleword Multiply
+    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011101}}, PARAM_ST,  "DMULTU" }, // Doubleword Multiply Unsigned
     // // doubleword div
-    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011110}}, PARAM_ST,  "DDIV"   },
-    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011111}}, PARAM_ST,  "DDIVU"  },
+    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011110}}, PARAM_ST,  "DDIV"   }, // Doubleword Divide
+    // {{.i={0b000000,       0,       0, 0b00000, 0b00000, 0b011111}}, PARAM_ST,  "DDIVU"  }, // Doubleword Divide Unsigned
 
     // Branch
-    {{.i={0b000001,       0, 0b00001,       0,       0,        0}}, PARAM_SO,  "BGEZ"   },
-    {{.i={0b000001,       0, 0b00010,       0,       0,        0}}, PARAM_SO,  "BLTZL"  },
-    {{.i={0b000001,       0, 0b00011,       0,       0,        0}}, PARAM_SO,  "BGEZL"  },
-    // {{.i={0b000001,       0, 0b10000,       0,       0,        0}}, PARAM_SO,  "BLTZAL" },
-    // {{.i={0b000001,       0, 0b10001,       0,       0,        0}}, PARAM_SO,  "BGEZAL" },
-    // {{.i={0b000001,       0, 0b10010,       0,       0,        0}}, PARAM_SO,  "BLTZALL"},
-    // {{.i={0b000001,       0, 0b10011,       0,       0,        0}}, PARAM_SO,  "BGEZALL"},
-    {{.i={0b000111,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BGTZ"   },
-    {{.i={0b010111,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BGTZL"  },
-    {{.i={0b000110,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BLEZ"   },
-    {{.i={0b010110,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BLEZL"  },
-    {{.i={0b000001,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BLTZ"   },
-    {{.i={0b000100, 0b00000, 0b00000,       0,       0,        0}}, PARAM_B,   "B"      }, // pseudo of beq
-    {{.i={0b000100,       0,       0,       0,       0,        0}}, PARAM_STO, "BEQ"    },
-    {{.i={0b000101,       0,       0,       0,       0,        0}}, PARAM_STO, "BNE"    },
-    {{.i={0b010100,       0,       0,       0,       0,        0}}, PARAM_STO, "BEQL"   },
-    {{.i={0b010101,       0,       0,       0,       0,        0}}, PARAM_STO, "BNEL"   },
+    {{.i={0b000001,       0, 0b00001,       0,       0,        0}}, PARAM_SO,  "BGEZ"   }, // Branch on Greater Than or Equal to Zero
+    {{.i={0b000001,       0, 0b00010,       0,       0,        0}}, PARAM_SO,  "BLTZL"  }, // Branch on Less Than Zero Likely
+    {{.i={0b000001,       0, 0b00011,       0,       0,        0}}, PARAM_SO,  "BGEZL"  }, // Branch on Greater Than or Equal to Zero Likely
+    // {{.i={0b000001,       0, 0b10000,       0,       0,        0}}, PARAM_SO,  "BLTZAL" }, // Branch on Less Than Zero and Link
+    // {{.i={0b000001,       0, 0b10001,       0,       0,        0}}, PARAM_SO,  "BGEZAL" }, // Branch on Greater Than or Equal to Zero and Link
+    // {{.i={0b000001,       0, 0b10010,       0,       0,        0}}, PARAM_SO,  "BLTZALL"}, // Branch on Less Than Zero and Link Likely
+    // {{.i={0b000001,       0, 0b10011,       0,       0,        0}}, PARAM_SO,  "BGEZALL"}, // Branch on Greater Than or Equal to Zero and Link Likely
+    {{.i={0b000111,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BGTZ"   }, // Branch on Greater Than Zero
+    {{.i={0b010111,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BGTZL"  }, // Branch on Greater Than Zero Likely
+    {{.i={0b000110,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BLEZ"   }, // Branch on Less Than or Equal to Zero
+    {{.i={0b010110,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BLEZL"  }, // Branch on Less Than or Equal to Zero Likely
+    {{.i={0b000001,       0, 0b00000,       0,       0,        0}}, PARAM_SO,  "BLTZ"   }, // Branch on Less Than Zero
+    {{.i={0b000100, 0b00000, 0b00000,       0,       0,        0}}, PARAM_O,   "B"      }, // Branch (pseudo of BEQ)
+    {{.i={0b000100, 0b00000,       0,       0,       0,        0}}, PARAM_SO,  "BEQZ"   }, // Branch on Equal to Zero (pseudo of BEQ)
+    {{.i={0b000100,       0,       0,       0,       0,        0}}, PARAM_STO, "BEQ"    }, // Branch on Equal
+    {{.i={0b000101, 0b00000,       0,       0,       0,        0}}, PARAM_SO,  "BNEZ"   }, // Branch on Not Equal to Zero (pseudo of BNE)
+    {{.i={0b000101,       0,       0,       0,       0,        0}}, PARAM_STO, "BNE"    }, // Branch on Not Equal
+    {{.i={0b010100, 0b00000,       0,       0,       0,        0}}, PARAM_SO,  "BEQZL"  }, // Branch on Equal to Zero Likely (pseudo of BEQZL)
+    {{.i={0b010100,       0,       0,       0,       0,        0}}, PARAM_STO, "BEQL"   }, // Branch on Equal Likely
+    {{.i={0b010101, 0b00000,       0,       0,       0,        0}}, PARAM_SO,  "BNEZL"  }, // Branch on Not Equal to Zero Likely (pseudo of BNEL)
+    {{.i={0b010101,       0,       0,       0,       0,        0}}, PARAM_STO, "BNEL"   }, // Branch on Not Equal Likely
+    // return
+    // {{.i={0b010000, 0b10000, 0b00000, 0b00000, 0b00000, 0b011000}}, PARAM_SYS, "ERET"}, // Return from interrupt, exception, or error exception
+    // tlb
+    // {{.i={0b010000, 0b10000, 0b00000, 0b00000, 0b00000, 0b001000}}, PARAM_SYS, "TLBP"}, // Searches for a TLB entry that matches the EntryHi register
+    // {{.i={0b010000, 0b10000, 0b00000, 0b00000, 0b00000, 0b000001}}, PARAM_SYS, "TLBR"}, // Loads EntryHi and EntryLo registers with the TLB entry pointed at by the Index register
+    // {{.i={0b010000, 0b10000, 0b00000, 0b00000, 0b00000, 0b000010}}, PARAM_SYS, "TLBWI"}, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Index register
+    // {{.i={0b010000, 0b10000, 0b00000, 0b00000, 0b00000, 0b000110}}, PARAM_SYS, "TLBWR"}, // Stores the contents of EntryHi and EntryLo registers into the TLB entry pointed at by the Random register
     // jal (special)
-    {{.i={0b000010,       0,       0,       0,       0,        0}}, PARAM_J,   "J"      },
-    {{.i={0b000011,       0,       0,       0,       0,        0}}, PARAM_J,   "JAL"    },
-    {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b001000}}, PARAM_S,   "JR"     },
-    {{.i={0b000000,       0, 0b00000,       0, 0b00000, 0b001001}}, PARAM_DS,  "JALR"   },
-    // {{.i={0b000000,       0,       0,       0,       0, 0b001101}}, PARAM_N,   "BREAK"  },
+    {{.i={0b000010,       0,       0,       0,       0,        0}}, PARAM_J,   "J"      }, // Jump
+    {{.i={0b000011,       0,       0,       0,       0,        0}}, PARAM_J,   "JAL"    }, // Jump and Link
+    {{.i={0b000000,       0, 0b00000, 0b00000, 0b00000, 0b001000}}, PARAM_S,   "JR"     }, // Jump Register
+    {{.i={0b000000,       0, 0b00000,       0, 0b00000, 0b001001}}, PARAM_DS,  "JALR"   }, // Jump and Link Register
+    // break
+    // {{.i={0b000000,       0,       0,       0,       0, 0b001101}}, PARAM_N,   "BREAK"  }, // Breakpoint
     // move
-    // {{.i={0b010000, 0b00000,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MFC0"   },
-    // {{.i={0b010000, 0b00100,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MTC0"   },
+    // {{.i={0b010000, 0b00000,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MFC0"   }, // Move from Coprocessor-0
+    // {{.i={0b010000, 0b00001,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "DMFC0"  }, // Doubleword Move from Coprocessor-0
+    // {{.i={0b010000, 0b00100,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MTC0"   }, // Move to Coprocessor-0
+    // {{.i={0b010000, 0b00101,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "DMTC0"  }, // Doubleword Move to Coprocessor-0
     // system call
-    // {{.i={0b000000, 0b00000, 0b00000, 0b00000, 0b00000, 0b001100}}, PARAM_SYS, "SYSCALL"},
+    // {{.i={0b000000, 0b00000, 0b00000, 0b00000, 0b00000, 0b001100}}, PARAM_SYS, "SYSCALL"}, // System Call
     // sync
-    // {{.i={0b000000, 0b00000, 0b00000, 0b00000,       0, 0b001111}}, PARAM_SYN, "SYNC"   },
+    // {{.i={0b000000, 0b00000, 0b00000, 0b00000,       0, 0b001111}}, PARAM_SYN, "SYNC"   }, // Synchronize Shared Memory
+    // cache
+    // {{.i={0b101111,       0,       0,       0,       0,        0}}, PARAM_TOS, "CACHE"  }, // https://techpubs.jurassic.nl/manuals/hdwr/developer/R10K_UM/sgi_html/t5.Ver.2.0.book_301.html
     // trap
-    // {{.i={0b000000,       0,       0,       0,       0, 0b110000}}, PARAM_ST2, "TGE"    },
-    // {{.i={0b000000,       0,       0,       0,       0, 0b110001}}, PARAM_ST2, "TGEU"   },
-    // {{.i={0b000000,       0,       0,       0,       0, 0b110010}}, PARAM_ST2, "TLT"    },
-    // {{.i={0b000000,       0,       0,       0,       0, 0b110011}}, PARAM_ST2, "TLTU"   },
-    {{.i={0b000000,       0,       0,       0,       0, 0b110100}}, PARAM_ST2, "TEQ"    },
-    // {{.i={0b000000,       0,       0,       0,       0, 0b110110}}, PARAM_ST2, "TNE"    },
-    // {{.i={0b000001,       0, 0b01000,       0,       0,        0}}, PARAM_SI,  "TGEI"   },
-    // {{.i={0b000001,       0, 0b01001,       0,       0,        0}}, PARAM_SI,  "TGEIU"  },
-    // {{.i={0b000001,       0, 0b01010,       0,       0,        0}}, PARAM_SI,  "TLTI"   },
-    // {{.i={0b000001,       0, 0b01011,       0,       0,        0}}, PARAM_SI,  "TLTIU"  },
-    // {{.i={0b000001,       0, 0b01100,       0,       0,        0}}, PARAM_SI,  "TEQI"   },
-    // {{.i={0b000001,       0, 0b01110,       0,       0,        0}}, PARAM_SI,  "TNEI"   },
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110000}}, PARAM_ST2, "TGE"    }, // Trap if Greater Than or Equal
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110001}}, PARAM_ST2, "TGEU"   }, // Trap if Greater Than or Equal Unsigned
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110010}}, PARAM_ST2, "TLT"    }, // Trap if Less Than
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110011}}, PARAM_ST2, "TLTU"   }, // Trap if Less Than Unsigned
+    {{.i={0b000000,       0,       0,       0,       0, 0b110100}}, PARAM_ST2, "TEQ"    }, // Trap if Equal
+    // {{.i={0b000000,       0,       0,       0,       0, 0b110110}}, PARAM_ST2, "TNE"    }, // Trap if Not Equal
+    // {{.i={0b000001,       0, 0b01000,       0,       0,        0}}, PARAM_SI,  "TGEI"   }, // Trap if Greater Than or Equal Immediate
+    // {{.i={0b000001,       0, 0b01001,       0,       0,        0}}, PARAM_SI,  "TGEIU"  }, // Trap if Greater Than or Equal Unsigned Immediate
+    // {{.i={0b000001,       0, 0b01010,       0,       0,        0}}, PARAM_SI,  "TLTI"   }, // Trap if Less Than Immediate
+    // {{.i={0b000001,       0, 0b01011,       0,       0,        0}}, PARAM_SI,  "TLTIU"  }, // Trap if Less Than Unsigned Immediate
+    // {{.i={0b000001,       0, 0b01100,       0,       0,        0}}, PARAM_SI,  "TEQI"   }, // Trap if Equal Immediate
+    // {{.i={0b000001,       0, 0b01110,       0,       0,        0}}, PARAM_SI,  "TNEI"   }, // Trap if Not Equal Immediate
 
     // Memory Access
     // coprocessor
-    // {{.i={0b010000,       0,       0,       0,       0,        0}}, PARAM_N,   "COP0"   },
-    // {{.i={0b010001,       0,       0,       0,       0,        0}}, PARAM_N,   "COP1"   },
-    // {{.i={0b010010,       0,       0,       0,       0,        0}}, PARAM_N,   "COP2"   },
-    // {{.i={0b010011,       0,       0,       0,       0,        0}}, PARAM_N,   "COP3"   },
+    // {{.i={0b010000,       0,       0,       0,       0,        0}}, PARAM_N,   "COP0"   }, // Coprocessor-0 Operation
+    // {{.i={0b010001,       0,       0,       0,       0,        0}}, PARAM_N,   "COP1"   }, // Coprocessor-1 Operation (FPU)
+    // {{.i={0b010010,       0,       0,       0,       0,        0}}, PARAM_N,   "COP2"   }, // Coprocessor-2 Operation
+    // {{.i={0b010011,       0,       0,       0,       0,        0}}, PARAM_N,   "COP3"   }, // Coprocessor-3 Operation
     // load
-    // {{.i={0b011010,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDL"    },
-    // {{.i={0b011011,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDR"    },
-    {{.i={0b100000,       0,       0,       0,       0,        0}}, PARAM_TIS, "LB"     },
-    {{.i={0b100001,       0,       0,       0,       0,        0}}, PARAM_TIS, "LH"     },
-    {{.i={0b100010,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWL"    },
-    {{.i={0b100011,       0,       0,       0,       0,        0}}, PARAM_TIS, "LW"     },
-    {{.i={0b100100,       0,       0,       0,       0,        0}}, PARAM_TIS, "LBU"    },
-    {{.i={0b100101,       0,       0,       0,       0,        0}}, PARAM_TIS, "LHU"    },
-    {{.i={0b100110,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWR"    },
-    // {{.i={0b100111,       0,       0,       0,       0,        0}}, PARAM_TIS, "LWU"    },
+    // {{.i={0b011010,       0,       0,       0,       0,        0}}, PARAM_TOS, "LDL"    }, // Load Doubleword Left
+    // {{.i={0b011011,       0,       0,       0,       0,        0}}, PARAM_TOS, "LDR"    }, // Load Doubleword Right
+    {{.i={0b100000,       0,       0,       0,       0,        0}}, PARAM_TOS, "LB"     }, // Load Byte
+    {{.i={0b100001,       0,       0,       0,       0,        0}}, PARAM_TOS, "LH"     }, // Load Halfword
+    {{.i={0b100010,       0,       0,       0,       0,        0}}, PARAM_TOS, "LWL"    }, // Load Word Left
+    {{.i={0b100011,       0,       0,       0,       0,        0}}, PARAM_TOS, "LW"     }, // Load Word
+    {{.i={0b100100,       0,       0,       0,       0,        0}}, PARAM_TOS, "LBU"    }, // Load Byte Unsigned
+    {{.i={0b100101,       0,       0,       0,       0,        0}}, PARAM_TOS, "LHU"    }, // Load Halfword Unsigned
+    {{.i={0b100110,       0,       0,       0,       0,        0}}, PARAM_TOS, "LWR"    }, // Load Word Right
+    // {{.i={0b100111,       0,       0,       0,       0,        0}}, PARAM_TOS, "LWU"    }, // Load Word Unsigned
     // save
-    {{.i={0b101000,       0,       0,       0,       0,        0}}, PARAM_TIS, "SB"     },
-    {{.i={0b101001,       0,       0,       0,       0,        0}}, PARAM_TIS, "SH"     },
-    // {{.i={0b101010,       0,       0,       0,       0,        0}}, PARAM_TIS, "SWL"    },
-    {{.i={0b101011,       0,       0,       0,       0,        0}}, PARAM_TIS, "SW"     },
-    // {{.i={0b101100,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDL"    },
-    // {{.i={0b101101,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDR"    },
-    // {{.i={0b101110,       0,       0,       0,       0,        0}}, PARAM_TIS, "SWR"    },
-    // {{.i={0b110000,       0,       0,       0,       0,        0}}, PARAM_TIS, "LL"     },
-    {{.i={0b110001,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC1"   },
-    // {{.i={0b110010,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC2"   },
-    // {{.i={0b110011,       0,       0,       0,       0,        0}}, PARAM_FIS, "LWC3"   },
-    // {{.i={0b110100,       0,       0,       0,       0,        0}}, PARAM_TIS, "LLD"    },
-    {{.i={0b110101,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDC1"   },
-    // {{.i={0b110110,       0,       0,       0,       0,        0}}, PARAM_TIS, "LDC2"   },
-    // {{.i={0b110111,       0,       0,       0,       0,        0}}, PARAM_TIS, "LD"     },
-    // {{.i={0b111000,       0,       0,       0,       0,        0}}, PARAM_TIS, "SC"     },
-    {{.i={0b111001,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC1"   },
-    // {{.i={0b111010,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC2"   },
-    // {{.i={0b111011,       0,       0,       0,       0,        0}}, PARAM_FIS, "SWC3"   },
-    // {{.i={0b111100,       0,       0,       0,       0,        0}}, PARAM_TIS, "SCD"    },
-    {{.i={0b111101,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDC1"   },
-    // {{.i={0b111110,       0,       0,       0,       0,        0}}, PARAM_TIS, "SDC2"   },
-    // {{.i={0b111111,       0,       0,       0,       0,        0}}, PARAM_TIS, "SD"     },
+    {{.i={0b101000,       0,       0,       0,       0,        0}}, PARAM_TOS, "SB"     }, // Store Byte
+    {{.i={0b101001,       0,       0,       0,       0,        0}}, PARAM_TOS, "SH"     }, // Store Halfword
+    // {{.i={0b101010,       0,       0,       0,       0,        0}}, PARAM_TOS, "SWL"    }, // Store Word Left
+    {{.i={0b101011,       0,       0,       0,       0,        0}}, PARAM_TOS, "SW"     }, // Store Word
+    // {{.i={0b101100,       0,       0,       0,       0,        0}}, PARAM_TOS, "SDL"    }, // Store Doubleword Left
+    // {{.i={0b101101,       0,       0,       0,       0,        0}}, PARAM_TOS, "SDR"    }, // Store Doubleword Right
+    // {{.i={0b101110,       0,       0,       0,       0,        0}}, PARAM_TOS, "SWR"    }, // Store Word Right
+    // {{.i={0b110000,       0,       0,       0,       0,        0}}, PARAM_TOS, "LL"     }, // Load Linked Word
+    {{.i={0b110001,       0,       0,       0,       0,        0}}, PARAM_FOS, "LWC1"   }, // Load Word to Floating-Point
+    // {{.i={0b110010,       0,       0,       0,       0,        0}}, PARAM_FOS, "LWC2"   }, // Load Word to Coprocessor-2
+    // {{.i={0b110011,       0,       0,       0,       0,        0}}, PARAM_FOS, "LWC3"   }, // Load Word to Coprocessor-3
+    // {{.i={0b110100,       0,       0,       0,       0,        0}}, PARAM_TOS, "LLD"    }, // Load Linked Doubleword
+    {{.i={0b110101,       0,       0,       0,       0,        0}}, PARAM_TOS, "LDC1"   }, // Load Doubleword to Floating-Point
+    // {{.i={0b110110,       0,       0,       0,       0,        0}}, PARAM_TOS, "LDC2"   }, // Load Doubleword to Coprocessor-2
+    // {{.i={0b110111,       0,       0,       0,       0,        0}}, PARAM_TOS, "LD"     }, // Load Doubleword
+    // {{.i={0b111000,       0,       0,       0,       0,        0}}, PARAM_TOS, "SC"     }, // Store Conditional Word
+    {{.i={0b111001,       0,       0,       0,       0,        0}}, PARAM_FOS, "SWC1"   }, // Store Word to Floating-Point
+    // {{.i={0b111010,       0,       0,       0,       0,        0}}, PARAM_FOS, "SWC2"   }, // Store Word from Coprocessor-2
+    // {{.i={0b111011,       0,       0,       0,       0,        0}}, PARAM_FOS, "SWC3"   }, // Store Word from Coprocessor-3
+    // {{.i={0b111100,       0,       0,       0,       0,        0}}, PARAM_TOS, "SCD"    }, // Store Conditional Doubleword
+    {{.i={0b111101,       0,       0,       0,       0,        0}}, PARAM_TOS, "SDC1"   }, // Store Doubleword to Floating-Point
+    // {{.i={0b111110,       0,       0,       0,       0,        0}}, PARAM_TOS, "SDC2"   }, // Store Doubleword from Coprocessor-2
+    // {{.i={0b111111,       0,       0,       0,       0,        0}}, PARAM_TOS, "SD"     }, // Store Doubleword
 };
 
 static const InsnData insn_masks[] = {
 //                       opcode,      rs,      rt,      rd,      sa, function
-    /*PARAM_N  */ {.i={0b111111, 0b11111, 0b11111, 0b11111,       0, 0b111111}},
-    /*PARAM_SYS*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}},
-    /*PARAM_SYN*/ {.i={0b111111, 0b11111, 0b11111, 0b11111, 0b11111, 0b111111}},
-    /*PARAM_S  */ {.i={0b111111,       0, 0b11111, 0b11111, 0b11111, 0b111111}},
-    /*PARAM_T  */ {.i={0b111111, 0b11111,       0, 0b11111, 0b11111, 0b111111}},
-    /*PARAM_D  */ {.i={0b111111, 0b11111, 0b11111,       0, 0b11111, 0b111111}},
-    /*PARAM_ST */ {.i={0b111111,       0,       0, 0b11111, 0b11111, 0b111111}},
-    /*PARAM_ST2*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}},
-    /*PARAM_DS */ {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}},
-    /*PARAM_TD */ {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}},
-    /*PARAM_SD */ {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}},
-    /*PARAM_STD*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}},
-    /*PARAM_DST*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}},
-    /*PARAM_DTS*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}},
-    /*PARAM_DTA*/ {.i={0b111111, 0b11111,       0,       0,       0, 0b111111}},
-    /*PARAM_SI */ {.i={0b111111,       0, 0b11111,       0,       0,        0}},
-    /*PARAM_TI */ {.i={0b111111, 0b11111,       0,       0,       0,        0}},
-    /*PARAM_STI*/ {.i={0b111111,       0,       0,       0,       0,        0}},
-    /*PARAM_TSI*/ {.i={0b111111,       0,       0,       0,       0,        0}},
-    /*PARAM_TIS*/ {.i={0b111111,       0,       0,       0,       0,        0}},
-    /*PARAM_SO */ {.i={0b111111,       0, 0b11111,       0,       0,        0}},
-    /*PARAM_STO*/ {.i={0b111111,       0,       0,       0,       0,        0}},
-    /*PARAM_B  */ {.i={0b111111, 0b11111, 0b11111,       0,       0,        0}},
-    /*PARAM_J  */ {.i={0b111111,       0,       0,       0,       0,        0}},
+    /*PARAM_NOP*/ {.i={0b111111, 0b11111, 0b11111, 0b11111, 0b11111, 0b111111}}, // NOP
+    /*PARAM_N  */ {.i={0b111111, 0b11111, 0b11111, 0b11111,       0, 0b111111}}, //
+    /*PARAM_SYS*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}}, //
+    /*PARAM_SYN*/ {.i={0b111111, 0b11111, 0b11111, 0b11111, 0b11111, 0b111111}}, //
+    /*PARAM_S  */ {.i={0b111111,       0, 0b11111, 0b11111, 0b11111, 0b111111}}, // rs
+    /*PARAM_T  */ {.i={0b111111, 0b11111,       0, 0b11111, 0b11111, 0b111111}}, // rt
+    /*PARAM_D  */ {.i={0b111111, 0b11111, 0b11111,       0, 0b11111, 0b111111}}, // rd
+    /*PARAM_ST */ {.i={0b111111,       0,       0, 0b11111, 0b11111, 0b111111}}, // rs, rt
+    /*PARAM_ST2*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}}, // rs, rt
+    /*PARAM_DS */ {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}}, // rd, rs
+    /*PARAM_TD */ {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}}, // rt, rd
+    /*PARAM_SD */ {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}}, // rs, rd
+    /*PARAM_STD*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rs, rd, rt
+    /*PARAM_DST*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rd, rs, rt
+    /*PARAM_DTS*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rd, rt, rs
+    /*PARAM_DTA*/ {.i={0b111111, 0b11111,       0,       0,       0, 0b111111}}, // rd, rt, shift
+    /*PARAM_SI */ {.i={0b111111,       0, 0b11111,       0,       0,        0}}, // rs, 0xI
+    /*PARAM_TI */ {.i={0b111111, 0b11111,       0,       0,       0,        0}}, // rt, 0xI
+    /*PARAM_STI*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // rs, rt, 0xI
+    /*PARAM_TSI*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // rt, rs, 0xI
+    /*PARAM_TOS*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // rt, 0xI(rs)
+    /*PARAM_SO */ {.i={0b111111,       0, 0b11111,       0,       0,        0}}, // rs, offset/func
+    /*PARAM_STO*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // rs, rt, offset
+    /*PARAM_O  */ {.i={0b111111, 0b11111, 0b11111,       0,       0,        0}}, // offset
+    /*PARAM_J  */ {.i={0b111111,       0,       0,       0,       0,        0}}, // func
 //                         COP1,    fmt,       rt,      fs,      fd,      MOV
-    /*PARAM_FIS*/ {.i={0b111111,       0,       0,       0,       0,        0}},
-    /*PARAM_TFS*/ {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}},
-    /*PARAM_FF */ {.i={0b111111,       0, 0b11111,       0,       0, 0b111111}},
-    /*PARAM_FFF*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}},
-    /*PARAM_CON*/ {.i={0b111111,       0,       0,       0, 0b00011, 0b110000}},
-    /*PARAM_BC1*/ {.i={0b111111, 0b11111, 0b00011,       0,       0,        0}},
+    /*PARAM_FOS*/ {.i={0b111111,       0,       0,       0,       0,        0}}, // ft, 0xI(rs)
+    /*PARAM_TFS*/ {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}}, // rt, fs
+    /*PARAM_FF */ {.i={0b111111,       0, 0b11111,       0,       0, 0b111111}}, // fd, fs
+    /*PARAM_FFF*/ {.i={0b111111,       0,       0,       0,       0, 0b111111}}, // fd, fs, ft
+    /*PARAM_CON*/ {.i={0b111111,       0,       0,       0, 0b00011, 0b110000}}, // fs, ft
+    /*PARAM_BC1*/ {.i={0b111111, 0b11111, 0b00011,       0,       0,        0}}, // offset
 };
 
-static const char registerMaps[][3] = {
+// C.cond.fmt
+static const char sFPUconditions[][5] = {
+    "F",    // False
+    "UN",   // Unordered
+    "EQ",   // Equal
+    "UEQ",  // Unordered or Equal
+    "OLT",  // Ordered Less Than
+    "ULT",  // Unordered or Less Than
+    "OLE",  // Ordered or Less Than or Equal
+    "ULE",  // Unordered or Less Than or Equal
+    "SF",   // Signaling False
+    "NGLE", // Not Greater or Less Than or Equal
+    "SEQ",  // Signalling Equal
+    "NGL",  // Not Greater or Less Than
+    "LT",   // Less Than
+    "NGE",  // Not Greater Than or Equal
+    "LE",   // Less Than or Equal
+    "NGT"   // Not Greater Than
+};
+
+// Registers
+static const char sRegisterNames[][3] = {
     "R0",                                           // $zero
     "AT",                                           // Assembler temporary value
     "V0", "V1",                                     // Subroutine return value
@@ -258,17 +300,16 @@ static const char registerMaps[][3] = {
     "RA",                                           // Return address
 };
 
-    // "F0", "F2",                                     // Subroutine return value
-    // "F4", "F6", "F8", "F10"                         // Temporary values
-    // "F12", "F14",                                   // Subroutine arguments
-    // "F16", "F18",                                   // Temporary values
-    // "F20", "F22", "F24", "F26", "F28", "F30",       // Saved Values
+// // FPU Registers
+// static const char sFloatRegisterNames[][3] = {
+//     "00", "02",                                     // Subroutine return value
+//     "04", "06", "08", "10"                          // Temporary values
+//     "12", "14",                                     // Subroutine arguments
+//     "16", "18",                                     // Temporary values
+//     "20", "22", "24", "26", "28", "30",             // Saved Values
+// };
 
-static const char conditions[][5] = {
-    "F",  "UN",   "EQ",  "UEQ", "OLT", "ULT", "OLE", "ULE",
-    "SF", "NGLE", "SEQ", "NGL", "LT",  "NGE", "LE",  "NGT"
-};
-
+// Print colors
 static const RGBA32 sDisasmColors[] = {
     /*DISASM_COLOR_NOP      */ COLOR_RGBA32_CRASH_DISASM_NOP,
     /*DISASM_COLOR_INSN     */ COLOR_RGBA32_CRASH_DISASM_INST,
@@ -293,7 +334,7 @@ static char fmt_to_char(InsnData insn) {
 }
 
 const InsnTemplate *get_insn_type(InsnData insn) {
-    if (insn.d) {
+    if (insn.d != 0) {
         for (s32 i = 0; i < ARRAY_COUNT(insn_db); i++) {
             if ((insn.d & insn_masks[insn_db[i].paramType].d) == insn_db[i].i.d) {
                 return &insn_db[i];
@@ -311,7 +352,7 @@ s32 get_branch_offset(InsnData insn) {
         switch (type->paramType) {
             case PARAM_SO:
             case PARAM_STO:
-            case PARAM_B:
+            case PARAM_O:
             case PARAM_BC1:
                 return insn.i.immediate;
         }
@@ -321,6 +362,7 @@ s32 get_branch_offset(InsnData insn) {
 }
 
 char *insn_disasm(InsnData insn, u32 isPC) {
+    const InsnTemplate *type = NULL;
     char *strp = &insn_as_string[0];
     uintptr_t target;
     s16 branchOffset;
@@ -331,233 +373,221 @@ char *insn_disasm(InsnData insn, u32 isPC) {
     bzero(insn_name, sizeof(insn_name));
 
     if (insn.d == 0) { // trivial case
-        if (isPC) {
-            strp += sprintf(strp, "@%08XNOP @%08X<-- CRASH",
-                sDisasmColors[DISASM_COLOR_NOP],
-                COLOR_RGBA32_CRASH_AT
-            );
-        } else {
-            strp += sprintf(strp, "@%08XNOP",
-                sDisasmColors[DISASM_COLOR_NOP]
-            );
-        }
-
-        return insn_as_string;
-    }
-
-    const InsnTemplate *type = get_insn_type(insn);
-
-    if (type) {
-        switch (type->paramType) {
-            case PARAM_SYS:
-            case PARAM_SYN:
-            case PARAM_N:
-                strp += sprintf(strp, "@%08X%-6s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name
-                );
-                break;
-            case PARAM_S:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs]
-                );
-                break;
-            case PARAM_T:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt]
-                );
-                break;
-            case PARAM_D:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd]
-                );
-                break;
-            case PARAM_ST:
-            case PARAM_ST2:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
-                                                      registerMaps[insn.i.rt]
-                );
-                break;
-            case PARAM_DS:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
-                                                      registerMaps[insn.i.rs]
-                );
-                break;
-            case PARAM_TD:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt],
-                                                      registerMaps[insn.i.rdata.rd]
-                );
-                break;
-            case PARAM_SD:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
-                                                      registerMaps[insn.i.rdata.rd]
-                );
-                break;
-            case PARAM_STD:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rs],
-                                                      registerMaps[insn.i.rt],
-                                                      registerMaps[insn.i.rdata.rd]
-                );
-                break;
-            case PARAM_DST:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
-                                                      registerMaps[insn.i.rs],
-                                                      registerMaps[insn.i.rt]
-                );
-                break;
-            case PARAM_DTS:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rdata.rd],
-                                                      registerMaps[insn.i.rt],
-                                                      registerMaps[insn.i.rs]
-                );
-                break;
-            case PARAM_DTA:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
-                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rdata.rd],
-                                                           registerMaps[insn.i.rt],
-                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.rdata.sa
-                );
-                break;
-            case PARAM_SI:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
-                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rs],
-                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
-                );
-                break;
-            case PARAM_TI:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
-                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
-                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
-                );
-                break;
-            case PARAM_STI:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
-                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rs],
-                                                           registerMaps[insn.i.rt],
-                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
-                );
-                break;
-            case PARAM_TSI:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
-                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
-                                                           registerMaps[insn.i.rs],
-                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
-                );
-                break;
-            case PARAM_TIS:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X@%08X(%s)",
-                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG      ], registerMaps[insn.i.rt],
-                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate,
-                    sDisasmColors[DISASM_COLOR_REG_2    ], registerMaps[insn.i.rs]
-                );
-                break;
-            case PARAM_SO:
-                branchOffset = (1 + insn.i.immediate);
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X%s0x%04X",
-                    sDisasmColors[DISASM_COLOR_INSN  ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG   ], registerMaps[insn.i.rs],
-                    sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
-                );
-                break;
-            case PARAM_STO:
-                branchOffset = (1 + insn.i.immediate);
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X%s0x%04X",
-                    sDisasmColors[DISASM_COLOR_INSN  ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG   ], registerMaps[insn.i.rs],
-                                                        registerMaps[insn.i.rt],
-                    sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
-                );
-                break;
-            case PARAM_B:
-            case PARAM_BC1:
-                branchOffset = (1 + insn.i.immediate);
-                strp += sprintf(strp, "@%08X%-6s @%08X%s0x%04X",
-                    sDisasmColors[DISASM_COLOR_INSN  ], type->name,
-                    sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), ABS(branchOffset)
-                );
-                break;
-            case PARAM_J:
-                target = (0x80000000 | ((insn.d & 0x1FFFFFF) * sizeof(InsnData)));
-                strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
-                    sDisasmColors[DISASM_COLOR_INSN   ], type->name,
-                    sDisasmColors[DISASM_COLOR_ADDRESS], target
-                );
-#ifdef INCLUDE_DEBUG_MAP
-                fname = parse_map_exact(target);
-                if (!((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
-                    strp += sprintf(strp, " (%s)", fname);
-                }
-#endif
-                break;
-            case PARAM_FIS:
-                strp += sprintf(strp, "@%08X%-6s @%08XF%d, @%08X0x%04X@%08X(%s)",
-                    sDisasmColors[DISASM_COLOR_INSN     ], type->name,
-                    sDisasmColors[DISASM_COLOR_REG      ], insn.i.rt,
-                    sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate,
-                    sDisasmColors[DISASM_COLOR_REG_2    ], registerMaps[insn.i.rs]
-                );
-                break;
-            case PARAM_TFS:
-                strp += sprintf(strp, "@%08X%-6s @%08X%s, F%d",
-                    sDisasmColors[DISASM_COLOR_INSN], type->name,
-                    sDisasmColors[DISASM_COLOR_REG ], registerMaps[insn.i.rt],
-                                                      insn.i.rdata.rd // fs
-                );
-                break;
-            case PARAM_FF:
-                sprintf(insn_name, "%s.%c", type->name, fmt_to_char(insn));
-                strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d",
-                    sDisasmColors[DISASM_COLOR_INSN], insn_name,
-                    sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
-                                                      insn.i.rdata.rd  // fs
-                );
-                break;
-            case PARAM_FFF:
-                sprintf(insn_name, "%s.%c", type->name, fmt_to_char(insn));
-                strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d, F%d",
-                    sDisasmColors[DISASM_COLOR_INSN], insn_name,
-                    sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
-                                                      insn.i.rdata.rd, // fs
-                                                      insn.i.rt        // ft
-                );
-                break;
-            case PARAM_CON:
-                sprintf(insn_name, "%s.%s.%c", type->name, conditions[insn.i.rdata.function & BITMASK(4)], fmt_to_char(insn));
-                strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%d",
-                    sDisasmColors[DISASM_COLOR_INSN], insn_name,
-                    sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.rd, // fd
-                                                      insn.i.rt        // ft
-                );
-                break;
-            case PARAM_UNK:
-            default:
-                strp += sprintf(strp, "unimpl 0x%08X", insn.d);
-                break;
-        }
+        strp += sprintf(strp, "@%08XNOP", sDisasmColors[DISASM_COLOR_NOP]);
     } else {
-        strp += sprintf(strp, "unimpl 0x%08X", insn.d);
+        type = get_insn_type(insn);
+        if (type) {
+            switch (type->paramType) {
+                case PARAM_SYS:
+                case PARAM_SYN:
+                case PARAM_N:
+                    strp += sprintf(strp, "@%08X%-6s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name
+                    );
+                    break;
+                case PARAM_S:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rs]
+                    );
+                    break;
+                case PARAM_T:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rt]
+                    );
+                    break;
+                case PARAM_D:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rdata.rd]
+                    );
+                    break;
+                case PARAM_ST:
+                case PARAM_ST2:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rs],
+                                                          sRegisterNames[insn.i.rt]
+                    );
+                    break;
+                case PARAM_DS:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rdata.rd],
+                                                          sRegisterNames[insn.i.rs]
+                    );
+                    break;
+                case PARAM_TD:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rt],
+                                                          sRegisterNames[insn.i.rdata.rd]
+                    );
+                    break;
+                case PARAM_SD:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rs],
+                                                          sRegisterNames[insn.i.rdata.rd]
+                    );
+                    break;
+                case PARAM_STD:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rs],
+                                                          sRegisterNames[insn.i.rt],
+                                                          sRegisterNames[insn.i.rdata.rd]
+                    );
+                    break;
+                case PARAM_DST:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rdata.rd],
+                                                          sRegisterNames[insn.i.rs],
+                                                          sRegisterNames[insn.i.rt]
+                    );
+                    break;
+                case PARAM_DTS:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rdata.rd],
+                                                          sRegisterNames[insn.i.rt],
+                                                          sRegisterNames[insn.i.rs]
+                    );
+                    break;
+                case PARAM_DTA:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
+                        sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG      ], sRegisterNames[insn.i.rdata.rd],
+                                                               sRegisterNames[insn.i.rt],
+                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.rdata.sa
+                    );
+                    break;
+                case PARAM_SI:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
+                        sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG      ], sRegisterNames[insn.i.rs],
+                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
+                    );
+                    break;
+                case PARAM_TI:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X",
+                        sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG      ], sRegisterNames[insn.i.rt],
+                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
+                    );
+                    break;
+                case PARAM_STI:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
+                        sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG      ], sRegisterNames[insn.i.rs],
+                                                               sRegisterNames[insn.i.rt],
+                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
+                    );
+                    break;
+                case PARAM_TSI:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X0x%04X",
+                        sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG      ], sRegisterNames[insn.i.rt],
+                                                               sRegisterNames[insn.i.rs],
+                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate
+                    );
+                    break;
+                case PARAM_TOS:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X0x%04X@%08X(%s)",
+                        sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG      ], sRegisterNames[insn.i.rt],
+                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate,
+                        sDisasmColors[DISASM_COLOR_REG_2    ], sRegisterNames[insn.i.rs]
+                    );
+                    break;
+                case PARAM_SO:
+                    branchOffset = (1 + insn.i.immediate);
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, @%08X%s0x%04X",
+                        sDisasmColors[DISASM_COLOR_INSN  ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG   ], sRegisterNames[insn.i.rs],
+                        sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), abss(branchOffset)
+                    );
+                    break;
+                case PARAM_STO:
+                    branchOffset = (1 + insn.i.immediate);
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, @%08X%s0x%04X",
+                        sDisasmColors[DISASM_COLOR_INSN  ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG   ], sRegisterNames[insn.i.rs],
+                                                            sRegisterNames[insn.i.rt],
+                        sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), abss(branchOffset)
+                    );
+                    break;
+                case PARAM_O:
+                case PARAM_BC1:
+                    branchOffset = (1 + insn.i.immediate);
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s0x%04X",
+                        sDisasmColors[DISASM_COLOR_INSN  ], type->name,
+                        sDisasmColors[DISASM_COLOR_OFFSET], ((branchOffset < 0) ? "-" : "+"), abss(branchOffset)
+                    );
+                    break;
+                case PARAM_J:
+                    target = (0x80000000 | ((insn.d & 0x1FFFFFF) * sizeof(InsnData)));
+                    strp += sprintf(strp, "@%08X%-6s @%08X0x%08X",
+                        sDisasmColors[DISASM_COLOR_INSN   ], type->name,
+                        sDisasmColors[DISASM_COLOR_ADDRESS], target
+                    );
+    #ifdef INCLUDE_DEBUG_MAP
+                    fname = parse_map_exact(target);
+                    if (!((fname == NULL) || ((*(uintptr_t*)target & 0x80000000) == 0))) {
+                        strp += sprintf(strp, " (%s)", fname);
+                    }
+    #endif
+                    break;
+                case PARAM_FOS:
+                    strp += sprintf(strp, "@%08X%-6s @%08XF%d, @%08X0x%04X@%08X(%s)",
+                        sDisasmColors[DISASM_COLOR_INSN     ], type->name,
+                        sDisasmColors[DISASM_COLOR_REG      ], insn.i.rt,
+                        sDisasmColors[DISASM_COLOR_IMMEDIATE], insn.i.immediate,
+                        sDisasmColors[DISASM_COLOR_REG_2    ], sRegisterNames[insn.i.rs]
+                    );
+                    break;
+                case PARAM_TFS:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, F%02d",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rt],
+                                                          insn.i.rdata.rd // fs
+                    );
+                    break;
+                case PARAM_FF:
+                    sprintf(insn_name, "%s.%c", type->name, fmt_to_char(insn));
+                    strp += sprintf(strp, "@%08X%-6s @%08XF%02d, F%02d",
+                        sDisasmColors[DISASM_COLOR_INSN], insn_name,
+                        sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
+                                                          insn.i.rdata.rd  // fs
+                    );
+                    break;
+                case PARAM_FFF:
+                    sprintf(insn_name, "%s.%c", type->name, fmt_to_char(insn));
+                    strp += sprintf(strp, "@%08X%-6s @%08XF%d, F%02d, F%02d",
+                        sDisasmColors[DISASM_COLOR_INSN], insn_name,
+                        sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.sa, // fd
+                                                          insn.i.rdata.rd, // fs
+                                                          insn.i.rt        // ft
+                    );
+                    break;
+                case PARAM_CON:
+                    sprintf(insn_name, "%s.%s.%c", type->name, sFPUconditions[insn.i.rdata.function & BITMASK(4)], fmt_to_char(insn));
+                    strp += sprintf(strp, "@%08X%-6s @%08XF%02d, F%02d",
+                        sDisasmColors[DISASM_COLOR_INSN], insn_name,
+                        sDisasmColors[DISASM_COLOR_REG ], insn.i.rdata.rd, // fd
+                                                          insn.i.rt        // ft
+                    );
+                    break;
+                case PARAM_UNK:
+                default:
+                    strp += sprintf(strp, "unimpl 0x%08X", insn.d);
+                    break;
+            }
+        } else {
+            strp += sprintf(strp, "unimpl 0x%08X", insn.d);
+        }
     }
 
     if (isPC) {

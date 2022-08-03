@@ -5,10 +5,11 @@
 #include "types.h"
 
 
-enum ParamTypes {
-    PARAM_N,
-    PARAM_SYS,
-    PARAM_SYN,
+enum InsnParamTypes {
+    PARAM_NOP, // NOP
+    PARAM_N,   //
+    PARAM_SYS, //
+    PARAM_SYN, //
     PARAM_S,   // rs
     PARAM_T,   // rt
     PARAM_D,   // rd
@@ -25,12 +26,12 @@ enum ParamTypes {
     PARAM_TI,  // rt, 0xI
     PARAM_STI, // rs, rt, 0xI
     PARAM_TSI, // rt, rs, 0xI
-    PARAM_TIS, // rt, 0xI(rs)
+    PARAM_TOS, // rt, 0xI(rs)
     PARAM_SO,  // rs, offset/func
     PARAM_STO, // rs, rt, offset
-    PARAM_B,   // offset
+    PARAM_O,   // offset
     PARAM_J,   // func
-    PARAM_FIS, // ft, 0xI(rs)
+    PARAM_FOS, // ft, 0xI(rs)
     PARAM_TFS, // rt, fs
     PARAM_FF,  // fd, fs
     PARAM_FFF, // fd, fs, ft
