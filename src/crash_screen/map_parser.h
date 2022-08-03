@@ -7,12 +7,10 @@
 
 struct MapEntry {
     /*0x00*/ uintptr_t addr;
-    /*0x04*/ size_t name_offset;
+    /*0x04*/ uintptr_t name_offset;
     /*0x08*/ size_t name_len;
     /*0x0C*/ size_t pad;
 }; /*0x10*/
-
-#define ADDR_IS_KNOWN(addr) ((*(uintptr_t*)(addr) & 0x80000000) != 0)
 
 #define IS_IN_SEGMENT(addr, segment) (((addr) >= (uintptr_t)_##segment##SegmentStart) && ((addr) <= (uintptr_t)_##segment##SegmentTextEnd))
 

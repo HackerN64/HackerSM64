@@ -18,7 +18,8 @@ enum InsnParamTypes {
     PARAM_DS,  // rd, rs
     PARAM_TD,  // rt, rd
     PARAM_SD,  // rs, rd
-    PARAM_STD, // rs, rd, rt
+    PARAM_STD, // rs, rt, rd
+    PARAM_SDT, // rs, rd, rt
     PARAM_DST, // rd, rs, rt
     PARAM_DTS, // rd, rt, rs
     PARAM_DTA, // rd, rt, shift

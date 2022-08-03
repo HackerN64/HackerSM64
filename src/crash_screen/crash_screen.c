@@ -698,7 +698,7 @@ void draw_stacktrace(OSThread *thread) {
 
             crash_screen_print(TEXT_X(0), y, "%08X:", faddr);
 
-            if (!sStackTraceSkipUnknowns && ((fname == NULL) || !ADDR_IS_KNOWN(faddr))) {
+            if (!sStackTraceSkipUnknowns && (fname == NULL)) {
                 // Print unknown function
                 crash_screen_print(TEXT_X(9), y, "@%08X%08X", COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
             } else {
@@ -956,7 +956,7 @@ void draw_disasm(OSThread *thread) {
     line += crash_screen_print(TEXT_X(7), TEXT_Y(line), "%08X in %08X-%08X", alignedSelectedAddr, sScrollAddress, (sScrollAddress + DISASM_SHOWN_SECTION));
     crash_screen_draw_divider(DIVIDER_Y(line));
 
-    if (((fname == NULL)/* || !ADDR_IS_KNOWN(funcAddr)*/)) {
+    if (fname == NULL) {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
@@ -1411,7 +1411,7 @@ void fill_function_stack_trace(OSThread *thread) {
         function->addr = temp_sp;
         function->name = fname;
 
-        if (!((fname == NULL) || !ADDR_IS_KNOWN(temp_sp))) {
+        if (fname != NULL) {
             function = &sKnownFunctionStack[sNumKnownFunctions++];
             function->addr = temp_sp;
             function->name = fname;

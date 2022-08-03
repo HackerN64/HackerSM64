@@ -242,7 +242,8 @@ static const InsnData insn_masks[] = {
     /*PARAM_DS */ {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}}, // rd, rs
     /*PARAM_TD */ {.i={0b111111, 0b11111,       0,       0, 0b11111, 0b111111}}, // rt, rd
     /*PARAM_SD */ {.i={0b111111,       0, 0b11111,       0, 0b11111, 0b111111}}, // rs, rd
-    /*PARAM_STD*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rs, rd, rt
+    /*PARAM_STD*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rs, rt, rd
+    /*PARAM_SDT*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rs, rd, rt
     /*PARAM_DST*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rd, rs, rt
     /*PARAM_DTS*/ {.i={0b111111,       0,       0,       0, 0b11111, 0b111111}}, // rd, rt, rs
     /*PARAM_DTA*/ {.i={0b111111, 0b11111,       0,       0,       0, 0b111111}}, // rd, rt, shift
@@ -461,6 +462,14 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                                                           sRegisterNames[insn.i.rdata.rd]
                     );
                     break;
+                case PARAM_SDT:
+                    strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
+                        sDisasmColors[DISASM_COLOR_INSN], type->name,
+                        sDisasmColors[DISASM_COLOR_REG ], sRegisterNames[insn.i.rs],
+                                                          sRegisterNames[insn.i.rdata.rd],
+                                                          sRegisterNames[insn.i.rt]
+                    );
+                    break;
                 case PARAM_DST:
                     strp += sprintf(strp, "@%08X%-6s @%08X%s, %s, %s",
                         sDisasmColors[DISASM_COLOR_INSN], type->name,
@@ -556,7 +565,7 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     );
     #ifdef INCLUDE_DEBUG_MAP
                     fname = parse_map_exact(target);
-                    if (!((fname == NULL) || !ADDR_IS_KNOWN(target))) {
+                    if (fname != NULL) {
                         strp += sprintf(strp, " (%s)", fname);
                     }
     #endif

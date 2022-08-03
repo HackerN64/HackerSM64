@@ -41,9 +41,10 @@ extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
 s32 is_in_code_segment(uintptr_t addr) {
-    return (IS_IN_SEGMENT(addr, main)
+    return (((addr & 0x80000000) != 0)
+        && (IS_IN_SEGMENT(addr, main)
          || IS_IN_SEGMENT(addr, engine)
-         || IS_IN_SEGMENT(addr, goddard));
+         || IS_IN_SEGMENT(addr, goddard)));
 }
 
 char *parse_map(uintptr_t *addr) {
@@ -77,7 +78,7 @@ char *parse_map_exact(uintptr_t addr) {
 char *find_function_in_stack(uintptr_t *sp) {
     for (s32 i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
         uintptr_t val = *(uintptr_t *)*sp;
-        *sp += sizeof(uintptr_t);
+        *sp += sizeof(void *);
 
         if (is_in_code_segment(val)) {
             return parse_map(&val);
