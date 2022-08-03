@@ -1,10 +1,6 @@
 // Boo
 
 // 0x05009B28
-static const Lights1 boo_seg5_lights_05009B28 = gdSPDefLights1(
-    0x97, 0x9a, 0xff,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x05009B40
 ALIGNED8 static const Texture boo_seg5_texture_05009B40[] = {
@@ -261,8 +257,8 @@ const Gfx boo_seg5_dl_0500BEE0[] = {
     gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&boo_seg5_lights_05009B28.l, 1),
-    gsSPLight(&boo_seg5_lights_05009B28.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x979affff),
     gsSPVertex(boo_seg5_vertex_0500B340, 12, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),

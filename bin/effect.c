@@ -130,6 +130,7 @@ const Gfx tiny_bubble_dl_0B006A50[] = {
 // 0x0B006AB0 - 0x0B006AD8
 const Gfx tiny_bubble_dl_0B006AB0[] = {
     gsSPTexture(0x0001, 0x0001, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsDPSetRenderMode(G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2),
     gsSPSetGeometryMode(G_LIGHTING | G_CULL_BACK | G_SHADING_SMOOTH),

@@ -17,6 +17,8 @@
 #include "puppyprint.h"
 #include "profiling.h"
 
+#include "config/config_audio.h"
+
 #define MUSIC_NONE 0xFFFF
 
 static OSMesgQueue sSoundMesgQueue;
@@ -294,7 +296,20 @@ void stop_shell_music(void) {
 /**
  * Called from threads: thread5_game_loop
  */
+
+#ifdef PERSISTENT_CAP_MUSIC
+static s8 sDoResetMusic = FALSE;
+extern void stop_cap_music(void);
+#endif
+
 void play_cap_music(u16 seqArgs) {
+#ifdef PERSISTENT_CAP_MUSIC
+    if (sDoResetMusic) {
+        sDoResetMusic = FALSE;
+        stop_cap_music();
+    }
+#endif
+
     play_music(SEQ_PLAYER_LEVEL, seqArgs, 0);
     if (sCurrentCapMusic != MUSIC_NONE && sCurrentCapMusic != seqArgs) {
         stop_background_music(sCurrentCapMusic);
@@ -308,6 +323,9 @@ void play_cap_music(u16 seqArgs) {
 void fadeout_cap_music(void) {
     if (sCurrentCapMusic != MUSIC_NONE) {
         fadeout_background_music(sCurrentCapMusic, 600);
+#ifdef PERSISTENT_CAP_MUSIC
+        sDoResetMusic = TRUE;
+#endif
     }
 }
 

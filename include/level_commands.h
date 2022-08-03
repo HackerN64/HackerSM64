@@ -247,6 +247,9 @@ enum GoddardScene {
 #undef LOAD_MIO0
 #define LOAD_MIO0(a,b,c) LOAD_YAY0(a,b,c)
 
+#undef LOAD_MIO0_TEXTURE
+#define LOAD_MIO0_TEXTURE(a,b,c) LOAD_YAY0_TEXTURE(a,b,c)
+
 #ifdef NO_SEGMENTED_MEMORY
 #define FIXED_LOAD(loadAddr, romStart, romEnd) \
     CMD_BBH(LEVEL_CMD_LOAD_TO_FIXED_ADDRESS, 0x10, 0x0000), \
@@ -309,9 +312,6 @@ enum GoddardScene {
     CMD_PTR(romStart), \
     CMD_PTR(romEnd)
 #endif
-
-#undef LOAD_MIO0_TEXTURE
-#define LOAD_MIO0_TEXTURE(a,b,c) LOAD_YAY0_TEXTURE(a,b,c)
 
 #define CHANGE_AREA_SKYBOX(area, segStart, segEnd) \
     CMD_BBH(LEVEL_CMD_CHANGE_AREA_SKYBOX, 0x0C, area), \
