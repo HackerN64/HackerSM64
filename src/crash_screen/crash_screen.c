@@ -54,7 +54,7 @@ static u8 sCrashPage = PAGE_CONTEXT;
 static u8 sUpdateBuffer = TRUE;
 
 
-static const char *gCauseDesc[18] = {
+static const char *sCauseDesc[18] = {
     /*EXC_INT    */ "Interrupt",
     /*EXC_MOD    */ "TLB modification",
     /*EXC_RMISS  */ "TLB exception on load or inst.",
@@ -75,7 +75,7 @@ static const char *gCauseDesc[18] = {
     /*EXC_VCED   */ "Virtual coherency on data",
 };
 
-static const char *gFpcsrDesc[6] = {
+static const char *sFpcsrDesc[6] = {
     /*FPCSR_CE*/ "Unimplemented operation",
     /*FPCSR_CV*/ "Invalid operation",
     /*FPCSR_CZ*/ "Division by zero",
@@ -84,7 +84,7 @@ static const char *gFpcsrDesc[6] = {
     /*FPCSR_CI*/ "Inexact operation",
 };
 
-static const char *gRegNames[29] = {
+static const char *sRegNames[29] = {
     "AT", "V0", "V1",
     "A0", "A1", "A2",
     "A3", "T0", "T1",
@@ -526,7 +526,7 @@ void crash_screen_print_fpcsr(uintptr_t fpcsr) {
 
     for (u32 i = 0; i < 6; i++) {
         if (fpcsr & bit) {
-            crash_screen_print(TEXT_X(16), (TEXT_Y(14) + 5), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, gFpcsrDesc[i]);
+            crash_screen_print(TEXT_X(16), (TEXT_Y(14) + 5), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sFpcsrDesc[i]);
             return;
         }
 
@@ -553,7 +553,7 @@ void crash_screen_print_registers(__OSThreadContext *tc) {
 
     for (u32 y = 0; y < 10; y++) {
         for (u32 x = 0; x < 3; x++) {
-            crash_screen_print_reg(TEXT_X(x * 15), TEXT_Y(4 + y), gRegNames[regNum], *(reg + regNum));
+            crash_screen_print_reg(TEXT_X(x * 15), TEXT_Y(4 + y), sRegNames[regNum], *(reg + regNum));
 
             regNum++;
 
@@ -597,7 +597,7 @@ void draw_crash_context(OSThread *thread) {
     u32 line = 1;
 
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XTHREAD:%d", COLOR_RGBA32_CRASH_THREAD, thread->id);
-    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, gCauseDesc[cause]);
+    line += crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X(%s)", COLOR_RGBA32_CRASH_DESCRIPTION, sCauseDesc[cause]);
 
     osWritebackDCacheAll();
 
