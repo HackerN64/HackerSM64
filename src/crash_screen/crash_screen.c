@@ -1134,12 +1134,13 @@ s32 update_crash_screen_page(void) {
 
         // Reset certain values when the page is changed.
         sStackTraceIndex = 0;
+        sDrawControls = FALSE;
         sCrashScreenSwitchedPage = TRUE;
 
         return TRUE;
     }
 
-    return FALSE;
+    return sDrawControls;
 }
 
 void crash_screen_input_default(void) {
@@ -1384,7 +1385,7 @@ void update_crash_screen_input(void) {
         sUpdateBuffer = TRUE;
     }
 
-    if (sDrawCrashScreen && !sDrawControls) {
+    if (sDrawCrashScreen) {
         update_crash_screen_direction_input();
 
         // Run the page-specific input function.
