@@ -564,6 +564,8 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                         sDisasmColors[DISASM_COLOR_ADDRESS], target
                     );
     #ifdef INCLUDE_DEBUG_MAP
+                    //! TODO: use sShowRamAsAscii to toggle whether to show hex address or name?
+                    //! TODO: localized function name scrolling here too
                     fname = parse_map_exact(target);
                     if (fname != NULL) {
                         strp += sprintf(strp, " (%s)", fname);

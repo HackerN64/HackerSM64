@@ -45,14 +45,15 @@ static s8 sStackTraceShowNames = TRUE;
 static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
 static s8 sShowRamAsAscii = FALSE;
+static s8 sQueueFramebufferUpdate = FALSE;
+static u8 sUpdateBuffer = TRUE;
 static s8 sAddressSelecCharIndex = 2;
 static uintptr_t sAddressSelectTarget = 0;
 static uintptr_t sSelectedAddress = 0;
 static uintptr_t sScrollAddress = 0;
 static u32 sStackTraceIndex = 0;
-
+static u32 sCrashScreenTimer = 0;
 static u8 sCrashPage = PAGE_CONTEXT;
-static u8 sUpdateBuffer = TRUE;
 
 
 static const char *sCauseDesc[18] = {
@@ -528,6 +529,42 @@ u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
     return numLines;
 }
 
+#define TEXT_SCROLL_NUM_SPACES 2
+
+//! TOOD: combine this with crash_screen_print
+s32 crash_screen_print_function_name(u32 x, u32 y, u32 maxNumChars, char *fmt, ...) {
+    unsigned char glyph;
+    char buf[CHAR_BUFFER_SIZE];
+    bzero(&buf, sizeof(buf));
+
+    va_list args;
+    va_start(args, fmt);
+
+    u32 size = _Printf(write_to_buf, buf, fmt, args);
+
+    RGBA32 color = COLOR_RGBA32_CRASH_FUNCTION_NAME;
+
+    if (size > 0) {
+        if (size > maxNumChars) {
+            u32 offset = (sCrashScreenTimer >> 3);
+            for (u32 i = 0; i < maxNumChars; i++) {
+                glyph = buf[(i + offset) % (size + TEXT_SCROLL_NUM_SPACES)];
+                if (glyph != 0) {
+                    crash_screen_draw_glyph(x, y, glyph, color);
+                }
+
+                x += TEXT_WIDTH(1);
+            }
+
+            sQueueFramebufferUpdate = TRUE;
+        } else {
+            crash_screen_print(x, y, "@%08X%s", color, buf);
+        }
+    }
+
+    return 1;
+}
+
 void crash_screen_sleep(u32 ms) {
     u64 cycles = (((ms * 1000LL) * osClockRate) / 1000000ULL);
     osSetTime(0);
@@ -638,7 +675,7 @@ void draw_crash_context(OSThread *thread) {
     if (fname == NULL) {
         crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
     } else {
-        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
+        crash_screen_print_function_name(TEXT_X(10), TEXT_Y(line), 34, "%s", fname);
     }
 #endif
 
@@ -700,7 +737,7 @@ void draw_stack_trace(OSThread *thread) {
 #ifdef INCLUDE_DEBUG_MAP
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
     uintptr_t pc = tc->pc;
-    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, parse_map(&pc));
+    line += crash_screen_print_function_name(TEXT_X(9), TEXT_Y(line), 35, parse_map(&pc));
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
@@ -733,7 +770,7 @@ void draw_stack_trace(OSThread *thread) {
             } else {
                 // Print known function
                 if (sStackTraceShowNames) {
-                    crash_screen_print(TEXT_X(9), y, "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, fname);
+                    crash_screen_print_function_name(TEXT_X(9), y, 35, fname);
                 } else {
                     crash_screen_print(TEXT_X(9), y, "@%08x%08X", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
                 }
@@ -757,25 +794,25 @@ void draw_stack_trace(OSThread *thread) {
 }
 
 void draw_address_select(void) {
-    crash_screen_draw_dark_rect((JUMP_MENU_X -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y - TEXT_HEIGHT(2) -  JUMP_MENU_MARGIN_X     ),
-                                (JUMP_MENU_W + (JUMP_MENU_MARGIN_Y * 2)), (JUMP_MENU_H + TEXT_HEIGHT(2) + (JUMP_MENU_MARGIN_Y * 2)),
+    crash_screen_draw_dark_rect((JUMP_MENU_X1 -  JUMP_MENU_MARGIN_X     ), (JUMP_MENU_Y1 -  JUMP_MENU_MARGIN_Y     ),
+                                (JUMP_MENU_W  + (JUMP_MENU_MARGIN_X * 2)), (JUMP_MENU_H  + (JUMP_MENU_MARGIN_Y * 2)),
                                 3);
 
-    crash_screen_print(JUMP_MENU_X + TEXT_WIDTH(1), JUMP_MENU_Y - TEXT_HEIGHT(2), "GO TO:");
+    crash_screen_print(SCREEN_CENTER_X - TEXT_WIDTH(3), JUMP_MENU_Y1, "GO TO:");
 
-    crash_screen_draw_vertical_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y - TEXT_HEIGHT(1) + CRASH_SCREEN_CHAR_SPACING_Y),
+    crash_screen_draw_vertical_triangle((SCREEN_CENTER_X - TEXT_WIDTH(4) + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y1 + TEXT_HEIGHT(1) + CRASH_SCREEN_CHAR_SPACING_Y),
                                         TEXT_WIDTH(1), TEXT_WIDTH(1),
                                         COLOR_RGBA32_CRASH_SELECT_ARROWS, FALSE);
-    crash_screen_draw_vertical_triangle((JUMP_MENU_X + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y + TEXT_HEIGHT(1) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
+    crash_screen_draw_vertical_triangle((SCREEN_CENTER_X - TEXT_WIDTH(4) + (sAddressSelecCharIndex * TEXT_WIDTH(1)) - 1), (JUMP_MENU_Y1 + TEXT_HEIGHT(3) - CRASH_SCREEN_CHAR_SPACING_Y + 1),
                                         TEXT_WIDTH(1), TEXT_WIDTH(1),
                                         COLOR_RGBA32_CRASH_SELECT_ARROWS, TRUE);
-    crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelectTarget);
+    crash_screen_print(SCREEN_CENTER_X - TEXT_WIDTH(8 / 2) - TEXT_WIDTH(2), JUMP_MENU_Y1 + TEXT_HEIGHT(2), "0x%08X", sAddressSelectTarget);
 
     char *fname = NULL;
     uintptr_t checkAddr = sAddressSelectTarget;
     fname = parse_map(&checkAddr);
     if (fname != NULL) {
-        crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y + TEXT_HEIGHT(2), "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
+        crash_screen_print_function_name(JUMP_MENU_X1, JUMP_MENU_Y1 + TEXT_HEIGHT(4), JUMP_MENU_CHARS_X, "%s", fname);
     }
 
     osWritebackDCacheAll();
@@ -994,7 +1031,8 @@ void draw_disasm(OSThread *thread) {
     if (fname == NULL) {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
-        line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
+        crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
+        line += crash_screen_print_function_name(TEXT_X(3), TEXT_Y(line), 41, "%s", fname);
     }
 
     osWritebackDCacheAll();
@@ -1449,7 +1487,12 @@ void draw_crash_screen(OSThread *thread) {
         }
 
         update_crash_screen_framebuffer();
-        sUpdateBuffer = FALSE;
+
+        if (sQueueFramebufferUpdate)  {
+            sQueueFramebufferUpdate = FALSE;
+        } else {
+            sUpdateBuffer = FALSE;
+        }
     }
 }
 
@@ -1639,6 +1682,7 @@ void thread2_crash_screen(UNUSED void *arg) {
             update_crash_screen_input();
             draw_crash_screen(thread);
             sCrashScreenSwitchedPage = FALSE;
+            sCrashScreenTimer++;
         }
     }
 }
