@@ -1,22 +1,10 @@
 // Manta Ray
 
 // 0x05001758
-static const Lights1 manta_seg5_lights_05001758 = gdSPDefLights1(
-    0x31, 0x3b, 0x3b,
-    0xc6, 0xee, 0xed, 0x28, 0x28, 0x28
-);
 
 // 0x05001770
-static const Lights1 manta_seg5_lights_05001770 = gdSPDefLights1(
-    0x00, 0x16, 0x18,
-    0x03, 0x5b, 0x63, 0x28, 0x28, 0x28
-);
 
 // Unreferenced light group
-UNUSED static const Lights1 manta_lights_unused = gdSPDefLights1(
-    0x3f, 0x3f, 0x35,
-    0xff, 0xff, 0xd7, 0x28, 0x28, 0x28
-);
 
 // 0x050017A0
 ALIGNED8 static const Texture manta_seg5_texture_050017A0[] = {
@@ -1037,13 +1025,13 @@ static const Vtx manta_seg5_vertex_05006A88[] = {
 
 // 0x05006B08 - 0x05006B70
 const Gfx manta_seg5_dl_05006B08[] = {
-    gsSPLight(&manta_seg5_lights_05001770.l, 1),
-    gsSPLight(&manta_seg5_lights_05001770.a, 2),
+    gsSPLightColor(LIGHT_1, 0x35b63ff),
+    gsSPLightColor(LIGHT_2, 0x1618ff),
     gsSPVertex(manta_seg5_vertex_05006808, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  1, 0x0),
     gsSP2Triangles( 1,  4,  2, 0x0,  1,  0,  5, 0x0),
-    gsSPLight(&manta_seg5_lights_05001758.l, 1),
-    gsSPLight(&manta_seg5_lights_05001758.a, 2),
+    gsSPLightColor(LIGHT_1, 0xc6eeedff),
+    gsSPLightColor(LIGHT_2, 0x313b3bff),
     gsSPVertex(manta_seg5_vertex_05006868, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSPEndDisplayList(),
@@ -1051,15 +1039,15 @@ const Gfx manta_seg5_dl_05006B08[] = {
 
 // 0x05006B70 - 0x05006C08
 const Gfx manta_seg5_dl_05006B70[] = {
-    gsSPLight(&manta_seg5_lights_05001770.l, 1),
-    gsSPLight(&manta_seg5_lights_05001770.a, 2),
+    gsSPLightColor(LIGHT_1, 0x35b63ff),
+    gsSPLightColor(LIGHT_2, 0x1618ff),
     gsSPVertex(manta_seg5_vertex_050068C8, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  4,  6, 0x0,  1,  7,  2, 0x0),
     gsSP2Triangles( 5,  1,  0, 0x0,  5,  0,  3, 0x0),
     gsSP2Triangles( 6,  7,  1, 0x0,  6,  1,  5, 0x0),
-    gsSPLight(&manta_seg5_lights_05001758.l, 1),
-    gsSPLight(&manta_seg5_lights_05001758.a, 2),
+    gsSPLightColor(LIGHT_1, 0xc6eeedff),
+    gsSPLightColor(LIGHT_2, 0x313b3bff),
     gsSPVertex(manta_seg5_vertex_05006948, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  6,  7, 0x0,  5,  7,  3, 0x0),
@@ -1068,15 +1056,15 @@ const Gfx manta_seg5_dl_05006B70[] = {
 
 // 0x05006C08 - 0x05006CA0
 const Gfx manta_seg5_dl_05006C08[] = {
-    gsSPLight(&manta_seg5_lights_05001770.l, 1),
-    gsSPLight(&manta_seg5_lights_05001770.a, 2),
+    gsSPLightColor(LIGHT_1, 0x35b63ff),
+    gsSPLightColor(LIGHT_2, 0x1618ff),
     gsSPVertex(manta_seg5_vertex_050069C8, 12, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  4,  6, 0x0,  1,  7,  2, 0x0),
     gsSP2Triangles( 5,  8,  9, 0x0,  5,  9,  3, 0x0),
     gsSP2Triangles( 6, 10, 11, 0x0,  6, 11,  5, 0x0),
-    gsSPLight(&manta_seg5_lights_05001758.l, 1),
-    gsSPLight(&manta_seg5_lights_05001758.a, 2),
+    gsSPLightColor(LIGHT_1, 0xc6eeedff),
+    gsSPLightColor(LIGHT_2, 0x313b3bff),
     gsSPVertex(manta_seg5_vertex_05006A88, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 5,  6,  7, 0x0,  5,  7,  3, 0x0),
