@@ -379,12 +379,13 @@ static s32 glyph_to_hex(char *dest, unsigned char glyph) {
 
 s32 crash_screen_parse_text_color(RGBA32 *color, const char *buf, u32 index, u32 size) {
     u32 byteIndex, digit;
-    char hex = 0;
-    Color component = 0;
-    ColorRGBA rgba = { 0, 0, 0, 0 };
+    char hex = 0x0;
+    Color component = 0x00;
+    ColorRGBA rgba = { 0x00, 0x00, 0x00, 0x00 };
     *color = COLOR_RGBA32_WHITE;
 
     for (byteIndex = 0; byteIndex < sizeof(RGBA32); byteIndex++) {
+        // Parse byte as color component.
         for (digit = 0; digit < 2; digit++) {
             if (index > size) {
                 return FALSE;
@@ -415,12 +416,14 @@ u32 crash_screen_parse_formatting_chars(const char *buf, u32 index, u32 size, un
     static u8 escape = FALSE;
     u32 skip = 0;
 
-    if ((index + (1 + 8)) > size) {
+    if ((index + 1 + 8) > size) {
         return 0;
     }
 
+    unsigned char nextGlyph = buf[index + 1];
+
     // Use '\\@' to print '@' and its color code instead of trying to parse it.
-    if (glyph == '\\' && buf[index + 1] && buf[index + 1] == '@') {
+    if (glyph == '\\' && nextGlyph && nextGlyph == '@') {
         escape = TRUE;
         skip = 1;
     } else if (glyph == '@' && !escape) { // @RRGGBBAA color prefix
@@ -442,7 +445,7 @@ s32 crash_screen_parse_space(const char *buf, u32 index, u32 size, u32 x) {
     u32 checkX = x + TEXT_WIDTH(1);
     UNUSED RGBA32 color;
 
-    while (buf[index] && glyph != ' ' && index < size) { // check the next word after the space
+    while (glyph && glyph != ' ' && index < size) { // check the next word after the space
         // New line if the next word is larger than the writable space.
         if ((index + 1) < size && checkX >= CRASH_SCREEN_TEXT_X2) {
             return TRUE;
@@ -707,10 +710,10 @@ void draw_stack_trace(OSThread *thread) {
     struct FunctionInStack *function = NULL;
 
     // Print
-    for (u32 j = 0; j < STACK_TRACE_NUM_ROWS; j++) {
-        u32 y = TEXT_Y(line + j);
+    for (u32 i = 0; i < STACK_TRACE_NUM_ROWS; i++) {
+        u32 y = TEXT_Y(line + i);
 
-        u32 currIndex = (sStackTraceIndex + j);
+        u32 currIndex = (sStackTraceIndex + i);
 
         if (currIndex >= sNumShownFunctions) {
             break;
@@ -1579,7 +1582,7 @@ void crash_screen_take_screenshot(RGBA16 *dst) {
     u32 *ptr = (u32 *)dst;
     const u32 mask = ((MSK_RGBA16_A << 16) | MSK_RGBA16_A);
 
-    for (size_t size = 0; size < FRAMEBUFFER_SIZE; size += 4) {
+    for (size_t size = 0; size < FRAMEBUFFER_SIZE; size += sizeof(u32)) {
         *ptr++ = (*src++ | mask);
     }
 }
