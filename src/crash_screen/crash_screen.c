@@ -768,6 +768,13 @@ void draw_address_select(void) {
                                         COLOR_RGBA32_CRASH_SELECT_ARROWS, TRUE);
     crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y, "%08X", sAddressSelectTarget);
 
+    char *fname = NULL;
+    uintptr_t checkAddr = sAddressSelectTarget;
+    fname = parse_map(&checkAddr);
+    if (fname != NULL) {
+        crash_screen_print(JUMP_MENU_X, JUMP_MENU_Y + TEXT_HEIGHT(2), "@%08X%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, fname);
+    }
+
     osWritebackDCacheAll();
 }
 
@@ -1013,7 +1020,7 @@ void draw_disasm(OSThread *thread) {
     for (u32 y = 0; y < DISASM_NUM_ROWS; y++) {
         uintptr_t addr = (sScrollAddress + (y * DISASM_STEP));
         InsnData toDisasm;
-        toDisasm.d = *(uintptr_t*)(addr);
+        toDisasm.d = *(uintptr_t*)addr;
 
         charY = TEXT_Y(line + y);
 
@@ -1376,11 +1383,12 @@ void update_crash_screen_input(void) {
         } else if (!sDrawBackground) {
             sDrawCrashScreen = TRUE;
             sDrawBackground = TRUE;
+            sDrawControls = FALSE;
         }
         sUpdateBuffer = TRUE;
     }
 
-    if (gPlayer1Controller->buttonPressed & START_BUTTON) {
+    if (sDrawCrashScreen && (gPlayer1Controller->buttonPressed & START_BUTTON)) {
         sDrawControls ^= TRUE;
         sUpdateBuffer = TRUE;
     }
@@ -1566,6 +1574,16 @@ void crash_screen_crash_screen_init(void) {
 }
 #endif // CRASH_SCREEN_CRASH_SCREEN
 
+void crash_screen_take_screenshot(RGBA16 *dst) {
+    u32 *src = (u32 *)gFramebuffers[sRenderingFramebuffer];
+    u32 *ptr = (u32 *)dst;
+    const u32 mask = ((MSK_RGBA16_A << 16) | MSK_RGBA16_A);
+
+    for (size_t size = 0; size < FRAMEBUFFER_SIZE; size += 4) {
+        *ptr++ = (*src++ | mask);
+    }
+}
+
 void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
@@ -1580,7 +1598,7 @@ void thread2_crash_screen(UNUSED void *arg) {
             osViSetEvent(&gCrashScreen.mesgQueue, (OSMesg)CRASH_SCREEN_MSG_VI_VBLANK, 1);
 
             // Save a screenshot of the game to the Z buffer's memory space.
-            bcopy(gFramebuffers[sRenderingFramebuffer], gZBuffer, FRAMEBUFFER_SIZE);
+            crash_screen_take_screenshot(gZBuffer);
 
             thread = get_crashed_thread();
             if (thread) {
