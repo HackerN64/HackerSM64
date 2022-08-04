@@ -365,11 +365,11 @@ static char *write_to_buf(char *buffer, const char *data, size_t size) {
 }
 
 static s32 glyph_to_hex(char *dest, unsigned char glyph) {
-    if (glyph >= '0' && glyph <= '9') {
+    if (IS_NUMERIC(glyph)) {
         *dest = ((glyph - '0') & 0xF);
-    } else if (glyph >= 'A' && glyph <= 'F') {
+    } else if (IS_UPPERCASE(glyph)) {
         *dest = (((glyph - 'A') + 10) & 0xF);
-    } else if (glyph >= 'a' && glyph <= 'f') {
+    } else if (IS_LOWERCASE(glyph)) {
         *dest = (((glyph - 'a') + 10) & 0xF);
     } else {
         return FALSE;
@@ -377,6 +377,7 @@ static s32 glyph_to_hex(char *dest, unsigned char glyph) {
 
     return TRUE;
 }
+
 
 s32 crash_screen_parse_text_color(RGBA32 *color, const char *buf, u32 index, u32 size) {
     u32 byteIndex, digit;

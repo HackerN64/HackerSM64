@@ -198,5 +198,12 @@ struct CrashScreen {
 #define DISASM_BRANCH_ARROW_SPACING       (TEXT_WIDTH(1) / 2)
 #define DISASM_FUNCTION_SEARCH_MAX_OFFSET (1024 * DISASM_STEP)
 
+// Char macros
+#define IS_NUMERIC(c)   ((c) >= '0' && (c) <= '9')
+#define IS_UPPERCASE(c) ((c) >= 'A' && (c) <= 'F')
+#define IS_LOWERCASE(c) ((c) >= 'a' && (c) <= 'f')
+
+#define IS_ALPHANUMERIC(c) (IS_NUMERIC(c) || IS_UPPERCASE(c) || IS_LOWERCASE(c))
+
 
 void crash_screen_init(void);
