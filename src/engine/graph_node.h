@@ -400,6 +400,7 @@ extern struct GraphNodePerspective *gCurGraphNodeCamFrustum;
 extern struct GraphNodeCamera      *gCurGraphNodeCamera;
 extern struct GraphNodeHeldObject  *gCurGraphNodeHeldObject;
 extern u16 gAreaUpdateCounter;
+extern Mat4 gCameraTransform;
 
 extern struct GraphNode *gCurRootGraphNode;
 extern struct GraphNode *gCurGraphNodeList[];

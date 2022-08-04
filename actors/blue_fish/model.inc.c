@@ -1,10 +1,6 @@
 // Blue Fish
 
 // 0x0301B5C8
-static const Lights1 blue_fish_seg3_lights_0301B5C8 = gdSPDefLights1(
-    0x3f, 0x3f, 0x3f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0301B5E0
 ALIGNED8 static const Texture blue_fish_seg3_texture_0301B5E0[] = {
@@ -34,8 +30,8 @@ const Gfx blue_fish_seg3_dl_0301BEC0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, blue_fish_seg3_texture_0301B5E0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&blue_fish_seg3_lights_0301B5C8.l, 1),
-    gsSPLight(&blue_fish_seg3_lights_0301B5C8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(blue_fish_seg3_vertex_0301BDE0, 14, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  0,  4, 0x0),
     gsSP2Triangles( 5,  0,  3, 0x0,  2,  6,  0, 0x0),
@@ -86,8 +82,8 @@ const Gfx blue_fish_seg3_dl_0301C0A8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, blue_fish_seg3_texture_0301B5E0),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&blue_fish_seg3_lights_0301B5C8.l, 1),
-    gsSPLight(&blue_fish_seg3_lights_0301B5C8.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x3f3f3fff),
     gsSPVertex(blue_fish_seg3_vertex_0301C018, 9, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  2,  3,  4, 0x0),
     gsSP2Triangles( 4,  5,  2, 0x0,  2,  5,  6, 0x0),

@@ -30,10 +30,14 @@
  *      64x64 collision cells.
  */
 
-// Set this to the extended bounds mode you want, then do "make clean".
+/**
+ * Set this to the extended bounds mode you want, then do "make clean".
+ */
 #define EXTENDED_BOUNDS_MODE 1
 
-// Don't touch the stuff past this point unless you know what you're doing!
+/**************************************************************************
+ * Don't touch the stuff past this point unless you know what you're doing!
+ **************************************************************************/
 
 #if EXTENDED_BOUNDS_MODE == 0 // 1x, normal cell size
     #define LEVEL_BOUNDARY_MAX 0x2000L //  8192
@@ -63,8 +67,12 @@
 
 STATIC_ASSERT(((EXTENDED_BOUNDS_MODE >= 0) && (EXTENDED_BOUNDS_MODE <= 3)), "You must set a valid extended bounds mode!");
 
-// The amount of cells in each axis in an area.
+/**
+ * The amount of cells in each axis in an area.
+ */
 #define NUM_CELLS                   (2 * LEVEL_BOUNDARY_MAX / CELL_SIZE)
 
-// Use this to convert game units to cell coordinates.
+/**
+ * Use this to convert game units to cell coordinates.
+ */
 #define GET_CELL_COORD(p)   ((((s32)(p) + LEVEL_BOUNDARY_MAX) / CELL_SIZE) & (NUM_CELLS - 1))

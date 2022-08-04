@@ -935,7 +935,7 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         Vec3f debugPos[2];
         vec3f_set(debugPos[0], sPuppyVolumeStack[index]->pos[0],    sPuppyVolumeStack[index]->pos[1],    sPuppyVolumeStack[index]->pos[2]);
         vec3f_set(debugPos[1], sPuppyVolumeStack[index]->radius[0], sPuppyVolumeStack[index]->radius[1], sPuppyVolumeStack[index]->radius[2]);
-        debug_box_color(0x0000FF00);
+        debug_box_color(0x00FF0000);
         debug_box_rot(debugPos[0], debugPos[1], sPuppyVolumeStack[index]->rot, DEBUG_SHAPE_BOX | DEBUG_UCODE_DEFAULT);
 #endif
         // Now compare values.
@@ -953,7 +953,7 @@ static s32 puppycam_check_volume_bounds(struct sPuppyVolume *volume, s32 index) 
         Vec3f debugPos[2];
         vec3f_set(debugPos[0], sPuppyVolumeStack[index]->pos[0],    sPuppyVolumeStack[index]->pos[1],    sPuppyVolumeStack[index]->pos[2]);
         vec3f_set(debugPos[1], sPuppyVolumeStack[index]->radius[0], sPuppyVolumeStack[index]->radius[1], sPuppyVolumeStack[index]->radius[2]);
-        debug_box_color(0x0000FF00);
+        debug_box_color(0x00FF0000);
         debug_box_rot(debugPos[0], debugPos[1], sPuppyVolumeStack[index]->rot, DEBUG_SHAPE_CYLINDER | DEBUG_UCODE_DEFAULT);
 #endif
         f32 distCheck = (dist < sqr(sPuppyVolumeStack[index]->radius[0]));
