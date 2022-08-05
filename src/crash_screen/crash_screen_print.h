@@ -17,6 +17,10 @@ typedef union {
     u32 val;
 } PrintCommand;
 
+// Maximum number of chars to print at once.
+#define CHAR_BUFFER_SIZE 0x100
+
+// Spaces between localized horizontal scrolling sections.
 #define TEXT_SCROLL_NUM_SPACES 2
 
 // Char macros
