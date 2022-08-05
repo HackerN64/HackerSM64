@@ -123,6 +123,13 @@ typedef u32 FontRow;
 // The number of functions to save to the stack trace buffer.
 #define STACK_SIZE 256 // (s32)(0x800 / sizeof(u64))
 
+struct CrashScreen {
+    /*0x000*/ OSThread thread;
+    /*0x1B0*/ u64 stack[0x800 / sizeof(u64)];
+    /*0x9B0*/ OSMesgQueue mesgQueue;
+    /*0x9C8*/ OSMesg mesg;
+}; /*0x9CC*/
+
 struct FunctionInStack {
     /*0x00*/ uintptr_t addr;
     /*0x04*/ char *name;
@@ -145,13 +152,6 @@ struct BranchArrow {
     /*0x04*/ s16 colorIndex;
     /*0x08*/ s32 xPos;
 }; /*0x10*/
-
-struct CrashScreen {
-    /*0x000*/ OSThread thread;
-    /*0x1B0*/ u64 stack[0x800 / sizeof(u64)];
-    /*0x9B0*/ OSMesgQueue mesgQueue;
-    /*0x9C8*/ OSMesg mesg;
-}; /*0x9CC*/
 
 // Maximum number of chars
 #define CHAR_BUFFER_SIZE 0x100
@@ -198,12 +198,13 @@ struct CrashScreen {
 #define DISASM_BRANCH_ARROW_SPACING       (TEXT_WIDTH(1) / 2)
 #define DISASM_FUNCTION_SEARCH_MAX_OFFSET (1024 * DISASM_STEP)
 
-// Char macros
-#define IS_NUMERIC(c)   ((c) >= '0' && (c) <= '9')
-#define IS_UPPERCASE(c) ((c) >= 'A' && (c) <= 'F')
-#define IS_LOWERCASE(c) ((c) >= 'a' && (c) <= 'f')
 
-#define IS_ALPHANUMERIC(c) (IS_NUMERIC(c) || IS_UPPERCASE(c) || IS_LOWERCASE(c))
+extern struct CrashScreen gCrashScreen;
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+extern struct CrashScreen gCrashScreen2;
+#endif
 
+extern u32 gCrashScreenTimer;
+extern s8 gCrashScreenQueueFramebufferUpdate;
 
 void crash_screen_init(void);

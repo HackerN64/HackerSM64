@@ -588,7 +588,7 @@ libultra: $(BUILD_DIR)/libultra.a
 
 # Extra object file dependencies
 $(BUILD_DIR)/asm/boot.o:              $(IPL3_RAW_FILES)
-$(BUILD_DIR)/src/crash_screen/crash_screen.o: $(CRASH_TEXTURE_C_FILES)
+$(BUILD_DIR)/src/crash_screen/crash_screen_draw.o: $(CRASH_TEXTURE_C_FILES)
 $(BUILD_DIR)/src/images/crash_screen_crashed.o: $(CRASH_TEXTURE_2_C_FILES)
 $(BUILD_DIR)/src/game/version.o:      $(BUILD_DIR)/src/game/version_data.h
 $(BUILD_DIR)/lib/aspMain.o:           $(BUILD_DIR)/rsp/audio.bin

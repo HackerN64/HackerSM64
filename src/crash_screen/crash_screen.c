@@ -5,6 +5,8 @@
 #include "types.h"
 #include "sm64.h"
 #include "crash_screen.h"
+#include "crash_screen_draw.h"
+#include "crash_screen_print.h"
 #include "insn_disasm.h"
 #include "map_parser.h"
 #include "audio/external.h"
@@ -18,42 +20,6 @@
 #include "game/puppyprint.h"
 #include "game/rumble_init.h"
 #include "game/vc_check.h"
-
-// Crash screen font. Each row of the image fits in one u32 pointer.
-ALIGNED32 static const FontRow gCrashScreenFont[CRASH_SCREEN_FONT_CHAR_HEIGHT * CRASH_SCREEN_FONT_NUM_ROWS] = {
-    #include "textures/crash_screen/crash_screen_font.custom.ia1.inc.c"
-};
-
-#ifdef INCLUDE_DEBUG_MAP
-static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
-static u32 sNumBranchArrows = 0;
-#endif
-
-static struct FunctionInStack sAllFunctionStack[STACK_SIZE];
-static struct FunctionInStack sKnownFunctionStack[STACK_SIZE];
-static u32 sNumKnownFunctions = 0;
-static u32 sNumShownFunctions = STACK_SIZE;
-
-static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
-
-static s8 sDrawCrashScreen = TRUE;
-static s8 sDrawBackground = TRUE;
-static s8 sDrawControls = FALSE;
-static s8 sCrashScreenSwitchedPage = FALSE;
-static s8 sCrashScreenWordWrap = TRUE;
-static s8 sStackTraceShowNames = TRUE;
-static s8 sStackTraceSkipUnknowns = FALSE;
-static s8 sAddressSelectMenuOpen = FALSE;
-static s8 sShowRamAsAscii = FALSE;
-static s8 sQueueFramebufferUpdate = FALSE;
-static u8 sUpdateBuffer = TRUE;
-static s8 sAddressSelecCharIndex = 2;
-static uintptr_t sAddressSelectTarget = 0;
-static uintptr_t sSelectedAddress = 0;
-static uintptr_t sScrollAddress = 0;
-static u32 sStackTraceIndex = 0;
-static u32 sCrashScreenTimer = 0;
-static u8 sCrashPage = PAGE_CONTEXT;
 
 
 static const char *sCauseDesc[18] = {
@@ -124,6 +90,13 @@ static const struct ControlType sControlsDescriptions[] = {
     /*CONT_DESC_TOGGLE_UNKNOWNS  */ {"B",                  "toggle unknowns in list"},
 };
 
+
+struct CrashScreen gCrashScreen;
+#ifdef CRASH_SCREEN_CRASH_SCREEN
+struct CrashScreen gCrashScreen2;
+#endif
+
+
 #ifdef INCLUDE_DEBUG_MAP
 static const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_ORANGE,
@@ -135,436 +108,37 @@ static const RGBA32 sBranchColors[] = {
     COLOR_RGBA32_LIGHT_GRAY,
     COLOR_RGBA32_LIGHT_BLUE,
 };
+
+static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
+static u32 sNumBranchArrows = 0;
 #endif
 
-extern u64 osClockRate;
-
-struct CrashScreen gCrashScreen;
-#ifdef CRASH_SCREEN_CRASH_SCREEN
-struct CrashScreen gCrashScreen2;
-#endif
-
-static ALWAYS_INLINE RGBA16 *crash_screen_get_framebuffer_pixel_ptr(u32 x, u32 y) {
-    return (gFramebuffers[sRenderingFramebuffer] + (SCREEN_WIDTH * y) + x);
-}
-
-// Darkens a rectangular area. This is faster than the color blending done by
-// crash_screen_draw_rect, so it's used for the large background rectangle.
-// 0  - does nothing
-// 1  - darken by 1/2
-// 2  - darken by 3/4
-// 3  - darken by 7/8
-// 4  - darken by 15/16
-// 5+ - darken to black
-void crash_screen_draw_dark_rect(u32 startX, u32 startY, u32 w, u32 h, u32 darken) {
-    if (darken == 0) {
-        return;
-    }
-
-    const RGBA16Component componentMask = (MSK_RGBA16_C & ~BITMASK(darken));
-    RGBA16 mask = 0;
-    for (u32 i = SIZ_RGBA16_A; i < (SIZ_RGBA16_C * 3); i += SIZ_RGBA16_C) {
-        mask |= (componentMask << i);
-    }
-
-    RGBA16 *dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
-
-    for (u32 y = 0; y < h; y++) {
-        for (u32 x = 0; x < w; x++) {
-            *dst = (((*dst & mask) >> darken) | MSK_RGBA16_A);
-            dst++;
-        }
-
-        dst += (SCREEN_WIDTH - w);
-    }
-}
-
-// Draws a rectangle.
-void crash_screen_draw_rect(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color) {
-    const Alpha alpha = RGBA32_A(color);
-    if (alpha == 0x00) {
-        return;
-    }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
-    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-
-    RGBA16 *dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
-
-    for (u32 y = 0; y < h; y++) {
-        for (u32 x = 0; x < w; x++) {
-            if (opaque) {
-                *dst = newColor;
-            } else {
-                *dst = rgba16_blend(*dst, newColor, alpha);
-            }
-            dst++;
-        }
-
-        dst += (SCREEN_WIDTH - w);
-    }
-}
-
-// Draws a triangle pointing upwards or downwards.
-void crash_screen_draw_vertical_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, s8 flip) {
-    const Alpha alpha = RGBA32_A(color);
-    if (alpha == 0x00) {
-        return;
-    }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
-    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    const f32 middle = (w / 2.0f);
-    f32 d = 0.0f;
-    f32 t = (middle / (f32) h);
-    if (flip) {
-        d = (middle - t);
-        t = -t;
-    }
-
-    RGBA16 *dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
-
-    for (u32 y = 0; y < h; y++) {
-        for (u32 x = 0; x < w; x++) {
-            if (absf(middle - x) < d) {
-                if (opaque) {
-                    *dst = newColor;
-                } else {
-                    *dst = rgba16_blend(*dst, newColor, alpha);
-                }
-            }
-            dst++;
-        }
-
-        d += t;
-        dst += (SCREEN_WIDTH - w);
-    }
-}
-
-// Draws a triangle pointing left or right.
-void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h, RGBA32 color, s8 flip) {
-    const Alpha alpha = RGBA32_A(color);
-    if (alpha == 0x00) {
-        return;
-    }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
-    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    const f32 middle = (h / 2.0f);
-    const f32 t = ((f32) w / middle);
-    f32 x1 = w;
-
-    RGBA16 *dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
-    RGBA16 *start = dst;
-
-    for (u32 y = 0; y < h; y++) {
-        for (u32 x = x1; x < w; x++) {
-            if (opaque) {
-                *dst = newColor;
-            } else {
-                *dst = rgba16_blend(*dst, newColor, alpha);
-            }
-            dst++;
-        }
-        x1 -= (y < middle) ? t : -t;
-        dst = start + (SCREEN_WIDTH * y);
-        if (flip) {
-            dst += (u32)x1;
-        }
-    }
-}
-
-// Draws a line from one point on the screen to another.
-void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color) {
-    const Alpha alpha = RGBA32_A(color);
-    if (alpha == 0x00) {
-        return;
-    }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
-    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-
-    RGBA16 *dst;
-
-    if (x1 > x2) SWAP(x1, x2);
-    if (y1 > y2) SWAP(y1, y2);
-
-    const f32 slope = (f32)(y2 - y1) / (x2 - x1);
-
-    f32 y, x = x1;
-    while (x <= x2) {
-        y = ((slope * (x - x1)) + y1);
-        dst = crash_screen_get_framebuffer_pixel_ptr(x, y);
-        if (opaque) {
-            *dst = newColor;
-        } else {
-            *dst = rgba16_blend(*dst, newColor, alpha);
-        }
-        x++;
-    }
-}
-
-ALWAYS_INLINE void crash_screen_draw_divider(u32 y) {
-    crash_screen_draw_rect(CRASH_SCREEN_X1, y, CRASH_SCREEN_W, 1, COLOR_RGBA32_LIGHT_GRAY);
-}
-
-void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32 color) {
-    if (glyph == 0) {
-        color = COLOR_RGBA32_GRAY;
-    }
-    const Alpha alpha = RGBA32_A(color);
-    if (alpha == 0x00) {
-        return;
-    }
-    const s8 opaque = (alpha == MSK_RGBA32_A);
-    const RGBA16 newColor = RGBA32_TO_RGBA16(color);
-    const FontRow startBit = ((FontRow)BIT(31) >> ((glyph % CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_WIDTH));
-    FontRow bit;
-    FontRow rowMask;
-
-    const FontRow *src = &gCrashScreenFont[(glyph / CRASH_SCREEN_FONT_CHARS_PER_ROW) * CRASH_SCREEN_FONT_CHAR_HEIGHT];
-    RGBA16 *dst = crash_screen_get_framebuffer_pixel_ptr(startX, startY);
-
-    for (u32 y = 0; y < CRASH_SCREEN_FONT_CHAR_HEIGHT; y++) {
-        bit = startBit;
-        rowMask = *src++;
-
-        for (u32 x = 0; x < CRASH_SCREEN_FONT_CHAR_WIDTH; x++) {
-            if (bit & rowMask) {
-                if (opaque) {
-                    *dst = newColor;
-                } else {
-                    *dst = rgba16_blend(*dst, newColor, alpha);
-                }
-            }
-            dst++;
-            bit >>= 1;
-        }
-
-        dst += (SCREEN_WIDTH - CRASH_SCREEN_FONT_CHAR_WIDTH);
-    }
-}
-
-void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color) {
-    // Start on the pixel below the divider.
-    topY++;
-
-    // Determine size of the scroll bar.
-    u32 totalHeight = (bottomY - topY);
-
-    u32 scrollBarHeight = (numVisibleEntries * ((f32) totalHeight / (f32) numTotalEntries));
-    scrollBarHeight = CLAMP(scrollBarHeight, minScrollBarHeight, totalHeight);
-
-    // Determine position of the scroll bar.
-    f32 scrollableHeight = (totalHeight - scrollBarHeight);
-    f32 numScrollableEntries = (numTotalEntries - numVisibleEntries);
-    u32 scrollPos = (currEntry * (scrollableHeight / numScrollableEntries));
-
-    // Draw the scroll bar rectangle.
-    crash_screen_draw_rect((CRASH_SCREEN_X2 - 1), (topY + scrollPos), 1, scrollBarHeight, color);
-}
-
-static char *write_to_buf(char *buffer, const char *data, size_t size) {
-    return ((char *) memcpy(buffer, data, size) + size);
-}
-
-static s32 glyph_to_hex(char *dest, unsigned char glyph) {
-    if (IS_NUMERIC(glyph)) {
-        *dest = ((glyph - '0') & 0xF);
-    } else if (IS_UPPERCASE(glyph)) {
-        *dest = (((glyph - 'A') + 10) & 0xF);
-    } else if (IS_LOWERCASE(glyph)) {
-        *dest = (((glyph - 'a') + 10) & 0xF);
-    } else {
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
-
-s32 crash_screen_parse_text_color(RGBA32 *color, const char *buf, u32 index, u32 size) {
-    u32 byteIndex, digit;
-    char hex = 0x0;
-    Color component = 0x00;
-    ColorRGBA rgba = { 0x00, 0x00, 0x00, 0x00 };
-    *color = COLOR_RGBA32_WHITE;
-
-    for (byteIndex = 0; byteIndex < sizeof(RGBA32); byteIndex++) {
-        // Parse byte as color component.
-        for (digit = 0; digit < 2; digit++) {
-            if (index > size) {
-                return FALSE;
-            }
-
-            if (!glyph_to_hex(&hex, buf[index])) {
-                return FALSE;
-            }
-
-            if (!buf[++index]) {
-                return FALSE;
-            }
-
-            component |= (hex << ((1 - digit) * sizeof(RGBA32)));
-        }
-
-        rgba[byteIndex] = component;
-        component = 0;
-    }
-
-    *color = COLORRGBA_TO_RGBA32(rgba);
-
-    return TRUE;
-}
-
-// Returns the number of chars to skip.
-u32 crash_screen_parse_formatting_chars(const char *buf, u32 index, u32 size, unsigned char glyph, RGBA32 *color) {
-    static u8 escape = FALSE;
-    u32 skip = 0;
-
-    if ((index + 1 + 8) > size) {
-        return 0;
-    }
-
-    unsigned char nextGlyph = buf[index + 1];
-
-    // Use '\\@' to print '@' and its color code instead of trying to parse it.
-    if (glyph == '\\' && nextGlyph && nextGlyph == '@') {
-        escape = TRUE;
-        skip = 1;
-    } else if (glyph == '@' && !escape) { // @RRGGBBAA color prefix
-        if (crash_screen_parse_text_color(color, buf, (index + 1), size)) {
-            skip = 8;
-        }
-    }
-
-    if (skip <= 0) {
-        escape = FALSE;
-    }
-
-    return skip;
-}
-
-// Returns whether to wrap or not.
-s32 crash_screen_parse_space(const char *buf, u32 index, u32 size, u32 x) {
-    unsigned char glyph = buf[++index];
-    u32 checkX = x + TEXT_WIDTH(1);
-    UNUSED RGBA32 color;
-
-    while (glyph && glyph != ' ' && index < size) { // check the next word after the space
-        // New line if the next word is larger than the writable space.
-        if ((index + 1) < size && checkX >= CRASH_SCREEN_TEXT_X2) {
-            return TRUE;
-        }
-
-        index += (1 + crash_screen_parse_formatting_chars(buf, index, size, glyph, &color));
-        glyph = buf[index];
-        checkX += TEXT_WIDTH(1);
-    }
-
-    return FALSE;
-}
-
-enum CrashScreenPrintOp {
-    CRASH_SCREEN_PRINT_OP_SPACE,
-    CRASH_SCREEN_PRINT_OP_SKIP,
-    CRASH_SCREEN_PRINT_OP_NEWLINE,
-};
-
-u32 crash_screen_print(u32 startX, u32 startY, const char *fmt, ...) {
-    unsigned char glyph;
-    char buf[CHAR_BUFFER_SIZE];
-    bzero(&buf, sizeof(buf));
-
-    va_list args;
-    va_start(args, fmt);
-
-    u32 size = _Printf(write_to_buf, buf, fmt, args);
-
-    RGBA32 color = COLOR_RGBA32_WHITE;
-
-    u32 x = startX;
-    u32 y = startY;
-
-    enum CrashScreenPrintOp printOp = CRASH_SCREEN_PRINT_OP_SPACE;
-    u32 skip = 0;
-    u32 numLines = 1;
-
-    s8 wrap = sCrashScreenWordWrap;
-
-    if (size > 0) {
-        for (u32 index = 0; index < size && buf[index]; index += (1 + skip)) {
-            glyph = buf[index];
-            printOp = CRASH_SCREEN_PRINT_OP_SPACE;
-            skip = 0;
-
-            if (glyph == ' ') { // space
-                if (wrap && crash_screen_parse_space(buf, index, size, x)) {
-                    printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
-                }
-            } else if (glyph == '\r' || glyph == '\n') { // new line
-                printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
-            } else {
-                // Check for formatting codes
-                skip = crash_screen_parse_formatting_chars(buf, index, size, glyph, &color);
-
-                if (skip > 0) {
-                    printOp = CRASH_SCREEN_PRINT_OP_SKIP;
-                } else { // normal char
-                    crash_screen_draw_glyph(x, y, glyph, color);
-
-                    if (wrap && (index + 1) < size && (x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2) {
-                        printOp = CRASH_SCREEN_PRINT_OP_NEWLINE;
-                    }
-                }
-            }
-
-            if (printOp == CRASH_SCREEN_PRINT_OP_SPACE) {
-                x += TEXT_WIDTH(1);
-            } else if (printOp == CRASH_SCREEN_PRINT_OP_NEWLINE) {
-                x = startX;
-                y += TEXT_HEIGHT(1);
-                numLines++;
-            }
-        }
-    }
-
-    va_end(args);
-
-    return numLines;
-}
-
-#define TEXT_SCROLL_NUM_SPACES 2
-
-//! TOOD: combine this with crash_screen_print
-s32 crash_screen_print_function_name(u32 x, u32 y, u32 maxNumChars, char *fmt, ...) {
-    unsigned char glyph;
-    char buf[CHAR_BUFFER_SIZE];
-    bzero(&buf, sizeof(buf));
-
-    va_list args;
-    va_start(args, fmt);
-
-    u32 size = _Printf(write_to_buf, buf, fmt, args);
-
-    RGBA32 color = COLOR_RGBA32_CRASH_FUNCTION_NAME;
-
-    if (size > 0) {
-        if (size > maxNumChars) {
-            u32 offset = (sCrashScreenTimer >> 3);
-            for (u32 i = 0; i < maxNumChars; i++) {
-                glyph = buf[(i + offset) % (size + TEXT_SCROLL_NUM_SPACES)];
-                if (glyph != 0) {
-                    crash_screen_draw_glyph(x, y, glyph, color);
-                }
-
-                x += TEXT_WIDTH(1);
-            }
-
-            sQueueFramebufferUpdate = TRUE;
-        } else {
-            crash_screen_print(x, y, "@%08X%s", color, buf);
-        }
-    }
-
-    return 1;
-}
+static struct FunctionInStack sAllFunctionStack[STACK_SIZE];
+static struct FunctionInStack sKnownFunctionStack[STACK_SIZE];
+static u32 sNumKnownFunctions = 0;
+static u32 sNumShownFunctions = STACK_SIZE;
+
+static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
+
+static s8 sDrawCrashScreen = TRUE;
+static s8 sDrawBackground = TRUE;
+static s8 sDrawControls = FALSE;
+static s8 sCrashScreenSwitchedPage = FALSE;
+static s8 sShowFunctionNames = TRUE;
+static s8 sStackTraceSkipUnknowns = FALSE;
+static s8 sAddressSelectMenuOpen = FALSE;
+static s8 sShowRamAsAscii = FALSE;
+static u8 sUpdateBuffer = TRUE;
+static s8 sAddressSelecCharIndex = 2;
+static uintptr_t sAddressSelectTarget = 0;
+static uintptr_t sSelectedAddress = 0;
+static uintptr_t sScrollAddress = 0;
+static u32 sStackTraceIndex = 0;
+static u8 sCrashPage = PAGE_CONTEXT;
+
+
+u32 gCrashScreenTimer = 0;
+s8 gCrashScreenQueueFramebufferUpdate = FALSE;
 
 void crash_screen_sleep(u32 ms) {
     u64 cycles = (((ms * 1000LL) * osClockRate) / 1000000ULL);
@@ -676,7 +250,7 @@ void draw_crash_context(OSThread *thread) {
     if (fname == NULL) {
         crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X%s", COLOR_RGBA32_CRASH_UNKNOWN, "UNKNOWN");
     } else {
-        crash_screen_print_function_name(TEXT_X(10), TEXT_Y(line), 34, "%s", fname);
+        crash_screen_print(TEXT_X(10), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, 34, fname);
     }
 #endif
 
@@ -723,6 +297,25 @@ void draw_crash_log(UNUSED OSThread *thread) {
 }
 #endif
 
+void crash_screen_draw_scroll_bar(u32 topY, u32 bottomY, u32 numVisibleEntries, u32 numTotalEntries, u32 currEntry, u32 minScrollBarHeight, RGBA32 color) {
+    // Start on the pixel below the divider.
+    topY++;
+
+    // Determine size of the scroll bar.
+    u32 totalHeight = (bottomY - topY);
+
+    u32 scrollBarHeight = (numVisibleEntries * ((f32) totalHeight / (f32) numTotalEntries));
+    scrollBarHeight = CLAMP(scrollBarHeight, minScrollBarHeight, totalHeight);
+
+    // Determine position of the scroll bar.
+    f32 scrollableHeight = (totalHeight - scrollBarHeight);
+    f32 numScrollableEntries = (numTotalEntries - numVisibleEntries);
+    u32 scrollPos = (currEntry * (scrollableHeight / numScrollableEntries));
+
+    // Draw the scroll bar rectangle.
+    crash_screen_draw_rect((CRASH_SCREEN_X2 - 1), (topY + scrollPos), 1, scrollBarHeight, color);
+}
+
 // prints any function pointers it finds in the stack format:
 // SP address: function name
 void draw_stack_trace(OSThread *thread) {
@@ -738,7 +331,7 @@ void draw_stack_trace(OSThread *thread) {
 #ifdef INCLUDE_DEBUG_MAP
     crash_screen_print(TEXT_X(0), TEXT_Y(line), "@%08XCURRFUNC:", COLOR_RGBA32_CRASH_AT);
     uintptr_t pc = tc->pc;
-    line += crash_screen_print_function_name(TEXT_X(9), TEXT_Y(line), 35, parse_map(&pc));
+    line += crash_screen_print(TEXT_X(9), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, 35, parse_map(&pc));
 
     crash_screen_draw_divider(DIVIDER_Y(line));
 
@@ -770,8 +363,8 @@ void draw_stack_trace(OSThread *thread) {
                 crash_screen_print(TEXT_X(9), y, "@%08X%08X", COLOR_RGBA32_CRASH_UNKNOWN, *(uintptr_t*)faddr);
             } else {
                 // Print known function
-                if (sStackTraceShowNames) {
-                    crash_screen_print_function_name(TEXT_X(9), y, 35, fname);
+                if (sShowFunctionNames) {
+                    crash_screen_print(TEXT_X(9), y, "@%08x^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, 35, fname);
                 } else {
                     crash_screen_print(TEXT_X(9), y, "@%08x%08X", COLOR_RGBA32_CRASH_FUNCTION_NAME_2, *(uintptr_t*)faddr);
                 }
@@ -813,7 +406,7 @@ void draw_address_select(void) {
     uintptr_t checkAddr = sAddressSelectTarget;
     fname = parse_map(&checkAddr);
     if (fname != NULL) {
-        crash_screen_print_function_name(JUMP_MENU_X1, JUMP_MENU_Y1 + TEXT_HEIGHT(4), JUMP_MENU_CHARS_X, "%s", fname);
+        crash_screen_print(JUMP_MENU_X1, JUMP_MENU_Y1 + TEXT_HEIGHT(4), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, JUMP_MENU_CHARS_X, fname);
     }
 
     osWritebackDCacheAll();
@@ -1033,7 +626,7 @@ void draw_disasm(OSThread *thread) {
         line += crash_screen_print(TEXT_X(0), TEXT_Y(line), "NOT IN A FUNCTION");
     } else {
         crash_screen_print(TEXT_X(0), TEXT_Y(line), "IN:");
-        line += crash_screen_print_function_name(TEXT_X(3), TEXT_Y(line), 41, "%s", fname);
+        line += crash_screen_print(TEXT_X(3), TEXT_Y(line), "@%08X^%d%s", COLOR_RGBA32_CRASH_FUNCTION_NAME, 41, fname);
     }
 
     osWritebackDCacheAll();
@@ -1054,7 +647,7 @@ void draw_disasm(OSThread *thread) {
     osWritebackDCacheAll();
 #endif
 
-    sCrashScreenWordWrap = FALSE;
+    gCrashScreenWordWrap = FALSE;
 
     u32 charX = TEXT_X(0);
     u32 charY = TEXT_Y(line);
@@ -1089,7 +682,7 @@ void draw_disasm(OSThread *thread) {
         }
     }
 
-    sCrashScreenWordWrap = TRUE;
+    gCrashScreenWordWrap = TRUE;
 
     osWritebackDCacheAll();
 
@@ -1109,31 +702,6 @@ void draw_disasm(OSThread *thread) {
 
     if (sAddressSelectMenuOpen) {
         draw_address_select();
-    }
-
-    osWritebackDCacheAll();
-}
-
-void reset_crash_screen_framebuffer(void) {
-    if (sDrawBackground) {
-        bcopy(gZBuffer, (void *) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]), FRAMEBUFFER_SIZE);
-    } else {
-        crash_screen_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_RGBA32_BLACK);
-    }
-
-    osWritebackDCacheAll();
-}
-
-void update_crash_screen_framebuffer(void) {
-    osWritebackDCacheAll();
-
-    osViBlack(FALSE);
-    osRecvMesg(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, OS_MESG_BLOCK);
-    osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]));
-    osRecvMesg(&gCrashScreen.mesgQueue, &gCrashScreen.mesg, OS_MESG_BLOCK);
-
-    if (++sRenderingFramebuffer == 3) {
-        sRenderingFramebuffer = 0;
     }
 
     osWritebackDCacheAll();
@@ -1200,7 +768,7 @@ void crash_screen_input_stack_trace(void) {
     if (!update_crash_screen_page()) {
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             // Toggle whether to display function names.
-            sStackTraceShowNames ^= TRUE;
+            sShowFunctionNames ^= TRUE;
             sUpdateBuffer = TRUE;
         }
 
@@ -1406,14 +974,14 @@ static const enum ControlTypes disasmPageControls[] = {
 };
 
 struct CrashScreenPage sCrashScreenPages[] = {
-    /*PAGE_CONTEXT    */ {draw_crash_context, crash_screen_input_default,     defaultPageControls},
-    /*PAGE_ASSERTS    */ {draw_assert,        crash_screen_input_default,     defaultPageControls},
+    /*PAGE_CONTEXT    */ {draw_crash_context, crash_screen_input_default,     defaultPageControls   },
+    /*PAGE_ASSERTS    */ {draw_assert,        crash_screen_input_default,     defaultPageControls   },
 #ifdef PUPPYPRINT_DEBUG
-    /*PAGE_LOG        */ {draw_crash_log,     crash_screen_input_default,     defaultPageControls},
+    /*PAGE_LOG        */ {draw_crash_log,     crash_screen_input_default,     defaultPageControls   },
 #endif
     /*PAGE_STACK_TRACE*/ {draw_stack_trace,   crash_screen_input_stack_trace, stackTracePageControls},
-    /*PAGE_RAM_VIEWER */ {draw_ram_viewer,    crash_screen_input_ram_viewer,  ramViewerPageControls},
-    /*PAGE_DISASM     */ {draw_disasm,        crash_screen_input_disasm,      disasmPageControls},
+    /*PAGE_RAM_VIEWER */ {draw_ram_viewer,    crash_screen_input_ram_viewer,  ramViewerPageControls },
+    /*PAGE_DISASM     */ {draw_disasm,        crash_screen_input_disasm,      disasmPageControls    },
 };
 
 void update_crash_screen_input(void) {
@@ -1464,7 +1032,7 @@ void draw_controls_box(void) {
 
 void draw_crash_screen(OSThread *thread) {
     if (sUpdateBuffer) {
-        reset_crash_screen_framebuffer();
+        reset_crash_screen_framebuffer(sDrawBackground);
 
         if (sDrawCrashScreen) {
             if (sDrawBackground) {
@@ -1489,8 +1057,8 @@ void draw_crash_screen(OSThread *thread) {
 
         update_crash_screen_framebuffer();
 
-        if (sQueueFramebufferUpdate)  {
-            sQueueFramebufferUpdate = FALSE;
+        if (gCrashScreenQueueFramebufferUpdate)  {
+            gCrashScreenQueueFramebufferUpdate = FALSE;
         } else {
             sUpdateBuffer = FALSE;
         }
@@ -1545,40 +1113,6 @@ extern struct SequenceQueueItem sBackgroundMusicQueue[6];
 extern void read_controller_inputs(s32 threadID);
 
 #ifdef CRASH_SCREEN_CRASH_SCREEN
-extern u8 _crash_screen_crash_screenSegmentRomStart[];
-extern u8 _crash_screen_crash_screenSegmentRomEnd[];
-extern void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd);
-
-void draw_crashed_image_i4(void) {
-    u8 srcColor;
-    Color color;
-    RGBA16 *fb_u16 = gFramebuffers[sRenderingFramebuffer];
-
-    u8 *segStart = _crash_screen_crash_screenSegmentRomStart;
-    u8 *segEnd = _crash_screen_crash_screenSegmentRomEnd;
-    size_t size = (uintptr_t) (segEnd - segStart);
-    u8 *fb_u8 = (u8*) ((uintptr_t) fb_u16 + (SCREEN_SIZE * sizeof(RGBA16*)) - size);
-
-    // Make sure the source image is the correct size.
-    if (size != SRC_IMG_SIZE) {
-        return;
-    }
-
-    // DMA the data directly onto the framebuffer.
-    dma_read(fb_u8, segStart, segEnd);
-
-    // Copy and convert the image data from the framebuffer to itself.
-    for (u32 i = 0; i < SRC_IMG_SIZE; i++) {
-        srcColor = *fb_u8++;
-
-        color = (srcColor & (BITMASK(4) << 4));
-        *fb_u16++ = ((color <<  8) | (color << 3) | (color >> 2) | 0x1); // GPACK_RGBA5551
-
-        color = (srcColor & (BITMASK(4) << 0));
-        *fb_u16++ = ((color << 12) | (color << 7) | (color << 2) | 0x1); // GPACK_RGBA5551
-    }
-}
-
 void thread20_crash_screen_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
     OSThread *thread = NULL;
@@ -1620,16 +1154,6 @@ void crash_screen_crash_screen_init(void) {
     osStartThread(&gCrashScreen2.thread);
 }
 #endif // CRASH_SCREEN_CRASH_SCREEN
-
-void crash_screen_take_screenshot(RGBA16 *dst) {
-    u32 *src = (u32 *)gFramebuffers[sRenderingFramebuffer];
-    u32 *ptr = (u32 *)dst;
-    const u32 mask = ((MSK_RGBA16_A << 16) | MSK_RGBA16_A);
-
-    for (size_t size = 0; size < FRAMEBUFFER_SIZE; size += sizeof(u32)) {
-        *ptr++ = (*src++ | mask);
-    }
-}
 
 void thread2_crash_screen(UNUSED void *arg) {
     OSMesg mesg;
@@ -1683,7 +1207,7 @@ void thread2_crash_screen(UNUSED void *arg) {
             update_crash_screen_input();
             draw_crash_screen(thread);
             sCrashScreenSwitchedPage = FALSE;
-            sCrashScreenTimer++;
+            gCrashScreenTimer++;
         }
     }
 }

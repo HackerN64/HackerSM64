@@ -165,8 +165,8 @@ static const InsnTemplate insn_db[] = {
     // {{.i={0b010000, 0b00001,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "DMFC0"  }, // Doubleword Move from Coprocessor-0
     // {{.i={0b010000, 0b00100,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "MTC0"   }, // Move to Coprocessor-0
     // {{.i={0b010000, 0b00101,       0,       0, 0b00000, 0b000000}}, PARAM_TD,  "DMTC0"  }, // Doubleword Move to Coprocessor-0
-    // system call
-    // {{.i={0b000000, 0b00000, 0b00000, 0b00000, 0b00000, 0b001100}}, PARAM_SYS, "SYSCALL"}, // System Call
+    // system call (assert)
+    {{.i={0b000000, 0b00000, 0b00000, 0b00000, 0b00000, 0b001100}}, PARAM_SYS, "SYSCALL"}, // System Call
     // sync
     // {{.i={0b000000, 0b00000, 0b00000, 0b00000,       0, 0b001111}}, PARAM_SYN, "SYNC"   }, // Synchronize Shared Memory
     // cache
@@ -565,10 +565,9 @@ char *insn_disasm(InsnData insn, u32 isPC) {
                     );
     #ifdef INCLUDE_DEBUG_MAP
                     //! TODO: use sShowRamAsAscii to toggle whether to show hex address or name?
-                    //! TODO: localized function name scrolling here too
                     fname = parse_map_exact(target);
                     if (fname != NULL) {
-                        strp += sprintf(strp, " (%s)", fname);
+                        strp += sprintf(strp, " ^%d%s", 26, fname);
                     }
     #endif
                     break;
