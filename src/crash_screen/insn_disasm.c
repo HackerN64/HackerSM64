@@ -389,7 +389,9 @@ char *insn_disasm(InsnData insn, u32 isPC) {
     char *strp = &insn_as_string[0];
     uintptr_t target;
     s16 branchOffset;
+#ifdef INCLUDE_DEBUG_MAP
     char *fname = NULL;
+#endif
     char insn_name[10];
 
     bzero(insn_as_string, sizeof(insn_as_string));

@@ -47,6 +47,7 @@ s32 is_in_code_segment(uintptr_t addr) {
          || IS_IN_SEGMENT(addr, goddard)));
 }
 
+#ifdef INCLUDE_DEBUG_MAP
 char *parse_map(uintptr_t *addr) {
     if (is_in_code_segment(*addr)) {
         for (u32 i = 0; i < gMapEntrySize; i++) {
@@ -78,7 +79,7 @@ char *parse_map_exact(uintptr_t addr) {
 char *find_function_in_stack(uintptr_t *sp) {
     for (s32 i = 0; i < STACK_TRAVERSAL_LIMIT; i++) {
         uintptr_t val = *(uintptr_t *)*sp;
-        *sp += sizeof(void *);
+        *sp += sizeof(uintptr_t);
 
         if (is_in_code_segment(val)) {
             return parse_map(&val);
@@ -87,3 +88,14 @@ char *find_function_in_stack(uintptr_t *sp) {
 
     return NULL;
 }
+#else
+char *parse_map(UNUSED uintptr_t *addr) {
+    return NULL;
+}
+char *parse_map_exact(UNUSED uintptr_t addr) {
+    return NULL;
+}
+char *find_function_in_stack(UNUSED uintptr_t *sp) {
+    return NULL;
+}
+#endif

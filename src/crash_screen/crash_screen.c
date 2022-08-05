@@ -111,12 +111,15 @@ static const RGBA32 sBranchColors[] = {
 
 static struct BranchArrow sBranchArrows[DISASM_BRANCH_BUFFER_SIZE];
 static u32 sNumBranchArrows = 0;
-#endif
 
 static struct FunctionInStack sAllFunctionStack[STACK_SIZE];
 static struct FunctionInStack sKnownFunctionStack[STACK_SIZE];
 static u32 sNumKnownFunctions = 0;
 static u32 sNumShownFunctions = STACK_SIZE;
+
+static s8 sStackTraceSkipUnknowns = FALSE;
+static s8 sShowFunctionNames = TRUE;
+#endif
 
 static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
 
@@ -124,8 +127,6 @@ static s8 sDrawCrashScreen = TRUE;
 static s8 sDrawBackground = TRUE;
 static s8 sDrawControls = FALSE;
 static s8 sCrashScreenSwitchedPage = FALSE;
-static s8 sShowFunctionNames = TRUE;
-static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
 static s8 sShowRamAsAscii = FALSE;
 static u8 sUpdateBuffer = TRUE;
@@ -766,6 +767,7 @@ void crash_screen_input_default(void) {
 
 void crash_screen_input_stack_trace(void) {
     if (!update_crash_screen_page()) {
+#ifdef INCLUDE_DEBUG_MAP
         if (gPlayer1Controller->buttonPressed & A_BUTTON) {
             // Toggle whether to display function names.
             sShowFunctionNames ^= TRUE;
@@ -794,6 +796,7 @@ void crash_screen_input_stack_trace(void) {
                 sUpdateBuffer = TRUE;
             }
         }
+#endif
     }
 }
 
