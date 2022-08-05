@@ -86,18 +86,33 @@
  */
 // #define DEBUG_FORCE_CRASH_ON_BOOT
 
-// Forces a crash when the player presses L in-game.
+/**
+ * Forces a crash when the player presses L in-game.
+ */
 #define DEBUG_FORCE_CRASH_ON_L
 
-// Enables the DEBUG_ASSERT macro.
+/**
+ * Enables the DEBUG_ASSERT macro.
+ */
 #define ENABLE_DEBUG_ASSERTS
 
-// Includes function map data in the ROM.
+/**
+ * Includes function map data in the ROM.
+ */
 #define INCLUDE_DEBUG_MAP
 
-// Includes an image which displays when the crash screen crashes.
-// Uses 38.4 KB of rom space.
+/**
+ * Include all MIPS III instructions in the disassembler, rather than just the ones that can generate normally.
+ */
+#define DISASM_INCLUDE_ALL_INSTRUCTIONS
+
+/**
+ * Includes an image which displays when the crash screen crashes.
+ * Uses 38.4 KB of rom space.
+ */
 #define CRASH_SCREEN_CRASH_SCREEN
 
-// Plays a Mario "WAAAOOOW" sound effect when the game crashes.
+/**
+ * Plays a Mario "WAAAOOOW" sound effect when the game crashes.
+ */
 // #define FUNNY_CRASH_SOUND

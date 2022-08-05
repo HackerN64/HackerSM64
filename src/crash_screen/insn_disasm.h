@@ -5,6 +5,15 @@
 #include "types.h"
 
 
+#define INSN_ID_1(opcode, rs, rt, rd, shift, function, paramType, name) \
+    {{.i={  opcode,      rs,      rt,      rd,   shift, function}}, paramType, name     },
+
+#ifdef DISASM_INCLUDE_ALL_INSTRUCTIONS
+    #define INSN_ID_0(opcode, rs, rt, rd, shift, function, paramType, name) INSN_ID_1(opcode, rs, rt, rd, shift, function, paramType, name)
+#else
+    #define INSN_ID_0(opcode, rs, rt, rd, shift, function, paramType, name)
+#endif
+
 enum InsnParamTypes {
     PARAM_NOP, // NOP
     PARAM_N,   //
@@ -28,7 +37,7 @@ enum InsnParamTypes {
     PARAM_STI, // rs, rt, 0xI
     PARAM_TSI, // rt, rs, 0xI
     PARAM_TOS, // rt, 0xI(rs)
-    PARAM_SO,  // rs, offset/func
+    PARAM_SO,  // rs, offset
     PARAM_STO, // rs, rt, offset
     PARAM_O,   // offset
     PARAM_J,   // func
