@@ -76,8 +76,8 @@ void crash_screen_draw_horizontal_triangle(u32 startX, u32 startY, u32 w, u32 h,
 void crash_screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, RGBA32 color);
 void crash_screen_draw_glyph(u32 startX, u32 startY, unsigned char glyph, RGBA32 color);
 void crash_screen_take_screenshot(RGBA16 *dst);
-void reset_crash_screen_framebuffer(s32 sDrawBackground);
-void update_crash_screen_framebuffer(void);
+void crash_screen_reset_framebuffer(s32 sDrawBackground);
+void crash_screen_update_framebuffer(void);
 
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 void draw_crashed_image_i4(void);

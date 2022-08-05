@@ -218,7 +218,7 @@ void crash_screen_take_screenshot(RGBA16 *dst) {
     }
 }
 
-void reset_crash_screen_framebuffer(s32 drawBackground) {
+void crash_screen_reset_framebuffer(s32 drawBackground) {
     if (drawBackground) {
         bcopy(gZBuffer, (void *) PHYSICAL_TO_VIRTUAL(gFramebuffers[sRenderingFramebuffer]), FRAMEBUFFER_SIZE);
     } else {
@@ -228,7 +228,7 @@ void reset_crash_screen_framebuffer(s32 drawBackground) {
     osWritebackDCacheAll();
 }
 
-void update_crash_screen_framebuffer(void) {
+void crash_screen_update_framebuffer(void) {
     osWritebackDCacheAll();
 
     osViBlack(FALSE);
