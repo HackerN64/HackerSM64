@@ -12,7 +12,10 @@ struct MapEntry {
     /*0x0C*/ size_t pad;
 }; /*0x10*/
 
+
+#define IS_IN_RAM(addr)              (((addr) >= RAM_START) && ((addr) < RAM_END))
 #define IS_IN_SEGMENT(addr, segment) (((addr) >= (uintptr_t)_##segment##SegmentStart) && ((addr) <= (uintptr_t)_##segment##SegmentTextEnd))
+
 
 void map_data_init(void);
 s32 is_in_code_segment(uintptr_t addr);

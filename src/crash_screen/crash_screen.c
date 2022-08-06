@@ -836,7 +836,7 @@ void crash_screen_input_stack_trace(void) {
     }
 }
 
-void crash_screen_select_address(size_t step) {
+void crash_screen_select_address(void) {
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
         sAddressSelecCharIndex = ((sAddressSelecCharIndex - 1) & 0x7);
         sUpdateBuffer = TRUE;
@@ -847,28 +847,40 @@ void crash_screen_select_address(size_t step) {
     }
 
     uintptr_t nextSelectedAddress = sAddressSelectTarget;
+    u32 shift = ((32 - 4) - (sAddressSelecCharIndex * 4));
+    u8 digit = GET_HEX_DIGIT(sAddressSelectTarget, shift);
+    s8 new = digit;
 
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP) {
         // Increment the selected digit.
-        u32 shift = (28 - (sAddressSelecCharIndex * 4));
-        u8 new = ((sAddressSelectTarget >> shift) & BITMASK(4));
-        new = ((new + 1) & BITMASK(4));
-        nextSelectedAddress = ((sAddressSelectTarget & ~(BITMASK(4) << shift)) | (new << shift));
-
-        if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
-            sAddressSelectTarget = ALIGN(nextSelectedAddress, step);
-            sUpdateBuffer = TRUE;
+        new = ((digit + 1) & BITMASK(4));
+        if (!IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
+            // Find the digit to wrap to
+            for (new = 0x0; new < 0xF; new++) {
+                if (IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
+                    break;
+                }
+            }
         }
     }
     if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN) {
         // Decrement the selected digit.
-        u32 shift = (28 - (sAddressSelecCharIndex * 4));
-        u8 new = ((sAddressSelectTarget >> shift) & BITMASK(4));
-        new = ((new - 1) & BITMASK(4));
-        nextSelectedAddress = ((sAddressSelectTarget & ~(BITMASK(4) << shift)) | (new << shift));
+        new = ((digit - 1) & BITMASK(4));
+        if (!IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
+            // Find the digit to wrap to
+            for (new = 0xF; new > 0x0; new--) {
+                if (IS_IN_RAM(SET_HEX_DIGIT(sAddressSelectTarget, new, shift))) {
+                    break;
+                }
+            }
+        }
+    }
 
-        if (nextSelectedAddress >= RAM_VIEWER_SCROLL_MIN && nextSelectedAddress <= RAM_VIEWER_SCROLL_MAX) {
-            sAddressSelectTarget = ALIGN(nextSelectedAddress, step);
+    if (new != digit) {
+        nextSelectedAddress = SET_HEX_DIGIT(sAddressSelectTarget, new, shift);
+
+        if (IS_IN_RAM(nextSelectedAddress)) {
+            sAddressSelectTarget = nextSelectedAddress;
             sUpdateBuffer = TRUE;
         }
     }
@@ -894,7 +906,7 @@ void crash_screen_select_address(size_t step) {
 
 void crash_screen_input_ram_viewer(void) {
     if (sAddressSelectMenuOpen) {
-        crash_screen_select_address(1);
+        crash_screen_select_address();
     } else if (!update_crash_screen_page()) {
         if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP)
          && ((sSelectedAddress - RAM_VIEWER_STEP) >= RAM_START)) {
@@ -932,7 +944,7 @@ void crash_screen_input_ram_viewer(void) {
 
 void crash_screen_input_disasm(void) {
     if (sAddressSelectMenuOpen) {
-        crash_screen_select_address(DISASM_STEP);
+        crash_screen_select_address();
     } else if (!update_crash_screen_page()) {
 #ifdef INCLUDE_DEBUG_MAP
         uintptr_t oldPos = sSelectedAddress;

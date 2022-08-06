@@ -141,6 +141,10 @@ struct BranchArrow {
 #define USEC_TO_FRAMES(n)   (((u64)(n) * FPS_COUNT) / 1000000LL)
 #define CYCLES_TO_FRAMES(c) (((u64)(c) * FPS_COUNT) / OS_CPU_COUNTER)
 
+// Macros used to modify individual digits in a hexadecimal value.
+#define GET_HEX_DIGIT(src, shift)       (((src) >> (shift)) & BITMASK(4))
+#define SET_HEX_DIGIT(dst, src, shift)  (((dst) & ~(BITMASK(4) << (shift))) | ((src) << (shift)))
+
 
 extern struct CrashScreen gCrashScreen;
 #ifdef CRASH_SCREEN_CRASH_SCREEN

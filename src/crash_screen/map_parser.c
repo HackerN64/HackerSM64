@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include "segments.h"
+#include "crash_screen.h"
 #include "map_parser.h"
 
 #define STACK_TRAVERSAL_LIMIT 100
@@ -41,7 +42,7 @@ extern u8 _goddardSegmentStart[];
 extern u8 _goddardSegmentTextEnd[];
 
 s32 is_in_code_segment(uintptr_t addr) {
-    return (((addr & 0x80000000) != 0)
+    return (IS_IN_RAM(addr)
         && (IS_IN_SEGMENT(addr, main)
          || IS_IN_SEGMENT(addr, engine)
          || IS_IN_SEGMENT(addr, goddard)));
