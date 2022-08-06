@@ -121,7 +121,10 @@ static s8 sStackTraceSkipUnknowns = FALSE;
 static s8 sShowFunctionNames = TRUE;
 #endif
 
-static s8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
+static OSTime sCrashScreenInputTimeY = 0;
+static OSTime sCrashScreenInputTimeX = 0;
+
+static u8 sCrashScreenDirectionFlags = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
 
 static s8 sDrawCrashScreen = TRUE;
 static s8 sDrawBackground = TRUE;
@@ -130,16 +133,15 @@ static s8 sCrashScreenSwitchedPage = FALSE;
 static s8 sAddressSelectMenuOpen = FALSE;
 static s8 sShowRamAsAscii = FALSE;
 static u8 sUpdateBuffer = TRUE;
+static u8 sCrashPage = PAGE_CONTEXT;
 static s8 sAddressSelecCharIndex = 2;
 static uintptr_t sAddressSelectTarget = 0;
 static uintptr_t sSelectedAddress = 0;
 static uintptr_t sScrollAddress = 0;
 static u32 sStackTraceIndex = 0;
-static u8 sCrashPage = PAGE_CONTEXT;
 
-
-u32 gCrashScreenTimer = 0;
 s8 gCrashScreenQueueFramebufferUpdate = FALSE;
+
 
 void crash_screen_sleep(u32 ms) {
     u64 cycles = (((ms * 1000LL) * osClockRate) / 1000000ULL);
@@ -482,18 +484,18 @@ void draw_ram_viewer(OSThread *thread) {
                 charX += 2;
             }
 
-            color = ((x & 0x1) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
+            color = ((sShowRamAsAscii || (x & 0x1)) ? COLOR_RGBA32_WHITE : COLOR_RGBA32_LIGHT_GRAY);
 
             if (currAddr == tc->pc) {
-                crash_screen_draw_rect(charX - 1, charY - 1, TEXT_WIDTH(2) + 1, TEXT_WIDTH(1) + 3, COLOR_RGBA32_RED);
+                crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), COLOR_RGBA32_RED);
             }
             if (currAddr == sSelectedAddress) {
-                crash_screen_draw_rect(charX - 1, charY - 1, TEXT_WIDTH(2) + 1, TEXT_WIDTH(1) + 3, COLOR_RGBA32_WHITE);
+                crash_screen_draw_rect((charX - 1), (charY - 1), (TEXT_WIDTH(2) + 1), (TEXT_WIDTH(1) + 3), COLOR_RGBA32_WHITE);
                 color = COLOR_RGBA32_BLACK;
             }
 
             if (sShowRamAsAscii) {
-                crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, byte, COLOR_RGBA32_WHITE);
+                crash_screen_draw_glyph(charX + TEXT_WIDTH(1), charY, byte, color);
             } else {
                 crash_screen_print(charX, charY, "@%08X%02X", color, byte);
             }
@@ -720,35 +722,58 @@ void draw_disasm(OSThread *thread) {
 }
 
 void update_crash_screen_direction_input(void) {
-    u8 prevHeld = (sCrashScreenDirectionFlags & BITMASK(4));
-    u8 currHeld = (
-        (((gPlayer1Controller->buttonDown & (U_CBUTTONS | U_JPAD))
-         || (gPlayer1Controller->rawStickY >  60)) << 0) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP
-      | (((gPlayer1Controller->buttonDown & (D_CBUTTONS | D_JPAD))
-         || (gPlayer1Controller->rawStickY < -60)) << 1) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN
-      | (((gPlayer1Controller->buttonDown & (L_CBUTTONS | L_JPAD))
-         || (gPlayer1Controller->rawStickX < -60)) << 2) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT
-      | (((gPlayer1Controller->buttonDown & (R_CBUTTONS | R_JPAD))
-         || (gPlayer1Controller->rawStickX >  60)) << 3) // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT
-    );
+    OSTime currTime = osGetTime();
 
-    u8 pressed = (~prevHeld & currHeld);
-    sCrashScreenDirectionFlags = ((pressed << 4) | currHeld);
+    u8 prevHeld = (sCrashScreenDirectionFlags & BITMASK(4));
+    u8 currPressed = CRASH_SCREEN_INPUT_DIRECTION_FLAGS_NONE;
+
+    s16 rawStickX  = gPlayer1Controller->rawStickX;
+    s16 rawStickY  = gPlayer1Controller->rawStickY;
+    u16 buttonDown = gPlayer1Controller->buttonDown;
+
+    u8 heldY = ((((buttonDown & (U_CBUTTONS | U_JPAD)) || (rawStickY >  60)) << 0)   // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP
+              | (((buttonDown & (D_CBUTTONS | D_JPAD)) || (rawStickY < -60)) << 1)); // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN
+    u8 heldX = ((((buttonDown & (L_CBUTTONS | L_JPAD)) || (rawStickX < -60)) << 2)   // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT
+              | (((buttonDown & (R_CBUTTONS | R_JPAD)) || (rawStickX >  60)) << 3)); // CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT
+
+    if (heldY && !(prevHeld & (CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP | CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN))) {
+        // On press
+        sCrashScreenInputTimeY = currTime;
+        currPressed |= heldY;
+    } else if (heldY) {
+        // held
+        OSTime diff = (currTime - sCrashScreenInputTimeY);
+        if (diff > FRAMES_TO_CYCLES(10)) {
+            currPressed |= heldY;
+        }
+    }
+
+    if (heldX && !(prevHeld & (CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT | CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT))) {
+        // On press
+        sCrashScreenInputTimeX = currTime;
+        currPressed |= heldX;
+    } else if (heldX) {
+        // held
+        OSTime diff = (currTime - sCrashScreenInputTimeX);
+        if (diff > FRAMES_TO_CYCLES(10)) {
+            currPressed |= heldX;
+        }
+    }
+
+    sCrashScreenDirectionFlags = ((currPressed << 4) | heldX | heldY);
 }
 
 s32 update_crash_screen_page(void) {
     u8 prevPage = sCrashPage;
 
-    // if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT) {
-    if (gPlayer1Controller->buttonPressed & R_TRIG) {
-        // Next page.
-        sCrashPage++;
-        sUpdateBuffer = TRUE;
-    }
-    // if (sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT) {
     if (gPlayer1Controller->buttonPressed & L_TRIG) {
         // Previous Page.
         sCrashPage--;
+        sUpdateBuffer = TRUE;
+    }
+    if (gPlayer1Controller->buttonPressed & R_TRIG) {
+        // Next page.
+        sCrashPage++;
         sUpdateBuffer = TRUE;
     }
 
@@ -871,22 +896,22 @@ void crash_screen_input_ram_viewer(void) {
     if (sAddressSelectMenuOpen) {
         crash_screen_select_address(1);
     } else if (!update_crash_screen_page()) {
-        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP)
+        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP)
          && ((sSelectedAddress - RAM_VIEWER_STEP) >= RAM_START)) {
             sSelectedAddress -= RAM_VIEWER_STEP;
             sUpdateBuffer = TRUE;
         }
-        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN)
+        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN)
          && ((sSelectedAddress + RAM_VIEWER_STEP) < RAM_END)) {
             sSelectedAddress += RAM_VIEWER_STEP;
             sUpdateBuffer = TRUE;
         }
-        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_LEFT)
+        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_LEFT)
          && (((sSelectedAddress - 1) & 0xF) != 0xF)) {
             sSelectedAddress--;
             sUpdateBuffer = TRUE;
         }
-        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_RIGHT)
+        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_RIGHT)
          && (((sSelectedAddress + 1) & 0xF) != 0x0)) {
             sSelectedAddress++;
             sUpdateBuffer = TRUE;
@@ -913,13 +938,13 @@ void crash_screen_input_disasm(void) {
         uintptr_t oldPos = sSelectedAddress;
 #endif
         // sSelectedAddress = ALIGN(sSelectedAddress, DISASM_STEP);
-        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_UP)
+        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_UP)
          && ((sSelectedAddress - DISASM_STEP) >= RAM_START)) {
             // Scroll up.
             sSelectedAddress -= DISASM_STEP;
             sUpdateBuffer = TRUE;
         }
-        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_HELD_DOWN)
+        if ((sCrashScreenDirectionFlags & CRASH_SCREEN_INPUT_DIRECTION_FLAG_PRESSED_DOWN)
          && ((sSelectedAddress + DISASM_STEP) < RAM_END)) {
             // Scroll down.
             sSelectedAddress += DISASM_STEP;
@@ -1222,7 +1247,6 @@ void thread2_crash_screen(UNUSED void *arg) {
             update_crash_screen_input();
             draw_crash_screen(thread);
             sCrashScreenSwitchedPage = FALSE;
-            gCrashScreenTimer++;
         }
     }
 }
