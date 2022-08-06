@@ -132,13 +132,22 @@ struct BranchArrow {
 #define DISASM_BRANCH_ARROW_SPACING       (TEXT_WIDTH(1) / 2)
 #define DISASM_FUNCTION_SEARCH_MAX_OFFSET (1024 * DISASM_STEP)
 
+// Time conversion macros
+#define FPS_COUNT 30
+#define FRAMES_TO_NESC(f)   (((u64)(f) * 1000000000LL) / FPS_COUNT)
+#define FRAMES_TO_UESC(f)   (((u64)(f) * 1000000LL) / FPS_COUNT)
+#define FRAMES_TO_CYCLES(f) (((u64)(f) * OS_CPU_COUNTER) / FPS_COUNT)
+#define NSEC_TO_FRAMES(n)   (((u64)(n) * FPS_COUNT) / 1000000000LL)
+#define USEC_TO_FRAMES(n)   (((u64)(n) * FPS_COUNT) / 1000000LL)
+#define CYCLES_TO_FRAMES(c) (((u64)(c) * FPS_COUNT) / OS_CPU_COUNTER)
+
 
 extern struct CrashScreen gCrashScreen;
 #ifdef CRASH_SCREEN_CRASH_SCREEN
 extern struct CrashScreen gCrashScreen2;
 #endif
 
-extern u32 gCrashScreenTimer;
 extern s8 gCrashScreenQueueFramebufferUpdate;
+
 
 void crash_screen_init(void);

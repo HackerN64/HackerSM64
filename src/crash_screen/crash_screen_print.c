@@ -18,16 +18,7 @@ s8 gCrashScreenWordWrap = TRUE;
 static u8 sCrashScreenPrintEscape = FALSE;
 
 
-u32 crash_screen_fornat_newline_char(UNUSED const char *buf, UNUSED u32 index, UNUSED u32 size, UNUSED RGBA32 *color, UNUSED u32 x, UNUSED u32 y) {
-    PrintCommand cmd;
-    cmd.val = 0;
-
-    cmd.d.newLine = TRUE;
-
-    return cmd.val;
-}
-
-u32 crash_screen_fornat_space(const char *buf, u32 index, u32 size, UNUSED RGBA32 *color, u32 x, UNUSED u32 y) {
+u32 crash_screen_fornat_space(const char *buf, u32 index, u32 size, u32 x, u32 y) {
     PrintCommand cmd, cmd2;
     UNUSED RGBA32 checkColor = 0;
 
@@ -87,7 +78,7 @@ static s32 glyph_to_hex(char *dest, unsigned char glyph) {
     return TRUE;
 }
 
-u32 crash_screen_fornat_text_color(const char *buf, u32 index, u32 size, RGBA32 *color, UNUSED u32 x, UNUSED u32 y) {
+u32 crash_screen_fornat_text_color(const char *buf, u32 index, u32 size, RGBA32 *color) {
     PrintCommand cmd;
     cmd.val = 0;
 
@@ -125,7 +116,7 @@ u32 crash_screen_fornat_text_color(const char *buf, u32 index, u32 size, RGBA32 
     return cmd.val;
 }
 
-u32 crash_screen_fornat_escape(const char *buf, u32 index, UNUSED u32 size, UNUSED RGBA32 *color, UNUSED u32 x, UNUSED u32 y) {
+u32 crash_screen_fornat_escape(const char *buf, u32 index) {
     PrintCommand cmd;
     cmd.val = 0;
 
@@ -147,7 +138,7 @@ u32 crash_screen_fornat_escape(const char *buf, u32 index, UNUSED u32 size, UNUS
     return cmd.val;
 }
 
-u32 crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 size, UNUSED RGBA32 *color, u32 x, u32 y) {
+u32 crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 size, RGBA32 *color, u32 x, u32 y) {
     PrintCommand cmd;
     cmd.val = 0;
 
@@ -184,7 +175,7 @@ u32 crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 size, UNUSE
     if (numChars > 0) {
         if (numChars > maxNumChars) {
             // Scroll text
-            u32 offset = (gCrashScreenTimer >> 3);
+            u32 offset = (CYCLES_TO_FRAMES(osGetTime()) >> 3);
             for (u32 i = 0; i < maxNumChars; i++) {
                 glyph = buf[startIndex + ((i + offset) % (numChars + TEXT_SCROLL_NUM_SPACES))];
                 if (glyph != 0) {
@@ -208,17 +199,14 @@ u32 crash_screen_fornat_local_scroll(const char *buf, u32 index, u32 size, UNUSE
         }
     }
 
-    cmd.d.skip = numDigits + numChars;
-    cmd.d.shift = cmd.d.skip;
+    cmd.d.shift = cmd.d.skip = numDigits + numChars;
 
     return cmd.val;
 }
 
-u32 crash_screen_fornat_normal_glyph(UNUSED const char *buf, u32 index, u32 size, UNUSED RGBA32 *color, u32 x, UNUSED u32 y) {
+u32 crash_screen_fornat_normal_glyph(u32 index, u32 size, u32 x) {
     PrintCommand cmd;
     cmd.val = 0;
-
-    sCrashScreenPrintEscape = FALSE;
 
     cmd.d.print = TRUE;
     if (gCrashScreenWordWrap && index < size && (x + TEXT_WIDTH(1)) >= CRASH_SCREEN_TEXT_X2) {
@@ -237,27 +225,28 @@ u32 crash_screen_parse_formatting(const char *buf, u32 index, u32 size, RGBA32 *
     unsigned char glyph = buf[index++];
 
     if (sCrashScreenPrintEscape) {
-        cmd.val = crash_screen_fornat_normal_glyph(buf, index, size, color, x, y);
+        sCrashScreenPrintEscape = FALSE;
+        cmd.val = crash_screen_fornat_normal_glyph(index, size, x);
     } else {
         switch (glyph) {
             case '\n':
             case '\r':
-                cmd.val = crash_screen_fornat_newline_char(buf, index, size, color, x, y);
+                cmd.d.newLine = TRUE;
                 break;
             case ' ':
-                cmd.val = crash_screen_fornat_space(buf, index, size, color, x, y);
+                cmd.val = crash_screen_fornat_space(buf, index, size, x, y);
                 break;
             case '@': // @RRGGBBAA color prefix
-                cmd.val = crash_screen_fornat_text_color(buf, index, size, color, x, y);
+                cmd.val = crash_screen_fornat_text_color(buf, index, size, color);
                 break;
             case '\\':
-                cmd.val = crash_screen_fornat_escape(buf, index, size, color, x, y);
+                cmd.val = crash_screen_fornat_escape(buf, index);
                 break;
             case '^':
                 cmd.val = crash_screen_fornat_local_scroll(buf, index, size, color, x, y);
                 break;
             default:
-                cmd.val = crash_screen_fornat_normal_glyph(buf, index, size, color, x, y);
+                cmd.val = crash_screen_fornat_normal_glyph(index, size, x);
                 break;
         }
     }

@@ -6,7 +6,7 @@
 #include "engine/colors.h"
 
 
-// Crash screen font properties.
+// Crash screen font image properties.
 #define CRASH_SCREEN_FONT_CHAR_WIDTH     5
 #define CRASH_SCREEN_FONT_CHAR_HEIGHT    7
 #define CRASH_SCREEN_FONT_CHARS_PER_ROW  6
