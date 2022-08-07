@@ -14,6 +14,16 @@
     #define INSN_ID_0(opcode, rs, rt, rd, shift, function, paramType, name)
 #endif
 
+// Special opcodes
+enum SpecialOpcodes {
+    OPC_SPEC = 0b000000,
+    OPC_REGI = 0b000001,
+    OPC_COP0 = 0b010000,
+    OPC_COP1 = 0b010001,
+    OPC_COP2 = 0b010010,
+    OPC_COP3 = 0b010011,
+};
+
 enum InsnParamTypes {
     PARAM_NOP, // NOP
     PARAM_N,   //
