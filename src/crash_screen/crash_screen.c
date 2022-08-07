@@ -683,14 +683,17 @@ void draw_disasm(OSThread *thread) {
         if (is_in_code_segment(addr)) {
             crash_screen_print(charX, charY, "%s", insn_disasm(toDisasm, (addr == tc->pc)));
         } else if (sShowRamAsAscii) {
-            char asText[8];
-            bzero(asText, sizeof(asText));
-
-            for (u32 c = 0; c < 4; c++) {
-                asText[c] = (unsigned char)(toDisasm.d >> (24 - (8 * c)));
+            // for (u32 c = 0; c < 4; c++) {
+            //     crash_screen_draw_glyph(charX + (c * TEXT_WIDTH(1)), charY, (unsigned char)(toDisasm.d >> ((32 - 8) - (8 * c))), COLOR_RGBA32_WHITE);
+            // }
+            s32 bitX = charX;
+            for (u32 c = 0; c < 32; c++) {
+                if ((c & 0x7) == 0) {
+                    bitX += TEXT_WIDTH(1);
+                }
+                crash_screen_draw_glyph(bitX, charY, ((toDisasm.d >> (32 - c)) & 0x1) ? '1' : '0', COLOR_RGBA32_WHITE);
+                bitX += TEXT_WIDTH(1);
             }
-
-            crash_screen_print(charX, charY, "%s", asText);
         } else {
             crash_screen_print(charX, charY, "%08X", toDisasm.d);
         }
