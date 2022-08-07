@@ -249,14 +249,14 @@ extern u8 _crash_screen_crash_screenSegmentRomEnd[];
 extern void dma_read(u8 *dest, u8 *srcStart, u8 *srcEnd);
 
 void draw_crashed_image_i4(void) {
-    u8 srcColor;
-    Color color;
+    Texture srcColor;
+    Color color; // I4 color
     RGBA16 *fb_u16 = gFramebuffers[sRenderingFramebuffer];
 
     u8 *segStart = _crash_screen_crash_screenSegmentRomStart;
     u8 *segEnd = _crash_screen_crash_screenSegmentRomEnd;
     size_t size = (uintptr_t) (segEnd - segStart);
-    u8 *fb_u8 = (u8*) ((uintptr_t) fb_u16 + (SCREEN_SIZE * sizeof(RGBA16*)) - size);
+    Texture *fb_u8 = (u8*) ((uintptr_t) fb_u16 + (SCREEN_SIZE * sizeof(RGBA16*)) - size);
 
     // Make sure the source image is the correct size.
     if (size != SRC_IMG_SIZE) {
@@ -266,15 +266,29 @@ void draw_crashed_image_i4(void) {
     // DMA the data directly onto the framebuffer.
     dma_read(fb_u8, segStart, segEnd);
 
+    const s32 diff = (SIZ_RGBA16_C - SIZ_I4); // 1
+    const s32 shiftUpper = (SIZ_I4 * 1); // 0
+    const s32 shiftLower = (SIZ_I4 * 0); // 0
+    const s32 diffShiftUpper = (diff - shiftUpper); // -3
+    const s32 diffShiftLower = (diff - shiftLower); //  1
+
     // Copy and convert the image data from the framebuffer to itself.
     for (u32 i = 0; i < SRC_IMG_SIZE; i++) {
         srcColor = *fb_u8++;
 
-        color = (srcColor & (BITMASK(4) << 4));
-        *fb_u16++ = ((color <<  8) | (color << 3) | (color >> 2) | 0x1); // GPACK_RGBA5551
+        // Convert upper 4 bits to RGBA16
+        color = (srcColor & (MSK_I4 << shiftUpper));
+        *fb_u16++ = (SSHIFTL(color, (IDX_RGBA16_R + diffShiftUpper)) // color << 8
+                   | SSHIFTL(color, (IDX_RGBA16_G + diffShiftUpper)) // color << 3
+                   | SSHIFTL(color, (IDX_RGBA16_B + diffShiftUpper)) // color >> 2
+                   | MSK_RGBA16_A);
 
-        color = (srcColor & (BITMASK(4) << 0));
-        *fb_u16++ = ((color << 12) | (color << 7) | (color << 2) | 0x1); // GPACK_RGBA5551
+        // Convert lower 4 bits to RGBA16
+        color = (srcColor & (MSK_I4 << shiftLower));
+        *fb_u16++ = (SSHIFTL(color, (IDX_RGBA16_R + diffShiftLower)) // color << 12
+                   | SSHIFTL(color, (IDX_RGBA16_G + diffShiftLower)) // color <<  7
+                   | SSHIFTL(color, (IDX_RGBA16_B + diffShiftLower)) // color <<  2
+                   | MSK_RGBA16_A);
     }
 }
 #endif // CRASH_SCREEN_CRASH_SCREEN

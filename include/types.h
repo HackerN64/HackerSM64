@@ -10,7 +10,11 @@
 
 #define BIT(i)  (1 << (i))
 #define BITMASK(size) ((BIT(size)) - 1)
-#define SHIFTED_BITMASK(size, shift) (BITMASK(size) << shift)
+#define SHIFTED_BITMASK(size, shift)    (BITMASK(size) << (shift))
+
+// Signed shift (inverts shift direction if the shift amount is negative).
+#define SSHIFTL(src, shift)             (((shift) < 0) ? ((src) >> -(shift)) : ((src) << (shift)))
+#define SSHIFTR(src, shift)             (((shift) < 0) ? ((src) << -(shift)) : ((src) >> (shift)))
 
 // #define COND_BIT(cond, dst, flag) { (dst) &= ~(flag); if (cond) (dst) |= (flag); }
 #define COND_BIT(cond, dst, flag) { \

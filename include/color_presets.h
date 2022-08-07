@@ -119,9 +119,6 @@
 #define I4_TO_RGBA16_C(c)                               (((c) << (SIZ_RGBA16_C - SIZ_I4)) & MSK_RGBA16_C)
 #define I8_TO_RGBA16_C(c)                               (((c) >> (SIZ_I8 - SIZ_RGBA16_C)) & MSK_RGBA16_C)
 
-#define RGBA16_COMPOSITE(r, g, b, a)                    (R_RGBA16(r) | G_RGBA16(g) | B_RGBA16(b) | A_RGBA16(a))
-#define RGBA16_COMPOSITE_GRAYSCALE(val, alpha)          RGBA16_COMPOSITE((val), (val), (val), (alpha))
-
 #define COMPOSITE_TO_COLOR(src, bitmask, index)         (((((src) >> (index)) & (bitmask)) * 255.0f) / (bitmask))
 #define COLOR_TO_COMPOSITE(src, bitmask, index)         (((CompositeColor)(((src) * (bitmask)) / 255.0f) & (bitmask)) << (index))
 
@@ -132,10 +129,18 @@
 #define COLORRGB1_TO_RGBA32(src)                        (R_RGBA32((src)[0]) | G_RGBA32((src)[1]) | B_RGBA32((src)[2]) | MSK_RGBA32_A)
 #define COLORRGBA_TO_RGBA32(src)                        (R_RGBA32((src)[0]) | G_RGBA32((src)[1]) | B_RGBA32((src)[2]) | A_RGBA32((src)[3]))
 
-#define COLORRGBA_TO_RGBA16(src)                        GPACK_RGBA5551((src)[0], (src)[1], (src)[2], (src)[3])
-#define RGBA32_TO_RGBA16(src)                           GPACK_RGBA5551(RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src))
-
 #define RGBA32_TO_COLORRGBA(src)                        { RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src) }
+
+// GPACK_RGBA5551 but slightly faster in some cases.
+#define RGBA_TO_RGBA16(r, g, b, a)                              \
+    ((((r) >> (SIZ_RGBA32_C - SIZ_RGBA16_C)) << IDX_RGBA16_R) | \
+     (((g) >> (SIZ_RGBA32_C - SIZ_RGBA16_C)) << IDX_RGBA16_G) | \
+     (((b) >> (SIZ_RGBA32_C - SIZ_RGBA16_C)) << IDX_RGBA16_B) | \
+     (((a) >> (SIZ_RGBA32_A - SIZ_RGBA16_A)) << IDX_RGBA16_A))
+
+#define COLORRGBA_TO_RGBA16(src)                        RGBA_TO_RGBA16((src)[0], (src)[1], (src)[2], (src)[3])
+#define RGBA32_TO_RGBA16(src)                           RGBA_TO_RGBA16(RGBA32_R(src), RGBA32_G(src), RGBA32_B(src), RGBA32_A(src))
+
 
 
 // -- Presets --
