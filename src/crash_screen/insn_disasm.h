@@ -77,8 +77,8 @@ typedef union {
 // Instruction database format
 typedef struct __attribute__((packed)) {
     /*0x00*/ InsnData i;
-    /*0x04*/ u16 paramType;
-    /*0x06*/ char name[10];
+    /*0x04*/ s32 paramType;
+    /*0x08*/ char name[8];
 } InsnTemplate; /*0x10*/
 
 // sDisasmColors

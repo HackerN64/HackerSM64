@@ -13,7 +13,7 @@
 
 
 // MIPS III Instructions
-static const InsnTemplate insn_db[] = {
+ALIGNED32 static const InsnTemplate insn_db[] = {
     INSN_ID_1(0b000000, 0b00000, 0b00000, 0b00000, 0b00000, 0b000000, PARAM_NOP, "NOP"    ) // NOP
 //            COP1,    fmt,       rt,      fs,      fd,      MOV
     // Floating point
