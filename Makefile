@@ -819,10 +819,7 @@ $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
 ifeq ($(FIXLIGHTS),1)
 # This must not be run multiple times at once, so we run it ahead of time rather than in a rule
 DUMMY != $(FIXLIGHTS_PY) actors
-# Modify the leveldata build rule to fix lights for any files in that level's folder
-$(BUILD_DIR)/levels/%/leveldata.o: levels/%/leveldata.c
-	$(V)$(FIXLIGHTS_PY) $(dir $<)
-	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
+DUMMY != $(FIXLIGHTS_PY) levels
 endif
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
