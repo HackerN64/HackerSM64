@@ -57,9 +57,9 @@ enum TTMPaintingIDs {
 
 // Painting group ids
 enum PaintingGroups {
-    /* 0*/PAINTING_GROUP_HMC,
-    /* 1*/PAINTING_GROUP_INSIDE_CASTLE,
-    /* 2*/PAINTING_GROUP_TTM,
+    /* 0*/ PAINTING_GROUP_HMC,
+    /* 1*/ PAINTING_GROUP_INSIDE_CASTLE,
+    /* 2*/ PAINTING_GROUP_TTM,
     PAINTING_NUM_GROUPS,
     PAINTING_GROUP_NULL = -1,
 };
@@ -121,31 +121,29 @@ struct Painting {
 
     /// Display list used when the painting is normal.
     /*0x24*/ const Gfx *normalDisplayList;
-    /// Data used to map the texture to the mesh
-    /*0x28*/ const PaintingData *const *textureMaps;
 
     // Texture data
-    /*0x2C*/ const Texture *const *textureArray;
-    /*0x30*/ PaintingData textureWidth;
-    /*0x32*/ PaintingData textureHeight;
+    /*0x28*/ const Texture *const *textureArray;
+    /*0x2C*/ PaintingData textureWidth;
+    /*0x2E*/ PaintingData textureHeight;
 
     /// Display list used when the painting is rippling.
-    /*0x34*/ const Gfx *rippleDisplayList;
+    /*0x30*/ const Gfx *rippleDisplayList;
 
     /// Controls when a passive ripple starts. RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
-    /*0x38*/ s8 rippleTrigger;
+    /*0x34*/ s8 rippleTrigger;
 
     /// The painting's transparency (0..255). Determines what layer the painting is in.
-    /*0x39*/ Alpha alpha;
+    /*0x35*/ Alpha alpha;
 
     /// Struct padding.
-    /*0x3A*/ PaintingData unused;
+    /*0x36*/ PaintingData unused;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f
-    /*0x3C*/ f32 sizeX;
-    /*0x40*/ f32 sizeY;
-}; /*0x44*/
+    /*0x38*/ f32 sizeX;
+    /*0x3C*/ f32 sizeY;
+}; /*0x40*/
 
 /**
  * Contains the position and normal of a vertex in the painting's generated mesh.

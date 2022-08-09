@@ -604,7 +604,7 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
 /**
  * Ripple a painting that has 1 or more images that need to be mapped
  */
-Gfx *painting_ripple_image(struct Painting *painting) {
+Gfx *painting_ripple_image(struct Painting *painting, PaintingData **textureMaps) {
     PaintingData i;
     PaintingData meshVerts;
     PaintingData meshTris;
@@ -612,7 +612,6 @@ Gfx *painting_ripple_image(struct Painting *painting) {
     PaintingData imageCount = painting->imageCount;
     PaintingData tWidth = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
-    PaintingData **textureMaps = segmented_to_virtual(painting->textureMaps);
     Texture **textures = segmented_to_virtual(painting->textureArray);
     Gfx *dlist = alloc_display_list((imageCount + 6) * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -646,13 +645,12 @@ Gfx *painting_ripple_image(struct Painting *painting) {
 /**
  * Ripple a painting that has 1 "environment map" texture.
  */
-Gfx *painting_ripple_env_mapped(struct Painting *painting) {
+Gfx *painting_ripple_env_mapped(struct Painting *painting, PaintingData **textureMaps) {
     PaintingData meshVerts;
     PaintingData meshTris;
     PaintingData *textureMap;
     PaintingData tWidth = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
-    PaintingData **textureMaps = segmented_to_virtual(painting->textureMaps);
     Texture **tArray = segmented_to_virtual(painting->textureArray);
     Gfx *dlist = alloc_display_list(7 * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -701,10 +699,10 @@ Gfx *display_painting_rippling(struct Painting *painting) {
     // Map the painting's texture depending on the painting's texture type.
     switch (painting->textureType) {
         case PAINTING_IMAGE:
-            dlist = painting_ripple_image(painting);
+            dlist = painting_ripple_image(painting, segmented_to_virtual(seg2_painting_image_texture_maps));
             break;
         case PAINTING_ENV_MAP:
-            dlist = painting_ripple_env_mapped(painting);
+            dlist = painting_ripple_env_mapped(painting, segmented_to_virtual(seg2_painting_env_map_texture_maps));
             break;
     }
 
@@ -850,7 +848,6 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         // Draw the painting.
         if (painting->imageCount > 0
          && painting->normalDisplayList != NULL
-         && painting->textureMaps != NULL
          && painting->textureArray != NULL
          && painting->textureWidth > 0
          && painting->textureHeight > 0
