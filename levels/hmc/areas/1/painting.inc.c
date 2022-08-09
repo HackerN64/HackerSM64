@@ -476,7 +476,7 @@ const Texture *const hmc_seg7_painting_textures_cotmc[] = {
 // 0x0702551C (PaintingData)
 const struct Painting cotmc_painting = {
     /* id */ PAINTING_ID_HMC_COTMC,
-    /* Image Count */ 0x01,
+    /* Image Count */ 1,
     /* Texture Type */ PAINTING_ENV_MAP,
     /*                      passive     entry */
     /* Ripple Magnitude */    10.0f,    30.0f,
@@ -490,5 +490,6 @@ const struct Painting cotmc_painting = {
     /* Ripple DList */ hmc_seg7_painting_dl_cotmc_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xFF,
+    /* Unused*/ 0,
     /* Size */  723.968018f, 723.968018f,
 };

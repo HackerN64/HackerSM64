@@ -283,7 +283,6 @@ static const PaintingData ttm_seg7_painting_texture_map_bottom_07012450[] = {
     73, 71, 68,
 };
 
-
 // 0x0701296C - 0x07012E84
 static const PaintingData ttm_seg7_painting_top_0701296C[] = {
     85, // num mappings
@@ -512,15 +511,11 @@ static const PaintingData ttm_seg7_painting_top_0701296C[] = {
     72, 70, 67,
 };
 
-
 // 0x07012E88
 static const PaintingData *const ttm_seg7_painting_texture_maps_07012E88[] = {
     ttm_seg7_painting_texture_map_bottom_07012450,
     ttm_seg7_painting_top_0701296C,
 };
-
-UNUSED static const u64 ttm_unused_0 = 0x0;
-
 
 // 0x07012E98 - 0x07012EF8
 static const Gfx ttm_seg7_painting_dl_slide_normal[] = {
@@ -547,7 +542,7 @@ ALIGNED8 static const Texture *const ttm_seg7_painting_textures_slide[] = {
 // 0x07012F00 (PaintingData)
 const struct Painting ttm_slide_painting = {
     /* id */ PAINTING_ID_TTM_SLIDE,
-    /* Image Count */ 0x02,
+    /* Image Count */ 2,
     /* Texture Type */ PAINTING_IMAGE,
     /*                      passive     entry */
     /* Ripple Magnitude */    20.0f,    80.0f,
@@ -561,5 +556,6 @@ const struct Painting ttm_slide_painting = {
     /* Ripple DList */ ttm_seg7_painting_dl_slide_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
+    /* Unused*/ 0,
     /* Size */  460.8f, 460.8f,
 };

@@ -9,7 +9,7 @@
 
 /// Use to properly set a GraphNodeGenerated's parameter to point to the right painting.
 /// Use this for both bparam1 and bparam2 for painting objects.
-#define PAINTING_ID(id, grp) (id | (grp << 8))
+#define PAINTING_ID(id, grp) ((id) | ((grp) << 8))
 
 /// The default painting side length.
 #define PAINTING_SIZE 614.0f
@@ -28,38 +28,38 @@
 
 // HMC painting group
 enum HMCPaintingIDs {
-    /*0x0*/ PAINTING_ID_HMC_COTMC,
+    /* 0*/ PAINTING_ID_HMC_COTMC,
 };
 
 // Inside Castle painting group
 enum CastlePaintingIDs {
-    /*0x0*/ PAINTING_ID_CASTLE_BOB,
-    /*0x1*/ PAINTING_ID_CASTLE_CCM,
-    /*0x2*/ PAINTING_ID_CASTLE_WF,
-    /*0x3*/ PAINTING_ID_CASTLE_JRB,
-    /*0x4*/ PAINTING_ID_CASTLE_LLL,
-    /*0x5*/ PAINTING_ID_CASTLE_SSL,
-    /*0x6*/ PAINTING_ID_CASTLE_HMC,
-    /*0x7*/ PAINTING_ID_CASTLE_DDD,
-    /*0x8*/ PAINTING_ID_CASTLE_WDW,
-    /*0x9*/ PAINTING_ID_CASTLE_THI_TINY,
-    /*0xA*/ PAINTING_ID_CASTLE_TTM,
-    /*0xB*/ PAINTING_ID_CASTLE_TTC,
-    /*0xC*/ PAINTING_ID_CASTLE_SL,
-    /*0xD*/ PAINTING_ID_CASTLE_THI_HUGE,
-    /*0xE*/ PAINTING_ID_CASTLE_RR,
+    /* 0*/ PAINTING_ID_CASTLE_BOB,
+    /* 1*/ PAINTING_ID_CASTLE_CCM,
+    /* 2*/ PAINTING_ID_CASTLE_WF,
+    /* 3*/ PAINTING_ID_CASTLE_JRB,
+    /* 4*/ PAINTING_ID_CASTLE_LLL,
+    /* 5*/ PAINTING_ID_CASTLE_SSL,
+    /* 6*/ PAINTING_ID_CASTLE_HMC,
+    /* 7*/ PAINTING_ID_CASTLE_DDD,
+    /* 8*/ PAINTING_ID_CASTLE_WDW,
+    /* 9*/ PAINTING_ID_CASTLE_THI_TINY,
+    /*10*/ PAINTING_ID_CASTLE_TTM,
+    /*11*/ PAINTING_ID_CASTLE_TTC,
+    /*12*/ PAINTING_ID_CASTLE_SL,
+    /*13*/ PAINTING_ID_CASTLE_THI_HUGE,
+    /*14*/ PAINTING_ID_CASTLE_RR,
 };
 
 // TTM painting group
 enum TTMPaintingIDs {
-    /*0x0*/ PAINTING_ID_TTM_SLIDE,
+    /* 0*/ PAINTING_ID_TTM_SLIDE,
 };
 
 // Painting group ids
 enum PaintingGroups {
-    PAINTING_GROUP_HMC,
-    PAINTING_GROUP_INSIDE_CASTLE,
-    PAINTING_GROUP_TTM,
+    /* 0*/PAINTING_GROUP_HMC,
+    /* 1*/PAINTING_GROUP_INSIDE_CASTLE,
+    /* 2*/PAINTING_GROUP_TTM,
     PAINTING_NUM_GROUPS,
     PAINTING_GROUP_NULL = -1,
 };
@@ -80,11 +80,11 @@ enum RippleTriggers {
 // Painting->lastFlags, Painting->currFlags, Painting->changedFlags
 enum PaintingRippleFlags {
     // Not rippling.
-    RIPPLE_FLAGS_NONE  = (0 << 0), // 0x00
+    RIPPLE_FLAGS_NONE  = 0x0,
     // Triggers an entry ripple.
-    RIPPLE_FLAG_ENTER  = (1 << 0), // 0x01
+    RIPPLE_FLAG_ENTER  = BIT(0), // 0x01
     // Triggers a passive ripple.
-    RIPPLE_FLAG_RIPPLE = (1 << 1), // 0x02
+    RIPPLE_FLAG_RIPPLE = BIT(1), // 0x02
 };
 
 // Painting->textureType
@@ -97,52 +97,55 @@ enum PaintingType {
 
 struct Painting {
     /// Id of the painting warp node.
-    PaintingData id;
+    /*0x00*/ PaintingData id;
     /// How many images should be drawn when the painting is rippling.
-    s8 imageCount;
+    /*0x02*/ s8 imageCount;
     /// Either PAINTING_IMAGE or PAINTING_ENV_MAP
-    s8 textureType;
+    /*0x03*/ s8 textureType;
 
     /// Controls how high the peaks of the ripple are.
-    f32 passiveRippleMag;
-    f32 entryRippleMag;
+    /*0x04*/ f32 passiveRippleMag;
+    /*0x08*/ f32 entryRippleMag;
 
     /// Multiplier that controls how fast the ripple regresses to the IDLE state.
-    f32 passiveRippleDecay;
-    f32 entryRippleDecay;
+    /*0x0C*/ f32 passiveRippleDecay;
+    /*0x10*/ f32 entryRippleDecay;
 
     /// Controls the ripple's frequency
-    f32 passiveRippleRate;
-    f32 entryRippleRate;
+    /*0x14*/ f32 passiveRippleRate;
+    /*0x18*/ f32 entryRippleRate;
 
     /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple
-    f32 passiveDispersionFactor;
-    f32 entryDispersionFactor;
+    /*0x1C*/ f32 passiveDispersionFactor;
+    /*0x20*/ f32 entryDispersionFactor;
 
     /// Display list used when the painting is normal.
-    const Gfx *normalDisplayList;
+    /*0x24*/ const Gfx *normalDisplayList;
     /// Data used to map the texture to the mesh
-    const PaintingData *const *textureMaps;
+    /*0x28*/ const PaintingData *const *textureMaps;
 
     // Texture data
-    const Texture *const *textureArray;
-    s16 textureWidth;
-    s16 textureHeight;
+    /*0x2C*/ const Texture *const *textureArray;
+    /*0x30*/ PaintingData textureWidth;
+    /*0x32*/ PaintingData textureHeight;
 
     /// Display list used when the painting is rippling.
-    const Gfx *rippleDisplayList;
+    /*0x34*/ const Gfx *rippleDisplayList;
 
     /// Controls when a passive ripple starts. RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
-    s8 rippleTrigger;
+    /*0x38*/ s8 rippleTrigger;
 
-    /// The painting's transparency. Determines what layer the painting is in.
-    Alpha alpha;
+    /// The painting's transparency (0..255). Determines what layer the painting is in.
+    /*0x39*/ Alpha alpha;
+
+    /// Struct padding.
+    /*0x3A*/ PaintingData unused;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f
-    f32 sizeX;
-    f32 sizeY;
-};
+    /*0x3C*/ f32 sizeX;
+    /*0x40*/ f32 sizeY;
+}; /*0x44*/
 
 /**
  * Contains the position and normal of a vertex in the painting's generated mesh.
@@ -150,7 +153,7 @@ struct Painting {
 struct PaintingMeshVertex {
     /*0x00*/ Vec3s pos;
     /*0x06*/ Vec3c norm;
-};
+}; /*0x0C*/
 
 extern struct PaintingMeshVertex *gPaintingMesh;
 extern Vec3f *gPaintingTriNorms;

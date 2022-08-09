@@ -2873,9 +2873,17 @@ const Gfx dl_paintings_env_mapped_end[] = {
 
 // 0x02014A30 - 0x02014A60
 const Gfx dl_paintings_draw_ripples[] = {
+#ifdef F3DEX_GBI_2
+    gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
+    gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
+    gsSP2Triangles(12, 13, 14, 0x0, 15, 16, 17, 0x0),
+    gsSP2Triangles(18, 19, 20, 0x0, 21, 22, 23, 0x0),
+    gsSP2Triangles(24, 25, 26, 0x0, 27, 28, 29, 0x0),
+#else
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
     gsSP1Triangle( 12, 13, 14, 0x0),
+#endif
     gsSPEndDisplayList(),
 };
 
