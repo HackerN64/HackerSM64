@@ -389,284 +389,209 @@ ALIGNED8 static const Texture *const inside_castle_seg7_painting_textures_sl[] =
 
 // 0x07023620 - 0x07023698
 const struct Painting bob_painting = {
-    /* id */ PAINTING_ID_CASTLE_BOB,
+    /* ID */ PAINTING_ID_CASTLE_BOB,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
+
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_bob,
     /* Textures */     inside_castle_seg7_painting_textures_bob,
-    /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
-    /* Size */  614.0f, 614.0f,
+    /* Texture w, h */ 64, 32,    /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023698 - 0x07023710
 const struct Painting ccm_painting = {
-    /* id */ PAINTING_ID_CASTLE_CCM,
+    /* ID */ PAINTING_ID_CASTLE_CCM,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_ccm,
     /* Textures */     inside_castle_seg7_painting_textures_ccm,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023710 - 0x07023788
 const struct Painting wf_painting = {
-    /* id */ PAINTING_ID_CASTLE_WF,
+    /* ID */ PAINTING_ID_CASTLE_WF,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_wf,
     /* Textures */     inside_castle_seg7_painting_textures_wf,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023788 - 0x07023800
 const struct Painting jrb_painting = {
-    /* id */ PAINTING_ID_CASTLE_JRB,
+    /* ID */ PAINTING_ID_CASTLE_JRB,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_jrb,
     /* Textures */     inside_castle_seg7_painting_textures_jrb,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023800 - 0x07023878
 const struct Painting lll_painting = {
-    /* id */ PAINTING_ID_CASTLE_LLL,
+    /* ID */ PAINTING_ID_CASTLE_LLL,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_lll,
     /* Textures */     inside_castle_seg7_painting_textures_lll,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023878 - 0x070238F0
 const struct Painting ssl_painting = {
-    /* id */ PAINTING_ID_CASTLE_SSL,
+    /* ID */ PAINTING_ID_CASTLE_SSL,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_ssl,
     /* Textures */     inside_castle_seg7_painting_textures_ssl,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  614.0f, 614.0f,
 };
 
 // 0x070238F0 - 0x07023968
 const struct Painting hmc_painting = {
-    /* id */ PAINTING_ID_CASTLE_HMC,
+    /* ID */ PAINTING_ID_CASTLE_HMC,
     /* Image Count */ 1,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_ENV_MAP,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    10.0f,    30.0f,
-    /* Ripple Decay */         1.0f,    0.98f,
-    /* Ripple Rate */         0.05f,    0.05f,
-    /* Ripple Dispersion */   15.0f,    15.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
+    /* Ripple Animation */ RIPPLE_ANIM_CONTINUOUS,
     /* Normal DList */ inside_castle_seg7_painting_dl_hmc,
     /* Textures */     inside_castle_seg7_painting_textures_hmc_env,
     /* Texture w, h */ 32, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  768.0f, 768.0f,
 };
 
 // 0x07023968 - 0x070239E0
 const struct Painting ddd_painting = {
-    /* id */ PAINTING_ID_CASTLE_DDD,
+    /* ID */ PAINTING_ID_CASTLE_DDD,
     /* Image Count */ 1,
+    /* Alpha */ 0xB4,
     /* Texture Type */ PAINTING_ENV_MAP,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    10.0f,    30.0f,
-    /* Ripple Decay */         1.0f,    0.98f,
-    /* Ripple Rate */         0.05f,    0.05f,
-    /* Ripple Dispersion */   15.0f,    15.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
+    /* Ripple Animation */ RIPPLE_ANIM_CONTINUOUS,
     /* Normal DList */ inside_castle_seg7_painting_dl_ddd,
     /* Textures */     inside_castle_seg7_painting_textures_ddd_env,
     /* Texture w, h */ 32, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
-    /* Alpha */ 0xB4,
-    /* Unused*/ 0,
     /* Size */  819.2f, 819.2f,
 };
 
 // 0x070239E0 - 0x07023A58
 const struct Painting wdw_painting = {
-    /* id */ PAINTING_ID_CASTLE_WDW,
+    /* ID */ PAINTING_ID_CASTLE_WDW,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_wdw,
     /* Textures */     inside_castle_seg7_painting_textures_wdw,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  614.0f, 614.0f,
 };
 
 // 0x07023A58 - 0x07023AD0
 const struct Painting thi_tiny_painting = {
-    /* id */ PAINTING_ID_CASTLE_THI_TINY,
+    /* ID */ PAINTING_ID_CASTLE_THI_TINY,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_thi,
     /* Textures */     inside_castle_seg7_painting_textures_thi,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  393.216f, 393.216f,
 };
 
 // 0x07023AD0 - 0x07023B48
 const struct Painting ttm_painting = {
-    /* id */ PAINTING_ID_CASTLE_TTM,
+    /* ID */ PAINTING_ID_CASTLE_TTM,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_ttm,
     /* Textures */     inside_castle_seg7_painting_textures_ttm,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  256.0f, 256.0f,
 };
 
 // 0x07023B48 - 0x07023BC0
 const struct Painting ttc_painting = {
-    /* id */ PAINTING_ID_CASTLE_TTC,
+    /* ID */ PAINTING_ID_CASTLE_TTC,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_ttc,
     /* Textures */     inside_castle_seg7_painting_textures_ttc,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  409.6f, 409.6f,
 };
 
 // 0x07023BC0 - 0x07023C38
 const struct Painting sl_painting = {
-    /* id */ PAINTING_ID_CASTLE_SL,
+    /* ID */ PAINTING_ID_CASTLE_SL,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ inside_castle_seg7_painting_dl_sl,
     /* Textures */     inside_castle_seg7_painting_textures_sl,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  716.8f, 716.8f,
 };
 
 // 0x07023C38 - 0x07023CB0
 const struct Painting thi_huge_painting = {
-    /* id */ PAINTING_ID_CASTLE_THI_HUGE,
+    /* ID */ PAINTING_ID_CASTLE_THI_HUGE,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    40.0f,   160.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.12f,    0.07f,
-    /* Ripple Dispersion */   80.0f,    60.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY_LARGE,
     /* Normal DList */ inside_castle_seg7_painting_dl_thi,
     /* Textures */     inside_castle_seg7_painting_textures_thi,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  1638.4f, 1638.4f,
 };
 
 const struct Painting rr_painting = {
-    /* id */ PAINTING_ID_CASTLE_THI_HUGE,
+    /* ID */ PAINTING_ID_CASTLE_THI_HUGE,
     /* Image Count */ 0,
+    /* Alpha */ 0x00,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    40.0f,   160.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.12f,    0.07f,
-    /* Ripple Dispersion */   80.0f,    60.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ NULL,
     /* Textures */     NULL,
     /* Texture w, h */  0,  0,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0x00,
-    /* Unused*/ 0,
     /* Size */  204.8f, 204.8f,
 };

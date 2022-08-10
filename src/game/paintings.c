@@ -85,18 +85,45 @@ struct Object *gRipplingPainting = NULL;
 struct Object *gEnteredPainting = NULL;
 
 /**
- * HMC painting group
+ * Info for ripple animations.
  */
-struct Painting *sHmcPaintings[] = {
+static const struct RippleAnimationInfo sRippleAnimationInfo[] = {
+    { // RIPPLE_ANIM_CONTINUOUS
+        /*                      passive     entry */
+        /* Ripple Magnitude */    10.0f,    30.0f,
+        /* Ripple Decay */         1.0f,    0.98f,
+        /* Ripple Rate */         0.05f,    0.05f,
+        /* Ripple Dispersion */   15.0f,    15.0f,
+    },
+    { // RIPPLE_ANIM_PROXIMITY
+        /*                      passive     entry */
+        /* Ripple Magnitude */    20.0f,    80.0f,
+        /* Ripple Decay */      0.9608f,  0.9524f,
+        /* Ripple Rate */         0.24f,    0.14f,
+        /* Ripple Dispersion */   40.0f,    30.0f,
+    },
+    { // RIPPLE_ANIM_PROXIMITY_LARGE
+        /*                      passive     entry */
+        /* Ripple Magnitude */    40.0f,   160.0f,
+        /* Ripple Decay */      0.9608f,  0.9524f,
+        /* Ripple Rate */         0.12f,    0.07f,
+        /* Ripple Dispersion */   80.0f,    60.0f,
+    }
+};
+
+/**
+ * HMC painting group.
+ */
+const struct Painting *sHmcPaintings[] = {
     /*Painting ID                   */
     /*PAINTING_ID_HMC_COTMC         */ &cotmc_painting,
     NULL,
 };
 
 /**
- * Inside Castle painting group
+ * Inside Castle painting group.
  */
-struct Painting *sInsideCastlePaintings[] = {
+const struct Painting *sInsideCastlePaintings[] = {
     /*Painting ID                   */
     /*PAINTING_ID_CASTLE_BOB        */ &bob_painting,
     /*PAINTING_ID_CASTLE_CCM        */ &ccm_painting,
@@ -117,18 +144,18 @@ struct Painting *sInsideCastlePaintings[] = {
 };
 
 /**
- * TTM painting group
+ * TTM painting group.
  */
-struct Painting *sTtmPaintings[] = {
+const struct Painting *sTtmPaintings[] = {
     /*Painting ID                   */
     /*PAINTING_ID_TTM_SLIDE         */ &ttm_slide_painting,
     NULL,
 };
 
 /**
- * Array of all painting groups
+ * Array of all painting groups.
  */
-struct Painting **sPaintingGroups[] = {
+const struct Painting **sPaintingGroups[] = {
     /*Group ID                      */
     /*PAINTING_GROUP_HMC            */ sHmcPaintings,
     /*PAINTING_GROUP_INSIDE_CASTLE  */ sInsideCastlePaintings,
@@ -160,22 +187,23 @@ UNUSED s32 get_painting_group(void) {
  * @param resetTimer if TRUE, set the timer to 0
  */
 void painting_state(struct Object *obj, s8 state, s8 centerRipples, s8 resetTimer) {
-    struct Painting *painting = obj->oPaintingPtr;
+    const struct Painting *painting = obj->oPaintingPtr;
+    const struct RippleAnimationInfo *anim = &sRippleAnimationInfo[painting->rippleAnimationType];
 
     // Use a different set of variables depending on the state
     switch (state) {
         case PAINTING_RIPPLE:
-            obj->oPaintingCurrRippleMag    = painting->passiveRippleMag;
-            obj->oPaintingRippleDecay      = painting->passiveRippleDecay;
-            obj->oPaintingCurrRippleRate   = painting->passiveRippleRate;
-            obj->oPaintingDispersionFactor = painting->passiveDispersionFactor;
+            obj->oPaintingCurrRippleMag    = anim->passiveRippleMag;
+            obj->oPaintingRippleDecay      = anim->passiveRippleDecay;
+            obj->oPaintingCurrRippleRate   = anim->passiveRippleRate;
+            obj->oPaintingDispersionFactor = anim->passiveDispersionFactor;
             break;
 
         case PAINTING_ENTERED:
-            obj->oPaintingCurrRippleMag    = painting->entryRippleMag;
-            obj->oPaintingRippleDecay      = painting->entryRippleDecay;
-            obj->oPaintingCurrRippleRate   = painting->entryRippleRate;
-            obj->oPaintingDispersionFactor = painting->entryDispersionFactor;
+            obj->oPaintingCurrRippleMag    = anim->entryRippleMag;
+            obj->oPaintingRippleDecay      = anim->entryRippleDecay;
+            obj->oPaintingCurrRippleRate   = anim->entryRippleRate;
+            obj->oPaintingDispersionFactor = anim->entryDispersionFactor;
             break;
     }
 
@@ -254,8 +282,9 @@ void painting_update_mario_pos(struct Object *obj) {
  * Automatically changes the painting back to IDLE state (or RIPPLE for continuous paintings) if the
  * ripple's magnitude becomes small enough.
  */
-void painting_update_ripple_state(struct Painting *painting) {
+void painting_update_ripple_state(const struct Painting *painting) {
     struct Object *obj = gCurGraphNodeObjectNode;
+    const struct RippleAnimationInfo *anim = &sRippleAnimationInfo[painting->rippleAnimationType];
 
     if (obj->oPaintingUpdateCounter != obj->oLastPaintingUpdateCounter) {
         obj->oPaintingCurrRippleMag *= obj->oPaintingRippleDecay;
@@ -278,12 +307,12 @@ void painting_update_ripple_state(struct Painting *painting) {
         // passive ripple, make it do a passive ripple.
         // If Mario goes below the surface but doesn't warp, the painting will eventually reset.
         if ((obj->oPaintingState == PAINTING_ENTERED)
-         && (obj->oPaintingCurrRippleMag <= painting->passiveRippleMag)) {
+         && (obj->oPaintingCurrRippleMag <= anim->passiveRippleMag)) {
             obj->oPaintingState = PAINTING_RIPPLE;
-            obj->oPaintingCurrRippleMag    = painting->passiveRippleMag;
-            obj->oPaintingRippleDecay      = painting->passiveRippleDecay;
-            obj->oPaintingCurrRippleRate   = painting->passiveRippleRate;
-            obj->oPaintingDispersionFactor = painting->passiveDispersionFactor;
+            obj->oPaintingCurrRippleMag    = anim->passiveRippleMag;
+            obj->oPaintingRippleDecay      = anim->passiveRippleDecay;
+            obj->oPaintingCurrRippleRate   = anim->passiveRippleRate;
+            obj->oPaintingDispersionFactor = anim->passiveDispersionFactor;
         }
     }
 }
@@ -307,7 +336,7 @@ void painting_update_ripple_state(struct Painting *painting) {
  *
  * The mesh used in game, seg2_painting_triangle_mesh, is in bin/segment2.c.
  */
-void painting_generate_mesh(struct Painting *painting, PaintingData *mesh, PaintingData numTris) {
+void painting_generate_mesh(const struct Painting *painting, PaintingData *mesh, PaintingData numTris) {
     struct Object *obj = gCurGraphNodeObjectNode;
     PaintingData i, tri;
 
@@ -582,7 +611,7 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
 /**
  * Orient the painting mesh for rendering.
  */
-Gfx *painting_model_view_transform(struct Painting *painting) {
+Gfx *painting_model_view_transform(const struct Painting *painting) {
     u32 commands = (
         /*gSPMatrix         */ 1 +
         /*gSPEndDisplayList */ 1
@@ -607,7 +636,7 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
 /**
  * Ripple a painting that has 1 or more images that need to be mapped
  */
-Gfx *painting_ripple_image(struct Painting *painting, PaintingData **textureMaps) {
+Gfx *painting_ripple_image(const struct Painting *painting, PaintingData **textureMaps) {
     PaintingData i;
     PaintingData meshVerts;
     PaintingData meshTris;
@@ -657,7 +686,7 @@ Gfx *painting_ripple_image(struct Painting *painting, PaintingData **textureMaps
 /**
  * Ripple a painting that has 1 "environment map" texture.
  */
-Gfx *painting_ripple_env_mapped(struct Painting *painting, PaintingData **textureMaps) {
+Gfx *painting_ripple_env_mapped(const struct Painting *painting, PaintingData **textureMaps) {
     PaintingData meshVerts;
     PaintingData meshTris;
     PaintingData *textureMap;
@@ -703,7 +732,7 @@ Gfx *painting_ripple_env_mapped(struct Painting *painting, PaintingData **textur
  * Generates a mesh, calculates vertex normals for lighting, and renders a rippling painting.
  * The mesh and vertex normals are regenerated and freed every frame.
  */
-Gfx *display_painting_rippling(struct Painting *painting) {
+Gfx *display_painting_rippling(const struct Painting *painting) {
     PaintingData *mesh = segmented_to_virtual(seg2_painting_triangle_mesh);
     PaintingData *neighborTris = segmented_to_virtual(seg2_painting_mesh_neighbor_tris);
     PaintingData numVtx = mesh[0];
@@ -735,7 +764,7 @@ Gfx *display_painting_rippling(struct Painting *painting) {
 /**
  * Render a normal painting.
  */
-Gfx *display_painting_not_rippling(struct Painting *painting) {
+Gfx *display_painting_not_rippling(const struct Painting *painting) {
     u32 commands = (
         /*gSPDisplayList    */ 1 +
         /*gSPDisplayList    */ 1 +
@@ -842,7 +871,7 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     }
 
     Gfx *paintingDlist = NULL;
-    struct Painting *painting = obj->oPaintingPtr;
+    const struct Painting *painting = obj->oPaintingPtr;
 
     if (painting == NULL) {
         return NULL;
@@ -933,7 +962,7 @@ void bhv_painting_init(void) {
         return;
     }
 
-    struct Painting **paintingGroup = sPaintingGroups[obj->oPaintingGroup];
+    const struct Painting **paintingGroup = sPaintingGroups[obj->oPaintingGroup];
     obj->oPaintingPtr = segmented_to_virtual(paintingGroup[obj->oPaintingId]);
 
     Vec3f roomFloorCheckPos;

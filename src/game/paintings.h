@@ -77,6 +77,13 @@ enum RippleTriggers {
     RIPPLE_TRIGGER_CONTINUOUS,
 };
 
+// Painting->rippleAnimationType
+enum PaintingRippleAnimations {
+    RIPPLE_ANIM_CONTINUOUS,
+    RIPPLE_ANIM_PROXIMITY,
+    RIPPLE_ANIM_PROXIMITY_LARGE,
+};
+
 // Painting->lastFlags, Painting->currFlags, Painting->changedFlags
 enum PaintingRippleFlags {
     // Not rippling.
@@ -95,52 +102,56 @@ enum PaintingType {
     PAINTING_ENV_MAP
 };
 
-struct Painting {
-    /// Id of the painting warp node.
-    /*0x00*/ PaintingData id;
-    /// How many images should be drawn when the painting is rippling.
-    /*0x02*/ s8 imageCount;
-    /// Either PAINTING_IMAGE or PAINTING_ENV_MAP
-    /*0x03*/ s8 textureType;
-
+struct RippleAnimationInfo {
     /// Controls how high the peaks of the ripple are.
-    /*0x04*/ f32 passiveRippleMag;
-    /*0x08*/ f32 entryRippleMag;
+    /*0x00*/ f32 passiveRippleMag;
+    /*0x04*/ f32 entryRippleMag;
 
     /// Multiplier that controls how fast the ripple regresses to the IDLE state.
-    /*0x0C*/ f32 passiveRippleDecay;
-    /*0x10*/ f32 entryRippleDecay;
+    /*0x08*/ f32 passiveRippleDecay;
+    /*0x0C*/ f32 entryRippleDecay;
 
     /// Controls the ripple's frequency
-    /*0x14*/ f32 passiveRippleRate;
-    /*0x18*/ f32 entryRippleRate;
+    /*0x10*/ f32 passiveRippleRate;
+    /*0x14*/ f32 entryRippleRate;
 
     /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple
-    /*0x1C*/ f32 passiveDispersionFactor;
-    /*0x20*/ f32 entryDispersionFactor;
+    /*0x18*/ f32 passiveDispersionFactor;
+    /*0x1C*/ f32 entryDispersionFactor;
+}; /*0x20*/
 
-    /// Display list used when the painting is not rippling.
-    /*0x24*/ const Gfx *normalDisplayList;
+struct Painting {
+    /// ID of the painting and the warp node.
+    /*0x00*/ PaintingData id;
 
-    // Texture data
-    /*0x28*/ const Texture *const *textureArray;
-    /*0x2C*/ PaintingData textureWidth;
-    /*0x2E*/ PaintingData textureHeight;
+    /// How many images should be drawn when the painting is rippling.
+    /*0x02*/ PaintingData imageCount;
+
+    /// The painting's transparency (0..255). Determines the drawing layer of the painting.
+    /*0x04*/ Alpha alpha;
+
+    /// Either PAINTING_IMAGE or PAINTING_ENV_MAP.
+    /*0x05*/ s8 textureType;
 
     /// Controls when a passive ripple starts. RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
-    /*0x30*/ s8 rippleTrigger;
+    /*0x06*/ s8 rippleTrigger;
 
-    /// The painting's transparency (0..255). Determines what layer the painting is in.
-    /*0x31*/ Alpha alpha;
+    /// Which animation type to use. RIPPLE_ANIM_CONTINUOUS, RIPPLE_ANIM_PROXIMITY, or RIPPLE_ANIM_PROXIMITY_LARGE.
+    /*0x07*/ s8 rippleAnimationType;
 
-    /// Struct padding.
-    /*0x32*/ PaintingData unused;
+    /// Display list used when the painting is not rippling.
+    /*0x08*/ const Gfx *normalDisplayList;
+
+    // Texture data.
+    /*0x0C*/ const Texture *const *textureArray;
+    /*0x10*/ PaintingData textureWidth;
+    /*0x12*/ PaintingData textureHeight;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f
-    /*0x34*/ f32 sizeX;
-    /*0x38*/ f32 sizeY;
-}; /*0x3C*/
+    /*0x14*/ f32 sizeX;
+    /*0x18*/ f32 sizeY;
+}; /*0x1C*/
 
 /**
  * Contains the position and normal of a vertex in the painting's generated mesh.

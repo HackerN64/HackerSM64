@@ -71,19 +71,14 @@ ALIGNED8 static const Texture *const ttm_seg7_painting_textures_slide[] = {
 
 // 0x07012F00 (PaintingData)
 const struct Painting ttm_slide_painting = {
-    /* id */ PAINTING_ID_TTM_SLIDE,
+    /* ID */ PAINTING_ID_TTM_SLIDE,
     /* Image Count */ 2,
+    /* Alpha */ 0xFF,
     /* Texture Type */ PAINTING_IMAGE,
-    /*                      passive     entry */
-    /* Ripple Magnitude */    20.0f,    80.0f,
-    /* Ripple Decay */      0.9608f,  0.9524f,
-    /* Ripple Rate */         0.24f,    0.14f,
-    /* Ripple Dispersion */   40.0f,    30.0f,
+    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
+    /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
     /* Normal DList */ ttm_seg7_painting_dl_slide_normal,
     /* Textures */     ttm_seg7_painting_textures_slide,
     /* Texture w, h */ 64, 32,
-    /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
-    /* Alpha */ 0xFF,
-    /* Unused*/ 0,
     /* Size */  460.8f, 460.8f,
 };
