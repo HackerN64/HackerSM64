@@ -7,6 +7,7 @@
 #include "macros.h"
 #include "types.h"
 
+
 /// Use to properly set a GraphNodeGenerated's parameter to point to the right painting.
 /// Use this for both bparam1 and bparam2 for painting objects.
 #define PAINTING_ID(id, grp) ((id) | ((grp) << 8))
@@ -25,6 +26,7 @@
 
 /// This is added to Mario's Y position to make the ripple closer to Mario's center of mass.
 #define PAINTING_MARIO_Y_OFFSET 50
+
 
 // HMC painting group
 enum HMCPaintingIDs {
@@ -102,6 +104,7 @@ enum PaintingType {
     PAINTING_ENV_MAP
 };
 
+
 struct RippleAnimationInfo {
     /// Controls how high the peaks of the ripple are.
     /*0x00*/ f32 passiveRippleMag;
@@ -161,14 +164,15 @@ struct PaintingMeshVertex {
     /*0x06*/ Vec3c norm;
 }; /*0x0C*/
 
-extern struct PaintingMeshVertex *gPaintingMesh;
-extern Vec3f *gPaintingTriNorms;
+
 extern struct Object *gRipplingPainting;
 extern struct Object *gEnteredPainting;
+
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
 
 void bhv_painting_init(void);
 void bhv_painting_loop(void);
+
 
 #endif // PAINTINGS_H
