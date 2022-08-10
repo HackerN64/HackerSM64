@@ -392,7 +392,6 @@ const struct Painting bob_painting = {
     /* ID */ PAINTING_ID_CASTLE_BOB,
     /* Image Count */ 2,
     /* Alpha */ 0xFF,
-
     /* Texture Type */ PAINTING_IMAGE,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Ripple Animation */ RIPPLE_ANIM_PROXIMITY,
