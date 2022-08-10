@@ -12,10 +12,10 @@
 #define PAINTING_ID(id, grp) ((id) | ((grp) << 8))
 
 /// The default painting side length.
-#define PAINTING_SIZE 614.0f
+#define PAINTING_SIZE 614
 
 /// The depth of the area in front of the painting which triggers ripples without warping.
-#define PAINTING_WOBBLE_DEPTH 100.0f
+#define PAINTING_WOBBLE_DEPTH 100
 
 /// The depth of the area behind the painting which triggers the warp.
 #define PAINTING_WARP_DEPTH PAINTING_SIZE
@@ -24,7 +24,7 @@
 #define PAINTING_EDGE_MARGIN (PAINTING_SIZE / 2)
 
 /// This is added to Mario's Y position to make the ripple closer to Mario's center of mass.
-#define PAINTING_MARIO_Y_OFFSET 50.0f
+#define PAINTING_MARIO_Y_OFFSET 50
 
 // HMC painting group
 enum HMCPaintingIDs {
@@ -119,7 +119,7 @@ struct Painting {
     /*0x1C*/ f32 passiveDispersionFactor;
     /*0x20*/ f32 entryDispersionFactor;
 
-    /// Display list used when the painting is normal.
+    /// Display list used when the painting is not rippling.
     /*0x24*/ const Gfx *normalDisplayList;
 
     // Texture data
@@ -127,23 +127,20 @@ struct Painting {
     /*0x2C*/ PaintingData textureWidth;
     /*0x2E*/ PaintingData textureHeight;
 
-    /// Display list used when the painting is rippling.
-    /*0x30*/ const Gfx *rippleDisplayList;
-
     /// Controls when a passive ripple starts. RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
-    /*0x34*/ s8 rippleTrigger;
+    /*0x30*/ s8 rippleTrigger;
 
     /// The painting's transparency (0..255). Determines what layer the painting is in.
-    /*0x35*/ Alpha alpha;
+    /*0x31*/ Alpha alpha;
 
     /// Struct padding.
-    /*0x36*/ PaintingData unused;
+    /*0x32*/ PaintingData unused;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f
-    /*0x38*/ f32 sizeX;
-    /*0x3C*/ f32 sizeY;
-}; /*0x40*/
+    /*0x34*/ f32 sizeX;
+    /*0x38*/ f32 sizeY;
+}; /*0x3C*/
 
 /**
  * Contains the position and normal of a vertex in the painting's generated mesh.

@@ -2,14 +2,14 @@
 
 // 0x07012308 - 0x07012388
 static const Vtx ttm_seg7_vertex_slide_painting[] = {
-    {{{     0,      0,      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,      0,      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,    307,      0}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{     0,    307,      0}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{     0,    307,      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,    307,      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,    614,      0}, 0, {  2012,    -28}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{     0,    614,      0}, 0, {   -32,    -28}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0,                   0,      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE,                   0,      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE, (PAINTING_SIZE / 2),      0}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0, (PAINTING_SIZE / 2),      0}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0, (PAINTING_SIZE / 2),      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE, (PAINTING_SIZE / 2),      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE,       PAINTING_SIZE,      0}, 0, {  2012,    -28}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0,       PAINTING_SIZE,      0}, 0, {   -32,    -28}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x07012388 - 0x070123A0
@@ -44,14 +44,6 @@ const Gfx ttm_seg7_sub_dl_slide_painting_normal_end[] = {
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
     gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
-    gsSPEndDisplayList(),
-};
-
-// 0x07012430 - 0x07012450
-static const Gfx ttm_seg7_painting_dl_slide_normal_ripple[] = {
-    gsDPTileSync(),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
-    gsDPSetTileSize(0, 0, 0, (64 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
     gsSPEndDisplayList(),
 };
 
@@ -90,7 +82,6 @@ const struct Painting ttm_slide_painting = {
     /* Normal DList */ ttm_seg7_painting_dl_slide_normal,
     /* Textures */     ttm_seg7_painting_textures_slide,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ ttm_seg7_painting_dl_slide_normal_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,

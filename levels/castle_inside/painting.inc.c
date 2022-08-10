@@ -2,50 +2,50 @@
 
 // 0x07021818 - 0x07021898
 static const Vtx inside_castle_seg7_vertex_painting_textured[] = {
-    {{{     0,      0,      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,      0,      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,    307,      0}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{     0,    307,      0}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{     0,    307,      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,    307,      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,    614,      0}, 0, {  2012,    -28}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{     0,    614,      0}, 0, {   -32,    -28}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0,                    0,      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE,                    0,      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE,  (PAINTING_SIZE / 2),      0}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0,  (PAINTING_SIZE / 2),      0}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0,  (PAINTING_SIZE / 2),      0}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE,  (PAINTING_SIZE / 2),      0}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE,        PAINTING_SIZE,      0}, 0, {  2012,    -28}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0,        PAINTING_SIZE,      0}, 0, {   -32,    -28}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x07021898 - 0x07021918
 static const Vtx inside_castle_seg7_vertex_painting_sl[] = {
-    {{{     0,      0,      0}, 0, {   -32,    992}, {0xdd, 0xdd, 0xdd, 0xff}}},
-    {{{   614,      0,      0}, 0, {  2012,    992}, {0xdd, 0xdd, 0xdd, 0xff}}},
-    {{{   614,    307,      0}, 0, {  2012,      0}, {0xdd, 0xdd, 0xdd, 0xff}}},
-    {{{     0,    307,      0}, 0, {   -32,      0}, {0xdd, 0xdd, 0xdd, 0xff}}},
-    {{{     0,    307,      0}, 0, {   -32,    992}, {0xdd, 0xdd, 0xdd, 0xff}}},
-    {{{   614,    307,      0}, 0, {  2012,    992}, {0xdd, 0xdd, 0xdd, 0xff}}},
-    {{{   614,    614,      0}, 0, {  2012,    -28}, {0xdd, 0xdd, 0xdd, 0xff}}},
-    {{{     0,    614,      0}, 0, {   -32,    -28}, {0xdd, 0xdd, 0xdd, 0xff}}},
+    {{{            0,                    0,      0}, 0, {   -32,    992}, {0xdd, 0xdd, 0xdd, 0xff}}},
+    {{{PAINTING_SIZE,                    0,      0}, 0, {  2012,    992}, {0xdd, 0xdd, 0xdd, 0xff}}},
+    {{{PAINTING_SIZE,  (PAINTING_SIZE / 2),      0}, 0, {  2012,      0}, {0xdd, 0xdd, 0xdd, 0xff}}},
+    {{{            0,  (PAINTING_SIZE / 2),      0}, 0, {   -32,      0}, {0xdd, 0xdd, 0xdd, 0xff}}},
+    {{{            0,  (PAINTING_SIZE / 2),      0}, 0, {   -32,    992}, {0xdd, 0xdd, 0xdd, 0xff}}},
+    {{{PAINTING_SIZE,  (PAINTING_SIZE / 2),      0}, 0, {  2012,    992}, {0xdd, 0xdd, 0xdd, 0xff}}},
+    {{{PAINTING_SIZE,        PAINTING_SIZE,      0}, 0, {  2012,    -28}, {0xdd, 0xdd, 0xdd, 0xff}}},
+    {{{            0,        PAINTING_SIZE,      0}, 0, {   -32,    -28}, {0xdd, 0xdd, 0xdd, 0xff}}},
 };
 
 // 0x07021918 - 0x07021998
 static const Vtx inside_castle_seg7_vertex_painting_ccm_fake_1[] = {
-    {{{ -3046,   -307,  -3724}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -2742,   -307,  -4258}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -2742,      0,  -4258}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -3046,      0,  -3724}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -3046,      0,  -3724}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -2742,      0,  -4258}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -2742,    307,  -4258}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -3046,    307,  -3724}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -3046, -(PAINTING_SIZE / 2),  -3724}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -2742, -(PAINTING_SIZE / 2),  -4258}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -2742,                    0,  -4258}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -3046,                    0,  -3724}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -3046,                    0,  -3724}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -2742,                    0,  -4258}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -2742,  (PAINTING_SIZE / 2),  -4258}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -3046,  (PAINTING_SIZE / 2),  -3724}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x07021998 - 0x07021A18
 static const Vtx inside_castle_seg7_vertex_painting_ccm_fake_2[] = {
-    {{{ -1866,   -307,  -4258}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -1562,   -307,  -3724}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -1562,      0,  -3724}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -1866,      0,  -4258}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -1866,      0,  -4258}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -1562,      0,  -3724}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -1562,    307,  -3724}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{ -1866,    307,  -4258}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -1866, -(PAINTING_SIZE / 2),  -4258}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -1562, -(PAINTING_SIZE / 2),  -3724}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -1562,                    0,  -3724}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -1866,                    0,  -4258}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -1866,                    0,  -4258}, 0, {   -32,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -1562,                    0,  -3724}, 0, {  2012,    992}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -1562,  (PAINTING_SIZE / 2),  -3724}, 0, {  2012,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{        -1866,  (PAINTING_SIZE / 2),  -4258}, 0, {   -32,      0}, {0x00, 0x00, 0x7f, 0xff}}},
 };
 
 // 0x07021A18 - 0x07021A30
@@ -83,31 +83,13 @@ static const Gfx inside_castle_seg7_dl_painting_texture_end[] = {
     gsSPEndDisplayList(),
 };
 
-// 0x07021AC0 - 0x07021AE0
-static const Gfx inside_castle_seg7_painting_dl_image_ripple[] = {
-    gsDPTileSync(),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 6, G_TX_NOLOD),
-    gsDPSetTileSize(0, 0, 0, (64 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsSPEndDisplayList(),
-};
-
-
 // 0x07022598 - 0x070225D8
 static const Vtx inside_castle_seg7_vertex_hmc[] = {
-    {{{     0,      0,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,      0,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{   614,    614,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
-    {{{     0,    614,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0,             0,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE,             0,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{PAINTING_SIZE, PAINTING_SIZE,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
+    {{{            0, PAINTING_SIZE,      0}, 0, {     0,      0}, {0x00, 0x00, 0x7f, 0xff}}},
 };
-
-// 0x07022640 - 0x07022660
-static const Gfx inside_castle_seg7_painting_dl_env_map_ripple[] = {
-    gsDPTileSync(),
-    gsDPSetTile(G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD, G_TX_WRAP | G_TX_NOMIRROR, 5, G_TX_NOLOD),
-    gsDPSetTileSize(0, 0, 0, (32 - 1) << G_TEXTURE_IMAGE_FRAC, (32 - 1) << G_TEXTURE_IMAGE_FRAC),
-    gsSPEndDisplayList(),
-};
-
 
 // 0x07023050 - 0x070230B0
 static const Gfx inside_castle_seg7_painting_dl_bob[] = {
@@ -418,7 +400,6 @@ const struct Painting bob_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_bob,
     /* Textures */     inside_castle_seg7_painting_textures_bob,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -438,7 +419,6 @@ const struct Painting ccm_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_ccm,
     /* Textures */     inside_castle_seg7_painting_textures_ccm,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -458,7 +438,6 @@ const struct Painting wf_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_wf,
     /* Textures */     inside_castle_seg7_painting_textures_wf,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -478,7 +457,6 @@ const struct Painting jrb_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_jrb,
     /* Textures */     inside_castle_seg7_painting_textures_jrb,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -498,7 +476,6 @@ const struct Painting lll_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_lll,
     /* Textures */     inside_castle_seg7_painting_textures_lll,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -518,7 +495,6 @@ const struct Painting ssl_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_ssl,
     /* Textures */     inside_castle_seg7_painting_textures_ssl,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -538,7 +514,6 @@ const struct Painting hmc_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_hmc,
     /* Textures */     inside_castle_seg7_painting_textures_hmc_env,
     /* Texture w, h */ 32, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_env_map_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -558,7 +533,6 @@ const struct Painting ddd_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_ddd,
     /* Textures */     inside_castle_seg7_painting_textures_ddd_env,
     /* Texture w, h */ 32, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_env_map_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_CONTINUOUS,
     /* Alpha */ 0xB4,
     /* Unused*/ 0,
@@ -578,7 +552,6 @@ const struct Painting wdw_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_wdw,
     /* Textures */     inside_castle_seg7_painting_textures_wdw,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -598,7 +571,6 @@ const struct Painting thi_tiny_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_thi,
     /* Textures */     inside_castle_seg7_painting_textures_thi,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -618,7 +590,6 @@ const struct Painting ttm_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_ttm,
     /* Textures */     inside_castle_seg7_painting_textures_ttm,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -638,7 +609,6 @@ const struct Painting ttc_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_ttc,
     /* Textures */     inside_castle_seg7_painting_textures_ttc,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -658,7 +628,6 @@ const struct Painting sl_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_sl,
     /* Textures */     inside_castle_seg7_painting_textures_sl,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -678,7 +647,6 @@ const struct Painting thi_huge_painting = {
     /* Normal DList */ inside_castle_seg7_painting_dl_thi,
     /* Textures */     inside_castle_seg7_painting_textures_thi,
     /* Texture w, h */ 64, 32,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0xFF,
     /* Unused*/ 0,
@@ -697,7 +665,6 @@ const struct Painting rr_painting = {
     /* Normal DList */ NULL,
     /* Textures */     NULL,
     /* Texture w, h */  0,  0,
-    /* Ripple DList */ inside_castle_seg7_painting_dl_image_ripple,
     /* Ripple Trigger */ RIPPLE_TRIGGER_PROXIMITY,
     /* Alpha */ 0x00,
     /* Unused*/ 0,

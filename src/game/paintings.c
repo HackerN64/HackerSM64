@@ -480,16 +480,16 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
 
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
     u32 commands = (
-        /*gLoadBlockTexture*/ 5 +
+        /*gLoadBlockTexture */ 5 +
         (triGroups * (
-            /*gSPVertex*/ 1 +
-            /*gSPDisplayList*/ 1
+            /*gSPVertex         */ 1 +
+            /*gSPDisplayList    */ 1
         )) +
-        /*gSPVertex*/ 1 +
+        /*gSPVertex         */ 1 +
         (remGroupTris * (
-            /*gSP1Triangle*/ 1
+            /*gSP1Triangle      */ 1
         )) +
-        /*gSPEndDisplayList*/ 1
+        /*gSPEndDisplayList */ 1
     );
     Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
@@ -583,7 +583,11 @@ Gfx *render_painting(Texture *img, PaintingData tWidth, PaintingData tHeight, Pa
  * Orient the painting mesh for rendering.
  */
 Gfx *painting_model_view_transform(struct Painting *painting) {
-    Gfx *dlist = alloc_display_list(2 * sizeof(Gfx));
+    u32 commands = (
+        /*gSPMatrix         */ 1 +
+        /*gSPEndDisplayList */ 1
+    );
+    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     // Scale
@@ -595,7 +599,6 @@ Gfx *painting_model_view_transform(struct Painting *painting) {
         1.0f
     );
     gSPMatrix(gfx++, scale, (G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_PUSH));
-
     gSPEndDisplayList(gfx);
 
     return dlist;
@@ -613,7 +616,17 @@ Gfx *painting_ripple_image(struct Painting *painting, PaintingData **textureMaps
     PaintingData tWidth = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
     Texture **textures = segmented_to_virtual(painting->textureArray);
-    Gfx *dlist = alloc_display_list((imageCount + 6) * sizeof(Gfx));
+    u32 commands = (
+        /*gSPDisplayList    */ 1 +
+        /*gSPDisplayList    */ 1 +
+        (imageCount * (
+            /*gSPDisplayList    */ 1
+        )) +
+        /*gSPPopMatrix      */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPEndDisplayList */ 1
+    );
+    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     if (dlist == NULL) {
@@ -622,7 +635,6 @@ Gfx *painting_ripple_image(struct Painting *painting, PaintingData **textureMaps
 
     gSPDisplayList(gfx++, painting_model_view_transform(painting));
     gSPDisplayList(gfx++, dl_paintings_rippling_begin);
-    gSPDisplayList(gfx++, painting->rippleDisplayList);
 
     // Map each image to the mesh's vertices.
     for (i = 0; i < imageCount; i++) {
@@ -652,7 +664,15 @@ Gfx *painting_ripple_env_mapped(struct Painting *painting, PaintingData **textur
     PaintingData tWidth = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
     Texture **tArray = segmented_to_virtual(painting->textureArray);
-    Gfx *dlist = alloc_display_list(7 * sizeof(Gfx));
+    u32 commands = (
+        /*gSPDisplayList    */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPPopMatrix      */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPEndDisplayList */ 1
+    );
+    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     if (dlist == NULL) {
@@ -661,7 +681,6 @@ Gfx *painting_ripple_env_mapped(struct Painting *painting, PaintingData **textur
 
     gSPDisplayList(gfx++, painting_model_view_transform(painting));
     gSPDisplayList(gfx++, dl_paintings_env_mapped_begin);
-    gSPDisplayList(gfx++, painting->rippleDisplayList);
 
     // Map the image to the mesh's vertices.
     textureMap = segmented_to_virtual(textureMaps[0]);
@@ -717,7 +736,13 @@ Gfx *display_painting_rippling(struct Painting *painting) {
  * Render a normal painting.
  */
 Gfx *display_painting_not_rippling(struct Painting *painting) {
-    Gfx *dlist = alloc_display_list(4 * sizeof(Gfx));
+    u32 commands = (
+        /*gSPDisplayList    */ 1 +
+        /*gSPDisplayList    */ 1 +
+        /*gSPPopMatrix      */ 1 +
+        /*gSPEndDisplayList */ 1
+    );
+    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     if (dlist == NULL) {
