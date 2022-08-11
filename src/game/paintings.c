@@ -502,7 +502,7 @@ Gfx *render_painting(const Texture *img, PaintingData tWidth, PaintingData tHeig
     PaintingData numVtx       = (mapTris * 3);
 
     Vtx *verts = alloc_display_list(numVtx * sizeof(Vtx));
-    u32 commands = (
+    u32 gfxCmds = (
         /*gLoadBlockTexture */ 5 +
         (triGroups * (
             /*gSPVertex         */ 1 +
@@ -514,7 +514,7 @@ Gfx *render_painting(const Texture *img, PaintingData tWidth, PaintingData tHeig
         )) +
         /*gSPEndDisplayList */ 1
     );
-    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     gLoadBlockTexture(gfx++, tWidth, tHeight, G_IM_FMT_RGBA, img);
@@ -606,11 +606,11 @@ Gfx *render_painting(const Texture *img, PaintingData tWidth, PaintingData tHeig
  * Orient the painting mesh for rendering.
  */
 Gfx *painting_model_view_transform(const struct Painting *painting) {
-    u32 commands = (
+    u32 gfxCmds = (
         /*gSPMatrix         */ 1 +
         /*gSPEndDisplayList */ 1
     );
-    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     // Scale
@@ -639,7 +639,7 @@ Gfx *painting_ripple_image(const struct Painting *painting, const PaintingData *
     PaintingData tWidth = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
     const Texture **textures = segmented_to_virtual(painting->textureArray);
-    u32 commands = (
+    u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
         /*gSPDisplayList    */ 1 +
         (imageCount * (
@@ -649,7 +649,7 @@ Gfx *painting_ripple_image(const struct Painting *painting, const PaintingData *
         /*gSPDisplayList    */ 1 +
         /*gSPEndDisplayList */ 1
     );
-    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     if (dlist == NULL) {
@@ -687,7 +687,7 @@ Gfx *painting_ripple_env_mapped(const struct Painting *painting, const PaintingD
     PaintingData tWidth = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
     const Texture **tArray = segmented_to_virtual(painting->textureArray);
-    u32 commands = (
+    u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
         /*gSPDisplayList    */ 1 +
         /*gSPDisplayList    */ 1 +
@@ -695,7 +695,7 @@ Gfx *painting_ripple_env_mapped(const struct Painting *painting, const PaintingD
         /*gSPDisplayList    */ 1 +
         /*gSPEndDisplayList */ 1
     );
-    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     if (dlist == NULL) {
@@ -759,13 +759,13 @@ Gfx *display_painting_rippling(const struct Painting *painting) {
  * Render a normal painting.
  */
 Gfx *display_painting_not_rippling(const struct Painting *painting) {
-    u32 commands = (
+    u32 gfxCmds = (
         /*gSPDisplayList    */ 1 +
         /*gSPDisplayList    */ 1 +
         /*gSPPopMatrix      */ 1 +
         /*gSPEndDisplayList */ 1
     );
-    Gfx *dlist = alloc_display_list(commands * sizeof(Gfx));
+    Gfx *dlist = alloc_display_list(gfxCmds * sizeof(Gfx));
     Gfx *gfx = dlist;
 
     if (dlist == NULL) {
