@@ -23,24 +23,17 @@
 /**
  * @file paintings.c
  *
- * Implements the rippling painting effect. Paintings are GraphNodes that exist without being connected
- * to any particular object.
+ * Implements the rippling painting effect. Paintings are GraphNodes that are attached to a bhvPainting object.
  *
  * Paintings are defined in level data. Look at levels/castle_inside/painting.inc.c for examples.
  *
  * The ripple effect uses data that is split into several parts:
- *      The mesh positions are generated from a base mesh. See seg2_painting_triangle_mesh near the
- *          bottom of bin/segment2.c
- *
- *      The lighting for the ripple is also generated from a base table, seg2_painting_mesh_neighbor_tris
- *          in bin/segment2.c
- *
- *      Each painting's texture uses yet another table to map its texture to the mesh.
- *          These maps are in level data, see levels/castle_inside/painting.inc.c for example.
- *
- *      Finally, each painting has two display lists, normal and rippling, which are defined in the same
- *      level data file as the Painting itself. See levels/castle_inside/painting.inc.c.
- *
+ *      In bin/segment2.c:
+ *          seg2_painting_triangle_mesh: The mesh positions are generated from a base mesh.
+ *          seg2_painting_mesh_neighbor_tris: The lighting for the ripple is also generated from a base table.
+ *          Each painting's texture uses yet another table to map its texture to the mesh.
+ *      In levels/[LEVEL]/painting.inc.c:
+ *          Painting structs, texture pointers, non-ripple display lists.
  *
  * Painting state machine:
  * Paintings spawn in the PAINTING_IDLE state
@@ -49,8 +42,7 @@
  *          reset to IDLE
  *
  * Paintings in the PAINTING_RIPPLE state are passively rippling.
- *      For RIPPLE_TRIGGER_PROXIMITY paintings, this means Mario bumped the wall in front of the
- *          painting.
+ *      For RIPPLE_TRIGGER_PROXIMITY paintings, this means Mario bumped the front of the painting.
  *
  *      Paintings that use RIPPLE_TRIGGER_CONTINUOUS try to transition to this state as soon as possible,
  *          usually when Mario enters the room.
@@ -65,8 +57,8 @@
  * HMC painting group.
  */
 const struct Painting *sHmcPaintings[] = {
-    /*Painting ID                   */
-    /*PAINTING_ID_HMC_COTMC         */ &cotmc_painting,
+    /* Painting ID                  */
+    /* PAINTING_ID_HMC_COTMC        */ &cotmc_painting,
     NULL,
 };
 
@@ -74,22 +66,22 @@ const struct Painting *sHmcPaintings[] = {
  * Inside Castle painting group.
  */
 const struct Painting *sInsideCastlePaintings[] = {
-    /*Painting ID                   */
-    /*PAINTING_ID_CASTLE_BOB        */ &bob_painting,
-    /*PAINTING_ID_CASTLE_CCM        */ &ccm_painting,
-    /*PAINTING_ID_CASTLE_WF         */ &wf_painting,
-    /*PAINTING_ID_CASTLE_JRB        */ &jrb_painting,
-    /*PAINTING_ID_CASTLE_LLL        */ &lll_painting,
-    /*PAINTING_ID_CASTLE_SSL        */ &ssl_painting,
-    /*PAINTING_ID_CASTLE_HMC        */ &hmc_painting,
-    /*PAINTING_ID_CASTLE_DDD        */ &ddd_painting,
-    /*PAINTING_ID_CASTLE_WDW        */ &wdw_painting,
-    /*PAINTING_ID_CASTLE_THI_TINY   */ &thi_tiny_painting,
-    /*PAINTING_ID_CASTLE_TTM        */ &ttm_painting,
-    /*PAINTING_ID_CASTLE_TTC        */ &ttc_painting,
-    /*PAINTING_ID_CASTLE_SL         */ &sl_painting,
-    /*PAINTING_ID_CASTLE_THI_HUGE   */ &thi_huge_painting,
-    /*PAINTING_ID_CASTLE_RR         */ &rr_painting,
+    /* Painting ID                  */
+    /* PAINTING_ID_CASTLE_BOB       */ &bob_painting,
+    /* PAINTING_ID_CASTLE_CCM       */ &ccm_painting,
+    /* PAINTING_ID_CASTLE_WF        */ &wf_painting,
+    /* PAINTING_ID_CASTLE_JRB       */ &jrb_painting,
+    /* PAINTING_ID_CASTLE_LLL       */ &lll_painting,
+    /* PAINTING_ID_CASTLE_SSL       */ &ssl_painting,
+    /* PAINTING_ID_CASTLE_HMC       */ &hmc_painting,
+    /* PAINTING_ID_CASTLE_DDD       */ &ddd_painting,
+    /* PAINTING_ID_CASTLE_WDW       */ &wdw_painting,
+    /* PAINTING_ID_CASTLE_THI_TINY  */ &thi_tiny_painting,
+    /* PAINTING_ID_CASTLE_TTM       */ &ttm_painting,
+    /* PAINTING_ID_CASTLE_TTC       */ &ttc_painting,
+    /* PAINTING_ID_CASTLE_SL        */ &sl_painting,
+    /* PAINTING_ID_CASTLE_THI_HUGE  */ &thi_huge_painting,
+    /* PAINTING_ID_CASTLE_RR        */ &rr_painting,
     NULL,
 };
 
@@ -97,8 +89,8 @@ const struct Painting *sInsideCastlePaintings[] = {
  * TTM painting group.
  */
 const struct Painting *sTtmPaintings[] = {
-    /*Painting ID                   */
-    /*PAINTING_ID_TTM_SLIDE         */ &ttm_slide_painting,
+    /* Painting ID                  */
+    /* PAINTING_ID_TTM_SLIDE        */ &ttm_slide_painting,
     NULL,
 };
 
@@ -106,10 +98,10 @@ const struct Painting *sTtmPaintings[] = {
  * Array of all painting groups.
  */
 const struct Painting * const* sPaintingGroups[] = {
-    /*Group ID                      */
-    /*PAINTING_GROUP_HMC            */ sHmcPaintings,
-    /*PAINTING_GROUP_INSIDE_CASTLE  */ sInsideCastlePaintings,
-    /*PAINTING_GROUP_TTM            */ sTtmPaintings,
+    /* Group ID                     */
+    /* PAINTING_GROUP_HMC           */ sHmcPaintings,
+    /* PAINTING_GROUP_INSIDE_CASTLE */ sInsideCastlePaintings,
+    /* PAINTING_GROUP_TTM           */ sTtmPaintings,
 };
 
 /**
@@ -833,25 +825,24 @@ void move_ddd_painting(struct Object *obj, f32 frontPos, f32 backPos, f32 speed)
     return;
 #endif
     // Obtain the DDD star flags and find out whether Board Bowser's Sub was collected.
-    u32 bowsersSubBeaten = (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD)) & STAR_FLAG_ACT_1);
-    // Get the other save file flags and check whether DDD has already moved back.
-    u32 dddBack = (save_file_get_flags() & SAVE_FLAG_DDD_MOVED_BACK);
-
-    if (!bowsersSubBeaten && !dddBack) {
-        // If we haven't collected the star or moved the painting, put the painting at the front.
-        obj->oPosX = frontPos;
-    } else if (bowsersSubBeaten && !dddBack) {
-        // If we've collected the star but not moved the painting back,
-        // Each frame, move the painting by a certain speed towards the back area.
-        obj->oPosX += speed;
-        if (obj->oPosX >= backPos) {
+    if (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_DDD)) & STAR_FLAG_ACT_1) {
+        // Get the other save file flags and check whether DDD has already moved back.
+        if (save_file_get_flags() & SAVE_FLAG_DDD_MOVED_BACK) {
+            // If the painting has already moved back, place it in the back position.
             obj->oPosX = backPos;
-            // Tell the save file that we've moved DDD back.
-            save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
+        } else {
+            // If we've collected the star but not moved the painting back,
+            // Each frame, move the painting by a certain speed towards the back area.
+            obj->oPosX += speed;
+            if (obj->oPosX >= backPos) {
+                obj->oPosX = backPos;
+                // Tell the save file that we've moved DDD back.
+                save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
+            }
         }
-    } else if (bowsersSubBeaten && dddBack) {
-        // If the painting has already moved back, place it in the back position.
-        obj->oPosX = backPos;
+    } else {
+        // If we haven't collected the star, put the painting at the front.
+        obj->oPosX = frontPos;
     }
 }
 
@@ -923,20 +914,18 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         }
 
         if (painting->rippleTrigger == RIPPLE_TRIGGER_PROXIMITY) {
+            // Proximity type:
             if (obj->oPaintingChangedFlags & RIPPLE_FLAG_ENTER) {
-                // Proximity painting enter ripple.
-                painting_state(obj, PAINTING_ENTERED, FALSE, TRUE);
+                painting_state(obj, PAINTING_ENTERED, FALSE, TRUE); // Entering
             } else if (obj->oPaintingState != PAINTING_ENTERED && (obj->oPaintingChangedFlags & RIPPLE_FLAG_RIPPLE)) {
-                // Proximity painting wobble ripple.
-                painting_state(obj, PAINTING_RIPPLE, FALSE, TRUE);
+                painting_state(obj, PAINTING_RIPPLE, FALSE, TRUE); // Wobbling
             }
         } else if (painting->rippleTrigger == RIPPLE_TRIGGER_CONTINUOUS) {
+            // Continuous type:
             if (obj->oPaintingChangedFlags & RIPPLE_FLAG_ENTER) {
-                // Continuous painting enter ripple.
-                painting_state(obj, PAINTING_ENTERED, FALSE, FALSE);
+                painting_state(obj, PAINTING_ENTERED, FALSE, FALSE); // Entering
             } else if (obj->oPaintingState == PAINTING_IDLE) {
-                // Continuous painting idle ripple.
-                painting_state(obj, PAINTING_RIPPLE, TRUE, TRUE);
+                painting_state(obj, PAINTING_RIPPLE, TRUE, TRUE); // Idle
             }
         }
 
@@ -978,9 +967,8 @@ void bhv_painting_init(void) {
     Vec3s rotation;
     vec3i_to_vec3s(rotation, &obj->oFaceAngleVec);
 
-    Vec3f roomCheckPos;
-
     // Set 'roomCheckPos' to the world space coords of 'distPos'.
+    Vec3f roomCheckPos;
     vec3f_local_pos_to_world_pos(roomCheckPos, distPos, &obj->oPosVec, rotation);
 
     // Set the object's room so that paintings only render in their room.

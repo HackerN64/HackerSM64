@@ -30,47 +30,52 @@
 
 // HMC painting group
 enum HMCPaintingIDs {
-    /* 0*/ PAINTING_ID_HMC_COTMC,
+    /* Painting ID */
+    /*           0 */ PAINTING_ID_HMC_COTMC,
 };
 
 // Inside Castle painting group
 enum CastlePaintingIDs {
-    /* 0*/ PAINTING_ID_CASTLE_BOB,
-    /* 1*/ PAINTING_ID_CASTLE_CCM,
-    /* 2*/ PAINTING_ID_CASTLE_WF,
-    /* 3*/ PAINTING_ID_CASTLE_JRB,
-    /* 4*/ PAINTING_ID_CASTLE_LLL,
-    /* 5*/ PAINTING_ID_CASTLE_SSL,
-    /* 6*/ PAINTING_ID_CASTLE_HMC,
-    /* 7*/ PAINTING_ID_CASTLE_DDD,
-    /* 8*/ PAINTING_ID_CASTLE_WDW,
-    /* 9*/ PAINTING_ID_CASTLE_THI_TINY,
-    /*10*/ PAINTING_ID_CASTLE_TTM,
-    /*11*/ PAINTING_ID_CASTLE_TTC,
-    /*12*/ PAINTING_ID_CASTLE_SL,
-    /*13*/ PAINTING_ID_CASTLE_THI_HUGE,
-    /*14*/ PAINTING_ID_CASTLE_RR,
+    /* Painting ID */
+    /*           0 */ PAINTING_ID_CASTLE_BOB,
+    /*           1 */ PAINTING_ID_CASTLE_CCM,
+    /*           2 */ PAINTING_ID_CASTLE_WF,
+    /*           3 */ PAINTING_ID_CASTLE_JRB,
+    /*           4 */ PAINTING_ID_CASTLE_LLL,
+    /*           5 */ PAINTING_ID_CASTLE_SSL,
+    /*           6 */ PAINTING_ID_CASTLE_HMC,
+    /*           7 */ PAINTING_ID_CASTLE_DDD,
+    /*           8 */ PAINTING_ID_CASTLE_WDW,
+    /*           9 */ PAINTING_ID_CASTLE_THI_TINY,
+    /*          10 */ PAINTING_ID_CASTLE_TTM,
+    /*          11 */ PAINTING_ID_CASTLE_TTC,
+    /*          12 */ PAINTING_ID_CASTLE_SL,
+    /*          13 */ PAINTING_ID_CASTLE_THI_HUGE,
+    /*          14 */ PAINTING_ID_CASTLE_RR,
 };
 
 // TTM painting group
 enum TTMPaintingIDs {
-    /* 0*/ PAINTING_ID_TTM_SLIDE,
+    /* Painting ID */
+    /*           0 */ PAINTING_ID_TTM_SLIDE,
 };
 
-// Painting group ids
+// Painting group IDs
 enum PaintingGroups {
-    /* 0*/ PAINTING_GROUP_HMC,
-    /* 1*/ PAINTING_GROUP_INSIDE_CASTLE,
-    /* 2*/ PAINTING_GROUP_TTM,
+    /* Group ID */
+    /*        0 */ PAINTING_GROUP_HMC,
+    /*        1 */ PAINTING_GROUP_INSIDE_CASTLE,
+    /*        2 */ PAINTING_GROUP_TTM,
     PAINTING_NUM_GROUPS,
     PAINTING_GROUP_NULL = -1,
 };
 
-// Painting->state
-enum PaintingState {
-    PAINTING_IDLE,
-    PAINTING_RIPPLE,
-    PAINTING_ENTERED,
+// Painting->textureType
+enum PaintingType {
+    /// Painting that uses 1 or more images as a texture
+    PAINTING_IMAGE,
+    /// Painting that has one texture used for an environment map effect
+    PAINTING_ENV_MAP
 };
 
 // Painting->rippleTrigger
@@ -86,7 +91,7 @@ enum PaintingRippleAnimations {
     RIPPLE_ANIM_PROXIMITY_LARGE,
 };
 
-// Painting->lastFlags, Painting->currFlags, Painting->changedFlags
+// oPaintingCurrFlags, oPaintingChangedFlags
 enum PaintingRippleFlags {
     // Not rippling.
     RIPPLE_FLAGS_NONE  = 0x0,
@@ -96,15 +101,17 @@ enum PaintingRippleFlags {
     RIPPLE_FLAG_RIPPLE = BIT(1), // 0x02
 };
 
-// Painting->textureType
-enum PaintingType {
-    /// Painting that uses 1 or more images as a texture
-    PAINTING_IMAGE,
-    /// Painting that has one texture used for an environment map effect
-    PAINTING_ENV_MAP
+// oPaintingState
+enum PaintingState {
+    PAINTING_IDLE,
+    PAINTING_RIPPLE,
+    PAINTING_ENTERED,
 };
 
 
+/**
+ * A list of preset constants for the ripple animation.
+ */
 struct RippleAnimationInfo {
     /// Controls how high the peaks of the ripple are.
     /*0x00*/ f32 passiveRippleMag;
@@ -114,15 +121,18 @@ struct RippleAnimationInfo {
     /*0x08*/ f32 passiveRippleDecay;
     /*0x0C*/ f32 entryRippleDecay;
 
-    /// Controls the ripple's frequency
+    /// Controls the ripple's frequency.
     /*0x10*/ f32 passiveRippleRate;
     /*0x14*/ f32 entryRippleRate;
 
-    /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple
+    /// The rate at which the magnitude of the ripple decreases as you move farther from the central point of the ripple.
     /*0x18*/ f32 passiveDispersionFactor;
     /*0x1C*/ f32 entryDispersionFactor;
 }; /*0x20*/
 
+/**
+ * Painting info struct.
+ */
 struct Painting {
     /// ID of the painting and the warp node.
     /*0x00*/ PaintingData id;
