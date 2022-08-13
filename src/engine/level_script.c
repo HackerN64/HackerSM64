@@ -700,7 +700,25 @@ static void level_cmd_set_mario_start_pos(void) {
 #else
     vec3s_copy(gMarioSpawnInfo->startPos, CMD_GET(Vec3s, 6));
 #endif
-    vec3s_set(gMarioSpawnInfo->startAngle, 0, CMD_GET(s16, 4) * 0x8000 / 180, 0);
+    vec3s_set(gMarioSpawnInfo->startAngle, 0x0, degrees_to_angle(CMD_GET(s16, 4)), 0x0);
+
+#ifdef STARTUP_SPAWN_LEVEL
+    static u8 firstWarp = TRUE;
+    if (firstWarp) {
+        firstWarp = FALSE;
+ #ifdef STARTUP_SPAWN_AREA
+        if (gAreaData[STARTUP_SPAWN_AREA].terrainData != NULL) {
+            gMarioSpawnInfo->areaIndex = STARTUP_SPAWN_AREA;
+        }
+ #endif
+ #ifdef STARTUP_SPAWN_POS
+        vec3s_set(gMarioSpawnInfo->startPos, STARTUP_SPAWN_POS);
+ #endif
+ #ifdef STARTUP_SPAWN_ANGLE
+        gMarioSpawnInfo->startAngle[1] = STARTUP_SPAWN_ANGLE;
+ #endif
+    }
+#endif // STARTUP_SPAWN_LEVEL
 
     sCurrentCmd = CMD_NEXT;
 }

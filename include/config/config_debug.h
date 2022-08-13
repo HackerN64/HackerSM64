@@ -26,7 +26,26 @@
  * This allows you to quickly test the level you're working on.
  * If you want the game to boot normally, just comment out the define again.
  */
-// #define TEST_LEVEL LEVEL_BOB
+// #define STARTUP_SPAWN_LEVEL LEVEL_BOB
+
+/**
+ * Mario's starting area on boot.
+ * NOTE: Requires STARTUP_SPAWN_LEVEL.
+ * NOTE: It is also recommended to set STARTUP_SPAWN_POS with this, otherwise the default position may cause Mario to spawn out of bounds.
+ */
+// #define STARTUP_SPAWN_AREA 1
+
+/**
+ * Mario's starting position on boot.
+ * NOTE: Requires STARTUP_SPAWN_LEVEL.
+ */
+// #define STARTUP_SPAWN_POS 0, 0, 0
+
+/**
+ * Mario's starting yaw on boot.
+ * NOTE: Requires STARTUP_SPAWN_LEVEL.
+ */
+// #define STARTUP_SPAWN_ANGLE 0x0
 
 /**
  * Enables debug level select. Hold L while the game boots to turn it on.

@@ -75,7 +75,10 @@
 
 #ifdef DISABLE_ALL
     #undef DEBUG_ALL
-    #undef TEST_LEVEL
+    #undef STARTUP_SPAWN_LEVEL
+    #undef STARTUP_SPAWN_AREA
+    #undef STARTUP_SPAWN_POS
+    #undef STARTUP_SPAWN_ANGLE
     #undef DEBUG_LEVEL_SELECT
     #undef ENABLE_DEBUG_FREE_MOVE
     #undef VANILLA_DEBUG
@@ -111,6 +114,12 @@
     #undef COMPLETE_SAVE_FILE
     #define COMPLETE_SAVE_FILE
 #endif // DEBUG_ALL
+
+#ifndef STARTUP_SPAWN_LEVEL
+    #undef STARTUP_SPAWN_AREA
+    #undef STARTUP_SPAWN_POS
+    #undef STARTUP_SPAWN_ANGLE
+#endif // STARTUP_SPAWN_LEVEL
 
 #ifdef PUPPYPRINT_DEBUG
     #undef PUPPYPRINT
