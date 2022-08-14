@@ -13,7 +13,7 @@
 #define PAINTING_ID(id, grp) ((id) | ((grp) << 8))
 
 /// The default painting side length.
-#define PAINTING_SIZE 614
+#define PAINTING_SIZE 614.4f
 
 /// The depth of the area in front of the painting which triggers ripples without warping.
 #define PAINTING_WOBBLE_DEPTH 100
@@ -80,6 +80,7 @@ enum PaintingType {
 
 // Painting->rippleTrigger
 enum RippleTriggers {
+    RIPPLE_TRIGGER_NONE,
     RIPPLE_TRIGGER_PROXIMITY,
     RIPPLE_TRIGGER_CONTINUOUS,
 };
@@ -140,31 +141,28 @@ struct Painting {
     /// How many images should be drawn when the painting is rippling.
     /*0x02*/ PaintingData imageCount;
 
-    /// The painting's transparency (0..255). Determines the drawing layer of the painting.
-    /*0x04*/ Alpha alpha;
+    // Texture data.
+    /*0x04*/ const Texture *const *textureArray;
+    /*0x08*/ PaintingData textureWidth;
+    /*0x0A*/ PaintingData textureHeight;
 
     /// Either PAINTING_IMAGE or PAINTING_ENV_MAP.
-    /*0x05*/ s8 textureType;
+    /*0x0C*/ s8 textureType;
 
-    /// Controls when a passive ripple starts. RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
-    /*0x06*/ s8 rippleTrigger;
+    /// Controls when a passive ripple starts. RIPPLE_TRIGGER_NONE, RIPPLE_TRIGGER_CONTINUOUS or RIPPLE_TRIGGER_PROXIMITY.
+    /*0x0D*/ s8 rippleTrigger;
 
-    /// Which animation type to use. RIPPLE_ANIM_CONTINUOUS, RIPPLE_ANIM_PROXIMITY, or RIPPLE_ANIM_PROXIMITY_LARGE.
-    /*0x07*/ s8 rippleAnimationType;
+    /// Whether to use shading or not.
+    /*0x0E*/ s8 shaded;
 
-    /// Display list used when the painting is not rippling.
-    /*0x08*/ const Gfx *normalDisplayList;
-
-    // Texture data.
-    /*0x0C*/ const Texture *const *textureArray;
-    /*0x10*/ PaintingData textureWidth;
-    /*0x12*/ PaintingData textureHeight;
+    /// The painting's transparency (0..255). Determines the drawing layer of the painting.
+    /*0x0F*/ Alpha alpha;
 
     /// Uniformly scales the painting to a multiple of PAINTING_SIZE.
     /// By default a painting is 614.0f x 614.0f
-    /*0x14*/ f32 sizeX;
-    /*0x18*/ f32 sizeY;
-}; /*0x1C*/
+    /*0x10*/ f32 sizeX;
+    /*0x14*/ f32 sizeY;
+}; /*0x18*/
 
 /**
  * Contains the position and normal of a vertex in the painting's generated mesh.
