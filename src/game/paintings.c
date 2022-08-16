@@ -571,7 +571,7 @@ Gfx *render_painting(const Texture *img, PaintingData index, PaintingData imageC
 
             // Texture coordinates.
             tx = ((mesh->pos[0] * tWidthScale) - 32);
-            ty = ((y1 - mesh->pos[1]) * tHeightScale);
+            ty = (((y1 - mesh->pos[1]) * tHeightScale) + 4);
 
             // Map the texture and place it in the verts array.
             make_vertex(verts, (groupIndex + map),
@@ -608,7 +608,7 @@ Gfx *render_painting(const Texture *img, PaintingData index, PaintingData imageC
 
         // Texture coordinates.
         tx = ((mesh->pos[0] * tWidthScale) - 32);
-        ty = ((y1 - mesh->pos[1]) * tHeightScale);
+        ty = (((y1 - mesh->pos[1]) * tHeightScale) + 4);
 
         make_vertex(verts, ((triGroups * VTX_PER_GRP) + map),
             mesh->pos[0],
@@ -675,9 +675,9 @@ void painting_setup_textures(Gfx **gfx, PaintingData tWidth, PaintingData tHeigh
     // Get the exponents (shift) of tWidth and tHeight for the texture map.
     // Making this conversion into its own function does not work for some reason.
     f32 tmp = tWidth;
-    s32 mskt = ((((*(s32 *)&tmp) >> 23) & (u32)BITMASK(8)) - 0x7F);
+    s32 mskt = ((((*(s32 *)&tmp) >> 23) & (u32)BITMASK(8)) - 127);
     tmp = tHeight;
-    s32 msks = ((((*(s32 *)&tmp) >> 23) & (u32)BITMASK(8)) - 0x7F);
+    s32 msks = ((((*(s32 *)&tmp) >> 23) & (u32)BITMASK(8)) - 127);
 
     // Set up the textures.
     gDPSetTile((*gfx)++, G_IM_FMT_RGBA, G_IM_SIZ_16b,
@@ -837,8 +837,10 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
 
     painting_setup_textures(&gfx, tWidth, tHeight);
 
-    const s16 s = ((tWidth  * 32) - 32);
-    const s16 t = ((tHeight * 32) - 32);
+    const s16 s1 = -32;
+    const s16 t1 = 4;
+    const s16 s2 = ((tWidth  * 32) - 32);
+    const s16 t2 = ((tHeight * 32) - 32) + 4;
 
     s32 idx = 0;
     s16 dy = (PAINTING_SIZE / imageCount);
@@ -848,10 +850,10 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
     for (s32 i = 0; i < imageCount; i++) {
         y1 = (i * dy);
         y2 = (y1 + dy);
-        make_vertex(verts, idx++,             0, y1, 0, -32, t, n[0], n[1], n[2], alpha); // Bottom Left
-        make_vertex(verts, idx++, PAINTING_SIZE, y1, 0,   s, t, n[0], n[1], n[2], alpha); // Bottom Right
-        make_vertex(verts, idx++, PAINTING_SIZE, y2, 0,   s, 0, n[0], n[1], n[2], alpha); // Top Right
-        make_vertex(verts, idx++,             0, y2, 0, -32, 0, n[0], n[1], n[2], alpha); // Top left
+        make_vertex(verts, idx++,             0, y1, 0, s1, t2, n[0], n[1], n[2], alpha); // Bottom Left
+        make_vertex(verts, idx++, PAINTING_SIZE, y1, 0, s2, t2, n[0], n[1], n[2], alpha); // Bottom Right
+        make_vertex(verts, idx++, PAINTING_SIZE, y2, 0, s2, t1, n[0], n[1], n[2], alpha); // Top Right
+        make_vertex(verts, idx++,             0, y2, 0, s1, t1, n[0], n[1], n[2], alpha); // Top left
     }
 
     gSPVertex(gfx++, verts, idx, 0);
