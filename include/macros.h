@@ -46,6 +46,13 @@
 #define FALL_THROUGH
 #endif
 
+// Align to 4-byte boundary
+#ifdef __GNUC__
+#define ALIGNED4 __attribute__((aligned(4)))
+#else
+#define ALIGNED4
+#endif
+
 // Align to 8-byte boundary (for DMA requirements)
 #ifdef __GNUC__
 #define ALIGNED8 __attribute__((aligned(8)))
@@ -74,13 +81,6 @@
 #define ALIGNED64
 #endif
 
-// Static assertions
-#ifdef __GNUC__
-#define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
-#else
-#define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
-#endif
-
 #ifndef NO_SEGMENTED_MEMORY
 // convert a virtual address to physical.
 #define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr) & 0x1FFFFFFF)
@@ -91,17 +91,18 @@
 // another way of converting virtual to physical
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((u8 *)(addr) - 0x80000000U)
 #else
-// no conversion needed other than cast
+// no conversion needed other than cast.
 #define VIRTUAL_TO_PHYSICAL(addr)   ((uintptr_t)(addr))
 #define PHYSICAL_TO_VIRTUAL(addr)   ((uintptr_t)(addr))
 #define VIRTUAL_TO_PHYSICAL2(addr)  ((void *)(addr))
 #endif
 
-enum VIModes {
-    MODE_NTSC,
-    MODE_MPAL,
-    MODE_PAL,
-};
+// Static (compile-time) assertions.
+#ifdef __GNUC__
+#define STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+#else
+#define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
+#endif
 
 #define FORCE_CRASH { *(vs8*)0 = 0; }
 

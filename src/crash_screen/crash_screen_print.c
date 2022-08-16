@@ -66,11 +66,11 @@ u32 crash_screen_fornat_space(const char *buf, u32 index, u32 size, u32 x, u32 y
 
 static s32 glyph_to_hex(char *dest, unsigned char glyph) {
     if (IS_NUMERIC(glyph)) {
-        *dest = ((glyph - '0') & 0xF);
+        *dest = ((glyph - '0') & BITMASK(4));
     } else if (IS_UPPERCASE(glyph)) {
-        *dest = (((glyph - 'A') + 10) & 0xF);
+        *dest = (((glyph - 'A') + 10) & BITMASK(4));
     } else if (IS_LOWERCASE(glyph)) {
-        *dest = (((glyph - 'a') + 10) & 0xF);
+        *dest = (((glyph - 'a') + 10) & BITMASK(4));
     } else {
         return FALSE;
     }
