@@ -27,6 +27,9 @@
 /// This is added to Mario's Y position to make the ripple closer to Mario's center of mass.
 #define PAINTING_MARIO_Y_OFFSET 50
 
+// Convert image coordinates to texel coordinates.
+#define TC(t) (((t) - 1) << 5)
+
 
 // HMC painting group
 enum HMCPaintingIDs {

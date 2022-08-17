@@ -498,12 +498,9 @@ void painting_average_vertex_normals(const PaintingData *neighborTris, PaintingD
 #define TRI_PER_GRP (VTX_BUF_MAX / 3) //  5 or 10
 #define VTX_PER_GRP (TRI_PER_GRP * 3) // 15 or 30
 
-// Amount by which to shift the texture.
+// Amount by which to shift the painting textures.
 #define PTX_OFFSET_S 0
 #define PTX_OFFSET_T 4
-
-// Convert image coordinates to texel coordinates.
-#define ST(t) (((t) - 1) << 5)
 
 /**
  * Creates a display list that draws the rippling painting, with 'img' mapped to the painting's mesh,
@@ -554,8 +551,8 @@ Gfx *render_painting(const Texture *img, PaintingData index, PaintingData imageC
     const f32 dy = (PAINTING_SIZE / imageCount);
 
     // To scale the vertex positions into texture positions.
-    const f32 tWidthScale  = (ST(tWidth ) / dx);
-    const f32 tHeightScale = (ST(tHeight) / dy);
+    const f32 tWidthScale  = (TC(tWidth ) / dx);
+    const f32 tHeightScale = (TC(tHeight) / dy);
 
     // Starting Y position of the current section.
     const s16 y1 = ((index + 1) * dy);
@@ -681,21 +678,25 @@ Gfx *painting_model_view_transform(const struct Painting *painting) {
 }
 
 /**
+ * Gets the exponent of an integer by converting it into a float and extracting the exponent bits.
+ */
+s32 get_exponent(s32 x) {
+    union { s32 i; f32 f; } b = { .f = x };
+    return (((b.i >> 23) & (u32)BITMASK(8)) - 127);
+}
+
+/**
  * Set up the texture format in the display list.
  */
 void painting_setup_textures(Gfx **gfx, PaintingData tWidth, PaintingData tHeight) {
-    // Get the exponents (shift) of tWidth and tHeight for the texture map.
-    // Making this conversion into its own function does not work for some reason.
-    f32 tmp = tWidth;
-    s32 mskt = ((((*(s32 *)&tmp) >> 23) & (u32)BITMASK(8)) - 127);
-    tmp = tHeight;
-    s32 msks = ((((*(s32 *)&tmp) >> 23) & (u32)BITMASK(8)) - 127);
+    u32 masks = get_exponent(tWidth);
+    u32 maskt = get_exponent(tHeight);
 
     // Set up the textures.
     gDPSetTile((*gfx)++, G_IM_FMT_RGBA, G_IM_SIZ_16b,
         (tWidth >> 2), 0, G_TX_RENDERTILE, 0,
-        (G_TX_WRAP | G_TX_NOMIRROR), msks, G_TX_NOLOD,
-        (G_TX_WRAP | G_TX_NOMIRROR), mskt, G_TX_NOLOD
+        (G_TX_WRAP | G_TX_NOMIRROR), maskt, G_TX_NOLOD,
+        (G_TX_WRAP | G_TX_NOMIRROR), masks, G_TX_NOLOD
     );
     gDPSetTileSize((*gfx)++, 0,
         0, 0,
@@ -739,8 +740,6 @@ Gfx *dl_painting_rippling(const struct Painting *painting) {
     Gfx *beginDl = (isEnvMap ? dl_paintings_env_mapped_begin : dl_paintings_rippling_begin);
     gSPDisplayList(gfx++, beginDl);
 
-    painting_setup_textures(&gfx, tWidth, tHeight);
-
     //! TODO: Automatically determine texture maps based on the image count.
     const PaintingData **textureMaps = NULL;
     if (imageCount > 1) {
@@ -748,6 +747,8 @@ Gfx *dl_painting_rippling(const struct Painting *painting) {
     } else {
         textureMaps = segmented_to_virtual(seg2_painting_env_map_texture_maps);
     }
+
+    painting_setup_textures(&gfx, tWidth, tHeight);
 
     // Map each image to the mesh's vertices.
     for (i = 0; i < imageCount; i++) {
@@ -804,9 +805,9 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
     s32 shaded = painting->shaded;
     u32 gfxCmds = (
         /*gSPDisplayList        */ 1 +
+        /*gSPVertex             */ 1 +
         /*gDPSetTile            */ 1 +
         /*gDPSetTileSize        */ 1 +
-        /*gSPVertex             */ 1 +
         (imageCount * (
             /*gDPSetTextureImage    */ 1 +
             /*gDPLoadSync           */ 1 +
@@ -847,30 +848,32 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
     PaintingData tWidth = painting->textureWidth;
     PaintingData tHeight = painting->textureHeight;
 
-    painting_setup_textures(&gfx, tWidth, tHeight);
+    const f32 dx = (PAINTING_SIZE / 1);
+    const f32 dy = (PAINTING_SIZE / imageCount);
 
     // Top left corner texture coordinates.
     const s16 s1 = PTX_OFFSET_S;
     const s16 t1 = PTX_OFFSET_T;
     // Bottom right corner texture coordinates.
-    const s16 s2 = (s1 + ST(tWidth ));
-    const s16 t2 = (t1 + ST(tHeight));
+    const s16 s2 = (s1 + TC(tWidth ));
+    const s16 t2 = (t1 + TC(tHeight));
 
     s32 idx = 0;
-    s16 dy = (PAINTING_SIZE / imageCount);
     s16 y1, y2;
 
     // Generate vertices
     for (s32 i = 0; i < imageCount; i++) {
         y1 = (i * dy);
         y2 = (y1 + dy);
-        make_vertex(verts, idx++,             0, y1, 0, s1, t2, n[0], n[1], n[2], alpha); // Bottom Left
-        make_vertex(verts, idx++, PAINTING_SIZE, y1, 0, s2, t2, n[0], n[1], n[2], alpha); // Bottom Right
-        make_vertex(verts, idx++, PAINTING_SIZE, y2, 0, s2, t1, n[0], n[1], n[2], alpha); // Top Right
-        make_vertex(verts, idx++,             0, y2, 0, s1, t1, n[0], n[1], n[2], alpha); // Top left
+        make_vertex(verts, idx++,  0, y1, 0, s1, t2, n[0], n[1], n[2], alpha); // Bottom Left
+        make_vertex(verts, idx++, dx, y1, 0, s2, t2, n[0], n[1], n[2], alpha); // Bottom Right
+        make_vertex(verts, idx++, dx, y2, 0, s2, t1, n[0], n[1], n[2], alpha); // Top Right
+        make_vertex(verts, idx++,  0, y2, 0, s1, t1, n[0], n[1], n[2], alpha); // Top left
     }
 
     gSPVertex(gfx++, verts, idx, 0);
+
+    painting_setup_textures(&gfx, tWidth, tHeight);
 
     for (s32 i = 0; i < imageCount; i++) {
         gDPSetTextureImage(gfx++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, textures[i]);
