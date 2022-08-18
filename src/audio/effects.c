@@ -343,16 +343,12 @@ f32 adsr_update(struct AdsrState *adsr) {
 s32 adsr_update(struct AdsrState *adsr) {
 #endif
     u8 action = adsr->action;
-#if defined(VERSION_EU) || defined(VERSION_SH)
     u8 state = adsr->state;
     switch (state) {
-#else
-    switch (adsr->state) {
-#endif
         case ADSR_STATE_DISABLED:
             return 0;
 
-        case ADSR_STATE_INITIAL: {
+        case ADSR_STATE_INITIAL:
 #if defined(VERSION_JP) || defined(VERSION_US)
             adsr->current = adsr->initial;
             adsr->target = adsr->initial;
@@ -361,8 +357,7 @@ s32 adsr_update(struct AdsrState *adsr) {
                 adsr->state = ADSR_STATE_HANG;
                 break;
             }
-        }
-        // fallthrough
+            // fallthrough
 
         case ADSR_STATE_START_LOOP:
             adsr->envIndex = 0;
@@ -370,11 +365,12 @@ s32 adsr_update(struct AdsrState *adsr) {
             adsr->currentHiRes = (adsr->current << 0x10);
 #endif
             adsr->state = ADSR_STATE_LOOP;
-
 #ifdef VERSION_SH
+            // fallthrough
             restart:
 #endif
             // fallthrough
+
         case ADSR_STATE_LOOP:
             adsr->delay = BSWAP16(adsr->envelope[adsr->envIndex].delay);
             switch (adsr->delay) {
@@ -399,25 +395,23 @@ s32 adsr_update(struct AdsrState *adsr) {
 #if defined(VERSION_EU) || defined(VERSION_SH)
                     if (adsr->delay >= 4) {
                         adsr->delay = adsr->delay * gAudioBufferParameters.updatesPerFrame
-#ifdef VERSION_SH
+ #ifdef VERSION_SH
                         / gAudioBufferParameters.presetUnk4
-#endif
+ #endif
                         / 4;
                     }
-#if defined(VERSION_SH)
+ #ifdef VERSION_SH
                     if (adsr->delay == 0) {
                         adsr->delay = 1;
                     }
+ #endif
                     adsr->target = (f32) BSWAP16(adsr->envelope[adsr->envIndex].arg) / 32767.0f;
-#elif defined(VERSION_EU)
-                    adsr->target = (f32) BSWAP16(adsr->envelope[adsr->envIndex].arg) / 32767.0;
-#endif
                     adsr->target = adsr->target * adsr->target;
                     adsr->velocity = (adsr->target - adsr->current) / adsr->delay;
-#else
+#else // !(VERSION_EU || VERSION_SH)
                     adsr->target = BSWAP16(adsr->envelope[adsr->envIndex].arg);
                     adsr->velocity = ((adsr->target - adsr->current) << 0x10) / adsr->delay;
-#endif
+#endif // !(VERSION_EU || VERSION_SH)
                     adsr->state = ADSR_STATE_FADE;
                     adsr->envIndex++;
                     break;

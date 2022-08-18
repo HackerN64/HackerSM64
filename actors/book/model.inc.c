@@ -3,10 +3,6 @@
 // This actor file requires including actor bookend because of bookend_seg5_texture_05000C60
 
 // 0x05002558
-static const Lights1 book_seg5_lights_05002558 = gdSPDefLights1(
-    0x7f, 0x7f, 0x7f,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x05002570
 ALIGNED8 static const Texture book_seg5_texture_05002570[] = {
@@ -50,8 +46,8 @@ const Gfx book_seg5_dl_05002EF0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, bookend_seg5_texture_05000C60),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 32 - 1, CALC_DXT(16, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&book_seg5_lights_05002558.l, 1),
-    gsSPLight(&book_seg5_lights_05002558.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x7f7f7fff),
     gsSPVertex(book_seg5_vertex_05002D70, 12, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  6,  7, 0x0),
