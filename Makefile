@@ -114,20 +114,10 @@ else ifeq ($(GRUCODE),super3d) # Super3D
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
 endif
 
-LIBRARIES := nustd hvqm2 z goddard
-
 # TEXT ENGINES
 #   s2dex_text_engine - Text Engine by someone2639
 TEXT_ENGINE := none
-ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
-  LIBRARIES += s2d_engine
-  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/
-endif
-# add more text engines here
-
-LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
-
+$(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
 
 #==============================================================================#
 # Optimization flags                                                           #
@@ -436,6 +426,18 @@ else ifneq ($(call find-command,mips-ld),)
 else
   $(error Unable to detect a suitable MIPS toolchain installed)
 endif
+
+LIBRARIES := nustd hvqm2 z goddard
+
+# Text engine
+ifeq ($(TEXT_ENGINE), s2dex_text_engine)
+  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
+  LIBRARIES += s2d_engine
+  DUMMY != $(MAKE) -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
+endif
+# add more text engines here
+
+LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
 
 export LD_LIBRARY_PATH=./tools
 
