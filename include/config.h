@@ -14,7 +14,6 @@
 #include "config/config_game.h"
 #include "config/config_goddard.h"
 #include "config/config_graphics.h"
-#include "config/config_interaction.h"
 #include "config/config_menu.h"
 #include "config/config_movement.h"
 #include "config/config_objects.h"
