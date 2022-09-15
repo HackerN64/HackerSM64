@@ -195,13 +195,13 @@ void draw_shape(struct ObjShape *shape, s32 flag, f32 c, f32 d, f32 e, // "sweep
 
     if (flag & 8) {
         if (m != 0.0f) {
-            func_8019F2C4(m, 121);
+            gd_dl_rot_matrix(m, GD_Y_AXIS);
         }
         if (l != 0.0f) {
-            func_8019F2C4(l, 120);
+            gd_dl_rot_matrix(l, GD_X_AXIS);
         }
         if (n != 0.0f) {
-            func_8019F2C4(n, 122);
+            gd_dl_rot_matrix(n, GD_Z_AXIS);
         }
     }
 
@@ -486,7 +486,7 @@ void draw_face(struct ObjFace *face) {
             vtx->gbiVerts = make_vtx_link(vtx->gbiVerts, gbiVtx);
         }
     }
-    func_8019FEF0();
+    gd_dl_flush_at_threshold();
     imout();
 }
 
@@ -525,7 +525,7 @@ void Unknown801792F0(struct GdObj *obj) {
     format_object_id(objId, obj);
     set_cur_dynobj(obj);
     d_get_world_pos(&objPos);
-    func_801A4438(objPos.x, objPos.y, objPos.z);
+    set_text_draw_pos(objPos.x, objPos.y, objPos.z);
     stub_draw_label_text(objId);
 }
 
@@ -584,7 +584,7 @@ void draw_label(struct ObjLabel *label) {
     position.x += label->position.x;
     position.y += label->position.y;
     position.z += label->position.z;
-    func_801A4438(position.x, position.y, position.z);
+    set_text_draw_pos(position.x, position.y, position.z);
     stub_draw_label_text(strbuf);
 }
 
@@ -856,7 +856,7 @@ void draw_shape_faces(struct ObjShape *shape) {
     if (shape->dlNums[gGdFrameBufNum] != 0) {
         draw_indexed_dl(shape->dlNums[gGdFrameBufNum], shape->unk50);
     } else if (shape->faceGroup != NULL) {
-        func_801A0038();
+        gd_dl_flush_buffer();
         draw_group(shape->faceGroup);
         gd_dl_flush_vertices();
     }
