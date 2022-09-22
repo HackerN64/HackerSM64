@@ -43,9 +43,8 @@ struct GfxPool *gGfxPool;
 
 // OS Controllers
 OSContStatus gControllerStatuses[4];
-OSContPadEx gControllerPads[4];
+OSContPad gControllerPads[4];
 u8 gControllerBits;
-s8 gGamecubeControllerPort = -1; // HackerSM64: This is set to -1 if there's no GC controller, 0 if there's one in the first port and 1 if there's one in the second port.
 u8 gIsConsole = TRUE; // Needs to be initialized before audio_reset_session is called
 u8 gCacheEmulated = TRUE;
 u8 gBorderHeight;
@@ -603,7 +602,7 @@ void read_controller_inputs(s32 threadID) {
         if (threadID == THREAD_5_GAME_LOOP) {
             osRecvMesg(&gSIEventMesgQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
         }
-        osContGetReadDataEx(&gControllerPads[0]);
+        osContGetReadData(&gControllerPads[0]);
 #if ENABLE_RUMBLE
         release_rumble_pak_control();
 #endif
@@ -614,18 +613,7 @@ void read_controller_inputs(s32 threadID) {
 
     for (i = 0; i < 2; i++) {
         struct Controller *controller = &gControllers[i];
-        // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-        u32 oldButton = controller->controllerData->button;
-        if (gIsConsole && (gGamecubeControllerPort >= 0)) {
-            u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
-            if (oldButton & Z_TRIG) {
-                newButton |= L_TRIG;
-            }
-            if (controller->controllerData->l_trig > 85) { // How far the player has to press the L trigger for it to be considered a Z press. 64 is about 25%. 127 would be about 50%.
-                newButton |= Z_TRIG;
-            }
-            controller->controllerData->button = newButton;
-        }
+
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             controller->rawStickX = controller->controllerData->stick_x;
@@ -701,15 +689,6 @@ void init_controllers(void) {
             gControllers[cont].statusData = &gControllerStatuses[port];
             gControllers[cont++].controllerData = &gControllerPads[port];
         }
-    }
-    if (__osControllerTypes[1] == CONT_TYPE_GCN) {
-        gGamecubeControllerPort = 1;
-        gPlayer1Controller = &gControllers[1];
-    } else {
-        if (__osControllerTypes[0] == CONT_TYPE_GCN) {
-            gGamecubeControllerPort = 0;
-        }
-        gPlayer1Controller = &gControllers[0];
     }
 }
 
@@ -790,7 +769,7 @@ void thread5_game_loop(UNUSED void *arg) {
 #if ENABLE_RUMBLE
             block_until_rumble_pak_free();
 #endif
-            osContStartReadDataEx(&gSIEventMesgQueue);
+            osContStartReadData(&gSIEventMesgQueue);
         }
 
         audio_game_loop_tick();

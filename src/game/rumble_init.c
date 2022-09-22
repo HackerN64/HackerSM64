@@ -232,7 +232,7 @@ static void thread6_rumble_loop(UNUSED void *arg) {
                 sRumblePakActive = FALSE;
             }
         } else if (gNumVblanks % 60 == 0) {
-            sRumblePakActive = osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) < 1;
+            sRumblePakActive = osMotorInit(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) < 1;
             sRumblePakErrorCount = 0;
         }
 
@@ -243,7 +243,7 @@ static void thread6_rumble_loop(UNUSED void *arg) {
 }
 
 void cancel_rumble(void) {
-    sRumblePakActive = osMotorInitEx(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) < 1;
+    sRumblePakActive = osMotorInit(&gSIEventMesgQueue, &gRumblePakPfs, gPlayer1Controller->port) < 1;
 
     if (sRumblePakActive) {
         osMotorStop(&gRumblePakPfs);

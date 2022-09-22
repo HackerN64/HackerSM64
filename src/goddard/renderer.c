@@ -103,8 +103,8 @@ static struct ObjView *D_801BE994; // store if View flag 0x40 set
 u8 EUpad4[0x88];
 #endif
 static OSContStatus D_801BAE60[4];
-static OSContPadEx sGdContPads[4];    // @ 801BAE70
-static OSContPadEx sPrevFrameCont[4]; // @ 801BAE88
+static OSContPad sGdContPads[4];    // @ 801BAE70
+static OSContPad sPrevFrameCont[4]; // @ 801BAE88
 static u8 D_801BAEA0;
 static struct ObjGadget *sTimerGadgets[GD_NUM_TIMERS]; // @ 801BAEA8
 static u32 D_801BAF28;                                 // RAM addr offset?
@@ -1287,12 +1287,12 @@ void gd_vblank(void) {
 /**
  * Copies the player1 controller data from p1cont to sGdContPads[0].
  */
-void gd_copy_p1_contpad(OSContPadEx *p1cont) {
+void gd_copy_p1_contpad(OSContPad *p1cont) {
     u32 i;                                    // 24
     u8 *src = (u8 *) p1cont;             // 20
     u8 *dest = (u8 *) &sGdContPads[0]; // 1c
 
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
+    for (i = 0; i < sizeof(OSContPad); i++) {
         dest[i] = src[i];
     }
 
@@ -2397,8 +2397,8 @@ void start_view_dl(struct ObjView *view) {
 void parse_p1_controller(void) {
     u32 i;
     struct GdControl *gdctrl = &gGdCtrl;
-    OSContPadEx *currInputs;
-    OSContPadEx *prevInputs;
+    OSContPad *currInputs;
+    OSContPad *prevInputs;
 
     // Copy current inputs to previous
     u8 *src = (u8 *) gdctrl;
@@ -2509,7 +2509,7 @@ void parse_p1_controller(void) {
         gdctrl->csrY = sScreenView->parent->upperLeft.y + sScreenView->parent->lowerRight.y - 32.0f;
     }
 
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
+    for (i = 0; i < sizeof(OSContPad); i++) {
         ((u8 *) prevInputs)[i] = ((u8 *) currInputs)[i];
     }
 }
@@ -2800,15 +2800,15 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
 
 /* 252AF8 -> 252BAC; orig name: _InitControllers */
 void gd_init_controllers(void) {
-    OSContPadEx *p1cont = &sPrevFrameCont[0]; // 1c
+    OSContPad *p1cont = &sPrevFrameCont[0]; // 1c
     u32 i;                                  // 18
 
     osCreateMesgQueue(&D_801BE830, D_801BE848, ARRAY_COUNT(D_801BE848));
     osSetEventMesg(OS_EVENT_SI, &D_801BE830, (OSMesg) OS_MESG_SI_COMPLETE);
     osContInit(&D_801BE830, &D_801BAEA0, D_801BAE60);
-    osContStartReadDataEx(&D_801BE830);
+    osContStartReadData(&D_801BE830);
 
-    for (i = 0; i < sizeof(OSContPadEx); i++) {
+    for (i = 0; i < sizeof(OSContPad); i++) {
         ((u8 *) p1cont)[i] = 0;
     }
 }
