@@ -471,22 +471,6 @@ enum GeoLayoutCommands {
     CMD_BBH(GEO_CMD_NODE_CULLING_RADIUS, 0x00, cullingRadius)
 
 /**
- * 0x21: Create a scene graph node that is rotated by the object's animation + an initial rotation.
- *       u8 drawingLayer
- *       s16 xTranslation
- *       s16 yTranslation
- *       s16 zTranslation
- *       s16 xRotation
- *       s16 yRotation
- *       s16 zRotation
- *       u32 displayList: dislay list segmented address
- */
-#define GEO_BONE(layer, tx, ty, tz, rx, ry, rz, displayList) \
-    CMD_BBH(GEO_CMD_BONE, layer, 0x0000), \
-    CMD_HHHHHH(tx, ty, tz, rx, ry, rz), \
-    CMD_PTR(displayList)
-
-/**
  * Advanced lighting engine
  * GEO_CMD_SCENE_LIGHT: Create a scene light node. Can be a regular light, point light, or ambient light.
  *   0x01: u8 lightType (0 is ambient, 1 is directional, 2 is point, 3 is occluded point)

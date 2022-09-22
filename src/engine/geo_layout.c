@@ -42,7 +42,6 @@ GeoLayoutCommandProc GeoLayoutJumpTable[] = {
     /*GEO_CMD_NOP_1E                    */ geo_layout_cmd_nop2,
     /*GEO_CMD_NOP_1F                    */ geo_layout_cmd_nop3,
     /*GEO_CMD_NODE_CULLING_RADIUS       */ geo_layout_cmd_node_culling_radius,
-    /*GEO_CMD_NODE_BONE                 */ geo_layout_cmd_bone,
     /*Advanced lighting engine          */ geo_layout_cmd_scene_light,
 };
 
@@ -786,30 +785,6 @@ void geo_layout_cmd_scene_light(void) {
         /* linear falloff */ sizeof(u8) +
         /* unused */ sizeof(u8)) << CMD_SIZE_SHIFT;
 }
-/*
-  Create a scene graph node that is rotated by the object's animation + an initial rotation.
-*/
-void geo_layout_cmd_bone(void) {
-    struct GraphNodeBone *graphNode;
-    Vec3s translation;
-    Vec3s rotation;
-    s32 drawingLayer = cur_geo_cmd_u8(0x01);
-    void *displayList;
-    s16 *cmdPos = (s16 *) gGeoLayoutCommand;
-
-    cmdPos = read_vec3s(translation, &cmdPos[2]);
-    cmdPos = read_vec3s(rotation, &cmdPos[0]);
-    displayList = *(void **) &cmdPos[0];
-    cmdPos += 2 << CMD_SIZE_SHIFT;
-
-    graphNode =
-        init_graph_node_bone(gGraphNodePool, NULL, drawingLayer, displayList, translation, rotation);
-
-    register_scene_graph_node(&graphNode->node);
-
-    gGeoLayoutCommand = (u8 *) cmdPos;
-}
-
 struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
     // set by register_scene_graph_node when gCurGraphNodeIndex is 0
     // and gCurRootGraphNode is NULL
