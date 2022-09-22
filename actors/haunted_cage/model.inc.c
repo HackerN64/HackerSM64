@@ -1,16 +1,8 @@
 // Haunted Cage
 
 // 0x0500C258
-static const Lights1 haunted_cage_seg5_lights_0500C258 = gdSPDefLights1(
-    0x39, 0x0c, 0x0e,
-    0x90, 0x1e, 0x25, 0x28, 0x28, 0x28
-);
 
 // 0x0500C270
-static const Lights1 haunted_cage_seg5_lights_0500C270 = gdSPDefLights1(
-    0x47, 0x47, 0x47,
-    0xb2, 0xb2, 0xb2, 0x28, 0x28, 0x28
-);
 
 // 0x0500C288
 ALIGNED8 static const Texture haunted_cage_seg5_texture_0500C288[] = {
@@ -254,8 +246,8 @@ const Gfx haunted_cage_seg5_dl_0500F4C8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, haunted_cage_seg5_texture_0500D288),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&haunted_cage_seg5_lights_0500C258.l, 1),
-    gsSPLight(&haunted_cage_seg5_lights_0500C258.a, 2),
+    gsSPLightColor(LIGHT_1, 0x901e25ff),
+    gsSPLightColor(LIGHT_2, 0x390c0eff),
     gsSPVertex(haunted_cage_seg5_vertex_0500EA88, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  9, 10, 11, 0x0),
@@ -266,8 +258,8 @@ const Gfx haunted_cage_seg5_dl_0500F4C8[] = {
     gsSP1Triangle(12, 13, 14, 0x0),
     gsSPVertex(haunted_cage_seg5_vertex_0500EC68, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
-    gsSPLight(&haunted_cage_seg5_lights_0500C270.l, 1),
-    gsSPLight(&haunted_cage_seg5_lights_0500C270.a, 2),
+    gsSPLightColor(LIGHT_1, 0xb2b2b2ff),
+    gsSPLightColor(LIGHT_2, 0x474747ff),
     gsSPVertex(haunted_cage_seg5_vertex_0500ECC8, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  3,  9,  4, 0x0),
@@ -353,10 +345,6 @@ const Gfx haunted_cage_seg5_dl_0500F7D8[] = {
 };
 
 // 0x0500F888
-static const Lights1 haunted_cage_seg5_lights_0500F888 = gdSPDefLights1(
-    0x66, 0x66, 0x66,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x0500F8A0
 static const Vtx haunted_cage_seg5_vertex_0500F8A0[] = {
@@ -417,8 +405,8 @@ const Gfx haunted_cage_seg5_dl_0500FB40[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, haunted_cage_seg5_texture_0500D688),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 16 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&haunted_cage_seg5_lights_0500F888.l, 1),
-    gsSPLight(&haunted_cage_seg5_lights_0500F888.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x666666ff),
     gsSPVertex(haunted_cage_seg5_vertex_0500F8A0, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  6,  4, 0x0,  7,  8,  9, 0x0),
@@ -455,10 +443,6 @@ const Gfx haunted_cage_seg5_dl_0500FC28[] = {
 };
 
 // 0x0500FC98
-static const Lights1 haunted_cage_seg5_lights_0500FC98 = gdSPDefLights1(
-    0x2c, 0x2c, 0x2c,
-    0xb2, 0xb2, 0xb2, 0x28, 0x28, 0x28
-);
 
 // 0x0500FCB0
 static const Vtx haunted_cage_seg5_vertex_0500FCB0[] = {
@@ -533,8 +517,8 @@ const Gfx haunted_cage_seg5_dl_0500FFF0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, haunted_cage_seg5_texture_0500DA88),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&haunted_cage_seg5_lights_0500FC98.l, 1),
-    gsSPLight(&haunted_cage_seg5_lights_0500FC98.a, 2),
+    gsSPLightColor(LIGHT_1, 0xb2b2b2ff),
+    gsSPLightColor(LIGHT_2, 0x2c2c2cff),
     gsSPVertex(haunted_cage_seg5_vertex_0500FCB0, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),

@@ -357,28 +357,6 @@ struct GraphNodeAnimatedPart *init_graph_node_animated_part(struct AllocOnlyPool
 }
 
 /**
- * Allocates and returns a newly created bone node with initial rotation/translation
- */
-struct GraphNodeBone *init_graph_node_bone(struct AllocOnlyPool *pool,
-                                           struct GraphNodeBone *graphNode,
-                                           s32 drawingLayer, void *displayList,
-                                           Vec3s translation, Vec3s rotation) {
-    if (pool != NULL) {
-        graphNode = alloc_only_pool_alloc(pool, sizeof(struct GraphNodeBone));
-    }
-
-    if (graphNode != NULL) {
-        init_scene_graph_node_links(&graphNode->node, GRAPH_NODE_TYPE_BONE);
-        vec3s_copy(graphNode->translation, translation);
-        vec3s_copy(graphNode->rotation, rotation);
-        SET_GRAPH_NODE_LAYER(graphNode->node.flags, drawingLayer);
-        graphNode->displayList = displayList;
-    }
-
-    return graphNode;
-}
-
-/**
  * Allocates and returns a newly created billboard node
  */
 struct GraphNodeBillboard *init_graph_node_billboard(struct AllocOnlyPool *pool,
@@ -430,11 +408,15 @@ struct GraphNodeShadow *init_graph_node_shadow(struct AllocOnlyPool *pool,
 
     if (graphNode != NULL) {
 #ifdef LEGACY_SHADOW_IDS
-        if (shadowType == 1 || shadowType == 2 || shadowType == 99) {
+        if (shadowType == LEGACY_SHADOW_CIRCLE_9_VERTS
+         || shadowType == LEGACY_SHADOW_CIRCLE_4_VERTS
+         || shadowType == LEGACY_SHADOW_CIRCLE_4_VERTS_FLAT_UNUSED
+         || shadowType == LEGACY_SHADOW_CIRCLE_PLAYER) {
             shadowType = SHADOW_CIRCLE;
-        } else if (shadowType == 11 || shadowType == 12) {
+        } else if (shadowType == LEGACY_SHADOW_SQUARE_SCALABLE
+                || shadowType == LEGACY_SHADOW_SQUARE_TOGGLABLE) {
             shadowType = SHADOW_SQUARE;
-        } else if (shadowType == 10) {
+        } else if (shadowType == LEGACY_SHADOW_SQUARE_PERMANENT) {
             shadowType = SHADOW_SQUARE_PERMANENT;
         }
 #endif
