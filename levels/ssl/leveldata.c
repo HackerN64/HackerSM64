@@ -38,7 +38,6 @@
 #include "levels/ssl/spindel/model.inc.c"
 #include "levels/ssl/moving_pyramid_wall/model.inc.c"
 #include "levels/ssl/pyramid_elevator/model.inc.c"
-#include "levels/ssl/eyerok_col/model.inc.c" // Blank file
 #include "levels/ssl/areas/2/collision.inc.c"
 #include "levels/ssl/areas/3/collision.inc.c"
 #include "levels/ssl/areas/2/macro.inc.c"

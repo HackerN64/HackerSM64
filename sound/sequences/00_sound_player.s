@@ -4088,16 +4088,9 @@ layer_note1 31, 0x14, 127
 layer_end
 
 .sound_general_red_coin:
-#if defined(VERSION_EU) || defined(VERSION_SH)
-  chan_setbank 9
-  chan_setinstr 3
-#else
-  chan_setinstr 128
-#endif
-chan_setenvelope .envelope_3378
-// Small bugfix: .main_loop_023589 expects layer 0 to live the longest.
-// I don't think this actually makes any audible difference given the
-// silence at the end.
+chan_setbank 9
+chan_setinstr 3
+# chan_setenvelope .envelope_3378 // Envelope for EU/SH not authentic to JP sound
 chan_setlayer 0, .layer_1907
 chan_setlayer 1, .layer_1902
 chan_setlayer 2, .layer_1909
