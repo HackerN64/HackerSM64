@@ -866,7 +866,7 @@ s32 cur_obj_has_model(ModelID16 modelID) {
 
 // HackerSM64 function
 ModelID32 obj_get_model_id(struct Object *obj) {
-    if (!obj->header.gfx.sharedChild) {
+    if (obj->header.gfx.sharedChild != NULL) {
         for (s32 i = MODEL_NONE; i < MODEL_ID_COUNT; i++) {
             if (obj->header.gfx.sharedChild == gLoadedGraphNodes[i]) {
                 return i;

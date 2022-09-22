@@ -329,6 +329,7 @@ static Gfx gd_dl_star_common[] = {
     gsSPVertex(gd_vertex_star, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsDPSetRenderMode(G_RM_AA_ZB_OPA_INTER, G_RM_NOOP2),
     gsSPEndDisplayList(),
@@ -516,6 +517,7 @@ static Gfx gd_dl_sparkle[] = {
     gsSPVertex(gd_vertex_sparkle, 4, 0),
     gsSP2Triangles(0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPTexture(0x0001, 0x0001, 0, G_TX_RENDERTILE, G_OFF),
+    gsDPPipeSync(),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsDPSetRenderMode(G_RM_AA_ZB_OPA_INTER, G_RM_NOOP2),
     gsSPEndDisplayList(),
@@ -1469,12 +1471,8 @@ struct GdDisplayList *create_child_gdl(s32 id, struct GdDisplayList *srcDl) {
     newDl = alloc_displaylist(id);
     newDl->parent = srcDl;
     cpy_remaining_gddl(newDl, srcDl);
-//! @bug No return statement, despite return value being used.
-//!      Goddard lucked out that `v0` return from alloc_displaylist()
-//!      is not overwriten, as that pointer is what should be returned
-#ifdef AVOID_UB
+
     return newDl;
-#endif
 }
 
 /* 24B7F8 -> 24BA48; orig name: func_8019D028 */
@@ -2797,14 +2795,7 @@ s32 setup_view_buffers(const char *name, struct ObjView *view, UNUSED s32 ulx, U
         view->parent = D_801A86E0;
     }
 
-//! @bug No actual return, but the return value is used.
-//!      There is no obvious value to return. Since the function
-//!      doesn't use four of its parameters, this function may have
-//!      had a fair amount of its code commented out. In game, the
-//!      returned value is always 0, so the fix returns that value
-#ifdef AVOID_UB
     return 0;
-#endif
 }
 
 /* 252AF8 -> 252BAC; orig name: _InitControllers */
@@ -2836,10 +2827,7 @@ void stub_renderer_6(UNUSED struct GdObj *obj) {
  * @return  an identifier of the menu just defined
  */
 long defpup(UNUSED const char *menufmt, ...) {
-    //! @bug no return; function was stubbed
-#ifdef AVOID_UB
    return 0;
-#endif
 }
 
 /**

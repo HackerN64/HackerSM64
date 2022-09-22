@@ -309,7 +309,7 @@ static Gfx *make_gfx_mario_alpha(struct GraphNodeGenerated *node, s16 alpha) {
         SET_GRAPH_NODE_LAYER(node->fnNode.node.flags, LAYER_TRANSPARENT);
         gfxHead = alloc_display_list(3 * sizeof(*gfxHead));
         gfx = gfxHead;
-        if (gMarioState->flags & MARIO_VANISH_CAP) {
+        if (gMarioState->flags & (MARIO_VANISH_CAP | MARIO_TELEPORTING)) {
             gDPSetAlphaCompare(gfx++, G_AC_DITHER);
         } else {
             gDPSetAlphaCompare(gfx++, G_AC_NONE);
