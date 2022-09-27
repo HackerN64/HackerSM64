@@ -5,9 +5,6 @@
 #include "surface_terrains.h"
 #include "types.h"
 
-#ifdef VERSION_EU
-#include "text_strings.h"
-#endif
 #include "make_const_nonconst.h"
 #include "game/ingame_menu.h"
 
@@ -1644,6 +1641,31 @@ const struct AsciiCharLUTEntry menu_font_lut[] = {
     {NULL, 0}, // 124 "|" (Unimplemented)
     {NULL, 0}, // 125 "}" (Unimplemented)
     {NULL, 0}, // 126 "~" (Unimplemented)
+};
+
+const struct Utf8CharLUTEntry menu_font_utf8_2byte_lut[] = {
+    {0x00D7, 6, 0, texture_menu_font_char_multiply}, // ×
+};
+
+const struct Utf8CharLUTEntry menu_font_utf8_3byte_lut[] = {
+    {0x2605, 10, 0, texture_menu_font_char_star_filled}, // ★
+    {0x272A, 8, 0, texture_menu_font_char_coin}, // ✪
+};
+
+const struct Utf8CharLUTEntry menu_font_utf8_4byte_lut[] = {
+
+};
+
+const struct Utf8CharLUTEntry menu_font_utf8_missing_char = {0, 7, 0, texture_menu_font_char_question};
+
+const struct Utf8LUT menu_font_utf8_lut = {
+    menu_font_utf8_2byte_lut,
+    menu_font_utf8_3byte_lut,
+    menu_font_utf8_4byte_lut,
+    ARRAY_COUNT(menu_font_utf8_2byte_lut),
+    ARRAY_COUNT(menu_font_utf8_3byte_lut),
+    ARRAY_COUNT(menu_font_utf8_4byte_lut),
+    &menu_font_utf8_missing_char,
 };
 
 // Menu small font print table

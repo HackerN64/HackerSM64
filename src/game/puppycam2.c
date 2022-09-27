@@ -13,7 +13,6 @@
 #include "print.h"
 #include "engine/surface_collision.h"
 #include "engine/surface_load.h"
-#include "include/text_strings.h"
 #include "segment2.h"
 #include "ingame_menu.h"
 #include "memory.h"
@@ -52,6 +51,65 @@ u8  gPCOptionScroll = 0;
 u16 gPuppyVolumeCount = 0;
 struct MemoryPool *gPuppyMemoryPool;
 s32 gPuppyError = 0;
+
+/*
+#define NC_CAMX_EN 				_("Camera X Sensitivity")
+#define NC_CAMY_EN 				_("Camera Y Sensitivity")
+#define NC_INVERTX_EN			_("Invert X Axis")
+#define NC_INVERTY_EN			_("Invert Y Axis")
+#define NC_CAMC_EN 				_("Camera Centre Speed")
+#define NC_ANALOGUE_EN			_("Analogue Camera")
+#define NC_SCHEME_EN			_("Control Scheme")
+#define OPTION_ENABLED_EN 		_("Enabled")
+#define OPTION_DISABLED_EN 		_("Disabled")
+#define OPTION_SCHEME1_EN 		_("Double Tap")
+#define OPTION_SCHEME2_EN 		_("Single Press")
+#define OPTION_SCHEME3_EN 		_("Classic")
+#define OPTION_LANGUAGE_EN 		_("Language")
+#define NC_WIDE_EN	 			_("Widescreen")
+#define NC_HIGHLIGHT_L 			_(">")
+#define NC_HIGHLIGHT_R 			_("<")
+#define NC_BUTTON_EN 			_("Ⓡ: Options")
+#define NC_BUTTON2_EN 			_("Ⓡ: Return")
+#define NC_OPTION_EN 			_("OPTIONS")
+
+#if MULTILANG
+#define NC_CAMX_FR 				_("Sensibilite sur l'axe X")
+#define NC_CAMY_FR 				_("Sensibilite sur l'axe Y")
+#define NC_INVERTX_FR			_("Invertir Axe X")
+#define NC_INVERTY_FR			_("Invertir Axe Y")
+#define NC_CAMC_FR 				_("Vitesse de Centrage")
+#define NC_ANALOGUE_FR			_("Camera Analogue")
+#define NC_SCHEME_FR			_("Control Scheme")
+#define OPTION_ENABLED_FR	    _("Active")
+#define OPTION_DISABLED_FR	    _("Desactive")
+#define OPTION_SCHEME1_FR 		_("Double Tap")
+#define OPTION_SCHEME2_FR 		_("Single Press")
+#define OPTION_SCHEME3_FR 		_("Classic")
+#define OPTION_LANGUAGE_FR 		_("Language")
+#define NC_WIDE_FR	 			_("Widescreen")
+#define NC_BUTTON_FR 			_("Ⓡ: Options")
+#define NC_BUTTON2_FR 			_("Ⓡ: Retournez")
+#define NC_OPTION_FR 			_("OPTIONS")
+
+#define NC_CAMX_DE 				_("Camera X Sensitivity")
+#define NC_CAMY_DE 				_("Camera Y Sensitivity")
+#define NC_INVERTY_DE			_("Invert Y Axis")
+#define NC_INVERTX_DE			_("Invert X Axis")
+#define NC_CAMC_DE 				_("Camera Centre Speed")
+#define NC_ANALOGUE_DE			_("Analogue Camera")
+#define NC_SCHEME_DE			_("Control Scheme")
+#define OPTION_ENABLED_DE 		_("Enabled")
+#define OPTION_DISABLED_DE	    _("Disabled")
+#define OPTION_SCHEME1_DE 		_("Double Tap")
+#define OPTION_SCHEME2_DE 		_("Single Press")
+#define OPTION_SCHEME3_DE 		_("Classic")
+#define OPTION_LANGUAGE_DE 		_("Language")
+#define NC_WIDE_DE	 			_("Widescreen")
+#define NC_BUTTON_DE 			_("Ⓡ: Options")
+#define NC_BUTTON2_DE 			_("Ⓡ: Return")
+#define NC_OPTION_DE 			_("OPTIONS")
+*/
 
 #if defined(VERSION_EU)
 static unsigned char  gPCOptionStringsFR[][64] = {{NC_ANALOGUE_FR}, {NC_CAMX_FR}, {NC_CAMY_FR}, {NC_INVERTX_FR}, {NC_INVERTY_FR}, {NC_CAMC_FR}, {NC_SCHEME_FR}, {NC_WIDE_FR}, {OPTION_LANGUAGE_FR}};

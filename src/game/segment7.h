@@ -8,7 +8,8 @@
 extern Gfx dl_menu_idle_hand[];
 extern Gfx dl_menu_grabbing_hand[];
 extern Texture menu_hud_lut[];
-extern Texture menu_font_lut[];
+extern struct AsciiCharLUTEntry menu_font_lut[];
+extern struct Utf8LUT menu_font_utf8_lut;
 extern Gfx dl_menu_ia8_text_begin[];
 extern Gfx dl_menu_ia8_text_end[];
 extern Gfx dl_menu_rgba16_wood_course[];

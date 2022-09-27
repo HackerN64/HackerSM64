@@ -39,10 +39,6 @@ void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
  * Prints text in the colorful lettering at given X, Y coordinates.
  */
 void print_text(s32 x, s32 y, const char *str) {
-    char c = 0;
-    s32 length = 0;
-    s32 srcIndex = 0;
-
     // Don't continue if there is no memory to do so.
     if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
                                                         sizeof(struct TextLabel))) == NULL) {
@@ -70,11 +66,7 @@ void print_text_centered(s32 x, s32 y, const char *str) {
  */
 void render_text_labels(void) {
     s32 i;
-    s32 j;
-    s8 glyphIndex;
     Mtx *mtx;
-    u8 curOffset;
-    u8 kerning;
 
     if (sTextLabelsCount == 0) {
         return;

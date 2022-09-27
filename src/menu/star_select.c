@@ -18,7 +18,6 @@
 #include "game/rumble_init.h"
 #include "sm64.h"
 #include "star_select.h"
-#include "text_strings.h"
 #include "game/main.h"
 
 /**
@@ -213,7 +212,7 @@ void bhv_act_selector_loop(void) {
  */
 
 void print_course_number(void) {
-    u8 courseNum[4];
+    char courseNum[4];
 
     create_dl_translation_matrix(MENU_MTX_PUSH, 158.0f, 81.0f, 0.0f);
 
@@ -261,12 +260,10 @@ char *textActMyScore = LANGUAGE_TEXT(
  * Print act selector strings, some with special checks.
  */
 void print_act_selector_strings(void) {
-    unsigned char starNumbers[] = { TEXT_ZERO };
-
-    u8 **levelNameTbl = segmented_to_virtual(seg2_course_name_table);
-    u8 *currLevelName = segmented_to_virtual(levelNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum)]);
-    u8 **actNameTbl = segmented_to_virtual(seg2_act_name_table);
-    u8 *selectedActName;
+    char **levelNameTbl = segmented_to_virtual(seg2_course_name_table);
+    char *currLevelName = segmented_to_virtual(levelNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum)]);
+    char **actNameTbl = segmented_to_virtual(seg2_act_name_table);
+    char *selectedActName;
     s16 lvlNameX;
     s16 actNameX;
     s8 i;
@@ -305,8 +302,9 @@ void print_act_selector_strings(void) {
 
     // Print the numbers above each star.
     for (i = 1; i <= sVisibleStars; i++) {
-        starNumbers[0] = i;
-        print_menu_generic_string(139 - sVisibleStars * 17 + i * 34, 38, starNumbers);
+        char str[4];
+        sprintf(str, "%d", i);
+        print_menu_generic_string(139 - sVisibleStars * 17 + i * 34, 38, str);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);

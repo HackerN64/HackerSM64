@@ -20,7 +20,6 @@
 #include "game/spawn_object.h"
 #include "game/rumble_init.h"
 #include "sm64.h"
-#include "text_strings.h"
 
 #include "eu_translation.h"
 #if MULTILANG
@@ -110,46 +109,6 @@ s8 sSelectedFileNum = 0;
 s8 sScoreFileCoinScoreMode = 0;
 
 // In EU, if no save file exists, open the language menu so the user can find it.
-
-char textReturn[] = { TEXT_RETURN };
-
-char textViewScore[] = { TEXT_CHECK_SCORE };
-
-char textCopyFileButton[] = { TEXT_COPY_FILE_BUTTON };
-
-char textEraseFileButton[] = { TEXT_ERASE_FILE_BUTTON };
-
-char textSoundModes[][8] = { { TEXT_STEREO }, { TEXT_MONO }, { TEXT_HEADSET } };
-
-char textMarioA[] = { TEXT_FILE_MARIO_A };
-char textMarioB[] = { TEXT_FILE_MARIO_B };
-char textMarioC[] = { TEXT_FILE_MARIO_C };
-char textMarioD[] = { TEXT_FILE_MARIO_D };
-
-char textScore[] = { TEXT_SCORE };
-
-char textCopy[] = { TEXT_COPY };
-
-char textErase[] = { TEXT_ERASE };
-
-char textLanguage[][9] = {{ TEXT_ENGLISH }, { TEXT_FRENCH }, { TEXT_GERMAN }};
-
-char textNoSavedDataExists[] = { TEXT_NO_SAVED_DATA_EXISTS };
-
-char textCopyItToWhere[] = { TEXT_COPY_IT_TO_WHERE };
-
-char textNoSavedDataExistsCopy[] = { TEXT_NO_SAVED_DATA_EXISTS };
-
-char textCopyCompleted[] = { TEXT_COPYING_COMPLETED };
-
-char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
-
-char textNoFileToCopyFrom[] = { TEXT_NO_FILE_TO_COPY_FROM };
-
-char textYes[] = { TEXT_YES };
-
-char textNo[] = { TEXT_NO };
-
 
 /**
  * Yellow Background Menu Initial Action
@@ -1295,8 +1254,7 @@ char *textNew = LANGUAGE_TEXT(
     "NEW");
 
 void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
-    u8 starCountText[10];
-    s8 offset = 0;
+    char starCountText[10];
 
     if (save_file_exists(fileIndex)) {
         s16 starCount = save_file_get_total_star_count(fileIndex,
@@ -1330,6 +1288,66 @@ char *textSelectFile = LANGUAGE_TEXT(
     "WwHLE SPIEL",
     "ファイルセレクト");
 
+char *textScore = LANGUAGE_TEXT(
+    "SCORE",
+    "SCORE",
+    "LEISTUNG",
+    "スコア");
+
+char *textCopy = LANGUAGE_TEXT(
+    "COPY",
+    "COPIER",
+    "KOPIEREN",
+    "コピー");
+
+char *textErase = LANGUAGE_TEXT(
+    "ERASE",
+    "EFFACER",
+    "LÖSCHEN",
+    "けす");
+
+char *textMarioA = LANGUAGE_TEXT(
+    "MARIO A",
+    "MARIO A",
+    "MARIO A",
+    "マリオＡ");
+
+char *textMarioB = LANGUAGE_TEXT(
+    "MARIO B",
+    "MARIO B",
+    "MARIO B",
+    "マリオＢ");
+
+char *textMarioC = LANGUAGE_TEXT(
+    "MARIO C",
+    "MARIO C",
+    "MARIO C",
+    "マリオＣ");
+
+char *textMarioD = LANGUAGE_TEXT(
+    "MARIO D",
+    "MARIO D",
+    "MARIO D",
+    "マリオＤ");
+
+char *textSoundModes[] = {
+    LANGUAGE_TEXT(
+        "STEREO",
+        "STÉRÉO",
+        "STEREO",
+        "ステレオ"),
+    LANGUAGE_TEXT(
+        "MONO",
+        "MONO",
+        "MONO",
+        "モノラル"),
+    LANGUAGE_TEXT(
+        "HEADSET",
+        "CASQUE",
+        "PHONES",
+        "ヘッドホン"),
+};
+
 /**
  * Prints main menu strings that shows on the yellow background menu screen.
  *
@@ -1351,19 +1369,19 @@ void print_main_menu_strings(void) {
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string(SCORE_X, 39, textScore);
-    print_generic_string(COPY_X, 39, textCopy);
-    print_generic_string(ERASE_X, 39, textErase);
-    sSoundTextX = get_str_x_pos_from_center(254, textSoundModes[sSoundMode], 10.0f);
-    print_generic_string(sSoundTextX, 39, textSoundModes[sSoundMode]);
+    print_generic_string(SCORE_X, 39, LANGUAGE_ARRAY(textScore));
+    print_generic_string(COPY_X, 39, LANGUAGE_ARRAY(textCopy));
+    print_generic_string(ERASE_X, 39, LANGUAGE_ARRAY(textErase));
+    sSoundTextX = get_str_x_pos_from_center(254, LANGUAGE_ARRAY(textSoundModes[sSoundMode]), 10.0f);
+    print_generic_string(sSoundTextX, 39, LANGUAGE_ARRAY(textSoundModes[sSoundMode]));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(MARIOTEXT_X1, 65, textMarioA);
-    print_menu_generic_string(MARIOTEXT_X2, 65, textMarioB);
-    print_menu_generic_string(MARIOTEXT_X1, 105, textMarioC);
-    print_menu_generic_string(MARIOTEXT_X2, 105, textMarioD);
+    print_menu_generic_string(MARIOTEXT_X1, 65, LANGUAGE_ARRAY(textMarioA));
+    print_menu_generic_string(MARIOTEXT_X2, 65, LANGUAGE_ARRAY(textMarioB));
+    print_menu_generic_string(MARIOTEXT_X1, 105, LANGUAGE_ARRAY(textMarioC));
+    print_menu_generic_string(MARIOTEXT_X2, 105, LANGUAGE_ARRAY(textMarioD));
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -1376,6 +1394,12 @@ char *textCheckFile = LANGUAGE_TEXT(
     "VOIR  SCORE",
     "VON WELCHEM SPIEL",
     "どのスコアをみる？");
+
+char *textNoSavedDataExists = LANGUAGE_TEXT(
+    "NO SAVED DATA EXISTS",
+    "AUCUNE SAUVEGARDE DISPONIBLE",
+    "KEIN SPIEL VORHANDEN",
+    "ファイルにデータがありません");
 
 /**
  * Defines IDs for the top message of the score menu and displays it if the ID is called in messageID.
@@ -1398,11 +1422,28 @@ void score_menu_display_message(s8 messageID) {
 
 #define FADEOUT_TIMER 20
 
+char *textReturn = LANGUAGE_TEXT(
+    "RETURN",
+    "RETOUR",
+    "ZURÜCK",
+    "もどる");
+
+char *textCopyFileButton = LANGUAGE_TEXT(
+    "COPY FILE",
+    "COPIER  FICHIER",
+    "SPIEL KOPIEREN",
+    "ファイルコピー");
+
+char *textEraseFileButton = LANGUAGE_TEXT(
+    "ERASE FILE",
+    "EFFACER  FICHIER",
+    "SPIEL LÖSCHEN",
+    "ファイルけす");
+
 /**
  * Prints score menu strings that shows on the green background menu screen.
  */
 void print_score_menu_strings(void) {
-
     // Update and print the message at the top of the menu.
     if (sMainMenuTimer == FADEOUT_TIMER) {
         sFadeOutText = TRUE;
@@ -1437,10 +1478,10 @@ void print_score_menu_strings(void) {
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(89, 62, textMarioA);
-    print_menu_generic_string(211, 62, textMarioB);
-    print_menu_generic_string(89, 105, textMarioC);
-    print_menu_generic_string(211, 105, textMarioD);
+    print_menu_generic_string(89, 62, LANGUAGE_ARRAY(textMarioA));
+    print_menu_generic_string(211, 62, LANGUAGE_ARRAY(textMarioB));
+    print_menu_generic_string(89, 105, LANGUAGE_ARRAY(textMarioC));
+    print_menu_generic_string(211, 105, LANGUAGE_ARRAY(textMarioD));
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -1456,6 +1497,31 @@ char *textCopyFile = LANGUAGE_TEXT(
     "COPIER",
     "KOPIEREN",
     "ファイルコピーする");
+
+char *textCopyItToWhere = LANGUAGE_TEXT(
+    "COPY IT TO WHERE?",
+    "COPIER SUR?",
+    "WOHIN KOPIEREN?",
+    "どこにコピーしますか？");
+
+char *textCopyCompleted = LANGUAGE_TEXT(
+    "COPYING COMPLETED",
+    "COPIE ACHEVEÉ",
+    "SPIEL KOPIERT",
+    "コピーおわりました");
+
+char *textSavedDataExists = LANGUAGE_TEXT(
+    "SAVED DATA EXISTS",
+    "SAVEGARDE EXISTANTE",
+    "BEREITS BELEGT",
+    "ファイルにデータがはいってます");
+
+char *textNoFileToCopyFrom = LANGUAGE_TEXT(
+    "NO EMPTY FILE",
+    "AUCUN FICHIER VIDE",
+    "KEIN PLATZ VORHANDEN",
+    "からのファイルがありません");
+
 
 /**
  * Defines IDs for the top message of the copy menu and displays it if the ID is called in messageID.
@@ -1474,7 +1540,7 @@ void copy_menu_display_message(s8 messageID) {
             print_generic_string_fade(COPYIT_WHERE_X, 190, LANGUAGE_ARRAY(textCopyItToWhere));
             break;
         case COPY_MSG_NOSAVE_EXISTS:
-            print_generic_string_fade(NOSAVE_DATA_X2, 190, textNoSavedDataExistsCopy);
+            print_generic_string_fade(NOSAVE_DATA_X2, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
             break;
         case COPY_MSG_COPY_COMPLETE:
             print_generic_string_fade(COPYCOMPLETE_X, 190, LANGUAGE_ARRAY(textCopyCompleted));
@@ -1533,6 +1599,12 @@ void copy_menu_update_message(void) {
 #define VIEWSCORE_X1 128
 #define ERASEFILE_X2 230
 
+char *textViewScore = LANGUAGE_TEXT(
+    "CHECK SCORE",
+    "SCORE",
+    "LEISTUNG",
+    "スコアをみる");
+
 /**
  * Prints copy menu strings that shows on the blue background menu screen.
  */
@@ -1560,10 +1632,10 @@ void print_copy_menu_strings(void) {
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(89, 62, textMarioA);
-    print_menu_generic_string(211, 62, textMarioB);
-    print_menu_generic_string(89, 105, textMarioC);
-    print_menu_generic_string(211, 105, textMarioD);
+    print_menu_generic_string(89, 62, LANGUAGE_ARRAY(textMarioA));
+    print_menu_generic_string(211, 62, LANGUAGE_ARRAY(textMarioB));
+    print_menu_generic_string(89, 105, LANGUAGE_ARRAY(textMarioC));
+    print_menu_generic_string(211, 105, LANGUAGE_ARRAY(textMarioD));
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -1575,6 +1647,18 @@ void print_copy_menu_strings(void) {
 #define MENU_ERASE_YES_NO_MAX_Y 210
     #define MENU_ERASE_NO_MIN_X 189
     #define MENU_ERASE_NO_MAX_X 218
+
+char *textYes = LANGUAGE_TEXT(
+    "YES",
+    "OUI",
+    "JA",
+    "はい");
+
+char *textNo = LANGUAGE_TEXT(
+    "NO",
+    "NON",
+    "NEIN",
+    "いいえ");
 
 /**
  * Prints the "YES NO" prompt and checks if one of the prompts are hovered to do it's functions.
@@ -1660,15 +1744,23 @@ char *textEraseFile = LANGUAGE_TEXT(
     "LÖSCHEN",
     "ファイルけす");
 
+char *textSure = LANGUAGE_TEXT(
+    "SURE?",
+    "OK?",
+    "SICHER?",
+    "ほんと？");
+
+char *textMarioXJustErased = LANGUAGE_TEXT(
+    "MARIO %s JUST ERASED",
+    "MARIO %s EFFACÉ",
+    "MARIO %s GELÖSCHT",
+    "マリオ%sをけしました");
+
 /**
  * Defines IDs for the top message of the erase menu and displays it if the ID is called in messageID.
  */
 void erase_menu_display_message(s8 messageID) {
-    char textSure[] = { TEXT_SURE };
-    char textNoSavedDataExists[] = { TEXT_NO_SAVED_DATA_EXISTS };
-    char textMarioAJustErased[] = { TEXT_FILE_MARIO_A_JUST_ERASED };
-    char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
-
+    char str[50];
     switch (messageID) {
         case ERASE_MSG_MAIN_TEXT:
             print_hud_lut_string_fade(ERASE_FILE_X, 35, LANGUAGE_ARRAY(textEraseFile));
@@ -1681,8 +1773,8 @@ void erase_menu_display_message(s8 messageID) {
             print_generic_string_fade(NOSAVE_DATA_X3, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
             break;
         case ERASE_MSG_MARIO_ERASED:
-            LANGUAGE_ARRAY(textMarioAJustErased)[MARIO_ERASED_VAR] = sSelectedFileIndex + 10;
-            print_generic_string_fade(MARIO_ERASED_X, 190, LANGUAGE_ARRAY(textMarioAJustErased));
+            sprintf(str, LANGUAGE_ARRAY(textMarioXJustErased), sSelectedFileIndex + 'A');
+            print_generic_string_fade(MARIO_ERASED_X, 190, str);
             break;
         case ERASE_MSG_SAVE_EXISTS: // unused
             print_generic_string_fade(SAVE_EXISTS_X2, 190, LANGUAGE_ARRAY(textSavedDataExists));
@@ -1759,18 +1851,18 @@ void print_erase_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
-    print_generic_string(RETURN_X, 35, textReturn);
-    print_generic_string(VIEWSCORE_X2, 35, textViewScore);
-    print_generic_string(COPYFILE_X2, 35, textCopyFileButton);
+    print_generic_string(RETURN_X, 35, LANGUAGE_ARRAY(textReturn));
+    print_generic_string(VIEWSCORE_X2, 35, LANGUAGE_ARRAY(textViewScore));
+    print_generic_string(COPYFILE_X2, 35, LANGUAGE_ARRAY(textCopyFileButton));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(89, 62, textMarioA);
-    print_menu_generic_string(211, 62, textMarioB);
-    print_menu_generic_string(89, 105, textMarioC);
-    print_menu_generic_string(211, 105, textMarioD);
+    print_menu_generic_string(89, 62, LANGUAGE_ARRAY(textMarioA));
+    print_menu_generic_string(211, 62, LANGUAGE_ARRAY(textMarioB));
+    print_menu_generic_string(89, 105, LANGUAGE_ARRAY(textMarioC));
+    print_menu_generic_string(211, 105, LANGUAGE_ARRAY(textMarioD));
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
@@ -1794,6 +1886,13 @@ char *textLanguageSelect = LANGUAGE_TEXT(
     "SELECTION LANGUE",
     "WwHLE SPRACHE",
     ""); // no japanese translation
+
+char *textLanguage[] = {
+    "ENGLISH",
+    "FRANÇAIS",
+    "DEUTSCH",
+    "", // no japanese translation
+};
 #endif
 
 /**
@@ -1850,20 +1949,16 @@ void print_sound_mode_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-char textStarX[] = { TEXT_STAR_X };
-
 /**
  * Prints castle secret stars collected in a score menu save file.
  */
 void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     char secretStarsText[20];
-    // Print "[star] x"
-    print_menu_generic_string(x, y, textStarX);
     // Print number of castle secret stars
-    sprintf(secretStarsText, "%d", save_file_get_total_star_count(fileIndex,
+    sprintf(secretStarsText, "★×%d", save_file_get_total_star_count(fileIndex,
                                                                   COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                                   COURSE_NUM_TO_INDEX(COURSE_MAX)));
-    print_menu_generic_string(x + 16, y, secretStarsText);
+    print_menu_generic_string(x, y, secretStarsText);
 }
 
 #define HISCORE_COIN_ICON_X  18
@@ -1909,7 +2004,8 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
  */
 void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     s16 i = 0;
-    char starScoreText[19];
+    char starScoreText[30];
+    char *entries[6];
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
     s8 starCount = save_file_get_course_star_count(fileIndex, courseIndex);
     // Don't count 100 coin star
@@ -1918,10 +2014,12 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     }
     // Add 1 star character for every star collected
     for (i = 0; i < starCount; i++) {
-        starScoreText[i] = '★';
+        entries[i] = "★";
     }
-    // Terminating byte
-    starScoreText[i] = '\0';
+    for (i = starCount; i < 6; i++) {
+        entries[i] = "";
+    }
+    sprintf(starScoreText, "%s%s%s%s%s%s", entries[0], entries[1], entries[2], entries[3], entries[4], entries[5]);
     print_menu_generic_string(x, y, starScoreText);
 }
 

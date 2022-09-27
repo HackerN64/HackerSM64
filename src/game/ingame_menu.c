@@ -21,7 +21,6 @@
 #include "segment7.h"
 #include "seq_ids.h"
 #include "sm64.h"
-#include "text_strings.h"
 #include "types.h"
 #include "config.h"
 #include "puppycam2.h"
@@ -290,7 +289,7 @@ void print_generic_string(s16 x, s16 y, char *str) {
 
     create_dl_translation_matrix(MENU_MTX_PUSH, x, y, 0.0f);
 
-    while (str[strPos] != 0x00 && str[strPos] != 0xFF) {
+    while (str[strPos] != '\0') {
         switch (str[strPos]) {
             /**case DIALOG_CHAR_COLOR:
                 customColor = 1;
@@ -367,7 +366,6 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     u32 curX = x;
     u32 curY = y;
     u32 renderX, renderY;
-    u32 codepoint;
     struct Utf8CharLUTEntry *utf8Entry;
 
     u32 xStride; // X separation
@@ -427,6 +425,7 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
     s32 strPos = 0;
     u32 curX = x;
     u32 curY = y;
+    u32 kerning;
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(menu_font_lut);
 
     while (str[strPos] != '\0') {
@@ -435,13 +434,20 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
                 curX += 4;
                 break;
             default:
-                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[str[strPos] - ' '].texture);
+                if (str[strPos] & 0x80) {
+                    struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&menu_font_utf8_lut, str, &strPos);
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, utf8Entry->texture);
+                    kerning = utf8Entry->kerning;
+                } else {
+                    gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, fontLUT[str[strPos] - ' '].texture);
+                    kerning = fontLUT[str[strPos] - ' '].kerning;
+                }
                 gDPLoadSync(gDisplayListHead++);
                 gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
                 gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
                                     (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
-                curX += fontLUT[str[strPos] - ' '].kerning;
+                curX += kerning;
         }
         strPos++;
     }
@@ -716,7 +722,7 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     ColorRGBA rgbaColors = { 0x00, 0x00, 0x00, 0x00 };
     u8 customColor = 0;
     u8 diffTmp = 0;
-    u8 *str = segmented_to_virtual(dialog->str);
+    char *str = segmented_to_virtual(dialog->str);
     s8 lineNum = 1;
     s8 totalLines;
     s8 pageState = DIALOG_PAGE_STATE_NONE;
@@ -924,33 +930,55 @@ void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
 
 s16 gMenuMode = MENU_MODE_NONE;
 
-char gEndCutsceneStrEn0[] = { TEXT_FILE_MARIO_EXCLAMATION };
-char gEndCutsceneStrEn1[] = { TEXT_POWER_STARS_RESTORED };
-char gEndCutsceneStrEn2[] = { TEXT_THANKS_TO_YOU };
-char gEndCutsceneStrEn3[] = { TEXT_THANK_YOU_MARIO };
-char gEndCutsceneStrEn4[] = { TEXT_SOMETHING_SPECIAL };
-char gEndCutsceneStrEn5[] = { TEXT_LISTEN_EVERYBODY };
-char gEndCutsceneStrEn6[] = { TEXT_LETS_HAVE_CAKE };
-char gEndCutsceneStrEn7[] = { TEXT_FOR_MARIO };
-char gEndCutsceneStrEn8[] = { TEXT_FILE_MARIO_QUESTION };
-
 char *gEndCutsceneStringsEn[] = {
-    gEndCutsceneStrEn0,
-    gEndCutsceneStrEn1,
-    gEndCutsceneStrEn2,
-    gEndCutsceneStrEn3,
-    gEndCutsceneStrEn4,
-    gEndCutsceneStrEn5,
-    gEndCutsceneStrEn6,
-    gEndCutsceneStrEn7,
-    // This [8] string is actually unused. In the cutscene handler, the developers do not
-    // set the 8th one, but use the first string again at the very end, so Peach ends up
-    // saying "Mario!" twice. It is likely that she was originally meant to say "Mario?" at
-    // the end but the developers changed their mind, possibly because the line recorded
-    // sounded more like an exclamation than a question.
-    gEndCutsceneStrEn8,
-    NULL
+    LANGUAGE_TEXT(
+        "Mario!",
+        "Mario!",
+        "Mario!",
+        "マリオ！！"),
+    LANGUAGE_TEXT(
+        "The power of the Stars is restored to the castle...",
+        "Grâce aux étoiles, le château a retrouvé ses pouvoirs...",
+        "Die Macht der Sterne ruht wieder sicher im Schloss...",
+        "おしろにスターが　もどったのね"),
+    LANGUAGE_TEXT(
+        "...and it's all thanks to you!",
+        "...et ceci grâce à toi!",
+        "...und alles dank Deiner Hilfe!",
+        "みんな　あなたのおかげだわ！"),
+    LANGUAGE_TEXT(
+        "Thank you, Mario!",
+        "Merci, Mario!",
+        "Vielen Dank, Mario!",
+        "ありがとう　マリオ"),
+    LANGUAGE_TEXT(
+        "We have to do something special for you...",
+        "Tu mérites une récompense...",
+        "Wir haben eine Überraschung für Dich...",
+        "なにか　おれいをしなくちゃ・・"),
+    LANGUAGE_TEXT(
+        "Listen, everybody,",
+        "Venez les amis...",
+        "Hört alle her...",
+        "さあ　みんな"),
+    LANGUAGE_TEXT(
+        "let's bake a delicious cake...",
+        "Allons préparer un délicieux gâteau...",
+        "Laßt uns einen leckeren Kuchen backen...",
+        "おいしいケーキを　やきましょう"),
+    LANGUAGE_TEXT(
+        "...for Mario...",
+        "...pour Mario...",
+        "...für Mario...",
+        "マリオの　ために・・・"),
+    LANGUAGE_TEXT(
+        "Mario!",
+        "Mario!",
+        "Mario!",
+        "マリオ！！"),
+    NULL,
 };
+
 
 
 u16 gCutsceneMsgFade        =  0;
@@ -1434,25 +1462,25 @@ void render_pause_my_score_coins(void) {
 #define TXT2_X 119
 #define Y_VAL7 2
 
-textLakituMario = LANGUAGE_TEXT(
+char *textLakituMario = LANGUAGE_TEXT(
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "ジュゲム↔マリオ");
 
-textLakituStop = LANGUAGE_TEXT(
+char *textLakituStop = LANGUAGE_TEXT(
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "ジュゲム↔ストップ");
 
-textNormalUpClose = LANGUAGE_TEXT(
+char *textNormalUpClose = LANGUAGE_TEXT(
     "(NORMAL)(UP-CLOSE)",
     "(NORMAL)(GROS-PLAN)",
     "(NORMAL)(WEIT-ZOOM)",
     "（おすすめ）（リアル）");
 
-textNormalFixed = LANGUAGE_TEXT(
+char *textNormalFixed = LANGUAGE_TEXT(
     "(NORMAL)(FIXED)",
     "(NORMAL)(FIXE)",
     "(NORMAL)(STATIV)",
@@ -1944,11 +1972,25 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 #define TXT_SAVEQUIT_Y 20
 #define TXT_CONTNOSAVE_Y 40
 
-void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
-    char textSaveAndContinue[] = { TEXT_SAVE_AND_CONTINUE };
-    char textSaveAndQuit[] = { TEXT_SAVE_AND_QUIT };
-    char textContinueWithoutSave[] = { TEXT_CONTINUE_WITHOUT_SAVING };
+char *textSaveAndContinue = LANGUAGE_TEXT(
+    "SAVE & CONTINUE",
+    "SAUVEGARDER & CONTINUER",
+    "SPEICHERN & WEITER",
+    "セーブしてつづける？");
 
+char *textSaveAndQuit = LANGUAGE_TEXT(
+    "SAVE & QUIT",
+    "SAUVEGARDER & QUITTER",
+    "SPEICHERN & ENDE",
+    "セーブしておわる？");
+
+char *textContinueWithoutSave = LANGUAGE_TEXT(
+    "CONTINUE, DON'T SAVE",
+    "CONTINUER SANS SAUVEGARDER",
+    "WEITER OHNE ZU SPEICHERN",
+    "セーブしないでつづける？");
+
+void render_save_confirmation(s16 x, s16 y, s8 *index, s16 yPos) {
     handle_menu_scrolling(MENU_SCROLL_VERTICAL, index, 1, 3);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
