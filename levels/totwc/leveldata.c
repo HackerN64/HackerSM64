@@ -15,4 +15,3 @@
 #include "levels/totwc/cloud/model.inc.c"
 #include "levels/totwc/areas/1/collision.inc.c"
 #include "levels/totwc/areas/1/macro.inc.c"
-#include "levels/totwc/cloud/collision.inc.c" // Blank File

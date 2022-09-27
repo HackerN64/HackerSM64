@@ -547,52 +547,50 @@ void mtxf_billboard(Mat4 dest, Mat4 mtx, Vec3f position, Vec3f scale, s32 angle)
     register s32 i;
     register f32 sx = scale[0];
     register f32 sy = scale[1];
-    register f32 sz = ((f32 *) scale)[2];
-    register f32 *temp2, *temp = (f32 *)dest;
-    for (i = 0; i < 16; i++) {
-        *temp = 0;
-        temp++;
-    }
-    if (angle == 0x0) {
-        // ((u32 *) dest)[0] = FLOAT_ONE;
-        dest[0][0] = sx; // [0][0]
-        dest[0][1] = 0;
-        dest[1][0] = 0;
-        // ((u32 *) dest)[5] = FLOAT_ONE;
-        dest[1][1] = sy; // [1][1]
-    } else {
-        dest[0][0] = (coss(angle) * sx);
-        dest[0][1] = (sins(angle) * sx);
-        dest[1][0] = (-dest[0][1] * sy);
-        dest[1][1] = ( dest[0][0] * sy);
-    }
-    // ((u32 *) dest)[10] = FLOAT_ONE;
-    // dest[2][2] = sz; // [2][2]
-    ((f32 *) dest)[10] = sz; // [2][2]
-    dest[2][3] = 0;
-    ((u32 *) dest)[15] = FLOAT_ONE; // [3][3]
-
-    temp  = (f32 *)dest;
-    temp2 = (f32 *)mtx;
+    register f32 sz = scale[2];
+    Mat4* cameraMat = &gCameraTransform;
     for (i = 0; i < 3; i++) {
-        temp[12] = ((temp2[ 0] * position[0])
-                  + (temp2[ 4] * position[1])
-                  + (temp2[ 8] * position[2])
-                  +  temp2[12]);
-        temp++;
-        temp2++;
+        for (int j = 0; j < 3; j++) {
+            dest[i][j] = (*cameraMat)[j][i];
+        }
+        dest[i][3] = 0.0f;
     }
+    if (angle != 0x0) {
+        float m00 = dest[0][0];
+        float m01 = dest[0][1];
+        float m02 = dest[0][2];
+        float m10 = dest[1][0];
+        float m11 = dest[1][1];
+        float m12 = dest[1][2];
+        float cosa = coss(angle);
+        float sina = sins(angle);
+        dest[0][0] = cosa * m00 + sina * m10; 
+        dest[0][1] = cosa * m01 + sina * m11; 
+        dest[0][2] = cosa * m02 + sina * m12;
+        dest[1][0] = -sina * m00 + cosa * m10;
+        dest[1][1] = -sina * m01 + cosa * m11;
+        dest[1][2] = -sina * m02 + cosa * m12;
+    }
+    for (i = 0; i < 3; i++) {
+        dest[0][i] *= sx;
+        dest[1][i] *= sy;
+        dest[2][i] *= sz;
+    }
+
+    // Translation = input translation + position
+    vec3f_copy(dest[3], position);
+    vec3f_add(dest[3], mtx[3]);
+    dest[3][3] = 1.0f;
 }
 
 /**
  * Mostly the same as 'mtxf_align_terrain_normal', but also applies a scale and multiplication.
- * 'src' is the matrix to multiply from
  * 'upDir' is the terrain normal
  * 'pos' is the object's position in the world
  * 'scale' is the scale of the shadow
  * 'yaw' is the angle which it should face
  */
-void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
+void mtxf_shadow(Mat4 dest, Vec3f upDir, Vec3f pos, Vec3f scale, s32 yaw) {
     Vec3f lateralDir;
     Vec3f leftDir;
     Vec3f forwardDir;
@@ -602,15 +600,11 @@ void mtxf_shadow(Mat4 dest, Mat4 src, Vec3f upDir, Vec3f pos, Vec3f scale, s32 y
     vec3f_normalize(leftDir);
     vec3f_cross(forwardDir, leftDir, upDir);
     vec3f_normalize(forwardDir);
-    Vec3f entry;
-    vec3f_prod(entry, leftDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[0], entry);
-    vec3f_prod(entry, upDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[1], entry);
-    vec3f_prod(entry, forwardDir, scale);
-    linear_mtxf_mul_vec3f(src, dest[2], entry);
-    linear_mtxf_mul_vec3f(src, dest[3], pos);
-    vec3f_add(dest[3], src[3]);
+
+    vec3f_prod(dest[0], leftDir, scale);
+    vec3f_prod(dest[1], upDir, scale);
+    vec3f_prod(dest[2], forwardDir, scale);
+    vec3f_copy(dest[3], pos);
     MTXF_END(dest);
 }
 
@@ -781,39 +775,6 @@ void mtxf_rotate_xy(Mtx *mtx, s32 angle) {
     ((s16 *) mtx)[10] = 1;
     ((s16 *) mtx)[15] = 1;
 }
-
-/**
- * Extract a position given an object's transformation matrix and a camera matrix.
- * This is used for determining the world position of the held object: since objMtx
- * inherits the transformation from both the camera and Mario, it calculates this
- * by taking the camera matrix and inverting its transformation by first rotating
- * objMtx back from screen orientation to world orientation, and then subtracting
- * the camera position.
- */
-void get_pos_from_transform_mtx(Vec3f dest, Mat4 objMtx, register Mat4 camMtx) {
-    register s32 i;
-    register f32 *temp1 = (f32 *)dest;
-    register f32 *temp2 = (f32 *)camMtx;
-    f32 y[3];
-    register f32 *x = y;
-    register f32 *temp3 = (f32 *)objMtx;
-
-    for (i = 0; i < 3; i++) {
-        *x = (temp3[12] - temp2[12]);
-        temp2++;
-        temp3++;
-        x = (f32 *)(((u32)x) + 4);
-    }
-    temp2 -= 3;
-    for (i = 0; i < 3; i++) {
-        *temp1 = ((x[-3] * temp2[0])
-                + (x[-2] * temp2[1])
-                + (x[-1] * temp2[2]));
-        temp1++;
-        temp2 += 4;
-    }
-}
-
 
 /**
  * Take the vector starting at 'from' pointed at 'to' an retrieve the length
