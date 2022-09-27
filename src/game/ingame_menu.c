@@ -229,9 +229,27 @@ struct Utf8CharLUTEntry *utf8_lookup(struct Utf8LUT *lut, char *str, s32 *strPos
     return segmented_to_virtual(lut->missingChar);
 }
 
+s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT) {
+    s32 length = 0;
+    s32 strPos = 0;
+
+    asciiLut = segmented_to_virtual(asciiLut);
+
+    while (str[strPos] != '\0') {
+        if (str[strPos] & 0x80) {
+            length += utf8_lookup(utf8LUT, str, &strPos)->kerning;
+        } else {
+            length += asciiLut[str[strPos] - ' '].kerning;
+        }
+        strPos++;
+    }
+
+    return length;
+}
+
 u8 render_generic_ascii_char(char c) {
     struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_font_lut);
-    void *texture = fontLUT[c - ' '].texture;
+    const Texture *texture = fontLUT[c - ' '].texture;
 
     if (texture == NULL) {
         return 0;
@@ -335,10 +353,10 @@ void print_generic_string(s16 x, s16 y, char *str) {
                 lineNum++;
                 break;
             case '/':
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, 5 * 2, 0.0f, 0.0f);
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, SPACE_KERNING(segmented_to_virtual(main_font_lut)) * 2, 0.0f, 0.0f);
                 break;
             case ' ':
-                create_dl_translation_matrix(MENU_MTX_NOPUSH, 5, 0.0f, 0.0f);
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, SPACE_KERNING(segmented_to_virtual(main_font_lut)), 0.0f, 0.0f);
                 break;
             default:
                 if (!(str[strPos] & 0x80)) {
@@ -356,6 +374,9 @@ void print_generic_string(s16 x, s16 y, char *str) {
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
 
+void print_generic_string_centered(s16 x, s16 y, char *str) {
+    print_generic_string(x - (get_string_length(str, main_font_lut, &main_font_utf8_lut) / 2), y, str);
+}
 
 /**
  * Prints a hud string.
@@ -379,17 +400,26 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     while (str[strPos] != 0x00) {
         switch (str[strPos]) {
             case ' ':
-                curX += 8;
+                curX += SPACE_KERNING(hudLUT);
                 break;
             default:
                 gDPPipeSync(gDisplayListHead++);
 
                 if (!(str[strPos] & 0x80)) {
-                    Texture *tex = hudLUT[str[strPos] - ' '].texture;
+                    const Texture *tex = hudLUT[str[strPos] - ' '].texture;
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, tex);
                     xStride = hudLUT[str[strPos] - ' '].kerning;
                 } else {
                     utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
+                    if ((utf8Entry->flags & GENERIC_TEXT_DIACRITIC_MASK) == TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
+                        renderX = curX;
+                        renderY = curY - 4;
+                        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, &texture_hud_char_umlaut);
+                        gSPDisplayList(gDisplayListHead++, dl_rgba16_load_tex_block);
+                        gSPTextureRectangle(gDisplayListHead++, renderX << 2, renderY << 2, (renderX + 16) << 2,
+                                    (renderY + 16) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                        gDPPipeSync(gDisplayListHead++);
+                    }
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, utf8Entry->texture);
                     xStride = utf8Entry->kerning;
                 }
@@ -420,6 +450,10 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
     }
 }
 
+void print_hud_lut_string_centered(s16 x, s16 y, char *str) {
+    print_hud_lut_string(x - (get_string_length(str, main_hud_lut, &main_hud_utf8_lut) / 2), y, str);
+}
+
 
 void print_menu_generic_string(s16 x, s16 y, char *str) {
     s32 strPos = 0;
@@ -431,7 +465,7 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
     while (str[strPos] != '\0') {
         switch (str[strPos]) {
             case ' ':
-                curX += 4;
+                curX += SPACE_KERNING(fontLUT);
                 break;
             default:
                 if (str[strPos] & 0x80) {
@@ -453,9 +487,13 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
     }
 }
 
-void print_credits_string(s16 x, s16 y, const u8 *str) {
+void print_menu_generic_string_centered(s16 x, s16 y, char *str) {
+    print_menu_generic_string(x - (get_string_length(str, menu_font_lut, &menu_font_utf8_lut) / 2), y, str);
+}
+
+void print_credits_string(s16 x, s16 y, const char *str) {
     s32 strPos = 0;
-    void **fontLUT = segmented_to_virtual(main_credits_font_lut);
+    struct AsciiCharLUTEntry *fontLUT = segmented_to_virtual(main_credits_font_lut);
     u32 curX = x;
     u32 curY = y;
 
@@ -469,16 +507,16 @@ void print_credits_string(s16 x, s16 y, const u8 *str) {
     while (str[strPos] != '\0') {
         switch (str[strPos]) {
             case ' ':
-                curX += 4;
+                curX += SPACE_KERNING(main_credits_font_lut);
                 break;
             default:
                 gDPPipeSync(gDisplayListHead++);
-                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos] - ' ']);
+                gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, fontLUT[str[strPos] - ' '].texture);
                 gDPLoadSync(gDisplayListHead++);
                 gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_16b_BYTES));
                 gSPTextureRectangle(gDisplayListHead++, curX << 2, curY << 2, (curX + 8) << 2,
                                     (curY + 8) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                curX += 7;
+                curX += fontLUT[str[strPos] - ' '].kerning;
                 break;
         }
         strPos++;
@@ -1115,21 +1153,6 @@ void dl_rgba16_stop_cutscene_msg_fade(void) {
     } else {
         gCutsceneMsgFade = 255;
     }
-}
-
-void print_credits_str_ascii(s16 x, s16 y, const char *str) {
-    s32 pos = 0;
-    u8 c = str[pos];
-    u8 creditStr[100];
-
-    while (c != 0) {
-        creditStr[pos++] = c;
-        c = str[pos];
-    }
-
-    creditStr[pos] = '\0';
-
-    print_credits_string(x, y, creditStr);
 }
 
 void set_cutscene_message(s16 xOffset, s16 yOffset, s16 msgIndex, s16 msgDuration) {

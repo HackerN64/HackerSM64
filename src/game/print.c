@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <string.h>
 
 #include "config.h"
 #include "game_init.h"
@@ -29,16 +30,16 @@ s16 sTextLabelsCount = 0;
  * Takes a number, formats the number, and prints it
  * at the given X & Y coordinates.
  */
-void print_text_fmt_int(s32 x, s32 y, const char *str, s32 n) {
+void print_text_fmt_int(s32 x, s32 y, char *str, s32 n) {
     char buffer[50];
     sprintf(buffer, str, n);
-    print_text(x, y, str);
+    print_text(x, y, buffer);
 }
 
 /**
  * Prints text in the colorful lettering at given X, Y coordinates.
  */
-void print_text(s32 x, s32 y, const char *str) {
+void print_text(s32 x, s32 y, char *str) {
     // Don't continue if there is no memory to do so.
     if ((sTextLabels[sTextLabelsCount] = mem_pool_alloc(gEffectsMemoryPool,
                                                         sizeof(struct TextLabel))) == NULL) {
@@ -56,8 +57,8 @@ void print_text(s32 x, s32 y, const char *str) {
 /**
  * Prints text in the colorful lettering centered at given X, Y coordinates.
  */
-void print_text_centered(s32 x, s32 y, const char *str) {
-    print_text(x - strlen(str) * 6, y, str);
+void print_text_centered(s32 x, s32 y, char *str) {
+    print_text(x - get_string_length(str, main_hud_lut, &main_hud_utf8_lut) / 2, y, str);
 }
 
 /**

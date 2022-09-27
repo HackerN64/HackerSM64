@@ -197,16 +197,6 @@ ALIGNED8 static const Texture texture_hud_char_double_quote[] = {
 #include "textures/segment2/segment2.04A00.rgba16.inc.c"
 };
 
-#if defined(VERSION_EU) || defined(COMPLETE_EN_US_SEGMENT2)
-ALIGNED8 static const Texture texture_hud_char_umlaut[] = {
-#include "textures/segment2/segment2.umlaut.rgba16.inc.c"// EU ¨
-};
-#else
-ALIGNED8 static const Texture texture_hud_char_umlaut[] = {
-#include "textures/segment2/segment2.umlaut_us.rgba16.inc.c"// EU ¨
-};
-#endif
-
 ALIGNED8 static const Texture texture_hud_char_exclamation[] = {
 #include "textures/segment2/segment2.exclamation.rgba16.inc.c"// JP !
 };
@@ -216,8 +206,7 @@ ALIGNED8 static const Texture texture_hud_char_double_exclamation[] = {
 };
 
 ALIGNED8 static const Texture texture_hud_char_question[] = {
-#include "textures/segment2/segment2.question.rgba16.inc.c"// JP ?
-// #include "levels/menu/main_menu_seg7.0A1D0.rgba16.png"
+#include "textures/segment2/segment2.question.rgba16.inc.c"
 };
 
 ALIGNED8 static const Texture texture_hud_char_ampersand[] = {
@@ -258,6 +247,10 @@ ALIGNED8 static const Texture texture_hud_char_beta_key[] = {
 
 ALIGNED8 static const Texture texture_hud_char_floomba[] = {
 #include "textures/segment2/segment2.floomba.rgba16.inc.c"
+};
+
+ALIGNED8 const Texture texture_hud_char_umlaut[] = {
+#include "textures/segment2/segment2.umlaut_us.rgba16.inc.c"// EU ¨
 };
 
 ALIGNED8 static const Texture texture_credits_char_3[] = {
@@ -1473,22 +1466,22 @@ ALIGNED8 static const Texture texture_hud_char_arrow_down[] = {
 };
 
 const struct AsciiCharLUTEntry main_hud_lut[] = {
-    {NULL, 12}, // 32 " "
+    {NULL, 8}, // 32 " "
     {texture_hud_char_exclamation, 12}, // 33 "!"
     {texture_hud_char_double_quote, 10}, // 34 "\""
-    {NULL, 12}, // 35 "#" (Unimplemented)
-    {NULL, 12}, // 36 "$" (Unimplemented)
+    {NULL, 0}, // 35 "#" (Unimplemented)
+    {NULL, 0}, // 36 "$" (Unimplemented)
     {texture_hud_char_percent, 12}, // 37 "%"
     {texture_hud_char_ampersand, 12}, // 38 "&"
     {texture_hud_char_apostrophe, 8}, // 39 "'"
-    {NULL, 12}, // 40 "(" (Unimplemented)
-    {NULL, 12}, // 41 ")" (Unimplemented)
-    {NULL, 12}, // 42 "*" (Unimplemented)
-    {NULL, 12}, // 43 "+" (Unimplemented)
+    {NULL, 0}, // 40 "(" (Unimplemented)
+    {NULL, 0}, // 41 ")" (Unimplemented)
+    {NULL, 0}, // 42 "*" (Unimplemented)
+    {NULL, 0}, // 43 "+" (Unimplemented)
     {texture_hud_char_apostrophe, 8}, // 44 ","
     {texture_hud_char_minus, 16}, // 45 "-"
     {texture_hud_char_decimal_point, 8}, // 46 "."
-    {NULL, 12}, // 47 "/" (Unimplemented)
+    {NULL, 0}, // 47 "/" (Unimplemented)
     {texture_hud_char_0, 12}, // 48 "0"
     {texture_hud_char_1, 12}, // 49 "1"
     {texture_hud_char_2, 12}, // 50 "2"
@@ -1499,13 +1492,13 @@ const struct AsciiCharLUTEntry main_hud_lut[] = {
     {texture_hud_char_7, 12}, // 55 "7"
     {texture_hud_char_8, 12}, // 56 "8"
     {texture_hud_char_9, 12}, // 57 "9"
-    {NULL, 12}, // 58 ":" (Unimplemented)
-    {NULL, 12}, // 59 ";" (Unimplemented)
-    {NULL, 12}, // 60 "<" (Unimplemented)
-    {NULL, 12}, // 61 "=" (Unimplemented)
-    {NULL, 12}, // 62 ">" (Unimplemented)
+    {NULL, 0}, // 58 ":" (Unimplemented)
+    {NULL, 0}, // 59 ";" (Unimplemented)
+    {NULL, 0}, // 60 "<" (Unimplemented)
+    {NULL, 0}, // 61 "=" (Unimplemented)
+    {NULL, 0}, // 62 ">" (Unimplemented)
     {texture_hud_char_question, 12}, // 63 "?"
-    {NULL, 12}, // 64 "@" (Unimplemented)
+    {NULL, 0}, // 64 "@" (Unimplemented)
     {texture_hud_char_A, 12}, // 65 "A"
     {texture_hud_char_B, 12}, // 66 "B"
     {texture_hud_char_C, 12}, // 67 "C"
@@ -1532,12 +1525,12 @@ const struct AsciiCharLUTEntry main_hud_lut[] = {
     {texture_hud_char_X, 12}, // 88 "X"
     {texture_hud_char_Y, 12}, // 89 "Y"
     {texture_hud_char_Z, 12}, // 90 "Z"
-    {NULL, 12}, // 91 "[" (Unimplemented)
-    {NULL, 12}, // 92 "\\" (Unimplemented)
-    {NULL, 12}, // 93 "]" (Unimplemented)
-    {NULL, 12}, // 94 "^" (Unimplemented)
-    {NULL, 12}, // 95 "_" (Unimplemented)
-    {NULL, 12}, // 96 "`" (Unimplemented)
+    {NULL, 0}, // 91 "[" (Unimplemented)
+    {NULL, 0}, // 92 "\\" (Unimplemented)
+    {NULL, 0}, // 93 "]" (Unimplemented)
+    {NULL, 0}, // 94 "^" (Unimplemented)
+    {NULL, 0}, // 95 "_" (Unimplemented)
+    {NULL, 0}, // 96 "`" (Unimplemented)
     {texture_hud_char_A, 12}, // 97 "a"
     {texture_hud_char_B, 12}, // 98 "b"
     {texture_hud_char_C, 12}, // 99 "c"
@@ -1564,14 +1557,19 @@ const struct AsciiCharLUTEntry main_hud_lut[] = {
     {texture_hud_char_X, 12}, // 120 "x"
     {texture_hud_char_Y, 12}, // 121 "y"
     {texture_hud_char_Z, 12}, // 122 "z"
-    {NULL, 12}, // 123 "{" (Unimplemented)
-    {NULL, 12}, // 124 "|" (Unimplemented)
-    {NULL, 12}, // 125 "}" (Unimplemented)
-    {NULL, 12}, // 126 "~" (Unimplemented)
+    {NULL, 0}, // 123 "{" (Unimplemented)
+    {NULL, 0}, // 124 "|" (Unimplemented)
+    {NULL, 0}, // 125 "}" (Unimplemented)
+    {NULL, 0}, // 126 "~" (Unimplemented)
 };
 
 const struct Utf8CharLUTEntry main_hud_utf8_2byte_lut[] = {
+    {0x00C4, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_A}, // Ä
+    {0x00CB, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_E}, // Ë
+    {0x00CF, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_I}, // Ï
+    {0x00D6, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_O}, // Ö
     {0x00D7, 14, 0, texture_hud_char_multiply}, // ×
+    {0x00DC, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_U}, // Ü
 };
 
 const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {
@@ -2048,104 +2046,105 @@ const Texture *const main_font_lut[] = {
 #endif
 };
 **/
-
-const Texture *const main_credits_font_lut[] = {
-    NULL, // 32 " "
-    NULL, // 33 "!" (Unimplemented)
-    NULL, // 34 "\"" (Unimplemented)
-    NULL, // 35 "#" (Unimplemented)
-    NULL, // 36 "$" (Unimplemented)
-    NULL, // 37 "%" (Unimplemented)
-    NULL, // 38 "&" (Unimplemented)
-    NULL, // 39 "'" (Unimplemented)
-    NULL, // 40 "(" (Unimplemented)
-    NULL, // 41 ")" (Unimplemented)
-    NULL, // 42 "*" (Unimplemented)
-    NULL, // 43 "+" (Unimplemented)
-    NULL, // 44 "," (Unimplemented)
-    NULL, // 45 "-" (Unimplemented)
-    texture_credits_char_period, // 46 "."
-    NULL, // 47 "/" (Unimplemented)
-    NULL, // 48 "0" (Unimplemented)
-    NULL, // 49 "1" (Unimplemented)
-    NULL, // 50 "2" (Unimplemented)
-    texture_credits_char_3, // 51 "3"
-    texture_credits_char_4, // 52 "4"
-    NULL, // 53 "5" (Unimplemented)
-    texture_credits_char_6, // 54 "6"
-    NULL, // 55 "7" (Unimplemented)
-    NULL, // 56 "8" (Unimplemented)
-    NULL, // 57 "9" (Unimplemented)
-    NULL, // 58 ":" (Unimplemented)
-    NULL, // 59 ";" (Unimplemented)
-    NULL, // 60 "<" (Unimplemented)
-    NULL, // 61 "=" (Unimplemented)
-    NULL, // 62 ">" (Unimplemented)
-    NULL, // 63 "?" (Unimplemented)
-    NULL, // 64 "@" (Unimplemented)
-    texture_credits_char_A, // 65 "A"
-    texture_credits_char_B, // 66 "B"
-    texture_credits_char_C, // 67 "C"
-    texture_credits_char_D, // 68 "D"
-    texture_credits_char_E, // 69 "E"
-    texture_credits_char_F, // 70 "F"
-    texture_credits_char_G, // 71 "G"
-    texture_credits_char_H, // 72 "H"
-    texture_credits_char_I, // 73 "I"
-    texture_credits_char_J, // 74 "J"
-    texture_credits_char_K, // 75 "K"
-    texture_credits_char_L, // 76 "L"
-    texture_credits_char_M, // 77 "M"
-    texture_credits_char_N, // 78 "N"
-    texture_credits_char_O, // 79 "O"
-    texture_credits_char_P, // 80 "P"
-    texture_credits_char_Q, // 81 "Q"
-    texture_credits_char_R, // 82 "R"
-    texture_credits_char_S, // 83 "S"
-    texture_credits_char_T, // 84 "T"
-    texture_credits_char_U, // 85 "U"
-    texture_credits_char_V, // 86 "V"
-    texture_credits_char_W, // 87 "W"
-    texture_credits_char_X, // 88 "X"
-    texture_credits_char_Y, // 89 "Y"
-    texture_credits_char_Z, // 90 "Z"
-    NULL, // 91 "[" (Unimplemented)
-    NULL, // 92 "\\" (Unimplemented)
-    NULL, // 93 "]" (Unimplemented)
-    NULL, // 94 "^" (Unimplemented)
-    NULL, // 95 "_" (Unimplemented)
-    NULL, // 96 "`" (Unimplemented)
-    texture_credits_char_A, // 97 "a"
-    texture_credits_char_B, // 98 "b"
-    texture_credits_char_C, // 99 "c"
-    texture_credits_char_D, // 100 "d"
-    texture_credits_char_E, // 101 "e"
-    texture_credits_char_F, // 102 "f"
-    texture_credits_char_G, // 103 "g"
-    texture_credits_char_H, // 104 "h"
-    texture_credits_char_I, // 105 "i"
-    texture_credits_char_J, // 106 "j"
-    texture_credits_char_K, // 107 "k"
-    texture_credits_char_L, // 108 "l"
-    texture_credits_char_M, // 109 "m"
-    texture_credits_char_N, // 110 "n"
-    texture_credits_char_O, // 111 "o"
-    texture_credits_char_P, // 112 "p"
-    texture_credits_char_Q, // 113 "q"
-    texture_credits_char_R, // 114 "r"
-    texture_credits_char_S, // 115 "s"
-    texture_credits_char_T, // 116 "t"
-    texture_credits_char_U, // 117 "u"
-    texture_credits_char_V, // 118 "v"
-    texture_credits_char_W, // 119 "w"
-    texture_credits_char_X, // 120 "x"
-    texture_credits_char_Y, // 121 "y"
-    texture_credits_char_Z, // 122 "z"
-    NULL, // 123 "{" (Unimplemented)
-    NULL, // 124 "|" (Unimplemented)
-    NULL, // 125 "}" (Unimplemented)
-    NULL, // 126 "~" (Unimplemented)
+const struct AsciiCharLUTEntry main_credits_font_lut[] = {
+    {NULL, 4}, // 32 " "
+    {NULL, 0}, // 33 "!" (Unimplemented)
+    {NULL, 0}, // 34 "\"" (Unimplemented)
+    {NULL, 0}, // 35 "#" (Unimplemented)
+    {NULL, 0}, // 36 "$" (Unimplemented)
+    {NULL, 0}, // 37 "%" (Unimplemented)
+    {NULL, 0}, // 38 "&" (Unimplemented)
+    {NULL, 0}, // 39 "'" (Unimplemented)
+    {NULL, 0}, // 40 "(" (Unimplemented)
+    {NULL, 0}, // 41 ")" (Unimplemented)
+    {NULL, 0}, // 42 "*" (Unimplemented)
+    {NULL, 0}, // 43 "+" (Unimplemented)
+    {NULL, 0}, // 44 "," (Unimplemented)
+    {NULL, 0}, // 45 "-" (Unimplemented)
+    {texture_credits_char_period, 7}, // 46 "."
+    {NULL, 0}, // 47 "/" (Unimplemented)
+    {NULL, 0}, // 48 "0" (Unimplemented)
+    {NULL, 0}, // 49 "1" (Unimplemented)
+    {NULL, 0}, // 50 "2" (Unimplemented)
+    {texture_credits_char_3, 7}, // 51 "3"
+    {texture_credits_char_4, 7}, // 52 "4"
+    {NULL, 0}, // 53 "5" (Unimplemented)
+    {texture_credits_char_6, 7}, // 54 "6"
+    {NULL, 0}, // 55 "7" (Unimplemented)
+    {NULL, 0}, // 56 "8" (Unimplemented)
+    {NULL, 0}, // 57 "9" (Unimplemented)
+    {NULL, 0}, // 58 ":" (Unimplemented)
+    {NULL, 0}, // 59 ";" (Unimplemented)
+    {NULL, 0}, // 60 "<" (Unimplemented)
+    {NULL, 0}, // 61 "=" (Unimplemented)
+    {NULL, 0}, // 62 ">" (Unimplemented)
+    {NULL, 0}, // 63 "?" (Unimplemented)
+    {NULL, 0}, // 64 "@" (Unimplemented)
+    {texture_credits_char_A, 7}, // 65 "A"
+    {texture_credits_char_B, 7}, // 66 "B"
+    {texture_credits_char_C, 7}, // 67 "C"
+    {texture_credits_char_D, 7}, // 68 "D"
+    {texture_credits_char_E, 7}, // 69 "E"
+    {texture_credits_char_F, 7}, // 70 "F"
+    {texture_credits_char_G, 7}, // 71 "G"
+    {texture_credits_char_H, 7}, // 72 "H"
+    {texture_credits_char_I, 7}, // 73 "I"
+    {texture_credits_char_J, 7}, // 74 "J"
+    {texture_credits_char_K, 7}, // 75 "K"
+    {texture_credits_char_L, 7}, // 76 "L"
+    {texture_credits_char_M, 7}, // 77 "M"
+    {texture_credits_char_N, 7}, // 78 "N"
+    {texture_credits_char_O, 7}, // 79 "O"
+    {texture_credits_char_P, 7}, // 80 "P"
+    {texture_credits_char_Q, 7}, // 81 "Q"
+    {texture_credits_char_R, 7}, // 82 "R"
+    {texture_credits_char_S, 7}, // 83 "S"
+    {texture_credits_char_T, 7}, // 84 "T"
+    {texture_credits_char_U, 7}, // 85 "U"
+    {texture_credits_char_V, 7}, // 86 "V"
+    {texture_credits_char_W, 7}, // 87 "W"
+    {texture_credits_char_X, 7}, // 88 "X"
+    {texture_credits_char_Y, 7}, // 89 "Y"
+    {texture_credits_char_Z, 7}, // 90 "Z"
+    {NULL, 0}, // 91 "[" (Unimplemented)
+    {NULL, 0}, // 92 "\" (Unimplemented)
+    {NULL, 0}, // 93 "]" (Unimplemented)
+    {NULL, 0}, // 94 "^" (Unimplemented)
+    {NULL, 0}, // 95 "_" (Unimplemented)
+    {NULL, 0}, // 96 "`" (Unimplemented)
+    {texture_credits_char_A, 7}, // 97 "a"
+    {texture_credits_char_B, 7}, // 98 "b"
+    {texture_credits_char_C, 7}, // 99 "c"
+    {texture_credits_char_D, 7}, // 100 "d"
+    {texture_credits_char_E, 7}, // 101 "e"
+    {texture_credits_char_F, 7}, // 102 "f"
+    {texture_credits_char_G, 7}, // 103 "g"
+    {texture_credits_char_H, 7}, // 104 "h"
+    {texture_credits_char_I, 7}, // 105 "i"
+    {texture_credits_char_J, 7}, // 106 "j"
+    {texture_credits_char_K, 7}, // 107 "k"
+    {texture_credits_char_L, 7}, // 108 "l"
+    {texture_credits_char_M, 7}, // 109 "m"
+    {texture_credits_char_N, 7}, // 110 "n"
+    {texture_credits_char_O, 7}, // 111 "o"
+    {texture_credits_char_P, 7}, // 112 "p"
+    {texture_credits_char_Q, 7}, // 113 "q"
+    {texture_credits_char_R, 7}, // 114 "r"
+    {texture_credits_char_S, 7}, // 115 "s"
+    {texture_credits_char_T, 7}, // 116 "t"
+    {texture_credits_char_U, 7}, // 117 "u"
+    {texture_credits_char_V, 7}, // 118 "v"
+    {texture_credits_char_W, 7}, // 119 "w"
+    {texture_credits_char_X, 7}, // 120 "x"
+    {texture_credits_char_Y, 7}, // 121 "y"
+    {texture_credits_char_Z, 7}, // 122 "z"
+    {NULL, 0}, // 123 "{" (Unimplemented)
+    {NULL, 0}, // 124 "|" (Unimplemented)
+    {NULL, 0}, // 125 "}" (Unimplemented)
+    {NULL, 0}, // 126 "~" (Unimplemented)
 };
+    
+
 
 // credits font LUT 0x02008738-0x020087CB
 // const Texture *const main_credits_font_lut[] = {

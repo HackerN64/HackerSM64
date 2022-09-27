@@ -37,9 +37,6 @@ extern void *languageTable[][3];
  * special menu messages and phases, button states and button clicked checks.
  */
 
-// The current sound mode is automatically centered on US and Shindou.
-s16 sSoundTextX;
-
 // Amount of main menu buttons defined in the code called by spawn_object_rel_with_rot.
 // See file_select.h for the names in MenuButtonTypes.
 struct Object *sMainMenuButtons[MENU_BUTTON_OPTION_MAX];
@@ -988,8 +985,6 @@ void bhv_menu_button_manager_init(void) {
     sTextBaseAlpha = 0;
 }
 
-#define SAVE_FILE_SOUND SOUND_MENU_STAR_SOUND_OKEY_DOKEY
-
 /**
  * In the main menu, check if a button was clicked to play it's button growing state.
  * Also play a sound and/or render buttons depending of the button ID selected.
@@ -1024,7 +1019,7 @@ void check_main_menu_clicked_buttons(void) {
         case MENU_BUTTON_PLAY_FILE_B:
         case MENU_BUTTON_PLAY_FILE_C:
         case MENU_BUTTON_PLAY_FILE_D:
-            play_sound(SAVE_FILE_SOUND, gGlobalSoundSource);
+            play_sound(SOUND_MENU_STAR_SOUND_OKEY_DOKEY, gGlobalSoundSource);
 #if ENABLE_RUMBLE
             queue_rumble_data(60, 70);
             queue_rumble_decay(1);
@@ -1049,8 +1044,6 @@ void check_main_menu_clicked_buttons(void) {
             break;
     }
 }
-
-#undef SAVE_FILE_SOUND
 
 /**
  * Menu Buttons Menu Manager Loop Action
@@ -1273,19 +1266,10 @@ void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
     }
 }
 
-#define SELECT_FILE_X 93
-#define SCORE_X       52
-#define COPY_X       117
-#define ERASE_X      177
-#define SAVEFILE_X1   92
-#define SAVEFILE_X2  209
-#define MARIOTEXT_X1  92
-#define MARIOTEXT_X2 207
-
 char *textSelectFile = LANGUAGE_TEXT(
     "SELECT FILE",
     "CHOISIR  FICHIER",
-    "WwHLE SPIEL",
+    "WÄHLE SPIEL",
     "ファイルセレクト");
 
 char *textScore = LANGUAGE_TEXT(
@@ -1359,29 +1343,28 @@ void print_main_menu_strings(void) {
     // Print "SELECT FILE" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_hud_lut_string(SELECT_FILE_X, 35, textSelectFile);
+    print_hud_lut_string_centered(SCREEN_WIDTH/2, 35, textSelectFile);
     // Print file star counts
-    print_save_file_star_count(SAVE_FILE_A, SAVEFILE_X1, 78);
-    print_save_file_star_count(SAVE_FILE_B, SAVEFILE_X2, 78);
-    print_save_file_star_count(SAVE_FILE_C, SAVEFILE_X1, 118);
-    print_save_file_star_count(SAVE_FILE_D, SAVEFILE_X2, 118);
+    print_save_file_star_count(SAVE_FILE_A, 92, 78);
+    print_save_file_star_count(SAVE_FILE_B, 209, 78);
+    print_save_file_star_count(SAVE_FILE_C, 92, 118);
+    print_save_file_star_count(SAVE_FILE_D, 209, 118);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string(SCORE_X, 39, LANGUAGE_ARRAY(textScore));
-    print_generic_string(COPY_X, 39, LANGUAGE_ARRAY(textCopy));
-    print_generic_string(ERASE_X, 39, LANGUAGE_ARRAY(textErase));
-    sSoundTextX = get_str_x_pos_from_center(254, LANGUAGE_ARRAY(textSoundModes[sSoundMode]), 10.0f);
-    print_generic_string(sSoundTextX, 39, LANGUAGE_ARRAY(textSoundModes[sSoundMode]));
+    print_generic_string_centered(67, 39, LANGUAGE_ARRAY(textScore));
+    print_generic_string_centered(130, 39, LANGUAGE_ARRAY(textCopy));
+    print_generic_string_centered(191, 39, LANGUAGE_ARRAY(textErase));
+    print_generic_string_centered(253, 39, LANGUAGE_ARRAY(textSoundModes[sSoundMode]));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_menu_generic_string(MARIOTEXT_X1, 65, LANGUAGE_ARRAY(textMarioA));
-    print_menu_generic_string(MARIOTEXT_X2, 65, LANGUAGE_ARRAY(textMarioB));
-    print_menu_generic_string(MARIOTEXT_X1, 105, LANGUAGE_ARRAY(textMarioC));
-    print_menu_generic_string(MARIOTEXT_X2, 105, LANGUAGE_ARRAY(textMarioD));
+    print_menu_generic_string(92, 65, LANGUAGE_ARRAY(textMarioA));
+    print_menu_generic_string(207, 65, LANGUAGE_ARRAY(textMarioB));
+    print_menu_generic_string(92, 105, LANGUAGE_ARRAY(textMarioC));
+    print_menu_generic_string(207, 105, LANGUAGE_ARRAY(textMarioD));
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 

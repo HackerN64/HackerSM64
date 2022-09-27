@@ -1538,7 +1538,7 @@ ALIGNED8 static const Texture texture_menu_font_char_colon[] = {
 #endif
 
 const struct AsciiCharLUTEntry menu_font_lut[] = {
-    {NULL, 0}, // 32 " "
+    {NULL, 4}, // 32 " "
     {texture_menu_font_char_exclamation, 5}, // 33 "!"
     {NULL, 0}, // 34 "\"" (Unimplemented)
     {NULL, 0}, // 35 "#" (Unimplemented)

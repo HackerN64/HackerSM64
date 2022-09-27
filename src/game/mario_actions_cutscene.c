@@ -73,24 +73,6 @@ static Vec4s sJumboStarKeyframes[27] = {
     { 0, -3500, 2100, -2000 },  { 0, -2000, 2200, -3500 },  { 0, 0, 2300, -4000 },
 };
 
-/**
- * get_credits_str_width: Calculate width of a Credits String
- * Loop over each character in a credits string and increment the length. If the
- * character is a space, increment by 4; otherwise increment by 7. Once the next
- * character is a null character (equal to 0), stop counting the length since
- * that's the end of the string.
- */
-s32 get_credits_str_width(char *str) {
-    u32 c;
-    s32 length = 0;
-
-    while ((c = *str++) != 0) {
-        length += (c == ' ' ? 4 : 7);
-    }
-
-    return length;
-}
-
 #define CREDIT_TEXT_MARGIN_X ((s32)(GFX_DIMENSIONS_ASPECT_RATIO * 21))
 #define CREDIT_TEXT_X_LEFT GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(CREDIT_TEXT_MARGIN_X)
 #define CREDIT_TEXT_X_RIGHT GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(CREDIT_TEXT_MARGIN_X)
@@ -119,33 +101,33 @@ void print_displaying_credits_entry(void) {
         s16 lineHeight = 16;
 
         dl_rgba16_begin_cutscene_msg_fade();
-        print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY, titleStr);
+        print_credits_string(CREDIT_TEXT_X_LEFT, strY, titleStr);
 
         switch (numLines) {
             case 4:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 24, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 24, *currStrPtr++);
                 numLines = 2;
                 lineHeight = 24;
                 break;
             case 5:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
                 numLines = 3;
                 break;
 #ifdef VERSION_EU
             case 6:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
                 numLines = 3;
                 break;
             case 7:
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
-                print_credits_str_ascii(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 16, *currStrPtr++);
+                print_credits_string(CREDIT_TEXT_X_LEFT, strY + 32, *currStrPtr++);
                 numLines = 3;
                 break;
 #endif
         }
 
         while (numLines-- > 0) {
-            print_credits_str_ascii(CREDIT_TEXT_X_RIGHT - get_credits_str_width(*currStrPtr), strY, *currStrPtr);
+            print_credits_string(CREDIT_TEXT_X_RIGHT - get_string_length(*currStrPtr, main_credits_font_lut, NULL), strY, *currStrPtr);
 
             strY += lineHeight;
 
