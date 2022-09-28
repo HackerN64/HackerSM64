@@ -1520,22 +1520,15 @@ ALIGNED8 static const Texture texture_menu_font_char_ampersand[] = {
 };
 #endif
 
-#ifdef VERSION_EU
-// 0x0700B840
-ALIGNED8 static const Texture texture_menu_font_char_umlaut[] = {
-#include "levels/menu/main_menu_seg7_eu.0B840.ia8.inc.c"
-};
-
 // 0x0700B880
-ALIGNED8 static const Texture texture_menu_font_char_cedilla_mayus[] = {
-#include "levels/menu/main_menu_seg7_eu.0B880.ia8.inc.c"
+ALIGNED8 static const Texture texture_menu_font_char_cedilla[] = {
+#include "levels/menu/main_menu_seg7_cedilla.ia8.inc.c"
 };
 
 // 0x0700B8C0
 ALIGNED8 static const Texture texture_menu_font_char_colon[] = {
-#include "levels/menu/main_menu_seg7_eu.0B8C0.ia8.inc.c"
+#include "levels/menu/main_menu_seg7_colon.ia8.inc.c"
 };
-#endif
 
 const struct AsciiCharLUTEntry menu_font_lut[] = {
     {NULL, 4}, // 32 " "
@@ -1564,7 +1557,7 @@ const struct AsciiCharLUTEntry menu_font_lut[] = {
     {texture_menu_font_char_7, 7}, // 55 "7"
     {texture_menu_font_char_8, 7}, // 56 "8"
     {texture_menu_font_char_9, 7}, // 57 "9"
-    {NULL, 0}, // 58 ":" (Unimplemented)
+    {texture_menu_font_char_colon, 4}, // 58 ":"
     {NULL, 0}, // 59 ";" (Unimplemented)
     {NULL, 0}, // 60 "<" (Unimplemented)
     {NULL, 0}, // 61 "=" (Unimplemented)
@@ -1629,14 +1622,15 @@ const struct AsciiCharLUTEntry menu_font_lut[] = {
     {texture_menu_font_char_X, 7}, // 120 "x"
     {texture_menu_font_char_Y, 6}, // 121 "y"
     {texture_menu_font_char_Z, 6}, // 122 "z"
-    {NULL, 0}, // 123 "{" (Unimplemented)
+    {texture_menu_font_char_mface1, 8}, // 123 "{" (First half of Mario face)
     {NULL, 0}, // 124 "|" (Unimplemented)
-    {NULL, 0}, // 125 "}" (Unimplemented)
+    {texture_menu_font_char_mface2, 8}, // 125 "}" (Second half of Mario face)
     {NULL, 0}, // 126 "~" (Unimplemented)
 };
 
 const struct Utf8CharLUTEntry menu_font_utf8_2byte_lut[] = {
     {0x00D7, 6, 0, texture_menu_font_char_multiply}, // ×
+    {0x00E7, 5, 0, texture_menu_font_char_cedilla}, // ç
 };
 
 const struct Utf8CharLUTEntry menu_font_utf8_3byte_lut[] = {
@@ -1659,6 +1653,8 @@ const struct Utf8LUT menu_font_utf8_lut = {
     ARRAY_COUNT(menu_font_utf8_4byte_lut),
     &menu_font_utf8_missing_char,
 };
+
+//texture_menu_font_char_umlaut
 
 // Menu small font print table
 // 0x0700CD08

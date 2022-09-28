@@ -1568,7 +1568,7 @@ const struct Utf8CharLUTEntry main_hud_utf8_2byte_lut[] = {
     {0x00CB, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_E}, // Ë
     {0x00CF, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_I}, // Ï
     {0x00D6, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_O}, // Ö
-    {0x00D7, 14, 0, texture_hud_char_multiply}, // ×
+    {0x00D7, 15, 0, texture_hud_char_multiply}, // ×
     {0x00DC, 12, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_hud_char_U}, // Ü
 };
 

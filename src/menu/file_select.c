@@ -1199,6 +1199,15 @@ void print_menu_cursor(void) {
 }
 
 /**
+ * Takes a number 0-3 and a string containing %s, and formats the string to contain the corresponding file letter A-D
+ */
+void string_insert_file_letter(char *dst, char *src, u8 index) {
+    char *fileLetter = "A";
+    fileLetter[0] = 'A' + index;
+    sprintf(dst, src, fileLetter);
+}
+
+/**
  * Prints a hud string depending of the hud table list defined with text fade properties.
  */
 void print_hud_lut_string_fade(s16 x, s16 y, char *text) {
@@ -1409,9 +1418,9 @@ void score_menu_display_message(s8 messageID) {
     }
 }
 
-#define LEFT_X 62
-#define MIDDLE_X  160
-#define RIGHT_X 258
+#define SUBMENU_LEFT_BUTTON_X 62
+#define SUBMENU_MIDDLE_BUTTON_X  160
+#define SUBMENU_RIGHT_BUTTON_X 258
 
 #define FADEOUT_TIMER 20
 
@@ -1463,9 +1472,9 @@ void print_score_menu_strings(void) {
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string_centered(LEFT_X, 35, LANGUAGE_ARRAY(textReturn));
-    print_generic_string_centered(MIDDLE_X, 35, LANGUAGE_ARRAY(textCopyFileButton));
-    print_generic_string_centered(RIGHT_X, 35, LANGUAGE_ARRAY(textEraseFileButton));
+    print_generic_string_centered(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn));
+    print_generic_string_centered(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textCopyFileButton));
+    print_generic_string_centered(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textEraseFileButton));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     // Print file names
@@ -1607,9 +1616,9 @@ void print_copy_menu_strings(void) {
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string_centered(LEFT_X, 35, LANGUAGE_ARRAY(textReturn));
-    print_generic_string_centered(MIDDLE_X, 35, LANGUAGE_ARRAY(textViewScore));
-    print_generic_string_centered(RIGHT_X, 35, LANGUAGE_ARRAY(textEraseFileButton));
+    print_generic_string_centered(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn));
+    print_generic_string_centered(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textViewScore));
+    print_generic_string_centered(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textEraseFileButton));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
@@ -1724,7 +1733,6 @@ char *textMarioXJustErased = LANGUAGE_TEXT(
  */
 void erase_menu_display_message(s8 messageID) {
     char str[50];
-    char *fileLetter = "A";
     switch (messageID) {
         case ERASE_MSG_MAIN_TEXT:
             print_hud_lut_string_fade_centered(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textEraseFile));
@@ -1737,8 +1745,7 @@ void erase_menu_display_message(s8 messageID) {
             print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
             break;
         case ERASE_MSG_MARIO_ERASED:
-            fileLetter[0] = 'A' + sSelectedFileIndex;
-            sprintf(str, LANGUAGE_ARRAY(textMarioXJustErased), fileLetter);
+            string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioXJustErased), sSelectedFileIndex);
             print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, str);
             break;
         case ERASE_MSG_SAVE_EXISTS: // unused
@@ -1813,9 +1820,9 @@ void print_erase_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
-    print_generic_string_centered(LEFT_X, 35, LANGUAGE_ARRAY(textReturn));
-    print_generic_string_centered(MIDDLE_X, 35, LANGUAGE_ARRAY(textViewScore));
-    print_generic_string_centered(RIGHT_X, 35, LANGUAGE_ARRAY(textCopyFileButton));
+    print_generic_string_centered(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn));
+    print_generic_string_centered(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textViewScore));
+    print_generic_string_centered(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textCopyFileButton));
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     // Print file names
@@ -1905,28 +1912,32 @@ void print_sound_mode_menu_strings(void) {
 void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     char secretStarsText[20];
     // Print number of castle secret stars
-    sprintf(secretStarsText, "★×%d", save_file_get_total_star_count(fileIndex,
+    sprintf(secretStarsText, "★× %d", save_file_get_total_star_count(fileIndex,
                                                                   COURSE_NUM_TO_INDEX(COURSE_BONUS_STAGES),
                                                                   COURSE_NUM_TO_INDEX(COURSE_MAX)));
     print_menu_generic_string(x, y, secretStarsText);
 }
 
+char textMarioFace[] = LANGUAGE_TEXT(
+    "{}%s",
+    "{}%s",
+    "{}%s",
+    "マリオ%s");
+
 /**
  * Prints course coins collected in a score menu save file.
  */
 void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
-    char coinScoreText[20];
+    char str[20];
     u8 stars = save_file_get_star_flags(fileIndex, courseIndex);
-    char fileNames[][10] = {"----", "☺A", "☺B", "☺C", "☺D"};
-    // come back to when doing JP
-    //char fileNamesJP[][10] = {"----", "マリオＡ", "マリオＢ", "マリオＣ", "マリオＤ"};
+
     // MYSCORE
     if (sScoreFileCoinScoreMode == 0) {
         // Print "[coin] x"
         print_menu_generic_string(x + 25, y, "✪×");
         // Print coin score
-        sprintf(coinScoreText, "%d", save_file_get_course_coin_score(fileIndex, courseIndex));
-        print_menu_generic_string(x + 41, y, coinScoreText);
+        sprintf(str, "%d", save_file_get_course_coin_score(fileIndex, courseIndex));
+        print_menu_generic_string(x + 41, y, str);
         // If collected, print 100 coin star
         if (stars & STAR_FLAG_ACT_100_COINS) {
             print_menu_generic_string(x + 70, y, "★");
@@ -1934,14 +1945,20 @@ void print_score_file_course_coin_score(s8 fileIndex, s16 courseIndex, s16 x, s1
     }
     // HISCORE
     else {
+        u16 coinScoreFile;
         // Print "[coin] x"
         print_menu_generic_string(x + 18, y, "✪×");
         // Print coin highscore
-        sprintf(coinScoreText, "%d", (u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
-        print_menu_generic_string(x + 34, y, coinScoreText);
+        sprintf(str, "%d", (u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
+        print_menu_generic_string(x + 34, y, str);
         // Print coin highscore file
-        print_menu_generic_string(x + 60, y,
-                         fileNames[(save_file_get_max_coin_score(courseIndex) >> 16) & 0xFFFF]);
+        coinScoreFile = (save_file_get_max_coin_score(courseIndex) >> 16) & 0xFFFF;
+        if (coinScoreFile == 0) {
+            print_menu_generic_string(x + 60, y, "----");
+        } else {
+            string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioFace), coinScoreFile - 1);
+            print_menu_generic_string(x + 60, y, str);
+        }
     }
 }
 
@@ -1969,20 +1986,11 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     print_menu_generic_string(x, y, starScoreText);
 }
 
-#define MARIO_X         25
-#define FILE_LETTER_X   95
-#define LEVEL_NUM_PAD    3
-#define SECRET_STARS_PAD 6
-#define LEVEL_NAME_X    23
-#define STAR_SCORE_X   171
-#define MYSCORE_X      238
-#define HISCORE_X      231
-
-char *textMario = LANGUAGE_TEXT(
-    "MARIO",
-    "MARIO",
-    "MARIO",
-    "マリオ");
+char *textMarioX = LANGUAGE_TEXT(
+    "MARIO %s",
+    "MARIO %s",
+    "MARIO %s",
+    "マリオ%s");
 
 char *textHiScore = LANGUAGE_TEXT(
     "HI SCORE",
@@ -2001,16 +2009,14 @@ char *textMyScore = LANGUAGE_TEXT(
  */
 void print_save_file_scores(s8 fileIndex) {
     u32 i;
-    char textFileLetter[2] = "A";
+    char str[20];
     void **levelNameTable = segmented_to_virtual(languageTable[gInGameLanguage][1]);
-
-    textFileLetter[0] = fileIndex + 'A'; // get letter of file selected
 
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_hud_lut_string(MARIO_X, 15, textMario);
-    print_hud_lut_string(FILE_LETTER_X, 15, textFileLetter);
+    string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioX), fileIndex);
+    print_hud_lut_string(25, 15, str);
 
     // Print save file star count at top
     print_save_file_star_count(fileIndex, 124, 15);
@@ -2020,22 +2026,21 @@ void print_save_file_scores(s8 fileIndex) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
     for ((i = 0); (i < COURSE_STAGES_MAX); (i++)) {
-        print_menu_generic_string((LEVEL_NAME_X + ((i < 9) * LEVEL_NUM_PAD)), (23 + (12 * (i + 1))), segmented_to_virtual(levelNameTable[i]));
-        print_score_file_star_score(              fileIndex, i, STAR_SCORE_X, (23 + (12 * (i + 1))));
-        print_score_file_course_coin_score(       fileIndex, i,          213, (23 + (12 * (i + 1))));
+        print_menu_generic_string((23 + ((i < 9) * 3)), (23 + (12 * (i + 1))), segmented_to_virtual(levelNameTable[i]));
+        print_score_file_star_score(       fileIndex, i, 171, (23 + (12 * (i + 1))));
+        print_score_file_course_coin_score(fileIndex, i, 213, (23 + (12 * (i + 1))));
     }
 
     // Print castle secret stars text
-    print_menu_generic_string(LEVEL_NAME_X + SECRET_STARS_PAD, 23 + 12 * 16,
-                              segmented_to_virtual(levelNameTable[25]));
+    print_menu_generic_string(29, 215, segmented_to_virtual(levelNameTable[25]));
     // Print castle secret stars score
-    print_score_file_castle_secret_stars(fileIndex, STAR_SCORE_X, 23 + 12 * 16);
+    print_score_file_castle_secret_stars(fileIndex, 171, 215);
 
     // Print current coin score mode
     if (sScoreFileCoinScoreMode == 0) {
-        print_menu_generic_string(MYSCORE_X, 24, LANGUAGE_ARRAY(textMyScore));
+        print_menu_generic_string(238, 24, LANGUAGE_ARRAY(textMyScore));
     } else {
-        print_menu_generic_string(HISCORE_X, 24, LANGUAGE_ARRAY(textHiScore));
+        print_menu_generic_string(231, 24, LANGUAGE_ARRAY(textHiScore));
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
