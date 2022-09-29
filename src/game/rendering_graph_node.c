@@ -573,13 +573,18 @@ void setup_global_light() {
     Lights1* curLight = (Lights1*)alloc_display_list(sizeof(Lights1));
     bcopy(&defaultLight, curLight, sizeof(Lights1));
 
+#ifdef WORLDSPACE_LIGHTING
+    curLight->l->l.dir[0] = (s8)(globalLightDirection[0]);
+    curLight->l->l.dir[1] = (s8)(globalLightDirection[1]);
+    curLight->l->l.dir[2] = (s8)(globalLightDirection[2]);
+#else
     Vec3f transformedLightDirection;
-
     linear_mtxf_transpose_mul_vec3f(gCameraTransform, transformedLightDirection, globalLightDirection);
-
     curLight->l->l.dir[0] = (s8)(transformedLightDirection[0]);
     curLight->l->l.dir[1] = (s8)(transformedLightDirection[1]);
     curLight->l->l.dir[2] = (s8)(transformedLightDirection[2]);
+#endif
+
     gSPSetLights1(gDisplayListHead++, (*curLight));
 }
 
