@@ -692,6 +692,10 @@ static void level_cmd_unload_area(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
+#ifdef STARTUP_SPAWN_LEVEL
+static u8 sFirstWarp = TRUE;
+#endif
+
 static void level_cmd_set_mario_start_pos(void) {
     gMarioSpawnInfo->areaIndex = CMD_GET(u8, 2);
 
@@ -703,9 +707,9 @@ static void level_cmd_set_mario_start_pos(void) {
     vec3s_set(gMarioSpawnInfo->startAngle, 0x0, degrees_to_angle(CMD_GET(s16, 4)), 0x0);
 
 #ifdef STARTUP_SPAWN_LEVEL
-    static u8 firstWarp = TRUE;
-    if (firstWarp) {
-        firstWarp = FALSE;
+
+    if (sFirstWarp) {
+        sFirstWarp = FALSE;
  #ifdef STARTUP_SPAWN_AREA
         if (gAreaData[STARTUP_SPAWN_AREA].terrainData != NULL) {
             gMarioSpawnInfo->areaIndex = STARTUP_SPAWN_AREA;
