@@ -688,15 +688,16 @@ s32 get_exponent(s32 x) {
 /**
  * Set up the texture format in the display list.
  */
-void painting_setup_textures(Gfx **gfx, PaintingData tWidth, PaintingData tHeight) {
+void painting_setup_textures(Gfx **gfx, PaintingData tWidth, PaintingData tHeight, PaintingData isEnvMap) {
+    s16 cm = isEnvMap ? (G_TX_WRAP | G_TX_NOMIRROR) : G_TX_CLAMP;
     u32 masks = get_exponent(tWidth);
     u32 maskt = get_exponent(tHeight);
 
     // Set up the textures.
     gDPSetTile((*gfx)++, G_IM_FMT_RGBA, G_IM_SIZ_16b,
         (tWidth >> 2), 0, G_TX_RENDERTILE, 0,
-        (G_TX_WRAP | G_TX_NOMIRROR), maskt, G_TX_NOLOD,
-        (G_TX_WRAP | G_TX_NOMIRROR), masks, G_TX_NOLOD
+        cm, maskt, G_TX_NOLOD,
+        cm, masks, G_TX_NOLOD
     );
     gDPSetTileSize((*gfx)++, 0,
         0, 0,
@@ -748,7 +749,7 @@ Gfx *dl_painting_rippling(const struct Painting *painting) {
         textureMaps = segmented_to_virtual(seg2_painting_env_map_texture_maps);
     }
 
-    painting_setup_textures(&gfx, tWidth, tHeight);
+    painting_setup_textures(&gfx, tWidth, tHeight, isEnvMap);
 
     // Map each image to the mesh's vertices.
     for (i = 0; i < imageCount; i++) {
@@ -873,7 +874,7 @@ Gfx *dl_painting_not_rippling(const struct Painting *painting) {
 
     gSPVertex(gfx++, verts, idx, 0);
 
-    painting_setup_textures(&gfx, tWidth, tHeight);
+    painting_setup_textures(&gfx, tWidth, tHeight, isEnvMap);
 
     for (s32 i = 0; i < imageCount; i++) {
         gDPSetTextureImage(gfx++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, textures[i]);
