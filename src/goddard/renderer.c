@@ -860,12 +860,6 @@ f64 gd_sqrt_d(f64 x) {
 #if defined(ISVPRINT) || defined(UNF)
 #define stubbed_printf osSyncPrintf
 #else
-/**
- * Unused
- */
-f64 stub_renderer_1(UNUSED f64 x) {
-    return 0.0;
-}
 
 /* 249BCC -> 24A19C */
 void gd_printf(const char *format, ...) {
@@ -1186,10 +1180,6 @@ void gdm_setup(void) {
     reset_cur_dl_indices();
     setup_stars();
     imout();
-}
-
-/* 24AC18 -> 24AC2C */
-void stub_renderer_2(UNUSED u32 a0) {
 }
 
 /* 24AC2C -> 24AC80; not called; orig name: Unknown8019C45C */
@@ -2332,11 +2322,6 @@ void gd_set_one_cycle(void) {
     update_render_mode();
 }
 
-/* 250B30 -> 250B44 */
-UNUSED void stub_renderer_3(void) {
-    UNUSED u8 filler[16];
-}
-
 /* 250B44 -> 250B58 */
 void gddl_is_loading_stub_dl(UNUSED s32 dlLoad) {
 }
@@ -2523,16 +2508,6 @@ void parse_p1_controller(void) {
     }
 }
 
-UNUSED void stub_renderer_4(f32 arg0) {
-    return;
-
-    // dead code
-    if (unknown_vec3f_2.x * unit_vector.x + arg0 * 2.0f > 160.0) {
-        gd_dl_mul_trans_matrix_set_unknown_vec3f(unknown_vec3f_1.x - unknown_vec3f_2.x, -20.0f, 0.0f);
-        unknown_vec3f_2.x = unknown_vec3f_1.x;
-    }
-}
-
 /**
  * Unused
  */
@@ -2697,10 +2672,6 @@ void gd_setproperty(enum GdProperty prop, f32 f1, f32 f2, f32 f3) {
     }
 }
 
-/* 2522B0 -> 2522C0 */
-UNUSED void stub_renderer_5(void) {
-}
-
 /* 2522C0 -> 25245C */
 void gd_create_ortho_matrix(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
     uintptr_t orthoMtx;
@@ -2829,10 +2800,6 @@ void gd_init_controllers(void) {
     }
 }
 
-/* 252BAC -> 252BC0 */
-UNUSED void stub_renderer_6(UNUSED struct GdObj *obj) {
-}
-
 /**
  * Unused - This is likely a stub version of the `defpup` function from the IRIX
  * Graphics Library. It was used to define a popup menu. See the IRIX "Graphics
@@ -2956,13 +2923,6 @@ void save_view_to_global(struct ObjView *v) {
     }
 }
 
-UNUSED void stub_renderer_7(void) {
-}
-
-/* 252FC4 -> 252FD8 */
-UNUSED void stub_renderer_8(UNUSED u32 arg0) {
-}
-
 /**
  * Unused - called by unused_main_renderer and Unknown801A5344
  */
@@ -2988,10 +2948,6 @@ void gd_dl_get_at(s32 linkDl) {
  * Unused - called by unused_main_renderer and Unknown801A5344
  */
 void stub_renderer_9(void) {
-}
-
-/* 253094 -> 2530A8 */
-UNUSED void stub_renderer_10(UNUSED u32 arg0) {
 }
 
 /* 2530A8 -> 2530C0 */
@@ -3163,7 +3119,6 @@ void unused_main_renderer(void) {
 
     start_timer("1frame");
     start_timer("cpu");
-    // stub_renderer_9();
     reset_cur_dl_indices();
     parse_p1_controller();
     setup_timers();
@@ -3201,7 +3156,6 @@ UNUSED void Unknown801A5344(void) {
     gd_set_one_cycle();
     gd_enddlsplist_parent();
     gd_dl_get_at(sScreenView->gdDlNum);
-    // stub_renderer_9();
     // func_801A4808();
     sScreenView->gdDlNum = 0;
 }
@@ -3309,18 +3263,6 @@ void reverse_string(char *str, s32 len) {
     }
 }
 
-/* 254168 -> 25417C */
-UNUSED void stub_renderer_12(UNUSED s8 *arg0) {
-}
-
-/* 25417C -> 254190 */
-UNUSED void stub_renderer_13(UNUSED void *arg0) {
-}
-
-/* 254190 -> 2541A4 */
-UNUSED void stub_renderer_14(UNUSED s8 *arg0) {
-}
-
 /**
  * Initializes the pick buffer. This functions like the `pick` or `gselect`
  * functions from IRIS GL.
@@ -3349,18 +3291,6 @@ void store_in_pickbuf(s16 data) {
 ** (datasize is always 2) */
 s32 get_cur_pickbuf_offset(UNUSED s16 *arg0) {
     return sPickBufPosition / 3;
-}
-
-/* 254250 -> 254264 */
-UNUSED void stub_renderer_15(UNUSED u32 arg0) {
-}
-
-/* 254264 -> 254278 */
-UNUSED void stub_renderer_16(UNUSED u32 arg0) {
-}
-
-/* 254278 -> 254288 */
-UNUSED void stub_renderer_17(void) {
 }
 
 /* 254288 -> 2542B0 */
@@ -3722,14 +3652,6 @@ void make_timer_gadgets(void) {
     return;
 }
 
-/* 255600 -> 255614 */
-void stub_renderer_18(UNUSED u32 a0) {
-}
-
-/* 255614 -> 255628 */
-void stub_renderer_19(UNUSED u32 a0) {
-}
-
 #ifndef NO_SEGMENTED_MEMORY
 /**
  * Copies `size` bytes of data from ROM address `romAddr` to RAM address `vAddr`.
@@ -3833,12 +3755,6 @@ struct GdObj *load_dynlist(struct DynList *dynlist) {
 /**
  * Unused (not called)
  */
-UNUSED void stub_renderer_20(UNUSED u32 a0) {
-}
-
-/**
- * Unused (not called)
- */
 void func_801A71CC(struct ObjNet *net) {
     s32 i; // spB4
     s32 j; // spB0
@@ -3932,8 +3848,4 @@ void func_801A71CC(struct ObjNet *net) {
             fatal_printf("plane not in any zones\n");
         }
     }
-}
-
-/* 255EB0 -> 255EC0 */
-UNUSED void stub_renderer_21(void) {
 }
