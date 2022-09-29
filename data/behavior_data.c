@@ -2626,6 +2626,7 @@ const BehaviorScript bhvExclamationBox[] = {
     OR_INT(oFlags, OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE),
     SET_FLOAT(oCollisionDistance, 300),
     SET_HOME(),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_exclamation_box_loop),
     END_LOOP(),
@@ -3772,6 +3773,7 @@ const BehaviorScript bhvMessagePanel[] = {
     DROP_TO_FLOOR(),
     SET_HITBOX(/*Radius*/ 150, /*Height*/ 80),
     SET_INT(oWoodenPostTotalMarioAngle, 0),
+    CALL_NATIVE(bhv_init_room),
     CALL_NATIVE(load_object_static_model),
     BEGIN_LOOP(),
         SET_INT(oIntangibleTimer, 0),
@@ -5600,6 +5602,7 @@ const BehaviorScript bhvActivatedBackAndForthPlatform[] = {
 const BehaviorScript bhvRecoveryHeart[] = {
     BEGIN(OBJ_LIST_LEVEL),
     OR_INT(oFlags, (OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_COMPUTE_DIST_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)),
+    CALL_NATIVE(bhv_init_room),
     BEGIN_LOOP(),
         CALL_NATIVE(bhv_recovery_heart_loop),
     END_LOOP(),

@@ -820,6 +820,13 @@ void cur_obj_update(void) {
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
 
+    if (!(objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM)) {
+        if (o->oRoom != -1 && gMarioCurrentRoom != 0 && !is_room_loaded(o->oRoom)) {
+            cur_obj_enable_rendering_if_mario_in_room();
+            return;
+        }
+    }
+
     // Calculate the distance from the object to Mario.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
         o->oDistanceToMario = dist_between_objects(o, gMarioObject);
