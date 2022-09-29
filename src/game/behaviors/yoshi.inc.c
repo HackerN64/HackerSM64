@@ -146,7 +146,7 @@ void yoshi_give_present_loop(void) {
 #ifdef ENABLE_LIVES
     s32 globalTimer = gGlobalTimer;
 
-    if (gHudDisplay.lives == 100) {
+    if (gHudDisplay.lives == MAX_NUM_LIVES) {
         play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
         gSpecialTripleJump = TRUE;
         o->oAction = YOSHI_ACT_WALK_JUMP_OFF_ROOF;
