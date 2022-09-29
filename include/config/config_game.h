@@ -12,11 +12,6 @@
 // #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
 
 /**
- * Saves the number of lives to the save file (Does nothing if DISABLE_LIVES is enabled).
- */
-#define SAVE_NUM_LIVES
-
-/**
  * Enable lives and the lives counter. The number next to the define is the number of lives you start with.
  */
 // #define ENABLE_LIVES 4
