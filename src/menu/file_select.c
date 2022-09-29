@@ -895,11 +895,31 @@ void load_main_menu_save_file(struct Object *fileButton, s32 fileNum) {
 }
 
 /**
+ * Clears a section of sMainMenuButtons.
+ */
+void delete_menu_button_objects(s16 minID, s16 maxID) {
+    for (s16 buttonID = minID; buttonID < maxID; buttonID++) {
+        obj_mark_for_deletion(sMainMenuButtons[buttonID]);
+    }
+}
+
+/**
+ * Hides buttons of corresponding button menu groups.
+ */
+void hide_submenu_buttons(s16 prevMenuButtonID) {
+    switch (prevMenuButtonID) {
+        case MENU_BUTTON_SCORE:      delete_menu_button_objects(MENU_BUTTON_SCORE_MIN,  MENU_BUTTON_SCORE_MAX ); break;
+        case MENU_BUTTON_COPY:       delete_menu_button_objects(MENU_BUTTON_COPY_MIN,   MENU_BUTTON_COPY_MAX  ); break;
+        case MENU_BUTTON_ERASE:      delete_menu_button_objects(MENU_BUTTON_ERASE_MIN,  MENU_BUTTON_ERASE_MAX ); break;
+        case MENU_BUTTON_SOUND_MODE: delete_menu_button_objects(MENU_BUTTON_OPTION_MIN, MENU_BUTTON_OPTION_MAX); break;
+    }
+}
+
+/**
  * Returns from the previous menu back to the main menu using
  * the return button (or sound mode) as source button.
  */
 void return_to_main_menu(s16 prevMenuButtonID, struct Object *sourceButton) {
-    s32 buttonID;
     // If the source button is in default state and the previous menu in full screen,
     // play zoom out sound and shrink previous menu
     if (sourceButton->oMenuButtonState == MENU_BUTTON_STATE_DEFAULT
@@ -911,27 +931,7 @@ void return_to_main_menu(s16 prevMenuButtonID, struct Object *sourceButton) {
     // If the previous button is in default state, return back to the main menu
     if (sMainMenuButtons[prevMenuButtonID]->oMenuButtonState == MENU_BUTTON_STATE_DEFAULT) {
         sSelectedButtonID = MENU_BUTTON_NONE;
-        // Hide buttons of corresponding button menu groups
-        if (prevMenuButtonID == MENU_BUTTON_SCORE) {
-            for (buttonID = MENU_BUTTON_SCORE_MIN; buttonID < MENU_BUTTON_SCORE_MAX; buttonID++) {
-                obj_mark_for_deletion(sMainMenuButtons[buttonID]);
-            }
-        }
-        if (prevMenuButtonID == MENU_BUTTON_COPY) {
-            for (buttonID = MENU_BUTTON_COPY_MIN; buttonID < MENU_BUTTON_COPY_MAX; buttonID++) {
-                obj_mark_for_deletion(sMainMenuButtons[buttonID]);
-            }
-        }
-        if (prevMenuButtonID == MENU_BUTTON_ERASE) {
-            for (buttonID = MENU_BUTTON_ERASE_MIN; buttonID < MENU_BUTTON_ERASE_MAX; buttonID++) {
-                obj_mark_for_deletion(sMainMenuButtons[buttonID]);
-            }
-        }
-        if (prevMenuButtonID == MENU_BUTTON_SOUND_MODE) {
-            for (buttonID = MENU_BUTTON_OPTION_MIN; buttonID < MENU_BUTTON_OPTION_MAX; buttonID++) {
-                obj_mark_for_deletion(sMainMenuButtons[buttonID]);
-            }
-        }
+        hide_submenu_buttons(prevMenuButtonID);
     }
 }
 
@@ -946,22 +946,8 @@ void load_menu_from_submenu(s16 prevMenuButtonID, s16 selectedButtonID, struct O
     }
     // If the previous button is in default state
     if (sMainMenuButtons[prevMenuButtonID]->oMenuButtonState == MENU_BUTTON_STATE_DEFAULT) {
-        s32 buttonID;
-        // Hide buttons of corresponding button menu groups
-        if ((selectedButtonID != MENU_BUTTON_SCORE) && (prevMenuButtonID == MENU_BUTTON_SCORE)) {
-            for (buttonID = MENU_BUTTON_SCORE_MIN; buttonID < MENU_BUTTON_SCORE_MAX; buttonID++) {
-                obj_mark_for_deletion(sMainMenuButtons[buttonID]);
-            }
-        }
-        if ((selectedButtonID != MENU_BUTTON_ERASE) && (prevMenuButtonID == MENU_BUTTON_COPY)) {
-            for (buttonID = MENU_BUTTON_COPY_MIN; buttonID < MENU_BUTTON_COPY_MAX; buttonID++) {
-                obj_mark_for_deletion(sMainMenuButtons[buttonID]);
-            }
-        }
-        if ((selectedButtonID != MENU_BUTTON_ERASE) && (prevMenuButtonID == MENU_BUTTON_ERASE)) {
-            for (buttonID = MENU_BUTTON_ERASE_MIN; buttonID < MENU_BUTTON_ERASE_MAX; buttonID++) {
-                obj_mark_for_deletion(sMainMenuButtons[buttonID]);
-            }
+        if (selectedButtonID != prevMenuButtonID) {
+            hide_submenu_buttons(prevMenuButtonID);
         }
         // Play zoom in sound, select score menu and render it's buttons
         sSelectedButtonID = selectedButtonID;
