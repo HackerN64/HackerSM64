@@ -2944,12 +2944,6 @@ void gd_dl_get_at(s32 linkDl) {
     sCurrentGdDl = curDl;
 }
 
-/**
- * Unused - called by unused_main_renderer and Unknown801A5344
- */
-void stub_renderer_9(void) {
-}
-
 /* 2530A8 -> 2530C0 */
 void stub_draw_label_text(UNUSED char *s) {
     UNUSED u8 filler1[4];
@@ -2960,9 +2954,6 @@ void stub_draw_label_text(UNUSED char *s) {
 /* 2530C0 -> 2530D8; orig name: func_801A48F0 */
 void set_active_view(struct ObjView *v) {
     sActiveView = v;
-}
-
-UNUSED void stub_renderer_11(void) {
 }
 
 /**
