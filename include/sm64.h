@@ -20,16 +20,27 @@ extern u32   __n64Assert_LineNum;
 extern char *__n64Assert_Message;
 extern void __n64Assert(char *fileName, u32 lineNum, char *message);
 
-#define ASSERT(cond, message) do {\
-    if (!(cond)) { \
-        __n64Assert(__FILE__, __LINE__, (message)); \
-    } \
+/**
+ * Will always cause a crash with your message of choice
+ */
+#define ERROR(message) __n64Assert(__FILE__, __LINE__, (message))
+
+/**
+ * Will always cause a crash if cond is not true (handle with care)
+ */
+#define ASSERT(cond, message) do {  \
+    if (!(cond)) {                  \
+        ERROR(message);             \
+    }                               \
 } while (0);
 
+/**
+ * Will cause a crash if cond is not true, and ENABLE_DEBUG_ASSERTS is defined (allows for quick removal of littered asserts)
+ */
 #ifdef ENABLE_DEBUG_ASSERTS
-#define DEBUG_ASSERT(cond, message) ASSERT(cond, message)
+    #define DEBUG_ASSERT(cond, message) ASSERT(cond, message)
 #else
-#define DEBUG_ASSERT(cond, message)
+    #define DEBUG_ASSERT(cond, message)
 #endif
 
 // Pointer casting is technically UB, and avoiding it gets rid of endian issues as well as a nice side effect.
