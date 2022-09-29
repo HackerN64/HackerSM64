@@ -90,6 +90,7 @@
     #undef COMPLETE_SAVE_FILE
     #undef DEBUG_FORCE_CRASH_ON_BOOT
     #undef USE_PROFILER
+    #undef ENABLE_CREDITS_BENCHMARK
 #endif // DISABLE_ALL
 
 #ifdef DEBUG_ALL
@@ -132,6 +133,17 @@
     #undef UNLOCK_ALL
     #define UNLOCK_ALL
 #endif // COMPLETE_SAVE_FILE
+
+
+/*****************
+ * config_benchmark.h
+ */
+
+#ifdef ENABLE_CREDITS_BENCHMARK
+    #define DEBUG_ALL
+    #define ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
+    #define STARTUP_SPAWN_LEVEL LEVEL_CASTLE_GROUNDS
+#endif
 
 
 /*****************
