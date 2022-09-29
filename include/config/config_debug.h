@@ -21,30 +21,16 @@
 #define USE_PROFILER
 
 /**
- * -- DEBUG_STARTUP_SPAWN_LEVEL --
- * Uncomment this define and set a level in order to boot straight into said level.
- * This allows you to quickly test the level you're working on.
- * If you want the game to boot normally, just comment out the define again.
+ * -- DEBUG STARTUP SPAWN PARAMETERS --
+ * Sets a level in order to boot straight into said level, skipping the title screen and file select.
+ * This allows you to quickly test the level or location you're working on.
+ * NOTE: STARTUP_SPAWN_LEVEL is required for the other parameters to have an effect.
+ * NOTE: It is recommended to set STARTUP_SPAWN_POS in addition to STARTUP_SPAWN_AREA, otherwise the default position may be out of bounds.
+ * NOTE: STARTUP_SPAWN_ANGLE is an s16 angle.
  */
 // #define STARTUP_SPAWN_LEVEL LEVEL_BOB
-
-/**
- * Mario's starting area on boot.
- * NOTE: Requires STARTUP_SPAWN_LEVEL.
- * NOTE: It is also recommended to set STARTUP_SPAWN_POS with this, otherwise the default position may cause Mario to spawn out of bounds.
- */
-// #define STARTUP_SPAWN_AREA 1
-
-/**
- * Mario's starting position on boot.
- * NOTE: Requires STARTUP_SPAWN_LEVEL.
- */
-// #define STARTUP_SPAWN_POS 0, 0, 0
-
-/**
- * Mario's starting yaw on boot, as an s16 angle.
- * NOTE: Requires STARTUP_SPAWN_LEVEL.
- */
+// #define STARTUP_SPAWN_AREA  1
+// #define STARTUP_SPAWN_POS   0, 0, 0
 // #define STARTUP_SPAWN_ANGLE 0x0
 
 /**
