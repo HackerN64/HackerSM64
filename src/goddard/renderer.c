@@ -181,8 +181,6 @@ static struct ObjView *stored_view; // store if View flag 0x40 set
 UNUSED static u32 unref_801a8670 = 0;
 static s32 D_801A8674 = 0;
 UNUSED static u32 unref_801a8678 = 0;
-static s32 D_801A867C = 0; // useless
-static s32 D_801A8680 = 0; // useless
 static f32 sTracked1FrameTime = 0.0f; // @ 801A8684
 static f32 sDynamicsTime = 0.0f;      // @ 801A8688
 static f32 sDLGenTime = 0.0f;         // @ 801A868C
@@ -195,11 +193,9 @@ static struct GdTimer *dlgen_dynamics_rcp_timer1 = NULL; // timer for dlgen, dyn
 static struct GdTimer *dlgen_dynamics_rcp_timer2 = NULL; // timer for dlgen, dynamics, or rcp
 static struct GdTimer *dlgen_dynamics_rcp_timer3 = NULL; // timer for dlgen, dynamics, or rcp
 s32 gGdFrameBufNum = 0;                      // @ 801A86B0
-UNUSED static u32 unref_801a86B4 = 0; // useless 
 static struct ObjShape *sHandShape = NULL; // @ 801A86B8
 static s32 D_801A86BC = 1; // useless
 static s32 D_801A86C0 = 0; // gd_dl id for something?
-UNUSED static u32 unref_801a86C4 = 10; // useless
 static s32 sMtxParamType = G_MTX_PROJECTION;
 UNUSED static struct GdVec3f unit_vector = { 1.0f, 1.0f, 1.0f }; // unit vec3f
 static struct ObjView *sActiveView = NULL;  // @ 801A86D8 current view? used when drawing dl
@@ -3221,11 +3217,8 @@ void gd_init(void) {
     data = gd_allocblock(i);
     gd_add_mem_to_heap(i, data, 0x10);
     sAlpha = (u16) 0xff;
-    D_801A867C = 0;
-    D_801A8680 = 0;
     sTextureCount = 0;
     gGdFrameBufNum = 0;
-    D_801A86BC = 1;
     sItemsInMenu = 0;
     sDebugViewsCount = 0;
     sCurrDebugViewIndex = 0;
