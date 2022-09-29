@@ -1874,7 +1874,7 @@ void init_mario_from_save_file(void) {
 #ifdef ENABLE_LIVES
     gMarioState->numLives = ENABLE_LIVES;
 #else
-    gMarioState->numLives = 99;
+    gMarioState->numLives = 0;
 #endif
     gMarioState->health = 0x880;
 #ifdef BREATH_METER

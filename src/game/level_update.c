@@ -913,11 +913,12 @@ void update_hud_values(void) {
             }
         }
 
+#ifdef ENABLE_LIVES
         if (gMarioState->numLives > 100) {
             gMarioState->numLives = 100;
         }
+#endif
 
-#if BUGFIX_MAX_LIVES
         if (gMarioState->numCoins > 999) {
             gMarioState->numCoins = 999;
         }
@@ -925,11 +926,6 @@ void update_hud_values(void) {
         if (gHudDisplay.coins > 999) {
             gHudDisplay.coins = 999;
         }
-#else
-        if (gMarioState->numCoins > 999) {
-            gMarioState->numLives = (s8) 999; //! Wrong variable
-        }
-#endif
 
         gHudDisplay.stars = gMarioState->numStars;
         gHudDisplay.lives = gMarioState->numLives;

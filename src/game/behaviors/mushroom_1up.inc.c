@@ -9,7 +9,9 @@ void bhv_1up_interact(void) {
         gMarioState->breathCounter = 31;
 #endif
 #endif
+#ifdef ENABLE_LIVES
         gMarioState->numLives++;
+#endif
         o->activeFlags = ACTIVE_FLAG_DEACTIVATED;
 #if ENABLE_RUMBLE
         queue_rumble_data(5, 80);
