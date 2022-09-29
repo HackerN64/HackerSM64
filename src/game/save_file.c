@@ -658,11 +658,7 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
 
     saveFile->capLevel = gCurrLevelNum;
     saveFile->capArea = gCurrAreaIndex;
-#ifndef SAVE_NUM_LIVES
     vec3s_set(saveFile->capPos, x, y, z);
-#else
-    (void) x; (void) y; (void) z; // Address compiler warnings for unused variables
-#endif
     save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
 }
 
@@ -672,29 +668,11 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
 
     if (saveFile->capLevel == gCurrLevelNum && saveFile->capArea == gCurrAreaIndex
         && (flags & SAVE_FLAG_CAP_ON_GROUND)) {
-#ifdef SAVE_NUM_LIVES
-        vec3_zero(capPos);
-#else
         vec3s_copy(capPos, saveFile->capPos);
-#endif
         return TRUE;
     }
     return FALSE;
 }
-
-#ifdef SAVE_NUM_LIVES
-void save_file_set_num_lives(s8 numLives) {
-    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
-    saveFile->numLives = numLives;
-    saveFile->flags |= SAVE_FLAG_FILE_EXISTS;
-    gSaveFileModified = TRUE;
-}
-
-s32 save_file_get_num_lives(void) {
-    struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
-    return saveFile->numLives;
-}
-#endif
 
 void save_file_set_sound_mode(u16 mode) {
     set_sound_mode(mode);
