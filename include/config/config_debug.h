@@ -21,8 +21,8 @@
 #define USE_PROFILER
 
 /**
- * -- TEST LEVEL --
- * Uncomment this define and set a test level in order to boot straight into said level.
+ * -- DEBUG_STARTUP_SPAWN_LEVEL --
+ * Uncomment this define and set a level in order to boot straight into said level.
  * This allows you to quickly test the level you're working on.
  * If you want the game to boot normally, just comment out the define again.
  */
@@ -42,7 +42,7 @@
 // #define STARTUP_SPAWN_POS 0, 0, 0
 
 /**
- * Mario's starting yaw on boot.
+ * Mario's starting yaw on boot, as an s16 angle.
  * NOTE: Requires STARTUP_SPAWN_LEVEL.
  */
 // #define STARTUP_SPAWN_ANGLE 0x0
