@@ -78,6 +78,12 @@ enum GenericTextDiacriticMarks {
     TEXT_DIACRITIC_UMLAUT_UPPERCASE,
 };
 
+enum TextAlignments {
+    TEXT_ALIGN_LEFT,
+    TEXT_ALIGN_CENTER,
+    TEXT_ALIGN_RIGHT,
+};
+
 #define GENERIC_TEXT_PACKED 0x8000
 #define GENERIC_TEXT_DIACRITIC_MASK 0x7FFF
 
@@ -106,8 +112,6 @@ extern u16 gDialogColorFadeTimer;
 extern s8  gLastDialogLineNum;
 extern s32 gDialogVariable;
 extern u16 gDialogTextAlpha;
-extern s16 gCutsceneMsgXOffset;
-extern s16 gCutsceneMsgYOffset;
 extern s8  gRedCoinsCollected;
 
 void create_dl_identity_matrix(void);
@@ -117,11 +121,11 @@ void create_dl_scale_matrix(s8 pushOp, f32 x, f32 y, f32 z);
 
 s32 get_string_length(char *str, struct AsciiCharLUTEntry *asciiLut, struct Utf8LUT *utf8LUT);
 void print_generic_string(s16 x, s16 y, char *str);
-void print_generic_string_centered(s16 x, s16 y, char *str);
 void print_hud_lut_string(s16 x, s16 y, char *str);
-void print_hud_lut_string_centered(s16 x, s16 y, char *str);
 void print_menu_generic_string(s16 x, s16 y, char *str);
-void print_menu_generic_string_centered(s16 x, s16 y, char *str);
+void print_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment);
+void print_hud_lut_string_aligned(s16 x, s16 y, char *str, u32 alignment);
+void print_menu_generic_string_aligned(s16 x, s16 y, char *str, u32 alignment);
 void print_credits_string(s16 x, s16 y, const char *str);
 
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex);
@@ -137,7 +141,7 @@ void set_menu_mode(s16 mode);
 void reset_cutscene_msg_fade(void);
 void dl_rgba16_begin_cutscene_msg_fade(void);
 void dl_rgba16_stop_cutscene_msg_fade(void);
-void set_cutscene_message(s16 xOffset, s16 yOffset, s16 msgIndex, s16 msgDuration);
+void set_cutscene_message(s16 msgIndex, s16 msgDuration);
 void do_cutscene_handler(void);
 void render_hud_cannon_reticle(void);
 void reset_red_coins_collected(void);

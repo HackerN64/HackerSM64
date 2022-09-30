@@ -1208,36 +1208,22 @@ void string_insert_file_letter(char *dst, char *src, u8 index) {
 }
 
 /**
- * Prints a hud string depending of the hud table list defined with text fade properties.
+ * Prints a hud string with text fade properties.
  */
-void print_hud_lut_string_fade(s16 x, s16 y, char *text) {
+void print_hud_lut_string_fade(s16 x, s16 y, char *text, u32 alignment) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha - sTextFadeAlpha);
-    print_hud_lut_string(x, y, text);
-    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
-}
-
-void print_hud_lut_string_fade_centered(s16 x, s16 y, char *text) {
-    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha - sTextFadeAlpha);
-    print_hud_lut_string_centered(x, y, text);
+    print_hud_lut_string_aligned(x, y, text, alignment);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
 /**
  * Prints a generic white string with text fade properties.
  */
-void print_generic_string_fade(s16 x, s16 y, char *text) {
+void print_generic_string_fade(s16 x, s16 y, char *text, u32 alignment) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha - sTextFadeAlpha);
-    print_generic_string(x, y, text);
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-}
-
-void print_generic_string_fade_centered(s16 x, s16 y, char *text) {
-    gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
-    gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha - sTextFadeAlpha);
-    print_generic_string_centered(x, y, text);
+    print_generic_string_aligned(x, y, text, alignment);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
@@ -1366,7 +1352,7 @@ void print_main_menu_strings(void) {
     // Print "SELECT FILE" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_hud_lut_string_centered(SCREEN_WIDTH/2, 35, textSelectFile);
+    print_hud_lut_string_aligned(SCREEN_WIDTH/2, 35, textSelectFile, TEXT_ALIGN_CENTER);
     // Print file star counts
     print_save_file_star_count(SAVE_FILE_A, 92, 78);
     print_save_file_star_count(SAVE_FILE_B, 209, 78);
@@ -1376,10 +1362,10 @@ void print_main_menu_strings(void) {
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string_centered(67, 39, LANGUAGE_ARRAY(textScore));
-    print_generic_string_centered(130, 39, LANGUAGE_ARRAY(textCopy));
-    print_generic_string_centered(191, 39, LANGUAGE_ARRAY(textErase));
-    print_generic_string_centered(253, 39, LANGUAGE_ARRAY(textSoundModes[sSoundMode]));
+    print_generic_string_aligned(67, 39, LANGUAGE_ARRAY(textScore), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(130, 39, LANGUAGE_ARRAY(textCopy), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(191, 39, LANGUAGE_ARRAY(textErase), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(253, 39, LANGUAGE_ARRAY(textSoundModes[sSoundMode]), TEXT_ALIGN_CENTER);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
@@ -1410,10 +1396,10 @@ void score_menu_display_message(s8 messageID) {
 
     switch (messageID) {
         case SCORE_MSG_CHECK_FILE:
-            print_hud_lut_string_fade_centered(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textCheckFile));
+            print_hud_lut_string_fade(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textCheckFile), TEXT_ALIGN_CENTER);
             break;
         case SCORE_MSG_NOSAVE_DATA:
-            print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
+            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
             break;
     }
 }
@@ -1450,6 +1436,7 @@ void print_score_menu_strings(void) {
     if (sMainMenuTimer == FADEOUT_TIMER) {
         sFadeOutText = TRUE;
     }
+
     if (update_text_fade_out()) {
         if (sStatusMessageID == SCORE_MSG_CHECK_FILE) {
             sStatusMessageID = SCORE_MSG_NOSAVE_DATA;
@@ -1457,6 +1444,7 @@ void print_score_menu_strings(void) {
             sStatusMessageID = SCORE_MSG_CHECK_FILE;
         }
     }
+
     // Print messageID called above
     score_menu_display_message(sStatusMessageID);
 
@@ -1472,9 +1460,9 @@ void print_score_menu_strings(void) {
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string_centered(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn));
-    print_generic_string_centered(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textCopyFileButton));
-    print_generic_string_centered(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textEraseFileButton));
+    print_generic_string_aligned(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textCopyFileButton), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textEraseFileButton), TEXT_ALIGN_CENTER);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     // Print file names
@@ -1525,22 +1513,22 @@ void copy_menu_display_message(s8 messageID) {
     switch (messageID) {
         case COPY_MSG_MAIN_TEXT:
             if (sAllFilesExist) {
-                print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoFileToCopyFrom));
+                print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoFileToCopyFrom), TEXT_ALIGN_CENTER);
             } else {
-                print_hud_lut_string_fade_centered(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textCopyFile));
+                print_hud_lut_string_fade(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textCopyFile), TEXT_ALIGN_CENTER);
             }
             break;
         case COPY_MSG_COPY_WHERE:
-            print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textCopyItToWhere));
+            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textCopyItToWhere), TEXT_ALIGN_CENTER);
             break;
         case COPY_MSG_NOSAVE_EXISTS:
-            print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
+            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
             break;
         case COPY_MSG_COPY_COMPLETE:
-            print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textCopyCompleted));
+            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textCopyCompleted), TEXT_ALIGN_CENTER);
             break;
         case COPY_MSG_SAVE_EXISTS:
-            print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textSavedDataExists));
+            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textSavedDataExists), TEXT_ALIGN_CENTER);
             break;
     }
 }
@@ -1600,11 +1588,12 @@ char *textViewScore = LANGUAGE_TEXT(
  * Prints copy menu strings that shows on the blue background menu screen.
  */
 void print_copy_menu_strings(void) {
-
     // Update and print the message at the top of the menu.
     copy_menu_update_message();
+
     // Print messageID called inside a copy_menu_update_message case
     copy_menu_display_message(sStatusMessageID);
+
     // Print file star counts
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
@@ -1613,13 +1602,15 @@ void print_copy_menu_strings(void) {
     print_save_file_star_count(SAVE_FILE_C, 90, 119);
     print_save_file_star_count(SAVE_FILE_D, 211, 119);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
+
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_generic_string_centered(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn));
-    print_generic_string_centered(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textViewScore));
-    print_generic_string_centered(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textEraseFileButton));
+    print_generic_string_aligned(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textViewScore), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textEraseFileButton), TEXT_ALIGN_CENTER);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
+
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
@@ -1735,21 +1726,21 @@ void erase_menu_display_message(s8 messageID) {
     char str[50];
     switch (messageID) {
         case ERASE_MSG_MAIN_TEXT:
-            print_hud_lut_string_fade_centered(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textEraseFile));
+            print_hud_lut_string_fade(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textEraseFile), TEXT_ALIGN_CENTER);
             break;
         case ERASE_MSG_PROMPT:
-            print_generic_string_fade(90, 190, LANGUAGE_ARRAY(textSure));
+            print_generic_string_fade(90, 190, LANGUAGE_ARRAY(textSure), TEXT_ALIGN_LEFT);
             print_erase_menu_prompt(90, 190); // YES NO, has functions for it too
             break;
         case ERASE_MSG_NOSAVE_EXISTS:
-            print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists));
+            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
             break;
         case ERASE_MSG_MARIO_ERASED:
             string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioXJustErased), sSelectedFileIndex);
-            print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, str);
+            print_generic_string_fade(SCREEN_WIDTH/2, 190, str, TEXT_ALIGN_CENTER);
             break;
         case ERASE_MSG_SAVE_EXISTS: // unused
-            print_generic_string_fade_centered(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textSavedDataExists));
+            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textSavedDataExists), TEXT_ALIGN_CENTER);
             break;
     }
 }
@@ -1800,7 +1791,6 @@ void erase_menu_update_message(void) {
  * Prints erase menu strings that shows on the red background menu screen.
  */
 void print_erase_menu_strings(void) {
-
     // Update and print the message at the top of the menu.
     erase_menu_update_message();
 
@@ -1819,10 +1809,9 @@ void print_erase_menu_strings(void) {
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-
-    print_generic_string_centered(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn));
-    print_generic_string_centered(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textViewScore));
-    print_generic_string_centered(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textCopyFileButton));
+    print_generic_string_aligned(SUBMENU_LEFT_BUTTON_X, 35, LANGUAGE_ARRAY(textReturn), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textViewScore), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textCopyFileButton), TEXT_ALIGN_CENTER);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
     // Print file names
@@ -1885,7 +1874,7 @@ void print_sound_mode_menu_strings(void) {
         } else {
             gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
         }
-        print_generic_string_centered(textX, 87, LANGUAGE_ARRAY(textSoundModes[mode]));
+        print_generic_string_aligned(textX, 87, LANGUAGE_ARRAY(textSoundModes[mode]), TEXT_ALIGN_CENTER);
     }
 
 #if MULTILANG
@@ -1896,7 +1885,7 @@ void print_sound_mode_menu_strings(void) {
         } else {
             gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
         }
-        print_generic_string_centered(textX, 72, textLanguage[mode]);
+        print_generic_string_aligned(textX, 72, textLanguage[mode], TEXT_ALIGN_CENTER);
     }
 
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
@@ -1986,7 +1975,7 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     print_menu_generic_string(x, y, starScoreText);
 }
 
-char *textMarioX = LANGUAGE_TEXT(
+char *textScoreMenuMarioX = LANGUAGE_TEXT(
     "MARIO %s",
     "MARIO %s",
     "MARIO %s",
@@ -1998,11 +1987,7 @@ char *textHiScore = LANGUAGE_TEXT(
     "BESTLEISTUNG",
     "ハイスコア");
 
-char *textMyScore = LANGUAGE_TEXT(
-    "MY SCORE",
-    "MON SCORE",
-    "LEISTUNG",
-    "マイスコア");
+extern char *textMyScore;
 
 /**
  * Prints save file score strings that shows when a save file is chosen inside the score menu.
@@ -2015,7 +2000,7 @@ void print_save_file_scores(s8 fileIndex) {
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioX), fileIndex);
+    string_insert_file_letter(str, LANGUAGE_ARRAY(textScoreMenuMarioX), fileIndex);
     print_hud_lut_string(25, 15, str);
 
     // Print save file star count at top
