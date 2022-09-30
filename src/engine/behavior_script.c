@@ -821,8 +821,10 @@ void cur_obj_update(void) {
     s32 bhvProcResult;
 
     if (!(objFlags & OBJ_FLAG_PROCESS_OUTSIDE_ROOM)) {
-        if (o->oRoom != -1 && gMarioCurrentRoom != 0 && !is_room_loaded(o->oRoom)) {
-            cur_obj_enable_rendering_if_mario_in_room();
+        if (o->oRoom != -1 && gMarioCurrentRoom != 0 && !is_room_loaded()) {
+            cur_obj_disable_rendering();
+            o->activeFlags |= ACTIVE_FLAG_IN_DIFFERENT_ROOM;
+            gNumRoomedObjectsNotInMarioRoom++;
             return;
         }
     }
