@@ -10,7 +10,6 @@ DUMMY != mkdir -p $(BUILD_DIR)
 C_FILES = $(wildcard ./*.c)
 O_FILES = $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
-CROSS := mips-linux-gnu-
 CC = $(CROSS)gcc
 AR = $(CROSS)ar
 
