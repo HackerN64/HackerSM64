@@ -5,6 +5,7 @@
 
 #include "sm64.h"
 #include "audio/external.h"
+#include "audio/synthesis.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
 #include "game/area.h"
@@ -732,6 +733,41 @@ static void level_cmd_show_dialog(void) {
     sCurrentCmd = CMD_NEXT;
 }
 
+#ifdef BETTER_REVERB
+static void level_cmd_set_music(void) {
+    if (sCurrAreaIndex != -1) {
+        gAreas[sCurrAreaIndex].musicParam = CMD_GET(s16, 2);
+        if (gIsConsole)
+            gAreas[sCurrAreaIndex].betterReverbPreset = CMD_GET(u8, 4);
+        else
+            gAreas[sCurrAreaIndex].betterReverbPreset = CMD_GET(u8, 5);
+        gAreas[sCurrAreaIndex].musicParam2 = CMD_GET(s16, 6);
+    }
+    sCurrentCmd = CMD_NEXT;
+}
+
+static void level_cmd_set_menu_music(void) {
+    if (gIsConsole)
+        gBetterReverbPreset = CMD_GET(u8, 4);
+    else
+        gBetterReverbPreset = CMD_GET(u8, 5);
+    set_background_music(0, CMD_GET(s16, 2), 0);
+    sCurrentCmd = CMD_NEXT;
+}
+
+static void level_cmd_fadeout_music(void) {
+    s16 dur = CMD_GET(s16, 2);
+    if (sCurrAreaIndex != -1 && dur == 0) {
+        // Allow persistent block overrides for SET_BACKGROUND_MUSIC_WITH_REVERB
+        gAreas[sCurrAreaIndex].musicParam = 0x00;
+        gAreas[sCurrAreaIndex].musicParam2 = 0x00;
+        gAreas[sCurrAreaIndex].betterReverbPreset = 0x00;
+    } else {
+        fadeout_music(dur);
+    }
+    sCurrentCmd = CMD_NEXT;
+}
+#else
 static void level_cmd_set_music(void) {
     if (sCurrAreaIndex != -1) {
         gAreas[sCurrAreaIndex].musicParam = CMD_GET(s16, 2);
@@ -746,9 +782,16 @@ static void level_cmd_set_menu_music(void) {
 }
 
 static void level_cmd_fadeout_music(void) {
-    fadeout_music(CMD_GET(s16, 2));
+    s16 dur = CMD_GET(s16, 2);
+    if (sCurrAreaIndex != -1 && dur == 0) {
+        gAreas[sCurrAreaIndex].musicParam = 0x00;
+        gAreas[sCurrAreaIndex].musicParam2 = 0x00;
+    } else {
+        fadeout_music(dur);
+    }
     sCurrentCmd = CMD_NEXT;
 }
+#endif
 
 static void level_cmd_get_or_set_var(void) {
     if (CMD_GET(u8, 2) == OP_SET) {

@@ -41,6 +41,69 @@ struct AudioSessionSettingsEU gAudioSessionPresets[] = {
 };
 #endif
 
+#ifdef BETTER_REVERB
+s32 delaysArr[][NUM_ALLPASS] = {
+    { /* 0 */ 
+        4, 4, 4,
+        4, 4, 4,
+        4, 4, 4,
+        4, 4, 4
+    },
+    { /* 1 */ 
+        1080, 1352, 1200,
+        1200, 1232, 1432,
+        1384, 1048, 1352,
+        928, 1504, 1512
+    },
+    { /* 2 */ 
+        1384, 1352, 1048,
+        928, 1512, 1504,
+        1080, 1200, 1352,
+        1200, 1432, 1232
+    },
+};
+
+s32 reverbMultsArr[][NUM_ALLPASS / 3] = {
+    /* 0 */ {0x00, 0x00, 0x00, 0x00},
+    /* 1 */ {0xD7, 0x6F, 0x36, 0x22},
+    /* 2 */ {0xCF, 0x73, 0x38, 0x1F},
+};
+
+// TODO: Add WIKI page
+
+/**
+ * Format:
+ * - downsampleRate
+ * - isMono
+ * - filterCount
+ * - windowSize
+ * - gain
+ * - gainIndex
+ * - reverbIndex
+ * 
+ * - *delaysL
+ * - *delaysR
+ * - *reverbMultsL
+ * - *reverbMultsR
+ * 
+ * NOTE: First entry will always be used by default when not using the level commands to specify a preset.
+ */
+struct BetterReverbSettings gBetterReverbSettings[] = {
+    { /* 0 */
+        -1, FALSE, NUM_ALLPASS, -1, -1, 0x00, 0x00, // Vanilla Reverb
+        delaysArr[0], delaysArr[0], reverbMultsArr[0], reverbMultsArr[0]
+    },
+    { /* 1 */
+        2, FALSE, (NUM_ALLPASS - 9), 0x1000, 0x53FF, 0x30, 0xA0, // Default Console
+        delaysArr[1], delaysArr[2], reverbMultsArr[1], reverbMultsArr[2]
+    },
+    { /* 2 */
+        1, FALSE, NUM_ALLPASS, 0x1000, 0x31FF, 0x60, 0xA0, // Default Emulator (RCVI Hack only)
+        delaysArr[1], delaysArr[2], reverbMultsArr[1], reverbMultsArr[2]
+    },
+};
+#endif
+
 // Format:
 // - frequency
 // - max number of simultaneous notes

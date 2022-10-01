@@ -1,6 +1,7 @@
 #include <PR/ultratypes.h>
 
 #include "audio/external.h"
+#include "audio/synthesis.h"
 #include "engine/math_util.h"
 #include "game/area.h"
 #include "game/game_init.h"
@@ -246,7 +247,6 @@ s32 intro_game_over(void) {
  * Plays the casual "It's a me mario" when the game stars.
  */
 s32 intro_play_its_a_me_mario(void) {
-    set_background_music(0, SEQ_SOUND_PLAYER, 0);
     play_sound(SOUND_MENU_COIN_ITS_A_ME_MARIO, gGlobalSoundSource);
     return LEVEL_NONE + 1;
 }

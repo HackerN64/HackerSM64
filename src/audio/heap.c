@@ -9,6 +9,7 @@
 #include "game/game_init.h"
 #include "game/puppyprint.h"
 #include "game/vc_check.h"
+#include "game/debug.h"
 #include "string.h"
 
 struct PoolSplit {
@@ -1043,37 +1044,40 @@ void init_reverb_eu(void) {
 void init_reverb_us(s32 presetId) {
     s16 *mem;
     s32 i;
-#ifdef BETTER_REVERB
-    s8 reverbConsole;
-#endif
 
     s32 reverbWindowSize = gReverbSettings[presetId].windowSize;
     gReverbDownsampleRate = gReverbSettings[presetId].downsampleRate;
 #ifdef BETTER_REVERB
-    if (gIsConsole) {
-        reverbConsole = betterReverbDownsampleConsole; // Console!
-    } else {
-        reverbConsole = betterReverbDownsampleEmulator; // Setting this to 1 is REALLY slow, please use sparingly!
-    }
-    if (reverbConsole <= 0) {
-        reverbConsole = 1;
+    // This will likely crash if given an invalid preset value. Adding a safety check here isn't worth the usability interference.
+    struct BetterReverbSettings *betterReverbPreset = &gBetterReverbSettings[gBetterReverbPreset];
+
+    betterReverbDownsampleRate = betterReverbPreset->downsampleRate;
+    monoReverb = betterReverbPreset->isMono;
+    reverbFilterCount = betterReverbPreset->filterCount;
+    betterReverbWindowsSize = betterReverbPreset->windowSize;
+    betterReverbRevIndex = betterReverbPreset->reverbIndex;
+    betterReverbGainIndex = betterReverbPreset->gainIndex;
+    gReverbMultsL = betterReverbPreset->reverbMultsL;
+    gReverbMultsR = betterReverbPreset->reverbMultsR;
+    if (betterReverbDownsampleRate <= 0) {
         toggleBetterReverb = FALSE;
     } else {
         toggleBetterReverb = TRUE;
-    }
 
-    if (toggleBetterReverb && betterReverbWindowsSize >= 0) {
-        reverbWindowSize = betterReverbWindowsSize;
-    }
-    if (gReverbDownsampleRate < (1 << (reverbConsole - 1))) {
-        gReverbDownsampleRate = (1 << (reverbConsole - 1));
-    }
-    reverbWindowSize /= gReverbDownsampleRate;
-    if (reverbWindowSize < DEFAULT_LEN_2CH) { // Minimum window size to not overflow
-        reverbWindowSize = DEFAULT_LEN_2CH;
+        if (gReverbDownsampleRate < (1 << (betterReverbDownsampleRate - 1)))
+            gReverbDownsampleRate = (1 << (betterReverbDownsampleRate - 1));
+        if (betterReverbWindowsSize >= 0) {
+            reverbWindowSize = betterReverbWindowsSize;
+            reverbWindowSize /= gReverbDownsampleRate;
+            if (reverbWindowSize < DEFAULT_LEN_2CH) { // Minimum window size to not overflow
+                reverbWindowSize = DEFAULT_LEN_2CH;
+            }
+        }
     }
 #endif
     if (reverbWindowSize == 0) {
+        // TODO: Does this even work or does it always crash? Might be worth removing.
+        // One reason it does crash is simply because the buffers won't ever get initialized if it's disabled on boot, but even still...
         gSynthesisReverb.useReverb = 0;
     } else {
         gSynthesisReverb.useReverb = 8;
@@ -1096,9 +1100,6 @@ void init_reverb_us(s32 presetId) {
                 gSynthesisReverb.items[1][i].toDownsampleLeft  = mem;
                 gSynthesisReverb.items[1][i].toDownsampleRight = (mem + (DEFAULT_LEN_1CH / sizeof(s16)));
             }
-#ifdef BETTER_REVERB
-            initialize_better_reverb_buffers();
-#endif
         } else {
             bzero(gSynthesisReverb.ringBuffer.left, (REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16)));
         }
@@ -1124,15 +1125,17 @@ void init_reverb_us(s32 presetId) {
             }
         }
 
-        // This does not have to be reset after being initialized for the first time, which would speed up load times dramatically.
-        // However, reseting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
 #ifdef BETTER_REVERB
-        if (toggleBetterReverb) {
-            if (sAudioIsInitialized) {
-                clear_better_reverb_buffers();
-            }
+        if (betterReverbPreset->gain > 0)
+            gSynthesisReverb.reverbGain = (u16) betterReverbPreset->gain;
 
-            set_better_reverb_buffers();
+        if (!sAudioIsInitialized)
+            initialize_better_reverb_buffers();
+
+        // This does not have to be reset after being initialized for the first time, which would help speed up load times.
+        // However, resetting this allows for proper clearing of the reverb buffers, as well as dynamic customization of the delays array.
+        if (toggleBetterReverb) {
+            set_better_reverb_buffers(betterReverbPreset->delaysL, betterReverbPreset->delaysR);
         }
 #endif
     }
