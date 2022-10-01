@@ -124,13 +124,3 @@
  * The number of segments Wiggler has, not including the head. Vanilla is 4.
  */
 #define WIGGLER_NUM_SEGMENTS     4
-
-// -- JRB MIST --
-
-// Makes the JRB mist always appear on act 1.
-// #define JRB_ACT_SPECIFIC_MIST
-
-// -- DDD OBJECTS --
-
-// Makes certain objects in DDD (Bowser's sub, sub door, & poles) act-specific instead of being dependent on Bowser 2 being beaten.
-// #define DDD_ACT_SPECIFIC_OBJECTS

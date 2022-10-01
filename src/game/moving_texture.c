@@ -598,11 +598,7 @@ Gfx *geo_movtex_draw_water_regions(s32 callContext, struct GraphNode *node, UNUS
             if (gLakituState.goalPos[1] < 1024.0f) { // if camera under water
                 return NULL;
             }
-#ifdef JRB_ACT_SPECIFIC_MIST
             if (gCurrActNum != 1) {
-#else
-            if (save_file_get_star_flags((gCurrSaveFileNum - 1), COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1) { // first star in JRB complete
-#endif
                 return NULL;
             }
         } else if (asGenerated->parameter == HMC_MOVTEX_TOXIC_MAZE_MIST) {
