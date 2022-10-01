@@ -38,6 +38,6 @@ void bhv_rotating_platform_loop(void) {
         o->oCollisionDistance = sWFRotatingPlatformData[o->oBehParams2ndByte].collisionDistance;
         cur_obj_scale(sWFRotatingPlatformData[o->oBehParams2ndByte].scale * 0.01f);
     }
-    o->oAngleVelYaw = speed * 0x10;
+    o->oAngleVelYaw = speed << 4;
     o->oFaceAngleYaw += o->oAngleVelYaw;
 }
