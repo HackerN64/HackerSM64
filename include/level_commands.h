@@ -247,6 +247,9 @@ enum GoddardScene {
 #undef LOAD_MIO0
 #define LOAD_MIO0(a,b,c) LOAD_YAY0(a,b,c)
 
+#undef LOAD_MIO0_TEXTURE
+#define LOAD_MIO0_TEXTURE(a,b,c) LOAD_YAY0_TEXTURE(a,b,c)
+
 #ifdef NO_SEGMENTED_MEMORY
 #define FIXED_LOAD(loadAddr, romStart, romEnd) \
     CMD_BBH(LEVEL_CMD_LOAD_TO_FIXED_ADDRESS, 0x10, 0x0000), \
@@ -374,9 +377,10 @@ enum GoddardScene {
     CMD_BBBB(destArea, destNode, flags, 0x00)
 
 #define INSTANT_WARP(index, destArea, displaceX, displaceY, displaceZ) \
-    CMD_BBBB(LEVEL_CMD_CREATE_INSTANT_WARP, 0x0C, index, destArea), \
-    CMD_HH(displaceX, displaceY), \
-    CMD_HH(displaceZ, 0x0000)
+    CMD_BBBB(LEVEL_CMD_CREATE_INSTANT_WARP, 0x10, index, destArea), \
+    CMD_W(displaceX), \
+    CMD_W(displaceY), \
+    CMD_W(displaceZ)
 
 #define LOAD_AREA(area) \
     CMD_BBBB(LEVEL_CMD_LOAD_AREA, 0x04, area, 0x00)

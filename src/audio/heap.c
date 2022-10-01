@@ -169,7 +169,7 @@ void reset_bank_and_seq_load_status(void) {
 #ifdef VERSION_SH
     bzero(&gBankLoadStatus, sizeof(gBankLoadStatus));
     bzero(&gUnkLoadStatus,  sizeof(gUnkLoadStatus));
-    bzero(&gSeqLoadStatus,  sizeof(gBankLoadStatus));
+    bzero(&gSeqLoadStatus,  sizeof(gSeqLoadStatus));
 #else
     bzero(&gBankLoadStatus, sizeof(gBankLoadStatus)); // Setting this array to zero is equivilent to SOUND_LOAD_STATUS_NOT_LOADED
     bzero(&gSeqLoadStatus,  sizeof(gSeqLoadStatus));  // Same dealio
@@ -274,7 +274,7 @@ void sound_alloc_pool_init(struct SoundAllocPool *pool, void *memAddr, u32 size)
 #ifdef VERSION_SH
     pool->size = size - ((uintptr_t) memAddr & 0xf);
 #else
-    pool->size = size;
+    pool->size = ALIGN16(size);
 #endif
     pool->numAllocatedEntries = 0;
 }
@@ -380,7 +380,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
     // arg3 = 0, 1 or 2?
 
 #ifdef VERSION_SH
-    struct SoundMultiPool *arg0;
+    struct SoundMultiPool *arg0 = NULL;
 #define isSound poolIdx
 #endif
     struct TemporaryPool *tp;
@@ -407,6 +407,8 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
     u32 leftNotLoaded, rightNotLoaded;
     u32 leftAvail, rightAvail;
 #endif
+
+size = ALIGN16(size);
 
 #ifdef VERSION_SH
     switch (poolIdx) {
@@ -656,7 +658,7 @@ void *alloc_bank_or_seq(struct SoundMultiPool *arg0, s32 arg1, s32 size, s32 arg
 #if defined(VERSION_SH)
                 tp->entries[1].ptr = (u8 *) ((uintptr_t) (pool->start + pool->size - size) & ~0x0f);
 #else
-                tp->entries[1].ptr = pool->start + pool->size - size - 0x10;
+                tp->entries[1].ptr = pool->start + pool->size - size;
 #endif
                 tp->entries[1].id = id;
                 tp->entries[1].size = size;
@@ -758,7 +760,7 @@ void *get_bank_or_seq(s32 poolIdx, s32 arg1, s32 id) {
 }
 void *get_bank_or_seq_inner(s32 poolIdx, s32 arg1, s32 bankId) {
     u32 i;
-    struct SoundMultiPool* loadedPool;
+    struct SoundMultiPool* loadedPool = NULL;
     struct TemporaryPool* temporary;
     struct PersistentPool* persistent;
 
@@ -931,7 +933,7 @@ void decrease_reverb_gain(void) {
 
 #if defined(VERSION_EU) || defined(VERSION_SH)
 s32 audio_shut_down_and_reset_step(void) {
-    s32 i, j;
+    s32 i;
 
     switch (gAudioResetStatus) {
         case 5:
@@ -1007,7 +1009,7 @@ void init_reverb_eu(void) {
     gNumSynthesisReverbs = preset->numReverbs;
     for (j = 0; j < gNumSynthesisReverbs; j++) {
         reverb = &gSynthesisReverbs[j];
-        reverbSettings = &sReverbSettings[MIN((gAudioResetPresetIdToLoad + j), (sizeof(sReverbSettings) / sizeof(struct ReverbSettingsEU)) - 1)];
+        reverbSettings = &sReverbSettings[MIN((u32)(gAudioResetPresetIdToLoad + j), (sizeof(sReverbSettings) / sizeof(struct ReverbSettingsEU)) - 1)];
         reverb->windowSize = (reverbSettings->windowSize * 0x40);
         reverb->downsampleRate = reverbSettings->downsampleRate;
         reverb->reverbGain = reverbSettings->gain;
@@ -1059,7 +1061,6 @@ void init_reverb_us(s32 presetId) {
     s32 i;
 #ifdef BETTER_REVERB
     s8 reverbConsole;
-    s32 bufOffset = 0;
 #endif
 
     s32 reverbWindowSize = gReverbSettings[presetId].windowSize;
@@ -1112,9 +1113,7 @@ void init_reverb_us(s32 presetId) {
                 gSynthesisReverb.items[1][i].toDownsampleRight = (mem + (DEFAULT_LEN_1CH / sizeof(s16)));
             }
 #ifdef BETTER_REVERB
-            delayBufsL = (s32**) soundAlloc(&gBetterReverbPool, BETTER_REVERB_PTR_SIZE);
-            delayBufsR = &delayBufsL[NUM_ALLPASS];
-            delayBufsL[0] = (s32*) soundAlloc(&gBetterReverbPool, BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE);
+            initialize_better_reverb_buffers();
 #endif
         } else {
             bzero(gSynthesisReverb.ringBuffer.left, (REVERB_WINDOW_SIZE_MAX * 2 * sizeof(s16)));
@@ -1146,17 +1145,10 @@ void init_reverb_us(s32 presetId) {
 #ifdef BETTER_REVERB
         if (toggleBetterReverb) {
             if (sAudioIsInitialized) {
-                bzero(delayBufsL[0], (BETTER_REVERB_SIZE - BETTER_REVERB_PTR_SIZE));
-            }            
-
-            for (i = 0; i < NUM_ALLPASS; ++i) {
-                delaysL[i] = (delaysBaselineL[i] / gReverbDownsampleRate);
-                delaysR[i] = (delaysBaselineR[i] / gReverbDownsampleRate);
-                delayBufsL[i] = (s32*) &delayBufsL[0][bufOffset];
-                bufOffset += delaysL[i];
-                delayBufsR[i] = (s32*) &delayBufsL[0][bufOffset]; // L and R buffers are interpolated adjacently in memory; not a bug
-                bufOffset += delaysR[i];
+                clear_better_reverb_buffers();
             }
+
+            set_better_reverb_buffers();
         }
 #endif
     }

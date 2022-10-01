@@ -1,14 +1,6 @@
 // 0x07057380 - 0x07057398
-static const Lights1 inside_castle_seg7_lights_07057380 = gdSPDefLights1(
-    0x51, 0x34, 0x42,
-    0xd8, 0x8c, 0xb2, 0x28, 0x28, 0x28
-);
 
 // 0x07057398 - 0x070573B0
-static const Lights1 inside_castle_seg7_lights_07057398 = gdSPDefLights1(
-    0x40, 0x24, 0x1e,
-    0xac, 0x61, 0x52, 0x28, 0x28, 0x28
-);
 
 // 0x070573B0 - 0x070573F0
 static const Vtx inside_castle_seg7_vertex_070573B0[] = {
@@ -187,8 +179,8 @@ static const Gfx inside_castle_seg7_dl_07057B70[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_0900B000),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&inside_castle_seg7_lights_07057380.l, 1),
-    gsSPLight(&inside_castle_seg7_lights_07057380.a, 2),
+    gsSPLightColor(LIGHT_1, 0xd88cb2ff),
+    gsSPLightColor(LIGHT_2, 0x513442ff),
     gsSPVertex(inside_castle_seg7_vertex_070573B0, 4, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  2,  3, 0x0),
     gsSPEndDisplayList(),
@@ -238,8 +230,8 @@ static const Gfx inside_castle_seg7_dl_07057D30[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_bowser_top_left),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&inside_castle_seg7_lights_07057398.l, 1),
-    gsSPLight(&inside_castle_seg7_lights_07057398.a, 2),
+    gsSPLightColor(LIGHT_1, 0xac6152ff),
+    gsSPLightColor(LIGHT_2, 0x40241eff),
     gsSPVertex(inside_castle_seg7_vertex_070577D0, 8, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 4,  5,  6, 0x0,  4,  7,  5, 0x0),
@@ -284,8 +276,8 @@ static const Gfx inside_castle_seg7_dl_07057E60[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_09007000),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 64 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&inside_castle_seg7_lights_07057380.l, 1),
-    gsSPLight(&inside_castle_seg7_lights_07057380.a, 2),
+    gsSPLightColor(LIGHT_1, 0xd88cb2ff),
+    gsSPLightColor(LIGHT_2, 0x513442ff),
     gsSPVertex(inside_castle_seg7_vertex_070579D0, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 6,  7,  8, 0x0,  6,  9,  7, 0x0),

@@ -61,7 +61,7 @@ struct Skybox {
 
 struct Skybox sSkyBoxInfo[2];
 
-typedef const Texture *const SkyboxTexture[80 * SKYBOX_SIZE];
+typedef const Texture *const SkyboxTexture[80 * sqr(SKYBOX_SIZE)];
 
 extern SkyboxTexture bbh_skybox_ptrlist;
 extern SkyboxTexture bidw_skybox_ptrlist;
@@ -290,14 +290,17 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov, Vec3f pos, V
     s8 colorIndex = 1;
 
     // If the "Plunder in the Sunken Ship" star in JRB is not collected, make the sky darker and slightly green.
+#ifdef ENABLE_VANILLA_LEVEL_SPECIFIC_CHECKS
     if (background == BACKGROUND_ABOVE_CLOUDS
 #ifdef JRB_ACT_SPECIFIC_MIST
-        && gCurrActNum == 1) {
+        && gCurrActNum == 1
 #else
-        && !(save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)) {
+        && !(save_file_get_star_flags(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(COURSE_JRB)) & STAR_FLAG_ACT_1)
 #endif
+    ) {
         colorIndex = 0;
     }
+#endif
 
     //! fov is always set to 90.0f. If this line is removed, then the game crashes because fov is 0 on
     //! the first frame, which causes a floating point divide by 0

@@ -1,20 +1,8 @@
 // 0x07005800 - 0x07005818
-static const Lights1 hmc_seg7_lights_07005800 = gdSPDefLights1(
-    0x48, 0x48, 0x48,
-    0x99, 0x99, 0x99, 0x28, 0x28, 0x28
-);
 
 // 0x07005818 - 0x07005830
-static const Lights1 hmc_seg7_lights_07005818 = gdSPDefLights1(
-    0x79, 0x00, 0x00,
-    0xff, 0x00, 0x00, 0x28, 0x28, 0x28
-);
 
 // 0x07005830 - 0x07005848
-static const Lights1 hmc_seg7_lights_07005830 = gdSPDefLights1(
-    0x79, 0x79, 0x79,
-    0xff, 0xff, 0xff, 0x28, 0x28, 0x28
-);
 
 // 0x07005848 - 0x070058A8
 static const Vtx hmc_seg7_vertex_07005848[] = {
@@ -516,13 +504,13 @@ static const Gfx hmc_seg7_dl_07006FF8[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cave_09009800),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&hmc_seg7_lights_07005800.l, 1),
-    gsSPLight(&hmc_seg7_lights_07005800.a, 2),
+    gsSPLightColor(LIGHT_1, 0x999999ff),
+    gsSPLightColor(LIGHT_2, 0x484848ff),
     gsSPVertex(hmc_seg7_vertex_07005848, 6, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  0,  3,  1, 0x0),
     gsSP2Triangles( 0,  2,  4, 0x0,  0,  4,  5, 0x0),
-    gsSPLight(&hmc_seg7_lights_07005818.l, 1),
-    gsSPLight(&hmc_seg7_lights_07005818.a, 2),
+    gsSPLightColor(LIGHT_1, 0xff0000ff),
+    gsSPLightColor(LIGHT_2, 0x790000ff),
     gsSPVertex(hmc_seg7_vertex_070058A8, 7, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP1Triangle( 3,  5,  6, 0x0),
@@ -534,8 +522,8 @@ static const Gfx hmc_seg7_dl_07007080[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, cave_09006800),
     gsDPLoadSync(),
     gsDPLoadBlock(G_TX_LOADTILE, 0, 0, 32 * 32 - 1, CALC_DXT(32, G_IM_SIZ_16b_BYTES)),
-    gsSPLight(&hmc_seg7_lights_07005830.l, 1),
-    gsSPLight(&hmc_seg7_lights_07005830.a, 2),
+    gsSPLightColor(LIGHT_1, 0xffffffff),
+    gsSPLightColor(LIGHT_2, 0x797979ff),
     gsSPVertex(hmc_seg7_vertex_07005918, 15, 0),
     gsSP2Triangles( 0,  1,  2, 0x0,  3,  4,  5, 0x0),
     gsSP2Triangles( 3,  5,  6, 0x0,  7,  8,  9, 0x0),
