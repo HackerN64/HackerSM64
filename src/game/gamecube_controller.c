@@ -398,7 +398,7 @@ static OSPifRam __MotorDataBuf[MAXCONTROLLERS];
 
 s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
     int i;
-    s32 ret;
+    s32 ret = 0;
     u8* ptr = (u8*)&__MotorDataBuf[pfs->channel];
 
     if (!(pfs->status & PFS_MOTOR_INITIALIZED)) {
@@ -441,6 +441,9 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
     return ret;
 }
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
 static void _MakeMotorData(int channel, OSPifRam *mdata) {
     u8 *ptr = (u8 *)mdata->ramarray;
     __OSContRamReadFormat ramreadformat;
@@ -529,3 +532,4 @@ s32 osMotorInitEx(OSMesgQueue *mq, OSPfs *pfs, int channel)
     pfs->status = PFS_MOTOR_INITIALIZED;
     return 0;
 }
+#pragma GCC diagnostic pop
