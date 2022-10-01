@@ -32,7 +32,7 @@ void bhv_wf_rotating_wooden_platform_loop(void) {
 }
 
 void bhv_rotating_platform_loop(void) {
-    s8 speed = (s8) GET_BPARAM1(o->oBehParams);
+    s8 speed = GET_BPARAM1(o->oBehParams);
     if (o->oTimer == 0) {
         obj_set_collision_data(o, sWFRotatingPlatformData[o->oBehParams2ndByte].collisionData);
         o->oCollisionDistance = sWFRotatingPlatformData[o->oBehParams2ndByte].collisionDistance;
