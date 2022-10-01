@@ -1,7 +1,6 @@
 #include <PR/ultratypes.h>
 
 #include "audio/external.h"
-#include "audio/synthesis.h"
 #include "engine/math_util.h"
 #include "game/area.h"
 #include "game/game_init.h"

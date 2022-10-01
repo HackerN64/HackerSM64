@@ -41,16 +41,12 @@
 #define AUDIO_ALIGN(val, amnt) (((val) + (1 << amnt) - 1) & ~((1 << amnt) - 1))
 
 #ifdef BETTER_REVERB
-u8 gBetterReverbPreset = 0;
-u8 monoReverb;
-s8 betterReverbDownsampleRate;
-s32 reverbFilterCount;
-s32 betterReverbWindowsSize;
-s32 betterReverbRevIndex;
-s32 betterReverbGainIndex;
 
 // Do not touch these values manually, unless you want potential for problems.
+u8 gBetterReverbPreset = 0;
 u8 toggleBetterReverb = FALSE;
+u8 monoReverb;
+s8 betterReverbDownsampleRate;
 static s32 allpassIdxL[NUM_ALLPASS] = {0};
 static s32 allpassIdxR[NUM_ALLPASS] = {0};
 static s32     delaysL[NUM_ALLPASS] = {0};
@@ -59,6 +55,10 @@ static u8 reverbMultsL[NUM_ALLPASS / 3] = {0};
 static u8 reverbMultsR[NUM_ALLPASS / 3] = {0};
 static s32 **delayBufsL;
 static s32 **delayBufsR;
+s32 reverbFilterCount;
+s32 betterReverbWindowsSize;
+s32 betterReverbRevIndex; // This one is okay to adjust whenever
+s32 betterReverbGainIndex; // This one is okay to adjust whenever
 s32 *gReverbMultsL;
 s32 *gReverbMultsR;
 #endif
