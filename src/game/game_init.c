@@ -617,7 +617,7 @@ void read_controller_inputs(s32 threadID) {
         // if we're receiving inputs, update the controller struct with the new button info.
         if (controller->controllerData != NULL) {
             // HackerSM64: Swaps Z and L, only on console, and only when playing with a GameCube controller.
-            if (gIsConsole && (gGamecubeControllerPort >= 0)) {
+            if (gIsConsole && i == gGamecubeControllerPort) {
                 u32 oldButton = controller->controllerData->button;
                 u32 newButton = oldButton & ~(Z_TRIG | L_TRIG);
                 if (oldButton & Z_TRIG) {

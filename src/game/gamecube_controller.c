@@ -441,7 +441,6 @@ s32 __osMotorAccessEx(OSPfs* pfs, s32 flag) {
     return ret;
 }
 
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
 static void _MakeMotorData(int channel, OSPifRam *mdata) {
