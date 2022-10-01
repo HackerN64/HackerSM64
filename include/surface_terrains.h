@@ -227,16 +227,20 @@ enum SurfaceTypes {
     SURFACE_TRAPDOOR,                   // 0x00FF // Bowser Left trapdoor, has no action defined
 };
 
+// From Surface 0x1B to 0x1E
+#define INSTANT_WARP_INDEX_START  0x00 // Equal and greater than Surface 0x1B
+#define INSTANT_WARP_INDEX_STOP   0x04 // Less than Surface 0x1F
+
 #define SURFACE_IS_NEW_WATER(cmd)       (((cmd) == SURFACE_NEW_WATER) || ((cmd) == SURFACE_NEW_WATER_BOTTOM))
 #define SURFACE_IS_QUICKSAND(cmd)       ((((cmd) >= SURFACE_SHALLOW_QUICKSAND) && ((cmd) <= SURFACE_MOVING_QUICKSAND)) || ((cmd) == SURFACE_INSTANT_MOVING_QUICKSAND))
 #define SURFACE_IS_NOT_HARD(cmd)        (((cmd) != SURFACE_HARD) && !((cmd) >= SURFACE_HARD_SLIPPERY && ((cmd) <= SURFACE_HARD_NOT_SLIPPERY)))
-#define SURFACE_IS_INSTANT_WARP(cmd)    (((cmd) >= SURFACE_INSTANT_WARP_1B) && ((cmd) <= SURFACE_INSTANT_WARP_1E))
+#define SURFACE_IS_INSTANT_WARP(cmd)    (((cmd) >= SURFACE_INSTANT_WARP_1B) && ((cmd) <= (SURFACE_INSTANT_WARP_1B + INSTANT_WARP_INDEX_STOP)))
 #define SURFACE_IS_WARP(cmd)            (((cmd) == SURFACE_LOOK_UP_WARP) || SURFACE_IS_INSTANT_WARP(cmd))
 #define SURFACE_IS_UNSAFE(cmd)          (((cmd) == SURFACE_BURNING) || ((cmd) == SURFACE_DEATH_PLANE) || SURFACE_IS_QUICKSAND(cmd) || SURFACE_IS_WARP(cmd))
 
 enum SurfaceClass {
     SURFACE_CLASS_DEFAULT,
-    SURFACE_CLASS_VERY_SLIPPERY = 0x0013,
+    SURFACE_CLASS_VERY_SLIPPERY = SURFACE_VERY_SLIPPERY,
     SURFACE_CLASS_SLIPPERY,
     SURFACE_CLASS_NOT_SLIPPERY
 };
