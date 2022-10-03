@@ -53,7 +53,7 @@ static s8 sSelectableStarIndex = 0;
 static s32 sActSelectorMenuTimer = 0;
 
 #ifdef WIDE
-#define ACT_SELECT_WIDESCREEN_SCALE (4.f / 3)
+#define ACT_SELECT_WIDESCREEN_SCALE (gConfig.widescreen ? (4.f / 3) : 1.f)
 #else
 #define ACT_SELECT_WIDESCREEN_SCALE 1.f
 #endif
@@ -241,12 +241,7 @@ void print_course_number(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
 
     sprintf(courseNum, "%d", gCurrCourseNum);
-
-    if (gCurrCourseNum < 10) { // 1 digit number
-        print_hud_lut_string(152, 158, courseNum);
-    } else { // 2 digit number
-        print_hud_lut_string(143, 158, courseNum);
-    }
+    print_hud_lut_string_aligned(SCREEN_WIDTH/2, 158, courseNum, TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
@@ -264,8 +259,6 @@ void print_act_selector_strings(void) {
     char *currLevelName = segmented_to_virtual(levelNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum)]);
     char **actNameTbl = segmented_to_virtual(seg2_act_name_table);
     char *selectedActName;
-    s16 lvlNameX;
-    s16 actNameX;
     s8 i;
 
     create_dl_ortho_matrix();
@@ -280,11 +273,10 @@ void print_act_selector_strings(void) {
     gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 255);
     // Print the "MY SCORE" text if the coin score is more than 0
     if (save_file_get_course_coin_score(gCurrSaveFileNum - 1, COURSE_NUM_TO_INDEX(gCurrCourseNum)) != 0) {
-        print_generic_string(102, 118, LANGUAGE_ARRAY(textActMyScore));
+        print_generic_string_aligned(145, 118, LANGUAGE_ARRAY(textActMyScore), TEXT_ALIGN_RIGHT);
     }
 
-    lvlNameX = get_str_x_pos_from_center(160, currLevelName + 3, 10.0f);
-    print_generic_string(lvlNameX, 33, currLevelName + 3);
+    print_generic_string_aligned(SCREEN_WIDTH/2, 33, currLevelName + 3, TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
@@ -296,15 +288,14 @@ void print_act_selector_strings(void) {
     if (sVisibleStars != 0) {
         selectedActName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + sSelectedActIndex]);
 
-        actNameX = get_str_x_pos_from_center(163, selectedActName, 8.0f);
-        print_menu_generic_string(actNameX, 81, selectedActName);
+        print_menu_generic_string_aligned(SCREEN_WIDTH/2, 81, selectedActName, TEXT_ALIGN_CENTER);
     }
 
     // Print the numbers above each star.
     for (i = 1; i <= sVisibleStars; i++) {
         char str[4];
         sprintf(str, "%d", i);
-        print_menu_generic_string(139 - sVisibleStars * 17 + i * 34, 38, str);
+        print_menu_generic_string_aligned(SCREEN_WIDTH/2 + (i*2 - sVisibleStars - 1) * 17, 38, str, TEXT_ALIGN_CENTER);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);

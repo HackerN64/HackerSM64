@@ -1457,7 +1457,7 @@ void render_pause_my_score_coins(void) {
         print_generic_string(PAUSE_MENU_RIGHT_X, PAUSE_MENU_COURSE_Y, &courseName[3]);
 
         if (save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0) {
-            print_generic_string_aligned(PAUSE_MENU_LEFT_X, PAUSE_MENU_MY_SCORE_Y, LANGUAGE_ARRAY(textMyScore), TEXT_ALIGN_RIGHT);
+            print_generic_string_aligned(PAUSE_MENU_LEFT_X + 3, PAUSE_MENU_MY_SCORE_Y, LANGUAGE_ARRAY(textMyScore), TEXT_ALIGN_RIGHT);
         }
     } else {
         print_generic_string_aligned(SCREEN_WIDTH/2, PAUSE_MENU_COURSE_Y, &courseName[3], TEXT_ALIGN_CENTER);
