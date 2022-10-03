@@ -432,7 +432,7 @@ enum GoddardScene {
 // Functionally identical to calling SET_BACKGROUND_MUSIC if BETTER_REVERB is disabled
 #define SET_BACKGROUND_MUSIC_WITH_REVERB(settingsPreset, seq, reverbPresetConsole, reverbPresetEmulator) \
     CMD_BBH(LEVEL_CMD_SET_MUSIC, 0x08, settingsPreset), \
-    CMD_HH(seq, 0x0000)
+    CMD_HH(0x0000, seq)
 
 // Functionally identical to calling SET_MENU_MUSIC if BETTER_REVERB is disabled
 #define SET_MENU_MUSIC_WITH_REVERB(seq, reverbPresetConsole, reverbPresetEmulator) \
