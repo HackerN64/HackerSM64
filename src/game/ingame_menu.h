@@ -107,7 +107,7 @@ enum DialogResponseDefines {
 // Macro to create an array of all 4 languages' versions of a string.
 typedef char * langarray_t[4];
 #define LANGUAGE_TEXT(english, french, german, japanese) {english, french, german, japanese}
-#define LANGUAGE_ARRAY(cmd) (cmd[0])
+#define LANGUAGE_ARRAY(cmd) ((cmd)[0])
 
 extern s32 gDialogResponse;
 extern u16 gDialogColorFadeTimer;

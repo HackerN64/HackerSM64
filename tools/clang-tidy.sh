@@ -4,6 +4,7 @@
 # The brace check is the only check being applied right now, 
 # but other checks (like naming scheme) may be added at a later time. 
 
+# '--fix-errors` due to generated text_strings.h as well as the enhancement inc.c files
 TIDY_OPTS="-p . --fix --fix-errors" 
 COMPILER_OPTS="-nostdinc -fno-builtin -std=gnu90 -Iinclude -Isrc -D_LANGUAGE_C"
 VERSIONS="-DVERSION_US -DVERSION_JP -DVERSION_EU"

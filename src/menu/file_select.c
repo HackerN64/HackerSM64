@@ -1357,7 +1357,7 @@ void print_main_menu_strings(void) {
     print_generic_string_aligned(67, 39, LANGUAGE_ARRAY(textScore), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(130, 39, LANGUAGE_ARRAY(textCopy), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(191, 39, LANGUAGE_ARRAY(textErase), TEXT_ALIGN_CENTER);
-    print_generic_string_aligned(253, 39, LANGUAGE_ARRAY(textSoundModes[sSoundMode]), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(253, 39, LANGUAGE_ARRAY(*textSoundModes[sSoundMode]), TEXT_ALIGN_CENTER);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
@@ -1424,11 +1424,11 @@ langarray_t textEraseFileButton = LANGUAGE_TEXT(
  * Prints score menu strings that shows on the green background menu screen.
  */
 void print_score_menu_strings(void) {
+
     // Update and print the message at the top of the menu.
     if (sMainMenuTimer == FADEOUT_TIMER) {
         sFadeOutText = TRUE;
     }
-
     if (update_text_fade_out()) {
         if (sStatusMessageID == SCORE_MSG_CHECK_FILE) {
             sStatusMessageID = SCORE_MSG_NOSAVE_DATA;
@@ -1436,7 +1436,6 @@ void print_score_menu_strings(void) {
             sStatusMessageID = SCORE_MSG_CHECK_FILE;
         }
     }
-
     // Print messageID called above
     score_menu_display_message(sStatusMessageID);
 
@@ -1580,12 +1579,11 @@ langarray_t textViewScore = LANGUAGE_TEXT(
  * Prints copy menu strings that shows on the blue background menu screen.
  */
 void print_copy_menu_strings(void) {
+
     // Update and print the message at the top of the menu.
     copy_menu_update_message();
-
     // Print messageID called inside a copy_menu_update_message case
     copy_menu_display_message(sStatusMessageID);
-
     // Print file star counts
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
@@ -1594,7 +1592,6 @@ void print_copy_menu_strings(void) {
     print_save_file_star_count(SAVE_FILE_C, 90, 119);
     print_save_file_star_count(SAVE_FILE_D, 211, 119);
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
-
     // Print menu names
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
@@ -1602,7 +1599,6 @@ void print_copy_menu_strings(void) {
     print_generic_string_aligned(SUBMENU_MIDDLE_BUTTON_X, 35, LANGUAGE_ARRAY(textViewScore), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(SUBMENU_RIGHT_BUTTON_X, 35, LANGUAGE_ARRAY(textEraseFileButton), TEXT_ALIGN_CENTER);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
-
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
@@ -1783,6 +1779,7 @@ void erase_menu_update_message(void) {
  * Prints erase menu strings that shows on the red background menu screen.
  */
 void print_erase_menu_strings(void) {
+
     // Update and print the message at the top of the menu.
     erase_menu_update_message();
 

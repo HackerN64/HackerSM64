@@ -1,6 +1,6 @@
 // Parameters: dialog enum ID, (unused), lines per box, left offset, width
 
-DEFINE_DIALOG(DIALOG_000, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_000, NO_SOUND, 6, 30, 200, "\
 Incroyable! Vous voilà\n\
 propulsé au beau milieu\n\
 d'un champ de bataille!\n\
@@ -24,9 +24,9 @@ arrêtez-vous, faites face\n\
 au panneau et appuyez sur\n\
 Ⓑ. Appuyez sur Ⓐ ou Ⓑ\n\
 pour lire la suite du\n\
-texte."))
+texte.")
 
-DEFINE_DIALOG(DIALOG_001, SOUND_OBJ_BOBOMB_BUDDY_TALK, 5, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_001, SOUND_OBJ_BOBOMB_BUDDY_TALK, 5, 95, 200, "\
 Attention! Si tu te\n\
 promènes par ici, tu\n\
 risques de te faire\n\
@@ -54,9 +54,9 @@ trouver le Roi Bob-omb.\n\
 \n\
 Reviens me voir lorsque tu\n\
 auras récupéré l'étoile de\n\
-puissance!"))
+puissance!")
 
-DEFINE_DIALOG(DIALOG_002, SOUND_OBJ_BOBOMB_BUDDY_TALK, 6, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_002, SOUND_OBJ_BOBOMB_BUDDY_TALK, 6, 95, 200, "\
 Hé, toi! C'est dangereux\n\
 par ici! Alors écoute bien\n\
 mon conseil:\n\
@@ -80,9 +80,9 @@ Bob-ombs, et nous sommes\n\
 de ton côté.\n\
 N'hésite pas à venir nous\n\
 parler à chaque fois que\n\
-tu en as envie!"))
+tu en as envie!")
 
-DEFINE_DIALOG(DIALOG_003, SOUND_OBJ_BOBOMB_BUDDY_TALK, 5, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_003, SOUND_OBJ_BOBOMB_BUDDY_TALK, 5, 95, 200, "\
 Merci beaucoup Mario!\n\
 Tu as éclaté le vilain Roi\n\
 Bob-omb comme une vieille\n\
@@ -101,9 +101,9 @@ de nouvelles portes menant\n\
 Mes camarades Bob-ombs\n\
 t'attendent. Si tu leur\n\
 parles, ils te prépareront\n\
-de jolis canons!"))
+de jolis canons!")
 
-DEFINE_DIALOG(DIALOG_004, SOUND_OBJ_BOBOMB_BUDDY_TALK, 6, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_004, SOUND_OBJ_BOBOMB_BUDDY_TALK, 6, 95, 200, "\
 Nous sommes des\n\
 Bob-ombs pacifiques, nous\n\
 n'utilisons pas de canons.\n\
@@ -115,9 +115,9 @@ vers les cieux,\n\
 No Problemo: nous\n\
 nous ferons une joie de te\n\
 préparer tous les canons\n\
-de ce niveau. Bon voyage!"))
+de ce niveau. Bon voyage!")
 
-DEFINE_DIALOG(DIALOG_005, SOUND_OBJ_KOOPA_TALK, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_005, SOUND_OBJ_KOOPA_TALK, 5, 30, 200, "\
 Hé, Mario! C'est vrai ce\n\
 qu'on raconte? Tu as\n\
 vraiment battu le Roi\n\
@@ -137,25 +137,25 @@ Lorsque je dis “partez”,\n\
 la course commence...\n\
 Prêt...\n\
 \n\
-//Partez!//Heu, non."))
+//Partez!//Heu, non.")
 
-DEFINE_DIALOG(DIALOG_006, SOUND_OBJ_KOOPA_TALK, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_006, SOUND_OBJ_KOOPA_TALK, 4, 30, 200, "\
 Hé! Tu te moques de moi,\n\
 p'tit nain pas beau?\n\
 Tu dois courir du début\n\
 jusqu'à la fin!\n\
 A plus tard. Reviens me\n\
 voir lorsque tu arrêteras\n\
-de tricher..."))
+de tricher...")
 
-DEFINE_DIALOG(DIALOG_007, SOUND_OBJ_KOOPA_TALK, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_007, SOUND_OBJ_KOOPA_TALK, 5, 30, 200, "\
 Heuufff...fff...peufff...\n\
 Whoa! Tu...es...vraiment\n\
 rapide...pour un nabot!\n\
 Tu viens de l'espace?\n\
-Tiens, tu l'as méritée!"))
+Tiens, tu l'as méritée!")
 
-DEFINE_DIALOG(DIALOG_008, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_008, NO_SOUND, 5, 30, 200, "\
 ATTENTION AU CHOMP\n\
 ENCHAINE!!!\n\
 Danger! Approchez-vous\n\
@@ -168,9 +168,9 @@ Lorsque vous collecterez 8\n\
 pièces comme celle-ci,\n\
 une étoile apparaîtra\n\
 dans le pré de l'autre\n\
-côté du pont..."))
+côté du pont...")
 
-DEFINE_DIALOG(DIALOG_009, SOUND_OBJ_KOOPA_TALK, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_009, SOUND_OBJ_KOOPA_TALK, 4, 30, 200, "\
 Ça fait longtemps qu'on\n\
 ne s'était pas vu, Mario!\n\
 Fouiii! Tu es devenu super\n\
@@ -190,14 +190,14 @@ dans la vallée Valvent...\n\
 Prêt...\n\
 \n\
 \n\
-//Partez!// Heu, non."))
+//Partez!// Heu, non.")
 
 /**
  * Special case: if the voice is SEQ_EVENT_SOLVE_PUZZLE,
  * then play_dialog_sound will run play_puzzle_jingle
  * instead of playing a sound effect
  */
-DEFINE_DIALOG(DIALOG_010, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_010, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Vous venez d'actionner\n\
 l'interrupteur des\n\
 casquettes ailées...\n\
@@ -212,9 +212,9 @@ rouges que vous\n\
 détruirez...\n\
 Voulez-vous sauvegarder?\n\
 \n\
-//Oui////Non."))
+//Oui////Non.")
 
-DEFINE_DIALOG(DIALOG_011, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_011, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Vous venez d'actionner\n\
 l'interrupteur des\n\
 casquettes-métal!\n\
@@ -229,9 +229,9 @@ surgiront des blocs verts\n\
 que vous détruirez...\n\
 Voulez-vous sauvegarder?\n\
 \n\
-//Oui////Non."))
+//Oui////Non.")
 
-DEFINE_DIALOG(DIALOG_012, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_012, SEQ_EVENT_SOLVE_PUZZLE, 4, 30, 200, "\
 Vous venez d'actionner\n\
 l'interrupteur des\n\
 casquettes d'invisibilité.\n\
@@ -246,25 +246,25 @@ des blocs bleus que vous\n\
 détruirez...\n\
 Voulez-vous sauvegarder?\n\
 \n\
-//Oui////Non."))
+//Oui////Non.")
 
-DEFINE_DIALOG(DIALOG_013, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_013, NO_SOUND, 6, 30, 200, "\
 Vous avez récupéré 100\n\
 pièces! Mario sera\n\
 désormais plus puissant!\n\
 Voulez-vous sauvegarder?\n\
 \n\
-//Oui////Non."))
+//Oui////Non.")
 
-DEFINE_DIALOG(DIALOG_014, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_014, NO_SOUND, 6, 30, 200, "\
 Whoa, génial! Une autre\n\
 étoile de puissance! Mario\n\
 devient de plus en plus\n\
 courageux!\n\
 Voulez-vous sauvegarder?\n\
-//Oui////Non."))
+//Oui////Non.")
 
-DEFINE_DIALOG(DIALOG_015, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_015, NO_SOUND, 6, 30, 200, "\
 Vous pouvez frapper vos\n\
 ennemis et les assommer.\n\
 Appuyez sur Ⓐ pour sauter\n\
@@ -275,15 +275,15 @@ coup de pied, et sur Ⓑ\n\
 pour ramasser quelque\n\
 chose. Pour lancer ce que\n\
 vous portez, appuyez sur\n\
-Ⓑ à nouveau."))
+Ⓑ à nouveau.")
 
-DEFINE_DIALOG(DIALOG_016, SOUND_OBJ_KING_BOBOMB_TALK, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_016, SOUND_OBJ_KING_BOBOMB_TALK, 4, 30, 200, "\
 Si vous sautez sur une\n\
 carapace brillante, vous\n\
 pourrez aller n'importe où\n\
-et détruire vos ennemis!"))
+et détruire vos ennemis!")
 
-DEFINE_DIALOG(DIALOG_017, 1, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_017, 1, 4, 30, 200, "\
 Je suis le Roi Bob-omb,\n\
 seigneur des explosions.\n\
 Je te félicite d'être\n\
@@ -294,81 +294,81 @@ jeter au sol.\n\
 \n\
 Es-tu capable de soulever\n\
 mon royal fessier?\n\
-En garde, moucheron!"))
+En garde, moucheron!")
 
-DEFINE_DIALOG(DIALOG_018, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_018, NO_SOUND, 4, 30, 200, "\
 SILENCE! Je dors!\n\
 Gare à l'imprudent qui\n\
 oserait me reveiller...\n\
-Marchez doucement, sinon!"))
+Marchez doucement, sinon!")
 
-DEFINE_DIALOG(DIALOG_019, NO_SOUND, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_019, NO_SOUND, 2, 30, 200, "\
 CHUT! Marchez doucement\n\
-dans les couloirs!!!"))
+dans les couloirs!!!")
 
-DEFINE_DIALOG(DIALOG_020, NO_SOUND, 6, 95, 150, _("\
+DEFINE_DIALOG(DIALOG_020, NO_SOUND, 6, 95, 150, "\
 Mon très cher Mario:\n\
 Viens vite au château,\n\
 je t'ai préparé un\n\
 délicieux gâteau...\n\
 A bientôt,\n\
-Princesse Toadstool."))
+Princesse Toadstool.")
 
-DEFINE_DIALOG(DIALOG_021, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_021, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Bienvenue l'ami!\n\
 Ici il n'y a personne,\n\
 alors dégage, moustique!\n\
-GWA HA HA HA HA HA!!!"))
+GWA HA HA HA HA HA!!!")
 
-DEFINE_DIALOG(DIALOG_022, SOUND_OBJ_BOWSER_INTRO_LAUGH, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_022, SOUND_OBJ_BOWSER_INTRO_LAUGH, 2, 95, 200, "\
 Cette porte est fermée\n\
-à clé..."))
+à clé...")
 
-DEFINE_DIALOG(DIALOG_023, SOUND_OBJ_BOWSER_INTRO_LAUGH, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_023, SOUND_OBJ_BOWSER_INTRO_LAUGH, 2, 95, 200, "\
 Ce n'est pas la bonne clé.\n\
-Peut-être à la cave..."))
+Peut-être à la cave...")
 
-DEFINE_DIALOG(DIALOG_024, SOUND_OBJ_BOWSER_INTRO_LAUGH, 6, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_024, SOUND_OBJ_BOWSER_INTRO_LAUGH, 6, 95, 200, "\
 Vous avez besoin de la\n\
 puissance des étoiles pour\n\
 ouvrir cette porte.\n\
 Récupérez des étoiles en\n\
 combattant des ennemis à\n\
-l'intérieur des tableaux..."))
+l'intérieur des tableaux...")
 
-DEFINE_DIALOG(DIALOG_025, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_025, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Vous avez besoin de 3\n\
 étoiles pour ouvrir cette\n\
 porte. Il vous manque\n\
-encore [%] étoile(s)."))
+encore [%] étoile(s).")
 
-DEFINE_DIALOG(DIALOG_026, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_026, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Vous avez besoin de 8\n\
 étoiles pour ouvrir cette\n\
 porte. Il vous manque\n\
-encore [%] étoile(s)."))
+encore [%] étoile(s).")
 
-DEFINE_DIALOG(DIALOG_027, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_027, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Vous avez besoin de 30\n\
 étoiles pour ouvrir cette\n\
 porte. Il vous manque\n\
-encore [%] étoile(s)."))
+encore [%] étoile(s).")
 
-DEFINE_DIALOG(DIALOG_028, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_028, SOUND_OBJ_BOWSER_INTRO_LAUGH, 4, 95, 200, "\
 Vous avez besoin de 50\n\
 étoiles pour ouvrir cette\n\
 porte. Il vous manque\n\
-encore [%] étoile(s)."))
+encore [%] étoile(s).")
 
-DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 6, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_029, SOUND_OBJ_BOWSER_INTRO_LAUGH, 6, 95, 200, "\
 Vous avez besoin de 70\n\
 étoiles pour arriver en\n\
 haut de “l'escalier sans\n\
 fin”... Il vous manque\n\
 encore [%] étoile(s).\n\
-GWA HA HA HA HA HA!!!"))
+GWA HA HA HA HA HA!!!")
 
-DEFINE_DIALOG(DIALOG_030, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_030, NO_SOUND, 4, 30, 200, "\
 Bonjour à tous!\n\
 Ici Lakitu, le reporter de\n\
 choc et de charme! Voici\n\
@@ -387,16 +387,16 @@ un signal sonore se fera\n\
 entendre...\n\
 Mes chers téléspectateurs,\n\
 à bientôt!\n\
-//// --Lakitu--"))
+//// --Lakitu--")
 
-DEFINE_DIALOG(DIALOG_031, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_031, NO_SOUND, 5, 30, 200, "\
 Incroyable! Tu m'as encore\n\
 battu? J'étais pourtant\n\
 certain de gagner!\n\
 Tiens, petit homme, tu as\n\
-bien mérité cette étoile..."))
+bien mérité cette étoile...")
 
-DEFINE_DIALOG(DIALOG_032, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_032, NO_SOUND, 5, 30, 200, "\
 Si en portant une\n\
 casquette ailée vous\n\
 effectuez trois sauts\n\
@@ -410,9 +410,9 @@ par un canon!\n\
 Utilisez les boutons Ⓒ pour\n\
 regarder autour de vous\n\
 en plein vol, et appuyez\n\
-sur Ⓩ pour atterrir."))
+sur Ⓩ pour atterrir.")
 
-DEFINE_DIALOG(DIALOG_033, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_033, NO_SOUND, 5, 30, 200, "\
 Ciao bello!\n\
 Vous voici arrivé au\n\
 château de la Princesse\n\
@@ -427,9 +427,9 @@ Utilisez le stick multi-\n\
 directionnel pour déplacer\n\
 Mario...\n\
 Et maintenant, en route\n\
-vers le château!!!"))
+vers le château!!!")
 
-DEFINE_DIALOG(DIALOG_034, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_034, NO_SOUND, 6, 30, 200, "\
 Bonjour! Nous sommes les\n\
 frères Lakitu et nous nous\n\
 ferons une joie de filmer\n\
@@ -457,9 +457,9 @@ savoir d'avantage...\n\
 C'était Lakitu,\n\
 le caméraman toujours\n\
 prêt à vous fournir les\n\
-meilleures images..."))
+meilleures images...")
 
-DEFINE_DIALOG(DIALOG_035, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_035, NO_SOUND, 6, 30, 200, "\
 Il existe quatre boutons\n\
 Ⓒ. En appuyant sur Ⓒ▲ et\n\
 en bougeant le stick\n\
@@ -477,9 +477,9 @@ pour utiliser la caméra de\n\
 Lakitu. Appuyez sur Ⓒ▼\n\
 pour voir Mario de loin,\n\
 quelque soit le mode de\n\
-vue que vous utilisez."))
+vue que vous utilisez.")
 
-DEFINE_DIALOG(DIALOG_036, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_036, NO_SOUND, 4, 30, 200, "\
 --PANORAMA--\n\
 Appuyez sur Ⓒ▲ pour jeter\n\
 un coup d'oeil. Profitez\n\
@@ -495,22 +495,22 @@ de Lakitu.\n\
 Mettez le jeu en pause et\n\
 choisissez le mode “Fixe”\n\
 puis maintenez Ⓡ pour que\n\
-la caméra reste en place."))
+la caméra reste en place.")
 
-DEFINE_DIALOG(DIALOG_037, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_037, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, "\
 Bwa ha ha ha ha!\n\
 Je t'ai battu gros nain!\n\
 Tu es aussi rapide qu'une\n\
 vieille limace malade!\n\
 Reviens me voir si tu\n\
-veux prendre ta revanche!"))
+veux prendre ta revanche!")
 
-DEFINE_DIALOG(DIALOG_038, NO_SOUND, 3, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_038, NO_SOUND, 3, 95, 200, "\
 Grâce à la puissance des\n\
 étoiles, la porte s'ouvre\n\
-doucement..."))
+doucement...")
 
-DEFINE_DIALOG(DIALOG_039, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_039, NO_SOUND, 5, 30, 200, "\
 ROYAUME DE BOB-OMB\n\
 \n\
 Interdit aux touristes!!!\n\
@@ -530,22 +530,22 @@ lisez attentivement le nom\n\
 de chaque étoile au début\n\
 des niveaux.\n\
 \n\
-/// --Roi Bob-omb--"))
+/// --Roi Bob-omb--")
 
-DEFINE_DIALOG(DIALOG_040, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_040, NO_SOUND, 3, 30, 200, "\
 ATTENTION!\n\
 Crevasse de glace juste\n\
-en dessous!"))
+en dessous!")
 
-DEFINE_DIALOG(DIALOG_041, SOUND_OBJ_KOOPA_TALK, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_041, SOUND_OBJ_KOOPA_TALK, 2, 30, 200, "\
 J'ai gagné! J'ai gagné!\n\
 Ha! Ha! Pauv'nul!\n\
 Ça t'apprendra à défier\n\
 le grand Koopa-Rapido!\n\
 Reviens me voir si tu\n\
-veux une autre raclée!"))
+veux une autre raclée!")
 
-DEFINE_DIALOG(DIALOG_042, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_042, NO_SOUND, 6, 30, 200, "\
 ATTENTION!\n\
 \n\
 Pont étroit!!!\n\
@@ -568,18 +568,18 @@ Pour vous hisser, appuyez\n\
 vers le haut sur le stick\n\
 multidirectionnel ou sur le\n\
 bouton Ⓐ pour aller plus\n\
-vite."))
+vite.")
 
-DEFINE_DIALOG(DIALOG_043, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_043, NO_SOUND, 5, 30, 200, "\
 Si vous sautez en\n\
 maintenant le bouton Ⓐ,\n\
 vous pourrez vous\n\
 accrocher à des objets\n\
 au-dessus de vous...\n\
 Vous pourrez même vous\n\
-accrocher à un oiseau!"))
+accrocher à un oiseau!")
 
-DEFINE_DIALOG(DIALOG_044, NO_SOUND, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_044, NO_SOUND, 4, 95, 200, "\
 Mmm? Hein? Qui m'a\n\
 réveillé? Quoi!?! Il fait\n\
 encore jour? Je devrais\n\
@@ -597,9 +597,9 @@ aussi longtemps que mes\n\
 ailes pourront supporter\n\
 ton poids!\n\
 Regarde bien mon ombre\n\
-et accroche-toi!!!"))
+et accroche-toi!!!")
 
-DEFINE_DIALOG(DIALOG_045, NO_SOUND, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_045, NO_SOUND, 4, 95, 200, "\
 Fouiii! J'suis naze!!!\n\
 Tu devrais peut-être\n\
 arrêter les pâtes aux\n\
@@ -607,9 +607,9 @@ oeufs...\n\
 Allez, ciao Mario!\n\
 Lâche le bouton Ⓐ sinon\n\
 j'te balance dans le vide\n\
-mon gros..."))
+mon gros...")
 
-DEFINE_DIALOG(DIALOG_046, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_046, NO_SOUND, 6, 30, 200, "\
 Il existe trois sauts\n\
 différents que vous\n\
 devez maîtriser:\n\
@@ -645,20 +645,20 @@ Triple Saut, Saut en\n\
 Longueur et Impulsion?\n\
 Pour y arriver à chaque\n\
 fois il faut s'entraîner\n\
-encore et encore et...?"))
+encore et encore et...?")
 
-DEFINE_DIALOG(DIALOG_047, SOUND_OBJ_BOBOMB_BUDDY_TALK, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_047, SOUND_OBJ_BOBOMB_BUDDY_TALK, 2, 95, 200, "\
 Salut l'ami! Je vais te\n\
-préparer un joli canon!"))
+préparer un joli canon!")
 
-DEFINE_DIALOG(DIALOG_048, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_048, NO_SOUND, 5, 30, 200, "\
 Sommet du glacier...\n\
 Attention à ne pas\n\
 glisser!\n\
 Tout d'abord, visitez ce\n\
-chalet..."))
+chalet...")
 
-DEFINE_DIALOG(DIALOG_049, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_049, NO_SOUND, 4, 30, 200, "\
 Vous vous souvenez de\n\
 l'Impulsion? Utilisez cette\n\
 technique pour atteindre\n\
@@ -668,9 +668,9 @@ mur, en appuyant sur le\n\
 stick multidirectionnel\n\
 vers la direction desirée.\n\
 Entraînez-vous encore et\n\
-encore et encore et...?"))
+encore et encore et...?")
 
-DEFINE_DIALOG(DIALOG_050, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_050, NO_SOUND, 4, 30, 200, "\
 Maintenez le bouton Ⓩ pour\n\
 vous accroupir et ainsi\n\
 glisser le long d'une\n\
@@ -694,9 +694,9 @@ Saut en Longueur...\n\
 Vous pouvez aussi marcher\n\
 en maintenant le bouton Ⓩ.\n\
 Mais c'est une autre\n\
-histoire..."))
+histoire...")
 
-DEFINE_DIALOG(DIALOG_051, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_051, NO_SOUND, 6, 30, 200, "\
 Vous pouvez facilement\n\
 vous accrocher aux arbres\n\
 et aux poteaux...\n\
@@ -718,9 +718,9 @@ haut pour faire le poirier.\n\
 Appuyez alors sur Ⓐ pour\n\
 faire un méga-saut vers\n\
 l'arrière, digne des plus\n\
-grands athlètes!"))
+grands athlètes!")
 
-DEFINE_DIALOG(DIALOG_052, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_052, NO_SOUND, 5, 30, 200, "\
 Arrêtez-vous et appuyez\n\
 sur Ⓩ pour vous accroupir,\n\
 puis appuyez sur Ⓐ pour\n\
@@ -734,9 +734,9 @@ sautez.\n\
 Ces deux types de saut\n\
 vous permettent de\n\
 sauter beaucoup plus haut\n\
-qu'un saut normal..."))
+qu'un saut normal...")
 
-DEFINE_DIALOG(DIALOG_053, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_053, NO_SOUND, 5, 30, 200, "\
 Quelques fois, en\n\
 traversant un anneau ou\n\
 en découvrant un passage\n\
@@ -744,9 +744,9 @@ secret dans un niveau, un\n\
 chiffre rouge apparaîtra.\n\
 Si vous faites apparaître\n\
 cinq chiffres rouges, une\n\
-étoile secrète apparaîtra."))
+étoile secrète apparaîtra.")
 
-DEFINE_DIALOG(DIALOG_054, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_054, NO_SOUND, 3, 30, 200, "\
 Attention:\n\
 Glissade Périlleuse!\n\
 En voiture Simone...\n\
@@ -755,9 +755,9 @@ le stick multidirectionnel\n\
 pour accélérer.\n\
 Appuyez vers l'arrière\n\
 pour ralentir...\n\
-Roulez jeunesse!"))
+Roulez jeunesse!")
 
-DEFINE_DIALOG(DIALOG_055, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_055, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, "\
 Salut mon tout petit\n\
 Mario...\n\
 Alors, il paraît que tu es\n\
@@ -767,9 +767,9 @@ que moi?\n\
 On fait la course,\n\
 mon petit biquet?\n\
 Prêt...\n\
-//Partez!//Heu, non."))
+//Partez!//Heu, non.")
 
-DEFINE_DIALOG(DIALOG_056, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_056, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, "\
 Qu-qu-quoi? T-t-tu as\n\
 battu mon record?\n\
 Je l'admets, tu es très\n\
@@ -777,18 +777,18 @@ rapide pour un humain.\n\
 Je n'ai pas de médaille\n\
 d'or sur moi mais...\n\
 Cette étoile fera\n\
-l'affaire..."))
+l'affaire...")
 
-DEFINE_DIALOG(DIALOG_057, SOUND_OBJ_BIG_PENGUIN_YELL, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_057, SOUND_OBJ_BIG_PENGUIN_YELL, 4, 30, 200, "\
 Mon bébé! J'ai perdu mon\n\
 bébé... Mon p'tit chou...\n\
 Ma puce à moi...\n\
 Mon chocolat...\n\
 JE VEUX MON BÉBÉ!!!\n\
 GNAAAAAAAAAAAAAA!!!\n\
-MON BÉBÉ!"))
+MON BÉBÉ!")
 
-DEFINE_DIALOG(DIALOG_058, SOUND_OBJ_BIG_PENGUIN_YELL, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_058, SOUND_OBJ_BIG_PENGUIN_YELL, 3, 30, 200, "\
 Tu as trouvé mon bébé!!!\n\
 Mon chou...\n\
 Mon p'tit chou...\n\
@@ -797,15 +797,15 @@ gratitude, gros Mario?\n\
 Tu es formidable...\n\
 Tiens, prends cette étoile.\n\
 Tu l'as bien méritée...\n\
-Encore merci, petit!"))
+Encore merci, petit!")
 
-DEFINE_DIALOG(DIALOG_059, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_059, SOUND_OBJ_BIG_PENGUIN_YELL, 2, 30, 200, "\
 C'est pas mon bébé!!!\n\
 Où est mon bébé?\n\
 JE VEUX MON BÉBÉ!!!!\n\
-GNAAAAAAAAAAAAAA!!!!"))
+GNAAAAAAAAAAAAAA!!!!")
 
-DEFINE_DIALOG(DIALOG_060, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_060, NO_SOUND, 6, 30, 200, "\
 ATTENTION!\n\
 A lire avant de plonger!\n\
 Si vous restez sous l'eau\n\
@@ -835,15 +835,15 @@ surface, maintenez la\n\
 flèche vers le bas sur le\n\
 stick multidirectionnel et\n\
 appuyez sur Ⓐ pour sortir\n\
-de l'eau."))
+de l'eau.")
 
-DEFINE_DIALOG(DIALOG_061, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_061, NO_SOUND, 4, 30, 200, "\
 Brrrrr!!!\n\
 Baignade déconseillée!!!\n\
 Trop froid...\n\
-// ---Le Pingouin---"))
+// ---Le Pingouin---")
 
-DEFINE_DIALOG(DIALOG_062, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_062, NO_SOUND, 4, 30, 200, "\
 A l'intérieur des\n\
 blocs verts se cache la\n\
 casquette-métal...\n\
@@ -855,9 +855,9 @@ vos ennemis.\n\
 Vous n'aurez même plus\n\
 besoin de respirer!\n\
 Mais il y a un problème:\n\
-vous ne pouvez pas nager!"))
+vous ne pouvez pas nager!")
 
-DEFINE_DIALOG(DIALOG_063, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_063, NO_SOUND, 4, 30, 200, "\
 La casquette d'invisibilité\n\
 se trouve dans les blocs\n\
 bleus.\n\
@@ -868,9 +868,9 @@ terribles Boos, ne\n\
 pourront pas vous voir!\n\
 En plus, vous pourrez\n\
 traverser des murs\n\
-secrets!"))
+secrets!")
 
-DEFINE_DIALOG(DIALOG_064, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_064, NO_SOUND, 6, 30, 200, "\
 Si vous portez une\n\
 casquette ailée provenant\n\
 d'un bloc rouge, faites le\n\
@@ -884,9 +884,9 @@ bas pour prendre de\n\
 l'altitude, et vers le haut\n\
 pour piquer du nez.\n\
 Et enfin, appuyez sur Ⓩ\n\
-pour atterrir."))
+pour atterrir.")
 
-DEFINE_DIALOG(DIALOG_065, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_065, NO_SOUND, 6, 30, 200, "\
 Leçons de natation...\n\
 Appuyez sur Ⓐ pour nager\n\
 la brasse. Si votre\n\
@@ -920,9 +920,9 @@ d'oxygène...\n\
 Dernière chose:\n\
 vous ne pouvez pas ouvrir\n\
 les portes se trouvant\n\
-sous l'eau."))
+sous l'eau.")
 
-DEFINE_DIALOG(DIALOG_066, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_066, NO_SOUND, 6, 30, 200, "\
 Mario! Fais attention:\n\
 Bowser est un gros\n\
 vicieux! Il va tenter de\n\
@@ -958,9 +958,9 @@ pour lancer Bowser.\n\
 Bonne chance, Mario!\n\
 Tu en auras besoin...\n\
 \n\
-// ---Peach---"))
+// ---Peach---")
 
-DEFINE_DIALOG(DIALOG_067, SOUND_OBJ_BOWSER_LAUGH, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_067, SOUND_OBJ_BOWSER_LAUGH, 3, 30, 200, "\
 HA HA! Dommage pour toi,\n\
 Mario! La P'tite Peach\n\
 n'est pas là...\n\
@@ -975,9 +975,9 @@ faire tourner autour de\n\
 ta tête!\n\
 Tu n'arriveras jamais à\n\
 me faire décoller d'ici...\n\
-GWA HA! A table!!!!!!!"))
+GWA HA! A table!!!!!!!")
 
-DEFINE_DIALOG(DIALOG_068, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_068, NO_SOUND, 4, 30, 200, "\
 Voici les Laves Fatales!\n\
 Si vous touchez de la lave\n\
 ou des flammes, vous\n\
@@ -985,17 +985,17 @@ aurez le feu aux fesses!\n\
 Mais pas de panique:\n\
 vous pourrez toujours\n\
 contrôler Mario...\n\
-Restez calme!"))
+Restez calme!")
 
-DEFINE_DIALOG(DIALOG_069, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_069, NO_SOUND, 6, 30, 200, "\
 A l'intérieur des tableaux\n\
 vous pourrez touchez des\n\
 murs invisibles marquant\n\
 les limites du niveau.\n\
 Si vous touchez un mur en\n\
-volant, vous serez bloqué."))
+volant, vous serez bloqué.")
 
-DEFINE_DIALOG(DIALOG_070, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_070, NO_SOUND, 6, 30, 200, "\
 Vous pouvez retourner\n\
 dans le hall du château\n\
 depuis n'importe quel\n\
@@ -1028,9 +1028,9 @@ l'écran au début du\n\
 niveau...\n\
 Toutefois, vous n'êtes pas\n\
 obligé d'attraper l'étoile\n\
-décrite par l'indice."))
+décrite par l'indice.")
 
-DEFINE_DIALOG(DIALOG_071, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_071, NO_SOUND, 4, 30, 200, "\
 DANGER!\n\
 Attention au brouillard\n\
 toxique!\n\
@@ -1041,17 +1041,17 @@ plate-forme en hauteur\n\
 pour respirer.\n\
 \n\
 Cercle: Abri\n\
-Flèche: Entrée - Sortie"))
+Flèche: Entrée - Sortie")
 
-DEFINE_DIALOG(DIALOG_072, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_072, NO_SOUND, 3, 30, 200, "\
 Attention: vents violents!\n\
 Accrochez-vous à votre\n\
 casquette!\n\
 Si vous la perdez, vous\n\
 devrez revenir la chercher\n\
-là où vous l'avez perdue..."))
+là où vous l'avez perdue...")
 
-DEFINE_DIALOG(DIALOG_073, NO_SOUND, 3, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_073, NO_SOUND, 3, 95, 200, "\
 Souquez ferme, matelot!\n\
 J'ai caché un trésor\n\
 par ici, moussaillon.\n\
@@ -1060,9 +1060,9 @@ vous devrez ouvrir les\n\
 coffres dans l'ordre...\n\
 Y arriveras-tu, petit?\n\
 \n\
-// -- Le capitaine --"))
+// -- Le capitaine --")
 
-DEFINE_DIALOG(DIALOG_074, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_074, NO_SOUND, 5, 30, 200, "\
 Vous pouvez vous\n\
 accrocher au rebord d'une\n\
 falaise.\n\
@@ -1077,9 +1077,9 @@ Pour vous hisser, appuyez\n\
 vers le haut sur le stick\n\
 multidirectionnel ou sur le\n\
 bouton Ⓐ pour monter plus\n\
-vite."))
+vite.")
 
-DEFINE_DIALOG(DIALOG_075, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_075, NO_SOUND, 5, 30, 200, "\
 Mario! Mon château est\n\
 en danger, et Bowser en\n\
 est le responsable...\n\
@@ -1114,9 +1114,9 @@ Retrouve toutes les étoiles\n\
 du château et tu pourras\n\
 nous délivrer!\n\
 Je t'en prie, Mario!\n\
-Sauve-nous!"))
+Sauve-nous!")
 
-DEFINE_DIALOG(DIALOG_076, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_076, NO_SOUND, 3, 30, 200, "\
 Grâce au pouvoir des\n\
 étoiles, le château\n\
 revient à la vie...\n\
@@ -1136,13 +1136,13 @@ Rentre dans ce niveau en\n\
 sautant très haut...\n\
 \n\
 Au fait! Regarde ce que\n\
-j'ai pour toi!"))
+j'ai pour toi!")
 
-DEFINE_DIALOG(DIALOG_077, NO_SOUND, 2, 150, 200, _("\
+DEFINE_DIALOG(DIALOG_077, NO_SOUND, 2, 150, 200, "\
 Il est dit que les piliers\n\
-doivent être enfoncés..."))
+doivent être enfoncés...")
 
-DEFINE_DIALOG(DIALOG_078, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_078, NO_SOUND, 4, 30, 200, "\
 Enfoncez le bloc des\n\
 pièces bleues grâce à\n\
 l'Attaque Rodéo, en\n\
@@ -1153,9 +1153,9 @@ pièces jaunes.\n\
 \n\
 Dépêchez-vous de les\n\
 attraper, sinon elles\n\
-disparaîtront!"))
+disparaîtront!")
 
-DEFINE_DIALOG(DIALOG_079, SOUND_OBJ_UKIKI_CHATTER_LONG, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_079, SOUND_OBJ_UKIKI_CHATTER_LONG, 2, 30, 200, "\
 GNIIIIIIIII!!!\n\
 LACHE-MOI!\n\
 Je blaguais! Tu n'as\n\
@@ -1163,12 +1163,12 @@ aucun sens de l'humour.\n\
 Lâche-moi et je te\n\
 donnerais un truc cool.\n\
 Ça marche?\n\
-//OK//// Jamais!"))
+//OK//// Jamais!")
 
-DEFINE_DIALOG(DIALOG_080, SOUND_OBJ_UKIKI_CHATTER_LONG, 1, 30, 200, _("\
-Gnii hi hi hi hi hi!!!"))
+DEFINE_DIALOG(DIALOG_080, SOUND_OBJ_UKIKI_CHATTER_LONG, 1, 30, 200, "\
+Gnii hi hi hi hi hi!!!")
 
-DEFINE_DIALOG(DIALOG_081, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_081, NO_SOUND, 3, 30, 200, "\
 Bienvenue dans le monde\n\
 “Trempé-Séché”...\n\
 \n\
@@ -1177,9 +1177,9 @@ altère le niveau d'eau...\n\
 \n\
 En y pénétrant,\n\
 serez-vous assez\n\
-intelligent?"))
+intelligent?")
 
-DEFINE_DIALOG(DIALOG_082, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_082, NO_SOUND, 4, 30, 200, "\
 Accroche-toi à ta\n\
 casquette, gentil petit\n\
 Mario...\n\
@@ -1205,9 +1205,9 @@ beau y font régner la\n\
 terreur!\n\
 \n\
 Tiens, j'ai un petit\n\
-cadeau pour toi..."))
+cadeau pour toi...")
 
-DEFINE_DIALOG(DIALOG_083, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_083, NO_SOUND, 4, 30, 200, "\
 Cette grosse horloge est\n\
 étrange...\n\
 \n\
@@ -1217,9 +1217,9 @@ position de la grande\n\
 aiguille lorsque tu sautes\n\
 à l'intérieur...\n\
 Au fait, regarde ce que\n\
-j'ai là pour toi!"))
+j'ai là pour toi!")
 
-DEFINE_DIALOG(DIALOG_084, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_084, NO_SOUND, 3, 30, 200, "\
 GNAAAAAAAAA!!!\n\
 LACHE-MOI!!!\n\
 GROSSE BRUTE!\n\
@@ -1228,34 +1228,34 @@ Ne me mange pas!\n\
 Au secours!!!!!!\n\
 Tiens, voilà une étoile.\n\
 Prends-la, mais tu dois\n\
-me laisser partir..."))
+me laisser partir...")
 
-DEFINE_DIALOG(DIALOG_085, SOUND_OBJ_BOO_LAUGH_LONG, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_085, SOUND_OBJ_BOO_LAUGH_LONG, 3, 30, 200, "\
 Va-t'en, simple mortel!\n\
 Si tu tiens à ton âme,\n\
 retourne chez toi...\n\
 Si tu oses rentrer,\n\
-tu seras damné!!!"))
+tu seras damné!!!")
 
-DEFINE_DIALOG(DIALOG_086, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_086, NO_SOUND, 3, 30, 200, "\
 Tourner autour de\n\
 certains ennemis peut\n\
-faire tourner de l'oeil..."))
+faire tourner de l'oeil...")
 
-DEFINE_DIALOG(DIALOG_087, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_087, NO_SOUND, 5, 30, 200, "\
 Le Père Noël n'est pas le\n\
 seul à passer par les\n\
 cheminées...\n\
 Avis aux curieux...\n\
-- Le bonhomme de neige -"))
+- Le bonhomme de neige -")
 
-DEFINE_DIALOG(DIALOG_088, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_088, NO_SOUND, 4, 30, 200, "\
 -Plate-forme de travail-\n\
 Pour descendre, utilisez\n\
 le poteau sur la gauche et\n\
-glissez jusqu'en bas..."))
+glissez jusqu'en bas...")
 
-DEFINE_DIALOG(DIALOG_089, NO_SOUND, 6, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_089, NO_SOUND, 6, 95, 200, "\
 Les deux routes sont très\n\
 dangereuses...\n\
 Ceux qui ne sont pas\n\
@@ -1273,24 +1273,24 @@ Cercle rouge:\n\
 ////Lac souterrain.\n\
 Flèche:\n\
 ////Votre position\n\
-////actuelle."))
+////actuelle.")
 
-DEFINE_DIALOG(DIALOG_090, SOUND_OBJ_BOWSER_LAUGH, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_090, SOUND_OBJ_BOWSER_LAUGH, 6, 30, 200, "\
 BWA HA HA HA HA HA!!!\n\
 Tu es tombé dans mon\n\
 piège, petit Mario!\n\
 Mais voici un conseil\n\
 d'ami: prends garde à ne\n\
-pas tomber!"))
+pas tomber!")
 
-DEFINE_DIALOG(DIALOG_091, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_091, NO_SOUND, 5, 30, 200, "\
 Danger!!!\n\
 Vents violents!\n\
 Sachez utiliser les\n\
 courants à votre\n\
-avantage..."))
+avantage...")
 
-DEFINE_DIALOG(DIALOG_092, SOUND_OBJ_BOWSER_LAUGH, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_092, SOUND_OBJ_BOWSER_LAUGH, 5, 30, 200, "\
 Mario...\n\
 Mon p'tit Mario...\n\
 Tu m'cherches ou quoi?\n\
@@ -1300,9 +1300,9 @@ Mais d'abord tu vas me\n\
 rendre mes étoiles,\n\
 voleur!\n\
 BWA HA HA HA HA HA!!!\n\
-C'est l'heure du goûter!"))
+C'est l'heure du goûter!")
 
-DEFINE_DIALOG(DIALOG_093, SOUND_OBJ_BOWSER_LAUGH, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_093, SOUND_OBJ_BOWSER_LAUGH, 6, 30, 200, "\
 Mario?!?\n\
 Tu es encore là, toi?\n\
 Très bien, tu l'auras\n\
@@ -1314,17 +1314,17 @@ puissance, tu n'arriveras\n\
 jamais à sauver Peach et\n\
 ses amis...\n\
 Allez... En garde!\n\
-BWA HA HA HA HA HA HA!"))
+BWA HA HA HA HA HA HA!")
 
-DEFINE_DIALOG(DIALOG_094, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_094, NO_SOUND, 6, 30, 200, "\
 Pourquoi ne pas escalader\n\
 cette pente en courant?\n\
 Petit rappel: pour faire\n\
 un Saut en Longueur,\n\
 courir, appuyer sur Ⓩ,\n\
-puis sauter..."))
+puis sauter...")
 
-DEFINE_DIALOG(DIALOG_095, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_095, NO_SOUND, 5, 30, 200, "\
 Pour lire une pancarte,\n\
 il faut se tenir devant\n\
 l'écriteau et appuyer Ⓑ.\n\
@@ -1337,9 +1337,9 @@ face de lui ou elle.\n\
 \n\
 Retrouvez vite les étoiles\n\
 que Bowser a caché dans\n\
-ce niveau!"))
+ce niveau!")
 
-DEFINE_DIALOG(DIALOG_096, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_096, NO_SOUND, 5, 30, 200, "\
 Le sommet de la montagne\n\
 est interdit au public!\n\
 Alors n'essayez pas d'y\n\
@@ -1348,36 +1348,36 @@ recherche des étoiles...\n\
 Autre conseil: ne réveillez\n\
 jamais quelqu'un qui dort.\n\
 Marchez doucement...\n\
-Et sans bruit..."))
+Et sans bruit...")
 
-DEFINE_DIALOG(DIALOG_097, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_097, NO_SOUND, 5, 30, 200, "\
 Si quelqu'un vous pousse,\n\
 n'ayez pas peur!\n\
 Poussez-le vous aussi!\n\
 Le perdant aura plutôt\n\
-chaud aux fesses..."))
+chaud aux fesses...")
 
-DEFINE_DIALOG(DIALOG_098, SOUND_OBJ_BOO_LAUGH_LONG, 5, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_098, SOUND_OBJ_BOO_LAUGH_LONG, 5, 95, 200, "\
 Viens...\n\
 ...entre donc...\n\
 Mon biquet...\n\
 ...viens dîner...\n\
-Hin...hin...hin..."))
+Hin...hin...hin...")
 
-DEFINE_DIALOG(DIALOG_099, SOUND_OBJ_BOO_LAUGH_LONG, 3, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_099, SOUND_OBJ_BOO_LAUGH_LONG, 3, 95, 200, "\
 Hé...hé...hé...\n\
 Ciao bello Mario!\n\
 Moi j'traverse les murs!\n\
 Tu peux le faire, toi?\n\
-Hin...hin...hin..."))
+Hin...hin...hin...")
 
-DEFINE_DIALOG(DIALOG_100, SOUND_OBJ_UKIKI_CHATTER_LONG, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_100, SOUND_OBJ_UKIKI_CHATTER_LONG, 4, 95, 200, "\
 GNIIIIII! KIIIII!\n\
 J'l'ai eue!!!\n\
 HI KI KI KI KI KI!\n\
-C'est à moi!!!"))
+C'est à moi!!!")
 
-DEFINE_DIALOG(DIALOG_101, SOUND_OBJ_UKIKI_CHATTER_LONG, 5, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_101, SOUND_OBJ_UKIKI_CHATTER_LONG, 5, 95, 200, "\
 Aaaak...kiiii!!!\n\
 Arrête! Tu m'étrangles!\n\
 Quoi? Cette casquette?\n\
@@ -1385,9 +1385,9 @@ OK, prends-la...\n\
 Grande brute, va!\n\
 De toutes façons,\n\
 tu as l'air débile avec ça\n\
-sur la tête..."))
+sur la tête...")
 
-DEFINE_DIALOG(DIALOG_102, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_102, NO_SOUND, 4, 30, 200, "\
 Les Boos sont timides! Si\n\
 vous les regardez dans les\n\
 yeux, ils disparaîtront...\n\
@@ -1398,15 +1398,15 @@ Invisibles, ils sont\n\
 invincibles...\n\
 Tentez de vous faufiler\n\
 derrière eux et de leur\n\
-botter les fesses!"))
+botter les fesses!")
 
-DEFINE_DIALOG(DIALOG_103, NO_SOUND, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_103, NO_SOUND, 4, 95, 200, "\
 Au sommet des quatre\n\
 piliers l'on doit se tenir,\n\
 pour que la lumière puisse\n\
-enfin jaillir..."))
+enfin jaillir...")
 
-DEFINE_DIALOG(DIALOG_104, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_104, NO_SOUND, 4, 30, 200, "\
 L'ombre de l'étoile en\n\
 face de vous est un\n\
 “Marqueur d'étoile”.\n\
@@ -1414,9 +1414,9 @@ face de vous est un\n\
 Lorsque vous récupérerez\n\
 8 pièces rouges, une\n\
 étoile apparaîtra à cet\n\
-emplacement."))
+emplacement.")
 
-DEFINE_DIALOG(DIALOG_105, SOUND_OBJ_BOBOMB_BUDDY_TALK, 6, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_105, SOUND_OBJ_BOBOMB_BUDDY_TALK, 6, 95, 200, "\
 Canon prêt à tirer!\n\
 Allez, saute à l'intérieur!\n\
 Tu peux atteindre l'étoile\n\
@@ -1428,21 +1428,21 @@ directionnel pour viser et\n\
 appuie sur Ⓐ pour tirer.\n\
 Si tu es habile, sers-toi\n\
 des arbres et des poteaux\n\
-pour atterrir..."))
+pour atterrir...")
 
-DEFINE_DIALOG(DIALOG_106, SOUND_OBJ_BOBOMB_BUDDY_TALK, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_106, SOUND_OBJ_BOBOMB_BUDDY_TALK, 2, 95, 200, "\
 Canon prêt à tirer!\n\
-Allez, saute à l'intérieur!"))
+Allez, saute à l'intérieur!")
 
-DEFINE_DIALOG(DIALOG_107, SOUND_OBJ_BOO_LAUGH_LONG, 3, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_107, SOUND_OBJ_BOO_LAUGH_LONG, 3, 95, 200, "\
 Les fantômes sont...\n\
 ...immortels!\n\
 Hin hin hin hin...\n\
 Pourras-tu sortir d'ici...\n\
 ...vivant?\n\
-Gni hi hi hi hi hi..."))
+Gni hi hi hi hi hi...")
 
-DEFINE_DIALOG(DIALOG_108, SOUND_OBJ_BOO_LAUGH_LONG, 3, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_108, SOUND_OBJ_BOO_LAUGH_LONG, 3, 95, 200, "\
 GNI HI HI HI HI HOU!\n\
 Voici le seigneur des\n\
 supplices!\n\
@@ -1451,9 +1451,9 @@ Le souverain des\n\
 cauchemars...\n\
 Le Big Boo en personne!\n\
 Tremblez humains!!!\n\
-GNA HI HOU HA HIN HU !"))
+GNA HI HOU HA HIN HU !")
 
-DEFINE_DIALOG(DIALOG_109, NO_SOUND, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_109, NO_SOUND, 2, 95, 200, "\
 Oooooh Noooon!\n\
 Mon corps a fondu!\n\
 Tu ne pourrais pas\n\
@@ -1461,9 +1461,9 @@ m'aider, petit homme?\n\
 J'ai besoin d'un nouveau\n\
 corps!\n\
 Je dois faire un golf\n\
-demain..."))
+demain...")
 
-DEFINE_DIALOG(DIALOG_110, NO_SOUND, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_110, NO_SOUND, 2, 95, 200, "\
 J'ai perdu la tête, on\n\
 dirait...\n\
 Connais-tu quelqu'un à la\n\
@@ -1471,17 +1471,17 @@ recherche d'un corps?\n\
 Je suis peut-être petit,\n\
 mais je grandis vite!\n\
 Guide-moi, je te suivrai\n\
-n'importe où!"))
+n'importe où!")
 
-DEFINE_DIALOG(DIALOG_111, NO_SOUND, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_111, NO_SOUND, 2, 95, 200, "\
 Coooooool!\n\
 Quel super corps!\n\
 Maintenant je vais\n\
 pouvoir aller draguer!\n\
 Tiens, voici un petit\n\
-quelque chose pour toi..."))
+quelque chose pour toi...")
 
-DEFINE_DIALOG(DIALOG_112, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_112, NO_SOUND, 4, 30, 200, "\
 Ramassez le plus de pièces\n\
 possible! Elles rempliront\n\
 votre énergie!\n\
@@ -1497,9 +1497,9 @@ un coeur!\n\
 Si vous faites tourner le\n\
 coeur très vite, il vous\n\
 donnera beaucoup\n\
-d'énergie..."))
+d'énergie...")
 
-DEFINE_DIALOG(DIALOG_113, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_113, NO_SOUND, 5, 30, 200, "\
 Il existe des casquettes\n\
 spéciales dans les blocs\n\
 rouges, verts et bleus.\n\
@@ -1509,9 +1509,9 @@ Marchez sur les\n\
 interrupteurs dans les\n\
 niveaux cachés pour faire\n\
 apparaître les blocs de\n\
-couleur."))
+couleur.")
 
-DEFINE_DIALOG(DIALOG_114, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 3, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_114, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 3, 95, 200, "\
 Ah c'est pas le moment\n\
 de venir m'embêter!\n\
 \n\
@@ -1529,17 +1529,17 @@ une Attaque Rodéo sur\n\
 mon dos?\n\
 Ça m'étonnerais!\n\
 Allez... En garde, nabot\n\
-rouge et bleu!"))
+rouge et bleu!")
 
-DEFINE_DIALOG(DIALOG_115, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_115, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 2, 95, 200, "\
 Quoi? J'ai perdu?!?\n\
 Sacré nom d'un pétard!\n\
 Vous les humains, vous\n\
 n'avez aucun coeur...\n\
 Tiens, prends ça...\n\
-Et va-t'en!"))
+Et va-t'en!")
 
-DEFINE_DIALOG(DIALOG_116, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 4, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_116, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 4, 95, 200, "\
 Hein?/De quoi?\n\
 Moi? J'ai perdu?\n\
 Battu par un tout petit\n\
@@ -1555,9 +1555,9 @@ Ciao petit Mario!\n\
 Si tu veux me revoir,\n\
 choisis cette étoile sur\n\
 l'écran du départ.\n\
-A bientôt!"))
+A bientôt!")
 
-DEFINE_DIALOG(DIALOG_117, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 2, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_117, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 2, 95, 200, "\
 Qui...dérange...mon...\n\
 ...sommeil...éternel...?\n\
 Tout...bruit...doit...\n\
@@ -1565,17 +1565,17 @@ Tout...bruit...doit...\n\
 Intrus...va...être...\n\
 ...détruit...!\n\
 ...COMBAT...!!!\n\
-...A...MAINS...NUES...!!!"))
+...A...MAINS...NUES...!!!")
 
-DEFINE_DIALOG(DIALOG_118, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 3, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_118, SOUND_OBJ2_BOSS_DIALOG_GRUNT, 3, 95, 200, "\
 Qu...qu...qu...Hein?\n\
 Moi...perdu?...Hein?\n\
 Moi...faible...nul.\n\
 Toi...nouveau pharaon...\n\
 Tiens...pour toi...\n\
-Moi...dormir...dodo. Ciao."))
+Moi...dormir...dodo. Ciao.")
 
-DEFINE_DIALOG(DIALOG_119, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_119, NO_SOUND, 5, 30, 200, "\
 Grrrrr! Tu m'as surpris...\n\
 Je t'ai sous-estimé!\n\
 Petit mais costaud, hein?\n\
@@ -1585,9 +1585,9 @@ Ne t'inquiète pas, on se\n\
 reverra! Et la prochaine\n\
 fois, je te mangerai les\n\
 doigts!\n\
-Allez, à bientôt! GWA HA!"))
+Allez, à bientôt! GWA HA!")
 
-DEFINE_DIALOG(DIALOG_120, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_120, NO_SOUND, 3, 30, 200, "\
 Moi? Le grand Bowser?\n\
 Vaincu? Non, non!\n\
 Ça ne compte pas!\n\
@@ -1599,9 +1599,9 @@ p'tite Peach, rejoins-moi\n\
 en haut de la tour...\n\
 Allez, à la prochaine!\n\
 GWA HA HA HA HA HA HA!\n\
-GWA HI HOU HÉ HEU...HA!"))
+GWA HI HOU HÉ HEU...HA!")
 
-DEFINE_DIALOG(DIALOG_121, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_121, NO_SOUND, 4, 30, 200, "\
 NOoOoOoOoOoOoOoOon!\n\
 Mario... Méchant petit!\n\
 Cette fois-ci...\n\
@@ -1617,23 +1617,23 @@ C'est insupportable!\n\
 Mais je reviendrai...\n\
 Un jour... Je reviendrai!\n\
 Et ce jour-là...\n\
-Bye Bye Mario! BWA HA!!"))
+Bye Bye Mario! BWA HA!!")
 
-DEFINE_DIALOG(DIALOG_122, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_122, NO_SOUND, 6, 30, 200, "\
 -Le Trou Noir-\n\
 Droite: Plate-forme de\n\
 ////travail.\n\
 ////Labyrinthe\n\
 ////toxique.\n\
-Gauche: Lac souterrain."))
+Gauche: Lac souterrain.")
 
-DEFINE_DIALOG(DIALOG_123, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_123, NO_SOUND, 5, 30, 200, "\
 -Caverne Métallique-\n\
 Droite: Vers la cascade.\n\
 Gauche: Interrupteur des\n\
-////casquettes-métal."))
+////casquettes-métal.")
 
-DEFINE_DIALOG(DIALOG_124, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_124, NO_SOUND, 4, 30, 200, "\
 Plate-forme de travail:\n\
 Danger!\n\
 Lire le mode d'emploi\n\
@@ -1645,22 +1645,22 @@ forme.\n\
 Si jamais vous tombez de\n\
 la plate-forme, retournez\n\
 là où vous l'avez vue pour\n\
-la première fois."))
+la première fois.")
 
-DEFINE_DIALOG(DIALOG_125, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_125, NO_SOUND, 3, 30, 200, "\
 Sortie du Labyrinthe\n\
 toxique... Fermée!\n\
-Faites demi-tour!"))
+Faites demi-tour!")
 
-DEFINE_DIALOG(DIALOG_126, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_126, NO_SOUND, 6, 30, 200, "\
 -Ascenseur 1-\n\
 Haut:/ Trou Noir.\n\
 Droite: Plate-forme de\n\
 ////travail.\n\
 ////Labyrinthe\n\
-////toxique."))
+////toxique.")
 
-DEFINE_DIALOG(DIALOG_127, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_127, NO_SOUND, 5, 30, 200, "\
 -Lac Souterrain-\n\
 Droite: Caverne\n\
 ////métallique.\n\
@@ -1670,16 +1670,16 @@ Gros Bibi, un gentil\n\
 dragon, vit ici.\n\
 Faites l'Attaque Rodéo\n\
 sur son dos pour qu'il\n\
-baisse la tête..."))
+baisse la tête...")
 
-DEFINE_DIALOG(DIALOG_128, NO_SOUND, 5, 95, 200, _("\
+DEFINE_DIALOG(DIALOG_128, NO_SOUND, 5, 95, 200, "\
 Tu dois te battre avec\n\
 honneur! Il est interdit\n\
 de jeter une personnalité\n\
 royale hors de la surface\n\
-de combat!"))
+de combat!")
 
-DEFINE_DIALOG(DIALOG_129, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_129, NO_SOUND, 5, 30, 200, "\
 Bienvenue dans\n\
 le niveau des casquettes\n\
 d'invisibilité!!!\n\
@@ -1694,9 +1694,9 @@ Si vous portez une\n\
 casquette d'invisibilité,\n\
 vous pourrez traverser vos\n\
 ennemis et pleins d'autres\n\
-choses..."))
+choses...")
 
-DEFINE_DIALOG(DIALOG_130, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_130, NO_SOUND, 6, 30, 200, "\
 Bienvenue dans le niveau\n\
 des casquettes-métal!!!\n\
 Si vous marchez sur\n\
@@ -1708,9 +1708,9 @@ casquette-métal, vous\n\
 vous transformerez en\n\
 Métal Mario! Vous pourrez\n\
 alors marcher sous l'eau.\n\
-Faites un essai pour voir!"))
+Faites un essai pour voir!")
 
-DEFINE_DIALOG(DIALOG_131, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_131, NO_SOUND, 6, 30, 200, "\
 Bienvenue dans le niveau\n\
 des casquettes ailées!!!\n\
 Marchez sur l'interrupteur\n\
@@ -1734,17 +1734,17 @@ stick multidirectionnel\n\
 pour prendre de l'altitude\n\
 et vers le haut pour\n\
 piquer du nez. Imaginez-\n\
-vous à bord d'un 747!!!"))
+vous à bord d'un 747!!!")
 
-DEFINE_DIALOG(DIALOG_132, SOUND_OBJ_BIG_PENGUIN_YELL, 1, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_132, SOUND_OBJ_BIG_PENGUIN_YELL, 1, 30, 200, "\
 Non, mais?\n\
 Tu...tu...t'es fou?\n\
 Tu triches?\n\
 OK! T'es disqualifié!\n\
 Tu l'auras pas volé!\n\
-Houuuuuu! Le tricheur!"))
+Houuuuuu! Le tricheur!")
 
-DEFINE_DIALOG(DIALOG_133, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_133, NO_SOUND, 6, 30, 200, "\
 Mario! C'est toi?\n\
 Comme je suis heureux de\n\
 te voir!\n\
@@ -1774,9 +1774,9 @@ cette porte. Lorsque tu\n\
 auras récupéré 8 étoiles,\n\
 va ouvrir la porte avec la\n\
 grosse étoile: la Princesse\n\
-doit être de l'autre côté!"))
+doit être de l'autre côté!")
 
-DEFINE_DIALOG(DIALOG_134, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_134, NO_SOUND, 4, 30, 200, "\
 Le nom des étoiles inscrit\n\
 au début de chaque monde\n\
 est un indice!\n\
@@ -1795,9 +1795,9 @@ chance dans d'autres\n\
 niveaux...\n\
 Aide-nous le plus vite\n\
 possible, mon mignon petit\n\
-Mario en sucre..."))
+Mario en sucre...")
 
-DEFINE_DIALOG(DIALOG_135, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_135, NO_SOUND, 6, 30, 200, "\
 Bowser a volé les étoiles!\n\
 Je l'ai vu!\n\
 De mes propres yeux!\n\
@@ -1820,9 +1820,9 @@ Si tu désires revoir les\n\
 ennemis que tu as déjà\n\
 vaincu, sélectionne les\n\
 étoiles en relation avec\n\
-ces ennemis..."))
+ces ennemis...")
 
-DEFINE_DIALOG(DIALOG_136, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_136, NO_SOUND, 6, 30, 200, "\
 Whoa!!! Tu as déjà\n\
 récupéré autant d'étoiles?\n\
 Incroyable! T'es fort, toi!\n\
@@ -1852,9 +1852,9 @@ te faire moins mal en\n\
 tombant d'une falaise, en\n\
 effectuant une Attaque\n\
 Rodéo juste avant de\n\
-toucher le sol..."))
+toucher le sol...")
 
-DEFINE_DIALOG(DIALOG_137, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_137, NO_SOUND, 5, 30, 200, "\
 Merci Mario!\n\
 Grâce à tes étoiles de\n\
 puissance, Bowser est allé\n\
@@ -1864,17 +1864,17 @@ Au fait, savais-tu qu'une\n\
 étoile de puissance\n\
 apparaît à chaque fois\n\
 que tu récupères 100\n\
-pièces dans un niveau?"))
+pièces dans un niveau?")
 
-DEFINE_DIALOG(DIALOG_138, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_138, NO_SOUND, 6, 30, 200, "\
 -Ascenseur 2-\n\
 Bas://Lac souterrain.\n\
 Gauche: Trou Noir.\n\
 Droite: Labyrinthe\n\
 ////toxique\n\
-////(fermé)."))
+////(fermé).")
 
-DEFINE_DIALOG(DIALOG_139, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_139, NO_SOUND, 4, 30, 200, "\
 \n\
 Au dessus:\n\
 Chariot automatique.\n\
@@ -1885,9 +1885,9 @@ suit un chemin pré-\n\
 déterminé...\n\
 Le chariot disparaîtra\n\
 automatiquement lorsque\n\
-vous tomberez..."))
+vous tomberez...")
 
-DEFINE_DIALOG(DIALOG_140, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_140, NO_SOUND, 6, 30, 200, "\
 -Plate-forme de travail-\n\
 Droite: Entrée du\n\
 ////Labyrinthe\n\
@@ -1895,9 +1895,9 @@ Droite: Entrée du\n\
 Gauche: Trou Noir.\n\
 ////Ascenseur 1.\n\
 Flèche: Votre position\n\
-////actuelle."))
+////actuelle.")
 
-DEFINE_DIALOG(DIALOG_141, NO_SOUND, 4, 150, 200, _("\
+DEFINE_DIALOG(DIALOG_141, NO_SOUND, 4, 150, 200, "\
 Vous avez récupéré une\n\
 des étoiles du château!\n\
 Vous pouvez désormais\n\
@@ -1913,9 +1913,9 @@ au rez-de-chaussée...\n\
 Les troupes de Bowser\n\
 sont encore nombreuses!\n\
 Il faut les arrêter à tout\n\
-prix! Courage..."))
+prix! Courage...")
 
-DEFINE_DIALOG(DIALOG_142, NO_SOUND, 5, 150, 200, _("\
+DEFINE_DIALOG(DIALOG_142, NO_SOUND, 5, 150, 200, "\
 Vous avez récupéré trois\n\
 étoiles de puissance!\n\
 Désormais, vous pouvez\n\
@@ -1929,9 +1929,9 @@ bon vous semble...\n\
 Les ennemis qui vous\n\
 attendent seront de plus\n\
 en plus costauds!\n\
-Alors, prudence..."))
+Alors, prudence...")
 
-DEFINE_DIALOG(DIALOG_143, NO_SOUND, 5, 150, 200, _("\
+DEFINE_DIALOG(DIALOG_143, NO_SOUND, 5, 150, 200, "\
 Vous avez récupéré huit\n\
 étoiles de puissance!\n\
 Vous pouvez désormais\n\
@@ -1941,9 +1941,9 @@ La Princesse est juste de\n\
 l'autre côté...\n\
 Pouvez-vous l'entendre\n\
 crier votre nom?\n\
-“Marioooooo!”"))
+“Marioooooo!”")
 
-DEFINE_DIALOG(DIALOG_144, NO_SOUND, 5, 150, 200, _("\
+DEFINE_DIALOG(DIALOG_144, NO_SOUND, 5, 150, 200, "\
 Vous avez récupéré 30\n\
 étoiles de puissance!\n\
 Vous pouvez désormais\n\
@@ -1967,9 +1967,9 @@ vilain vautour...\n\
 On dit que Bowser s'est\n\
 réfugié dans les\n\
 profondeurs de l'océan...\n\
-L'avez-vous rencontré?"))
+L'avez-vous rencontré?")
 
-DEFINE_DIALOG(DIALOG_145, NO_SOUND, 6, 150, 200, _("\
+DEFINE_DIALOG(DIALOG_145, NO_SOUND, 6, 150, 200, "\
 Vous avez récupéré 50\n\
 étoiles de puissance!\n\
 Vous pouvez désormais\n\
@@ -1984,9 +1984,9 @@ des blocs de couleur\n\
 peuvent être très utiles...\n\
 Allez, en route Mario...\n\
 Et que la force soit avec\n\
-toi, petit homme."))
+toi, petit homme.")
 
-DEFINE_DIALOG(DIALOG_146, NO_SOUND, 5, 150, 200, _("\
+DEFINE_DIALOG(DIALOG_146, NO_SOUND, 5, 150, 200, "\
 Vous avez récupéré 70\n\
 étoiles de puissance!\n\
 Désormais, vous pouvez\n\
@@ -1995,9 +1995,9 @@ accéder en haut de\n\
 Le terrible Bowser vous y\n\
 attend...\n\
 Etes-vous prêt à\n\
-l'affronter?"))
+l'affronter?")
 
-DEFINE_DIALOG(DIALOG_147, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_147, NO_SOUND, 6, 30, 200, "\
 Faites-vous bon usage\n\
 des casquettes spéciales?\n\
 Elles peuvent vous être\n\
@@ -2015,9 +2015,9 @@ fourniront des casquettes\n\
 ailées, les bleus des\n\
 casquettes d'invisibilité,\n\
 et les verts des\n\
-casquettes-métal..."))
+casquettes-métal...")
 
-DEFINE_DIALOG(DIALOG_148, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_148, NO_SOUND, 6, 30, 200, "\
 Montagne du Bonhomme de\n\
 neige.../DANGER!\n\
 Ne pas tenter le Triple\n\
@@ -2029,9 +2029,9 @@ vous fera vite perdre de\n\
 l'énergie de façon\n\
 permanente.\n\
 Alors, attention!\n\
--Le Bonhomme de neige-"))
+-Le Bonhomme de neige-")
 
-DEFINE_DIALOG(DIALOG_149, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_149, NO_SOUND, 5, 30, 200, "\
 Voici la Glissade Secrète\n\
 de la Princesse Peach!\n\
 Vous y trouverez une\n\
@@ -2045,9 +2045,9 @@ ralentir...\n\
 Si vous glissez très vite,\n\
 vous découvrirez une\n\
 des étoiles secrètes du\n\
-château!"))
+château!")
 
-DEFINE_DIALOG(DIALOG_150, SOUND_OBJ_WIGGLER_TALK, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_150, SOUND_OBJ_WIGGLER_TALK, 4, 30, 200, "\
 Whoa! Va-z'y, lui!\n\
 T' as inondé ma zon-mé!!!\n\
 Pourquoi t'as fait ça, yo!\n\
@@ -2062,34 +2062,34 @@ C'est à cause de cette\n\
 étoile...\n\
 Je suis sûr qu'elle me\n\
 porte la poisse...\n\
-Saleté, va!"))
+Saleté, va!")
 
-DEFINE_DIALOG(DIALOG_151, SOUND_OBJ_WIGGLER_TALK, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_151, SOUND_OBJ_WIGGLER_TALK, 6, 30, 200, "\
 Ah non! Ça suffit!\n\
 D'abord tu me mouilles,\n\
 ensuite tu m'écrases la\n\
 face...\n\
 Grrrr! Pas cool, Bob.\n\
-Tu cherches le contact?"))
+Tu cherches le contact?")
 
-DEFINE_DIALOG(DIALOG_152, SOUND_OBJ_WIGGLER_TALK, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_152, SOUND_OBJ_WIGGLER_TALK, 2, 30, 200, "\
 Gnaaaaa! Pov'type, va!\n\
 Tiens, la v'là ton étoile!\n\
 J'm'en fiche...\n\
 J'peux en avoir d'autres.\n\
 Allez, à la prochaine...\n\
-Cool, Abdoul."))
+Cool, Abdoul.")
 
-DEFINE_DIALOG(DIALOG_153, NO_SOUND, 1, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_153, NO_SOUND, 1, 30, 200, "\
 Hé! Qui va là?\n\
 Qui me grimpe dessus?\n\
 Une mouche?\n\
 Un moustique?\n\
 Un cafard?\n\
 T'as intérêt à dégager!\n\
-Sinon j'te souffle dessus!"))
+Sinon j'te souffle dessus!")
 
-DEFINE_DIALOG(DIALOG_154, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_154, NO_SOUND, 5, 30, 200, "\
 Accroche-toi à ta\n\
 casquette! Si jamais tu\n\
 la perds, retourne la\n\
@@ -2107,9 +2107,9 @@ Sauve-la, mon mignon\n\
 Mario rouge et bleu...\n\
 Heu... Tu savais qu'il\n\
 existe aussi des niveaux\n\
-dans les murs, hein?"))
+dans les murs, hein?")
 
-DEFINE_DIALOG(DIALOG_155, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_155, NO_SOUND, 5, 30, 200, "\
 Grâce au pouvoir des\n\
 étoiles, le château revient\n\
 peu à peu à la vie...\n\
@@ -2124,17 +2124,17 @@ Autre chose: rentre dans\n\
 le niveau Trempé-Séché\n\
 à l'aide d'un grand saut.\n\
 \n\
-Allez, courage camarade!"))
+Allez, courage camarade!")
 
-DEFINE_DIALOG(DIALOG_156, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_156, NO_SOUND, 3, 30, 200, "\
 Le niveau de la pendule\n\
 est étrange...\n\
 \n\
 Fais attention à la\n\
 grande aiguille lorsque\n\
-tu rentres dans l'horloge."))
+tu rentres dans l'horloge.")
 
-DEFINE_DIALOG(DIALOG_157, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_157, NO_SOUND, 5, 30, 200, "\
 Attention aux sables\n\
 mouvants!\n\
 Si vous vous faites\n\
@@ -2143,9 +2143,9 @@ boire la tasse!\n\
 Les zones sombres sont\n\
 des trous sans fond...\n\
 Alors, prudence jeune\n\
-aventurier..."))
+aventurier...")
 
-DEFINE_DIALOG(DIALOG_158, NO_SOUND, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_158, NO_SOUND, 6, 30, 200, "\
 1. Si vous sautez de\n\
 façon répétée, vous\n\
 sauterez de plus en plus\n\
@@ -2157,26 +2157,26 @@ et sautez à nouveau pour\n\
 créer une Impulsion.\n\
 Grâce à cette technique,\n\
 vous pourrez accéder à\n\
-des lieux en hauteur."))
+des lieux en hauteur.")
 
-DEFINE_DIALOG(DIALOG_159, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_159, NO_SOUND, 4, 30, 200, "\
 3. En vous arrêtant, en\n\
 appuyant sur Ⓩ et en\n\
 sautant, vous ferez un\n\
 Saut Périlleux en arrière.\n\
 Pour faire un Saut en\n\
 Longueur, courez, appuyez\n\
-sur Ⓩ, puis sautez."))
+sur Ⓩ, puis sautez.")
 
-DEFINE_DIALOG(DIALOG_160, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_160, NO_SOUND, 3, 30, 200, "\
 Appuyez sur Ⓑ lorsque\n\
 vous courez pour faire\n\
 une attaque en glissade.\n\
 Pour vous remettre\n\
 debout, appuyez sur Ⓐ ou\n\
-sur Ⓑ."))
+sur Ⓑ.")
 
-DEFINE_DIALOG(DIALOG_161, SOUND_GENERAL_YOSHI_TALK, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_161, SOUND_GENERAL_YOSHI_TALK, 4, 30, 200, "\
 Mario!?!?!\n\
 C'est toi? Vraiment toi?\n\
 Ça fait un bout de temps\n\
@@ -2208,9 +2208,9 @@ alors...\n\
 Voici quelques munitions!\n\
 A bientôt et merci!\n\
 --Les créateurs de\n\
-/Mario 64..."))
+/Mario 64...")
 
-DEFINE_DIALOG(DIALOG_162, NO_SOUND, 2, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_162, NO_SOUND, 2, 30, 200, "\
 Oh, non!\n\
 Encore toi?\n\
 T'es amoureux, ou quoi?\n\
@@ -2226,9 +2226,9 @@ c'est la dernière fois!\n\
 Ah... Autre chose...\n\
 \n\
 LACHE-MOI!!!!!\n\
-GRANDE BRUTE!!!!!"))
+GRANDE BRUTE!!!!!")
 
-DEFINE_DIALOG(DIALOG_163, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_163, NO_SOUND, 4, 30, 200, "\
 NoOoOoOoOoOoOoOon!!!\n\
 Tu...tu...tu m'as battu?\n\
 Moi?!? C'est illogique!\n\
@@ -2247,9 +2247,9 @@ suis pas du genre à\n\
 abandonner si facilement!\n\
 BWA HA HA HA HA HA HA!\n\
 GWA HI HA HI HOU HEU!\n\
-..... Atcha!"))
+..... Atcha!")
 
-DEFINE_DIALOG(DIALOG_164, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_164, NO_SOUND, 4, 30, 200, "\
 Beuuuuuuuu...\n\
 J'ai trop mangé, moi...\n\
 Beuuuuuuuu...\n\
@@ -2261,20 +2261,20 @@ A moins que tu aies peur!\n\
 Alors, c'est d'accord?\n\
 Prêt...\n\
 \n\
-//Partez!//Heu, non!"))
+//Partez!//Heu, non!")
 
-DEFINE_DIALOG(DIALOG_165, NO_SOUND, 3, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_165, NO_SOUND, 3, 30, 200, "\
 Tourner autour du poteau\n\
 peut faire tourner les\n\
-têtes..."))
+têtes...")
 
-DEFINE_DIALOG(DIALOG_166, NO_SOUND, 4, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_166, NO_SOUND, 4, 30, 200, "\
 Je m'entraîne...\n\
 Je reviens plus tard...\n\
 \n\
--- Koopa-Rapido --"))
+-- Koopa-Rapido --")
 
-DEFINE_DIALOG(DIALOG_167, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_167, NO_SOUND, 5, 30, 200, "\
 En route vers le château!\n\
 \n\
 Appuyez sur Ⓐ pour sauter\n\
@@ -2284,19 +2284,19 @@ Appuyez sur Ⓑ pour\n\
 attaquer ou pour attraper\n\
 quelque chose. Appuyez à\n\
 nouveau sur Ⓑ pour lancer\n\
-ce que vous portez."))
+ce que vous portez.")
 
-DEFINE_DIALOG(DIALOG_168, SOUND_OBJ_WIGGLER_TALK, 6, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_168, SOUND_OBJ_WIGGLER_TALK, 6, 30, 200, "\
 Hé! Lâche-moi un peu!\n\
 Ça fait deux fois que tu\n\
 t'essuies les pieds sur\n\
 ma tête!\n\
 Tu m'cherches ou quoi?\n\
-Coup d'boule!!!!"))
+Coup d'boule!!!!")
 
-DEFINE_DIALOG(DIALOG_169, NO_SOUND, 5, 30, 200, _("\
+DEFINE_DIALOG(DIALOG_169, NO_SOUND, 5, 30, 200, "\
 Dehors les touristes!\n\
 Cette caverne est très\n\
 dangereuse!!!\n\
 Alors... DE-HORS!\n\
-/ -- Le capitaine --"))
+/ -- Le capitaine --")

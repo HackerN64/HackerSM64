@@ -1304,10 +1304,6 @@ ALIGNED8 static const Texture texture_font_char_us_open_parentheses[] = {
 #include "textures/segment2/font_graphics.06980.ia4.inc.c"
 };
 
-ALIGNED8 static const Texture texture_font_char_us_close_open_parentheses[] = {
-#include "textures/segment2/font_graphics.069C0.ia4.inc.c"
-};
-
 ALIGNED8 static const Texture texture_font_char_us_close_parentheses[] = {
 #include "textures/segment2/font_graphics.06A00.ia4.inc.c"
 };
@@ -1576,6 +1572,7 @@ const struct Utf8CharLUTEntry main_hud_utf8_3byte_lut[] = {
     {0x203C, 12, 0, texture_hud_char_double_exclamation}, // ‼
     {0x2605, 16, 0, texture_hud_char_star}, // ★
     {0x263A, 16, 0, texture_hud_char_mario_head}, // ☺
+    {0x26BF, 16, 0, texture_hud_char_beta_key}, // ⚿
     {0x272A, 16, 0, texture_hud_char_coin}, // ✪
 };
 
@@ -1594,41 +1591,6 @@ const struct Utf8LUT main_hud_utf8_lut = {
     ARRAY_COUNT(main_hud_utf8_4byte_lut),
     &main_hud_utf8_missing_char,
 };
-
-//texture_hud_char_beta_key
-//texture_hud_char_umlaut
-
-/**
-u8 gDialogCharWidths[256] = { // TODO: Is there a way to auto generate this?
-    7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  6,  6,  6,  6,  6,  6,
-    6,  6,  5,  6,  6,  5,  8,  8,  6,  6,  6,  6,  6,  5,  6,  6,
-    8,  7,  6,  6,  6,  5,  5,  6,  5,  5,  6,  5,  4,  5,  5,  3,
-    7,  5,  5,  5,  6,  5,  5,  5,  5,  5,  7,  7,  5,  5,  4,  4,
-    8,  6,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    8,  8,  8,  8,  7,  7,  6,  7,  7,  0,  0,  0,  0,  0,  0,  0,
-#ifdef VERSION_EU
-    6,  6,  6,  0,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,  4,
-    5,  5,  5,  5,  6,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,
-    5,  5,  5,  0,  6,  6,  6,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  5,  5,  0,  0,  6,  6,  0,  0,  0,  0,  0,  0,  0,  5,  6,
-    0,  4,  4,  0,  0,  5,  5,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-#else
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  4,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  5,  6,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-#endif
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-#ifdef VERSION_EU
-    7,  5, 10,  5,  9,  8,  4,  0,  0,  0,  0,  5,  5,  6,  5,  0,
-#else
-    7,  5, 10,  5,  9,  8,  4,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-#endif
-    0,  0,  5,  7,  7,  6,  6,  8,  0,  8, 10,  6,  4, 10,  0,  0
-};**/
 
 const struct DiacriticLUTEntry main_font_diacritic_lut[] = {
     {-1, 0, texture_font_char_diacritic_grave}, // TEXT_DIACRITIC_GRAVE,
@@ -1843,142 +1805,8 @@ const struct Utf8LUT main_font_utf8_lut = {
     ARRAY_COUNT(main_font_utf8_4byte_lut),
     &main_font_utf8_missing_char,
 };
+
 /**
-// Main small font print table 0x02008338-0x02008737
-const Texture *const main_font_lut[] = {
-#ifdef VERSION_EU // EU Font Table
-    texture_font_char_eu_0, texture_font_char_eu_1, texture_font_char_eu_2, texture_font_char_eu_3,
-    texture_font_char_eu_4, texture_font_char_eu_5, texture_font_char_eu_6, texture_font_char_eu_7,
-    texture_font_char_eu_8, texture_font_char_eu_9, texture_font_char_eu_A, texture_font_char_eu_B,
-    texture_font_char_eu_C, texture_font_char_eu_D, texture_font_char_eu_E, texture_font_char_eu_F,
-    texture_font_char_eu_G, texture_font_char_eu_H, texture_font_char_eu_I, texture_font_char_eu_J,
-    texture_font_char_eu_K, texture_font_char_eu_L, texture_font_char_eu_M, texture_font_char_eu_N,
-    texture_font_char_eu_O, texture_font_char_eu_P, texture_font_char_eu_Q, texture_font_char_eu_R,
-    texture_font_char_eu_S, texture_font_char_eu_T, texture_font_char_eu_U, texture_font_char_eu_V,
-    texture_font_char_eu_W, texture_font_char_eu_X, texture_font_char_eu_Y, texture_font_char_eu_Z,
-    texture_font_char_eu_a, texture_font_char_eu_b, texture_font_char_eu_c, texture_font_char_eu_d,
-    texture_font_char_eu_e, texture_font_char_eu_f, texture_font_char_eu_g, texture_font_char_eu_h,
-    texture_font_char_eu_i, texture_font_char_eu_j, texture_font_char_eu_k, texture_font_char_eu_l,
-    texture_font_char_eu_m, texture_font_char_eu_n, texture_font_char_eu_o, texture_font_char_eu_p,
-    texture_font_char_eu_q, texture_font_char_eu_r, texture_font_char_eu_s, texture_font_char_eu_t,
-    texture_font_char_eu_u, texture_font_char_eu_v, texture_font_char_eu_w, texture_font_char_eu_x,
-    texture_font_char_eu_y, texture_font_char_eu_z, texture_font_char_eu_apostrophe, texture_font_char_eu_period,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    texture_font_char_eu_button_C_up,
-    texture_font_char_eu_button_C_down,
-    texture_font_char_eu_button_C_left,
-    texture_font_char_eu_button_C_right,
-    texture_font_char_eu_button_A,
-    texture_font_char_eu_button_B,
-    texture_font_char_eu_button_C,
-    texture_font_char_eu_button_Z,
-    texture_font_char_eu_button_R,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    texture_font_char_eu_comma,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    texture_font_char_EU_slash,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-    0x0,
-    texture_font_char_eu_open_parentheses,
-    texture_font_char_eu_close_open_parentheses,
-    texture_font_char_eu_close_parentheses,
-    texture_font_char_eu_left_right_arrow,
-    texture_font_char_eu_ampersand,
-    texture_font_char_eu_colon,
-    texture_font_char_eu_acute,
-    texture_font_char_eu_circumflex,
-    texture_font_char_eu_umlaut,
-    texture_font_char_eu_grave,
-    texture_font_char_eu_unknown,
-    texture_font_char_eu_eszeet,
-    texture_font_char_eu_Cedilla,
-    texture_font_char_eu_cedilla,
-    0x0, 0x0, 0x0,
-    texture_font_char_eu_exclamation,
-    texture_font_char_eu_percent,
-    texture_font_char_eu_question,
-    texture_font_char_eu_double_quote_open,
-    texture_font_char_eu_double_quote_close,
-    texture_font_char_eu_tilde,
-    0x0,
-    texture_font_char_eu_coin,
-    texture_font_char_eu_star_filled,
-    texture_font_char_eu_multiply,
-    texture_font_char_eu_interpunct,
-    texture_font_char_eu_star_hollow,
-    0x0, 0x0,
-#elif defined(VERSION_US) // US Font Table
-    texture_font_char_us_0, texture_font_char_us_1, texture_font_char_us_2, texture_font_char_us_3,
-    texture_font_char_us_4, texture_font_char_us_5, texture_font_char_us_6, texture_font_char_us_7,
-    texture_font_char_us_8, texture_font_char_us_9, texture_font_char_us_A, texture_font_char_us_B,
-    texture_font_char_us_C, texture_font_char_us_D, texture_font_char_us_E, texture_font_char_us_F,
-    texture_font_char_us_G, texture_font_char_us_H, texture_font_char_us_I, texture_font_char_us_J,
-    texture_font_char_us_K, texture_font_char_us_L, texture_font_char_us_M, texture_font_char_us_N,
-    texture_font_char_us_O, texture_font_char_us_P, texture_font_char_us_Q, texture_font_char_us_R,
-    texture_font_char_us_S, texture_font_char_us_T, texture_font_char_us_U, texture_font_char_us_V,
-    texture_font_char_us_W, texture_font_char_us_X, texture_font_char_us_Y, texture_font_char_us_Z,
-    texture_font_char_us_a, texture_font_char_us_b, texture_font_char_us_c, texture_font_char_us_d,
-    texture_font_char_us_e, texture_font_char_us_f, texture_font_char_us_g, texture_font_char_us_h,
-    texture_font_char_us_i, texture_font_char_us_j, texture_font_char_us_k, texture_font_char_us_l,
-    texture_font_char_us_m, texture_font_char_us_n, texture_font_char_us_o, texture_font_char_us_p,
-    texture_font_char_us_q, texture_font_char_us_r, texture_font_char_us_s, texture_font_char_us_t,
-    texture_font_char_us_u, texture_font_char_us_v, texture_font_char_us_w, texture_font_char_us_x,
-    texture_font_char_us_y, texture_font_char_us_z, texture_font_char_us_apostrophe, texture_font_char_us_period,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-    texture_font_char_us_button_C_up, texture_font_char_us_button_C_down, texture_font_char_us_button_C_left, texture_font_char_us_button_C_right,
-    texture_font_char_us_button_A, texture_font_char_us_button_B, texture_font_char_us_button_C, texture_font_char_us_button_Z,
-    texture_font_char_us_button_R,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0, texture_font_char_us_comma,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0, texture_font_char_us_hyphen,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0, texture_font_char_us_open_parentheses, texture_font_char_us_close_open_parentheses, texture_font_char_us_close_parentheses,
-    texture_font_char_us_left_right_arrow, texture_font_char_us_ampersand, texture_font_char_us_colon,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0, texture_font_char_us_exclamation, texture_font_char_us_percent,
-    texture_font_char_us_question, texture_font_char_us_double_quote_open, texture_font_char_us_double_quote_close, texture_font_char_us_tilde,
-                  0x0, texture_font_char_us_coin, texture_font_char_us_star_filled, texture_font_char_us_multiply,
-    texture_font_char_us_interpunct, texture_font_char_us_star_hollow,               0x0,               0x0,
-#elif defined(VERSION_JP) || defined(VERSION_SH)
     texture_font_char_jp_0, texture_font_char_jp_1, texture_font_char_jp_2, texture_font_char_jp_3,
     texture_font_char_jp_4, texture_font_char_jp_5, texture_font_char_jp_6, texture_font_char_jp_7,
     texture_font_char_jp_8, texture_font_char_jp_9, texture_font_char_jp_A, texture_font_char_jp_B,
@@ -2043,9 +1871,9 @@ const Texture *const main_font_lut[] = {
     texture_font_char_jp_question, texture_font_char_jp_double_quotation_open, texture_font_char_jp_double_quotation_close, texture_font_char_jp_wave_dash,
     texture_font_char_jp_ellipsis, texture_font_char_jp_coin, texture_font_char_jp_star_filled, texture_font_char_jp_multiply,
     texture_font_char_jp_interpunct, texture_font_char_jp_star_hollow,                   0x0,                   0x0,
-#endif
-};
 **/
+
+// credits font LUT
 const struct AsciiCharLUTEntry main_credits_font_lut[] = {
     {NULL, 4}, // 32 " "
     {NULL, 0}, // 33 "!" (Unimplemented)
@@ -2143,22 +1971,6 @@ const struct AsciiCharLUTEntry main_credits_font_lut[] = {
     {NULL, 0}, // 125 "}" (Unimplemented)
     {NULL, 0}, // 126 "~" (Unimplemented)
 };
-    
-
-
-// credits font LUT 0x02008738-0x020087CB
-// const Texture *const main_credits_font_lut[] = {
-//                        0x0,                    0x0,                    0x0, texture_credits_char_3,
-//     texture_credits_char_4,                    0x0, texture_credits_char_6,                    0x0,
-//                        0x0,                    0x0, texture_credits_char_A, texture_credits_char_B,
-//     texture_credits_char_C, texture_credits_char_D, texture_credits_char_E, texture_credits_char_F,
-//     texture_credits_char_G, texture_credits_char_H, texture_credits_char_I, texture_credits_char_J,
-//     texture_credits_char_K, texture_credits_char_L, texture_credits_char_M, texture_credits_char_N,
-//     texture_credits_char_O, texture_credits_char_P, texture_credits_char_Q, texture_credits_char_R,
-//     texture_credits_char_S, texture_credits_char_T, texture_credits_char_U, texture_credits_char_V,
-//     texture_credits_char_W, texture_credits_char_X, texture_credits_char_Y, texture_credits_char_Z,
-//     texture_credits_char_period,
-// };
 
 // HUD camera table 0x020087CC-0x020087E3
 const Texture *const main_hud_camera_lut[] = {
@@ -2166,17 +1978,7 @@ const Texture *const main_hud_camera_lut[] = {
     texture_hud_char_arrow_up, texture_hud_char_arrow_down,
 };
 
-#define _(x) x
-// If you change the language here, the following Makefile rule also needs to
-// change, to generate the right version of define_text.inc.c:
-// $(BUILD_DIR)/bin/segment2.o: $(BUILD_DIR)/text/$(VERSION)/define_text.inc.c
-#if defined(VERSION_JP) || defined(VERSION_SH)
 #include "text/define_text.inc.c"
-#elif defined(VERSION_US)
-#include "text/define_text.inc.c"
-#endif
-
-#undef _
 
 // 0x0200EC60 - 0x0200EC98
 const Gfx dl_hud_img_begin[] = {

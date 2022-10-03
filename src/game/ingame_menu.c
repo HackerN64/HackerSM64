@@ -1200,7 +1200,7 @@ void do_cutscene_handler(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
 
-    print_generic_string_aligned(SCREEN_WIDTH/2, 13, LANGUAGE_ARRAY(*gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_WIDTH/2, 13, LANGUAGE_ARRAY(gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
