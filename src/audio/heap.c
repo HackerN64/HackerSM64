@@ -1066,9 +1066,8 @@ void init_reverb_us(s32 presetId) {
             reverbWindowSize = betterReverbWindowsSize;
     } else {
         toggleBetterReverb = TRUE;
+        gReverbDownsampleRate = (1 << (betterReverbDownsampleRate - 1));
 
-        if (gReverbDownsampleRate < (1 << (betterReverbDownsampleRate - 1)))
-            gReverbDownsampleRate = (1 << (betterReverbDownsampleRate - 1));
         if (betterReverbWindowsSize >= 0) {
             reverbWindowSize = betterReverbWindowsSize;
             reverbWindowSize /= gReverbDownsampleRate;
