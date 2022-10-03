@@ -1235,7 +1235,7 @@ s32 update_text_fade_out(void) {
  * Prints the amount of stars of a save file.
  * If a save doesn't exist, print "NEW" instead.
  */
-char *textNew = LANGUAGE_TEXT(
+langarray_t textNew = LANGUAGE_TEXT(
     "NEW",
     "VIDE",
     "FREI",
@@ -1261,70 +1261,76 @@ void print_save_file_star_count(s8 fileIndex, s16 x, s16 y) {
     }
 }
 
-char *textSelectFile = LANGUAGE_TEXT(
+langarray_t textSelectFile = LANGUAGE_TEXT(
     "SELECT FILE",
     "CHOISIR  FICHIER",
     "WÄHLE SPIEL",
     "ファイルセレクト");
 
-char *textScore = LANGUAGE_TEXT(
+langarray_t textScore = LANGUAGE_TEXT(
     "SCORE",
     "SCORE",
     "LEISTUNG",
     "スコア");
 
-char *textCopy = LANGUAGE_TEXT(
+langarray_t textCopy = LANGUAGE_TEXT(
     "COPY",
     "COPIER",
     "KOPIEREN",
     "コピー");
 
-char *textErase = LANGUAGE_TEXT(
+langarray_t textErase = LANGUAGE_TEXT(
     "ERASE",
     "EFFACER",
     "LÖSCHEN",
     "けす");
 
-char *textMarioA = LANGUAGE_TEXT(
+langarray_t textMarioA = LANGUAGE_TEXT(
     "MARIO A",
     "MARIO A",
     "MARIO A",
     "マリオＡ");
 
-char *textMarioB = LANGUAGE_TEXT(
+langarray_t textMarioB = LANGUAGE_TEXT(
     "MARIO B",
     "MARIO B",
     "MARIO B",
     "マリオＢ");
 
-char *textMarioC = LANGUAGE_TEXT(
+langarray_t textMarioC = LANGUAGE_TEXT(
     "MARIO C",
     "MARIO C",
     "MARIO C",
     "マリオＣ");
 
-char *textMarioD = LANGUAGE_TEXT(
+langarray_t textMarioD = LANGUAGE_TEXT(
     "MARIO D",
     "MARIO D",
     "MARIO D",
     "マリオＤ");
 
-char *textSoundModes[] = {
-    LANGUAGE_TEXT(
-        "STEREO",
-        "STÉRÉO",
-        "STEREO",
-        "ステレオ"),
-    LANGUAGE_TEXT(
-        "MONO",
-        "MONO",
-        "MONO",
-        "モノラル"),
-    LANGUAGE_TEXT(
-        "HEADSET",
-        "CASQUE",
-        "PHONES",
-        "ヘッドホン"),
+langarray_t textSoundModeStereo = LANGUAGE_TEXT(
+    "STEREO",
+    "STÉRÉO",
+    "STEREO",
+    "ステレオ");
+
+langarray_t textSoundModeMono = LANGUAGE_TEXT(
+    "MONO",
+    "MONO",
+    "MONO",
+    "モノラル");
+
+langarray_t textSoundModeHeadset = LANGUAGE_TEXT(
+    "HEADSET",
+    "CASQUE",
+    "PHONES",
+    "ヘッドホン");
+
+langarray_t *textSoundModes[] = {
+    &textSoundModeStereo,
+    &textSoundModeMono,
+    &textSoundModeHeadset
 };
 
 /**
@@ -1338,7 +1344,7 @@ void print_main_menu_strings(void) {
     // Print "SELECT FILE" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_hud_lut_string_aligned(SCREEN_WIDTH/2, 35, textSelectFile, TEXT_ALIGN_CENTER);
+    print_hud_lut_string_aligned(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textSelectFile), TEXT_ALIGN_CENTER);
     // Print file star counts
     print_save_file_star_count(SAVE_FILE_A, 92, 78);
     print_save_file_star_count(SAVE_FILE_B, 209, 78);
@@ -1363,13 +1369,13 @@ void print_main_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
-char *textCheckFile = LANGUAGE_TEXT(
+langarray_t textCheckFile = LANGUAGE_TEXT(
     "CHECK FILE",
     "VOIR  SCORE",
     "VON WELCHEM SPIEL",
     "どのスコアをみる？");
 
-char *textNoSavedDataExists = LANGUAGE_TEXT(
+langarray_t textNoSavedDataExists = LANGUAGE_TEXT(
     "NO SAVED DATA EXISTS",
     "AUCUNE SAUVEGARDE DISPONIBLE",
     "KEIN SPIEL VORHANDEN",
@@ -1396,22 +1402,22 @@ void score_menu_display_message(s8 messageID) {
 
 #define FADEOUT_TIMER 20
 
-char *textReturn = LANGUAGE_TEXT(
+langarray_t textReturn = LANGUAGE_TEXT(
     "RETURN",
     "RETOUR",
     "ZURÜCK",
     "もどる");
 
-char *textCopyFileButton = LANGUAGE_TEXT(
+langarray_t textCopyFileButton = LANGUAGE_TEXT(
     "COPY FILE",
-    "COPIER  FICHIER",
-    "SPIEL KOPIEREN",
+    "COPIER",
+    "KOPIEREN",
     "ファイルコピー");
 
-char *textEraseFileButton = LANGUAGE_TEXT(
+langarray_t textEraseFileButton = LANGUAGE_TEXT(
     "ERASE FILE",
-    "EFFACER  FICHIER",
-    "SPIEL LÖSCHEN",
+    "EFFACER",
+    "LÖSCHEN",
     "ファイルけす");
 
 /**
@@ -1461,31 +1467,31 @@ void print_score_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
-char *textCopyFile = LANGUAGE_TEXT(
+langarray_t textCopyFile = LANGUAGE_TEXT(
     "COPY FILE",
-    "COPIER",
-    "KOPIEREN",
+    "COPIER  FICHIER",
+    "SPIEL KOPIEREN",
     "ファイルコピーする");
 
-char *textCopyItToWhere = LANGUAGE_TEXT(
+langarray_t textCopyItToWhere = LANGUAGE_TEXT(
     "COPY IT TO WHERE?",
     "COPIER SUR?",
     "WOHIN KOPIEREN?",
     "どこにコピーしますか？");
 
-char *textCopyCompleted = LANGUAGE_TEXT(
+langarray_t textCopyCompleted = LANGUAGE_TEXT(
     "COPYING COMPLETED",
     "COPIE ACHEVEÉ",
     "SPIEL KOPIERT",
     "コピーおわりました");
 
-char *textSavedDataExists = LANGUAGE_TEXT(
+langarray_t textSavedDataExists = LANGUAGE_TEXT(
     "SAVED DATA EXISTS",
     "SAVEGARDE EXISTANTE",
     "BEREITS BELEGT",
     "ファイルにデータがはいってます");
 
-char *textNoFileToCopyFrom = LANGUAGE_TEXT(
+langarray_t textNoFileToCopyFrom = LANGUAGE_TEXT(
     "NO EMPTY FILE",
     "AUCUN FICHIER VIDE",
     "KEIN PLATZ VORHANDEN",
@@ -1564,7 +1570,7 @@ void copy_menu_update_message(void) {
     }
 }
 
-char *textViewScore = LANGUAGE_TEXT(
+langarray_t textViewScore = LANGUAGE_TEXT(
     "CHECK SCORE",
     "SCORE",
     "LEISTUNG",
@@ -1607,13 +1613,13 @@ void print_copy_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
-char *textYes = LANGUAGE_TEXT(
+langarray_t textYes = LANGUAGE_TEXT(
     "YES",
     "OUI",
     "JA",
     "はい");
 
-char *textNo = LANGUAGE_TEXT(
+langarray_t textNo = LANGUAGE_TEXT(
     "NO",
     "NON",
     "NEIN",
@@ -1687,19 +1693,19 @@ void print_erase_menu_prompt(s16 x, s16 y) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-char *textEraseFile = LANGUAGE_TEXT(
+langarray_t textEraseFile = LANGUAGE_TEXT(
     "ERASE FILE",
-    "EFFACER",
-    "LÖSCHEN",
+    "EFFACER  FICHIER",
+    "SPIEL LÖSCHEN",
     "ファイルけす");
 
-char *textSure = LANGUAGE_TEXT(
+langarray_t textSure = LANGUAGE_TEXT(
     "SURE?",
     "OK?",
     "SICHER?",
     "ほんと？");
 
-char *textMarioXJustErased = LANGUAGE_TEXT(
+langarray_t textMarioXJustErased = LANGUAGE_TEXT(
     "MARIO %s JUST ERASED",
     "MARIO %s EFFACÉ",
     "MARIO %s GELÖSCHT",
@@ -1810,20 +1816,20 @@ void print_erase_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);
 }
 
-char textSoundSelect[] = LANGUAGE_TEXT(
+langarray_t textSoundSelect = LANGUAGE_TEXT(
     "SOUND SELECT",
     "SON",
     "SOUND",
     "サウンドセレクト");
 
 #if MULTILANG
-char *textLanguageSelect = LANGUAGE_TEXT(
+langarray_t textLanguageSelect = LANGUAGE_TEXT(
     "LANGUAGE SELECT",
     "SELECTION LANGUE",
     "WwHLE SPRACHE",
     ""); // no japanese translation
 
-char *textLanguage[] = {
+langarray_t textLanguage = {
     "ENGLISH",
     "FRANÇAIS",
     "DEUTSCH",
@@ -1860,7 +1866,7 @@ void print_sound_mode_menu_strings(void) {
         } else {
             gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
         }
-        print_generic_string_aligned(textX, 87, LANGUAGE_ARRAY(textSoundModes[mode]), TEXT_ALIGN_CENTER);
+        print_generic_string_aligned(textX, 87, LANGUAGE_ARRAY(*textSoundModes[mode]), TEXT_ALIGN_CENTER);
     }
 
 #if MULTILANG
@@ -1893,7 +1899,7 @@ void print_score_file_castle_secret_stars(s8 fileIndex, s16 x, s16 y) {
     print_menu_generic_string(x, y, secretStarsText);
 }
 
-char textMarioFace[] = LANGUAGE_TEXT(
+langarray_t textMarioFace = LANGUAGE_TEXT(
     "{}%s",
     "{}%s",
     "{}%s",
@@ -1961,19 +1967,19 @@ void print_score_file_star_score(s8 fileIndex, s16 courseIndex, s16 x, s16 y) {
     print_menu_generic_string(x, y, starScoreText);
 }
 
-char *textScoreMenuMarioX = LANGUAGE_TEXT(
+langarray_t textScoreMenuMarioX = LANGUAGE_TEXT(
     "MARIO %s",
     "MARIO %s",
     "MARIO %s",
     "マリオ%s");
 
-char *textHiScore = LANGUAGE_TEXT(
+langarray_t textHiScore = LANGUAGE_TEXT(
     "HI SCORE",
     "MEILLEUR SCORE",
     "BESTLEISTUNG",
     "ハイスコア");
 
-extern char *textMyScore;
+extern langarray_t textMyScore;
 
 /**
  * Prints save file score strings that shows when a save file is chosen inside the score menu.

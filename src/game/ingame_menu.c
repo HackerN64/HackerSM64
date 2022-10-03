@@ -980,53 +980,70 @@ void handle_special_dialog_text(s16 dialogID) { // dialog ID tables, in order
 
 s16 gMenuMode = MENU_MODE_NONE;
 
-char *gEndCutsceneStringsEn[] = {
-    LANGUAGE_TEXT(
-        "Mario!",
-        "Mario!",
-        "Mario!",
-        "マリオ！！"),
-    LANGUAGE_TEXT(
-        "The power of the Stars is restored to the castle...",
-        "Grâce aux étoiles, le château a retrouvé ses pouvoirs...",
-        "Die Macht der Sterne ruht wieder sicher im Schloss...",
-        "おしろにスターが　もどったのね"),
-    LANGUAGE_TEXT(
-        "...and it's all thanks to you!",
-        "...et ceci grâce à toi!",
-        "...und alles dank Deiner Hilfe!",
-        "みんな　あなたのおかげだわ！"),
-    LANGUAGE_TEXT(
-        "Thank you, Mario!",
-        "Merci, Mario!",
-        "Vielen Dank, Mario!",
-        "ありがとう　マリオ"),
-    LANGUAGE_TEXT(
-        "We have to do something special for you...",
-        "Tu mérites une récompense...",
-        "Wir haben eine Überraschung für Dich...",
-        "なにか　おれいをしなくちゃ・・"),
-    LANGUAGE_TEXT(
-        "Listen, everybody,",
-        "Venez les amis...",
-        "Hört alle her...",
-        "さあ　みんな"),
-    LANGUAGE_TEXT(
-        "let's bake a delicious cake...",
-        "Allons préparer un délicieux gâteau...",
-        "Laßt uns einen leckeren Kuchen backen...",
-        "おいしいケーキを　やきましょう"),
-    LANGUAGE_TEXT(
-        "...for Mario...",
-        "...pour Mario...",
-        "...für Mario...",
-        "マリオの　ために・・・"),
-    LANGUAGE_TEXT(
-        "Mario!",
-        "Mario!",
-        "Mario!",
-        "マリオ！！"),
-    NULL,
+langarray_t textEndCutscene1 = LANGUAGE_TEXT(
+    "Mario!",
+    "Mario!",
+    "Mario!",
+    "マリオ！！");
+
+langarray_t textEndCutscene2 = LANGUAGE_TEXT(
+    "The power of the Stars is restored to the castle...",
+    "Grâce aux étoiles, le château a retrouvé ses pouvoirs...",
+    "Die Macht der Sterne ruht wieder sicher im Schloss...",
+    "おしろにスターが　もどったのね");
+
+langarray_t textEndCutscene3 = LANGUAGE_TEXT(
+    "...and it's all thanks to you!",
+    "...et ceci grâce à toi!",
+    "...und alles dank Deiner Hilfe!",
+    "みんな　あなたのおかげだわ！");
+
+langarray_t textEndCutscene4 = LANGUAGE_TEXT(
+    "Thank you, Mario!",
+    "Merci, Mario!",
+    "Vielen Dank, Mario!",
+    "ありがとう　マリオ");
+
+langarray_t textEndCutscene5 = LANGUAGE_TEXT(
+    "We have to do something special for you...",
+    "Tu mérites une récompense...",
+    "Wir haben eine Überraschung für Dich...",
+    "なにか　おれいをしなくちゃ・・");
+
+langarray_t textEndCutscene6 = LANGUAGE_TEXT(
+    "Listen, everybody,",
+    "Venez les amis...",
+    "Hört alle her...",
+    "さあ　みんな");
+
+langarray_t textEndCutscene7 = LANGUAGE_TEXT(
+    "let's bake a delicious cake...",
+    "Allons préparer un délicieux gâteau...",
+    "Laßt uns einen leckeren Kuchen backen...",
+    "おいしいケーキを　やきましょう");
+
+langarray_t textEndCutscene8 = LANGUAGE_TEXT(
+    "...for Mario...",
+    "...pour Mario...",
+    "...für Mario...",
+    "マリオの　ために・・・");
+
+langarray_t textEndCutscene9 = LANGUAGE_TEXT(
+    "Mario!",
+    "Mario!",
+    "Mario!",
+    "マリオ！！");
+
+langarray_t *gEndCutsceneStringsEn[] = {
+    &textEndCutscene1,
+    &textEndCutscene2,
+    &textEndCutscene3,
+    &textEndCutscene4,
+    &textEndCutscene5,
+    &textEndCutscene6,
+    &textEndCutscene7,
+    &textEndCutscene8,
+    &textEndCutscene9
 };
 
 u16 gCutsceneMsgFade        =  0;
@@ -1177,13 +1194,13 @@ void do_cutscene_handler(void) {
     if (gCutsceneMsgIndex == -1) {
         return;
     }
-    
+
     create_dl_ortho_matrix();
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
 
-    print_generic_string_aligned(SCREEN_WIDTH/2, 13, gEndCutsceneStringsEn[gCutsceneMsgIndex], TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_WIDTH/2, 13, LANGUAGE_ARRAY(*gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
@@ -1398,13 +1415,13 @@ void render_widescreen_setting(void) {
 }
 #endif
 
-char *textCourseX = LANGUAGE_TEXT(
+langarray_t textCourseX = LANGUAGE_TEXT(
     "COURSE %d",
     "NIVEAU %d",
     "KURS %d",
     "コース%d");
 
-char *textMyScore = LANGUAGE_TEXT(
+langarray_t textMyScore = LANGUAGE_TEXT(
     "MY SCORE",
     "MON SCORE",
     "LEISTUNG",
@@ -1466,25 +1483,25 @@ void render_pause_my_score_coins(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-char *textLakituMario = LANGUAGE_TEXT(
+langarray_t textLakituMario = LANGUAGE_TEXT(
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "LAKITU ↔ MARIO",
     "ジュゲム↔マリオ");
 
-char *textLakituStop = LANGUAGE_TEXT(
+langarray_t textLakituStop = LANGUAGE_TEXT(
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "LAKITU ↔ STOP",
     "ジュゲム↔ストップ");
 
-char *textNormalUpClose = LANGUAGE_TEXT(
+langarray_t textNormalUpClose = LANGUAGE_TEXT(
     "(NORMAL)(UP-CLOSE)",
     "(NORMAL)(GROS-PLAN)",
     "(NORMAL)(WEIT-ZOOM)",
     "（おすすめ）（リアル）");
 
-char *textNormalFixed = LANGUAGE_TEXT(
+langarray_t textNormalFixed = LANGUAGE_TEXT(
     "(NORMAL)(FIXED)",
     "(NORMAL)(FIXE)",
     "(NORMAL)(STATIV)",
@@ -1517,19 +1534,19 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     }
 }
 
-char *textContinue = LANGUAGE_TEXT(
+langarray_t textContinue = LANGUAGE_TEXT(
     "CONTINUE",
     "CONTINUER",
     "WEITER",
     "つづけて　マリオする？");
 
-char *textExitCourse = LANGUAGE_TEXT(
+langarray_t textExitCourse = LANGUAGE_TEXT(
     "EXIT COURSE",
     "QUITTER NIVEAU",
     "KURS VERLASSEN",
     "コースからでる？");
 
-char *textCameraAngleR = LANGUAGE_TEXT(
+langarray_t textCameraAngleR = LANGUAGE_TEXT(
     "SET CAMERA ANGLE WITH Ⓡ",
     "RÉGLAGE CAMÉRA AVEC Ⓡ",
     "KAMERA MIT Ⓡ VERSTELLEN",
@@ -1801,13 +1818,13 @@ enum HUDCourseCompleteStringIDs {
     HUD_PRINT_CONGRATULATIONS
 };
 
-char *textHudHiScore = LANGUAGE_TEXT(
+langarray_t textHudHiScore = LANGUAGE_TEXT(
     "HI SCORE",
     "MEILLEUR SCORE",
     "BESTLEISTUNG",
     "HISCORE");
 
-char *textCongratulations = LANGUAGE_TEXT(
+langarray_t textCongratulations = LANGUAGE_TEXT(
     "CONGRATULATIONS",
     "FELICITATIONS",
     "GRATULATION",
@@ -1872,7 +1889,7 @@ void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
     }
 }
 
-char *textClear = LANGUAGE_TEXT(
+langarray_t textClear = LANGUAGE_TEXT(
     "CLEAR",
     "CLEAR",
     "CLEAR",
@@ -1929,10 +1946,10 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 
         gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, gDialogTextAlpha);
         print_generic_string(CONGRATULATIONS_COURSE_X + 2, CONGRATULATIONS_COURSE_Y - 2, name);
-        print_generic_string(clearX                   + 2, CONGRATULATIONS_COURSE_Y - 2, textClear);
+        print_generic_string(clearX                   + 2, CONGRATULATIONS_COURSE_Y - 2, LANGUAGE_ARRAY(textClear));
         gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
         print_generic_string(CONGRATULATIONS_COURSE_X,     CONGRATULATIONS_COURSE_Y,     name);
-        print_generic_string(clearX,                       CONGRATULATIONS_COURSE_Y,     textClear);
+        print_generic_string(clearX,                       CONGRATULATIONS_COURSE_Y,     LANGUAGE_ARRAY(textClear));
         gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
         print_hud_course_complete_string(HUD_PRINT_CONGRATULATIONS);
@@ -1966,19 +1983,19 @@ void render_course_complete_lvl_info_and_hud_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 }
 
-char *textSaveAndContinue = LANGUAGE_TEXT(
+langarray_t textSaveAndContinue = LANGUAGE_TEXT(
     "SAVE & CONTINUE",
     "SAUVEGARDER & CONTINUER",
     "SPEICHERN & WEITER",
     "セーブしてつづける？");
 
-char *textSaveAndQuit = LANGUAGE_TEXT(
+langarray_t textSaveAndQuit = LANGUAGE_TEXT(
     "SAVE & QUIT",
     "SAUVEGARDER & QUITTER",
     "SPEICHERN & ENDE",
     "セーブしておわる？");
 
-char *textContinueWithoutSave = LANGUAGE_TEXT(
+langarray_t textContinueWithoutSave = LANGUAGE_TEXT(
     "CONTINUE, DON'T SAVE",
     "CONTINUER SANS SAUVEGARDER",
     "WEITER OHNE ZU SPEICHERN",

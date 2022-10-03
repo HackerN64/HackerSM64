@@ -443,11 +443,12 @@ void render_hud_keys(void) {
     }
 }
 
-char *textTime = LANGUAGE_TEXT(
+langarray_t textTime = LANGUAGE_TEXT(
     " TIME",
     "TEMPS",
     " ZEIT",
     " TIME");
+
 /**
  * Renders the timer when Mario start sliding in PSS.
  */

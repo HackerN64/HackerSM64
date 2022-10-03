@@ -2425,7 +2425,7 @@ static void end_peach_cutscene_run_to_castle(struct MarioState *m) {
     }
 
     if (m->actionTimer == 95) {
-        set_cutscene_message(0, 40);
+        set_cutscene_message(8, 40);
 #ifndef VERSION_JP
         play_sound(SOUND_PEACH_MARIO2, sEndPeachObj->header.gfx.cameraToObject);
 #endif
