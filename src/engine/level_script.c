@@ -540,12 +540,12 @@ static void level_cmd_create_instant_warp(void) {
 
         warp = gAreas[sCurrAreaIndex].instantWarps + CMD_GET(u8, 2);
 
-        warp[0].id = 1;
+        warp[0].id = SURFACE_INSTANT_WARP_1B + CMD_GET(u8, 2);
         warp[0].area = CMD_GET(u8, 3);
 
-        vec3s_set(warp[0].displacement, CMD_GET(s16, 4),
-                                        CMD_GET(s16, 6),
-                                        CMD_GET(s16, 8));
+        warp[0].displacement[0] = CMD_GET(s32, 4);
+        warp[0].displacement[1] = CMD_GET(s32, 8);
+        warp[0].displacement[2] = CMD_GET(s32, 12);
     }
 
     sCurrentCmd = CMD_NEXT;
