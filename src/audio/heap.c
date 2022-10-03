@@ -1059,8 +1059,11 @@ void init_reverb_us(s32 presetId) {
     betterReverbGainIndex = betterReverbPreset->gainIndex;
     gReverbMultsL = betterReverbPreset->reverbMultsL;
     gReverbMultsR = betterReverbPreset->reverbMultsR;
+
     if (betterReverbDownsampleRate <= 0) {
         toggleBetterReverb = FALSE;
+        if (betterReverbWindowsSize >= 0)
+            reverbWindowSize = betterReverbWindowsSize;
     } else {
         toggleBetterReverb = TRUE;
 
@@ -1069,9 +1072,8 @@ void init_reverb_us(s32 presetId) {
         if (betterReverbWindowsSize >= 0) {
             reverbWindowSize = betterReverbWindowsSize;
             reverbWindowSize /= gReverbDownsampleRate;
-            if (reverbWindowSize < DEFAULT_LEN_2CH && betterReverbWindowsSize != 0) { // Minimum window size to not overflow
+            if (reverbWindowSize < DEFAULT_LEN_2CH && betterReverbWindowsSize != 0) // Minimum window size to not overflow
                 reverbWindowSize = DEFAULT_LEN_2CH;
-            }
         }
     }
 #endif
