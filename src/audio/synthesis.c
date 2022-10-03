@@ -465,7 +465,7 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
         gCurrentLeftVolRamping = leftVolRamp;
         gCurrentRightVolRamping = rightVolRamp;
         for (j = 0; j < gNumSynthesisReverbs; j++) {
-            if (gSynthesisReverbs[j].useReverb != 0) {
+            if (gSynthesisReverbs[j].useReverb) {
                 prepare_reverb_ring_buffer(chunkLen, gAudioBufferParameters.updatesPerFrame - i, j);
             }
         }
@@ -533,7 +533,7 @@ u64 *synthesis_execute(u64 *cmdBuf, s32 *writtenCmds, s16 *aiBuf, s32 bufLen) {
             }
         }
         process_sequences(i - 1);
-        if (gSynthesisReverb.useReverb != 0) {
+        if (gSynthesisReverb.useReverb) {
             prepare_reverb_ring_buffer(chunkLen, gAudioUpdatesPerFrame - i);
         }
         cmd = synthesis_do_one_audio_update((s16 *) aiBufPtr, chunkLen, cmd, gAudioUpdatesPerFrame - i);
@@ -593,7 +593,7 @@ u64 *synthesis_save_reverb_samples(u64 *cmd, s16 reverbIndex, s16 updateIndex) {
     struct ReverbRingBufferItem *item;
 
     item = &gSynthesisReverbs[reverbIndex].items[gSynthesisReverbs[reverbIndex].curFrame][updateIndex];
-    if (gSynthesisReverbs[reverbIndex].useReverb != 0) {
+    if (gSynthesisReverbs[reverbIndex].useReverb) {
         switch (gSynthesisReverbs[reverbIndex].downsampleRate) {
             case 1:
                 // Put the oldest samples in the ring buffer into the wet channels
@@ -653,7 +653,7 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
     i = 0;
     for (j = 0; j < gNumSynthesisReverbs; j++) {
         gUseReverb = gSynthesisReverbs[j].useReverb;
-        if (gUseReverb != 0) {
+        if (gUseReverb) {
             cmd = synthesis_resample_and_mix_reverb(cmd, bufLen, j, updateIndex);
         }
         for (; i < notePos; i++) {
@@ -668,7 +668,7 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
                 break;
             }
         }
-        if (gSynthesisReverbs[j].useReverb != 0) {
+        if (gSynthesisReverbs[j].useReverb) {
             cmd = synthesis_save_reverb_samples(cmd, j, updateIndex);
         }
     }
@@ -699,7 +699,7 @@ u64 *synthesis_do_one_audio_update(s16 *aiBuf, s32 bufLen, u64 *cmd, s32 updateI
 
     v1 = &gSynthesisReverb.items[gSynthesisReverb.curFrame][updateIndex];
 
-    if (gSynthesisReverb.useReverb == 0) {
+    if (!gSynthesisReverb.useReverb) {
         aClearBuffer(cmd++, DMEM_ADDR_LEFT_CH, DEFAULT_LEN_2CH);
         cmd = synthesis_process_notes(aiBuf, bufLen, cmd);
     } else {
