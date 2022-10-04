@@ -1186,7 +1186,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
                                                     (y + textPos[1] + offsetY) << 2,
                                                     (x + textPos[0] + 8) << 2,
                                                     (y + textPos[1] + offsetY + 12) << 2,
-                                                    G_TX_RENDERTILE, (textX << 6), 0, 1024, 1024);
+                                                    G_TX_RENDERTILE, (textX << 6) + 1, 0, 1024, 1024);
         textPos[0] += (spaceX + 1);
     }
 
