@@ -395,7 +395,7 @@ void render_game(void) {
 
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         render_text_labels();
-#ifdef PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT
         puppyprint_print_deferred();
 #endif
         do_cutscene_handler();
@@ -431,7 +431,7 @@ void render_game(void) {
         }
     } else {
         render_text_labels();
-#ifdef PUPPYPRINT_DEBUG
+#ifdef PUPPYPRINT
         puppyprint_print_deferred();
 #endif
         if (gViewportClip != NULL) {

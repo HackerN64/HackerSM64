@@ -1347,7 +1347,7 @@ void puppycam_loop(void) {
         // Sets this before going through any possible modifications.
         gPuppyCam.flags = gPuppyCam.intendedFlags;
 #ifdef PUPPYPRINT_DEBUG
-        if (sPPDebugPage == 7)
+        if (sPPDebugPage == PUPPYPRINT_PAGE_CAMERA)
             gPuppyCam.flags |= PUPPYCAM_BEHAVIOUR_FREE | PUPPYCAM_BEHAVIOUR_PITCH_ROTATION | PUPPYCAM_BEHAVIOUR_YAW_ROTATION;
 #endif
         puppycam_input_core();

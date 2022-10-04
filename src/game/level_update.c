@@ -996,14 +996,17 @@ s32 play_mode_normal(void) {
     warp_area();
     check_instant_warp();
 
-    if (sTimerRunning && gHudDisplay.timer < 17999) {
-        gHudDisplay.timer++;
-    }
 #ifdef PUPPYPRINT_DEBUG
     if (sPPDebugPage != PUPPYPRINT_PAGE_RAM && sPPDebugPage != PUPPYPRINT_PAGE_LEVEL_SELECT) {
+        if (sTimerRunning && gHudDisplay.timer < 17999) {
+            gHudDisplay.timer++;
+        }
         area_update_objects();
     }
 #else
+    if (sTimerRunning && gHudDisplay.timer < 17999) {
+        gHudDisplay.timer++;
+    }
     area_update_objects();
 #endif
     update_hud_values();

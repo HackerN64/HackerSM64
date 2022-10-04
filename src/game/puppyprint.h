@@ -3,8 +3,7 @@
 #include "segment2.h"
 #include "profiling.h"
 
-// This is how many indexes of timers are saved at once. higher creates a smoother average, but naturally uses more RAM. 15's fine.
-// #define NUM_PERF_ITERATIONS   15
+// This is how many indexes of timers are saved at once. higher creates a smoother average, but naturally uses more RAM. 32's fine.
 #define NUM_PERF_ITERATIONS   32
 #define PERF_AGGREGATE NUM_PERF_ITERATIONS
 #define PERF_TOTAL NUM_PERF_ITERATIONS + 1
@@ -118,3 +117,5 @@ extern void set_segment_memory_printout(u32 segment, u32 amount);
 extern void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 font);
 extern void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font);
 void puppyprint_profiler_process(void);
+s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
+void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font);

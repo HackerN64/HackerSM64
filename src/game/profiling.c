@@ -101,10 +101,9 @@ void profiler_collision_completed() {
 }
 
 u32 profiler_get_delta(enum ProfilerDeltaTime which) {
-    switch (which) {
-        case PROFILER_DELTA_COLLISION:
-            return collision_time;
-        default:
+    if (which == PROFILER_DELTA_COLLISION) {
+        return collision_time;
+    } else {
         return 0;
     }
 }
@@ -154,7 +153,6 @@ static void update_rdp_timers() {
     if (gGlobalTimer > 5) {
         IO_WRITE(DPC_STATUS_REG, (DPC_CLR_CLOCK_CTR | DPC_CLR_CMD_CTR | DPC_CLR_PIPE_CTR | DPC_CLR_TMEM_CTR));
     }
-
 
     buffer_update(&all_profiling_data[PROFILER_TIME_TMEM], tmem, profile_buffer_index);
     buffer_update(&all_profiling_data[PROFILER_TIME_CMD], cmd, profile_buffer_index);
@@ -217,7 +215,7 @@ void profiler_print_times() {
     update_total_timer();
     update_rdp_timers();
 
-#ifdef PUPPYPRINT_DEBUG
+#ifndef PUPPYPRINT_DEBUG
     static u8 show_profiler = 0;
     if (gPlayer1Controller->buttonPressed & L_TRIG) {
         show_profiler ^= 1;

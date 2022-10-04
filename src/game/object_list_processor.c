@@ -622,9 +622,6 @@ UNUSED static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  * and object surface management.
  */
 void update_objects(UNUSED s32 unused) {
-    //s64 cycleCounts[30];
-
-    // cycleCounts[0] = get_current_clock();
 
     gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
 
@@ -655,7 +652,8 @@ void update_objects(UNUSED s32 unused) {
     // Update all other objects that haven't been updated yet
     update_non_terrain_objects();
     
-    u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
+    // Take a snapshot of the current collision processing time.
+    u32 firstPoint = profiler_get_delta(PROFILER_DELTA_COLLISION);
 
     // Unload any objects that have been deactivated
     unload_deactivated_objects();
@@ -674,5 +672,6 @@ void update_objects(UNUSED s32 unused) {
     }
 
     gPrevFrameObjectCount = gObjectCounter;
-    profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
+    // Set the recorded behaviour time, minus the difference between the snapshotted collision time and the actual collision time.
+    profiler_update(PROFILER_TIME_BEHAVIOR_AFTER_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - firstPoint);
 }

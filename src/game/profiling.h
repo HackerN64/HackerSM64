@@ -84,11 +84,13 @@ static ALWAYS_INLINE void profiler_rsp_yielded() {
 #define profiler_audio_started()
 #define profiler_audio_completed()
 #define profiler_rsp_yielded()
-#define profiler_collision_reset();
-#define profiler_collision_completed();
-#define profiler_collision_update(time);
-#define profiler_update_delta(which, time);
+#define profiler_collision_reset()
+#define profiler_collision_completed()
+#define profiler_collision_update(time)
 #define profiler_get_delta(which) 0
+#define profiler_get_cpu_microseconds() 0
+#define profiler_get_rsp_microseconds() 0
+#define profiler_get_rdp_microseconds() 0
 #endif
 
 #endif

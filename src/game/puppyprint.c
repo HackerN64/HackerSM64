@@ -61,24 +61,16 @@ ColorRGBA gCurrEnvCol;
 
 #ifdef PUPPYPRINT_DEBUG
 
-#define GENERAL_PAGE_TEXT_LENGTH 200
-
 s8 logViewer    = FALSE;
 u8 sPPDebugPage = 0;
 u8 sDebugMenu   = FALSE;
 u8 sDebugOption = 0;
 s32 ramsizeSegment[NUM_TLB_SEGMENTS + 1] = {
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0
 };
 s32 mempool;
 u32 gPoolMem;
@@ -86,8 +78,10 @@ u32 gPPSegScroll = 0;
 u32 gMiscMem = 0;
 struct CallCounter gPuppyCallCounter;
 
+#define NUM_RAM_CHARS 32
+
 // Another epic lookup table, for text this time.
-const char ramNames[][32] = {
+const char ramNames[][NUM_RAM_CHARS] = {
     "Buffers",
     "Main",
     "Engine",
@@ -113,7 +107,7 @@ enum RamNames {
     RAM_AUDIO
 };
 
-const char segNames[][32] = {
+const char segNames[][NUM_RAM_CHARS] = {
     "HUD",
     "Common1 GFX",
     "Group0 GFX",
@@ -140,10 +134,10 @@ const char segNames[][32] = {
     "Languages"
 };
 
-const s8 nameTable = sizeof(ramNames) / 32;
+const s8 nameTable = sizeof(ramNames) / NUM_RAM_CHARS;
 
 void puppyprint_calculate_ram_usage(void) {
-    ramsizeSegment[RAM_BUFFERS] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - sizeof(gAudioHeap);
+    ramsizeSegment[RAM_BUFFERS] = (u32)&_buffersSegmentBssEnd - (u32)&_buffersSegmentBssStart - gAudioHeapSize;
     ramsizeSegment[RAM_MAIN] = (u32)&_mainSegmentEnd - (u32)&_mainSegmentStart;
     ramsizeSegment[RAM_ENGINE] = (u32)&_engineSegmentEnd - (u32)&_engineSegmentStart;
     ramsizeSegment[RAM_FRAMEBUFFERS] = (u32)&_framebuffersSegmentBssEnd - (u32)&_framebuffersSegmentBssStart;
@@ -152,7 +146,7 @@ void puppyprint_calculate_ram_usage(void) {
     ramsizeSegment[RAM_POOLS] = gPoolMem;
     ramsizeSegment[RAM_COLLISION] = ((u32) gCurrStaticSurfacePoolEnd - (u32) gCurrStaticSurfacePool) + ((u32) gDynamicSurfacePoolEnd - (u32) gDynamicSurfacePool);
     ramsizeSegment[RAM_MISC] = gMiscMem;
-    ramsizeSegment[RAM_AUDIO] = gAudioHeapSize + gAudioInitPoolSize;
+    ramsizeSegment[RAM_AUDIO] = gAudioHeapSize;
 }
 
 #ifdef PUPPYPRINT_DEBUG_CYCLES
@@ -217,13 +211,13 @@ void sort_numbers(s32 *values, u8 *values2)
     int i, j, min_idx;
 
     // One by one move boundary of unsorted subarray
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < NUM_TLB_SEGMENTS; i++) {
 
         if (values[i] == 0)
             continue;
         // Find the minimum element in unsorted array
         min_idx = i;
-        for (j = i + 1; j < 32; j++)
+        for (j = i + 1; j < NUM_TLB_SEGMENTS; j++)
             if (values[j] > values[min_idx])
                 min_idx = j;
 
@@ -271,7 +265,7 @@ void print_ram_overview(void) {
     print_small_text_light(SCREEN_WIDTH/2, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
     sprintf(textBytes, "(%2.3f%%)", (((f32)(main_pool_available() - 0x400) / (f32)(RAM_END - 0x80000000)) * 100));
     print_small_text_light(SCREEN_WIDTH - 24, 40 - gPPSegScroll, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, FONT_DEFAULT);
-    for (u8 i = 0; i < 32; i++) {
+    for (u8 i = 0; i < NUM_TLB_SEGMENTS; i++) {
         if (tempNums[i] == 0) {
             continue;
         }
@@ -422,12 +416,12 @@ void puppyprint_render_collision(void) {
     print_small_text_light(SCREEN_WIDTH-16, 60, textBytes, PRINT_TEXT_ALIGN_RIGHT, PRINT_ALL, 1);
 
 #ifdef VISUAL_DEBUG
-    print_small_text_light(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1);
+    print_small_text_light(160, (SCREEN_HEIGHT - 42), "Use the dpad to toggle visual collision modes", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
     switch (viewCycle) {
-        case 0: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 1: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 2: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
-        case 3: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 1); break;
+        case 0: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: None",                  PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE); break;
+        case 1: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE); break;
+        case 2: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Surfaces",              PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE); break;
+        case 3: print_small_text_light(160, (SCREEN_HEIGHT - 32), "Current view: Hitboxes and Surfaces", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE); break;
     }
 
     hitboxView  = ((viewCycle == 1) || (viewCycle == 3));
@@ -509,7 +503,7 @@ static char sLevelNames[][32] = {
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
 
-static u8 sLevelSelectOption = 0;
+static s16 sLevelSelectOption = 0;
 static u8 sLevelSelectOptionArea = 0;
 u8 gPuppyWarp = 0;
 u8 gPuppyWarpArea = 0;
@@ -533,7 +527,7 @@ void puppyprint_level_select_menu(void) {
         if (posY < 0 || posY > 84) {
             continue;
         }
-        if (sLevelSelectOption == i) {
+        if ((u32) sLevelSelectOption == i) {
             sprintf(textBytes, "%s - %d", sLevelNames[i], sLevelSelectOptionArea + 1);
             print_set_envcolour(0xFF, 0x40, 0x40, 0xFF);
         }
@@ -601,18 +595,18 @@ void puppyprint_render_general_vars(void) {
 
 struct PuppyPrintPage ppPages[] = {
 #ifdef USE_PROFILER
-    {&puppyprint_render_standard, "Profiler"},
-    {&puppyprint_render_minimal, "Minimal"},
+    {&puppyprint_render_standard,       "Profiler"},
+    {&puppyprint_render_minimal,        "Minimal"},
 #endif
-    {&puppyprint_render_general_vars, "General"},
-    {&print_audio_ram_overview, "Audio"},
-    {&print_ram_overview, "Segments"},
-    {&puppyprint_render_collision, "Collision"},
-    {&print_console_log, "Log"},
-    {&puppyprint_level_select_menu, "Level Select"      },
-    {&render_coverage_map, "Coverage"},
+    {&puppyprint_render_general_vars,   "General"},
+    {&print_audio_ram_overview,         "Audio"},
+    {&print_ram_overview,               "Segments"},
+    {&puppyprint_render_collision,      "Collision"},
+    {&print_console_log,                "Log"},
+    {&puppyprint_level_select_menu,     "Level Select"},
+    {&render_coverage_map,              "Coverage"},
 #ifdef PUPPYCAM
-    {&puppycamera_debug_view, "Unlock Camera"},
+    {&puppycamera_debug_view,           "Unlock Camera"},
 #endif
 };
 
@@ -698,27 +692,24 @@ void puppyprint_profiler_process(void) {
         {
             if (gPlayer1Controller->buttonPressed & U_JPAD) {
                 sLevelSelectOption--;
+                // If there is no level entry to this ID, skip over.
                 while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
                     sLevelSelectOption--;
+                }
+                if (sLevelSelectOption <= 0) {
+                    sLevelSelectOption = LEVEL_COUNT - 1;
+                    // If there is no level entry to this ID, skip over.
+                    while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
+                        sLevelSelectOption--;
+                    }
                 }
             }
             if (gPlayer1Controller->buttonPressed & D_JPAD) {
-                sLevelSelectOption++;
+                sLevelSelectOption = (sLevelSelectOption + 1) % (LEVEL_COUNT - 1);
+                // If there is no level entry to this ID, skip over.
                 while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
-                    sLevelSelectOption++;
+                    sLevelSelectOption = (sLevelSelectOption + 1) % (LEVEL_COUNT - 1);
                 }
-            }
-            if (sLevelSelectOption == 255) {
-                sLevelSelectOption = (sizeof(sLevelNames)/32)-1;
-                while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
-                    sLevelSelectOption--;
-                }
-            }
-            if (sLevelSelectOption >= (sizeof(sLevelNames)/32)) {
-                while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
-                    sLevelSelectOption++;
-                }
-                sLevelSelectOption = 0;
             }
             if (gPlayer1Controller->buttonPressed & R_JPAD) {
                 sLevelSelectOptionArea++;
@@ -790,11 +781,6 @@ void finish_blank_box(void) {
 // If the width is a multiple of 4, then use fillmode (fastest)
 // Otherwise, if there's transparency, it uses that rendermode, which is slower than using opaque rendermodes.
 void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
-
-    if (x1 < 0) x1 = 0;
-    if (y1 < 0) y1 = 0;
-    if (x2 > SCREEN_WIDTH) x2 = SCREEN_WIDTH;
-    if (y2 > SCREEN_HEIGHT) y2 = SCREEN_HEIGHT;
     if (x2 < x1)
     {
         u32 temp = x2;
@@ -807,10 +793,14 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
         y2 = y1;
         y1 = temp;
     }
+    if (x1 < 0) x1 = 0;
+    if (y1 < 0) y1 = 0;
+    if (x2 > SCREEN_WIDTH) x2 = SCREEN_WIDTH;
+    if (y2 > SCREEN_HEIGHT) y2 = SCREEN_HEIGHT;
     s32 cycleadd = 0;
     gDPPipeSync(gDisplayListHead++);
     if (((absi(x1 - x2) % 4) == 0) && (a == 255)) {
-        gDPSetCycleType( gDisplayListHead++, G_CYC_FILL);
+        gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
         gDPSetRenderMode(gDisplayListHead++, G_RM_NOOP, G_RM_NOOP);
         cycleadd = 1;
     } else {
@@ -832,10 +822,6 @@ void render_blank_box(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
 // Same as above, but with rounded edges.
 // Follows all the same rules of usage.
 void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, u8 a) {
-    if (x1 < 0) x1 = 0;
-    if (y1 < 0) y1 = 0;
-    if (x2 > SCREEN_WIDTH) x2 = SCREEN_WIDTH;
-    if (y2 > SCREEN_HEIGHT) y2 = SCREEN_HEIGHT;
     if (x2 < x1)
     {
         u32 temp = x2;
@@ -848,6 +834,10 @@ void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, 
         y2 = y1;
         y1 = temp;
     }
+    if (x1 < 0) x1 = 0;
+    if (y1 < 0) y1 = 0;
+    if (x2 > SCREEN_WIDTH) x2 = SCREEN_WIDTH;
+    if (y2 > SCREEN_HEIGHT) y2 = SCREEN_HEIGHT;
     s32 cycleadd = 0;
     gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
     if (a == 255) {
@@ -871,9 +861,6 @@ void render_blank_box_rounded(s32 x1, s32 y1, s32 x2, s32 y2, u8 r, u8 g, u8 b, 
     gDPFillRectangle(gDisplayListHead++, x1, y1+4, x2 - cycleadd, y2-4 - cycleadd);
     gDPPipeSync(gDisplayListHead++);
 }
-
-extern s32 text_iterate_command(const char *str, s32 i, s32 runCMD);
-extern void get_char_from_byte(u8 letter, s32 *textX, u8 *spaceX, s8 *offsetY, u8 font);
 
 s8 shakeToggle = 0;
 s8 waveToggle = 0;
@@ -899,7 +886,7 @@ s32 get_text_width(const char *str, s32 font) {
     textSizeTotal = textSizeTemp * textSize;
 
     for (i = 0; i < strLen; i++) {
-        if (str[i] == '#' || str[i] == 0x0A) {
+        if (str[i] == '#' || str[i] == '\n') {
             textPos = 0;
             continue;
         }
@@ -933,7 +920,7 @@ s32 get_text_height(const char *str) {
     textPos = topLineHeight;
 
     for (i = 0; i < strLen; i++) {
-        if (str[i] == '#' || str[i] == 0x0A) {
+        if (str[i] == '\n') {
             textPos += topLineHeight;
             topLineHeight = 12 * textSizeTotal;
             continue;
@@ -1007,7 +994,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
     if (align == PRINT_TEXT_ALIGN_CENTRE || align == PRINT_TEXT_ALIGN_RIGHT) {
         for (s32 i = 0; i < strLen; i++) {
-            if (str[i] == '#' || str[i] == 0x0A) {
+            if (str[i] == 0x0A) {
                 textPos[0] = 0;
                 lines++;
                 wideX[lines] = 0;
@@ -1046,7 +1033,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 672, 12, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
-        if (str[i] == '#' || str[i] == 0x0A) {
+        if (str[i] == 0x0A) {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
                 textPos[0] = -(wideX[lines]);
@@ -1070,7 +1057,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
             break;
 
         if (shakeToggle) {
-            shakePos[0] = sTextShakeTable[shakeTablePos++] * textSizeTotal;
+            shakePos[0] = (sTextShakeTable[shakeTablePos++] * textSizeTotal);
             if (shakeTablePos == sizeof(sTextShakeTable))
                 shakeTablePos = 0;
             shakePos[1] = sTextShakeTable[shakeTablePos++] * textSizeTotal;
@@ -1102,7 +1089,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                                                     (y + textPos[1] + (s16)((shakePos[1] + offsetY + wavePos))) << 2,
                                                     (x + textPos[0] + (s16)((shakePos[0] + textOffsets[0]))) << 2,
                                                     (y + textPos[1] + (s16)((wavePos + offsetY + shakePos[1] + textOffsets[1]))) << 2,
-                                                    G_TX_RENDERTILE, (textX << 6), 0, textTempScale, textTempScale);
+                                                    G_TX_RENDERTILE, (textX << 6) + 1, 0, textTempScale, textTempScale);
         textPos[0] += (spaceX + 1) * textSizeTotal;
     }
 
@@ -1138,7 +1125,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
     if (align == PRINT_TEXT_ALIGN_CENTRE || align == PRINT_TEXT_ALIGN_RIGHT) {
         for (s32 i = 0; i < strLen; i++) {
-            if (str[i] == '#' || str[i] == 0x0A) {
+            if (str[i] == '\n') {
                 textPos[0] = 0;
                 lines++;
                 wideX[lines] = 0;
@@ -1161,7 +1148,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 672, 12, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
-        if (str[i] == '#' || str[i] == 0x0A) {
+        if (str[i] == '\n') {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
                 textPos[0] = -(wideX[lines]);
@@ -1241,7 +1228,7 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
     } else if (len == 14 && strncmp((newStr), "<COL_xxxxxxxx>", 5) == 0) { // Simple text colour effect. goes up to FF for each, so FF0000FF is red.
         // Each value is taken from the string. The first is shifted left 4 bits, because it's a larger significant value, then it adds the next digit onto it.
         // Reverting to envcoluor can be achieved by passing something like <COL_-------->, or it could be combined with real colors for just partial reversion like <COL_FF00FF--> for instance.
-        //if (!runCMD)
+        if (!runCMD)
             return len;
 
         s32 rgba[4];
@@ -1280,8 +1267,8 @@ s32 text_iterate_command(const char *str, s32 i, s32 runCMD) {
         rainbowToggle ^= 1;
         if (rainbowToggle) {
             s32 r = (coss(gGlobalTimer * 600) + 1) * 127;
-            s32 g = (coss((gGlobalTimer * 600) + 21845) + 1) * 127;
-            s32 b = (coss((gGlobalTimer * 600) - 21845) + 1) * 127;
+            s32 g = (coss((gGlobalTimer * 600) + (0x10000 / 3)) + 1) * 127;
+            s32 b = (coss((gGlobalTimer * 600) - (0x10000 / 3)) + 1) * 127;
             gDPSetEnvColor(gDisplayListHead++, (Color) r, (Color) g, (Color) b, (Color) gCurrEnvCol[3]); // Don't use print_set_envcolour here, also opt to use alpha value from gCurrEnvCol
         } else {
             gDPSetEnvColor(gDisplayListHead++, (Color) gCurrEnvCol[0], (Color) gCurrEnvCol[1], (Color) gCurrEnvCol[2], (Color) gCurrEnvCol[3]); // Reset text to envcolor
@@ -1377,7 +1364,7 @@ static u8 gIsLightText = FALSE;
 void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
     u8 strLen = MIN((signed)strlen(str), 255);
     // Compare the cursor position and the string length, plus 12 (header size) and return if it overflows.
-    if (sPuppyprintTextBufferPos + strLen + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
+    if (sPuppyprintTextBufferPos + strLen + 1 + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
         return;
     x += 0x8000;
     y += 0x8000;
@@ -1389,13 +1376,14 @@ void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amou
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 5] = gCurrEnvCol[1];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 6] = gCurrEnvCol[2];
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 7] = gCurrEnvCol[3];
-    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 8] = strLen;
+    sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 8] = strLen + 1;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 9] = align;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 10] = (amount == -1) ? 255 : amount;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 11] = font;
     sPuppyprintTextBuffer[sPuppyprintTextBufferPos + 12] = gIsLightText;
     bcopy(str, &sPuppyprintTextBuffer[sPuppyprintTextBufferPos + HEADERSIZE], strLen);
-    sPuppyprintTextBufferPos += strLen + HEADERSIZE;
+    sPuppyprintTextBuffer[strLen + HEADERSIZE] = '\0';
+    sPuppyprintTextBufferPos += strLen + HEADERSIZE + 1;
 }
 
 void print_small_text_buffered_light(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
