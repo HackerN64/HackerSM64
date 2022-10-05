@@ -408,7 +408,7 @@ extern s16 gVisualSurfaceCount;
 
 void puppyprint_render_collision(void) {
     char textBytes[128];
-    sprintf(textBytes, "Static Pool Size: 0x%X#Dynamic Pool Size: 0x%X#Dynamic Pool Used: 0x%X#Surfaces Allocated: %d#Nodes Allocated: %d", 
+    sprintf(textBytes, "Static Pool Size: 0x%X\nDynamic Pool Size: 0x%X\nDynamic Pool Used: 0x%X\nSurfaces Allocated: %d\nNodes Allocated: %d", 
     gTotalStaticSurfaceData,
     DYNAMIC_SURFACE_POOL_SIZE,
     (uintptr_t)gDynamicSurfacePoolEnd - (uintptr_t)gDynamicSurfacePool,
@@ -437,7 +437,7 @@ void print_basic_profiling(void) {
     u32 rspTime = profiler_get_rsp_microseconds();
     u32 rdpTime = profiler_get_rdp_microseconds();
     print_fps(16, 40);
-    sprintf(textBytes, "CPU: %dus (%d%%)#RSP: %dus (%d%%)#RDP: %dus (%d%%)",
+    sprintf(textBytes, "CPU: %dus (%d%%)\nRSP: %dus (%d%%)\nRDP: %dus (%d%%)",
             cpuTime, (cpuTime / 333),
             rspTime, (rspTime / 333),
             rdpTime, (rdpTime / 333));
@@ -475,7 +475,7 @@ void puppycamera_debug_view(void) {
     char textBytes[80];
     // Very little point printing useless info if Mayro doesn't even exist.
     if (gMarioState->marioObj) {
-        sprintf(textBytes, "Mario Pos#X: %d#Y: %d#Z: %d#D: %X#A: %x",
+        sprintf(textBytes, "Mario Pos\nX: %d\nY: %d\nZ: %d\nD: %X\nA: %x",
             (s32)(gMarioState->pos[0]),
             (s32)(gMarioState->pos[1]),
             (s32)(gMarioState->pos[2]),
@@ -485,7 +485,7 @@ void puppycamera_debug_view(void) {
     }
     // Same for the camera, especially so because this will crash otherwise.
     if (gCamera) {
-        sprintf(textBytes, "Camera Pos#X: %d#Y: %d#Z: %d#D: %X",
+        sprintf(textBytes, "Camera Pos\nX: %d\nY: %d\nZ: %d\nD: %X",
             (s32)(gCamera->pos[0]),
             (s32)(gCamera->pos[1]),
             (s32)(gCamera->pos[2]),
@@ -639,7 +639,7 @@ void render_page_menu(void) {
 }
 
 void puppyprint_render_profiler(void) {
-    u32 first = osGetCount();
+    PUPPYPRINT_GET_SNAPSHOT();
 
     bzero(&gCurrEnvCol, sizeof(ColorRGBA));
     print_set_envcolour(255, 255, 255, 255);
@@ -659,7 +659,7 @@ void puppyprint_render_profiler(void) {
 }
 
 void puppyprint_profiler_process(void) {
-    u32 first = osGetCount();
+    PUPPYPRINT_GET_SNAPSHOT();
 
     if (fDebug && (gPlayer1Controller->buttonPressed & L_TRIG)) {
         sDebugMenu ^= TRUE;

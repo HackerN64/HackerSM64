@@ -1356,9 +1356,7 @@ void find_surface_on_ray_list(struct SurfaceNode *list, Vec3f orig, Vec3f dir, f
     f32 length;
     Vec3f chk_hit_pos;
     f32 top, bottom;
-#ifdef PUPPYPRINT_DEBUG
-    u32 first = osGetCount();
-#endif
+    PUPPYPRINT_GET_SNAPSHOT();
     // Get upper and lower bounds of ray
     if (dir[1] >= 0.0f) {
         // Ray is upwards.

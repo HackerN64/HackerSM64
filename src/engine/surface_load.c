@@ -488,9 +488,7 @@ u32 get_area_terrain_size(TerrainData *data) {
  * boxes (water, gas, JRB fog).
  */
 void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16 *macroObjects) {
-#ifdef PUPPYPRINT_DEBUG
-    u32 first = osGetCount();
-#endif
+    PUPPYPRINT_GET_SNAPSHOT();
     s32 terrainLoadType;
     TerrainData *vertexData = NULL;
     u32 surfacePoolData;
@@ -560,9 +558,7 @@ void load_area_terrain(s32 index, TerrainData *data, RoomData *surfaceRooms, s16
  * If not in time stop, clear the surface partitions.
  */
 void clear_dynamic_surfaces(void) {
-#ifdef PUPPYPRINT_DEBUG
-    u32 first = osGetCount();
-#endif
+    PUPPYPRINT_GET_SNAPSHOT();
     if (!(gTimeStopState & TIME_STOP_ACTIVE)) {
         gSurfacesAllocated = gNumStaticSurfaces;
         gSurfaceNodesAllocated = gNumStaticSurfaceNodes;
@@ -691,9 +687,7 @@ static void get_optimal_coll_dist(struct Object *obj) {
  * Transform an object's vertices, reload them, and render the object.
  */
 void load_object_collision_model(void) {
-#ifdef PUPPYPRINT_DEBUG
-    u32 first = osGetCount();
-#endif
+    PUPPYPRINT_GET_SNAPSHOT();
     TerrainData vertexData[600];
 
     TerrainData *collisionData = o->collisionData;

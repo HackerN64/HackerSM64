@@ -12,8 +12,12 @@
 
 #ifdef PUPPYPRINT_DEBUG
 #define PUPPYPRINT_ADD_COUNTER(x) x++
+#define PUPPYPRINT_GET_SNAPSHOT() u32 first = osGetCount()
+#define PUPPYPRINT_GET_SNAPSHOT_TYPE(type) u32 first = profiler_get_delta(type)
 #else
 #define PUPPYPRINT_ADD_COUNTER(x)
+#define PUPPYPRINT_GET_SNAPSHOT()
+#define PUPPYPRINT_GET_SNAPSHOT_TYPE()
 #endif
 
 struct CallCounter {
