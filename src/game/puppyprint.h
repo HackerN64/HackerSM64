@@ -17,7 +17,7 @@
 #else
 #define PUPPYPRINT_ADD_COUNTER(x)
 #define PUPPYPRINT_GET_SNAPSHOT()
-#define PUPPYPRINT_GET_SNAPSHOT_TYPE()
+#define PUPPYPRINT_GET_SNAPSHOT_TYPE(type)
 #endif
 
 struct CallCounter {
