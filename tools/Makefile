@@ -72,6 +72,7 @@ all: all-except-recomp
 
 clean:
 	$(RM) $(ALL_PROGRAMS)
+	$(RM) UNFLoader*
 	$(MAKE) -C audiofile clean
 
 define COMPILE

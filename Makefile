@@ -5,6 +5,8 @@ include util.mk
 # Default target
 default: all
 
+TARGET_STRING := sm64
+
 # Preprocessor definitions
 DEFINES :=
 
@@ -117,20 +119,10 @@ else ifeq ($(GRUCODE),super3d) # Super3D
   DEFINES += SUPER3D_GBI=1 F3D_NEW=1
 endif
 
-LIBRARIES := nustd hvqm2 z goddard
-
 # TEXT ENGINES
 #   s2dex_text_engine - Text Engine by someone2639
 TEXT_ENGINE := none
-ifeq ($(TEXT_ENGINE), s2dex_text_engine)
-  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
-  LIBRARIES += s2d_engine
-  DUMMY != make -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/
-endif
-# add more text engines here
-
-LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
-
+$(eval $(call validate-option,TEXT_ENGINE,none s2dex_text_engine))
 
 #==============================================================================#
 # Optimization flags                                                           #
@@ -189,14 +181,12 @@ GCC_GRAPH_NODE_OPT_FLAGS = \
 #==============================================================================#
 
 ifeq ($(COMPILER),gcc)
-  NON_MATCHING := 1
   MIPSISET     := -mips3
   OPT_FLAGS           := $(GCC_MAIN_OPT_FLAGS)
   COLLISION_OPT_FLAGS  = $(GCC_COLLISION_OPT_FLAGS)
   MATH_UTIL_OPT_FLAGS  = $(GCC_MATH_UTIL_OPT_FLAGS)
   GRAPH_NODE_OPT_FLAGS = $(GCC_GRAPH_NODE_OPT_FLAGS)
 else ifeq ($(COMPILER),clang)
-  NON_MATCHING := 1
   # clang doesn't support ABI 'o32' for 'mips3'
   MIPSISET     := -mips2
   OPT_FLAGS    := $(DEFAULT_OPT_FLAGS)
@@ -205,29 +195,17 @@ else ifeq ($(COMPILER),clang)
   GRAPH_NODE_OPT_FLAGS = $(DEFAULT_OPT_FLAGS)
 endif
 
-
-# NON_MATCHING - whether to build a matching, identical copy of the ROM
-#   1 - enable some alternate, more portable code that does not produce a matching ROM
-#   0 - build a matching ROM
-NON_MATCHING ?= 1
-$(eval $(call validate-option,NON_MATCHING,0 1))
-
-ifeq ($(TARGET_N64),0)
-  NON_MATCHING := 1
-endif
-
-ifeq ($(NON_MATCHING),1)
-  DEFINES += NON_MATCHING=1 AVOID_UB=1
-endif
-
-
-TARGET_STRING := sm64
-
 # UNF - whether to use UNFLoader flashcart library
 #   1 - includes code in ROM
 #   0 - does not
 UNF ?= 0
 $(eval $(call validate-option,UNF,0 1))
+
+# if `unf` is a target, make sure that UNF is set
+ifneq ($(filter unf,$(MAKECMDGOALS)),)
+	UNF = 1
+endif
+
 ifeq ($(UNF),1)
   DEFINES += UNF=1
   SRC_DIRS += src/usb
@@ -287,15 +265,6 @@ endif
 
 GZIPVER ?= std
 $(eval $(call validate-option,GZIPVER,std libdef))
-
-# GODDARD - whether to use libgoddard (Mario Head)
-#   1 - includes code in ROM
-#   0 - does not
-GODDARD ?= 0
-$(eval $(call validate-option,GODDARD,0 1))
-ifeq ($(GODDARD),1)
-  DEFINES += GODDARD=1
-endif
 
 # Whether to hide commands or not
 VERBOSE ?= 0
@@ -438,6 +407,18 @@ else
   $(error Unable to detect a suitable MIPS toolchain installed)
 endif
 
+LIBRARIES := nustd hvqm2 z goddard
+
+# Text engine
+ifeq ($(TEXT_ENGINE), s2dex_text_engine)
+  DEFINES += S2DEX_GBI_2=1 S2DEX_TEXT_ENGINE=1
+  LIBRARIES += s2d_engine
+  DUMMY != $(MAKE) -C src/s2d_engine COPY_DIR=$(shell pwd)/lib/ CROSS=$(CROSS)
+endif
+# add more text engines here
+
+LINK_LIBRARIES = $(foreach i,$(LIBRARIES),-l$(i))
+
 export LD_LIBRARY_PATH=./tools
 
 AS        := $(CROSS)as
@@ -529,8 +510,13 @@ endif
 ENDIAN_BITWIDTH       := $(BUILD_DIR)/endian-and-bitwidth
 EMULATOR = mupen64plus
 EMU_FLAGS =
-LOADER = loader64
-LOADER_FLAGS = -vwf
+
+ifneq (,$(call find-command,wslview))
+    LOADER = ./$(TOOLS_DIR)/UNFLoader.exe
+else
+    LOADER = ./$(TOOLS_DIR)/UNFLoader
+endif
+
 SHA1SUM = sha1sum
 PRINT = printf
 
@@ -580,8 +566,18 @@ test-pj64: $(ROM)
 	wine ~/Desktop/new64/Project64.exe $<
 # someone2639
 
-load: $(ROM)
-	$(LOADER) $(LOADER_FLAGS) $<
+# download and extract most recent unfloader build if needed
+$(LOADER):
+ifeq (,$(wildcard $(LOADER)))
+	@$(PRINT) "Downloading latest UNFLoader...$(NO_COL)\n"
+	$(PYTHON) $(TOOLS_DIR)/get_latest_unfloader.py $(TOOLS_DIR)
+endif
+
+load: $(ROM) $(LOADER)
+	$(LOADER) -r $<
+
+unf: $(ROM) $(LOADER)
+	$(LOADER) -d -r $<
 
 libultra: $(BUILD_DIR)/libultra.a
 
@@ -706,17 +702,17 @@ $(BUILD_DIR)/levels/%/leveldata.bin: $(BUILD_DIR)/levels/%/leveldata.elf
 	$(V)$(EXTRACT_DATA_FOR_MIO) $< $@
 
 ifeq ($(COMPRESS),gzip)
-include gziprules.mk
+include compression/gziprules.mk
 else ifeq ($(COMPRESS),rnc1)
-include rnc1rules.mk
+include compression/rnc1rules.mk
 else ifeq ($(COMPRESS),rnc2)
-include rnc2rules.mk
+include compression/rnc2rules.mk
 else ifeq ($(COMPRESS),yay0)
-include yay0rules.mk
+include compression/yay0rules.mk
 else ifeq ($(COMPRESS),mio0)
-include mio0rules.mk
+include compression/mio0rules.mk
 else ifeq ($(COMPRESS),uncomp)
-include uncomprules.mk
+include compression/uncomprules.mk
 endif
 
 #==============================================================================#
@@ -819,10 +815,7 @@ $(BUILD_DIR)/src/game/version_data.h: tools/make_version.sh
 ifeq ($(FIXLIGHTS),1)
 # This must not be run multiple times at once, so we run it ahead of time rather than in a rule
 DUMMY != $(FIXLIGHTS_PY) actors
-# Modify the leveldata build rule to fix lights for any files in that level's folder
-$(BUILD_DIR)/levels/%/leveldata.o: levels/%/leveldata.c
-	$(V)$(FIXLIGHTS_PY) $(dir $<)
-	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(BUILD_DIR)/$*.d  -o $@ $<
+DUMMY != $(FIXLIGHTS_PY) levels
 endif
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
@@ -894,7 +887,7 @@ endif
 $(BUILD_DIR)/$(TARGET).objdump: $(ELF)
 	$(OBJDUMP) -D $< > $@
 
-.PHONY: all clean distclean default diff test load
+.PHONY: all clean distclean default test load
 # with no prerequisites, .SECONDARY causes no intermediate target to be removed
 .SECONDARY:
 
