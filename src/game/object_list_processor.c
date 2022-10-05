@@ -547,7 +547,7 @@ void clear_objects(void) {
  * Update spawner and surface objects.
  */
 void update_terrain_objects(void) {
-    u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
+    UNUSED u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
     gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
     profiler_update(PROFILER_TIME_SPAWNER, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
 
@@ -568,7 +568,7 @@ void update_non_terrain_objects(void) {
 
     s32 i = 2;
     while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
-        u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
+        UNUSED u32 first = profiler_get_delta(PROFILER_DELTA_COLLISION);
         if (listIndex == OBJ_LIST_PLAYER) {
             profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
         }
@@ -653,7 +653,7 @@ void update_objects(UNUSED s32 unused) {
     update_non_terrain_objects();
     
     // Take a snapshot of the current collision processing time.
-    u32 firstPoint = profiler_get_delta(PROFILER_DELTA_COLLISION);
+    UNUSED u32 firstPoint = profiler_get_delta(PROFILER_DELTA_COLLISION); 
 
     // Unload any objects that have been deactivated
     unload_deactivated_objects();

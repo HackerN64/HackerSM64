@@ -10,6 +10,12 @@
 #define LOG_BUFFER_SIZE       16
 #define PUPPYPRINT_DEFERRED_BUFFER_SIZE 0x1000
 
+#ifdef PUPPYPRINT_DEBUG
+#define PUPPYPRINT_ADD_COUNTER(x) x++
+#else
+#define PUPPYPRINT_ADD_COUNTER(x)
+#endif
+
 struct CallCounter {
     u16 collision_floor;
     u16 collision_wall;

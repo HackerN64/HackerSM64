@@ -504,7 +504,7 @@ static char sLevelNames[][32] = {
 #undef DEFINE_LEVEL
 
 static s16 sLevelSelectOption = 0;
-static u8 sLevelSelectOptionArea = 0;
+static s8 sLevelSelectOptionArea = 0;
 u8 gPuppyWarp = 0;
 u8 gPuppyWarpArea = 0;
 
@@ -516,7 +516,7 @@ void puppyprint_level_select_menu(void) {
     render_blank_box_rounded((SCREEN_WIDTH/2) - 80, (SCREEN_HEIGHT/2) - 60, (SCREEN_WIDTH/2) + 80, (SCREEN_HEIGHT/2) + 60, 0, 0, 0, 160);
     finish_blank_box();
     print_small_text_light(SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) - 58, "Pick a level", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
-    print_small_text_light(SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) + 64, "(Area must have warp node of 0x0A)\nDpad Left: Warp / Dpad Right: Area\nYellow is current level.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
+    print_small_text_light(SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) + 64, "(Area must have warp node of 0x0A)\nDpad Left/Right: Area / A: Warp\nYellow is current level.", PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_OUTLINE);
     for (u32 i = 0; i < sizeof(sLevelNames) / 32; i++) {
         s32 yOffset = sLevelSelectOption > 8 ? sLevelSelectOption-8 : 0;
         posY = ((renderedText-yOffset) * 10);
@@ -633,7 +633,7 @@ void render_page_menu(void) {
                 print_set_envcolour(0xFF, 0xFF, 0xFF, 0xFF);
             }
 
-            print_small_text_light((28 + (MENU_BOX_WIDTH / 2)), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, 0);
+            print_small_text_light((28 + (MENU_BOX_WIDTH / 2)), posY, ppPages[i].name, PRINT_TEXT_ALIGN_CENTRE, PRINT_ALL, FONT_DEFAULT);
         }
     }
 }
@@ -697,7 +697,7 @@ void puppyprint_profiler_process(void) {
                     sLevelSelectOption--;
                 }
                 if (sLevelSelectOption <= 0) {
-                    sLevelSelectOption = LEVEL_COUNT - 1;
+                    sLevelSelectOption = LEVEL_COUNT - 2;
                     // If there is no level entry to this ID, skip over.
                     while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
                         sLevelSelectOption--;
@@ -705,10 +705,10 @@ void puppyprint_profiler_process(void) {
                 }
             }
             if (gPlayer1Controller->buttonPressed & D_JPAD) {
-                sLevelSelectOption = (sLevelSelectOption + 1) % (LEVEL_COUNT - 1);
+                sLevelSelectOption = (sLevelSelectOption + 1) % (LEVEL_COUNT - 2);
                 // If there is no level entry to this ID, skip over.
                 while (sLevelNames[sLevelSelectOption][0] == 0 && sLevelSelectOption < LEVEL_COUNT) {
-                    sLevelSelectOption = (sLevelSelectOption + 1) % (LEVEL_COUNT - 1);
+                    sLevelSelectOption = (sLevelSelectOption + 1) % (LEVEL_COUNT - 2);
                 }
             }
             if (gPlayer1Controller->buttonPressed & R_JPAD) {
@@ -716,8 +716,13 @@ void puppyprint_profiler_process(void) {
                 if (sLevelSelectOptionArea > AREA_COUNT - 1) {
                     sLevelSelectOptionArea = 0;
                 }
+            } else if (gPlayer1Controller->buttonPressed & L_JPAD) {
+                sLevelSelectOptionArea--;
+                if (sLevelSelectOptionArea < 0) {
+                    sLevelSelectOptionArea = AREA_COUNT - 1;
+                }
             }
-            if (gPlayer1Controller->buttonPressed & L_JPAD) {
+            if (gPlayer1Controller->buttonPressed & A_BUTTON) {
                 sPPDebugPage = 0;
                 gPuppyWarp = sLevelSelectOption + 1;
                 gPuppyWarpArea = sLevelSelectOptionArea + 1;
@@ -886,7 +891,7 @@ s32 get_text_width(const char *str, s32 font) {
     textSizeTotal = textSizeTemp * textSize;
 
     for (i = 0; i < strLen; i++) {
-        if (str[i] == '#' || str[i] == '\n') {
+        if (str[i] == '\n') {
             textPos = 0;
             continue;
         }
@@ -994,7 +999,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     gSPDisplayList(gDisplayListHead++, dl_small_text_begin);
     if (align == PRINT_TEXT_ALIGN_CENTRE || align == PRINT_TEXT_ALIGN_RIGHT) {
         for (s32 i = 0; i < strLen; i++) {
-            if (str[i] == 0x0A) {
+            if (str[i] == '\n') {
                 textPos[0] = 0;
                 lines++;
                 wideX[lines] = 0;
@@ -1033,7 +1038,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 672, 12, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
-        if (str[i] == 0x0A) {
+        if (str[i] == '\n') {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
                 textPos[0] = -(wideX[lines]);
@@ -1362,7 +1367,7 @@ static u8 gIsLightText = FALSE;
 // The data afterwards is the text data itself, using the string length byte to know when to stop.
 #define HEADERSIZE 13
 void print_small_text_buffered(s32 x, s32 y, const char *str, u8 align, s32 amount, u8 font) {
-    u8 strLen = MIN((signed)strlen(str), 255);
+    u8 strLen = MIN((signed)strlen(str), 254);
     // Compare the cursor position and the string length, plus 12 (header size) and return if it overflows.
     if (sPuppyprintTextBufferPos + strLen + 1 + HEADERSIZE > sizeof(sPuppyprintTextBuffer))
         return;
