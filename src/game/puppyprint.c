@@ -1056,6 +1056,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
                 break;
 
             i += commandOffset;
+            textLength += commandOffset;
         }
 
         if (i >= textLength)
@@ -1420,7 +1421,7 @@ void puppyprint_print_deferred(void) {
         ColorRGBA originalEnvCol = {gCurrEnvCol[0], gCurrEnvCol[1], gCurrEnvCol[2], gCurrEnvCol[3]};
         print_set_envcolour(sPuppyprintTextBuffer[i + 4], sPuppyprintTextBuffer[i + 5], sPuppyprintTextBuffer[i + 6], sPuppyprintTextBuffer[i + 7]);
         u8 alignment = sPuppyprintTextBuffer[i + 9];
-        u8 amount = (sPuppyprintTextBuffer[i + 10] == 255 ? -1 : amount);
+        u8 amount = (sPuppyprintTextBuffer[i + 10] == 255 ? -1 : sPuppyprintTextBuffer[i + 10]);
         u8 font = sPuppyprintTextBuffer[i + 11];
         bcopy(&sPuppyprintTextBuffer[i + HEADERSIZE], text, length);
         if (sPuppyprintTextBuffer[i + 12]) {
