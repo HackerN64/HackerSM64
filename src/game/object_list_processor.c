@@ -547,7 +547,7 @@ void clear_objects(void) {
  * Update spawner and surface objects.
  */
 void update_terrain_objects(void) {
-    PUPPYPRINT_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
+    PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
     gObjectCounter = update_objects_in_list(&gObjectLists[OBJ_LIST_SPAWNER]);
     profiler_update(PROFILER_TIME_SPAWNER, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
 
@@ -570,7 +570,7 @@ void update_non_terrain_objects(void) {
 
     s32 i = 2;
     while ((listIndex = sObjectListUpdateOrder[i]) != -1) {
-        PUPPYPRINT_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
+        PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
         if (listIndex == OBJ_LIST_PLAYER) {
             profiler_update(PROFILER_TIME_BEHAVIOR_BEFORE_MARIO, profiler_get_delta(PROFILER_DELTA_COLLISION) - first);
         }

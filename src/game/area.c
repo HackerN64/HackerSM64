@@ -380,7 +380,7 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
 }
 
 void render_game(void) {
-    PUPPYPRINT_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
+    PROFILER_GET_SNAPSHOT_TYPE(PROFILER_DELTA_COLLISION);
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
         if (gCurrentArea->graphNode) {
             geo_process_root(gCurrentArea->graphNode, gViewportOverride, gViewportClip, gFBSetColor);

@@ -73,8 +73,12 @@ u32 profiler_get_rdp_microseconds();
 // See profiling.c to see why profiler_rsp_yielded isn't its own function
 static ALWAYS_INLINE void profiler_rsp_yielded() {
     profiler_rsp_resumed();
+#define PROFILER_GET_SNAPSHOT() u32 first = osGetCount()
+#define PROFILER_GET_SNAPSHOT_TYPE(type) u32 first = profiler_get_delta(type)
 }
 #else
+#define PROFILER_GET_SNAPSHOT()
+#define PROFILER_GET_SNAPSHOT_TYPE(type)
 #define profiler_update(which, delta)
 #define profiler_print_times()
 #define profiler_frame_setup()
