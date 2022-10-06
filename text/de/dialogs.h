@@ -1791,7 +1791,7 @@ sehr kalt - Deine Fitness\n\
 könnte bei einem Bad\n\
 großen Schaden nehmen!")
 
-DEFINE_DIALOG(DIALOG_149, NO_SOUND 5, 30, 200, "\
+DEFINE_DIALOG(DIALOG_149, NO_SOUND, 5, 30, 200, "\
 Willkommen auf der\n\
 Rutschbahn der Prinzessin.\n\
 Hier befindet sich ein\n\

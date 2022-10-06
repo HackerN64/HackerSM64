@@ -3,6 +3,8 @@
 #include "macros.h"
 
 #include "game/ingame_menu.h"
+#include "sounds.h"
+#include "seq_ids.h"
 
 #include "make_const_nonconst.h"
 
@@ -12,4 +14,8 @@
 #define seg2_act_name_table act_name_table_eu_fr
 #define seg2_dialog_table dialog_table_eu_fr
 
-#include "text/fr/define_text.inc.c"
+#define DIALOG_FILE "fr/dialogs.h"
+#define COURSE_FILE "fr/courses.h"
+#include "text/define_text.inc.c"
+#undef DIALOG_FILE
+#undef COURSE_FILE

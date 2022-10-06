@@ -13,7 +13,7 @@ extern struct Utf8LUT menu_font_utf8_lut;
 extern Gfx dl_menu_ia8_text_begin[];
 extern Gfx dl_menu_ia8_text_end[];
 extern Gfx dl_menu_rgba16_wood_course[];
-#ifdef VERSION_EU
+#ifdef MULTILANG
 extern Gfx dl_menu_rgba16_wood_course_end[];
 extern Gfx dl_menu_texture_course_upper[];
 extern Gfx dl_menu_texture_niveau_upper[];

@@ -99,7 +99,7 @@ DECLARE_SEGMENT(title_screen_bg_yay0)
 
 DECLARE_SEGMENT(debug_level_select_yay0)
 
-#ifdef VERSION_EU
+#ifdef MULTILANG
 DECLARE_SEGMENT(translation_de_yay0)
 DECLARE_SEGMENT(translation_en_yay0)
 DECLARE_SEGMENT(translation_fr_yay0)
@@ -136,7 +136,7 @@ DECLARE_SEGMENT(title_screen_bg_mio0)
 
 DECLARE_SEGMENT(debug_level_select_mio0)
 
-#ifdef VERSION_EU
+#ifdef MULTILANG
 DECLARE_SEGMENT(translation_de_mio0)
 DECLARE_SEGMENT(translation_en_mio0)
 DECLARE_SEGMENT(translation_fr_mio0)

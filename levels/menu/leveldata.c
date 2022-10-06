@@ -1321,19 +1321,10 @@ ALIGNED8 static const Texture texture_menu_font_char_C[] = {
 #include "levels/menu/main_menu_seg7_us.0AF40.ia8.inc.c"
 };
 
-#ifdef VERSION_EU
-// 0x0700AF80
-ALIGNED8 static const Texture texture_menu_font_char_D[] = {
-#include "levels/menu/main_menu_seg7_eu.0AF80.ia8.inc.c"
-};
-
-#else
-
 // 0x0700AF80
 ALIGNED8 static const Texture texture_menu_font_char_D[] = {
 #include "levels/menu/main_menu_seg7_us.0AF80.ia8.inc.c"
 };
-#endif
 
 // 0x0700AFC0
 ALIGNED8 static const Texture texture_menu_font_char_E[] = {
@@ -1736,7 +1727,7 @@ const Gfx dl_menu_ia8_text_end[] = {
     gsSPEndDisplayList(),
 };
 
-#ifdef VERSION_EU
+#ifdef MULTILANG
 
 // 0x0700BDA0 - 0x0700CDA0
 ALIGNED8 static const Texture texture_menu_course_upper[] = {
@@ -1793,7 +1784,7 @@ const Gfx dl_menu_rgba16_wood_course[] = {
     gsDPSetCombineMode(G_CC_DECALRGBA, G_CC_DECALRGBA),
     gsSPTexture(0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON),
     gsDPSetRenderMode(G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2),
-#ifdef VERSION_EU
+#ifdef MULTILANG
     gsSPEndDisplayList(),
 };
 const Gfx dl_menu_rgba16_wood_course_end[] = {
@@ -1823,7 +1814,7 @@ const Gfx dl_menu_rgba16_wood_course_end[] = {
     gsSPEndDisplayList(),
 };
 
-#ifdef VERSION_EU
+#ifdef MULTILANG
 // 0x0700FEF0 - 0x0700FF00
 const Gfx dl_menu_texture_course_upper[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture_menu_course_upper),
@@ -1858,22 +1849,28 @@ const Collision main_menu_seg7_collision[] = {
     COL_END(),
 };
 
-#ifdef VERSION_EU
+#ifdef MULTILANG
 
 // Duplicate course name tables; the main menu needs all languages loaded at
 // once since it switches language, so the copies in segment 19 aren't good
 // enough.
 
 #define COURSE_TABLE eu_course_strings_en_table
-#include "text/us/define_courses.inc.c"
+#define COURSE_FILE "us/courses.h"
+#include "text/define_courses.inc.c"
 #undef COURSE_TABLE
+#undef COURSE_FILE
 
 #define COURSE_TABLE eu_course_strings_fr_table
-#include "text/fr/define_courses.inc.c"
+#define COURSE_FILE "fr/courses.h"
+#include "text/define_courses.inc.c"
 #undef COURSE_TABLE
+#undef COURSE_FILE
 
 #define COURSE_TABLE eu_course_strings_de_table
-#include "text/de/define_courses.inc.c"
+#define COURSE_FILE "de/courses.h"
+#include "text/define_courses.inc.c"
 #undef COURSE_TABLE
+#undef COURSE_FILE
 
 #endif

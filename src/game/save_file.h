@@ -63,7 +63,7 @@ struct MainMenuSaveData {
     u8 wideMode: 1;
 #endif
 
-#if MULTILANG
+#ifdef MULTILANG
     u8 language: 2;
 #define SUBTRAHEND 8
 #else
@@ -197,7 +197,7 @@ void disable_warp_checkpoint(void);
 void check_if_should_set_warp_checkpoint(struct WarpNode *warpNode);
 s32 check_warp_checkpoint(struct WarpNode *warpNode);
 
-#if MULTILANG
+#ifdef MULTILANG
 enum EuLanguages {
     LANGUAGE_ENGLISH,
     LANGUAGE_FRENCH,

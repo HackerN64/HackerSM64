@@ -219,7 +219,7 @@ void print_course_number(void) {
     // Full wood texture in JP & US, lower part of it on EU
     gSPDisplayList(gDisplayListHead++, dl_menu_rgba16_wood_course);
 
-#if MULTILANG
+#ifdef MULTILANG
     // Change upper part of the wood texture depending of the language defined
     switch (eu_get_language()) {
         case LANGUAGE_ENGLISH:

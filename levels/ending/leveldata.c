@@ -6,7 +6,7 @@
 
 #include "make_const_nonconst.h"
 
-#ifdef VERSION_EU
+#ifdef MULTILANG
 #include "levels/ending/cake_eu.inc.c"
 
 #ifndef EU_CUSTOM_CAKE_FIX

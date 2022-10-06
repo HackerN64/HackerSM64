@@ -22,9 +22,7 @@
 #include "sm64.h"
 
 #include "eu_translation.h"
-#if MULTILANG
-#undef LANGUAGE_FUNCTION
-#define LANGUAGE_FUNCTION sLanguageMode
+#ifdef MULTILANG
 s8 sLanguageMode = LANGUAGE_ENGLISH;
 #endif
 
@@ -718,7 +716,7 @@ void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
 
 #undef ACTION_TIMER
 
-#if MULTILANG
+#ifdef MULTILANG
     #define SOUND_BUTTON_Y 388
 #else
     #define SOUND_BUTTON_Y 0
@@ -741,7 +739,7 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
         soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton, -533, SOUND_BUTTON_Y, -100, 0x0, -0x8000, 0x0);
     sMainMenuButtons[MENU_BUTTON_HEADSET]->oMenuButtonScale = MENU_BUTTON_SCALE;
 
-#if MULTILANG
+#ifdef MULTILANG
     // English option button
     sMainMenuButtons[MENU_BUTTON_LANGUAGE_ENGLISH] = spawn_object_rel_with_rot(
         soundModeButton, MODEL_MAIN_MENU_GENERIC_BUTTON, bhvMenuButton,  533, -111, -100, 0x0, -0x8000, 0x0);
@@ -789,7 +787,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
                         queue_rumble_data(5, 80);
 #endif
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
-#if !MULTILANG
+#ifndef MULTILANG
                         // Sound menu buttons don't return to Main Menu in EU
                         // because they don't have a case in bhv_menu_button_manager_loop
                         sSelectedButtonID = buttonID;
@@ -798,7 +796,7 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
                         save_file_set_sound_mode(sSoundMode);
                     }
                 }
-#if MULTILANG
+#ifdef MULTILANG
                 // If language mode button clicked, select it and change language
                 if (buttonID == MENU_BUTTON_LANGUAGE_ENGLISH || buttonID == MENU_BUTTON_LANGUAGE_FRENCH
                          || buttonID == MENU_BUTTON_LANGUAGE_GERMAN) {
@@ -1079,7 +1077,7 @@ void bhv_menu_button_manager_loop(void) {
 
         case MENU_BUTTON_SOUND_MODE: check_sound_mode_menu_clicked_buttons(sMainMenuButtons[MENU_BUTTON_SOUND_MODE]); break;
 
-#if MULTILANG
+#ifdef MULTILANG
         case MENU_BUTTON_LANGUAGE_RETURN: return_to_main_menu(MENU_BUTTON_SOUND_MODE, sMainMenuButtons[MENU_BUTTON_LANGUAGE_RETURN]); break;
 #endif
         // STEREO, MONO and HEADSET buttons are undefined so they can be selected without
@@ -1819,7 +1817,7 @@ langarray_t textSoundSelect = LANGUAGE_TEXT(
     "SOUND",
     "サウンドセレクト");
 
-#if MULTILANG
+#ifdef MULTILANG
 langarray_t textLanguageSelect = LANGUAGE_TEXT(
     "LANGUAGE SELECT",
     "SELECTION LANGUE",
@@ -1848,7 +1846,7 @@ void print_sound_mode_menu_strings(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
 
     print_hud_lut_string(47, 32, LANGUAGE_ARRAY(textSoundSelect));
-#if MULTILANG
+#ifdef MULTILANG
     print_hud_lut_string(47, 101, LANGUAGE_ARRAY(textLanguageSelect));
 #endif
 
@@ -1866,10 +1864,10 @@ void print_sound_mode_menu_strings(void) {
         print_generic_string_aligned(textX, 87, LANGUAGE_ARRAY(*textSoundModes[mode]), TEXT_ALIGN_CENTER);
     }
 
-#if MULTILANG
+#ifdef MULTILANG
     // In EU, print language mode names
     for (mode = 0, textX = 90; mode < 3; textX += 70, mode++) {
-        if (mode == LANGUAGE_FUNCTION) {
+        if (mode == sLanguageMode) {
             gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
         } else {
             gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);

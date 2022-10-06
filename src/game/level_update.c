@@ -19,7 +19,7 @@
 #include "ingame_menu.h"
 #include "obj_behaviors.h"
 #include "save_file.h"
-#if MULTILANG
+#ifdef MULTILANG
 #include "memory.h"
 #include "eu_translation.h"
 #include "segment_symbols.h"
@@ -1257,7 +1257,7 @@ s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 unused) {
     return (initOrUpdate ? update_level() : init_level());
 }
 
-#if MULTILANG
+#ifdef MULTILANG
 void load_language_text(void) {
     switch (gInGameLanguage - 1) {
         case LANGUAGE_ENGLISH:
@@ -1274,7 +1274,7 @@ void load_language_text(void) {
 #endif
 
 s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
-#if MULTILANG
+#ifdef MULTILANG
     gInGameLanguage = eu_get_language()+1;
     load_language_text();
 #endif

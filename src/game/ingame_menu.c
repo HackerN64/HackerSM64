@@ -26,18 +26,13 @@
 #include "puppycam2.h"
 #include "main.h"
 
-#ifdef VERSION_EU
-#undef LANGUAGE_FUNCTION
-#define LANGUAGE_FUNCTION gInGameLanguage
-#endif
-
 u16 gDialogColorFadeTimer;
 s8 gLastDialogLineNum;
 s32 gDialogVariable;
 u16 gDialogTextAlpha;
 s8 gRedCoinsCollected;
 
-#if MULTILANG
+#ifdef MULTILANG
 #define seg2_course_name_table course_name_table_eu_en
 #define seg2_act_name_table act_name_table_eu_en
 #define seg2_dialog_table dialog_table_eu_en
@@ -48,7 +43,7 @@ s16 gLoadedLanguage = LANGUAGE_ENGLISH;
 
 void *languageTable[][3] = {
     {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table}, // In EU, this is just mirroring English.
-#if MULTILANG
+#ifdef MULTILANG
     {&dialog_table_eu_en, &course_name_table_eu_en, &act_name_table_eu_en},
     {&dialog_table_eu_fr, &course_name_table_eu_fr, &act_name_table_eu_fr},
     {&dialog_table_eu_de, &course_name_table_eu_de, &act_name_table_eu_de},

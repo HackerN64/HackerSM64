@@ -4,7 +4,7 @@
 #define DEFINE_DIALOG(id, _1, _2, _3, _4, str) \
     static const u8 dialog_text_ ## id[] = { str };
 
-#include "dialogs.h"
+#include DIALOG_FILE
 
 #undef DEFINE_DIALOG
 #define DEFINE_DIALOG(id, voice, linesPerBox, leftOffset, width, _) \
@@ -12,13 +12,13 @@
         voice, linesPerBox, leftOffset, width, dialog_text_ ## id \
     };
 
-#include "dialogs.h"
+#include DIALOG_FILE
 
 #undef DEFINE_DIALOG
 #define DEFINE_DIALOG(id, _1, _2, _3, _4, _5) &dialog_entry_ ## id,
 
 const struct DialogEntry *const seg2_dialog_table[] = {
-#include "dialogs.h"
+#include DIALOG_FILE
     NULL
 };
 
@@ -49,7 +49,7 @@ const struct DialogEntry *const seg2_dialog_table[] = {
 #define EXTRA_TEXT(id, str) \
     static const u8 extra_text_ ## id[] = { str };
 
-#include "courses.h"
+#include COURSE_FILE
 
 #undef COURSE_ACTS
 #undef EXTRA_TEXT
@@ -60,6 +60,6 @@ const struct DialogEntry *const seg2_dialog_table[] = {
 #define EXTRA_TEXT(id, str) extra_text_ ## id,
 
 const u8 *const seg2_act_name_table[] = {
-#include "courses.h"
+#include COURSE_FILE
     NULL
 };

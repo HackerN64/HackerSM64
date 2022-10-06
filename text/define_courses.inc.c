@@ -9,7 +9,7 @@
 
 #define EXTRA_TEXT(id, str)
 
-#include "courses.h"
+#include COURSE_FILE
 
 #undef COURSE_ACTS
 #undef SECRET_STAR
@@ -20,7 +20,7 @@
 #define CASTLE_SECRET_STARS(str) GLUE2(COURSE_TABLE, _castle_secret_stars),
 
 const u8 *const COURSE_TABLE[] = {
-#include "courses.h"
+#include COURSE_FILE
     NULL
 };
 

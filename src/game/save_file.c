@@ -716,7 +716,7 @@ void save_file_move_cap_to_default_location(void) {
     }
 }
 
-#if MULTILANG
+#ifdef MULTILANG
 void eu_set_language(u16 language) {
     gSaveBuffer.menuData.language = language;
     gMainMenuDataModified = TRUE;

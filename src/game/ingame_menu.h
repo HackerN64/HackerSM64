@@ -2,6 +2,7 @@
 #define INGAME_MENU_H
 
 #include <PR/ultratypes.h>
+#include "types.h"
 
 enum MenuMtxPushOp {
     MENU_MTX_NONE,

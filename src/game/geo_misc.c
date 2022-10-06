@@ -190,12 +190,12 @@ Gfx *geo_exec_cake_end_screen(s32 callContext, struct GraphNode *node, UNUSED Ma
         displayListHead = displayList;
 
         SET_GRAPH_NODE_LAYER(generatedNode->fnNode.node.flags, LAYER_OPAQUE);
-#if MULTILANG
+#ifdef MULTILANG
         gSPDisplayList(displayListHead++, dl_cake_end_screen);
 #else
         gSPDisplayList(displayListHead++, dl_proj_mtx_fullscreen);
 #endif
-#if MULTILANG
+#ifdef MULTILANG
 #ifdef EU_CUSTOM_CAKE_FIX
     gSPDisplayList(displayListHead++, dl_cake_end_screen_eu_fix);
 #else

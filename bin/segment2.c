@@ -5,8 +5,6 @@
 #include "macros.h"
 #include "types.h"
 #include "game/ingame_menu.h"
-#include "sounds.h"
-#include "seq_ids.h"
 
 #include "make_const_nonconst.h"
 
@@ -1978,7 +1976,14 @@ const Texture *const main_hud_camera_lut[] = {
     texture_hud_char_arrow_up, texture_hud_char_arrow_down,
 };
 
+#include "sounds.h"
+#include "seq_ids.h"
+
+#define DIALOG_FILE "us/dialogs.h"
+#define COURSE_FILE "us/courses.h"
 #include "text/define_text.inc.c"
+#undef DIALOG_FILE
+#undef COURSE_FILE
 
 // 0x0200EC60 - 0x0200EC98
 const Gfx dl_hud_img_begin[] = {
