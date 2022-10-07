@@ -1163,7 +1163,19 @@ void fill_function_stack_trace(OSThread *thread) {
 extern void audio_signal_game_loop_tick(void);
 extern void stop_sounds_in_continuous_banks(void);
 extern struct SequenceQueueItem sBackgroundMusicQueue[6];
+
+void play_crash_sound(struct CrashScreen *crashScreen, s32 sound) {
+    crashScreen->thread.priority = 15;
+    stop_sounds_in_continuous_banks();
+    stop_background_music(sBackgroundMusicQueue[0].seqId);
+    audio_signal_game_loop_tick();
+    crash_screen_sleep(200);
+    play_sound(sound, gGlobalSoundSource);
+    audio_signal_game_loop_tick();
+    crash_screen_sleep(200);
+}
 #endif
+
 extern void read_controller_inputs(s32 threadID);
 
 #ifdef CRASH_SCREEN_CRASH_SCREEN
@@ -1180,14 +1192,7 @@ void thread20_crash_screen_crash_screen(UNUSED void *arg) {
             thread = get_crashed_thread();
             if (thread) {
  #ifdef FUNNY_CRASH_SOUND
-                gCrashScreen2.thread.priority = 15;
-                stop_sounds_in_continuous_banks();
-                stop_background_music(sBackgroundMusicQueue[0].seqId);
-                audio_signal_game_loop_tick();
-                crash_screen_sleep(200);
-                play_sound(SOUND_MARIO_MAMA_MIA, gGlobalSoundSource);
-                audio_signal_game_loop_tick();
-                crash_screen_sleep(200);
+                play_crash_sound(&gCrashScreen2, SOUND_MARIO_MAMA_MIA);
  #endif
                 crash_screen_reset_framebuffer(FALSE);
                 draw_crashed_image_i4();
@@ -1228,27 +1233,20 @@ void thread2_crash_screen(UNUSED void *arg) {
 
             thread = get_crashed_thread();
             if (thread) {
-#ifdef INCLUDE_DEBUG_MAP
-                map_data_init();
-                fill_function_stack_trace(thread);
+#ifdef FUNNY_CRASH_SOUND
+                play_crash_sound(&gCrashScreen, SOUND_MARIO_WAAAOOOW);
 #endif
                 // Default to the assert page if the crash was caused by an assert.
                 if (thread->context.cause == EXC_SYSCALL) {
                     sCrashPage = PAGE_ASSERTS;
                 }
                 sSelectedAddress = thread->context.pc;
+#ifdef INCLUDE_DEBUG_MAP
+                map_data_init();
+                fill_function_stack_trace(thread);
+#endif
 #ifdef CRASH_SCREEN_CRASH_SCREEN
                 crash_screen_crash_screen_init();
-#endif
-#ifdef FUNNY_CRASH_SOUND
-                gCrashScreen.thread.priority = 15;
-                stop_sounds_in_continuous_banks();
-                stop_background_music(sBackgroundMusicQueue[0].seqId);
-                audio_signal_game_loop_tick();
-                crash_screen_sleep(200);
-                play_sound(SOUND_MARIO_WAAAOOOW, gGlobalSoundSource);
-                audio_signal_game_loop_tick();
-                crash_screen_sleep(200);
 #endif
             }
         } else {
