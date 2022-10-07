@@ -204,8 +204,8 @@ enum EuLanguages {
     LANGUAGE_GERMAN
 };
 
-void eu_set_language(u16 language);
-u32 eu_get_language(void);
+void multilang_set_language(u16 language);
+u32 multilang_get_language(void);
 #else
 #define LANGUAGE_ENGLISH 0
 #endif

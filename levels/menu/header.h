@@ -40,9 +40,9 @@ extern const Collision main_menu_seg7_collision[];
 extern const Gfx dl_menu_texture_course_upper[];
 extern const Gfx dl_menu_texture_niveau_upper[];
 extern const Gfx dl_menu_texture_kurs_upper[];
-extern const u8 eu_course_strings_en_table[];
-extern const u8 eu_course_strings_fr_table[];
-extern const u8 eu_course_strings_de_table[];
+extern const u8 course_strings_en_table[];
+extern const u8 course_strings_fr_table[];
+extern const u8 course_strings_de_table[];
 #endif
 
 // script

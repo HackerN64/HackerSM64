@@ -717,13 +717,13 @@ void save_file_move_cap_to_default_location(void) {
 }
 
 #ifdef MULTILANG
-void eu_set_language(u16 language) {
+void multilang_set_language(u16 language) {
     gSaveBuffer.menuData.language = language;
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
 }
 
-u32 eu_get_language(void) {
+u32 multilang_get_language(void) {
     return gSaveBuffer.menuData.language;
 }
 #endif

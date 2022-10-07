@@ -47,7 +47,7 @@ extern s16 seg2_painting_triangle_mesh[];
 extern s16 seg2_painting_mesh_neighbor_tris[];
 extern struct AsciiCharLUTEntry main_hud_lut[];
 extern struct Utf8LUT main_hud_utf8_lut;
-extern Texture texture_hud_char_umlaut;
+extern Texture texture_hud_char_umlaut[];
 extern Gfx dl_hud_img_load_tex_block[];
 extern Gfx dl_hud_img_begin[];
 extern Gfx dl_hud_img_end[];

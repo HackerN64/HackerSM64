@@ -17,7 +17,7 @@
 #undef DEFINE_DIALOG
 #define DEFINE_DIALOG(id, _1, _2, _3, _4, _5) &dialog_entry_ ## id,
 
-const struct DialogEntry *const seg2_dialog_table[] = {
+const struct DialogEntry *const DIALOG_TABLE[] = {
 #include DIALOG_FILE
     NULL
 };
@@ -28,7 +28,6 @@ const struct DialogEntry *const seg2_dialog_table[] = {
 // The game duplicates this in levels/menu/leveldata.c in EU, so we split
 // it out into a separate include file.
 
-#define COURSE_TABLE seg2_course_name_table
 #include "define_courses.inc.c"
 
 // == acts ==
@@ -59,7 +58,7 @@ const struct DialogEntry *const seg2_dialog_table[] = {
     act_name_ ## id ## _4, act_name_ ## id ## _5, act_name_ ## id ## _6,
 #define EXTRA_TEXT(id, str) extra_text_ ## id,
 
-const u8 *const seg2_act_name_table[] = {
+const u8 *const ACT_NAME_TABLE[] = {
 #include COURSE_FILE
     NULL
 };

@@ -21,13 +21,6 @@
 #include "game/rumble_init.h"
 #include "sm64.h"
 
-#include "eu_translation.h"
-#ifdef MULTILANG
-s8 sLanguageMode = LANGUAGE_ENGLISH;
-#endif
-
-extern void *languageTable[][3];
-
 /**
  * @file file_select.c
  * This file implements how the file select and it's menus render and function.
@@ -803,8 +796,8 @@ void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
                     if (soundModeButton->oMenuButtonActionPhase == SOUND_MODE_PHASE_MAIN) {
                         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource);
                         sMainMenuButtons[buttonID]->oMenuButtonState = MENU_BUTTON_STATE_ZOOM_IN_OUT;
-                        sLanguageMode = buttonID - MENU_BUTTON_LANGUAGE_MIN;
-                        eu_set_language(sLanguageMode);
+                        gInGameLanguage = buttonID - MENU_BUTTON_LANGUAGE_MIN;
+                        multilang_set_language(gInGameLanguage);
                     }
                 }
                 // If neither of the buttons above are pressed, return to main menu
@@ -1331,6 +1324,14 @@ langarray_t *textSoundModes[] = {
     &textSoundModeHeadset
 };
 
+#ifdef MULTILANG
+langarray_t textOption = LANGUAGE_TEXT(
+    "OPTION",
+    "OPTION",
+    "OPTIONEN",
+    ""); // no japanese translation
+#endif
+
 /**
  * Prints main menu strings that shows on the yellow background menu screen.
  *
@@ -1342,7 +1343,7 @@ void print_main_menu_strings(void) {
     // Print "SELECT FILE" text
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
-    print_hud_lut_string_aligned(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textSelectFile), TEXT_ALIGN_CENTER);
+    print_hud_lut_string_aligned(SCREEN_CENTER_X, 35, LANGUAGE_ARRAY(textSelectFile), TEXT_ALIGN_CENTER);
     // Print file star counts
     print_save_file_star_count(SAVE_FILE_A, 92, 78);
     print_save_file_star_count(SAVE_FILE_B, 209, 78);
@@ -1355,7 +1356,11 @@ void print_main_menu_strings(void) {
     print_generic_string_aligned(67, 39, LANGUAGE_ARRAY(textScore), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(130, 39, LANGUAGE_ARRAY(textCopy), TEXT_ALIGN_CENTER);
     print_generic_string_aligned(191, 39, LANGUAGE_ARRAY(textErase), TEXT_ALIGN_CENTER);
+#ifdef MULTILANG
+    print_generic_string_aligned(253, 39, LANGUAGE_ARRAY(textOption), TEXT_ALIGN_CENTER);
+#else
     print_generic_string_aligned(253, 39, LANGUAGE_ARRAY(*textSoundModes[sSoundMode]), TEXT_ALIGN_CENTER);
+#endif
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     // Print file names
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_begin);
@@ -1386,10 +1391,10 @@ void score_menu_display_message(s8 messageID) {
 
     switch (messageID) {
         case SCORE_MSG_CHECK_FILE:
-            print_hud_lut_string_fade(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textCheckFile), TEXT_ALIGN_CENTER);
+            print_hud_lut_string_fade(SCREEN_CENTER_X, 35, LANGUAGE_ARRAY(textCheckFile), TEXT_ALIGN_CENTER);
             break;
         case SCORE_MSG_NOSAVE_DATA:
-            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
+            print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
             break;
     }
 }
@@ -1502,22 +1507,22 @@ void copy_menu_display_message(s8 messageID) {
     switch (messageID) {
         case COPY_MSG_MAIN_TEXT:
             if (sAllFilesExist) {
-                print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoFileToCopyFrom), TEXT_ALIGN_CENTER);
+                print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textNoFileToCopyFrom), TEXT_ALIGN_CENTER);
             } else {
-                print_hud_lut_string_fade(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textCopyFile), TEXT_ALIGN_CENTER);
+                print_hud_lut_string_fade(SCREEN_CENTER_X, 35, LANGUAGE_ARRAY(textCopyFile), TEXT_ALIGN_CENTER);
             }
             break;
         case COPY_MSG_COPY_WHERE:
-            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textCopyItToWhere), TEXT_ALIGN_CENTER);
+            print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textCopyItToWhere), TEXT_ALIGN_CENTER);
             break;
         case COPY_MSG_NOSAVE_EXISTS:
-            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
+            print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
             break;
         case COPY_MSG_COPY_COMPLETE:
-            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textCopyCompleted), TEXT_ALIGN_CENTER);
+            print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textCopyCompleted), TEXT_ALIGN_CENTER);
             break;
         case COPY_MSG_SAVE_EXISTS:
-            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textSavedDataExists), TEXT_ALIGN_CENTER);
+            print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textSavedDataExists), TEXT_ALIGN_CENTER);
             break;
     }
 }
@@ -1712,21 +1717,21 @@ void erase_menu_display_message(s8 messageID) {
     char str[50];
     switch (messageID) {
         case ERASE_MSG_MAIN_TEXT:
-            print_hud_lut_string_fade(SCREEN_WIDTH/2, 35, LANGUAGE_ARRAY(textEraseFile), TEXT_ALIGN_CENTER);
+            print_hud_lut_string_fade(SCREEN_CENTER_X, 35, LANGUAGE_ARRAY(textEraseFile), TEXT_ALIGN_CENTER);
             break;
         case ERASE_MSG_PROMPT:
             print_generic_string_fade(90, 190, LANGUAGE_ARRAY(textSure), TEXT_ALIGN_LEFT);
             print_erase_menu_prompt(90, 190); // YES NO, has functions for it too
             break;
         case ERASE_MSG_NOSAVE_EXISTS:
-            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
+            print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textNoSavedDataExists), TEXT_ALIGN_CENTER);
             break;
         case ERASE_MSG_MARIO_ERASED:
             string_insert_file_letter(str, LANGUAGE_ARRAY(textMarioXJustErased), sSelectedFileIndex);
-            print_generic_string_fade(SCREEN_WIDTH/2, 190, str, TEXT_ALIGN_CENTER);
+            print_generic_string_fade(SCREEN_CENTER_X, 190, str, TEXT_ALIGN_CENTER);
             break;
         case ERASE_MSG_SAVE_EXISTS: // unused
-            print_generic_string_fade(SCREEN_WIDTH/2, 190, LANGUAGE_ARRAY(textSavedDataExists), TEXT_ALIGN_CENTER);
+            print_generic_string_fade(SCREEN_CENTER_X, 190, LANGUAGE_ARRAY(textSavedDataExists), TEXT_ALIGN_CENTER);
             break;
     }
 }
@@ -1821,7 +1826,7 @@ langarray_t textSoundSelect = LANGUAGE_TEXT(
 langarray_t textLanguageSelect = LANGUAGE_TEXT(
     "LANGUAGE SELECT",
     "SELECTION LANGUE",
-    "WwHLE SPRACHE",
+    "WÄHLE SPRACHE",
     ""); // no japanese translation
 
 langarray_t textLanguage = {
@@ -1830,7 +1835,13 @@ langarray_t textLanguage = {
     "DEUTSCH",
     "", // no japanese translation
 };
+
+#define SOUND_LABEL_Y 141
+#else
+#define SOUND_LABEL_Y 87
 #endif
+
+#define OPTION_LABEL_SPACING 74
 
 /**
  * Prints sound mode menu strings that shows on the purple background menu screen.
@@ -1855,19 +1866,19 @@ void print_sound_mode_menu_strings(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
 
     // Print sound mode names
-    for (mode = 0, textX = 90; mode < 3; textX += 70, mode++) {
+    for (mode = 0, textX = SCREEN_CENTER_X - OPTION_LABEL_SPACING; mode < 3; textX += OPTION_LABEL_SPACING, mode++) {
         if (mode == sSoundMode) {
             gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
         } else {
             gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
         }
-        print_generic_string_aligned(textX, 87, LANGUAGE_ARRAY(*textSoundModes[mode]), TEXT_ALIGN_CENTER);
+        print_generic_string_aligned(textX, SOUND_LABEL_Y, LANGUAGE_ARRAY(*textSoundModes[mode]), TEXT_ALIGN_CENTER);
     }
 
 #ifdef MULTILANG
     // In EU, print language mode names
-    for (mode = 0, textX = 90; mode < 3; textX += 70, mode++) {
-        if (mode == sLanguageMode) {
+    for (mode = 0, textX = SCREEN_CENTER_X - OPTION_LABEL_SPACING; mode < 3; textX += OPTION_LABEL_SPACING, mode++) {
+        if (mode == gInGameLanguage) {
             gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, sTextBaseAlpha);
         } else {
             gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, sTextBaseAlpha);
@@ -1982,7 +1993,13 @@ extern langarray_t textMyScore;
 void print_save_file_scores(s8 fileIndex) {
     u32 i;
     char str[20];
-    void **levelNameTable = segmented_to_virtual(languageTable[gInGameLanguage][1]);
+
+#ifndef MULTILANG
+    void **levelNameTable = segmented_to_virtual(seg2_course_name_table);
+#else
+    void ***levelNameLanguageTable = segmented_to_virtual(course_strings_language_table);
+    void **levelNameTable = segmented_to_virtual(levelNameLanguageTable[gInGameLanguage]);
+#endif
 
     // Print file name at top
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);

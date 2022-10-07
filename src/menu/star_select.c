@@ -4,7 +4,6 @@
 #include "behavior_data.h"
 #include "engine/behavior_script.h"
 #include "engine/graph_node.h"
-#include "eu_translation.h"
 #include "game/area.h"
 #include "game/game_init.h"
 #include "game/ingame_menu.h"
@@ -221,7 +220,7 @@ void print_course_number(void) {
 
 #ifdef MULTILANG
     // Change upper part of the wood texture depending of the language defined
-    switch (eu_get_language()) {
+    switch (multilang_get_language()) {
         case LANGUAGE_ENGLISH:
             gSPDisplayList(gDisplayListHead++, dl_menu_texture_course_upper);
             break;
@@ -241,7 +240,7 @@ void print_course_number(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
 
     sprintf(courseNum, "%d", gCurrCourseNum);
-    print_hud_lut_string_aligned(SCREEN_WIDTH/2, 158, courseNum, TEXT_ALIGN_CENTER);
+    print_hud_lut_string_aligned(SCREEN_CENTER_X, 158, courseNum, TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
@@ -255,9 +254,9 @@ langarray_t textActMyScore = LANGUAGE_TEXT(
  * Print act selector strings, some with special checks.
  */
 void print_act_selector_strings(void) {
-    char **levelNameTbl = segmented_to_virtual(seg2_course_name_table);
+    char **levelNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][1]);
     char *currLevelName = segmented_to_virtual(levelNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum)]);
-    char **actNameTbl = segmented_to_virtual(seg2_act_name_table);
+    char **actNameTbl = segmented_to_virtual(languageTable[gInGameLanguage][2]);
     char *selectedActName;
     s8 i;
 
@@ -276,7 +275,7 @@ void print_act_selector_strings(void) {
         print_generic_string_aligned(145, 118, LANGUAGE_ARRAY(textActMyScore), TEXT_ALIGN_RIGHT);
     }
 
-    print_generic_string_aligned(SCREEN_WIDTH/2, 33, currLevelName + 3, TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_CENTER_X, 33, currLevelName + 3, TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
@@ -288,14 +287,14 @@ void print_act_selector_strings(void) {
     if (sVisibleStars != 0) {
         selectedActName = segmented_to_virtual(actNameTbl[COURSE_NUM_TO_INDEX(gCurrCourseNum) * 6 + sSelectedActIndex]);
 
-        print_menu_generic_string_aligned(SCREEN_WIDTH/2, 81, selectedActName, TEXT_ALIGN_CENTER);
+        print_menu_generic_string_aligned(SCREEN_CENTER_X, 81, selectedActName, TEXT_ALIGN_CENTER);
     }
 
     // Print the numbers above each star.
     for (i = 1; i <= sVisibleStars; i++) {
         char str[4];
         sprintf(str, "%d", i);
-        print_menu_generic_string_aligned(SCREEN_WIDTH/2 + (i*2 - sVisibleStars - 1) * 17, 38, str, TEXT_ALIGN_CENTER);
+        print_menu_generic_string_aligned(SCREEN_CENTER_X + (i*2 - sVisibleStars - 1) * 17, 38, str, TEXT_ALIGN_CENTER);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_menu_ia8_text_end);

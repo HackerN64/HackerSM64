@@ -21,7 +21,6 @@
 #include "save_file.h"
 #ifdef MULTILANG
 #include "memory.h"
-#include "eu_translation.h"
 #include "segment_symbols.h"
 #endif
 #include "level_table.h"
@@ -1259,7 +1258,7 @@ s32 lvl_init_or_update(s16 initOrUpdate, UNUSED s32 unused) {
 
 #ifdef MULTILANG
 void load_language_text(void) {
-    switch (gInGameLanguage - 1) {
+    switch (gInGameLanguage) {
         case LANGUAGE_ENGLISH:
             load_segment_decompress(SEGMENT_EU_TRANSLATION, _translation_en_yay0SegmentRomStart, _translation_en_yay0SegmentRomEnd);
             break;
@@ -1275,7 +1274,7 @@ void load_language_text(void) {
 
 s32 lvl_init_from_save_file(UNUSED s16 initOrUpdate, s32 levelNum) {
 #ifdef MULTILANG
-    gInGameLanguage = eu_get_language()+1;
+    gInGameLanguage = multilang_get_language();
     load_language_text();
 #endif
     sWarpDest.type = WARP_TYPE_NOT_WARPING;

@@ -34,6 +34,7 @@ extern s8 gHudFlash;
 
 extern s8 gDialogCourseActNum;
 extern s16 gInGameLanguage;
+extern void *languageTable[][3];
 
 struct AsciiCharLUTEntry {
     const Texture *texture;
@@ -65,7 +66,7 @@ struct DiacriticLUTEntry {
     const Texture *texture;
 };
 
-enum GenericTextDiacriticMarks {
+enum TextDiacriticMarks {
     TEXT_DIACRITIC_NONE,
     TEXT_DIACRITIC_GRAVE,
     TEXT_DIACRITIC_GRAVE_UPPERCASE,
@@ -85,8 +86,8 @@ enum TextAlignments {
     TEXT_ALIGN_RIGHT,
 };
 
-#define GENERIC_TEXT_PACKED 0x8000
-#define GENERIC_TEXT_DIACRITIC_MASK 0x7FFF
+#define TEXT_FLAG_PACKED 0x8000
+#define TEXT_DIACRITIC_MASK 0x7FFF
 
 struct DialogEntry {
     /*0x00*/ s32 voice;
@@ -106,9 +107,19 @@ enum DialogResponseDefines {
 };
 
 // Macro to create an array of all 4 languages' versions of a string.
+#ifdef MULTILANG
+
 typedef char * langarray_t[4];
 #define LANGUAGE_TEXT(english, french, german, japanese) {english, french, german, japanese}
-#define LANGUAGE_ARRAY(cmd) ((cmd)[0])
+#define LANGUAGE_ARRAY(cmd) ((cmd)[gInGameLanguage])
+
+#else
+
+typedef char * langarray_t;
+#define LANGUAGE_TEXT(english, french, german, japanese) english
+#define LANGUAGE_ARRAY(cmd) (cmd)
+
+#endif
 
 extern s32 gDialogResponse;
 extern u16 gDialogColorFadeTimer;

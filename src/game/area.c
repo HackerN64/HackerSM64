@@ -85,13 +85,11 @@ Vp gViewport = { {
     { 640, 480, 511, 0 },
 } };
 
-#ifdef MULTILANG
-const char *gNoControllerMsg[] = {
+langarray_t gNoControllerMsg = LANGUAGE_TEXT(
     "NO CONTROLLER",
     "MANETTE DEBRANCHEE",
     "CONTROLLER FEHLT",
-};
-#endif
+    ""); // no japanese translation
 
 void override_viewport_and_clip(Vp *vpOverride, Vp *vpClip, Color red, Color green, Color blue) {
     RGBA16 color = ((red >> 3) << IDX_RGBA16_R) | ((green >> 3) << IDX_RGBA16_G) | ((blue >> 3) << IDX_RGBA16_B) | MSK_RGBA16_A;
@@ -111,16 +109,9 @@ void set_warp_transition_rgb(Color red, Color green, Color blue) {
 }
 
 void print_intro_text(void) {
-#ifdef MULTILANG
-    s32 language = eu_get_language();
-#endif
     if ((gGlobalTimer & 31) < 20) {
         if (gControllerBits == 0) {
-#ifdef MULTILANG
-            print_text_centered(SCREEN_CENTER_X, 20, gNoControllerMsg[language]);
-#else
-            print_text_centered(SCREEN_CENTER_X, 20, "NO CONTROLLER");
-#endif
+            print_text_centered(SCREEN_CENTER_X, 20, LANGUAGE_ARRAY(gNoControllerMsg));
         } else {
             print_text_centered(60, 38, "PRESS");
             print_text_centered(60, 20, "START");

@@ -1507,6 +1507,10 @@ ALIGNED8 static const Texture texture_menu_font_char_colon[] = {
 #include "levels/menu/main_menu_seg7_colon.ia8.inc.c"
 };
 
+ALIGNED8 const u8 texture_menu_font_char_umlaut[] = {
+#include "levels/menu/main_menu_seg7_umlaut.ia8.inc.c"
+};
+
 const struct AsciiCharLUTEntry menu_font_lut[] = {
     {NULL, 4}, // 32 " "
     {texture_menu_font_char_exclamation, 5}, // 33 "!"
@@ -1606,8 +1610,13 @@ const struct AsciiCharLUTEntry menu_font_lut[] = {
 };
 
 const struct Utf8CharLUTEntry menu_font_utf8_2byte_lut[] = {
+    {0x00C4, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_A}, // Ä
+    {0x00C7, 5, 0, texture_menu_font_char_cedilla}, // Ç
+    {0x00CB, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_E}, // Ë
+    {0x00CF, 5, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_I}, // Ï
+    {0x00D6, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_O}, // Ö
     {0x00D7, 6, 0, texture_menu_font_char_multiply}, // ×
-    {0x00E7, 5, 0, texture_menu_font_char_cedilla}, // ç
+    {0x00DC, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_menu_font_char_U}, // Ü
 };
 
 const struct Utf8CharLUTEntry menu_font_utf8_3byte_lut[] = {
@@ -1731,22 +1740,22 @@ const Gfx dl_menu_ia8_text_end[] = {
 
 // 0x0700BDA0 - 0x0700CDA0
 ALIGNED8 static const Texture texture_menu_course_upper[] = {
-#include "levels/menu/main_menu_seg7_eu.0BDA0.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7_course_upper.rgba16.inc.c"
 };
 
 // 0x0700CDA0 - 0x0700DDA0
 ALIGNED8 static const Texture texture_menu_niveau_upper[] = {
-#include "levels/menu/main_menu_seg7_eu.0CDA0.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7_niveau_upper.rgba16.inc.c"
 };
 
 // 0x0700DDA0 - 0x0700EDA0
 ALIGNED8 static const Texture texture_menu_kurs_upper[] = {
-#include "levels/menu/main_menu_seg7_eu.0DDA0.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7_kurs_upper.rgba16.inc.c"
 };
 
 // 0x0700EDA0 - 0x0700FDA0
 ALIGNED8 static const Texture texture_menu_course_lower[] = {
-#include "levels/menu/main_menu_seg7_eu.0EDA0.rgba16.inc.c"
+#include "levels/menu/main_menu_seg7_course_lower.rgba16.inc.c"
 };
 
 #else
@@ -1855,22 +1864,28 @@ const Collision main_menu_seg7_collision[] = {
 // once since it switches language, so the copies in segment 19 aren't good
 // enough.
 
-#define COURSE_TABLE eu_course_strings_en_table
+#define COURSE_NAME_TABLE course_strings_en_table
 #define COURSE_FILE "us/courses.h"
 #include "text/define_courses.inc.c"
-#undef COURSE_TABLE
+#undef COURSE_NAME_TABLE
 #undef COURSE_FILE
 
-#define COURSE_TABLE eu_course_strings_fr_table
+#define COURSE_NAME_TABLE course_strings_fr_table
 #define COURSE_FILE "fr/courses.h"
 #include "text/define_courses.inc.c"
-#undef COURSE_TABLE
+#undef COURSE_NAME_TABLE
 #undef COURSE_FILE
 
-#define COURSE_TABLE eu_course_strings_de_table
+#define COURSE_NAME_TABLE course_strings_de_table
 #define COURSE_FILE "de/courses.h"
 #include "text/define_courses.inc.c"
-#undef COURSE_TABLE
+#undef COURSE_NAME_TABLE
 #undef COURSE_FILE
+
+const u8 *const course_strings_language_table[] = {
+    &course_strings_en_table,
+    &course_strings_fr_table,
+    &course_strings_de_table
+};
 
 #endif

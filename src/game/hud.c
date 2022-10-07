@@ -17,7 +17,6 @@
 #include "engine/math_util.h"
 #include "puppycam2.h"
 #include "puppyprint.h"
-#include "eu_translation.h"
 
 #include "config.h"
 

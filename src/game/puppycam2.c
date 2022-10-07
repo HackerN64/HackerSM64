@@ -52,65 +52,6 @@ u16 gPuppyVolumeCount = 0;
 struct MemoryPool *gPuppyMemoryPool;
 s32 gPuppyError = 0;
 
-/*
-#define NC_CAMX_EN 				_("Camera X Sensitivity")
-#define NC_CAMY_EN 				_("Camera Y Sensitivity")
-#define NC_INVERTX_EN			_("Invert X Axis")
-#define NC_INVERTY_EN			_("Invert Y Axis")
-#define NC_CAMC_EN 				_("Camera Centre Speed")
-#define NC_ANALOGUE_EN			_("Analogue Camera")
-#define NC_SCHEME_EN			_("Control Scheme")
-#define OPTION_ENABLED_EN 		_("Enabled")
-#define OPTION_DISABLED_EN 		_("Disabled")
-#define OPTION_SCHEME1_EN 		_("Double Tap")
-#define OPTION_SCHEME2_EN 		_("Single Press")
-#define OPTION_SCHEME3_EN 		_("Classic")
-#define OPTION_LANGUAGE_EN 		_("Language")
-#define NC_WIDE_EN	 			_("Widescreen")
-#define NC_HIGHLIGHT_L 			_(">")
-#define NC_HIGHLIGHT_R 			_("<")
-#define NC_BUTTON_EN 			_("Ⓡ: Options")
-#define NC_BUTTON2_EN 			_("Ⓡ: Return")
-#define NC_OPTION_EN 			_("OPTIONS")
-
-#if MULTILANG
-#define NC_CAMX_FR 				_("Sensibilite sur l'axe X")
-#define NC_CAMY_FR 				_("Sensibilite sur l'axe Y")
-#define NC_INVERTX_FR			_("Invertir Axe X")
-#define NC_INVERTY_FR			_("Invertir Axe Y")
-#define NC_CAMC_FR 				_("Vitesse de Centrage")
-#define NC_ANALOGUE_FR			_("Camera Analogue")
-#define NC_SCHEME_FR			_("Control Scheme")
-#define OPTION_ENABLED_FR	    _("Active")
-#define OPTION_DISABLED_FR	    _("Desactive")
-#define OPTION_SCHEME1_FR 		_("Double Tap")
-#define OPTION_SCHEME2_FR 		_("Single Press")
-#define OPTION_SCHEME3_FR 		_("Classic")
-#define OPTION_LANGUAGE_FR 		_("Language")
-#define NC_WIDE_FR	 			_("Widescreen")
-#define NC_BUTTON_FR 			_("Ⓡ: Options")
-#define NC_BUTTON2_FR 			_("Ⓡ: Retournez")
-#define NC_OPTION_FR 			_("OPTIONS")
-
-#define NC_CAMX_DE 				_("Camera X Sensitivity")
-#define NC_CAMY_DE 				_("Camera Y Sensitivity")
-#define NC_INVERTY_DE			_("Invert Y Axis")
-#define NC_INVERTX_DE			_("Invert X Axis")
-#define NC_CAMC_DE 				_("Camera Centre Speed")
-#define NC_ANALOGUE_DE			_("Analogue Camera")
-#define NC_SCHEME_DE			_("Control Scheme")
-#define OPTION_ENABLED_DE 		_("Enabled")
-#define OPTION_DISABLED_DE	    _("Disabled")
-#define OPTION_SCHEME1_DE 		_("Double Tap")
-#define OPTION_SCHEME2_DE 		_("Single Press")
-#define OPTION_SCHEME3_DE 		_("Classic")
-#define OPTION_LANGUAGE_DE 		_("Language")
-#define NC_WIDE_DE	 			_("Widescreen")
-#define NC_BUTTON_DE 			_("Ⓡ: Options")
-#define NC_BUTTON2_DE 			_("Ⓡ: Return")
-#define NC_OPTION_DE 			_("OPTIONS")
-*/
-
 #if defined(VERSION_EU)
 static unsigned char  gPCOptionStringsFR[][64] = {{NC_ANALOGUE_FR}, {NC_CAMX_FR}, {NC_CAMY_FR}, {NC_INVERTX_FR}, {NC_INVERTY_FR}, {NC_CAMC_FR}, {NC_SCHEME_FR}, {NC_WIDE_FR}, {OPTION_LANGUAGE_FR}};
 static unsigned char  gPCOptionStringsDE[][64] = {{NC_ANALOGUE_DE}, {NC_CAMX_DE}, {NC_CAMY_DE}, {NC_INVERTX_DE}, {NC_INVERTY_DE}, {NC_CAMC_DE}, {NC_SCHEME_DE}, {NC_WIDE_DE}, {OPTION_LANGUAGE_DE}};
@@ -144,8 +85,8 @@ static const struct gPCOptionStruct gPCOptions[] = { //If the min and max are 0 
 #ifdef WIDE
     {/*Option Name*/ 7, /*Option Variable*/ &gConfig.widescreen,       /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
 #endif
-#if MULTILANG
-    {/*Option Name*/ 8, /*Option Variable*/ &gInGameLanguage,       /*Option Value Text Start*/ 4, /*Option Minimum*/ 1, /*Option Maximum*/ 3},
+#ifdef MULTILANG
+    {/*Option Name*/ 8, /*Option Variable*/ &gInGameLanguage,       /*Option Value Text Start*/ 4, /*Option Minimum*/ 0, /*Option Maximum*/ 2},
 #endif
     {/*Option Name*/ 0, /*Option Variable*/ &gPuppyCam.options.analogue,       /*Option Value Text Start*/ 0, /*Option Minimum*/ FALSE, /*Option Maximum*/ TRUE},
     {/*Option Name*/ 6, /*Option Variable*/ &gPuppyCam.options.inputType,       /*Option Value Text Start*/ 2, /*Option Minimum*/ 0, /*Option Maximum*/ 2},
@@ -223,9 +164,9 @@ void puppycam_warp(f32 displacementX, f32 displacementY, f32 displacementZ) {
     gPuppyCam.floorY[1]             += displacementY;
 }
 
-#if MULTILANG
+#ifdef MULTILANG
 static void newcam_set_language(void) {
-    switch (gInGameLanguage - 1) {
+    switch (gInGameLanguage) {
     case LANGUAGE_ENGLISH:
         gPCOptionStringsPtr = &gPCOptionStringsEN;
         gPCFlagStringsPtr   = &gPCFlagStringsEN;
@@ -463,13 +404,13 @@ void puppycam_check_pause_buttons(void) {
         play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource);
         if (gPCOptionOpen == 0) {
             gPCOptionOpen = 1;
-#if MULTILANG
+#ifdef MULTILANG
             newcam_set_language();
-            eu_set_language(gInGameLanguage-1);
+            multilang_set_language(gInGameLanguage);
 #endif
         } else {
             gPCOptionOpen = 0;
-#if MULTILANG
+#ifdef MULTILANG
             load_language_text();
 #endif
             puppycam_set_save();

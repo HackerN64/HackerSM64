@@ -72,22 +72,9 @@
 // #define DIALOG_INDICATOR
 
 /**
- * Include the English characters that were missing from US segment2
- * J, Q, V, X, Z, ¨, !, !!, ?, &, %, ., and the beta key.
- * [MAKE SURE TO INCLUDE EU AND JP/SH BASEROMS IN THE REPO TO OBTAIN THE ASSETS]
- * If this is disabled, backup assets will be used.
- */
-// #define COMPLETE_EN_US_SEGMENT2
-
-/**
- * Removes multi-language cake screen.
- */
-#define EU_CUSTOM_CAKE_FIX
-
-/**
  * Adds multiple languages to the game. Just a placeholder for the most part, because it only works with EU, and must be enabled with EU.
  */
-#define MULTILANG
+// #define MULTILANG
 
 /**
  * Prevents infinite death loops by always restoring Mario's health when he's warped to any kind of warp while dead.

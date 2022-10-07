@@ -7,7 +7,6 @@
 #include "course_table.h"
 #include "dialog_ids.h"
 #include "engine/math_util.h"
-#include "eu_translation.h"
 #include "segment_symbols.h"
 #include "game_init.h"
 #include "gfx_dimensions.h"
@@ -32,21 +31,27 @@ s32 gDialogVariable;
 u16 gDialogTextAlpha;
 s8 gRedCoinsCollected;
 
-#ifdef MULTILANG
-#define seg2_course_name_table course_name_table_eu_en
-#define seg2_act_name_table act_name_table_eu_en
-#define seg2_dialog_table dialog_table_eu_en
-#endif
-
 s16 gInGameLanguage = LANGUAGE_ENGLISH;
-s16 gLoadedLanguage = LANGUAGE_ENGLISH;
+
+extern u8 dialog_table_en[];
+extern u8 course_name_table_en[];
+extern u8 act_name_table_en[];
+
+extern u8 dialog_table_fr[];
+extern u8 course_name_table_fr[];
+extern u8 act_name_table_fr[];
+
+extern u8 dialog_table_de[];
+extern u8 course_name_table_de[];
+extern u8 act_name_table_de[];
 
 void *languageTable[][3] = {
-    {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table}, // In EU, this is just mirroring English.
-#ifdef MULTILANG
-    {&dialog_table_eu_en, &course_name_table_eu_en, &act_name_table_eu_en},
-    {&dialog_table_eu_fr, &course_name_table_eu_fr, &act_name_table_eu_fr},
-    {&dialog_table_eu_de, &course_name_table_eu_de, &act_name_table_eu_de},
+#ifndef MULTILANG
+    {&seg2_dialog_table, &seg2_course_name_table, &seg2_act_name_table},
+#else
+    {&dialog_table_en, &course_name_table_en, &act_name_table_en},
+    {&dialog_table_fr, &course_name_table_fr, &act_name_table_fr},
+    {&dialog_table_de, &course_name_table_de, &act_name_table_de},
 #endif
 };
 
@@ -262,9 +267,9 @@ u8 render_generic_unicode_char(char *str, s32 *strPos) {
     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_16b, 1, utf8Entry->texture);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_tex_settings);
 
-    if (utf8Entry->flags & GENERIC_TEXT_DIACRITIC_MASK) {
+    if (utf8Entry->flags & TEXT_DIACRITIC_MASK) {
         struct DiacriticLUTEntry *diacriticLUT = segmented_to_virtual(&main_font_diacritic_lut);
-        struct DiacriticLUTEntry *diacritic = &diacriticLUT[(utf8Entry->flags & GENERIC_TEXT_DIACRITIC_MASK) - 1];
+        struct DiacriticLUTEntry *diacritic = &diacriticLUT[(utf8Entry->flags & TEXT_DIACRITIC_MASK) - 1];
         
         if (diacritic->xOffset | diacritic->yOffset) {
             create_dl_translation_matrix(MENU_MTX_PUSH, diacritic->xOffset, diacritic->yOffset, 0.0f);
@@ -400,7 +405,7 @@ void print_hud_lut_string(s16 x, s16 y, char *str) {
                     xStride = hudLUT[str[strPos] - ' '].kerning;
                 } else {
                     utf8Entry = utf8_lookup(&main_hud_utf8_lut, str, &strPos);
-                    if ((utf8Entry->flags & GENERIC_TEXT_DIACRITIC_MASK) == TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
+                    if ((utf8Entry->flags & TEXT_DIACRITIC_MASK) == TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
                         renderX = curX;
                         renderY = curY - 4;
                         gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, &texture_hud_char_umlaut);
@@ -458,6 +463,15 @@ void print_menu_generic_string(s16 x, s16 y, char *str) {
             default:
                 if (str[strPos] & 0x80) {
                     struct Utf8CharLUTEntry *utf8Entry = utf8_lookup(&menu_font_utf8_lut, str, &strPos);
+
+                    if (utf8Entry->flags & TEXT_DIACRITIC_UMLAUT_UPPERCASE) {
+                        gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, texture_menu_font_char_umlaut);
+                        gDPLoadSync(gDisplayListHead++);
+                        gDPLoadBlock(gDisplayListHead++, G_TX_LOADTILE, 0, 0, 8 * 8 - 1, CALC_DXT(8, G_IM_SIZ_8b_BYTES));
+                        gSPTextureRectangle(gDisplayListHead++, curX << 2, (curY - 4) << 2, (curX + 8) << 2,
+                                            (curY + 4) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                    }
+
                     gDPSetTextureImage(gDisplayListHead++, G_IM_FMT_IA, G_IM_SIZ_8b, 1, utf8Entry->texture);
                     kerning = utf8Entry->kerning;
                 } else {
@@ -1195,7 +1209,7 @@ void do_cutscene_handler(void) {
     gSPDisplayList(gDisplayListHead++, dl_ia_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gCutsceneMsgFade);
 
-    print_generic_string_aligned(SCREEN_WIDTH/2, 13, LANGUAGE_ARRAY(gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
+    print_generic_string_aligned(SCREEN_CENTER_X, 13, LANGUAGE_ARRAY(gEndCutsceneStringsEn[gCutsceneMsgIndex]), TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
@@ -1231,18 +1245,7 @@ void do_cutscene_handler(void) {
 
 // "Dear Mario" message handler
 void print_peach_letter_message(void) {
-#ifdef VERSION_EU
-    void **dialogTable;
-    gInGameLanguage = eu_get_language();
-    switch (gInGameLanguage) {
-        default:
-        case LANGUAGE_ENGLISH: dialogTable = segmented_to_virtual(dialog_table_eu_en); break;
-        case LANGUAGE_FRENCH:  dialogTable = segmented_to_virtual(dialog_table_eu_fr); break;
-        case LANGUAGE_GERMAN:  dialogTable = segmented_to_virtual(dialog_table_eu_de); break;
-    }
-#else
-    void **dialogTable = segmented_to_virtual(seg2_dialog_table);
-#endif
+    void **dialogTable = segmented_to_virtual(languageTable[gInGameLanguage][0]);
     struct DialogEntry *dialog = segmented_to_virtual(dialogTable[gDialogID]);
     char *str = segmented_to_virtual(dialog->str);
 
@@ -1472,7 +1475,7 @@ void render_pause_my_score_coins(void) {
             print_generic_string_aligned(PAUSE_MENU_LEFT_X + 3, PAUSE_MENU_MY_SCORE_Y, LANGUAGE_ARRAY(textMyScore), TEXT_ALIGN_RIGHT);
         }
     } else {
-        print_generic_string_aligned(SCREEN_WIDTH/2, PAUSE_MENU_COURSE_Y, &courseName[3], TEXT_ALIGN_CENTER);
+        print_generic_string_aligned(SCREEN_CENTER_X, PAUSE_MENU_COURSE_Y, &courseName[3], TEXT_ALIGN_CENTER);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
@@ -1612,7 +1615,7 @@ void print_hud_pause_colorful_str(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
-    print_hud_lut_string_aligned(SCREEN_WIDTH/2, 81, "PAUSE", TEXT_ALIGN_CENTER);
+    print_hud_lut_string_aligned(SCREEN_CENTER_X, 81, "PAUSE", TEXT_ALIGN_CENTER);
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
@@ -1832,9 +1835,9 @@ void print_hud_course_complete_string(s8 str) {
     gDPSetEnvColor(gDisplayListHead++, colorFade, colorFade, colorFade, 255);
 
     if (str == HUD_PRINT_HISCORE) {
-        print_hud_lut_string_aligned(SCREEN_WIDTH/2, 36, LANGUAGE_ARRAY(textHudHiScore),      TEXT_ALIGN_CENTER);
+        print_hud_lut_string_aligned(SCREEN_CENTER_X, 36, LANGUAGE_ARRAY(textHudHiScore),      TEXT_ALIGN_CENTER);
     } else { // HUD_PRINT_CONGRATULATIONS
-        print_hud_lut_string_aligned(SCREEN_WIDTH/2, 67, LANGUAGE_ARRAY(textCongratulations), TEXT_ALIGN_CENTER);
+        print_hud_lut_string_aligned(SCREEN_CENTER_X, 67, LANGUAGE_ARRAY(textCongratulations), TEXT_ALIGN_CENTER);
     }
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);

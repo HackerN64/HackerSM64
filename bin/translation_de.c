@@ -8,11 +8,9 @@
 
 #include "make_const_nonconst.h"
 
-// Include text/define_text.inc.c, preprocessed with -I text/de/ to get the
-// right translation strings, with symbols renamed as below.
-#define seg2_course_name_table course_name_table_eu_de
-#define seg2_act_name_table act_name_table_eu_de
-#define seg2_dialog_table dialog_table_eu_de
+#define COURSE_NAME_TABLE course_name_table_de
+#define ACT_NAME_TABLE act_name_table_de
+#define DIALOG_TABLE dialog_table_de
 
 #define DIALOG_FILE "de/dialogs.h"
 #define COURSE_FILE "de/courses.h"

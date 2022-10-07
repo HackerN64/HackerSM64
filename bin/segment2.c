@@ -1410,6 +1410,10 @@ ALIGNED8 static const Texture texture_font_char_us_cedilla_uppercase[] = {
 #include "textures/segment2/font_graphics.cedilla_uppercase.ia4.inc.c"
 };
 
+ALIGNED8 static const Texture texture_font_char_eszett[] = {
+#include "textures/segment2/font_graphics.eszett.ia4.inc.c"
+};
+
 ALIGNED8 static const Texture texture_font_char_diacritic_acute[] = {
 #include "textures/segment2/font_graphics.acute.ia4.inc.c"
 };
@@ -1735,6 +1739,8 @@ const struct Utf8CharLUTEntry main_font_utf8_2byte_lut[] = {
     {0x00DB, 6, TEXT_DIACRITIC_CIRCUMFLEX_UPPERCASE, texture_font_char_us_U}, // Û
     {0x00DC, 6, TEXT_DIACRITIC_UMLAUT_UPPERCASE, texture_font_char_us_U}, // Ü
 
+    {0x00DF, 6, 0, texture_font_char_eszett}, // ß
+
     {0x00E0, 6, TEXT_DIACRITIC_GRAVE, texture_font_char_us_a}, // à
     {0x00E1, 6, TEXT_DIACRITIC_ACUTE, texture_font_char_us_a}, // á
     {0x00E2, 6, TEXT_DIACRITIC_CIRCUMFLEX, texture_font_char_us_a}, // â
@@ -1976,14 +1982,20 @@ const Texture *const main_hud_camera_lut[] = {
     texture_hud_char_arrow_up, texture_hud_char_arrow_down,
 };
 
+#ifndef MULTILANG
 #include "sounds.h"
 #include "seq_ids.h"
+
+#define COURSE_NAME_TABLE seg2_course_name_table
+#define ACT_NAME_TABLE seg2_act_name_table
+#define DIALOG_TABLE seg2_dialog_table
 
 #define DIALOG_FILE "us/dialogs.h"
 #define COURSE_FILE "us/courses.h"
 #include "text/define_text.inc.c"
 #undef DIALOG_FILE
 #undef COURSE_FILE
+#endif
 
 // 0x0200EC60 - 0x0200EC98
 const Gfx dl_hud_img_begin[] = {
