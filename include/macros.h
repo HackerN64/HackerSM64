@@ -98,6 +98,6 @@
 #define STATIC_ASSERT(cond, msg) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #endif
 
-#define FORCE_CRASH { *(vs8*)0 = 0; }
+#define FORCE_CRASH do { *(vs8*)0 = 0; } while (0)
 
 #endif // MACROS_H

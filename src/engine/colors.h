@@ -20,17 +20,17 @@
 #define colorRGB_to_vec3(dst, src    ) vec3_copy((dst), (src)        )
 #define vec3_to_colorRGB(dst, src    ) vec3_copy((dst), (src)        )
 
-#define COPY_RGBA32_TO_COLORRGB(dst, src) {  \
-    (dst)[0] = RGBA32_R(src);                \
-    (dst)[1] = RGBA32_G(src);                \
-    (dst)[2] = RGBA32_B(src);                \
-}
-#define COPY_RGBA32_TO_COLORRGBA(dst, src) { \
-    (dst)[0] = RGBA32_R(src);                \
-    (dst)[1] = RGBA32_G(src);                \
-    (dst)[2] = RGBA32_B(src);                \
-    (dst)[3] = RGBA32_A(src);                \
-}
+#define COPY_RGBA32_TO_COLORRGB(dst, src) do {  \
+    (dst)[0] = RGBA32_R(src);                   \
+    (dst)[1] = RGBA32_G(src);                   \
+    (dst)[2] = RGBA32_B(src);                   \
+} while (0)
+#define COPY_RGBA32_TO_COLORRGBA(dst, src) do { \
+    (dst)[0] = RGBA32_R(src);                   \
+    (dst)[1] = RGBA32_G(src);                   \
+    (dst)[2] = RGBA32_B(src);                   \
+    (dst)[3] = RGBA32_A(src);                   \
+} while (0)
 
 RGBA16 rgba16_blend(RGBA16 a, RGBA16 b, Alpha fac);
 

@@ -396,7 +396,7 @@ void draw_reset_bars(void) {
  */
 void render_init(void) {
 #ifdef DEBUG_FORCE_CRASH_ON_BOOT
-    FORCE_CRASH
+    FORCE_CRASH;
 #endif
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(SEGMENT_RENDER, gGfxPool->buffer);
