@@ -1038,7 +1038,7 @@ void print_small_text(s32 x, s32 y, const char *str, s32 align, s32 amount, u8 f
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 672, 12, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
-        s32 goddamnJMeasure = str[i] == 'j' ? 1 : 0;
+        s32 goddamnJMeasure = str[i] == 'j' ? -1 : 0;
         if (str[i] == '\n') {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
@@ -1155,7 +1155,7 @@ void print_small_text_light(s32 x, s32 y, const char *str, s32 align, s32 amount
     gDPLoadTextureBlock_4b(gDisplayListHead++, (*fontTex)[font], G_IM_FMT_I, 672, 12, (G_TX_NOMIRROR | G_TX_CLAMP), (G_TX_NOMIRROR | G_TX_CLAMP), 0, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
     
     for (s32 i = 0, j = 0; i < textLength; i++, j++) {
-        s32 goddamnJMeasure = str[i] == 'j' ? 1 : 0;
+        s32 goddamnJMeasure = str[i] == 'j' ? -1 : 0;
         if (str[i] == '\n') {
             lines++;
             if (align == PRINT_TEXT_ALIGN_RIGHT) {
