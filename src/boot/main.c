@@ -346,7 +346,11 @@ void thread3_main(UNUSED void *arg) {
         gIsConsole = FALSE;
         gBorderHeight = BORDER_HEIGHT_EMULATOR;
         gIsVC = IS_VC();
-        check_cache_emulation();
+        if (!gIsVC) {
+            check_cache_emulation();
+        } else {
+            gCacheEmulated = FALSE;
+        }
     } else {
         gIsConsole = TRUE;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
