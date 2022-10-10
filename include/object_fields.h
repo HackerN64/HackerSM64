@@ -33,7 +33,6 @@
 #define OBJECT_FIELD_CHAIN_SEGMENT(index) rawData.asChainSegment[index]
 #define OBJECT_FIELD_OBJ(index)           rawData.asObject[index]
 #define OBJECT_FIELD_SURFACE(index)       rawData.asSurface[index]
-#define OBJECT_FIELD_PAINTING(index)      rawData.asPainting[index]
 #define OBJECT_FIELD_VPTR(index)          rawData.asVoidPtr[index]
 #define OBJECT_FIELD_CVPTR(index)         rawData.asConstVoidPtr[index]
 #else
@@ -44,7 +43,6 @@
 #define OBJECT_FIELD_CHAIN_SEGMENT(index) ptrData.asChainSegment[index]
 #define OBJECT_FIELD_OBJ(index)           ptrData.asObject[index]
 #define OBJECT_FIELD_SURFACE(index)       ptrData.asSurface[index]
-#define OBJECT_FIELD_PAINTING(index)      rawData.asPainting[index]
 #define OBJECT_FIELD_VPTR(index)          ptrData.asVoidPtr[index]
 #define OBJECT_FIELD_CVPTR(index)         ptrData.asConstVoidPtr[index]
 #endif
@@ -1257,7 +1255,7 @@
 #define /*0x100*/ oYoshiTargetYaw  OBJECT_FIELD_S32(0x1E)
 
 /* Painting */
-#define /*0x0F4*/ oPaintingPtr                  OBJECT_FIELD_PAINTING(0x1B)
+#define /*0x0F4*/ oPaintingData                 OBJECT_FIELD_CVPTR(0x1B)
 #define /*0x0F8*/ oPaintingGroup                OBJECT_FIELD_S16(0x1C, 0)
 #define /*0x0FA*/ oPaintingId                   OBJECT_FIELD_S16(0x1C, 1)
 #define /*0x1AC*/ oPaintingLocalMarioPosX       OBJECT_FIELD_S16(0x1D, 0)
