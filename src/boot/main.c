@@ -345,7 +345,6 @@ void thread3_main(UNUSED void *arg) {
     if (IO_READ(DPC_CLOCK_REG) == 0) {
         gIsConsole = FALSE;
         gBorderHeight = BORDER_HEIGHT_EMULATOR;
-        gIsVC = IS_VC();
         if (!gIsVC) {
             check_cache_emulation();
         } else {
